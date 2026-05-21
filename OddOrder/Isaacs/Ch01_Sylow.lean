@@ -452,10 +452,106 @@ instance fitting.normal (G : Type*) [Group G] : (fitting G).Normal := by
     rw [heq]
     exact (fitting G).mul_mem hx hy
 
--- TODO **Isaacs Cor 1.28** (Fitting の冪零性 + 最大性).
---   (a) `(fitting G).IsNilpotent` — Lemma 1.27 (iSupIndep + 各 opCore が冪零) + 直積の冪零性.
---   (b) `∀ N : Subgroup G, N.Normal → IsNilpotent N → N ≤ fitting G` — Thm 1.26 で N が
---       Sylow の直積 ⇒ 各 Sylow 特性的 ⇒ G で正規 (Lemma 1.10) ⇒ Problem 1B.2 で opCore ≤ fitting.
+/-- 補助補題: 有限冪零群 `N` では, 各素因数 `p` に対する代表 Sylow 部分群
+`default : Sylow p N` の supremum は `⊤_N` に等しい.
+
+証明骨子: Thm 1.26 で全 Sylow が正規, よって `unique_of_normal` で各素因数につき
+Sylow が 1 つ. `noncommPiCoprod` 経由で `(∀ p ∈ pf(|N|), Sylow p N) →* N` を作り,
+互いに素な p-群より単射 (`independent_of_coprime_order`), 濃度比較で全射 ⇒ range = ⊤.
+range = `⨆ p, ↑(default Sylow)` (by `noncommPiCoprod_range`). -/
+private theorem iSup_default_sylow_eq_top_of_nilpotent
+    (N : Type*) [Group N] [Finite N] [Group.IsNilpotent N] :
+    ⨆ p : (Nat.card N).primeFactors,
+        ((default : Sylow (p : ℕ) N) : Subgroup N) = ⊤ := by
+  classical
+  have hnormal : ∀ {p : ℕ} [Fact p.Prime] (P : Sylow p N), P.Normal := fun P =>
+    Sylow.normal_of_isNilpotent P
+  have _ := Fintype.ofFinite N
+  set ps := (Nat.card N).primeFactors with hps
+  let P : ∀ p, Sylow p N := default
+  have hPfin : ∀ p, Fintype (P p) := fun p ↦ Fintype.ofFinite (P p)
+  have hcomm : Pairwise fun p₁ p₂ : ps =>
+      ∀ x y : N, x ∈ (P p₁ : Subgroup N) → y ∈ (P p₂ : Subgroup N) → Commute x y := by
+    rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
+    haveI hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
+    haveI hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
+    have hne' : p₁ ≠ p₂ := by simpa using hne
+    apply Subgroup.commute_of_normal_of_disjoint _ _ (hnormal (P p₁)) (hnormal (P p₂))
+    exact IsPGroup.disjoint_of_ne p₁ p₂ hne' _ _ (P p₁).isPGroup' (P p₂).isPGroup'
+  -- noncommPiCoprod : (∀ p : ps, P p) →* N
+  set f := Subgroup.noncommPiCoprod (G := N) (H := fun p : ps => (P p : Subgroup N)) hcomm
+    with hf
+  -- f is injective by independent_of_coprime_order
+  have hinj : Function.Injective f := by
+    apply Subgroup.injective_noncommPiCoprod_of_iSupIndep
+    apply Subgroup.independent_of_coprime_order hcomm
+    rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
+    haveI hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
+    haveI hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
+    have hne' : p₁ ≠ p₂ := by simpa using hne
+    simp only [← Nat.card_eq_fintype_card]
+    exact IsPGroup.coprime_card_of_ne p₁ p₂ hne' _ _ (P p₁).isPGroup' (P p₂).isPGroup'
+  -- |∀ p : ps, P p| = |N|
+  have hcard : Fintype.card (∀ p : ps, P p) = Fintype.card N := by
+    simp only [← Nat.card_eq_fintype_card]
+    calc Nat.card (∀ p : ps, P p)
+        = ∏ p : ps, Nat.card (P p) := Nat.card_pi
+      _ = ∏ p : ps, p.1 ^ (Nat.card N).factorization p.1 := by
+          refine Finset.prod_congr rfl ?_
+          rintro ⟨p, hp⟩ _
+          exact @Sylow.card_eq_multiplicity _ _ _ p
+            ⟨Nat.prime_of_mem_primeFactors hp⟩ (P p)
+      _ = ∏ p ∈ ps, p ^ (Nat.card N).factorization p :=
+          Finset.prod_finset_coe (fun p => p ^ (Nat.card N).factorization p) _
+      _ = (Nat.card N).factorization.prod (· ^ ·) := rfl
+      _ = Nat.card N := Nat.prod_factorization_pow_eq_self Nat.card_pos.ne'
+  -- bijective
+  have hbij : Function.Bijective f :=
+    (Fintype.bijective_iff_injective_and_card f).mpr ⟨hinj, hcard⟩
+  -- range = ⊤
+  have hrange : f.range = (⊤ : Subgroup N) :=
+    MonoidHom.range_eq_top.mpr hbij.surjective
+  -- but noncommPiCoprod_range says range = ⨆ i, H i
+  have hrange' : f.range = ⨆ p : ps, (P p : Subgroup N) :=
+    Subgroup.noncommPiCoprod_range
+  rw [hrange'] at hrange
+  exact hrange
+
+/-- **Isaacs Cor 1.28(b)** (Fitting subgroup の最大性).
+任意の正規冪零部分群 `N` は `fitting G` に含まれる.
+
+証明骨子: `N` が冪零 ⇒ `N` の各 Sylow `Q` は `N` で正規 (Thm 1.26) ⇒ `Q` は `N` で
+特性的 (`Sylow.characteristic_of_normal`) ⇒ `N ◁ G` で `Q.map N.subtype ◁ G` (Lemma 1.10).
+これが `p`-部分群なので Problem 1B.2 で `Q.map N.subtype ≤ opCore p G ≤ fitting G`.
+`N` 全体が unique Sylow 達の sup に等しい (`iSup_default_sylow_eq_top_of_nilpotent`) ことから
+`N ≤ fitting G`. -/
+theorem nilpotent_normal_le_fitting [Finite G] {N : Subgroup G} [N.Normal]
+    [Group.IsNilpotent N] : N ≤ fitting G := by
+  -- N 全体 (= ⊤ within Subgroup N, mapped through N.subtype = N) ≤ fitting G
+  have hsup : (⊤ : Subgroup N).map N.subtype = N := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  rw [← hsup, ← iSup_default_sylow_eq_top_of_nilpotent N, Subgroup.map_iSup]
+  refine iSup_le ?_
+  rintro ⟨p, hp⟩
+  haveI hp' : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  -- default : Sylow p N is normal in N
+  have hPN : (default : Sylow p N).Normal := Sylow.normal_of_isNilpotent _
+  -- default Sylow is characteristic in N (unique Sylow ⇒ characteristic)
+  haveI : ((default : Sylow p N) : Subgroup N).Characteristic :=
+    Sylow.characteristic_of_normal _ hPN
+  -- so its image in G is normal (Lemma 1.10)
+  haveI : (((default : Sylow p N) : Subgroup N).map N.subtype).Normal :=
+    normal_of_characteristic_in_normal
+  -- it's a p-subgroup of G
+  have hpGroup : IsPGroup p (((default : Sylow p N) : Subgroup N).map N.subtype) :=
+    (default : Sylow p N).2.map N.subtype
+  -- Problem 1B.2 + opCore ≤ fitting
+  calc ((default : Sylow p N) : Subgroup N).map N.subtype
+      ≤ opCore p G := normal_pgroup_le_opCore hpGroup
+    _ ≤ fitting G := opCore_le_fitting ⟨p, hp'.out⟩ G
+
+-- TODO **Isaacs Cor 1.28(a)** (Fitting の冪零性).
+--   `(fitting G).IsNilpotent` — Lemma 1.27 (iSupIndep + 各 opCore が冪零) + 直積の冪零性.
 
 -- TODO **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).  Cor 1.28 (b) から直結:
 --   K, L 冪零正規 ⇒ K, L ≤ fitting ⇒ KL ≤ fitting (冪零) ⇒ KL 冪零.
