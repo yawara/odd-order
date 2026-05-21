@@ -416,9 +416,107 @@ theorem lt_normalizer_of_isNilpotent_of_lt_top [Group.IsNilpotent G]
     H < Subgroup.normalizer H :=
   normalizerCondition_of_isNilpotent H hH
 
--- TODO Isaacs Lemma 1.23. P p-群, N ◁ P, M ◁ P with N < M ⇒ ∃ L ◁ P, N ≤ L ≤ M, |L:N|=p.
---   Strategy: P/N の正規部分群 M/N に Thm 1.19 (上記の `IsPGroup.normal_inf_center_nontrivial`)
---   を適用. (M/N) ∩ Z(P/N) ≠ {1} から位数 p の中心元を取り pull back. 中継部分が30行超.
+/-- **Isaacs Lemma 1.23**.  `P` を有限 `p`-群, `N, M ⊴ P` で `N < M` ならば,
+ある `L ⊴ P` が存在して `N < L`, `L ≤ M`, かつ `N.relIndex L = p`.
+
+証明: `M.map (mk' N) ⊴ P/N` は非自明 (`N < M`).  `P/N` は finite p-群なので
+Thm 1.19 で `M.map (mk' N) ⊓ Z(P/N)` も非自明. Cauchy で位数 `p` の元 `y` を取り,
+`zpowers y ≤ Z(P/N)` ゆえ `P/N` で正規.  `L := (zpowers y).comap (mk' N)` が
+条件 (`N < L ≤ M`, `relIndex = p`) を満たす. -/
+theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
+    {N M : Subgroup P} [N.Normal] [M.Normal] (hNM : N < M) :
+    ∃ L : Subgroup P, L.Normal ∧ N < L ∧ L ≤ M ∧ N.relIndex L = p := by
+  -- P/N も p-群
+  haveI hQuot_pgroup : IsPGroup p (P ⧸ N) := hP.to_quotient N
+  -- M.map (mk' N) ⊴ P/N
+  let M' : Subgroup (P ⧸ N) := M.map (QuotientGroup.mk' N)
+  haveI : M'.Normal := inferInstance
+  -- M' は非自明 (N < M)
+  have hM'_nontriv : Nontrivial M' := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hbot
+    obtain ⟨m, hmM, hmN⟩ := SetLike.exists_of_lt hNM
+    apply hmN
+    have hm_in : QuotientGroup.mk' N m ∈ M' := Subgroup.mem_map.mpr ⟨m, hmM, rfl⟩
+    rw [hbot, Subgroup.mem_bot] at hm_in
+    exact (QuotientGroup.eq_one_iff m).mp hm_in
+  -- Thm 1.19 で M' ⊓ Z(P/N) も非自明.  Quotient is finite.
+  haveI : Finite (P ⧸ N) := Quotient.finite _
+  have hinf_nontriv : Nontrivial ((M' ⊓ Subgroup.center (P ⧸ N) : Subgroup (P ⧸ N))) :=
+    IsPGroup.normal_inf_center_nontrivial hQuot_pgroup hM'_nontriv
+  -- Cauchy: 位数 p の元を取る
+  have h_subgroup_pgroup : IsPGroup p (↥(M' ⊓ Subgroup.center (P ⧸ N))) :=
+    hQuot_pgroup.to_subgroup _
+  obtain ⟨k, hk0, hk_card⟩ := h_subgroup_pgroup.nontrivial_iff_card.mp hinf_nontriv
+  have hp_dvd_inf : p ∣ Nat.card (↥(M' ⊓ Subgroup.center (P ⧸ N))) := by
+    rw [hk_card]; exact dvd_pow_self _ hk0.ne'
+  obtain ⟨ysub, hy_ord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd_inf
+  set y : P ⧸ N := (ysub : P ⧸ N)
+  have hy_M : y ∈ M' := (Subgroup.mem_inf.mp ysub.2).1
+  have hy_Z : y ∈ Subgroup.center (P ⧸ N) := (Subgroup.mem_inf.mp ysub.2).2
+  have hy_order : orderOf y = p := by
+    rw [show y = ((ysub : ↥(M' ⊓ Subgroup.center (P ⧸ N))) : P ⧸ N) from rfl]
+    exact (orderOf_injective ((M' ⊓ Subgroup.center (P ⧸ N)).subtype)
+      Subtype.coe_injective ysub).trans hy_ord
+  -- ⟨y⟩ ≤ Z(P/N), 正規
+  have hzpowers_le_center : Subgroup.zpowers y ≤ Subgroup.center (P ⧸ N) :=
+    Subgroup.zpowers_le.mpr hy_Z
+  haveI hzpowers_normal : (Subgroup.zpowers y).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hn_center := hzpowers_le_center hn
+    rw [Subgroup.mem_center_iff] at hn_center
+    have hgn : g * n = n * g := hn_center g
+    have : g * n * g⁻¹ = n := by rw [hgn, mul_inv_cancel_right]
+    rw [this]; exact hn
+  have hzpowers_le_M' : Subgroup.zpowers y ≤ M' := Subgroup.zpowers_le.mpr hy_M
+  set L : Subgroup P := (Subgroup.zpowers y).comap (QuotientGroup.mk' N) with hL_def
+  refine ⟨L, inferInstance, ?_, ?_, ?_⟩
+  · -- N < L
+    refine lt_of_le_of_ne ?_ ?_
+    · intro x hx
+      rw [hL_def, Subgroup.mem_comap, QuotientGroup.mk'_apply,
+        (QuotientGroup.eq_one_iff x).mpr hx]
+      exact (Subgroup.zpowers y).one_mem
+    · intro heq
+      have hy_eq_one : y = 1 := by
+        obtain ⟨pbar, hpbar⟩ := QuotientGroup.mk'_surjective N y
+        have hpbar_L : pbar ∈ L := by
+          rw [hL_def, Subgroup.mem_comap, hpbar]; exact Subgroup.mem_zpowers y
+        rw [← heq] at hpbar_L
+        rw [← hpbar]; exact (QuotientGroup.eq_one_iff pbar).mpr hpbar_L
+      have hOrder1 : orderOf (1 : P ⧸ N) = p := hy_eq_one ▸ hy_order
+      rw [orderOf_one] at hOrder1
+      exact (Fact.out (p := p.Prime)).one_lt.ne hOrder1
+  · -- L ≤ M
+    intro x hx
+    simp only [hL_def, Subgroup.mem_comap, QuotientGroup.mk'_apply] at hx
+    have hx_M' : QuotientGroup.mk x ∈ M' := hzpowers_le_M' hx
+    obtain ⟨m, hmM, hmEq⟩ := Subgroup.mem_map.mp hx_M'
+    have hmx : (QuotientGroup.mk m : P ⧸ N) = QuotientGroup.mk x := by
+      have := hmEq; simp only [QuotientGroup.mk'_apply] at this; exact this
+    have hinN : m⁻¹ * x ∈ N := QuotientGroup.eq.mp hmx
+    have hmix_M : m⁻¹ * x ∈ M := hNM.le hinN
+    have hxeq : x = m * (m⁻¹ * x) := by group
+    rw [hxeq]; exact M.mul_mem hmM hmix_M
+  · -- N.relIndex L = p
+    have hN_le_L : N ≤ L := by
+      intro x hx
+      rw [hL_def, Subgroup.mem_comap, QuotientGroup.mk'_apply,
+        (QuotientGroup.eq_one_iff x).mpr hx]
+      exact (Subgroup.zpowers y).one_mem
+    have hLidx : L.index = (Subgroup.zpowers y).index :=
+      Subgroup.index_comap_of_surjective (Subgroup.zpowers y) (QuotientGroup.mk'_surjective N)
+    have hLag1 : Nat.card (Subgroup.zpowers y) * (Subgroup.zpowers y).index = Nat.card (P ⧸ N) :=
+      (Subgroup.zpowers y).card_mul_index
+    have hzy_card : Nat.card (Subgroup.zpowers y) = p := by rw [Nat.card_zpowers, hy_order]
+    have hLag2 : N.relIndex L * L.index = N.index := Subgroup.relIndex_mul_index hN_le_L
+    have hN_index : N.index = Nat.card (P ⧸ N) := rfl
+    have h_N_eq : N.index = p * L.index := by rw [hN_index, ← hLag1, hzy_card, hLidx]
+    have h_eq : N.relIndex L * L.index = p * L.index := by rw [hLag2, h_N_eq]
+    haveI : Finite (P ⧸ L) := Quotient.finite _
+    have hL_index_ne_zero : L.index ≠ 0 := Nat.card_pos.ne'
+    exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hL_index_ne_zero) h_eq
 
 /-- **Isaacs Cor 1.24** (弱形).  位数 `p^n` の有限 `p`-群 `G` は, 各 `m ≤ n` に対して
 位数 `p^m` の部分群を持つ.
@@ -875,9 +973,84 @@ theorem sylow_normal_of_card_eq_mul_prime_lt
       exact (Fact.out (p := q.Prime)).one_lt.ne' hq_eq
   exact Sylow.normal_of_subsingleton P
 
--- TODO Thm 1.30 (後半): q ∤ p−1 ならば `G` は巡回群.
---   方針: `Aut(Sylow_p) ≅ (ℤ/p)ˣ = ℤ/(p-1)` への Sylow `q` 共役作用が自明,
---   よって Sylow `p`, `q` 互いに centralize で `G ≃ ℤ/p × ℤ/q ≅ ℤ/pq`.
+/-- **Isaacs Thm 1.30** (後半).  `|G| = p·q` (`q < p` 素), `q ∤ (p − 1)` ⇒ `G` 巡回.
+
+証明 (Isaacs p.31): 前半で Sylow `p` は正規 (一意).  Sylow `q` についても
+`n_q ∣ p` (`Sylow.card_dvd_index`), `n_q ≡ 1 (mod q)` (`card_sylow_modEq_one`).
+`q` 素数なので `n_q ∈ {1, p}`; `n_q = p` ならば `q ∣ p − 1` で仮定矛盾.
+ゆえに Sylow `q` も正規.  Cauchy で位数 `p` の `s ∈ Sylow p`, 位数 `q` の
+`t ∈ Sylow q` を取り, 正規 + 互いに素位数 (disjoint) ⇒ 可換
+(`commute_of_normal_of_disjoint`).  `orderOf (s * t) = pq = |G|`
+(`Commute.orderOf_mul_eq_mul_orderOf_of_coprime`) ⇒ `G` 巡回. -/
+theorem isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
+    [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hqp : q < p) (hcard : Nat.card G = p * q) (hndvd : ¬ q ∣ p - 1) :
+    IsCyclic G := by
+  classical
+  haveI : Finite (Sylow p G) := inferInstance
+  haveI : Finite (Sylow q G) := inferInstance
+  have hpq_ne : p ≠ q := fun h => (Nat.lt_irrefl _ (h ▸ hqp))
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  -- 位数情報
+  have hcop_qp : Nat.Coprime q p := (Nat.coprime_primes hq.out hp.out).mpr hpq_ne.symm
+  have hcop_pq : Nat.Coprime p q := hcop_qp.symm
+  have hcard' : Nat.card G = q * p := by rw [hcard, mul_comm]
+  have hfact_p : (Nat.card G).factorization p = 1 := by
+    rw [hcard, Nat.factorization_mul_apply_of_coprime hcop_pq,
+        hp.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne ((Nat.prime_dvd_prime_iff_eq hp.out hq.out).mp hd))]
+  have hfact_q : (Nat.card G).factorization q = 1 := by
+    rw [hcard', Nat.factorization_mul_apply_of_coprime hcop_qp,
+        hq.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne.symm ((Nat.prime_dvd_prime_iff_eq hq.out hp.out).mp hd))]
+  have hPcard : Nat.card P = p := by rw [P.card_eq_multiplicity, hfact_p, pow_one]
+  have hQcard : Nat.card Q = q := by rw [Q.card_eq_multiplicity, hfact_q, pow_one]
+  have hQindex : (Q : Subgroup G).index = p := by
+    have := (Q : Subgroup G).card_mul_index
+    rw [hQcard, hcard'] at this
+    exact Nat.eq_of_mul_eq_mul_left hq.out.pos this
+  -- Sylow q が一意 (q ∤ p-1 を使う)
+  have hnq_dvd : Nat.card (Sylow q G) ∣ p := hQindex ▸ Sylow.card_dvd_index Q
+  have hnq_mod : Nat.card (Sylow q G) ≡ 1 [MOD q] := card_sylow_modEq_one q G
+  have hnq_pos : 0 < Nat.card (Sylow q G) := Nat.card_pos
+  have hnq_eq : Nat.card (Sylow q G) = 1 := by
+    rcases (Nat.dvd_prime hp.out).mp hnq_dvd with h1 | hp_eq
+    · exact h1
+    · exfalso
+      apply hndvd
+      have : p ≡ 1 [MOD q] := hp_eq ▸ hnq_mod
+      have hp_ge : 1 ≤ p := hp.out.one_lt.le
+      exact (Nat.modEq_iff_dvd' hp_ge).mp this.symm
+  haveI hQsub : Subsingleton (Sylow q G) := by
+    rw [Nat.card_eq_one_iff_unique] at hnq_eq
+    exact hnq_eq.1
+  haveI hPnormal : (↑P : Subgroup G).Normal :=
+    sylow_normal_of_card_eq_mul_prime_lt hqp hcard P
+  haveI hQnormal : (↑Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
+  -- Cauchy で各 Sylow から位数 p / q の元
+  have hPdvd : p ∣ Nat.card (↑P : Subgroup G) := by rw [hPcard]
+  have hQdvd : q ∣ Nat.card (↑Q : Subgroup G) := by rw [hQcard]
+  obtain ⟨s, hs_order⟩ := exists_prime_orderOf_dvd_card' (G := (↑P : Subgroup G)) p hPdvd
+  obtain ⟨t, ht_order⟩ := exists_prime_orderOf_dvd_card' (G := (↑Q : Subgroup G)) q hQdvd
+  set sG : G := (s : G)
+  set tG : G := (t : G)
+  have hsG_orderG : orderOf sG = p := (Subgroup.orderOf_coe s).trans hs_order
+  have htG_orderG : orderOf tG = q := (Subgroup.orderOf_coe t).trans ht_order
+  have hsG_mem : sG ∈ (↑P : Subgroup G) := s.2
+  have htG_mem : tG ∈ (↑Q : Subgroup G) := t.2
+  have hdisjoint : Disjoint (↑P : Subgroup G) (↑Q : Subgroup G) :=
+    IsPGroup.disjoint_of_ne p q hpq_ne _ _ P.isPGroup' Q.isPGroup'
+  have hcomm : Commute sG tG :=
+    Subgroup.commute_of_normal_of_disjoint _ _ hPnormal hQnormal hdisjoint _ _ hsG_mem htG_mem
+  have hcop_orders : Nat.Coprime (orderOf sG) (orderOf tG) := by
+    rw [hsG_orderG, htG_orderG]; exact hcop_pq
+  have horder : orderOf (sG * tG) = p * q := by
+    rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders, hsG_orderG, htG_orderG]
+  have horder_eq : orderOf (sG * tG) = Nat.card G := by rw [horder, hcard]
+  exact isCyclic_of_orderOf_eq_card (sG * tG) horder_eq
 
 /-- **Isaacs Thm 1.31** (`p > q` のとき).  `|G| = p² · q` で `q < p` がともに素数なら,
 Sylow `p`-部分群は正規.
