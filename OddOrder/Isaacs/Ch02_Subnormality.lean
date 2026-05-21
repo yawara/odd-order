@@ -1281,7 +1281,33 @@ theorem subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
 
 end -- 2A
 
-/-! ## §2B – §2D 残り (TODO)
+section /- 2B: Baer's theorem (pp. 55-58) -/
+
+variable {G : Type*} [Group G]
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.12 (Baer)** — 順方向: `H ≤ F(G)` ⇒ ∀x, `⟨H, H^x⟩` 冪零.
+
+`H, H^x ⊆ F(G)` (F(G) ⊴ G で `H^x ⊆ F(G)`), `⟨H, H^x⟩ = H ⊔ H^x ≤ F(G)`,
+F(G) 冪零, subgroup of nilpotent も冪零. 逆方向は Thm 2.11 を要し別途. -/
+theorem baer_sup_conj_isNilpotent_of_le_fitting [Finite G] {H : Subgroup G}
+    (hH : H ≤ fitting G) (x : G) :
+    Group.IsNilpotent ↥(H ⊔ ((MulAut.conj x) • H : Subgroup G)) := by
+  -- MulAut.conj x • F(G) = F(G) (F(G) ⊴ G).
+  have hFnormal : (MulAut.conj x : MulAut G) • (fitting G : Subgroup G) = fitting G :=
+    Subgroup.Normal.conj_smul_eq_self (h := fitting.normal G) x (fitting G)
+  -- H^x ≤ F(G).
+  have hHx_le : ((MulAut.conj x) • H : Subgroup G) ≤ fitting G := by
+    rw [← hFnormal]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hH
+  -- H ⊔ H^x ≤ F(G).
+  have hSup_le : (H ⊔ ((MulAut.conj x) • H : Subgroup G)) ≤ fitting G := sup_le hH hHx_le
+  -- Subgroup of nilpotent F(G) is nilpotent.
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hSup_le)
+
+end -- 2B
+
+/-! ## §2B 残り + §2C / §2D (TODO)
 
 * **Thm 2.12 (Baer)**: `H ≤ F(G) ↔ ⟨H, H^x⟩` 冪零 ∀x. 順方向は trivial, 逆方向は
   Thm 2.11 経由.
