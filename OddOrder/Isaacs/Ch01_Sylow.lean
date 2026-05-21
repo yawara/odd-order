@@ -1184,8 +1184,6 @@ theorem normalSubgroup_index_two_of_card_two_mul_odd
       Nat.mul_div_cancel_left n (by norm_num : (0 : ℕ) < 2)]
   exact hn.neg_one_pow
 
--- TODO Thm 1.36  : |G|=p^a q ⇒ 単純でない.
-
 end -- 1E
 
 section /- 1F: Brodkey's theorem on abelian Sylow (pp. 37-38) -/
