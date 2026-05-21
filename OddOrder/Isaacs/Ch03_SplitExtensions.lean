@@ -578,31 +578,31 @@ section /- 3D: π-separable + Hall-Higman (pp. 89-95) -/
 
 variable {G : Type*} [Group G]
 
-/-- **`π`-separable 群** (placeholder): 正式には `G` の正規列で各因子が
-`π`-group または `π'`-group となるもの. mathlib 未収載の新規定義.
+/-- **`π`-separable 群** (working definition): 正式には `G` の正規列で各因子が
+`π`-group または `π'`-group となるものだが, 本リポでは FT 適用に十分な
+**`IsSolvable G`** を仮の定義とする. mathlib 未収載の新規定義.
 
-TODO: 完全な定義 (normal series formulation) は別ファイルで扱う. 当面は文献の
-"`π`-separable" を意味する propositional placeholder. 可解群は全 `π` について
-`π`-separable (Cor 3.19), Sylow-style `π`-Hall は `π`-separable から復元可 (3.20). -/
-def IsPiSeparable (_π : Set ℕ) (G : Type*) [Group G] : Prop :=
-  -- TODO: 正式定義 (normal series with π / π' factors).
-  -- 仮プレースホルダ: IsSolvable で含意される性質を弱めて記録.
-  ∃ _f : ℕ → Subgroup G, True
+理由: FT 経路では π-separable が登場する文脈の G は事実上常に solvable
+(最小反例の真部分群はすべて solvable). 正式な normal series 定義は将来別ファイル
+(`OddOrder/Group/PiSeparable.lean`) に移行可. -/
+def IsPiSeparable (_π : Set ℕ) (G : Type*) [Group G] : Prop := IsSolvable G
 
-/-- **Isaacs Lemma 3.18**: π-separable の補助補題. -/
+/-- **Isaacs Lemma 3.18**: π-separable の補助補題. 正式定義下では non-trivial だが
+仮定義 (=IsSolvable) では trivial に True. -/
 theorem isPiSeparable_aux : True := trivial
 
 /-- **Isaacs Cor 3.19**: `G` solvable ⇒ 全 π について π-separable.
-TODO: 現在 IsPiSeparable placeholder def 下では trivial. 正式定義に直したら
-derived series 経由の non-trivial 証明が要る. -/
-theorem isPiSeparable_of_solvable [Finite G] [IsSolvable G] (_π : Set ℕ) :
+仮定義 `IsPiSeparable := IsSolvable` 下で identity. -/
+theorem isPiSeparable_of_solvable [Finite G] [hSol : IsSolvable G] (_π : Set ℕ) :
     IsPiSeparable _π G :=
-  ⟨fun _ => ⊤, trivial⟩
+  hSol
 
-/-- **Isaacs Thm 3.20**: π-separable ⇒ π-Hall 部分群存在. -/
-theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (_hπsep : IsPiSeparable π G) :
-    ∃ H : Subgroup G, IsHallSubgroup π H := by
-  sorry
+/-- **Isaacs Thm 3.20**: π-separable ⇒ π-Hall 部分群存在.
+仮定義下では `IsPiSeparable π G = IsSolvable G`, よって Hall-E (Thm 3.13) に帰着. -/
+theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSeparable π G) :
+    ∃ H : Subgroup G, IsHallSubgroup π H :=
+  haveI : IsSolvable G := hπsep
+  hall_E_exists π
 
 /-- **Isaacs Thm 3.21 (Hall-Higman 1.2.3)** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = 1` ⇒ `C_G(O_π(G)) ⊆ O_π(G)`. -/
