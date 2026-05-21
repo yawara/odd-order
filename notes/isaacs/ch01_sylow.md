@@ -17,24 +17,37 @@
 
 ## mathlib 対応表
 
-直接ラッパー可能 (薄い再述で済む):
+CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` に従い, 以下は **本ファイルで
+ラッパーを書かず, 呼出側で直接 mathlib 名を使う** (純粋なリネームは禁止). 例外
+として `cauchy` と `lt_normalizer_of_isNilpotent_of_lt_top` (Thm 1.22),
+`isNilpotent_iff_forall_sylow_normal` / `Sylow.normal_of_isNilpotent` (Thm 1.26) は
+**章内 2 回以上の慣用名** として残置.
 
-| Isaacs | mathlib | 備考 |
-|---|---|---|
-| Thm 1.1   | `Subgroup.normalCore_eq_ker` | perm action `G → Sym(G⧸H)` の核 = `H.normalCore` (実装済) |
-| Thm 1.4   | `MulAction.orbitEquivQuotientStabilizer` | orbit ≃ G ⧸ stabilizer (実装済) |
-| Cor 1.5   | `ConjClasses.card_carrier` | 共役類サイズ = `|G|/|C_G(x)|` (= `[G:C_G(x)]`) |
-| Thm 1.7   | `Sylow.nonempty` | Sylow E (実装済) |
-| Lemma 1.8 | `Choose.choose_pow_mul_pow_mul_modEq_choose_nat` (b:=1) | `C(p^a m, p^a) ≡ m mod p` (実装済) |
-| Cor 1.9   | `exists_prime_orderOf_dvd_card'` | Cauchy (実装済) |
-| Lemma 1.10 | `Subgroup.normal_of_characteristic_of_normal` インスタンス | char in normal ⇒ normal (実装済) |
-| Thm 1.12  | `Sylow.orbit_eq_top` + `Sylow.equiv` | Sylow C (共役) |
-| Lemma 1.13 | (探索: `Subgroup.normalizer_sup_eq_top` ?) | Frattini argument |
-| Cor 1.17  | `card_sylow_modEq_one` | n_p ≡ 1 (mod p) |
-| Cor 1.25  | (Cor 1.24 の系) | p^b ∣ |G| ⇒ |L|=p^b 部分群存在 |
-| Thm 1.26  | `Group.IsNilpotent` の特性化と既存補題で組む | 冪零 ⇔ Sylow 全正規 |
-| Lemma 1.34 | 自前 (`MulAction.toPermHom` + `Equiv.Perm.sign` + `Int.units_eq_one_or` + `Subgroup.index_ker`) | 奇に作用 ⇒ index 2 (実装済) |
-| Thm 1.35  | Lemma 1.34 + Cauchy + `Equiv.Perm.sign_of_pow_two_eq_one` | \|G\|=2n, n 奇 ⇒ index 2 (実装済) |
+| Isaacs | 呼び出し方 |
+|---|---|
+| Thm 1.1   | `H.normalCore_eq_ker` (`Subgroup.normalCore_eq_ker`) を直接呼ぶ |
+| Thm 1.4   | `MulAction.orbitEquivQuotientStabilizer` を直接呼ぶ |
+| Cor 1.5   | `ConjAct.orbit_eq_carrier_conjClasses` + `MulAction.index_stabilizer` + `Subgroup.centralizer_eq_comap_stabilizer` |
+| Cor 1.6   | 同上 (Pointwise locale で `Subgroup G` への conjAct 作用) |
+| Thm 1.7   | `Sylow.nonempty` |
+| Lemma 1.8 | `Choose.choose_pow_mul_pow_mul_modEq_choose_nat (b := 1)` |
+| Cor 1.9   | `cauchy` (慣用名, 中身 `exists_prime_orderOf_dvd_card'`) — Ch.2 ほかで再使用 |
+| Lemma 1.10 | typeclass `Subgroup.normal_of_characteristic_of_normal` instance → `inferInstance` |
+| Thm 1.11  | `IsPGroup.exists_le_sylow` + `Sylow.orbit_eq_top` |
+| Thm 1.12  | `MulAction.exists_smul_eq` (`Sylow.isPretransitive_of_finite`) |
+| Lemma 1.13 | `Sylow.normalizer_sup_eq_top'` |
+| Thm 1.14  | `IsPGroup.exists_le_sylow` |
+| Cor 1.15  | `Sylow.card_eq_index_normalizer` |
+| Cor 1.17  | `card_sylow_modEq_one` |
+| Lemma 1.18 | `IsPGroup.inf_normalizer_sylow` |
+| Thm 1.20  | `isNilpotent_of_finite_tfae.out 0 1` |
+| Thm 1.21  | `upperCentralSeries_nilpotencyClass` |
+| Thm 1.22  | `lt_normalizer_of_isNilpotent_of_lt_top` (慣用名, 中身 `normalizerCondition_of_isNilpotent`) |
+| Cor 1.24 弱 | `Sylow.exists_subgroup_card_pow_prime_of_le_card` |
+| Cor 1.25  | `Sylow.exists_subgroup_card_pow_prime` |
+| Thm 1.26  | `isNilpotent_iff_forall_sylow_normal` / `Sylow.normal_of_isNilpotent` (慣用名, 中身 `isNilpotent_of_finite_tfae.out 0 3`) |
+| Lemma 1.34 | 自前 (`MulAction.toPermHom` + `Equiv.Perm.sign` + `Int.units_eq_one_or` + `Subgroup.index_ker`) — Isaacs 流の独立補題 |
+| Thm 1.35  | 自前 (Lemma 1.34 + `cauchy` + `Equiv.Perm.sign_of_pow_two_eq_one`) |
 
 新規実装が必要な主要項目 (mathlib 未収載 — Phase 1 の山場):
 

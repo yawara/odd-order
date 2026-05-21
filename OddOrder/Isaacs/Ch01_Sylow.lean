@@ -53,24 +53,10 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-/-- **Isaacs Thm 1.1**.  部分群 `H ≤ G` の coset 集合 `G ⧸ H` への右乗法作用の
-permutation 表現 `G → Sym(G ⧸ H)` の核は `core_G(H) = H.normalCore` に一致する。
-従って `G / core_G(H)` は `Sym(G ⧸ H)` の部分群と同型 (第一同型定理).
-
-mathlib `Subgroup.normalCore_eq_ker` の再述. -/
-theorem normalCore_eq_perm_ker (H : Subgroup G) :
-    H.normalCore = (MulAction.toPermHom G (G ⧸ H)).ker :=
-  H.normalCore_eq_ker
-
-/-- **Isaacs Thm 1.4** (Fundamental Counting Principle).  `G` が `Ω` に作用し
-`α ∈ Ω` の軌道 `O` と固定部分群 `H = G_α` を取ると, `O ≃ G ⧸ H`
-(orbit-stabilizer theorem の "全単射" 部分).
-
-mathlib `MulAction.orbitEquivQuotientStabilizer` の Isaacs 流再述. -/
-noncomputable def fundamentalCountingEquiv
-    {Ω : Type*} [MulAction G Ω] (α : Ω) :
-    MulAction.orbit G α ≃ G ⧸ MulAction.stabilizer G α :=
-  MulAction.orbitEquivQuotientStabilizer G α
+/-! **Isaacs Thm 1.1** (`H.normalCore = (MulAction.toPermHom G (G ⧸ H)).ker`) と
+**Thm 1.4** (`MulAction.orbit G α ≃ G ⧸ MulAction.stabilizer G α`) は mathlib
+`Subgroup.normalCore_eq_ker` / `MulAction.orbitEquivQuotientStabilizer` を直接
+呼び出す (本ファイルではラッパーを書かない). -/
 
 /-- **Isaacs Cor 1.2**.  `H ≤ G` で `[G:H] = n` なら，`N := core_G(H) = H.normalCore` は
 `N ◁ G`, `N ≤ H` であり，`[G:N] ∣ n!`.
@@ -109,52 +95,10 @@ theorem card_dvd_factorial_of_simple_subgroup_index [IsSimpleGroup G] [Finite G]
     rw [hHtop, Subgroup.index_top] at hn1
     exact Nat.lt_irrefl 1 hn1
 
-/-- **Isaacs Cor 1.5**.  有限群 `G` と `x ∈ G` について，`x` の共役類のサイズは
-`[G : C_G(x)]` に等しい.
-
-証明: `ConjAct G` の `G` への共役作用で
-`x` の軌道 = 共役類 (`ConjAct.orbit_eq_carrier_conjClasses`)，
-orbit-stabilizer 定理 (`MulAction.index_stabilizer`) より
-orbit サイズ = `(stabilizer (ConjAct G) x).index`，
-`Subgroup.centralizer_eq_comap_stabilizer` + `index_comap_of_surjective`
-で centralizer の指数に書き換える. -/
-theorem card_conjClass_eq_index_centralizer [Finite G] (x : G) :
-    Nat.card (ConjClasses.mk x).carrier = (Subgroup.centralizer {x}).index := by
-  have horb : MulAction.orbit (ConjAct G) x = (ConjClasses.mk x).carrier :=
-    ConjAct.orbit_eq_carrier_conjClasses x
-  -- Nat.card ↑carrier = carrier.ncard (forward), then rewrite using orbit
-  rw [Nat.card_coe_set_eq, ← horb,
-      ← MulAction.index_stabilizer (G := ConjAct G) (X := G)]
-  -- (centralizer {x}).index = (comap toConjAct stab).index = stab.index
-  rw [Subgroup.centralizer_eq_comap_stabilizer]
-  exact ((MulAction.stabilizer (ConjAct G) x).index_comap_of_surjective
-           ConjAct.toConjAct.surjective).symm
-
-open scoped Pointwise in
-/-- **Isaacs Cor 1.6**.  有限群 `G` の部分群 `H` の `G` 内の共役の総数は
-`[G : N_G(H)]` に等しい.
-
-証明: `ConjAct G` の `Subgroup G` への点別共役作用 (`Pointwise` locale) で，
-`H` の軌道サイズ = `[ConjAct G : stabilizer (ConjAct G) H]` (orbit-stabilizer)，
-`ofConjAct` が等長写像なので `stabilizer` と `normalizer H` の指数が一致する
-(`Subgroup.index_map_equiv` + `Subgroup.conjAct_pointwise_smul_iff`). -/
-theorem card_subgroup_conjugates_eq_index_normalizer [Finite G] (H : Subgroup G) :
-    (MulAction.orbit (ConjAct G) H).ncard = (Subgroup.normalizer (H : Set G)).index := by
-  rw [← MulAction.index_stabilizer (G := ConjAct G) (X := Subgroup G)]
-  -- (stab).index = (stab.map ofConjAct).index (isomorphism preserves index)
-  rw [← (MulAction.stabilizer (ConjAct G) H).index_map_equiv ConjAct.ofConjAct]
-  congr 1
-  -- (stabilizer (ConjAct G) H).map ofConjAct = normalizer (H : Set G)
-  ext h
-  simp only [Subgroup.mem_map, MulAction.mem_stabilizer_iff]
-  constructor
-  · rintro ⟨g, hg, rfl⟩
-    -- hg : g • H = H, g : ConjAct G; rewrite as toConjAct (ofConjAct g) • H = H
-    rw [← ConjAct.toConjAct_ofConjAct g] at hg
-    exact Subgroup.conjAct_pointwise_smul_iff.mp hg
-  · intro hh
-    exact ⟨ConjAct.toConjAct h, Subgroup.conjAct_pointwise_smul_iff.mpr hh,
-           ConjAct.ofConjAct_toConjAct h⟩
+/-! **Isaacs Cor 1.5** (`|conjClass x| = [G : C_G(x)]`) と **Cor 1.6**
+(`|conj(H)| = [G : N_G(H)]`) は mathlib の `ConjAct.orbit_eq_carrier_conjClasses` +
+`MulAction.index_stabilizer` + `Subgroup.centralizer_eq_comap_stabilizer` を
+直接組合せる. -/
 
 end -- 1A
 
@@ -162,24 +106,9 @@ section /- 1B: Sylow's existence theorem and Cauchy (pp. 10-17) -/
 
 variable {G : Type*} [Group G]
 
-/-- **Isaacs Thm 1.7** (Sylow E).  任意の群 `G` と素数 `p` について `G` は
-Sylow `p`-部分群を持つ.
-
-mathlib `Sylow.nonempty` の再述.  mathlib では `Sylow p G` 型自体が
-"`G` の極大 `p`-部分群" を表し, `[Fact p.Prime]` のみで非空 (有限性不要; Zorn).
-有限 `G` ではさらに `Sylow.card_eq_multiplicity` で `|S| = p^{v_p(|G|)}` が成り立つ. -/
-theorem sylow_nonempty (p : ℕ) [Fact p.Prime] : Nonempty (Sylow p G) :=
-  Sylow.nonempty
-
-/-- **Isaacs Lemma 1.8** (Sylow E の補題).  素数 `p`, `a ≥ 0`, `m ≥ 1` で
-`Nat.choose (p^a · m) (p^a) ≡ m (mod p)`.  Wielandt 流 Sylow E 証明で
-`Ω = {S ⊆ G : |S| = p^a}` への右乗法作用の濃度を見るときに使う.
-
-mathlib `Choose.choose_pow_mul_pow_mul_modEq_choose_nat` の `b := 1` 特殊化. -/
-theorem choose_pow_mul_modEq_self {p : ℕ} [Fact p.Prime] (a m : ℕ) :
-    (p ^ a * m).choose (p ^ a) ≡ m [MOD p] := by
-  simpa using
-    Choose.choose_pow_mul_pow_mul_modEq_choose_nat (p := p) (k := a) (a := m) (b := 1)
+/-! **Isaacs Thm 1.7** (Sylow E) は mathlib `Sylow.nonempty` を直接呼ぶ.
+**Lemma 1.8** (`C(p^a m, p^a) ≡ m mod p`) は
+`Choose.choose_pow_mul_pow_mul_modEq_choose_nat (b := 1)` を直接呼ぶ. -/
 
 /-- **Isaacs Cor 1.9** (Cauchy).  有限群 `G` で素数 `p ∣ |G|` ⇒ `G` は位数 `p`
 の元を持つ.
@@ -189,19 +118,9 @@ theorem cauchy [Finite G] {p : ℕ} [Fact p.Prime] (hdvd : p ∣ Nat.card G) :
     ∃ x : G, orderOf x = p :=
   exists_prime_orderOf_dvd_card' p hdvd
 
-/-- **Isaacs Lemma 1.10**.  `K ≤ N ≤ G`, `N ◁ G` で `K` が `N` の特性部分群なら
-`K ◁ G`.  ここでは `K : Subgroup N`, 結論は `K.map N.subtype` の `G` における
-正規性, という mathlib 寄りの形.
-
-mathlib `Subgroup.normal_of_characteristic_of_normal` がインスタンスとして
-提供しているため typeclass で自動推論される; 以下は再述. -/
-theorem normal_of_characteristic_in_normal
-    {N : Subgroup G} [N.Normal] {K : Subgroup N} [K.Characteristic] :
-    (K.map N.subtype).Normal :=
-  inferInstance
-
--- TODO  Isaacs 流に `K N : Subgroup G, K ≤ N, (K.subgroupOf N).Characteristic`
---   ⇒ `K.Normal` の "G 内 K" 形ラッパーも欲しい (低優先度).
+/-! **Isaacs Lemma 1.10** (特性 in 正規 ⇒ 正規) は mathlib
+`Subgroup.normal_of_characteristic_of_normal` がインスタンスとして提供している
+ので typeclass で自動推論される. 呼び出し側では `inferInstance` で取得. -/
 
 end -- 1B
 
@@ -211,54 +130,19 @@ open Pointwise Subgroup MulAction
 
 variable {G : Type*} [Group G] {p : ℕ} [Fact p.Prime]
 
-/-- **Isaacs Thm 1.11**.  `G` の任意の `p`-部分群 `P` は, ある Sylow `p`-部分群 `S` と
-ある `g ∈ G` が存在して `P ≤ g • S` (= `S` の共役) に含まれる.
+/-! **Isaacs Thm 1.11** (任意 `p`-部分群は Sylow の共役に含まれる),
+**Thm 1.12 Sylow C** (任意 2 Sylow が共役),
+**Lemma 1.13 Frattini argument**,
+**Thm 1.14 Sylow D** (任意 `p`-部分群は Sylow に含まれる),
+**Cor 1.15** (`n_p(G) = [G : N_G(S)]`) はすべて mathlib に直接対応がある:
 
-証明の方針: `IsPGroup.exists_le_sylow` で `P ≤ Q` となる Sylow 部分群 `Q` を取り,
-`orbit_eq_top` を使って `Q` と任意の Sylow を結ぶ共役元を取る.
+* Thm 1.11: `IsPGroup.exists_le_sylow` + `Sylow.orbit_eq_top` を組合せる
+* Thm 1.12: `MulAction.exists_smul_eq` (`Sylow.isPretransitive_of_finite`)
+* Lemma 1.13: `Sylow.normalizer_sup_eq_top'`
+* Thm 1.14: `IsPGroup.exists_le_sylow`
+* Cor 1.15: `Sylow.card_eq_index_normalizer`
 
-mathlib `IsPGroup.exists_le_sylow` + `Sylow.orbit_eq_top` の組み合わせ. -/
-theorem sylow_pgroup_le_conjugate [Finite (Sylow p G)]
-    {P : Subgroup G} (hP : IsPGroup p P) (S : Sylow p G) :
-    ∃ g : G, P ≤ ↑(g • S) := by
-  obtain ⟨Q, hQ⟩ := hP.exists_le_sylow
-  obtain ⟨g, rfl⟩ := (S.orbit_eq_top ▸ Set.mem_univ Q :
-      Q ∈ MulAction.orbit G S)
-  exact ⟨g, hQ.trans (by rfl)⟩
-
-/-- **Isaacs Thm 1.12** (Sylow C).  有限群 `G` の任意の 2 つの Sylow `p`-部分群は
-`G` の元による共役で移り合う.
-
-mathlib `MulAction.exists_smul_eq` (from `Sylow.isPretransitive_of_finite`) の再述. -/
-theorem sylow_conjugate [Finite (Sylow p G)] (P Q : Sylow p G) :
-    ∃ g : G, g • P = Q :=
-  exists_smul_eq G P Q
-
-/-- **Isaacs Lemma 1.13** (Frattini argument).  `N ◁ G` 有限, `P ∈ Syl_p(N)` ならば
-`G = N_G(P) · N`, すなわち `normalizer (↑P) ⊔ N = ⊤`.
-
-mathlib `Sylow.normalizer_sup_eq_top'` の再述 (P を G の Sylow として N に含まれる形). -/
-theorem frattini_argument [Finite (Sylow p G)]
-    {N : Subgroup G} [N.Normal] (P : Sylow p G) (hPN : ↑P ≤ N) :
-    normalizer (P : Subgroup G) ⊔ N = ⊤ :=
-  P.normalizer_sup_eq_top' hPN
-
-omit [Fact p.Prime] in
-/-- **Isaacs Thm 1.14** (Sylow D).  `G` の任意の `p`-部分群は何らかの Sylow `p`-部分群に
-含まれる.
-
-mathlib `IsPGroup.exists_le_sylow` の直接再述. -/
-theorem pgroup_le_sylow
-    {P : Subgroup G} (hP : IsPGroup p P) : ∃ Q : Sylow p G, P ≤ Q :=
-  hP.exists_le_sylow
-
-/-- **Isaacs Cor 1.15**.  `S ∈ Syl_p(G)` について Sylow `p`-部分群の個数は
-`n_p(G) = [G : N_G(S)]`.
-
-mathlib `Sylow.card_eq_index_normalizer` の再述. -/
-theorem card_sylow_eq_index_normalizer [Finite (Sylow p G)] (S : Sylow p G) :
-    Nat.card (Sylow p G) = (normalizer ((S : Subgroup G) : Set G)).index :=
-  S.card_eq_index_normalizer
+呼び出し側で直接 mathlib 名を使う. -/
 
 /-- **Isaacs Thm 1.16**.  `n_p(G) > 1` のとき, distinct `S, T ∈ Syl_p(G)` で
 `|S ∩ T|` が最大となるペアを取ると `n_p(G) ≡ 1 (mod |S : S ∩ T|)`.
@@ -445,29 +329,9 @@ theorem card_sylow_modEq_one_of_max_inter
   -- want: (1 + d * q) % d = 1 % d
   exact Nat.add_mul_mod_self_left 1 d q
 
-/-- **Isaacs Cor 1.17**.  `n_p(G) ≡ 1 (mod p)`.
-
-mathlib `card_sylow_modEq_one` の再述. -/
-theorem card_sylow_modEq_one_prime [Finite (Sylow p G)] :
-    Nat.card (Sylow p G) ≡ 1 [MOD p] :=
-  card_sylow_modEq_one p G
-
-omit [Fact p.Prime] in
-/-- **Isaacs Lemma 1.18**.  `P ∈ Syl_p(G)`, `Q` が `N_G(P)` に含まれる `p`-部分群ならば
-`Q ≤ P`.
-
-証明: `IsPGroup.inf_normalizer_sylow` より `Q ⊓ N_G(P) = Q ⊓ P`, そして `Q ≤ N_G(P)` から
-`Q = Q ⊓ N_G(P) = Q ⊓ P ≤ P`.
-
-mathlib `IsPGroup.inf_normalizer_sylow` の系. -/
-theorem pgroup_in_normalizer_le_sylow
-    {Q : Subgroup G} (hQ : IsPGroup p Q) (P : Sylow p G)
-    (hQN : Q ≤ normalizer (P : Subgroup G)) : Q ≤ P := by
-  have h := hQ.inf_normalizer_sylow P
-  -- h : Q ⊓ N_G(P) = Q ⊓ P
-  rw [inf_of_le_left hQN] at h
-  -- h : Q = Q ⊓ P
-  exact inf_eq_left.mp h.symm
+/-! **Isaacs Cor 1.17** (`n_p ≡ 1 mod p`) は mathlib `card_sylow_modEq_one` を,
+**Lemma 1.18** (`N_G(P)` 内の `p`-部分群は `P` に含まれる) は
+`IsPGroup.inf_normalizer_sylow` を直接呼ぶ. -/
 
 end -- 1C
 
@@ -527,25 +391,14 @@ theorem IsPGroup.normal_inf_center_nontrivial {P : Type*} [Group P] [Finite P]
   have := congrArg (fun x : (N ⊓ Subgroup.center P : Subgroup P) => (x : P)) heq
   simpa using this
 
-/-- **Isaacs Lemma 1.20** (nilpotent 群の特性化, 部分結果).  有限群 `G` が冪零であることと
-全 Sylow が正規であることは同値.
+/-! **Isaacs Lemma 1.20** は冪零性のいくつかの特性化を主張するが, (1)-(2) は
+`IsNilpotent` の定義そのもの, (3) 「全 Sylow 正規」は mathlib
+`isNilpotent_of_finite_tfae` 全体に対応する (Thm 1.26 慣用名
+`isNilpotent_iff_forall_sylow_normal` で扱う).
 
-Isaacs Lemma 1.20 は冪零性のいくつかの特性化を主張するが (1)-(2) 部分は `IsNilpotent` の
-定義そのもの, 残りの (3) 「全 Sylow 正規」は mathlib `isNilpotent_of_finite_tfae` で完備.
-ここではすでに後段の Thm 1.26 で同じ TFAE をラップ済 (`isNilpotent_iff_forall_sylow_normal`).
-独立の名前空間にエイリアスを置く. -/
-theorem isNilpotent_iff_normalizerCondition [Finite G] :
-    Group.IsNilpotent G ↔ NormalizerCondition G :=
-  isNilpotent_of_finite_tfae.out 0 1
-
-/-- **Isaacs Thm 1.21**.  冪零群は中心列 `1 = Z_0 ≤ Z_1 ≤ ... ≤ Z_n = G` を持ち,
-各 `Z_{i+1}/Z_i ≤ Z(G/Z_i)`. 逆も成り立つ.
-
-mathlib `Group.upperCentralSeries_nilpotencyClass : upperCentralSeries G (nilpotencyClass G) = ⊤`
-の再述. `upperCentralSeries` が中心列で, `nilpotencyClass` ステップで `⊤` に到達する. -/
-theorem upperCentralSeries_eq_top_of_isNilpotent [Group.IsNilpotent G] :
-    upperCentralSeries G (Group.nilpotencyClass G) = ⊤ :=
-  upperCentralSeries_nilpotencyClass
+**Thm 1.20** (冪零 ⇔ NormalizerCondition) は `isNilpotent_of_finite_tfae.out 0 1`,
+**Thm 1.21** (`upperCentralSeries G (nilpotencyClass G) = ⊤`) は
+`upperCentralSeries_nilpotencyClass` を直接呼ぶ. -/
 
 /-- **Isaacs Thm 1.22** (Normalizer Condition).  有限冪零群 `G` で真部分群 `H < G` ならば
 `H < N_G(H)`.
@@ -658,25 +511,10 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
     have hL_index_ne_zero : L.index ≠ 0 := Nat.card_pos.ne'
     exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hL_index_ne_zero) h_eq
 
-/-- **Isaacs Cor 1.24** (弱形).  位数 `p^n` の有限 `p`-群 `G` は, 各 `m ≤ n` に対して
-位数 `p^m` の部分群を持つ.
-
-`Sylow.exists_subgroup_card_pow_prime_of_le_card` の再述. (mathlib 直.)  Isaacs 厳密形は
-さらに「これらの部分群が正規」も主張するが, Lemma 1.23 強形が必要なので一旦弱形. -/
-theorem IsPGroup.exists_subgroup_card_pow_le {G : Type*} [Group G]
-    {p : ℕ} (hp : p.Prime) (hG : IsPGroup p G) {m : ℕ}
-    (hm : p ^ m ≤ Nat.card G) :
-    ∃ H : Subgroup G, Nat.card H = p ^ m :=
-  Sylow.exists_subgroup_card_pow_prime_of_le_card hp hG hm
-
-/-- **Isaacs Cor 1.25**.  有限群 `G` で素数 `p`, `p^m ∣ |G|` ならば, 位数 `p^m` の
-部分群が存在する (Sylow E の一般化).
-
-mathlib `Sylow.exists_subgroup_card_pow_prime` の再述. -/
-theorem Sylow.exists_subgroup_card_pow_dvd [Finite G] (p : ℕ) {m : ℕ} [Fact p.Prime]
-    (hdvd : p ^ m ∣ Nat.card G) :
-    ∃ H : Subgroup G, Nat.card H = p ^ m :=
-  Sylow.exists_subgroup_card_pow_prime p hdvd
+/-! **Isaacs Cor 1.24** (弱形, `p`-群が各 `m ≤ n` で位数 `p^m` 部分群を持つ) は
+mathlib `Sylow.exists_subgroup_card_pow_prime_of_le_card` を, **Cor 1.25** (Sylow E
+の一般化 `p^m ∣ |G| ⇒ 位数 `p^m` 部分群存在) は `Sylow.exists_subgroup_card_pow_prime`
+を直接呼ぶ. -/
 
 /-! ### O_p(G) と Fitting 部分群 F(G)
 
@@ -772,12 +610,8 @@ theorem isNilpotent_iff_forall_sylow_normal [Finite G] :
       ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal :=
   isNilpotent_of_finite_tfae.out 0 3
 
-/-- **Isaacs Thm 1.26 (4) ⇒ (1)** (片向き取り出し).
-全 Sylow が正規ならば G は冪零. -/
-theorem isNilpotent_of_forall_sylow_normal [Finite G]
-    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal) :
-    Group.IsNilpotent G :=
-  isNilpotent_iff_forall_sylow_normal.mpr h
+/-! **Isaacs Thm 1.26 (4) ⇒ (1)** (全 Sylow 正規 ⇒ 冪零) は呼出側で
+`isNilpotent_iff_forall_sylow_normal.mpr` を直接呼ぶ. -/
 
 /-- **Isaacs Thm 1.26 (1) ⇒ (4)** (片向き取り出し).
 冪零ならば任意の Sylow は正規. -/
@@ -936,9 +770,9 @@ theorem nilpotent_normal_le_fitting [Finite G] {N : Subgroup G} [N.Normal]
   -- default Sylow is characteristic in N (unique Sylow ⇒ characteristic)
   haveI : ((default : Sylow p N) : Subgroup N).Characteristic :=
     Sylow.characteristic_of_normal _ hPN
-  -- so its image in G is normal (Lemma 1.10)
+  -- so its image in G is normal (mathlib instance: characteristic in normal ⇒ normal)
   haveI : (((default : Sylow p N) : Subgroup N).map N.subtype).Normal :=
-    normal_of_characteristic_in_normal
+    inferInstance
   -- it's a p-subgroup of G
   have hpGroup : IsPGroup p (((default : Sylow p N) : Subgroup N).map N.subtype) :=
     (default : Sylow p N).2.map N.subtype
@@ -2194,7 +2028,7 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
     Sylow.characteristic_of_normal PN hPN_normal
   -- Phase 2: define f : G →* Equiv.Perm (G ⧸ N), K = N.normalCore = f.ker.
   let f : G →* Equiv.Perm (G ⧸ N) := MulAction.toPermHom G (G ⧸ N)
-  have hKer_eq : N.normalCore = f.ker := normalCore_eq_perm_ker N
+  have hKer_eq : N.normalCore = f.ker := N.normalCore_eq_ker
   set K : Subgroup G := N.normalCore with hK_def
   have hK_le_N : K ≤ N := N.normalCore_le
   haveI hK_normal : K.Normal := N.normalCore_normal
