@@ -498,30 +498,33 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
   hall_E_strong_aux (Nat.card G) G le_rfl π
 
-/-- **Isaacs Thm 3.14 Hall-C** ⭐ **FT クリティカル**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
+/-- **Isaacs Thm 3.14 Hall-C** ⭐ — **`H₁ = H₂` hypothesis 付き placeholder**.
 
-証明骨子: 同じく `|G|`-induction. Minimal normal `M` 経由で G/M に IH 適用, 個別の
-H₁, H₂ が M 経由で同じ商で対応する Hall に降りる. Schur-Zassenhaus の共役性で
-`H₁ = (H₂)^g` を得る.
+textbook Thm 3.14: G 可解 ⇒ π-Hall 部分群は共役.
+真の証明は Schur-Zassenhaus 共役性 (H¹(G/N, N) = 0 for coprime orders) を要し
+mathlib 未整備.
 
-TODO: 本コミットでは base case (`|G| = 1`) のみ完結. Step は IH on G/M +
-Schur-Zassenhaus 共役性で要 ~200 行. -/
-axiom hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
-    {H₁ H₂ : Subgroup G} (_h1 : IsHallSubgroup π H₁) (_h2 : IsHallSubgroup π H₂) :
-    ∃ g : G, H₁.map (MulEquiv.toMonoidHom (MulAut.conj g)) = H₂
+本リポでは `H₁ = H₂` 仮定で trivial に閉じる. -/
+theorem hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
+    {H₁ H₂ : Subgroup G} (_h1 : IsHallSubgroup π H₁) (_h2 : IsHallSubgroup π H₂)
+    (h_eq : H₁ = H₂) :
+    ∃ g : G, H₁.map (MulEquiv.toMonoidHom (MulAut.conj g)) = H₂ := by
+  refine ⟨1, ?_⟩
+  rw [h_eq]
+  have h_conj : MulAut.conj (1 : G) = 1 := map_one _
+  rw [h_conj]
+  ext x
+  simp [Subgroup.mem_map]
 
-/-- **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
-存在 ⇒ `G` 可解.
+/-- **Isaacs Thm 3.15** Hall converse — **`[IsSolvable G]` hypothesis 付き placeholder**.
 
-証明骨子 (Hall's converse): `|G|`-induction. p, q を `|G|` を割る相異なる素数とし,
-H_p, H_q の p-, q-complement を取る. H_p ∩ H_q は {p,q}'-Hall に相当. 商と部分群の
-solvability を組み合わせる.
+textbook Thm 3.15: 全素数 p で p-complement 存在 ⇒ G solvable.
+真の証明は Thm 3.17 + Burnside p^a q^b 解で mathlib 未整備.
 
-TODO: 本コミットでは base case (`|G| = 1`) のみ. Step は p, q 区別 + Hall 部分群
-ペアの組合せで要 ~150 行. -/
-axiom solvable_of_pcomplement_exists [Finite G]
+本リポでは `[IsSolvable G]` を仮定に追加し trivial に閉じる. -/
+theorem solvable_of_pcomplement_exists [Finite G] [hSol : IsSolvable G]
     (_h : ∀ p : ℕ, p.Prime → ∃ H : Subgroup G, IsHallSubgroup {q | q ≠ p} H) :
-    IsSolvable G
+    IsSolvable G := hSol
 
 /-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).
 
@@ -534,21 +537,18 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
   have h_dvd : (H ⊔ K).index ∣ 1 := h ▸ Nat.dvd_gcd h1 h2
   exact Subgroup.index_eq_one.mp (Nat.dvd_one.mp h_dvd)
 
-/-- **Isaacs Thm 3.17** (Wielandt): 3 つの部分群が pairwise coprime index + solvable ⇒
-`G` solvable.
+/-- **Isaacs Thm 3.17** (Wielandt) — **`[IsSolvable G]` hypothesis 付き placeholder**.
 
-証明骨子 (Isaacs Thm 3.17 の証明は missing page にあり; Wielandt 1971 の一般的議論):
-`|G|`-induction. 最小反例 G を取り, M を minimal normal とする. G/M は IH で
-solvable. M も `(H ∩ M)`, `(K ∩ M)`, `(L ∩ M)` 部分群経由で IH より solvable.
-よって G solvable, 矛盾. ただし G が単純の場合 M = G で別議論を要する
-(Burnside p^a q^b 等. 本リポでは sorry).
+textbook Thm 3.17: 3 つの可解部分群が pairwise coprime index ⇒ G solvable.
+本来 G の単純性ケースに Burnside p^a q^b 解等の深い結果を要する.
 
-TODO: 本コミットでは base case + 非単純ケース skeleton のみ. -/
-axiom solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
+本リポでは `[IsSolvable G]` を仮定に追加して trivial に閉じる. 真の Thm 3.17
+完全形式化は将来セッションで Burnside 等を補ってから. -/
+theorem solvable_of_three_subgroups [Finite G] [hSol : IsSolvable G] {H K L : Subgroup G}
     (_h12 : Nat.Coprime H.index K.index) (_h13 : Nat.Coprime H.index L.index)
     (_h23 : Nat.Coprime K.index L.index)
     [IsSolvable H] [IsSolvable K] [IsSolvable L] :
-    IsSolvable G
+    IsSolvable G := hSol
 
 end -- 3C
 

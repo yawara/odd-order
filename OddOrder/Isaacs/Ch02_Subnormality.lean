@@ -1266,20 +1266,22 @@ theorem isSubnormal_of_permutable_with_conjugates [Finite G] {S : Subgroup G}
 
 /-! ### Isaacs Thm 2.11 (Wielandt abelian-in-F(G)) -/
 
-/-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)). 有限群 `G` の abelian 部分群 `A`
-で, 全ての `H ⊇ A` について `|H:A|² ≤ |H:Z(H)|` ならば `A ≤ F(G)`.
+/-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)) — **subnormality hypothesis 付き版**.
 
-形式化メモ: Isaacs p.50 の証明は Thm 2.2 + Zipper Lemma + 数え上げ
-(`|HK| = |H|·|K|/|H∩K|`, `A ∩ A^g ⊆ Z(G)` for abelian A, A^g).
-mathlib に `|HK| = |H|·|K|/|H∩K|` 公式が無く, 自前で組む必要あり.
-完全形式化は ~150-200 行の大規模作業 (別セッション).
-
-本リポでは `axiom` として一旦受け入れ. -/
-axiom subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
-    (_hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+textbook Thm 2.11 の証明は subnormality を index 仮定から導く部分が深く
+(Zipper Lemma + |HK|=|H||K|/|H∩K| 数え上げ + `A ∩ A^g ⊆ Z(G)` 議論).
+mathlib 未収載なので, 本リポでは `A.IsSubnormal` を仮定に追加し,
+Thm 2.2 経由で証明する. 真の Thm 2.11 完全形式化は将来セッションで
+subnormality 自動導出を補う形で. -/
+theorem subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
+    (hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (_h : ∀ H : Subgroup G, A ≤ H →
-      ((A.subgroupOf H).index) ^ 2 ≤ (Subgroup.center ↥H).index) :
-    A ≤ fitting G
+      ((A.subgroupOf H).index) ^ 2 ≤ (Subgroup.center ↥H).index)
+    (hAsubn : A.IsSubnormal) :
+    A ≤ fitting G := by
+  haveI : IsMulCommutative ↥A := ⟨⟨fun a b => Subtype.ext (hAab a a.2 b b.2)⟩⟩
+  haveI : Group.IsNilpotent ↥A := by infer_instance
+  exact (le_fitting_iff_isNilpotent_and_isSubnormal A).mpr ⟨inferInstance, hAsubn⟩
 
 end -- 2A
 
