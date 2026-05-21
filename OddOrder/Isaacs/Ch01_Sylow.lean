@@ -417,6 +417,49 @@ theorem Sylow.normal_of_isNilpotent [Finite G] [Group.IsNilpotent G]
 --   `Disjoint` ⇒ `commute_of_normal_of_disjoint` への中継補題が必要 (要 Lagrange
 --   による `orderOf` の分割整除).
 
+/-! ### Fitting 部分群 F(G) -/
+
+/-- **Fitting subgroup** `F(G)`: 全ての素数 `p` についての `opCore p G` (= `O_p(G)`)
+の supremum.  これは `G` の最大の正規冪零部分群となる (Isaacs Cor 1.28).
+
+mathlib 未収載のため新規定義. `Subgroup.fitting` として将来 mathlib に PR したい形.
+
+Isaacs 流の定義「`|G|` の各素因子 `p` について `O_p(G)` の積」と等価. 非素数 `p` や
+`|G|` に分割しない素数 `p` に対しては `opCore p G ⊆` 既存の sup なので, 範囲を
+広げても結果は変わらない (実際 `opCore p G = ⊥` for primes p ∤ |G|, 有限 G で). -/
+def fitting (G : Type*) [Group G] : Subgroup G :=
+  ⨆ p : Nat.Primes, opCore (p : ℕ) G
+
+theorem opCore_le_fitting (p : Nat.Primes) (G : Type*) [Group G] :
+    opCore (p : ℕ) G ≤ fitting G :=
+  le_iSup (fun q : Nat.Primes => opCore (q : ℕ) G) p
+
+/-- `F(G)` は `G` の正規部分群. 各 `opCore p G` の正規性を `iSup_induction` で全体に持ち上げる. -/
+instance fitting.normal (G : Type*) [Group G] : (fitting G).Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  refine Subgroup.iSup_induction _ (C := fun x => g * x * g⁻¹ ∈ fitting G) hn
+    ?mem ?one ?mul
+  case mem =>
+    intro p x hx
+    -- x ∈ opCore p G が正規だから g * x * g⁻¹ ∈ opCore p G ≤ fitting
+    exact (opCore_le_fitting p G) ((opCore.normal (p : ℕ) G).conj_mem x hx g)
+  case one =>
+    simp
+  case mul =>
+    intro x y hx hy
+    -- g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹)
+    have heq : g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) := by group
+    rw [heq]
+    exact (fitting G).mul_mem hx hy
+
+-- TODO **Isaacs Cor 1.28** (Fitting の冪零性 + 最大性).
+--   (a) `(fitting G).IsNilpotent` — Lemma 1.27 (iSupIndep + 各 opCore が冪零) + 直積の冪零性.
+--   (b) `∀ N : Subgroup G, N.Normal → IsNilpotent N → N ≤ fitting G` — Thm 1.26 で N が
+--       Sylow の直積 ⇒ 各 Sylow 特性的 ⇒ G で正規 (Lemma 1.10) ⇒ Problem 1B.2 で opCore ≤ fitting.
+
+-- TODO **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).  Cor 1.28 (b) から直結:
+--   K, L 冪零正規 ⇒ K, L ≤ fitting ⇒ KL ≤ fitting (冪零) ⇒ KL 冪零.
+
 end -- 1D
 
 section /- 1E: Small-order groups, normal subgroup of index 2 (pp. 31-34) -/
