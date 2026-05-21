@@ -566,7 +566,52 @@ theorem isSubnormal_sup_of_isSubnormal [Finite G] {S T : Subgroup G}
     (hS : S.IsSubnormal) (hT : T.IsSubnormal) : (S ⊔ T).IsSubnormal :=
   isSubnormal_sup_aux (Nat.card G) G le_rfl hS hT
 
--- TODO Thm 2.8 (permutability ⇒ subnormality), Thm 2.9 Zipper Lemma, Thm 2.10, Thm 2.11.
+open scoped Pointwise in
+/-- **Isaacs Lemma 2.10**: if `H ≤ G` and `H · H^x = G` (as sets) for some `x ∈ G`,
+then `H = G`.
+
+`H^x` (Isaacs convention `x⁻¹ H x`) は mathlib `MulAut.conj x⁻¹ • H` に対応.
+仮定は **集合** の等式 (積 `HH^x` は一般に部分群ではない).
+
+Proof (Isaacs p.49):
+1. `x ∈ HH^x = G` ⇒ `x = u * v` with `u ∈ H`, `v ∈ H^x`.
+2. `v ∈ H^x ↔ x v x⁻¹ ∈ H`. `u * v = x` ⇒ `v = u⁻¹ * x` ⇒ `x v x⁻¹ = x u⁻¹ ∈ H`.
+   よって `x = (x u⁻¹) * u ∈ H`.
+3. `x ∈ H` ⇒ `MulAut.conj x⁻¹ • H = H` (`Subgroup.conj_smul_eq_self_of_mem` 適用).
+4. `H · H = H` (`Submonoid.coe_mul_self_eq`) と `HH^x = univ` から `H = univ`. -/
+theorem eq_top_of_set_mul_conj_eq_top {H : Subgroup G} (x : G)
+    (h : (H : Set G) * (((MulAut.conj x⁻¹) • H : Subgroup G) : Set G) = Set.univ) :
+    H = ⊤ := by
+  -- Step 1+2: x ∈ H.
+  have hx_in_H : x ∈ H := by
+    have hx_in_prod : x ∈ (H : Set G) * (((MulAut.conj x⁻¹) • H : Subgroup G) : Set G) := by
+      rw [h]; exact Set.mem_univ _
+    rcases Set.mem_mul.mp hx_in_prod with ⟨u, hu, v, hv, huv⟩
+    -- v ∈ H^x ⇒ x v x⁻¹ ∈ H.
+    have hconj_inv : (MulAut.conj x⁻¹ : MulAut G)⁻¹ = MulAut.conj x := by
+      rw [← map_inv MulAut.conj, inv_inv]
+    rw [SetLike.mem_coe, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hconj_inv] at hv
+    -- hv : (MulAut.conj x) • v ∈ H. By definition this is x * v * x⁻¹.
+    have hxvx : x * v * x⁻¹ ∈ H := hv
+    -- hu : u ∈ H, huv : u * v = x ⇒ v = u⁻¹ * x ⇒ x v x⁻¹ = x u⁻¹ ∈ H.
+    have hv_eq : v = u⁻¹ * x := by rw [← huv]; group
+    rw [hv_eq] at hxvx
+    have heq : x * (u⁻¹ * x) * x⁻¹ = x * u⁻¹ := by group
+    rw [heq] at hxvx
+    -- Now hxvx : x * u⁻¹ ∈ H, hu : u ∈ H ⇒ x = (x * u⁻¹) * u ∈ H.
+    have : x = (x * u⁻¹) * u := by group
+    rw [this]
+    exact H.mul_mem hxvx hu
+  -- Step 3: H^x = H (subgroup equality).
+  have hHx_eq_H : (MulAut.conj x⁻¹ : MulAut G) • H = H :=
+    Subgroup.conj_smul_eq_self_of_mem (H.inv_mem hx_in_H)
+  -- Step 4: HH^x = univ + H^x = H ⇒ HH = univ ⇒ H = univ (subgroup closure under mul).
+  rw [hHx_eq_H] at h
+  -- h : (H : Set G) * (H : Set G) = Set.univ
+  refine eq_top_iff.mpr (fun g _ => ?_)
+  have hg_in : g ∈ (H : Set G) * (H : Set G) := h ▸ Set.mem_univ g
+  rcases Set.mem_mul.mp hg_in with ⟨h1, hh1, h2, hh2, hg⟩
+  exact hg ▸ H.mul_mem hh1 hh2
 
 end -- 2A
 
