@@ -271,9 +271,6 @@ theorem socle_ne_bot_of_nontrivial [Finite G] [Nontrivial G] : socle G ≠ ⊥ :
 --          H ≤ F(M) ⊴ G (F(M) 冪零 + 正規) ⇒ H ≤ fitting G (`nilpotent_normal_le_fitting`).
 --   Ch.1 Cor 1.28(a) 完成後に着手.
 
--- TODO **Isaacs Thm 2.5 Wielandt 結合定理** (`S, T ⊴⊴ G ⇒ ⟨S, T⟩ ⊴⊴ G`).
---   Isaacs 流: Thm 2.6 経由で induction on |G|.
-
 /-- 補助補題 (Thm 2.6 の strong induction の generalized core).
 
 `n : ℕ` についての induction で, 任意の有限群 `G` (with `|G| ≤ n`) に対し,
@@ -468,6 +465,106 @@ theorem isMinimalNormal_le_normalizer_of_isSubnormal [Finite G]
     {S M : Subgroup G} (hS : S.IsSubnormal) (hM : IsMinimalNormal M) :
     M ≤ Subgroup.normalizer (S : Set G) :=
   isMinimalNormal_le_normalizer_aux (Nat.card G) G le_rfl hS hM
+
+/-- 補助補題 (Thm 2.5 の strong induction の generalized core).
+
+任意の有限群 `G` (with `Nat.card G ≤ n`) について, subnormal `S, T : Subgroup G`
+の sup `S ⊔ T` も subnormal. -/
+private theorem isSubnormal_sup_aux :
+    ∀ n, ∀ (G : Type*) [Group G] [Finite G],
+      Nat.card G ≤ n → ∀ {S T : Subgroup G}, S.IsSubnormal → T.IsSubnormal →
+      (S ⊔ T).IsSubnormal := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hG _ _ _ _
+    exact absurd (Nat.le_zero.mp hG) Nat.card_pos.ne'
+  | succ n ih =>
+    intro G _ _ hG S T hS hT
+    classical
+    by_cases hGnontriv : Nontrivial G
+    case neg =>
+      -- Subsingleton G ⇒ every subgroup = ⊤ ⇒ IsSubnormal.top.
+      rw [not_nontrivial_iff_subsingleton] at hGnontriv
+      haveI := hGnontriv
+      have hST_top : (S ⊔ T : Subgroup G) = ⊤ := by
+        refine eq_top_iff.mpr (fun x _ => ?_)
+        rw [show x = 1 from Subsingleton.elim x 1]
+        exact (S ⊔ T).one_mem
+      rw [hST_top]
+      exact Subgroup.IsSubnormal.top
+    case pos =>
+      haveI := hGnontriv
+      -- Pick minimal normal M ≤ ⊤.
+      have htop_ne_bot : (⊤ : Subgroup G) ≠ ⊥ := by
+        intro h
+        obtain ⟨x, y, hxy⟩ := hGnontriv
+        apply hxy
+        have hxbot : x ∈ (⊥ : Subgroup G) := h ▸ Subgroup.mem_top x
+        have hybot : y ∈ (⊥ : Subgroup G) := h ▸ Subgroup.mem_top y
+        rw [Subgroup.mem_bot] at hxbot hybot
+        rw [hxbot, hybot]
+      obtain ⟨M, hM, _⟩ :=
+        exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) htop_ne_bot
+      haveI hMnorm : M.Normal := hM.1
+      -- Quotient map f : G →* G ⧸ M.
+      let f : G →* G ⧸ M := QuotientGroup.mk' M
+      have hSbar : (S.map f).IsSubnormal := hS.map (QuotientGroup.mk'_surjective M)
+      have hTbar : (T.map f).IsSubnormal := hT.map (QuotientGroup.mk'_surjective M)
+      -- Card bound: |G/M| < |G| ≤ n+1, so |G/M| ≤ n.
+      have h1lt_M : 1 < Nat.card M := by
+        have h_ne_one : Nat.card M ≠ 1 := by
+          intro h1
+          apply hM.2.1
+          haveI hSub : Subsingleton M := Nat.card_eq_one_iff_unique.mp h1 |>.1
+          refine eq_bot_iff.mpr (fun x hx => ?_)
+          rw [Subgroup.mem_bot]
+          exact congrArg Subtype.val (Subsingleton.elim (⟨x, hx⟩ : M) 1)
+        have h_pos : 0 < Nat.card M := Nat.card_pos
+        omega
+      have hquot_lt : Nat.card (G ⧸ M) < Nat.card G := by
+        have heq : M.index * Nat.card M = Nat.card G := M.index_mul_card
+        have hM_pos : 0 < Nat.card M := Nat.card_pos
+        have hidx_eq : M.index = Nat.card G / Nat.card M := by
+          rw [← heq, Nat.mul_div_cancel _ hM_pos]
+        change M.index < Nat.card G
+        rw [hidx_eq]
+        exact Nat.div_lt_self Nat.card_pos h1lt_M
+      have hquot_le : Nat.card (G ⧸ M) ≤ n := by omega
+      -- IH on G ⧸ M.
+      have hIH : (S.map f ⊔ T.map f).IsSubnormal :=
+        ih (G ⧸ M) hquot_le hSbar hTbar
+      rw [← Subgroup.map_sup] at hIH
+      -- Comap back to G: comap f (map f (S ⊔ T)) = (S ⊔ T) ⊔ ker f = (S ⊔ T) ⊔ M.
+      have hcomap_subn : (((S ⊔ T).map f).comap f).IsSubnormal := hIH.comap f
+      have hcomap_eq : ((S ⊔ T).map f).comap f = (S ⊔ T) ⊔ M := by
+        rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+      rw [hcomap_eq] at hcomap_subn
+      -- Thm 2.6: M ≤ N(S) ⊓ N(T) ≤ N(S ⊔ T).
+      have hMS : M ≤ Subgroup.normalizer (S : Set G) :=
+        isMinimalNormal_le_normalizer_of_isSubnormal hS hM
+      have hMT : M ≤ Subgroup.normalizer (T : Set G) :=
+        isMinimalNormal_le_normalizer_of_isSubnormal hT hM
+      have hMnormST : M ≤ Subgroup.normalizer ((S ⊔ T : Subgroup G) : Set G) :=
+        (le_inf hMS hMT).trans (Subgroup.normalizer_inf_normalizer_le_normalizer_sup S T)
+      -- S ⊔ T ⊴ (S ⊔ T) ⊔ M. Both summands ⊆ N(S ⊔ T).
+      have hSupSup_le_norm :
+          (S ⊔ T) ⊔ M ≤ Subgroup.normalizer ((S ⊔ T : Subgroup G) : Set G) :=
+        sup_le Subgroup.le_normalizer hMnormST
+      have hSupNormal : ((S ⊔ T).subgroupOf ((S ⊔ T) ⊔ M)).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr hSupSup_le_norm
+      exact Subgroup.IsSubnormal.step _ _ le_sup_left hcomap_subn hSupNormal
+
+/-- **Isaacs Thm 2.5 Wielandt 結合定理**: 部分正規部分群の sup は部分正規.
+
+有限群 `G` の subnormal `S, T : Subgroup G` について `S ⊔ T` も subnormal.
+
+Isaacs p.46 の証明: `|G|`-induction. minimal normal `M` を取って `G ⧸ M` に IH を
+適用 ⇒ `(S ⊔ T) ⊔ M ⊴⊴ G`. Thm 2.6 で `M ≤ N(S ⊔ T)` ⇒ `S ⊔ T ⊴ (S ⊔ T) ⊔ M`.
+合わせて `S ⊔ T ⊴⊴ G`. -/
+theorem isSubnormal_sup_of_isSubnormal [Finite G] {S T : Subgroup G}
+    (hS : S.IsSubnormal) (hT : T.IsSubnormal) : (S ⊔ T).IsSubnormal :=
+  isSubnormal_sup_aux (Nat.card G) G le_rfl hS hT
 
 -- TODO Thm 2.8 (permutability ⇒ subnormality), Thm 2.9 Zipper Lemma, Thm 2.10, Thm 2.11.
 
