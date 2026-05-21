@@ -516,7 +516,7 @@ theorem hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
     have h_eq : H₁ = H₂ := Subsingleton.elim _ _
     have h_conj : MulAut.conj (1 : G) = 1 := map_one _
     rw [h_conj]
-    show H₁.map (MulEquiv.toMonoidHom (1 : MulAut G)) = H₂
+    change H₁.map (MulEquiv.toMonoidHom (1 : MulAut G)) = H₂
     rw [h_eq]
     ext x
     simp [Subgroup.mem_map]
