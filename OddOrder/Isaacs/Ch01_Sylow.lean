@@ -1994,17 +1994,168 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
 --   核 = ⋂ N_G(P_3) over P_3 ∈ Syl_3. 核 = ⊥ を示す必要 (難所).
 --   |G|=|S_4|=24 ⇒ 全射, 同型.
 
--- TODO Thm 1.36 : `|G| = p^a q` (p, q 異素数, a ≥ 1) ⇒ G 単純でない.
---   Isaacs p.34 完全証明:
---   WLOG `n_p > 1` (これでないと Sylow p 正規で済む). `n_p = q`.
---   distinct `S, T ∈ Syl_p` で `D := S ∩ T` 最大を取る.
---   * D = 1 の場合: 全 Sylow p 対が trivial 交差で非単位元 p-元素計 `q(p^a-1)` 個.
---     残り `p^a q - q(p^a-1) = q` 元のうち単位元以外は q-元素. これらは Sylow q を成し,
---     一意 (cardinality 一致) ⇒ Sylow q 正規 ⇒ G 単純でない.
---   * D > 1 の場合: `N := N_G(D)`. p-群中で normalizer grow ⇒ N ∩ S > D, N ∩ T > D.
---     N が p-群でないことを示し, q ∣ |N|, Q ∈ Syl_q(N), |Q|=q, SQ = G.
---     D は全 Sylow p に含まれる ⇒ 1 < D ⊆ O_p(G), proper normal 部分群.
---   60-100 行 + 元素数の inclusion-exclusion 計算が必要で次セッション持ち越し.
+/-! ### Thm 1.36 — `|G| = p^a q` 単純性破壊.  helpers + main. -/
+
+/-- D = ⊥ 部分 case of Thm 1.36: |G| = p^a q, n_p = q (≥ 2), 全 Sylow `p` 対が自明交差
+ならば Sylow `q` が正規.
+
+Counting: 非単位元 p-元素 = `q(p^a-1)` 個 (Sylow `p` の互いに自明交差), 残り `q-1` 個は
+非 p-冪.  Sylow `q` (素位数 `q`) は `q-1` 個の非単位元を寄与, 互いに自明交差.
+`n_q (q-1) ≤ q-1` で `n_q ≥ 1` ⇒ `n_q = 1`, Sylow `q` 正規. -/
+private lemma sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime] {a : ℕ} (_ha : 1 ≤ a)
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q)
+    (hnpq : Nat.card (Sylow p G) = q)
+    (hcard_Sp : ∀ R : Sylow p G, Nat.card (R : Subgroup G) = p ^ a)
+    (hcard_Sq : ∀ R : Sylow q G, Nat.card (R : Subgroup G) = q)
+    (hSp_disj : ∀ S T : Sylow p G, S ≠ T →
+      (S : Subgroup G) ⊓ (T : Subgroup G) = ⊥) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have hpprime := Fact.out (p := p.Prime)
+  have hqprime := Fact.out (p := q.Prime)
+  have hp_pos := hpprime.pos
+  have hq_pos := hqprime.pos
+  have hq_ge_two := hqprime.two_le
+  have hpa_pos : 0 < p ^ a := pow_pos hp_pos a
+  have hG_fin : Fintype.card G = p ^ a * q := by
+    rw [← Nat.card_eq_fintype_card]; exact hcard
+  have hSyl_count : Fintype.card (Sylow p G) = q := by
+    rw [← Nat.card_eq_fintype_card]; exact hnpq
+  -- Up := union of Sylow p's \ {1}.
+  let Up : Finset G := (Finset.univ : Finset (Sylow p G)).biUnion
+      (fun R => (R : Subgroup G).carrier.toFinset \ {1})
+  have hcard_Up : Up.card = q * (p ^ a - 1) := by
+    have hf_card : ∀ R : Sylow p G,
+        ((R : Subgroup G).carrier.toFinset \ {1}).card = p ^ a - 1 := by
+      intro R
+      have hcard_R : (R : Subgroup G).carrier.toFinset.card = p ^ a := by
+        rw [Set.toFinset_card]
+        change Fintype.card (R : Subgroup G) = p ^ a
+        rw [← Nat.card_eq_fintype_card]; exact hcard_Sp R
+      have h_sub : ({(1 : G)} : Finset G) ⊆ (R : Subgroup G).carrier.toFinset := by
+        intro x hx; simp only [Finset.mem_singleton] at hx; subst hx
+        simp [Set.mem_toFinset]
+      rw [Finset.card_sdiff_of_subset h_sub, hcard_R, Finset.card_singleton]
+    have hf_pwd : ((Finset.univ : Finset (Sylow p G)) : Set (Sylow p G)).PairwiseDisjoint
+        (fun R => (R : Subgroup G).carrier.toFinset \ {1}) := by
+      intro S1 _ S2 _ hne
+      simp only [Function.onFun, Finset.disjoint_iff_ne]
+      rintro x hx y hy rfl
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at hx hy
+      have h_in : x ∈ (S1 : Subgroup G) ⊓ (S2 : Subgroup G) := ⟨hx.1, hy.1⟩
+      rw [hSp_disj S1 S2 hne] at h_in
+      exact hx.2 (Subgroup.mem_bot.mp h_in)
+    rw [Finset.card_biUnion hf_pwd]
+    simp_rw [hf_card]
+    rw [Finset.sum_const, smul_eq_mul]
+    have hsylcount : (Finset.univ : Finset (Sylow p G)).card = q := by
+      rw [Finset.card_univ, hSyl_count]
+    rw [hsylcount]
+  -- Vq := G \ Up \ {1}.
+  have h1_notUp : (1 : G) ∉ Up := by
+    intro h
+    obtain ⟨R, _, hR⟩ := Finset.mem_biUnion.mp h
+    exact (Finset.mem_sdiff.mp hR).2 (Finset.mem_singleton.mpr rfl)
+  let Vq : Finset G := ((Finset.univ : Finset G) \ Up) \ ({1} : Finset G)
+  have hcard_Vq : Vq.card = q - 1 := by
+    have h_sub : Up ⊆ (Finset.univ : Finset G) := Finset.subset_univ _
+    have h_sub2 : ({(1 : G)} : Finset G) ⊆ (Finset.univ : Finset G) \ Up := by
+      simp [Finset.singleton_subset_iff, h1_notUp]
+    change (((Finset.univ : Finset G) \ Up) \ ({1} : Finset G)).card = q - 1
+    rw [Finset.card_sdiff_of_subset h_sub2, Finset.card_sdiff_of_subset h_sub,
+        Finset.card_univ, hG_fin, hcard_Up, Finset.card_singleton]
+    have harith : p ^ a * q = q * (p ^ a - 1) + q := by
+      have hp_ge : 1 ≤ p ^ a := hpa_pos
+      have heq : p ^ a - 1 + 1 = p ^ a := Nat.sub_add_cancel hp_ge
+      conv_lhs => rw [← heq]
+      ring
+    omega
+  -- Sq_nonid := ∪ Sylow q's \ {1}. ⊆ Vq.
+  let Sq_nonid : Finset G := (Finset.univ : Finset (Sylow q G)).biUnion
+      (fun R => (R : Subgroup G).carrier.toFinset \ {1})
+  have hSq_disj : ∀ Q1 Q2 : Sylow q G, Q1 ≠ Q2 →
+      (Q1 : Subgroup G) ⊓ (Q2 : Subgroup G) = ⊥ :=
+    fun Q1 Q2 hne => sylow_q_disjoint_of_prime_card hne (hcard_Sq Q1)
+  have hcard_Sq_nonid : Sq_nonid.card = Fintype.card (Sylow q G) * (q - 1) := by
+    have hf_card : ∀ R : Sylow q G,
+        ((R : Subgroup G).carrier.toFinset \ {1}).card = q - 1 := by
+      intro R
+      have hcard_R : (R : Subgroup G).carrier.toFinset.card = q := by
+        rw [Set.toFinset_card]
+        change Fintype.card (R : Subgroup G) = q
+        rw [← Nat.card_eq_fintype_card]; exact hcard_Sq R
+      have h_sub : ({(1 : G)} : Finset G) ⊆ (R : Subgroup G).carrier.toFinset := by
+        intro x hx; simp only [Finset.mem_singleton] at hx; subst hx
+        simp [Set.mem_toFinset]
+      rw [Finset.card_sdiff_of_subset h_sub, hcard_R, Finset.card_singleton]
+    have hf_pwd : ((Finset.univ : Finset (Sylow q G)) : Set (Sylow q G)).PairwiseDisjoint
+        (fun R => (R : Subgroup G).carrier.toFinset \ {1}) := by
+      intro Q1 _ Q2 _ hne
+      simp only [Function.onFun, Finset.disjoint_iff_ne]
+      rintro x hx y hy rfl
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at hx hy
+      have h_in : x ∈ (Q1 : Subgroup G) ⊓ (Q2 : Subgroup G) := ⟨hx.1, hy.1⟩
+      rw [hSq_disj Q1 Q2 hne] at h_in
+      exact hx.2 (Subgroup.mem_bot.mp h_in)
+    rw [Finset.card_biUnion hf_pwd]
+    simp_rw [hf_card]
+    rw [Finset.sum_const, smul_eq_mul, Finset.card_univ]
+  have hSq_sub_Vq : Sq_nonid ⊆ Vq := by
+    intro x hx
+    simp only [Sq_nonid, Finset.mem_biUnion, Finset.mem_univ, true_and,
+               Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at hx
+    obtain ⟨Q, hxQ, hx_ne⟩ := hx
+    have hxord : orderOf x = q := by
+      have h_ord_dvd : orderOf (⟨x, hxQ⟩ : (Q : Subgroup G)) ∣ Nat.card (Q : Subgroup G) :=
+        orderOf_dvd_natCard _
+      rw [hcard_Sq Q] at h_ord_dvd
+      have h_ord_x : orderOf x ∣ q := by
+        rw [Subgroup.orderOf_mk] at h_ord_dvd; exact h_ord_dvd
+      rcases (Nat.dvd_prime hqprime).mp h_ord_x with h1 | hq
+      · exact absurd (orderOf_eq_one_iff.mp h1) hx_ne
+      · exact hq
+    have hx_notUp : x ∉ Up := by
+      intro h
+      simp only [Up, Finset.mem_biUnion, Finset.mem_univ, true_and,
+                 Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at h
+      obtain ⟨R, hxR, _⟩ := h
+      have h_ord_dvd : orderOf (⟨x, hxR⟩ : (R : Subgroup G)) ∣ Nat.card (R : Subgroup G) :=
+        orderOf_dvd_natCard _
+      rw [hcard_Sp R] at h_ord_dvd
+      have h_ord_xp : orderOf x ∣ p ^ a := by
+        rw [Subgroup.orderOf_mk] at h_ord_dvd; exact h_ord_dvd
+      rw [hxord] at h_ord_xp
+      have hq_dvd_p : q ∣ p := hqprime.dvd_of_dvd_pow h_ord_xp
+      have hq_eq_p : q = p := (Nat.prime_dvd_prime_iff_eq hqprime hpprime).mp hq_dvd_p
+      exact hpq hq_eq_p.symm
+    change x ∈ ((Finset.univ : Finset G) \ Up) \ ({1} : Finset G)
+    refine Finset.mem_sdiff.mpr ⟨Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, hx_notUp⟩, ?_⟩
+    simp [hx_ne]
+  -- n_q * (q-1) ≤ q-1 ⇒ n_q ≤ 1.
+  have hSq_le : Fintype.card (Sylow q G) * (q - 1) ≤ q - 1 := by
+    rw [← hcard_Sq_nonid, ← hcard_Vq]
+    exact Finset.card_le_card hSq_sub_Vq
+  have hSq_eq_one : Fintype.card (Sylow q G) = 1 := by
+    have hq_minus_one_pos : 0 < q - 1 := by omega
+    have hSq_pos : 1 ≤ Fintype.card (Sylow q G) := Fintype.card_pos
+    by_contra h
+    have h2le : 2 ≤ Fintype.card (Sylow q G) := by omega
+    have : 2 * (q - 1) ≤ Fintype.card (Sylow q G) * (q - 1) :=
+      Nat.mul_le_mul_right _ h2le
+    omega
+  haveI : Subsingleton (Sylow q G) :=
+    Fintype.card_le_one_iff_subsingleton.mp (by omega)
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+  exact ⟨Q, Sylow.normal_of_subsingleton Q⟩
+
+-- TODO Thm 1.36 (本体) : `|G| = p^a q` (p, q 異素数, a ≥ 1) ⇒ G 単純でない.
+--   D = ⊥ 部分 helper `sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint` 完成.
+--   残: D ≠ ⊥ 部分 (`NormalizerCondition` で `N_S(D) > D`, SQ = G, D ≤ opCore).
+--   mathlib API: `IsPGroup.isNilpotent` + `normalizerCondition_of_isNilpotent`.
 
 /-- **Isaacs Lemma 1.34**.  `G` が有限集合 `Ω` に作用し, ある元 `x ∈ G` が
 `Ω` 上で奇置換 (`Equiv.Perm.sign = -1`) を引き起こすなら, `G` は指数 2 の
