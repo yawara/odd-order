@@ -1642,6 +1642,28 @@ theorem sylow_normal_of_card_eq_sq_mul_prime
 
 /-! ### Thm 1.32 — `|G| = p³q` helpers and main theorem. -/
 
+/-- Distinct Sylow `q` subgroups of prime order `q` intersect trivially. -/
+private lemma sylow_q_disjoint_of_prime_card
+    [Finite G] {q : ℕ} [Fact q.Prime]
+    {Q₁ Q₂ : Sylow q G} (hne : Q₁ ≠ Q₂)
+    (hQ₁ : Nat.card (Q₁ : Subgroup G) = q) :
+    (Q₁ : Subgroup G) ⊓ (Q₂ : Subgroup G) = ⊥ := by
+  have hcoe : (Q₁ : Subgroup G) ⊓ (Q₂ : Subgroup G) ≤ (Q₁ : Subgroup G) := inf_le_left
+  have hdvd : Nat.card ((Q₁ : Subgroup G) ⊓ (Q₂ : Subgroup G) : Subgroup G) ∣
+      Nat.card (Q₁ : Subgroup G) := Subgroup.card_dvd_of_le hcoe
+  rw [hQ₁] at hdvd
+  rcases (Nat.dvd_prime (Fact.out (p := q.Prime))).mp hdvd with h1 | hq
+  · exact (Subgroup.card_eq_one (H := (Q₁ : Subgroup G) ⊓ (Q₂ : Subgroup G))).mp h1
+  · exfalso
+    apply hne
+    have hinf_eq : (Q₁ : Subgroup G) ⊓ (Q₂ : Subgroup G) = (Q₁ : Subgroup G) := by
+      apply Subgroup.eq_of_le_of_card_ge hcoe
+      omega
+    have hQ₁_le_Q₂ : (Q₁ : Subgroup G) ≤ (Q₂ : Subgroup G) := by
+      rw [← hinf_eq]; exact inf_le_right
+    have h := Q₁.is_maximal' Q₂.isPGroup' hQ₁_le_Q₂
+    exact Sylow.ext h.symm
+
 /-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `p` subgroup has order `p^3`. -/
 private theorem sylow_p_card_of_card_eq_cube_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
@@ -1671,25 +1693,216 @@ private theorem sylow_q_card_of_card_eq_cube_mul_prime
              Finsupp.single_apply, if_neg hpq] at hmul
   simpa [(Fact.out (p := q.Prime)).factorization_self] using hmul
 
-/-- **Isaacs Thm 1.32** (部分形).  `|G| = p^3 · q` (p, q 異素数) のもとで, 以下の
-いずれかが成立する:
+/-- For `|G| = p^3 · q` (p, q 異素数) with `n_q = p^3`, the Sylow `p`-subgroup is normal.
 
-* Sylow `p`-部分群が正規 (`n_p = 1`),
-* Sylow `q`-部分群が正規 (`n_q = 1`),
-* `|G| = 24` (例外, Thm 1.33 で扱う),
-* `n_q = p^3` (元素勘定で結局 Sylow `p` 正規が出るが, 詳細な finset 計算は将来課題).
+Counting argument: each Sylow `q` has prime order `q` (distinct ones disjoint outside {1}),
+so order-`q` elements form a set of size `n_q * (q-1) = p^3 (q-1)`.  The complement
+(`p^3 - 1` non-identity elements + identity = `p^3` elements) contains every Sylow `p`-subgroup
+(since elements of a Sylow `p` have `p`-power order, not order `q`).  Each Sylow `p` has exactly
+`p^3` elements, matching the complement's size, so any two Sylow `p` subgroups coincide as sets,
+hence are equal.  Therefore `n_p = 1`. -/
+private lemma sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q)
+    (hnq : Nat.card (Sylow q G) = p ^ 3) :
+    ∃ P : Sylow p G, (P : Subgroup G).Normal := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  classical
+  have hpprime := Fact.out (p := p.Prime)
+  have hqprime := Fact.out (p := q.Prime)
+  have hp_pos : 0 < p := hpprime.pos
+  have hq_pos : 0 < q := hqprime.pos
+  have hp3_pos : 0 < p ^ 3 := pow_pos hp_pos 3
+  have hcard_Sq : ∀ Q : Sylow q G, Nat.card (Q : Subgroup G) = q :=
+    fun Q => sylow_q_card_of_card_eq_cube_mul_prime hpq hcard Q
+  have hcard_Sp : ∀ P : Sylow p G, Nat.card (P : Subgroup G) = p ^ 3 :=
+    fun P => sylow_p_card_of_card_eq_cube_mul_prime hpq hcard P
+  have hfin_Sq : ∀ Q : Sylow q G, Fintype.card (Q : Subgroup G) = q := by
+    intro Q; rw [← Nat.card_eq_fintype_card]; exact hcard_Sq Q
+  have hfin_Sp : ∀ P : Sylow p G, Fintype.card (P : Subgroup G) = p ^ 3 := by
+    intro P; rw [← Nat.card_eq_fintype_card]; exact hcard_Sp P
+  have hG_fin : Fintype.card G = p ^ 3 * q := by
+    rw [← Nat.card_eq_fintype_card]; exact hcard
+  -- U := order-q elements (a Finset).
+  let U : Finset G := Finset.univ.filter (fun g => orderOf g = q)
+  -- |U| = p^3 * (q - 1).
+  have hU_card : U.card = p ^ 3 * (q - 1) := by
+    let f : Sylow q G → Finset G :=
+      fun Q => (Q : Subgroup G).carrier.toFinset \ {1}
+    have hf_card : ∀ Q : Sylow q G, (f Q).card = q - 1 := by
+      intro Q
+      have hQ_card : (Q : Subgroup G).carrier.toFinset.card = q := by
+        rw [Set.toFinset_card]
+        change Fintype.card (Q : Subgroup G) = q
+        exact hfin_Sq Q
+      have h_sub : ({(1 : G)} : Finset G) ⊆ (Q : Subgroup G).carrier.toFinset := by
+        intro x hx
+        simp only [Finset.mem_singleton] at hx; subst hx
+        simp [Set.mem_toFinset]
+      rw [Finset.card_sdiff_of_subset h_sub, hQ_card, Finset.card_singleton]
+    have hf_pwd : ((Finset.univ : Finset (Sylow q G)) : Set (Sylow q G)).PairwiseDisjoint f := by
+      intro Q1 _ Q2 _ hne
+      simp only [f, Function.onFun, Finset.disjoint_iff_ne]
+      rintro x hx y hy rfl
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at hx hy
+      have h_in : x ∈ (Q1 : Subgroup G) ⊓ (Q2 : Subgroup G) := ⟨hx.1, hy.1⟩
+      rw [sylow_q_disjoint_of_prime_card hne (hcard_Sq Q1)] at h_in
+      exact hx.2 (Subgroup.mem_bot.mp h_in)
+    have hU_eq : U = (Finset.univ : Finset (Sylow q G)).biUnion f := by
+      ext g
+      simp only [U, f, Finset.mem_filter, Finset.mem_univ, true_and,
+        Finset.mem_biUnion, Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton]
+      constructor
+      · intro hg
+        have hg_ne_one : g ≠ 1 := by
+          intro h; rw [h, orderOf_one] at hg
+          have := hqprime.two_le
+          omega
+        have h_qgroup : IsPGroup q (Subgroup.zpowers g) := by
+          rw [IsPGroup.iff_card]
+          exact ⟨1, by rw [Nat.card_zpowers, hg, pow_one]⟩
+        obtain ⟨Q, hQ⟩ := h_qgroup.exists_le_sylow
+        exact ⟨Q, hQ (Subgroup.mem_zpowers g), hg_ne_one⟩
+      · rintro ⟨Q, hgQ, hg_ne⟩
+        have hcardQ := hcard_Sq Q
+        have h_ord_dvd : orderOf (⟨g, hgQ⟩ : (Q : Subgroup G)) ∣ Nat.card (Q : Subgroup G) :=
+          orderOf_dvd_natCard _
+        rw [hcardQ] at h_ord_dvd
+        have h_ord_g : orderOf g ∣ q := by
+          rw [Subgroup.orderOf_mk] at h_ord_dvd
+          exact h_ord_dvd
+        rcases (Nat.dvd_prime hqprime).mp h_ord_g with hone | hq_eq
+        · exact absurd (orderOf_eq_one_iff.mp hone) hg_ne
+        · exact hq_eq
+    rw [hU_eq, Finset.card_biUnion hf_pwd]
+    simp_rw [hf_card]
+    rw [Finset.sum_const, smul_eq_mul]
+    have hSylowq_card : (Finset.univ : Finset (Sylow q G)).card = p ^ 3 := by
+      rw [Finset.card_univ, ← Nat.card_eq_fintype_card]
+      exact hnq
+    rw [hSylowq_card]
+  -- V := (G \ U) \ {1}.  |V| = p^3 - 1.
+  let V : Finset G := ((Finset.univ : Finset G) \ U) \ ({1} : Finset G)
+  have hV_card : V.card = p ^ 3 - 1 := by
+    have h1_notU : (1 : G) ∉ U := by
+      simp only [U, Finset.mem_filter, Finset.mem_univ, true_and, orderOf_one]
+      have := hqprime.two_le
+      omega
+    have h_sub : U ⊆ (Finset.univ : Finset G) := Finset.subset_univ _
+    have h_sub2 : ({(1 : G)} : Finset G) ⊆ (Finset.univ : Finset G) \ U := by
+      simp [Finset.singleton_subset_iff, h1_notU]
+    change (((Finset.univ : Finset G) \ U) \ ({1} : Finset G)).card = p ^ 3 - 1
+    rw [Finset.card_sdiff_of_subset h_sub2, Finset.card_sdiff_of_subset h_sub,
+      Finset.card_univ, hG_fin, hU_card, Finset.card_singleton]
+    -- Goal: p^3 * q - p^3 * (q - 1) - 1 = p^3 - 1
+    have harith : p ^ 3 * q = p ^ 3 * (q - 1) + p ^ 3 := by
+      have hq_ge : 1 ≤ q := hq_pos
+      have heq : q - 1 + 1 = q := Nat.sub_add_cancel hq_ge
+      conv_lhs => rw [← heq]
+      ring
+    omega
+  -- Every non-identity element of a Sylow p subgroup is in V.
+  have h_Sp_sub_V : ∀ P : Sylow p G,
+      ((P : Subgroup G).carrier.toFinset \ {1} : Finset G) ⊆ V := by
+    intro P x hx
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, Finset.mem_singleton] at hx
+    obtain ⟨hxP, hx_ne⟩ := hx
+    have h_ord_dvd : orderOf (⟨x, hxP⟩ : (P : Subgroup G)) ∣ Nat.card (P : Subgroup G) :=
+      orderOf_dvd_natCard _
+    rw [hcard_Sp P] at h_ord_dvd
+    have h_ord_x : orderOf x ∣ p ^ 3 := by
+      rw [Subgroup.orderOf_mk] at h_ord_dvd
+      exact h_ord_dvd
+    have h_ord_ne_q : orderOf x ≠ q := by
+      intro heq
+      rw [heq] at h_ord_x
+      have hq_dvd_p : q ∣ p := hqprime.dvd_of_dvd_pow h_ord_x
+      have hq_eq_p : q = p := (Nat.prime_dvd_prime_iff_eq hqprime hpprime).mp hq_dvd_p
+      exact hpq hq_eq_p.symm
+    change x ∈ ((Finset.univ : Finset G) \ U) \ ({1} : Finset G)
+    refine Finset.mem_sdiff.mpr ⟨?_, ?_⟩
+    · refine Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, ?_⟩
+      simp only [U, Finset.mem_filter, Finset.mem_univ, true_and]
+      exact h_ord_ne_q
+    · simp [hx_ne]
+  -- |Sylow p \ {1}| = p^3 - 1.
+  have h_Sp_card : ∀ P : Sylow p G,
+      ((P : Subgroup G).carrier.toFinset \ {1} : Finset G).card = p ^ 3 - 1 := by
+    intro P
+    have hP_card : (P : Subgroup G).carrier.toFinset.card = p ^ 3 := by
+      rw [Set.toFinset_card]
+      change Fintype.card (P : Subgroup G) = p ^ 3
+      exact hfin_Sp P
+    have h_sub : ({(1 : G)} : Finset G) ⊆ (P : Subgroup G).carrier.toFinset := by
+      intro x hx
+      simp only [Finset.mem_singleton] at hx; subst hx
+      simp [Set.mem_toFinset]
+    rw [Finset.card_sdiff_of_subset h_sub, hP_card, Finset.card_singleton]
+  -- Sylow p \ {1} = V.
+  have h_Sp_eq_V : ∀ P : Sylow p G,
+      ((P : Subgroup G).carrier.toFinset \ {1} : Finset G) = V := by
+    intro P
+    exact Finset.eq_of_subset_of_card_le (h_Sp_sub_V P)
+      (by rw [hV_card, h_Sp_card P])
+  -- All Sylow p subgroups are equal.
+  have h_Sp_eq : ∀ P Q : Sylow p G, (P : Subgroup G) = (Q : Subgroup G) := by
+    intro P Q
+    have hP := h_Sp_eq_V P
+    have hQ' := h_Sp_eq_V Q
+    have h_carriers : ((P : Subgroup G).carrier.toFinset : Finset G) =
+        (Q : Subgroup G).carrier.toFinset := by
+      have hP_carr : ((P : Subgroup G).carrier.toFinset \ {1} : Finset G) ∪ {(1 : G)} =
+          (P : Subgroup G).carrier.toFinset := by
+        rw [Finset.sdiff_union_self_eq_union]
+        rw [Finset.union_eq_left.mpr]
+        intro x hx
+        simp only [Finset.mem_singleton] at hx; subst hx
+        simp [Set.mem_toFinset]
+      have hQ_carr : ((Q : Subgroup G).carrier.toFinset \ {1} : Finset G) ∪ {(1 : G)} =
+          (Q : Subgroup G).carrier.toFinset := by
+        rw [Finset.sdiff_union_self_eq_union]
+        rw [Finset.union_eq_left.mpr]
+        intro x hx
+        simp only [Finset.mem_singleton] at hx; subst hx
+        simp [Set.mem_toFinset]
+      rw [← hP_carr, ← hQ_carr, hP, hQ']
+    apply SetLike.coe_injective
+    ext x
+    have hP_iff : x ∈ ((P : Subgroup G).carrier.toFinset : Finset G) ↔
+        x ∈ (P : Subgroup G) := by simp [Set.mem_toFinset]
+    have hQ_iff : x ∈ ((Q : Subgroup G).carrier.toFinset : Finset G) ↔
+        x ∈ (Q : Subgroup G) := by simp [Set.mem_toFinset]
+    constructor
+    · intro hxP
+      have : x ∈ ((P : Subgroup G).carrier.toFinset : Finset G) := hP_iff.mpr hxP
+      rw [h_carriers] at this
+      exact hQ_iff.mp this
+    · intro hxQ
+      have : x ∈ ((Q : Subgroup G).carrier.toFinset : Finset G) := hQ_iff.mpr hxQ
+      rw [← h_carriers] at this
+      exact hP_iff.mp this
+  haveI : Subsingleton (Sylow p G) := ⟨fun P Q => Sylow.ext (h_Sp_eq P Q)⟩
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  exact ⟨P, Sylow.normal_of_subsingleton P⟩
 
-完全形は `n_q = p^3` の場合に Sylow `p` の正規性を直接結論する形だが,
-ここでは `n_q = p^3` を 4 番目の選択肢として返す.  これでも `|G| = p^3 q` の構造定理として
-有用 (情報の損失なし).  完全な数え上げ証明には Finset 上の `biUnion` 計算が必要 (40-80 行)
-で `sylow_q_disjoint_of_prime_card` (Wave 5-Y で実装) と組み合わせる. -/
+/-- **Isaacs Thm 1.32**.  `|G| = p^3 · q` (p, q 異素数) ⇒ Sylow `p` または Sylow `q` 部分群が
+正規, または `|G| = 24` (Thm 1.33 で扱う例外).
+
+Isaacs p.31 の証明: `n_p` の場合分け (∈ {1, q}). `n_p = 1` なら直ちに Sylow `p` 正規.
+`n_p = q` なら `p < q`, 次に `n_q ∈ {1, p, p², p³}` で場合分け.
+* `n_q = 1`: Sylow `q` 正規.
+* `n_q = p`: Sylow III で `q ∣ p-1`, しかし `p < q` で矛盾.
+* `n_q = p²`: Sylow III で `q ∣ p²-1 = (p-1)(p+1)`. `p < q` で `q ∤ p-1` ⇒ `q ∣ p+1`,
+  `q ≤ p+1` と `p < q` で `q = p+1`, 連続素数で `(p,q) = (2,3)` ⇒ `|G| = 24`.
+* `n_q = p³`: 各 Sylow `q` が prime 位数 `q` で互いに自明交差, 元素勘定で Sylow `p` 一意 ⇒ 正規. -/
 theorem sylow_normal_of_card_eq_cube_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) :
     (∃ P : Sylow p G, (P : Subgroup G).Normal) ∨
     (∃ Q : Sylow q G, (Q : Subgroup G).Normal) ∨
-    Nat.card G = 24 ∨
-    Nat.card (Sylow q G) = p ^ 3 := by
+    Nat.card G = 24 := by
   classical
   haveI : Finite (Sylow p G) := inferInstance
   haveI : Finite (Sylow q G) := inferInstance
@@ -1766,15 +1979,15 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
             · omega
             · omega
         have hq_eq_3 : q = 3 := by rw [hq_eq, hp_eq]
-        refine Or.inr (Or.inr (Or.inl ?_))
+        refine Or.inr (Or.inr ?_)
         rw [hcard, hp_eq, hq_eq_3]
         norm_num
       · exfalso
         have hp_sub_pos : 0 < p - 1 := by omega
         have hq_le : q ≤ p - 1 := Nat.le_of_dvd hp_sub_pos hq_dvd_pred
         omega
-    · -- k = 3: n_q = p³.  Return as disjunct.
-      exact Or.inr (Or.inr (Or.inr hk_eq))
+    · -- k = 3: n_q = p³.  By the counting helper, Sylow p is normal.
+      exact Or.inl (sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube hpq hcard hk_eq)
 
 -- TODO Thm 1.33  : |G|=24 ∧ n_2,n_3>1 ⇒ G ≅ S_4.
 --   方針: G が n_3 = 4 個の Sylow 3 に共役で作用 ⇒ G →* S_4.
