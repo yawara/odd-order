@@ -304,6 +304,39 @@ theorem IsHallSubgroup.bot_of_card_eq_one (π : Set ℕ) (h : Nat.card G = 1) :
   rw [h, Nat.primeFactors_one] at hp
   exact absurd hp (Finset.notMem_empty p)
 
+/-- **Isaacs Thm 3.13 Hall-E** の `|G|`-強誘導補助補題.
+
+`n` パラメータは `Nat.card G ≤ n` を表し, induction by `n` で strong induction の
+形を取れる. base case (`Nat.card G = 1`) は完全に閉じる; step case は IH on `G/M`
++ Schur-Zassenhaus で要 ~200 行 (sorry).
+
+TODO: step case を completion. 必要なのは:
+1. M minimal normal 取り (G nontrivial で existence).
+2. Thm 3.11 で M elementary abelian p-group.
+3. `IH (G ⧸ M) (|G/M| ≤ n から |G/M| = |G|/|M| < |G|)` で `H̄` π-Hall in G/M を得る.
+4. pullback `H = comap (mk' M) H̄`.
+5. p ∈ π case: H は π-Hall (|H| = |H̄|·|M|, |M| は p-power, |G:H| = |G/M : H̄|).
+6. p ∉ π case: H の subgroup M ⊴ H で `Coprime (Nat.card M) M.index` (in H).
+   Schur-Zassenhaus で `H = M ⋊ K`. K が π-Hall in G. -/
+private theorem hall_E_strong_aux : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+      Nat.card G ≤ n → ∀ (π : Set ℕ),
+      ∃ H : Subgroup G, IsHallSubgroup π H := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard _
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ _ hcard π
+    by_cases hsmall : Nat.card G ≤ n
+    · exact ih G hsmall π
+    · -- Nat.card G = n + 1.
+      by_cases hG_one : Nat.card G = 1
+      · exact ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one⟩
+      · -- |G| > 1, G nontrivial. TODO: full step case.
+        sorry
+
 /-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
 について `π`-Hall 部分群が存在.
 
@@ -316,8 +349,8 @@ theorem IsHallSubgroup.bot_of_card_eq_one (π : Set ℕ) (h : Nat.card G = 1) :
     (`p ∉ π` で `L/M` 内に `p` 因子なし). Schur-Zassenhaus で `L = M ⋊ H`, `H` が
     `G` の π-Hall. -/
 theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
-    ∃ H : Subgroup G, IsHallSubgroup π H := by
-  sorry
+    ∃ H : Subgroup G, IsHallSubgroup π H :=
+  hall_E_strong_aux (Nat.card G) G le_rfl π
 
 /-- **Isaacs Thm 3.14 Hall-C** ⭐ **FT クリティカル**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
 
