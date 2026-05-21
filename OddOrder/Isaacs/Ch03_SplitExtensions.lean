@@ -417,8 +417,71 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
           · -- Primes of H.index ⊆ π'.
             rw [hH_index]
             exact hHbar.2
-        · -- Case 2: p ∉ π. TODO: Schur-Zassenhaus.
-          sorry
+        · -- Case 2: p ∉ π. Apply Schur-Zassenhaus to M.subgroupOf H ≤ H.
+          have hM_le_H : M ≤ H := QuotientGroup.le_comap_mk' M Hbar
+          have h_card_MH : Nat.card ↥(M.subgroupOf H) = Nat.card ↥M :=
+            Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM_le_H).toEquiv
+          -- Coprime |M| |Hbar|.
+          have h_disjoint : Disjoint (Nat.card ↥M).primeFactors (Nat.card Hbar).primeFactors := by
+            rw [Finset.disjoint_left]
+            intro q hq_M hq_Hbar
+            exact hp_pi (hM_primes q hq_M ▸ hHbar.1 q hq_Hbar)
+          have h_coprime_M_Hbar : Nat.Coprime (Nat.card ↥M) (Nat.card Hbar) :=
+            (Nat.disjoint_primeFactors Nat.card_pos.ne' Nat.card_pos.ne').mp h_disjoint
+          -- (M.subgroupOf H).index = |Hbar|.
+          have h_idx_MH : (M.subgroupOf H).index = Nat.card Hbar := by
+            have hMH_lag : Nat.card ↥(M.subgroupOf H) * (M.subgroupOf H).index = Nat.card ↥H :=
+              Subgroup.card_mul_index (M.subgroupOf H)
+            rw [h_card_MH, hH_card_eq] at hMH_lag
+            -- Nat.card ↥M * (M.subgroupOf H).index = Nat.card Hbar * Nat.card ↥M
+            have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+            have : Nat.card ↥M * (M.subgroupOf H).index = Nat.card ↥M * Nat.card Hbar := by
+              rw [hMH_lag, mul_comm (Nat.card Hbar)]
+            exact Nat.mul_left_cancel hM_pos this
+          -- Schur-Zassenhaus.
+          have h_coprime_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
+            rw [h_card_MH, h_idx_MH]; exact h_coprime_M_Hbar
+          haveI : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+          obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_MH
+          -- K.index in H = |M.subgroupOf H|, |K| = |Hbar|.
+          have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
+          have hK_card : Nat.card ↥K = Nat.card Hbar := by
+            have := hK.card_mul
+            -- this : Nat.card (M.subgroupOf H) * Nat.card K = Nat.card H
+            rw [h_card_MH, hH_card_eq] at this
+            -- |M| * |K| = |Hbar| * |M|
+            have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+            have h_eq : Nat.card ↥M * Nat.card ↥K = Nat.card ↥M * Nat.card Hbar := by
+              rw [this, mul_comm]
+            exact Nat.mul_left_cancel hM_pos h_eq
+          -- |K.map H.subtype| = |K| = |Hbar|.
+          have hKlift_card : Nat.card ↥(K.map H.subtype) = Nat.card Hbar := by
+            rw [Subgroup.card_subtype, hK_card]
+          -- (K.map H.subtype).index = K.index * H.index = |M| * Hbar.index.
+          have hKlift_index : (K.map H.subtype).index = Nat.card ↥M * Hbar.index := by
+            rw [Subgroup.index_map, Subgroup.ker_subtype, sup_bot_eq, hK_index, h_card_MH,
+                Subgroup.range_subtype, hH_index]
+          refine ⟨K.map H.subtype, ?_, ?_⟩
+          · -- Primes of |K.map H.subtype| ⊆ π.
+            intro q hq_pf
+            rw [hKlift_card] at hq_pf
+            exact hHbar.1 q hq_pf
+          · -- Primes of (K.map H.subtype).index ⊆ π'.
+            intro q hq_pf hq_pi
+            rw [hKlift_index] at hq_pf
+            rw [Nat.mem_primeFactors] at hq_pf
+            obtain ⟨hq_prime, hq_dvd, _⟩ := hq_pf
+            rcases hq_prime.dvd_mul.mp hq_dvd with h_in_M | h_in_HbarIdx
+            · -- q divides |M| ⇒ q = p (M is p-power).
+              have hq_in_M_pf : q ∈ (Nat.card ↥M).primeFactors :=
+                Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩
+              have hq_eq_p : q = _p := hM_primes q hq_in_M_pf
+              rw [hq_eq_p] at hq_pi
+              exact hp_pi hq_pi
+            · -- q divides Hbar.index ⇒ q ∉ π (from IH).
+              have hq_in_HbarIdx_pf : q ∈ Hbar.index.primeFactors :=
+                Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_HbarIdx, Subgroup.index_ne_zero_of_finite⟩
+              exact hHbar.2 q hq_in_HbarIdx_pf hq_pi
 
 /-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
 について `π`-Hall 部分群が存在.
