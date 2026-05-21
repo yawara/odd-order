@@ -347,19 +347,21 @@ instance opCore.normal (p : ℕ) (G : Type*) [Group G] : (opCore p G).Normal := 
   intro g
   ext x
   simp only [mem_opCore, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def]
+  -- After simp: ∀ P, (MulAut.conj g)⁻¹ x ∈ ↑P  ↔  ∀ P, x ∈ ↑P
+  -- Here ↑P is the Subgroup G coercion via CoeOut (Sylow p G) (Subgroup G)
   constructor
-  · -- Assume ∀ P, (MulAut.conj g)⁻¹ x ∈ P. Want ∀ P, x ∈ P.
-    -- For any P, take Q := g⁻¹ • P; then (conj g)⁻¹ x ∈ Q means x ∈ conj g • Q = P.
-    intro h P
-    have hQ := h (g⁻¹ • P)
-    rw [Sylow.coe_subgroup_smul, ← map_inv] at hQ
-    rwa [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, ← MulAut.smul_def] at hQ
-  · -- Assume ∀ P, x ∈ P. Want ∀ P, (conj g)⁻¹ x ∈ P.
-    -- For any P, take Q := g • P; then x ∈ Q means (conj g)⁻¹ x ∈ P.
-    intro h P
-    have hQ := h (g • P)
-    rw [Sylow.coe_subgroup_smul] at hQ
-    rw [← map_inv, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, ← MulAut.smul_def]
+  · intro h P
+    -- Apply h to (g⁻¹ • P : Sylow p G); then unfold the smul at Subgroup level
+    have hQ : (MulAut.conj g)⁻¹ x ∈ (↑(g⁻¹ • P) : Subgroup G) := h (g⁻¹ • P)
+    rw [Sylow.coe_subgroup_smul, ← map_inv,
+        Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hQ
+    simp only [map_inv, inv_inv, MulAut.smul_def] at hQ
+    rwa [MulAut.apply_inv_self] at hQ
+  · intro h P
+    -- Apply h to (g • P : Sylow p G); then unfold the smul at Subgroup level
+    have hQ : x ∈ (↑(g • P) : Subgroup G) := h (g • P)
+    rw [Sylow.coe_subgroup_smul,
+        Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hQ
     exact hQ
 
 /-- **Isaacs Problem 1B.2**. 任意の正規 `p`-部分群 `N` は `opCore p G` に含まれる.
