@@ -7,6 +7,7 @@ import Mathlib.Data.Finite.Perm
 import Mathlib.Data.Nat.Choose.Lucas
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Sylow
@@ -336,16 +337,83 @@ theorem opCore_isPGroup (p : ℕ) [Fact p.Prime] (G : Type*) [Group G] :
   exact P.2.of_injective (Subgroup.inclusion (opCore_le P))
     (Subgroup.inclusion_injective _)
 
--- TODO `opCore.normal` (`O_p(G)` は `G` で正規).
---   共役で全 Sylow が permute されることから `⨅ Sylow` が共役不変であることを示す.
---   `Sylow.coe_subgroup_smul` + `Subgroup.mem_pointwise_smul_iff_inv_smul_mem` の
---   組み合わせで membership 計算する必要があり、`MulAut.conj` の inverse 周りで
---   simp 補題が要安定化のため次の iteration へ.
+/-- `O_p(G)` は `G` で正規.
+証明: `Subgroup.Normal.of_conjugate_fixed` を使い,
+`∀ g : G, MulAut.conj g • opCore p G = opCore p G` を示す.
+各 `g` について `MulAut.conj g` は Sylow 部分群を Sylow 部分群に写す (`g • P ∈ Sylow p G`)
+ので, 全 Sylow の共通部分 `opCore p G` も共役不変. -/
+instance opCore.normal (p : ℕ) (G : Type*) [Group G] : (opCore p G).Normal := by
+  apply Subgroup.Normal.of_conjugate_fixed
+  intro g
+  ext x
+  simp only [mem_opCore, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def]
+  constructor
+  · -- Assume ∀ P, (MulAut.conj g)⁻¹ x ∈ P. Want ∀ P, x ∈ P.
+    -- For any P, take Q := g⁻¹ • P; then (conj g)⁻¹ x ∈ Q means x ∈ conj g • Q = P.
+    intro h P
+    have hQ := h (g⁻¹ • P)
+    rw [Sylow.coe_subgroup_smul, ← map_inv] at hQ
+    rwa [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, ← MulAut.smul_def] at hQ
+  · -- Assume ∀ P, x ∈ P. Want ∀ P, (conj g)⁻¹ x ∈ P.
+    -- For any P, take Q := g • P; then x ∈ Q means (conj g)⁻¹ x ∈ P.
+    intro h P
+    have hQ := h (g • P)
+    rw [Sylow.coe_subgroup_smul] at hQ
+    rw [← map_inv, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, ← MulAut.smul_def]
+    exact hQ
 
--- TODO **Isaacs Problem 1B.2** (`opCore` の最大性): 任意の正規 `p`-部分群 ⊆ `opCore p G`.
---   証明骨子: 正規 `p`-部分群 N について N ≤ Q ∈ Sylow (Sylow D), 任意の P ∈ Sylow に対し
---   N = g • N ⊆ g • Q = P (Sylow C による共役). 上の `opCore.normal` 同様,
---   pointwise smul の membership 計算が必要.
+/-- **Isaacs Problem 1B.2**. 任意の正規 `p`-部分群 `N` は `opCore p G` に含まれる.
+これにより `opCore p G` は `G` の最大正規 `p`-部分群である.
+
+証明: Sylow D (`IsPGroup.exists_le_sylow`) で `N ≤ Q` となる Sylow `Q` を取り,
+任意の Sylow `P` に対して Sylow C (`[Finite (Sylow p G)]`) で `∃ g, P = g • Q` を取る.
+`N` の正規性から `N = MulAut.conj g • N ≤ MulAut.conj g • Q = ↑(g • Q) = ↑P`. -/
+theorem normal_pgroup_le_opCore {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite (Sylow p G)]
+    {N : Subgroup G} [N.Normal] (hN : IsPGroup p N) :
+    N ≤ opCore p G := by
+  rw [opCore, le_iInf_iff]
+  intro P
+  obtain ⟨Q, hNQ⟩ := hN.exists_le_sylow
+  obtain ⟨g, hgQ⟩ := MulAction.exists_smul_eq G Q P
+  calc (N : Subgroup G)
+      = MulAut.conj g • N := (Subgroup.Normal.conj_smul_eq_self g N).symm
+    _ ≤ MulAut.conj g • (Q : Subgroup G) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hNQ
+    _ = ↑(g • Q) := Sylow.coe_subgroup_smul.symm
+    _ = ↑P := by rw [hgQ]
+
+/-! ### Isaacs Thm 1.26 (冪零 ⇔ Sylow 全正規) -/
+
+/-- **Isaacs Thm 1.26 (1) ⇔ (4)**.  有限群 `G` について「`G` が冪零」と
+「`G` の任意の Sylow 部分群が正規」は同値.
+
+mathlib `isNilpotent_of_finite_tfae` の (0) ⇔ (3) の抽出ラッパー.  Isaacs 流 5 条件
+((1)冪零, (2)`H<G ⇒ N_G(H)>H`, (3) 全極大正規, (4) 全 Sylow 正規, (5) Sylow 内部直積)
+は TFAE 全体 (`isNilpotent_of_finite_tfae`) で確保される. -/
+theorem isNilpotent_iff_forall_sylow_normal [Finite G] :
+    Group.IsNilpotent G ↔
+      ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal :=
+  isNilpotent_of_finite_tfae.out 0 3
+
+/-- **Isaacs Thm 1.26 (4) ⇒ (1)** (片向き取り出し).
+全 Sylow が正規ならば G は冪零. -/
+theorem isNilpotent_of_forall_sylow_normal [Finite G]
+    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal) :
+    Group.IsNilpotent G :=
+  isNilpotent_iff_forall_sylow_normal.mpr h
+
+/-- **Isaacs Thm 1.26 (1) ⇒ (4)** (片向き取り出し).
+冪零ならば任意の Sylow は正規. -/
+theorem Sylow.normal_of_isNilpotent [Finite G] [Group.IsNilpotent G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) : (↑P : Subgroup G).Normal :=
+  isNilpotent_iff_forall_sylow_normal.mp ‹_› p P
+
+-- TODO **Isaacs Lemma 1.27**. 互いに素な位数を持つ有限正規部分群族の和は `iSupIndep`.
+--   mathlib `Subgroup.independent_of_coprime_order` を呼ぶラッパー. ただし
+--   その関数は `Pairwise commute` を要求し, 正規部分群 + coprime cards から
+--   `Disjoint` ⇒ `commute_of_normal_of_disjoint` への中継補題が必要 (要 Lagrange
+--   による `orderOf` の分割整除).
 
 end -- 1D
 
