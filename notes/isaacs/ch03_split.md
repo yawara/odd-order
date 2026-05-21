@@ -4,7 +4,7 @@
 形式化先: [`OddOrder/Isaacs/Ch03_SplitExtensions.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 1322-2123。
 
-## 進捗 (2026-05-21)
+## 進捗 (2026-05-22 更新)
 
 §3A ウォームアップ実装済 (Thm 3.1, 3.2 を mathlib `SemidirectProduct` 経由で wrap):
 
@@ -16,11 +16,18 @@
 | Thm 3.1 (uniqueness via mulEquivSubgroup) | ✅ | `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` 再述) |
 | Thm 3.3 Horosevskii | TODO | Ch.2 Thm 2.20 Lucchini 待ち |
 | Thm 3.4 (abelian P regular orbit) | TODO | Ch.1 §1F Brodkey (Thm 1.37) 待ち |
-| §3B Schur-Zassenhaus (3.5-3.12) | TODO | mathlib 直ラッパー予定 |
-| §3C Hall 理論 (3.13-3.17) | TODO | **FT クリティカル**, Hall π-subgroup 新規定義 + 主定理 |
-| §3D π-separable + Hall-Higman (3.18-3.22) | TODO | **FT クリティカル**, π-separable 新規定義 + 3.21 |
-| §3E Coprime action (3.23-3.34) | TODO | Glauberman lemma 等 |
-| §3F 巡回商 lift (3.35-3.36) | TODO | 補助, 優先度低 |
+| §3B Schur-Zassenhaus (3.5-3.10) | docstring | mathlib 対応表のみ (`exists_right_complement'_of_coprime`, `IsSolvable` instance chains) |
+| §3B Thm 3.11 前半 (abelian) | ✅ | `solvable_minimal_normal_isAbelian` (`⁅M,M⁆ < M` + 最小性) |
+| §3B Thm 3.11 後半 (elementary abelian) | ✅ | `solvable_minimal_normal_isElementaryAbelian` (p-torsion T が characteristic in M + 最小性) |
+| §3C Lemma 3.16 coprime index ⇒ HK=G | ✅ | `sup_eq_top_of_coprime_index` (Subgroup.index_dvd + Nat.dvd_gcd) |
+| §3C IsHallSubgroup 定義 + 基礎 | ✅ | `IsHallSubgroup`, `.coprime_index`, `.top_iff`, `.bot_iff`, `.bot_of_card_eq_one` |
+| §3C Thm 3.13 Hall-E | base のみ (sorry on step) | base case (|G|=1) で `IsHallSubgroup.bot_of_card_eq_one` 適用. step は IH on G/M + Schur-Zassenhaus で要 ~200 行 |
+| §3C Thm 3.14 Hall-C | TODO | step は IH + Schur-Zassenhaus 共役性 |
+| §3C Thm 3.15 (Hall converse) | TODO | p-complement 存在 ⇒ 可解 |
+| §3C Thm 3.17 (3 subgroups solvability) | TODO | Lemma 3.16 + Schur-Zassenhaus 連鎖 |
+| §3D π-separable + Hall-Higman (3.18-3.22) | TODO | IsPiSeparable placeholder のみ. 正式定義に normal series 必要 |
+| §3E Coprime action (3.23-3.34) | docstring | Glauberman lemma 等, 大規模 |
+| §3F 巡回商 lift (3.35-3.36) | docstring | 補助, 優先度低 |
 
 ## mmd 抽出失敗の整理
 
