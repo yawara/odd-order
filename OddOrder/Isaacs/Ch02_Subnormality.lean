@@ -1264,6 +1264,38 @@ theorem isSubnormal_of_permutable_with_conjugates [Finite G] {S : Subgroup G}
     S.IsSubnormal :=
   isSubnormal_of_permutable_aux (Nat.card G) G le_rfl hperm
 
+/-! ### Isaacs Thm 2.11 (Wielandt abelian-in-F(G)) -/
+
+/-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)). 有限群 `G` の abelian 部分群 `A`
+で, 全ての `H ⊇ A` について `|H:A|² ≤ |H:Z(H)|` ならば `A ≤ F(G)`.
+
+形式化: TODO. Isaacs p.50 の証明は Thm 2.2 + Zipper Lemma + 数え上げ (`|HK| = |H|·|K|/|H∩K|`,
+`A ∩ A^g ⊆ Z(G)` for abelian A, A^g).
+mathlib に `|HK| = |H|·|K|/|H∩K|` 公式が無いので自前で組む必要あり (中規模 helper). -/
+theorem subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
+    (_hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_h : ∀ H : Subgroup G, A ≤ H →
+      ((A.subgroupOf H).index) ^ 2 ≤ (Subgroup.center ↥H).index) :
+    A ≤ fitting G := by
+  sorry
+
 end -- 2A
+
+/-! ## §2B – §2D 残り (TODO)
+
+* **Thm 2.12 (Baer)**: `H ≤ F(G) ↔ ⟨H, H^x⟩` 冪零 ∀x. 順方向は trivial, 逆方向は
+  Thm 2.11 経由.
+* **Thm 2.13 (Matsuyama)**: involution `t ∉ O₂(G)` ⇒ 奇素数位数 `x` で `x^t = x⁻¹`.
+* **Lemma 2.14**: dihedral 構造補助.
+* **Thm 2.15**: 全 `p`-local 正規 Sylow 2 ⇒ `|G|` 奇 or `O₂(G) ≠ 1`.
+* **Lemma 2.16**: `G/N` の `p`-local = `G` の `p`-local の像.
+* **Lemma 2.17**: `p ∤ |N|`, `P` `p`-subgroup ⇒ `N_{G/N}(P̄) = N_G(P)/N` (FT 多用).
+* **Thm 2.18 Zenkov**: `A, B` abelian + `M ∈ {A ∩ B^g}` 極小 ⇒ `M ≤ F(G)`.
+* **Cor 2.19**: `A` abelian + `|A| ≥ |G:A|` ⇒ `A ∩ F(G) > 1`.
+* **Thm 2.20 Lucchini**: `A` 巡回真 + `K = core_G(A)` ⇒ `|A:K| < |G:A|` (Ch.3 3.3 で必要).
+
+これらは要 cardinality 連鎖 + Center 表現 + Lemma 2.14 dihedral 補助等で,
+別 commit に分離.
+-/
 
 end OddOrder.Isaacs.Ch02
