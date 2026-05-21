@@ -550,8 +550,106 @@ theorem nilpotent_normal_le_fitting [Finite G] {N : Subgroup G} [N.Normal]
       ≤ opCore p G := normal_pgroup_le_opCore hpGroup
     _ ≤ fitting G := opCore_le_fitting ⟨p, hp'.out⟩ G
 
--- TODO **Isaacs Cor 1.28(a)** (Fitting の冪零性).
---   `(fitting G).IsNilpotent` — Lemma 1.27 (iSupIndep + 各 opCore が冪零) + 直積の冪零性.
+/-- 有限 `G` で `p ∤ |G|` (より一般に `p` が `|G|` の素因子でない) なら, 任意の
+Sylow `p`-部分群は自明 `⊥`, 従って `opCore p G = ⊥`.
+
+`Sylow.card_eq_multiplicity` で各 Sylow の濃度は `p ^ v_p(|G|)`. `p ∉ pf(|G|)` なら
+`v_p(|G|) = 0` で濃度 1, ゆえ `⊥`. -/
+theorem opCore_eq_bot_of_not_mem_primeFactors [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : p ∉ (Nat.card G).primeFactors) :
+    opCore p G = ⊥ := by
+  -- Pick any Sylow P; it's ⊥ since its card is p^0 = 1.
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  have hcard : Nat.card (P : Subgroup G) = 1 := by
+    rw [Sylow.card_eq_multiplicity P]
+    have hfact : (Nat.card G).factorization p = 0 := by
+      by_cases hdvd : p ∣ Nat.card G
+      · -- p divides but is not in primeFactors → contradiction since Nat.card G ≠ 0
+        exfalso
+        exact hp (Nat.mem_primeFactors.mpr
+          ⟨(Fact.out : p.Prime), hdvd, Nat.card_pos.ne'⟩)
+      · exact Nat.factorization_eq_zero_of_not_dvd hdvd
+    rw [hfact, pow_zero]
+  have hPbot : (P : Subgroup G) = ⊥ := Subgroup.eq_bot_of_card_eq _ hcard
+  exact le_bot_iff.mp (le_of_le_of_eq (opCore_le P) hPbot)
+
+/-- 有限 `G` について `fitting G` は `|G|` の素因子だけに渡る `opCore` の sup と等しい.
+非素因子 `p` に対しては `opCore p G = ⊥` で寄与しないため. -/
+theorem fitting_eq_iSup_primeFactors [Finite G] :
+    fitting G = ⨆ p : (Nat.card G).primeFactors, opCore (p : ℕ) G := by
+  apply le_antisymm
+  · -- fitting = ⨆ p : Primes ≤ ⨆ p : pf
+    refine iSup_le (fun p => ?_)
+    haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+    by_cases hmem : (p : ℕ) ∈ (Nat.card G).primeFactors
+    · -- p is in primeFactors, contribute via the indexed sup
+      exact le_iSup (fun q : (Nat.card G).primeFactors => opCore (q : ℕ) G) ⟨p, hmem⟩
+    · -- p not in primeFactors: opCore p G = ⊥
+      rw [opCore_eq_bot_of_not_mem_primeFactors hmem]
+      exact bot_le
+  · -- ⨆ p : pf ≤ ⨆ p : Primes (= fitting)
+    refine iSup_le (fun p => ?_)
+    have hp : (p : ℕ).Prime := Nat.prime_of_mem_primeFactors p.2
+    exact opCore_le_fitting ⟨(p : ℕ), hp⟩ G
+
+/-- **Isaacs Cor 1.28(a)** (Fitting subgroup の冪零性).
+有限群 `G` について `fitting G` は冪零.
+
+証明骨子: `(Nat.card G).primeFactors` 上の積 `∀ p, opCore p G` から `G` への
+`noncommPiCoprod` を考える. (i) 異なる素数 `p ≠ q` で `opCore p G, opCore q G` は
+互いに素な p-群 (`IsPGroup.disjoint_of_ne`) ゆえ可換 (`commute_of_normal_of_disjoint`,
+両者は正規), (ii) `independent_of_coprime_order` で `iSupIndep`, よって
+`noncommPiCoprod` は単射 (`injective_noncommPiCoprod_of_iSupIndep`).
+range は `⨆ p, opCore p G = fitting G` (`fitting_eq_iSup_primeFactors`).
+従って `(∀ p, opCore p G) ≃* fitting G` (`MulEquiv.ofInjective` + `subgroupCongr`).
+各 `opCore p G` は有限 p-群ゆえ冪零 (`IsPGroup.isNilpotent`), 有限積も冪零
+(`isNilpotent_pi`), `MulEquiv` で `fitting G` も冪零.
+
+`instance` 指定で `[Group.IsNilpotent (fitting G)]` が下流で自動推論される. -/
+instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
+  classical
+  have _ := Fintype.ofFinite G
+  set ps := (Nat.card G).primeFactors with hps
+  -- For each p ∈ pf, opCore p G is a p-group and normal in G
+  have hcomm : Pairwise fun p₁ p₂ : ps =>
+      ∀ x y : G, x ∈ opCore (p₁ : ℕ) G → y ∈ opCore (p₂ : ℕ) G → Commute x y := by
+    rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
+    haveI hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
+    haveI hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
+    have hne' : p₁ ≠ p₂ := by simpa using hne
+    apply Subgroup.commute_of_normal_of_disjoint _ _ (opCore.normal p₁ G)
+      (opCore.normal p₂ G)
+    exact IsPGroup.disjoint_of_ne p₁ p₂ hne' _ _
+      (opCore_isPGroup p₁ G) (opCore_isPGroup p₂ G)
+  set f := Subgroup.noncommPiCoprod (G := G)
+    (H := fun p : ps => opCore (p : ℕ) G) hcomm with hf
+  -- f is injective by iSupIndep (coprime orders)
+  have hinj : Function.Injective f := by
+    apply Subgroup.injective_noncommPiCoprod_of_iSupIndep
+    apply Subgroup.independent_of_coprime_order hcomm
+    rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
+    haveI hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
+    haveI hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
+    have hne' : p₁ ≠ p₂ := by simpa using hne
+    simp only [← Nat.card_eq_fintype_card]
+    exact IsPGroup.coprime_card_of_ne p₁ p₂ hne' _ _
+      (opCore_isPGroup p₁ G) (opCore_isPGroup p₂ G)
+  -- range f = ⨆ p, opCore p G = fitting G
+  have hrange : f.range = fitting G := by
+    rw [hf, Subgroup.noncommPiCoprod_range, ← fitting_eq_iSup_primeFactors]
+  -- Build MulEquiv (∀ p, opCore p G) ≃* fitting G
+  let e : (∀ p : ps, opCore (p : ℕ) G) ≃* fitting G :=
+    (MonoidHom.ofInjective hinj).trans (MulEquiv.subgroupCongr hrange)
+  -- Each opCore p G (as a group) is finite + p-group ⇒ nilpotent
+  have hnilp : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := by
+    rintro ⟨p, hp⟩
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    exact (opCore_isPGroup p G).isNilpotent
+  -- Finite product of nilpotent is nilpotent
+  haveI : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := hnilp
+  haveI : Group.IsNilpotent (∀ p : ps, opCore (p : ℕ) G) := isNilpotent_pi
+  -- Transport across the MulEquiv
+  exact nilpotent_of_mulEquiv e
 
 -- TODO **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).  Cor 1.28 (b) から直結:
 --   K, L 冪零正規 ⇒ K, L ≤ fitting ⇒ KL ≤ fitting (冪零) ⇒ KL 冪零.
