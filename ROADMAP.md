@@ -9,8 +9,8 @@
 | 略称 | 書名 | 役割 |
 |------|------|------|
 | **Isaacs** | I. M. Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) | 有限群論の前提一式 (Fitting, Hall, Frobenius, ZJ, transfer, 一般化 Fitting `F*`) |
-| **BG** | H. Bender & G. Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994) | FT 原論文 Ch.IV (局所解析) + Ch.VI (最終矛盾、App.C で Peterfalvi 改訂版) |
-| **Peterfalvi** | T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000) | FT 原論文 Ch.V (指標理論) |
+| **BG** | H. Bender & G. Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994) | Feit-Thompson 1963 原論文 Ch.IV (局所解析) + Ch.VI (最終矛盾; App.C は Peterfalvi 1984 paper の改訂版) |
+| **Peterfalvi** | T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000) | Feit-Thompson 1963 原論文 Ch.V (指標理論) |
 
 ## 方針
 
@@ -57,6 +57,7 @@ Phase 2a と 2b は Phase 1 が概ね終わった後、独立に並行進行可�
 ## Lean モジュール構成 (提案)
 
 ```
+OddOrder.lean                            # entry module — 章ファイルを順次 import
 OddOrder/
 ├── Isaacs/                              # Phase 1
 │   ├── Ch01_Sylow.lean
@@ -93,7 +94,7 @@ OddOrder/
 │   │   └── S16_MainResults.lean
 │   ├── AppA_Prerequisites.lean
 │   ├── AppB_Puig.lean
-│   ├── AppC_FinalContradiction.lean     # Peterfalvi Ch.VI 改訂版
+│   ├── AppC_FinalContradiction.lean     # Peterfalvi (1984 paper) 改訂版
 │   ├── AppD_CNGroups.lean
 │   └── AppE_FeitThompson.lean
 ├── Peterfalvi/                          # Phase 2b
@@ -123,7 +124,7 @@ OddOrder/
 └── Basic.lean                           # 一時ダミー (削除予定)
 ```
 
-Namespace 階層: `OddOrder.Isaacs.Ch1`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peterfalvi.S04` 等。
+Namespace 階層: `OddOrder.Isaacs.Ch01`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peterfalvi.S04` 等。
 
 ## ファイル粒度とトレーサビリティ
 
@@ -186,22 +187,67 @@ end -- 1B
 ## 進捗ログ
 
 - **2026-05-21** Phase 0 完了 (Lean プロジェクト初期化、mathlib カバレッジ調査、3 冊スコープ確定、本ロードマップ作成)
+- **2026-05-21** Phase 1 章間依存を Isaacs mmd から集計、下記の依存図を追加
+
+## Phase 1 内の章間依存 (Isaacs)
+
+Isaacs FGT 本文中で `Theorem|Lemma|Corollary|Proposition N.M` 形式の章間参照を `references/isaacs/finite-group-theory.mmd` から集計した実依存:
+
+```
+Ch.1 (Sylow) ──┬─→ Ch.2 (Subnormality) ──→ Ch.9 (F*)
+               │     │
+               │     ↓
+               ├─→ Ch.3 (Hall, S-Z) ─→ Ch.4 (Commutators) ─→ Ch.5 (Transfer)
+               │                                                  │
+               │                                                  ↓
+               │                                             Ch.6 (Frobenius)
+               │                                                  │
+               │                                       ┌──────────┤
+               │                                       ↓          ↓
+               │                                 Ch.10 (More)  Ch.7 (Thompson, ZJ)
+               │
+               └─→ Ch.8 (Permutation, 実質独立)
+
+Appendix: 前提なし
+```
+
+並列着手の指針:
+
+- **第 1 波 (前提なし、mathlib 既存資産で薄く):** Ch.1, Ch.8, Appendix
+- **第 2 波 (Ch.1 完了後):** Ch.2
+- **第 3 波 (Ch.2 完了後、並列可):** Ch.3, Ch.9 (F\* は Ch.2 直後に着手可)
+- **第 4 波:** Ch.4 → Ch.5 → Ch.6 のシーケンス (Transfer は mathlib 既存で速い)
+- **第 5 波 (Ch.6 完了後、並列可):** Ch.7 (Thompson J(P), ZJ), Ch.10 (More Transfer)
+
+クリティカルパスは Ch.6 → Ch.7 (Frobenius 群と Thompson subgroup の新規実装が Phase 1 の山場)。Ch.9 (F\*) は意外に Ch.6/Ch.7 を待たずに並行できる。
+
+集計再現手順 (mathlib や Isaacs 改訂で章番号が変わった場合に再実行):
+
+```bash
+mmd=references/isaacs/finite-group-theory.mmd
+# 章境界: grep -n "^## Chapter " "$mmd" で取得 (Ch.3 は MISSING_PAGE_EMPTY で欠落するので前後章から推定)
+# 各章本文範囲を awk で切り出し、Theorem/Lemma/Corollary/Proposition N.M の N を grep -oE で抽出
+awk -v s=START -v e=END 'NR>=s && NR<e' "$mmd" \
+  | grep -oE "(Theorem|Lemma|Corollary|Proposition) [0-9]+\.[0-9]+" \
+  | grep -oE "[0-9]+\.[0-9]+" | awk -F. '{print "Ch."$1}' \
+  | sort | uniq -c | sort -rn
+```
 
 ## チャプター進捗チェックリスト
 
 ### Phase 1 — Isaacs
 
-- [ ] Ch.1 Sylow Theory (p.1)
-- [ ] Ch.2 Subnormality (p.45)
-- [ ] Ch.3 Split Extensions (p.65) — Hall, Schur-Zassenhaus
-- [ ] Ch.4 Commutators (p.113)
-- [ ] Ch.5 Transfer (p.147)
-- [ ] Ch.6 Frobenius Actions (p.177)
-- [ ] Ch.7 The Thompson Subgroup (p.201) — J(P), ZJ
-- [ ] Ch.8 Permutation Groups (p.223)
-- [ ] Ch.9 More on Subnormality (p.271) — F*(G)
-- [ ] Ch.10 More Transfer Theory (p.295)
-- [ ] Appendix: The Basics (p.325)
+- [ ] Ch.1 Sylow Theory (p.1) — *前提なし*
+- [ ] Ch.2 Subnormality (p.45) — *前提: Ch.1*
+- [ ] Ch.3 Split Extensions (p.65) — Hall, Schur-Zassenhaus; *前提: Ch.1, Ch.2*
+- [ ] Ch.4 Commutators (p.113) — *前提: Ch.3 (Ch.1, Ch.2 軽)*
+- [ ] Ch.5 Transfer (p.147) — *前提: Ch.3, Ch.4*
+- [ ] Ch.6 Frobenius Actions (p.177) — *前提: Ch.3, Ch.4, Ch.5*
+- [ ] Ch.7 The Thompson Subgroup (p.201) — J(P), ZJ; *前提: Ch.6 (Ch.1-5 横断)*
+- [ ] Ch.8 Permutation Groups (p.223) — *前提: Ch.1 (実質独立)*
+- [ ] Ch.9 More on Subnormality (p.271) — F*(G); *前提: Ch.2 (Ch.1 軽)*
+- [ ] Ch.10 More Transfer Theory (p.295) — *前提: Ch.4, Ch.5, Ch.6*
+- [ ] Appendix: The Basics (p.325) — *前提なし (基礎集合)*
 
 ### Phase 2a — Bender-Glauberman
 
@@ -232,7 +278,7 @@ end -- 1B
 **Appendices**
 - [ ] App.A Prerequisites and p-Stability (p.135)
 - [ ] App.B The Puig Subgroup (p.139)
-- [ ] App.C The Final Contradiction (p.145) — Peterfalvi 改訂版
+- [ ] App.C The Final Contradiction (p.145) — Peterfalvi (1984 paper) 改訂版
 - [ ] App.D CN-Groups of Odd Order (p.153)
 - [ ] App.E Further Results of Feit and Thompson (p.157)
 
@@ -291,5 +337,5 @@ notes/
 
 ## 補足ドキュメント
 
-- mathlib カバレッジ詳細 (どの mathlib 資産が使えるか、何が欠けているか): メモリ `mathlib_coverage_feit_thompson.md` 参照
+- mathlib カバレッジ詳細 (どの mathlib 資産が使えるか、何が欠けているか): [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md)
 - プロジェクトセットアップ状態: メモリ `project_setup_state.md` 参照

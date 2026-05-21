@@ -38,4 +38,4 @@ Lean toolchain は [`lean-toolchain`](lean-toolchain)、mathlib バージョン�
 
 ## ライセンス
 
-未定。
+Apache License 2.0 ([LICENSE](LICENSE))。

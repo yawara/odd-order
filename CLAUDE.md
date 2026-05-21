@@ -36,7 +36,7 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 
 ### namespace
 
-階層: `OddOrder.Isaacs.Ch1`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peterfalvi.S04`。汎用補題は将来 `Subgroup.fitting` のように mathlib 階層へリネーム可能な形で書く。
+階層: `OddOrder.Isaacs.Ch01`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peterfalvi.S04`。汎用補題は将来 `Subgroup.fitting` のように mathlib 階層へリネーム可能な形で書く。
 
 ## ノート・小ロードマップの管理
 
@@ -73,9 +73,4 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 ## mathlib カバレッジ
 
-mathlib に既存のもの (再利用) と無いもの (新規実装) はおおよそ調査済み。代表:
-
-- **✓ 既存**: Sylow, p-群 (`IsPGroup`), 可解 (`IsSolvable`), 冪零 (`IsNilpotent`), Frattini, Transfer, Focal subgroup, Schur-Zassenhaus, 表現論・指標の基本 (Maschke, 直交関係, 誘導表現の adjunction)
-- **✗ 無し (新規実装)**: Fitting `F(G)`, 一般化 Fitting `F*(G)`, π-Hall (一般), Frobenius 群 (kernel/complement), ZJ-定理, Thompson subgroup `J(P)`, 仮想指標環 `ℤ[Irr G]`, Brauer/Artin 誘導, Dade isometry, Peterfalvi の coherence
-
-優先順序は ROADMAP Phase 1 (Isaacs Ch.1-10) でカバー。
+詳細は [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md) に集約。概要: Sylow / `IsPGroup` / `IsSolvable` / `IsNilpotent` / Frattini / Transfer / Schur-Zassenhaus / 表現論・指標の基本は既存。Fitting `F(G)` / `F*(G)` / 一般 π-Hall / Frobenius 群 / ZJ / Thompson subgroup `J(P)` / Dade isometry / Peterfalvi coherence は新規実装が必要。
