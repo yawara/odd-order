@@ -1097,6 +1097,173 @@ theorem zipper_lemma [Finite G] {S : Subgroup G}
         have hK_eq_M' : K = M' := hM'_uniq K hK_coatom hT_le_K
         rw [hM_eq_M', hK_eq_M']
 
+/-! ### Isaacs Thm 2.8 (permutability ⇒ subnormality) -/
+
+open scoped Pointwise in
+/-- `HK = KH` (set equation, permutable) なら `↑(H ⊔ K) = HK` (集合等式). -/
+private theorem coe_sup_eq_set_mul_of_set_mul_comm {H K : Subgroup G}
+    (hcomm : (H : Set G) * (K : Set G) = (K : Set G) * (H : Set G)) :
+    ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G) := by
+  -- Construct HK as a Subgroup with carrier H * K (set product).
+  let HK : Subgroup G := {
+    carrier := (H : Set G) * (K : Set G)
+    one_mem' := ⟨1, H.one_mem, 1, K.one_mem, mul_one 1⟩
+    mul_mem' := by
+      rintro _ _ ⟨a, ha, b, hb, rfl⟩ ⟨c, hc, d, hd, rfl⟩
+      have hbc : b * c ∈ (K : Set G) * (H : Set G) := ⟨b, hb, c, hc, rfl⟩
+      rw [← hcomm] at hbc
+      obtain ⟨e, he, f, hf, hef⟩ := hbc
+      refine ⟨a * e, H.mul_mem ha he, f * d, K.mul_mem hf hd, ?_⟩
+      have eq1 : a * e * (f * d) = a * (e * f) * d := by group
+      have eq2 : a * (e * f) * d = a * (b * c) * d := congrArg (fun x => a * x * d) hef
+      have eq3 : a * (b * c) * d = a * b * (c * d) := by group
+      exact eq1.trans (eq2.trans eq3)
+    inv_mem' := by
+      rintro _ ⟨a, ha, b, hb, rfl⟩
+      have hba : b⁻¹ * a⁻¹ ∈ (K : Set G) * (H : Set G) :=
+        ⟨b⁻¹, K.inv_mem hb, a⁻¹, H.inv_mem ha, rfl⟩
+      rw [← hcomm] at hba
+      rw [mul_inv_rev]
+      exact hba
+  }
+  have hHK_eq : HK = H ⊔ K := by
+    apply le_antisymm
+    · intro x hx
+      obtain ⟨a, ha, b, hb, rfl⟩ := hx
+      exact mul_mem (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hb)
+    · refine sup_le ?_ ?_
+      · intro a ha
+        exact ⟨a, ha, 1, K.one_mem, mul_one a⟩
+      · intro b hb
+        exact ⟨1, H.one_mem, b, hb, one_mul b⟩
+  show ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G)
+  rw [← hHK_eq]
+  rfl
+
+open scoped Pointwise in
+/-- Thm 2.8 のメイン induction 補助補題 (|G| ≤ n に generalize). -/
+private theorem isSubnormal_of_permutable_aux :
+    ∀ n, ∀ (G : Type*) [Group G] [Finite G],
+      Nat.card G ≤ n → ∀ {S : Subgroup G},
+      (∀ x : G, (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
+              = (((MulAut.conj x) • S : Subgroup G) : Set G) * (S : Set G)) →
+      S.IsSubnormal := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hG S _
+    exact absurd (Nat.le_zero.mp hG) Nat.card_pos.ne'
+  | succ n ih =>
+    intro G _ _ _ S hperm
+    by_contra hSn
+    -- S < ⊤.
+    have hSlt : S < (⊤ : Subgroup G) := by
+      refine lt_of_le_of_ne le_top fun hSt => hSn ?_
+      rw [hSt]; exact Subgroup.IsSubnormal.top
+    -- IH 適用: 真部分群 H ⊇ S で `S.subgroupOf H` は H で部分正規.
+    have hS_in_H : ∀ (H : Subgroup G), S ≤ H → H ≠ ⊤ →
+        (S.subgroupOf H).IsSubnormal := by
+      intro H hSH hHne
+      have hHcard : Nat.card H ≤ n := by
+        have hHle : Nat.card H ≤ Nat.card G := H.card_le_card_group
+        have hHne_card : Nat.card H ≠ Nat.card G := fun heq =>
+          hHne (Subgroup.eq_top_of_card_eq H heq)
+        omega
+      refine ih H hHcard ?_
+      intro y
+      -- Permutability transfer G → ↥H via Subgroup.conj_smul_subgroupOf.
+      rw [Subgroup.conj_smul_subgroupOf hSH]
+      -- Lift to G via H.subtype injective image, then apply G-permutability.
+      have hSy_le_H : ((MulAut.conj (y : G)) • S : Subgroup G) ≤ H :=
+        Subgroup.conj_smul_le_of_le hSH y
+      apply H.subtype_injective.image_injective
+      simp only [Set.image_mul]
+      have hS_im : H.subtype '' ((S.subgroupOf H : Subgroup ↥H) : Set ↥H) = (S : Set G) := by
+        rw [show H.subtype '' ((S.subgroupOf H : Subgroup ↥H) : Set ↥H)
+              = (((S.subgroupOf H).map H.subtype : Subgroup G) : Set G)
+            from (Subgroup.coe_map _ _).symm,
+            Subgroup.map_subgroupOf_eq_of_le hSH]
+      have hSy_im : H.subtype '' ((((MulAut.conj (y : G)) • S : Subgroup G).subgroupOf H :
+            Subgroup ↥H) : Set ↥H)
+          = (((MulAut.conj (y : G)) • S : Subgroup G) : Set G) := by
+        rw [show H.subtype '' ((((MulAut.conj (y : G)) • S : Subgroup G).subgroupOf H :
+              Subgroup ↥H) : Set ↥H)
+              = (((((MulAut.conj (y : G)) • S : Subgroup G).subgroupOf H).map H.subtype :
+                  Subgroup G) : Set G)
+            from (Subgroup.coe_map _ _).symm,
+            Subgroup.map_subgroupOf_eq_of_le hSy_le_H]
+      rw [hS_im, hSy_im]
+      exact hperm (y : G)
+    -- Zipper Lemma で `S` を含む極大部分群 `M` の一意性.
+    obtain ⟨M, hMcoatom, hSM, hMuniq⟩ := zipper_lemma hS_in_H hSn
+    -- 各 x : G で `MulAut.conj x • S ≤ M`.
+    have hSx_le_M : ∀ x : G, ((MulAut.conj x) • S : Subgroup G) ≤ M := by
+      intro x
+      -- `S ⊔ S^x ≠ ⊤`: 集合等式から Lemma 2.10 で `S = ⊤` を排除.
+      have hSup_lt : (S ⊔ ((MulAut.conj x) • S : Subgroup G) : Subgroup G) ≠ ⊤ := by
+        intro hSup_top
+        have hHK_eq : ((S ⊔ ((MulAut.conj x) • S : Subgroup G) : Subgroup G) : Set G)
+            = (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G) :=
+          coe_sup_eq_set_mul_of_set_mul_comm (hperm x)
+        have huniv : (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G) = Set.univ := by
+          rw [← hHK_eq, hSup_top]
+          rfl
+        have hS_top : S = ⊤ :=
+          eq_top_of_set_mul_conj_eq_top x⁻¹ (by rw [inv_inv]; exact huniv)
+        exact hSlt.ne hS_top
+      -- `S ⊔ S^x ≤ M` (M は S を含む唯一の極大).
+      obtain ⟨K, hKcoatom, hKle⟩ :=
+        (eq_top_or_exists_le_coatom (S ⊔ ((MulAut.conj x) • S : Subgroup G) :
+          Subgroup G)).resolve_left hSup_lt
+      have hSK : S ≤ K := le_sup_left.trans hKle
+      have hKM : K = M := hMuniq K hKcoatom hSK
+      exact (le_sup_right.trans hKle).trans hKM.le
+    -- 正規閉包 `S^G ≤ M`.
+    have hNS_le_M : Subgroup.normalClosure (S : Set G) ≤ M := by
+      rw [Subgroup.normalClosure, Subgroup.closure_le]
+      intro y hy
+      rcases Group.mem_conjugatesOfSet_iff.mp hy with ⟨a, haS, hConj⟩
+      rcases hConj with ⟨c, hc⟩
+      apply hSx_le_M (c : G)
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def]
+      -- 目標: `(MulAut.conj (c : G)⁻¹) y ∈ S`, つまり `(c : G)⁻¹ * y * (c : G) ∈ S`.
+      change ((c : G)⁻¹) * y * ((c : G)⁻¹)⁻¹ ∈ S
+      rw [inv_inv]
+      -- hc : SemiconjBy (c : G) a y, i.e., (c : G) * a = y * (c : G).
+      have hc_eq : (c : G) * a = y * (c : G) := hc
+      have ha_eq : ((c : G)⁻¹) * y * ((c : G)) = a := by
+        rw [mul_assoc, ← hc_eq]
+        group
+      rw [ha_eq]
+      exact haS
+    -- 正規閉包 < ⊤ (since ≤ M coatom).
+    have hNS_lt : Subgroup.normalClosure (S : Set G) ≠ ⊤ := fun hNStop =>
+      hMcoatom.1 (le_top.antisymm (hNStop.symm.le.trans hNS_le_M))
+    -- IH を `normalClosure S` に適用.
+    have hSle_NS : S ≤ Subgroup.normalClosure (S : Set G) :=
+      Subgroup.le_normalClosure
+    have hS_sn_in_NS : (S.subgroupOf (Subgroup.normalClosure (S : Set G))).IsSubnormal :=
+      hS_in_H _ hSle_NS hNS_lt
+    have hNS_sn : (Subgroup.normalClosure (S : Set G)).IsSubnormal :=
+      Subgroup.Normal.isSubnormal inferInstance
+    exact hSn (Subgroup.IsSubnormal.trans hSle_NS hS_sn_in_NS hNS_sn)
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.8** (permutability ⇒ subnormality). 有限群 `G` の部分群 `S` で,
+全ての共役 `S^x = MulAut.conj x • S` について `S · S^x = S^x · S` (集合等式) ならば,
+`S` は `G` で部分正規.
+
+Isaacs p.49 の証明: `|G|`-induction. `S ⊴⊴ G` でないと仮定して矛盾.
+1. IH: 真部分群 `H ⊇ S` で `S` は `H` で部分正規 (G → ↥H の permutability transfer).
+2. Zipper Lemma (Thm 2.9) で `S` を含む極大 `M` 一意.
+3. 任意 `x` で `S ⊔ S^x` は ≠ ⊤ (Lemma 2.10) で `S ⊆ S ⊔ S^x ⊆ M`, よって `S^x ⊆ M`.
+4. 正規閉包 `S^G ⊆ M < ⊤`. IH で `S` は `S^G` で部分正規, `S^G ⊴ G` で `S` は `G` で部分正規, 矛盾. -/
+theorem isSubnormal_of_permutable_with_conjugates [Finite G] {S : Subgroup G}
+    (hperm : ∀ x : G, (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
+                    = (((MulAut.conj x) • S : Subgroup G) : Set G) * (S : Set G)) :
+    S.IsSubnormal :=
+  isSubnormal_of_permutable_aux (Nat.card G) G le_rfl hperm
+
 end -- 2A
 
 end OddOrder.Isaacs.Ch02

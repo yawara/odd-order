@@ -19,7 +19,8 @@
 | `socle` インフラ | ✅ | `def socle`, `socle.normal`, `socle.characteristic`, `IsMinimalNormal.map_equiv`, `exists_isMinimalNormal_le_of_normal`, `socle_ne_bot_of_nontrivial` |
 | **Thm 2.2** | ✅ (2026-05-22) | `le_fitting_iff_isNilpotent_and_isSubnormal`. Ch.1 `fitting.characteristic` を追加して `K ⊴ G ⇒ (fitting K).map K.subtype ⊴ G` 経由で `|G|`-induction. 補助 `le_fitting_aux` 含む |
 | Thm 2.5 Wielandt 結合 | ✅ | Thm 2.6 経由の `|G|`-induction |
-| Thm 2.8, 2.11 | TODO | 2.8 permutability, 2.11 Wielandt-abelian |
+| **Thm 2.8** | ✅ (2026-05-22) | `isSubnormal_of_permutable_with_conjugates`. |G|-induction + Zipper Lemma + normal closure. IH transfer via `Subgroup.conj_smul_subgroupOf` + `H.subtype` injective image |
+| Thm 2.11 | TODO | Wielandt-abelian |H:A|² ≤ |H:Z(H)| |
 | §2B, §2C, §2D | TODO | §2D は FT 経路で不要なので最後回し可 |
 
 ## 章のセクション分割と全 20 定理
