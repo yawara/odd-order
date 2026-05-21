@@ -282,6 +282,28 @@ theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
     Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd.2, hI_pos⟩
   exact h.2 p hp_idx_pf (h.1 p hp_H_pf)
 
+/-- `⊤` は π-Hall ⇔ `G` が π-group (`|G|` の全素因子が π に属す). -/
+theorem IsHallSubgroup.top_iff (π : Set ℕ) :
+    IsHallSubgroup π (⊤ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∈ π := by
+  unfold IsHallSubgroup
+  rw [Subgroup.index_top, Subgroup.card_top, Nat.primeFactors_one]
+  simp
+
+/-- `⊥` は π-Hall ⇔ `G` が π'-group (`|G|` の素因子が π を避ける). -/
+theorem IsHallSubgroup.bot_iff (π : Set ℕ) :
+    IsHallSubgroup π (⊥ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∉ π := by
+  unfold IsHallSubgroup
+  rw [Subgroup.index_bot, Subgroup.card_bot, Nat.primeFactors_one]
+  simp
+
+/-- `|G| = 1` ⇒ `⊥` は任意の π について π-Hall. -/
+theorem IsHallSubgroup.bot_of_card_eq_one (π : Set ℕ) (h : Nat.card G = 1) :
+    IsHallSubgroup π (⊥ : Subgroup G) := by
+  rw [IsHallSubgroup.bot_iff]
+  intro p hp
+  rw [h, Nat.primeFactors_one] at hp
+  exact absurd hp (Finset.notMem_empty p)
+
 /-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
 について `π`-Hall 部分群が存在.
 
