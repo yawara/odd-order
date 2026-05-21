@@ -6,18 +6,19 @@
 
 ## 進捗 (2026-05-21)
 
-§2A ウォームアップ実装済:
+§2A 主要結果 (Thm 2.1, 2.3, 2.4, 2.6, 2.7 + Lemma 2.7) 実装済:
 
 | # | 状態 | 実装 |
 |---|---|---|
-| Def `IsMinimalNormal` | ✅ | mathlib 未収載の新規述語 (Thm 2.6, 2.18 で必須) |
+| Def `IsMinimalNormal` | ✅ | mathlib 未収載の新規述語 |
 | Thm 2.1 (iff 全体) | ✅ | `isNilpotent_iff_all_isSubnormal` + 両方向 |
 | Thm 2.3 | ✅ | `inf_isSubnormal_subgroupOf` (mathlib `inf_subgroupOf_right` + `IsSubnormal.subgroupOf`) |
-| Thm 2.4 | ✅ | `inf_isSubnormal` (mathlib `IsSubnormal.inf` ラッパー) |
-| Lemma 2.7 | ✅ | `commute_of_disjoint_normal` (mathlib `commute_of_normal_of_disjoint` ラッパー) |
-| Thm 2.2 | TODO | Ch.1 Cor 1.28(a) (`(fitting G).IsNilpotent`) 待ち |
-| Thm 2.5 Wielandt 結合 | TODO | Thm 2.6 経由の |G|-induction、先に 2.6 を実装 |
-| Thm 2.6 | TODO | minimal normal が subnormal を正規化、socle 経由 |
+| Thm 2.4 | ✅ (wrapper 不要) | mathlib `Subgroup.IsSubnormal.inf` を直接呼ぶ ([feedback_no_mathlib_wrapper](../../CLAUDE.md#mathlib-ラッパー方針)) |
+| Lemma 2.7 | ✅ | `commute_of_disjoint_normal` (mathlib `commute_of_normal_of_disjoint` の **適応版**; instance + implicit M N) |
+| **Thm 2.6** ⭐ | ✅ (2026-05-21) | **`isMinimalNormal_le_normalizer_of_isSubnormal`**. Isaacs p.46 の `|G|`-induction を直訳. socle インフラ含めて +316 行 |
+| `socle` インフラ | ✅ | `def socle`, `socle.normal`, `socle.characteristic`, `IsMinimalNormal.map_equiv`, `exists_isMinimalNormal_le_of_normal`, `socle_ne_bot_of_nontrivial` |
+| Thm 2.2 | TODO | `fitting.characteristic` (Ch.1) または同等の局所 helper 必要 |
+| Thm 2.5 Wielandt 結合 | **解禁** | Thm 2.6 完成で着手可. `|G|`-induction で `G/M` の image |
 | Thm 2.8 - 2.11 | TODO | 2.8 permutability, 2.9 Zipper, 2.10, 2.11 Wielandt-abelian |
 | §2B, §2C, §2D | TODO | §2D は FT 経路で不要なので最後回し可 |
 
