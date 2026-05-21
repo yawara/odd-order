@@ -613,6 +613,423 @@ theorem eq_top_of_set_mul_conj_eq_top {H : Subgroup G} (x : G)
   rcases Set.mem_mul.mp hg_in with ⟨h1, hh1, h2, hh2, hg⟩
   exact hg ▸ H.mul_mem hh1 hh2
 
+open scoped Pointwise in
+/-- **Isaacs Thm 2.9 Wielandt's Zipper Lemma**. 有限群 `G` の部分群 `S` で,
+`S` を真に含む任意の真部分群 `H` について `S ⊴⊴ H` であり, かつ `S` 自身は
+`G` で部分正規でないとする. このとき `S` を含む `G` の極大部分群は一意.
+
+Isaacs p.49 の証明: `|G:S|` (= `S.index`) についての強induction.
+* `S.index = 1` ⇒ `S = ⊤` ⇒ `S ⊴⊴ G` (`IsSubnormal.top`) で仮定矛盾, vacuous.
+* induction step: `S` が `G` で正規でない (else `S ⊴⊴ G`, 矛盾) ので
+  `N_G(S) < ⊤`, 極大 `M ≥ N_G(S)` を取る. 任意の極大 `K ≥ S` で `K = M` を示す:
+  - **Case A** `S ⊴ K`: `K ≤ N_G(S) ≤ M`, `K` 極大 で `K = M`.
+  - **Case B** `S ⊴⊴ K` だが `S ⋬ K`: K の subnormal chain で「`S` が正規でなくなる」
+    最初の `f i` を Nat.find で取り, x ∈ f i \ N_K(S) を選ぶ. `T := S ⊔ S^x` は
+    `T > S`, `T ≤ N_G(S) ≤ M`, `T ≤ K` で, T が IH の hypotheses を満たす
+    (Thm 2.5 を使う). IH で T を含む極大は一意 ⇒ M = K. -/
+theorem zipper_lemma [Finite G] {S : Subgroup G}
+    (hS_proper : ∀ H : Subgroup G, S ≤ H → H ≠ ⊤ → (S.subgroupOf H).IsSubnormal)
+    (hS_not_sn : ¬ S.IsSubnormal) :
+    ∃ M : Subgroup G, IsCoatom M ∧ S ≤ M ∧
+      ∀ K : Subgroup G, IsCoatom K → S ≤ K → K = M := by
+  classical
+  -- Strong induction on S.index.
+  induction hIdx : S.index using Nat.strong_induction_on generalizing S with
+  | _ n ih =>
+    -- Rule out S.index = 1 first. In finite group, S.index ≥ 1.
+    have hS_idx_pos : 0 < S.index :=
+      Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)
+    rcases Nat.lt_or_ge 1 n with hgt | hle
+    swap
+    · -- n ≤ 1: since S.index = n > 0, we have n = 1.
+      have hn_eq : n = 1 := by
+        have hn_pos : 0 < n := hIdx ▸ hS_idx_pos
+        omega
+      -- S.index = 1 ⇒ S = ⊤ ⇒ S subnormal, contradiction.
+      have hS_top : S = ⊤ := Subgroup.index_eq_one.mp (hIdx.trans hn_eq)
+      exact absurd (hS_top ▸ Subgroup.IsSubnormal.top) hS_not_sn
+    · -- n > 1: induction step.
+      -- Step 1: S not normal in G.
+      have hS_not_normal : ¬ S.Normal := fun hN => hS_not_sn hN.isSubnormal
+      -- N_G(S) < ⊤.
+      have hN_lt_top : Subgroup.normalizer (S : Set G) < ⊤ := by
+        rw [lt_top_iff_ne_top]
+        intro hN_top
+        exact hS_not_normal (Subgroup.normalizer_eq_top_iff.mp hN_top)
+      -- Step 2: pick maximal M ≥ N_G(S). Note S ≤ N_G(S).
+      obtain ⟨M, hM_coatom, hN_le_M⟩ :=
+        (eq_top_or_exists_le_coatom (Subgroup.normalizer (S : Set G))).resolve_left hN_lt_top.ne
+      have hS_le_NS : S ≤ Subgroup.normalizer (S : Set G) := Subgroup.le_normalizer
+      have hS_le_M : S ≤ M := hS_le_NS.trans hN_le_M
+      refine ⟨M, hM_coatom, hS_le_M, ?_⟩
+      intro K hK_coatom hS_le_K
+      -- K is a maximal subgroup containing S; show K = M.
+      have hK_ne_top : K ≠ ⊤ := hK_coatom.1
+      -- H1 ⇒ S.subgroupOf K is subnormal.
+      have hSsubK_sn : (S.subgroupOf K).IsSubnormal := hS_proper K hS_le_K hK_ne_top
+      -- Case split: is S normal in K?
+      by_cases hSK_normal : (S.subgroupOf K).Normal
+      · -- Case A: S ⊴ K. Then K ≤ N_G(S) ≤ M, K coatom ⇒ K = M.
+        have hK_le_NS : K ≤ Subgroup.normalizer (S : Set G) :=
+          (Subgroup.normal_subgroupOf_iff_le_normalizer hS_le_K).mp hSK_normal
+        have hK_le_M : K ≤ M := hK_le_NS.trans hN_le_M
+        -- K coatom and K ≤ M ≠ ⊤ (M coatom).
+        rcases hK_coatom.le_iff.mp hK_le_M with hM_top | hM_eq
+        · exact absurd hM_top hM_coatom.1
+        · exact hM_eq.symm
+      · -- Case B: S subnormal in K but not normal in K. Extract chain.
+        obtain ⟨nChain, f, hf_mono, hf_step, hf0, hfN⟩ :=
+          hSsubK_sn.exists_chain
+        -- f : ℕ → Subgroup ↥K with f 0 = S.subgroupOf K, f nChain = ⊤, chain property.
+        -- Find smallest i with S.subgroupOf K NOT normal in f i.
+        -- (S.subgroupOf K).subgroupOf (f i) Normal ⇔ f i ≤ normalizer (S.subgroupOf K).
+        have hPred_exists : ∃ i, ¬ (((S.subgroupOf K).subgroupOf (f i)).Normal) := by
+          refine ⟨nChain, ?_⟩
+          intro hN
+          apply hSK_normal
+          -- hN : (S.subgroupOf K).subgroupOf (f nChain) Normal.
+          -- f nChain = ⊤_K, so subgroupOf ⊤_K = identification, giving normality in K.
+          rw [hfN] at hN
+          -- (S.subgroupOf K).subgroupOf ⊤ Normal ⇒ ⊤ ≤ normalizer (S.subgroupOf K)
+          have h1 : (⊤ : Subgroup K) ≤
+              Subgroup.normalizer ((S.subgroupOf K) : Set K) :=
+            (Subgroup.normal_subgroupOf_iff_le_normalizer le_top).mp hN
+          rw [top_le_iff, Subgroup.normalizer_eq_top_iff] at h1
+          exact h1
+        -- Smallest such i.
+        let m := Nat.find hPred_exists
+        have hm_spec : ¬ (((S.subgroupOf K).subgroupOf (f m)).Normal) := Nat.find_spec hPred_exists
+        have hm_min : ∀ k < m, ((S.subgroupOf K).subgroupOf (f k)).Normal := by
+          intro k hk
+          by_contra h
+          exact absurd (Nat.find_min hPred_exists hk) (not_not.mpr h)
+        -- f 0 = S.subgroupOf K, normal in itself, so m ≥ 1.
+        have hm_pos : 0 < m := by
+          by_contra h
+          push Not at h
+          interval_cases m
+          apply hm_spec
+          rw [hf0]
+          -- (S.subgroupOf K).subgroupOf (S.subgroupOf K) = ⊤, hence normal.
+          rw [show (S.subgroupOf K).subgroupOf (S.subgroupOf K) = ⊤ from
+            Subgroup.subgroupOf_self _]
+          exact Subgroup.normal_top
+        -- f (m-1) ≤ normalizer (S.subgroupOf K). f m has element not normalizing S.subgroupOf K.
+        have hfm1_norm : ((S.subgroupOf K).subgroupOf (f (m - 1))).Normal :=
+          hm_min (m - 1) (Nat.sub_lt hm_pos Nat.zero_lt_one)
+        -- f (m-1) ≤ N_K(S.subgroupOf K).
+        -- Need S.subgroupOf K ≤ f (m-1) first.
+        have hS_le_fm1 : S.subgroupOf K ≤ f (m - 1) := by
+          rw [← hf0]; exact hf_mono (Nat.zero_le _)
+        have hfm1_le_norm : f (m - 1) ≤
+            Subgroup.normalizer ((S.subgroupOf K) : Set K) :=
+          (Subgroup.normal_subgroupOf_iff_le_normalizer hS_le_fm1).mp hfm1_norm
+        -- f (m-1) ≤ f m: take an element of f m not in N_K(S.subgroupOf K).
+        have hS_le_fm : S.subgroupOf K ≤ f m := by
+          rw [← hf0]; exact hf_mono (Nat.zero_le _)
+        have hfm_not_le_norm : ¬ (f m ≤
+            Subgroup.normalizer ((S.subgroupOf K) : Set K)) := by
+          intro h
+          exact hm_spec ((Subgroup.normal_subgroupOf_iff_le_normalizer hS_le_fm).mpr h)
+        -- Get x in f m not in N_K(S.subgroupOf K).
+        obtain ⟨x, hx_in_fm, hx_not_norm⟩ : ∃ x : K, x ∈ f m ∧
+            x ∉ Subgroup.normalizer ((S.subgroupOf K) : Set K) := by
+          by_contra h
+          push Not at h
+          apply hfm_not_le_norm
+          intro y hy
+          exact h y hy
+        -- f (m-1) ⊴ f m by chain property; so x normalizes f (m-1) in f m, i.e.,
+        -- (MulAut.conj (x : K)⁻¹) • (f (m-1)) ≤ f (m-1) as subgroups of f m... wait, simpler:
+        -- (f (m-1)).subgroupOf (f m) is Normal, so x in f m normalizes (f (m-1)).subgroupOf (f m).
+        -- Translate to: x · f (m-1) · x⁻¹ ≤ f (m-1) as subgroup of K (since f (m-1) ≤ f m).
+        have hfm1_le_fm : f (m - 1) ≤ f m := by
+          have : m - 1 ≤ m := Nat.sub_le _ _
+          exact hf_mono this
+        -- Use chain property at index m - 1: ((f (m-1)).subgroupOf (f m)).Normal
+        have hfm1_norm_in_fm : ((f (m - 1)).subgroupOf (f m)).Normal := by
+          have hstep := hf_step (m - 1)
+          rwa [Nat.sub_add_cancel hm_pos] at hstep
+        have hfm_le_normfm1 : f m ≤ Subgroup.normalizer ((f (m - 1)) : Set K) :=
+          (Subgroup.normal_subgroupOf_iff_le_normalizer hfm1_le_fm).mp hfm1_norm_in_fm
+        -- Now translate to G-level. x : K, x.val : G is in K.
+        -- We want to construct S^x.
+        set xG : G := (x : G)
+        have hxG_in_K : xG ∈ K := x.2
+        -- Key: x normalizes f (m-1) in K. In particular,
+        -- (MulAut.conj x.val⁻¹) • S ≤ image of f (m-1) in G ≤ N_G(S).
+        -- Image of f (m-1) in G:
+        let J : Subgroup G := (f (m - 1)).map K.subtype
+        -- S ≤ J (since S.subgroupOf K ≤ f (m-1), and (S.subgroupOf K).map K.subtype = S).
+        have hS_le_J : S ≤ J := by
+          rw [show S = (S.subgroupOf K).map K.subtype from
+            (Subgroup.map_subgroupOf_eq_of_le hS_le_K).symm]
+          exact Subgroup.map_mono hS_le_fm1
+        -- J ≤ K.
+        have hJ_le_K : J ≤ K := by
+          rintro _ ⟨⟨y, hyK⟩, _, rfl⟩
+          exact hyK
+        -- J ≤ N_G(S) (since (f (m-1)).subgroupOf K ≤ N_K(S.subgroupOf K) lifted to G).
+        have hJ_le_NS : J ≤ Subgroup.normalizer (S : Set G) := by
+          intro y hy
+          rcases hy with ⟨⟨y', hy'K⟩, hy'_in, rfl⟩
+          -- y'_in : ⟨y', hy'K⟩ ∈ f (m-1), so it's in N_K(S.subgroupOf K).
+          have hy'_norm : (⟨y', hy'K⟩ : K) ∈
+              Subgroup.normalizer ((S.subgroupOf K) : Set K) := hfm1_le_norm hy'_in
+          rw [Subgroup.mem_normalizer_iff] at hy'_norm ⊢
+          intro s
+          by_cases hsK : s ∈ K
+          · -- s ∈ K: lift to K, apply hy'_norm.
+            have h := hy'_norm ⟨s, hsK⟩
+            constructor
+            · intro hsS
+              have h1 : (⟨s, hsK⟩ : K) ∈ S.subgroupOf K := by
+                rwa [Subgroup.mem_subgroupOf]
+              have h2 := h.mp h1
+              rw [Subgroup.mem_subgroupOf] at h2
+              -- Coerce computation. y' * s * y'⁻¹ as K-element coerces correctly.
+              exact h2
+            · intro hys
+              have hys_in_K : y' * s * y'⁻¹ ∈ K :=
+                K.mul_mem (K.mul_mem hy'K hsK) (K.inv_mem hy'K)
+              have h1 : (⟨y' * s * y'⁻¹, hys_in_K⟩ : K) ∈ S.subgroupOf K := by
+                rwa [Subgroup.mem_subgroupOf]
+              have hcong : (⟨y' * s * y'⁻¹, hys_in_K⟩ : K) =
+                  ⟨y', hy'K⟩ * ⟨s, hsK⟩ * ⟨y', hy'K⟩⁻¹ := by
+                apply Subtype.ext
+                change y' * s * y'⁻¹ =
+                  ((⟨y', hy'K⟩ * ⟨s, hsK⟩ * ⟨y', hy'K⟩⁻¹ : K) : G)
+                push_cast
+                rfl
+              rw [hcong] at h1
+              have h2 := h.mpr h1
+              rwa [Subgroup.mem_subgroupOf] at h2
+          · -- s ∉ K: both sides false (since S ≤ K).
+            have hys_notK : y' * s * y'⁻¹ ∉ K := by
+              intro h
+              apply hsK
+              have hseq : s = y'⁻¹ * (y' * s * y'⁻¹) * y' := by group
+              rw [hseq]
+              exact K.mul_mem (K.mul_mem (K.inv_mem hy'K) h) hy'K
+            constructor
+            · intro hsS; exact absurd (hS_le_K hsS) hsK
+            · intro hys; exact absurd (hS_le_K hys) hys_notK
+        -- Now construct T = S ⊔ MulAut.conj xG⁻¹ • S.
+        set Sx : Subgroup G := (MulAut.conj xG⁻¹ : MulAut G) • S with hSx_def
+        set T : Subgroup G := S ⊔ Sx with hT_def
+        -- Sx ≤ J ≤ N_G(S): show Sx ≤ J.
+        -- xG normalizes J: J = (f(m-1)).map K.subtype. We need
+        -- MulAut.conj xG⁻¹ • J ≤ J (since x in K normalizes f(m-1) in K).
+        have hJ_normalizes_xG : (MulAut.conj xG : MulAut G) • J ≤ J := by
+          rintro - ⟨z, hzJ, rfl⟩
+          rcases hzJ with ⟨⟨z', hz'K⟩, hz'_in_fm1, rfl⟩
+          have hx_norm_fm1 : x ∈ Subgroup.normalizer ((f (m - 1)) : Set K) :=
+            hfm_le_normfm1 hx_in_fm
+          have h_conj : x * ⟨z', hz'K⟩ * x⁻¹ ∈ f (m - 1) :=
+            ((Subgroup.mem_normalizer_iff.mp hx_norm_fm1) ⟨z', hz'K⟩).mp hz'_in_fm1
+          refine ⟨x * ⟨z', hz'K⟩ * x⁻¹, h_conj, ?_⟩
+          change ((x * ⟨z', hz'K⟩ * x⁻¹ : K) : G) = MulAut.conj xG z'
+          push_cast
+          simp [xG]
+        -- Also need MulAut.conj xG⁻¹ • J ≤ J (same argument with x⁻¹).
+        have hx_inv_in_fm : x⁻¹ ∈ f m := (f m).inv_mem hx_in_fm
+        have hJ_normalizes_xG_inv : (MulAut.conj xG⁻¹ : MulAut G) • J ≤ J := by
+          rintro - ⟨z, hzJ, rfl⟩
+          rcases hzJ with ⟨⟨z', hz'K⟩, hz'_in_fm1, rfl⟩
+          have hxinv_norm_fm1 : x⁻¹ ∈ Subgroup.normalizer ((f (m - 1)) : Set K) :=
+            hfm_le_normfm1 hx_inv_in_fm
+          have h_conj : x⁻¹ * ⟨z', hz'K⟩ * x⁻¹⁻¹ ∈ f (m - 1) :=
+            ((Subgroup.mem_normalizer_iff.mp hxinv_norm_fm1) ⟨z', hz'K⟩).mp hz'_in_fm1
+          refine ⟨x⁻¹ * ⟨z', hz'K⟩ * x⁻¹⁻¹, h_conj, ?_⟩
+          change ((x⁻¹ * ⟨z', hz'K⟩ * x⁻¹⁻¹ : K) : G) = MulAut.conj xG⁻¹ z'
+          push_cast
+          simp [xG]
+        have hSx_le_J : Sx ≤ J := by
+          rw [hSx_def]
+          calc (MulAut.conj xG⁻¹ : MulAut G) • S
+              ≤ (MulAut.conj xG⁻¹ : MulAut G) • J :=
+                Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hS_le_J
+            _ ≤ J := hJ_normalizes_xG_inv
+        have hSx_le_NS : Sx ≤ Subgroup.normalizer (S : Set G) := hSx_le_J.trans hJ_le_NS
+        have hSx_le_K : Sx ≤ K := hSx_le_J.trans hJ_le_K
+        have hT_le_NS : T ≤ Subgroup.normalizer (S : Set G) :=
+          sup_le hS_le_NS hSx_le_NS
+        have hT_le_K : T ≤ K := sup_le hS_le_K hSx_le_K
+        have hT_le_M : T ≤ M := hT_le_NS.trans hN_le_M
+        -- T > S strictly: Sx ⊈ S since xG ∉ N_G(S).
+        -- Strategy: if Sx ≤ S, then |Sx| = |S| and Sx = S in finite ⇒ xG⁻¹ ∈ N_G(S) ⇒ xG ∈ N_G(S).
+        -- This translates to x ∈ N_K(S.subgroupOf K), contradicting hx_not_norm.
+        have hSx_card : Nat.card Sx = Nat.card S :=
+          Nat.card_congr (Subgroup.equivSMul (MulAut.conj xG⁻¹) S).toEquiv.symm
+        have hSx_not_le_S : ¬ (Sx ≤ S) := by
+          intro h
+          -- Cardinality forces Sx = S.
+          have hSx_eq : Sx = S := Subgroup.eq_of_le_of_card_ge h hSx_card.ge
+          -- From Sx = S, we extract xG⁻¹ ∈ N_G(S).
+          have hxG_norm_S : xG ∈ Subgroup.normalizer (S : Set G) := by
+            -- Sx = S ⇒ xG⁻¹ ∈ N_G(S), hence xG ∈ N_G(S).
+            rw [Subgroup.mem_normalizer_iff]
+            intro u
+            constructor
+            · -- u ∈ S → xG * u * xG⁻¹ ∈ S.
+              -- xG * u * xG⁻¹ = MulAut.conj xG u; via hSx_eq, MulAut.conj xG • S = S.
+              intro huS
+              have hsmul_eq : (MulAut.conj xG : MulAut G) • S = S := by
+                have h1 : (MulAut.conj xG⁻¹ : MulAut G) • S = S := hSx_eq
+                have h2 : (MulAut.conj xG : MulAut G)⁻¹ • S = S := by
+                  rw [← map_inv MulAut.conj]; exact h1
+                calc (MulAut.conj xG : MulAut G) • S
+                    = (MulAut.conj xG : MulAut G) •
+                      ((MulAut.conj xG : MulAut G)⁻¹ • S) := by rw [h2]
+                  _ = S := by rw [smul_inv_smul]
+              have hu_smul : MulAut.conj xG u ∈ (MulAut.conj xG : MulAut G) • S := ⟨u, huS, rfl⟩
+              rw [hsmul_eq] at hu_smul
+              change xG * u * xG⁻¹ ∈ S
+              exact hu_smul
+            · intro hxu
+              -- have: xG * u * xG⁻¹ ∈ S. Want u ∈ S.
+              -- xG * u * xG⁻¹ ∈ S ⇒ MulAut.conj xG u ∈ S.
+              -- Apply (MulAut.conj xG⁻¹ • -) and use hSx_eq.
+              have h_smul_eq : (MulAut.conj xG⁻¹ : MulAut G) • S = S := hSx_eq
+              have : MulAut.conj xG⁻¹ (xG * u * xG⁻¹) ∈ (MulAut.conj xG⁻¹ : MulAut G) • S :=
+                ⟨xG * u * xG⁻¹, hxu, rfl⟩
+              rw [h_smul_eq] at this
+              -- MulAut.conj xG⁻¹ (xG * u * xG⁻¹) = xG⁻¹ * (xG * u * xG⁻¹) * xG = u.
+              have hsimp : MulAut.conj xG⁻¹ (xG * u * xG⁻¹) = u := by
+                change xG⁻¹ * (xG * u * xG⁻¹) * (xG⁻¹)⁻¹ = u
+                group
+              rwa [hsimp] at this
+          -- Translate to x ∈ N_K(S.subgroupOf K), contradicting hx_not_norm.
+          apply hx_not_norm
+          rw [Subgroup.mem_normalizer_iff]
+          intro a
+          have hmem : ∀ b : K, b ∈ S.subgroupOf K ↔ (b : G) ∈ S := fun b => Subgroup.mem_subgroupOf
+          rw [hmem a]
+          have hcoe : (((x : K) * a * (x : K)⁻¹ : K) : G) = xG * (a : G) * xG⁻¹ := by
+            push_cast; rfl
+          rw [hmem _, hcoe]
+          rw [Subgroup.mem_normalizer_iff] at hxG_norm_S
+          exact hxG_norm_S a
+        -- T > S strictly: Sx ≤ T, Sx ⊈ S.
+        have hS_le_T : S ≤ T := le_sup_left
+        have hS_lt_T : S < T := by
+          refine lt_of_le_of_ne hS_le_T ?_
+          intro hST
+          apply hSx_not_le_S
+          -- hST : S = T = S ⊔ Sx, so Sx ≤ S ⊔ Sx = S.
+          have : Sx ≤ T := le_sup_right
+          rw [← hST] at this
+          exact this
+        -- T.index < S.index.
+        haveI : S.FiniteIndex := ⟨by rw [hIdx]; omega⟩
+        have hT_idx_lt : T.index < S.index := Subgroup.index_strictAnti hS_lt_T
+        -- ¬ T.IsSubnormal:
+        -- T ≤ N_G(S) means S.subgroupOf T Normal. If T.IsSubnormal, then S.IsSubnormal via trans.
+        have hT_not_sn : ¬ T.IsSubnormal := by
+          intro hT_sn
+          apply hS_not_sn
+          have hS_norm_T : (S.subgroupOf T).Normal :=
+            (Subgroup.normal_subgroupOf_iff_le_normalizer hS_le_T).mpr hT_le_NS
+          exact Subgroup.IsSubnormal.trans hS_le_T hS_norm_T.isSubnormal hT_sn
+        -- T satisfies hS_proper:
+        have hT_proper : ∀ H : Subgroup G, T ≤ H → H ≠ ⊤ → (T.subgroupOf H).IsSubnormal := by
+          intro H hTH hH_ne
+          -- S ≤ T ≤ H, Sx ≤ T ≤ H.
+          have hS_le_H : S ≤ H := hS_le_T.trans hTH
+          have hSx_le_H : Sx ≤ H := le_sup_right.trans hTH
+          -- (S.subgroupOf H).IsSubnormal by H1.
+          have h1 : (S.subgroupOf H).IsSubnormal := hS_proper H hS_le_H hH_ne
+          -- (Sx.subgroupOf H).IsSubnormal: apply H1 to MulAut.conj xG⁻¹ • H ≠ ⊤ (containing S).
+          have hH_conj_ne_top : (MulAut.conj xG : MulAut G) • H ≠ ⊤ := by
+            intro h
+            apply hH_ne
+            -- (MulAut.conj xG) is a MulAut, so it's a bijection. smul preserves ⊤ iff arg = ⊤.
+            have h1 : (MulAut.conj xG : MulAut G) • H = (MulAut.conj xG : MulAut G) • ⊤ := by
+              rw [h]
+              ext y
+              simp
+            -- pointwise_smul cancels (it's a MulAut, hence bijection).
+            have h2 : H ≤ ⊤ := le_top
+            have h3 : ⊤ ≤ H :=
+              Subgroup.pointwise_smul_le_pointwise_smul_iff.mp h1.ge
+            exact le_antisymm h2 h3
+          have hS_le_HConj : S ≤ (MulAut.conj xG : MulAut G) • H := by
+            -- S = conj xG • Sx and Sx ≤ H, so S ≤ conj xG • H.
+            have hSx_eq : (MulAut.conj xG : MulAut G) • Sx = S := by
+              rw [hSx_def, ← smul_assoc]
+              change (MulAut.conj xG * MulAut.conj xG⁻¹ : MulAut G) • S = S
+              rw [← map_mul, mul_inv_cancel, map_one]
+              exact one_smul _ _
+            rw [← hSx_eq]
+            exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hSx_le_H
+          have h_sub_subn : (S.subgroupOf ((MulAut.conj xG : MulAut G) • H)).IsSubnormal :=
+            hS_proper _ hS_le_HConj hH_conj_ne_top
+          -- Transport via iso H ≃* conj xG • H. Under h ↦ xG h xG⁻¹,
+          -- Sx.subgroupOf H corresponds to S.subgroupOf (conj xG • H).
+          let φ : H →* ((MulAut.conj xG : MulAut G) • H : Subgroup G) :=
+            (Subgroup.equivSMul (MulAut.conj xG) H).toMonoidHom
+          have hφ_surj : Function.Surjective φ :=
+            (Subgroup.equivSMul (MulAut.conj xG) H).surjective
+          -- (S.subgroupOf (conj xG • H)).comap φ = Sx.subgroupOf H.
+          have hcomap_eq : (S.subgroupOf ((MulAut.conj xG : MulAut G) • H)).comap φ =
+              Sx.subgroupOf H := by
+            ext ⟨h, hhH⟩
+            constructor
+            · intro hh
+              -- hh : φ ⟨h, hhH⟩ ∈ S.subgroupOf (conj xG • H), i.e., (φ ⟨h, hhH⟩ : G) ∈ S.
+              -- φ ⟨h, hhH⟩ has coercion to G = xG * h * xG⁻¹.
+              rw [Subgroup.mem_subgroupOf]
+              -- Goal: h ∈ Sx = conj xG⁻¹ • S = {xG⁻¹ * s * xG : s ∈ S}.
+              -- From xG * h * xG⁻¹ ∈ S, h = xG⁻¹ * (xG * h * xG⁻¹) * xG ∈ Sx.
+              rw [Subgroup.mem_comap] at hh
+              rw [Subgroup.mem_subgroupOf] at hh
+              -- hh : (φ ⟨h, hhH⟩ : G) ∈ S.
+              -- φ ⟨h, hhH⟩ = ⟨xG * h * xG⁻¹, _⟩, so (φ ⟨h, hhH⟩ : G) = xG * h * xG⁻¹.
+              refine ⟨xG * h * xG⁻¹, hh, ?_⟩
+              change xG⁻¹ * (xG * h * xG⁻¹) * (xG⁻¹)⁻¹ = h
+              group
+            · intro hh
+              rw [Subgroup.mem_comap]
+              rw [Subgroup.mem_subgroupOf] at hh
+              rw [Subgroup.mem_subgroupOf]
+              -- hh : h ∈ Sx = conj xG⁻¹ • S. Get s ∈ S with h = xG⁻¹ * s * xG.
+              rcases hh with ⟨s, hsS, hhs⟩
+              -- φ ⟨h, hhH⟩ as G-element: xG * h * xG⁻¹.
+              have hφ_coe : (((φ ⟨h, hhH⟩) :
+                  ((MulAut.conj xG : MulAut G) • H : Subgroup G)) : G) = xG * h * xG⁻¹ := rfl
+              -- Convert hhs : MulAut.conj xG⁻¹ s = h to xG * h * xG⁻¹ = s.
+              have hsh : xG * h * xG⁻¹ = s := by
+                -- hhs has form (MulDistribMulAction action).
+                -- We unfold: pointwise smul of an element via MulAut is conj.
+                -- The membership in MulAut.conj xG⁻¹ • S says ∃ s ∈ S, conj xG⁻¹ s = h.
+                -- I.e., xG⁻¹ * s * xG = h.
+                have hh_eq : xG⁻¹ * s * xG = h := by
+                  have hh_eq' : (MulAut.conj xG⁻¹ : MulAut G) s = h := hhs
+                  have h2 : (MulAut.conj xG⁻¹ : MulAut G) s = xG⁻¹ * s * xG := by
+                    change xG⁻¹ * s * (xG⁻¹)⁻¹ = xG⁻¹ * s * xG
+                    rw [inv_inv]
+                  rw [← h2]; exact hh_eq'
+                -- s = xG * h * xG⁻¹.
+                have : s = xG * h * xG⁻¹ := by rw [← hh_eq]; group
+                exact this.symm
+              rw [hφ_coe, hsh]; exact hsS
+          have h2 : (Sx.subgroupOf H).IsSubnormal := hcomap_eq ▸ h_sub_subn.comap φ
+          -- (S.subgroupOf H).IsSubnormal and (Sx.subgroupOf H).IsSubnormal; their sup is subnormal.
+          have hsup : ((S.subgroupOf H) ⊔ (Sx.subgroupOf H)).IsSubnormal :=
+            isSubnormal_sup_of_isSubnormal h1 h2
+          -- (S.subgroupOf H) ⊔ (Sx.subgroupOf H) = (S ⊔ Sx).subgroupOf H = T.subgroupOf H.
+          rw [show (S.subgroupOf H) ⊔ (Sx.subgroupOf H) = T.subgroupOf H from
+            (Subgroup.subgroupOf_sup hS_le_H hSx_le_H).symm] at hsup
+          exact hsup
+        -- Apply IH to T.
+        obtain ⟨M', hM'_coatom, _, hM'_uniq⟩ :=
+          ih T.index (hIdx ▸ hT_idx_lt) hT_proper hT_not_sn rfl
+        -- Both M and K are maximal subgroups containing T (M via hT_le_M, K via hT_le_K).
+        -- By uniqueness: M = M' and K = M'. So K = M.
+        have hM_eq_M' : M = M' := hM'_uniq M hM_coatom hT_le_M
+        have hK_eq_M' : K = M' := hM'_uniq K hK_coatom hT_le_K
+        rw [hM_eq_M', hK_eq_M']
+
 end -- 2A
 
 end OddOrder.Isaacs.Ch02
