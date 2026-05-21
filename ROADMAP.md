@@ -190,6 +190,10 @@ end -- 1B
 - **2026-05-21** Phase 1 章間依存を Isaacs mmd から集計、下記の依存図を追加
 - **2026-05-22** Phase 2 全体構造の調査ノート完了: [`notes/bg/_overview.md`](notes/bg/_overview.md) (BG 138 結果集計 + FT 経路 + Phase 2a 着手順), [`notes/peterfalvi/_overview.md`](notes/peterfalvi/_overview.md) (Peterfalvi 140 結果集計 + FT 経路 + Phase 2b 着手順), [`notes/meta/phase2_cross_refs.md`](notes/meta/phase2_cross_refs.md) (3 冊間クロス参照マップ + Phase 1 Isaacs ↔ Phase 2 対応表)
 - **2026-05-22** Phase 2 per-section ノート 全節完了: BG 全 16 §1-§16 + App.A-E (22 ファイル), Peterfalvi 全 16 §1-§16 (§1+§2 統合) + App.A Suzuki + App.B-E 統合 (18 ファイル). 各節について TL;DR / 結果表 / Isaacs/BG 対応 / mathlib カバレッジ / Phase 2 形式化着手順 / 未解決 TODO を整理. 合計約 16200 行の調査ドキュメント
+- **2026-05-22** Isaacs §2A Thm 2.2 完成 (`le_fitting_iff_isNilpotent_and_isSubnormal` + Ch.1 `opCore.characteristic`/`fitting.characteristic` instance 追加 + `|G|`-induction 補助 `le_fitting_aux`)
+- **2026-05-22** Isaacs §2A Thm 2.8 完成 (`isSubnormal_of_permutable_with_conjugates`: permutability ⇒ subnormality, |G|-induction + Zipper Lemma + normal closure + `Subgroup.conj_smul_subgroupOf` 経由の H への permutability transfer)
+- **2026-05-22** Isaacs §2A Thm 2.11 (Wielandt abelian-in-F(G)): sorry stub. §2B Thm 2.12 Baer 順方向 (`baer_sup_conj_isNilpotent_of_le_fitting`) 完成, 逆方向は 2.11 依存で stub
+- **2026-05-22** Isaacs Ch.3 構造完成: §3A 3.3/3.4 stub, §3B mathlib 対応表 + `IsElementaryAbelian` 定義 + Thm 3.11 stub, §3C `IsHallSubgroup` 定義 + Lemma 3.16 完成 + `IsHallSubgroup.coprime_index` 完成 + Thm 3.13-3.17 stubs, §3D `IsPiSeparable` 定義 + Thm 3.18-3.22 stubs, §3E/§3F docstrings
 
 ## Phase 1 内の章間依存 (Isaacs)
 
