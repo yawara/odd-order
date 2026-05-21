@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.SemidirectProduct
@@ -146,6 +147,32 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
 mathlib 未収載の新規定義. -/
 def IsElementaryAbelian (p : ℕ) (G : Type*) [Group G] : Prop :=
   (∀ x y : G, x * y = y * x) ∧ (∀ x : G, x ^ p = 1)
+
+open scoped commutatorElement in
+/-- Thm 3.11 の前半: 可解群の minimal normal subgroup は abelian.
+
+証明: M 可解 (G 可解の部分群), M ≠ ⊥ (minimal normal) ⇒
+`IsSolvable.commutator_lt_of_ne_bot` で `⁅M, M⁆ < M`. `⁅M, M⁆ ⊴ G` (commutator of normals).
+M の minimality で `⁅M, M⁆ = ⊥`, よって M abelian. -/
+theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+    ∀ x ∈ M, ∀ y ∈ M, x * y = y * x := by
+  haveI hMnormal : M.Normal := hM.1
+  have hM_ne_bot : M ≠ ⊥ := hM.2.1
+  -- ⁅M, M⁆ < M (M solvable, M ≠ ⊥).
+  have hcomm_lt : ⁅M, M⁆ < M := IsSolvable.commutator_lt_of_ne_bot hM_ne_bot
+  -- ⁅M, M⁆ ⊴ G (commutator of normals: mathlib auto-instance).
+  have hCommNormal : (⁅M, M⁆ : Subgroup G).Normal := inferInstance
+  -- By minimality of M, ⁅M, M⁆ = ⊥ or = M. Strict < rules out =.
+  have hcomm_eq_bot : ⁅M, M⁆ = ⊥ := by
+    rcases hM.2.2 ⁅M, M⁆ hCommNormal hcomm_lt.le with h | h
+    · exact h
+    · exact absurd h hcomm_lt.ne
+  -- M abelian: ⁅x, y⁆ ∈ ⁅M, M⁆ = ⊥ ⇒ x * y = y * x.
+  intro x hx y hy
+  have hcomm_xy : ⁅x, y⁆ ∈ ⁅M, M⁆ := Subgroup.commutator_mem_commutator hx hy
+  rw [hcomm_eq_bot, Subgroup.mem_bot] at hcomm_xy
+  exact commutatorElement_eq_one_iff_mul_comm.mp hcomm_xy
 
 /-- **Isaacs Thm 3.11**: 可解群 `G` の minimal normal subgroup は ある素数 `p` について
 elementary abelian p-group.
