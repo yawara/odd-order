@@ -359,12 +359,66 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
           omega
         haveI hQuot_sol : IsSolvable (G ⧸ M) := inferInstance
         -- IH on G/M.
-        obtain ⟨_Hbar, _hHbar⟩ := ih (G ⧸ M) hquot_card π
-        -- TODO: Pull back H̄ to H = comap (mk' M) H̄.
-        --   Case 1 (p ∈ π): H is π-Hall in G.
-        --   Case 2 (p ∉ π): Schur-Zassenhaus splits H = M ⋊ K, K is π-Hall.
-        -- 各 ~80 行 (cardinality computations).
-        sorry
+        obtain ⟨Hbar, hHbar⟩ := ih (G ⧸ M) hquot_card π
+        -- Pull back: H = comap (mk' M) Hbar.
+        set H : Subgroup G := Subgroup.comap (QuotientGroup.mk' M) Hbar with hH_def
+        -- Key cardinality facts.
+        have hH_index : H.index = Hbar.index :=
+          Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+        have hHbar_idx_pos : 0 < Hbar.index := Nat.pos_of_ne_zero
+          (Subgroup.index_ne_zero_of_finite)
+        -- |H| = |Hbar| * |M|.
+        have hH_card_eq : Nat.card H = Nat.card Hbar * Nat.card ↥M := by
+          have eq1 : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+          have eq2 : Nat.card Hbar * Hbar.index = Nat.card (G ⧸ M) :=
+            Subgroup.card_mul_index Hbar
+          have eq3 : Nat.card (G ⧸ M) * Nat.card ↥M = Nat.card G :=
+            (Subgroup.card_eq_card_quotient_mul_card_subgroup M).symm
+          have h_eq : Nat.card H * Hbar.index = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by
+            calc Nat.card H * Hbar.index
+                = Nat.card H * H.index := by rw [hH_index]
+              _ = Nat.card G := eq1
+              _ = Nat.card (G ⧸ M) * Nat.card ↥M := eq3.symm
+              _ = (Nat.card Hbar * Hbar.index) * Nat.card ↥M := by rw [eq2]
+              _ = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by ring
+          exact Nat.mul_right_cancel hHbar_idx_pos h_eq
+        -- |M| is a p-power (M is elementary abelian p-group ⇒ IsPGroup).
+        have hM_pPower : ∃ k, Nat.card ↥M = _p ^ k := by
+          haveI : Fact _p.Prime := ⟨_hp_prime⟩
+          have hPG : IsPGroup _p ↥M := fun x => ⟨1, by simp [pow_one]; exact _hp_elem.2 x⟩
+          exact IsPGroup.iff_card.mp hPG
+        -- Primes of |M| ⊆ {p}.
+        have hM_primes : ∀ q ∈ (Nat.card ↥M).primeFactors, q = _p := by
+          obtain ⟨k, hk⟩ := hM_pPower
+          intro q hq
+          rw [hk] at hq
+          rw [Nat.mem_primeFactors] at hq
+          obtain ⟨hq_prime, hq_dvd, _⟩ := hq
+          exact (Nat.prime_dvd_prime_iff_eq hq_prime _hp_prime).mp
+            (hq_prime.dvd_of_dvd_pow hq_dvd)
+        by_cases hp_pi : _p ∈ π
+        · -- Case 1: p ∈ π. H is π-Hall.
+          refine ⟨H, ?_, ?_⟩
+          · -- Primes of |H| ⊆ π.
+            intro q hq_pf
+            rw [hH_card_eq] at hq_pf
+            rw [Nat.mem_primeFactors] at hq_pf
+            obtain ⟨hq_prime, hq_dvd, hq_ne0⟩ := hq_pf
+            -- q divides |Hbar| * |M|, so q divides |Hbar| or q divides |M|.
+            rcases hq_prime.dvd_mul.mp hq_dvd with h_in_Hbar | h_in_M
+            · -- q ∈ primeFactors(|Hbar|) ⊆ π.
+              refine hHbar.1 q ?_
+              exact Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_Hbar, Nat.card_pos.ne'⟩
+            · -- q ∈ primeFactors(|M|) ⊆ {p} ⊆ π.
+              have hq_in_M_pf : q ∈ (Nat.card ↥M).primeFactors :=
+                Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩
+              rw [hM_primes q hq_in_M_pf]
+              exact hp_pi
+          · -- Primes of H.index ⊆ π'.
+            rw [hH_index]
+            exact hHbar.2
+        · -- Case 2: p ∉ π. TODO: Schur-Zassenhaus.
+          sorry
 
 /-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
 について `π`-Hall 部分群が存在.
