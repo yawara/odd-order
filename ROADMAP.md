@@ -17,6 +17,7 @@
 - **すべてローカルに書く** (mathlib への PR は将来課題、当面はこのリポジトリ内)
 - **mathlib 互換を可能な限り維持** (将来の upstream を見据えて命名・スタイル・namespace を mathlib に寄せる)
 - **blueprint は使わない** (教科書 PDF → Lean 直接)
+- **教科書として Isaacs を採用 (Gorenstein 1968 は使わない)** — BG が "**G**" として引く Gorenstein _Finite Groups_ (1968) は古典で、BG/Peterfalvi の前提知識を提供する標準文献だが、本プロジェクトでは現代記法で同等内容を扱う **Isaacs FGT を一次参照に採用**するという明示的な選択。BG 中の "G, Thm X.Y.Z" 引用は Isaacs の対応定理に読み替えて Phase 1 で形式化する
 - mathlib 既存資産 (Sylow, p-群, 可解, 冪零, Frattini, Transfer, Focal subgroup, Schur-Zassenhaus, 基本表現論/指標, Maschke, 既約表現, 直交関係, 誘導表現) は再利用
 - 命名: `OddOrder.Isaacs.Subgroup.fitting` のように、将来 `Subgroup.fitting` へリネームしやすい形を取る
 
