@@ -191,20 +191,37 @@ theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
     Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd.2, hI_pos⟩
   exact h.2 p hp_idx_pf (h.1 p hp_H_pf)
 
-/-- **Isaacs Thm 3.13 Hall-E**: `G` 可解 ⇒ 任意の `π ⊆ Primes` について
-`π`-Hall 部分群が存在. -/
+/-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
+について `π`-Hall 部分群が存在.
+
+証明骨子 (Isaacs p.84): `|G|`-induction.
+* Base: `|G| = 1` ⇒ `⊥ = ⊤` が π-Hall.
+* Step: minimal normal `M` を取る (G ≠ ⊥). Thm 3.11 で `M` は elem abelian p-group.
+  - **Case 1** `p ∈ π`: IH を `G/M` に適用 (`G/M` solvable, `|G/M| < |G|`),
+    π-Hall `H/M` を得る. 引き戻した `H` が `G` の π-Hall.
+  - **Case 2** `p ∉ π`: IH を `G/M` に. π-Hall `L/M`. `M` 位数と `L/M` 位数 coprime
+    (`p ∉ π` で `L/M` 内に `p` 因子なし). Schur-Zassenhaus で `L = M ⋊ H`, `H` が
+    `G` の π-Hall. -/
 theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H := by
   sorry
 
-/-- **Isaacs Thm 3.14 Hall-C**: `G` 可解 ⇒ `π`-Hall 部分群は共役. -/
+/-- **Isaacs Thm 3.14 Hall-C** ⭐ **FT クリティカル**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
+
+証明骨子: 同じく `|G|`-induction. Minimal normal `M` 経由で G/M に IH 適用, 個別の
+H₁, H₂ が M 経由で同じ商で対応する Hall に降りる. Schur-Zassenhaus の共役性で
+`H₁ = (H₂)^g` を得る. -/
 theorem hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
     {H₁ H₂ : Subgroup G} (_h1 : IsHallSubgroup π H₁) (_h2 : IsHallSubgroup π H₂) :
     ∃ g : G, H₁.map (MulEquiv.toMonoidHom (MulAut.conj g)) = H₂ := by
   sorry
 
 /-- **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
-存在 ⇒ `G` 可解. -/
+存在 ⇒ `G` 可解.
+
+証明骨子 (Hall's converse): `|G|`-induction. p, q を `|G|` を割る相異なる素数とし,
+H_p, H_q の p-, q-complement を取る. H_p ∩ H_q は {p,q}'-Hall に相当. 商と部分群の
+solvability を組み合わせる. -/
 theorem solvable_of_pcomplement_exists [Finite G]
     (_h : ∀ p : ℕ, p.Prime → ∃ H : Subgroup G, IsHallSubgroup {q | q ≠ p} H) :
     IsSolvable G := by
