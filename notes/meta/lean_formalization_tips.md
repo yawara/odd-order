@@ -146,7 +146,29 @@ BG / Peterfalvi: 1 節 = 1 ファイル. **先回り分割しない** — 育つ
 
 S, T で `|S∩T|` 最大の場合の精密な mod 計算. S 上の共役作用で固定点を数える必要があり, mathlib 直対応無し. 40+ 行が見込まれるため TODO.
 
-→ **再着手のヒント**: mathlib `Sylow.card_modEq_card_normalizer` 系を grep し, 抽象化された版が無いか確認.
+→ **再着手のヒント** (2026-05-21 偵察結果):
+
+**証明骨子 (Isaacs p.15)**:
+1. `S : Subgroup G` を `Sylow p G` 上に共役で作用させる (`Subgroup.instMulAction` で自動).
+2. 固定点軌道 `{S}` (size 1) を分離, 残り軌道のサイズが `|S:S∩T|` の倍数になることを示せばよい.
+3. 任意の `P ∈ Syl_p(G), P ≠ S` について `Stab_S P = S ⊓ N_G(P) = S ⊓ P` (Sylow.smul_eq_iff_mem_normalizer + IsPGroup.inf_normalizer_sylow).
+4. orbit-stabilizer: `|orbit_S(P)| = |S : S ⊓ P|`.
+5. `|S ⊓ P| ≤ |S ⊓ T|` (S∩T 最大性) ⇒ `|S:S⊓T| ≤ |S:S⊓P|`. 両者 p-冪 ⇒ 整除.
+
+**必要 mathlib 補題** (全て確認済):
+- `Sylow.smul_eq_iff_mem_normalizer` (Mathlib/GroupTheory/Sylow.lean:258)
+- `IsPGroup.inf_normalizer_sylow` (Sylow.lean:277): p-群 Q, Sylow P で `Q ⊓ N_G(P) = Q ⊓ P`.
+- `IsPGroup.card_orbit` (Mathlib/GroupTheory/PGroup.lean:147): p-群作用 ⇒ 軌道は p-冪サイズ.
+- `MulAction.card_orbit_mul_card_stabilizer_eq_card_group` (Quotient.lean:182)
+- `MulAction.selfEquivSigmaOrbitsQuotientStabilizer'` (Quotient.lean:214): class formula.
+- `Subgroup.instMulAction` (GroupAction/Defs.lean:246).
+
+**主な詰まりどころ (blocker)**:
+class formula で `Nat.card (Sylow p G) = Σ orbit_sizes` の和への変換は可能だが,
+固定点軌道 `{S}` を分離し残りを `(mod |S:S⊓T|)` で計算する Finset 操作 + `Quotient.out` の扱いがトリッキー.
+さらに `(stabilizer ↥S P : Subgroup ↥S)` を `S ⊓ P` の subtype と関連付ける `subgroupOf` の Nat.card 変換が必要. 60-80 行が見込まれる.
+
+参考実装: mathlib 内 `Sylow.card_modEq_card_normalizer` 系 (Sylow.lean:540-610) の類似 pattern. 詳細 TODO は OddOrder/Isaacs/Ch01_Sylow.lean L262- に breadcrumbs 込みで残してある.
 
 ---
 

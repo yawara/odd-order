@@ -9,11 +9,11 @@
 |---|---|---|---|
 | 1A | 群作用と Fundamental Counting Principle | Thm 1.1–1.6 (6 件) | 1.1, 1.2, 1.3, 1.4, 1.5, 1.6 ✅ |
 | 1B | Sylow E, Cauchy | Thm 1.7–1.10 (4 件) | 1.7, 1.8, 1.9, 1.10 ✅ |
-| 1C | Sylow C / D, Frattini argument | Thm 1.11–1.18 (8 件) | 1.11-1.15, 1.17, 1.18 ✅ / 1.16 TODO |
-| 1D | 冪零群, Fitting 部分群 `F(G)` | Thm 1.19–1.29 (11 件) | 1.26 ✅, opCore + Problem 1B.2 + fitting + fitting.normal ✅, 1.28(a), 1.28(b), 1.29 ✅ / 1.19-1.25, 1.27 TODO |
-| 1E | 小位数群, 指数 2 正規部分群 | Thm 1.30–1.36 (7 件) | 1.34, 1.35 ✅ / 1.30-1.33, 1.36 TODO |
-| 1F | Brodkey (abelian Sylow) | Thm 1.37–1.40 (4 件) | TODO (低優先度) |
-| 1G | Chermak–Delgado | Thm 1.41–1.46 (6 件) | TODO (BG/Peterfalvi 引用無ければ省略可) |
+| 1C | Sylow C / D, Frattini argument | Thm 1.11–1.18 (8 件) | 1.11-1.15, 1.17, 1.18 ✅ / 1.16 詳細 TODO (sketch + breadcrumbs 済) |
+| 1D | 冪零群, Fitting 部分群 `F(G)` | Thm 1.19–1.29 (11 件) | 1.19, 1.20, 1.21, 1.22, 1.24(弱形), 1.25, 1.26, 1.27 ✅, opCore + Problem 1B.2 + fitting + fitting.normal ✅, 1.28(a), 1.28(b), 1.29 ✅ / 1.23 TODO (`P/N` quotient + Cauchy 経由) |
+| 1E | 小位数群, 指数 2 正規部分群 | Thm 1.30–1.36 (7 件) | 1.30 (前半 `q<p` ⇒ Sylow p 正規), 1.31 (`q<p` 部分), 1.34, 1.35 ✅ / 1.30 後半 (cyclic), 1.31 一般 (`p<q`, 例外 `|G|=12`), 1.32, 1.33, 1.36 TODO (詳細 sketch 済) |
+| 1F | Brodkey (abelian Sylow) | Thm 1.37–1.40 (4 件) | 1.37, 1.38, 1.39, 1.40 ✅ (2026-05-21) |
+| 1G | Chermak–Delgado | Thm 1.41–1.46 (6 件) | **省略** (BG/Peterfalvi grep 0 件, 2026-05-21) |
 
 ## mathlib 対応表
 
