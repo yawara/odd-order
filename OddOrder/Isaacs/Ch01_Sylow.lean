@@ -651,8 +651,19 @@ instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
   -- Transport across the MulEquiv
   exact nilpotent_of_mulEquiv e
 
--- TODO **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).  Cor 1.28 (b) から直結:
---   K, L 冪零正規 ⇒ K, L ≤ fitting ⇒ KL ≤ fitting (冪零) ⇒ KL 冪零.
+/-- **Isaacs Cor 1.29** (冪零正規部分群の積も冪零).
+`K, L` が `G` の正規冪零部分群ならば `K ⊔ L` (= `KL`) も冪零.
+
+証明: Cor 1.28(b) で `K, L ≤ fitting G` ⇒ `K ⊔ L ≤ fitting G`.
+`(K ⊔ L).subgroupOf (fitting G)` は冪零 (Cor 1.28(a) + `Subgroup.isNilpotent` instance),
+`subgroupOfEquivOfLe` の同型で `K ⊔ L` も冪零. -/
+instance sup_isNilpotent_of_normal_nilpotent [Finite G]
+    (K L : Subgroup G) [K.Normal] [L.Normal]
+    [Group.IsNilpotent K] [Group.IsNilpotent L] :
+    Group.IsNilpotent (↥(K ⊔ L)) := by
+  have hKLfit : K ⊔ L ≤ fitting G :=
+    sup_le nilpotent_normal_le_fitting nilpotent_normal_le_fitting
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hKLfit)
 
 end -- 1D
 
