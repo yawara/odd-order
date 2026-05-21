@@ -165,12 +165,20 @@ def IsHallSubgroup (π : Set ℕ) (H : Subgroup G) : Prop :=
   (∀ p ∈ (Nat.card H).primeFactors, p ∈ π) ∧
   (∀ p ∈ H.index.primeFactors, p ∉ π)
 
-/-- 同値表現: `IsHallSubgroup` ↔ `Nat.Coprime (Nat.card H) H.index`. -/
-theorem isHallSubgroup_iff_coprime_index [Finite G] (π : Set ℕ) (H : Subgroup G) :
-    IsHallSubgroup π H ↔
-      Nat.Coprime (Nat.card H) H.index ∧
-      (∀ p ∈ (Nat.card H).primeFactors, p ∈ π) := by
-  sorry  -- 標準的, 両端で primeFactors の disjointness 経由.
+/-- π-Hall ⇒ Coprime `|H|` `|G:H|`. 標準的: 共通素因子は π と π' 両方に属し矛盾. -/
+theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
+    (h : IsHallSubgroup π H) : Nat.Coprime (Nat.card H) H.index := by
+  rw [Nat.coprime_iff_gcd_eq_one]
+  by_contra hne
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hne
+  rw [Nat.dvd_gcd_iff] at hp_dvd
+  have hH_pos : Nat.card H ≠ 0 := Nat.card_pos.ne'
+  have hI_pos : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hp_H_pf : p ∈ (Nat.card H).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd.1, hH_pos⟩
+  have hp_idx_pf : p ∈ H.index.primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd.2, hI_pos⟩
+  exact h.2 p hp_idx_pf (h.1 p hp_H_pf)
 
 /-- **Isaacs Thm 3.13 Hall-E**: `G` 可解 ⇒ 任意の `π ⊆ Primes` について
 `π`-Hall 部分群が存在. -/
@@ -191,10 +199,16 @@ theorem solvable_of_pcomplement_exists [Finite G]
     IsSolvable G := by
   sorry
 
-/-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`). -/
-theorem sup_eq_top_of_coprime_index [Finite G] {H K : Subgroup G}
-    (_h : Nat.Coprime H.index K.index) : H ⊔ K = ⊤ := by
-  sorry
+/-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).
+
+証明: `(H ⊔ K).index` は `H.index` と `K.index` の両方を割り切るので gcd を割り切る.
+gcd は 1 なので `(H ⊔ K).index = 1`, 故に `H ⊔ K = ⊤`. -/
+theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
+    (h : Nat.Coprime H.index K.index) : H ⊔ K = ⊤ := by
+  have h1 : (H ⊔ K).index ∣ H.index := Subgroup.index_dvd_of_le le_sup_left
+  have h2 : (H ⊔ K).index ∣ K.index := Subgroup.index_dvd_of_le le_sup_right
+  have h_dvd : (H ⊔ K).index ∣ 1 := h ▸ Nat.dvd_gcd h1 h2
+  exact Subgroup.index_eq_one.mp (Nat.dvd_one.mp h_dvd)
 
 /-- **Isaacs Thm 3.17**: 3 つの部分群が pairwise coprime index + solvable ⇒ `G` solvable. -/
 theorem solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
