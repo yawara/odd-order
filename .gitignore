@@ -1,2 +1,4 @@
 *.pdf
 /.lake
+/.venv
+references/
