@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Finite.Perm
 import Mathlib.Data.Nat.Choose.Lucas
+import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Nilpotent
@@ -1065,6 +1066,8 @@ end -- 1D
 
 section /- 1E: Small-order groups, normal subgroup of index 2 (pp. 31-34) -/
 
+open scoped Pointwise
+
 variable {G : Type*} [Group G]
 
 /-- **Isaacs Thm 1.30** (前半).  `|G| = p · q` で `q < p` がともに素数ならば,
@@ -1989,10 +1992,364 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
     · -- k = 3: n_q = p³.  By the counting helper, Sylow p is normal.
       exact Or.inl (sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube hpq hcard hk_eq)
 
--- TODO Thm 1.33  : |G|=24 ∧ n_2,n_3>1 ⇒ G ≅ S_4.
---   方針: G が n_3 = 4 個の Sylow 3 に共役で作用 ⇒ G →* S_4.
---   核 = ⋂ N_G(P_3) over P_3 ∈ Syl_3. 核 = ⊥ を示す必要 (難所).
---   |G|=|S_4|=24 ⇒ 全射, 同型.
+/-! ### Thm 1.33 — `|G| = 24` で Sylow 2 も Sylow 3 も非正規ならば `G ≅ S₄`. -/
+
+/-- `(24 : ℕ).factorization 3 = 1`. -/
+private lemma factorization_twenty_four_three : (24 : ℕ).factorization 3 = 1 := by
+  have hmul_eq : (24 : ℕ) = 2 ^ 3 * 3 := by norm_num
+  rw [show (24 : ℕ) = 2 ^ 3 * 3 from hmul_eq,
+      Nat.factorization_mul (pow_ne_zero _ Nat.prime_two.ne_zero) Nat.prime_three.ne_zero,
+      Nat.Prime.factorization_pow Nat.prime_two,
+      Nat.Prime.factorization Nat.prime_three]
+  simp
+
+/-- `(24 : ℕ).factorization 2 = 3`. -/
+private lemma factorization_twenty_four_two : (24 : ℕ).factorization 2 = 3 := by
+  have hmul_eq : (24 : ℕ) = 2 ^ 3 * 3 := by norm_num
+  rw [show (24 : ℕ) = 2 ^ 3 * 3 from hmul_eq,
+      Nat.factorization_mul (pow_ne_zero _ Nat.prime_two.ne_zero) Nat.prime_three.ne_zero,
+      Nat.Prime.factorization_pow Nat.prime_two,
+      Nat.Prime.factorization Nat.prime_three]
+  simp
+
+/-- `(12 : ℕ).factorization 2 = 2`. -/
+private lemma factorization_twelve_two : (12 : ℕ).factorization 2 = 2 := by
+  have hmul_eq : (12 : ℕ) = 2 ^ 2 * 3 := by norm_num
+  rw [show (12 : ℕ) = 2 ^ 2 * 3 from hmul_eq,
+      Nat.factorization_mul (pow_ne_zero _ Nat.prime_two.ne_zero) Nat.prime_three.ne_zero,
+      Nat.Prime.factorization_pow Nat.prime_two,
+      Nat.Prime.factorization Nat.prime_three]
+  simp
+
+/-- `(12 : ℕ).factorization 3 = 1`. -/
+private lemma factorization_twelve_three : (12 : ℕ).factorization 3 = 1 := by
+  have hmul_eq : (12 : ℕ) = 2 ^ 2 * 3 := by norm_num
+  rw [show (12 : ℕ) = 2 ^ 2 * 3 from hmul_eq,
+      Nat.factorization_mul (pow_ne_zero _ Nat.prime_two.ne_zero) Nat.prime_three.ne_zero,
+      Nat.Prime.factorization_pow Nat.prime_two,
+      Nat.Prime.factorization Nat.prime_three]
+  simp
+
+/-- `(6 : ℕ).factorization 3 = 1`. -/
+private lemma factorization_six_three : (6 : ℕ).factorization 3 = 1 := by
+  have hmul_eq : (6 : ℕ) = 2 * 3 := by norm_num
+  rw [show (6 : ℕ) = 2 * 3 from hmul_eq,
+      Nat.factorization_mul Nat.prime_two.ne_zero Nat.prime_three.ne_zero,
+      Nat.Prime.factorization Nat.prime_two,
+      Nat.Prime.factorization Nat.prime_three]
+  simp
+
+/-- 位数 24 の群の Sylow 3 部分群は位数 3. -/
+private lemma card_sylow_three_of_card_twenty_four
+    [Finite G] (hG : Nat.card G = 24) (P : Sylow 3 G) :
+    Nat.card (P : Subgroup G) = 3 := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have hmul := P.card_eq_multiplicity (G := G)
+  rw [hG, factorization_twenty_four_three] at hmul
+  simpa using hmul
+
+/-- 位数 24 の群の Sylow 2 部分群は位数 8. -/
+private lemma card_sylow_two_of_card_twenty_four
+    [Finite G] (hG : Nat.card G = 24) (P : Sylow 2 G) :
+    Nat.card (P : Subgroup G) = 8 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hmul := P.card_eq_multiplicity (G := G)
+  rw [hG, factorization_twenty_four_two] at hmul
+  simpa using hmul
+
+/-- 位数 12 の群の Sylow 2 部分群は位数 4. -/
+private lemma card_sylow_two_of_card_twelve
+    {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 12) (Q : Sylow 2 H) :
+    Nat.card (Q : Subgroup H) = 4 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hmul := Q.card_eq_multiplicity (G := H)
+  rw [hH, factorization_twelve_two] at hmul
+  simpa using hmul
+
+/-- 位数 12 の群の Sylow 3 部分群は位数 3. -/
+private lemma card_sylow_three_of_card_twelve
+    {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 12) (Q : Sylow 3 H) :
+    Nat.card (Q : Subgroup H) = 3 := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have hmul := Q.card_eq_multiplicity (G := H)
+  rw [hH, factorization_twelve_three] at hmul
+  simpa using hmul
+
+/-- 位数 6 の群の Sylow 3 部分群は位数 3. -/
+private lemma card_sylow_three_of_card_six
+    {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 6) (Q : Sylow 3 H) :
+    Nat.card (Q : Subgroup H) = 3 := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have hmul := Q.card_eq_multiplicity (G := H)
+  rw [hH, factorization_six_three] at hmul
+  simpa using hmul
+
+/-- 位数 6 の群の Sylow 3 部分群は一意. -/
+private lemma subsingleton_sylow_three_of_card_six
+    {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 6) :
+    Subsingleton (Sylow 3 H) := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  obtain ⟨Q⟩ := Sylow.nonempty (p := 3) (G := H)
+  have hQ_card : Nat.card (Q : Subgroup H) = 3 := card_sylow_three_of_card_six hH Q
+  have hQ_index : (Q : Subgroup H).index = 2 := by
+    have h1 : Nat.card (Q : Subgroup H) * (Q : Subgroup H).index = Nat.card H :=
+      Subgroup.card_mul_index _
+    rw [hH, hQ_card] at h1; omega
+  have hdvd : Nat.card (Sylow 3 H) ∣ 2 := hQ_index ▸ Q.card_dvd_index
+  have hmod : Nat.card (Sylow 3 H) ≡ 1 [MOD 3] := card_sylow_modEq_one 3 H
+  have hle : Nat.card (Sylow 3 H) ≤ 2 := Nat.le_of_dvd (by norm_num) hdvd
+  have hN3_eq_1 : Nat.card (Sylow 3 H) = 1 := by
+    interval_cases (Nat.card (Sylow 3 H))
+    all_goals first | rfl | (exfalso; revert hmod; decide)
+  exact Finite.card_le_one_iff_subsingleton.mp (by omega)
+
+/-- `|G| = 24` で Sylow 3 が非正規 (`n_3 > 1`) ならば `n_3 = 4`.
+
+`n_3 ∣ 8` (`Sylow.card_dvd_index`, |G:P| = 24/3 = 8), `n_3 ≡ 1 mod 3` (Sylow III),
+ゆえ `n_3 ∈ {1, 4}`. `n_3 > 1` より `n_3 = 4`. -/
+private lemma card_sylow_three_of_card_eq_twenty_four
+    [Finite G] (hcard : Nat.card G = 24) (hn3 : 1 < Nat.card (Sylow 3 G)) :
+    Nat.card (Sylow 3 G) = 4 := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  obtain ⟨P⟩ := Sylow.nonempty (p := 3) (G := G)
+  have hPcard : Nat.card (P : Subgroup G) = 3 :=
+    card_sylow_three_of_card_twenty_four hcard P
+  have hPindex : (P : Subgroup G).index = 8 := by
+    have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+      Subgroup.card_mul_index _
+    rw [hcard, hPcard] at h1
+    omega
+  have hdvd : Nat.card (Sylow 3 G) ∣ 8 := hPindex ▸ P.card_dvd_index
+  have hmod : Nat.card (Sylow 3 G) ≡ 1 [MOD 3] := card_sylow_modEq_one 3 G
+  have hle : Nat.card (Sylow 3 G) ≤ 8 := Nat.le_of_dvd (by norm_num) hdvd
+  interval_cases (Nat.card (Sylow 3 G))
+  all_goals first | omega | (exfalso; revert hmod; decide)
+
+/-- `|G| = 24` で Sylow 3 が非正規 (`n_3 > 1`) ならば任意の Sylow 3 部分群の正規化群の位数は 6. -/
+private lemma card_normalizer_sylow_three_of_card_eq_twenty_four
+    [Finite G] (hcard : Nat.card G = 24) (hn3 : 1 < Nat.card (Sylow 3 G))
+    (P : Sylow 3 G) :
+    Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G)) = 6 := by
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have hn3_eq : Nat.card (Sylow 3 G) = 4 :=
+    card_sylow_three_of_card_eq_twenty_four hcard hn3
+  have hidx : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index = 4 := by
+    rw [← P.card_eq_index_normalizer]; exact hn3_eq
+  have h1 : Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G)) *
+      (Subgroup.normalizer ((P : Subgroup G) : Set G)).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  rw [hcard, hidx] at h1
+  omega
+
+/-- `|G| = 24`, Sylow 2 と Sylow 3 が共に非正規ならば `G ≅ S₄`.
+
+**Isaacs Thm 1.33** (p.32).
+
+証明骨子 (Isaacs):
+* Phase 1: `n_3 ∈ {1, 4}`, 仮定 `n_3 > 1` から `n_3 = 4`. ゆえに `P ∈ Syl_3` に対し
+  `N := N_G(P)` は `|N| = 6`.
+* Phase 2: `G` が `G ⧸ N` (4 元) に左乗法作用 ⇒ `G →* Sym(G ⧸ N)`,
+  核 `K = N.normalCore`.
+* Phase 3 (難所): `K = ⊥` を示す.  `K ≤ N` で `|K| ∈ {1, 2, 3, 6}`.
+  - `|K| = 6 ⇒ K = N ⇒ N ⊴ G ⇒ P` (`N` 内の唯一の Sylow 3) `⊴ G ⇒ n_3 = 1`, 矛盾.
+  - `|K| = 3`: `K` は `N` の位数 3 部分群, 唯一なので `K = P ⊴ G ⇒ n_3 = 1`, 矛盾.
+  - `|K| = 2`: `|G/K| = 12`.  Thm 1.31 で `G/K` の `n_2 = 1` または `n_3 = 1`:
+    - `n_2(G/K) = 1`: 対応で `|S| = 8` の正規 Sylow 2 in `G ⇒ n_2 = 1`, 矛盾.
+    - `n_3(G/K) = 1`: 対応で `|S| = 6` の正規部分群, 唯一の Sylow 3 (特性) ⇒ `n_3 = 1`, 矛盾.
+* Phase 4: `K = ⊥` ⇒ `G →* Sym(G ⧸ N)` 単射. 両側 24 元で全単射 ⇒ `MulEquiv`. -/
+theorem mulEquiv_perm_fin_four_of_card_twenty_four
+    [Finite G] (hcard : Nat.card G = 24)
+    (hn2 : 1 < Nat.card (Sylow 2 G))
+    (hn3 : 1 < Nat.card (Sylow 3 G)) :
+    Nonempty (G ≃* Equiv.Perm (Fin 4)) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  haveI : Fintype G := Fintype.ofFinite G
+  -- Phase 1: n_3 = 4, |N| = 6.
+  obtain ⟨P⟩ := Sylow.nonempty (p := 3) (G := G)
+  have hPcard : Nat.card (P : Subgroup G) = 3 :=
+    card_sylow_three_of_card_twenty_four hcard P
+  set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_def
+  have hN_card : Nat.card N = 6 :=
+    card_normalizer_sylow_three_of_card_eq_twenty_four hcard hn3 P
+  have hN_index : N.index = 4 := by
+    have h1 : Nat.card N * N.index = Nat.card G := Subgroup.card_mul_index _
+    rw [hcard, hN_card] at h1; omega
+  have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
+  haveI hN_sub3 : Subsingleton (Sylow 3 N) :=
+    subsingleton_sylow_three_of_card_six hN_card
+  let PN : Sylow 3 N := P.subtype hP_le_N
+  have hPN_card : Nat.card (PN : Subgroup N) = 3 := by
+    have hPN_equiv : (PN : Subgroup N) ≃* (P : Subgroup G) := by
+      change ((P : Subgroup G).subgroupOf N) ≃* (P : Subgroup G)
+      exact Subgroup.subgroupOfEquivOfLe hP_le_N
+    rw [Nat.card_congr hPN_equiv.toEquiv]
+    exact hPcard
+  have hPN_map_eq_P : (PN : Subgroup N).map N.subtype = (P : Subgroup G) := by
+    change ((P : Subgroup G).subgroupOf N).map N.subtype = (P : Subgroup G)
+    exact Subgroup.map_subgroupOf_eq_of_le hP_le_N
+  haveI hPN_normal : (PN : Subgroup N).Normal := PN.normal_of_subsingleton
+  haveI hPN_char : (PN : Subgroup N).Characteristic :=
+    Sylow.characteristic_of_normal PN hPN_normal
+  -- Phase 2: define f : G →* Equiv.Perm (G ⧸ N), K = N.normalCore = f.ker.
+  let f : G →* Equiv.Perm (G ⧸ N) := MulAction.toPermHom G (G ⧸ N)
+  have hKer_eq : N.normalCore = f.ker := normalCore_eq_perm_ker N
+  set K : Subgroup G := N.normalCore with hK_def
+  have hK_le_N : K ≤ N := N.normalCore_le
+  haveI hK_normal : K.Normal := N.normalCore_normal
+  -- Phase 3: K = ⊥.
+  have hK_dvd : Nat.card K ∣ 6 := by
+    rw [← hN_card]; exact Subgroup.card_dvd_of_le hK_le_N
+  have hK_pos : 0 < Nat.card K := Nat.card_pos
+  have hK_le_six : Nat.card K ≤ 6 := Nat.le_of_dvd (by norm_num) hK_dvd
+  have hK_card_in : Nat.card K = 1 ∨ Nat.card K = 2 ∨ Nat.card K = 3 ∨ Nat.card K = 6 := by
+    rcases hK_dvd with ⟨k, hk⟩
+    interval_cases (Nat.card K)
+    all_goals omega
+  have hK_eq_bot : K = ⊥ := by
+    rcases hK_card_in with hKK | hKK | hKK | hKK
+    · exact (Subgroup.card_eq_one (H := K)).mp hKK
+    · -- |K| = 2: derive contradiction.
+      exfalso
+      have hquot_card : Nat.card (G ⧸ K) = 12 := by
+        have h1 : Nat.card G = Nat.card (G ⧸ K) * Nat.card K :=
+          K.card_eq_card_quotient_mul_card_subgroup
+        rw [hcard, hKK] at h1; omega
+      have h12_eq : Nat.card (G ⧸ K) = 2 ^ 2 * 3 := by rw [hquot_card]; norm_num
+      have hpq : (2 : ℕ) ≠ 3 := by norm_num
+      rcases sylow_normal_of_card_eq_sq_mul_prime (G := G ⧸ K) hpq h12_eq with
+        ⟨S2_quot, hS2_quot_normal⟩ | ⟨S3_quot, hS3_quot_normal⟩
+      · set S2 : Subgroup G := Subgroup.comap (QuotientGroup.mk' K) (S2_quot : Subgroup (G ⧸ K))
+          with hS2_def
+        haveI hS2_normal : S2.Normal := hS2_quot_normal.comap _
+        have hS2_quot_card : Nat.card (S2_quot : Subgroup (G ⧸ K)) = 4 :=
+          card_sylow_two_of_card_twelve hquot_card S2_quot
+        have hS2_card : Nat.card S2 = 8 := by
+          have hindex_eq : S2.index = (S2_quot : Subgroup (G ⧸ K)).index :=
+            (S2_quot : Subgroup (G ⧸ K)).index_comap_of_surjective
+              (QuotientGroup.mk'_surjective K)
+          have hS2_quot_index : (S2_quot : Subgroup (G ⧸ K)).index = 3 := by
+            have h1 : Nat.card (S2_quot : Subgroup (G ⧸ K)) *
+                (S2_quot : Subgroup (G ⧸ K)).index = Nat.card (G ⧸ K) :=
+              Subgroup.card_mul_index _
+            rw [hquot_card, hS2_quot_card] at h1; omega
+          have hS2_index : S2.index = 3 := hindex_eq.trans hS2_quot_index
+          have h1 : Nat.card S2 * S2.index = Nat.card G := Subgroup.card_mul_index _
+          rw [hcard, hS2_index] at h1; omega
+        have hS2_pgroup : IsPGroup 2 S2 := by
+          rw [IsPGroup.iff_card]
+          exact ⟨3, by rw [hS2_card]; norm_num⟩
+        obtain ⟨S2_syl, hS2_le_syl⟩ := hS2_pgroup.exists_le_sylow
+        have hS2_card_syl : Nat.card (S2_syl : Subgroup G) = 8 :=
+          card_sylow_two_of_card_twenty_four hcard S2_syl
+        have hS2_eq : S2 = (S2_syl : Subgroup G) :=
+          Subgroup.eq_of_le_of_card_ge hS2_le_syl (by rw [hS2_card, hS2_card_syl])
+        haveI hS2_syl_normal : (S2_syl : Subgroup G).Normal := hS2_eq ▸ hS2_normal
+        haveI : Unique (Sylow 2 G) := Sylow.unique_of_normal S2_syl hS2_syl_normal
+        have hn2_eq : Nat.card (Sylow 2 G) = 1 :=
+          Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨S2_syl⟩⟩
+        omega
+      · set S3 : Subgroup G := Subgroup.comap (QuotientGroup.mk' K) (S3_quot : Subgroup (G ⧸ K))
+          with hS3_def
+        haveI hS3_normal : S3.Normal := hS3_quot_normal.comap _
+        have hS3_quot_card : Nat.card (S3_quot : Subgroup (G ⧸ K)) = 3 :=
+          card_sylow_three_of_card_twelve hquot_card S3_quot
+        have hS3_card : Nat.card S3 = 6 := by
+          have hindex_eq : S3.index = (S3_quot : Subgroup (G ⧸ K)).index :=
+            (S3_quot : Subgroup (G ⧸ K)).index_comap_of_surjective
+              (QuotientGroup.mk'_surjective K)
+          have hS3_quot_index : (S3_quot : Subgroup (G ⧸ K)).index = 4 := by
+            have h1 : Nat.card (S3_quot : Subgroup (G ⧸ K)) *
+                (S3_quot : Subgroup (G ⧸ K)).index = Nat.card (G ⧸ K) :=
+              Subgroup.card_mul_index _
+            rw [hquot_card, hS3_quot_card] at h1; omega
+          have hS3_index : S3.index = 4 := hindex_eq.trans hS3_quot_index
+          have h1 : Nat.card S3 * S3.index = Nat.card G := Subgroup.card_mul_index _
+          rw [hcard, hS3_index] at h1; omega
+        haveI : Subsingleton (Sylow 3 S3) := subsingleton_sylow_three_of_card_six hS3_card
+        obtain ⟨P3⟩ := Sylow.nonempty (p := 3) (G := S3)
+        have hP3_card : Nat.card (P3 : Subgroup S3) = 3 :=
+          card_sylow_three_of_card_six hS3_card P3
+        haveI hP3_normal : (P3 : Subgroup S3).Normal := P3.normal_of_subsingleton
+        haveI hP3_char : (P3 : Subgroup S3).Characteristic :=
+          Sylow.characteristic_of_normal P3 hP3_normal
+        haveI hP3_normal_in_G : ((P3 : Subgroup S3).map S3.subtype).Normal :=
+          inferInstance
+        have hP3_map_card : Nat.card ((P3 : Subgroup S3).map S3.subtype) = 3 := by
+          rw [Subgroup.card_map_of_injective Subtype.coe_injective]
+          exact hP3_card
+        have hP3_map_pgroup : IsPGroup 3 ((P3 : Subgroup S3).map S3.subtype) := by
+          rw [IsPGroup.iff_card]
+          exact ⟨1, by rw [hP3_map_card, pow_one]⟩
+        obtain ⟨P3_syl, hP3_le_syl⟩ := hP3_map_pgroup.exists_le_sylow
+        have hP3_card_syl : Nat.card (P3_syl : Subgroup G) = 3 :=
+          card_sylow_three_of_card_twenty_four hcard P3_syl
+        have hP3_map_eq_syl : (P3 : Subgroup S3).map S3.subtype = (P3_syl : Subgroup G) :=
+          Subgroup.eq_of_le_of_card_ge hP3_le_syl (by rw [hP3_map_card, hP3_card_syl])
+        haveI hP3_syl_normal : (P3_syl : Subgroup G).Normal := hP3_map_eq_syl ▸ hP3_normal_in_G
+        haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P3_syl hP3_syl_normal
+        have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
+          Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P3_syl⟩⟩
+        omega
+    · -- |K| = 3.
+      exfalso
+      have hKsub_card : Nat.card (K.subgroupOf N) = 3 := by
+        have hK_equiv : K.subgroupOf N ≃* K := Subgroup.subgroupOfEquivOfLe hK_le_N
+        rw [Nat.card_congr hK_equiv.toEquiv]
+        exact hKK
+      have hKsub_pgroup : IsPGroup 3 (K.subgroupOf N) := by
+        rw [IsPGroup.iff_card]
+        exact ⟨1, by rw [hKsub_card, pow_one]⟩
+      obtain ⟨QN, hKsub_le_QN⟩ := hKsub_pgroup.exists_le_sylow
+      have hQN_eq_PN : QN = PN := Subsingleton.elim _ _
+      have hQN_card : Nat.card (QN : Subgroup N) = 3 := hQN_eq_PN ▸ hPN_card
+      have hKsub_eq_QN : K.subgroupOf N = (QN : Subgroup N) :=
+        Subgroup.eq_of_le_of_card_ge hKsub_le_QN (by rw [hKsub_card, hQN_card])
+      have hK_eq_P : K = (P : Subgroup G) := by
+        rw [show K = (K.subgroupOf N).map N.subtype from
+              (Subgroup.map_subgroupOf_eq_of_le hK_le_N).symm,
+            hKsub_eq_QN, hQN_eq_PN, hPN_map_eq_P]
+      have hP_normal : (P : Subgroup G).Normal := hK_eq_P ▸ hK_normal
+      haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
+      have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
+        Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P⟩⟩
+      omega
+    · -- |K| = 6.
+      exfalso
+      have hK_eq_N : K = N := Subgroup.eq_of_le_of_card_ge hK_le_N (by rw [hKK, hN_card])
+      haveI hN_normal : N.Normal := hK_eq_N ▸ hK_normal
+      haveI hPN_map_normal : ((PN : Subgroup N).map N.subtype).Normal := inferInstance
+      have hP_normal : (P : Subgroup G).Normal := hPN_map_eq_P ▸ hPN_map_normal
+      haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
+      have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
+        Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P⟩⟩
+      omega
+  -- Phase 4: f is injective ⇒ surjective ⇒ MulEquiv.
+  have hf_ker : f.ker = ⊥ := by rw [← hKer_eq]; exact hK_eq_bot
+  have hf_inj : Function.Injective f := (MonoidHom.ker_eq_bot_iff f).mp hf_ker
+  have hquotN_card : Nat.card (G ⧸ N) = 4 := by rw [← N.index_eq_card]; exact hN_index
+  haveI : Finite (G ⧸ N) := Nat.finite_of_card_ne_zero (by rw [hquotN_card]; norm_num)
+  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  have hfintype_card : Fintype.card (G ⧸ N) = 4 := by
+    rw [← Nat.card_eq_fintype_card]; exact hquotN_card
+  let e : G ⧸ N ≃ Fin 4 := Fintype.equivFinOfCardEq hfintype_card
+  let φ : Equiv.Perm (G ⧸ N) ≃* Equiv.Perm (Fin 4) := e.permCongrHom
+  let f' : G →* Equiv.Perm (Fin 4) := φ.toMonoidHom.comp f
+  have hf'_inj : Function.Injective f' := φ.injective.comp hf_inj
+  have hperm_card : Nat.card (Equiv.Perm (Fin 4)) = 24 := by
+    rw [Nat.card_perm, Nat.card_fin]; decide
+  haveI : Finite (Equiv.Perm (Fin 4)) := inferInstance
+  haveI : Fintype (Equiv.Perm (Fin 4)) := Fintype.ofFinite _
+  have hfin_perm_card : Fintype.card (Equiv.Perm (Fin 4)) = 24 := by
+    rw [← Nat.card_eq_fintype_card]; exact hperm_card
+  have hfin_G_card : Fintype.card G = 24 := by
+    rw [← Nat.card_eq_fintype_card]; exact hcard
+  have hcard_eq : Fintype.card G = Fintype.card (Equiv.Perm (Fin 4)) := by
+    rw [hfin_G_card, hfin_perm_card]
+  have hf'_bij : Function.Bijective f' :=
+    (Fintype.bijective_iff_injective_and_card f').mpr ⟨hf'_inj, hcard_eq⟩
+  exact ⟨MulEquiv.ofBijective f' hf'_bij⟩
 
 /-! ### Thm 1.36 — `|G| = p^a q` 単純性破壊.  helpers + main. -/
 
@@ -2152,10 +2509,464 @@ private lemma sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   exact ⟨Q, Sylow.normal_of_subsingleton Q⟩
 
--- TODO Thm 1.36 (本体) : `|G| = p^a q` (p, q 異素数, a ≥ 1) ⇒ G 単純でない.
---   D = ⊥ 部分 helper `sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint` 完成.
---   残: D ≠ ⊥ 部分 (`NormalizerCondition` で `N_S(D) > D`, SQ = G, D ≤ opCore).
---   mathlib API: `IsPGroup.isNilpotent` + `normalizerCondition_of_isNilpotent`.
+/-- `D ≠ ⊥` 部分 case of Thm 1.36: `|G| = p^a q` (p, q 異素数, a ≥ 1),
+`n_p = q`, `(S, T)` を `|S ⊓ T|` 最大の Sylow `p` ペア (`S ≠ T`) として固定し,
+`D := S ⊓ T ≠ ⊥` のとき `opCore p G ≠ ⊥`.
+
+Isaacs proof (p.34): `N := N_G(D)` とおく.  S は p-群 ⇒ 冪零 (Thm 1.22),
+`D < S` から S 内 normalizer condition で `(S ⊓ N) > D`. 同様 `(T ⊓ N) > D`.
+これより `N` は p-群でない (もし `N ≤ R ∈ Sylow p` だと `R ⊓ S ⊇ N ⊓ S > D` で
+`hmax` から `R = S`, 同様 `R = T`, しかし `S ≠ T` で矛盾).  よって `q ∣ |N|`,
+Cauchy で位数 `q` の `y ∈ N` あり `Q := zpowers y`, `|Q| = q`.
+`Disjoint S Q` (gcd(p^a, q) = 1), `|S| · |Q| = |G|` で `S, Q` は complement.
+任意の Sylow `p` `R` は Sylow C で `R = g • S`; `g = s · z` (`s ∈ S, z ∈ Q`) と書け
+`R = (sz) • S = z • S` (S 自己正規化).  `z ∈ Q ⊆ N` で `D = z • D ⊆ z • S = R`.
+∀ Sylow R で `D ≤ R` ゆえ `D ≤ opCore p G`, `D ≠ ⊥` より `opCore p G ≠ ⊥`. -/
+private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime] {a : ℕ} (ha : 1 ≤ a)
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q)
+    (_hnpq : Nat.card (Sylow p G) = q)
+    (hcard_Sp : ∀ R : Sylow p G, Nat.card (R : Subgroup G) = p ^ a)
+    {S T : Sylow p G} (hST : S ≠ T)
+    (hmax : ∀ R₁ R₂ : Sylow p G, R₁ ≠ R₂ →
+      Nat.card (((R₁ : Subgroup G) ⊓ (R₂ : Subgroup G) : Subgroup G)) ≤
+      Nat.card (((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G)))
+    (hD_ne : ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) ≠ ⊥) :
+    opCore p G ≠ ⊥ := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  have hpprime := Fact.out (p := p.Prime)
+  have hqprime := Fact.out (p := q.Prime)
+  have hp_pos := hpprime.pos
+  have hq_pos := hqprime.pos
+  have hpa_pos : 0 < p ^ a := pow_pos hp_pos a
+  -- Notation.
+  set Ssub : Subgroup G := (S : Subgroup G) with hSsubDef
+  set Tsub : Subgroup G := (T : Subgroup G) with hTsubDef
+  set D : Subgroup G := Ssub ⊓ Tsub with hDdef
+  -- Sub-cards.
+  have hScard : Nat.card Ssub = p ^ a := hcard_Sp S
+  have hTcard : Nat.card Tsub = p ^ a := hcard_Sp T
+  have hD_le_S : D ≤ Ssub := inf_le_left
+  have hD_le_T : D ≤ Tsub := inf_le_right
+  -- D ≠ S (else S ≤ T and same card ⇒ S = T, contra).
+  have hD_ne_S : D ≠ Ssub := by
+    intro h
+    apply hST; apply Sylow.ext
+    -- h : D = Ssub, and D = Ssub ⊓ Tsub.  So Ssub = Ssub ⊓ Tsub, giving Ssub ≤ Tsub.
+    have hS_le_T : Ssub ≤ Tsub := by
+      conv_lhs => rw [← h, hDdef]
+      exact inf_le_right
+    exact Subgroup.eq_of_le_of_card_ge hS_le_T (by rw [hScard, hTcard])
+  have hD_ne_T : D ≠ Tsub := by
+    intro h
+    apply hST; apply Sylow.ext
+    have hT_le_S : Tsub ≤ Ssub := by
+      conv_lhs => rw [← h, hDdef]
+      exact inf_le_left
+    refine (Subgroup.eq_of_le_of_card_ge hT_le_S
+      (by rw [hScard, hTcard])).symm
+  have hD_lt_S : D < Ssub := lt_of_le_of_ne hD_le_S hD_ne_S
+  have hD_lt_T : D < Tsub := lt_of_le_of_ne hD_le_T hD_ne_T
+  -- S, T are nilpotent (p-groups).
+  haveI hS_nilp : Group.IsNilpotent Ssub := IsPGroup.isNilpotent S.2
+  haveI hT_nilp : Group.IsNilpotent Tsub := IsPGroup.isNilpotent T.2
+  haveI : Finite Ssub := inferInstance
+  haveI : Finite Tsub := inferInstance
+  -- D.subgroupOf S < ⊤ in S.
+  have hDS_lt_top : D.subgroupOf Ssub < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro h
+    apply hD_ne_S
+    refine le_antisymm hD_le_S ?_
+    intro x hx
+    have : (⟨x, hx⟩ : Ssub) ∈ D.subgroupOf Ssub := by rw [h]; trivial
+    exact (Subgroup.mem_subgroupOf).mp this
+  have hDT_lt_top : D.subgroupOf Tsub < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro h
+    apply hD_ne_T
+    refine le_antisymm hD_le_T ?_
+    intro x hx
+    have : (⟨x, hx⟩ : Tsub) ∈ D.subgroupOf Tsub := by rw [h]; trivial
+    exact (Subgroup.mem_subgroupOf).mp this
+  -- Normalizer condition in S, T.
+  have hlt_S := lt_normalizer_of_isNilpotent_of_lt_top (G := Ssub) hDS_lt_top
+  have hlt_T := lt_normalizer_of_isNilpotent_of_lt_top (G := Tsub) hDT_lt_top
+  -- Set N := N_G(D) at G level.
+  set Nd : Subgroup G := Subgroup.normalizer (D : Set G) with hNdDef
+  -- Translate via subgroupOf_normalizer_eq: N_S(D.subOf S) = N.subOf S.
+  rw [show Subgroup.normalizer (D.subgroupOf Ssub) = Nd.subgroupOf Ssub from
+      (Subgroup.subgroupOf_normalizer_eq hD_le_S).symm] at hlt_S
+  rw [show Subgroup.normalizer (D.subgroupOf Tsub) = Nd.subgroupOf Tsub from
+      (Subgroup.subgroupOf_normalizer_eq hD_le_T).symm] at hlt_T
+  -- D ≤ Nd : a subgroup normalizes itself.
+  have hD_le_Nd : D ≤ Nd := by
+    intro d hd
+    rw [hNdDef]
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    constructor
+    · intro hh
+      exact D.mul_mem (D.mul_mem hd hh) (D.inv_mem hd)
+    · intro hh
+      have : h = d⁻¹ * (d * h * d⁻¹) * d := by group
+      rw [this]; exact D.mul_mem (D.mul_mem (D.inv_mem hd) hh) hd
+  -- Extract an element x ∈ S, x ∈ Nd, x ∉ D.
+  obtain ⟨⟨x, hxS⟩, hxNd_sub, hxD_sub⟩ :
+      ∃ y : Ssub, y ∈ Nd.subgroupOf Ssub ∧ y ∉ D.subgroupOf Ssub := by
+    obtain ⟨y, hyN, hyD⟩ := SetLike.exists_of_lt hlt_S
+    exact ⟨y, hyN, hyD⟩
+  have hxNd : x ∈ Nd := (Subgroup.mem_subgroupOf).mp hxNd_sub
+  have hxD : x ∉ D := fun hxD =>
+    hxD_sub (by rw [Subgroup.mem_subgroupOf]; exact hxD)
+  -- Helper: D ≤ subgroup, D ≠ subgroup, finite ⇒ |D| < |subgroup|.
+  have card_lt_of_lt :
+      ∀ {H : Subgroup G}, D < H → Nat.card D < Nat.card H := by
+    intro H hlt
+    have hle : Nat.card D ≤ Nat.card H := Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_dvd_of_le hlt.le)
+    rcases lt_or_eq_of_le hle with h | h
+    · exact h
+    · exfalso
+      apply ne_of_lt hlt
+      exact Subgroup.eq_of_le_of_card_ge hlt.le h.ge
+  -- Step 4: N_G(D) is not a p-group.
+  have hN_not_pgroup : ¬ IsPGroup p Nd := by
+    intro hN_p
+    obtain ⟨R, hNR⟩ := hN_p.exists_le_sylow
+    have hxR : x ∈ (R : Subgroup G) := hNR hxNd
+    have hD_le_R : D ≤ (R : Subgroup G) := hD_le_Nd.trans hNR
+    -- D < R ⊓ S, since x ∈ R ⊓ S but x ∉ D.
+    have hD_lt_RS : D < (R : Subgroup G) ⊓ Ssub := by
+      rw [lt_iff_le_and_ne]
+      refine ⟨le_inf hD_le_R hD_le_S, ?_⟩
+      intro heq
+      apply hxD
+      have : x ∈ (R : Subgroup G) ⊓ Ssub := ⟨hxR, hxS⟩
+      rw [← heq] at this; exact this
+    -- |R ⊓ S| > |D|; hmax says |R ⊓ S| ≤ |D| if R ≠ S; so R = S.
+    have hR_eq_S : R = S := by
+      by_contra hne
+      have hle : Nat.card ((R : Subgroup G) ⊓ Ssub : Subgroup G) ≤ Nat.card D := hmax R S hne
+      exact absurd (lt_of_lt_of_le (card_lt_of_lt hD_lt_RS) hle) (lt_irrefl _)
+    -- Symmetric for T.
+    obtain ⟨⟨xT, hxTS⟩, hxTN_sub, hxTD_sub⟩ :
+        ∃ y : Tsub, y ∈ Nd.subgroupOf Tsub ∧ y ∉ D.subgroupOf Tsub := by
+      obtain ⟨y, hyN, hyD⟩ := SetLike.exists_of_lt hlt_T
+      exact ⟨y, hyN, hyD⟩
+    have hxTN : xT ∈ Nd := (Subgroup.mem_subgroupOf).mp hxTN_sub
+    have hxTD : xT ∉ D := fun hxTD' =>
+      hxTD_sub (by rw [Subgroup.mem_subgroupOf]; exact hxTD')
+    have hxTR : xT ∈ (R : Subgroup G) := hNR hxTN
+    have hD_lt_RT : D < (R : Subgroup G) ⊓ Tsub := by
+      rw [lt_iff_le_and_ne]
+      refine ⟨le_inf hD_le_R hD_le_T, ?_⟩
+      intro heq
+      apply hxTD
+      have : xT ∈ (R : Subgroup G) ⊓ Tsub := ⟨hxTR, hxTS⟩
+      rw [← heq] at this; exact this
+    have hR_eq_T : R = T := by
+      by_contra hne
+      have hle : Nat.card ((R : Subgroup G) ⊓ Tsub : Subgroup G) ≤ Nat.card D := hmax R T hne
+      exact absurd (lt_of_lt_of_le (card_lt_of_lt hD_lt_RT) hle) (lt_irrefl _)
+    exact hST (hR_eq_S.symm.trans hR_eq_T)
+  -- Step 5: q ∣ |Nd|.  |Nd| ∣ |G| = p^a q.  Nd not a p-group ⇒ q | |Nd|.
+  have hNd_dvd_G : Nat.card Nd ∣ Nat.card G :=
+    Subgroup.card_dvd_of_le (le_top : Nd ≤ ⊤) |>.trans (by rw [Subgroup.card_top])
+  rw [hcard] at hNd_dvd_G
+  -- Decompose |Nd| ∣ p^a q.  Either |Nd| | p^a (so Nd is p-group), or q | |Nd|.
+  have hq_dvd_Nd : q ∣ Nat.card Nd := by
+    -- |Nd| > 1 since x ∈ Nd, x ∉ D, x might be 1? No, x ∉ D but D ∋ 1.
+    have hx_ne_one : x ≠ 1 := fun h => hxD (h ▸ D.one_mem)
+    have hNd_card_pos : 0 < Nat.card Nd := Nat.card_pos
+    -- |Nd| = p^k * m where gcd(m, p) = 1.  Nd is p-group iff m = 1.
+    -- |Nd| ∣ p^a q ⇒ m ∣ q (after dividing out p-power).
+    by_contra hq_nd
+    apply hN_not_pgroup
+    -- IsPGroup p Nd ↔ every element has p-power order.  Equivalent to |Nd| being p-power.
+    -- Use: |Nd| ∣ p^a · q and ¬ (q ∣ |Nd|) imply |Nd| ∣ p^a, so Nd is p-group.
+    have hcop : Nat.Coprime (Nat.card Nd) q :=
+      Nat.coprime_comm.mp (hqprime.coprime_iff_not_dvd.mpr hq_nd)
+    have h_dvd_pa : Nat.card Nd ∣ p ^ a :=
+      Nat.Coprime.dvd_of_dvd_mul_right hcop hNd_dvd_G
+    -- IsPGroup p Nd from |Nd| = p^k.
+    obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hpprime).mp h_dvd_pa
+    exact IsPGroup.of_card (n := k) hk
+  -- Step 6: Cauchy for q ∣ |Nd|: ∃ y : Nd, orderOf y = q.
+  have hq_dvd_Nd' : q ∣ Nat.card Nd := hq_dvd_Nd
+  obtain ⟨ysub, hy_ord⟩ := cauchy (G := Nd) hq_dvd_Nd'
+  set y : G := (ysub : G) with hy_def
+  have hy_orderOf : orderOf y = q := by
+    rw [hy_def, Subgroup.orderOf_coe, hy_ord]
+  have hy_mem_Nd : y ∈ Nd := ysub.2
+  -- Q := zpowers y.  |Q| = orderOf y = q.
+  set Q : Subgroup G := Subgroup.zpowers y with hQdef
+  have hQ_card : Nat.card Q = q := by
+    rw [hQdef, Nat.card_zpowers, hy_orderOf]
+  -- Disjoint: S ⊓ Q has order dividing both p^a and q, with gcd 1.
+  have hS_Q_disjoint : Disjoint Ssub Q := by
+    rw [disjoint_iff]
+    apply Subgroup.eq_bot_of_card_eq
+    have hSQ_dvd_S : Nat.card (Ssub ⊓ Q : Subgroup G) ∣ Nat.card Ssub :=
+      Subgroup.card_dvd_of_le inf_le_left
+    have hSQ_dvd_Q : Nat.card (Ssub ⊓ Q : Subgroup G) ∣ Nat.card Q :=
+      Subgroup.card_dvd_of_le inf_le_right
+    rw [hScard] at hSQ_dvd_S
+    rw [hQ_card] at hSQ_dvd_Q
+    have hcop : Nat.Coprime (p ^ a) q := by
+      rw [Nat.coprime_pow_left_iff (by omega : 0 < a)]
+      exact (Nat.coprime_primes hpprime hqprime).mpr hpq
+    exact Nat.eq_one_of_dvd_coprimes hcop hSQ_dvd_S hSQ_dvd_Q
+  -- |S| * |Q| = p^a * q = |G|. So S, Q complement.
+  have hSQ_card : Nat.card Ssub * Nat.card Q = Nat.card G := by
+    rw [hScard, hQ_card, hcard]
+  have hSQ_complement : Subgroup.IsComplement' Ssub Q :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint hSQ_card hS_Q_disjoint
+  -- For every Sylow p R, ∃ z ∈ Q, R = z • S.
+  -- Step: ∀ R : Sylow p G, D ≤ ↑R.
+  have hD_le_all : ∀ R : Sylow p G, D ≤ (R : Subgroup G) := by
+    intro R
+    -- Sylow C: ∃ g, R = g • S.
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G S R
+    -- g = z * s with z ∈ Q, s ∈ S via complement (Q first by IsComplement'.symm).
+    have hQS_complement : Subgroup.IsComplement' Q Ssub := hSQ_complement.symm
+    have hbij := hQS_complement
+    rw [Subgroup.IsComplement'] at hbij
+    obtain ⟨pair, hzs⟩ := hbij.2 g
+    set z : G := pair.1.1 with hz_def
+    set s : G := pair.2.1 with hs_def
+    have hz : z ∈ Q := pair.1.2
+    have hs : s ∈ Ssub := pair.2.2
+    -- hzs : z * s = g.  R = g • S = (z * s) • S = z • (s • S) = z • S (s ∈ S normalizes S).
+    have hR_sub : (R : Subgroup G) = MulAut.conj z • Ssub := by
+      have h1 : (R : Subgroup G) = MulAut.conj g • Ssub := by
+        rw [← hg]; exact Sylow.coe_subgroup_smul
+      have hzs' : z * s = g := hzs
+      rw [h1, ← hzs', map_mul, mul_smul, Subgroup.conj_smul_eq_self_of_mem hs]
+    -- z ∈ Q ≤ Nd ?  Need: Q ≤ Nd.  zpowers y ≤ Nd iff y ∈ Nd, yes.
+    have hQ_le_Nd : Q ≤ Nd := by
+      rw [hQdef, Subgroup.zpowers_le]
+      exact hy_mem_Nd
+    have hz_in_Nd : z ∈ Nd := hQ_le_Nd hz
+    -- D = (MulAut.conj z) • D, since z normalizes D.
+    have hConjD : MulAut.conj z • D = D := by
+      apply le_antisymm
+      · intro d hd
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hd
+        simp only [MulAut.smul_def, MulAut.conj_apply, ← map_inv, inv_inv] at hd
+        -- hd : z⁻¹ * d * z ∈ D.  z ∈ Nd = N_G(D) ⇒ z * (z⁻¹ d z) * z⁻¹ = d ∈ D.
+        rw [show (Nd : Subgroup G) = Subgroup.normalizer (D : Set G) from rfl,
+            Subgroup.mem_normalizer_iff''] at hz_in_Nd
+        exact (hz_in_Nd d).mpr hd
+      · intro d hd
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+        simp only [MulAut.smul_def, MulAut.conj_apply, ← map_inv, inv_inv]
+        rw [show (Nd : Subgroup G) = Subgroup.normalizer (D : Set G) from rfl,
+            Subgroup.mem_normalizer_iff''] at hz_in_Nd
+        exact (hz_in_Nd d).mp hd
+    -- D ≤ R = z • S follows from D ≤ S (after conjugation by z, which fixes D).
+    have hD_eq : D = MulAut.conj z • D := hConjD.symm
+    calc D = MulAut.conj z • D := hD_eq
+      _ ≤ MulAut.conj z • Ssub := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hD_le_S
+      _ = (R : Subgroup G) := hR_sub.symm
+  -- D ≤ opCore p G.
+  have hD_le_op : D ≤ opCore p G := by
+    rw [opCore, le_iInf_iff]
+    exact hD_le_all
+  -- D ≠ ⊥ ⇒ opCore ≠ ⊥.
+  intro hbot
+  rw [hbot, le_bot_iff] at hD_le_op
+  exact hD_ne hD_le_op
+
+/-- **Isaacs Thm 1.36**.  有限群 `G` で `|G| = p^a · q` (p, q 異素数, a ≥ 1) ならば
+`G` は単純でない.
+
+証明 (Isaacs p.34): `n_p(G)` を Sylow `p` の個数とする.  Sylow C/III より
+`n_p ∣ q` かつ `n_p ≡ 1 (mod p)`.  q は素数なので `n_p ∈ {1, q}`.
+
+(i) `n_p = 1`: Sylow `p` は唯一 ⇒ 正規.  `|G|` を `q` が真に割るから真部分群.
+よって `G` 単純なら矛盾.
+
+(ii) `n_p = q`: 各 Sylow `p` は位数 `p^a`.  `|S ⊓ T|` 最大の (S, T) を取る.
+* (a) D = ⊥: helper `sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint` で
+  Sylow `q` 正規.  Sylow `q` の位数は `q < p^a q = |G|`, 真部分群で矛盾.
+* (b) D ≠ ⊥: helper `opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot` で
+  `opCore p G ≠ ⊥`.  `opCore p G ≤ S` で `|S| = p^a < |G|` より `opCore ≠ ⊤`.
+  どちらの場合も真部分の正規部分群が存在し, 単純性と矛盾. -/
+theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {a : ℕ} (ha : 1 ≤ a) (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q) :
+    ¬ IsSimpleGroup G := by
+  classical
+  intro h_simple
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have hpprime := Fact.out (p := p.Prime)
+  have hqprime := Fact.out (p := q.Prime)
+  have hp_pos := hpprime.pos
+  have hq_pos := hqprime.pos
+  have hpa_pos : 0 < p ^ a := pow_pos hp_pos a
+  have hpa_one_lt : 1 < p ^ a := by
+    calc 1 = p ^ 0 := by simp
+      _ < p ^ a := by
+        apply pow_lt_pow_right₀ hpprime.one_lt
+        omega
+  have hpaq_pos : 0 < p ^ a * q := Nat.mul_pos hpa_pos hq_pos
+  have hpaq_gt_q : q < p ^ a * q := by
+    have h1 : 1 * q < p ^ a * q := by
+      exact (Nat.mul_lt_mul_right hq_pos).mpr hpa_one_lt
+    rwa [one_mul] at h1
+  have hpaq_gt_pa : p ^ a < p ^ a * q := by
+    have h1 : p ^ a * 1 < p ^ a * q := by
+      exact (Nat.mul_lt_mul_left hpa_pos).mpr hqprime.one_lt
+    rwa [mul_one] at h1
+  -- |G| > 1.  G is Nontrivial.
+  have hG_card_gt_one : 1 < Nat.card G := by rw [hcard]; omega
+  have hpq_coprime : Nat.Coprime (p ^ a) q := by
+    rw [Nat.coprime_pow_left_iff (by omega : 0 < a)]
+    exact (Nat.coprime_primes hpprime hqprime).mpr hpq
+  -- Each Sylow p has order p^a.
+  have hcard_Sp : ∀ R : Sylow p G, Nat.card (R : Subgroup G) = p ^ a := by
+    intro R
+    have hmul := R.card_eq_multiplicity (G := G)
+    have hpne : p ^ a ≠ 0 := hpa_pos.ne'
+    have hqne : q ≠ 0 := hqprime.ne_zero
+    rw [hcard, Nat.factorization_mul hpne hqne,
+        Nat.Prime.factorization_pow hpprime] at hmul
+    simp only [Finsupp.coe_add, Pi.add_apply, hqprime.factorization,
+               Finsupp.single_apply, if_neg (Ne.symm hpq)] at hmul
+    simpa using hmul
+  -- Each Sylow q has order q.
+  have hcard_Sq : ∀ R : Sylow q G, Nat.card (R : Subgroup G) = q := by
+    intro R
+    have hmul := R.card_eq_multiplicity (G := G)
+    have hpne : p ^ a ≠ 0 := hpa_pos.ne'
+    have hqne : q ≠ 0 := hqprime.ne_zero
+    rw [hcard, Nat.factorization_mul hpne hqne,
+        Nat.Prime.factorization_pow hpprime] at hmul
+    simp only [Finsupp.coe_add, Pi.add_apply, Finsupp.single_apply,
+               if_neg hpq] at hmul
+    simpa [hqprime.factorization_self] using hmul
+  -- np ∈ {1, q}.  np = 1 case: Sylow p normal, proper since |S| = p^a < |G|.
+  -- np ≥ 2 case: np = q, then split D = ⊥ or D ≠ ⊥.
+  -- Sylow C/III on np: np | q and np ≡ 1 mod p.
+  have hnp_dvd : Nat.card (Sylow p G) ∣ q := by
+    -- np * normalizer.index = |G| ?  Use `Sylow.card_dvd`.
+    -- Actually np = [G : N_G(S)] ∣ [G : 1] = |G| = p^a q.
+    -- And gcd(np, p) = 1 by Sylow's third theorem.
+    -- So np ∣ q.
+    obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    have hidx_dvd : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index ∣ Nat.card G :=
+      Subgroup.index_dvd_card _
+    rw [← P.card_eq_index_normalizer, hcard] at hidx_dvd
+    -- np ∣ p^a q, gcd(np, p) = 1 ⇒ np ∣ q.
+    have hnp_coprime_p : Nat.Coprime (Nat.card (Sylow p G)) p :=
+      Nat.coprime_comm.mp (hpprime.coprime_iff_not_dvd.mpr (not_dvd_card_sylow p G))
+    have hnp_coprime : Nat.Coprime (Nat.card (Sylow p G)) (p ^ a) := by
+      rw [Nat.coprime_pow_right_iff (by omega : 0 < a)]; exact hnp_coprime_p
+    exact Nat.Coprime.dvd_of_dvd_mul_left hnp_coprime hidx_dvd
+  have hnp_eq_one_or_q : Nat.card (Sylow p G) = 1 ∨ Nat.card (Sylow p G) = q :=
+    (Nat.dvd_prime hqprime).mp hnp_dvd
+  rcases hnp_eq_one_or_q with hnp_eq_one | hnp_eq_q
+  · -- (i) np = 1: Sylow p is normal and proper.
+    haveI : Subsingleton (Sylow p G) :=
+      Fintype.card_le_one_iff_subsingleton.mp (by
+        rw [← Nat.card_eq_fintype_card]; omega)
+    obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    have hP_normal : (P : Subgroup G).Normal := P.normal_of_subsingleton
+    -- (P : Subgroup G) is bot or top by IsSimpleGroup.
+    rcases hP_normal.eq_bot_or_eq_top with hPbot | hPtop
+    · -- |P| = p^a > 1, can't be bot.
+      have : Nat.card (P : Subgroup G) = 1 := by
+        rw [hPbot]; exact Subgroup.card_bot
+      rw [hcard_Sp P] at this
+      omega
+    · -- |P| = p^a, |G| = p^a q, q > 1, can't be top.
+      have hcardP : Nat.card (P : Subgroup G) = Nat.card G := by
+        rw [hPtop, Subgroup.card_top]
+      rw [hcard_Sp P, hcard] at hcardP
+      have : p ^ a * 1 = p ^ a * q := by rw [mul_one]; exact hcardP
+      have : 1 = q := Nat.eq_of_mul_eq_mul_left hpa_pos this
+      omega
+  · -- (ii) np = q.
+    -- Sub-case split on D = ⊥ vs D ≠ ⊥.
+    by_cases hAllDisj : ∀ S T : Sylow p G, S ≠ T →
+        (S : Subgroup G) ⊓ (T : Subgroup G) = ⊥
+    · -- D = ⊥ all.  Helper gives Sylow q normal.
+      obtain ⟨Q, hQ_normal⟩ := sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
+        ha hpq hcard hnp_eq_q hcard_Sp hcard_Sq hAllDisj
+      rcases hQ_normal.eq_bot_or_eq_top with hQbot | hQtop
+      · have hQ1 : Nat.card (Q : Subgroup G) = 1 := by
+          rw [hQbot]; exact Subgroup.card_bot
+        rw [hcard_Sq Q] at hQ1
+        have : q ≥ 2 := hqprime.two_le
+        omega
+      · have hcardQ : Nat.card (Q : Subgroup G) = Nat.card G := by
+          rw [hQtop, Subgroup.card_top]
+        rw [hcard_Sq Q, hcard] at hcardQ
+        -- hcardQ : q = p^a * q.  p^a ≥ 2 so contradiction.
+        have hpa : p ^ a ≥ 2 := by
+          calc p ^ a ≥ p ^ 1 := pow_le_pow_right₀ hpprime.one_lt.le ha
+            _ = p := pow_one p
+            _ ≥ 2 := hpprime.two_le
+        have hqpos : 1 ≤ q := hq_pos
+        nlinarith [hcardQ, hpa, hqpos]
+    · -- D ≠ ⊥ for some (S, T).
+      push Not at hAllDisj
+      obtain ⟨S, T, hST_ne, hD_ne⟩ := hAllDisj
+      -- Take (S', T') maximizing |S' ⊓ T'| over distinct pairs.
+      -- We can use Finset.exists_max_image on Finset.univ filtered.
+      -- Alternative: take the max over the full univ (S' = T' included), which gives S' = T' since
+      -- |S' ⊓ S'| = |S'| = p^a maximizes trivially.  Need to restrict to distinct.
+      -- Use distinct-pair set: { (S, T) : S ≠ T } : nonempty.
+      let distinctPairs : Finset (Sylow p G × Sylow p G) :=
+        Finset.univ.filter (fun ST => ST.1 ≠ ST.2)
+      have h_nonempty : distinctPairs.Nonempty :=
+        ⟨(S, T), Finset.mem_filter.mpr ⟨Finset.mem_univ _, hST_ne⟩⟩
+      obtain ⟨ST_max, hST_max_mem, hST_max⟩ :=
+        distinctPairs.exists_max_image
+          (fun ST => Nat.card ((ST.1 : Subgroup G) ⊓ (ST.2 : Subgroup G) : Subgroup G))
+          h_nonempty
+      obtain ⟨S', T'⟩ := ST_max
+      have hST'_ne : S' ≠ T' := (Finset.mem_filter.mp hST_max_mem).2
+      -- hmax: ∀ distinct pair, ≤ |S' ⊓ T'|.
+      have hmax : ∀ R₁ R₂ : Sylow p G, R₁ ≠ R₂ →
+          Nat.card (((R₁ : Subgroup G) ⊓ (R₂ : Subgroup G) : Subgroup G)) ≤
+          Nat.card (((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G)) := by
+        intro R₁ R₂ hR
+        exact hST_max (R₁, R₂) (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hR⟩)
+      -- |S' ⊓ T'| ≥ |S ⊓ T|, and we know |S ⊓ T| > 0 since it's ≠ ⊥, so |S' ⊓ T'| ≥ |S ⊓ T| > 1.
+      have hST_card_ge : Nat.card (((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G)) ≤
+          Nat.card (((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G)) :=
+        hmax S T hST_ne
+      have hD'_ne : ((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G) ≠ ⊥ := by
+        intro hbot
+        apply hD_ne
+        rw [Subgroup.eq_bot_iff_card]
+        rw [hbot, Subgroup.card_bot] at hST_card_ge
+        rw [show Nat.card (((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G)) = 1
+          from le_antisymm hST_card_ge (Nat.card_pos)]
+      -- Apply helper: opCore p G ≠ ⊥.
+      have hopCore_ne : opCore p G ≠ ⊥ :=
+        opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
+          ha hpq hcard hnp_eq_q hcard_Sp hST'_ne hmax hD'_ne
+      -- opCore p G ≤ S' for any S' Sylow, so |opCore| ≤ p^a < |G|, hence ≠ ⊤.
+      have hopCore_normal : (opCore p G).Normal := opCore.normal p G
+      rcases hopCore_normal.eq_bot_or_eq_top with hbot | htop
+      · exact hopCore_ne hbot
+      · have hop_le : opCore p G ≤ (S' : Subgroup G) := opCore_le S'
+        rw [htop] at hop_le
+        have htop_le_S' : (⊤ : Subgroup G) ≤ (S' : Subgroup G) := hop_le
+        have h_top_S' : (S' : Subgroup G) = ⊤ := top_le_iff.mp htop_le_S'
+        have hcardS' : Nat.card (S' : Subgroup G) = Nat.card G := by
+          rw [h_top_S', Subgroup.card_top]
+        rw [hcard_Sp S', hcard] at hcardS'
+        have : p ^ a * 1 = p ^ a * q := by rw [mul_one]; exact hcardS'
+        have hone_eq_q : 1 = q := Nat.eq_of_mul_eq_mul_left hpa_pos this
+        omega
 
 /-- **Isaacs Lemma 1.34**.  `G` が有限集合 `Ω` に作用し, ある元 `x ∈ G` が
 `Ω` 上で奇置換 (`Equiv.Perm.sign = -1`) を引き起こすなら, `G` は指数 2 の
