@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.IsSubnormal
 import OddOrder.Isaacs.Ch01_Sylow
 
+open OddOrder.Isaacs.Ch01
+
 /-!
 # OddOrder.Isaacs.Ch02 — Subnormality
 
@@ -262,14 +264,79 @@ theorem socle_ne_bot_of_nontrivial [Finite G] [Nontrivial G] : socle G ≠ ⊥ :
   apply hM.2.1
   exact le_bot_iff.mp (hbot ▸ isMinimalNormal_le_socle hM)
 
--- TODO **Isaacs Thm 2.2** (`H ⊆ F(G) ⇔ H` 冪零かつ部分正規).
---   `(⇒)`: H ⊆ F(G) で F(G) 冪零 (Cor 1.28(a), Ch.1 TODO 未済) → H 冪零 (mathlib).
---          F(G) ⊴ G → F(G).IsSubnormal. Lemma 2.1 を F(G) に適用して H ⊴⊴ F(G).
---          IsSubnormal.trans で H ⊴⊴ G.
---   `(⇐)`: H ⊴⊴ G かつ H 冪零 で induction on |G|.  H = G なら G 冪零 = F(G).
---          さもなくば subnormal chain の penultimate term M < G を取り IH で
---          H ≤ F(M) ⊴ G (F(M) 冪零 + 正規) ⇒ H ≤ fitting G (`nilpotent_normal_le_fitting`).
---   Ch.1 Cor 1.28(a) 完成後に着手.
+/-! ### Isaacs Thm 2.2 (`H ⊆ F(G) ⇔ H` 冪零 + subnormal) -/
+
+/-- Thm 2.2 逆方向の strong induction を `|G| ≤ n` で外側に出した補助補題.
+`G` を generalize するため `∀ n, ∀ G, ...` の形を取る (Ch.2 内の
+`isMinimalNormal_le_normalizer_aux` と同じパターン). -/
+private theorem le_fitting_aux :
+    ∀ n, ∀ (G : Type*) [Group G] [Finite G],
+      Nat.card G ≤ n → ∀ {H : Subgroup G},
+      Group.IsNilpotent H → H.IsSubnormal → H ≤ fitting G := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hG _ _ _
+    exact absurd (Nat.le_zero.mp hG) Nat.card_pos.ne'
+  | succ n ih =>
+    intro G _ _ _ H hNilp hSn
+    by_cases hHtop : H = ⊤
+    · -- H = ⊤: `G` 冪零 ⇒ `(⊤ : Subgroup G) ≤ fitting G`
+      subst hHtop
+      haveI := hNilp
+      exact nilpotent_normal_le_fitting
+    · -- H < ⊤: penultimate term `K` を取って IH を `K` に適用
+      obtain ⟨K, hKnorm, hHK, hKlt⟩ := hSn.exists_normal_and_le_and_lt_top_of_ne hHtop
+      have _ := hKnorm
+      -- `Nat.card K < Nat.card G ≤ succ n`, so `Nat.card K ≤ n`.
+      have hKcard_le : Nat.card K ≤ n := by
+        have hKle : Nat.card K ≤ Nat.card G := K.card_le_card_group
+        have hKne_top : K ≠ ⊤ := hKlt.ne
+        have hKne : Nat.card K ≠ Nat.card G := fun heq =>
+          hKne_top (Subgroup.eq_top_of_card_eq K heq)
+        omega
+      -- IH の入力: subnormality と nilpotency を `H.subgroupOf K` (K の部分群) に転送.
+      have hH_sn_in_K : (H.subgroupOf K).IsSubnormal := hSn.subgroupOf
+      have hH_nilp_in_K : Group.IsNilpotent (H.subgroupOf K) :=
+        nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHK).symm
+      have hH_le_fitK : H.subgroupOf K ≤ fitting K :=
+        ih K hKcard_le hH_nilp_in_K hH_sn_in_K
+      -- `H = (H.subgroupOf K).map K.subtype ≤ (fitting K).map K.subtype`.
+      have hHeq : (H.subgroupOf K).map K.subtype = H :=
+        Subgroup.map_subgroupOf_eq_of_le hHK
+      have hpush : H ≤ (fitting K).map K.subtype := by
+        rw [← hHeq]; exact Subgroup.map_mono hH_le_fitK
+      -- `(fitting K).map K.subtype` は normal (characteristic in K + K ⊴ G) かつ nilpotent.
+      haveI : ((fitting K).map K.subtype).Normal := inferInstance
+      haveI : Group.IsNilpotent ((fitting K).map K.subtype) :=
+        nilpotent_of_mulEquiv ((fitting K).equivMapOfInjective K.subtype K.subtype_injective)
+      exact hpush.trans nilpotent_normal_le_fitting
+
+/-- **Isaacs Thm 2.2**: 有限群 `G` の部分群 `H` について,
+`H ≤ F(G) ↔ H が冪零かつ G で部分正規`.
+
+形式化メモ:
+- 順方向: `H ≤ F(G)`, `F(G)` 冪零 (Ch.1 `fitting.isNilpotent`) ⇒ `H` も冪零
+  (`Subgroup.subgroupOfEquivOfLe` 経由).  `F(G) ⊴ G` で `F(G).IsSubnormal`,
+  Lemma 2.1 (`isSubnormal_of_isNilpotent_finite`) で `H.subgroupOf (F(G))` も subnormal,
+  `IsSubnormal.trans` で `H.IsSubnormal`.
+- 逆方向: `|G|`-induction (`le_fitting_aux`).  `H = ⊤` なら `G` 冪零 ⇒
+  `nilpotent_normal_le_fitting`.  `H < ⊤` なら `K ⊴ G, H ≤ K, K < ⊤` を取り
+  (`exists_normal_and_le_and_lt_top_of_ne`), IH を `K` に適用して
+  `H.subgroupOf K ≤ fitting K`.  `fitting K` は `K` で特性的 (Ch.1
+  `fitting.characteristic`) + `K ⊴ G` ⇒ `(fitting K).map K.subtype ⊴ G`, 冪零でもあるので
+  `nilpotent_normal_le_fitting` で `fitting G` 配下. -/
+theorem le_fitting_iff_isNilpotent_and_isSubnormal [Finite G] (H : Subgroup G) :
+    H ≤ fitting G ↔ Group.IsNilpotent H ∧ H.IsSubnormal := by
+  refine ⟨fun hH => ⟨?_, ?_⟩,
+    fun ⟨hNilp, hSn⟩ => le_fitting_aux (Nat.card G) G le_rfl hNilp hSn⟩
+  · -- H ≤ F(G) ⇒ H 冪零 (`H.subgroupOf F(G) ≃* H`, F(G) 冪零, subgroup 継承)
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hH)
+  · -- H ≤ F(G) ⇒ H subnormal (F(G) subnormal in G + H.subgroupOf F(G) subnormal in F(G))
+    have hFsn : (fitting G).IsSubnormal := Subgroup.Normal.isSubnormal inferInstance
+    have hHsn_in_F : (H.subgroupOf (fitting G)).IsSubnormal :=
+      isSubnormal_of_isNilpotent_finite _
+    exact Subgroup.IsSubnormal.trans hH hHsn_in_F hFsn
 
 /-- 補助補題 (Thm 2.6 の strong induction の generalized core).
 

@@ -17,9 +17,9 @@
 | Lemma 2.7 | ✅ | `commute_of_disjoint_normal` (mathlib `commute_of_normal_of_disjoint` の **適応版**; instance + implicit M N) |
 | **Thm 2.6** ⭐ | ✅ (2026-05-21) | **`isMinimalNormal_le_normalizer_of_isSubnormal`**. Isaacs p.46 の `|G|`-induction を直訳. socle インフラ含めて +316 行 |
 | `socle` インフラ | ✅ | `def socle`, `socle.normal`, `socle.characteristic`, `IsMinimalNormal.map_equiv`, `exists_isMinimalNormal_le_of_normal`, `socle_ne_bot_of_nontrivial` |
-| Thm 2.2 | TODO | `fitting.characteristic` (Ch.1) または同等の局所 helper 必要 |
-| Thm 2.5 Wielandt 結合 | **解禁** | Thm 2.6 完成で着手可. `|G|`-induction で `G/M` の image |
-| Thm 2.8 - 2.11 | TODO | 2.8 permutability, 2.9 Zipper, 2.10, 2.11 Wielandt-abelian |
+| **Thm 2.2** | ✅ (2026-05-22) | `le_fitting_iff_isNilpotent_and_isSubnormal`. Ch.1 `fitting.characteristic` を追加して `K ⊴ G ⇒ (fitting K).map K.subtype ⊴ G` 経由で `|G|`-induction. 補助 `le_fitting_aux` 含む |
+| Thm 2.5 Wielandt 結合 | ✅ | Thm 2.6 経由の `|G|`-induction |
+| Thm 2.8, 2.11 | TODO | 2.8 permutability, 2.11 Wielandt-abelian |
 | §2B, §2C, §2D | TODO | §2D は FT 経路で不要なので最後回し可 |
 
 ## 章のセクション分割と全 20 定理

@@ -576,6 +576,25 @@ instance opCore.normal (p : ℕ) (G : Type*) [Group G] : (opCore p G).Normal := 
         Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hQ
     exact hQ
 
+/-- `O_p(G)` は `G` で特性的 (任意の自己同型 `φ : G ≃* G` で不変).
+
+証明: `characteristic_iff_le_comap` 経由. 任意の `φ` と `x ∈ opCore p G` について,
+全 Sylow `Q` に対し `Q.comapOfInjective φ.toMonoidHom` も Sylow `p` で,
+`x ∈ Q.comapOfInjective ...` ⇔ `φ x ∈ Q`. -/
+instance opCore.characteristic (p : ℕ) (G : Type*) [Group G] :
+    (opCore p G).Characteristic := by
+  rw [Subgroup.characteristic_iff_le_comap]
+  intro φ x hx
+  rw [Subgroup.mem_comap, mem_opCore]
+  rw [mem_opCore] at hx
+  intro Q
+  have hinj : Function.Injective (φ.toMonoidHom : G →* G) := φ.injective
+  have hrange : (Q : Subgroup G) ≤ (φ.toMonoidHom : G →* G).range := by
+    rw [MonoidHom.range_eq_top.mpr φ.surjective]; exact le_top
+  -- `Q.comapOfInjective φ.toMonoidHom hinj hrange : Sylow p G` and its coercion is `Q.comap φ`.
+  have hxQ' := hx (Q.comapOfInjective (φ.toMonoidHom : G →* G) hinj hrange)
+  rwa [Sylow.coe_comapOfInjective, Subgroup.mem_comap] at hxQ'
+
 /-- **Isaacs Problem 1B.2**. 任意の正規 `p`-部分群 `N` は `opCore p G` に含まれる.
 これにより `opCore p G` は `G` の最大正規 `p`-部分群である.
 
@@ -664,6 +683,17 @@ def fitting (G : Type*) [Group G] : Subgroup G :=
 theorem opCore_le_fitting (p : Nat.Primes) (G : Type*) [Group G] :
     opCore (p : ℕ) G ≤ fitting G :=
   le_iSup (fun q : Nat.Primes => opCore (q : ℕ) G) p
+
+/-- `F(G)` は `G` で特性的. 各 `opCore p G` が特性的 (`opCore.characteristic`) で,
+特性的部分群の sup は特性的 (`Subgroup.map_iSup` + `iSup_congr`). -/
+instance fitting.characteristic (G : Type*) [Group G] : (fitting G).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_eq]
+  intro φ
+  change (⨆ p : Nat.Primes, opCore (p : ℕ) G).map φ.toMonoidHom
+    = ⨆ p : Nat.Primes, opCore (p : ℕ) G
+  rw [Subgroup.map_iSup]
+  exact iSup_congr fun _ =>
+    Subgroup.characteristic_iff_map_eq.mp (opCore.characteristic _ _) φ
 
 /-- `F(G)` は `G` の正規部分群. 各 `opCore p G` の正規性を `iSup_induction` で全体に持ち上げる. -/
 instance fitting.normal (G : Type*) [Group G] : (fitting G).Normal := by
