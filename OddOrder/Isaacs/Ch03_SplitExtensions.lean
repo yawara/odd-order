@@ -142,13 +142,24 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
   Isaacs 自身の証明は短い. mathlib に直接の対応があるか調査が必要.
 -/
 
-/-- **Isaacs Thm 3.11**: 可解群 `G` の minimal normal subgroup は elementary abelian p-group.
-TODO: minimal normal は冪零 (commutator is solvable, derived series terminate) なので
-F(G) に含まれ, F(G) は冪零, さらに minimal normal は単純なので p-elementary abelian. -/
+/-- **Elementary Abelian p-Group**: G が abelian かつ全ての元の `p`乗が単位元.
+mathlib 未収載の新規定義. -/
+def IsElementaryAbelian (p : ℕ) (G : Type*) [Group G] : Prop :=
+  (∀ x y : G, x * y = y * x) ∧ (∀ x : G, x ^ p = 1)
+
+/-- **Isaacs Thm 3.11**: 可解群 `G` の minimal normal subgroup は ある素数 `p` について
+elementary abelian p-group.
+
+証明骨子 (Isaacs p.79): M minimal normal in G, M solvable (G solvable の部分群).
+1. `M' = ⁅M, M⁆` は M で characteristic, M ⊴ G ⇒ M' ⊴ G. M' ≤ M.
+2. M' < M (M solvable + M ≠ ⊥), minimality で M' = ⊥. M abelian.
+3. p prime ∣ |M| 取り, Sylow_p M 唯一 (M abelian) ⇒ characteristic ⇒ ⊴ G ⇒ = M (minimality).
+4. `M^p = {x^p | x ∈ M}` は M で characteristic ⇒ ⊴ G ⇒ = ⊥ or M.
+5. M^p = M なら反復で M = ⊥, 矛盾. よって M^p = ⊥, M は p-elementary abelian. -/
 theorem solvable_minimal_normal_isElementaryAbelian [Finite G] [IsSolvable G]
     {M : Subgroup G} (_hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
-    True := by  -- TODO: 正確な statement (p-elementary abelian)
-  trivial
+    ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p ↥M := by
+  sorry
 
 end -- 3B
 
