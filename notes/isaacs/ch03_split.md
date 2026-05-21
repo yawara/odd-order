@@ -1,8 +1,26 @@
 # Isaacs Ch.3: Split Extensions — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.3 (pp. 65-112) — Hall, Schur-Zassenhaus, coprime action。
-形式化先 (予定): `OddOrder/Isaacs/Ch03_SplitExtensions.lean` (未作成)。
+形式化先: [`OddOrder/Isaacs/Ch03_SplitExtensions.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 1322-2123。
+
+## 進捗 (2026-05-21)
+
+§3A ウォームアップ実装済 (Thm 3.1, 3.2 を mathlib `SemidirectProduct` 経由で wrap):
+
+| # | 状態 | 実装 |
+|---|---|---|
+| Thm 3.2 part 1 (inl(N) normal) | ✅ | `inl_range_normal` instance (`range_inl_eq_ker_rightHom` + `MonoidHom.normal_ker`) |
+| Thm 3.2 part 2 (inl(N), inr(H) complementary) | ✅ | `inl_range_isComplement_inr_range` (構造 projection 経由) |
+| Thm 3.2 part 3 (conjugation = action) | ✅ | `inr_conj_inl_eq` (mathlib `inl_aut` ラッパー) |
+| Thm 3.1 (uniqueness via mulEquivSubgroup) | ✅ | `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` 再述) |
+| Thm 3.3 Horosevskii | TODO | Ch.2 Thm 2.20 Lucchini 待ち |
+| Thm 3.4 (abelian P regular orbit) | TODO | Ch.1 §1F Brodkey (Thm 1.37) 待ち |
+| §3B Schur-Zassenhaus (3.5-3.12) | TODO | mathlib 直ラッパー予定 |
+| §3C Hall 理論 (3.13-3.17) | TODO | **FT クリティカル**, Hall π-subgroup 新規定義 + 主定理 |
+| §3D π-separable + Hall-Higman (3.18-3.22) | TODO | **FT クリティカル**, π-separable 新規定義 + 3.21 |
+| §3E Coprime action (3.23-3.34) | TODO | Glauberman lemma 等 |
+| §3F 巡回商 lift (3.35-3.36) | TODO | 補助, 優先度低 |
 
 ## mmd 抽出失敗の整理
 
