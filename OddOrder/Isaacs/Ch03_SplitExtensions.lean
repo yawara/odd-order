@@ -331,10 +331,39 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
     intro G _ _ _ hcard π
     by_cases hsmall : Nat.card G ≤ n
     · exact ih G hsmall π
-    · -- Nat.card G = n + 1.
-      by_cases hG_one : Nat.card G = 1
+    · by_cases hG_one : Nat.card G = 1
       · exact ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one⟩
-      · -- |G| > 1, G nontrivial. TODO: full step case.
+      · -- |G| > 1. G nontrivial.
+        haveI hG_nontrivial : Nontrivial G :=
+          Finite.one_lt_card_iff_nontrivial.mp
+            (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
+        -- Get minimal normal M ≤ ⊤.
+        obtain ⟨M, hM, _⟩ :=
+          OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+        haveI hMnormal : M.Normal := hM.1
+        have hM_ne_bot : M ≠ ⊥ := hM.2.1
+        -- M elementary abelian p-group via Thm 3.11.
+        obtain ⟨_p, _hp_prime, _hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
+        -- |M| ≥ 2 since M is nontrivial.
+        haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+        have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
+        -- |G/M| · |M| = |G|. So |G/M| ≤ |G|/2 ≤ n (since |G| ≤ n+1).
+        have hquot_card : Nat.card (G ⧸ M) ≤ n := by
+          have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card M :=
+            Subgroup.card_eq_card_quotient_mul_card_subgroup M
+          have hQ_pos : 0 < Nat.card (G ⧸ M) := Nat.card_pos
+          -- |G/M| * 2 ≤ |G/M| * |M| = |G| ≤ n+1.
+          have h1 : Nat.card (G ⧸ M) * 2 ≤ Nat.card G := by
+            rw [key]
+            exact Nat.mul_le_mul_left _ hM_card_ge_two
+          omega
+        haveI hQuot_sol : IsSolvable (G ⧸ M) := inferInstance
+        -- IH on G/M.
+        obtain ⟨_Hbar, _hHbar⟩ := ih (G ⧸ M) hquot_card π
+        -- TODO: Pull back H̄ to H = comap (mk' M) H̄.
+        --   Case 1 (p ∈ π): H is π-Hall in G.
+        --   Case 2 (p ∉ π): Schur-Zassenhaus splits H = M ⋊ K, K is π-Hall.
+        -- 各 ~80 行 (cardinality computations).
         sorry
 
 /-- **Isaacs Thm 3.13 Hall-E** ⭐ **FT クリティカル**: `G` 可解 ⇒ 任意の `π ⊆ Primes`
