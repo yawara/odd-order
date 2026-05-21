@@ -189,6 +189,7 @@ end -- 1B
 - **2026-05-21** Phase 0 完了 (Lean プロジェクト初期化、mathlib カバレッジ調査、3 冊スコープ確定、本ロードマップ作成)
 - **2026-05-21** Phase 1 章間依存を Isaacs mmd から集計、下記の依存図を追加
 - **2026-05-22** Phase 2 全体構造の調査ノート完了: [`notes/bg/_overview.md`](notes/bg/_overview.md) (BG 138 結果集計 + FT 経路 + Phase 2a 着手順), [`notes/peterfalvi/_overview.md`](notes/peterfalvi/_overview.md) (Peterfalvi 140 結果集計 + FT 経路 + Phase 2b 着手順), [`notes/meta/phase2_cross_refs.md`](notes/meta/phase2_cross_refs.md) (3 冊間クロス参照マップ + Phase 1 Isaacs ↔ Phase 2 対応表)
+- **2026-05-22** Phase 2 per-section ノート 全節完了: BG 全 16 §1-§16 + App.A-E (22 ファイル), Peterfalvi 全 16 §1-§16 (§1+§2 統合) + App.A Suzuki + App.B-E 統合 (18 ファイル). 各節について TL;DR / 結果表 / Isaacs/BG 対応 / mathlib カバレッジ / Phase 2 形式化着手順 / 未解決 TODO を整理. 合計約 16200 行の調査ドキュメント
 
 ## Phase 1 内の章間依存 (Isaacs)
 
@@ -256,62 +257,62 @@ awk -v s=START -v e=END 'NR>=s && NR<e' "$mmd" \
 
 **Chapter I. Preliminary Results** (62 結果)
 - [ ] §1 Elementary Properties of Solvable Groups (p.1) — 22 結果. **Prop 1.5-1.6 が Peterfalvi で多用**. A-invariant Hall + p-length + solvable basic. *前提: Isaacs Ch.1, Ch.3, Ch.4* — [調査メモ](notes/bg/s01_solvable.md): A-invariant Hall (Prop 1.5 = 28+ 引用, Lemma 1.1 = 43+ 引用), Prop 1.15 = Isaacs 3.21 Hall-Higman 1.2.3, 9/22 が mathlib 直接, 8/22 が Isaacs 再引用, 5/22 が新規定義/構造
-- [ ] §2 General Results on Representations (p.9) — 6 結果. Operator group の表現、Fong-Swan 系. 本文使用 1-2 箇所. *前提: Isaacs Ch.6 軽*
-- [ ] §3 Actions of Frobenius Groups (p.17) — 10 結果. Frobenius kernel nilpotent + 表現論的 Frobenius action. **Isaacs Ch.6 全面前提**. *前提: Isaacs Ch.6 完成*
-- [ ] §4 p-Groups of Small Rank (p.33) — 10 結果. Rank ≤ 2 p-群構造定理 (Blackburn). *前提: Isaacs Ch.4*
-- [ ] §5 Narrow p-Groups (p.44) — 7 結果. Narrow p-群族, Sylow 形状制限. *前提: Isaacs Ch.4*
+- [ ] §2 General Results on Representations (p.9) — 6 結果. Operator group の表現、Fong-Swan 系. 本文使用 1-2 箇所. *前提: Isaacs Ch.6 軽* — [調査メモ](notes/bg/s02_representations.md): Thm 2.1 Schur, Thm 2.3 Fong-Swan, Thm 2.5/2.6 extraspecial. mathlib カバレッジ high (大半 `RepresentationTheory.*` 既存). **本節は optional, 必要時のみ着手**
+- [ ] §3 Actions of Frobenius Groups (p.17) — 10 結果. Frobenius kernel nilpotent + 表現論的 Frobenius action. **Isaacs Ch.6 全面前提**. *前提: Isaacs Ch.6 完成* — [調査メモ](notes/bg/s03_frobenius_actions.md): Lem 3.2 = Isaacs 6.2 (quotient Frobenius), L825 Note = Isaacs 6.24 (kernel nilpotent), Thm 3.6 Z-group centralizer (244 行 13 step proof), Peterfalvi 04.11 (9.1) Wielandt 引用. mathlib `FrobeniusGroup` 完全未収載, 90% 新規
+- [ ] §4 p-Groups of Small Rank (p.33) — 10 結果. Rank ≤ 2 p-群構造定理 (Blackburn). *前提: Isaacs Ch.4* — [調査メモ](notes/bg/s04_pgroups_small_rank.md): **Thm 4.16 (Blackburn) が中核**. m_p(G), r_p(G) rank 概念で §10 の α(M) = {p : r_p(M) ≥ 3} を定義. mathlib カバレッジ 30-40%, 新規 60-70%, 25-35 日推定
+- [ ] §5 Narrow p-Groups (p.44) — 7 結果. Narrow p-群族, Sylow 形状制限. *前提: Isaacs Ch.4* — [調査メモ](notes/bg/s05_narrow_pgroups.md): Thm 5.3 narrow characterization (r(R) ≤ 2 自動 narrow, r ≥ 3 は elementary abelian maximal で characterize). §4 (Small Rank) を統一概念に. mathlib 100% 新規
 - [ ] §6 Additional Results (p.49) — 7 結果 (Thm 6.1, 6.2, 6.3, 6.4, 6.7 + Lem 6.5, 6.6). solvable + p-length 1 + Frobenius factorization. **§7-§16 で多用される道具袋**. mmd L1957-2128 (§6 ヘッダ Nougat 抽出ミスあり、`**6.**` インライン). *前提: Isaacs Ch.5, Ch.7* — [調査メモ](notes/bg/s06_additional.md): **Thm 6.2 (normal-J) ≡ Isaacs Thm 7.6** odd-order 等価, §8 (3 箇所) §9 (2 箇所) App.A (Thm A.4(b) で再述) App.B App.C で 7+ 引用. 形式化方針: Isaacs 7.6 import 推奨 (1-2 日) vs BG App.A 経由再証明 (4-5 日). MISSING_PAGE:67 は §6 末で論理影響無し
 
 **Chapter II. The Uniqueness Theorem** (10 結果)
-- [ ] §7 The Transitivity Theorem (p.55) — 3 結果. **Hypothesis 7.1 で最小反例 G を固定** (mmd L2133). *前提: Isaacs Ch.7 (J(P))*
-- [ ] §8 The Fitting Subgroup of a Maximal Subgroup (p.61) — 1 結果. **Thm 6.2 を 5+ 箇所引用**. *前提: §6, §7, Isaacs Ch.7 Thm 7.6*
-- [ ] §9 The Uniqueness Theorem (p.64) — 6 結果. central structure + maximal subgroup 一意性. **Thm 6.2 を 4+ 箇所引用**. *前提: §8, Isaacs Ch.7 Thm 7.6*
+- [ ] §7 The Transitivity Theorem (p.55) — 3 結果. **Hypothesis 7.1 で最小反例 G を固定** (mmd L2133). *前提: Isaacs Ch.7 (J(P))* — [調査メモ](notes/bg/s07_transitivity.md): Hypothesis 7.1 (G, ℳ, 𝒰, SCN_3(p), ℋ_H(A;π) 記法), Thm 7.4 propagation theorem, Thm 7.6 Thompson Transitivity. §8-§16 暗黙前提. 実装 11-15 日
+- [ ] §8 The Fitting Subgroup of a Maximal Subgroup (p.61) — 1 結果. **Thm 6.2 を 5+ 箇所引用**. *前提: §6, §7, Isaacs Ch.7 Thm 7.6* — [調査メモ](notes/bg/s08_fitting_max.md): Theorem 8.1 + 番号付き式 (8.1)-(8.13). Case (a) F(M) not p-group / Case (b) F(M) = p-group の分岐証明. Thm 6.2 引用 L2456/L2478/L2482 の精密文脈. §9 Uniqueness の直接前提
+- [ ] §9 The Uniqueness Theorem (p.64) — 6 結果. central structure + maximal subgroup 一意性. **Thm 6.2 を 4+ 箇所引用**. *前提: §8, Isaacs Ch.7 Thm 7.6* — [調査メモ](notes/bg/s09_uniqueness.md): Thm 9.6 主結果 (r(K) ≥ 2 ⇒ K ∈ 𝒰), Lemma 9.5 pivotal (SCN₃(p) ∈ 𝒰, 67 行最複雑証明), §10-§16 + App.C で連鎖被引用. 実装 7-10 日
 
 **Chapter III. Maximal Subgroups** (32 結果)
-- [ ] §10 The Subgroups M_α and M_σ (p.69) — 6 結果. maximal subgroup の族の定義・性質. *前提: §9*
-- [ ] §11 Exceptional Maximal Subgroups (p.80) — 4 結果. 例外 maximal subgroup 分類. *前提: §10*
-- [ ] §12 The Subgroup E (p.83) — 15 結果 (大規模, §12 が小章相当). 部分群 E の構造と共役性. *前提: §10-§11, Isaacs Ch.7*
-- [ ] §13 Prime Action (p.97) — 7 結果. derived series, Thompson 風作用. *前提: §12*
+- [ ] §10 The Subgroups M_α and M_σ (p.69) — 6 結果. maximal subgroup の族の定義・性質. *前提: §9* — [調査メモ](notes/bg/s10_malpha_msigma.md): α(M) = {p : r_p(M) ≥ 3}, σ(M) = {p : N_G(P) ⊆ M}, β(M) ideal primes. Thm 10.2 Hall M_α/M_σ 主定理, Cor 10.7 Sylow structure (5 部). Lem 6.5/6.6 多用 (L2795-L2801)
+- [ ] §11 Exceptional Maximal Subgroups (p.80) — 4 結果. 例外 maximal subgroup 分類. *前提: §10* — [調査メモ](notes/bg/s11_exceptional_maximal.md): Hypothesis 11.1 + Thm 11.3/11.5/11.7 のチェーン (nilpotency → abelianity → normality M_σA ⊴ M). §10 から 13 引用箇所継承
+- [ ] §12 The Subgroup E (p.83) — 15 結果 (大規模, §12 が小章相当). 部分群 E の構造と共役性. *前提: §10-§11, Isaacs Ch.7* — [調査メモ](notes/bg/s12_subgroup_e.md): τ₁/τ₂/τ₃(M) partition + Hall E₁/E₂/E₃. Group A (12.1-12.4) E 基本, Group B (12.5-12.12) τ₂(M)≠∅ 局所解析最複雑, Group C (12.13-12.19) σ(M) embedding. **2000+ 行 Lean 予想, 3 ファイル分割推奨**
+- [ ] §13 Prime Action (p.97) — 7 結果. derived series, Thompson 風作用. *前提: §12* — [調査メモ](notes/bg/s13_prime_action.md): Thm 13.4 中核 (Thompson 風, derived series 制御, 33 行証明), Lem 13.7 E₁E₃ 同時作用 conditional. §12 から 13+ 引用. 800-1100 行 Lean
 
 **Chapter IV. The Family of All Maximal Subgroups of G** (17 結果)
-- [ ] §14 Maximal Subgroups of Type 𝒫 and Counting (p.105) — 7 結果. counting argument; type-𝒫 構造. *前提: §10-§13 統合*
-- [ ] §15 The Subgroup M_F (p.117) — 9 結果. Fitting 関連 maximal. *前提: §14*
-- [ ] §16 The Main Results (p.123) — 1 結果 (Theorem B). FT 局所部の最終. App.C / Peterfalvi へ橋渡し. *前提: §1-§15 全統合*
+- [ ] §14 Maximal Subgroups of Type 𝒫 and Counting (p.105) — 7 結果. counting argument; type-𝒫 構造. *前提: §10-§13 統合* — [調査メモ](notes/bg/s14_type_p_counting.md): Thm 14.7 中核 (Type 𝒫 family duality + Z cyclicity + TI-set), Cor 14.10 **ℓ_σ(g) ≤ 2** が framework 頂点. σ-分解 + κ(M) で Type 𝒫₁/𝒫₂ 分類
+- [ ] §15 The Subgroup M_F (p.117) — 9 結果. Fitting 関連 maximal. *前提: §14* — [調査メモ](notes/bg/s15_m_f.md): Theorem 15.2 (M_F ≠ M_σ ⇒ type 𝒫₁), Type ℱ/𝒫₁/𝒫₂ 分類. §16 への橋渡し. 800-1200 行 Lean, 6-12 週推定
+- [ ] §16 The Main Results (p.123) — 1 結果 (Theorem B). FT 局所部の最終. App.C / Peterfalvi へ橋渡し. *前提: §1-§15 全統合* — [調査メモ](notes/bg/s16_main_results.md): **Theorem A-E** statement (Type I-V 分類確定). Peterfalvi §10 (8.11-8.13) 入力. Phase 3 結合の前提. 18-25 日独立, 10-12 日 Peterfalvi 並行
 
 **Appendices** (17 結果)
 - [ ] App.A Prerequisites and p-Stability (p.135) — 5 結果 (Thm A.1-A.5). **Thm A.4(b) ≡ Isaacs Thm 7.6 odd-order 版**. §6 Thm 6.2 の証明前提. *前提: Isaacs Ch.7 全面* — [調査メモ](notes/bg/appA_pstability.md): p-stability 概念の正式定義 (Glauberman 1968 [11] origin), Isaacs Ch.7 全体の odd-order 再構築. A.5 が App.B Puig L(S) の中核前提. 実装量 ~530 行 / 9-11 日. mathlib ~10%, Phase 1 Ch.7 import ~50%, 新規 ~40%
-- [ ] App.B The Puig Subgroup L(S) (p.139) — 3 結果. J(S) の代替 Puig 不変部分群. App.A 補強の独立証明枝. *前提: App.A*
-- [ ] App.C The Final Contradiction (p.145) — 3 結果 (Theorem C, Lem C.1, C.2). **Peterfalvi 1984 paper [22] の Carlip-Wheeler 編集再録**. **Phase 2b §9 と統合形式化**. mmd L4763 `## Appendix D Main Theorem` は Nougat 抽出ミスで App.C 本文の続き.
-- [ ] App.D CN-Groups of Odd Order (p.153) — 2 結果. Feit-Hall-Thompson 1960 短縮ルート. FT 本筋外 (△).
-- [ ] App.E Further Results of Feit and Thompson (p.157) — 5 結果. 発展結果. Phase 2a 完了後の発展材料、または Phase 4 メイン結合時に. △.
+- [ ] App.B The Puig Subgroup L(S) (p.139) — 3 結果. J(S) の代替 Puig 不変部分群. App.A 補強の独立証明枝. *前提: App.A* — [調査メモ](notes/bg/appB_puig.md): Lem B.1-B.3 + Thm B.4 (= Thm 6.2 substitute). J(S) path vs L(S) path 二者択一, **J(S) path で BG 本文完結可** (App.B は optional)
+- [ ] App.C The Final Contradiction (p.145) — 3 結果 (Theorem C, Lem C.1, C.2). **Peterfalvi 1984 paper [22] の Carlip-Wheeler 編集再録**. **Phase 2b §9 と統合形式化**. mmd L4763 `## Appendix D Main Theorem` は Nougat 抽出ミスで App.C 本文の続き. — [調査メモ](notes/bg/appC_final_contradiction.md): 指標論 (Peterfalvi) vs 有限体代数 (BG) の対応マップ. Theorem C + Lem C.1-C.3 + 11 個 Preliminary (I)-(XI). Phase 3 で統合
+- [ ] App.D CN-Groups of Odd Order (p.153) — 2 結果. Feit-Hall-Thompson 1960 短縮ルート. FT 本筋外 (△). — [調査メモ](notes/bg/appD_cn_groups.md): Lem D.1 (Sylow TI for min simple CN) + Lem D.2 (P ⊆ N'). Thm 6.2 + Focal Subgroup Theorem を CN-theorem に応用. **Phase 2 完全 skip 推奨**, Phase 4 後の発展材料
+- [ ] App.E Further Results of Feit and Thompson (p.157) — 5 結果. 発展結果. Phase 2a 完了後の発展材料、または Phase 4 メイン結合時に. △. — [調査メモ](notes/bg/appE_further_results.md): Thm E.1 (Philip Hall lower central) + Prop E.2 (φ(x)=x^p homo) + Thm E.3 (Feit-Thompson 1991 regular operator), BG 本書での被引用 0. Phase 4 後の発展材料 (~1000 行 Lean, 13-18 日)
 
 ### Phase 2b — Peterfalvi 本体 (Character Theory for the Odd Order Theorem)
 
 **Overview**: [`notes/peterfalvi/_overview.md`](notes/peterfalvi/_overview.md) — 本文 113 結果 ((N.M) 形式) + 付録 27 結果 (140 結果). FT クリティカル: §3-§8 (指標論コア) → §9 (= BG App.C) → §10-§15 (型分析、BG Ch.3-Ch.4 出力依存) → §16 (G 非存在). 全節 ☆ (FT 必須). 付録は △.
 
-- [ ] §1 Introduction (pp.1-2) — 0 結果. FT 証明戦略 + BG 依存明示. *前提なし*
-- [ ] §2 Notation (pp.3-4) — 0 結果. 指標論・加群記号. *前提なし*
+- [ ] §1 Introduction (pp.1-2) — 0 結果. FT 証明戦略 + BG 依存明示. *前提なし* — [調査メモ (§1+§2 合体)](notes/peterfalvi/s01s02_intro_notation.md): FT 二部構成 (局所/指標) + [BG]/[Is]/[HB]/[H] 文献依存
+- [ ] §2 Notation (pp.3-4) — 0 結果. 指標論・加群記号. *前提なし* — [調査メモ (§1+§2 合体)](notes/peterfalvi/s01s02_intro_notation.md): Irr(G), CF(G), Z[Irr G], Res/Ind, I_G(θ), F(G), O_p(G) 等 40+ 記号 → mathlib 対応表
 - [ ] §3 Preliminary Results from Character Theory (pp.5-9) — 10 結果 ((1.1)-(1.10)). Isaacs [Is] 表現論 + Peterfalvi 補強. mathlib `Character.lean` API 橋渡し. *前提: Phase 1 完成, mathlib `RepresentationTheory.Character`* — [調査メモ](notes/peterfalvi/s03_preliminary_character.md): (1.4) tau isometry が §4 Dade の準備 (☆☆☆), (1.3) Fourier 展開も新規. (1.1), (1.5)-(1.8) は Isaacs [Is] Thm 6.32, 6.5, 6.11, Cor 6.28, Cor 2.30 の odd-order 再述. 実装量 ~400 行
 - [ ] §4 The Dade Isometry (pp.10-14) — 6 結果 ((2.1)-(2.6)). **TI-subset 上の virtual character isometry**. **新規概念**. *前提: §3* — [調査メモ](notes/peterfalvi/s04_dade_isometry.md): **Phase 2b の山場**, mathlib 完全新規 (~70% 新規実装). 主定理 (2.6) は (a) isometry + (b) virtual character preservation. 形式化方針: **predicate-based (候補 3 推奨)** で `IsDadeIsometry τ hyp` + existence theorem. §5-§8 Coherence の前提. 実装量 ~400-450 行 / 16-18 時間
-- [ ] §5 TI-Subsets with Cyclic Normalizers (pp.15-20) — 5 結果 ((3.1)-(3.5)). cyclic normalizer 特殊化. *前提: §4*
-- [ ] §6 The Dade Isometry for a Certain Type of Subgroup (pp.21-24) — 5 結果 ((4.1)-(4.5)). Dade 拡張. *前提: §4-§5*
-- [ ] §7 Coherence (pp.25-29) — 6 結果 ((5.1)-(5.6)). **Coherence 定義 + 基本性質**. Dade 後の isometry 整合条件. **新規概念**. *前提: §4*
-- [ ] §8 Some Coherence Theorems (pp.30-37) — 4 結果 ((6.1)-(6.4)). Coherence 応用定理. Sibley/Reynolds 系含む. *前提: §7*
+- [ ] §5 TI-Subsets with Cyclic Normalizers (pp.15-20) — 5 結果 ((3.1)-(3.5)). cyclic normalizer 特殊化. *前提: §4* — [調査メモ](notes/peterfalvi/s05_ti_cyclic_normalizer.md): (3.1) Hypothesis W = W₁×W₂ cyclic + V TI-subset, (3.2) σ Dade isometry の 4 性質, (3.5) **orthonormal (χ_{ij}) 族と分解公式** (最重要, Case I/II 矛盾排除, 計算の山場). 実装 23-31 時間
+- [ ] §6 The Dade Isometry for a Certain Type of Subgroup (pp.21-24) — 5 結果 ((4.1)-(4.5)). Dade 拡張. *前提: §4-§5* — [調査メモ](notes/peterfalvi/s06_dade_certain_subgroup.md): (4.2) Hypothesis L = K ⋊ W₁ + cyclic Hall + C_K(x) = W₂, (4.3) TI-subset (W - W₂) + Induced character decomposition μ_ij, (4.5) χ_j i-independence + Irr(L) 完全性. 13-16 時間
+- [ ] §7 Coherence (pp.25-29) — 6 結果 ((5.1)-(5.6)). **Coherence 定義 + 基本性質**. Dade 後の isometry 整合条件. **新規概念**. *前提: §4* — [調査メモ](notes/peterfalvi/s07_coherence.md): (5.1) Coherence の正式定義 (Z[S] への τ 拡張 + virtual character の差での expression). 形式化候補: **predicate-based (IsCoherent τ̃)** が §4 設計と整合, coherent triple (τ₁,τ₂,τ₃) 比較が自然. 14-18 時間
+- [ ] §8 Some Coherence Theorems (pp.30-37) — 4 結果 ((6.1)-(6.4)). Coherence 応用定理. Sibley/Reynolds 系含む. *前提: §7* — [調査メモ](notes/peterfalvi/s08_coherence_theorems.md): Sibley 1984 (6.4)-(6.6) p-group determination bound, Reynolds 1965 (6.7) character mod \|P\|, (6.8) main theorem Frobenius family 統合 (最複雑, 7-10 日). 30 日推定
 - [ ] §9 Non-existence of a Certain Type of Group of Odd Order (pp.38-43) — 6 結果 ((7.1)-(7.6)). **≡ BG App.C Theorem C**. Frobenius family の非存在. *前提: §3-§8 + BG §3* — [調査メモ](notes/peterfalvi/s09_nonexistence_certain.md): BG App.C と内容重複 (BG L4759-5005). 形式化方針: **Peterfalvi §9 を一次, BG App.C は section docstring + reference**. Phase 3 で equivalence lemma `OddOrder.BG.AppC.TheoremC ≅ OddOrder.Peterfalvi.S09.TheoremC`. 有限体 F_{p^q} + norm-1 部分群 U + Frobenius H = PU の Lean 形式化設計含む
-- [ ] §10 Structure of a Minimal Simple Group of Odd Order (pp.44-49) — 6 結果 ((8.1)-(8.6)). **G の Type I-V 分類定義**. BG Theorem A-E 翻訳. *前提: **BG §10-§16 全面***
-- [ ] §11 Maximal Subgroups of G of Types II, III and IV (pp.50-57) — 9 結果 ((9.1)-(9.9)). (9.1) Wielandt 作用, (9.2) Frobenius kernel cohomology. *前提: §10 + BG §11-§13*
-- [ ] §12 Maximal Subgroups of Types III, IV and V (pp.58-63) — 7 結果 ((10.1)-(10.7)). (10.7) [S,S] が Frobenius. *前提: §11*
-- [ ] §13 Maximal Subgroups of Types III and IV (pp.64-68) — 8 結果 ((11.1)-(11.8)). *前提: §12*
-- [ ] §14 Maximal Subgroups of Type I (pp.69-74) — 13 結果 ((12.1)-(12.13)). 型 I は最複雑. *前提: §13 + BG §12 (E)*
-- [ ] §15 The Subgroups S and T (pp.75-86) — 17 結果 ((13.1)-(13.17)). **本文最大規模 (365 行)**. S, T の位数・正規化群・指標. §16 直前の最終仕込み. *前提: §14 + BG §15 (M_F)*
-- [ ] §16 Non-existence of G (pp.87-92) — 11 結果 ((14.1)-(14.11)). **FT 完了 = G の非存在**. 指標論計算が中心. *前提: §3-§15 + BG §16*
+- [ ] §10 Structure of a Minimal Simple Group of Odd Order (pp.44-49) — 6 結果 ((8.1)-(8.6)). **G の Type I-V 分類定義**. BG Theorem A-E 翻訳. *前提: **BG §10-§16 全面*** — [調査メモ](notes/peterfalvi/s10_structure_minimal_simple.md): (8.11)→BG Thm A, (8.12)/(8.13)→Thm B/D, (8.8)-(8.9)→Thm C. Type 𝓕/𝓟 基礎層 + Type I-V 精密 5 分類. `inductive PeterfalviType` Lean 設計. 20-25 日
+- [ ] §11 Maximal Subgroups of G of Types II, III and IV (pp.50-57) — 9 結果 ((9.1)-(9.9)). (9.1) Wielandt 作用, (9.2) Frobenius kernel cohomology. *前提: §10 + BG §11-§13* — [調査メモ](notes/peterfalvi/s11_maximal_II_III_IV.md): (9.7) Clifford 分岐 (Case (a) 分散的 H̄ vs Case (b) F = 𝔽_{p^q} 既約), (9.10) Frobenius 実現化, (9.11) Coherence 完全性証明 (8 sub-lemma, 最大規模)
+- [ ] §12 Maximal Subgroups of Types III, IV and V (pp.58-63) — 7 結果 ((10.1)-(10.7)). (10.7) [S,S] が Frobenius. *前提: §11* — [調査メモ](notes/peterfalvi/s12_maximal_III_IV_V.md): (10.7) [S,S] Frobenius §16 最終矛盾の重要段階, (10.8) ℐ non-coherent 背理法 (numerical chain). 680-850 行 Lean, 9-11 日
+- [ ] §13 Maximal Subgroups of Types III and IV (pp.64-68) — 8 結果 ((11.1)-(11.8)). *前提: §12* — [調査メモ](notes/peterfalvi/s13_maximal_III_IV.md): (11.3)-(11.5) commutator 階層 M''=HC, (11.6)-(11.7) 核構造 (p-group, H₀=H', C=U'), (11.8) character orthogonality (5 段階 sub-lemma 最技巧), (11.9) Type III 確定
+- [ ] §14 Maximal Subgroups of Type I (pp.69-74) — 13 結果 ((12.1)-(12.13)). 型 I は最複雑. *前提: §13 + BG §12 (E)* — [調査メモ](notes/peterfalvi/s14_maximal_type_I.md): (12.7) **Main Theorem: Type I ⇒ Frobenius group**, (12.12) complement order e は (p±1) の約数, (12.16) Sylow non-cyclic 反例排除, (12.17) Case (b) [S,T 存在] 強制. 1000-1500 行 Lean / 4-5 週
+- [ ] §15 The Subgroups S and T (pp.75-86) — 17 結果 ((13.1)-(13.17)). **本文最大規模 (365 行)**. S, T の位数・正規化群・指標. §16 直前の最終仕込み. *前提: §14 + BG §15 (M_F)* — [調査メモ](notes/peterfalvi/s15_s_and_t.md): Phase A setup + B character + C 位数 c=1 + D 外部構造の 4 フェーズ. (13.12) c=1 numeric exhaustion, (13.15) u 決定, (13.19.c) §16 dichotomy 入力. **1500-1800 行 Lean / 6-7 週, 4 ファイル分割推奨**
+- [ ] §16 Non-existence of G (pp.87-92) — 11 結果 ((14.1)-(14.11)). **FT 完了 = G の非存在**. 指標論計算が中心. *前提: §3-§15 + BG §16* — [調査メモ](notes/peterfalvi/s16_nonexistence_g.md): (14.11) 主結果に 4 sub-propositions, (14.11.4) norm inequality cascade で最終矛盾, BG App.C との合体方針 (Phase 3). Phase 4 FeitThompson メイン定理の statement 設計. **1000-1200 行 Lean / 5 週**
 
 **Peterfalvi 補章** (27 結果, 全 △ = FT 経路外)
-- [ ] App: A Theorem of Suzuki (pp.97-134) — 21 結果 (Prop 1-16 in 05.3 + Lemmas in 05.0-05.6). Suzuki 1962: PSL(2,q), Sz(q), PSU(3,q) の二重推移群特性化
-- [ ] App: A Special Case of a Theorem of Huppert (pp.135-136) — 1 結果. Huppert 1957 定理の Peterfalvi 流再証明
-- [ ] App: On Near-Fields (pp.137-138) — 2 結果. Near-field (Wedderburn 系) の基本
-- [ ] App: On Suzuki 2-Groups (pp.139-143) — 4 結果. Higman 分類 Suzuki 2-群
-- [ ] App: The Feit-Sibley Theorem (pp.144-150) — 2 結果. Feit-Sibley 1976 定理
+- [ ] App: A Theorem of Suzuki (pp.97-134) — 21 結果 (Prop 1-16 in 05.3 + Lemmas in 05.0-05.6). Suzuki 1962: PSL(2,q), Sz(q), PSU(3,q) の二重推移群特性化 — [調査メモ](notes/peterfalvi/appA_suzuki.md): mathlib PSL(2,q) 既存, Sz(q)/PSU(3,q) 完全新規. Phase 1 Ch.8 (Permutation Groups) 依存. 本筋外 (△). 1500-2500 行 Lean
+- [ ] App: A Special Case of a Theorem of Huppert (pp.135-136) — 1 結果. Huppert 1957 定理の Peterfalvi 流再証明 — [調査メモ (B-E 合体)](notes/peterfalvi/appB_E_small_appendices.md)
+- [ ] App: On Near-Fields (pp.137-138) — 2 結果. Near-field (Wedderburn 系) の基本 — [調査メモ (B-E 合体)](notes/peterfalvi/appB_E_small_appendices.md)
+- [ ] App: On Suzuki 2-Groups (pp.139-143) — 4 結果. Higman 分類 Suzuki 2-群 — [調査メモ (B-E 合体)](notes/peterfalvi/appB_E_small_appendices.md)
+- [ ] App: The Feit-Sibley Theorem (pp.144-150) — 2 結果. Feit-Sibley 1976 定理 — [調査メモ (B-E 合体)](notes/peterfalvi/appB_E_small_appendices.md)
 
 ### Phase 3-4
 
