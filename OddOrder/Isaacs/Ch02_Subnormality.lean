@@ -37,6 +37,24 @@ namespace OddOrder.Isaacs.Ch02
 
 section /- 2A: Subnormality basics, joins, Wielandt's F(G) (pp. 45-54) -/
 
+/-! ### mathlib 直接利用 (本ファイル内に wrapper を置かない)
+
+CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` に従い, 以下の Isaacs 結果は
+mathlib に直接対応があり, 純粋なリネームラッパーは書かない. 呼び出し側で
+直接 mathlib 名を使う:
+
+* **Isaacs Cor 2.4** (`S ∩ T subnormal`): `Subgroup.IsSubnormal.inf`
+* (`H ⊴ G ⇒ H ⊴⊴ G`): `Subgroup.Normal.isSubnormal`
+* (subnormal の推移律): `Subgroup.IsSubnormal.trans`
+* (subnormal の準同型像/逆像/quotient/smul): `.map`, `.comap`, `.quotient`, `.smul`
+* (単純群の subnormal は normal): `.normal_of_isSimpleGroup`, `.eq_bot_or_top_of_isSimpleGroup`
+
+下記の wrapper は **適応** または **2 回以上の使用予定** で書く:
+* `inf_isSubnormal_subgroupOf` (Thm 2.3): `S ⊓ K |_K = S |_K` への書換を含む
+* `commute_of_disjoint_normal` (Lemma 2.7): `Normal` を instance, `M N` を implicit
+  に取り直した適応版 (Thm 2.6 等で複数回使う)
+-/
+
 variable {G : Type*} [Group G]
 
 /-- **Minimal normal subgroup**: `M` が `G` の非自明正規部分群で、`M` に真に含まれる
@@ -113,13 +131,11 @@ theorem inf_isSubnormal_subgroupOf {S : Subgroup G} (hS : S.IsSubnormal) (K : Su
   rw [Subgroup.inf_subgroupOf_right]
   exact hS.subgroupOf
 
-/-- **Isaacs Cor 2.4**: 部分正規部分群の積は部分正規.  mathlib `IsSubnormal.inf` ラッパー. -/
-theorem inf_isSubnormal {S T : Subgroup G} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
-    (S ⊓ T).IsSubnormal := hS.inf hT
-
 /-- **Isaacs Lemma 2.7**: `M, N ◁ G` で `M ∩ N = 1` ならば `M` の元と `N` の元は可換.
 
-mathlib `Subgroup.commute_of_normal_of_disjoint` のラッパー (Isaacs 流の語順に合わせる). -/
+mathlib `Subgroup.commute_of_normal_of_disjoint` の **適応版** —
+`Normal` を instance, `M N` を implicit に取り直す (Isaacs 流の呼び出し記法).
+Thm 2.6 等で複数回使用予定. (CLAUDE.md mathlib ラッパー方針の例外規定に該当.) -/
 theorem commute_of_disjoint_normal {M N : Subgroup G} [hM : M.Normal] [hN : N.Normal]
     (hDis : Disjoint M N) {m n : G} (hm : m ∈ M) (hn : n ∈ N) : Commute m n :=
   Subgroup.commute_of_normal_of_disjoint M N hM hN hDis m n hm hn
