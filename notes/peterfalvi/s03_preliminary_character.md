@@ -1,0 +1,162 @@
+# Peterfalvi §3: Preliminary Results from Character Theory — mini-roadmap
+
+**スコープ**: Peterfalvi §3 (pp. 5-9), mmd `04.3_pp_5_9_*.mmd` (140 行), 10 結果 ((1.1)-(1.10)).
+形式化先 (予定): `OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean`.
+ROADMAP 上の位置: **Phase 2b 第 1 波** (Phase 1 Isaacs Ch.指標論完成 + mathlib `Character.lean` API 確認後).
+役割: **Phase 2b の入口**: mathlib `RepresentationTheory.Character` API と odd-order 特化結果の橋渡し.
+
+## TL;DR — Phase 2b の入口, mathlib との橋渡し
+
+Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独自の odd-order strengthening の集約**. §3 の大半 ((1.1), (1.5)-(1.8)) は Isaacs の character-theoretic 再述 + odd-order 強化で、**mathlib 既存 API で薄くラップ可能**. ただし **(1.3) (Fourier 展開) と (1.4) (tau isometry)** は **§4 (Dade isometry) の基礎となる新概念** で、Phase 2b 形式化の最初の山場.
+
+**形式化方針**: Phase 1 で Isaacs Ch.指標論 (Thm 6.32, 6.5, 6.11, Lem 2.21, Cor 6.28, Cor 2.30 等) が完成していれば、§3 の (1.1), (1.5)-(1.8) は薄い wrapper で完了 (合計 200 行程度). (1.3)-(1.4) は新規実装 (合計 130 行). §3 全体で約 400 行の Lean.
+
+## §3 全 10 結果
+
+| # | mmd 行 | 種別 | 主張要約 | Isaacs [Is] 対応 | mathlib | §4-§16 被引用 |
+|---|--------|------|----------|------------------|---------|---------------|
+| **(1.1)** | 5-7 | Characterization | `\|G\| odd ⇒ χ ≠ χ̄ for nontrivial χ ∈ Irr(G)` | **Thm 6.32** (real irreducibles ↔ real conjugacy classes) | low (odd-order specific) | ◯ §4-§6 (Dade hypotheses) |
+| **(1.2)** | 9-15 | Vanishing | `H ◁ G, χ ∈ Irr(G), H ⊄ Ker χ, C_H(g)=1 ⇒ χ(g)=0` | **Thm 6.32** + 2nd orthog. relation | mid (orthog. API exists) | ◯ §11 (type analysis) |
+| **(1.3)** | 17-37 | Basis + Fourier | `CF(H,A) basis → Ind_H^G ψ_j = Σ_i(ψ_j,χ_i) μ_i` (Frobenius reciprocity form) | **Frobenius reciprocity** (implicit in [Is] 6.15-6.16) | mid (Frobenius API 部分) | ☆☆ §4 (core), §7-§8 (coherence) |
+| **(1.4)** | 39-45 | **Tau Isometry** | `τ: Z[X,H^#] → Z[Irr G], isometry ⇒ ∃ μ_i ∈ Irr(G), ε=±1: (χ_i - χ_1)^τ = ε(μ_i - μ_1)` | (Character orthogonality implicit, 新規補題) | **low** (完全新規) | **☆☆☆ §4 (2.4) prerequisite** |
+| **(1.5)** | 47-69 | Clifford theory (5 部) | (a) Clifford decomposition (b) `\|χ\|²=r` 既約性 criterion (c) inertia-orbit (d) χ(1) 公式 (e) odd ⇒ χ̄ ⊥ χ | **Thm 6.5** (Clifford), **Thm 6.11** (induced from inertia), **Cor 6.28** | mid (Clifford 部分) | ◯◯ §5-§7 core setup |
+| **(1.6)** | 71-83 | Kernel + descent (2 部) | (a) A ⊆ Ker(θ) ⇔ A ⊆ Ker(Ind_H^G θ) (b) quotient descent | **Lem 2.21** (kernel under induction) | mid | ◯ §9-§15 |
+| **(1.7)** | 85-97 | Inertia decomp (3 部) | Ind_H^T θ = Σ e_i ψ_i, cyclic T/H ⇒ e=1 multiplicity-one | **Thm 6.11** + **Cor 6.28** + **Thm 6.5** | mid | ◯ §10-§15 (Type I-V) |
+| **(1.8)** | 99-105 | Height bound | `ψ(1) ≤ \|G\|/√(\|C\|\|D\|)` (D/B ⊂ Z(C/B)) | **Cor 2.30** (Schur degree bound) | low | ◯ §14-§15 |
+| **(1.9)** | 107-127 | Galois auto (2 部) | (a) Aut(Q_n) ⊇ Aut(Q_a) × Aut(Q_b), (b) χ^v(g) = χ(g^k) for ord(g)|a | **[L] Ch.VIII Thm 3.1** (cyclotomic auto) | low (cyclotomic) | ◯ §16 |
+| **(1.10)** | 129-140 | Modular arith (2 部) | (a) χ(xy) ≡ χ(y) mod (1-ε), (b) (1-ε)|n in Z[ζ_p] ⇒ p|n | **Lem 3.2, Cor 3.5** (cyclotomic int) | low (cyclotomic) | ◯ §16 |
+
+**FT 経路上の役割凡例**: ☆☆☆ critical (§4 prerequisite), ☆☆ core (§4 + §7-§8 主要), ◯ 標準利用.
+
+## 主要結果の詳細
+
+### (1.1) Odd Order ⇒ Real Irreducibles Distinguished
+
+**主張**: |G| odd, χ ∈ Irr(G), χ ≠ 1_G ⇒ χ̄ ≠ χ.
+
+**証明概要**: Z/2Z 作用を共役と指標共役で連動 → [Is] Thm 6.32 で「real irreducible 個数 = real conjugacy class 個数」. odd order では C^{-1} = C は C = {1} のみ (g^{-1} = g^x ⇒ x^2 ∈ C_G(g), odd order ⇒ x ∈ ⟨x^2⟩ ⊆ C_G(g), so g^{-1} = g, g = 1). 結論: real irreducible は trivial のみ.
+
+**Isaacs 依存**: [Is] Thm 6.32 (Phase 1 Ch.6 で完成想定).
+
+**mathlib**: 
+- `Mathlib/RepresentationTheory/Character.lean` に `Character.innerProductDef`
+- `Character.isReal` predicate (χ = conj χ) は未明示, 要追加
+- Z/2Z 作用は手動定義
+
+**形式化**: ~15 行 (Phase 1 Thm 6.32 + character conjugation).
+
+### (1.4) Tau Isometry — Core Dade Preparation
+
+**主張**: H finite, X ⊆ Irr(H), |X| = n ≥ 2, all χ_i(1) equal. τ: Z[X,H^#] → Z[Irr G, G^#] isometry ⇒ ∃ distinct μ_i ∈ Irr(G), ε = ±1: (χ_i - χ_1)^τ = ε(μ_i - μ_1) for all i.
+
+**証明概要** (induction on n):
+- **n=2**: ||(χ_2 - χ_1)^τ||² = 2 ⇒ (χ_2 - χ_1)^τ = e_2 - e_1 (orthonormal decomposition)
+- **n=3**: (χ_2 - χ_1)^τ と (χ_3 - χ_1)^τ は 2 つの直交 norm-1 成分の和. 内積 = 1 ⇒ 共通成分 -e_1 共有
+- **n > 3, induction**: 各 χ_k (k > 3) について ((χ_k - χ_1)^τ, (χ_i - χ_1)^τ) = 1 for i < k. 2 ケースのみ: (χ_k - χ_1)^τ = e_k - e_1 or e_2 + e_3. 後者は (e_2 + e_3)(1) = 0 = (e_2 - e_3)(1), so e_2(1) = 0 が矛盾.
+
+**mathlib 状況**: **完全新規**. Peterfalvi 独自の補題で「isometry が orthonormal basis を保存する構造」を抽出. 基本 character orthogonality + 有限次元線形代数は mathlib にあり.
+
+**形式化**: ~60-80 行 (非自明だが self-contained).
+
+**重要性**: **(1.4) は §4 Dade isometry の主定理 (2.6) への "isometry 構造 lemma"**. これにより、「TI-subset 上の virtual character 等距 → 既約成分への分解保存」が言える.
+
+## Isaacs [Is] 1976 → mathlib 対応 (Phase 1 完成想定)
+
+Peterfalvi §3 が明示引用する [Is] results:
+
+| [Is] | Isaacs 内容 | mathlib (Phase 1) | Peterfalvi 利用 |
+|------|-------------|-------------------|------------------|
+| **Thm 6.32** | # real irreducibles = # self-inverse conj classes | Phase 1 Ch.6 | (1.1) core, (1.2) base |
+| **Thm 6.5** | Clifford: Res_H^T ψ when T = I_G(θ) | Phase 1 Ch.6 | (1.5), (1.7) |
+| **Lem 2.21** | Kernel under induction | Phase 1 Ch.2 | (1.6) |
+| **Thm 6.11** | Induced from stabilizer | Phase 1 Ch.6 | (1.5), (1.7) |
+| **Cor 6.28** | Multiplicity-one criterion (abelian normalizer) | Phase 1 Ch.6 | (1.5.b), (1.7.c) |
+| **Cor 2.30** | Schur's bound χ(1)² ≤ \|G:Z(χ)\| | Phase 1 Ch.2 | (1.8) |
+| **Lem 7.7** | TI-subset Ind isometry | Phase 1 Ch.7 | (1.4) context |
+| **Lem 3.2, Cor 3.5** | Cyclotomic arithmetic | Phase 1 Ch.3 | (1.10) |
+
+**観察**: §3 は **新規群論機構を導入しない** — Isaacs Ch.1-7 の **再述 + odd-order specialization**. Phase 2b は §3 を **薄い wrapper layer** として扱える, ただし (1.3)-(1.4) は新規実装.
+
+## mathlib `RepresentationTheory.Character` API
+
+§3 形式化のための既存 API:
+
+```lean
+-- Mathlib/RepresentationTheory/Character.lean
+def Character (G : Type*) [MonoidHomClass F M G] : Type* := ...
+theorem char_orthonormal ... : ⟨V.character, W.character⟩ = if V ≅ W then 1 else 0
+
+-- Mathlib/RepresentationTheory/Induced.lean
+def Induced (R : Type*) [Semiring R] (H : Subgroup G) : ... 
+theorem frobenius_reciprocity : (Induced_char θ, χ) = (θ, Res χ) := ...
+```
+
+**§3 形式化のための gap**:
+1. **Character space CF(H,A)** with support A — 新型 wrapper 要
+2. **Frobenius reciprocity at character level** — adjunction at Representation level あり, character 翻訳要
+3. **Clifford decomposition explicit theorem** — Thm 6.5 形式化要; pieces は Induced API に
+4. **Tau isometry (1.4)** — 完全新規
+
+## §3 → §4 (Dade) の依存
+
+§4 Theorem (2.6) (Dade Main Isometry) は以下を前提:
+- (1.4) **Tau isometry 構造** — isometry が orthonormal form を保つ ⇒ 差分の符号付き対応
+- (1.3) **Fourier decomposition** — 誘導指標を supported basis で展開
+- (1.5) **Clifford theory** — 誘導指標の multiplicity + inertia 構造
+
+⇒ **§3 → §4 の strict dependency**: §4 着手前に (1.3), (1.4) 必須.
+
+## Phase 2b §3 形式化着手順
+
+### Stage 1 (Infrastructure, ~100 行)
+- `CharacterSupport : Set H → (G → ℂ) → Prop`
+- `ClassFunction.restrict : (H → ℂ) → (A → ℂ)`
+- Frobenius reciprocity at character level (`Representation.dualPairing` wrapper)
+
+### Stage 2 ((1.1) Odd Order Characterization, ~30 行)
+- Phase 1 Thm 6.32 import
+- Z/2Z action + oddness で (1.1) 証明
+
+### Stage 3 ((1.5) Clifford Theory, ~60 行)
+- Phase 1 Thm 6.5 + Thm 6.11 + Cor 6.28 を Peterfalvi 記法に翻訳
+- (1.5.a)-(1.5.e) bundled lemma
+
+### Stage 4 ((1.4) Tau Isometry, ~80 行) ← **§3 の山場**
+- `Isometry τ : Z[X,H^#] →ₗ Z[Irr G, G^#]` 定義
+- (1.4) induction + orthonormal basis extraction
+
+### Stage 5 ((1.3) Fourier Expansion, ~50 行)
+- (1.4) machinery で (1.3.a)-(1.3.b) 証明
+- supported orthogonal projection
+
+### Stage 6 ((1.2), (1.6)-(1.8), ~70 行)
+- (1.2) Vanishing on trivial centralizers
+- (1.6) Kernel descent
+- (1.7) Inertia specialization
+- (1.8) Height bound
+
+### Stage 7 ((1.9)-(1.10) Cyclotomic, ~50 行)
+- (1.9) Galois restriction
+- (1.10) Z[ζ_p] modular arithmetic
+
+**合計**: ~350-400 行 Lean 4 for §3.
+
+## CLAUDE.md `feedback_no_mathlib_wrapper` 整合
+
+- **純粋リネーム禁止**: Peterfalvi 結果は **既存 API の組み合わせ** ((1.5) = Thm 6.5 + 6.11) または **全く新規** ((1.4) tau isometry) のいずれか
+- **Character space**: 新型 `CharacterSubspace` は Peterfalvi 専用モジュールに置く (mathlib に PR する候補ではない、特化型)
+- **Phase 1 / Phase 2 境界**: Isaacs [Is] Thm 6.2, 6.5, 6.11 等は Phase 1 で独立形式化, §3 で再導出しない. §3 は import + 適用のみ.
+
+## 未解決 / TODO
+
+1. **Frobenius reciprocity character-level**: 現状 Representation level のみ. character 統一 API 設計要.
+2. **Supported character space CF(H,A) 型**: subtype (`{f : H → ℂ // supported_on f A}`) vs predicate? mathlib 慣例 (`Submodule k V`) 準拠.
+3. **(1.4) Isometry 形式化戦略**: `LinearIsometry` API or 自前 predicate? TBD.
+4. **Phase 1 Isaacs Ch.6 完成日程**: §3 は Phase 1 Ch.6 完成必須. ~2-3 ヶ月先と推定.
+5. **Peterfalvi §4 並行設計**: §3 進行中に §4 (Dade) の structure 設計 (`Dade.Isometry` def vs structure) を並行検討要.
+
+---
+
+**作成**: 2026-05-22. **出典**: Peterfalvi `references/peterfalvi/04.3_pp_5_9_*.mmd` (140 行), Phase 1 Isaacs ノート, `notes/peterfalvi/_overview.md`, `notes/meta/phase2_cross_refs.md`.
+
+**次ステップ**: Phase 1 Ch.6 完成モニタ, Phase 2b §3 着手前に Stage 1 (infrastructure) の API 設計 review, §4 設計と並行調整.

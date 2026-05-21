@@ -1,0 +1,470 @@
+# Peterfalvi §15: The Subgroups S and T — mini-roadmap (本文最大規模)
+
+**スコープ**: Peterfalvi §15 (pp.75-86, 12 ページ), mmd `04.15_pp_75_86_The_Subgroups_S_and_T.mmd` (365 行).  
+**結果数**: 17 結果 ((13.1)-(13.17)) + 1 補足 ((13.18)-(13.19)) = 計 19 個の番号付き内容.  
+**形式化先** (予定): `OddOrder/Peterfalvi/S15_SAndT.lean` (将来 subdirectory 分割可能性大)  
+**ROADMAP 上の位置**: **Phase 2b 第 6 波** (§10-§14 完成必須, §16 直前).  
+**役割**: 最小反例 G の 2 つの特殊最大部分群 S, T の **位数・正規化群・指標論的詳細**. 指標演算を極限まで詰めて §16 の最終矛盾を導く直前準備.
+
+---
+
+## TL;DR — Peterfalvi 本文最大規模, §16 直前の最終仕込み
+
+§15 は Peterfalvi 著作の中で **最も計算が過密** な節. §14 で確立した Type I 最大部分群 (13 個の補題) に続き、§15 は **Type II/III の 2 つの最大部分群 S, T** に焦点を絞る. 両者の位数・正規化群・Dade 等距写像を組合せ、最終的に「S, T の存在は矛盾を導く」という結論に到達させる. これが §16 の 11 個の結果による「G 非存在」の直接的な前提となる.
+
+**本文規模**: 365 行（全 16 節中最大、§10-§14 の平均 150 行を大きく上回る）  
+**指標論の深さ**: §3-§8 で確立した Dade isometry / Coherence / TI-subset 理論の **全パイプラインを§15 1 節で集約**  
+**形式化上の懸念**: 17 結果 × 大規模 × 指標論特化 → **Lean コード 1500+ 行** の見込み. 2-3 ファイルへの分割戦略が必須.
+
+---
+
+## §15 全 17 結果 + 補足 2 (表形式)
+
+| # | 結果 | 型 | 頁 | 主張 | 依存 | 指標論度 |
+|---|------|------|------|------|------|---------|
+| 0 | (13.1) | **仮説** | 75 | S, T 定義. W=S∩T=W₁×W₂, P=S_F, Q=T_F. (a)-(e) 5 条件: S=(P⋊U)⋊W₁, T=(Q⋊V)⋊W₂, Dade τ, character ω_ij, η_ij, μ_ij, ν_ij, 集合 𝒮, 𝒯 | (12.1)-(12.13) | **複雑な setup** |
+| 1 | (13.2) | Prop | 75-76 | (a) S Type II or III, q<p ⇒ S Type II. UW₁ Frobenius. (b) P elementary abelian rank q. (c) u ≤ (p^q-1)/(p-1). (d) 𝒮 coherent. (e) A₀(S) is TI-subset with normalizer S, τ = Ind_S^G | (10.10), (11.9), (8.4.d), (9.11), (12.7), (8.13) | **structure + coherence** |
+| 2 | (13.3) | Prop | 76-77 | (a) j≥1 ⇒ μ_j induced from linear char of PC, μ_j(1)=uq. (b) If 𝒮 has no uq-degree char from PC, then case (9.7.b) holds. (c) δ_j=δ'_i=1. μ_j^{τ₁} = Σ_{i} η_{ij} or (p=3, sign flip) | (9.8), (9.9), (4.3), (4.4), (4.9), (5.8) | **character degree analysis** |
+| 3 | (13.4) | Prop | 77 | If 𝒮 has λ of degree uq from PC, then case (9.7.b) for M=T, D=1, v=(q^p-1)/(q-1) | **key case split** | (9.7.b), (13.3.b) | **character orthogonality** |
+| 4 | (13.5) | Prop | 77-78 | TI-subset 上の character orthogonality formula. (a) χ(x) = (a/‖ζ₁‖²)ζ₁(x) + α(x) for x∈H^#, a=(ζ₁^τ, χ). (b), (c) norm inequality on α | (7.7.a), (1.5) | **linear algebra on character** |
+| 5 | (13.6) | Prop | 78 | Σ_{x∈H#} \|λ^{τ₁}(x)\|² ≥ \|S\| - λ(1)² | (13.5), (13.2.c) | **norm lower bound** |
+| 6 | (13.7) | Prop | 78-79 | Σ_{x∈H#} \|η₁₀(x)\|² ≥ \|H^#\| | (5.3.b), (5.5), (13.3.c), (1.10) | **norm lower bound** |
+| 7 | (13.8) | Prop | 79 | Σ_{x∈H#} \|η₀₁(x)\|² ≥ \|S'\| - u² | (13.3.c), (13.3.a), (13.5) | **norm lower bound** |
+| 8 | (13.9) | Prop | 79-80 | G₀ = G# - ((H#)^G ∪ (Q#)^G). (a) x∈G₀ ⇒ λ^{τ₁}(x) ≠ 0 or η₁₀(x) ≠ 0. (b) Σ_{x∈G₀} (\|λ^{τ₁}(x)\|² + \|η₁₀(x)\|²) ≥ \|G₀\| | (13.3.c), (3.9.b), (3.2.c), (3.4), (1.9.b) | **global character bound** |
+| 9 | (13.10) | Prop | 80 | m = 1 - 1/(q-1) - (q-1)/q^p + 1/((q-1)q^p). If 𝒮 has λ, then u/c > mp^{q-1}/q | (13.9), (13.6), (13.7), (13.8), (13.4) | **analytic inequality** |
+| 10 | (13.11) | Prop | 80-81 | (a) q≥7 ⇒ m > 8/10. (b) q≥5 ⇒ m > 7/10. (c) q=3 ⇒ m > 49/100 and u/c > (p²-1)/6 | (13.10) | **numeric bounds** |
+| 11 | (13.12) | **Main** | 81 | **c = 1** (最重要結果) | (13.3.b), (13.10), (13.11) | **contradiction via bounds** |
+| 12 | (13.13) | Prop | 81-82 | If case (9.7.a) for M=S, then q=3 and u=(p-1)²/4 | (13.3.b), (13.10), (13.12), (13.11.b) | **case elimination** |
+| 13 | (13.14) | Prop | 82 | (p^q-1)/(p-1) is odd. Divisor arithmetic: if p≡1 (mod q), q divides ratio; if not, ratio is coprime to p-1 | — | **number theory** |
+| 14 | (13.15) | Prop | 82 | If case (9.7.b) with M=S, then u = (p^q-1)/(p-1) [if p≢1(q)] or (p^q-1)/(q(p-1)) [if p≡1(q)] | (13.14), (13.3.b), (13.10), (13.12) | **divisor analysis** |
+| 15 | (13.16) | Prop | 82-83 | **N_G(W₁) = C_G(W₁) = QW₂** | (13.12), (8.6.a), (9.1) | **normalizer determination** |
+| 16 | (13.17) | Prop | 83-84 | If S is Type II, L is maximal with N_G(U)⊆L, H=L_F. Then (a) L is Frobenius group. (b) U⊆H. (c) L=H⋊W₁ or L=H⋊(W₁W₂^y) for y∈Q | (13.2.a), (13.16), (8.8.b4), (12.7), (8.17.a) | **Frobenius structure** |
+| 17 | (13.18) | Prop | 84-85 | β_j = Ind_{PW₁}^S 1_{PW₁} - μ_{0j}. (a) Supp(β_j) ⊆ P# ∪ (W-(W₁∪W₂))^S ⊆ A₀(S). (b) ‖β_j‖² = (u-1)/q + 2. (c) Γ = β_j^τ - 1_G + η_{0j} independent of j, orthogonal to 1_G, real. (d) ‖Y‖² ≤ (u-1)/q where Y is orthogonal to η_{ik} | (4.5.a), (4.3.c), (13.3.c), (13.12), (1.6.b), (4.8) | **virtual character decomp** |
+| 18 | (13.19) | Prop | 85-87 | L maximal Type I, H=L_F, e=\|L:H\|. (a) Ã(L)∩(P^G∪W^G)=∅. (b) ℒ^{τ₁} orthogonal to η_{ij}. (c) (β_L^τ, η_{0j}) independent of j. Two cases: (c1) (β_S^τ, φ^{τ₁})≡1(2) and (|H|-1)/e ≤ (u-1)/q, or (c2) (β_L^τ, η_{0j})≡1(2) and p ≤ e | (13.18.a), (7.8), (7.8.b), (13.18.d) | **Type I vs (S,T) orthogonality** |
+
+**合計**: 17 結果 (13.1)-(13.17) + 2 補足 (13.18)-(13.19) = **計 19 個**.
+
+---
+
+## §15 の構造: 4 つのフェーズ
+
+### Phase A: Setup と基本構造 ((13.1)-(13.2))
+
+**役割**: 仮説の精密化. §14 の Type I 分析から §15 の (S, T) 分析への転換.
+
+**(13.1) 仮説 (5 条件)**:
+- (a) S, T: maximal subgroup pair satisfying (8.8.b conditions). W = S ∩ T = W₁ × W₂ (cyclic direct product)
+- (b) P = S_F, Q = T_F. S = (P⋊U)⋊W₁, T = (Q⋊V)⋊W₂. W₁ normalizes U, W₂ normalizes V.
+- (c) 𝒮 = {Ind_W^S θ | θ ∈ Irr S', P ⊄ Ker θ}, 𝒯 = similar for T. Dade isometry τ for A₀(S), A₀(T).
+- (d) ω_{ij} (as in (3.3)), η_{ij} = ω_{ij}^τ.
+- (e) μ_{ij}, ν_{ij}: characters from (4.3) with specific reduction properties.
+
+**mathlib 上の課題**: (13.1) 全体が 1 つの大型 `structure` または `class` になると見込まれる. 10-15 個のフィールド.
+
+**(13.2) 基本事実 (5 項)**:
+- (a) S is Type II or III. q < p ⇒ S Type II. UW₁ is Frobenius with abelian kernel U.
+- (b) P is elementary abelian of order p^q.
+- (c) u ≤ (p^q - 1)/(p - 1).
+- (d) 𝒮 is coherent.
+- (e) A₀(S) is TI-subset of G with normalizer S. τ = Ind_S^G.
+
+**意義**: §14 の Type I 定理群を (S, T) に特化. Coherence が明示的に現れる最初の箇所.
+
+---
+
+### Phase B: Character-Theoretic Analysis ((13.3)-(13.10))
+
+**役割**: Dade isometry + Coherence を駆使した, S の指標の詳細解析. 8 個の補題で段階的に制約を積み重ねる.
+
+**(13.3) Character Degrees**:
+- μ_j (j ≥ 1) は PC の linear character から induced
+- μ_j(1) = uq
+- δ_j = δ'_i = 1
+- μ_j^{τ₁} = Σ η_{ij} (or sign-flipped if p=3)
+
+**ポイント**: Character の度数が (1.1.e) 内で完全に決定される → degree freedom の除外.
+
+**(13.4) Key Case Split**:
+- If 𝒮 contains λ of degree uq from PC, then **case (9.7.b) holds for M=T** with D=1, v=(q^p-1)/(q-1).
+
+**意義**: (13.3)-(13.4) は **"Either ... or ..."** 分岐の開始. (13.3.b) で (9.7.b) の可能性を示唆, (13.4) で逆方向を固定.
+
+**(13.5)-(13.8) Norm Lower Bounds** (4 個の補題):
+- (13.5): TI-subset 上の character orthogonality (一般型). χ(x) = (a/‖ζ₁‖²)ζ₁(x) + α(x).
+- (13.6): Σ |λ^{τ₁}(x)|² ≥ |S| - λ(1)².
+- (13.7): Σ |η₁₀(x)|² ≥ |H^#| (H = PC).
+- (13.8): Σ |η₀₁(x)|² ≥ |S'| - u².
+
+**手法**: Frobenius-type inner product と Dade image の norm decay を逐次追跡.
+
+**(13.9) Global Character Bound**:
+- G₀ = G# - ((H#)^G ∪ (Q#)^G) (intermediate element set)
+- (a) x ∈ G₀ ⇒ λ^{τ₁}(x) ≠ 0 OR η₁₀(x) ≠ 0 (完全カバー)
+- (b) Σ_{x∈G₀} (|λ^{τ₁}(x)|² + |η₁₀(x)|²) ≥ |G₀|.
+
+**意義**: 「G の generic 元は λ または η₁₀ で非自明」→ character の global 支配権確立.
+
+**(13.10) Analytic Inequality**:
+- m = 1 - 1/(q-1) - (q-1)/q^p + 1/((q-1)q^p)
+- **u/c > mp^{q-1}/q**
+
+**ポイント**: norm 計算の集約. (13.6)-(13.9) の結果を組合せて, 位数と normalizer サイズの関係式を導出.
+
+---
+
+### Phase C: 位数決定 ((13.11)-(13.15))
+
+**役割**: Analytic inequality (13.10) を数値分析 + case elimination で進める. 最終的に **c=1 決定** と u の明示形を得る.
+
+**(13.11) Numeric Bounds** (3 項):
+- (a) q ≥ 7 ⇒ m > 8/10
+- (b) q ≥ 5 ⇒ m > 7/10
+- (c) q = 3 ⇒ m > 49/100 and u/c > (p²-1)/6
+
+**手法**: 初等不等式 (f(x) monotonicity など)
+
+**(13.12) MAIN RESULT: c = 1**
+
+**Proof Strategy**:
+1. (13.3.b) より λ existence 仮定
+2. (13.10), (13.12) より m < uq/(p^{q-1}) ≤ q(p^q-1)/((p-1)cp^{q-1})
+3. c ≠ 1 ⇒ c ≥ 2q+1 (W₁ acts fixed-point-freely on C, c odd)
+4. 3 つの case (p=3, p≥5) で numerically 矛盾導出
+   - p=3: m < 3/4 < 8/10, (13.11.a) と矛盾
+   - p≥5: m < p/(2(p-1)) < 7/10, (13.11.b) と矛盾
+
+**結論**: c = 1 is forced.
+
+**形式化上の注**: この証明は **case-by-case numeric 検証**. Lean での numeric tactic (omega, norm_num 等) の活躍場.
+
+**(13.13) Case (9.7.a) Analysis**:
+- If case (9.7.a) for M=S, then q=3, u=(p-1)²/4.
+
+**意義**: (13.3.b) の (9.7.b) assumption に対して, 逆に (9.7.a) を仮定すると矛盾 → (9.7.b) forced.
+
+**(13.14) Number-Theoretic Facts on Cyclotomic**:
+- (p^q-1)/(p-1) is always odd
+- If p ≡ 1 (mod q), q divides ratio
+- If p ≢ 1 (mod q), ratio is coprime to p-1, and divisors ≡ 1 (mod q)
+
+**目的**: (13.15) の分母分析の準備.
+
+**(13.15) u の最終形**:
+- **If case (9.7.b)**:
+  - p ≢ 1 (mod q): **u = (p^q-1)/(p-1)**
+  - p ≡ 1 (mod q): **u = (p^q-1)/(q(p-1))**
+
+**ポイント**: (13.14) の divisor 性質を使い, (p^q-1)/(p-1) の factorization を決定 → u の一意性.
+
+---
+
+### Phase D: 正規化群と Frobenius 構造 ((13.16)-(13.19))
+
+**役割**: S, T の外部 (G 内での) normalizer 構造と, Type I との相互作用を分析.
+
+**(13.16) KEY FACT: N_G(W₁) = C_G(W₁) = QW₂**
+
+**Proof**: 
+1. TI-subset 性質 (13.2.e) より N_G(W₁) = N_T(W₁)
+2. QW₂ ⊆ C_G(W₁) は定義より
+3. Maschke → Q = W₁ × Q₁ with KW₂ normalizes Q₁ (K = N_V(W₁))
+4. K ≠ 1 → contradiction by (13.12) and (9.1)
+5. **K = 1** ⇒ N_G(W₁) = QW₂
+
+**意義**: W₁ の正規化群が (S の外で) exactly QW₂ に等しい → geometric constraint on T.
+
+**(13.17) Type II Frobenius Structure**:
+- If S is Type II, L = maximal ⊃ N_G(U), H = L_F. Then:
+  - (a) **L is Frobenius group with kernel H**
+  - (b) **U ⊆ H**
+  - (c) **L = H⋊W₁** or **L = H⋊(W₁W₂^y)** for some y ∈ Q
+
+**Proof Idea**:
+1. L ≠ S (S は Type II → non-Frobenius)
+2. L ≠ T (|H| = q^p, but W₁ ⊆ N_G(U) ⊆ L, W₁ ⊆ H, [U, W₁] ⊆ H ∩ U = 1 → contradiction with (13.2.a))
+3. L は Type I → Frobenius (by (12.7))
+4. Structure of L.complement via (13.16)
+
+**形式化上の注**: L, M の 2 つの maximal subgroup を導入. これが §16 の (14.3), (14.10) に対応.
+
+**(13.18) Virtual Character Decomposition** (補足):
+- β_j = Ind_{PW₁}^S 1_{PW₁} - μ_{0j}
+- (a) Supp(β_j) ⊆ P# ∪ (W-(W₁∪W₂))^S ⊆ A₀(S)
+- (b) ‖β_j‖² = (u-1)/q + 2
+- (c) Γ = β_j^τ - 1_G + η_{0j} independent of j, orthogonal to 1_G, real
+- (d) ‖Y‖² ≤ (u-1)/q (Y orthogonal to η_{ik})
+
+**意義**: (13.18) は (13.19) の前置き. β_j の Dade norm と support 構造を確定.
+
+**(13.19) Type I との Orthogonality** (補足):
+- L: maximal Type I, H=L_F, e=|L:H|
+- ℒ = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}
+- (a) Ã(L) ∩ (P^G ∪ W^G) = ∅ (A₀(L), A₀(S), A₀(T) disjoint in fixed-point-set sense)
+- (b) ℒ^{τ₁} orthogonal to η_{ij}
+- (c) **Two alternative cases**:
+  - (c1) (β_S^τ, φ^{τ₁}) ≡ 1 (2) and (|H|-1)/e ≤ (u-1)/q
+  - (c2) (β_L^τ, η_{0j}) ≡ 1 (2) for j ≥ 1 and p ≤ e
+
+**意義**: Type I (L) と Type II (S, T) の character family が "orthogonal" → dimension analysis へ. (c1), (c2) は §16 の key case split.
+
+---
+
+## S, T の定義と役割
+
+### S, T は何か?
+
+**定義** (from (13.1), (8.8.b)):
+- G: minimal odd-order non-solvable group (極小反例)
+- **S, T**: maximal subgroup pair of G, both solvable, satisfying:
+  - W = S ∩ T (分解 W = W₁ × W₂, cyclic)
+  - |W₁| = q (prime), |W₂| = p (prime), q < p
+  - W₁ cyclic Hall subgroup of S, W₂ cyclic Hall subgroup of T
+  - S, T are **conjugate-free** (no S ≅^conj T in typical case, see (13.17.c) exception)
+
+### 構造
+
+**S の構造** (from (13.1.b), (13.2)):
+- S = (P⋊U)⋊W₁ (nested semidirect product)
+- P = S_F (Fitting subgroup, elementary abelian, rank q)
+- U: abelian (from (13.2.a)), order u
+- W₁: cyclic of order q
+- U, W₁ complement P with specific action properties
+- S' = PU, C = C_U(P), S'/P ≅ U/C
+
+**対称性**:
+- T は S と同じ構造で, P ↔ Q, U ↔ V, W₁ ↔ W₂, q ↔ p を交換した形.
+
+### 指標論的特徴
+
+**集合 𝒮, 𝒯** (from (13.1.c)):
+- 𝒮 = {Ind_W^S θ | θ ∈ Irr S', P ⊄ Ker θ}
+- 𝒯 = {Ind_W^T ψ | ψ ∈ Irr T', Q ⊄ Ker ψ}
+- **Coherent** (from (13.2.d)): Dade isometry τ̃: Z[𝒮] → Z[Irr G] の拡張が存在
+
+**主要指標族**:
+- μ_{ij}, ν_{ij}: S, T 上の character famiglia, degree u
+- η_{ij} = ω_{ij}^τ: Dade image (virtual character on G)
+
+---
+
+## 17 結果のグループ化
+
+### Group 1: Type Determination (13.3)-(13.4)
+
+**内容**: S, T の Type (II or III) 決定, character degree structure.  
+**キー結果**: (13.3.a) μ_j(1) = uq, (13.4) case (9.7.b) for T with v=(q^p-1)/(q-1).  
+**mathlib 上**: character degree の列挙 (finite list, Lean で直接?).
+
+### Group 2: Norm Inequalities (13.5)-(13.10)
+
+**内容**: Dade norm, character support, analytic inequality.  
+**キー結果**: (13.10) u/c > mp^{q-1}/q (m parameterized by q, p).  
+**mathlib 上**: `ℝ` 不等式の cascade. `norm_num` tactic 多用.  
+**形式化量**: **最大** (6 補題 × 詳細計算 = 300-400 行?)
+
+### Group 3: Order and Centralizer Determination (13.11)-(13.15)
+
+**内容**: c=1 証明, u の明示形.  
+**キー結果**: (13.12) c=1, (13.15) u = (p^q-1)/(p-1) [or divided by q].  
+**mathlib 上**: numeric case analysis + divisor theorem.  
+**形式化量**: **大** (case split 多い, 150-200 行)
+
+### Group 4: External Structure (13.16)-(13.19)
+
+**内容**: G 内での normalizer, Frobenius structure, Type I との orthogonality.  
+**キー結果**: (13.16) N_G(W₁) = QW₂, (13.17) L Frobenius, (13.19.c) case (c1)/(c2).  
+**mathlib 上**: Group theory (normalizer, Frobenius定義).  
+**形式化量**: **中程度** (100-150 行)
+
+---
+
+## §14 (Type I) からの継承
+
+**§14 全 13 結果** (12.1)-(12.13) は Type I 最大部分群 L の詳細分析.  
+**§15 の依存**: 
+- (13.1) の仮説は (12.1)-(12.13) の **逆側 (non-Type I case)**
+- (13.2.a) "S is Type II or III" = **not Type I**
+- (13.17) "L is Type I Frobenius" = §14 の type classification を再利用
+
+**継承構造**:
+```
+§14: Type I (M) の 13 補題
+    ↓ (exhaustion)
+§15: Type II,III (S,T) の 17 補題 + Type I 例外 (13.17.c)
+    ↓
+§16: G non-existence (11 補題)
+```
+
+---
+
+## §16 (Non-existence G) への橋渡し (final input)
+
+**§16 全 11 結果** (14.1)-(14.11) + (14.12)-(14.17):
+
+| §15 Result | § 16 usage | Purpose |
+|------------|-----------|---------|
+| (13.1) Hyp | (14.1) Hyp | Setup (q < p variant) |
+| (13.2.e) τ=Ind | (14.2) FT Main | Dade simplification |
+| (13.3), (13.4) char degree | (14.4) case (9.7.b) | Type constraint |
+| (13.10) ineq | (14.8) key ineq | u/c bound |
+| (13.12) c=1 | (14.12)-(14.16) | Simplification |
+| (13.16) N_G(W₁)=QW₂ | (14.5.c) L structure | Frobenius complement |
+| (13.17) L Frobenius | (14.5.a) | Type I analysis |
+| (13.18)-(13.19) | (14.14.c) case (c1)/(c2) | Orthogonality switch |
+
+**Key Mechanism**:
+- §15: (13.1)-(13.19) で S, T の完全記述を達成
+- §16: その記述を (14.1)-(14.11) で矛盾導出に使用
+- **結論**: S, T 共存不可 ⇒ G 존재不可 (by exhaustion with Type I (13.17))
+
+---
+
+## BG §15 (M_F) との関係
+
+**BG Notation**: M_F = Fitting subgroup of M (maximal Hall odd-order normal subgroup)
+
+**Peterfalvi vs BG**:
+| 項目 | BG §15 | Peterfalvi §15 |
+|------|--------|-----------------|
+| **焦点** | M_F の局所構造 (Frobenius action, cohomology) | S, T の指標論的詳細 (Dade, coherence, norm) |
+| **手法** | Group cohomology H²(U, M_F), Maschke | Character theory, Dade isometry |
+| **結果** | Type 𝓕 definition | c=1, u = (p^q-1)/(p-1) |
+| **規模** | ~60 行 | ~365 行 |
+
+**統合点**:
+- BG §15 で M_F の structure 決定
+- Peterfalvi §15 で M_F (= P or Q) を S_F, T_F と呼び, 指標論で再分析
+
+---
+
+## ファイル分割の検討 (s15_s_and_t subdirectory 戦略)
+
+**規模見積**: 365 行 (本文) → **1500-1800 行 (Lean)**
+
+**理由**: 
+- 17 結果各々 80-120 行の Lean code (proof density 高)
+- 指標論計算 (norm, character degree) の detailed lemma化
+- case split 多い ((13.12), (13.13), (13.15) 等)
+
+**分割案 A (フェーズベース)**:
+```
+s15_s_and_t/
+  ├─ A_setup_and_types.lean       (~200 行: 13.1-13.4)
+  ├─ B_norm_and_analytics.lean    (~500 行: 13.5-13.10)
+  ├─ C_order_determination.lean   (~350 行: 13.11-13.15)
+  ├─ D_normalizers_and_frobenius.lean (~300 行: 13.16-13.19)
+  └─ S15_SAndT.lean               (imports + index)
+```
+
+**分割案 B (グループベース)**:
+```
+s15_s_and_t/
+  ├─ Normalizers.lean             (13.16)
+  ├─ TypeDetermination.lean       (13.3-13.4)
+  ├─ NormInequalityMain.lean      (13.5-13.10) — **最大ファイル**
+  ├─ OrderDetermination.lean      (13.11-13.15)
+  ├─ FrobeniusStructure.lean      (13.17-13.19)
+  └─ S15_SAndT.lean
+```
+
+**推奨**: **分割案 A** (フェーズ順に development → より readable)
+
+---
+
+## mathlib カバレッジ
+
+### 完全新規 (Peterfalvi 固有)
+- `DadeIsometry` API (§4 から継続)
+- `Coherence` 定義・主定理 (§7 から継続)
+- Virtual character norm inequality (§5-§8 application)
+- Type II/III 定義と properties (from BG §11, but Peterfalvi-specific formulation)
+
+### 部分既存 (mathlib+補強)
+- `Character.degree`, `Character.induced`: existing in `Mathlib.RepresentationTheory.Character`
+- Frobenius group structure: existing in `Mathlib.GroupTheory.Frobenius` (but (13.17.a)-(c) may need extension)
+- Numeric inequality: `norm_num`, `omega` tactic
+
+### 依存関係 (§15 独自)
+- **§3 Preliminary** (character orthogonality, Frobenius, TI-subset)
+- **§4 Dade Isometry** (全体の backbone)
+- **§5 TI-Cyclic Normalizer** (13.16 preparation)
+- **§7-§8 Coherence** (13.2.d, 13.3.c application)
+- **§14 Type I** (13.2.a, 13.17 structure)
+
+---
+
+## Phase 2b 形式化着手順
+
+### 予備調査 (準備期間, 1-2 週)
+1. mmd ファイル全 365 行を Lean code 密度で分類 (proof vs setup vs lemma)
+2. mathlib Character/Frobenius API の詳細確認
+3. (13.12) c=1 の numeric case split strategy を mock-up
+
+### 第 1 pass: Setup + Type (1 週)
+- (13.1)-(13.4): structure 定義 + basic properties
+- **形式化量**: 200-250 行
+
+### 第 2 pass: Norm Inequalities (2-2.5 週) ← **最長**
+- (13.5)-(13.10): 6 個の norm lemma, analytic inequality
+- **難所**: (13.6)-(13.9) の nested character bound, (13.10) の analytic formula
+- **形式化量**: 500-600 行
+
+### 第 3 pass: Order & Divisor (1.5 週)
+- (13.11)-(13.15): numeric bounds, case (9.7.a)/(9.7.b), divisor arithmetic
+- **難所**: (13.12) c=1 の exhaustive case analysis (p=3 vs p≥5)
+- **形式化量**: 350-400 行
+
+### 第 4 pass: Normalizers & Frobenius (1 週)
+- (13.16)-(13.19): normalizer determination, Frobenius structure, Type I orthogonality
+- **形式化量**: 300-350 行
+
+### 統合テスト (0.5 週)
+- Full file build
+- Cross-reference check with §16 (14.1)-(14.11)
+
+**総所要期間**: **6-7 週** (依存コンポーネント §3-§14 完成後)
+
+---
+
+## 未解決 / TODO
+
+### Theory-Level
+1. **c=1 決定の formal 手法**: (13.12) の proof は numerically exhaustive (case p=3, p≥5). Lean での `interval_cases` 的な tactic の適用可能性?
+2. **Divisor arithmetic の mathlib**: (13.14)-(13.15) で (p^q-1)/(p-1) の divisor properties. `Nat.dvd` + congruence `Nat.ModEq` で formalize?
+3. **Frobenius complement の一意性**: (13.17.c) で "L = H⋊W₁ or L = H⋊(W₁W₂^y)" の either/or structure. Lean で case-by-case proof design?
+
+### Formalization-Level
+1. **Virtual character space Z[Irr G]**: §5 では virtual character を informal に扱う. Lean type を設計する際, `Z-Module ℂ` か, それとも custom type か?
+2. **Dade isometry の norm 計算**: (13.5)-(13.8) の norm lower bound が本体. mathlib `‖·‖` notation との統一?
+3. **TI-subset orthogonality** ((13.5.a) etc.): inner product (·, ·) on CF(L, A^#) の定義が (7.1) Hypothesis に依存. dependency handling?
+
+### Integration-Level
+1. **§15 → §16 引き継ぎ**: (13.19.c) の two cases が (14.14) の case (a)/(b) に対応するが, formal mapping を明確化?
+2. **BG App.C との overlap check**: BG でも M_F (type 𝓕) と U の関係が扱われるが, 重複部分の elimination strategy?
+
+---
+
+## Summary
+
+**Peterfalvi §15** は Phase 2b の最終直前準備として、**17 個の結果 (365 行) を使い, S, T 部分群の位数・正規化群・指標を極限まで詳細化する**.
+
+**Key achievements**:
+- (13.12) **c = 1** (C_U(P) が自明)
+- (13.15) **u = (p^q-1)/(p-1)** (order 決定)
+- (13.16) **N_G(W₁) = QW₂** (external normalizer)
+- (13.17) **Type II ⇒ L is Frobenius** (structure)
+- (13.19) **(c1)/(c2) dichotomy** (§16 key case split)
+
+**形式化規模**: 1500-1800 行 (4 ファイル分割推奨)
+
+**所要期間**: 6-7 週 (§3-§14 完成後, §16 前)
+
+**最大の挑戦**: 
+- Norm inequality cascade (13.5-13.10) の formal proof
+- Numeric case analysis (13.12) の exhaustiveness guarantee
+- Character family orthogonality (13.19) の dimensional argument
+
+---
+
+**作成**: 2026-05-22. **出典**: `references/peterfalvi/04.15_pp_75_86_The_Subgroups_S_and_T.mmd` (365 行, 17 結果). §14, §16 ノートのクロス参照確認済.
+

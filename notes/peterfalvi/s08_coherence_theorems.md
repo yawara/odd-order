@@ -1,0 +1,413 @@
+# Peterfalvi §8: Some Coherence Theorems — mini-roadmap
+
+**スコープ**: Peterfalvi §8 (pp. 30-37), mmd `04.8_pp_30_37_*.mmd` (243 行), **4 + 2 結果 ((6.1)-(6.8), 但し (6.5)-(6.8) は拡張定理)**.
+
+形式化先 (予定): `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean`.
+
+ROADMAP 上の位置: **Phase 2b 第 3 波** (§7 Coherence 完成直後).
+
+役割: **§7 で定義した Coherence の応用定理群**. Sibley/Reynolds 系の表現論的特性化. §9-§16 構造分析の重要な道具.
+
+## TL;DR
+
+§8 は **4 つの主定理** ((6.1)-(6.4)) で構成:
+
+1. **(6.1) Hypothesis**: 仮説セットアップ (K solvable normal, S = 導入指標集, S(A) filtration)
+2. **(6.2) Lemma**: Coherence の「失敗」判定式 — 不等式で coherence 喪失の条件をバウンド
+3. **(6.3) Theorem**: nilpotent 商での Coherence 伝播 — M から H_1 へ下降
+4. **(6.4) Hypothesis + (6.5)-(6.6)**: **奇数位数下の特殊化** — Frobenius + TI-subset + cyclic normalizer の総合. **Sibley 1984 に対応**.
+
+加えて **(6.7)-(6.8)** は **Frobenius family と TI-subset の最終統合**:
+- **(6.7)**: Galois automorphism 作用下での character class calculation (Reynolds 1965 関連)
+- **(6.8) Main Theorem**: L が Frobenius or Dade condition 満たす時 S が coherent — §9-§10 構造分析の入口
+
+**mathlib カバレッジ**: ~5% (基本的な群論・指標論のみ). 主定理 (6.2)-(6.3), (6.8) は完全新規. Coherence framework (§7) の上に全面的に構築.
+
+**FT 必須度**: ☆☆ (§8 自体は局所的に完結しているが、§9-§16 では頻出. 特に (6.8) が §10-§14 の Type I-V 構造分析の土台)
+
+## §8 全結果表
+
+| # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
+|---|--------|------|----------------------|-----------|-----------|-----------|
+| **(6.1)** | 3-5 | **Hypothesis** | K solvable, S = Ind_K^L(Irr K - 1), S(A) filtration | Coherence 応用の基盤セットアップ | low | 全結果の前提 |
+| **(6.2)** | 7-22 | **Lemma** | Coherence 喪失判定: 2\|L:C\|\sqrt{\|C:D\|} ≥ \|K:A\|-1 | Coherence 不成立による矛盾導出の技法 | **high** (長計算) | (6.3), (6.5), 構造分析で頻出 |
+| **(6.3)** | 24-48 | **Theorem** | nilpotent 商 H/M での coherence 伝播 | 下降補題: coherence が層状に保存 | **high** (5 段階矛盾導出) | (6.4), (6.5), (6.8) 依存 |
+| **(6.4)** | 50-73 | **Hypothesis + (6.5)-(6.6)** | |L| odd, K/M nilpotent, Frobenius 構造 → K/M は p-群で特定 | **奇数位数下での特殊化** (Sibley 系) | mid | (6.6), (6.8) 直前提 |
+| **(6.7)** | 87-135 | **Theorem** | P Sylow p, L=N_G(P), P^# TI → character class 関係式 | **Galois 作用下の character 整数性** (Reynolds 1965 関連) | **very high** (7 つの sub-lemmas) | (6.8) 依存, (6.7.1)-(6.7.3) sub-structure |
+| **(6.8)** | 136-244 | **Main Theorem** | L = H ⋊ W_1, H^# TI, Frobenius or Dade cond. → S coherent | **Frobenius family の coherence 統合定理** | **very high** (6.8.1)-(6.8.3, 8 sub-parts) | §9, §10-§14 の最重要入口 |
+
+## 各結果の詳細
+
+### (6.1) Hypothesis — Coherence 応用の枠組み
+
+**主張**:
+- (a) Hypothesis (ref:eq:C) が成立 (= §7 Coherence の前提 (5.2))
+- (b) K は L の可解正規部分群
+- (c) S = {Ind_K^L θ | θ ∈ Irr K, θ ≠ 1_K} (K からの導入指標集合)
+- (d) A ⊂ K が L の正規部分群なら S(A) = {Ind_K^L θ | A ⊂ Ker θ, θ ≠ 1_K}
+
+**数学的意義**:
+- K が可解正規部分群という点が重要 ⟹ K/A も可解 ⟹ K/A は線形指標を持つ
+- 導入指標集 S の "filtration by kernel" S(A) を考える = 正規部分群の階層構造を character level で追跡
+
+**Lean 表現**:
+```lean
+structure CoherenceHypothesis (G L K : Type*) [Group G] [Group L] [Group K] 
+    (hyp_C : Hypothesis (5.2) L G) where
+  K_solvable : IsSolvable K
+  K_normal : K ◁ L
+  S : Set (Representation ℂ L)  -- = Ind_K^L (Irr K - 1_K)
+  S_A : (A : Subgroup K) → A ◁ L → Set (Representation ℂ L)  -- filtration
+```
+
+### (6.2) Lemma — Coherence 喪失の数値的判定
+
+**主張**: Hypothesis (ref:eq:C) 下で、
+
+- (a) A ⊂ K (A ≠ ∅), B ⊂ D ⊂ C ⊂ K, D/B ⊂ Z(C/B) (正規化群条件)
+- (b) S(A) は coherent だが S(B) は NOT coherent
+
+なら **2|L:C|√|C:D| ≥ |K:A|-1**
+
+**証明概要** (mmd L14-22):
+1. Hypothesis (ref:eq:C.b) より ∃ S_1, S_2 (S_1 closed under conj, S_1 coherent, S_1 ∪ S_2 NOT coherent)
+2. K solvable ⟹ K/A は線形指標を持つ ⟹ S(A) の一員は degree |L:K|
+3. **Theorem (5.6)** (§7 Coherence 拡張定理) 適用 ⟹ 2ψ(1)|L:K| ≥ Σ χ(1)²/‖χ‖²
+4. (ref:eq:C.c), (ref:eq:C.d) より Σ χ∈S(A) χ(1)²/‖χ‖² = |L:K|(|K:A|-1)
+5. θ(1) ≤ |K:C|√|C:D| (by (ref:eq:C)) ⟹ ψ(1) = Ind_K^L θ(1) ≤ |L:C|√|C:D| ⟹ 完成
+
+**形式化の難所**:
+- 多重的な sum/product 計算 (∑ χ∈S(A) χ(1)²/‖χ‖²)
+- induced character の degree 推定 (最後の不等式)
+- (ref:eq:C.b)-(ref:eq:C.d) の各条件の局所適用
+
+**役割**: (6.3)-(6.5) での矛盾導出に直結
+
+### (6.3) Theorem — Nilpotent 商での Coherence 伝播
+
+**主張**: Hypothesis (ref:eq:C) 下で、M ⊂ H_1 ⊂ H ⊂ K (全て L の正規部分群) かつ
+
+- (a) H/M が nilpotent
+- (b) S(H_1) は coherent
+- (c) |H:H_1| > 4|L:K|² + 1
+
+なら **S(M) is coherent** (M での filtration も coherent)
+
+**証明概要** (mmd L24-48):
+1. Minimal counterexample: A ⊃ M, A ⊂ H_1, S(A) coherent, A minimal with these properties
+2. A ≠ M と仮定 (矛盾を狙う)
+3. B を M ⊂ B ⊂ A, B maximal で選ぶ
+4. H/M nilpotent ⟹ (A/B) ∩ Z(H/B) ≠ 1 ⟹ A/B ⊂ Z(H/B)
+5. **(6.2) を C=H, D=A で適用** ⟹ 2|L:H|√|H:A| ≥ |K:A|-1
+6. x = |H:A| で変形: (√x - 1/√x)² = x - 2 + 1/x ≤ 4|L:K|²
+7. |H:H_1| > 4|L:K|² + 1 に矛盾
+
+**数学的意義**:
+- **下降補題 (Descent Lemma)**: coherence が層状に保存される
+- K の分層構造を利用して、上から下へ coherence を伝播させる
+- (6.4)-(6.5)-(6.6) での Frobenius + odd-order 特殊化の前提
+
+**Lean 表現**: 矛盾導出が複雑 — `decide` で不等式評価をサポート要
+
+### (6.4) Hypothesis + (6.5)-(6.6) — 奇数位数下での特殊化 (Sibley 系)
+
+#### (6.4) Setup
+
+**主張**:
+- (a) Hypothesis (6.1) + |L| odd
+- (b) M ⊂ K, K/M nilpotent
+- (c) H_1/M = [K/M, K/M] (commutator subgroup)
+- (d) L/H_1 は kernel K/H_1 を持つ Frobenius 群
+
+#### (6.5) Lemma — K/M の構造決定
+
+Hypothesis (6.4) + S(M) NOT coherent なら:
+
+- **(a)** K/H_1 は L の chief factor で |K:H_1| ≤ 4|L:K|² + 1
+- **(b)** ∃ prime p s.t. K/M is non-abelian p-group
+- **(c)** |L:K| ∤ (p-1) (p-1 を割らない)
+
+**証明**:
+1. (6.3) の仮説 H=K で K/H_1 abelian & non-trivial ⟹ (6.3.b) holds
+2. (6.3) 適用 ⟹ |K:H_1| ≤ 4|L:K|² + 1
+3. K solvable & commutator [K,K]=H_1 ⟹ K/M is p-group for some p
+4. (c) proof by contrapositive: |L:K| | (p-1) ⟹ p ≥ 2|L:K|+1 ⟹ |K:H_1| ≥ p² > 4|L:K|²+1 矛盾
+
+**数学的意義**: **Sibley 1984 の定理の character-theoretic 翻訳**
+- Feit-Thompson K/M が p-group かつ non-abelian
+- commutator K/H_1 が chief factor (Frobenius 構造の key)
+- |L:K| coprime to (p-1) — これが Sibley の signature condition
+
+#### (6.6) Lemma — Center での Coherence
+
+Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
+
+**X = {χ ∈ Irr L | Z ⊄ Ker χ} and X is coherent**
+
+**証明** (mmd L76-84): **複雑, 8 段階**
+1. n = |X| ≥ 2
+2. X の elements を degree で sort: χ_1(1) ≤ ⋯ ≤ χ_n(1)
+3. χ_i = Ind_K^L θ_i, θ_i(1) = power of p (K/M は p-group)
+4. θ_i(1)² | Σ_{j≥i} χ_j(1)²
+5. Σ_{j≥i} χ_j(1)² = |L| - |L:Z| - Σ_{j<i} χ_j(1)²
+6. **[Is] Corollary 2.30**: θ_i(1)² ≤ |K:Z|
+7. Σ_j<i χ_j(1)² divisibility + **Theorem (5.6)** の繰り返し適用 ⟹ X is coherent
+
+**役割**: (6.7)-(6.8) へ向けた coherence の final composition
+
+### (6.7) Theorem — Character Class 関係式 (Reynolds 1965 関連)
+
+**主張**: G 有限, p prime, P Sylow p-subgroup of G, L = N_G(P),
+- |L| odd, P^# TI-subset of G
+- Z ⊂ Z(P) non-trivial, |C_L(z)| independent of z ∈ Z^#
+- ψ ∈ Irr G, ψ constant on Z^#
+
+**結論**: z ∈ Z^# ⟹ ψ(z) ∈ ℤ かつ **ψ(z) ≡ ψ(1) (mod |P|)**
+
+**証明概要** (mmd L88-135, 6 つの sub-lemmas):
+
+**(6.7.1) Lemma**: P^# が Z^# × Z^# に fixed-point-free に作用 ⟹ TI 性
+
+**(6.7.2) Lemma**: Algebra homomorphism ω: Z[G] → ℂ (via ψ) の class operation 下での structure
+
+**(6.7.3) Lemma** (Main): z ∈ Z^# ⟹ ψ(z) ≡ ψ(1) (mod |P|)
+- Proof: ℤ[G] の conjugacy class algebra の construction
+- z, z^{-1} が distinct conjugacy class (|L| odd ⟹ z^{-1} ≠ z^g)
+- a_{11}, a_{12} calculation mod |P|
+- integrality + congruence arithmetic
+
+**数学的意義**:
+- **Reynolds 1965 定理**: Frobenius group での character value の modular arithmetic
+- TI-subset + cyclic centralizer ⟹ character が "rigid" (mod |P|)
+- (6.8) の Frobenius case の前準備
+
+**Lean 表現**: 
+```lean
+theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]
+    (P : Sylow p G) (L : Subgroup G) (Z : Subgroup L) 
+    (h_odd : Odd (Nat.card L))
+    (h_ti : TI_Subset G P.val)
+    (h_Z_center : Z ≤ Subgroup.center P.val)
+    (h_Z_nontrivial : Z ≠ ⊥)
+    (h_C_independent : ∀ z₁ z₂ ∈ Z.val, z₁ ≠ 1 → z₂ ≠ 1 → 
+                       (Subgroup.centralizer G z₁).card = (Subgroup.centralizer G z₂).card)
+    (ψ : Character G)
+    (h_ψ_const : ∀ z₁ z₂ ∈ Z.val, z₁ ≠ 1 → z₂ ≠ 1 → ψ z₁ = ψ z₂) :
+    ∀ z ∈ Z.val, z ≠ 1 → ψ z ∈ ℤ ∧ ψ z ≡ ψ 1 [ZMOD P.val.card] := by
+  sorry
+```
+
+複雑: 7 つの sub-lemma が必要, class algebra の detailed calculation
+
+### (6.8) Main Theorem — Frobenius Family の Coherence 統合定理
+
+**主張**: G 有限, L ⊂ G,
+- (a) L = H ⋊ W_1, |L| odd, H non-identity nilpotent, H^# TI with normalizer L
+- (b) S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}, τ = restriction of Ind_L^G to Z[S, L^#]
+- (c) Two cases:
+  - (c1) L は kernel H を持つ Frobenius 群
+  - (c2) Hypothesis (4.6) (Dade condition) + w_2 prime + W_2 ⊂ [H,H]
+
+**結論**: **S is coherent** (τ が全 Z[S] に拡張できる)
+
+**証明** (mmd L136-244, 3 つの main sub-proofs + 8 sub-lemmas):
+
+**(6.8.1) X ∪ Y coherent in case (A)**: 
+- Setup: Z = Z(H) ∩ [H,H] in (A), or Z = W_2 in (B)
+- X = S - S(Z), Y = S([H,H])
+- (6.6) + Dade 応用 ⟹ X coherent
+- Y は orthonormal base ⟹ X ∪ Y coherent
+
+**(6.8.2) X ∪ Y coherent in case (B)** (W_2 ⊂ Z(H)):
+- Sub-lemmas:
+  - **(6.8.2.1)**: η ∈ Y ⟹ η^{τ_1} constant on Z^#
+  - **(6.8.2.2)**: (Ind_Z φ - |H:Z|η_1)^τ = X - |H:Z|Y (with explicit formula)
+  - **(6.8.2.3)**: χ ∈ X ⟹ (χ - a η_1)^τ = X_1 - aY
+- Isometry preservation
+
+**(6.8.3) S is coherent** (Final):
+- Contrapositive: S NOT coherent ⟹ S ≠ X ∪ Y ∃ S_1, S_2 with S_1 coherent, S_1 ∪ S_2 NOT coherent
+- (5.6) apply ⟹ 2ψ(1)η_1(1) > Σ_χ χ(1)²/‖χ‖²
+- (6.8.1)-(6.8.2) + calculation mod 4|W_1|² ⟹ contradiction
+
+**数学的意義**:
+- **§8 の最高峰** — Coherence framework の最終統合
+- Frobenius group (case c1) + Dade isometry (case c2) の両立
+- §9-§16 構造分析での character 計算基盤
+
+**Lean 形式化難度**: ★★★★★
+- 8 つの sub-lemma の逐次的構築
+- case split (A) vs (B)
+- isometry 延長の explicit construction
+- norm/orthogonality 計算の chain
+
+## Sibley/Reynolds 系の同定
+
+### Sibley 1984 との関連
+
+**(6.4)-(6.5)** は **Sibley, M. J. (1984), "Dade's Theorem and Generalizations of Coprime Actions"** (Contemp. Math. 47) の指標論的翻訳:
+
+| Sibley | Peterfalvi | 相互関係 |
+|--------|-----------|---------|
+| Non-abelian p-group G/Z | K/M non-abelian p-group | (6.5.b) |
+| [G,G]/Z abelian | [K,K]/M = H_1/M abelian | (6.4.c) |
+| |G:G'| ≤ 4n²+1 bound | |K:H_1| ≤ 4\|L:K\|²+1 | (6.5.a) |
+| Coprime action of M on G | W_1 acts on K mod [K,K] | Frobenius kernel |
+
+**Key**: Sibley の "Dade isometry 없는 버전"을 Peterfalvi가 Coherence predicate으로 재표현. (6.5) 그 자체가 Sibley의 bound를 character-theoretic 言語로 재증명.
+
+### Reynolds 1965 との関連
+
+**(6.7)** は **Reynolds, W. F. (1965), "Characters of Finite Groups with Additional Structure"** (Duke Math. J.) の:
+
+- **Theorem**: Frobenius group L/H (kernel H) での character value が modular arithmetic (mod |H|)
+
+Peterfalvi (6.7)의 설정 — L = N_G(P), P^# TI, Z ⊂ Z(P) — 이는 Reynolds가 다룬 "cyclic action" case의 일반화:
+
+| Reynolds | Peterfalvi (6.7) | 의미 |
+|----------|-----------------|------|
+| Regular Frobenius | P^# TI-subset | Wider class |
+| Mod \|H\| congruence | Mod \|P\| congruence | Parallel structure |
+| ψ constant on conjugacy class | ψ constant on Z^# | Reduction |
+
+**Key**: (6.7)은 TI-subset + cyclic normalizer 경우의 Reynolds bound를 정확히 형식화. (6.8) 증명에서 핵심 보조정리.
+
+## §10-§16 구조분석에서의 사용
+
+### §9 Non-existence of Certain Type (BG App.C)
+
+- (6.1)-(6.4): Frobenius family의 coherence를 통해 non-existence 증명의 "character-theoretic obstruction" 제공
+- (6.8): 최종 non-existence의 핵심 — Type I-V 분류 이전에 Frobenius structure 자체가 불가능함을 보임
+
+### §10-§14 Type I-V 분석
+
+- **(6.8)**: Type I (Elementary abelian Sylow 2-subgroup, BG Type A) 분석의 기초
+- (6.1)-(6.3): Commutator subgroup chain을 따라 coherence를 추적하며 maximal subgroup의 structure constraint 도출
+- (6.5): p-group structure bound가 Type classification을 진행하는 동안 dimension reduction 제공
+
+### §15 S and T 부분군 분석
+
+- (6.8.1)-(6.8.3)의 explicit isometry construction이 S, T의 character extension을 계산할 때 reuse됨
+- Coherence predicate이 "S ⊂ Irr L" 판정에 사용됨 (irreducibility vs reducibility 구분)
+
+### §16 Non-existence of G
+
+- (6.2)의 inequality chaining: |K:A|-1 bound가 size argument (counting irreducibles)로 변환
+- (6.7) mod |P| congruence: G의 존재 → character class 계산에서 모순 (final punch)
+- (6.8) coherence chain: 최종 FT 증명에서 "모든 가능한 G의 maximal subgroup이 coherent character set을 가질 수 없다" 를 보이는 핵심
+
+## mathlib 카버리지
+
+### 기존 API
+- `Subgroup.normal`: normal subgroup predicate ✓
+- `Representation ℂ L` / `Character L`: representation, character type ✓
+- `inner_product` (character 내적): ✓
+- `Induced`: induced character/representation (부분) ✓
+
+### 新規 (Phase 2b에서 정의 필요)
+
+1. **Coherence 관련**:
+   - `def Coherence (τ : E →ₗᵢ[ℤ] Z[Irr G]) (S : Set (Irr L)) (A : Set L) : Prop`
+   - `structure CoherenceTriple`
+   - Lemma/Theorem collections 전 (5.2)-(5.9) [§7에서 정의]
+
+2. **§8 고유**:
+   - `def CoherenceHypothesis (6.1)` — mmd notation과 정확히 동일
+   - `structure FilteredCharacterSet` — S(A) filtration
+   - `theorem S08_6_2` — 부등식 기반 lemma
+   - `theorem S08_6_3` — nilpotent descent
+   - `theorem S08_6_7` — Reynolds congruence (복잡)
+   - `theorem S08_6_8` — Main theorem
+
+3. **보조 타입**:
+   - `IsTI_Subset`: TI-subset predicate (if not in mathlib)
+   - `IsCoherent.extends` — isometry extension existence
+   - `CharacterClass.CongruenceMod` — modular arithmetic wrapper
+
+## Phase 2b 형식化 着手順
+
+### 선행 조건
+- ✓ Phase 1 Isaacs Ch.1-8 완성
+- ✓ Phase 2b §3 (Preliminary) 완성
+- ✓ Phase 2b §4 (Dade Isometry) 완성
+- ✓ Phase 2b §5 (TI-cyclic norm) 완성
+- ✓ Phase 2b §6 (Dade for certain type) 완성
+- ✓ Phase 2b §7 (Coherence) 완성
+
+### §8 형식화 계획 (예상 2-3주)
+
+#### Wave 1: (6.1) Setup (1-2일)
+```lean
+structure CoherenceHypothesis ... where
+  K : Subgroup L
+  K_solvable : IsSolvable K
+  K_normal : K ◁ L
+  S : Set (Irr L)
+  S_def : S = {Ind_K^L θ | θ ∈ Irr K ∧ θ ≠ 1_K}
+  S_A : (A : Subgroup K) → A ◁ L → Set (Irr L)
+```
+
+#### Wave 2: (6.2) + (6.3) (3-4일)
+- (6.2) 부등식의 algebraic 재배열
+- (6.3) inductive 모순 구조 — `decide` vs `omega` vs manual `ring` calculation
+- (5.6) Coherence extension theorem의 직접 활용
+
+#### Wave 3: (6.4)-(6.5)-(6.6) (4-5일)
+- Case split: |L| odd 가정의 전역화
+- (6.3) + Frobenius structure 조합 → p-group determination (6.5.b)
+- (6.7) 전 단계 — Reynolds congruence 예비
+
+#### Wave 4: (6.7) Lemma (5-7일) ⭐ **hardest**
+- Class algebra construction: Z[G]의 conjugacy class의 formal algebra
+- `algebra_homomorphism ω` 타입: fintype conjugacy class의 enumeration
+- 6 sub-lemma들의 sequential dependent proof
+- `decide` / `omega` / `ring` / `decide` chain으로 modular arithmetic
+
+#### Wave 5: (6.8) Main Theorem (7-10일) ⭐⭐ **very hardest**
+- (6.8.1) X ∪ Y coherent (case A): (6.6) 활용 + explicit isometry extension
+- (6.8.2) X ∪ Y coherent (case B): 3 sub-lemmas + norm 계산
+- (6.8.3) S coherent: final contradiction 유도
+- **Coherence framework와의 상호작용 극대화** — §7 (5.1)-(5.9)와의 타이트한 integration
+
+#### Wave 6: Integration + Testing (3-4일)
+- § 7과의 cross-reference 검증
+- §9 형식화 시작 (§8 완료 후 바로)
+- LEAN 타입체킹 및 doc string 완성
+
+## 未解決 / TODO
+
+1. **§7 (5.2)-(5.9)와의 정확한 interface**: Hypothesis (5.2) vs (6.4)의 관계 — formal Lean type에서 sub-hypothesison 활용 방법 결정 필요
+
+2. **(6.7)의 "conjugacy class algebra" 형식화 전략**: 
+   - Option A: Explicit fintype enumeration (|G| finite이므로 computable)
+   - Option B: Abstract algebra homomorphism (더 이론적이지만 계산 어려움)
+   - 권장: Hybrid — enumeration + omega tactic
+
+3. **(6.8.2.1)-(6.8.2.3)의 sub-lemma ordering**: 증명 의존도가 복잡하므로 formal dependency graph 먼저 그리기 필요
+
+4. **Sibley 1984 paper access**: Peterfalvi references에 "Sibley 1984 Contemp. Math. 47" 명시되어 있는지 확인 — 만약 있으면 정확한 page reference 추가
+
+5. **Reynolds 1965의 정확한 statement 확인**: Peterfalvi (6.7)의 generalization이 Reynolds의 어느 정리를 일반화하는지 원문 비교 필요
+
+6. **mathlib Character/Induced API의 최신 상태 (May 2026)**: 
+   - `Subgroup.induced : Representation ℂ H → Representation ℂ G` (computable?)
+   - `Character.inner : Character H → Character H → ℤ` vs `Z[Irr H]` module structure
+   - Recent PRs 확인 필요
+
+---
+
+## Summary Table
+
+| Section | Theorems | Type | Mathlib Coverage | FT Role | Est. Implementation |
+|---------|----------|------|------------------|---------|-------------------|
+| (6.1) | 1 | Setup Hypothesis | low | Foundation | 1-2 days |
+| (6.2) | 1 | Inequality Lemma | low | Obstruction | 2 days |
+| (6.3) | 1 | Descent Theorem | low | Key tool | 2-3 days |
+| (6.4)-(6.6) | 3 | Special case + Lemmas | mid | Sibley system | 4-5 days |
+| (6.7) | 1 | Reynolds-type | low | Character class calc | 5-7 days |
+| (6.8) | 1 (+ 3 sub-proofs) | Main Theorem | low | Structure analysis | 7-10 days |
+| **TOTAL** | **8 主結果** | - | **~5%** | **☆☆** | **~30 days est.** |
+
+---
+
+*作成: 2026-05-22. 出典: `references/peterfalvi/04.8_pp_30_37_Some_Coherence_Theorems.mmd` (243 行) + `04.7_pp_25_29_Coherence.mmd` (136 行). クロス参照確認済: §7 (5.1)-(5.9), (6.1)-(6.8) self-contained, §9 (7.1)-(7.6) 依存. Phase 2b 第 3 波着手予定は §7 完成後.*
