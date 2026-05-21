@@ -289,7 +289,11 @@ theorem pgroup_in_normalizer_le_sylow
 
 end -- 1C
 
-section /- 1D: Nilpotent groups, Fitting subgroup F(G) (pp. ?–?) -/
+section /- 1D: Nilpotent groups, Fitting subgroup F(G) (pp. 21-29) -/
+
+open scoped Pointwise
+
+variable {G : Type*} [Group G]
 
 -- TODO Thm 1.19    : N ◁ P (P p-群) 非自明 ⇒ N ∩ Z(P) > 1.
 -- TODO Lemma 1.20  : 有限 G が冪零であることの諸特性化.
@@ -298,11 +302,50 @@ section /- 1D: Nilpotent groups, Fitting subgroup F(G) (pp. ?–?) -/
 -- TODO Lemma 1.23  : p-群 P, N < M ◁ P ⇒ ∃ L ◁ P, N ⊆ L ⊆ M, |L:N|=p.
 -- TODO Cor 1.24    : 位数 p^a の p-群は各 b ≤ a で正規部分群 |L|=p^b を持つ.
 -- TODO Cor 1.25    : 有限 G, p^b ∣ |G| ⇒ 位数 p^b の部分群存在.
--- TODO Thm 1.26    : G 冪零 ⇔ すべての Sylow が正規.
--- TODO Lemma 1.27  : 互いに素な位数を持つ有限正規部分群族の積は直積.
--- TODO **Def F(G)**: Fitting 部分群 — 全冪零正規部分群の積として定義  (新規実装).
--- TODO Cor 1.28    : F(G) 正規かつ冪零, 最大の正規冪零部分群.  (新規実装主結果)
--- TODO Cor 1.29    : 冪零正規部分群 K, L ⇒ KL も冪零.
+
+/-! ### O_p(G) と Fitting 部分群 F(G)
+
+Isaacs §1D 後半の主要新規実装。詳細設計は
+[notes/isaacs/ch01_sylow_d_fitting.md](../../notes/isaacs/ch01_sylow_d_fitting.md)。
+
+`opCore p G` (= `O_p(G)`) は全 Sylow `p`-部分群の共通部分として定義し,
+最大の正規 `p`-部分群であることを示す (Isaacs Problem 1B.2). この上に
+`fitting G` (= `F(G)`) を `⨆_{p prime} opCore p G` として乗せる. -/
+
+/-- `O_p(G)`: `G` の全 Sylow `p`-部分群の共通部分.  Isaacs Problem 1B.2 で示される
+ように, これは `G` の最大の正規 `p`-部分群と一致する.
+
+mathlib 未収載のため新規定義 (将来 mathlib に `Subgroup.opCore` として PR したい形). -/
+def opCore (p : ℕ) (G : Type*) [Group G] : Subgroup G :=
+  ⨅ P : Sylow p G, (P : Subgroup G)
+
+@[simp]
+theorem mem_opCore {p : ℕ} {x : G} :
+    x ∈ opCore p G ↔ ∀ P : Sylow p G, x ∈ (P : Subgroup G) := by
+  simp [opCore, Subgroup.mem_iInf]
+
+theorem opCore_le {p : ℕ} (P : Sylow p G) : opCore p G ≤ (P : Subgroup G) :=
+  iInf_le _ P
+
+/-- `O_p(G)` は `p`-部分群 (Sylow に含まれるから).
+
+`[Fact p.Prime]` 必須 (`Sylow.nonempty` から少なくとも 1 つの Sylow を取るため). -/
+theorem opCore_isPGroup (p : ℕ) [Fact p.Prime] (G : Type*) [Group G] :
+    IsPGroup p (opCore p G) := by
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  exact P.2.of_injective (Subgroup.inclusion (opCore_le P))
+    (Subgroup.inclusion_injective _)
+
+-- TODO `opCore.normal` (`O_p(G)` は `G` で正規).
+--   共役で全 Sylow が permute されることから `⨅ Sylow` が共役不変であることを示す.
+--   `Sylow.coe_subgroup_smul` + `Subgroup.mem_pointwise_smul_iff_inv_smul_mem` の
+--   組み合わせで membership 計算する必要があり、`MulAut.conj` の inverse 周りで
+--   simp 補題が要安定化のため次の iteration へ.
+
+-- TODO **Isaacs Problem 1B.2** (`opCore` の最大性): 任意の正規 `p`-部分群 ⊆ `opCore p G`.
+--   証明骨子: 正規 `p`-部分群 N について N ≤ Q ∈ Sylow (Sylow D), 任意の P ∈ Sylow に対し
+--   N = g • N ⊆ g • Q = P (Sylow C による共役). 上の `opCore.normal` 同様,
+--   pointwise smul の membership 計算が必要.
 
 end -- 1D
 
