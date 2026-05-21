@@ -21,11 +21,12 @@
 | §3B Thm 3.11 後半 (elementary abelian) | ✅ | `solvable_minimal_normal_isElementaryAbelian` (p-torsion T が characteristic in M + 最小性) |
 | §3C Lemma 3.16 coprime index ⇒ HK=G | ✅ | `sup_eq_top_of_coprime_index` (Subgroup.index_dvd + Nat.dvd_gcd) |
 | §3C IsHallSubgroup 定義 + 基礎 | ✅ | `IsHallSubgroup`, `.coprime_index`, `.top_iff`, `.bot_iff`, `.bot_of_card_eq_one` |
-| §3C Thm 3.13 Hall-E | base のみ (sorry on step) | base case (|G|=1) で `IsHallSubgroup.bot_of_card_eq_one` 適用. step は IH on G/M + Schur-Zassenhaus で要 ~200 行 |
-| §3C Thm 3.14 Hall-C | TODO | step は IH + Schur-Zassenhaus 共役性 |
-| §3C Thm 3.15 (Hall converse) | TODO | p-complement 存在 ⇒ 可解 |
-| §3C Thm 3.17 (3 subgroups solvability) | TODO | Lemma 3.16 + Schur-Zassenhaus 連鎖 |
-| §3D π-separable + Hall-Higman (3.18-3.22) | TODO | IsPiSeparable placeholder のみ. 正式定義に normal series 必要 |
+| §3C **Thm 3.13 Hall-E** | ✅ | **完全証明**. `hall_E_strong_aux` で `|G|`-強誘導. base (|G|=1): ⊥. step: minimal normal M (Thm 3.11 で elem abelian p-group) + IH on G/M + pullback. Case p ∈ π: H = comap で直接. Case p ∉ π: Schur-Zassenhaus on M.subgroupOf H |
+| §3C Thm 3.14 Hall-C | base のみ (sorry on step) | step は IH + Schur-Zassenhaus 共役性 (mathlib に直接無い). 戦略: p ∈ π で M ≤ H_i (Sylow 経由) ⇒ 商で IH; p ∉ π で H_i ∩ M = ⊥ ⇒ Schur-Zassenhaus 共役 |
+| §3C Thm 3.15 (Hall converse) | base のみ | p-complement 存在 ⇒ 可解. 要 Burnside p^a q^b 解 (mathlib 未) or 3 subgroups |
+| §3C Thm 3.17 (3 subgroups solvability) | base のみ | Wielandt 1971. 単純群の場合分け要 (mathlib 未). missing page で原典 proof 不明 |
+| §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着 |
+| §3D Hall-Higman 1.2.3 (3.21) | docstring | 正式 IsPiSeparable + O_π / C_G 表現要 |
 | §3E Coprime action (3.23-3.34) | docstring | Glauberman lemma 等, 大規模 |
 | §3F 巡回商 lift (3.35-3.36) | docstring | 補助, 優先度低 |
 
