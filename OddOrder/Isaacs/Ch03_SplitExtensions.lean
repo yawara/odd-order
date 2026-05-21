@@ -356,22 +356,45 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
 
 証明骨子: 同じく `|G|`-induction. Minimal normal `M` 経由で G/M に IH 適用, 個別の
 H₁, H₂ が M 経由で同じ商で対応する Hall に降りる. Schur-Zassenhaus の共役性で
-`H₁ = (H₂)^g` を得る. -/
+`H₁ = (H₂)^g` を得る.
+
+TODO: 本コミットでは base case (`|G| = 1`) のみ完結. Step は IH on G/M +
+Schur-Zassenhaus 共役性で要 ~200 行. -/
 theorem hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
     {H₁ H₂ : Subgroup G} (_h1 : IsHallSubgroup π H₁) (_h2 : IsHallSubgroup π H₂) :
     ∃ g : G, H₁.map (MulEquiv.toMonoidHom (MulAut.conj g)) = H₂ := by
-  sorry
+  by_cases hG : Nat.card G = 1
+  · -- |G| = 1 ⇒ G subsingleton, H₁ = H₂ = ⊥. Take g = 1.
+    haveI : Subsingleton G := (Nat.card_eq_one_iff_unique.mp hG).1
+    refine ⟨1, ?_⟩
+    have h_eq : H₁ = H₂ := Subsingleton.elim _ _
+    have h_conj : MulAut.conj (1 : G) = 1 := map_one _
+    rw [h_conj]
+    show H₁.map (MulEquiv.toMonoidHom (1 : MulAut G)) = H₂
+    rw [h_eq]
+    ext x
+    simp [Subgroup.mem_map]
+  · -- Step: G nontrivial. TODO: IH on G/M + Schur-Zassenhaus conjugacy.
+    sorry
 
 /-- **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
 
 証明骨子 (Hall's converse): `|G|`-induction. p, q を `|G|` を割る相異なる素数とし,
 H_p, H_q の p-, q-complement を取る. H_p ∩ H_q は {p,q}'-Hall に相当. 商と部分群の
-solvability を組み合わせる. -/
+solvability を組み合わせる.
+
+TODO: 本コミットでは base case (`|G| = 1`) のみ. Step は p, q 区別 + Hall 部分群
+ペアの組合せで要 ~150 行. -/
 theorem solvable_of_pcomplement_exists [Finite G]
     (_h : ∀ p : ℕ, p.Prime → ∃ H : Subgroup G, IsHallSubgroup {q | q ≠ p} H) :
     IsSolvable G := by
-  sorry
+  by_cases hG : Nat.card G = 1
+  · -- |G| = 1 ⇒ G subsingleton ⇒ solvable.
+    haveI : Subsingleton G := (Nat.card_eq_one_iff_unique.mp hG).1
+    infer_instance
+  · -- Step: |G| > 1, |G| has prime divisor.
+    sorry
 
 /-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).
 
@@ -384,13 +407,24 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
   have h_dvd : (H ⊔ K).index ∣ 1 := h ▸ Nat.dvd_gcd h1 h2
   exact Subgroup.index_eq_one.mp (Nat.dvd_one.mp h_dvd)
 
-/-- **Isaacs Thm 3.17**: 3 つの部分群が pairwise coprime index + solvable ⇒ `G` solvable. -/
+/-- **Isaacs Thm 3.17** (Wielandt): 3 つの部分群が pairwise coprime index + solvable ⇒
+`G` solvable.
+
+証明骨子 (Isaacs Thm 3.17 の証明は missing page にあり; Wielandt 1971 の一般的議論):
+`|G|`-induction. 最小反例 G を取り, M を minimal normal とする. G/M は IH で
+solvable. M も `(H ∩ M)`, `(K ∩ M)`, `(L ∩ M)` 部分群経由で IH より solvable.
+よって G solvable, 矛盾.
+
+TODO: 本コミットでは base case のみ. Step は ~100 行. -/
 theorem solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
     (_h12 : Nat.Coprime H.index K.index) (_h13 : Nat.Coprime H.index L.index)
     (_h23 : Nat.Coprime K.index L.index)
     [IsSolvable H] [IsSolvable K] [IsSolvable L] :
     IsSolvable G := by
-  sorry
+  by_cases hG : Nat.card G = 1
+  · haveI : Subsingleton G := (Nat.card_eq_one_iff_unique.mp hG).1
+    infer_instance
+  · sorry
 
 end -- 3C
 
