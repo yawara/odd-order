@@ -111,15 +111,37 @@ noncomputable def fitting (G : Type*) [Group G] : Subgroup G :=
      ─ Cor 1.28 から直結.
 ```
 
-## mathlib との突合せ TODO (実装前に grep する)
+## mathlib 偵察結果 (2026-05-21, Explore agent)
 
-* `Subgroup.iSupIndep_of_coprime_card` (or similar) — Lemma 1.27 相当があるか確認
-* `Group.isNilpotent_iff_sylow_normal` — Thm 1.26 (1)⇔(4) 既存?
-* `Group.IsNilpotent` の API (`Group.IsNilpotent.subgroup`, `.quot` 等)
+**実装簡略化の主要発見**:
 
-これらが揃っていれば、上記 1–14 のうち多くが薄いラッパーで済む可能性。
-逆に揃っていなければ、ステップ 6 (Lemma 1.27) と 7 (Thm 1.26) を先に潰す必要あり。
-事前調査を Phase 1 §1D 着手時に行う。
+| 項目 | mathlib | 影響 |
+|---|---|---|
+| Lemma 1.27 (互いに素 ⇒ 直積) | `Subgroup.independent_of_coprime_order` @ NoncommPiCoprod.lean:305 | step 6 は薄いラッパー |
+| Thm 1.26 全体 ((1)⇔(4)⇔(5)) | `isNilpotent_of_finite_tfae` @ Nilpotent.lean:941 | **step 7, 8 不要** |
+| (4)⇒(5) の具体的同型 | `Sylow.directProductOfNormal` @ Sylow.lean:774 | TFAE 内部で活用 |
+| p-群 ⇒ 冪零 | `IsPGroup.isNilpotent` @ Nilpotent.lean:904 | step 11 で `opCore` の冪零性に使用 |
+| 部分群の冪零継承 | instance `Subgroup.isNilpotent` @ Nilpotent.lean:477 | step 5 相当を自動化 |
+| 商の冪零継承 | instance `nilpotent_quotient_of_nilpotent` @ Nilpotent.lean:582 | 補助 |
+| p-部分群 → Sylow 含有 | `IsPGroup.exists_le_sylow` @ Sylow.lean:159 | step 5 (`opCore` 最大性) の core |
+| 互いに素素 p-群間の disjoint | `IsPGroup.disjoint_of_ne` @ PGroup.lean:304 | `opCore` 間直接性 |
+| 正規 Sylow ⇒ 特性的 | `Sylow.characteristic_of_normal` @ Sylow.lean:736 | step 12 補助 |
+
+**結論**:
+- 新規実装の山は **step 1–5 (opCore 系) と step 9–13 (Fitting 系)** のみ。
+- step 7, 8 は TFAE 1 行で代替。
+- step 6 は wrapper で完了。
+
+更新後の実装順:
+
+```
+1. opCore : ℕ → ∀ G, Subgroup G   定義: ⨅ P : Sylow p G, ↑P
+2. opCore_normal, opCore_isPGroup, opCore_le_sylow, opCore_max_normal_pSubgroup
+3. fitting : Subgroup G   定義: ⨆ p ∈ primeFactors |G|, opCore p G
+4. fitting_normal, fitting_isNilpotent (← TFAE と IsPGroup.isNilpotent から)
+5. nilpotent_normal_le_fitting (Cor 1.28 主要部)
+6. (系) nilpotent_normal_mul_is_nilpotent (Cor 1.29)
+```
 
 ## ファイル分割
 

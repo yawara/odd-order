@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.Finite.Perm
 import Mathlib.Data.Nat.Choose.Lucas
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Perm.Cycle.Type
+import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Sylow
 
 /-!
@@ -45,6 +47,8 @@ namespace OddOrder.Isaacs.Ch01
 
 section /- 1A: Group actions and the Fundamental Counting Principle (pp. 1-10) -/
 
+open scoped Pointwise
+
 variable {G : Type*} [Group G]
 
 /-- **Isaacs Thm 1.1**.  部分群 `H ≤ G` の coset 集合 `G ⧸ H` への右乗法作用の
@@ -66,13 +70,89 @@ noncomputable def fundamentalCountingEquiv
     MulAction.orbit G α ≃ G ⧸ MulAction.stabilizer G α :=
   MulAction.orbitEquivQuotientStabilizer G α
 
--- TODO Cor 1.2  指数 [G:H]=n の H は正規部分群 N≤H で [G:N] ∣ n! を含む.
---   N := H.normalCore を取って perm action 経由で示す.
--- TODO Cor 1.3  G simple ∧ ∃ H, [G:H]=n>1  ⇒  |G| ∣ n!.   (Cor 1.2 の系)
--- TODO Cor 1.5  有限 G, x ∈ G の共役類サイズ = [G : C_G(x)].
---   mathlib `ConjClasses.card_carrier` + ConjAct.
--- TODO Cor 1.6  有限 G の部分群 H の共役の総数 = [G : N_G(H)].
---   ConjAct G の H への作用で stabilizer = normalizer から FCP.
+/-- **Isaacs Cor 1.2**.  `H ≤ G` で `[G:H] = n` なら，`N := core_G(H) = H.normalCore` は
+`N ◁ G`, `N ≤ H` であり，`[G:N] ∣ n!`.
+
+証明: Thm 1.1 より `G/N ↪ Sym(G/H) ≅ S_n`，よって `|G/N| ∣ |S_n| = n!`．
+mathlib では `H.normalCore_eq_ker` → `index_ker` → `card_subgroup_dvd_card` + `Nat.card_perm`
+を組み合わせる. -/
+theorem normalCore_index_dvd_factorial (H : Subgroup G) [Finite (G ⧸ H)] :
+    H.normalCore.Normal ∧ H.normalCore ≤ H ∧
+      H.normalCore.index ∣ Nat.factorial H.index := by
+  refine ⟨inferInstance, H.normalCore_le, ?_⟩
+  rw [H.normalCore_eq_ker, Subgroup.index_ker]
+  calc Nat.card (MulAction.toPermHom G (G ⧸ H)).range
+      ∣ Nat.card (Equiv.Perm (G ⧸ H)) := Subgroup.card_subgroup_dvd_card _
+    _ = Nat.factorial (Nat.card (G ⧸ H)) := Nat.card_perm
+    _ = Nat.factorial H.index := by rw [← Subgroup.index_eq_card]
+
+/-- **Isaacs Cor 1.3**.  `G` が単純群で `∃ H ≤ G` with `[G:H] = n > 1` なら `|G| ∣ n!`.
+
+証明: Cor 1.2 の `N := core_G(H)` は `G` で正規．`G` 単純なので `N = ⊥` か `N = ⊤`．
+`n > 1` より `H ⊊ G`，よって `N ≤ H ⊊ G`，つまり `N ≠ ⊤`．
+ゆえに `N = ⊥`，`[G:⊥] = |G|`，`|G| ∣ n!`. -/
+theorem card_dvd_factorial_of_simple_subgroup_index [IsSimpleGroup G] [Finite G]
+    (H : Subgroup G) (hn1 : 1 < H.index) :
+    Nat.card G ∣ Nat.factorial H.index := by
+  have hn : H.index ≠ 0 := by omega
+  haveI : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp hn
+  obtain ⟨_, hNH, hdvd⟩ := normalCore_index_dvd_factorial H
+  rcases Subgroup.Normal.eq_bot_or_eq_top (inferInstance : H.normalCore.Normal)
+      with hN | hN
+  · rw [hN, Subgroup.index_bot] at hdvd
+    exact hdvd
+  · -- N = ⊤ なら H = ⊤ つまり [G:H] = 1, hn1 と矛盾
+    exfalso
+    have hHtop : H = ⊤ := le_antisymm le_top (hN ▸ hNH)
+    rw [hHtop, Subgroup.index_top] at hn1
+    exact Nat.lt_irrefl 1 hn1
+
+/-- **Isaacs Cor 1.5**.  有限群 `G` と `x ∈ G` について，`x` の共役類のサイズは
+`[G : C_G(x)]` に等しい.
+
+証明: `ConjAct G` の `G` への共役作用で
+`x` の軌道 = 共役類 (`ConjAct.orbit_eq_carrier_conjClasses`)，
+orbit-stabilizer 定理 (`MulAction.index_stabilizer`) より
+orbit サイズ = `(stabilizer (ConjAct G) x).index`，
+`Subgroup.centralizer_eq_comap_stabilizer` + `index_comap_of_surjective`
+で centralizer の指数に書き換える. -/
+theorem card_conjClass_eq_index_centralizer [Finite G] (x : G) :
+    Nat.card (ConjClasses.mk x).carrier = (Subgroup.centralizer {x}).index := by
+  have horb : MulAction.orbit (ConjAct G) x = (ConjClasses.mk x).carrier :=
+    ConjAct.orbit_eq_carrier_conjClasses x
+  -- Nat.card ↑carrier = carrier.ncard (forward), then rewrite using orbit
+  rw [Nat.card_coe_set_eq, ← horb,
+      ← MulAction.index_stabilizer (G := ConjAct G) (X := G)]
+  -- (centralizer {x}).index = (comap toConjAct stab).index = stab.index
+  rw [Subgroup.centralizer_eq_comap_stabilizer]
+  exact ((MulAction.stabilizer (ConjAct G) x).index_comap_of_surjective
+           ConjAct.toConjAct.surjective).symm
+
+open scoped Pointwise in
+/-- **Isaacs Cor 1.6**.  有限群 `G` の部分群 `H` の `G` 内の共役の総数は
+`[G : N_G(H)]` に等しい.
+
+証明: `ConjAct G` の `Subgroup G` への点別共役作用 (`Pointwise` locale) で，
+`H` の軌道サイズ = `[ConjAct G : stabilizer (ConjAct G) H]` (orbit-stabilizer)，
+`ofConjAct` が等長写像なので `stabilizer` と `normalizer H` の指数が一致する
+(`Subgroup.index_map_equiv` + `Subgroup.conjAct_pointwise_smul_iff`). -/
+theorem card_subgroup_conjugates_eq_index_normalizer [Finite G] (H : Subgroup G) :
+    (MulAction.orbit (ConjAct G) H).ncard = (Subgroup.normalizer (H : Set G)).index := by
+  rw [← MulAction.index_stabilizer (G := ConjAct G) (X := Subgroup G)]
+  -- (stab).index = (stab.map ofConjAct).index (isomorphism preserves index)
+  rw [← (MulAction.stabilizer (ConjAct G) H).index_map_equiv ConjAct.ofConjAct]
+  congr 1
+  -- (stabilizer (ConjAct G) H).map ofConjAct = normalizer (H : Set G)
+  ext h
+  simp only [Subgroup.mem_map, MulAction.mem_stabilizer_iff]
+  constructor
+  · rintro ⟨g, hg, rfl⟩
+    -- hg : g • H = H, g : ConjAct G; rewrite as toConjAct (ofConjAct g) • H = H
+    rw [← ConjAct.toConjAct_ofConjAct g] at hg
+    exact Subgroup.conjAct_pointwise_smul_iff.mp hg
+  · intro hh
+    exact ⟨ConjAct.toConjAct h, Subgroup.conjAct_pointwise_smul_iff.mpr hh,
+           ConjAct.ofConjAct_toConjAct h⟩
 
 end -- 1A
 
@@ -123,16 +203,89 @@ theorem normal_of_characteristic_in_normal
 
 end -- 1B
 
-section /- 1C: Sylow C / D, Frattini argument (pp. ?–?) -/
+section /- 1C: Sylow C / D, Frattini argument (pp. 13-17) -/
 
--- TODO Thm 1.11  : 任意 p-部分群は Sylow p-部分群の共役に含まれる.
--- TODO Thm 1.12  (Sylow C)  : Sylow p-部分群は互いに共役  (`Sylow.orbit_eq_top`).
--- TODO Lemma 1.13 (Frattini): N ◁ G, P ∈ Syl_p(N) ⇒ G = N_G(P) N.
--- TODO Thm 1.14  (Sylow D)  : 任意 p-部分群は Sylow p-部分群に含まれる.
--- TODO Cor 1.15            : n_p(G) = [G : N_G(S)]  (S ∈ Syl_p).
--- TODO Thm 1.16            : n_p ≡ 1 (mod |S:S∩T|), S,T で |S∩T| 最大.
--- TODO Cor 1.17            : n_p(G) ≡ 1 (mod p).   `card_sylow_modEq_one`.
--- TODO Lemma 1.18          : P ∈ Syl_p, Q ≤ N_G(P) p-部分群 ⇒ Q ⊆ P.
+open Pointwise Subgroup MulAction
+
+variable {G : Type*} [Group G] {p : ℕ} [Fact p.Prime]
+
+/-- **Isaacs Thm 1.11**.  `G` の任意の `p`-部分群 `P` は, ある Sylow `p`-部分群 `S` と
+ある `g ∈ G` が存在して `P ≤ g • S` (= `S` の共役) に含まれる.
+
+証明の方針: `IsPGroup.exists_le_sylow` で `P ≤ Q` となる Sylow 部分群 `Q` を取り,
+`orbit_eq_top` を使って `Q` と任意の Sylow を結ぶ共役元を取る.
+
+mathlib `IsPGroup.exists_le_sylow` + `Sylow.orbit_eq_top` の組み合わせ. -/
+theorem sylow_pgroup_le_conjugate [Finite (Sylow p G)]
+    {P : Subgroup G} (hP : IsPGroup p P) (S : Sylow p G) :
+    ∃ g : G, P ≤ ↑(g • S) := by
+  obtain ⟨Q, hQ⟩ := hP.exists_le_sylow
+  obtain ⟨g, rfl⟩ := (S.orbit_eq_top ▸ Set.mem_univ Q :
+      Q ∈ MulAction.orbit G S)
+  exact ⟨g, hQ.trans (by rfl)⟩
+
+/-- **Isaacs Thm 1.12** (Sylow C).  有限群 `G` の任意の 2 つの Sylow `p`-部分群は
+`G` の元による共役で移り合う.
+
+mathlib `MulAction.exists_smul_eq` (from `Sylow.isPretransitive_of_finite`) の再述. -/
+theorem sylow_conjugate [Finite (Sylow p G)] (P Q : Sylow p G) :
+    ∃ g : G, g • P = Q :=
+  exists_smul_eq G P Q
+
+/-- **Isaacs Lemma 1.13** (Frattini argument).  `N ◁ G` 有限, `P ∈ Syl_p(N)` ならば
+`G = N_G(P) · N`, すなわち `normalizer (↑P) ⊔ N = ⊤`.
+
+mathlib `Sylow.normalizer_sup_eq_top'` の再述 (P を G の Sylow として N に含まれる形). -/
+theorem frattini_argument [Finite (Sylow p G)]
+    {N : Subgroup G} [N.Normal] (P : Sylow p G) (hPN : ↑P ≤ N) :
+    normalizer (P : Subgroup G) ⊔ N = ⊤ :=
+  P.normalizer_sup_eq_top' hPN
+
+omit [Fact p.Prime] in
+/-- **Isaacs Thm 1.14** (Sylow D).  `G` の任意の `p`-部分群は何らかの Sylow `p`-部分群に
+含まれる.
+
+mathlib `IsPGroup.exists_le_sylow` の直接再述. -/
+theorem pgroup_le_sylow
+    {P : Subgroup G} (hP : IsPGroup p P) : ∃ Q : Sylow p G, P ≤ Q :=
+  hP.exists_le_sylow
+
+/-- **Isaacs Cor 1.15**.  `S ∈ Syl_p(G)` について Sylow `p`-部分群の個数は
+`n_p(G) = [G : N_G(S)]`.
+
+mathlib `Sylow.card_eq_index_normalizer` の再述. -/
+theorem card_sylow_eq_index_normalizer [Finite (Sylow p G)] (S : Sylow p G) :
+    Nat.card (Sylow p G) = (normalizer ((S : Subgroup G) : Set G)).index :=
+  S.card_eq_index_normalizer
+
+-- TODO **Isaacs Thm 1.16**.  S, T ∈ Syl_p(G) で |S∩T| が最大のとき
+--   n_p(G) ≡ 1 (mod |S : S∩T|), すなわち S での S∩T からの相対指数.
+--   S 上の共役作用で固定点を数える精密な mod 計算が必要.
+--   mathlib に直接対応する補題がなく 40 行超の実装が見込まれるため TODO に留める.
+
+/-- **Isaacs Cor 1.17**.  `n_p(G) ≡ 1 (mod p)`.
+
+mathlib `card_sylow_modEq_one` の再述. -/
+theorem card_sylow_modEq_one_prime [Finite (Sylow p G)] :
+    Nat.card (Sylow p G) ≡ 1 [MOD p] :=
+  card_sylow_modEq_one p G
+
+omit [Fact p.Prime] in
+/-- **Isaacs Lemma 1.18**.  `P ∈ Syl_p(G)`, `Q` が `N_G(P)` に含まれる `p`-部分群ならば
+`Q ≤ P`.
+
+証明: `IsPGroup.inf_normalizer_sylow` より `Q ⊓ N_G(P) = Q ⊓ P`, そして `Q ≤ N_G(P)` から
+`Q = Q ⊓ N_G(P) = Q ⊓ P ≤ P`.
+
+mathlib `IsPGroup.inf_normalizer_sylow` の系. -/
+theorem pgroup_in_normalizer_le_sylow
+    {Q : Subgroup G} (hQ : IsPGroup p Q) (P : Sylow p G)
+    (hQN : Q ≤ normalizer (P : Subgroup G)) : Q ≤ P := by
+  have h := hQ.inf_normalizer_sylow P
+  -- h : Q ⊓ N_G(P) = Q ⊓ P
+  rw [inf_of_le_left hQN] at h
+  -- h : Q = Q ⊓ P
+  exact inf_eq_left.mp h.symm
 
 end -- 1C
 
