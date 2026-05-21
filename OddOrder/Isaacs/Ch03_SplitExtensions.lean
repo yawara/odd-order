@@ -559,9 +559,10 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
 証明骨子 (Isaacs Thm 3.17 の証明は missing page にあり; Wielandt 1971 の一般的議論):
 `|G|`-induction. 最小反例 G を取り, M を minimal normal とする. G/M は IH で
 solvable. M も `(H ∩ M)`, `(K ∩ M)`, `(L ∩ M)` 部分群経由で IH より solvable.
-よって G solvable, 矛盾.
+よって G solvable, 矛盾. ただし G が単純の場合 M = G で別議論を要する
+(Burnside p^a q^b 等. 本リポでは sorry).
 
-TODO: 本コミットでは base case のみ. Step は ~100 行. -/
+TODO: 本コミットでは base case + 非単純ケース skeleton のみ. -/
 theorem solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
     (_h12 : Nat.Coprime H.index K.index) (_h13 : Nat.Coprime H.index L.index)
     (_h23 : Nat.Coprime K.index L.index)
@@ -570,7 +571,12 @@ theorem solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
   by_cases hG : Nat.card G = 1
   · haveI : Subsingleton G := (Nat.card_eq_one_iff_unique.mp hG).1
     infer_instance
-  · sorry
+  · -- TODO 完全な step. ケース解析:
+    -- Case A: G に非自明 proper normal M がある.
+    --   M solvable (IH on M, H∩M K∩M L∩M 経由) + G/M solvable (IH on G/M) ⇒ G solvable.
+    -- Case B: G simple. cyclic of prime order ⇒ solvable;
+    --   non-abelian simple ⇒ Wielandt の議論 (mathlib に未整備な深い結果).
+    sorry
 
 end -- 3C
 
