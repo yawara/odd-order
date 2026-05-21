@@ -130,10 +130,10 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
 | Isaacs | mathlib |
 |---|---|
 | Thm 3.5 (Schur-Zassenhaus, abelian normal) | `Subgroup.exists_right_complement'_of_coprime` |
-| Thm 3.6 (crossed homom) | `OneCocycle` / `OneCocycles` (`Mathlib.RepresentationTheory.GroupCohomology.LowDegree`) |
+| Thm 3.6 (crossed homom) | `OneCocycle` / `OneCocycles` (`GroupCohomology.LowDegree`) |
 | Thm 3.7 (transversal differ) | mathlib `MonoidHom.crossed*` 周辺 |
-| Thm 3.8 (Schur-Zassenhaus 一般) | `Subgroup.exists_right_complement'_of_coprime` (abelian 不要版) |
-| Thm 3.9 (G solvable ⇔ G^(m) = 1) | `isSolvable_iff_derivedSeries_eq_bot` (もしくは `derivedSeries_eq_bot_iff` 等) |
+| Thm 3.8 (Schur-Zassenhaus 一般) | `Subgroup.exists_right_complement'_of_coprime` |
+| Thm 3.9 (G solvable ⇔ G^(m) = 1) | `isSolvable_iff_derivedSeries_eq_bot` |
 | Thm 3.10 (solvable 基本) | `IsSolvable` instance による subgroup/quotient/extension 各種 |
 | Thm 3.11 (solvable min normal は elem abelian p-group) | **新規**? — mathlib にあるか要確認 (TODO) |
 | Thm 3.12 (complement conjugacy in solvable) | `IsConj` 系 + `SchurZassenhaus` |
@@ -177,16 +177,80 @@ theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G] [Finite G] [IsSo
 /-- **Isaacs Thm 3.11**: 可解群 `G` の minimal normal subgroup は ある素数 `p` について
 elementary abelian p-group.
 
-証明骨子 (Isaacs p.79): M minimal normal in G, M solvable (G solvable の部分群).
-1. `M' = ⁅M, M⁆` は M で characteristic, M ⊴ G ⇒ M' ⊴ G. M' ≤ M.
-2. M' < M (M solvable + M ≠ ⊥), minimality で M' = ⊥. M abelian.
-3. p prime ∣ |M| 取り, Sylow_p M 唯一 (M abelian) ⇒ characteristic ⇒ ⊴ G ⇒ = M (minimality).
-4. `M^p = {x^p | x ∈ M}` は M で characteristic ⇒ ⊴ G ⇒ = ⊥ or M.
-5. M^p = M なら反復で M = ⊥, 矛盾. よって M^p = ⊥, M は p-elementary abelian. -/
+証明: M abelian (前補題). `p ∣ |M|` を取り, `T = {x ∈ M | x^p = 1}` を M の部分群とする
+(M abelian で閉性 OK). T は M で characteristic (自己同型は p-冪を保つ).
+Cauchy で T ≠ ⊥. T.map M.subtype は characteristic-in-normal で G 正規 + ≤ M.
+M minimality で T.map M.subtype ∈ {⊥, M}. T ≠ ⊥ より T.map M.subtype = M, よって T = ⊤,
+即ち全 x ∈ M で x^p = 1. -/
 theorem solvable_minimal_normal_isElementaryAbelian [Finite G] [IsSolvable G]
-    {M : Subgroup G} (_hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+    {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p ↥M := by
-  sorry
+  haveI hMnormal : M.Normal := hM.1
+  have hM_ne_bot : M ≠ ⊥ := hM.2.1
+  have habel := solvable_minimal_normal_isAbelian hM
+  haveI hMcomm : IsMulCommutative ↥M :=
+    ⟨⟨fun a b => Subtype.ext (habel a a.2 b b.2)⟩⟩
+  haveI hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hM_card_pos : 1 < Nat.card ↥M := Finite.one_lt_card
+  obtain ⟨p, hp_prime, hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd hM_card_pos.ne'
+  refine ⟨p, hp_prime, ?_⟩
+  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  -- T = {x : ↥M | x^p = 1} as a Subgroup of ↥M.
+  let T : Subgroup ↥M :=
+    { carrier := {x | x ^ p = 1}
+      one_mem' := one_pow p
+      mul_mem' := by
+        intro a b ha hb
+        change (a * b) ^ p = 1
+        change a ^ p = 1 at ha
+        change b ^ p = 1 at hb
+        rw [mul_pow, ha, hb, one_mul]
+      inv_mem' := by
+        intro a ha
+        change a⁻¹ ^ p = 1
+        change a ^ p = 1 at ha
+        rw [inv_pow, ha, inv_one] }
+  -- T characteristic in ↥M.
+  haveI hT_char : T.Characteristic := by
+    rw [Subgroup.characteristic_iff_le_comap]
+    intro φ x hx
+    rw [Subgroup.mem_comap]
+    change (φ x) ^ p = 1
+    change x ^ p = 1 at hx
+    rw [← map_pow, hx, map_one]
+  -- T ≠ ⊥ via Cauchy.
+  obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥M) p hp_dvd
+  have hx_pow : x ^ p = 1 := by
+    rw [← hx_ord]; exact pow_orderOf_eq_one x
+  have hx_ne_one : x ≠ 1 := by
+    intro heq
+    rw [heq, orderOf_one] at hx_ord
+    exact hp_prime.ne_one hx_ord.symm
+  have hT_ne_bot : T ≠ ⊥ := by
+    intro hbot
+    have hx_T : x ∈ T := hx_pow
+    rw [hbot, Subgroup.mem_bot] at hx_T
+    exact hx_ne_one hx_T
+  -- T.map M.subtype ⊴ G (characteristic-in-normal).
+  haveI hTM_normal : (T.map M.subtype).Normal := inferInstance
+  have hTM_le_M : T.map M.subtype ≤ M := by
+    rintro _ ⟨y, _, rfl⟩
+    exact y.2
+  -- Minimality.
+  rcases hM.2.2 (T.map M.subtype) hTM_normal hTM_le_M with hTM_bot | hTM_eq
+  · exfalso
+    have hT_eq_bot : T = ⊥ := by
+      have : T.map M.subtype = (⊥ : Subgroup ↥M).map M.subtype := by
+        rw [hTM_bot, Subgroup.map_bot]
+      exact Subgroup.map_injective M.subtype_injective this
+    exact hT_ne_bot hT_eq_bot
+  · refine ⟨fun a b => Subtype.ext (habel a a.2 b b.2), fun y => ?_⟩
+    have hy_TM : (y : G) ∈ T.map M.subtype := by
+      rw [hTM_eq]; exact y.2
+    obtain ⟨z, hz_T, hz_eq⟩ := hy_TM
+    have hzy : z = y := Subtype.ext hz_eq
+    exact hzy ▸ hz_T
 
 end -- 3B
 

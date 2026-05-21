@@ -422,7 +422,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
         have hSoc_lift_le_norm :
             (socle N).map N.subtype ≤ Subgroup.normalizer (S : Set G) := by
           rintro _ ⟨⟨g', hg'N⟩, hg'soc, rfl⟩
-          show (g' : G) ∈ Subgroup.normalizer (S : Set G)
+          change (g' : G) ∈ Subgroup.normalizer (S : Set G)
           have hg'norm : (⟨g', hg'N⟩ : N) ∈
               Subgroup.normalizer (S.subgroupOf N : Set N) := hSoc_le_norm_inner hg'soc
           rw [Subgroup.mem_normalizer_iff] at hg'norm ⊢
@@ -447,7 +447,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
               have hcong : (⟨g' * s * g'⁻¹, hgsg_N⟩ : N) =
                   ⟨g', hg'N⟩ * ⟨s, hsN⟩ * ⟨g', hg'N⟩⁻¹ := by
                 apply Subtype.ext
-                show g' * s * g'⁻¹ = (↑(⟨g', hg'N⟩ * ⟨s, hsN⟩ * ⟨g', hg'N⟩⁻¹ : N) : G)
+                change g' * s * g'⁻¹ = (↑(⟨g', hg'N⟩ * ⟨s, hsN⟩ * ⟨g', hg'N⟩⁻¹ : N) : G)
                 push_cast
                 rfl
               rw [hcong] at h1
@@ -1136,7 +1136,7 @@ private theorem coe_sup_eq_set_mul_of_set_mul_comm {H K : Subgroup G}
         exact ⟨a, ha, 1, K.one_mem, mul_one a⟩
       · intro b hb
         exact ⟨1, H.one_mem, b, hb, one_mul b⟩
-  show ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G)
+  change ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G)
   rw [← hHK_eq]
   rfl
 
