@@ -117,6 +117,60 @@ CLAUDE.md 規約: 識別子に **番号を入れない** (`thm_1_4` NG), 記述�
 Isaacs: 1 章 = 1 ファイル, 1500-2000 行で subsection 単位に分割.  
 BG / Peterfalvi: 1 節 = 1 ファイル. **先回り分割しない** — 育つかどうかは事前に読めない.
 
+### 2.7 mathlib ラッパー方針 (2026-05-21 確定)
+
+CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` の規約に対応する詳細。
+
+#### 書かない (デフォルト)
+
+```lean
+-- ❌ 純粋なリネーム — 維持負担のみで価値無し
+theorem inf_isSubnormal {S T} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
+    (S ⊓ T).IsSubnormal := hS.inf hT
+```
+
+理由:
+- mathlib API 変更時の追従コスト
+- 同事実が 2 名で呼ばれてプロジェクト内の証明が分裂する
+- 将来 upstream するときどうせ消す
+- CLAUDE.md の "Don't add abstractions beyond what the task requires" にも反する
+
+#### 書く例外
+
+| ケース | 例 |
+|---|---|
+| 引数順 / convention 適応 | `commute_of_disjoint_normal` — mathlib `commute_of_normal_of_disjoint M N` を Isaacs 流の `[Normal] + Disjoint` で取り直す |
+| 仮定特殊化 | `cauchy [Finite G]` — mathlib `exists_prime_orderOf_dvd_card'` を Finite 仮定に specialize して呼び出しを短くする |
+| 章内で 2 回以上呼ぶ慣用名 | `sylow_nonempty` — Isaacs Thm 1.7 として呼びたい場合 |
+
+**判定基準**: 「章内で 2 回以上呼ぶ **かつ** 適応が必要」 ⇒ ラッパー OK。
+それ以外は本体側で mathlib 名を直接呼ぶ。
+
+#### 書かない場合のトレーサビリティ
+
+教科書 ↔ mathlib の対応は以下のいずれかで残す (どちらか必須、両方やる必要は無い):
+
+1. **`notes/{book}/{chXX,sNN}_*.md` の対応表** (一次ソース、章/節単位):
+   ```markdown
+   | Isaacs | mathlib | 備考 |
+   |---|---|---|
+   | Thm 2.4 | `Subgroup.IsSubnormal.inf` | 直接利用、wrap 不要 |
+   ```
+
+2. **section 冒頭の docstring** (本体に近い場所で記録したい場合):
+   ```lean
+   /-! ### mathlib 直接利用 (本ファイル内に wrapper を置かない)
+   * **Isaacs Cor 2.4** (`S ∩ T subnormal`): `Subgroup.IsSubnormal.inf`
+   * **Isaacs Lemma 2.7** (...): `Subgroup.commute_of_normal_of_disjoint`
+   -/
+   ```
+
+これで `grep "Thm 2."` の網羅性は保たれる ⇒ **コード本体に薄い wrapper を置く必要は無い**。
+
+#### 既存コードへの retrofit
+
+新規ファイル (Ch.2 以降) はこの方針で書く。Ch.1 既存ラッパー (`sylow_nonempty`, `cauchy` 等) は判定基準に合致する範囲で残し、合致しないものは将来 cleanup commit で削除予定。**緊急 refactor はしない** — green build を保つ方が優先。
+
 ---
 
 ## 3. 詰まった証明パターン (後で再着手用 backlog)
