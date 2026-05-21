@@ -97,10 +97,87 @@ rewrite チェーンを試行錯誤する作業。
 **所要時間**: ~ 3 commit batches。並列なしの逐次なら推定 2-3 倍。
 **反省**: もっと早く並列に振るべきだった (最初の §1A は逐次でやり始めた)。
 
-## 6. 関連メモリ・規約
+## 6. Wave 4-6 で見えた長大証明での失敗パターン (2026-05-21 後半)
+
+§1E Thm 1.32 / 1.33 / 1.36 (200-300 行クラスの長い証明) を agent に投げた経験から、
+**「短い独立補題は速いが、長い証明は agent 単独で完走しない」** ことが明確に出た。
+
+### 6.1 戦績データ
+
+| Wave | 対象 | 結果 | コスト | 採用 |
+|---|---|---|---|---|
+| 4-A | Thm 1.36 (~250 行) | breadcrumb のみ (proof 未完) | 標準 | 不採用 |
+| 4-B | Thm 1.31 一般 (~100 行) | ✅ build green | 標準 | 採用 |
+| 4-C | Thm 1.16 (~190 行) | ✅ build green | 標準 | 採用 |
+| 4-D | Thm 1.32 弱形 | 仮定追加で signature 違い | 標準 | 不採用 |
+| 5-X | Thm 1.36 (~940 行で再挑戦) | build red 22 件で力尽き | 1087s / 104 tool calls | 不採用 |
+| 5-Y | Thm 1.32 完全 + Thm 1.33 | 4 sorry, k=3 ケース未完 | 1391s / 114 tool calls | 部分構造のみ手動で salvage |
+
+### 6.2 観察された失敗様式
+
+1. **API name death spiral**: 長い証明 (250+ 行) では mathlib API 名一致が 20-30 ヶ所必要になり、
+   各 fix で 1-2 ツールコール消費 → トークン予算が尽きる前に決着がつかない。
+   `Subgroup.card_dvd_card_of_le` (実際は `Subgroup.card_dvd_of_le`)、
+   `Nat.Coprime.pow_right_iff` (実際は `Nat.Coprime.pow_right`)、
+   `Nat.dvd_prime_pow (n := 3)` (実際は `(m := 3)`)、
+   `Subgroup.card_lt_card` (存在しない)、
+   `Subgroup.card_mul_eq_card_mul_div` (存在しない) など。
+2. **Stale base 問題**: `isolation: "worktree"` で agent を切ると、main の最新 commit 以前から
+   分岐するため、**直前の wave で main に取り込んだ補題が agent からは見えない**。
+   Wave 5-X は Wave 4-C の Thm 1.16 を使うつもりで投げたが、worktree の base は
+   c8cfd41 (Thm 1.16 取り込み前) で、結局 Thm 1.16 を使わない別アプローチに走った。
+3. **部分結果の信頼性**: `agent_result.success = true` でも sorry が混入していたり、
+   theorem signature が当初仕様と違っていたりする。**必ず手で確認**。
+
+### 6.3 ハイブリッド方式 — 速かったのはコレ
+
+Thm 1.32 のケース:
+- Wave 5-Y agent: 4 sorry + 5 API mismatch を残して停止 (1391 秒)
+- 手動 salvage: agent の骨格を main に splice → ビルド → 5 エラーを 5 回の build cycle で fix
+- **所要時間**: 約 10 分 (Edit + build × 5)
+
+→ **agent が提示した structural skeleton を 100% 信頼するのではなく、
+  「設計図」として受け取って手で完成させる**ハイブリッドが、純粋 agent 委譲より速い。
+
+### 6.4 更新された heuristics
+
+| サイズ | 推奨アプローチ |
+|---|---|
+| ~20 行 | 手動 (agent 起動コスト > 利得) |
+| 20-80 行, mathlib 直系 | agent 単独で worktree |
+| 80-200 行, 中規模新証明 | agent 単独, ただしプロンプトで具体 API 名を 5-10 個明示 |
+| 200-400 行, 複雑な structure | **ハイブリッド**: agent で骨格 → 手で splice + 細部修正 |
+| 400+ 行, 長大複合証明 | 補題分割を先にやってから個別 agent |
+
+### 6.5 一行サマリ (改訂 heuristics, 2026-05-21 後半)
+
+**デフォルトは手動**。次のいずれかを満たすときだけ agent を起動する:
+
+1. **独立並列タスクが同時に来ている** — 並列にしないと時短にならない場合。
+2. **read-only の悉皆調査** — Explore agent で mathlib grep / ファイル横断調査。
+3. **30 分以上手動でかかる、かつ入出力が明確な単一タスク** — 概ね 50-150 行の中規模補題で
+   API 名がすでに分かっているもの。
+
+**投げない**:
+- **長大証明 (200+ 行) 単独委譲**: Wave 5 で 2 連敗 (Thm 1.32, Thm 1.36)。
+  API 名一致が 20+ 箇所必要になり、トークン予算が尽きる前に決着しない。
+  どうしても agent を使うならハイブリッド (§ 6.3) — 骨格を取り出して手で splice。
+- **アーキテクチャ判断 / 名前空間設計**: 会話コンテキストが本質。
+- **5 分以下の軽い follow-up**: 起動コストが利得を上回る。
+
+### 6.6 並列 wave の依存関係に注意
+
+Wave 4-B (Thm 1.31 一般) と Wave 4-C (Thm 1.16) は **独立** に走らせたが、
+**Thm 1.36 は Thm 1.16 に依存する** ため Wave 4-A は本来 Wave 4-C 後に走らせるべきだった。
+並列発注時は依存グラフを 1 度書き出す。次回からは:
+1. 依存無しグループを 1 batch
+2. それを main に取り込んでから依存ありグループを別 batch
+
+## 7. 関連メモリ・規約
 
 - [`CLAUDE.md`](../../CLAUDE.md) — プロジェクト規約 (ファイル粒度・トレーサビリティ 3 層・mathlib 互換命名)
 - [`ROADMAP.md`](../../ROADMAP.md) — Phase 計画 + 章節チェックリスト
+- [`lean_formalization_tips.md`](lean_formalization_tips.md) — mathlib API gotcha 集 (§ 6 で言及した API 名の正解一覧はここ)
 - オートメモリ `feedback_subagent_orchestration.md` — このファイルへのポインタ (自動ロード用)
 
 このファイルは知見の蓄積場所として進化させていく。新しい知見が出たら追記、古くなった項目は更新 (削除より追記+理由併記が望ましい)。

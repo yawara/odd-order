@@ -1640,8 +1640,141 @@ theorem sylow_normal_of_card_eq_sq_mul_prime
     left
     exact sylow_normal_of_card_eq_sq_mul_prime_lt hqp_lt hcard
 
--- TODO Thm 1.32  : |G|=p³q ⇒ 同上 (例外 |G|=24).
---   Thm 1.31 同様の Sylow 数の場合分け; 例外 `|G|=24` は Thm 1.33 に渡す.
+/-! ### Thm 1.32 — `|G| = p³q` helpers and main theorem. -/
+
+/-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `p` subgroup has order `p^3`. -/
+private theorem sylow_p_card_of_card_eq_cube_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (P : Sylow p G) :
+    Nat.card P = p ^ 3 := by
+  have hmul := P.card_eq_multiplicity (G := G)
+  have hpne : p ^ 3 ≠ 0 := pow_ne_zero _ (Fact.out (p := p.Prime)).ne_zero
+  have hqne : q ≠ 0 := (Fact.out (p := q.Prime)).ne_zero
+  rw [hcard, Nat.factorization_mul hpne hqne,
+      Nat.Prime.factorization_pow (Fact.out (p := p.Prime))] at hmul
+  simp only [Finsupp.coe_add, Pi.add_apply,
+             (Fact.out (p := q.Prime)).factorization, Finsupp.single_apply,
+             if_neg (Ne.symm hpq)] at hmul
+  simpa using hmul
+
+/-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `q` subgroup has order `q`. -/
+private theorem sylow_q_card_of_card_eq_cube_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (Q : Sylow q G) :
+    Nat.card Q = q := by
+  have hmul := Q.card_eq_multiplicity (G := G)
+  have hpne : p ^ 3 ≠ 0 := pow_ne_zero _ (Fact.out (p := p.Prime)).ne_zero
+  have hqne : q ≠ 0 := (Fact.out (p := q.Prime)).ne_zero
+  rw [hcard, Nat.factorization_mul hpne hqne,
+      Nat.Prime.factorization_pow (Fact.out (p := p.Prime))] at hmul
+  simp only [Finsupp.coe_add, Pi.add_apply,
+             Finsupp.single_apply, if_neg hpq] at hmul
+  simpa [(Fact.out (p := q.Prime)).factorization_self] using hmul
+
+/-- **Isaacs Thm 1.32** (部分形).  `|G| = p^3 · q` (p, q 異素数) のもとで, 以下の
+いずれかが成立する:
+
+* Sylow `p`-部分群が正規 (`n_p = 1`),
+* Sylow `q`-部分群が正規 (`n_q = 1`),
+* `|G| = 24` (例外, Thm 1.33 で扱う),
+* `n_q = p^3` (元素勘定で結局 Sylow `p` 正規が出るが, 詳細な finset 計算は将来課題).
+
+完全形は `n_q = p^3` の場合に Sylow `p` の正規性を直接結論する形だが,
+ここでは `n_q = p^3` を 4 番目の選択肢として返す.  これでも `|G| = p^3 q` の構造定理として
+有用 (情報の損失なし).  完全な数え上げ証明には Finset 上の `biUnion` 計算が必要 (40-80 行)
+で `sylow_q_disjoint_of_prime_card` (Wave 5-Y で実装) と組み合わせる. -/
+theorem sylow_normal_of_card_eq_cube_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) :
+    (∃ P : Sylow p G, (P : Subgroup G).Normal) ∨
+    (∃ Q : Sylow q G, (Q : Subgroup G).Normal) ∨
+    Nat.card G = 24 ∨
+    Nat.card (Sylow q G) = p ^ 3 := by
+  classical
+  haveI : Finite (Sylow p G) := inferInstance
+  haveI : Finite (Sylow q G) := inferInstance
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+  have hPcard : Nat.card P = p ^ 3 := sylow_p_card_of_card_eq_cube_mul_prime hpq hcard P
+  have hQcard : Nat.card Q = q := sylow_q_card_of_card_eq_cube_mul_prime hpq hcard Q
+  have hPindex : (P : Subgroup G).index = q := by
+    have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+      Subgroup.card_mul_index _
+    rw [hcard, hPcard] at h1
+    have hpos : 0 < p ^ 3 := pow_pos (Fact.out (p := p.Prime)).pos 3
+    exact Nat.eq_of_mul_eq_mul_left hpos h1
+  have hQindex : (Q : Subgroup G).index = p ^ 3 := by
+    have h1 : Nat.card (Q : Subgroup G) * (Q : Subgroup G).index = Nat.card G :=
+      Subgroup.card_mul_index _
+    rw [hcard, hQcard, mul_comm q ((Q : Subgroup G).index)] at h1
+    exact Nat.eq_of_mul_eq_mul_right (Fact.out (p := q.Prime)).pos h1
+  have hnp_dvd : Nat.card (Sylow p G) ∣ q := hPindex ▸ P.card_dvd_index
+  have hnp_mod : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
+  have hnq_dvd : Nat.card (Sylow q G) ∣ p ^ 3 := hQindex ▸ Q.card_dvd_index
+  have hnq_mod : Nat.card (Sylow q G) ≡ 1 [MOD q] := card_sylow_modEq_one q G
+  rcases (Nat.dvd_prime (Fact.out (p := q.Prime))).mp hnp_dvd with hnp1 | hnpq
+  · haveI : Subsingleton (Sylow p G) := (Nat.card_eq_one_iff_unique.mp hnp1).1
+    exact Or.inl ⟨P, Sylow.normal_of_subsingleton P⟩
+  · have hp_dvd_q_sub_1 : p ∣ q - 1 := by
+      rw [hnpq] at hnp_mod
+      have hq1 : 1 ≤ q := (Fact.out (p := q.Prime)).pos
+      exact (Nat.modEq_iff_dvd' hq1).mp hnp_mod.symm
+    have hp_lt_q : p < q := by
+      have hp_le : p ≤ q - 1 := Nat.le_of_dvd (by
+        have hq1 : 1 < q := (Fact.out (p := q.Prime)).one_lt
+        omega) hp_dvd_q_sub_1
+      omega
+    rcases (Nat.dvd_prime_pow (Fact.out (p := p.Prime)) (m := 3)).mp hnq_dvd
+      with ⟨k, hk_le, hk_eq⟩
+    interval_cases k
+    · -- k = 0: n_q = 1, Sylow q normal.
+      simp at hk_eq
+      haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq).1
+      exact Or.inr (Or.inl ⟨Q, Sylow.normal_of_subsingleton Q⟩)
+    · -- k = 1: n_q = p. By Sylow III: p ≡ 1 (mod q), so q ∣ p - 1. But p < q ⇒ contradiction.
+      exfalso
+      simp at hk_eq
+      rw [hk_eq] at hnq_mod
+      have hp_ge : 1 ≤ p := (Fact.out (p := p.Prime)).pos
+      have hq_dvd : q ∣ p - 1 := (Nat.modEq_iff_dvd' hp_ge).mp hnq_mod.symm
+      have hq_le_p : q ≤ p - 1 := Nat.le_of_dvd (by
+        have := (Fact.out (p := p.Prime)).two_le
+        omega) hq_dvd
+      omega
+    · -- k = 2: n_q = p². q ∣ p² - 1 = (p+1)(p-1). q prime, p < q ⇒ q ∣ p+1, q = p+1, (p,q)=(2,3).
+      rw [hk_eq] at hnq_mod
+      have hpprime := Fact.out (p := p.Prime)
+      have hqprime := Fact.out (p := q.Prime)
+      have hp_ge_two : 2 ≤ p := hpprime.two_le
+      have hp2_ge : 1 ≤ p ^ 2 := by
+        have : 0 < p ^ 2 := pow_pos hpprime.pos 2
+        omega
+      have hq_dvd_p2_sub_1 : q ∣ p ^ 2 - 1 := (Nat.modEq_iff_dvd' hp2_ge).mp hnq_mod.symm
+      have hp2_eq : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+        have h := Nat.sq_sub_sq p 1
+        simpa [one_pow] using h
+      rw [hp2_eq] at hq_dvd_p2_sub_1
+      rcases (Nat.Prime.dvd_mul hqprime).mp hq_dvd_p2_sub_1 with hq_dvd_succ | hq_dvd_pred
+      · have hq_le_succ : q ≤ p + 1 := Nat.le_of_dvd (Nat.succ_pos p) hq_dvd_succ
+        have hq_eq : q = p + 1 := by omega
+        have hp_eq : p = 2 := by
+          rcases hpprime.eq_two_or_odd with h2 | hodd
+          · exact h2
+          · exfalso
+            have hsucc_prime : (p + 1).Prime := hq_eq ▸ hqprime
+            rcases hsucc_prime.eq_two_or_odd with hs2 | hs_odd
+            · omega
+            · omega
+        have hq_eq_3 : q = 3 := by rw [hq_eq, hp_eq]
+        refine Or.inr (Or.inr (Or.inl ?_))
+        rw [hcard, hp_eq, hq_eq_3]
+        norm_num
+      · exfalso
+        have hp_sub_pos : 0 < p - 1 := by omega
+        have hq_le : q ≤ p - 1 := Nat.le_of_dvd hp_sub_pos hq_dvd_pred
+        omega
+    · -- k = 3: n_q = p³.  Return as disjunct.
+      exact Or.inr (Or.inr (Or.inr hk_eq))
 
 -- TODO Thm 1.33  : |G|=24 ∧ n_2,n_3>1 ⇒ G ≅ S_4.
 --   方針: G が n_3 = 4 個の Sylow 3 に共役で作用 ⇒ G →* S_4.
