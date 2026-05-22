@@ -928,6 +928,15 @@ theorem Subgroup.IsPiGroup.bot {G : Type*} [Group G] (π : Set ℕ) :
   intro p hp
   simp [Subgroup.card_bot] at hp
 
+/-- **IsPiGroup は subgroup inclusion で保持**: 有限 G で `H ≤ K` and `K` is π-group
+⇒ `H` is π-group. `Nat.card ↥H ∣ Nat.card ↥K` で primeFactors 包含. -/
+theorem Subgroup.IsPiGroup.le {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {H K : Subgroup G} (hHK : H ≤ K) (hK : Subgroup.IsPiGroup π K) :
+    Subgroup.IsPiGroup π H := by
+  intro p hp
+  have hdvd : Nat.card ↥H ∣ Nat.card ↥K := Subgroup.card_dvd_of_le hHK
+  exact hK p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
+
 /-- **Hall-Higman 3.21 case π core**: `K ⊴ G` π-group + `K ≤ C_G(O_π(G))` ⇒
 `K ≤ C_G(O_π(G)) ⊓ O_π(G)`.
 
