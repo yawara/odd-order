@@ -351,8 +351,44 @@ theorem commutator_lowerCentralSeries_le (i j : ℕ) :
     rw [Subgroup.commutator_comm]
     exact key
 
-/-! **Isaacs Cor 4.12** (weight n commutator ⊆ G^n), **Cor 4.13** (derived ⊆ lcs,
-derived length ≤ 1 + log₂ m): Thm 4.11 系. 形式化保留. -/
+/-! **Isaacs Cor 4.12** (weight n commutator ⊆ G^n): 任意の重み `n` の左結合交換子
+`⁅⁅...⁅g₁, g₂⁆, g₃⁆ ..., gₙ⁆` は `G^n` (= mathlib `lcs (n-1)`) に含まれる. 弱結合や
+別配置でも同じ `G^n` への inclusion が成立 (Thm 4.11 経由).
+
+形式化保留 (`weight n commutator` の汎用 mathlib API 不在; 個別誘導で書ける). -/
+
+/-- **Isaacs Cor 4.13** (derived ⊆ lcs with exponential index):
+`derivedSeries G r ≤ lowerCentralSeries G (2^r - 1)`.
+
+mathlib 既存の `derived_le_lower_central` (`derived r ≤ lcs r`) より strictly stronger
+(`r ≥ 2` で lcs が antitone のため): Isaacs notation `G^{(r)} ⊆ G^{2^r}` (`G^k = lcs (k-1)`,
+`G^{(r)} = derivedSeries r`) に対応.
+
+**証明** (Isaacs p.124): `r`-induction.
+* base `r = 0`: `derivedSeries 0 = ⊤ = lcs 0 = lcs (2^0 - 1)` (rfl).
+* step: `derivedSeries (r+1) = ⁅derivedSeries r, derivedSeries r⁆`
+  - IH + `commutator_mono`: ≤ `⁅lcs (2^r-1), lcs (2^r-1)⁆`.
+  - **Thm 4.11** (`commutator_lowerCentralSeries_le`): ≤ `lcs ((2^r-1) + (2^r-1) + 1)`.
+  - 算術: `(2^r-1) + (2^r-1) + 1 = 2·2^r - 1 = 2^(r+1) - 1` (`1 ≤ 2^r` 経由).
+
+**系** (Isaacs Cor 4.13 文): `G` nilpotent class `m` (`lcs m = ⊥`) ⇒ derived length
+`≤ 1 + ⌈log₂ m⌉`. 本リポでは boolean form のみ実装, log₂ 操作は別途. -/
+theorem derivedSeries_le_lowerCentralSeries_two_pow_sub_one (r : ℕ) :
+    derivedSeries G r ≤ lowerCentralSeries G (2 ^ r - 1) := by
+  induction r with
+  | zero => simp
+  | succ r ih =>
+    rw [derivedSeries_succ]
+    calc ⁅derivedSeries G r, derivedSeries G r⁆
+        ≤ ⁅lowerCentralSeries G (2 ^ r - 1), lowerCentralSeries G (2 ^ r - 1)⁆ :=
+          Subgroup.commutator_mono ih ih
+      _ ≤ lowerCentralSeries G ((2 ^ r - 1) + (2 ^ r - 1) + 1) :=
+          commutator_lowerCentralSeries_le _ _
+      _ = lowerCentralSeries G (2 ^ (r + 1) - 1) := by
+          congr 1
+          have h1 : 1 ≤ 2 ^ r := Nat.one_le_two_pow
+          rw [pow_succ]
+          omega
 
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
