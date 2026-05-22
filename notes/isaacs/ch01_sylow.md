@@ -13,7 +13,7 @@
 | 1D | 冪零群, Fitting 部分群 `F(G)` | Thm 1.19–1.29 (11 件) | 1.19, 1.20, 1.21, 1.22, 1.23, 1.24(弱形), 1.25, 1.26, 1.27 ✅, opCore + Problem 1B.2 + fitting + fitting.normal ✅, 1.28(a), 1.28(b), 1.29 ✅ (全 11/11 + Fitting) |
 | 1E | 小位数群, 指数 2 正規部分群 | Thm 1.30–1.36 (7 件) | 1.30 (前半 + cyclic), 1.31 一般, 1.32, 1.33, 1.34, 1.35, 1.36 ✅ (2026-05-22 全完) |
 | 1F | Brodkey (abelian Sylow) | Thm 1.37–1.40 (4 件) | 1.37, 1.38, 1.39, 1.40 ✅ (2026-05-21) |
-| 1G | Chermak–Delgado | Thm 1.41–1.46 (6 件) | **省略** (BG/Peterfalvi grep 0 件, 2026-05-21) |
+| 1G | Chermak–Delgado | Thm 1.41–1.46 (6 件) | **実装予定 (2026-05-23 決定変更)** — 当初 BG/Peterfalvi 引用 0 件で省略, mathlib upstream 価値のため実装方針へ. `OddOrder/Mathlib/Subgroup.lean` (H1, H2 helper) + `OddOrder/GroupTheory/ChermakDelgado.lean` (§1G 本体) ~200 LOC / ~2 日. 実装計画: [`../meta/ch01_chermak_delgado_plan.md`](../meta/ch01_chermak_delgado_plan.md) |
 
 ## mathlib 対応表
 

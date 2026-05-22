@@ -3193,20 +3193,52 @@ theorem opCore_ne_bot_of_card_sylow_sq_gt
 
 end -- 1F
 
-section /- 1G: Chermak–Delgado (pp. 41-44) — Phase 1 では省略 -/
+section /- 1G: Chermak–Delgado (pp. 41-44) — 実装計画策定済, ファイル分離予定 -/
 
-/-! ### §1G (Chermak–Delgado measure) は本プロジェクトでは省略
+/-! ### §1G (Chermak–Delgado measure): 実装方針 (2026-05-23 更新)
 
-**省略理由 (2026-05-21 決定)**: Isaacs §1G は Chermak–Delgado measure
-`m_G(H) := |H|·|C_G(H)|` と最大値部分群族 `L(G)` の理論 (Thm 1.41–1.46).
+**2026-05-23 決定変更**: 旧 "省略" 判断を **mathlib upstream のための実装** に変更.
+詳細実装計画: [`notes/meta/ch01_chermak_delgado_plan.md`](../../../notes/meta/ch01_chermak_delgado_plan.md).
+
+**配置予定**:
+* `OddOrder/Mathlib/Subgroup.lean` (新規) — H1 `card_HK_mul_card_inf_eq_card_mul_card`,
+  H2 `le_centralizer_centralizer`, (任意) `centralizer_sup` 等 mathlib gap fill
+* `OddOrder/GroupTheory/ChermakDelgado.lean` (新規) — `chermakDelgadoMeasure`,
+  `chermakDelgadoLattice`, `chermakDelgadoSubgroup` + Thm 1.41-1.46 全 6 結果
+* 本 §1G section: 実装完了後に上記 import + re-export 形に書き換え
+
+**実装着手前の元 skip 経緯 (歴史記録)**:
+
+**省略理由 (2026-05-21 決定, 2026-05-23 audit で再確認)**: Isaacs §1G は Chermak–Delgado
+measure `m_G(H) := |H|·|C_G(H)|` と最大値部分群族 `L(G)` の理論 (Thm 1.41–1.46).
 本プロジェクトの目標である Feit-Thompson 形式化 (Phase 2a/2b: BG + Peterfalvi)
-において Chermak / Delgado への引用は `references/bg/*.mmd` および
-`references/peterfalvi/*.mmd` の grep 検索で **0 件** (2026-05-21 確認).
-従って本プロジェクトのスコープ外として正式に省略する.
+において Chermak / Delgado への引用は **0 件** — 2026-05-23 fresh grep で再確認:
+* BG mmd: 0 件 (`chermak|delgado` ファイルレベル)
+* Peterfalvi mmd: 0 件 (同上)
+* Isaacs Ch.2-10 proof body: 0 件 (索引 2 行 (L5308, L5370) のみ)
+
+⇒ 本プロジェクトのスコープ外として正式に省略する.
+
+**2026-05-23 audit の tactical refinement**: §1G 実装は副産物として mathlib upstream 価値の
+高い 2 helper を要求 — どちらも mathlib v4.29.1 不在:
+* H1 `Subgroup.card_HK_mul_card_inf_eq_card_mul_card`
+  (古典 `|HK|·|H∩K| = |H|·|K|`; mathlib `index_inf_le` 等は部分対応のみ)
+* H2 `Subgroup.le_centralizer_centralizer`
+  (`H ≤ C_G(C_G(H))`, IsMulCommutative 仮定なし; 既存 `le_centralizer` は仮定強すぎ)
+
+これら helper は **§1G 本体を待たず**, Ch.2+ で必要になった時点で
+`OddOrder/GroupTheory/Subgroup.lean` 等に standalone 実装する方針.
 
 将来 mathlib 本体への寄与時等に必要となれば Isaacs Thm 1.41–1.46 を本節に
 追加する; その際の起点は本書 pp.41-44 の議論で, 特に Lemma 1.43
 (m の不等式) が技術的中核.
+
+**Deferred-revisit triggers** (2026-05-23):
+1. 後の Isaacs/BG/Peterfalvi 節で `m_G(H)` 記法 / "Chermak-Delgado" 概念が現れる (periodic grep)
+2. H1, H2 helper が他の理由で実装される (累積で §1G 実装コスト ~150 → ~80 LOC に低下)
+3. Phase 1 完成後の mathlib upstream pivot
+
+詳細は [`notes/meta/ch01_audit_2026_05_23.md`](../../../notes/meta/ch01_audit_2026_05_23.md).
 
 関連項目: §1F Brodkey (Thm 1.37) は Chermak–Delgado から派生する Cor 1.39 の
 abelian Sylow 版で, こちらは本ファイル §1F に実装済 (`exists_pair_inf_eq_opCore_of_abelian`,

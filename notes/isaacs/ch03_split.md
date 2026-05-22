@@ -15,7 +15,7 @@
 | Thm 3.2 part 3 (conjugation = action) | ✅ | `inr_conj_inl_eq` (mathlib `inl_aut` ラッパー) |
 | Thm 3.1 (uniqueness via mulEquivSubgroup) | ✅ | `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` 再述) |
 | **Thm 3.3 Horosevskii** | ✅ (2026-05-22) | `horosevskii_aut_order_lt`: `orderOf σ < Nat.card G`. Ch.2 Lucchini axiom + 半直積 (mathlib `SemidirectProduct`) + `inl_range_isComplement_inr_range` (Thm 3.2 part 2) + Lemma 2.7 (`commute_of_normal_of_disjoint`) で完全証明 (~120 行) |
-| Thm 3.4 (abelian P regular orbit) | TODO | Ch.1 §1F Brodkey (Thm 1.37) 待ち |
+| Thm 3.4 (abelian P regular orbit) | ✅ (2026-05-21 完成, 2026-05-23 audit で確認) | `abelian_p_aut_regular_orbit` L255-424. Ch.1 §1F Thm 1.37 Brodkey + `opCore` + Lemma 2.7 + Sylow II 経由 |
 | §3B Schur-Zassenhaus (3.5-3.10) | docstring | mathlib 対応表のみ (`exists_right_complement'_of_coprime`, `IsSolvable` instance chains) |
 | §3B Thm 3.11 前半 (abelian) | ✅ | `solvable_minimal_normal_isAbelian` (`⁅M,M⁆ < M` + 最小性) |
 | §3B Thm 3.11 後半 (elementary abelian) | ✅ | `solvable_minimal_normal_isElementaryAbelian` (p-torsion T が characteristic in M + 最小性) |
@@ -136,10 +136,9 @@ Ch.2 と比べて **mathlib カバレッジは厚い** が、FT クリティカ�
 |---|---|---|
 | Thm 3.2 半直積 | `SemidirectProduct` (`Mathlib/GroupTheory/SemidirectProduct.lean`) | external semidirect product 構成 |
 | Def 補集合 | `Subgroup.IsComplement`, `IsComplement'` (`Mathlib/GroupTheory/Complement.lean`) | |
-| Thm 3.5 SZ abelian | `Subgroup.exists_right_complement'_of_coprime` (`SchurZassenhaus.lean:274`) で同時に得る | 一般版を直接提供 |
-| Thm 3.8 SZ general | `Subgroup.exists_right_complement'_of_coprime` / `exists_left_complement'_of_coprime` | abelian 仮定不要 |
+| Thm 3.5 SZ abelian + Thm 3.8 SZ general | **`Subgroup.exists_right_complement'_of_coprime` 1 つで両方カバー** (`SchurZassenhaus.lean:274`, abelian 仮定不要) — 2026-05-23 audit 確認 | 3.5 / 3.8 別実装は不要 |
 | Def IsSolvable | `IsSolvable` class (`Mathlib/GroupTheory/Solvable.lean:106`) | 既存. Thm 3.9, 3.10 ラッパー可 |
-| Thm 3.9 G^{(m)}=1 | mathlib `derivedSeries` + `IsSolvable` の同値 | 直接対応あるはず (要確認) |
+| Thm 3.9 G^{(m)}=1 | **`isSolvable_def`** (auto-gen `@[mk_iff]`, `Solvable.lean:105`) が exact match. 2026-05-23 audit 確認: `derivedSeries_eq_bot_iff` や `isSolvable_iff_derivedSeries_eq_bot` は mathlib v4.29.1 に **存在しない** | `(isSolvable_def G).symm` 1 行 |
 | Thm 3.10 solvable 基本 | mathlib に整っているはず (subgroup/quotient/extension) | |
 
 ### 新規実装が必要な主要項目
@@ -220,5 +219,6 @@ A-invariant Hall (Isaacs 3.23 の流れ) も精神的には必要だが、BG は
 * **3.23-3.34 (coprime action) の優先度** — Isaacs Ch.4+ で 3.28 が 3 回引用される
   以外、BG/Peterfalvi 直接引用無し. ⇒ Ch.4-7 を実装する時に順次必要になる予感だが、
   §3E をひとまとめに実装するか、必要分だけ pull するか要判断.
-* **3.31 Hartley-Turull** — Isaacs 独自結果. 完全な形式化は時間がかかる. FT 経路で
-  本当に必要かどうか, Ch.5-6 着手時に再評価.
+* **3.31 Hartley-Turull** — Isaacs 独自結果. **BG / Peterfalvi で by-name 引用 0 件**
+  (2026-05-23 audit grep 確認). Ch.4-10 でも by-name cite 無し. ⇒ **Phase 4 までも skip 可**,
+  Phase 1 完成度のためのみ.
