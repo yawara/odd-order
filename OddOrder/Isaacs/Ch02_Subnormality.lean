@@ -2343,31 +2343,146 @@ theorem zenkov_case1_le_fitting {G : Type*} [Group G] [Finite G] {A B : Subgroup
   exact h_inf_center.trans (center_le_fitting G)
 
 open scoped Pointwise in
+/-- **Isaacs Thm 2.18 (Zenkov)** WLOG version (`g₀ = 1`, `M = A ⊓ B`): `|G|`-induction.
+Case 1: `zenkov_case1_le_fitting`. Case 2: Sylow-by-Sylow via Baer iff + IH on `↥H`. -/
+private theorem zenkov_wlog_aux : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G], Nat.card G ≤ n →
+    ∀ (A B : Subgroup G),
+      (∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a) →
+      (∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b) →
+      (∀ g : G, (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤ A ⊓ B →
+        (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) = A ⊓ B) →
+      (A ⊓ B : Subgroup G) ≤ fitting G := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hcard A B _ _ _
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ hcard A B hAab hBab hMin
+    classical
+    by_cases h_case1 : ∃ g : G, A ⊔ ((MulAut.conj g) • B : Subgroup G) = ⊤
+    · exact zenkov_case1_le_fitting hAab hBab hMin h_case1
+    push_neg at h_case1
+    -- Case 2.
+    set M := (A ⊓ B : Subgroup G) with hM_def
+    -- Show M ≤ fitting G via Sylow + Baer.
+    have hM_top_map : ((⊤ : Subgroup ↥M).map M.subtype : Subgroup G) = M := by
+      rw [← MonoidHom.range_eq_map, M.range_subtype]
+    have hM_eq_sup : (M : Subgroup G) =
+        (⨆ p : (Nat.card ↥M).primeFactors, ⨆ P : Sylow p.val ↥M,
+          ((P : Subgroup ↥M).map M.subtype : Subgroup G)) := by
+      conv_lhs => rw [← hM_top_map, ← iSup_sylow_eq_top (M := ↥M)]
+      simp_rw [Subgroup.map_iSup]
+    rw [hM_eq_sup]
+    refine iSup_le fun p => iSup_le fun P => ?_
+    haveI hp_prime : Fact p.val.Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+    set P_in_G : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPG_def
+    have hP_pgroup : IsPGroup p.val ↥P_in_G := P.2.map M.subtype
+    have hP_in_M : P_in_G ≤ M := by
+      rw [hPG_def]
+      intro y hy
+      obtain ⟨z, _, hz⟩ := hy
+      rw [← hz]; exact z.2
+    -- Use Baer iff: P_in_G ≤ fitting G iff ∀ x, ⟨P_in_G, P_in_G^x⟩ nilpotent.
+    rw [le_fitting_iff_baer_sup_conj_isNilpotent]
+    intro x
+    set H : Subgroup G := A ⊔ ((MulAut.conj x) • B : Subgroup G) with hH_def
+    have hH_proper : H ≠ ⊤ := h_case1 x
+    have hH_card_le : Nat.card ↥H ≤ n := by
+      have hlt : Nat.card ↥H < Nat.card G := by
+        have h_le : Nat.card ↥H ≤ Nat.card G := H.card_le_card_group
+        have h_ne : Nat.card ↥H ≠ Nat.card G := fun heq =>
+          hH_proper (Subgroup.eq_top_of_card_eq H heq)
+        omega
+      omega
+    have hA_le_H : A ≤ H := le_sup_left
+    have hBx_le_H : ((MulAut.conj x) • B : Subgroup G) ≤ H := le_sup_right
+    have hM_le_H : M ≤ H := le_trans (inf_le_left : (A ⊓ B : Subgroup G) ≤ A) hA_le_H
+    have hP_le_H : P_in_G ≤ H := hP_in_M.trans hM_le_H
+    have hP_le_B : P_in_G ≤ B := hP_in_M.trans (inf_le_right : (A ⊓ B : Subgroup G) ≤ B)
+    have hPx_le_H : ((MulAut.conj x) • P_in_G : Subgroup G) ≤ H := by
+      refine le_trans ?_ hBx_le_H
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hP_le_B
+    -- Apply IH on ↥H.
+    have hAH_ab : ∀ a ∈ A.subgroupOf H, ∀ b ∈ A.subgroupOf H, a * b = b * a := by
+      intro a ha b hb
+      rw [Subgroup.mem_subgroupOf] at ha hb
+      exact Subtype.ext (hAab _ ha _ hb)
+    have hBH_ab : ∀ a ∈ B.subgroupOf H, ∀ b ∈ B.subgroupOf H, a * b = b * a := by
+      intro a ha b hb
+      rw [Subgroup.mem_subgroupOf] at ha hb
+      exact Subtype.ext (hBab _ ha _ hb)
+    have hMin_H := zenkov_minimality_transfer hMin hA_le_H
+    have hIH : ((A.subgroupOf H : Subgroup ↥H) ⊓ B.subgroupOf H : Subgroup ↥H) ≤
+        fitting ↥H := ih ↥H hH_card_le (A.subgroupOf H) (B.subgroupOf H) hAH_ab hBH_ab hMin_H
+    -- (A.subgroupOf H) ⊓ B.subgroupOf H = M.subgroupOf H.
+    have hMH_eq : (A.subgroupOf H : Subgroup ↥H) ⊓ B.subgroupOf H = M.subgroupOf H := by
+      ext y; simp [Subgroup.mem_inf, Subgroup.mem_subgroupOf, hM_def]
+    rw [hMH_eq] at hIH
+    -- P_in_G.subgroupOf H ≤ M.subgroupOf H ≤ fitting ↥H.
+    have hPH_le_MH : P_in_G.subgroupOf H ≤ M.subgroupOf H := Subgroup.subgroupOf_mono _ hP_in_M
+    have hPH_le_F : P_in_G.subgroupOf H ≤ fitting ↥H := hPH_le_MH.trans hIH
+    -- P_in_G.subgroupOf H is p-group (via subgroupOfEquivOfLe iso).
+    have hPH_pgroup : IsPGroup p.val (P_in_G.subgroupOf H) :=
+      hP_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hP_le_H).symm
+    have hPH_le_op : P_in_G.subgroupOf H ≤ opCore p.val ↥H :=
+      mem_opCore_of_le_fitting_of_isPGroup hPH_pgroup hPH_le_F
+    -- (P_in_G)^x.subgroupOf H is p-group.
+    have hPx_pgroup : IsPGroup p.val ((MulAut.conj x) • P_in_G : Subgroup G) := by
+      rw [Subgroup.pointwise_smul_def]
+      exact hP_pgroup.map _
+    have hPxH_pgroup : IsPGroup p.val (((MulAut.conj x) • P_in_G : Subgroup G).subgroupOf H) :=
+      hPx_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hPx_le_H).symm
+    -- Sup of the two subgroupOf H is p-group.
+    have h_sup_pgroup_H : IsPGroup p.val ↥(P_in_G.subgroupOf H ⊔
+        ((MulAut.conj x) • P_in_G : Subgroup G).subgroupOf H : Subgroup ↥H) :=
+      sup_isPGroup_of_le_opCore_left hPH_le_op hPxH_pgroup
+    -- Sup of subgroupOf = (sup).subgroupOf.
+    have hsup_le_H : (P_in_G ⊔ (MulAut.conj x) • P_in_G : Subgroup G) ≤ H :=
+      sup_le hP_le_H hPx_le_H
+    have h_sup_subgroupOf : (P_in_G ⊔ (MulAut.conj x) • P_in_G : Subgroup G).subgroupOf H =
+        P_in_G.subgroupOf H ⊔ ((MulAut.conj x) • P_in_G : Subgroup G).subgroupOf H :=
+      Subgroup.subgroupOf_sup hP_le_H hPx_le_H
+    rw [← h_sup_subgroupOf] at h_sup_pgroup_H
+    -- Transfer p-group property back to G via subgroupOfEquivOfLe.
+    have h_sup_pgroup_G : IsPGroup p.val ↥(P_in_G ⊔ (MulAut.conj x) • P_in_G : Subgroup G) :=
+      h_sup_pgroup_H.of_equiv (Subgroup.subgroupOfEquivOfLe hsup_le_H)
+    exact h_sup_pgroup_G.isNilpotent
+
+open scoped Pointwise in
 /-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
 `M = A ⊓ B^{g₀}` が集合 `{A ⊓ B^g | g ∈ G}` の minimal member (包含関係について) なら,
 `M ⊆ F(G)`.
 
 書籍 p.61 の証明 (induction on `|G|`):
-1. WLOG `g₀ = 1` (B を `B^{g₀}` で置き換え).
-2. **Case G = ⟨A, B^g⟩ for some g**: A, B^g abelian ⇒ `A ⊓ B^g ⊆ Z(G)`. Z(G) 共役不変 ⇒
-   `A ⊓ B^g = (A ⊓ B^g)^{g⁻¹} ⊆ B`. 故に `A ⊓ B^g ⊆ A ⊓ B = M`. Minimality で
-   `M = A ⊓ B^g ⊆ Z(G) ⊆ F(G)`.
-3. **Case ⟨A, B^g⟩ < G for all g**: `M` の各 Sylow `p` `P` について `P ⊆ F(G)` を示す
-   (Baer iff). Fix `h`. `H = ⟨A, B^h⟩ < G`. `C = B ⊓ H`. `x ∈ H` で
-   `A ⊓ C^x = A ⊓ B^x ⊓ H = A ⊓ B^x` (A ⊆ H). `M = A ⊓ C` minimal in
-   `{A ⊓ C^x | x ∈ H}`. IH in H ⇒ `M ⊆ F(H)`, `P ⊆ O_p(H)` (Sylow p of nilpotent F(H)).
-   `P^h ⊆ B^h ⊆ H` ⇒ `P^h` normalizes `O_p(H)` ⇒ `O_p(H) · P^h` は p-group ⊇ `⟨P, P^h⟩`.
-   故に `⟨P, P^h⟩` 冪零. Baer で `P ⊆ F(G)`. -/
-axiom zenkov_minimal_le_fitting [Finite G] {A B : Subgroup G}
-    (_hA_ab : ∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a)
-    (_hB_ab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b)
+1. WLOG `g₀ = 1` (B を `B^{g₀}` で置き換え) — 本実装で wrapper.
+2. **Case G = ⟨A, B^g⟩ for some g**: `zenkov_case1_le_fitting`.
+3. **Case ⟨A, B^g⟩ < G for all g**: Sylow-by-Sylow via Baer iff + IH on ↥H. -/
+theorem zenkov_minimal_le_fitting [Finite G] {A B : Subgroup G}
+    (hA_ab : ∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a)
+    (hB_ab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b)
     (g₀ : G)
-    (_hMin : ∀ g : G,
+    (hMin : ∀ g : G,
         (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤
           A ⊓ ((MulAut.conj g₀) • B : Subgroup G) →
         (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) =
           A ⊓ ((MulAut.conj g₀) • B : Subgroup G)) :
-    (A ⊓ ((MulAut.conj g₀) • B : Subgroup G) : Subgroup G) ≤ fitting G
+    (A ⊓ ((MulAut.conj g₀) • B : Subgroup G) : Subgroup G) ≤ fitting G := by
+  -- WLOG: replace B with B' := (MulAut.conj g₀) • B. Family is the same.
+  set B' : Subgroup G := (MulAut.conj g₀) • B with hB'_def
+  have hB'_ab : ∀ b ∈ B', ∀ b' ∈ B', b * b' = b' * b := conj_smul_abelian hB_ab g₀
+  have hMin' : ∀ h : G,
+      (A ⊓ ((MulAut.conj h) • B' : Subgroup G) : Subgroup G) ≤ A ⊓ B' →
+      (A ⊓ ((MulAut.conj h) • B' : Subgroup G) : Subgroup G) = A ⊓ B' := by
+    intro h hle
+    -- (MulAut.conj h) • B' = (MulAut.conj h) • ((MulAut.conj g₀) • B) = (MulAut.conj (h * g₀)) • B.
+    have h_smul_eq : ((MulAut.conj h) • B' : Subgroup G) =
+        ((MulAut.conj (h * g₀)) • B : Subgroup G) := by
+      rw [hB'_def, ← mul_smul, ← map_mul]
+    rw [h_smul_eq] at hle ⊢
+    exact hMin (h * g₀) hle
+  exact zenkov_wlog_aux (Nat.card G) G le_rfl A B' hA_ab hB'_ab hMin'
 
 open scoped Pointwise in
 /-- **Isaacs Cor 2.19**: `G` 非自明有限群, `A` abelian 部分群, `|A| ≥ |G:A|`
