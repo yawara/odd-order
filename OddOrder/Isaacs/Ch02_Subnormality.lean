@@ -2186,6 +2186,53 @@ private lemma center_le_fitting (G : Type*) [Group G] [Finite G] :
   haveI : Group.IsNilpotent ↥(Subgroup.center G) := inferInstance
   exact nilpotent_normal_le_fitting
 
+/-- 有限群 `M` は **その全 Sylow 部分群の sup** で生成される: 各素因子 `p` ごとの
+全 Sylow `p` 部分群を sup したものは `⊤_M`.
+
+書籍では「`M` は Sylow 部分群で生成される」と頻用される. mathlib の
+`iSup_default_sylow_eq_top_of_nilpotent` は冪零版 (一つの Sylow per prime で十分).
+本版は一般有限群対応 (Sylow 共役を全て取る).
+
+証明: 各素因子 `p` に対し `|Sylow p| = p ^ v_p(|M|)` (`Sylow.card_eq_multiplicity`),
+これが sup の card を割る. 異素因子で coprime ⇒ factorization 比較で `|sup| = |M|`. -/
+private lemma iSup_sylow_eq_top {M : Type*} [Group M] [Finite M] :
+    (⨆ p : (Nat.card M).primeFactors, ⨆ P : Sylow p.val M, (P : Subgroup M)) = ⊤ := by
+  classical
+  set sup := ⨆ p : (Nat.card M).primeFactors, ⨆ P : Sylow p.val M, (P : Subgroup M) with hsup_def
+  -- |sup| ∣ |M|.
+  have h_sup_dvd : Nat.card sup ∣ Nat.card M := Subgroup.card_subgroup_dvd_card sup
+  -- For each p ∈ primeFactors |M|, p^{v_p(|M|)} ∣ |sup|.
+  have h_pow_dvd : ∀ p ∈ (Nat.card M).primeFactors,
+      p ^ (Nat.card M).factorization p ∣ Nat.card sup := by
+    intro p hp
+    haveI hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have hP_le : ((default : Sylow p M) : Subgroup M) ≤ sup := by
+      rw [hsup_def]
+      refine le_trans ?_ (le_iSup (fun q : (Nat.card M).primeFactors =>
+        ⨆ Q : Sylow q.val M, (Q : Subgroup M)) ⟨p, hp⟩)
+      exact le_iSup (fun Q : Sylow p M => (Q : Subgroup M)) default
+    have h_dvd := Subgroup.card_dvd_of_le hP_le
+    rwa [Sylow.card_eq_multiplicity] at h_dvd
+  -- v_p(|M|) ≤ v_p(|sup|) for all p.
+  have h_factorization_le : ∀ p, (Nat.card M).factorization p ≤ (Nat.card sup).factorization p := by
+    intro p
+    rcases Nat.eq_zero_or_pos ((Nat.card M).factorization p) with h0 | hpos
+    · rw [h0]; exact Nat.zero_le _
+    · have hp_in : p ∈ (Nat.card M).primeFactors := by
+        rw [← Nat.support_factorization]
+        exact Finsupp.mem_support_iff.mpr (by omega)
+      have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp_in
+      exact (hp_prime.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp (h_pow_dvd p hp_in)
+  -- v_p(|sup|) ≤ v_p(|M|) for all p.
+  have h_factorization_le' : ∀ p, (Nat.card sup).factorization p ≤ (Nat.card M).factorization p :=
+    fun p => (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr h_sup_dvd p
+  -- |sup| = |M|.
+  have h_eq : Nat.card sup = Nat.card M := by
+    apply Nat.eq_of_factorization_eq Nat.card_pos.ne' Nat.card_pos.ne'
+    intro p
+    exact le_antisymm (h_factorization_le' p) (h_factorization_le p)
+  exact Subgroup.eq_top_of_card_eq sup h_eq
+
 open scoped Pointwise in
 /-- **Zenkov Case 1** (Isaacs Thm 2.18 の Case 1, WLOG `g₀ = 1`):
 `A`, `B` abelian, `M = A ⊓ B` minimal in family, **かつ ある `g` で `A ⊔ B^g = ⊤`** ⇒
