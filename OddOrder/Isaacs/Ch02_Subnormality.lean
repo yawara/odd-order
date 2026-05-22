@@ -2248,6 +2248,65 @@ private lemma sup_isPGroup_of_le_opCore_left {H : Type*} [Group H] [Finite H]
   exact h_op_sup.to_le (sup_le_sup_right hS _)
 
 open scoped Pointwise in
+/-- 補助: G の Zenkov minimality `hMin` を `↥H` に転送 (Zenkov Case 2 IH 適用用).
+
+`A ≤ H` のとき, G レベルの `A ⊓ B^g ≤ A ⊓ B ⇒ equal` から ↥H レベルの対応する
+minimality を導く. `conj_smul_subgroupOf` (`h ∈ H` で `H` 共役不変) + subgroupOf 同型. -/
+private lemma zenkov_minimality_transfer {G : Type*} [Group G] {A B : Subgroup G}
+    (hMin : ∀ g : G, (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤ A ⊓ B →
+        (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) = A ⊓ B)
+    {H : Subgroup G} (hAH : A ≤ H) :
+    ∀ h : ↥H,
+      ((A.subgroupOf H : Subgroup ↥H) ⊓
+        ((MulAut.conj h) • (B.subgroupOf H) : Subgroup ↥H)) ≤
+        A.subgroupOf H ⊓ B.subgroupOf H →
+      ((A.subgroupOf H : Subgroup ↥H) ⊓
+        ((MulAut.conj h) • (B.subgroupOf H) : Subgroup ↥H)) =
+        A.subgroupOf H ⊓ B.subgroupOf H := by
+  intro h hle
+  have hB_sub : B.subgroupOf H = (B ⊓ H).subgroupOf H :=
+    (Subgroup.inf_subgroupOf_right B H).symm
+  have hBcap_le_H : (B ⊓ H : Subgroup G) ≤ H := inf_le_right
+  have hconj : ((MulAut.conj h) • B.subgroupOf H : Subgroup ↥H) =
+      (((MulAut.conj (h : G)) • (B ⊓ H) : Subgroup G).subgroupOf H : Subgroup ↥H) := by
+    rw [hB_sub]
+    exact Subgroup.conj_smul_subgroupOf hBcap_le_H h
+  have h_conj_H_eq_H : ((MulAut.conj (h : G)) • H : Subgroup G) = H := by
+    ext y
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def]
+    change (h : G)⁻¹ * y * ((h : G)⁻¹)⁻¹ ∈ H ↔ y ∈ H
+    rw [inv_inv]
+    refine ⟨fun hy => ?_, fun hy => ?_⟩
+    · have heq : (h : G) * ((h : G)⁻¹ * y * (h : G)) * (h : G)⁻¹ = y := by group
+      rw [← heq]
+      exact H.mul_mem (H.mul_mem h.2 hy) (H.inv_mem h.2)
+    · exact H.mul_mem (H.mul_mem (H.inv_mem h.2) hy) h.2
+  have h_conj_inter : ((MulAut.conj (h : G)) • (B ⊓ H) : Subgroup G) =
+      ((MulAut.conj (h : G)) • B : Subgroup G) ⊓ H := by
+    rw [Subgroup.smul_inf, h_conj_H_eq_H]
+  rw [hconj, h_conj_inter] at hle ⊢
+  have h_lhs_eq : ((A.subgroupOf H : Subgroup ↥H) ⊓
+      (((MulAut.conj (h : G)) • B ⊓ H : Subgroup G).subgroupOf H : Subgroup ↥H)) =
+      ((A ⊓ ((MulAut.conj (h : G)) • B) : Subgroup G).subgroupOf H : Subgroup ↥H) := by
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+    refine ⟨fun ⟨hxA, hxB_H⟩ => ⟨hxA, hxB_H.1⟩, fun ⟨hxA, hxB⟩ => ⟨hxA, hxB, x.2⟩⟩
+  have h_rhs_eq : ((A.subgroupOf H : Subgroup ↥H) ⊓ B.subgroupOf H) =
+      ((A ⊓ B : Subgroup G).subgroupOf H : Subgroup ↥H) := by
+    ext x; simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+  rw [h_lhs_eq, h_rhs_eq] at hle ⊢
+  have hLA_le_H : (A ⊓ ((MulAut.conj (h : G)) • B) : Subgroup G) ≤ H :=
+    le_trans inf_le_left hAH
+  have hle_G : (A ⊓ ((MulAut.conj (h : G)) • B) : Subgroup G) ≤ (A ⊓ B : Subgroup G) := by
+    intro y hy
+    have hyH : y ∈ H := hLA_le_H hy
+    have : (⟨y, hyH⟩ : ↥H) ∈
+        ((A ⊓ ((MulAut.conj (h : G)) • B) : Subgroup G).subgroupOf H : Subgroup ↥H) := hy
+    exact hle this
+  have h_eq_G := hMin (h : G) hle_G
+  exact congrArg (·.subgroupOf H) h_eq_G
+
+open scoped Pointwise in
 /-- **Zenkov Case 1** (Isaacs Thm 2.18 の Case 1, WLOG `g₀ = 1`):
 `A`, `B` abelian, `M = A ⊓ B` minimal in family, **かつ ある `g` で `A ⊔ B^g = ⊤`** ⇒
 `M ⊆ F(G)`.
