@@ -171,24 +171,35 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 /-! **Isaacs Lemma 4.5** (`P/N` elementary abelian ⇔ `Φ(P) ⊆ N`):
 mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述). -/
 
+/-- **Isaacs Lemma 4.6 easy direction**: `⁅A, ⊤⁆ ≤ G'` (任意 `A ≤ G` で常時成立).
+
+`commutator_mono` で `A ≤ ⊤ ∧ ⊤ ≤ ⊤ ⇒ ⁅A, ⊤⁆ ≤ ⁅⊤, ⊤⁆ = commutator G`. -/
+theorem commutator_top_subgroup_le_commutator (A : Subgroup G) :
+    ⁅A, (⊤ : Subgroup G)⁆ ≤ _root_.commutator G := by
+  rw [_root_.commutator_def]
+  exact Subgroup.commutator_mono le_top le_rfl
+
 /-- **Isaacs Lemma 4.6** ⭐ (章内 5 引用 + Ch.5/7/10 で多用 — 章内ハブ):
-`A ⊴ G` abelian + `G/A` cyclic ⇒ `G' = ⁅A, G⁆` (commutator subgroup).
+`A ⊴ G` abelian + `G/A` cyclic ⇒ `G' = ⁅A, ⊤⁆` (commutator subgroup).
 
 (本 statement は前半. 後半 `G' ≅ A / (A ∩ Z(G))` の同型は別途 statement 化予定.)
 
 **証明骨子** (Isaacs p.118):
-- `⁅A, G⁆ ≤ G'`: `commutator_mono` で `A ≤ G ⇒ ⁅A, G⁆ ≤ ⁅G, G⁆ = G'`.
-- `G' ≤ ⁅A, G⁆`: `G/A` abelian (cyclic ⇒ abelian) ⇒ `G' ≤ A`.
-  `G/A` 巡回で `G = A · ⟨g⟩` (`g` lift). 任意 commutator `⁅x, y⁆` (`x = a · g^i, y = b · g^j`)
-  は abelian 性で `⁅A, G⁆` 内に reduce. 詳細は `cyclic_quotient_lift` (Ch.3 §3F) +
-  abelian 計算.
-
-形式化保留 (~150 LOC. cyclic_quotient_lift + commutator-expansion identities). -/
+- (≥) 部分 = `commutator_top_subgroup_le_commutator` (上記, 仮定不要).
+- (≤) 部分 `G' ≤ ⁅A, ⊤⁆`: `G/⁅A, ⊤⁆` が abelian であることを示す.
+  - `commutative_of_cyclic_center_quotient` (mathlib `Cyclic.lean:180`) を Q = G/⁅A,⊤⁆ に
+    適用: Q → G/A が cyclic codomain (hypothesis) で ker = (image of A in Q) ⊆ Z(Q).
+  - Z(Q) 包含: `a ∈ A, x ∈ G ⇒ ⁅a, x⁆ ∈ ⁅A, ⊤⁆` ⇒ Q で `ax ≡ xa`.
+  - ⁅A, ⊤⁆ ≤ A (A 正規 + Lem 4.3) で `Q/ker ≅ G/A` cyclic.
+形式化保留 (~80 LOC: mathlib `commutative_of_cyclic_center_quotient` の wrapper として
+構築). -/
 theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
     {A : Subgroup G} [A.Normal] [Finite G]
     (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (_hCyclic : IsCyclic (G ⧸ A)) :
     _root_.commutator G = ⁅A, (⊤ : Subgroup G)⁆ := by
+  refine le_antisymm ?_ (commutator_top_subgroup_le_commutator A)
+  -- 残り方向: commutator G ≤ ⁅A, ⊤⁆. `commutative_of_cyclic_center_quotient` 経由.
   sorry
 
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
