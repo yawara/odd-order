@@ -2104,11 +2104,22 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
 
 end -- 2B
 
-/-! ### §2C 状態 (TODO)
+section /- 2C: p-local subgroups (pp. 58-61) -/
 
-§2C 全体 (Thm 2.15 p-local + Lemma 2.16/2.17) は p-local 部分群の準同型像/逆像の構造
-定理. Isaacs 自身が「subnormality との直接関連無く脱線」と明言する独立小節. FT クリティカル
-度低く, Lemma 2.17 のみ Ch.4+ で 3 回引用される. 本リポでは別 commit で §2D 完了後に追加. -/
+variable {G : Type*} [Group G]
+
+/-- **p-local 部分群**: 非自明 p-部分群 `P ≤ G` の正規化群 `N_G(P)` として表せる部分群.
+
+Isaacs p.58 定義: "A subgroup `H` of a group `G` is `p`**-local**, where `p` is prime,
+if `H` is of the form `H = N_G(P)`, where `P` is some nonidentity `p`-subgroup of `G`." -/
+def IsPLocal (p : ℕ) (H : Subgroup G) : Prop :=
+  ∃ P : Subgroup G, P ≠ ⊥ ∧ IsPGroup p P ∧ H = Subgroup.normalizer (P : Set G)
+
+/-- **local 部分群**: ある素数 `p` について `p`-local. -/
+def IsLocal (H : Subgroup G) : Prop :=
+  ∃ p : ℕ, p.Prime ∧ IsPLocal p H
+
+end -- 2C
 
 section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
 
