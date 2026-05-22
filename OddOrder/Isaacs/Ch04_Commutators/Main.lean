@@ -845,6 +845,9 @@ theorem actionCommutator_one_eq_bot {A G : Type*} [Group A] [Group G] :
   show g * (1 : MulAut G) g⁻¹ = 1
   simp
 
+-- TODO: IsAInvariant.actionCommutator (`actionCommutator φ` は φ 作用下で A-inv).
+-- MulAut composition convention の確認後に追加.
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
