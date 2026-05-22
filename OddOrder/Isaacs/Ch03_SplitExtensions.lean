@@ -922,6 +922,21 @@ theorem Subgroup.IsPiGroup.le_oPiCore {G : Type*} [Group G] {π : Set ℕ} {H : 
   le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H, ‹_›, hH⟩
 
+/-- **π-group extension**: `N ⊴ H` で `N` も `H/N` も π-group ⇒ `H` は π-group.
+mathlib `card_eq_card_quotient_mul_card_subgroup` (`|H| = |H/N| * |N|`) +
+`primeFactors_mul` で primes |H| ⊆ primes |H/N| ∪ primes |N| ⊆ π. -/
+theorem IsPiGroup.of_normal_quotient {H : Type*} [Group H] [Finite H]
+    {π : Set ℕ} (N : Subgroup H) [N.Normal]
+    (hN : ∀ p ∈ (Nat.card ↥N).primeFactors, p ∈ π)
+    (hQ : ∀ p ∈ (Nat.card (H ⧸ N)).primeFactors, p ∈ π) :
+    IsPiGroup π H := by
+  intro p hp
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N] at hp
+  rw [Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hp
+  rcases Finset.mem_union.mp hp with h | h
+  · exact hQ p h
+  · exact hN p h
+
 /-- **2 つの normal π-subgroup の sup も π-subgroup**: 有限群 `G` で `H₁, H₂ ⊴ G`
 が共に π-group ⇒ `H₁ ⊔ H₂` も π-group.
 
