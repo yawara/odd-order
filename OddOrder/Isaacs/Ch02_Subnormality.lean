@@ -1438,23 +1438,113 @@ theorem le_fitting_iff_baer_sup_conj_isNilpotent [Finite G] (H : Subgroup G) :
   ⟨fun hH => baer_sup_conj_isNilpotent_of_le_fitting hH,
    le_fitting_of_baer_sup_conj_isNilpotent⟩
 
-end -- 2B
+/-! ### Lemma 2.14 (dihedral structure) + Thm 2.13 (Matsuyama)
 
-/-! ## §2B 残り + §2C / §2D (TODO)
+Lemma 2.14 の full statement (D が dihedral group `DihedralGroup n` と同型) は別途.
+ここでは Matsuyama 2.13 の証明に必要な核心のみ:
+- `inv_by_two_involutions`: `t * z * t = z⁻¹` for `z ∈ ⟨s * t⟩` (Lemma 2.14 inversion).
+- `mem_zpowers_or_mul_t_mem_of_mem_closure_pair`: ⟨{s, t}⟩ の元の構造 ∈ ⟨s*t⟩ または `x*t`.
 
-* **Thm 2.12 (Baer)**: `H ≤ F(G) ↔ ⟨H, H^x⟩` 冪零 ∀x. 順方向は trivial, 逆方向は
-  Thm 2.11 経由.
-* **Thm 2.13 (Matsuyama)**: involution `t ∉ O₂(G)` ⇒ 奇素数位数 `x` で `x^t = x⁻¹`.
-* **Lemma 2.14**: dihedral 構造補助.
-* **Thm 2.15**: 全 `p`-local 正規 Sylow 2 ⇒ `|G|` 奇 or `O₂(G) ≠ 1`.
-* **Lemma 2.16**: `G/N` の `p`-local = `G` の `p`-local の像.
-* **Lemma 2.17**: `p ∤ |N|`, `P` `p`-subgroup ⇒ `N_{G/N}(P̄) = N_G(P)/N` (FT 多用).
-* **Thm 2.18 Zenkov**: `A, B` abelian + `M ∈ {A ∩ B^g}` 極小 ⇒ `M ≤ F(G)`.
-* **Cor 2.19**: `A` abelian + `|A| ≥ |G:A|` ⇒ `A ∩ F(G) > 1`.
-* **Thm 2.20 Lucchini**: `A` 巡回真 + `K = core_G(A)` ⇒ `|A:K| < |G:A|` (Ch.3 3.3 で必要).
-
-これらは要 cardinality 連鎖 + Center 表現 + Lemma 2.14 dihedral 補助等で,
-別 commit に分離.
+これらから, `⟨{s, t}⟩` の non-2-power 位数の元は ⟨s*t⟩ にあると示し, Matsuyama に使う.
 -/
+
+/-- **Isaacs Lemma 2.14 essence (inversion)**: 2 つの involution `s, t ∈ G` の積 `s * t`
+の zpower 部分群 `⟨s * t⟩` の任意の元は involution `t` で反転される.
+
+書籍 p.56-57 Lemma 2.14(a),(b) の核心. Dihedral group の "rotation subgroup is inverted
+by reflections" の代数版. Matsuyama 2.13 で奇素数位数元の存在から最終結論 `x^t = x⁻¹`
+を導くのに使用. -/
+theorem inv_by_two_involutions {s t : G} (hs : s * s = 1) (ht : t * t = 1) {z : G}
+    (hz : z ∈ Subgroup.zpowers (s * t)) : t * z * t = z⁻¹ := by
+  have ht_inv : t⁻¹ = t := (eq_inv_iff_mul_eq_one.mpr ht).symm
+  have hs_inv : s⁻¹ = s := (eq_inv_iff_mul_eq_one.mpr hs).symm
+  -- t * (s * t) * t⁻¹ = (s * t)⁻¹.
+  have h_conj_st : t * (s * t) * t⁻¹ = (s * t)⁻¹ := by
+    have h1 : t * (s * t) * t⁻¹ = t * s := by group
+    rw [h1, mul_inv_rev, hs_inv, ht_inv]
+  obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hz
+  calc t * z * t
+      = t * (s * t) ^ n * t := by rw [← hn]
+    _ = t * (s * t) ^ n * t⁻¹ := by congr 1; exact ht_inv.symm
+    _ = (t * (s * t) * t⁻¹) ^ n := conj_zpow.symm
+    _ = ((s * t)⁻¹) ^ n := by rw [h_conj_st]
+    _ = ((s * t) ^ n)⁻¹ := inv_zpow _ _
+    _ = z⁻¹ := by rw [hn]
+
+/-- **Lemma 2.14 (structural form)**: 2 つの involution `s, t ∈ G` について,
+`⟨{s, t}⟩` の任意の元は `⟨s * t⟩` に属するか, `x * t` (`x ∈ ⟨s * t⟩`) の形.
+
+書籍 p.56-57 Lemma 2.14 の dihedral 構造の代数版. Closure induction で証明.
+4 つの mul cases + 2 つの inv cases を `inv_by_two_involutions` で繋ぐ.
+
+Matsuyama 2.13 で ⟨{s, t}⟩ が 2-group iff ⟨s*t⟩ が 2-group, を導くのに使用. -/
+theorem mem_zpowers_or_mul_t_mem_of_mem_closure_pair {s t : G}
+    (hs : s * s = 1) (ht : t * t = 1) {y : G}
+    (hy : y ∈ Subgroup.closure ({s, t} : Set G)) :
+    y ∈ Subgroup.zpowers (s * t) ∨ ∃ x ∈ Subgroup.zpowers (s * t), y = x * t := by
+  have ht_inv : t⁻¹ = t := (eq_inv_iff_mul_eq_one.mpr ht).symm
+  -- t * x = x⁻¹ * t for x ∈ ⟨s * t⟩.
+  have h_t_mul : ∀ x ∈ Subgroup.zpowers (s * t), t * x = x⁻¹ * t := by
+    intro x hx
+    have h := inv_by_two_involutions hs ht hx
+    have h' : t * x = x⁻¹ * t⁻¹ := by
+      rw [eq_mul_inv_iff_mul_eq]; exact h
+    rwa [ht_inv] at h'
+  induction hy using Subgroup.closure_induction with
+  | mem y hy =>
+    rcases hy with hy_eq | hy_mem
+    · -- y = s.
+      rw [hy_eq]
+      right
+      refine ⟨s * t, Subgroup.mem_zpowers _, ?_⟩
+      rw [mul_assoc, ht, mul_one]
+    · -- y ∈ {t}, i.e., y = t.
+      rw [Set.mem_singleton_iff.mp hy_mem]
+      right
+      exact ⟨1, Subgroup.one_mem _, (one_mul t).symm⟩
+  | one => left; exact Subgroup.one_mem _
+  | mul a b _ _ iha ihb =>
+    rcases iha with ha_K | ⟨a', ha'_K, ha_eq⟩
+    · rcases ihb with hb_K | ⟨b', hb'_K, hb_eq⟩
+      · left; exact Subgroup.mul_mem _ ha_K hb_K
+      · subst hb_eq
+        right
+        refine ⟨a * b', Subgroup.mul_mem _ ha_K hb'_K, ?_⟩
+        rw [← mul_assoc]
+    · subst ha_eq
+      rcases ihb with hb_K | ⟨b', hb'_K, hb_eq⟩
+      · -- (a' * t) * b. Push t through: t * b = b⁻¹ * t.
+        right
+        refine ⟨a' * b⁻¹, Subgroup.mul_mem _ ha'_K (Subgroup.inv_mem _ hb_K), ?_⟩
+        calc a' * t * b
+            = a' * (t * b) := mul_assoc a' t b
+          _ = a' * (b⁻¹ * t) := by rw [h_t_mul b hb_K]
+          _ = (a' * b⁻¹) * t := (mul_assoc _ _ _).symm
+      · subst hb_eq
+        -- (a' * t) * (b' * t) = a' * b'⁻¹ ∈ K (using t² = 1 + inversion).
+        left
+        have h_eq : a' * t * (b' * t) = a' * b'⁻¹ := by
+          calc a' * t * (b' * t)
+              = a' * (t * b') * t := by group
+            _ = a' * (b'⁻¹ * t) * t := by rw [h_t_mul b' hb'_K]
+            _ = a' * b'⁻¹ * (t * t) := by group
+            _ = a' * b'⁻¹ * 1 := by rw [ht]
+            _ = a' * b'⁻¹ := mul_one _
+        rw [h_eq]
+        exact Subgroup.mul_mem _ ha'_K (Subgroup.inv_mem _ hb'_K)
+  | inv y _ ihy =>
+    rcases ihy with hy_K | ⟨y', hy'_K, hy_eq⟩
+    · left; exact Subgroup.inv_mem _ hy_K
+    · subst hy_eq
+      -- y⁻¹ = (y' * t)⁻¹ = t⁻¹ * y'⁻¹ = t * y'⁻¹ = y' * t (using inversion: t * y'⁻¹ = y' * t).
+      right
+      refine ⟨y', hy'_K, ?_⟩
+      calc (y' * t)⁻¹
+          = t⁻¹ * y'⁻¹ := mul_inv_rev _ _
+        _ = t * y'⁻¹ := by rw [ht_inv]
+        _ = (y'⁻¹)⁻¹ * t := h_t_mul y'⁻¹ (Subgroup.inv_mem _ hy'_K)
+        _ = y' * t := by rw [inv_inv]
+
+end -- 2B
 
 end OddOrder.Isaacs.Ch02
