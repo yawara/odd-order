@@ -4,9 +4,10 @@
 形式化先: [`OddOrder/Isaacs/Ch02_Subnormality.lean`](../../OddOrder/Isaacs/Ch02_Subnormality.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 952-2123.
 
-## 進捗 (2026-05-21)
+## 進捗 (2026-05-22)
 
-§2A 主要結果 (Thm 2.1, 2.3, 2.4, 2.6, 2.7 + Lemma 2.7) 実装済:
+§2A 完成 (Thm 2.11 のみ axiom). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式).
+§2C, §2D は TODO.
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -20,8 +21,19 @@
 | **Thm 2.2** | ✅ (2026-05-22) | `le_fitting_iff_isNilpotent_and_isSubnormal`. Ch.1 `fitting.characteristic` を追加して `K ⊴ G ⇒ (fitting K).map K.subtype ⊴ G` 経由で `|G|`-induction. 補助 `le_fitting_aux` 含む |
 | Thm 2.5 Wielandt 結合 | ✅ | Thm 2.6 経由の `|G|`-induction |
 | **Thm 2.8** | ✅ (2026-05-22) | `isSubnormal_of_permutable_with_conjugates`. |G|-induction + Zipper Lemma + normal closure. IH transfer via `Subgroup.conj_smul_subgroupOf` + `H.subtype` injective image |
-| Thm 2.11 | TODO | Wielandt-abelian |H:A|² ≤ |H:Z(H)| |
-| §2B, §2C, §2D | TODO | §2D は FT 経路で不要なので最後回し可 |
+| Thm 2.9 (Zipper) | ✅ | `zipper_lemma`. `S.index` 強 induction. Case A (K で S normal) と Case B (chain で T = S ⊔ S^x を構成) |
+| Thm 2.10 | ✅ | `eq_top_of_set_mul_conj_eq_top`. 集合等式 `H · H^x = G` ⇒ `H = G`. `Subgroup.conj_smul_eq_self_of_mem` 経由 |
+| **Thm 2.11** ⚠ | axiom | Wielandt-abelian `|H:A|² ≤ |H:Z(H)|`. 完全証明には `|HK|` 公式が必要 (mathlib 未収載). 別 commit で fill in |
+| **Thm 2.12 Baer 順方向** | ✅ (2026-05-22) | `baer_sup_conj_isNilpotent_of_le_fitting`. F(G) ⊴ G + 冪零 subgroup 継承の単純証明 |
+| **Thm 2.12 Baer 逆方向** | ✅ (2026-05-22) | `le_fitting_of_baer_sup_conj_isNilpotent`. Zipper Lemma + Thm 2.2 経由の `|G|`-induction. IH transfer via `Subgroup.conj_smul_subgroupOf` + sup of subgroupOf + subgroupOfEquivOfLe. `x = 1` で `H` 冪零, 部分正規性は背理法 |
+| Thm 2.12 Baer iff | ✅ | `le_fitting_iff_baer_sup_conj_isNilpotent` (順+逆 結合) |
+| **Lemma 2.14 essence** | ✅ (2026-05-22) | `inv_by_two_involutions`: `t * z * t = z⁻¹` for `z ∈ ⟨s*t⟩`. `conj_zpow` + `inv_zpow` + involution 自己逆 |
+| **Lemma 2.14 structural** | ✅ (2026-05-22) | `mem_zpowers_or_mul_t_mem_of_mem_closure_pair`: `⟨{s, t}⟩` の元は `⟨s*t⟩` か `x*t`. Closure induction 4 mul cases + 2 inv cases. Full Lemma 2.14 (`D ≅ DihedralGroup n`) は deferred |
+| **Thm 2.13 Matsuyama** | ✅ (2026-05-22) | `matsuyama`: `t ∉ O_2(G)` ⇒ ∃ x odd prime order, `t*x*t = x⁻¹`. Baer iff + Cauchy + Lemma 2.14 essence + structural |
+| Helper `mem_opCore_of_le_fitting_of_isPGroup` | ✅ | `H ≤ F(G)` で `H` が `p`-subgroup ⇒ `H ≤ O_p(G)`. Sylow `p` of nilpotent F(G) が unique で characteristic-in-normal 経由 |
+| Helper `exists_odd_prime_dvd_of_not_pow_two` | ✅ | Nat 補助: 2-べきでない正整数は奇素数約数を持つ. 強 induction |
+| §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
+| §2D (Thm 2.18-2.20) | TODO | Zenkov + Lucchini. FT 経路で必要なし |
 
 ## 章のセクション分割と全 20 定理
 
