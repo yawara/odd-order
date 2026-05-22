@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
 import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # OddOrder.Isaacs.Ch04 — Commutators
@@ -824,6 +825,37 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 (~250 行 / 1-2 週), 4.31 + 4.32 + 4.38 (~150 行 / 1 週), 4.33 + 4.37 (~150 行 / 1 週).
 
 合計 ~750 行 LOC / 4-5 週. Phase 1 残予算と要相談. -/
+
+/-- **Isaacs Lemma 4.32 (前半)**: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
+`Γ = G ⋊[φ] P` 内で `⁅inl(G), inr(P)⁆ < inl(G)` (strict).
+
+**proof**: Γ = G ⋊ P は p-群 (`IsPGroup.semidirectProduct`) で nilpotent. `inl(G)` は
+normal (`SemidirectProduct.inl_range_normal`) かつ G 非自明より ≠ ⊥.
+`commutator_lt_self_of_isNilpotent_ambient` を適用.
+
+Isaacs 流の `⁅G, P⁆ < G` (G の中で見た [G, P]) と等価 (inl を介して identify).
+
+C_G(P) > 1 (Lem 4.32 後半) は Γ の center > 1 経由で別途. -/
+theorem commutator_inl_inr_lt_inl_of_pgroup_action
+    {G P : Type*} [Group G] [Group P] [Finite G] [Finite P] [Nontrivial G]
+    {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) (hP : IsPGroup p P)
+    (φ : P →* MulAut G) :
+    ⁅(SemidirectProduct.inl : G →* G ⋊[φ] P).range,
+      (SemidirectProduct.inr : P →* G ⋊[φ] P).range⁆ <
+        (SemidirectProduct.inl : G →* G ⋊[φ] P).range := by
+  haveI : Group.IsNilpotent (G ⋊[φ] P) :=
+    Group.IsNilpotent.semidirectProduct_of_pGroup hG hP
+  haveI : (SemidirectProduct.inl : G →* G ⋊[φ] P).range.Normal :=
+    OddOrder.Isaacs.Ch03.inl_range_normal φ
+  apply commutator_lt_self_of_isNilpotent_ambient
+  -- inl.range ≠ ⊥: inl injective + G nontrivial
+  rw [Subgroup.ne_bot_iff_exists_ne_one]
+  obtain ⟨g, hg⟩ := exists_ne (1 : G)
+  refine ⟨⟨SemidirectProduct.inl g, g, rfl⟩, ?_⟩
+  intro h
+  apply hg
+  have : SemidirectProduct.inl g = (1 : G ⋊[φ] P) := Subtype.ext_iff.mp h
+  exact SemidirectProduct.inl_injective this
 
 end -- 4D
 
