@@ -1291,7 +1291,7 @@ open scoped Pointwise in
 /-- **Isaacs Thm 2.12 (Baer)** — 順方向: `H ≤ F(G)` ⇒ ∀x, `⟨H, H^x⟩` 冪零.
 
 `H, H^x ⊆ F(G)` (F(G) ⊴ G で `H^x ⊆ F(G)`), `⟨H, H^x⟩ = H ⊔ H^x ≤ F(G)`,
-F(G) 冪零, subgroup of nilpotent も冪零. 逆方向は Thm 2.11 を要し別途. -/
+F(G) 冪零, subgroup of nilpotent も冪零. -/
 theorem baer_sup_conj_isNilpotent_of_le_fitting [Finite G] {H : Subgroup G}
     (hH : H ≤ fitting G) (x : G) :
     Group.IsNilpotent ↥(H ⊔ ((MulAut.conj x) • H : Subgroup G)) := by
@@ -1306,6 +1306,137 @@ theorem baer_sup_conj_isNilpotent_of_le_fitting [Finite G] {H : Subgroup G}
   have hSup_le : (H ⊔ ((MulAut.conj x) • H : Subgroup G)) ≤ fitting G := sup_le hH hHx_le
   -- Subgroup of nilpotent F(G) is nilpotent.
   exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hSup_le)
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.12 (Baer)** 逆方向の `|G|`-induction の generalized core.
+
+任意の有限群 `G` (with `Nat.card G ≤ n`) について,
+`∀x ∈ G, ⟨H, H^x⟩ 冪零` ならば `H ≤ F(G)`.
+
+Isaacs p.55 の証明戦略:
+1. `x = 1` 適用で `H` 自身が冪零.
+2. Thm 2.2 で `H ≤ F(G) ⟺ H 冪零 ∧ H 部分正規`. 部分正規性のみ示せばよい.
+3. 部分正規性を背理法 + `|G|`-induction.  IH が真部分群 `K ⊇ H` で `H` の部分正規性を
+   与える (Zipper Lemma の hypothesis を充足).
+4. Zipper Lemma で `H` を含む極大 `M` 一意.
+5. 各 `x` で `⟨H, H^x⟩` 冪零 ≠ ⊤ (= ⊤ なら `G` 冪零 ⇒ 矛盾) ⇒ `⟨H, H^x⟩ ⊆ M`.
+6. 正規閉包 `H^G ⊆ M < ⊤`. IH で `H ⊴⊴ H^G ⊴ G`, 矛盾. -/
+private theorem le_fitting_of_baer_aux :
+    ∀ n, ∀ (G : Type*) [Group G] [Finite G],
+      Nat.card G ≤ n → ∀ {H : Subgroup G},
+      (∀ x : G, Group.IsNilpotent ↥(H ⊔ ((MulAut.conj x) • H : Subgroup G))) →
+      H ≤ fitting G := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hG _ _
+    exact absurd (Nat.le_zero.mp hG) Nat.card_pos.ne'
+  | succ n ih =>
+    intro G _ _ _ H hN
+    -- Step 0: H は冪零 (x = 1 で hN 適用).
+    have hH_nilp : Group.IsNilpotent ↥H := by
+      have h1 := hN 1
+      rw [map_one, one_smul, sup_idem] at h1
+      exact h1
+    -- Step 1: H が部分正規であれば Thm 2.2 で結論.
+    suffices hSn : H.IsSubnormal from
+      (le_fitting_iff_isNilpotent_and_isSubnormal H).mpr ⟨hH_nilp, hSn⟩
+    -- Step 2: H 部分正規でないと仮定 ⇒ 矛盾.
+    by_contra hSnneg
+    -- IH: 真部分群 K ⊇ H で H.subgroupOf K は部分正規.
+    have hIH : ∀ K : Subgroup G, H ≤ K → K ≠ ⊤ →
+        (H.subgroupOf K).IsSubnormal := by
+      intro K hHK hKne
+      have hK_card : Nat.card K ≤ n := by
+        have hKle : Nat.card K ≤ Nat.card G := K.card_le_card_group
+        have hKne_card : Nat.card K ≠ Nat.card G := fun heq =>
+          hKne (Subgroup.eq_top_of_card_eq K heq)
+        omega
+      have hIH_K : (H.subgroupOf K) ≤ fitting K := by
+        apply ih K hK_card
+        intro y
+        -- Permutability transfer G → ↥K via Subgroup.conj_smul_subgroupOf.
+        rw [Subgroup.conj_smul_subgroupOf hHK]
+        have hHy_le_K : ((MulAut.conj (y : G)) • H : Subgroup G) ≤ K :=
+          Subgroup.conj_smul_le_of_le hHK y
+        rw [← Subgroup.subgroupOf_sup hHK hHy_le_K]
+        haveI : Group.IsNilpotent
+            ↥(H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) := hN (y : G)
+        have hsup_le_K : (H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) ≤ K :=
+          sup_le hHK hHy_le_K
+        exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hsup_le_K).symm
+      exact ((le_fitting_iff_isNilpotent_and_isSubnormal _).mp hIH_K).2
+    -- Zipper Lemma で `H` を含む極大部分群 `M` の一意性.
+    obtain ⟨M, hMcoatom, _, hMuniq⟩ := zipper_lemma hIH hSnneg
+    -- 各 x : G で `MulAut.conj x • H ≤ M`.
+    have hHx_le_M : ∀ x : G, ((MulAut.conj x) • H : Subgroup G) ≤ M := by
+      intro x
+      have hNx := hN x
+      -- ⟨H, H^x⟩ ≠ ⊤ (else G 冪零 ⇒ H 部分正規, 矛盾).
+      have hsup_ne_top : (H ⊔ ((MulAut.conj x) • H : Subgroup G)) ≠ ⊤ := by
+        intro h_top
+        apply hSnneg
+        rw [h_top] at hNx
+        haveI := hNx
+        haveI hG_nilp : Group.IsNilpotent G :=
+          nilpotent_of_mulEquiv (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G)
+        exact isSubnormal_of_isNilpotent_finite H
+      -- ⟨H, H^x⟩ ≤ M (M は H を含む唯一の極大).
+      obtain ⟨K, hKcoatom, hKle⟩ :=
+        (eq_top_or_exists_le_coatom (H ⊔ ((MulAut.conj x) • H : Subgroup G) :
+          Subgroup G)).resolve_left hsup_ne_top
+      have hHK : H ≤ K := le_sup_left.trans hKle
+      have hKM : K = M := hMuniq K hKcoatom hHK
+      exact (le_sup_right.trans hKle).trans hKM.le
+    -- 正規閉包 `H^G ≤ M`.
+    have hNH_le_M : Subgroup.normalClosure (H : Set G) ≤ M := by
+      rw [Subgroup.normalClosure, Subgroup.closure_le]
+      intro y hy
+      rcases Group.mem_conjugatesOfSet_iff.mp hy with ⟨a, haH, hConj⟩
+      rcases hConj with ⟨c, hc⟩
+      apply hHx_le_M (c : G)
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def]
+      change ((c : G)⁻¹) * y * ((c : G)⁻¹)⁻¹ ∈ H
+      rw [inv_inv]
+      have hc_eq : (c : G) * a = y * (c : G) := hc
+      have ha_eq : ((c : G)⁻¹) * y * ((c : G)) = a := by
+        rw [mul_assoc, ← hc_eq]
+        group
+      rw [ha_eq]
+      exact haH
+    -- 正規閉包 < ⊤ (since ≤ M coatom).
+    have hNH_lt : Subgroup.normalClosure (H : Set G) ≠ ⊤ := fun hNHtop =>
+      hMcoatom.1 (le_top.antisymm (hNHtop.symm.le.trans hNH_le_M))
+    -- IH を `normalClosure H` に適用.
+    have hHle_NH : H ≤ Subgroup.normalClosure (H : Set G) :=
+      Subgroup.le_normalClosure
+    have hH_sn_in_NH : (H.subgroupOf (Subgroup.normalClosure (H : Set G))).IsSubnormal :=
+      hIH _ hHle_NH hNH_lt
+    have hNH_sn : (Subgroup.normalClosure (H : Set G)).IsSubnormal :=
+      Subgroup.Normal.isSubnormal inferInstance
+    exact hSnneg (Subgroup.IsSubnormal.trans hHle_NH hH_sn_in_NH hNH_sn)
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.12 (Baer)** 逆方向: `∀ x ∈ G, ⟨H, H^x⟩` 冪零 ⇒ `H ≤ F(G)`.
+
+Isaacs p.55 の証明: Wielandt's Zipper Lemma (Thm 2.9) + Thm 2.2 経由の `|G|`-induction.
+詳細は補助 [`le_fitting_of_baer_aux`](#le_fitting_of_baer_aux) の docstring 参照. -/
+theorem le_fitting_of_baer_sup_conj_isNilpotent [Finite G] {H : Subgroup G}
+    (hN : ∀ x : G, Group.IsNilpotent ↥(H ⊔ ((MulAut.conj x) • H : Subgroup G))) :
+    H ≤ fitting G :=
+  le_fitting_of_baer_aux (Nat.card G) G le_rfl hN
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.12 (Baer)** 完全形 (iff): 有限群 `G` の部分群 `H` について,
+`H ≤ F(G) ↔ ∀ x ∈ G, ⟨H, H^x⟩ 冪零`.
+
+順方向 (`baer_sup_conj_isNilpotent_of_le_fitting`) は F(G) ⊴ G の単なる帰結.
+逆方向 (`le_fitting_of_baer_sup_conj_isNilpotent`) は Zipper Lemma 経由の核心. -/
+theorem le_fitting_iff_baer_sup_conj_isNilpotent [Finite G] (H : Subgroup G) :
+    H ≤ fitting G ↔
+      ∀ x : G, Group.IsNilpotent ↥(H ⊔ ((MulAut.conj x) • H : Subgroup G)) :=
+  ⟨fun hH => baer_sup_conj_isNilpotent_of_le_fitting hH,
+   le_fitting_of_baer_sup_conj_isNilpotent⟩
 
 end -- 2B
 
