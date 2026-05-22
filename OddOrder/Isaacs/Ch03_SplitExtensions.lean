@@ -908,17 +908,33 @@ theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSepar
   haveI : IsSolvable G := hπsep
   hall_E_exists π
 
-/-! **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
+/-- **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
 **所在**: Isaacs PDF p.94 の証明は **Ch.3 内部資産で完結** — π-separable normal series +
-`Subgroup.centralizer` + Schur-Zassenhaus + Sylow のみを使い, Ch.6 (Frobenius p-nilpotence)
-や Ch.4 (Thompson P×Q) は不要. ⇒ true owner は **Ch.3 §3D 自身**. 旧
-`Ch06_FrobeniusActions/ForwardFromCh03.lean` placeholder は配置ミスで, 2026-05-23 audit
-で削除. 実装着手時はこの位置 (§3D) に inline で書く.
+`Subgroup.centralizer` + Schur-Zassenhaus + Sylow のみを使う.
+
+**証明戦略** (Isaacs p.94, 5 段階):
+1. `C := C_G(O_π(G))`, `B := C ⊓ O_π(G)`. 目標 `B = C`. 背理法で `B < C`.
+2. `B` は π-group, `B, C` は G で正規 (characteristic も).
+3. `C/B` 非自明 π-separable ⇒ 非自明 characteristic 部分群 `K/B` で π-group か π'-group.
+   - `K/B ⊴ G/B` ⇒ `K ⊴ G`.
+4. Case `K/B` π-group: `K` 正規 π-subgroup (B π-group + K/B π-group). `K ⊆ O_π(G)` で
+   `B < K ⊆ C` だが `B = C ⊓ O_π(G)` で矛盾.
+5. Case `K/B` π'-group: Schur-Zassenhaus で複合 `K = B ⋊ H`, `H > 1` π'-group.
+   `H ⊆ C ⊆ C_G(B)` で `H ⊴ K`. `H ⊆ O_{π'}(K) ⊴ G` で `O_{π'}(G) = ⊥` 矛盾.
 
 **下流被引用**: Ch.4 Thm 4.33 (mmd L2659), Ch.7 Thm 7.5 (L3853), Thm 7.6 (L3802) の 3 箇所.
-詳細は [`notes/meta/ch03_audit_2026_05_23.md`](../../notes/meta/ch03_audit_2026_05_23.md). -/
+
+**実装状態**: statement のみ. 5 段階の各 step を Lean 補題に分解する必要あり (~150-200 LOC
+予想). 詳細は [`notes/meta/ch03_audit_2026_05_23.md`](../../notes/meta/ch03_audit_2026_05_23.md).
+-/
+theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ)
+    (_hπsep : IsPiSeparable π G)
+    (_hπ' : oPiCore {p | p ∉ π} G = ⊥) :
+    Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G := by
+  -- Step 1-5 を分解した補題群が要る. 本セッションでは statement のみ.
+  sorry
 
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
