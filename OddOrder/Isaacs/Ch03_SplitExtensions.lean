@@ -1181,6 +1181,37 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ)
     True := by  -- TODO: π-length の正式定義後に書き直す
   trivial
 
+/-- **Hall-Higman 3.21 case π closure**: Hall-Higman setup で case π を一気に close.
+
+仮定:
+- `K ⊴ G` (case π で K = preimage of K' in G/B 経由で構築).
+- `K ≤ centralizer (oPiCore π G)` (preimage of K' ≤ C/B 経由).
+- `B = centralizer ⊓ oPiCore π G ≤ K` (preimage of ⊥ ⊆ preimage of K').
+- `↥K ⧸ B.subgroupOf K` is π-group (K' = O_π(C/B) is π).
+- `B < K` (strict; K' nontrivial).
+
+結論: `False`. 1-liner-ish composition of helpers (~7 LOC). -/
+theorem hall_higman_case_pi_contradiction
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    {K : Subgroup G} [K.Normal]
+    (hKle : K ≤ Subgroup.centralizer (oPiCore π G : Set G))
+    (hBle : Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G ≤ K)
+    (hQpi : ∀ p ∈ (Nat.card ((↥K) ⧸
+        (Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G).subgroupOf K)).primeFactors,
+      p ∈ π)
+    (hStrict : Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G < K) :
+    False := by
+  have hBpi : Subgroup.IsPiGroup π
+      (Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G) :=
+    Subgroup.IsPiGroup.le inf_le_right (oPiCore.isPiGroup π)
+  have hBsubpi : Subgroup.IsPiGroup π
+      ((Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G).subgroupOf K) :=
+    Subgroup.IsPiGroup.subgroupOf hBle hBpi
+  have hKpi : Subgroup.IsPiGroup π K := fun p hp =>
+    IsPiGroup.of_normal_quotient _ hBsubpi hQpi p hp
+  have hKle_B := hall_higman_case_pi_K_le_B π hKpi hKle
+  exact absurd hKle_B (lt_irrefl _ ∘ hStrict.trans_le)
+
 end -- 3D
 
 section /- 3E: Coprime action (pp. 96-104) -/
