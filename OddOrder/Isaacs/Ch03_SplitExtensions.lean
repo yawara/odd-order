@@ -1475,6 +1475,34 @@ theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ)
   · exact hall_higman_case_pi_body π h_not_le hπCase
   · exact hall_higman_case_pi'_body π hπ' h_not_le hπ'Case
 
+/-- **Hall-Higman 1.2.3 系**: `G` π-separable + `O_{π'}(G) = ⊥` ⇒
+`C_G(O_π(G)) = Z(O_π(G))` (i.e., centralizer of O_π is the center of O_π).
+
+`C_G(O_π(G)) ≤ O_π(G)` (Hall-Higman 3.21) + 一般 `Z(H) = H ⊓ C_G(H)` から従う. -/
+theorem centralizer_oPiCore_eq_center [Finite G] (π : Set ℕ)
+    (hπsep : IsPiSeparable π G)
+    (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
+    Subgroup.centralizer (oPiCore π G : Set G) =
+      (Subgroup.center ↥(oPiCore π G)).map (oPiCore π G).subtype := by
+  apply le_antisymm
+  · -- C_G(O) ⊆ O (Hall-Higman) so g ∈ C_G(O) ⇒ ⟨g, _⟩ ∈ Z(↥O)
+    intro g hg
+    have hg_O : g ∈ oPiCore π G := hall_higman_1_2_3 π hπsep hπ' hg
+    refine ⟨⟨g, hg_O⟩, ?_, rfl⟩
+    show (⟨g, hg_O⟩ : ↥(oPiCore π G)) ∈ Subgroup.center ↥(oPiCore π G)
+    rw [Subgroup.mem_center_iff]
+    rintro ⟨h, hh⟩
+    apply Subtype.ext
+    exact Subgroup.mem_centralizer_iff.mp hg h hh
+  · -- Z(↥O) image ⊆ C_G(O) trivially
+    rintro _ ⟨⟨g, hg_O⟩, hg_center, rfl⟩
+    show (oPiCore π G).subtype ⟨g, hg_O⟩ ∈ Subgroup.centralizer (oPiCore π G : Set G)
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hc : (⟨h, hh⟩ : ↥(oPiCore π G)) * ⟨g, hg_O⟩ = ⟨g, hg_O⟩ * ⟨h, hh⟩ :=
+      Subgroup.mem_center_iff.mp hg_center ⟨h, hh⟩
+    exact congr_arg Subtype.val hc
+
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
 
