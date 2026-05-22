@@ -520,6 +520,57 @@ theorem iterCommutator_eq_bot_of_isNilpotent
         iterCommutator_le_lowerCentralSeries_map hE n
     _ ≤ ⊥ := by rw [hn]; exact (Subgroup.map_bot F.subtype).le
 
+/-- **iterCommutator は E 内に留まる**: `E, F ⊴ G ⇒ iter E F n ≤ E`. -/
+theorem iterCommutator_le_self {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
+    iterCommutator E F n ≤ E := by
+  induction n with
+  | zero => exact le_refl _
+  | succ n ih => exact (iterCommutator_succ_le_self n).trans ih
+
+/-- **Z(F(G)) absorbs G-minimal normal in F(G)** ⭐ (Lucchini K=⊥ aux 解消の核補題):
+`E ⊴ G` minimal normal, `E ≤ F`, `F ⊴ G` 冪零 ⇒ `E ≤ centralizer F`.
+
+**証明** (Isaacs §4A lcs 経路):
+1. `iterCommutator E F` の降下列を考える. 各項は G-normal (`iterCommutator_normal`),
+   decreasing (`iterCommutator_succ_le_self`), `E` 内 (`iterCommutator_le_self`).
+2. `F` 冪零 で `iter n = ⊥` for some `n` (`iterCommutator_eq_bot_of_isNilpotent`).
+3. 最小 `k` で `iter k = ⊥` を取る. `k = 0` だと `E = ⊥` で `E` minimal 仮定と矛盾.
+4. `k = j + 1` で, `iter j ≠ ⊥`, `iter j ⊴ G`, `iter j ≤ E`. **E の minimality**
+   より `iter j = E`.
+5. `⁅E, F⁆ = ⁅iter j, F⁆ = iter (j+1) = iter k = ⊥`. 故に `E ≤ centralizer F`.
+
+**下流**: Ch.2 §2D Lucchini K=⊥ aux. -/
+theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
+    (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal E) (hEF : E ≤ F)
+    [F.Normal] [Group.IsNilpotent ↥F] :
+    E ≤ Subgroup.centralizer (F : Set G) := by
+  classical
+  haveI hE_norm : E.Normal := hMin.1
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+  -- Find smallest k with iter E F k = ⊥.
+  have hExists : ∃ k, iterCommutator E F k = ⊥ :=
+    iterCommutator_eq_bot_of_isNilpotent hEF
+  set k := Nat.find hExists with hk_def
+  have hk_iter : iterCommutator E F k = ⊥ := Nat.find_spec hExists
+  -- k = 0 ⇒ E = ⊥, 矛盾.
+  rcases Nat.eq_zero_or_pos k with hk0 | hk_pos
+  · exfalso
+    rw [hk0, iterCommutator_zero] at hk_iter
+    exact hMin.2.1 hk_iter
+  -- k = j + 1, j minimality に達しない.
+  obtain ⟨j, hj⟩ := Nat.exists_eq_succ_of_ne_zero hk_pos.ne'
+  have hIter_j_ne : iterCommutator E F j ≠ ⊥ := fun h => by
+    have hjk : j < k := hj ▸ Nat.lt_succ_self j
+    exact absurd (Nat.find_min' hExists h) (not_le.mpr hjk)
+  haveI : (iterCommutator E F j).Normal := iterCommutator_normal j
+  have hIter_j_le : iterCommutator E F j ≤ E := iterCommutator_le_self j
+  rcases hMin.2.2 _ inferInstance hIter_j_le with h_bot | h_eq_E
+  · exact absurd h_bot hIter_j_ne
+  · -- iter j = E, hence ⁅E, F⁆ = iter (j+1) = iter k = ⊥.
+    rw [← h_eq_E, ← iterCommutator_succ,
+        show j + 1 = k from hj.symm]
+    exact hk_iter
+
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
 
