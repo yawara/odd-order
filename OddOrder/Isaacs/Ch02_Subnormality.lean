@@ -2233,6 +2233,20 @@ private lemma iSup_sylow_eq_top {M : Type*} [Group M] [Finite M] :
     exact le_antisymm (h_factorization_le' p) (h_factorization_le p)
   exact Subgroup.eq_top_of_card_eq sup h_eq
 
+/-- 補助: `S ≤ opCore p H` (p-subgroup of opCore), `S'` p-subgroup of H ⇒ `S ⊔ S'` p-group.
+
+Zenkov Case 2 で `⟨P, P^x⟩` (P が p-Sylow of M, P^x conjugate) を p-group と
+示す核心. `opCore p H ⊴ H` で normal-sup-pgroup を経由. -/
+private lemma sup_isPGroup_of_le_opCore_left {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] {S S' : Subgroup H}
+    (hS : S ≤ opCore p H) (hS' : IsPGroup p S') :
+    IsPGroup p ↥(S ⊔ S' : Subgroup H) := by
+  have h_op_pgroup : IsPGroup p ↥(opCore p H) := opCore_isPGroup p H
+  haveI : (opCore p H).Normal := opCore.normal p H
+  have h_op_sup : IsPGroup p ↥(opCore p H ⊔ S' : Subgroup H) :=
+    h_op_pgroup.to_sup_of_normal_left hS'
+  exact h_op_sup.to_le (sup_le_sup_right hS _)
+
 open scoped Pointwise in
 /-- **Zenkov Case 1** (Isaacs Thm 2.18 の Case 1, WLOG `g₀ = 1`):
 `A`, `B` abelian, `M = A ⊓ B` minimal in family, **かつ ある `g` で `A ⊔ B^g = ⊤`** ⇒
