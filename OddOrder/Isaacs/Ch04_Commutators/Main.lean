@@ -683,14 +683,20 @@ theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
     have hzy : z = y := Subtype.ext hz_eq
     exact hzy ▸ hz_T
 
-/-- **Lucchini K=⊥ 1st step**: G 非自明有限, A abelian, `|A| ≥ |G:A|` ⇒
-∃ `E ⊴ G` minimal normal で `E ≤ F(G) ∧ E ≤ centralizer F(G)`.
+/-- **Lucchini K=⊥ 1st step (with elem abelian conclusion)**: G 非自明有限, A abelian,
+`|A| ≥ |G:A|` ⇒ ∃ `E ⊴ G` minimal normal で:
+- `E ≤ F(G)`
+- `E ≤ centralizer F(G)` (Z(F(G)) absorbs)
+- `E` elementary abelian `p`-group (for some prime `p`)
 
-書籍 p.62 の Lucchini K=⊥ proof の最初の 3 ステップを 1 補題に集約:
-1. **Cor 2.19** (`inf_fitting_ne_bot_of_abelian_card_ge_index`) で `A ⊓ F(G) ≠ ⊥`
-   ⇒ `F(G) ≠ ⊥`.
+書籍 p.62 の Lucchini K=⊥ proof の最初の **4 ステップ** を 1 補題に集約:
+1. **Cor 2.19** で `F(G) ≠ ⊥`.
 2. **`exists_isMinimalNormal_le_of_normal`** で minimal normal `E ≤ F(G)` を取得.
-3. **`le_centralizer_of_isMinimalNormal`** で `E ≤ centralizer F(G)`.
+3. **`le_centralizer_of_isMinimalNormal`** (Z(F(G)) absorbs lemma) で
+   `E ≤ centralizer F(G)`.
+4. **`isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype`** で `E` elem
+   abelian p-group. `↥E` 冪零性は `E ≤ F(G)` + `fitting.isNilpotent` +
+   `subgroupOfEquivOfLe` 経由.
 
 下流: Lucchini K=⊥ 残 2 case (M abelian/non-abelian) でこの E を使う. -/
 theorem exists_isMinimalNormal_le_fitting_le_centralizer_fitting
@@ -698,9 +704,11 @@ theorem exists_isMinimalNormal_le_fitting_le_centralizer_fitting
     {A : Subgroup G}
     (hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCard : A.index ≤ Nat.card A) :
-    ∃ E : Subgroup G, OddOrder.Isaacs.Ch02.IsMinimalNormal E ∧
+    ∃ (E : Subgroup G) (p : ℕ), p.Prime ∧
+      OddOrder.Isaacs.Ch02.IsMinimalNormal E ∧
       E ≤ OddOrder.Isaacs.Ch01.fitting G ∧
-      E ≤ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) := by
+      E ≤ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ∧
+      E.IsElementaryAbelian p := by
   -- F(G) ≠ ⊥ via Cor 2.19.
   have hFne : OddOrder.Isaacs.Ch01.fitting G ≠ ⊥ := by
     intro hF
@@ -709,7 +717,15 @@ theorem exists_isMinimalNormal_le_fitting_le_centralizer_fitting
     rw [hF, inf_bot_eq]
   obtain ⟨E, hMin, hEle⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal _ hFne
-  refine ⟨E, hMin, hEle, ?_⟩
+  -- ↥E nilpotent via E ≤ F(G) + subgroupOfEquivOfLe.
+  haveI hFNilp : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting G) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI hENilp : Group.IsNilpotent ↥E :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hEle)
+  -- E elem abelian p-group.
+  obtain ⟨p, hp_prime, hElem⟩ :=
+    isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype hMin
+  refine ⟨E, p, hp_prime, hMin, hEle, ?_, hElem⟩
   exact le_centralizer_of_isMinimalNormal hMin hEle
 
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
