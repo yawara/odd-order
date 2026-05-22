@@ -1218,6 +1218,21 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ)
     True := by  -- TODO: π-length の正式定義後に書き直す
   trivial
 
+/-- **`C/B` nontrivial when `B < C`**: `B < C` strict + `B ⊴ G` ⇒ `C.map (QuotientGroup.mk' B) ≠ ⊥`.
+
+mathlib pattern: image of C in G/B equals ⊥ iff C ⊆ B (= ker mk'). With B < C strict,
+C ⊄ B, so image is nontrivial. -/
+theorem Subgroup.map_quotientGroup_mk_ne_bot_of_lt {G : Type*} [Group G]
+    {B C : Subgroup G} [B.Normal] (hBC : B < C) :
+    C.map (QuotientGroup.mk' B) ≠ ⊥ := by
+  intro h
+  have hCleB : C ≤ B := by
+    intro c hc
+    have hmem : (QuotientGroup.mk' B) c ∈ C.map (QuotientGroup.mk' B) := ⟨c, hc, rfl⟩
+    rw [h, Subgroup.mem_bot] at hmem
+    rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hmem
+  exact absurd hCleB (fun hCB => (lt_irrefl _) (hBC.trans_le hCB))
+
 /-- **Hall-Higman 3.21 setup**: `¬ centralizer(O) ≤ O ⇒ B := centralizer(O) ⊓ O < centralizer(O)`.
 
 3-line derivation: `B ≤ C` 自明, `B = C` だと `C ≤ O` (= C ⊓ O ⊆ O) で仮定矛盾. -/
