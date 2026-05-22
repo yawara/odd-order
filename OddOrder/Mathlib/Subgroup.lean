@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Coset.Card
+import Mathlib.GroupTheory.Index
+import Mathlib.Data.Finite.Card
 import Mathlib.Data.Setoid.Basic
 
 /-!
@@ -159,6 +161,17 @@ instance powMonoidHom_range_characteristic
     change (φ y) ^ n = φ x
     rw [← map_pow]
     exact congrArg φ hy
+
+/-- **`G ⧸ N` nontrivial iff `N ≠ ⊤`** (有限 G で): mathlib `Subgroup.index_eq_one`
++ `Finite.one_lt_card_iff_nontrivial` を結合.
+
+用途: Hall-Higman 3.21 で C/B nontrivial を `B < C` から導出. -/
+theorem nontrivial_quotient_of_ne_top {G : Type*} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] (h : N ≠ ⊤) : Nontrivial (G ⧸ N) := by
+  rw [← Finite.one_lt_card_iff_nontrivial]
+  change 1 < N.index
+  exact Nat.one_lt_iff_ne_zero_and_ne_one.mpr
+    ⟨Subgroup.index_ne_zero_of_finite, mt Subgroup.index_eq_one.mp h⟩
 
 /-- **normalCore = ⊥ ⇒ no nontrivial G-normal subgroup of H**:
 `B ⊴ G + B ≤ H + H.normalCore = ⊥ ⇒ B = ⊥`.
