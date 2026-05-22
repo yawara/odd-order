@@ -22,12 +22,12 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 3A | 半直積構成 + Aut(G) 位数評価 | 3.1 – 3.4 | 着手中 (Thm 3.1, 3.2 wrapper 済) |
-| 3B | Schur-Zassenhaus + 可解群基本 | 3.5 – 3.12 | TODO (mathlib `SchurZassenhaus` ラッパー予定) |
-| 3C | Hall 部分群 + 可解性判定 | 3.13 – 3.17 | TODO (FT クリティカル, 新規実装重い) |
-| 3D | π-separable + Hall-Higman 1.2.3 | 3.18 – 3.22 | TODO (FT クリティカル) |
-| 3E | Coprime action | 3.23 – 3.34 | TODO |
-| 3F | 巡回商 lift | 3.35 – 3.36 | TODO (FT 経路で必要性低) |
+| 3A | 半直積構成 + Aut(G) 位数評価 | 3.1 – 3.4 | ✅ (Thm 3.1, 3.2, 3.3 Horosevskii, 3.4 完成) |
+| 3B | Schur-Zassenhaus + 可解群基本 | 3.5 – 3.12 | ✅ (mathlib wrapper + Thm 3.11 minimal normal elem abelian) |
+| 3C | Hall 部分群 + 可解性判定 | 3.13 – 3.17 | ✅ (Hall-E 完全証明 + IsHallSubgroup + Lem 3.16; 3.15 placeholder) |
+| 3D | π-separable + Hall-Higman 1.2.3 | 3.18 – 3.22 | ✅⭐⭐ (Thm 3.21 Hall-Higman 1.2.3 sorry-free; AxiomsCheck flagship) |
+| 3E | Coprime action | 3.23 – 3.34 | 部分 (IsAInvariant + 多数 helpers; Glauberman 3.24 stub) |
+| 3F | 巡回商 lift | 3.35 – 3.36 | ✅ (cyclic_quotient_lift 弱版; full 3.35-36 は Phase 4) |
 
 ## 方針
 
