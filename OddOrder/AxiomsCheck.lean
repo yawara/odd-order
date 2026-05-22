@@ -81,3 +81,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.3 (Split Extensions): Thm 3.13 Hall E (solvable case)
 -- Hall π-subgroup の存在 (solvable G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_E_exists
+
+-- Ch.3 (Split Extensions): Thm 3.21 Hall-Higman 1.2.3 ⭐ **FT クリティカル**
+-- G π-separable + O_{π'}(G) = ⊥ ⇒ C_G(O_π(G)) ≤ O_π(G)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_higman_1_2_3
