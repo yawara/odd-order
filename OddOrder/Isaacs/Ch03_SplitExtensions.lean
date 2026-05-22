@@ -1731,6 +1731,20 @@ theorem IsAInvariant.subgroupOf {A : Type*} [Group A] {φ : A →* MulAut G}
     show (φ a)⁻¹ g ∈ K
     exact hK.inv_smul_mem a hg_K
 
+/-- `fixedPointsOfMulAut φ` は (同じ) `φ` 作用下で A-不変 (定義より trivially). -/
+theorem IsAInvariant.fixedPointsOfMulAut {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (Subgroup.fixedPointsOfMulAut φ) := fun a => by
+  show (Subgroup.fixedPointsOfMulAut φ).map (φ a).toMonoidHom = Subgroup.fixedPointsOfMulAut φ
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_fixedPointsOfMulAut]
+  refine ⟨?_, fun hy => ⟨y, hy, hy a⟩⟩
+  rintro ⟨x, hx, rfl⟩
+  -- (MulEquiv.toMonoidHom (φ a)) x = (φ a) x; need to show ∀ b, (φ b) ((φ a) x) = (φ a) x
+  show ∀ b, (φ b) ((φ a) x) = (φ a) x
+  intro b
+  rw [show (φ a) x = x from hx a]
+  exact hx b
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
