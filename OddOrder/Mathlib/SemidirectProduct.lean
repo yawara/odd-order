@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Generic helpers for `SemidirectProduct`
@@ -37,3 +38,11 @@ theorem IsPGroup.semidirectProduct
   obtain ⟨b, hb⟩ := (IsPGroup.iff_card).mp hG
   refine ⟨a + b, ?_⟩
   rw [SemidirectProduct.card, ha, hb, pow_add]
+
+/-- **p-group の半直積は冪零** (`IsPGroup.semidirectProduct` + `IsPGroup.isNilpotent`). -/
+theorem Group.IsNilpotent.semidirectProduct_of_pGroup
+    {N G : Type*} [Group N] [Group G] [Finite N] [Finite G]
+    {p : ℕ} [Fact p.Prime] {φ : G →* MulAut N}
+    (hN : IsPGroup p N) (hG : IsPGroup p G) :
+    Group.IsNilpotent (N ⋊[φ] G) :=
+  (IsPGroup.semidirectProduct hN hG).isNilpotent
