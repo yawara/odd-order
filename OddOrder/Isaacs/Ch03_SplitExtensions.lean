@@ -1597,6 +1597,11 @@ theorem IsAInvariant.center {A : Type*} [Group A] (φ : A →* MulAut G) :
     IsAInvariant φ (Subgroup.center G) :=
   IsAInvariant.of_characteristic φ
 
+/-- `fitting G` (Fitting subgroup) は A-不変 (characteristic instance 経由). -/
+theorem IsAInvariant.fittingSubgroup {A : Type*} [Group A] [Finite G] (φ : A →* MulAut G) :
+    IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting G) :=
+  IsAInvariant.of_characteristic φ
+
 /-- A-不変 + A-不変 の commutator は A-不変 (`Subgroup.map_commutator`). -/
 theorem IsAInvariant.commutator {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) :
