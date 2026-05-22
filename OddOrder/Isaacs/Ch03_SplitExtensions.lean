@@ -891,6 +891,30 @@ instance oPiCore.normal (π : Set ℕ) (G : Type*) [Group G] : (oPiCore π G).No
     rw [heq]
     exact (oPiCore π G).mul_mem hx hy
 
+/-- `O_π(G)` は `G` で characteristic. mathlib `characteristic_iff_le_comap` 経由で
+任意の自己同型 `φ : G ≃* G` で `oPiCore` の generator 各 `H` (normal π-group) の像
+`H.map φ` も normal π-group ⇒ `≤ oPiCore` を使う.
+
+Hall-Higman 3.21 の K char in C/B + C ⊴ G ⇒ K ⊴ G の経路で必須. -/
+instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
+    (oPiCore π G).Characteristic := by
+  rw [Subgroup.characteristic_iff_le_comap]
+  intro φ
+  refine iSup_le ?_
+  rintro ⟨H, hHN, hHpi⟩ h hh
+  rw [Subgroup.mem_comap]
+  -- φ h ∈ H.map φ.toMonoidHom (which is normal + π-group) ≤ oPiCore π G.
+  haveI hMapN : (H.map φ.toMonoidHom).Normal := hHN.map φ.toMonoidHom φ.surjective
+  have hMapPi : Subgroup.IsPiGroup π (H.map φ.toMonoidHom) := by
+    intro p hp
+    have hcardEq : Nat.card ↥(H.map φ.toMonoidHom) = Nat.card ↥H :=
+      Nat.card_congr (Subgroup.equivMapOfInjective H φ.toMonoidHom φ.injective).symm.toEquiv
+    rw [hcardEq] at hp
+    exact hHpi p hp
+  have hMapMem : φ h ∈ H.map φ.toMonoidHom := ⟨h, hh, rfl⟩
+  exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
+    (K.val : Subgroup G)) ⟨H.map φ.toMonoidHom, hMapN, hMapPi⟩ hMapMem
+
 /-- **Isaacs Lemma 3.18**: π-separable の補助補題. 正式定義下では non-trivial だが
 仮定義 (=IsSolvable) では trivial に True. -/
 theorem isPiSeparable_aux : True := trivial
