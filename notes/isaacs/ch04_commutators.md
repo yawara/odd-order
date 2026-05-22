@@ -25,6 +25,18 @@
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
+§4D **Lemma 4.32 完成** (2026-05-23 ⭐, ralph-loop): P p-群 が G 非自明 p-群 に作用 ⇒ `⁅G,P⁆ < G` + `C_G(P) > 1`.
+- **前半** `commutator_inl_inr_lt_inl_of_pgroup_action`: Γ = G ⋊[φ] P 内で ⁅inl(G), inr(P)⁆ < inl(G).
+  proof: Γ は p-群 (`IsPGroup.semidirectProduct`) で nilpotent. inl(G) 正規 + nontrivial.
+  `commutator_lt_self_of_isNilpotent_ambient` 適用. ~10 LOC.
+- **後半** `fixedPoints_ne_bot_of_pgroup_action_pgroup`: `Subgroup.fixedPointsOfMulAut φ ≠ ⊥`.
+  proof: `MulAction.compHom` で P が G に作用. 1 は trivial fixed point. p ∣ |G| (G nontrivial p-群).
+  mathlib `IsPGroup.exists_fixed_point_of_prime_dvd_card_of_fixed_point` で別 fixed point. ~15 LOC.
+- 関連 helper: `OddOrder.Mathlib.SemidirectProduct.{finite, IsPGroup.semidirectProduct,
+  IsNilpotent.semidirectProduct_of_pGroup}`, `OddOrder.Mathlib.Subgroup.fixedPointsOfMulAut`,
+  Ch.4 `iterCommutator_{le_lowerCentralSeries, eq_bot_of_isNilpotent_ambient}` (E ≤ F 不要版),
+  `commutator_lt_self_of_isNilpotent_ambient` (strict 降下).
+
 §4B **iterCommutator + Z(F(G)) absorbs G-minimal 補題 完成** (2026-05-23): Lucchini K=⊥ aux 解消の核補題.
 - `iterCommutator E F : ℕ → Subgroup G` 定義 + 5 補助補題 (`_le_lowerCentralSeries_map`, `_normal`, `_succ_le_self`, `_le_self`, `_eq_bot_of_isNilpotent`).
 - `le_centralizer_of_isMinimalNormal`: E ⊴ G minimal normal + E ≤ F + F ⊴ G + F 冪零 ⇒ E ≤ centralizer F. ~30 LOC. 証明は iterCommutator 降下列 + `Nat.find` で smallest k 取得 + minimality descent.
