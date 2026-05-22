@@ -1301,6 +1301,138 @@ private theorem hall_higman_case_pi_body
     exact (oPiCore.isPiGroup (G := ↥CB) π) p hp
   exact hall_higman_case_pi_contradiction π hKle_C hBle_K hQpi hBK_lt
 
+/-- **Hall-Higman 3.21 case π' body**: case π' での K + Schur-Zassenhaus + H' ⊴ K + 矛盾. -/
+private theorem hall_higman_case_pi'_body
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] (π : Set ℕ)
+    (hπ' : oPiCore {p | p ∉ π} G = ⊥)
+    (h_not_le : ¬ Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G)
+    (hCπ' : oPiCore {p | p ∉ π} ↥((Subgroup.centralizer (oPiCore π G : Set G)).map
+        (QuotientGroup.mk' (Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G))) ≠ ⊥) :
+    False := by
+  set O : Subgroup G := oPiCore π G with hO_def
+  set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
+  set B : Subgroup G := C ⊓ O with hB_def
+  haveI hO_normal : O.Normal := inferInstance
+  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
+  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
+  set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
+  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  set K_quot : Subgroup ↥CB := oPiCore {p | p ∉ π} ↥CB
+  haveI hKq_norm : K_quot.Normal := inferInstance
+  haveI hKq_char : K_quot.Characteristic := inferInstance
+  set K_GB : Subgroup (G ⧸ B) := K_quot.map CB.subtype with hKGB_def
+  haveI hKGB_norm : K_GB.Normal := inferInstance
+  set K : Subgroup G := K_GB.comap (QuotientGroup.mk' B) with hK_def
+  haveI hK_norm : K.Normal := inferInstance
+  have hKGB_le_CB : K_GB ≤ CB := by
+    have hRangEq : CB = (⊤ : Subgroup ↥CB).map CB.subtype := by
+      rw [← MonoidHom.range_eq_map]; exact CB.range_subtype.symm
+    rw [hRangEq]; exact Subgroup.map_mono le_top
+  have hKle_C : K ≤ C := Subgroup.comap_le_of_le_map_quotient inf_le_left hKGB_le_CB
+  have hBle_K : B ≤ K := by
+    intro x hx
+    simp only [hK_def, Subgroup.mem_comap]
+    rw [show (QuotientGroup.mk' B) x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+    exact K_GB.one_mem
+  have hBK_lt : B < K := by
+    refine lt_of_le_of_ne hBle_K ?_
+    intro hBKeq
+    apply hCπ'
+    have hKGB_bot : K_GB = ⊥ := by
+      rw [eq_bot_iff]
+      intro y hy
+      obtain ⟨x, hxy⟩ := QuotientGroup.mk_surjective y
+      rw [← hxy] at hy ⊢
+      have hx_K : x ∈ K := Subgroup.mem_comap.mpr hy
+      rw [← hBKeq] at hx_K
+      exact (QuotientGroup.eq_one_iff x).mpr hx_K
+    apply Subgroup.map_injective CB.subtype_injective
+    rw [Subgroup.map_bot]
+    exact hKGB_bot
+  have hBpi : Subgroup.IsPiGroup π B :=
+    Subgroup.IsPiGroup.le inf_le_right (oPiCore.isPiGroup π)
+  have hBsub_pi : Subgroup.IsPiGroup π (B.subgroupOf K) :=
+    Subgroup.IsPiGroup.subgroupOf hBle_K hBpi
+  have hKBindex_pi' : ∀ p ∈ (B.subgroupOf K).index.primeFactors, p ∉ π := by
+    intro p hp
+    have hindex_eq : (B.subgroupOf K).index = Nat.card ↥K_GB := by
+      show Nat.card (↥K ⧸ (B.subgroupOf K)) = _
+      rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map B K]
+      have hKmap_eq : K.map (QuotientGroup.mk' B) = K_GB :=
+        Subgroup.map_comap_eq_self_of_surjective QuotientGroup.mk_surjective K_GB
+      rw [hKmap_eq]
+    rw [hindex_eq] at hp
+    have hcard : Nat.card ↥K_GB = Nat.card ↥K_quot :=
+      Nat.card_congr
+        (Subgroup.equivMapOfInjective K_quot CB.subtype CB.subtype_injective).symm.toEquiv
+    rw [hcard] at hp
+    exact (oPiCore.isPiGroup (G := ↥CB) {p | p ∉ π}) p hp
+  haveI hBsub_K_normal : (B.subgroupOf K).Normal := inferInstance
+  have hCoprime : Nat.Coprime (Nat.card ↥(B.subgroupOf K)) (B.subgroupOf K).index :=
+    Nat.coprime_of_isPiGroup_of_isPiGroup_compl Nat.card_pos.ne'
+      Subgroup.index_ne_zero_of_finite hBsub_pi hKBindex_pi'
+  obtain ⟨H', hH'_compl⟩ :=
+    Subgroup.exists_right_complement'_of_coprime (N := B.subgroupOf K) hCoprime
+  have hCommute : ∀ n ∈ B.subgroupOf K, ∀ h ∈ H', n * h = h * n := by
+    intro n hn h _
+    apply Subtype.ext
+    show n.val * h.val = h.val * n.val
+    have hnB : n.val ∈ B := hn
+    have hnO : n.val ∈ O := by
+      rw [hB_def, Subgroup.mem_inf] at hnB
+      exact hnB.2
+    have hh_in_K : h.val ∈ K := h.property
+    have hh_in_C : h.val ∈ C := hKle_C hh_in_K
+    exact (Subgroup.mem_centralizer_iff.mp hh_in_C) n.val hnO
+  haveI hH'_normal : H'.Normal := Subgroup.normal_complement_of_commute hH'_compl hCommute
+  have hH'_card : Nat.card ↥H' = (B.subgroupOf K).index := by
+    have hCompl_card : Nat.card ↥(B.subgroupOf K) * Nat.card ↥H' = Nat.card ↥K := by
+      rw [← Nat.card_prod]
+      exact Nat.card_congr (Subgroup.IsComplement.equiv hH'_compl).symm
+    have hKcard : Nat.card ↥K =
+        Nat.card (↥K ⧸ B.subgroupOf K) * Nat.card ↥(B.subgroupOf K) :=
+      (B.subgroupOf K).card_eq_card_quotient_mul_card_subgroup
+    have hpos : 0 < Nat.card ↥(B.subgroupOf K) := Nat.card_pos
+    have heq : Nat.card ↥H' * Nat.card ↥(B.subgroupOf K) =
+        (B.subgroupOf K).index * Nat.card ↥(B.subgroupOf K) := by
+      rw [Nat.mul_comm (Nat.card ↥H') _, hCompl_card, hKcard]
+      show (B.subgroupOf K).index * Nat.card ↥(B.subgroupOf K) =
+           (B.subgroupOf K).index * Nat.card ↥(B.subgroupOf K)
+      rfl
+    exact Nat.eq_of_mul_eq_mul_right hpos heq
+  have hH'_pi' : Subgroup.IsPiGroup {p | p ∉ π} H' := by
+    intro p hp
+    rw [hH'_card] at hp
+    exact hKBindex_pi' p hp
+  have hH'_le : H' ≤ oPiCore {p | p ∉ π} ↥K := hH'_pi'.le_oPiCore
+  haveI hOpi'_KG_normal : ((oPiCore {p | p ∉ π} ↥K).map K.subtype).Normal := inferInstance
+  have hOpi'_KG_pi' : Subgroup.IsPiGroup {p | p ∉ π}
+      ((oPiCore {p | p ∉ π} ↥K).map K.subtype) := by
+    intro p hp
+    have hcard : Nat.card ↥((oPiCore {p | p ∉ π} ↥K).map K.subtype) =
+        Nat.card ↥(oPiCore {p | p ∉ π} ↥K) :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ K.subtype K.subtype_injective).symm.toEquiv
+    rw [hcard] at hp
+    exact oPiCore.isPiGroup (G := ↥K) {p | p ∉ π} p hp
+  have hKG_le_bot : (oPiCore {p | p ∉ π} ↥K).map K.subtype = ⊥ :=
+    eq_bot_of_isPiGroup_of_oPiCore_eq_bot {p | p ∉ π} hOpi'_KG_pi' hπ'
+  have hOpi'_K_bot : oPiCore {p | p ∉ π} ↥K = ⊥ := by
+    apply Subgroup.map_injective K.subtype_injective
+    rw [Subgroup.map_bot]
+    exact hKG_le_bot
+  have hH'_bot : H' = ⊥ := le_bot_iff.mp (hH'_le.trans (le_of_eq hOpi'_K_bot))
+  have hBsub_ne_top : B.subgroupOf K ≠ ⊤ := by
+    intro hEq
+    rw [Subgroup.subgroupOf_eq_top] at hEq
+    exact absurd hEq (fun hKleB => (lt_irrefl _) (hBK_lt.trans_le hKleB))
+  have hH'_card_gt : 1 < Nat.card ↥H' := by
+    rw [hH'_card]
+    exact Subgroup.one_lt_index_of_ne_top hBsub_ne_top
+  have hH'_card_one : Nat.card ↥H' = 1 := by
+    rw [hH'_bot, Subgroup.card_bot]
+  omega
+
 /-- **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
