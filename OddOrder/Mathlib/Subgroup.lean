@@ -138,6 +138,24 @@ theorem centralizer_sup (H K : Subgroup G) :
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
 
+/-- **`Subgroup.centralizer` の bijective hom 像**: bijective `f : G →* G'` で
+`(centralizer s).map f = centralizer (f '' s)`. mathlib v4.29.1 では `≤` 方向のみ
+(`map_centralizer_le_centralizer_image`). -/
+theorem map_centralizer_eq_of_bijective {G G' : Type*} [Group G] [Group G']
+    (s : Set G) (f : G →* G') (hf : Function.Bijective f) :
+    (Subgroup.centralizer s).map f = Subgroup.centralizer (f '' s) := by
+  apply le_antisymm (Subgroup.map_centralizer_le_centralizer_image s f)
+  intro y hy
+  obtain ⟨g, rfl⟩ := hf.surjective y
+  refine ⟨g, ?_, rfl⟩
+  show g ∈ Subgroup.centralizer s
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  have hfx : f x ∈ f '' s := ⟨x, hx, rfl⟩
+  have := Subgroup.mem_centralizer_iff.mp hy (f x) hfx
+  rw [← map_mul, ← map_mul] at this
+  exact hf.injective this
+
 /-- **`p`-th power subgroup is characteristic** in CommGroup: for any `n : ℕ`, the range
 of `powMonoidHom n` (= `{x^n : x : M}` as subgroup of M) is characteristic in M.
 
