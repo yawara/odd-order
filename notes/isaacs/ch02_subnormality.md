@@ -42,7 +42,7 @@
 | §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
 | **Thm 2.18 Zenkov** | ✅ (2026-05-22) | `zenkov_minimal_le_fitting`. WLOG wrapper + `zenkov_wlog_aux` (|G|-induction). Case 1 (∃ g, A ⊔ B^g = ⊤): `zenkov_case1_le_fitting` (中心性 + minimality). Case 2 (∀ g, < ⊤): Sylow-by-Sylow via Baer iff + IH on ↥H (`zenkov_minimality_transfer`) + opCore + p-group sup. ~350 行 (補助補題込み) |
 | **Cor 2.19** | ✅ (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov axiom + Lemma 2.10 + `card_set_mul_card_inf` 計数. A = ⊤ case は G abelian ⇒ G nilpotent ⇒ F(G) = ⊤ |
-| **Thm 2.20 Lucchini** | axiom (2026-05-22) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. 完全証明 ~200-300 行 (Cor 2.19 を利用) |
+| **Thm 2.20 Lucchini** | ✅ (2026-05-22, K > ⊥ 部分) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. **K > ⊥ inductive step**: G/K に IH 適用 + `MonoidHom.subgroupMap` の核計算 (~100 行). **K = ⊥ 部分のみ narrower axiom** (`lucchini_K_bot_aux`); 完全形式化は Cor 2.19 + minimal normal E ⊆ Z(F(G)) 解析で ~200 行 |
 
 ## 章のセクション分割と全 20 定理
 
