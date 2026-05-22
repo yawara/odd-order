@@ -117,7 +117,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.8, 5.9 Z(G) transversal の commutator 構造 | 短い補題. 5.7 Schur の証明部品で mathlib `closureCommutatorRepresentatives` 周辺と関連 | 短い |
 | 5.10 Dietzmann theorem | mathlib `Mathlib/GroupTheory` 全体を grep する限り Dietzmann 名は未登場. Schur 5.7 の証明で間接的に使用 (`Schreier.lean` で別経路の bound 経由) | **新規実装** (Isaacs §5B 末) |
 | 5.11 Hall transfer | mathlib 未収載 (`exists_right_complement'_of_coprime` 周辺と独立). 5.13 証明の一部 | 中 |
-| 5.12 N_G(P) controls C_G(P) fusion | mathlib に直接対応無し. Sylow conjugacy + 直接計算 | 中 |
+| 5.12 N_G(P) controls C_G(P) fusion | ✅ `normalizer_controls_centralizer_fusion` (2026-05-23). Sylow II in K = C_G(y) + `Sylow.smul_subtype` + `Sylow.subtype_injective` + `Sylow.smul_eq_iff_mem_normalizer` で ~50 LOC | ✅ |
 | 5.17 cyclic Sylow ⇒ p ∤ \|G'\|·\|G:G'\| | `IsZGroup.coprime_commutator_index` (`ZGroup.lean:280`) と関連. 単一 prime での命題に分離 | 短い (ZGroup API 経由) |
 | **5.18 abelian Sylow 強化 Burnside** | mathlib 未収載. 5.21 (Focal) を P abelian に特殊化した形. Foc_G(P) を P^{ab} ∩ ... と詳述 | 中 (Focal 経由) |
 | 5.19 Sylow_2 direct product 系 ⇒ 非単純 | mathlib 未収載. 5.18 から導出 | 短い |
