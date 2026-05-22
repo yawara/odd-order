@@ -487,6 +487,39 @@ theorem iterCommutator_le_lowerCentralSeries_map
     rw [hMapLcs]
     exact Subgroup.commutator_mono ih le_rfl
 
+/-- **iterCommutator は normal を保つ**. `E, F ⊴ G` ⇒ `iter E F n ⊴ G`. -/
+theorem iterCommutator_normal {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
+    (iterCommutator E F n).Normal := by
+  induction n with
+  | zero => exact ‹E.Normal›
+  | succ n ih =>
+    haveI := ih
+    rw [iterCommutator_succ]
+    infer_instance
+
+/-- **iterCommutator は antitone (decreasing)**. `E, F ⊴ G` ⇒
+`iter E F (n+1) ≤ iter E F n`.
+
+(直観: `iter E F n ⊴ G ⊇ F` で `F` は `iter E F n` を normalize するので
+`⁅iter, F⁆ ≤ iter`.) -/
+theorem iterCommutator_succ_le_self {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
+    iterCommutator E F (n + 1) ≤ iterCommutator E F n := by
+  haveI : (iterCommutator E F n).Normal := iterCommutator_normal n
+  rw [iterCommutator_succ]
+  exact Subgroup.commutator_le_left (iterCommutator E F n) F
+
+/-- **F 冪零 ⇒ iterCommutator は最終的に ⊥**: `E ≤ F` + `F` (as group `↥F`) が冪零
+⇒ ∃ n, `iter E F n = ⊥`. -/
+theorem iterCommutator_eq_bot_of_isNilpotent
+    {E F : Subgroup G} (hE : E ≤ F) [hF : Group.IsNilpotent ↥F] :
+    ∃ n, iterCommutator E F n = ⊥ := by
+  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hF
+  refine ⟨n, le_antisymm ?_ bot_le⟩
+  calc iterCommutator E F n
+      ≤ (lowerCentralSeries (↥F) n).map F.subtype :=
+        iterCommutator_le_lowerCentralSeries_map hE n
+    _ ≤ ⊥ := by rw [hn]; exact (Subgroup.map_bot F.subtype).le
+
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
 
