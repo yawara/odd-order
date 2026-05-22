@@ -922,6 +922,47 @@ theorem Subgroup.IsPiGroup.le_oPiCore {G : Type*} [Group G] {π : Set ℕ} {H : 
   le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H, ‹_›, hH⟩
 
+/-- **2 つの normal π-subgroup の sup も π-subgroup**: 有限群 `G` で `H₁, H₂ ⊴ G`
+が共に π-group ⇒ `H₁ ⊔ H₂` も π-group.
+
+**証明**: `|H₁ ⊔ H₂| · |H₁ ⊓ H₂| = |H₁| · |H₂|` (`card_HK_mul_card_inf_eq_card_mul_card`
+in `OddOrder/Mathlib/Subgroup`) + `(H₁ ⊔ H₂ : Set G) = ↑H₁ * ↑H₂` (normal で
+`mem_sup_of_normal_left`) で `|H₁ ⊔ H₂| ∣ |H₁| · |H₂|`. primeFactors monotone +
+primeFactors_mul で結論.
+
+**用途**: `oPiCore.isPiGroup` (Hall-Higman 3.21 critical bottleneck) の closure step. -/
+theorem Subgroup.IsPiGroup.sup_of_normal {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {H K : Subgroup G} [H.Normal] [K.Normal]
+    (hH : Subgroup.IsPiGroup π H) (hK : Subgroup.IsPiGroup π K) :
+    Subgroup.IsPiGroup π (H ⊔ K) := by
+  intro p hp
+  -- Step 1: Nat.card ↥(H ⊔ K) = Nat.card (↑H * ↑K : Set G) via mem_sup_of_normal_left.
+  have hcard_eq : Nat.card ↥(H ⊔ K) = Nat.card (↑H * ↑K : Set G) := by
+    refine Nat.card_congr ⟨fun x => ⟨x.val, ?_⟩, fun y => ⟨y.val, ?_⟩,
+        fun _ => rfl, fun _ => rfl⟩
+    · obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_left.mp x.2
+      exact ⟨a, ha, b, hb, hab⟩
+    · obtain ⟨a, ha, b, hb, hab⟩ := y.2
+      rw [← hab]
+      exact Subgroup.mul_mem_sup ha hb
+  -- Step 3: Nat.card (↑H * ↑K : Set G) ∣ Nat.card ↥H * Nat.card ↥K.
+  have hHKformula : Nat.card (↑H * ↑K : Set G) * Nat.card ↥(H ⊓ K)
+      = Nat.card H * Nat.card K :=
+    Subgroup.card_HK_mul_card_inf_eq_card_mul_card H K
+  have hdvd : Nat.card ↥(H ⊔ K) ∣ Nat.card ↥H * Nat.card ↥K := by
+    rw [hcard_eq]
+    exact ⟨_, hHKformula.symm⟩
+  -- Step 4: primeFactors of |H ⊔ K| ⊆ primeFactors of (|H| * |K|).
+  have hne : Nat.card ↥H * Nat.card ↥K ≠ 0 :=
+    mul_ne_zero Nat.card_pos.ne' Nat.card_pos.ne'
+  have hsubset : (Nat.card ↥(H ⊔ K)).primeFactors
+      ⊆ (Nat.card ↥H * Nat.card ↥K).primeFactors :=
+    Nat.primeFactors_mono hdvd hne
+  rw [Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hsubset
+  rcases Finset.mem_union.mp (hsubset hp) with hpH | hpK
+  · exact hH p hpH
+  · exact hK p hpK
+
 /-- **`oPiCore` は `π` について monotone**: `π₁ ⊆ π₂ ⇒ oPiCore π₁ G ≤ oPiCore π₂ G`.
 π を広げると normal π-subgroup の集合は大きくなり, iSup も増える. -/
 theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [Group G] :
