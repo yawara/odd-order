@@ -1,3 +1,4 @@
+import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Isaacs.Ch01_Sylow
