@@ -4,9 +4,25 @@
 形式化先 (予定): [`OddOrder/Isaacs/Ch04_Commutators.lean`](../../OddOrder/Isaacs/Ch04_Commutators.lean) (未着手)。
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 2124-2798。
 
-## 進捗 (2026-05-21)
+## 進捗 (2026-05-23 更新)
 
-未着手。本ノートは調査結果のみ。前提は Ch.3 (特に Cor 3.28 coprime quotient, Lemma 3.21 Hall-Higman 1.2.3) と Ch.1 (Frattini, nilpotency)。
+§4A 部分完成 + §4B Cor 4.10 完成:
+
+| # | 状態 | 実装 |
+|---|---|---|
+| **Lem 4.1** (H, K normalize ⁅H,K⁆, 一般版) | ✅ | `subgroup_le_normalizer_commutator_self` + `_right`. Identity `g·⁅a,b⁆·g⁻¹ = ⁅ga,b⁆·⁅b,g⁆` (`conj_commutator_split`) + `closure_induction`. |
+| Lem 4.2 (map_commutator) | ✅ mathlib direct | no-wrapper. |
+| **Lem 4.3** (⁅H,K⁆ ≤ H ↔ K ≤ N(H)) | ✅ | `commutator_le_iff_le_normalizer` (3 forms: forward/backward/iff). Element identity `k·x·k⁻¹ = ⁅k,x⁆·x`. |
+| Lem 4.4 (class 2 p-群 exponent) | docstring | Subgroup `Monoid.exponent` API 要拡張. |
+| Lem 4.5 (P/N elementary abelian iff Φ ⊆ N) | docstring | mathlib `Subgroup.frattini` 経由保留. |
+| **Lem 4.6** ⭐ (G' = ⁅A, ⊤⁆) | ✅ (2026-05-23) | `commutator_eq_commutator_of_normal_abelian_cyclic_quotient`. mathlib `commutative_of_cyclic_center_quotient` 経由 5-step proof: ⁅A,⊤⁆ ≤ A, lift Q→G/A, ker ⊆ Z(Q) (∵ ⁅a,g⁆∈⁅A,⊤⁆), Q abelian, commutator G ⊆ ⁅A,⊤⁆. Lem 4.6 後半 G' ≅ A/(A∩Z(G)) は別途. |
+| Thm 4.7 (maximal class) | docstring | Lem 4.6 経由予定. |
+| Thm 4.8 (p>2 class≤2 ⇒ {x^p=1} 群) | docstring | Baer trick (4.37) 前身. |
+| **Cor 4.10** (Three-sub mod N) | ✅ | `commutator_commutator_le_of_rotate`. 商写像 G→G/N で push し mathlib `commutator_commutator_eq_bot_of_rotate` 適用. |
+
+§4B-§4D 残: Thm 4.11 lcs additivity, §4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster).
+
+前提は Ch.3 (特に Cor 3.28 coprime quotient, Lemma 3.21 Hall-Higman 1.2.3) と Ch.1 (Frattini, nilpotency)。
 
 ## mmd 抽出失敗の整理
 
