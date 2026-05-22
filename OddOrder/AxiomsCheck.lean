@@ -7,6 +7,8 @@ import Lean
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch05_Transfer
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -85,3 +87,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.3 (Split Extensions): Thm 3.21 Hall-Higman 1.2.3 ⭐ **FT クリティカル**
 -- G π-separable + O_{π'}(G) = ⊥ ⇒ C_G(O_π(G)) ≤ O_π(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_higman_1_2_3
+
+-- Ch.4 (Commutators): Lem 4.32 (両半) P p-群 on G p-群 nontrivial
+-- 前半: Γ = G ⋊ P 内で ⁅inl(G), inr(P)⁆ < inl(G) (strict)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.commutator_inl_inr_lt_inl_of_pgroup_action
+-- 後半: fixedPointsOfMulAut φ > ⊥ (C_G(P) > 1)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup
+
+-- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
