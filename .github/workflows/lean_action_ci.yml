@@ -36,4 +36,6 @@ jobs:
             exit 1
           fi
 
-      - uses: leanprover-community/docgen-action@v1
+      # GitHub Pages 未有効化のため docgen-action は Pages deploy で 404 失敗する.
+      # Pages を有効化するか, deploy を切り離すまで一時無効化.
+      # - uses: leanprover-community/docgen-action@v1
