@@ -1572,6 +1572,54 @@ theorem IsAInvariant.normalizer {A : Type*} [Group A] {φ : A →* MulAut G} {H 
   rw [Subgroup.map_normalizer_eq_of_bijective H (φ a).bijective,
       show H.map (φ a).toMonoidHom = H from hH a]
 
+/-- A-不変部分群の centralizer は A-不変. proof: 元レベルで `(φ a)⁻¹ h ∈ H` (A-inv 経由) +
+`(φ a)` が monoid hom で commute を保存. -/
+theorem IsAInvariant.centralizer {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) :
+    IsAInvariant φ (Subgroup.centralizer (H : Set G)) := fun a => by
+  have hHinv : (φ a⁻¹) • H = H := hH a⁻¹
+  rw [φ.map_inv] at hHinv
+  -- Forward: ∀ h ∈ H, (φ a)⁻¹ h ∈ H
+  have h_inv_mem : ∀ h : G, h ∈ H → (φ a)⁻¹ h ∈ H := fun h hh => by
+    have : (φ a)⁻¹ h ∈ (φ a)⁻¹ • H := ⟨h, hh, rfl⟩
+    rwa [hHinv] at this
+  -- Forward: ∀ h ∈ H, (φ a) h ∈ H
+  have h_mem : ∀ h : G, h ∈ H → (φ a) h ∈ H := fun h hh => by
+    have : (φ a) h ∈ (φ a) • H := ⟨h, hh, rfl⟩
+    rwa [hH a] at this
+  ext g
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      Subgroup.mem_centralizer_iff, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hyp h hh
+    -- hyp at ((φ a) h) ∈ H gives: (φ a) h * (φ a)⁻¹ g = (φ a)⁻¹ g * (φ a) h
+    -- Apply (φ a): (φ a)((φ a) h * (φ a)⁻¹ g) = (φ a)((φ a)⁻¹ g * (φ a) h)
+    --             ⇒ ((φ a)(φ a) h) * g = g * ((φ a)(φ a) h)
+    -- That's wrong. Let me redo.
+    -- hyp at h ∈ H gives: h * (φ a)⁻¹ g = (φ a)⁻¹ g * h
+    -- Apply (φ a) to both sides: (φ a) h * g = g * (φ a) h
+    -- So g commutes with (φ a) h. Since (φ a) is bijective on H, every h' ∈ H comes from
+    -- (φ a) h_0 for some h_0 ∈ H. So g commutes with all of H. ✓
+    -- Apply hyp at h_0 := (φ a)⁻¹ h.
+    have hh0 : (φ a)⁻¹ h ∈ H := h_inv_mem h hh
+    have hcom := hyp ((φ a)⁻¹ h) hh0
+    simp only [MulAut.smul_def] at hcom
+    have := congr_arg (φ a) hcom
+    simp only [map_mul, MulAut.apply_inv_self] at this
+    exact this
+  · intro hyp h hh
+    have h_phi_mem : (φ a) h ∈ H := h_mem h hh
+    have hcom := hyp ((φ a) h) h_phi_mem
+    show h * ((φ a)⁻¹ • g) = ((φ a)⁻¹ • g) * h
+    simp only [MulAut.smul_def]
+    -- hcom: (φ a) h * g = g * (φ a) h
+    -- Apply (φ a)⁻¹ as MulAut (so map_mul + apply_inv works)
+    have heq : ((φ a)⁻¹ : MulAut G) ((φ a) h * g) = ((φ a)⁻¹ : MulAut G) (g * (φ a) h) := by
+      rw [hcom]
+    simp only [map_mul, show ∀ x : G, ((φ a)⁻¹ : MulAut G) ((φ a) x) = x from
+      fun x => MulAut.inv_apply_self G (φ a) x] at heq
+    exact heq
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
