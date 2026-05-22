@@ -576,6 +576,14 @@ def IsHallSubgroup (π : Set ℕ) (H : Subgroup G) : Prop :=
   (∀ p ∈ (Nat.card H).primeFactors, p ∈ π) ∧
   (∀ p ∈ H.index.primeFactors, p ∉ π)
 
+/-- π-Hall H ⇒ H's order has only π-prime factors (definition の片半分 = π-group 性質). -/
+theorem IsHallSubgroup.primeFactors_card_subset {π : Set ℕ} {H : Subgroup G}
+    (h : IsHallSubgroup π H) : ∀ p ∈ (Nat.card H).primeFactors, p ∈ π := h.1
+
+/-- π-Hall H ⇒ H.index is a π'-number (no π-prime divides it). -/
+theorem IsHallSubgroup.index_no_pi {π : Set ℕ} {H : Subgroup G}
+    (h : IsHallSubgroup π H) : ∀ p ∈ H.index.primeFactors, p ∉ π := h.2
+
 /-- π-Hall ⇒ Coprime `|H|` `|G:H|`. 標準的: 共通素因子は π と π' 両方に属し矛盾. -/
 theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
     (h : IsHallSubgroup π H) : Nat.Coprime (Nat.card H) H.index := by
