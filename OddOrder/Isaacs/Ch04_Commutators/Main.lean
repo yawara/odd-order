@@ -836,6 +836,15 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 def actionCommutator {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) : Subgroup G :=
   Subgroup.closure {x : G | ∃ g : G, ∃ a : A, x = g * (φ a) g⁻¹}
 
+/-- 自明作用 (φ = 1) の場合, `actionCommutator = ⊥` (各 generator = g * g⁻¹ = 1). -/
+@[simp]
+theorem actionCommutator_one_eq_bot {A G : Type*} [Group A] [Group G] :
+    actionCommutator (1 : A →* MulAut G) = ⊥ := by
+  rw [actionCommutator, Subgroup.closure_eq_bot_iff]
+  rintro _ ⟨g, a, rfl⟩
+  show g * (1 : MulAut G) g⁻¹ = 1
+  simp
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
