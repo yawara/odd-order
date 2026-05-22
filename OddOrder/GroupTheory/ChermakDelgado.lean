@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Data.Finite.Card
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.GroupTheory.Index
 import Mathlib.Tactic.Ring
 import OddOrder.Mathlib.Subgroup
 
@@ -348,5 +350,205 @@ theorem chermakDelgadoLattice_centralizer_centralizer_eq [Finite G] {H : Subgrou
             = (centralizer (H : Set G) : Subgroup G).chermakDelgadoMeasure :=
     le_antisymm (chermakDelgadoMeasure_le_centralizer H) (hH _)
   exact (chermakDelgadoMeasure_eq_centralizer_iff H).mp h_eq
+
+/-! ### Cor 1.45 + Thm 1.41: properties of `M = chermakDelgadoSubgroup G`. -/
+
+/-- L(G) is nonempty (max measure exists for finite G). -/
+theorem chermakDelgadoLattice_nonempty [Finite G] :
+    (chermakDelgadoLattice G).Nonempty := by
+  haveI : Nonempty (Subgroup G) := ⟨⊥⟩
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  obtain ⟨H_max, h_max⟩ :=
+    Finite.exists_max (fun H : Subgroup G => H.chermakDelgadoMeasure)
+  exact ⟨H_max, h_max⟩
+
+/-- L(G) is finite. -/
+theorem chermakDelgadoLattice_finite [Finite G] :
+    (chermakDelgadoLattice G).Finite := by
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  exact Set.toFinite _
+
+/-- M = sInf L (alternative form of `chermakDelgadoSubgroup`). -/
+theorem chermakDelgadoSubgroup_eq_sInf :
+    chermakDelgadoSubgroup G = sInf (chermakDelgadoLattice G) := by
+  rw [chermakDelgadoSubgroup, sInf_eq_iInf]
+
+/-- 補助: 有限・閉じた sublattice の `sInf` は中身に入っている. -/
+private theorem _sInf_mem_of_finite_subset [Finite G] (S : Set (Subgroup G))
+    (hfin : S.Finite) :
+    S.Nonempty → S ⊆ chermakDelgadoLattice G → sInf S ∈ chermakDelgadoLattice G := by
+  induction S, hfin using Set.Finite.induction_on with
+  | empty => intro hne _; exact (Set.not_nonempty_empty hne).elim
+  | @insert a t hat ht_fin ih =>
+    intro _hne hsub
+    rcases t.eq_empty_or_nonempty with rfl | ht_ne
+    · -- t = ∅, so S = {a}. sInf {a} = a, and a ∈ L
+      rw [Set.insert_eq, Set.union_empty, sInf_singleton]
+      exact hsub (Set.mem_insert _ _)
+    · -- t nonempty
+      have hsub_t : t ⊆ chermakDelgadoLattice G :=
+        fun H hH => hsub (Set.mem_insert_of_mem _ hH)
+      have ha_in : a ∈ chermakDelgadoLattice G := hsub (Set.mem_insert _ _)
+      have h_ih := ih ht_ne hsub_t
+      rw [sInf_insert]
+      exact chermakDelgadoLattice_inf_mem ha_in h_ih
+
+/-- **Isaacs Cor 1.45 part 1**: `M = chermakDelgadoSubgroup G ∈ L(G)`. -/
+theorem chermakDelgadoSubgroup_mem_lattice [Finite G] :
+    chermakDelgadoSubgroup G ∈ chermakDelgadoLattice G := by
+  rw [chermakDelgadoSubgroup_eq_sInf]
+  exact _sInf_mem_of_finite_subset _ chermakDelgadoLattice_finite
+    chermakDelgadoLattice_nonempty Set.Subset.rfl
+
+/-- `M ≤ H` for any `H ∈ L`. -/
+theorem chermakDelgadoSubgroup_le_of_mem [Finite G] {H : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) :
+    chermakDelgadoSubgroup G ≤ H := by
+  rw [chermakDelgadoSubgroup_eq_sInf]
+  exact sInf_le hH
+
+/-- `M ≤ C_G(M)` ── M ∈ L で `C_G(M) ∈ L` (Thm 1.44(c)) なので `M ≤ C_G(M)`. -/
+theorem chermakDelgadoSubgroup_le_centralizer [Finite G] :
+    chermakDelgadoSubgroup G
+      ≤ (centralizer ((chermakDelgadoSubgroup G : Subgroup G) : Set G) : Subgroup G) :=
+  chermakDelgadoSubgroup_le_of_mem
+    (chermakDelgadoLattice_centralizer_mem chermakDelgadoSubgroup_mem_lattice)
+
+/-- **Isaacs Cor 1.45 part 2**: `M` is abelian (`IsMulCommutative`). -/
+instance chermakDelgadoSubgroup_isMulCommutative [Finite G] :
+    IsMulCommutative (chermakDelgadoSubgroup G) :=
+  le_centralizer_iff_isMulCommutative.mp chermakDelgadoSubgroup_le_centralizer
+
+/-- **Isaacs Cor 1.45 part 3**: `Z(G) ≤ M`.
+
+`M = C_G(C_G(M))` (Thm 1.44(c)) で `Z(G) ≤ C_G(X)` (任意 X) を組み合わせる. -/
+theorem center_le_chermakDelgadoSubgroup [Finite G] :
+    center G ≤ chermakDelgadoSubgroup G := by
+  rw [← chermakDelgadoLattice_centralizer_centralizer_eq chermakDelgadoSubgroup_mem_lattice]
+  exact center_le_centralizer _
+
+/-- Chermak-Delgado 測度は群自己同型の下で不変. -/
+private lemma chermakDelgadoMeasure_map_equiv (ϕ : G ≃* G) (K : Subgroup G) :
+    (K.map ϕ.toMonoidHom).chermakDelgadoMeasure = K.chermakDelgadoMeasure := by
+  rw [chermakDelgadoMeasure_def, chermakDelgadoMeasure_def]
+  have h_card_K : Nat.card (K.map ϕ.toMonoidHom : Subgroup G) = Nat.card K :=
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective K ϕ.toMonoidHom ϕ.injective).symm.toEquiv
+  have h_centralizer :
+      (centralizer ((K.map ϕ.toMonoidHom : Subgroup G) : Set G) : Subgroup G)
+        = (centralizer (K : Set G) : Subgroup G).map ϕ.toMonoidHom := by
+    apply SetLike.coe_injective
+    ext g
+    simp only [Subgroup.coe_map, Set.mem_image, mem_centralizer_iff, SetLike.mem_coe]
+    constructor
+    · intro hg
+      refine ⟨ϕ.symm g, ?_, by simp⟩
+      intro k hk
+      -- hg (ϕ k) hkmap : ϕ k * g = g * ϕ k
+      have h1 : ϕ k * g = g * ϕ k :=
+        hg (ϕ k) (Subgroup.mem_map.mpr ⟨k, hk, rfl⟩)
+      have h2 := congrArg ϕ.symm h1
+      simp only [MulEquiv.map_mul, MulEquiv.symm_apply_apply] at h2
+      -- h2 : k * ϕ.symm g = ϕ.symm g * k
+      exact h2
+    · rintro ⟨a, ha, rfl⟩ y hy
+      obtain ⟨k, hk, rfl⟩ := Subgroup.mem_map.mp hy
+      -- ha k hk : k * a = a * k
+      have h1 : k * a = a * k := ha k hk
+      have h2 := congrArg ϕ h1
+      simp only [MulEquiv.map_mul] at h2
+      -- h2 : ϕ k * ϕ a = ϕ a * ϕ k
+      exact h2
+  rw [h_card_K, h_centralizer]
+  congr 1
+  exact Nat.card_congr
+    (Subgroup.equivMapOfInjective
+      (centralizer (K : Set G) : Subgroup G) ϕ.toMonoidHom ϕ.injective).symm.toEquiv
+
+/-- comap 版の不変性. -/
+private lemma chermakDelgadoMeasure_comap_equiv (ϕ : G ≃* G) (K : Subgroup G) :
+    (K.comap ϕ.toMonoidHom).chermakDelgadoMeasure = K.chermakDelgadoMeasure := by
+  rw [comap_equiv_eq_map_symm', chermakDelgadoMeasure_map_equiv]
+
+/-- 自己同型は L(G) を保つ (comap 形式). -/
+private lemma chermakDelgadoLattice_comap_mem (ϕ : G ≃* G) {K : Subgroup G}
+    (hK : K ∈ chermakDelgadoLattice G) :
+    K.comap ϕ.toMonoidHom ∈ chermakDelgadoLattice G := by
+  intro J
+  rw [chermakDelgadoMeasure_comap_equiv]
+  exact hK J
+
+/-- **Isaacs Cor 1.45 part 4**: `M` is characteristic.
+
+`L(G)` は自己同型で不変 ⟹ `M = sInf L(G)` も不変. -/
+instance chermakDelgadoSubgroup_characteristic [Finite G] :
+    (chermakDelgadoSubgroup G).Characteristic := by
+  rw [characteristic_iff_le_comap]
+  intro ϕ
+  rw [chermakDelgadoSubgroup_eq_sInf]
+  -- 目標: sInf L ≤ (sInf L).comap ϕ
+  -- 各 x ∈ sInf L について, ϕ x ∈ sInf L を示せばよい
+  intro x hx
+  rw [mem_comap, Subgroup.mem_sInf]
+  intro K hK
+  -- K ∈ L. ϕ x ∈ K ↔ x ∈ K.comap ϕ. K.comap ϕ ∈ L (measure-invariant).
+  -- x ∈ sInf L ≤ K.comap ϕ. ✓
+  have hKcomap : K.comap ϕ.toMonoidHom ∈ chermakDelgadoLattice G :=
+    chermakDelgadoLattice_comap_mem ϕ hK
+  rw [Subgroup.mem_sInf] at hx
+  exact hx _ hKcomap
+
+/-! ### Thm 1.41 (Chermak-Delgado main theorem). -/
+
+/-- **Isaacs Thm 1.41 (Chermak-Delgado)**: There exists a characteristic abelian subgroup `N` with
+`|G : N| ≤ |G : A|²` for every abelian subgroup `A`.
+
+具体的には `N = chermakDelgadoSubgroup G` を取る. -/
+theorem chermakDelgado [Finite G] :
+    ∃ N : Subgroup G, N.Characteristic ∧ IsMulCommutative N ∧
+      ∀ A : Subgroup G, IsMulCommutative A → N.index ≤ A.index ^ 2 := by
+  refine ⟨chermakDelgadoSubgroup G, inferInstance, inferInstance, ?_⟩
+  intro A hA
+  set M := chermakDelgadoSubgroup G with hM_def
+  -- Step 1: |A| ≤ |C_G(A)| (since A ≤ C_G(A) for abelian A)
+  haveI : IsMulCommutative A := hA
+  have hA_le_CA : Nat.card A ≤ Nat.card (centralizer (A : Set G) : Subgroup G) :=
+    Nat.card_le_card_of_injective
+      (Subgroup.inclusion A.le_centralizer) (Subgroup.inclusion_injective _)
+  -- Step 2: |A|² ≤ m_G(A) = |A|·|C_G(A)|
+  have hA_sq_le : Nat.card A ^ 2 ≤ A.chermakDelgadoMeasure := by
+    rw [chermakDelgadoMeasure_def, sq]
+    exact Nat.mul_le_mul_left _ hA_le_CA
+  -- Step 3: m_G(A) ≤ m_G(M) (M ∈ L)
+  have hA_le_M : A.chermakDelgadoMeasure ≤ M.chermakDelgadoMeasure :=
+    chermakDelgadoSubgroup_mem_lattice A
+  have hA_sq_le_M : Nat.card A ^ 2 ≤ M.chermakDelgadoMeasure := hA_sq_le.trans hA_le_M
+  -- Step 4: Lagrange |G| = |M|·M.index = |A|·A.index
+  have hM_card : Nat.card M * M.index = Nat.card G := M.card_mul_index
+  have hA_card : Nat.card A * A.index = Nat.card G := A.card_mul_index
+  -- Step 5: |G|² = |A|² · A.index² (rearrange Lagrange)
+  have hG_sq : Nat.card G ^ 2 = Nat.card A ^ 2 * A.index ^ 2 := by
+    rw [← hA_card]; ring
+  -- Step 6: M.index · |A|² ≤ M.index · m_G(M) = |G| · |C_G(M)| ≤ |G|²
+  have h1 : M.index * Nat.card A ^ 2 ≤ M.index * M.chermakDelgadoMeasure :=
+    Nat.mul_le_mul_left _ hA_sq_le_M
+  have h2 : M.index * M.chermakDelgadoMeasure
+          = Nat.card G * Nat.card (centralizer (M : Set G) : Subgroup G) := by
+    rw [chermakDelgadoMeasure_def]
+    -- M.index · (|M| · |C_G(M)|) = (M.index · |M|) · |C_G(M)| = (|M| · M.index) · |C_G(M)|
+    rw [← Nat.mul_assoc, Nat.mul_comm M.index (Nat.card M), hM_card]
+  have h3 : Nat.card (centralizer (M : Set G) : Subgroup G) ≤ Nat.card G :=
+    Nat.card_le_card_of_injective
+      (centralizer (M : Set G) : Subgroup G).subtype
+      ((centralizer (M : Set G) : Subgroup G).subtype_injective)
+  have h4 : Nat.card G * Nat.card (centralizer (M : Set G) : Subgroup G) ≤ Nat.card G ^ 2 := by
+    rw [sq]; exact Nat.mul_le_mul_left _ h3
+  have h5 : M.index * Nat.card A ^ 2 ≤ Nat.card G ^ 2 := h1.trans (h2.le.trans h4)
+  -- Step 7: |G|² = |A|² · A.index² ⟹ M.index · |A|² ≤ A.index² · |A|²
+  rw [hG_sq, Nat.mul_comm (Nat.card A ^ 2) (A.index ^ 2)] at h5
+  -- Step 8: Cancel |A|² (positive)
+  exact Nat.le_of_mul_le_mul_right h5 (pow_pos Nat.card_pos 2)
 
 end Subgroup
