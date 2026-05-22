@@ -2119,6 +2119,373 @@ def IsPLocal (p : ℕ) (H : Subgroup G) : Prop :=
 def IsLocal (H : Subgroup G) : Prop :=
   ∃ p : ℕ, p.Prime ∧ IsPLocal p H
 
+set_option maxHeartbeats 1200000 in
+-- 長い構成的証明 (Sylow II + Frattini, ↥M 内で構築 + G への持ち上げ) のため heartbeat を増やす.
+/-- **Isaacs Lemma 2.16** (lifting p-local subgroups from a quotient).
+
+Let `N ⊴ G` and `Ḡ = G/N`. For every prime `p`, every `p`-local subgroup `Mbar` of `Ḡ`
+has the form `L̄` where `L` is a `p`-local subgroup of `G`.
+
+書籍 p.59 の証明:
+1. `Mbar = N_Ḡ(Ubar)` で `Ubar` は非自明 `p`-部分群.
+2. 対応定理で `Ubar = U/N`, `N < U ≤ G`. `M := Mbar.comap (mk' N) = N_G(U)`
+   (`comap_normalizer_eq_of_surjective`).
+3. `P ∈ Syl_p(U)` を取り `P_G := P.map U.subtype ≤ U ≤ G`. `Ubar` 非自明 ⇒ `p ∣ |Ubar| ∣ |U|`
+   ⇒ `P_G ≠ ⊥`.
+4. `U = N · P_G`: `|U:N| = |Ubar|` は p-冪, `|U:P_G|` は p と互いに素 ⇒ gcd = 1.
+5. `L := N_G(P_G)`. `P_G` 非自明 p-群 ⇒ `L` は p-local.
+6. `L ⊆ M`: `L` は `N` (`N ⊴ G`) と `P_G` を正規化 ⇒ `N ⊔ P_G = U` を正規化 ⇒ `L ⊆ N_G(U) = M`.
+7. `M ⊆ N · L` (Frattini in ↥M): `U.subgroupOf M ⊴ ↥M` (M = N_G(U)). `P` を `↥(U.subgroupOf M)`
+   の Sylow と同一視し `Sylow.normalizer_sup_eq_top` で `N_↥M(P) ⊔ U.subgroupOf M = ⊤_↥M`.
+   ↥M から G へ持ち上げ `M ⊆ U · L = (N · P_G) · L = N · L`.
+8. 商に送る: `M.map f = (N ⊔ L).map f = N.map f ⊔ L.map f = ⊥ ⊔ L.map f = L.map f = Mbar`. -/
+theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    {Mbar : Subgroup (G ⧸ N)} (hMbar : IsPLocal p Mbar) :
+    ∃ L : Subgroup G, IsPLocal p L ∧ L.map (QuotientGroup.mk' N) = Mbar := by
+  classical
+  -- Step 1: unpack Mbar = N_Ḡ(Ubar).
+  obtain ⟨Ubar, hUbar_ne, hUbar_pgroup, hMbar_eq⟩ := hMbar
+  set f : G →* G ⧸ N := QuotientGroup.mk' N with hf_def
+  have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective N
+  have hf_ker : f.ker = N := QuotientGroup.ker_mk' N
+  -- Step 2: U := comap f Ubar, M := comap f Mbar = normalizer U.
+  set U : Subgroup G := Ubar.comap f with hU_def
+  set M : Subgroup G := Mbar.comap f with hM_def
+  have hN_le_U : N ≤ U := by
+    intro x hx
+    have hfx : f x = 1 := by
+      have : x ∈ f.ker := by rw [hf_ker]; exact hx
+      exact this
+    rw [hU_def, Subgroup.mem_comap, hfx]
+    exact Subgroup.one_mem _
+  have hU_map : U.map f = Ubar := by
+    rw [hU_def]; exact Subgroup.map_comap_eq_self_of_surjective hf_surj Ubar
+  have hM_map : M.map f = Mbar := by
+    rw [hM_def]; exact Subgroup.map_comap_eq_self_of_surjective hf_surj Mbar
+  have hM_eq_norm : M = Subgroup.normalizer U := by
+    rw [hM_def, hMbar_eq]
+    exact Subgroup.comap_normalizer_eq_of_surjective Ubar hf_surj
+  -- U ≤ M.
+  have hU_le_M : U ≤ M := by rw [hM_eq_norm]; exact Subgroup.le_normalizer
+  -- Step 3: pick a Sylow p-subgroup of U and lift to G.
+  haveI : Finite ↥U := Subtype.finite
+  let P : Sylow p ↥U := default
+  set P_G : Subgroup G := (P : Subgroup ↥U).map U.subtype with hPG_def
+  have hP_pgroup : IsPGroup p ↥P_G := P.2.map U.subtype
+  have hP_le_U : P_G ≤ U := by
+    rw [hPG_def]
+    intro y hy; obtain ⟨z, _, hz⟩ := hy; rw [← hz]; exact z.2
+  -- |Ubar| > 1 since Ubar ≠ ⊥, and Ubar p-group, so p ∣ |Ubar|.
+  obtain ⟨k, hUbar_card⟩ : ∃ k, Nat.card ↥Ubar = p ^ k := IsPGroup.iff_card.mp hUbar_pgroup
+  have hUbar_card_pos : 1 < Nat.card ↥Ubar := by
+    have h_ne_one : Nat.card ↥Ubar ≠ 1 := by
+      intro h
+      apply hUbar_ne
+      rw [Subgroup.eq_bot_iff_forall]
+      intro x hx
+      have h_sub : Subsingleton ↥Ubar := (Nat.card_eq_one_iff_unique.mp h).1
+      have : (⟨x, hx⟩ : ↥Ubar) = ⟨1, Subgroup.one_mem _⟩ := Subsingleton.elim _ _
+      exact Subtype.ext_iff.mp this
+    have h_pos : 0 < Nat.card ↥Ubar := Nat.card_pos
+    omega
+  have hk_pos : 0 < k := by
+    by_contra h
+    push Not at h
+    interval_cases k
+    rw [pow_zero] at hUbar_card
+    omega
+  have hp_dvd_Ubar : p ∣ Nat.card ↥Ubar := by
+    rw [hUbar_card]; exact dvd_pow_self p hk_pos.ne'
+  -- |U/N.subgroupOf U| = |Ubar|.
+  have hU_quot_card : Nat.card (↥U ⧸ N.subgroupOf U) = Nat.card ↥Ubar := by
+    rw [← hU_map]
+    let g : ↥U →* G ⧸ N := f.comp U.subtype
+    have hg_range : g.range = U.map f := by
+      simp [g, MonoidHom.range_comp, Subgroup.range_subtype]
+    have hg_ker : g.ker = N.subgroupOf U := by
+      ext x
+      constructor
+      · intro hx
+        have : f (x : G) = 1 := hx
+        have hxN : (x : G) ∈ N := by rw [← hf_ker]; exact this
+        exact hxN
+      · intro hx
+        have hxN : (x : G) ∈ N := hx
+        have : (x : G) ∈ f.ker := by rw [hf_ker]; exact hxN
+        exact this
+    have h_iso : (↥U) ⧸ g.ker ≃* ↥g.range :=
+      QuotientGroup.quotientKerEquivRange g
+    have h_card_eq : Nat.card ((↥U) ⧸ g.ker) = Nat.card ↥g.range :=
+      Nat.card_congr h_iso.toEquiv
+    rw [hg_ker] at h_card_eq
+    rw [h_card_eq, hg_range]
+  have hN_subU_index : (N.subgroupOf U).index = Nat.card ↥Ubar := by
+    rw [Subgroup.index_eq_card]; exact hU_quot_card
+  have hp_dvd_U : p ∣ Nat.card ↥U := by
+    have h_idx_dvd : (N.subgroupOf U).index ∣ Nat.card ↥U := Subgroup.index_dvd_card _
+    rw [hN_subU_index] at h_idx_dvd
+    exact dvd_trans hp_dvd_Ubar h_idx_dvd
+  have hp_dvd_P : p ∣ Nat.card ↥(P : Subgroup ↥U) :=
+    P.dvd_card_of_dvd_card hp_dvd_U
+  have hP_ne_bot_inU : (P : Subgroup ↥U) ≠ ⊥ := by
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hp_dvd_P
+    exact (Fact.out : p.Prime).not_dvd_one hp_dvd_P
+  have hPG_ne_bot : P_G ≠ ⊥ := by
+    intro hbot
+    apply hP_ne_bot_inU
+    rw [Subgroup.eq_bot_iff_forall]
+    intro x hx
+    have hx_G : (x : G) ∈ P_G := ⟨x, hx, rfl⟩
+    rw [hbot, Subgroup.mem_bot] at hx_G
+    exact Subtype.ext hx_G
+  -- Step 4: N ⊔ P_G = U.
+  have hP_idx_not_dvd : ¬ p ∣ (P : Subgroup ↥U).index := P.not_dvd_index
+  have hN_P_sup_top : N.subgroupOf U ⊔ (P : Subgroup ↥U) = ⊤ := by
+    rw [← Subgroup.index_eq_one]
+    have h_dvd_N : (N.subgroupOf U ⊔ (P : Subgroup ↥U)).index ∣ (N.subgroupOf U).index :=
+      Subgroup.index_dvd_of_le le_sup_left
+    have h_dvd_P : (N.subgroupOf U ⊔ (P : Subgroup ↥U)).index ∣ (P : Subgroup ↥U).index :=
+      Subgroup.index_dvd_of_le le_sup_right
+    rw [hN_subU_index, hUbar_card] at h_dvd_N
+    have hp_prime : p.Prime := Fact.out
+    have h_coprime : Nat.Coprime (p ^ k) (P : Subgroup ↥U).index :=
+      Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hP_idx_not_dvd)
+    exact Nat.eq_one_of_dvd_coprimes h_coprime h_dvd_N h_dvd_P
+  have hN_PG_sup_U : N ⊔ P_G = U := by
+    have h_sub_map : (N.subgroupOf U ⊔ (P : Subgroup ↥U)).map U.subtype = U := by
+      rw [hN_P_sup_top, ← MonoidHom.range_eq_map, U.range_subtype]
+    rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hN_le_U] at h_sub_map
+    rw [← hPG_def] at h_sub_map
+    exact h_sub_map
+  -- Step 5: L = normalizer P_G is p-local.
+  set L : Subgroup G := Subgroup.normalizer P_G with hL_def
+  have hL_pLocal : IsPLocal p L := ⟨P_G, hPG_ne_bot, hP_pgroup, rfl⟩
+  -- Step 6: L ⊆ M = N_G(U) = N_G(N ⊔ P_G).
+  -- L normalizes N (N ⊴ G) and P_G (by def), hence N ⊔ P_G = U.
+  -- Helper: if g normalizes both N and P_G then g normalizes N ⊔ P_G.
+  have h_preserve : ∀ (g : G), (∀ n ∈ N, g * n * g⁻¹ ∈ N) →
+      (∀ q ∈ P_G, g * q * g⁻¹ ∈ P_G) →
+      ∀ z ∈ N ⊔ P_G, g * z * g⁻¹ ∈ N ⊔ P_G := by
+    intro g hgN hgPG z hz
+    rw [Subgroup.sup_eq_closure] at hz
+    induction hz using Subgroup.closure_induction with
+    | mem w hw =>
+      rcases hw with hwN | hwPG
+      · exact Subgroup.mem_sup_left (hgN w hwN)
+      · exact Subgroup.mem_sup_right (hgPG w hwPG)
+    | one =>
+      have h1 : g * 1 * g⁻¹ = 1 := by group
+      rw [h1]; exact Subgroup.one_mem _
+    | mul a b _ _ ha hb =>
+      have h_eq : g * (a * b) * g⁻¹ = (g * a * g⁻¹) * (g * b * g⁻¹) := by group
+      rw [h_eq]; exact Subgroup.mul_mem _ ha hb
+    | inv a _ ha =>
+      have h_eq : g * a⁻¹ * g⁻¹ = (g * a * g⁻¹)⁻¹ := by group
+      rw [h_eq]; exact Subgroup.inv_mem _ ha
+  have hL_le_M : L ≤ M := by
+    rw [hM_eq_norm]
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    have h_conj_N : ∀ n ∈ N, x * n * x⁻¹ ∈ N := fun n hn =>
+      Subgroup.Normal.conj_mem ‹N.Normal› n hn x
+    have h_conj_N_inv : ∀ n ∈ N, x⁻¹ * n * (x⁻¹)⁻¹ ∈ N := fun n hn =>
+      Subgroup.Normal.conj_mem ‹N.Normal› n hn x⁻¹
+    have hx_in_norm : x ∈ Subgroup.normalizer (P_G : Set G) := hx
+    have hx_inv_in_norm : x⁻¹ ∈ Subgroup.normalizer (P_G : Set G) :=
+      Subgroup.inv_mem _ hx
+    have h_conj_PG : ∀ q ∈ P_G, x * q * x⁻¹ ∈ P_G :=
+      fun q hq => (Subgroup.mem_normalizer_iff.mp hx_in_norm q).mp hq
+    have h_conj_PG_inv : ∀ q ∈ P_G, x⁻¹ * q * (x⁻¹)⁻¹ ∈ P_G :=
+      fun q hq => (Subgroup.mem_normalizer_iff.mp hx_inv_in_norm q).mp hq
+    intro y
+    constructor
+    · intro hy
+      rw [← hN_PG_sup_U] at hy ⊢
+      exact h_preserve x h_conj_N h_conj_PG y hy
+    · intro hy
+      rw [← hN_PG_sup_U] at hy ⊢
+      have h_pre : x⁻¹ * (x * y * x⁻¹) * (x⁻¹)⁻¹ ∈ N ⊔ P_G :=
+        h_preserve x⁻¹ h_conj_N_inv h_conj_PG_inv _ hy
+      have h_simp : x⁻¹ * (x * y * x⁻¹) * (x⁻¹)⁻¹ = y := by group
+      rwa [h_simp] at h_pre
+  -- Step 7: M ⊆ N ⊔ L (Frattini argument inside ↥M).
+  -- We have U ⊴ M (M = normalizer U). View U.subgroupOf M as a normal subgroup of ↥M.
+  -- Pick the Sylow corresponding to P inside ↥(U.subgroupOf M) (using ↥(U.subgroupOf M) ≃ ↥U).
+  -- Apply Sylow.normalizer_sup_eq_top to get N_↥M(P_M.map _) ⊔ U.subgroupOf M = ⊤.
+  have hM_le_N_sup_L : M ≤ N ⊔ L := by
+    -- Set up the normality of U.subgroupOf M.
+    haveI hUM_normal : (U.subgroupOf M).Normal := by
+      rw [hM_eq_norm]
+      exact Subgroup.normal_in_normalizer
+    -- The isomorphism ↥(U.subgroupOf M) ≃* ↥U lifts the Sylow P.
+    let e : ↥(U.subgroupOf M) ≃* ↥U := Subgroup.subgroupOfEquivOfLe hU_le_M
+    -- Transport P : Sylow p ↥U back to a Sylow of ↥(U.subgroupOf M).
+    let P_M : Sylow p ↥(U.subgroupOf M) :=
+      Sylow.ofCard ((P : Subgroup ↥U).comap e.toMonoidHom) (by
+        rw [show Nat.card ↥(U.subgroupOf M) = Nat.card ↥U from
+          Nat.card_congr e.toEquiv]
+        -- The preimage under e is in bijection with P.
+        have h_card_eq : Nat.card ↥((P : Subgroup ↥U).comap e.toMonoidHom) =
+            Nat.card (P : Subgroup ↥U) := by
+          refine Nat.card_congr ?_
+          exact {
+            toFun := fun x => ⟨e x.1, x.2⟩
+            invFun := fun y => ⟨e.symm y.1, by
+              change e (e.symm y.1) ∈ (P : Subgroup ↥U)
+              rw [MulEquiv.apply_symm_apply]
+              exact y.2⟩
+            left_inv := fun x => Subtype.ext (e.symm_apply_apply x.1)
+            right_inv := fun y => Subtype.ext (e.apply_symm_apply y.1)
+          }
+        rw [h_card_eq, Sylow.card_eq_multiplicity P])
+    -- Apply Sylow.normalizer_sup_eq_top in ↥M.
+    haveI : Finite ↥M := Subtype.finite
+    haveI : Finite ↥(U.subgroupOf M) := Subtype.finite
+    have h_frattini : Subgroup.normalizer (P_M.map (U.subgroupOf M).subtype) ⊔
+        U.subgroupOf M = ⊤ :=
+      Sylow.normalizer_sup_eq_top P_M
+    -- Identify P_M.map (U.subgroupOf M).subtype.map M.subtype = P_G.
+    have h_PM_map_eq : ((P_M.map (U.subgroupOf M).subtype : Subgroup ↥M).map M.subtype) =
+        P_G := by
+      -- (P_M.map (U.subgroupOf M).subtype).map M.subtype as a set in G:
+      -- elements are M.subtype (U.subgroupOf M).subtype z for z in P_M.
+      ext y
+      simp only [Subgroup.mem_map, Subgroup.coe_subtype, P_G]
+      constructor
+      · rintro ⟨a, ⟨b, hb, hba⟩, hay⟩
+        -- b ∈ P_M, (U.subgroupOf M).subtype b = a, M.subtype a = y.
+        -- P_M corresponds to (P : Subgroup ↥U).comap e via e iso.
+        -- So b ∈ P_M iff e b ∈ P.
+        have hb' : e b ∈ (P : Subgroup ↥U) := by
+          change b ∈ (P : Subgroup ↥U).comap e.toMonoidHom at hb
+          rw [Subgroup.mem_comap] at hb; exact hb
+        refine ⟨e b, hb', ?_⟩
+        -- Need: U.subtype (e b) = y.
+        -- y = M.subtype a = a.val, a = (U.subgroupOf M).subtype b = b.val (as element of ↥M).
+        -- (U.subgroupOf M).subtype b ∈ ↥M, so a.val = b.val.val. y = b.val.val.
+        -- e b : ↥U has e b.val = b.val.val (by definition of subgroupOfEquivOfLe).
+        have he_val : ((e b : ↥U) : G) = ((b : ↥(U.subgroupOf M)) : ↥M).1 := by
+          rfl
+        rw [← hay, ← hba]
+        change ((b : ↥(U.subgroupOf M)) : ↥M).1 = _
+        rw [← he_val]
+      · rintro ⟨z, hzP, hzy⟩
+        -- z ∈ P, U.subtype z = y. Lift z back through e to b : ↥(U.subgroupOf M).
+        refine ⟨⟨z, hU_le_M z.2⟩, ⟨e.symm z, ?_, ?_⟩, ?_⟩
+        · change e.symm z ∈ (P : Subgroup ↥U).comap e.toMonoidHom
+          rw [Subgroup.mem_comap]
+          simp only [MulEquiv.apply_symm_apply, MulEquiv.coe_toMonoidHom]
+          exact hzP
+        · -- (U.subgroupOf M).subtype (e.symm z) = ⟨z.val, hU_le_M z.2⟩
+          rfl
+        · exact hzy
+    -- Now use Frattini: each m ∈ M lifts to ⟨m, hm⟩ : ↥M, decomposes as a * b
+    -- with a ∈ normalizer(P_M.map (U.subgroupOf M).subtype), b ∈ U.subgroupOf M.
+    -- Lifting: M.subtype a ∈ L (= normalizer P_G in G), M.subtype b ∈ U.
+    intro m hm
+    have hm_M : (⟨m, hm⟩ : ↥M) ∈ (⊤ : Subgroup ↥M) := trivial
+    rw [← h_frattini] at hm_M
+    -- Use the characterization of sup via `mem_sup_of_normal_right`.
+    rcases Subgroup.mem_sup_of_normal_right.mp hm_M with ⟨a, ha, b, hb, hab⟩
+    -- a ∈ normalizer (P_M.map ...), b ∈ U.subgroupOf M. a * b = ⟨m, hm⟩.
+    -- M.subtype b ∈ U.
+    have hMb_U : (b : G) ∈ U := by
+      change (b : ↥M).1 ∈ U
+      change b ∈ U.subgroupOf M at hb
+      exact hb
+    -- M.subtype a ∈ L = normalizer P_G in G.
+    have hMa_L : (a : G) ∈ L := by
+      rw [hL_def, Subgroup.mem_normalizer_iff]
+      intro y
+      -- a normalizes P_M.map (U.subgroupOf M).subtype in ↥M.
+      have ha_norm : a ∈ Subgroup.normalizer (P_M.map (U.subgroupOf M).subtype) := ha
+      rw [Subgroup.mem_normalizer_iff] at ha_norm
+      constructor
+      · intro hy
+        -- y ∈ P_G; need a * y * a⁻¹ ∈ P_G.
+        -- y ∈ P_G ⊆ U ⊆ M, so y ∈ ↥M. y as element of ↥M is in P_M.map (U.subgroupOf M).subtype.
+        have hy_U : y ∈ U := hP_le_U hy
+        have hy_M : y ∈ M := hU_le_M hy_U
+        have hy_PM_map : (⟨y, hy_M⟩ : ↥M) ∈ P_M.map (U.subgroupOf M).subtype := by
+          -- Equivalently y ∈ (P_M.map _).map M.subtype = P_G.
+          rw [← h_PM_map_eq] at hy
+          rcases Subgroup.mem_map.mp hy with ⟨x, hx, hxy⟩
+          have hx_eq : x = ⟨y, hy_M⟩ := Subtype.ext hxy
+          rw [hx_eq] at hx; exact hx
+        have h_step := (ha_norm ⟨y, hy_M⟩).mp hy_PM_map
+        -- h_step : a * ⟨y, hy_M⟩ * a⁻¹ ∈ P_M.map ...
+        -- Lift to G via M.subtype.
+        have h_step_G : (a : G) * y * (a : G)⁻¹ ∈ P_G := by
+          rw [← h_PM_map_eq]
+          refine ⟨a * ⟨y, hy_M⟩ * a⁻¹, h_step, ?_⟩
+          rfl
+        exact h_step_G
+      · intro hy
+        -- Need y ∈ P_G given a * y * a⁻¹ ∈ P_G.
+        -- Use a⁻¹ ∈ normalizer (P_M.map ...).
+        have ha_inv_norm : a⁻¹ ∈ Subgroup.normalizer (P_M.map (U.subgroupOf M).subtype) :=
+          (Subgroup.normalizer _).inv_mem ha
+        rw [Subgroup.mem_normalizer_iff] at ha_inv_norm
+        -- We want y ∈ P_G. Have aya⁻¹ ∈ P_G ⊆ U ⊆ M.
+        have hay_U : (a : G) * y * (a : G)⁻¹ ∈ U := hP_le_U hy
+        -- We need y ∈ M to use the lift.
+        -- a * y * a⁻¹ ∈ U ⊆ M, so a * y * a⁻¹ ∈ ↥M.
+        -- y = a⁻¹ * (a y a⁻¹) * a ∈ M.
+        have hy_M : y ∈ M := by
+          have : (a : G)⁻¹ * ((a : G) * y * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ = y := by group
+          rw [← this]
+          exact M.mul_mem (M.mul_mem (M.inv_mem a.2) (hU_le_M hay_U)) (M.inv_mem (M.inv_mem a.2))
+        have hay_PM_map : (⟨(a : G) * y * (a : G)⁻¹, hU_le_M hay_U⟩ : ↥M)
+            ∈ P_M.map (U.subgroupOf M).subtype := by
+          rw [← h_PM_map_eq] at hy
+          rcases Subgroup.mem_map.mp hy with ⟨x, hx, hxy⟩
+          have hx_eq : x = ⟨(a : G) * y * (a : G)⁻¹, hU_le_M hay_U⟩ := Subtype.ext hxy
+          rw [hx_eq] at hx; exact hx
+        -- a⁻¹ * (aya⁻¹) * a = y, and a⁻¹ * (aya⁻¹) * (a⁻¹)⁻¹ ∈ P_M.map ... by ha_inv_norm.
+        have h_back := (ha_inv_norm ⟨(a : G) * y * (a : G)⁻¹, hU_le_M hay_U⟩).mp hay_PM_map
+        have h_back_G : (a : G)⁻¹ * ((a : G) * y * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ ∈ P_G := by
+          rw [← h_PM_map_eq]
+          refine ⟨a⁻¹ * ⟨(a : G) * y * (a : G)⁻¹, hU_le_M hay_U⟩ * (a⁻¹)⁻¹, h_back, ?_⟩
+          rfl
+        have h_simp : (a : G)⁻¹ * ((a : G) * y * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ = y := by group
+        rwa [h_simp] at h_back_G
+    -- m = (M.subtype a) * (M.subtype b).
+    have hm_eq : m = (a : G) * (b : G) := by
+      have h := congrArg ((↑) : ↥M → G) hab
+      simp at h; exact h.symm
+    -- (M.subtype b) ∈ U = N ⊔ P_G, decompose.
+    have hb_NL : (b : G) ∈ N ⊔ L := by
+      rw [← hN_PG_sup_U] at hMb_U
+      rcases Subgroup.mem_sup_of_normal_left.mp hMb_U with ⟨n, hn, q, hq, hq_eq⟩
+      have hq_in_L : q ∈ L := by
+        rw [hL_def]; exact Subgroup.le_normalizer hq
+      rw [← hq_eq]
+      exact (N ⊔ L).mul_mem (Subgroup.mem_sup_left hn) (Subgroup.mem_sup_right hq_in_L)
+    have ha_NL : (a : G) ∈ N ⊔ L := Subgroup.mem_sup_right hMa_L
+    rw [hm_eq]
+    exact (N ⊔ L).mul_mem ha_NL hb_NL
+  -- Step 8: send to quotient.
+  refine ⟨L, hL_pLocal, ?_⟩
+  apply le_antisymm
+  · rw [← hM_map]
+    exact Subgroup.map_mono hL_le_M
+  · rw [← hM_map]
+    have h_step1 : M.map f ≤ (N ⊔ L).map f := Subgroup.map_mono hM_le_N_sup_L
+    have h_step2 : (N ⊔ L).map f = L.map f := by
+      rw [Subgroup.map_sup]
+      have h_N_map : N.map f = ⊥ := by
+        apply le_bot_iff.mp
+        intro x hx
+        rcases hx with ⟨y, hy, hyx⟩
+        rw [Subgroup.mem_bot]
+        rw [← hyx]
+        have : y ∈ f.ker := by rw [hf_ker]; exact hy
+        exact this
+      rw [h_N_map, bot_sup_eq]
+    rw [← h_step2]
+    exact h_step1
+
 end -- 2C
 
 section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
