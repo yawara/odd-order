@@ -109,8 +109,8 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 
 /-! ### Isaacs §5C (Hall transfer + Burnside)
 
-- **Lemma 5.11** (Hall index transfer): mathlib 直接対応なし. Hall 性 + transfer 計算で
-  導出. 形式化保留 (FT 経路で要求軽).
+- **Lemma 5.11** (Hall index transfer): `ker_transfer_sup_eq_top_of_hall` ✅.
+  H π-Hall + ϕ : H →* A + |A| ∣ |H| ⇒ ker(transfer ϕ) · H = G. Lem 3.16 経由 ~25 LOC.
 - **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion`
   ✅ — Sylow II in C_G(y) + 直接計算.
 - **Thm 5.13 Burnside**: `MonoidHom.ker_transferSylow_isComplement'` 直接.
@@ -118,6 +118,33 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16-5.17** (Z-group 構造): mathlib `IsZGroup` API 直接.
 - **Cor 5.19** (Sylow_2 cyclic direct factor ⇒ 非単純): 形式化保留. -/
+
+/-- **Isaacs Lemma 5.11** (Hall transfer index): `H` が π-Hall 部分群 + `ϕ : H →* A`
+(`A` 可換有限群, `|A| ∣ |H|`) ⇒ `ker(transfer ϕ) · H = G`.
+
+**証明** (Isaacs p.159): `transfer ϕ : G →* A` の range ⊆ A から `|G:ker(v)| = |range|`
+が `|A|` を割り切る. 仮定 `|A| ∣ |H|` から `|G:ker(v)| ∣ |H|`. Hall 性 `gcd(|H|, |G:H|) = 1`
+で `gcd(|G:ker(v)|, |G:H|) = 1`. Lemma 3.16 で `ker(v) ⊔ H = ⊤`.
+
+通常 `A := H/H'` で適用するとき `|A| = |H|/|H'| ∣ |H|` が成立. -/
+theorem ker_transfer_sup_eq_top_of_hall [Finite G] {π : Set ℕ}
+    {H : Subgroup G} (hHall : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) [H.FiniteIndex]
+    {A : Type*} [CommGroup A] [Finite A] (ϕ : H →* A)
+    (hAH : Nat.card A ∣ Nat.card H) :
+    (MonoidHom.transfer ϕ).ker ⊔ H = ⊤ := by
+  apply OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index
+  -- (transfer ϕ).ker.index ∣ |A| (1st iso + Lagrange in A)
+  have h_range_card : (MonoidHom.transfer ϕ).ker.index ∣ Nat.card A := by
+    have heq : Nat.card (G ⧸ (MonoidHom.transfer ϕ).ker) =
+        Nat.card (MonoidHom.transfer ϕ).range :=
+      Nat.card_congr (QuotientGroup.quotientKerEquivRange _).toEquiv
+    rw [Subgroup.index_eq_card] at *
+    rw [heq]
+    exact Subgroup.card_subgroup_dvd_card _
+  have h_dvd_H : (MonoidHom.transfer ϕ).ker.index ∣ Nat.card H :=
+    h_range_card.trans hAH
+  -- gcd(ker.index, |G:H|) divides gcd(|H|, |G:H|) = 1 (Hall)
+  exact Nat.Coprime.coprime_dvd_left h_dvd_H hHall.coprime_index
 
 /-- **Isaacs Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion):
 `P ∈ Syl_p(G)`, `x, y ∈ C_G(P)` が `G` で共役 (∃ g, gxg⁻¹ = y) ⇒ `N_G(P)` で共役.
