@@ -1627,6 +1627,40 @@ theorem IsAInvariant.iInf {A : Type*} [Group A] {φ : A →* MulAut G} {ι : Sor
   rw [Subgroup.map_iInf _ (φ a).injective]
   exact iInf_congr fun i => hf i a
 
+/-- **A-不変部分群への制限作用**: `φ : A →* MulAut G` + A-inv `H` から
+`A →* MulAut ↥H` を構成する. 各 `a : A` で `(φ a)` は `H` を保つので
+restricted MulEquiv ↥H ↥H を作る. -/
+def IsAInvariant.restrict {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) : A →* MulAut ↥H where
+  toFun a := {
+    toFun := fun h => ⟨(φ a) h.val, hH.smul_mem a h.property⟩
+    invFun := fun h => ⟨(φ a)⁻¹ h.val, hH.inv_smul_mem a h.property⟩
+    left_inv := fun h => Subtype.ext (MulAut.inv_apply_self G (φ a) h.val)
+    right_inv := fun h => Subtype.ext (MulAut.apply_inv_self G (φ a) h.val)
+    map_mul' := fun x y => Subtype.ext (map_mul (φ a) x.val y.val)
+  }
+  map_one' := by
+    apply MulEquiv.ext
+    intro ⟨g, hg⟩
+    apply Subtype.ext
+    show (φ 1) g = g
+    rw [φ.map_one]
+    rfl
+  map_mul' a b := by
+    apply MulEquiv.ext
+    intro ⟨g, hg⟩
+    apply Subtype.ext
+    show (φ (a * b)) g = (φ a) ((φ b) g)
+    rw [φ.map_mul]
+    rfl
+
+/-- restrict の値域への射影: A-inv H に対し, `(IsAInvariant.restrict hH a) h` の underlying
+要素は `(φ a) h.val`. -/
+@[simp]
+theorem IsAInvariant.restrict_apply_val {A : Type*} [Group A] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : IsAInvariant φ H) (a : A) (h : ↥H) :
+    ((hH.restrict a) h).val = (φ a) h.val := rfl
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
