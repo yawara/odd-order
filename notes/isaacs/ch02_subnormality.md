@@ -7,8 +7,14 @@
 ## 進捗 (2026-05-22)
 
 §2A 完成 (Thm 2.11 のみ axiom). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式).
-**§2D**: Thm 2.18 Zenkov + Cor 2.19 + Thm 2.20 Lucchini 全て axiom として導入 (Lucchini が
-Ch.3 Horosevskii の必須前提のため). §2C は依然 TODO.
+**§2D**: Cor 2.19 完成 (2026-05-22). Thm 2.18 Zenkov + Thm 2.20 Lucchini は依然 axiom.
+§2C は依然 TODO.
+
+### 補助補題 (mathlib 未収載)
+
+* **`card_set_mul_card_inf`** (§2A 末尾, 2026-05-22): `|H · K| · |H ∩ K| = |H| · |K|`
+  古典 group counting formula. H-action on G/K の orbit-stabilizer 経由で証明.
+  Cor 2.19 (Lemma 2.10 contrapositive で計数) と Thm 2.11 (Wielandt 計数) で使用.
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -35,8 +41,8 @@ Ch.3 Horosevskii の必須前提のため). §2C は依然 TODO.
 | Helper `exists_odd_prime_dvd_of_not_pow_two` | ✅ | Nat 補助: 2-べきでない正整数は奇素数約数を持つ. 強 induction |
 | §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
 | **Thm 2.18 Zenkov** | axiom (2026-05-22) | `zenkov_minimal_le_fitting`. minimal `M = A ⊓ B^{g₀}` (A, B abelian) ⇒ `M ≤ F(G)`. 完全証明 ~200 行, 別 commit で fill in |
-| **Cor 2.19** | axiom (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov 経由 |
-| **Thm 2.20 Lucchini** | axiom (2026-05-22) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. 完全証明 ~200-300 行 |
+| **Cor 2.19** | ✅ (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov axiom + Lemma 2.10 + `card_set_mul_card_inf` 計数. A = ⊤ case は G abelian ⇒ G nilpotent ⇒ F(G) = ⊤ |
+| **Thm 2.20 Lucchini** | axiom (2026-05-22) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. 完全証明 ~200-300 行 (Cor 2.19 を利用) |
 
 ## 章のセクション分割と全 20 定理
 

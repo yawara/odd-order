@@ -26,9 +26,10 @@
 | §3C Thm 3.15 (Hall converse) | base のみ | p-complement 存在 ⇒ 可解. 要 Burnside p^a q^b 解 (mathlib 未) or 3 subgroups |
 | §3C Thm 3.17 (3 subgroups solvability) | base のみ | Wielandt 1971. 単純群の場合分け要 (mathlib 未). missing page で原典 proof 不明 |
 | §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着 |
-| §3D Hall-Higman 1.2.3 (3.21) | docstring | 正式 IsPiSeparable + O_π / C_G 表現要 |
-| §3E Coprime action (3.23-3.34) | docstring | Glauberman lemma 等, 大規模 |
-| §3F 巡回商 lift (3.35-3.36) | docstring | 補助, 優先度低 |
+| §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
+| §3D Hall-Higman 1.2.3 (3.21) | axiom (2026-05-22) | proper signature `Subgroup.centralizer (oPiCore π G) ≤ oPiCore π G` under `oPiCore πᶜ G = ⊥` |
+| §3E `IsAInvariant` 定義 + Thm 3.23 (a/b) + Lemma 3.24 | axiom (2026-05-22) | proper signatures for `exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point`. 完全実装は ~8-12 週 |
+| §3F 巡回商 lift (3.35-3.36) | axiom (2026-05-22) | `cyclic_quotient_lift` proper signature |
 
 ## mmd 抽出失敗の整理
 
