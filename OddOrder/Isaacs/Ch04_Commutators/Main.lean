@@ -510,6 +510,26 @@ theorem iterCommutator_eq_bot_of_isNilpotent_ambient
   refine ⟨n, le_antisymm ?_ bot_le⟩
   exact (iterCommutator_le_lowerCentralSeries E F n).trans (le_of_eq hn)
 
+/-- **冪零 ambient G + nontrivial normal E ⇒ ⁅E, F⁆ < E**: 厳密降下.
+
+`⁅E, F⁆ = E` なら iterCommutator E F は定常 (induction で各 n で = E). しかし
+`iterCommutator_eq_bot_of_isNilpotent_ambient` で ∃ n, iter = ⊥. ⇒ E = ⊥ 矛盾. -/
+theorem commutator_lt_self_of_isNilpotent_ambient
+    [Group.IsNilpotent G] {E F : Subgroup G} [E.Normal] (hE : E ≠ ⊥) :
+    ⁅E, F⁆ < E := by
+  refine lt_of_le_of_ne (Subgroup.commutator_le_left E F) ?_
+  intro heq
+  have hconst : ∀ n, iterCommutator E F n = E := by
+    intro n
+    induction n with
+    | zero => rfl
+    | succ n ih =>
+      rw [iterCommutator_succ, ih]
+      exact heq
+  obtain ⟨n, hn⟩ := iterCommutator_eq_bot_of_isNilpotent_ambient E F
+  rw [hconst n] at hn
+  exact hE hn
+
 /-- **iterCommutator は normal を保つ**. `E, F ⊴ G` ⇒ `iter E F n ⊴ G`. -/
 theorem iterCommutator_normal {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
     (iterCommutator E F n).Normal := by
