@@ -42,6 +42,7 @@ Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F 未着手).
 namespace OddOrder.Isaacs.Ch03
 
 open SemidirectProduct
+open scoped Pointwise
 
 section /- 3A: Semidirect product + Aut bounds (pp. 65-74) -/
 
@@ -232,16 +233,194 @@ theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
   rw [hAₛ_card, hAₛ_index] at hLucchini
   exact hLucchini
 
-/-- **Isaacs Thm 3.4**: `P` が `Aut(G)` の abelian `p`-部分群で `p ∤ |G|` ならば,
-`P` の `G` への作用は regular orbit を持つ. 特に `G` 非自明なら `|P| < |G|`.
-証明: `Γ := G ⋊ P` で `P ∈ Syl_p(Γ)`, P abelian + Brodkey (Thm 1.37) で `O_p(Γ) = P ∩ P^x`,
-P が自明的に G に作用 ⇒ O_p(Γ) = 1, ∃ g ∈ G with P ∩ P^g = 1, P-orbit of g is regular. -/
+/-- **Isaacs Cor 3.4**: `P` が `Aut(G)` の abelian `p`-部分群で `p ∤ |G|` ならば,
+`P` は `G` に regular orbit を持つ. 形式化では「∃ g : G, P の stabilizer が trivial」
+として書く (orbit が regular = stabilizer trivial, 標準的な同値).
+
+Isaacs p.71-72 の証明:
+1. `Γ := G ⋊ P` を natural action で構成, `inl(G), inr(P) ≤ Γ` と同一視.
+2. `|Γ : inr P| = |G|` で `p ∤ |G|` ⇒ `inr P ∈ Syl_p(Γ)`.
+3. `inr P` 内の元の `inl(G)` への conjugation = 元の作用. P 自己同型から成り恒等のみ自明
+   作用 ⇒ `inr P ∩ C_Γ(inl G) = 1`.
+4. `O_p(Γ) ⊆ inr P` (Sylow との交わり), `O_p(Γ) ∩ inl G = 1` (補集合性).
+5. `inl G, O_p(Γ) ⊴ Γ` で disjoint ⇒ お互いに中心化 (Lemma 2.7). よって
+   `O_p(Γ) ⊆ inr P ∩ C_Γ(inl G) = 1`.
+6. `inr P` abelian + Brodkey (Thm 1.37) ⇒ `O_p(Γ) = S ⊓ T` for some Sylows S, T.
+   Sylow 共役性で S = inr P, T = (inr P)^x の形に取れる. ∴ `inr P ⊓ (inr P)^x = 1`.
+7. `x = inl n * inr u` (補集合分解), P abelian で `(inr P)^{inr u} = inr P`, よって
+   `(inr P)^x = (inr P)^{inl n}`. `inr P ⊓ (inr P)^{inl n} = 1`.
+8. `n` の P-stabilizer は `inr P ⊓ (inr P)^{inl n}` と同型 (作用 = conjugation), 故 trivial.
+-/
 theorem abelian_p_aut_regular_orbit {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
-    (_hp : ¬ p ∣ Nat.card G) {P : Subgroup (MulAut G)}
-    (_hPab : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a)
-    (_hPpgroup : IsPGroup p P) :
-    True := by  -- TODO: ∃ g : G, ∀ φ ∈ P, φ g = g → φ = 1
-  trivial
+    (hp : ¬ p ∣ Nat.card G) {P : Subgroup (MulAut G)}
+    (hPab : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a)
+    (hPpgroup : IsPGroup p P) :
+    ∃ g : G, ∀ φ : P, (φ : MulAut G) g = g → φ = 1 := by
+  -- Setup the semidirect product Γ = G ⋊ ↥P (action via subtype P.subtype).
+  let φP : ↥P →* MulAut G := P.subtype
+  haveI : Finite ↥P := inferInstance
+  haveI : Finite (G ⋊[φP] ↥P) :=
+    Finite.of_equiv _ (SemidirectProduct.equivProd (φ := φP)).symm
+  -- |G ⋊ ↥P| = |G| * |P|.
+  have hΓ_card : Nat.card (G ⋊[φP] ↥P) = Nat.card G * Nat.card ↥P := SemidirectProduct.card
+  set Pₛ : Subgroup (G ⋊[φP] ↥P) :=
+    (SemidirectProduct.inr : ↥P →* G ⋊[φP] ↥P).range with hPₛ_def
+  set Gₛ : Subgroup (G ⋊[φP] ↥P) :=
+    (SemidirectProduct.inl : G →* G ⋊[φP] ↥P).range with hGₛ_def
+  -- Cardinalities.
+  have hPₛ_card : Nat.card Pₛ = Nat.card ↥P :=
+    (Nat.card_congr (Equiv.ofInjective _ SemidirectProduct.inr_injective
+      (β := G ⋊[φP] ↥P))).symm
+  have hGₛ_card : Nat.card Gₛ = Nat.card G :=
+    (Nat.card_congr (Equiv.ofInjective _ SemidirectProduct.inl_injective
+      (β := G ⋊[φP] ↥P))).symm
+  have hPₛ_index : Pₛ.index = Nat.card G := by
+    have h := Subgroup.index_mul_card Pₛ
+    rw [hPₛ_card, hΓ_card] at h
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos h
+  -- Pₛ is a p-group via the iso ↥P ≃* Pₛ.
+  have hPₛ_pgroup : IsPGroup p Pₛ :=
+    hPpgroup.of_equiv
+      (MonoidHom.ofInjective (f := (SemidirectProduct.inr : ↥P →* G ⋊[φP] ↥P))
+        SemidirectProduct.inr_injective)
+  -- ¬ p ∣ Pₛ.index from hp.
+  have hp_Pₛ_idx : ¬ p ∣ Pₛ.index := by rw [hPₛ_index]; exact hp
+  -- Promote Pₛ to a Sylow p-subgroup.
+  let Pₛ_sylow : Sylow p (G ⋊[φP] ↥P) := hPₛ_pgroup.toSylow hp_Pₛ_idx
+  have hPₛ_sylow_coe : (Pₛ_sylow : Subgroup (G ⋊[φP] ↥P)) = Pₛ :=
+    IsPGroup.toSylow_coe _ _
+  -- Gₛ is normal.
+  haveI hGₛ_normal : Gₛ.Normal := by
+    change ((SemidirectProduct.inl : G →* G ⋊[φP] ↥P).range).Normal
+    rw [SemidirectProduct.range_inl_eq_ker_rightHom]
+    infer_instance
+  -- Complement: Gₛ and Pₛ are complements.
+  have hCompl : Gₛ.IsComplement' Pₛ := inl_range_isComplement_inr_range (φ := φP)
+  have hDisj_GP : Disjoint Gₛ Pₛ := hCompl.disjoint
+  -- O_p(Γ) ≤ Pₛ.
+  have hOp_le_Pₛ : OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P) ≤ Pₛ := by
+    have h := OddOrder.Isaacs.Ch01.opCore_le Pₛ_sylow
+    rwa [hPₛ_sylow_coe] at h
+  -- O_p(Γ) ∩ Gₛ = ⊥.
+  have hDisj_OpG : Disjoint (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)) Gₛ :=
+    Disjoint.mono_left hOp_le_Pₛ hDisj_GP.symm
+  -- O_p(Γ) is normal.
+  haveI hOpNormal : (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)).Normal :=
+    OddOrder.Isaacs.Ch01.opCore.normal p _
+  -- O_p(Γ) = ⊥: elements centralize Gₛ (Lemma 2.7), but Pₛ acts faithfully.
+  have hOp_bot : OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨a, rfl⟩ := hOp_le_Pₛ hx
+    -- inr a commutes with all inl g (Lemma 2.7 on O_p × Gₛ).
+    have hcent : ∀ g : G, Commute (SemidirectProduct.inr a : G ⋊[φP] ↥P)
+        (SemidirectProduct.inl g) := fun g =>
+      Subgroup.commute_of_normal_of_disjoint
+        (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)) Gₛ
+        hOpNormal hGₛ_normal hDisj_OpG
+        (SemidirectProduct.inr a) (SemidirectProduct.inl g)
+        hx ⟨g, rfl⟩
+    -- ⇒ φP a = identity ⇒ a = 1.
+    have ha_act : ∀ g : G, (φP a) g = g := fun g => by
+      have h1 : (SemidirectProduct.inr a : G ⋊[φP] ↥P) * SemidirectProduct.inl g *
+                (SemidirectProduct.inr a⁻¹) = SemidirectProduct.inl ((φP a) g) :=
+        (SemidirectProduct.inl_aut a g).symm
+      have h2 : (SemidirectProduct.inr a : G ⋊[φP] ↥P) * SemidirectProduct.inl g *
+                (SemidirectProduct.inr a⁻¹) = SemidirectProduct.inl g := by
+        rw [(hcent g).eq, mul_assoc, ← map_mul, mul_inv_cancel, map_one, mul_one]
+      exact SemidirectProduct.inl_injective (h1.symm.trans h2)
+    have ha_one : a = 1 := Subtype.ext (MulEquiv.ext ha_act)
+    simp [ha_one]
+  -- Pₛ elements commute (since P is abelian and inr is a monoid hom).
+  have hPₛ_ab : ∀ a ∈ Pₛ, ∀ b ∈ Pₛ, a * b = b * a := by
+    rintro _ ⟨α, rfl⟩ _ ⟨β, rfl⟩
+    have hcomm : α * β = β * α := Subtype.ext (hPab α α.2 β β.2)
+    calc SemidirectProduct.inr α * SemidirectProduct.inr β
+        = SemidirectProduct.inr (α * β) := (map_mul (SemidirectProduct.inr (φ := φP)) α β).symm
+      _ = SemidirectProduct.inr (β * α) := by rw [hcomm]
+      _ = SemidirectProduct.inr β * SemidirectProduct.inr α :=
+            map_mul (SemidirectProduct.inr (φ := φP)) β α
+  -- All Sylow p-subgroups of Γ are abelian (conjugate to Pₛ which is abelian).
+  have hAllSyl_ab : ∀ Q : Sylow p (G ⋊[φP] ↥P),
+      ∀ a ∈ (Q : Subgroup (G ⋊[φP] ↥P)),
+      ∀ b ∈ (Q : Subgroup (G ⋊[φP] ↥P)), a * b = b * a := by
+    intro Q a ha b hb
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (G ⋊[φP] ↥P) Pₛ_sylow Q
+    -- (Q : Subgroup) = MulAut.conj g • Pₛ.
+    have hQ : (Q : Subgroup (G ⋊[φP] ↥P)) = MulAut.conj g • Pₛ := by
+      rw [← hg, Sylow.coe_subgroup_smul, hPₛ_sylow_coe]
+    rw [hQ, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at ha hb
+    simp only [MulAut.smul_def, ← map_inv, MulAut.conj_apply, inv_inv] at ha hb
+    -- ha : g⁻¹ * a * g ∈ Pₛ; similarly for hb.
+    have comm := hPₛ_ab _ ha _ hb
+    -- Conjugate by g to recover a * b = b * a.
+    have key : g * ((g⁻¹ * a * g) * (g⁻¹ * b * g)) * g⁻¹ =
+               g * ((g⁻¹ * b * g) * (g⁻¹ * a * g)) * g⁻¹ := by rw [comm]
+    have h_lhs : g * ((g⁻¹ * a * g) * (g⁻¹ * b * g)) * g⁻¹ = a * b := by group
+    have h_rhs : g * ((g⁻¹ * b * g) * (g⁻¹ * a * g)) * g⁻¹ = b * a := by group
+    rw [h_lhs, h_rhs] at key
+    exact key
+  -- Apply Brodkey: ∃ S T : Sylow p Γ, ↑S ⊓ ↑T = O_p(Γ) = ⊥.
+  obtain ⟨Syl1, Syl2, hST⟩ :=
+    OddOrder.Isaacs.Ch01.exists_pair_inf_eq_opCore_of_abelian (G := G ⋊[φP] ↥P) (p := p)
+      (fun Q x y hx hy => hAllSyl_ab Q x hx y hy)
+  rw [hOp_bot] at hST
+  -- Conjugate so one Sylow is Pₛ_sylow and the other is x • Pₛ_sylow (Sylow II twice).
+  obtain ⟨g₁, hg₁⟩ := MulAction.exists_smul_eq (G ⋊[φP] ↥P) Syl1 Pₛ_sylow
+  obtain ⟨x, hx⟩ := MulAction.exists_smul_eq (G ⋊[φP] ↥P) Pₛ_sylow (g₁ • Syl2)
+  -- Pₛ ⊓ (MulAut.conj x • Pₛ) = (MulAut.conj g₁ • ↑Syl1) ⊓ (MulAut.conj g₁ • ↑Syl2)
+  --                          = MulAut.conj g₁ • (↑Syl1 ⊓ ↑Syl2) = MulAut.conj g₁ • ⊥ = ⊥.
+  have h_Pₛ_as_conj_Syl1 : Pₛ = MulAut.conj g₁ • (Syl1 : Subgroup (G ⋊[φP] ↥P)) := by
+    rw [← hPₛ_sylow_coe, ← hg₁, Sylow.coe_subgroup_smul]
+  have h_conj_x_eq_conj_Syl2 : MulAut.conj x • Pₛ
+      = MulAut.conj g₁ • (Syl2 : Subgroup (G ⋊[φP] ↥P)) := by
+    rw [← hPₛ_sylow_coe, ← Sylow.coe_subgroup_smul, hx, Sylow.coe_subgroup_smul]
+  have hDisj_x : Disjoint Pₛ (MulAut.conj x • Pₛ) := by
+    rw [disjoint_iff, h_conj_x_eq_conj_Syl2, h_Pₛ_as_conj_Syl1, ← Subgroup.smul_inf, hST,
+        Subgroup.smul_bot]
+  -- Decompose x = inl n * inr u; inr u ∈ Pₛ ⇒ MulAut.conj (inr u) • Pₛ = Pₛ.
+  -- So MulAut.conj x • Pₛ = MulAut.conj (inl n) • Pₛ.
+  set n : G := x.left with hn_def
+  set u : ↥P := x.right with hu_def
+  have hx_decomp : x = SemidirectProduct.inl n * SemidirectProduct.inr u :=
+    (SemidirectProduct.inl_left_mul_inr_right x).symm
+  have hPₛ_conj_inr_u : MulAut.conj (SemidirectProduct.inr u : G ⋊[φP] ↥P) • Pₛ = Pₛ :=
+    Subgroup.conj_smul_eq_self_of_mem ⟨u, rfl⟩
+  have hDisj_n : Disjoint Pₛ
+      (MulAut.conj (SemidirectProduct.inl n : G ⋊[φP] ↥P) • Pₛ) := by
+    have h : MulAut.conj x • Pₛ =
+        MulAut.conj (SemidirectProduct.inl n : G ⋊[φP] ↥P) • Pₛ := by
+      rw [hx_decomp, map_mul, mul_smul, hPₛ_conj_inr_u]
+    rw [← h]; exact hDisj_x
+  -- Witness for regular orbit: n. For φ ∈ ↥P fixing n, show φ = 1.
+  refine ⟨n, fun φ hφg => ?_⟩
+  -- φ fixes n ⇒ inr φ commutes with inl n (via inl_aut) ⇒ inr φ ∈ MulAut.conj (inl n) • Pₛ.
+  -- Combined with inr φ ∈ Pₛ and hDisj_n: inr φ ∈ ⊥, hence φ = 1.
+  have hfix : (φP φ) n = n := hφg
+  have hφ_in_Pₛ : (SemidirectProduct.inr φ : G ⋊[φP] ↥P) ∈ Pₛ := ⟨φ, rfl⟩
+  have hcomm : (SemidirectProduct.inl n : G ⋊[φP] ↥P) * SemidirectProduct.inr φ
+             = SemidirectProduct.inr φ * SemidirectProduct.inl n := by
+    -- inl_aut φ n : inl ((φP φ) n) = inr φ * inl n * inr φ⁻¹.
+    -- With hfix: inl n = inr φ * inl n * inr φ⁻¹.
+    -- Right-multiplying by inr φ: inl n * inr φ = inr φ * inl n.
+    have h1 : (SemidirectProduct.inl n : G ⋊[φP] ↥P) =
+        SemidirectProduct.inr φ * SemidirectProduct.inl n * SemidirectProduct.inr φ⁻¹ := by
+      have h : (SemidirectProduct.inl ((φP φ) n) : G ⋊[φP] ↥P) =
+          SemidirectProduct.inr φ * SemidirectProduct.inl n * SemidirectProduct.inr φ⁻¹ :=
+        SemidirectProduct.inl_aut φ n
+      rw [hfix] at h; exact h
+    conv_lhs => rw [h1]
+    rw [mul_assoc, ← map_mul, inv_mul_cancel, map_one, mul_one]
+  have hφ_in_conj : (SemidirectProduct.inr φ : G ⋊[φP] ↥P) ∈
+      MulAut.conj (SemidirectProduct.inl n : G ⋊[φP] ↥P) • Pₛ := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def,
+        MulAut.conj_inv_apply]
+    -- Goal: (inl n)⁻¹ * inr φ * inl n ∈ Pₛ. Equals inr φ via hcomm.
+    rw [mul_assoc, ← hcomm, ← mul_assoc, inv_mul_cancel, one_mul]
+    exact hφ_in_Pₛ
+  have hφ_eq_one : (SemidirectProduct.inr φ : G ⋊[φP] ↥P) = 1 :=
+    Subgroup.mem_bot.mp (hDisj_n.le_bot ⟨hφ_in_Pₛ, hφ_in_conj⟩)
+  exact SemidirectProduct.inr_injective (hφ_eq_one.trans (map_one _).symm)
 
 end -- 3A
 
