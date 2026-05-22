@@ -200,4 +200,16 @@ theorem inf_sup_eq_sup_inf_of_normal_of_le
     · intro x ⟨hxM, hxA⟩
       exact ⟨hxM, Subgroup.mem_sup_right hxA⟩
 
+/-- **Dedekind 直接形** (`M ⊆ E ⊔ A` 仮定下): `E, A, M ≤ G`, `E ⊴ G`, `E ≤ M ≤ E ⊔ A`
+⇒ `M = E ⊔ (M ⊓ A)`.
+
+Lucchini Thm 2.20 (K=⊥ case) で **直接** 使う形: `M ⊆ AE ⇒ M = E·(A ∩ M) = E ⊔ B`
+where `B = A ⊓ M`. `inf_sup_eq_sup_inf_of_normal_of_le` + `inf_eq_left.mpr hMle` で
+合成. -/
+theorem eq_sup_inf_of_le_sup_of_normal_of_le
+    {E A M : Subgroup G} [E.Normal] (hEM : E ≤ M) (hMle : M ≤ E ⊔ A) :
+    M = E ⊔ (M ⊓ A) := by
+  rw [← inf_sup_eq_sup_inf_of_normal_of_le hEM]
+  exact (inf_eq_left.mpr hMle).symm
+
 end Subgroup
