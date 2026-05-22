@@ -134,4 +134,30 @@ theorem centralizer_sup (H K : Subgroup G) :
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
 
+/-- **Dedekind / modular law for subgroups** (with normality of one summand).
+`E, A, M ≤ G`, `E ⊴ G`, `E ≤ M` ⇒ `M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A)`.
+
+mathlib v4.29.1 では `IsModularLattice (Subgroup G)` instance は `[CommGroup G]` 限定で,
+非可換群版は不在 (実際は片方正規で modular).
+
+**用途**: Lucchini Thm 2.20 (K=⊥ case) で `M ⊆ AE ⇒ M = E(A ∩ M)` を導出. -/
+theorem inf_sup_eq_sup_inf_of_normal_of_le
+    {E A M : Subgroup G} [E.Normal] (hEM : E ≤ M) :
+    M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A) := by
+  apply le_antisymm
+  · intro x hx
+    have hxM : x ∈ M := hx.1
+    have hxEA : x ∈ E ⊔ A := hx.2
+    obtain ⟨e, he, a, ha, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxEA
+    -- x = e * a, a = e⁻¹ * x ∈ M.
+    have ha_in_M : a ∈ M := by
+      have : e⁻¹ * (e * a) ∈ M := M.mul_mem (M.inv_mem (hEM he)) hxM
+      simpa [mul_assoc] using this
+    exact Subgroup.mul_mem_sup he ⟨ha_in_M, ha⟩
+  · refine sup_le ?_ ?_
+    · intro x hx
+      exact ⟨hEM hx, Subgroup.mem_sup_left hx⟩
+    · intro x ⟨hxM, hxA⟩
+      exact ⟨hxM, Subgroup.mem_sup_right hxA⟩
+
 end Subgroup
