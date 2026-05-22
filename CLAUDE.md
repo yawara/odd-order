@@ -86,3 +86,15 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 ## mathlib カバレッジ
 
 詳細は [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md) に集約。概要: Sylow / `IsPGroup` / `IsSolvable` / `IsNilpotent` / Frattini / Transfer / Schur-Zassenhaus / 表現論・指標の基本は既存。Fitting `F(G)` / `F*(G)` / 一般 π-Hall / Frobenius 群 / ZJ / Thompson subgroup `J(P)` / Dade isometry / Peterfalvi coherence は新規実装が必要。
+
+## mathlib API 探索方針 (3 層運用)
+
+mathlib lemma の名前 / 署名を調べるときは, 闇雲に `grep -rn` を叩かず以下の順:
+
+1. **概念は明確で名前が未知** → **Web 検索** (`WebFetch https://leansearch.net/?q=<query>` / `WebSearch "mathlib4 <concept>"`). leansearch.net / moogle.ai が mathlib 専用のセマンティック検索. 候補名は必ず local で確認 (v4.29.1 pin との drift 注意)
+2. **不慣れなモジュールの API 把握** → **該当ファイルを `Read` で通読**. 個別 grep を 3 回以上叩くなら通読の方が早い (例: `SemidirectProduct.lean`, `Nilpotent.lean`)
+3. **名前細部 (namespace, 引数順) が不確か** → **自然名で書いて `lake build` のエラー任せ**. ~12 秒で決着
+
+`grep -rn` は「使用例を本プロジェクト内で探す」 (Ch.1 等で類似 proof パターンの確認) には引き続き有用. mathlib 名前探索とは目的を分けて運用.
+
+詳細は memory `feedback_mathlib_api_3layer_lookup.md`.
