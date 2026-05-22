@@ -184,22 +184,28 @@ theorem commutator_top_subgroup_le_commutator (A : Subgroup G) :
 
 (本 statement は前半. 後半 `G' ≅ A / (A ∩ Z(G))` の同型は別途 statement 化予定.)
 
-**証明骨子** (Isaacs p.118):
+**証明** (Isaacs p.118): `commutative_of_cyclic_center_quotient` 経由.
 - (≥) 部分 = `commutator_top_subgroup_le_commutator` (上記, 仮定不要).
-- (≤) 部分 `G' ≤ ⁅A, ⊤⁆`: `G/⁅A, ⊤⁆` が abelian であることを示す.
-  - `commutative_of_cyclic_center_quotient` (mathlib `Cyclic.lean:180`) を Q = G/⁅A,⊤⁆ に
-    適用: Q → G/A が cyclic codomain (hypothesis) で ker = (image of A in Q) ⊆ Z(Q).
-  - Z(Q) 包含: `a ∈ A, x ∈ G ⇒ ⁅a, x⁆ ∈ ⁅A, ⊤⁆` ⇒ Q で `ax ≡ xa`.
-  - ⁅A, ⊤⁆ ≤ A (A 正規 + Lem 4.3) で `Q/ker ≅ G/A` cyclic.
-形式化保留 (~80 LOC: mathlib `commutative_of_cyclic_center_quotient` の wrapper として
-構築). -/
+- (≤) 部分: `Q := G/⁅A, ⊤⁆` が abelian を示す.
+  - lift `f : Q →* G/A` (mk' A の lift, 可能なのは `⁅A, ⊤⁆ ≤ A` (Lem 4.3 + A 正規)).
+  - `f.ker = image(A) in Q ≤ center(Q)` (`⁅a, g⁆ ∈ ⁅A, ⊤⁆` で Q では `ag = ga`).
+  - codomain `G/A` cyclic (hypothesis).
+  - `commutative_of_cyclic_center_quotient` ⇒ Q commutative ⇒ commutator G ≤ ⁅A, ⊤⁆. -/
 theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
     {A : Subgroup G} [A.Normal] [Finite G]
     (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
-    (_hCyclic : IsCyclic (G ⧸ A)) :
+    (hCyclic : IsCyclic (G ⧸ A)) :
     _root_.commutator G = ⁅A, (⊤ : Subgroup G)⁆ := by
   refine le_antisymm ?_ (commutator_top_subgroup_le_commutator A)
-  -- 残り方向: commutator G ≤ ⁅A, ⊤⁆. `commutative_of_cyclic_center_quotient` 経由.
+  -- (≤) direction: 残り方向. `commutative_of_cyclic_center_quotient` (Cyclic.lean:180) で
+  -- Q := G/⁅A,⊤⁆ が abelian を示し commutator G ⊆ ⁅A,⊤⁆ を導出予定. 構造 step:
+  --   1. ⁅A,⊤⁆ ≤ A (commutator_top_left_le_iff + commutator_comm + A 正規).
+  --   2. lift f : G/⁅A,⊤⁆ →* G/A (QuotientGroup.lift, codomain cyclic by hypothesis).
+  --   3. f.ker = image(A) ≤ center(G/⁅A,⊤⁆) (∵ ⁅a,g⁆ ∈ ⁅A,⊤⁆ ⇒ Q で ag = ga).
+  --   4. commutative_of_cyclic_center_quotient ⇒ G/⁅A,⊤⁆ commutative.
+  --   5. commutator G ⊆ kernel of mk' = ⁅A,⊤⁆.
+  -- API gotcha 残: QuotientGroup.mk'_eq_mk'_iff_div_mem 名前不在, lift_mk' signature,
+  -- center_mem_iff vs mem_center_iff 等. 次セッションで API 確定後完成予定.
   sorry
 
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
