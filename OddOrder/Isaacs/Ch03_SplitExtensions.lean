@@ -1021,12 +1021,36 @@ FT 経路では優先度低 (Peterfalvi で散発使用).
 **形式化状態**: stub. 全 lifted 結果は SemidirectProduct (mathlib) との接続で得られる
 可能性が高い. -/
 
-/-- **Isaacs Thm 3.35 (片向き; cyclic-quotient lift exists)**: `H ⊴ G`, `G/H` cyclic ⇒
-`G/H` の生成元の preimage 集合の中に `H` を normalize するもの (= K) が取れる. -/
-axiom cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
-    (_hCyclic : IsCyclic (G ⧸ H)) :
-    ∃ K : Subgroup G, H ≤ K ∧ K ⊔ H = ⊤ ∧
-      Nat.card ↥K * H.index = Nat.card G * Nat.card ↥(K ⊓ H)
+/-- **Isaacs Thm 3.35 (cyclic lift; 弱版)**: `H ⊴ G`, `G/H` cyclic ⇒ ある `g ∈ G` が
+`G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`.
+
+Isaacs FGT 3.35 の本体は cyclic-quotient extension の **uniqueness** (与えられた
+N + 自己同型 + 適合条件で extension が同型 up to iso). 本リポでは FT 経路必要性が低い
+ため, 弱版 (cyclic 部分群 ⟨g⟩ で G/H を覆える g の存在) のみ. 完全 3.35 は Phase 4 で. -/
+theorem cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
+    (hCyclic : IsCyclic (G ⧸ H)) :
+    ∃ g : G, Subgroup.zpowers g ⊔ H = ⊤ := by
+  obtain ⟨gbar, hgbar⟩ := hCyclic.exists_generator
+  -- gbar : G ⧸ H, hgbar : ∀ x, x ∈ Subgroup.zpowers gbar.
+  -- Lift to g ∈ G.
+  obtain ⟨g, hg_proj⟩ := QuotientGroup.mk_surjective gbar
+  refine ⟨g, ?_⟩
+  rw [eq_top_iff]
+  intro x _
+  -- ⟦x⟧ ∈ ⟨gbar⟩, so ⟦x⟧ = gbar^n for some n. So x = g^n · h for some h ∈ H.
+  have hx : (x : G ⧸ H) ∈ Subgroup.zpowers gbar := hgbar _
+  rw [Subgroup.mem_zpowers_iff] at hx
+  obtain ⟨n, hn⟩ := hx
+  -- hn : gbar ^ n = (x : G ⧸ H). Substituting gbar = ⟦g⟧: ⟦g⟧^n = ⟦g^n⟧ = ⟦x⟧.
+  have h_in_H : x * (g ^ n)⁻¹ ∈ H := by
+    rw [← QuotientGroup.eq_one_iff]
+    rw [← hg_proj] at hn
+    -- hn : (↑g : G ⧸ H) ^ n = ↑x
+    rw [QuotientGroup.mk_mul, QuotientGroup.mk_inv, QuotientGroup.mk_zpow, ← hn]
+    group
+  -- x = (x · (g^n)⁻¹) · g^n with first factor in H and second in ⟨g⟩.
+  rw [show x = (x * (g ^ n)⁻¹) * g ^ n by group, sup_comm]
+  exact Subgroup.mul_mem_sup h_in_H (Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) n)
 
 end -- 3F
 
