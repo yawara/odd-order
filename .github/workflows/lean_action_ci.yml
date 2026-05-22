@@ -18,4 +18,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: leanprover/lean-action@v1
+
+      # AxiomsCheck verification: re-build OddOrder.AxiomsCheck (cached, fast)
+      # and surface the `axioms check OK` info messages in the CI log.
+      # The actual axioms check runs as part of `lake build` above (via
+      # `OddOrder.lean` → `import OddOrder.AxiomsCheck` → elab-time
+      # `#assert_only_allowed_axioms` commands); if any flagship theorem
+      # regresses to depend on `sorryAx` or a project-internal axiom, the
+      # main `lake build` step fails and this step is never reached.
+      - name: AxiomsCheck (flagship theorems unconditional)
+        run: |
+          set -o pipefail
+          lake build OddOrder.AxiomsCheck 2>&1 | tee axioms.log
+          echo "---"
+          if ! grep -E "axioms check OK" axioms.log; then
+            echo "::error::AxiomsCheck did not emit expected 'axioms check OK' messages"
+            exit 1
+          fi
+
       - uses: leanprover-community/docgen-action@v1
