@@ -910,8 +910,14 @@ theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSepar
 /-! **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
-**Forward dep**: Ch.6 § (Frobenius p-nilpotence, P×Q lemma) を要する. Ch.6 完成後に着手.
-所在: `OddOrder/Isaacs/Ch06_FrobeniusActions/ForwardFromCh03.lean` (placeholder). -/
+**所在**: Isaacs PDF p.94 の証明は **Ch.3 内部資産で完結** — π-separable normal series +
+`Subgroup.centralizer` + Schur-Zassenhaus + Sylow のみを使い, Ch.6 (Frobenius p-nilpotence)
+や Ch.4 (Thompson P×Q) は不要. ⇒ true owner は **Ch.3 §3D 自身**. 旧
+`Ch06_FrobeniusActions/ForwardFromCh03.lean` placeholder は配置ミスで, 2026-05-23 audit
+で削除. 実装着手時はこの位置 (§3D) に inline で書く.
+
+**下流被引用**: Ch.4 Thm 4.33 (mmd L2659), Ch.7 Thm 7.5 (L3853), Thm 7.6 (L3802) の 3 箇所.
+詳細は [`notes/meta/ch03_audit_2026_05_23.md`](../../notes/meta/ch03_audit_2026_05_23.md). -/
 
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
