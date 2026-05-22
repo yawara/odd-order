@@ -134,6 +134,32 @@ theorem centralizer_sup (H K : Subgroup G) :
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
 
+/-- **`p`-th power subgroup is characteristic** in CommGroup: for any `n : ℕ`, the range
+of `powMonoidHom n` (= `{x^n : x : M}` as subgroup of M) is characteristic in M.
+
+mathlib v4.29.1 不在の generic lemma. Lucchini K=⊥ (M abelian case で `φ(M) ⊴ G` を
+`characteristic in normal` 経由で得る) で使用. -/
+instance powMonoidHom_range_characteristic
+    {M : Type*} [CommGroup M] (n : ℕ) :
+    ((powMonoidHom (α := M) n).range).Characteristic := by
+  refine ⟨fun φ => ?_⟩
+  ext x
+  rw [Subgroup.mem_comap]
+  constructor
+  · intro hφx
+    obtain ⟨y, hy⟩ := hφx
+    refine ⟨φ.symm y, ?_⟩
+    have : φ ((φ.symm y) ^ n) = φ x := by
+      rw [map_pow, MulEquiv.apply_symm_apply]
+      exact hy
+    exact φ.injective this
+  · intro hx
+    obtain ⟨y, hy⟩ := hx
+    refine ⟨φ y, ?_⟩
+    change (φ y) ^ n = φ x
+    rw [← map_pow]
+    exact congrArg φ hy
+
 /-- **Dedekind / modular law for subgroups** (with normality of one summand).
 `E, A, M ≤ G`, `E ⊴ G`, `E ≤ M` ⇒ `M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A)`.
 
