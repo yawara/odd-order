@@ -6,7 +6,7 @@
 
 ## 進捗 (2026-05-22)
 
-§2A 完成 (Thm 2.11 のみ axiom). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式).
+**Ch.2 完成 (2026-05-23)**: §2A 完成 (Thm 2.11 ✅). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式). **§2C 完成** (IsPLocal/IsLocal + Lemma 2.16 + Thm 2.15 + Lemma 2.17). §2D 完成 (Lucchini K > ⊥ structural lemma + 本体は Ch.4 dir に owner-chapter 配置).
 **§2D**: Cor 2.19, Thm 2.18 Zenkov 完成 (2026-05-22). Thm 2.20 Lucchini は K > ⊥ structural
 reduction (`lucchini_K_pos_reduction`) を Ch.2 に, full theorem (`lucchini_index_normalCore_lt_index`)
 を `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean` に owner chapter 規則で配置
@@ -42,7 +42,7 @@ reduction (`lucchini_K_pos_reduction`) を Ch.2 に, full theorem (`lucchini_ind
 | **Thm 2.13 Matsuyama** | ✅ (2026-05-22) | `matsuyama`: `t ∉ O_2(G)` ⇒ ∃ x odd prime order, `t*x*t = x⁻¹`. Baer iff + Cauchy + Lemma 2.14 essence + structural |
 | Helper `mem_opCore_of_le_fitting_of_isPGroup` | ✅ | `H ≤ F(G)` で `H` が `p`-subgroup ⇒ `H ≤ O_p(G)`. Sylow `p` of nilpotent F(G) が unique で characteristic-in-normal 経由 |
 | Helper `exists_odd_prime_dvd_of_not_pow_two` | ✅ | Nat 補助: 2-べきでない正整数は奇素数約数を持つ. 強 induction |
-| §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
+| **§2C 完成** (2026-05-23) | ✅ | **IsPLocal / IsLocal** 定義 + **Lemma 2.16** (`isPLocal_of_quotient`, ~367 行: correspondence + Frattini in M) + **Thm 2.15** (`normal_sylow_two_of_odd_pLocal_normal_sylow_two`, ~382 行: 特殊case O_2(G)=⊥ + Matsuyama + 一般case via Lemma 2.16) + **Lemma 2.17** (`normalizer_map_of_coprime_kernel` + 系 `isPLocal_map_of_coprime_kernel`, ~388 行: p ∤ \|N\| で N_{Ḡ}(P̄) = N_G(P).map). 計 ~1140 行 |
 | **Thm 2.18 Zenkov** | ✅ (2026-05-22) | `zenkov_minimal_le_fitting`. WLOG wrapper + `zenkov_wlog_aux` (|G|-induction). Case 1 (∃ g, A ⊔ B^g = ⊤): `zenkov_case1_le_fitting` (中心性 + minimality). Case 2 (∀ g, < ⊤): Sylow-by-Sylow via Baer iff + IH on ↥H (`zenkov_minimality_transfer`) + opCore + p-group sup. ~350 行 (補助補題込み) |
 | **Cor 2.19** | ✅ (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov axiom + Lemma 2.10 + `card_set_mul_card_inf` 計数. A = ⊤ case は G abelian ⇒ G nilpotent ⇒ F(G) = ⊤ |
 | **Thm 2.20 Lucchini** | ✅ (2026-05-22, owner-chapter 配置) | **Ch.2 内**: `lucchini_K_pos_reduction` (K > ⊥ structural lemma, subgroup correspondence のみ). **Ch.4 dir** (`Ch04_Commutators/ForwardFromCh02.lean`): `lucchini_index_normalCore_lt_index` (本体, theorem) + `lucchini_K_bot_aux` (K = ⊥ narrower axiom). owner chapter 規則 (`notes/meta/forward_dep_policy.md`) により Ch.4 §4A-§4B (lcs 加法性) 依存部分を Ch.4 dir に配置. Ch.3 Horosevskii (Thm 3.3) は Ch.4 dir から import. |
