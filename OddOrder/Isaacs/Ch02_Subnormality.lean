@@ -2119,7 +2119,72 @@ variable {G : Type*} [Group G]
 * Cor 2.19 完成 (Zenkov axiom 経由)
 * Thm 2.18 Zenkov, Thm 2.20 Lucchini は引き続き axiom 化
 * 補助補題 `card_set_mul_card_inf` は §2A 末尾に移動 (Thm 2.11 でも使用)
+* Zenkov 用 Case 1 補助補題 (`conj_smul_abelian`, `inf_le_center_of_join_eq_top`,
+  `center_le_fitting`) を standalone で提供 — Zenkov 完成時 + Lucchini 完成時に再利用
 -/
+
+open scoped Pointwise in
+/-- 共役で abelian 性は保たれる: `B` abelian なら `(MulAut.conj g) • B` も abelian.
+
+Zenkov Case 1 / Wielandt Case 1 等で頻用. -/
+private lemma conj_smul_abelian {G : Type*} [Group G] {B : Subgroup G}
+    (hBab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b) (g : G) :
+    ∀ b ∈ ((MulAut.conj g) • B : Subgroup G),
+      ∀ b' ∈ ((MulAut.conj g) • B : Subgroup G), b * b' = b' * b := by
+  intro b₁ hb₁ b₂ hb₂
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def] at hb₁ hb₂
+  have hb₁' : g⁻¹ * b₁ * g ∈ B := by
+    have h : g⁻¹ * b₁ * (g⁻¹)⁻¹ ∈ B := hb₁
+    rwa [inv_inv] at h
+  have hb₂' : g⁻¹ * b₂ * g ∈ B := by
+    have h : g⁻¹ * b₂ * (g⁻¹)⁻¹ ∈ B := hb₂
+    rwa [inv_inv] at h
+  have habelian := hBab _ hb₁' _ hb₂'
+  have hs1 : (g⁻¹ * b₁ * g) * (g⁻¹ * b₂ * g) = g⁻¹ * (b₁ * b₂) * g := by group
+  have hs2 : (g⁻¹ * b₂ * g) * (g⁻¹ * b₁ * g) = g⁻¹ * (b₂ * b₁) * g := by group
+  rw [hs1, hs2] at habelian
+  have hconj := congrArg (fun z => g * z * g⁻¹) habelian
+  simp only at hconj
+  calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
+    _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := hconj
+    _ = b₂ * b₁ := by group
+
+/-- `A`, `B` abelian で `⟨A, B⟩ = ⊤` ⇒ `A ⊓ B ⊆ Z(G)`.
+
+Wielandt と Zenkov Case 1 共通の中心性論証. centralizer ⊇ A ∪ B ⇒ centralizer ⊇ ⟨A,B⟩ = ⊤. -/
+private lemma inf_le_center_of_join_eq_top {G : Type*} [Group G] {A B : Subgroup G}
+    (hAab : ∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a)
+    (hBab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b)
+    (hsup : A ⊔ B = ⊤) :
+    (A ⊓ B : Subgroup G) ≤ Subgroup.center G := by
+  intro c hc
+  rw [Subgroup.mem_inf] at hc
+  obtain ⟨hc_A, hc_B⟩ := hc
+  rw [Subgroup.mem_center_iff]
+  intro x
+  have h_central_A : A ≤ Subgroup.centralizer ({c} : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy; rw [Set.mem_singleton_iff] at hy; rw [hy]
+    exact (hAab a ha c hc_A).symm
+  have h_central_B : B ≤ Subgroup.centralizer ({c} : Set G) := by
+    intro b hb
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy; rw [Set.mem_singleton_iff] at hy; rw [hy]
+    exact (hBab b hb c hc_B).symm
+  have h_sup_le := sup_le h_central_A h_central_B
+  have h_centralizer_top : Subgroup.centralizer ({c} : Set G) = ⊤ :=
+    top_le_iff.mp (hsup ▸ h_sup_le)
+  have hx_central : x ∈ Subgroup.centralizer ({c} : Set G) := by
+    rw [h_centralizer_top]; exact Subgroup.mem_top x
+  rw [Subgroup.mem_centralizer_iff] at hx_central
+  exact (hx_central c (Set.mem_singleton _)).symm
+
+/-- `Subgroup.center G ≤ fitting G`. Center は abelian → 冪零, 正規部分群. -/
+private lemma center_le_fitting (G : Type*) [Group G] [Finite G] :
+    Subgroup.center G ≤ fitting G := by
+  haveI : Group.IsNilpotent ↥(Subgroup.center G) := inferInstance
+  exact nilpotent_normal_le_fitting
 
 open scoped Pointwise in
 /-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
