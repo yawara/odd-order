@@ -928,6 +928,20 @@ theorem Subgroup.IsPiGroup.bot {G : Type*} [Group G] (π : Set ℕ) :
   intro p hp
   simp [Subgroup.card_bot] at hp
 
+/-- **Hall-Higman 3.21 case π core**: `K ⊴ G` π-group + `K ≤ C_G(O_π(G))` ⇒
+`K ≤ C_G(O_π(G)) ⊓ O_π(G)`.
+
+`oPiCore π G` の極大性 (`IsPiGroup.le_oPiCore`) で `K ≤ oPiCore π G`,
+これと仮定 `K ≤ centralizer` から inf に入る. 1-liner.
+
+**用途**: Hall-Higman 3.21 case π で `K/B ⊆ C/B π-group ⇒ K ⊆ C ⊓ O = B`,
+これと `B < K` で矛盾 (K = preimage of nontrivial K' で `B < K` を担保). -/
+theorem hall_higman_case_pi_K_le_B {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    {K : Subgroup G} [K.Normal] (hKpi : Subgroup.IsPiGroup π K)
+    (hKC : K ≤ Subgroup.centralizer (oPiCore π G : Set G)) :
+    K ≤ Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G :=
+  le_inf hKC hKpi.le_oPiCore
+
 /-- **IsPiGroup は subgroupOf で保持**: `B ≤ K ≤ G` で `B` が π-group (as `Subgroup G`)
 ⇒ `B.subgroupOf K` も π-group (as `Subgroup ↥K`).
 
