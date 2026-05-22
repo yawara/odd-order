@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Data.Finite.Card
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.Tactic.Ring
 import OddOrder.Mathlib.Subgroup
 
@@ -550,5 +552,46 @@ theorem chermakDelgado [Finite G] :
   rw [hG_sq, Nat.mul_comm (Nat.card A ^ 2) (A.index ^ 2)] at h5
   -- Step 8: Cancel |A|² (positive)
   exact Nat.le_of_mul_le_mul_right h5 (pow_pos Nat.card_pos 2)
+
+/-! ### Cor 1.46. -/
+
+/-- **Isaacs Cor 1.46**: If `H ≤ G` with `|H| · |C_G(H)| > |G|`, then `G` is not a nonabelian simple
+group. -/
+theorem not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt [Finite G]
+    {H : Subgroup G} (h : H.chermakDelgadoMeasure > Nat.card G) :
+    ¬ (IsSimpleGroup G ∧ ¬ IsMulCommutative G) := by
+  rintro ⟨h_simple, h_nonab⟩
+  set M := chermakDelgadoSubgroup G with hM_def
+  -- m_G(M) > |G|
+  have h_M_gt : Nat.card G < M.chermakDelgadoMeasure :=
+    lt_of_lt_of_le h (chermakDelgadoSubgroup_mem_lattice H)
+  -- m_G(⊥) = |G|
+  have h_bot_measure : (⊥ : Subgroup G).chermakDelgadoMeasure = Nat.card G := by
+    rw [chermakDelgadoMeasure_def, Subgroup.card_bot, one_mul]
+    have hC : (centralizer ((⊥ : Subgroup G) : Set G) : Subgroup G) = ⊤ := by
+      ext x
+      rw [Subgroup.coe_bot]
+      simp [mem_centralizer_iff]
+    rw [hC]
+    exact Nat.card_congr Subgroup.topEquiv.toEquiv
+  -- M ≠ ⊥
+  have h_M_ne_bot : M ≠ ⊥ := by
+    intro h_eq
+    rw [h_eq, h_bot_measure] at h_M_gt
+    exact (lt_irrefl _) h_M_gt
+  -- M is normal (characteristic ⟹ normal)
+  haveI : M.Normal := inferInstance
+  -- G simple ⟹ M = ⊥ or M = ⊤. M ≠ ⊥ ⟹ M = ⊤
+  have h_M_top : M = ⊤ :=
+    (h_simple.eq_bot_or_eq_top_of_normal M ‹M.Normal›).resolve_left h_M_ne_bot
+  -- M abelian
+  haveI hM_comm : IsMulCommutative M := inferInstance
+  -- IsMulCommutative G derivation
+  apply h_nonab
+  refine ⟨⟨fun a b => ?_⟩⟩
+  have h_top_comm := h_M_top ▸ hM_comm
+  exact congrArg Subtype.val
+    (h_top_comm.is_comm.comm
+      (⟨a, Subgroup.mem_top _⟩ : (⊤ : Subgroup G)) ⟨b, Subgroup.mem_top _⟩)
 
 end Subgroup

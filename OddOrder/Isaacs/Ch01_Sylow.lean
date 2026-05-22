@@ -12,6 +12,7 @@ import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.ChermakDelgado
 
 /-!
 # OddOrder.Isaacs.Ch01 — Sylow Theory
@@ -3193,56 +3194,45 @@ theorem opCore_ne_bot_of_card_sylow_sq_gt
 
 end -- 1F
 
-section /- 1G: Chermak–Delgado (pp. 41-44) — 実装計画策定済, ファイル分離予定 -/
+section /- 1G: Chermak–Delgado (pp. 41-44) -/
 
-/-! ### §1G (Chermak–Delgado measure): 実装方針 (2026-05-23 更新)
+/-! ### §1G (Chermak-Delgado): 本体は別ファイルに分離.
 
-**2026-05-23 決定変更**: 旧 "省略" 判断を **mathlib upstream のための実装** に変更.
-詳細実装計画: [`notes/meta/ch01_chermak_delgado_plan.md`](../../../notes/meta/ch01_chermak_delgado_plan.md).
+実装本体は [`OddOrder/GroupTheory/ChermakDelgado.lean`](../GroupTheory/ChermakDelgado.lean).
 
-**配置予定**:
-* `OddOrder/Mathlib/Subgroup.lean` (新規) — H1 `card_HK_mul_card_inf_eq_card_mul_card`,
-  H2 `le_centralizer_centralizer`, (任意) `centralizer_sup` 等 mathlib gap fill
-* `OddOrder/GroupTheory/ChermakDelgado.lean` (新規) — `chermakDelgadoMeasure`,
-  `chermakDelgadoLattice`, `chermakDelgadoSubgroup` + Thm 1.41-1.46 全 6 結果
-* 本 §1G section: 実装完了後に上記 import + re-export 形に書き換え
+mathlib upstream 視野の shared module 化 (`OddOrder/GroupTheory/` 慣用 dir).
+本 section は import + 主要 API への再 export. 詳細実装計画:
+[`notes/meta/ch01_chermak_delgado_plan.md`](../../notes/meta/ch01_chermak_delgado_plan.md).
 
-**実装着手前の元 skip 経緯 (歴史記録)**:
+実装一覧 (定理は `Subgroup` namespace 内):
 
-**省略理由 (2026-05-21 決定, 2026-05-23 audit で再確認)**: Isaacs §1G は Chermak–Delgado
-measure `m_G(H) := |H|·|C_G(H)|` と最大値部分群族 `L(G)` の理論 (Thm 1.41–1.46).
-本プロジェクトの目標である Feit-Thompson 形式化 (Phase 2a/2b: BG + Peterfalvi)
-において Chermak / Delgado への引用は **0 件** — 2026-05-23 fresh grep で再確認:
-* BG mmd: 0 件 (`chermak|delgado` ファイルレベル)
-* Peterfalvi mmd: 0 件 (同上)
-* Isaacs Ch.2-10 proof body: 0 件 (索引 2 行 (L5308, L5370) のみ)
+* **Lemma 1.42**: `chermakDelgadoMeasure_le_centralizer`
+* **Lemma 1.43**: `chermakDelgadoMeasure_mul_le`
+* **Thm 1.44 (a)**: `chermakDelgadoLattice_inf_mem`, `chermakDelgadoLattice_sup_mem`
+* **Thm 1.44 (b)**: `chermakDelgadoLattice_sup_eq_mul`
+* **Thm 1.44 (c)**: `chermakDelgadoLattice_centralizer_mem`,
+  `chermakDelgadoLattice_centralizer_centralizer_eq`
+* **Cor 1.45**: `chermakDelgadoSubgroup_mem_lattice`,
+  `chermakDelgadoSubgroup_isMulCommutative`, `center_le_chermakDelgadoSubgroup`,
+  `chermakDelgadoSubgroup_characteristic`
+* **Thm 1.41**: `chermakDelgado` (main theorem)
+* **Cor 1.46**: `not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt`
 
-⇒ 本プロジェクトのスコープ外として正式に省略する.
+汎用 helper (mathlib upstream 候補): [`OddOrder/Mathlib/Subgroup.lean`](../Mathlib/Subgroup.lean)
+の `card_HK_mul_card_inf_eq_card_mul_card`, `le_centralizer_centralizer`, `centralizer_sup` を使用.
 
-**2026-05-23 audit の tactical refinement**: §1G 実装は副産物として mathlib upstream 価値の
-高い 2 helper を要求 — どちらも mathlib v4.29.1 不在:
-* H1 `Subgroup.card_HK_mul_card_inf_eq_card_mul_card`
-  (古典 `|HK|·|H∩K| = |H|·|K|`; mathlib `index_inf_le` 等は部分対応のみ)
-* H2 `Subgroup.le_centralizer_centralizer`
-  (`H ≤ C_G(C_G(H))`, IsMulCommutative 仮定なし; 既存 `le_centralizer` は仮定強すぎ)
-
-これら helper は **§1G 本体を待たず**, Ch.2+ で必要になった時点で
-`OddOrder/GroupTheory/Subgroup.lean` 等に standalone 実装する方針.
-
-将来 mathlib 本体への寄与時等に必要となれば Isaacs Thm 1.41–1.46 を本節に
-追加する; その際の起点は本書 pp.41-44 の議論で, 特に Lemma 1.43
-(m の不等式) が技術的中核.
-
-**Deferred-revisit triggers** (2026-05-23):
-1. 後の Isaacs/BG/Peterfalvi 節で `m_G(H)` 記法 / "Chermak-Delgado" 概念が現れる (periodic grep)
-2. H1, H2 helper が他の理由で実装される (累積で §1G 実装コスト ~150 → ~80 LOC に低下)
-3. Phase 1 完成後の mathlib upstream pivot
-
-詳細は [`notes/meta/ch01_audit_2026_05_23.md`](../../../notes/meta/ch01_audit_2026_05_23.md).
-
-関連項目: §1F Brodkey (Thm 1.37) は Chermak–Delgado から派生する Cor 1.39 の
+関連項目: §1F Brodkey (Thm 1.37-1.40) は Chermak-Delgado から派生する Cor 1.39 の
 abelian Sylow 版で, こちらは本ファイル §1F に実装済 (`exists_pair_inf_eq_opCore_of_abelian`,
 `index_opCore_le_index_sylow_sq`). -/
+
+export Subgroup (chermakDelgadoMeasure chermakDelgadoLattice chermakDelgadoSubgroup
+  chermakDelgadoMeasure_le_centralizer chermakDelgadoMeasure_mul_le
+  chermakDelgadoLattice_inf_mem chermakDelgadoLattice_sup_mem
+  chermakDelgadoLattice_sup_eq_mul
+  chermakDelgadoLattice_centralizer_mem chermakDelgadoLattice_centralizer_centralizer_eq
+  chermakDelgadoSubgroup_mem_lattice
+  center_le_chermakDelgadoSubgroup chermakDelgado
+  not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt)
 
 end -- 1G
 
