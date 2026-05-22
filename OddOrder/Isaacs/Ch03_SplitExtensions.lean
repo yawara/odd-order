@@ -977,6 +977,17 @@ theorem hall_higman_case_pi_K_le_B {G : Type*} [Group G] [Finite G] (π : Set �
     K ≤ Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G :=
   le_inf hKC hKpi.le_oPiCore
 
+/-- **IsPiGroup は MulEquiv (group iso) で保持**: `K ≃* K.map φ.toMonoidHom`
+(`equivMapOfInjective`) で cardinality 同じ. -/
+theorem Subgroup.IsPiGroup.map_equiv {G H : Type*} [Group G] [Group H] (φ : G ≃* H)
+    {π : Set ℕ} {K : Subgroup G} (hK : Subgroup.IsPiGroup π K) :
+    Subgroup.IsPiGroup π (K.map φ.toMonoidHom) := by
+  intro p hp
+  have hcard : Nat.card ↥(K.map φ.toMonoidHom) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.equivMapOfInjective K φ.toMonoidHom φ.injective).symm.toEquiv
+  rw [hcard] at hp
+  exact hK p hp
+
 /-- **IsPiGroup は subgroupOf で保持**: `B ≤ K ≤ G` で `B` が π-group (as `Subgroup G`)
 ⇒ `B.subgroupOf K` も π-group (as `Subgroup ↥K`).
 
