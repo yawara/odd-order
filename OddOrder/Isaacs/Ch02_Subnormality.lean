@@ -1721,14 +1721,78 @@ section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
 
 variable {G : Type*} [Group G]
 
-/-! ### §2D 状態 (axiom 化)
+/-! ### §2D 状態
 
-§2D の Thm 2.18 Zenkov + Thm 2.20 Lucchini は Baer (Thm 2.12, 完成) を主な道具と
-する重め (~200 行) の結果. **Ch.3 Thm 3.3 Horosevskii で Lucchini が必須**となるため
-本節を導入. 本リポでは statement を axiom で固定し, Horosevskii は実証明する.
-
-各 axiom の証明戦略は docstring に詳細記載. 別 commit で fill in 予定.
+* Cor 2.19 完成 (Zenkov axiom 経由)
+* Thm 2.18 Zenkov, Thm 2.20 Lucchini は引き続き axiom 化
 -/
+
+open scoped Pointwise in
+/-- **古典的計数公式** `|H · K| · |H ∩ K| = |H| · |K|` (group counting formula).
+有限群 `G` の部分群 `H, K` の **集合積** の cardinality と intersection の cardinality
+が, `H`, `K` の cardinality の積に等しい. mathlib 未収載なので, ここで一度示しておく.
+
+証明: H を G/K (左 coset 集合) に左乗法で作用させ, `(1 : G ⧸ K)` の軌道が
+`(H : Set G).image (↑ : G → G ⧸ K)`, 安定化群が `K.subgroupOf H` (≃ `H ⊓ K`).
+orbit-stabilizer + `Subgroup.card_mul_eq_card_subgroup_mul_card_quotient` で合成.
+
+Cor 2.19 と Thm 2.11 で `H = K = A` (またはその共役) の形で使う. -/
+private lemma card_set_mul_card_inf {G : Type*} [Group G] [Finite G]
+    (H K : Subgroup G) :
+    Nat.card ((H : Set G) * (K : Set G)) * Nat.card ↥(H ⊓ K) = Nat.card ↥H * Nat.card ↥K := by
+  classical
+  -- (1) |H · K| = |K| · |image of H in G/K| via card_mul_eq_card_subgroup_mul_card_quotient.
+  have h1 : Nat.card ((H : Set G) * (K : Set G)) =
+      Nat.card ↥K * Nat.card ((H : Set G).image ((↑) : G → G ⧸ K)) :=
+    Subgroup.card_mul_eq_card_subgroup_mul_card_quotient K (H : Set G)
+  -- (2) Set up H-action on G/K (instance: mulLeftCosetsCompSubtypeVal).
+  -- orbit of (1 : G ⧸ K) equals image of H in G/K (as set).
+  have h_orbit_eq : (MulAction.orbit (↥H) (((1 : G) : G ⧸ K))) =
+      (H : Set G).image ((↑) : G → G ⧸ K) := by
+    ext y
+    constructor
+    · rintro ⟨h, rfl⟩
+      refine ⟨(h : G), h.2, ?_⟩
+      show ((h : G) : G ⧸ K) = (h • ((1 : G) : G ⧸ K) : G ⧸ K)
+      change ((h : G) : G ⧸ K) = (((h : G) : G) * (1 : G) : G ⧸ K)
+      rw [mul_one]
+    · rintro ⟨g, hg, rfl⟩
+      exact ⟨⟨g, hg⟩, by
+        show ((⟨g, hg⟩ : ↥H) • ((1 : G) : G ⧸ K) : G ⧸ K) = ((g : G) : G ⧸ K)
+        change ((g : G) * (1 : G) : G ⧸ K) = ((g : G) : G ⧸ K)
+        rw [mul_one]⟩
+  -- (3) stabilizer of (1 : G ⧸ K) in H equals K.subgroupOf H.
+  have h_stab_eq : MulAction.stabilizer ↥H (((1 : G) : G ⧸ K)) = K.subgroupOf H := by
+    ext h
+    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+    constructor
+    · intro hsmul
+      have hraw : (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K) := hsmul
+      rw [mul_one] at hraw
+      -- hraw : ((h : G) : G ⧸ K) = ((1 : G) : G ⧸ K) iff (h:G)⁻¹ * 1 ∈ K iff (h:G)⁻¹ ∈ K iff (h:G) ∈ K
+      have := QuotientGroup.eq.mp hraw
+      simpa using this
+    · intro hh
+      show (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K)
+      rw [mul_one]
+      apply QuotientGroup.eq.mpr
+      simpa using hh
+  -- (4) Orbit-stabilizer: |orbit| · |stabilizer| = |H|.
+  have h_orbstab : Nat.card (MulAction.orbit ↥H (((1 : G) : G ⧸ K))) *
+      Nat.card (MulAction.stabilizer ↥H (((1 : G) : G ⧸ K))) = Nat.card ↥H := by
+    rw [← Nat.card_prod]
+    exact Nat.card_congr (MulAction.orbitProdStabilizerEquivGroup ↥H _)
+  -- (5) |K.subgroupOf H| = |H ⊓ K|.
+  have h_subgrpof_card : Nat.card ↥(K.subgroupOf H) = Nat.card ↥(H ⊓ K) := by
+    rw [show K.subgroupOf H = (H ⊓ K).subgroupOf H from
+      (Subgroup.inf_subgroupOf_left K H).symm]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+  -- (6) Combine all.
+  rw [h_orbit_eq, h_stab_eq, h_subgrpof_card] at h_orbstab
+  -- h_orbstab : Nat.card ((H : Set G).image ↑) * Nat.card (H ⊓ K) = Nat.card H
+  rw [h1]
+  -- Goal: Nat.card K * Nat.card (image) * Nat.card (H ⊓ K) = Nat.card H * Nat.card K
+  rw [mul_assoc, h_orbstab, mul_comm]
 
 open scoped Pointwise in
 /-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
@@ -1757,19 +1821,106 @@ axiom zenkov_minimal_le_fitting [Finite G] {A B : Subgroup G}
           A ⊓ ((MulAut.conj g₀) • B : Subgroup G)) :
     (A ⊓ ((MulAut.conj g₀) • B : Subgroup G) : Subgroup G) ≤ fitting G
 
+open scoped Pointwise in
 /-- **Isaacs Cor 2.19**: `G` 非自明有限群, `A` abelian 部分群, `|A| ≥ |G:A|`
 ⇒ `A ⊓ F(G) ≠ ⊥`.
 
 書籍 p.62 の証明: g ∈ G について `|A| · |A^g| = |A|² ≥ |G|`. `A < G` ならば Lemma 2.10
-で `A · A^g < G`. `|A · A^g| = |A|² / |A ⊓ A^g|` の formula で `A ⊓ A^g > 1`. Zenkov で
-minimal-card `g₀` を取り `A ⊓ A^{g₀} ⊆ F(G)`, これが `> 1` で `A ⊓ F(G) > 1`.
-
-実装方針: §2D は Zenkov axiom 経由なので, 本系を axiom 化しても証明連鎖の affordability に
-影響しない. Lucchini 2.20 で内部使用される (Lucchini 2.20 axiom 経由で Horosevskii に渡る). -/
-axiom inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A : Subgroup G}
-    (_hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
-    (_hCard : A.index ≤ Nat.card A) :
-    A ⊓ fitting G ≠ ⊥
+で `A · A^g ≠ G` (集合), `|A · A^g| = |A|² / |A ⊓ A^g|` の formula で `A ⊓ A^g > 1`.
+Zenkov で minimal-card `g₀` を取り `A ⊓ A^{g₀} ⊆ F(G)`, これが `> 1` で `A ⊓ F(G) > 1`. -/
+theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A : Subgroup G}
+    (hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (hCard : A.index ≤ Nat.card A) :
+    A ⊓ fitting G ≠ ⊥ := by
+  classical
+  -- Case 1: A = ⊤. Then G is abelian, F(G) = G ≠ ⊥.
+  by_cases hAtop : A = ⊤
+  · subst hAtop
+    rw [top_inf_eq]
+    -- G is commutative via hA_ab on ⊤.
+    have hG_commute : ∀ a b : G, a * b = b * a := fun a b =>
+      hA_ab a (Subgroup.mem_top a) b (Subgroup.mem_top b)
+    -- center G = ⊤.
+    have hcenter : Subgroup.center G = ⊤ := by
+      ext x
+      refine ⟨fun _ => Subgroup.mem_top x, fun _ => ?_⟩
+      rw [Subgroup.mem_center_iff]
+      intro g
+      exact hG_commute g x
+    -- G is nilpotent.
+    haveI hGnilp : Group.IsNilpotent G := ⟨1, by
+      rw [upperCentralSeries_one]; exact hcenter⟩
+    -- ↥⊤ is also nilpotent.
+    haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
+      nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+    -- F(G) = ⊤.
+    have hFtop : fitting G = ⊤ := top_le_iff.mp (nilpotent_normal_le_fitting (N := ⊤))
+    rw [hFtop]
+    exact top_ne_bot
+  · -- Case 2: A < ⊤.
+    -- Pick g₀ minimizing |A ⊓ A^g| over g ∈ G.
+    haveI : Fintype G := Fintype.ofFinite G
+    set M : G → Subgroup G := fun g => A ⊓ ((MulAut.conj g) • A : Subgroup G) with hM_def
+    obtain ⟨g₀, _, hg₀_min⟩ := Finset.exists_min_image Finset.univ
+      (fun g => Nat.card ↥(M g)) Finset.univ_nonempty
+    -- g₀ is ≤-minimal (used in Zenkov hypothesis).
+    have hg₀_minimal : ∀ g : G, M g ≤ M g₀ → M g = M g₀ := by
+      intro g hle
+      have h_card_g₀_le_g : Nat.card ↥(M g₀) ≤ Nat.card ↥(M g) :=
+        hg₀_min g (Finset.mem_univ _)
+      -- M g ≤ M g₀ and |M g₀| ≤ |M g| ⇒ M g₀ = M g, hence M g = M g₀.
+      exact (Subgroup.eq_of_le_of_card_ge hle h_card_g₀_le_g)
+    -- Apply Zenkov to A, A.
+    have h_M_le_F : M g₀ ≤ fitting G :=
+      zenkov_minimal_le_fitting hA_ab hA_ab g₀ hg₀_minimal
+    -- Show M g₀ ≠ ⊥ (using A < ⊤ + Lemma 2.10 + counting).
+    have h_M_neBot : M g₀ ≠ ⊥ := by
+      intro h_M_bot
+      -- M g₀ = ⊥ means |M g₀| = 1.
+      have h_card_one : Nat.card ↥(M g₀) = 1 := by
+        rw [h_M_bot]; exact Subgroup.card_bot
+      -- |A · A^g₀| · |M g₀| = |A| · |A^g₀| (counting helper).
+      have h_count : Nat.card ((A : Set G) *
+          (((MulAut.conj g₀) • A : Subgroup G) : Set G)) *
+          Nat.card ↥(A ⊓ (MulAut.conj g₀) • A : Subgroup G) =
+          Nat.card ↥A * Nat.card ↥((MulAut.conj g₀) • A : Subgroup G) :=
+        card_set_mul_card_inf A ((MulAut.conj g₀) • A)
+      -- |A^g₀| = |A| (conjugation preserves card).
+      have h_conj_card : Nat.card ↥((MulAut.conj g₀) • A : Subgroup G) = Nat.card ↥A := by
+        rw [Subgroup.pointwise_smul_def]
+        exact Subgroup.card_map_of_injective (MulEquiv.injective (MulAut.conj g₀))
+      -- M g₀ = A ⊓ ((MulAut.conj g₀) • A) by definition.
+      have h_M_unfold : M g₀ = A ⊓ ((MulAut.conj g₀) • A : Subgroup G) := rfl
+      rw [← h_M_unfold] at h_count
+      rw [h_card_one, mul_one, h_conj_card] at h_count
+      -- h_count : |A · A^g₀| = |A|²
+      -- |A|² ≥ |G| (from hypothesis hCard).
+      have h_A_sq : Nat.card G ≤ Nat.card ↥A * Nat.card ↥A := by
+        calc Nat.card G = Nat.card ↥A * A.index := (Subgroup.card_mul_index A).symm
+          _ ≤ Nat.card ↥A * Nat.card ↥A := Nat.mul_le_mul_left _ hCard
+      -- |A · A^g₀| ≤ |G| (subset of G).
+      have h_prod_subset : (A : Set G) *
+          (((MulAut.conj g₀) • A : Subgroup G) : Set G) ⊆ Set.univ :=
+        Set.subset_univ _
+      -- A · A^g₀ = Set.univ (subset of G with cardinality |G|).
+      have h_prod_eq_univ : (A : Set G) *
+          (((MulAut.conj g₀) • A : Subgroup G) : Set G) = Set.univ := by
+        apply Set.eq_of_subset_of_ncard_le h_prod_subset _ Set.finite_univ
+        rw [Set.ncard_univ, ← Nat.card_coe_set_eq, h_count]
+        exact h_A_sq
+      -- Lemma 2.10: A · A^g₀ = univ ⇒ A = ⊤.
+      -- For eq_top_of_set_mul_conj_eq_top, need: A * (MulAut.conj x⁻¹) • A = univ for some x.
+      -- With x = g₀⁻¹: (MulAut.conj (g₀⁻¹)⁻¹) • A = (MulAut.conj g₀) • A. So apply with x = g₀⁻¹.
+      have h_A_top : A = ⊤ := by
+        apply eq_top_of_set_mul_conj_eq_top g₀⁻¹
+        convert h_prod_eq_univ using 2
+        rw [inv_inv]
+      exact hAtop h_A_top
+    -- Conclude.
+    have h_M_le_inf : M g₀ ≤ A ⊓ fitting G := le_inf inf_le_left h_M_le_F
+    intro hbot
+    rw [hbot, le_bot_iff] at h_M_le_inf
+    exact h_M_neBot h_M_le_inf
 
 /-- **Isaacs Thm 2.20 (Lucchini)**: `G` 有限群, `A` cyclic 真部分群, `K = core_G(A)`.
 ならば `|A:K| < |G:A|`. 特に `|A| ≥ |G:A|` なら `K > 1`.
