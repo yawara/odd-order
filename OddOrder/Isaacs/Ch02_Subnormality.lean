@@ -2585,190 +2585,108 @@ theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A
     rw [hbot, le_bot_iff] at h_M_le_inf
     exact h_M_neBot h_M_le_inf
 
-/-- **Isaacs Thm 2.20 (Lucchini) K = 1 case (narrower)**: `G` 有限群, `A` cyclic 真部分群,
-`K = core_G(A) = 1` ならば `|A| < |G:A|`.
+/-- **Isaacs Thm 2.20 (Lucchini) K > ⊥ structural reduction**: `K = A.normalCore ≠ ⊥` の
+場合, Lucchini の K > ⊥ inductive step を担う **structural lemma**.
 
-これは Lucchini の核心部 (induction の base step). 完全形式化は深い構造:
-* Cor 2.19 (✅) で `|A| ≥ |G:A|` を仮定して `A ⊓ F(G) > 1` ⇒ `F(G) > 1` を導出.
-* minimal normal `E ⊆ F(G)` を選び, **`E ⊆ Z(F(G))`** + elementary abelian p.
-  この補題 ("Z(F(G)) absorbs G-minimal normal in F(G)") は **Ch.4 §4A-§4B 領域** の
-  `lowerCentralSeries` 加法性 (Isaacs Thm 4.11) を要する. 詳細は
-  [`notes/isaacs/ch04_commutators.md`](../../notes/isaacs/ch04_commutators.md) 内の
-  「逆引き: Ch.2 §2D Lucchini K = ⊥ case」セクション.
-* `AE < G` (K = 1 で), G/E に IH 適用, `M̄ = core(Ā)` の解析.
-* M abelian / 非可換 sub-case で `M ⊴ G + M ⊆ A` を導いて K = 1 と矛盾.
+Given:
+* `Ā := A.map (mk' K) ≤ G ⧸ K` で Lucchini の結論が成立する (`h_quot`).
 
-実装方針: Ch.4 §4A-§4B 完成後 ~150-200 行で本 axiom を theorem 化可能.
-**前提**: Ch.4 Thm 4.11 (`[γᵢ(F), γⱼ(F)] ⊆ γᵢ₊ⱼ(F)`) を mathlib 拡張で実装. -/
-axiom lucchini_K_bot_aux [Finite G] {A : Subgroup G}
-    (_hA_proper : A < ⊤)
-    (_hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
-    (_hA_isCyclic : ∃ g : G, A = Subgroup.zpowers g)
-    (_hK_bot : A.normalCore = ⊥) :
-    Nat.card ↥A < A.index
+Conclusion:
+* `(A.normalCore.subgroupOf A).index < A.index` が `G` で成立.
 
-/-- **Lucchini strong induction wrapper**: `|G|`-induction. K = ⊥ で `lucchini_K_bot_aux`,
-K > ⊥ で G/K に IH を適用. -/
-private theorem lucchini_aux : ∀ n : ℕ,
-    ∀ {G : Type*} [Group G] [Finite G] {A : Subgroup G},
-      Nat.card G ≤ n →
-      A < ⊤ →
-      (∀ a ∈ A, ∀ b ∈ A, a * b = b * a) →
-      (∃ g : G, A = Subgroup.zpowers g) →
-      (A.normalCore.subgroupOf A).index < A.index := by
-  intro n
-  induction n with
-  | zero =>
-    intro G _ _ A hcard _ _ _
-    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
-  | succ n ih =>
-    intro G _ _ A hcard hAprop hAab hAcyc
-    by_cases hsmall : Nat.card G ≤ n
-    · exact ih hsmall hAprop hAab hAcyc
-    -- |G| = n+1 exactly.
-    set K := A.normalCore with hKdef
-    have hKnormal : K.Normal := A.normalCore_normal
-    have hK_le_A : K ≤ A := Subgroup.normalCore_le A
-    by_cases hK_bot : K = ⊥
-    · -- K = ⊥ case: use narrower axiom.
-      have h_idx : (K.subgroupOf A).index = Nat.card ↥A := by
-        rw [hK_bot, Subgroup.bot_subgroupOf, Subgroup.index_bot]
-      change (K.subgroupOf A).index < A.index
-      rw [h_idx]
-      have hA_normalCore_eq : A.normalCore = ⊥ := hK_bot
-      exact lucchini_K_bot_aux hAprop hAab hAcyc hA_normalCore_eq
-    · -- K > ⊥ case: apply IH on G/K.
-      -- Set up the quotient map f : G →* G/K.
-      let f : G →* G ⧸ K := QuotientGroup.mk' K
-      have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective K
-      have hf_ker : f.ker = K := QuotientGroup.ker_mk' K
-      -- Ā := A.map f ≤ G/K.
-      set Ā : Subgroup (G ⧸ K) := A.map f with hĀ_def
-      -- Ā < ⊤: from A < ⊤ and K ≤ A.
-      have hĀ_proper : Ā < ⊤ := by
-        rw [lt_top_iff_ne_top]
-        intro h_eq
-        -- If Ā = ⊤, then comap f Ā = ⊤, but comap f (A.map f) = K ⊔ A = A.
-        have h1 : Subgroup.comap f Ā = ⊤ := by rw [h_eq]; exact Subgroup.comap_top _
-        have h2 : Subgroup.comap f Ā = K ⊔ A := by
-          rw [hĀ_def, QuotientGroup.comap_map_mk']
-        have h3 : K ⊔ A = A := sup_of_le_right hK_le_A
-        rw [h2, h3] at h1
-        exact ne_of_lt hAprop h1
-      -- Ā cyclic.
-      have hĀ_cyc : ∃ ĝ : G ⧸ K, Ā = Subgroup.zpowers ĝ := by
-        obtain ⟨g, hg⟩ := hAcyc
-        refine ⟨f g, ?_⟩
-        rw [hĀ_def, hg, f.map_zpowers]
-      -- Ā abelian.
-      have hĀ_ab : ∀ x ∈ Ā, ∀ y ∈ Ā, x * y = y * x := by
-        intro x hx y hy
-        obtain ⟨a, haA, hfa⟩ := hx
-        obtain ⟨b, hbA, hfb⟩ := hy
-        rw [← hfa, ← hfb, ← map_mul, ← map_mul, hAab a haA b hbA]
-      -- Ā.normalCore = ⊥ in G/K.
-      have hĀ_core_bot : Ā.normalCore = ⊥ := by
-        rw [eq_bot_iff]
-        intro xbar hxbar
-        -- Pullback: comap (Ā.normalCore) ⊴ G with K ≤ comap ≤ A.
-        -- So comap ≤ A.normalCore = K, thus comap = K, thus xbar = 1.
-        have h_subset : (Subgroup.comap f Ā.normalCore : Subgroup G) ≤ A := by
-          have h_le : Ā.normalCore ≤ Ā := Subgroup.normalCore_le _
-          have h_comap_le : Subgroup.comap f Ā.normalCore ≤ Subgroup.comap f Ā :=
-            Subgroup.comap_mono h_le
-          have h_comap_eq : (Subgroup.comap f Ā : Subgroup G) = K ⊔ A := by
-            rw [hĀ_def, QuotientGroup.comap_map_mk']
-          rw [h_comap_eq, sup_of_le_right hK_le_A] at h_comap_le
-          exact h_comap_le
-        -- comap is normal.
-        haveI : (Subgroup.comap f Ā.normalCore).Normal :=
-          (Subgroup.normalCore_normal Ā).comap f
-        -- comap ≤ A and normal ⇒ comap ≤ K.
-        have h_comap_le_K : Subgroup.comap f Ā.normalCore ≤ K :=
-          Subgroup.normal_le_normalCore.mpr h_subset
-        -- xbar ∈ Ā.normalCore. Pick g with f g = xbar. Then g ∈ comap.
-        obtain ⟨g, hgmap⟩ := hf_surj xbar
-        have hg_comap : g ∈ Subgroup.comap f Ā.normalCore := by
-          change f g ∈ Ā.normalCore; rw [hgmap]; exact hxbar
-        have hg_K : g ∈ K := h_comap_le_K hg_comap
-        -- f g = xbar and g ∈ K = ker f, so xbar = 1.
-        rw [← hgmap]
-        change f g = 1
-        rw [← hf_ker] at hg_K
-        exact hg_K
-      -- |G/K| ≤ n.
-      have hKnonbot_card : 2 ≤ Nat.card ↥K := by
-        haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_bot
-        exact Finite.one_lt_card
-      have hquot_card : Nat.card (G ⧸ K) ≤ n := by
-        have heq : Nat.card G = Nat.card (G ⧸ K) * Nat.card ↥K :=
-          Subgroup.card_eq_card_quotient_mul_card_subgroup K
-        have h1 : Nat.card (G ⧸ K) * 2 ≤ Nat.card G := by
-          rw [heq]; exact Nat.mul_le_mul_left _ hKnonbot_card
-        have h2 : Nat.card G ≤ n + 1 := hcard
-        omega
-      -- Apply IH on G/K with Ā.
-      have hIH : (Ā.normalCore.subgroupOf Ā).index < Ā.index :=
-        ih hquot_card hĀ_proper hĀ_ab hĀ_cyc
-      -- Translate IH back. Ā.normalCore = ⊥, so LHS = Nat.card Ā.
-      have h_lhs : (Ā.normalCore.subgroupOf Ā).index = Nat.card ↥Ā := by
-        rw [hĀ_core_bot, Subgroup.bot_subgroupOf, Subgroup.index_bot]
-      -- Ā.index = A.index by index_map_eq (f surjective, K = ker f ≤ A).
-      have h_rhs : Ā.index = A.index := by
-        rw [hĀ_def]
-        exact Subgroup.index_map_eq A hf_surj (by rw [hf_ker]; exact hK_le_A)
-      rw [h_lhs, h_rhs] at hIH
-      -- |Ā| = (K.subgroupOf A).index. Both equal |A|/|K|.
-      -- Goal: (A.normalCore.subgroupOf A).index < A.index, i.e., (K.subgroupOf A).index < A.index.
-      have h_card_Ā : Nat.card ↥Ā = (K.subgroupOf A).index := by
-        -- Use f.subgroupMap A : A →* A.map f. It's surjective with kernel K.subgroupOf A.
-        rw [hĀ_def]
-        -- ker (f.subgroupMap A) = K.subgroupOf A (as subgroup of A).
-        have hker_eq : (f.subgroupMap A).ker = K.subgroupOf A := by
-          ext x
-          simp only [Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
-          constructor
-          · intro hx
-            -- hx : f.subgroupMap A x = 1 in A.map f.
-            -- Unwrap: f.subgroupMap A x = ⟨f ↑x, _⟩, so f ↑x = ↑1 = 1.
-            have hf_eq : f ↑x = 1 := by
-              have h := congr_arg (Subtype.val : A.map f → G ⧸ K) hx
-              -- h : (f.subgroupMap A x).val = ((1 : A.map f) : G ⧸ K) = 1
-              change f ↑x = (1 : G ⧸ K) at h
-              exact h
-            have : (↑x : G) ∈ f.ker := hf_eq
-            rwa [hf_ker] at this
-          · intro hx
-            -- ↑x ∈ K = f.ker, so f ↑x = 1, so f.subgroupMap A x = 1.
-            have hf_eq : f ↑x = 1 := by
-              have : (↑x : G) ∈ f.ker := by rw [hf_ker]; exact hx
-              exact this
-            apply Subtype.ext
-            change f ↑x = (1 : G ⧸ K)
-            exact hf_eq
-        -- |A.map f| = (ker).index = (K.subgroupOf A).index.
-        have h_eq : Nat.card ↥(A.map f) = Nat.card (A ⧸ (f.subgroupMap A).ker) :=
-          Nat.card_congr
-            (QuotientGroup.quotientKerEquivOfSurjective (f.subgroupMap A)
-              (f.subgroupMap_surjective A)).symm.toEquiv
-        rw [h_eq, hker_eq, ← Subgroup.index_eq_card]
-      rw [h_card_Ā] at hIH
-      -- (K.subgroupOf A).index = (A.normalCore.subgroupOf A).index since K = A.normalCore.
-      exact hIH
+証明は subgroup correspondence のみ使用 (Ch.4 等の外部章依存無し):
+1. `f := mk' K`, `Ā := A.map f`.
+2. **Ā.normalCore = ⊥** in `G/K` (K = A.normalCore の maximality 経由 pullback).
+3. `h_quot` を `Ā.normalCore = ⊥` で書き換えると `Nat.card Ā < Ā.index`.
+4. `Ā.index = A.index` (`index_map_eq`, `ker f = K ≤ A`).
+5. `Nat.card Ā = (K.subgroupOf A).index` (`f.subgroupMap A` の核 + quotient).
+6. 結論.
 
-/-- **Isaacs Thm 2.20 (Lucchini)**: `G` 有限群, `A` cyclic 真部分群, `K = core_G(A)`.
-ならば `|A:K| < |G:A|`. 特に `|A| ≥ |G:A|` なら `K > 1`.
-
-書籍 p.62-63 の証明 (induction on `|G|`):
-* K > 1 (K = A.normalCore): `A/K` cyclic 真部分群 of `G/K`, `core_{G/K}(A/K) = 1`,
-  IH in `G/K` で結論. (本 wrapper で完成 ✅)
-* K = 1: `lucchini_K_bot_aux` (narrower axiom) で対応. 完全形式化は Cor 2.19 +
-  minimal normal E ⊆ Z(F(G)) の解析を要する ~200 行. -/
-theorem lucchini_index_normalCore_lt_index [Finite G] {A : Subgroup G} (hA_proper : A < ⊤)
-    (hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
-    (hA_isCyclic : ∃ g : G, A = Subgroup.zpowers g) :
-    (A.normalCore.subgroupOf A).index < A.index :=
-  lucchini_aux (Nat.card G) le_rfl hA_proper hA_ab hA_isCyclic
+**Lucchini 完全定理本体** (`lucchini_index_normalCore_lt_index`) は
+`Ch04_Commutators/ForwardFromCh02.lean` に. K = ⊥ case が Ch.4 §4A-§4B
+(lcs 加法性) に依存するため owner chapter (Ch.4) に置く. 詳細は
+[`notes/meta/forward_dep_policy.md`](../../notes/meta/forward_dep_policy.md). -/
+theorem lucchini_K_pos_reduction [Finite G] {A : Subgroup G}
+    (_hAprop : A < ⊤)
+    (_hK_ne_bot : A.normalCore ≠ ⊥)
+    (h_quot :
+      ((A.map (QuotientGroup.mk' A.normalCore)).normalCore.subgroupOf
+        (A.map (QuotientGroup.mk' A.normalCore))).index <
+      (A.map (QuotientGroup.mk' A.normalCore)).index) :
+    (A.normalCore.subgroupOf A).index < A.index := by
+  set K := A.normalCore with hKdef
+  haveI hKnormal : K.Normal := A.normalCore_normal
+  have hK_le_A : K ≤ A := Subgroup.normalCore_le A
+  -- Set up the quotient map f : G →* G/K.
+  let f : G →* G ⧸ K := QuotientGroup.mk' K
+  have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective K
+  have hf_ker : f.ker = K := QuotientGroup.ker_mk' K
+  set Ā : Subgroup (G ⧸ K) := A.map f with hĀ_def
+  -- Ā.normalCore = ⊥ in G/K (the key Ch.2-level fact).
+  have hĀ_core_bot : Ā.normalCore = ⊥ := by
+    rw [eq_bot_iff]
+    intro xbar hxbar
+    -- Pullback: comap (Ā.normalCore) ⊴ G with K ≤ comap ≤ A.
+    -- So comap ≤ A.normalCore = K, thus comap = K, thus xbar = 1.
+    have h_subset : (Subgroup.comap f Ā.normalCore : Subgroup G) ≤ A := by
+      have h_le : Ā.normalCore ≤ Ā := Subgroup.normalCore_le _
+      have h_comap_le : Subgroup.comap f Ā.normalCore ≤ Subgroup.comap f Ā :=
+        Subgroup.comap_mono h_le
+      have h_comap_eq : (Subgroup.comap f Ā : Subgroup G) = K ⊔ A := by
+        rw [hĀ_def, QuotientGroup.comap_map_mk']
+      rw [h_comap_eq, sup_of_le_right hK_le_A] at h_comap_le
+      exact h_comap_le
+    haveI : (Subgroup.comap f Ā.normalCore).Normal :=
+      (Subgroup.normalCore_normal Ā).comap f
+    have h_comap_le_K : Subgroup.comap f Ā.normalCore ≤ K :=
+      Subgroup.normal_le_normalCore.mpr h_subset
+    obtain ⟨g, hgmap⟩ := hf_surj xbar
+    have hg_comap : g ∈ Subgroup.comap f Ā.normalCore := by
+      change f g ∈ Ā.normalCore; rw [hgmap]; exact hxbar
+    have hg_K : g ∈ K := h_comap_le_K hg_comap
+    rw [← hgmap]
+    change f g = 1
+    rw [← hf_ker] at hg_K
+    exact hg_K
+  -- Translate h_quot. Ā.normalCore = ⊥, so LHS = Nat.card Ā.
+  have h_lhs : (Ā.normalCore.subgroupOf Ā).index = Nat.card ↥Ā := by
+    rw [hĀ_core_bot, Subgroup.bot_subgroupOf, Subgroup.index_bot]
+  -- Ā.index = A.index by index_map_eq (f surjective, K = ker f ≤ A).
+  have h_rhs : Ā.index = A.index := by
+    rw [hĀ_def]
+    exact Subgroup.index_map_eq A hf_surj (by rw [hf_ker]; exact hK_le_A)
+  -- Convert h_quot to our notation.
+  have hIH : (Ā.normalCore.subgroupOf Ā).index < Ā.index := h_quot
+  rw [h_lhs, h_rhs] at hIH
+  -- |Ā| = (K.subgroupOf A).index via f.subgroupMap A.
+  have h_card_Ā : Nat.card ↥Ā = (K.subgroupOf A).index := by
+    rw [hĀ_def]
+    -- ker (f.subgroupMap A) = K.subgroupOf A (as subgroup of A).
+    have hker_eq : (f.subgroupMap A).ker = K.subgroupOf A := by
+      ext x
+      simp only [Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
+      constructor
+      · intro hx
+        have hf_eq : f ↑x = 1 := by
+          have h := congr_arg (Subtype.val : A.map f → G ⧸ K) hx
+          change f ↑x = (1 : G ⧸ K) at h
+          exact h
+        have : (↑x : G) ∈ f.ker := hf_eq
+        rwa [hf_ker] at this
+      · intro hx
+        have hf_eq : f ↑x = 1 := by
+          have : (↑x : G) ∈ f.ker := by rw [hf_ker]; exact hx
+          exact this
+        apply Subtype.ext
+        change f ↑x = (1 : G ⧸ K)
+        exact hf_eq
+    have h_eq : Nat.card ↥(A.map f) = Nat.card (A ⧸ (f.subgroupMap A).ker) :=
+      Nat.card_congr
+        (QuotientGroup.quotientKerEquivOfSurjective (f.subgroupMap A)
+          (f.subgroupMap_surjective A)).symm.toEquiv
+    rw [h_eq, hker_eq, ← Subgroup.index_eq_card]
+  rw [h_card_Ā] at hIH
+  exact hIH
 
 end -- 2D
 

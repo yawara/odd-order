@@ -1,3 +1,4 @@
 import OddOrder.Isaacs.Ch01_Sylow
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02

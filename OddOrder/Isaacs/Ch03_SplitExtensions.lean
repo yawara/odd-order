@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import OddOrder.Isaacs.Ch02_Subnormality
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # OddOrder.Isaacs.Ch03 — Split Extensions
@@ -113,7 +114,7 @@ K = ⊥, `|inr A : K| = |inr A| = o(σ)`. 結論 `o(σ) < |G|`.
 - `inl_range_isComplement_inr_range` (本ファイル §3A): inl(G), inr(A) 補集合
 - `inr_conj_inl_eq` (本ファイル §3A): 半直積内の共役 = 作用
 - `Subgroup.commute_of_normal_of_disjoint` (mathlib, Lemma 2.7): K ⊴, inl(G) ⊴, K∩inl(G)=⊥ ⇒ 可換
-- `OddOrder.Isaacs.Ch02.lucchini_index_normalCore_lt_index` (axiom)
+- `OddOrder.Isaacs.Ch04.lucchini_index_normalCore_lt_index` (Ch.4 dir owner; K = ⊥ axiom 残)
 - `MonoidHom.map_zpowers`, `Nat.card_zpowers`, `Subgroup.index_mul_card`. -/
 theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
     (σ : MulAut G) :
@@ -177,7 +178,7 @@ theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
     rw [← zpow_add, add_comm, zpow_add]
   -- Apply Lucchini.
   have hLucchini :=
-    OddOrder.Isaacs.Ch02.lucchini_index_normalCore_lt_index hAₛ_proper hAₛ_ab
+    OddOrder.Isaacs.Ch04.lucchini_index_normalCore_lt_index hAₛ_proper hAₛ_ab
       ⟨g₀, hAₛ_eq_zpowers⟩
   -- Show Aₛ.normalCore = ⊥.
   -- Setup normality and disjointness.
