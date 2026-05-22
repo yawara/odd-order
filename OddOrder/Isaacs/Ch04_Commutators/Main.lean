@@ -487,6 +487,29 @@ theorem iterCommutator_le_lowerCentralSeries_map
     rw [hMapLcs]
     exact Subgroup.commutator_mono ih le_rfl
 
+/-- **iterCommutator は ambient G の lcs に押し込められる**: 任意 `E, F ⊆ G` で
+`iterCommutator E F n ≤ lowerCentralSeries G n`. `E ≤ F` 不要 (E, F は ⊤ ≤ G で挟まれる).
+
+`E ≤ ⊤` と `F ≤ ⊤` 経由で `iterCommutator E F n ≤ iterCommutator ⊤ ⊤ n = lcs G n`. -/
+theorem iterCommutator_le_lowerCentralSeries (E F : Subgroup G) (n : ℕ) :
+    iterCommutator E F n ≤ lowerCentralSeries G n := by
+  induction n with
+  | zero =>
+    simp only [iterCommutator_zero, lowerCentralSeries_zero]
+    exact le_top
+  | succ n ih =>
+    rw [iterCommutator_succ, lowerCentralSeries_succ]
+    exact Subgroup.commutator_mono ih le_top
+
+/-- **ambient G 冪零 ⇒ iterCommutator は最終的に ⊥** (任意 E, F).
+`E ≤ F` 制約のない一般版 (上の `iterCommutator_eq_bot_of_isNilpotent` は `E ≤ F` 必要). -/
+theorem iterCommutator_eq_bot_of_isNilpotent_ambient
+    [Group.IsNilpotent G] (E F : Subgroup G) :
+    ∃ n, iterCommutator E F n = ⊥ := by
+  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp ‹_›
+  refine ⟨n, le_antisymm ?_ bot_le⟩
+  exact (iterCommutator_le_lowerCentralSeries E F n).trans (le_of_eq hn)
+
 /-- **iterCommutator は normal を保つ**. `E, F ⊴ G` ⇒ `iter E F n ⊴ G`. -/
 theorem iterCommutator_normal {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
     (iterCommutator E F n).Normal := by
