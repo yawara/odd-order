@@ -151,7 +151,7 @@ mathlib 4.29.1 に **存在しない**. Ch.4 Thm 4.33 を書くために必要�
 `awk 'NR>=2799' mmd | grep -oE "(Theorem|Lemma|Corollary) 4\.[0-9]+" | sort | uniq -c` の結果:
 
 ```
-3  Lemma 4.6        ← abelian normal + cyclic 商 (Ch.5 Thm 5.18 周辺, Ch.7, Ch.10)
+3  Lemma 4.6        ← abelian normal + cyclic 商 (Ch.7, Ch.10) — 注: mmd grep ヒットは出るが Ch.5 5.18 周辺は Problems 5A.5 hint のみで本文の proof 内 cite 無し (2026-05-22 audit 確認)
 2  Theorem 4.8      ← class ≤ 2, p > 2 ⇒ x ↦ x^p 準同型 (Ch.5, Ch.10)
 2  Theorem 4.7      ← maximal class p-群構造 (Ch.10 × 2)
 2  Theorem 4.36     ← p odd, p′-group が order-p 元 fix ⇒ trivial (Ch.5 × 2)

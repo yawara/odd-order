@@ -192,7 +192,7 @@ Ch.6 は Isaacs 内では **Ch.7 (Thompson J(P), ZJ) への入口**として機�
 - §6A: 6.1 → 6.2 → 6.3, 6.4 → 6.5, 6.6 → **6.7** (章の入口)
 - §6B 前半 (Frobenius complement 構造): **6.8** → **6.9** → 6.10 → **6.11**
 - §6B 後半 (p-group 分類): 6.12 → 6.13 → 6.14, 6.15, **6.16** → **6.17** → (6.18, 6.19)
-- §6B 末: 6.20 ↔ 6.21 (相互参照)
+- §6B 末: **6.21 ⇒ 6.20 (one-way)** — mmd L3625 で 6.20 が 6.21 の corollary (2026-05-22 audit 訂正; 元 "相互参照" は誤り)
 - §6C: **6.22** + **6.23 (axiom)** → **6.24** (Thompson)
 
 ## 着手順 (提案)
@@ -203,8 +203,8 @@ FT クリティカル度 + 章内依存で並べる:
 2. **§6A 全 (6.1-6.7)** — 定義 + 6.4 等価条件が肝. **6.7 が章の入口主要定理**.
 3. **6.16 (i^p ≡ 1 mod p^e)** — 数論補題, mathlib `ZMod` 上の純粋計算. 早めに片付ける.
 4. **6.13, 6.14 (cyclic index 2 + 位数 8 非可換 分類)** — mathlib `DihedralGroup`, `QuaternionGroup` を直接利用.
-5. **6.11 (p-group ≤1 subgroup p ⇒ cyclic or quaternion)** — 古典 p-群分類. 重い証明.
-6. **6.12 + `SemiDihedral` 定義** — 半二面体群を `Mathlib/GroupTheory/SpecificGroups/SemiDihedral.lean` 相当として新規実装.
+5. **6.12 + `SemiDihedral` 定義** — 半二面体群を `OddOrder/GroupTheory/SemiDihedral.lean` (将来 mathlib upstream) として新規実装. **6.12 を 6.11 より先**: mmd L3519 で 6.11 は 6.12 の corollary と明示 (2026-05-22 audit 訂正; 旧記載は順序逆).
+6. **6.11 (p-group ≤1 subgroup p ⇒ cyclic or quaternion)** — 6.12 から 5-10 行の系として導出.
 7. **6.8, 6.9, 6.10** — partition + Frobenius complement の禁止構造. 6.7 の応用.
 8. **6.17 + 6.18 + 6.19** — Frobenius complement Sylow 分類の主結果. **FT クリティカル**.
 9. **6.20, 6.21** — Ch.7 J(P), ZJ への前提結果. 比較的短い.
@@ -282,7 +282,7 @@ Phase 2a / 2b で頻繁に Frobenius を引用する:
 - **6.11, 6.12 の証明スキーマ** — Isaacs の証明 (induction + 中心化群分析) を Lean で写す難度. mathlib `Quaternion.lean` の lemma 群との接続でどこまで短く書けるか実装時調査.
 - **`SemiDihedral` 新規定義** — `Mathlib/GroupTheory/SpecificGroups/SemiDihedral.lean` 相当として upstream 視野に入れた形 (`s · a · s = a^{2^{n-1} - 1}` 関係) で書く. mathlib スタイル踏襲.
 - **6.16 (i^p ≡ 1 mod p^e) の存在感** — Isaacs では Frobenius complement Sylow 構造 (6.17) で短く使う. mathlib `ZMod` 系で書き下せる範囲か, ε 程度の自作補題で済むかは実装時判断.
-- **6.21 (⟨C_N(a)⟩ = N) は Ch.7 で何回使われるか** — mmd L3713- の Ch.7 を見ると 6.20, 6.21 がそれぞれ 1 回引用. **次の調査で Ch.7 を見るとき** 6.21 の役割を確認すべき.
+- ~~**6.21 (⟨C_N(a)⟩ = N) は Ch.7 で何回使われるか**~~ → **解決 (2026-05-22 audit)**: Ch.7 で **6.20 のみ使用** (Thm 7.6 Step 5). 6.21 は Ch.7 内で proof body 引用無し. (元 mmd grep ヒットは 6.20 の prose mention 内で 6.21 を comparison 引用していたためのノイズ.)
 - **Thm 6.23 の Ch.6 内での扱い** — `axiom` か `sorry` 経由のステートメントか, あるいは Ch.6 では skip して 6.24 だけ Ch.7 で 6.23 と一緒に証明する形にするか. 章間の依存最小化を考えると Ch.6 全部一度書いて 6.23 を Ch.7 完了時に書き換える運用が clean.
 
 ## 第 5 波 (Ch.7, Ch.10) との接続

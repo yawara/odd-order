@@ -2486,6 +2486,386 @@ theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [F
     rw [← h_step2]
     exact h_step1
 
+/-! ### Thm 2.15 — Sylow 2 normal from odd p-local hypothesis
+
+書籍 p.60 の証明骨子:
+1. **特殊ケース**: `O_2(G) = ⊥` ならば `|G|` は奇数. Matsuyama (Thm 2.13) + Lemma 2.7.
+2. **一般ケース**: `N := O_2(G)` の商 `Ḡ = G/N` に Lemma 2.16 で仮定を持ち上げ,
+   特殊ケースを `Ḡ` に適用 (`O_2(Ḡ) = ⊥`).
+
+主要補助補題:
+* `opCore_quotient_opCore_eq_bot` — `O_p(G/O_p(G)) = ⊥` (汎用, Ch.1 拡張的補助).
+* `normal_sylow_image_under_surjective` — surjective hom で `Subgroup` レベル正規 Sylow の
+  像も正規 Sylow.
+-/
+
+/-- 補助 (Ch.1 拡張): `O_p(G / O_p(G)) = ⊥`.
+
+証明: `K̄ := O_p(G/O_p G)` の preimage `K := comap (mk' O_p G)` を考える.
+`K̄` は正規 p-群 ⇒ `K/O_p G ≅ K̄` も p-群, `O_p G` 自身が p-群なので `K` も p-群.
+`K ⊴ G` ゆえ `normal_pgroup_le_opCore` で `K ≤ O_p G`. 一方 `O_p G ≤ K` (preimage
+で `O_p G = ker f` を含む). よって `K = O_p G`, ゆえ `K̄ = K.map f = ⊥`. -/
+private lemma opCore_quotient_opCore_eq_bot {G : Type*} [Group G] [Finite G]
+    (p : ℕ) [Fact p.Prime] :
+    opCore p (G ⧸ opCore p G) = ⊥ := by
+  set N : Subgroup G := opCore p G with hN_def
+  set f : G →* G ⧸ N := QuotientGroup.mk' N with hf_def
+  have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective N
+  have hf_ker : f.ker = N := QuotientGroup.ker_mk' N
+  -- K̄ := opCore p (G/N)
+  set Kbar : Subgroup (G ⧸ N) := opCore p (G ⧸ N) with hKbar_def
+  -- K := preimage of Kbar
+  set K : Subgroup G := Kbar.comap f with hK_def
+  have hK_normal : K.Normal := Kbar.normal_comap f
+  -- K is a p-group: |K/N| = |Kbar| (p-power), |N| (p-power), so |K| is p-power.
+  have hKbar_pgroup : IsPGroup p Kbar := opCore_isPGroup p (G ⧸ N)
+  have hN_pgroup : IsPGroup p N := opCore_isPGroup p G
+  have hN_le_K : N ≤ K := by
+    intro x hx
+    have hfx : f x = 1 := by
+      have : x ∈ f.ker := by rw [hf_ker]; exact hx
+      exact this
+    rw [hK_def, Subgroup.mem_comap, hfx]
+    exact Subgroup.one_mem _
+  have hK_map : K.map f = Kbar := by
+    rw [hK_def]; exact Subgroup.map_comap_eq_self_of_surjective hf_surj Kbar
+  -- |K| = |K/N| · |N| where K/N ≅ K.map f = Kbar.
+  -- We show IsPGroup p K via cardinality.
+  have hK_pgroup : IsPGroup p K := by
+    -- |K/(N.subgroupOf K)| = |K.map f| = |Kbar| is p-power
+    -- |N.subgroupOf K| ≃ N (since N ≤ K), is p-power
+    -- So |K| = p-power · p-power = p-power.
+    haveI : Finite K := Subtype.finite
+    -- Use IsPGroup.of_card after computing |K|.
+    have h_quot_card : Nat.card (↥K ⧸ N.subgroupOf K) = Nat.card Kbar := by
+      let g : ↥K →* G ⧸ N := f.comp K.subtype
+      have hg_range : g.range = K.map f := by
+        simp [g, MonoidHom.range_comp, Subgroup.range_subtype]
+      have hg_ker : g.ker = N.subgroupOf K := by
+        ext x
+        constructor
+        · intro hx
+          have : f (x : G) = 1 := hx
+          have hxN : (x : G) ∈ N := by rw [← hf_ker]; exact this
+          exact hxN
+        · intro hx
+          have hxN : (x : G) ∈ N := hx
+          have : (x : G) ∈ f.ker := by rw [hf_ker]; exact hxN
+          exact this
+      have h_iso : (↥K) ⧸ g.ker ≃* ↥g.range :=
+        QuotientGroup.quotientKerEquivRange g
+      have h_card_eq : Nat.card ((↥K) ⧸ g.ker) = Nat.card ↥g.range :=
+        Nat.card_congr h_iso.toEquiv
+      rw [hg_ker] at h_card_eq
+      rw [h_card_eq, hg_range, hK_map]
+    -- |N.subgroupOf K| = |N| because N ≤ K (subgroupOfEquivOfLe).
+    have h_sub_card : Nat.card (N.subgroupOf K) = Nat.card N := by
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN_le_K).toEquiv
+    -- Combine to show IsPGroup p K.
+    obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hKbar_pgroup
+    obtain ⟨b, hb⟩ := IsPGroup.iff_card.mp hN_pgroup
+    have hK_card : Nat.card K = p ^ (a + b) := by
+      have h_mul : Nat.card K = Nat.card (↥K ⧸ N.subgroupOf K) *
+          Nat.card (N.subgroupOf K) := by
+        rw [Subgroup.card_eq_card_quotient_mul_card_subgroup]
+      rw [h_mul, h_quot_card, ha, h_sub_card, hb, pow_add]
+    exact IsPGroup.of_card hK_card
+  -- K ≤ opCore p G = N (normal_pgroup_le_opCore).
+  have hK_le_N : K ≤ N := by
+    have := normal_pgroup_le_opCore (N := K) hK_pgroup
+    rw [hN_def]; exact this
+  have hK_eq_N : K = N := le_antisymm hK_le_N hN_le_K
+  -- Then Kbar = K.map f = N.map f = ⊥.
+  rw [← hK_map, hK_eq_N]
+  apply le_bot_iff.mp
+  intro y hy
+  rcases hy with ⟨z, hz, hzy⟩
+  rw [Subgroup.mem_bot, ← hzy]
+  have : z ∈ f.ker := by rw [hf_ker]; exact hz
+  exact this
+
+/-- 補助: surjective hom `φ : G →* G'` で `S : Sylow p G` が正規ならば,
+`(S : Subgroup G).map φ` は `G'` の正規部分群でかつ `Sylow.mapSurjective hφ S` の台.
+
+`Subgroup.Normal.map` と `Sylow.coe_mapSurjective` の組合せ. -/
+private lemma normal_sylow_image_of_surjective
+    {G' G'' : Type*} [Group G'] [Group G''] [Finite G']
+    {p : ℕ} [Fact p.Prime]
+    {φ : G' →* G''} (hφ : Function.Surjective φ)
+    (S : Sylow p G') (hS_normal : (S : Subgroup G').Normal) :
+    ((S : Subgroup G').map φ).Normal :=
+  hS_normal.map φ hφ
+
+/-- **特殊ケース**: `O_2(G) = ⊥` のとき, 奇素数 p-local 部分群がすべて正規 Sylow 2 を
+持つならば, `|G|` は奇数.
+
+書籍 p.60 の証明:
+1. `|G|` が偶数と仮定して矛盾を導く.
+2. Cauchy で `t ∈ G, orderOf t = 2`. `t ≠ 1` で `O_2(G) = ⊥` ゆえ `t ∉ O_2(G)`.
+3. Matsuyama (Thm 2.13) で奇素数 p の元 x が `t·x·t = x⁻¹` を満たす.
+4. `H := N_G(⟨x⟩)` は p-local (`⟨x⟩` 非自明 p-部分群).
+5. `t ∈ H` (`t·x·t⁻¹ = t·x·t = x⁻¹ ∈ ⟨x⟩`).
+6. 仮定で `H` に正規 Sylow 2 `S` が存在.
+7. `⟨t⟩ ⊆ H` は 2-部分群 ⇒ ある Sylow 2 に含まれる ⇒ `S` が唯一 (normal) ⇒ `t ∈ S`.
+8. `⟨x⟩, S` ともに `H` で正規, `⟨x⟩` p-群, `S` 2-群 (p 奇) で互いに素 ⇒ disjoint.
+9. Lemma 2.7 (`commute_of_disjoint_normal`) で `x, t` 可換.
+10. `t·x·t = x` だが `t·x·t = x⁻¹` で `x = x⁻¹`, `orderOf x ∣ 2`, p ≠ 2 で矛盾. -/
+private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
+    (h : ∀ p : ℕ, p.Prime → Odd p → ∀ H : Subgroup G, IsPLocal p H →
+         ∃ S : Sylow 2 H, (S : Subgroup H).Normal)
+    (hO2 : opCore 2 G = ⊥) :
+    Odd (Nat.card G) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- 1. Suppose |G| is even.
+  by_contra heven
+  rw [Nat.not_odd_iff_even] at heven
+  have h_dvd : 2 ∣ Nat.card G := heven.two_dvd
+  -- 2. Cauchy: there's t : G with orderOf t = 2.
+  haveI : Fintype G := Fintype.ofFinite G
+  obtain ⟨t, ht_ord⟩ : ∃ t : G, orderOf t = 2 := by
+    have h_dvd' : 2 ∣ Fintype.card G := by
+      rwa [Nat.card_eq_fintype_card] at h_dvd
+    exact exists_prime_orderOf_dvd_card 2 h_dvd'
+  have ht_sq : t * t = 1 := by
+    have h : t ^ 2 = 1 := by
+      rw [← ht_ord]
+      exact pow_orderOf_eq_one t
+    rwa [pow_two] at h
+  have ht_ne_one : t ≠ 1 := by
+    intro h
+    rw [h, orderOf_one] at ht_ord
+    omega
+  have ht_notin : t ∉ opCore 2 G := by
+    rw [hO2, Subgroup.mem_bot]; exact ht_ne_one
+  -- 3. Matsuyama: ∃ x, p odd prime, orderOf x = p, t·x·t = x⁻¹.
+  obtain ⟨x, p, hp_prime, hp_odd, hx_ord, hxt⟩ := matsuyama ht_sq ht_notin
+  -- 4. X := ⟨x⟩ is a non-trivial p-subgroup.
+  set X : Subgroup G := Subgroup.zpowers x with hX_def
+  haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+  have hX_pgroup : IsPGroup p X := by
+    apply IsPGroup.of_card (n := 1)
+    rw [Nat.card_zpowers, hx_ord, pow_one]
+  have hX_ne_bot : X ≠ ⊥ := by
+    intro h
+    have hxmem : x ∈ X := Subgroup.mem_zpowers x
+    rw [h, Subgroup.mem_bot] at hxmem
+    rw [hxmem, orderOf_one] at hx_ord
+    exact absurd hx_ord.symm hp_prime.one_lt.ne'
+  -- 5. H := N_G(X) is p-local.
+  set H : Subgroup G := Subgroup.normalizer (X : Set G) with hH_def
+  have hH_pLocal : IsPLocal p H := ⟨X, hX_ne_bot, hX_pgroup, rfl⟩
+  -- 6. t ∈ H since t·x·t⁻¹ = x⁻¹ ∈ X (using t = t⁻¹).
+  -- t = t⁻¹ since t * t = 1.
+  have ht_inv : t⁻¹ = t :=
+    (eq_inv_of_mul_eq_one_left ht_sq).symm
+  -- t · x · t⁻¹ = x⁻¹ ∈ X.
+  have h_conj_x : t * x * t⁻¹ = x⁻¹ := by
+    rw [ht_inv]; exact hxt
+  have ht_inH : t ∈ H := by
+    rw [hH_def, Subgroup.mem_normalizer_iff]
+    -- Use the description of X = zpowers x: y ∈ X ↔ ∃ k, x^k = y.
+    -- Goal: ∀ y, y ∈ X ↔ t * y * t⁻¹ ∈ X.
+    intro y
+    -- Use a closed form: conj by t maps each x^k to (x⁻¹)^k via h_conj_x.
+    -- Conjugation by t sends x^k to (x⁻¹)^k = x^(-k).
+    have h_conj_pow : ∀ (k : ℤ), t * (x ^ k) * t⁻¹ = x ^ (-k) := by
+      intro k
+      rw [← conj_zpow, h_conj_x, inv_zpow']
+    constructor
+    · intro hy
+      rw [hX_def, Subgroup.mem_zpowers_iff] at hy
+      obtain ⟨k, hk⟩ := hy
+      rw [← hk, h_conj_pow]
+      rw [hX_def]; exact Subgroup.zpow_mem _ (Subgroup.mem_zpowers x) _
+    · intro hy
+      -- t * y * t⁻¹ ∈ X, deduce y ∈ X. Use t = t⁻¹.
+      -- y = t * (t * y * t⁻¹) * t⁻¹ since t = t⁻¹.
+      have hyeq : y = t * (t * y * t⁻¹) * t⁻¹ := by
+        calc y = (t * t) * y * (t * t) := by rw [ht_sq, one_mul, mul_one]
+          _ = t * (t * y * t) * t := by group
+          _ = t * (t * y * t⁻¹) * t⁻¹ := by rw [ht_inv]
+      rw [hX_def, Subgroup.mem_zpowers_iff] at hy
+      obtain ⟨k, hk⟩ := hy
+      rw [hyeq, ← hk, h_conj_pow]
+      rw [hX_def]; exact Subgroup.zpow_mem _ (Subgroup.mem_zpowers x) _
+  -- 7. By hypothesis, H has a normal Sylow 2.
+  haveI hH_finite : Finite ↥H := Subtype.finite
+  obtain ⟨S, hS_normal⟩ := h p hp_prime hp_odd H hH_pLocal
+  -- Now show t (lifted to ↥H) lies in S.
+  set t_H : ↥H := ⟨t, ht_inH⟩ with ht_H_def
+  -- ⟨t_H⟩ is a 2-subgroup of ↥H.
+  have ht_H_sq : t_H * t_H = 1 := by
+    apply Subtype.ext
+    exact ht_sq
+  have h_zpowers_pgroup : IsPGroup 2 (Subgroup.zpowers t_H) := by
+    apply IsPGroup.of_card (n := 1)
+    rw [Nat.card_zpowers, pow_one]
+    -- orderOf t_H = 2.
+    have : orderOf t_H = orderOf t := by
+      exact (orderOf_injective H.subtype Subtype.coe_injective t_H).symm
+    rw [this, ht_ord]
+  -- Get some Sylow Q containing zpowers t_H, then use uniqueness from normality.
+  obtain ⟨Q, hQ_le⟩ := h_zpowers_pgroup.exists_le_sylow
+  haveI : Subsingleton (Sylow 2 ↥H) := by
+    have huniq := Sylow.unique_of_normal S hS_normal
+    exact Unique.instSubsingleton
+  have hQS : Q = S := Subsingleton.elim Q S
+  have ht_H_inS : t_H ∈ (S : Subgroup ↥H) := by
+    have : t_H ∈ Q := hQ_le (Subgroup.mem_zpowers t_H)
+    rw [hQS] at this
+    exact this
+  -- 8. X.subgroupOf H is normal in H (since X ⊴ H = normalizer X).
+  haveI hX_subOf_H_normal : (X.subgroupOf H).Normal := by
+    rw [hH_def]; exact Subgroup.normal_in_normalizer
+  have hX_subOf_H_pgroup : IsPGroup p (X.subgroupOf H) :=
+    hX_pgroup.comap_of_injective H.subtype Subtype.coe_injective
+  -- 9. Disjoint: X.subgroupOf H (p-group) and S (2-group), p ≠ 2.
+  have hp_ne_two : p ≠ 2 := by
+    intro h2
+    rw [h2] at hp_odd
+    rcases hp_odd with ⟨k, hk⟩; omega
+  have h_disjoint : Disjoint (X.subgroupOf H) (S : Subgroup ↥H) := by
+    apply IsPGroup.disjoint_of_ne p 2 hp_ne_two
+    · exact hX_subOf_H_pgroup
+    · exact S.2
+  -- x as element of H. Note x ∈ X ⊆ H (since X ≤ N_G(X) = H).
+  have hx_inX : x ∈ X := Subgroup.mem_zpowers x
+  have hx_inH : x ∈ H := by
+    rw [hH_def]
+    exact Subgroup.le_normalizer hx_inX
+  set x_H : ↥H := ⟨x, hx_inH⟩ with hx_H_def
+  have hx_H_in : x_H ∈ X.subgroupOf H := by
+    change (x_H : G) ∈ X
+    exact hx_inX
+  -- Apply Lemma 2.7.
+  have h_commute : Commute x_H t_H :=
+    commute_of_disjoint_normal (M := X.subgroupOf H) (N := (S : Subgroup ↥H))
+      h_disjoint hx_H_in ht_H_inS
+  -- 10. Extract x * t = t * x in G.
+  have h_xt : x * t = t * x := by
+    -- Commute x_H t_H : x_H * t_H = t_H * x_H
+    have hxt_H : x_H * t_H = t_H * x_H := h_commute
+    have hxt_val := congrArg (Subtype.val (p := fun y => y ∈ H)) hxt_H
+    simpa using hxt_val
+  -- Now t * x * t = (t * x) * t = (x * t) * t = x * (t * t) = x. But matsuyama: t * x * t = x⁻¹.
+  have h_x_eq : x = x⁻¹ := by
+    have h1 : t * x * t = x := by
+      rw [show t * x = x * t from h_xt.symm]
+      rw [mul_assoc, ht_sq, mul_one]
+    exact h1.symm.trans hxt
+  -- So orderOf x ∣ 2.
+  have hx_sq : x * x = 1 := by
+    have : x * x⁻¹ = 1 := mul_inv_cancel x
+    rw [← h_x_eq] at this; rw [this]
+  have hx_ord_dvd : orderOf x ∣ 2 :=
+    orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact hx_sq)
+  rw [hx_ord] at hx_ord_dvd
+  -- p ∣ 2 and p prime ⇒ p = 2; but p odd ⇒ contradiction.
+  have hp_eq_two : p = 2 := by
+    rcases (Nat.dvd_prime Nat.prime_two).mp hx_ord_dvd with h1 | h2
+    · exact absurd h1 hp_prime.one_lt.ne'
+    · exact h2
+  rw [hp_eq_two] at hp_odd
+  rcases hp_odd with ⟨k, hk⟩
+  omega
+
+/-- 補助: 仮定 (奇素数 p-local の正規 Sylow 2 存在) を商 `G/N` (`N := opCore 2 G`)
+に持ち上げる. Lemma 2.16 (`isPLocal_of_quotient`) で `Ḡ` の p-local `Mbar` を
+`G` の p-local `L` の像にし, hypothesis から `L` の正規 Sylow 2 を取り,
+`Sylow.mapSurjective` で `Ḡ` 上のものへ送る. -/
+private lemma transfer_hypothesis_to_quotient {G : Type*} [Group G] [Finite G]
+    (h : ∀ p : ℕ, p.Prime → Odd p → ∀ H : Subgroup G, IsPLocal p H →
+         ∃ S : Sylow 2 H, (S : Subgroup H).Normal) :
+    ∀ p : ℕ, p.Prime → Odd p →
+      ∀ Mbar : Subgroup (G ⧸ opCore 2 G), IsPLocal p Mbar →
+      ∃ S' : Sylow 2 Mbar, (S' : Subgroup Mbar).Normal := by
+  intro p hp_prime hp_odd Mbar hMbar_pLocal
+  haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+  -- Step 1: Lift Mbar to a p-local L of G with L.map f = Mbar.
+  obtain ⟨L, hL_pLocal, hL_map⟩ := isPLocal_of_quotient hMbar_pLocal
+  -- Step 2: Get normal Sylow 2 of L.
+  obtain ⟨S, hS_normal⟩ := h p hp_prime hp_odd L hL_pLocal
+  -- Step 3: The image of S in Mbar is a normal Sylow 2.
+  -- Restrict f to L: f|_L : L → L.map f = Mbar. This is surjective.
+  set f : G →* G ⧸ opCore 2 G := QuotientGroup.mk' (opCore 2 G) with hf_def
+  -- The map L → L.map f = Mbar.
+  haveI hL_finite : Finite ↥L := Subtype.finite
+  set fL : ↥L →* ↥(L.map f) := f.subgroupMap L with hfL_def
+  have hfL_surj : Function.Surjective fL := f.subgroupMap_surjective L
+  -- Apply Sylow.mapSurjective.
+  set S' : Sylow 2 ↥(L.map f) := S.mapSurjective hfL_surj with hS'_def
+  -- S' is normal: image of normal under surjective.
+  have hS'_normal : (S' : Subgroup ↥(L.map f)).Normal := by
+    have h_eq : (S' : Subgroup ↥(L.map f)) = (S : Subgroup ↥L).map fL := by
+      rw [hS'_def]; exact Sylow.coe_mapSurjective hfL_surj S
+    rw [h_eq]
+    exact hS_normal.map fL hfL_surj
+  -- Transport to Mbar via equality L.map f = Mbar.
+  -- The MulEquiv from ↥(L.map f) to ↥Mbar gives us a Sylow on Mbar.
+  let e : ↥(L.map f) ≃* ↥Mbar := MulEquiv.subgroupCongr hL_map
+  let eH : ↥(L.map f) →* ↥Mbar := e.toMonoidHom
+  have heH_surj : Function.Surjective eH := e.surjective
+  -- The image of S' under e.
+  set S'' : Sylow 2 ↥Mbar := S'.mapSurjective heH_surj with hS''_def
+  refine ⟨S'', ?_⟩
+  have h_eq2 : (S'' : Subgroup ↥Mbar) = (S' : Subgroup ↥(L.map f)).map eH := by
+    rw [hS''_def]; exact Sylow.coe_mapSurjective heH_surj S'
+  rw [h_eq2]
+  exact hS'_normal.map eH heH_surj
+
+/-- **Isaacs Thm 2.15**: 有限群 `G` で全ての奇素数 `p` について全ての p-local 部分群が
+正規 Sylow 2-部分群を持つならば, `G` 自身が正規 Sylow 2-部分群を持つ.
+
+書籍 p.60 の証明 (Matsuyama Thm 2.13 経由):
+1. **特殊ケース**: `O_2(G) = ⊥` ⇒ `|G|` 奇数 (`odd_of_opCore_two_eq_bot_aux`).
+   Matsuyama で奇素数位元 `x` (`t·x·t = x⁻¹`) を取り, `N_G(⟨x⟩)` の正規 Sylow 2 から
+   `x, t` 可換を導いて `x = x⁻¹` の矛盾.
+2. **一般ケース**: `N := O_2(G)` の商 `Ḡ = G/N` に Lemma 2.16 (`isPLocal_of_quotient`)
+   で仮定を持ち上げる. `Ḡ` で `O_2(Ḡ) = ⊥` (`opCore_quotient_opCore_eq_bot`) なので
+   特殊ケースを適用し `|Ḡ|` 奇数. ゆえ `N` 自身が `G` の Sylow 2 (2-冪 + index 奇). -/
+theorem normal_sylow_two_of_odd_pLocal_normal_sylow_two [Finite G]
+    (h : ∀ p : ℕ, p.Prime → Odd p → ∀ H : Subgroup G, IsPLocal p H →
+         ∃ S : Sylow 2 H, (S : Subgroup H).Normal) :
+    ∃ S : Sylow 2 G, (↑S : Subgroup G).Normal := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- Set N := opCore 2 G.
+  set N : Subgroup G := opCore 2 G with hN_def
+  -- Transfer hypothesis to G/N.
+  have h_bar := transfer_hypothesis_to_quotient h
+  -- Apply special case to G/N: opCore 2 (G/N) = ⊥, so |G/N| is odd.
+  have hO2_bar : opCore 2 (G ⧸ N) = ⊥ := opCore_quotient_opCore_eq_bot 2
+  have h_odd_bar : Odd (Nat.card (G ⧸ N)) :=
+    odd_of_opCore_two_eq_bot_aux h_bar hO2_bar
+  -- N is a 2-group.
+  have hN_pgroup : IsPGroup 2 N := opCore_isPGroup 2 G
+  obtain ⟨k, hN_card⟩ := IsPGroup.iff_card.mp hN_pgroup
+  -- |G| = |N| · |G/N| = 2^k · odd. So (Nat.card G).factorization 2 = k.
+  have hN_index : N.index = Nat.card (G ⧸ N) := Subgroup.index_eq_card N
+  have h_total : Nat.card G = Nat.card N * N.index :=
+    (Subgroup.card_mul_index N).symm
+  -- 2-part of |G| = 2^k = |N|.
+  have h_two_prime : Nat.Prime 2 := Nat.prime_two
+  have h_odd_not_dvd : ¬ 2 ∣ Nat.card (G ⧸ N) := fun hdvd =>
+    (Nat.not_even_iff_odd.mpr h_odd_bar) ⟨Nat.card (G ⧸ N) / 2, by
+      have := hdvd; omega⟩
+  have h_odd_ne_zero : Nat.card (G ⧸ N) ≠ 0 := Nat.card_pos.ne'
+  have h_card_ne_zero : (2 ^ k : ℕ) ≠ 0 := by positivity
+  have h_fact_two : (Nat.card G).factorization 2 = k := by
+    rw [h_total, hN_card, hN_index, Nat.factorization_mul h_card_ne_zero h_odd_ne_zero]
+    rw [Finsupp.add_apply]
+    rw [Nat.Prime.factorization_pow h_two_prime]
+    rw [Nat.factorization_eq_zero_of_not_dvd h_odd_not_dvd]
+    simp
+  -- Construct Sylow.ofCard N with this cardinality info.
+  have hN_card_sylow : Nat.card N = 2 ^ (Nat.card G).factorization 2 := by
+    rw [h_fact_two, hN_card]
+  let S : Sylow 2 G := Sylow.ofCard N hN_card_sylow
+  refine ⟨S, ?_⟩
+  -- S as Subgroup G is N (= opCore 2 G), which is normal.
+  have hS_eq : (S : Subgroup G) = N := Sylow.coe_ofCard N hN_card_sylow
+  rw [hS_eq]
+  exact opCore.normal 2 G
+
 end -- 2C
 
 section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
