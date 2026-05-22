@@ -1097,6 +1097,20 @@ instance oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
       exact ⟨b.2.1, b.2.2⟩
   exact hgoal.2
 
+/-- **K.map qmk が π-group ⇒ ↥K ⧸ N.subgroupOf K の primes も π 内**.
+`Subgroup.nat_card_quotient_subgroupOf_eq_card_map` 経由で cardinality 経由の primeFactors
+転送.
+
+用途: Hall-Higman 3.21 body で `K/B` の π-group 性を `K_GB = K.map qmk` から導出. -/
+theorem Subgroup.IsPiGroup.primeFactors_quotient_subgroupOf
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {N : Subgroup G} [N.Normal] {K : Subgroup G}
+    (hMap : Subgroup.IsPiGroup π (K.map (QuotientGroup.mk' N))) :
+    ∀ p ∈ (Nat.card ((↥K) ⧸ (N.subgroupOf K))).primeFactors, p ∈ π := by
+  intro p hp
+  rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map N K] at hp
+  exact hMap p hp
+
 /-- **`oPiCore` は `π` について monotone**: `π₁ ⊆ π₂ ⇒ oPiCore π₁ G ≤ oPiCore π₂ G`.
 π を広げると normal π-subgroup の集合は大きくなり, iSup も増える. -/
 theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [Group G] :
