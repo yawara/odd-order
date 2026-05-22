@@ -1548,6 +1548,23 @@ theorem IsAInvariant.smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {H : 
   have : (φ a) g ∈ (φ a) • H := ⟨g, hg, rfl⟩
   rwa [hH a] at this
 
+/-- **A-不変の特徴付け**: `IsAInvariant φ H ↔ ∀ a g, g ∈ H ⇒ (φ a) g ∈ H`. -/
+theorem isAInvariant_iff_smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G} :
+    IsAInvariant φ H ↔ ∀ a : A, ∀ g, g ∈ H → (φ a) g ∈ H := by
+  refine ⟨fun hH a g hg => hH.smul_mem a hg, fun h a => ?_⟩
+  -- (φ a) • H = H. Show le_antisymm.
+  apply le_antisymm
+  · -- (φ a) • H ≤ H: image is in H by assumption
+    rintro _ ⟨g, hg, rfl⟩
+    exact h a g hg
+  · -- H ≤ (φ a) • H: take h, find preimage via (φ a)⁻¹
+    intro g hg
+    refine ⟨(φ a)⁻¹ g, ?_, MulAut.apply_inv_self G (φ a) g⟩
+    -- (φ a)⁻¹ g ∈ H: use h with a := a⁻¹, since φ is a hom, (φ a⁻¹) = (φ a)⁻¹
+    have hg' : (φ a⁻¹) g ∈ H := h a⁻¹ g hg
+    rw [φ.map_inv] at hg'
+    exact hg'
+
 /-- A-不変な H に対し, 要素レベルで `(φ a)⁻¹ g ∈ H` が成立 (= 逆作用 a⁻¹ で smul_mem). -/
 theorem IsAInvariant.inv_smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
     (hH : IsAInvariant φ H) (a : A) {g : G} (hg : g ∈ H) : (φ a)⁻¹ g ∈ H := by
