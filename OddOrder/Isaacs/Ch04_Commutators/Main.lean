@@ -171,6 +171,126 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 /-! **Isaacs Lemma 4.5** (`P/N` elementary abelian ⇔ `Φ(P) ⊆ N`):
 mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述). -/
 
+/-! **Isaacs Lemma 4.6** ⭐ (章内 5 引用 + Ch.5/7/10 で多用 — 章内ハブ):
+`A ⊴ G` abelian + `G/A` cyclic ⇒ `G' = ⁅A, G⁆` かつ `G' ≅ A / (A ∩ Z(G))`.
+
+**証明骨子** (Isaacs p.118): `G/A` cyclic は生成元 `gA` を持ち `G = A · ⟨g⟩`. 任意 commutator は
+`A`-abelian と `⟨g⟩`-cyclic で `⁅a, g⟩` 形に reduce. 写像 `A → ⁅A, G⁆`, `a ↦ ⁅a, g⁆` の核が
+`A ∩ Z(G)`.
+
+形式化保留 (~150 行 LOC. semidirect 構造 + abelian 計算). 章内最頻引用なので後続. -/
+
+/-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
+`|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
+
+Lem 4.6 を経由. 形式化保留. -/
+
+/-! **Isaacs Thm 4.8** (p > 2 + class ≤ 2):
+(a) `{x ∈ P : x^p = 1}` is a subgroup;
+(b) commutators p乗 = 1 ⇒ `x ↦ x^p` is a homomorphism.
+
+Ch.10 で 2 回引用. Baer trick (Lem 4.37) の前身. 形式化保留. -/
+
 end -- 4A
+
+section /- 4B: Three-subgroups + lcs additivity + Mann (pp. 122-131) -/
+
+/-! ### Isaacs §4B (Three-subgroups + lower central series)
+
+- **Lemma 4.9 Three-subgroups**: mathlib `Subgroup.commutator_commutator_eq_bot_of_rotate`
+  で完全カバー (前提 `⁅⁅H₂,H₃⁆, H₁⁆ = ⊥ ∧ ⁅⁅H₃,H₁⁆, H₂⁆ = ⊥ ⇒ ⁅⁅H₁,H₂⁆, H₃⁆ = ⊥`).
+  no-wrapper. -/
+
+/-- **Isaacs Cor 4.10** (Three-subgroups mod `N`):
+`N ⊴ G` を含む形での 4.9 — `⁅⁅H₂, H₃⁆, H₁⁆ ≤ N ∧ ⁅⁅H₃, H₁⁆, H₂⁆ ≤ N
+⇒ ⁅⁅H₁, H₂⁆, H₃⁆ ≤ N`.
+
+商写像 `G → G/N` で push し, image 上で mathlib `commutator_commutator_eq_bot_of_rotate`
+を適用. -/
+theorem commutator_commutator_le_of_rotate {H₁ H₂ H₃ N : Subgroup G} [N.Normal]
+    (h1 : ⁅⁅H₂, H₃⁆, H₁⁆ ≤ N) (h2 : ⁅⁅H₃, H₁⁆, H₂⁆ ≤ N) :
+    ⁅⁅H₁, H₂⁆, H₃⁆ ≤ N := by
+  -- Use `≤ N ↔ map (mk' N) = ⊥` (since ker (mk' N) = N).
+  set π : G →* G ⧸ N := QuotientGroup.mk' N with hπ
+  have to_quot : ∀ {K : Subgroup G}, K ≤ N ↔ K.map π = ⊥ := by
+    intro K
+    rw [eq_bot_iff, Subgroup.map_le_iff_le_comap]
+    constructor
+    · intro h x hx
+      rw [Subgroup.mem_comap, hπ, Subgroup.mem_bot, QuotientGroup.mk'_apply,
+          QuotientGroup.eq_one_iff]
+      exact h hx
+    · intro h x hx
+      have := h hx
+      rw [Subgroup.mem_comap, hπ, Subgroup.mem_bot, QuotientGroup.mk'_apply,
+          QuotientGroup.eq_one_iff] at this
+      exact this
+  rw [to_quot]
+  rw [to_quot] at h1 h2
+  -- Map distributes over commutator.
+  simp only [Subgroup.map_commutator] at h1 h2 ⊢
+  exact Subgroup.commutator_commutator_eq_bot_of_rotate h1 h2
+
+/-! **Isaacs Thm 4.11** (`⁅G^i, G^j⁆ ≤ G^{i+j}`): mathlib `lowerCentralSeries` の加法性.
+新規補題 ~30 行. **Lucchini K=⊥ aux 前提** (Ch.2 §2D ノートで指摘). 形式化保留. -/
+
+/-! **Isaacs Cor 4.12** (weight n commutator ⊆ G^n), **Cor 4.13** (derived ⊆ lcs,
+derived length ≤ 1 + log₂ m): 4.11 系. 形式化保留. -/
+
+/-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
+**BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
+
+end -- 4B
+
+section /- 4C: A acts on G via automorphisms (pp. 131-138) -/
+
+/-! ### Isaacs §4C (A 作用 + [G,A])
+
+`A ⊆ Aut(G)` の作用下で `[G, A]` (= smallest A-invariant N with A trivial on G/N) の構造論.
+
+- **Lemma 4.20**: `⁅G, A⁆` は `A` が trivial 作用する最小 A-invariant 正規部分群.
+- **Cor 4.21**: TFAE: (a) 右剰余類すべて A-inv, (b) 左剰余類すべて A-inv, (c) `⁅G,A⁆ ⊆ H`.
+- **Thm 4.22**: A faithful + `⁅G, A, ..., A⁆_m = 1` ⇒ A solvable, derived length ≤ m-1.
+- **Cor 4.23**: m=2 版.
+- **Thm 4.24**: A faithful + chain ⇒ A nilpotent.
+- **Lemma 4.25**: `⁅G,A,A⁆ = 1` ⇒ `⁅G,A⁆` abelian.
+- **Thm 4.26**: A p-群 + chain ⇒ `⁅G,A⁆` は p-群.
+- **Thm 4.27**: A 有限 + chain ⇒ `⁅G,A⁆` nilpotent.
+
+全 stub. `[G, A]` の Lean 形式化 (semidirect product `G ⋊ A` 経由 vs `MulAut` 経由)
+の設計判断が要る. ~500-800 行 LOC 推定. -/
+
+end -- 4C
+
+section /- 4D: Coprime action — Fitting + Thompson PxQ + Baer (pp. 138-146) -/
+
+/-! ### Isaacs §4D (Coprime action) ⭐ FT クリティカル
+
+BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占める.
+
+- **Lemma 4.28** ⭐ BG Prop 1.6(a): `(|G|,|A|) = 1` + (A or G solvable)
+  ⇒ `G = C_G(A) · ⁅G, A⁆`.
+- **Lemma 4.29** ⭐ BG Prop 1.6(b): coprime ⇒ `⁅G, A, A⁆ = ⁅G, A⁆`.
+- **Cor 4.30**: A faithful + chain + coprime ⇒ `|A|` の素因子 ⊆ `|G|` の素因子.
+- **Thm 4.31 Thompson P×Q** ⭐: `A = P × Q` (P p-群, Q p'-群) acts on p-群 G,
+  Q fixes every P-fixed element ⇒ Q trivial on G.
+- **Lemma 4.32**: P p-群, G 非自明 p-群: `⁅G, P⁆ < G` かつ `C_G(P) > 1`.
+- **Thm 4.33**: G p-solvable ⇒ 全 p-local H で `O_{p'}(H) ≤ O_{p'}(G)`. **Hall-Higman 1.2.3
+  (Ch.3 Lem 3.21) 経由**.
+- **Thm 4.34 Fitting** ⭐ BG Prop 1.6(d): G abelian + coprime ⇒ `G = C_G(A) × ⁅G, A⁆`.
+- **Cor 4.35** ⭐ BG Prop 1.6(e): G abelian p-群 + A p'-群 fixes order-p elements
+  ⇒ A trivial.
+- **Thm 4.36** ⭐ BG Thm 1.11: p > 2, G p-群 + A p'-群 fixes order-p elements
+  ⇒ A trivial. **Ch.5 Cor 5.30 経由で normal p-comp 5.26 へ**.
+- **Lemma 4.37 Baer trick**: G odd order + class ≤ 2 ⇒ `x +' y := xy√⁅y,x⁆` で加法群.
+- **Thm 4.38**: p > 2, P p-群 + Q ⊴ A p'-群, Q fixes P-fixed elements ⇒ Q trivial
+  (4.31 強化, P 正規不要).
+
+**実装スケジュール推定**: 4.28 + 4.29 + 4.30 (~200 行 / 1 週), 4.34 + 4.35 + 4.36
+(~250 行 / 1-2 週), 4.31 + 4.32 + 4.38 (~150 行 / 1 週), 4.33 + 4.37 (~150 行 / 1 週).
+
+合計 ~750 行 LOC / 4-5 週. Phase 1 残予算と要相談. -/
+
+end -- 4D
 
 end OddOrder.Isaacs.Ch04
