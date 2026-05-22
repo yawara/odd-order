@@ -155,6 +155,15 @@ theorem mem_fixedPointsOfMulAut {A G : Type*} [Group A] [Group G]
     {φ : A →* MulAut G} {g : G} :
     g ∈ fixedPointsOfMulAut φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
 
+/-- 自明作用 (`1 : A →* MulAut G`) の固定点は `⊤` (全要素が固定). -/
+@[simp]
+theorem fixedPointsOfMulAut_one_eq_top {A G : Type*} [Group A] [Group G] :
+    fixedPointsOfMulAut (1 : A →* MulAut G) = ⊤ := by
+  ext g
+  simp only [mem_fixedPointsOfMulAut, Subgroup.mem_top, iff_true]
+  intro a
+  rfl
+
 /-- 内自己同型作用 (`MulAut.conj : G →* MulAut G`) の固定点は `Subgroup.center G`. -/
 theorem fixedPointsOfMulAut_conj_eq_center {G : Type*} [Group G] :
     fixedPointsOfMulAut (MulAut.conj : G →* MulAut G) = Subgroup.center G := by
