@@ -805,30 +805,22 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
   hall_E_strong_aux (Nat.card G) G le_rfl π
 
-/-- **Isaacs Thm 3.14 Hall-C** ⭐ **FT クリティカル**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
+/-! **Isaacs Thm 3.14 Hall-C**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
 
-証明骨子: 同じく `|G|`-induction. Minimal normal `M` 経由で G/M に IH 適用, 個別の
-H₁, H₂ が M 経由で同じ商で対応する Hall に降りる. Schur-Zassenhaus の共役性で
-`H₁ = (H₂)^g` を得る.
+**Forward dep**: mathlib への Schur-Zassenhaus 共役性追加が前提.
+詳細は [Ch03_SplitExtensions に直接書く理由]:
+- mathlib への汎用補題なので owner chapter 不在.
+- 将来 SZ 共役性を `OddOrder/Mathlib/SchurZassenhausConj.lean` に実装した時点で
+  本箇所で theorem 化.
+- それまでは **leaf axiom 削除** (使用箇所 0 件).
+- 詳細は [`notes/isaacs/ch03_split.md`](../../notes/isaacs/ch03_split.md). -/
 
-TODO: 本コミットでは base case (`|G| = 1`) のみ完結. Step は IH on G/M +
-Schur-Zassenhaus 共役性で要 ~200 行. -/
-axiom hall_C_conjugate [Finite G] [IsSolvable G] (π : Set ℕ)
-    {H₁ H₂ : Subgroup G} (_h1 : IsHallSubgroup π H₁) (_h2 : IsHallSubgroup π H₂) :
-    ∃ g : G, H₁.map (MulEquiv.toMonoidHom (MulAut.conj g)) = H₂
-
-/-- **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
+/-! **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
 
-証明骨子 (Hall's converse): `|G|`-induction. p, q を `|G|` を割る相異なる素数とし,
-H_p, H_q の p-, q-complement を取る. H_p ∩ H_q は {p,q}'-Hall に相当. 商と部分群の
-solvability を組み合わせる.
-
-TODO: 本コミットでは base case (`|G| = 1`) のみ. Step は p, q 区別 + Hall 部分群
-ペアの組合せで要 ~150 行. -/
-axiom solvable_of_pcomplement_exists [Finite G]
-    (_h : ∀ p : ℕ, p.Prime → ∃ H : Subgroup G, IsHallSubgroup {q | q ≠ p} H) :
-    IsSolvable G
+**Forward dep**: Burnside `p^a q^b` 経由. Ch.7 完成後に back-fill.
+所在: `OddOrder/Isaacs/Ch07_Burnside/ForwardFromCh03.lean` (placeholder).
+詳細は [`notes/isaacs/ch07_burnside.md`](../../notes/isaacs/ch07_burnside.md). -/
 
 /-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).
 
@@ -841,21 +833,10 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
   have h_dvd : (H ⊔ K).index ∣ 1 := h ▸ Nat.dvd_gcd h1 h2
   exact Subgroup.index_eq_one.mp (Nat.dvd_one.mp h_dvd)
 
-/-- **Isaacs Thm 3.17** (Wielandt): 3 つの部分群が pairwise coprime index + solvable ⇒
-`G` solvable.
+/-! **Isaacs Thm 3.17 Wielandt**: 3 部分群 pairwise coprime index + solvable ⇒ G solvable.
 
-証明骨子 (Isaacs Thm 3.17 の証明は missing page にあり; Wielandt 1971 の一般的議論):
-`|G|`-induction. 最小反例 G を取り, M を minimal normal とする. G/M は IH で
-solvable. M も `(H ∩ M)`, `(K ∩ M)`, `(L ∩ M)` 部分群経由で IH より solvable.
-よって G solvable, 矛盾. ただし G が単純の場合 M = G で別議論を要する
-(Burnside p^a q^b 等. 本リポでは sorry).
-
-TODO: 本コミットでは base case + 非単純ケース skeleton のみ. -/
-axiom solvable_of_three_subgroups [Finite G] {H K L : Subgroup G}
-    (_h12 : Nat.Coprime H.index K.index) (_h13 : Nat.Coprime H.index L.index)
-    (_h23 : Nat.Coprime K.index L.index)
-    [IsSolvable H] [IsSolvable K] [IsSolvable L] :
-    IsSolvable G
+**Forward dep**: 単純群の場合分けで Burnside `p^a q^b` 必要. Ch.7 完成後に back-fill.
+所在: `OddOrder/Isaacs/Ch07_Burnside/ForwardFromCh03.lean` (placeholder). -/
 
 end -- 3C
 
@@ -926,17 +907,11 @@ theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSepar
   haveI : IsSolvable G := hπsep
   hall_E_exists π
 
-/-- **Isaacs Thm 3.21 (Hall-Higman 1.2.3)** ⭐ **FT クリティカル**.
+/-! **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
-書籍 p.94 の証明骨子: π-separable normal series での induction. F* (一般化 Fitting) 経由,
-または Bender 法 (`C := C_G(O_π(G))` の極小反例 → `C ⊓ O_π(G) = Z(O_π(G))` と
-`C O_π(G) ⊴ G` の解析). 完全形式化は ~100-200 行 (別 commit).
-
-本リポでは正確な statement で axiom 化. (`Subgroup.centralizer` は mathlib 既存.) -/
-axiom hall_higman_1_2_3 [Finite G] (π : Set ℕ) (_hπsep : IsPiSeparable π G)
-    (_hPiPrime : oPiCore πᶜ G = ⊥) :
-    Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G
+**Forward dep**: Ch.6 § (Frobenius p-nilpotence, P×Q lemma) を要する. Ch.6 完成後に着手.
+所在: `OddOrder/Isaacs/Ch06_FrobeniusActions/ForwardFromCh03.lean` (placeholder). -/
 
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
@@ -996,35 +971,11 @@ theorem IsAInvariant.sup {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Sub
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊔ K) := fun a => by
   rw [Subgroup.smul_sup, hH a, hK a]
 
-/-- **Isaacs Thm 3.23 (a)** ⭐: 有限 `A`, `G`, `gcd(|A|, |G|) = 1`, `A` が `G` に
-`φ` で作用 ⇒ 任意素数 `p` で `A`-不変 Sylow `p`-部分群が存在. -/
-axiom exists_aInvariant_sylow {A : Type*} [Group A] [Finite A] [Finite G]
-    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (p : ℕ) [Fact p.Prime] :
-    ∃ P : Sylow p G, IsAInvariant φ (P : Subgroup G)
+/-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
+A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
-/-- **Isaacs Thm 3.23 (b)** ⭐: 上記設定下で, 二つの `A`-不変 Sylow は `C_G(A)` で共役. -/
-axiom aInvariant_sylow_conj {A : Type*} [Group A] [Finite A] [Finite G]
-    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    {p : ℕ} [Fact p.Prime] {P Q : Sylow p G}
-    (_hP : IsAInvariant φ (P : Subgroup G)) (_hQ : IsAInvariant φ (Q : Subgroup G)) :
-    ∃ g : G, (∀ a : A, (φ a).toMonoidHom g = g) ∧
-      (P : Subgroup G).map (MulAut.conj g).toMonoidHom = (Q : Subgroup G)
-
-/-- **Isaacs Lemma 3.24 (Glauberman lemma)** ⭐: `A` 可解, `A → MulAut G`,
-`gcd(|A|, |G|) = 1` で `G` が transitive に `Ω` に作用しているとき, `A` の作用と
-コンパチブルなら A-fixed 点が存在. (FT 経路で多用.)
-
-形式化メモ: コンパチ条件 `(s • g) • ω = s • (g • ω)` は SemidirectProduct を経由する
-方が clean な定式化が可能. 完全形式化は別 phase で. 現状は stub. -/
-axiom glauberman_fixed_point {A : Type*} [Group A] [Finite A] [Finite G]
-    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hASol : IsSolvable A)
-    (Ω : Type*) [MulAction G Ω] [Finite Ω]
-    -- TODO: A の Ω 上作用と φ の compatible 条件 (正式記述は SemidirectProduct 経由)
-    (_hTrans : ∀ ω₁ ω₂ : Ω, ∃ g : G, g • ω₁ = ω₂) :
-    ∃ ω : Ω, ∀ a : A, ∀ g : G, (φ a).toMonoidHom g • ω = g • ω
-    -- ↑ A-不変条件の最小定式化
+**Forward dep**: Ch.4 §4C-§4D (coprime action machinery) を要する. ~8-12 週の大規模.
+所在: `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` (placeholder). -/
 
 end -- 3E
 

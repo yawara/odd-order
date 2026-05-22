@@ -2,3 +2,6 @@ import OddOrder.Isaacs.Ch01_Sylow
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch03_SplitExtensions
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ForwardFromCh03
+import OddOrder.Isaacs.Ch07_Burnside.ForwardFromCh03
