@@ -927,6 +927,26 @@ instance sup_isNilpotent_of_normal_nilpotent [Finite G]
     sup_le nilpotent_normal_le_fitting nilpotent_normal_le_fitting
   exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hKLfit)
 
+/-- **Isaacs Lucchini 2.20 prereq**: `M ⊴ G` ⇒ `F(M) ⊆ F(G)` (`F(M)` を `M.subtype`
+で `G` 部分群として見て).
+
+形式的には `(fitting ↥M).map M.subtype ≤ fitting G`. Lucchini Thm 2.20 (K=⊥ case)
+の M non-abelian 場面で利用.
+
+**証明**: `fitting ↥M` は `↥M` で characteristic (`fitting.characteristic`).
+`M ⊴ G` ゆえ mathlib `Subgroup.normal_of_characteristic_of_normal` instance で
+`(fitting ↥M).map M.subtype ⊴ G`. `fitting ↥M` は冪零 (`fitting.isNilpotent`),
+`equivMapOfInjective` + `nilpotent_of_mulEquiv` で image も冪零.
+`nilpotent_normal_le_fitting` を適用して結論. -/
+theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
+    (fitting ↥M).map M.subtype ≤ fitting G := by
+  haveI : Finite ↥M := inferInstance
+  haveI : Group.IsNilpotent ↥(fitting (↥M : Type _)) := fitting.isNilpotent
+  haveI hNilp : Group.IsNilpotent ↥((fitting ↥M).map M.subtype) :=
+    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (fitting ↥M) M.subtype
+      M.subtype_injective)
+  exact nilpotent_normal_le_fitting
+
 end -- 1D
 
 section /- 1E: Small-order groups, normal subgroup of index 2 (pp. 31-34) -/
