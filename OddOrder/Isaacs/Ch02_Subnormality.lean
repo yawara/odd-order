@@ -1545,6 +1545,170 @@ theorem mem_zpowers_or_mul_t_mem_of_mem_closure_pair {s t : G}
         _ = (y'⁻¹)⁻¹ * t := h_t_mul y'⁻¹ (Subgroup.inv_mem _ hy'_K)
         _ = y' * t := by rw [inv_inv]
 
+/-! ### Helpers for Thm 2.13 (Matsuyama) -/
+
+/-- 自然数の補助: `N > 0` で `N` が `2` のべきでないなら, 奇素数の約数が存在する. -/
+private theorem exists_odd_prime_dvd_of_not_pow_two :
+    ∀ N : ℕ, 0 < N → (∀ k : ℕ, N ≠ 2^k) → ∃ q : ℕ, q.Prime ∧ q ∣ N ∧ Odd q := by
+  intro N
+  induction N using Nat.strong_induction_on with
+  | _ N ih =>
+    intro _ hN_not_pow
+    have hN_ne_one : N ≠ 1 := fun h => hN_not_pow 0 (by rw [h, pow_zero])
+    obtain ⟨q, hq, hq_dvd⟩ := Nat.exists_prime_and_dvd hN_ne_one
+    by_cases hq_two : q = 2
+    · subst hq_two
+      obtain ⟨m, hm⟩ := hq_dvd
+      have hm_pos : 0 < m := by
+        rcases Nat.eq_zero_or_pos m with rfl | h
+        · simp at hm; omega
+        · exact h
+      have hm_lt : m < N := by rw [hm]; omega
+      have hm_not_pow : ∀ k, m ≠ 2^k := fun k hk => by
+        apply hN_not_pow (k + 1)
+        rw [hm, hk, pow_succ, mul_comm]
+      obtain ⟨q', hq', hq'_dvd, hq'_odd⟩ := ih m hm_lt hm_pos hm_not_pow
+      exact ⟨q', hq', dvd_trans hq'_dvd ⟨2, by rw [hm, Nat.mul_comm]⟩, hq'_odd⟩
+    · exact ⟨q, hq, hq_dvd, hq.odd_of_ne_two hq_two⟩
+
+/-- `H ≤ F(G)` で `H` が `p`-subgroup なら `H ≤ O_p(G)`.
+
+証明: `F(G)` は冪零 ⇒ 各素数 `p` について Sylow `p` が一意 (`Sylow.normal_of_isNilpotent`
++ `Sylow.characteristic_of_normal`). `H` をその unique Sylow に含め, characteristic
+in normal で `G` の正規 `p`-部分群 ⇒ `normal_pgroup_le_opCore` で `O_p(G)` 配下. -/
+private theorem mem_opCore_of_le_fitting_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {H : Subgroup G} (hH_pgroup : IsPGroup p H) (hH_fit : H ≤ fitting G) :
+    H ≤ opCore p G := by
+  -- Lift H to a subgroup of fitting G.
+  set Hin : Subgroup (fitting G) := H.subgroupOf (fitting G) with hHin_def
+  have hHin_pgroup : IsPGroup p Hin :=
+    hH_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hH_fit).symm
+  -- Sylow p of fitting G containing Hin.
+  obtain ⟨Q, hHin_le_Q⟩ := hHin_pgroup.exists_le_sylow
+  haveI hQ_normal : (Q : Subgroup (fitting G)).Normal := Sylow.normal_of_isNilpotent _
+  haveI hQ_char : (Q : Subgroup (fitting G)).Characteristic :=
+    Sylow.characteristic_of_normal _ hQ_normal
+  haveI : ((Q : Subgroup (fitting G)).map (fitting G).subtype).Normal := inferInstance
+  have hpgroupG : IsPGroup p ((Q : Subgroup (fitting G)).map (fitting G).subtype) :=
+    Q.2.map (fitting G).subtype
+  have hQ_le_op : (Q : Subgroup (fitting G)).map (fitting G).subtype ≤ opCore p G :=
+    normal_pgroup_le_opCore hpgroupG
+  intro x hx
+  have hx_fit : x ∈ fitting G := hH_fit hx
+  have hx_Hin : (⟨x, hx_fit⟩ : fitting G) ∈ Hin := by
+    rw [hHin_def, Subgroup.mem_subgroupOf]
+    exact hx
+  have hx_Q : (⟨x, hx_fit⟩ : fitting G) ∈ (Q : Subgroup (fitting G)) :=
+    hHin_le_Q hx_Hin
+  exact hQ_le_op ⟨⟨x, hx_fit⟩, hx_Q, rfl⟩
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.13 (Matsuyama)**: 有限群 `G` の involution `t` (`t * t = 1`) で
+`t ∉ O_2(G)` ならば, 奇素数位数の元 `x` で `t * x * t = x⁻¹` (Isaacs notation `x^t = x⁻¹`).
+
+書籍 p.57 の証明 (Goldschmidt の Burnside `p^a q^b` 定理 (両素数奇) を偶数位数に拡張する
+Matsuyama の核心):
+1. `T = ⟨t⟩` は 2-subgroup, `t ≠ 1`.
+2. `t ∉ O_2(G)` ⇒ `T ⊄ F(G)` (補助 `mem_opCore_of_le_fitting_of_isPGroup`).
+3. Baer 逆 (Thm 2.12 iff) で ∃ g, `⟨T, T^g⟩` 非冪零.
+4. `s = g·t·g⁻¹` も involution. `s = t` なら `⟨T, T^g⟩ = T` で冪零, 矛盾.
+5. `s ≠ t` で `⟨{s, t}⟩` 非冪零 ⇒ 非 2-group (有限 p-group は冪零).
+6. ∃ 奇素数 `q ∣ |⟨{s, t}⟩|`. Cauchy で `y ∈ ⟨{s, t}⟩` で `orderOf y = q`.
+7. 構造補題 (`mem_zpowers_or_mul_t_mem_of_mem_closure_pair`) で `y ∈ ⟨s*t⟩` or `y = x*t`.
+   後者なら `y² = 1` で `q ∣ 2` 矛盾 (q odd).
+8. `y ∈ ⟨s*t⟩` で Lemma 2.14 essence (`inv_by_two_involutions`) ⇒ `t * y * t = y⁻¹`. -/
+theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
+    (ht_notin : t ∉ opCore 2 G) :
+    ∃ x : G, ∃ p : ℕ, p.Prime ∧ Odd p ∧ orderOf x = p ∧ t * x * t = x⁻¹ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- Step 1: t ≠ 1.
+  have ht_ne_one : t ≠ 1 := fun h => ht_notin (h ▸ Subgroup.one_mem _)
+  set T : Subgroup G := Subgroup.zpowers t with hT_def
+  -- orderOf t = 2.
+  have h_ord_t : orderOf t = 2 := by
+    have h_dvd : orderOf t ∣ 2 :=
+      orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact ht_sq)
+    rcases (Nat.dvd_prime Nat.prime_two).mp h_dvd with hone | htwo
+    · exact absurd (orderOf_eq_one_iff.mp hone) ht_ne_one
+    · exact htwo
+  have hT_pgroup : IsPGroup 2 T := by
+    apply IsPGroup.of_card (n := 1)
+    rw [Nat.card_zpowers, h_ord_t, pow_one]
+  -- Step 2: T ⊄ fitting G.
+  have hT_not_fit : ¬ T ≤ fitting G := fun hTF => ht_notin
+    (mem_opCore_of_le_fitting_of_isPGroup hT_pgroup hTF (Subgroup.mem_zpowers _))
+  -- Step 3: Baer iff ⇒ ∃ g, ⟨T, T^g⟩ not nilpotent.
+  have hExist : ∃ g : G, ¬ Group.IsNilpotent ↥(T ⊔ ((MulAut.conj g) • T : Subgroup G)) := by
+    by_contra h
+    push_neg at h
+    exact hT_not_fit ((le_fitting_iff_baer_sup_conj_isNilpotent T).mpr h)
+  obtain ⟨g, hg⟩ := hExist
+  -- Step 4: s := g·t·g⁻¹.
+  set s : G := g * t * g⁻¹ with hs_def
+  have hs_sq : s * s = 1 := by
+    change (g * t * g⁻¹) * (g * t * g⁻¹) = 1
+    calc (g * t * g⁻¹) * (g * t * g⁻¹)
+        = g * t * (g⁻¹ * g) * t * g⁻¹ := by group
+      _ = g * t * 1 * t * g⁻¹ := by rw [inv_mul_cancel]
+      _ = g * (t * t) * g⁻¹ := by group
+      _ = g * 1 * g⁻¹ := by rw [ht_sq]
+      _ = 1 := by group
+  -- T^g = zpowers s.
+  have hTg_eq : ((MulAut.conj g) • T : Subgroup G) = Subgroup.zpowers s := by
+    rw [hT_def, Subgroup.pointwise_smul_def]
+    exact MonoidHom.map_zpowers _ _
+  rw [hTg_eq] at hg
+  -- Step 5: Case s = t ⇒ T ⊔ T = T nilpotent, 矛盾.
+  by_cases hst : s = t
+  · exfalso
+    rw [hst, ← hT_def, sup_idem] at hg
+    exact hg hT_pgroup.isNilpotent
+  -- Step 6: s ≠ t. T ⊔ zpowers s = closure {s, t}.
+  have h_sup_eq : T ⊔ Subgroup.zpowers s = Subgroup.closure ({s, t} : Set G) := by
+    rw [hT_def, Subgroup.zpowers_eq_closure, Subgroup.zpowers_eq_closure,
+        ← Subgroup.closure_union]
+    congr 1
+    ext x
+    simp [Set.mem_insert_iff, Set.mem_singleton_iff, or_comm]
+  rw [h_sup_eq] at hg
+  haveI hClosure_fin : Finite ↥(Subgroup.closure ({s, t} : Set G)) := Subtype.finite
+  -- Step 7: ⟨{s, t}⟩ not 2-group.
+  have h_not_pgroup : ¬ IsPGroup 2 ↥(Subgroup.closure ({s, t} : Set G)) := fun h =>
+    hg h.isNilpotent
+  have h_card_not_pow : ∀ k : ℕ,
+      Nat.card ↥(Subgroup.closure ({s, t} : Set G)) ≠ 2^k := fun k hk =>
+    h_not_pgroup (IsPGroup.iff_card.mpr ⟨k, hk⟩)
+  obtain ⟨q, hq_prime, hq_dvd, hq_odd⟩ :=
+    exists_odd_prime_dvd_of_not_pow_two _ Nat.card_pos h_card_not_pow
+  haveI hq_fact : Fact q.Prime := ⟨hq_prime⟩
+  -- Step 8: Cauchy ⇒ ∃ y of order q.
+  obtain ⟨y, hy_ord⟩ := exists_prime_orderOf_dvd_card' q hq_dvd
+  have h_ord_y_G : orderOf (y : G) = q := by
+    rw [← hy_ord]; exact Subgroup.orderOf_coe y
+  have hy_inG : (y : G) ∈ Subgroup.closure ({s, t} : Set G) := y.2
+  -- Step 9: 構造補題で y ∈ ⟨s*t⟩ or y = x*t.
+  rcases mem_zpowers_or_mul_t_mem_of_mem_closure_pair hs_sq ht_sq hy_inG with
+    hy_K | ⟨x, hx_K, hy_eq⟩
+  · -- y ∈ ⟨s*t⟩ ⇒ Lemma 2.14 で t * y * t = y⁻¹.
+    exact ⟨(y : G), q, hq_prime, hq_odd, h_ord_y_G,
+           inv_by_two_involutions hs_sq ht_sq hy_K⟩
+  · -- y = x * t ⇒ y² = 1 ⇒ q ∣ 2 ⇒ q = 2, 矛盾 (q odd).
+    exfalso
+    have h_sq : (y : G) * (y : G) = 1 := by
+      rw [hy_eq]
+      calc (x * t) * (x * t)
+          = x * (t * x * t) := by group
+        _ = x * x⁻¹ := by rw [inv_by_two_involutions hs_sq ht_sq hx_K]
+        _ = 1 := mul_inv_cancel x
+    have h_ord_dvd : orderOf (y : G) ∣ 2 :=
+      orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact h_sq)
+    rw [h_ord_y_G] at h_ord_dvd
+    rcases (Nat.dvd_prime Nat.prime_two).mp h_ord_dvd with h1 | h2
+    · exact hq_prime.one_lt.ne' h1
+    · rw [h2] at hq_odd
+      rcases hq_odd with ⟨k, hk⟩
+      omega
+
 end -- 2B
 
 end OddOrder.Isaacs.Ch02
