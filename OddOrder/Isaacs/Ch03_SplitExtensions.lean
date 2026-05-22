@@ -1586,30 +1586,19 @@ theorem IsAInvariant.normalizer {A : Type*} [Group A] {φ : A →* MulAut G} {H 
   rw [Subgroup.map_normalizer_eq_of_bijective H (φ a).bijective,
       show H.map (φ a).toMonoidHom = H from hH a]
 
-/-- A-不変部分群の centralizer は A-不変. proof: 元レベルで `(φ a)⁻¹ h ∈ H` (A-inv 経由) +
-`(φ a)` が monoid hom で commute を保存. -/
+/-- A-不変部分群の centralizer は A-不変. `Subgroup.map_centralizer_eq_of_bijective` +
+`hH a` で (φ a) '' H = H が言えるので clean. -/
 theorem IsAInvariant.centralizer {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
     (hH : IsAInvariant φ H) :
     IsAInvariant φ (Subgroup.centralizer (H : Set G)) := fun a => by
-  ext g
-  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
-      Subgroup.mem_centralizer_iff, Subgroup.mem_centralizer_iff]
-  refine ⟨fun hyp h hh => ?_, fun hyp h hh => ?_⟩
-  · -- (φ a)⁻¹ h ∈ H (A-inv) applied to hyp + congr (φ a) + apply_inv_self
-    have hcom := hyp ((φ a)⁻¹ h) (hH.inv_smul_mem a hh)
-    simp only [MulAut.smul_def] at hcom
-    have := congr_arg (φ a) hcom
-    simp only [map_mul, MulAut.apply_inv_self] at this
-    exact this
-  · -- (φ a) h ∈ H (A-inv) applied to hyp + congr (φ a)⁻¹ + inv_apply_self
-    have hcom := hyp ((φ a) h) (hH.smul_mem a hh)
-    show h * ((φ a)⁻¹ • g) = ((φ a)⁻¹ • g) * h
-    simp only [MulAut.smul_def]
-    have heq : ((φ a)⁻¹ : MulAut G) ((φ a) h * g) = ((φ a)⁻¹ : MulAut G) (g * (φ a) h) := by
-      rw [hcom]
-    simp only [map_mul, show ∀ x : G, ((φ a)⁻¹ : MulAut G) ((φ a) x) = x from
-      fun x => MulAut.inv_apply_self G (φ a) x] at heq
-    exact heq
+  show (Subgroup.centralizer (H : Set G)).map (φ a).toMonoidHom
+      = Subgroup.centralizer (H : Set G)
+  rw [Subgroup.map_centralizer_eq_of_bijective _ _ (φ a).bijective]
+  congr 1
+  -- want: (φ a).toMonoidHom '' (H : Set G) = (H : Set G)
+  have hH_set : ((H.map (φ a).toMonoidHom : Subgroup G) : Set G) = (H : Set G) := by
+    rw [show H.map (φ a).toMonoidHom = H from hH a]
+  exact hH_set
 
 /-- A-不変部分群族の iSup は A-不変. -/
 theorem IsAInvariant.iSup {A : Type*} [Group A] {φ : A →* MulAut G} {ι : Sort*}
