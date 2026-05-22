@@ -156,18 +156,47 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 
 /-! ### Isaacs §5E (Frobenius normal p-complement)
 
-**FT クリティカル**. mathlib 未収載で新規実装が必要.
+**FT クリティカル**. mathlib 未収載で新規実装が必要. -/
 
-- **Thm 5.25** (Sylow controls own G-fusion ⇔ normal p-complement)
-- **Thm 5.26 Frobenius** (3 同値条件: normal p-comp / 全 p-local が normal p-comp /
-  N_G(X)/C_G(X) is p-group ∀ p-subgroup X)
-- **Lemma 5.27, 5.28** (5.26 の補題)
-- **Cor 5.29** (|G| = p^a m, q ∤ p^e-1 ⇒ normal p-complement)
-- **Cor 5.30** (p odd, 全 order-p 元中心 ⇒ normal p-complement) ⭐ **FT 経路で奇数位数仮定との親和性**.
-  Isaacs p.180 の証明は **Ch.4 Thm 4.36** (p>2 一般 p-群 + p'-A が order-p 元全部 fix
-  ⇒ A trivial) を直接利用.
+/-! **Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**.
+`G` は normal p-complement を持つ ⇔ 任意の p-subgroup `X` で `N_G(X)/C_G(X)` が p-group.
 
-**所在**: 全 statement docstring レベル. Ch.4 §4D (4.36) 完成後に再着手. -/
+3 同値条件のうち本 statement は (1) ⇔ (3). 5.25 経由で (1) ⇔ (2) (全 p-local 部分群
+が normal p-comp) も導出. mathlib 未収載 ~200 LOC 推定.
+
+**証明骨子** (Isaacs p.174-177):
+- (1) ⇒ (3): normal p-complement N ⇒ G = N · P (P Sylow_p). 任意 p-subgroup X ⊆ P^g
+  に対し N_G(X) = N_N(X) · N_P^g(X) で N/C 部分は p-group のみ.
+- (3) ⇒ (1): 5.28 lemma で C_G(P∩Q) 内で P, Q ∈ Syl_p 共役 ⇒ 自分自身の fusion 制御 ⇒
+  Thm 5.25 で normal p-complement.
+
+statement 形式化保留 (mathlib `Subgroup.normalizerMonoidHom : N(X) →* MulAut X` 経由
+で `image` を p-group とする, あるいは centralizer の subgroupOf normalizer 商を取る
+形が考えられる). -/
+
+/-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
+`p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
+
+**証明** (Isaacs p.180): Thm 5.26 で any p-subgroup X に対し N_G(X)/C_G(X) が p-group
+を示せばよい. `Q := N_G(X)/C_G(X)` 内の p'-部分 A を取り A が trivial に作用することを
+**Ch.4 Thm 4.36** (p>2 + p-群 G + p'-A が order-p 元固定 ⇒ A trivial) で示す. 仮定より
+order-p 元は中心で A 不変, 中心で固定 ⇒ Thm 4.36 適用条件成立.
+
+**実装状態**: Ch.4 §4D Thm 4.36 完成待ち. -/
+theorem normal_p_complement_of_order_p_central_odd
+    [Finite G] {p : ℕ} [Fact p.Prime] (_hp_odd : p ≠ 2)
+    (_hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
+    ∃ N : Subgroup G, N.Normal ∧
+      ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G) := by
+  sorry
+
+/-! **Isaacs Thm 5.25** (Sylow controls own G-fusion ⇔ normal p-complement):
+形式化保留. Focal Subgroup Theorem (5.21) + Sylow conjugacy.
+
+**Lemma 5.27, 5.28** (5.26 の補題): 5.26 実装時に同時実装.
+
+**Cor 5.29** (|G| = p^a m, q ∤ p^e-1 ⇒ normal p-complement): 5.26 + p-group action 計算.
+形式化保留. -/
 
 end -- 5E
 
