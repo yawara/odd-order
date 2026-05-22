@@ -1238,6 +1238,69 @@ theorem hall_higman_case_pi_contradiction
   have hKle_B := hall_higman_case_pi_K_le_B π hKpi hKle
   exact absurd hKle_B (lt_irrefl _ ∘ hStrict.trans_le)
 
+/-- **Hall-Higman 3.21 case π body**: case π での K construction + 矛盾.
+case π 仮定 (`oPiCore π (↥CB) ≠ ⊥`) から K = preimage of K_quot を構築し
+`hall_higman_case_pi_contradiction` で False を導出. -/
+private theorem hall_higman_case_pi_body
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] (π : Set ℕ)
+    (h_not_le : ¬ Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G)
+    (hCπ : oPiCore π ↥((Subgroup.centralizer (oPiCore π G : Set G)).map
+        (QuotientGroup.mk' (Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G))) ≠ ⊥) :
+    False := by
+  set O : Subgroup G := oPiCore π G with hO_def
+  set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
+  set B : Subgroup G := C ⊓ O with hB_def
+  haveI hO_normal : O.Normal := inferInstance
+  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
+  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
+  set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
+  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  set K_quot : Subgroup ↥CB := oPiCore π ↥CB
+  haveI hKq_norm : K_quot.Normal := inferInstance
+  haveI hKq_char : K_quot.Characteristic := inferInstance
+  set K_GB : Subgroup (G ⧸ B) := K_quot.map CB.subtype with hKGB_def
+  haveI hKGB_norm : K_GB.Normal := inferInstance
+  set K : Subgroup G := K_GB.comap (QuotientGroup.mk' B) with hK_def
+  haveI hK_norm : K.Normal := inferInstance
+  have hKGB_le_CB : K_GB ≤ CB := by
+    have hRangEq : CB = (⊤ : Subgroup ↥CB).map CB.subtype := by
+      rw [← MonoidHom.range_eq_map]; exact CB.range_subtype.symm
+    rw [hRangEq]; exact Subgroup.map_mono le_top
+  have hKle_C : K ≤ C := Subgroup.comap_le_of_le_map_quotient inf_le_left hKGB_le_CB
+  have hBle_K : B ≤ K := by
+    intro x hx
+    simp only [hK_def, Subgroup.mem_comap]
+    rw [show (QuotientGroup.mk' B) x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+    exact K_GB.one_mem
+  have hBK_lt : B < K := by
+    refine lt_of_le_of_ne hBle_K ?_
+    intro hBKeq
+    apply hCπ
+    have hKGB_bot : K_GB = ⊥ := by
+      rw [eq_bot_iff]
+      intro y hy
+      obtain ⟨x, hxy⟩ := QuotientGroup.mk_surjective y
+      rw [← hxy] at hy ⊢
+      have hx_K : x ∈ K := Subgroup.mem_comap.mpr hy
+      rw [← hBKeq] at hx_K
+      exact (QuotientGroup.eq_one_iff x).mpr hx_K
+    apply Subgroup.map_injective CB.subtype_injective
+    rw [Subgroup.map_bot]
+    exact hKGB_bot
+  have hQpi : ∀ p ∈ (Nat.card ((↥K) ⧸ (B.subgroupOf K))).primeFactors, p ∈ π := by
+    intro p hp
+    rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map B K] at hp
+    have hKmap_eq : K.map (QuotientGroup.mk' B) = K_GB :=
+      Subgroup.map_comap_eq_self_of_surjective QuotientGroup.mk_surjective K_GB
+    rw [hKmap_eq] at hp
+    have hcard : Nat.card ↥K_GB = Nat.card ↥K_quot :=
+      Nat.card_congr
+        (Subgroup.equivMapOfInjective K_quot CB.subtype CB.subtype_injective).symm.toEquiv
+    rw [hcard] at hp
+    exact (oPiCore.isPiGroup (G := ↥CB) π) p hp
+  exact hall_higman_case_pi_contradiction π hKle_C hBle_K hQpi hBK_lt
+
 /-- **Isaacs Thm 3.21 Hall-Higman 1.2.3** ⭐ **FT クリティカル**.
 `G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
