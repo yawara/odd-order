@@ -571,6 +571,42 @@ theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
         show j + 1 = k from hj.symm]
     exact hk_iter
 
+/-- **Helper**: 部分群 `E` で `↥E` 冪零 + 非自明 ⇒ `⁅E, E⁆ < E`.
+
+mathlib `IsSolvable.commutator_lt_of_ne_bot` の冪零部分群版 (ambient `G` の可解性は不要).
+証明は mathlib 版を mirror: `IsSolvable ↥E ← IsNilpotent ↥E` + `map_subtype_lt_map_subtype`. -/
+theorem commutator_lt_self_of_isNilpotent_subtype
+    {G : Type*} [Group G]
+    (E : Subgroup G) [Group.IsNilpotent ↥E] [Nontrivial ↥E] :
+    ⁅E, E⁆ < E := by
+  haveI : IsSolvable ↥E := IsNilpotent.to_isSolvable
+  rw [← E.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
+      Subgroup.map_subtype_lt_map_subtype]
+  exact IsSolvable.commutator_lt_top_of_nontrivial ↥E
+
+/-- **Variant of Thm 3.11 part 1** (minimal normal nilpotent ⇒ abelian):
+`E ⊴ G` minimal normal + `↥E` 冪零 ⇒ `E` abelian.
+
+`solvable_minimal_normal_isAbelian` の `[IsSolvable G]` 仮定を `[Group.IsNilpotent ↥E]`
+に弱めた版. Lucchini K=⊥ で E ≤ F(G) (G は solvable と限らない) の場合に有用. -/
+theorem isCommutative_of_isMinimalNormal_of_isNilpotent_subtype
+    {G : Type*} [Group G] [Finite G]
+    {E : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal E)
+    [Group.IsNilpotent ↥E] :
+    ∀ x ∈ E, ∀ y ∈ E, x * y = y * x := by
+  haveI hEnormal : E.Normal := hMin.1
+  haveI hE_NT : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hMin.2.1
+  have hcomm_lt : ⁅E, E⁆ < E := commutator_lt_self_of_isNilpotent_subtype E
+  have hCommNormal : (⁅E, E⁆ : Subgroup G).Normal := inferInstance
+  have hcomm_eq_bot : ⁅E, E⁆ = ⊥ := by
+    rcases hMin.2.2 ⁅E, E⁆ hCommNormal hcomm_lt.le with h | h
+    · exact h
+    · exact absurd h hcomm_lt.ne
+  intro x hx y hy
+  have hcomm_xy : ⁅x, y⁆ ∈ ⁅E, E⁆ := Subgroup.commutator_mem_commutator hx hy
+  rw [hcomm_eq_bot, Subgroup.mem_bot] at hcomm_xy
+  exact commutatorElement_eq_one_iff_mul_comm.mp hcomm_xy
+
 /-- **Lucchini K=⊥ 1st step**: G 非自明有限, A abelian, `|A| ≥ |G:A|` ⇒
 ∃ `E ⊴ G` minimal normal で `E ≤ F(G) ∧ E ≤ centralizer F(G)`.
 
