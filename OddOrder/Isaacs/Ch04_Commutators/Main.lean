@@ -421,6 +421,29 @@ theorem derivedSeries_le_lowerCentralSeries_two_pow_sub_one (r : ℕ) :
           rw [pow_succ]
           omega
 
+/-- **Cor 4.13 系** (G nilpotent ⇒ derived series 量的境界):
+`lowerCentralSeries G m = ⊥` ⇒ `derivedSeries G (Nat.log 2 m + 1) = ⊥`.
+
+形式的には `lcs m = ⊥ ⇒ derived (⌊log₂ m⌋ + 1) = ⊥`. mathlib 既存 `IsNilpotent → IsSolvable`
+は qualitative only (具体的 derived length 不明), 本補題は **Cor 4.13** から得られる
+**explicit upper bound** を与える.
+
+**証明**: `m < 2^(Nat.log 2 m + 1)` (`Nat.lt_pow_succ_log_self`) ⇒ `2^(...)-1 ≥ m`
+⇒ lcs antitone で `lcs (2^(...)-1) ≤ lcs m = ⊥`. **Cor 4.13** で `derived (Nat.log 2 m + 1)
+≤ lcs (2^(Nat.log 2 m + 1) - 1) = ⊥`. -/
+theorem derivedSeries_eq_bot_of_lowerCentralSeries_eq_bot
+    {m : ℕ} (h : lowerCentralSeries G m = ⊥) :
+    derivedSeries G (Nat.log 2 m + 1) = ⊥ := by
+  have h2pow : m < 2 ^ (Nat.log 2 m + 1) :=
+    Nat.lt_pow_succ_log_self (by norm_num : (1:ℕ) < 2) m
+  have hidx : m ≤ 2 ^ (Nat.log 2 m + 1) - 1 := by omega
+  rw [eq_bot_iff]
+  calc derivedSeries G (Nat.log 2 m + 1)
+      ≤ lowerCentralSeries G (2 ^ (Nat.log 2 m + 1) - 1) :=
+        derivedSeries_le_lowerCentralSeries_two_pow_sub_one _
+    _ ≤ lowerCentralSeries G m := lowerCentralSeries_antitone (G := G) hidx
+    _ = ⊥ := h
+
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
 
