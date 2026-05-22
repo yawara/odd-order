@@ -922,6 +922,20 @@ theorem Subgroup.IsPiGroup.le_oPiCore {G : Type*} [Group G] {π : Set ℕ} {H : 
   le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H, ‹_›, hH⟩
 
+/-- **IsPiGroup は subgroupOf で保持**: `B ≤ K ≤ G` で `B` が π-group (as `Subgroup G`)
+⇒ `B.subgroupOf K` も π-group (as `Subgroup ↥K`).
+
+mathlib `subgroupOfEquivOfLe` で `↥(B.subgroupOf K) ≃* ↥B`, よって cardinality 同じ
+⇒ primeFactors 同じ. -/
+theorem Subgroup.IsPiGroup.subgroupOf {G : Type*} [Group G] {π : Set ℕ}
+    {B K : Subgroup G} (hBK : B ≤ K) (hB : Subgroup.IsPiGroup π B) :
+    Subgroup.IsPiGroup π (B.subgroupOf K) := by
+  intro p hp
+  have hcard : Nat.card ↥(B.subgroupOf K) = Nat.card ↥B :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBK).toEquiv
+  rw [hcard] at hp
+  exact hB p hp
+
 /-- **π-group extension**: `N ⊴ H` で `N` も `H/N` も π-group ⇒ `H` は π-group.
 mathlib `card_eq_card_quotient_mul_card_subgroup` (`|H| = |H/N| * |N|`) +
 `primeFactors_mul` で primes |H| ⊆ primes |H/N| ∪ primes |N| ⊆ π. -/
