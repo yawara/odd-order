@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Complement
+import Mathlib.GroupTheory.Frattini
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
@@ -1607,6 +1608,11 @@ theorem IsAInvariant.commutator_self {A : Type*} [Group A] (φ : A →* MulAut G
     IsAInvariant φ (commutator G) := by
   rw [← derivedSeries_one]
   exact IsAInvariant.derivedSeries φ 1
+
+/-- `frattini G` (Frattini subgroup, mathlib def) は A-不変 (characteristic instance 経由). -/
+theorem IsAInvariant.frattini {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (_root_.frattini G) :=
+  IsAInvariant.of_characteristic φ
 
 /-- A-不変な集合 S の生成部分群 `Subgroup.closure S` は A-不変. -/
 theorem IsAInvariant.closure_of_invariant_set {A : Type*} [Group A] {φ : A →* MulAut G}
