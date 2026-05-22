@@ -1602,6 +1602,12 @@ theorem IsAInvariant.fittingSubgroup {A : Type*} [Group A] [Finite G] (φ : A �
     IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting G) :=
   IsAInvariant.of_characteristic φ
 
+/-- `commutator G = G'` は A-不変 (derivedSeries 1 経由). -/
+theorem IsAInvariant.commutator_self {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (commutator G) := by
+  rw [← derivedSeries_one]
+  exact IsAInvariant.derivedSeries φ 1
+
 /-- A-不変 + A-不変 の commutator は A-不変 (`Subgroup.map_commutator`). -/
 theorem IsAInvariant.commutator {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) :
