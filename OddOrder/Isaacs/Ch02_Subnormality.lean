@@ -1266,15 +1266,74 @@ theorem isSubnormal_of_permutable_with_conjugates [Finite G] {S : Subgroup G}
 
 /-! ### Isaacs Thm 2.11 (Wielandt abelian-in-F(G)) -/
 
+open scoped Pointwise in
+/-- **古典的計数公式** `|H · K| · |H ∩ K| = |H| · |K|` (group counting formula).
+有限群 `G` の部分群 `H, K` の **集合積** の cardinality と intersection の cardinality
+が, `H`, `K` の cardinality の積に等しい. mathlib 未収載なので, ここで一度示しておく.
+
+証明: H を G/K (左 coset 集合) に左乗法で作用させ, `(1 : G ⧸ K)` の軌道が
+`(H : Set G).image (↑ : G → G ⧸ K)`, 安定化群が `K.subgroupOf H` (≃ `H ⊓ K`).
+orbit-stabilizer + `Subgroup.card_mul_eq_card_subgroup_mul_card_quotient` で合成.
+
+Thm 2.11 (Wielandt) と Cor 2.19 で `H = K = A` (またはその共役) の形で使う. -/
+private lemma card_set_mul_card_inf {G : Type*} [Group G] [Finite G]
+    (H K : Subgroup G) :
+    Nat.card ((H : Set G) * (K : Set G)) * Nat.card ↥(H ⊓ K) = Nat.card ↥H * Nat.card ↥K := by
+  classical
+  have h1 : Nat.card ((H : Set G) * (K : Set G)) =
+      Nat.card ↥K * Nat.card ((H : Set G).image ((↑) : G → G ⧸ K)) :=
+    Subgroup.card_mul_eq_card_subgroup_mul_card_quotient K (H : Set G)
+  have h_orbit_eq : (MulAction.orbit (↥H) (((1 : G) : G ⧸ K))) =
+      (H : Set G).image ((↑) : G → G ⧸ K) := by
+    ext y
+    constructor
+    · rintro ⟨h, rfl⟩
+      refine ⟨(h : G), h.2, ?_⟩
+      change ((h : G) : G ⧸ K) = (((h : G) : G) * (1 : G) : G ⧸ K)
+      rw [mul_one]
+    · rintro ⟨g, hg, rfl⟩
+      exact ⟨⟨g, hg⟩, by
+        change ((⟨g, hg⟩ : ↥H).val * (1 : G) : G ⧸ K) = ((g : G) : G ⧸ K)
+        rw [mul_one]⟩
+  have h_stab_eq : MulAction.stabilizer ↥H (((1 : G) : G ⧸ K)) = K.subgroupOf H := by
+    ext h
+    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+    constructor
+    · intro hsmul
+      have hraw : (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K) := hsmul
+      rw [mul_one] at hraw
+      have := QuotientGroup.eq.mp hraw
+      simpa using this
+    · intro hh
+      change (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K)
+      rw [mul_one]
+      apply QuotientGroup.eq.mpr
+      simpa using hh
+  have h_orbstab : Nat.card (MulAction.orbit ↥H (((1 : G) : G ⧸ K))) *
+      Nat.card (MulAction.stabilizer ↥H (((1 : G) : G ⧸ K))) = Nat.card ↥H := by
+    rw [← Nat.card_prod]
+    exact Nat.card_congr (MulAction.orbitProdStabilizerEquivGroup ↥H _)
+  have h_subgrpof_card : Nat.card ↥(K.subgroupOf H) = Nat.card ↥(H ⊓ K) := by
+    rw [show K.subgroupOf H = (H ⊓ K).subgroupOf H from
+      (Subgroup.inf_subgroupOf_left K H).symm]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+  rw [h_orbit_eq, h_stab_eq, h_subgrpof_card] at h_orbstab
+  rw [h1, mul_assoc, h_orbstab, mul_comm]
+
 /-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)). 有限群 `G` の abelian 部分群 `A`
 で, 全ての `H ⊇ A` について `|H:A|² ≤ |H:Z(H)|` ならば `A ≤ F(G)`.
 
-形式化メモ: Isaacs p.50 の証明は Thm 2.2 + Zipper Lemma + 数え上げ
-(`|HK| = |H|·|K|/|H∩K|`, `A ∩ A^g ⊆ Z(G)` for abelian A, A^g).
-mathlib に `|HK| = |H|·|K|/|H∩K|` 公式が無く, 自前で組む必要あり.
-完全形式化は ~150-200 行の大規模作業 (別セッション).
+書籍 p.50 の証明 (`|G|`-induction; cf. Wielandt 1958):
+1. **IH**: 任意の真部分群 `H ⊋ A` で `A ≤ F(H)` ⇒ `A ⊴⊴ H` (Thm 2.2 経由).
+2. **Zipper Lemma (2.9)** で, `A` が `G` で部分正規でないなら `A` を含む極大 `M` が一意.
+3. ある `g ∈ G` で `⟨A, A^g⟩ = G`: 全 `g` で `⟨A, A^g⟩ < G` なら `A^g ⊆ M` 故 `A^G ⊆ M < G`,
+   `A ⊴ A^G ⊴ G` で `A ⊴⊴ G`, 矛盾.
+4. `A, A^g` abelian で `⟨A, A^g⟩ = G` ⇒ `A ⊓ A^g ⊆ Z(G)`.
+5. Lemma 2.10 で `|A · A^g| < |G|`. 計数 `|A·A^g| = |A|²/|A⊓A^g| ≥ |A|²/|Z(G)|`
+   で `|G:A|² > |G:Z(G)|`, 仮定 (`H = G`) に矛盾.
 
-本リポでは `axiom` として一旦受け入れ. -/
+形式化メモ: ~200 行の `|G|`-induction (部分群対応 + IH 適用 + Zipper). 別 commit で完成.
+本リポでは `axiom` として一旦受け入れ (補助補題 `card_set_mul_card_inf` は完成済み). -/
 axiom subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
     (_hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (_h : ∀ H : Subgroup G, A ≤ H →
@@ -1725,74 +1784,8 @@ variable {G : Type*} [Group G]
 
 * Cor 2.19 完成 (Zenkov axiom 経由)
 * Thm 2.18 Zenkov, Thm 2.20 Lucchini は引き続き axiom 化
+* 補助補題 `card_set_mul_card_inf` は §2A 末尾に移動 (Thm 2.11 でも使用)
 -/
-
-open scoped Pointwise in
-/-- **古典的計数公式** `|H · K| · |H ∩ K| = |H| · |K|` (group counting formula).
-有限群 `G` の部分群 `H, K` の **集合積** の cardinality と intersection の cardinality
-が, `H`, `K` の cardinality の積に等しい. mathlib 未収載なので, ここで一度示しておく.
-
-証明: H を G/K (左 coset 集合) に左乗法で作用させ, `(1 : G ⧸ K)` の軌道が
-`(H : Set G).image (↑ : G → G ⧸ K)`, 安定化群が `K.subgroupOf H` (≃ `H ⊓ K`).
-orbit-stabilizer + `Subgroup.card_mul_eq_card_subgroup_mul_card_quotient` で合成.
-
-Cor 2.19 と Thm 2.11 で `H = K = A` (またはその共役) の形で使う. -/
-private lemma card_set_mul_card_inf {G : Type*} [Group G] [Finite G]
-    (H K : Subgroup G) :
-    Nat.card ((H : Set G) * (K : Set G)) * Nat.card ↥(H ⊓ K) = Nat.card ↥H * Nat.card ↥K := by
-  classical
-  -- (1) |H · K| = |K| · |image of H in G/K| via card_mul_eq_card_subgroup_mul_card_quotient.
-  have h1 : Nat.card ((H : Set G) * (K : Set G)) =
-      Nat.card ↥K * Nat.card ((H : Set G).image ((↑) : G → G ⧸ K)) :=
-    Subgroup.card_mul_eq_card_subgroup_mul_card_quotient K (H : Set G)
-  -- (2) Set up H-action on G/K (instance: mulLeftCosetsCompSubtypeVal).
-  -- orbit of (1 : G ⧸ K) equals image of H in G/K (as set).
-  have h_orbit_eq : (MulAction.orbit (↥H) (((1 : G) : G ⧸ K))) =
-      (H : Set G).image ((↑) : G → G ⧸ K) := by
-    ext y
-    constructor
-    · rintro ⟨h, rfl⟩
-      refine ⟨(h : G), h.2, ?_⟩
-      show ((h : G) : G ⧸ K) = (h • ((1 : G) : G ⧸ K) : G ⧸ K)
-      change ((h : G) : G ⧸ K) = (((h : G) : G) * (1 : G) : G ⧸ K)
-      rw [mul_one]
-    · rintro ⟨g, hg, rfl⟩
-      exact ⟨⟨g, hg⟩, by
-        show ((⟨g, hg⟩ : ↥H) • ((1 : G) : G ⧸ K) : G ⧸ K) = ((g : G) : G ⧸ K)
-        change ((g : G) * (1 : G) : G ⧸ K) = ((g : G) : G ⧸ K)
-        rw [mul_one]⟩
-  -- (3) stabilizer of (1 : G ⧸ K) in H equals K.subgroupOf H.
-  have h_stab_eq : MulAction.stabilizer ↥H (((1 : G) : G ⧸ K)) = K.subgroupOf H := by
-    ext h
-    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf]
-    constructor
-    · intro hsmul
-      have hraw : (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K) := hsmul
-      rw [mul_one] at hraw
-      -- hraw : ((h : G) : G ⧸ K) = ((1 : G) : G ⧸ K) iff (h:G)⁻¹ * 1 ∈ K iff (h:G)⁻¹ ∈ K iff (h:G) ∈ K
-      have := QuotientGroup.eq.mp hraw
-      simpa using this
-    · intro hh
-      show (((h : G) : G) * (1 : G) : G ⧸ K) = ((1 : G) : G ⧸ K)
-      rw [mul_one]
-      apply QuotientGroup.eq.mpr
-      simpa using hh
-  -- (4) Orbit-stabilizer: |orbit| · |stabilizer| = |H|.
-  have h_orbstab : Nat.card (MulAction.orbit ↥H (((1 : G) : G ⧸ K))) *
-      Nat.card (MulAction.stabilizer ↥H (((1 : G) : G ⧸ K))) = Nat.card ↥H := by
-    rw [← Nat.card_prod]
-    exact Nat.card_congr (MulAction.orbitProdStabilizerEquivGroup ↥H _)
-  -- (5) |K.subgroupOf H| = |H ⊓ K|.
-  have h_subgrpof_card : Nat.card ↥(K.subgroupOf H) = Nat.card ↥(H ⊓ K) := by
-    rw [show K.subgroupOf H = (H ⊓ K).subgroupOf H from
-      (Subgroup.inf_subgroupOf_left K H).symm]
-    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
-  -- (6) Combine all.
-  rw [h_orbit_eq, h_stab_eq, h_subgrpof_card] at h_orbstab
-  -- h_orbstab : Nat.card ((H : Set G).image ↑) * Nat.card (H ⊓ K) = Nat.card H
-  rw [h1]
-  -- Goal: Nat.card K * Nat.card (image) * Nat.card (H ⊓ K) = Nat.card H * Nat.card K
-  rw [mul_assoc, h_orbstab, mul_comm]
 
 open scoped Pointwise in
 /-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
