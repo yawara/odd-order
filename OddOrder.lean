@@ -2,6 +2,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
 import OddOrder.Isaacs.Ch01_Sylow
 import OddOrder.Isaacs.Ch02_Subnormality
