@@ -27,7 +27,7 @@
 | §3C Thm 3.17 (3 subgroups solvability) | **placeholder 移動** (2026-05-22) | 同上 (`Ch07_ThompsonSubgroup/ForwardFromCh03.lean`). 単純群場合分けで Burnside 必要. |
 | §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着 |
 | §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
-| §3D Hall-Higman 1.2.3 (3.21) | **inline (Ch.3 §3D)** (2026-05-23) | Isaacs proof は Ch.3 内部資産 (π-separable normal series + centralizer + SZ + Sylow) で完結 ⇒ true owner = Ch.3 §3D. 旧 `Ch06_FrobeniusActions/ForwardFromCh03.lean` placeholder は配置ミスで削除. 実装は L910 周辺に inline. |
+| §3D Hall-Higman 1.2.3 (3.21) | ✅⭐⭐ (2026-05-23 ralph-loop) | `hall_higman_1_2_3` — G π-separable + `oPiCore π' G = ⊥` ⇒ `centralizer(oPiCore π G) ≤ oPiCore π G`. case π body + case π' body + main assembly (~350 LOC 累計: helpers 200 + cases 130 + main 25). AxiomsCheck flagship 入り (3 標準公理のみで unconditional). 下流引用: Ch.4 4.33, Ch.7 7.5/7.6. |
 | §3E `IsAInvariant` 定義 | ✅ (2026-05-22) | `IsAInvariant`, `.top`, `.bot`, `.inf`, `.sup` (Ch.3 内に残置, definition のみ) |
 | §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |
 | §3F 巡回商 lift (3.35 弱版) | ✅ (2026-05-22) | `cyclic_quotient_lift`: G/H cyclic ⇒ ∃ g, ⟨g⟩ ⊔ H = ⊤. 弱版を Quotient.mk_surjective + zpowers で証明. 旧 axiom statement は inconsistent (H ≤ K + K ⊔ H = ⊤ ⇒ K = ⊤ で card 等式が \|G/H\| = \|H\| に帰着し反例あり) のため置換 |
