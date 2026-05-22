@@ -155,6 +155,24 @@ theorem mem_fixedPointsOfMulAut {A G : Type*} [Group A] [Group G]
     {φ : A →* MulAut G} {g : G} :
     g ∈ fixedPointsOfMulAut φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
 
+/-- 内自己同型作用 (`MulAut.conj : G →* MulAut G`) の固定点は `Subgroup.center G`. -/
+theorem fixedPointsOfMulAut_conj_eq_center {G : Type*} [Group G] :
+    fixedPointsOfMulAut (MulAut.conj : G →* MulAut G) = Subgroup.center G := by
+  ext x
+  rw [mem_fixedPointsOfMulAut, Subgroup.mem_center_iff]
+  constructor
+  · intro h g
+    have hg := h g
+    rw [MulAut.conj_apply] at hg
+    -- hg : g * x * g⁻¹ = x
+    calc g * x = g * x * g⁻¹ * g := by group
+      _ = x * g := by rw [hg]
+  · intro h g
+    rw [MulAut.conj_apply]
+    -- want: g * x * g⁻¹ = x
+    calc g * x * g⁻¹ = x * g * g⁻¹ := by rw [h g]
+      _ = x := by group
+
 /-- **`Subgroup.centralizer` の bijective hom 像**: bijective `f : G →* G'` で
 `(centralizer s).map f = centralizer (f '' s)`. mathlib v4.29.1 では `≤` 方向のみ
 (`map_centralizer_le_centralizer_image`). -/
