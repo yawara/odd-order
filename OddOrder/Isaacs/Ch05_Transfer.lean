@@ -72,6 +72,8 @@ transfer-evaluation を直接利用 (1 件).
 
 namespace OddOrder.Isaacs.Ch05
 
+open Pointwise
+
 variable {G : Type*} [Group G]
 
 section /- 5A: Transfer definition + homomorphism (pp. 147-153) -/
@@ -109,13 +111,82 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 
 - **Lemma 5.11** (Hall index transfer): mathlib 直接対応なし. Hall 性 + transfer 計算で
   導出. 形式化保留 (FT 経路で要求軽).
-- **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): mathlib 直接対応なし.
-  Sylow conjugacy + 直接計算. 形式化保留.
+- **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion`
+  ✅ — Sylow II in C_G(y) + 直接計算.
 - **Thm 5.13 Burnside**: `MonoidHom.ker_transferSylow_isComplement'` 直接.
 - **Cor 5.14**: `IsCyclic.isComplement'` 直接.
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16-5.17** (Z-group 構造): mathlib `IsZGroup` API 直接.
 - **Cor 5.19** (Sylow_2 cyclic direct factor ⇒ 非単純): 形式化保留. -/
+
+/-- **Isaacs Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion):
+`P ∈ Syl_p(G)`, `x, y ∈ C_G(P)` が `G` で共役 (∃ g, gxg⁻¹ = y) ⇒ `N_G(P)` で共役.
+
+**証明** (Isaacs p.161): `y = x^g` (g ∈ G). `x ∈ C_G(P)` から `q ∈ P` は `x` と可換 ⇒
+`gqg⁻¹` は `gxg⁻¹ = y` と可換 ⇒ `gPg⁻¹ ⊆ C_G(y)`. 一方 `y ∈ C_G(P)` から `P ⊆ C_G(y)`.
+ゆえに `P`, `gPg⁻¹` は `C_G(y)` の Sylow_p. Sylow II in `C_G(y)` で `c ∈ C_G(y)` 存在し
+`c (gPg⁻¹) c⁻¹ = P`, i.e., `(cg) ∈ N_G(P)`. `(cg) x (cg)⁻¹ = c y c⁻¹ = y`. -/
+theorem normalizer_controls_centralizer_fusion
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    {x y g : G}
+    (hx : x ∈ Subgroup.centralizer (P : Set G))
+    (hy : y ∈ Subgroup.centralizer (P : Set G))
+    (hgxy : g * x * g⁻¹ = y) :
+    ∃ n : G, n ∈ Subgroup.normalizer (P : Subgroup G) ∧ n * x * n⁻¹ = y := by
+  set K : Subgroup G := Subgroup.centralizer ({y} : Set G) with hK_def
+  -- y ∈ C_G(P) ⇒ P ≤ K = C_G(y)
+  have hP_le_K : (P : Subgroup G) ≤ K := by
+    intro q hq z hz
+    rw [Set.mem_singleton_iff] at hz; subst hz
+    exact (Subgroup.mem_centralizer_iff.mp hy q hq).symm
+  -- x ∈ C_G(P) ⇒ gPg⁻¹ ≤ K (using Sylow's G-action via MulAut.conj)
+  have hPg_le_K : ((g • P : Sylow p G) : Subgroup G) ≤ K := by
+    rw [Sylow.coe_subgroup_smul]
+    intro w hw
+    -- w = g * q * g⁻¹ for some q ∈ P
+    obtain ⟨q, hq_mem, hqw⟩ : ∃ q ∈ (P : Subgroup G), g * q * g⁻¹ = w := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hw
+      refine ⟨(MulAut.conj g)⁻¹ w, hw, ?_⟩
+      have heq : (MulAut.conj g) ((MulAut.conj g)⁻¹ w) = w :=
+        MulAut.apply_inv_self G (MulAut.conj g) w
+      simpa [MulAut.conj] using heq
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff] at hz; subst hz
+    have hxq : q * x = x * q := Subgroup.mem_centralizer_iff.mp hx q hq_mem
+    -- w * y = (g q g⁻¹) * (g x g⁻¹) = g (q x) g⁻¹ = g (x q) g⁻¹ = (g x g⁻¹) * (g q g⁻¹) = y * w
+    rw [← hqw, ← hgxy]
+    calc (g * x * g⁻¹) * (g * q * g⁻¹)
+        = g * (x * q) * g⁻¹ := by group
+      _ = g * (q * x) * g⁻¹ := by rw [← hxq]
+      _ = (g * q * g⁻¹) * (g * x * g⁻¹) := by group
+  -- Promote to Sylow p K
+  let P_K : Sylow p K := P.subtype hP_le_K
+  let Pg_K : Sylow p K := (g • P).subtype hPg_le_K
+  -- Sylow II in K: there exists c : K with c • Pg_K = P_K
+  haveI : Finite K := inferInstance
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq (M := K) Pg_K P_K
+  -- Translate back: c • Pg_K = P_K via Sylow.smul_subtype ⇒ (c.val • (g • P)).subtype = P.subtype
+  have h_subtype_eq : ((c : G) • g • P).subtype (Sylow.smul_le hPg_le_K c) = P_K := by
+    rw [show ((c : G) • g • P).subtype (Sylow.smul_le hPg_le_K c) =
+        c • (g • P).subtype hPg_le_K from (Sylow.smul_subtype hPg_le_K c).symm]
+    exact hc
+  have hcgP : (c : G) • g • P = P := Sylow.subtype_injective h_subtype_eq
+  -- (c * g) • P = P, so c * g ∈ N_G(P)
+  have hcgP_smul : ((c : G) * g) • P = P := by rw [mul_smul]; exact hcgP
+  refine ⟨(c : G) * g, ?_, ?_⟩
+  · -- (c * g) ∈ N_G(P)
+    rw [← Sylow.smul_eq_iff_mem_normalizer]
+    exact hcgP_smul
+  · -- (cg) * x * (cg)⁻¹ = c * (g x g⁻¹) * c⁻¹ = c * y * c⁻¹ = y (c ∈ K = C_G(y))
+    have hcy : y * (c : G) = (c : G) * y := by
+      have hcK : (c : G) ∈ K := c.property
+      exact Subgroup.mem_centralizer_iff.mp hcK y (Set.mem_singleton y)
+    calc ((c : G) * g) * x * ((c : G) * g)⁻¹
+        = (c : G) * (g * x * g⁻¹) * (c : G)⁻¹ := by group
+      _ = (c : G) * y * (c : G)⁻¹ := by rw [hgxy]
+      _ = y * (c : G) * (c : G)⁻¹ := by rw [← hcy]
+      _ = y := by group
 
 /-- **Isaacs Thm 5.18**: `P` abelian Sylow_p ⇒ `G' ∩ P = focalSubgroup P` ((Burnside 強化形).
 
