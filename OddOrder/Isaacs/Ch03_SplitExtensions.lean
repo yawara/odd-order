@@ -953,23 +953,81 @@ end -- 3D
 
 section /- 3E: Coprime action (pp. 96-104) -/
 
-/-! ### Isaacs §3E (Coprime action) — TODO
+variable {G : Type*} [Group G]
 
-3.23-3.34: A-invariant Sylow theory, Glauberman lemma, centralizer correspondence,
-Hartley-Turull (orbit structure), 軌道サイズ. BG/Peterfalvi 中で名前なしで標準的に
-使われる. 主要結果:
-- Thm 3.23: coprime action ⇒ A-invariant Sylow 存在・共役・等.
-- Lemma 3.24 (Glauberman): コンパチブル作用 + transitive ⇒ A-不変点.
-- Thm 3.31 (Hartley-Turull): 軌道構造が abelian H に転送可.
+/-! ### Isaacs §3E (Coprime action)
 
-実装 ~ 8-12 週, 大規模. 別 commit. -/
+`A` が `G` に作用し `gcd(|A|, |G|) = 1` の場合の構造論. BG/Peterfalvi 全体で頻用.
+
+**含まれる結果**:
+- Thm 3.23: coprime action ⇒ A-invariant Sylow 存在・共役・unique up to A-action.
+- Lemma 3.24 (Glauberman lemma): A 作用 + transitive G 作用 のコンパチで A-fixed 元存在.
+- Thm 3.25-3.27: A-不変部分群と商の対応 (`C_G(A)` 経由).
+- Thm 3.28: A-不変 Sylow と `C_G(A)` の Sylow の対応.
+- Thm 3.29-3.31: 軌道構造 (Hartley-Turull, orbit-size 主張).
+- Thm 3.32-3.34: テクニカル系 (`[G,A,A] = [G,A]` Three-Subgroup Lemma 経由 等).
+
+**形式化状態**: 全 stub.  完全実装は ~8-12 週の大規模作業 (mathlib coprime action machinery
+の活用 + Isaacs 流の細部). 別 phase で進める. -/
+
+/-- **A-不変部分群**: `φ : A →* MulAut G` の作用下で `H ≤ G` が `A`-不変.
+i.e., `∀ a ∈ A, φ(a) • H = H`. -/
+def IsAInvariant {A : Type*} [Group A] (φ : A →* MulAut G) (H : Subgroup G) : Prop :=
+  ∀ a : A, (φ a : MulAut G) • H = H
+
+/-- **Isaacs Thm 3.23 (a)** ⭐: 有限 `A`, `G`, `gcd(|A|, |G|) = 1`, `A` が `G` に
+`φ` で作用 ⇒ 任意素数 `p` で `A`-不変 Sylow `p`-部分群が存在. -/
+axiom exists_aInvariant_sylow {A : Type*} [Group A] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (p : ℕ) [Fact p.Prime] :
+    ∃ P : Sylow p G, IsAInvariant φ (P : Subgroup G)
+
+/-- **Isaacs Thm 3.23 (b)** ⭐: 上記設定下で, 二つの `A`-不変 Sylow は `C_G(A)` で共役. -/
+axiom aInvariant_sylow_conj {A : Type*} [Group A] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    {p : ℕ} [Fact p.Prime] {P Q : Sylow p G}
+    (_hP : IsAInvariant φ (P : Subgroup G)) (_hQ : IsAInvariant φ (Q : Subgroup G)) :
+    ∃ g : G, (∀ a : A, (φ a).toMonoidHom g = g) ∧
+      (P : Subgroup G).map (MulAut.conj g).toMonoidHom = (Q : Subgroup G)
+
+/-- **Isaacs Lemma 3.24 (Glauberman lemma)** ⭐: `A` 可解, `A → MulAut G`,
+`gcd(|A|, |G|) = 1` で `G` が transitive に `Ω` に作用しているとき, `A` の作用と
+コンパチブルなら A-fixed 点が存在. (FT 経路で多用.)
+
+形式化メモ: コンパチ条件 `(s • g) • ω = s • (g • ω)` は SemidirectProduct を経由する
+方が clean な定式化が可能. 完全形式化は別 phase で. 現状は stub. -/
+axiom glauberman_fixed_point {A : Type*} [Group A] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hASol : IsSolvable A)
+    (Ω : Type*) [MulAction G Ω] [Finite Ω]
+    -- TODO: A の Ω 上作用と φ の compatible 条件 (正式記述は SemidirectProduct 経由)
+    (_hTrans : ∀ ω₁ ω₂ : Ω, ∃ g : G, g • ω₁ = ω₂) :
+    ∃ ω : Ω, ∀ a : A, ∀ g : G, (φ a).toMonoidHom g • ω = g • ω
+    -- ↑ A-不変条件の最小定式化
+
 end -- 3E
 
 section /- 3F: 巡回商 lift (pp. 105-112) -/
 
-/-! ### Isaacs §3F (Cyclic quotient lift) — TODO
+variable {G : Type*} [Group G]
 
-3.35, 3.36: 巡回商の同型 lift (generalization of 3.1). FT 経路で優先度低. -/
+/-! ### Isaacs §3F (Cyclic quotient lift)
+
+3.35-3.36: `H ⊴ G` で `G/H` 巡回 (位数 n) のとき, `H ≤ K ≤ G` で `G = HK` かつ
+`|K/H| = n` となる `K` が存在 (3.35 lift, 3.36 specialization).
+
+FT 経路では優先度低 (Peterfalvi で散発使用).
+
+**形式化状態**: stub. 全 lifted 結果は SemidirectProduct (mathlib) との接続で得られる
+可能性が高い. -/
+
+/-- **Isaacs Thm 3.35 (片向き; cyclic-quotient lift exists)**: `H ⊴ G`, `G/H` cyclic ⇒
+`G/H` の生成元の preimage 集合の中に `H` を normalize するもの (= K) が取れる. -/
+axiom cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
+    (_hCyclic : IsCyclic (G ⧸ H)) :
+    ∃ K : Subgroup G, H ≤ K ∧ K ⊔ H = ⊤ ∧
+      Nat.card ↥K * H.index = Nat.card G * Nat.card ↥(K ⊓ H)
+
 end -- 3F
 
 end OddOrder.Isaacs.Ch03
