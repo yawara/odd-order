@@ -197,16 +197,56 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
     (hCyclic : IsCyclic (G ⧸ A)) :
     _root_.commutator G = ⁅A, (⊤ : Subgroup G)⁆ := by
   refine le_antisymm ?_ (commutator_top_subgroup_le_commutator A)
-  -- (≤) direction: 残り方向. `commutative_of_cyclic_center_quotient` (Cyclic.lean:180) で
-  -- Q := G/⁅A,⊤⁆ が abelian を示し commutator G ⊆ ⁅A,⊤⁆ を導出予定. 構造 step:
-  --   1. ⁅A,⊤⁆ ≤ A (commutator_top_left_le_iff + commutator_comm + A 正規).
-  --   2. lift f : G/⁅A,⊤⁆ →* G/A (QuotientGroup.lift, codomain cyclic by hypothesis).
-  --   3. f.ker = image(A) ≤ center(G/⁅A,⊤⁆) (∵ ⁅a,g⁆ ∈ ⁅A,⊤⁆ ⇒ Q で ag = ga).
-  --   4. commutative_of_cyclic_center_quotient ⇒ G/⁅A,⊤⁆ commutative.
-  --   5. commutator G ⊆ kernel of mk' = ⁅A,⊤⁆.
-  -- API gotcha 残: QuotientGroup.mk'_eq_mk'_iff_div_mem 名前不在, lift_mk' signature,
-  -- center_mem_iff vs mem_center_iff 等. 次セッションで API 確定後完成予定.
-  sorry
+  -- (≤) direction: G/⁅A,⊤⁆ が abelian であることを示し commutator G ⊆ ⁅A,⊤⁆ を導出.
+  set H : Subgroup G := ⁅A, (⊤ : Subgroup G)⁆ with hHeq
+  -- Step 1: H ≤ A.
+  have hHleA : H ≤ A := by
+    show ⁅A, (⊤ : Subgroup G)⁆ ≤ A
+    rw [Subgroup.commutator_comm]
+    exact (Subgroup.commutator_top_left_le_iff (H := A)).mpr ‹A.Normal›
+  -- Step 2: lift f : G/H →* G/A.
+  let f : G ⧸ H →* G ⧸ A :=
+    QuotientGroup.lift H (QuotientGroup.mk' A) (fun x hx => by
+      simp only [MonoidHom.mem_ker, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact hHleA hx)
+  -- Step 3: f.ker ≤ center(G/H).
+  have hker_central : f.ker ≤ Subgroup.center (G ⧸ H) := by
+    intro q hq
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective q
+    -- hq : f ↑y = 1. f ↑y = (mk' A) y by lift_mk'.
+    have hyA : y ∈ A := by
+      have hfy : f ((y : G) : G ⧸ H) = ((y : G) : G ⧸ A) := by
+        change QuotientGroup.lift H (QuotientGroup.mk' A) _ ((y : G) : G ⧸ H) = _
+        exact QuotientGroup.lift_mk' _ _ y
+      rw [MonoidHom.mem_ker, hfy, QuotientGroup.eq_one_iff] at hq
+      exact hq
+    rw [Subgroup.mem_center_iff]
+    intro x
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+    -- Goal: (g : G ⧸ H) * (y : G ⧸ H) = (y : G ⧸ H) * (g : G ⧸ H).
+    show ((g : G) : G ⧸ H) * ((y : G) : G ⧸ H) = ((y : G) : G ⧸ H) * ((g : G) : G ⧸ H)
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul]
+    rw [QuotientGroup.eq_iff_div_mem]
+    -- (g * y) / (y * g) ∈ H. Compute (g*y)*(y*g)⁻¹ = g*y*g⁻¹*y⁻¹ = ⁅g, y⁆ = ⁅y, g⁆⁻¹.
+    have heq : g * y / (y * g) = ⁅g, y⁆ := by
+      simp only [div_eq_mul_inv, commutatorElement_def]; group
+    rw [heq]
+    -- ⁅g, y⁆ ∈ ⁅⊤, A⁆ = ⁅A, ⊤⁆ = H.
+    rw [hHeq, Subgroup.commutator_comm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top g) hyA
+  -- Step 4: G/H is abelian.
+  have habelian : ∀ a b : G ⧸ H, a * b = b * a :=
+    commutative_of_cyclic_center_quotient f hker_central
+  -- Step 5: commutator G ⊆ H.
+  rw [_root_.commutator_def, Subgroup.commutator_def, Subgroup.closure_le]
+  rintro _ ⟨a, _, b, _, rfl⟩
+  show ⁅a, b⁆ ∈ H
+  rw [← QuotientGroup.eq_one_iff (N := H)]
+  show ((⁅a, b⁆ : G) : G ⧸ H) = 1
+  rw [show ((⁅a, b⁆ : G) : G ⧸ H) = ⁅(a : G ⧸ H), (b : G ⧸ H)⁆ by
+    simp only [commutatorElement_def, QuotientGroup.mk_mul, QuotientGroup.mk_inv]]
+  rw [commutatorElement_eq_one_iff_mul_comm]
+  exact habelian _ _
 
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
 `|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
