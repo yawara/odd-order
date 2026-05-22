@@ -162,6 +162,31 @@ instance powMonoidHom_range_characteristic
     rw [← map_pow]
     exact congrArg φ hy
 
+/-- **`Nat.card (↥K ⧸ N.subgroupOf K) = Nat.card (K.map qmk_N)`** via first iso.
+`f := (QuotientGroup.mk' N).comp K.subtype` has `ker = N.subgroupOf K`, `range = K.map qmk_N`.
+`quotientKerEquivRange` gives the equiv, take Nat.card_congr. -/
+theorem nat_card_quotient_subgroupOf_eq_card_map {G : Type*} [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] (K : Subgroup G) :
+    Nat.card ((↥K) ⧸ (N.subgroupOf K)) = Nat.card (K.map (QuotientGroup.mk' N)) := by
+  let f0 : ↥K →* G ⧸ N := (QuotientGroup.mk' N).comp K.subtype
+  have hker : f0.ker = N.subgroupOf K := by
+    ext ⟨x, hx⟩
+    simp only [f0, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+  have hrange : f0.range = K.map (QuotientGroup.mk' N) := by
+    ext y
+    constructor
+    · rintro ⟨⟨x, hx⟩, hxy⟩
+      exact ⟨x, hx, hxy⟩
+    · rintro ⟨x, hx, hxy⟩
+      exact ⟨⟨x, hx⟩, hxy⟩
+  have hEq : Nat.card ((↥K) ⧸ f0.ker) = Nat.card ↥(f0.range) :=
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange f0).toEquiv
+  -- Substitute the equal subgroups.
+  conv_lhs => rw [show N.subgroupOf K = f0.ker from hker.symm]
+  conv_rhs => rw [show K.map (QuotientGroup.mk' N) = f0.range from hrange.symm]
+  exact hEq
+
 /-- **comap of subgroup of `C.map qmk` is ≤ C** when `B ≤ C` (`B = ker qmk`).
 `K_GB ≤ C.map qmk ⇒ K_GB.comap qmk ≤ B ⊔ C = C`. -/
 theorem comap_le_of_le_map_quotient {G : Type*} [Group G]
