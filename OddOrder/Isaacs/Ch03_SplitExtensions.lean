@@ -975,6 +975,26 @@ i.e., `∀ a ∈ A, φ(a) • H = H`. -/
 def IsAInvariant {A : Type*} [Group A] (φ : A →* MulAut G) (H : Subgroup G) : Prop :=
   ∀ a : A, (φ a : MulAut G) • H = H
 
+/-- ⊤ は常に A-不変. -/
+theorem IsAInvariant.top {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (⊤ : Subgroup G) := fun a => by
+  ext x
+  simp only [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_top]
+
+/-- ⊥ は常に A-不変. -/
+theorem IsAInvariant.bot {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (⊥ : Subgroup G) := fun _ => Subgroup.smul_bot _
+
+/-- A-不変部分群の交わりは A-不変. -/
+theorem IsAInvariant.inf {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
+    (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊓ K) := fun a => by
+  rw [Subgroup.smul_inf, hH a, hK a]
+
+/-- A-不変部分群の sup は A-不変. -/
+theorem IsAInvariant.sup {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
+    (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊔ K) := fun a => by
+  rw [Subgroup.smul_sup, hH a, hK a]
+
 /-- **Isaacs Thm 3.23 (a)** ⭐: 有限 `A`, `G`, `gcd(|A|, |G|) = 1`, `A` が `G` に
 `φ` で作用 ⇒ 任意素数 `p` で `A`-不変 Sylow `p`-部分群が存在. -/
 axiom exists_aInvariant_sylow {A : Type*} [Group A] [Finite A] [Finite G]
