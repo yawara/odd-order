@@ -1608,6 +1608,15 @@ theorem IsAInvariant.commutator_self {A : Type*} [Group A] (φ : A →* MulAut G
   rw [← derivedSeries_one]
   exact IsAInvariant.derivedSeries φ 1
 
+/-- A-不変な集合 S の生成部分群 `Subgroup.closure S` は A-不変. -/
+theorem IsAInvariant.closure_of_invariant_set {A : Type*} [Group A] {φ : A →* MulAut G}
+    {S : Set G} (hS : ∀ a : A, (φ a) '' S = S) :
+    IsAInvariant φ (Subgroup.closure S) := fun a => by
+  show (Subgroup.closure S).map (φ a).toMonoidHom = Subgroup.closure S
+  rw [MonoidHom.map_closure]
+  congr 1
+  exact hS a
+
 /-- A-不変 + A-不変 の commutator は A-不変 (`Subgroup.map_commutator`). -/
 theorem IsAInvariant.commutator {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) :
