@@ -164,6 +164,14 @@ theorem fixedPointsOfMulAut_one_eq_top {A G : Type*} [Group A] [Group G] :
   intro a
   rfl
 
+/-- **`fixedPointsOfMulAut` の monotonicity (反変)**: B → A の hom があれば
+`fixedPoints φ ≤ fixedPoints (φ ∘ f)`. より小さい acting group では固定点が増える. -/
+theorem fixedPointsOfMulAut_mono {A B G : Type*} [Group A] [Group B] [Group G]
+    (f : B →* A) (φ : A →* MulAut G) :
+    fixedPointsOfMulAut φ ≤ fixedPointsOfMulAut (φ.comp f) := by
+  intro x hx b
+  exact hx (f b)
+
 /-- 内自己同型作用 (`MulAut.conj : G →* MulAut G`) の固定点は `Subgroup.center G`. -/
 theorem fixedPointsOfMulAut_conj_eq_center {G : Type*} [Group G] :
     fixedPointsOfMulAut (MulAut.conj : G →* MulAut G) = Subgroup.center G := by
