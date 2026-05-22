@@ -20,10 +20,12 @@
 | Thm 4.8 (p>2 class≤2 ⇒ {x^p=1} 群) | docstring | Baer trick (4.37) 前身. |
 | **Cor 4.10** (Three-sub mod N) | ✅ | `commutator_commutator_le_of_rotate`. 商写像 G→G/N で push し mathlib `commutator_commutator_eq_bot_of_rotate` 適用. |
 | **Thm 4.11** ⭐ (lcs additivity) | ✅ (2026-05-23) | `commutator_lowerCentralSeries_le`: `⁅lcs i, lcs j⁆ ≤ lcs (i+j+1)`. `j`-induction (`i` free), step は Cor 4.10 を `H₁=lcs j, H₂=⊤, H₃=lcs i, N=lcs (i+j+2)` で適用. h1: `⁅⊤, lcs i⁆ = lcs (i+1)` 経由で IH at `(i+1)`. h2: IH + commutator_mono + lcs_succ 定義. mathlib `Characteristic (lcs n)` instance が `[N.Normal]` を自動提供. ~30 LOC. |
-| Cor 4.12 (weight n commutator ⊆ G^n) | docstring | `weight n commutator` 汎用 mathlib API 不在; 個別誘導で書けるが優先度低. |
+| **Cor 4.12** (weight n commutator ⊆ G^n) | ✅ (2026-05-23) | `iterLeftCommutator g [g₁,...,gₙ] ∈ lcs G n`. `iterLeftCommutator` を `List.foldl ⁅·, ·⁆` で定義し, 汎用補題 `iterLeftCommutator_mem_lowerCentralSeries_add (n acc) (hacc : acc ∈ lcs n) (gs)` を gs-induction で証明: step は `⁅acc, g⁆ ∈ ⁅lcs n, ⊤⁆ = lcs (n+1)` (mathlib `commutator_mem_commutator` + `lowerCentralSeries` 定義式). 主結果は `n = 0, acc ∈ ⊤ = lcs 0` で specialize. |
 | **Cor 4.13** (derived ⊆ lcs exponential) | ✅ (2026-05-23) | `derivedSeries_le_lowerCentralSeries_two_pow_sub_one`: `derivedSeries G r ≤ lcs G (2^r - 1)`. mathlib 既存 `derived_le_lower_central` (`derived r ≤ lcs r`) より strictly stronger (r ≥ 2 で lcs antitone). 証明: `r`-induction + `derivedSeries_succ` + commutator_mono + **Thm 4.11** + 算術 (`pow_succ` + omega + `Nat.one_le_two_pow`). ~10 LOC. |
 
-§4B-§4D 残: §4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster). §4B Mann (4.14-4.19) は Phase 1 skip 可.
+§4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
+
+§4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster) が次の主戦場.
 
 前提は Ch.3 (特に Cor 3.28 coprime quotient, Lemma 3.21 Hall-Higman 1.2.3) と Ch.1 (Frattini, nilpotency)。
 
