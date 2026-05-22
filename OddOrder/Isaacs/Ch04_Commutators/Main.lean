@@ -171,14 +171,25 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 /-! **Isaacs Lemma 4.5** (`P/N` elementary abelian ⇔ `Φ(P) ⊆ N`):
 mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述). -/
 
-/-! **Isaacs Lemma 4.6** ⭐ (章内 5 引用 + Ch.5/7/10 で多用 — 章内ハブ):
-`A ⊴ G` abelian + `G/A` cyclic ⇒ `G' = ⁅A, G⁆` かつ `G' ≅ A / (A ∩ Z(G))`.
+/-- **Isaacs Lemma 4.6** ⭐ (章内 5 引用 + Ch.5/7/10 で多用 — 章内ハブ):
+`A ⊴ G` abelian + `G/A` cyclic ⇒ `G' = ⁅A, G⁆` (commutator subgroup).
 
-**証明骨子** (Isaacs p.118): `G/A` cyclic は生成元 `gA` を持ち `G = A · ⟨g⟩`. 任意 commutator は
-`A`-abelian と `⟨g⟩`-cyclic で `⁅a, g⟩` 形に reduce. 写像 `A → ⁅A, G⁆`, `a ↦ ⁅a, g⁆` の核が
-`A ∩ Z(G)`.
+(本 statement は前半. 後半 `G' ≅ A / (A ∩ Z(G))` の同型は別途 statement 化予定.)
 
-形式化保留 (~150 行 LOC. semidirect 構造 + abelian 計算). 章内最頻引用なので後続. -/
+**証明骨子** (Isaacs p.118):
+- `⁅A, G⁆ ≤ G'`: `commutator_mono` で `A ≤ G ⇒ ⁅A, G⁆ ≤ ⁅G, G⁆ = G'`.
+- `G' ≤ ⁅A, G⁆`: `G/A` abelian (cyclic ⇒ abelian) ⇒ `G' ≤ A`.
+  `G/A` 巡回で `G = A · ⟨g⟩` (`g` lift). 任意 commutator `⁅x, y⁆` (`x = a · g^i, y = b · g^j`)
+  は abelian 性で `⁅A, G⁆` 内に reduce. 詳細は `cyclic_quotient_lift` (Ch.3 §3F) +
+  abelian 計算.
+
+形式化保留 (~150 LOC. cyclic_quotient_lift + commutator-expansion identities). -/
+theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
+    {A : Subgroup G} [A.Normal] [Finite G]
+    (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_hCyclic : IsCyclic (G ⧸ A)) :
+    _root_.commutator G = ⁅A, (⊤ : Subgroup G)⁆ := by
+  sorry
 
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
 `|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
