@@ -29,7 +29,7 @@
 | §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
 | §3D Hall-Higman 1.2.3 (3.21) | axiom (2026-05-22) | proper signature `Subgroup.centralizer (oPiCore π G) ≤ oPiCore π G` under `oPiCore πᶜ G = ⊥` |
 | §3E `IsAInvariant` 定義 + Thm 3.23 (a/b) + Lemma 3.24 | axiom (2026-05-22) | proper signatures for `exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point`. 完全実装は ~8-12 週 |
-| §3F 巡回商 lift (3.35-3.36) | axiom (2026-05-22) | `cyclic_quotient_lift` proper signature |
+| §3F 巡回商 lift (3.35 弱版) | ✅ (2026-05-22) | `cyclic_quotient_lift`: G/H cyclic ⇒ ∃ g, ⟨g⟩ ⊔ H = ⊤. 弱版を Quotient.mk_surjective + zpowers で証明. 旧 axiom statement は inconsistent (H ≤ K + K ⊔ H = ⊤ ⇒ K = ⊤ で card 等式が \|G/H\| = \|H\| に帰着し反例あり) のため置換 |
 
 ## mmd 抽出失敗の整理
 
