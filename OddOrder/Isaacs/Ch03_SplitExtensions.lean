@@ -1620,6 +1620,14 @@ theorem IsAInvariant.centralizer {A : Type*} [Group A] {φ : A →* MulAut G} {H
       fun x => MulAut.inv_apply_self G (φ a) x] at heq
     exact heq
 
+/-- A-不変部分群族の iSup は A-不変. -/
+theorem IsAInvariant.iSup {A : Type*} [Group A] {φ : A →* MulAut G} {ι : Sort*}
+    {f : ι → Subgroup G} (hf : ∀ i, IsAInvariant φ (f i)) :
+    IsAInvariant φ (⨆ i, f i) := fun a => by
+  show (⨆ i, f i).map (φ a).toMonoidHom = ⨆ i, f i
+  rw [Subgroup.map_iSup]
+  exact iSup_congr fun i => hf i a
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
