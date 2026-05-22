@@ -2590,12 +2590,16 @@ theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A
 
 これは Lucchini の核心部 (induction の base step). 完全形式化は深い構造:
 * Cor 2.19 (✅) で `|A| ≥ |G:A|` を仮定して `A ⊓ F(G) > 1` ⇒ `F(G) > 1` を導出.
-* minimal normal `E ⊆ F(G)` を選び, `E ⊆ Z(F(G))` + elementary abelian p (Thm 1.49 系).
+* minimal normal `E ⊆ F(G)` を選び, **`E ⊆ Z(F(G))`** + elementary abelian p.
+  この補題 ("Z(F(G)) absorbs G-minimal normal in F(G)") は **Ch.4 §4A-§4B 領域** の
+  `lowerCentralSeries` 加法性 (Isaacs Thm 4.11) を要する. 詳細は
+  [`notes/isaacs/ch04_commutators.md`](../../notes/isaacs/ch04_commutators.md) 内の
+  「逆引き: Ch.2 §2D Lucchini K = ⊥ case」セクション.
 * `AE < G` (K = 1 で), G/E に IH 適用, `M̄ = core(Ā)` の解析.
 * M abelian / 非可換 sub-case で `M ⊴ G + M ⊆ A` を導いて K = 1 と矛盾.
 
-実装方針: 完全形式化は Thm 1.49 / Z(F(G)) の inner structure + Frobenius p-element
-解析が必要で ~200 行. 本リポでは K = ⊥ case のみ narrower axiom 化. -/
+実装方針: Ch.4 §4A-§4B 完成後 ~150-200 行で本 axiom を theorem 化可能.
+**前提**: Ch.4 Thm 4.11 (`[γᵢ(F), γⱼ(F)] ⊆ γᵢ₊ⱼ(F)`) を mathlib 拡張で実装. -/
 axiom lucchini_K_bot_aux [Finite G] {A : Subgroup G}
     (_hA_proper : A < ⊤)
     (_hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)

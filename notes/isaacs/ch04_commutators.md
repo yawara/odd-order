@@ -241,6 +241,57 @@ Ch.1, Ch.2 完了かつ Ch.3 §3E (coprime action) が一通り終わってか�
 
 **FT クリティカル優先**: 4.28, 4.29, 4.34, 4.35, 4.36 > 4.31, 4.27, 4.33 > その他.
 
+## 逆引き: 他章から Ch.4 へ要求される補題
+
+### Ch.2 §2D Lucchini Thm 2.20 (K = ⊥ case)
+
+**現状**: Lucchini の K > ⊥ inductive step は ✅ theorem 化済 (`OddOrder.Isaacs.Ch02.lucchini_aux`). K = ⊥ case のみ `lucchini_K_bot_aux` (narrower axiom) として残置.
+
+**K = ⊥ case が必要とする補題** (Ch.4 領域):
+
+> **Lemma "Z(F(G)) absorbs G-minimal normal in F(G)"**:
+> `E ⊴ G`, `E ⊆ F(G)`, `E` minimal normal in `G` ⇒ `E ⊆ Z(F(G))`.
+
+**証明スケッチ** (Isaacs Ch.4 §4A の lcs 経路):
+
+1. `F := F(G)` は冪零 (Ch.1 §1D で完成).
+2. `F` の lower central series `F = γ₁(F) ⊇ γ₂(F) ⊇ ...` は ⊥ に到達.
+3. `E` を `F` への作用で考え, 降下列 `E ⊇ [E, F] ⊇ [E, F, F] ⊇ ...` を作る.
+   各項 `[E, γᵢ(F)]` は `E ⊴ G` + `γᵢ(F) ⊴ G` (characteristic in F, F normal) で `G` で正規.
+4. `[[E, F, ..., F]_k] ⊆ E ⊓ γₖ₊₁(F)` (Ch.4 Thm 4.11 系 + 通常 mathlib 系).
+   `F` 冪零 で `γₖ₊₁(F) = ⊥` (大きな `k`) なので, 降下列は `⊥` に到達.
+5. `E` の minimality より, 降下列の最後の **非自明な** 項 = `E` (途中で ⊥ に飛ぶ前の一つ前).
+6. その項は `[E, F]` の繰り返しで, `Z(F)` に含まれる (`[E', F] = ⊥` ⇒ `E' ⊆ Z(F)`).
+
+**Ch.4 のうち何が必要か**:
+
+| 必要要素 | Ch.4 § | 状態 |
+|---|---|---|
+| `[γᵢ(F), γⱼ(F)] ⊆ γᵢ₊ⱼ(F)` (Thm 4.11) | §4B | 未実装 |
+| `E ⊴ G + N ⊴ G ⇒ [E, N] ⊴ G` (Lemma 4.1 系) | §4A | mathlib 部分有 (`commutator_normal`) |
+| `commutator_eq_bot_iff_le_centralizer` ⇒ Z(F) 解釈 | mathlib | 既存 |
+
+`[γᵢ(F), γⱼ(F)] ⊆ γᵢ₊ⱼ(F)` (Thm 4.11) は **mathlib に `lowerCentralSeries_succ`** が有るが, 一般の `i + j` 加法性は **新規実装** (~30 行) と思われる. (要確認: `Mathlib.GroupTheory.Nilpotent` での加法性 lemma の有無).
+
+**工数見積もり**: Ch.4 §4A 前半 + §4B Thm 4.11 が完成すれば, この補題自体は ~50-80 行で書ける. 加えて Lucchini K = ⊥ 本体は ~100 行 (minimal normal の選択 + AE 構造 + sub-case 解析). 計 ~150-200 行.
+
+**現実的順序**:
+
+1. Ch.4 §4A (4.1, 4.2, 4.3, 4.4, 4.5, 4.6) — mathlib 既存ラッパー + 拡張.
+2. Ch.4 §4B Thm 4.11 (lcs 加法性) — mathlib 既存 + 新規補題 1-2 件.
+3. **副産物**: 上記補題 ("Z(F(G)) absorbs G-minimal normal in F(G)") を Ch.4 内 or Ch.2 内 standalone で書く.
+4. **Ch.2 Lucchini K = ⊥ 本体** を `lucchini_K_bot_aux` の代わりに書いて axiom 解消.
+
+### Ch.3 §3C hall_C_conjugate (Thm 3.14)
+
+**現状**: axiom 残置. mathlib に Schur-Zassenhaus の **共役性** 部分 (`exists_right_complement'_of_coprime` の存在性のみ) 無し.
+
+**Ch.4 領域からの寄与**: 直接の依存無し. ただし以下が利用可能になれば形式化が楽:
+
+- Ch.4 §4D Thm 4.34 (Fitting decomposition) — abelian coprime での共役性は Fitting 経由で導出可能.
+
+**現実的に直接書くべき**: mathlib に SZ 共役性を新規実装する道 (Ch.4 とは独立) のほうが順序付け良い.
+
 ## 未解決の疑問
 
 * **mathlib `lowerCentralSeries` の index 規約と Isaacs `G^k` のズレ** — mathlib は `lcs 0 = ⊤`, `lcs 1 = G' = commutator G`. Isaacs は `G^1 = G`, `G^2 = G' = [G,G]`. ラッパー時のオフセット表記をどう統一するか. 候補: section 冒頭の docstring に "Isaacs `G^k` corresponds to mathlib `lowerCentralSeries (k-1)`" と明示し、新規定義 (`isaacsLcs k := lowerCentralSeries (k-1)`) は作らず docstring のみで吸収.
