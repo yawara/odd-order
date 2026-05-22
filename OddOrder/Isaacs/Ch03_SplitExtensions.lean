@@ -915,6 +915,22 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
   exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H.map φ.toMonoidHom, hMapN, hMapPi⟩ hMapMem
 
+/-- **`IsPiGroup.le_oPiCore`**: 任意の normal π-subgroup は `oPiCore π G` に含まれる.
+`le_iSup` の素直な実体化. Hall-Higman 等での頻用 helper. -/
+theorem Subgroup.IsPiGroup.le_oPiCore {G : Type*} [Group G] {π : Set ℕ} {H : Subgroup G}
+    [H.Normal] (hH : Subgroup.IsPiGroup π H) : H ≤ oPiCore π G :=
+  le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
+    (K.val : Subgroup G)) ⟨H, ‹_›, hH⟩
+
+/-- **`oPiCore` は `π` について monotone**: `π₁ ⊆ π₂ ⇒ oPiCore π₁ G ≤ oPiCore π₂ G`.
+π を広げると normal π-subgroup の集合は大きくなり, iSup も増える. -/
+theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [Group G] :
+    oPiCore π₁ G ≤ oPiCore π₂ G := by
+  refine iSup_le ?_
+  rintro ⟨H, hHN, hHpi⟩
+  exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π₂ K} =>
+    (K.val : Subgroup G)) ⟨H, hHN, fun p hp => h (hHpi p hp)⟩
+
 /-- **Hall-Higman prereq**: 有限非自明可解群は π-radical または π'-radical が非自明.
 
 `oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥`.
