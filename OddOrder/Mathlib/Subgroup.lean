@@ -138,6 +138,23 @@ theorem centralizer_sup (H K : Subgroup G) :
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
 
+/-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
+満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
+group 構造を持つので Subgroup として bundle.
+
+下流: Isaacs Lem 4.32 後半 (P p-group on G p-group ⇒ fixedPoints > 1) で使用. -/
+def Subgroup.fixedPointsOfMulAut {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
+    Subgroup G where
+  carrier := {g | ∀ a : A, (φ a) g = g}
+  one_mem' := fun a => map_one (φ a)
+  mul_mem' := fun {x y} hx hy a => by rw [map_mul, hx, hy]
+  inv_mem' := fun {x} hx a => by rw [map_inv, hx]
+
+@[simp]
+theorem Subgroup.mem_fixedPointsOfMulAut {A G : Type*} [Group A] [Group G]
+    {φ : A →* MulAut G} {g : G} :
+    g ∈ Subgroup.fixedPointsOfMulAut φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
+
 /-- **`Subgroup.centralizer` の bijective hom 像**: bijective `f : G →* G'` で
 `(centralizer s).map f = centralizer (f '' s)`. mathlib v4.29.1 では `≤` 方向のみ
 (`map_centralizer_le_centralizer_image`). -/
