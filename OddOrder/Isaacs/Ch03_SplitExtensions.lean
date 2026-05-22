@@ -1451,15 +1451,29 @@ private theorem hall_higman_case_pi'_body
 
 **下流被引用**: Ch.4 Thm 4.33 (mmd L2659), Ch.7 Thm 7.5 (L3853), Thm 7.6 (L3802) の 3 箇所.
 
-**実装状態**: statement のみ. 5 段階の各 step を Lean 補題に分解する必要あり (~150-200 LOC
-予想). 詳細は [`notes/meta/ch03_audit_2026_05_23.md`](../../notes/meta/ch03_audit_2026_05_23.md).
+**実装状態** ⭐ sorry-free. case π body + case π' body を `exists_oPiCore_ne_bot_or_oPi'Core_ne_bot`
+(↥CB に対して) で場合分けして組み立て.
 -/
 theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ)
-    (_hπsep : IsPiSeparable π G)
-    (_hπ' : oPiCore {p | p ∉ π} G = ⊥) :
+    (hπsep : IsPiSeparable π G)
+    (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
     Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G := by
-  -- Step 1-5 を分解した補題群が要る. 本セッションでは statement のみ.
-  sorry
+  haveI : IsSolvable G := hπsep
+  by_contra h_not_le
+  set O : Subgroup G := oPiCore π G with hO_def
+  set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
+  set B : Subgroup G := C ⊓ O with hB_def
+  haveI hO_normal : O.Normal := inferInstance
+  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
+  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
+  set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
+  have hCB_ne_bot : CB ≠ ⊥ := Subgroup.map_quotientGroup_mk_ne_bot_of_lt hBC_lt
+  haveI hCB_nontrivial : Nontrivial ↥CB := (Subgroup.nontrivial_iff_ne_bot CB).mpr hCB_ne_bot
+  haveI hCB_solvable : IsSolvable ↥CB := inferInstance
+  rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot (G := ↥CB) π with hπCase | hπ'Case
+  · exact hall_higman_case_pi_body π h_not_le hπCase
+  · exact hall_higman_case_pi'_body π hπ' h_not_le hπ'Case
 
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
