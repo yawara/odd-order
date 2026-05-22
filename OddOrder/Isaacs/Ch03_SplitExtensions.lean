@@ -1513,6 +1513,20 @@ i.e., `∀ a ∈ A, φ(a) • H = H`. -/
 def IsAInvariant {A : Type*} [Group A] (φ : A →* MulAut G) (H : Subgroup G) : Prop :=
   ∀ a : A, (φ a : MulAut G) • H = H
 
+/-- A-不変な H に対し, 要素レベルで `(φ a) g ∈ H` が成立. -/
+theorem IsAInvariant.smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) (a : A) {g : G} (hg : g ∈ H) : (φ a) g ∈ H := by
+  have : (φ a) g ∈ (φ a) • H := ⟨g, hg, rfl⟩
+  rwa [hH a] at this
+
+/-- A-不変な H に対し, 要素レベルで `(φ a)⁻¹ g ∈ H` が成立 (= 逆作用 a⁻¹ で smul_mem). -/
+theorem IsAInvariant.inv_smul_mem {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) (a : A) {g : G} (hg : g ∈ H) : (φ a)⁻¹ g ∈ H := by
+  have hHinv : (φ a⁻¹) • H = H := hH a⁻¹
+  rw [φ.map_inv] at hHinv
+  have : (φ a)⁻¹ g ∈ (φ a)⁻¹ • H := ⟨g, hg, rfl⟩
+  rwa [hHinv] at this
+
 /-- ⊤ は常に A-不変. -/
 theorem IsAInvariant.top {A : Type*} [Group A] (φ : A →* MulAut G) :
     IsAInvariant φ (⊤ : Subgroup G) := fun a => by
