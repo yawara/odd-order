@@ -922,6 +922,12 @@ theorem Subgroup.IsPiGroup.le_oPiCore {G : Type*} [Group G] {π : Set ℕ} {H : 
   le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H, ‹_›, hH⟩
 
+/-- **`⊥` は任意 π について π-group**: |⊥| = 1, primeFactors 1 = ∅. -/
+theorem Subgroup.IsPiGroup.bot {G : Type*} [Group G] (π : Set ℕ) :
+    Subgroup.IsPiGroup π (⊥ : Subgroup G) := by
+  intro p hp
+  simp [Subgroup.card_bot] at hp
+
 /-- **IsPiGroup は subgroupOf で保持**: `B ≤ K ≤ G` で `B` が π-group (as `Subgroup G`)
 ⇒ `B.subgroupOf K` も π-group (as `Subgroup ↥K`).
 
