@@ -25,6 +25,10 @@
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
+§4B **iterCommutator + Z(F(G)) absorbs G-minimal 補題 完成** (2026-05-23): Lucchini K=⊥ aux 解消の核補題.
+- `iterCommutator E F : ℕ → Subgroup G` 定義 + 5 補助補題 (`_le_lowerCentralSeries_map`, `_normal`, `_succ_le_self`, `_le_self`, `_eq_bot_of_isNilpotent`).
+- `le_centralizer_of_isMinimalNormal`: E ⊴ G minimal normal + E ≤ F + F ⊴ G + F 冪零 ⇒ E ≤ centralizer F. ~30 LOC. 証明は iterCommutator 降下列 + `Nat.find` で smallest k 取得 + minimality descent.
+
 §4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster) が次の主戦場.
 
 前提は Ch.3 (特に Cor 3.28 coprime quotient, Lemma 3.21 Hall-Higman 1.2.3) と Ch.1 (Frattini, nilpotency)。
