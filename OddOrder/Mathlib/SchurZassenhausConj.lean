@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.GroupTheory.Solvable
 
 /-!
 # Schur-Zassenhaus conjugacy (axiom)
@@ -35,16 +36,21 @@ complements to `N` in `G` ⇒ ∃ `n ∈ N`, `n K n⁻¹ = K'`.
 namespace Subgroup
 
 /-- **Schur-Zassenhaus conjugacy** (axiom): Any two complements to a normal Hall subgroup
-are conjugate by an element of the normal subgroup.
+are conjugate by an element of the normal subgroup, **assuming `N` or `G/N` is solvable**.
 
 mathlib v4.29.1 has only the abelian case (`Subgroup.exists_smul_eq`); general case is
 open as `OddOrder/Mathlib` gap fill.
 
 形式: `K.map (MulAut.conj n).toMonoidHom = K'` は `{n x n⁻¹ : x ∈ K} = K'` と同値, 即ち
-`n K n⁻¹ = K'`. -/
+`n K n⁻¹ = K'`.
+
+**Solvability hypothesis**: 古典 SZ conjugacy は `N` または `G/N` のいずれかが可解
+であることを要する (Feit-Thompson に頼らない). 仮定 `IsSolvable N ∨ IsSolvable (G ⧸ N)`
+を明示することで, 本 axiom が Feit-Thompson より強くならないようにする. -/
 axiom IsComplement'.exists_conj_of_coprime {G : Type*} [Group G] [Finite G]
     {N K K' : Subgroup G} [N.Normal]
     (_hN : Nat.Coprime (Nat.card N) N.index)
+    (_hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
     (_hK : IsComplement' N K) (_hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K'
 
