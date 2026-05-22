@@ -862,6 +862,17 @@ section /- 3D: π-separable + Hall-Higman (pp. 89-95) -/
 
 variable {G : Type*} [Group G]
 
+/-- **`π`-group**: `G` の全ての素因子が `π` に属す.
+
+mathlib 未収載 (`IsPGroup` の π 版). `IsHallSubgroup π ⊤` と同値だが,
+意図 (G 自体が π-group) を明示するため別名を導入. -/
+def IsPiGroup (π : Set ℕ) (G : Type*) [Group G] : Prop :=
+  ∀ p ∈ (Nat.card G).primeFactors, p ∈ π
+
+/-- 部分群版: `H ≤ G` が π-group (= `|H|` の全素因子が π). -/
+def Subgroup.IsPiGroup (π : Set ℕ) (H : Subgroup G) : Prop :=
+  ∀ p ∈ (Nat.card H).primeFactors, p ∈ π
+
 /-- **`π`-separable 群** (working definition): 正式には `G` の正規列で各因子が
 `π`-group または `π'`-group となるものだが, 本リポでは FT 適用に十分な
 **`IsSolvable G`** を仮の定義とする. mathlib 未収載の新規定義.
@@ -870,6 +881,32 @@ variable {G : Type*} [Group G]
 (最小反例の真部分群はすべて solvable). 正式な normal series 定義は将来別ファイル
 (`OddOrder/Group/PiSeparable.lean`) に移行可. -/
 def IsPiSeparable (_π : Set ℕ) (G : Type*) [Group G] : Prop := IsSolvable G
+
+/-- **π-radical** `O_π(G)`: `G` の正規 π-subgroup の sup (= 最大の正規 π-subgroup).
+
+mathlib 未収載 (各 `opCore p G` の π 版 sup). Hall-Higman 1.2.3 で必須.
+形式化都合で subtype 上の単層 iSup を採用. -/
+def oPiCore (π : Set ℕ) (G : Type*) [Group G] : Subgroup G :=
+  ⨆ H : {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H}, (H.val : Subgroup G)
+
+/-- `O_π(G)` は `G` の正規部分群 (正規部分群の sup). -/
+instance oPiCore.normal (π : Set ℕ) (G : Type*) [Group G] : (oPiCore π G).Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  refine Subgroup.iSup_induction _ (C := fun x => g * x * g⁻¹ ∈ oPiCore π G) hn
+    ?mem ?one ?mul
+  case mem =>
+    rintro ⟨H, hN, _⟩ x hx
+    -- x ∈ H 正規 ⇒ g x g⁻¹ ∈ H ≤ oPiCore π G.
+    have hHle : H ≤ oPiCore π G :=
+      le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
+        (K.val : Subgroup G)) ⟨H, hN, ‹_›⟩
+    exact hHle (hN.conj_mem x hx g)
+  case one => simp
+  case mul =>
+    intro x y hx hy
+    have heq : g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) := by group
+    rw [heq]
+    exact (oPiCore π G).mul_mem hx hy
 
 /-- **Isaacs Lemma 3.18**: π-separable の補助補題. 正式定義下では non-trivial だが
 仮定義 (=IsSolvable) では trivial に True. -/
@@ -889,17 +926,27 @@ theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSepar
   hall_E_exists π
 
 /-- **Isaacs Thm 3.21 (Hall-Higman 1.2.3)** ⭐ **FT クリティカル**.
-`G` π-separable + `O_{π'}(G) = 1` ⇒ `C_G(O_π(G)) ⊆ O_π(G)`. -/
-theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ) (_hπsep : IsPiSeparable π G)
-    -- TODO: O_{π'}(G) = 1 の表現, C_G の表現
-    : True := by
-  trivial
+`G` π-separable + `O_{π'}(G) = ⊥` ⇒ `C_G(O_π(G)) ≤ O_π(G)`.
 
-/-- **Isaacs Thm 3.22**: π-separable + abelian Hall π ⇒ π-length ≤ 1. -/
+書籍 p.94 の証明骨子: π-separable normal series での induction. F* (一般化 Fitting) 経由,
+または Bender 法 (`C := C_G(O_π(G))` の極小反例 → `C ⊓ O_π(G) = Z(O_π(G))` と
+`C O_π(G) ⊴ G` の解析). 完全形式化は ~100-200 行 (別 commit).
+
+本リポでは正確な statement で axiom 化. (`Subgroup.centralizer` は mathlib 既存.) -/
+axiom hall_higman_1_2_3 [Finite G] (π : Set ℕ) (_hπsep : IsPiSeparable π G)
+    (_hPiPrime : oPiCore πᶜ G = ⊥) :
+    Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G
+
+/-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
+`G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
+
+`O_{π',π}(G)` (= `π` を `O_{π'}(G)` 上に乗せた π-層) の交換子部分群が `O_{π'}(G)` に
+含まれる, つまり π-length ≤ 1 と同値. 完全 π-length 定義は別ファイル. 本リポでは
+statement を保留 (型レベル定式化が大きいため): -/
 theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ)
     (_hπsep : IsPiSeparable π G)
     (_hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H, a * b = b * a) :
-    True := by  -- TODO: 正確な statement (π-length)
+    True := by  -- TODO: π-length の正式定義後に書き直す
   trivial
 
 end -- 3D
