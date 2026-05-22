@@ -243,9 +243,22 @@ Ch.1, Ch.2 完了かつ Ch.3 §3E (coprime action) が一通り終わってか�
 
 ## 逆引き: 他章から Ch.4 へ要求される補題
 
+### 2026-05-22: ファイル構造確定 (`notes/meta/forward_dep_policy.md` で文書化)
+
+owner-chapter 規則を採用. Ch.4 dir にサブファイルを作って forward dep を集約:
+
+- **`OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean`**: Lucchini Thm 2.20 全体
+  (本体 theorem + K = ⊥ narrower axiom).
+- **`OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean`**: §3E IsAInvariant 系
+  (Thm 3.23 a/b, Lemma 3.24 Glauberman). placeholder 空ファイル.
+
+Ch.4 本体 (4.1-4.38) は将来 `OddOrder/Isaacs/Ch04_Commutators/Main.lean` 等で実装.
+
 ### Ch.2 §2D Lucchini Thm 2.20 (K = ⊥ case)
 
-**現状**: Lucchini の K > ⊥ inductive step は ✅ theorem 化済 (`OddOrder.Isaacs.Ch02.lucchini_aux`). K = ⊥ case のみ `lucchini_K_bot_aux` (narrower axiom) として残置.
+**現状**: Ch.4 dir に full theorem 配置. K > ⊥ branch は Ch.2 内 `lucchini_K_pos_reduction`
+(subgroup correspondence のみ使用) を構造補題として呼出. K = ⊥ case のみ
+`lucchini_K_bot_aux` (Ch.4 dir 内の narrower axiom) として残置.
 
 **K = ⊥ case が必要とする補題** (Ch.4 領域):
 

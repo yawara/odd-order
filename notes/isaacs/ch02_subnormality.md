@@ -7,7 +7,10 @@
 ## 進捗 (2026-05-22)
 
 §2A 完成 (Thm 2.11 のみ axiom). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式).
-**§2D**: Cor 2.19 完成 (2026-05-22). Thm 2.18 Zenkov + Thm 2.20 Lucchini は依然 axiom.
+**§2D**: Cor 2.19, Thm 2.18 Zenkov 完成 (2026-05-22). Thm 2.20 Lucchini は K > ⊥ structural
+reduction (`lucchini_K_pos_reduction`) を Ch.2 に, full theorem (`lucchini_index_normalCore_lt_index`)
+を `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean` に owner chapter 規則で配置
+(K = ⊥ case が Ch.4 §4A-§4B 依存のため). 詳細は [`notes/meta/forward_dep_policy.md`](../meta/forward_dep_policy.md).
 §2C は依然 TODO.
 
 ### 補助補題 (mathlib 未収載)
@@ -42,7 +45,7 @@
 | §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
 | **Thm 2.18 Zenkov** | ✅ (2026-05-22) | `zenkov_minimal_le_fitting`. WLOG wrapper + `zenkov_wlog_aux` (|G|-induction). Case 1 (∃ g, A ⊔ B^g = ⊤): `zenkov_case1_le_fitting` (中心性 + minimality). Case 2 (∀ g, < ⊤): Sylow-by-Sylow via Baer iff + IH on ↥H (`zenkov_minimality_transfer`) + opCore + p-group sup. ~350 行 (補助補題込み) |
 | **Cor 2.19** | ✅ (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov axiom + Lemma 2.10 + `card_set_mul_card_inf` 計数. A = ⊤ case は G abelian ⇒ G nilpotent ⇒ F(G) = ⊤ |
-| **Thm 2.20 Lucchini** | ✅ (2026-05-22, K > ⊥ 部分) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. **K > ⊥ inductive step**: G/K に IH 適用 + `MonoidHom.subgroupMap` の核計算 (~100 行). **K = ⊥ 部分のみ narrower axiom** (`lucchini_K_bot_aux`); 完全形式化は Cor 2.19 + minimal normal E ⊆ Z(F(G)) 解析で ~200 行 |
+| **Thm 2.20 Lucchini** | ✅ (2026-05-22, owner-chapter 配置) | **Ch.2 内**: `lucchini_K_pos_reduction` (K > ⊥ structural lemma, subgroup correspondence のみ). **Ch.4 dir** (`Ch04_Commutators/ForwardFromCh02.lean`): `lucchini_index_normalCore_lt_index` (本体, theorem) + `lucchini_K_bot_aux` (K = ⊥ narrower axiom). owner chapter 規則 (`notes/meta/forward_dep_policy.md`) により Ch.4 §4A-§4B (lcs 加法性) 依存部分を Ch.4 dir に配置. Ch.3 Horosevskii (Thm 3.3) は Ch.4 dir から import. |
 
 ## 章のセクション分割と全 20 定理
 

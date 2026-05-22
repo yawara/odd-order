@@ -22,13 +22,14 @@
 | §3C Lemma 3.16 coprime index ⇒ HK=G | ✅ | `sup_eq_top_of_coprime_index` (Subgroup.index_dvd + Nat.dvd_gcd) |
 | §3C IsHallSubgroup 定義 + 基礎 | ✅ | `IsHallSubgroup`, `.coprime_index`, `.top_iff`, `.bot_iff`, `.bot_of_card_eq_one` |
 | §3C **Thm 3.13 Hall-E** | ✅ | **完全証明**. `hall_E_strong_aux` で `|G|`-強誘導. base (|G|=1): ⊥. step: minimal normal M (Thm 3.11 で elem abelian p-group) + IH on G/M + pullback. Case p ∈ π: H = comap で直接. Case p ∉ π: Schur-Zassenhaus on M.subgroupOf H |
-| §3C Thm 3.14 Hall-C | base のみ (sorry on step) | step は IH + Schur-Zassenhaus 共役性 (mathlib に直接無い). 戦略: p ∈ π で M ≤ H_i (Sylow 経由) ⇒ 商で IH; p ∉ π で H_i ∩ M = ⊥ ⇒ Schur-Zassenhaus 共役 |
-| §3C Thm 3.15 (Hall converse) | base のみ | p-complement 存在 ⇒ 可解. 要 Burnside p^a q^b 解 (mathlib 未) or 3 subgroups |
-| §3C Thm 3.17 (3 subgroups solvability) | base のみ | Wielandt 1971. 単純群の場合分け要 (mathlib 未). missing page で原典 proof 不明 |
+| §3C Thm 3.14 Hall-C | **leaf axiom 削除** (2026-05-22) | mathlib SZ 共役性依存. 将来 `OddOrder/Mathlib/SchurZassenhausConj.lean` で実装後にここで theorem 化. Ch.3 内 redirect コメントのみ. |
+| §3C Thm 3.15 (Hall converse) | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` に owner-chapter 配置. Burnside `p^a q^b` 経由のため Ch.7 完成後に実装. |
+| §3C Thm 3.17 (3 subgroups solvability) | **placeholder 移動** (2026-05-22) | 同上 (`Ch07_ThompsonSubgroup/ForwardFromCh03.lean`). 単純群場合分けで Burnside 必要. |
 | §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着 |
 | §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
-| §3D Hall-Higman 1.2.3 (3.21) | axiom (2026-05-22) | proper signature `Subgroup.centralizer (oPiCore π G) ≤ oPiCore π G` under `oPiCore πᶜ G = ⊥` |
-| §3E `IsAInvariant` 定義 + Thm 3.23 (a/b) + Lemma 3.24 | axiom (2026-05-22) | proper signatures for `exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point`. 完全実装は ~8-12 週 |
+| §3D Hall-Higman 1.2.3 (3.21) | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch06_FrobeniusActions/ForwardFromCh03.lean` に owner-chapter 配置. Ch.6 (Frobenius p-nilpotence, P×Q) 完成後に実装. |
+| §3E `IsAInvariant` 定義 | ✅ (2026-05-22) | `IsAInvariant`, `.top`, `.bot`, `.inf`, `.sup` (Ch.3 内に残置, definition のみ) |
+| §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |
 | §3F 巡回商 lift (3.35 弱版) | ✅ (2026-05-22) | `cyclic_quotient_lift`: G/H cyclic ⇒ ∃ g, ⟨g⟩ ⊔ H = ⊤. 弱版を Quotient.mk_surjective + zpowers で証明. 旧 axiom statement は inconsistent (H ≤ K + K ⊔ H = ⊤ ⇒ K = ⊤ で card 等式が \|G/H\| = \|H\| に帰着し反例あり) のため置換 |
 
 ## mmd 抽出失敗の整理

@@ -819,7 +819,7 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
 存在 ⇒ `G` 可解.
 
 **Forward dep**: Burnside `p^a q^b` 経由. Ch.7 完成後に back-fill.
-所在: `OddOrder/Isaacs/Ch07_Burnside/ForwardFromCh03.lean` (placeholder).
+所在: `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` (placeholder).
 詳細は [`notes/isaacs/ch07_burnside.md`](../../notes/isaacs/ch07_burnside.md). -/
 
 /-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).
@@ -836,7 +836,7 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
 /-! **Isaacs Thm 3.17 Wielandt**: 3 部分群 pairwise coprime index + solvable ⇒ G solvable.
 
 **Forward dep**: 単純群の場合分けで Burnside `p^a q^b` 必要. Ch.7 完成後に back-fill.
-所在: `OddOrder/Isaacs/Ch07_Burnside/ForwardFromCh03.lean` (placeholder). -/
+所在: `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` (placeholder). -/
 
 end -- 3C
 

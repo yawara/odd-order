@@ -41,7 +41,7 @@ OddOrder/Isaacs/ChXX_<Topic>/
 - `Ch04_Commutators/ForwardFromCh02.lean`: Ch.2 Lucchini Thm 2.20 (Ch.4 lcs 依存)
 - `Ch04_Commutators/ForwardFromCh03.lean`: Ch.3 §3E IsAInvariant 系 (Ch.4 coprime action 依存)
 - `Ch06_FrobeniusActions/ForwardFromCh03.lean`: Ch.3 Hall-Higman 1.2.3 (Ch.6 P×Q 依存)
-- `Ch07_Burnside/ForwardFromCh03.lean`: Ch.3 Thm 3.15, 3.17 (Ch.7 Burnside 依存)
+- `Ch07_ThompsonSubgroup/ForwardFromCh03.lean`: Ch.3 Thm 3.15, 3.17 (Ch.7 Burnside 依存)
 
 ### ルール 2: 「ファイル + コメントだけ」状態
 
@@ -113,7 +113,7 @@ axiom が **使用箇所 0 件** なら, 単に削除して owner chapter ディ
 **空ファイル + docstring** を作る. notes に「将来この場所に Thm X.Y が来る」と書く.
 
 ```lean
--- 例: OddOrder/Isaacs/Ch07_Burnside/ForwardFromCh03.lean
+-- 例: OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean
 /-!
 # Ch.7 → Ch.3 forward dependencies
 
