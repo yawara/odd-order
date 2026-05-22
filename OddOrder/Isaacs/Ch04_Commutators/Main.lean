@@ -444,6 +444,49 @@ theorem derivedSeries_eq_bot_of_lowerCentralSeries_eq_bot
     _ ≤ lowerCentralSeries G m := lowerCentralSeries_antitone (G := G) hidx
     _ = ⊥ := h
 
+/-! ### iterated right commutator infrastructure
+
+Lucchini K = ⊥ case の「Z(F(G)) absorbs G-minimal normal」補題等で使用する.
+`E, F ≤ G` に対し `iter E F n = ⁅...⁅E, F⁆, F⁆..., F⁆` (`n` 回右から `F`). -/
+
+/-- **Iterated right commutator**: `iterCommutator E F n = ⁅...⁅E, F⁆, F⁆..., F⁆`. -/
+def iterCommutator (E F : Subgroup G) : ℕ → Subgroup G
+  | 0 => E
+  | n + 1 => ⁅iterCommutator E F n, F⁆
+
+@[simp]
+theorem iterCommutator_zero (E F : Subgroup G) :
+    iterCommutator E F 0 = E := rfl
+
+@[simp]
+theorem iterCommutator_succ (E F : Subgroup G) (n : ℕ) :
+    iterCommutator E F (n + 1) = ⁅iterCommutator E F n, F⁆ := rfl
+
+/-- **iterCommutator は F の lcs 経由で押し込められる**: `E ≤ F` ⇒
+`iterCommutator E F n ≤ (lowerCentralSeries (↥F) n).map F.subtype`.
+
+特に `F` が冪零 (Group.IsNilpotent ↥F) なら, 十分大きな `n` で `lcs ↥F n = ⊥`,
+よって `iterCommutator E F n = ⊥`. これが Lucchini K = ⊥ case の核心 (Z(F(G))
+absorbs G-minimal). -/
+theorem iterCommutator_le_lowerCentralSeries_map
+    {E F : Subgroup G} (hE : E ≤ F) (n : ℕ) :
+    iterCommutator E F n ≤ (lowerCentralSeries (↥F) n).map F.subtype := by
+  induction n with
+  | zero =>
+    simp only [iterCommutator_zero, lowerCentralSeries_zero]
+    rw [← MonoidHom.range_eq_map, F.range_subtype]
+    exact hE
+  | succ n ih =>
+    rw [iterCommutator_succ]
+    have hRange : (⊤ : Subgroup ↥F).map F.subtype = F := by
+      rw [← MonoidHom.range_eq_map]; exact F.range_subtype
+    have hMapLcs : (lowerCentralSeries (↥F) (n + 1)).map F.subtype =
+        ⁅((lowerCentralSeries (↥F) n).map F.subtype), F⁆ := by
+      change ⁅lowerCentralSeries (↥F) n, (⊤ : Subgroup ↥F)⁆.map F.subtype = _
+      rw [Subgroup.map_commutator, hRange]
+    rw [hMapLcs]
+    exact Subgroup.commutator_mono ih le_rfl
+
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
 
