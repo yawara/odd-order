@@ -937,6 +937,18 @@ theorem Subgroup.IsPiGroup.le {G : Type*} [Group G] [Finite G] {π : Set ℕ}
   have hdvd : Nat.card ↥H ∣ Nat.card ↥K := Subgroup.card_dvd_of_le hHK
   exact hK p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
 
+/-- **`oPiCore π G = ⊥` ⇒ G で normal π-subgroup は ⊥ のみ**.
+`Subgroup.IsPiGroup.le_oPiCore` + `oPiCore = ⊥` の chain.
+
+用途: Hall-Higman 3.21 case π' で `H ≤ O_π'(K) ⊴ G` + `O_π'(G) = ⊥` ⇒ `O_π'(K) = ⊥`,
+よって H = ⊥ で Schur-Zassenhaus complement の存在と矛盾. -/
+theorem eq_bot_of_isPiGroup_of_oPiCore_eq_bot {G : Type*} [Group G] (π : Set ℕ)
+    {H : Subgroup G} [H.Normal] (hHpi : Subgroup.IsPiGroup π H)
+    (hCore : oPiCore π G = ⊥) :
+    H = ⊥ := by
+  rw [eq_bot_iff, ← hCore]
+  exact hHpi.le_oPiCore
+
 /-- **`π` と `π'` の cardinality は互いに素**: `n` の素因子が全 `π` 内 + `m` の素因子
 が全 `π` 外 ⇒ `Coprime n m`.
 
