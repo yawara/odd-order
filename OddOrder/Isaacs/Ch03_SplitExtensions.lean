@@ -1533,6 +1533,38 @@ theorem IsAInvariant.sup {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Sub
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊔ K) := fun a => by
   rw [Subgroup.smul_sup, hH a, hK a]
 
+/-- **Characteristic 部分群は常に A-不変**: H.Characteristic ⇒ IsAInvariant φ H for any φ.
+mathlib `characteristic_iff_map_eq` 経由. -/
+theorem IsAInvariant.of_characteristic {A : Type*} [Group A] (φ : A →* MulAut G)
+    {H : Subgroup G} [hH : H.Characteristic] : IsAInvariant φ H := fun a => by
+  show H.map (φ a).toMonoidHom = H
+  exact (Subgroup.characteristic_iff_map_eq.mp hH) (φ a)
+
+/-- `derivedSeries G n` は A-不変 (characteristic instance 経由). -/
+theorem IsAInvariant.derivedSeries {A : Type*} [Group A] (φ : A →* MulAut G) (n : ℕ) :
+    IsAInvariant φ (derivedSeries G n) :=
+  IsAInvariant.of_characteristic φ
+
+/-- `lowerCentralSeries G n` は A-不変 (characteristic instance 経由). -/
+theorem IsAInvariant.lowerCentralSeries {A : Type*} [Group A] (φ : A →* MulAut G) (n : ℕ) :
+    IsAInvariant φ (lowerCentralSeries G n) :=
+  IsAInvariant.of_characteristic φ
+
+/-- `Subgroup.center G` は A-不変 (characteristic instance 経由). -/
+theorem IsAInvariant.center {A : Type*} [Group A] (φ : A →* MulAut G) :
+    IsAInvariant φ (Subgroup.center G) :=
+  IsAInvariant.of_characteristic φ
+
+/-- A-不変 + A-不変 の commutator は A-不変 (`Subgroup.map_commutator`). -/
+theorem IsAInvariant.commutator {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Subgroup G}
+    (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) :
+    IsAInvariant φ ⁅H, K⁆ := fun a => by
+  show ⁅H, K⁆.map (φ a).toMonoidHom = ⁅H, K⁆
+  rw [Subgroup.map_commutator]
+  show ⁅H.map (φ a).toMonoidHom, K.map (φ a).toMonoidHom⁆ = ⁅H, K⁆
+  rw [show H.map (φ a).toMonoidHom = H from hH a,
+      show K.map (φ a).toMonoidHom = K from hK a]
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
