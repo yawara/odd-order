@@ -143,7 +143,7 @@ theorem centralizer_sup (H K : Subgroup G) :
 group 構造を持つので Subgroup として bundle.
 
 下流: Isaacs Lem 4.32 後半 (P p-group on G p-group ⇒ fixedPoints > 1) で使用. -/
-def Subgroup.fixedPointsOfMulAut {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
+def fixedPointsOfMulAut {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
     Subgroup G where
   carrier := {g | ∀ a : A, (φ a) g = g}
   one_mem' := fun a => map_one (φ a)
@@ -151,9 +151,9 @@ def Subgroup.fixedPointsOfMulAut {A G : Type*} [Group A] [Group G] (φ : A →* 
   inv_mem' := fun {x} hx a => by rw [map_inv, hx]
 
 @[simp]
-theorem Subgroup.mem_fixedPointsOfMulAut {A G : Type*} [Group A] [Group G]
+theorem mem_fixedPointsOfMulAut {A G : Type*} [Group A] [Group G]
     {φ : A →* MulAut G} {g : G} :
-    g ∈ Subgroup.fixedPointsOfMulAut φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
+    g ∈ fixedPointsOfMulAut φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
 
 /-- **`Subgroup.centralizer` の bijective hom 像**: bijective `f : G →* G'` で
 `(centralizer s).map f = centralizer (f '' s)`. mathlib v4.29.1 では `≤` 方向のみ

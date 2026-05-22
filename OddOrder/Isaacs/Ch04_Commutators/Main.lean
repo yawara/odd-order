@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
 import OddOrder.Isaacs.Ch03_SplitExtensions
 import OddOrder.Mathlib.SemidirectProduct
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # OddOrder.Isaacs.Ch04 — Commutators
@@ -825,6 +826,37 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 (~250 行 / 1-2 週), 4.31 + 4.32 + 4.38 (~150 行 / 1 週), 4.33 + 4.37 (~150 行 / 1 週).
 
 合計 ~750 行 LOC / 4-5 週. Phase 1 残予算と要相談. -/
+
+/-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
+`C_G(P)` (= fixed point subgroup) は非自明.
+
+**proof**: `MulAction P G` を `φ` 経由で setup. `card_modEq_card_fixedPoints` で
+`|G| ≡ |fixedPoints| mod p`. G 非自明 p-群より `p ∣ |G|`. 1 は trivial fixed point.
+`exists_fixed_point_of_prime_dvd_card_of_fixed_point` で `1` と異なる fixed point 存在. -/
+theorem fixedPoints_ne_bot_of_pgroup_action_pgroup
+    {G P : Type*} [Group G] [Group P] [Finite G] [Finite P] [Nontrivial G]
+    {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) (hP : IsPGroup p P)
+    (φ : P →* MulAut G) :
+    Subgroup.fixedPointsOfMulAut φ ≠ ⊥ := by
+  letI : MulAction P G := MulAction.compHom G φ
+  -- 1 ∈ fixedPoints (φ p is a group hom, so (φ p) 1 = 1)
+  have h1_fix : (1 : G) ∈ MulAction.fixedPoints P G := fun p => by
+    show (φ p) 1 = 1
+    exact map_one (φ p)
+  -- p ∣ |G| since G is a nontrivial p-group
+  obtain ⟨n, hn_pos, hn_card⟩ := hG.nontrivial_iff_card.mp inferInstance
+  have hp_dvd : p ∣ Nat.card G := by
+    rw [hn_card]; exact dvd_pow_self p hn_pos.ne'
+  -- ∃ b ∈ fixedPoints, b ≠ 1
+  obtain ⟨b, hb_fix, hb_ne⟩ :=
+    hP.exists_fixed_point_of_prime_dvd_card_of_fixed_point (α := G) hp_dvd h1_fix
+  -- b ∈ Subgroup.fixedPointsOfMulAut φ via the same definition
+  rw [Subgroup.ne_bot_iff_exists_ne_one]
+  refine ⟨⟨b, ?_⟩, ?_⟩
+  · exact fun p => hb_fix p
+  · intro h
+    apply hb_ne
+    exact (Subtype.ext_iff.mp h).symm
 
 /-- **Isaacs Lemma 4.32 (前半)**: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `Γ = G ⋊[φ] P` 内で `⁅inl(G), inr(P)⁆ < inl(G)` (strict).
