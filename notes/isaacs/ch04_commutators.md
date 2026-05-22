@@ -6,7 +6,7 @@
 
 ## 進捗 (2026-05-23 更新)
 
-§4A 部分完成 + §4B Cor 4.10 完成:
+§4A 部分完成 + §4B Cor 4.10, **Thm 4.11** 完成:
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -19,8 +19,9 @@
 | Thm 4.7 (maximal class) | docstring | Lem 4.6 経由予定. |
 | Thm 4.8 (p>2 class≤2 ⇒ {x^p=1} 群) | docstring | Baer trick (4.37) 前身. |
 | **Cor 4.10** (Three-sub mod N) | ✅ | `commutator_commutator_le_of_rotate`. 商写像 G→G/N で push し mathlib `commutator_commutator_eq_bot_of_rotate` 適用. |
+| **Thm 4.11** ⭐ (lcs additivity) | ✅ (2026-05-23) | `commutator_lowerCentralSeries_le`: `⁅lcs i, lcs j⁆ ≤ lcs (i+j+1)`. `j`-induction (`i` free), step は Cor 4.10 を `H₁=lcs j, H₂=⊤, H₃=lcs i, N=lcs (i+j+2)` で適用. h1: `⁅⊤, lcs i⁆ = lcs (i+1)` 経由で IH at `(i+1)`. h2: IH + commutator_mono + lcs_succ 定義. mathlib `Characteristic (lcs n)` instance が `[N.Normal]` を自動提供. ~30 LOC. |
 
-§4B-§4D 残: Thm 4.11 lcs additivity, §4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster).
+§4B-§4D 残: §4C `[G,A]` 全 8 結果, §4D FT-critical (4.28-4.36, BG Prop 1.6 cluster).
 
 前提は Ch.3 (特に Cor 3.28 coprime quotient, Lemma 3.21 Hall-Higman 1.2.3) と Ch.1 (Frattini, nilpotency)。
 
