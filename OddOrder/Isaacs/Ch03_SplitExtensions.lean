@@ -1678,6 +1678,35 @@ theorem IsAInvariant.restrict_apply_val {A : Type*} [Group A] {φ : A →* MulAu
     {H : Subgroup G} (hH : IsAInvariant φ H) (a : A) (h : ↥H) :
     ((hH.restrict a) h).val = (φ a) h.val := rfl
 
+/-- A-不変 H の normalCore は A-不変. proof: `normalCore_eq_iInf_conjAct` で
+`normalCore H = ⨅ g : ConjAct G, g • H`. (φ a) は inner action と可換でないが,
+element-level の `b * x * b⁻¹ ∈ H` を通して直接示せる. -/
+theorem IsAInvariant.normalCore {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) : IsAInvariant φ H.normalCore := fun a => by
+  show H.normalCore.map (φ a).toMonoidHom = H.normalCore
+  ext x
+  rw [Subgroup.mem_map]
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    -- hy : y ∈ normalCore H = {a : ∀ b, b * a * b⁻¹ ∈ H}
+    show ∀ b, b * (φ a) y * b⁻¹ ∈ H
+    intro b
+    have hcyc : ((φ a)⁻¹ b) * y * ((φ a)⁻¹ b)⁻¹ ∈ H := hy ((φ a)⁻¹ b)
+    have h_apply : (φ a) (((φ a)⁻¹ b) * y * ((φ a)⁻¹ b)⁻¹) ∈ H := hH.smul_mem a hcyc
+    simp only [map_mul, MulAut.apply_inv_self, map_inv] at h_apply
+    exact h_apply
+  · intro hx
+    -- hx : x ∈ normalCore H = {a : ∀ b, b * a * b⁻¹ ∈ H}
+    refine ⟨(φ a)⁻¹ x, ?_, MulAut.apply_inv_self G (φ a) x⟩
+    show ∀ b, b * ((φ a)⁻¹ x) * b⁻¹ ∈ H
+    intro b
+    have hcxc : ((φ a) b) * x * ((φ a) b)⁻¹ ∈ H := hx ((φ a) b)
+    have h_apply : (φ a)⁻¹ (((φ a) b) * x * ((φ a) b)⁻¹) ∈ H := hH.inv_smul_mem a hcxc
+    simp only [map_mul, map_inv,
+      show ∀ y : G, ((φ a)⁻¹ : MulAut G) ((φ a) y) = y from
+        fun y => MulAut.inv_apply_self G (φ a) y] at h_apply
+    exact h_apply
+
 /-- A-不変 H と K (`K ≤ G`) に対し, `K.subgroupOf H` は restricted action `hH.restrict`
 下で A-不変. -/
 theorem IsAInvariant.subgroupOf {A : Type*} [Group A] {φ : A →* MulAut G}
