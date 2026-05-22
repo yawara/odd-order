@@ -1320,6 +1320,342 @@ private lemma card_set_mul_card_inf {G : Type*} [Group G] [Finite G]
   rw [h_orbit_eq, h_stab_eq, h_subgrpof_card] at h_orbstab
   rw [h1, mul_assoc, h_orbstab, mul_comm]
 
+open scoped Pointwise in
+/-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)) の `|G|`-induction 補助補題. -/
+private theorem subset_fitting_aux : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G],
+      Nat.card G ≤ n → ∀ {A : Subgroup G},
+      (∀ a ∈ A, ∀ b ∈ A, a * b = b * a) →
+      (∀ H : Subgroup G, A ≤ H →
+        ((A.subgroupOf H).index) ^ 2 ≤ (Subgroup.center ↥H).index) →
+      A ≤ fitting G := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ hcard A _ _
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ hGcard A hAab h
+    classical
+    -- A is nilpotent (abelian).
+    have hA_center_top : Subgroup.center ↥A = ⊤ := by
+      ext ⟨x, hx⟩
+      refine ⟨fun _ => Subgroup.mem_top _, fun _ => ?_⟩
+      rw [Subgroup.mem_center_iff]
+      intro ⟨g, hg⟩
+      exact Subtype.ext (hAab g hg x hx)
+    haveI hA_nilp : Group.IsNilpotent ↥A := ⟨1, by
+      rw [upperCentralSeries_one]; exact hA_center_top⟩
+    -- Case split: A subnormal in G.
+    by_cases hA_sn : A.IsSubnormal
+    · exact (le_fitting_iff_isNilpotent_and_isSubnormal A).mpr ⟨hA_nilp, hA_sn⟩
+    -- Case: A not subnormal. Derive contradiction.
+    exfalso
+    -- IH gives `A.subgroupOf K` subnormal in K for every proper K ⊇ A.
+    have hAK_sn : ∀ K : Subgroup G, A ≤ K → K ≠ ⊤ → (A.subgroupOf K).IsSubnormal := by
+      intro K hAK hKne
+      haveI : Finite K := inferInstance
+      have hKcard : Nat.card K ≤ n := by
+        have hKlt_card : Nat.card K < Nat.card G := by
+          have hKlag := K.card_mul_index
+          have h1 : K.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+          have h2 : K.index ≠ 1 := fun he => hKne (Subgroup.index_eq_one.mp he)
+          have hKidx : K.index ≥ 2 := by omega
+          have hKpos : 0 < Nat.card K := Nat.card_pos
+          nlinarith
+        omega
+      -- Inherited abelianness of A.subgroupOf K.
+      have hAK_ab : ∀ a ∈ A.subgroupOf K, ∀ b ∈ A.subgroupOf K, a * b = b * a := by
+        intro a ha b hb
+        rw [Subgroup.mem_subgroupOf] at ha hb
+        exact Subtype.ext (hAab _ ha _ hb)
+      -- Inherited index hypothesis: for H' ⊇ A.subgroupOf K in K, transfer h on H'.map K.subtype.
+      have hAK_h : ∀ H' : Subgroup ↥K, A.subgroupOf K ≤ H' →
+          (((A.subgroupOf K).subgroupOf H').index) ^ 2 ≤ (Subgroup.center ↥H').index := by
+        intro H' hAH'
+        set H : Subgroup G := H'.map K.subtype with hH_def
+        have hAH : A ≤ H := by
+          intro a ha
+          have haK : a ∈ K := hAK ha
+          exact ⟨⟨a, haK⟩, hAH' ((Subgroup.mem_subgroupOf).mpr ha), rfl⟩
+        have hkey := h H hAH
+        -- Iso φ : H' ≃* H (= H'.map K.subtype).
+        set φ : ↥H' ≃* ↥H :=
+          Subgroup.equivMapOfInjective H' K.subtype K.subtype_injective with hφ_def
+        have hφ_surj : Function.Surjective (φ.toMonoidHom) := φ.surjective
+        -- Subgroup correspondence: (A.subgroupOf H).comap φ.toMonoidHom = (A.subgroupOf K).subgroupOf H'.
+        have h_S_eq : (A.subgroupOf H).comap φ.toMonoidHom =
+            (A.subgroupOf K).subgroupOf H' := by
+          ext x
+          rw [Subgroup.mem_comap, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf,
+              Subgroup.mem_subgroupOf]
+          rfl
+        -- Index transfer for A.
+        have h_idx_S : ((A.subgroupOf K).subgroupOf H').index =
+            (A.subgroupOf H).index := by
+          rw [← h_S_eq]
+          exact (A.subgroupOf H).index_comap_of_surjective hφ_surj
+        -- Center correspondence via iso.
+        have h_C_eq : (Subgroup.center ↥H).comap φ.toMonoidHom = Subgroup.center ↥H' := by
+          ext x
+          rw [Subgroup.mem_comap, Subgroup.mem_center_iff, Subgroup.mem_center_iff]
+          constructor
+          · intro hx y
+            apply φ.injective
+            show φ.toMonoidHom (y * x) = φ.toMonoidHom (x * y)
+            rw [map_mul, map_mul]
+            exact hx (φ.toMonoidHom y)
+          · intro hx z
+            obtain ⟨y, hy⟩ := hφ_surj z
+            calc z * φ.toMonoidHom x = φ.toMonoidHom y * φ.toMonoidHom x := by rw [← hy]
+              _ = φ.toMonoidHom (y * x) := (map_mul _ _ _).symm
+              _ = φ.toMonoidHom (x * y) := by rw [hx y]
+              _ = φ.toMonoidHom x * φ.toMonoidHom y := map_mul _ _ _
+              _ = φ.toMonoidHom x * z := by rw [hy]
+        have h_idx_C : (Subgroup.center ↥H').index = (Subgroup.center ↥H).index := by
+          rw [← h_C_eq]
+          exact (Subgroup.center ↥H).index_comap_of_surjective hφ_surj
+        rw [h_idx_S, h_idx_C]
+        exact hkey
+      have hAK_le_F : A.subgroupOf K ≤ fitting ↥K := ih ↥K hKcard hAK_ab hAK_h
+      -- F(K) nilpotent (Cor 1.28(a) instance), A.subgroupOf K ≤ F(K) subnormal in F(K).
+      have hAK_in_FK : ((A.subgroupOf K).subgroupOf (fitting ↥K)).IsSubnormal :=
+        isSubnormal_of_isNilpotent_finite _
+      have hFK_sn : (fitting ↥K).IsSubnormal := Subgroup.Normal.isSubnormal inferInstance
+      exact Subgroup.IsSubnormal.trans hAK_le_F hAK_in_FK hFK_sn
+    -- Zipper Lemma.
+    obtain ⟨M, hMcoatom, hAM, hMuniq⟩ := zipper_lemma hAK_sn hA_sn
+    -- A ≠ ⊤ (else A ⊴⊴ G via top).
+    have h_A_ne_top : A ≠ ⊤ := by
+      intro hAtop
+      apply hMcoatom.1
+      exact le_top.antisymm (hAtop ▸ hAM)
+    -- Show ∃ g, ⟨A, (MulAut.conj g) • A⟩ = ⊤.
+    have h_exists_g : ∃ g : G, A ⊔ ((MulAut.conj g) • A : Subgroup G) = ⊤ := by
+      by_contra h_all_proper
+      push_neg at h_all_proper
+      -- ∀ g, A ⊔ A^g < ⊤, hence ≤ some maximal = M.
+      have hAg_le_M : ∀ g : G, ((MulAut.conj g) • A : Subgroup G) ≤ M := by
+        intro g
+        have hne : A ⊔ ((MulAut.conj g) • A : Subgroup G) ≠ ⊤ := h_all_proper g
+        obtain ⟨K, hKcoatom, hKle⟩ :=
+          (eq_top_or_exists_le_coatom (A ⊔ ((MulAut.conj g) • A : Subgroup G))).resolve_left hne
+        have hAK : A ≤ K := le_sup_left.trans hKle
+        have hKM : K = M := hMuniq K hKcoatom hAK
+        exact (le_sup_right.trans hKle).trans hKM.le
+      -- A^G (normal closure) ≤ M.
+      have hNH_le_M : Subgroup.normalClosure (A : Set G) ≤ M := by
+        rw [Subgroup.normalClosure, Subgroup.closure_le]
+        intro y hy
+        rcases Group.mem_conjugatesOfSet_iff.mp hy with ⟨a, haA, hConj⟩
+        rcases hConj with ⟨c, hc⟩
+        apply hAg_le_M (c : G)
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def]
+        change ((c : G)⁻¹) * y * ((c : G)⁻¹)⁻¹ ∈ A
+        rw [inv_inv]
+        have hc_eq : (c : G) * a = y * (c : G) := hc
+        have ha_eq : ((c : G)⁻¹) * y * ((c : G)) = a := by
+          rw [mul_assoc, ← hc_eq]
+          group
+        rw [ha_eq]; exact haA
+      have hNH_lt : Subgroup.normalClosure (A : Set G) ≠ ⊤ := fun hNHtop =>
+        hMcoatom.1 (le_top.antisymm (hNHtop.symm.le.trans hNH_le_M))
+      -- A ⊴⊴ A^G ⊴ G ⇒ A ⊴⊴ G, contradiction.
+      have hA_le_NH : A ≤ Subgroup.normalClosure (A : Set G) := Subgroup.le_normalClosure
+      have hA_sn_NH : (A.subgroupOf (Subgroup.normalClosure (A : Set G))).IsSubnormal :=
+        hAK_sn _ hA_le_NH hNH_lt
+      have hNH_normal_sn : (Subgroup.normalClosure (A : Set G)).IsSubnormal :=
+        Subgroup.Normal.isSubnormal inferInstance
+      exact hA_sn (Subgroup.IsSubnormal.trans hA_le_NH hA_sn_NH hNH_normal_sn)
+    obtain ⟨g, hsup_top⟩ := h_exists_g
+    -- Helper: A^g is abelian. For b₁, b₂ ∈ A^g, write back via g⁻¹.
+    have hAg_ab : ∀ b₁ ∈ ((MulAut.conj g) • A : Subgroup G),
+        ∀ b₂ ∈ ((MulAut.conj g) • A : Subgroup G), b₁ * b₂ = b₂ * b₁ := by
+      intro b₁ hb₁ b₂ hb₂
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def] at hb₁ hb₂
+      have hb₁' : g⁻¹ * b₁ * g ∈ A := by
+        have : g⁻¹ * b₁ * (g⁻¹)⁻¹ ∈ A := hb₁
+        rwa [inv_inv] at this
+      have hb₂' : g⁻¹ * b₂ * g ∈ A := by
+        have : g⁻¹ * b₂ * (g⁻¹)⁻¹ ∈ A := hb₂
+        rwa [inv_inv] at this
+      have habelian := hAab _ hb₁' _ hb₂'
+      -- (g⁻¹ b₁ g)(g⁻¹ b₂ g) = g⁻¹ (b₁ b₂) g, similarly for swap. Cancel.
+      have hs1 : (g⁻¹ * b₁ * g) * (g⁻¹ * b₂ * g) = g⁻¹ * (b₁ * b₂) * g := by group
+      have hs2 : (g⁻¹ * b₂ * g) * (g⁻¹ * b₁ * g) = g⁻¹ * (b₂ * b₁) * g := by group
+      rw [hs1, hs2] at habelian
+      -- conjugate both sides by g to cancel.
+      have := congrArg (fun z => g * z * g⁻¹) habelian
+      simp only at this
+      calc b₁ * b₂ = g * (g⁻¹ * (b₁ * b₂) * g) * g⁻¹ := by group
+        _ = g * (g⁻¹ * (b₂ * b₁) * g) * g⁻¹ := this
+        _ = b₂ * b₁ := by group
+    -- A ⊓ A^g ⊆ Z(G): For c ∈ A ⊓ A^g, show centralizer contains both A and A^g, hence ⊤.
+    have h_inf_center : (A ⊓ ((MulAut.conj g) • A : Subgroup G) : Subgroup G) ≤
+        Subgroup.center G := by
+      intro c hc
+      rw [Subgroup.mem_inf] at hc
+      obtain ⟨hc_A, hc_Ag⟩ := hc
+      rw [Subgroup.mem_center_iff]
+      intro x
+      -- Show centralizer of {c} contains A and A^g, hence ⊤ ≤ centralizer.
+      have h_central_A : A ≤ Subgroup.centralizer ({c} : Set G) := by
+        intro a ha
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        rw [Set.mem_singleton_iff] at hy
+        rw [hy]
+        exact (hAab a ha c hc_A).symm
+      have h_central_Ag : ((MulAut.conj g) • A : Subgroup G) ≤
+          Subgroup.centralizer ({c} : Set G) := by
+        intro b hb
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        rw [Set.mem_singleton_iff] at hy
+        rw [hy]
+        exact (hAg_ab b hb c hc_Ag).symm
+      have h_sup_le : (A ⊔ ((MulAut.conj g) • A : Subgroup G) : Subgroup G) ≤
+          Subgroup.centralizer ({c} : Set G) := sup_le h_central_A h_central_Ag
+      have h_central_top : Subgroup.centralizer ({c} : Set G) = ⊤ :=
+        top_le_iff.mp (hsup_top ▸ h_sup_le)
+      have hx_central : x ∈ Subgroup.centralizer ({c} : Set G) := by
+        rw [h_central_top]; exact Subgroup.mem_top x
+      rw [Subgroup.mem_centralizer_iff] at hx_central
+      exact (hx_central c (Set.mem_singleton _)).symm
+    -- Counting: |A·A^g| · |A⊓A^g| = |A|² (via card_set_mul_card_inf).
+    have h_count_eq : Nat.card ((A : Set G) *
+        (((MulAut.conj g) • A : Subgroup G) : Set G)) *
+        Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) =
+        Nat.card ↥A * Nat.card ↥((MulAut.conj g) • A : Subgroup G) :=
+      card_set_mul_card_inf A ((MulAut.conj g) • A)
+    have h_conj_card : Nat.card ↥((MulAut.conj g) • A : Subgroup G) = Nat.card ↥A := by
+      rw [Subgroup.pointwise_smul_def]
+      exact Subgroup.card_map_of_injective (MulEquiv.injective (MulAut.conj g))
+    rw [h_conj_card] at h_count_eq
+    -- |A·A^g| < |G| (Lemma 2.10 対偶).
+    have h_set_mul_lt : Nat.card ((A : Set G) *
+        (((MulAut.conj g) • A : Subgroup G) : Set G)) < Nat.card G := by
+      have h_subset : (A : Set G) *
+          (((MulAut.conj g) • A : Subgroup G) : Set G) ⊆ Set.univ := Set.subset_univ _
+      have h_set_ne_univ : (A : Set G) *
+          (((MulAut.conj g) • A : Subgroup G) : Set G) ≠ Set.univ := by
+        intro h_univ
+        apply h_A_ne_top
+        apply eq_top_of_set_mul_conj_eq_top g⁻¹
+        convert h_univ using 2
+        rw [inv_inv]
+      -- |set| ≤ |G|, and |set| ≠ |G| (else set = univ).
+      have h_card_le : Nat.card ((A : Set G) *
+          (((MulAut.conj g) • A : Subgroup G) : Set G)) ≤ Nat.card G := by
+        rw [← Nat.card_univ (α := G)]
+        refine Nat.card_le_card_of_injective (fun x => ⟨x.val, Set.mem_univ _⟩) ?_
+        intro x y hxy
+        exact Subtype.ext (Subtype.mk.injEq _ _ _ _ |>.mp hxy)
+      rcases lt_or_eq_of_le h_card_le with hlt | heq
+      · exact hlt
+      · exfalso
+        apply h_set_ne_univ
+        apply Set.eq_of_subset_of_ncard_le h_subset _ Set.finite_univ
+        rw [Set.ncard_univ, ← Nat.card_coe_set_eq]
+        exact le_of_eq heq.symm
+    -- |A⊓A^g| ≤ |Z(G)|.
+    have h_inf_le_center_card : Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) ≤
+        Nat.card ↥(Subgroup.center G) :=
+      Subgroup.card_le_of_le h_inf_center
+    -- Counting: derive |G| · |Z(G)| > |A|² .
+    have h_card_inf_pos : 0 < Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) := Nat.card_pos
+    have h_card_A_pos : 0 < Nat.card ↥A := Nat.card_pos
+    have h_card_G_pos : 0 < Nat.card G := Nat.card_pos
+    have h_count_lt : Nat.card G * Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) >
+        Nat.card ↥A * Nat.card ↥A := by
+      have h1 : Nat.card ((A : Set G) *
+          (((MulAut.conj g) • A : Subgroup G) : Set G)) *
+          Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) <
+          Nat.card G * Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) :=
+        (Nat.mul_lt_mul_right h_card_inf_pos).mpr h_set_mul_lt
+      omega
+    have h_G_center_gt : Nat.card G * Nat.card ↥(Subgroup.center G) >
+        Nat.card ↥A * Nat.card ↥A := by
+      calc Nat.card G * Nat.card ↥(Subgroup.center G)
+          ≥ Nat.card G * Nat.card ↥(A ⊓ (MulAut.conj g) • A : Subgroup G) :=
+            Nat.mul_le_mul_left _ h_inf_le_center_card
+        _ > Nat.card ↥A * Nat.card ↥A := h_count_lt
+    -- Apply h at H = ⊤: convert to A.index^2 ≤ (center G).index.
+    have h_at_top := h ⊤ le_top
+    -- h_at_top : (A.subgroupOf ⊤).index ^ 2 ≤ (Subgroup.center ↥(⊤ : Subgroup G)).index
+    -- Conversion 1: (A.subgroupOf ⊤).index = A.index.
+    have h_idx_A : (A.subgroupOf ⊤).index = A.index := A.relIndex_top_right
+    -- Conversion 2: (center ↥⊤).index = (center G).index, via topEquiv.
+    have h_topEquiv_surj : Function.Surjective
+        ((Subgroup.topEquiv : ↥(⊤ : Subgroup G) ≃* G).toMonoidHom) :=
+      (Subgroup.topEquiv : ↥(⊤ : Subgroup G) ≃* G).surjective
+    have h_idx_C : (Subgroup.center ↥(⊤ : Subgroup G)).index = (Subgroup.center G).index := by
+      have hcenter_eq : (Subgroup.center G).comap
+          (Subgroup.topEquiv : ↥(⊤ : Subgroup G) ≃* G).toMonoidHom =
+          Subgroup.center ↥(⊤ : Subgroup G) := by
+        ext x
+        rw [Subgroup.mem_comap, Subgroup.mem_center_iff, Subgroup.mem_center_iff]
+        constructor
+        · intro hx y
+          apply Subgroup.topEquiv.injective
+          show Subgroup.topEquiv.toMonoidHom (y * x) = Subgroup.topEquiv.toMonoidHom (x * y)
+          rw [map_mul, map_mul]
+          exact hx (Subgroup.topEquiv.toMonoidHom y)
+        · intro hx z
+          obtain ⟨y, hy⟩ := h_topEquiv_surj z
+          calc z * Subgroup.topEquiv.toMonoidHom x
+              = Subgroup.topEquiv.toMonoidHom y * Subgroup.topEquiv.toMonoidHom x := by rw [← hy]
+            _ = Subgroup.topEquiv.toMonoidHom (y * x) := (map_mul _ _ _).symm
+            _ = Subgroup.topEquiv.toMonoidHom (x * y) := by rw [hx y]
+            _ = Subgroup.topEquiv.toMonoidHom x * Subgroup.topEquiv.toMonoidHom y := map_mul _ _ _
+            _ = Subgroup.topEquiv.toMonoidHom x * z := by rw [hy]
+      rw [← hcenter_eq]
+      exact (Subgroup.center G).index_comap_of_surjective h_topEquiv_surj
+    rw [h_idx_A, h_idx_C] at h_at_top
+    -- Numerical derivation: from h_at_top + h_G_center_gt, contradiction.
+    -- h_at_top : A.index ^ 2 ≤ (Subgroup.center G).index
+    -- hA_lag : A.index * |A| = |G|
+    -- hC_lag : (Subgroup.center G).index * |Z(G)| = |G|
+    -- h_G_center_gt : |G| * |Z(G)| > |A| * |A|
+    -- Derivation: |G|^2 * |Z(G)| = A.index^2 * |A|^2 * |Z(G)| ≤ (center G).index * |A|^2 * |Z(G)|
+    --   = ((center G).index * |Z(G)|) * |A|^2 = |G| * |A|^2.
+    -- So |G|^2 * |Z(G)| ≤ |G| * |A|^2, cancel |G|: |G| * |Z(G)| ≤ |A|^2.
+    -- Contradicts h_G_center_gt.
+    have hA_lag : A.index * Nat.card ↥A = Nat.card G := A.index_mul_card
+    have hC_lag : (Subgroup.center G).index * Nat.card ↥(Subgroup.center G) = Nat.card G :=
+      (Subgroup.center G).index_mul_card
+    -- |G|^2 = A.index^2 * |A|^2.
+    have hGG_eq : Nat.card G * Nat.card G =
+        A.index ^ 2 * (Nat.card ↥A * Nat.card ↥A) := by
+      have h := hA_lag
+      calc Nat.card G * Nat.card G
+          = (A.index * Nat.card ↥A) * (A.index * Nat.card ↥A) := by rw [h]
+        _ = A.index ^ 2 * (Nat.card ↥A * Nat.card ↥A) := by ring
+    -- Step: A.index^2 * |A|^2 * |Z(G)| ≤ (center G).index * |A|^2 * |Z(G)| = |G| * |A|^2.
+    have h_step : Nat.card G * Nat.card G * Nat.card ↥(Subgroup.center G) ≤
+        Nat.card G * (Nat.card ↥A * Nat.card ↥A) := by
+      calc Nat.card G * Nat.card G * Nat.card ↥(Subgroup.center G)
+          = A.index ^ 2 * (Nat.card ↥A * Nat.card ↥A) * Nat.card ↥(Subgroup.center G) := by
+            rw [hGG_eq]
+        _ ≤ (Subgroup.center G).index * (Nat.card ↥A * Nat.card ↥A) *
+              Nat.card ↥(Subgroup.center G) :=
+            Nat.mul_le_mul_right _ (Nat.mul_le_mul_right _ h_at_top)
+        _ = ((Subgroup.center G).index * Nat.card ↥(Subgroup.center G)) *
+              (Nat.card ↥A * Nat.card ↥A) := by ring
+        _ = Nat.card G * (Nat.card ↥A * Nat.card ↥A) := by rw [hC_lag]
+    -- Cancel |G| > 0.
+    have h_GZ_le : Nat.card G * Nat.card ↥(Subgroup.center G) ≤
+        Nat.card ↥A * Nat.card ↥A := by
+      have h_pos := Nat.card_pos (α := G)
+      have h_eq : Nat.card G * (Nat.card G * Nat.card ↥(Subgroup.center G)) ≤
+          Nat.card G * (Nat.card ↥A * Nat.card ↥A) := by
+        calc Nat.card G * (Nat.card G * Nat.card ↥(Subgroup.center G))
+            = Nat.card G * Nat.card G * Nat.card ↥(Subgroup.center G) := by ring
+          _ ≤ Nat.card G * (Nat.card ↥A * Nat.card ↥A) := h_step
+      exact Nat.le_of_mul_le_mul_left h_eq h_pos
+    -- Contradiction.
+    omega
+
 /-- **Isaacs Thm 2.11** (Wielandt abelian-in-F(G)). 有限群 `G` の abelian 部分群 `A`
 で, 全ての `H ⊇ A` について `|H:A|² ≤ |H:Z(H)|` ならば `A ≤ F(G)`.
 
@@ -1330,15 +1666,13 @@ private lemma card_set_mul_card_inf {G : Type*} [Group G] [Finite G]
    `A ⊴ A^G ⊴ G` で `A ⊴⊴ G`, 矛盾.
 4. `A, A^g` abelian で `⟨A, A^g⟩ = G` ⇒ `A ⊓ A^g ⊆ Z(G)`.
 5. Lemma 2.10 で `|A · A^g| < |G|`. 計数 `|A·A^g| = |A|²/|A⊓A^g| ≥ |A|²/|Z(G)|`
-   で `|G:A|² > |G:Z(G)|`, 仮定 (`H = G`) に矛盾.
-
-形式化メモ: ~200 行の `|G|`-induction (部分群対応 + IH 適用 + Zipper). 別 commit で完成.
-本リポでは `axiom` として一旦受け入れ (補助補題 `card_set_mul_card_inf` は完成済み). -/
-axiom subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
-    (_hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
-    (_h : ∀ H : Subgroup G, A ≤ H →
+   で `|G:A|² > |G:Z(G)|`, 仮定 (`H = G`) に矛盾. -/
+theorem subset_fitting_of_index_sq_le_index_center [Finite G] {A : Subgroup G}
+    (hAab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (h : ∀ H : Subgroup G, A ≤ H →
       ((A.subgroupOf H).index) ^ 2 ≤ (Subgroup.center ↥H).index) :
-    A ≤ fitting G
+    A ≤ fitting G :=
+  subset_fitting_aux (Nat.card G) G le_rfl hAab h
 
 end -- 2A
 

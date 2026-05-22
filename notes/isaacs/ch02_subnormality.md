@@ -30,7 +30,7 @@
 | **Thm 2.8** | ✅ (2026-05-22) | `isSubnormal_of_permutable_with_conjugates`. |G|-induction + Zipper Lemma + normal closure. IH transfer via `Subgroup.conj_smul_subgroupOf` + `H.subtype` injective image |
 | Thm 2.9 (Zipper) | ✅ | `zipper_lemma`. `S.index` 強 induction. Case A (K で S normal) と Case B (chain で T = S ⊔ S^x を構成) |
 | Thm 2.10 | ✅ | `eq_top_of_set_mul_conj_eq_top`. 集合等式 `H · H^x = G` ⇒ `H = G`. `Subgroup.conj_smul_eq_self_of_mem` 経由 |
-| **Thm 2.11** ⚠ | axiom | Wielandt-abelian `|H:A|² ≤ |H:Z(H)|`. 完全証明には `|HK|` 公式が必要 (mathlib 未収載). 別 commit で fill in |
+| **Thm 2.11** | ✅ (2026-05-22) | `subset_fitting_of_index_sq_le_index_center` (Wielandt). `\|G\|`-induction + IH を `K ⊋ A` に部分群対応で transfer (`Subgroup.equivMapOfInjective` + `index_comap_of_surjective` で index / center index を移送) + Zipper Lemma + 計数 (`card_set_mul_card_inf` 経由) で `\|G\|·\|Z(G)\| ≤ \|A\|²` を導出して矛盾. ~250 行 |
 | **Thm 2.12 Baer 順方向** | ✅ (2026-05-22) | `baer_sup_conj_isNilpotent_of_le_fitting`. F(G) ⊴ G + 冪零 subgroup 継承の単純証明 |
 | **Thm 2.12 Baer 逆方向** | ✅ (2026-05-22) | `le_fitting_of_baer_sup_conj_isNilpotent`. Zipper Lemma + Thm 2.2 経由の `|G|`-induction. IH transfer via `Subgroup.conj_smul_subgroupOf` + sup of subgroupOf + subgroupOfEquivOfLe. `x = 1` で `H` 冪零, 部分正規性は背理法 |
 | Thm 2.12 Baer iff | ✅ | `le_fitting_iff_baer_sup_conj_isNilpotent` (順+逆 結合) |
