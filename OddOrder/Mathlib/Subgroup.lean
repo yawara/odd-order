@@ -6,9 +6,11 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Coset.Card
+import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.Data.Finite.Card
 import Mathlib.Data.Setoid.Basic
+import Mathlib.Tactic.Group
 
 /-!
 # Auxiliary `Subgroup` lemmas
@@ -186,6 +188,30 @@ theorem nat_card_quotient_subgroupOf_eq_card_map {G : Type*} [Group G] [Finite G
   conv_lhs => rw [show N.subgroupOf K = f0.ker from hker.symm]
   conv_rhs => rw [show K.map (QuotientGroup.mk' N) = f0.range from hrange.symm]
   exact hEq
+
+/-- **`H` is normal when complement of normal `N` with elementwise commute**:
+`N ⊴ G`, `H` complement of `N`, `∀ n ∈ N h ∈ H, n*h = h*n` ⇒ `H ⊴ G`.
+
+直積構造 `G ≃ N × H` を導出する古典的事実. Hall-Higman 3.21 case π' で
+`H' ⊴ K` 導出に使用. -/
+theorem normal_complement_of_commute {G : Type*} [Group G]
+    {N H : Subgroup G} [N.Normal] (hCompl : N.IsComplement' H)
+    (hCommute : ∀ n ∈ N, ∀ h ∈ H, n * h = h * n) :
+    H.Normal := by
+  refine ⟨fun h hh g => ?_⟩
+  have hsurj : Function.Surjective (fun x : N × H => (x.1 : G) * x.2) := hCompl.surjective
+  obtain ⟨⟨⟨n, hn⟩, ⟨h', hh'⟩⟩, hg⟩ := hsurj g
+  simp only at hg
+  rw [← hg]
+  have hy_in_H : h' * h * h'⁻¹ ∈ H := H.mul_mem (H.mul_mem hh' hh) (H.inv_mem hh')
+  have heq : (n * h') * h * (n * h')⁻¹ = h' * h * h'⁻¹ := by
+    calc (n * h') * h * (n * h')⁻¹
+        = n * (h' * h * h'⁻¹) * n⁻¹ := by group
+      _ = (h' * h * h'⁻¹) * n * n⁻¹ := by
+          rw [hCommute n hn (h' * h * h'⁻¹) hy_in_H]
+      _ = h' * h * h'⁻¹ := by group
+  rw [heq]
+  exact hy_in_H
 
 /-- **comap of subgroup of `C.map qmk` is ≤ C** when `B ≤ C` (`B = ker qmk`).
 `K_GB ≤ C.map qmk ⇒ K_GB.comap qmk ≤ B ⊔ C = C`. -/
