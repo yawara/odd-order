@@ -97,13 +97,27 @@ noncomputable def mulEquivSubgroupOfComplement {G : Type*} [Group G]
       (Subgroup.inclusion (N.normalizer_eq_top ▸ le_top))] K ≃* G :=
   SemidirectProduct.mulEquivSubgroup hCompl
 
-/-- **Isaacs Thm 3.3 Horosevskii**: 有限群 `G` で `σ ∈ Aut(G)` ならば `o(σ) < |G|`.
-証明: `Γ := G ⋊ ⟨σ⟩` で Lucchini (Thm 2.20) を `⟨σ⟩` に適用.
-TODO: Ch.2 Thm 2.20 Lucchini stub 完成後. -/
-theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G]
-    (_σ : MulAut G) [Nontrivial G] :
-    True := by  -- TODO: 正しい statement (orderOf σ < Nat.card G) + proof
-  trivial
+/-- **Isaacs Thm 3.3 Horosevskii**: 有限非自明群 `G` で `σ ∈ Aut(G)` ならば `o(σ) < |G|`.
+
+Isaacs p.71 の証明: `A = ⟨σ⟩ ≤ Aut(G)` cyclic, `Γ = G ⋊ A` semidirect product. `inr A ≤ Γ` は
+`A` の同型像で proper (Nontrivial G). Lucchini (Thm 2.20) を `inr A` に適用:
+`|inr A : K| < |Γ : inr A| = |G|`, where `K = core_Γ(inr A)`.
+`K ⊆ inr A`, `inr A ⊓ inl(G) = ⊥` (補集合) ⇒ `K ⊓ inl(G) = ⊥`. `K, inl(G) ⊴ Γ` で Lemma 2.7
+適用 ⇒ K と inl(G) 可換. K ⊆ C_Γ(inl(G)) ⊓ inr A = ⊥ (非自明自己同型は非自明作用). 故に
+K = ⊥, `|inr A : K| = |inr A| = o(σ)`. 結論 `o(σ) < |G|`.
+
+実装 TODO: Lucchini axiom + 半直積セットアップが揃った後に別 commit で本証明を fill in.
+鍵となる補題:
+- `SemidirectProduct.card`, `SemidirectProduct.equivProd` (Finite + 濃度)
+- `inl_range_isComplement_inr_range` (本ファイル §3A): inl(G), inr(A) 補集合
+- `inr_conj_inl_eq` (本ファイル §3A): 半直積内の共役 = 作用
+- `Subgroup.commute_of_normal_of_disjoint` (mathlib, Lemma 2.7): K ⊴, inl(G) ⊴, K∩inl(G)=⊥ ⇒ 可換
+- `OddOrder.Isaacs.Ch02.lucchini_index_normalCore_lt_index` (axiom)
+- `MonoidHom.map_zpowers`, `Nat.card_zpowers`, `Subgroup.index_mul_card`. -/
+theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    (σ : MulAut G) :
+    orderOf σ < Nat.card G := by
+  sorry
 
 /-- **Isaacs Thm 3.4**: `P` が `Aut(G)` の abelian `p`-部分群で `p ∤ |G|` ならば,
 `P` の `G` への作用は regular orbit を持つ. 特に `G` 非自明なら `|P| < |G|`.
