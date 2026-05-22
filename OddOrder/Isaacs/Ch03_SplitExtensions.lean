@@ -1628,6 +1628,14 @@ theorem IsAInvariant.iSup {A : Type*} [Group A] {φ : A →* MulAut G} {ι : Sor
   rw [Subgroup.map_iSup]
   exact iSup_congr fun i => hf i a
 
+/-- A-不変部分群族の iInf は A-不変 (非空 ι が必要; `(φ a)` 単射性を利用). -/
+theorem IsAInvariant.iInf {A : Type*} [Group A] {φ : A →* MulAut G} {ι : Sort*} [Nonempty ι]
+    {f : ι → Subgroup G} (hf : ∀ i, IsAInvariant φ (f i)) :
+    IsAInvariant φ (⨅ i, f i) := fun a => by
+  show (⨅ i, f i).map (φ a).toMonoidHom = ⨅ i, f i
+  rw [Subgroup.map_iInf _ (φ a).injective]
+  exact iInf_congr fun i => hf i a
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
