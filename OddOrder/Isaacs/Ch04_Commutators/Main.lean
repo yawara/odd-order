@@ -351,11 +351,42 @@ theorem commutator_lowerCentralSeries_le (i j : ℕ) :
     rw [Subgroup.commutator_comm]
     exact key
 
-/-! **Isaacs Cor 4.12** (weight n commutator ⊆ G^n): 任意の重み `n` の左結合交換子
-`⁅⁅...⁅g₁, g₂⁆, g₃⁆ ..., gₙ⁆` は `G^n` (= mathlib `lcs (n-1)`) に含まれる. 弱結合や
-別配置でも同じ `G^n` への inclusion が成立 (Thm 4.11 経由).
+/-- **左結合 n-重交換子**: `iterLeftCommutator g [g₁, g₂, ..., gₙ] = ⁅...⁅⁅g, g₁⁆, g₂⁆..., gₙ⁆`.
+`gs.length = n` のとき重み `n+1`. -/
+def iterLeftCommutator (head : G) (tail : List G) : G :=
+  tail.foldl (fun acc g => ⁅acc, g⁆) head
 
-形式化保留 (`weight n commutator` の汎用 mathlib API 不在; 個別誘導で書ける). -/
+/-- **`iterLeftCommutator` 汎用補題**: accumulator が `lcs n` 内なら, 長さ `m` の
+リストでの fold は `lcs (n + m)` に収まる. -/
+theorem iterLeftCommutator_mem_lowerCentralSeries_add (n : ℕ) (acc : G)
+    (hacc : acc ∈ lowerCentralSeries G n) (gs : List G) :
+    iterLeftCommutator acc gs ∈ lowerCentralSeries G (n + gs.length) := by
+  induction gs generalizing n acc with
+  | nil =>
+    simpa [iterLeftCommutator] using hacc
+  | cons g rest ih =>
+    -- iterLeftCommutator acc (g :: rest) = iterLeftCommutator ⁅acc, g⁆ rest.
+    have step : ⁅acc, g⁆ ∈ lowerCentralSeries G (n + 1) := by
+      change ⁅acc, g⁆ ∈ ⁅lowerCentralSeries G n, (⊤ : Subgroup G)⁆
+      exact Subgroup.commutator_mem_commutator hacc (Subgroup.mem_top g)
+    have hRec := ih (n + 1) ⁅acc, g⁆ step
+    -- hRec : iterLeftCommutator ⁅acc, g⁆ rest ∈ lcs ((n+1) + rest.length)
+    have hidx : n + (g :: rest).length = (n + 1) + rest.length := by
+      simp [List.length_cons]; omega
+    rw [hidx]
+    -- Convert goal: iterLeftCommutator acc (g :: rest) = iterLeftCommutator ⁅acc, g⁆ rest (rfl).
+    change iterLeftCommutator ⁅acc, g⁆ rest ∈ _
+    exact hRec
+
+/-- **Isaacs Cor 4.12** (weight n commutator ⊆ G^n): 重み `n+1` の左結合交換子は
+`lcs G n` に含まれる. mathlib indexing で Isaacs `G^{n+1}` = mathlib `lcs G n`.
+
+**証明**: 汎用補題 `iterLeftCommutator_mem_lowerCentralSeries_add` を `n = 0`,
+`acc = g ∈ ⊤ = lcs 0` で specialize. -/
+theorem iterLeftCommutator_mem_lowerCentralSeries (g : G) (gs : List G) :
+    iterLeftCommutator g gs ∈ lowerCentralSeries G gs.length := by
+  simpa using iterLeftCommutator_mem_lowerCentralSeries_add 0 g
+    (by simp : g ∈ (⊤ : Subgroup G)) gs
 
 /-- **Isaacs Cor 4.13** (derived ⊆ lcs with exponential index):
 `derivedSeries G r ≤ lowerCentralSeries G (2^r - 1)`.
