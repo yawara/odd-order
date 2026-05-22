@@ -299,11 +299,60 @@ theorem commutator_commutator_le_of_rotate {H₁ H₂ H₃ N : Subgroup G} [N.No
   simp only [Subgroup.map_commutator] at h1 h2 ⊢
   exact Subgroup.commutator_commutator_eq_bot_of_rotate h1 h2
 
-/-! **Isaacs Thm 4.11** (`⁅G^i, G^j⁆ ≤ G^{i+j}`): mathlib `lowerCentralSeries` の加法性.
-新規補題 ~30 行. **Lucchini K=⊥ aux 前提** (Ch.2 §2D ノートで指摘). 形式化保留. -/
+/-- **Isaacs Thm 4.11** (lcs 加法性) ⭐: `⁅γᵢ(G), γⱼ(G)⁆ ≤ γᵢ₊ⱼ(G)`.
+
+mathlib indexing (`lcs 0 = ⊤ = G^1`, `lcs n = G^{n+1}`) では Isaacs `⁅G^i, G^j⁆ ≤ G^{i+j}`
+は `⁅lcs (i-1), lcs (j-1)⁆ ≤ lcs (i+j-1)`, つまり `⁅lcs a, lcs b⁆ ≤ lcs (a + b + 1)`
+(`a = i-1, b = j-1`).
+
+**証明** (Isaacs p.123-124): `j` についての induction (`i` 自由).
+* base `j = 0`: `⁅lcs i, ⊤⁆ = lcs (i+1)` (mathlib `lowerCentralSeries` 定義式).
+* step: Cor 4.10 (Three-subgroups mod `N`) を `H₁ = lcs j, H₂ = ⊤, H₃ = lcs i,
+  N = lcs (i+j+2)` で適用. `lcs n` は characteristic ⇒ normal なので `[N.Normal]` 成立.
+  - h1 (`⁅⁅⊤, lcs i⁆, lcs j⁆ ≤ N`): `⁅⊤, lcs i⁆ = ⁅lcs i, ⊤⁆ = lcs (i+1)`
+    (`commutator_comm` + 定義) 経由で IH at `(i+1, j)`.
+  - h2 (`⁅⁅lcs i, lcs j⁆, ⊤⁆ ≤ N`): IH at `(i, j)` + `commutator_mono`
+    + `lcs (i+j+1)+1 = lcs (i+j+2)` (定義).
+  - 結論 `⁅⁅lcs j, ⊤⁆, lcs i⁆ ≤ N`, つまり `⁅lcs (j+1), lcs i⁆ ≤ lcs (i+j+2)`.
+  - `commutator_comm` で `⁅lcs i, lcs (j+1)⁆ ≤ lcs (i+j+2)` を得る.
+
+**下流**: Cor 4.12 (weight n commutator ⊆ G^n), Cor 4.13 (derived ⊆ lcs),
+Ch.2 §2D Lucchini K = ⊥ aux の解消経路. -/
+theorem commutator_lowerCentralSeries_le (i j : ℕ) :
+    ⁅lowerCentralSeries G i, lowerCentralSeries G j⁆ ≤
+      lowerCentralSeries G (i + j + 1) := by
+  induction j generalizing i with
+  | zero =>
+    -- ⁅lcs i, lcs 0⁆ = ⁅lcs i, ⊤⁆ = lcs (i+1) by `lowerCentralSeries` def.
+    change ⁅lowerCentralSeries G i, (⊤ : Subgroup G)⁆ ≤ lowerCentralSeries G (i + 1)
+    exact le_refl _
+  | succ j ih =>
+    -- Goal: ⁅lcs i, lcs (j+1)⁆ ≤ lcs (i + (j+1) + 1) = lcs (i + j + 2).
+    -- Step A: prove the rotated form via Cor 4.10.
+    have key : ⁅⁅lowerCentralSeries G j, (⊤ : Subgroup G)⁆, lowerCentralSeries G i⁆ ≤
+        lowerCentralSeries G (i + j + 2) := by
+      refine commutator_commutator_le_of_rotate ?_ ?_
+      · -- h1: ⁅⁅⊤, lcs i⁆, lcs j⁆ ≤ lcs (i + j + 2).
+        have h_top : (⁅(⊤ : Subgroup G), lowerCentralSeries G i⁆ : Subgroup G) =
+            lowerCentralSeries G (i + 1) := by
+          rw [Subgroup.commutator_comm]; rfl
+        rw [h_top]
+        have hIH := ih (i + 1)
+        have heq : (i + 1) + j + 1 = i + j + 2 := by omega
+        rwa [heq] at hIH
+      · -- h2: ⁅⁅lcs i, lcs j⁆, ⊤⁆ ≤ lcs (i + j + 2).
+        -- By IH at i + `commutator_mono` + `lcs (i+j+1)+1 = lcs (i+j+2)` def.
+        exact Subgroup.commutator_mono (ih i) le_rfl
+    -- Step B: rewrite goal into rotated form via `commutator_comm` + `lowerCentralSeries` def.
+    have hidx : i + (j + 1) + 1 = i + j + 2 := by omega
+    rw [hidx]
+    -- Goal: ⁅lcs i, lcs (j+1)⁆ ≤ lcs (i + j + 2).
+    -- lcs (j+1) = ⁅lcs j, ⊤⁆ definitionally; commute and conclude.
+    rw [Subgroup.commutator_comm]
+    exact key
 
 /-! **Isaacs Cor 4.12** (weight n commutator ⊆ G^n), **Cor 4.13** (derived ⊆ lcs,
-derived length ≤ 1 + log₂ m): 4.11 系. 形式化保留. -/
+derived length ≤ 1 + log₂ m): Thm 4.11 系. 形式化保留. -/
 
 /-! **Mann 4.14-4.19**: M(G), self-centralizing normal abelian 系. Isaacs 独自集約で
 **BG/Peterfalvi 直接被引用 0**. ⇒ **Phase 1 内では skip 可** (audit 確認). -/
