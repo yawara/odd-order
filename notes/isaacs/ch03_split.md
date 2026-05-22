@@ -18,7 +18,7 @@
 | Thm 3.4 (abelian P regular orbit) | ✅ (2026-05-21 完成, 2026-05-23 audit で確認) | `abelian_p_aut_regular_orbit` L255-424. Ch.1 §1F Thm 1.37 Brodkey + `opCore` + Lemma 2.7 + Sylow II 経由 |
 | §3B Schur-Zassenhaus (3.5-3.10) | docstring | mathlib 対応表のみ (`exists_right_complement'_of_coprime`, `IsSolvable` instance chains) |
 | §3B Thm 3.11 前半 (abelian) | ✅ | `solvable_minimal_normal_isAbelian` (`⁅M,M⁆ < M` + 最小性) |
-| §3B Thm 3.11 後半 (elementary abelian) | ✅ | `solvable_minimal_normal_isElementaryAbelian` (p-torsion T が characteristic in M + 最小性) |
+| §3B Thm 3.11 後半 (elementary abelian) | ✅ (2026-05-23 shared 化) | `solvable_minimal_normal_isElementaryAbelian` (p-torsion T が characteristic in M + 最小性). `IsElementaryAbelian` def は `OddOrder/GroupTheory/ElementaryAbelian.lean` に extract (whole-group + subgroup form), Ch.6/Ch.7/BG App.A 共有予定 |
 | §3C Lemma 3.16 coprime index ⇒ HK=G | ✅ | `sup_eq_top_of_coprime_index` (Subgroup.index_dvd + Nat.dvd_gcd) |
 | §3C IsHallSubgroup 定義 + 基礎 | ✅ | `IsHallSubgroup`, `.coprime_index`, `.top_iff`, `.bot_iff`, `.bot_of_card_eq_one` |
 | §3C **Thm 3.13 Hall-E** | ✅ | **完全証明**. `hall_E_strong_aux` で `|G|`-強誘導. base (|G|=1): ⊥. step: minimal normal M (Thm 3.11 で elem abelian p-group) + IH on G/M + pullback. Case p ∈ π: H = comap で直接. Case p ∉ π: Schur-Zassenhaus on M.subgroupOf H |

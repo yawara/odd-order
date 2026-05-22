@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
+import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
@@ -450,10 +451,10 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
   Isaacs 自身の証明は短い. mathlib に直接の対応があるか調査が必要.
 -/
 
-/-- **Elementary Abelian p-Group**: G が abelian かつ全ての元の `p`乗が単位元.
-mathlib 未収載の新規定義. -/
-def IsElementaryAbelian (p : ℕ) (G : Type*) [Group G] : Prop :=
-  (∀ x y : G, x * y = y * x) ∧ (∀ x : G, x ^ p = 1)
+/-! **Elementary Abelian p-Group** の def は `OddOrder/GroupTheory/ElementaryAbelian.lean`
+に移動 (2026-05-23). Ch.3, Ch.6, Ch.7 共通の shared concept として独立 module 化.
+本ファイルでは `OddOrder.GroupTheory.IsElementaryAbelian` (whole-group form) と
+`Subgroup.IsElementaryAbelian` (subgroup form) の双方を利用可能. -/
 
 open scoped commutatorElement in
 /-- Thm 3.11 の前半: 可解群の minimal normal subgroup は abelian.
@@ -491,7 +492,7 @@ M minimality で T.map M.subtype ∈ {⊥, M}. T ≠ ⊥ より T.map M.subtype 
 即ち全 x ∈ M で x^p = 1. -/
 theorem solvable_minimal_normal_isElementaryAbelian [Finite G] [IsSolvable G]
     {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
-    ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p ↥M := by
+    ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
   haveI hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
   have habel := solvable_minimal_normal_isAbelian hM
