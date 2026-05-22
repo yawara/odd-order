@@ -1565,6 +1565,13 @@ theorem IsAInvariant.commutator {A : Type*} [Group A] {φ : A →* MulAut G} {H 
   rw [show H.map (φ a).toMonoidHom = H from hH a,
       show K.map (φ a).toMonoidHom = K from hK a]
 
+/-- A-不変部分群の normalizer は A-不変 (`Subgroup.map_normalizer_eq_of_bijective`). -/
+theorem IsAInvariant.normalizer {A : Type*} [Group A] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) : IsAInvariant φ (Subgroup.normalizer H) := fun a => by
+  show (Subgroup.normalizer H).map (φ a).toMonoidHom = Subgroup.normalizer H
+  rw [Subgroup.map_normalizer_eq_of_bijective H (φ a).bijective,
+      show H.map (φ a).toMonoidHom = H from hH a]
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
