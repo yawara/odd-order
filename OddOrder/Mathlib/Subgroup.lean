@@ -162,6 +162,18 @@ instance powMonoidHom_range_characteristic
     rw [← map_pow]
     exact congrArg φ hy
 
+/-- **comap of subgroup of `C.map qmk` is ≤ C** when `B ≤ C` (`B = ker qmk`).
+`K_GB ≤ C.map qmk ⇒ K_GB.comap qmk ≤ B ⊔ C = C`. -/
+theorem comap_le_of_le_map_quotient {G : Type*} [Group G]
+    {B C : Subgroup G} [B.Normal] (hBC : B ≤ C)
+    {K_GB : Subgroup (G ⧸ B)} (hK : K_GB ≤ C.map (QuotientGroup.mk' B)) :
+    K_GB.comap (QuotientGroup.mk' B) ≤ C := by
+  calc K_GB.comap (QuotientGroup.mk' B)
+      ≤ (C.map (QuotientGroup.mk' B)).comap (QuotientGroup.mk' B) :=
+        Subgroup.comap_mono hK
+    _ = B ⊔ C := QuotientGroup.comap_map_mk' B C
+    _ = C := by rw [sup_comm]; exact sup_of_le_left hBC
+
 /-- **`G ⧸ N` nontrivial iff `N ≠ ⊤`** (有限 G で): mathlib `Subgroup.index_eq_one`
 + `Finite.one_lt_card_iff_nontrivial` を結合.
 
