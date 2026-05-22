@@ -607,6 +607,82 @@ theorem isCommutative_of_isMinimalNormal_of_isNilpotent_subtype
   rw [hcomm_eq_bot, Subgroup.mem_bot] at hcomm_xy
   exact commutatorElement_eq_one_iff_mul_comm.mp hcomm_xy
 
+/-- **Variant of Thm 3.11**: minimal normal subgroup of finite group with `↥E` nilpotent
+⇒ E is elementary abelian p-group for some prime p.
+
+`solvable_minimal_normal_isElementaryAbelian` の `[IsSolvable G]` 仮定を
+`[Group.IsNilpotent ↥E]` に弱めた版. 証明は Ch.3 既存版とほぼ同じだが abelianness 取得を
+`isCommutative_of_isMinimalNormal_of_isNilpotent_subtype` に置換.
+
+**Lucchini K=⊥ 用途**: E ≤ F(G) で `↥E` 冪零 (F(G) 冪零の部分群経由) かつ minimal normal の
+場合に, E が elementary abelian p-group であることを示す. -/
+theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
+    {G : Type*} [Group G] [Finite G]
+    {E : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal E)
+    [Group.IsNilpotent ↥E] :
+    ∃ p : ℕ, p.Prime ∧ E.IsElementaryAbelian p := by
+  haveI hEnormal : E.Normal := hMin.1
+  have hE_ne_bot : E ≠ ⊥ := hMin.2.1
+  have habel := isCommutative_of_isMinimalNormal_of_isNilpotent_subtype hMin
+  haveI hEcomm : IsMulCommutative ↥E :=
+    ⟨⟨fun a b => Subtype.ext (habel a a.2 b b.2)⟩⟩
+  haveI hEnt : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hE_ne_bot
+  have hE_card_pos : 1 < Nat.card ↥E := Finite.one_lt_card
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hE_card_pos.ne'
+  refine ⟨p, hp_prime, ?_⟩
+  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  -- T = {x : ↥E | x^p = 1} as Subgroup ↥E.
+  let T : Subgroup ↥E :=
+    { carrier := {x | x ^ p = 1}
+      one_mem' := one_pow p
+      mul_mem' := by
+        intro a b ha hb
+        change (a * b) ^ p = 1
+        change a ^ p = 1 at ha
+        change b ^ p = 1 at hb
+        rw [mul_pow, ha, hb, one_mul]
+      inv_mem' := by
+        intro a ha
+        change a⁻¹ ^ p = 1
+        change a ^ p = 1 at ha
+        rw [inv_pow, ha, inv_one] }
+  haveI hT_char : T.Characteristic := by
+    rw [Subgroup.characteristic_iff_le_comap]
+    intro φ x hx
+    rw [Subgroup.mem_comap]
+    change (φ x) ^ p = 1
+    change x ^ p = 1 at hx
+    rw [← map_pow, hx, map_one]
+  obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥E) p hp_dvd
+  have hx_pow : x ^ p = 1 := by
+    rw [← hx_ord]; exact pow_orderOf_eq_one x
+  have hx_ne_one : x ≠ 1 := by
+    intro heq
+    rw [heq, orderOf_one] at hx_ord
+    exact hp_prime.ne_one hx_ord.symm
+  have hT_ne_bot : T ≠ ⊥ := by
+    intro hbot
+    have hx_T : x ∈ T := hx_pow
+    rw [hbot, Subgroup.mem_bot] at hx_T
+    exact hx_ne_one hx_T
+  haveI hTE_normal : (T.map E.subtype).Normal := inferInstance
+  have hTE_le_E : T.map E.subtype ≤ E := by
+    rintro _ ⟨y, _, rfl⟩
+    exact y.2
+  rcases hMin.2.2 (T.map E.subtype) hTE_normal hTE_le_E with hTE_bot | hTE_eq
+  · exfalso
+    have hT_eq_bot : T = ⊥ := by
+      have : T.map E.subtype = (⊥ : Subgroup ↥E).map E.subtype := by
+        rw [hTE_bot, Subgroup.map_bot]
+      exact Subgroup.map_injective E.subtype_injective this
+    exact hT_ne_bot hT_eq_bot
+  · refine ⟨fun a b => Subtype.ext (habel a a.2 b b.2), fun y => ?_⟩
+    have hy_TE : (y : G) ∈ T.map E.subtype := by
+      rw [hTE_eq]; exact y.2
+    obtain ⟨z, hz_T, hz_eq⟩ := hy_TE
+    have hzy : z = y := Subtype.ext hz_eq
+    exact hzy ▸ hz_T
+
 /-- **Lucchini K=⊥ 1st step**: G 非自明有限, A abelian, `|A| ≥ |G:A|` ⇒
 ∃ `E ⊴ G` minimal normal で `E ≤ F(G) ∧ E ≤ centralizer F(G)`.
 
