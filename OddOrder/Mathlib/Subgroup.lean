@@ -160,6 +160,20 @@ instance powMonoidHom_range_characteristic
     rw [← map_pow]
     exact congrArg φ hy
 
+/-- **normalCore = ⊥ ⇒ no nontrivial G-normal subgroup of H**:
+`B ⊴ G + B ≤ H + H.normalCore = ⊥ ⇒ B = ⊥`.
+
+`H.normalCore` は G-normal subgroups of G contained in H の最大. 仮定 `H.normalCore = ⊥`
+は H が G-core を持たない (= 「core-free」) を意味する. このとき H の任意の G-normal
+sub は ⊥ に強制される.
+
+**用途**: Lucchini Thm 2.20 (K=⊥ case) で `M ⊴ G + M ≤ A + core_G(A) = ⊥ ⇒ M = ⊥` の
+最終矛盾導出に使用. -/
+theorem eq_bot_of_le_of_normal_of_normalCore_eq_bot {H B : Subgroup G} [B.Normal]
+    (hBH : B ≤ H) (hCore : H.normalCore = ⊥) : B = ⊥ := by
+  rw [← le_bot_iff, ← hCore]
+  exact (normal_le_normalCore (N := B) (H := H)).mpr hBH
+
 /-- **Dedekind / modular law for subgroups** (with normality of one summand).
 `E, A, M ≤ G`, `E ⊴ G`, `E ≤ M` ⇒ `M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A)`.
 
