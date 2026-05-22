@@ -2187,6 +2187,42 @@ private lemma center_le_fitting (G : Type*) [Group G] [Finite G] :
   exact nilpotent_normal_le_fitting
 
 open scoped Pointwise in
+/-- **Zenkov Case 1** (Isaacs Thm 2.18 の Case 1, WLOG `g₀ = 1`):
+`A`, `B` abelian, `M = A ⊓ B` minimal in family, **かつ ある `g` で `A ⊔ B^g = ⊤`** ⇒
+`M ⊆ F(G)`.
+
+書籍 p.61 Case 1: `A ⊓ B^g ⊆ Z(G)` (A, B^g abelian + 生成) → 中心元は conj 不変
+⇒ `A ⊓ B^g ⊆ B` ⇒ `A ⊓ B^g ⊆ M`. Minimality で `M = A ⊓ B^g ⊆ Z(G) ⊆ F(G)`. -/
+theorem zenkov_case1_le_fitting {G : Type*} [Group G] [Finite G] {A B : Subgroup G}
+    (hAab : ∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a)
+    (hBab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b)
+    (hMin : ∀ g : G, (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤ A ⊓ B →
+        (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) = A ⊓ B)
+    (hExists : ∃ g : G, A ⊔ ((MulAut.conj g) • B : Subgroup G) = ⊤) :
+    (A ⊓ B : Subgroup G) ≤ fitting G := by
+  obtain ⟨g, hsup⟩ := hExists
+  have hBg_ab := conj_smul_abelian hBab g
+  have h_inf_center : (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤
+      Subgroup.center G := inf_le_center_of_join_eq_top hAab hBg_ab hsup
+  -- A ⊓ B^g ⊆ B: central c は g⁻¹ c g = c, c = g b g⁻¹ ⇒ b = c ∈ B.
+  have h_inf_le_B : (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤ B := by
+    intro c hc
+    have hc_central : c ∈ Subgroup.center G := h_inf_center hc
+    rw [Subgroup.mem_inf] at hc
+    obtain ⟨_, hc_Bg⟩ := hc
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def] at hc_Bg
+    change g⁻¹ * c * (g⁻¹)⁻¹ ∈ B at hc_Bg
+    rw [Subgroup.mem_center_iff] at hc_central
+    have h_inv_c_g : g⁻¹ * c = c * g⁻¹ := hc_central g⁻¹
+    have h_eq : g⁻¹ * c * (g⁻¹)⁻¹ = c := by rw [h_inv_c_g]; group
+    rwa [h_eq] at hc_Bg
+  have h_inf_le_M : (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤ A ⊓ B :=
+    le_inf inf_le_left h_inf_le_B
+  have h_eq := hMin g h_inf_le_M
+  rw [← h_eq]
+  exact h_inf_center.trans (center_le_fitting G)
+
+open scoped Pointwise in
 /-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
 `M = A ⊓ B^{g₀}` が集合 `{A ⊓ B^g | g ∈ G}` の minimal member (包含関係について) なら,
 `M ⊆ F(G)`.
