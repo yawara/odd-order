@@ -21,7 +21,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 |---|---|---|---|
 | 5A | Transfer 定義・welldefinedness・準同型性 | 5.1 – 5.4 | mathlib `MonoidHom.transfer` 直接 |
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
-| 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | mathlib 直接 + 5.18 実装 |
+| 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.18; その他 mathlib 直接 |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
 | 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | docstring + 保留 (FT クリティカル) |
 
