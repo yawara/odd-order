@@ -915,6 +915,61 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
   exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H.map φ.toMonoidHom, hMapN, hMapPi⟩ hMapMem
 
+/-- **Hall-Higman prereq**: 有限非自明可解群は π-radical または π'-radical が非自明.
+
+`oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥`.
+
+**証明**: minimal normal `M ⊴ G` を取り (Ch.2 `exists_isMinimalNormal_le_of_normal`),
+Thm 3.11 で `M` elem abelian `p`-group (for some prime `p`). `IsPGroup p ↥M` から
+`|M| = p^n` (`IsPGroup.iff_card`). `n ≥ 1` (`M ≠ ⊥`) で primeFactors `(p^n) = {p}`.
+`p ∈ π` or `p ∉ π` で場合分け: 各々 `M ≤ oPiCore (π or π') G`, `M ≠ ⊥` で結論. -/
+theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot
+    {G : Type*} [Group G] [Finite G] [Nontrivial G] [IsSolvable G] (π : Set ℕ) :
+    oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥ := by
+  have hTopNeBot : (⊤ : Subgroup G) ≠ ⊥ := top_ne_bot
+  obtain ⟨M, hMin, _⟩ :=
+    OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal _ hTopNeBot
+  haveI hMNormal : M.Normal := hMin.1
+  have hM_ne_bot : M ≠ ⊥ := hMin.2.1
+  obtain ⟨p, hp_prime, hElem⟩ := solvable_minimal_normal_isElementaryAbelian hMin
+  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  have hIsPGroup : IsPGroup p ↥M := fun x => ⟨1, by
+    rw [pow_one]; exact hElem.pow_eq_one x⟩
+  obtain ⟨n, hn_card⟩ := (IsPGroup.iff_card (G := ↥M)).mp hIsPGroup
+  haveI hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hM_card_gt : 1 < Nat.card ↥M := Finite.one_lt_card
+  have hn_ne : n ≠ 0 := by
+    intro h
+    rw [h, pow_zero] at hn_card
+    rw [hn_card] at hM_card_gt
+    exact absurd hM_card_gt (lt_irrefl _)
+  have hPF : (Nat.card ↥M).primeFactors = {p} := by
+    rw [hn_card]
+    exact Nat.primeFactors_prime_pow hn_ne hp_prime
+  by_cases hp_pi : p ∈ π
+  · left
+    intro hbot
+    have hM_isPi : Subgroup.IsPiGroup π M := by
+      intro q hq
+      rw [hPF, Finset.mem_singleton] at hq
+      exact hq ▸ hp_pi
+    have hMle : M ≤ oPiCore π G :=
+      le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
+        (K.val : Subgroup G)) ⟨M, hMNormal, hM_isPi⟩
+    have : M = ⊥ := le_antisymm (hbot ▸ hMle) bot_le
+    exact hM_ne_bot this
+  · right
+    intro hbot
+    have hM_isPi' : Subgroup.IsPiGroup {q | q ∉ π} M := by
+      intro q hq
+      rw [hPF, Finset.mem_singleton] at hq
+      exact hq ▸ hp_pi
+    have hMle : M ≤ oPiCore {q | q ∉ π} G :=
+      le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup {q | q ∉ π} K} =>
+        (K.val : Subgroup G)) ⟨M, hMNormal, hM_isPi'⟩
+    have : M = ⊥ := le_antisymm (hbot ▸ hMle) bot_le
+    exact hM_ne_bot this
+
 /-- **Isaacs Lemma 3.18**: π-separable の補助補題. 正式定義下では non-trivial だが
 仮定義 (=IsSolvable) では trivial に True. -/
 theorem isPiSeparable_aux : True := trivial
