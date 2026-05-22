@@ -195,6 +195,8 @@ end -- 1B
 - **2026-05-22** Isaacs §2A Thm 2.11 (Wielandt abelian-in-F(G)): sorry stub. §2B Thm 2.12 Baer 順方向 (`baer_sup_conj_isNilpotent_of_le_fitting`) 完成, 逆方向は 2.11 依存で stub
 - **2026-05-22** Isaacs Ch.3 構造完成: §3A 3.3/3.4 stub, §3B mathlib 対応表 + `IsElementaryAbelian` 定義 + Thm 3.11 stub, §3C `IsHallSubgroup` 定義 + Lemma 3.16 完成 + `IsHallSubgroup.coprime_index` 完成 + Thm 3.13-3.17 stubs, §3D `IsPiSeparable` 定義 + Thm 3.18-3.22 stubs, §3E/§3F docstrings
 - **2026-05-22** Isaacs §2B 完成: Thm 2.12 Baer (順方向 + 逆方向 + iff) — Zipper Lemma + Thm 2.2 経由の `|G|`-induction で逆方向を構成. Lemma 2.14 essence (`inv_by_two_involutions`) + structural (`mem_zpowers_or_mul_t_mem`) — closure induction で 4 mul cases + 2 inv cases. Thm 2.13 Matsuyama (`t ∉ O_2(G)` ⇒ 奇素数位数 inversion `x^t = x⁻¹`) — Baer iff + Cauchy + Lemma 2.14. Helpers: `mem_opCore_of_le_fitting_of_isPGroup` (Sylow `p` of F(G) = O_p(G)), `exists_odd_prime_dvd_of_not_pow_two` (Nat 強 induction)
+- **2026-05-22** Isaacs §2D axiom 化: Thm 2.18 Zenkov (`zenkov_minimal_le_fitting`), Cor 2.19 (`inf_fitting_ne_bot_of_abelian_card_ge_index`), Thm 2.20 Lucchini (`lucchini_index_normalCore_lt_index`) を statement のみ axiom 化. 各 docstring に Isaacs p.61-63 の完全証明戦略 (|G|-induction + Baer + 計算) を記載. Lucchini が Ch.3 Horosevskii の必須前提
+- **2026-05-22** Isaacs Ch.3 §3A Thm 3.3 Horosevskii 完成: `horosevskii_aut_order_lt` (`orderOf σ < Nat.card G`). Lucchini axiom + 半直積 `G ⋊[A.subtype] A` + `inl_range_isComplement_inr_range` (Thm 3.2) + Lemma 2.7 + `inl_aut` + `MonoidHom.map_zpowers` で完全証明 (~120 行)
 
 ## Phase 1 内の章間依存 (Isaacs)
 

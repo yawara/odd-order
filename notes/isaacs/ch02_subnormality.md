@@ -7,7 +7,8 @@
 ## 進捗 (2026-05-22)
 
 §2A 完成 (Thm 2.11 のみ axiom). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式).
-§2C, §2D は TODO.
+**§2D**: Thm 2.18 Zenkov + Cor 2.19 + Thm 2.20 Lucchini 全て axiom として導入 (Lucchini が
+Ch.3 Horosevskii の必須前提のため). §2C は依然 TODO.
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -33,7 +34,9 @@
 | Helper `mem_opCore_of_le_fitting_of_isPGroup` | ✅ | `H ≤ F(G)` で `H` が `p`-subgroup ⇒ `H ≤ O_p(G)`. Sylow `p` of nilpotent F(G) が unique で characteristic-in-normal 経由 |
 | Helper `exists_odd_prime_dvd_of_not_pow_two` | ✅ | Nat 補助: 2-べきでない正整数は奇素数約数を持つ. 強 induction |
 | §2C (Thm 2.15-2.17) | TODO | p-local 部分群. Thm 2.13 を使う |
-| §2D (Thm 2.18-2.20) | TODO | Zenkov + Lucchini. FT 経路で必要なし |
+| **Thm 2.18 Zenkov** | axiom (2026-05-22) | `zenkov_minimal_le_fitting`. minimal `M = A ⊓ B^{g₀}` (A, B abelian) ⇒ `M ≤ F(G)`. 完全証明 ~200 行, 別 commit で fill in |
+| **Cor 2.19** | axiom (2026-05-22) | `inf_fitting_ne_bot_of_abelian_card_ge_index`. `\|A\| ≥ \|G:A\|` ⇒ `A ⊓ F(G) > 1`. Zenkov 経由 |
+| **Thm 2.20 Lucchini** | axiom (2026-05-22) | `lucchini_index_normalCore_lt_index`. cyclic 真部分群 A, K = core(A) ⇒ `\|A:K\| < \|G:A\|`. **Ch.3 Horosevskii の必須前提**. 完全証明 ~200-300 行 |
 
 ## 章のセクション分割と全 20 定理
 

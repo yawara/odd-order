@@ -14,7 +14,7 @@
 | Thm 3.2 part 2 (inl(N), inr(H) complementary) | ✅ | `inl_range_isComplement_inr_range` (構造 projection 経由) |
 | Thm 3.2 part 3 (conjugation = action) | ✅ | `inr_conj_inl_eq` (mathlib `inl_aut` ラッパー) |
 | Thm 3.1 (uniqueness via mulEquivSubgroup) | ✅ | `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` 再述) |
-| Thm 3.3 Horosevskii | TODO | Ch.2 Thm 2.20 Lucchini 待ち |
+| **Thm 3.3 Horosevskii** | ✅ (2026-05-22) | `horosevskii_aut_order_lt`: `orderOf σ < Nat.card G`. Ch.2 Lucchini axiom + 半直積 (mathlib `SemidirectProduct`) + `inl_range_isComplement_inr_range` (Thm 3.2 part 2) + Lemma 2.7 (`commute_of_normal_of_disjoint`) で完全証明 (~120 行) |
 | Thm 3.4 (abelian P regular orbit) | TODO | Ch.1 §1F Brodkey (Thm 1.37) 待ち |
 | §3B Schur-Zassenhaus (3.5-3.10) | docstring | mathlib 対応表のみ (`exists_right_complement'_of_coprime`, `IsSolvable` instance chains) |
 | §3B Thm 3.11 前半 (abelian) | ✅ | `solvable_minimal_normal_isAbelian` (`⁅M,M⁆ < M` + 最小性) |
