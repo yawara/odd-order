@@ -963,6 +963,45 @@ theorem Subgroup.IsPiGroup.sup_of_normal {G : Type*} [Group G] [Finite G] {π : 
   · exact hH p hpH
   · exact hK p hpK
 
+/-- **`oPiCore.isPiGroup`** ⭐ (Hall-Higman 3.21 critical bottleneck):
+有限 `G` で `oPiCore π G` は π-group.
+
+**証明** (~30 LOC): `Finset.sup_induction` を predicate `H ↦ H.Normal ∧ IsPiGroup π H`
+で適用.
+- iSup = Finset.sup over finite indexing (`Subgroup G` is Fintype for finite G).
+- bot: trivially normal + π-group (primeFactors 1 = ∅).
+- closure: `H₁, H₂ ⊴ G + π-group ⇒ H₁ ⊔ H₂ ⊴ G + π-group` (mathlib + `IsPiGroup.sup_of_normal`).
+- generators: each subtype element has the predicate by construction. -/
+instance oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
+    Subgroup.IsPiGroup π (oPiCore π G) := by
+  classical
+  haveI hSubF : Fintype {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H} :=
+    Fintype.ofFinite _
+  -- The iSup over the subtype equals Finset.univ.sup.
+  set p : Subgroup G → Prop := fun H => H.Normal ∧ Subgroup.IsPiGroup π H with hp_def
+  -- Step: show p holds for oPiCore.
+  have hgoal : p (oPiCore π G) := by
+    change p (⨆ H : {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H},
+        (H.val : Subgroup G))
+    have hsup : (⨆ H : {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H},
+        (H.val : Subgroup G)) =
+        (Finset.univ : Finset {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H}).sup
+          (fun H => (H.val : Subgroup G)) := by
+      rw [Finset.sup_eq_iSup]
+      simp [iSup_pos]
+    rw [hsup]
+    refine Finset.sup_induction (p := p) ?_ ?_ ?_
+    · refine ⟨inferInstance, ?_⟩
+      intro q hq
+      simp [Subgroup.card_bot] at hq
+    · rintro a₁ ⟨ha₁N, ha₁Pi⟩ a₂ ⟨ha₂N, ha₂Pi⟩
+      haveI := ha₁N
+      haveI := ha₂N
+      exact ⟨inferInstance, Subgroup.IsPiGroup.sup_of_normal ha₁Pi ha₂Pi⟩
+    · intro b _
+      exact ⟨b.2.1, b.2.2⟩
+  exact hgoal.2
+
 /-- **`oPiCore` は `π` について monotone**: `π₁ ⊆ π₂ ⇒ oPiCore π₁ G ≤ oPiCore π₂ G`.
 π を広げると normal π-subgroup の集合は大きくなり, iSup も増える. -/
 theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [Group G] :
