@@ -1661,6 +1661,30 @@ theorem IsAInvariant.restrict_apply_val {A : Type*} [Group A] {φ : A →* MulAu
     {H : Subgroup G} (hH : IsAInvariant φ H) (a : A) (h : ↥H) :
     ((hH.restrict a) h).val = (φ a) h.val := rfl
 
+/-- A-不変 H と K (`K ≤ G`) に対し, `K.subgroupOf H` は restricted action `hH.restrict`
+下で A-不変. -/
+theorem IsAInvariant.subgroupOf {A : Type*} [Group A] {φ : A →* MulAut G}
+    {H K : Subgroup G} (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) :
+    IsAInvariant hH.restrict (K.subgroupOf H) := fun a => by
+  ext ⟨g, hg⟩
+  simp only [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_subgroupOf]
+  constructor
+  · intro hmem
+    -- hmem : ((hH.restrict a)⁻¹ • ⟨g, hg⟩).val ∈ K
+    -- We have ((hH.restrict a)⁻¹ ⟨g, hg⟩).val = (φ a)⁻¹ g
+    -- So (φ a)⁻¹ g ∈ K (via hmem). Apply (φ a) to get g ∈ K.
+    show g ∈ K
+    have h1 : ((hH.restrict a)⁻¹ • (⟨g, hg⟩ : ↥H)).val = (φ a)⁻¹ g := rfl
+    have h2 : (φ a)⁻¹ g ∈ K := h1 ▸ hmem
+    have : (φ a) ((φ a)⁻¹ g) ∈ K := hK.smul_mem a h2
+    rwa [MulAut.apply_inv_self] at this
+  · intro hg_K
+    -- g ∈ K
+    -- Want ((hH.restrict a)⁻¹ ⟨g, hg⟩).val ∈ K, i.e., (φ a)⁻¹ g ∈ K.
+    show ((hH.restrict a)⁻¹ • (⟨g, hg⟩ : ↥H)).val ∈ K
+    show (φ a)⁻¹ g ∈ K
+    exact hK.inv_smul_mem a hg_K
+
 /-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
 A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
 
