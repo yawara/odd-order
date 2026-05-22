@@ -1711,4 +1711,90 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
 
 end -- 2B
 
+/-! ### §2C 状態 (TODO)
+
+§2C 全体 (Thm 2.15 p-local + Lemma 2.16/2.17) は p-local 部分群の準同型像/逆像の構造
+定理. Isaacs 自身が「subnormality との直接関連無く脱線」と明言する独立小節. FT クリティカル
+度低く, Lemma 2.17 のみ Ch.4+ で 3 回引用される. 本リポでは別 commit で §2D 完了後に追加. -/
+
+section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
+
+variable {G : Type*} [Group G]
+
+/-! ### §2D 状態 (axiom 化)
+
+§2D の Thm 2.18 Zenkov + Thm 2.20 Lucchini は Baer (Thm 2.12, 完成) を主な道具と
+する重め (~200 行) の結果. **Ch.3 Thm 3.3 Horosevskii で Lucchini が必須**となるため
+本節を導入. 本リポでは statement を axiom で固定し, Horosevskii は実証明する.
+
+各 axiom の証明戦略は docstring に詳細記載. 別 commit で fill in 予定.
+-/
+
+open scoped Pointwise in
+/-- **Isaacs Thm 2.18 (Zenkov)**: 有限群 `G` の abelian 部分群 `A, B`. `g₀ ∈ G` で
+`M = A ⊓ B^{g₀}` が集合 `{A ⊓ B^g | g ∈ G}` の minimal member (包含関係について) なら,
+`M ⊆ F(G)`.
+
+書籍 p.61 の証明 (induction on `|G|`):
+1. WLOG `g₀ = 1` (B を `B^{g₀}` で置き換え).
+2. **Case G = ⟨A, B^g⟩ for some g**: A, B^g abelian ⇒ `A ⊓ B^g ⊆ Z(G)`. Z(G) 共役不変 ⇒
+   `A ⊓ B^g = (A ⊓ B^g)^{g⁻¹} ⊆ B`. 故に `A ⊓ B^g ⊆ A ⊓ B = M`. Minimality で
+   `M = A ⊓ B^g ⊆ Z(G) ⊆ F(G)`.
+3. **Case ⟨A, B^g⟩ < G for all g**: `M` の各 Sylow `p` `P` について `P ⊆ F(G)` を示す
+   (Baer iff). Fix `h`. `H = ⟨A, B^h⟩ < G`. `C = B ⊓ H`. `x ∈ H` で
+   `A ⊓ C^x = A ⊓ B^x ⊓ H = A ⊓ B^x` (A ⊆ H). `M = A ⊓ C` minimal in
+   `{A ⊓ C^x | x ∈ H}`. IH in H ⇒ `M ⊆ F(H)`, `P ⊆ O_p(H)` (Sylow p of nilpotent F(H)).
+   `P^h ⊆ B^h ⊆ H` ⇒ `P^h` normalizes `O_p(H)` ⇒ `O_p(H) · P^h` は p-group ⊇ `⟨P, P^h⟩`.
+   故に `⟨P, P^h⟩` 冪零. Baer で `P ⊆ F(G)`. -/
+axiom zenkov_minimal_le_fitting [Finite G] {A B : Subgroup G}
+    (_hA_ab : ∀ a ∈ A, ∀ a' ∈ A, a * a' = a' * a)
+    (_hB_ab : ∀ b ∈ B, ∀ b' ∈ B, b * b' = b' * b)
+    (g₀ : G)
+    (_hMin : ∀ g : G,
+        (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) ≤
+          A ⊓ ((MulAut.conj g₀) • B : Subgroup G) →
+        (A ⊓ ((MulAut.conj g) • B : Subgroup G) : Subgroup G) =
+          A ⊓ ((MulAut.conj g₀) • B : Subgroup G)) :
+    (A ⊓ ((MulAut.conj g₀) • B : Subgroup G) : Subgroup G) ≤ fitting G
+
+/-- **Isaacs Cor 2.19**: `G` 非自明有限群, `A` abelian 部分群, `|A| ≥ |G:A|`
+⇒ `A ⊓ F(G) ≠ ⊥`.
+
+書籍 p.62 の証明: g ∈ G について `|A| · |A^g| = |A|² ≥ |G|`. `A < G` ならば Lemma 2.10
+で `A · A^g < G`. `|A · A^g| = |A|² / |A ⊓ A^g|` の formula で `A ⊓ A^g > 1`. Zenkov で
+minimal-card `g₀` を取り `A ⊓ A^{g₀} ⊆ F(G)`, これが `> 1` で `A ⊓ F(G) > 1`.
+
+実装方針: §2D は Zenkov axiom 経由なので, 本系を axiom 化しても証明連鎖の affordability に
+影響しない. Lucchini 2.20 で内部使用される (Lucchini 2.20 axiom 経由で Horosevskii に渡る). -/
+axiom inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A : Subgroup G}
+    (_hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_hCard : A.index ≤ Nat.card A) :
+    A ⊓ fitting G ≠ ⊥
+
+/-- **Isaacs Thm 2.20 (Lucchini)**: `G` 有限群, `A` cyclic 真部分群, `K = core_G(A)`.
+ならば `|A:K| < |G:A|`. 特に `|A| ≥ |G:A|` なら `K > 1`.
+
+書籍 p.62-63 の証明 (induction on `|G|`):
+* `A/K` cyclic 真部分群 of `G/K`, `core_{G/K}(A/K) = 1`. `K > 1` なら IH in `G/K` で結論.
+* `K = 1` のとき矛盾を導く. 仮に `|A| ≥ |G:A|`. Cor 2.19 で `A ⊓ F(G) > 1`. F(G) > 1.
+  minimal normal `E ⊆ F(G)`, E ⊆ Z(F(G)), E elementary abelian `p`-group.
+* `A ⊓ F(G) ⊴ AE`, `K = 1` で `AE < G`. Ḡ = G/E. `M̄ = core_{Ḡ}(Ā)`, M ⊇ E. AM = AE.
+  IH in Ḡ で `|AE:M| < |G:AE|`. `B = A ⊓ M` cyclic.
+* `|AE:A| = |M:B|`, `|AE:M| = |A:B|`. 計算で `|M:B| < |B|`.
+* `M` abelian の場合: φ: m ↦ m^p, ker ⊇ E, M = EB ⇒ φ(M) = φ(B) ⊆ B ⊆ A. φ(M) ⊴ G で
+  K = 1 より φ(M) = 1, B cyclic で `|B| ≤ p`, `|M:B| < p`, `M/B` p-group ⇒ `M = B ⊆ A`,
+  M ⊴ G で M ⊆ K = 1 ⇒ E = 1 矛盾.
+* `M` 非可換 + `M/E` cyclic ⇒ E 非中心 in M ⇒ `E ∩ Z(M) = 1`, Z(M) cyclic. B abelian in M,
+  `|M:B| < |B|`, Cor 2.19 で `B ⊓ F(M) > 1`. F(M) ⊆ F(G), E centralizes F(M),
+  `B ⊓ F(M)` central in `BE = M`. Z(M) cyclic ⇒ `B ⊓ F(M)` characteristic in Z(M) ⊴ G
+  ⇒ G で正規 ⊆ A, K = 1 矛盾.
+
+実装方針: 完全形式化は ~200-300 行の大規模作業. 本リポでは axiom で受け入れ. -/
+axiom lucchini_index_normalCore_lt_index [Finite G] {A : Subgroup G} (_hA_proper : A < ⊤)
+    (_hA_cyclic : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_hA_isCyclic : ∃ g : G, A = Subgroup.zpowers g) :
+    (A.normalCore.subgroupOf A).index < A.index
+
+end -- 2D
+
 end OddOrder.Isaacs.Ch02
