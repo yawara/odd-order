@@ -32,6 +32,30 @@
   - §1D `opCore.normal` で実例.
 - **`IsPGroup p G`** 自体は `G : Type*` の型クラスではなく述語. 部分群への遺伝は
   `P.2.of_injective (Subgroup.inclusion h) (Subgroup.inclusion_injective _)` で取る (h : opCore ≤ P).
+- **`SemidirectProduct.inl_aut g n`** は implicit な action map `φ : G →* MulAut N` を結果の型
+  `inl (φ g n) = inr g * inl n * inr g⁻¹` から推論する設計. `have h := SemidirectProduct.inl_aut φ n`
+  のように bare で書くと action map が ambiguous で `don't know how to synthesize implicit argument`
+  エラー. **戻り値型 annotation 必須**:
+  ```lean
+  have h : (SemidirectProduct.inl ((φP φ) n) : G ⋊[φP] ↥P) =
+      SemidirectProduct.inr φ * SemidirectProduct.inl n * SemidirectProduct.inr φ⁻¹ :=
+    SemidirectProduct.inl_aut φ n
+  ```
+  §3A Horosevskii / Cor 3.4 で実例.
+- **`Subgroup.mem_map` は `_ ∈ _ • _` に直接 match しない**.
+  `MulAut.conj g • Pₛ` は `Pₛ.map (MulDistribMulAction.toMonoidEnd _ _ (MulAut.conj g))` と
+  定義的に等しい (`Subgroup.pointwise_smul_def` が `rfl`) が, `rw [Subgroup.mem_map]` は syntactic
+  match を要求するので fail. 代替:
+  - **`Subgroup.mem_pointwise_smul_iff_inv_smul_mem`** (`x ∈ a • S ↔ a⁻¹ • x ∈ S`) で還元
+  - もしくは先に `rw [Subgroup.pointwise_smul_def]` で `.map` 形に展開してから `Subgroup.mem_map`
+  - §3A Cor 3.4 `hAllSyl_ab`, `hφ_in_conj` で実例.
+- **`← map_inv` は scope 内で ambiguous** — `(f x)⁻¹` パターンは見える任意の hom `f` に match する.
+  例えば `(MulAut.conj (inl n))⁻¹` を `MulAut.conj ((inl n)⁻¹)` に書き換える意図で
+  `simp only [← map_inv]` を撃つと, `(inl n)⁻¹` も `inl (n⁻¹)` に書き換わって inv_mul_cancel
+  パターン `?a⁻¹ * ?a` が見えなくなる. 解: **名前付き補題で一発書き換え**:
+  - **`MulAut.conj_inv_apply`** (`(MulAut.conj g)⁻¹ h = g⁻¹ * h * g`, rfl 補題)
+  - §3A Cor 3.4 `hφ_in_conj` で `simp only [MulAut.smul_def, ← map_inv, MulAut.conj_apply, inv_inv]`
+    が暴発, `rw [MulAut.smul_def, MulAut.conj_inv_apply]` で解決.
 
 ### 1.3 構文
 
