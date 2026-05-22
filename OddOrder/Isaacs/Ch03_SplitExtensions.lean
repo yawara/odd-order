@@ -1218,6 +1218,20 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ)
     True := by  -- TODO: π-length の正式定義後に書き直す
   trivial
 
+/-- **Hall-Higman 3.21 setup**: `¬ centralizer(O) ≤ O ⇒ B := centralizer(O) ⊓ O < centralizer(O)`.
+
+3-line derivation: `B ≤ C` 自明, `B = C` だと `C ≤ O` (= C ⊓ O ⊆ O) で仮定矛盾. -/
+theorem hall_higman_B_lt_C_of_not_le {G : Type*} [Group G] (π : Set ℕ)
+    (h_not_le : ¬ Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G) :
+    Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G <
+      Subgroup.centralizer (oPiCore π G : Set G) := by
+  refine lt_of_le_of_ne inf_le_left ?_
+  intro h
+  apply h_not_le
+  rw [show Subgroup.centralizer (oPiCore π G : Set G) =
+       Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G from h.symm]
+  exact inf_le_right
+
 /-- **Hall-Higman 3.21 case π closure**: Hall-Higman setup で case π を一気に close.
 
 仮定:
