@@ -937,6 +937,20 @@ theorem Subgroup.IsPiGroup.le {G : Type*} [Group G] [Finite G] {π : Set ℕ}
   have hdvd : Nat.card ↥H ∣ Nat.card ↥K := Subgroup.card_dvd_of_le hHK
   exact hK p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
 
+/-- **`π` と `π'` の cardinality は互いに素**: `n` の素因子が全 `π` 内 + `m` の素因子
+が全 `π` 外 ⇒ `Coprime n m`.
+
+Hall-Higman 3.21 case π' で B π-group + K/B π'-group のとき Schur-Zassenhaus 適用
+の前提 `Nat.Coprime |B| (K.index in K)` を得るための補題. -/
+theorem Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    {n m : ℕ} (hn : n ≠ 0) (hm : m ≠ 0) {π : Set ℕ}
+    (hnPi : ∀ p ∈ n.primeFactors, p ∈ π)
+    (hmPi' : ∀ p ∈ m.primeFactors, p ∉ π) :
+    Nat.Coprime n m := by
+  rw [← Nat.disjoint_primeFactors hn hm, Finset.disjoint_left]
+  intro p hp_n hp_m
+  exact absurd (hnPi p hp_n) (hmPi' p hp_m)
+
 /-- **Hall-Higman 3.21 case π core**: `K ⊴ G` π-group + `K ≤ C_G(O_π(G))` ⇒
 `K ≤ C_G(O_π(G)) ⊓ O_π(G)`.
 
