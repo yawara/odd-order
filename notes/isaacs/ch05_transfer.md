@@ -111,15 +111,15 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 
 | Isaacs | 状況 | コスト見積もり |
 |---|---|---|
-| 5.3 \|G' ∩ Z\| 素数 ⇒ Sylow 非可換 | 5.13 (Burnside) と双対の補題. mathlib 未収載だが 5.6 (transferCenterPow) からほぼ直接導出可 | 短い |
-| 5.4 Schur multiplier 系 | Schur multiplier 概念自体 mathlib 未収載. Isaacs 内補論 (digression) で FT に不要 | 後回し |
+| 5.3 \|G' ∩ Z\| 素数 ⇒ Sylow 非可換 | ✅ `not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center` (2026-05-23, ~70 LOC). Cauchy in G' ∩ Z(G) + zpowers z normal (z central) + Sylow II conj + transfer id : P→P (P abelian) + transfer_eq_pow + map_commutatorElement | ✅ |
+| 5.4 Schur multiplier 弱形 | ✅ `not_isMulCommutative_sylow_of_le_commutator_inf_center` (2026-05-23, ~7 LOC). 5.3 hypothesis weakening via `Subgroup.card_dvd_of_le`. フル形 (Sylow_p(Γ/Z) noncyclic) は `commutative_of_cyclic_center_quotient` 経由で追加可 | ✅ |
 | 5.5 transfer-evaluation lemma | mathlib `transfer_eq_prod_quotient_orbitRel_zpowers_quot` で同等内容. Isaacs 流ステートメント (T_0 ⊆ T と n_t) への変換が必要 | 中 (ラッパー) |
 | 5.8, 5.9 Z(G) transversal の commutator 構造 | 短い補題. 5.7 Schur の証明部品で mathlib `closureCommutatorRepresentatives` 周辺と関連 | 短い |
 | 5.10 Dietzmann theorem | mathlib `Mathlib/GroupTheory` 全体を grep する限り Dietzmann 名は未登場. Schur 5.7 の証明で間接的に使用 (`Schreier.lean` で別経路の bound 経由) | **新規実装** (Isaacs §5B 末) |
 | 5.11 Hall transfer | ✅ `ker_transfer_sup_eq_top_of_hall` (2026-05-23). 1st iso + Lagrange + Lem 3.16. ~10 LOC. | ✅ |
 | 5.12 N_G(P) controls C_G(P) fusion | ✅ `normalizer_controls_centralizer_fusion` (2026-05-23). Sylow II in K = C_G(y) + `Sylow.smul_subtype` + `Sylow.subtype_injective` + `Sylow.smul_eq_iff_mem_normalizer` で ~50 LOC | ✅ |
 | 5.17 cyclic Sylow ⇒ p ∤ \|G'\|·\|G:G'\| | `IsZGroup.coprime_commutator_index` (`ZGroup.lean:280`) と関連. 単一 prime での命題に分離 | 短い (ZGroup API 経由) |
-| **5.18 abelian Sylow 強化 Burnside** | mathlib 未収載. 5.21 (Focal) を P abelian に特殊化した形. Foc_G(P) を P^{ab} ∩ ... と詳述 | 中 (Focal 経由) |
+| **5.18 abelian Sylow 強化 Burnside** | ✅ 2 形式: (i) **弱形** `abelian_sylow_commutator_inf_eq_focal` (mathlib `commutator_inf_eq_focalSubgroup` alias, G' ∩ P = focal P 形); (ii) **強形** `eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (2026-05-23, ~80 LOC, Isaacs p.166 流) — `G' ∩ P ∩ Z(N_G(P)) = 1` の要素形式. 強形は transfer id : P→P + transfer_eq_pow に Lem 5.12 (N_G(P) controls C_G(P) fusion) + `Commute.pow_right` を組み合わせ. **下流 Cor 5.19 (cyclic Sylow_2 ⇒ G 非単純) を unblock** | ✅ |
 | 5.19 Sylow_2 direct product 系 ⇒ 非単純 | mathlib 未収載. 5.18 から導出 | 短い |
 | 5.20 ker(v) = A^p(G) | mathlib `Focal.lean` で `commutator_inf_eq_focalSubgroup` (L208 周辺) + 商の構造で導出可. A^p(G) 定義そのものが未収載 | 中 (`Subgroup.AStarP` 等の新規 def 必要) |
 | 5.22 H controls fusion ⇒ controls p-transfer | mathlib 未収載. Focal subgroup theorem + index 計算 | 中 |
