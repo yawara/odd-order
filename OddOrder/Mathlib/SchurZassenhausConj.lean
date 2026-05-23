@@ -691,14 +691,71 @@ private theorem step_caseA
       show n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
       group
 
-/-- **Case B (G/N solvable)**: full SZ conjugacy when `G ⧸ N` is solvable. -/
+/-- Helper: a conjugate of a complement is a complement. The conjugating element lies in `G`,
+not necessarily in `N`. (Generalizes the inline proof in `step_caseA`.) -/
+private theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
+    (hK : IsComplement' N K) (g : G) :
+    IsComplement' N (K.map (MulAut.conj g).toMonoidHom) := by
+  haveI hN_normal : N.Normal := inferInstance
+  apply isComplement'_of_disjoint_and_mul_eq_univ
+  · -- Disjoint: N ⊓ K^g = ⊥.
+    rw [disjoint_iff]
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_bot, Subgroup.mem_map,
+               MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+    refine ⟨fun ⟨hxN, k, hkK, hkx⟩ => ?_, fun h => ?_⟩
+    · have hk_eq : k = g⁻¹ * x * g := by rw [← hkx]; group
+      have hkN : k ∈ N := by
+        rw [hk_eq]
+        -- g⁻¹ * x * g ∈ N since N is normal.
+        have := hN_normal.conj_mem x hxN g⁻¹
+        simpa [mul_assoc] using this
+      have hk_inter : k ∈ N ⊓ K := ⟨hkN, hkK⟩
+      rw [hK.disjoint.eq_bot, Subgroup.mem_bot] at hk_inter
+      rw [hk_inter, mul_one, mul_inv_cancel] at hkx
+      exact hkx.symm
+    · subst h
+      exact ⟨N.one_mem, 1, K.one_mem, by simp⟩
+  · -- (N : Set G) * (K^g : Set G) = univ.
+    rw [Set.eq_univ_iff_forall]
+    intro x
+    have h_conj_in_sup : g⁻¹ * x * g ∈ (N ⊔ K : Subgroup G) := by
+      rw [hK.sup_eq_top]; trivial
+    rw [mem_sup_of_normal_left] at h_conj_in_sup
+    obtain ⟨n', hn'_N, k', hk'_K, hnk'⟩ := h_conj_in_sup
+    refine ⟨g * n' * g⁻¹, hN_normal.conj_mem n' hn'_N g,
+            g * k' * g⁻¹, ?_, ?_⟩
+    · exact Subgroup.mem_map.mpr ⟨k', hk'_K, rfl⟩
+    · show g * n' * g⁻¹ * (g * k' * g⁻¹) = x
+      have hcalc : g * n' * g⁻¹ * (g * k' * g⁻¹) = g * (n' * k') * g⁻¹ := by group
+      rw [hcalc, hnk']
+      group
+
+/-- **Case B (G/N solvable)**: full SZ conjugacy when `G ⧸ N` is solvable.
+
+Proof outline (Isaacs Thm 3.12, mmd L1644-1660):
+- Trivial cases: `N = ⊤` (then `K = K' = ⊥`) and `N = ⊥` (then `K = K' = ⊤`).
+- Main case: take `M̄` minimal normal in `G ⧸ N`, `M := M̄.comap (mk' N)`. By Isaacs Lem 3.11
+  (`minimal_normal_isPGroup_of_solvable`), `M̄` is a `p`-group for some prime `p`. Since
+  `p ∣ |G : N|` and `|N|, |G : N|` coprime, `p ∤ |N|`. Apply `step_factor` with `M` to
+  get `g_f ∈ N` with `H ⊔ M = K' ⊔ M` where `H := K^{g_f}`.
+  - If `H ⊔ M < ⊤`: `step_restriction` on `H ⊔ M` with `H, K'` as complements.
+  - If `H ⊔ M = ⊤` (i.e., `HM = G`): then `M ∩ H` and `M ∩ K'` are both Sylow `p`-subgroups
+    of `M` (Dedekind + coprime); Sylow C in `M` gives `m ∈ M` with `M ∩ H = (M ∩ K')^m`.
+    Set `L := M ∩ H = M ∩ K'^m`. Both `H` and `K'^m` are contained in `N_G(L)`.
+    - If `N_G(L) < G`: `step_restriction` on `N_G(L)` with `H, K'^m`; then promote the
+      conjugating element via `g_M = m⁻¹ * n * g_f`, decompose in `N · K` to land in `N`.
+    - If `N_G(L) = G` (so `L ⊴ G, L > 1, L ⊆ H`): apply `step_factor` again, this time
+      with `H, K'` and `L`. Since `L ⊆ H ⊴ G ⇒ L ⊆ H^g'` for the resulting `g' ∈ N`, the
+      join collapses: `H^{g'} = K' ⊔ L`, hence `K' ⊆ H^{g'}` and by cardinality `K' = H^{g'}`,
+      giving `K^{g' * g_f} = K'` with `g' * g_f ∈ N`. -/
 private theorem step_caseB
     (h1 : Nat.Coprime (Nat.card N) N.index)
     (hQN_solv : IsSolvable (G ⧸ N))
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
-  -- Trivial case: N = ⊤ ⇒ K = K' = ⊥.
+  -- Trivial: N = ⊤ ⇒ K = K' = ⊥.
   by_cases hN_top : N = ⊤
   · subst hN_top
     have hK_bot : K = ⊥ := by
@@ -711,18 +768,75 @@ private theorem step_caseB
     rw [hK_bot, hK'_bot]
     ext x
     simp [Subgroup.mem_map, Subgroup.mem_bot]
-  -- Main: minimal normal M/N + Sylow C + N_G(L) argument.
-  -- N ≠ ⊤. G/N nontrivial + solvable.
-  -- Take minimal normal M̄ ⊆ G/N (use exists_minimal_normal_le on G/N).
-  -- M := M̄.comap (mk' N). N ≤ M ≤ G.
-  -- M̄ is p-group (minimal normal of solvable ⇒ elementary abelian p-group via Lem 3.11 extension).
-  -- M ∩ K, M ∩ K^g are Sylow p in M (since coprime, |M ∩ K| = |M:N| = |M̄|).
-  -- Sylow C in M: ∃ m ∈ M, (M ∩ K)^m = M ∩ K^g.
-  -- L := M ∩ K normal in K, K^(g*m).
-  -- ⟨K, K^(g*m)⟩ ≤ N_G(L). Case N_G(L) < G: apply step_restriction.
-  -- Case N_G(L) = G: L ⊴ G. step_factor with L gives K^h ⊔ L = K' ⊔ L.
-  -- ... lengthy case analysis.
-  sorry
+  -- Trivial: N = ⊥ ⇒ K = K' = ⊤.
+  by_cases hN_bot : N = ⊥
+  · subst hN_bot
+    have hK_top : K = ⊤ := by
+      have hsup := hK.sup_eq_top
+      rwa [bot_sup_eq] at hsup
+    have hK'_top : K' = ⊤ := by
+      have hsup := hK'.sup_eq_top
+      rwa [bot_sup_eq] at hsup
+    refine ⟨1, (⊥ : Subgroup G).one_mem, ?_⟩
+    rw [hK_top, hK'_top]
+    ext x
+    simp [Subgroup.mem_map]
+  -- Main: N ≠ ⊥, N ≠ ⊤.
+  haveI hGN_nontriv : Nontrivial (G ⧸ N) := by
+    have h_idx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hN_top
+    have h_card : 1 < Nat.card (G ⧸ N) := h_idx
+    exact Finite.one_lt_card_iff_nontrivial.mp h_card
+  -- Take M̄ minimal normal in G/N.
+  have h_top_ne_bot : (⊤ : Subgroup (G ⧸ N)) ≠ ⊥ := by
+    intro h_eq
+    obtain ⟨a, b, hab⟩ := exists_pair_ne (G ⧸ N)
+    have ha : a ∈ (⊤ : Subgroup (G ⧸ N)) := trivial
+    have hb : b ∈ (⊤ : Subgroup (G ⧸ N)) := trivial
+    rw [h_eq, Subgroup.mem_bot] at ha hb
+    exact hab (ha.trans hb.symm)
+  obtain ⟨M_bar, hM_bar_normal, _, hM_bar_ne_bot, hM_bar_min⟩ :=
+    exists_minimal_normal_le (N := (⊤ : Subgroup (G ⧸ N))) inferInstance h_top_ne_bot
+  haveI : M_bar.Normal := hM_bar_normal
+  -- M := M̄.comap (mk' N) ⊴ G.
+  let M : Subgroup G := M_bar.comap (QuotientGroup.mk' N)
+  haveI hM_normal : M.Normal := M_bar.normal_comap (QuotientGroup.mk' N)
+  -- N ≤ M.
+  have hN_le_M : N ≤ M := by
+    intro n hn
+    change (QuotientGroup.mk n : G ⧸ N) ∈ M_bar
+    rw [(QuotientGroup.eq_one_iff n).mpr hn]
+    exact M_bar.one_mem
+  -- M ≠ ⊥ (since N ⊆ M and N ≠ ⊥).
+  have hM_ne_bot : M ≠ ⊥ := fun hbot => hN_bot (le_bot_iff.mp (hN_le_M.trans hbot.le))
+  -- M_bar is a p-group (Isaacs Lem 3.11).
+  haveI : IsSolvable M_bar := inferInstance
+  obtain ⟨p, hp_prime, hp_pgroup⟩ :=
+    minimal_normal_isPGroup_of_solvable (L := M_bar) hM_bar_ne_bot hM_bar_min
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  -- Apply step_factor with L := M.
+  obtain ⟨g_f, hg_f_N, h_factor⟩ :=
+    step_factor h1 (Or.inr hQN_solv) ih hK hK' hM_ne_bot
+  -- H := K^{g_f}, complement of N.
+  set H := K.map (MulAut.conj g_f).toMonoidHom with hH_def
+  have hH_compl : IsComplement' N H := isComplement'_conj hK g_f
+  -- Case split on H ⊔ M = ⊤.
+  by_cases hHM_top : H ⊔ M = ⊤
+  · -- Case ⊔ M = ⊤: HM = G. Use Sylow C in M.
+    sorry
+  · -- Case ⊔ M < ⊤: step_restriction on H ⊔ M.
+    have hHU : H ≤ H ⊔ M := le_sup_left
+    have hK'U : K' ≤ H ⊔ M := by rw [h_factor]; exact le_sup_left
+    obtain ⟨n', hn'_N, h_conj⟩ :=
+      step_restriction h1 (Or.inr hQN_solv) ih hH_compl hK' hHU hK'U hHM_top
+    -- H.map (conj n') = K'. Compose: K.map (conj (n' * g_f)) = K'.
+    refine ⟨n' * g_f, N.mul_mem hn'_N hg_f_N, ?_⟩
+    have hcomp : (MulAut.conj (n' * g_f)).toMonoidHom =
+          (MulAut.conj n').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom := by
+      ext x
+      show n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
+      group
+    rw [hcomp, ← Subgroup.map_map]
+    exact h_conj
 
 /-- **Main induction**: combines `step_caseA` and `step_caseB` via strong induction. -/
 private theorem main_aux {n : ℕ} :
