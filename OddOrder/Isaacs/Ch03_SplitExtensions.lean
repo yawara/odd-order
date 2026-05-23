@@ -1818,12 +1818,8 @@ FT 経路では優先度低 (Peterfalvi で散発使用).
 **形式化状態**: stub. 全 lifted 結果は SemidirectProduct (mathlib) との接続で得られる
 可能性が高い. -/
 
-/-- **Isaacs Thm 3.35 (cyclic lift; 弱版)**: `H ⊴ G`, `G/H` cyclic ⇒ ある `g ∈ G` が
-`G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`.
-
-Isaacs FGT 3.35 の本体は cyclic-quotient extension の **uniqueness** (与えられた
-N + 自己同型 + 適合条件で extension が同型 up to iso). 本リポでは FT 経路必要性が低い
-ため, 弱版 (cyclic 部分群 ⟨g⟩ で G/H を覆える g の存在) のみ. 完全 3.35 は Phase 4 で. -/
+/-- **Isaacs Thm 3.35 (cyclic lift; generator)**: `H ⊴ G`, `G/H` cyclic ⇒ ある `g ∈ G` が
+`G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`. (Thm 3.35 強版の uniqueness の前提.) -/
 theorem cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
     (hCyclic : IsCyclic (G ⧸ H)) :
     ∃ g : G, Subgroup.zpowers g ⊔ H = ⊤ := by
@@ -1848,6 +1844,37 @@ theorem cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
   -- x = (x · (g^n)⁻¹) · g^n with first factor in H and second in ⟨g⟩.
   rw [show x = (x * (g ^ n)⁻¹) * g ^ n by group, sup_comm]
   exact Subgroup.mul_mem_sup h_in_H (Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) n)
+
+/-- **Isaacs Thm 3.35 (uniqueness)** ⭐: `N ⊴ G` で `gN` が `G/N` の生成元のとき,
+`G →* G₀` の準同型は `N` 上での値と `g ↦ g₀` から **一意に決定**.
+
+Isaacs §3F の主結果 (extension uniqueness). 任意 `u ∈ G` は `u = (u·(g^i)⁻¹) · g^i` の
+形に一意分解 (`u·(g^i)⁻¹ ∈ N`, `i` は `gN` の zpowers での representation).
+両 θ, θ' が同じ extension を与えるなら値が一致.
+
+**注**: existence (Thm 3.36 cyclic extension) は別途 (Sym(Ω) realization), Phase 4 予定. -/
+theorem cyclic_quotient_extension_unique
+    {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal]
+    (g : G) (g₀ : G₀)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤)
+    {θ θ' : G →* G₀}
+    (hθ_ext : ∀ x ∈ N, θ x = θ' x) (hθ_g : θ g = g₀) (hθ'_g : θ' g = g₀) :
+    θ = θ' := by
+  ext u
+  -- ⟦u⟧ ∈ ⟨⟦g⟧⟩, so ⟦u⟧ = ⟦g⟧^i for some i ∈ ℤ.
+  have hu_mem : (u : G ⧸ N) ∈ Subgroup.zpowers ((g : G ⧸ N)) := hg_gen ▸ Subgroup.mem_top _
+  rw [Subgroup.mem_zpowers_iff] at hu_mem
+  obtain ⟨i, hi⟩ := hu_mem
+  -- hi : (↑g)^i = ↑u in G ⧸ N, i.e., x := u * (g^i)⁻¹ ∈ N.
+  set x : G := u * (g^i)⁻¹ with hxdef
+  have hx_mem : x ∈ N := by
+    rw [hxdef, ← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, QuotientGroup.mk_inv,
+        QuotientGroup.mk_zpow, ← hi]
+    group
+  -- u = x * g^i.
+  have hu_decomp : u = x * g^i := by rw [hxdef]; group
+  rw [hu_decomp, map_mul θ, map_mul θ', map_zpow θ, map_zpow θ', hθ_g, hθ'_g, hθ_ext _ hx_mem]
 
 end -- 3F
 
