@@ -6,6 +6,7 @@ import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.SCN
+import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
