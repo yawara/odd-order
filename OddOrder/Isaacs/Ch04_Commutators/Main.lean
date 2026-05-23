@@ -488,8 +488,28 @@ def setOfPowEqOne (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ}
       rw [show 2 * k / 2 = k from Nat.mul_div_cancel_left k (by norm_num : (0 : ℕ) < 2)]
     rw [hdiv, pow_mul, hcom_p, one_pow]
 
-/-! **Isaacs Theorem 4.8(b)** (p > 2 + class ≤ 2 + 全交換子 p乗 1 ⇒ `x ↦ x^p` 準同型):
-形式化保留. (a) と同様の collection formula + `[y,x]^p = 1` 仮定で `(xy)^p = x^p y^p`. -/
+/-- **Isaacs Theorem 4.8(b)**: `p > 2` (odd), `commutator G ≤ Z(G)` (class ≤ 2),
+全交換子の `p` 乗が `1` ⇒ `x ↦ x^p : G →* G` は (Monoid) 準同型.
+
+**証明**: collection formula `(xy)^p = x^p · y^p · ⁅y, x⁆^(p(p-1)/2)`.
+仮定で `⁅y, x⁆^p = 1` + `p` odd ⇒ `p ∣ p(p-1)/2` ⇒ `⁅y, x⁆^(p(p-1)/2) = 1`.
+よって `(xy)^p = x^p · y^p`. `1^p = 1` は自明. -/
+def powPHom (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ} (hp : Odd p)
+    (hcomp : ∀ c ∈ _root_.commutator G, c^p = 1) : G →* G where
+  toFun x := x^p
+  map_one' := one_pow p
+  map_mul' x y := by
+    show (x * y)^p = x^p * y^p
+    rw [mul_pow_of_class_le_two hC]
+    -- Goal: x^p * y^p * ⁅y, x⁆^(p*(p-1)/2) = x^p * y^p
+    have hcom_p : ⁅y, x⁆^p = 1 := hcomp ⁅y, x⁆ (commutatorElement_mem_commutator_top y x)
+    obtain ⟨k, hk⟩ := hp
+    have hdiv : p * (p - 1) / 2 = p * k := by
+      subst hk
+      have h1 : 2 * k + 1 - 1 = 2 * k := by omega
+      rw [h1, Nat.mul_div_assoc _ (Dvd.intro k rfl)]
+      rw [show 2 * k / 2 = k from Nat.mul_div_cancel_left k (by norm_num : (0 : ℕ) < 2)]
+    rw [hdiv, pow_mul, hcom_p, one_pow, mul_one]
 
 end -- 4A
 
