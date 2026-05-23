@@ -2595,6 +2595,160 @@ theorem derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful
   rw [h_ker] at h_le
   exact le_bot_iff.mp h_le
 
+/-! ### Isaacs §4D: Baer trick (Lem 4.37) — odd order class ≤ 2 ⇒ additive group structure
+
+For `G` finite of **odd order** and **nilpotence class ≤ 2**, define
+`baerAdd x y := x * y * sqrtOdd ⁅y, x⁆`. Then `(G, baerAdd)` is an abelian group, and:
+- (a) commuting elements satisfy `x +' y = x * y`.
+- (b) Additive order = multiplicative order.
+- (c) Every multiplicative automorphism is also an additive automorphism.
+
+下流: Thm 4.36 (p > 2, p-群 + p'-A fixes order-p elements ⇒ A trivial) で利用. -/
+
+/-- **Square root in groups with odd `Nat.card`**: `sqrtOdd x := x^((|G|+1)/2)`.
+For `Odd (Nat.card G)`, `(sqrtOdd x)² = x` (`pow_card_eq_one'` で `x^(|G|+1) = x`). -/
+noncomputable def sqrtOdd {G : Type*} [Group G] (x : G) : G :=
+  x ^ ((Nat.card G + 1) / 2)
+
+lemma sqrtOdd_def {G : Type*} [Group G] (x : G) :
+    sqrtOdd x = x ^ ((Nat.card G + 1) / 2) := rfl
+
+/-- **核補題**: `Odd (Nat.card G) ⇒ (sqrtOdd x)² = x`. -/
+lemma sqrtOdd_sq {G : Type*} [Group G] (hOdd : Odd (Nat.card G)) (x : G) :
+    (sqrtOdd x) ^ 2 = x := by
+  unfold sqrtOdd
+  rw [← pow_mul]
+  have h_eq : (Nat.card G + 1) / 2 * 2 = Nat.card G + 1 := by
+    obtain ⟨k, hk⟩ := hOdd; rw [hk]; omega
+  rw [h_eq, pow_succ, pow_card_eq_one', one_mul]
+
+@[simp] lemma sqrtOdd_one {G : Type*} [Group G] : sqrtOdd (1 : G) = 1 := by
+  simp [sqrtOdd]
+
+lemma sqrtOdd_inv {G : Type*} [Group G] (x : G) : sqrtOdd x⁻¹ = (sqrtOdd x)⁻¹ := by
+  unfold sqrtOdd; rw [← inv_pow]
+
+lemma sqrtOdd_mul_of_commute {G : Type*} [Group G] {x y : G} (h : Commute x y) :
+    sqrtOdd (x * y) = sqrtOdd x * sqrtOdd y := by
+  unfold sqrtOdd; rw [Commute.mul_pow h]
+
+lemma sqrtOdd_mem_subgroup {G : Type*} [Group G] {H : Subgroup G} {x : G} (hx : x ∈ H) :
+    sqrtOdd x ∈ H := H.pow_mem hx _
+
+/-- `sqrtOdd` の center 保存性. -/
+lemma sqrtOdd_mem_center {G : Type*} [Group G] {x : G} (hx : x ∈ Subgroup.center G) :
+    sqrtOdd x ∈ Subgroup.center G := sqrtOdd_mem_subgroup hx
+
+/-- `sqrtOdd` is preserved by group homomorphisms (between groups of same cardinality).
+For an automorphism `f : G ≃* G`, `f (sqrtOdd x) = sqrtOdd (f x)`. -/
+lemma sqrtOdd_apply_mulEquiv {G : Type*} [Group G] (f : G ≃* G) (x : G) :
+    f (sqrtOdd x) = sqrtOdd (f x) := by
+  unfold sqrtOdd
+  rw [map_pow]
+
+/-- `sqrtOdd ⁅x, y⁆⁻¹ = sqrtOdd ⁅y, x⁆`. -/
+lemma sqrtOdd_commutator_inv {G : Type*} [Group G] (x y : G) :
+    sqrtOdd (⁅x, y⁆⁻¹ : G) = sqrtOdd ⁅y, x⁆ := by
+  rw [commutatorElement_inv]
+
+/-- **Baer addition** for class ≤ 2 odd order groups: `x +' y := x * y * sqrtOdd ⁅y, x⁆`. -/
+noncomputable def baerAdd {G : Type*} [Group G] (x y : G) : G := x * y * sqrtOdd ⁅y, x⁆
+
+lemma baerAdd_def {G : Type*} [Group G] (x y : G) :
+    baerAdd x y = x * y * sqrtOdd ⁅y, x⁆ := rfl
+
+/-- **Lem 4.37 part (a) precursor**: If `x` and `y` commute, then `x +' y = x * y`
+(since `⁅y, x⁆ = 1` and `sqrtOdd 1 = 1`). -/
+lemma baerAdd_eq_mul_of_commute {G : Type*} [Group G] {x y : G} (h : Commute x y) :
+    baerAdd x y = x * y := by
+  rw [baerAdd_def, (commutatorElement_eq_one_iff_commute (g₁ := y) (g₂ := x)).mpr h.symm,
+      sqrtOdd_one, mul_one]
+
+/-- Identity: `1 +' x = x`. -/
+@[simp] lemma baerAdd_one_left {G : Type*} [Group G] (x : G) : baerAdd 1 x = x := by
+  rw [baerAdd_def, one_mul, commutatorElement_one_right, sqrtOdd_one, mul_one]
+
+/-- Identity: `x +' 1 = x`. -/
+@[simp] lemma baerAdd_one_right {G : Type*} [Group G] (x : G) : baerAdd x 1 = x := by
+  rw [baerAdd_def, mul_one, commutatorElement_one_left, sqrtOdd_one, mul_one]
+
+/-- Inverse: `x +' x⁻¹ = 1`. -/
+@[simp] lemma baerAdd_inv_right {G : Type*} [Group G] (x : G) : baerAdd x x⁻¹ = 1 := by
+  have h1 : ⁅x⁻¹, x⁆ = (1 : G) :=
+    commutatorElement_eq_one_iff_commute.mpr (Commute.refl x).inv_left
+  rw [baerAdd_def, mul_inv_cancel, h1, sqrtOdd_one, mul_one]
+
+/-- Inverse: `x⁻¹ +' x = 1`. -/
+@[simp] lemma baerAdd_inv_left {G : Type*} [Group G] (x : G) : baerAdd x⁻¹ x = 1 := by
+  have h1 : ⁅x, x⁻¹⁆ = (1 : G) :=
+    commutatorElement_eq_one_iff_commute.mpr (Commute.refl x).inv_right
+  rw [baerAdd_def, inv_mul_cancel, h1, sqrtOdd_one, mul_one]
+
+/-- **Lem 4.37 commutativity**: `x +' y = y +' x` for class ≤ 2.
+
+Derivation: `y +' x = y * x * sqrtOdd ⁅x, y⁆ = x * y * ⁅y, x⁆ * sqrtOdd ⁅x, y⁆`
+(using `mul_comm_commutator_of_class_le_two`). Now `⁅x, y⁆⁻¹ = ⁅y, x⁆`, so
+`sqrtOdd ⁅x, y⁆ = (sqrtOdd ⁅y, x⁆)⁻¹`. Combined:
+`y +' x = x * y * ⁅y, x⁆ * (sqrtOdd ⁅y, x⁆)⁻¹ = x * y * sqrtOdd ⁅y, x⁆ = x +' y`
+(using `(sqrtOdd ⁅y, x⁆)² = ⁅y, x⁆`). -/
+lemma baerAdd_comm {G : Type*} [Group G] (hC : _root_.commutator G ≤ Subgroup.center G)
+    (hOdd : Odd (Nat.card G)) (x y : G) :
+    baerAdd x y = baerAdd y x := by
+  rw [baerAdd_def, baerAdd_def]
+  -- Set S := sqrtOdd ⁅y, x⁆. Show x * y * S = y * x * sqrtOdd ⁅x, y⁆.
+  set S : G := sqrtOdd ⁅y, x⁆ with hS_def
+  have h_yx : y * x = x * y * ⁅y, x⁆ := mul_comm_commutator_of_class_le_two hC x y
+  have h_inv : (sqrtOdd ⁅x, y⁆ : G) = S⁻¹ := by
+    rw [hS_def, ← sqrtOdd_inv]
+    congr 1
+    exact (commutatorElement_inv y x).symm
+  have h_sq : S * S = ⁅y, x⁆ := by
+    have := sqrtOdd_sq hOdd (⁅y, x⁆ : G); rw [sq] at this; exact this
+  -- Goal: x * y * S = y * x * sqrtOdd ⁅x, y⁆
+  rw [h_inv, h_yx]
+  -- Goal: x * y * S = x * y * ⁅y, x⁆ * S⁻¹
+  rw [← h_sq]
+  -- Goal: x * y * S = x * y * (S * S) * S⁻¹
+  group
+
+/-- **Lem 4.37 (a)**: If `x` and `y` commute, then `x +' y = x * y`. -/
+lemma baerAdd_eq_mul_of_commute' {G : Type*} [Group G] {x y : G} (h : Commute x y) :
+    baerAdd x y = x * y := baerAdd_eq_mul_of_commute h
+
+/-- `sqrtOdd` of a central element is central. -/
+lemma sqrtOdd_central_of_central {G : Type*} [Group G] {z : G}
+    (hz : z ∈ Subgroup.center G) : sqrtOdd z ∈ Subgroup.center G :=
+  sqrtOdd_mem_subgroup hz
+
+/-- Right-hom version of commutator in class ≤ 2: `⁅z, a * b⁆ = ⁅z, a⁆ * ⁅z, b⁆`.
+Derived from left-hom + `commutatorElement_inv`. -/
+lemma commutatorElement_mul_right_of_class_le_two {G : Type*} [Group G]
+    (hC : _root_.commutator G ≤ Subgroup.center G) (z a b : G) :
+    ⁅z, a * b⁆ = ⁅z, a⁆ * ⁅z, b⁆ := by
+  -- ⁅z, a*b⁆ = ⁅a*b, z⁆⁻¹ = (⁅a, z⁆ * ⁅b, z⁆)⁻¹ = ⁅b, z⁆⁻¹ * ⁅a, z⁆⁻¹ = ⁅z, b⁆ * ⁅z, a⁆
+  -- In class 2, ⁅z, a⁆ and ⁅z, b⁆ are central, so commute.
+  have h_swap : (⁅z, a⁆ : G) * ⁅z, b⁆ = ⁅z, b⁆ * ⁅z, a⁆ := by
+    have h_ca : ⁅z, a⁆ ∈ Subgroup.center G := hC (commutatorElement_mem_commutator_top z a)
+    exact (Subgroup.mem_center_iff.mp h_ca _).symm
+  have h_inv_ab : (⁅a * b, z⁆ : G)⁻¹ = ⁅z, a * b⁆ := commutatorElement_inv (a * b) z
+  have h_left : (⁅a * b, z⁆ : G) = ⁅a, z⁆ * ⁅b, z⁆ :=
+    commutatorElement_mul_left_of_class_le_two hC a b z
+  rw [← h_inv_ab, h_left, mul_inv_rev, commutatorElement_inv, commutatorElement_inv, h_swap]
+
+/-! **Lem 4.37 associativity** (`baerAdd_assoc`): 形式化 TODO.
+
+教科書 (Isaacs p.142) の証明: class ≤ 2 で commutator が中心 ⇒
+- 左/右両側で hom: `⁅·, z⁆`, `⁅z, ·⁆` 共に hom
+- `√c` (`c` 中心) も中心 ⇒ `⁅√c, anything⁆ = 1`
+- 中心の元は commute ⇒ `√` distributes (`sqrtOdd_mul_of_commute`)
+
+両辺展開: `x +' (y +' z) = xyz · √(⁅z, y⁆ · ⁅y, x⁆ · ⁅z, x⁆)`
+        `(x +' y) +' z = xyz · √(⁅y, x⁆ · ⁅z, x⁆ · ⁅z, y⁆)`
+中心 commutators の積は順序自由で等値. ~80-120 LOC 推定. -/
+
+/-! **Lem 4.37 part (b) (additive order = multiplicative order)** + **(c) (automorphism preservation)**:
+形式化 TODO. 要 `baerAdd_assoc` で AddGroup 構造構築後. -/
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
