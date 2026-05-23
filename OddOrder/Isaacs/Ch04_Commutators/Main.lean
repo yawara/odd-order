@@ -835,10 +835,83 @@ theorem card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quo
   rw [mul_comm]
   exact h_lag
 
-/-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
-`|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
+/-! ### Thm 4.7: maximal class p-群 (helpers + base case m = 1) -/
 
-Lem 4.6 cardinality formula + Thm 1.19 経由予定. 形式化保留. -/
+/-- Helper: For surjective hom `f : G →* H`, `(lcs G n).map f = lcs H n`. -/
+theorem lowerCentralSeries_map_eq_of_surjective {G H : Type*} [Group G] [Group H]
+    (f : G →* H) (hf : Function.Surjective f) (n : ℕ) :
+    Subgroup.map f (lowerCentralSeries G n) = lowerCentralSeries H n := by
+  induction n with
+  | zero =>
+    show Subgroup.map f (⊤ : Subgroup G) = ⊤
+    exact Subgroup.map_top_of_surjective f hf
+  | succ n ih =>
+    show Subgroup.map f ⁅lowerCentralSeries G n, (⊤ : Subgroup G)⁆
+        = ⁅lowerCentralSeries H n, (⊤ : Subgroup H)⁆
+    rw [Subgroup.map_commutator, ih, Subgroup.map_top_of_surjective f hf]
+
+/-- **Thm 4.7, m = 1 case**: `A ⊴ P` abelian, `P` p-群, `|A| = p`, `P/A` cyclic,
+`|A ⊓ Z(P)| = p` ⇒ `Group.nilpotencyClass P = 1` (i.e., P abelian, nontrivial).
+
+`|A| = |A ⊓ Z(P)| = p` ⇒ `A ⊆ Z(P)` (両者 ⊆ A で等カード ⇒ 等). P/A cyclic +
+`A ⊆ Z(P)` ⇒ P abelian (`commutative_of_cyclic_center_quotient`). -/
+theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P)
+    {A : Subgroup P} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (hCyc : IsCyclic (P ⧸ A))
+    (hAcard : Nat.card A = p)
+    (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
+    Group.nilpotencyClass P = 1 := by
+  haveI : Group.IsNilpotent P := hP.isNilpotent
+  -- A ⊓ Z(P) ⊆ A, 等カード ⇒ A ⊓ Z(P) = A ⇒ A ⊆ Z(P)
+  have hAZ_eq_A : A ⊓ Subgroup.center P = A :=
+    Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hAcard, hAZcard])
+  have hA_le_Z : A ≤ Subgroup.center P := by
+    rw [← hAZ_eq_A]; exact inf_le_right
+  -- P abelian: G/A cyclic + A ⊆ Z(G)
+  have hP_abelian : ∀ x y : P, x * y = y * x := by
+    have hker_le : (QuotientGroup.mk' A).ker ≤ Subgroup.center P := by
+      rw [QuotientGroup.ker_mk']; exact hA_le_Z
+    exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' A) hker_le
+  -- commutator P = ⊥ via center P = ⊤
+  have hcomm_bot : _root_.commutator P = ⊥ := by
+    rw [commutator_eq_bot_iff_center_eq_top, Subgroup.eq_top_iff']
+    intro x
+    rw [Subgroup.mem_center_iff]
+    intro y
+    exact hP_abelian y x
+  -- nilpotencyClass ≤ 1
+  have h_class_le : Group.nilpotencyClass P ≤ 1 := by
+    rw [← lowerCentralSeries_eq_bot_iff_nilpotencyClass_le, lowerCentralSeries_one]
+    exact hcomm_bot
+  -- P nontrivial (|A| = p ≥ 2)
+  have hA_ne_bot : A ≠ ⊥ := by
+    intro hA_bot
+    rw [hA_bot, Subgroup.card_bot] at hAcard
+    have := hp.out.one_lt
+    omega
+  have hP_nontrivial : Nontrivial P := by
+    obtain ⟨x, hx_in_A, hx_ne⟩ : ∃ x : P, x ∈ A ∧ x ≠ 1 := by
+      by_contra h
+      push_neg at h
+      apply hA_ne_bot
+      rw [Subgroup.eq_bot_iff_forall]
+      exact h
+    exact ⟨x, 1, hx_ne⟩
+  -- nilpotencyClass ≠ 0
+  have h_class_ne_zero : Group.nilpotencyClass P ≠ 0 := by
+    intro h
+    rw [nilpotencyClass_zero_iff_subsingleton] at h
+    exact not_subsingleton P h
+  omega
+
+/-! **Isaacs Thm 4.7** (full statement, m ≥ 2 induction): `A ⊴ P` abelian, `P` p-群,
+`|A| = p^m`, `P/A` cyclic, `|A ⊓ Z(P)| = p` ⇒ `Group.nilpotencyClass P = m`.
+
+`m = 1` 場合は上記 `nilpotencyClass_eq_one_of_...` で完成.
+`m ≥ 2` 場合 (帰納): Thm 1.19 (`IsPGroup.normal_inf_center_nontrivial`) +
+Lem 4.6 cardinality + quotient P̄ = P/Z で IH 適用. ~150 LOC. 形式化保留. -/
 
 /-! ### Commutator collection in class ≤ 2 (Thm 4.8 の前段) -/
 
