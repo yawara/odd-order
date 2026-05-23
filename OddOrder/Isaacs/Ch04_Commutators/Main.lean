@@ -10,6 +10,7 @@ import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
 import Mathlib.LinearAlgebra.Dual.Lemmas
 import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
 
@@ -2594,6 +2595,47 @@ theorem derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful
   have h_le := derivedSeries_le_ker_of_iter_inl_inr_eq_bot φ m hm h_iter
   rw [h_ker] at h_le
   exact le_bot_iff.mp h_le
+
+/-! ### Isaacs §4D Lem 4.28 ⭐ (BG Prop 1.6(a)): G = C_G(A) · [G,A] for coprime + solvable -/
+
+/-- **Isaacs Lemma 4.28** ⭐ (= BG Prop 1.6(a), **FT クリティカル**):
+A acts on G via φ. Coprime (`|A|, |G|`) + one of A or G solvable ⇒
+`fixedPointsOfMulAut φ ⊔ actionCommutator φ = ⊤` (= `G = C_G(A) · [G, A]`).
+
+**証明** (Isaacs p.138, ~6 lines): Write `Ḡ = G / [G, A]`. By Cor 3.28 (coprime fixed points
+come from G fixed points), `C_Ḡ(A) = image of C_G(A) under quotient`. But A acts trivially
+on `Ḡ` (definition of `[G, A]` ⇒ `A` fixes every coset, so `C_Ḡ(A) = Ḡ`).
+Hence `image of C_G(A) = Ḡ`, i.e., `C_G(A) ⊔ [G, A] = G`.
+
+**Lean 化**: 各 `g ∈ G`, Cor 3.28 を `N = [G, A]` で適用 ⇒ ∃ `c ∈ C_G(A), c ∈ g · [G, A]`,
+i.e., `c = g * n` for `n ∈ [G, A]`. Then `g = c * n⁻¹ ∈ C_G(A) * [G, A]`. -/
+theorem fixedPoints_sup_actionCommutator_eq_top
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ = ⊤ := by
+  rw [eq_top_iff]
+  intro g _
+  -- Setup: N := actionCommutator φ, which is normal and A-invariant
+  have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator φ) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator φ
+  -- For every a ∈ A, (φ a) g = g * n with n := g⁻¹ * (φ a) g ∈ actionCommutator
+  -- (Lem 4.20 left form: actionCommutator ≤ actionCommutator gives this)
+  have hg_fix : ∀ a : A, ∃ n ∈ actionCommutator φ, (φ a) g = g * n := by
+    intro a
+    refine ⟨g⁻¹ * (φ a) g, ?_, ?_⟩
+    · exact (actionCommutator_le_iff_left φ (actionCommutator φ)).mp le_rfl a g
+    · group
+  -- Apply Cor 3.28: ∃ c ∈ C_G(A), c ∈ g · actionCommutator
+  obtain ⟨c, hc_fix, ⟨n, hn_mem, hc_eq⟩⟩ :=
+    coprime_fixedPoints_quotient hCop hSolv hN_inv hg_fix
+  -- c ∈ fixedPointsOfMulAut, n⁻¹ ∈ actionCommutator
+  have hc_mem : c ∈ Subgroup.fixedPointsOfMulAut φ := hc_fix
+  -- g = c * n⁻¹: from hc_eq : c = g * n, so g = c * n⁻¹
+  have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
+  -- g ∈ fixedPointsOfMulAut * actionCommutator ⊆ sup
+  rw [hg_eq]
+  exact Subgroup.mul_mem_sup hc_mem ((actionCommutator φ).inv_mem hn_mem)
 
 /-! ### Isaacs §4D: Baer trick (Lem 4.37) — odd order class ≤ 2 ⇒ additive group structure
 
