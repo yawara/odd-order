@@ -1,7 +1,9 @@
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
+import OddOrder.GroupTheory.SCN
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
