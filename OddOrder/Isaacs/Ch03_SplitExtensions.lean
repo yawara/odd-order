@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.Mathlib.Subgroup
+import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
@@ -815,15 +817,192 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
   hall_E_strong_aux (Nat.card G) G le_rfl π
 
-/-! **Isaacs Thm 3.14 Hall-C**: `G` 可解 ⇒ `π`-Hall 部分群は共役.
+/-- **Isaacs Thm 3.14 Hall-C** の `|G|`-強誘導補助補題.
 
-**Forward dep**: mathlib への Schur-Zassenhaus 共役性追加が前提.
-詳細は [Ch03_SplitExtensions に直接書く理由]:
-- mathlib への汎用補題なので owner chapter 不在.
-- 将来 SZ 共役性を `OddOrder/Mathlib/SchurZassenhausConj.lean` に実装した時点で
-  本箇所で theorem 化.
-- それまでは **leaf axiom 削除** (使用箇所 0 件).
-- 詳細は [`notes/isaacs/ch03_split.md`](../../notes/isaacs/ch03_split.md). -/
+`Phase 2` (2026-05-23): Phase 1 `IsComplement'.exists_conj_of_coprime` 完成で実装可能化.
+
+証明骨格 (Isaacs FGT p.85-86):
+1. base case (`Nat.card G = 1`): trivial (H = K = ⊥).
+2. step case:
+   - `M` minimal normal ⊆ `G`, Thm 3.11 で elementary abelian `p`-group.
+   - `H̄, K̄ : Subgroup (G/M)` ともに π-Hall (cardinality 議論).
+   - IH on `G/M` で `∃ ḡ, H̄.map (conj ḡ) = K̄`. Lift to `g ∈ G`.
+   - `H^g ⊔ M = K ⊔ M` (= `HM`) via `mk'_comp_conj_eq` + `map_eq_map_iff`.
+   - **Case `p ∈ π`**: `M ⊆ H, M ⊆ K` (cardinality + π-Hall maximality). 故に
+     `HM = H^g = K`.
+   - **Case `p ∉ π`**: `H^g ∩ M = ⊥, K ∩ M = ⊥` (coprime orders). 両方 `M` の
+     complement in `HM`. Phase 1 `IsComplement'.exists_conj_of_coprime`
+     (M solvable since abelian p-group) で `∃ m ∈ M, H^g.map (conj m) = K`. -/
+private theorem hall_C_strong_aux : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+      Nat.card G ≤ n → ∀ {π : Set ℕ} {H K : Subgroup G},
+      IsHallSubgroup π H → IsHallSubgroup π K →
+      ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard _ _ _ _ _
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ _ hcard π H K hH hK
+    by_cases hsmall : Nat.card G ≤ n
+    · exact ih G hsmall hH hK
+    by_cases hG_one : Nat.card G = 1
+    · -- |G| = 1 ⇒ G subsingleton ⇒ H = K = ⊥. Take g = 1.
+      haveI : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
+      refine ⟨1, ?_⟩
+      apply Subgroup.ext
+      intro x
+      have hx : x = 1 := Subsingleton.elim x 1
+      subst hx
+      simp [Subgroup.one_mem]
+    -- |G| > 1: G nontrivial.
+    haveI hG_nontrivial : Nontrivial G :=
+      Finite.one_lt_card_iff_nontrivial.mp
+        (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
+    -- Minimal normal M ⊆ G.
+    obtain ⟨M, hM, _⟩ :=
+      OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+    haveI hMnormal : M.Normal := hM.1
+    have hM_ne_bot : M ≠ ⊥ := hM.2.1
+    -- M elementary abelian p-group via Thm 3.11.
+    obtain ⟨p, hp_prime, hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
+    haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
+    -- |G/M| ≤ n.
+    have hquot_card : Nat.card (G ⧸ M) ≤ n := by
+      have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card ↥M :=
+        Subgroup.card_eq_card_quotient_mul_card_subgroup M
+      have h1 : Nat.card (G ⧸ M) * 2 ≤ Nat.card G := by
+        rw [key]
+        exact Nat.mul_le_mul_left _ hM_card_ge_two
+      omega
+    -- M is a p-group (from elementary abelian structure).
+    have hM_pPower : ∃ k, Nat.card ↥M = p ^ k := by
+      have hPG : IsPGroup p ↥M := fun x => ⟨1, by rw [pow_one]; exact hp_elem.2 x⟩
+      exact IsPGroup.iff_card.mp hPG
+    -- |M| primes ⊆ {p}.
+    have hM_primes : ∀ q ∈ (Nat.card ↥M).primeFactors, q = p := by
+      obtain ⟨k, hk⟩ := hM_pPower
+      intro q hq
+      rw [hk, Nat.mem_primeFactors] at hq
+      exact (Nat.prime_dvd_prime_iff_eq hq.1 hp_prime).mp (hq.1.dvd_of_dvd_pow hq.2.1)
+    -- Step 1: H̄ := H.map (mk' M), K̄ := K.map (mk' M) are π-Hall in G/M.
+    have hbar_hall : ∀ {S : Subgroup G}, IsHallSubgroup π S →
+        IsHallSubgroup π (S.map (QuotientGroup.mk' M)) := by
+      intro S hS
+      refine ⟨?_, ?_⟩
+      · -- |S̄| divides |S|, so primeFactors ⊆ π.
+        intro q hq
+        apply hS.1
+        rw [Nat.mem_primeFactors] at hq ⊢
+        exact ⟨hq.1, hq.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+      · -- S̄.index divides S.index, so primeFactors ⊆ π'.
+        intro q hq
+        apply hS.2
+        rw [Nat.mem_primeFactors] at hq ⊢
+        exact ⟨hq.1,
+          hq.2.1.trans (S.index_map_dvd (QuotientGroup.mk'_surjective M)),
+          Subgroup.index_ne_zero_of_finite⟩
+    have h_Hbar_hall := hbar_hall hH
+    have h_Kbar_hall := hbar_hall hK
+    -- Step 2: IH on G/M.
+    haveI : IsSolvable (G ⧸ M) := inferInstance
+    obtain ⟨gbar, h_gbar⟩ := ih (G ⧸ M) hquot_card h_Hbar_hall h_Kbar_hall
+    -- Step 3: Lift gbar to g.
+    obtain ⟨g, hg_mk⟩ : ∃ g : G, (QuotientGroup.mk g : G ⧸ M) = gbar :=
+      QuotientGroup.mk_surjective gbar
+    -- Step 4: H^g ⊔ M = K ⊔ M via mk'-conj intertwining.
+    have h_supeq : (H.map (MulAut.conj g).toMonoidHom) ⊔ M = K ⊔ M := by
+      -- (mk' M).comp (conj g) = (conj (mk g)).comp (mk' M), so:
+      -- (H.map (conj g)).map (mk' M) = H.map ((conj (mk g)).comp (mk' M))
+      --   = (H.map (mk' M)).map (conj (mk g)) = H̄.map (conj gbar) = K̄
+      have h_intertwine : (QuotientGroup.mk' M).comp (MulAut.conj g).toMonoidHom =
+          ((MulAut.conj (QuotientGroup.mk g : G ⧸ M)).toMonoidHom).comp (QuotientGroup.mk' M) := by
+        ext x
+        show (QuotientGroup.mk (g * x * g⁻¹) : G ⧸ M) =
+             (QuotientGroup.mk g) * (QuotientGroup.mk x) * (QuotientGroup.mk g)⁻¹
+        rw [QuotientGroup.mk_mul, QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+      have h_quot_eq : (H.map (MulAut.conj g).toMonoidHom).map (QuotientGroup.mk' M) =
+          K.map (QuotientGroup.mk' M) := by
+        rw [Subgroup.map_map, h_intertwine, ← Subgroup.map_map, hg_mk]
+        exact h_gbar
+      have h_iff := (Subgroup.map_eq_map_iff (f := QuotientGroup.mk' M)).mp h_quot_eq
+      rwa [QuotientGroup.ker_mk'] at h_iff
+    -- Step 5: Case split on p ∈ π.
+    by_cases hp_pi : p ∈ π
+    · -- Case p ∈ π. M ⊆ H, M ⊆ K. So H^g · M = H^g, K · M = K. H^g = K.
+      -- π-Hall maximality: |S| ∣ |T| for any π-subgroup S and π-Hall T.
+      have π_hall_max : ∀ {T : Subgroup G}, IsHallSubgroup π T →
+          ∀ {S : Subgroup G}, (∀ q ∈ (Nat.card ↥S).primeFactors, q ∈ π) →
+          Nat.card ↥S ∣ Nat.card ↥T := by
+        intro T hT S hS_pi
+        have h_S_dvd_G : Nat.card ↥S ∣ Nat.card G := Subgroup.card_subgroup_dvd_card S
+        have h_cop : Nat.Coprime (Nat.card ↥S) T.index := by
+          rw [Nat.coprime_iff_gcd_eq_one]
+          by_contra hne
+          obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
+          rw [Nat.dvd_gcd_iff] at hq_dvd
+          have hq_S_pf : q ∈ (Nat.card ↥S).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.1, Nat.card_pos.ne'⟩
+          have hq_idx_pf : q ∈ T.index.primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.2, Subgroup.index_ne_zero_of_finite⟩
+          exact hT.2 q hq_idx_pf (hS_pi q hq_S_pf)
+        have h_G_eq : Nat.card G = Nat.card ↥T * T.index := (Subgroup.card_mul_index T).symm
+        rw [h_G_eq] at h_S_dvd_G
+        exact h_cop.dvd_of_dvd_mul_right h_S_dvd_G
+      have hM_pi : ∀ q ∈ (Nat.card ↥M).primeFactors, q ∈ π := fun q hq =>
+        hM_primes q hq ▸ hp_pi
+      -- |S ⊔ M| primes ⊆ π when S is π-Hall.
+      have hSup_pi : ∀ {S : Subgroup G}, IsHallSubgroup π S →
+          ∀ q ∈ (Nat.card ↥(S ⊔ M : Subgroup G)).primeFactors, q ∈ π := by
+        intro S hS q hq
+        rw [Nat.mem_primeFactors] at hq
+        obtain ⟨hq_prime, hq_dvd, _⟩ := hq
+        have h_card_eq : Nat.card ↥(S ⊔ M : Subgroup G) * Nat.card ↥(S ⊓ M : Subgroup G)
+            = Nat.card ↥S * Nat.card ↥M := by
+          have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card S M
+          rwa [show (↑S * ↑M : Set G) = ↑(S ⊔ M : Subgroup G) from
+            (Subgroup.mul_normal S M).symm] at h_hk
+        have h_dvd_prod : q ∣ Nat.card ↥S * Nat.card ↥M := by
+          rw [← h_card_eq]; exact hq_dvd.mul_right _
+        rcases (Nat.Prime.dvd_mul hq_prime).mp h_dvd_prod with hS_dvd | hM_dvd
+        · exact hS.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, hS_dvd, Nat.card_pos.ne'⟩)
+        · exact hM_pi q (Nat.mem_primeFactors.mpr ⟨hq_prime, hM_dvd, Nat.card_pos.ne'⟩)
+      -- M ⊆ S for any π-Hall S (since p ∈ π).
+      have hM_le_hall : ∀ {S : Subgroup G}, IsHallSubgroup π S → M ≤ S := by
+        intro S hS
+        have h_HM_card_dvd : Nat.card ↥(S ⊔ M : Subgroup G) ∣ Nat.card ↥S :=
+          π_hall_max hS (hSup_pi hS)
+        have h_S_le_SM : S ≤ S ⊔ M := le_sup_left
+        have h_S_le_card : Nat.card ↥S ≤ Nat.card ↥(S ⊔ M : Subgroup G) :=
+          Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective h_S_le_SM)
+        have h_card_eq : Nat.card ↥(S ⊔ M : Subgroup G) = Nat.card ↥S :=
+          Nat.le_antisymm (Nat.le_of_dvd Nat.card_pos h_HM_card_dvd) h_S_le_card
+        have h_SM_eq : (S ⊔ M : Subgroup G) = S :=
+          (Subgroup.eq_of_le_of_card_ge h_S_le_SM h_card_eq.le).symm
+        intro x hxM
+        have : x ∈ (S ⊔ M : Subgroup G) := Subgroup.mem_sup_right hxM
+        rwa [h_SM_eq] at this
+      have hM_le_H : M ≤ H := hM_le_hall hH
+      have hM_le_K : M ≤ K := hM_le_hall hK
+      -- M ⊴ G + M ≤ H ⇒ M ≤ H^g.
+      have hM_le_Hg : M ≤ H.map (MulAut.conj g).toMonoidHom := by
+        intro x hxM
+        rw [Subgroup.mem_map]
+        refine ⟨g⁻¹ * x * g, ?_, by show g * (g⁻¹ * x * g) * g⁻¹ = x; group⟩
+        apply hM_le_H
+        have := hMnormal.conj_mem x hxM g⁻¹
+        simpa using this
+      -- H^g · M = H^g, K · M = K. Conclude H^g = K.
+      have h_HMg_eq : (H.map (MulAut.conj g).toMonoidHom) ⊔ M =
+          H.map (MulAut.conj g).toMonoidHom := sup_eq_left.mpr hM_le_Hg
+      have h_KM_eq : K ⊔ M = K := sup_eq_left.mpr hM_le_K
+      refine ⟨g, ?_⟩
+      rw [← h_HMg_eq, h_supeq, h_KM_eq]
+    · -- Case p ∉ π. Apply SZ conjugacy in HM.
+      sorry  -- to be written
 
 /-! **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
