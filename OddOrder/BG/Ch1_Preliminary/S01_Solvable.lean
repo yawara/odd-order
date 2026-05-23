@@ -35,7 +35,9 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 
 | BG | Isaacs FGT | mathlib | 本ファイル |
 |---|---|---|---|
+| **Lem 1.1** (部分) | Ch.3 Thm 3.11 + Ch.1 Fitting | — | ✅ **sorry-free 部分** (M elem ab + ≤ F(G); Z(F(G)) は Ch.4 待ち) |
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
+| **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
 | Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
 | Thm 1.13 | (Thompson critical) | (Phase 1 未) | Phase 1 待ち |
 | **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
@@ -59,9 +61,11 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 - Cor 1.19(b) → mathlib `IsZGroup.coprime_commutator_index` 直接ヒット
 - 内部 hub は **Prop 1.5(d)** (6 §1 proofs)
 
-## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐
+## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1C 部分着手
 
-- **Skeleton** + **§1F docstring mapping** + **9 結果 全 sorry-free**:
+- **Skeleton** + **§1F docstring mapping** + **11 結果 全 sorry-free**:
+  - **Lem 1.1 (部分)** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free (Z(F(G)) 部分は Ch.4 待ち)
+  - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
   - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` ⭐ **sorry-free 完成**
   - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
@@ -70,7 +74,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
   - **`inf_eq_bot_of_pGroup_coprime`** (Step 1) ⭐ sorry-free
   - **`card_sup_eq_card_mul_card_of_disjoint_normal`** (Step 2) ⭐ sorry-free
   - **`subgroupOf_sup_card_eq_and_pGroup`** (Step 3 part 1) ⭐ sorry-free
-  - **`subgroupOf_sup_eq_of_pGroup_le_of_coprime`** (Step 3 part 2) ⭐ sorry-free
+  - **`subgroupOf_sup_eq_of_pGroup_le_of_card_eq`** (Step 3 part 2 一般版) ⭐ sorry-free
+  - **`subgroupOf_sup_eq_of_pGroup_le_of_coprime`** (Step 3 part 2 corollary) ⭐ sorry-free
 - Lem 1.14 hard direction proof (~115 LOC inline): TSyl + T_xSyl 構築 + `MulAction.exists_smul_eq`
   (Sylow II in ↥(T ⊔ M)) + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` + `inf_of_le_left`
   で `MulAut.conj y.val • T = T_x` を G で取得 + `mem_sup_of_normal_left` で `y.val = m·t'` 分解
