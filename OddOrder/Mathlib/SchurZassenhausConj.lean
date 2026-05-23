@@ -325,6 +325,14 @@ private theorem step_factor
   have heq := (Subgroup.map_eq_map_iff (f := QuotientGroup.mk' L)).mp key
   rwa [QuotientGroup.ker_mk'] at heq
 
+/-- Isaacs Lem 3.11: minimal `G`-normal of solvable group is commutative.
+mathlib v4.29.1 にこの形の lemma がないため自前. -/
+private theorem minimal_normal_isCommutative_of_solvable
+    {N L : Subgroup G} [N.Normal] [L.Normal] (hL_le : L ≤ N) (hL_ne : L ≠ ⊥)
+    (_hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L)
+    (_hN_solv : IsSolvable N) : IsMulCommutative L := by
+  sorry
+
 /-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
 private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
     ∃ L : Subgroup G, L.Normal ∧ L ≤ N ∧ L ≠ ⊥ ∧
