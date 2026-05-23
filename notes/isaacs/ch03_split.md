@@ -38,7 +38,10 @@
 
 「Ch.3 完成 = forward dep を持たない結果を全て sorry-free」の射程で, 残作業:
 
-### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — abelian 完成, step_caseB 進行中 (2026-05-23 セッション)
+### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — **完全完成** ⭐⭐⭐ (2026-05-23 セッション)
+
+**`Subgroup.IsComplement'.exists_conj_of_coprime`** が `propext, Classical.choice, Quot.sound`
+のみに依存する unconditional theorem として確立. AxiomsCheck flagship 入り.
 
 - 場所: `OddOrder/Mathlib/SchurZassenhausConj.lean`
 - ralph-loop prompt: `/tmp/phase1_sz_conjugacy.md`.
@@ -73,18 +76,36 @@
    * h_M_eq: M = N ⊔ (M ⊓ H) (Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le).
    * h_MH_inf_N: (M ⊓ H) ⊓ N = ⊥.
 
-#### 残 sorry (1 件, ~80-100 LOC 予想, 次セッション)
+#### step_caseB 完成詳細 (commit ef14cf1, 4345d26, 9d951c6)
 
-`step_caseB` case H ⊔ M = ⊤ の Sylow C + N_G(L) argument:
+12 Steps すべて sorry-free:
 
-- **Step 2**: |M ⊓ H| · |N| = |M| (card_HK_mul_card_inf_eq_card_mul_card 経由).
-- **Step 3**: M ⊓ H is Sylow p of M (|M ⊓ H| = |M̄| = p^k, |M : M ⊓ H| = |N| ∤ p).
-- **Step 4**: M ⊓ K' も同様 Sylow p of M (K'M = G 経由).
-- **Step 5**: Sylow C in M (mathlib `Sylow.exists_smul_eq`): ∃ m ∈ M, (M ⊓ K')^m = M ⊓ H.
-- **Step 6**: L := M ⊓ H = M ⊓ K'^m, L ⊴ H, L ⊴ K'^m, L > 1.
-- **Step 7a**: N_G(L) < G case (step_restriction on N_G(L) + composition + N 還元).
-- **Step 7b**: N_G(L) = G case (L ⊴ G, step_factor with H, K', L: L ⊆ H ⊴ G ⇒ L ⊆ H^g',
-  hence H^g' ⊔ L = H^g' = K' ⊔ L ⊇ K', cardinality K' = H^g', K^(g'*g_f) = K').
+- **Steps 1-4** (cardinality + p-group structure): |M ⊓ H| · |N| = |M|, |N| · |M̄| = |M|,
+  |M ⊓ H| = |M̄|, |M ⊓ H| = p^k.
+- **Step 5** (p ∤ |N|): k ≥ 1 + |M̄| ∣ N.index + coprime contradiction.
+- **Step 6** ((|M|).factorization p = k): Nat.factorization_mul + hp_prime.factorization_pow.
+- **Steps 7-8** (Sylow P_H, P_K' : Sylow p ↥M): Sylow.ofCard + subgroupOfEquivOfLe で
+  cardinality 一致確認.
+- **Step 9** (Sylow C in M): MulAction.exists_smul_eq with Sylow.isPretransitive_of_finite.
+- **Step 10** (Sylow → subgroup 引き戻し): Sylow.coe_subgroup_smul + Subgroup.pointwise_smul_def
+  で ((M ⊓ K').subgroupOf M).map (conj m_M) = (M ⊓ H).subgroupOf M.
+  既存 helper map_subtype_conj_subgroupOf で M.subtype 経由, 最終的に M ⊓ K'^m = M ⊓ H
+  (M ⊴ G ⇒ intersection conjugation 分配).
+- **Step 11** (L 性質): L := M ⊓ H = M ⊓ K'm, L ≠ ⊥ (p^k > 1), L ≤ H, L ≤ K'm,
+  H ≤ N_G(L), K'm ≤ N_G(L) (両方向: mem_normalizer_iff 経由).
+- **Step 12a** (N_G(L) = ⊤): L ⊴ G 直接構成 → step_factor on (H, K', L) → L ⊆ H^g'
+  (L ⊴ G + L ⊆ H) → H^g' = K' ⊔ L → cardinality K' = H^g' → K^(g'*g_f) = K'.
+- **Step 12b** (N_G(L) < ⊤): step_restriction on N_G(L) → H^n' = K'm → chain
+  K^(m⁻¹ n' g_f) = K' → mem_sup_of_normal_left で m⁻¹ n' g_f = n_N * k_K
+  decomp → K.map (conj n_N) = K.map (conj (n_N k_K)) (k_K conj preserves K) = K'.
+
+合計: step_caseB body ~250 LOC, helpers (isComplement'_conj, minimal_normal_isPGroup_of_solvable,
+stabilizer_quotientDiff_eq_self) ~120 LOC.
+
+#### Phase 2 (Hall-C Thm 3.14) unblock
+
+Phase 1 完成で `IsComplement'.exists_conj_of_coprime` 公開 theorem 化.
+§3C で `hall_C` を ~30-50 LOC で theorem 化可能.
 
 #### 完成 (sorry-free)
 
