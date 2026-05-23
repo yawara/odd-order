@@ -720,6 +720,103 @@ theorem isaacs_thm_5_17
     intro h_p_dvd_comm
     exact h_M_no_p (h_p_dvd_comm.trans (Subgroup.card_dvd_of_le h_comm_le_M))
 
+/-- Helper: in any finite cyclic group, the element of order 2 is unique (if exists).
+mathlib `IsCyclic.card_orderOf_eq_totient` + `Nat.totient_two = 1` + Subsingleton. -/
+private lemma cyclic_finite_unique_order_two
+    {P : Type*} [Group P] [Finite P] [IsCyclic P] {s t : P}
+    (hs_ord : orderOf s = 2) (ht_ord : orderOf t = 2) : s = t := by
+  haveI : Fintype P := Fintype.ofFinite P
+  classical
+  have h2_dvd : (2 : ℕ) ∣ Fintype.card P := by
+    rw [← hs_ord]; exact orderOf_dvd_card
+  have h_card : Fintype.card {x : P // orderOf x = 2} = 1 := by
+    rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd, Nat.totient_two]
+  haveI : Subsingleton {x : P // orderOf x = 2} :=
+    Fintype.card_le_one_iff_subsingleton.mp h_card.le
+  exact congrArg Subtype.val
+    (Subsingleton.elim (⟨s, hs_ord⟩ : {x : P // orderOf x = 2}) ⟨t, ht_ord⟩)
+
+/-- **Isaacs Cor 5.19** (cyclic Sylow_2 版): `G` 非可換 finite + `P ∈ Syl_2(G)` cyclic
+非自明 ⇒ `G` 単純でない.
+
+Isaacs 原版は `P = A × B` with `A` cyclic strictly largest (本実装は `B = ⊥` の特殊化).
+原版への一般化は同じ Thm 5.18 強形 + 適切な characteristic 部分群選択で extensible.
+
+**証明**: `P` cyclic Sylow_2, `|P| = 2^a, a ≥ 1`. Cauchy で order-2 元 `t ∈ P` を取る.
+任意 `n ∈ N_G(P)` で `n * t * n⁻¹ ∈ P` (normalizer) かつ order 2 (semiconjugate);
+cyclic finite group の unique order-2 element (`cyclic_finite_unique_order_two`) で
+`n * t * n⁻¹ = t`, ゆえに `t ∈ Z(N_G(P))`. Thm 5.18 強形
+(`eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer`) で
+`t ∈ G' ⇒ t = 1` だが `orderOf t = 2`, 矛盾 ⇒ `G' < G`. `G` simple なら
+`commutator G ∈ {⊥, ⊤}`, `G' ⊊ G` ⇒ `G' = ⊥` ⇒ `G` abelian, 非可換と矛盾. -/
+theorem not_isSimpleGroup_of_isCyclic_sylow_two
+    [Finite G] (hG_nonab : ¬ IsMulCommutative G)
+    (P : Sylow 2 G) [P.FiniteIndex]
+    [hPcyc : IsCyclic ↥(P : Subgroup G)]
+    (hP_nontrivial : (P : Subgroup G) ≠ ⊥) :
+    ¬ IsSimpleGroup G := by
+  intro hSimp
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- |P| = 2^a, a ≥ 1
+  obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp P.isPGroup'
+  have ha_pos : 1 ≤ a := by
+    by_contra h
+    push_neg at h
+    interval_cases a
+    rw [pow_zero] at hP_card
+    exact hP_nontrivial (Subgroup.eq_bot_of_card_eq _ hP_card)
+  -- Cauchy in ↥P: ∃ t ∈ P with orderOf t = 2
+  have h_2_dvd : (2 : ℕ) ∣ Nat.card ↥(P : Subgroup G) := by
+    rw [hP_card]
+    exact dvd_pow_self 2 (Nat.one_le_iff_ne_zero.mp ha_pos)
+  obtain ⟨⟨t, ht_inP⟩, ht_ord⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥(P : Subgroup G)) 2 h_2_dvd
+  have ht_ord_g : orderOf t = 2 := (Subgroup.orderOf_coe _).trans ht_ord
+  have ht_ne_one : t ≠ 1 := by
+    intro h_eq; rw [h_eq, orderOf_one] at ht_ord_g; norm_num at ht_ord_g
+  -- t ∈ Z(N(P)): for n ∈ N(P), n * t * n⁻¹ = t (cyclic unique order-2)
+  have ht_central :
+      ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), n * t = t * n := by
+    intro n hn
+    have hntn_inP : n * t * n⁻¹ ∈ (P : Subgroup G) :=
+      (Subgroup.mem_normalizer_iff.mp hn t).mp ht_inP
+    have hntn_ord : orderOf (n * t * n⁻¹) = 2 := by
+      have h_sb : SemiconjBy n t (n * t * n⁻¹) := by
+        show n * t = (n * t * n⁻¹) * n; group
+      exact (SemiconjBy.orderOf_eq n h_sb).symm.trans ht_ord_g
+    -- Lift to ↥P, use cyclic_finite_unique_order_two
+    have ht_P_ord : orderOf (⟨t, ht_inP⟩ : ↥(P : Subgroup G)) = 2 := by
+      rw [Subgroup.orderOf_mk]; exact ht_ord_g
+    have hntn_P_ord :
+        orderOf (⟨n * t * n⁻¹, hntn_inP⟩ : ↥(P : Subgroup G)) = 2 := by
+      rw [Subgroup.orderOf_mk]; exact hntn_ord
+    have h_eq_P : (⟨n * t * n⁻¹, hntn_inP⟩ : ↥(P : Subgroup G)) = ⟨t, ht_inP⟩ :=
+      cyclic_finite_unique_order_two hntn_P_ord ht_P_ord
+    have h_g_eq : n * t * n⁻¹ = t := congrArg Subtype.val h_eq_P
+    calc n * t = n * t * n⁻¹ * n := by group
+      _ = t * n := by rw [h_g_eq]
+  -- Apply 5.18 strong: t ∉ commutator G
+  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+  have h_t_not_in_comm : t ∉ commutator G := by
+    intro h_t_in
+    exact ht_ne_one
+      (eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer P
+        h_t_in ht_inP ht_central)
+  -- G simple ⇒ commutator G ∈ {⊥, ⊤}. ≠ ⊤ (else t ∈ ⊤). So = ⊥ ⇒ G abelian, 矛盾
+  have h_comm_normal : (commutator G).Normal := inferInstance
+  rcases hSimp.eq_bot_or_eq_top_of_normal _ h_comm_normal with h_bot | h_top
+  · -- commutator G = ⊥ ⇒ G abelian (直接 commutator element 経由)
+    apply hG_nonab
+    refine ⟨⟨fun a b => ?_⟩⟩
+    have h_comm_mem : ⁅a, b⁆ ∈ commutator G := by
+      rw [_root_.commutator_def]
+      exact Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b)
+    rw [h_bot, Subgroup.mem_bot] at h_comm_mem
+    rwa [commutatorElement_eq_one_iff_mul_comm] at h_comm_mem
+  · -- commutator G = ⊤ ⇒ t ∈ commutator G, contradiction
+    apply h_t_not_in_comm
+    rw [h_top]; exact Subgroup.mem_top t
+
 end -- 5C
 
 section /- 5D: Focal Subgroup theorem (pp. 167-173) -/
