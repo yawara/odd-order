@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Module.ZMod
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
+import Mathlib.LinearAlgebra.Dual.Lemmas
 import OddOrder.Isaacs.Ch03_SplitExtensions
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
@@ -247,7 +250,7 @@ theorem pow_mem_center_of_class_le_two_of_commutator_pow
 `commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c^p = 1)
 ⇒ `G/Z(G)` も `p`-elementary abelian.
 
-(Φ(G) ⊆ Z(G) への帰結は Lem 4.5 を経由するため別途.) -/
+(Φ(G) ⊆ Z(G) への帰結は Lem 4.5 forward を経由: 後段 `frattini_le_center_of_...` 参照.) -/
 theorem isElementaryAbelian_quotient_center_of_class_le_two
     {p : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
     (hExp : ∀ c ∈ _root_.commutator G, c^p = 1) :
@@ -426,10 +429,177 @@ theorem isElementaryAbelian_quotient_of_frattini_le_of_pgroup
     rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     exact hΦ (pow_p_mem_frattini_of_pgroup hP x)
 
-/-! **Isaacs Lemma 4.5 forward** (`P/N` elem abelian ⇒ `Φ(P) ⊆ N`): 形式化保留.
-有限 abelian 群の構造定理 (`AddCommGroup.equiv_directSum_zmod_of_finite`) 経由で
-`P/N ≅ (ℤ/pℤ)^k` に分解し, hyperplanes の交わりが `⊥` であることを使う.
-~100-150 LOC. 下流引用は無し ("backward direction only" で実用上十分). -/
+/-- **Helper**: For any group `G` and subgroup `M ≤ G` with prime index, `M` is a coatom
+(maximal proper subgroup) in the subgroup lattice.
+
+**証明**: M.index = p ≥ 2 ⇒ M ≠ ⊤. For M < K, by `relIndex_mul_index`,
+`M.relIndex K * K.index = M.index = p`, so K.index = 1 or p. If K.index = p, then
+`M.relIndex K = 1` so K = M, contradicting M < K. Hence K.index = 1, K = ⊤. -/
+private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
+    {p : ℕ} (hp : p.Prime) (h_idx : M.index = p) : IsCoatom M := by
+  refine ⟨?_, ?_⟩
+  · -- M ≠ ⊤
+    intro h_top
+    rw [h_top, Subgroup.index_top] at h_idx
+    exact hp.one_lt.ne' h_idx.symm
+  · -- ∀ K, M < K → K = ⊤
+    intro K hMK
+    by_contra h_K_ne_top
+    -- M ≤ K, use relIndex_mul_index
+    have hMK_le : M ≤ K := hMK.le
+    have h_eq : M.relIndex K * K.index = M.index :=
+      Subgroup.relIndex_mul_index hMK_le
+    rw [h_idx] at h_eq
+    -- K.index ∣ p, so K.index = 1 or p
+    have h_dvd : K.index ∣ p := ⟨M.relIndex K, by linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]⟩
+    rcases hp.eq_one_or_self_of_dvd _ h_dvd with h1 | hp_eq
+    · -- K.index = 1 ⇒ K = ⊤
+      have hK_top : K = ⊤ := Subgroup.index_eq_one.mp h1
+      exact h_K_ne_top hK_top
+    · -- K.index = p ⇒ M.relIndex K = 1 ⇒ M = K, contradicting M < K
+      rw [hp_eq] at h_eq
+      have h_rel_one : M.relIndex K = 1 := by
+        have hp_pos : 0 < p := hp.pos
+        have : M.relIndex K * p = 1 * p := by rw [h_eq, one_mul]
+        exact Nat.eq_of_mul_eq_mul_right hp_pos this
+      have hM_eq_K : M = K := by
+        -- M.relIndex K = 1 ⇒ M.subgroupOf K = ⊤
+        have := Subgroup.relIndex_eq_one.mp h_rel_one
+        -- this : K ≤ M (since M.subgroupOf K = ⊤ means everything in K is in M)
+        exact le_antisymm hMK_le this
+      exact absurd hM_eq_K (ne_of_lt hMK)
+
+/-- **Isaacs Lemma 4.5 forward**: For finite `p`-group `P` and `N ⊴ P`,
+`P/N` is `p`-elementary abelian ⇒ `Φ(P) ⊆ N`.
+
+**証明**: For each `x ∈ Φ(P)`, suppose `x ∉ N`. Construct a maximal `M ≤ P` with
+`N ≤ M` and `x ∉ M`, contradicting `Φ(P) ⊆ M`.
+
+`P/N` elementary abelian ⇒ `(P/N)` is a `ZMod p`-vector space (`AddCommGroup.zmodModule`
+on `Additive (P/N)`). For `xa := xN ≠ 1`, `Projective.exists_dual_ne_zero` gives
+a linear functional `f : (Additive (P/N)) →ₗ[ZMod p] ZMod p` with `f xa ≠ 0`.
+Convert to `φ : (P/N) →* Multiplicative (ZMod p)` via `AddMonoidHom.toMultiplicativeRight`.
+`φ.ker.comap (mk' N) : Subgroup P` is the desired maximal subgroup (index `p`,
+`x ∉ M`, `N ≤ M`). -/
+theorem frattini_le_of_isElementaryAbelian_quotient_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] (_hP : IsPGroup p P)
+    {N : Subgroup P} [N.Normal]
+    (hN : OddOrder.GroupTheory.IsElementaryAbelian p (P ⧸ N)) :
+    frattini P ≤ N := by
+  intro x hx_frat
+  by_contra hx_notN
+  -- Set up: P/N as CommGroup (via IsMulCommutative instance → CommGroup.ofIsMulCommutative)
+  haveI hPN_comm : IsMulCommutative (P ⧸ N) := ⟨⟨hN.comm⟩⟩
+  -- Set up: Additive (P/N) as ZMod p-module (vector space over the field ZMod p)
+  have hp_smul : ∀ a : Additive (P ⧸ N), (p : ℕ) • a = 0 := fun a => by
+    apply Additive.toMul.injective
+    show (p • a).toMul = (0 : Additive _).toMul
+    rw [toMul_nsmul, toMul_zero]
+    exact hN.pow_eq_one _
+  haveI hMod : Module (ZMod p) (Additive (P ⧸ N)) := AddCommGroup.zmodModule hp_smul
+  haveI hFree : Module.Free (ZMod p) (Additive (P ⧸ N)) :=
+    @Module.Free.of_divisionRing (ZMod p) (Additive (P ⧸ N)) _ _ inferInstance
+  haveI hProj : Module.Projective (ZMod p) (Additive (P ⧸ N)) := Module.Projective.of_free
+  -- xa : Additive (P/N) is nonzero (corresponds to x ∉ N)
+  set xa : Additive (P ⧸ N) := Additive.ofMul ((x : P ⧸ N)) with hxa_def
+  have hxa_ne_zero : xa ≠ 0 := by
+    intro h_eq
+    apply hx_notN
+    have h_mul_one : (x : P ⧸ N) = 1 := by
+      have := congr_arg Additive.toMul h_eq
+      rwa [toMul_ofMul, toMul_zero] at this
+    exact (QuotientGroup.eq_one_iff x).mp h_mul_one
+  -- Find linear functional f with f xa ≠ 0
+  obtain ⟨f, hf⟩ := Module.Projective.exists_dual_ne_zero (ZMod p) hxa_ne_zero
+  -- Convert to MonoidHom φ : (P/N) →* Multiplicative (ZMod p)
+  let φ : (P ⧸ N) →* Multiplicative (ZMod p) :=
+    AddMonoidHom.toMultiplicativeRight f.toAddMonoidHom
+  -- Define M_quot := ker φ : Subgroup (P/N), and M := M_quot.comap (mk' N) : Subgroup P
+  let M_quot : Subgroup (P ⧸ N) := φ.ker
+  let M : Subgroup P := M_quot.comap (QuotientGroup.mk' N)
+  -- N ≤ M: y ∈ N ⇒ mk' N y = 1 ⇒ φ 1 = 1
+  have hN_le_M : N ≤ M := by
+    intro y hy
+    show QuotientGroup.mk' N y ∈ M_quot
+    show φ (QuotientGroup.mk' N y) = 1
+    have h_eq_one : QuotientGroup.mk' N y = 1 := (QuotientGroup.eq_one_iff y).mpr hy
+    rw [h_eq_one, map_one]
+  -- x ∉ M: φ (xN) = ofAdd (f xa), and f xa ≠ 0 ⇒ ofAdd ... ≠ 1
+  have hx_notM : x ∉ M := by
+    intro hx_M
+    apply hf
+    -- hx_M : x ∈ M = M_quot.comap (mk' N), so mk' N x ∈ M_quot = φ.ker
+    -- i.e., φ (xN) = 1, i.e., ofAdd (f xa) = 1, i.e., f xa = 0
+    have hx_in : φ ((x : P ⧸ N)) = 1 := hx_M
+    -- φ ↑x = ofAdd (f xa) by def
+    change Multiplicative.ofAdd (f xa) = 1 at hx_in
+    rwa [show (1 : Multiplicative (ZMod p)) = Multiplicative.ofAdd 0 from rfl,
+         Multiplicative.ofAdd.injective.eq_iff] at hx_in
+  -- φ.range = ⊤ (since f ≠ 0 ⇒ range f = ⊤ in ZMod p, simple module)
+  have hf_range_top : LinearMap.range f = ⊤ := by
+    have h_ne_bot : LinearMap.range f ≠ ⊥ := fun h_bot => hf <| by
+      have h_in : f xa ∈ LinearMap.range f := ⟨xa, rfl⟩
+      rw [h_bot] at h_in
+      exact (Submodule.mem_bot _).mp h_in
+    rcases eq_bot_or_eq_top (LinearMap.range f) with h | h
+    · exact absurd h h_ne_bot
+    · exact h
+  have hφ_surj : Function.Surjective φ := by
+    intro y
+    -- y : Multiplicative (ZMod p), need x' : P/N with φ x' = y
+    -- y.toAdd ∈ ZMod p = range f (= ⊤), so ∃ a : Additive (P/N), f a = y.toAdd
+    have h_in_top : y.toAdd ∈ LinearMap.range f := hf_range_top.symm ▸ Submodule.mem_top
+    obtain ⟨a, ha⟩ := h_in_top
+    refine ⟨a.toMul, ?_⟩
+    change Multiplicative.ofAdd (f (Additive.ofMul (a.toMul))) = y
+    rw [ofMul_toMul, ha, ofAdd_toAdd]
+  -- M_quot.index = Nat.card (P/N) / Nat.card range = Nat.card Multiplicative (ZMod p) = p
+  -- Use Subgroup.index_ker for surjective φ
+  have h_M_quot_index : M_quot.index = p := by
+    -- Use: φ surjective ⇒ (P/N) ⧸ φ.ker ≃* Multiplicative (ZMod p)
+    -- Nat.card (Multiplicative (ZMod p)) = Nat.card (ZMod p) = p
+    have h_quot_card : Nat.card ((P ⧸ N) ⧸ M_quot) = p := by
+      have e : ((P ⧸ N) ⧸ φ.ker) ≃* Multiplicative (ZMod p) :=
+        QuotientGroup.quotientKerEquivOfSurjective φ hφ_surj
+      rw [Nat.card_congr e.toEquiv]
+      exact Nat.card_zmod p
+    rw [Subgroup.index, h_quot_card]
+  -- M.index = p (via comap of surjective mk' N)
+  have h_M_index : M.index = p := by
+    rw [show M = M_quot.comap (QuotientGroup.mk' N) from rfl]
+    rw [Subgroup.index_comap_of_surjective _ QuotientGroup.mk_surjective]
+    exact h_M_quot_index
+  -- M is a coatom (maximal proper subgroup)
+  have h_M_coatom : IsCoatom M := isCoatom_of_index_prime hp.out h_M_index
+  -- Φ(P) ⊆ M
+  have hfrat_le_M : frattini P ≤ M := frattini_le_coatom h_M_coatom
+  -- Contradiction: x ∈ Φ(P) ⊆ M but x ∉ M
+  exact hx_notM (hfrat_le_M hx_frat)
+
+/-- **Isaacs Lemma 4.5** (full equivalence): For finite `p`-group `P` and `N ⊴ P`,
+`Φ(P) ⊆ N ↔ P/N is p-elementary abelian`. -/
+theorem frattini_le_iff_isElementaryAbelian_quotient_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
+    {N : Subgroup P} [N.Normal] :
+    frattini P ≤ N ↔ OddOrder.GroupTheory.IsElementaryAbelian p (P ⧸ N) :=
+  ⟨isElementaryAbelian_quotient_of_frattini_le_of_pgroup hP,
+   frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP⟩
+
+/-- **Isaacs Lemma 4.4 final conclusion** (`thus Φ(P) ⊆ Z(P)`):
+For finite `p`-group `P` of class ≤ 2 with `commutator P` `p`-elementary abelian,
+`Φ(P) ⊆ Z(P)`.
+
+**証明**: `isElementaryAbelian_quotient_center_of_class_le_two` で `P/Z(P)` が
+`p`-elementary abelian. 次に Lem 4.5 forward
+(`frattini_le_of_isElementaryAbelian_quotient_of_pgroup`) で
+`Φ(P) ⊆ Z(P)`. -/
+theorem frattini_le_center_of_class_le_two_of_commutator_pow_eq_one
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
+    (hC : _root_.commutator P ≤ Subgroup.center P)
+    (hExp : ∀ c ∈ _root_.commutator P, c^p = 1) :
+    frattini P ≤ Subgroup.center P :=
+  frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP
+    (isElementaryAbelian_quotient_center_of_class_le_two hC hExp)
 
 /-- **Isaacs Lemma 4.6 easy direction**: `⁅A, ⊤⁆ ≤ G'` (任意 `A ≤ G` で常時成立).
 
