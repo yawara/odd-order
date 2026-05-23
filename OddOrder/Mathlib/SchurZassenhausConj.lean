@@ -874,7 +874,85 @@ private theorem step_caseB
     obtain ⟨k, hk_eq⟩ := hp_pgroup.exists_card_eq
     have h_MH_card_eq_pk : Nat.card ↥(M ⊓ H : Subgroup G) = p ^ k := by
       rw [h_MH_card_eq_M_bar, hk_eq]
-    sorry
+    -- Step 5: p ∤ |N|.
+    have hk_pos : 1 ≤ k := by
+      by_contra h
+      push_neg at h
+      interval_cases k
+      rw [pow_zero] at hk_eq
+      haveI hM_bar_nontriv : Nontrivial M_bar :=
+        (Subgroup.bot_or_nontrivial _).resolve_left hM_bar_ne_bot
+      have : 1 < Nat.card M_bar := Finite.one_lt_card
+      omega
+    have hp_dvd_M_bar : p ∣ Nat.card M_bar := by
+      rw [hk_eq]
+      exact dvd_pow_self p (Nat.one_le_iff_ne_zero.mp hk_pos)
+    have hp_dvd_idx : p ∣ N.index := by
+      have h_dvd : Nat.card M_bar ∣ N.index := by
+        have := Subgroup.card_subgroup_dvd_card M_bar
+        rwa [show Nat.card (G ⧸ N) = N.index from rfl] at this
+      exact hp_dvd_M_bar.trans h_dvd
+    have hp_not_dvd_N : ¬ p ∣ Nat.card N := by
+      intro h_dvd_N
+      have h_dvd_gcd : p ∣ Nat.gcd (Nat.card N) N.index := Nat.dvd_gcd h_dvd_N hp_dvd_idx
+      rw [h1] at h_dvd_gcd
+      exact hp_prime.one_lt.ne' (Nat.dvd_one.mp h_dvd_gcd)
+    -- Step 6: (Nat.card ↥M).factorization p = k.
+    have h_N_card_ne_zero : Nat.card ↥N ≠ 0 := Nat.card_pos.ne'
+    have h_M_bar_card_ne_zero : Nat.card ↥M_bar ≠ 0 := Nat.card_pos.ne'
+    have h_M_factorization : (Nat.card ↥M).factorization p = k := by
+      rw [← h_M_card]
+      rw [Nat.factorization_mul h_N_card_ne_zero h_M_bar_card_ne_zero]
+      rw [Finsupp.add_apply]
+      rw [Nat.factorization_eq_zero_of_not_dvd hp_not_dvd_N, zero_add]
+      rw [hk_eq, hp_prime.factorization_pow, Finsupp.single_apply, if_pos rfl]
+    -- Step 7: Construct Sylow P_H : Sylow p ↥M.
+    have h_MH_subgroupOf_card_eq :
+        Nat.card ((M ⊓ H : Subgroup G).subgroupOf M) = Nat.card ↥(M ⊓ H : Subgroup G) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : (M ⊓ H : Subgroup G) ≤ M)).toEquiv
+    have h_MH_subgroupOf_card :
+        Nat.card ((M ⊓ H : Subgroup G).subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+      rw [h_MH_subgroupOf_card_eq, h_MH_card_eq_pk, h_M_factorization]
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    let P_H : Sylow p ↥M := Sylow.ofCard ((M ⊓ H : Subgroup G).subgroupOf M) h_MH_subgroupOf_card
+    -- Step 8: K' analog. K'M = G ⇒ |M ⊓ K'| = p^k.
+    have hK'M_top : K' ⊔ M = ⊤ := by rw [← h_factor]; exact hHM_top
+    have h_M_le_NK' : M ≤ N ⊔ K' := by rw [hK'.sup_eq_top]; exact le_top
+    have h_M_eq_K' : M = N ⊔ (M ⊓ K') :=
+      Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le hN_le_M h_M_le_NK'
+    have h_MK'_inf_N : (M ⊓ K' : Subgroup G) ⊓ N = ⊥ := by
+      have h_le : (M ⊓ K' : Subgroup G) ⊓ N ≤ K' ⊓ N := by
+        intro x ⟨⟨_, hxK'⟩, hxN⟩
+        exact ⟨hxK', hxN⟩
+      have h_K'N_bot : (K' : Subgroup G) ⊓ N = ⊥ := by
+        rw [inf_comm]; exact hK'.disjoint.eq_bot
+      exact le_bot_iff.mp (h_le.trans h_K'N_bot.le)
+    have h_MK'_sup_N : (M ⊓ K' : Subgroup G) ⊔ N = M := by
+      rw [sup_comm]; exact h_M_eq_K'.symm
+    have h_MK'_card : Nat.card (M ⊓ K' : Subgroup G) * Nat.card N = Nat.card M := by
+      have h_card := card_HK_mul_card_inf_eq_card_mul_card (M ⊓ K' : Subgroup G) N
+      rw [h_MK'_inf_N, Subgroup.card_bot, mul_one] at h_card
+      have h_set_eq : (↑(M ⊓ K' : Subgroup G) * ↑N : Set G) = (↑M : Set G) := by
+        rw [← Subgroup.mul_normal, h_MK'_sup_N]
+      rw [h_set_eq] at h_card
+      exact h_card.symm
+    have h_MK'_card_eq_M_bar : Nat.card (M ⊓ K' : Subgroup G) = Nat.card M_bar := by
+      have hN_pos : 0 < Nat.card N := Nat.card_pos
+      apply Nat.eq_of_mul_eq_mul_right hN_pos
+      rw [h_MK'_card, mul_comm, h_M_card]
+    have h_MK'_card_eq_pk : Nat.card ↥(M ⊓ K' : Subgroup G) = p ^ k := by
+      rw [h_MK'_card_eq_M_bar, hk_eq]
+    have h_MK'_subgroupOf_card_eq :
+        Nat.card ((M ⊓ K' : Subgroup G).subgroupOf M) = Nat.card ↥(M ⊓ K' : Subgroup G) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : (M ⊓ K' : Subgroup G) ≤ M)).toEquiv
+    have h_MK'_subgroupOf_card :
+        Nat.card ((M ⊓ K' : Subgroup G).subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+      rw [h_MK'_subgroupOf_card_eq, h_MK'_card_eq_pk, h_M_factorization]
+    let P_K' : Sylow p ↥M := Sylow.ofCard ((M ⊓ K' : Subgroup G).subgroupOf M) h_MK'_subgroupOf_card
+    -- Step 9: Sylow C in M: ∃ m_M : ↥M, m_M • P_K' = P_H.
+    obtain ⟨m_M, h_mM_smul⟩ : ∃ m_M : ↥M, m_M • P_K' = P_H :=
+      MulAction.exists_smul_eq ↥M P_K' P_H
+    sorry  -- continue with Step 10+ (L := M ⊓ H, N_G(L) cases)
   · -- Case ⊔ M < ⊤: step_restriction on H ⊔ M.
     have hHU : H ≤ H ⊔ M := le_sup_left
     have hK'U : K' ≤ H ⊔ M := by rw [h_factor]; exact le_sup_left
