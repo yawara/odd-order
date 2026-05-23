@@ -174,12 +174,81 @@ Schur-Zassenhaus existence in `U` gives complement `H` of `U ∩ G` in `U`. `H` 
 complement of `G` in `Γ`. `inr(A)` is too. SZ conjugacy: `H = (inr A)^x` for `x ∈ inl(G)`.
 Then `x⁻¹ • α` is `A`-invariant. -/
 theorem glauberman_fixed_point_exists
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
     {Ω : Type*} [MulAction G Ω] [MulAction A Ω] [Nonempty Ω]
-    (_h : IsCompatibleMulAction φ Ω) (_hG_trans : MulAction.IsPretransitive G Ω) :
+    (h : IsCompatibleMulAction φ Ω) (hG_trans : MulAction.IsPretransitive G Ω) :
     ∃ α : Ω, ∀ a : A, a • α = α := by
-  sorry  -- TODO: SDP + SZ existence + conjugacy.
+  letI := h.toMulAction
+  -- Notation.
+  set α₀ : Ω := Classical.arbitrary Ω with hα₀_def
+  set Γ := SemidirectProduct G A φ with hΓ_def
+  set inlG : Subgroup Γ := (SemidirectProduct.inl : G →* Γ).range with hinlG_def
+  set inrA : Subgroup Γ := (SemidirectProduct.inr : A →* Γ).range with hinrA_def
+  set U : Subgroup Γ := MulAction.stabilizer Γ α₀ with hU_def
+  -- inlG normal in Γ.
+  haveI hinlG_normal : inlG.Normal := by
+    rw [hinlG_def, SemidirectProduct.range_inl_eq_ker_rightHom]; infer_instance
+  -- inlG.index = Nat.card A.
+  have h_index_A : inlG.index = Nat.card A := inlRange_index_eq_card_A
+  -- Nat.card inlG = Nat.card G.
+  have h_card_inlG : Nat.card inlG = Nat.card G := by
+    rw [hinlG_def]; exact Nat.card_range_of_injective SemidirectProduct.inl_injective
+  -- Coprime |inlG| |inlG.index|.
+  have h_coprime_inlG : Nat.Coprime (Nat.card inlG) inlG.index := by
+    rw [h_card_inlG, h_index_A]; exact hCop.symm
+  -- Solvability transfer to inlG or Γ/inlG.
+  have hSolv_inlG : IsSolvable inlG ∨ IsSolvable (Γ ⧸ inlG) := by
+    rcases hSolv with hA | hG
+    · exact Or.inr (isSolvable_quotient_inlRange_of_isSolvable (φ := φ))
+    · exact Or.inl (isSolvable_inlRange_of_isSolvable (φ := φ))
+  -- Step 1: U ⊔ inlG = ⊤.
+  have h_UG_top : U ⊔ inlG = ⊤ := by
+    rw [eq_top_iff]; intro γ _
+    obtain ⟨g, hg⟩ := hG_trans.exists_smul_eq α₀ (γ • α₀)
+    -- inl(g) • α₀ = γ • α₀.
+    have h_eq : (SemidirectProduct.inl g : Γ) • α₀ = γ • α₀ := by
+      rw [show ((SemidirectProduct.inl g : Γ) • α₀ : Ω) = g • α₀ from
+        IsCompatibleMulAction.toMulAction_inl_smul h g α₀]
+      exact hg
+    -- inl(g)⁻¹ * γ ∈ U.
+    have h_in_U : (SemidirectProduct.inl g : Γ)⁻¹ * γ ∈ U := by
+      rw [hU_def, MulAction.mem_stabilizer_iff, mul_smul]
+      rw [show (γ • α₀ : Ω) = (SemidirectProduct.inl g : Γ) • α₀ from h_eq.symm]
+      rw [← mul_smul, inv_mul_cancel, one_smul]
+    -- inl(g) ∈ inlG.
+    have h_in_inlG : (SemidirectProduct.inl g : Γ) ∈ inlG := ⟨g, rfl⟩
+    -- γ = inl(g) * (inl(g)⁻¹ * γ).
+    have h_decomp : γ = (SemidirectProduct.inl g : Γ) * ((SemidirectProduct.inl g : Γ)⁻¹ * γ) := by
+      group
+    rw [h_decomp, sup_comm]
+    exact Subgroup.mul_mem_sup h_in_inlG h_in_U
+  -- Step 2: inlG.relIndex U = Nat.card A.
+  have h_relIndex : inlG.relIndex U = Nat.card A := by
+    rw [← Subgroup.relIndex_sup_right (H := U) (K := inlG), h_UG_top,
+        Subgroup.relIndex_top_right, h_index_A]
+  -- Step 3: SZ apply in U. First, Coprime (Nat.card (inlG.subgroupOf U)) (...).index = |A|.
+  have h_card_subof_dvd_G : Nat.card (inlG.subgroupOf U) ∣ Nat.card G := by
+    -- inlG.subgroupOf U ≃ inlG ⊓ U (as subgroups, same elements via U.subtype).
+    have h_iso : (inlG.subgroupOf U : Subgroup U) ≃* ((U ⊓ inlG).subgroupOf U) := by
+      rw [Subgroup.inf_subgroupOf_left]
+    have h_card_eq : Nat.card (inlG.subgroupOf U) = Nat.card (U ⊓ inlG : Subgroup Γ) := by
+      rw [Nat.card_congr h_iso.toEquiv]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+    rw [h_card_eq, ← h_card_inlG]
+    exact Subgroup.card_dvd_of_le inf_le_right
+  have h_subof_index : (inlG.subgroupOf U).index = Nat.card A := by
+    show inlG.relIndex U = Nat.card A
+    exact h_relIndex
+  have h_coprime_subof : Nat.Coprime (Nat.card (inlG.subgroupOf U)) (inlG.subgroupOf U).index := by
+    rw [h_subof_index]
+    exact hCop.symm.coprime_dvd_left h_card_subof_dvd_G
+  haveI hU_finite : Finite U := Subtype.finite
+  obtain ⟨H_in_U, hH_compl_in_U⟩ :=
+    Subgroup.exists_right_complement'_of_coprime (N := inlG.subgroupOf U) h_coprime_subof
+  -- Step 4: H := H_in_U.map U.subtype is a complement of inlG in Γ.
+  set H : Subgroup Γ := H_in_U.map U.subtype with hH_def
+  sorry  -- TODO: Step 4-8.
 
 end Glauberman
 
