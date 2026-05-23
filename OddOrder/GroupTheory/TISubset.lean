@@ -1,0 +1,124 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.GroupTheory.Subgroup.Centralizer
+
+/-!
+# Trivial Intersection (TI) Subsets
+
+`OddOrder.GroupTheory` shared module: TI-subset (trivial intersection subset) の
+正式定義. Peterfalvi *Character Theory for the Odd Order Theorem* (LMS LNS 272,
+2000) §4-§8 全節 + §11-§16 で多用される概念.
+
+## 数学的定義
+
+有限群 `G` の部分集合 `A ⊂ G` が **TI** ⟺ `A` の異なる共役が非自明な交差を持たない:
+
+  `∀ g ∈ G, (A^g ∩ A ≠ ∅) ⟹ g ∈ N_G(A)`
+
+(ここで `A^g = g·A·g⁻¹`, `N_G(A)` は `A` の集合-正規化群)
+
+Peterfalvi の典型 setup は `A = H \ {1}` で, ホスト `L = N_G(H)` に対し
+"`A` is TI-subset with normalizer `L`" の形で現れる. 本 module は
+**`L` を parameter として取る `IsTISubset A L` 形式** を採用:
+- Peterfalvi 流に直結する自然な表現
+- `N_G(A)` の毎回計算を回避できる
+- §6 (4.6), §8 (6.7) 等で `L = N_G(A)` と限らない一般化された使用にも対応
+
+## mathlib カバレッジ
+
+mathlib v4.29.1 で TI-subset 概念は **完全不在**:
+- `Mathlib.GroupTheory.GroupAction.Blocks.IsTrivialBlock` は **別概念**
+  (block の singleton/univ 性であって TI とは無関係)
+- `Subgroup.normalizer` は subgroup 用 (set 上の集合-正規化群ではない)
+
+そのため本 module で新規定義. (audit 訂正前の per-section ノートで
+`MulAction.IsTrivialIntersection` 既存と誤記されていたが該当 API 不在を確認済.)
+
+## Peterfalvi での主要使用箇所
+
+- §4 (2.3): `H(a) = 1 ⟺ A is TI-subset` — Dade Hypothesis の TI 特殊化
+- §5 (3.1): `V = W - (W₁∪W₂)` is TI-subset for `N_G(V) = W` (cyclic normalizer)
+- §6 (4.3.a): `W - W₂` is TI-subset of `L` (Hypothesis (4.2) 下)
+- §8 (6.7), (6.8): `P^# = P \ {1}` is TI-subset (Sylow case, |L| odd)
+
+詳細 audit: `notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md` §3.1 row
+`IsTISubset A`. Wave 1a 共有 infra (~80 LOC) として最初に着手.
+
+## 関連 mathlib upstream
+
+将来的に `Mathlib.GroupTheory.Subgroup.TI` へ upstream 視野. 現状は
+`OddOrder.GroupTheory` namespace で保持し, naming/API を mathlib 互換に
+保ちながら開発する (CLAUDE.md no-mathlib-wrapper policy).
+-/
+
+namespace OddOrder.GroupTheory
+
+variable {G : Type*} [Group G]
+
+/-- A subset `A ⊆ G` is a **TI-subset** with normalizer-bound `L ≤ G` iff every
+element `g : G` that produces an overlap between `A` and the conjugate
+`g · A · g⁻¹` must already lie in `L`.
+
+Formally: `∀ g : G, (∃ a ∈ A, g * a * g⁻¹ ∈ A) → g ∈ L`.
+
+The intended use is `L = N_G(A)`, in which case the TI condition states that
+distinct conjugates of `A` (by elements outside `L`) are mutually disjoint.
+
+Peterfalvi §4-§8 全節共有の predicate. -/
+def IsTISubset (A : Set G) (L : Subgroup G) : Prop :=
+  ∀ g : G, (∃ a ∈ A, g * a * g⁻¹ ∈ A) → g ∈ L
+
+namespace IsTISubset
+
+variable {A : Set G} {L : Subgroup G}
+
+/-- TI 条件の対偶: `L` 外の `g` では `A` と `g · A · g⁻¹` が disjoint. -/
+theorem disjoint_conj_of_not_mem (hA : IsTISubset A L) {g : G} (hg : g ∉ L) :
+    ∀ a ∈ A, g * a * g⁻¹ ∉ A := by
+  intro a ha hga
+  exact hg (hA g ⟨a, ha, hga⟩)
+
+/-- 対偶の逆: 「`L` 外で全ての `a ∈ A` の共役が `A` 外」⇒ TI. `IsTISubset` の
+構築によく使う introduction form. -/
+theorem of_disjoint_conj
+    (h : ∀ g : G, g ∉ L → ∀ a ∈ A, g * a * g⁻¹ ∉ A) :
+    IsTISubset A L := by
+  intro g ⟨a, ha, hga⟩
+  by_contra hg
+  exact h g hg a ha hga
+
+/-- ホスト部分群を緩めても TI: `L ≤ L'` なら `A` は `L'` 相対でも TI. -/
+theorem mono {L' : Subgroup G} (hA : IsTISubset A L) (hLL' : L ≤ L') :
+    IsTISubset A L' :=
+  fun g hg => hLL' (hA g hg)
+
+/-- 部分集合に絞っても TI: `A' ⊆ A` なら `A'` も同じ `L` で TI. -/
+theorem subset {A' : Set G} (hA : IsTISubset A L) (hA' : A' ⊆ A) :
+    IsTISubset A' L :=
+  fun g ⟨a, ha', hga'⟩ => hA g ⟨a, hA' ha', hA' hga'⟩
+
+end IsTISubset
+
+end OddOrder.GroupTheory
+
+namespace Subgroup
+
+variable {G : Type*} [Group G]
+
+/-- A subgroup `H ≤ G` is **TI** iff its non-identity part `H \ {1}` is a
+TI-subset (in the `OddOrder.GroupTheory.IsTISubset` sense) relative to the
+normalizer `N_G(H)`.
+
+これは古典的な「Trivial Intersection 部分群」の概念: 異なる共役
+`g H g⁻¹` (g ∉ N_G(H)) は `H` と `{1}` のみで交わる.
+
+Peterfalvi §8 (6.7), (6.8) で `P` Sylow `p`-部分群 + `L = N_G(P)`, `P^#` TI
+の形で多用. -/
+def IsTI (H : Subgroup G) : Prop :=
+  OddOrder.GroupTheory.IsTISubset ((H : Set G) \ {1}) (Subgroup.normalizer (H : Set G))
+
+end Subgroup
