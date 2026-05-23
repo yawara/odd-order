@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.Isaacs.Ch02_Subnormality
 import OddOrder.Isaacs.Ch03_SplitExtensions
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer
 
 /-!
@@ -110,3 +111,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- N, m > 0, a ∈ N, σ ∈ Aut(N) で σ a = a かつ σ^m = MulAut.conj a
 --   ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.cyclic_extension_exists
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Lemma 3.24(a) Glauberman fixed-point) ⭐
+-- A acts on G via auto, A,G finite, (|A|,|G|)=1, A or G solvable.
+-- A and G act on Ω with compatibility, G transitive ⇒ ∃ A-invariant α ∈ Ω.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists
