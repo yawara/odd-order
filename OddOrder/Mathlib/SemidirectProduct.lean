@@ -59,3 +59,14 @@ theorem SemidirectProduct.inl_range_sup_inr_range_eq_top
   refine top_le_iff.mp fun x _ => ?_
   rw [← SemidirectProduct.inl_left_mul_inr_right x]
   exact Subgroup.mul_mem_sup ⟨x.left, rfl⟩ ⟨x.right, rfl⟩
+
+open scoped commutatorElement in
+/-- **`⁅inl n, inr g⁆ = inl (n * (φ g) n⁻¹)`**: Γ = N ⋊[φ] G 内の commutator は
+`inl` の中で計算できる. これが `actionCommutator φ` の Γ 内 commutator 表示の核. -/
+theorem SemidirectProduct.commutator_inl_inr
+    {N G : Type*} [Group N] [Group G] {φ : G →* MulAut N} (n : N) (g : G) :
+    ⁅(SemidirectProduct.inl n : N ⋊[φ] G), (SemidirectProduct.inr g : N ⋊[φ] G)⁆ =
+      SemidirectProduct.inl (n * (φ g) n⁻¹) := by
+  rw [commutatorElement_def]
+  ext <;> simp [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+                SemidirectProduct.inv_left, SemidirectProduct.inv_right, mul_assoc]
