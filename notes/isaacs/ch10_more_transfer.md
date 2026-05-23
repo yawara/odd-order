@@ -4,6 +4,7 @@
 形式化先 (予定): `OddOrder/Isaacs/Ch10_MoreTransfer.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 5310-5914.
 ROADMAP 上の位置: **第 5 波 (Ch.6 完了後、Ch.7 と並列)** — Isaacs 本編の最終章. 前提は Ch.4 (Commutators: Thm 4.6, 4.7, 4.8), Ch.5 (Transfer: Thm 5.5, 5.6, Lemma 5.12, Cor 5.22), Ch.6 (Thm 6.11) を軽く参照する程度.
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
 
 ## TL;DR — Isaacs 内では葉、BG/Peterfalvi 直接被引用ゼロ、Phase 1 スキップ推奨
 
@@ -30,6 +31,16 @@ BG が引く Huppert は **Huppert *Endliche Gruppen I* (1967) Satz III.11.6 / I
 **Peterfalvi 付録 06.0 "A Special Case of a Theorem of Huppert"** も別物: solvable doubly transitive permutation groups に関する Huppert (Huppert-Blackburn Ch.XII §7) で, metacyclic p-group とは無関係.
 
 **結論**: §1G Chermak-Delgado, Ch.9 と同じく **FT 経路では未着手 — Phase 1 スキップ推奨**. Ch.5 §5D (Focal Subgroup) と §5E (Frobenius normal p-complement) で BG/Peterfalvi に必要な transfer 内容は尽きている. Ch.10 は Isaacs 本編を Phase 1 で全部閉じたい場合の "完備化" 仕事になる.
+
+## 視点 1: forward dependencies (2026-05-23 audit 統合)
+
+**(a) Isaacs 内 後続章**: Ch.10 は Isaacs FGT の **最終 main chapter**. Ch.11+ 以降は存在せず, 後続 Isaacs 章への forward edge は本質的に **0 件** (Index と Bibliography のみ; 既存 L154-159 参照).
+
+**(b) BG / Peterfalvi 直接被引用**: 再 grep 結果 (`grep -c` 全 mmd) — `Yoshida` 0, `Mackey` 0, `Furtwängler` / `Furtwangler` 0, `principal ideal` 0, `transitivity.*transfer` 0, `augmentation ideal` 0, `Alperin` 0. `metacyclic` 12 件はすべて **BG §4 別 Huppert (Endliche Gruppen I) の文脈での偽陽性** であり Isaacs Ch.10 §10B 非依存 (詳細 L172-189 と §2.4 共通 subroutine 補足参照). ⇒ FT 経路への直接 forward edge **0**.
+
+**(c) Class field theory への forward edge** (mathlib upstream 視野): Thm 10.18 principal ideal theorem (Furtwängler) ＋ augmentation ideal API (Δ(G), 10.19-10.27) は mathlib `NumberTheory.ClassNumber.*` 系統への upstream 候補. FT 経路で 0 件だが Phase 1 完成後の余剰時間で `Mathlib/GroupTheory/AugmentationIdeal.lean` 単独 PR 価値が HIGH (詳細 §5.4).
+
+**(d) Suzuki / Sz(q) 系 wreath product 共有**: Peterfalvi §05.6 PSU(3,q) appendix でも wreath product 利用予定. mathlib `RegularWreathProduct` を Ch.10 §10A と共有して両方の重複実装を避ける.
 
 ## 章のセクション分割と全 28 結果
 
@@ -148,6 +159,20 @@ mmd 抽出では `### 10a` (L5312), `### Problems 10a` (L5553), `### Problems 10
 
 Ch.10 は **Ch.6 (Frobenius Actions) と並んで Phase 1 で mathlib カバレッジが最も薄い章のひとつ**. しかも FT 経路への直接寄与がほぼゼロ (下記参照) なので, **コスト/効果比は最低**.
 
+## 視点 3: mathlib status — proof-internal API per major theorem (2026-05-23 audit 統合)
+
+上記「## mathlib カバレッジ」は statement-level overview. 以下は **証明本体で呼ぶ mathlib v4.29.1 API** の具体名 + path (audit §3.3 由来):
+
+| Isaacs | mathlib API (v4.29.1, exact paths + names) |
+|---|---|
+| **10.1 Yoshida** | **修正** (wreath cost 「大→中」): `Mathlib/GroupTheory/RegularWreathProduct.lean` (260 行, 2025): `RegularWreathProduct D Q` (中置 `D ≀ᵣ Q`), `IteratedWreathProduct G n`, **`Sylow.mulEquivIteratedWreathProduct` (`:242`)** が `C_p ≀ C_p` 認識を直接与える. `MonoidHom.transfer` (`Mathlib/GroupTheory/Transfer.lean:148`), `transferFunction` (`:89`), `transferTransversal` (`:111`). + `IsPGroup`, `Subgroup.normalClosure`, `Sylow.Conj` |
+| **10.8 transitivity of transfer** | mathlib **完全不在** (`grep "transfer_comp\|transitivity.*transfer"` 0). `MonoidHom.transfer`, `transferFunction`, `transferTransversal` を基底に **新規 lemma `transfer_comp`** を `OddOrder/GroupTheory/TransferMackey.lean` 内に構築. 補助 `Subgroup.commutator`, `QuotientGroup.mk` |
+| **10.10 Mackey transfer** | `Mathlib/GroupTheory/DoubleCoset.lean`: `doubleCoset` (`:37`), `Quotient` (`:79`), `quotToDoubleCoset` (`:109`), `disjoint_out` (`:149`), `iUnion_quotToDoubleCoset` (`:155`). + `H.LeftTransversal` (`Transfer.lean:111`). DoubleCoset API がほぼ完備 ⇒ コスト「大 → 中-大」 |
+| **10.16 Maschke 一般化** | `Mathlib/RepresentationTheory/Maschke.lean` の `MonoidAlgebra.Submodule.exists_isCompl` (`:162`), `equivariantProjection_condition` (`:123`) は **module 版**. Isaacs 10.16 は群作用版 (`u ↦ u^m` bijective hypothesis) で mathlib 直接対応無し ⇒ `OddOrder/GroupTheory/MaschkeGroupAction.lean` 新規 |
+| **10.18 principal ideal** | **augmentation NOT in mathlib** (`grep "augmentation\|Augment" .lake/.../MonoidAlgebra/` 0 件). 自前: `def augmentation : MonoidAlgebra ℤ G →+* ℤ := MonoidAlgebra.lift ℤ G ℤ (fun _ => 1)` (mathlib `MonoidAlgebra/Basic.lean:220`). + `def Δ : Ideal (MonoidAlgebra ℤ G) := (augmentation G).ker`, `Ideal.span_singleton`, `Ideal.Quotient` |
+| **10.26 classical adjoint** | `Mathlib/LinearAlgebra/Matrix/Adjugate.lean`: `Matrix.adjugate` (`:188`), `Matrix.mul_adjugate` (`:264`) `M * adjugate M = M.det • 1`, `Matrix.adjugate_mul` (`:269`). Cayley-Hamilton 経路 `Matrix.aeval_self_charpoly` (`Matrix/Charpoly/Basic.lean:211`) |
+| **10.28 Alperin-Kuo** | `MonoidHom.transferCenterPow` (`Transfer.lean:229`), `transferCenterPow_apply` (`:235`) `↑(transferCenterPow G g) = g^(center G).index`. 10.18 完成後 5-10 行 |
+
 ## 下流被引用 (Isaacs Ch.10+ = なし, BG, Peterfalvi)
 
 ### Isaacs 内 (Ch.10 が最終章)
@@ -181,6 +206,8 @@ BG §4 (L1377-1640) には "metacyclic p-group" の議論があるが, **Isaacs 
 | Thm 4.16 (Blackburn) | r(R) ≤ 2, [R,A] = R, \|A\| odd ⇒ p > 3 + 構造 | Isaacs Ch.10 範疇外 |
 
 ⇒ BG §4 は Isaacs Ch.10 §10B の "Huppert metacyclic" を **概念的に独立した別の Huppert 定理として再構築**している. 共通項は "metacyclic p-group" の定義 (BG L1377: 同じ定義) のみで, 証明戦略・結論ともに異なる. Phase 2a 進行時に BG §4 を書くとき, Isaacs Ch.10 §10B の Lean 形式化は **援用しない**.
+
+**(2026-05-23 audit 補足)** BG §4 と Isaacs §10B Huppert で **共通の subroutine は 1 つだけ**: 「p odd, R metacyclic noncyclic ⇒ Ω_1(R) elementary abelian of order p²」 (BG Lem 4.10 L1546 / Isaacs 10.15 proof L5636 暗黙). 実装時は `OddOrder/GroupTheory/Metacyclic.lean` に小補題化して両方から import. Hall-Higman 1956 共通 cite なし: BG §4 は Hall (regular p-groups) を `[17]`/`[19]` 経由のみ. Peterfalvi 全 mmd `Hall-Higman` 0 件.
 
 ### Peterfalvi での引用 (`references/peterfalvi/*.mmd`)
 
@@ -234,6 +261,56 @@ Peterfalvi 付録 06.0 "A Special Case of a Theorem of Huppert" (pp.135-136) は
 ```
 
 ⇒ Ch.10 は **Ch.5 (Transfer) ＋ Ch.4 (Commutators)** を主に引く. Ch.6 引用は 6.11 (p-group 構造判定) のみ. Ch.7 / Ch.8 / Ch.9 引用は **ゼロ** — 並列章なので妥当.
+
+## 視点 4: 先行章節への依存 (per-target) (2026-05-23 audit 統合)
+
+mmd L5310-5914 grep ベースの per-target dep table (audit §4.3 由来):
+
+| Ch.10 target | Cite | mmd | OddOrder 状態 |
+|---|---|---|---|
+| §10A intro prose | Lem 5.12, Cor 5.22 | L5318 | ✅ Ch.5 既実装 |
+| **10.3** | Lem 4.6 (`|Z(P)| ≥ p`) | L5350 | ✅ Ch.4 hub |
+| 10.3 | Thm 4.7 (p-group nilpotence class) | L5350 | ⚠️ Ch.4 skeleton, **未証明** |
+| 10.9 | Lem 5.5 (transfer-evaluation) | L5479 | ⚠️ mathlib 直接 `transfer_eq_prod_quotient_orbitRel_zpowers_quot` (`Transfer.lean:161`), wrapper 不在 |
+| **10.15** | Thm 4.8(a) (p odd: {x: x^p=1} subgroup) | L5636 | ⚠️ Ch.4 skeleton, **未証明** |
+| **10.15** | Thm 6.11 (p-group ≤1 subgroup of order p ⇒ cyclic/quaternion) | L5636 | ❌ Ch.6 未着手 |
+| 10.28 | Thm 5.6 (central transfer = pow) | L5893 | ✅ mathlib `MonoidHom.transferCenterPow` (`Transfer.lean:229`) 直接 |
+| 10.28 | Thm 10.8 (transitivity, 章内) | L5893 | — internal |
+| 10.28 | Thm 10.18 (principal ideal, 章内) | L5893 | — internal |
+
+**Phase 1 gating implication**:
+
+- **§10A 単独 (Yoshida 10.1)**: Ch.4 Thm 4.7 必須. Ch.4 §4A-§4B 完成後着手可.
+- **§10B (Huppert 10.12 + 10.15)**: **Ch.6 Thm 6.11 待ち** ⇒ Ch.6 完了が gating.
+- **§10C (principal ideal 10.18)**: 内部完結 — Ch.4/5 補強不要で **stand-alone 実装可** (FT 不要だが mathlib upstream 価値 HIGH).
+- **10.28 Alperin-Kuo**: 10.18 完成 + mathlib `transferCenterPow` で **5-10 行**, Ch.4/5/6 追加実装不要.
+
+## Shared module 配置提案 (`OddOrder/GroupTheory/` 4 files + Ch10 thin glue) (2026-05-23 audit 統合)
+
+Ch.4-7 audit (2026-05-22) で確立した shared module パターンを Ch.10 に適用 (audit §5.3 由来):
+
+```
+OddOrder/GroupTheory/Metacyclic.lean          -- IsMetacyclic def, 10.13 closure, 10.14
+                                              -- + BG §4 共用 Ω_1 補題 (Lem 4.10 / Isaacs 10.15 暗黙)
+OddOrder/GroupTheory/AugmentationIdeal.lean   -- ⭐ HIGH upstream value
+                                              -- augmentation, Δ(G), 10.19 basis, 10.20 G^{ab} ≅ Δ/Δ²
+                                              -- (class field theory + group cohomology 両方需要)
+OddOrder/GroupTheory/MaschkeGroupAction.lean  -- group-action Maschke (10.16, 10.17)
+OddOrder/GroupTheory/TransferMackey.lean      -- 10.8 transitivity, 10.10 Mackey
+OddOrder/Isaacs/Ch10_MoreTransfer.lean        -- Yoshida 10.1 + Huppert 10.12 + principal ideal 10.18
+                                              -- (Isaacs 命名 + 上記 4 module の thin glue のみ)
+```
+
+### mathlib upstream 価値 ranking (Phase 1 完成後の余剰時間用) (audit §5.4)
+
+| 候補 | upstream 価値 | コスト |
+|---|---|---|
+| `AugmentationIdeal.lean` (Δ(G), Thm 10.20 `G^{ab} ≅ Δ/Δ²`) | **HIGH** (class field theory + group cohomology 両需要) | 大 |
+| Yoshida 10.1 (`Mathlib/GroupTheory/Transfer/Yoshida.lean`) | MEDIUM (単体で強い結果) | 大 |
+| Maschke 群作用版 + Mackey transfer | MEDIUM (mathlib RepresentationTheory / DoubleCoset 補強) | 中 |
+| `Subgroup.IsMetacyclic` def | LOW (1 行 def) | 極小 |
+
+⇒ **AugmentationIdeal が単体最高価値**. Phase 1 完成後の最初の mathlib PR 候補.
 
 ## 着手順 (提案)
 
@@ -313,3 +390,13 @@ ROADMAP は Ch.6 → (Ch.7 と Ch.10 並列) を提案するが, 実状は:
 | Isaacs Ch.10+ 被引用 | 0 (最終章) |
 
 **FT クリティカル度: LOW** (BG/Peterfalvi 双方で直接被引用ゼロ). Phase 1 では実装せず, ROADMAP 第 5 波で Ch.7 のみ進めて Ch.10 は "未着手 — BG/Peterfalvi 進行中に必要が判明したら戻る" と注記する運用が合理的. §1G Chermak-Delgado, Ch.9 と同列扱い.
+
+## 関連ノート (2026-05-23 audit 統合)
+
+- [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) — 4 視点 framework テンプレート
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) — 本ノートに統合した audit synthesis doc (Ch.8/9/10 横断)
+- [`ch04_commutators.md`](ch04_commutators.md) — Lem 4.6 (10.3 で使用) / Thm 4.7-4.8 (10.3, 10.15 で使用, **skeleton**) dep
+- [`ch05_transfer.md`](ch05_transfer.md) — Lem 5.5 (10.9) / Thm 5.6 (10.28) / Lem 5.12 + Cor 5.22 (§10A intro) dep
+- [`ch06_frobenius_actions.md`](ch06_frobenius_actions.md) — Thm 6.11 (10.15 で使用, §10B **gating dep**)
+- [`../meta/mathlib_coverage.md`](../meta/mathlib_coverage.md) — 全体 coverage 表 (`RegularWreathProduct` 既存を追記推奨)
+- [`../meta/phase2_cross_refs.md`](../meta/phase2_cross_refs.md) — BG §4 vs Isaacs §10B Huppert 別物分類の cross-ref

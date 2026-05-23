@@ -5,6 +5,8 @@
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4880-5310.
 ROADMAP 上の位置: **第 3 波 (Ch.2 完了後、並列可)** — 直接前提は Ch.2 (Thm 2.6 minimal normal が subnormal を正規化, socle 概念), 軽く Ch.1 (Fitting, 冪零).
 
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
+
 ## TL;DR — FT 経路ではほぼ全章スキップ可
 
 BG / Peterfalvi mmd を厳密検索した結果, Ch.9 の主結果群はすべて **使用 0 件**:
@@ -108,6 +110,75 @@ mmd 抽出では `### 9a`, `### Problems 9A`, `### 9b`, `**Problems 9B**`, `### 
 
 注: 9.31 は実は §9D 内に置かれているだけで, §9C 証明や §9B でも使える一般補題. mathlib `Sylow.subgroupOf` 等の周辺で類似ありそう (要確認).
 
+## Definitions inventory (2026-05-23 audit 統合)
+
+Ch.9 で導入 (または recall) される全 14 定義. 上記 §9A-§9D 表の "Def" 行 + 暗黙導入分を集約.
+
+| # | 定義名 | mmd | 説明 | mathlib 対応 |
+|---|---|---|---|---|
+| 1 | perfect | L4890 | `G = G'` (recalled from Ch.2) | `IsPerfect` (`GroupTheory/IsPerfect.lean`) ✅ |
+| 2 | quasisimple | L4900 | `H/Z(H)` simple ∧ `H` perfect | 無し (合成定義) |
+| 3 | component of `G` | L4910 | subnormal quasisimple subgroup of `G` | 無し |
+| 4 | layer `E(G)` | L4926 | ⟨all components⟩, characteristic in `G` | 無し |
+| 5 | semisimple | L4928 | nonabelian simple normal subgroups の product (Isaacs convention; abelian factor 不可) | 無し |
+| 6 | generalized Fitting `F*(G)` | L4970 | `F(G) · E(G)` | 無し |
+| 7 | automorphism tower | L5000-L5002 | `G ◁ Aut(G) ◁ Aut(Aut(G)) ◁ …` | 無し (`MulAut` iterated 自前) |
+| 8 | complete group | L5012 | `Z(G) = 1 ∧ Aut(G) = Inn(G)` | 無し |
+| 9 | `S^∞` nilpotent residual | L5063 | `lowerCentralSeries G` の final term (= `⨅ n, lowerCentralSeries G n`) | `lowerCentralSeries` ✅ あるが `∞` term 補題なし |
+| 10 | corefree (subgroup) | L5145 | `core_G(H) = 1` | `Subgroup.normalCore = ⊥` ✅ |
+| 11 | strongly conjugate | def at MISSING_PAGE L5199 | **`Y` strongly conj to `X` :⇔ `∃ g ∈ ⟨X, Y⟩, Y = X^g`** (下記復元) | 無し |
+| 12 | `X^{(G)}` | L5205 | `⟨ Y : Y strongly conjugate to X ⟩` | 無し |
+| 13 | `X^{*G}` subnormal closure | L5201 (RHS of 9.28) | smallest subnormal subgroup containing `X` (recalled from Ch.2) | 無し |
+| 14 | subnormal core | Problem 9D.1 L5294 | largest subnormal subgroup contained in `H` | 無し |
+| (補) | characteristically simple | Problem 9A.8 L4995 | proper characteristic subgroup 無し | 無し |
+
+### §9D strongly conjugate def 復元 (MISSING_PAGE workaround)
+
+mmd L5199 が `[MISSING_PAGE_FAIL:302]` で消失. Thm 9.28 (L5203) と Lem 9.29(b) (L5218) の使用文脈から
+**一意に復元** 可能:
+
+**`Y` strongly conjugate to `X` in `G` :⇔ `∃ g ∈ ⟨X, Y⟩, Y = X^g`**
+
+復元根拠: Lem 9.29(b) は `Y ⊆ X` の場合の `Y^{(X)} ⊆ X^{(G)}` を主張するが, この argument が成立
+するためには共役元 `g` を `⟨X, Y⟩` 内に取れる必要がある (`Y ⊆ X` のとき `⟨X, Y⟩ = X`). 単純な
+`Y = X^g for some g ∈ G` だと Lem 9.29 が破綻するので, `g ∈ ⟨X, Y⟩` 制約が必須.
+
+Lean 実装では `Subgroup.IsStronglyConjugate (X Y : Subgroup G) : Prop := ∃ g : G, g ∈ X ⊔ Y ∧ Y = X.map (MulAut.conj g).toMonoidHom` 形式.
+
+## 視点 1: forward dependencies — Ch.9 は完全 leaf (2026-05-23 audit 統合)
+
+- **Isaacs Ch.10 への被引用 0 件**: `grep -nE "(Theorem|Lemma|Corollary|Proposition) 9\.[0-9]+"` を
+  Ch.10 範囲 (L5310-5914) で実行 → **0 件**.
+- **BG mmd 0 件**: `quasisimple`, `\mathbf{F}^*`, `\mathbf{E}(`, `automorphism tower`, `Bartels`,
+  `Schenkman`, `subnormal closure`, `strongly conjugate` 全 0. 表面的 hit (`Wielandt` 2 件 +
+  `component` 2 件) は全て false positive = §III.C の Wielandt fixed-point thm + Wedderburn/Clifford
+  components.
+- **Peterfalvi mmd 0 件**: 同パターン全 0. 表面 hit (`Wielandt` 10 件 + `component` 23 件) も全て
+  false positive = 同 fixed-point + Clifford component analysis.
+
+**結論**: Ch.9 は本 1 冊内 leaf + 後続 2 冊で被引用 0. forward dep ゼロ.
+
+## 視点 2: 章節内部の依存 (hub-and-spoke) (2026-05-23 audit 統合)
+
+Ch.9 主要 hub (proof body で章内他結果を 2 件以上引く頻出 lemma):
+
+- **9.4** (異なる 2 つの components は commute) — §9A spine の起点 hub
+- **9.8 Bender** (`F*(G) ⊇ C_G(F*(G))`) — §9A 終局, 6.5, 9.7, 9.6 を統合
+- **9.10 Wielandt aut tower** — §9B 看板, 9.13/9.12/9.11(d) 統合
+- **9.21 Schenkman** — §9B 後半 motor, 9.20, 9.22, 9.15 + induction
+- **9.24** (Thompson 一般版) — §9C 全体の支配定理
+- **9.28 Bartels** — §9D 主結果
+- **9.31** (Sylow ∩ subnormal) — §9D 内に置かれるが §9B/§9C でも汎用
+
+**主要 chain**:
+- §9A spine: `9.1 → 9.2 → 9.4 → 9.7 → 9.8`
+- §9B tower bound: `9.14 → 9.21 → 9.13 → 9.10`
+- §9C reduction: `9.25, 9.26, 9.27 → 9.24 → 9.23`
+- §9D: `9.29 → 9.30 → 9.31 → 9.28`
+
+**sharpening**: 既存ノートが 9.31 の mathlib 状況を「存在?」と flag していた件は本 audit で
+**不在** 確定 (`Sylow.exists_comap_eq Sylow.lean:193` は別ステートメント). mathlib 表で更新済.
+
 ## mathlib カバレッジ
 
 Ch.9 の主要概念は **どれも mathlib 未収載** (mmd grep 結果: quasisimple 0 件, Subgroup.layer 0 件, fittingStar / FStar 0 件, subnormalClosure 0 件, stronglyConjugate / StrongConjugate 0 件, GroupTheory 内 socle 0 件).
@@ -125,6 +196,61 @@ Ch.9 の主要概念は **どれも mathlib 未収載** (mmd grep 結果: quasis
 | Lemma 9.31 (S◁G, Sylow_p ∩ S) | **無し** (2026-05-23 audit 確定) | mathlib v4.29.1 直接 lemma 無し (`Sylow.exists_comap_eq` `Sylow.lean:193` は別ステートメント, `IsPGroup.inf_normalizer_sylow` `:277` も別). ~10 行 induction on `|G|` で新規 |
 
 `Subgroup.IsSubnormal` の基本 API は `Mathlib/GroupTheory/IsSubnormal.lean` に整備済 (Ch.2 ノート参照) なので, Ch.9 の subnormal 関連は base API 上に書ける.
+
+## 視点 3: mathlib status — proof-internal API per major theorem (2026-05-23 audit 統合)
+
+statement-level coverage は上記表のとおりほぼ全て **無し**. ここでは **証明本体で呼ぶ mathlib API**
+を per-target で列挙 (Ch.9 全結果は bucket (b)/(c), bucket (a) は無し).
+
+| Thm | bucket | proof-internal mathlib API (v4.29.1, 必要箇所) |
+|---|---|---|
+| 9.1 | (b) | `IsPerfect` (`GroupTheory/IsPerfect.lean`), `Subgroup.center`, `QuotientGroup.mk`, `IsSimpleGroup`. helper: `G/Z(G) simple ⇔ G nonsolvable` 補強 |
+| 9.2 | (b) | `Subgroup.Normal`, `QuotientGroup.quotientInfEquivProdNormalQuotient` (2nd iso) |
+| 9.3 | (b) | **Three Subgroups** `Subgroup.commutator_commutator_eq_bot_of_rotate` (`Commutator/Basic.lean:109`); `Subgroup.commutator_le` |
+| 9.4 hub | (b) | 9.3 + 9.2 + induction on `Nat.card G`; `IsSubnormal.map` (`IsSubnormal.lean:243`) |
+| 9.6 | (b) | `Subgroup.fitting` (Ch.1 ✅), `Subgroup.center_normal`, `Subgroup.IsMinimalNormal` (Ch.2 ✅), Thm 2.6 (Ch.2 ✅) |
+| 9.7 | (b) | Three subgroups + `IsSolvable` + 9.4, 9.5 |
+| **9.8 Bender** | (c) | 9.6 + 9.5 + 9.1 + `Subgroup.fitting` + induction `|G:Z|` |
+| **9.10 Wielandt aut tower** | (c) | `MulAut G` (`Algebra/Group/End.lean:698`), `MulAut.conj` (`Pointwise.lean:482`); iterated `Aut`. **mathlib に `Inn`/`Out` named subgroup 無し** ⇒ `Inn G := MonoidHom.range (MulAut.conj)` 自前. Bound: 9.13 + 9.12 + 9.11(d) |
+| 9.13 | (c) | 9.21, 9.16, 9.18, 9.14; `Nat.card_perm`; helper `MulAut.card_le_factorial` 新規 |
+| 9.14 | (b) | `MonoidHom.range` + `QuotientGroup.quotientKerEquivRange`, `Fintype.card_perm` |
+| **9.15** | (b) | **`nilpotentResidual G := ⨅ n, lowerCentralSeries G n` 新規 helper**, mathlib `lowerCentralSeries` `Nilpotent.lean:299` あるが `infinityTerm` lemma なし |
+| 9.17 | (b) | **`Subgroup.socle` 新規**, Thm 2.6 (Ch.2 ✅), 9.4, 9.5 |
+| 9.19 | (b) | `Mathlib/GroupTheory/Frattini.lean` `frattini G`, `frattini_le_coatom` (mathlib 既存) |
+| **9.21 Schenkman** | (c) | 9.20 + 9.22 + 9.15 + Dedekind + induction |
+| **9.23 Thompson** | (c) | 9.24 (general); `Subgroup.normalizer`, `Subgroup.normalCore` (`Algebra/Group/Subgroup/Basic.lean:557`), `Sylow.opCore` |
+| **9.28 Bartels** | (c) | 9.29-9.31 + 6 Steps L5240-5290 + induction on `|G|, |X|`; ~150 行 |
+| **9.31** Sylow ∩ subnormal | (b) | **mathlib 不在 (上記カバレッジ表 確定)**, `Sylow.exists_comap_eq` を induction で wrap, ~10 行 |
+
+**Helper 不在 list (新規, `OddOrder/GroupTheory/` 候補)**:
+
+1. `Group.IsQuasisimple` (mathlib `IsPerfect` + `IsSimpleGroup G⧸Z` 合成)
+2. `Subgroup.IsComponent`
+3. `Subgroup.layer`
+4. `Subgroup.fittingStar`
+5. `Subgroup.socle` (Ch.2 min-normal infra 利用)
+6. `Group.nilpotentResidual` (= `S^∞`)
+7. `Subgroup.subnormalClosure` (`X^{*G}`)
+8. `Inn G` named subgroup (= `MonoidHom.range (MulAut.conj)`)
+9. `MulAut.card_le_factorial` (auxiliary)
+10. `Sylow.inf_normal_isSylow` (= 9.31)
+
+## 視点 4: 先行章節への依存 (per-target) (2026-05-23 audit 統合)
+
+mmd L4880-5310 grep 結果:
+
+| Ch.9 target | Ch.1-8 cite | 回数 | OddOrder 状態 |
+|---|---|---|---|
+| 9.3, 9.4, 9.6, 9.17, 9.18 | **Thm 2.6** (min normal が subnormal を正規化) | **5** | ✅ Ch.2 既実装 `isMinimalNormal_le_normalizer_of_isSubnormal` |
+| 9.6 | Thm 1.19 (nilpotent ⇒ Z(N) nontrivial) | 1 | ✅ Ch.1 |
+| 9.6 | `Subgroup.fitting` (Ch.1 §1D) | 1 | ✅ Ch.1 |
+| 9.19 | Thm 1.26 (max normalizer ⇒ nilpotent) | 1 | ✅ Ch.1 |
+| (intro prose only L4886) | Lem 3.21 (Hall-Higman) | 0 proof body | prose のみ — Ch.3 依存 **無し** |
+| (intro prose only) | Thm 8.32, 8.33 (SL quasisimple) | 0 proof body | prose のみ |
+
+**結論**: Ch.9 は **Ch.1 + Ch.2 のみ** に依存. Ch.3 Hall-Higman は prose 言及のみで proof body 内
+では引かない. Ch.4-8 ゼロ. **§1G Chermak-Delgado 依存もゼロ** (`Chermak`, `Delgado`, `m_{CD}` ヒット 0).
+⇒ Ch.9 は Ch.2 Thm 2.6 (既実装) 完了済の今, 着手 unblocked.
 
 ## 着手しない方針 (推奨)
 
@@ -149,6 +275,29 @@ Phase 1 内での Ch.9 の扱い:
 
 §1G Chermak-Delgado を Ch.1 で省略している前例を踏襲する.
 
+## Shared module 配置提案 (`OddOrder/GroupTheory/` 5-6 files) (2026-05-23 audit 統合)
+
+Ch.4-7 audit (2026-05-22) で確立した **`OddOrder/GroupTheory/` shared module パターン** を Ch.9
+にも適用. §9A 最小 bundle の場合のファイル分割:
+
+```
+OddOrder/GroupTheory/Quasisimple.lean         -- Group.IsQuasisimple, Lem 9.1, 9.2
+OddOrder/GroupTheory/Component.lean           -- Subgroup.IsComponent, Thm 9.4
+OddOrder/GroupTheory/Layer.lean               -- Subgroup.layer, characteristic, Thm 9.7
+OddOrder/GroupTheory/FittingStar.lean         -- Subgroup.fittingStar, Thm 9.8 Bender, Cor 9.9
+OddOrder/GroupTheory/Socle.lean               -- Subgroup.socle (Ch.2 min-normal infra 利用)
+OddOrder/GroupTheory/NilpotentResidual.lean   -- Group.nilpotentResidual (S^∞)
+-- 以下は §9D が必要になった場合:
+OddOrder/GroupTheory/Subnormal.lean (拡張)    -- subnormalClosure, IsStronglyConjugate
+```
+
+**rationale**: `IsQuasisimple`, `Subgroup.socle`, `nilpotentResidual` はいずれも一般群論で頻出
+する概念で plausibly **mathlib upstream 候補**. §9A 5-6 ファイルで `OddOrder/GroupTheory/` 配下
+に置けば後の mathlib PR が容易.
+
+§9B (aut tower) / §9C (Thompson) / §9D (Bartels) は `OddOrder/Isaacs/Ch09_MoreSubnormality/{S9B,
+S9C,S9D}.lean` 階層配置だが **Phase 1 skip** (BG/Peterfalvi 0 件のため).
+
 ## 未解決の疑問
 
 * §9C Thm 9.24 の証明は F*(G) と S^∞ を使う. もし §9A を書くなら §9C も自然な続きになるか?
@@ -160,3 +309,12 @@ Phase 1 内での Ch.9 の扱い:
   の `lowerCentralSeries` を使って `⨅ n, lowerCentralSeries G n` で書けるはず. 既存 lemma 量を要調査.
 * "subnormal core" (Problem 9D.1) — `Subgroup.IsSubnormal` の最大下界として `sSup` で構成可能.
   mathlib 一般化候補だが Phase 1 では不要.
+
+## 関連ノート (2026-05-23 audit 統合)
+
+- [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) — 4 視点 framework template.
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) — 本 audit (Ch.8/9/10 統合) doc.
+- [`ch01_sylow.md`](ch01_sylow.md) — Ch.1 依存 (Thm 1.19, 1.26).
+- [`ch02_subnormality.md`](ch02_subnormality.md) — **Ch.2 Thm 2.6 ⭐ 5x dep** (9.3, 9.4, 9.6, 9.17, 9.18 すべての hub).
+- [`ch01_sylow_d_fitting.md`](ch01_sylow_d_fitting.md) — `Subgroup.fitting` (9.6 で利用).
+- [`../meta/mathlib_coverage.md`](../meta/mathlib_coverage.md) — 全体 mathlib カバレッジ.

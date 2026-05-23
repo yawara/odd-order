@@ -4,6 +4,7 @@
 形式化先 (予定): `OddOrder/Isaacs/Ch08_Permutation.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4059-4878.
 ROADMAP 上の位置: **第 1 波 (前提なし、mathlib 既存資産で薄く)** — Ch.1 のみが軽い前提。
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
 
 ## 章のセクション分割と全 44 定理
 
@@ -162,6 +163,32 @@ orbital / paired orbital / rank / 自己ペア / orbital function / subdegree �
   接続する大きな新規実装. FT 経路への直接寄与は薄い (BG/Peterfalvi 直接引用ゼロ) ので
   優先度低.
 
+## 視点 3: proof-internal mathlib API (per major theorem)
+
+(2026-05-23 audit 統合) — statement 単位の有無だけでなく, 証明本体で呼ぶ mathlib API
+v4.29.1 の具体名 + path を per-theorem で列挙. 既存ノートの「mathlib カバレッジ」表
+(statement level) を補完する形.
+
+| Isaacs | mathlib API 名 (v4.29.1) | path | 備考 |
+|---|---|---|---|
+| **8.16** 2-trans ⇒ primitive | `MulAction.isPreprimitive_of_is_two_pretransitive` | `GroupAction/Primitive.lean:~248` | 1 行 |
+| **8.17** Jordan (転置) | `Equiv.Perm.subgroup_eq_top_of_isPreprimitive_of_isSwap_mem` | `GroupAction/Jordan.lean:385` | alias `eq_top_of_…` `:422` |
+| **8.18** Jordan general | `MulAction.IsPreprimitive.is_two_motive_of_is_motive`, `isMultiplyPretransitive_succ_iff_ofStabilizer`, `ofFixingSubgroup` API | `Jordan.lean:107-245`, `MultiplePrimitivity.lean`, `SubMulAction/OfFixingSubgroup.lean` | 既存 Jordan.lean 内 motor |
+| **8.19** Cor 3-cycle ⇒ Alt/Sym | `Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem` | `Jordan.lean:426` | 直接 |
+| **8.26** Bochert (新規) | `Equiv.Perm.support`, `MulAction.fixingSubgroup` of set, `Equiv.Perm.card`, `Fintype.card_perm`, `Subgroup.index`, `Nat.factorial_le` | `Perm/Support.lean`, `GroupAction/FixingSubgroup.lean`, `Logic.Equiv.Defs` | 純組合せ; 既存ノートが指すが具体名なし |
+| **8.27** A_n simple (n ≥ 5) | `Equiv.Perm.IsThreeCycle.alternating_normalClosure` + base `alternatingGroup.isSimpleGroup_five` + `Subgroup.normalClosure_eq_iSup` + `normalClosure_le_normal` | `SpecificGroups/Alternating.lean:260, 385, 322-353` | mathlib TODO `:56` を埋める形 |
+| **8.28** S_n 正規部分群分類 | `alternatingGroup.index_eq_two`, `Equiv.Perm.eq_alternatingGroup_of_index_eq_two` | `Alternating.lean:112, 38 ref` | 8.27 完成後直接 |
+| **8.30** Iwasawa | `IwasawaStructure` + `IwasawaStructure.isSimpleGroup` | `GroupAction/Iwasawa.lean:47, 82` | **要注意**: hypothesis は `IsQuasiPreprimitive M α` + `IsPerfect`. Isaacs は primitive のみ ⇒ `IsPreprimitive.isQuasipreprimitive` (`Primitive.lean:~54`) で wrapper. |
+| **8.31** SL generated | (mathlib 不在; `LinearAlgebra/Matrix/SpecialLinearGroup.lean:240` 周辺に transvection 関連 lemma 散在) | — | Gauss elimination 新規 |
+| **8.32** SL perfect | `Matrix.SpecialLinearGroup.commutator`, basic matrix mul | — | 計算 |
+| **8.33** PSL simple | 8.30 IwasawaStructure + 8.29 + 8.32 | — | structure 埋め |
+
+**Helper 候補** (新規 `OddOrder/` 配下):
+- `OddOrder/GroupTheory/Orbital.lean` — §8D の `Orbital`, `subdegree`, `commonDivisorGraph`
+  は mathlib 不在. FT 経路 0 件で skip 推奨だが mathlib upstream 候補.
+- `OddOrder/Mathlib/Alternating/IsSimpleGroup.lean` — Thm 8.27 A_n simple 一般 n ≥ 5
+  (mathlib TODO `Alternating.lean:56` を埋める形, mathlib PR 候補).
+
 ## Ch.8 から下流への被引用
 
 ### Isaacs 内 (Ch.9+ 本文を grep)
@@ -213,6 +240,19 @@ Near-fields 付録 (`07.0`)** で:
   単純性証明の汎用道具として価値あり.
 - **§8D (orbital theory)**: **LOW** — FT 経路への寄与ほぼゼロ.
 
+## 視点 4: 先行章節への依存 (per-target)
+
+(2026-05-23 audit 統合) — mmd L4059-4878 全範囲で `(Theorem|Lemma|Corollary|Proposition) [1-7]\.[0-9]+`
+を grep した結果:
+
+| Ch.8 target | Ch.1-7 cite | mmd | OddOrder 状態 |
+|---|---|---|---|
+| **8.1 prose intro** | Thm 1.4 (orbit ↔ coset 計数) | L4069 | ✅ mathlib `MulAction.orbitEquivQuotientStabilizer` (Ch.1 既使用) |
+
+それ以外の Ch.2-7 cite は **proof body 内も prose 内も 0 件**.
+
+**結論**: Ch.8 は Isaacs FGT で最も独立した章. prerequisite は mathlib `IsPretransitive` のみ.
+
 ## 章内依存 (Ch.8 内で 8.X が引用される頻度)
 
 `awk` で Ch.8 本文 (L4059-4878) を切り出し `(Theorem|Lemma|Corollary|Proposition) 8\.[0-9]+`
@@ -237,6 +277,44 @@ Near-fields 付録 (`07.0`)** で:
 - 8.18 が §8B 内ハブ
 - 8.29 → 8.30 (Iwasawa 適用) → 8.31 → 8.32 → 8.33 (PSL simple 経路)
 - 8.34 → (8.35, 8.39) → 8.37, 8.38, 8.40, 8.41, 8.42, 8.43, 8.44 (§8D 連鎖)
+
+### 章内依存 sharpening (2026-05-23 audit)
+
+ハブ frequency 表だけでは見えない proof-internal chain の細部:
+
+(a) **8.20 → 8.21 → 8.22 strict chain**: 8.22 の minimality argument は 8.21 (Jordan 集合 ∩
+   も Jordan) を L4419 で直接 cite, 8.21 は 8.20 (primitive on big H-orbit) を L4407 で cite.
+   実装順序は `8.20 → 8.21 → 8.22 → 8.18 → 8.19`.
+
+(b) **8.23 → 8.18 + 8.19 + 8.24** (proof L4435-L4449): Sym(Λ) Frattini argument で 8.18 を
+   直接呼び, 内部で n-cycle centralizer の 8.24 も使用. **(8.24 は 8.23 用)**
+
+(c) **8.26 Bochert → 8.25 + 8.19 のみ** (proof L4467-L4513): 8.24 は **使わない**. 既に
+   上記「新規実装が必要な主要項目」の **Thm 8.24** の項で訂正済 (8.24 は 8.23 用,
+   Bochert proof 内では引かれない).
+
+(d) **8.27 (A_n simple) proof は 8.5 + 8.8(c) + 8.15 + 8.16 を全部使用** (proof L4520-L4524).
+   主軸 `8.1 → 8.5 → 8.8 → 8.27` に加え, **8.15 が proof 第一手** で必須. 実装段階で
+   8.15 が in scope であること.
+
+(e) **Nougat OCR 注意**: mmd L4435 に "Proof of Theorem 18.23" の typo あり (= 8.23 の
+   proof 開始). naive `grep "Theorem 8\.23"` は 1 件 under-count するため自己引用頻度
+   表が微妙にずれる可能性 (本ハブ表に対する影響は無し).
+
+## Shared module 配置提案
+
+(2026-05-23 audit 統合) — Ch.4-7 audit で確立した `OddOrder/GroupTheory/` shared module
+パターンを Ch.8 に適用. Ch.8 から派生する新規ファイル候補:
+
+- **`OddOrder/GroupTheory/Orbital.lean`** — §8D (Thm 8.34-8.44) の orbital, paired orbital,
+  subdegree, common-divisor graph の概念は mathlib 不在. orbital を Ω × Ω 上の G-軌道
+  として定義する shared module. FT 経路寄与は 0 件で Phase 1 内優先度は低いが, mathlib
+  upstream 候補として独立価値あり.
+
+- **`OddOrder/Mathlib/Alternating/IsSimpleGroup.lean`** — Thm 8.27 (A_n simple, n ≥ 5) を
+  実装する場所. mathlib `Mathlib/GroupTheory/SpecificGroups/Alternating.lean:56` に
+  TODO として明記された "Show that `alternatingGroup α` is simple if and only if
+  `Fintype.card α ≠ 4`" を埋める形. `OddOrder/Mathlib/` 名前空間に置き将来 mathlib PR.
 
 ## 着手順 (提案)
 
@@ -328,3 +406,18 @@ A_n general (8.27) が新規実装の中心.
 
 ⇒ **FT 経路への Ch.8 寄与は §8A 基本概念のみ**. それ以外は Phase 1 完成度のための
 形式化で、急ぐ必要無し.
+
+## 関連ノート
+
+(2026-05-23 audit 統合)
+
+- [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) —
+  4 視点 framework (本ノートの構造ベース).
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) —
+  Ch.8/9/10 横断 audit 統合 doc. 本ノートの視点 3/4 + sharpening の出所.
+- [`ch01_sylow.md`](ch01_sylow.md) — Thm 1.4 (Ch.8 唯一の Ch.1-7 依存) 実装ノート.
+- [`ch07_thompson.md`](ch07_thompson.md) — Phase 1 完成 sibling 章 (Thompson subgroup,
+  Ch.4-7 wave の末尾).
+- [`../meta/mathlib_coverage.md`](../meta/mathlib_coverage.md) — 全体カバレッジ.
+  `GroupTheory/GroupAction/` 配下 (Transitive, Blocks, Primitive, Jordan, Iwasawa, ...)
+  の Ch.8 直撃ファイル群が要となる.
