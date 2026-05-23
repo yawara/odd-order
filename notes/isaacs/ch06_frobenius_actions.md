@@ -228,6 +228,10 @@ FT クリティカル度 + 章内依存で並べる:
 - Thm 6.3 用 helper: `fixedPointFree_toMulAut`, `involutive_toMulAut_of_sq_eq_one`,
   `involution_smul_eq_inv`. mathlib `MonoidHom.FixedPointFree` (Mathlib/GroupTheory/
   FixedPointFree.lean, Browning 2024) 経由で大半 reduce.
+- **Lem 6.16** `pow_prime_modEq_one_cases` (§6B 数論補題, 先行章依存ゼロ):
+  i^p ≡ 1 [ZMOD p^e] ⇒ 3 cases. p odd は LTE (mathlib `Int.emultiplicity_pow_sub_pow`),
+  p=2 は (i-1)(i+1) 因数分解 + 奇数因子の IsCoprime で powers of 2 を相殺. ~172 LOC.
+  §6B Cor 6.17 (Frobenius complement Sylow 構造) で本補題が要件.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
