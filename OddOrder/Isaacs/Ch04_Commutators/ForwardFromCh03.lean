@@ -19,15 +19,19 @@ Schur-Zassenhaus + Sylow + Frattini のみで実装可能 (2026-05-23 audit).
 
 | Isaacs # | Lean | 状態 |
 |---|---|---|
-| Lem 3.24(a) Glauberman | `glauberman_fixed_point_exists` | 進行中 |
-| Lem 3.24(b) Glauberman | `glauberman_fixed_points_conj` | 予定 |
-| Thm 3.23(a) A-inv Sylow | `exists_aInvariant_sylow` | 予定 |
-| Thm 3.23(b) A-inv Sylow conj | `aInvariant_sylow_conj` | 予定 |
-| Cor 3.25 A-inv p-subgroup | `aInvariant_pSubgroup_le_aInvariant_sylow` | 予定 |
-| Thm 3.27 A-inv coset | `aInvariant_coset_mem_centralizer` | 予定 |
-| Cor 3.28 商の固定点 | `coprime_fixedPoints_quotient` | 予定 |
-| Cor 3.29 A trivial on G/Φ | `aFixed_quotient_frattini` | 予定 |
-| Cor 3.30 A faithful on G/Φ | `aFaithful_quotient_frattini` | 予定 |
+| Lem 3.24(a) Glauberman | `glauberman_fixed_point_exists` | ✅ |
+| Lem 3.24(b) Glauberman | `glauberman_fixed_points_conj` | ✅ |
+| Thm 3.23(a) A-inv Sylow | `exists_aInvariant_sylow` | ✅ |
+| Thm 3.23(b) A-inv Sylow conj | `aInvariant_sylow_conj` | ✅ |
+| Cor 3.25 A-inv p-subgroup | `aInvariant_pSubgroup_le_aInvariant_sylow` | ✅ |
+| Thm 3.27 A-inv coset | `aInvariant_coset_mem_centralizer` | ✅ |
+| Cor 3.28 商の固定点 | `coprime_fixedPoints_quotient` | ✅ |
+| Cor 3.29 A trivial on G/Φ | `aFixed_quotient_frattini` | ✅ |
+| Cor 3.30 A faithful on G/Φ | `aFaithful_quotient_frattini` | ✅ |
+
+§3E Tier 1 (Glauberman + A-invariant Sylow/coset + frattini) 全 9 件 sorry-free 完成
+(2026-05-24). Tier 2 (Thm 3.31-3.34 軌道/Three-Subgroup Lemma) は本来 Ch.4 §4C-§4D
+依存のため別 phase で実装.
 
 ## namespace 設計
 
@@ -534,18 +538,154 @@ theorem aInvariant_sylow_conj
 
 /-- **Isaacs Cor 3.25**: A-invariant p-subgroup is contained in some A-invariant Sylow.
 
-Strategy: maximalize P among A-invariant p-subgroups, then apply 3.23(a) to its normalizer.
-The maximal element is then shown to be a Sylow of G via "normalizers grow in p-groups".
-
-**実装ノート (2026-05-24)**: "normalizers grow in p-groups" は mathlib に直接対応する
-lemma が無く, `NormalizerCondition` 経由 + 部分群の subgroupOf 計算が必要. 完成には
-~150 LOC + helper lemmas を要するため deferred. -/
+**証明骨子**:
+1. `P` を含む A-不変 p-部分群の中で極大なもの `Q` を取る (`Finite.exists_le_maximal`).
+2. `N := N_G(Q)` は A-不変 (`IsAInvariant.normalizer`). 3.23(a) を `N` の制限作用に
+   適用して A-不変 Sylow `R_in_N` を得る.
+3. `R := R_in_N.map N.subtype ≤ N ≤ G` も A-不変 p-部分群. `R ≤ N(Q)` なので
+   `Q ⊔ R` も p-部分群 (`IsPGroup.to_sup_of_normal_left'`). 極大性で `Q ⊔ R = Q`,
+   よって `R ≤ Q`. Sylow の極大性で `Q.subgroupOf N = R_in_N`, つまり `Q = R` が
+   `N` 内で Sylow.
+4. **Normalizer grow**: 任意の p-部分群 `T ⊇ Q` に対し, `T` が p-群 ⇒
+   `NormalizerCondition T` (`IsPGroup.isNilpotent` + `normalizerCondition_of_isNilpotent`).
+   `Q.subgroupOf T < ⊤` ⇒ `Q.subgroupOf T < normalizer = N.subgroupOf T`, 翻訳して
+   `Q < N ⊓ T`. `N ⊓ T ≤ N` は p-部分群で `Q` Sylow に矛盾. よって `T = Q`,
+   つまり `Q` は `G` の Sylow. -/
 theorem aInvariant_pSubgroup_le_aInvariant_sylow
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
-    {P : Subgroup G} (_hP_pgrp : IsPGroup p P) (_hP_inv : IsAInvariant φ P) :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    {P : Subgroup G} (hP_pgrp : IsPGroup p P) (hP_inv : IsAInvariant φ P) :
     ∃ S : Sylow p G, IsAInvariant φ (S : Subgroup G) ∧ P ≤ S := by
-  sorry  -- TODO: maximalize + 3.23(a) on N_G(P') + normalizers-grow argument (~150 LOC)
+  classical
+  -- Step 1: 極大 A-不変 p-部分群 Q ⊇ P を取る.
+  obtain ⟨Q, hPQ, hQ_max⟩ :=
+    Finite.exists_le_maximal (α := Subgroup G)
+      (p := fun Q => IsPGroup p Q ∧ IsAInvariant φ Q ∧ P ≤ Q)
+      ⟨hP_pgrp, hP_inv, le_refl P⟩
+  obtain ⟨hQ_pgrp, hQ_inv, hPQ_le⟩ := hQ_max.prop
+  -- Step 2: N := N_G(Q). A-不変. 3.23(a) を制限作用に適用.
+  set N : Subgroup G := Subgroup.normalizer Q with hN_def
+  have hQN : Q ≤ N := Subgroup.le_normalizer
+  have hN_inv : IsAInvariant φ N := IsAInvariant.normalizer hQ_inv
+  haveI hN_finite : Finite ↥N := Subtype.finite
+  have hCop_N : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
+  have hSolv_N : IsSolvable A ∨ IsSolvable ↥N := by
+    rcases hSolv with hA | hG
+    · exact Or.inl hA
+    · haveI := hG; exact Or.inr inferInstance
+  obtain ⟨R_in_N, hR_in_N_inv⟩ :=
+    exists_aInvariant_sylow (G := ↥N) (A := A) (φ := hN_inv.restrict)
+      hCop_N hSolv_N p
+  -- Step 3: R := R_in_N を G の部分群に持ち上げる.
+  set R : Subgroup G := (R_in_N : Subgroup ↥N).map N.subtype with hR_def
+  have hR_le_N : R ≤ N := by
+    rintro x ⟨y, _, rfl⟩
+    exact y.property
+  have hR_pgrp : IsPGroup p R := R_in_N.isPGroup'.map _
+  have hR_inv_G : IsAInvariant φ R := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    -- hx : x ∈ R. Decompose: x = z.val for z ∈ R_in_N.
+    obtain ⟨z, hz_in, hz_eq⟩ := hx
+    -- (hN_inv.restrict a) z ∈ R_in_N because R_in_N is A-inv under restricted action.
+    have hRzn : (hN_inv.restrict a) z ∈ R_in_N := hR_in_N_inv.smul_mem a hz_in
+    -- (φ a) x = ((hN_inv.restrict a) z).val (since x = z.val and restrict_apply_val).
+    refine ⟨(hN_inv.restrict a) z, hRzn, ?_⟩
+    show ((hN_inv.restrict a) z).val = (φ a) x
+    rw [← hz_eq]
+    rfl
+  -- Step 4: R ≤ N(Q), so Q ⊔ R is a p-group; A-inv; ⊇ P. Maximality ⇒ R ≤ Q.
+  have hR_le_NQ : R ≤ Subgroup.normalizer Q := hR_le_N
+  have hQR_pgrp : IsPGroup p ((Q ⊔ R : Subgroup G) : Subgroup G) :=
+    hQ_pgrp.to_sup_of_normal_left' hR_pgrp hR_le_NQ
+  have hQR_inv : IsAInvariant φ (Q ⊔ R : Subgroup G) := IsAInvariant.sup hQ_inv hR_inv_G
+  have hPQR : P ≤ Q ⊔ R := hPQ_le.trans le_sup_left
+  -- Maximality: hQ_max.eq_of_le gives Q = Q ⊔ R for any candidate ≥ Q satisfying p.
+  have hQ_eq_QR : Q = Q ⊔ R :=
+    hQ_max.eq_of_le ⟨hQR_pgrp, hQR_inv, hPQR⟩ le_sup_left
+  have hR_le_Q : R ≤ Q := by
+    have : R ≤ Q ⊔ R := le_sup_right
+    rwa [← hQ_eq_QR] at this
+  -- Step 5: Q.subgroupOf N is p-subgroup ⊇ R_in_N. By R_in_N Sylow maximality, equal.
+  have hQN_pgrp : IsPGroup p (Q.subgroupOf N) := hQ_pgrp.comap_subtype
+  have hR_in_N_le_QN : (R_in_N : Subgroup ↥N) ≤ Q.subgroupOf N := by
+    intro x hx
+    show x.val ∈ Q
+    have : x.val ∈ R := ⟨x, hx, rfl⟩
+    exact hR_le_Q this
+  have hQN_eq_R_in_N : Q.subgroupOf N = R_in_N :=
+    R_in_N.3 hQN_pgrp hR_in_N_le_QN
+  -- Translate back: Q = R as subgroups of G.
+  have hQ_eq_R : Q = R := by
+    have h1 : (Q.subgroupOf N).map N.subtype = Q :=
+      Subgroup.map_subgroupOf_eq_of_le hQN
+    have h2 : ((R_in_N : Subgroup ↥N) : Subgroup ↥N).map N.subtype = R := rfl
+    rw [hQN_eq_R_in_N] at h1
+    rw [h2] at h1
+    exact h1.symm
+  -- Step 6: Q is Sylow of G via normalizer-grow argument.
+  let S : Sylow p G := {
+    toSubgroup := Q
+    isPGroup' := hQ_pgrp
+    is_maximal' := by
+      intro T hT_pgrp hQT
+      -- Show T = Q.
+      by_contra hT_ne_Q
+      have hQT_lt : Q < T := lt_of_le_of_ne hQT (Ne.symm hT_ne_Q)
+      haveI hT_finite : Finite ↥T := Subtype.finite
+      haveI hT_nilp : Group.IsNilpotent ↥T := hT_pgrp.isNilpotent
+      have hT_nc : NormalizerCondition ↥T := normalizerCondition_of_isNilpotent
+      -- Q.subgroupOf T < ⊤ in T.
+      have hQT_subOf_lt : Q.subgroupOf T < (⊤ : Subgroup ↥T) := by
+        rw [lt_top_iff_ne_top]
+        intro h_top
+        apply hT_ne_Q
+        refine le_antisymm ?_ hQT
+        intro x hx
+        have : (⟨x, hx⟩ : ↥T) ∈ Q.subgroupOf T := by rw [h_top]; trivial
+        exact this
+      -- NormalizerCondition gives strict inclusion in normalizer.
+      have hQT_lt_norm : Q.subgroupOf T < Subgroup.normalizer (Q.subgroupOf T) :=
+        hT_nc _ hQT_subOf_lt
+      -- normalizer (Q.subgroupOf T) = N.subgroupOf T.
+      have h_norm_eq : Subgroup.normalizer (Q.subgroupOf T) = N.subgroupOf T := by
+        rw [← Subgroup.subgroupOf_normalizer_eq hQT]
+      -- So Q.subgroupOf T < N.subgroupOf T. Translate: Q < N ⊓ T.
+      have hQ_lt_NT : Q < N ⊓ T := by
+        refine lt_of_le_of_ne (le_inf hQN hQT) ?_
+        intro h_eq
+        apply hQT_lt_norm.ne
+        rw [h_norm_eq]
+        ext ⟨x, hx⟩
+        simp only [Subgroup.mem_subgroupOf]
+        constructor
+        · intro hxQ; exact hQN hxQ
+        · intro hxN
+          have : x ∈ (N ⊓ T : Subgroup G) := ⟨hxN, hx⟩
+          rw [← h_eq] at this
+          exact this
+      -- N ⊓ T is a p-subgroup of N. (N ⊓ T).subgroupOf N is p-subgroup of N.
+      have hNT_le_N : (N ⊓ T : Subgroup G) ≤ N := inf_le_left
+      have hNT_subOf_N_pgrp : IsPGroup p ((N ⊓ T).subgroupOf N) :=
+        (hT_pgrp.to_le inf_le_right).comap_subtype
+      -- Q.subgroupOf N ≤ (N ⊓ T).subgroupOf N (from Q ≤ N ⊓ T).
+      have hQN_le_NT_subOf : Q.subgroupOf N ≤ (N ⊓ T).subgroupOf N :=
+        Subgroup.subgroupOf_mono N hQ_lt_NT.le
+      -- Since Q.subgroupOf N = R_in_N, R_in_N ≤ (N ⊓ T).subgroupOf N.
+      rw [hQN_eq_R_in_N] at hQN_le_NT_subOf
+      -- Sylow maximality of R_in_N:
+      have h_NT_sub_eq : (N ⊓ T).subgroupOf N = R_in_N :=
+        R_in_N.3 hNT_subOf_N_pgrp hQN_le_NT_subOf
+      -- Translate back: N ⊓ T = Q.
+      have h_NT_eq_Q : (N ⊓ T : Subgroup G) = Q := by
+        have h_map : ((N ⊓ T).subgroupOf N).map N.subtype = N ⊓ T :=
+          Subgroup.map_subgroupOf_eq_of_le hNT_le_N
+        rw [h_NT_sub_eq, ← hQN_eq_R_in_N, Subgroup.map_subgroupOf_eq_of_le hQN] at h_map
+        exact h_map.symm
+      exact hQ_lt_NT.ne h_NT_eq_Q.symm
+  }
+  exact ⟨S, hQ_inv, hPQ_le⟩
 
 end AInvariantSylow
 
