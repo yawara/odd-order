@@ -1490,8 +1490,92 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
         (Subgroup.normalizer (Y : Set G)))
       X hXp
   · -- (3) ⇒ (1): Pick Sylow P, show P.ControlsOwnFusion via Lem 5.28,
-    -- then apply Thm 5.25 (⇐). Currently blocked on 5.25 (⇐) sorry.
-    sorry
+    -- then apply Thm 5.25 (⇐) (sorry).
+    obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
+    refine (hasNormalPComplement_iff_controlsOwnFusion P).mpr ?_
+    intro x y hx_P hy_P ⟨g, hgxy⟩
+    -- Apply Lem 5.28 to (P, g • P)
+    set gP : Sylow p G := g • P with hgP_def
+    -- y ∈ P ⊓ gP
+    have hy_in_gP : y ∈ (gP : Subgroup G) := by
+      show y ∈ ((g • P : Sylow p G) : Subgroup G)
+      rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      have h_smul_eq : (MulAut.conj g)⁻¹ • y = x := by
+        show g⁻¹ * y * g = x
+        rw [← hgxy]; group
+      rw [h_smul_eq]; exact hx_P
+    have hy_in_PgP : y ∈ (P : Subgroup G) ⊓ (gP : Subgroup G) :=
+      Subgroup.mem_inf.mpr ⟨hy_P, hy_in_gP⟩
+    -- Lem 5.28: ∃ c ∈ C(P ⊓ gP), c • gP = P
+    obtain ⟨c, hc_C, hc_smul⟩ := isaacs_lem_5_28 hH P gP
+    -- c centralizes y
+    have hcy : c * y = y * c := (Subgroup.mem_centralizer_iff.mp hc_C y hy_in_PgP).symm
+    -- cg ∈ N(P): c • gP = P ⇒ (c * g) • P = P ⇒ cg ∈ normalizer
+    have hcg_in_N : c * g ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := by
+      rw [← Sylow.smul_eq_iff_mem_normalizer, mul_smul, ← hgP_def]
+      exact hc_smul
+    set N_P : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_P_def
+    -- P ≤ N(P) (general)
+    have hP_le_N : (P : Subgroup G) ≤ N_P := Subgroup.le_normalizer
+    -- P as Sylow of ↥N(P)
+    let P_NP : Sylow p ↥N_P := P.subtype hP_le_N
+    -- hH applied to P: ↥N(P) / C(P).subgroupOf N(P) is p-group
+    have h_quot_pgroup : IsPGroup p
+        (↥N_P ⧸ (Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P) :=
+      hH P P.isPGroup'
+    -- Normal instance for the centralizer subgroupOf
+    haveI : ((Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P).Normal :=
+      centralizer_subgroupOf_normalizer_normal (P : Subgroup G)
+    -- N(P) = C(P).subgroupOf N(P) ⊔ P_NP (via helper applied to ↥N(P))
+    have hSC_top : (P_NP : Subgroup ↥N_P) ⊔
+        (Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P = ⊤ :=
+      sylow_sup_normal_eq_top_of_quot_isPGroup h_quot_pgroup P_NP
+    -- cg lifted to ↥N(P)
+    let cg_N : ↥N_P := ⟨c * g, hcg_in_N⟩
+    have hcg_in_sup : cg_N ∈ (Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P
+        ⊔ (P_NP : Subgroup ↥N_P) := by
+      rw [sup_comm]; rw [hSC_top]; exact Subgroup.mem_top _
+    obtain ⟨t_N, ht_C, u_N, hu_P, htu_eq⟩ :=
+      Subgroup.mem_sup_of_normal_left.mp hcg_in_sup
+    -- t_N : ↥N(P), t_N ∈ centralizer.subgroupOf ⇒ t_N.val ∈ centralizer P
+    -- u_N : ↥N(P), u_N ∈ P_NP ⇒ u_N.val ∈ P
+    have ht_in_C : (t_N : G) ∈ Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+      have := ht_C
+      rwa [Subgroup.mem_subgroupOf] at this
+    have hu_in_P : (u_N : G) ∈ (P : Subgroup G) := by
+      have := hu_P
+      change (u_N : G) ∈ (P : Subgroup G) at this ⊢
+      exact this
+    -- (cg).val = t_N.val * u_N.val
+    have hcg_val_eq : c * g = (t_N : G) * (u_N : G) := by
+      have h := congrArg Subtype.val htu_eq
+      exact h.symm
+    -- y = (cg) • x = (t_N.val * u_N.val) • x = t_N.val • (u_N.val • x) = u_N.val • x (t centralizes uxu⁻¹ ∈ P)
+    refine ⟨(u_N : G), hu_in_P, ?_⟩
+    -- Goal: u_N.val * x * u_N.val⁻¹ = y
+    -- First: y = (cg) x (cg)⁻¹. From c * y = y * c, y = c y c⁻¹ = c (g x g⁻¹) c⁻¹ = (cg) x (cg)⁻¹.
+    have h_y_eq_cgx : y = (c * g) * x * (c * g)⁻¹ := by
+      have h_c_y_eq : c * y * c⁻¹ = y := by
+        rw [hcy]; group
+      calc y = c * y * c⁻¹ := h_c_y_eq.symm
+        _ = c * (g * x * g⁻¹) * c⁻¹ := by rw [hgxy]
+        _ = (c * g) * x * (c * g)⁻¹ := by group
+    -- (cg) x (cg)⁻¹ = (t * u) x (t * u)⁻¹. Use t centralizes uxu⁻¹ ∈ P to simplify.
+    have h_uux_in_P : (u_N : G) * x * (u_N : G)⁻¹ ∈ (P : Subgroup G) :=
+      (P : Subgroup G).mul_mem
+        ((P : Subgroup G).mul_mem hu_in_P hx_P)
+        ((P : Subgroup G).inv_mem hu_in_P)
+    have h_t_comm : ((u_N : G) * x * (u_N : G)⁻¹) * (t_N : G) =
+        (t_N : G) * ((u_N : G) * x * (u_N : G)⁻¹) :=
+      Subgroup.mem_centralizer_iff.mp ht_in_C _ h_uux_in_P
+    have h_t_uxu_eq : (t_N : G) * ((u_N : G) * x * (u_N : G)⁻¹) * (t_N : G)⁻¹ =
+        (u_N : G) * x * (u_N : G)⁻¹ := by
+      rw [← h_t_comm]; group
+    calc (u_N : G) * x * (u_N : G)⁻¹
+        = (t_N : G) * ((u_N : G) * x * (u_N : G)⁻¹) * (t_N : G)⁻¹ := h_t_uxu_eq.symm
+      _ = ((t_N : G) * (u_N : G)) * x * ((t_N : G) * (u_N : G))⁻¹ := by group
+      _ = (c * g) * x * (c * g)⁻¹ := by rw [← hcg_val_eq]
+      _ = y := h_y_eq_cgx.symm
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
