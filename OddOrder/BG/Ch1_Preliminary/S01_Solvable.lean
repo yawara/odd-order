@@ -83,7 +83,33 @@ namespace OddOrder.BG.Ch1.S01
 open OddOrder.Isaacs.Ch01
 open Pointwise
 
-/-! ## §1A-§1B: 未実装 (Phase 1 + shared module 待ち) -/
+/-! ## §1A: Solvable group basics (Lem 1.1, Prop 1.2-1.4) -/
+
+/-- **BG Lemma 1.1 (部分; elementary abelian + ≤ F(G))**: 有限可解群 `G` の
+minimal normal `M` は (i) elementary abelian, (ii) `M ≤ F(G)` (Fitting absorbs).
+
+BG 原 statement の "M ⊆ Z(F(G))" 部分は Phase 1 Ch.4 `le_centralizer_of_isMinimalNormal`
+依存だが Ch.4 現状 parse error で import 不可. M ⊆ F(G) ⊓ C_G(F(G)) の完全形は将来.
+
+CLAUDE.md no-wrapper policy 例外: 異なる Ch.3 結果 + nilpotent_normal_le_fitting の合成
++ 仮定特殊化 (`[IsSolvable G]`). -/
+theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {M : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+    M ≤ OddOrder.Isaacs.Ch01.fitting G ∧
+    ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
+  haveI hMnormal : M.Normal := hMin.1
+  -- Elementary abelian (Ch.3)
+  obtain ⟨p, hp_prime, hM_elem⟩ :=
+    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  -- ↥M is p-group (every x ∈ M satisfies x^p = 1)
+  haveI hM_pgroup : IsPGroup p ↥M :=
+    fun x => ⟨1, by rw [pow_one]; exact hM_elem.pow_eq_one x⟩
+  -- ↥M nilpotent (finite p-group ⇒ nilpotent)
+  haveI hM_nilp : Group.IsNilpotent ↥M := hM_pgroup.isNilpotent
+  -- M ⊴ G + ↥M nilpotent ⇒ M ≤ F(G)
+  exact ⟨OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting, p, hp_prime, hM_elem⟩
 
 /-! ## §1C: Frattini + Burnside operator (Lem 1.7-1.10) -/
 
