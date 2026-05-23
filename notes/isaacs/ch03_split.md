@@ -127,21 +127,18 @@ Phase 1 完成で `IsComplement'.exists_conj_of_coprime` 公開 theorem 化.
 | `main_aux` 強誘導 | ✅ skeleton | step_caseA / step_caseB に dispatch |
 | 公開 `IsComplement'.exists_conj_of_coprime` | ✅ | main_aux 経由. signature 確定 |
 
-#### 残 sorry (2 件, ~230 LOC)
+#### 残 sorry 解消履歴 (2 件, ~230 LOC) — **完成** ⭐
 
-1. **`abelian_sz_conjugacy` body** (~80-100 LOC, mathlib transition).
-   - mathlib `Subgroup.exists_smul_eq` (`QuotientDiff` form) を subgroup conjugation 形に変換.
-   - mathlib v4.29.1 に直接 lemma 無し (2026-05-23 explore agent 確認). 自前 transition 必要.
-2. **`step_caseB` main body** (~150 LOC).
-   - minimal normal M/N in G/N が p-group (Lem 3.11 拡張 for solvable quotient).
-   - M ∩ K, M ∩ K^g Sylow p in M, Sylow C で m ∈ M.
-   - L := M ∩ K normal in K, K^(g*m). N_G(L) argument.
+1. **`abelian_sz_conjugacy` body** (~80-100 LOC, mathlib transition) — **完成 (commit bb72c39)**.
+   - mathlib `MulAction.stabilizer_smul_eq_stabilizer_map_conj` (Basic.lean:251) +
+     `stabilizer_quotientDiff_eq_self` 自前 helper で解決.
+2. **`step_caseB` main body** (~150 LOC) — **完成 (commit ef14cf1, 4345d26, 9d951c6)**.
+   - Steps 1-12 全て sorry-free. minimal_normal_isPGroup_of_solvable 等の helper 経由.
 
-#### ralph-loop 進捗 (2026-05-23)
+#### ralph-loop 進捗 (2026-05-23 → 2026-05-24)
 
-iter 1-9 で 9 commit. abelian_sz_conjugacy + step_caseB main は技術的に重く, ralph-loop max 30 iter での完成は厳しい. 完成は数日〜複数 session 規模.
-
-- 完成後 → axiom 削除 → Phase 2 着手可能.
+iter 1-9 ⇒ 9 commits. 当初想定より早く Phase 1 全 sorry 解消, ralph-loop session 内で完成.
+最終: axiom 削除済, Phase 2 (Hall-C) も完成 (commit bfe92da, e4bf24d).
 
 ### Phase 2: Hall-C (Thm 3.14) — **完全完成** ⭐⭐⭐ (2026-05-23 セッション, commit bfe92da, e4bf24d)
 
