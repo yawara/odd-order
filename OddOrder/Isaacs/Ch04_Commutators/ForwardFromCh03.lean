@@ -402,13 +402,20 @@ theorem aInvariant_sylow_conj
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (MulAut.conj c • (S : Subgroup G) = T) := by
   sorry  -- TODO: apply 3.24(b) with Ω = Sylow p G.
 
-/-- **Isaacs Cor 3.25**: A-invariant p-subgroup is contained in some A-invariant Sylow. -/
+/-- **Isaacs Cor 3.25**: A-invariant p-subgroup is contained in some A-invariant Sylow.
+
+Strategy: maximalize P among A-invariant p-subgroups, then apply 3.23(a) to its normalizer.
+The maximal element is then shown to be a Sylow of G via "normalizers grow in p-groups".
+
+**実装ノート (2026-05-24)**: "normalizers grow in p-groups" は mathlib に直接対応する
+lemma が無く, `NormalizerCondition` 経由 + 部分群の subgroupOf 計算が必要. 完成には
+~150 LOC + helper lemmas を要するため deferred. -/
 theorem aInvariant_pSubgroup_le_aInvariant_sylow
     {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     (_hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
     {P : Subgroup G} (_hP_pgrp : IsPGroup p P) (_hP_inv : IsAInvariant φ P) :
     ∃ S : Sylow p G, IsAInvariant φ (S : Subgroup G) ∧ P ≤ S := by
-  sorry  -- TODO: maximalize P inside A-inv p-subgroups; apply 3.23(a) to N_G(P).
+  sorry  -- TODO: maximalize + 3.23(a) on N_G(P') + normalizers-grow argument (~150 LOC)
 
 end AInvariantSylow
 
@@ -555,16 +562,27 @@ theorem aFixed_quotient_frattini
   have hg_in_C : g ∈ C := by rw [hC_top]; exact Subgroup.mem_top g
   exact hg_in_C a
 
-/-- **Isaacs Cor 3.30**: A faithful on G ⇒ A faithful on G/Φ(G).
+/-- **Isaacs Cor 3.30 (実用形)**: A が G に faithful + A が G/Φ(G) に自明作用 ⇒ A 自明.
 
-注: A の G/Φ(G) への誘導作用が必要のため, 正確な statement 化は
-`IsAInvariant.quotientHom` (誘導 quotient action) 完成後に行う. 現状は placeholder. -/
+書籍版 (A faithful on G ⇒ A faithful on G/Φ(G)) と対偶: A が G/Φ に自明 ⇒ A が G に自明
+(Cor 3.29) であり, faithful なら核 = 1 から A = 1. -/
 theorem aFaithful_quotient_frattini
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
-    (h_faithful : Function.Injective φ) :
-    -- placeholder: 仮 statement.
-    Function.Injective φ := h_faithful
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_faithful : Function.Injective φ)
+    (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
+    ∀ a : A, a = 1 := by
+  intro a
+  -- By 3.29: ∀ a g, (φ a) g = g, i.e., φ a = 1.
+  have h_triv_G : ∀ g : G, (φ a) g = g := aFixed_quotient_frattini hCop hSolv h_triv_quot a
+  -- So φ a = 1 (as MulAut G).
+  have h_phi_one : φ a = 1 := by
+    apply MulEquiv.ext
+    intro g
+    rw [h_triv_G g]
+    rfl
+  -- By faithful: a = 1.
+  exact h_faithful (h_phi_one.trans (map_one φ).symm)
 
 end FrattiniAction
 
