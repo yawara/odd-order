@@ -952,7 +952,208 @@ private theorem step_caseB
     -- Step 9: Sylow C in M: ∃ m_M : ↥M, m_M • P_K' = P_H.
     obtain ⟨m_M, h_mM_smul⟩ : ∃ m_M : ↥M, m_M • P_K' = P_H :=
       MulAction.exists_smul_eq ↥M P_K' P_H
-    sorry  -- continue with Step 10+ (L := M ⊓ H, N_G(L) cases)
+    -- Step 10: extract m ∈ M and derive M ⊓ K'^m = M ⊓ H.
+    let m : G := m_M.val
+    have hm_M : m ∈ M := m_M.2
+    -- Sylow conjugation at subgroup level (in ↥M).
+    have h_conj_in_M :
+        ((M ⊓ K' : Subgroup G).subgroupOf M).map (MulAut.conj m_M).toMonoidHom =
+          (M ⊓ H : Subgroup G).subgroupOf M := by
+      have h := congr_arg (Sylow.toSubgroup) h_mM_smul
+      rw [Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def] at h
+      exact h
+    -- Push to G via M.subtype: (M ⊓ K').map (conj m) = M ⊓ H.
+    have h_push : (M ⊓ K' : Subgroup G).map (MulAut.conj m).toMonoidHom = M ⊓ H := by
+      have h_rhs : ((M ⊓ H : Subgroup G).subgroupOf M).map M.subtype = M ⊓ H :=
+        subgroupOf_map_subtype_eq (inf_le_left : (M ⊓ H : Subgroup G) ≤ M)
+      have h_lhs_eq :
+          (((M ⊓ K' : Subgroup G).subgroupOf M).map (MulAut.conj m_M).toMonoidHom).map M.subtype =
+            (M ⊓ K' : Subgroup G).map (MulAut.conj m).toMonoidHom :=
+        map_subtype_conj_subgroupOf m_M (M ⊓ K' : Subgroup G)
+          (inf_le_left : (M ⊓ K' : Subgroup G) ≤ M)
+      rw [← h_rhs, ← h_conj_in_M, h_lhs_eq]
+    -- Use M normal to derive M ⊓ K'^m = M ⊓ H.
+    set K'm : Subgroup G := K'.map (MulAut.conj m).toMonoidHom with hK'm_def
+    have h_M_inter_K'm : M ⊓ K'm = M ⊓ H := by
+      rw [← h_push]
+      ext x
+      simp only [Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      haveI : M.Normal := inferInstance
+      constructor
+      · rintro ⟨hxM, y, hyK', rfl⟩
+        refine ⟨y, ⟨?_, hyK'⟩, rfl⟩
+        -- m * y * m⁻¹ ∈ M ⇒ y = m⁻¹ * (m y m⁻¹) * m ∈ M (m, m⁻¹ ∈ M).
+        have : m⁻¹ * (m * y * m⁻¹) * m ∈ M :=
+          M.mul_mem (M.mul_mem (M.inv_mem hm_M) hxM) hm_M
+        simpa [mul_assoc] using this
+      · rintro ⟨y, ⟨hyM, hyK'⟩, rfl⟩
+        refine ⟨?_, y, hyK', rfl⟩
+        exact (inferInstance : M.Normal).conj_mem _ hyM _
+    -- Step 11: L := M ⊓ H. Properties: L = M ⊓ K'm, L > 1, L ≤ H, L ≤ K'm.
+    set L : Subgroup G := M ⊓ H with hL_def
+    have hL_eq : L = M ⊓ K'm := h_M_inter_K'm.symm
+    have hL_le_H : L ≤ H := inf_le_right
+    have hL_le_K'm : L ≤ K'm := hL_eq ▸ inf_le_right
+    have hL_ne_bot : L ≠ ⊥ := by
+      intro hbot
+      have h_card : Nat.card ↥L = 1 := by rw [hbot]; exact Subgroup.card_bot
+      have : Nat.card ↥L = p ^ k := h_MH_card_eq_pk
+      rw [h_card] at this
+      have : p ^ k = 1 := this.symm
+      have hk_pos' := Nat.one_le_iff_ne_zero.mp hk_pos
+      have hp_gt_one : 1 < p := hp_prime.one_lt
+      exact absurd this (Nat.ne_of_gt (Nat.one_lt_pow hk_pos' hp_gt_one))
+    -- H ≤ N_G(L) (since L = M ⊓ H, M normal in G, H closed under self-conjugation).
+    have hH_le_NL : H ≤ normalizer (L : Set G) := by
+      intro h hHmem
+      rw [Subgroup.mem_normalizer_iff]
+      intro x
+      haveI : M.Normal := inferInstance
+      constructor
+      · rintro ⟨hxM, hxH⟩
+        refine ⟨(inferInstance : M.Normal).conj_mem _ hxM _, ?_⟩
+        exact H.mul_mem (H.mul_mem hHmem hxH) (H.inv_mem hHmem)
+      · rintro ⟨hcM, hcH⟩
+        refine ⟨?_, ?_⟩
+        · have : h⁻¹ * (h * x * h⁻¹) * h ∈ M := by
+            have hin := (inferInstance : M.Normal).conj_mem (h * x * h⁻¹) hcM h⁻¹
+            simpa [mul_assoc] using hin
+          simpa [mul_assoc] using this
+        · have : h⁻¹ * (h * x * h⁻¹) * h ∈ H :=
+            H.mul_mem (H.mul_mem (H.inv_mem hHmem) hcH) hHmem
+          simpa [mul_assoc] using this
+    -- K'm ≤ N_G(L) (similar via L = M ⊓ K'm).
+    have hK'm_le_NL : K'm ≤ normalizer (L : Set G) := by
+      intro k hKmem
+      rw [Subgroup.mem_normalizer_iff]
+      intro x
+      haveI : M.Normal := inferInstance
+      constructor
+      · intro hxL
+        have hxL' : x ∈ (M ⊓ K'm : Subgroup G) := hL_eq ▸ hxL
+        obtain ⟨hxM, hxK'm⟩ := hxL'
+        have hL_form : (M ⊓ K'm : Subgroup G) = L := hL_eq.symm
+        rw [← hL_form]
+        refine ⟨(inferInstance : M.Normal).conj_mem _ hxM _, ?_⟩
+        exact K'm.mul_mem (K'm.mul_mem hKmem hxK'm) (K'm.inv_mem hKmem)
+      · intro hL
+        have hL' : k * x * k⁻¹ ∈ (M ⊓ K'm : Subgroup G) := hL_eq ▸ hL
+        obtain ⟨hcM, hcKm⟩ := hL'
+        have hL_form : (M ⊓ K'm : Subgroup G) = L := hL_eq.symm
+        rw [← hL_form]
+        refine ⟨?_, ?_⟩
+        · have : k⁻¹ * (k * x * k⁻¹) * k ∈ M := by
+            have hin := (inferInstance : M.Normal).conj_mem (k * x * k⁻¹) hcM k⁻¹
+            simpa [mul_assoc] using hin
+          simpa [mul_assoc] using this
+        · have : k⁻¹ * (k * x * k⁻¹) * k ∈ K'm :=
+            K'm.mul_mem (K'm.mul_mem (K'm.inv_mem hKmem) hcKm) hKmem
+          simpa [mul_assoc] using this
+    -- Step 12: Case split on N_G(L) = ⊤ vs N_G(L) < ⊤.
+    have hK'm_compl : IsComplement' N K'm := isComplement'_conj hK' m
+    by_cases hNL_top : normalizer (L : Set G) = ⊤
+    · -- Case N_G(L) = G: L ⊴ G, apply step_factor with H, K', L.
+      haveI hL_normal : L.Normal := by
+        refine ⟨fun n hn g => ?_⟩
+        have hg_mem : g ∈ normalizer (L : Set G) := by rw [hNL_top]; trivial
+        exact (Subgroup.mem_normalizer_iff.mp hg_mem n).mp hn
+      obtain ⟨g', hg'_N, h_factor_L⟩ :=
+        step_factor h1 (Or.inr hQN_solv) ih hH_compl hK' hL_ne_bot
+      -- L ⊴ G + L ⊆ H ⇒ L = L^g' ⊆ H^g'.
+      have hL_le_Hg : L ≤ H.map (MulAut.conj g').toMonoidHom := by
+        intro x hxL
+        rw [Subgroup.mem_map]
+        refine ⟨g'⁻¹ * x * g', ?_, ?_⟩
+        · -- g'⁻¹ * x * g' ∈ L (L ⊴ G), then ∈ H (L ≤ H).
+          have h_in_L : g'⁻¹ * x * g' ∈ L := by
+            have := hL_normal.conj_mem x hxL g'⁻¹
+            simpa [mul_assoc] using this
+          exact hL_le_H h_in_L
+        · show g' * (g'⁻¹ * x * g') * g'⁻¹ = x; group
+      -- H^g' ⊔ L = H^g'.
+      have hHg_sup : (H.map (MulAut.conj g').toMonoidHom) ⊔ L =
+          H.map (MulAut.conj g').toMonoidHom :=
+        sup_eq_left.mpr hL_le_Hg
+      -- Combined with h_factor_L: H^g' = K' ⊔ L.
+      have hHg_eq_K'L : H.map (MulAut.conj g').toMonoidHom = K' ⊔ L := by
+        rw [← hHg_sup, h_factor_L]
+      -- K' ⊆ H^g'.
+      have hK'_le_Hg : K' ≤ H.map (MulAut.conj g').toMonoidHom := by
+        rw [hHg_eq_K'L]; exact le_sup_left
+      -- |K'| = |H^g'| (both complements of N).
+      have hHg_compl : IsComplement' N (H.map (MulAut.conj g').toMonoidHom) :=
+        isComplement'_conj hH_compl g'
+      have h_K'_card_eq_Hg : Nat.card ↥K' = Nat.card ↥(H.map (MulAut.conj g').toMonoidHom) :=
+        hK'.symm.index_eq_card.symm.trans hHg_compl.symm.index_eq_card
+      -- K' = H^g'.
+      have hK'_eq_Hg : K' = H.map (MulAut.conj g').toMonoidHom :=
+        Subgroup.eq_of_le_of_card_ge hK'_le_Hg h_K'_card_eq_Hg.symm.le
+      -- Conclusion: K^(g' * g_f) = K'.
+      refine ⟨g' * g_f, N.mul_mem hg'_N hg_f_N, ?_⟩
+      have hcomp : (MulAut.conj (g' * g_f)).toMonoidHom =
+            (MulAut.conj g').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom := by
+        ext x; show g' * g_f * x * (g' * g_f)⁻¹ = g' * (g_f * x * g_f⁻¹) * g'⁻¹; group
+      rw [hcomp, ← Subgroup.map_map]
+      exact hK'_eq_Hg.symm
+    · -- Case N_G(L) < G: step_restriction on N_G(L) with H, K'm as complements.
+      obtain ⟨n', hn'_N, h_conj⟩ :=
+        step_restriction h1 (Or.inr hQN_solv) ih hH_compl hK'm_compl hH_le_NL hK'm_le_NL hNL_top
+      -- h_conj : H.map (conj n') = K'm = K'.map (conj m).
+      -- Then K.map (conj (n' * g_f)) = H.map (conj n') = K'.map (conj m).
+      -- Goal: ∃ n0 ∈ N, K.map (conj n0) = K'.
+      -- Strategy: K.map (conj (m⁻¹ * n' * g_f)) = K', then promote via N · K decomposition.
+      have h_chain : K.map (MulAut.conj (m⁻¹ * n' * g_f)).toMonoidHom = K' := by
+        -- K^(m⁻¹ n' g_f) = K^g_f^(m⁻¹ n') = H^(m⁻¹ n') = ?
+        -- We need K^(m⁻¹ n' g_f) = K'.
+        -- From h_conj: H^n' = K'^m (K'm = K'.map (conj m)).
+        -- K^g_f^n' = H^n' = K'^m. Conjugate both by m⁻¹:
+        -- K^g_f^n'^(m⁻¹) = K'^m^(m⁻¹) = K'.
+        -- K^g_f^n'^(m⁻¹) = K^(m⁻¹ * n' * g_f).
+        have h1 : K.map (MulAut.conj g_f).toMonoidHom = H := rfl
+        have h2 : H.map (MulAut.conj n').toMonoidHom = K'm := h_conj
+        have h3 : K'm.map (MulAut.conj m⁻¹).toMonoidHom = K' := by
+          rw [hK'm_def, Subgroup.map_map]
+          have h_inv_comp : (MulAut.conj m⁻¹).toMonoidHom.comp (MulAut.conj m).toMonoidHom =
+              MonoidHom.id G := by
+            ext x; show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x; group
+          rw [h_inv_comp]
+          ext; simp
+        -- Chain: K.map (...) = K^(g_f) (= H) .map (conj n').map (conj m⁻¹) = K'm.map (...) = K'.
+        have hcomp : (MulAut.conj (m⁻¹ * n' * g_f)).toMonoidHom =
+              (MulAut.conj m⁻¹).toMonoidHom.comp
+                ((MulAut.conj n').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom) := by
+          ext x
+          show m⁻¹ * n' * g_f * x * (m⁻¹ * n' * g_f)⁻¹ =
+            m⁻¹ * (n' * (g_f * x * g_f⁻¹) * n'⁻¹) * m⁻¹⁻¹
+          group
+        rw [hcomp, ← Subgroup.map_map, ← Subgroup.map_map, h1, h2, h3]
+      -- Promote: decompose m⁻¹ * n' * g_f = n_N * k_K (n_N ∈ N, k_K ∈ K) via IsComplement.
+      have h_g_in_sup : (m⁻¹ * n' * g_f) ∈ (N ⊔ K : Subgroup G) := by
+        rw [hK.sup_eq_top]; trivial
+      rw [mem_sup_of_normal_left] at h_g_in_sup
+      obtain ⟨n_N, hn_N_N, k_K, hk_K_K, hg_decomp⟩ := h_g_in_sup
+      -- K.map (conj (n_N * k_K)) = K.map (conj n_N) since conj k_K preserves K.
+      refine ⟨n_N, hn_N_N, ?_⟩
+      have hcomp_NK : (MulAut.conj (n_N * k_K)).toMonoidHom =
+            (MulAut.conj n_N).toMonoidHom.comp (MulAut.conj k_K).toMonoidHom := by
+        ext x; show n_N * k_K * x * (n_N * k_K)⁻¹ = n_N * (k_K * x * k_K⁻¹) * n_N⁻¹; group
+      have h_K_conj_kK : K.map (MulAut.conj k_K).toMonoidHom = K := by
+        ext y
+        simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+        constructor
+        · rintro ⟨z, hzK, rfl⟩
+          exact K.mul_mem (K.mul_mem hk_K_K hzK) (K.inv_mem hk_K_K)
+        · intro hyK
+          refine ⟨k_K⁻¹ * y * k_K, ?_, ?_⟩
+          · exact K.mul_mem (K.mul_mem (K.inv_mem hk_K_K) hyK) hk_K_K
+          · show k_K * (k_K⁻¹ * y * k_K) * k_K⁻¹ = y; group
+      calc K.map (MulAut.conj n_N).toMonoidHom
+          = (K.map (MulAut.conj k_K).toMonoidHom).map (MulAut.conj n_N).toMonoidHom := by
+              rw [h_K_conj_kK]
+        _ = K.map (MulAut.conj (n_N * k_K)).toMonoidHom := by
+              rw [hcomp_NK, ← Subgroup.map_map]
+        _ = K.map (MulAut.conj (m⁻¹ * n' * g_f)).toMonoidHom := by rw [hg_decomp]
+        _ = K' := h_chain
   · -- Case ⊔ M < ⊤: step_restriction on H ⊔ M.
     have hHU : H ≤ H ⊔ M := le_sup_left
     have hK'U : K' ≤ H ⊔ M := by rw [h_factor]; exact le_sup_left
