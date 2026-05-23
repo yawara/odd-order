@@ -2637,6 +2637,123 @@ theorem fixedPoints_sup_actionCommutator_eq_top
   rw [hg_eq]
   exact Subgroup.mul_mem_sup hc_mem ((actionCommutator φ).inv_mem hn_mem)
 
+/-! ### Isaacs §4D Lem 4.29 ⭐ (BG Prop 1.6(b)): [G, A, A] = [G, A] for coprime + solvable -/
+
+/-- **Isaacs Lemma 4.29** (Γ form) ⭐: coprime + (A or G solvable) ⇒
+`iterCommutator inl(G).range inr(A).range 2 = iterCommutator inl(G).range inr(A).range 1`
+in Γ = G ⋊[φ] A. Equivalent (Isaacs notation): `[G, A, A] = [G, A]`.
+
+**証明** (Isaacs p.139): Each generator `⁅inl g, inr a⁆` of [G, A]_Γ is in [G, A, A]_Γ.
+By Lem 4.28: g = c * x with c ∈ C_G(A), x ∈ actionCommutator.
+- `⁅inl c, inr a⁆ = 1` (c ∈ C_G(A) ⇒ inl c and inr a commute in Γ).
+- Commutator identity: `⁅inl c · inl x, inr a⁆ = inl c · ⁅inl x, inr a⁆ · inl c⁻¹ · ⁅inl c, inr a⁆`
+  `= inl c · ⁅inl x, inr a⁆ · inl c⁻¹`.
+- Conjugate by inl c (= conjugate_commutatorElement): `= ⁅inl(cxc⁻¹), inr a⁆` (using
+  inl c commutes with inr a).
+- `cxc⁻¹ ∈ actionCommutator` (G-normal), so `inl(cxc⁻¹) ∈ inl(actionCommutator) = [G, A]_Γ`
+  (`actionCommutator_map_inl`).
+- Hence `⁅inl(cxc⁻¹), inr a⁆ ∈ ⁅[G, A]_Γ, inr(A).range⁆ = [G, A, A]_Γ`. -/
+theorem iterCommutator_inl_inr_two_eq_one
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                   (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 =
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                   (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 := by
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  -- I1 = ⁅XG, YA⁆ = [G, A]_Γ, I2 = ⁅I1, YA⁆ = [G, A, A]_Γ
+  -- I1.Normal in Γ (Lem 4.1 系 via XG ⊔ YA = ⊤)
+  haveI hI1_normal : (⁅XG, YA⁆).Normal :=
+    commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
+  refine le_antisymm ?_ ?_
+  · -- I2 ≤ I1 (trivial: I1 normal in Γ, so ⁅I1, F⁆ ≤ I1)
+    show iterCommutator XG YA 2 ≤ iterCommutator XG YA 1
+    show ⁅iterCommutator XG YA 1, YA⁆ ≤ iterCommutator XG YA 1
+    rw [show iterCommutator XG YA 1 = ⁅XG, YA⁆ from rfl]
+    exact Subgroup.commutator_le_left _ _
+  · -- I1 ≤ I2 (the substantive direction)
+    show iterCommutator XG YA 1 ≤ iterCommutator XG YA 2
+    show ⁅XG, YA⁆ ≤ ⁅iterCommutator XG YA 1, YA⁆
+    rw [Subgroup.commutator_le]
+    rintro _ ⟨g_0, rfl⟩ _ ⟨a, rfl⟩
+    -- Goal: ⁅inl g_0, inr a⁆ ∈ ⁅iterCommutator XG YA 1, YA⁆
+    -- By Lem 4.28: g_0 = c * x, c ∈ fixedPoints, x ∈ actionCommutator
+    have h_top : g_0 ∈ Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ := by
+      rw [fixedPoints_sup_actionCommutator_eq_top hCop hSolv]
+      exact Subgroup.mem_top _
+    rw [Subgroup.mem_sup_of_normal_right] at h_top
+    obtain ⟨c, hc_fix, x, hx_ac, h_eq⟩ := h_top
+    -- h_eq : c * x = g_0
+    have h_fix : (φ a) c = c := hc_fix a
+    -- ⁅inl c, inr a⁆ = 1 (c ∈ fixedPoints ⇒ inl c commutes with inr a)
+    have h_commute_ca : Commute (SemidirectProduct.inl c : G ⋊[φ] A)
+        (SemidirectProduct.inr a) := by
+      -- inl c · inr a = inr a · inl c iff (φ a) c = c (which holds by h_fix)
+      show (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a =
+          SemidirectProduct.inr a * SemidirectProduct.inl c
+      -- inr a * inl c * inr a⁻¹ = inl((φ a) c) = inl c (by inl_aut + h_fix)
+      have h_aut := SemidirectProduct.inl_aut (φ := φ) a c
+      rw [h_fix] at h_aut
+      -- h_aut : inl c = inr a * inl c * inr a⁻¹
+      -- Want: inl c * inr a = inr a * inl c
+      -- From h_aut: inl c * inr a = (inr a * inl c * inr a⁻¹) * inr a
+      --           = inr a * inl c * (inr a⁻¹ * inr a) = inr a * inl c
+      have h_inv_eq : (SemidirectProduct.inr a⁻¹ : G ⋊[φ] A) =
+          (SemidirectProduct.inr a)⁻¹ := map_inv SemidirectProduct.inr a
+      rw [h_inv_eq] at h_aut
+      rw [show (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a =
+            (SemidirectProduct.inr a * SemidirectProduct.inl c * (SemidirectProduct.inr a)⁻¹) *
+              SemidirectProduct.inr a from by rw [← h_aut]]
+      group
+    have h_comm_ca_eq_one : ⁅(SemidirectProduct.inl c : G ⋊[φ] A),
+        SemidirectProduct.inr a⁆ = 1 :=
+      commutatorElement_eq_one_iff_commute.mpr h_commute_ca
+    -- Goal: ⁅inl g_0, inr a⁆ ∈ ⁅⁅XG, YA⁆, YA⁆
+    -- g_0 = c * x, so inl g_0 = inl c * inl x. Use commutator identity.
+    rw [← h_eq, map_mul SemidirectProduct.inl]
+    -- Goal: ⁅inl c * inl x, inr a⁆ ∈ ...
+    -- Identity: ⁅cx, a⁆ = c · ⁅x, a⁆ · c⁻¹ · ⁅c, a⁆
+    have h_id : ⁅(SemidirectProduct.inl c * SemidirectProduct.inl x : G ⋊[φ] A),
+        (SemidirectProduct.inr a : G ⋊[φ] A)⁆ =
+        (SemidirectProduct.inl c : G ⋊[φ] A) *
+          ⁅(SemidirectProduct.inl x : G ⋊[φ] A), SemidirectProduct.inr a⁆ *
+          (SemidirectProduct.inl c)⁻¹ *
+          ⁅(SemidirectProduct.inl c : G ⋊[φ] A), SemidirectProduct.inr a⁆ := by
+      simp only [commutatorElement_def]
+      group
+    rw [h_id, h_comm_ca_eq_one, mul_one]
+    -- Goal: inl c * ⁅inl x, inr a⁆ * (inl c)⁻¹ ∈ ⁅⁅XG, YA⁆, YA⁆
+    -- = ⁅inl c · inl x · (inl c)⁻¹, inl c · inr a · (inl c)⁻¹⁆ (conjugate_commutatorElement)
+    -- inl c · inr a · (inl c)⁻¹ = inr a (commute)
+    rw [conjugate_commutatorElement]
+    have h_conj_ca : (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a *
+        (SemidirectProduct.inl c)⁻¹ = SemidirectProduct.inr a := by
+      rw [show (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a =
+          SemidirectProduct.inr a * SemidirectProduct.inl c from h_commute_ca]
+      group
+    rw [h_conj_ca]
+    -- Goal: ⁅inl c * inl x * (inl c)⁻¹, inr a⁆ ∈ ⁅⁅XG, YA⁆, YA⁆
+    -- inl c * inl x * (inl c)⁻¹ = inl(c * x * c⁻¹) ∈ inl(actionCommutator) = ⁅XG, YA⁆
+    have h_lift : (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inl x *
+        (SemidirectProduct.inl c)⁻¹ = SemidirectProduct.inl (c * x * c⁻¹) := by
+      have h_inv : ((SemidirectProduct.inl c : G ⋊[φ] A))⁻¹ = SemidirectProduct.inl c⁻¹ :=
+        (map_inv SemidirectProduct.inl c).symm
+      rw [h_inv, ← map_mul, ← map_mul]
+    rw [h_lift]
+    -- c * x * c⁻¹ ∈ actionCommutator (G-normal)
+    haveI : (actionCommutator φ).Normal := actionCommutator.normal φ
+    have h_cxc_ac : c * x * c⁻¹ ∈ actionCommutator φ :=
+      ‹(actionCommutator φ).Normal›.conj_mem _ hx_ac c
+    -- inl(c * x * c⁻¹) ∈ (actionCommutator).map inl = ⁅XG, YA⁆ (= I1)
+    have h_in_I1 : (SemidirectProduct.inl (c * x * c⁻¹) : G ⋊[φ] A) ∈ ⁅XG, YA⁆ := by
+      have := actionCommutator_map_inl (φ := φ)
+      rw [← this]
+      exact ⟨c * x * c⁻¹, h_cxc_ac, rfl⟩
+    exact Subgroup.commutator_mem_commutator h_in_I1 ⟨a, rfl⟩
+
 /-! ### Isaacs §4D: Baer trick (Lem 4.37) — odd order class ≤ 2 ⇒ additive group structure
 
 For `G` finite of **odd order** and **nilpotence class ≤ 2**, define
