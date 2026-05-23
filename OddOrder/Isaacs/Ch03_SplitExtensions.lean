@@ -2437,8 +2437,37 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
       map_zpow (QuotientGroup.mk' N₀)]
     exact Subgroup.zpow_mem_zpowers _ _
   · -- g^m = ι a.
-    -- g^m = ⟦inr (ofAdd m)⟧ = ⟦(1, ofAdd m)⟧, and (a, 1) - (1, ofAdd m) = (a⁻¹, ofAdd m) = K-element.
-    sorry
+    -- g^m = mk' K (inr (ofAdd m)). (ι a : G) = mk' K (inl a).
+    -- (inr (ofAdd m))⁻¹ * inl a = (a, ofAdd(-m)) = cExt⁻¹ ∈ K (using σ^k a = a ∀ k).
+    have h_iota_a : (ι a : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+        (SemidirectProduct.inl a) := rfl
+    rw [h_iota_a]
+    have h_g_pow : (g ^ m : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+        (SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))) := by
+      show (QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))) ^ m = _
+      rw [← map_pow]; congr 1
+      rw [← map_pow]; congr 1
+      rw [← ofAdd_nsmul]; congr 1; simp
+    rw [h_g_pow, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq]
+    have hσa_zpow : ∀ k : ℤ, (σ ^ k) a = a := fun k =>
+      Subgroup.zpow_mem (MulAction.stabilizer (MulAut N) a)
+        (MulAction.mem_stabilizer_iff.mpr hσa) k
+    have h_eq_inv : (SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))
+        : CyclicExtPreG N σ)⁻¹ * SemidirectProduct.inl a = (cyclicExtK m a σ)⁻¹ := by
+      apply SemidirectProduct.ext
+      · show ((SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)))⁻¹ *
+            SemidirectProduct.inl a : CyclicExtPreG N σ).left = (cyclicExtK m a σ)⁻¹.left
+        unfold cyclicExtK
+        simp [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+          SemidirectProduct.inv_left, SemidirectProduct.inv_right,
+          cyclicExtPhi_apply, hσa_zpow]
+      · show ((SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)))⁻¹ *
+            SemidirectProduct.inl a : CyclicExtPreG N σ).right = (cyclicExtK m a σ)⁻¹.right
+        unfold cyclicExtK
+        simp only [SemidirectProduct.mul_right, SemidirectProduct.inv_right,
+          SemidirectProduct.right_inl, SemidirectProduct.right_inr, one_mul, mul_one]
+    rw [h_eq_inv]
+    exact Subgroup.inv_mem _ (Subgroup.mem_zpowers _)
   · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via inl_aut.
     -- Plan: g = ⟦inr (ofAdd 1)⟧, (ι x : G) = ⟦inl x⟧.
     -- LHS = ⟦inr 1 * inl x * (inr 1)⁻¹⟧ = ⟦inl (φ 1 x)⟧ = ⟦inl (σ x)⟧ = (ι (σ x) : G).
