@@ -38,10 +38,53 @@
 
 「Ch.3 完成 = forward dep を持たない結果を全て sorry-free」の射程で, 残作業:
 
-### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — ralph-loop 進行中
+### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — abelian 完成, step_caseB 進行中 (2026-05-23 セッション)
 
 - 場所: `OddOrder/Mathlib/SchurZassenhausConj.lean`
 - ralph-loop prompt: `/tmp/phase1_sz_conjugacy.md`.
+
+#### 2026-05-23 セッション (commit bb72c39, c52f0d5, 90ccb1e, 8f649c2)
+
+1. **abelian_sz_conjugacy sorry-free** (bb72c39):
+   * 新 helper `stabilizer_quotientDiff_eq_self` (αK : N.QuotientDiff explicit param で TC 合成回避):
+     - K complement of abelian normal N + |N| coprime N.index ⇒ stabilizer G ⟦⟨K, _⟩⟧ = K.
+     - 証明: (⊆) op k⁻¹ • (K : Set G) = K * k⁻¹ = K (set 等式) ⇒ Quotient.mk'' で push;
+       (⊇) isComplement'_stabilizer_of_coprime で stab も complement, eq_of_le_of_card_ge.
+   * `abelian_sz_conjugacy` 書き換え: mathlib `MulAction.stabilizer_smul_eq_stabilizer_map_conj`
+     (Basic.lean:251) で stab (n • αK) = (stab αK).map (conj n) を取得して K' = K.map (conj n).
+   * 副次: `open scoped Pointwise` 追加.
+
+2. **minimal_normal_isPGroup_of_solvable helper** (c52f0d5, ~80 LOC):
+   * Isaacs Lem 3.11 の p-group 部分. mathlib 不在 (SchurZassenhaus.lean step6 private で同等).
+   * 証明: minimal_normal_isCommutative_of_solvable で abelian, p-torsion T characteristic,
+     T.map L.subtype ⊴ G + 最小性で T = ⊤, 各 x : ↥L で x^(p^1) = 1.
+
+3. **isComplement'_conj helper + step_caseB easy cases** (90ccb1e, ~128 LOC):
+   * 新 helper `isComplement'_conj`: K complement of normal N + g : G ⇒ K^g complement.
+   * step_caseB: trivial N = ⊥ (K = K' = ⊤, n = 1), trivial N = ⊤ (既存).
+   * Main setup: Nontrivial (G/N), M-bar minimal normal, M := M-bar.comap (mk' N),
+     N ≤ M, M ≠ ⊥, M.Normal, p-group on M-bar.
+   * step_factor with M: ∃ g_f ∈ N, K^g_f ⊔ M = K' ⊔ M. H := K^g_f, IsComplement' N H.
+   * **case H ⊔ M < ⊤**: step_restriction で K^g_f → K' の n ∈ N, composition で K^(n*g_f) = K'.
+
+4. **case H ⊔ M = ⊤ Dedekind setup** (8f649c2):
+   * import OddOrder.Mathlib.Subgroup.
+   * h_M_le_NH: M ≤ N ⊔ H (H complement).
+   * h_M_eq: M = N ⊔ (M ⊓ H) (Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le).
+   * h_MH_inf_N: (M ⊓ H) ⊓ N = ⊥.
+
+#### 残 sorry (1 件, ~80-100 LOC 予想, 次セッション)
+
+`step_caseB` case H ⊔ M = ⊤ の Sylow C + N_G(L) argument:
+
+- **Step 2**: |M ⊓ H| · |N| = |M| (card_HK_mul_card_inf_eq_card_mul_card 経由).
+- **Step 3**: M ⊓ H is Sylow p of M (|M ⊓ H| = |M̄| = p^k, |M : M ⊓ H| = |N| ∤ p).
+- **Step 4**: M ⊓ K' も同様 Sylow p of M (K'M = G 経由).
+- **Step 5**: Sylow C in M (mathlib `Sylow.exists_smul_eq`): ∃ m ∈ M, (M ⊓ K')^m = M ⊓ H.
+- **Step 6**: L := M ⊓ H = M ⊓ K'^m, L ⊴ H, L ⊴ K'^m, L > 1.
+- **Step 7a**: N_G(L) < G case (step_restriction on N_G(L) + composition + N 還元).
+- **Step 7b**: N_G(L) = G case (L ⊴ G, step_factor with H, K', L: L ⊆ H ⊴ G ⇒ L ⊆ H^g',
+  hence H^g' ⊔ L = H^g' = K' ⊔ L ⊇ K', cardinality K' = H^g', K^(g'*g_f) = K').
 
 #### 完成 (sorry-free)
 
