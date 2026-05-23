@@ -25,6 +25,15 @@
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
+§4D **`actionCommutator` 定義 + A-不変性 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
+- `actionCommutator φ := Subgroup.closure {g * (φ a) g⁻¹ | g a}`. `Γ = G ⋊[φ] A` 内で
+  `⁅inl(G), inr(A)⁆` を `inl` 経由で pull back したもの (∵ `[inl(g), inr(a)] = inl(g * (φ a) g⁻¹)`).
+- `actionCommutator_one_eq_bot`: 自明作用 `φ = 1` ⇒ `[G, 1] = ⊥` (@[simp]).
+- **`IsAInvariant.actionCommutator`**: `actionCommutator φ` は φ 作用下で A-不変.
+  proof: generator `g * (φ a) g⁻¹` → `(φ b) g * (φ (b·a·b⁻¹)) ((φ b) g)⁻¹` (key 計算)
+  で生成集合自体が `(φ b)`-stable. `IsAInvariant.closure_of_invariant_set` で結論. ~30 LOC.
+- 下流 §4D 4.28-4.30 で `[G, A]` 記号を多用する準備.
+
 §4D **Lemma 4.32 完成** (2026-05-23 ⭐, ralph-loop): P p-群 が G 非自明 p-群 に作用 ⇒ `⁅G,P⁆ < G` + `C_G(P) > 1`.
 - **前半** `commutator_inl_inr_lt_inl_of_pgroup_action`: Γ = G ⋊[φ] P 内で ⁅inl(G), inr(P)⁆ < inl(G).
   proof: Γ は p-群 (`IsPGroup.semidirectProduct`) で nilpotent. inl(G) 正規 + nontrivial.
