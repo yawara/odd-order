@@ -156,6 +156,18 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
   let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
   exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
 
+/-! ### Main induction (Isaacs Thm 3.12)
+
+To be completed in a follow-up session. Required steps:
+* `step_restriction`: proper subgroup `U < ⊤` contains `K, K'` ⇒ IH on `↥U` gives `n ∈ N ∩ U`.
+* `step_factor`: nontrivial `L ⊴ G` ⇒ IH on `G ⧸ L` gives `HL = (KL)^g`.
+* `step_caseA` (N solvable): minimal normal `L ⊆ N` (G-normal), `L` abelian; reduce to abelian SZ.
+* `step_caseB` (G/N solvable): minimal normal `M/N`, Sylow argument.
+* `main_aux`: strong induction in `Nat.card G` assembling above.
+* `axiom IsComplement'.exists_conj_of_coprime` → `theorem` via `main_aux`.
+
+Current scaffolding: `IH G` def + Helpers A, B + solvability transfer instances. -/
+
 end SchurZassenhausConj
 
 end Subgroup
