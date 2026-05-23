@@ -343,10 +343,54 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 /-- **Isaacs Thm 3.23(a)**: A-invariant Sylow p-subgroup の存在.
 `Glauberman 3.24(a)` を `Ω = Sylow p G` に適用 (G 推移 by Sylow C). -/
 theorem exists_aInvariant_sylow
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G) (p : ℕ) [Fact p.Prime] :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) (p : ℕ) [Fact p.Prime] :
     ∃ P : Sylow p G, IsAInvariant φ (P : Subgroup G) := by
-  sorry  -- TODO: Sylow MulAction infra + apply 3.24(a).
+  -- A acts on G via φ as MulDistribMulAction.
+  letI mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  -- This gives MulAction A (Sylow p G) via Sylow.pointwiseMulAction.
+  -- G acts on Sylow p G via conjugation (Sylow.mulAction).
+  -- Compatibility: a • (g • P) = (φ a g) • (a • P).
+  have hcompat : IsCompatibleMulAction φ (Sylow p G) := by
+    intro a g P
+    apply Sylow.ext
+    -- Goal: ↑(a • (g • P)) = ↑((φ a g) • (a • P)) as Subgroup G.
+    show (a • (g • P) : Sylow p G).toSubgroup = ((φ a g) • (a • P)).toSubgroup
+    rw [Sylow.pointwise_smul_def, Sylow.coe_subgroup_smul,
+        Sylow.coe_subgroup_smul, Sylow.pointwise_smul_def]
+    -- Goal: φ a • (MulAut.conj g • P.toSubgroup) = MulAut.conj (φ a g) • (φ a • P.toSubgroup).
+    ext x
+    constructor
+    · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
+      -- y = (MulAut.conj g) z = g * z * g⁻¹, x = (φ a) y = (φ a)(g z g⁻¹) = (φ a g) (φ a z) (φ a g)⁻¹
+      refine ⟨(φ a) z, ⟨z, hz, rfl⟩, ?_⟩
+      show MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
+      simp [MulAut.conj_apply, map_mul, map_inv]
+    · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
+      refine ⟨(MulAut.conj g) z, ⟨z, hz, rfl⟩, ?_⟩
+      show (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
+      simp [MulAut.conj_apply, map_mul, map_inv]
+  -- G transitive on Sylow p G.
+  haveI hSyl_nonempty : Nonempty (Sylow p G) := inferInstance
+  haveI hSyl_finite : Finite (Sylow p G) := inferInstance
+  have hG_trans : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
+  -- Apply Glauberman 3.24(a).
+  obtain ⟨P, hP_fix⟩ :=
+    glauberman_fixed_point_exists (G := G) (A := A) (φ := φ) hCop hSolv (Ω := Sylow p G)
+      hcompat hG_trans
+  -- hP_fix : ∀ a : A, a • P = P (in Sylow type). Translate to IsAInvariant on Subgroup.
+  refine ⟨P, ?_⟩
+  intro a
+  -- IsAInvariant: (φ a) • (P : Subgroup G) = P.
+  have h_pt : a • P = P := hP_fix a
+  -- a • P in Sylow has carrier (φ a) • (P : Set G) = (φ a) • (P : Subgroup G) (as set).
+  have h_coe : ((a • P : Sylow p G) : Subgroup G) = ((P : Sylow p G) : Subgroup G) := by
+    rw [h_pt]
+  rw [Sylow.pointwise_smul_def] at h_coe
+  -- h_coe : (φ a) • (P : Subgroup G) = (P : Subgroup G).
+  -- IsAInvariant says (φ a) • P = P (as Subgroup), which by smul_def is the same.
+  show (φ a : MulAut G) • (P : Subgroup G) = (P : Subgroup G)
+  exact h_coe
 
 /-- **Isaacs Thm 3.23(b)**: 2 つの A-invariant Sylow p-subgroup は C_G(A) で共役.
 `Glauberman 3.24(b)` の Sylow p G 版. -/
