@@ -906,12 +906,275 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
     exact not_subsingleton P h
   omega
 
-/-! **Isaacs Thm 4.7** (full statement, m ≥ 2 induction): `A ⊴ P` abelian, `P` p-群,
-`|A| = p^m`, `P/A` cyclic, `|A ⊓ Z(P)| = p` ⇒ `Group.nilpotencyClass P = m`.
+/-- Helper: for `f : G →* G' = G/N` (`N` normal) surjective and `H ≤ G`,
+`|H.map (mk' N)| · |H ⊓ N| = |H|`. First iso on `(mk' N).comp H.subtype` + Lagrange in `H`. -/
+private lemma card_map_mk_mul_card_inf_eq_card {G : Type*} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] (H : Subgroup G) :
+    Nat.card (H.map (QuotientGroup.mk' N)) * Nat.card (H ⊓ N : Subgroup G) = Nat.card H := by
+  let f : H →* G ⧸ N := (QuotientGroup.mk' N).comp H.subtype
+  have hker : f.ker = (H ⊓ N).subgroupOf H := by
+    ext ⟨x, hx⟩
+    simp only [f, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf,
+      Subgroup.mem_inf]
+    exact ⟨fun hxN => ⟨hx, hxN⟩, fun h => h.2⟩
+  have hrange : f.range = H.map (QuotientGroup.mk' N) := by
+    ext y
+    simp only [MonoidHom.mem_range, Subgroup.mem_map, f, MonoidHom.comp_apply,
+      Subgroup.coe_subtype, QuotientGroup.mk'_apply]
+    exact ⟨fun ⟨⟨x, hx⟩, h⟩ => ⟨x, hx, h⟩, fun ⟨x, hx, h⟩ => ⟨⟨x, hx⟩, h⟩⟩
+  have hSO : Nat.card ((H ⊓ N).subgroupOf H : Subgroup H) = Nat.card (H ⊓ N : Subgroup G) :=
+    Nat.card_congr
+      ⟨fun x => ⟨((x : H) : G), Subgroup.mem_subgroupOf.mp x.2⟩,
+        fun y => ⟨⟨(y : G), (Subgroup.mem_inf.mp y.2).1⟩, Subgroup.mem_subgroupOf.mpr y.2⟩,
+        fun _ => rfl, fun _ => rfl⟩
+  have hLagr : Nat.card (H ⧸ f.ker) * Nat.card f.ker = Nat.card H :=
+    (Subgroup.card_eq_card_quotient_mul_card_subgroup f.ker).symm
+  have hQ : Nat.card (H ⧸ f.ker) = Nat.card f.range :=
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv
+  rw [hker, hSO] at hLagr
+  rw [hker, hrange] at hQ
+  rw [← hQ]; exact hLagr
 
-`m = 1` 場合は上記 `nilpotencyClass_eq_one_of_...` で完成.
-`m ≥ 2` 場合 (帰納): Thm 1.19 (`IsPGroup.normal_inf_center_nontrivial`) +
-Lem 4.6 cardinality + quotient P̄ = P/Z で IH 適用. ~150 LOC. 形式化保留. -/
+/-- **Isaacs Thm 4.7** ⭐: Let `A ⊴ P` abelian, `P` a p-group, `|A| = p^m`, `P/A` cyclic,
+`|A ⊓ Z(P)| = p`. Then `Group.nilpotencyClass P = m`.
+
+**Proof** (Isaacs p.118-119): Induction on `m`.
+- `m = 0` is impossible: `|A| = 1` but `|A ⊓ Z(P)| = p ≥ 2`, contradicting `A ⊓ Z(P) ≤ A`.
+- `m = 1`: `nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p`
+  (`|A| = |A ⊓ Z(P)| = p` ⇒ `A ⊆ Z(P)` ⇒ `P` abelian).
+- `m ≥ 2`: Let `Z = A ⊓ Z(P)`. By Lem 4.6 cardinality, `|commutator P| = p^(m-1)`.
+  Since `m-1 ≥ 1`, `commutator P` is nontrivial; by Thm 1.19,
+  `commutator P ⊓ Z(P) > ⊥`. Combined with `commutator P ⊓ Z(P) ⊆ A ⊓ Z(P) = Z`
+  and `|Z| = p` prime, get `commutator P ⊓ Z(P) = Z`, so `Z ⊆ commutator P`.
+  Apply IH to `P̄ = P/Z` and `Ā = A.map mk'`: class `P̄ = m-1`. Lift back via
+  `lowerCentralSeries_map_eq_of_surjective`. -/
+theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p_pow
+    (m : ℕ) {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (hCyc : IsCyclic (P ⧸ A))
+    (hAcard : Nat.card A = p^m)
+    (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
+    Group.nilpotencyClass P = m := by
+  induction m generalizing P with
+  | zero =>
+    -- |A| = 1 but |A ⊓ Z(P)| = p ≥ 2, contradicting A ⊓ Z(P) ≤ A
+    exfalso
+    rw [pow_zero] at hAcard
+    have hle : (A ⊓ Subgroup.center P : Subgroup P) ≤ A := inf_le_left
+    have hcard_le := Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hle)
+    rw [hAcard, hAZcard] at hcard_le
+    have := hp.out.one_lt
+    omega
+  | succ k ih =>
+    haveI : Group.IsNilpotent P := hP.isNilpotent
+    rcases Nat.eq_zero_or_pos k with rfl | hk_pos
+    · -- k = 0, i.e., m = 1: use existing base case
+      have hAcard' : Nat.card A = p := by rw [hAcard]; ring
+      exact nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p
+        hP hAb hCyc hAcard' hAZcard
+    -- k ≥ 1, i.e., m = k+1 ≥ 2
+    have hp_prime : p.Prime := hp.out
+    have hp_pos : 0 < p := hp_prime.pos
+    have hp1 : 1 < p := hp_prime.one_lt
+    -- Step 1: commutator P ≤ A (P/A cyclic ⇒ abelian)
+    have hG'_le_A : _root_.commutator P ≤ A := by
+      letI : CommGroup (P ⧸ A) := IsCyclic.commGroup
+      exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨mul_comm⟩
+    -- Step 2: |commutator P| = p^k via Lem 4.6 cardinality
+    have hG'_card : Nat.card (_root_.commutator P) = p^k := by
+      have h := card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+        hAb hCyc
+      rw [hAcard, hAZcard, pow_succ] at h
+      exact Nat.eq_of_mul_eq_mul_right hp_pos h
+    -- Step 3: commutator P is nontrivial (|commutator P| = p^k ≥ p > 1)
+    have hG'_nontriv : Nontrivial (_root_.commutator P : Subgroup P) := by
+      rw [← Finite.one_lt_card_iff_nontrivial, hG'_card]
+      exact one_lt_pow₀ hp1 hk_pos.ne'
+    -- Step 4: Thm 1.19 ⇒ commutator P ⊓ Z(P) nontrivial
+    haveI : Nontrivial ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P) :=
+      OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial hP
+        (N := _root_.commutator P) hG'_nontriv
+    -- Step 5: commutator P ⊓ Z(P) ⊆ A ⊓ Z(P), and |A ⊓ Z(P)| = p, so equality holds
+    have h_inf_le : ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P)
+        ≤ (A ⊓ Subgroup.center P : Subgroup P) :=
+      inf_le_inf_right _ hG'_le_A
+    have h_inf_eq : ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P)
+        = (A ⊓ Subgroup.center P : Subgroup P) := by
+      refine Subgroup.eq_of_le_of_card_ge h_inf_le ?_
+      rw [hAZcard]
+      have h_nontriv_card : 1 < Nat.card ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P) :=
+        Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+      -- Apply Lagrange: card H divides card K = p, with card H > 1 ⇒ card H = p
+      have h_dvd : Nat.card ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P)
+          ∣ Nat.card (A ⊓ Subgroup.center P : Subgroup P) :=
+        Subgroup.card_dvd_of_le h_inf_le
+      rw [hAZcard] at h_dvd
+      rcases hp_prime.eq_one_or_self_of_dvd _ h_dvd with h_one | h_self
+      · omega
+      · exact h_self.symm.le
+    -- Set Z := A ⊓ Z(P)
+    set Z : Subgroup P := A ⊓ Subgroup.center P with hZ_def
+    have hZ_card : Nat.card Z = p := hAZcard
+    have hZ_le_A : Z ≤ A := inf_le_left
+    have hZ_le_center : Z ≤ Subgroup.center P := inf_le_right
+    -- Z ≤ commutator P
+    have hZ_le_G' : Z ≤ _root_.commutator P := by
+      intro x hx
+      have hx_in_inf : x ∈ ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P) := by
+        rw [h_inf_eq]; exact hx
+      exact (Subgroup.mem_inf.mp hx_in_inf).1
+    -- Z is normal in P (Z ≤ Z(P))
+    haveI hZ_normal : Z.Normal := by
+      refine ⟨fun x hx g => ?_⟩
+      have hxZ : x ∈ Subgroup.center P := hZ_le_center hx
+      rw [Subgroup.mem_center_iff] at hxZ
+      have : g * x * g⁻¹ = x := by rw [hxZ g]; group
+      rw [this]; exact hx
+    -- Step 6: Work in P̄ = P / Z
+    let φ : P →* P ⧸ Z := QuotientGroup.mk' Z
+    have hφ_surj : Function.Surjective φ := QuotientGroup.mk_surjective
+    haveI : Finite (P ⧸ Z) := Finite.of_surjective φ hφ_surj
+    have hφ_ker : φ.ker = Z := QuotientGroup.ker_mk' Z
+    -- Ā := image of A
+    let Abar : Subgroup (P ⧸ Z) := A.map φ
+    haveI hAbar_normal : Abar.Normal := Subgroup.Normal.map ‹A.Normal› φ hφ_surj
+    -- Ā abelian
+    have hAbar_Ab : ∀ a ∈ Abar, ∀ b ∈ Abar, a * b = b * a := by
+      intro a ha b hb
+      obtain ⟨a', ha'A, rfl⟩ := ha
+      obtain ⟨b', hb'A, rfl⟩ := hb
+      rw [← map_mul, ← map_mul, hAb a' ha'A b' hb'A]
+    -- P̄ / Ā ≃* P / A ⇒ cyclic
+    have hAbar_quot_cyclic : IsCyclic ((P ⧸ Z) ⧸ Abar) := by
+      let e : ((P ⧸ Z) ⧸ Abar) ≃* P ⧸ A :=
+        QuotientGroup.quotientQuotientEquivQuotient (G := P) Z A hZ_le_A
+      exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+    -- IsPGroup p P̄
+    have hPbar : IsPGroup p (P ⧸ Z) := hP.to_quotient Z
+    -- |A ⊓ Z| = |Z| = p (since Z ≤ A ⇒ A ⊓ Z = Z)
+    have hAZ_inter_eq : (A ⊓ Z : Subgroup P) = Z := inf_of_le_right hZ_le_A
+    -- |Ā| = p^k via card_map_mk_mul_card_inf_eq_card
+    have hAbar_card : Nat.card Abar = p^k := by
+      have h := card_map_mk_mul_card_inf_eq_card (N := Z) A
+      rw [hAZ_inter_eq, hZ_card, hAcard, pow_succ] at h
+      exact Nat.eq_of_mul_eq_mul_right hp_pos h
+    -- |commutator P ⊓ Z| = |Z| = p (since Z ≤ commutator P)
+    have hG'Z_inter_eq : ((_root_.commutator P) ⊓ Z : Subgroup P) = Z := inf_of_le_right hZ_le_G'
+    -- commutator P̄ = (commutator P).map φ (by lcs_map at n=1)
+    have h_lcs1 : Subgroup.map φ (_root_.commutator P) = _root_.commutator (P ⧸ Z) := by
+      have := lowerCentralSeries_map_eq_of_surjective φ hφ_surj 1
+      simpa [lowerCentralSeries_one] using this
+    -- |commutator P̄| = p^(k-1)
+    have hGbar'_card : Nat.card (_root_.commutator (P ⧸ Z)) = p^(k-1) := by
+      have h := card_map_mk_mul_card_inf_eq_card (N := Z) (_root_.commutator P)
+      rw [hG'Z_inter_eq, hZ_card, hG'_card] at h
+      -- h: |(commutator P).map φ| * p = p^k
+      rw [h_lcs1] at h
+      have hk_succ : k = (k - 1) + 1 := (Nat.sub_add_cancel hk_pos).symm
+      rw [hk_succ, pow_succ] at h
+      exact Nat.eq_of_mul_eq_mul_right hp_pos h
+    -- |Ā ⊓ Z(P̄)| = p (apply Lem 4.6 cardinality to P̄, Ā)
+    have hAbarZbar_card : Nat.card (Abar ⊓ Subgroup.center (P ⧸ Z) : Subgroup (P ⧸ Z)) = p := by
+      have h := card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+        hAbar_Ab hAbar_quot_cyclic
+      rw [hGbar'_card, hAbar_card] at h
+      -- h: p^(k-1) * |Ā ⊓ Z(P̄)| = p^k
+      have hk_succ : k = (k - 1) + 1 := (Nat.sub_add_cancel hk_pos).symm
+      rw [hk_succ, pow_succ] at h
+      have hp_pow_pos : 0 < p^(k-1) := pow_pos hp_pos _
+      exact Nat.eq_of_mul_eq_mul_left hp_pow_pos h
+    -- Apply IH
+    have h_class_Pbar : Group.nilpotencyClass (P ⧸ Z) = k :=
+      ih hPbar hAbar_Ab hAbar_quot_cyclic hAbar_card hAbarZbar_card
+    -- Translate to lcs: lcs P̄ k = ⊥ and lcs P̄ (k-1) ≠ ⊥
+    have h_lcs_Pbar_k : lowerCentralSeries (P ⧸ Z) k = ⊥ :=
+      lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h_class_Pbar.le
+    have h_lcs_Pbar_km1_ne : lowerCentralSeries (P ⧸ Z) (k - 1) ≠ ⊥ := by
+      intro h_eq
+      have := lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_eq
+      rw [h_class_Pbar] at this
+      omega
+    -- lcs P k ≤ Z (lift lcs P̄ k = ⊥ back)
+    have h_lcs_P_k_le_Z : lowerCentralSeries P k ≤ Z := by
+      have h_map : Subgroup.map φ (lowerCentralSeries P k) = lowerCentralSeries (P ⧸ Z) k :=
+        lowerCentralSeries_map_eq_of_surjective φ hφ_surj k
+      rw [h_lcs_Pbar_k] at h_map
+      have h_le_ker : lowerCentralSeries P k ≤ φ.ker :=
+        (Subgroup.map_eq_bot_iff _).mp h_map
+      rw [hφ_ker] at h_le_ker
+      exact h_le_ker
+    -- lcs P (k+1) = ⊥ (lcs P k ≤ Z ≤ Z(P))
+    have h_lcs_P_kp1 : lowerCentralSeries P (k + 1) = ⊥ :=
+      lowerCentralSeries_succ_eq_bot (h_lcs_P_k_le_Z.trans hZ_le_center)
+    -- lcs P k ≠ ⊥
+    have h_lcs_P_k_ne : lowerCentralSeries P k ≠ ⊥ := by
+      -- Case k = 1: lcs P 1 = commutator P ≠ ⊥
+      -- Case k ≥ 2: lcs P (k-1) ⊆ commutator P ⊆ A, lcs P (k-1) ⊄ Z ⇒ ...
+      by_cases hk1 : k = 1
+      · -- k = 1
+        subst hk1
+        rw [lowerCentralSeries_one]
+        intro h_bot
+        rw [h_bot, Subgroup.card_bot] at hG'_card
+        -- p^1 = 1 ⇒ p = 1, contradiction
+        rw [pow_one] at hG'_card
+        omega
+      · -- k ≥ 2: lcs P (k-1) ⊆ commutator P ⊆ A,
+        -- lcs P (k-1) ⊄ Z ⇒ lcs P (k-1) ⊄ Z(P) ⇒ lcs P k ≠ ⊥
+        intro h_lcs_k_bot
+        -- lcs P (k-1) maps to lcs P̄ (k-1) ≠ ⊥
+        have h_map_km1 : Subgroup.map φ (lowerCentralSeries P (k - 1))
+            = lowerCentralSeries (P ⧸ Z) (k - 1) :=
+          lowerCentralSeries_map_eq_of_surjective φ hφ_surj (k - 1)
+        -- lcs P (k-1) ⊄ Z (= φ.ker)
+        have h_lcs_km1_nle_Z : ¬ lowerCentralSeries P (k - 1) ≤ Z := by
+          intro h_le
+          have h_le_ker : lowerCentralSeries P (k - 1) ≤ φ.ker := by
+            rw [hφ_ker]; exact h_le
+          have : Subgroup.map φ (lowerCentralSeries P (k - 1)) = ⊥ :=
+            (Subgroup.map_eq_bot_iff _).mpr h_le_ker
+          rw [h_map_km1] at this
+          exact h_lcs_Pbar_km1_ne this
+        -- lcs P (k-1) ⊆ commutator P ⊆ A (using k - 1 ≥ 1, lcs decreasing)
+        have hk_one_le : 1 ≤ k - 1 := by omega
+        have h_lcs_km1_le_G' : lowerCentralSeries P (k - 1) ≤ _root_.commutator P := by
+          rw [← lowerCentralSeries_one]
+          exact lowerCentralSeries_antitone hk_one_le
+        have h_lcs_km1_le_A : lowerCentralSeries P (k - 1) ≤ A := h_lcs_km1_le_G'.trans hG'_le_A
+        -- ∃ x ∈ lcs P (k-1), x ∉ Z
+        rw [SetLike.not_le_iff_exists] at h_lcs_km1_nle_Z
+        obtain ⟨x, hx_in, hx_notZ⟩ := h_lcs_km1_nle_Z
+        -- x ∈ A but x ∉ Z = A ⊓ Z(P), so x ∉ Z(P) (since x ∈ A)
+        have hx_in_A : x ∈ A := h_lcs_km1_le_A hx_in
+        have hx_notZP : x ∉ Subgroup.center P := by
+          intro hxZP
+          exact hx_notZ (Subgroup.mem_inf.mpr ⟨hx_in_A, hxZP⟩)
+        -- So ∃ y, [x, y] ≠ 1 (x not in center)
+        rw [Subgroup.mem_center_iff] at hx_notZP
+        push_neg at hx_notZP
+        obtain ⟨y, hxy⟩ := hx_notZP
+        -- [x, y] ∈ ⁅lcs P (k-1), ⊤⁆ = lcs P k via lcs definition
+        have h_xy_in_kp : ⁅x, y⁆ ∈ lowerCentralSeries P ((k - 1) + 1) := by
+          show ⁅x, y⁆ ∈ ⁅lowerCentralSeries P (k - 1), (⊤ : Subgroup P)⁆
+          exact Subgroup.commutator_mem_commutator hx_in (Subgroup.mem_top y)
+        have hk_succ : (k - 1) + 1 = k := Nat.sub_add_cancel hk_pos
+        rw [hk_succ] at h_xy_in_kp
+        -- lcs P k = ⊥ ⇒ [x, y] = 1 ⇒ x*y = y*x, contradiction
+        rw [h_lcs_k_bot, Subgroup.mem_bot] at h_xy_in_kp
+        rw [commutatorElement_eq_one_iff_mul_comm] at h_xy_in_kp
+        exact hxy h_xy_in_kp.symm
+    -- Conclude: Group.nilpotencyClass P = k + 1
+    refine Nat.le_antisymm ?_ ?_
+    · -- ≤ : lcs P (k+1) = ⊥
+      exact lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_lcs_P_kp1
+    · -- ≥ : NOT (nilpotencyClass ≤ k)
+      by_contra h
+      push_neg at h
+      have : lowerCentralSeries P k = ⊥ :=
+        lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (Nat.lt_succ_iff.mp h)
+      exact h_lcs_P_k_ne this
 
 /-! ### Commutator collection in class ≤ 2 (Thm 4.8 の前段) -/
 

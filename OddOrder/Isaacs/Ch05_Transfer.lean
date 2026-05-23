@@ -264,19 +264,114 @@ axiom fitting_coprime_abelian_decomp
     (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ ∧
       (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P
 
-/-- **Cyclic p-group inf-eq-bot** — axiom 形 (cyclic-finite-p-group lattice 線形性の系).
+/-- **Cyclic p-group inf-eq-bot** (theorem 形, 2026-05-23 axiom → theorem 化).
 
 cyclic 有限 `p`-group の部分群 lattice は線形 (divisor lattice 同型). よって
 任意 2 部分群 `H, K ≤ P` で `H ⊓ K = ⊥ ⇒ H = ⊥ ∨ K = ⊥`.
 
-**実装方針**: mathlib `IsCyclic.exists_generator` + `Subgroup.zpowers` 解析 + `IsPGroup`
-で ~50-80 LOC. (Subgroups of cyclic ↔ divisors of order ⇒ lattice 線形 ⇒
-intersection = min element.) -/
-axiom cyclic_pgroup_inf_eq_bot_iff
+**証明戦略**:
+- `H, K` 非自明と仮定 (背理法). `IsPGroup p ↥H` (`hP_pgroup.to_le hH_le_P`) + `Cauchy`
+  (`exists_prime_orderOf_dvd_card'`) で `H, K` に order `p` 元 `h, k` を取る.
+- `↥P` に lift: cyclic ⇒ CommGroup. mathlib `IsCyclic.card_powMonoidHom_ker` で
+  `(powMonoidHom p).ker` (cyclic 内 unique order-p subgroup) の cardinality = `p`.
+- `zpowers h_P` と `zpowers k_P` (両方 ↥P 内) は cardinality = p で `(powMonoidHom p).ker`
+  に含まれる ⇒ `Subgroup.eq_of_le_of_card_ge` で両方 = ker.
+- ゆえに `zpowers h_P = zpowers k_P`, 特に `h_P ∈ zpowers k_P`. G に戻して `h ∈ K`.
+- `h ∈ H ⊓ K = ⊥` ⇒ `h = 1` だが `orderOf h = p > 1`, 矛盾. -/
+theorem cyclic_pgroup_inf_eq_bot_iff
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
-    {P : Subgroup G} [IsCyclic ↥P] (_hP_pgroup : IsPGroup p ↥P)
-    {H K : Subgroup G} (_hH_le_P : H ≤ P) (_hK_le_P : K ≤ P) :
-    H ⊓ K = ⊥ ↔ H = ⊥ ∨ K = ⊥
+    {P : Subgroup G} [hPcyc : IsCyclic ↥P] (hP_pgroup : IsPGroup p ↥P)
+    {H K : Subgroup G} (hH_le_P : H ≤ P) (hK_le_P : K ≤ P) :
+    H ⊓ K = ⊥ ↔ H = ⊥ ∨ K = ⊥ := by
+  refine ⟨fun h_inf => ?_, fun h => h.elim
+    (fun he => by rw [he, bot_inf_eq]) (fun he => by rw [he, inf_bot_eq])⟩
+  by_contra h_not
+  push_neg at h_not
+  obtain ⟨hH_ne, hK_ne⟩ := h_not
+  -- Cauchy in H: ∃ h ∈ H with orderOf h = p
+  have hH_pgroup : IsPGroup p ↥H := hP_pgroup.to_le hH_le_P
+  obtain ⟨nH, hnH⟩ := IsPGroup.iff_card.mp hH_pgroup
+  have hnH_pos : 1 ≤ nH := by
+    by_contra h
+    push_neg at h
+    interval_cases nH
+    rw [pow_zero] at hnH
+    exact hH_ne (Subgroup.eq_bot_of_card_eq H hnH)
+  have h_p_dvd_H : p ∣ Nat.card ↥H :=
+    hnH ▸ dvd_pow_self p (Nat.one_le_iff_ne_zero.mp hnH_pos)
+  obtain ⟨⟨h, hh_mem⟩, hh_ord⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥H) p h_p_dvd_H
+  have hh_inP : h ∈ P := hH_le_P hh_mem
+  have hh_ord_g : orderOf h = p := (Subgroup.orderOf_coe _).trans hh_ord
+  -- Cauchy in K: ∃ k ∈ K with orderOf k = p
+  have hK_pgroup : IsPGroup p ↥K := hP_pgroup.to_le hK_le_P
+  obtain ⟨nK, hnK⟩ := IsPGroup.iff_card.mp hK_pgroup
+  have hnK_pos : 1 ≤ nK := by
+    by_contra h
+    push_neg at h
+    interval_cases nK
+    rw [pow_zero] at hnK
+    exact hK_ne (Subgroup.eq_bot_of_card_eq K hnK)
+  have h_p_dvd_K : p ∣ Nat.card ↥K :=
+    hnK ▸ dvd_pow_self p (Nat.one_le_iff_ne_zero.mp hnK_pos)
+  obtain ⟨⟨k, hk_mem⟩, hk_ord⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥K) p h_p_dvd_K
+  have hk_inP : k ∈ P := hK_le_P hk_mem
+  have hk_ord_g : orderOf k = p := (Subgroup.orderOf_coe _).trans hk_ord
+  -- Lift h, k to ↥P (cyclic ⇒ IsMulCommutative auto ⇒ CommGroup auto via priority 100)
+  let h_P : ↥P := ⟨h, hh_inP⟩
+  let k_P : ↥P := ⟨k, hk_inP⟩
+  have hh_P_ord : orderOf h_P = p := by
+    show orderOf (⟨h, hh_inP⟩ : ↥P) = p
+    rw [Subgroup.orderOf_mk]; exact hh_ord_g
+  have hk_P_ord : orderOf k_P = p := by
+    show orderOf (⟨k, hk_inP⟩ : ↥P) = p
+    rw [Subgroup.orderOf_mk]; exact hk_ord_g
+  -- Z := (powMonoidHom p).ker, unique order-p subgroup of ↥P
+  obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp hP_pgroup
+  have ha_pos : 1 ≤ a := by
+    have h_dvd : Nat.card ↥H ∣ Nat.card ↥P := Subgroup.card_dvd_of_le hH_le_P
+    rw [hP_card, hnH] at h_dvd
+    exact (Nat.pow_dvd_pow_iff_le_right (Nat.Prime.one_lt Fact.out)).mp
+      (h_dvd.trans (dvd_refl _)) |>.trans' hnH_pos
+  have hZ_card : Nat.card ((@powMonoidHom ↥P _ p).ker) = p := by
+    rw [IsCyclic.card_powMonoidHom_ker, hP_card,
+        Nat.gcd_eq_right (dvd_pow_self p (Nat.one_le_iff_ne_zero.mp ha_pos))]
+  -- h_P, k_P ∈ Z (since h_P^p = 1)
+  have hh_in_Z : h_P ∈ (@powMonoidHom ↥P _ p).ker := by
+    rw [MonoidHom.mem_ker, powMonoidHom_apply]
+    exact orderOf_dvd_iff_pow_eq_one.mp (hh_P_ord ▸ dvd_refl _)
+  have hk_in_Z : k_P ∈ (@powMonoidHom ↥P _ p).ker := by
+    rw [MonoidHom.mem_ker, powMonoidHom_apply]
+    exact orderOf_dvd_iff_pow_eq_one.mp (hk_P_ord ▸ dvd_refl _)
+  -- zpowers h_P = Z (same card p) ; similarly zpowers k_P = Z
+  have h_zpowers_h : Subgroup.zpowers h_P = (@powMonoidHom ↥P _ p).ker := by
+    apply Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hh_in_Z)
+    rw [hZ_card, Nat.card_zpowers, hh_P_ord]
+  have h_zpowers_k : Subgroup.zpowers k_P = (@powMonoidHom ↥P _ p).ker := by
+    apply Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hk_in_Z)
+    rw [hZ_card, Nat.card_zpowers, hk_P_ord]
+  have h_eq_zpowers : Subgroup.zpowers h_P = Subgroup.zpowers k_P := by
+    rw [h_zpowers_h, h_zpowers_k]
+  -- h_P ∈ zpowers k_P ⇒ h_P = k_P^n for some n ⇒ h = k^n in G
+  have hh_in_zpowers_k : h_P ∈ Subgroup.zpowers k_P := by
+    rw [← h_eq_zpowers]; exact Subgroup.mem_zpowers _
+  obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hh_in_zpowers_k
+  have hh_g_eq : h = (k : G) ^ n := by
+    have h1 : (h_P : G) = ((k_P ^ n : ↥P) : G) := by rw [hn]
+    have h2 : ((k_P ^ n : ↥P) : G) = (k_P : G) ^ n := SubgroupClass.coe_zpow _ _
+    have h3 : (h_P : G) = h := rfl
+    have h4 : (k_P : G) = k := rfl
+    rw [h3, h2, h4] at h1
+    exact h1
+  -- h ∈ K (K closed under zpow)
+  have hh_in_K : h ∈ K := by
+    rw [hh_g_eq]; exact K.zpow_mem hk_mem n
+  -- h ∈ H ⊓ K = ⊥ ⇒ h = 1, but orderOf h = p > 1, contradiction
+  have hh_inHK : h ∈ H ⊓ K := ⟨hh_mem, hh_in_K⟩
+  rw [h_inf, Subgroup.mem_bot] at hh_inHK
+  rw [hh_inHK, orderOf_one] at hh_ord_g
+  exact (Nat.Prime.ne_one Fact.out) hh_ord_g.symm
 
 end _root_.OddOrder.Isaacs.Ch04
 
