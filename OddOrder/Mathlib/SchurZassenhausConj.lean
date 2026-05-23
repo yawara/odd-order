@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
 
+open scoped Pointwise
+
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)
 
@@ -377,33 +379,90 @@ private theorem minimal_normal_isCommutative_of_solvable
     rw [h_ds_top] at hn
     exact bot_lt_top.ne' hn
 
-/-- **Abelian SZ conjugacy**: for `N` abelian normal in `G` with coprime order/index,
-any two complements are conjugate by an element of `N`. mathlib's `exists_smul_eq`
-provides the abstract `QuotientDiff` form; we translate to the subgroup-level statement.
+/-- Helper: for `K` complement of abelian normal `N`, the stabilizer (under the
+`G`-action on `N.QuotientDiff`) of the equivalence class of `K`'s transversal equals `K`.
 
-TODO (sorry remaining at the end): the final piece requires converting the equivalence
-`n • [TK] = [TK']` in `N.QuotientDiff` into the subgroup equation `K^n = K'`. This is
-non-trivial: `diff = 1` equivalence relates transversals only setwise (each coset rep
-differs by an N element with product 1), not as subgroups. May need a Lean tactic chain
-through `Quotient.exact'` + `smul_diff_smul'` + cardinality. -/
+The result is stated for an explicit `αK : N.QuotientDiff` plus an equation `αK = ⟦⟨K, _⟩⟧`,
+to avoid Lean's instance-synthesis difficulty with embedded `Quotient.mk''`-expressions
+of type `N.QuotientDiff` (the def is not reducible, so the `MulAction G _` instance does
+not match against the unfolded `Quotient {...}` form).
+
+Proof: (⊆) because for `k ∈ K`, `op k⁻¹ • (K : Set G) = K` as sets, so the LeftTransversal
+is unchanged in the QuotientDiff; (⊇) by cardinality (both `K` and the stabilizer are
+complements of `N` of cardinality `N.index`). -/
+private theorem stabilizer_quotientDiff_eq_self {K : Subgroup G} [N.Normal]
+    [IsMulCommutative N] [Finite G]
+    (hN : Nat.Coprime (Nat.card N) N.index) (hK : IsComplement' N K)
+    (αK : N.QuotientDiff)
+    (hαK : αK =
+      (Quotient.mk'' (⟨(K : Set G), hK.symm⟩ : N.LeftTransversal) : N.QuotientDiff)) :
+    MulAction.stabilizer G αK = K := by
+  -- Step 1: K ≤ stabilizer αK.
+  have hK_le : K ≤ MulAction.stabilizer G αK := by
+    intro k hkK
+    rw [MulAction.mem_stabilizer_iff, hαK]
+    -- k • ⟦⟨K, _⟩⟧ = ⟦⟨K, _⟩⟧ via op k⁻¹ • (K : Set G) = K as a set.
+    have h_set : (MulOpposite.op (k⁻¹ : G)) • (K : Set G) = (K : Set G) := by
+      ext x
+      refine ⟨?_, fun hxK => ⟨x * k, K.mul_mem hxK hkK, ?_⟩⟩
+      · rintro ⟨y, hyK, hxy⟩
+        -- hxy : (fun z ↦ MulOpposite.op k⁻¹ • z) y = x, which is y * k⁻¹ = x.
+        change (y * k⁻¹ : G) = x at hxy
+        rw [← hxy]
+        exact K.mul_mem hyK (K.inv_mem hkK)
+      · -- Goal: (fun z ↦ MulOpposite.op k⁻¹ • z) (x * k) = x, i.e., (x * k) * k⁻¹ = x.
+        change ((x * k) * k⁻¹ : G) = x
+        group
+    have h_trans :
+        (MulOpposite.op (k⁻¹ : G)) • (⟨(K : Set G), hK.symm⟩ : N.LeftTransversal)
+          = ⟨(K : Set G), hK.symm⟩ := Subtype.ext h_set
+    exact congrArg Quotient.mk'' h_trans
+  -- Step 2: cardinality equality forces stabilizer = K.
+  have hStab_compl : IsComplement' N (MulAction.stabilizer G αK) :=
+    isComplement'_stabilizer_of_coprime hN
+  have h_card_K : Nat.card K = N.index := hK.symm.index_eq_card.symm
+  have h_card_stab : Nat.card (MulAction.stabilizer G αK) = N.index :=
+    hStab_compl.symm.index_eq_card.symm
+  have h_eq : Nat.card (MulAction.stabilizer G αK) = Nat.card K := by
+    rw [h_card_stab, ← h_card_K]
+  exact (Subgroup.eq_of_le_of_card_ge hK_le h_eq.le).symm
+
+/-- **Abelian SZ conjugacy** (Isaacs Thm 3.5 / part of Thm 3.12): for `N` abelian normal
+in `G` with coprime order/index, any two complements are conjugate by an element of `N`.
+
+Proof: realize `K, K'` as `MulAction.stabilizer G αK`, `MulAction.stabilizer G αK'` for
+`αK, αK' ∈ N.QuotientDiff` (via `stabilizer_quotientDiff_eq_self`). Apply mathlib's
+`Subgroup.exists_smul_eq` to get `⟨n, hn⟩ • αK = αK'`, and conclude via
+`MulAction.stabilizer_smul_eq_stabilizer_map_conj`. -/
 private theorem abelian_sz_conjugacy
     {N : Subgroup G} [N.Normal] [Finite G] [IsMulCommutative N]
     (hN : Nat.Coprime (Nat.card N) N.index)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
-  -- Construct LeftTransversals from complements.
-  let TK : N.LeftTransversal := ⟨(K : Set G), hK.symm⟩
-  let TK' : N.LeftTransversal := ⟨(K' : Set G), hK'.symm⟩
-  -- Form QuotientDiff classes.
-  let αK : N.QuotientDiff := Quotient.mk'' TK
-  let αK' : N.QuotientDiff := Quotient.mk'' TK'
-  -- Apply mathlib exists_smul_eq (requires [FiniteIndex N], auto from [Finite G] instance).
+  let αK : N.QuotientDiff :=
+    Quotient.mk'' (⟨(K : Set G), hK.symm⟩ : N.LeftTransversal)
+  let αK' : N.QuotientDiff :=
+    Quotient.mk'' (⟨(K' : Set G), hK'.symm⟩ : N.LeftTransversal)
+  have hαK : αK = (Quotient.mk'' (⟨(K : Set G), hK.symm⟩ : N.LeftTransversal)
+      : N.QuotientDiff) := rfl
+  have hαK' : αK' = (Quotient.mk'' (⟨(K' : Set G), hK'.symm⟩ : N.LeftTransversal)
+      : N.QuotientDiff) := rfl
+  -- Apply mathlib exists_smul_eq.
   obtain ⟨⟨n, hn⟩, hsmul⟩ := Subgroup.exists_smul_eq hN αK αK'
   refine ⟨n, hn, ?_⟩
-  -- hsmul : (⟨n, hn⟩ : ↥N) • αK = αK' (in N.QuotientDiff).
-  -- Need: K.map (conj n) = K' (subgroup conjugation).
-  -- TODO: technical transition via Quotient.exact' + diff = 1 + subgroup characterization.
-  sorry
+  -- hsmul : (⟨n, hn⟩ : ↥N) • αK = αK'.
+  -- Subgroup-induced action coincides with G-action on Subtype.val.
+  have hsmul_G : (n : G) • αK = αK' := hsmul
+  -- Apply stabilizer_smul_eq_stabilizer_map_conj.
+  have hstab :
+      MulAction.stabilizer G ((n : G) • αK)
+        = (MulAction.stabilizer G αK).map (MulAut.conj n).toMonoidHom :=
+    MulAction.stabilizer_smul_eq_stabilizer_map_conj n αK
+  rw [hsmul_G] at hstab
+  -- Now hstab : stabilizer αK' = (stabilizer αK).map (conj n).
+  rw [stabilizer_quotientDiff_eq_self hN hK' αK' hαK',
+      stabilizer_quotientDiff_eq_self hN hK αK hαK] at hstab
+  exact hstab.symm
 
 /-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
 private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
