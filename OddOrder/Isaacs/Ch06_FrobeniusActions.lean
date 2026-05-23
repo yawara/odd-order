@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Data.Nat.ModEq
+import Mathlib.GroupTheory.FixedPointFree
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.FixedPoints
 import Mathlib.GroupTheory.GroupAction.Quotient
@@ -143,6 +144,88 @@ theorem coprime_card [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
     Nat.Coprime (Fintype.card N) (Fintype.card A) := by
   unfold Nat.Coprime
   rw [(card_modEq_one h).gcd_eq, Nat.gcd_one_left]
+
+/-! ### Theorem 6.3: even-order Frobenius complements
+
+If `|A|` is even and `N` is nontrivial under a Frobenius action, then `A` contains a *unique*
+involution and `N` is abelian.
+
+The proof leverages mathlib's `MonoidHom.FixedPointFree` machinery (`Mathlib/GroupTheory/
+FixedPointFree.lean`): for each `t ∈ A`, the map `n ↦ t • n` is an automorphism of `N`, and the
+Frobenius condition (with `t ≠ 1`) is exactly fixed-point-freeness. When `t² = 1` (involution),
+the map is involutive, so by `commute_all_of_involutive` `N` is commutative, and the unique
+involution follows from the fact that any involution inverts every element. -/
+
+/-- The action of `t ∈ A` on `N` (as `MulDistribMulAction.toMulAut`) is fixed-point-free whenever
+`t ≠ 1` and the action of `A` on `N` is Frobenius. -/
+theorem fixedPointFree_toMulAut (h : IsFrobeniusAction A N) {t : A} (ht : t ≠ 1) :
+    MonoidHom.FixedPointFree (MulDistribMulAction.toMulAut A N t) := by
+  intro n hn
+  by_contra hne
+  exact h t ht n hne (by simpa using hn)
+
+/-- If `t ∈ A` satisfies `t² = 1`, then its action on `N` is involutive (as a function). -/
+theorem involutive_toMulAut_of_sq_eq_one {t : A} (ht_sq : t ^ 2 = 1) :
+    Function.Involutive ((MulDistribMulAction.toMulAut A N t : MulAut N) : N → N) := by
+  intro n
+  change t • (t • n) = n
+  rw [← mul_smul, ← sq, ht_sq, one_smul]
+
+/-- **Key lemma for Thm 6.3**: an involution `t ∈ A` (`t ≠ 1`, `t² = 1`) inverts every element
+of `N` under a Frobenius action. -/
+theorem involution_smul_eq_inv [Finite N] (h : IsFrobeniusAction A N)
+    {t : A} (ht_ne : t ≠ 1) (ht_sq : t ^ 2 = 1) (n : N) : t • n = n⁻¹ := by
+  have hfree := fixedPointFree_toMulAut h ht_ne
+  have hinv := involutive_toMulAut_of_sq_eq_one (A := A) (N := N) ht_sq
+  have h_eq := hfree.coe_eq_inv_of_involutive hinv
+  -- h_eq : ⇑(MulDistribMulAction.toMulAut A N t) = (·⁻¹)
+  have := congrFun h_eq n
+  simpa using this
+
+/-- **Isaacs Theorem 6.3** (commutativity part): `|A|` even + Frobenius action on nontrivial `N`
+⇒ every pair in `N` commutes. -/
+theorem commute_of_card_even [Finite A] [Finite N] (h : IsFrobeniusAction A N)
+    (h_even : 2 ∣ Nat.card A) (x y : N) : Commute x y := by
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨t, ht_ord⟩ :=
+    exists_prime_orderOf_dvd_card 2 (by rwa [Nat.card_eq_fintype_card] at h_even)
+  have ht_ne : t ≠ 1 := by
+    intro heq; rw [heq, orderOf_one] at ht_ord; norm_num at ht_ord
+  have ht_sq : t ^ 2 = 1 := by rw [← ht_ord, pow_orderOf_eq_one]
+  exact (fixedPointFree_toMulAut h ht_ne).commute_all_of_involutive
+    (involutive_toMulAut_of_sq_eq_one ht_sq) x y
+
+/-- **Isaacs Theorem 6.3** (uniqueness of involution): `|A|` even + Frobenius action on nontrivial
+`N` ⇒ `A` has exactly one element of order 2. -/
+theorem unique_involution [Finite A] [Finite N] (h : IsFrobeniusAction A N)
+    (h_even : 2 ∣ Nat.card A) (hN : Nontrivial N) :
+    ∃! t : A, t ≠ 1 ∧ t ^ 2 = 1 := by
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨t, ht_ord⟩ :=
+    exists_prime_orderOf_dvd_card 2 (by rwa [Nat.card_eq_fintype_card] at h_even)
+  have ht_ne : t ≠ 1 := by
+    intro heq; rw [heq, orderOf_one] at ht_ord; norm_num at ht_ord
+  have ht_sq : t ^ 2 = 1 := by rw [← ht_ord, pow_orderOf_eq_one]
+  refine ⟨t, ⟨ht_ne, ht_sq⟩, ?_⟩
+  rintro s ⟨hs_ne, hs_sq⟩
+  -- Both `s` and `t` invert every element of `N`. Hence `s * t⁻¹` fixes a nontrivial `n`.
+  obtain ⟨n, hn_ne⟩ := exists_ne (1 : N)
+  have hs_inv : s • n = n⁻¹ := involution_smul_eq_inv h hs_ne hs_sq n
+  have ht_inv : t • n = n⁻¹ := involution_smul_eq_inv h ht_ne ht_sq n
+  -- `t⁻¹ = t` since `t² = 1`.
+  have ht_inv_eq : t⁻¹ = t := by
+    rw [inv_eq_iff_mul_eq_one, ← sq, ht_sq]
+  -- `(s * t⁻¹) • n = s • (t • n) = s • n⁻¹ = (s • n)⁻¹ = n`.
+  have h_st_n : (s * t⁻¹) • n = n := by
+    rw [mul_smul, ht_inv_eq, ht_inv, smul_inv', hs_inv, inv_inv]
+  -- By Frobenius, `s * t⁻¹ = 1`, i.e., `s = t`.
+  by_contra h_neq
+  have h_st_ne : s * t⁻¹ ≠ 1 := by
+    intro h_eq
+    exact h_neq (mul_inv_eq_one.mp h_eq)
+  exact h _ h_st_ne n hn_ne h_st_n
 
 end IsFrobeniusAction
 
