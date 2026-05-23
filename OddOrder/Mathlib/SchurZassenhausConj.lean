@@ -527,7 +527,20 @@ private theorem step_caseB
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
-  sorry
+  -- Trivial case: N = ⊤ ⇒ K = K' = ⊥.
+  by_cases hN_top : N = ⊤
+  · subst hN_top
+    have hK_bot : K = ⊥ := by
+      have h_inf : ⊤ ⊓ K = ⊥ := hK.disjoint.eq_bot
+      rwa [top_inf_eq] at h_inf
+    have hK'_bot : K' = ⊥ := by
+      have h_inf : ⊤ ⊓ K' = ⊥ := hK'.disjoint.eq_bot
+      rwa [top_inf_eq] at h_inf
+    refine ⟨1, (⊤ : Subgroup G).one_mem, ?_⟩
+    rw [hK_bot, hK'_bot]
+    ext x
+    simp [Subgroup.mem_map, Subgroup.mem_bot]
+  sorry  -- Main: minimal normal M/N + Sylow C + N_G(L) argument
 
 /-- **Main induction**: combines `step_caseA` and `step_caseB` via strong induction. -/
 private theorem main_aux {n : ℕ} :
