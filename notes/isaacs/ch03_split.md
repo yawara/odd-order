@@ -142,11 +142,45 @@ iter 1-9 で 9 commit. abelian_sz_conjugacy + step_caseB main は技術的に重
 
 - 完成後 → axiom 削除 → Phase 2 着手可能.
 
-### Phase 2: Hall-C (Thm 3.14) — Phase 1 完成 blocked
-- 場所: `OddOrder/Isaacs/Ch03_SplitExtensions.lean` §3C
-- 現状: leaf axiom 削除済 (2026-05-22). placeholder コメント中.
-- Phase 1 完成後: `IsComplement'.exists_conj_of_coprime` (= SZ conjugacy theorem) を使って
-  `hall_C` theorem 化. ~30-50 LOC.
+### Phase 2: Hall-C (Thm 3.14) — **完全完成** ⭐⭐⭐ (2026-05-23 セッション, commit bfe92da, e4bf24d)
+
+**`hall_C`** が `propext, Classical.choice, Quot.sound` のみに依存する unconditional theorem として確立. AxiomsCheck flagship 入り.
+
+#### 実装詳細 (~300 LOC for `hall_C_strong_aux` + ~6 LOC for `hall_C` public)
+
+`hall_C_strong_aux` 構造:
+- Base case (|G| = 1): K = H = ⊥, g = 1.
+- 設定: M minimal normal (Thm 3.11 elementary abelian p-group), |G/M| ≤ n.
+- **Step 1**: H̄ := H.map (mk' M), K̄ := K.map (mk' M) は π-Hall in G/M.
+  証明: card_map_dvd + index_map_dvd で primeFactors propagation.
+- **Step 2**: IH on G/M で ∃ ḡ, H̄.map (conj ḡ) = K̄.
+- **Step 3**: Lift ḡ to g via mk_surjective.
+- **Step 4**: H^g ⊔ M = K ⊔ M via mk'-conj 交換律 + map_eq_map_iff.
+- **Step 5a (case p ∈ π)** (~60 LOC):
+  - `π_hall_max` helper: 任意 π-subgroup S, T pi-Hall ⇒ |S| ∣ |T| (coprime dvd_of_dvd_mul_right).
+  - `hSup_pi`: |S ⊔ M| primes ⊆ π (HK formula + Nat.Prime.dvd_mul case分け).
+  - `hM_le_hall`: |S ⊔ M| = |S| ⇒ S ⊔ M = S ⇒ M ⊆ S.
+  - 適用: M ⊆ H, M ⊆ K, hence M ⊆ H^g (M ⊴ G), HM_g = H^g, KM = K, 結論 H^g = K.
+- **Step 5b (case p ∉ π)** (~140 LOC):
+  - `h_inter_bot` helper: pi-Hall S + p ∉ π ⇒ S ⊓ M = ⊥ (coprime orders).
+  - Hg := H^g も π-Hall (cardinality + index preservation by equivMapOfInjective / index_map_equiv).
+  - HM := Hg ⊔ M = K ⊔ M.
+  - 構成 `Subgroup.IsComplement' (M.subgroupOf HM) (Hg.subgroupOf HM)` in ↥HM:
+    * Disjoint: M ⊓ Hg = ⊥.
+    * Product 覆い: mem_sup_of_normal_right で h * m → m' * h 変換 (M ⊴ G).
+  - 同様に K side.
+  - M.subgroupOf HM solvable (subgroupOfEquivOfLe + solvable_of_solvable_injective).
+  - Coprime (|M.subgroupOf HM|, (M.subgroupOf HM).index) = (|M|, |Hg|): p-power vs π-Hall.
+  - **Phase 1 `Subgroup.IsComplement'.exists_conj_of_coprime` 適用** ⇒
+    ∃ n_HM ∈ M.subgroupOf HM, Hg.subgroupOf HM .map (conj n_HM) = K.subgroupOf HM.
+  - Push back to G via HM.subtype: inline intertwining + map_map + subgroupOf_map_subtype.
+  - 結論: K = H^(m * g) (composition rule).
+
+`hall_C` public theorem: `hall_C_strong_aux (Nat.card G) G le_rfl hH hK` (~6 LOC).
+
+#### Phase 3 (Hall-D, Thm 3.17) unblock 可能性
+
+Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着手可. ただし Thm 3.15/3.17 は Burnside p^a q^b 経由 ⇒ Ch.7 完成後. Ch.4-7 横断パスは別途.
 
 ### Phase 4: Thm 3.36 (cyclic extension existence) — ralph-loop 委譲中
 - 場所: `OddOrder/Isaacs/Ch03_SplitExtensions.lean` §3F (`cyclic_quotient_extension_unique`
