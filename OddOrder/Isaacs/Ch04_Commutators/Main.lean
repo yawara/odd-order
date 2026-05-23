@@ -2822,6 +2822,32 @@ lemma baerAdd_assoc {G : Type*} [Group G] (hC : _root_.commutator G ≤ Subgroup
     rw [h_rearrange, h_Sxy_z.eq]; group
   rw [h_LHS_norm, h_RHS_norm]
 
+/-- **Lem 4.37 part (c)**: Every group homomorphism (between equal-card groups) preserves
+`baerAdd`: `f (baerAdd x y) = baerAdd (f x) (f y)`. -/
+lemma baerAdd_map_eq {G H : Type*} [Group G] [Group H] (f : G →* H)
+    (h_card : Nat.card G = Nat.card H) (x y : G) :
+    f (baerAdd x y) = baerAdd (f x) (f y) := by
+  rw [baerAdd_def, baerAdd_def, map_mul, map_mul]
+  congr 1
+  -- f (sqrtOdd ⁅y, x⁆) = sqrtOdd (f ⁅y, x⁆) = sqrtOdd ⁅f y, f x⁆
+  rw [sqrtOdd, sqrtOdd, h_card, map_pow, map_commutatorElement]
+
+/-- **Lem 4.37 part (c) for MulEquiv** (Aut preservation): For `f : G ≃* G`,
+`f (baerAdd x y) = baerAdd (f x) (f y)`. つまり multiplicative automorphism は
+baerAdd を保存. -/
+lemma baerAdd_mulEquiv_eq {G : Type*} [Group G] (f : G ≃* G) (x y : G) :
+    f (baerAdd x y) = baerAdd (f x) (f y) :=
+  baerAdd_map_eq f.toMonoidHom rfl x y
+
+/-! **Lem 4.37 AddCommGroup instance** + **(b) additive order = multiplicative order**:
+形式化 TODO.
+
+教科書 (Isaacs p.142) (b) 証明: `nx = x + (n-1)x = x + x^(n-1) = x · x^(n-1) = x^n`
+(commute case で baerAdd_eq_mul_of_commute, induction on n). ⇒ AddOrderOf = OrderOf.
+
+実装メモ: `AddCommGroup G` 構築には `Zero G` (= 1) + `nsmul`, `zsmul` の field 完全実装が必要
+(`nsmulRec` 等 default は `Add G` instance 経由で nsmul = pow に reduce すべき). 別 session 完成. -/
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
