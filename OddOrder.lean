@@ -4,6 +4,7 @@ import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.SCN
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
