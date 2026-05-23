@@ -849,8 +849,8 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 - **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
 - **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 形式化保留.
 - **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
-- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ Part 1 (`hasNormalPComplement_of_subgroup`).
-  Part 2 (`isPGroup_normalizer_quotient_centralizer`) は保留.
+- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
+  Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
 - **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): 形式化保留 (5.26 鍵).
 - **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
 - **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
@@ -956,26 +956,114 @@ theorem hasNormalPComplement_of_subgroup [Finite G] {p : ℕ} [Fact p.Prime]
     exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_M).symm).pow_right a
   exact Subgroup.isComplement'_of_coprime h_mul_eq h_coprime
 
-/-! **Isaacs Lem 5.27 part 2 (2 ⇒ 3)** — placeholder.
+/-- `(C_G(X)).subgroupOf (N_G(X))` は `N_G(X)` で normal (kernel of `normalizerMonoidHom`).
+mathlib `normalizerMonoidHom_ker` 経由で機械的に得られるが、typeclass resolution が
+直接行かないので明示 instance 化. -/
+instance centralizer_subgroupOf_normalizer_normal (X : Subgroup G) :
+    ((Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))).Normal := by
+  rw [← X.normalizerMonoidHom_ker]
+  infer_instance
 
-形式化保留. 必要なステップ (Isaacs p.174 の trivial direction):
-* 仮定: ∀ 非自明 p-subgroup `X`, `N_G(X)` が normal p-complement `K'` を持つ.
-* `X ≠ ⊥` の場合: `K' ⊓ X.subgroupOf N_G(X) = ⊥` (|K'| p', |X| p-power) かつ両者
-  N_G(X) で normal ⇒ `[K', X.subgroupOf] ⊆ ⊥` (Three-Subgroup 系の commutator) ⇒
-  `K' ≤ (centralizer X).subgroupOf N_G(X)` (`commutator_eq_bot_iff_le_centralizer`).
-  N_G(X)/K' は p-power ⇒ 商の商 N_G(X)/centralizer も p-power.
-* `X = ⊥`: `normalizer ⊥ = ⊤`, `centralizer (⊥ : Set G) = ⊤`, quotient trivial.
+/-- **Isaacs Lem 5.27 part 2 (2 ⇒ 3)**: 仮定「∀ 非自明 p-subgroup `X` ⊆ `G`,
+`N_G(X)` が normal p-complement を持つ」 ⇒ 任意 p-subgroup `X` で
+`↥N_G(X) / (C_G(X)).subgroupOf N_G(X)` は p-group.
 
-statement 例:
-```lean
-theorem isPGroup_normalizer_quotient_centralizer
+**証明** (Isaacs p.174):
+* `X = ⊥` の場合: `centralizer (⊥ : Set G) = ⊤` (1 と全 g が可換) ⇒
+  `subgroupOf normalizer = ⊤` ⇒ 商 ↥(normalizer ⊥) ⧸ ⊤ は Subsingleton ⇒ p-group.
+* `X ≠ ⊥` の場合: 仮定で `normalizer X` の normal p-complement `K'` を得る.
+  `X.subgroupOf (normalizer X)` (`X_n`) は normal (`normal_in_normalizer`),
+  `K'` も normal. `K' ⊓ X_n = ⊥` (|K'| coprime to p, |X_n| = |X| p-power,
+  `inf_eq_bot_of_coprime`).
+  `[K', X_n] ≤ K' ⊓ X_n = ⊥` (`commutator_le_inf` with両 normal) ⇒
+  `K' ≤ centralizer X_n` (`commutator_eq_bot_iff_le_centralizer`).
+  座標 ↥(normalizer X) → G で `K' ≤ (centralizer X).subgroupOf (normalizer X)` (`C_n`).
+  `↥(normalizer X) ⧸ K'` は p-group (Sylow Q complement), `↥(normalizer X) ⧸ C_n` は
+  その quotient (`QuotientGroup.map (id) ... K'≤C_n`) ⇒ `IsPGroup.of_surjective` で p-group. -/
+theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
+    [Finite G] {p : ℕ} [Fact p.Prime]
     (h : ∀ X : Subgroup G, X ≠ ⊥ → IsPGroup p X →
-        HasNormalPComplement p ↥(Subgroup.normalizer X))
+        HasNormalPComplement p ↥(Subgroup.normalizer (X : Set G)))
     (X : Subgroup G) (hXp : IsPGroup p X) :
-    IsPGroup p (↥(Subgroup.normalizer X) ⧸
-      (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer X))
-```
--/
+    IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+      (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))) := by
+  -- 統一戦略: `C_n := (centralizer X).subgroupOf (normalizer X)` の `index` が `p` 乗
+  -- であることを示し, `IsPGroup.of_card` を介して `↥N ⧸ C_n` が p-group であることを導く.
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  -- ∃ b, C_n.index = p^b を示せばよい
+  suffices h_idx_pow : ∃ b, ((Subgroup.centralizer (X : Set G)).subgroupOf N).index = p ^ b by
+    obtain ⟨b, hb⟩ := h_idx_pow
+    refine IsPGroup.of_card (n := b) ?_
+    rw [← Subgroup.index_eq_card]; exact hb
+  -- 場合分け
+  by_cases hX_bot : X = ⊥
+  · -- X = ⊥: centralizer = ⊤ ⇒ subgroupOf = ⊤ ⇒ index = 1 = p^0
+    refine ⟨0, ?_⟩
+    rw [pow_zero]
+    have hSubgroup_top : (Subgroup.centralizer (X : Set G)).subgroupOf N = ⊤ := by
+      ext ⟨g, hg⟩
+      refine ⟨fun _ => Subgroup.mem_top _, fun _ => ?_⟩
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff]
+      intro b hb
+      subst hX_bot
+      rw [Subgroup.coe_bot, Set.mem_singleton_iff] at hb
+      rw [hb, one_mul, mul_one]
+    rw [hSubgroup_top, Subgroup.index_top]
+  · -- X ≠ ⊥: hypothesis gives K' normal p-complement, K' ≤ C_n, C_n.index ∣ K'.index = p^a
+    obtain ⟨K', hK'_normal, hK'_compl⟩ := h X hX_bot hXp
+    haveI : K'.Normal := hK'_normal
+    let X_n : Subgroup ↥N := X.subgroupOf N
+    haveI hX_n_normal : X_n.Normal := by
+      change (X.subgroupOf (Subgroup.normalizer (X : Set G))).Normal
+      exact Subgroup.normal_in_normalizer
+    -- Sylow Q in ↥N
+    obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p ↥N))
+    have hQ_compl : Subgroup.IsComplement' K' (Q : Subgroup ↥N) := hK'_compl Q
+    -- ¬ p ∣ |K'| (Sylow not_dvd_index + IsComplement'.index_eq_card)
+    have h_p_ndvd_K' : ¬ p ∣ Nat.card ↥K' := by
+      rw [← hQ_compl.index_eq_card]; exact Q.not_dvd_index
+    -- X_n p-group (|X_n| = |X|)
+    have h_X_n_pg : IsPGroup p X_n := by
+      have hX_le_N : X ≤ N := Subgroup.le_normalizer
+      have h_card_eq : Nat.card ↥X_n = Nat.card ↥X :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX_le_N).toEquiv
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hXp
+      exact IsPGroup.of_card (h_card_eq.trans hk)
+    -- K' ⊓ X_n = ⊥ (coprime cards)
+    have h_inf_bot : K' ⊓ X_n = ⊥ := by
+      apply Subgroup.inf_eq_bot_of_coprime
+      obtain ⟨k, hX_n_card⟩ := IsPGroup.iff_card.mp h_X_n_pg
+      rw [hX_n_card]
+      exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_K').symm).pow_right k
+    -- [K', X_n] = ⊥ (commutator_le_inf with K', X_n both normal)
+    have h_comm_bot : ⁅K', X_n⁆ = ⊥ :=
+      le_bot_iff.mp (h_inf_bot ▸ Subgroup.commutator_le_inf K' X_n)
+    -- K' ≤ centralizer (X_n : Set ↥N)
+    have h_K'_cent : K' ≤ Subgroup.centralizer (X_n : Set ↥N) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp h_comm_bot
+    -- K' ≤ (centralizer X).subgroupOf N
+    have h_K'_le_C_n : K' ≤ (Subgroup.centralizer (X : Set G)).subgroupOf N := by
+      intro k hk
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff]
+      intro x hxX
+      have hxN : x ∈ N := Subgroup.le_normalizer hxX
+      have hx_in_Xn : (⟨x, hxN⟩ : ↥N) ∈ X_n := by
+        change (⟨x, hxN⟩ : ↥N) ∈ X.subgroupOf N
+        rw [Subgroup.mem_subgroupOf]; exact hxX
+      have hkx_eq : (⟨x, hxN⟩ : ↥N) * k = k * (⟨x, hxN⟩ : ↥N) :=
+        Subgroup.mem_centralizer_iff.mp (h_K'_cent hk) ⟨x, hxN⟩ hx_in_Xn
+      exact congrArg Subtype.val hkx_eq
+    -- K'.index = |Q| (IsComplement'.symm.index_eq_card)
+    have hK'_idx : K'.index = Nat.card ↥(Q : Subgroup ↥N) := hQ_compl.symm.index_eq_card
+    -- K'.index = p^a (Q is p-group)
+    obtain ⟨a, hKa⟩ : ∃ a, K'.index = p ^ a := by
+      rw [hK'_idx]; exact IsPGroup.iff_card.mp Q.isPGroup'
+    -- C_n.index ∣ K'.index (K' ≤ C_n)
+    have hC_n_idx_dvd : ((Subgroup.centralizer (X : Set G)).subgroupOf N).index ∣ K'.index :=
+      Subgroup.index_dvd_of_le h_K'_le_C_n
+    -- C_n.index = p^b for some b ≤ a
+    rcases (Nat.dvd_prime_pow Fact.out).mp (hKa ▸ hC_n_idx_dvd) with ⟨b, _, hb⟩
+    exact ⟨b, hb⟩
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
