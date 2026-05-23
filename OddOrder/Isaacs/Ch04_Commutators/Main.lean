@@ -342,10 +342,125 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
   rw [commutatorElement_eq_one_iff_mul_comm]
   exact habelian _ _
 
+/-! ### Lemma 4.6 後半: hom A → commutator G + ker = A ∩ Z(G) -/
+
+/-- Helper: For `A ⊴ G` and `b ∈ A`, `⁅b, g⁆ ∈ A` for any `g : G`.
+
+`⁅b, g⁆ = b · (g · b⁻¹ · g⁻¹)`. `b⁻¹ ∈ A` + A normal ⇒ `g · b⁻¹ · g⁻¹ ∈ A`. -/
+private lemma commutatorElement_mem_of_normal {A : Subgroup G} [A.Normal]
+    {b : G} (hb : b ∈ A) (g : G) : ⁅b, g⁆ ∈ A := by
+  have heq : ⁅b, g⁆ = b * (g * b⁻¹ * g⁻¹) := by
+    rw [commutatorElement_def]; group
+  rw [heq]
+  exact A.mul_mem hb (‹A.Normal›.conj_mem _ (A.inv_mem hb) g)
+
+/-- **Lemma 4.6 hom** (右 commutator hom): For `A ⊴ G` abelian and any `g : G`,
+the map `θ : A → G` by `θ a = ⁅a, g⁆` is a monoid homomorphism.
+
+`map_mul`: general identity `⁅ab, g⁆ = a · ⁅b, g⁆ · a⁻¹ · ⁅a, g⁆`. `⁅b, g⁆ ∈ A`
+(A normal) + A abelian ⇒ `a · ⁅b, g⁆ · a⁻¹ = ⁅b, g⁆`. Result `⁅b, g⁆ · ⁅a, g⁆`
+を A 内 swap で `⁅a, g⁆ · ⁅b, g⁆`. -/
+def commutatorRightHom {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (g : G) : A →* G where
+  toFun a := ⁅(a : G), g⁆
+  map_one' := by
+    show ⁅((1 : A) : G), g⁆ = 1
+    rw [Subgroup.coe_one]
+    exact commutatorElement_one_left g
+  map_mul' a b := by
+    show ⁅((a * b : A) : G), g⁆ = ⁅((a : A) : G), g⁆ * ⁅((b : A) : G), g⁆
+    rw [Subgroup.coe_mul, commutatorElement_mul_left_eq]
+    have hbg : ⁅(b : G), g⁆ ∈ A := commutatorElement_mem_of_normal b.2 g
+    have hag : ⁅(a : G), g⁆ ∈ A := commutatorElement_mem_of_normal a.2 g
+    have h1 : (a : G) * ⁅(b : G), g⁆ * (a : G)⁻¹ = ⁅(b : G), g⁆ := by
+      rw [hAb _ a.2 _ hbg, mul_assoc, mul_inv_cancel, mul_one]
+    rw [h1]
+    exact hAb _ hbg _ hag
+
+/-- The range of `commutatorRightHom hAb g` is contained in `commutator G`. -/
+theorem commutatorRightHom_range_le_commutator {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (g : G) :
+    (commutatorRightHom hAb g).range ≤ _root_.commutator G := by
+  rintro x ⟨a, rfl⟩
+  show ⁅((a : A) : G), g⁆ ∈ _root_.commutator G
+  exact commutatorElement_mem_commutator_top _ _
+
+/-- For `g : G` such that `g · A` generates `G ⧸ A`, `A ⊔ ⟨g⟩ = ⊤`. -/
+private lemma sup_zpowers_eq_top_of_generator_quot
+    {A : Subgroup G} [A.Normal] {g : G}
+    (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) :
+    A ⊔ Subgroup.zpowers g = ⊤ := by
+  rw [eq_top_iff]
+  intro x _
+  obtain ⟨k, hk⟩ := hgen (x : G ⧸ A)
+  -- hk : (↑g : G ⧸ A)^k = (↑x : G ⧸ A)
+  -- So (↑(g^k) : G ⧸ A) = (↑x : G ⧸ A), i.e., x * (g^k)⁻¹ ∈ A.
+  have hk' : ((g^k : G) : G ⧸ A) = ((x : G) : G ⧸ A) := by
+    rw [← hk]
+    exact (map_zpow (QuotientGroup.mk' A) g k).symm
+  -- From hk': (g^k : G ⧸ A) = (x : G ⧸ A), so g^k / x ∈ A by QuotientGroup.eq_iff_div_mem
+  have h_div : g^k / x ∈ A := (QuotientGroup.eq_iff_div_mem (N := A)).mp hk'
+  -- Hence x * (g^k)⁻¹ = (g^k / x)⁻¹ ∈ A
+  have hxgk : x * (g^k)⁻¹ ∈ A := by
+    have heq : x * (g^k)⁻¹ = (g^k / x)⁻¹ := by rw [div_eq_mul_inv]; group
+    rw [heq]
+    exact A.inv_mem h_div
+  -- x = (x * (g^k)⁻¹) * g^k ∈ A · ⟨g⟩
+  have hx_eq : x = (x * (g^k)⁻¹) * g^k := by group
+  rw [hx_eq]
+  exact Subgroup.mul_mem_sup hxgk (Subgroup.zpow_mem_zpowers g k)
+
+/-- For `g : G` such that `g · A` generates `G ⧸ A`, and `A` is abelian normal:
+`a ∈ A` is in the kernel of `commutatorRightHom hAb g` iff `(a : G) ∈ Z(G)`. -/
+theorem commutatorRightHom_mem_ker_iff {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    {g : G} (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) (a : A) :
+    a ∈ (commutatorRightHom hAb g).ker ↔ (a : G) ∈ Subgroup.center G := by
+  constructor
+  · -- Forward: a ∈ ker (commutes with g) + A abelian ⇒ a commutes with A ⊔ ⟨g⟩ = G
+    intro ha
+    rw [MonoidHom.mem_ker] at ha
+    -- ha : ⁅(a : G), g⁆ = 1, i.e., a · g = g · a
+    have ha_g : (a : G) * g = g * (a : G) :=
+      commutatorElement_eq_one_iff_mul_comm.mp ha
+    rw [Subgroup.mem_center_iff]
+    intro x
+    -- S := { x : G | (a : G) · x = x · (a : G) } = centralizer {a}
+    let S : Subgroup G := Subgroup.centralizer ({(a : G)} : Set G)
+    -- A ≤ S (A abelian, a ∈ A)
+    have hAS : A ≤ S := by
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff]
+      rintro z (rfl : z = (a : G))
+      exact hAb _ a.2 _ hy
+    -- g ∈ S
+    have hgS : g ∈ S := by
+      rw [Subgroup.mem_centralizer_iff]
+      rintro z (rfl : z = (a : G))
+      exact ha_g
+    -- ⟨g⟩ ≤ S
+    have hzpgS : Subgroup.zpowers g ≤ S := by
+      rw [Subgroup.zpowers_eq_closure]
+      exact Subgroup.closure_le _ |>.mpr (by rintro _ (rfl : _ = g); exact hgS)
+    -- A ⊔ ⟨g⟩ ≤ S
+    have hsupS : A ⊔ Subgroup.zpowers g ≤ S := sup_le hAS hzpgS
+    -- ⊤ ≤ S
+    have hsupTop : A ⊔ Subgroup.zpowers g = ⊤ := sup_zpowers_eq_top_of_generator_quot hgen
+    have hTopS : (⊤ : Subgroup G) ≤ S := hsupTop ▸ hsupS
+    -- x ∈ S
+    have hxS : x ∈ S := hTopS (Subgroup.mem_top x)
+    rw [Subgroup.mem_centralizer_iff] at hxS
+    exact (hxS _ rfl).symm
+  · intro ha
+    rw [MonoidHom.mem_ker]
+    show ⁅(a : G), g⁆ = 1
+    rw [commutatorElement_eq_one_iff_mul_comm]
+    exact (Subgroup.mem_center_iff.mp ha g).symm
+
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
 `|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
 
-Lem 4.6 を経由. 形式化保留. -/
+Lem 4.6 後半 + Thm 1.19 経由予定. 形式化保留. -/
 
 /-! ### Commutator collection in class ≤ 2 (Thm 4.8 の前段) -/
 
