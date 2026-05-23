@@ -20,6 +20,10 @@
 - **§2 は Isaacs Ch.6 §6F Clifford 完成依存** (Prop 2.2 で必須). Ch.6 not started ⇒ §2 全体 blocker.
 - 新規 shared modules: `IsExtraspecial.lean`, `AbsolutelyIrreducible.lean`, `Clifford.lean`, `PGroupFixedVector.lean`, `EigenspaceUnderCyclicAction.lean`.
 
+## 実装ログ
+
+- **2026-05-24** [`OddOrder/BG/Ch1_Preliminary/S02_Representations.lean`](../../OddOrder/BG/Ch1_Preliminary/S02_Representations.lean) **skeleton 完成** (~330 行 docstring 中心). 6 sub-section (§2A Prop 2.1 / §2B Prop 2.2 / §2C Lem 2.3 / §2D Prop 2.4 / §2E Thm 2.5 / §2F Thm 2.6) に BG 本文 statement (mmd L598-793) + 形式化方針 + mathlib カバレッジ + 下流引用 (audit 実測) + Lean signature 案 を整理. **statement stub は全 6 結果未配置** (`RepresentationTheory/*` shared module 5 件未作成 + Isaacs Ch.6 §6F Clifford 未完成). 着手順 (audit 推奨): Thm 2.6 → Prop 2.4 → Prop 2.1 → Thm 2.5 → Prop 2.2 (Ch.6 待ち); Lem 2.3 (forward use 0, defer).
+
 ## TL;DR
 
 **§2 は基本的な表現論モジュール**: operator group G に対する FG-加群の性質を 6 つの定理で系統化. 主な成果は:
