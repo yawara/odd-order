@@ -130,6 +130,42 @@ theorem inf_eq_bot_of_pGroup_coprime
   rw [hpow_eq_one] at hk
   exact Subgroup.eq_bot_of_card_eq _ hk
 
+/-- **Helper for Lem 1.14** (Step 2, cardinality): `T ⊓ M = ⊥` + `M ⊴ G` ⇒
+`|T ⊔ M| = |T| · |M|`. mathlib 第二同型 `quotientInfEquivProdNormalQuotient` +
+`subgroupOfEquivOfLe` + `card_eq_card_quotient_mul_card_subgroup`. -/
+theorem card_sup_eq_card_mul_card_of_disjoint_normal
+    {G : Type*} [Group G] [Finite G]
+    {T M : Subgroup G} [M.Normal] (h_disj : T ⊓ M = ⊥) :
+    Nat.card (T ⊔ M : Subgroup G) = Nat.card T * Nat.card M := by
+  -- Step A: M.subgroupOf T = ⊥ (from T ⊓ M = ⊥)
+  have hMT_bot : M.subgroupOf T = ⊥ := by
+    rw [Subgroup.subgroupOf_eq_bot, Subgroup.disjoint_def]
+    intro x hxM hxT
+    have hx_inf : x ∈ T ⊓ M := Subgroup.mem_inf.mpr ⟨hxT, hxM⟩
+    rwa [h_disj, Subgroup.mem_bot] at hx_inf
+  -- |M.subgroupOf T| = 1
+  have hMT_card_one : Nat.card (M.subgroupOf T) = 1 := by
+    rw [hMT_bot]; exact Subgroup.card_bot
+  -- |T| = |T ⧸ M.subgroupOf T| * |M.subgroupOf T| = |T ⧸ M.subgroupOf T|
+  have hT_quot_card : Nat.card T = Nat.card (T ⧸ M.subgroupOf T) := by
+    have := Subgroup.card_eq_card_quotient_mul_card_subgroup (M.subgroupOf T)
+    rw [hMT_card_one, mul_one] at this
+    exact this
+  -- Second iso theorem: T ⧸ M.subgroupOf T ≃* (T ⊔ M) ⧸ M.subgroupOf (T ⊔ M)
+  have h_iso := QuotientGroup.quotientInfEquivProdNormalQuotient T M
+  have h_eq_TM : Nat.card ((T ⊔ M : Subgroup G) ⧸ (M.subgroupOf (T ⊔ M))) = Nat.card T := by
+    rw [hT_quot_card]
+    exact (Nat.card_congr h_iso.toEquiv).symm
+  -- |M.subgroupOf (T ⊔ M)| = |M|
+  have hM_sub_TM_card : Nat.card (M.subgroupOf (T ⊔ M : Subgroup G)) = Nat.card M :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : M ≤ T ⊔ M)).toEquiv
+  -- |T ⊔ M| = |quotient| · |M.subgroupOf (T ⊔ M)| = |T| · |M|
+  have h_card : Nat.card ↥(T ⊔ M : Subgroup G) =
+      Nat.card ((T ⊔ M : Subgroup G) ⧸ (M.subgroupOf (T ⊔ M))) *
+      Nat.card (M.subgroupOf (T ⊔ M : Subgroup G)) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  rw [h_card, h_eq_TM, hM_sub_TM_card]
+
 /-- **BG Lemma 1.14 (易 direction, sorry-free)**: `N_G(T)·M ≤ N_G(T·M)`.
 
 - `T.normalizer ≤ (T ⊔ M).normalizer`: x normalizes T ⇒ x normalizes M (M ⊴ G) ⇒ x
