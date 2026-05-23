@@ -156,17 +156,68 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
   let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
   exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
 
-/-! ### Main induction (Isaacs Thm 3.12)
+/-! ### Step 1: Restriction reduction (proper subgroup `U`) -/
 
-To be completed in a follow-up session. Required steps:
-* `step_restriction`: proper subgroup `U < ⊤` contains `K, K'` ⇒ IH on `↥U` gives `n ∈ N ∩ U`.
-* `step_factor`: nontrivial `L ⊴ G` ⇒ IH on `G ⧸ L` gives `HL = (KL)^g`.
-* `step_caseA` (N solvable): minimal normal `L ⊆ N` (G-normal), `L` abelian; reduce to abelian SZ.
-* `step_caseB` (G/N solvable): minimal normal `M/N`, Sylow argument.
-* `main_aux`: strong induction in `Nat.card G` assembling above.
-* `axiom IsComplement'.exists_conj_of_coprime` → `theorem` via `main_aux`.
+variable [Finite G] {N : Subgroup G} [N.Normal]
 
-Current scaffolding: `IH G` def + Helpers A, B + solvability transfer instances. -/
+/-- `(K.subgroupOf U).map U.subtype = K` when `K ≤ U`. -/
+private theorem subgroupOf_map_subtype_eq {U K : Subgroup G} (hKU : K ≤ U) :
+    (K.subgroupOf U).map U.subtype = K := by
+  rw [subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hKU]
+
+/-- Conjugation by `n' : ↥U` in `↥U` corresponds (via `U.subtype`) to conjugation by `n'.val` in `G`. -/
+private theorem subtype_comp_conj_eq {U : Subgroup G} (n' : ↥U) :
+    U.subtype.comp ((MulAut.conj n').toMonoidHom) =
+      ((MulAut.conj (n'.val : G)).toMonoidHom).comp U.subtype := by
+  ext ⟨x, hx⟩
+  rfl
+
+/-- Pushing `((K.subgroupOf U).map (conj n')).map U.subtype` equals `K.map (conj n'.val)`. -/
+private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Subgroup G)
+    (hKU : K ≤ U) :
+    ((K.subgroupOf U).map (MulAut.conj n').toMonoidHom).map U.subtype =
+      K.map (MulAut.conj (n'.val : G)).toMonoidHom := by
+  rw [Subgroup.map_map, subtype_comp_conj_eq, ← Subgroup.map_map, subgroupOf_map_subtype_eq hKU]
+
+/-- **Step 1 (Restriction)**: if `K, K' ≤ U < ⊤`, the inductive hypothesis applied to `↥U`
+gives an element `n ∈ N` conjugating `K` to `K'`. -/
+private theorem step_restriction
+    (h1 : Nat.Coprime (Nat.card N) N.index)
+    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    (ih : IH G)
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K')
+    {U : Subgroup G} (hKU : K ≤ U) (hK'U : K' ≤ U) (hU_lt : U ≠ ⊤) :
+    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  -- |↥U| < |G| via Lagrange + index > 1.
+  have hcard_lt : Nat.card ↥U < Nat.card G := by
+    have h_idx : 1 < U.index := Subgroup.one_lt_index_of_ne_top hU_lt
+    calc Nat.card ↥U = Nat.card ↥U * 1 := (mul_one _).symm
+      _ < Nat.card ↥U * U.index := (Nat.mul_lt_mul_left Nat.card_pos).mpr h_idx
+      _ = Nat.card G := Subgroup.card_mul_index U
+  -- Coprime |N.subgroupOf U| (N.subgroupOf U).index.
+  have h_card_dvd : Nat.card (N.subgroupOf U) ∣ Nat.card N :=
+    Subgroup.card_comap_dvd_of_injective N U.subtype U.subtype_injective
+  have h_index_dvd : (N.subgroupOf U).index ∣ N.index :=
+    Subgroup.relIndex_dvd_index_of_normal N U
+  have h_cop : Nat.Coprime (Nat.card (N.subgroupOf U)) (N.subgroupOf U).index :=
+    (h1.coprime_dvd_left h_card_dvd).coprime_dvd_right h_index_dvd
+  -- Solvability transfer.
+  have h_solv : IsSolvable (N.subgroupOf U) ∨ IsSolvable (↥U ⧸ N.subgroupOf U) := by
+    rcases hSolv with h | h
+    · left; haveI := h; infer_instance
+    · right; haveI := h; infer_instance
+  -- Helper A: restrict complements to ↥U.
+  have hK_U : IsComplement' (N.subgroupOf U) (K.subgroupOf U) := hK.subgroupOf_of_le hKU
+  have hK'_U : IsComplement' (N.subgroupOf U) (K'.subgroupOf U) := hK'.subgroupOf_of_le hK'U
+  -- Apply IH.
+  obtain ⟨n', hn'_mem, hconj⟩ := ih ↥U hcard_lt h_cop h_solv hK_U hK'_U
+  -- Lift n' to n'.val ∈ G (which is ∈ N via mem_subgroupOf).
+  refine ⟨n'.val, hn'_mem, ?_⟩
+  -- Push hconj via U.subtype.
+  have hpush : ((K.subgroupOf U).map (MulAut.conj n').toMonoidHom).map U.subtype =
+               (K'.subgroupOf U).map U.subtype := by rw [hconj]
+  rw [map_subtype_conj_subgroupOf n' K hKU, subgroupOf_map_subtype_eq hK'U] at hpush
+  exact hpush
 
 end SchurZassenhausConj
 
