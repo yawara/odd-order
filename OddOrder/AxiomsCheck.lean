@@ -101,3 +101,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
 #assert_only_allowed_axioms Subgroup.IsComplement'.exists_conj_of_coprime
+
+-- Ch.3 (Split Extensions): Thm 3.14 Hall-C ⭐⭐⭐ **FT クリティカル**
+-- G finite solvable, π set of primes, H K both π-Hall ⇒ ∃ g, H^g = K.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_C
