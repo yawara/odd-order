@@ -38,6 +38,33 @@ namespace Subgroup
 
 variable {G : Type*} [Group G]
 
+/-! ### Helper B: Push a complement to a quotient -/
+
+/-- If `K` complements `N ⊴ G` with coprime cardinalities, then the images of `N` and `K`
+in `G/L` (any `L ⊴ G`) are also complements. (Isaacs Thm 3.12 proof, second paragraph.) -/
+theorem IsComplement'.map_mk' {N K : Subgroup G} [Finite G] [N.Normal]
+    (hK : IsComplement' N K) (h_cop : Nat.Coprime (Nat.card N) (Nat.card K))
+    (L : Subgroup G) [L.Normal] :
+    IsComplement' (N.map (QuotientGroup.mk' L)) (K.map (QuotientGroup.mk' L)) := by
+  apply isComplement'_of_disjoint_and_mul_eq_univ
+  · -- Disjoint via coprime cardinality.
+    refine disjoint_iff.mpr (inf_eq_bot_of_coprime ?_)
+    refine h_cop.coprime_dvd_left ?_ |>.coprime_dvd_right ?_
+    · exact Subgroup.card_map_dvd _ _
+    · exact Subgroup.card_map_dvd _ _
+  · -- mul = univ via mk' surjective + N ⊔ K = ⊤.
+    rw [Set.eq_univ_iff_forall]
+    intro x
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+    have hg_top : g ∈ (N ⊔ K : Subgroup G) := by rw [hK.sup_eq_top]; trivial
+    rw [mem_sup_of_normal_left] at hg_top
+    obtain ⟨n, hn, k, hk, hnk⟩ := hg_top
+    refine ⟨QuotientGroup.mk n, ?_, QuotientGroup.mk k, ?_, ?_⟩
+    · exact mem_map.mpr ⟨n, hn, rfl⟩
+    · exact mem_map.mpr ⟨k, hk, rfl⟩
+    · show (QuotientGroup.mk n : G ⧸ L) * QuotientGroup.mk k = QuotientGroup.mk g
+      rw [← QuotientGroup.mk_mul, hnk]
+
 /-! ### Helper A: Restriction of a complement to a containing subgroup -/
 
 /-- If `K ≤ U ≤ G` and `K` complements `N ⊴ G`, then `K.subgroupOf U` complements
