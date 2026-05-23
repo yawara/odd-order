@@ -83,7 +83,23 @@ namespace OddOrder.BG.Ch1.S01
 open OddOrder.Isaacs.Ch01
 open Pointwise
 
-/-! ## §1A-§1D: 未実装 (Phase 1 + shared module 待ち) -/
+/-! ## §1A-§1B: 未実装 (Phase 1 + shared module 待ち) -/
+
+/-! ## §1C: Frattini + Burnside operator (Lem 1.7-1.10) -/
+
+/-- **BG Lemma 1.7(a)** (Frattini argument, finite specialization):
+有限群 `G` で `H ≤ G` かつ `H ⊔ Φ(G) = ⊤` ⇒ `H = ⊤`.
+
+mathlib `frattini_nongenerating` の有限群特殊化. `[Finite G]` から
+`Finite (Subgroup G)` → `WellFoundedGT (Subgroup G)` → `IsStronglyCoatomic` →
+`IsCoatomic` の instance chain で `frattini_nongenerating` に渡せる.
+
+BG 原 statement は R p-group の文脈だが proof は finite group で成立. -/
+theorem eq_top_of_sup_frattini_eq_top {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (h : H ⊔ frattini G = ⊤) : H = ⊤ :=
+  frattini_nongenerating h
+
+/-! ## §1D: 未実装 (Phase 1 Ch.4 §4D 待ち) -/
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
 
