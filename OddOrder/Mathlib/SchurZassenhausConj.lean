@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Mathlib.Subgroup
 
 open scoped Pointwise
 
@@ -822,6 +823,27 @@ private theorem step_caseB
   -- Case split on H ⊔ M = ⊤.
   by_cases hHM_top : H ⊔ M = ⊤
   · -- Case ⊔ M = ⊤: HM = G. Use Sylow C in M.
+    -- Step 1: |M ⊓ H| = |M̄| (Dedekind + complementarity in M).
+    -- M = N ⊔ (M ⊓ H) by Dedekind (eq_sup_inf_of_le_sup_of_normal_of_le).
+    have h_M_le_NH : M ≤ N ⊔ H := by
+      rw [hH_compl.sup_eq_top]; exact le_top
+    have h_M_eq : M = N ⊔ (M ⊓ H) := by
+      exact Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le hN_le_M h_M_le_NH
+    -- (M ⊓ H) ⊓ N = ⊥ in G.
+    have h_MH_inf_N : (M ⊓ H : Subgroup G) ⊓ N = ⊥ := by
+      have h_le : (M ⊓ H : Subgroup G) ⊓ N ≤ H ⊓ N := by
+        intro x ⟨⟨_, hxH⟩, hxN⟩
+        exact ⟨hxH, hxN⟩
+      have h_HN_bot : (H : Subgroup G) ⊓ N = ⊥ := by
+        rw [inf_comm]; exact hH_compl.disjoint.eq_bot
+      exact le_bot_iff.mp (h_le.trans h_HN_bot.le)
+    -- Cardinality: |M ⊓ H| · |N| = |M|.
+    -- Step 2: M ⊓ H is a Sylow p-subgroup of M.
+    -- Step 3: M ⊓ K' is also Sylow p of M (same argument with K' instead of H).
+    -- Step 4: Sylow C in M: ∃ m ∈ M, (M ⊓ K')^m = M ⊓ H, equivalently M ⊓ K'^m = M ⊓ H.
+    -- Step 5: L := M ⊓ H = M ⊓ K'^m. L ⊴ H, L ⊴ K'^m, L > 1.
+    -- Step 6a: N_G(L) < G ⇒ step_restriction on N_G(L) ⇒ promote via decomp.
+    -- Step 6b: N_G(L) = G ⇒ L ⊴ G ⇒ step_factor with H, L gives K'.
     sorry
   · -- Case ⊔ M < ⊤: step_restriction on H ⊔ M.
     have hHU : H ≤ H ⊔ M := le_sup_left
