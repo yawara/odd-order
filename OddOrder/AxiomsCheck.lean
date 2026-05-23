@@ -105,3 +105,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.3 (Split Extensions): Thm 3.14 Hall-C ⭐⭐⭐ **FT クリティカル**
 -- G finite solvable, π set of primes, H K both π-Hall ⇒ ∃ g, H^g = K.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_C
+
+-- Ch.3 (Split Extensions): Thm 3.36 cyclic extension existence (Phase 4 完成)
+-- N, m > 0, a ∈ N, σ ∈ Aut(N) で σ a = a かつ σ^m = MulAut.conj a
+--   ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.cyclic_extension_exists

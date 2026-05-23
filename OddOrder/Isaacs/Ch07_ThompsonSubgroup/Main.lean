@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality
 
@@ -118,17 +120,33 @@ kernel nilpotent) を完備化. BG/Peterfalvi 直接被引用は無し (Ch.6 経
 
 着手は Lem 7.4 + Hall-Higman 利用環境整備後. -/
 
-/-! ### Lem 7.4 — SL(2,q) の唯一 involution = -I (statement 保留)
+-- `Neg (SpecialLinearGroup (Fin 2) F)` のための `Fact (Even 2)`.
+private instance instFactEvenFinTwo : Fact (Even (Fintype.card (Fin 2))) := ⟨by decide⟩
 
-**Isaacs Lem 7.4** (mmd L3765):
+/-- **Isaacs Lem 7.4** (mmd L3765): `F` field, characteristic ≠ 2 ⇒ `SL(2, F)`
+の唯一 involution は `-1` (= `-I`).
 
-> `q` odd ⇒ `SL(2,q)` 内の唯一 involution は `-I`.
+Isaacs 原本の "`q` odd" は本質的に `char F ≠ 2` (= `(2 : F) ≠ 0`) の特殊化.
+`F = ZMod q` (`q` 奇素数冪) では `(2 : ZMod q) ≠ 0`.
 
-**先行**: mathlib `SpecialLinearGroup 2 (ZMod p)` (既存) のみ. **先行章不要で独立**.
-proof: Cayley-Hamilton + 最小多項式 `x² - 1 = (x-1)(x+1)`. `q` 奇数で
-`x = ±1` のみ. `t ∈ SL(2,q), t² = I, det t = 1` から `t = -I` を結論.
+**proof 戦略**: `M := ↑ₘt`, `M² = I`, `det M = 1`. 4 entries `a = M 0 0`,
+`b = M 0 1`, `c = M 1 0`, `d = M 1 1` で:
 
-着手は早期にできる. -/
+* `M² = I` の (0,1) entry: `b(a+d) = 0`.
+* `M² = I` の (1,0) entry: `c(a+d) = 0`.
+* `M² = I` の (0,0) entry: `a² + bc = 1`.
+* `M² = I` の (1,1) entry: `bc + d² = 1`.
+* `det M = 1`: `ad - bc = 1`.
+
+`a + d = 0` の場合: `det + (0,0)entry` から `a² - 1 = -1 - a² + (a² + bc) - bc - 0 = -1`,
+即ち `2 = 0`, char ≠ 2 と矛盾. 従って `a + d ≠ 0`, よって `b = c = 0`.
+`a² = 1` かつ `a · d = 1`, `a = d` で `a = ±1`. `t ≠ 1` から `a = -1`, `d = -1`. -/
+theorem sl2_unique_involution
+    {F : Type*} [Field F] (h2 : (2 : F) ≠ 0)
+    {t : Matrix.SpecialLinearGroup (Fin 2) F}
+    (ht_sq : t ^ 2 = 1) (ht_ne : t ≠ 1) :
+    t = -1 := by
+  sorry
 
 /-! ### Thm 7.5 — normal-P theorem (statement 保留)
 
