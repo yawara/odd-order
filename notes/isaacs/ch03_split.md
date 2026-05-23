@@ -38,12 +38,44 @@
 
 「Ch.3 完成 = forward dep を持たない結果を全て sorry-free」の射程で, 残作業:
 
-### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — ralph-loop 委譲中
+### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — ralph-loop 進行中
+
 - 場所: `OddOrder/Mathlib/SchurZassenhausConj.lean`
-- 現状: Helper A (Restriction) + Helper B (Quotient) + solvability transfer instances 完成.
-  Main induction (`step_restriction` / `step_factor` / `step_caseA` (N solv) /
-  `step_caseB` (G/N solv) / `main_aux` / 公開 theorem) 未完成 (~200-250 LOC).
-- ralph-loop prompt: `/tmp/phase1_sz_conjugacy.md` (起動例: `/ralph-loop "$(cat /tmp/phase1_sz_conjugacy.md)" --completion-promise "SZ_CONJUGACY_COMPLETE" --max-iterations 30`).
+- ralph-loop prompt: `/tmp/phase1_sz_conjugacy.md`.
+
+#### 完成 (sorry-free)
+
+| Helper / Step | 状態 | 内容 |
+|---|---|---|
+| Helper A `subgroupOf_of_le` | ✅ | K ≤ U + IsComplement' N K ⇒ subgroupOf 版 complement |
+| Helper B `map_mk'` | ✅ | coprime + IsComplement' ⇒ G/L で複合 (Lem 3.11 系) |
+| solv transfer (subgroup) | ✅ instance | IsSolvable N ⇒ IsSolvable (N.subgroupOf U) |
+| solv transfer (quotient) | ✅ instance | IsSolvable (G/N) ⇒ IsSolvable (U/(N.subgroupOf U)) (second iso 経由) |
+| Step 1 `step_restriction` | ✅ | proper U で IH 呼び出し + lifting (~80 LOC) |
+| Step 2 `step_factor` | ✅ | factor group reduction + map_eq_map_iff (~70 LOC) |
+| `mk'_comp_conj_eq` | ✅ helper | conjugation の quotient lift |
+| `card_quotient_lt_of_ne_bot` | ✅ helper | L ≠ ⊥ ⇒ |G/L| < |G| |
+| `exists_minimal_normal_le` | ✅ | Set.Finite.exists_minimal で minimal G-normal subgroup |
+| `minimal_normal_isCommutative_of_solvable` ⭐ | ✅ | **Isaacs Lem 3.11 自前実装** (~30 LOC). [L,L]=⊥ or L (minimality), L solv で contradiction |
+| `step_caseA` 構造 + 全 case 除く abelian SZ | ✅ | trivial (N=⊥) + main flow (minimal normal + step_factor + step_restriction lifting + cardinality argument L=N) |
+| `step_caseB` trivial (N=⊤) | ✅ | K=K'=⊥ で n=1 |
+| `main_aux` 強誘導 | ✅ skeleton | step_caseA / step_caseB に dispatch |
+| 公開 `IsComplement'.exists_conj_of_coprime` | ✅ | main_aux 経由. signature 確定 |
+
+#### 残 sorry (2 件, ~230 LOC)
+
+1. **`abelian_sz_conjugacy` body** (~80-100 LOC, mathlib transition).
+   - mathlib `Subgroup.exists_smul_eq` (`QuotientDiff` form) を subgroup conjugation 形に変換.
+   - mathlib v4.29.1 に直接 lemma 無し (2026-05-23 explore agent 確認). 自前 transition 必要.
+2. **`step_caseB` main body** (~150 LOC).
+   - minimal normal M/N in G/N が p-group (Lem 3.11 拡張 for solvable quotient).
+   - M ∩ K, M ∩ K^g Sylow p in M, Sylow C で m ∈ M.
+   - L := M ∩ K normal in K, K^(g*m). N_G(L) argument.
+
+#### ralph-loop 進捗 (2026-05-23)
+
+iter 1-9 で 9 commit. abelian_sz_conjugacy + step_caseB main は技術的に重く, ralph-loop max 30 iter での完成は厳しい. 完成は数日〜複数 session 規模.
+
 - 完成後 → axiom 削除 → Phase 2 着手可能.
 
 ### Phase 2: Hall-C (Thm 3.14) — Phase 1 完成 blocked
