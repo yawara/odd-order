@@ -95,4 +95,67 @@ theorem IsComplement'.subgroupOf_of_le {N K U : Subgroup G} [N.Normal]
     refine ⟨⟨n, hnU⟩, mem_subgroupOf.mpr hn, ⟨k, hkU⟩, mem_subgroupOf.mpr hk, ?_⟩
     ext; simpa using hnk
 
+/-! ### Main induction (Isaacs Thm 3.12) -/
+
+universe u
+
+namespace SchurZassenhausConj
+
+/-- Induction hypothesis form: SZ conjugacy for groups of strictly smaller cardinality. -/
+private def IH (G : Type u) [Group G] [Finite G] : Prop :=
+  ∀ (G' : Type u) [Group G'] [Finite G'],
+    Nat.card G' < Nat.card G → ∀ {N' : Subgroup G'} [N'.Normal],
+      Nat.Coprime (Nat.card N') N'.index →
+      (IsSolvable N' ∨ IsSolvable (G' ⧸ N')) →
+      ∀ {K K' : Subgroup G'}, IsComplement' N' K → IsComplement' N' K' →
+      ∃ n : G', n ∈ N' ∧ K.map (MulAut.conj n).toMonoidHom = K'
+
+variable {G : Type u} [Group G]
+
+/-- Subgroup ⊆ inclusion of subgroupOf to N: `↥(N.subgroupOf U) →* ↥N`. -/
+private def subgroupOfInclToN (N U : Subgroup G) : ↥(N.subgroupOf U) →* ↥N where
+  toFun x := ⟨x.val.val, x.property⟩
+  map_one' := rfl
+  map_mul' _ _ := rfl
+
+private theorem subgroupOfInclToN_injective (N U : Subgroup G) :
+    Function.Injective (subgroupOfInclToN N U) := by
+  intro x y h
+  simp only [subgroupOfInclToN, MonoidHom.coe_mk, OneHom.coe_mk, Subtype.mk.injEq] at h
+  exact Subtype.ext (Subtype.ext h)
+
+/-- `IsSolvable N ⇒ IsSolvable (N.subgroupOf U)`. -/
+instance subgroupOf_isSolvable_of_isSolvable (N U : Subgroup G) [IsSolvable N] :
+    IsSolvable (N.subgroupOf U) :=
+  solvable_of_solvable_injective (subgroupOfInclToN_injective N U)
+
+/-- `IsSolvable (G ⧸ N) ⇒ IsSolvable (U ⧸ N.subgroupOf U)` for any `U ≤ G`.
+Proof: `U ⧸ N.subgroupOf U ≃ (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N)` (second iso theorem), and
+the latter embeds into `G ⧸ N` via `QuotientGroup.lift`. -/
+instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal]
+    [IsSolvable (G ⧸ N)] : IsSolvable (U ⧸ N.subgroupOf U) := by
+  -- Step 1: define φ : (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N) →* G ⧸ N via lift.
+  let φ : ((U ⊔ N : Subgroup G) ⧸ N.subgroupOf (U ⊔ N)) →* G ⧸ N :=
+    QuotientGroup.lift (N.subgroupOf (U ⊔ N))
+      ((QuotientGroup.mk' N).comp (U ⊔ N).subtype)
+      (fun x hx => by
+        show (QuotientGroup.mk x.val : G ⧸ N) = 1
+        exact (QuotientGroup.eq_one_iff _).mpr hx)
+  have hφ_inj : Function.Injective φ := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    rintro ⟨x⟩ hx
+    rw [MonoidHom.mem_ker] at hx
+    change (QuotientGroup.mk x.val : G ⧸ N) = 1 at hx
+    rw [QuotientGroup.eq_one_iff] at hx
+    -- ⟦x⟧ = 1 in (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N): x ∈ N.subgroupOf (U ⊔ N).
+    rw [Subgroup.mem_bot]
+    exact (QuotientGroup.eq_one_iff _).mpr hx
+  haveI hUN : IsSolvable ((U ⊔ N : Subgroup G) ⧸ N.subgroupOf (U ⊔ N)) :=
+    solvable_of_solvable_injective hφ_inj
+  -- Step 2: Transfer back via second iso (direction U ⧸ ... → (U ⊔ N) ⧸ ...).
+  let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
+  exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+
+end SchurZassenhausConj
+
 end Subgroup
