@@ -113,7 +113,7 @@ mmd 抽出では `### 10a` (L5312), `### Problems 10a` (L5553), `### Problems 10
 
 | Isaacs | 状況 | コスト見積もり |
 |---|---|---|
-| **`WreathProduct C_p C_p`** | mathlib に wreath product 一般の def **未収載** (`grep "wreath\|Wreath"` 全マッチ 0). `C_p ≀ C_p` を `(C_p)^{C_p} ⋊ C_p` として手作りする必要 | **大** (Phase 1 で wreath product 一般を入れるか, C_p ≀ C_p 単体を新規構成) |
+| **`WreathProduct C_p C_p`** | **(2026-05-23 audit 訂正)** mathlib v4.29.1 に `Mathlib/GroupTheory/RegularWreathProduct.lean` (260 行, 2025) 既存: `RegularWreathProduct D Q` (中置 `D ≀ᵣ Q`), `IteratedWreathProduct G n`, `Sylow.mulEquivIteratedWreathProduct` (`:242`) (Sylow `p`-subgroup of `Sym(p^n)` ≅ iterated wreath). `Cp ≀ Cp = (ZMod p) ≀ᵣ (ZMod p)` 直接. ad-hoc 手作りは不要 | **中** (旧評価「大」を訂正; mathlib API 利用) |
 | **Lemma 10.3, Thm 10.4, Cor 10.5** (C_p ≀ C_p 認識) | mathlib 未収載. 10.4 の S_{p^2} ↪ argument は permutation embedding (mathlib `Equiv.Perm`) ＋ class size 計算 | 中 (linear algebra over F_p の援用) |
 | **Lemma 10.6, 10.7** (pretransfer pth-power 化) | mathlib `transfer_eq_pow` (`Transfer.lean:205`) ＋ Frattini factor `Mathlib/GroupTheory/Frattini` で類似. Isaacs 流ステートメントへ橋渡し | 中 |
 | **Thm 10.8 transitivity of transfer** | mathlib **完全未収載** (`grep "transitivity.*transfer"` 0). pretransfer の合成 = pretransfer ということを `transferFunction` ベースで示す | 中 (一般原則だが proof は技術的) |
@@ -262,7 +262,7 @@ FT クリティカル度 + mathlib カバレッジ + 章内依存で並べる:
 
 - **pretransfer vs transfer**: mathlib `MonoidHom.transfer` は abelian target 専用の準同型 (`G →* A`). Isaacs の "pretransfer `V: G → H`" (非可換 target 許容, mod H' で一意) は mathlib `transferFunction` (`Transfer.lean:89`) で表現可能. `transferFunction` は `G ⧸ H → G` だが Isaacs の linear order 入りの transversal による積形と等価.
 - **DoubleCoset の方向**: mathlib `DoubleCoset.doubleCoset a H K = H・a・K`. Isaacs は `HgK` 形 (左右同じ). 単に notation の差.
-- **wreath product**: mathlib に一般 wreath product `H ≀ K` の def **未収載** (確認済: `grep "wreath\|Wreath"` 全マッチ 0). C_p ≀ C_p を `def Cp_wreath_Cp (p : ℕ) [Fact p.Prime] : Type := (Fin p → ZMod p) ⋊[Equiv.cycle_p_perm] ZMod p` 風に直接構成する必要. または `MulAction.WreathProduct` を新規追加して mathlib upstream.
+- **wreath product**: **(2026-05-23 audit 訂正)** mathlib v4.29.1 に `Mathlib/GroupTheory/RegularWreathProduct.lean` (Francisco Silva, 2025, 260 行) が既収載. `RegularWreathProduct D Q` 構造体 (中置記法 `D ≀ᵣ Q`), `mul`/`inv`/`Group` instance, `rightHom`/`inl`, `Nat.card (D ≀ᵣ Q) = (Nat.card D)^(Nat.card Q) * Nat.card Q`, `toPerm` (action on `Λ × Q`), `IteratedWreathProduct G n`, **`Sylow.mulEquivIteratedWreathProduct` (`:242`)** (= Sylow `p`-subgroup of `Sym(p^n)` is iso to iterated wreath product — まさに Isaacs 10.4 が要求する装置) まで揃う. `Cp ≀ Cp = (ZMod p) ≀ᵣ (ZMod p)` 直接. **手作り不要**. Suzuki/Sz(q) 用途 (Peterfalvi §05.6 PSU(3,q)) でも同じ恩恵.
 - **`MonoidAlgebra ℤ G` = Z[G]**: mathlib 既収載. `MonoidAlgebra.augmentation : MonoidAlgebra ℤ G →ₐ[ℤ] ℤ` のような map が **未収載** — 自前で `def augmentation : MonoidAlgebra ℤ G →+* ℤ := MonoidAlgebra.lift ℤ G ℤ (fun _ => (1 : ℤ))` で 1 行 def できる. `Δ(G) = (augmentation G).ker` で ideal.
 - **Maschke 群作用版 (Thm 10.16)**: mathlib `RepresentationTheory.Maschke` はベクトル空間版. 10.16 の "u ↦ u^m が U 上 bijective" は coprime 仮定の同値表現で, 元の Maschke 証明はそのまま group automorphism 作用に通る. mathlib にコピー版を `Mathlib/GroupTheory/Maschke.lean` で新規追加する手も.
 

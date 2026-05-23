@@ -138,10 +138,14 @@ orbital / paired orbital / rank / 自己ペア / orbital function / subdegree �
 * **Thm 8.18 (Jordan 一般版) / 8.20-8.22 (Jordan 集合 / 強 Jordan)** — mathlib の Jordan.lean
   に既に近い結果はあるが、Isaacs の "Jordan set" 概念での記述は新規補題が必要.
 * **Thm 8.23** (p-cycle ⇒ Sym or Alt) — 8.18 + 8.19 の系統. Bochert と並ぶ §8B の "山".
-* **Thm 8.24** (n-cycle centralizer = ⟨x⟩), **Thm 8.25** (重なる動点 1 つ ⇒ [x,y] 3-cycle) —
-  Bochert の準備. mathlib `Equiv.Perm.cycleType` 周辺で類似結果は ある可能性.
-* **Thm 8.26 Bochert** — 本章の §8B の大物. mathlib 未収載, 新規実装. 証明は 8.24, 8.25
-  + 純組合せ.
+* **Thm 8.24** (n-cycle centralizer = ⟨x⟩) — **(2026-05-23 audit 訂正)** Bochert 8.26 ではなく
+  Thm 8.23 (p-cycle ⇒ Sym/Alt) の proof L4435-L4449 内で使用. mathlib `Equiv.Perm.cycleType`
+  周辺で類似結果はある可能性.
+* **Thm 8.25** (重なる動点 1 つ ⇒ [x,y] 3-cycle) — Bochert 8.26 の直接の準備.
+* **Thm 8.26 Bochert** — 本章の §8B の大物. mathlib 未収載, 新規実装. 証明は 8.25 + 8.19 +
+  純組合せ (8.24 は使わない). proof-internal API: `Equiv.Perm.support`,
+  `MulAction.fixingSubgroup` (集合版), `Equiv.Perm.card`, `Fintype.card_perm`,
+  `Subgroup.index`, `Nat.factorial_le`.
 * **Thm 8.27** (A_n simple, n ≥ 5) — mathlib に TODO として明記 ("Show that
   `alternatingGroup α` is simple if and only if `Fintype.card α ≠ 4`"). mathlib の
   `IsThreeCycle.alternating_normalClosure` (n ≥ 5 で 3-cycle が任意の非自明正規部分群を
@@ -265,7 +269,10 @@ FT クリティカル度 + mathlib カバレッジ + 章内依存で並べる:
   で微妙に異なる. `isBlock_iff_smul_eq_or_disjoint` で標準形に戻せる.
 * **Iwasawa.lean の `IwasawaStructure`** は構造体ベース — 4 つのデータ (T, is_comm, is_conj, is_generated)
   を組み立てる必要. Isaacs Thm 8.30 の "A ⊴ G_α 可解, G = A^G" から構造体への変換は
-  パターン化できる.
+  パターン化できる. **(2026-05-23 audit 注意)** `IwasawaStructure.isSimpleGroup` (`Iwasawa.lean:82`)
+  は hypothesis に `[IsQuasiPreprimitive M α]` を要求 (primitive のみではない). Isaacs 8.30 は
+  primitive 仮定なので, `IsPreprimitive.isQuasipreprimitive` (`Primitive.lean:~54`) を間に
+  挟む wrapper が必要.
 * **Jordan.lean** は `Jordan set` の Isaacs 概念とは別の意味 (?) で命名されている可能性
   あり (mathlib の Jordan は transposition theorem 等を含む). Lemma 8.21 の "Jordan set"
   概念は自前定義が必要かも.

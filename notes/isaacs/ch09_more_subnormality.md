@@ -122,7 +122,7 @@ Ch.9 の主要概念は **どれも mathlib 未収載** (mmd grep 結果: quasis
 | S^∞ (nilpotent residual) | **無し** | lower central series の極限. `Mathlib/GroupTheory/Nilpotent.lean` 周辺に直接無し (要再確認) |
 | strongly conjugate | **無し** | §9D 専用. 独立に定義 |
 | X^{*G} (subnormal closure) | **無し** | "smallest subnormal subgroup containing X". `IsSubnormal` ベースで `sInf` |
-| Lemma 9.31 (S◁G, Sylow_p ∩ S) | **存在?** | `Sylow.subgroupOf` 周辺で類似がありそう (要確認) |
+| Lemma 9.31 (S◁G, Sylow_p ∩ S) | **無し** (2026-05-23 audit 確定) | mathlib v4.29.1 直接 lemma 無し (`Sylow.exists_comap_eq` `Sylow.lean:193` は別ステートメント, `IsPGroup.inf_normalizer_sylow` `:277` も別). ~10 行 induction on `|G|` で新規 |
 
 `Subgroup.IsSubnormal` の基本 API は `Mathlib/GroupTheory/IsSubnormal.lean` に整備済 (Ch.2 ノート参照) なので, Ch.9 の subnormal 関連は base API 上に書ける.
 
