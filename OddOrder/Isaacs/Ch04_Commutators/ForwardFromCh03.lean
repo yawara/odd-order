@@ -313,6 +313,119 @@ theorem glauberman_fixed_point_exists
   -- (inl g)⁻¹ • α₀ = g⁻¹ • α₀.
   rw [← map_inv, IsCompatibleMulAction.toMulAction_inl_smul h g⁻¹ α₀]
 
+/-! ### Glauberman 3.24(b) (C_G(A) conjugacy) — 予定 -/
+
+/-- **Isaacs Lemma 3.24(b)**: 同じ前提下で, 2 つの A-invariant 元 α, β ∈ Ω に対し,
+`∃ c ∈ C_G(A), c • α = β`.
+
+**証明戦略**: `X := { g | g • α = β }` (transporter, nonempty by G transitive).
+`H := stabilizer G β` acts on `X` transitively by left multiplication.
+`A` acts on `X` via φ (well-defined since α, β A-inv).
+`A` acts on `H` via φ (well-defined since β A-inv).
+Apply 3.24(a) with (A, H, X) to get x ∈ X A-fixed, i.e., x ∈ C_G(A) ∩ X. -/
+theorem glauberman_fixed_points_conj
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {Ω : Type*} [MulAction G Ω] [MulAction A Ω]
+    (_h : IsCompatibleMulAction φ Ω) (_hG_trans : MulAction.IsPretransitive G Ω)
+    {α β : Ω} (_hα : ∀ a : A, a • α = α) (_hβ : ∀ a : A, a • β = β) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ c • α = β := by
+  sorry  -- TODO: apply Glauberman 3.24(a) to transporter X with H = stabilizer β.
+
 end Glauberman
+
+/-! ## §3E.2 Thm 3.23 (a/b) A-invariant Sylow -/
+
+section AInvariantSylow
+
+variable {A : Type*} [Group A] [Finite A] [Finite G]
+
+/-- **Isaacs Thm 3.23(a)**: A-invariant Sylow p-subgroup の存在.
+`Glauberman 3.24(a)` を `Ω = Sylow p G` に適用 (G 推移 by Sylow C). -/
+theorem exists_aInvariant_sylow
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G) (p : ℕ) [Fact p.Prime] :
+    ∃ P : Sylow p G, IsAInvariant φ (P : Subgroup G) := by
+  sorry  -- TODO: Sylow MulAction infra + apply 3.24(a).
+
+/-- **Isaacs Thm 3.23(b)**: 2 つの A-invariant Sylow p-subgroup は C_G(A) で共役.
+`Glauberman 3.24(b)` の Sylow p G 版. -/
+theorem aInvariant_sylow_conj
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    {S T : Sylow p G} (_hS_inv : IsAInvariant φ (S : Subgroup G))
+    (_hT_inv : IsAInvariant φ (T : Subgroup G)) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (MulAut.conj c • (S : Subgroup G) = T) := by
+  sorry  -- TODO: apply 3.24(b) with Ω = Sylow p G.
+
+/-- **Isaacs Cor 3.25**: A-invariant p-subgroup is contained in some A-invariant Sylow. -/
+theorem aInvariant_pSubgroup_le_aInvariant_sylow
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    {P : Subgroup G} (_hP_pgrp : IsPGroup p P) (_hP_inv : IsAInvariant φ P) :
+    ∃ S : Sylow p G, IsAInvariant φ (S : Subgroup G) ∧ P ≤ S := by
+  sorry  -- TODO: maximalize P inside A-inv p-subgroups; apply 3.23(a) to N_G(P).
+
+end AInvariantSylow
+
+/-! ## §3E.3 Thm 3.27 + Cor 3.28 (A-invariant cosets / quotient fixed points) -/
+
+section CosetFixed
+
+variable {A : Type*} [Group A] [Finite A] [Finite G]
+
+/-- **Isaacs Thm 3.27**: A-invariant coset gN は C_G(A) の元を含む.
+
+`gN` が A-不変 (条件 `∀ a, ∃ n ∈ N, φ a g = g * n`) のとき, ∃ c ∈ gN かつ ∀ a, φ a c = c. -/
+theorem aInvariant_coset_mem_centralizer
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} (_hN_inv : IsAInvariant φ N) {g : G}
+    (_hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
+  sorry  -- TODO: apply 3.24(a) to Ω = subtype of gN, N acting by right multiplication.
+
+/-- **Isaacs Cor 3.28 (transitive blocker for Ch.4)**: 商の固定点は底群の固定点像.
+
+`N ⊴ G` A-不変, coprime + solvable のとき, `Ḡ = G/N` 上の A-fixed 元は `C_G(A)` の像と一致.
+ステートメント: A-fixed `ḡ ∈ Ḡ` ⇒ ∃ c ∈ C_G(A), c·N = g·N. -/
+theorem coprime_fixedPoints_quotient
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (_hN_inv : IsAInvariant φ N) {g : G}
+    (_hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
+  sorry  -- TODO: alias of 3.27 (or thin wrap if 3.27 is more general).
+
+end CosetFixed
+
+/-! ## §3E.4 Cor 3.29 + Cor 3.30 (A action on G/Φ(G)) -/
+
+section FrattiniAction
+
+variable {A : Type*} [Group A] [Finite A] [Finite G]
+
+/-- **Isaacs Cor 3.29**: A が `G/Φ(G)` に自明作用 ⇒ A が G に自明作用.
+
+(`G = C·Φ(G)` ⇒ `G = C` by Frattini characterization.) -/
+theorem aFixed_quotient_frattini
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    (_h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
+    ∀ a : A, ∀ g : G, (φ a) g = g := by
+  sorry  -- TODO: Cor 3.28 with N = Φ(G) + Frattini's argument (M < G containing Φ → contradiction).
+
+/-- **Isaacs Cor 3.30**: A faithful on G ⇒ A faithful on G/Φ(G).
+
+注: A の G/Φ(G) への誘導作用が必要のため, 正確な statement 化は
+`IsAInvariant.quotientHom` (誘導 quotient action) 完成後に行う. 現状は placeholder. -/
+theorem aFaithful_quotient_frattini
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_faithful : Function.Injective φ) :
+    -- placeholder: 仮 statement.
+    Function.Injective φ := h_faithful
+
+end FrattiniAction
 
 end OddOrder.Isaacs.Ch04
