@@ -46,3 +46,16 @@ theorem Group.IsNilpotent.semidirectProduct_of_pGroup
     (hN : IsPGroup p N) (hG : IsPGroup p G) :
     Group.IsNilpotent (N ⋊[φ] G) :=
   (IsPGroup.semidirectProduct hN hG).isNilpotent
+
+/-- **`inl.range ⊔ inr.range = ⊤`**: 半直積は `inl` と `inr` の像で生成される.
+
+`inl_left_mul_inr_right` (∀ x, `inl x.left * inr x.right = x`) から従う.
+Γ 内 commutator `⁅inl.range, inr.range⁆` に Isaacs Lem 4.1 (`⁅H, K⁆ ⊴ ⟨H, K⟩`) を
+適用する際の前提. -/
+theorem SemidirectProduct.inl_range_sup_inr_range_eq_top
+    {N G : Type*} [Group N] [Group G] {φ : G →* MulAut N} :
+    (SemidirectProduct.inl : N →* N ⋊[φ] G).range ⊔
+      (SemidirectProduct.inr : G →* N ⋊[φ] G).range = ⊤ := by
+  refine top_le_iff.mp fun x _ => ?_
+  rw [← SemidirectProduct.inl_left_mul_inr_right x]
+  exact Subgroup.mul_mem_sup ⟨x.left, rfl⟩ ⟨x.right, rfl⟩
