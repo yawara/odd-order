@@ -106,6 +106,17 @@ theorem subgroup_le_normalizer_commutator_self_right (H K : Subgroup G) :
   rw [Subgroup.commutator_comm]
   exact subgroup_le_normalizer_commutator_self K H
 
+/-- **Isaacs Lem 4.1 系**: `H ⊔ K = ⊤` ⇒ `⁅H, K⁆` は G で normal.
+`H` も `K` も `⁅H, K⁆` を正規化 (Lem 4.1) ⇒ `H ⊔ K ≤ N(⁅H, K⁆)`, `⊤ ≤ N(⁅H, K⁆)`,
+よって `⁅H, K⁆.Normal`. mathlib `commutator_normal` instance は `H, K` 両方 G で normal
+を要求するが, ここでは生成集合の `⊔` だけで十分. -/
+theorem commutator_normal_of_sup_eq_top {H K : Subgroup G} (hsup : H ⊔ K = ⊤) :
+    (⁅H, K⁆ : Subgroup G).Normal := by
+  refine Subgroup.normalizer_eq_top_iff.mp ?_
+  rw [← top_le_iff, ← hsup]
+  exact sup_le (subgroup_le_normalizer_commutator_self H K)
+    (subgroup_le_normalizer_commutator_self_right H K)
+
 /-! **Isaacs Lemma 4.2** (quotient/map commutator):
 `f : G →* G'` の像での commutator は元の像の commutator.
 **mathlib `Subgroup.map_commutator` 直接利用**. wrapper 不要. -/
@@ -905,9 +916,20 @@ theorem actionCommutator_map_inl
     refine ⟨g * (φ a) g⁻¹, ⟨g, a, rfl⟩, ?_⟩
     exact (SemidirectProduct.commutator_inl_inr (φ := φ) g a).symm
 
--- TODO: `(actionCommutator φ).Normal` (G 内). 上記 `actionCommutator_map_inl` +
--- Γ 内 `⁅inl.range, inr.range⁆ ⊴ inl_range_sup_inr_range_eq_top = Γ`
--- (Lem 4.1: subgroup_le_normalizer_commutator_self) + `inl` injectivity.
+/-- **`actionCommutator φ` は G で normal subgroup**.
+
+経路: `actionCommutator_map_inl` で `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`,
+Γ 内で `inl.range ⊔ inr.range = ⊤` (`SemidirectProduct.inl_range_sup_inr_range_eq_top`) より
+Lem 4.1 系 `commutator_normal_of_sup_eq_top` で `⁅inl.range, inr.range⁆.Normal`. `inl`
+injectivity で pull back (`Subgroup.Normal.of_map_injective`).
+
+Isaacs §4C 冒頭注 (Lem 4.1 を Γ で適用) を直接実装. -/
+instance actionCommutator.normal {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
+    (actionCommutator φ).Normal := by
+  refine Subgroup.Normal.of_map_injective
+    (φ := (SemidirectProduct.inl : G →* G ⋊[φ] A)) SemidirectProduct.inl_injective ?_
+  rw [actionCommutator_map_inl]
+  exact commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
