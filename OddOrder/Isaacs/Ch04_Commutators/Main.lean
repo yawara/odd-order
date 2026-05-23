@@ -261,9 +261,175 @@ theorem isElementaryAbelian_quotient_center_of_class_le_two
     rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     exact hxp
 
-/-! **Isaacs Lemma 4.5** (`P/N` elementary abelian ⇔ `Φ(P) ⊆ N`):
-mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述).
-Lem 4.4 の "thus `Φ(P) ⊆ Z(P)`" 帰結はこの Lem 4.5 経由のため未完. -/
+/-! ### Lemma 4.5: P/N elementary abelian ⇔ Φ(P) ⊆ N -/
+
+/-- Helper: For finite `p`-group `P` and maximal subgroup `M`, `M.index = p`.
+
+**証明**: `M` 正規 (nilpotent + max). `|P/M| = p^k`. `k = 1` を示す:
+- `k = 0` ⇒ `M = ⊤`, 矛盾.
+- `k ≥ 2` ⇒ Cauchy で `P/M` に order `p` の元 `g` 存在 ⇒ `⟨g⟩` は order `p` の subgroup.
+  pull back で `M < H' < ⊤` (M maximal と矛盾). -/
+private lemma index_eq_prime_of_isCoatom_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) : M.index = p := by
+  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have hMnormal : M.Normal :=
+    Subgroup.NormalizerCondition.normal_of_coatom M
+      (normalizerCondition_of_isNilpotent (G := P)) hMax
+  haveI := hMnormal
+  have hPQuot : IsPGroup p (P ⧸ M) := hP.to_quotient M
+  obtain ⟨k, hk⟩ := hPQuot.exists_card_eq
+  have h_idx : M.index = Nat.card (P ⧸ M) := Subgroup.index_eq_card _
+  have hM_ne_top : M ≠ ⊤ := hMax.1
+  -- k ≥ 1 (else |P/M| = 1, so M = ⊤)
+  have hk_pos : 1 ≤ k := by
+    by_contra h
+    push_neg at h
+    interval_cases k
+    rw [pow_zero] at hk
+    have hsub : Subsingleton (P ⧸ M) := Nat.card_eq_one_iff_unique.mp hk |>.1
+    apply hM_ne_top
+    rw [Subgroup.eq_top_iff']
+    intro x
+    have h1 : (QuotientGroup.mk x : P ⧸ M) = 1 := Subsingleton.elim _ _
+    exact (QuotientGroup.eq_one_iff x).mp h1
+  -- Suppose k ≥ 2 for contradiction
+  by_contra h_idx_ne
+  have hk_ne_1 : k ≠ 1 := fun h_eq => h_idx_ne (by rw [h_idx, hk, h_eq, pow_one])
+  have hk_ge_2 : 2 ≤ k := Nat.lt_of_le_of_ne hk_pos (Ne.symm hk_ne_1)
+  -- Cauchy: ∃ g : P/M, orderOf g = p
+  have hp_dvd : p ∣ Nat.card (P ⧸ M) := by
+    rw [hk]; exact dvd_pow_self p (Nat.one_le_iff_ne_zero.mp hk_pos)
+  obtain ⟨g, hg_ord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  -- ⟨g⟩ has order p
+  let H : Subgroup (P ⧸ M) := Subgroup.zpowers g
+  have hH_card : Nat.card H = p := by rw [Nat.card_zpowers, hg_ord]
+  -- |P/M| = p^k > p for k ≥ 2
+  have hp_lt : p < Nat.card (P ⧸ M) := by
+    rw [hk]
+    calc p = p^1 := (pow_one p).symm
+      _ < p^k := by apply pow_lt_pow_right₀ hp.out.one_lt; omega
+  have hH_ne_top : H ≠ ⊤ := by
+    intro hH_top
+    have hcard_eq : Nat.card H = Nat.card (P ⧸ M) := by
+      rw [hH_top]; exact Nat.card_congr Subgroup.topEquiv.toEquiv
+    rw [hH_card] at hcard_eq
+    omega
+  have hH_ne_bot : H ≠ ⊥ := by
+    intro hH_bot
+    have : Nat.card H = 1 := Subgroup.card_eq_one.mpr hH_bot
+    rw [hH_card] at this
+    exact hp.out.one_lt.ne this.symm
+  -- Pull back H to subgroup of P
+  let H' : Subgroup P := H.comap (QuotientGroup.mk' M)
+  -- M ≤ H'
+  have h_M_le_H' : M ≤ H' := by
+    intro x hx
+    show (QuotientGroup.mk' M) x ∈ H
+    rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
+    exact Subgroup.one_mem H
+  -- H' < ⊤ (else H = ⊤ via mk' surjective)
+  have h_H'_lt_top : H' < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro h_H'_top
+    apply hH_ne_top
+    rw [Subgroup.eq_top_iff']
+    intro q
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+    have hxH' : x ∈ H' := h_H'_top ▸ Subgroup.mem_top x
+    exact hxH'
+  -- M < H' (else H = ⊥)
+  have h_M_lt_H' : M < H' := by
+    rw [lt_iff_le_and_ne]
+    refine ⟨h_M_le_H', ?_⟩
+    intro h_eq
+    apply hH_ne_bot
+    rw [Subgroup.eq_bot_iff_forall]
+    intro x hx_H
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective x
+    have hy_H' : y ∈ H' := hx_H
+    rw [← h_eq] at hy_H'
+    exact (QuotientGroup.eq_one_iff y).mpr hy_H'
+  -- hMax.2 gives H' = ⊤, contradicting H' < ⊤
+  exact h_H'_lt_top.ne (hMax.2 H' h_M_lt_H')
+
+/-- For finite `p`-group `P` and maximal `M`, `commutator P ≤ M` (`P/M` is order `p`, abelian). -/
+private lemma commutator_le_of_isCoatom_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) :
+    _root_.commutator P ≤ M := by
+  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have hMnormal : M.Normal :=
+    Subgroup.NormalizerCondition.normal_of_coatom M
+      (normalizerCondition_of_isNilpotent (G := P)) hMax
+  haveI := hMnormal
+  have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
+  have h_card_quot : Nat.card (P ⧸ M) = p := by
+    rw [← Subgroup.index_eq_card]; exact h_idx
+  haveI : Fact (Nat.card (P ⧸ M)).Prime := ⟨h_card_quot ▸ hp.out⟩
+  haveI : IsCyclic (P ⧸ M) := isCyclic_of_prime_card h_card_quot
+  -- commutator P ≤ M iff P/M abelian
+  rw [← Subgroup.Normal.quotient_commutative_iff_commutator_le]
+  letI := IsCyclic.commGroup (α := P ⧸ M)
+  exact ⟨mul_comm⟩
+
+/-- For finite `p`-group `P` and maximal `M`, `x^p ∈ M` for all `x : P`. -/
+private lemma pow_p_mem_of_isCoatom_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) (x : P) :
+    x^p ∈ M := by
+  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have hMnormal : M.Normal :=
+    Subgroup.NormalizerCondition.normal_of_coatom M
+      (normalizerCondition_of_isNilpotent (G := P)) hMax
+  haveI := hMnormal
+  have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
+  have h_card_quot : Nat.card (P ⧸ M) = p := by
+    rw [← Subgroup.index_eq_card]; exact h_idx
+  -- In P/M of order p, q^p = 1 for any q. So x^p ∈ M.
+  rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_pow]
+  rw [← h_card_quot]
+  exact pow_card_eq_one'
+
+/-- **For finite `p`-group `P`, `commutator P ≤ frattini P`**. -/
+theorem commutator_le_frattini_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) :
+    _root_.commutator P ≤ frattini P := by
+  refine le_iInf fun M => ?_
+  refine le_iInf fun hM => ?_
+  exact commutator_le_of_isCoatom_of_pgroup hP hM
+
+/-- **For finite `p`-group `P`, `x^p ∈ frattini P` for all `x : P`**. -/
+theorem pow_p_mem_frattini_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (x : P) :
+    x^p ∈ frattini P := by
+  refine Subgroup.mem_iInf.mpr fun M => Subgroup.mem_iInf.mpr fun hM => ?_
+  exact pow_p_mem_of_isCoatom_of_pgroup hP hM x
+
+/-- **Isaacs Lemma 4.5 backward**: For finite `p`-group `P` and `N ⊴ P`,
+`Φ(P) ⊆ N` ⇒ `P/N` is `p`-elementary abelian.
+
+**証明**: `commutator P ≤ Φ(P) ⊆ N` ⇒ `P/N` abelian.
+`∀ x, x^p ∈ Φ(P) ⊆ N` ⇒ `∀ q : P/N, q^p = 1`. -/
+theorem isElementaryAbelian_quotient_of_frattini_le_of_pgroup
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
+    {N : Subgroup P} [N.Normal] (hΦ : frattini P ≤ N) :
+    OddOrder.GroupTheory.IsElementaryAbelian p (P ⧸ N) := by
+  refine ⟨?_, ?_⟩
+  · -- P/N abelian
+    have h_comm_le : _root_.commutator P ≤ N :=
+      le_trans (commutator_le_frattini_of_pgroup hP) hΦ
+    exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr h_comm_le).comm
+  · -- ∀ q : P/N, q^p = 1
+    intro q
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+    rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    exact hΦ (pow_p_mem_frattini_of_pgroup hP x)
+
+/-! **Isaacs Lemma 4.5 forward** (`P/N` elem abelian ⇒ `Φ(P) ⊆ N`): 形式化保留.
+有限 abelian 群の構造定理 (`AddCommGroup.equiv_directSum_zmod_of_finite`) 経由で
+`P/N ≅ (ℤ/pℤ)^k` に分解し, hyperplanes の交わりが `⊥` であることを使う.
+~100-150 LOC. 下流引用は無し ("backward direction only" で実用上十分). -/
 
 /-- **Isaacs Lemma 4.6 easy direction**: `⁅A, ⊤⁆ ≤ G'` (任意 `A ≤ G` で常時成立).
 
