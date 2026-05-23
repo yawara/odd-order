@@ -2369,8 +2369,9 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     -- g^m = ⟦inr (ofAdd m)⟧ = ⟦(1, ofAdd m)⟧, and (a, 1) - (1, ofAdd m) = (a⁻¹, ofAdd m) = K-element.
     sorry
   · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via inl_aut.
-    intro x
-    sorry
+    -- Plan: g = ⟦inr (ofAdd 1)⟧, (ι x : G) = ⟦inl x⟧.
+    -- LHS = ⟦inr 1 * inl x * (inr 1)⁻¹⟧ = ⟦inl (φ 1 x)⟧ = ⟦inl (σ x)⟧ = (ι (σ x) : G).
+    sorry  -- TODO: inl_aut application + QuotientGroup.mk-arithmetic
 
 end -- 3F
 
