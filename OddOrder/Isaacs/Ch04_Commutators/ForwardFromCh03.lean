@@ -115,6 +115,52 @@ section Glauberman
 
 variable {A : Type*} [Group A] [Finite A] [Finite G]
 
+/-! ### Glauberman の補助補題群 -/
+
+/-- `IsSolvable G ⇒ IsSolvable inl.range` (inl の rangeRestrict 経由). -/
+private lemma isSolvable_inlRange_of_isSolvable {φ : A →* MulAut G} [IsSolvable G] :
+    IsSolvable (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
+  solvable_of_surjective (MonoidHom.rangeRestrict_surjective
+    (SemidirectProduct.inl : G →* SemidirectProduct G A φ))
+
+/-- `IsSolvable A ⇒ IsSolvable (Γ ⧸ inl.range)`.
+`rightHom` の核が `inl.range` で `rightHom` は全射, 第一同型定理 + 同型による IsSolvable
+の移送. -/
+private lemma isSolvable_quotient_inlRange_of_isSolvable
+    {φ : A →* MulAut G} [IsSolvable A] :
+    IsSolvable (SemidirectProduct G A φ ⧸
+      (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range) := by
+  -- Compose two isos: Γ⧸inl.range ≃ Γ⧸rightHom.ker ≃ A.
+  have h_ker_eq : (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range =
+      (SemidirectProduct.rightHom : SemidirectProduct G A φ →* A).ker :=
+    SemidirectProduct.range_inl_eq_ker_rightHom
+  have h_iso1 : SemidirectProduct G A φ ⧸
+      (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range ≃*
+      SemidirectProduct G A φ ⧸
+      (SemidirectProduct.rightHom : SemidirectProduct G A φ →* A).ker :=
+    QuotientGroup.quotientMulEquivOfEq h_ker_eq
+  have h_iso2 :
+      SemidirectProduct G A φ ⧸
+        (SemidirectProduct.rightHom : SemidirectProduct G A φ →* A).ker ≃* A :=
+    QuotientGroup.quotientKerEquivOfSurjective _ SemidirectProduct.rightHom_surjective
+  let h_iso : A ≃* SemidirectProduct G A φ ⧸
+      (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
+    (h_iso1.trans h_iso2).symm
+  exact solvable_of_surjective (f := h_iso.toMonoidHom) h_iso.surjective
+
+/-- `inl.range` の `Γ = G ⋊ A` における index は `Nat.card A`. -/
+private lemma inlRange_index_eq_card_A {φ : A →* MulAut G} :
+    (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range.index = Nat.card A := by
+  have h_card_Gamma : Nat.card (SemidirectProduct G A φ) = Nat.card G * Nat.card A :=
+    SemidirectProduct.card
+  have h_card_inlG : Nat.card
+      (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range = Nat.card G :=
+    Nat.card_range_of_injective SemidirectProduct.inl_injective
+  have key := Subgroup.card_mul_index
+    (H := (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range)
+  rw [h_card_inlG, h_card_Gamma] at key
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos key
+
 /-- **Isaacs Lemma 3.24(a) Glauberman fixed-point lemma**:
 Let `A` act via automorphisms on `G`, where `A`, `G` are finite groups with `(|A|, |G|) = 1`,
 and at least one of `A` or `G` is solvable.
