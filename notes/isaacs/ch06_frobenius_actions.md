@@ -214,6 +214,32 @@ FT クリティカル度 + 章内依存で並べる:
 
 優先度 (FT クリティカル度): **6.7 (Frobenius 定義), 6.17 (Sylow cyclic/quaternion), 6.22-6.24 (kernel nilpotent)** ≫ 6.4, 6.11 (具体群構造) > 6.18, 6.19, 6.21 (Ch.7 接続) > その他.
 
+## 進捗 (2026-05-23 開始)
+
+ファイル: [`OddOrder/Isaacs/Ch06_FrobeniusActions.lean`](../../OddOrder/Isaacs/Ch06_FrobeniusActions.lean) 新規作成.
+
+**完成済 (no preceding-chapter dep)**:
+- `IsFrobeniusAction A N : Prop` — action ベース定義 (Isaacs p.177).
+- 構造補題: `orbit_one`, `stabilizer_eq_bot`, `fixedBy_eq_singleton_one`.
+- **Lem 6.1** `card_modEq_one`: `|N| ≡ 1 mod |A|`. Burnside 経由.
+- Cor `coprime_card`: |A|, |N| coprime.
+- **Thm 6.3 (commute part)** `commute_of_card_even`: 2 ∣ |A| ⇒ N abelian.
+- **Thm 6.3 (uniqueness part)** `unique_involution`: + Nontrivial N ⇒ unique involution.
+- Thm 6.3 用 helper: `fixedPointFree_toMulAut`, `involutive_toMulAut_of_sq_eq_one`,
+  `involution_smul_eq_inv`. mathlib `MonoidHom.FixedPointFree` (Mathlib/GroupTheory/
+  FixedPointFree.lean, Browning 2024) 経由で大半 reduce.
+
+**設計判断**:
+- **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
+  版 `IsFrobeniusGroup G N A` は Thm 6.4 等価関係を導いてから別途定義予定.
+- mathlib `FixedPointFree` モジュールが involution → invert + commute 部分の machinery を
+  全部持っているため, Thm 6.3 は実質 30-40 行で完成.
+
+**未着手 (今回 scope 外)**:
+- 6.2 (Cor 3.28 dep), 6.7 (Schur-Zassenhaus dep) — 先行章完成待ち.
+- 6.4 (4-way equivalence) — `IsFrobeniusGroup` 定義 + 重い証明.
+- 6.5, 6.6 (counting in G) — 6.4 とセット.
+
 ## 開発時の注意点
 
 ### Frobenius 群の定義候補
