@@ -181,8 +181,89 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 `P` p-群, class ≤ 2, `P'` exponent `p^e` ⇒ `P/Z(P)` exponent も `p^e`.
 形式化保留 (Subgroup `Monoid.exponent` API 拡張要). -/
 
+/-! ### Lemma 4.4 helpers: class ≤ 2 ⇒ `⁅·, z⁆` は左で homomorphism -/
+
+/-- General commutator identity (no hypothesis):
+`⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆`. -/
+private lemma commutatorElement_mul_left_eq (x y z : G) :
+    ⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆ := by
+  simp only [commutatorElement_def]
+  group
+
+/-- Helper: `⁅x, y⁆ ∈ commutator G` for all `x, y : G`. -/
+private lemma commutatorElement_mem_commutator_top (x y : G) :
+    ⁅x, y⁆ ∈ _root_.commutator G := by
+  rw [_root_.commutator_def]
+  exact Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
+
+/-- In class ≤ 2 (`commutator G ≤ Z(G)`), the map `⁅·, z⁆ : G → G'` is a
+homomorphism on the left: `⁅x * y, z⁆ = ⁅x, z⁆ * ⁅y, z⁆`.
+
+**証明**: 一般 identity `⁅x*y, z⁆ = x · ⁅y, z⁆ · x⁻¹ · ⁅x, z⁆` で `⁅y, z⁆` 中心
+⇒ `x · ⁅y, z⁆ = ⁅y, z⁆ · x` ⇒ `x · ⁅y, z⁆ · x⁻¹ = ⁅y, z⁆`. 結果 `⁅y, z⁆ · ⁅x, z⁆`
+を `⁅x, z⁆` 中心で swap. -/
+private lemma commutatorElement_mul_left_of_class_le_two
+    (hC : _root_.commutator G ≤ Subgroup.center G) (x y z : G) :
+    ⁅x * y, z⁆ = ⁅x, z⁆ * ⁅y, z⁆ := by
+  have h_yz : ⁅y, z⁆ ∈ Subgroup.center G :=
+    hC (commutatorElement_mem_commutator_top y z)
+  have h_xz : ⁅x, z⁆ ∈ Subgroup.center G :=
+    hC (commutatorElement_mem_commutator_top x z)
+  rw [commutatorElement_mul_left_eq]
+  rw [show x * ⁅y, z⁆ = ⁅y, z⁆ * x from Subgroup.mem_center_iff.mp h_yz x]
+  rw [mul_inv_cancel_right]
+  exact Subgroup.mem_center_iff.mp h_xz ⁅y, z⁆
+
+/-- In class ≤ 2, `⁅x^n, z⁆ = ⁅x, z⁆^n` for all `n : ℕ`. 帰納で `*` 版から従う. -/
+private lemma commutatorElement_pow_left_of_class_le_two
+    (hC : _root_.commutator G ≤ Subgroup.center G) (x z : G) (n : ℕ) :
+    ⁅x^n, z⁆ = ⁅x, z⁆^n := by
+  induction n with
+  | zero => simp [commutatorElement_def]
+  | succ k ih =>
+    rw [pow_succ, commutatorElement_mul_left_of_class_le_two hC, ih, pow_succ]
+
+/-! ### Isaacs Lemma 4.4 -/
+
+/-- **Isaacs Lemma 4.4** (main, 一般化): `commutator G ≤ Z(G)` (class ≤ 2) で
+全交換子の `n` 乗が `1` ⇒ 任意 `x : G` で `x^n ∈ Z(G)`.
+
+Isaacs は `p`-群 + `n = p^e` で述べるが, 証明は class ≤ 2 + 任意 `n` で動く.
+
+**証明** (Isaacs p.116): 任意 `z : G` で `⁅x^n, z⁆ = ⁅x, z⁆^n = 1`
+(class ≤ 2 ⇒ `⁅·, z⁆` 左 hom + `⁅x, z⁆ ∈ G'` 仮定で `n` 乗 1). よって `x^n` は
+全 `z` と可換 ⇒ `x^n ∈ Z(G)`. -/
+theorem pow_mem_center_of_class_le_two_of_commutator_pow
+    {n : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
+    (hExp : ∀ c ∈ _root_.commutator G, c^n = 1) (x : G) :
+    x^n ∈ Subgroup.center G := by
+  rw [Subgroup.mem_center_iff]
+  intro z
+  rw [eq_comm, ← commutatorElement_eq_one_iff_mul_comm,
+      commutatorElement_pow_left_of_class_le_two hC]
+  exact hExp ⁅x, z⁆ (commutatorElement_mem_commutator_top x z)
+
+/-- **Isaacs Lemma 4.4** (elementary abelian corollary, "In particular" 部分):
+`commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c^p = 1)
+⇒ `G/Z(G)` も `p`-elementary abelian.
+
+(Φ(G) ⊆ Z(G) への帰結は Lem 4.5 を経由するため別途.) -/
+theorem isElementaryAbelian_quotient_center_of_class_le_two
+    {p : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
+    (hExp : ∀ c ∈ _root_.commutator G, c^p = 1) :
+    OddOrder.GroupTheory.IsElementaryAbelian p (G ⧸ Subgroup.center G) := by
+  refine ⟨?_, ?_⟩
+  · exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hC).comm
+  · intro a
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
+    have hxp : x^p ∈ Subgroup.center G :=
+      pow_mem_center_of_class_le_two_of_commutator_pow hC hExp x
+    rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    exact hxp
+
 /-! **Isaacs Lemma 4.5** (`P/N` elementary abelian ⇔ `Φ(P) ⊆ N`):
-mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述). -/
+mathlib `Subgroup.frattini` を経由. 形式化保留 (本書 §1B 正式証明の Ch.4 再述).
+Lem 4.4 の "thus `Φ(P) ⊆ Z(P)`" 帰結はこの Lem 4.5 経由のため未完. -/
 
 /-- **Isaacs Lemma 4.6 easy direction**: `⁅A, ⊤⁆ ≤ G'` (任意 `A ≤ G` で常時成立).
 
