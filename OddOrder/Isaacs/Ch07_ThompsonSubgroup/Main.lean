@@ -285,20 +285,121 @@ end -- 7B
 
 section /- 7C: 7.1 proof + 7.7 -/
 
-/-! ### Lem 7.7 — `N/C` 系の `p'`-quotient (statement 保留)
+open scoped commutatorElement
 
-**Isaacs Lem 7.7** (mmd L3902):
+/-- centralizer ⊆ normalizer (mathlib v4.29.1 に直接の lemma 無し). -/
+private theorem centralizer_le_normalizer {G : Type*} [Group G] (H : Subgroup G) :
+    Subgroup.centralizer (H : Set G) ≤ Subgroup.normalizer H := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hcomm : ∀ z ∈ H, z * x = x * z := Subgroup.mem_centralizer_iff.mp hx
+  have hx_inv_mem : x⁻¹ ∈ Subgroup.centralizer (H : Set G) :=
+    Subgroup.inv_mem _ hx
+  have hcomm_inv : ∀ z ∈ H, z * x⁻¹ = x⁻¹ * z :=
+    Subgroup.mem_centralizer_iff.mp hx_inv_mem
+  refine ⟨fun hy => ?_, fun hxyx => ?_⟩
+  · -- y ∈ H ⇒ xyx⁻¹ = y ∈ H
+    have hxy : x * y = y * x := (hcomm y hy).symm
+    have : x * y * x⁻¹ = y := by rw [hxy]; group
+    rw [this]; exact hy
+  · -- xyx⁻¹ ∈ H ⇒ y = xyx⁻¹ ∈ H
+    have hcomm_z : (x * y * x⁻¹) * x⁻¹ = x⁻¹ * (x * y * x⁻¹) :=
+      hcomm_inv (x * y * x⁻¹) hxyx
+    -- 計算: (xyx⁻¹) * x⁻¹ = x⁻¹*(xyx⁻¹) ⇒ y = xyx⁻¹
+    have h_eq : y * x⁻¹ = (x * y * x⁻¹) * x⁻¹ := by
+      rw [hcomm_z]; group
+    have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
+    rw [hy_eq]; exact hxyx
 
-> `N ⊴ G` が `p'`-subgroup, `P ⊆ G` が `p`-subgroup ⇒
-> (a) `N_{G/N}(PN/N) = N_G(P)·N/N` = **Lem 2.17** (Ch.2 既完: `normalizer_map_of_coprime_kernel`)
-> (b) **`C_{G/N}(PN/N) = C_G(P)·N/N`** (Ch.7 で新規)
+/-- **Isaacs Lem 7.7 (b)** (image of centralizer under p'-quotient).
 
-**先行**: Ch.2 Lem 2.17 ✅ 完成済 (`OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel`).
+`N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
+`C_Ḡ(P̄) = (C_G(P)).map f`.
 
-**proof 戦略** (b): Lem 2.17 (a) の証明戦略を centralizer に並行翻訳 (correspondence
-+ Sylow-style Frattini argument). 短い延長.
-
-**先行章不要で着手可** (Ch.2 完成済). -/
+書籍 p.215-216 の証明 (Lem 2.17 の "short extension"):
+1. ⊇ は明らか (image of centralizer ⊆ centralizer of image).
+2. ⊆: Lem 2.17 (a) で `N̄(P̄) = (N_G(P)).map f`. `Cbar ≤ Nbar` (centralizer ≤ normalizer).
+   correspondence: `X := N_G(P) ⊓ Cbar.comap f` とおく ⇒ `X.map f = Cbar`.
+   `⁅P, X⁆.map f = ⁅Pbar, Cbar⁆ = ⊥` ⇒ `⁅P, X⁆ ≤ ker f = N`. かつ `⁅P, X⁆ ≤ P`
+   (X ≤ N_G(P) なので). 従って `⁅P, X⁆ ≤ P ⊓ N = ⊥` (coprime), 即ち `X ≤ C_G(P)`. -/
+theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
+    [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    Subgroup.centralizer ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N) := by
+  classical
+  set f : G →* G ⧸ N := QuotientGroup.mk' N with hf_def
+  set Pbar : Subgroup (G ⧸ N) := P.map f with hPbar_def
+  set Cbar : Subgroup (G ⧸ N) := Subgroup.centralizer (Pbar : Set (G ⧸ N)) with hCbar_def
+  -- Coprime: P ⊓ N = ⊥
+  obtain ⟨k, hP_card⟩ : ∃ k, Nat.card ↥P = p ^ k := IsPGroup.iff_card.mp hP_pgroup
+  have hp_prime : p.Prime := Fact.out
+  have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
+    rw [hP_card]
+    exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
+  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  -- ker f = N
+  have hf_ker : f.ker = N := QuotientGroup.ker_mk' N
+  refine le_antisymm ?_ ?_
+  · -- ⊆ direction (hard)
+    -- Cbar ≤ Nbar
+    have hCbar_le_Nbar : Cbar ≤ Subgroup.normalizer Pbar := centralizer_le_normalizer Pbar
+    -- Nbar = (N_G(P)).map f by Lem 2.17 (a)
+    have hN_eq : Subgroup.normalizer Pbar = (Subgroup.normalizer P).map f := by
+      rw [hPbar_def, hf_def]
+      exact OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+    -- X := N_G(P) ⊓ (Cbar.comap f).  X.map f = Cbar (correspondence).
+    set X : Subgroup G := Subgroup.normalizer P ⊓ Cbar.comap f with hX_def
+    have hX_map_eq : X.map f = Cbar := by
+      apply le_antisymm
+      · rintro _ ⟨y, ⟨_hy_N, hy_C⟩, rfl⟩
+        exact (Subgroup.mem_comap.mp hy_C : f y ∈ Cbar)
+      · intro c hc
+        have hc_Nbar : c ∈ Subgroup.normalizer Pbar := hCbar_le_Nbar hc
+        rw [hN_eq] at hc_Nbar
+        obtain ⟨n, hn_NgP, hn_eq⟩ := hc_Nbar
+        refine ⟨n, ⟨hn_NgP, ?_⟩, hn_eq⟩
+        show f n ∈ Cbar
+        rw [hn_eq]
+        exact hc
+    -- Claim: X ≤ centralizer P
+    have hX_le_C : X ≤ Subgroup.centralizer (P : Set G) := by
+      rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+      -- ⁅X, P⁆ = ⊥: ⊆ N (commutator maps to ⊥) and ⊆ P (X ≤ N_G(P)), so ⊆ P ⊓ N = ⊥.
+      have h_map_bot : (⁅X, P⁆ : Subgroup G).map f = ⊥ := by
+        rw [Subgroup.map_commutator, hX_map_eq]
+        -- goal: ⁅Cbar, Pbar⁆ = ⊥
+        exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr le_rfl
+      have h_comm_le_N : (⁅X, P⁆ : Subgroup G) ≤ N := by
+        rw [← hf_ker]
+        exact (Subgroup.map_eq_bot_iff _).mp h_map_bot
+      have h_comm_le_P : (⁅X, P⁆ : Subgroup G) ≤ P := by
+        rw [Subgroup.commutator_le]
+        intro x hx_X p hp_P
+        -- x ∈ X ≤ N_G(P), so x p x⁻¹ ∈ P. Then ⁅x, p⁆ = x p x⁻¹ p⁻¹ ∈ P.
+        have hx_N : x ∈ Subgroup.normalizer P := hx_X.1
+        have hxpx : x * p * x⁻¹ ∈ P :=
+          (Subgroup.mem_normalizer_iff.mp hx_N p).mp hp_P
+        change x * p * x⁻¹ * p⁻¹ ∈ P
+        exact P.mul_mem hxpx (P.inv_mem hp_P)
+      -- ⁅X, P⁆ ≤ P ⊓ N = ⊥
+      have h_comm_le_bot : (⁅X, P⁆ : Subgroup G) ≤ ⊥ := by
+        have h_inf : (⁅X, P⁆ : Subgroup G) ≤ P ⊓ N := le_inf h_comm_le_P h_comm_le_N
+        rw [hP_inf_N] at h_inf
+        exact h_inf
+      exact le_bot_iff.mp h_comm_le_bot
+    -- Cbar = X.map f ⊆ (centralizer P).map f
+    rw [← hX_map_eq]
+    exact Subgroup.map_mono hX_le_C
+  · -- ⊇ direction (easy): (C_G(P)).map f ≤ Cbar
+    rintro - ⟨c, hc, rfl⟩
+    rw [Subgroup.mem_centralizer_iff]
+    rintro - ⟨p, hp, rfl⟩
+    -- c centralizes p in G ⇒ f(c) centralizes f(p)
+    have hcp : c * p = p * c := (Subgroup.mem_centralizer_iff.mp hc p hp).symm
+    rw [← map_mul, ← map_mul]
+    exact congrArg f hcp.symm
 
 end -- 7C
 
