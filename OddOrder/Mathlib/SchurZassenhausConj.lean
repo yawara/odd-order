@@ -837,13 +837,43 @@ private theorem step_caseB
       have h_HN_bot : (H : Subgroup G) ⊓ N = ⊥ := by
         rw [inf_comm]; exact hH_compl.disjoint.eq_bot
       exact le_bot_iff.mp (h_le.trans h_HN_bot.le)
-    -- Cardinality: |M ⊓ H| · |N| = |M|.
-    -- Step 2: M ⊓ H is a Sylow p-subgroup of M.
-    -- Step 3: M ⊓ K' is also Sylow p of M (same argument with K' instead of H).
-    -- Step 4: Sylow C in M: ∃ m ∈ M, (M ⊓ K')^m = M ⊓ H, equivalently M ⊓ K'^m = M ⊓ H.
-    -- Step 5: L := M ⊓ H = M ⊓ K'^m. L ⊴ H, L ⊴ K'^m, L > 1.
-    -- Step 6a: N_G(L) < G ⇒ step_restriction on N_G(L) ⇒ promote via decomp.
-    -- Step 6b: N_G(L) = G ⇒ L ⊴ G ⇒ step_factor with H, L gives K'.
+    have h_MH_sup_N : (M ⊓ H : Subgroup G) ⊔ N = M := by
+      rw [sup_comm]; exact h_M_eq.symm
+    -- Step 1: cardinality |M ⊓ H| · |N| = |M|.
+    have h_MH_card : Nat.card (M ⊓ H : Subgroup G) * Nat.card N = Nat.card M := by
+      have h_card := card_HK_mul_card_inf_eq_card_mul_card (M ⊓ H : Subgroup G) N
+      rw [h_MH_inf_N, Subgroup.card_bot, mul_one] at h_card
+      -- h_card : Nat.card (↑(M ⊓ H) * ↑N : Set G) = Nat.card (M ⊓ H) * Nat.card N
+      have h_set_eq : (↑(M ⊓ H : Subgroup G) * ↑N : Set G) = (↑M : Set G) := by
+        rw [← Subgroup.mul_normal, h_MH_sup_N]
+      rw [h_set_eq] at h_card
+      exact h_card.symm
+    -- Step 2: |N| · |M̄| = |M|.
+    have h_M_card : Nat.card N * Nat.card M_bar = Nat.card M := by
+      have h_M_idx_eq : M.index = M_bar.index :=
+        M_bar.index_comap_of_surjective (QuotientGroup.mk'_surjective N)
+      have h_M_lagrange : Nat.card ↥M * M.index = Nat.card G := M.card_mul_index
+      have h_M_bar_lagrange : Nat.card ↥M_bar * M_bar.index = N.index := by
+        rw [show N.index = Nat.card (G ⧸ N) from rfl]
+        exact M_bar.card_mul_index
+      have h_N_lagrange : Nat.card ↥N * N.index = Nat.card G := N.card_mul_index
+      have h_M_idx_pos : 0 < M.index :=
+        Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+      apply Nat.eq_of_mul_eq_mul_right h_M_idx_pos
+      calc Nat.card N * Nat.card M_bar * M.index
+          = Nat.card N * (Nat.card M_bar * M_bar.index) := by rw [h_M_idx_eq]; ring
+        _ = Nat.card N * N.index := by rw [h_M_bar_lagrange]
+        _ = Nat.card G := h_N_lagrange
+        _ = Nat.card M * M.index := h_M_lagrange.symm
+    -- Step 3: |M ⊓ H| = |M̄|.
+    have h_MH_card_eq_M_bar : Nat.card (M ⊓ H : Subgroup G) = Nat.card M_bar := by
+      have hN_pos : 0 < Nat.card N := Nat.card_pos
+      apply Nat.eq_of_mul_eq_mul_right hN_pos
+      rw [h_MH_card, mul_comm, h_M_card]
+    -- Step 4: |M ⊓ H| = p^k (where M_bar is a p-group of cardinality p^k).
+    obtain ⟨k, hk_eq⟩ := hp_pgroup.exists_card_eq
+    have h_MH_card_eq_pk : Nat.card ↥(M ⊓ H : Subgroup G) = p ^ k := by
+      rw [h_MH_card_eq_M_bar, hk_eq]
     sorry
   · -- Case ⊔ M < ⊤: step_restriction on H ⊔ M.
     have hHU : H ≤ H ⊔ M := le_sup_left
