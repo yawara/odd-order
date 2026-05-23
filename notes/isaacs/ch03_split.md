@@ -214,23 +214,33 @@ Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着�
 - §3E coprime action 主要結果 (Thm 3.23, Lem 3.24 Glauberman, Thm 3.26-3.34 等):
   Ch.4 §4C-§4D coprime action machinery 依存.
   `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` で実装中.
-  **2026-05-24 進捗**: Tier 1 **ほぼ完成** (8/9). 残 1 sorry のみ (Cor 3.25 deferred).
+  **2026-05-24 進捗**: Tier 1 **全 9 件 sorry-free 完成** ⭐⭐⭐
   | Isaacs # | Lean 名 | 状態 |
   |---|---|---|
   | Lem 3.24(a) Glauberman fixed | `glauberman_fixed_point_exists` | ✅ flagship |
   | Lem 3.24(b) Glauberman conj | `glauberman_fixed_points_conj` | ✅ flagship |
   | Thm 3.23(a) A-inv Sylow | `exists_aInvariant_sylow` | ✅ flagship ⭐ |
   | Thm 3.23(b) A-inv Sylow conj | `aInvariant_sylow_conj` | ✅ flagship |
-  | Cor 3.25 A-inv p-subgr ⊆ Syl | `aInvariant_pSubgroup_le_aInvariant_sylow` | ⏳ sorry (normalizers grow infra 要) |
+  | Cor 3.25 A-inv p-subgr ⊆ Syl | `aInvariant_pSubgroup_le_aInvariant_sylow` | ✅ flagship ⭐ |
   | Thm 3.27 A-inv coset | `aInvariant_coset_mem_centralizer` | ✅ flagship |
   | Cor 3.28 商の固定点 (**transitive blocker**) | `coprime_fixedPoints_quotient` | ✅ flagship ⭐⭐⭐ |
   | Cor 3.29 A trivial on G/Φ | `aFixed_quotient_frattini` | ✅ flagship |
   | Cor 3.30 (実用形) faithful + triv on G/Φ ⇒ triv | `aFaithful_quotient_frattini` | ✅ flagship |
 
   これで Ch.4 多数定理 (4.26, 4.28-30, 4.34-36, 4.38) の transitive 前提
-  (Cor 3.28) が解除. Ch.4 §4C-§4D 本格着手可能. 残 Cor 3.25 は
-  `NormalizerCondition` for p-groups の subgroupOf 計算 (~150 LOC) が必要で
-  future work.
+  (Cor 3.28) と Hall-Higman 系統で要求される A-不変 Sylow 拡大 (Cor 3.25) の
+  両方が解除. Ch.4 §4C-§4D 本格着手可能.
+
+  **Cor 3.25 実装概要 (2026-05-24)**: 極大 A-不変 p-部分群 Q を取り,
+  N := N_G(Q) に 3.23(a) を適用して A-不変 Sylow R_in_N を得, 極大性で Q = R_in_N.
+  Q の Sylow-of-G 性は normalizer-grow-in-p-groups で示す: 任意の p-部分群 T ⊇ Q
+  に対し T が p-群 ⇒ `Group.IsNilpotent T` (mathlib `IsPGroup.isNilpotent`) ⇒
+  `NormalizerCondition T`. `subgroupOf_normalizer_eq` で
+  `(Q.subgroupOf T).normalizer = N.subgroupOf T` を得て, Q < N ⊓ T を導出.
+  N ⊓ T ≤ N は p-部分群で Q の Sylow-in-N 性に矛盾. 全体 ~110 LOC.
+
+  Tier 2 (Thm 3.31-3.34 軌道/Three-Subgroup Lemma) は本来 Ch.4 §4C-§4D 依存の
+  ため別 phase で実装.
 
 ## mmd 抽出失敗の整理
 
