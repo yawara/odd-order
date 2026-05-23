@@ -2352,12 +2352,59 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)).comp SemidirectProduct.inl
   -- inl_to_G is injective: ker = inl⁻¹(K) = ⊥.
   have h_inj : Function.Injective inl_to_G := by
-    rw [← MonoidHom.ker_eq_bot_iff]
-    sorry  -- (a⁻¹, m)^j = (a⁻ʲ, jm), so inl x ∈ K iff x = 1 ∧ j = 0.
+    rw [injective_iff_map_eq_one]
+    intro x hx
+    have h_in_K : (SemidirectProduct.inl x : CyclicExtPreG N σ) ∈ cyclicExtKSubgroup m a σ := by
+      have heq : inl_to_G x = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+          (SemidirectProduct.inl x) := rfl
+      rw [heq] at hx
+      exact (QuotientGroup.eq_one_iff _).mp hx
+    rw [Subgroup.mem_zpowers_iff] at h_in_K
+    obtain ⟨j, hj⟩ := h_in_K
+    have h_K_right : (cyclicExtK m a σ).right = Multiplicative.ofAdd (m : ℤ) := by
+      show (SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr _).right = _
+      simp
+    have h_jm_eq_zero : (j • (m : ℤ)) = 0 := by
+      have h_right_of_inl : (SemidirectProduct.inl x : CyclicExtPreG N σ).right = 1 :=
+        SemidirectProduct.right_inl x
+      have h_zpow_right : ((cyclicExtK m a σ) ^ j : CyclicExtPreG N σ).right =
+          (Multiplicative.ofAdd (m : ℤ)) ^ j := by
+        have hmap : SemidirectProduct.rightHom ((cyclicExtK m a σ) ^ j) =
+            SemidirectProduct.rightHom (cyclicExtK m a σ) ^ j := map_zpow _ _ _
+        show SemidirectProduct.rightHom ((cyclicExtK m a σ) ^ j) = _
+        rw [hmap]; congr 1
+      have h_one : ((cyclicExtK m a σ) ^ j : CyclicExtPreG N σ).right = 1 := by
+        rw [hj]; exact h_right_of_inl
+      rw [h_zpow_right] at h_one
+      rw [← ofAdd_zsmul, ofAdd_eq_one] at h_one
+      exact h_one
+    have hj_zero : j = 0 := by
+      rw [smul_eq_mul] at h_jm_eq_zero
+      rcases mul_eq_zero.mp h_jm_eq_zero with h | h
+      · exact h
+      · exfalso
+        have hm_pos : (m : ℤ) > 0 := Int.natCast_pos.mpr _hm
+        exact (ne_of_gt hm_pos) h
+    subst hj_zero
+    rw [zpow_zero] at hj
+    have h_inl_one : (SemidirectProduct.inl x : CyclicExtPreG N σ) = 1 := hj.symm
+    have : SemidirectProduct.inl x = (SemidirectProduct.inl (1 : N) : CyclicExtPreG N σ) := by
+      rw [(SemidirectProduct.inl : N →* CyclicExtPreG N σ).map_one]; exact h_inl_one
+    exact SemidirectProduct.inl_injective this
   -- N₀ := range of inl_to_G.
   let N₀ : Subgroup G := inl_to_G.range
   haveI hN₀_norm : N₀.Normal := by
-    sorry  -- inl(N) ⊴ preG (SemidirectProduct.range_inl_normal), image normal via mk' surjective.
+    have h_range_eq : (inl_to_G.range : Subgroup G) =
+        (SemidirectProduct.inl : N →* CyclicExtPreG N σ).range.map
+          (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)) :=
+      MonoidHom.range_comp _ _
+    show N₀.Normal
+    rw [show N₀ = inl_to_G.range from rfl, h_range_eq]
+    have h_inl_range_normal :
+        (SemidirectProduct.inl : N →* CyclicExtPreG N σ).range.Normal := by
+      rw [SemidirectProduct.range_inl_eq_ker_rightHom]
+      exact (SemidirectProduct.rightHom : CyclicExtPreG N σ →* Multiplicative ℤ).normal_ker
+    exact h_inl_range_normal.map _ (QuotientGroup.mk'_surjective _)
   -- ι := N ≃* N₀.
   let ι : N ≃* ↥N₀ := MonoidHom.ofInjective h_inj
   -- g := ⟦inr (ofAdd 1)⟧.
