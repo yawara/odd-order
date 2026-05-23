@@ -2735,19 +2735,92 @@ lemma commutatorElement_mul_right_of_class_le_two {G : Type*} [Group G]
     commutatorElement_mul_left_of_class_le_two hC a b z
   rw [← h_inv_ab, h_left, mul_inv_rev, commutatorElement_inv, commutatorElement_inv, h_swap]
 
-/-! **Lem 4.37 associativity** (`baerAdd_assoc`): 形式化 TODO.
+/-- **Lem 4.37 associativity**: `x +' (y +' z) = (x +' y) +' z` for class ≤ 2 + odd order.
 
-教科書 (Isaacs p.142) の証明: class ≤ 2 で commutator が中心 ⇒
-- 左/右両側で hom: `⁅·, z⁆`, `⁅z, ·⁆` 共に hom
-- `√c` (`c` 中心) も中心 ⇒ `⁅√c, anything⁆ = 1`
-- 中心の元は commute ⇒ `√` distributes (`sqrtOdd_mul_of_commute`)
+**証明**: 両辺は `x * y * z * sqrtOdd ⁅z, y⁆ * sqrtOdd ⁅y, x⁆ * sqrtOdd ⁅z, x⁆` に等しい
+(中心 commutators の積 は順序自由).
 
-両辺展開: `x +' (y +' z) = xyz · √(⁅z, y⁆ · ⁅y, x⁆ · ⁅z, x⁆)`
-        `(x +' y) +' z = xyz · √(⁅y, x⁆ · ⁅z, x⁆ · ⁅z, y⁆)`
-中心 commutators の積は順序自由で等値. ~80-120 LOC 推定. -/
+LHS = `x * (yz·S_{zy}) * S_{(yz·S_{zy}, x)}`:
+- `⁅yz·S_{zy}, x⁆ = ⁅y, x⁆ * ⁅z, x⁆` (left hom + `⁅S_{zy}, x⁆ = 1`)
+- `S_{⁅y,x⁆·⁅z,x⁆} = S_{y,x} * S_{z,x}` (sqrtOdd of central commuting product)
 
-/-! **Lem 4.37 part (b) (additive order = multiplicative order)** + **(c) (automorphism preservation)**:
-形式化 TODO. 要 `baerAdd_assoc` で AddGroup 構造構築後. -/
+RHS = `(xy·S_{yx}) * z * S_{(z, xy·S_{yx})}`:
+- `⁅z, xy·S_{yx}⁆ = ⁅z, x⁆ * ⁅z, y⁆` (right hom + `⁅z, S_{yx}⁆ = 1`)
+- `z` moves past central `S_{yx}` ⇒ `xyz·S_{yx}·S_{⁅z,x⁆·⁅z,y⁆}`
+- `S_{⁅z,x⁆·⁅z,y⁆} = S_{z,x} * S_{z,y}`. -/
+lemma baerAdd_assoc {G : Type*} [Group G] (hC : _root_.commutator G ≤ Subgroup.center G)
+    (hOdd : Odd (Nat.card G)) (x y z : G) :
+    baerAdd x (baerAdd y z) = baerAdd (baerAdd x y) z := by
+  -- Notation: S_{ab} = sqrtOdd ⁅a, b⁆
+  set Syz : G := sqrtOdd ⁅z, y⁆
+  set Sxy : G := sqrtOdd ⁅y, x⁆
+  set Sxz : G := sqrtOdd ⁅z, x⁆
+  -- Centrality of all sqrtOdd-of-commutator elements
+  have h_Sc_zy : Syz ∈ Subgroup.center G :=
+    sqrtOdd_central_of_central (hC (commutatorElement_mem_commutator_top z y))
+  have h_Sc_yx : Sxy ∈ Subgroup.center G :=
+    sqrtOdd_central_of_central (hC (commutatorElement_mem_commutator_top y x))
+  have h_Sc_zx : Sxz ∈ Subgroup.center G :=
+    sqrtOdd_central_of_central (hC (commutatorElement_mem_commutator_top z x))
+  -- Helper: central element commutes with anything (Commute)
+  have h_comm_central : ∀ {c : G}, c ∈ Subgroup.center G → ∀ a, Commute c a := fun hc a =>
+    (Subgroup.mem_center_iff.mp hc a).symm
+  have h_Comm_Syz : ∀ a, Commute Syz a := fun a => h_comm_central h_Sc_zy a
+  have h_Comm_Sxy : ∀ a, Commute Sxy a := fun a => h_comm_central h_Sc_yx a
+  -- LHS commutator computation: ⁅y * z * Syz, x⁆ = ⁅y, x⁆ * ⁅z, x⁆
+  have h_LHS_arg : ⁅y * z * Syz, x⁆ = ⁅y, x⁆ * ⁅z, x⁆ := by
+    have h_yz_x : ⁅y * z, x⁆ = ⁅y, x⁆ * ⁅z, x⁆ :=
+      commutatorElement_mul_left_of_class_le_two hC y z x
+    have h_Syz_x : ⁅Syz, x⁆ = (1 : G) :=
+      (commutatorElement_eq_one_iff_commute (g₁ := Syz) (g₂ := x)).mpr (h_Comm_Syz x)
+    rw [commutatorElement_mul_left_of_class_le_two hC, h_yz_x, h_Syz_x, mul_one]
+  -- RHS commutator computation: ⁅z, x * y * Sxy⁆ = ⁅z, x⁆ * ⁅z, y⁆
+  have h_RHS_arg : ⁅z, x * y * Sxy⁆ = ⁅z, x⁆ * ⁅z, y⁆ := by
+    have h_z_xy : ⁅z, x * y⁆ = ⁅z, x⁆ * ⁅z, y⁆ :=
+      commutatorElement_mul_right_of_class_le_two hC z x y
+    have h_z_Sxy : ⁅z, Sxy⁆ = (1 : G) :=
+      (commutatorElement_eq_one_iff_commute (g₁ := z) (g₂ := Sxy)).mpr (h_Comm_Sxy z).symm
+    rw [commutatorElement_mul_right_of_class_le_two hC z (x * y) Sxy, h_z_xy, h_z_Sxy, mul_one]
+  -- Distribute sqrtOdd over products of central commutators
+  -- sqrtOdd (⁅y, x⁆ * ⁅z, x⁆) = Sxy * Sxz (centrals commute)
+  have h_C_xy : (⁅y, x⁆ : G) ∈ Subgroup.center G :=
+    hC (commutatorElement_mem_commutator_top y x)
+  have h_C_zx : (⁅z, x⁆ : G) ∈ Subgroup.center G :=
+    hC (commutatorElement_mem_commutator_top z x)
+  have h_split_LHS : sqrtOdd (⁅y, x⁆ * ⁅z, x⁆ : G) = Sxy * Sxz :=
+    sqrtOdd_mul_of_commute ((h_comm_central h_C_xy) ⁅z, x⁆)
+  -- sqrtOdd (⁅z, x⁆ * ⁅z, y⁆) = Sxz * Syz
+  have h_C_zy : (⁅z, y⁆ : G) ∈ Subgroup.center G :=
+    hC (commutatorElement_mem_commutator_top z y)
+  have h_split_RHS : sqrtOdd (⁅z, x⁆ * ⁅z, y⁆ : G) = Sxz * Syz :=
+    sqrtOdd_mul_of_commute ((h_comm_central h_C_zx) ⁅z, y⁆)
+  -- Compute LHS and RHS
+  -- LHS = x * (y * z * Syz) * sqrtOdd ⁅y * z * Syz, x⁆
+  --     = x * y * z * Syz * sqrtOdd (⁅y, x⁆ * ⁅z, x⁆)
+  --     = x * y * z * Syz * Sxy * Sxz
+  -- RHS = (x * y * Sxy) * z * sqrtOdd ⁅z, x * y * Sxy⁆
+  --     = x * y * Sxy * z * sqrtOdd (⁅z, x⁆ * ⁅z, y⁆)
+  --     = x * y * Sxy * z * Sxz * Syz
+  --     = x * y * z * Sxy * Sxz * Syz  (Sxy commutes with z)
+  -- LHS = RHS iff Syz * Sxy * Sxz = Sxy * Sxz * Syz, which holds because all centrals commute.
+  rw [baerAdd_def, baerAdd_def, baerAdd_def, baerAdd_def, h_LHS_arg, h_RHS_arg,
+      h_split_LHS, h_split_RHS]
+  -- Goal: x * (y * z * Syz) * (Sxy * Sxz) = (x * y * Sxy) * z * (Sxz * Syz)
+  -- Both sides normalize to `x * y * z * Sxy * Sxz * Syz` via commutativity
+  -- of central elements (Syz, Sxy, Sxz).
+  have h_Sxy_z := h_Comm_Sxy z
+  have h_LHS_norm :
+      x * (y * z * Syz) * (Sxy * Sxz) = x * y * z * Sxy * Sxz * Syz := by
+    have hC : Commute Syz (Sxy * Sxz) := (h_Comm_Syz Sxy).mul_right (h_Comm_Syz Sxz)
+    have h_rearrange :
+        x * (y * z * Syz) * (Sxy * Sxz) = (x * y * z) * (Syz * (Sxy * Sxz)) := by group
+    rw [h_rearrange, hC.eq]; group
+  have h_RHS_norm :
+      (x * y * Sxy) * z * (Sxz * Syz) = x * y * z * Sxy * Sxz * Syz := by
+    have h_rearrange :
+        (x * y * Sxy) * z * (Sxz * Syz) = x * y * (Sxy * z) * (Sxz * Syz) := by group
+    rw [h_rearrange, h_Sxy_z.eq]; group
+  rw [h_LHS_norm, h_RHS_norm]
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
