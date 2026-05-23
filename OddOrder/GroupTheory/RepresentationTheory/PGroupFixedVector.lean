@@ -83,16 +83,60 @@ variable {G : Type*} [Group G] [Finite G]
 variable {F : Type*} [Field F] [CharP F p]
 variable {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
 
+/-! ### Helper lemmas (sorry-free) -/
+
+omit [Finite G] [Module.Finite F V] [CharP F p] in
+/-- `(ρ g)^(orderOf g) = 1` as an endomorphism of `V`. Used in
+`invariants_ne_bot` proof: `ρ g` の order は `orderOf g` を割る. -/
+theorem map_pow_orderOf_eq_one (ρ : Representation F G V) (g : G) :
+    (ρ g) ^ orderOf g = (1 : Module.End F V) := by
+  rw [← map_pow, pow_orderOf_eq_one, map_one]
+
+omit [Finite G] [Module.Finite F V] [CharP F p] in
+/-- For a `p`-group element `g`, `(ρ g)^(p^k) = 1` for some `k`
+(specifically, `k` such that `orderOf g = p^k`). -/
+theorem exists_map_pow_prime_pow_eq_one
+    (hG : IsPGroup p G) (ρ : Representation F G V) (g : G) :
+    ∃ k : ℕ, (ρ g) ^ (p ^ k) = (1 : Module.End F V) := by
+  obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp hG g
+  exact ⟨k, hk ▸ map_pow_orderOf_eq_one ρ g⟩
+
+/-! ### Main result -/
+
 /-- **Gorenstein Lemma 2.6.3** (Isaacs FGT 不在): `p`-群 `G` が char `p`
 の体 `F` 上の有限次元 vector space `V` に表現として作用するとき, `V` が
 非零なら固定 vector の部分加群は `⊥` でない.
 
-stub: 詳細 proof は本ファイル冒頭 docstring の "Proof strategy" 参照. -/
+**Proof status (2026-05-24, ralph-loop iter 1)**:
+- base case `¬ Nontrivial G` (G subsingleton): sorry-free
+  (`ρ g = 1` for all g ⇒ `invariants = ⊤`).
+- step case `Nontrivial G`: center 非自明
+  (`IsPGroup.center_nontrivial`) + helper
+  `exists_map_pow_prime_pow_eq_one` + nilpotent kernel + G/⟨z⟩ 帰納.
+  詳細 proof は本ファイル冒頭 docstring の "Proof strategy" 参照.
+  内部 sorry 残. -/
 theorem invariants_ne_bot
-    (_hG : IsPGroup p G) (ρ : Representation F G V)
-    (_hV : (⊤ : Submodule F V) ≠ ⊥) :
+    (hG : IsPGroup p G) (ρ : Representation F G V)
+    (hV : (⊤ : Submodule F V) ≠ ⊥) :
     ρ.invariants ≠ ⊥ := by
-  sorry
+  by_cases hNontriv : Nontrivial G
+  · -- Step: Nontrivial G. center 非自明 + helper 適用 + 帰納
+    -- 詳細は次 iter で
+    haveI := hNontriv
+    haveI := hG.center_nontrivial
+    sorry
+  · -- Base: G subsingleton ⇒ ρ g = 1 for all g ⇒ invariants = ⊤
+    haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hNontriv
+    have h_eq_top : ρ.invariants = ⊤ := by
+      rw [eq_top_iff]
+      intro v _ g
+      have hg : g = 1 := Subsingleton.elim g 1
+      rw [hg, map_one, Module.End.one_apply]
+    intro h_inv_bot
+    apply hV
+    calc (⊤ : Submodule F V)
+        = ρ.invariants := h_eq_top.symm
+      _ = ⊥ := h_inv_bot
 
 /-- **言い換え**: 非零固定 vector の存在形 (BG §2 Thm 2.6 / BG §3 で
 直接使う形). `IsPGroup.invariants_ne_bot` の corollary. -/
