@@ -247,6 +247,15 @@ FT クリティカル度 + 章内依存で並べる:
   - bijection `G ⧸ A ≃ conjugates A` 経由で |conjugates| = A.index.
   - `|X| = |G| - A.index × (|A| - 1) = A.index` (Lagrange + omega).
   - ConjAct typeclass 回避のため `MulAut.conj g · A` 直接パラメトライズ.
+- **Cor 6.6** `IsFrobeniusGroup.kernel_eq_notConjugateSet` (~30 LOC):
+  Frobenius 群で N = notConjugateSet A (set 等式). N ⊆ X は normality + Disjoint,
+  逆向きは Lem 6.5 cardinality (|N| = A.index = |X|) で `Set.eq_of_subset_of_ncard_le`.
+- **Thm 6.4 (1) ⇒ (4)** `IsFrobeniusGroup.centralizer_kernel_le` (~50 LOC):
+  Cor 6.6 経由で `c ∉ N` ⇒ c is A-conjugate ⇒ `m := g⁻¹ n g ∈ N, m ≠ 1` で
+  `a * m * a⁻¹ = m` を導出, conj_frobenius と矛盾.
+- **Thm 6.4 完全 TFAE 達成**: (1) ⇔ (2) ⇔ (3) ⇔ (4) all closed.
+  Constructor 形 (`of_centralizer_*_le`) + projection 形 (`trivialIntersection`,
+  `centralizer_complement_le`, `centralizer_kernel_le`) 揃った.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
