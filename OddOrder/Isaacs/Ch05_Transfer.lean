@@ -851,11 +851,11 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 - **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
 - **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
   Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
-- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): 🟡 部分完成 (skeleton + helpers).
-  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` (~20 LOC) +
-  `lt_normalizer_of_pgroup_of_lt_top` (~6 LOC) は sorry-free. main body は
-  強帰納法 setup + Case 1 (P = Q) + Case 2 開始 (D < P, D < Q 確立) まで.
-  残り ~200 LOC は別 session.
+- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
+  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` + `lt_normalizer_of_pgroup_of_lt_top`.
+  main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
+  Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
+  二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
 - **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
 - **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
 
@@ -1361,12 +1361,119 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         hPN_le_S_in_G.trans hS_in_G_le_R
       have hPR_gt_D : D < (P : Subgroup G) ⊓ R :=
         lt_of_lt_of_le hPN_gt_D (le_inf inf_le_left hPN_le_R)
-      -- Remaining: Step 9 (Q ⊓ N ≤ yR := yC • R via T conjugation translation) +
-      --            Step 10/11 (IH on (P,R), (yR,Q), combine c = x · y⁻¹ · z) は別 session.
-      -- 主な技術障壁: (yC • S : Sylow p ↥N : Subgroup ↥N).map N.subtype = yC.val • S_in_G
-      -- の conjugation translation. `Sylow.coe_subgroup_smul` + `mem_pointwise_smul_iff_inv_smul_mem`
-      -- + ↥N vs G 座標変換が複雑.
-      sorry
+      -- **Step 9**: yR := yC.val • R (Sylow in G). Q ⊓ N ≤ yR.
+      set yR : Sylow p G := (yC : G) • R with hyR_def
+      have hQN_le_yR : (Q : Subgroup G) ⊓ N ≤ (yR : Subgroup G) := by
+        intro q hq
+        obtain ⟨hq_Q, hq_N⟩ := Subgroup.mem_inf.mp hq
+        let q_N : ↥N := ⟨q, hq_N⟩
+        have hq_N_in_QN : q_N ∈ ((Q : Subgroup G) ⊓ N).subgroupOf N := by
+          rw [Subgroup.mem_subgroupOf]
+          exact Subgroup.mem_inf.mpr ⟨hq_Q, hq_N⟩
+        have hq_N_in_T : q_N ∈ (T : Subgroup ↥N) := hQN_le_T hq_N_in_QN
+        have hq_in_yCS : q_N ∈ ((yC • S : Sylow p ↥N) : Subgroup ↥N) := by
+          rw [← h_T_eq]; exact hq_N_in_T
+        rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hq_in_yCS
+        -- hq_in_yCS : (MulAut.conj yC)⁻¹ • q_N ∈ S
+        have hs_in_R : ((MulAut.conj yC)⁻¹ q_N : ↥N).val ∈ (R : Subgroup G) := by
+          apply hS_in_G_le_R
+          exact ⟨(MulAut.conj yC)⁻¹ q_N, hq_in_yCS, rfl⟩
+        show q ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
+        rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+        -- Goal: (MulAut.conj (yC : G))⁻¹ q ∈ (R : Subgroup G)
+        -- Both sides equal (yC : G)⁻¹ * q * (yC : G); ((MulAut.conj yC)⁻¹ q_N).val computes same
+        convert hs_in_R using 1
+      -- **Step 10**: index strict inequalities for IH (P, R) and (yR, Q)
+      have hQyR_gt_D : D < (Q : Subgroup G) ⊓ yR :=
+        lt_of_lt_of_le hQN_gt_D (le_inf inf_le_left hQN_le_yR)
+      -- (P ⊓ R).index < k (D.index)
+      have h_PR_idx_lt : ((P : Subgroup G) ⊓ R : Subgroup G).index < k := by
+        rw [← hk]
+        have h_dvd : ((P : Subgroup G) ⊓ R).index ∣ D.index :=
+          Subgroup.index_dvd_of_le hPR_gt_D.le
+        have h_D_idx_pos : 0 < D.index :=
+          Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+        refine lt_of_le_of_ne (Nat.le_of_dvd h_D_idx_pos h_dvd) ?_
+        intro h_eq
+        have h_card_eq : Nat.card ↥D = Nat.card ↥((P : Subgroup G) ⊓ R) := by
+          have h1 := Subgroup.index_mul_card D
+          have h2 := Subgroup.index_mul_card ((P : Subgroup G) ⊓ R)
+          rw [h_eq] at h2
+          exact Nat.eq_of_mul_eq_mul_left h_D_idx_pos (h1.trans h2.symm)
+        exact hPR_gt_D.ne (Subgroup.eq_of_le_of_card_ge hPR_gt_D.le h_card_eq.ge)
+      -- ((Q ⊓ yR)).index < k. Note inf_comm: Q ⊓ yR = yR ⊓ Q? Use Q ⊓ yR for symmetric IH.
+      have h_QyR_idx_lt : ((Q : Subgroup G) ⊓ yR : Subgroup G).index < k := by
+        rw [← hk]
+        have h_dvd : ((Q : Subgroup G) ⊓ yR).index ∣ D.index :=
+          Subgroup.index_dvd_of_le hQyR_gt_D.le
+        have h_D_idx_pos : 0 < D.index :=
+          Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+        refine lt_of_le_of_ne (Nat.le_of_dvd h_D_idx_pos h_dvd) ?_
+        intro h_eq
+        have h_card_eq : Nat.card ↥D = Nat.card ↥((Q : Subgroup G) ⊓ yR) := by
+          have h1 := Subgroup.index_mul_card D
+          have h2 := Subgroup.index_mul_card ((Q : Subgroup G) ⊓ yR)
+          rw [h_eq] at h2
+          exact Nat.eq_of_mul_eq_mul_left h_D_idx_pos (h1.trans h2.symm)
+        exact hQyR_gt_D.ne (Subgroup.eq_of_le_of_card_ge hQyR_gt_D.le h_card_eq.ge)
+      -- **Step 11**: IH applications + combine c = x · yC.val⁻¹ · z
+      -- IH on (P, R): (P : Subgroup G) ⊓ R as intersection (need to match shape)
+      -- The IH wants ∃ c ∈ centralizer((P' ⊓ Q' : Set G)), c • Q' = P' for any P' Q' pair with
+      -- index of P' ⊓ Q' < k. Apply to (P, R) and (yR, Q).
+      obtain ⟨x, hx_C, hxR⟩ := ih _ h_PR_idx_lt P R rfl
+      -- hx_C : x ∈ Subgroup.centralizer (((P : Subgroup G) ⊓ (R : Subgroup G)) : Set G)
+      -- hxR : x • R = P
+      -- For (yR, Q): index = (yR : Subgroup G) ⊓ Q. Hmm I have Q ⊓ yR.
+      have hyRQ_inf_eq : (yR : Subgroup G) ⊓ Q = (Q : Subgroup G) ⊓ yR := inf_comm _ _
+      have h_yRQ_idx_lt' : ((yR : Subgroup G) ⊓ (Q : Subgroup G) : Subgroup G).index < k := by
+        rw [hyRQ_inf_eq]; exact h_QyR_idx_lt
+      obtain ⟨z, hz_C, hzQ⟩ := ih _ h_yRQ_idx_lt' yR Q rfl
+      -- hz_C : z ∈ Subgroup.centralizer (((yR : Subgroup G) ⊓ (Q : Subgroup G)) : Set G)
+      -- hzQ : z • Q = yR
+      -- c := x * yC.val⁻¹ * z
+      refine ⟨x * (yC : G)⁻¹ * z, ?_, ?_⟩
+      · -- c ∈ centralizer D
+        have hyC_cent_D : (yC : G) ∈ Subgroup.centralizer (D : Set G) := by
+          have : yC.val ∈ C := by
+            have := hyC_in
+            rwa [Subgroup.mem_subgroupOf] at this
+          exact this
+        have hyC_inv_cent_D : ((yC : G))⁻¹ ∈ Subgroup.centralizer (D : Set G) :=
+          (Subgroup.centralizer (D : Set G)).inv_mem hyC_cent_D
+        have hx_cent_D : x ∈ Subgroup.centralizer (D : Set G) := by
+          have h_D_le : (D : Set G) ⊆ (((P : Subgroup G) ⊓ R : Subgroup G) : Set G) := by
+            intro a ha
+            exact Subgroup.mem_inf.mpr
+              ⟨hD_le_P ha, hPN_le_R (le_inf hD_le_P hD_le_N ha)⟩
+          exact Subgroup.centralizer_le h_D_le hx_C
+        have hz_cent_D : z ∈ Subgroup.centralizer (D : Set G) := by
+          have h_D_le : (D : Set G) ⊆ (((yR : Subgroup G) ⊓ Q : Subgroup G) : Set G) := by
+            intro a ha
+            refine Subgroup.mem_inf.mpr ⟨?_, hD_le_Q ha⟩
+            -- a ∈ yR = yC.val • R; yC centralizes D so yC⁻¹ a yC = a ∈ R
+            show a ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
+            rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+            have h_a_in_R : a ∈ (R : Subgroup G) :=
+              hPN_le_R (le_inf hD_le_P hD_le_N ha)
+            have h_comm : a * (yC : G) = (yC : G) * a :=
+              Subgroup.mem_centralizer_iff.mp hyC_cent_D a ha
+            have h_smul_eq : (MulAut.conj (yC : G))⁻¹ • a = a := by
+              show (yC : G)⁻¹ * a * (yC : G) = a
+              rw [mul_assoc, h_comm, ← mul_assoc, inv_mul_cancel, one_mul]
+            rw [h_smul_eq]; exact h_a_in_R
+          exact Subgroup.centralizer_le h_D_le hz_C
+        exact (Subgroup.centralizer (D : Set G)).mul_mem
+          ((Subgroup.centralizer (D : Set G)).mul_mem hx_cent_D hyC_inv_cent_D)
+          hz_cent_D
+      · -- c • Q = P
+        -- z • Q = yR = yC.val • R, so yC.val⁻¹ • (z • Q) = R, (yC.val⁻¹ * z) • Q = R
+        -- x • R = P, so x • ((yC.val⁻¹ * z) • Q) = P, (x * yC.val⁻¹ * z) • Q = P
+        rw [show (x * (yC : G)⁻¹ * z) • Q = x • ((yC : G)⁻¹ • (z • Q)) by
+          rw [← mul_smul, ← mul_smul]]
+        rw [hzQ, hyR_def]
+        rw [show ((yC : G)⁻¹ • (yC : G) • R : Sylow p G) = R from by
+          rw [← mul_smul, inv_mul_cancel, one_smul]]
+        exact hxR
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
