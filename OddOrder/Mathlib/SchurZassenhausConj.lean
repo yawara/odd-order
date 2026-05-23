@@ -431,7 +431,41 @@ private theorem step_caseA
   -- h_factor : (K.map (conj g_f)) ⊔ L = K' ⊔ L
   -- Need: IsComplement' N K^g (K conjugated by g_f ∈ N, N normal preserves complement).
   have hK_g_compl : IsComplement' N (K.map (MulAut.conj g_f).toMonoidHom) := by
-    sorry
+    apply isComplement'_of_disjoint_and_mul_eq_univ
+    · -- Disjoint: N ⊓ K^g_f = ⊥.
+      rw [disjoint_iff]
+      ext x
+      simp only [Subgroup.mem_inf, Subgroup.mem_bot, Subgroup.mem_map,
+                 MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      refine ⟨fun ⟨hxN, k, hkK, hkx⟩ => ?_, fun h => ?_⟩
+      · -- k = g_f⁻¹ * x * g_f. Both x ∈ N and g_f ∈ N ⇒ k ∈ N. K ⊓ N = ⊥ ⇒ k = 1 ⇒ x = 1.
+        have hk_eq : k = g_f⁻¹ * x * g_f := by rw [← hkx]; group
+        have hkN : k ∈ N := by
+          rw [hk_eq]
+          exact N.mul_mem (N.mul_mem (N.inv_mem hg_f_N) hxN) hg_f_N
+        have hk_inter : k ∈ N ⊓ K := ⟨hkN, hkK⟩
+        rw [hK.disjoint.eq_bot, Subgroup.mem_bot] at hk_inter
+        rw [hk_inter, mul_one, mul_inv_cancel] at hkx
+        exact hkx.symm
+      · subst h
+        exact ⟨N.one_mem, 1, K.one_mem, by simp⟩
+    · -- (N : Set G) * (K^g_f : Set G) = univ.
+      rw [Set.eq_univ_iff_forall]
+      intro x
+      -- Decompose g_f⁻¹ x g_f = n' * k' in N + K, then conjugate back.
+      have h_conj_in_sup : g_f⁻¹ * x * g_f ∈ (N ⊔ K : Subgroup G) := by
+        rw [hK.sup_eq_top]; trivial
+      rw [mem_sup_of_normal_left] at h_conj_in_sup
+      obtain ⟨n', hn'_N, k', hk'_K, hnk'⟩ := h_conj_in_sup
+      have hN_normal_inst' : N.Normal := inferInstance
+      refine ⟨g_f * n' * g_f⁻¹, hN_normal_inst'.conj_mem n' hn'_N g_f,
+              g_f * k' * g_f⁻¹, ?_, ?_⟩
+      · exact Subgroup.mem_map.mpr ⟨k', hk'_K, rfl⟩
+      · -- (g_f n' g_f⁻¹) * (g_f k' g_f⁻¹) = g_f (n' k') g_f⁻¹ = g_f (g_f⁻¹ x g_f) g_f⁻¹ = x.
+        show g_f * n' * g_f⁻¹ * (g_f * k' * g_f⁻¹) = x
+        have : g_f * n' * g_f⁻¹ * (g_f * k' * g_f⁻¹) = g_f * (n' * k') * g_f⁻¹ := by group
+        rw [this, hnk']
+        group
   -- Case split on K^g ⊔ L = ⊤.
   by_cases hH_top : (K.map (MulAut.conj g_f).toMonoidHom) ⊔ L = ⊤
   · -- N = L (cardinality), N abelian, abelian SZ conjugacy.
