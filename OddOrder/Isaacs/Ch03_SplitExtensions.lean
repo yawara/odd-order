@@ -29,8 +29,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3
 | 3B | Schur-Zassenhaus + 可解群基本 | 3.5 – 3.12 | ✅ (mathlib wrapper + Thm 3.11 minimal normal elem abelian) |
 | 3C | Hall 部分群 + 可解性判定 | 3.13 – 3.17 | ✅ (Hall-E 完全証明 + IsHallSubgroup + Lem 3.16; 3.15 placeholder) |
 | 3D | π-separable + Hall-Higman 1.2.3 | 3.18 – 3.22 | ✅⭐⭐ (Thm 3.21 Hall-Higman 1.2.3 sorry-free; AxiomsCheck flagship) |
-| 3E | Coprime action | 3.23 – 3.34 | 部分 (IsAInvariant + 多数 helpers; Glauberman 3.24 stub) |
-| 3F | 巡回商 lift | 3.35 – 3.36 | ✅ (cyclic_quotient_lift 弱版; full 3.35-36 は Phase 4) |
+| 3E | Coprime action | 3.23 – 3.34 | ✅⭐⭐⭐ Tier 1 (3.23-3.30) 全完成 (Ch.4 ForwardFromCh03 配置, 9 件 unconditional flagship). Tier 2 (3.31-3.34) は Ch.4 §4C-§4D 依存で別 phase. |
+| 3F | 巡回商 lift | 3.35 – 3.36 | ✅⭐⭐ Thm 3.35 (uniqueness) + Thm 3.36 (existence) 完成 (`cyclic_extension_exists` AxiomsCheck flagship). |
 
 ## 方針
 
@@ -626,17 +626,17 @@ theorem IsHallSubgroup.bot_of_card_eq_one (π : Set ℕ) (h : Nat.card G = 1) :
 /-- **Isaacs Thm 3.13 Hall-E** の `|G|`-強誘導補助補題.
 
 `n` パラメータは `Nat.card G ≤ n` を表し, induction by `n` で strong induction の
-形を取れる. base case (`Nat.card G = 1`) は完全に閉じる; step case は IH on `G/M`
-+ Schur-Zassenhaus で要 ~200 行 (sorry).
-
-TODO: step case を completion. 必要なのは:
+形を取れる. base case (`Nat.card G = 1`) は完全に閉じる. step case (~200 LOC):
 1. M minimal normal 取り (G nontrivial で existence).
 2. Thm 3.11 で M elementary abelian p-group.
 3. `IH (G ⧸ M) (|G/M| ≤ n から |G/M| = |G|/|M| < |G|)` で `H̄` π-Hall in G/M を得る.
 4. pullback `H = comap (mk' M) H̄`.
 5. p ∈ π case: H は π-Hall (|H| = |H̄|·|M|, |M| は p-power, |G:H| = |G/M : H̄|).
 6. p ∉ π case: H の subgroup M ⊴ H で `Coprime (Nat.card M) M.index` (in H).
-   Schur-Zassenhaus で `H = M ⋊ K`. K が π-Hall in G. -/
+   Schur-Zassenhaus で `H = M ⋊ K`. K が π-Hall in G.
+
+**実装状態** ⭐ sorry-free (2026-05-23 完成). AxiomsCheck flagship 入り
+(`OddOrder.Isaacs.Ch03.hall_E_exists`). -/
 private theorem hall_E_strong_aux : ∀ n : ℕ,
     ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
       Nat.card G ≤ n → ∀ (π : Set ℕ),
