@@ -2468,10 +2468,33 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
           SemidirectProduct.right_inl, SemidirectProduct.right_inr, one_mul, mul_one]
     rw [h_eq_inv]
     exact Subgroup.inv_mem _ (Subgroup.mem_zpowers _)
-  · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via inl_aut.
-    -- Plan: g = ⟦inr (ofAdd 1)⟧, (ι x : G) = ⟦inl x⟧.
-    -- LHS = ⟦inr 1 * inl x * (inr 1)⁻¹⟧ = ⟦inl (φ 1 x)⟧ = ⟦inl (σ x)⟧ = (ι (σ x) : G).
-    sorry  -- TODO: inl_aut application + QuotientGroup.mk-arithmetic
+  · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via SemidirectProduct.inl_aut.
+    intro x
+    have h_iota_x : (ι x : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+        (SemidirectProduct.inl x) := rfl
+    have h_iota_σx : (ι (σ x) : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+        (SemidirectProduct.inl (σ x)) := rfl
+    rw [h_iota_x, h_iota_σx]
+    show (QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))) *
+        (QuotientGroup.mk' _ (SemidirectProduct.inl x)) *
+        (QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ))))⁻¹ =
+      QuotientGroup.mk' _ (SemidirectProduct.inl (σ x))
+    rw [← map_inv (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)),
+        ← map_mul (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)),
+        ← map_mul (QuotientGroup.mk' (cyclicExtKSubgroup m a σ))]
+    congr 1
+    -- Goal: inr (ofAdd 1) * inl x * (inr (ofAdd 1))⁻¹ = inl (σ x)
+    have h_phi : (cyclicExtPhi σ) (Multiplicative.ofAdd (1 : ℤ)) = σ := by
+      show σ ^ (Multiplicative.ofAdd (1 : ℤ)).toAdd = σ
+      exact zpow_one σ
+    have h_inl_aut : (SemidirectProduct.inl ((cyclicExtPhi σ) (Multiplicative.ofAdd (1 : ℤ)) x)
+        : CyclicExtPreG N σ) =
+        SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)) * SemidirectProduct.inl x *
+          SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ))⁻¹ :=
+      SemidirectProduct.inl_aut (φ := cyclicExtPhi σ) (Multiplicative.ofAdd (1 : ℤ)) x
+    rw [h_phi] at h_inl_aut
+    rw [← (SemidirectProduct.inr : Multiplicative ℤ →* CyclicExtPreG N σ).map_inv] at *
+    exact h_inl_aut.symm
 
 end -- 3F
 
