@@ -2316,6 +2316,285 @@ theorem actionCommutator_commutator_eq_bot_of_acts_trivially
   exact (Subgroup.map_eq_bot_iff_of_injective ⁅actionCommutator φ, actionCommutator φ⁆
         SemidirectProduct.inl_injective).mp h_map_bot
 
+/-! ### Isaacs §4C: 連鎖仮定下の A の構造 (Thm 4.22, Cor 4.23) -/
+
+/-- **Bridge lemma** (semidirect product): `K ≤ φ.ker` iff `⁅K.map inr, inl(G).range⁆ = ⊥`
+in `Γ = G ⋊[φ] A`. つまり `K ≤ A` が trivial action ↔ `inr(K)` と `inl(G)` が可換.
+
+**証明**: `Subgroup.commutator_eq_bot_iff_le_centralizer` で commutator = ⊥ ↔ centralizer
+包含, さらに semidirect product の `inl_aut` (`inl ((φ a) g) = inr a * inl g * inr a⁻¹`)
+で `inr(k)` と `inl(g)` が可換 ↔ `(φ k) g = g`. -/
+theorem _root_.SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G} (K : Subgroup A) :
+    ⁅K.map (SemidirectProduct.inr : A →* G ⋊[φ] A),
+      (SemidirectProduct.inl : G →* G ⋊[φ] A).range⁆ = ⊥ ↔ K ≤ φ.ker := by
+  rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+  constructor
+  · -- K.map inr ≤ centralizer inl.range ⇒ K ≤ ker φ
+    intro h k hk
+    -- k ∈ K. Want φ k = 1, i.e., (φ k) g = g for all g.
+    rw [MonoidHom.mem_ker]
+    -- Use MulEquiv.ext for (φ k) = 1
+    refine MulEquiv.ext fun g => ?_
+    -- Goal: (φ k) g = (1 : MulAut G) g = g
+    rw [MulAut.one_apply]
+    have h_mem : (SemidirectProduct.inr k : G ⋊[φ] A) ∈
+        K.map (SemidirectProduct.inr : A →* G ⋊[φ] A) := ⟨k, hk, rfl⟩
+    have h_centr := h h_mem
+    rw [Subgroup.mem_centralizer_iff] at h_centr
+    have h_comm := h_centr (SemidirectProduct.inl g : G ⋊[φ] A) ⟨g, rfl⟩
+    -- h_comm : inl g * inr k = inr k * inl g
+    have h_aut : (SemidirectProduct.inr k : G ⋊[φ] A) * SemidirectProduct.inl g =
+        (SemidirectProduct.inl ((φ k) g) : G ⋊[φ] A) * SemidirectProduct.inr k := by
+      have hi := SemidirectProduct.inl_aut (φ := φ) k g
+      have h_inv : (SemidirectProduct.inr k⁻¹ : G ⋊[φ] A) = (SemidirectProduct.inr k)⁻¹ :=
+        map_inv SemidirectProduct.inr k
+      rw [hi, h_inv, mul_assoc, inv_mul_cancel, mul_one]
+    rw [h_aut] at h_comm
+    -- h_comm : inl g * inr k = inl ((φ k) g) * inr k
+    have h_eq : (SemidirectProduct.inl g : G ⋊[φ] A) = SemidirectProduct.inl ((φ k) g) :=
+      mul_right_cancel h_comm
+    exact (SemidirectProduct.inl_injective h_eq).symm
+  · -- K ≤ ker φ ⇒ K.map inr ≤ centralizer inl.range
+    intro h y hy
+    rw [Subgroup.mem_centralizer_iff]
+    obtain ⟨k, hk, rfl⟩ := hy
+    have h_fix : φ k = 1 := h hk
+    intro x hx
+    obtain ⟨g, rfl⟩ := hx
+    -- Goal: inl g * inr k = inr k * inl g
+    have h_aut : (SemidirectProduct.inr k : G ⋊[φ] A) * SemidirectProduct.inl g =
+        (SemidirectProduct.inl ((φ k) g) : G ⋊[φ] A) * SemidirectProduct.inr k := by
+      have hi := SemidirectProduct.inl_aut (φ := φ) k g
+      have h_inv : (SemidirectProduct.inr k⁻¹ : G ⋊[φ] A) = (SemidirectProduct.inr k)⁻¹ :=
+        map_inv SemidirectProduct.inr k
+      rw [hi, h_inv, mul_assoc, inv_mul_cancel, mul_one]
+    rw [h_aut, h_fix, MulAut.one_apply]
+
+/-- **Isaacs Corollary 4.23**: A が `G` に faithful 作用 + `[G, A, A] = 1`
+(`actionCommutator φ ≤ fixedPointsOfMulAut φ`) ⇒ `commutator A ≤ φ.ker`.
+
+**Faithful case**: φ injective ⇒ φ.ker = ⊥ ⇒ commutator A = ⊥ ⇒ A abelian.
+
+**証明戦略** (Three-subgroups in Γ = G ⋊[φ] A, m = 2 specialization of Thm 4.22):
+仮定 ⇒ `⁅⁅inl(G), inr(A)⁆, inr(A)⁆ = ⊥` (= `[G, A, A] = 1` in Γ). Three-subgroups で
+`⁅⁅inr(A), inr(A)⁆, inl(G)⁆ = ⊥` (= `[A, A, G] = 1`). これは `inr(A')` と
+`inl(G)` の交換子 = ⊥, つまり bridge lemma で `commutator A ≤ φ.ker`. -/
+theorem commutator_le_ker_of_acts_trivially_on_actionCommutator
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G)
+    (h_triv : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut φ) :
+    _root_.commutator A ≤ φ.ker := by
+  -- Setup in Γ = G ⋊[φ] A
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range with hXG
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range with hYA
+  -- Hypothesis ⇒ ⁅⁅XG, YA⁆, YA⁆ = ⊥ in Γ
+  -- (Same Step 1 as in Lem 4.25 / actionCommutator_commutator_eq_bot_of_acts_trivially)
+  set H_Γ : Subgroup (G ⋊[φ] A) := ⁅XG, YA⁆
+  have h_HΓ_eq : (actionCommutator φ).map SemidirectProduct.inl = H_Γ :=
+    actionCommutator_map_inl φ
+  have h_step1 : ⁅H_Γ, YA⁆ = ⊥ := by
+    rw [← h_HΓ_eq, eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨k, hk, rfl⟩ _ ⟨a, rfl⟩
+    rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+    have h_fix : (φ a) k = k := h_triv hk a
+    rw [show (φ a) k⁻¹ = ((φ a) k)⁻¹ from map_inv (φ a) k, h_fix, mul_inv_cancel]
+    exact map_one _
+  -- Apply three-subgroups in Γ with H₁ = YA, H₂ = YA, H₃ = XG
+  -- (this gives ⁅⁅YA, YA⁆, XG⁆ = ⊥)
+  have h_three : ⁅⁅YA, YA⁆, XG⁆ = ⊥ := by
+    -- We need: ⁅⁅YA, XG⁆, YA⁆ = ⊥ and ⁅⁅XG, YA⁆, YA⁆ = ⊥, then conclude ⁅⁅YA, YA⁆, XG⁆ = ⊥.
+    have h_a : ⁅⁅YA, XG⁆, YA⁆ = ⊥ := by
+      rw [Subgroup.commutator_comm YA XG]
+      exact h_step1
+    have h_b : ⁅⁅XG, YA⁆, YA⁆ = ⊥ := h_step1
+    -- mathlib three-subgroups: ⁅⁅H₂, H₃⁆, H₁⁆ = ⊥ → ⁅⁅H₃, H₁⁆, H₂⁆ = ⊥ → ⁅⁅H₁, H₂⁆, H₃⁆ = ⊥
+    -- With H₁ = YA, H₂ = YA, H₃ = XG: gives ⁅⁅YA, YA⁆, XG⁆ = ⊥ from h_a + h_b.
+    exact Subgroup.commutator_commutator_eq_bot_of_rotate h_a h_b
+  -- Now convert ⁅⁅YA, YA⁆, XG⁆ = ⊥ to ⁅(commutator A).map inr, inl(G).range⁆ = ⊥
+  rw [← SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker]
+  -- Goal: ⁅(commutator A).map inr, inl(G).range⁆ = ⊥
+  have h_eq : (_root_.commutator A).map (SemidirectProduct.inr : A →* G ⋊[φ] A) = ⁅YA, YA⁆ := by
+    rw [_root_.commutator_def, Subgroup.map_commutator]
+    -- ⁅⊤, ⊤⁆.map inr = ⁅(⊤).map inr, (⊤).map inr⁆ = ⁅inr.range, inr.range⁆
+    rw [show ((⊤ : Subgroup A).map (SemidirectProduct.inr : A →* G ⋊[φ] A)) = YA from
+        (MonoidHom.range_eq_map SemidirectProduct.inr).symm]
+  rw [h_eq]
+  exact h_three
+
+/-- **Isaacs Cor 4.23 (faithful)**: A が `G` に faithful 作用 + `[G, A, A] = 1`
+⇒ A is abelian (`commutator A = ⊥`).
+
+`commutator_le_ker_of_acts_trivially_on_actionCommutator` の faithful 特殊化. -/
+theorem commutator_eq_bot_of_acts_trivially_on_actionCommutator_of_faithful
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G)
+    (h_inj : Function.Injective φ)
+    (h_triv : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut φ) :
+    _root_.commutator A = ⊥ := by
+  have h_ker : φ.ker = ⊥ := (MonoidHom.ker_eq_bot_iff φ).mpr h_inj
+  have h_le : _root_.commutator A ≤ φ.ker :=
+    commutator_le_ker_of_acts_trivially_on_actionCommutator φ h_triv
+  rw [h_ker] at h_le
+  exact le_bot_iff.mp h_le
+
+/-! ### Isaacs §4C: Thm 4.22 (chain stabilization ⇒ A solvable) -/
+
+/-- **Helper**: `iterCommutator (iterCommutator E X j) X k = iterCommutator E X (j + k)`.
+-/
+private lemma iterCommutator_add (E X : Subgroup G) (j k : ℕ) :
+    iterCommutator (iterCommutator E X j) X k = iterCommutator E X (j + k) := by
+  induction k with
+  | zero => simp [iterCommutator_zero]
+  | succ k ih =>
+    rw [iterCommutator_succ, ih]
+    rw [show j + (k + 1) = (j + k) + 1 from by omega, iterCommutator_succ]
+
+/-- **Abstract subgroup form of Isaacs Theorem 4.22**: For subgroups `E X` of an
+ambient group `H` with `X ≤ E.normalizer` and `iterCommutator E X m = ⊥` for `m ≥ 1`,
+the `(m-1)`-th derived series of `X` (viewed in `H`) commutes trivially with `E`.
+
+**証明** (induction on `m`):
+- Base `m = 1`: `iter E X 1 = ⁅E, X⁆ = ⊥`. `derivedSeries ↥X 0 = ⊤`, `.map subtype = X`.
+  Goal: `⁅X, E⁆ = ⊥` = `⁅E, X⁆ = ⊥` ✓.
+- Step `m = k + 1 ≥ 2`: Set `E' := ⁅E, X⁆`. `X ≤ E'.normalizer`
+  (Lem 4.3: `⁅E, X⁆ ≤ E` ⇒ `⁅⁅E, X⁆, X⁆ ≤ ⁅E, X⁆`).
+  `iter E' X k = iter E X (k+1) = ⊥` (helper). IH ⇒ `⁅D, E'⁆ = ⊥` where
+  `D := (derivedSeries ↥X (k-1)).map subtype`.
+  Three-subgroups with `H₁ = H₂ = D, H₃ = E`:
+  * `⁅⁅D, E⁆, D⁆ ≤ ⁅⁅E, X⁆, D⁆ = ⁅D, ⁅E, X⁆⁆ = ⊥` (IH + comm)
+  * `⁅⁅E, D⁆, D⁆ ≤ ⁅⁅E, X⁆, D⁆ = ⊥` (same)
+  * ⇒ `⁅⁅D, D⁆, E⁆ = ⊥` (Three-subgroups).
+  `⁅D, D⁆ = (⁅derivedSeries (k-1), derivedSeries (k-1)⁆).map subtype =
+    (derivedSeries ↥X k).map subtype`. ✓ -/
+theorem derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot
+    {H : Type*} [Group H] {X : Subgroup H} (m : ℕ) (hm : 1 ≤ m) :
+    ∀ {E : Subgroup H}, X ≤ Subgroup.normalizer E →
+      iterCommutator E X m = ⊥ →
+      ⁅((derivedSeries (↥X) (m - 1)).map X.subtype), E⁆ = ⊥ := by
+  induction m with
+  | zero => omega
+  | succ k ih =>
+    intro E h_norm h_iter
+    rcases Nat.eq_zero_or_pos k with hk | hk
+    · -- m = 1 base case (k = 0)
+      subst hk
+      -- derivedSeries (1-1) = derivedSeries 0 = ⊤, .map subtype = X
+      have h_top : (⊤ : Subgroup ↥X).map X.subtype = X :=
+        (MonoidHom.range_eq_map X.subtype).symm.trans X.range_subtype
+      have h_idx : (0 + 1 : ℕ) - 1 = 0 := by omega
+      rw [h_idx, derivedSeries_zero, h_top]
+      -- Goal: ⁅X, E⁆ = ⊥. Hyp: iter E X 1 = ⁅E, X⁆ = ⊥.
+      rw [Subgroup.commutator_comm]
+      have h1 : iterCommutator E X (0 + 1) = ⁅E, X⁆ := by
+        rw [iterCommutator_succ, iterCommutator_zero]
+      rw [← h1]; exact h_iter
+    · -- m = k + 1 ≥ 2 (k ≥ 1)
+      have hk_le : 1 ≤ k := hk
+      -- E' := ⁅E, X⁆
+      set E' : Subgroup H := ⁅E, X⁆ with hE'_def
+      -- X normalizes E'
+      have h_norm_E' : X ≤ Subgroup.normalizer E' := by
+        rw [← commutator_le_iff_le_normalizer]
+        refine Subgroup.commutator_mono ?_ le_rfl
+        exact commutator_le_iff_le_normalizer.mpr h_norm
+      -- iter E' X k = iter E X (k+1) = ⊥
+      have h_iter_E' : iterCommutator E' X k = ⊥ := by
+        show iterCommutator (iterCommutator E X 1) X k = ⊥
+        rw [iterCommutator_add]
+        convert h_iter using 2
+        omega
+      -- IH applied
+      have h_IH : ⁅(derivedSeries ↥X (k - 1)).map X.subtype, E'⁆ = ⊥ :=
+        ih hk_le h_norm_E' h_iter_E'
+      set D : Subgroup H := (derivedSeries ↥X (k - 1)).map X.subtype with hD_def
+      -- D ≤ X
+      have hD_le_X : D ≤ X := by
+        rw [hD_def]
+        exact (Subgroup.map_mono le_top).trans
+          ((MonoidHom.range_eq_map X.subtype).symm.trans X.range_subtype).le
+      -- ⁅D, ⁅E, X⁆⁆ = ⊥ from IH
+      -- Three-subgroups in ambient H: H₁ = D, H₂ = D, H₃ = E
+      have h_DE : ⁅⁅D, E⁆, D⁆ = ⊥ := by
+        have h_le1 : ⁅D, E⁆ ≤ ⁅X, E⁆ := Subgroup.commutator_mono hD_le_X le_rfl
+        have h_le2 : ⁅⁅D, E⁆, D⁆ ≤ ⁅⁅X, E⁆, D⁆ := Subgroup.commutator_mono h_le1 le_rfl
+        have h_swap : ⁅⁅X, E⁆, D⁆ = ⁅D, ⁅E, X⁆⁆ := by
+          rw [Subgroup.commutator_comm X E, Subgroup.commutator_comm ⁅E, X⁆ D]
+        rw [h_swap] at h_le2
+        exact le_bot_iff.mp (h_le2.trans h_IH.le)
+      have h_ED : ⁅⁅E, D⁆, D⁆ = ⊥ := by
+        rw [Subgroup.commutator_comm E D]
+        exact h_DE
+      -- Three-subgroups: gives ⁅⁅D, D⁆, E⁆ = ⊥
+      have h_DDE : ⁅⁅D, D⁆, E⁆ = ⊥ :=
+        Subgroup.commutator_commutator_eq_bot_of_rotate h_DE h_ED
+      -- ⁅D, D⁆ = ((derivedSeries ↥X k)).map subtype
+      have h_DD : (⁅D, D⁆ : Subgroup H) =
+          (derivedSeries (↥X) k).map X.subtype := by
+        rw [hD_def, ← Subgroup.map_commutator]
+        congr 1
+        rw [show k = (k - 1) + 1 from (Nat.sub_add_cancel hk_le).symm,
+            derivedSeries_succ]
+        congr 2 <;> omega
+      show ⁅(derivedSeries ↥X (k + 1 - 1)).map X.subtype, E⁆ = ⊥
+      rw [show k + 1 - 1 = k from by omega]
+      rw [← h_DD]
+      exact h_DDE
+
+/-- **Isaacs Theorem 4.22** ⭐: A 作用 + `[G, A, ..., A]_m = 1` ⇒
+`derivedSeries A (m-1) ≤ φ.ker`. (faithful case: A is solvable with derived length ≤ m-1.)
+
+Semidirect product `Γ = G ⋊[φ] A` 形で記述: iter (inl(G).range) (inr(A).range) m = ⊥
+⇒ derivedSeries A (m-1) ≤ φ.ker. -/
+theorem derivedSeries_le_ker_of_iter_inl_inr_eq_bot
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) (m : ℕ) (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                             (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    derivedSeries A (m - 1) ≤ φ.ker := by
+  -- Apply abstract form with X = inr(A).range, E = inl(G).range
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  haveI hXG_normal : XG.Normal := OddOrder.Isaacs.Ch03.inl_range_normal φ
+  -- YA ≤ Subgroup.normalizer XG (XG normal ⇒ normalizer = ⊤)
+  have h_norm : YA ≤ Subgroup.normalizer XG := by
+    intro y _
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    refine ⟨fun hz => hXG_normal.conj_mem _ hz y, fun hz => ?_⟩
+    have h1 := hXG_normal.conj_mem _ hz y⁻¹
+    -- h1 : y⁻¹ * (y * z * y⁻¹) * y⁻¹⁻¹ ∈ XG, simplifies to z ∈ XG via group
+    rwa [show y⁻¹ * (y * z * y⁻¹) * y⁻¹⁻¹ = z by group] at h1
+  have h_abs := derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot
+    (X := YA) m hm h_norm h_iter
+  -- Bridge: ⁅(derivedSeries A (m-1)).map inr, XG⁆ = ⊥ ⇔ derivedSeries A (m-1) ≤ φ.ker
+  rw [← SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker]
+  -- Transport: (derivedSeries A (m-1)).map inr = (derivedSeries ↥YA (m-1)).map YA.subtype
+  have h_transport : ((derivedSeries A (m - 1)).map
+      (SemidirectProduct.inr : A →* G ⋊[φ] A)) =
+      (derivedSeries (↥YA) (m - 1)).map YA.subtype := by
+    have h_factor : (SemidirectProduct.inr : A →* G ⋊[φ] A) =
+        YA.subtype.comp (SemidirectProduct.inr (φ := φ)).rangeRestrict :=
+      (MonoidHom.subtype_comp_rangeRestrict _).symm
+    rw [h_factor, ← Subgroup.map_map]
+    congr 1
+    have h_surj : Function.Surjective (SemidirectProduct.inr (φ := φ)).rangeRestrict :=
+      (SemidirectProduct.inr : A →* G ⋊[φ] A).rangeRestrict_surjective
+    exact map_derivedSeries_eq h_surj (m - 1)
+  rw [h_transport]
+  exact h_abs
+
+/-- **Isaacs Theorem 4.22 (faithful)**: A が `G` に faithful 作用 +
+`iter (inl(G).range) (inr(A).range) m = ⊥` (= `[G, A, ..., A]_m = 1`)
+⇒ A is solvable with derived length ≤ m - 1 (`derivedSeries A (m-1) = ⊥`). -/
+theorem derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G)
+    (h_inj : Function.Injective φ) (m : ℕ) (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                             (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    derivedSeries A (m - 1) = ⊥ := by
+  have h_ker : φ.ker = ⊥ := (MonoidHom.ker_eq_bot_iff φ).mpr h_inj
+  have h_le := derivedSeries_le_ker_of_iter_inl_inr_eq_bot φ m hm h_iter
+  rw [h_ker] at h_le
+  exact le_bot_iff.mp h_le
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
