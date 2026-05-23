@@ -398,20 +398,27 @@ private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal)
 Strategy: take minimal normal `L ⊆ N` in `G`, which is abelian (Isaacs Lem 3.11). Apply
 step_factor with `L` to get `g ∈ N` with `K^g · L = K' · L =: HL`. If `HL < G`, apply
 step_restriction. If `HL = G`, then `L = N` (cardinality), so `N` is abelian and we use
-mathlib `Subgroup.exists_smul_eq` (abelian SZ conjugacy).
-
-**TODO**: requires
-1. `exists_minimal_normal_le` (skeleton above, sorry).
-2. Lem 3.11 (minimal normal of solvable is abelian) — needs derivedSeries argument or
-   import from Ch.3 (circular).
-3. Cardinality argument (HL = G + L ⊆ N + IsComplement' ⇒ L = N).
-4. mathlib `Subgroup.exists_smul_eq` (abelian SZ conjugacy) application. -/
+mathlib `Subgroup.exists_smul_eq` (abelian SZ conjugacy). -/
 private theorem step_caseA
     (h1 : Nat.Coprime (Nat.card N) N.index)
     (hN_solv : IsSolvable N)
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  -- Trivial case: N = ⊥ ⇒ K = K' = ⊤.
+  by_cases hN_bot : N = ⊥
+  · subst hN_bot
+    have hK_top : K = ⊤ := by
+      have := hK.sup_eq_top
+      rwa [bot_sup_eq] at this
+    have hK'_top : K' = ⊤ := by
+      have := hK'.sup_eq_top
+      rwa [bot_sup_eq] at this
+    refine ⟨1, (⊥ : Subgroup G).one_mem, ?_⟩
+    rw [hK_top, hK'_top]
+    ext x
+    simp [Subgroup.mem_map]
+  -- Nontrivial case: take minimal normal L ⊆ N, abelian, then case split on K^g ⊔ L.
   sorry
 
 /-- **Case B (G/N solvable)**: full SZ conjugacy when `G ⧸ N` is solvable. -/
