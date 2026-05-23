@@ -2330,18 +2330,47 @@ private lemma cyclicExtKSubgroup_normal {N : Type*} [Group N]
 
 /-- **Isaacs Thm 3.36 (cyclic extension existence)** ⭐:
 given `N`, `m > 0`, `a ∈ N`, `σ ∈ Aut(N)` with `σ a = a` and `σ^m = MulAut.conj a`,
-there exists a group `G` with `N ⊴ G` (via iso `ι`), `G/N` cyclic of order `m`,
-and an element `g ∈ G` with `g^m = ι a` and `g · ι x · g⁻¹ = ι (σ x)`.
+there exists a group `G` with `N ⊴ G` (via iso `ι`), `G/N` cyclic of order `m` generator `g`,
+`g^m = ι a` and `g · ι x · g⁻¹ = ι (σ x)`.
 
-Construction: `G := (N ⋊_σ ℤ) / ⟨(a⁻¹, m)⟩`. -/
-theorem cyclic_extension_exists {N : Type*} [Group N] {m : ℕ} (hm : 0 < m)
+Construction: `G := (N ⋊_σ ℤ) / ⟨(a⁻¹, m)⟩`. The element `(a⁻¹, m)` is central (proven in
+`cyclicExtK_centralized` using `σ a = a` and `σ^m = MulAut.conj a`), so its zpowers form
+a normal subgroup. Quotienting gives `G` with the desired cyclic-extension structure. -/
+theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < m)
     (a : N) (σ : MulAut N) (hσa : σ a = a) (hσm : σ ^ m = MulAut.conj a) :
-    ∃ (G : Type _) (_ : Group G) (N₀ : Subgroup G) (_ : N₀.Normal)
+    ∃ (G : Type u) (_ : Group G) (N₀ : Subgroup G) (_ : N₀.Normal)
       (ι : N ≃* ↥N₀) (g : G),
       Subgroup.zpowers ((g : G ⧸ N₀)) = ⊤ ∧
       g ^ m = (ι a : G) ∧
       ∀ x : N, g * (ι x : G) * g⁻¹ = (ι (σ x) : G) := by
-  sorry  -- to be implemented
+  haveI hK_norm : (cyclicExtKSubgroup m a σ).Normal :=
+    cyclicExtKSubgroup_normal m a σ hσa hσm
+  -- G := preG ⧸ K with the natural Group instance.
+  let G := CyclicExtPreG N σ ⧸ cyclicExtKSubgroup m a σ
+  -- inl_to_G : N →* G via inl then quotient.
+  let inl_to_G : N →* G :=
+    (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)).comp SemidirectProduct.inl
+  -- inl_to_G is injective: ker = inl⁻¹(K) = ⊥.
+  have h_inj : Function.Injective inl_to_G := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    sorry  -- (a⁻¹, m)^j = (a⁻ʲ, jm), so inl x ∈ K iff x = 1 ∧ j = 0.
+  -- N₀ := range of inl_to_G.
+  let N₀ : Subgroup G := inl_to_G.range
+  haveI hN₀_norm : N₀.Normal := by
+    sorry  -- inl(N) ⊴ preG (SemidirectProduct.range_inl_normal), image normal via mk' surjective.
+  -- ι := N ≃* N₀.
+  let ι : N ≃* ↥N₀ := MonoidHom.ofInjective h_inj
+  -- g := ⟦inr (ofAdd 1)⟧.
+  let g : G := QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))
+  refine ⟨G, inferInstance, N₀, hN₀_norm, ι, g, ?_, ?_, ?_⟩
+  · -- zpowers ⟦g⟧ = ⊤ in G/N₀ (via Multiplicative ℤ / ⟨ofAdd m⟩ ≅ ZMod m).
+    sorry
+  · -- g^m = ι a.
+    -- g^m = ⟦inr (ofAdd m)⟧ = ⟦(1, ofAdd m)⟧, and (a, 1) - (1, ofAdd m) = (a⁻¹, ofAdd m) = K-element.
+    sorry
+  · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via inl_aut.
+    intro x
+    sorry
 
 end -- 3F
 
