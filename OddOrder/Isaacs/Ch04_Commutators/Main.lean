@@ -881,12 +881,33 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator
         show φ (b⁻¹ * a * b) = (φ b)⁻¹ * (φ a) * (φ b) from by rw [map_mul, map_mul, map_inv],
         MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
 
--- TODO: `(actionCommutator φ).Normal` (G 内). Isaacs §4C: Γ = G ⋊ A 内で
--- `⁅inl G, inr A⁆ ⊴ ⟨inl G, inr A⟩ = Γ` (Lem 4.1 系) を経由する必要あり.
--- generator `g * (φ a) g⁻¹` を h ∈ G で conjugate しても generator set 内に
--- 戻らない (a' に内部 conj が必要だが φ 像にない可能性) ため,
--- closure_induction 直接は不可. 推奨経路: `(actionCommutator φ).map inl =
--- ⁅inl.range, inr.range⁆` を示し Γ 内 normality + inl injectivity で pull back.
+/-- **`(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`** (Γ = G ⋊[φ] A 内).
+
+Γ 経由で `actionCommutator` を Γ 内 commutator subgroup と同一視. `inl` 経由 push が
+Γ 内 commutator `⁅inl.range, inr.range⁆` に一致. これと Lem 4.1 (`⁅H, K⁆ ⊴ ⟨H, K⟩`)
+を組合せて `(actionCommutator φ).Normal` (G 内) を導出する経路の主補題.
+
+**証明**: 両側 `Subgroup.closure` 形に展開し集合等式. 生成元の対応は
+`⁅inl g, inr a⁆ = inl (g * (φ a) g⁻¹)` (`SemidirectProduct.commutator_inl_inr`). -/
+theorem actionCommutator_map_inl
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
+    (actionCommutator φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) =
+      ⁅(SemidirectProduct.inl : G →* G ⋊[φ] A).range,
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range⁆ := by
+  rw [actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    refine ⟨SemidirectProduct.inl g, ⟨g, rfl⟩, SemidirectProduct.inr a, ⟨a, rfl⟩, ?_⟩
+    exact SemidirectProduct.commutator_inl_inr (φ := φ) g a
+  · rintro ⟨_, ⟨g, rfl⟩, _, ⟨a, rfl⟩, rfl⟩
+    refine ⟨g * (φ a) g⁻¹, ⟨g, a, rfl⟩, ?_⟩
+    exact (SemidirectProduct.commutator_inl_inr (φ := φ) g a).symm
+
+-- TODO: `(actionCommutator φ).Normal` (G 内). 上記 `actionCommutator_map_inl` +
+-- Γ 内 `⁅inl.range, inr.range⁆ ⊴ inl_range_sup_inr_range_eq_top = Γ`
+-- (Lem 4.1: subgroup_le_normalizer_commutator_self) + `inl` injectivity.
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
