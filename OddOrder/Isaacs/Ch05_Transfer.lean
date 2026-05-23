@@ -83,10 +83,104 @@ section /- 5A: Transfer definition + homomorphism (pp. 147-153) -/
 - **Thm 5.1** (transfer welldef): mathlib `MonoidHom.transfer` 構成時点で transversal
   非依存性が組み込み済. wrapper 不要.
 - **Thm 5.2** (transfer 準同型性): 同上, 構造の `map_mul'` フィールドで内包.
-- **Thm 5.3** (`p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換): 短い証明 (transfer 計算で
-  `z = z^{|G:P|}` を導出して矛盾). Schur multiplier 補論. 形式化保留 (FT 経路で要求なし).
+- **Thm 5.3** (`p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換): ✅
+  `not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center`.
 - **Thm 5.4** (Schur multiplier corollary): Schur multiplier 概念自体 mathlib 未収載.
   FT 経路では不要. 保留. -/
+
+/-- **Isaacs Thm 5.3**: 素数 `p` で `p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換.
+
+**証明** (Isaacs p.157): `P ∈ Syl_p(G)`, `P` abelian と仮定. `P` abelian なら
+`id : P →* P` で transfer `v : G →* P` が定義できる. Cauchy で `G' ∩ Z(G)` 中の
+位数 `p` の元 `z` を取る. `z` 中心 ⇒ `zpowers z` 正規 (normal) かつ `p`-subgroup ⇒
+任意の Sylow_p P に含まれる (Sylow II + 正規性の conjugation 不変).
+transfer_eq_pow + `z` 中心 で `v(z) = z^|G:P|`. `v` hom to abelian ⇒
+`G' ⊆ ker v` ⇒ `z ∈ G' ⇒ v(z) = 1` ⇒ `z^|G:P| = 1`. `orderOf z = p` だが
+Sylow_p は `p ∤ |G:P|`, 矛盾. -/
+theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
+    (h : p ∣ Nat.card ((commutator G ⊓ Subgroup.center G : Subgroup G))) :
+    ¬ IsMulCommutative (P : Subgroup G) := by
+  intro hPab
+  -- Cauchy: z ∈ G' ∩ Z(G), orderOf z = p
+  obtain ⟨z₀, hz₀⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥(commutator G ⊓ Subgroup.center G)) p h
+  have hz_comm : z₀.val ∈ commutator G := z₀.property.1
+  have hz_cent : z₀.val ∈ Subgroup.center G := z₀.property.2
+  have hz_ord : orderOf z₀.val = p := by
+    rw [Subgroup.orderOf_coe]; exact hz₀
+  -- ⟨z⟩ ⊴ G (z central)
+  haveI : (Subgroup.zpowers z₀.val).Normal := by
+    refine ⟨fun x hx g => ?_⟩
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
+    refine ⟨n, ?_⟩
+    have hzn_cent : z₀.val ^ n ∈ Subgroup.center G :=
+      Subgroup.zpow_mem _ hz_cent n
+    have hcomm : g * z₀.val ^ n = z₀.val ^ n * g :=
+      (Subgroup.mem_center_iff.mp hzn_cent) g
+    rw [hcomm]; group
+  -- z ∈ P: ⟨z⟩ 正規 p-subgroup ⇒ 任意の Sylow_p P に含まれる
+  have hz_inP : z₀.val ∈ P := by
+    have h_zp_card : Nat.card (Subgroup.zpowers z₀.val) = p :=
+      (Nat.card_zpowers z₀.val).trans hz_ord
+    have h_zp_pg : IsPGroup p (Subgroup.zpowers z₀.val) :=
+      IsPGroup.of_card (h_zp_card.trans (pow_one p).symm)
+    obtain ⟨Q, hzQ⟩ := IsPGroup.exists_le_sylow h_zp_pg
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q P
+    have h_zp_le_P : Subgroup.zpowers z₀.val ≤ (P : Subgroup G) := by
+      calc Subgroup.zpowers z₀.val
+          = MulAut.conj g • Subgroup.zpowers z₀.val :=
+            (Subgroup.Normal.conj_smul_eq_self g _).symm
+        _ ≤ MulAut.conj g • (Q : Subgroup G) :=
+            Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hzQ
+        _ = ((g • Q : Sylow p G) : Subgroup G) := Sylow.coe_subgroup_smul.symm
+        _ = (P : Subgroup G) := by rw [hg]
+    exact h_zp_le_P (Subgroup.mem_zpowers _)
+  -- Setup transfer v : G →* ↥P (P abelian → CommGroup via priority-100 instance)
+  -- mathlib transferSylow パターンと同じ @ explicit 形で typeclass diamond 回避
+  let v : G →* (P : Subgroup G) :=
+    @MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+      (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+        (MonoidHom.id (P : Subgroup G)) _
+  -- transfer_eq_pow for z central: v(z) val = z^|G:P|
+  have h_key : ∀ (k : ℕ) (g₀ : G), g₀⁻¹ * z₀.val ^ k * g₀ ∈ (P : Subgroup G) →
+      g₀⁻¹ * z₀.val ^ k * g₀ = z₀.val ^ k := by
+    intro k g₀ _
+    have hzk_cent : z₀.val ^ k ∈ Subgroup.center G :=
+      Subgroup.pow_mem _ hz_cent k
+    have hcomm : z₀.val ^ k * g₀ = g₀ * z₀.val ^ k :=
+      (Subgroup.mem_center_iff.mp hzk_cent g₀).symm
+    calc g₀⁻¹ * z₀.val ^ k * g₀
+        = g₀⁻¹ * (z₀.val ^ k * g₀) := by group
+      _ = g₀⁻¹ * (g₀ * z₀.val ^ k) := by rw [hcomm]
+      _ = z₀.val ^ k := by group
+  have hv_z_val : (v z₀.val).val = z₀.val ^ (P : Subgroup G).index := by
+    show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+        (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+          (MonoidHom.id (P : Subgroup G)) _) z₀.val).val = _
+    rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)
+          (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+            (MonoidHom.id (P : Subgroup G)) _ z₀.val h_key]
+    rfl
+  -- v hom to abelian ⇒ commutator G ≤ ker v ⇒ v(z) = 1
+  have hv_z_one : v z₀.val = 1 := by
+    have hker : commutator G ≤ v.ker := by
+      rw [_root_.commutator_def, Subgroup.commutator_le]
+      intro a _ b _
+      rw [MonoidHom.mem_ker, map_commutatorElement,
+          commutatorElement_eq_one_iff_mul_comm]
+      exact mul_comm _ _
+    exact MonoidHom.mem_ker.mp (hker hz_comm)
+  -- z^|G:P| = 1 ⇒ p ∣ |G:P|, contradicting Sylow_p ⇒ p ∤ |G:P|
+  have h_pow_one : z₀.val ^ (P : Subgroup G).index = 1 := by
+    have hh : (v z₀.val).val = (1 : ↥(P : Subgroup G)).val := by
+      rw [hv_z_one]
+    rw [hv_z_val] at hh
+    exact hh
+  have h_p_dvd : p ∣ (P : Subgroup G).index := by
+    have h := orderOf_dvd_of_pow_eq_one h_pow_one
+    rwa [hz_ord] at h
+  exact P.not_dvd_index h_p_dvd
 
 end -- 5A
 
