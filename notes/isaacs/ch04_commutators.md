@@ -34,6 +34,23 @@
 - **Cor 4.21** `actionCommutator_le_iff_TFAE` (List.TFAE 三方向): (1) [G,A] ⊆ H, (2) 右剰余類 element form, (3) 左剰余類 element form. + 系 `IsAInvariant.of_actionCommutator_le`: [G,A] ⊆ H ⇒ H A-inv.
 - **Lem 4.25** ⭐ `actionCommutator_commutator_eq_bot_of_acts_trivially`: A が [G,A] に trivial 作用 ⇒ [G,A] abelian. 証明: Γ = G ⋊[φ] A 内 Three-subgroups lemma. Step 1 (`⁅H_Γ, inr(A)⁆ = ⊥` from generator computation), Step 2 (内側 commutator ≤ H_Γ via Normal), Step 3 (`Subgroup.commutator_commutator_eq_bot_of_rotate`), Step 4 (`inl` injective で pull back). ~145 LOC. commit `7ef0e4c` (parallel session が Glauberman 3.24 statement と同梱 commit).
 
+§4D **Phase A.3 大部分完成** (2026-05-24, commits `e0ac1d0`, `9dbd721`, `ca7dc06`): Baer trick (Lem 4.37) — sqrtOdd + baerAdd + comm + assoc + Lem 4.37(a)(c).
+- **`sqrtOdd`** (noncomputable): `sqrtOdd x := x^((Nat.card G + 1) / 2)`. 基本性質: `sqrtOdd_sq` (square), `sqrtOdd_one`, `sqrtOdd_inv`, `sqrtOdd_mul_of_commute`, `sqrtOdd_mem_subgroup/center`, `sqrtOdd_apply_mulEquiv` (Aut 保存), `sqrtOdd_commutator_inv`.
+- **`baerAdd`** (noncomputable): `baerAdd x y := x * y * sqrtOdd ⁅y, x⁆` (mathlib commutator 規約). 基本: `baerAdd_one_left/right`, `baerAdd_inv_left/right`.
+- **Lem 4.37(a)** `baerAdd_eq_mul_of_commute`: commute ⇒ `x +' y = x * y`.
+- **commutativity** `baerAdd_comm`: class ≤ 2 + odd order ⇒ `x +' y = y +' x`. 証明: `y * x = x * y * ⁅y, x⁆` + `sqrtOdd (a⁻¹) = (sqrtOdd a)⁻¹` + `(sqrtOdd c)² = c`.
+- **associativity** `baerAdd_assoc` ⭐: class ≤ 2 + odd order ⇒ associative. 戦略: 両辺 = `x * y * z * Sxy * Sxz * Syz` via 左/右 hom of commutator + sqrtOdd 中心化 + sqrtOdd 中心積分配 + 中心 commute 入れ替え.
+- **`commutatorElement_mul_right_of_class_le_two`** (helper): class ≤ 2 で右 hom (左 hom + `commutatorElement_inv`).
+- **Lem 4.37(c)** `baerAdd_map_eq` / `baerAdd_mulEquiv_eq`: 任意 group hom (同濃度) / 自己同型は baerAdd を保存.
+- 総 ~265 LOC. **残**: AddCommGroup G instance def (要 nsmul/zsmul field 実装) + Lem 4.37(b) (additive order = multiplicative order, induction on n).
+
+§4C **Phase A.2 完成** (2026-05-24, commit `e3f8ce6`): Thm 4.22 (chain ⇒ A solvable) + Cor 4.23.
+- **Bridge lemma** `SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker`: `K ≤ A` について `⁅K.map inr, (inl : G →* Γ).range⁆ = ⊥ ↔ K ≤ φ.ker`. inl_aut + commutator_eq_bot_iff_le_centralizer 経由. ~50 LOC.
+- **Cor 4.23** `commutator_le_ker_of_acts_trivially_on_actionCommutator`: `[G, A, A] = 1 ⇒ commutator A ≤ φ.ker`. Faithful 版 `commutator_eq_bot_of_acts_trivially_on_actionCommutator_of_faithful`. 証明: Γ 内 three-subgroups で `⁅⁅YA, YA⁆, XG⁆ = ⊥` (Lem 4.25 と同 Step 1 + Three-subgroups direct application). ~40 LOC.
+- **Thm 4.22 abstract** `derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot`: 任意 H 内 E, X (X ≤ E.normalizer) で `iterCommutator E X m = ⊥ ⇒ ⁅(derivedSeries ↥X (m-1)).map X.subtype, E⁆ = ⊥`. Induction on m: base m=1 trivial, step m=k+1 で `E' := ⁅E, X⁆` + Lem 4.3 + IH + Three-subgroups (H₁=H₂=D, H₃=E). ~80 LOC. helper `iterCommutator_add`.
+- **Thm 4.22 semidirect** `derivedSeries_le_ker_of_iter_inl_inr_eq_bot`: `iter (inl(G).range) (inr(A).range) m = ⊥ ⇒ derivedSeries A (m-1) ≤ φ.ker`. abstract form + bridge + transport (subtype_comp_rangeRestrict + map_derivedSeries_eq). Faithful 版 `derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful`. ~50 LOC.
+- 総 ~280 LOC. **残**: Thm 4.24 (A nilpotent, 要 lcs 安定値 A^∞ infra + |G|-induction).
+
 §4D **`actionCommutator` 定義 + A-不変性 + G-Normal 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
 - `actionCommutator φ := Subgroup.closure {g * (φ a) g⁻¹ | g a}`. `Γ = G ⋊[φ] A` 内で
   `⁅inl(G), inr(A)⁆` を `inl` 経由で pull back したもの (∵ `[inl(g), inr(a)] = inl(g * (φ a) g⁻¹)`).

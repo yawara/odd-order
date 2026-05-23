@@ -133,3 +133,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 -- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.30 実用形): A faithful + trivial on G/Φ ⇒ trivial
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aFaithful_quotient_frattini
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Lemma 3.24(b) Glauberman conjugacy): C_G(A) で結ぶ
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.glauberman_fixed_points_conj
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Thm 3.23(b)): A-invariant Sylow C_G(A)-conjugate
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aInvariant_sylow_conj
