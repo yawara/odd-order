@@ -2754,6 +2754,102 @@ theorem iterCommutator_inl_inr_two_eq_one
       exact ⟨c * x * c⁻¹, h_cxc_ac, rfl⟩
     exact Subgroup.commutator_mem_commutator h_in_I1 ⟨a, rfl⟩
 
+/-! ### Isaacs §4D Thm 4.34 ⭐ (Fitting, BG Prop 1.6(d)): G abelian + coprime ⇒
+G = C_G(A) × [G, A] -/
+
+/-- **Fitting product hom** `θ : G →* G` defined by `θ(g) = ∏ a : A, (φ a) g`.
+
+Well-defined hom for abelian G (使用 Finset.prod_mul_distrib). 教科書 (Isaacs p.140) の
+Thm 4.34 証明の核. -/
+noncomputable def fittingProductHom {A G : Type*} [CommGroup G] [Group A] [Fintype A]
+    (φ : A →* MulAut G) : G →* G where
+  toFun g := ∏ a : A, (φ a) g
+  map_one' := by simp
+  map_mul' x y := by
+    simp_rw [map_mul]
+    exact Finset.prod_mul_distrib
+
+/-- **`fittingProductHom` of A-fixed element**: c ∈ C_G(A) ⇒ θ c = c^|A|. -/
+lemma fittingProductHom_apply_of_fixed {A G : Type*} [CommGroup G] [Group A] [Fintype A]
+    {φ : A →* MulAut G} {c : G} (hc : ∀ a : A, (φ a) c = c) :
+    fittingProductHom φ c = c ^ Nat.card A := by
+  show ∏ a : A, (φ a) c = c ^ Nat.card A
+  have h_eq : ∏ a : A, (φ a) c = ∏ _a : A, c :=
+    Finset.prod_congr rfl (fun a _ => hc a)
+  rw [h_eq, Finset.prod_const, Finset.card_univ, Nat.card_eq_fintype_card]
+
+/-- **`fittingProductHom` of action-image**: For g ∈ G, a ∈ A,
+`θ ((φ a) g) = θ g` (using `b ↦ b * a` is a permutation of A). -/
+lemma fittingProductHom_apply_of_smul {A G : Type*} [CommGroup G] [Group A] [Fintype A]
+    {φ : A →* MulAut G} (g : G) (a : A) :
+    fittingProductHom φ ((φ a) g) = fittingProductHom φ g := by
+  show ∏ b : A, (φ b) ((φ a) g) = ∏ b : A, (φ b) g
+  -- Rewrite (φ b) ∘ (φ a) = φ (b * a) using map_mul
+  have h_compose : ∀ b : A, (φ b) ((φ a) g) = (φ (b * a)) g := fun b => by
+    rw [← MulAut.mul_apply, ← map_mul]
+  rw [Finset.prod_congr (rfl : (Finset.univ : Finset A) = Finset.univ)
+        (fun b _ => h_compose b)]
+  -- ∏ b : A, (φ (b * a)) g = ∏ b' : A, (φ b') g (b' = b * a is a bijection)
+  exact Finset.prod_bijective (fun b => b * a) (Group.mulRight_bijective a)
+    (fun b => by simp) (fun _ _ => rfl)
+
+/-- **`actionCommutator` is in `ker (fittingProductHom)`** (G abelian).
+
+For each generator `g * (φ a) g⁻¹` of `actionCommutator`: `θ (g * (φ a) g⁻¹) = θ g * θ ((φ a) g)⁻¹
+= θ g * (θ g)⁻¹ = 1` (using θ hom + `fittingProductHom_apply_of_smul` + map_inv on φ a). -/
+lemma actionCommutator_le_ker_fittingProductHom
+    {A G : Type*} [CommGroup G] [Group A] [Fintype A] (φ : A →* MulAut G) :
+    actionCommutator φ ≤ (fittingProductHom φ).ker := by
+  rw [actionCommutator, Subgroup.closure_le]
+  rintro _ ⟨g, a, rfl⟩
+  rw [SetLike.mem_coe, MonoidHom.mem_ker]
+  -- Goal: θ (g * (φ a) g⁻¹) = 1
+  -- (φ a) g⁻¹ = (φ a)(g⁻¹) = ((φ a) g)⁻¹
+  have h_inv_eq : (φ a) g⁻¹ = ((φ a) g)⁻¹ := map_inv (φ a) g
+  rw [h_inv_eq, map_mul, map_inv, fittingProductHom_apply_of_smul]
+  exact mul_inv_cancel _
+
+/-- **Isaacs Theorem 4.34** ⭐ (Fitting, = BG Prop 1.6(d)):
+G abelian + A 作用 + coprime (|A|, |G|) ⇒
+`fixedPointsOfMulAut φ ⊓ actionCommutator φ = ⊥` (intersection trivial,
+combined with Lem 4.28 sup = ⊤ gives internal direct product `G = C_G(A) × [G, A]`).
+
+**証明** (Isaacs p.140): θ : G →* G, `θ g = ∏ a : A, (φ a) g`.
+- For c ∈ C_G(A): `θ c = c^|A|`.
+- `actionCommutator ⊆ ker θ` (各生成元 `[g, a] ↦ 1`).
+- So `c ∈ C_G(A) ∩ actionCommutator ⇒ θ c = c^|A| = 1`. Combined with `c^|G| = 1`
+  (Lagrange) + coprime ⇒ `c = 1` (Bezout: ∃ s t, s|A| + t|G| = 1, c = c^1 = ...). -/
+theorem fixedPoints_inf_actionCommutator_eq_bot_of_abelian
+    {A G : Type*} [CommGroup G] [Group A] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Subgroup.fixedPointsOfMulAut φ ⊓ actionCommutator φ = ⊥ := by
+  rw [eq_bot_iff]
+  intro c hc
+  rw [Subgroup.mem_bot]
+  obtain ⟨hc_fix, hc_ac⟩ := Subgroup.mem_inf.mp hc
+  -- c is A-fixed
+  have hc_fixed : ∀ a : A, (φ a) c = c := hc_fix
+  -- c ∈ ker θ via actionCommutator ⊆ ker θ
+  haveI : Fintype A := Fintype.ofFinite A
+  have hc_ker : fittingProductHom φ c = 1 :=
+    actionCommutator_le_ker_fittingProductHom φ hc_ac
+  -- θ c = c^|A| from hc_fixed
+  have hc_pow_A : c ^ Nat.card A = 1 := by
+    rw [← fittingProductHom_apply_of_fixed hc_fixed]; exact hc_ker
+  -- c^|G| = 1 (Lagrange)
+  have hc_pow_G : c ^ Nat.card G = 1 := pow_card_eq_one'
+  -- Bezout: ∃ s t, s|A| + t|G| = 1 (coprime), then c = c^(s|A| + t|G|) = 1
+  have h_one : c = 1 := by
+    have h_gcd : Nat.gcd (Nat.card A) (Nat.card G) = 1 := hCop
+    -- Use orderOf c ∣ Nat.card A and orderOf c ∣ Nat.card G ⇒ orderOf c ∣ gcd = 1 ⇒ c = 1
+    have h_ord_A : orderOf c ∣ Nat.card A := orderOf_dvd_of_pow_eq_one hc_pow_A
+    have h_ord_G : orderOf c ∣ Nat.card G := orderOf_dvd_of_pow_eq_one hc_pow_G
+    have h_ord_gcd : orderOf c ∣ Nat.gcd (Nat.card A) (Nat.card G) :=
+      Nat.dvd_gcd h_ord_A h_ord_G
+    rw [h_gcd] at h_ord_gcd
+    exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp h_ord_gcd)
+  exact h_one
+
 /-! ### Isaacs §4D: Baer trick (Lem 4.37) — odd order class ≤ 2 ⇒ additive group structure
 
 For `G` finite of **odd order** and **nilpotence class ≤ 2**, define
