@@ -33,6 +33,7 @@
 | §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |
 | §3F 巡回商 lift (3.35 弱版) | ✅ (2026-05-22) | `cyclic_quotient_lift`: G/H cyclic ⇒ ∃ g, ⟨g⟩ ⊔ H = ⊤. 弱版を Quotient.mk_surjective + zpowers で証明. 旧 axiom statement は inconsistent (H ≤ K + K ⊔ H = ⊤ ⇒ K = ⊤ で card 等式が \|G/H\| = \|H\| に帰着し反例あり) のため置換 |
 | §3F **Thm 3.35 強版 (uniqueness)** | ✅ (2026-05-23) | `cyclic_quotient_extension_unique`: N ⊴ G + gN が G/N 生成元 + θ θ' : G →* G₀ が N 上一致 + g → g₀ ⇒ θ = θ'. proof: u = x * g^i (x ∈ N) 分解 + map_mul + map_zpow. ~20 LOC. |
+| §3F **Thm 3.36 (existence)** | ✅⭐⭐ (2026-05-24) | `cyclic_extension_exists`: N + m>0 + a ∈ N + σ ∈ Aut(N) で σ a = a + σ^m = MulAut.conj a ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x. 構成: N ⋊_σ ℤ を ⟨(a⁻¹, m)⟩ で quotient. AxiomsCheck flagship 入り. ~170 LOC. **§3F 全 sorry-free 達成** 🎉 |
 
 ## Ch.3 完成の残作業 (2026-05-23 ralph-loop 委譲)
 
@@ -182,12 +183,29 @@ iter 1-9 で 9 commit. abelian_sz_conjugacy + step_caseB main は技術的に重
 
 Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着手可. ただし Thm 3.15/3.17 は Burnside p^a q^b 経由 ⇒ Ch.7 完成後. Ch.4-7 横断パスは別途.
 
-### Phase 4: Thm 3.36 (cyclic extension existence) — ralph-loop 委譲中
-- 場所: `OddOrder/Isaacs/Ch03_SplitExtensions.lean` §3F (`cyclic_quotient_extension_unique`
-  の直後 / `end -- 3F` 直前).
-- 現状: statement / proof 未着手.
-- Construction: Sym(Ω) realization, Ω = Fin m × N. ~150-250 LOC.
-- ralph-loop prompt: `/tmp/phase4_thm336_cyclic_extension.md` (起動例: 同様).
+### Phase 4: Thm 3.36 (cyclic extension existence) — **完全完成** ⭐⭐⭐ (2026-05-24 セッション)
+
+#### 完成済 (sorry-free, AxiomsCheck flagship)
+- `OddOrder.Isaacs.Ch03.cyclic_extension_exists` (~170 LOC)
+- 公理依存: `{propext, Classical.choice, Quot.sound}` のみ (unconditional)
+- 構成: `preG := N ⋊_σ ℤ` を `K := ⟨(a⁻¹, m)⟩` で quotient
+  ([Sym(Ω) realization は不採用 — SemidirectProduct ベースの方が mathlib API 活用度高い]).
+
+#### 実装詳細 (commit a8cd028, 78445ab, 9a23515, 788d8cb)
+- **cyclicExtPhi**: `Multiplicative ℤ →* MulAut N` (`zpowersHom`)
+- **CyclicExtPreG := N ⋊_σ ℤ** (`SemidirectProduct N (Multiplicative ℤ) (cyclicExtPhi σ)`)
+- **cyclicExtK := inl(a⁻¹) * inr(ofAdd m)**: 中心元 (cyclicExtK_centralized で証明済)
+- **cyclicExtKSubgroup**: zpowers, 正規 (cyclicExtKSubgroup_normal)
+- **G := preG ⧸ cyclicExtKSubgroup**: 商群
+- **5 sub-properties**:
+  1. **h_inj**: `inl_to_G : N →* G` 単射. (a⁻¹, m)^j の right component (= ofAdd (j*m)) と inl 像 (right=1) の照合で `jm = 0`, `m > 0 ⇒ j = 0`.
+  2. **hN₀_norm**: N₀ := inl_to_G.range 正規. `range_inl_eq_ker_rightHom` + `Normal.map (mk' K) (mk'_surjective)`.
+  3. **zpowers ⟦g⟧ = ⊤** (in G/N₀): preG lift y を inl·inr 分解, inl 成分は N₀ で消え, inr 成分は g^(right.toAdd).
+  4. **g^m = ι a**: g^m = ⟦inr(ofAdd m)⟧, ι a = ⟦inl a⟧. (inr(ofAdd m))⁻¹ * inl a = (σ^(-m) a, ofAdd(-m)) = (a, ofAdd(-m)) = cExt⁻¹ ∈ K (using σ a = a ⇒ σ^k a = a ∀ k).
+  5. **Conjugation g·ιx·g⁻¹ = ι(σx)**: `SemidirectProduct.inl_aut: inl (φ g n) = inr g * inl n * inr g⁻¹` を活用, `cyclicExtPhi σ (ofAdd 1) = σ^1 = σ`.
+
+#### Phase 4 unblock
+- Thm 3.36 は Bender-Glauberman §1 (preliminary), Peterfalvi §1-3 等で被引用 (詳細は要再 audit).
 
 ### Ch.3 内 forward dep ありで除外 (owner chapter 待ち)
 - Thm 3.15 (p-complement for all primes ⇒ solvable): Ch.7 Burnside 依存.
