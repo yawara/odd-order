@@ -481,13 +481,35 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 
 /-- **Isaacs Cor 3.29**: A が `G/Φ(G)` に自明作用 ⇒ A が G に自明作用.
 
-(`G = C·Φ(G)` ⇒ `G = C` by Frattini characterization.) -/
+`G = C·Φ(G)` ⇒ `C ⊔ Φ = ⊤` ⇒ `C = ⊤` (Frattini non-generating). -/
 theorem aFixed_quotient_frattini
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
-    (_h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
     ∀ a : A, ∀ g : G, (φ a) g = g := by
-  sorry  -- TODO: Cor 3.28 with N = Φ(G) + Frattini's argument (M < G containing Φ → contradiction).
+  set C : Subgroup G := fixedPointsOfMulAut φ with hC_def
+  haveI hΦ_inv : IsAInvariant φ (_root_.frattini G) := IsAInvariant.frattini φ
+  -- Step 1: C ⊔ Φ(G) = ⊤ via Cor 3.28.
+  have hCΦ_top : C ⊔ _root_.frattini G = ⊤ := by
+    rw [eq_top_iff]
+    intro g _
+    obtain ⟨c, hc_fix, hc_coset⟩ :=
+      coprime_fixedPoints_quotient hCop hSolv hΦ_inv (fun a => h_triv_quot a g)
+    obtain ⟨n, hn_in, hc_eq⟩ := hc_coset
+    have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
+    rw [hg_eq]
+    refine Subgroup.mul_mem_sup ?_ ?_
+    · -- c ∈ C
+      exact hc_fix
+    · -- n⁻¹ ∈ Φ
+      exact Subgroup.inv_mem _ hn_in
+  -- Step 2: Frattini non-generating ⇒ C = ⊤.
+  haveI : IsCoatomic (Subgroup G) := inferInstance
+  have hC_top : C = ⊤ := frattini_nongenerating hCΦ_top
+  -- Step 3: ∀ a g, φ a g = g.
+  intro a g
+  have hg_in_C : g ∈ C := by rw [hC_top]; exact Subgroup.mem_top g
+  exact hg_in_C a
 
 /-- **Isaacs Cor 3.30**: A faithful on G ⇒ A faithful on G/Φ(G).
 
