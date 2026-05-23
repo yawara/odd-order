@@ -329,9 +329,53 @@ private theorem step_factor
 mathlib v4.29.1 にこの形の lemma がないため自前. -/
 private theorem minimal_normal_isCommutative_of_solvable
     {N L : Subgroup G} [N.Normal] [L.Normal] (hL_le : L ≤ N) (hL_ne : L ≠ ⊥)
-    (_hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L)
-    (_hN_solv : IsSolvable N) : IsMulCommutative L := by
-  sorry
+    (hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L)
+    (hN_solv : IsSolvable N) : IsMulCommutative L := by
+  haveI hN_solv' : IsSolvable N := hN_solv
+  -- [L, L] ≤ L, [L, L] is G-normal.
+  have h_LL_le : ⁅L, L⁆ ≤ L := Subgroup.commutator_le_self L
+  haveI h_LL_normal : (⁅L, L⁆ : Subgroup G).Normal := Subgroup.commutator_normal L L
+  -- By minimality, [L, L] = ⊥ or [L, L] = L.
+  by_cases h : (⁅L, L⁆ : Subgroup G) = ⊥
+  · -- [L, L] = ⊥ ⇒ L is commutative in G ⇒ IsMulCommutative L.
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at h
+    refine ⟨⟨fun a b => ?_⟩⟩
+    have ha_cent : (a : G) ∈ Subgroup.centralizer L := h a.property
+    rw [Subgroup.mem_centralizer_iff] at ha_cent
+    apply Subtype.ext
+    exact (ha_cent b.val b.property).symm
+  · -- [L, L] = L, contradiction with solvability of L (subgroup of solvable N).
+    exfalso
+    have h_eq : (⁅L, L⁆ : Subgroup G) = L := hL_min _ h_LL_normal h_LL_le h
+    -- L ≃* L.subgroupOf N, the latter is solvable, hence L solvable.
+    haveI hL_solv : IsSolvable L := by
+      haveI : IsSolvable (L.subgroupOf N) := inferInstance
+      let e := (subgroupOfEquivOfLe hL_le).symm
+      exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+    -- ⁅⊤_L, ⊤_L⁆.map L.subtype = ⁅L, L⁆.
+    have h_comm_map : (⁅(⊤ : Subgroup ↥L), ⊤⁆ : Subgroup ↥L).map L.subtype = ⁅L, L⁆ := by
+      rw [Subgroup.map_commutator, ← L.subtype.range_eq_map, Subgroup.range_subtype]
+    -- ⁅L, L⁆ = L = L.subtype.range.
+    have h_map_range : (⁅(⊤ : Subgroup ↥L), ⊤⁆ : Subgroup ↥L).map L.subtype = L.subtype.range := by
+      rw [h_comm_map, h_eq, Subgroup.range_subtype]
+    -- ⁅⊤_L, ⊤_L⁆ = ⊤ in ↥L (via map_eq_range_iff).
+    have h_comm_top : (⁅(⊤ : Subgroup ↥L), ⊤⁆ : Subgroup ↥L) = ⊤ := by
+      have := Subgroup.map_eq_range_iff.mp h_map_range
+      rw [show L.subtype.ker = ⊥ from L.ker_subtype] at this
+      exact codisjoint_bot.mp this
+    -- By induction, derivedSeries L n = ⊤ for all n.
+    have h_ds_top : ∀ n, derivedSeries L n = ⊤ := by
+      intro n
+      induction n with
+      | zero => rfl
+      | succ n ih => rw [derivedSeries_succ]; rw [ih]; exact h_comm_top
+    -- L is nontrivial (since L ≠ ⊥ in G).
+    haveI : Nontrivial ↥L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
+    -- L solvable: derivedSeries L n = ⊥ for some n.
+    obtain ⟨n, hn⟩ := hL_solv.solvable
+    -- Contradiction: (⊤ : Subgroup ↥L) = ⊥.
+    rw [h_ds_top] at hn
+    exact bot_lt_top.ne' hn
 
 /-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
 private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
