@@ -29,6 +29,11 @@
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
+§4C **Phase A 完成** (2026-05-24): Cor 3.28 と独立に着手可な §4C 結果 3 件.
+- **Lem 4.20** `actionCommutator_le_iff` (element form): `actionCommutator φ ≤ N ↔ ∀ a g, (φ a) g * g⁻¹ ∈ N`. Left form `actionCommutator_le_iff_left` も提供. ⇒ N A-inv なら "A acts trivially on G/N" の最小部分群.
+- **Cor 4.21** `actionCommutator_le_iff_TFAE` (List.TFAE 三方向): (1) [G,A] ⊆ H, (2) 右剰余類 element form, (3) 左剰余類 element form. + 系 `IsAInvariant.of_actionCommutator_le`: [G,A] ⊆ H ⇒ H A-inv.
+- **Lem 4.25** ⭐ `actionCommutator_commutator_eq_bot_of_acts_trivially`: A が [G,A] に trivial 作用 ⇒ [G,A] abelian. 証明: Γ = G ⋊[φ] A 内 Three-subgroups lemma. Step 1 (`⁅H_Γ, inr(A)⁆ = ⊥` from generator computation), Step 2 (内側 commutator ≤ H_Γ via Normal), Step 3 (`Subgroup.commutator_commutator_eq_bot_of_rotate`), Step 4 (`inl` injective で pull back). ~145 LOC. commit `7ef0e4c` (parallel session が Glauberman 3.24 statement と同梱 commit).
+
 §4D **`actionCommutator` 定義 + A-不変性 + G-Normal 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
 - `actionCommutator φ := Subgroup.closure {g * (φ a) g⁻¹ | g a}`. `Γ = G ⋊[φ] A` 内で
   `⁅inl(G), inr(A)⁆` を `inl` 経由で pull back したもの (∵ `[inl(g), inr(a)] = inl(g * (φ a) g⁻¹)`).
