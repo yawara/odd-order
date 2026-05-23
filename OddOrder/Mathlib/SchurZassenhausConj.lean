@@ -555,7 +555,18 @@ private theorem step_caseB
     rw [hK_bot, hK'_bot]
     ext x
     simp [Subgroup.mem_map, Subgroup.mem_bot]
-  sorry  -- Main: minimal normal M/N + Sylow C + N_G(L) argument
+  -- Main: minimal normal M/N + Sylow C + N_G(L) argument.
+  -- N ≠ ⊤. G/N nontrivial + solvable.
+  -- Take minimal normal M̄ ⊆ G/N (use exists_minimal_normal_le on G/N).
+  -- M := M̄.comap (mk' N). N ≤ M ≤ G.
+  -- M̄ is p-group (minimal normal of solvable ⇒ elementary abelian p-group via Lem 3.11 extension).
+  -- M ∩ K, M ∩ K^g are Sylow p in M (since coprime, |M ∩ K| = |M:N| = |M̄|).
+  -- Sylow C in M: ∃ m ∈ M, (M ∩ K)^m = M ∩ K^g.
+  -- L := M ∩ K normal in K, K^(g*m).
+  -- ⟨K, K^(g*m)⟩ ≤ N_G(L). Case N_G(L) < G: apply step_restriction.
+  -- Case N_G(L) = G: L ⊴ G. step_factor with L gives K^h ⊔ L = K' ⊔ L.
+  -- ... lengthy case analysis.
+  sorry
 
 /-- **Main induction**: combines `step_caseA` and `step_caseB` via strong induction. -/
 private theorem main_aux {n : ℕ} :
