@@ -240,6 +240,13 @@ FT クリティカル度 + 章内依存で並べる:
   - `trivialIntersection` (Thm 6.4 (1) ⇒ (2)): A ∩ A^g = ⊥ for g ∉ A, [b, n] 経由
   - `centralizer_complement_le` (Thm 6.4 (2) ⇒ (3))
   - 部分 TFAE: (1) ⇔ (2) ⇔ (3) + (4) ⇒ (1) 完成. **(1) ⇒ (4) は Cor 6.6 待ち.**
+- **Lem 6.5** `card_notConjugateSet_eq_index` (~250 LOC):
+  TI 条件下で X = "non-A-conjugate 元集合" は `|X| = A.index`. Isaacs p.179 直訳.
+  - private `normalizer_eq_self_of_TI`: TI + A ≠ ⊥ ⇒ N_G(A) = A.
+  - private `TI_conjugate`: 異なる conjugate は trivial intersection.
+  - bijection `G ⧸ A ≃ conjugates A` 経由で |conjugates| = A.index.
+  - `|X| = |G| - A.index × (|A| - 1) = A.index` (Lagrange + omega).
+  - ConjAct typeclass 回避のため `MulAut.conj g · A` 直接パラメトライズ.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
