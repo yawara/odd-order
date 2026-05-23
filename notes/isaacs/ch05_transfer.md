@@ -128,7 +128,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.25 controls own fusion ⇔ normal p-comp | mathlib 未収載. Focal Subgroup ＋ Sylow conjugacy | 中 |
 | **5.26 Frobenius normal p-complement** | mathlib 未収載 (grep 確認: `frobenius.*complement` 全マッチなし). Phase 1 では本書最重要新規実装の一つ | **大** (3 同値条件、5.25 + 5.27 + 5.28 連鎖) |
 | 5.27 (Lem, easy 1⇒2⇒3) | ✅ 完成 (2026-05-24, sorry+axiom-free, ~160 LOC). `def HasNormalPComplement p G` 導入 (mathlib 未収載). **Part 1** (1⇒2 strong, `hasNormalPComplement_of_subgroup`, ~70 LOC): Sylow `card_eq_multiplicity` + `not_dvd_index` + `relIndex_dvd_index_of_normal` + `factorization_mul` で `\|N \cap H\| * \|Q\| = \|H\|` 確立 + `isComplement'_of_coprime`. **Part 2** (2⇒3, `isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`, ~80 LOC): `[K', X_n] ≤ K' ⊓ X_n = ⊥` (`commutator_le_inf` + coprime) ⇒ `K' ≤ C_n` ⇒ `C_n.index ∣ K'.index = p^a` (`index_dvd_of_le`) ⇒ `IsPGroup.of_card`. helper instance `centralizer_subgroupOf_normalizer_normal` (`normalizerMonoidHom_ker` 経由). X = ⊥ case は subgroup = ⊤ ⇒ index = 1 で吸収. | ✅ |
-| 5.28 (Lem, key Sylow 共役) | mathlib 未収載. 5.26 と同時実装 | 中 (~120-150 LOC) |
+| 5.28 (Lem, key Sylow 共役) | 🟡 部分完成 (2026-05-24). Statement + 強帰納法 skeleton + Case 1 (P = Q) + Case 2 開始 (D < P, D < Q) 実装済. Helper 2 件 (`sylow_sup_normal_eq_top_of_quot_isPGroup` ~20 LOC, `lt_normalizer_of_pgroup_of_lt_top` ~6 LOC) は sorry-free. Case 2 残り (~200 LOC): N := normalizer D の Sylow S, T + Sylow II + N = SC 分解 + 二回 IH chain (P, R) と (R^y, Q). | 🟡 部分 |
 | 5.29 q ∤ p^e−1 ⇒ normal p-comp | 5.26 + p-group action 計算. Burnside p^a q^b 系の補助 | 中 |
 | 5.30 p odd, 全 order-p 元中心 ⇒ normal p-comp | 5.26 + Thm 4.36 (Ch.4 で要実装). FT 経路で重要可能性 (奇数位数仮定との親和性) | 中 |
 

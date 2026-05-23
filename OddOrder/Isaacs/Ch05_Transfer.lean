@@ -851,7 +851,11 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 - **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
 - **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
   Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
-- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): 形式化保留 (5.26 鍵).
+- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): 🟡 部分完成 (skeleton + helpers).
+  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` (~20 LOC) +
+  `lt_normalizer_of_pgroup_of_lt_top` (~6 LOC) は sorry-free. main body は
+  強帰納法 setup + Case 1 (P = Q) + Case 2 開始 (D < P, D < Q 確立) まで.
+  残り ~200 LOC は別 session.
 - **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
 - **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
 
