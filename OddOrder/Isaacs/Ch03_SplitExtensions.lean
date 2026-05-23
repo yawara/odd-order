@@ -2410,8 +2410,32 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
   -- g := ⟦inr (ofAdd 1)⟧.
   let g : G := QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))
   refine ⟨G, inferInstance, N₀, hN₀_norm, ι, g, ?_, ?_, ?_⟩
-  · -- zpowers ⟦g⟧ = ⊤ in G/N₀ (via Multiplicative ℤ / ⟨ofAdd m⟩ ≅ ZMod m).
-    sorry
+  · -- zpowers ⟦g⟧ = ⊤ in G/N₀: every G/N₀ element lifts to preG, decompose y = inl·inr;
+    -- inl part vanishes in G/N₀, inr part is ⟦g⟧^(y.right.toAdd).
+    rw [Subgroup.eq_top_iff']
+    intro z
+    obtain ⟨zG, rfl⟩ : ∃ zG : G, QuotientGroup.mk' N₀ zG = z :=
+      QuotientGroup.mk'_surjective _ z
+    obtain ⟨y, rfl⟩ : ∃ y : CyclicExtPreG N σ,
+        QuotientGroup.mk' (cyclicExtKSubgroup m a σ) y = zG :=
+      QuotientGroup.mk'_surjective _ zG
+    rw [show y = SemidirectProduct.inl y.left * SemidirectProduct.inr y.right from
+      (SemidirectProduct.inl_left_mul_inr_right y).symm,
+      map_mul (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)),
+      map_mul (QuotientGroup.mk' N₀)]
+    have h_in_N₀ : (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+        (SemidirectProduct.inl y.left)) ∈ N₀ := ⟨y.left, rfl⟩
+    have h_first_one : (QuotientGroup.mk' N₀ : G →* G ⧸ N₀)
+        ((QuotientGroup.mk' (cyclicExtKSubgroup m a σ)) (SemidirectProduct.inl y.left)) = 1 := by
+      rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact h_in_N₀
+    rw [h_first_one, one_mul]
+    have h_right_eq : y.right = (Multiplicative.ofAdd (1 : ℤ)) ^ y.right.toAdd := by
+      conv_lhs => rw [← ofAdd_toAdd y.right]
+      rw [← ofAdd_zsmul]; congr 1; simp
+    rw [h_right_eq, map_zpow (SemidirectProduct.inr : Multiplicative ℤ →* CyclicExtPreG N σ),
+      map_zpow (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)),
+      map_zpow (QuotientGroup.mk' N₀)]
+    exact Subgroup.zpow_mem_zpowers _ _
   · -- g^m = ι a.
     -- g^m = ⟦inr (ofAdd m)⟧ = ⟦(1, ofAdd m)⟧, and (a, 1) - (1, ofAdd m) = (a⁻¹, ofAdd m) = K-element.
     sorry
