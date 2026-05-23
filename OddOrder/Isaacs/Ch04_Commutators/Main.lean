@@ -845,8 +845,41 @@ theorem actionCommutator_one_eq_bot {A G : Type*} [Group A] [Group G] :
   show g * (1 : MulAut G) g⁻¹ = 1
   simp
 
--- TODO: IsAInvariant.actionCommutator (`actionCommutator φ` は φ 作用下で A-inv).
--- MulAut composition convention の確認後に追加.
+/-- **`actionCommutator φ` は φ 作用下で A-不変**.
+
+`(φ b) (g * (φ a) g⁻¹) = (φ b) g * (φ (b * a * b⁻¹)) ((φ b) g)⁻¹` (generator → generator 写像)
+が両方向で成り立つので生成集合自体が `(φ b)`-stable. `closure_of_invariant_set` で結論. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator φ) := by
+  apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
+  intro b
+  -- generator g * (φ a) g⁻¹ → (φ b) g * (φ (b·a·b⁻¹)) ((φ b) g)⁻¹ (= 別の generator).
+  have key : ∀ g : G, ∀ a : A,
+      (φ b) (g * (φ a) g⁻¹) = (φ b) g * (φ (b * a * b⁻¹)) ((φ b) g)⁻¹ := by
+    intro g a
+    rw [map_mul (φ b)]
+    congr 1
+    -- (φ b) ((φ a) g⁻¹) = (φ (b·a·b⁻¹)) ((φ b) g)⁻¹
+    rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
+        show φ (b * a * b⁻¹) = (φ b) * (φ a) * (φ b)⁻¹ from by rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.inv_apply_self]
+  ext x
+  refine ⟨?_, ?_⟩
+  · -- (φ b) '' S ⊆ S
+    rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    exact ⟨(φ b) g, b * a * b⁻¹, key g a⟩
+  · -- S ⊆ (φ b) '' S: take preimage via (φ b)⁻¹
+    rintro ⟨g, a, rfl⟩
+    refine ⟨(φ b)⁻¹ g * (φ (b⁻¹ * a * b)) ((φ b)⁻¹ g)⁻¹,
+      ⟨(φ b)⁻¹ g, b⁻¹ * a * b, rfl⟩, ?_⟩
+    rw [map_mul (φ b)]
+    congr 1
+    · exact MulAut.apply_inv_self (M := G) (φ b) g
+    -- (φ b) ((φ (b⁻¹·a·b)) ((φ b)⁻¹ g)⁻¹) = (φ a) g⁻¹
+    rw [show ((φ b)⁻¹ g)⁻¹ = (φ b)⁻¹ g⁻¹ from (map_inv ((φ b)⁻¹) g).symm,
+        show φ (b⁻¹ * a * b) = (φ b)⁻¹ * (φ a) * (φ b) from by rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
