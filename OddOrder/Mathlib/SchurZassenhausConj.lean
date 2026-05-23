@@ -379,6 +379,88 @@ private theorem minimal_normal_isCommutative_of_solvable
     rw [h_ds_top] at hn
     exact bot_lt_top.ne' hn
 
+/-- **Isaacs Lemma 3.11** (`p`-group part): for `L` a minimal normal subgroup of a
+finite group with `L` solvable, `L` is a `p`-group for some prime `p`.
+The commutativity follows from `minimal_normal_isCommutative_of_solvable`; the
+`p`-group structure follows from the `p`-primary component being characteristic in `L`
+(and hence normal in the ambient group), then minimality forces the `p`-primary = `L`. -/
+private theorem minimal_normal_isPGroup_of_solvable
+    {L : Subgroup G} [Finite G] [L.Normal] [IsSolvable L]
+    (hL_ne : L ≠ ⊥)
+    (hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p L := by
+  -- L commutative.
+  haveI hL_comm : IsMulCommutative L :=
+    minimal_normal_isCommutative_of_solvable (N := L) le_rfl hL_ne hL_min inferInstance
+  haveI hL_nontriv : Nontrivial L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
+  have hL_card_pos : 1 < Nat.card L := Finite.one_lt_card
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hL_card_pos.ne'
+  refine ⟨p, hp_prime, ?_⟩
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  -- T := p-torsion of L as a Subgroup of ↥L.
+  let T : Subgroup ↥L :=
+    { carrier := {x | x ^ p = 1}
+      one_mem' := one_pow p
+      mul_mem' := by
+        intro a b ha hb
+        change (a * b) ^ p = 1
+        change a ^ p = 1 at ha
+        change b ^ p = 1 at hb
+        rw [mul_pow, ha, hb, one_mul]
+      inv_mem' := by
+        intro a ha
+        change a⁻¹ ^ p = 1
+        change a ^ p = 1 at ha
+        rw [inv_pow, ha, inv_one] }
+  -- T characteristic in ↥L (image of p-torsion under any automorphism is p-torsion).
+  haveI hT_char : T.Characteristic := by
+    rw [Subgroup.characteristic_iff_le_comap]
+    intro φ x hx
+    rw [Subgroup.mem_comap]
+    change (φ x) ^ p = 1
+    change x ^ p = 1 at hx
+    rw [← map_pow, hx, map_one]
+  -- T ≠ ⊥ by Cauchy.
+  obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥L) p hp_dvd
+  have hx_pow : x ^ p = 1 := by rw [← hx_ord]; exact pow_orderOf_eq_one x
+  have hx_ne_one : x ≠ 1 := by
+    intro heq
+    rw [heq, orderOf_one] at hx_ord
+    exact hp_prime.ne_one hx_ord.symm
+  have hT_ne_bot : T ≠ ⊥ := by
+    intro hbot
+    have hx_T : x ∈ T := hx_pow
+    rw [hbot, Subgroup.mem_bot] at hx_T
+    exact hx_ne_one hx_T
+  -- T.map L.subtype ⊴ G (characteristic in normal), ≤ L, ≠ ⊥.
+  haveI hTL_normal : (T.map L.subtype).Normal := inferInstance
+  have hTL_le : T.map L.subtype ≤ L := by
+    rintro _ ⟨y, _, rfl⟩
+    exact y.2
+  have hTL_ne_bot : T.map L.subtype ≠ ⊥ := by
+    intro hbot
+    have hT_eq : T = ⊥ := by
+      have h : T.map L.subtype = (⊥ : Subgroup ↥L).map L.subtype := by
+        rw [hbot, Subgroup.map_bot]
+      exact Subgroup.map_injective L.subtype_injective h
+    exact hT_ne_bot hT_eq
+  -- Minimality of L: T.map L.subtype = L.
+  have hTL_eq : T.map L.subtype = L := hL_min _ hTL_normal hTL_le hTL_ne_bot
+  -- Hence T = ⊤ in ↥L (via map_injective).
+  have hT_top : T = ⊤ := by
+    have h_top_map : (⊤ : Subgroup ↥L).map L.subtype = L := by
+      rw [← L.subtype.range_eq_map, Subgroup.range_subtype]
+    have hh : T.map L.subtype = (⊤ : Subgroup ↥L).map L.subtype := by
+      rw [h_top_map, hTL_eq]
+    exact Subgroup.map_injective L.subtype_injective hh
+  -- Each x : ↥L satisfies x^p = 1, hence x^(p^1) = 1.
+  intro x
+  refine ⟨1, ?_⟩
+  have hxT : x ∈ T := by rw [hT_top]; trivial
+  change x ^ p = 1 at hxT
+  rw [pow_one]
+  exact hxT
+
 /-- Helper: for `K` complement of abelian normal `N`, the stabilizer (under the
 `G`-action on `N.QuotientDiff`) of the equivalence class of `K`'s transversal equals `K`.
 
