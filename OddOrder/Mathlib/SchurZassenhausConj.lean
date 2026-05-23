@@ -156,9 +156,27 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
   let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
   exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
 
-/-! ### Step 1: Restriction reduction (proper subgroup `U`) -/
+/-! ### Helper lemmas for IH termination -/
 
-variable [Finite G] {N : Subgroup G} [N.Normal]
+variable [Finite G]
+
+/-- `L ≠ ⊥ ⇒ |G ⧸ L| < |G|` for finite `G`. -/
+private theorem card_quotient_lt_of_ne_bot {L : Subgroup G} [L.Normal] (hL : L ≠ ⊥) :
+    Nat.card (G ⧸ L) < Nat.card G := by
+  show L.index < Nat.card G
+  have h_L_gt : 1 < Nat.card ↥L := (Subgroup.one_lt_card_iff_ne_bot _).mpr hL
+  have h_L_idx_pos : 0 < L.index := by
+    rw [Nat.pos_iff_ne_zero]
+    intro h
+    have : Nat.card G = 0 := by rw [← L.card_mul_index, h]; ring
+    exact absurd this Nat.card_pos.ne'
+  calc L.index = L.index * 1 := (mul_one _).symm
+    _ < L.index * Nat.card ↥L := (Nat.mul_lt_mul_left h_L_idx_pos).mpr h_L_gt
+    _ = Nat.card G := L.index_mul_card
+
+variable {N : Subgroup G} [N.Normal]
+
+/-! ### Step 1: Restriction reduction (proper subgroup `U`) -/
 
 /-- `(K.subgroupOf U).map U.subtype = K` when `K ≤ U`. -/
 private theorem subgroupOf_map_subtype_eq {U K : Subgroup G} (hKU : K ≤ U) :
