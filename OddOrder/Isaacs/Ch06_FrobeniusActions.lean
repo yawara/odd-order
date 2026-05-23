@@ -5,12 +5,15 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Int.ModEq
 import Mathlib.Data.Nat.ModEq
+import Mathlib.Data.Set.Card
+import Mathlib.Data.Set.Card.Arithmetic
 import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.FixedPointFree
 import Mathlib.GroupTheory.GroupAction.Basic
+import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.FixedPoints
 import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
@@ -25,7 +28,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 6
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1 ✅, 6.3-6.6 未, 6.2/6.7 保留 |
+| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.3/6.5 ✅, 6.4/6.6 未, 6.2/6.7 保留 |
 | 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 未着手 |
 | 6C | Frobenius kernel nilpotent + Thompson | 6.22 – 6.24 | 未着手 |
 
@@ -235,6 +238,315 @@ end IsFrobeniusAction
 
 end
 
+section /- 6A (continued): Lemma 6.5 — TI subgroup counting (pp. 178-179) -/
+
+/-! ### Isaacs Lemma 6.5 (TI subgroup counting)
+
+If `A ≤ G` satisfies `A ∩ A^g = 1` for all `g ∈ G - A` (the **TI**, "trivial intersection",
+condition), then the set `X = { x ∈ G | x is not conjugate to any nonidentity element of A }`
+has cardinality `|G : A|`.
+
+The proof (Isaacs p. 179) goes via:
+
+1. (Case `A = ⊥`) trivially `X = G` and `A.index = |G|`.
+2. (Case `A > ⊥`) Show `N_G(A) = A` from TI: if `gAg⁻¹ = A` and `g ∉ A`, then
+   `A = A ∩ gAg⁻¹ = ⊥`, contradiction.
+3. The orbit of `A` under `ConjAct G` (the set of conjugates) has size `[G : N_G(A)] = A.index`.
+4. Distinct conjugates of `A` have trivial intersection (by TI applied to a representative).
+5. The carriers of the conjugates partition `Xᶜ ⊔ {1}`, so
+   `|Xᶜ| = A.index · (|A| − 1)`, hence `|X| = |G| − A.index(|A|−1) = A.index`.
+
+We work with `Set.ncard` (the natural-number cardinality of a `Set`) since the conclusion is
+phrased as the size of a `Set G`. -/
+
+open scoped Pointwise
+
+variable {G : Type*} [Group G]
+
+/-- Auxiliary: the set of elements of `G` **not conjugate to any nonidentity element of `A`**. -/
+private def notConjugateSet (A : Subgroup G) : Set G :=
+  { x : G | ∀ a ∈ A, a ≠ 1 → ¬ IsConj a x }
+
+/-- Helper for Lem 6.5: under the TI condition, the normalizer of `A` is `A` itself
+(provided `A ≠ ⊥`). -/
+private lemma normalizer_eq_self_of_TI
+    {A : Subgroup G} (hA_ne : A ≠ ⊥)
+    (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
+    Subgroup.normalizer A = A := by
+  refine le_antisymm ?_ A.le_normalizer
+  intro g hg
+  by_contra hgA
+  -- `g ∈ N_G(A)` means conjugation by `g` preserves `A`, so `MulAut.conj g • A = A`.
+  have hconj : MulAut.conj g • A = A := by
+    have hgN : g ∈ Subgroup.normalizer A := hg
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm x ∈ A ↔ x ∈ A
+    rw [MulAut.conj_symm_apply]
+    -- Goal: `g⁻¹ * x * g ∈ A ↔ x ∈ A`, which is `mem_normalizer_iff''`.
+    exact ((Subgroup.mem_normalizer_iff''.mp hgN) x).symm
+  -- Then `A ⊓ MulAut.conj g • A = A`, but TI gives `⊥`, so `A = ⊥`, contradicting `hA_ne`.
+  have h_eq : A ⊓ (MulAut.conj g • A) = A := by rw [hconj]; exact inf_idem A
+  have h_bot : A ⊓ (MulAut.conj g • A) = ⊥ := h_TI g hgA
+  exact hA_ne (h_eq.symm.trans h_bot)
+
+/-- Helper for Lem 6.5: the carrier set `(B : Set G)` of any conjugate `B = MulAut.conj h • A`
+satisfies the same TI hypothesis with respect to elements outside `B`. (This is just a relabelling
+of the TI assumption.) Used to show distinct conjugates are disjoint outside `{1}`. -/
+private lemma TI_conjugate
+    {A : Subgroup G}
+    (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥)
+    (h k : G) (hhk : (MulAut.conj h • A : Subgroup G) ≠ MulAut.conj k • A) :
+    (MulAut.conj h • A : Subgroup G) ⊓ (MulAut.conj k • A) = ⊥ := by
+  -- Let `g := h⁻¹ * k`.  If `g ∈ A`, then `MulAut.conj h • A = MulAut.conj k • A`, contradiction.
+  set g : G := h⁻¹ * k with hg_def
+  have hg_notmem : g ∉ A := by
+    intro hgA
+    apply hhk
+    -- `k = h * g`, so `MulAut.conj k • A = MulAut.conj h • (MulAut.conj g • A)`.
+    have hk_eq : k = h * g := by simp [hg_def]
+    have hconjg : MulAut.conj g • A = A :=
+      Subgroup.conj_smul_eq_self_of_mem hgA
+    calc (MulAut.conj h • A : Subgroup G)
+        = MulAut.conj h • (MulAut.conj g • A) := by rw [hconjg]
+      _ = MulAut.conj (h * g) • A := by rw [← mul_smul, ← map_mul]
+      _ = MulAut.conj k • A := by rw [← hk_eq]
+  -- Now apply TI for `g` and conjugate by `h`.
+  have h_TI_g : A ⊓ (MulAut.conj g • A) = ⊥ := h_TI g hg_notmem
+  -- Conjugating by `h`: `MulAut.conj h` is a `MulEquiv`, so it preserves `⊓` and `⊥`.
+  have hsmul : MulAut.conj h • (A ⊓ (MulAut.conj g • A) : Subgroup G)
+      = (MulAut.conj h • A) ⊓ (MulAut.conj h • (MulAut.conj g • A)) :=
+    Subgroup.smul_inf _ _ _
+  have hsmul_bot : MulAut.conj h • (⊥ : Subgroup G) = (⊥ : Subgroup G) := Subgroup.smul_bot _
+  -- `MulAut.conj h • (MulAut.conj g • A) = MulAut.conj k • A` (since `h * g = k`).
+  have hk_smul : MulAut.conj h • (MulAut.conj g • A) = MulAut.conj k • A := by
+    rw [← mul_smul]
+    congr 1
+    rw [← map_mul]
+    congr 1
+    simp [hg_def]
+  rw [h_TI_g, hsmul_bot] at hsmul
+  rw [← hk_smul]
+  exact hsmul.symm
+
+/-- **Isaacs Lemma 6.5**: Let `A` be a subgroup of a finite group `G`, and suppose `A ∩ A^g = 1`
+for all `g ∈ G \ A`. Then the set of elements of `G` not conjugate to any nonidentity element of `A`
+has cardinality `|G : A|`. -/
+theorem card_notConjugateSet_eq_index [Finite G]
+    (A : Subgroup G)
+    (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
+    (notConjugateSet A).ncard = A.index := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  rcases eq_or_ne A ⊥ with rfl | hA_ne
+  · -- Case `A = ⊥`: every element of `G` lies in `notConjugateSet ⊥`.
+    have h_univ : notConjugateSet (⊥ : Subgroup G) = Set.univ := by
+      ext x
+      simp only [notConjugateSet, Set.mem_setOf_eq, Set.mem_univ, iff_true]
+      intro a ha h_ne
+      rw [Subgroup.mem_bot] at ha
+      exact absurd ha h_ne
+    rw [h_univ, Set.ncard_univ, Subgroup.index_bot]
+  · -- Case `A ≠ ⊥`.  Build the orbit of `A` under conjugation; counted to give `A.index`.
+    -- The complement of `notConjugateSet A` is `⋃_{B ∈ orbit} (B.carrier \ {1})`.
+    -- Pairwise disjoint outside `{1}`; sum gives `index · (|A| - 1)`.
+    have hNGA : Subgroup.normalizer A = A := normalizer_eq_self_of_TI hA_ne h_TI
+    -- The set of conjugates of `A` (indexed as subgroups of `G`).
+    set conjs : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • A) with hconjs_def
+    -- (Step a) Identify the complement.
+    have h_compl :
+        (notConjugateSet A)ᶜ = ⋃ B ∈ conjs, ((B : Set G) \ {1}) := by
+      ext x
+      constructor
+      · -- `x ∈ Xᶜ`: exists `a ∈ A`, `a ≠ 1`, `IsConj a x`.
+        intro hx
+        rw [Set.mem_compl_iff, notConjugateSet, Set.mem_setOf_eq] at hx
+        push Not at hx
+        obtain ⟨a, haA, ha_ne, hIsConj⟩ := hx
+        -- `IsConj a x` means `∃ c, c * a * c⁻¹ = x`.
+        rcases (isConj_iff (a := a) (b := x)).1 hIsConj with ⟨c, hcax⟩
+        rw [Set.mem_iUnion]
+        refine ⟨MulAut.conj c • A, ?_⟩
+        rw [Set.mem_iUnion]
+        refine ⟨⟨c, rfl⟩, ?_, ?_⟩
+        · -- `x = c * a * c⁻¹ ∈ MulAut.conj c • A`.
+          rw [← hcax]
+          have hca : c * a * c⁻¹ = MulAut.conj c a := by simp [MulAut.conj_apply]
+          rw [hca, Subgroup.coe_pointwise_smul]
+          exact Set.smul_mem_smul_set haA
+        · -- `x ≠ 1` since `a ≠ 1` and `x = c a c⁻¹`.
+          rw [Set.mem_singleton_iff]
+          rw [← hcax]
+          intro hcax_one
+          apply ha_ne
+          have heq : c⁻¹ * (c * a * c⁻¹) * c = a := by group
+          rw [hcax_one] at heq
+          group at heq
+          exact heq.symm
+      · -- `x ∈ ⋃...`: extract `c`, get `IsConj a x`.
+        intro hx
+        rw [Set.mem_iUnion] at hx
+        obtain ⟨B, hB⟩ := hx
+        rw [Set.mem_iUnion] at hB
+        obtain ⟨hBconj, hxB_diff⟩ := hB
+        rw [hconjs_def, Set.mem_range] at hBconj
+        obtain ⟨c, rfl⟩ := hBconj
+        obtain ⟨hxB, hx_ne⟩ := hxB_diff
+        rw [Set.mem_singleton_iff] at hx_ne
+        rw [Subgroup.coe_pointwise_smul] at hxB
+        rcases hxB with ⟨a, haA, hax⟩
+        rw [Set.mem_compl_iff]
+        intro h_all
+        apply h_all a haA
+        · -- `a ≠ 1` since `x ≠ 1` and `x = MulAut.conj c a`.
+          intro ha_one
+          apply hx_ne
+          rw [← hax, ha_one]; simp
+        · -- `IsConj a x` from `x = MulAut.conj c a = c * a * c⁻¹`.
+          refine (isConj_iff (a := a) (b := x)).2 ⟨c, ?_⟩
+          rw [← hax]; simp [MulAut.conj_apply]
+    -- (Step b) `conjs` is finite (image of finite type).
+    have h_conjs_fin : conjs.Finite := by
+      rw [hconjs_def]; exact Set.finite_range _
+    -- (Step c) Pairwise disjoint outside `{1}`.
+    have h_disj : conjs.PairwiseDisjoint (fun B : Subgroup G => (B : Set G) \ {1}) := by
+      intro B hB B' hB' hBB'
+      simp only [hconjs_def, Set.mem_range] at hB hB'
+      obtain ⟨h, rfl⟩ := hB
+      obtain ⟨k, rfl⟩ := hB'
+      have h_inter_bot : (MulAut.conj h • A : Subgroup G) ⊓ (MulAut.conj k • A) = ⊥ :=
+        TI_conjugate h_TI h k hBB'
+      -- Now derive Set-level disjointness of the `\ {1}` subsets.
+      rw [Function.onFun, Set.disjoint_left]
+      intro x hxB hxB'
+      have hx_inter : x ∈ ((MulAut.conj h • A : Subgroup G) ⊓ (MulAut.conj k • A) :
+          Subgroup G) := by
+        rw [Subgroup.mem_inf]
+        exact ⟨hxB.1, hxB'.1⟩
+      rw [h_inter_bot, Subgroup.mem_bot] at hx_inter
+      exact hxB.2 hx_inter
+    -- (Step d) Cardinality of each diff is `Nat.card A - 1` (independent of conjugate).
+    have h_card_each : ∀ B ∈ conjs, ((B : Set G) \ {1}).ncard = Nat.card A - 1 := by
+      intro B hB
+      simp only [hconjs_def, Set.mem_range] at hB
+      obtain ⟨g, rfl⟩ := hB
+      -- `MulAut.conj g • A` has the same cardinality as `A` (subgroup map is a MulEquiv).
+      have h_card_B : ((MulAut.conj g • A : Subgroup G) : Set G).ncard = Nat.card A := by
+        rw [← Nat.card_coe_set_eq]
+        exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) A).toEquiv).symm
+      -- Now `(B.carrier \ {1}).ncard = |B| - 1`.
+      have h1_mem : (1 : G) ∈ ((MulAut.conj g • A : Subgroup G) : Set G) :=
+        Subgroup.one_mem _
+      rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+          Set.ncard_singleton, h_card_B]
+    -- (Step e) Cardinality of `conjs` is `A.index`.
+    -- We build a bijection `G ⧸ A ≃ conjs` directly using `hNGA`.
+    have h_card_conjs : conjs.ncard = A.index := by
+      -- Define `f : G → conjs` by `g ↦ ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩`.
+      -- `f g₁ = f g₂ ↔ g₂⁻¹ * g₁ ∈ N_G(A) = A ↔ g₁, g₂ in same left coset of A`.
+      let f : G → conjs := fun g => ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩
+      -- `f` factors through `G ⧸ A` as a function.
+      have hf_lift : ∀ g₁ g₂ : G, (QuotientGroup.leftRel A) g₁ g₂ → f g₁ = f g₂ := by
+        intro g₁ g₂ hrel
+        rw [QuotientGroup.leftRel_apply] at hrel
+        -- hrel : g₁⁻¹ * g₂ ∈ A, so g₁⁻¹ * g₂ ∈ N_G(A), so conjugation is trivial.
+        have h_in_N : g₁⁻¹ * g₂ ∈ Subgroup.normalizer A := by rw [hNGA]; exact hrel
+        -- `MulAut.conj (g₁⁻¹ * g₂) • A = A`.
+        have h_conj : MulAut.conj (g₁⁻¹ * g₂) • A = A :=
+          Subgroup.conj_smul_eq_self_of_mem (by rw [hNGA] at h_in_N; exact h_in_N)
+        ext1
+        simp only [f]
+        -- `MulAut.conj g₁ • A = MulAut.conj g₂ • A`:
+        -- `MulAut.conj g₂ = MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂)`.
+        have heq : MulAut.conj g₂ = MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂) := by
+          rw [← map_mul]; congr 1; group
+        calc (MulAut.conj g₁ • A : Subgroup G)
+            = MulAut.conj g₁ • (MulAut.conj (g₁⁻¹ * g₂) • A) := by rw [h_conj]
+          _ = (MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂)) • A := by rw [mul_smul]
+          _ = MulAut.conj g₂ • A := by rw [← heq]
+      -- Now lift `f` to `G ⧸ A → conjs`.
+      let f' : G ⧸ A → conjs := Quotient.lift f (fun a b => hf_lift a b)
+      -- `f'` is surjective.
+      have hf_surj : Function.Surjective f' := by
+        rintro ⟨B, g, rfl⟩
+        exact ⟨⟦g⟧, rfl⟩
+      -- `f'` is injective.
+      have hf_inj : Function.Injective f' := by
+        rintro ⟨g₁⟩ ⟨g₂⟩ hfeq
+        change f g₁ = f g₂ at hfeq
+        -- `MulAut.conj g₁ • A = MulAut.conj g₂ • A`, so g₂⁻¹ * g₁ ∈ N_G(A) = A.
+        have hsub : (MulAut.conj g₁ • A : Subgroup G) = MulAut.conj g₂ • A := by
+          exact Subtype.ext_iff.mp hfeq
+        -- Rearrange: `MulAut.conj (g₂⁻¹ * g₁) • A = A`.
+        have h_step : (MulAut.conj (g₂⁻¹ * g₁) • A : Subgroup G) = A := by
+          have heq : MulAut.conj (g₂⁻¹ * g₁) = MulAut.conj g₂⁻¹ * MulAut.conj g₁ := by
+            rw [← map_mul]
+          rw [heq, mul_smul, hsub, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+        -- So g₂⁻¹ * g₁ ∈ N_G(A) = A.
+        have h_mem : g₂⁻¹ * g₁ ∈ Subgroup.normalizer A := by
+          rw [Subgroup.mem_normalizer_iff'']
+          intro y
+          -- Want: `y ∈ A ↔ (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁) ∈ A`.
+          -- From `h_step : MulAut.conj (g₂⁻¹ * g₁) • A = A`, membership in either side
+          -- agrees: `y ∈ MulAut.conj (g₂⁻¹ * g₁) • A ↔ y ∈ A`.
+          have hmem : y ∈ MulAut.conj (g₂⁻¹ * g₁) • A ↔ y ∈ A := by rw [h_step]
+          rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hmem
+          -- Now `(MulAut.conj (g₂⁻¹ * g₁))⁻¹ • y = (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁)`.
+          have hcalc : (MulAut.conj (g₂⁻¹ * g₁))⁻¹ • y = (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁) := by
+            change (MulAut.conj (g₂⁻¹ * g₁)).symm y = _
+            rw [MulAut.conj_symm_apply]
+          rw [hcalc] at hmem
+          exact hmem.symm
+        rw [hNGA] at h_mem
+        -- Conclude: g₁ ≈ g₂ in G ⧸ A.
+        apply Quotient.sound
+        change (QuotientGroup.leftRel A) g₁ g₂
+        rw [QuotientGroup.leftRel_apply]
+        -- `g₁⁻¹ * g₂` ∈ A. We have `g₂⁻¹ * g₁ ∈ A`; take inverse.
+        have : (g₂⁻¹ * g₁)⁻¹ ∈ A := A.inv_mem h_mem
+        simpa [mul_inv_rev] using this
+      -- So `G ⧸ A ≃ conjs`, giving `Nat.card conjs = Nat.card (G ⧸ A) = A.index`.
+      have hbij : Function.Bijective f' := ⟨hf_inj, hf_surj⟩
+      have h_card_eq : Nat.card conjs = Nat.card (G ⧸ A) :=
+        (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
+      rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
+    -- (Step f) Apply `Set.Finite.ncard_biUnion` (disjoint union counting).
+    have h_card_union :
+        (⋃ B ∈ conjs, ((B : Set G) \ {1})).ncard = ∑ᶠ B ∈ conjs, ((B : Set G) \ {1}).ncard :=
+      Set.Finite.ncard_biUnion h_conjs_fin (fun _ _ => Set.toFinite _) h_disj
+    -- (Step g) The finsum is `conjs.ncard * (Nat.card A - 1)`.
+    have h_finsum :
+        ∑ᶠ B ∈ conjs, ((B : Set G) \ {1}).ncard = conjs.ncard * (Nat.card A - 1) := by
+      rw [finsum_mem_eq_finite_toFinset_sum _ h_conjs_fin]
+      rw [Finset.sum_congr rfl (fun B hB => h_card_each B
+            ((Set.Finite.mem_toFinset h_conjs_fin).mp hB))]
+      rw [Finset.sum_const, smul_eq_mul]
+      congr 1
+      rw [Set.ncard_eq_toFinset_card _ h_conjs_fin]
+    -- (Step h) Combine: |Xᶜ| = |G| - |X| = A.index · (|A| - 1).  Solve for |X| = A.index.
+    have hX_fin : (notConjugateSet A).Finite := Set.toFinite _
+    have hXc_fin : (notConjugateSet A)ᶜ.Finite := Set.toFinite _
+    have h_total : (notConjugateSet A).ncard + ((notConjugateSet A)ᶜ).ncard = Nat.card G :=
+      Set.ncard_add_ncard_compl _ hX_fin hXc_fin
+    rw [h_compl, h_card_union, h_finsum, h_card_conjs] at h_total
+    -- |G| = A.index * |A| (Lagrange).
+    have h_lagrange : A.index * Nat.card A = Nat.card G := by
+      rw [mul_comm]; exact Subgroup.card_mul_index A
+    -- |A| ≥ 1 since A is a subgroup.
+    have hA_pos : 0 < Nat.card A := Nat.card_pos
+    -- Rewrite `A.index * (|A| - 1) = A.index * |A| - A.index` so omega can finish.
+    have h_expand : A.index * (Nat.card A - 1) = A.index * Nat.card A - A.index := by
+      rw [Nat.mul_sub_one]
+    rw [h_expand, h_lagrange] at h_total
+    -- h_total : (notConjugateSet A).ncard + (Nat.card G - A.index) = Nat.card G
+    -- and A.index ≤ Nat.card G (from h_lagrange and hA_pos), so:
+    have hA_index_le : A.index ≤ Nat.card G := by
+      have := h_lagrange
+      nlinarith
+    omega
+
+end
+
 section /- 6B (number-theoretic prelude): Lemma 6.16 (pp. 191-193) -/
 
 /-! ### Isaacs Lemma 6.16
@@ -401,219 +713,6 @@ theorem pow_prime_modEq_one_cases {p : ℕ} (hp : p.Prime) {e : ℕ} (he : 0 < e
     have : (1 - i : ℤ) = -(i - 1) := by ring
     rw [this]
     exact dvd_neg.mpr h_pe'_dvd
-
-end
-
-section /- 6A continued: Frobenius group (subgroup pair, Thm 6.4) -/
-
-/-! ### Definition of Frobenius group (subgroup-pair version)
-
-A **Frobenius group** is a group `G` together with a nontrivial proper normal subgroup `N`
-(the *kernel*) and a nontrivial complement `A` (the *Frobenius complement*) such that the
-conjugation action of `A` on `N` is Frobenius (Isaacs's condition (1) of Thm 6.4).
-
-Thm 6.4 in Isaacs asserts the equivalence of four conditions:
-1. (conjugation-Frobenius) `∀ 1 ≠ a ∈ A, 1 ≠ n ∈ N, a n a⁻¹ ≠ n`.
-2. (TI) `∀ g ∉ A, A ∩ A^g = 1`.
-3. (centralizer-in-A) `∀ 1 ≠ a ∈ A, C_G(a) ⊆ A`.
-4. (centralizer-in-N) `∀ 1 ≠ n ∈ N, C_G(n) ⊆ N`.
-
-We adopt (1) as the canonical condition (it is the most directly elementary). We then prove
-the cyclic equivalence of (1) ⇔ (2) ⇔ (3) directly, and supply constructors from (3) and (4).
-The direction (1) ⇒ (4) requires Cor 6.6 (Frobenius's theorem on Frobenius kernels) and is
-deferred. -/
-
-/-- A **Frobenius group**: `G` has a nontrivial normal subgroup `N` (the *Frobenius kernel*)
-complemented by a nontrivial subgroup `A` (the *Frobenius complement*), with the conjugation
-action of `A` on `N` being Frobenius.
-
-This is Isaacs's condition (1) of Thm 6.4; the other three equivalent conditions are proven
-separately as `trivialIntersection`, `centralizer_complement_le`, and the constructors
-`of_centralizer_complement_le` / `of_centralizer_kernel_le`. -/
-structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
-  /-- The kernel `N` is normal in `G`. -/
-  isNormal : N.Normal
-  /-- `N` and `A` are complements: `N ⊓ A = ⊥` and the product map `N × A → G` is a bijection. -/
-  isComplement : Subgroup.IsComplement' N A
-  /-- The kernel is nontrivial. -/
-  ne_bot_kernel : N ≠ ⊥
-  /-- The complement is nontrivial. -/
-  ne_bot_complement : A ≠ ⊥
-  /-- The conjugation action of `A` on `N` is Frobenius (Isaacs Thm 6.4 condition (1)). -/
-  conj_frobenius : ∀ a ∈ A, a ≠ 1 → ∀ n ∈ N, n ≠ 1 → a * n * a⁻¹ ≠ n
-
-namespace IsFrobeniusGroup
-
-variable {G : Type*} [Group G] {N A : Subgroup G}
-
-/-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
-then the conjugation action of `A` on `N` is Frobenius. -/
-theorem of_centralizer_complement_le
-    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
-    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
-    (h3 : ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A) :
-    IsFrobeniusGroup G N A where
-  isNormal := hN
-  isComplement := hC
-  ne_bot_kernel := hN_ne
-  ne_bot_complement := hA_ne
-  conj_frobenius := by
-    intro a haA ha n hnN hn h_conj
-    -- `a * n * a⁻¹ = n` ⇒ `n * a = a * n` ⇒ `n ∈ C_G(a) ⊆ A`.
-    have h_an : a * n = n * a := by
-      have := congrArg (· * a) h_conj
-      simpa using this
-    have h_comm : n * a = a * n := h_an.symm
-    have hnA : n ∈ A :=
-      h3 a haA ha (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
-    -- `n ∈ N ∩ A = ⊥` ⇒ `n = 1`, contradicting `hn`.
-    have hdisj : Disjoint N A := hC.disjoint
-    exact hn (Subgroup.disjoint_def.mp hdisj hnN hnA)
-
-/-- **Isaacs Thm 6.4 (4) ⇒ (1)** (constructor). If `C_G(n) ⊆ N` for every nontrivial `n ∈ N`,
-then the conjugation action of `A` on `N` is Frobenius. -/
-theorem of_centralizer_kernel_le
-    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
-    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
-    (h4 : ∀ n ∈ N, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ N) :
-    IsFrobeniusGroup G N A where
-  isNormal := hN
-  isComplement := hC
-  ne_bot_kernel := hN_ne
-  ne_bot_complement := hA_ne
-  conj_frobenius := by
-    intro a haA ha n hnN hn h_conj
-    -- `a * n * a⁻¹ = n` ⇒ `a * n = n * a` ⇒ `a ∈ C_G(n) ⊆ N`.
-    have h_an : a * n = n * a := by
-      have := congrArg (· * a) h_conj
-      simpa using this
-    -- We need `a ∈ C_G(n) = { x : x * n = n * x }`.
-    have h_comm : a * n = n * a := h_an
-    have haN : a ∈ N :=
-      h4 n hnN hn (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
-    -- `a ∈ N ∩ A = ⊥` ⇒ `a = 1`, contradicting `ha`.
-    have hdisj : Disjoint N A := hC.disjoint
-    exact ha (Subgroup.disjoint_def.mp hdisj haN haA)
-
-/-- Given `IsComplement' N A`, every `g : G` factors uniquely as `n * a` with `n ∈ N`, `a ∈ A`. -/
-private theorem _root_.Subgroup.IsComplement'.factor
-    (hC : Subgroup.IsComplement' N A) (g : G) :
-    ∃ (n : G) (a : G), n ∈ N ∧ a ∈ A ∧ n * a = g := by
-  obtain ⟨⟨n, a⟩, hna⟩ := (hC.existsUnique g).exists
-  exact ⟨n, a, n.2, a.2, hna⟩
-
-/-- **Isaacs Thm 6.4 (1) ⇒ (2)**: Frobenius group ⇒ trivial intersection.
-
-If `g ∉ A`, then `A ⊓ A^g = ⊥`. (Here `A^g = g A g⁻¹ = (MulAut.conj g) '' A`.) -/
-theorem trivialIntersection (h : IsFrobeniusGroup G N A) :
-    ∀ g : G, g ∉ A → A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A = ⊥ := by
-  intro g hg
-  -- Outline: assume `A ⊓ A^g ≠ ⊥`, derive `g ∈ A`, contradiction.
-  by_contra h_ne
-  apply hg
-  -- Factor `g = n * a` with `n ∈ N`, `a ∈ A` (from `IsComplement' N A`).
-  obtain ⟨n, a, hnN, haA, hna⟩ := h.isComplement.factor g
-  -- Get a nontrivial `x ∈ A ⊓ A^g`.
-  have h_ne_bot : A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A ≠ ⊥ := h_ne
-  obtain ⟨x, hxAg, hx_ne⟩ : ∃ x ∈ A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A, x ≠ 1 := by
-    by_contra h_all
-    apply h_ne_bot
-    rw [eq_bot_iff]
-    intro y hy
-    rw [Subgroup.mem_bot]
-    by_contra hy_ne
-    exact h_all ⟨y, hy, hy_ne⟩
-  rw [Subgroup.mem_inf] at hxAg
-  obtain ⟨hxA, hxAg⟩ := hxAg
-  -- `x = g * b * g⁻¹` for some `b ∈ A`.
-  rw [Subgroup.mem_map] at hxAg
-  obtain ⟨b, hbA, hxeq⟩ := hxAg
-  simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom] at hxeq
-  -- Substitute `g = n * a`. Then `x = (n * a) * b * (n * a)⁻¹ = n * (a b a⁻¹) * n⁻¹`.
-  have hxeq' : x = n * (a * b * a⁻¹) * n⁻¹ := by
-    rw [← hxeq, ← hna]
-    group
-  -- Let `b' := a * b * a⁻¹ ∈ A`. Then `x = n * b' * n⁻¹` and `b' ∈ A`.
-  set b' := a * b * a⁻¹ with hb'_def
-  have hb'_mem : b' ∈ A := by
-    rw [hb'_def]
-    exact Subgroup.mul_mem _ (Subgroup.mul_mem _ haA hbA) (Subgroup.inv_mem _ haA)
-  have hx_eq2 : x = n * b' * n⁻¹ := hxeq'
-  -- Consider `b'⁻¹ * x = b'⁻¹ * (n * b' * n⁻¹)`.
-  -- This is in `A` (both `b'⁻¹` and `x` are in `A`).
-  -- This is also in `N`: rewrite as `(b'⁻¹ * n * b') * n⁻¹`. The factor `b'⁻¹ * n * b' ∈ N`
-  -- by normality of `N`, and `n⁻¹ ∈ N`, so the product is in `N`.
-  have h_comm_elem : b'⁻¹ * (n * b' * n⁻¹) ∈ A := by
-    apply Subgroup.mul_mem
-    · exact Subgroup.inv_mem _ hb'_mem
-    · rw [← hx_eq2]; exact hxA
-  have h_comm_elem' : b'⁻¹ * (n * b' * n⁻¹) ∈ N := by
-    -- Rewrite as `(b'⁻¹ * n * b') * n⁻¹`.
-    have h_eq : b'⁻¹ * (n * b' * n⁻¹) = (b'⁻¹ * n * b') * n⁻¹ := by group
-    rw [h_eq]
-    apply Subgroup.mul_mem _ _ (Subgroup.inv_mem _ hnN)
-    -- `b'⁻¹ * n * b' ∈ N` by normality.
-    have := h.isNormal.conj_mem' n hnN b'
-    exact this
-  have hdisj : Disjoint N A := h.isComplement.disjoint
-  -- So `b'⁻¹ * (n * b' * n⁻¹) = 1`, i.e., `n * b' * n⁻¹ = b'`, i.e., `b'` commutes with `n`.
-  have h_one : b'⁻¹ * (n * b' * n⁻¹) = 1 := Subgroup.disjoint_def.mp hdisj h_comm_elem' h_comm_elem
-  have h_conj_b' : n * b' * n⁻¹ = b' := by
-    have := h_one
-    -- `b'⁻¹ * Y = 1` ⇒ `Y = b'`.
-    have h_mul := congrArg (b' * ·) this
-    simp only [← mul_assoc, mul_inv_cancel, one_mul, mul_one] at h_mul
-    exact h_mul
-  -- By Frobenius condition, if `b' ≠ 1` and `n ≠ 1`, then... wait, we have `b' * n * b'⁻¹ ≠ n`.
-  -- Reformulate `h_conj_b'`: `n * b' * n⁻¹ = b'` ⇔ `n * b' = b' * n` ⇔ `b' * n * b'⁻¹ = n`.
-  -- So if `b' ≠ 1` and `n ≠ 1`, Frobenius gives contradiction. Hence `b' = 1` or `n = 1`.
-  have h_conj_n : b' * n * b'⁻¹ = n := by
-    -- `n * b' * n⁻¹ = b'` ⇒ `n * b' = b' * n`.
-    have h_nb' : n * b' = b' * n := by
-      have := congrArg (· * n) h_conj_b'
-      simpa using this
-    -- `b' * n * b'⁻¹ = (b' * n) * b'⁻¹ = (n * b') * b'⁻¹ = n`.
-    rw [← h_nb', mul_inv_cancel_right]
-  -- Case analysis: either `b' = 1` or `n = 1`.
-  by_cases h_n_one : n = 1
-  · -- `n = 1` ⇒ `g = n * a = a ∈ A`.
-    rw [← hna, h_n_one, one_mul]
-    exact haA
-  · -- `n ≠ 1`. By Frobenius, `b' = 1`. Then `x = n * 1 * n⁻¹ = 1`, contradiction.
-    by_cases h_b'_one : b' = 1
-    · exfalso
-      have : x = 1 := by rw [hx_eq2, h_b'_one, mul_one, mul_inv_cancel]
-      exact hx_ne this
-    · exfalso
-      exact h.conj_frobenius b' hb'_mem h_b'_one n hnN h_n_one h_conj_n
-
-/-- **Isaacs Thm 6.4 (2) ⇒ (3)**: Frobenius group ⇒ centralizer of any nontrivial element of `A`
-is contained in `A`. -/
-theorem centralizer_complement_le (h : IsFrobeniusGroup G N A) :
-    ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A := by
-  intro a haA ha x hx
-  -- `x * a = a * x`, so `x * a * x⁻¹ = a`, so `a = (MulAut.conj x) a⁻¹⁻¹ ∈ A.map (MulAut.conj x)`.
-  rw [Subgroup.mem_centralizer_singleton_iff] at hx
-  -- Want: `x ∈ A`. Assume for contradiction `x ∉ A`.
-  by_contra hxA
-  -- By (2), `A ⊓ A^x = ⊥`.
-  have h_ti := h.trivialIntersection x hxA
-  -- `a ∈ A ⊓ A^x`: indeed `a ∈ A`, and `a = (MulAut.conj x) a` (from commutativity).
-  have h_a_in_conj : a ∈ Subgroup.map (MulAut.conj x).toMonoidHom A := by
-    rw [Subgroup.mem_map]
-    refine ⟨a, haA, ?_⟩
-    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
-    -- `x * a * x⁻¹ = a` follows from `x * a = a * x`.
-    have := hx
-    calc x * a * x⁻¹ = (x * a) * x⁻¹ := by rfl
-      _ = (a * x) * x⁻¹ := by rw [hx]
-      _ = a := by rw [mul_inv_cancel_right]
-  have h_a_in : a ∈ A ⊓ Subgroup.map (MulAut.conj x).toMonoidHom A :=
-    Subgroup.mem_inf.mpr ⟨haA, h_a_in_conj⟩
-  rw [h_ti, Subgroup.mem_bot] at h_a_in
-  exact ha h_a_in
-
-end IsFrobeniusGroup
 
 end
 
