@@ -381,13 +381,28 @@ private theorem minimal_normal_isCommutative_of_solvable
 any two complements are conjugate by an element of `N`. mathlib's `exists_smul_eq`
 provides the abstract `QuotientDiff` form; we translate to the subgroup-level statement.
 
-TODO (currently sorry): mathlib v4.29.1 lacks a direct lemma. Need to convert
-`IsComplement' N K` → `N.LeftTransversal` → `N.QuotientDiff` and back. -/
+TODO (sorry remaining at the end): the final piece requires converting the equivalence
+`n • [TK] = [TK']` in `N.QuotientDiff` into the subgroup equation `K^n = K'`. This is
+non-trivial: `diff = 1` equivalence relates transversals only setwise (each coset rep
+differs by an N element with product 1), not as subgroups. May need a Lean tactic chain
+through `Quotient.exact'` + `smul_diff_smul'` + cardinality. -/
 private theorem abelian_sz_conjugacy
     {N : Subgroup G} [N.Normal] [Finite G] [IsMulCommutative N]
-    (_hN : Nat.Coprime (Nat.card N) N.index)
-    {K K' : Subgroup G} (_hK : IsComplement' N K) (_hK' : IsComplement' N K') :
+    (hN : Nat.Coprime (Nat.card N) N.index)
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  -- Construct LeftTransversals from complements.
+  let TK : N.LeftTransversal := ⟨(K : Set G), hK.symm⟩
+  let TK' : N.LeftTransversal := ⟨(K' : Set G), hK'.symm⟩
+  -- Form QuotientDiff classes.
+  let αK : N.QuotientDiff := Quotient.mk'' TK
+  let αK' : N.QuotientDiff := Quotient.mk'' TK'
+  -- Apply mathlib exists_smul_eq (requires [FiniteIndex N], auto from [Finite G] instance).
+  obtain ⟨⟨n, hn⟩, hsmul⟩ := Subgroup.exists_smul_eq hN αK αK'
+  refine ⟨n, hn, ?_⟩
+  -- hsmul : (⟨n, hn⟩ : ↥N) • αK = αK' (in N.QuotientDiff).
+  -- Need: K.map (conj n) = K' (subgroup conjugation).
+  -- TODO: technical transition via Quotient.exact' + diff = 1 + subgroup characterization.
   sorry
 
 /-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
