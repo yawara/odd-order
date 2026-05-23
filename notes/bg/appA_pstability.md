@@ -5,6 +5,19 @@
 ROADMAP 上の位置: **Phase 2a 第 2 波** (Phase 1 Isaacs Ch.7 完成必須, §6 と並行 or 直後).
 役割: **Isaacs Ch.7 と BG §6-§16 の橋渡し**; **p-stability 概念の正式定義**; **Thm A.4(b) ≡ Isaacs Thm 7.6 の odd-order 再述**.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **L13-14 "下流被引用 BG Thm 6.1, 6.2"** → **方向逆**. App.A は §6 の **上流**. BG 序文 L4452 "Theorems 6.1 and 6.2 ... are obtained by use of p-stability ... we outline these shorter proofs". 実装順序: BG §1+§2 → **App.A → §6** (並行ではなく §6 直前).
+- **L24 "Isaacs Thm 3.8.1 weakening" / L25 "Isaacs Thm 3.8.3"** → **Isaacs FGT にこれらの番号は存在しない** (Gorenstein 1968 §3.8 番号). Isaacs では Thm 7.3 (GL(2,p)) + Thm 7.5 (normal-P) path で再構築.
+- **L29-61 "A.4(b) ≡ Isaacs 7.6 論理同値"** → **同値ではなく系**. 仮定: 7.6 は P=C_G(Z(P)) + O_{p'}(G)=1 等, A.4(b) は P Sylow のみ. 結論: 7.6 = J(P)⊴G (specific), A.4(b) = abelian normal of S ⊆ O_{p',p}(G) (collection bound). **7.6 ⇒ A.4(b) trivial, 逆方向は J(P) ⊴ G の追加要**.
+- **L194-203 "mathlib ~10%, Ch.7 import ~50%"** → 過大評価. Ch.7 import で得るのは **A.4(b) のみ (~30%)**. A.1-A.3, A.4(c), A.5 は **BG §1 + §2** 経由.
+- **L207-213 前提 "Phase 1 Ch.7 + Isaacs 6.20/6.24 のみ"** → **+ BG §1 Prop 1.8/1.15(b) + BG §2 Thm 2.6 必須** (A.1 proof L4464, A.5 proof L4503/L4507).
+- **`O_p`, `O_{p'}`, `O_{p',p}` mathlib 完全に不在**. 新規 `OpResidual.lean` ~150-250 行が App.A 必須前提.
+- 実装コスト: shared module 込み **11-15 日** (既存「9-11 日」は shared module + BG §1/§2 dep 見落とし).
+- A.4(b) は §7 でも L2275, L2291 cite (既存ノート未捕捉).
+
 ## TL;DR — Isaacs Ch.7 の奇数位数特殊化 + p-stability 正式定義
 
 **App.A の本質**: Isaacs Ch.7 全体 (Thm 7.1, 7.3, 7.5, 7.6, 7.8, Lem 7.2, 7.4, 7.7) を **「奇数位数群」仮定下で再構築** し、同時に **p-stability という概念名を正式に導入**. Isaacs では「p-solvable + abelian Sylow-2 + O_{p'}=1 + P=C_G(Z(P))」が定理仮定として分散しているのに対し、BG App.A は「これらの条件群を満たす G を p-stable と呼ぶ」と命名.

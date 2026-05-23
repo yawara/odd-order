@@ -5,6 +5,20 @@
 ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後着手).
 前提: Phase 1 Isaacs Ch.1 (Sylow), Ch.3 (Hall, Schur-Zassenhaus), Ch.4 (Commutators), Ch.5 軽.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **Lemma 1.1 "43+ 回引用"** → 実測 **0 in §586+** (§1 内 2 self-cite のみ). 「Peterfalvi `[Is] Lem 1.5` (Schur) と混同」の可能性大.
+- **Prop 1.2 "22 回引用"** → 実測 **6**. 大幅誇張.
+- Prop 1.5 "28+" → 25, Prop 1.6 "16" → 13 (小誇張).
+- **Thm 1.13 ↔ Isaacs 4.31 同一視 (L34, L217 等)** → 別物. **Thm 1.13 = Thompson critical (G 5.3.11-13)**, Isaacs 4.31 = Thompson P×Q lemma.
+- mathlib "high" for Lem 1.7 → **partial** ((b)(d) 不在; 新規 `FrattiniPGroup.lean` 要).
+- Cor 1.19(b) "derived" → **`IsZGroup.coprime_commutator_index` 直接ヒット** (`SpecificGroups/ZGroup.lean:280`).
+- Prop 1.15 ★★★ → **★** (Phase 1 Ch.3 `hall_higman_1_2_3` ✅ 2026-05-23 完成, (a) は thin wrap).
+- 未捕捉: chief factor / CompositionSeries / Omega1 mathlib **不在**. 新規 shared module `ChiefSeries.lean`, `OmegaSubgroup.lean`, `MinimalNormal.lean`, `InvariantSubgroup.lean` 要.
+- 内部 hub は **Prop 1.5(d)** (6 §1 proofs), Lemma 1.1 ではない.
+
 ## TL;DR
 
 **§1 は BG 全 138 結果の基礎となる "solvable groups の operator action 理論" モジュール**. わずか 22 結果で、solvable 群族の **A-不変 Hall 定理** (Prop 1.5-1.6, Peterfalvi で多数引用) と **p-length の基本性質** (Lemma 1.21) をまとめる. 主要引用頻度: **Prop 1.5 は 28+ 回, Lemma 1.1 は 43+ 回, Prop 1.2 は 22 回引用** — BG 全章を通じた最重要ツール.

@@ -8,6 +8,18 @@
 
 **役割**: operator group の表現論基礎、Fong–Swan 系 (Thm 2.3)、extraspecial p-群の加群構造 (Thm 2.5)、odd-order 2-次元表現 (Thm 2.6). **§9 周辺で 1–2 箇所のみ被引用**, optional 節のため形式化は必要時のみ.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **"§9 周辺で 1-2 箇所のみ被引用" → 完全に誤り**. 実測 §9 = **0 cites**. 実際: §3 ×5 (Prop 2.1, Prop 2.2 ×2, Thm 2.5, Thm 2.6 ×2 + 別 cite), §4 Lem 4.17, §15 Thm 15.7, **App.A Thm A.1 proof (L4464) で Thm 2.6 cite**. 合計 **8+ cites**, §2 は FT 中核.
+- **"optional 節, 形式化は必要時のみ" / "skip 推奨" → 完全に逆**. §3 + App.A の **前提** ⇒ Phase 2a 第 1 波必須.
+- **"Short path Thm 2.3 only" 推奨 → INVERTED**. Lem 2.3 (Fong-Swan) は forward use **0**, defer 可. Thm 2.5 + Thm 2.6 + Prop 2.1 + Prop 2.2 が必須.
+- **L70 "Jacobson Density mathlib 未実装" → 誤り**. `Mathlib/RingTheory/SimpleModule/Basic.lean:582` `Module.Finite.toModuleEnd_moduleEnd_surjective` ✓.
+- §2 ⇒ Peterfalvi §3-§8 オーバーラップなし (Peterfalvi は character-theoretic `[Is]`=Isaacs *Character Theory* 別書).
+- **§2 は Isaacs Ch.6 §6F Clifford 完成依存** (Prop 2.2 で必須). Ch.6 not started ⇒ §2 全体 blocker.
+- 新規 shared modules: `IsExtraspecial.lean`, `AbsolutelyIrreducible.lean`, `Clifford.lean`, `PGroupFixedVector.lean`, `EigenspaceUnderCyclicAction.lean`.
+
 ## TL;DR
 
 **§2 は基本的な表現論モジュール**: operator group G に対する FG-加群の性質を 6 つの定理で系統化. 主な成果は:

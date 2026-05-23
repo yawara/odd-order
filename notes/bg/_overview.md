@@ -89,15 +89,15 @@ App.A は §6-§16 全体の前提として **§6 開始と同時に必要**. Ap
 
 ### 第 1 波 (Phase 1 Isaacs 完了直後、並列可)
 - **§1** (Elementary Properties): solvable / Hall / Prop 1.5-1.6 — Isaacs Ch.1+Ch.3 と mathlib `Solvable`/`SchurZassenhaus` を組み合わせ
-- **§4** (p-Groups Small Rank): rank ≤ 2 p-群構造定理. Isaacs Ch.4 完成必須
-- **§5** (Narrow p-Groups): §4 とほぼ独立 (内部依存だけ)
-- **§2** (Representations): 表現論. §3 直前に置けばよい
-- **App.B** (Puig L(S)): App.A 不要で独立着手可 (L(S) 定義自体は J(S) と並行)
+- **§4** (p-Groups Small Rank): rank ≤ 2 p-群構造定理. Isaacs Ch.4 §4D (Cor 3.28 → Thm 4.36) 完成必須 *(2026-05-23 audit 訂正: 「軽前提」ではなく hard gate; 詳細 [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md))*
+- **§5** (Narrow p-Groups): §4 とほぼ独立 *(2026-05-23 audit 訂正: 実は §4 を 6 results cite, 完全独立ではない. Lem 5.1-Cor 5.4 のみ §4 partial 並行可, Thm 5.5-5.7 は §4 完成依存)*
+- **§2** (Representations): 表現論. §3 + App.A の前提 *(2026-05-23 audit 訂正: 「§9 1-2 cite」は誤り, 実測 §3×5 + §4 + §15 + App.A = 8+ cites; Lem 2.3 のみ defer, Thm 2.5/2.6 は FT 中核; **Isaacs Ch.6 §6F Clifford 完成依存**)*
+- ~~**App.B** (Puig L(S)): App.A 不要で独立着手可 (L(S) 定義自体は J(S) と並行)~~ **App.B は Phase 2a スキップ推奨** *(2026-05-23 audit 訂正: B.3+B.4 が Thm A.5 cite で App.A 不要は誤り; さらに App.B 自身が FT-orphan = §1-§16 + App.C + App.E + Peterfalvi 全て 0 cite, 唯一の本文使用は App.D parenthetical のみ. A.5 + App.B 共に skip で ~570 行 / ~10-13 日節約)*
 
 ### 第 2 波 (§1, §4 完了後)
 - **§3** (Frobenius Actions): Isaacs Ch.6 完成必須. mathlib `FrobeniusGroup` 新規実装 (Phase 1 Ch.6 で完成想定)
 - **§6** (Additional Results): §1+§3 完了後. Thm 6.4, 6.7 + Lem 6.5, 6.6 (solvable + p-length 1)
-- **App.A** (p-Stability): Isaacs Ch.7 Thm 7.6 完成必須. **§6 と並行 or 後**
+- **App.A** (p-Stability): Isaacs Ch.7 Thm 7.6 完成必須. **§6 の直前 (上流)** *(2026-05-23 audit 訂正: App.A は §6 の上流, 並行ではない. BG 序文 L4452「Theorems 6.1 and 6.2 ... by use of p-stability」. さらに **BG §1 Prop 1.8/1.15(b) + BG §2 Thm 2.6 完成必須** 追加. shared module `OpResidual.lean` ~150-250 行が必須前提)*
 
 ### 第 3 波 (Ch.1 完了後 = Phase 2a 中盤)
 - **§7** (Transitivity Theorem) → **§8** (Fitting of Max) → **§9** (Uniqueness Theorem). 線形チェーン. Thm 6.2 を §8 で 5+ 回, §9 で 4+ 回引用.

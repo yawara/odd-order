@@ -10,6 +10,20 @@
 
 ---
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **"Phase 1 Ch.4 (Commutators) 軽前提"** → **HARD GATE**. Cor 3.28 + Isaacs Thm 4.36 (Ch.4 §4D) が Lem 4.5(a) の必須前提.
+- **"§4 は J(P) を使う"** (prompt 内仮定) → 検証結果 **使わない**. `J(P)` grep on L1359-1788 = 0. §4 自体は `OddOrder/BG/Ch1_Preliminary/` 配下, shared module 不要.
+- 内部 hub: **Lem 4.5 (11 self-cites)** が最重要. 既存表は Thm 4.18 hub だが Lem 4.5 の役割を過小評価.
+- **`Subgroup.rank` mathlib 不在**. `Group.rank G` は **min-generators**, BG `m(A) = log_p|Ω₁(A)|` 用ではない. 新規 `PRank.lean` 要.
+- **`IsElementaryAbelian` mathlib 0 hits**, **`SCN`/`IsExtraspecial`/`IsMetacyclic` 全て新規**.
+- **BG §1 が hard gate** (5 cites: Thm 1.8, Thm 1.13, Lem 1.22, Prop 1.2, Prop 1.6). 既存ノートが flag していない.
+- Thm 4.18 → **Isaacs Thm 6.16 / Fitting (Ch.6 §6D)** dep. Ch.6 not started.
+- 実装規模: **30-40 日** (vs 既存 25-35), 新規 shared module オーバーヘッド込み.
+- L312 "Thm 4.12 ↔ Isaacs Thm 5.7" は broken (Isaacs Thm 5.7 not in Ch.5). 訂正: "G Satz III.13.5 (Huppert) or BG inline".
+
 ## TL;DR
 
 §4 は **rank-based p-group 構造の完全分類**: 

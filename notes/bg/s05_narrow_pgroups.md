@@ -5,6 +5,19 @@
 ROADMAP 上の位置: **Phase 2a 第 1 波** (§4 p-groups of small rank と並行可, Phase 1 Isaacs Ch.4 完成後着手).
 役割: Narrow p-群族を主軸に、Sylow 形状制限と p-group 結構造理論.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **"r(R) ≤ 2 or ∃ S ⊆ R..." narrow def** (L13) → 正は **§1 L354 verbatim "no elementary abelian subgroup of order p³, or ∃ R₀, R₁ cyclic, C_R(R₀) = R₀ × R₁"**. "r(R) ≤ 2" は informal restatement. r(R) ≤ 2 ↔ no elem ab of order p³ は Lem 4.7 (非自明).
+- **"§4 とほぼ独立, 並行可" → 誤り**. §5 は §4 を **6 distinct results** で cite (4.5, 4.7, 4.14, 4.16, 4.17, 4.18, Prop 4.4). 実装順序 **§4 → §5 strict**. ただし Lem 5.1-Cor 5.4 は §4 Prop 4.4 + Lem 4.5 + Lem 4.7 で着手可 (partial parallel).
+- **Hub 誤認**: 既存「Thm 5.3 / Thm 5.5 が hub」→ 実測 **Lemma 5.1 (4 cites)** が最重要 hub. 5.1 を ★★ → **★★★**.
+- L94-96 "r(R) ≤ 2 ⇒ SCN₃ empty" 一方向 → 正: **iff** (Lem 4.7).
+- **Downstream undercounted**: 既存 §10, §13, App.C のみ → 実測 **5+ distinct sites** (§8 L2324, §9 L2629, §10 ×3, §12 L3373-3379, §14 L4130, §15 L4188, App.E).
+- §10 L2643 の "ideal prime" def は **Thm 5.3 の contrapositive** ⇒ §5 は §10-§16 全体に定義的 forward.
+- 新規 shared modules: `OmegaSubgroup.lean`, `PRank.lean`, `SCN.lean`, `AutElementaryAbelian.lean`, `ElementaryAbelian.lean` (既設).
+- **`Group.rank` mathlib は min-generators** (BG `r(R)` 不適). 明示 `IsPGroup.pRank` 命名要.
+
 ## TL;DR
 
 **§5 は "narrow p-group" という Feit-Thompson 定理の局所解析に特化した p-群族 class を導入・展開する短編章**. わずか 7 結果 (内 Theorem/Lemma 5 個、Corollary 2 個) で、rank ≥ 3 の narrow p-群の characterization (Thm 5.3, Cor 5.4) と、その automorphism group の制御 (Thm 5.5-5.7) を確立する.

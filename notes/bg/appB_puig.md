@@ -7,6 +7,17 @@ ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 �
 
 ---
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+
+- **"Lem B.1-B.5" (L6, 333, 343, 408, 504)** → **誤り. B.5 は存在しない**. App.B 全結果は **Lem B.1, B.2, B.3 + Thm B.4 の 4 つのみ**.
+- **`_overview.md` L95 "App.B は App.A 不要で独立着手可"** → **誤り**. **Lem B.3 (L4666) + Thm B.4 Step 3 (L4735) が Thm A.5 cite**. App.B は App.A 下流.
+- **"J(S) = L(S)" (L76 等)** → **誤り**. **`J(S) ⊆ L(S)` のみ**. `Z(J(S)) ⊆ Z(L(S))` substitutable but **NOT equal**. L 再帰, J 一回最大.
+- **App.B is COMPLETELY ORPHANED in FT path**: §1-§16 + App.C + App.E から 0 cite, Peterfalvi 0 cite. 本文使用箇所は **§6 L1979 (advertisement only)** + **App.D L5014 (FT 無関係 "may substitute")** の 2 箇所のみ.
+- **L374 "A.5 が BG §6-§16 で使わない"** → True, さらに **A.5 自体も App.B 唯一の消費者** ⇒ **A.5 + App.B が共に orphan**.
+- **Recommendation revision**: 既存「optional 補強, Phase 2a 第 6 波」 → **完全に Phase 2a スキップ推奨**. ~570 行, ~10-13 日節約. Phase 4 または mathlib upstream pivot 時に revisit. App.A docstring に skip rationale 残す.
+
 ## TL;DR — J(S) の代替, optional 補強節
 
 **App.B の本質**: Thompson J-subgroup の一般化. J(P) (maximal elementary abelian の生成) の代わりに、abelian subgroup の「最大特性部分群」として定義される Puig L(G) (and L_*(G)) を導入. **BG 本文 (§6-§16) は J(S) path で完結可** だが、**L(S) の下位互換性を示して代替可能性を提示**.
