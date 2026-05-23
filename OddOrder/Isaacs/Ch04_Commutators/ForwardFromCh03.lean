@@ -324,13 +324,104 @@ theorem glauberman_fixed_point_exists
 `A` acts on `H` via φ (well-defined since β A-inv).
 Apply 3.24(a) with (A, H, X) to get x ∈ X A-fixed, i.e., x ∈ C_G(A) ∩ X. -/
 theorem glauberman_fixed_points_conj
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
     {Ω : Type*} [MulAction G Ω] [MulAction A Ω]
-    (_h : IsCompatibleMulAction φ Ω) (_hG_trans : MulAction.IsPretransitive G Ω)
-    {α β : Ω} (_hα : ∀ a : A, a • α = α) (_hβ : ∀ a : A, a • β = β) :
+    (h : IsCompatibleMulAction φ Ω) (hG_trans : MulAction.IsPretransitive G Ω)
+    {α β : Ω} (hα : ∀ a : A, a • α = α) (hβ : ∀ a : A, a • β = β) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ c • α = β := by
-  sorry  -- TODO: apply Glauberman 3.24(a) to transporter X with H = stabilizer β.
+  -- H := stabilizer G β (subgroup, A-invariant via hβ).
+  set H : Subgroup G := MulAction.stabilizer G β with hH_def
+  have hH_inv : IsAInvariant φ H := by
+    intro a
+    ext g
+    constructor
+    · rintro ⟨g', hg'_in_H, rfl⟩
+      change ((φ a) g') • β = β
+      have hg' : g' • β = β := hg'_in_H
+      have hcomp := h a g' β
+      rw [hg', hβ a] at hcomp
+      exact hcomp.symm
+    · intro hg_in_H
+      refine ⟨(φ a)⁻¹ g, ?_, by simp⟩
+      change ((φ a)⁻¹ g) • β = β
+      have hg : g • β = β := hg_in_H
+      have hcomp := h a⁻¹ g β
+      rw [hg, hβ a⁻¹] at hcomp
+      -- hcomp : β = (φ a⁻¹) g • β. Convert φ a⁻¹ to (φ a)⁻¹.
+      have hphi : (φ a⁻¹ : MulAut G) = (φ a)⁻¹ := map_inv φ a
+      rw [hphi] at hcomp
+      exact hcomp.symm
+  -- X := transporter from α to β: { g : G // g • α = β }.
+  let X := { g : G // g • α = β }
+  -- X nonempty by G transitive.
+  haveI hX_nonempty : Nonempty X := by
+    obtain ⟨g, hg⟩ := hG_trans.exists_smul_eq α β
+    exact ⟨⟨g, hg⟩⟩
+  -- H acts on X by left multiplication.
+  letI mulH : MulAction ↥H X := {
+    smul := fun h x => ⟨h.val * x.val, by
+      change (h.val * x.val) • α = β
+      rw [mul_smul, x.property]
+      exact h.property⟩
+    one_smul := fun x => Subtype.ext (one_mul _)
+    mul_smul := fun h₁ h₂ x => Subtype.ext (by
+      change (h₁ * h₂).val * x.val = h₁.val * (h₂.val * x.val)
+      rw [Subgroup.coe_mul, mul_assoc])
+  }
+  -- A acts on X via φ.
+  letI mulA : MulAction A X := {
+    smul := fun a x => ⟨(φ a) x.val, by
+      change ((φ a) x.val) • α = β
+      have hcompat := h a x.val α
+      rw [x.property] at hcompat
+      rw [hα a] at hcompat
+      rw [← hcompat, hβ a]⟩
+    one_smul := fun x => Subtype.ext (by change (φ 1) x.val = x.val; simp)
+    mul_smul := fun a b x => Subtype.ext (by
+      change (φ (a * b)) x.val = (φ a) ((φ b) x.val)
+      simp [map_mul])
+  }
+  -- Compatibility: a • (h • x) = (hH_inv.restrict a h) • (a • x).
+  have hcompat_X : IsCompatibleMulAction (hH_inv.restrict) X := by
+    intro a h_elem x
+    apply Subtype.ext
+    change (φ a) (h_elem.val * x.val) = ((hH_inv.restrict a) h_elem).val * (φ a) x.val
+    rw [map_mul]; rfl
+  -- H acts transitively on X.
+  have hH_trans : MulAction.IsPretransitive ↥H X := by
+    constructor
+    intro x₁ x₂
+    -- x₁, x₂ ∈ X with x_i • α = β. Want h ∈ H with h * x₁ = x₂.
+    -- h := x₂ * x₁⁻¹. Then h • β = (x₂ * x₁⁻¹) • β = x₂ • (x₁⁻¹ • β).
+    -- x₁ • α = β, so x₁⁻¹ • β = α. Then x₂ • α = β. So h • β = β.
+    have hx₁_inv : x₁.val⁻¹ • β = α :=
+      ((smul_eq_iff_eq_inv_smul x₁.val).mp x₁.property).symm
+    refine ⟨⟨x₂.val * x₁.val⁻¹, ?_⟩, ?_⟩
+    · change (x₂.val * x₁.val⁻¹) • β = β
+      rw [mul_smul, hx₁_inv, x₂.property]
+    · apply Subtype.ext
+      change (x₂.val * x₁.val⁻¹) * x₁.val = x₂.val
+      rw [mul_assoc, inv_mul_cancel, mul_one]
+  -- Coprime |A| |H|.
+  have hCop' : Nat.Coprime (Nat.card A) (Nat.card ↥H) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
+  -- Solvable A ∨ Solvable H.
+  have hSolv' : IsSolvable A ∨ IsSolvable ↥H := by
+    rcases hSolv with hA | hG
+    · exact Or.inl hA
+    · haveI := hG; exact Or.inr inferInstance
+  haveI hH_finite : Finite ↥H := Subtype.finite
+  -- Apply Glauberman 3.24(a) with (↥H, A, X).
+  obtain ⟨x₀, hx₀_fix⟩ :=
+    glauberman_fixed_point_exists (G := ↥H) (A := A) (φ := hH_inv.restrict)
+      hCop' hSolv' (Ω := X) hcompat_X hH_trans
+  -- x₀ ∈ X is A-fixed. So x₀.val ∈ C_G(A) and x₀.val • α = β.
+  refine ⟨x₀.val, ?_, x₀.property⟩
+  intro a
+  have hfix : (a • x₀ : X) = x₀ := hx₀_fix a
+  have h_eq : ((a • x₀ : X) : G) = (φ a) x₀.val := rfl
+  rw [← h_eq, hfix]
 
 end Glauberman
 
@@ -395,12 +486,51 @@ theorem exists_aInvariant_sylow
 /-- **Isaacs Thm 3.23(b)**: 2 つの A-invariant Sylow p-subgroup は C_G(A) で共役.
 `Glauberman 3.24(b)` の Sylow p G 版. -/
 theorem aInvariant_sylow_conj
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
-    {S T : Sylow p G} (_hS_inv : IsAInvariant φ (S : Subgroup G))
-    (_hT_inv : IsAInvariant φ (T : Subgroup G)) :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    {S T : Sylow p G} (hS_inv : IsAInvariant φ (S : Subgroup G))
+    (hT_inv : IsAInvariant φ (T : Subgroup G)) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (MulAut.conj c • (S : Subgroup G) = T) := by
-  sorry  -- TODO: apply 3.24(b) with Ω = Sylow p G.
+  -- Re-establish the Sylow MulAction setup (same as 3.23(a)).
+  letI mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  have hcompat : IsCompatibleMulAction φ (Sylow p G) := by
+    intro a g P
+    apply Sylow.ext
+    show (a • (g • P) : Sylow p G).toSubgroup = ((φ a g) • (a • P)).toSubgroup
+    rw [Sylow.pointwise_smul_def, Sylow.coe_subgroup_smul,
+        Sylow.coe_subgroup_smul, Sylow.pointwise_smul_def]
+    ext x
+    constructor
+    · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
+      refine ⟨(φ a) z, ⟨z, hz, rfl⟩, ?_⟩
+      show MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
+      simp [MulAut.conj_apply, map_mul, map_inv]
+    · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
+      refine ⟨(MulAut.conj g) z, ⟨z, hz, rfl⟩, ?_⟩
+      show (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
+      simp [MulAut.conj_apply, map_mul, map_inv]
+  have hG_trans : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
+  -- A-invariance of S, T as Sylow: a • S = S (in Sylow type).
+  have hS_fix : ∀ a : A, a • S = S := by
+    intro a
+    apply Sylow.ext
+    show (a • S : Sylow p G).toSubgroup = S.toSubgroup
+    rw [Sylow.pointwise_smul_def]
+    exact hS_inv a
+  have hT_fix : ∀ a : A, a • T = T := by
+    intro a
+    apply Sylow.ext
+    show (a • T : Sylow p G).toSubgroup = T.toSubgroup
+    rw [Sylow.pointwise_smul_def]
+    exact hT_inv a
+  -- Apply Glauberman 3.24(b).
+  obtain ⟨c, hc_fix, hc_smul⟩ :=
+    glauberman_fixed_points_conj (G := G) (A := A) (φ := φ) hCop hSolv (Ω := Sylow p G)
+      hcompat hG_trans hS_fix hT_fix
+  -- hc_smul : c • S = T in Sylow. Translate to Subgroup.
+  refine ⟨c, hc_fix, ?_⟩
+  have h_coe : ((c • S : Sylow p G) : Subgroup G) = (T : Subgroup G) := by rw [hc_smul]
+  rwa [Sylow.coe_subgroup_smul] at h_coe
 
 /-- **Isaacs Cor 3.25**: A-invariant p-subgroup is contained in some A-invariant Sylow.
 
