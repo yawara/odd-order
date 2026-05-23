@@ -116,3 +116,11 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- A acts on G via auto, A,G finite, (|A|,|G|)=1, A or G solvable.
 -- A and G act on Ω with compatibility, G transitive ⇒ ∃ A-invariant α ∈ Ω.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Thm 3.27): A-invariant coset has C_G(A) elem
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aInvariant_coset_mem_centralizer
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.28) ⭐⭐⭐ **transitive blocker**
+-- N ⊴ G A-inv, coprime + solvable, A-fixed coset gN ⇒ ∃ c ∈ C_G(A), cN = gN.
+-- Ch.4 多数定理 (4.26, 4.28-30, 4.34-36, 4.38) の transitive 前提.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
