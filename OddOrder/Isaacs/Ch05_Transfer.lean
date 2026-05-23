@@ -886,6 +886,18 @@ instance OPrime_normal (p : ℕ) (G : Type*) [Group G] : (OPrime p G).Normal := 
   unfold OPrime
   exact Subgroup.normal_iInf_normal (fun N => N.property.1)
 
+/-- For finite `G`, `OPrime p G` has `p`-power index. mathlib に直接 lemma 無し,
+証明戦略: iInf over finite set, 各成分 p-power index, intersection の index は
+H ⊓ K 場合 ∣ |G/H| × |G/K| (canonical injection), iInf に一般化. -/
+lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.Prime] :
+    ∃ k : ℕ, (OPrime p G).index = p ^ k := by
+  -- Proof strategy (sorry, for future implementation):
+  -- 1. (⨅ N, N.val).index ∣ ∏ N, N.val.index (via canonical injection arg).
+  -- 2. Each N.val.index = p^k_N (p-power).
+  -- 3. Product of p-powers = p-power.
+  -- 4. Divisor of p-power = p-power.
+  sorry
+
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
 
