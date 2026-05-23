@@ -620,10 +620,59 @@ theorem commutatorRightHom_range_eq_commutator {A : Subgroup G} [A.Normal] [Fini
     have h_conj := ‹((commutatorRightHom hAb g).range).Normal›.conj_mem _ h_inv y₀⁻¹
     simpa using h_conj
 
+/-- **Lem 4.6 後半 kernel as subgroup**: ker of `commutatorRightHom hAb g` (as a subgroup
+of `A`) equals `(A ⊓ Subgroup.center G).subgroupOf A`. -/
+theorem commutatorRightHom_ker_eq {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    {g : G} (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) :
+    (commutatorRightHom hAb g).ker = (A ⊓ Subgroup.center G).subgroupOf A := by
+  ext a
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_inf]
+  constructor
+  · intro ha
+    exact ⟨a.2, (commutatorRightHom_mem_ker_iff hAb hgen a).mp ha⟩
+  · intro ha
+    exact (commutatorRightHom_mem_ker_iff hAb hgen a).mpr ha.2
+
+/-- **Lem 4.6 cardinality form**: For `A ⊴ G` abelian + `G ⧸ A` cyclic + `G` finite,
+`|commutator G| · |A ⊓ Z(G)| = |A|`. First iso theorem経由. -/
+theorem card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+    {A : Subgroup G} [A.Normal] [Finite G]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (hCyc : IsCyclic (G ⧸ A)) :
+    Nat.card (_root_.commutator G) * Nat.card (A ⊓ Subgroup.center G : Subgroup G)
+      = Nat.card A := by
+  obtain ⟨γ, hγ⟩ := hCyc.exists_generator
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective γ
+  -- Apply Lagrange to θ := commutatorRightHom hAb g
+  have h_ker := commutatorRightHom_ker_eq hAb hγ
+  have h_range := commutatorRightHom_range_eq_commutator hAb hγ
+  have h_lag : Nat.card (commutatorRightHom hAb g).ker *
+      (commutatorRightHom hAb g).ker.index = Nat.card A :=
+    Subgroup.card_mul_index _
+  rw [Subgroup.index_ker, h_range, h_ker] at h_lag
+  -- Convert Nat.card ((A ⊓ Z(G)).subgroupOf A) = Nat.card (A ⊓ Z(G))
+  have h_card_eq : Nat.card ((A ⊓ Subgroup.center G).subgroupOf A) =
+      Nat.card (A ⊓ Subgroup.center G : Subgroup G) := by
+    refine Nat.card_congr ?_
+    refine {
+      toFun := fun x => ⟨((x : A) : G), (Subgroup.mem_subgroupOf.mp x.2)⟩
+      invFun := fun y => ⟨⟨(y : G), y.2.1⟩, ?_⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
+    · -- ⟨y, y.2.1⟩ ∈ (A ⊓ Z(G)).subgroupOf A
+      rw [Subgroup.mem_subgroupOf]
+      exact y.2
+    · intro x; rfl
+    · intro y; rfl
+  rw [h_card_eq] at h_lag
+  rw [mul_comm]
+  exact h_lag
+
 /-! **Isaacs Thm 4.7**: maximal class p-群構造 — `A ⊴ P` abelian, `P/A` cyclic,
 `|A ∩ Z(P)| = p` ⇒ nilpotence class = `m` where `|A| = p^m`.
 
-Lem 4.6 後半 part 2 (range = commutator G) + Thm 1.19 経由予定. 形式化保留. -/
+Lem 4.6 cardinality formula + Thm 1.19 経由予定. 形式化保留. -/
 
 /-! ### Commutator collection in class ≤ 2 (Thm 4.8 の前段) -/
 
