@@ -1065,6 +1065,98 @@ theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
     rcases (Nat.dvd_prime_pow Fact.out).mp (hKa ▸ hC_n_idx_dvd) with ⟨b, _, hb⟩
     exact ⟨b, hb⟩
 
+/-- **N = S · C 補題**: `S : Sylow p N`, `C ⊴ N` で `N/C` が p-group ⇒
+`(S : Subgroup N) ⊔ C = ⊤`.
+
+**証明**: `mk' C : N →* N/C` 全射. `S.mapSurjective mk' surj : Sylow p (N/C)`.
+`N/C` は p-group なので任意 Sylow p = ⊤ (cardinality 一致). よって
+`S.map (mk' C) = ⊤`. `comap_map_eq` で `S ⊔ ker (mk' C) = S ⊔ C = ⊤`. -/
+private lemma sylow_sup_normal_eq_top_of_quot_isPGroup
+    {N : Type*} [Group N] [Finite N] {p : ℕ} [Fact p.Prime]
+    {C : Subgroup N} [C.Normal] (hQ : IsPGroup p (N ⧸ C))
+    (S : Sylow p N) :
+    (S : Subgroup N) ⊔ C = ⊤ := by
+  have hSurj : Function.Surjective (QuotientGroup.mk' C : N →* N ⧸ C) :=
+    QuotientGroup.mk'_surjective C
+  let S' : Sylow p (N ⧸ C) := S.mapSurjective hSurj
+  -- (S' : Subgroup (N ⧸ C)) = ⊤ via cardinality
+  have h_S'_top : (S' : Subgroup (N ⧸ C)) = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [S'.card_eq_multiplicity]
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hQ
+    rw [hk, Nat.factorization_pow_self Fact.out]
+  -- Translate back: S ⊔ C = ⊤
+  have h_S_map : (S : Subgroup N).map (QuotientGroup.mk' C) = ⊤ := h_S'_top
+  have h := Subgroup.comap_map_eq (f := QuotientGroup.mk' C) (S : Subgroup N)
+  rw [h_S_map, Subgroup.comap_top, QuotientGroup.ker_mk'] at h
+  exact h.symm
+
+/-- **"Normalizers grow" in p-group** (mathlib `lt_normalizer_of_isNilpotent_of_lt_top` の
+p-group 特殊化). `G` finite p-group, `H : Subgroup G` で `H < ⊤` ⇒
+`H < Subgroup.normalizer (H : Set G)`. -/
+private lemma lt_normalizer_of_pgroup_of_lt_top
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hG : IsPGroup p G) {H : Subgroup G} (hH : H < ⊤) :
+    H < Subgroup.normalizer (H : Set G) := by
+  haveI : Group.IsNilpotent G := IsPGroup.isNilpotent hG
+  exact OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top hH
+
+/-- **Isaacs Lem 5.28**: 仮定「∀ p-subgroup `X` ⊆ `G`, `N_G(X)/C_G(X)` は p-group」
+⇒ 任意 `P, Q : Sylow p G` で `Q = P^c` (= `c • Q = P` in mathlib 流) を満たす
+`c ∈ C_G(P ⊓ Q)` が存在. **Frobenius normal p-complement 5.26 の鍵補題**.
+
+**証明** (Isaacs p.174-175): `D := P ⊓ Q` の cardinality に関する強帰納法 (counter-example
+の最大 `|D|` を取る). `D < P, D < Q` (else `P = Q`, `c = 1`).
+* `N := N_G(D)`, `C := C_G(D)`, 仮定で `N/C` は p-group.
+* `P ⊓ N = N_P(D) > D` (`IsPGroup.lt_normalizer_subgroupOf`).
+* `S := Sylow p N ⊇ P ⊓ N`, `T := Sylow p N ⊇ Q ⊓ N`, `R := Sylow p G ⊇ S`.
+* `N = S · C` (`sylow_sup_normal_eq_top_of_quot_isPGroup`).
+* Sylow II in `N`: `T = n • S`, `n = s · y`, `s ∈ S`, `y ∈ C` ⇒ `T = y • S ⊆ y • R = R^y`.
+* `P ⊓ R ⊇ P ⊓ N > D` ⇒ IH on `(P, R)`: `∃ x ∈ C_G(P ⊓ R), x • R = P`. `x` centralizes `D`.
+* `R^y ⊓ Q ⊇ T ⊓ Q ⊇ Q ⊓ N > D` ⇒ IH on `(R^y, Q)`: `∃ z ∈ C_G(R^y ⊓ Q), z • Q = R^y`.
+  `z` centralizes `D`.
+* `(x y z) • Q = x • y • z • Q = x • (y • R^y) = x • R = P`. `x, y, z` all centralize `D`,
+  hence `xyz ∈ C_G(D)`. 完了.
+
+**実装状態 (2026-05-24)**: 助補題 (sylow_sup_normal + normalizers grow) は実装済.
+本体は ~250 LOC で骨格のみ. 完全形式化は別 session.
+
+**FT クリティカル**: Frobenius 5.26 (3⇒1) 経由. -/
+theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
+    (hH : ∀ X : Subgroup G, IsPGroup p X →
+      IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+        (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))))
+    (P Q : Sylow p G) :
+    ∃ c ∈ Subgroup.centralizer (((P : Subgroup G) ⊓ (Q : Subgroup G)) : Set G),
+      c • Q = P := by
+  -- Strong induction on `k = ((P : Subgroup G) ⊓ Q).index`. Smaller k = larger intersection.
+  suffices h : ∀ k : ℕ, ∀ (P Q : Sylow p G),
+      ((P : Subgroup G) ⊓ (Q : Subgroup G)).index = k →
+      ∃ c ∈ Subgroup.centralizer (((P : Subgroup G) ⊓ (Q : Subgroup G)) : Set G),
+        c • Q = P by exact h _ P Q rfl
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k ih =>
+    intro P Q hk
+    -- **Case 1**: P = Q. Take c = 1.
+    by_cases hPQ : P = Q
+    · refine ⟨1, Subgroup.one_mem _, ?_⟩
+      rw [hPQ, one_smul]
+    -- **Case 2**: P ≠ Q. Apply textbook argument.
+    · -- 詳細実装は別 session. 戦略:
+      --   D := P ⊓ Q. P ≠ Q + Sylow card equality ⇒ D < P, D < Q.
+      --   N := normalizer D, C := centralizer D. hH で N/(C.subgroupOf N) は p-group.
+      --   `lt_normalizer_of_pgroup_of_lt_top` を ↥P に適用: D.subgroupOf P < normalizer ⇒
+      --     P ⊓ normalizer D > D (via subgroupOf_normalizer_eq).
+      --   `IsPGroup.exists_le_sylow` で S, T : Sylow p ↥N containing P ⊓ N, Q ⊓ N.
+      --   R : Sylow p G containing S.map N.subtype.
+      --   `sylow_sup_normal_eq_top_of_quot_isPGroup` で S ⊔ C.subgroupOf N = ⊤.
+      --   Sylow II in ↥N: T = n • S. n = s · y (s ∈ S, y ∈ C). T = y • S ⇒ y⁻¹ • T = S.
+      --   P ⊓ R ⊇ P ⊓ N > D, IH on (P, R): ∃ x ∈ C_G(P ⊓ R) ⊆ C_G(D), x • R = P.
+      --   R^y ⊓ Q ⊇ Q ⊓ N > D, IH on (R^y, Q): ∃ z ∈ C_G(R^y ⊓ Q) ⊆ C_G(D), z • Q = R^y.
+      --   Combine: (x y z) • Q = x • y • z • Q = x • R = P. xyz ∈ C_G(D).
+      sorry
+
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
 
