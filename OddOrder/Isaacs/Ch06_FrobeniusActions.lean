@@ -3,12 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.Int.ModEq
 import Mathlib.Data.Nat.ModEq
+import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.GroupTheory.FixedPointFree
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.FixedPoints
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
@@ -228,6 +231,175 @@ theorem unique_involution [Finite A] [Finite N] (h : IsFrobeniusAction A N)
   exact h _ h_st_ne n hn_ne h_st_n
 
 end IsFrobeniusAction
+
+end
+
+section /- 6B (number-theoretic prelude): Lemma 6.16 (pp. 191-193) -/
+
+/-! ### Isaacs Lemma 6.16
+
+Pure number-theoretic fact used in §6B for the Sylow structure of Frobenius complements
+(Cor 6.17). Independent of all preceding chapters and of §6A.
+
+* For `p` odd: relies on the Lifting-the-Exponent lemma (mathlib
+  `Int.emultiplicity_pow_sub_pow`); conclusion `i ≡ 1 (mod p^{e-1})` always holds.
+* For `p = 2`: direct factorization `i^2 - 1 = (i-1)(i+1)` plus coprimality of the two
+  factors with the odd residual. Three sub-cases according to which factor carries the
+  bulk of the `2`-power and whether the residual is even or odd. -/
+
+open Int
+
+/-- Helper for the `p = 2` branch of Lemma 6.16: if `2 ^ (e + 1) ∣ i ^ 2 - 1`, then
+`2 ^ e` divides one of `i - 1` or `i + 1`. -/
+private theorem two_pow_dvd_or_of_sq_sub_one {e : ℕ} {i : ℤ}
+    (h : (2 : ℤ) ^ (e + 1) ∣ i ^ 2 - 1) :
+    (2 : ℤ) ^ e ∣ i - 1 ∨ (2 : ℤ) ^ e ∣ i + 1 := by
+  -- `i` must be odd, otherwise `i^2 - 1` is odd, contradicting even divisibility.
+  have h_fact : (i ^ 2 - 1 : ℤ) = (i - 1) * (i + 1) := by ring
+  rw [h_fact] at h
+  have h_i_odd : Odd i := by
+    rcases Int.even_or_odd i with ⟨k, rfl⟩ | hodd
+    · -- `i = k + k`, so `(i - 1)(i + 1) = (k+k-1)(k+k+1)` is a product of two odd numbers; odd.
+      exfalso
+      have h2 : (2 : ℤ) ∣ (k + k - 1) * (k + k + 1) :=
+        (dvd_pow_self 2 (Nat.succ_ne_zero _)).trans h
+      rcases Int.prime_two.dvd_or_dvd h2 with h2' | h2'
+      · -- `2 ∣ k + k - 1` is impossible mod 2.
+        omega
+      · omega
+    · exact hodd
+  obtain ⟨j, rfl⟩ := h_i_odd
+  -- Now `i = 2 j + 1`. Factorization: `(i-1)(i+1) = (2j)(2j+2) = 4 · j · (j+1)`.
+  have h_dvd' : (2 : ℤ) ^ (e + 1) ∣ 4 * (j * (j + 1)) := by
+    have h_re : ((2 * j + 1) - 1) * ((2 * j + 1) + 1) = 4 * (j * (j + 1)) := by ring
+    rwa [h_re] at h
+  -- Case split on parity of `j` (then either `j` or `j + 1` contributes a 2-power).
+  rcases Int.even_or_odd j with hjeven | hjodd
+  · -- `j = 2k` (well, `j = k + k`). Then `i - 1 = 4k`.
+    obtain ⟨k, rfl⟩ := hjeven
+    -- Coprimality: `2k + 1` (i.e. `(k + k) + 1`) is odd.
+    have h_coprime : IsCoprime ((2 : ℤ) ^ (e + 1)) ((k + k) + 1) := by
+      apply IsCoprime.pow_left
+      exact ⟨-k, 1, by ring⟩
+    -- Rewrite `4 * ((k + k) * ((k + k) + 1))` as `(4 * (k + k)) * ((k + k) + 1)` to factor.
+    have h_dvd'' : (2 : ℤ) ^ (e + 1) ∣ (4 * (k + k)) * ((k + k) + 1) := by
+      convert h_dvd' using 1; ring
+    have h_dvd_bulk : (2 : ℤ) ^ (e + 1) ∣ 4 * (k + k) :=
+      h_coprime.dvd_of_dvd_mul_right h_dvd''
+    -- `4 * (k + k) = 8 k = 2 · (4 k)`. Divide by 2: `2^e ∣ 4k = i - 1`.
+    left
+    rcases h_dvd_bulk with ⟨m, hm⟩
+    refine ⟨m, ?_⟩
+    have h2pow : (2 : ℤ) ^ (e + 1) = 2 * 2 ^ e := by rw [pow_succ]; ring
+    have hm' : (4 : ℤ) * (k + k) = 2 * (2 ^ e * m) := by rw [hm, h2pow]; ring
+    -- `((k + k) + 1) - 1 = k + k`, so `i - 1 = (2 j + 1) - 1` with `j = k + k`.
+    linarith
+  · -- `j = 2k + 1` for some `k`. Then `i + 1 = 2(2k+1) + 2 = 4(k+1)`.
+    obtain ⟨k, rfl⟩ := hjodd
+    right
+    -- `2 k + 1` is odd.
+    have h_coprime : IsCoprime ((2 : ℤ) ^ (e + 1)) (2 * k + 1) := by
+      apply IsCoprime.pow_left
+      exact ⟨-k, 1, by ring⟩
+    -- `4 * ((2k+1) * ((2k+1) + 1)) = (4 * (2 * (k + 1))) * (2 k + 1)`.
+    have h_dvd'' : (2 : ℤ) ^ (e + 1) ∣ (4 * (2 * (k + 1))) * (2 * k + 1) := by
+      convert h_dvd' using 1; ring
+    have h_dvd_bulk : (2 : ℤ) ^ (e + 1) ∣ 4 * (2 * (k + 1)) :=
+      h_coprime.dvd_of_dvd_mul_right h_dvd''
+    rcases h_dvd_bulk with ⟨m, hm⟩
+    refine ⟨m, ?_⟩
+    have h2pow : (2 : ℤ) ^ (e + 1) = 2 * 2 ^ e := by rw [pow_succ]; ring
+    have hm' : (4 : ℤ) * (2 * (k + 1)) = 2 * (2 ^ e * m) := by rw [hm, h2pow]; ring
+    -- `(2 * (2 k + 1) + 1) + 1 = 4 k + 4 = 4 (k + 1)`, so this is `i + 1`.
+    linarith
+
+/-- **Isaacs Lemma 6.16**. Let `p` be a prime and `e` a positive integer. If `i : ℤ` satisfies
+`i ^ p ≡ 1 (mod p ^ e)`, then one of the following holds:
+* `i ≡ 1 (mod p ^ (e - 1))`,
+* `p = 2` and `i ≡ -1 (mod 2 ^ e)`,
+* `p = 2` and `i ≡ 2 ^ (e - 1) - 1 (mod 2 ^ e)`. -/
+theorem pow_prime_modEq_one_cases {p : ℕ} (hp : p.Prime) {e : ℕ} (he : 0 < e) {i : ℤ}
+    (h : i ^ p ≡ 1 [ZMOD ((p : ℤ) ^ e)]) :
+    i ≡ 1 [ZMOD ((p : ℤ) ^ (e - 1))] ∨
+    (p = 2 ∧ i ≡ -1 [ZMOD ((2 : ℤ) ^ e)]) ∨
+    (p = 2 ∧ i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) := by
+  -- Normalise `e = e' + 1` so `e - 1 = e'` is definitionally clean.
+  obtain ⟨e', rfl⟩ : ∃ e', e = e' + 1 := ⟨e - 1, (Nat.sub_add_cancel he).symm⟩
+  simp only [Nat.add_sub_cancel]
+  -- Convert hypothesis to divisibility (`a ≡ b [ZMOD n]` gives `n ∣ b - a`).
+  have h_dvd : ((p : ℤ) ^ (e' + 1)) ∣ i ^ p - 1 := h.symm.dvd
+  rcases hp.eq_two_or_odd' with rfl | hp_odd
+  · -- ##### Case p = 2 #####
+    rcases two_pow_dvd_or_of_sq_sub_one h_dvd with h_left | h_right
+    · -- (a) holds: `2 ^ e' ∣ i - 1` ⇒ `i ≡ 1 (mod 2^e')`.
+      left
+      refine Int.modEq_iff_dvd.mpr ?_
+      have : (1 - i : ℤ) = -(i - 1) := by ring
+      rw [this]
+      exact dvd_neg.mpr h_left
+    · -- `2 ^ e' ∣ i + 1`. Case-split on whether `2 ^ (e' + 1) ∣ i + 1`.
+      by_cases h_b : (2 : ℤ) ^ (e' + 1) ∣ i + 1
+      · -- (b): `2 ^ (e' + 1) ∣ i + 1`, i.e. `i ≡ -1 (mod 2 ^ (e' + 1))`.
+        right; left
+        refine ⟨rfl, Int.modEq_iff_dvd.mpr ?_⟩
+        have : (-1 - i : ℤ) = -(i + 1) := by ring
+        rw [this]
+        exact dvd_neg.mpr h_b
+      · -- (c): write `i + 1 = 2 ^ e' * a` with `a` odd (else (b) would hold).
+        right; right
+        refine ⟨rfl, Int.modEq_iff_dvd.mpr ?_⟩
+        obtain ⟨a, ha⟩ := h_right
+        have ha_odd : Odd a := by
+          rcases Int.even_or_odd a with hev | hodd
+          · -- `a = b + b`, so `i + 1 = 2 ^ e' * (b + b) = 2 * (2^e' * b)`, contradicting `h_b`.
+            exfalso
+            obtain ⟨b, rfl⟩ := hev
+            apply h_b
+            refine ⟨b, ?_⟩
+            rw [ha, pow_succ]; ring
+          · exact hodd
+        obtain ⟨b, rfl⟩ := ha_odd
+        -- `i + 1 = 2^e' * (2 b + 1)`, so `i = 2^e' * (2 b + 1) - 1 = (2^e' - 1) + 2^(e'+1) * b`.
+        -- Goal: `2 ^ (e' + 1) ∣ (2 ^ e' - 1) - i`.
+        refine ⟨-b, ?_⟩
+        have hi : i = (2 : ℤ) ^ e' * (2 * b + 1) - 1 := by linarith
+        rw [hi, pow_succ]; ring
+  · -- ##### Case p odd ##### (LTE).
+    left
+    -- Step 1: `p ∣ i - 1` from Fermat + hypothesis reduced modulo `p`.
+    have h_p_dvd_sub : (p : ℤ) ∣ i - 1 := by
+      have h_fermat : i ^ p ≡ i [ZMOD (p : ℤ)] := Int.ModEq.pow_prime_eq_self hp i
+      have h_mod_p : i ^ p ≡ 1 [ZMOD (p : ℤ)] :=
+        h.of_dvd (dvd_pow_self _ (Nat.succ_ne_zero _))
+      exact (h_fermat.symm.trans h_mod_p).symm.dvd
+    -- Step 2: `p ∤ i` (else `p ∣ 1`).
+    have h_p_not_dvd_i : ¬ (p : ℤ) ∣ i := by
+      intro hpi
+      have h1 : (p : ℤ) ∣ 1 := by
+        have := dvd_sub hpi h_p_dvd_sub
+        simpa using this
+      have hp_eq : (p : ℤ) = 1 := Int.eq_one_of_dvd_one (by positivity) h1
+      have hp_eq' : p = 1 := by exact_mod_cast hp_eq
+      exact hp.one_lt.ne' hp_eq'
+    -- Step 3: LTE: `emultiplicity p (i^p - 1) = emultiplicity p (i - 1) + emultiplicity p p`.
+    have h_LTE :=
+      Int.emultiplicity_pow_sub_pow hp hp_odd (x := i) (y := 1) (by simpa using h_p_dvd_sub)
+        h_p_not_dvd_i p
+    rw [one_pow, hp.emultiplicity_self] at h_LTE
+    -- Convert the hypothesis into an `emultiplicity` lower bound.
+    have h_e_le : ((e' + 1 : ℕ) : ℕ∞) ≤ emultiplicity (p : ℤ) (i ^ p - 1) :=
+      pow_dvd_iff_le_emultiplicity.mp h_dvd
+    rw [h_LTE] at h_e_le
+    -- `(e' + 1 : ℕ∞) ≤ m + 1 ⇒ (e' : ℕ∞) ≤ m`.
+    have h_em : (e' : ℕ∞) ≤ emultiplicity (p : ℤ) (i - 1) := by
+      have h_cast : ((e' + 1 : ℕ) : ℕ∞) = (e' : ℕ∞) + 1 := by push_cast; rfl
+      rw [h_cast] at h_e_le
+      exact (WithTop.add_le_add_iff_right WithTop.one_ne_top).mp h_e_le
+    have h_pe'_dvd : (p : ℤ) ^ e' ∣ i - 1 := pow_dvd_iff_le_emultiplicity.mpr h_em
+    refine Int.modEq_iff_dvd.mpr ?_
+    have : (1 - i : ℤ) = -(i - 1) := by ring
+    rw [this]
+    exact dvd_neg.mpr h_pe'_dvd
 
 end
 
