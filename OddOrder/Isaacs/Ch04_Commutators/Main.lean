@@ -881,6 +881,13 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator
         show φ (b⁻¹ * a * b) = (φ b)⁻¹ * (φ a) * (φ b) from by rw [map_mul, map_mul, map_inv],
         MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
 
+-- TODO: `(actionCommutator φ).Normal` (G 内). Isaacs §4C: Γ = G ⋊ A 内で
+-- `⁅inl G, inr A⁆ ⊴ ⟨inl G, inr A⟩ = Γ` (Lem 4.1 系) を経由する必要あり.
+-- generator `g * (φ a) g⁻¹` を h ∈ G で conjugate しても generator set 内に
+-- 戻らない (a' に内部 conj が必要だが φ 像にない可能性) ため,
+-- closure_induction 直接は不可. 推奨経路: `(actionCommutator φ).map inl =
+-- ⁅inl.range, inr.range⁆` を示し Γ 内 normality + inl injectivity で pull back.
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
