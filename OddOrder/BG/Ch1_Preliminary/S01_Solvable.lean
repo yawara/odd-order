@@ -61,14 +61,19 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 
 ## 実装 status (2026-05-24)
 
-- **Skeleton** + **§1F docstring mapping** + **4 結果**:
+- **Skeleton** + **§1F docstring mapping** + **7 結果 (sorry-free 6)**:
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
   - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` statement 確定 (sorry)
   - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
   - **Prop 1.15(a)** `hall_higman_solvable_specialization` ⭐ sorry-free thin wrap
   - **`card_comap_eq_card_mul_card_ker`** helper sorry-free
-- 残 sorry: Lem 1.14 main の hard direction (Frattini argument via `Sylow.normalizer_sup_eq_top`
-  + `subgroupOf` layered gymnastics, ~100-150 LOC 規模で次セッション).
+  - **`inf_eq_bot_of_pGroup_coprime`** (Step 1) ⭐ sorry-free
+  - **`card_sup_eq_card_mul_card_of_disjoint_normal`** (Step 2) ⭐ sorry-free
+  - **`subgroupOf_sup_card_eq_and_pGroup`** (Step 3 part 1) ⭐ sorry-free
+- 残 sorry: Lem 1.14 main の hard direction.
+  Step 3 part 2 (T as Sylow object via maximality cardinality argument), Step 4 (Frattini
+  via `Sylow.normalizer_sup_eq_top` 適用 inside ↥(N_G(T ⊔ M))), Step 5 (element decomp +
+  assembly) — ~70-100 LOC 規模, 次セッション.
 - Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.7 §7A/§7C 着手 / Ch.5/6 進行中.
 -/
 
