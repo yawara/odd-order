@@ -378,24 +378,98 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 
 `gN` が A-不変 (条件 `∀ a, ∃ n ∈ N, φ a g = g * n`) のとき, ∃ c ∈ gN かつ ∀ a, φ a c = c. -/
 theorem aInvariant_coset_mem_centralizer
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
-    {N : Subgroup G} (_hN_inv : IsAInvariant φ N) {g : G}
-    (_hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} (hN_inv : IsAInvariant φ N) {g : G}
+    (hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
-  sorry  -- TODO: apply 3.24(a) to Ω = subtype of gN, N acting by right multiplication.
+  -- Ω := subtype of gN.
+  let Ω := { x : G // ∃ n ∈ N, x = g * n }
+  haveI hΩ_nonempty : Nonempty Ω := ⟨⟨g, 1, N.one_mem, (mul_one g).symm⟩⟩
+  -- N acts on Ω by right multiplication of inverse (to make it a left action).
+  letI mulN : MulAction ↥N Ω := {
+    smul := fun n ω => ⟨ω.val * n.val⁻¹, by
+      obtain ⟨m, hm, hω_eq⟩ := ω.property
+      refine ⟨m * n.val⁻¹, N.mul_mem hm (N.inv_mem n.property), ?_⟩
+      rw [hω_eq, mul_assoc]⟩
+    one_smul := fun ω => Subtype.ext (by
+      change ω.val * (1 : ↥N).val⁻¹ = ω.val
+      simp)
+    mul_smul := fun m n ω => Subtype.ext (by
+      change ω.val * (m * n).val⁻¹ = ω.val * n.val⁻¹ * m.val⁻¹
+      rw [Subgroup.coe_mul, mul_inv_rev, mul_assoc])
+  }
+  -- A acts on Ω via φ.
+  letI mulA : MulAction A Ω := {
+    smul := fun a ω => ⟨φ a ω.val, by
+      obtain ⟨n, hn, hω_eq⟩ := ω.property
+      obtain ⟨m, hm, hg_eq⟩ := hgN_inv a
+      refine ⟨m * (φ a n), N.mul_mem hm (hN_inv.smul_mem a hn), ?_⟩
+      rw [hω_eq, map_mul, hg_eq, mul_assoc]⟩
+    one_smul := fun ω => Subtype.ext (by
+      change (φ 1) ω.val = ω.val
+      rw [map_one]; rfl)
+    mul_smul := fun a b ω => Subtype.ext (by
+      change (φ (a * b)) ω.val = (φ a) ((φ b) ω.val)
+      rw [map_mul]; rfl)
+  }
+  -- Compatibility: a • (n • ω) = (hN_inv.restrict a n) • (a • ω).
+  have hcompat : IsCompatibleMulAction (hN_inv.restrict) Ω := by
+    intro a n ω
+    apply Subtype.ext
+    change (φ a) (ω.val * n.val⁻¹) = (φ a) ω.val * ((hN_inv.restrict a) n).val⁻¹
+    rw [map_mul, map_inv]
+    rfl
+  -- N transitive on Ω.
+  have hN_trans : MulAction.IsPretransitive ↥N Ω := by
+    constructor
+    intro ω₁ ω₂
+    obtain ⟨n₁, hn₁, hω₁_eq⟩ := ω₁.property
+    obtain ⟨n₂, hn₂, hω₂_eq⟩ := ω₂.property
+    -- Want n with n • ω₁ = ω₂, i.e., ω₁.val * n⁻¹ = ω₂.val.
+    -- So n⁻¹ = ω₁⁻¹ * ω₂ = (g * n₁)⁻¹ * (g * n₂) = n₁⁻¹ * n₂. Thus n = n₂⁻¹ * n₁.
+    refine ⟨⟨n₂⁻¹ * n₁, N.mul_mem (N.inv_mem hn₂) hn₁⟩, ?_⟩
+    apply Subtype.ext
+    change ω₁.val * (n₂⁻¹ * n₁)⁻¹ = ω₂.val
+    rw [hω₁_eq, hω₂_eq, mul_inv_rev, inv_inv, mul_assoc, ← mul_assoc n₁, mul_inv_cancel, one_mul]
+  -- Coprime |A| |N| (since |N| ∣ |G|).
+  have hCop' : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
+  -- IsSolvable A ∨ IsSolvable N.
+  have hSolv' : IsSolvable A ∨ IsSolvable ↥N := by
+    rcases hSolv with hA | hG
+    · exact Or.inl hA
+    · haveI := hG
+      exact Or.inr inferInstance
+  -- Finite N.
+  haveI hN_finite : Finite ↥N := Subtype.finite
+  -- Apply Glauberman 3.24(a).
+  obtain ⟨ω₀, hω₀_fix⟩ :=
+    glauberman_fixed_point_exists (G := ↥N) (A := A) (φ := hN_inv.restrict)
+      hCop' hSolv' (Ω := Ω) hcompat hN_trans
+  -- Extract: c := ω₀.val ∈ gN and ∀ a, φ a c = c.
+  refine ⟨ω₀.val, ω₀.property, ?_⟩
+  intro a
+  have := hω₀_fix a
+  -- this : (a • ω₀ : Ω) = ω₀ as Subtype.
+  -- (a • ω₀).val = φ a ω₀.val by definition.
+  have h_eq : ((a • ω₀ : Ω) : G) = (φ a) ω₀.val := rfl
+  rw [← h_eq, this]
 
 /-- **Isaacs Cor 3.28 (transitive blocker for Ch.4)**: 商の固定点は底群の固定点像.
 
 `N ⊴ G` A-不変, coprime + solvable のとき, `Ḡ = G/N` 上の A-fixed 元は `C_G(A)` の像と一致.
 ステートメント: A-fixed `ḡ ∈ Ḡ` ⇒ ∃ c ∈ C_G(A), c·N = g·N. -/
 theorem coprime_fixedPoints_quotient
-    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (_hSolv : IsSolvable A ∨ IsSolvable G)
-    {N : Subgroup G} [N.Normal] (_hN_inv : IsAInvariant φ N) {g : G}
-    (_hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (hN_inv : IsAInvariant φ N) {g : G}
+    (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
-  sorry  -- TODO: alias of 3.27 (or thin wrap if 3.27 is more general).
+  -- 3.27 のリオーダー版: (coset 性質, A-fixed) → (A-fixed, coset 性質).
+  obtain ⟨c, hc_coset, hc_fixed⟩ :=
+    aInvariant_coset_mem_centralizer hCop hSolv hN_inv hg_fix
+  exact ⟨c, hc_fixed, hc_coset⟩
 
 end CosetFixed
 
