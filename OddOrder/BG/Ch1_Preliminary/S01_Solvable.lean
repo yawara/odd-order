@@ -166,6 +166,18 @@ theorem card_sup_eq_card_mul_card_of_disjoint_normal
     Subgroup.card_eq_card_quotient_mul_card_subgroup _
   rw [h_card, h_eq_TM, hM_sub_TM_card]
 
+/-- **Helper for Lem 1.14** (Step 3 part 1): `T.subgroupOf (T ⊔ M)` is a p-group with
+cardinality `|T|`. uses `Subgroup.subgroupOfEquivOfLe` (T ≤ T ⊔ M ⇒ T.subgroupOf (T⊔M) ≃* T). -/
+theorem subgroupOf_sup_card_eq_and_pGroup
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T) (M : Subgroup G) :
+    Nat.card (T.subgroupOf (T ⊔ M)) = Nat.card T ∧
+      IsPGroup p (T.subgroupOf (T ⊔ M : Subgroup G)) := by
+  refine ⟨?_, ?_⟩
+  · exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : T ≤ T ⊔ M)).toEquiv
+  · exact hT.of_injective (Subgroup.subgroupOfEquivOfLe (le_sup_left : T ≤ T ⊔ M)).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe (le_sup_left : T ≤ T ⊔ M)).injective
+
 /-- **BG Lemma 1.14 (易 direction, sorry-free)**: `N_G(T)·M ≤ N_G(T·M)`.
 
 - `T.normalizer ≤ (T ⊔ M).normalizer`: x normalizes T ⇒ x normalizes M (M ⊴ G) ⇒ x

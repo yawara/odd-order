@@ -124,3 +124,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- N ⊴ G A-inv, coprime + solvable, A-fixed coset gN ⇒ ∃ c ∈ C_G(A), cN = gN.
 -- Ch.4 多数定理 (4.26, 4.28-30, 4.34-36, 4.38) の transitive 前提.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Thm 3.23(a)): A-invariant Sylow ⭐ FT クリティカル
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.exists_aInvariant_sylow
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.29): A trivial on G/Φ ⇒ A trivial on G
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aFixed_quotient_frattini
