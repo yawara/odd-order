@@ -847,7 +847,7 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 **FT クリティカル**. mathlib 未収載で新規実装が必要.
 
 - **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
-- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 形式化保留.
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 🟡 部分完成. `Sylow.ControlsOwnFusion` 定義 + (⇒) `controlsOwnFusion_of_hasNormalPComplement` ✅. (⇐) `hasNormalPComplement_of_controlsOwnFusion` sorry (O^p, A^p 定義必要).
 - **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
 - **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
   Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
@@ -868,10 +868,91 @@ def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
   ∃ N : Subgroup G, N.Normal ∧
     ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
 
-/-! **Isaacs Thm 5.25** (Sylow controls own G-fusion ⇔ normal p-complement):
-形式化保留. Focal Subgroup Theorem (5.21) + Sylow conjugacy.
+/-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
+that are conjugate in `G`, they are already conjugate by some element of `P`.
 
-**Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**:
+Isaacs §5C-§5E で頻出. mathlib 未収載のため新規定義. -/
+def _root_.Sylow.ControlsOwnFusion {p : ℕ} {G : Type*} [Group G] (P : Sylow p G) : Prop :=
+  ∀ ⦃x y : G⦄, x ∈ (P : Subgroup G) → y ∈ (P : Subgroup G) →
+    (∃ g : G, g * x * g⁻¹ = y) →
+    (∃ u : G, u ∈ (P : Subgroup G) ∧ u * x * u⁻¹ = y)
+
+/-- **Isaacs Thm 5.25 (⇒)**: G has normal p-complement ⇒ any Sylow_p `P` controls own fusion.
+
+**証明** (Isaacs p.173): 与えられた N normal p-comp で `G = N · P`, `N ⊓ P = ⊥`.
+x, y ∈ P G-conjugate: ∃ g, g x g⁻¹ = y. `mem_sup_of_normal_left` で `g = n · p`
+(n ∈ N, p ∈ P). z := p x p⁻¹ ∈ P. `g x g⁻¹ = n z n⁻¹ = y ∈ P`. 一方
+`n z n⁻¹ · z⁻¹ = n · (z n⁻¹ z⁻¹) ∈ N` (N normal) かつ `∈ P` (= y · z⁻¹). よって
+`∈ N ⊓ P = ⊥`, つまり `n z n⁻¹ = z = p x p⁻¹ = y`. `u = p` で完了. -/
+theorem controlsOwnFusion_of_hasNormalPComplement [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hG : HasNormalPComplement p G) :
+    P.ControlsOwnFusion := by
+  obtain ⟨N, hN_normal, hN_compl⟩ := hG
+  haveI : N.Normal := hN_normal
+  rintro x y hx_P hy_P ⟨g, hgxy⟩
+  -- g ∈ N ⊔ P = ⊤ ⇒ g = n · p (n ∈ N, p ∈ P)
+  have h_sup_top : N ⊔ (P : Subgroup G) = ⊤ := (hN_compl P).sup_eq_top
+  have hg_in_sup : g ∈ N ⊔ (P : Subgroup G) := h_sup_top ▸ Subgroup.mem_top g
+  obtain ⟨n, hn_N, q, hq_P, hg_eq⟩ := Subgroup.mem_sup_of_normal_left.mp hg_in_sup
+  -- z := q * x * q⁻¹ ∈ P
+  have hz_P : q * x * q⁻¹ ∈ (P : Subgroup G) :=
+    (P : Subgroup G).mul_mem ((P : Subgroup G).mul_mem hq_P hx_P)
+      ((P : Subgroup G).inv_mem hq_P)
+  -- y = g x g⁻¹ = n · (q x q⁻¹) · n⁻¹ = n z n⁻¹
+  have h_y_eq : y = n * (q * x * q⁻¹) * n⁻¹ := by
+    rw [← hgxy, ← hg_eq]; group
+  -- n z n⁻¹ ∈ P (= y)
+  have h_nzn_in_P : n * (q * x * q⁻¹) * n⁻¹ ∈ (P : Subgroup G) := h_y_eq ▸ hy_P
+  -- n z n⁻¹ · z⁻¹ ∈ N: rewrite as n · (z n⁻¹ z⁻¹) with z n⁻¹ z⁻¹ ∈ N (conj)
+  have h_in_N : n * (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ ∈ N := by
+    have hzn_inv_z_inv_N : (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ ∈ N :=
+      hN_normal.conj_mem n⁻¹ (N.inv_mem hn_N) (q * x * q⁻¹)
+    have heq : n * (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ =
+               n * ((q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹) := by group
+    rw [heq]
+    exact N.mul_mem hn_N hzn_inv_z_inv_N
+  -- n z n⁻¹ · z⁻¹ ∈ P
+  have h_in_P : n * (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ ∈ (P : Subgroup G) :=
+    (P : Subgroup G).mul_mem h_nzn_in_P ((P : Subgroup G).inv_mem hz_P)
+  -- n z n⁻¹ · z⁻¹ ∈ N ⊓ P = ⊥, so equal to 1
+  have h_eq_one : n * (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ = 1 := by
+    have h_in_inf : n * (q * x * q⁻¹) * n⁻¹ * (q * x * q⁻¹)⁻¹ ∈ N ⊓ (P : Subgroup G) :=
+      ⟨h_in_N, h_in_P⟩
+    rw [(hN_compl P).disjoint.eq_bot, Subgroup.mem_bot] at h_in_inf
+    exact h_in_inf
+  -- n z n⁻¹ = z, so y = z = q x q⁻¹
+  rw [mul_inv_eq_one] at h_eq_one
+  refine ⟨q, hq_P, ?_⟩
+  rw [h_y_eq, h_eq_one]
+
+/-- **Isaacs Thm 5.25 (⇐)**: any Sylow_p `P` controls own fusion ⇒ G has normal p-complement.
+
+**証明** (Isaacs p.173, harder direction): N := O^p(G) (smallest normal subgroup with
+p-power index). Q := N ⊓ P ∈ Sylow_p(N). A^p(N) := N の最小 normal subgroup で N/A^p(N)
+abelian + p-power index. A^p(N) characteristic in N ⇒ normal in G. |G:A^p(N)| = |G:N| · |N:A^p(N)|
+p-power ⇒ N = O^p(G) ⊆ A^p(N), hence A^p(N) = N.
+
+Focal Subgroup Theorem ⇒ Foc_N(Q) = Q ⊓ A^p(N) = Q ⊓ N = Q.
+
+For x, y ∈ Q N-conjugate: x⁻¹ y ∈ Foc_N(Q) (generator). x, y ∈ P G-conjugate, hypothesis
+で P-conjugate: y = x^u, u ∈ P. x⁻¹ y = [x, u] ∈ [Q, P]. So Foc_N(Q) ⊆ [Q, P].
+Combined: Q ⊆ [Q, P]. 反復: Q ⊆ [Q, P, P, ...] (lowerCentralSeries P n). P nilpotent finite
+⇒ ∃ n, lowerCentralSeries P n = ⊥. よって Q = ⊥, つまり N が normal p-complement.
+
+**実装状態**: 形式化保留. mathlib に O^p(G), A^p(G) 未収載で新規定義必要 (~50 LOC).
+本体は ~150 LOC. -/
+theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hP : P.ControlsOwnFusion) :
+    HasNormalPComplement p G := by
+  sorry
+
+/-- **Isaacs Thm 5.25**: G has normal p-complement ⇔ Sylow_p controls own fusion. -/
+theorem hasNormalPComplement_iff_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    HasNormalPComplement p G ↔ P.ControlsOwnFusion :=
+  ⟨controlsOwnFusion_of_hasNormalPComplement P, hasNormalPComplement_of_controlsOwnFusion P⟩
+
+/-! **Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**:
 `G` は normal p-complement を持つ ⇔ 任意の p-subgroup `X` で `N_G(X)/C_G(X)` が p-group.
 
 3 同値条件のうち本 statement は (1) ⇔ (3). 5.25 経由で (1) ⇔ (2) (全 p-local 部分群
