@@ -5,6 +5,23 @@
 ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 役割: **Dade isometry の整合性条件**. Coherent triple の定義と基本性質. §8-§16 全面の前提.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+- **L3 "6 結果 (5.1)-(5.6)"** → **重大誤認: 実際 9 結果 (5.1)-(5.9)**. (5.7) degree-regular, (5.8) reducible μ_k, (5.9) automorphism/μ-μ̄ が完全欠落.
+- **(5.5) と (5.7) が forward 最多 hub**: (5.5) ×11 cite (§8, §11, §12, §13, §14×4, §15×2, §16), (5.7) ×10 cite (§8, §11×3, §12×2, §13, §14×2, §16) — "all of S coherent" gateway. (5.8) ×5, (5.9) ×5. 既存「bonus/peripheral」評価は逆.
+- **L10 TL;DR / L46-69 / L408-413 Coherence (5.1) 定義** → **重大誤り**: 「`τ̃(χ - 1)` virtual character の差」rider は (5.1) **に含まれない**. 正: (5.1) は extension `τ̃ : Z[S] → Z[Irr G]` の存在のみ (isometric + agrees with τ on Z[S, A]). "character difference" property は **(5.9.b) の結論** (under §4 (2.2) Hypothesis).
+- **L62 コード `χ - 1`** → 正は **`χ - χ̄`** (複素共役); §7 全体で `χ - 1_L` ではなく `χ - χ̄` を扱う.
+- **L46-69 candidate A code "(G → ℂ)"** → 正は `ClassFunction G` または `Z[Irr G]` codomain.
+- **L329 "Inner product 既存"** → partial (`char_orthonormal` irreducible のみ; CF 全体 inner product, ZIrr inner product 不在).
+- **L334 "TI-subset Coherence.Hypothesis 内定義"** → TI-subset は §4-§5 work, §7 内不要; shared `OddOrder/GroupTheory/TISubset.lean` 配置.
+- **L464 "§4 Dade isometry 完成後必須"** → 実は §3 も必須 ((5.8), (5.9) が §3 (1.1), (1.5.c), (1.9) 利用).
+- (5.6.1)-(5.6.3) microstructure (3-step Sibley) 正しく認識.
+- **(5.7) は (5.6) の corollary ではない** (parallel proof, uses (5.4) directly).
+- Encoding 推奨: **propositional predicate `IsCoherent`** (bundled structure ではなく); ただし **Hypothesis (5.2) は structure** で bundle. 既存 note の予感正しいが (5.1) def 訂正必要.
+- 行数 "14-18h" → **18-22h realistic** + Wave 1a infra 別途.
+
 ## TL;DR — Coherence の正式定義, mathlib 完全新規
 
 **Coherence は Dade isometry 完成後の "整合性チェック" 概念**. 等距写像 `τ: Z[S, A] → Z[Irr G]` が **coherent** ⟺ Z[S] 全体への拡張 `τ̃` が存在し、各 `χ ∈ S` で `τ̃(χ - 1)` が virtual character の差で書ける (∈ Z[Irr G]). 

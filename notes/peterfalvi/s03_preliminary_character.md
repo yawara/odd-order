@@ -5,6 +5,20 @@
 ROADMAP 上の位置: **Phase 2b 第 1 波** (Phase 1 Isaacs Ch.指標論完成 + mathlib `Character.lean` API 確認後).
 役割: **Phase 2b の入口**: mathlib `RepresentationTheory.Character` API と odd-order 特化結果の橋渡し.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+- **§3 は dependency-graph leaf**: 内部 self-cite **2 件のみ** ((1.1)→(1.5.e), (1.5.a)→(1.6.a)). 既存「structured」評価は overstate; flat checklist が実態.
+- **内部 hub 訂正**: 既存「(1.4) hub」→ 実は **(1.6) が forward 最多 (7 cites)**. (1.4) は §4 prereq として重要だが overall は (1.6) が上位.
+- L18, L72 (1.5)/(1.7) "mid (Clifford)" → **low** (Clifford theorem は mathlib 不在, 新規 `Clifford.lean` 要; BG §2 Prop 2.2 と共有 module).
+- L76 [Is] Lem 7.7 "(1.4) context" → **誤り**, 実は **§8 (Coherence) L150**.
+- L25 (1.8) "◯ §14-§15" → 実は **forward 0 explicit cite** (background tool only).
+- L20 (1.3) "mid Frobenius API" → 実は **partial low** (mathlib `indResAdjunction_homEquiv` categorical のみ; character-level numerical Frobenius reciprocity 不在).
+- (1.5)/(1.7)/(1.8) bucket: 全て **(c) new helper 要** (既存「mid」誤認). 各 [Is] cite (Thm 6.32, 6.5, 6.11, Lem 2.21, Cor 6.28, Cor 2.30, Lem 3.2/Cor 3.5, Lang Ch.VIII Thm 3.1 = 計 8 件) は **全 proof body cite**, mathlib v4.29.1 で対応**ゼロ**, 全て新規 helper 要.
+- 行数 "350-400 LOC" → **~1000-1200 LOC** (Wave 1a infra `ClassFunction.lean`, `InducedCharacter.lean`, `Clifford.lean`, `Inertia.lean`, `BrauerPermutation.lean`, `IsReal.lean`, `SchurCenterBound.lean`, `IsometryDifferencePair.lean`, `SecondOrthogonality.lean` 合計 ~600 LOC 含む).
+- [BG] cite **0**: §3 mmd で [BG] 引用なし. 既存 "[BG] §1 軽" 等の言及は overstated.
+
 ## TL;DR — Phase 2b の入口, mathlib との橋渡し
 
 Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独自の odd-order strengthening の集約**. §3 の大半 ((1.1), (1.5)-(1.8)) は Isaacs の character-theoretic 再述 + odd-order 強化で、**mathlib 既存 API で薄くラップ可能**. ただし **(1.3) (Fourier 展開) と (1.4) (tau isometry)** は **§4 (Dade isometry) の基礎となる新概念** で、Phase 2b 形式化の最初の山場.

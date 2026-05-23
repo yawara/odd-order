@@ -5,6 +5,23 @@
 ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 役割: **§4 Dade isometry の cyclic normalizer specialization**, Frobenius complement との連結, 計算的取り扱いの簡素化.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+- **L3, L12 "5 結果 (3.1)-(3.5)"** → **重大誤認: 実際 9 結果 (3.1)-(3.9)**. 既存表で (3.6) Hypothesis, (3.7) index identity, **(3.8) NC trichotomy**, (3.9) Galois rationality package が完全欠落.
+- **(3.8) NC trichotomy が下流 8 cite で最多 hub** (§6×多, §7, §12×2, §15×2). 既存「side material」評価は逆.
+- (3.9.b) Galois は §6×2, §12, §13, §15 で利用; (3.7) は **§16 final-contradiction calc** で直接消費.
+- **L18 (3.5) "§6-§8+§10-§16 全面"** → 実測 §6×9, §15×3, §12×2, §7×2, §13, §16; **§8/§9/§10/§11/§14 = 0 direct cite**.
+- **L53 "Phase 1 §4 (Frobenius) TI-subset dep"** → §5 mmd で §4 (2.X) cite **0**. 実 dep は §3 (1.3) ×1 + §3 (1.9) ×2 + [Is] Ch.7 + [Is] Cor 2.23 + Thm 4.21.
+- **L216-232 "Frobenius Complement との関係"** → 推測; §5 mmd で `Frobenius` keyword **0**.
+- L292 forward "§11 (9.1), (9.2)" → 誤り; §11 = 0 direct (3.X) cite.
+- **L294-319 mathlib eval**: "Induced character 既存 / CF 既存 / ZIrr 既存" → **全て誤り**. mathlib `Induced.lean` は categorical `IndV` (coinvariants) のみ, classical induced character formula 不在. `ClassFunction` 型不在. `ZIrr` 不在.
+- **`MulAction.IsBlock` ≠ TI-subset** (混同に注意); TI-subset は新規 `OddOrder/GroupTheory/TISubset.lean` 要.
+- "[BG] §3 dep" → **0**. §5 は **BG 完全独立**.
+- 行数 "350-400 LOC" → **700-850 LOC** (500-650 (3.1-3.5) + 150-200 (3.6-3.9)).
+- **Two-hub** structure: (3.5) Case I/II 内部 hub + (3.8) NC 外部 forward hub. 既存「(3.5) only hub」誤認.
+
 ## TL;DR
 
 §5 は §4 Dade isometry を **最重要特殊化** する. 仮説: `G` 有限群, `W = W₁ × W₂` が cyclic (odd order), `V = W - (W₁ ∪ W₂)` が TI-subset で `N_G(V) = W` となる case. **目標**: W が cyclic ⇒ `CF(W, V)` の basis `(α_{ij})` を explicit に構成し、induced characters `Ind_W^G α_{ij}` が orthonormal family `(χ_{ij})` を張る. **結果**: Dade map `τ` の image の orthogonality 構造が完全に決定される ⇒ §6-§8 で coherence 条件を精密に制御可能.

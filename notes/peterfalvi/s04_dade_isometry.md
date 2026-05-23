@@ -5,6 +5,20 @@
 ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 役割: **Dade isometry 新規概念の正式定義**, §5-§8 (Coherence) の全前提.
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+- **L3, L7, L16, L18 "6 結果 (2.1)-(2.6)"** → **重大誤認: 実際 11 結果 (2.1)-(2.11)** + sub-lemmas (2.10.1)-(2.10.3). 既存表で **(2.7), (2.8), (2.9), (2.10), (2.11) 完全欠落**.
+- (2.7) Adjoint formula は **外部 7 cite** (§7, §9, §12×2, §13, §16×2) で **最重要 forward-export 補題**. 既存「Helper」評価は overstate.
+- (2.1) Coprime decomp は **外部 6 cite** で §4 内部用ではなく **shared primitive**. `OddOrder/GroupTheory/CoprimeAction.lean` (既存) 配置推奨.
+- **L141 "mathlib `ClassFunction` 既存" → 誤り**. `ClassFunction G` 型不在 (only `FDRep.character : G → k`, conj-invariant submodule なし). 新規 `OddOrder/RepresentationTheory/ClassFunction.lean` 要.
+- **L150 "`MulAction.IsTrivialIntersection` あり" → 誤り**. `Mathlib/GroupTheory/GroupAction/Blocks.lean` の `IsTrivialBlock` は別概念 (subsingleton/univ block, not TI-subset). TI-subset (`A^g ∩ A ≠ ∅ ⇒ g ∈ N_G(A)`) は **mathlib 完全不在**, 新規 `OddOrder/GroupTheory/TISubset.lean` 要.
+- **L213 "Phase 1 Ch.6 (Frobenius) 完成必須" → overstate**. §4 で必要なのは `Subgroup.piCore` (= O_{π'}) facts のみで mathlib-native. **Frobenius kernel nilpotency は §4 で不使用** (Ch.6 dep ゼロ).
+- **"[BG] §1 軽" → 0**. §4 mmd で [BG] cite **0** (intro prose の `[1s] Lem 7.7` は OCR typo of `[Is]`). §4 は **Phase 2a BG 完全独立**.
+- **Encoding 推奨更新**: 既存 candidate 3 (predicate) → **bundled `structure DadeHypothesis` + named `def dadeMap`** (refined candidate 2). 理由: §6-§16 全節で「let τ be the Dade isometry relative to (A,L,G)」と named 形で参照される. predicate は existence elimination の冗長性を生む.
+- 行数 "16-18h" → infra 8-10h 別途要; 実装 11 結果 = 既存 6 結果想定の **約 2 倍**.
+
 ## TL;DR — Phase 2b の山場, mathlib 完全新規
 
 **Dade isometry は mathlib 未収載の Peterfalvi 独自概念**. TI-subset (Trivial Intersection) または一般化された仮説 (2.2) 下の virtual character 空間 `CF(L, A^#)` から `Z[Irr G]` への等距写像. **§5-§8 (Coherence), §9 (Non-existence), §10-§16 (構造分析) 全てが Dade isometry の上に構築される**.

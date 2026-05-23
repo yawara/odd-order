@@ -7,6 +7,21 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 ---
 
+## Audit log (2026-05-23 audit 訂正)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+- **L3 "5 結果 (4.1)-(4.5)"** → **重大誤認: 実際 10 結果 (4.1)-(4.10)**. 既存表で (4.6) Hypothesis (実は中核), (4.7) Supp 補題, (4.8), (4.9) τ-isometry Thm, (4.10) 4-term identity が完全欠落.
+- **(4.1) orthogonality crit は下流 9 cite (技術 hub)**, (4.3) も 9 cite, **(4.7) Supp は 7 cite (§7 (5.3.b) proof で重要)**. 既存「(4.5) main thm」評価不十分.
+- **L12 TL;DR "§4 の応用・拡張"** → 実は **§5 への依存が遥かに重い**: §5 (3.X) cite **8 件** (3.1×3, 3.2×5, 3.3×2, 3.4, 3.6, 3.8, 3.9×3) vs §4 (2.X) cite **3 件のみ**. §6 = "§5 σ を §6 (4.6) で embed + §4 Dade τ で L→G lift".
+- **L14 "mathlib ~30%"** → "20%; Brauer permutation 最大 gap".
+- **L60 (4.2.a) "W₁ は K の cyclic Hall subgroup"** → **正は "W₁ は L の cyclic Hall subgroup"** (L9 mmd: Hall of L). K (= L^p′) でない.
+- **L181 (4.5.b) "Phase 1 Ch.指標論で fixed point theory 確認"** → **Brauer's permutation lemma ([Is] Thm 6.32) は mathlib v4.29.1 不在 (grep 0 hits); Phase 1 計画にも無し**. 新規 `OddOrder/RepresentationTheory/BrauerPermutation.lean` 要 — **§6 (4.5.b) の単一最大 blocker**.
+- **L213 "§5 と独立"** → **誤り (8 §5 cites)**.
+- L218-237 §7 bridge "(4.3.d), (4.5)/(4.4) → (5.6) norm bound" → 正は **(5.3.b) は (4.7)+(4.9) を経由** ((4.7) が API edge).
+- §10 への §6 cite は **0** (note implied §10-§16 多出現は overstate). 最大消費は §12 (13 cites), §7 (11), §15 (11), §11 (7).
+- 行数 "13-16h" → **18-22h realistic** ((4.5.b) Brauer 4-6h + 既存 (4.1)-(4.5) 想定の約 2 倍).
+
 ## TL;DR — §4 の応用・拡張, 新概念なし
 
 **§6 の位置づけ**: §4 (2.1)-(2.6) で Dade isometry の一般理論を確立した後、**Hypothesis (4.2) という特定の algebraic structure** (L = K ⋊ W₁, cyclic Hall subgroup W₁, centralizer factorization) を持つ部分群族に対し、Dade isometry がどのように **具体的に構成・計算** されるかを詳細化. 新しい概念は不要で、§4 の結果を組み合わせる.

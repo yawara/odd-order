@@ -5,6 +5,30 @@
 形式化先 (予定): `OddOrder/Peterfalvi/S{NN}_*.lean` + `Appendices/*.lean`.
 ROADMAP 上の位置: **Phase 2b** (Phase 1 Isaacs 完了後着手, Phase 2a BG と並行可).
 
+## Audit log (2026-05-23 audit 訂正, §3-§8 範囲)
+
+統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+
+**結果数の systematic 誤認 (本文表 L28-44)** — §3 のみ正確、§4-§8 で 2-5 結果欠落:
+
+| § | 既存 _overview | 実際 (audit) | 欠落 |
+|---|---|---|---|
+| §4 | 6 | **11** | (2.7)-(2.11) |
+| §5 | 5 | **9** | (3.6)-(3.9) (特に (3.8) NC trichotomy = forward 最多 hub) |
+| §6 | 5 | **10** | (4.6)-(4.10) (特に (4.6) Hypothesis = 実は中核) |
+| §7 | 6 | **9** | (5.7)-(5.9) (特に (5.7) degree-regular = forward 10 cites) |
+| §8 | 4 | **8** | (6.5)-(6.8) (特に (6.8) Sibley main thm) |
+
+L46 "本体合計 113 結果" → 数値再集計要 (per-section 漏れ加算で実数は **131** 程度).
+
+**[BG] 依存 §3-§8 範囲 ゼロ**: §3-§8 character theory core は **BG 完全独立**. L31-37 (§3-§8) で "[BG] §1 軽", "[BG] §3" 等の記載は **全て overstated or false**. 実 [BG] dep は §9 (=App.C) 以降に集中.
+
+**mathlib カバレッジ評価 overstated** (L36-37, L46): "§3 mid", "§4-§8 low" → 実は **全て (c) bucket dominant** (Wave 1a infra 11 modules ~1100 LOC 要). 既存「§4 mid Phase 1 Ch.6 完成下」「§5 low w/ Frobenius API」「§3 既存 wrapper」評価誤認.
+
+**§8 fabrication 訂正** (per-section s08 ノート 該当): "Sibley 1984 Contemp. Math. 47" → **Sibley 1976 *Illinois J. Math.* 20** (Notes §SS6); "Reynolds 1965 Duke Math. J." → **存在しない (捏造)**.
+
+詳細は統合 doc + per-section audit log 参照.
+
 ## TL;DR
 
 Peterfalvi 本書は Feit-Thompson 定理の **指標理論パート**: BG (Phase 2a) で確立した最小反例 G の局所構造を、指標論で再分析し、最終矛盾を導出する. 全 16 節 + 5 appendix で **本文 113 個 + 付録 27 個 = 140 個の番号付き結果** ((N.M) 形式が本文、Proposition/Lemma/Theorem N. 形式が付録).
