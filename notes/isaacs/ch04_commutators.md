@@ -13,15 +13,17 @@
 | **Lem 4.1** (H, K normalize ⁅H,K⁆, 一般版) | ✅ | `subgroup_le_normalizer_commutator_self` + `_right`. Identity `g·⁅a,b⁆·g⁻¹ = ⁅ga,b⁆·⁅b,g⁆` (`conj_commutator_split`) + `closure_induction`. |
 | Lem 4.2 (map_commutator) | ✅ mathlib direct | no-wrapper. |
 | **Lem 4.3** (⁅H,K⁆ ≤ H ↔ K ≤ N(H)) | ✅ | `commutator_le_iff_le_normalizer` (3 forms: forward/backward/iff). Element identity `k·x·k⁻¹ = ⁅k,x⁆·x`. |
-| Lem 4.4 (class 2 p-群 exponent) | docstring | Subgroup `Monoid.exponent` API 要拡張. |
-| Lem 4.5 (P/N elementary abelian iff Φ ⊆ N) | docstring | mathlib `Subgroup.frattini` 経由保留. |
+| **Lem 4.4** (class 2 + exponent) | ✅ (2026-05-23) | `pow_mem_center_of_class_le_two_of_commutator_pow` (一般化 statement: 任意 `n`, `commutator G ≤ Z(G)` + 全交換子の `n`乗 = 1 ⇒ `x^n ∈ Z(G)`. Isaacs は `p`-群 + `n = p^e` に特殊化). + `isElementaryAbelian_quotient_center_of_class_le_two` ("In particular" `p`-elem abelian 帰結). class ≤ 2 で `⁅·, z⁆` 左 hom (`commutatorElement_mul_left_of_class_le_two`) + `⁅x^n, z⁆ = ⁅x, z⁆^n` (`commutatorElement_pow_left_of_class_le_two`) 経由. ~80 LOC. "thus Φ(P) ⊆ Z(P)" は Lem 4.5 経由のため別途. |
+| Lem 4.5 (P/N elementary abelian iff Φ ⊆ N) | docstring | mathlib `Subgroup.frattini` 経由保留. 必要 helper: "max subgroup of p-group has prime index p" (mathlib 未, ~50 LOC). 下流引用: Lem 4.4 "thus Φ ⊆ Z(P)" 帰結のみ (FT 経路無し). |
 | **Lem 4.6** ⭐ (G' = ⁅A, ⊤⁆) | ✅ (2026-05-23) | `commutator_eq_commutator_of_normal_abelian_cyclic_quotient`. mathlib `commutative_of_cyclic_center_quotient` 経由 5-step proof: ⁅A,⊤⁆ ≤ A, lift Q→G/A, ker ⊆ Z(Q) (∵ ⁅a,g⁆∈⁅A,⊤⁆), Q abelian, commutator G ⊆ ⁅A,⊤⁆. Lem 4.6 後半 G' ≅ A/(A∩Z(G)) は別途. |
-| Thm 4.7 (maximal class) | docstring | Lem 4.6 経由予定. |
-| Thm 4.8 (p>2 class≤2 ⇒ {x^p=1} 群) | docstring | Baer trick (4.37) 前身. |
+| Thm 4.7 (maximal class) | docstring | Lem 4.6 後半 (cardinality / isomorphism) + Thm 1.19 (P' ∩ Z(P) 非自明) 経由. ~150-200 LOC. Ch.10 で 2 引用. |
+| **Thm 4.8(a)(b)** ⭐ (p>2 class≤2) | ✅ (2026-05-23) | (a) `setOfPowEqOne hC hp : Subgroup G` — `{x : G | x^p = 1}` が部分群 (`p` odd + class ≤ 2). (b) `powPHom hC hp hcomp : G →* G` — `x ↦ x^p` is hom (全交換子 `p`乗 = 1 の仮定下). 核補題 `mul_pow_of_class_le_two`: **commutator collection formula** `(xy)^n = x^n · y^n · ⁅y, x⁆^(n(n-1)/2)`. ~160 LOC (formula 90 + (a) 30 + (b) 25 + helpers). 鍵: `y · x = x · y · ⁅y, x⁆` (`mul_comm_commutator_of_class_le_two`), `y^k · x = x · y^k · ⁅y, x⁆^k` (`pow_mul_eq_mul_pow_commutator_pow_of_class_le_two`). Ch.10 で 2 引用; Baer trick (Lem 4.37) の前身. |
 | **Cor 4.10** (Three-sub mod N) | ✅ | `commutator_commutator_le_of_rotate`. 商写像 G→G/N で push し mathlib `commutator_commutator_eq_bot_of_rotate` 適用. |
 | **Thm 4.11** ⭐ (lcs additivity) | ✅ (2026-05-23) | `commutator_lowerCentralSeries_le`: `⁅lcs i, lcs j⁆ ≤ lcs (i+j+1)`. `j`-induction (`i` free), step は Cor 4.10 を `H₁=lcs j, H₂=⊤, H₃=lcs i, N=lcs (i+j+2)` で適用. h1: `⁅⊤, lcs i⁆ = lcs (i+1)` 経由で IH at `(i+1)`. h2: IH + commutator_mono + lcs_succ 定義. mathlib `Characteristic (lcs n)` instance が `[N.Normal]` を自動提供. ~30 LOC. |
 | **Cor 4.12** (weight n commutator ⊆ G^n) | ✅ (2026-05-23) | `iterLeftCommutator g [g₁,...,gₙ] ∈ lcs G n`. `iterLeftCommutator` を `List.foldl ⁅·, ·⁆` で定義し, 汎用補題 `iterLeftCommutator_mem_lowerCentralSeries_add (n acc) (hacc : acc ∈ lcs n) (gs)` を gs-induction で証明: step は `⁅acc, g⁆ ∈ ⁅lcs n, ⊤⁆ = lcs (n+1)` (mathlib `commutator_mem_commutator` + `lowerCentralSeries` 定義式). 主結果は `n = 0, acc ∈ ⊤ = lcs 0` で specialize. |
 | **Cor 4.13** (derived ⊆ lcs exponential) | ✅ (2026-05-23) | `derivedSeries_le_lowerCentralSeries_two_pow_sub_one`: `derivedSeries G r ≤ lcs G (2^r - 1)`. mathlib 既存 `derived_le_lower_central` (`derived r ≤ lcs r`) より strictly stronger (r ≥ 2 で lcs antitone). 証明: `r`-induction + `derivedSeries_succ` + commutator_mono + **Thm 4.11** + 算術 (`pow_succ` + omega + `Nat.one_le_two_pow`). ~10 LOC. |
+
+§4A **大部分完成** (Lem 4.1, 4.3, 4.4, 4.6 前半, **Thm 4.8(a)(b) + collection formula**). 残: Lem 4.5 (Frattini 経由), Lem 4.6 後半 (G' ≅ A/(A∩Z) 同型) → Thm 4.7 (maximal class p-群構造).
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
