@@ -214,6 +214,9 @@ Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着�
 - §3E coprime action 主要結果 (Thm 3.23, Lem 3.24 Glauberman, Thm 3.26-3.34 等):
   Ch.4 §4C-§4D coprime action machinery 依存.
   `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` placeholder.
+  **2026-05-24 進捗**: Tier 1 着手. **Glauberman 3.24(a) 完成 sorry-free** ⭐
+  (`glauberman_fixed_point_exists` ~120 LOC). 基盤 `IsCompatibleMulAction` +
+  SDP 作用構築. 残: 3.24(b), 3.23(a/b), 3.25, 3.27, 3.28, 3.29, 3.30.
 
 ## mmd 抽出失敗の整理
 
