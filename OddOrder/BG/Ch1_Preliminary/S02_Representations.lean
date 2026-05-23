@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
 import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
 /-!
 # BG §2: General Results on Representations
@@ -453,8 +454,45 @@ theorem odd_two_dim_sylow_abelian
     IsMulCommutative P ∧ commutator G ≤ (P : Subgroup G)
 ```
 
-(stub 未配置: 依存 `PGroupFixedVector` shared module +
-MISSING_PAGE:29 補完後.)
+**Lean stubs** (2026-05-24): `PGroupFixedVector` shared module skeleton 完成
+([OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean]
+(../../GroupTheory/RepresentationTheory/PGroupFixedVector.lean), stub),
+よって本節 Thm 2.6 (a)(b) の Lean signature を確定 + sorry 付き stub
+を配置. 残: (i) `PGroupFixedVector.invariants_ne_bot` の proof, (ii)
+帰納 + GL(2,F) 計算 + MISSING_PAGE:29 補完, (iii) `hchar` 引数の
+mathlib との型整合 (`CharP F p` vs `(ringChar F).Prime`) 確認.
 -/
+
+/-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
+faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
+
+stub: 詳細 proof は §2F section docstring の "證明梗概" 参照. -/
+theorem odd_two_dim_abelian
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (_hodd : Odd (Nat.card G))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (_hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (_hfaithful : Function.Injective ρ)
+    (_hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
+    Std.Commutative (· * · : G → G → G) := by
+  sorry
+
+/-- **BG Theorem 2.6 (b)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
+faithful 表現を持ち, char `F = p` が `|G|` を割るなら, `G` の `p`-Sylow
+は abelian かつ `G'` を含む.
+
+stub: 詳細 proof は §2F section docstring の "證明梗概" + Case q = p
+(BG L785-787) 参照. -/
+theorem odd_two_dim_sylow_abelian
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (_hodd : Odd (Nat.card G))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (_hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (_hfaithful : Function.Injective ρ)
+    {p : ℕ} [Fact p.Prime] (_hp_dvd : p ∣ Nat.card G)
+    (_hchar : CharP F p) (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  sorry
 
 end OddOrder.BG.Ch1.S02
