@@ -183,6 +183,50 @@ theorem subgroupOf_sup_card_eq_and_pGroup
   · exact hT.of_injective (Subgroup.subgroupOfEquivOfLe (le_sup_left : T ≤ T ⊔ M)).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe (le_sup_left : T ≤ T ⊔ M)).injective
 
+/-- **Helper for Lem 1.14** (Step 3 part 2, Sylow 性): T p-group + M ⊴ G p'-subgroup ⇒
+任意の `Q ≤ ↥(T ⊔ M)` で `T.subgroupOf (T ⊔ M) ≤ Q` かつ `Q` p-group ⇒
+`Q = T.subgroupOf (T ⊔ M)`. つまり T は T ⊔ M の Sylow p (maximal p-subgroup).
+
+証明: |Q| = p^j (Q p-group) ∣ |T ⊔ M| = |T| · |M| = p^k · |M| with (|M|, p) = 1.
+`(p^j, |M|) = 1` ⇒ `p^j ∣ p^k = |T|`. `T.subgroupOf ≤ Q` ⇒ `|T| ≤ |Q|`. 両方合わせて
+`|Q| = |T| = |T.subgroupOf|`. `Subgroup.eq_of_le_of_card_ge` で等号. -/
+theorem subgroupOf_sup_eq_of_pGroup_le_of_coprime
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    {M : Subgroup G} [hM_norm : M.Normal] (hM_p' : (Nat.card M).Coprime p)
+    {Q : Subgroup ↥(T ⊔ M : Subgroup G)} (hQ_pgroup : IsPGroup p Q)
+    (hT_sub_Q : T.subgroupOf (T ⊔ M) ≤ Q) :
+    Q = T.subgroupOf (T ⊔ M) := by
+  -- |T.subgroupOf (T ⊔ M)| = |T|
+  obtain ⟨hT'_card, _⟩ := subgroupOf_sup_card_eq_and_pGroup hT M
+  -- T ⊓ M = ⊥, |T ⊔ M| = |T| · |M|
+  have h_disj : T ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hT hM_p'
+  have h_card_sup : Nat.card (T ⊔ M : Subgroup G) = Nat.card T * Nat.card M :=
+    card_sup_eq_card_mul_card_of_disjoint_normal h_disj
+  -- |T| = p^k, |Q| = p^j
+  obtain ⟨k, hk⟩ := hT.exists_card_eq
+  obtain ⟨j, hj⟩ := hQ_pgroup.exists_card_eq
+  -- |Q| ∣ |↥(T ⊔ M)| = |T| · |M|
+  have hQ_dvd_sup : Nat.card Q ∣ Nat.card ↥(T ⊔ M : Subgroup G) :=
+    Subgroup.card_subgroup_dvd_card Q
+  rw [h_card_sup, hk, hj] at hQ_dvd_sup
+  -- (p^j, |M|) = 1 ⇒ p^j ∣ p^k
+  have hp_pow_cop : (p ^ j).Coprime (Nat.card M) := (hM_p'.symm).pow_left j
+  have hpj_dvd_pk : p ^ j ∣ p ^ k :=
+    Nat.Coprime.dvd_of_dvd_mul_right hp_pow_cop hQ_dvd_sup
+  -- |T.subgroupOf| ≤ |Q| (from inclusion)
+  have hcard_le : Nat.card (T.subgroupOf (T ⊔ M)) ≤ Nat.card Q :=
+    Subgroup.card_le_of_le hT_sub_Q
+  rw [hT'_card, hk, hj] at hcard_le
+  -- p^j ≤ p^k and p^j ∣ p^k ⇒ j ≤ k and j ≥ k via card ⇒ k = j
+  have hk_le_j : k ≤ j := (Nat.pow_le_pow_iff_right (Fact.out : p.Prime).one_lt).mp hcard_le
+  have hj_le_k : j ≤ k := (Nat.pow_dvd_pow_iff_le_right (Fact.out : p.Prime).one_lt).mp hpj_dvd_pk
+  have hjk : j = k := le_antisymm hj_le_k hk_le_j
+  -- Equal cardinality ⇒ Q = T.subgroupOf
+  symm
+  apply Subgroup.eq_of_le_of_card_ge hT_sub_Q
+  rw [hT'_card, hk, hj, hjk]
+
 /-- **BG Lemma 1.14 (易 direction, sorry-free)**: `N_G(T)·M ≤ N_G(T·M)`.
 
 - `T.normalizer ≤ (T ⊔ M).normalizer`: x normalizes T ⇒ x normalizes M (M ⊴ G) ⇒ x
