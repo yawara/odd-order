@@ -952,17 +952,8 @@ theorem hasNormalPComplement_iff_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.
     HasNormalPComplement p G ↔ P.ControlsOwnFusion :=
   ⟨controlsOwnFusion_of_hasNormalPComplement P, hasNormalPComplement_of_controlsOwnFusion P⟩
 
-/-! **Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**:
-`G` は normal p-complement を持つ ⇔ 任意の p-subgroup `X` で `N_G(X)/C_G(X)` が p-group.
-
-3 同値条件のうち本 statement は (1) ⇔ (3). 5.25 経由で (1) ⇔ (2) (全 p-local 部分群
-が normal p-comp) も導出.
-
-**証明骨子** (Isaacs p.174-177):
-- (1) ⇒ (2) ⇒ (3): **Lem 5.27** (本ファイル下記). 易方向.
-- (3) ⇒ (1): **Lem 5.28** (Sylow conjugacy via centralizer) + 5.25.
-
-形式化保留. -/
+/-! **Isaacs Thm 5.26 Frobenius normal p-complement** (forward declaration; theorem 化は下記)
+は (1) ⇔ (3) で記述. 詳細は Lem 5.27, Lem 5.28 完成後の theorem 化を参照. -/
 
 /-- **Isaacs Lem 5.27 part 1 (1 ⇒ 2, strong form)**: G が normal p-complement を持つなら,
 任意の subgroup `H ≤ G` も normal p-complement を持つ.
@@ -1474,6 +1465,33 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         rw [show ((yC : G)⁻¹ • (yC : G) • R : Sylow p G) = R from by
           rw [← mul_smul, inv_mul_cancel, one_smul]]
         exact hxR
+
+/-- **Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**.
+`G` has normal p-complement ⇔ ∀ p-subgroup `X`, `N_G(X)/C_G(X)` is p-group.
+
+**証明** (Isaacs p.175-177):
+* (1) ⇒ (3): `hasNormalPComplement_of_subgroup` (Lem 5.27 Part 1) で
+  ∀ p-subgroup X non-trivial, `normalizer X` も normal p-comp を持つ.
+  `isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`
+  (Lem 5.27 Part 2) で結論. ✅
+* (3) ⇒ (1): 任意 Sylow `P` で `P.ControlsOwnFusion` を示し (Lem 5.28 経由),
+  `hasNormalPComplement_of_controlsOwnFusion` (Thm 5.25 ⇐) で normal p-comp.
+  **Thm 5.25 (⇐) sorry のため (3⇒1) 方向は sorry**. -/
+theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
+    [Finite G] {p : ℕ} [Fact p.Prime] :
+    HasNormalPComplement p G ↔
+    ∀ X : Subgroup G, IsPGroup p X →
+      IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+        (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))) := by
+  refine ⟨fun hG X hXp => ?_, fun hH => ?_⟩
+  · -- (1) ⇒ (3): via Lem 5.27 Part 1 + Part 2 (both sorry-free)
+    exact isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
+      (fun Y _hY_ne _hY_pg => hasNormalPComplement_of_subgroup hG
+        (Subgroup.normalizer (Y : Set G)))
+      X hXp
+  · -- (3) ⇒ (1): Pick Sylow P, show P.ControlsOwnFusion via Lem 5.28,
+    -- then apply Thm 5.25 (⇐). Currently blocked on 5.25 (⇐) sorry.
+    sorry
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
