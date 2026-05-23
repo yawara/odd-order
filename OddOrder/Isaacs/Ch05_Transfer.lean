@@ -1143,9 +1143,28 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
     · refine ⟨1, Subgroup.one_mem _, ?_⟩
       rw [hPQ, one_smul]
     -- **Case 2**: P ≠ Q. Apply textbook argument.
-    · -- 詳細実装は別 session. 戦略:
-      --   D := P ⊓ Q. P ≠ Q + Sylow card equality ⇒ D < P, D < Q.
-      --   N := normalizer D, C := centralizer D. hH で N/(C.subgroupOf N) は p-group.
+    · -- D := P ⊓ Q. P ≠ Q + Sylow card equality ⇒ D < P, D < Q.
+      set D : Subgroup G := (P : Subgroup G) ⊓ (Q : Subgroup G) with hD_def
+      have hPQ_card_eq : Nat.card ↥(P : Subgroup G) = Nat.card ↥(Q : Subgroup G) := by
+        rw [P.card_eq_multiplicity, Q.card_eq_multiplicity]
+      have hD_lt_P : D < (P : Subgroup G) := by
+        refine lt_of_le_of_ne inf_le_left ?_
+        intro h_eq
+        have hP_le_Q : (P : Subgroup G) ≤ (Q : Subgroup G) := h_eq ▸ inf_le_right
+        have h_subgroup_eq : (P : Subgroup G) = (Q : Subgroup G) :=
+          Subgroup.eq_of_le_of_card_ge hP_le_Q hPQ_card_eq.symm.le
+        exact hPQ (Sylow.ext h_subgroup_eq)
+      have hD_lt_Q : D < (Q : Subgroup G) := by
+        refine lt_of_le_of_ne inf_le_right ?_
+        intro h_eq
+        have hQ_le_P : (Q : Subgroup G) ≤ (P : Subgroup G) := h_eq ▸ inf_le_left
+        have h_subgroup_eq : (P : Subgroup G) = (Q : Subgroup G) :=
+          (Subgroup.eq_of_le_of_card_ge hQ_le_P hPQ_card_eq.le).symm
+        exact hPQ (Sylow.ext h_subgroup_eq)
+      -- N := normalizer D, C := centralizer D
+      -- 残りの実装 (~200 LOC) は別 session.
+      -- 戦略:
+      --   hH で `N/(C.subgroupOf N)` は p-group.
       --   `lt_normalizer_of_pgroup_of_lt_top` を ↥P に適用: D.subgroupOf P < normalizer ⇒
       --     P ⊓ normalizer D > D (via subgroupOf_normalizer_eq).
       --   `IsPGroup.exists_le_sylow` で S, T : Sylow p ↥N containing P ⊓ N, Q ⊓ N.
