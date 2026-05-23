@@ -85,31 +85,7 @@ open OddOrder.Isaacs.Ch01
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
 
-/-- **BG Lemma 1.14 (heart, normalizer-in-G form)**: `T` p-subgroup of `G`, `M ⊴ G` p'-subgroup
-(`gcd(|M|, p) = 1` を採用) ⇒ `N_G(T·M) = N_G(T)·M`.
-
-In quotient form: with `f = QuotientGroup.mk' M`,
-- `(N_{G/M}(T·M/M)).comap f = N_G(T·M)` (mathlib `comap_normalizer_eq_of_surjective`)
-- `N_G(T·M) = N_G(T)·M` (this lemma)
-
-**Proof** (BG p.5, 主要部 = hard direction):
-- 易: `M ≤ T·M ≤ N_G(T·M)` (subgroup self-normalization) + `N_G(T) ≤ N_G(T·M)` (M normal
-  ⇒ conjugation fixes M, T conjugation fixes T, so T·M fixed).
-- 難: `x ∈ N_G(T·M)` ⇒ `xTx⁻¹ ⊆ T·M`. `T ∩ M = ⊥` (coprime orders) ⇒ `|T·M| = |T|·|M|`,
-  `|T|` は `|T·M|` の p-part ⇒ `T` Sylow `p` of `T·M`. 同様に `xTx⁻¹` Sylow `p` of `T·M`.
-  Sylow II in T·M: `∃ y ∈ T·M, xTx⁻¹ = yTy⁻¹`. `y = m·t` (`m ∈ M`, `t ∈ T`, possible
-  since `M·T = T·M` for M normal) ⇒ `xTx⁻¹ = m·T·m⁻¹` ⇒ `m⁻¹x ∈ N_G(T)` ⇒
-  `x ∈ M·N_G(T) = N_G(T)·M`.
-
-**実装状態**: hard direction proof sorry. helpers: `inf_eq_bot_of_pGroup_coprime`
-(disjoint from coprime orders) は sorry-free 完成. proof body は Sylow II in T·M 等で
-~80 LOC 規模, 次 commit で完成予定. -/
-theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
-    {T : Subgroup G} (_hT : IsPGroup p T)
-    {M : Subgroup G} [_hM_norm : M.Normal] (_hM_p' : (Nat.card M).Coprime p) :
-    Subgroup.normalizer (T ⊔ M : Subgroup G) = Subgroup.normalizer T ⊔ M := by
-  sorry
+/-! ### Lem 1.14 helpers (Step 1-3 sorry-free, main statement 下方) -/
 
 /-- **Helper for Lem 1.14**: T p-group + M p'-group ⇒ `T ⊓ M = ⊥`.
 
@@ -237,6 +213,40 @@ theorem le_normalizer_sup_of_normal
     Subgroup.normalizer T ⊔ M ≤ Subgroup.normalizer (T ⊔ M : Subgroup G) :=
   sup_le Subgroup.normalizer_le_normalizer_sup_normal
     (le_sup_right.trans Subgroup.le_normalizer)
+
+/-- **BG Lemma 1.14 (heart, normalizer-in-G form)**: `T` p-subgroup of `G`, `M ⊴ G` p'-subgroup
+(`gcd(|M|, p) = 1` を採用) ⇒ `N_G(T·M) = N_G(T)·M`.
+
+In quotient form: with `f = QuotientGroup.mk' M`,
+- `(N_{G/M}(T·M/M)).comap f = N_G(T·M)` (mathlib `comap_normalizer_eq_of_surjective`)
+- `N_G(T·M) = N_G(T)·M` (this lemma)
+
+**Proof** (BG p.5, 主要部 = hard direction):
+- 易: `M ≤ T·M ≤ N_G(T·M)` (subgroup self-normalization) + `N_G(T) ≤ N_G(T·M)` (M normal
+  ⇒ conjugation fixes M, T conjugation fixes T, so T·M fixed).
+- 難: `x ∈ N_G(T·M)` ⇒ `xTx⁻¹ ⊆ T·M`. `T ∩ M = ⊥` (coprime orders) ⇒ `|T·M| = |T|·|M|`,
+  `|T|` は `|T·M|` の p-part ⇒ `T` Sylow `p` of `T·M`. 同様に `xTx⁻¹` Sylow `p` of `T·M`.
+  Sylow II in T·M: `∃ y ∈ T·M, xTx⁻¹ = yTy⁻¹`. `y = m·t` (`m ∈ M`, `t ∈ T`, possible
+  since `M·T = T·M` for M normal) ⇒ `xTx⁻¹ = m·T·m⁻¹` ⇒ `m⁻¹x ∈ N_G(T)` ⇒
+  `x ∈ M·N_G(T) = N_G(T)·M`.
+
+**実装状態**: hard direction proof sorry. helpers (本ファイル上方) は sorry-free 完成,
+TSyl Sylow object も上の helpers から構築可能. Step 4-5 (Sylow II + Frattini + element
+decomp + assembly) は次セッション. -/
+theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    {M : Subgroup G} [hM_norm : M.Normal] (hM_p' : (Nat.card M).Coprime p) :
+    Subgroup.normalizer (T ⊔ M : Subgroup G) = Subgroup.normalizer T ⊔ M := by
+  apply le_antisymm _ (le_normalizer_sup_of_normal T M)
+  intro x hx
+  -- Sylow object construction: T.subgroupOf (T ⊔ M) は ↥(T ⊔ M) の Sylow p
+  let _TSyl : Sylow p ↥(T ⊔ M : Subgroup G) :=
+    ⟨T.subgroupOf (T ⊔ M),
+     (subgroupOf_sup_card_eq_and_pGroup hT M).2,
+     fun {Q} hQ hle => subgroupOf_sup_eq_of_pGroup_le_of_coprime hT hM_p' hQ hle⟩
+  -- Step 4-5: Sylow II + element decomposition (次セッション, ~55 LOC)
+  sorry
 
 /-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3", thin wrap)**: `G` 有限可解 +
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
