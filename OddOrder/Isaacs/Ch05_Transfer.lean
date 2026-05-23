@@ -844,23 +844,138 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 
 /-! ### Isaacs §5E (Frobenius normal p-complement)
 
-**FT クリティカル**. mathlib 未収載で新規実装が必要. -/
+**FT クリティカル**. mathlib 未収載で新規実装が必要.
 
-/-! **Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**.
+- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 形式化保留.
+- **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
+- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ Part 1 (`hasNormalPComplement_of_subgroup`).
+  Part 2 (`isPGroup_normalizer_quotient_centralizer`) は保留.
+- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): 形式化保留 (5.26 鍵).
+- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
+- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
+
+/-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
+that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
+
+For finite `G`, this is equivalent to existence of normal `N` with `|N|` coprime to `p`
+and `|G:N|` a `p`-power. mathlib 未収載のため新規定義. -/
+def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
+  ∃ N : Subgroup G, N.Normal ∧
+    ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
+
+/-! **Isaacs Thm 5.25** (Sylow controls own G-fusion ⇔ normal p-complement):
+形式化保留. Focal Subgroup Theorem (5.21) + Sylow conjugacy.
+
+**Isaacs Thm 5.26 Frobenius normal p-complement** ⭐ **FT クリティカル**:
 `G` は normal p-complement を持つ ⇔ 任意の p-subgroup `X` で `N_G(X)/C_G(X)` が p-group.
 
 3 同値条件のうち本 statement は (1) ⇔ (3). 5.25 経由で (1) ⇔ (2) (全 p-local 部分群
-が normal p-comp) も導出. mathlib 未収載 ~200 LOC 推定.
+が normal p-comp) も導出.
 
 **証明骨子** (Isaacs p.174-177):
-- (1) ⇒ (3): normal p-complement N ⇒ G = N · P (P Sylow_p). 任意 p-subgroup X ⊆ P^g
-  に対し N_G(X) = N_N(X) · N_P^g(X) で N/C 部分は p-group のみ.
-- (3) ⇒ (1): 5.28 lemma で C_G(P∩Q) 内で P, Q ∈ Syl_p 共役 ⇒ 自分自身の fusion 制御 ⇒
-  Thm 5.25 で normal p-complement.
+- (1) ⇒ (2) ⇒ (3): **Lem 5.27** (本ファイル下記). 易方向.
+- (3) ⇒ (1): **Lem 5.28** (Sylow conjugacy via centralizer) + 5.25.
 
-statement 形式化保留 (mathlib `Subgroup.normalizerMonoidHom : N(X) →* MulAut X` 経由
-で `image` を p-group とする, あるいは centralizer の subgroupOf normalizer 商を取る
-形が考えられる). -/
+形式化保留. -/
+
+/-- **Isaacs Lem 5.27 part 1 (1 ⇒ 2, strong form)**: G が normal p-complement を持つなら,
+任意の subgroup `H ≤ G` も normal p-complement を持つ.
+
+`H` の p-complement は `N.subgroupOf H = N ⊓ H` viewed inside `H` (witness).
+
+**証明** (Isaacs p.174): `N` は `G` で normal なので `N.subgroupOf H` は `H` で normal
+(`Normal.subgroupOf`). Cardinality:
+
+* 任意 Sylow `P₀ : Sylow p G` で `IsComplement' N P₀` ⇒ `N.index = |P₀| = p^v_p(|G|)`,
+  `|N|` coprime to `p` (Sylow `not_dvd_index` + `IsComplement'.index_eq_card`).
+* `(N.subgroupOf H).index ∣ N.index` (`relIndex_dvd_index_of_normal`) ⇒ p-power.
+* `|N.subgroupOf H| = |M.map H.subtype| = |N ⊓ H| ∣ |N|` ⇒ coprime to `p`.
+* 任意 Sylow `Q : Sylow p ↥H` で `|Q| = p^v_p(|H|)` (`Sylow.card_eq_multiplicity`).
+* Lagrange + `Nat.factorization_mul` で `v_p(|H|) = a` (M.index = p^a の指数).
+  ⇒ `|Q| = p^a = M.index`, よって `|N.subgroupOf H| * |Q| = |H|` + Coprime.
+* `Subgroup.isComplement'_of_coprime` 適用. -/
+theorem hasNormalPComplement_of_subgroup [Finite G] {p : ℕ} [Fact p.Prime]
+    (hG : HasNormalPComplement p G) (H : Subgroup G) :
+    HasNormalPComplement p ↥H := by
+  obtain ⟨N, hN_normal, hN_compl⟩ := hG
+  haveI : N.Normal := hN_normal
+  refine ⟨N.subgroupOf H, hN_normal.subgroupOf H, fun Q => ?_⟩
+  set M : Subgroup ↥H := N.subgroupOf H with hM_def
+  -- Get any Sylow P₀ in G
+  obtain ⟨P₀⟩ := (inferInstance : Nonempty (Sylow p G))
+  -- |P₀| = p^v_p(|G|)
+  have hP₀_card : Nat.card ↥(P₀ : Subgroup G) = p ^ (Nat.card G).factorization p :=
+    P₀.card_eq_multiplicity
+  -- N.index = |P₀|
+  have hN_idx_eq_P₀ : N.index = Nat.card ↥(P₀ : Subgroup G) :=
+    (hN_compl P₀).symm.index_eq_card
+  -- ¬ p ∣ |N|
+  have h_p_ndvd_N : ¬ p ∣ Nat.card ↥N := by
+    rw [← (hN_compl P₀).index_eq_card]; exact P₀.not_dvd_index
+  -- |M| ∣ |N|: M ≃ N ⊓ H ≤ N via H.subtype
+  have hM_card_dvd_N : Nat.card ↥M ∣ Nat.card ↥N := by
+    have h_inj : Function.Injective (H.subtype : ↥H → G) := Subtype.coe_injective
+    have h_card_eq : Nat.card ↥M = Nat.card ↥(M.map H.subtype) :=
+      Nat.card_congr (Subgroup.equivMapOfInjective M H.subtype h_inj).toEquiv
+    rw [h_card_eq, Subgroup.subgroupOf_map_subtype]
+    exact Subgroup.card_dvd_of_le inf_le_left
+  -- ¬ p ∣ |M|
+  have h_p_ndvd_M : ¬ p ∣ Nat.card ↥M := fun h => h_p_ndvd_N (h.trans hM_card_dvd_N)
+  -- M.index ∣ N.index (relIndex_dvd_index_of_normal)
+  have hM_idx_dvd_Nidx : M.index ∣ N.index :=
+    Subgroup.relIndex_dvd_index_of_normal N H
+  -- M.index = p^a for some a ≤ v_p(|G|)
+  obtain ⟨a, _, hM_idx_pow⟩ : ∃ a ≤ (Nat.card G).factorization p, M.index = p ^ a :=
+    (Nat.dvd_prime_pow Fact.out).mp ((hN_idx_eq_P₀.trans hP₀_card) ▸ hM_idx_dvd_Nidx)
+  -- |Q| = p^v_p(|H|)
+  have hQ_card : Nat.card ↥(Q : Subgroup ↥H) = p ^ (Nat.card ↥H).factorization p :=
+    Q.card_eq_multiplicity
+  -- |H| = |M| * M.index (Lagrange)
+  have hL_M : Nat.card ↥M * M.index = Nat.card ↥H := by
+    rw [mul_comm]; exact M.index_mul_card
+  -- v_p(|H|) = a (from |M| * p^a = |H|, |M| coprime to p ⇒ v_p(|M|) = 0)
+  have h_va : (Nat.card ↥H).factorization p = a := by
+    have h_card_eq : Nat.card ↥M * p ^ a = Nat.card ↥H := by
+      rw [← hM_idx_pow]; exact hL_M
+    have hp_pos : 0 < p := (Fact.out (p := p.Prime)).pos
+    have hM_ne : Nat.card ↥M ≠ 0 := Nat.card_pos.ne'
+    have hpa_ne : p ^ a ≠ 0 := pow_ne_zero a hp_pos.ne'
+    rw [← h_card_eq, Nat.factorization_mul hM_ne hpa_ne, Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd h_p_ndvd_M,
+        Nat.factorization_pow_self Fact.out, zero_add]
+  -- |Q| = M.index
+  have hQ_card_eq : Nat.card ↥(Q : Subgroup ↥H) = M.index := by
+    rw [hQ_card, h_va, ← hM_idx_pow]
+  -- |M| * |Q| = |H|
+  have h_mul_eq : Nat.card ↥M * Nat.card ↥(Q : Subgroup ↥H) = Nat.card ↥H := by
+    rw [hQ_card_eq]; exact hL_M
+  -- Coprime |M| |Q|: |M| coprime to p ⇒ Coprime |M| p ⇒ Coprime |M| p^a
+  have h_coprime : Nat.Coprime (Nat.card ↥M) (Nat.card ↥(Q : Subgroup ↥H)) := by
+    rw [hQ_card, h_va]
+    exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_M).symm).pow_right a
+  exact Subgroup.isComplement'_of_coprime h_mul_eq h_coprime
+
+/-! **Isaacs Lem 5.27 part 2 (2 ⇒ 3)** — placeholder.
+
+形式化保留. 必要なステップ (Isaacs p.174 の trivial direction):
+* 仮定: ∀ 非自明 p-subgroup `X`, `N_G(X)` が normal p-complement `K'` を持つ.
+* `X ≠ ⊥` の場合: `K' ⊓ X.subgroupOf N_G(X) = ⊥` (|K'| p', |X| p-power) かつ両者
+  N_G(X) で normal ⇒ `[K', X.subgroupOf] ⊆ ⊥` (Three-Subgroup 系の commutator) ⇒
+  `K' ≤ (centralizer X).subgroupOf N_G(X)` (`commutator_eq_bot_iff_le_centralizer`).
+  N_G(X)/K' は p-power ⇒ 商の商 N_G(X)/centralizer も p-power.
+* `X = ⊥`: `normalizer ⊥ = ⊤`, `centralizer (⊥ : Set G) = ⊤`, quotient trivial.
+
+statement 例:
+```lean
+theorem isPGroup_normalizer_quotient_centralizer
+    (h : ∀ X : Subgroup G, X ≠ ⊥ → IsPGroup p X →
+        HasNormalPComplement p ↥(Subgroup.normalizer X))
+    (X : Subgroup G) (hXp : IsPGroup p X) :
+    IsPGroup p (↥(Subgroup.normalizer X) ⧸
+      (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer X))
+```
+-/
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
@@ -874,17 +989,8 @@ order-p 元は中心で A 不変, 中心で固定 ⇒ Thm 4.36 適用条件成�
 theorem normal_p_complement_of_order_p_central_odd
     [Finite G] {p : ℕ} [Fact p.Prime] (_hp_odd : p ≠ 2)
     (_hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
-    ∃ N : Subgroup G, N.Normal ∧
-      ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G) := by
+    HasNormalPComplement p G := by
   sorry
-
-/-! **Isaacs Thm 5.25** (Sylow controls own G-fusion ⇔ normal p-complement):
-形式化保留. Focal Subgroup Theorem (5.21) + Sylow conjugacy.
-
-**Lemma 5.27, 5.28** (5.26 の補題): 5.26 実装時に同時実装.
-
-**Cor 5.29** (|G| = p^a m, q ∤ p^e-1 ⇒ normal p-complement): 5.26 + p-group action 計算.
-形式化保留. -/
 
 end -- 5E
 
