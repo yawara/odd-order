@@ -213,14 +213,19 @@ Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着�
 - Thm 3.17 (3 subgroups pairwise coprime ⇒ solvable): 同上.
 - §3E coprime action 主要結果 (Thm 3.23, Lem 3.24 Glauberman, Thm 3.26-3.34 等):
   Ch.4 §4C-§4D coprime action machinery 依存.
-  `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` placeholder.
-  **2026-05-24 進捗**: Tier 1 着手. **Glauberman 3.24(a) 完成 sorry-free** ⭐
-  AxiomsCheck flagship 入り (`glauberman_fixed_point_exists` ~120 LOC).
-  基盤 `IsCompatibleMulAction` + SDP 作用構築 (`SemidirectProduct.lift` 経由).
-  7 ステップ証明: U⊔inlG=⊤ (G transitive) → relIndex 計算 (second iso) →
-  SZ existence in U → H is Γ-complement of inlG → inrA も complement →
-  SZ conjugacy → algebraic 計算で g⁻¹•α₀ が A-fixed.
-  残 7 sorry-stubs: 3.24(b), 3.23(a/b), 3.25, 3.27, 3.28, 3.29, 3.30 (全 statement 確定).
+  `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` で実装中.
+  **2026-05-24 進捗**: Tier 1 大幅前進. 5 主要定理 sorry-free 完成 ⭐⭐:
+  | Isaacs # | Lean 名 | 状態 |
+  |---|---|---|
+  | Lem 3.24(a) Glauberman | `glauberman_fixed_point_exists` | ✅ flagship |
+  | Thm 3.23(a) A-inv Sylow | `exists_aInvariant_sylow` | ✅ flagship |
+  | Thm 3.27 A-inv coset | `aInvariant_coset_mem_centralizer` | ✅ flagship |
+  | Cor 3.28 商の固定点 (transitive blocker) | `coprime_fixedPoints_quotient` | ✅ flagship ⭐⭐⭐ |
+  | Cor 3.29 A trivial on G/Φ | `aFixed_quotient_frattini` | ✅ flagship |
+
+  残 4 sorry-stubs: 3.24(b), 3.23(b), 3.25, 3.30 (全 statement 確定).
+  これで Ch.4 多数定理 (4.26, 4.28-30, 4.34-36, 4.38) の transitive 前提
+  (Cor 3.28) が解除. Ch.4 §4C-§4D 本格着手可能.
 
 ## mmd 抽出失敗の整理
 
