@@ -76,7 +76,7 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
 |---|---|---|
 | Prop 2.2 | **Isaacs Ch.6 §6F Clifford** | ❌ Ch.6 §6A 部分のみ |
 | Thm 2.5 | Isaacs Thm 5.5.4-5 (extraspecial repr) | 対応 Ch.6 §6E? 未 |
-| Thm 2.6 | Gorenstein Lem 2.6.3 (p-group fixed vec) | partial (shared module 要) |
+| Thm 2.6 | G Lem 2.6.3 (Isaacs FGT 不在) | `PGroupFixedVector.lean` 新規 + `Maschke` |
 | Prop 2.1 (a)(b) | Jacobson Density | ✅ mathlib 既存 |
 | Prop 2.1 (c) | Wedderburn (`LittleWedderburn`) | ✅ mathlib 既存 |
 
@@ -96,12 +96,53 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
   5. Lem 2.3 Fong–Swan は forward use 0 ⇒ defer
   6. Prop 2.2 Clifford は **Isaacs Ch.6 §6F 完成待ち**
 
+## Gorenstein (G) ↔ Isaacs FGT / mathlib / shared module 読み替え
+
+CLAUDE.md L20 方針: BG が **G** として引く Gorenstein, *Finite Groups* (1968)
+の定理は Isaacs FGT (2008) に読み替えるが, **§2 は representation theory
+中心のため Isaacs FGT (群論本, character theory 章なし) に対応定理が
+ほとんど存在しない** (`Clifford` 0 hit in Isaacs mmd; Isaacs Ch.6 は
+Frobenius Actions であって Clifford 章ではない). したがって本節は
+**mathlib 既存 API + 新規 shared module で再構築する方針** を採用.
+詳細マップ: `notes/meta/phase2_cross_refs.md` §5 + 本ファイル下表.
+
+**BG §2 内 G 引用 → 代替経路**:
+
+- **G Thm 3.4.1** (Clifford theorem)
+  → Isaacs FGT **不在** (Ch.6 = Frobenius Actions ≠ Clifford 章);
+  新規 shared module `RepresentationTheory/Clifford.lean` (mathlib upstream candidate).
+- **G Thm 3.5.2** (Schur 補題)
+  → Isaacs FGT **不在**; mathlib `Representation.IsIrreducible` +
+  `algebraMap_intertwiningMap_bijective_of_isAlgClosed`.
+- **G Thm 3.5.7** (既約 ⟺ `Hom_{FG}(M,M) = F`, char 0/coprime case)
+  → Isaacs FGT **不在**; mathlib `Representation` + 新規
+  `RepresentationTheory/AbsolutelyIrreducible.lean`.
+- **G Thm 3.6.2** (Jacobson Density)
+  → Isaacs FGT **不在**; mathlib
+  `Module.Finite.toModuleEnd_moduleEnd_surjective` ✓.
+- **G Lem 2.6.3** (p-group on char-p F-vector ⇒ fixed vec ≠ 0)
+  → Isaacs FGT **不在**; mathlib `Representation.Coinvariants` partial
+  + 新規 `RepresentationTheory/PGroupFixedVector.lean`.
+- **G Thm 5.5.4-5.5.5** (faithful irreducible repr of extraspecial,
+  `dim = p^n`)
+  → Isaacs FGT **不在**; 新規 shared module (extraspecial faithful
+  irreducible repr の構造).
+- **G, Wedderburn** (finite division ring = field)
+  → Isaacs FGT **不在**; mathlib `LittleWedderburn` ✓.
+
+以下 §2A-§2F 内では `(BG 引用 G X.Y.Z; Isaacs FGT 不在 / mathlib `…`)`
+の短縮形で個別注記.
+
 ## References
 
 - BG mmd `references/bg/local-analysis.mmd` L586-794
 - 節ノート: `notes/bg/s02_representations.md`
 - Audit: `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`
-- BG "G" = Gorenstein, *Finite Groups* (1968) (Isaacs FGT に読み替え)
+- Cross-refs: `notes/meta/phase2_cross_refs.md` §5
+- Isaacs FGT 章一覧: 1 Sylow / 2 Subnormality / 3 Split Extensions /
+  4 Commutators / 5 Transfer / 6 Frobenius Actions / 7 Thompson Subgroup /
+  8 Permutation / 9 More Subnormality / 10 More Transfer
+  (= 群論本, character/representation theory 章なし)
 -/
 
 namespace OddOrder.BG.Ch1.S02
@@ -121,11 +162,17 @@ namespace OddOrder.BG.Ch1.S02
     `M` は absolutely irreducible `KG`-加群.
 
 **証明梗概** (BG L604-612):
-- (a): char F = 0 or coprime to |G| ⇒ Gorenstein Thm 3.5.7. 一般:
-  Jacobson Density (G Thm 3.6.2) or Curtis-Reiner Thm 29.13.
-- (b): Jacobson Density + `Hom_{FG}(M,M) = Hom_{E(G)}(M,M)`.
-- (c): Schur (G Thm 3.5.2) ⇒ K division algebra over F. F 有限 +
-  dim M 有限 ⇒ M, K 有限. Wedderburn (finite div ring is field)
+- (a): char F = 0 or coprime to |G| ⇒ BG が引く G Thm 3.5.7
+  (Isaacs FGT 不在; mathlib `Representation` + `AbsolutelyIrreducible.lean`
+  新規 で構築). 一般: Jacobson Density (G Thm 3.6.2 = mathlib
+  `Module.Finite.toModuleEnd_moduleEnd_surjective` ✓) or Curtis-Reiner
+  Thm 29.13.
+- (b): Jacobson Density (mathlib 既存) +
+  `Hom_{FG}(M,M) = Hom_{E(G)}(M,M)`.
+- (c): Schur 補題 (G Thm 3.5.2; Isaacs FGT 不在; mathlib
+  `Representation.IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed`)
+  ⇒ K division algebra over F. F 有限 + dim M 有限 ⇒ M, K 有限.
+  Wedderburn finite division ring = field (mathlib `LittleWedderburn`)
   ⇒ K field. (a) を K 上適用 ⇒ M abs. irreducible KG-module.
 
 **形式化方針**: `IsAbsolutelyIrreducible` / `EnvelopingAlgebra`
@@ -166,7 +213,10 @@ statement 確定.)
 (b) `H` 上 `M` の表現は `G` の表現に拡張可.
 
 **証明梗概** (BG L617-652):
-- (a): Clifford (G Thm 3.4.1) ⇒ `L_H = M_1 ⊕ ⋯ ⊕ M_k`
+- (a): Clifford theorem (G Thm 3.4.1; **Isaacs FGT 不在** —
+  Isaacs Ch.6 は Frobenius Actions であって Clifford 章ではない;
+  新規 shared module `RepresentationTheory/Clifford.lean` で構築)
+  ⇒ `L_H = M_1 ⊕ ⋯ ⊕ M_k`
   (各 `M_i ≅ M`). `G = ⟨H, x⟩` (`x` cyclic generator).
   `M ≅ M^{x^{-1}}` ⇒ `τ ∈ E(H) = Hom_F(M,M)` で
   `(mh)τ = (mτ)(xhx⁻¹)`. `τ` を `L` に延長 (各 `M_i` で同様),
@@ -302,8 +352,10 @@ of order `h`, `gcd(h, p) = 1`, `∀ x ∈ H^#, C_P(x) = Z(P)`
    含む ⇒ `P` が `M, W` に faithful. `G` も `W` に faithful.
 3. (L744-746) `F = F^*` and `W = V` と仮定可.
 4. (L747-755) **G Thm 5.5.4-5.5.5** (faithful, irreducible repr of
-   extraspecial group): `dim M = p^n` (= `q`). `M = V_P`
-   (= `V` の `P` 制限).
+   extraspecial group; **Isaacs FGT 不在** — 表現論の章なし;
+   新規 shared module で「extraspecial の faithful irreducible repr は
+   `dim = p^n` で center 作用で一意」を構築): `dim M = p^n` (= `q`).
+   `M = V_P` (= `V` の `P` 制限).
 5. (L757-762) Prop 2.1 ⇒ `E(P) = Hom_F(V, V)`.
    `E(P) = ⊕_{g ∈ R} F·g` (`R` = coset reps of `Z(P)`).
    `|R| = p^{2n} = q^2 = dim E`, sum direct.
@@ -349,8 +401,10 @@ with `dim V = 2`. 以下が成立:
    `K = Ω_1(Z(O_q(G^*)))`. `K` elementary abelian q-group, `K ⊴ G`.
    Case 分岐 q = p / q ≠ p.
 3. **Case q = p**: `W = C_V(K)`. G Lem 2.6.3 (p-group on char-p F-vector
-   ⇒ fixed vector ≠ 0) ⟹ `W ≠ 0`. `dim V = 2` + `G` faithful
-   ⟹ `dim W = dim V/W = 1`.
+   ⇒ fixed vector ≠ 0; **Isaacs FGT 不在**; 新規 shared module
+   `RepresentationTheory/PGroupFixedVector.lean` で構築 — mathlib
+   `Representation.Coinvariants` から partial 構築可) ⟹ `W ≠ 0`.
+   `dim V = 2` + `G` faithful ⟹ `dim W = dim V/W = 1`.
 4. **Case q ≠ p**: (MISSING_PAGE:29 以降) Sylow q-subgroup の coprime
    action, induction.
 5. (L789-793, MISSING_PAGE 後の残部) `Q ⊆ GL(P)` 線型変換のうち
@@ -358,10 +412,10 @@ with `dim V = 2`. 以下が成立:
 
 **形式化方針**:
 - mathlib `Sylow` ✓, `Matrix.GeneralLinearGroup` ✓, `Module.finrank` ✓.
-- 依存: Gorenstein Lem 2.6.3 (p-group fixed vector) = mathlib partial,
-  shared module
+- 依存: G Lem 2.6.3 (p-group fixed vector; Isaacs FGT 不在;
+  mathlib partial), shared module
   `OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean`
-  (~30 行) で wrap.
+  (~30 行) で新規構築.
 - 奇数位数: `Odd (Nat.card G)`.
 - 帰納構造: `(Nat.card G).strongRecOn` または `WellFoundedLT`.
 - MISSING_PAGE:29 内容: PDF p.28-29 を再 OCR or 別文献

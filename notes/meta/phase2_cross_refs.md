@@ -125,9 +125,14 @@ BG §1-§16 で書かれた "Theorem X.Y" の Gorenstein 引用を、Isaacs に�
 | **Thm 1.17** | G 7.3.4 (p.250) | **Isaacs Thm 5.21** (Focal Subgroup) | Focal subgroup theorem |
 | **Thm 1.18** | (古典, 標準証明) | **Isaacs Thm 5.13** | Burnside normal p-complement |
 | **Thm 1.20** | (古典, Maschke) | mathlib `Maschke` | Maschke の定理 |
-| **Thm 2.1** | G 3.5.7, 3.6.2 | (mathlib `Representation` 経由) | Schur 補題 + 既約分解 |
-| **Thm 2.5** | G 5.5.4-5.5.5 | (Isaacs 表現論 chapter 経由) | operator group の Maschke 拡張 |
-| **Thm 2.6** | G 2.6.3, Lem 2.6.3 | (mathlib `Maschke`/`Solvable`) | Fong-Swan 系 |
+| **Prop 2.1** (Schur+abs.irred.) | G 3.5.2, 3.5.7, 3.6.2 | **Isaacs FGT 不在**; mathlib + 新規 `RepresentationTheory/AbsolutelyIrreducible.lean` | Schur 補題 + 既約 ⟺ Hom_{FG}(M,M)=F |
+| **Prop 2.2** (Clifford+cyclic 商) | G 3.4.1 | **Isaacs FGT 不在** (Ch.6 = Frobenius ≠ Clifford); 新規 `RepresentationTheory/Clifford.lean` | Clifford lift to G via cyclic quotient |
+| **Lem 2.3** (Fong-Swan) | BG cite [5] Curtis-Reiner Thm 72.1 | Isaacs FGT 不在; Prop 2.2 依存; forward use 0 ⇒ defer | solvable abs.irred. ⇒ dim ∣ \|G\| |
+| **Prop 2.4** (eigenspace 分解) | (純線型代数) | 新規 `RepresentationTheory/EigenspaceUnderCyclicAction.lean` | cyclic action 下 V_i ⊕ + E_{i,t} 構造 (10 部) |
+| **Thm 2.5** (extraspecial+cyclic) | G 5.5.4-5.5.5 | **Isaacs FGT 不在** (representation theory 章なし); 新規 shared module | extraspecial faithful repr の cyclic H 上構造 |
+| **Thm 2.6** (奇数 2-dim) | G Lem 2.6.3 (p-group fixed vec) | **Isaacs FGT 不在**; 新規 `RepresentationTheory/PGroupFixedVector.lean` + mathlib `Maschke` | odd-order 2-dim repr ⇒ abelian / Sylow abelian |
+
+**観察 (2026-05-24 訂正)**: 旧表 (L128-130 三行版) は (i) "Isaacs 表現論 chapter 経由" と書いたが **Isaacs FGT は群論本で representation theory 章なし** (Isaacs mmd で `Clifford` 0 hit, Ch.6 は Frobenius Actions), (ii) Thm 2.6 内容を "Fong-Swan 系" と誤記 (実際は Lem 2.3 が Fong-Swan, Thm 2.6 は奇数 2-dim 構造), (iii) Prop 2.2 (Clifford), Lem 2.3 (Fong-Swan), Prop 2.4 (eigenspace) を欠落. **§2 全 6 結果ともに Isaacs FGT に対応なし** ⇒ 全部 mathlib + 新規 `OddOrder/GroupTheory/RepresentationTheory/*` shared module 経由で再構築の方針.
 | **Thm 3.1-3.3** | G 2.7.6-2.7.7, Thompson Thesis | **Isaacs Thm 6.1-6.10** | Frobenius 群 basic |
 | **Thm 3.4-3.10** | G + Thompson Thesis | **Isaacs Thm 6.11-6.24** + 表現論補強 | Frobenius action + kernel nilpotent |
 | **Thm 6.1** | (Hall-Higman 1.2.3 別形) | **Isaacs Thm 3.21** 再述 | O_{p',p}(G) abelian normal containment |
