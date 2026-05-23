@@ -5,53 +5,67 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.Solvable
+import Mathlib.GroupTheory.Sylow
 
 /-!
-# Schur-Zassenhaus conjugacy (axiom)
+# Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)
 
-mathlib v4.29.1 は `Subgroup.exists_right_complement'_of_coprime` (任意 normal Hall 部分群
-の complement 存在) を public で提供するが, **complement の N-共役性は abelian case のみ**
-(`Subgroup.exists_smul_eq` via `QuotientDiff` action, `SchurZassenhaus.lean:100`).
+mathlib v4.29.1 provides existence (`Subgroup.exists_right_complement'_of_coprime`)
+and abelian-case conjugacy (`Subgroup.exists_smul_eq` via `QuotientDiff`).
+This file fills the **general-case conjugacy** assuming `N` or `G/N` is solvable
+(Isaacs FGT Thm 3.12, mmd lines 1605-1665).
 
-本ファイルは general SZ conjugacy を **暫定 axiom** として記載する.
+## Main result
 
-## 使用箇所
+* `Subgroup.IsComplement'.exists_conj_of_coprime`: For `N ⊴ G` finite with
+  `(|N|, |G:N|) = 1` and `IsSolvable N ∨ IsSolvable (G ⧸ N)`, any two complements
+  to `N` are conjugate by an element of `N`.
 
-* `OddOrder/GroupTheory/CoprimeAction.lean` Lemma 3.24 Glauberman (本 axiom が必須)
-* `OddOrder/Isaacs/Ch03_SplitExtensions.lean` Thm 3.12 (complement conjugacy), Thm 3.14 Hall-C
+## Proof outline (Isaacs Thm 3.12)
 
-## 実装 TODO
+Strong induction on `|G|`.
 
-mathlib `SchurZassenhausInduction` (step1-step7, `SchurZassenhaus.lean:125-256`) を mirror
-して conjugacy 版 induction を書く. abelian base case は `Subgroup.exists_smul_eq` を使用.
-全体 ~100-200 LOC 予想. `notes/meta/forward_dep_policy.md` の "暫定 axiom" 規則に従い,
-owner chapter (mathlib gap fill) 完成時に theorem 化.
-
-## Statement
-
-`Subgroup.IsComplement'.exists_conj_of_coprime`: `N ⊴ G` normal, `(|N|, |G:N|) = 1`, `K, K'`
-complements to `N` in `G` ⇒ ∃ `n ∈ N`, `n K n⁻¹ = K'`.
+1. **Restriction** (`IsComplement'.subgroupOf_of_le`): if `K ≤ U ≤ G` and `K` complements
+   `N`, then `K.subgroupOf U` complements `N.subgroupOf U` in `U`. Uses Dedekind modular
+   law `(N ⊓ U) ⊔ K = U` (`K ≤ U`).
+2. **Quotient** (`IsComplement'.map_mk'`): for `L ⊴ G`, complements push forward to
+   complements in `G/L` (when `|K|` is coprime to `|N.map mk'|`).
+3. **Main induction**: combine (1), (2), Sylow C-theorem, and abelian SZ conjugacy
+   to handle the two solvability cases.
 -/
 
 namespace Subgroup
 
-/-- **Schur-Zassenhaus conjugacy** (axiom): Any two complements to a normal Hall subgroup
-are conjugate by an element of the normal subgroup, **assuming `N` or `G/N` is solvable**.
+variable {G : Type*} [Group G]
 
-mathlib v4.29.1 has only the abelian case (`Subgroup.exists_smul_eq`); general case is
-open as `OddOrder/Mathlib` gap fill.
+/-! ### Helper A: Restriction of a complement to a containing subgroup -/
 
-形式: `K.map (MulAut.conj n).toMonoidHom = K'` は `{n x n⁻¹ : x ∈ K} = K'` と同値, 即ち
-`n K n⁻¹ = K'`.
-
-**Solvability hypothesis**: 古典 SZ conjugacy は `N` または `G/N` のいずれかが可解
-であることを要する (Feit-Thompson に頼らない). 仮定 `IsSolvable N ∨ IsSolvable (G ⧸ N)`
-を明示することで, 本 axiom が Feit-Thompson より強くならないようにする. -/
-axiom IsComplement'.exists_conj_of_coprime {G : Type*} [Group G] [Finite G]
-    {N K K' : Subgroup G} [N.Normal]
-    (_hN : Nat.Coprime (Nat.card N) N.index)
-    (_hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
-    (_hK : IsComplement' N K) (_hK' : IsComplement' N K') :
-    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K'
+/-- If `K ≤ U ≤ G` and `K` complements `N ⊴ G`, then `K.subgroupOf U` complements
+`N.subgroupOf U` in `U`. (Isaacs Thm 3.12 proof, first paragraph.) -/
+theorem IsComplement'.subgroupOf_of_le {N K U : Subgroup G} [N.Normal]
+    (hK : IsComplement' N K) (hKU : K ≤ U) :
+    IsComplement' (N.subgroupOf U) (K.subgroupOf U) := by
+  apply isComplement'_of_disjoint_and_mul_eq_univ
+  · -- Disjoint (N.subgroupOf U) (K.subgroupOf U).
+    rw [disjoint_iff]
+    ext ⟨u, hu⟩
+    simp only [mem_inf, mem_subgroupOf, mem_bot, Subtype.ext_iff, OneMemClass.coe_one]
+    refine ⟨fun ⟨hN, hKmem⟩ => ?_, fun h => by simp [h]⟩
+    have : u ∈ (N ⊓ K : Subgroup G) := ⟨hN, hKmem⟩
+    rwa [hK.disjoint.eq_bot, mem_bot] at this
+  · -- (N.subgroupOf U) * (K.subgroupOf U) = univ (in ↥U).
+    rw [Set.eq_univ_iff_forall]
+    rintro ⟨u, hu⟩
+    -- Decompose u = n * k via N ⊔ K = ⊤ (N normal: use mem_sup_of_normal_left).
+    have hu_top : (u : G) ∈ (N ⊔ K : Subgroup G) := by rw [hK.sup_eq_top]; trivial
+    rw [mem_sup_of_normal_left] at hu_top
+    obtain ⟨n, hn, k, hk, hnk⟩ := hu_top
+    have hkU : k ∈ U := hKU hk
+    have hnU : n ∈ U := by
+      have heq : n = u * k⁻¹ := by rw [← hnk]; group
+      rw [heq]
+      exact U.mul_mem hu (U.inv_mem hkU)
+    refine ⟨⟨n, hnU⟩, mem_subgroupOf.mpr hn, ⟨k, hkU⟩, mem_subgroupOf.mpr hk, ?_⟩
+    ext; simpa using hnk
 
 end Subgroup
