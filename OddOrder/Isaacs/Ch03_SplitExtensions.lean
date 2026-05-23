@@ -2270,7 +2270,43 @@ private lemma cyclicExtK_centralized {N : Type*} [Group N]
     (hσa : σ a = a) (hσm : σ ^ m = MulAut.conj a) :
     ∀ y : CyclicExtPreG N σ, y * cyclicExtK m a σ * y⁻¹ = cyclicExtK m a σ := by
   intro y
-  sorry  -- (x, l) * (a⁻¹, m) * (x, l)⁻¹ = (a⁻¹, m) via σa=a, σ^m=conj a.
+  -- σ^k fixes a (and a⁻¹) for any k : ℤ (since σ ∈ stabilizer a).
+  have hσka : ∀ k : ℤ, (σ ^ k) a = a := fun k =>
+    (Subgroup.zpow_mem (MulAction.stabilizer (MulAut N) a)
+      (MulAction.mem_stabilizer_iff.mpr hσa) k : _)
+  have hσka_inv : ∀ k : ℤ, (σ ^ k) a⁻¹ = a⁻¹ := fun k => by rw [map_inv, hσka k]
+  -- σ^m sends x to a * x * a⁻¹ (from hσm).
+  have hσm_apply : ∀ x : N, ((σ ^ m : MulAut N)) x = a * x * a⁻¹ := fun x => by
+    rw [hσm]; rfl
+  -- (cyclicExtK).left = a⁻¹, .right = ofAdd m.
+  have h_K_left : (cyclicExtK m a σ).left = a⁻¹ := by
+    show (SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr _).left = _
+    simp [SemidirectProduct.mul_left, SemidirectProduct.left_inl, SemidirectProduct.right_inl,
+          SemidirectProduct.left_inr]
+  have h_K_right : (cyclicExtK m a σ).right = Multiplicative.ofAdd (m : ℤ) := by
+    show (SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr _).right = _
+    simp [SemidirectProduct.mul_right, SemidirectProduct.right_inl, SemidirectProduct.right_inr]
+  ext
+  · -- Left component.
+    show ((y * cyclicExtK m a σ) * y⁻¹).left = (cyclicExtK m a σ).left
+    simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+               SemidirectProduct.inv_left, SemidirectProduct.inv_right,
+               h_K_left, h_K_right, cyclicExtPhi_apply]
+    -- Goal (approx): y.left * (σ^l.toAdd) a⁻¹ * (σ^(l.toAdd+m)) ((σ^(-l.toAdd)) y.left⁻¹) = a⁻¹.
+    rw [hσka_inv]
+    -- Compose σ chain.
+    have hcompose : (σ ^ ((y.right * Multiplicative.ofAdd (m : ℤ)).toAdd))
+        ((σ ^ ((y.right⁻¹ : Multiplicative ℤ).toAdd)) y.left⁻¹) = ((σ : MulAut N) ^ m) y.left⁻¹ := by
+      show (σ ^ ((y.right.toAdd + (m : ℤ)) : ℤ))
+            ((σ ^ ((-y.right.toAdd) : ℤ)) y.left⁻¹) = _
+      rw [← MulAut.mul_apply, ← zpow_add,
+          show (y.right.toAdd + (m : ℤ)) + (-y.right.toAdd) = (m : ℤ) by ring, zpow_natCast]
+    rw [hcompose, hσm_apply]
+    group
+  · -- Right component (Multiplicative ℤ abelian).
+    show ((y * cyclicExtK m a σ) * y⁻¹).right = (cyclicExtK m a σ).right
+    simp only [SemidirectProduct.mul_right, SemidirectProduct.inv_right]
+    rw [mul_comm y.right _, mul_assoc, mul_inv_cancel, mul_one]
 
 /-- The kernel subgroup `K = ⟨(a⁻¹, m)⟩`. -/
 private noncomputable abbrev cyclicExtKSubgroup {N : Type*} [Group N]
