@@ -215,8 +215,12 @@ Hall-C 完成で Hall-D / 3 部分群 solvability 等の Wielandt 系定理着�
   Ch.4 §4C-§4D coprime action machinery 依存.
   `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` placeholder.
   **2026-05-24 進捗**: Tier 1 着手. **Glauberman 3.24(a) 完成 sorry-free** ⭐
-  (`glauberman_fixed_point_exists` ~120 LOC). 基盤 `IsCompatibleMulAction` +
-  SDP 作用構築. 残: 3.24(b), 3.23(a/b), 3.25, 3.27, 3.28, 3.29, 3.30.
+  AxiomsCheck flagship 入り (`glauberman_fixed_point_exists` ~120 LOC).
+  基盤 `IsCompatibleMulAction` + SDP 作用構築 (`SemidirectProduct.lift` 経由).
+  7 ステップ証明: U⊔inlG=⊤ (G transitive) → relIndex 計算 (second iso) →
+  SZ existence in U → H is Γ-complement of inlG → inrA も complement →
+  SZ conjugacy → algebraic 計算で g⁻¹•α₀ が A-fixed.
+  残 7 sorry-stubs: 3.24(b), 3.23(a/b), 3.25, 3.27, 3.28, 3.29, 3.30 (全 statement 確定).
 
 ## mmd 抽出失敗の整理
 
