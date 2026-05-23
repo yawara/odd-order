@@ -248,7 +248,70 @@ theorem glauberman_fixed_point_exists
     Subgroup.exists_right_complement'_of_coprime (N := inlG.subgroupOf U) h_coprime_subof
   -- Step 4: H := H_in_U.map U.subtype is a complement of inlG in Γ.
   set H : Subgroup Γ := H_in_U.map U.subtype with hH_def
-  sorry  -- TODO: Step 4-8.
+  -- 4a: Nat.card H = Nat.card A.
+  have h_card_H : Nat.card H = Nat.card A := by
+    rw [hH_def, Subgroup.card_subtype]
+    exact hH_compl_in_U.symm.index_eq_card.symm.trans h_subof_index
+  -- 4b: H ≤ U.
+  have h_H_le_U : H ≤ U := by rintro x ⟨y, _, rfl⟩; exact y.property
+  -- 4c: H is a complement of inlG in Γ.
+  have hH_compl_inlG : inlG.IsComplement' H := by
+    rw [Subgroup.isComplement'_iff_card_mul_and_disjoint]
+    refine ⟨?_, ?_⟩
+    · -- Nat.card inlG * Nat.card H = Nat.card Γ.
+      rw [h_card_inlG, h_card_H, hΓ_def, SemidirectProduct.card]
+    · -- Disjoint inlG H.
+      rw [disjoint_iff]
+      ext x
+      simp only [Subgroup.mem_inf, Subgroup.mem_bot]
+      refine ⟨?_, fun hx => by rw [hx]; exact ⟨Subgroup.one_mem _, Subgroup.one_mem _⟩⟩
+      rintro ⟨hx_inlG, ⟨y, hy_in, rfl⟩⟩
+      -- y.val ∈ inlG ∧ y ∈ H_in_U ⇒ y ∈ inlG.subgroupOf U.
+      have hy_in_subof : y ∈ inlG.subgroupOf U := hx_inlG
+      have h_disj_in_U : Disjoint (inlG.subgroupOf U) H_in_U := hH_compl_in_U.disjoint
+      rw [disjoint_iff] at h_disj_in_U
+      have : y ∈ (inlG.subgroupOf U) ⊓ H_in_U := ⟨hy_in_subof, hy_in⟩
+      rw [h_disj_in_U, Subgroup.mem_bot] at this
+      rw [this]; rfl
+  -- Step 5: inrA is a complement of inlG in Γ (from Ch.3).
+  have h_inrA_compl : inlG.IsComplement' inrA := by
+    rw [hinlG_def, hinrA_def]
+    exact OddOrder.Isaacs.Ch03.inl_range_isComplement_inr_range φ
+  -- Step 6: SZ conjugacy: ∃ n ∈ inlG, inrA.map (conj n).toMonoidHom = H.
+  haveI hΓ_finite : Finite Γ := by rw [hΓ_def]; infer_instance
+  obtain ⟨n, hn_in_inlG, hn_conj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime h_coprime_inlG hSolv_inlG
+      h_inrA_compl hH_compl_inlG
+  -- Extract g ∈ G with n = inl g.
+  obtain ⟨g, rfl⟩ := hn_in_inlG
+  -- Step 7: The A-fixed element is (inl g)⁻¹ • α₀ = g⁻¹ • α₀.
+  refine ⟨g⁻¹ • α₀, ?_⟩
+  intro a
+  -- a • (g⁻¹ • α₀) = (inr a * (inl g)⁻¹) • α₀ (action via SDP).
+  have h_a_smul : (a • (g⁻¹ • α₀) : Ω) = ((SemidirectProduct.inr a : Γ) *
+      (SemidirectProduct.inl g : Γ)⁻¹) • α₀ := by
+    rw [mul_smul, ← map_inv,
+        IsCompatibleMulAction.toMulAction_inl_smul h g⁻¹ α₀,
+        IsCompatibleMulAction.toMulAction_inr_smul h a (g⁻¹ • α₀)]
+  rw [h_a_smul]
+  -- inr a * (inl g)⁻¹ = (inl g)⁻¹ * (inl g * inr a * (inl g)⁻¹).
+  have h_rewrite : (SemidirectProduct.inr a : Γ) * (SemidirectProduct.inl g : Γ)⁻¹ =
+      (SemidirectProduct.inl g : Γ)⁻¹ *
+        ((SemidirectProduct.inl g : Γ) * (SemidirectProduct.inr a : Γ) *
+          (SemidirectProduct.inl g : Γ)⁻¹) := by group
+  rw [h_rewrite, mul_smul]
+  -- inl g * inr a * (inl g)⁻¹ ∈ H (from hn_conj : inrA.map (conj (inl g)) = H).
+  have h_h_in_H : (SemidirectProduct.inl g : Γ) * (SemidirectProduct.inr a : Γ) *
+      (SemidirectProduct.inl g : Γ)⁻¹ ∈ H := by
+    rw [← hn_conj]
+    exact ⟨SemidirectProduct.inr a, ⟨a, rfl⟩, rfl⟩
+  -- H ⊆ U, so this element fixes α₀.
+  have h_fixes : ((SemidirectProduct.inl g : Γ) * (SemidirectProduct.inr a : Γ) *
+      (SemidirectProduct.inl g : Γ)⁻¹) • α₀ = α₀ :=
+    h_H_le_U h_h_in_H
+  rw [h_fixes]
+  -- (inl g)⁻¹ • α₀ = g⁻¹ • α₀.
+  rw [← map_inv, IsCompatibleMulAction.toMulAction_inl_smul h g⁻¹ α₀]
 
 end Glauberman
 

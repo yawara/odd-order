@@ -74,49 +74,61 @@ open OddOrder.Isaacs.Ch01
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
 
-/-- **BG Lemma 1.14** (Sylow correspondence under quotient): `T` p-subgroup of `G`,
-`M ⊴ G` p'-subgroup, `C = C_G(T)`, `N = N_G(T)`. Then in `G/M`:
-- `C_{G/M}(TM/M) = CM/M`
-- `N_{G/M}(TM/M) = NM/M`.
+/-- **BG Lemma 1.14 (heart, normalizer-in-G form)**: `T` p-subgroup of `G`, `M ⊴ G` p'-subgroup
+(`gcd(|M|, p) = 1` を採用) ⇒ `N_G(T·M) = N_G(T)·M`.
 
-**Proof** (BG p.5): `NM ⊆ N*` clear. Reverse: `x ∈ N*` normalizes `TM` ⇒ `T^x` is Sylow `p` of
-`TM` ⇒ `∃ y ∈ M` with `T^x = T^y` (Sylow II in `TM`) ⇒ `xy⁻¹ ∈ N`, so `x ∈ NM`. Hence
-`N* = NM`. Then `CM ⊆ C* ⊆ N* = NM`. Since `T ∩ M = 1` (orders coprime), `C* ∩ N = C`, so
-`C* = (C* ∩ N)M = CM`.
+In quotient form: with `f = QuotientGroup.mk' M`,
+- `(N_{G/M}(T·M/M)).comap f = N_G(T·M)` (mathlib `comap_normalizer_eq_of_surjective`)
+- `N_G(T·M) = N_G(T)·M` (this lemma)
 
-形式化方針: mathlib `Sylow.exists_smul_eq` + `Subgroup.comap_map_eq` の組み合わせ.
-`T ∩ M = 1` は `IsPGroup.disjoint_of_coprime` 系または直接 cardinality argument.
-proof 実装は次 commit. -/
-theorem sylow_lift_centralizer_normalizer
+**Proof** (BG p.5, 主要部 = hard direction):
+- 易: `M ≤ T·M ≤ N_G(T·M)` (subgroup self-normalization) + `N_G(T) ≤ N_G(T·M)` (M normal
+  ⇒ conjugation fixes M, T conjugation fixes T, so T·M fixed).
+- 難: `x ∈ N_G(T·M)` ⇒ `xTx⁻¹ ⊆ T·M`. `T ∩ M = ⊥` (coprime orders) ⇒ `|T·M| = |T|·|M|`,
+  `|T|` は `|T·M|` の p-part ⇒ `T` Sylow `p` of `T·M`. 同様に `xTx⁻¹` Sylow `p` of `T·M`.
+  Sylow II in T·M: `∃ y ∈ T·M, xTx⁻¹ = yTy⁻¹`. `y = m·t` (`m ∈ M`, `t ∈ T`, possible
+  since `M·T = T·M` for M normal) ⇒ `xTx⁻¹ = m·T·m⁻¹` ⇒ `m⁻¹x ∈ N_G(T)` ⇒
+  `x ∈ M·N_G(T) = N_G(T)·M`.
+
+**実装状態**: statement のみ. proof は Sylow II in subgroup + element decomposition 等
+で ~100 LOC 規模, 次 commit で完成予定. -/
+theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
-    {T : Subgroup G} (hT : IsPGroup p T)
-    {M : Subgroup G} [hM_norm : M.Normal] (hM : IsPGroup p M → M = ⊥) :
-    -- The "C_{G/M}(TM/M) = CM/M" + "N_{G/M}(TM/M) = NM/M" claim
-    -- C = centralizer T, N = normalizer T as Subgroup G
-    -- TM/M = (T ⊔ M).map (mk' M) in G/M
-    True := by
-  -- Full statement is complex; placeholder True for skeleton.
-  -- Actual statement to be refined in next commit using
-  -- Subgroup.centralizer (T : Set G) / Subgroup.normalizer T and quotient.
-  trivial
+    {T : Subgroup G} (_hT : IsPGroup p T)
+    {M : Subgroup G} [_hM_norm : M.Normal] (_hM_p' : (Nat.card M).Coprime p) :
+    Subgroup.normalizer (T ⊔ M : Subgroup G) = Subgroup.normalizer T ⊔ M := by
+  sorry
 
-/-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3")**: `G` solvable + `T` Sylow
-`p`-subgroup of `O_{p',p}(G)` ⇒ `C_G(T) ⊆ O_{p',p}(G)`.
+/-- **BG Lemma 1.14 (易 direction, sorry-free)**: `N_G(T)·M ≤ N_G(T·M)`.
 
-**Proof**: thin wrapper of Phase 1 `OddOrder.Isaacs.Ch03.hall_higman_1_2_3` via:
-1. Quotient by `O_{p'}(G)` to get `G̅` with `O_{p'}(G̅) = ⊥`
-2. `T̅ = T·O_{p'}(G)/O_{p'}(G) = O_p(G̅)` (Sylow p of `O_p` of quotient)
-3. Apply `hall_higman_1_2_3` with `π = {p}` to `G̅`: `centralizer(O_p(G̅)) ≤ O_p(G̅)`
-4. Pull back via Lem 1.14 to get `C_G(T) ⊆ O_{p',p}(G)`
+- `T.normalizer ≤ (T ⊔ M).normalizer`: x normalizes T ⇒ x normalizes M (M ⊴ G) ⇒ x
+  normalizes T ⊔ M.
+- `M ≤ (T ⊔ M).normalizer`: M ≤ T ⊔ M and subgroup self-normalizes via inner conjugation. -/
+theorem le_normalizer_sup_of_normal
+    {G : Type*} [Group G] (T : Subgroup G) (M : Subgroup G) [M.Normal] :
+    Subgroup.normalizer T ⊔ M ≤ Subgroup.normalizer (T ⊔ M : Subgroup G) :=
+  sup_le Subgroup.normalizer_le_normalizer_sup_normal
+    (le_sup_right.trans Subgroup.le_normalizer)
 
-proof 実装は次 commit (Lem 1.14 完成と並行). -/
+/-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3", thin wrap)**: `G` 有限可解 +
+`O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
+
+**形式化**: Phase 1 `OddOrder.Isaacs.Ch03.hall_higman_1_2_3` の π = {p} 特殊化.
+`IsPiSeparable {p} G` は `IsSolvable G` から `isPiSeparable_of_solvable` で取得.
+
+**BG 原 statement (`T` Sylow p of `O_{p',p}(G)` ⇒ `C_G(T) ⊆ O_{p',p}(G)`) との関係**:
+G を G/O_{p'}(G) に置き換えると `T` は `O_p(G/O_{p'}(G))` に一致 (Sylow p of p-group は
+全体). この特殊形が下の statement.
+
+CLAUDE.md no-wrapper policy 例外 (仮定特殊化: `IsSolvable G` instance + π = {p}
+specialization, `IsPiSeparable` hypothesis を取り除く). -/
 theorem hall_higman_solvable_specialization
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G] :
-    -- Statement placeholder: full form needs T explicitly and O_{p',p} (= mathlib oPiCore
-    -- for π = {p'} preimage in G/O_{p'}, structure-wise).
-    -- Refining the actual statement after Lem 1.14 in next commit.
-    True := by
-  trivial
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (hp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G : Set G) ≤
+      OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+  OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ)
+    (OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable ({p} : Set ℕ)) hp'
 
 /-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20) — mathlib 直接, no-wrapper
 
