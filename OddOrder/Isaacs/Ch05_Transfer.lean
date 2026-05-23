@@ -868,6 +868,24 @@ def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
   ∃ N : Subgroup G, N.Normal ∧
     ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
 
+/-- `OPrime p G` — the smallest normal subgroup of `G` with `p`-power index.
+For finite `G`, this is the intersection of all such normal subgroups (Isaacs §5D 冒頭, 'O^p(G)').
+
+mathlib 未収載のため新規定義. 5.25 (⇐), 5.20 等で使用. -/
+def OPrime (p : ℕ) (G : Type*) [Group G] : Subgroup G :=
+  ⨅ N : {N : Subgroup G // N.Normal ∧ ∃ k : ℕ, N.index = p ^ k}, N.val
+
+/-- `OPrime p G` ≤ any normal subgroup with `p`-power index. -/
+lemma OPrime_le {p : ℕ} {G : Type*} [Group G] {N : Subgroup G}
+    (hN_normal : N.Normal) {k : ℕ} (hN_idx : N.index = p ^ k) :
+    OPrime p G ≤ N :=
+  iInf_le_of_le ⟨N, hN_normal, k, hN_idx⟩ le_rfl
+
+/-- `OPrime p G` is normal. -/
+instance OPrime_normal (p : ℕ) (G : Type*) [Group G] : (OPrime p G).Normal := by
+  unfold OPrime
+  exact Subgroup.normal_iInf_normal (fun N => N.property.1)
+
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
 
