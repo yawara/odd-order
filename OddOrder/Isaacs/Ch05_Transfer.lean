@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import OddOrder.Isaacs.Ch03_SplitExtensions
 
+open scoped commutatorElement
+
 /-!
 # OddOrder.Isaacs.Ch05 — Transfer
 
@@ -73,6 +75,7 @@ transfer-evaluation を直接利用 (1 件).
 namespace OddOrder.Isaacs.Ch05
 
 open Pointwise
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -223,14 +226,59 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 /-! ### Isaacs §5C (Hall transfer + Burnside)
 
 - **Lemma 5.11** (Hall index transfer): `ker_transfer_sup_eq_top_of_hall` ✅.
-  H π-Hall + ϕ : H →* A + |A| ∣ |H| ⇒ ker(transfer ϕ) · H = G. Lem 3.16 経由 ~25 LOC.
-- **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion`
-  ✅ — Sylow II in C_G(y) + 直接計算.
+- **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion` ✅.
 - **Thm 5.13 Burnside**: `MonoidHom.ker_transferSylow_isComplement'` 直接.
 - **Cor 5.14**: `IsCyclic.isComplement'` 直接.
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
-- **Thm 5.16-5.17** (Z-group 構造): mathlib `IsZGroup` API 直接.
+- **Thm 5.16** (Z-group 構造): mathlib `IsZGroup` API 直接.
+- **Thm 5.17** (cyclic Sylow_p ⇒ p∤|G'| or p∤|G:G'|): ✅ `isaacs_thm_5_17`
+  (axiom on Ch.4 §4D Thm 4.34 Fitting + cyclic-chain helper).
 - **Cor 5.19** (Sylow_2 cyclic direct factor ⇒ 非単純): 形式化保留. -/
+
+/-! ### Forward axioms (Ch.4 §4D dep)
+
+Thm 5.17 は Ch.4 §4D **Thm 4.34 Fitting** に依存. 当面 axiom 化, Ch.4 §4D 完成後に
+theorem 化する. -/
+
+namespace _root_.OddOrder.Isaacs.Ch04
+
+/-- **Isaacs Thm 4.34 (Fitting)** — axiom 形 (Ch.4 §4D forward dep).
+
+`A` (= subgroup `K` of `G` with `K ≤ N_G(P)`) が abelian subgroup `P` に conjugation 経由で
+作用. `(|P|, |K|) = 1` (coprime) ⇒ `P = C_P(K) × ⁅P, K⁆` (internal direct product, element form).
+
+**証明戦略** (Isaacs p.142, θ trick):
+* θ : ↥P → ↥P, θ(p) = ∏_{k ∈ K} k • p. P abelian なので well-def + homomorphism.
+* θ(p) ∈ C_P(K) (θ は K 作用と可換).
+* `p ∈ C_P(K)` で θ(p) = p^|K|; (|P|, |K|) = 1 ⇒ θ(p) = 1 ⇒ p = 1.
+* ⁅P, K⁆ ⊆ ker θ (各 [p, k] が ker に入る).
+* ⇒ C_P(K) ⊓ ⁅P, K⁆ = ⊥.
+* p^|K| = θ(p) · h with h ∈ ⁅P, K⁆ (元素計算). Bezout で p ∈ C_P(K) · ⁅P, K⁆.
+
+**実装スケジュール**: Ch.4 §4D 着手時 ~150 LOC. 進捗は ROADMAP / `notes/isaacs/ch04_commutators.md`. -/
+axiom fitting_coprime_abelian_decomp
+    {G : Type*} [Group G] [Finite G]
+    {P : Subgroup G} [IsMulCommutative ↥P]
+    {K : Subgroup G} (_hK_norm : K ≤ Subgroup.normalizer P)
+    (_h_coprime : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K)) :
+    (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ ∧
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P
+
+/-- **Cyclic p-group inf-eq-bot** — axiom 形 (cyclic-finite-p-group lattice 線形性の系).
+
+cyclic 有限 `p`-group の部分群 lattice は線形 (divisor lattice 同型). よって
+任意 2 部分群 `H, K ≤ P` で `H ⊓ K = ⊥ ⇒ H = ⊥ ∨ K = ⊥`.
+
+**実装方針**: mathlib `IsCyclic.exists_generator` + `Subgroup.zpowers` 解析 + `IsPGroup`
+で ~50-80 LOC. (Subgroups of cyclic ↔ divisors of order ⇒ lattice 線形 ⇒
+intersection = min element.) -/
+axiom cyclic_pgroup_inf_eq_bot_iff
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {P : Subgroup G} [IsCyclic ↥P] (_hP_pgroup : IsPGroup p ↥P)
+    {H K : Subgroup G} (_hH_le_P : H ≤ P) (_hK_le_P : K ≤ P) :
+    H ⊓ K = ⊥ ↔ H = ⊥ ∨ K = ⊥
+
+end _root_.OddOrder.Isaacs.Ch04
 
 /-- **Isaacs Lemma 5.11** (Hall transfer index): `H` が π-Hall 部分群 + `ϕ : H →* A`
 (`A` 可換有限群, `|A| ∣ |H|`) ⇒ `ker(transfer ϕ) · H = G`.
@@ -429,6 +477,99 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
   have h_ord_eq_one : orderOf x = 1 :=
     Nat.eq_one_of_dvd_coprimes h_coprime dvd_rfl h_ord_dvd
   exact orderOf_eq_one_iff.mp h_ord_eq_one
+
+/-- **Isaacs Thm 5.17**: `P ∈ Syl_p(G)` cyclic ⇒ `p` は `|G'|`, `|G:G'|` のたかだか
+一方を割る (i.e., `¬ p ∣ |G'| ∨ ¬ p ∣ |G:G'|`).
+
+**証明** (Isaacs p.165, Fitting 4.34 + Burnside 5.13 経由):
+
+`N := N_G(P)`, `K` complement of `P` in `N` (Schur-Zassenhaus, `(|P|, |N:P|) = 1` since
+P Sylow_p). `K ≤ N`, `(|P|, |K|) = 1`. **Thm 4.34 Fitting** (axiom): `P = C_P(K) × ⁅P,K⁆`
+(internal direct, `C_P(K) ⊓ ⁅P,K⁆ = ⊥` AND `C_P(K) ⊔ ⁅P,K⁆ = P`).
+
+`P` cyclic + axiom **cyclic_pgroup_inf_eq_bot_iff**: `C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒
+C_P(K) = ⊥ ∨ ⁅P,K⁆ = ⊥`.
+
+* **Case 1** `⁅P,K⁆ = ⊥`: `K` centralizes `P`. `N = PK` で全要素が `P` と可換 ⇒
+  `N ⊆ C_G(P)`. `N(P) ≤ C(P)` ⇒ Burnside (mathlib `ker_transferSylow_isComplement'`)
+  で normal `p`-complement `M`. `G/M ≅ P` cyclic ⇒ `G/M` abelian ⇒ `G' ⊆ M`. `M`
+  `p'`-group ⇒ `p ∤ |G'|`.
+
+* **Case 2** `C_P(K) = ⊥`: 4.34 sup より `P = ⁅P,K⁆ ⊆ commutator G`. `|G:G'| = |G|/|G'|`,
+  Sylow_p 全体が `G'` に入る ⇒ `|G:G'|` の `p`-成分 = 1 ⇒ `p ∤ |G:G'|`.
+
+**FORWARD DEPENDENCY**: Thm 4.34 (Ch.4 §4D) + cyclic_pgroup_inf_eq_bot_iff (mathlib upstream
+候補) を axiom 化. 完成後 unconditional 化. -/
+theorem isaacs_thm_5_17
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
+    [hPcyc : IsCyclic ↥(P : Subgroup G)] :
+    ¬ p ∣ Nat.card (commutator G) ∨ ¬ p ∣ (commutator G).index := by
+  -- P abelian (cyclic)
+  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+  -- N := N_G(P), P_N := P.subgroupOf N (normal in N)
+  set N := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_def
+  set P_N : Subgroup ↥N := (P : Subgroup G).subgroupOf N with hP_N_def
+  haveI hP_N_normal : P_N.Normal := Subgroup.normal_in_normalizer
+  haveI : Finite ↥N := inferInstance
+  -- coprime(|P_N|, |N : P_N|)
+  have h_coprime_P_N : Nat.Coprime (Nat.card ↥P_N) P_N.index := by
+    -- |P_N| = |P| (subgroupOf preserves card for P ≤ N)
+    -- |N : P_N| ∣ |G : P|; |G : P| coprime to p; |P| = p^a
+    sorry
+  -- Schur-Zassenhaus: complement K' of P_N in N
+  obtain ⟨K', hK'_compl⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_P_N
+  -- Map K' back to G via subtype
+  let K : Subgroup G := K'.map N.subtype
+  -- K ≤ N
+  have hK_le_N : K ≤ N := by
+    intro k hk
+    obtain ⟨k', _, rfl⟩ := hk
+    exact k'.property
+  -- |K| coprime to |P|
+  have h_coprime_PK : Nat.Coprime (Nat.card ↥(P : Subgroup G)) (Nat.card ↥K) := by
+    sorry
+  -- Apply Thm 4.34 (axiom)
+  obtain ⟨h_inf_bot, h_sup_top⟩ :=
+    _root_.OddOrder.Isaacs.Ch04.fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
+  -- ⁅P, K⁆ ≤ P (since K ≤ N normalizes P, so conjugates of P-elements stay in P)
+  have h_comm_le_P : (⁅(P : Subgroup G), K⁆ : Subgroup G) ≤ (P : Subgroup G) := by
+    rw [Subgroup.commutator_le]
+    intro x hx y hy
+    have hyN : y ∈ N := hK_le_N hy
+    have hyxiy : y * x⁻¹ * y⁻¹ ∈ (P : Subgroup G) :=
+      (Subgroup.mem_normalizer_iff.mp hyN x⁻¹).mp ((P : Subgroup G).inv_mem hx)
+    have h_eq : x * y * x⁻¹ * y⁻¹ = x * (y * x⁻¹ * y⁻¹) := by group
+    rw [show (⁅x, y⁆ : G) = x * y * x⁻¹ * y⁻¹ from rfl, h_eq]
+    exact (P : Subgroup G).mul_mem hx hyxiy
+  have h_cent_le_P : Subgroup.centralizer (K : Set G) ⊓ (P : Subgroup G) ≤ (P : Subgroup G) :=
+    inf_le_right
+  -- Cyclic axiom: C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒ one of them is ⊥
+  rcases (_root_.OddOrder.Isaacs.Ch04.cyclic_pgroup_inf_eq_bot_iff P.isPGroup'
+      h_cent_le_P h_comm_le_P).mp h_inf_bot with h_cent_bot | h_comm_bot
+  · -- Case 2 (h_cent_bot): C_P(K) = ⊥ ⇒ P = ⁅P,K⁆ ⊆ commutator G ⇒ p ∤ |G:G'|
+    right
+    -- P ≤ commutator G
+    have hP_le_comm : (P : Subgroup G) ≤ commutator G := by
+      rw [← h_sup_top, h_cent_bot, bot_sup_eq]
+      -- ⁅P, K⁆ ≤ commutator G
+      rw [_root_.commutator_def]
+      exact Subgroup.commutator_mono le_top le_top
+    -- |P| ∣ |commutator G|
+    have hP_dvd_comm : Nat.card ↥(P : Subgroup G) ∣ Nat.card (commutator G) :=
+      Subgroup.card_dvd_of_le hP_le_comm
+    -- p ∤ (commutator G).index (= |G:G'|)
+    sorry
+  · -- Case 1 (h_comm_bot): ⁅P,K⁆ = ⊥ ⇒ K centralizes P ⇒ N(P) ≤ C(P) ⇒ Burnside
+    left
+    -- K centralizes P
+    have hK_cent_P : K ≤ Subgroup.centralizer (P : Set G) := by
+      sorry
+    -- N(P) = P · K (as set, complement). Both P and K centralize P (P abelian; K above).
+    -- So N(P) ≤ C(P).
+    have h_NP_le_CP : N ≤ Subgroup.centralizer (P : Set G) := by
+      sorry
+    -- Apply Burnside
+    sorry
 
 end -- 5C
 
