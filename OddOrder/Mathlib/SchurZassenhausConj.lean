@@ -469,7 +469,40 @@ private theorem step_caseA
   -- Case split on K^g ⊔ L = ⊤.
   by_cases hH_top : (K.map (MulAut.conj g_f).toMonoidHom) ⊔ L = ⊤
   · -- N = L (cardinality), N abelian, abelian SZ conjugacy.
-    sorry
+    -- K^g_f ⊓ L ⊆ K^g_f ⊓ N = ⊥.
+    have h_inter_bot : (K.map (MulAut.conj g_f).toMonoidHom) ⊓ L = ⊥ := by
+      apply le_bot_iff.mp
+      have h_KgN : (K.map (MulAut.conj g_f).toMonoidHom) ⊓ N = ⊥ := by
+        rw [inf_comm]; exact hK_g_compl.disjoint.eq_bot
+      calc (K.map (MulAut.conj g_f).toMonoidHom) ⊓ L
+          ≤ (K.map (MulAut.conj g_f).toMonoidHom) ⊓ N := inf_le_inf_left _ hL_le
+        _ = ⊥ := h_KgN
+    -- |K^g_f| * |L| = |G| (from disjoint + sup_eq_top via IsComplement').
+    have hKgL_compl : IsComplement' (K.map (MulAut.conj g_f).toMonoidHom) L := by
+      apply isComplement'_of_disjoint_and_mul_eq_univ
+      · rw [disjoint_iff]; exact h_inter_bot
+      · -- Set product = univ via mem_sup_of_normal_right (L normal).
+        rw [Set.eq_univ_iff_forall]
+        intro x
+        have hx_top : x ∈ (K.map (MulAut.conj g_f).toMonoidHom ⊔ L : Subgroup G) := by
+          rw [hH_top]; trivial
+        rw [mem_sup_of_normal_right] at hx_top
+        obtain ⟨k, hk, l, hl, hkl⟩ := hx_top
+        exact ⟨k, hk, l, hl, hkl⟩
+    -- |L| = |N| from |K^g_f| * |L| = |G| = |N| * |K^g_f|.
+    have h_card_L_eq_N : Nat.card ↥L = Nat.card N := by
+      have h1' : Nat.card (K.map (MulAut.conj g_f).toMonoidHom) * Nat.card ↥L = Nat.card G :=
+        hKgL_compl.card_mul
+      have h2' : Nat.card ↥N * Nat.card (K.map (MulAut.conj g_f).toMonoidHom) = Nat.card G :=
+        hK_g_compl.card_mul
+      have h_swap : Nat.card (K.map (MulAut.conj g_f).toMonoidHom) * Nat.card ↥N = Nat.card G := by
+        rw [mul_comm]; exact h2'
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h1'.trans h_swap.symm)
+    -- L = N (from L ≤ N + |L| = |N|).
+    have hL_eq_N : L = N :=
+      Subgroup.eq_of_le_of_card_ge hL_le h_card_L_eq_N.ge
+    -- Now N = L abelian.
+    sorry  -- abelian SZ conjugacy: ∃ n ∈ N, K.map (conj n) = K'
   · -- H = K^g ⊔ L is proper, apply step_restriction.
     have hKgU : K.map (MulAut.conj g_f).toMonoidHom ≤
                 K.map (MulAut.conj g_f).toMonoidHom ⊔ L := le_sup_left
