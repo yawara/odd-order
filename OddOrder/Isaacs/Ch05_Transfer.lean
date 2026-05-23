@@ -1319,7 +1319,38 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         rw [h_card_D, h_card_NQ] at h_card_lt
         exact lt_of_le_of_ne (le_inf hD_le_Q hD_le_N)
           (fun h => Nat.lt_irrefl _ (h ▸ h_card_lt))
-      -- Remaining: Steps 3-20 (Sylow setup, S=SC, conj chain, IH applications)
+      -- **Step 3**: Sylow p of ↥N containing (P ⊓ N).subgroupOf N, (Q ⊓ N).subgroupOf N
+      have hPN_pgroup_in_N : IsPGroup p ↥(((P : Subgroup G) ⊓ N).subgroupOf N) := by
+        have h_iso : ((P : Subgroup G) ⊓ N).subgroupOf N ≃* ↥((P : Subgroup G) ⊓ N) :=
+          Subgroup.subgroupOfEquivOfLe inf_le_right
+        exact (P.isPGroup'.to_le inf_le_left).of_equiv h_iso.symm
+      have hQN_pgroup_in_N : IsPGroup p ↥(((Q : Subgroup G) ⊓ N).subgroupOf N) := by
+        have h_iso : ((Q : Subgroup G) ⊓ N).subgroupOf N ≃* ↥((Q : Subgroup G) ⊓ N) :=
+          Subgroup.subgroupOfEquivOfLe inf_le_right
+        exact (Q.isPGroup'.to_le inf_le_left).of_equiv h_iso.symm
+      obtain ⟨S, hPN_le_S⟩ := IsPGroup.exists_le_sylow hPN_pgroup_in_N
+      obtain ⟨T, hQN_le_T⟩ := IsPGroup.exists_le_sylow hQN_pgroup_in_N
+      -- **Step 4**: R : Sylow p G containing S.map N.subtype
+      set S_in_G : Subgroup G := (S : Subgroup ↥N).map N.subtype with hS_in_G_def
+      have hS_in_G_pgroup : IsPGroup p ↥S_in_G := S.isPGroup'.map _
+      obtain ⟨R, hS_in_G_le_R⟩ := IsPGroup.exists_le_sylow hS_in_G_pgroup
+      -- **Step 5**: S ⊔ C.subgroupOf N = ⊤ in ↥N (via helper)
+      have hS_sup_C : (S : Subgroup ↥N) ⊔ C.subgroupOf N = ⊤ :=
+        sylow_sup_normal_eq_top_of_quot_isPGroup h_quot_pgroup S
+      -- **Step 6**: Sylow II in ↥N: ∃ n : ↥N, n • S = T
+      obtain ⟨n, hn_smul⟩ := MulAction.exists_smul_eq (↥N) S T
+      -- **Step 7**: Decompose n = yC * sS (yC ∈ C.subgroupOf N, sS ∈ S)
+      have hC_sup_S : C.subgroupOf N ⊔ (S : Subgroup ↥N) = ⊤ := by
+        rw [sup_comm]; exact hS_sup_C
+      have hn_in_top : (n : ↥N) ∈ C.subgroupOf N ⊔ (S : Subgroup ↥N) := by
+        rw [hC_sup_S]; exact Subgroup.mem_top _
+      obtain ⟨yC, hyC_in, sS, hsS_in, hn_eq⟩ := Subgroup.mem_sup_of_normal_left.mp hn_in_top
+      -- **Step 8**: T = yC • S (since (yC * sS) • S = yC • (sS • S) = yC • S)
+      have h_sS_S : (sS : ↥N) • S = S := by
+        rw [Sylow.smul_eq_iff_mem_normalizer]; exact Subgroup.le_normalizer hsS_in
+      have h_T_eq : T = yC • S := by
+        rw [← hn_smul, ← hn_eq, mul_smul, h_sS_S]
+      -- Steps 9-11 (G-side conjugation chain + IH applications + combine) は別 session.
       sorry
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.

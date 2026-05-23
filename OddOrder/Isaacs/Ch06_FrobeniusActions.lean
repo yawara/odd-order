@@ -13,6 +13,7 @@ import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.FixedPoints
 import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
@@ -713,6 +714,218 @@ theorem pow_prime_modEq_one_cases {p : ℕ} (hp : p.Prime) {e : ℕ} (he : 0 < e
     have : (1 - i : ℤ) = -(i - 1) := by ring
     rw [this]
     exact dvd_neg.mpr h_pe'_dvd
+
+end
+section /- 6A continued: Frobenius group (subgroup pair, Thm 6.4) -/
+
+/-! ### Definition of Frobenius group (subgroup-pair version)
+
+A **Frobenius group** is a group `G` together with a nontrivial proper normal subgroup `N`
+(the *kernel*) and a nontrivial complement `A` (the *Frobenius complement*) such that the
+conjugation action of `A` on `N` is Frobenius (Isaacs's condition (1) of Thm 6.4).
+
+Thm 6.4 in Isaacs asserts the equivalence of four conditions:
+1. (conjugation-Frobenius) `∀ 1 ≠ a ∈ A, 1 ≠ n ∈ N, a n a⁻¹ ≠ n`.
+2. (TI) `∀ g ∉ A, A ∩ A^g = 1`.
+3. (centralizer-in-A) `∀ 1 ≠ a ∈ A, C_G(a) ⊆ A`.
+4. (centralizer-in-N) `∀ 1 ≠ n ∈ N, C_G(n) ⊆ N`.
+
+We adopt (1) as the canonical condition (it is the most directly elementary). We then prove
+the cyclic equivalence of (1) ⇔ (2) ⇔ (3) directly, and supply constructors from (3) and (4).
+The direction (1) ⇒ (4) requires Cor 6.6 (Frobenius's theorem on Frobenius kernels) and is
+deferred. -/
+
+/-- A **Frobenius group**: `G` has a nontrivial normal subgroup `N` (the *Frobenius kernel*)
+complemented by a nontrivial subgroup `A` (the *Frobenius complement*), with the conjugation
+action of `A` on `N` being Frobenius.
+
+This is Isaacs's condition (1) of Thm 6.4; the other three equivalent conditions are proven
+separately as `trivialIntersection`, `centralizer_complement_le`, and the constructors
+`of_centralizer_complement_le` / `of_centralizer_kernel_le`. -/
+structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
+  /-- The kernel `N` is normal in `G`. -/
+  isNormal : N.Normal
+  /-- `N` and `A` are complements: `N ⊓ A = ⊥` and the product map `N × A → G` is a bijection. -/
+  isComplement : Subgroup.IsComplement' N A
+  /-- The kernel is nontrivial. -/
+  ne_bot_kernel : N ≠ ⊥
+  /-- The complement is nontrivial. -/
+  ne_bot_complement : A ≠ ⊥
+  /-- The conjugation action of `A` on `N` is Frobenius (Isaacs Thm 6.4 condition (1)). -/
+  conj_frobenius : ∀ a ∈ A, a ≠ 1 → ∀ n ∈ N, n ≠ 1 → a * n * a⁻¹ ≠ n
+
+namespace IsFrobeniusGroup
+
+variable {G : Type*} [Group G] {N A : Subgroup G}
+
+/-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
+then the conjugation action of `A` on `N` is Frobenius. -/
+theorem of_centralizer_complement_le
+    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
+    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
+    (h3 : ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A) :
+    IsFrobeniusGroup G N A where
+  isNormal := hN
+  isComplement := hC
+  ne_bot_kernel := hN_ne
+  ne_bot_complement := hA_ne
+  conj_frobenius := by
+    intro a haA ha n hnN hn h_conj
+    -- `a * n * a⁻¹ = n` ⇒ `n * a = a * n` ⇒ `n ∈ C_G(a) ⊆ A`.
+    have h_an : a * n = n * a := by
+      have := congrArg (· * a) h_conj
+      simpa using this
+    have h_comm : n * a = a * n := h_an.symm
+    have hnA : n ∈ A :=
+      h3 a haA ha (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
+    -- `n ∈ N ∩ A = ⊥` ⇒ `n = 1`, contradicting `hn`.
+    have hdisj : Disjoint N A := hC.disjoint
+    exact hn (Subgroup.disjoint_def.mp hdisj hnN hnA)
+
+/-- **Isaacs Thm 6.4 (4) ⇒ (1)** (constructor). If `C_G(n) ⊆ N` for every nontrivial `n ∈ N`,
+then the conjugation action of `A` on `N` is Frobenius. -/
+theorem of_centralizer_kernel_le
+    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
+    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
+    (h4 : ∀ n ∈ N, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ N) :
+    IsFrobeniusGroup G N A where
+  isNormal := hN
+  isComplement := hC
+  ne_bot_kernel := hN_ne
+  ne_bot_complement := hA_ne
+  conj_frobenius := by
+    intro a haA ha n hnN hn h_conj
+    -- `a * n * a⁻¹ = n` ⇒ `a * n = n * a` ⇒ `a ∈ C_G(n) ⊆ N`.
+    have h_an : a * n = n * a := by
+      have := congrArg (· * a) h_conj
+      simpa using this
+    -- We need `a ∈ C_G(n) = { x : x * n = n * x }`.
+    have h_comm : a * n = n * a := h_an
+    have haN : a ∈ N :=
+      h4 n hnN hn (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
+    -- `a ∈ N ∩ A = ⊥` ⇒ `a = 1`, contradicting `ha`.
+    have hdisj : Disjoint N A := hC.disjoint
+    exact ha (Subgroup.disjoint_def.mp hdisj haN haA)
+
+/-- Given `IsComplement' N A`, every `g : G` factors uniquely as `n * a` with `n ∈ N`, `a ∈ A`. -/
+private theorem _root_.Subgroup.IsComplement'.factor
+    (hC : Subgroup.IsComplement' N A) (g : G) :
+    ∃ (n : G) (a : G), n ∈ N ∧ a ∈ A ∧ n * a = g := by
+  obtain ⟨⟨n, a⟩, hna⟩ := (hC.existsUnique g).exists
+  exact ⟨n, a, n.2, a.2, hna⟩
+
+/-- **Isaacs Thm 6.4 (1) ⇒ (2)**: Frobenius group ⇒ trivial intersection.
+
+If `g ∉ A`, then `A ⊓ A^g = ⊥`. (Here `A^g = g A g⁻¹ = (MulAut.conj g) '' A`.) -/
+theorem trivialIntersection (h : IsFrobeniusGroup G N A) :
+    ∀ g : G, g ∉ A → A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A = ⊥ := by
+  intro g hg
+  -- Outline: assume `A ⊓ A^g ≠ ⊥`, derive `g ∈ A`, contradiction.
+  by_contra h_ne
+  apply hg
+  -- Factor `g = n * a` with `n ∈ N`, `a ∈ A` (from `IsComplement' N A`).
+  obtain ⟨n, a, hnN, haA, hna⟩ := h.isComplement.factor g
+  -- Get a nontrivial `x ∈ A ⊓ A^g`.
+  have h_ne_bot : A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A ≠ ⊥ := h_ne
+  obtain ⟨x, hxAg, hx_ne⟩ : ∃ x ∈ A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A, x ≠ 1 := by
+    by_contra h_all
+    apply h_ne_bot
+    rw [eq_bot_iff]
+    intro y hy
+    rw [Subgroup.mem_bot]
+    by_contra hy_ne
+    exact h_all ⟨y, hy, hy_ne⟩
+  rw [Subgroup.mem_inf] at hxAg
+  obtain ⟨hxA, hxAg⟩ := hxAg
+  -- `x = g * b * g⁻¹` for some `b ∈ A`.
+  rw [Subgroup.mem_map] at hxAg
+  obtain ⟨b, hbA, hxeq⟩ := hxAg
+  simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom] at hxeq
+  -- Substitute `g = n * a`. Then `x = (n * a) * b * (n * a)⁻¹ = n * (a b a⁻¹) * n⁻¹`.
+  have hxeq' : x = n * (a * b * a⁻¹) * n⁻¹ := by
+    rw [← hxeq, ← hna]
+    group
+  -- Let `b' := a * b * a⁻¹ ∈ A`. Then `x = n * b' * n⁻¹` and `b' ∈ A`.
+  set b' := a * b * a⁻¹ with hb'_def
+  have hb'_mem : b' ∈ A := by
+    rw [hb'_def]
+    exact Subgroup.mul_mem _ (Subgroup.mul_mem _ haA hbA) (Subgroup.inv_mem _ haA)
+  have hx_eq2 : x = n * b' * n⁻¹ := hxeq'
+  -- Consider `b'⁻¹ * x = b'⁻¹ * (n * b' * n⁻¹)`.
+  -- This is in `A` (both `b'⁻¹` and `x` are in `A`).
+  -- This is also in `N`: rewrite as `(b'⁻¹ * n * b') * n⁻¹`. The factor `b'⁻¹ * n * b' ∈ N`
+  -- by normality of `N`, and `n⁻¹ ∈ N`, so the product is in `N`.
+  have h_comm_elem : b'⁻¹ * (n * b' * n⁻¹) ∈ A := by
+    apply Subgroup.mul_mem
+    · exact Subgroup.inv_mem _ hb'_mem
+    · rw [← hx_eq2]; exact hxA
+  have h_comm_elem' : b'⁻¹ * (n * b' * n⁻¹) ∈ N := by
+    -- Rewrite as `(b'⁻¹ * n * b') * n⁻¹`.
+    have h_eq : b'⁻¹ * (n * b' * n⁻¹) = (b'⁻¹ * n * b') * n⁻¹ := by group
+    rw [h_eq]
+    apply Subgroup.mul_mem _ _ (Subgroup.inv_mem _ hnN)
+    -- `b'⁻¹ * n * b' ∈ N` by normality.
+    have := h.isNormal.conj_mem' n hnN b'
+    exact this
+  have hdisj : Disjoint N A := h.isComplement.disjoint
+  -- So `b'⁻¹ * (n * b' * n⁻¹) = 1`, i.e., `n * b' * n⁻¹ = b'`, i.e., `b'` commutes with `n`.
+  have h_one : b'⁻¹ * (n * b' * n⁻¹) = 1 := Subgroup.disjoint_def.mp hdisj h_comm_elem' h_comm_elem
+  have h_conj_b' : n * b' * n⁻¹ = b' := by
+    have := h_one
+    -- `b'⁻¹ * Y = 1` ⇒ `Y = b'`.
+    have h_mul := congrArg (b' * ·) this
+    simp only [← mul_assoc, mul_inv_cancel, one_mul, mul_one] at h_mul
+    exact h_mul
+  -- By Frobenius condition, if `b' ≠ 1` and `n ≠ 1`, then... wait, we have `b' * n * b'⁻¹ ≠ n`.
+  -- Reformulate `h_conj_b'`: `n * b' * n⁻¹ = b'` ⇔ `n * b' = b' * n` ⇔ `b' * n * b'⁻¹ = n`.
+  -- So if `b' ≠ 1` and `n ≠ 1`, Frobenius gives contradiction. Hence `b' = 1` or `n = 1`.
+  have h_conj_n : b' * n * b'⁻¹ = n := by
+    -- `n * b' * n⁻¹ = b'` ⇒ `n * b' = b' * n`.
+    have h_nb' : n * b' = b' * n := by
+      have := congrArg (· * n) h_conj_b'
+      simpa using this
+    -- `b' * n * b'⁻¹ = (b' * n) * b'⁻¹ = (n * b') * b'⁻¹ = n`.
+    rw [← h_nb', mul_inv_cancel_right]
+  -- Case analysis: either `b' = 1` or `n = 1`.
+  by_cases h_n_one : n = 1
+  · -- `n = 1` ⇒ `g = n * a = a ∈ A`.
+    rw [← hna, h_n_one, one_mul]
+    exact haA
+  · -- `n ≠ 1`. By Frobenius, `b' = 1`. Then `x = n * 1 * n⁻¹ = 1`, contradiction.
+    by_cases h_b'_one : b' = 1
+    · exfalso
+      have : x = 1 := by rw [hx_eq2, h_b'_one, mul_one, mul_inv_cancel]
+      exact hx_ne this
+    · exfalso
+      exact h.conj_frobenius b' hb'_mem h_b'_one n hnN h_n_one h_conj_n
+
+/-- **Isaacs Thm 6.4 (2) ⇒ (3)**: Frobenius group ⇒ centralizer of any nontrivial element of `A`
+is contained in `A`. -/
+theorem centralizer_complement_le (h : IsFrobeniusGroup G N A) :
+    ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A := by
+  intro a haA ha x hx
+  -- `x * a = a * x`, so `x * a * x⁻¹ = a`, so `a = (MulAut.conj x) a⁻¹⁻¹ ∈ A.map (MulAut.conj x)`.
+  rw [Subgroup.mem_centralizer_singleton_iff] at hx
+  -- Want: `x ∈ A`. Assume for contradiction `x ∉ A`.
+  by_contra hxA
+  -- By (2), `A ⊓ A^x = ⊥`.
+  have h_ti := h.trivialIntersection x hxA
+  -- `a ∈ A ⊓ A^x`: indeed `a ∈ A`, and `a = (MulAut.conj x) a` (from commutativity).
+  have h_a_in_conj : a ∈ Subgroup.map (MulAut.conj x).toMonoidHom A := by
+    rw [Subgroup.mem_map]
+    refine ⟨a, haA, ?_⟩
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+    -- `x * a * x⁻¹ = a` follows from `x * a = a * x`.
+    have := hx
+    calc x * a * x⁻¹ = (x * a) * x⁻¹ := by rfl
+      _ = (a * x) * x⁻¹ := by rw [hx]
+      _ = a := by rw [mul_inv_cancel_right]
+  have h_a_in : a ∈ A ⊓ Subgroup.map (MulAut.conj x).toMonoidHom A :=
+    Subgroup.mem_inf.mpr ⟨haA, h_a_in_conj⟩
+  rw [h_ti, Subgroup.mem_bot] at h_a_in
+  exact ha h_a_in
+
+end IsFrobeniusGroup
 
 end
 
