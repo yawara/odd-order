@@ -329,7 +329,17 @@ private theorem step_factor
 private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
     ∃ L : Subgroup G, L.Normal ∧ L ≤ N ∧ L ≠ ⊥ ∧
       ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L := by
-  sorry
+  let S : Set (Subgroup G) := {L | L.Normal ∧ L ≤ N ∧ L ≠ ⊥}
+  have hS_fin : S.Finite := Set.toFinite S
+  have hS_ne : S.Nonempty := ⟨N, hN_normal, le_refl N, hN⟩
+  obtain ⟨L, hL_min⟩ := hS_fin.exists_minimal hS_ne
+  -- hL_min : Minimal (· ∈ S) L
+  obtain ⟨⟨hL_normal, hL_le, hL_ne⟩, hL_minimal⟩ := hL_min
+  refine ⟨L, hL_normal, hL_le, hL_ne, ?_⟩
+  intro L' hL'_normal hL'_le hL'_ne
+  have hL'_mem : L' ∈ S := ⟨hL'_normal, hL'_le.trans hL_le, hL'_ne⟩
+  -- hL_minimal : ∀ b ∈ S, b ≤ L → L ≤ b
+  exact le_antisymm hL'_le (hL_minimal hL'_mem hL'_le)
 
 /-- **Case A (N solvable)**: full SZ conjugacy when `N` is solvable.
 
