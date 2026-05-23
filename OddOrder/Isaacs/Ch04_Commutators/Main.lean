@@ -2850,6 +2850,75 @@ theorem fixedPoints_inf_actionCommutator_eq_bot_of_abelian
     exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp h_ord_gcd)
   exact h_one
 
+/-! ### Isaacs §4D Cor 4.35 ⭐ (BG Prop 1.6(e)): abelian p-群 + p'-A fixes order-p ⇒
+A trivial -/
+
+/-- **Isaacs Corollary 4.35** ⭐ (= BG Prop 1.6(e), **FT クリティカル**):
+G is abelian p-群, A is p'-group (i.e., p ∤ |A|), A acts on G via automorphisms.
+If A fixes every element of order p (i.e., every g with `g^p = 1`), then
+`actionCommutator φ = ⊥` (A acts trivially on G).
+
+**証明** (Isaacs p.141):
+- Coprime: p ∤ |A| + G p-group ⇒ |A| coprime |G|.
+- G abelian + coprime ⇒ Thm 4.34: `fixedPoints ⊓ actionCommutator = ⊥`.
+- Suppose [G, A] = actionCommutator ≠ ⊥. Then nontrivial subgroup of p-group G.
+- Cauchy: ∃ g ∈ [G, A] with orderOf g = p. So `g^p = 1`, `g ≠ 1`.
+- Hypothesis: A fixes g, i.e., g ∈ fixedPoints.
+- So g ∈ fixedPoints ⊓ [G, A] = ⊥, contradicting g ≠ 1. -/
+theorem actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
+    {A G : Type*} [Group A] [CommGroup G] [Finite A] [Finite G]
+    {p : ℕ} [hp : Fact p.Prime] (φ : A →* MulAut G) (hG : IsPGroup p G)
+    (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ g : G, g ^ p = 1 → ∀ a : A, (φ a) g = g) :
+    actionCommutator φ = ⊥ := by
+  -- Coprime |A|, |G|: G is p-group ⇒ |G| = p^n. p ∤ |A| ⇒ gcd = 1.
+  have hCop : Nat.Coprime (Nat.card A) (Nat.card G) := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+    rw [hn]
+    exact (Nat.Coprime.pow_right n
+      (Nat.coprime_comm.mp (Nat.Prime.coprime_iff_not_dvd hp.out |>.mpr hA_p')))
+  -- Apply Thm 4.34: fixedPoints ⊓ actionCommutator = ⊥
+  have h_inf_bot := fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hCop
+  -- Suppose actionCommutator ≠ ⊥, get contradiction via Cauchy
+  by_contra h_ne_bot
+  -- ∃ g ∈ actionCommutator with g ≠ 1
+  obtain ⟨g_elem, hg_in, hg_ne⟩ : ∃ g ∈ actionCommutator φ, g ≠ 1 := by
+    by_contra h
+    push_neg at h
+    apply h_ne_bot
+    rw [Subgroup.eq_bot_iff_forall]
+    exact h
+  -- actionCommutator is nontrivial subgroup of p-group ⇒ has order-p element
+  haveI hG_AC : IsPGroup p (actionCommutator φ) := hG.to_subgroup _
+  haveI : Nontrivial (actionCommutator φ) := ⟨⟨g_elem, hg_in⟩, 1, by
+    intro h
+    apply hg_ne
+    exact (Subtype.ext_iff.mp h)⟩
+  obtain ⟨n, hn_pos, hn_card⟩ := hG_AC.nontrivial_iff_card.mp inferInstance
+  -- |actionCommutator| = p^n with n ≥ 1, so p ∣ |actionCommutator|
+  have hp_dvd : p ∣ Nat.card (actionCommutator φ) := by
+    rw [hn_card]; exact dvd_pow_self p hn_pos.ne'
+  -- Cauchy: ∃ g ∈ actionCommutator with orderOf g = p
+  obtain ⟨g, hg_ord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  -- Convert orderOf inside subgroup ⇒ orderOf in G via subtype is preserved
+  have h_ord_eq : orderOf (g : G) = orderOf g := by
+    exact (orderOf_injective (actionCommutator φ).subtype
+      (Subgroup.subtype_injective _) g)
+  have h_ord_g : orderOf (g : G) = p := h_ord_eq.trans hg_ord
+  -- g^p = 1 in G
+  have hg_pow : (g : G) ^ p = 1 := by
+    rw [← h_ord_g]; exact pow_orderOf_eq_one _
+  -- g is fixed by A (hypothesis)
+  have hg_fixed : ∀ a : A, (φ a) (g : G) = g := h_fix g hg_pow
+  -- So g ∈ fixedPointsOfMulAut ⊓ actionCommutator = ⊥
+  have hg_in_inf : (g : G) ∈ Subgroup.fixedPointsOfMulAut φ ⊓ actionCommutator φ :=
+    Subgroup.mem_inf.mpr ⟨hg_fixed, g.2⟩
+  rw [h_inf_bot, Subgroup.mem_bot] at hg_in_inf
+  -- hg_in_inf : (g : G) = 1, but orderOf g = p > 1, contradiction
+  have : orderOf (g : G) = 1 := by rw [hg_in_inf, orderOf_one]
+  rw [h_ord_g] at this
+  exact hp.out.one_lt.ne' this
+
 /-! ### Isaacs §4D: Baer trick (Lem 4.37) — odd order class ≤ 2 ⇒ additive group structure
 
 For `G` finite of **odd order** and **nilpotence class ≤ 2**, define
