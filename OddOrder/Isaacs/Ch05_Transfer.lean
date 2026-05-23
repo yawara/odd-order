@@ -511,11 +511,21 @@ theorem isaacs_thm_5_17
   set P_N : Subgroup ↥N := (P : Subgroup G).subgroupOf N with hP_N_def
   haveI hP_N_normal : P_N.Normal := Subgroup.normal_in_normalizer
   haveI : Finite ↥N := inferInstance
-  -- coprime(|P_N|, |N : P_N|)
+  -- coprime(|P_N|, |N : P_N|): |P_N| = |P| = p^a, |N:P_N| ∣ |G:P| coprime to p
+  have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
   have h_coprime_P_N : Nat.Coprime (Nat.card ↥P_N) P_N.index := by
-    -- |P_N| = |P| (subgroupOf preserves card for P ≤ N)
-    -- |N : P_N| ∣ |G : P|; |G : P| coprime to p; |P| = p^a
-    sorry
+    have h_card_eq : Nat.card ↥P_N = Nat.card ↥(P : Subgroup G) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_N).toEquiv
+    have h_idx_dvd : P_N.index ∣ (P : Subgroup G).index :=
+      Subgroup.relIndex_dvd_index_of_le hP_le_N
+    obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    rw [h_card_eq, hP_card]
+    -- p coprime to |G:P| (Sylow); pow_left ⇒ p^a coprime to |G:P|; dvd ⇒ coprime to P_N.index
+    have h_p_coprime_idx : Nat.Coprime p ((P : Subgroup G).index) :=
+      (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr P.not_dvd_index
+    have h_pa_coprime_idx : Nat.Coprime (p^a) ((P : Subgroup G).index) :=
+      h_p_coprime_idx.pow_left a
+    exact h_pa_coprime_idx.coprime_dvd_right h_idx_dvd
   -- Schur-Zassenhaus: complement K' of P_N in N
   obtain ⟨K', hK'_compl⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_P_N
   -- Map K' back to G via subtype
@@ -525,9 +535,20 @@ theorem isaacs_thm_5_17
     intro k hk
     obtain ⟨k', _, rfl⟩ := hk
     exact k'.property
-  -- |K| coprime to |P|
+  -- |K| coprime to |P|: |K| = |K'| = P_N.index (complement), and (|P|, P_N.index) coprime
   have h_coprime_PK : Nat.Coprime (Nat.card ↥(P : Subgroup G)) (Nat.card ↥K) := by
-    sorry
+    -- |K| = |K'|
+    have h_K_card : Nat.card ↥K = Nat.card ↥K' :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective K' N.subtype Subtype.coe_injective).toEquiv).symm
+    -- |K'| = P_N.index (complement)
+    have h_K'_card : Nat.card ↥K' = P_N.index := by
+      have := hK'_compl.card_right
+      rwa [Nat.card_coe_set_eq] at this
+    -- |P_N| = |P|
+    have h_PN_card : Nat.card ↥P_N = Nat.card ↥(P : Subgroup G) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_N).toEquiv
+    rw [h_K_card, h_K'_card, ← h_PN_card]
+    exact h_coprime_P_N
   -- Apply Thm 4.34 (axiom)
   obtain ⟨h_inf_bot, h_sup_top⟩ :=
     _root_.OddOrder.Isaacs.Ch04.fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
@@ -551,25 +572,58 @@ theorem isaacs_thm_5_17
     -- P ≤ commutator G
     have hP_le_comm : (P : Subgroup G) ≤ commutator G := by
       rw [← h_sup_top, h_cent_bot, bot_sup_eq]
-      -- ⁅P, K⁆ ≤ commutator G
       rw [_root_.commutator_def]
       exact Subgroup.commutator_mono le_top le_top
-    -- |P| ∣ |commutator G|
-    have hP_dvd_comm : Nat.card ↥(P : Subgroup G) ∣ Nat.card (commutator G) :=
-      Subgroup.card_dvd_of_le hP_le_comm
-    -- p ∤ (commutator G).index (= |G:G'|)
-    sorry
+    -- (commutator G).index ∣ (P : Subgroup G).index (P ≤ G' ⇒ |G:G'| ∣ |G:P|)
+    -- p ∣ (commutator G).index ⇒ p ∣ (P : Subgroup G).index, contradicting Sylow
+    intro h_dvd_idx
+    have h_idx_dvd : (commutator G).index ∣ (P : Subgroup G).index :=
+      Subgroup.index_dvd_of_le hP_le_comm
+    exact P.not_dvd_index (h_dvd_idx.trans h_idx_dvd)
   · -- Case 1 (h_comm_bot): ⁅P,K⁆ = ⊥ ⇒ K centralizes P ⇒ N(P) ≤ C(P) ⇒ Burnside
     left
-    -- K centralizes P
-    have hK_cent_P : K ≤ Subgroup.centralizer (P : Set G) := by
-      sorry
-    -- N(P) = P · K (as set, complement). Both P and K centralize P (P abelian; K above).
-    -- So N(P) ≤ C(P).
-    have h_NP_le_CP : N ≤ Subgroup.centralizer (P : Set G) := by
-      sorry
-    -- Apply Burnside
-    sorry
+    -- K centralizes P (commutator_eq_bot_iff_le_centralizer + commutator_comm)
+    have hK_cent_P : K ≤ Subgroup.centralizer (P : Subgroup G) := by
+      have h_comm_KP : (⁅K, (P : Subgroup G)⁆ : Subgroup G) = ⊥ := by
+        rw [Subgroup.commutator_comm]; exact h_comm_bot
+      exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp h_comm_KP
+    -- (P : Subgroup G) ≤ centralizer P (abelian)
+    have hP_cent_P : (P : Subgroup G) ≤ Subgroup.centralizer (P : Subgroup G) := by
+      intro a haP
+      rw [Subgroup.mem_centralizer_iff]
+      intro b hbP
+      have h := mul_comm (⟨b, hbP⟩ : ↥(P : Subgroup G)) ⟨a, haP⟩
+      exact congrArg Subtype.val h
+    -- N = (P : Subgroup G) ⊔ K (from complement P_N ⊔ K' = ⊤ via Subgroup.map)
+    have hN_eq : (P : Subgroup G) ⊔ K = N := by
+      have h_sup_top_PN : P_N ⊔ K' = ⊤ := hK'_compl.sup_eq_top
+      calc (P : Subgroup G) ⊔ K
+          = P_N.map N.subtype ⊔ K := by
+            rw [Subgroup.map_subgroupOf_eq_of_le hP_le_N]
+        _ = P_N.map N.subtype ⊔ K'.map N.subtype := rfl
+        _ = (P_N ⊔ K').map N.subtype := (Subgroup.map_sup _ _ _).symm
+        _ = (⊤ : Subgroup ↥N).map N.subtype := by rw [h_sup_top_PN]
+        _ = N := by rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    -- N ≤ centralizer P
+    have h_NP_le_CP : N ≤ Subgroup.centralizer (P : Subgroup G) := by
+      rw [← hN_eq]
+      exact sup_le hP_cent_P hK_cent_P
+    -- Burnside: M := ker(transferSylow P h_NP_le_CP) is normal p-complement
+    -- |M| coprime to p (mathlib)
+    have h_M_no_p : ¬ p ∣ Nat.card (MonoidHom.transferSylow P h_NP_le_CP).ker :=
+      MonoidHom.not_dvd_card_ker_transferSylow P h_NP_le_CP
+    -- commutator G ≤ M (since ↥P abelian via IsCyclic ⇒ transferSylow hom to abelian)
+    have h_comm_le_M : commutator G ≤ (MonoidHom.transferSylow P h_NP_le_CP).ker := by
+      rw [_root_.commutator_def, Subgroup.commutator_le]
+      intro a _ b _
+      rw [MonoidHom.mem_ker, map_commutatorElement,
+          commutatorElement_eq_one_iff_mul_comm]
+      -- ↥P abelian (IsCyclic ⇒ IsMulCommutative)
+      haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+      exact mul_comm _ _
+    -- p ∤ |commutator G|
+    intro h_p_dvd_comm
+    exact h_M_no_p (h_p_dvd_comm.trans (Subgroup.card_dvd_of_le h_comm_le_M))
 
 end -- 5C
 
