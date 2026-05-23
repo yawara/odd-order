@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch03_SplitExtensions
 import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Ch.4 → Ch.3 forward dependencies (coprime action machinery)
@@ -19,7 +20,7 @@ Schur-Zassenhaus + Sylow + Frattini のみで実装可能 (2026-05-23 audit).
 | Isaacs # | Lean | 状態 |
 |---|---|---|
 | Lem 3.24(a) Glauberman | `glauberman_fixed_point_exists` | 進行中 |
-| Lem 3.24(b) Glauberman | `glauberman_fixed_points_conj` | 進行中 |
+| Lem 3.24(b) Glauberman | `glauberman_fixed_points_conj` | 予定 |
 | Thm 3.23(a) A-inv Sylow | `exists_aInvariant_sylow` | 予定 |
 | Thm 3.23(b) A-inv Sylow conj | `aInvariant_sylow_conj` | 予定 |
 | Cor 3.25 A-inv p-subgroup | `aInvariant_pSubgroup_le_aInvariant_sylow` | 予定 |
@@ -107,5 +108,33 @@ noncomputable def IsCompatibleMulAction.toMulAction
   simp [IsCompatibleMulAction.toPermHom, SemidirectProduct.lift_inr]
 
 end CompatibleAction
+
+/-! ## §3E.1 Lemma 3.24 Glauberman fixed-point lemma -/
+
+section Glauberman
+
+variable {A : Type*} [Group A] [Finite A] [Finite G]
+
+/-- **Isaacs Lemma 3.24(a) Glauberman fixed-point lemma**:
+Let `A` act via automorphisms on `G`, where `A`, `G` are finite groups with `(|A|, |G|) = 1`,
+and at least one of `A` or `G` is solvable.
+Suppose `A` and `G` both act on a nonempty set `Ω`, where `G` acts transitively, and the
+compatibility condition `a • (g • ω) = (φ a g) • (a • ω)` holds.
+Then there exists an `A`-invariant element `α ∈ Ω`.
+
+**証明** (Isaacs p.98): `Γ := G ⋊[φ] A`, choose `α ∈ Ω`, `U := stabilizer Γ α`.
+`UG = Γ` (since `G` transitive). `U ∩ G ⊴ U`, `|U:U∩G| = |Γ:G| = |A|` coprime to `|U∩G|`.
+Schur-Zassenhaus existence in `U` gives complement `H` of `U ∩ G` in `U`. `H` is also
+complement of `G` in `Γ`. `inr(A)` is too. SZ conjugacy: `H = (inr A)^x` for `x ∈ inl(G)`.
+Then `x⁻¹ • α` is `A`-invariant. -/
+theorem glauberman_fixed_point_exists
+    {φ : A →* MulAut G} (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (_hSolv : IsSolvable A ∨ IsSolvable G)
+    {Ω : Type*} [MulAction G Ω] [MulAction A Ω] [Nonempty Ω]
+    (_h : IsCompatibleMulAction φ Ω) (_hG_trans : MulAction.IsPretransitive G Ω) :
+    ∃ α : Ω, ∀ a : A, a • α = α := by
+  sorry  -- TODO: SDP + SZ existence + conjugacy.
+
+end Glauberman
 
 end OddOrder.Isaacs.Ch04

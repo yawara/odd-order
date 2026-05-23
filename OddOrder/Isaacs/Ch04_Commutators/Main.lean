@@ -2169,6 +2169,153 @@ instance actionCommutator.normal {A G : Type*} [Group A] [Group G] (φ : A →* 
   rw [actionCommutator_map_inl]
   exact commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
 
+/-! ### Isaacs §4C: [G,A] の universal property (Lem 4.20, Cor 4.21) -/
+
+/-- **Isaacs Lemma 4.20** (element form, right): `actionCommutator φ ≤ N` iff
+`∀ a g, (φ a) g * g⁻¹ ∈ N`. つまり `actionCommutator φ` は
+`{(φ a) g * g⁻¹ : a g}` で生成される最小の部分群.
+
+**意味**: `N ⊴ G` が `A`-不変なら `actionCommutator ≤ N ↔ A acts trivially on G/N`
+(右剰余類 `Nx` が A 不変 ↔ `(φ a) x ∈ Nx`).
+
+**証明**: `actionCommutator` は `g * (φ a) g⁻¹ = ((φ a) g * g⁻¹)⁻¹` で生成されるので
+`(φ a) g * g⁻¹` の集合と同じ subgroup を生成する. -/
+theorem actionCommutator_le_iff {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (N : Subgroup G) :
+    actionCommutator φ ≤ N ↔ ∀ a : A, ∀ g : G, (φ a) g * g⁻¹ ∈ N := by
+  constructor
+  · intro h a g
+    have h_gen : g * (φ a) g⁻¹ ∈ actionCommutator φ :=
+      Subgroup.subset_closure ⟨g, a, rfl⟩
+    have h_inv : (φ a) g * g⁻¹ = (g * (φ a) g⁻¹)⁻¹ := by
+      rw [show (φ a) g⁻¹ = ((φ a) g)⁻¹ from map_inv (φ a) g]
+      group
+    rw [h_inv]
+    exact Subgroup.inv_mem _ (h h_gen)
+  · intro h
+    rw [actionCommutator, Subgroup.closure_le]
+    rintro _ ⟨g, a, rfl⟩
+    have h_form : g * (φ a) g⁻¹ = ((φ a) g * g⁻¹)⁻¹ := by
+      rw [show (φ a) g⁻¹ = ((φ a) g)⁻¹ from map_inv (φ a) g]
+      group
+    rw [h_form]
+    exact Subgroup.inv_mem _ (h a g)
+
+/-- **Isaacs Lemma 4.20** (element form, left): `actionCommutator φ ≤ N` iff
+`∀ a g, g⁻¹ * (φ a) g ∈ N`. 左剰余類 `xN` 形.
+
+**意味**: 左剰余類 `xN` が `A` 不変 ↔ `(φ a) x ∈ xN` ↔ `x⁻¹ * (φ a) x ∈ N`. -/
+theorem actionCommutator_le_iff_left {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (N : Subgroup G) :
+    actionCommutator φ ≤ N ↔ ∀ a : A, ∀ g : G, g⁻¹ * (φ a) g ∈ N := by
+  rw [actionCommutator_le_iff]
+  -- ∀ a g, (φ a) g * g⁻¹ ∈ N ↔ ∀ a g, g⁻¹ * (φ a) g ∈ N
+  constructor
+  · intro h a x
+    have h' := h a x⁻¹
+    rw [show (φ a) x⁻¹ = ((φ a) x)⁻¹ from map_inv (φ a) x] at h'
+    -- h' : ((φ a) x)⁻¹ * x⁻¹⁻¹ ∈ N
+    have h_eq : ((φ a) x)⁻¹ * x⁻¹⁻¹ = (x⁻¹ * (φ a) x)⁻¹ := by group
+    rw [h_eq] at h'
+    simpa using Subgroup.inv_mem _ h'
+  · intro h a x
+    have h' := h a x⁻¹
+    rw [show (φ a) x⁻¹ = ((φ a) x)⁻¹ from map_inv (φ a) x] at h'
+    have h_eq : x⁻¹⁻¹ * ((φ a) x)⁻¹ = ((φ a) x * x⁻¹)⁻¹ := by group
+    rw [h_eq] at h'
+    simpa using Subgroup.inv_mem _ h'
+
+/-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
+(a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);
+(b) `∀ a x, (φ a) x ∈ xH` (left coset is A-invariant in element form);
+(c) `actionCommutator φ ≤ H`.
+
+Element-level: (a) = `∀ a x, (φ a) x * x⁻¹ ∈ H`, (b) = `∀ a x, x⁻¹ * (φ a) x ∈ H`. -/
+theorem actionCommutator_le_iff_TFAE {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (H : Subgroup G) :
+    List.TFAE [
+      actionCommutator φ ≤ H,
+      ∀ a : A, ∀ x : G, (φ a) x * x⁻¹ ∈ H,
+      ∀ a : A, ∀ x : G, x⁻¹ * (φ a) x ∈ H] := by
+  tfae_have 1 ↔ 2 := actionCommutator_le_iff φ H
+  tfae_have 1 ↔ 3 := actionCommutator_le_iff_left φ H
+  tfae_finish
+
+/-- **Isaacs Cor 4.21 corollary**: If `actionCommutator φ ≤ H`, then `H` is `A`-invariant.
+(Because `(φ a) h = ((φ a) h * h⁻¹) * h` and the first factor is in `H` by Lem 4.20.) -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.of_actionCommutator_le
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {H : Subgroup G} (h_le : actionCommutator φ ≤ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a h hh
+  -- (φ a) h ∈ H. Use: (φ a) h = ((φ a) h * h⁻¹) * h, both factors ∈ H.
+  have h1 : (φ a) h * h⁻¹ ∈ H := (actionCommutator_le_iff φ H).mp h_le a h
+  have h_eq : (φ a) h = ((φ a) h * h⁻¹) * h := by group
+  rw [h_eq]
+  exact H.mul_mem h1 hh
+
+/-- **Isaacs Lemma 4.25** ⭐: If `A` acts trivially on `actionCommutator φ` (i.e.,
+`[G, A, A] = 1`), then `actionCommutator φ` is abelian.
+
+**証明戦略** (Isaacs p.135): Γ = G ⋊[φ] A 内で Three-subgroups lemma を適用.
+- `H_Γ := ⁅inl(G).range, inr(A).range⁆` (Γ-内 commutator) `= inl(actionCommutator)`
+  (`actionCommutator_map_inl`).
+- 仮説 ⇒ Γ で `⁅H_Γ, inr(A).range⁆ = ⊥` (各生成元 `⁅inl k, inr a⁆ = inl(k * (φ a) k⁻¹)`
+  で `(φ a) k = k` から `= inl 1 = 1`).
+- `H_Γ.Normal` (Lem 4.1 系) ⇒ `⁅H_Γ, inl(G).range⁆ ≤ H_Γ` ⇒ 二重交換子も `⊥`.
+- Three-subgroups で `⁅⁅inl(G).range, inr(A).range⁆, H_Γ⁆ = ⁅H_Γ, H_Γ⁆ = ⊥`.
+- `inl` 単射で pull back. -/
+theorem actionCommutator_commutator_eq_bot_of_acts_trivially
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G)
+    (h_triv : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut φ) :
+    ⁅actionCommutator φ, actionCommutator φ⁆ = ⊥ := by
+  -- Setup: work in Γ = G ⋊[φ] A
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  set H_Γ : Subgroup (G ⋊[φ] A) := ⁅XG, YA⁆ with hHΓ_def
+  -- H_Γ = inl(actionCommutator)
+  have h_HΓ_eq : (actionCommutator φ).map SemidirectProduct.inl = H_Γ :=
+    actionCommutator_map_inl φ
+  -- H_Γ is Normal in Γ (Lem 4.1 系 via inl ⊔ inr = ⊤)
+  haveI h_HΓ_normal : H_Γ.Normal := commutator_normal_of_sup_eq_top
+    SemidirectProduct.inl_range_sup_inr_range_eq_top
+  -- Step 1: ⁅H_Γ, YA⁆ = ⊥ in Γ (from hypothesis, via generator computation)
+  have h_step1 : ⁅H_Γ, YA⁆ = ⊥ := by
+    rw [← h_HΓ_eq, eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨k, hk, rfl⟩ _ ⟨a, rfl⟩
+    -- Goal: ⁅inl k, inr a⁆ ∈ ⊥
+    rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+    -- Goal: inl (k * (φ a) k⁻¹) = 1
+    have h_fix : (φ a) k = k := h_triv hk a
+    rw [show (φ a) k⁻¹ = ((φ a) k)⁻¹ from map_inv (φ a) k, h_fix, mul_inv_cancel]
+    exact map_one _
+  -- Step 2: ⁅⁅H_Γ, XG⁆, YA⁆ = ⊥ (via H_Γ.Normal ⇒ ⁅H_Γ, XG⁆ ≤ H_Γ, then Step 1)
+  have h_step2 : ⁅⁅H_Γ, XG⁆, YA⁆ = ⊥ := by
+    have h_inner_le : ⁅H_Γ, XG⁆ ≤ H_Γ := Subgroup.commutator_le_left H_Γ XG
+    exact le_bot_iff.mp <|
+      le_trans (Subgroup.commutator_mono h_inner_le le_rfl) h_step1.le
+  -- Step 3: Three-subgroups in Γ
+  -- With H₁ = XG, H₂ = YA, H₃ = H_Γ:
+  -- ⁅⁅H₂, H₃⁆, H₁⁆ = ⁅⁅YA, H_Γ⁆, XG⁆ = ⁅⊥, XG⁆ = ⊥ (step 1 + commutator_comm)
+  -- ⁅⁅H₃, H₁⁆, H₂⁆ = ⁅⁅H_Γ, XG⁆, YA⁆ = ⊥ (step 2)
+  -- Conclude: ⁅⁅H₁, H₂⁆, H₃⁆ = ⁅⁅XG, YA⁆, H_Γ⁆ = ⁅H_Γ, H_Γ⁆ = ⊥
+  have h_step3 : ⁅H_Γ, H_Γ⁆ = ⊥ := by
+    have h_a : ⁅⁅YA, H_Γ⁆, XG⁆ = ⊥ := by
+      rw [Subgroup.commutator_comm YA H_Γ, h_step1, Subgroup.commutator_bot_left]
+    have h_b : ⁅⁅H_Γ, XG⁆, YA⁆ = ⊥ := h_step2
+    have h_three := Subgroup.commutator_commutator_eq_bot_of_rotate h_a h_b
+    -- h_three : ⁅⁅XG, YA⁆, H_Γ⁆ = ⊥
+    rwa [← hHΓ_def] at h_three
+  -- Step 4: Pull back ⁅H_Γ, H_Γ⁆ = ⊥ via inl injectivity to actionCommutator
+  have h_inl_comm : (⁅actionCommutator φ, actionCommutator φ⁆).map
+      SemidirectProduct.inl = ⁅H_Γ, H_Γ⁆ := by
+    rw [Subgroup.map_commutator, h_HΓ_eq]
+  have h_map_bot : (⁅actionCommutator φ, actionCommutator φ⁆).map
+      SemidirectProduct.inl = ⊥ := h_inl_comm.trans h_step3
+  exact (Subgroup.map_eq_bot_iff_of_injective ⁅actionCommutator φ, actionCommutator φ⁆
+        SemidirectProduct.inl_injective).mp h_map_bot
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
