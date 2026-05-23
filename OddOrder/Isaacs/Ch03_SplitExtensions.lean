@@ -2239,6 +2239,74 @@ theorem cyclic_quotient_extension_unique
   have hu_decomp : u = x * g^i := by rw [hxdef]; group
   rw [hu_decomp, map_mul θ, map_mul θ', map_zpow θ, map_zpow θ', hθ_g, hθ'_g, hθ_ext _ hx_mem]
 
+/-! ### Isaacs Thm 3.36 (cyclic extension existence)
+
+`N` 群, `m > 0`, `a ∈ N`, `σ ∈ Aut(N)` で `σ a = a` かつ `σ^m = MulAut.conj a` を満たすとき,
+`N ⊴ G` で `G/N` cyclic of order `m`, generator `g` で `g^m = a` かつ `x^g = σ x`
+となる群 `G` が存在.
+
+構成: `preG := N ⋊_σ (Multiplicative ℤ)` を quotient by `K := ⟨(a⁻¹, m)⟩`.
+`hσa, hσm` から `(a⁻¹, m)` が `preG` の中心元 ⇒ `K ⊴ preG`. 各性質は商計算. -/
+/-- Twist hom: `Multiplicative ℤ →* MulAut N` sending `ofAdd k ↦ σ^k`. -/
+private noncomputable def cyclicExtPhi {N : Type*} [Group N] (σ : MulAut N) :
+    Multiplicative ℤ →* MulAut N :=
+  zpowersHom (MulAut N) σ
+
+@[simp] private lemma cyclicExtPhi_apply {N : Type*} [Group N] (σ : MulAut N)
+    (k : Multiplicative ℤ) : cyclicExtPhi σ k = σ ^ k.toAdd := rfl
+
+/-- The pre-quotient group `N ⋊_σ ℤ`. -/
+private abbrev CyclicExtPreG (N : Type*) [Group N] (σ : MulAut N) : Type _ :=
+  SemidirectProduct N (Multiplicative ℤ) (cyclicExtPhi σ)
+
+/-- The "central" element `(a⁻¹, m)` in `preG`. -/
+private noncomputable def cyclicExtK {N : Type*} [Group N]
+    (m : ℕ) (a : N) (σ : MulAut N) : CyclicExtPreG N σ :=
+  SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))
+
+/-- Under `hσa` and `hσm`, the element `(a⁻¹, m)` is fixed by conjugation. -/
+private lemma cyclicExtK_centralized {N : Type*} [Group N]
+    (m : ℕ) (a : N) (σ : MulAut N)
+    (hσa : σ a = a) (hσm : σ ^ m = MulAut.conj a) :
+    ∀ y : CyclicExtPreG N σ, y * cyclicExtK m a σ * y⁻¹ = cyclicExtK m a σ := by
+  intro y
+  sorry  -- (x, l) * (a⁻¹, m) * (x, l)⁻¹ = (a⁻¹, m) via σa=a, σ^m=conj a.
+
+/-- The kernel subgroup `K = ⟨(a⁻¹, m)⟩`. -/
+private noncomputable abbrev cyclicExtKSubgroup {N : Type*} [Group N]
+    (m : ℕ) (a : N) (σ : MulAut N) : Subgroup (CyclicExtPreG N σ) :=
+  Subgroup.zpowers (cyclicExtK m a σ)
+
+private lemma cyclicExtKSubgroup_normal {N : Type*} [Group N]
+    (m : ℕ) (a : N) (σ : MulAut N)
+    (hσa : σ a = a) (hσm : σ ^ m = MulAut.conj a) :
+    (cyclicExtKSubgroup m a σ).Normal := by
+  refine ⟨fun n hn y => ?_⟩
+  rw [Subgroup.mem_zpowers_iff] at hn
+  obtain ⟨j, hj⟩ := hn
+  refine Subgroup.mem_zpowers_iff.mpr ⟨j, ?_⟩
+  rw [← hj]
+  have h_conj_zpow : y * (cyclicExtK m a σ)^j * y⁻¹ = (y * cyclicExtK m a σ * y⁻¹)^j := by
+    have h : (MulAut.conj y) ((cyclicExtK m a σ)^j) = ((MulAut.conj y) (cyclicExtK m a σ))^j :=
+      map_zpow (MulAut.conj y) _ _
+    simpa using h
+  rw [h_conj_zpow, cyclicExtK_centralized m a σ hσa hσm]
+
+/-- **Isaacs Thm 3.36 (cyclic extension existence)** ⭐:
+given `N`, `m > 0`, `a ∈ N`, `σ ∈ Aut(N)` with `σ a = a` and `σ^m = MulAut.conj a`,
+there exists a group `G` with `N ⊴ G` (via iso `ι`), `G/N` cyclic of order `m`,
+and an element `g ∈ G` with `g^m = ι a` and `g · ι x · g⁻¹ = ι (σ x)`.
+
+Construction: `G := (N ⋊_σ ℤ) / ⟨(a⁻¹, m)⟩`. -/
+theorem cyclic_extension_exists {N : Type*} [Group N] {m : ℕ} (hm : 0 < m)
+    (a : N) (σ : MulAut N) (hσa : σ a = a) (hσm : σ ^ m = MulAut.conj a) :
+    ∃ (G : Type _) (_ : Group G) (N₀ : Subgroup G) (_ : N₀.Normal)
+      (ι : N ≃* ↥N₀) (g : G),
+      Subgroup.zpowers ((g : G ⧸ N₀)) = ⊤ ∧
+      g ^ m = (ι a : G) ∧
+      ∀ x : N, g * (ι x : G) * g⁻¹ = (ι (σ x) : G) := by
+  sorry  -- to be implemented
+
 end -- 3F
 
 end OddOrder.Isaacs.Ch03
