@@ -328,17 +328,107 @@ theorem normalizer_controls_centralizer_fusion
       _ = y * (c : G) * (c : G)⁻¹ := by rw [← hcy]
       _ = y := by group
 
-/-- **Isaacs Thm 5.18**: `P` abelian Sylow_p ⇒ `G' ∩ P = focalSubgroup P` ((Burnside 強化形).
-
-mathlib `commutator_inf_eq_focalSubgroup` の特殊化 (abelian 仮定は計算を簡略化するのみ).
-
-Isaacs 流のフル statement は `G' ∩ P` と `Z(N_G(P)) ∩ P` が direct factor 形分解だが,
-mathlib `commutator_inf_eq_focalSubgroup` で得られる `G' ∩ P = focal P` の方が
-Focal Subgroup Theorem の特殊化として扱いやすい. -/
+/-- mathlib `commutator_inf_eq_focalSubgroup` のリネーム (Focal Subgroup Theorem の
+Isaacs 5.18 弱形). 注: Isaacs 5.18 のフル statement は次の
+`eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (強形). -/
 theorem abelian_sylow_commutator_inf_eq_focal
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex] :
     _root_.commutator G ⊓ (P : Subgroup G) = P.focalSubgroup :=
   Subgroup.commutator_inf_eq_focalSubgroup P
+
+/-- **Isaacs Thm 5.18 (強形)**: `P` abelian Sylow_p(G) ⇒ `G' ∩ P ∩ Z(N_G(P)) = 1`.
+
+要素形式: `x ∈ G', x ∈ P, x ∈ Z(N_G(P))` ⇒ `x = 1`.
+
+**証明** (Isaacs p.166): transfer `v : G →* P` (P abelian, id : P →* P).
+`v(x) = 1` (x ∈ G', v hom to abelian P, commutator ≤ ker).
+`transfer_eq_pow` の key: `g₀⁻¹ x^k g₀ ∈ P ⇒ g₀⁻¹ x^k g₀ = x^k`.
+このために (i) P abelian で x^k, g₀⁻¹ x^k g₀ ∈ C_G(P), (ii) G-conjugate (via g₀⁻¹),
+(iii) **Lemma 5.12** で N_G(P)-conjugate: ∃ n ∈ N(P), n · x^k · n⁻¹ = g₀⁻¹ x^k g₀.
+(iv) x ∈ Z(N(P)) ⇒ x^k ∈ Z(N(P)) ⇒ Commute n x^k ⇒ n · x^k · n⁻¹ = x^k.
+ゆえに v(x).val = x^|G:P|. v(x) = 1 ⇒ x^|G:P| = 1. orderOf x は p-power (x ∈ P),
+|G:P| coprime to p ⇒ orderOf x = 1 ⇒ x = 1. -/
+theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
+    [hPab : IsMulCommutative (P : Subgroup G)]
+    {x : G} (hx_comm : x ∈ commutator G) (hx_P : x ∈ (P : Subgroup G))
+    (hx_central_N : ∀ n ∈ Subgroup.normalizer (P : Subgroup G), n * x = x * n) :
+    x = 1 := by
+  -- Setup transfer v : G →* ↥P (P abelian)
+  let v : G →* (P : Subgroup G) :=
+    @MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+      (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+        (MonoidHom.id (P : Subgroup G)) _
+  -- P abelian ⇒ P ⊆ centralizer P
+  have hP_le_centP : (P : Subgroup G) ≤ Subgroup.centralizer (P : Set G) := by
+    intro a haP
+    rw [Subgroup.mem_centralizer_iff]
+    intro b hbP
+    have h : (⟨b, hbP⟩ : ↥(P : Subgroup G)) * ⟨a, haP⟩ = ⟨a, haP⟩ * ⟨b, hbP⟩ :=
+      mul_comm _ _
+    exact congrArg Subtype.val h
+  -- key for transfer_eq_pow
+  have h_key : ∀ (k : ℕ) (g₀ : G), g₀⁻¹ * x ^ k * g₀ ∈ (P : Subgroup G) →
+      g₀⁻¹ * x ^ k * g₀ = x ^ k := by
+    intro k g₀ hg_pow_in_P
+    have hxk_in_P : x ^ k ∈ (P : Subgroup G) := Subgroup.pow_mem _ hx_P k
+    have hxk_cent_P : x ^ k ∈ Subgroup.centralizer (P : Set G) := hP_le_centP hxk_in_P
+    have hg_pow_cent_P : g₀⁻¹ * x ^ k * g₀ ∈ Subgroup.centralizer (P : Set G) :=
+      hP_le_centP hg_pow_in_P
+    -- G-conjugate via g₀⁻¹
+    have h_conj : g₀⁻¹ * x ^ k * (g₀⁻¹)⁻¹ = g₀⁻¹ * x ^ k * g₀ := by group
+    -- Lemma 5.12: N_G(P)-conjugate
+    obtain ⟨n, hn_N, hn_eq⟩ := normalizer_controls_centralizer_fusion P
+      hxk_cent_P hg_pow_cent_P h_conj
+    -- x ∈ Z(N(P)) ⇒ Commute n x ⇒ Commute n (x^k)
+    have hxn_comm : Commute n x := hx_central_N n hn_N
+    have hxkn_comm : Commute n (x ^ k) := hxn_comm.pow_right k
+    -- n * x^k * n⁻¹ = x^k
+    have h_eq : n * x ^ k * n⁻¹ = x ^ k := by
+      rw [hxkn_comm.eq]; group
+    -- g₀⁻¹ x^k g₀ = n * x^k * n⁻¹ = x^k
+    rw [← hn_eq, h_eq]
+  -- v(x).val = x^|G:P|
+  have hv_x_val : (v x).val = x ^ (P : Subgroup G).index := by
+    show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+        (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+          (MonoidHom.id (P : Subgroup G)) _) x).val = _
+    rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)
+          (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+            (MonoidHom.id (P : Subgroup G)) _ x h_key]
+    rfl
+  -- v(x) = 1 (x ∈ G', v hom to abelian)
+  have hv_x_one : v x = 1 := by
+    have hker : commutator G ≤ v.ker := by
+      rw [_root_.commutator_def, Subgroup.commutator_le]
+      intro a _ b _
+      rw [MonoidHom.mem_ker, map_commutatorElement,
+          commutatorElement_eq_one_iff_mul_comm]
+      exact mul_comm _ _
+    exact MonoidHom.mem_ker.mp (hker hx_comm)
+  -- x^|G:P| = 1
+  have h_pow_one : x ^ (P : Subgroup G).index = 1 := by
+    have hh : (v x).val = (1 : ↥(P : Subgroup G)).val := by rw [hv_x_one]
+    rw [hv_x_val] at hh
+    exact hh
+  -- orderOf x is p-power (x ∈ P p-group)
+  have h_ord_ppow : ∃ n, orderOf x = p ^ n := by
+    have h_eq : orderOf x = orderOf (⟨x, hx_P⟩ : ↥(P : Subgroup G)) :=
+      (Subgroup.orderOf_mk x hx_P).symm
+    rw [h_eq]
+    exact (IsPGroup.iff_orderOf.mp P.isPGroup') _
+  obtain ⟨n, hn⟩ := h_ord_ppow
+  -- Coprime (orderOf x) |G:P|: orderOf x = p^n and p ∤ |G:P|
+  have h_coprime : Nat.Coprime (orderOf x) (P : Subgroup G).index := by
+    rw [hn]
+    exact Nat.Coprime.pow_left _
+      ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr P.not_dvd_index)
+  -- orderOf x ∣ |G:P| ∧ Coprime ⇒ orderOf x = 1 ⇒ x = 1
+  have h_ord_dvd : orderOf x ∣ (P : Subgroup G).index :=
+    orderOf_dvd_of_pow_eq_one h_pow_one
+  have h_ord_eq_one : orderOf x = 1 :=
+    Nat.eq_one_of_dvd_coprimes h_coprime dvd_rfl h_ord_dvd
+  exact orderOf_eq_one_iff.mp h_ord_eq_one
 
 end -- 5C
 
