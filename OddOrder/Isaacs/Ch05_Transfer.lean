@@ -85,8 +85,10 @@ section /- 5A: Transfer definition + homomorphism (pp. 147-153) -/
 - **Thm 5.2** (transfer 準同型性): 同上, 構造の `map_mul'` フィールドで内包.
 - **Thm 5.3** (`p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換): ✅
   `not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center`.
-- **Thm 5.4** (Schur multiplier corollary): Schur multiplier 概念自体 mathlib 未収載.
-  FT 経路では不要. 保留. -/
+- **Thm 5.4** (Schur multiplier corollary): ✅ 弱形
+  `not_isMulCommutative_sylow_of_le_commutator_inf_center` — `Z ≤ Γ' ∩ Z(Γ)`, `p ∣ |Z|`
+  ⇒ Sylow_p(Γ) 非可換. Schur multiplier 概念 (M(G), 中心 extension の universal) 自体は
+  mathlib 未収載で full 形 (Sylow_p(Γ/Z) noncyclic) は別途. -/
 
 /-- **Isaacs Thm 5.3**: 素数 `p` で `p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換.
 
@@ -181,6 +183,23 @@ theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
     have h := orderOf_dvd_of_pow_eq_one h_pow_one
     rwa [hz_ord] at h
   exact P.not_dvd_index h_p_dvd
+
+/-- **Isaacs Cor 5.4** (Sylow non-abelian part, Schur multiplier 系): `Z ≤ Γ' ∩ Z(Γ)`,
+`p ∣ |Z|` ⇒ Sylow_p(Γ) は非可換.
+
+Thm 5.3 の hypothesis weakening (具体的 Z で `p ∣ |Z| → p ∣ |Γ' ∩ Z(Γ)|`).
+
+Schur multiplier 文脈: Γ = `G` の中心拡大 (`Γ/Z ≅ G`, `Z ≤ Γ' ∩ Z(Γ)`), `Z` の取りうる最大
+群が Schur multiplier `M(G)`. このとき "`p ∣ |M(G)|` ⇒ Sylow_p(`G`) noncyclic" が
+得られる. ここでは前段の Sylow_p(Γ) 非可換のみ実装. (Γ/Z の Sylow noncyclic への
+変換は `Cyclic.commutative_of_cyclic_center_quotient` + `P ∩ Z ≤ Z(P)` 経由で追加可.) -/
+theorem not_isMulCommutative_sylow_of_le_commutator_inf_center
+    [Finite G] {p : ℕ} [Fact p.Prime] {Z : Subgroup G}
+    (hZ : Z ≤ commutator G ⊓ Subgroup.center G)
+    (h_p_dvd : p ∣ Nat.card Z) (P : Sylow p G) [P.FiniteIndex] :
+    ¬ IsMulCommutative (P : Subgroup G) :=
+  not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center P
+    (h_p_dvd.trans (Subgroup.card_dvd_of_le hZ))
 
 end -- 5A
 
