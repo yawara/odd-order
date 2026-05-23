@@ -280,10 +280,37 @@ private theorem step_factor
                   (N.map (QuotientGroup.mk' L)).index :=
     (h1.coprime_dvd_left (Subgroup.card_map_dvd _ _)).coprime_dvd_right
       (N.index_map_dvd (QuotientGroup.mk'_surjective L))
-  -- Solvability transfer to G/L (left for next iteration).
+  -- Solvability transfer to G/L.
   have h_solv_q : IsSolvable (N.map (QuotientGroup.mk' L)) ∨
                    IsSolvable ((G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) := by
-    sorry
+    rcases hSolv with h | h
+    · left
+      haveI : IsSolvable N := h
+      -- N → N.map mk' is surjective.
+      let f : N →* ↥(N.map (QuotientGroup.mk' L)) :=
+        ((QuotientGroup.mk' L).comp N.subtype).codRestrict _ (fun x =>
+          Subgroup.mem_map.mpr ⟨x.val, x.property, rfl⟩)
+      have hf_surj : Function.Surjective f := by
+        rintro ⟨y, hy⟩
+        obtain ⟨n, hn, hny⟩ := Subgroup.mem_map.mp hy
+        exact ⟨⟨n, hn⟩, by ext; exact hny⟩
+      exact solvable_of_surjective hf_surj
+    · right
+      haveI : IsSolvable (G ⧸ N) := h
+      -- (G ⧸ L) ⧸ (N.map mk') is quotient of (G ⧸ N) via lift.
+      -- φ : G ⧸ N →* (G ⧸ L) ⧸ (N.map mk') sending ⟦g⟧_N ↦ ⟦⟦g⟧_L⟧_{N.map mk'}.
+      let φ : G ⧸ N →* (G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L)) :=
+        QuotientGroup.lift N
+          ((QuotientGroup.mk' (N.map (QuotientGroup.mk' L))).comp (QuotientGroup.mk' L))
+          (fun n hn => by
+            show (QuotientGroup.mk (QuotientGroup.mk n : G ⧸ L) :
+                  (G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) = 1
+            rw [QuotientGroup.eq_one_iff]
+            exact Subgroup.mem_map.mpr ⟨n, hn, rfl⟩)
+      have hφ_surj : Function.Surjective φ := by
+        rintro ⟨⟨g⟩⟩
+        exact ⟨QuotientGroup.mk g, rfl⟩
+      exact solvable_of_surjective hφ_surj
   -- Apply IH on G/L.
   obtain ⟨x, hx_mem, hx_conj⟩ := ih (G ⧸ L) hcard_lt h_cop_q h_solv_q hK_q hK'_q
   -- Lift x to g ∈ N.
