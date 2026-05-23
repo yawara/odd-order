@@ -38,8 +38,9 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
 | Thm 1.13 | (Thompson critical) | (Phase 1 未) | Phase 1 待ち |
-| **Lem 1.14** | — | `Subgroup.comap_map_eq` + Sylow corresp. | **本ファイル statement (sorry)** |
-| **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | **本ファイル placeholder (thin wrap 予定)** |
+| **Lem 1.14** main | — | `Subgroup.comap_normalizer_eq_of_surjective` + Sylow II in T·M | **statement 確定 + sorry (hard direction)** |
+| **Lem 1.14** 易方向 | — | `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer` | ✅ **sorry-free 5 行** |
+| **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | ✅ **sorry-free thin wrap** (π = {p} 特殊化) |
 | Thm 1.17 | Thm 5.21 | `commutator_inf_eq_focalSubgroup` ✅ | no-wrapper, docstring 参照 |
 | Thm 1.18 | Thm 5.13 | `ker_transferSylow_isComplement'` ✅ | no-wrapper |
 | Cor 1.19(b) | — | `IsZGroup.coprime_commutator_index` ✅ | no-wrapper, audit 発見 |
@@ -58,12 +59,17 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 - Cor 1.19(b) → mathlib `IsZGroup.coprime_commutator_index` 直接ヒット
 - 内部 hub は **Prop 1.5(d)** (6 §1 proofs)
 
-## 実装 status (2026-05-23)
+## 実装 status (2026-05-24)
 
-- **Skeleton** + **§1F docstring mapping** + **3 結果 (Lem 1.14, Prop 1.15(a), Lem 1.22) statement**
-  + **`card_comap_eq_card_mul_card_ker` helper proof 完成** (Lem 1.22 で使用予定)
-- Proof body は次 commit で実装. 各 statement に proof 方針 docstring 記載.
-- Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.6, Ch.7 未着手.
+- **Skeleton** + **§1F docstring mapping** + **4 結果**:
+  - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
+  - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` statement 確定 (sorry)
+  - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
+  - **Prop 1.15(a)** `hall_higman_solvable_specialization` ⭐ sorry-free thin wrap
+  - **`card_comap_eq_card_mul_card_ker`** helper sorry-free
+- 残 sorry: Lem 1.14 main の hard direction (Frattini argument via `Sylow.normalizer_sup_eq_top`
+  + `subgroupOf` layered gymnastics, ~100-150 LOC 規模で次セッション).
+- Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.7 §7A/§7C 着手 / Ch.5/6 進行中.
 -/
 
 namespace OddOrder.BG.Ch1.S01
