@@ -34,6 +34,12 @@
 - **Cor 4.21** `actionCommutator_le_iff_TFAE` (List.TFAE 三方向): (1) [G,A] ⊆ H, (2) 右剰余類 element form, (3) 左剰余類 element form. + 系 `IsAInvariant.of_actionCommutator_le`: [G,A] ⊆ H ⇒ H A-inv.
 - **Lem 4.25** ⭐ `actionCommutator_commutator_eq_bot_of_acts_trivially`: A が [G,A] に trivial 作用 ⇒ [G,A] abelian. 証明: Γ = G ⋊[φ] A 内 Three-subgroups lemma. Step 1 (`⁅H_Γ, inr(A)⁆ = ⊥` from generator computation), Step 2 (内側 commutator ≤ H_Γ via Normal), Step 3 (`Subgroup.commutator_commutator_eq_bot_of_rotate`), Step 4 (`inl` injective で pull back). ~145 LOC. commit `7ef0e4c` (parallel session が Glauberman 3.24 statement と同梱 commit).
 
+§4D **Lem 4.28 ⭐ 完成** (2026-05-24, commit `b51b49e`, **FT クリティカル**): `G = C_G(A) · [G, A]` for coprime + (A or G solvable). BG Prop 1.6(a).
+- **`fixedPoints_sup_actionCommutator_eq_top`**: `fixedPointsOfMulAut φ ⊔ actionCommutator φ = ⊤`.
+- 証明: 各 g ∈ G で **Cor 3.28** (`coprime_fixedPoints_quotient`, Ch.3 forward) を `N = actionCommutator` で適用. `(φ a) g = g · (g⁻¹ · (φ a) g)` で `g⁻¹ · (φ a) g ∈ actionCommutator` (Lem 4.20 left form). Cor 3.28 で c ∈ C_G(A) を取って g = c * n⁻¹.
+- 新規 import: `OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03` (Cor 3.28 用).
+- 総 ~40 LOC. 下流: Lem 4.29, Cor 4.30, Thm 4.34 ⭐, Thm 4.31 P×Q.
+
 §4D **Phase A.3 大部分完成** (2026-05-24, commits `e0ac1d0`, `9dbd721`, `ca7dc06`): Baer trick (Lem 4.37) — sqrtOdd + baerAdd + comm + assoc + Lem 4.37(a)(c).
 - **`sqrtOdd`** (noncomputable): `sqrtOdd x := x^((Nat.card G + 1) / 2)`. 基本性質: `sqrtOdd_sq` (square), `sqrtOdd_one`, `sqrtOdd_inv`, `sqrtOdd_mul_of_commute`, `sqrtOdd_mem_subgroup/center`, `sqrtOdd_apply_mulEquiv` (Aut 保存), `sqrtOdd_commutator_inv`.
 - **`baerAdd`** (noncomputable): `baerAdd x y := x * y * sqrtOdd ⁅y, x⁆` (mathlib commutator 規約). 基本: `baerAdd_one_left/right`, `baerAdd_inv_left/right`.
