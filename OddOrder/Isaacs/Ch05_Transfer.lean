@@ -1350,7 +1350,22 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         rw [Sylow.smul_eq_iff_mem_normalizer]; exact Subgroup.le_normalizer hsS_in
       have h_T_eq : T = yC • S := by
         rw [← hn_smul, ← hn_eq, mul_smul, h_sS_S]
-      -- Steps 9-11 (G-side conjugation chain + IH applications + combine) は別 session.
+      -- **Step 10 preview**: index strict inequality for IH (works for any subgroup > D).
+      -- P ⊓ R ≥ P ⊓ N (via S_in_G ≤ R and P ⊓ N ⊆ S_in_G), and P ⊓ N > D.
+      have hPN_le_S_in_G : (P : Subgroup G) ⊓ N ≤ S_in_G := by
+        intro x hx
+        have ⟨_, hx_N⟩ := Subgroup.mem_inf.mp hx
+        refine ⟨⟨x, hx_N⟩, ?_, rfl⟩
+        exact hPN_le_S (by rw [Subgroup.mem_subgroupOf]; exact hx)
+      have hPN_le_R : (P : Subgroup G) ⊓ N ≤ (R : Subgroup G) :=
+        hPN_le_S_in_G.trans hS_in_G_le_R
+      have hPR_gt_D : D < (P : Subgroup G) ⊓ R :=
+        lt_of_lt_of_le hPN_gt_D (le_inf inf_le_left hPN_le_R)
+      -- Remaining: Step 9 (Q ⊓ N ≤ yR := yC • R via T conjugation translation) +
+      --            Step 10/11 (IH on (P,R), (yR,Q), combine c = x · y⁻¹ · z) は別 session.
+      -- 主な技術障壁: (yC • S : Sylow p ↥N : Subgroup ↥N).map N.subtype = yC.val • S_in_G
+      -- の conjugation translation. `Sylow.coe_subgroup_smul` + `mem_pointwise_smul_iff_inv_smul_mem`
+      -- + ↥N vs G 座標変換が複雑.
       sorry
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
