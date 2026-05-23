@@ -32,7 +32,40 @@
 | §3E IsAInvariant suite 拡張 | ✅ (2026-05-23 ralph-loop, ~24 lemmas) | `.{smul_mem, inv_smul_mem, iSup, iInf, of_characteristic, derivedSeries, lowerCentralSeries, center, fittingSubgroup, frattini, commutator (binary), commutator_self, normalizer, centralizer, normalCore, fixedPointsOfMulAut, restrict + restrict_apply_val, subgroupOf, closure_of_invariant_set}` 全部 sorry-free. 下流 Glauberman 3.24 + Ch.4 §4C [G,A] 機構の前哨基地. |
 | §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |
 | §3F 巡回商 lift (3.35 弱版) | ✅ (2026-05-22) | `cyclic_quotient_lift`: G/H cyclic ⇒ ∃ g, ⟨g⟩ ⊔ H = ⊤. 弱版を Quotient.mk_surjective + zpowers で証明. 旧 axiom statement は inconsistent (H ≤ K + K ⊔ H = ⊤ ⇒ K = ⊤ で card 等式が \|G/H\| = \|H\| に帰着し反例あり) のため置換 |
-| §3F **Thm 3.35 強版 (uniqueness)** | ✅ (2026-05-23) | `cyclic_quotient_extension_unique`: N ⊴ G + gN が G/N 生成元 + θ θ' : G →* G₀ が N 上一致 + g → g₀ ⇒ θ = θ'. proof: u = x * g^i (x ∈ N) 分解 + map_mul + map_zpow. ~20 LOC. **Thm 3.36 (existence, Sym(Ω) realization) は次セッション持ち越し**. |
+| §3F **Thm 3.35 強版 (uniqueness)** | ✅ (2026-05-23) | `cyclic_quotient_extension_unique`: N ⊴ G + gN が G/N 生成元 + θ θ' : G →* G₀ が N 上一致 + g → g₀ ⇒ θ = θ'. proof: u = x * g^i (x ∈ N) 分解 + map_mul + map_zpow. ~20 LOC. |
+
+## Ch.3 完成の残作業 (2026-05-23 ralph-loop 委譲)
+
+「Ch.3 完成 = forward dep を持たない結果を全て sorry-free」の射程で, 残作業:
+
+### Phase 1: SZ conjugacy (Isaacs Thm 3.12) — ralph-loop 委譲中
+- 場所: `OddOrder/Mathlib/SchurZassenhausConj.lean`
+- 現状: Helper A (Restriction) + Helper B (Quotient) + solvability transfer instances 完成.
+  Main induction (`step_restriction` / `step_factor` / `step_caseA` (N solv) /
+  `step_caseB` (G/N solv) / `main_aux` / 公開 theorem) 未完成 (~200-250 LOC).
+- ralph-loop prompt: `/tmp/phase1_sz_conjugacy.md` (起動例: `/ralph-loop "$(cat /tmp/phase1_sz_conjugacy.md)" --completion-promise "SZ_CONJUGACY_COMPLETE" --max-iterations 30`).
+- 完成後 → axiom 削除 → Phase 2 着手可能.
+
+### Phase 2: Hall-C (Thm 3.14) — Phase 1 完成 blocked
+- 場所: `OddOrder/Isaacs/Ch03_SplitExtensions.lean` §3C
+- 現状: leaf axiom 削除済 (2026-05-22). placeholder コメント中.
+- Phase 1 完成後: `IsComplement'.exists_conj_of_coprime` (= SZ conjugacy theorem) を使って
+  `hall_C` theorem 化. ~30-50 LOC.
+
+### Phase 4: Thm 3.36 (cyclic extension existence) — ralph-loop 委譲中
+- 場所: `OddOrder/Isaacs/Ch03_SplitExtensions.lean` §3F (`cyclic_quotient_extension_unique`
+  の直後 / `end -- 3F` 直前).
+- 現状: statement / proof 未着手.
+- Construction: Sym(Ω) realization, Ω = Fin m × N. ~150-250 LOC.
+- ralph-loop prompt: `/tmp/phase4_thm336_cyclic_extension.md` (起動例: 同様).
+
+### Ch.3 内 forward dep ありで除外 (owner chapter 待ち)
+- Thm 3.15 (p-complement for all primes ⇒ solvable): Ch.7 Burnside 依存.
+  `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` placeholder.
+- Thm 3.17 (3 subgroups pairwise coprime ⇒ solvable): 同上.
+- §3E coprime action 主要結果 (Thm 3.23, Lem 3.24 Glauberman, Thm 3.26-3.34 等):
+  Ch.4 §4C-§4D coprime action machinery 依存.
+  `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` placeholder.
 
 ## mmd 抽出失敗の整理
 
