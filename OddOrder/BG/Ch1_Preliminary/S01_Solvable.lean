@@ -96,14 +96,39 @@ In quotient form: with `f = QuotientGroup.mk' M`,
   since `M·T = T·M` for M normal) ⇒ `xTx⁻¹ = m·T·m⁻¹` ⇒ `m⁻¹x ∈ N_G(T)` ⇒
   `x ∈ M·N_G(T) = N_G(T)·M`.
 
-**実装状態**: statement のみ. proof は Sylow II in subgroup + element decomposition 等
-で ~100 LOC 規模, 次 commit で完成予定. -/
+**実装状態**: hard direction proof sorry. helpers: `inf_eq_bot_of_pGroup_coprime`
+(disjoint from coprime orders) は sorry-free 完成. proof body は Sylow II in T·M 等で
+~80 LOC 規模, 次 commit で完成予定. -/
 theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
     {T : Subgroup G} (_hT : IsPGroup p T)
     {M : Subgroup G} [_hM_norm : M.Normal] (_hM_p' : (Nat.card M).Coprime p) :
     Subgroup.normalizer (T ⊔ M : Subgroup G) = Subgroup.normalizer T ⊔ M := by
   sorry
+
+/-- **Helper for Lem 1.14**: T p-group + M p'-group ⇒ `T ⊓ M = ⊥`.
+
+`T ⊓ M` は T の subgroup として p-group (`hT.of_injective Subgroup.inclusion`) かつ
+|T ⊓ M| ∣ |M|. |M| が p と coprime ⇒ p^k ∣ |M| ⇒ k = 0 ⇒ |T ⊓ M| = 1 ⇒ T ⊓ M = ⊥. -/
+theorem inf_eq_bot_of_pGroup_coprime
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    {M : Subgroup G} (hM_p' : (Nat.card M).Coprime p) :
+    T ⊓ M = ⊥ := by
+  have hTM_le_T : T ⊓ M ≤ T := inf_le_left
+  have hTM_le_M : T ⊓ M ≤ M := inf_le_right
+  have hTM_pgroup : IsPGroup p (T ⊓ M : Subgroup G) :=
+    hT.of_injective (Subgroup.inclusion hTM_le_T) (Subgroup.inclusion_injective hTM_le_T)
+  have hcard_dvd : Nat.card (T ⊓ M : Subgroup G) ∣ Nat.card M :=
+    Subgroup.card_dvd_of_le hTM_le_M
+  obtain ⟨k, hk⟩ := hTM_pgroup.exists_card_eq
+  rw [hk] at hcard_dvd
+  -- p^k ∣ |M| and (|M|, p) = 1 ⇒ p^k = 1
+  have hcop_pow : ((p ^ k).Coprime (Nat.card M)) := (hM_p'.symm).pow_left k
+  have hpow_eq_one : p ^ k = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop_pow dvd_rfl hcard_dvd
+  rw [hpow_eq_one] at hk
+  exact Subgroup.eq_bot_of_card_eq _ hk
 
 /-- **BG Lemma 1.14 (易 direction, sorry-free)**: `N_G(T)·M ≤ N_G(T·M)`.
 
