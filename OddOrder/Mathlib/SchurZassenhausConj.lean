@@ -377,6 +377,19 @@ private theorem minimal_normal_isCommutative_of_solvable
     rw [h_ds_top] at hn
     exact bot_lt_top.ne' hn
 
+/-- **Abelian SZ conjugacy**: for `N` abelian normal in `G` with coprime order/index,
+any two complements are conjugate by an element of `N`. mathlib's `exists_smul_eq`
+provides the abstract `QuotientDiff` form; we translate to the subgroup-level statement.
+
+TODO (currently sorry): mathlib v4.29.1 lacks a direct lemma. Need to convert
+`IsComplement' N K` → `N.LeftTransversal` → `N.QuotientDiff` and back. -/
+private theorem abelian_sz_conjugacy
+    {N : Subgroup G} [N.Normal] [Finite G] [IsMulCommutative N]
+    (_hN : Nat.Coprime (Nat.card N) N.index)
+    {K K' : Subgroup G} (_hK : IsComplement' N K) (_hK' : IsComplement' N K') :
+    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  sorry
+
 /-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
 private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
     ∃ L : Subgroup G, L.Normal ∧ L ≤ N ∧ L ≠ ⊥ ∧
@@ -501,8 +514,10 @@ private theorem step_caseA
     -- L = N (from L ≤ N + |L| = |N|).
     have hL_eq_N : L = N :=
       Subgroup.eq_of_le_of_card_ge hL_le h_card_L_eq_N.ge
-    -- Now N = L abelian.
-    sorry  -- abelian SZ conjugacy: ∃ n ∈ N, K.map (conj n) = K'
+    -- Now N = L abelian. Use abelian SZ conjugacy.
+    subst hL_eq_N
+    -- hL_comm : IsMulCommutative L = IsMulCommutative N. Original hK, hK' still in scope.
+    exact abelian_sz_conjugacy h1 hK hK'
   · -- H = K^g ⊔ L is proper, apply step_restriction.
     have hKgU : K.map (MulAut.conj g_f).toMonoidHom ≤
                 K.map (MulAut.conj g_f).toMonoidHom ⊔ L := le_sup_left
