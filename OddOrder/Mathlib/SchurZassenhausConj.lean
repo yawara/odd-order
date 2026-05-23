@@ -237,6 +237,70 @@ private theorem step_restriction
   rw [map_subtype_conj_subgroupOf n' K hKU, subgroupOf_map_subtype_eq hK'U] at hpush
   exact hpush
 
+/-! ### Step 2 (Factor) / Case A (N solvable) / Case B (G/N solvable)
+
+These are still in progress. The skeleton below defines the statements and the main_aux
+assembly; the bodies (marked `sorry`) need to be filled. -/
+
+/-- **Step 2 (Factor)**: for nontrivial `L ⊴ G`, IH on `G ⧸ L` gives `g ∈ N` with
+`(K^g) ⊔ L = K' ⊔ L`. -/
+private theorem step_factor
+    (h1 : Nat.Coprime (Nat.card N) N.index)
+    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    (ih : IH G)
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K')
+    {L : Subgroup G} [L.Normal] (hL_ne_bot : L ≠ ⊥) :
+    ∃ g : G, g ∈ N ∧ (K.map (MulAut.conj g).toMonoidHom) ⊔ L = K' ⊔ L := by
+  sorry
+
+/-- **Case A (N solvable)**: full SZ conjugacy when `N` is solvable. -/
+private theorem step_caseA
+    (h1 : Nat.Coprime (Nat.card N) N.index)
+    (hN_solv : IsSolvable N)
+    (ih : IH G)
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
+    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  sorry
+
+/-- **Case B (G/N solvable)**: full SZ conjugacy when `G ⧸ N` is solvable. -/
+private theorem step_caseB
+    (h1 : Nat.Coprime (Nat.card N) N.index)
+    (hQN_solv : IsSolvable (G ⧸ N))
+    (ih : IH G)
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
+    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  sorry
+
+/-- **Main induction**: combines `step_caseA` and `step_caseB` via strong induction. -/
+private theorem main_aux {n : ℕ} :
+    ∀ {G : Type u} [Group G] [Finite G] (_hG : Nat.card G = n)
+      {N : Subgroup G} [N.Normal]
+      (h1 : Nat.Coprime (Nat.card N) N.index)
+      (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+      {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K'),
+      ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
+  induction n using Nat.strongRecOn with
+  | ind n ih =>
+    intro G _ _ hG N _ h1 hSolv K K' hK hK'
+    -- Build IH G from outer ih.
+    have ih_G : IH G := by
+      intro G' _ _ hcard_G' N' _ h1' hSolv' K1 K2 hK1 hK2
+      exact ih (Nat.card G') (hG ▸ hcard_G') rfl h1' hSolv' hK1 hK2
+    rcases hSolv with hN | hGN
+    · exact step_caseA h1 hN ih_G hK hK'
+    · exact step_caseB h1 hGN ih_G hK hK'
+
 end SchurZassenhausConj
+
+/-- **Schur-Zassenhaus conjugacy** (Isaacs Thm 3.12): for `N ⊴ G` finite with coprime order
+and index, assuming `N` or `G ⧸ N` is solvable, any two complements are conjugate by an
+element of `N`. -/
+theorem IsComplement'.exists_conj_of_coprime {G : Type u} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal]
+    (hN : Nat.Coprime (Nat.card N) N.index)
+    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
+    ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' :=
+  SchurZassenhausConj.main_aux rfl hN hSolv hK hK'
 
 end Subgroup
