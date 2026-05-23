@@ -232,6 +232,14 @@ FT クリティカル度 + 章内依存で並べる:
   i^p ≡ 1 [ZMOD p^e] ⇒ 3 cases. p odd は LTE (mathlib `Int.emultiplicity_pow_sub_pow`),
   p=2 は (i-1)(i+1) 因数分解 + 奇数因子の IsCoprime で powers of 2 を相殺. ~172 LOC.
   §6B Cor 6.17 (Frobenius complement Sylow 構造) で本補題が要件.
+- **Thm 6.4 部分 (cyclic equivalence)** + **`IsFrobeniusGroup G N A`** structure (~215 LOC):
+  - Defn: `IsFrobeniusGroup` = `N.Normal` + `IsComplement' N A` + 両者 `≠ ⊥` + `conj_frobenius`
+    (Isaacs condition (1) ベース).
+  - `of_centralizer_complement_le` (Thm 6.4 (3) ⇒ IsFrobeniusGroup)
+  - `of_centralizer_kernel_le` (Thm 6.4 (4) ⇒ IsFrobeniusGroup)
+  - `trivialIntersection` (Thm 6.4 (1) ⇒ (2)): A ∩ A^g = ⊥ for g ∉ A, [b, n] 経由
+  - `centralizer_complement_le` (Thm 6.4 (2) ⇒ (3))
+  - 部分 TFAE: (1) ⇔ (2) ⇔ (3) + (4) ⇒ (1) 完成. **(1) ⇒ (4) は Cor 6.6 待ち.**
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
