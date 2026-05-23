@@ -242,6 +242,16 @@ private theorem step_restriction
 These are still in progress. The skeleton below defines the statements and the main_aux
 assembly; the bodies (marked `sorry`) need to be filled. -/
 
+/-- Conjugation `mk'_comp_conj`: in `G ⧸ L`, conjugation by `mk' g` agrees with `mk'` applied
+to conjugation by `g`. Used in the lift-back step of `step_factor`. -/
+private theorem mk'_comp_conj_eq {L : Subgroup G} [L.Normal] (g : G) :
+    (QuotientGroup.mk' L).comp (MulAut.conj g).toMonoidHom =
+      ((MulAut.conj (QuotientGroup.mk g : G ⧸ L)).toMonoidHom).comp (QuotientGroup.mk' L) := by
+  ext x
+  show (QuotientGroup.mk (g * x * g⁻¹) : G ⧸ L) =
+       (QuotientGroup.mk g) * (QuotientGroup.mk x) * (QuotientGroup.mk g)⁻¹
+  rw [QuotientGroup.mk_mul, QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+
 /-- **Step 2 (Factor)**: for nontrivial `L ⊴ G`, IH on `G ⧸ L` gives `g ∈ N` with
 `(K^g) ⊔ L = K' ⊔ L`. -/
 private theorem step_factor
@@ -251,7 +261,42 @@ private theorem step_factor
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K')
     {L : Subgroup G} [L.Normal] (hL_ne_bot : L ≠ ⊥) :
     ∃ g : G, g ∈ N ∧ (K.map (MulAut.conj g).toMonoidHom) ⊔ L = K' ⊔ L := by
-  sorry
+  -- |G/L| < |G|.
+  have hcard_lt := card_quotient_lt_of_ne_bot hL_ne_bot
+  -- Coprime cardinalities for Helper B.
+  have h_NK_cop : Nat.Coprime (Nat.card N) (Nat.card K) := by
+    rw [show Nat.card K = N.index from hK.symm.index_eq_card.symm]
+    exact h1
+  have h_NK'_cop : Nat.Coprime (Nat.card N) (Nat.card K') := by
+    rw [show Nat.card K' = N.index from hK'.symm.index_eq_card.symm]
+    exact h1
+  -- Helper B: complements in G/L.
+  have hK_q : IsComplement' (N.map (QuotientGroup.mk' L)) (K.map (QuotientGroup.mk' L)) :=
+    hK.map_mk' h_NK_cop L
+  have hK'_q : IsComplement' (N.map (QuotientGroup.mk' L)) (K'.map (QuotientGroup.mk' L)) :=
+    hK'.map_mk' h_NK'_cop L
+  -- Coprime in G/L.
+  have h_cop_q : Nat.Coprime (Nat.card (N.map (QuotientGroup.mk' L)))
+                  (N.map (QuotientGroup.mk' L)).index :=
+    (h1.coprime_dvd_left (Subgroup.card_map_dvd _ _)).coprime_dvd_right
+      (N.index_map_dvd (QuotientGroup.mk'_surjective L))
+  -- Solvability transfer to G/L (left for next iteration).
+  have h_solv_q : IsSolvable (N.map (QuotientGroup.mk' L)) ∨
+                   IsSolvable ((G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) := by
+    sorry
+  -- Apply IH on G/L.
+  obtain ⟨x, hx_mem, hx_conj⟩ := ih (G ⧸ L) hcard_lt h_cop_q h_solv_q hK_q hK'_q
+  -- Lift x to g ∈ N.
+  obtain ⟨g, hg_N, hg_eq⟩ := Subgroup.mem_map.mp hx_mem
+  refine ⟨g, hg_N, ?_⟩
+  -- Translate (K.map (conj g)).map mk' = K'.map mk' to G level via map_eq_map_iff.
+  have key : (K.map (MulAut.conj g).toMonoidHom).map (QuotientGroup.mk' L) =
+             K'.map (QuotientGroup.mk' L) := by
+    rw [Subgroup.map_map, mk'_comp_conj_eq, ← Subgroup.map_map]
+    rw [show (QuotientGroup.mk g : G ⧸ L) = x from hg_eq]
+    exact hx_conj
+  have heq := (Subgroup.map_eq_map_iff (f := QuotientGroup.mk' L)).mp key
+  rwa [QuotientGroup.ker_mk'] at heq
 
 /-- **Case A (N solvable)**: full SZ conjugacy when `N` is solvable. -/
 private theorem step_caseA
