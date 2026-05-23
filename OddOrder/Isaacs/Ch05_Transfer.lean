@@ -1247,18 +1247,79 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
           (Subgroup.eq_of_le_of_card_ge hQ_le_P hPQ_card_eq.le).symm
         exact hPQ (Sylow.ext h_subgroup_eq)
       -- N := normalizer D, C := centralizer D
-      -- 残りの実装 (~200 LOC) は別 session.
-      -- 戦略:
-      --   hH で `N/(C.subgroupOf N)` は p-group.
-      --   `lt_normalizer_of_pgroup_of_lt_top` を ↥P に適用: D.subgroupOf P < normalizer ⇒
-      --     P ⊓ normalizer D > D (via subgroupOf_normalizer_eq).
-      --   `IsPGroup.exists_le_sylow` で S, T : Sylow p ↥N containing P ⊓ N, Q ⊓ N.
-      --   R : Sylow p G containing S.map N.subtype.
-      --   `sylow_sup_normal_eq_top_of_quot_isPGroup` で S ⊔ C.subgroupOf N = ⊤.
-      --   Sylow II in ↥N: T = n • S. n = s · y (s ∈ S, y ∈ C). T = y • S ⇒ y⁻¹ • T = S.
-      --   P ⊓ R ⊇ P ⊓ N > D, IH on (P, R): ∃ x ∈ C_G(P ⊓ R) ⊆ C_G(D), x • R = P.
-      --   R^y ⊓ Q ⊇ Q ⊓ N > D, IH on (R^y, Q): ∃ z ∈ C_G(R^y ⊓ Q) ⊆ C_G(D), z • Q = R^y.
-      --   Combine: (x y z) • Q = x • y • z • Q = x • R = P. xyz ∈ C_G(D).
+      set N : Subgroup G := Subgroup.normalizer (D : Set G) with hN_def
+      set C : Subgroup G := Subgroup.centralizer (D : Set G) with hC_def
+      -- D ≤ N (le_normalizer), D ≤ P (already), D ≤ Q (already), D ≤ C (D centralizes itself? NO!)
+      -- D centralizes itself only if D is abelian. Skip — we don't need D ≤ C.
+      have hD_le_N : D ≤ N := Subgroup.le_normalizer
+      have hD_le_P : D ≤ (P : Subgroup G) := inf_le_left
+      have hD_le_Q : D ≤ (Q : Subgroup G) := inf_le_right
+      -- D is p-group (subgroup of P p-group)
+      have hD_pgroup : IsPGroup p ↥D := P.isPGroup'.to_le inf_le_left
+      -- hH applied: ↥N ⧸ C.subgroupOf N is p-group
+      have h_quot_pgroup : IsPGroup p (↥N ⧸ C.subgroupOf N) := hH D hD_pgroup
+      -- **Step 1**: P ⊓ N > D via "normalizers grow" in ↥P
+      have hPN_gt_D : D < (P : Subgroup G) ⊓ N := by
+        have hD_sub_P_lt_top : D.subgroupOf (P : Subgroup G) < ⊤ := by
+          rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+          intro h_le; exact (not_le_of_gt hD_lt_P) h_le
+        have h_lt_norm : D.subgroupOf (P : Subgroup G) <
+            Subgroup.normalizer ((D.subgroupOf (P : Subgroup G)) : Set ↥(P : Subgroup G)) :=
+          lt_normalizer_of_pgroup_of_lt_top P.isPGroup' hD_sub_P_lt_top
+        have h_norm_eq : Subgroup.normalizer ((D.subgroupOf (P : Subgroup G)) :
+            Set ↥(P : Subgroup G)) = N.subgroupOf (P : Subgroup G) :=
+          (Subgroup.subgroupOf_normalizer_eq hD_le_P).symm
+        rw [h_norm_eq] at h_lt_norm
+        -- D.subgroupOf P < N.subgroupOf P (in ↥P). |·| translates to G.
+        have h_card_lt : Nat.card ↥(D.subgroupOf (P : Subgroup G)) <
+            Nat.card ↥(N.subgroupOf (P : Subgroup G)) := by
+          have h_dvd := Subgroup.card_dvd_of_le h_lt_norm.le
+          refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos h_dvd) ?_
+          intro hcardeq
+          exact h_lt_norm.ne
+            (Subgroup.eq_of_le_of_card_ge h_lt_norm.le hcardeq.symm.le)
+        have h_card_D : Nat.card ↥(D.subgroupOf (P : Subgroup G)) = Nat.card ↥D :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le_P).toEquiv
+        have h_card_NP : Nat.card ↥(N.subgroupOf (P : Subgroup G)) =
+            Nat.card ↥((P : Subgroup G) ⊓ N) := by
+          rw [show (P : Subgroup G) ⊓ N = N ⊓ (P : Subgroup G) from inf_comm _ _,
+              ← Subgroup.subgroupOf_map_subtype]
+          exact Nat.card_congr
+            (Subgroup.equivMapOfInjective _ _ ((P : Subgroup G).subtype_injective)).toEquiv
+        rw [h_card_D, h_card_NP] at h_card_lt
+        exact lt_of_le_of_ne (le_inf hD_le_P hD_le_N)
+          (fun h => Nat.lt_irrefl _ (h ▸ h_card_lt))
+      -- **Step 2**: Q ⊓ N > D (symmetric)
+      have hQN_gt_D : D < (Q : Subgroup G) ⊓ N := by
+        have hD_sub_Q_lt_top : D.subgroupOf (Q : Subgroup G) < ⊤ := by
+          rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+          intro h_le; exact (not_le_of_gt hD_lt_Q) h_le
+        have h_lt_norm : D.subgroupOf (Q : Subgroup G) <
+            Subgroup.normalizer ((D.subgroupOf (Q : Subgroup G)) : Set ↥(Q : Subgroup G)) :=
+          lt_normalizer_of_pgroup_of_lt_top Q.isPGroup' hD_sub_Q_lt_top
+        have h_norm_eq : Subgroup.normalizer ((D.subgroupOf (Q : Subgroup G)) :
+            Set ↥(Q : Subgroup G)) = N.subgroupOf (Q : Subgroup G) :=
+          (Subgroup.subgroupOf_normalizer_eq hD_le_Q).symm
+        rw [h_norm_eq] at h_lt_norm
+        have h_card_lt : Nat.card ↥(D.subgroupOf (Q : Subgroup G)) <
+            Nat.card ↥(N.subgroupOf (Q : Subgroup G)) := by
+          have h_dvd := Subgroup.card_dvd_of_le h_lt_norm.le
+          refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos h_dvd) ?_
+          intro hcardeq
+          exact h_lt_norm.ne
+            (Subgroup.eq_of_le_of_card_ge h_lt_norm.le hcardeq.symm.le)
+        have h_card_D : Nat.card ↥(D.subgroupOf (Q : Subgroup G)) = Nat.card ↥D :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le_Q).toEquiv
+        have h_card_NQ : Nat.card ↥(N.subgroupOf (Q : Subgroup G)) =
+            Nat.card ↥((Q : Subgroup G) ⊓ N) := by
+          rw [show (Q : Subgroup G) ⊓ N = N ⊓ (Q : Subgroup G) from inf_comm _ _,
+              ← Subgroup.subgroupOf_map_subtype]
+          exact Nat.card_congr
+            (Subgroup.equivMapOfInjective _ _ ((Q : Subgroup G).subtype_injective)).toEquiv
+        rw [h_card_D, h_card_NQ] at h_card_lt
+        exact lt_of_le_of_ne (le_inf hD_le_Q hD_le_N)
+          (fun h => Nat.lt_irrefl _ (h ▸ h_card_lt))
+      -- Remaining: Steps 3-20 (Sylow setup, S=SC, conj chain, IH applications)
       sorry
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
