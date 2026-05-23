@@ -419,7 +419,39 @@ private theorem step_caseA
     ext x
     simp [Subgroup.mem_map]
   -- Nontrivial case: take minimal normal L ⊆ N, abelian, then case split on K^g ⊔ L.
-  sorry
+  haveI hN_normal_inst : N.Normal := inferInstance
+  obtain ⟨L, hL_normal, hL_le, hL_ne_bot, hL_min⟩ :=
+    exists_minimal_normal_le hN_normal_inst hN_bot
+  haveI : L.Normal := hL_normal
+  haveI hL_comm : IsMulCommutative L :=
+    minimal_normal_isCommutative_of_solvable hL_le hL_ne_bot hL_min hN_solv
+  -- Apply step_factor with L.
+  obtain ⟨g_f, hg_f_N, h_factor⟩ :=
+    step_factor h1 (Or.inl hN_solv) ih hK hK' hL_ne_bot
+  -- h_factor : (K.map (conj g_f)) ⊔ L = K' ⊔ L
+  -- Need: IsComplement' N K^g (K conjugated by g_f ∈ N, N normal preserves complement).
+  have hK_g_compl : IsComplement' N (K.map (MulAut.conj g_f).toMonoidHom) := by
+    sorry
+  -- Case split on K^g ⊔ L = ⊤.
+  by_cases hH_top : (K.map (MulAut.conj g_f).toMonoidHom) ⊔ L = ⊤
+  · -- N = L (cardinality), N abelian, abelian SZ conjugacy.
+    sorry
+  · -- H = K^g ⊔ L is proper, apply step_restriction.
+    have hKgU : K.map (MulAut.conj g_f).toMonoidHom ≤
+                K.map (MulAut.conj g_f).toMonoidHom ⊔ L := le_sup_left
+    have hK'U : K' ≤ K.map (MulAut.conj g_f).toMonoidHom ⊔ L := by
+      rw [h_factor]; exact le_sup_left
+    obtain ⟨n', hn'_N, h_conj⟩ :=
+      step_restriction h1 (Or.inl hN_solv) ih hK_g_compl hK' hKgU hK'U hH_top
+    -- Compose conjugations: K.map (conj (n' * g_f)) = (K.map (conj g_f)).map (conj n') = K'
+    refine ⟨n' * g_f, N.mul_mem hn'_N hg_f_N, ?_⟩
+    rw [show (MulAut.conj (n' * g_f)).toMonoidHom =
+          (MulAut.conj n').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom from ?_,
+        ← Subgroup.map_map]
+    · exact h_conj
+    · ext x
+      show n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
+      group
 
 /-- **Case B (G/N solvable)**: full SZ conjugacy when `G ⧸ N` is solvable. -/
 private theorem step_caseB
