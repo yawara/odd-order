@@ -1,6 +1,6 @@
 # Peterfalvi §8: Some Coherence Theorems — mini-roadmap
 
-**スコープ**: Peterfalvi §8 (pp. 30-37), mmd `04.8_pp_30_37_*.mmd` (243 行), **4 + 2 結果 ((6.1)-(6.8), 但し (6.5)-(6.8) は拡張定理)**.
+**スコープ**: Peterfalvi §8 (pp. 30-37), mmd `04.8_pp_30_37_*.mmd` (243 行), **8 結果 ((6.1)-(6.8)) 全て同格 named results** ⚠️ audit 訂正 (旧記載「4+2 結果」は `**(N.M)**` grep artifact).
 
 形式化先 (予定): `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean`.
 
@@ -25,18 +25,17 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§7 Coherence 完成直後).
 
 ## TL;DR
 
-§8 は **4 つの主定理** ((6.1)-(6.4)) で構成:
+§8 は **8 つの主定理** ((6.1)-(6.8)) 全て同格:
 
 1. **(6.1) Hypothesis**: 仮説セットアップ (K solvable normal, S = 導入指標集, S(A) filtration)
 2. **(6.2) Lemma**: Coherence の「失敗」判定式 — 不等式で coherence 喪失の条件をバウンド
 3. **(6.3) Theorem**: nilpotent 商での Coherence 伝播 — M から H_1 へ下降
-4. **(6.4) Hypothesis + (6.5)-(6.6)**: **奇数位数下の特殊化** — Frobenius + TI-subset + cyclic normalizer の総合. **Sibley 1984 に対応**.
+4. **(6.4) Hypothesis**: **奇数位数下の特殊化** — Frobenius + TI-subset + cyclic normalizer の総合
+5. **(6.5)-(6.6)**: ⚠️ audit 訂正: 本書 Notes §SS6 (mmd 04.17 L11) 明示「(6.3), (6.5) は **[FT] §11** から; Sibley とは無関係」. (6.6) は center coherence
+6. **(6.7)**: character-class congruence (Galois 整数性). proof で [Is] p.35 class-sum algebra hom + AlgInt congruence (両方 mathlib 不在). ⚠️ audit 訂正: 旧記載「Reynolds 1965 Duke Math. J.」は **完全捏造** (Peterfalvi 参考文献/Notes に Reynolds **不在**); (6.7) は無名 internal lemma
+7. **(6.8) Main Theorem (= Sibley の唯一の寄与)**: L が Frobenius or Dade condition 満たす時 S が coherent. ⚠️ audit 訂正: **Sibley 参照は [Si1] Sibley 1976 *Illinois J. Math.* 20:434-442** "Coherence in finite groups containing a Frobenius section" + [Si2] unpublished lectures. "Sibley 1984 Contemp. Math. 47" は **存在しない**
 
-加えて **(6.7)-(6.8)** は **Frobenius family と TI-subset の最終統合**:
-- **(6.7)**: Galois automorphism 作用下での character class calculation (Reynolds 1965 関連)
-- **(6.8) Main Theorem**: L が Frobenius or Dade condition 満たす時 S が coherent — §9-§10 構造分析の入口
-
-**mathlib カバレッジ**: ~5% (基本的な群論・指標論のみ). 主定理 (6.2)-(6.3), (6.8) は完全新規. Coherence framework (§7) の上に全面的に構築.
+**mathlib カバレッジ**: ~5% statement-level (表面のみ); **(6.7)/(6.8) は実 0%**. proof-internal で 10 helper lemma + 2 新規 module (`ClassSumAlgebraHom.lean` + `AlgInt.cong.lean`) 要. Coherence framework (§7) の上に全面構築.
 
 **FT 必須度**: ☆☆ (§8 自体は局所的に完結しているが、§9-§16 では頻出. 特に (6.8) が §10-§14 の Type I-V 構造分析の土台)
 
@@ -124,7 +123,9 @@ structure CoherenceHypothesis (G L K : Type*) [Group G] [Group L] [Group K]
 
 **Lean 表現**: 矛盾導出が複雑 — `decide` で不等式評価をサポート要
 
-### (6.4) Hypothesis + (6.5)-(6.6) — 奇数位数下での特殊化 (Sibley 系)
+### (6.4) Hypothesis + (6.5)-(6.6) — 奇数位数下での特殊化
+
+⚠️ audit 訂正: 旧 section 見出し「(Sibley 系)」は誤帰属. (6.3) と (6.5) は **[FT] §11** から (Peterfalvi Notes §SS6 明示). Sibley の寄与は **(6.8) のみ**.
 
 #### (6.4) Setup
 
@@ -148,10 +149,12 @@ Hypothesis (6.4) + S(M) NOT coherent なら:
 3. K solvable & commutator [K,K]=H_1 ⟹ K/M is p-group for some p
 4. (c) proof by contrapositive: |L:K| | (p-1) ⟹ p ≥ 2|L:K|+1 ⟹ |K:H_1| ≥ p² > 4|L:K|²+1 矛盾
 
-**数学的意義**: **Sibley 1984 の定理の character-theoretic 翻訳**
-- Feit-Thompson K/M が p-group かつ non-abelian
+**数学的意義** ⚠️ audit 訂正 (旧記載「Sibley 1984 の翻訳」は **完全誤帰属**):
+- (6.5) は **[FT] §11** (Feit-Thompson 1963 原論文) からの character-theoretic 引き取り
+- Sibley とは無関係 ((6.8) のみが [Si1] Sibley 1976 *Illinois J. Math.* 20)
+- K/M が p-group かつ non-abelian
 - commutator K/H_1 が chief factor (Frobenius 構造の key)
-- |L:K| coprime to (p-1) — これが Sibley の signature condition
+- |L:K| coprime to (p-1) — [FT] §11 の signature condition
 
 #### (6.6) Lemma — Center での Coherence
 
@@ -170,7 +173,9 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 
 **役割**: (6.7)-(6.8) へ向けた coherence の final composition
 
-### (6.7) Theorem — Character Class 関係式 (Reynolds 1965 関連)
+### (6.7) Theorem — Character Class 関係式 (無名 internal lemma)
+
+⚠️ audit 訂正: 旧見出し「(Reynolds 1965 関連)」は **完全捏造**. Reynolds は Peterfalvi 参考文献 (04.18) + Notes (04.17) **両方に存在せず**. (6.7) は無名の internal lemma で (6.8) Sibley の前段補題.
 
 **主張**: G 有限, p prime, P Sylow p-subgroup of G, L = N_G(P),
 - |L| odd, P^# TI-subset of G
@@ -191,10 +196,10 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 - a_{11}, a_{12} calculation mod |P|
 - integrality + congruence arithmetic
 
-**数学的意義**:
-- **Reynolds 1965 定理**: Frobenius group での character value の modular arithmetic
-- TI-subset + cyclic centralizer ⟹ character が "rigid" (mod |P|)
-- (6.8) の Frobenius case の前準備
+**数学的意義** ⚠️ audit 訂正 (旧「Reynolds 1965 定理」は捏造帰属):
+- character class congruence: TI-subset + cyclic centralizer ⟹ character が "rigid" (mod |P|)
+- (6.8) Sibley main thm の前準備
+- proof 内で [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` + algebraic integer congruence を使用 (両方 mathlib 不在; 新規 `OddOrder/RepresentationTheory/ClassSumAlgebraHom.lean` + `AlgInt.cong.lean` 要)
 
 **Lean 表現**: 
 ```lean
@@ -256,36 +261,30 @@ theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]
 - isometry 延長の explicit construction
 - norm/orthogonality 計算の chain
 
-## Sibley/Reynolds 系の同定
+## Sibley 系の同定 (Reynolds 削除)
 
-### Sibley 1984 との関連
+⚠️ audit 訂正 (2026-05-23): 旧 section の「Sibley 1984 Contemp. Math. 47」と「Reynolds 1965 Duke Math. J.」は **両方とも完全捏造** (Peterfalvi 参考文献 04.18 + Notes 04.17 で検証):
 
-**(6.4)-(6.5)** は **Sibley, M. J. (1984), "Dade's Theorem and Generalizations of Coprime Actions"** (Contemp. Math. 47) の指標論的翻訳:
+- **正しい Sibley 引用**: **[Si1] Sibley, M. J. (1976), "Coherence in finite groups containing a Frobenius section", *Illinois J. Math.* 20:434-442** + **[Si2] unpublished lectures**
+- **Reynolds は本書全体に存在しない**. (6.7) は無名 internal lemma; (6.8) Sibley の前段補題.
 
-| Sibley | Peterfalvi | 相互関係 |
-|--------|-----------|---------|
-| Non-abelian p-group G/Z | K/M non-abelian p-group | (6.5.b) |
-| [G,G]/Z abelian | [K,K]/M = H_1/M abelian | (6.4.c) |
-| |G:G'| ≤ 4n²+1 bound | |K:H_1| ≤ 4\|L:K\|²+1 | (6.5.a) |
-| Coprime action of M on G | W_1 acts on K mod [K,K] | Frobenius kernel |
+### Sibley 1976 [Si1] との関連
 
-**Key**: Sibley の "Dade isometry 없는 버전"을 Peterfalvi가 Coherence predicate으로 재표현. (6.5) 그 자체가 Sibley의 bound를 character-theoretic 言語로 재증명.
+**Notes §SS6 (mmd 04.17 L11) 明示**:
+- (6.3), (6.5) は **[FT] §11** (Feit-Thompson 1963 原論文) から
+- **(6.8) のみ** が Sibley [Si1] の寄与
 
-### Reynolds 1965 との関連
+(6.8) Main Theorem: L が Frobenius or Dade condition 満たす時 S が coherent — これが Sibley 1976 *Illinois J. Math.* 20 の主結果の Peterfalvi 版.
 
-**(6.7)** は **Reynolds, W. F. (1965), "Characters of Finite Groups with Additional Structure"** (Duke Math. J.) の:
+### (6.7) は無名 lemma
 
-- **Theorem**: Frobenius group L/H (kernel H) での character value が modular arithmetic (mod |H|)
+Reynolds 帰属は完全捏造のため削除. (6.7) は character class congruence の internal lemma で、proof で:
+- [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` (mathlib 不在)
+- algebraic integer congruence `α ≡ β mod n` in Z[ζ_n] (mathlib 不在)
+- TI-subset (§4-§5)
+- [Is] Lem 7.7 (§8 で 2 回利用)
 
-Peterfalvi (6.7)의 설정 — L = N_G(P), P^# TI, Z ⊂ Z(P) — 이는 Reynolds가 다룬 "cyclic action" case의 일반화:
-
-| Reynolds | Peterfalvi (6.7) | 의미 |
-|----------|-----------------|------|
-| Regular Frobenius | P^# TI-subset | Wider class |
-| Mod \|H\| congruence | Mod \|P\| congruence | Parallel structure |
-| ψ constant on conjugacy class | ψ constant on Z^# | Reduction |
-
-**Key**: (6.7)은 TI-subset + cyclic normalizer 경우의 Reynolds bound를 정확히 형식화. (6.8) 증명에서 핵심 보조정리.
+を使用. (6.8) の Frobenius case の前準備.
 
 ## §10-§16 구조분석에서의 사용
 
@@ -400,9 +399,9 @@ structure CoherenceHypothesis ... where
 
 3. **(6.8.2.1)-(6.8.2.3)의 sub-lemma ordering**: 증명 의존도가 복잡하므로 formal dependency graph 먼저 그리기 필요
 
-4. **Sibley 1984 paper access**: Peterfalvi references에 "Sibley 1984 Contemp. Math. 47" 명시되어 있는지 확인 — 만약 있으면 정확한 page reference 추가
+4. ~~**Sibley 1984 paper access**~~ ⚠️ audit 訂正 (2026-05-23): "Sibley 1984 Contemp. Math. 47" は **完全捏造で存在しない**. 正しくは [Si1] Sibley 1976 *Illinois J. Math.* 20:434-442 のみ. (6.8) Main Theorem が Sibley 1976 の寄与.
 
-5. **Reynolds 1965의 정확한 statement 확인**: Peterfalvi (6.7)의 generalization이 Reynolds의 어느 정리를 일반화하는지 원문 비교 필요
+5. ~~**Reynolds 1965의 정확한 statement 확인**~~ ⚠️ audit 訂正: "Reynolds 1965 Duke Math. J." は **完全捏造**. Peterfalvi 参考文献 + Notes 両方に Reynolds 不在. (6.7) は無名 internal lemma.
 
 6. **mathlib Character/Induced API의 최신 상태 (May 2026)**: 
    - `Subgroup.induced : Representation ℂ H → Representation ℂ G` (computable?)
@@ -421,7 +420,7 @@ structure CoherenceHypothesis ... where
 | (6.4)-(6.6) | 3 | Special case + Lemmas | mid | Sibley system | 4-5 days |
 | (6.7) | 1 | Reynolds-type | low | Character class calc | 5-7 days |
 | (6.8) | 1 (+ 3 sub-proofs) | Main Theorem | low | Structure analysis | 7-10 days |
-| **TOTAL** | **8 主結果** | - | **~5%** | **☆☆** | **~30 days est.** |
+| **TOTAL** | **8 主結果** | - | **~5%** (statement-level; (6.7)/(6.8) 0%) | **☆☆** | **~35-45 days realistic** (audit 訂正; 旧 30 days は (6.7) class-sum module + (6.8) Sibley apparatus を過小評価) |
 
 ---
 

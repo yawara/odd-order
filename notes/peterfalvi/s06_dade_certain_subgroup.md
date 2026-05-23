@@ -1,6 +1,6 @@
 # Peterfalvi §6: The Dade Isometry for a Certain Type of Subgroup — mini-roadmap
 
-**スコープ**: Peterfalvi §6 (pp. 21-24), mmd `04.6_pp_21_24_*.mmd` (108 行), **5 結果 ((4.1)-(4.5))**.
+**スコープ**: Peterfalvi §6 (pp. 21-24), mmd `04.6_pp_21_24_*.mmd` (108 行), **10 結果 ((4.1)-(4.10))** ⚠️ audit 訂正 (旧 5 結果は (4.6) Hypothesis [実は中核], (4.7) Supp, (4.8), (4.9) τ-isometry, (4.10) 4-term identity 完全欠落).
 形式化先 (予定): `OddOrder/Peterfalvi/S06_DadeIsometryCertain.lean`.
 ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 役割: **§4 Dade isometry の Frobenius と特定 subgroup type への拡張**, §7 Coherence への中間ステップ.
@@ -32,15 +32,20 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 ---
 
-## §6 全 5 結果 (表)
+## §6 全 10 結果 (表) ⚠️ audit 訂正 (旧表「5 結果」は (4.6)-(4.10) 完全欠落)
 
 | # | 行数 | 種別 | statement 概要 | 役割 | §7-§16 被引用 |
 |---|-------|------|-----------------|------|-------------|
-| **(4.1)** | 5-7 | **Lemma** | Orthogonality criterion: inner product + degree condition から character orthogonality | 補助 (technical) | (4.3) 証明で活用 |
+| **(4.1)** | 5-7 | **Lemma** | Orthogonality criterion: inner product + degree condition から character orthogonality | **技術 hub** | **9 cite** (§7×2, §12, §14, §15, §16) |
 | **(4.2)** | 9-13 | **Hypothesis** | Hypothesis (4.2): L = K ⋊ W₁, W₁ cyclic Hall, C_K(x) = W₂ ∀x ∈ W₁^#, W₁ × W₂ odd | **核心 setup** (Frobenius 型) | §6 全結果の前提 |
-| **(4.3)** | 15-23 | **Theorem** | 4 部: (a) W - W₂ は TI-subset, (b) character Ind_W^L(ω_ij - ω_{0j}) = δ_j(μ_ij - μ_{0j}), (c) μ_ij 値評価, (d) degree 合同 | **Dade 構成の詳細化** | **§9-§11 多出現** |
-| **(4.4)** | 35-37 | **Lemma** | μ_{i0} 族 (j=0 case): kernel が K を含む既約 character 類 | (4.3) 補遺 (kernel characterization) | (4.5), §11-§13 |
-| **(4.5)** | 39-49 | **Theorem** | 2 部: (a) χ_j := Res_K^L μ_ij は i に無依存, Irr(K) 元, (b) Ind_K^L χ分解 | **Character factorization** | **§7 Coherence, §9-§11 Type 分析で多用** |
+| **(4.3)** | 15-23 | **Theorem** | 4 部: (a) W - W₂ は TI-subset, (b) character Ind_W^L(ω_ij - ω_{0j}) = δ_j(μ_ij - μ_{0j}), (c) μ_ij 値評価, (d) degree 合同 | **Dade 構成の詳細化**; (4.3.b) 論理中心 | **9 cite** (§7×2, §12×3, §15×2) |
+| **(4.4)** | 35-37 | **Lemma** | μ_{i0} 族 (j=0 case): kernel が K を含む既約 character 類 | (4.3) 補遺 (kernel characterization) | 5 cite (§12×3) |
+| **(4.5)** | 39-49 | **Theorem** | 2 部: (a) χ_j := Res_K^L μ_ij は i に無依存, Irr(K) 元, (b) Ind_K^L χ分解 | **Character factorization** | 5 cite (§7, §11×2) |
+| **(4.6)** | (proof body) | **Hypothesis** | Dade 一般 setup (実は §9-§16 で **explicit に呼ばれる中核**) | **named hypothesis** for §9-§16 | 5 cite (§7×2, §8, §12) |
+| **(4.7)** | (proof body) | **Supp lemma** | character support 制限の重要補題 | **§7 (5.3.b) proof の API edge** | **7 cite** (§7×3, §11×2, §8, §12) |
+| **(4.8)** | (proof body) | helper | (4.7) 補助 | 内部 | 内部 |
+| **(4.9)** | (proof body) | **τ-isometry Thm** | Dade isometry τ の formal Thm | 主結果 | 4 cite (§12, §13, §15) |
+| **(4.10)** | (proof body) | 4-term identity | character identity for (4.9) | 計算補助 | 内部 |
 
 ---
 
@@ -69,7 +74,7 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 **主張**: L = K ⋊ W₁ という **特定の structure** を仮定:
 
-- **(a) W₁ は K の cyclic Hall subgroup** (cyclic かつ (|W₁|, |K|) = 1)
+- **(a) W₁ は L の cyclic Hall subgroup** ⚠️ audit 訂正 (旧記載「K の Hall」は誤り; mmd L9: Hall of L) (cyclic かつ (|W₁|, |K|) = 1)
 - **(b) ∃ cyclic W₂ ⊂ K: ∀ x ∈ W₁^#, C_K(x) = W₂** — **Key condition**: K の全ての non-identity W₁-elements が **同じ centralizer を持つ** (characteristic subgroup W₂)
 - **(c) W := W₁ × W₂ は odd order**
 
@@ -193,7 +198,7 @@ Irr(L) = {μ_ij | 0≤i<w₁, 0≤j<w₂} ∪ {Ind_K^L χ | χ ∈ Irr(K) \ {χ_
 - (1.5.b) ⇒ Ind_K^L χ irreducible
 - (Ind_K^L χ, μ_ij) = (χ, χ_j) = 0
 
-**Lean 形式化**: (a) は degree counting + (4.3) apply, (b) は fixed point count + inertia group analysis. **難所**: (b) の Isaacs [Is] Thm 6.32 (character centralizer fixed point) の Lean embedding. Phase 1 Ch.指標論で character fixed point theory が formalize 済かを確認. ~60-80 行.
+**Lean 形式化**: (a) は degree counting + (4.3) apply, (b) は fixed point count + inertia group analysis. **難所**: (b) の Isaacs [Is] Thm 6.32 (Brauer permutation lemma / character centralizer fixed point). ⚠️ audit 訂正 (旧記載「Phase 1 Ch.指標論で確認」は誤り): **Brauer permutation lemma は mathlib v4.29.1 不在 (grep 0) かつ Phase 1 計画にも無し**. **新規 `OddOrder/RepresentationTheory/BrauerPermutation.lean` (~80 LOC) 要 — §6 (4.5.b) の単一最大 blocker** (§3 (1.1) でも必要). ~60-80 行 + infra.
 
 ---
 
@@ -211,22 +216,22 @@ Irr(L) = {μ_ij | 0≤i<w₁, 0≤j<w₂} ∪ {Ind_K^L χ | χ ∈ Irr(K) \ {χ_
 
 **使用パターン**: §6 は「§4 (2.2)-(2.6) が、Hypothesis (4.2) を満たすとき、concretely どう計算されるか」を示す tutorial 役.
 
-### §5 との関係
+### §5 との関係 ⚠️ audit 訂正 (旧記載「§5 と独立」は誤り)
 
-§5 (3.1)-(3.5) は **cyclic normalizer** 特殊化:
+§5 (3.1)-(3.9) は **cyclic normalizer** 特殊化:
 - L = N_G(A)
 - A ⊂ L, A^g ∩ A ≠ ∅ ⇒ g ∈ L (TI-definition)
 - L has cyclic normalizer (e.g., Frobenius complement)
 
-§6 (4.2)-(4.5) は **異なる setup**:
+§6 (4.2)-(4.10) は **異なる setup**:
 - L = K ⋊ W₁ (semi-direct product structure explicit)
 - Hypothesis (4.2.b) では "centralizer = W₂" と **fixed**, 関係定義ではない
 - W - W₂ が TI-subset (§5 の後続結果)
 
-**§5 → §6**: 
-- §5 で cyclic normalizer の一般理論 establish
-- §6 は §4 + Hypothesis (4.2) の合成で、§5 と **独立** (§5 に依存しない)
-- ただし §5, §6 両者が §7 Coherence で統合される
+**§5 → §6 (audit 訂正): 実は §5 dep が遥かに重い**:
+- §5 (3.X) cite **8 件** (3.1×3, 3.2×5, 3.3×2, 3.4, 3.6, 3.8, 3.9×3) vs §4 (2.X) cite **3 件のみ**
+- §6 = 「§5 σ を §6 (4.6) で embed + §4 Dade τ で L→G lift」
+- §5, §6 両者が §7 Coherence で統合される
 
 ---
 

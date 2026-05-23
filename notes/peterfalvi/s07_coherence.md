@@ -1,6 +1,6 @@
 # Peterfalvi §7: Coherence — mini-roadmap (Phase 2b の中核)
 
-**スコープ**: Peterfalvi §7 (pp.25-29), mmd `04.7_pp_25_29_Coherence.mmd` (136 行), **6 結果 ((5.1)-(5.6))**.
+**スコープ**: Peterfalvi §7 (pp.25-29), mmd `04.7_pp_25_29_Coherence.mmd` (136 行), **9 結果 ((5.1)-(5.9))** ⚠️ audit 訂正 (旧 6 結果は (5.7) degree-regular, (5.8) reducible μ_k, (5.9) automorphism/μ-μ̄ 欠落; **(5.5) ×11 cite + (5.7) ×10 cite が forward 最多 hub**).
 形式化先 (予定): `OddOrder/Peterfalvi/S07_Coherence.lean`.
 ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 役割: **Dade isometry の整合性条件**. Coherent triple の定義と基本性質. §8-§16 全面の前提.
@@ -24,7 +24,7 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ## TL;DR — Coherence の正式定義, mathlib 完全新規
 
-**Coherence は Dade isometry 完成後の "整合性チェック" 概念**. 等距写像 `τ: Z[S, A] → Z[Irr G]` が **coherent** ⟺ Z[S] 全体への拡張 `τ̃` が存在し、各 `χ ∈ S` で `τ̃(χ - 1)` が virtual character の差で書ける (∈ Z[Irr G]). 
+**Coherence は Dade isometry 完成後の "整合性チェック" 概念**. 等距写像 `τ: Z[S, A] → Z[Irr G]` が **coherent** ⟺ Z[S] 全体への isometric 拡張 `τ̃` が存在 (τ と Z[S, A] で一致). ⚠️ audit 訂正 (旧 TL;DR の rider「各 `χ ∈ S` で `τ̃(χ - 1)` が virtual character の差で書ける」は (5.1) **定義に含まれない**; 正は (5.1) は extension 存在のみ. "character difference" property は **(5.9.b) の結論** (under §4 (2.2) Hypothesis)). さらに §7 全体で扱うのは `χ - 1_L` ではなく **`χ - χ̄`** (複素共役). 
 
 **核となる思想**: Dade isometry は部分空間 `Z[S, A]` で成立するが、Coherence は **その拡張性** を問う. 複数の coherent isometry (τ_1, τ_2, τ_3) の組が §9-§16 で矛盾導出に活用される.
 
@@ -34,16 +34,19 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ---
 
-## §7 全 6 結果 (抽出表)
+## §7 全 9 結果 (抽出表) ⚠️ audit 訂正 (旧 6 結果は (5.7)-(5.9) 完全欠落)
 
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | §8-§16 被引用 |
 |---|--------|------|-----------------|------|---------|---------------|
-| **(5.1)** | 1-3 | **Definition** | Coherence の正式定義: isometry τ: Z[S,A] → Z[Irr G] が coherent ⟺ Z[S] 全体への拡張存在 + 各 χ で τ̃(χ-1) が character 差で表現可 | **核心 (5 結果の中心)** | **0** | **全面** |
-| **(5.2)** | 5-11 | **Hypothesis** | 5 条件: (a) χ̄ = χ case禁止, (b) τ isometry on Z[S, L^#], (c) pairwise orthogonal, (d) (χ - χ̄)^τ が orthonormal set R(χ) に分解, (e) R(χ) ⊥ R(φ) if φ ⊥ {χ, χ̄} | **Coherence 応用の setup** | low | (5.3), (5.6) |
-| **(5.3)** | 15-24 | Lemma (2 部) | (a) S ⊂ Irr L の場合 (5.2) 自動成立; (b) Hyp (4.6) (Dade 仮説) 下で induced char 系も (5.2) 満たす | Coherence 十分条件 | mid | (5.4), (5.5), (5.6) |
-| **(5.4)** | 31-53 | **Lemma** (2 部) | (a) ‖X‖² ≥ ‖χ‖²; (b) ‖Y‖² ≥ ‖ψ‖² なら ‖X‖² = ‖χ‖², ‖Y‖² = ‖ψ‖² かつ X ⊂ R(χ) (subset as sum) | **Coherence extension の技術核** | low | (5.5), (5.6) |
-| **(5.5)** | 55-57 | Lemma | τ̃ 拡張下で χ^τ̃ ∈ Z[R(χ)] (χ の像が R(χ) の部分和) | (5.4) の特殊化 | low | (5.6), (5.7), (5.8) |
-| **(5.6)** | 59-105 | **Main Theorem** | (5.1) 応用: 2 つの coherent set を統合. S_1 ∪ S_2 coherence 条件. (5.6.1)-(5.6.3) で 3 段階証明. 条件 (c): `2χ(1)χ_1(1) < Σ χ_i(1)²/‖χ_i‖²` が決定的 | **Coherence composition** | **low** | §8, §9 |
+| **(5.1)** | 1-3 | **Definition** | Coherence の正式定義: isometry τ: Z[S,A] → Z[Irr G] が coherent ⟺ Z[S] 全体への **isometric 拡張 τ̃ 存在** (τ と一致). ⚠️ 旧記載の "τ̃(χ-1) character 差" rider は誤り (実は (5.9.b) 結論) | **核心** | **0** | **全面** |
+| **(5.2)** | 5-11 | **Hypothesis** | 5 条件: (a) χ̄ = χ case禁止, (b) τ isometry on Z[S, L^#], (c) pairwise orthogonal, (d) (χ - χ̄)^τ が orthonormal set R(χ) に分解, (e) R(χ) ⊥ R(φ) if φ ⊥ {χ, χ̄} | **Coherence 応用の setup** | low | 6 cite (§8×2, §11, §12, §14×2) |
+| **(5.3)** | 15-24 | Lemma (2 部) | (a) S ⊂ Irr L の場合 (5.2) 自動成立; (b) Hyp (4.6) (Dade 仮説) 下で induced char 系も (5.2) 満たす | Coherence 十分条件 | mid | 4+ cite (§8×2, §13, §15) |
+| **(5.4)** | 31-53 | **Lemma** (2 部) | (a) ‖X‖² ≥ ‖χ‖²; (b) ‖Y‖² ≥ ‖ψ‖² なら ‖X‖² = ‖χ‖², ‖Y‖² = ‖ψ‖² かつ X ⊂ R(χ) (subset as sum) | **technical hub (内部 3 self-cite)** | low | (5.5), (5.6), (5.7) (5.6 経由せず direct) |
+| **(5.5)** | 55-57 | Lemma | τ̃ 拡張下で χ^τ̃ ∈ Z[R(χ)] (χ の像が R(χ) の部分和) | **forward 最多 hub** | low | **11 cite** (§8, §11, §12, §13, §14×4, §15×2, §16) |
+| **(5.6)** | 59-105 | **Main Theorem** | (5.1) 応用: 2 つの coherent set を統合. S_1 ∪ S_2 coherence 条件. (5.6.1)-(5.6.3) で 3 段階証明. 条件 (c): `2χ(1)χ_1(1) < Σ χ_i(1)²/‖χ_i‖²` が決定的 | **Coherence composition** | **low** | 3 cite (§8×2, §11) |
+| **(5.7)** | (proof body) | **Theorem (degree-regular)** | S の各元 degree 一定なら S 全体 coherent. (5.4) を直接利用 (NOT (5.6) corollary) | "all of S coherent" gateway | low | **10 cite** (§8, §11×3, §12×2, §13, §14×2, §16) |
+| **(5.8)** | (proof body) | Lemma (reducible μ_k) | (5.3.b) Dade 経路 + reducible μ_k decomp | (5.7) 補助 | low | 5 cite (§12×2, §13×2, §15) |
+| **(5.9)** | (proof body) | Lemma (2 部) | (a) Galois auto compatibility (b) **χ-χ̄ → μ-μ̄ extension property** ((5.1) rider の正しい所在) | character Galois | low | 5 cite (§9, §14, §15, §16×2) |
 
 ---
 
@@ -56,7 +59,8 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 **(S, A, τ) が coherent ⟺**
 1. `Z[S, A] ≠ 0`
 2. **∃ 拡張**: ∃ linear isometry `τ̃: Z[S] → Z[Irr G]` が τ と Z[S, A] で一致
-3. (拡張が character 差で表現可能)
+
+⚠️ audit 訂正: 旧記載 3 「拡張が character 差で表現可能」は (5.1) **定義に含まれない**. これは (5.9.b) の結論 (under §4 (2.2) Hypothesis) であり、定義の rider ではない. (5.1) は extension 存在のみ.
 
 ### Lean 形式化候補: 2 つの設計
 
@@ -73,10 +77,12 @@ structure Hypothesis (L G : Type*) [Group L] [Group G]
   -- (5.2) の 5 条件をここに encode
 
 def IsCoherent (τ̃ : CF L S →ₗᵢ[ℂ] (G → ℂ)) (hyp : Hypothesis L G S A) : Prop :=
-  -- τ̃ が hyp.tau を Z[S,A] で extend し、
-  -- ∀ χ ∈ S: τ̃(χ - 1) が virtual character 差で表現可能
-  (∀ x : Z[S, A], τ̃.comp (inclusion x) = hyp.tau x) ∧
-  (∀ χ : S, ∃ (μ_pos μ_neg : Irr G), τ̃ (χ - 1) = (μ_pos : ClassFunction G) - (μ_neg : ClassFunction G))
+  -- ⚠️ audit 訂正: rider 削除. (5.1) は extension 存在のみ; character difference は (5.9.b) 結論
+  ∀ x : Z[S, A], τ̃.comp (inclusion x) = hyp.tau x
+  -- (codomain は `ClassFunction G` or `Z[Irr G]` 推奨; `(G → ℂ)` 直接は audit 訂正対象)
+  -- "character difference" property は別 lemma (5.9.b):
+  --   ∀ χ : S, ∃ (μ ν : Irr G), τ̃ (χ - χ.conj) = (μ : ClassFunction G) - (ν : ClassFunction G)
+  -- これは χ - χ̄ (NOT χ - 1) を扱う点も注意
 
 theorem coherenceExists (hyp : Hypothesis L G S A) :
     ∃ τ̃ : CF L S →ₗᵢ[ℂ] (G → ℂ), IsCoherent τ̃ hyp := by

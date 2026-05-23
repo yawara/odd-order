@@ -33,10 +33,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 | **(1.2)** | 9-15 | Vanishing | `H ◁ G, χ ∈ Irr(G), H ⊄ Ker χ, C_H(g)=1 ⇒ χ(g)=0` | **Thm 6.32** + 2nd orthog. relation | mid (orthog. API exists) | ◯ §11 (type analysis) |
 | **(1.3)** | 17-37 | Basis + Fourier | `CF(H,A) basis → Ind_H^G ψ_j = Σ_i(ψ_j,χ_i) μ_i` (Frobenius reciprocity form) | **Frobenius reciprocity** (implicit in [Is] 6.15-6.16) | mid (Frobenius API 部分) | ☆☆ §4 (core), §7-§8 (coherence) |
 | **(1.4)** | 39-45 | **Tau Isometry** | `τ: Z[X,H^#] → Z[Irr G], isometry ⇒ ∃ μ_i ∈ Irr(G), ε=±1: (χ_i - χ_1)^τ = ε(μ_i - μ_1)` | (Character orthogonality implicit, 新規補題) | **low** (完全新規) | **☆☆☆ §4 (2.4) prerequisite** |
-| **(1.5)** | 47-69 | Clifford theory (5 部) | (a) Clifford decomposition (b) `\|χ\|²=r` 既約性 criterion (c) inertia-orbit (d) χ(1) 公式 (e) odd ⇒ χ̄ ⊥ χ | **Thm 6.5** (Clifford), **Thm 6.11** (induced from inertia), **Cor 6.28** | mid (Clifford 部分) | ◯◯ §5-§7 core setup |
-| **(1.6)** | 71-83 | Kernel + descent (2 部) | (a) A ⊆ Ker(θ) ⇔ A ⊆ Ker(Ind_H^G θ) (b) quotient descent | **Lem 2.21** (kernel under induction) | mid | ◯ §9-§15 |
-| **(1.7)** | 85-97 | Inertia decomp (3 部) | Ind_H^T θ = Σ e_i ψ_i, cyclic T/H ⇒ e=1 multiplicity-one | **Thm 6.11** + **Cor 6.28** + **Thm 6.5** | mid | ◯ §10-§15 (Type I-V) |
-| **(1.8)** | 99-105 | Height bound | `ψ(1) ≤ \|G\|/√(\|C\|\|D\|)` (D/B ⊂ Z(C/B)) | **Cor 2.30** (Schur degree bound) | low | ◯ §14-§15 |
+| **(1.5)** | 47-69 | Clifford theory (5 部) | (a) Clifford decomposition (b) `\|χ\|²=r` 既約性 criterion (c) inertia-orbit (d) χ(1) 公式 (e) odd ⇒ χ̄ ⊥ χ | **Thm 6.5** (Clifford), **Thm 6.11** (induced from inertia), **Cor 6.28** | **low** (audit 訂正; Clifford 完全不在) | ◯◯ §5-§7 core setup; (1.6) が外部最多 hub |
+| **(1.6)** | 71-83 | Kernel + descent (2 部) | (a) A ⊆ Ker(θ) ⇔ A ⊆ Ker(Ind_H^G θ) (b) quotient descent | **Lem 2.21** (kernel under induction) | mid | ☆ **forward 7 cite (§3 最多 hub)** §8×3, §11×3, §15 |
+| **(1.7)** | 85-97 | Inertia decomp (3 部) | Ind_H^T θ = Σ e_i ψ_i, cyclic T/H ⇒ e=1 multiplicity-one | **Thm 6.11** + **Cor 6.28** + **Thm 6.5** | **low** (audit 訂正; Inertia/Clifford 不在) | 内部利用のみ (explicit 0) |
+| **(1.8)** | 99-105 | Height bound | `ψ(1) ≤ \|G\|/√(\|C\|\|D\|)` (D/B ⊂ Z(C/B)) | **Cor 2.30** (Schur degree bound) | low | 0 explicit (audit 訂正); background tool only |
 | **(1.9)** | 107-127 | Galois auto (2 部) | (a) Aut(Q_n) ⊇ Aut(Q_a) × Aut(Q_b), (b) χ^v(g) = χ(g^k) for ord(g)|a | **[L] Ch.VIII Thm 3.1** (cyclotomic auto) | low (cyclotomic) | ◯ §16 |
 | **(1.10)** | 129-140 | Modular arith (2 部) | (a) χ(xy) ≡ χ(y) mod (1-ε), (b) (1-ε)|n in Z[ζ_p] ⇒ p|n | **Lem 3.2, Cor 3.5** (cyclotomic int) | low (cyclotomic) | ◯ §16 |
 
@@ -86,7 +86,7 @@ Peterfalvi §3 が明示引用する [Is] results:
 | **Thm 6.11** | Induced from stabilizer | Phase 1 Ch.6 | (1.5), (1.7) |
 | **Cor 6.28** | Multiplicity-one criterion (abelian normalizer) | Phase 1 Ch.6 | (1.5.b), (1.7.c) |
 | **Cor 2.30** | Schur's bound χ(1)² ≤ \|G:Z(χ)\| | Phase 1 Ch.2 | (1.8) |
-| **Lem 7.7** | TI-subset Ind isometry | Phase 1 Ch.7 | (1.4) context |
+| **Lem 7.7** | TI-subset Ind isometry | Phase 1 Ch.7 | **§8 (Coherence) L150** (audit 訂正; (1.4) ではない) |
 | **Lem 3.2, Cor 3.5** | Cyclotomic arithmetic | Phase 1 Ch.3 | (1.10) |
 
 **観察**: §3 は **新規群論機構を導入しない** — Isaacs Ch.1-7 の **再述 + odd-order specialization**. Phase 2b は §3 を **薄い wrapper layer** として扱える, ただし (1.3)-(1.4) は新規実装.
@@ -153,7 +153,7 @@ theorem frobenius_reciprocity : (Induced_char θ, χ) = (θ, Res χ) := ...
 - (1.9) Galois restriction
 - (1.10) Z[ζ_p] modular arithmetic
 
-**合計**: ~350-400 行 Lean 4 for §3.
+**合計**: ~350-400 行 Lean 4 for §3 本体. **⚠️ audit 訂正 (2026-05-23)**: Wave 1a infra (`ClassFunction.lean`, `InducedCharacter.lean`, `Clifford.lean`, `Inertia.lean`, `BrauerPermutation.lean`, `IsReal.lean`, `SchurCenterBound.lean`, `IsometryDifferencePair.lean`, `SecondOrthogonality.lean` 合計 ~600 LOC) を含めると **§3 ~1000-1200 LOC**.
 
 ## CLAUDE.md `feedback_no_mathlib_wrapper` 整合
 

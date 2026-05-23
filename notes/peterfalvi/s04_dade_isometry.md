@@ -1,6 +1,6 @@
 # Peterfalvi §4: The Dade Isometry — mini-roadmap (Phase 2b の山場)
 
-**スコープ**: Peterfalvi §4 (pp. 10-14), mmd `04.4_pp_10_14_*.mmd` (127 行), **6 結果 ((2.1)-(2.6))**.
+**スコープ**: Peterfalvi §4 (pp. 10-14), mmd `04.4_pp_10_14_*.mmd` (127 行), **11 結果 ((2.1)-(2.11))** ⚠️ audit 訂正 (旧記載「6 結果」は overview grep artifact; (2.7)-(2.11) 完全欠落).
 形式化先 (予定): `OddOrder/Peterfalvi/S04_DadeIsometry.lean`.
 ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 役割: **Dade isometry 新規概念の正式定義**, §5-§8 (Coherence) の全前提.
@@ -27,16 +27,20 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 
 **mathlib カバレッジ**: ~20% (周辺 API: TI-subset, induced character, inner product は存在). 主定理 (2.6) は完全新規. 補助 lemma (2.1)-(2.5) は Phase 1 Ch.6 (Frobenius) + Ch.指標論 完成下で 30-40% 既存.
 
-## §4 全 6 結果
+## §4 全 11 結果 ⚠️ audit 訂正 (旧表「6 結果 (2.1)-(2.6)」は (2.7)-(2.11) 完全欠落)
 
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | §5-§16 被引用 |
 |---|--------|------|-----------------|------|---------|---------------|
-| **(2.1)** | 5-11 | Lemma | Coprime conjugacy decomposition of Hg in solvable | 補助 ((2.6) induction で使用) | mid | §4 内部 |
+| **(2.1)** | 5-11 | Lemma | Coprime conjugacy decomposition of Hg in solvable | 補助 ((2.6) induction で使用) + **shared primitive** | mid | **外部 6 cite** (§6, §10, §12×2, §15, §16); `OddOrder/GroupTheory/CoprimeAction.lean` 配置推奨 |
 | **(2.2)** | 13-24 | **Hypothesis** | 一般化された仮説 3 条件: (a) conjugacy equiv in L, (b) C_G(a)=H(a) ⋊ C_L(a), (c) coprime | **TI-subset 一般化** (核心 setup) | **low** | §4 内全結果の前提 |
 | **(2.3)** | 20-22 | Theorem | Characterization: H(a)=1 ⟺ A is TI-subset | (2.2) の specialization | mid | §5, §6 |
 | **(2.4)** | 26-32 | Lemma (3 部) | (a) H(a^x)=H(a)^x, (b) conjugate overlap ⇒ L-conjugacy, (c) N_G(aH(a))=C_G(a) | τ well-definedness | low | (2.5), (2.6) |
 | **(2.5)** | 34-35 | **Definition** | **τ の定義**: `α^τ(g) = α(a)` if `g ~_G aH(a)`, else `0` | **Dade map の formal def** | low | §4-§16 全面 |
 | **(2.6)** | 38-42, 120-124 | **Main Theorem** | (a) **Isometry**: `⟨α^τ, β^τ⟩_G = ⟨α, β⟩_L`, (b) **Preserves virtual**: `Z[Irr L, A] → Z[Irr G]` | **Dade 核心定理** | **low** | **§5-§16 全面 (☆☆☆)** |
+| **(2.7)** | (proof body) | **Adjoint formula** | inner product を A 上 sum に reduce する手助け定理 | **stand-alone API edge** | low | **外部 7 cite** (§7, §9, §12×2, §13, §16×2) — §4 内最多 forward |
+| **(2.8)-(2.9)** | (proof body) | helper lemmas | (2.6) 経路の inclusion-exclusion 補助 | 内部技術 | low | 内部 |
+| **(2.10)** | (proof body) | **Inclusion-exclusion** | coprime + TI 経由の character 和計算 | (2.6) の中核 | low | 内部 + (2.10.1)-(2.10.3) sub-lemmas |
+| **(2.11)** | (proof body) | conclusion | (2.6) bundled corollary | (2.6) 同等 | low | 内部 |
 
 ## 主要結果の詳細
 
@@ -160,11 +164,12 @@ end DadeIsometry
 - `A ⊂ L = N_G(A)`, `A^g ∩ A ≠ ∅ ⇒ g ∈ L`
 - L は cyclic normalizer を持つ (e.g., Frobenius complement)
 
-**mathlib 状況**:
-- `Mathlib/GroupTheory/GroupAction/Blocks.lean` に `MulAction.IsTrivialIntersection` 概念あり
-- ただし Peterfalvi 流 `TI(G, A)` 1 型として定義されていない
+**mathlib 状況** ⚠️ audit 訂正 (旧記載「`MulAction.IsTrivialIntersection` あり」は誤り):
+- `Mathlib/GroupTheory/GroupAction/Blocks.lean` の `IsTrivialBlock` は **別概念** (subsingleton/univ block, not TI-subset)
+- Peterfalvi 流 TI-subset (`A^g ∩ A ≠ ∅ ⇒ g ∈ N_G(A)`) は **mathlib 完全不在**
+- **新規 `OddOrder/GroupTheory/TISubset.lean` (~80 LOC) 要**
 
-**Phase 2b 形式化**: 基本 `TI(G, A)` 概念は mathlib 既存 API で組める. cyclic normalizer 特殊化部分は §5 で 4-5 補題追加.
+**Phase 2b 形式化**: 新規 `TISubset.lean` を Wave 1a で先行実装 (§4-§8 全節 + §11-§16 でも使用).
 
 ## Virtual character space `CF(H, A^#)` の Lean 表現
 
@@ -265,7 +270,7 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
 1. **Hypothesis (2.2) の π parametrization**: BG/Peterfalvi で π = primes dividing |H(a)| を仮定する場合あり. global の `[Fact (...)]` vs. structure field か決定.
 2. **CF(L, A^#) と Z[Irr L, A] の関係**: 前者は ℂ 線形, 後者は ℤ 加群. (2.6.a) は ℂ 内積, (2.6.b) は ℤ 構造. Lean では `Submodule ℤ` の coercion 必要.
 3. **§4 → §7 Coherence の interface 設計**: §7 着手前に §4 完了が必須. Predicate-based なら interface 簡素.
-4. **Phase 1 Ch.6 (Frobenius) 完成日程**: §4 は Phase 1 Ch.6 完成 (Frobenius kernel nilpotent, TI-subset 関連) に依存. Ch.6 のスケジュール確認要.
+4. ~~**Phase 1 Ch.6 (Frobenius) 完成日程**: §4 は Phase 1 Ch.6 完成 (Frobenius kernel nilpotent, TI-subset 関連) に依存.~~ ⚠️ audit 訂正 (2026-05-23): **Ch.6 dep ゼロ**. §4 で必要なのは `Subgroup.piCore` (= O_{π'}) facts のみで mathlib-native; Frobenius kernel nilpotency は §4 不使用. Phase 1 Ch.6 未完でも §4 着手可.
 5. **BG App.C との対応**: §9 で Dade 経路 vs. App.C generator-relation 経路の Lean 統合戦略決定. Phase 3 結合時の整合性 lemma.
 
 ---

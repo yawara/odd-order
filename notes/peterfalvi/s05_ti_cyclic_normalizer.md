@@ -1,6 +1,6 @@
 # Peterfalvi §5: TI-Subsets with Cyclic Normalizers — mini-roadmap
 
-**スコープ**: Peterfalvi §5 (pp.15-20), mmd `04.5_pp_15_20_TI-Subsets_with_Cyclic_Normalizers.mmd` (174 行), **5 結果 ((3.1)-(3.5))**.
+**スコープ**: Peterfalvi §5 (pp.15-20), mmd `04.5_pp_15_20_TI-Subsets_with_Cyclic_Normalizers.mmd` (174 行), **9 結果 ((3.1)-(3.9))** ⚠️ audit 訂正 (旧 5 結果は (3.6)-(3.9) 欠落; **(3.8) NC trichotomy が forward 8 cite で外部最多 hub**).
 形式化先 (予定): `OddOrder/Peterfalvi/S05_TICyclic.lean`.
 ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 役割: **§4 Dade isometry の cyclic normalizer specialization**, Frobenius complement との連結, 計算的取り扱いの簡素化.
@@ -32,7 +32,11 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 | **(3.2)** | 9-19 | **Main Theorem** | σ: CF(W)→CF(G) linear isometry で (a) CF(W,V) は induced, (b) 1_W↦1_G, (c) σ on V は identity, (d) irreducible outside image vanishes on V | **Dade specialization の主結果** | low | (3.3)-(3.5) + §6 |
 | **(3.3)** | 21-23 | **Notation** | Irr(W) = {ω_{ij} : 0≤i<w₁, 0≤j<w₂}, ω_{ij}=ω_{i0}ω_{0j} (因数分解) | **Basis 構築の準備** | mid | (3.4)-(3.5) 中核 |
 | **(3.4)** | 25-31 | **Lemma** | α_{ij} = (1_W-ω_{i0})(1_W-ω_{0j}) (1≤i<w₁, 1≤j<w₂) が CF(W,V) の ℂ-basis | **Basis 構成** | low | (3.5) + §6 |
-| **(3.5)** | 33-115 | **Main Decomposition** | ∃ orthonormal (χ_{ij})_{0≤i<w₁, 0≤j<w₂} ⊂ Z Irr(G) s.t. Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij} | **Cyclic W による orthogonality** | low | **§6-§8+§10-§16 全面** |
+| **(3.5)** | 33-115 | **Main Decomposition** | ∃ orthonormal (χ_{ij})_{0≤i<w₁, 0≤j<w₂} ⊂ Z Irr(G) s.t. Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij} | **Cyclic W による orthogonality**; **(3.5) Case I/II 内部 hub** + **(3.8) NC 外部 forward hub** の two-hub 構造 | low | ⚠️ audit 訂正: §6×9, §15×3, §12×2, §7×2, §13, §16 のみ; §8/§9/§10/§11/§14 = **0 direct cite** |
+| **(3.6)** | (proof body) | Hypothesis | (3.5) Case II 用 setup | (3.5) 内部 | low | 内部 |
+| **(3.7)** | (proof body) | index identity | 単純 index 等式 | 計算補助 | low | **§16 final-contradiction で直接消費** |
+| **(3.8)** | (proof body) | **NC trichotomy** | normalizer-centralizer 3 場合分け combinatorial hub | **forward 外部最多 hub** | low | **8 cite** (§6×多, §7, §12×2, §15×2) |
+| **(3.9)** | (proof body) | Galois rationality | (a) Galois 作用 (b) σ-rationality | character Galois 整数性 | low | 4 cite (§6×2, §12, §13, §15) |
 
 ---
 
@@ -67,7 +71,7 @@ structure TICyclicNormalizer (G : Type*) [Group G] where
   hV_norm : Subgroup.normalizer V = W
 ```
 
-**Phase 1 との依存**: §4 (Frobenius) の TI-subset 基本論 + Ch.指標論の induced character isometry.
+**Phase 1 との依存** ⚠️ audit 訂正 (旧記載「Phase 1 Ch.6 (Frobenius) の TI-subset dep」は誤り): §5 mmd で **§4 (2.X) cite = 0**. 実 dep は §3 (1.3) ×1 + §3 (1.9) ×2 + [Is] Ch.7 + [Is] Cor 2.23 + Thm 4.21 のみ. Ch.6 Frobenius 不要; Wave 1a 新規 `TISubset.lean` で十分.
 
 ---
 
@@ -308,20 +312,20 @@ lemma tiCyclicIntersectionLattice (hyp : TICyclicNormalizer G) (hw₁ : 5 ≤ w�
 
 ---
 
-## mathlib カバレッジ
+## mathlib カバレッジ ⚠️ audit 訂正 (旧表の「Induced/CF/ZIrr 既存」は **全て誤り**)
 
 | 概念 | mathlib 状況 | Phase 1 依存 | 新規実装 | 形式化コスト |
 |------|---------|---------|----------|----------|
 | Cyclic group | 既存 | — | ~0% | — |
 | Direct product W₁×W₂ | 既存 | — | ~0% | — |
-| TI-subset | 周辺 (IsTrivialIntersection) | Ch.6 | 20% (wrapper) | 短 (5h) |
-| Induced character | 既存 | Ch.指標論 | ~0% | — |
-| Class function CF | 既存 | — | ~0% | — |
-| Virtual character ZIrr | 既存 | — | ~0% | — |
+| TI-subset | **不在** (`IsTrivialBlock` ≠ TI) | — | **100%** (新規 `TISubset.lean`) | 中 (~80 LOC) |
+| Induced character | **不在** (`IndV` coinvariants のみ; classical formula なし) | — | **100%** (新規 `InducedCharacter.lean`) | 大 (~200 LOC) |
+| Class function CF | **不在** (only `character : G → k`) | — | **100%** (新規 `ClassFunction.lean`) | 中 (~150 LOC) |
+| Virtual character ZIrr | **不在** | — | **100%** (新規 `ZIrr.lean`) | 中 (~80 LOC) |
 | **Basis in CF(W,V)** | — | — | **100%** | **中 (8h)** |
 | **Orthonormal (χ_{ij})** | — | — | **100%** | **大 (16h)** |
 
-**全体**: ~30% mathlib, ~20% Phase 1, ~50% 新規. **行数**: ~350-400 行.
+**全体**: ~0% mathlib (前提 infra 全部新規), ~0% Phase 1 dep, **100% 新規**. **行数**: **~700-850 LOC** (audit 訂正; 旧記載「350-400 LOC」の約 2 倍, (3.6)-(3.9) 追加分含む).
 
 ### "Basis in CF(W,V)" の実装
 

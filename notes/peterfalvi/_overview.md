@@ -34,7 +34,7 @@ L46 "本体合計 113 結果" → 数値再集計要 (per-section 漏れ加算�
 Peterfalvi 本書は Feit-Thompson 定理の **指標理論パート**: BG (Phase 2a) で確立した最小反例 G の局所構造を、指標論で再分析し、最終矛盾を導出する. 全 16 節 + 5 appendix で **本文 113 個 + 付録 27 個 = 140 個の番号付き結果** ((N.M) 形式が本文、Proposition/Lemma/Theorem N. 形式が付録).
 
 - **§1-§2** (80 行, 0 結果): 導入と記号 (前文相当、補強なし)
-- **§3-§8** (978 行, 36 結果): 指標理論の道具袋. **§3 Preliminary** (Isaacs Ch.指標論の再掲), **§4 Dade Isometry**, **§5 TI-Subset cyclic normalizer**, **§6 Dade Isometry for Certain Type**, **§7-§8 Coherence**. **新規概念 (Dade isometry, coherence) の中核**.
+- **§3-§8** (978 行, **57 結果** ⚠️ audit 訂正; 旧 36 は §4-§8 grep 漏れ累積): 指標理論の道具袋. **§3 Preliminary** (10), **§4 Dade Isometry** (11), **§5 TI-Subset cyclic normalizer** (9), **§6 Dade Isometry for Certain Type** (10), **§7-§8 Coherence** (9+8). **新規概念 (Dade isometry, coherence) の中核**. **BG 完全独立で並行着手可** (§3-§8 範囲で [BG] cite ゼロ).
 - **§9** (162 行, 6 結果): "Non-existence of a Certain Type of Group of Odd Order". **BG App.C と並行内容**. Phase 2a App.C と統合.
 - **§10-§15** (1087 行, 60 結果): 最小単純群 G の最大部分群 (Type I, II, III, IV, V) の **指標論的分析**. **BG Ch.3-Ch.4 の出力を入力にする**. §15 (365 行, 17 結果) が最大規模で、S, T 部分群を最終矛盾向けに詰める.
 - **§16** (184 行, 11 結果): **G の非存在**. FT 局所部 + 指標部の最終結合.
@@ -42,7 +42,7 @@ Peterfalvi 本書は Feit-Thompson 定理の **指標理論パート**: BG (Phas
 
 **FT クリティカル経路**: §3-§8 (指標論コア) → **§9** (= BG App.C) → §10-§15 (型分析) → **§16** (非存在). 全節が ☆ (FT 必須). 付録は **△ (FT 経路外)** — Suzuki/Huppert/Near-fields は Peterfalvi 自身の独立再録、Phase 2b 完成度のためのオプション.
 
-**mathlib カバレッジ**: §3 (前提部) は **mid** (mathlib `RepresentationTheory.Character` の orthogonality/induction/restriction で部分被覆), §4-§8 (Dade/Coherence) は **low** (Peterfalvi 固有の概念で完全新規), §10-§16 (構造分析) は **low** (BG 結果の指標論的再解釈で 100% 新規). **Phase 2b の中核は §4-§8 の Dade isometry + Coherence の形式化** (mathlib 完全未収載).
+**mathlib カバレッジ** ⚠️ audit 訂正 (旧記載「§3 mid」「§4-§8 low」評価 overstated): §3-§8 範囲は **全節 (c) bucket dominant** で、Wave 1a 共有 infra **11 modules ~1100 LOC** 要 (`OddOrder/RepresentationTheory/` 配下 `ClassFunction`, `InducedCharacter`, `ZIrr`, `Clifford` (BG §2 と共有), `Inertia`, `SchurCenterBound`, `BrauerPermutation`, `IsReal`, `IsometryDifferencePair`, `SecondOrthogonality` + `OddOrder/GroupTheory/TISubset`). (6.7) 専用 `ClassSumAlgebraHom` + `AlgInt.cong` 別途. §10-§16 (構造分析) は **low** (BG 結果の指標論的再解釈で 100% 新規). **Phase 2b の中核は §4-§8 の Dade isometry + Coherence の形式化** (mathlib 完全未収載).
 
 ## 本体節一覧
 
@@ -53,11 +53,11 @@ Peterfalvi 本書は Feit-Thompson 定理の **指標理論パート**: BG (Phas
 | 1 | 序 | 04.1 | 1-2 | 40 | Introduction | 0 | n/a | △ | none | FT 証明戦略 + BG 依存性明示 |
 | 2 | 記号 | 04.2 | 3-4 | 40 | Notation | 0 | n/a | △ | none | 指標論・加群記号定義. mathlib 移植先選定 |
 | 3 | 基礎 | 04.3 | 5-9 | 140 | Preliminary Results from Character Theory | 10 | **mid** | ◯ | [BG] §1 軽 | Isaacs [Is] Ch.指標論 + Peterfalvi 補強 ((1.1)-(1.10)). mathlib 既存と橋渡し |
-| 4 | 中核 | 04.4 | 10-14 | 127 | The Dade Isometry | 6 | **low** | ☆ | [BG] §1 軽 | **(2.1)-(2.6) Dade isometry 定義 + 主定理**. TI-subset 上の virtual character isometry |
-| 5 | 中核 | 04.5 | 15-20 | 174 | TI-Subsets with Cyclic Normalizers | 5 | low | ☆ | §4 | **(3.1)-(3.5)** cyclic normalizer 特殊化. Dade の応用 |
-| 6 | 中核 | 04.6 | 21-24 | 108 | The Dade Isometry for a Certain Type of Subgroup | 5 | low | ☆ | §4-§5 | **(4.1)-(4.5)** Dade 拡張 (より広い subgroup family) |
-| 7 | 中核 | 04.7 | 25-29 | 136 | Coherence | 6 | low | ☆ | §4 | **(5.1)-(5.6) Coherence 定義 + 基本性質**. Dade 後の isometry 整合条件 |
-| 8 | 中核 | 04.8 | 30-37 | 243 | Some Coherence Theorems | 4 | low | ☆ | §7 | **(6.1)-(6.4) Coherence 応用定理**. Sibley/Reynolds 系を含む |
+| 4 | 中核 | 04.4 | 10-14 | 127 | The Dade Isometry | **11** ⚠️ | **low** | ☆ | **0** ⚠️ | **(2.1)-(2.11) Dade isometry 定義 + 主定理 + (2.7)-(2.11) sub-lemmas**. TI-subset 上の virtual character isometry. audit 訂正: 旧 6 結果は (2.7)-(2.11) 欠落 |
+| 5 | 中核 | 04.5 | 15-20 | 174 | TI-Subsets with Cyclic Normalizers | **9** ⚠️ | low | ☆ | **0** ⚠️ | **(3.1)-(3.9)** cyclic normalizer 特殊化. **(3.8) NC trichotomy = forward 8 cite 最多 hub**. audit 訂正: 旧 5 結果 → 9 |
+| 6 | 中核 | 04.6 | 21-24 | 108 | The Dade Isometry for a Certain Type of Subgroup | **10** ⚠️ | low | ☆ | **0** ⚠️ | **(4.1)-(4.10)** Dade 拡張. (4.6) Hypothesis が §9-§16 で named hyp. audit 訂正: 旧 5 結果 → 10; **§5 dep が §4 より重い (8 vs 3 cites)** |
+| 7 | 中核 | 04.7 | 25-29 | 136 | Coherence | **9** ⚠️ | low | ☆ | **0** ⚠️ | **(5.1)-(5.9) Coherence 定義 + 基本性質**. **(5.5) ×11 + (5.7) ×10 が forward 最多 hub**. audit 訂正: (5.1) def に rider なし (character difference は (5.9.b) 結論) |
+| 8 | 中核 | 04.8 | 30-37 | 243 | Some Coherence Theorems | **8** ⚠️ | low | ☆ | **0** ⚠️ | **(6.1)-(6.8) Coherence 応用定理**. **(6.8) のみ** が Sibley 1976 *Illinois J. Math.* 20 寄与; **(6.3),(6.5) は [FT] §11 から** (Sibley 無関係); **(6.7) は無名 lemma** (Reynolds 帰属は audit 訂正で削除) |
 | 9 | 最終 | 04.9 | 38-43 | 162 | Non-existence of a Certain Type of Group of Odd Order | 6 | low | ☆ | §3-§8 + [BG] §3 | **(7.1)-(7.6) ≡ BG App.C Theorem C**. Frobenius family の非存在 |
 | 10 | 構造 | 04.10 | 44-49 | 166 | Structure of a Minimal Simple Group of Odd Order | 6 | low | ☆ | **[BG] §10-§16 全面** | **(8.1)-(8.6) G の Type I-V 分類定義**. BG Theorem A-E 翻訳 |
 | 11 | 構造 | 04.11 | 50-57 | 202 | Maximal Subgroups of Types II, III and IV | 9 | low | ☆ | §10 + [BG] §11-§13 | **(9.1)-(9.9) 型 II/III/IV 詳細**. (9.1) Wielandt 作用, (9.2) Frobenius kernel cohomology |
@@ -67,7 +67,7 @@ Peterfalvi 本書は Feit-Thompson 定理の **指標理論パート**: BG (Phas
 | 15 | 構造 | 04.15 | 75-86 | 365 | The Subgroups S and T | 17 | low | ☆ | §14 + [BG] §15 (M_F) | **(13.1)-(13.17) S, T の位数・正規化群・指標**. **§16 直前の最終仕込み**. 本文最大規模 |
 | 16 | 最終 | 04.16 | 87-92 | 184 | Non-existence of G | 11 | low | ☆☆ | §3-§15 + [BG] §16 | **(14.1)-(14.11) G の非存在 = FT 完了**. 指標論計算が中心 |
 
-**本体合計**: 1718 行, **113 結果**. mathlib カバレッジ: 主に §3 のみ mid (10/113), 他全節 low. **§4-§8 のコア理論 (Dade + Coherence) が形式化の山場** (26 結果, 全 23%).
+**本体合計**: 1718 行, **131 程度結果** ⚠️ audit 訂正 (旧「113 結果」は §4-§8 grep artifact で (2.7)-(2.11), (3.6)-(3.9), (4.6)-(4.10), (5.7)-(5.9), (6.5)-(6.8) 欠落の累積). per-section 再集計: §3=10, §4=11, §5=9, §6=10, §7=9, §8=8, §9=6, §10=6, §11=9, §12=7, §13=8, §14=13, §15=17, §16=11 → 合計 **134** (§1+§2 が 0 結果). mathlib カバレッジ: **全節 (c) bucket 多数** (audit 訂正で旧「§3 mid」「§7-§8 low」評価 overstated; (6.7)/(6.8) は実 0%). **§4-§8 のコア理論 (Dade + Coherence) が形式化の山場** (audit 訂正: 47 結果, 全 35%) + Wave 1a infra ~1100 LOC 別途.
 
 ## 付録一覧
 
