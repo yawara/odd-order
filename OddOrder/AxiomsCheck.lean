@@ -130,3 +130,6 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 -- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.29): A trivial on G/Φ ⇒ A trivial on G
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aFixed_quotient_frattini
+
+-- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.30 実用形): A faithful + trivial on G/Φ ⇒ trivial
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aFaithful_quotient_frattini
