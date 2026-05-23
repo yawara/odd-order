@@ -256,6 +256,10 @@ FT クリティカル度 + 章内依存で並べる:
 - **Thm 6.4 完全 TFAE 達成**: (1) ⇔ (2) ⇔ (3) ⇔ (4) all closed.
   Constructor 形 (`of_centralizer_*_le`) + projection 形 (`trivialIntersection`,
   `centralizer_complement_le`, `centralizer_kernel_le`) 揃った.
+- **§6B infra: `OddOrder.GroupTheory.SemiDihedral` 新規** (~221 LOC):
+  半二面体群 `SemiDihedralGroup n` (位数 `2^(n+1)`). mathlib `QuaternionGroup` template.
+  constructors `c i` / `ca i` with twist `r := 2^(n-1) - 1` (n=0,1 override). Group + Fintype.
+  Lem 6.13 / 6.14 / 6.17 の前提.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
