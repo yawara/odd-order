@@ -25,14 +25,24 @@
 
 §4B **コア部分完成** (Lem 4.9 mathlib, Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13). 残: Mann (4.14-4.19) — Phase 1 skip 可 (audit で BG/Peterfalvi 直接被引用 0 件確認済).
 
-§4D **`actionCommutator` 定義 + A-不変性 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
+§4D **`actionCommutator` 定義 + A-不変性 + G-Normal 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
 - `actionCommutator φ := Subgroup.closure {g * (φ a) g⁻¹ | g a}`. `Γ = G ⋊[φ] A` 内で
   `⁅inl(G), inr(A)⁆` を `inl` 経由で pull back したもの (∵ `[inl(g), inr(a)] = inl(g * (φ a) g⁻¹)`).
 - `actionCommutator_one_eq_bot`: 自明作用 `φ = 1` ⇒ `[G, 1] = ⊥` (@[simp]).
 - **`IsAInvariant.actionCommutator`**: `actionCommutator φ` は φ 作用下で A-不変.
   proof: generator `g * (φ a) g⁻¹` → `(φ b) g * (φ (b·a·b⁻¹)) ((φ b) g)⁻¹` (key 計算)
   で生成集合自体が `(φ b)`-stable. `IsAInvariant.closure_of_invariant_set` で結論. ~30 LOC.
-- 下流 §4D 4.28-4.30 で `[G, A]` 記号を多用する準備.
+- **`actionCommutator.normal`** ⭐: G で normal subgroup (Isaacs §4C 冒頭注).
+  generator level conjugation では証明不可 (`(φ a)` 内部 conj が φ 像にない可能性) — Γ 経路:
+  1. `actionCommutator_map_inl`: `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`
+     (~15 LOC, 両側 closure 形に展開 + `SemidirectProduct.commutator_inl_inr` 生成元対応).
+  2. **§4A 新規** `commutator_normal_of_sup_eq_top` (Lem 4.1 系): `H ⊔ K = ⊤` ⇒ `⁅H, K⁆.Normal`.
+     Lem 4.1 + symmetric の sup から normalizer = ⊤. ~6 LOC.
+  3. `Subgroup.Normal.of_map_injective` (mathlib) + `inl injective` で pull back. ~5 LOC.
+- 関連 helpers (OddOrder.Mathlib.SemidirectProduct):
+  `inl_range_sup_inr_range_eq_top` (`inl_left_mul_inr_right` 経由),
+  `commutator_inl_inr` (ext + simp).
+- Lem 4.20 (smallest A-inv normal subgroup with G/N trivial action) の前提整備完了.
 
 §4D **Lemma 4.32 完成** (2026-05-23 ⭐, ralph-loop): P p-群 が G 非自明 p-群 に作用 ⇒ `⁅G,P⁆ < G` + `C_G(P) > 1`.
 - **前半** `commutator_inl_inr_lt_inl_of_pgroup_action`: Γ = G ⋊[φ] P 内で ⁅inl(G), inr(P)⁆ < inl(G).
