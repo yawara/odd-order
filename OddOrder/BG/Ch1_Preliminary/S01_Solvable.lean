@@ -38,7 +38,7 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
 | Thm 1.13 | (Thompson critical) | (Phase 1 未) | Phase 1 待ち |
-| **Lem 1.14** main | — | `Subgroup.comap_normalizer_eq_of_surjective` + Sylow II in T·M | **statement 確定 + sorry (hard direction)** |
+| **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
 | **Lem 1.14** 易方向 | — | `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer` | ✅ **sorry-free 5 行** |
 | **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | ✅ **sorry-free thin wrap** (π = {p} 特殊化) |
 | Thm 1.17 | Thm 5.21 | `commutator_inf_eq_focalSubgroup` ✅ | no-wrapper, docstring 参照 |
@@ -59,27 +59,29 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 - Cor 1.19(b) → mathlib `IsZGroup.coprime_commutator_index` 直接ヒット
 - 内部 hub は **Prop 1.5(d)** (6 §1 proofs)
 
-## 実装 status (2026-05-24)
+## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐
 
-- **Skeleton** + **§1F docstring mapping** + **7 結果 (sorry-free 6)**:
+- **Skeleton** + **§1F docstring mapping** + **9 結果 全 sorry-free**:
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
-  - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` statement 確定 (sorry)
+  - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` ⭐ **sorry-free 完成**
   - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
   - **Prop 1.15(a)** `hall_higman_solvable_specialization` ⭐ sorry-free thin wrap
   - **`card_comap_eq_card_mul_card_ker`** helper sorry-free
   - **`inf_eq_bot_of_pGroup_coprime`** (Step 1) ⭐ sorry-free
   - **`card_sup_eq_card_mul_card_of_disjoint_normal`** (Step 2) ⭐ sorry-free
   - **`subgroupOf_sup_card_eq_and_pGroup`** (Step 3 part 1) ⭐ sorry-free
-- 残 sorry: Lem 1.14 main の hard direction.
-  Step 3 part 2 (T as Sylow object via maximality cardinality argument), Step 4 (Frattini
-  via `Sylow.normalizer_sup_eq_top` 適用 inside ↥(N_G(T ⊔ M))), Step 5 (element decomp +
-  assembly) — ~70-100 LOC 規模, 次セッション.
+  - **`subgroupOf_sup_eq_of_pGroup_le_of_coprime`** (Step 3 part 2) ⭐ sorry-free
+- Lem 1.14 hard direction proof (~115 LOC inline): TSyl + T_xSyl 構築 + `MulAction.exists_smul_eq`
+  (Sylow II in ↥(T ⊔ M)) + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` + `inf_of_le_left`
+  で `MulAut.conj y.val • T = T_x` を G で取得 + `mem_sup_of_normal_left` で `y.val = m·t'` 分解
+  + `t' ∈ T` で `t' · T · t'⁻¹ = T` + `m⁻¹·x ∈ N_G(T)` で集約.
 - Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.7 §7A/§7C 着手 / Ch.5/6 進行中.
 -/
 
 namespace OddOrder.BG.Ch1.S01
 
 open OddOrder.Isaacs.Ch01
+open Pointwise
 
 /-! ## §1A-§1D: 未実装 (Phase 1 + shared module 待ち) -/
 
@@ -230,9 +232,10 @@ In quotient form: with `f = QuotientGroup.mk' M`,
   since `M·T = T·M` for M normal) ⇒ `xTx⁻¹ = m·T·m⁻¹` ⇒ `m⁻¹x ∈ N_G(T)` ⇒
   `x ∈ M·N_G(T) = N_G(T)·M`.
 
-**実装状態**: hard direction proof sorry. helpers (本ファイル上方) は sorry-free 完成,
-TSyl Sylow object も上の helpers から構築可能. Step 4-5 (Sylow II + Frattini + element
-decomp + assembly) は次セッション. -/
+**実装状態**: ⭐ **sorry-free 完成** (2026-05-24). TSyl + T_xSyl 構築 + Sylow II
+(`MulAction.exists_smul_eq`) + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` で
+`MulAut.conj y.val • T = T_x` を G で取得. `mem_sup_of_normal_left` で `y.val = m·t'`
+分解 + `t' ∈ T ⇒ t'·T·t'⁻¹ = T` + `m⁻¹·x ∈ N_G(T)` で集約. ~115 LOC inline. -/
 theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
     {T : Subgroup G} (hT : IsPGroup p T)
@@ -240,13 +243,137 @@ theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     Subgroup.normalizer (T ⊔ M : Subgroup G) = Subgroup.normalizer T ⊔ M := by
   apply le_antisymm _ (le_normalizer_sup_of_normal T M)
   intro x hx
-  -- Sylow object construction: T.subgroupOf (T ⊔ M) は ↥(T ⊔ M) の Sylow p
-  let _TSyl : Sylow p ↥(T ⊔ M : Subgroup G) :=
+  -- === Step 0: setup ===
+  have h_disj : T ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hT hM_p'
+  have h_card_sup : Nat.card (T ⊔ M : Subgroup G) = Nat.card T * Nat.card M :=
+    card_sup_eq_card_mul_card_of_disjoint_normal h_disj
+  have hT_le_TM : T ≤ (T ⊔ M : Subgroup G) := le_sup_left
+  have hM_le_TM : M ≤ (T ⊔ M : Subgroup G) := le_sup_right
+  have hx_norm : ∀ s, s ∈ (T ⊔ M : Subgroup G) ↔ x * s * x⁻¹ ∈ T ⊔ M :=
+    Subgroup.mem_normalizer_iff.mp hx
+  -- === Step 1: TSyl construction ===
+  let TSyl : Sylow p ↥(T ⊔ M : Subgroup G) :=
     ⟨T.subgroupOf (T ⊔ M),
      (subgroupOf_sup_card_eq_and_pGroup hT M).2,
      fun {Q} hQ hle => subgroupOf_sup_eq_of_pGroup_le_of_coprime hT hM_p' hQ hle⟩
-  -- Step 4-5: Sylow II + element decomposition (次セッション, ~55 LOC)
-  sorry
+  -- === Step 2: T_x = x · T · x⁻¹ properties ===
+  let T_x : Subgroup G := T.map (MulAut.conj x).toMonoidHom
+  have hT_x_pg : IsPGroup p T_x :=
+    hT.of_equiv (Subgroup.equivMapOfInjective T _ (MulAut.conj x).injective)
+  have hT_x_card : Nat.card T_x = Nat.card T :=
+    (Nat.card_congr (Subgroup.equivMapOfInjective T _ (MulAut.conj x).injective).toEquiv).symm
+  have hT_x_le : T_x ≤ (T ⊔ M : Subgroup G) := by
+    rintro a ⟨t, ht, hta⟩
+    rw [← hta]
+    change x * t * x⁻¹ ∈ T ⊔ M
+    exact (hx_norm t).mp (hT_le_TM ht)
+  have hT_x_sub_pg : IsPGroup p (T_x.subgroupOf (T ⊔ M : Subgroup G)) :=
+    hT_x_pg.of_injective (Subgroup.subgroupOfEquivOfLe hT_x_le).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hT_x_le).injective
+  have hT_x_sub_card : Nat.card (T_x.subgroupOf (T ⊔ M : Subgroup G)) = Nat.card T := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hT_x_le).toEquiv, hT_x_card]
+  -- === Step 3: T_xSyl construction (maximality inline) ===
+  let T_xSyl : Sylow p ↥(T ⊔ M : Subgroup G) :=
+    ⟨T_x.subgroupOf (T ⊔ M),
+     hT_x_sub_pg,
+     fun {Q} hQ_pg hT_x_sub_Q => by
+       obtain ⟨k, hk⟩ := hT.exists_card_eq
+       obtain ⟨j, hj⟩ := hQ_pg.exists_card_eq
+       have hQ_dvd : Nat.card Q ∣ Nat.card ↥(T ⊔ M : Subgroup G) :=
+         Subgroup.card_subgroup_dvd_card Q
+       rw [h_card_sup, hk, hj] at hQ_dvd
+       have hp_cop : (p ^ j).Coprime (Nat.card M) := (hM_p'.symm).pow_left j
+       have hpj_dvd_pk : p ^ j ∣ p ^ k := Nat.Coprime.dvd_of_dvd_mul_right hp_cop hQ_dvd
+       have hcard_le : Nat.card (T_x.subgroupOf (T ⊔ M : Subgroup G)) ≤ Nat.card Q :=
+         Subgroup.card_le_of_le hT_x_sub_Q
+       rw [hT_x_sub_card, hk, hj] at hcard_le
+       have hk_le_j : k ≤ j :=
+         (Nat.pow_le_pow_iff_right (Fact.out : p.Prime).one_lt).mp hcard_le
+       have hj_le_k : j ≤ k :=
+         (Nat.pow_dvd_pow_iff_le_right (Fact.out : p.Prime).one_lt).mp hpj_dvd_pk
+       have hjk : j = k := le_antisymm hj_le_k hk_le_j
+       symm
+       apply Subgroup.eq_of_le_of_card_ge hT_x_sub_Q
+       rw [hT_x_sub_card, hk, hj, hjk]⟩
+  -- === Step 4: Sylow II — ∃ y : ↥(T ⊔ M), y • TSyl = T_xSyl ===
+  obtain ⟨y, hy⟩ := MulAction.exists_smul_eq (↥(T ⊔ M : Subgroup G)) TSyl T_xSyl
+  -- === Step 5: extract y.val · T · y.val⁻¹ = T_x as subgroups of G ===
+  have hy_carrier : (y • TSyl).toSubgroup = T_xSyl.toSubgroup := congrArg Sylow.toSubgroup hy
+  have h_conj_T_eq_Tx : MulAut.conj (y : G) • T = T_x := by
+    have h1 : (y • TSyl).toSubgroup = MulAut.conj y • T.subgroupOf (T ⊔ M) := rfl
+    have h2 : T_xSyl.toSubgroup = T_x.subgroupOf (T ⊔ M : Subgroup G) := rfl
+    have h3 : MulAut.conj y • T.subgroupOf (T ⊔ M : Subgroup G) =
+        (MulAut.conj (y : G) • T).subgroupOf (T ⊔ M : Subgroup G) :=
+      Subgroup.conj_smul_subgroupOf hT_le_TM y
+    rw [h1, h2, h3] at hy_carrier
+    -- hy_carrier : (MulAut.conj y.val • T).subgroupOf (T ⊔ M) = T_x.subgroupOf (T ⊔ M)
+    have h_smul_T_le : MulAut.conj (y : G) • T ≤ (T ⊔ M : Subgroup G) := by
+      rintro - ⟨t, ht, rfl⟩
+      change (y : G) * t * (y : G)⁻¹ ∈ T ⊔ M
+      exact (T ⊔ M).mul_mem ((T ⊔ M).mul_mem y.2 (hT_le_TM ht)) ((T ⊔ M).inv_mem y.2)
+    rw [Subgroup.subgroupOf_inj] at hy_carrier
+    rwa [inf_of_le_left h_smul_T_le, inf_of_le_left hT_x_le] at hy_carrier
+  -- === Step 6: decompose y.val = m · t' (m ∈ M, t' ∈ T) ===
+  have hy_in_MT : (y : G) ∈ (M ⊔ T : Subgroup G) := by
+    rw [sup_comm]; exact y.2
+  obtain ⟨m, hm_M, t', ht'_T, hmt⟩ := Subgroup.mem_sup_of_normal_left.mp hy_in_MT
+  -- hmt : m * t' = y.val
+  -- === Step 7: m · T · m⁻¹ = T_x (since t' normalizes T) ===
+  have h_t'_norm_T : MulAut.conj t' • T = T := by
+    ext s
+    refine ⟨?_, ?_⟩
+    · rintro ⟨u, hu, rfl⟩
+      change t' * u * t'⁻¹ ∈ T
+      exact T.mul_mem (T.mul_mem ht'_T hu) (T.inv_mem ht'_T)
+    · intro hs
+      refine ⟨t'⁻¹ * s * t', T.mul_mem (T.mul_mem (T.inv_mem ht'_T) hs) ht'_T, ?_⟩
+      change t' * (t'⁻¹ * s * t') * t'⁻¹ = s
+      group
+  have h_conj_y_eq_conj_m : MulAut.conj (y : G) • T = MulAut.conj m • T := by
+    rw [← hmt, map_mul, mul_smul, h_t'_norm_T]
+  have h_mT_eq_Tx : MulAut.conj m • T = T_x := h_conj_y_eq_conj_m.symm.trans h_conj_T_eq_Tx
+  -- === Step 8: m⁻¹ * x ∈ N_G(T) ===
+  have h_mx_in_NT : m⁻¹ * x ∈ Subgroup.normalizer T := by
+    rw [Subgroup.mem_normalizer_iff]
+    intro t
+    refine ⟨?_, ?_⟩
+    · -- Forward: t ∈ T ⇒ (m⁻¹x)t(m⁻¹x)⁻¹ ∈ T
+      intro ht
+      -- x·t·x⁻¹ ∈ T_x (definition unfolding)
+      have hxtx_in_Tx : x * t * x⁻¹ ∈ T_x := ⟨t, ht, by simp [MulAut.conj_apply]⟩
+      rw [← h_mT_eq_Tx] at hxtx_in_Tx
+      -- Get s ∈ T with m * s * m⁻¹ = x * t * x⁻¹
+      obtain ⟨s, hs, hms⟩ := hxtx_in_Tx
+      have hms_eq : m * s * m⁻¹ = x * t * x⁻¹ := by
+        rw [← MulAut.conj_apply m s]; exact hms
+      -- (m⁻¹x) · t · (m⁻¹x)⁻¹ = m⁻¹ · (x*t*x⁻¹) · m = m⁻¹ · (m*s*m⁻¹) · m = s
+      have h_eq : m⁻¹ * x * t * (m⁻¹ * x)⁻¹ = s := by
+        have step : m⁻¹ * (x * t * x⁻¹) * m = s := by rw [← hms_eq]; group
+        calc m⁻¹ * x * t * (m⁻¹ * x)⁻¹
+            = m⁻¹ * (x * t * x⁻¹) * m := by group
+          _ = s := step
+      rw [h_eq]; exact hs
+    · -- Reverse: (m⁻¹x)t(m⁻¹x)⁻¹ ∈ T ⇒ t ∈ T
+      intro hut
+      set u := m⁻¹ * x * t * (m⁻¹ * x)⁻¹ with hu_def
+      -- u ∈ T, and m·u·m⁻¹ = x·t·x⁻¹
+      have hmum_eq_xtx : m * u * m⁻¹ = x * t * x⁻¹ := by rw [hu_def]; group
+      -- m·u·m⁻¹ ∈ MulAut.conj m • T = T_x
+      have hmum_in_mT : m * u * m⁻¹ ∈ MulAut.conj m • T :=
+        ⟨u, hut, by simp [MulAut.conj_apply]⟩
+      rw [h_mT_eq_Tx, hmum_eq_xtx] at hmum_in_mT
+      -- hmum_in_mT : x * t * x⁻¹ ∈ T_x
+      obtain ⟨s, hs, hxs⟩ := hmum_in_mT
+      have hxs_eq : x * s * x⁻¹ = x * t * x⁻¹ := by
+        rw [← MulAut.conj_apply x s]; exact hxs
+      have h_st : s = t := mul_left_cancel (mul_right_cancel hxs_eq)
+      rw [← h_st]; exact hs
+  -- === Step 9: x = m · (m⁻¹ * x) ∈ M · N_G(T) ⊆ N_G(T) ⊔ M ===
+  have h_x_eq : x = m * (m⁻¹ * x) := by group
+  rw [h_x_eq]
+  have h_in_M_NT : m * (m⁻¹ * x) ∈ (M : Subgroup G) ⊔ Subgroup.normalizer T :=
+    Subgroup.mul_mem_sup hm_M h_mx_in_NT
+  rwa [sup_comm] at h_in_M_NT
 
 /-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3", thin wrap)**: `G` 有限可解 +
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
