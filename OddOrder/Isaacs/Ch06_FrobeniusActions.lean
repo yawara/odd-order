@@ -925,6 +925,90 @@ theorem centralizer_complement_le (h : IsFrobeniusGroup G N A) :
   rw [h_ti, Subgroup.mem_bot] at h_a_in
   exact ha h_a_in
 
+/-- **Isaacs Corollary 6.6**: In a Frobenius group `G` with kernel `N` and complement `A`, the
+kernel `N` is exactly the set of elements **not** conjugate to any nonidentity element of `A`.
+
+Proof: For `n ∈ N`, if `IsConj a n` with `a ∈ A`, write `g * a * g⁻¹ = n`. Then `a = g⁻¹ * n * g`
+lies in `N` (by normality of `N`), so `a ∈ N ⊓ A = ⊥`, i.e., `a = 1`. Hence `N ⊆ notConjugateSet A`.
+Equality follows by cardinality: `|N| = A.index = |notConjugateSet A|` (Lagrange + Lem 6.5). -/
+theorem kernel_eq_notConjugateSet [Finite G] (h : IsFrobeniusGroup G N A) :
+    (N : Set G) = notConjugateSet A := by
+  classical
+  -- Step 1: N ⊆ notConjugateSet A.
+  have h_subset : (N : Set G) ⊆ notConjugateSet A := by
+    intro n hnN a haA ha_ne h_conj
+    rw [SetLike.mem_coe] at hnN
+    rw [isConj_iff] at h_conj
+    obtain ⟨g, hg⟩ := h_conj
+    -- hg : g * a * g⁻¹ = n. Rearrange: a = g⁻¹ * n * g.
+    have hag : a = g⁻¹ * n * g := by rw [← hg]; group
+    -- g⁻¹ * n * g ∈ N (normality), so a ∈ N.
+    have h_gng_in_N : g⁻¹ * n * g ∈ N := by
+      have := h.isNormal.conj_mem n hnN g⁻¹
+      simpa using this
+    have ha_in_N : a ∈ N := hag ▸ h_gng_in_N
+    have hdisj : Disjoint N A := h.isComplement.disjoint
+    exact ha_ne (Subgroup.disjoint_def.mp hdisj ha_in_N haA)
+  -- Step 2: Equal cardinalities + subset ⇒ equal.
+  have h_ncard_N : (N : Set G).ncard = A.index := h.isComplement.ncard_left
+  have h_ncard_X : (notConjugateSet A).ncard = A.index :=
+    card_notConjugateSet_eq_index A fun g hg => h.trivialIntersection g hg
+  have h_finite : (notConjugateSet A).Finite := Set.toFinite _
+  exact Set.eq_of_subset_of_ncard_le h_subset (h_ncard_X.trans h_ncard_N.symm).le h_finite
+
+/-- **Isaacs Thm 6.4 (1) ⇒ (4)**: Frobenius group ⇒ centralizer of any nontrivial element of `N`
+is contained in `N`. Together with `of_centralizer_kernel_le` this completes the four-way
+equivalence of Thm 6.4.
+
+Proof uses Cor 6.6 (`kernel_eq_notConjugateSet`): suppose `c ∈ C_G(n) \ N`. Then `c` is conjugate
+to some `1 ≠ a ∈ A`, say `c = g a g⁻¹`. Set `m := g⁻¹ n g ∈ N` (by normality, `m ≠ 1`). From
+`c * n * c⁻¹ = n` we get `a * m * a⁻¹ = m`, contradicting the Frobenius condition. -/
+theorem centralizer_kernel_le [Finite G] (h : IsFrobeniusGroup G N A) :
+    ∀ n ∈ N, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ N := by
+  intro n hnN hn_ne c hc
+  rw [Subgroup.mem_centralizer_singleton_iff] at hc
+  -- hc : c * n = n * c
+  by_contra hcN
+  -- c ∉ N. Use Cor 6.6: N = notConjugateSet A, so c ∉ notConjugateSet A.
+  have hX_eq := h.kernel_eq_notConjugateSet
+  have hcX : c ∉ notConjugateSet A := by
+    intro h_mem
+    apply hcN
+    have h_in_N_set : c ∈ (N : Set G) := hX_eq ▸ h_mem
+    exact h_in_N_set
+  -- ¬ (∀ a ∈ A, a ≠ 1 → ¬ IsConj a c) ⇒ ∃ a ∈ A, a ≠ 1, IsConj a c.
+  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hcX
+  obtain ⟨a, haA, ha_ne, h_conj⟩ := hcX
+  rw [isConj_iff] at h_conj
+  obtain ⟨g, hgac⟩ := h_conj
+  -- hgac : g * a * g⁻¹ = c
+  -- Set m := g⁻¹ * n * g; by normality m ∈ N, and m ≠ 1 since n ≠ 1.
+  set m := g⁻¹ * n * g with hm_def
+  have hmN : m ∈ N := by
+    have := h.isNormal.conj_mem n hnN g⁻¹
+    simpa using this
+  have hm_ne : m ≠ 1 := by
+    intro hm_one
+    apply hn_ne
+    have h_n_eq : n = g * m * g⁻¹ := by rw [hm_def]; group
+    rw [h_n_eq, hm_one, mul_one, mul_inv_cancel]
+  -- From c * n = n * c and c = g a g⁻¹, conjugating both sides by g⁻¹/g gives a * m = m * a.
+  have h_am : a * m * a⁻¹ = m := by
+    have h_eq : a * m = m * a := by
+      have h_cn : c * n = n * c := hc
+      have h_cong : g⁻¹ * (c * n) * g = g⁻¹ * (n * c) * g :=
+        congrArg (fun x => g⁻¹ * x * g) h_cn
+      have hLHS : g⁻¹ * (c * n) * g = a * m := by
+        rw [← hgac, hm_def]; group
+      have hRHS : g⁻¹ * (n * c) * g = m * a := by
+        rw [← hgac, hm_def]; group
+      rw [hLHS, hRHS] at h_cong
+      exact h_cong
+    -- a * m = m * a ⇒ a * m * a⁻¹ = m.
+    calc a * m * a⁻¹ = (m * a) * a⁻¹ := by rw [h_eq]
+      _ = m := mul_inv_cancel_right m a
+  exact h.conj_frobenius a haA ha_ne m hmN hm_ne h_am
+
 end IsFrobeniusGroup
 
 end
