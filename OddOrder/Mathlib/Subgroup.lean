@@ -200,7 +200,7 @@ theorem map_centralizer_eq_of_bijective {G G' : Type*} [Group G] [Group G']
   intro y hy
   obtain ⟨g, rfl⟩ := hf.surjective y
   refine ⟨g, ?_, rfl⟩
-  show g ∈ Subgroup.centralizer s
+  change g ∈ Subgroup.centralizer s
   rw [Subgroup.mem_centralizer_iff]
   intro x hx
   have hfx : f x ∈ f '' s := ⟨x, hx, rfl⟩

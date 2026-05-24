@@ -65,7 +65,7 @@ theorem IsComplement'.map_mk' {N K : Subgroup G} [Finite G] [N.Normal]
     refine ⟨QuotientGroup.mk n, ?_, QuotientGroup.mk k, ?_, ?_⟩
     · exact mem_map.mpr ⟨n, hn, rfl⟩
     · exact mem_map.mpr ⟨k, hk, rfl⟩
-    · show (QuotientGroup.mk n : G ⧸ L) * QuotientGroup.mk k = QuotientGroup.mk g
+    · change (QuotientGroup.mk n : G ⧸ L) * QuotientGroup.mk k = QuotientGroup.mk g
       rw [← QuotientGroup.mk_mul, hnk]
 
 /-! ### Helper A: Restriction of a complement to a containing subgroup -/
@@ -142,7 +142,7 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
     QuotientGroup.lift (N.subgroupOf (U ⊔ N))
       ((QuotientGroup.mk' N).comp (U ⊔ N).subtype)
       (fun x hx => by
-        show (QuotientGroup.mk x.val : G ⧸ N) = 1
+        change (QuotientGroup.mk x.val : G ⧸ N) = 1
         exact (QuotientGroup.eq_one_iff _).mpr hx)
   have hφ_inj : Function.Injective φ := by
     rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
@@ -166,7 +166,7 @@ variable [Finite G]
 /-- `L ≠ ⊥ ⇒ |G ⧸ L| < |G|` for finite `G`. -/
 private theorem card_quotient_lt_of_ne_bot {L : Subgroup G} [L.Normal] (hL : L ≠ ⊥) :
     Nat.card (G ⧸ L) < Nat.card G := by
-  show L.index < Nat.card G
+  change L.index < Nat.card G
   have h_L_gt : 1 < Nat.card ↥L := (Subgroup.one_lt_card_iff_ne_bot _).mpr hL
   have h_L_idx_pos : 0 < L.index := by
     rw [Nat.pos_iff_ne_zero]
@@ -181,18 +181,22 @@ variable {N : Subgroup G} [N.Normal]
 
 /-! ### Step 1: Restriction reduction (proper subgroup `U`) -/
 
+omit [Finite G] in
 /-- `(K.subgroupOf U).map U.subtype = K` when `K ≤ U`. -/
 private theorem subgroupOf_map_subtype_eq {U K : Subgroup G} (hKU : K ≤ U) :
     (K.subgroupOf U).map U.subtype = K := by
   rw [subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hKU]
 
-/-- Conjugation by `n' : ↥U` in `↥U` corresponds (via `U.subtype`) to conjugation by `n'.val` in `G`. -/
+omit [Finite G] in
+/-- Conjugation by `n' : ↥U` in `↥U` corresponds via `U.subtype`
+to conjugation by `n'.val` in `G`. -/
 private theorem subtype_comp_conj_eq {U : Subgroup G} (n' : ↥U) :
     U.subtype.comp ((MulAut.conj n').toMonoidHom) =
       ((MulAut.conj (n'.val : G)).toMonoidHom).comp U.subtype := by
   ext ⟨x, hx⟩
   rfl
 
+omit [Finite G] in
 /-- Pushing `((K.subgroupOf U).map (conj n')).map U.subtype` equals `K.map (conj n'.val)`. -/
 private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Subgroup G)
     (hKU : K ≤ U) :
@@ -245,13 +249,14 @@ private theorem step_restriction
 These are still in progress. The skeleton below defines the statements and the main_aux
 assembly; the bodies (marked `sorry`) need to be filled. -/
 
+omit [Finite G] in
 /-- Conjugation `mk'_comp_conj`: in `G ⧸ L`, conjugation by `mk' g` agrees with `mk'` applied
 to conjugation by `g`. Used in the lift-back step of `step_factor`. -/
 private theorem mk'_comp_conj_eq {L : Subgroup G} [L.Normal] (g : G) :
     (QuotientGroup.mk' L).comp (MulAut.conj g).toMonoidHom =
       ((MulAut.conj (QuotientGroup.mk g : G ⧸ L)).toMonoidHom).comp (QuotientGroup.mk' L) := by
   ext x
-  show (QuotientGroup.mk (g * x * g⁻¹) : G ⧸ L) =
+  change (QuotientGroup.mk (g * x * g⁻¹) : G ⧸ L) =
        (QuotientGroup.mk g) * (QuotientGroup.mk x) * (QuotientGroup.mk g)⁻¹
   rw [QuotientGroup.mk_mul, QuotientGroup.mk_mul, QuotientGroup.mk_inv]
 
@@ -306,7 +311,7 @@ private theorem step_factor
         QuotientGroup.lift N
           ((QuotientGroup.mk' (N.map (QuotientGroup.mk' L))).comp (QuotientGroup.mk' L))
           (fun n hn => by
-            show (QuotientGroup.mk (QuotientGroup.mk n : G ⧸ L) :
+            change (QuotientGroup.mk (QuotientGroup.mk n : G ⧸ L) :
                   (G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) = 1
             rw [QuotientGroup.eq_one_iff]
             exact Subgroup.mem_map.mpr ⟨n, hn, rfl⟩)
@@ -328,6 +333,7 @@ private theorem step_factor
   have heq := (Subgroup.map_eq_map_iff (f := QuotientGroup.mk' L)).mp key
   rwa [QuotientGroup.ker_mk'] at heq
 
+omit [Finite G] in
 /-- Isaacs Lem 3.11: minimal `G`-normal of solvable group is commutative.
 mathlib v4.29.1 にこの形の lemma がないため自前. -/
 private theorem minimal_normal_isCommutative_of_solvable
@@ -380,6 +386,7 @@ private theorem minimal_normal_isCommutative_of_solvable
     rw [h_ds_top] at hn
     exact bot_lt_top.ne' hn
 
+omit [Finite G] in
 /-- **Isaacs Lemma 3.11** (`p`-group part): for `L` a minimal normal subgroup of a
 finite group with `L` solvable, `L` is a `p`-group for some prime `p`.
 The commutativity follows from `minimal_normal_isCommutative_of_solvable`; the
@@ -462,6 +469,7 @@ private theorem minimal_normal_isPGroup_of_solvable
   rw [pow_one]
   exact hxT
 
+omit [Finite G] [N.Normal] in
 /-- Helper: for `K` complement of abelian normal `N`, the stabilizer (under the
 `G`-action on `N.QuotientDiff`) of the equivalence class of `K`'s transversal equals `K`.
 
@@ -510,6 +518,7 @@ private theorem stabilizer_quotientDiff_eq_self {K : Subgroup G} [N.Normal]
     rw [h_card_stab, ← h_card_K]
   exact (Subgroup.eq_of_le_of_card_ge hK_le h_eq.le).symm
 
+omit [Finite G] in
 /-- **Abelian SZ conjugacy** (Isaacs Thm 3.5 / part of Thm 3.12): for `N` abelian normal
 in `G` with coprime order/index, any two complements are conjugate by an element of `N`.
 
@@ -587,7 +596,7 @@ private theorem step_caseA
     refine ⟨1, (⊥ : Subgroup G).one_mem, ?_⟩
     rw [hK_top, hK'_top]
     ext x
-    simp [Subgroup.mem_map]
+    simp
   -- Nontrivial case: take minimal normal L ⊆ N, abelian, then case split on K^g ⊔ L.
   haveI hN_normal_inst : N.Normal := inferInstance
   obtain ⟨L, hL_normal, hL_le, hL_ne_bot, hL_min⟩ :=
@@ -632,7 +641,7 @@ private theorem step_caseA
               g_f * k' * g_f⁻¹, ?_, ?_⟩
       · exact Subgroup.mem_map.mpr ⟨k', hk'_K, rfl⟩
       · -- (g_f n' g_f⁻¹) * (g_f k' g_f⁻¹) = g_f (n' k') g_f⁻¹ = g_f (g_f⁻¹ x g_f) g_f⁻¹ = x.
-        show g_f * n' * g_f⁻¹ * (g_f * k' * g_f⁻¹) = x
+        change g_f * n' * g_f⁻¹ * (g_f * k' * g_f⁻¹) = x
         have : g_f * n' * g_f⁻¹ * (g_f * k' * g_f⁻¹) = g_f * (n' * k') * g_f⁻¹ := by group
         rw [this, hnk']
         group
@@ -689,9 +698,10 @@ private theorem step_caseA
         ← Subgroup.map_map]
     · exact h_conj
     · ext x
-      show n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
+      change n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
       group
 
+omit [Finite G] in
 /-- Helper: a conjugate of a complement is a complement. The conjugating element lies in `G`,
 not necessarily in `N`. (Generalizes the inline proof in `step_caseA`.) -/
 private theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
@@ -727,7 +737,7 @@ private theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
     refine ⟨g * n' * g⁻¹, hN_normal.conj_mem n' hn'_N g,
             g * k' * g⁻¹, ?_, ?_⟩
     · exact Subgroup.mem_map.mpr ⟨k', hk'_K, rfl⟩
-    · show g * n' * g⁻¹ * (g * k' * g⁻¹) = x
+    · change g * n' * g⁻¹ * (g * k' * g⁻¹) = x
       have hcalc : g * n' * g⁻¹ * (g * k' * g⁻¹) = g * (n' * k') * g⁻¹ := by group
       rw [hcalc, hnk']
       group
@@ -768,7 +778,7 @@ private theorem step_caseB
     refine ⟨1, (⊤ : Subgroup G).one_mem, ?_⟩
     rw [hK_bot, hK'_bot]
     ext x
-    simp [Subgroup.mem_map, Subgroup.mem_bot]
+    simp [Subgroup.mem_bot]
   -- Trivial: N = ⊥ ⇒ K = K' = ⊤.
   by_cases hN_bot : N = ⊥
   · subst hN_bot
@@ -781,7 +791,7 @@ private theorem step_caseB
     refine ⟨1, (⊥ : Subgroup G).one_mem, ?_⟩
     rw [hK_top, hK'_top]
     ext x
-    simp [Subgroup.mem_map]
+    simp
   -- Main: N ≠ ⊥, N ≠ ⊤.
   haveI hGN_nontriv : Nontrivial (G ⧸ N) := by
     have h_idx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hN_top
@@ -877,7 +887,7 @@ private theorem step_caseB
     -- Step 5: p ∤ |N|.
     have hk_pos : 1 ≤ k := by
       by_contra h
-      push_neg at h
+      push Not at h
       interval_cases k
       rw [pow_zero] at hk_eq
       haveI hM_bar_nontriv : Nontrivial M_bar :=
@@ -943,8 +953,11 @@ private theorem step_caseB
     have h_MK'_card_eq_pk : Nat.card ↥(M ⊓ K' : Subgroup G) = p ^ k := by
       rw [h_MK'_card_eq_M_bar, hk_eq]
     have h_MK'_subgroupOf_card_eq :
-        Nat.card ((M ⊓ K' : Subgroup G).subgroupOf M) = Nat.card ↥(M ⊓ K' : Subgroup G) :=
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : (M ⊓ K' : Subgroup G) ≤ M)).toEquiv
+        Nat.card ((M ⊓ K' : Subgroup G).subgroupOf M) =
+          Nat.card ↥(M ⊓ K' : Subgroup G) :=
+      Nat.card_congr
+        (Subgroup.subgroupOfEquivOfLe
+          (inf_le_left : (M ⊓ K' : Subgroup G) ≤ M)).toEquiv
     have h_MK'_subgroupOf_card :
         Nat.card ((M ⊓ K' : Subgroup G).subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
       rw [h_MK'_subgroupOf_card_eq, h_MK'_card_eq_pk, h_M_factorization]
@@ -1069,7 +1082,7 @@ private theorem step_caseB
             have := hL_normal.conj_mem x hxL g'⁻¹
             simpa [mul_assoc] using this
           exact hL_le_H h_in_L
-        · show g' * (g'⁻¹ * x * g') * g'⁻¹ = x; group
+        · change g' * (g'⁻¹ * x * g') * g'⁻¹ = x; group
       -- H^g' ⊔ L = H^g'.
       have hHg_sup : (H.map (MulAut.conj g').toMonoidHom) ⊔ L =
           H.map (MulAut.conj g').toMonoidHom :=
@@ -1092,7 +1105,9 @@ private theorem step_caseB
       refine ⟨g' * g_f, N.mul_mem hg'_N hg_f_N, ?_⟩
       have hcomp : (MulAut.conj (g' * g_f)).toMonoidHom =
             (MulAut.conj g').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom := by
-        ext x; show g' * g_f * x * (g' * g_f)⁻¹ = g' * (g_f * x * g_f⁻¹) * g'⁻¹; group
+        ext x
+        change g' * g_f * x * (g' * g_f)⁻¹ = g' * (g_f * x * g_f⁻¹) * g'⁻¹
+        group
       rw [hcomp, ← Subgroup.map_map]
       exact hK'_eq_Hg.symm
     · -- Case N_G(L) < G: step_restriction on N_G(L) with H, K'm as complements.
@@ -1115,7 +1130,9 @@ private theorem step_caseB
           rw [hK'm_def, Subgroup.map_map]
           have h_inv_comp : (MulAut.conj m⁻¹).toMonoidHom.comp (MulAut.conj m).toMonoidHom =
               MonoidHom.id G := by
-            ext x; show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x; group
+            ext x
+            change m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x
+            group
           rw [h_inv_comp]
           ext; simp
         -- Chain: K.map (...) = K^(g_f) (= H) .map (conj n').map (conj m⁻¹) = K'm.map (...) = K'.
@@ -1123,7 +1140,7 @@ private theorem step_caseB
               (MulAut.conj m⁻¹).toMonoidHom.comp
                 ((MulAut.conj n').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom) := by
           ext x
-          show m⁻¹ * n' * g_f * x * (m⁻¹ * n' * g_f)⁻¹ =
+          change m⁻¹ * n' * g_f * x * (m⁻¹ * n' * g_f)⁻¹ =
             m⁻¹ * (n' * (g_f * x * g_f⁻¹) * n'⁻¹) * m⁻¹⁻¹
           group
         rw [hcomp, ← Subgroup.map_map, ← Subgroup.map_map, h1, h2, h3]
@@ -1136,7 +1153,9 @@ private theorem step_caseB
       refine ⟨n_N, hn_N_N, ?_⟩
       have hcomp_NK : (MulAut.conj (n_N * k_K)).toMonoidHom =
             (MulAut.conj n_N).toMonoidHom.comp (MulAut.conj k_K).toMonoidHom := by
-        ext x; show n_N * k_K * x * (n_N * k_K)⁻¹ = n_N * (k_K * x * k_K⁻¹) * n_N⁻¹; group
+        ext x
+        change n_N * k_K * x * (n_N * k_K)⁻¹ = n_N * (k_K * x * k_K⁻¹) * n_N⁻¹
+        group
       have h_K_conj_kK : K.map (MulAut.conj k_K).toMonoidHom = K := by
         ext y
         simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
@@ -1146,7 +1165,7 @@ private theorem step_caseB
         · intro hyK
           refine ⟨k_K⁻¹ * y * k_K, ?_, ?_⟩
           · exact K.mul_mem (K.mul_mem (K.inv_mem hk_K_K) hyK) hk_K_K
-          · show k_K * (k_K⁻¹ * y * k_K) * k_K⁻¹ = y; group
+          · change k_K * (k_K⁻¹ * y * k_K) * k_K⁻¹ = y; group
       calc K.map (MulAut.conj n_N).toMonoidHom
           = (K.map (MulAut.conj k_K).toMonoidHom).map (MulAut.conj n_N).toMonoidHom := by
               rw [h_K_conj_kK]
@@ -1164,7 +1183,7 @@ private theorem step_caseB
     have hcomp : (MulAut.conj (n' * g_f)).toMonoidHom =
           (MulAut.conj n').toMonoidHom.comp (MulAut.conj g_f).toMonoidHom := by
       ext x
-      show n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
+      change n' * g_f * x * (n' * g_f)⁻¹ = n' * (g_f * x * g_f⁻¹) * n'⁻¹
       group
     rw [hcomp, ← Subgroup.map_map]
     exact h_conj
@@ -1173,9 +1192,9 @@ private theorem step_caseB
 private theorem main_aux {n : ℕ} :
     ∀ {G : Type u} [Group G] [Finite G] (_hG : Nat.card G = n)
       {N : Subgroup G} [N.Normal]
-      (h1 : Nat.Coprime (Nat.card N) N.index)
-      (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
-      {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K'),
+      (_h1 : Nat.Coprime (Nat.card N) N.index)
+      (_hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+      {K K' : Subgroup G} (_hK : IsComplement' N K) (_hK' : IsComplement' N K'),
       ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
   induction n using Nat.strongRecOn with
   | ind n ih =>

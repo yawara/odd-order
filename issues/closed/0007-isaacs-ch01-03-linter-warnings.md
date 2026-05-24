@@ -26,18 +26,27 @@ created: 2026-05-24
 
 ## やること
 
-- [ ] `show` → `change` 置換 (ゴールを書き換えるなら `change`, 表示だけなら `show` のまま OK だが
+- [x] `show` → `change` 置換 (ゴールを書き換えるなら `change`, 表示だけなら `show` のまま OK だが
       Lean が「書き換えてる」と判定したケースが警告対象)
-- [ ] `push_neg` → `push Not` (mathlib v4.29.1 で `push_neg` が deprecated)
-- [ ] `simpa` → `simp` で済む箇所
-- [ ] unused simp args の除去
-- [ ] 100 文字超の改行
-- [ ] `automatically included section variable(s) unused` の解消 (variable 宣言を section 範囲縮小 or 明示 `omit`)
+- [x] `push_neg` → `push Not` (mathlib v4.29.1 で `push_neg` が deprecated)
+- [x] `simpa` → `simp` で済む箇所
+- [x] unused simp args の除去
+- [x] 100 文字超の改行
+- [x] `automatically included section variable(s) unused` の解消 (variable 宣言を section 範囲縮小 or 明示 `omit`)
 
 ## 完了条件
 
-- `lake build OddOrder.AxiomsCheck` 実行時の `warning:` 行数が現状 (~40+) から大幅減少
-- 理想: 該当 5 ファイル群で warning 0
+- [x] `lake build OddOrder.AxiomsCheck` 実行時の `warning:` 行数が現状 (~40+) から大幅減少
+- [x] 該当 5 ファイル群で warning 0
+
+## 完了メモ
+
+`lake build OddOrder.AxiomsCheck` で以下の 0007 対象ファイルから warning が消えたことを確認:
+`OddOrder/Mathlib/Subgroup.lean`, `OddOrder/Isaacs/Ch01_Sylow.lean`,
+`OddOrder/Isaacs/Ch02_Subnormality.lean`, `OddOrder/Isaacs/Ch03_SplitExtensions.lean`,
+`OddOrder/Mathlib/SchurZassenhausConj.lean`.
+
+残る warning は Ch.4/Ch.5 側で, 本 issue の対象外.
 
 ## 参照
 

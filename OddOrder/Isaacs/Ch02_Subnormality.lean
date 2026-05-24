@@ -194,7 +194,7 @@ theorem IsMinimalNormal.map_equiv {M : Subgroup G} (hM : IsMinimalNormal M) (ϕ 
       rintro _ ⟨y, hyN, rfl⟩
       rcases hNle hyN with ⟨z, hzM, hzeq⟩
       have h1 : ϕ.symm.toMonoidHom y = z := by
-        show ϕ.symm y = z
+        change ϕ.symm y = z
         rw [← hzeq]; exact ϕ.symm_apply_apply z
       rw [h1]; exact hzM
     -- Transport back: N = (N.map ϕ.symm).map ϕ via map_map and ϕ.symm.trans ϕ = id.
@@ -213,7 +213,7 @@ theorem IsMinimalNormal.map_equiv {M : Subgroup G} (hM : IsMinimalNormal M) (ϕ 
 instance socle.characteristic : (socle G).Characteristic := by
   refine (Subgroup.characteristic_iff_map_le).mpr ?_
   intro ϕ
-  show (⨆ M : {M : Subgroup G // IsMinimalNormal M}, (M : Subgroup G)).map
+  change (⨆ M : {M : Subgroup G // IsMinimalNormal M}, (M : Subgroup G)).map
       ϕ.toMonoidHom ≤ socle G
   rw [Subgroup.map_iSup]
   refine iSup_le ?_
@@ -239,7 +239,7 @@ theorem exists_isMinimalNormal_le_of_normal [Finite G] (N : Subgroup G) [N.Norma
     intro N hNn hcard hNne
     by_cases hmin : ∀ K : Subgroup G, K.Normal → K ≤ N → K = ⊥ ∨ K = N
     · exact ⟨N, ⟨hNn, hNne, hmin⟩, le_rfl⟩
-    · push_neg at hmin
+    · push Not at hmin
       obtain ⟨K, hKnorm, hKleN, hKne_bot, hKne_N⟩ := hmin
       have hKlt : K < N := lt_of_le_of_ne hKleN hKne_N
       have hsub : (K : Set G) ⊂ (N : Set G) := SetLike.coe_ssubset_coe.mpr hKlt
@@ -398,7 +398,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
         have hN_ne_top : N ≠ ⊤ := hNlt.ne
         obtain ⟨g, hg⟩ : ∃ g : G, g ∉ N := by
           by_contra h
-          push_neg at h
+          push Not at h
           exact hN_ne_top (eq_top_iff.mpr fun x _ => h x)
         have hN_card_lt : Nat.card N < Nat.card G :=
           Finite.card_subtype_lt (p := fun x : G => x ∈ N) (x := g) hg
@@ -1383,7 +1383,8 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
         set φ : ↥H' ≃* ↥H :=
           Subgroup.equivMapOfInjective H' K.subtype K.subtype_injective with hφ_def
         have hφ_surj : Function.Surjective (φ.toMonoidHom) := φ.surjective
-        -- Subgroup correspondence: (A.subgroupOf H).comap φ.toMonoidHom = (A.subgroupOf K).subgroupOf H'.
+        -- Subgroup correspondence:
+        -- (A.subgroupOf H).comap φ.toMonoidHom = (A.subgroupOf K).subgroupOf H'.
         have h_S_eq : (A.subgroupOf H).comap φ.toMonoidHom =
             (A.subgroupOf K).subgroupOf H' := by
           ext x
@@ -1402,7 +1403,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
           constructor
           · intro hx y
             apply φ.injective
-            show φ.toMonoidHom (y * x) = φ.toMonoidHom (x * y)
+            change φ.toMonoidHom (y * x) = φ.toMonoidHom (x * y)
             rw [map_mul, map_mul]
             exact hx (φ.toMonoidHom y)
           · intro hx z
@@ -1433,7 +1434,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
     -- Show ∃ g, ⟨A, (MulAut.conj g) • A⟩ = ⊤.
     have h_exists_g : ∃ g : G, A ⊔ ((MulAut.conj g) • A : Subgroup G) = ⊤ := by
       by_contra h_all_proper
-      push_neg at h_all_proper
+      push Not at h_all_proper
       -- ∀ g, A ⊔ A^g < ⊤, hence ≤ some maximal = M.
       have hAg_le_M : ∀ g : G, ((MulAut.conj g) • A : Subgroup G) ≤ M := by
         intro g
@@ -1598,7 +1599,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
         constructor
         · intro hx y
           apply Subgroup.topEquiv.injective
-          show Subgroup.topEquiv.toMonoidHom (y * x) = Subgroup.topEquiv.toMonoidHom (x * y)
+          change Subgroup.topEquiv.toMonoidHom (y * x) = Subgroup.topEquiv.toMonoidHom (x * y)
           rw [map_mul, map_mul]
           exact hx (Subgroup.topEquiv.toMonoidHom y)
         · intro hx z
@@ -2033,7 +2034,7 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
   -- Step 3: Baer iff ⇒ ∃ g, ⟨T, T^g⟩ not nilpotent.
   have hExist : ∃ g : G, ¬ Group.IsNilpotent ↥(T ⊔ ((MulAut.conj g) • T : Subgroup G)) := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact hT_not_fit ((le_fitting_iff_baer_sup_conj_isNilpotent T).mpr h)
   obtain ⟨g, hg⟩ := hExist
   -- Step 4: s := g·t·g⁻¹.
@@ -3513,7 +3514,7 @@ private theorem zenkov_wlog_aux : ∀ n : ℕ,
     classical
     by_cases h_case1 : ∃ g : G, A ⊔ ((MulAut.conj g) • B : Subgroup G) = ⊤
     · exact zenkov_case1_le_fitting hAab hBab hMin h_case1
-    push_neg at h_case1
+    push Not at h_case1
     -- Case 2.
     set M := (A ⊓ B : Subgroup G) with hM_def
     -- Show M ≤ fitting G via Sylow + Baer.

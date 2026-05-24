@@ -25,7 +25,7 @@ elaboration 時に検査する CI ガード. moore57 プロジェクトの `Moor
 | Ch.1 (Sylow Theory) | `Subgroup.chermakDelgado` | Thm 1.41 (Chermak-Delgado) |
 | Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.matsuyama` | Thm 2.13 (Matsuyama involution) |
 | Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.hall_E_exists` | Thm 3.13 (Hall E for solvable) |
-| Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall` | Thm 3.22 (Hall-Higman π-length ≤ 1) |
+| Ch.3 (Split Extensions) | `piLength_le_one_of_abelian_pi_hall` | Thm 3.22 (π-length ≤ 1) |
 
 ## 許可公理
 

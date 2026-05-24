@@ -1829,13 +1829,15 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
       with ⟨k, hk_le, hk_eq⟩
     interval_cases k
     · -- k = 0: n_q = 1, Sylow q normal.
-      simp at hk_eq
-      haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq).1
+      have hk_eq_one : Nat.card (Sylow q G) = 1 := by
+        simpa using hk_eq
+      haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq_one).1
       exact Or.inr (Or.inl ⟨Q, Sylow.normal_of_subsingleton Q⟩)
     · -- k = 1: n_q = p. By Sylow III: p ≡ 1 (mod q), so q ∣ p - 1. But p < q ⇒ contradiction.
       exfalso
-      simp at hk_eq
-      rw [hk_eq] at hnq_mod
+      have hk_eq_p : Nat.card (Sylow q G) = p := by
+        simpa using hk_eq
+      rw [hk_eq_p] at hnq_mod
       have hp_ge : 1 ≤ p := (Fact.out (p := p.Prime)).pos
       have hq_dvd : q ∣ p - 1 := (Nat.modEq_iff_dvd' hp_ge).mp hnq_mod.symm
       have hq_le_p : q ≤ p - 1 := Nat.le_of_dvd (by
