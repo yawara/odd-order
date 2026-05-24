@@ -1621,6 +1621,15 @@ theorem oPiCore.map_le_of_surjective {G H : Type*} [Group G] [Finite G] [Group H
     fun p hp => hKpi p (Nat.primeFactors_mono (K.card_map_dvd f) Nat.card_pos.ne' hp)
   exact Subgroup.IsPiGroup.le_oPiCore hKmapPi
 
+/-- `O_π` is invariant under group isomorphism. -/
+theorem oPiCore.map_eq_of_mulEquiv {G H : Type*} [Group G] [Finite G] [Group H] [Finite H]
+    (π : Set ℕ) (e : G ≃* H) :
+    (oPiCore π G).map e = oPiCore π H := by
+  refine le_antisymm (oPiCore.map_le_of_surjective π (e : G →* H) e.surjective) ?_
+  intro y hy
+  refine ⟨e.symm y, ?_, by simp⟩
+  exact oPiCore.map_le_of_surjective π (e.symm : H →* G) e.symm.surjective ⟨y, hy, rfl⟩
+
 /-- **`oPiCore.comap_le_of_injective`**: injective hom `f : G →* H`, `[Finite H]` 下で
 `oPiCore π H` の preimage は `oPiCore π G` に含まれる.
 
@@ -1932,8 +1941,8 @@ instance normalSubgroup_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Fini
 `G/Fₙ` 上の `O_π ⊔ O_{π'}` が非自明であることと同値. -/
 private theorem piFittingSeries_lt_succ_iff (π : Set ℕ) {G : Type*} [Group G] (n : ℕ) :
     piFittingSeries π G n < piFittingSeries π G (n + 1) ↔
-      oPiCore π (G ⧸ piFittingSeries π G n) ⊔
-        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) ≠ ⊥ := by
+      (oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)) ≠ ⊥ := by
   refine ⟨fun h => ?_, fun h => ?_⟩
   · intro h_sup_bot
     apply ne_of_lt h
@@ -1999,12 +2008,105 @@ instance isPiSeparable_of_solvable (π : Set ℕ) (G : Type*) [Group G] [Finite 
         apply ih (n + 1)
         omega
 
-/-! ### disjunction lemma の `[IsPiSeparable]` 版 (TODO: 別 issue で実装)
+/-! ### disjunction lemma の `[IsPiSeparable]` 版 -/
 
-`[Finite G] [Nontrivial G] [IsPiSeparable π G] ⇒ oPiCore π G ⊔ oPiCore π' G ≠ ⊥` を
-証明するには `piFittingSeries 1 = oPiCore π G ⊔ oPiCore π' G` (iso G ≃* G⧸⊥ 経由の
-subgroup lattice 同型) を確立する必要がある. 上記 normal subgroup 閉包と同じ
-sup 取り扱い問題があるため本セッションでは deferred. -/
+/-- If `O_π(G) = ⊥`, then also `O_π(G/⊥) = ⊥`.
+
+This is the quotient-by-`⊥` bridge used to transfer the first nontrivial
+`piFittingSeries` step back from `G ⧸ ⊥` to `G`. -/
+private theorem oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    (hbot : oPiCore π G = ⊥) :
+    oPiCore π (G ⧸ (⊥ : Subgroup G)) = ⊥ := by
+  let q : G →* G ⧸ (⊥ : Subgroup G) := QuotientGroup.mk' (⊥ : Subgroup G)
+  have hq_surj : Function.Surjective q := QuotientGroup.mk'_surjective _
+  have hq_inj : Function.Injective q := by
+    have hker : q.ker = ⊥ := by
+      dsimp [q]
+      exact QuotientGroup.ker_mk' (⊥ : Subgroup G)
+    exact (MonoidHom.ker_eq_bot_iff q).mp hker
+  apply Subgroup.comap_injective hq_surj
+  apply le_antisymm
+  · rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+    exact (oPiCore.comap_le_of_injective π q hq_inj).trans (le_of_eq hbot)
+  · rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+    exact bot_le
+
+/-- **π-separable disjunction**: a finite nontrivial π-separable group has a nontrivial
+first π-Fitting layer, i.e. `O_π(G) ⊔ O_{π'}(G) ≠ ⊥`. -/
+theorem oPiCore_sup_ne_bot_of_isPiSeparable
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [Nontrivial G] [IsPiSeparable π G] :
+    (oPiCore π G ⊔ oPiCore {p | p ∉ π} G) ≠ ⊥ := by
+  have hF1_ne_bot : piFittingSeries π G 1 ≠ ⊥ := by
+    intro hF1
+    obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
+    have hQsup_bot : (oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) = ⊥ := by
+      apply Subgroup.comap_injective (QuotientGroup.mk'_surjective (⊥ : Subgroup G))
+      rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+      simpa [piFittingSeries_succ, piFittingSeries_zero] using hF1
+    have h_all_bot : ∀ n, piFittingSeries π G n = ⊥ := by
+      intro n
+      induction n with
+      | zero =>
+        exact piFittingSeries_zero π G
+      | succ n ih =>
+        let e : G ⧸ piFittingSeries π G n ≃* G ⧸ (⊥ : Subgroup G) :=
+          QuotientGroup.quotientMulEquivOfEq ih
+        let Sₙ : Subgroup (G ⧸ piFittingSeries π G n) :=
+          oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+            oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)
+        have hSₙ_map : Sₙ.map e.toMonoidHom =
+            oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+              oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G)) := by
+          dsimp [Sₙ, e]
+          rw [Subgroup.map_sup, oPiCore.map_eq_of_mulEquiv π,
+            oPiCore.map_eq_of_mulEquiv {p | p ∉ π}]
+        have hSₙ_bot : Sₙ = ⊥ := by
+          refine (Subgroup.map_eq_bot_iff_of_injective (f := e.toMonoidHom)
+            (H := Sₙ) e.injective).mp ?_
+          rw [hSₙ_map, hQsup_bot]
+        rw [piFittingSeries_succ]
+        change Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n)) Sₙ = ⊥
+        rw [hSₙ_bot, MonoidHom.comap_bot, QuotientGroup.ker_mk', ih]
+    have htop_bot : (⊤ : Subgroup G) = ⊥ := by
+      rw [← hn, h_all_bot n]
+    exact top_ne_bot htop_bot
+  have hF0_lt : piFittingSeries π G 0 < piFittingSeries π G 1 := by
+    refine lt_of_le_of_ne (piFittingSeries_le_succ π G 0) ?_
+    intro hEq
+    exact hF1_ne_bot (by rw [← hEq, piFittingSeries_zero])
+  have hQsup0 :=
+    (piFittingSeries_lt_succ_iff π (G := G) 0).mp hF0_lt
+  have hQsup : (oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+      oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) ≠ ⊥ := by
+    simpa only [piFittingSeries_zero] using hQsup0
+  intro hsup_bot
+  have hπ_bot : oPiCore π G = ⊥ := by
+    apply le_antisymm ?_ bot_le
+    rw [← hsup_bot]
+    exact le_sup_left
+  have hπ'_bot : oPiCore {p | p ∉ π} G = ⊥ := by
+    apply le_antisymm ?_ bot_le
+    rw [← hsup_bot]
+    exact le_sup_right
+  have hQπ_bot : oPiCore π (G ⧸ (⊥ : Subgroup G)) = ⊥ :=
+    oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot π hπ_bot
+  have hQπ'_bot : oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G)) = ⊥ :=
+    oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot {p | p ∉ π} hπ'_bot
+  exact hQsup (by rw [hQπ_bot, hQπ'_bot, bot_sup_eq])
+
+/-- **π-separable disjunction**, split form:
+`O_π(G) ≠ ⊥ ∨ O_{π'}(G) ≠ ⊥`. -/
+theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [Nontrivial G] [IsPiSeparable π G] :
+    oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥ := by
+  have hsup := oPiCore_sup_ne_bot_of_isPiSeparable (G := G) π
+  by_cases hπ : oPiCore π G = ⊥
+  · right
+    intro hπ'
+    exact hsup (by rw [hπ, hπ', bot_sup_eq])
+  · exact Or.inl hπ
 
 /-- **Isaacs Thm 3.20**: 有限 π-separable ⇒ π-Hall 部分群存在.
 
