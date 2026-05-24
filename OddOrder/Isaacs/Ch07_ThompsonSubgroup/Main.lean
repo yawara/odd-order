@@ -12,6 +12,7 @@ import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Tactic.LinearCombination
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # OddOrder.Isaacs.Ch07 — The Thompson Subgroup
@@ -303,14 +304,55 @@ private theorem lem73_aux
     -- ## Step 1c: P が solvable (p-群 ⇒ nilpotent ⇒ solvable)
     haveI hP_nilpotent : Group.IsNilpotent ↥P := IsPGroup.isNilpotent hPp
     haveI hP_solvable : IsSolvable ↥P := inferInstance
-    -- TODO (次 commit):
-    --   d. q | |L:C_L(P)| を取り P-invariant Sylow q を `exists_aInvariant_sylow` で取得.
-    --   e. IH を Q (proper P-invariant subgroup) に適用 ⇒ Q ≤ C(L), 矛盾で L が q-群.
-    --   f. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
-    --   g. `[L,P] = L` case: L ≤ SL(2,p) を導出.
-    --   h. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
-    --   i. q odd: |SL(2,p)| 因子化 + orbit counting で矛盾.
-    sorry
+    -- ## Step 1d: 自明分岐 — `L ≤ C_G(P)` なら結論直結 (centralizer の対称性)
+    -- Isaacs proof は「q | |L:C_L(P)| を取る」ところから始まり, 暗黙に `C_L(P) ⊊ L` を仮定.
+    -- C_L(P) = L (即ち L ≤ C_G(P)) なら index = 1 で q が取れないため, 別途処理する.
+    by_cases hL_in_C : L ≤ Subgroup.centralizer (P : Set _)
+    · -- L ≤ C(P) ⇔ P ≤ C(L) (centralizer の対称性, `Subgroup.le_centralizer_iff`).
+      exact Subgroup.le_centralizer_iff.mp hL_in_C
+    · -- L ⊄ C(P): C_L(P) = L ⊓ C_G(P) は L の真部分群. q | |L:C_L(P)| が取れる.
+      -- ## Step 1e: C_L_P := L ⊓ centralizer(P) の真部分群性
+      set C_L_P : Subgroup _ := L ⊓ Subgroup.centralizer (P : Set _) with hC_L_P_def
+      have hC_le_L : C_L_P ≤ L := inf_le_left
+      have hC_ne_L : C_L_P ≠ L := by
+        intro h_eq
+        apply hL_in_C
+        rw [← h_eq]; exact inf_le_right
+      have h_card_lt : Nat.card ↥C_L_P < Nat.card ↥L := by
+        rcases lt_or_eq_of_le (Subgroup.card_le_of_le hC_le_L) with h | h
+        · exact h
+        · exact absurd (Subgroup.eq_of_le_of_card_ge hC_le_L h.ge) hC_ne_L
+      -- ## Step 1f: index `|L : C_L(P)| > 1` から素因子 q を取得
+      -- `Nat.card C_L_P ∣ Nat.card L` (Lagrange) + `|C_L_P| < |L|` ⇒ `|L| / |C_L_P| > 1`.
+      have hC_dvd : Nat.card ↥C_L_P ∣ Nat.card ↥L := Subgroup.card_dvd_of_le hC_le_L
+      have hC_pos : 0 < Nat.card ↥C_L_P := Nat.card_pos
+      have h_idx_gt : 1 < Nat.card ↥L / Nat.card ↥C_L_P := by
+        by_contra h_not
+        have h_le_one : Nat.card ↥L / Nat.card ↥C_L_P ≤ 1 := not_lt.mp h_not
+        have h_prod : Nat.card ↥L / Nat.card ↥C_L_P * Nat.card ↥C_L_P = Nat.card ↥L :=
+          Nat.div_mul_cancel hC_dvd
+        have h_le : Nat.card ↥L ≤ Nat.card ↥C_L_P :=
+          calc Nat.card ↥L
+              = Nat.card ↥L / Nat.card ↥C_L_P * Nat.card ↥C_L_P := h_prod.symm
+            _ ≤ 1 * Nat.card ↥C_L_P := Nat.mul_le_mul_right _ h_le_one
+            _ = Nat.card ↥C_L_P := one_mul _
+        omega
+      obtain ⟨q, hq_prime, hq_dvd_idx⟩ :=
+        Nat.exists_prime_and_dvd (Nat.ne_of_gt h_idx_gt)
+      haveI : Fact q.Prime := ⟨hq_prime⟩
+      -- ## Step 1g: P-invariant Sylow q-subgroup Q of ↥L を `exists_aInvariant_sylow` で取得
+      obtain ⟨Q, hQ_inv⟩ :=
+        OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (A := ↥P) (G := ↥L) (φ := φ) hCop
+          (Or.inl hP_solvable) q
+      -- TODO (次 commit):
+      --   h. Q (Sylow q ↥L) を G_ambient (= GL(2,ZMod p)) の subgroup に持ち上げる.
+      --   i. Q が C_L(P) に含まれないことを確認 (`q | |L : C_L(P)|` から).
+      --   j. IH を Q ⊊ L に適用 ⇒ P ≤ C(Q), 矛盾で `Q = L`, L が q-群.
+      --   k. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
+      --   l. `[L,P] = L` case: L ≤ SL(2,p) を導出.
+      --   m. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
+      --   n. q odd: |SL(2,p)| 因子化 + orbit counting で矛盾.
+      sorry
 
 /-- **Isaacs Lemma 7.3** ⭐ (GL(2,p) 補題). `p ≠ 2` prime, `P ≤ GL(2, ZMod p)`
 p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L` の
