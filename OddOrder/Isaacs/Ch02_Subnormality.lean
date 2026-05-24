@@ -3260,13 +3260,17 @@ section /- 2D: Zenkov + Lucchini (pp. 61-64) -/
 
 variable {G : Type*} [Group G]
 
-/-! ### §2D 状態
+/-! ### §2D 状態 (2026-05-24 更新)
 
-* Cor 2.19 完成 (Zenkov axiom 経由)
-* Thm 2.18 Zenkov, Thm 2.20 Lucchini は引き続き axiom 化
-* 補助補題 `card_set_mul_card_inf` は §2A 末尾に移動 (Thm 2.11 でも使用)
+* **Thm 2.18 Zenkov**: `zenkov_minimal_le_fitting` ✅ unconditional.
+* **Cor 2.19**: `inf_fitting_ne_bot_of_abelian_card_ge_index` ✅ unconditional (Zenkov 経由).
+* **Thm 2.20 Lucchini**: K > ⊥ structural reduction (`lucchini_K_pos_reduction`) ✅ 本ファイル内.
+  full theorem (`lucchini_index_normalCore_lt_index`) は owner chapter 規則で
+  `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean` に配置. K = ⊥ case のみ
+  `lucchini_K_bot_aux` axiom (Ch.4 §4A-§4B lcs 加法性 完成後に theorem 化予定).
+* 補助補題 `card_set_mul_card_inf` は §2A 末尾に置く (Thm 2.11 でも使用).
 * Zenkov 用 Case 1 補助補題 (`conj_smul_abelian`, `inf_le_center_of_join_eq_top`,
-  `center_le_fitting`) を standalone で提供 — Zenkov 完成時 + Lucchini 完成時に再利用
+  `center_le_fitting`) を standalone で提供 — Lucchini 完成時に再利用可.
 -/
 
 open scoped Pointwise in

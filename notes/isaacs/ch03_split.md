@@ -25,9 +25,10 @@
 | §3C Thm 3.14 Hall-C | **leaf axiom 削除** (2026-05-22) | mathlib SZ 共役性依存. 将来 `OddOrder/Mathlib/SchurZassenhausConj.lean` で実装後にここで theorem 化. Ch.3 内 redirect コメントのみ. |
 | §3C Thm 3.15 (Hall converse) | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` に owner-chapter 配置. Burnside `p^a q^b` 経由のため Ch.7 完成後に実装. |
 | §3C Thm 3.17 (3 subgroups solvability) | **placeholder 移動** (2026-05-22) | 同上 (`Ch07_ThompsonSubgroup/ForwardFromCh03.lean`). 単純群場合分けで Burnside 必要. |
-| §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着 |
+| §3D Thm 3.20 (π-separable ⇒ Hall) | ⚠ 仮定義 | 仮定義 `IsPiSeparable := IsSolvable` 下で `hall_E_exists` に帰着. π を無視しているため実質「solvable 限定」の主張で, 正式 π-separable 定義 (composition factor 連列) への置換が必要. 該当 issue: `IsPiSeparable` 再定義 |
 | §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
 | §3D Hall-Higman 1.2.3 (3.21) | ✅⭐⭐ (2026-05-23 ralph-loop) | `hall_higman_1_2_3` — G π-separable + `oPiCore π' G = ⊥` ⇒ `centralizer(oPiCore π G) ≤ oPiCore π G`. case π body + case π' body + main assembly (~350 LOC 累計: helpers 200 + cases 130 + main 25). AxiomsCheck flagship 入り (3 標準公理のみで unconditional). 下流引用: Ch.4 4.33, Ch.7 7.5/7.6. |
+| §3D Thm 3.22 (π-length ≤ 1) | ⚠ fake placeholder | `piLength_le_one_of_abelian_pi_hall` は `:= by trivial` で `True` を返すだけ. π-length の正式定義 + 正式 statement への書き換えが必要. 該当 issue: Thm 3.22 fake placeholder 解消 |
 | §3E `IsAInvariant` 定義 | ✅ (2026-05-22) | `IsAInvariant`, `.top`, `.bot`, `.inf`, `.sup` (Ch.3 内に残置, definition のみ) |
 | §3E IsAInvariant suite 拡張 | ✅ (2026-05-23 ralph-loop, ~24 lemmas) | `.{smul_mem, inv_smul_mem, iSup, iInf, of_characteristic, derivedSeries, lowerCentralSeries, center, fittingSubgroup, frattini, commutator (binary), commutator_self, normalizer, centralizer, normalCore, fixedPointsOfMulAut, restrict + restrict_apply_val, subgroupOf, closure_of_invariant_set}` 全部 sorry-free. 下流 Glauberman 3.24 + Ch.4 §4C [G,A] 機構の前哨基地. |
 | §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |

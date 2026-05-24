@@ -4,14 +4,18 @@
 形式化先: [`OddOrder/Isaacs/Ch02_Subnormality.lean`](../../OddOrder/Isaacs/Ch02_Subnormality.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 952-2123.
 
-## 進捗 (2026-05-22)
+## 進捗 (2026-05-24 更新)
 
-**Ch.2 完成 (2026-05-23)**: §2A 完成 (Thm 2.11 ✅). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式). **§2C 完成** (IsPLocal/IsLocal + Lemma 2.16 + Thm 2.15 + Lemma 2.17). §2D 完成 (Lucchini K > ⊥ structural lemma + 本体は Ch.4 dir に owner-chapter 配置).
-**§2D**: Cor 2.19, Thm 2.18 Zenkov 完成 (2026-05-22). Thm 2.20 Lucchini は K > ⊥ structural
-reduction (`lucchini_K_pos_reduction`) を Ch.2 に, full theorem (`lucchini_index_normalCore_lt_index`)
-を `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean` に owner chapter 規則で配置
-(K = ⊥ case が Ch.4 §4A-§4B 依存のため). 詳細は [`notes/meta/forward_dep_policy.md`](../meta/forward_dep_policy.md).
-§2C は依然 TODO.
+**Ch.2 本体は sorry-free / axiom-free** (`Ch02_Subnormality.lean` 内に live `sorry` も `axiom` も無し).
+§2A 完成 (Thm 2.11 ✅). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式). **§2C 完成** (IsPLocal/IsLocal + Lemma 2.16 + Thm 2.15 + Lemma 2.17). §2D 完成 (Cor 2.19, Thm 2.18 Zenkov, Lucchini K > ⊥ structural reduction).
+
+**§2D 詳細**:
+- **Thm 2.18 Zenkov**: `zenkov_minimal_le_fitting` ✅ unconditional (2026-05-22 完成).
+- **Cor 2.19**: `inf_fitting_ne_bot_of_abelian_card_ge_index` ✅ unconditional.
+- **Thm 2.20 Lucchini**: K > ⊥ structural reduction (`lucchini_K_pos_reduction`) を Ch.2 内に置き,
+  full theorem (`lucchini_index_normalCore_lt_index`) は `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean` に owner chapter 規則で配置.
+  K = ⊥ case のみ `lucchini_K_bot_aux` axiom として暫定化 (Ch.4 §4A-§4B lcs 加法性 完成後に theorem 化).
+  詳細は [`notes/meta/forward_dep_policy.md`](../meta/forward_dep_policy.md), 該当 issue: [`issues/`](../../issues/) (Lucchini K=⊥ theorem 化).
 
 ### 補助補題 (mathlib 未収載)
 
