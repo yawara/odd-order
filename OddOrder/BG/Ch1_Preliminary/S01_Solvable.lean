@@ -173,6 +173,38 @@ theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite
   haveI : Group.IsNilpotent R := hP.isNilpotent
   exact OddOrder.Isaacs.Ch04.aFixed_quotient_frattini hCop (Or.inr inferInstance) h_triv_quot
 
+/-- **BG Lemma 1.9 (2-step instance, ambient G 形)**: 有限群 `G`, `A` coprime operator,
+`N ⊴ G` が `A`-不変. `A` が `N` 上に自明 + `A` が `G/N` 上に自明 ⇒ `A` が `G` 上に自明.
+
+**BG 原 statement との関係**: BG Lem 1.9 は「A が G の normal series を stabilize するとき
+A/C_A(G) is π-group (G π-group)」と多段で述べるが, 証明は §1 内の各 induction step で
+本 2-step の繰り返し適用. 本実装は §1 で使用される **2-step instance に絞った形** で,
+多段版は本 2-step を normal series の長さで induct すれば得られる.
+
+**証明**: 任意の `g : G` に対し Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) で
+`∃ c ∈ C_G(A), c·N = g·N` を取り, `g = c · n⁻¹` (`n ∈ N`) と書く. すると
+`φ a g = φ a c · φ a n⁻¹ = c · n⁻¹ = g` (`c ∈ C_G(A)` で `A`-fix, `n ∈ N` で `h_triv_N`).
+
+**Isaacs 対応**: 直接対応無し (Ch.3 §3E coprime action machinery の application).
+**no-wrapper policy 例外**: 2-step extension lemma, §1 内 Prop 1.10 等で再利用. -/
+theorem coprime_actsTrivially_of_normal_and_quotient
+    {G : Type*} [Group G] [Finite G]
+    {A : Type*} [Group A] [Finite A]
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal]
+    (hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    (h_triv_N : ∀ a : A, ∀ n ∈ N, (φ a) n = n)
+    (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ N, (φ a) g = g * x) :
+    ∀ a : A, ∀ g : G, (φ a) g = g := by
+  intro a g
+  obtain ⟨c, hc_fix, hc_coset⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient hCop hSolv hN_inv
+      (fun a' => h_triv_quot a' g)
+  obtain ⟨n, hn_in, hc_eq⟩ := hc_coset
+  have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
+  rw [hg_eq, map_mul, hc_fix a, map_inv, h_triv_N a n hn_in]
+
 /-! ## §1D: 未実装 (Phase 1 Ch.4 §4D 待ち) -/
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
