@@ -75,6 +75,14 @@ notes/
 
 ROADMAP のチェックリストから対応する `notes/` にリンクして掘り下げる。
 
+## Issue 管理
+
+単発の作業項目 (1 つの sorry を埋める, 1 つの設計を決める, etc.) は `issues/` 配下のファイルベース issue で追跡する。GitHub Issues は使わない (local-first)。詳細は [`notes/meta/issue_management.md`](notes/meta/issue_management.md)。
+
+- 採番 + scaffold: `bin/new-issue <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`
+- 状態 = 配置ディレクトリが source of truth: `issues/` (open) / `issues/pending/` / `issues/closed/`
+- 遷移は `git mv`. frontmatter に `status:` は持たない
+
 ## 主要パス
 
 | パス | 内容 |
@@ -82,6 +90,8 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | [ROADMAP.md](ROADMAP.md) | 長期計画、フェーズ、依存グラフ、章節チェックリスト |
 | `OddOrder/` | Lean ソース本体 |
 | `notes/` | ミニロードマップ・調査メモ |
+| `issues/` | ファイルベース issue (open は直下, `pending/` `closed/` で状態管理) |
+| `bin/` | 雑用スクリプト (`new-issue` 等) |
 | `references/` (gitignored) | PDF + Nougat 抽出 Markdown — 別 private リポ `odd-order-references` |
 | `references/{isaacs,bg}/*.{pdf,mmd}` | 教科書原典と抽出物 (フラット) |
 | `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/*.mmd` | Peterfalvi だけ章別 PDF を `pdf/` に集約 |
