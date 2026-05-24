@@ -1599,6 +1599,123 @@ theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot
     have : M = ⊥ := le_antisymm (hbot ▸ hMle) bot_le
     exact hM_ne_bot this
 
+/-! ### `oPiCore` の写像下振る舞い: surjective map / injective comap
+
+`oPiCore` は normal π-subgroup の sup なので, surjective hom で image-押し出しは
+`oPiCore` を超えず, injective hom で comap-引き戻しも `oPiCore` を超えない. これらは
+`IsPiSeparable` の quotient / normal subgroup 閉包 instance の主要ステップ. -/
+
+/-- **`oPiCore.map_le_of_surjective`**: surjective hom `f : G →* H` 下で
+`oPiCore π G` の像は `oPiCore π H` に含まれる.
+
+理由: 各 normal π-subgroup `K ⊴ G` の image `K.map f ⊴ H` は `Nat.card (K.map f) ∣ Nat.card K`
+(`Subgroup.card_map_dvd`) なので π-group. -/
+theorem oPiCore.map_le_of_surjective {G H : Type*} [Group G] [Finite G] [Group H] (π : Set ℕ)
+    (f : G →* H) (hf : Function.Surjective f) :
+    (oPiCore π G).map f ≤ oPiCore π H := by
+  rw [oPiCore, Subgroup.map_iSup]
+  refine iSup_le ?_
+  rintro ⟨K, hKN, hKpi⟩
+  haveI hKmapN : (K.map f).Normal := hKN.map f hf
+  have hKmapPi : Subgroup.IsPiGroup π (K.map f) :=
+    fun p hp => hKpi p (Nat.primeFactors_mono (K.card_map_dvd f) Nat.card_pos.ne' hp)
+  exact Subgroup.IsPiGroup.le_oPiCore hKmapPi
+
+/-- **`oPiCore.comap_le_of_injective`**: injective hom `f : G →* H`, `[Finite H]` 下で
+`oPiCore π H` の preimage は `oPiCore π G` に含まれる.
+
+理由: `(oPiCore π H).comap f ⊴ G` (Normal.comap instance) で π-group
+(injective f で `Subgroup.equivMapOfInjective` により `comap f S ≃* (comap f S).map f`,
+さらに `(comap f S).map f ≤ S = oPiCore π H` で cardinality dvd). -/
+theorem oPiCore.comap_le_of_injective {G H : Type*} [Group G] [Group H] [Finite H] (π : Set ℕ)
+    (f : G →* H) (hf : Function.Injective f) :
+    (oPiCore π H).comap f ≤ oPiCore π G := by
+  have hN : ((oPiCore π H).comap f).Normal := inferInstance
+  have hPi : Subgroup.IsPiGroup π ((oPiCore π H).comap f) := by
+    intro p hp
+    have hcard_eq : Nat.card ↥((oPiCore π H).comap f) =
+        Nat.card ↥(((oPiCore π H).comap f).map f) :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ f hf).toEquiv
+    have hle : ((oPiCore π H).comap f).map f ≤ oPiCore π H :=
+      Subgroup.map_comap_le _ _
+    have hdvd : Nat.card ↥((oPiCore π H).comap f) ∣ Nat.card ↥(oPiCore π H) := by
+      rw [hcard_eq]; exact Subgroup.card_dvd_of_le hle
+    exact (oPiCore.isPiGroup π) p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
+  exact Subgroup.IsPiGroup.le_oPiCore hPi
+
+/-! ### `IsPiSeparable` の閉包 instance (quotient / normal subgroup)
+
+`piFittingSeries` を quotient map で押し出し / subgroup へ引き戻して長さ保存. -/
+
+/-- **`piFittingSeries` の quotient 押し出し**: `(piFittingSeries π G n).map (mk' N) ≤
+piFittingSeries π (G/N) n`. quotient closure instance の主要 step. -/
+private theorem piFittingSeries_map_quot_le (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] : ∀ n,
+    (piFittingSeries π G n).map (QuotientGroup.mk' N) ≤ piFittingSeries π (G ⧸ N) n := by
+  intro n
+  induction n with
+  | zero => simp [piFittingSeries_zero, Subgroup.map_bot]
+  | succ n ih =>
+    intro x hx
+    obtain ⟨g, hg, rfl⟩ := hx
+    have hg' : (QuotientGroup.mk' (piFittingSeries π G n)) g ∈
+        oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) := by
+      rw [piFittingSeries_succ] at hg
+      exact Subgroup.mem_comap.mp hg
+    -- IH gives F^G_n ≤ (F^{G/N}_n).comap (mk' N)
+    have hH_le : piFittingSeries π G n ≤
+        (piFittingSeries π (G ⧸ N) n).comap (QuotientGroup.mk' N) := by
+      intro y hy
+      rw [Subgroup.mem_comap]
+      exact ih ⟨y, hy, rfl⟩
+    -- QuotientGroup.map : G/F^G_n → (G/N)/F^{G/N}_n is surjective.
+    set Q : G ⧸ piFittingSeries π G n →* (G ⧸ N) ⧸ piFittingSeries π (G ⧸ N) n :=
+      QuotientGroup.map _ _ (QuotientGroup.mk' N) hH_le with hQ_def
+    have hQsurj : Function.Surjective Q := by
+      apply QuotientGroup.map_surjective_of_surjective
+      exact (QuotientGroup.mk_surjective).comp (QuotientGroup.mk'_surjective N)
+    -- (mk' F^{G/N}_n) (mk' N g) = Q (mk' F^G_n g)
+    have hQ_eq : (QuotientGroup.mk' (piFittingSeries π (G ⧸ N) n)) ((QuotientGroup.mk' N) g) =
+        Q ((QuotientGroup.mk' (piFittingSeries π G n)) g) := by
+      simp [hQ_def, QuotientGroup.map_mk']
+    rw [piFittingSeries_succ, Subgroup.mem_comap, hQ_eq]
+    -- Q maps sup_G into sup_{G/N} by oPiCore.map_le_of_surjective.
+    have hMapSup : (oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)).map Q ≤
+        oPiCore π ((G ⧸ N) ⧸ piFittingSeries π (G ⧸ N) n) ⊔
+        oPiCore {p | p ∉ π} ((G ⧸ N) ⧸ piFittingSeries π (G ⧸ N) n) := by
+      rw [Subgroup.map_sup]
+      exact sup_le_sup (oPiCore.map_le_of_surjective π Q hQsurj)
+                       (oPiCore.map_le_of_surjective {p | p ∉ π} Q hQsurj)
+    exact hMapSup ⟨_, hg', rfl⟩
+
+/-- **`IsPiSeparable` の quotient 閉包**: `[IsPiSeparable π G] [N ⊴ G] ⇒ [IsPiSeparable π (G/N)]`. -/
+instance quotient_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] [IsPiSeparable π G] : IsPiSeparable π (G ⧸ N) where
+  exists_top := by
+    obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
+    refine ⟨n, ?_⟩
+    have hmap := piFittingSeries_map_quot_le π G N n
+    rw [hn, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)] at hmap
+    exact top_le_iff.mp hmap
+
+/-! ### Normal subgroup 閉包 (TODO: 別 issue で実装)
+
+`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]` instance は本セッションで未完成.
+
+困難点: `r̄ : ↥N ⧸ FGn.subgroupOf N →* G ⧸ FGn` が injective なとき, 我々の helper
+`oPiCore.comap_le_of_injective` は `comap r̄ (O_π) ≤ O_π(domain)` を与えるが,
+`comap r̄ (O_π ⊔ O_π') ≤ comap r̄ (O_π) ⊔ comap r̄ (O_π')` は一般に成立しない (comap は
+sup と非可換). 数学的には有限群で `O_π ⊓ O_π' = ⊥` (coprime cardinality) より内部直積
+分解 `O_π ⊔ O_π' ≃ O_π × O_π'` が成立し, この場合 distributivity が回復するが,
+Lean 形式化には ~50-100 LOC の追加 helper (`Subgroup.IsComplement'` + Bezout 経由の
+π-part extraction) が必要.
+
+参考: Isaacs Lemma 3.18 (normal subgroup of π-separable is π-separable) の通常の証明は
+chain の N ⊓ Nᵢ への制限を用いる. piFittingSeries-based 定義では sup の取り扱いが
+追加で必要. -/
+
 /-- 補助: `piFittingSeries π G (n+1)` が `piFittingSeries π G n` を真に拡張する条件は,
 `G/Fₙ` 上の `O_π ⊔ O_{π'}` が非自明であることと同値. -/
 private theorem piFittingSeries_lt_succ_iff (π : Set ℕ) {G : Type*} [Group G] (n : ℕ) :
@@ -1669,6 +1786,13 @@ instance isPiSeparable_of_solvable (π : Set ℕ) (G : Type*) [Group G] [Finite 
           exact hne (Subgroup.eq_of_le_of_card_ge hle (le_of_eq hcard_eq.symm))
         apply ih (n + 1)
         omega
+
+/-! ### disjunction lemma の `[IsPiSeparable]` 版 (TODO: 別 issue で実装)
+
+`[Finite G] [Nontrivial G] [IsPiSeparable π G] ⇒ oPiCore π G ⊔ oPiCore π' G ≠ ⊥` を
+証明するには `piFittingSeries 1 = oPiCore π G ⊔ oPiCore π' G` (iso G ≃* G⧸⊥ 経由の
+subgroup lattice 同型) を確立する必要がある. 上記 normal subgroup 閉包と同じ
+sup 取り扱い問題があるため本セッションでは deferred. -/
 
 /-- **Isaacs Thm 3.20**: 有限 π-separable ⇒ π-Hall 部分群存在.
 
