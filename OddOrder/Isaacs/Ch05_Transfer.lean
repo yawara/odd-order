@@ -955,6 +955,88 @@ lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   obtain ⟨a, _, ha⟩ := (Nat.dvd_prime_pow Fact.out).mp h_idx_dvd
   exact ⟨a, ha⟩
 
+/-- `APrime p G` — the smallest normal subgroup `K ⊴ G` with `G/K` abelian and p-power index.
+Equivalently, the smallest member of the family `{K ⊴ G : commutator G ≤ K ∧ [G:K] is p-power}`.
+
+For finite `G`, this corresponds to Isaacs' `A^p(G)`. mathlib 未収載のため新規定義. -/
+def APrime (p : ℕ) (G : Type*) [Group G] : Subgroup G :=
+  ⨅ K : {K : Subgroup G // K.Normal ∧ commutator G ≤ K ∧ ∃ k : ℕ, K.index = p ^ k}, K.val
+
+/-- Per-element Normal instance for the `APrime` indexing subtype. -/
+instance APrime_index_subtype_normal {p : ℕ} {G : Type*} [Group G]
+    (K : {K : Subgroup G // K.Normal ∧ commutator G ≤ K ∧ ∃ k : ℕ, K.index = p ^ k}) :
+    (K.val : Subgroup G).Normal := K.property.1
+
+/-- `APrime p G` ≤ any normal subgroup containing `commutator G` with p-power index. -/
+lemma APrime_le {p : ℕ} {G : Type*} [Group G] {K : Subgroup G}
+    (hN : K.Normal) (hC : commutator G ≤ K) {k : ℕ} (hi : K.index = p ^ k) :
+    APrime p G ≤ K :=
+  iInf_le_of_le ⟨K, hN, hC, k, hi⟩ le_rfl
+
+/-- `APrime p G` is normal. -/
+instance APrime_normal (p : ℕ) (G : Type*) [Group G] : (APrime p G).Normal := by
+  unfold APrime
+  exact Subgroup.normal_iInf_normal (fun K => K.property.1)
+
+/-- `commutator G ≤ APrime p G` (the commutator is contained in every family member). -/
+lemma commutator_le_APrime (p : ℕ) (G : Type*) [Group G] : commutator G ≤ APrime p G := by
+  intro x hx
+  unfold APrime
+  rw [Subgroup.mem_iInf]
+  intro K
+  exact K.property.2.1 hx
+
+/-- For finite `G`, `APrime p G` has `p`-power index (same proof as `OPrime_index_isPGroup`,
+since the family is closed under `⊓` and each member has `p`-power index). -/
+lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.Prime] :
+    ∃ k : ℕ, (APrime p G).index = p ^ k := by
+  classical
+  let ι : Type _ :=
+    {K : Subgroup G // K.Normal ∧ commutator G ≤ K ∧ ∃ k : ℕ, K.index = p ^ k}
+  haveI : Finite ι := Subtype.finite
+  haveI : Fintype ι := Fintype.ofFinite ι
+  let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
+    Pi.monoidHom fun i : ι => QuotientGroup.mk' i.val
+  have h_ker : φ.ker = APrime p G := by
+    ext g
+    refine ⟨fun h => ?_, fun h => ?_⟩
+    · rw [APrime, Subgroup.mem_iInf]
+      intro i
+      have hg_i : φ g i = (1 : G ⧸ (i.val : Subgroup G)) := by
+        rw [MonoidHom.mem_ker] at h; exact congrFun h i
+      simpa [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff] using hg_i
+    · rw [MonoidHom.mem_ker]
+      ext i
+      simp only [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply, Pi.one_apply,
+        QuotientGroup.eq_one_iff]
+      rw [APrime, Subgroup.mem_iInf] at h
+      exact h i
+  haveI : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
+  have h_card_range : Nat.card φ.range ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
+    Subgroup.card_subgroup_dvd_card _
+  have h_card_quot : Nat.card (G ⧸ APrime p G) = Nat.card φ.range := by
+    rw [← h_ker]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv
+  have h_card_pi : Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) = ∏ i : ι, i.val.index := by
+    rw [Nat.card_pi]
+    refine Finset.prod_congr rfl fun i _ => ?_
+    rw [Subgroup.index_eq_card]
+  let k_fun : ι → ℕ := fun i => Classical.choose i.property.2.2
+  have hk_fun : ∀ i : ι, i.val.index = p ^ k_fun i :=
+    fun i => Classical.choose_spec i.property.2.2
+  have h_prod_pow : (∏ i : ι, i.val.index) = p ^ (∑ i : ι, k_fun i) := by
+    rw [← Finset.prod_pow_eq_pow_sum]
+    exact Finset.prod_congr rfl fun i _ => hk_fun i
+  have h_idx_dvd : (APrime p G).index ∣ p ^ (∑ i : ι, k_fun i) := by
+    rw [Subgroup.index_eq_card, h_card_quot]
+    calc Nat.card φ.range
+        ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) := h_card_range
+      _ = ∏ i : ι, i.val.index := h_card_pi
+      _ = p ^ (∑ i : ι, k_fun i) := h_prod_pow
+  obtain ⟨a, _, ha⟩ := (Nat.dvd_prime_pow Fact.out).mp h_idx_dvd
+  exact ⟨a, ha⟩
+
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
 
@@ -1026,8 +1108,7 @@ For x, y ∈ Q N-conjugate: x⁻¹ y ∈ Foc_N(Q) (generator). x, y ∈ P G-conj
 Combined: Q ⊆ [Q, P]. 反復: Q ⊆ [Q, P, P, ...] (lowerCentralSeries P n). P nilpotent finite
 ⇒ ∃ n, lowerCentralSeries P n = ⊥. よって Q = ⊥, つまり N が normal p-complement.
 
-**実装状態**: 形式化保留. mathlib に O^p(G), A^p(G) 未収載で新規定義必要 (~50 LOC).
-本体は ~150 LOC. -/
+**実装状態 (2026-05-25)**: APrime + OPrime infrastructure 完成. 本体は sorry (次タスク). -/
 theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     HasNormalPComplement p G := by
