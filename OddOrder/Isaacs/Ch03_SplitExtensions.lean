@@ -1228,15 +1228,6 @@ def IsPiGroup (π : Set ℕ) (G : Type*) [Group G] : Prop :=
 def Subgroup.IsPiGroup (π : Set ℕ) (H : Subgroup G) : Prop :=
   ∀ p ∈ (Nat.card H).primeFactors, p ∈ π
 
-/-- **`π`-separable 群** (working definition): 正式には `G` の正規列で各因子が
-`π`-group または `π'`-group となるものだが, 本リポでは FT 適用に十分な
-**`IsSolvable G`** を仮の定義とする. mathlib 未収載の新規定義.
-
-理由: FT 経路では π-separable が登場する文脈の G は事実上常に solvable
-(最小反例の真部分群はすべて solvable). 正式な normal series 定義は将来別ファイル
-(`OddOrder/Group/PiSeparable.lean`) に移行可. -/
-def IsPiSeparable (_π : Set ℕ) (G : Type*) [Group G] : Prop := IsSolvable G
-
 /-- **π-radical** `O_π(G)`: `G` の正規 π-subgroup の sup (= 最大の正規 π-subgroup).
 
 mathlib 未収載 (各 `opCore p G` の π 版 sup). Hall-Higman 1.2.3 で必須.
@@ -1286,6 +1277,67 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
   have hMapMem : φ h ∈ H.map φ.toMonoidHom := ⟨h, hh, rfl⟩
   exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π K} =>
     (K.val : Subgroup G)) ⟨H.map φ.toMonoidHom, hMapN, hMapPi⟩ hMapMem
+
+/-! ### π-separable 群の正式定義 (Isaacs Def 3.18)
+
+`G` は π-separable とは, 正規列 `⊥ = F₀ ⊴ F₁ ⊴ ... ⊴ Fₙ = ⊤` で各因子 `Fᵢ₊₁/Fᵢ` が
+π-group または π'-group となるものが存在する場合をいう (Isaacs FGT p.89).
+
+**実装**: mathlib の `IsSolvable` パターンに準拠して `piFittingSeries` (`⊥` から始まり
+各ステップで `G/Fₙ` の π-radical と π'-radical の sup を pull back する) の停留条件として
+定式化. `derivedSeries G n = ⊥` パターン参照.
+
+各 `Fₙ` は subtype `{S // S.Normal}` 経由で再帰中に normal instance を確保. -/
+
+private def piFittingSeriesAux (π : Set ℕ) (G : Type*) [Group G] :
+    ℕ → {S : Subgroup G // S.Normal}
+  | 0 => ⟨⊥, inferInstance⟩
+  | n + 1 =>
+    let prev := piFittingSeriesAux π G n
+    haveI : prev.val.Normal := prev.property
+    ⟨Subgroup.comap (QuotientGroup.mk' prev.val)
+        (oPiCore π (G ⧸ prev.val) ⊔ oPiCore {p | p ∉ π} (G ⧸ prev.val)),
+     inferInstance⟩
+
+/-- **π-Fitting series** of `G`: `F₀ = ⊥` から始まり, `Fₙ₊₁` は `G/Fₙ` 上の
+`O_π(G/Fₙ) ⊔ O_{π'}(G/Fₙ)` の pullback. mathlib `derivedSeries`/`lowerCentralSeries`
+パターンに準拠. `G` は π-separable iff この series が有限ステップで `⊤` に到達する. -/
+def piFittingSeries (π : Set ℕ) (G : Type*) [Group G] (n : ℕ) : Subgroup G :=
+  (piFittingSeriesAux π G n).val
+
+instance piFittingSeries.normal (π : Set ℕ) (G : Type*) [Group G] (n : ℕ) :
+    (piFittingSeries π G n).Normal :=
+  (piFittingSeriesAux π G n).property
+
+@[simp] theorem piFittingSeries_zero (π : Set ℕ) (G : Type*) [Group G] :
+    piFittingSeries π G 0 = ⊥ := rfl
+
+theorem piFittingSeries_succ (π : Set ℕ) (G : Type*) [Group G] (n : ℕ) :
+    piFittingSeries π G (n + 1) =
+      Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+        (oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+         oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)) := rfl
+
+theorem piFittingSeries_le_succ (π : Set ℕ) (G : Type*) [Group G] (n : ℕ) :
+    piFittingSeries π G n ≤ piFittingSeries π G (n + 1) := by
+  intro g hg
+  rw [piFittingSeries_succ, Subgroup.mem_comap]
+  rw [show (QuotientGroup.mk' (piFittingSeries π G n) g : G ⧸ piFittingSeries π G n) = 1
+        from (QuotientGroup.eq_one_iff g).mpr hg]
+  exact (oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+         oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)).one_mem
+
+theorem piFittingSeries_monotone (π : Set ℕ) (G : Type*) [Group G] :
+    Monotone (piFittingSeries π G) :=
+  monotone_nat_of_le_succ (piFittingSeries_le_succ π G)
+
+/-- **π-separable 群** (Isaacs Def 3.18): `G` の π-Fitting series が有限ステップで
+`⊤` に到達する. これは `G` が π-group と π'-group の交互の正規列に分解できることと同値.
+
+定式化は mathlib `IsSolvable` パターン (`exists_top : ∃ n, piFittingSeries π G n = ⊤`)
+に準拠. -/
+class IsPiSeparable (π : Set ℕ) (G : Type*) [Group G] : Prop where
+  exists_top : ∃ n : ℕ, piFittingSeries π G n = ⊤
 
 /-- **`IsPiGroup.le_oPiCore`**: 任意の normal π-subgroup は `oPiCore π G` に含まれる.
 `le_iSup` の素直な実体化. Hall-Higman 等での頻用 helper. -/
@@ -1547,21 +1599,83 @@ theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot
     have : M = ⊥ := le_antisymm (hbot ▸ hMle) bot_le
     exact hM_ne_bot this
 
-/-- **Isaacs Lemma 3.18**: π-separable の補助補題. 正式定義下では non-trivial だが
-仮定義 (=IsSolvable) では trivial に True. -/
-theorem isPiSeparable_aux : True := trivial
+/-- 補助: `piFittingSeries π G (n+1)` が `piFittingSeries π G n` を真に拡張する条件は,
+`G/Fₙ` 上の `O_π ⊔ O_{π'}` が非自明であることと同値. -/
+private theorem piFittingSeries_lt_succ_iff (π : Set ℕ) {G : Type*} [Group G] (n : ℕ) :
+    piFittingSeries π G n < piFittingSeries π G (n + 1) ↔
+      oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) ≠ ⊥ := by
+  refine ⟨fun h => ?_, fun h => ?_⟩
+  · intro h_sup_bot
+    apply ne_of_lt h
+    rw [piFittingSeries_succ, h_sup_bot]
+    rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+  · refine lt_of_le_of_ne (piFittingSeries_le_succ π G n) ?_
+    intro h_eq
+    apply h
+    have hSurj : Function.Surjective (QuotientGroup.mk' (piFittingSeries π G n)) :=
+      QuotientGroup.mk'_surjective _
+    apply Subgroup.comap_injective hSurj
+    rw [MonoidHom.comap_bot, QuotientGroup.ker_mk', ← piFittingSeries_succ, h_eq]
 
-/-- **Isaacs Cor 3.19**: `G` solvable ⇒ 全 π について π-separable.
-仮定義 `IsPiSeparable := IsSolvable` 下で identity. -/
-theorem isPiSeparable_of_solvable [Finite G] [hSol : IsSolvable G] (_π : Set ℕ) :
-    IsPiSeparable _π G :=
-  hSol
+/-! **Isaacs Lemma 3.18** の役割は本実装では subgroup / quotient 閉包 instance が果たす
+(別 issue で追加予定). 現状は `isPiSeparable_of_solvable` で十分. -/
 
-/-- **Isaacs Thm 3.20**: π-separable ⇒ π-Hall 部分群存在.
-仮定義下では `IsPiSeparable π G = IsSolvable G`, よって Hall-E (Thm 3.13) に帰着. -/
-theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) (hπsep : IsPiSeparable π G) :
+/-- **Isaacs Cor 3.19**: `G` 有限 solvable ⇒ 全 π について π-separable. instance 形.
+
+戦略: `Nat.card G ≤ Nat.card (Fₙ) + k` の `k` についての強誘導. 各ステップで
+`Fₙ < ⊤` なら `G/Fₙ` 非自明可解で `exists_oPiCore_ne_bot_or_oPi'Core_ne_bot` 適用,
+`Fₙ < F_{n+1}` ⇒ `|Fₙ| < |F_{n+1}|` で measure 単調減少. -/
+instance isPiSeparable_of_solvable (π : Set ℕ) (G : Type*) [Group G] [Finite G] [IsSolvable G] :
+    IsPiSeparable π G where
+  exists_top := by
+    classical
+    suffices h : ∀ (k : ℕ) (n : ℕ),
+        Nat.card G ≤ Nat.card (piFittingSeries π G n) + k →
+        ∃ m, piFittingSeries π G m = ⊤ from
+      h (Nat.card G) 0 (by simp)
+    intro k
+    induction k with
+    | zero =>
+      intro n hk
+      refine ⟨n, ?_⟩
+      have hle : piFittingSeries π G n ≤ (⊤ : Subgroup G) := le_top
+      apply Subgroup.eq_of_le_of_card_ge hle
+      have hcardTop : Nat.card ↥(⊤ : Subgroup G) = Nat.card G :=
+        Nat.card_congr Subgroup.topEquiv.toEquiv
+      omega
+    | succ k ih =>
+      intro n hk
+      by_cases h_top : piFittingSeries π G n = ⊤
+      · exact ⟨n, h_top⟩
+      · have hFn_lt_top : piFittingSeries π G n < ⊤ := lt_of_le_of_ne le_top h_top
+        haveI : Nontrivial (G ⧸ piFittingSeries π G n) := by
+          rw [QuotientGroup.nontrivial_iff]
+          exact ne_of_lt hFn_lt_top
+        haveI : IsSolvable (G ⧸ piFittingSeries π G n) := inferInstance
+        have hOplus : oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+            oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) ≠ ⊥ := by
+          rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot (G := G ⧸ piFittingSeries π G n) π with
+            hπ | hπ'
+          · intro h; exact hπ (le_bot_iff.mp (h ▸ le_sup_left))
+          · intro h; exact hπ' (le_bot_iff.mp (h ▸ le_sup_right))
+        have hFn_lt : piFittingSeries π G n < piFittingSeries π G (n + 1) :=
+          (piFittingSeries_lt_succ_iff π n).mpr hOplus
+        have hcard_lt : Nat.card (piFittingSeries π G n) <
+            Nat.card (piFittingSeries π G (n + 1)) := by
+          rcases lt_iff_le_and_ne.mp hFn_lt with ⟨hle, hne⟩
+          refine lt_of_le_of_ne (Subgroup.card_le_of_le hle) ?_
+          intro hcard_eq
+          exact hne (Subgroup.eq_of_le_of_card_ge hle (le_of_eq hcard_eq.symm))
+        apply ih (n + 1)
+        omega
+
+/-- **Isaacs Thm 3.20**: 有限 π-separable ⇒ π-Hall 部分群存在.
+
+現状: `[IsSolvable G]` 経由の Hall-E 帰着. π-separable 一般版の proof
+(`piFittingSeries` induction で各層に Hall-E を適用) は別 issue で完成予定. -/
+theorem hall_exists_of_piSeparable [Finite G] [IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
-  haveI : IsSolvable G := hπsep
   hall_E_exists π
 
 /-- **`C/B` nontrivial when `B < C`**: `B < C` strict + `B ⊴ G` ⇒ `C.map (QuotientGroup.mk' B) ≠ ⊥`. -/
@@ -1826,11 +1940,9 @@ private theorem hall_higman_case_pi'_body
 **実装状態** ⭐ sorry-free. case π body + case π' body を `exists_oPiCore_ne_bot_or_oPi'Core_ne_bot`
 (↥CB に対して) で場合分けして組み立て.
 -/
-theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ)
-    (hπsep : IsPiSeparable π G)
+theorem hall_higman_1_2_3 [Finite G] [IsSolvable G] (π : Set ℕ)
     (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
     Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G := by
-  haveI : IsSolvable G := hπsep
   by_contra h_not_le
   set O : Subgroup G := oPiCore π G with hO_def
   set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
@@ -1851,15 +1963,14 @@ theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ)
 `C_G(O_π(G)) = Z(O_π(G))` (i.e., centralizer of O_π is the center of O_π).
 
 `C_G(O_π(G)) ≤ O_π(G)` (Hall-Higman 3.21) + 一般 `Z(H) = H ⊓ C_G(H)` から従う. -/
-theorem centralizer_oPiCore_eq_center [Finite G] (π : Set ℕ)
-    (hπsep : IsPiSeparable π G)
+theorem centralizer_oPiCore_eq_center [Finite G] [IsSolvable G] (π : Set ℕ)
     (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
     Subgroup.centralizer (oPiCore π G : Set G) =
       (Subgroup.center ↥(oPiCore π G)).map (oPiCore π G).subtype := by
   apply le_antisymm
   · -- C_G(O) ⊆ O (Hall-Higman) so g ∈ C_G(O) ⇒ ⟨g, _⟩ ∈ Z(↥O)
     intro g hg
-    have hg_O : g ∈ oPiCore π G := hall_higman_1_2_3 π hπsep hπ' hg
+    have hg_O : g ∈ oPiCore π G := hall_higman_1_2_3 π hπ' hg
     refine ⟨⟨g, hg_O⟩, ?_, rfl⟩
     show (⟨g, hg_O⟩ : ↥(oPiCore π G)) ∈ Subgroup.center ↥(oPiCore π G)
     rw [Subgroup.mem_center_iff]
@@ -1881,10 +1992,9 @@ theorem centralizer_oPiCore_eq_center [Finite G] (π : Set ℕ)
 `O_{π',π}(G)` (= `π` を `O_{π'}(G)` 上に乗せた π-層) の交換子部分群が `O_{π'}(G)` に
 含まれる, つまり π-length ≤ 1 と同値. 完全 π-length 定義は別ファイル. 本リポでは
 statement を保留 (型レベル定式化が大きいため): -/
-theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ)
-    (_hπsep : IsPiSeparable π G)
+theorem piLength_le_one_of_abelian_pi_hall [Finite G] [IsSolvable G] (π : Set ℕ)
     (_hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H, a * b = b * a) :
-    True := by  -- TODO: π-length の正式定義後に書き直す
+    True := by  -- TODO: π-length の正式定義後に書き直す (issue 0004)
   trivial
 
 end -- 3D

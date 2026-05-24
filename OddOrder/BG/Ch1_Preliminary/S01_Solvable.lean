@@ -495,21 +495,21 @@ theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
 
 **形式化**: Phase 1 `OddOrder.Isaacs.Ch03.hall_higman_1_2_3` の π = {p} 特殊化.
-`IsPiSeparable {p} G` は `IsSolvable G` から `isPiSeparable_of_solvable` で取得.
+Ch.3 §3D の Hall-Higman は `[IsSolvable G]` を直接要求する (issue 0005 で新定義
+`IsPiSeparable` が導入されたが, Hall-Higman 本体の π-separable 一般版は別 issue 待ち).
 
 **BG 原 statement (`T` Sylow p of `O_{p',p}(G)` ⇒ `C_G(T) ⊆ O_{p',p}(G)`) との関係**:
 G を G/O_{p'}(G) に置き換えると `T` は `O_p(G/O_{p'}(G))` に一致 (Sylow p of p-group は
 全体). この特殊形が下の statement.
 
 CLAUDE.md no-wrapper policy 例外 (仮定特殊化: `IsSolvable G` instance + π = {p}
-specialization, `IsPiSeparable` hypothesis を取り除く). -/
+specialization). -/
 theorem hall_higman_solvable_specialization
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
     (hp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
     Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G : Set G) ≤
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
-  OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ)
-    (OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable ({p} : Set ℕ)) hp'
+  OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hp'
 
 /-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20) — mathlib 直接, no-wrapper
 
