@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# bin/new-issue <slug> <title>
+#
+# 新規 issue を採番して issues/NNNN-<slug>.md に scaffold を作る.
+#
+# - SEQUENCE ファイルは mkdir 原子ロックで保護 (macOS に flock(1) が無いため)
+# - slug は ASCII (小文字英数字 + ハイフン) 必須, ファイル名で使う
+# - title は自由 (日本語可), frontmatter と H1 に入る
+# - 作成したファイルと SEQUENCE は自動で `git add` する (commit はしない)
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: bin/new-issue <slug> <title>
+
+  slug   ASCII 小文字英数字 + ハイフン (例: bg-s1-lem-1-7b-sorry)
+  title  自由形式 (日本語可, 例: "BG §1 Lem 1.7(b) sorry を埋める")
+
+例:
+  bin/new-issue bg-s1-lem-1-7b-sorry "BG §1 Lem 1.7(b) sorry を埋める"
+EOF
+  exit 1
+}
+
+[[ $# -eq 2 ]] || usage
+
+slug="$1"
+title="$2"
+
+if [[ ! "$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+  echo "Error: slug は小文字英数字 + ハイフンのみ (got: '$slug')" >&2
+  exit 1
+fi
+
+if [[ -z "$title" ]]; then
+  echo "Error: title が空" >&2
+  exit 1
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+ISSUES_DIR="$ROOT/issues"
+SEQ_FILE="$ISSUES_DIR/SEQUENCE"
+LOCK_DIR="$ISSUES_DIR/.lock"
+
+[[ -d "$ISSUES_DIR" ]] || { echo "Error: $ISSUES_DIR が無い" >&2; exit 1; }
+[[ -f "$SEQ_FILE" ]] || { echo "Error: $SEQ_FILE が無い (内容は単一整数)" >&2; exit 1; }
+
+# Acquire lock (mkdir is atomic on POSIX)
+attempts=0
+while ! mkdir "$LOCK_DIR" 2>/dev/null; do
+  attempts=$((attempts + 1))
+  if [[ $attempts -gt 50 ]]; then
+    echo "Error: ロック取得に失敗 (5s 経過). 古い $LOCK_DIR があれば rmdir で除去" >&2
+    exit 1
+  fi
+  sleep 0.1
+done
+trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
+
+current=$(cat "$SEQ_FILE")
+if ! [[ "$current" =~ ^[0-9]+$ ]]; then
+  echo "Error: SEQUENCE の中身が整数ではない: '$current'" >&2
+  exit 1
+fi
+next=$((current + 1))
+padded=$(printf "%04d" "$next")
+filename="${padded}-${slug}.md"
+filepath="$ISSUES_DIR/$filename"
+
+# 同名 (= 同 slug の取り直し) を防ぐ
+if [[ -e "$filepath" ]] \
+  || [[ -e "$ISSUES_DIR/pending/$filename" ]] \
+  || [[ -e "$ISSUES_DIR/closed/$filename" ]]; then
+  echo "Error: $filename はすでに存在" >&2
+  exit 1
+fi
+
+# YAML frontmatter 用に title をダブルクォート文字列としてエスケープ
+title_yaml=$(printf '%s' "$title" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
+today=$(date +%Y-%m-%d)
+
+cat > "$filepath" <<EOF
+---
+id: $next
+slug: $slug
+title: "$title_yaml"
+created: $today
+---
+
+# $title
+
+## 背景
+
+<!-- なぜこの issue を立てたか. ROADMAP / notes / コミット等への参照. -->
+
+## やること
+
+- [ ]
+
+## 完了条件
+
+<!-- 何をもって closed とするか. 例: 該当 sorry が消える / lake build が通る / ノート x.md を書く -->
+
+## 参照
+
+<!-- 関連 issue / PR / ファイル / コミット. -->
+EOF
+
+echo "$next" > "$SEQ_FILE"
+
+git -C "$ROOT" add "$SEQ_FILE" "$filepath"
+
+echo "Created: issues/$filename"
+echo "Staged:  $SEQ_FILE, $filepath"
