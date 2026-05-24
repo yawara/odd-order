@@ -495,8 +495,8 @@ theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
 
 **形式化**: Phase 1 `OddOrder.Isaacs.Ch03.hall_higman_1_2_3` の π = {p} 特殊化.
-Ch.3 §3D の Hall-Higman は `[IsSolvable G]` を直接要求する (issue 0005 で新定義
-`IsPiSeparable` が導入されたが, Hall-Higman 本体の π-separable 一般版は別 issue 待ち).
+Ch.3 §3D の Hall-Higman は `[IsPiSeparable π G]` 版で, ここでは `[IsSolvable G]`
+から `isPiSeparable_of_solvable` instance を使って適用する.
 
 **BG 原 statement (`T` Sylow p of `O_{p',p}(G)` ⇒ `C_G(T) ⊆ O_{p',p}(G)`) との関係**:
 G を G/O_{p'}(G) に置き換えると `T` は `O_p(G/O_{p'}(G))` に一致 (Sylow p of p-group は

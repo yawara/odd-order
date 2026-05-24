@@ -9,7 +9,7 @@ created: 2026-05-25
 
 ## 背景
 
-[issues/0005](closed/0005-isaacs-3d-pi-separable-redefine.md) で `IsPiSeparable π G` を
+[issues/0005](0005-isaacs-3d-pi-separable-redefine.md) で `IsPiSeparable π G` を
 `piFittingSeries`-based class として正式定義. 続編として:
 
 1. **quotient 閉包** `[IsPiSeparable π G] [N ⊴ G] ⇒ [IsPiSeparable π (G/N)]` — 完成
@@ -41,16 +41,19 @@ cardinality (π-group ⊓ π'-group = ⊥, 有限群で primeFactors 共通な�
 
 ## やること
 
-- [ ] Helper: `oPiCore.coprime_inf` (`oPiCore π G ⊓ oPiCore π' G = ⊥` for finite G).
-- [ ] Helper: π-part / π'-part extraction (commuting coprime decomp).
-- [ ] Helper: distributivity `A ⊓ (oPiCore π ⊔ oPiCore π') = (A ⊓ oPiCore π) ⊔ (A ⊓ oPiCore π')`.
-- [ ] `piFittingSeries_subgroupOf_le_of_normal` の本体 proof (前回失敗時の skeleton 参照).
-- [ ] `instance normalSubgroup_isPiSeparable`.
-- [ ] `theorem oPiCore_sup_ne_bot_of_isPiSeparable` (disjunction lemma 一般版).
-- [ ] `hall_higman_1_2_3` / `centralizer_oPiCore_eq_center` / `piLength_le_one_of_abelian_pi_hall`
+- [x] Helper: `oPiCore.coprime_inf` (`oPiCore π G ⊓ oPiCore π' G = ⊥` for finite G).
+- [x] Helper: π-part / π'-part extraction (commuting coprime decomp).
+- [x] Helper: distributivity / normal subgroup restriction route for `piFittingSeries`.
+- [x] `piFittingSeries_subgroupOf_le_of_normal` の本体 proof.
+- [x] `instance normalSubgroup_isPiSeparable`.
+- [x] `theorem oPiCore_sup_ne_bot_of_isPiSeparable` (disjunction lemma 一般版).
+- [x] `hall_higman_1_2_3` / `centralizer_oPiCore_eq_center`
       の hypothesis を `[IsSolvable G]` から `[IsPiSeparable π G]` に変更.
-- [ ] BG/S01 の `hall_higman_solvable_specialization` を新 signature に追従.
-- [ ] AxiomsCheck flagship 維持 (3 標準公理).
+- [x] BG/S01 の `hall_higman_solvable_specialization` を新 signature に追従.
+- [x] AxiomsCheck flagship 維持 (3 標準公理).
+
+`piLength_le_one_of_abelian_pi_hall` は fake `True` placeholder の正式 statement 化を伴うため,
+本 issue から外して [issues/0004](../0004-isaacs-3-22-pilength-placeholder.md) に移管する.
 
 ## 完了条件
 
@@ -58,10 +61,16 @@ cardinality (π-group ⊓ π'-group = ⊥, 有限群で primeFactors 共通な�
 - `hall_higman_1_2_3` が `[Finite G] [IsPiSeparable π G]` で動作.
 - `lake build OddOrder.AxiomsCheck` 通過.
 
+## Close notes
+
+- `centralizer_oPiCore_eq_center` も `[Finite G] (π : Set ℕ) [IsPiSeparable π G]` に一般化済み.
+- BG §1 の solvable specialization は `[IsSolvable G]` から `isPiSeparable_of_solvable`
+  instance 経由で一般版 Hall-Higman を使う形に追従済み.
+
 ## 参照
 
-- 親 issue: [`closed/0005`](closed/0005-isaacs-3d-pi-separable-redefine.md) (`IsPiSeparable` 正式定義).
+- 親 issue: [`closed/0005`](0005-isaacs-3d-pi-separable-redefine.md) (`IsPiSeparable` 正式定義).
 - 前回 commit: `25281b5` (helpers + quotient closure).
-- [Ch03_SplitExtensions.lean §3D](../OddOrder/Isaacs/Ch03_SplitExtensions.lean) (`piFittingSeries` 周辺).
+- [Ch03_SplitExtensions.lean §3D](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean) (`piFittingSeries` 周辺).
 - Isaacs FGT pp.89-95 §3D.
 - mathlib `Subgroup.inf_eq_bot_of_coprime` (`PGroup.lean:316`).

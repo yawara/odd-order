@@ -2406,7 +2406,7 @@ theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ) [IsPiSeparable π G]
 `C_G(O_π(G)) = Z(O_π(G))` (i.e., centralizer of O_π is the center of O_π).
 
 `C_G(O_π(G)) ≤ O_π(G)` (Hall-Higman 3.21) + 一般 `Z(H) = H ⊓ C_G(H)` から従う. -/
-theorem centralizer_oPiCore_eq_center [Finite G] [IsSolvable G] (π : Set ℕ)
+theorem centralizer_oPiCore_eq_center [Finite G] (π : Set ℕ) [IsPiSeparable π G]
     (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
     Subgroup.centralizer (oPiCore π G : Set G) =
       (Subgroup.center ↥(oPiCore π G)).map (oPiCore π G).subtype := by
@@ -2429,13 +2429,35 @@ theorem centralizer_oPiCore_eq_center [Finite G] [IsSolvable G] (π : Set ℕ)
       Subgroup.mem_center_iff.mp hg_center ⟨h, hh⟩
     exact congr_arg Subtype.val hc
 
+/-- `O_{π',π}(G)`: the preimage of `O_π(G/O_{π'}(G))`.
+
+This is the subgroup appearing in Isaacs Thm 3.22.  The theorem is usually stated as
+`[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`, equivalent to π-length at most one. -/
+def oPiPrimePiCore (π : Set ℕ) (G : Type*) [Group G] : Subgroup G :=
+  Subgroup.comap (QuotientGroup.mk' (oPiCore {p | p ∉ π} G))
+    (oPiCore π (G ⧸ oPiCore {p | p ∉ π} G))
+
+instance oPiPrimePiCore.normal (π : Set ℕ) (G : Type*) [Group G] :
+    (oPiPrimePiCore π G).Normal := by
+  rw [oPiPrimePiCore]
+  infer_instance
+
+/-- The lower `O_{π'}` layer is contained in `O_{π',π}`. -/
+theorem oPiCore_compl_le_oPiPrimePiCore (π : Set ℕ) (G : Type*) [Group G] :
+    oPiCore {p | p ∉ π} G ≤ oPiPrimePiCore π G := by
+  intro g hg
+  rw [oPiPrimePiCore, Subgroup.mem_comap]
+  rw [show (QuotientGroup.mk' (oPiCore {p | p ∉ π} G)) g = 1
+      from (QuotientGroup.eq_one_iff g).mpr hg]
+  exact (oPiCore π (G ⧸ oPiCore {p | p ∉ π} G)).one_mem
+
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
 
 `O_{π',π}(G)` (= `π` を `O_{π'}(G)` 上に乗せた π-層) の交換子部分群が `O_{π'}(G)` に
 含まれる, つまり π-length ≤ 1 と同値. 完全 π-length 定義は別ファイル. 本リポでは
 statement を保留 (型レベル定式化が大きいため): -/
-theorem piLength_le_one_of_abelian_pi_hall [Finite G] [IsSolvable G] (π : Set ℕ)
+theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSeparable π G]
     (_hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H, a * b = b * a) :
     True := by  -- TODO: π-length の正式定義後に書き直す (issue 0004)
   trivial
