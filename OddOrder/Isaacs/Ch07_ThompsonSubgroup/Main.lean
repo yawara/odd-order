@@ -118,6 +118,11 @@ kernel nilpotent) を完備化. BG/Peterfalvi 直接被引用は無し (Ch.6 経
 (`gl2_pSubgroup_centralizes_of_normalizes`). 証明は `|L|`-induction + P-invariant
 Sylow (Ch.3 Thm 3.23(a)) + Lem 7.4 (本ファイル) + Lem 4.29 (Ch.4 §4D) を組み合わせる.
 
+**仮説形の選択**: 「L の Sylow 2-subgroup abelian」は「L 内の任意の 2-subgroup が
+abelian」と同値で, 後者の方が帰納法 (`Subgroup` の transitivity による継承) で扱い
+やすい. Lean では後者 (`hL2abelian`) を採用. 呼び出し側 (Thm 7.5 等) では一行で
+変換可能.
+
 **Aut(E) ≅ GL(n, ZMod p)** bridge は Thm 7.5 で初めて必要となる (ノート設計判断 (3)). -/
 
 -- `Neg (SpecialLinearGroup (Fin 2) F)` のための `Fact (Even 2)`.
@@ -274,8 +279,8 @@ private theorem lem73_aux
     ∀ (n : ℕ) {L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
       (_hPnorm : P ≤ Subgroup.normalizer (L : Set _))
       (_hLcop : ¬ p ∣ Nat.card L)
-      (_hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
-        ∀ x y : ↥(Q : Subgroup ↥L), x * y = y * x),
+      (_hL2abelian : ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ L → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x),
       Nat.card L ≤ n →
       P ≤ Subgroup.centralizer (L : Set _) := by
   intro n
@@ -288,7 +293,7 @@ private theorem lem73_aux
     have hL_pos : 0 < Nat.card L := Nat.card_pos
     omega
   | succ n ih =>
-    intro L hPnorm hLcop hLSyl2abelian hL_le
+    intro L hPnorm hLcop hL2abelian hL_le
     -- ## Step 1a: 共役作用 φ : ↥P →* MulAut ↥L
     -- `P ≤ N(L)` ⇒ `↥P` を inclusion で `↥(N(L))` に埋め, normalizerMonoidHom で MulAut ↥L へ.
     let φ : ↥P →* MulAut ↥L :=
@@ -355,8 +360,13 @@ private theorem lem73_aux
       sorry
 
 /-- **Isaacs Lemma 7.3** ⭐ (GL(2,p) 補題). `p ≠ 2` prime, `P ≤ GL(2, ZMod p)`
-p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L` の
-Sylow 2-subgroup が abelian ⇒ P は L を centralize.
+p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L` 内の
+任意の 2-部分群が abelian ⇒ P は L を centralize.
+
+**Sylow 2-subgroup abelian の hereditary form**: 仮説 `hL2abelian` は「L 内の任意の
+2-部分群が abelian」と述べる. Isaacs 原本の「L の Sylow 2 が abelian」と同値だが
+(任意の 2-部分群は Sylow 2 に含まれ, abelian 群の部分群は abelian), 帰納法
+(IH 適用時の継承) で便利な形.
 
 **proof skeleton** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction を
 [`lem73_aux`](#) で展開. 各 step (P-invariant Sylow, Lem 4.29 適用, q=2 / q-odd) は
@@ -366,10 +376,10 @@ theorem gl2_pSubgroup_centralizes_of_normalizes
     {P L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
     (hPp : IsPGroup p P) (hPnorm : P ≤ Subgroup.normalizer (L : Set _))
     (hLcop : ¬ p ∣ Nat.card L)
-    (hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
-      ∀ x y : ↥(Q : Subgroup ↥L), x * y = y * x) :
+    (hL2abelian : ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+      S ≤ L → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) :
     P ≤ Subgroup.centralizer (L : Set _) :=
-  lem73_aux hp2 hPp (Nat.card L) hPnorm hLcop hLSyl2abelian le_rfl
+  lem73_aux hp2 hPp (Nat.card L) hPnorm hLcop hL2abelian le_rfl
 
 /-! ### Thm 7.5 — normal-P theorem (statement 保留)
 
