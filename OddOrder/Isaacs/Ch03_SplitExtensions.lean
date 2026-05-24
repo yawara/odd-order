@@ -1643,6 +1643,119 @@ theorem oPiCore.comap_le_of_injective {G H : Type*} [Group G] [Group H] [Finite 
     exact (oPiCore.isPiGroup π) p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
   exact Subgroup.IsPiGroup.le_oPiCore hPi
 
+/-- **`oPiCore π G ⊓ oPiCore π' G = ⊥`** for finite `G`.
+
+`oPiCore π G` は π-group, `oPiCore π' G` は π'-group なので primeFactors が排他的
+⇒ cardinality が coprime ⇒ inf が ⊥ (`Subgroup.inf_eq_bot_of_coprime` 経由).
+
+Hall-Higman π-separable 一般版の Bezout decomposition 前提として必須. -/
+theorem oPiCore.coprime_inf {G : Type*} [Group G] [Finite G] (π : Set ℕ) :
+    oPiCore π G ⊓ oPiCore {p | p ∉ π} G = ⊥ := by
+  apply Subgroup.inf_eq_bot_of_coprime
+  exact Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    Nat.card_pos.ne' Nat.card_pos.ne'
+    (oPiCore.isPiGroup π) (oPiCore.isPiGroup _)
+
+/-- **Bezout 分解**: 有限群 `Q` で `A` 正規 π-group, `B` 正規 π'-group, `A ⊓ B = ⊥` のとき,
+`x ∈ A ⊔ B` ならば 整数指数 `k₁ + k₂ = 1` で `x^k₁ ∈ A`, `x^k₂ ∈ B`.
+
+数学的内容: `A ⊓ B = ⊥` + normality より `commute_of_normal_of_disjoint` で `A` と `B` の
+元は可換, したがって `A ⊔ B ≃ A × B` の内部直積分解が成立. `x = ã * b̃` から各成分を
+`x` の整数べきで実現 (`x^(n*β) = ã^(n*β)` (∵ `b̃^n = 1`) で π-部分, 同様に π'-部分). -/
+private theorem decompose_pi_pi'_exists_zpow {Q : Type*} [Group Q] [Finite Q] (π : Set ℕ)
+    {A B : Subgroup Q} [hAN : A.Normal] [hBN : B.Normal]
+    (hA : Subgroup.IsPiGroup π A) (hB : Subgroup.IsPiGroup {p | p ∉ π} B)
+    (hAB : A ⊓ B = ⊥) {x : Q} (hx : x ∈ A ⊔ B) :
+    ∃ k₁ k₂ : ℤ, k₁ + k₂ = 1 ∧ x^k₁ ∈ A ∧ x^k₂ ∈ B := by
+  obtain ⟨aA, haA, bB, hbB, hxeq⟩ := Subgroup.mem_sup_of_normal_left.mp hx
+  have hdis : Disjoint A B := disjoint_iff.mpr hAB
+  have hcomm : Commute aA bB :=
+    Subgroup.commute_of_normal_of_disjoint A B hAN hBN hdis aA bB haA hbB
+  have hm_dvd : orderOf aA ∣ Nat.card ↥A := A.orderOf_dvd_natCard haA
+  have hn_dvd : orderOf bB ∣ Nat.card ↥B := B.orderOf_dvd_natCard hbB
+  have hm_pi : ∀ p ∈ (orderOf aA).primeFactors, p ∈ π := fun p hp =>
+    hA p (Nat.primeFactors_mono hm_dvd Nat.card_pos.ne' hp)
+  have hn_pi' : ∀ p ∈ (orderOf bB).primeFactors, p ∉ π := fun p hp =>
+    hB p (Nat.primeFactors_mono hn_dvd Nat.card_pos.ne' hp)
+  have hcop : (orderOf aA).Coprime (orderOf bB) :=
+    Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (orderOf_pos aA).ne' (orderOf_pos bB).ne' hm_pi hn_pi'
+  have hbezout : (orderOf aA : ℤ) * (orderOf aA).gcdA (orderOf bB) +
+      (orderOf bB : ℤ) * (orderOf aA).gcdB (orderOf bB) = 1 := by
+    have h := Nat.gcd_eq_gcd_ab (orderOf aA) (orderOf bB)
+    have hg : Nat.gcd (orderOf aA) (orderOf bB) = 1 := hcop
+    rw [hg, Nat.cast_one] at h
+    linarith
+  refine ⟨(orderOf bB : ℤ) * (orderOf aA).gcdB (orderOf bB),
+          (orderOf aA : ℤ) * (orderOf aA).gcdA (orderOf bB), ?_, ?_, ?_⟩
+  · linarith
+  · rw [show x = aA * bB from hxeq.symm, hcomm.mul_zpow]
+    have hb_pow : bB ^ ((orderOf bB : ℤ) * (orderOf aA).gcdB (orderOf bB)) = 1 := by
+      rw [zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow]
+    rw [hb_pow, mul_one]
+    exact A.zpow_mem haA _
+  · rw [show x = aA * bB from hxeq.symm, hcomm.mul_zpow]
+    have ha_pow : aA ^ ((orderOf aA : ℤ) * (orderOf aA).gcdA (orderOf bB)) = 1 := by
+      rw [zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow]
+    rw [ha_pow, one_mul]
+    exact B.zpow_mem hbB _
+
+/-- **Image of `H.subgroupOf N` in `↥N/F'` is contained in `oPiCore π (↥N/F')`**.
+
+仮定: `F ⊴ G` で `F ≤ H ⊴ G`, `H.map (mk' F)` が π-group, `N ⊴ G`, `F' ⊴ ↥N` で
+`F.subgroupOf N ≤ F'`.
+
+数学的内容: cardinality chain
+- `|image| = |↥(H.subgroupOf N) / F'.subgroupOf|` (`nat_card_quotient_subgroupOf_eq_card_map`)
+- `∣ |↥(H.subgroupOf N) / (F.subgroupOf N).subgroupOf|` (`F.subgroupOf N ≤ F'` で分母拡大)
+- `= |φ.range|` for `φ := (mk' F).comp (N.subtype.comp S.subtype)` (1st iso)
+- `∣ |H.map (mk' F)|` (`φ.range ≤ H.map (mk' F)`).
+
+これで image の primeFactors ⊆ π, normality は image of normal under surjective ⇒
+`Subgroup.IsPiGroup.le_oPiCore` で結論. -/
+private lemma image_subgroupOf_le_oPiCore (π : Set ℕ) {G : Type*} [Group G] [Finite G]
+    {F : Subgroup G} [F.Normal] {H : Subgroup G} [H.Normal] (_hFH : F ≤ H)
+    (hH_pi : Subgroup.IsPiGroup π (H.map (QuotientGroup.mk' F)))
+    {N : Subgroup G} [N.Normal] {F' : Subgroup ↥N} [F'.Normal]
+    (hF'_le : F.subgroupOf N ≤ F') :
+    (H.subgroupOf N).map (QuotientGroup.mk' F') ≤ oPiCore π (↥N ⧸ F') := by
+  apply Subgroup.IsPiGroup.le_oPiCore
+  intro p hp
+  set S : Subgroup ↥N := H.subgroupOf N with hS_def
+  let φ : ↥S →* G ⧸ F := (QuotientGroup.mk' F).comp (N.subtype.comp S.subtype)
+  have hφ_range : φ.range ≤ H.map (QuotientGroup.mk' F) := by
+    rintro _ ⟨x, rfl⟩
+    exact ⟨x.val.val, x.property, rfl⟩
+  have hφ_ker : φ.ker = (F.subgroupOf N).subgroupOf S := by
+    ext x
+    simp only [φ, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+               QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+  have h_T_eq : Nat.card ↥(S.map (QuotientGroup.mk' F')) = Nat.card (↥S ⧸ F'.subgroupOf S) :=
+    (Subgroup.nat_card_quotient_subgroupOf_eq_card_map F' S).symm
+  have hKK' : (F.subgroupOf N).subgroupOf S ≤ F'.subgroupOf S := fun x hx => hF'_le hx
+  have h_quot_dvd : Nat.card (↥S ⧸ F'.subgroupOf S) ∣
+      Nat.card (↥S ⧸ (F.subgroupOf N).subgroupOf S) := by
+    apply Subgroup.card_dvd_of_surjective
+      (QuotientGroup.map ((F.subgroupOf N).subgroupOf S) (F'.subgroupOf S) (MonoidHom.id ↥S)
+        (fun x hx => by simpa using hKK' hx))
+    apply QuotientGroup.map_surjective_of_surjective
+    exact QuotientGroup.mk_surjective
+  have h_ker_eq : Nat.card (↥S ⧸ (F.subgroupOf N).subgroupOf S) = Nat.card (↥S ⧸ φ.ker) := by
+    rw [hφ_ker]
+  have h_first_iso : Nat.card (↥S ⧸ φ.ker) = Nat.card ↥φ.range :=
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv
+  have h_range_dvd : Nat.card ↥φ.range ∣ Nat.card ↥(H.map (QuotientGroup.mk' F)) :=
+    Subgroup.card_dvd_of_le hφ_range
+  have hT_dvd : Nat.card ↥(S.map (QuotientGroup.mk' F')) ∣
+      Nat.card ↥(H.map (QuotientGroup.mk' F)) := by
+    calc Nat.card ↥(S.map (QuotientGroup.mk' F'))
+        = Nat.card (↥S ⧸ F'.subgroupOf S) := h_T_eq
+      _ ∣ Nat.card (↥S ⧸ (F.subgroupOf N).subgroupOf S) := h_quot_dvd
+      _ = Nat.card (↥S ⧸ φ.ker) := h_ker_eq
+      _ = Nat.card ↥φ.range := h_first_iso
+      _ ∣ Nat.card ↥(H.map (QuotientGroup.mk' F)) := h_range_dvd
+  exact hH_pi p (Nat.primeFactors_mono hT_dvd Nat.card_pos.ne' hp)
+
 /-! ### `IsPiSeparable` の閉包 instance (quotient / normal subgroup)
 
 `piFittingSeries` を quotient map で押し出し / subgroup へ引き戻して長さ保存. -/
@@ -1700,21 +1813,120 @@ instance quotient_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
     rw [hn, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)] at hmap
     exact top_le_iff.mp hmap
 
-/-! ### Normal subgroup 閉包 (TODO: 別 issue で実装)
+/-! ### Normal subgroup 閉包
 
-`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]` instance は本セッションで未完成.
+`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]`.
 
-困難点: `r̄ : ↥N ⧸ FGn.subgroupOf N →* G ⧸ FGn` が injective なとき, 我々の helper
-`oPiCore.comap_le_of_injective` は `comap r̄ (O_π) ≤ O_π(domain)` を与えるが,
-`comap r̄ (O_π ⊔ O_π') ≤ comap r̄ (O_π) ⊔ comap r̄ (O_π')` は一般に成立しない (comap は
-sup と非可換). 数学的には有限群で `O_π ⊓ O_π' = ⊥` (coprime cardinality) より内部直積
-分解 `O_π ⊔ O_π' ≃ O_π × O_π'` が成立し, この場合 distributivity が回復するが,
-Lean 形式化には ~50-100 LOC の追加 helper (`Subgroup.IsComplement'` + Bezout 経由の
-π-part extraction) が必要.
+数学的内容 (Isaacs Lem 3.18 piFittingSeries 版): `(piFittingSeries π G n).subgroupOf N`
+は `↥N` の正規列で各因子が "A_π ⊔ A_π'" 構造. 各層で Bezout 分解
+(`decompose_pi_pi'_exists_zpow`) により `x = x^k₁ * x^k₂` と π-part × π'-part に分け,
+`image_subgroupOf_le_oPiCore` で各 part が `oPiCore π` / `oPiCore π'` に入ることを示す. -/
 
-参考: Isaacs Lemma 3.18 (normal subgroup of π-separable is π-separable) の通常の証明は
-chain の N ⊓ Nᵢ への制限を用いる. piFittingSeries-based 定義では sup の取り扱いが
-追加で必要. -/
+/-- **`piFittingSeries` の normal subgroup 制限**:
+`N ⊴ G` で `(piFittingSeries π G n).subgroupOf N ≤ piFittingSeries π N n`.
+
+帰納法: succ ステップで Bezout 分解で `x · F_n = π-part · π'-part` を整数指数で実現,
+各 part の image を `image_subgroupOf_le_oPiCore` で `O_π` / `O_π'` に押し込む. -/
+private theorem piFittingSeries_subgroupOf_le_of_normal (π : Set ℕ)
+    (G : Type*) [Group G] [Finite G] (N : Subgroup G) [N.Normal] : ∀ n,
+    (piFittingSeries π G n).subgroupOf N ≤ piFittingSeries π N n := by
+  intro n
+  induction n with
+  | zero =>
+    rw [piFittingSeries_zero, Subgroup.bot_subgroupOf, piFittingSeries_zero]
+  | succ n ih =>
+    intro x hx
+    haveI hFn_normal : (piFittingSeries π G n).Normal := piFittingSeries.normal π G n
+    haveI hF'n_normal : (piFittingSeries π N n).Normal := piFittingSeries.normal π N n
+    rw [Subgroup.mem_subgroupOf, piFittingSeries_succ, Subgroup.mem_comap] at hx
+    -- hx : (mk' Fn) (x.val) ∈ oPiCore π (G/Fn) ⊔ oPiCore π' (G/Fn).
+    -- Apply Bezout in G/Fn.
+    obtain ⟨k₁, k₂, hsum, hk₁mem, hk₂mem⟩ :=
+      decompose_pi_pi'_exists_zpow π (oPiCore.isPiGroup π) (oPiCore.isPiGroup _)
+        (oPiCore.coprime_inf π) hx
+    -- Goal: x ∈ piFittingSeries π N (n+1).
+    rw [piFittingSeries_succ, Subgroup.mem_comap]
+    -- Express x = x^k₁ * x^k₂ in ↥N (since k₁ + k₂ = 1).
+    have hx_zpow : x = x^k₁ * x^k₂ := by
+      rw [← zpow_add, hsum, zpow_one]
+    rw [hx_zpow, map_mul]
+    -- Goal: (mk' F'n) (x^k₁) * (mk' F'n) (x^k₂) ∈ oPiCore π ⊔ oPiCore π'.
+    -- Show (mk' F'n) (x^k₁) ∈ oPiCore π via image_subgroupOf_le_oPiCore.
+    have hF_le_Hπ : piFittingSeries π G n ≤
+        Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore π (G ⧸ piFittingSeries π G n)) := by
+      calc
+        piFittingSeries π G n = (QuotientGroup.mk' (piFittingSeries π G n)).ker :=
+          (QuotientGroup.ker_mk' _).symm
+        _ ≤ Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+            (oPiCore π (G ⧸ piFittingSeries π G n)) :=
+          Subgroup.ker_le_comap _ _
+    have hF_le_Hπ' : piFittingSeries π G n ≤
+        Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)) := by
+      calc
+        piFittingSeries π G n = (QuotientGroup.mk' (piFittingSeries π G n)).ker :=
+          (QuotientGroup.ker_mk' _).symm
+        _ ≤ Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+            (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)) :=
+          Subgroup.ker_le_comap _ _
+    have hHπ_image_eq : (Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore π (G ⧸ piFittingSeries π G n))).map
+          (QuotientGroup.mk' (piFittingSeries π G n)) =
+        oPiCore π (G ⧸ piFittingSeries π G n) := by
+      rw [Subgroup.map_comap_eq,
+          MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective _)]
+      exact top_inf_eq _
+    have hHπ'_image_eq : (Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n))).map
+          (QuotientGroup.mk' (piFittingSeries π G n)) =
+        oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) := by
+      rw [Subgroup.map_comap_eq,
+          MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective _)]
+      exact top_inf_eq _
+    have hHπ_pi : Subgroup.IsPiGroup π
+        ((Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore π (G ⧸ piFittingSeries π G n))).map
+          (QuotientGroup.mk' (piFittingSeries π G n))) := by
+      rw [hHπ_image_eq]; exact oPiCore.isPiGroup π
+    have hHπ'_pi : Subgroup.IsPiGroup {p | p ∉ π}
+        ((Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+          (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n))).map
+          (QuotientGroup.mk' (piFittingSeries π G n))) := by
+      rw [hHπ'_image_eq]; exact oPiCore.isPiGroup _
+    have hT1 : ((Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+        (oPiCore π (G ⧸ piFittingSeries π G n))).subgroupOf N).map
+        (QuotientGroup.mk' (piFittingSeries π N n)) ≤
+        oPiCore π (↥N ⧸ piFittingSeries π N n) :=
+      image_subgroupOf_le_oPiCore π hF_le_Hπ hHπ_pi ih
+    have hT2 : ((Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+        (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n))).subgroupOf N).map
+        (QuotientGroup.mk' (piFittingSeries π N n)) ≤
+        oPiCore {p | p ∉ π} (↥N ⧸ piFittingSeries π N n) :=
+      image_subgroupOf_le_oPiCore {p | p ∉ π} hF_le_Hπ' hHπ'_pi ih
+    -- y1 := x^k₁, y2 := x^k₂ in ↥N.
+    have hy1_in : x^k₁ ∈ (Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+        (oPiCore π (G ⧸ piFittingSeries π G n))).subgroupOf N := by
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_comap, Subgroup.coe_zpow, map_zpow]
+      exact hk₁mem
+    have hy2_in : x^k₂ ∈ (Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n))
+        (oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n))).subgroupOf N := by
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_comap, Subgroup.coe_zpow, map_zpow]
+      exact hk₂mem
+    exact Subgroup.mul_mem_sup
+      (hT1 ⟨x^k₁, hy1_in, rfl⟩)
+      (hT2 ⟨x^k₂, hy2_in, rfl⟩)
+
+/-- **`IsPiSeparable` の normal subgroup 閉包**:
+`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]`. -/
+instance normalSubgroup_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] [IsPiSeparable π G] : IsPiSeparable π ↥N where
+  exists_top := by
+    obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
+    refine ⟨n, ?_⟩
+    have hle := piFittingSeries_subgroupOf_le_of_normal π G N n
+    rw [hn, Subgroup.top_subgroupOf] at hle
+    exact top_le_iff.mp hle
 
 /-- 補助: `piFittingSeries π G (n+1)` が `piFittingSeries π G n` を真に拡張する条件は,
 `G/Fₙ` 上の `O_π ⊔ O_{π'}` が非自明であることと同値. -/
