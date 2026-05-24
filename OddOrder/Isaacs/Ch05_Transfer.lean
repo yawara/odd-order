@@ -886,17 +886,74 @@ instance OPrime_normal (p : ℕ) (G : Type*) [Group G] : (OPrime p G).Normal := 
   unfold OPrime
   exact Subgroup.normal_iInf_normal (fun N => N.property.1)
 
-/-- For finite `G`, `OPrime p G` has `p`-power index. mathlib に直接 lemma 無し,
-証明戦略: iInf over finite set, 各成分 p-power index, intersection の index は
-H ⊓ K 場合 ∣ |G/H| × |G/K| (canonical injection), iInf に一般化. -/
+/-- Per-element Normal instance for the `OPrime` indexing subtype. Needed so that
+`G ⧸ N.val` (over `N` in the subtype) has a group structure during type elaboration. -/
+instance OPrime_index_subtype_normal {p : ℕ} {G : Type*} [Group G]
+    (N : {N : Subgroup G // N.Normal ∧ ∃ k : ℕ, N.index = p ^ k}) :
+    (N.val : Subgroup G).Normal := N.property.1
+
+/-- For finite `G`, `OPrime p G` has `p`-power index.
+
+**証明**: `OPrime = ⨅ N : ι, N.val` over the finite indexing set `ι` of normal subgroups
+with p-power index. Build the diagonal `MonoidHom G →* ∏ N : ι, G/N.val` (via
+`Pi.monoidHom`); its kernel is exactly `⨅ N : ι, N.val = OPrime p G` (since `g ∈ ker`
+iff `g ∈ N` for every member of the family). By the first iso theorem,
+`G/OPrime ≃* range`, with range a subgroup of `∏ G/N.val`. Lagrange gives
+`|range| ∣ |∏ G/N.val| = ∏ N.val.index`. Each `N.val.index = p^{k_N}` so the product
+is `p^{∑ k_N}`. By `Nat.dvd_prime_pow`, `(OPrime).index = p^?`. -/
 lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.Prime] :
     ∃ k : ℕ, (OPrime p G).index = p ^ k := by
-  -- Proof strategy (sorry, for future implementation):
-  -- 1. (⨅ N, N.val).index ∣ ∏ N, N.val.index (via canonical injection arg).
-  -- 2. Each N.val.index = p^k_N (p-power).
-  -- 3. Product of p-powers = p-power.
-  -- 4. Divisor of p-power = p-power.
-  sorry
+  classical
+  let ι : Type _ := {N : Subgroup G // N.Normal ∧ ∃ k : ℕ, N.index = p ^ k}
+  haveI : Finite ι := Subtype.finite
+  haveI : Fintype ι := Fintype.ofFinite ι
+  -- Diagonal hom φ : G →* ∀ i : ι, G ⧸ i.val (instance found via OPrime_index_subtype_normal)
+  let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
+    Pi.monoidHom fun i : ι => QuotientGroup.mk' i.val
+  -- ker φ = OPrime p G
+  have h_ker : φ.ker = OPrime p G := by
+    ext g
+    refine ⟨fun h => ?_, fun h => ?_⟩
+    · rw [OPrime, Subgroup.mem_iInf]
+      intro i
+      have hg_i : φ g i = (1 : G ⧸ (i.val : Subgroup G)) := by
+        rw [MonoidHom.mem_ker] at h; exact congrFun h i
+      simpa [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff] using hg_i
+    · rw [MonoidHom.mem_ker]
+      ext i
+      simp only [φ, Pi.monoidHom_apply, QuotientGroup.mk'_apply, Pi.one_apply,
+        QuotientGroup.eq_one_iff]
+      rw [OPrime, Subgroup.mem_iInf] at h
+      exact h i
+  -- Lagrange: |range φ| ∣ |∀ i, G/i.val|
+  haveI : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
+  have h_card_range : Nat.card φ.range ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
+    Subgroup.card_subgroup_dvd_card _
+  -- |G/OPrime| = |range φ| via first iso
+  have h_card_quot : Nat.card (G ⧸ OPrime p G) = Nat.card φ.range := by
+    rw [← h_ker]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv
+  -- |∀ i, G/i.val| = ∏ (i.val.index)
+  have h_card_pi : Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) = ∏ i : ι, i.val.index := by
+    rw [Nat.card_pi]
+    refine Finset.prod_congr rfl fun i _ => ?_
+    rw [Subgroup.index_eq_card]
+  -- ∏ i.val.index = p ^ (∑ k_i)
+  let k_fun : ι → ℕ := fun i => Classical.choose i.property.2
+  have hk_fun : ∀ i : ι, i.val.index = p ^ k_fun i := fun i => Classical.choose_spec i.property.2
+  have h_prod_pow : (∏ i : ι, i.val.index) = p ^ (∑ i : ι, k_fun i) := by
+    rw [← Finset.prod_pow_eq_pow_sum]
+    exact Finset.prod_congr rfl fun i _ => hk_fun i
+  -- Combine: (OPrime).index ∣ p^∑
+  have h_idx_dvd : (OPrime p G).index ∣ p ^ (∑ i : ι, k_fun i) := by
+    rw [Subgroup.index_eq_card, h_card_quot]
+    calc Nat.card φ.range
+        ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) := h_card_range
+      _ = ∏ i : ι, i.val.index := h_card_pi
+      _ = p ^ (∑ i : ι, k_fun i) := h_prod_pow
+  obtain ⟨a, _, ha⟩ := (Nat.dvd_prime_pow Fact.out).mp h_idx_dvd
+  exact ⟨a, ha⟩
 
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
