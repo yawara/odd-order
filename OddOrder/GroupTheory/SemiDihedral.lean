@@ -51,7 +51,6 @@ the multiplication formula associative. We prove this as `twist_mul_self`.
 
 ## TODO
 
-* `orderOf` of typical elements (`c 1` has order `2^n`; `ca i` has order 2 or 4).
 * Center, derived subgroup, Frattini subgroup computations.
 * Isomorphism with `Dihedral` / `Quaternion` in degenerate cases (`n ≤ 2`).
 * Possible mathlib upstream as `Mathlib/GroupTheory/SpecificGroups/SemiDihedral.lean`.
@@ -215,6 +214,118 @@ theorem card : Fintype.card (SemiDihedralGroup n) = 2 ^ (n + 1) := by
 
 theorem nat_card : Nat.card (SemiDihedralGroup n) = 2 ^ (n + 1) := by
   rw [Nat.card_eq_fintype_card, card]
+
+/-! ### Powers and order of `c`
+
+The element `c 1` generates a cyclic subgroup of order `2^n`. -/
+
+@[simp]
+theorem c_one_pow (k : ℕ) : (c 1 : SemiDihedralGroup n) ^ k = c k := by
+  induction k with
+  | zero => rw [Nat.cast_zero]; rfl
+  | succ k IH =>
+    rw [pow_succ, IH, c_mul_c]
+    congr 1
+    push_cast
+    ring
+
+@[simp]
+theorem c_pow (i : ZMod (2 ^ n)) (k : ℕ) :
+    (c i) ^ k = c (i * (k : ZMod (2 ^ n))) := by
+  induction k with
+  | zero => rw [pow_zero, Nat.cast_zero, mul_zero]; rfl
+  | succ k IH =>
+    rw [pow_succ, IH, c_mul_c]
+    congr 1
+    push_cast
+    ring
+
+theorem c_one_pow_n : (c 1 : SemiDihedralGroup n) ^ (2 ^ n) = 1 := by
+  rw [c_one_pow]
+  show c ((2 ^ n : ℕ) : ZMod (2 ^ n)) = 1
+  rw [ZMod.natCast_self]
+  rfl
+
+/-- `orderOf (c 1) = 2 ^ n`. For `n = 0` both sides are `1` (the group is trivial-or-`Z/2`,
+and `c 1 = c 0 = 1`); for `n ≥ 1` the element `c 1` generates a cyclic subgroup of index 2. -/
+@[simp]
+theorem orderOf_c_one : orderOf (c 1 : SemiDihedralGroup n) = 2 ^ n := by
+  apply (Nat.le_of_dvd (NeZero.pos _)
+    (orderOf_dvd_of_pow_eq_one c_one_pow_n)).lt_or_eq.resolve_left
+  intro h
+  have h1 : (c 1 : SemiDihedralGroup n) ^ orderOf (c 1 : SemiDihedralGroup n) = 1 :=
+    pow_orderOf_eq_one _
+  rw [c_one_pow] at h1
+  have h_eq : (c ((orderOf (c 1 : SemiDihedralGroup n) : ℕ) : ZMod (2 ^ n)) :
+      SemiDihedralGroup n) = c 0 := h1
+  injection h_eq with h2
+  rw [← ZMod.val_eq_zero, ZMod.val_natCast, Nat.mod_eq_of_lt h] at h2
+  exact absurd h2 (orderOf_pos _).ne'
+
+/-- `orderOf (c i) = 2 ^ n / gcd(2^n, i.val)`. -/
+theorem orderOf_c (i : ZMod (2 ^ n)) :
+    orderOf (c i) = 2 ^ n / Nat.gcd (2 ^ n) i.val := by
+  conv_lhs => rw [← ZMod.natCast_zmod_val i]
+  rw [← c_one_pow, orderOf_pow, orderOf_c_one]
+
+/-! ### Powers and involutions on the `ca` side
+
+Every `ca i` satisfies `(ca i)^4 = 1`. The element `ca 0` is the canonical involution
+outside the cyclic subgroup `⟨c 1⟩`. -/
+
+@[simp]
+theorem ca_sq (i : ZMod (2 ^ n)) : (ca i : SemiDihedralGroup n) ^ 2 = c (twist n * i + i) := by
+  rw [sq, ca_mul_ca]
+
+theorem ca_zero_sq : (ca 0 : SemiDihedralGroup n) ^ 2 = 1 := by
+  rw [ca_sq, mul_zero, zero_add]
+  rfl
+
+/-- `2 · (twist n + 1) = 0` in `ZMod (2^n)`. Equivalent to `twist n ≡ -1 (mod 2^{n-1})`,
+the key identity behind `(ca i)^4 = 1`. -/
+private lemma two_mul_twist_succ_eq_zero :
+    (2 : ZMod (2 ^ n)) * (twist n + 1) = 0 := by
+  match n with
+  | 0 => decide
+  | 1 => decide
+  | k + 2 =>
+    have h_twist : (twist (k + 2) : ZMod (2 ^ (k + 2))) + 1 =
+        (2 ^ (k + 1) : ZMod (2 ^ (k + 2))) := by
+      change ((2 ^ (k + 1) : ZMod (2 ^ (k + 2))) - 1) + 1 = _
+      ring
+    rw [h_twist]
+    have key : ((2 ^ (k + 2) : ℕ) : ZMod (2 ^ (k + 2))) = 0 := ZMod.natCast_self _
+    have eq1 : (2 : ZMod (2 ^ (k + 2))) * 2 ^ (k + 1) =
+        ((2 ^ (k + 2) : ℕ) : ZMod (2 ^ (k + 2))) := by
+      push_cast
+      rw [pow_succ]
+      ring
+    rw [eq1, key]
+
+theorem ca_pow_four (i : ZMod (2 ^ n)) : (ca i : SemiDihedralGroup n) ^ 4 = 1 := by
+  rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, ca_sq, c_pow]
+  show c ((twist n * i + i) * ((2 : ℕ) : ZMod (2 ^ n))) = 1
+  have h : (twist n * i + i) * ((2 : ℕ) : ZMod (2 ^ n)) = 2 * (twist n + 1) * i := by
+    push_cast; ring
+  rw [h, two_mul_twist_succ_eq_zero, zero_mul]
+  rfl
+
+/-! ### Defining conjugation relation
+
+The relation `a · c · a⁻¹ = c^{twist n}` is the defining relation of `SemiDihedralGroup n`.
+This is what Isaacs Lemma 6.13 uses to recognise semidihedral structure. -/
+
+/-- **Defining relation**: conjugation of `c i` by any `ca j` is `c (twist n · i)`,
+independent of `j`. Specialised to `j = 0` this gives `a · c · a⁻¹ = c^{twist n}`. -/
+theorem c_conj_ca (j i : ZMod (2 ^ n)) :
+    (ca j : SemiDihedralGroup n) * c i * (ca j)⁻¹ = c (twist n * i) := by
+  simp only [inv_ca, ca_mul_c, ca_mul_ca]
+  congr 1
+  ring
+
+theorem c_one_conj_ca_zero :
+    (ca 0 : SemiDihedralGroup n) * c 1 * (ca 0)⁻¹ = c (twist n) := by
+  rw [c_conj_ca, mul_one]
 
 end SemiDihedralGroup
 
