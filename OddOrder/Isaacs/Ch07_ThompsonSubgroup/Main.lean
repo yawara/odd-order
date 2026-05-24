@@ -264,26 +264,57 @@ theorem sl2_unique_involution
 **現状**: statement + 証明戦略 docstring のみ. 各 step の実装 (P-invariant Sylow 取得,
 Lem 4.29 適用, q=2 / q-odd 場合分け) は別 commit で fill in. -/
 
+/-- **Isaacs Lemma 7.3 (`|L|`-induction aux)**: `Nat.card L ≤ n` をパラメータに取り,
+強い帰納法のための補助 form. p, P は外側で固定し L のみ帰納法で動かす. -/
+private theorem lem73_aux
+    {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 2)
+    {P : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
+    (hPp : IsPGroup p P) :
+    ∀ (n : ℕ) {L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
+      (_hPnorm : P ≤ Subgroup.normalizer (L : Set _))
+      (_hLcop : ¬ p ∣ Nat.card L)
+      (_hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
+        ∀ x y : ↥(Q : Subgroup ↥L), x * y = y * x),
+      Nat.card L ≤ n →
+      P ≤ Subgroup.centralizer (L : Set _) := by
+  intro n
+  induction n with
+  | zero =>
+    -- n = 0 ⇒ Nat.card L = 0. 一方 L : Subgroup G で G = GL(2,ZMod p) は finite, よって
+    -- L も finite で `Nat.card L ≥ 1`. 矛盾.
+    intro L _ _ _ hL_le
+    exfalso
+    have hL_pos : 0 < Nat.card L := Nat.card_pos
+    omega
+  | succ n ih =>
+    intro L hPnorm hLcop hLSyl2abelian hL_le
+    -- TODO (次 commit): n+1 case 本体
+    --   a. 共役作用 φ : ↥P →* MulAut ↥L を構成 (`normalizerMonoidHom` 経由).
+    --   b. (|P|, |L|) coprime と P solvable (p-group ⇒ nilpotent ⇒ solvable) を導出.
+    --   c. q | |L:C_L(P)| を取り P-invariant Sylow q を `exists_aInvariant_sylow` で取得.
+    --   d. IH を Q (proper P-invariant subgroup) に適用 ⇒ Q ≤ C(L), 矛盾で L が q-群.
+    --   e. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
+    --   f. `[L,P] = L` case: L ≤ SL(2,p) を導出.
+    --   g. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
+    --   h. q odd: |SL(2,p)| 因子化 + orbit counting で矛盾.
+    sorry
+
 /-- **Isaacs Lemma 7.3** ⭐ (GL(2,p) 補題). `p ≠ 2` prime, `P ≤ GL(2, ZMod p)`
 p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L` の
 Sylow 2-subgroup が abelian ⇒ P は L を centralize.
 
-**proof skeleton** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction.
-各 step (P-invariant Sylow, Lem 4.29 適用, q=2 / q-odd) は別 commit で fill in. -/
+**proof skeleton** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction を
+[`lem73_aux`](#) で展開. 各 step (P-invariant Sylow, Lem 4.29 適用, q=2 / q-odd) は
+別 commit で fill in. -/
 theorem gl2_pSubgroup_centralizes_of_normalizes
-    {p : ℕ} [Fact p.Prime] (_hp2 : p ≠ 2)
+    {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 2)
     {P L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
-    (_hPp : IsPGroup p P) (_hPnorm : P ≤ Subgroup.normalizer (L : Set _))
-    (_hLcop : ¬ p ∣ Nat.card L)
-    (_hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
+    (hPp : IsPGroup p P) (hPnorm : P ≤ Subgroup.normalizer (L : Set _))
+    (hLcop : ¬ p ∣ Nat.card L)
+    (hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
       ∀ x y : ↥(Q : Subgroup ↥L), x * y = y * x) :
-    P ≤ Subgroup.centralizer (L : Set _) := by
-  -- TODO (次回以降の commit):
-  -- 1. P-invariant Sylow q-subgroup の取得 (Ch.3 `exists_aInvariant_sylow`).
-  -- 2. `[L,P] = L` への reduction (Lem 4.29 in Γ form).
-  -- 3. q=2 case (Lem 7.4 + cyclic 2-group Aut).
-  -- 4. q odd case (`|SL(2,p)|` 因子化 + orbit counting).
-  sorry
+    P ≤ Subgroup.centralizer (L : Set _) :=
+  lem73_aux hp2 hPp (Nat.card L) hPnorm hLcop hLSyl2abelian le_rfl
 
 /-! ### Thm 7.5 — normal-P theorem (statement 保留)
 
