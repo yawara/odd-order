@@ -288,15 +288,28 @@ private theorem lem73_aux
     omega
   | succ n ih =>
     intro L hPnorm hLcop hLSyl2abelian hL_le
-    -- TODO (次 commit): n+1 case 本体
-    --   a. 共役作用 φ : ↥P →* MulAut ↥L を構成 (`normalizerMonoidHom` 経由).
-    --   b. (|P|, |L|) coprime と P solvable (p-group ⇒ nilpotent ⇒ solvable) を導出.
-    --   c. q | |L:C_L(P)| を取り P-invariant Sylow q を `exists_aInvariant_sylow` で取得.
-    --   d. IH を Q (proper P-invariant subgroup) に適用 ⇒ Q ≤ C(L), 矛盾で L が q-群.
-    --   e. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
-    --   f. `[L,P] = L` case: L ≤ SL(2,p) を導出.
-    --   g. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
-    --   h. q odd: |SL(2,p)| 因子化 + orbit counting で矛盾.
+    -- ## Step 1a: 共役作用 φ : ↥P →* MulAut ↥L
+    -- `P ≤ N(L)` ⇒ `↥P` を inclusion で `↥(N(L))` に埋め, normalizerMonoidHom で MulAut ↥L へ.
+    let φ : ↥P →* MulAut ↥L :=
+      L.normalizerMonoidHom.comp (Subgroup.inclusion hPnorm)
+    -- ## Step 1b: (|P|, |L|) coprime
+    -- P が p-群 ⇒ |P| = p^k. 仮定 `¬ p ∣ |L|` から `Nat.Coprime p (Nat.card L)`.
+    have hp_prime : p.Prime := Fact.out
+    have hp_coprime_L : Nat.Coprime p (Nat.card ↥L) :=
+      (Nat.Prime.coprime_iff_not_dvd hp_prime).mpr hLcop
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPp
+    have hCop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥L) := by
+      rw [hk]; exact hp_coprime_L.pow_left k
+    -- ## Step 1c: P が solvable (p-群 ⇒ nilpotent ⇒ solvable)
+    haveI hP_nilpotent : Group.IsNilpotent ↥P := IsPGroup.isNilpotent hPp
+    haveI hP_solvable : IsSolvable ↥P := inferInstance
+    -- TODO (次 commit):
+    --   d. q | |L:C_L(P)| を取り P-invariant Sylow q を `exists_aInvariant_sylow` で取得.
+    --   e. IH を Q (proper P-invariant subgroup) に適用 ⇒ Q ≤ C(L), 矛盾で L が q-群.
+    --   f. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
+    --   g. `[L,P] = L` case: L ≤ SL(2,p) を導出.
+    --   h. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
+    --   i. q odd: |SL(2,p)| 因子化 + orbit counting で矛盾.
     sorry
 
 /-- **Isaacs Lemma 7.3** ⭐ (GL(2,p) 補題). `p ≠ 2` prime, `P ≤ GL(2, ZMod p)`
