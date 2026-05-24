@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow
 import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.QuotientGroup.Basic
@@ -116,6 +117,25 @@ theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
   -- M ⊴ G + ↥M nilpotent ⇒ M ≤ F(G)
   exact ⟨OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting, p, hp_prime, hM_elem⟩
 
+/-! ## §1B: A-invariant Hall theory (Prop 1.5, Prop 1.6) — Isaacs Ch.4/§3E 既存 API 経由
+
+CLAUDE.md no-wrapper policy 準拠. BG Prop 1.5-1.6 は Isaacs §3E coprime action machinery
+で完全カバーされており, 個別 theorem は書かない (mapping は本 docstring に集約).
+
+| BG | Isaacs §3E | Lean (本リポ) | 備考 |
+|---|---|---|---|
+| Prop 1.5(a)(c) A-inv Hall 存在/共役 | Thm 3.23(a)(b) (Sylow), Lem 3.24 (Glauberman) | `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point_exists`, `glauberman_fixed_points_conj` | π = {p} 特殊化版が Ch.4 forward に存在; Hall π 一般版は §1B 内 Prop 1.5 完成時 |
+| Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
+| **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
+| Prop 1.5(e) C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | (新規) | (未実装) | Prop 1.5(e) は coprime + commutator structure, Hall API 整備後 |
+| Prop 1.6(a) G = C_G(A)[G,A] | Thm 3.27 / Cor 3.28 系 | (未実装) | Prop 1.5(d) を `H = [G,A]` で specialize |
+| Prop 1.6(b)(c) [G,A,A]=[G,A], =1 ⇒ trivial | Ch.4 §4C-§4D (lcs + Three-Sub Lemma) 待ち | (未実装) | Ch.4 §4D 完成依存 |
+| Prop 1.6(d)(e) abelian 直積分解 | (mathlib `MulAction.fixedPoints` + complement) | (未実装) | abelian 仮定下の direct product, Maschke 風 |
+
+**使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
+(= Prop 1.5(d) + Lem 1.7(a) 合成 = Isaacs Cor 3.29) を直接呼び出す.
+-/
+
 /-! ## §1C: Frattini + Burnside operator (Lem 1.7-1.10) -/
 
 /-- **BG Lemma 1.7(a)** (Frattini argument, finite specialization):
@@ -129,6 +149,29 @@ BG 原 statement は R p-group の文脈だが proof は finite group で成立.
 theorem eq_top_of_sup_frattini_eq_top {G : Type*} [Group G] [Finite G]
     {H : Subgroup G} (h : H ⊔ frattini G = ⊤) : H = ⊤ :=
   frattini_nongenerating h
+
+/-- **BG Theorem 1.8 (Burnside, operator on p-group)**: `A` を operator group とし,
+`R` を p-群とする. `(|A|, |R|) = 1` かつ `A` が `R/Φ(R)` に自明に作用するとき,
+`A` は `R` に自明に作用する.
+
+**証明**: `R` p-群 + `[Finite R]` + `[Fact p.Prime]` ⇒ `IsNilpotent R` (`IsPGroup.isNilpotent`)
+⇒ `IsSolvable R` (`IsNilpotent.to_isSolvable` instance). よって Isaacs Cor 3.29
+(`OddOrder.Isaacs.Ch04.aFixed_quotient_frattini`: Prop 1.5(d) + Lem 1.7(a) 合成形) を
+`G ↦ R`, `Or.inr` で適用するだけ.
+
+**Isaacs 対応**: Isaacs FGT Thm 1.8 (完全一致). Phase 1 Ch.1 §1B 側の Thm 1.8 は未実装
+だが, 本実装は Ch.4 forward §3E coprime action machinery 経由で独立に成立.
+
+**no-wrapper policy 例外**: 仮定特殊化 (p-群仮定から solvable を導出して
+`aFixed_quotient_frattini` の `IsSolvable A ∨ IsSolvable G` 引数を埋める). -/
+theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    {A : Type*} [Group A] [Finite A]
+    (hP : IsPGroup p R) {φ : A →* MulAut R}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card R))
+    (h_triv_quot : ∀ a : A, ∀ r : R, ∃ x ∈ _root_.frattini R, (φ a) r = r * x) :
+    ∀ a : A, ∀ r : R, (φ a) r = r := by
+  haveI : Group.IsNilpotent R := hP.isNilpotent
+  exact OddOrder.Isaacs.Ch04.aFixed_quotient_frattini hCop (Or.inr inferInstance) h_triv_quot
 
 /-! ## §1D: 未実装 (Phase 1 Ch.4 §4D 待ち) -/
 
