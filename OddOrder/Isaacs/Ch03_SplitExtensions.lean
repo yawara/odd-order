@@ -2166,7 +2166,7 @@ theorem hall_higman_case_pi_contradiction
 case π 仮定 (`oPiCore π (↥CB) ≠ ⊥`) から K = preimage of K_quot を構築し
 `hall_higman_case_pi_contradiction` で False を導出. -/
 private theorem hall_higman_case_pi_body
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] (π : Set ℕ)
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
     (h_not_le : ¬ Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G)
     (hCπ : oPiCore π ↥((Subgroup.centralizer (oPiCore π G : Set G)).map
         (QuotientGroup.mk' (Subgroup.centralizer (oPiCore π G : Set G) ⊓ oPiCore π G))) ≠ ⊥) :
@@ -2227,7 +2227,7 @@ private theorem hall_higman_case_pi_body
 
 /-- **Hall-Higman 3.21 case π' body**: case π' での K + Schur-Zassenhaus + H' ⊴ K + 矛盾. -/
 private theorem hall_higman_case_pi'_body
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] (π : Set ℕ)
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
     (hπ' : oPiCore {p | p ∉ π} G = ⊥)
     (h_not_le : ¬ Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G)
     (hCπ' : oPiCore {p | p ∉ π} ↥((Subgroup.centralizer (oPiCore π G : Set G)).map
@@ -2375,10 +2375,10 @@ private theorem hall_higman_case_pi'_body
 
 **下流被引用**: Ch.4 Thm 4.33 (mmd L2659), Ch.7 Thm 7.5 (L3853), Thm 7.6 (L3802) の 3 箇所.
 
-**実装状態** ⭐ sorry-free. case π body + case π' body を `exists_oPiCore_ne_bot_or_oPi'Core_ne_bot`
-(↥CB に対して) で場合分けして組み立て.
+**実装状態** ⭐ sorry-free. case π body + case π' body を
+`exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable` (↥CB に対して) で場合分けして組み立て.
 -/
-theorem hall_higman_1_2_3 [Finite G] [IsSolvable G] (π : Set ℕ)
+theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ) [IsPiSeparable π G]
     (hπ' : oPiCore {p | p ∉ π} G = ⊥) :
     Subgroup.centralizer (oPiCore π G : Set G) ≤ oPiCore π G := by
   by_contra h_not_le
@@ -2392,8 +2392,13 @@ theorem hall_higman_1_2_3 [Finite G] [IsSolvable G] (π : Set ℕ)
   set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
   have hCB_ne_bot : CB ≠ ⊥ := Subgroup.map_quotientGroup_mk_ne_bot_of_lt hBC_lt
   haveI hCB_nontrivial : Nontrivial ↥CB := (Subgroup.nontrivial_iff_ne_bot CB).mpr hCB_ne_bot
-  haveI hCB_solvable : IsSolvable ↥CB := inferInstance
-  rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot (G := ↥CB) π with hπCase | hπ'Case
+  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  haveI hQuot_piSeparable : IsPiSeparable π (G ⧸ B) :=
+    quotient_isPiSeparable π G B
+  haveI hCB_piSeparable : IsPiSeparable π ↥CB :=
+    normalSubgroup_isPiSeparable π (G ⧸ B) CB
+  rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable (G := ↥CB) π with
+    hπCase | hπ'Case
   · exact hall_higman_case_pi_body π h_not_le hπCase
   · exact hall_higman_case_pi'_body π hπ' h_not_le hπ'Case
 
