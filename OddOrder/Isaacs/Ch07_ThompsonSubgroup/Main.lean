@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Notation
@@ -46,9 +48,9 @@ Feit-Thompson 局所解析の中核を担う:
 ## Implementation order (本ファイル内)
 
 1. ✅ Thm 7.2 (`thompsonJ` shared module 経由)
-2. Lem 7.4 SL(2,q) — 独立小テーマ (先行章不要)
-3. Lem 7.7 — Lem 2.17 拡張 (Ch.2 完成済から短い延長)
-4. (Ch.3 §3D ✅ + Ch.4 §4D 完成後) Lem 7.3 → Thm 7.5 → Thm 7.6
+2. ✅ Lem 7.4 SL(2,q) — 独立小テーマ (先行章不要)
+3. ✅ Lem 7.7 — Lem 2.17 拡張 (Ch.2 完成済から短い延長)
+4. 🚧 Lem 7.3 (statement + 証明 skeleton 配置, 本体は別 commit) → Thm 7.5 → Thm 7.6
 5. (Ch.5 §5E 5.26 完成後) Thm 7.1
 6. (上記完成後) Thm 7.8 Burnside
 
@@ -106,21 +108,16 @@ kernel nilpotent) を完備化. BG/Peterfalvi 直接被引用は無し (Ch.6 経
 
 着手は Ch.5 §5E (5.26) + 本ファイル §7B (7.6) + §7C (7.7) 完成後. -/
 
-/-! ### Lem 7.3 — GL(2,p) 補題 (statement 保留)
+/-! ### Lem 7.3 — GL(2,p) 補題
 
-**Isaacs Lem 7.3** (mmd L3739):
+**Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2,p)` p-subgroup,
+`P ≤ N(L)`, `(|L|, p) = 1`, `L` の Sylow 2-subgroup abelian ⇒ `P ≤ C_G(L)`.
 
-> `G = GL(2,p)`, `p ≠ 2`, `P ⊆ G` p-subgroup, `P ⊆ N_G(L)`, `(|L|, p) = 1`,
-> `L` の Sylow-2 abelian ⇒ `P ⊆ C_G(L)`.
+**Lean 上の statement と証明 skeleton は Lem 7.4 の後** に配置
+(`gl2_pSubgroup_centralizes_of_normalizes`). 証明は `|L|`-induction + P-invariant
+Sylow (Ch.3 Thm 3.23(a)) + Lem 7.4 (本ファイル) + Lem 4.29 (Ch.4 §4D) を組み合わせる.
 
-**先行 def 依存**:
-- `Mathlib.LinearAlgebra.GeneralLinearGroup` (= `GeneralLinearGroup 2 (ZMod p)`).
-- `Aut(E) ≅ GL(n, ZMod p)` for E elementary abelian (新規, ノート設計判断 (3)).
-
-**proof 戦略**: induction on `|L|` + Sylow + 7.4 (-I unique inv) + Hall-Higman 3.21
-(Ch.3 §3D ✅ 完成済).
-
-着手は Lem 7.4 + Hall-Higman 利用環境整備後. -/
+**Aut(E) ≅ GL(n, ZMod p)** bridge は Thm 7.5 で初めて必要となる (ノート設計判断 (3)). -/
 
 -- `Neg (SpecialLinearGroup (Fin 2) F)` のための `Fact (Even 2)`.
 private instance instFactEvenFinTwo : Fact (Even (Fintype.card (Fin 2))) := ⟨by decide⟩
@@ -243,6 +240,50 @@ theorem sl2_unique_involution
       ext i j
       fin_cases i <;> fin_cases j <;> simp [Matrix.neg_apply]
     exact Subtype.ext (hM_eq.trans hneg_val.symm)
+
+/-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
+
+**Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
+`L ≤ GL(2, ZMod p)`, `P ≤ N(L)`, `(|L|, p) = 1`, `L` の Sylow 2-subgroup abelian
+⇒ `P ≤ C_G(L)`.
+
+**証明戦略** (Isaacs p.204):
+1. `|L|`-strong induction. IH: 任意の (より小さい) P-invariant subgroup `M ⊊ L` で
+   `P ≤ C(M)` が成立.
+2. q | `|L : C_L(P)|` を取り, P-invariant Sylow q-subgroup `Q ≤ L` を
+   `exists_aInvariant_sylow` (Ch.3 Thm 3.23(a)) で取得. IH より `Q = L`, 即ち L は q-群.
+3. `[L,P] < L` なら IH + Lem 4.29 (coprime ⇒ `[L,P,P] = [L,P]`) で `[L,P] = 1`, 終了.
+   よって `[L,P] = L` を仮定可. このとき `L ⊆ G' ⊆ SL(2,p)` (det homom が abelian quotient).
+4. `q = 2`: L abelian (仮定) + Lem 7.4 (L 内 unique involution = -I) ⇒ L cyclic 2-群.
+   Aut(cyclic 2-群) は 2-群で p-群 P の作用は trivial.
+5. `q` odd: `|L|` は q-冪 で `|SL(2,p)| = p(p-1)(p+1)` を割る. `q ≠ p` で `q | (p-1)(p+1)`.
+   `q` odd かつ `gcd(p-1, p+1) ∣ 2` より `q | (p-1)` または `q | (p+1)` の片方のみ.
+   よって `|L| ≤ p+1`. P が L に非自明作用なら orbit が p 以上を持ち `|L| ≥ p+1`,
+   即ち `|L| = p+1` で `|L|` even. 矛盾 (q odd).
+
+**現状**: statement + 証明戦略 docstring のみ. 各 step の実装 (P-invariant Sylow 取得,
+Lem 4.29 適用, q=2 / q-odd 場合分け) は別 commit で fill in. -/
+
+/-- **Isaacs Lemma 7.3** ⭐ (GL(2,p) 補題). `p ≠ 2` prime, `P ≤ GL(2, ZMod p)`
+p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L` の
+Sylow 2-subgroup が abelian ⇒ P は L を centralize.
+
+**proof skeleton** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction.
+各 step (P-invariant Sylow, Lem 4.29 適用, q=2 / q-odd) は別 commit で fill in. -/
+theorem gl2_pSubgroup_centralizes_of_normalizes
+    {p : ℕ} [Fact p.Prime] (_hp2 : p ≠ 2)
+    {P L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
+    (_hPp : IsPGroup p P) (_hPnorm : P ≤ Subgroup.normalizer (L : Set _))
+    (_hLcop : ¬ p ∣ Nat.card L)
+    (_hLSyl2abelian : ∀ Q : Sylow 2 ↥L,
+      ∀ x y : ↥(Q : Subgroup ↥L), x * y = y * x) :
+    P ≤ Subgroup.centralizer (L : Set _) := by
+  -- TODO (次回以降の commit):
+  -- 1. P-invariant Sylow q-subgroup の取得 (Ch.3 `exists_aInvariant_sylow`).
+  -- 2. `[L,P] = L` への reduction (Lem 4.29 in Γ form).
+  -- 3. q=2 case (Lem 7.4 + cyclic 2-group Aut).
+  -- 4. q odd case (`|SL(2,p)|` 因子化 + orbit counting).
+  sorry
 
 /-! ### Thm 7.5 — normal-P theorem (statement 保留)
 

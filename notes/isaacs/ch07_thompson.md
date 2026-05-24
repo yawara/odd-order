@@ -205,6 +205,17 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 7.6 → 7.8 (Burnside の Thompson factorization は 7.6 を maximal subgroup M に適用)
 - 6.23 (Ch.6) → 7.1 (Ch.7) → 6.24 (Ch.6 完備化) ← **Ch.6/Ch.7 間の唯一の双方向依存**
 
+## 着手状況 (2026-05-24)
+
+- ✅ shared module `OddOrder/GroupTheory/ElementaryAbelian.lean` (`IsElementaryAbelian`).
+- ✅ shared module `OddOrder/GroupTheory/ThompsonSubgroup.lean` (`Subgroup.thompsonJ` def + Thm 7.2).
+- ✅ Thm 7.2 in [`Main.lean`](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean) (shared module wrapper).
+- ✅ **Lem 7.4** SL(2,q) odd の唯一 involution = -I (sorry-free, ~100 行).
+- ✅ **Lem 7.7** N/C 系 p'-quotient (`centralizer_map_of_coprime_kernel`, sorry-free, ~80 行).
+- 🚧 **Lem 7.3** statement + 証明 skeleton 配置済 (`gl2_pSubgroup_centralizes_of_normalizes`,
+  proof body は `sorry`). 別 commit で `|L|`-induction body を fill in.
+- Thm 7.1, 7.5, 7.6, 7.8: docstring + statement 保留.
+
 ## 着手順 (提案)
 
 FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
