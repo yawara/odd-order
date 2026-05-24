@@ -62,11 +62,13 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 - Cor 1.19(b) → mathlib `IsZGroup.coprime_commutator_index` 直接ヒット
 - 内部 hub は **Prop 1.5(d)** (6 §1 proofs)
 
-## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1C 部分着手
+## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1B §1C §1G 部分着手
 
-- **Skeleton** + **§1F docstring mapping** + **11 結果 全 sorry-free**:
+- **Skeleton** + **§1B/§1F docstring mapping** + **13 結果 全 sorry-free**:
   - **Lem 1.1 (部分)** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free (Z(F(G)) 部分は Ch.4 待ち)
   - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
+  - **Thm 1.8** `burnside_operator` ⭐ sorry-free (Isaacs Cor 3.29 `aFixed_quotient_frattini` 経由)
+  - **Lem 1.9 (2-step)** `coprime_actsTrivially_of_normal_and_quotient` ⭐ sorry-free (Isaacs Cor 3.28 経由)
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
   - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` ⭐ **sorry-free 完成**
   - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
