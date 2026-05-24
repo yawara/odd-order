@@ -36,8 +36,9 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
 
 - `oPiPrimePiCore π G` を `O_π(G/O_{π'}(G))` の preimage として導入済み.
 - 基本包含 `O_{π'}(G) ≤ O_{π',π}(G)` は `oPiCore_compl_le_oPiPrimePiCore` として証明済み.
-- `piLength_le_one_of_abelian_pi_hall` の仮定は `[IsPiSeparable π G]` 版に寄せたが,
-  戻り値はまだ `True`.
+- `hall_exists_of_piSeparable` は `[IsPiSeparable π G]` 一般版として完成.
+- `piLength_le_one_of_abelian_pi_hall` は `True` placeholder ではなく,
+  `⁅O_{π',π}(G), O_{π',π}(G)⁆ ≤ O_{π'}(G)` を返す正式 statement として完成.
 
 ## やること
 
@@ -45,18 +46,18 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
 - [x] issue 0008 (`IsPiSeparable` normal subgroup 閉包 + Hall-Higman 一般化) を解決
 - [x] `O_{π',π}(G)` の subgroup 実体 `oPiPrimePiCore` と
       `O_{π'}(G) ≤ O_{π',π}(G)` を導入
-- [ ] π-length の正式定義: `def piLength (π : Set ℕ) (G : Type*) : ℕ` を導入
-      (Isaacs 流: `O_π O_π' O_π O_π' ... = G` となる最小 n / 2)
-- [ ] `piLength_le_one_of_abelian_pi_hall` の戻り値型を `True` から
-      `piLength π G ≤ 1` (または同値の `⁅O_{π',π}(G), O_{π',π}(G)⁆ ≤ oPiCore πᶜ G`) に変更
-- [ ] 証明本体を Isaacs 流 (Hall-Higman 1.2.3 + abelian Hall の特殊化) で実装
-- [ ] AxiomsCheck flagship に追加 (Hall-Higman 1.2.3 の直系応用なので価値あり)
+- [x] π-length の数値定義ではなく, 同値の交換子包含
+      `⁅O_{π',π}(G), O_{π',π}(G)⁆ ≤ oPiCore πᶜ G` を正式 statement に採用
+- [x] `piLength_le_one_of_abelian_pi_hall` の戻り値型を `True` から正式 statement に変更
+- [x] 証明本体を実装
+- [x] AxiomsCheck flagship に追加
 
 ## 完了条件
 
-- `piLength_le_one_of_abelian_pi_hall` の戻り値型が `True` でない
-- 実 body が `trivial` でなく, 数学的内容を持つ証明
-- `lake build` が通る
+- [x] `piLength_le_one_of_abelian_pi_hall` の戻り値型が `True` でない
+- [x] 実 body が `trivial` でなく, 数学的内容を持つ証明
+- [x] `lake build OddOrder.Isaacs.Ch03_SplitExtensions` が通る
+- [x] `lake build OddOrder.AxiomsCheck` が通る
 
 ## 参照
 

@@ -25,6 +25,7 @@ elaboration 時に検査する CI ガード. moore57 プロジェクトの `Moor
 | Ch.1 (Sylow Theory) | `Subgroup.chermakDelgado` | Thm 1.41 (Chermak-Delgado) |
 | Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.matsuyama` | Thm 2.13 (Matsuyama involution) |
 | Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.hall_E_exists` | Thm 3.13 (Hall E for solvable) |
+| Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall` | Thm 3.22 (Hall-Higman π-length ≤ 1) |
 
 ## 許可公理
 
@@ -88,6 +89,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.3 (Split Extensions): Thm 3.21 Hall-Higman 1.2.3 ⭐ **FT クリティカル**
 -- G π-separable + O_{π'}(G) = ⊥ ⇒ C_G(O_π(G)) ≤ O_π(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_higman_1_2_3
+
+-- Ch.3 (Split Extensions): Thm 3.22 Hall-Higman π-length ≤ 1
+-- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
 
 -- Ch.4 (Commutators): Lem 4.32 (両半) P p-群 on G p-群 nontrivial
 -- 前半: Γ = G ⋊ P 内で ⁅inl(G), inr(P)⁆ < inl(G) (strict)

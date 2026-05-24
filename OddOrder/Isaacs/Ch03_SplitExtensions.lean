@@ -601,6 +601,22 @@ theorem IsHallSubgroup.coprime_index [Finite G] {π : Set ℕ} {H : Subgroup G}
     Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd.2, hI_pos⟩
   exact h.2 p hp_idx_pf (h.1 p hp_H_pf)
 
+/-- The image of a π-Hall subgroup in a quotient is again π-Hall. -/
+theorem IsHallSubgroup.map_quotient [Finite G] {π : Set ℕ} {N : Subgroup G}
+    [N.Normal] {H : Subgroup G} (hH : IsHallSubgroup π H) :
+    IsHallSubgroup π (H.map (QuotientGroup.mk' N)) := by
+  refine ⟨?_, ?_⟩
+  · intro p hp
+    apply hH.1
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+  · intro p hp
+    apply hH.2
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1,
+      hp.2.1.trans (H.index_map_dvd (QuotientGroup.mk'_surjective N)),
+      Subgroup.index_ne_zero_of_finite⟩
+
 /-- `⊤` は π-Hall ⇔ `G` が π-group (`|G|` の全素因子が π に属す). -/
 theorem IsHallSubgroup.top_iff (π : Set ℕ) :
     IsHallSubgroup π (⊤ : Subgroup G) ↔ ∀ p ∈ (Nat.card G).primeFactors, p ∈ π := by
@@ -1228,6 +1244,25 @@ def IsPiGroup (π : Set ℕ) (G : Type*) [Group G] : Prop :=
 def Subgroup.IsPiGroup (π : Set ℕ) (H : Subgroup G) : Prop :=
   ∀ p ∈ (Nat.card H).primeFactors, p ∈ π
 
+/-- If `H` is a π-Hall subgroup, every π-subgroup has cardinality dividing `|H|`. -/
+theorem IsHallSubgroup.card_dvd_of_isPiGroup [Finite G] {π : Set ℕ} {H S : Subgroup G}
+    (hH : IsHallSubgroup π H) (hS : Subgroup.IsPiGroup π S) :
+    Nat.card S ∣ Nat.card H := by
+  have hS_dvd_G : Nat.card S ∣ Nat.card G := Subgroup.card_subgroup_dvd_card S
+  have hcop : Nat.Coprime (Nat.card S) H.index := by
+    rw [Nat.coprime_iff_gcd_eq_one]
+    by_contra hne
+    obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
+    rw [Nat.dvd_gcd_iff] at hq_dvd
+    have hq_S_pf : q ∈ (Nat.card S).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.1, Nat.card_pos.ne'⟩
+    have hq_idx_pf : q ∈ H.index.primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.2, Subgroup.index_ne_zero_of_finite⟩
+    exact hH.2 q hq_idx_pf (hS q hq_S_pf)
+  have hG_eq : Nat.card G = Nat.card H * H.index := (Subgroup.card_mul_index H).symm
+  rw [hG_eq] at hS_dvd_G
+  exact hcop.dvd_of_dvd_mul_right hS_dvd_G
+
 /-- **π-radical** `O_π(G)`: `G` の正規 π-subgroup の sup (= 最大の正規 π-subgroup).
 
 mathlib 未収載 (各 `opCore p G` の π 版 sup). Hall-Higman 1.2.3 で必須.
@@ -1481,6 +1516,39 @@ theorem Subgroup.IsPiGroup.sup_of_normal {G : Type*} [Group G] [Finite G] {π : 
   rcases Finset.mem_union.mp (hsubset hp) with hpH | hpK
   · exact hH p hpH
   · exact hK p hpK
+
+/-- A normal π-subgroup is contained in every π-Hall subgroup. -/
+theorem Subgroup.IsPiGroup.normal_le_hall {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {N H : Subgroup G} [N.Normal] (hN : Subgroup.IsPiGroup π N)
+    (hH : IsHallSubgroup π H) :
+    N ≤ H := by
+  have hSup_pi : Subgroup.IsPiGroup π (H ⊔ N : Subgroup G) := by
+    intro q hq
+    rw [Nat.mem_primeFactors] at hq
+    obtain ⟨hq_prime, hq_dvd, _⟩ := hq
+    have h_card_eq : Nat.card ↥(H ⊔ N : Subgroup G) * Nat.card ↥(H ⊓ N : Subgroup G)
+        = Nat.card ↥H * Nat.card ↥N := by
+      have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card H N
+      rwa [show (↑H * ↑N : Set G) = ↑(H ⊔ N : Subgroup G) from
+        (Subgroup.mul_normal H N).symm] at h_hk
+    have h_dvd_prod : q ∣ Nat.card ↥H * Nat.card ↥N := by
+      rw [← h_card_eq]
+      exact hq_dvd.mul_right _
+    rcases hq_prime.dvd_mul.mp h_dvd_prod with hH_dvd | hN_dvd
+    · exact hH.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, hH_dvd, Nat.card_pos.ne'⟩)
+    · exact hN q (Nat.mem_primeFactors.mpr ⟨hq_prime, hN_dvd, Nat.card_pos.ne'⟩)
+  have h_card_dvd : Nat.card ↥(H ⊔ N : Subgroup G) ∣ Nat.card ↥H :=
+    hH.card_dvd_of_isPiGroup hSup_pi
+  have hH_le_sup : H ≤ H ⊔ N := le_sup_left
+  have h_card_ge : Nat.card ↥H ≤ Nat.card ↥(H ⊔ N : Subgroup G) :=
+    Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hH_le_sup)
+  have h_card_eq : Nat.card ↥(H ⊔ N : Subgroup G) = Nat.card ↥H :=
+    Nat.le_antisymm (Nat.le_of_dvd Nat.card_pos h_card_dvd) h_card_ge
+  have h_sup_eq : (H ⊔ N : Subgroup G) = H :=
+    (Subgroup.eq_of_le_of_card_ge hH_le_sup h_card_eq.le).symm
+  intro x hx
+  have hx_sup : x ∈ (H ⊔ N : Subgroup G) := Subgroup.mem_sup_right hx
+  rwa [h_sup_eq] at hx_sup
 
 /-- **`oPiCore.isPiGroup`** ⭐ (Hall-Higman 3.21 critical bottleneck):
 有限 `G` で `oPiCore π G` は π-group.
@@ -2108,13 +2176,206 @@ theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable
     exact hsup (by rw [hπ, hπ', bot_sup_eq])
   · exact Or.inl hπ
 
-/-- **Isaacs Thm 3.20**: 有限 π-separable ⇒ π-Hall 部分群存在.
+/-- A minimal normal subgroup of a finite π-separable group is either a π-group
+or a π'-group. -/
+private theorem minimal_normal_isPiGroup_or_isPiGroup_compl_of_isPiSeparable
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [IsPiSeparable π G]
+    {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+    Subgroup.IsPiGroup π M ∨ Subgroup.IsPiGroup {p | p ∉ π} M := by
+  haveI hM_normal : M.Normal := hM.1
+  haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM.2.1
+  haveI hM_piSep : IsPiSeparable π ↥M := normalSubgroup_isPiSeparable π G M
+  let liftCore (ρ : Set ℕ) (hcore : oPiCore ρ ↥M ≠ ⊥) :
+      Subgroup.IsPiGroup ρ M := by
+    have hmap_ne_bot : (oPiCore ρ ↥M).map M.subtype ≠ ⊥ := by
+      intro hmap
+      exact hcore ((Subgroup.map_eq_bot_iff_of_injective
+        (H := oPiCore ρ ↥M) M.subtype_injective).mp hmap)
+    haveI hmap_normal : ((oPiCore ρ ↥M).map M.subtype).Normal := inferInstance
+    have hmap_le_M : (oPiCore ρ ↥M).map M.subtype ≤ M := by
+      simpa [M.range_subtype] using (oPiCore ρ ↥M).map_le_range M.subtype
+    have hmap_eq_M : (oPiCore ρ ↥M).map M.subtype = M := by
+      rcases hM.2.2 _ hmap_normal hmap_le_M with hbot | htop
+      · exact absurd hbot hmap_ne_bot
+      · exact htop
+    have hcore_top : oPiCore ρ ↥M = ⊤ := by
+      apply (Subgroup.map_subtype_inj (H := M)).mp
+      rw [hmap_eq_M]
+      rw [← MonoidHom.range_eq_map, M.range_subtype]
+    intro p hp
+    have hpiTop : Subgroup.IsPiGroup ρ (⊤ : Subgroup ↥M) := by
+      rw [← hcore_top]
+      exact oPiCore.isPiGroup ρ
+    rw [← Subgroup.card_top (G := ↥M)] at hp
+    exact hpiTop p hp
+  rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable
+      (G := ↥M) π with hπ | hπ'
+  · exact Or.inl (liftCore π hπ)
+  · exact Or.inr (liftCore {p | p ∉ π} hπ')
 
-現状: `[IsSolvable G]` 経由の Hall-E 帰着. π-separable 一般版の proof
-(`piFittingSeries` induction で各層に Hall-E を適用) は別 issue で完成予定. -/
-theorem hall_exists_of_piSeparable [Finite G] [IsSolvable G] (π : Set ℕ) :
+/-- Strong-induction core for Hall existence in finite π-separable groups. -/
+private theorem hall_exists_of_piSeparable_aux (π : Set ℕ) : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G], IsPiSeparable π G → Nat.card G ≤ n →
+      ∃ H : Subgroup G, IsHallSubgroup π H := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ hPiSep hcard
+    by_cases hsmall : Nat.card G ≤ n
+    · exact ih G hPiSep hsmall
+    by_cases hG_one : Nat.card G = 1
+    · exact ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one⟩
+    haveI hG_nontrivial : Nontrivial G :=
+      Finite.one_lt_card_iff_nontrivial.mp
+        (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
+    obtain ⟨M, hM, _⟩ :=
+      OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+    haveI hMnormal : M.Normal := hM.1
+    have hM_ne_bot : M ≠ ⊥ := hM.2.1
+    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
+    have hquot_card : Nat.card (G ⧸ M) ≤ n := by
+      have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card ↥M :=
+        Subgroup.card_eq_card_quotient_mul_card_subgroup M
+      have h1 : Nat.card (G ⧸ M) * 2 ≤ Nat.card G := by
+        rw [key]
+        exact Nat.mul_le_mul_left _ hM_card_ge_two
+      omega
+    haveI hQuot_piSep : IsPiSeparable π (G ⧸ M) :=
+      quotient_isPiSeparable π G M
+    obtain ⟨Hbar, hHbar⟩ := ih (G ⧸ M) hQuot_piSep hquot_card
+    rcases minimal_normal_isPiGroup_or_isPiGroup_compl_of_isPiSeparable π hM with
+      hM_pi | hM_pi'
+    · -- If M is a π-group, the pullback of a π-Hall of G/M is π-Hall in G.
+      set H : Subgroup G := Subgroup.comap (QuotientGroup.mk' M) Hbar with hH_def
+      have hH_index : H.index = Hbar.index :=
+        Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+      have hHbar_idx_pos : 0 < Hbar.index :=
+        Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+      have hH_card_eq : Nat.card H = Nat.card Hbar * Nat.card ↥M := by
+        have eq1 : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+        have eq2 : Nat.card Hbar * Hbar.index = Nat.card (G ⧸ M) :=
+          Subgroup.card_mul_index Hbar
+        have eq3 : Nat.card (G ⧸ M) * Nat.card ↥M = Nat.card G :=
+          (Subgroup.card_eq_card_quotient_mul_card_subgroup M).symm
+        have h_eq : Nat.card H * Hbar.index = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by
+          calc Nat.card H * Hbar.index
+              = Nat.card H * H.index := by rw [hH_index]
+            _ = Nat.card G := eq1
+            _ = Nat.card (G ⧸ M) * Nat.card ↥M := eq3.symm
+            _ = (Nat.card Hbar * Hbar.index) * Nat.card ↥M := by rw [eq2]
+            _ = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by ring
+        exact Nat.mul_right_cancel hHbar_idx_pos h_eq
+      refine ⟨H, ?_, ?_⟩
+      · intro q hq_pf
+        rw [hH_card_eq] at hq_pf
+        rw [Nat.mem_primeFactors] at hq_pf
+        obtain ⟨hq_prime, hq_dvd, _⟩ := hq_pf
+        rcases hq_prime.dvd_mul.mp hq_dvd with h_in_Hbar | h_in_M
+        · exact hHbar.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_Hbar, Nat.card_pos.ne'⟩)
+        · exact hM_pi q (Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩)
+      · rw [hH_index]
+        exact hHbar.2
+    · -- If M is a π'-group, split the pullback by Schur-Zassenhaus.
+      set H : Subgroup G := Subgroup.comap (QuotientGroup.mk' M) Hbar with hH_def
+      have hH_index : H.index = Hbar.index :=
+        Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+      have hM_le_H : M ≤ H := QuotientGroup.le_comap_mk' M Hbar
+      have h_card_MH : Nat.card ↥(M.subgroupOf H) = Nat.card ↥M :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM_le_H).toEquiv
+      have h_coprime_M_Hbar : Nat.Coprime (Nat.card ↥M) (Nat.card Hbar) := by
+        rw [Nat.coprime_iff_gcd_eq_one]
+        by_contra hne
+        obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
+        rw [Nat.dvd_gcd_iff] at hq_dvd
+        have hq_M_pf : q ∈ (Nat.card ↥M).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.1, Nat.card_pos.ne'⟩
+        have hq_Hbar_pf : q ∈ (Nat.card Hbar).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.2, Nat.card_pos.ne'⟩
+        exact hM_pi' q hq_M_pf (hHbar.1 q hq_Hbar_pf)
+      have h_idx_MH : (M.subgroupOf H).index = Nat.card Hbar := by
+        have hMH_lag : Nat.card ↥(M.subgroupOf H) * (M.subgroupOf H).index = Nat.card ↥H :=
+          Subgroup.card_mul_index (M.subgroupOf H)
+        have hH_card_eq : Nat.card H = Nat.card Hbar * Nat.card ↥M := by
+          have eq1 : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+          have eq2 : Nat.card Hbar * Hbar.index = Nat.card (G ⧸ M) :=
+            Subgroup.card_mul_index Hbar
+          have eq3 : Nat.card (G ⧸ M) * Nat.card ↥M = Nat.card G :=
+            (Subgroup.card_eq_card_quotient_mul_card_subgroup M).symm
+          have hHbar_idx_pos : 0 < Hbar.index :=
+            Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+          have h_eq : Nat.card H * Hbar.index =
+              (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by
+            calc Nat.card H * Hbar.index
+                = Nat.card H * H.index := by rw [hH_index]
+              _ = Nat.card G := eq1
+              _ = Nat.card (G ⧸ M) * Nat.card ↥M := eq3.symm
+              _ = (Nat.card Hbar * Hbar.index) * Nat.card ↥M := by rw [eq2]
+              _ = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by ring
+          exact Nat.mul_right_cancel hHbar_idx_pos h_eq
+        rw [h_card_MH, hH_card_eq] at hMH_lag
+        have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+        have : Nat.card ↥M * (M.subgroupOf H).index = Nat.card ↥M * Nat.card Hbar := by
+          rw [hMH_lag, mul_comm (Nat.card Hbar)]
+        exact Nat.mul_left_cancel hM_pos this
+      have h_coprime_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
+        rw [h_card_MH, h_idx_MH]
+        exact h_coprime_M_Hbar
+      haveI : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+      obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_MH
+      have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
+      have hK_card : Nat.card ↥K = Nat.card Hbar := by
+        have := hK.card_mul
+        have hH_card_eq : Nat.card H = Nat.card Hbar * Nat.card ↥M := by
+          have eq1 : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+          have eq2 : Nat.card Hbar * Hbar.index = Nat.card (G ⧸ M) :=
+            Subgroup.card_mul_index Hbar
+          have eq3 : Nat.card (G ⧸ M) * Nat.card ↥M = Nat.card G :=
+            (Subgroup.card_eq_card_quotient_mul_card_subgroup M).symm
+          have hHbar_idx_pos : 0 < Hbar.index :=
+            Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+          have h_eq : Nat.card H * Hbar.index =
+              (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by
+            calc Nat.card H * Hbar.index
+                = Nat.card H * H.index := by rw [hH_index]
+              _ = Nat.card G := eq1
+              _ = Nat.card (G ⧸ M) * Nat.card ↥M := eq3.symm
+              _ = (Nat.card Hbar * Hbar.index) * Nat.card ↥M := by rw [eq2]
+              _ = (Nat.card Hbar * Nat.card ↥M) * Hbar.index := by ring
+          exact Nat.mul_right_cancel hHbar_idx_pos h_eq
+        rw [h_card_MH, hH_card_eq] at this
+        have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+        have h_eq : Nat.card ↥M * Nat.card ↥K = Nat.card ↥M * Nat.card Hbar := by
+          rw [this, mul_comm (Nat.card Hbar)]
+        exact Nat.mul_left_cancel hM_pos h_eq
+      have hKlift_card : Nat.card ↥(K.map H.subtype) = Nat.card Hbar := by
+        rw [Subgroup.card_subtype, hK_card]
+      have hKlift_index : (K.map H.subtype).index = Nat.card ↥M * Hbar.index := by
+        rw [Subgroup.index_map, Subgroup.ker_subtype, sup_bot_eq, hK_index, h_card_MH,
+            Subgroup.range_subtype, hH_index]
+      refine ⟨K.map H.subtype, ?_, ?_⟩
+      · intro q hq_pf
+        rw [hKlift_card] at hq_pf
+        exact hHbar.1 q hq_pf
+      · intro q hq_pf hq_pi
+        rw [hKlift_index] at hq_pf
+        rw [Nat.mem_primeFactors] at hq_pf
+        obtain ⟨hq_prime, hq_dvd, _⟩ := hq_pf
+        rcases hq_prime.dvd_mul.mp hq_dvd with h_in_M | h_in_HbarIdx
+        · have hq_in_M_pf : q ∈ (Nat.card ↥M).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩
+          exact hM_pi' q hq_in_M_pf hq_pi
+        · have hq_in_HbarIdx_pf : q ∈ Hbar.index.primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_HbarIdx, Subgroup.index_ne_zero_of_finite⟩
+          exact hHbar.2 q hq_in_HbarIdx_pf hq_pi
+
+/-- **Isaacs Thm 3.20**: finite π-separable groups have π-Hall subgroups. -/
+theorem hall_exists_of_piSeparable [Finite G] (π : Set ℕ) [IsPiSeparable π G] :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
-  hall_E_exists π
+  hall_exists_of_piSeparable_aux π (Nat.card G) G ‹IsPiSeparable π G› le_rfl
 
 /-- **`C/B` nontrivial when `B < C`**: `B < C` strict + `B ⊴ G` ⇒ `C.map (QuotientGroup.mk' B) ≠ ⊥`. -/
 theorem Subgroup.map_quotientGroup_mk_ne_bot_of_lt {G : Type*} [Group G]
@@ -2451,16 +2712,46 @@ theorem oPiCore_compl_le_oPiPrimePiCore (π : Set ℕ) (G : Type*) [Group G] :
       from (QuotientGroup.eq_one_iff g).mpr hg]
   exact (oPiCore π (G ⧸ oPiCore {p | p ∉ π} G)).one_mem
 
+open scoped commutatorElement in
 /-- **Isaacs Thm 3.22 (片向き; π-length ≤ 1 の Hall-Higman 系)**:
 `G` π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`.
 
 `O_{π',π}(G)` (= `π` を `O_{π'}(G)` 上に乗せた π-層) の交換子部分群が `O_{π'}(G)` に
-含まれる, つまり π-length ≤ 1 と同値. 完全 π-length 定義は別ファイル. 本リポでは
-statement を保留 (型レベル定式化が大きいため): -/
+含まれる, つまり π-length ≤ 1 と同値. -/
 theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSeparable π G]
-    (_hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H, a * b = b * a) :
-    True := by  -- TODO: π-length の正式定義後に書き直す (issue 0004)
-  trivial
+    (hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H,
+      a * b = b * a) :
+    ⁅oPiPrimePiCore π G, oPiPrimePiCore π G⁆ ≤ oPiCore {p | p ∉ π} G := by
+  let N : Subgroup G := oPiCore {p | p ∉ π} G
+  let q : G →* G ⧸ N := QuotientGroup.mk' N
+  let O : Subgroup (G ⧸ N) := oPiCore π (G ⧸ N)
+  let K : Subgroup G := oPiPrimePiCore π G
+  have hK_def : K = O.comap q := by
+    dsimp [K, O, q, N, oPiPrimePiCore]
+  obtain ⟨H, hH⟩ := hall_exists_of_piSeparable π (G := G)
+  let Hbar : Subgroup (G ⧸ N) := H.map q
+  have hHbar : IsHallSubgroup π Hbar := hH.map_quotient
+  have hO_le_Hbar : O ≤ Hbar :=
+    Subgroup.IsPiGroup.normal_le_hall (oPiCore.isPiGroup π) hHbar
+  have hHbar_ab : ∀ a ∈ Hbar, ∀ b ∈ Hbar, a * b = b * a := by
+    intro a ha b hb
+    rcases ha with ⟨a₀, ha₀, rfl⟩
+    rcases hb with ⟨b₀, hb₀, rfl⟩
+    simpa using congrArg q (hAb H hH a₀ ha₀ b₀ hb₀)
+  have hO_comm : ⁅O, O⁆ = ⊥ := by
+    rw [eq_bot_iff, Subgroup.commutator_le]
+    intro a ha b hb
+    have hc : ⁅a, b⁆ = 1 :=
+      commutatorElement_eq_one_iff_mul_comm.mpr
+        (hHbar_ab a (hO_le_Hbar ha) b (hO_le_Hbar hb))
+    simpa [Subgroup.mem_bot] using hc
+  have hK_map : K.map q = O := by
+    rw [hK_def]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) O
+  have hmap_comm : (⁅K, K⁆).map q = ⊥ := by
+    rw [Subgroup.map_commutator, hK_map, hO_comm]
+  have hle_ker : ⁅K, K⁆ ≤ q.ker := (Subgroup.map_eq_bot_iff ⁅K, K⁆).mp hmap_comm
+  simpa [K, q, N, QuotientGroup.ker_mk'] using hle_ker
 
 end -- 3D
 

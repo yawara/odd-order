@@ -4,7 +4,7 @@
 形式化先: [`OddOrder/Isaacs/Ch03_SplitExtensions.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 1322-2123。
 
-## 進捗 (2026-05-22 更新)
+## 進捗 (2026-05-25 更新)
 
 §3A ウォームアップ実装済 (Thm 3.1, 3.2 を mathlib `SemidirectProduct` 経由で wrap):
 
@@ -26,10 +26,10 @@
 | §3C Thm 3.15 (Hall converse) | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` に owner-chapter 配置. Burnside `p^a q^b` 経由のため Ch.7 完成後に実装. |
 | §3C Thm 3.17 (3 subgroups solvability) | **placeholder 移動** (2026-05-22) | 同上 (`Ch07_ThompsonSubgroup/ForwardFromCh03.lean`). 単純群場合分けで Burnside 必要. |
 | §3D **IsPiSeparable 正式定義** | ✅ (2026-05-24, issue 0005) | `class IsPiSeparable π G` を `∃ n, piFittingSeries π G n = ⊤` で定義 (mathlib `IsSolvable` パターン準拠). `piFittingSeries π G n` は `⊥` から始めて各層で `O_π ⊔ O_π'` の pullback を取る再帰列, subtype `{S // S.Normal}` で normality を内蔵. `instance isPiSeparable_of_solvable [Finite] [IsSolvable]` も AxiomsCheck 標準 3 公理 (unconditional). 旧 placeholder `def IsPiSeparable := IsSolvable G` 削除. |
-| §3D Thm 3.20 (π-separable ⇒ Hall) | ⚠ 部分実装 | `hall_exists_of_piSeparable [Finite G] [IsSolvable G]` で `hall_E_exists` に帰着. π-separable 一般版 (`[IsPiSeparable π G]` で `piFittingSeries` induction) は別 issue. |
+| §3D Thm 3.20 (π-separable ⇒ Hall) | ✅ (2026-05-25, issue 0004) | `hall_exists_of_piSeparable [Finite G] [IsPiSeparable π G]` を `piFittingSeries` induction で完全証明. quotient への Hall 移行 `IsHallSubgroup.map_quotient`, π-subgroup の Hall への包含 `Subgroup.IsPiGroup.normal_le_hall` も追加. |
 | §3D **IsPiGroup / oPiCore 定義** | ✅ (2026-05-22) | `IsPiGroup`, `Subgroup.IsPiGroup`, `oPiCore π G`, `oPiCore.normal` instance |
 | §3D Hall-Higman 1.2.3 (3.21) | ✅⭐⭐ (2026-05-23 ralph-loop; 2026-05-24 issue 0005 で signature update) | `hall_higman_1_2_3 [Finite G] [IsSolvable G] (hπ' : ...)` — G solvable + `oPiCore π' G = ⊥` ⇒ `centralizer(oPiCore π G) ≤ oPiCore π G`. AxiomsCheck flagship 入り (3 標準公理のみで unconditional). 下流引用: Ch.4 4.33, Ch.7 7.5/7.6. **π-separable 一般版は別 issue**. |
-| §3D Thm 3.22 (π-length ≤ 1) | ⚠ fake placeholder | `piLength_le_one_of_abelian_pi_hall` は `:= by trivial` で `True` を返すだけ. π-length の正式定義 + 正式 statement への書き換えが必要. 該当 issue: 0004 (Thm 3.22 fake placeholder 解消). |
+| §3D Thm 3.22 (π-length ≤ 1) | ✅ (2026-05-25, issue 0004) | `piLength_le_one_of_abelian_pi_hall` を `True` placeholder から正式な同値 statement `⁅oPiPrimePiCore π G, oPiPrimePiCore π G⁆ ≤ oPiCore {p \| p ∉ π} G` に置換し完全証明. 証明は π-separable Hall 存在 → quotient Hall → `O_π(G/O_{π'}(G))` が abelian Hall 内に入る、という経路. AxiomsCheck flagship 入り. |
 | §3E `IsAInvariant` 定義 | ✅ (2026-05-22) | `IsAInvariant`, `.top`, `.bot`, `.inf`, `.sup` (Ch.3 内に残置, definition のみ) |
 | §3E IsAInvariant suite 拡張 | ✅ (2026-05-23 ralph-loop, ~24 lemmas) | `.{smul_mem, inv_smul_mem, iSup, iInf, of_characteristic, derivedSeries, lowerCentralSeries, center, fittingSubgroup, frattini, commutator (binary), commutator_self, normalizer, centralizer, normalCore, fixedPointsOfMulAut, restrict + restrict_apply_val, subgroupOf, closure_of_invariant_set}` 全部 sorry-free. 下流 Glauberman 3.24 + Ch.4 §4C [G,A] 機構の前哨基地. |
 | §3E Thm 3.23 (a/b) + Lemma 3.24 | **placeholder 移動** (2026-05-22) | `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` に owner-chapter 配置. Ch.4 §4C-§4D coprime action machinery 完成後に実装 (~8-12 週). |
