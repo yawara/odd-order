@@ -72,6 +72,17 @@
   `commutator_le_sylow_of_le_normal_pSubgroup` を追加した. 次の未解決点は
   `C = C_G(W) ∩ C_G(V/W)` が char p で p-subgroup になることを示し、
   `commutator_le_sylow_of_le_normal_pSubgroup C ...` へ渡すこと.
+- **2026-05-26**: 上の未解決点を解消. `g ∈ C_G(W) ∩ C_G(V/W)` なら
+  `n = ρ(g)-1` が `n^2 = 0` となり、char p で `(ρ(g))^p = 1`、faithful
+  なら `g^p=1` となることから
+  `fixedOnSubmoduleAndQuotientSubgroup_isPGroup_of_faithful` を追加した.
+  これにより 2 次元 invariant submodule 版
+  `commutator_le_sylow_of_finrank_two_invariant_submodule` と、q=p で使う
+  fixed-space 版 `commutator_le_sylow_of_nontrivial_normal_p_fixed_space`
+  まで Lean helper で閉じた. 現 frontier は **非自明 normal p-subgroup `K`
+  の構成**: `subgroup_commutative_of_nontrivial_normal_p_fixed_space` で Sylow
+  可換性、`commutator_le_sylow_of_nontrivial_normal_p_fixed_space` で `G' ≤ P`
+  を得る.
 
 ## TL;DR
 

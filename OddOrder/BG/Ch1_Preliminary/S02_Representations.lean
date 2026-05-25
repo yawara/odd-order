@@ -883,6 +883,75 @@ private theorem mem_fixedOnSubmoduleAndQuotientSubgroup
       (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W) :=
   Iff.rfl
 
+/-- If `g` acts trivially on `W` and on `V/W`, then `ρ g - 1` squares to zero.
+
+This is the unipotent calculation behind BG Thm 2.6(b), q = p. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_sub_pow_two_eq_zero
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    {g : G} (hg : g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ) :
+    (((ρ g : Module.End F V) - 1) ^ 2 : Module.End F V) = 0 := by
+  rw [pow_two]
+  ext v
+  rw [Module.End.mul_apply]
+  change ρ g (ρ g v - v) - (ρ g v - v) = 0
+  have hmem := (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hg).2 v
+  have hfix := (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hg).1 (ρ g v - v) hmem
+  rw [hfix, sub_self]
+
+/-- In characteristic `p`, every element of `C_G(W) ∩ C_G(V/W)` acts with
+p-th power identity under the representation. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_rep_pow_prime_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Nontrivial V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    {g : G} (hg : g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ) :
+    (ρ g : Module.End F V) ^ p = 1 := by
+  haveI : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
+  have hsq :
+      (((ρ g : Module.End F V) - 1) ^ 2 : Module.End F V) = 0 :=
+    fixedOnSubmoduleAndQuotientSubgroup_sub_pow_two_eq_zero W ρ hg
+  have hpow_zero :
+      (((ρ g : Module.End F V) - 1) ^ p : Module.End F V) = 0 :=
+    pow_eq_zero_of_le (Nat.Prime.two_le (Fact.out : p.Prime)) hsq
+  have hsub :
+      (((ρ g : Module.End F V) - 1) ^ p : Module.End F V) =
+        (ρ g : Module.End F V) ^ p - 1 := by
+    rw [sub_pow_char_of_commute p (Commute.one_right (ρ g : Module.End F V)), one_pow]
+  exact sub_eq_zero.mp (hsub ▸ hpow_zero)
+
+/-- Faithfulness turns the previous representation-level p-torsion into
+group-level p-torsion. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_pow_prime_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Nontrivial V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    {g : G} (hg : g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ) :
+    g ^ p = 1 := by
+  apply hfaithful
+  simpa [map_pow] using
+    (fixedOnSubmoduleAndQuotientSubgroup_rep_pow_prime_eq_one
+      (p := p) W ρ hg)
+
+/-- In a faithful representation over characteristic `p`, the subgroup acting
+trivially on a submodule and on the quotient is a p-subgroup. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_isPGroup_of_faithful
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Nontrivial V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) :
+    IsPGroup p (fixedOnSubmoduleAndQuotientSubgroup W ρ) := by
+  intro g
+  refine ⟨1, Subtype.ext ?_⟩
+  simpa using
+    (fixedOnSubmoduleAndQuotientSubgroup_pow_prime_eq_one
+      (p := p) W ρ hfaithful g.property)
+
 /-- The `C_G(W) ∩ C_G(V/W)` subgroup is abelian for a faithful representation. -/
 private theorem fixedOnSubmoduleAndQuotientSubgroup_commutative
     {F : Type*} [Field F] {G : Type*} [Group G]
@@ -1106,6 +1175,36 @@ private theorem commutator_le_sylow_of_le_normal_pSubgroup
     commutator G ≤ (P : Subgroup G) :=
   hcomm.trans (normal_pSubgroup_le_sylow N hNnormal hN P)
 
+/-- Two-dimensional fixed-subquotient route to the Sylow containment
+`G' ≤ P` in BG Thm 2.6(b), q = p.
+
+Once a nonzero proper invariant submodule `W` is available, the common
+fixed-on-subquotients subgroup is normal, is a p-subgroup in characteristic
+`p`, and contains `G'`; hence every Sylow p-subgroup contains `G'`. -/
+private theorem commutator_le_sylow_of_finrank_two_invariant_submodule
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdim : Module.finrank F V = 2) (hW_ne_bot : W ≠ ⊥) (hW_ne_top : W ≠ ⊤)
+    (P : Sylow p G) :
+    commutator G ≤ (P : Subgroup G) := by
+  have hVpos : 0 < Module.finrank F V := by
+    rw [hdim]
+    norm_num
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  exact commutator_le_sylow_of_le_normal_pSubgroup
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ)
+    (fixedOnSubmoduleAndQuotientSubgroup_normal_of_finrank_two
+      W ρ hW hdim hW_ne_bot hW_ne_top)
+    (fixedOnSubmoduleAndQuotientSubgroup_isPGroup_of_faithful
+      (p := p) W ρ hfaithful)
+    (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
+      W ρ hW hdim hW_ne_bot hW_ne_top)
+    P
+
 /-- Two-dimensional wrapper for
 `subgroup_commutative_of_rank_one_subquotients`.
 
@@ -1261,6 +1360,39 @@ private theorem
       (Representation.invariants (ρ.comp K.subtype)) ρ)
     (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space
       K ρ hfaithful hK hdim hK_ne_bot)
+
+/-- Nontrivial-normal-p-subgroup route to the Sylow containment `G' ≤ P`.
+
+This is the current q = p endpoint: after constructing a nontrivial normal
+p-subgroup `K`, its fixed space supplies the invariant submodule `W = C_V(K)`,
+and the fixed-subquotient subgroup carries `G'` into every Sylow p-subgroup. -/
+private theorem commutator_le_sylow_of_nontrivial_normal_p_fixed_space
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (K : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K)
+    (hdim : Module.finrank F V = 2) (hK_ne_bot : K ≠ ⊥)
+    (P : Sylow p G) :
+    commutator G ≤ (P : Subgroup G) := by
+  let W : Submodule F V := Representation.invariants (ρ.comp K.subtype)
+  have hVpos : 0 < Module.finrank F V := by
+    rw [hdim]
+    norm_num
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  exact commutator_le_sylow_of_le_normal_pSubgroup
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ)
+    (by
+      simpa [W] using
+        (fixedOnSubmoduleAndQuotientSubgroup_normal_of_nontrivial_normal_p_fixed_space
+          K ρ hfaithful hK hdim hK_ne_bot))
+    (fixedOnSubmoduleAndQuotientSubgroup_isPGroup_of_faithful
+      (p := p) W ρ hfaithful)
+    (by
+      simpa [W] using
+        (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space
+          K ρ hfaithful hK hdim hK_ne_bot))
+    P
 
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
