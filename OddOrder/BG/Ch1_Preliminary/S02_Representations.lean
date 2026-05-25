@@ -533,6 +533,430 @@ private theorem unit_eq_one_of_pow_prime_pow_eq_one
   exact eq_one_of_pow_prime_pow_eq_one (p := p) (u : F) (by
     simpa using congrArg Units.val hu)
 
+/-- A p-group has no nontrivial scalar characters over a characteristic-`p` field. -/
+private theorem monoidHom_units_eq_one_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) : φ = 1 := by
+  ext g
+  obtain ⟨n, hg⟩ := hG g
+  exact congrArg Units.val <|
+    unit_eq_one_of_pow_prime_pow_eq_one (p := p) (φ g) (n := n) (by
+      rw [← map_pow, hg, map_one])
+
+/-- Pointwise form of `monoidHom_units_eq_one_of_isPGroup_charP`. -/
+private theorem monoidHom_units_apply_eq_one_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) (g : G) : φ g = 1 :=
+  congrArg (fun ψ : G →* Fˣ => ψ g)
+    (monoidHom_units_eq_one_of_isPGroup_charP hG φ)
+
+/-- The image of a p-group scalar character is the trivial subgroup in characteristic `p`. -/
+private theorem monoidHom_units_range_eq_bot_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) : φ.range = ⊥ := by
+  rw [monoidHom_units_eq_one_of_isPGroup_charP hG φ]
+  simp
+
+/-- Sylow-subgroup specialization of `monoidHom_units_eq_one_of_isPGroup_charP`. -/
+private theorem sylow_monoidHom_units_eq_one_of_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (P : Sylow p G) {F : Type*} [Field F] [CharP F p]
+    (φ : P →* Fˣ) : φ = 1 :=
+  monoidHom_units_eq_one_of_isPGroup_charP P.isPGroup' φ
+
+/-- Pointwise scalar form of the rank-one endomorphism theorem. -/
+private theorem exists_scalar_apply_of_finrank_eq_one
+    {F : Type*} [Field F] {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (f : Module.End F M) :
+    ∃ c : F, ∀ m : M, f m = c • m := by
+  obtain ⟨c, hc, _⟩ := LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one hdim f
+  refine ⟨c, ?_⟩
+  intro m
+  simpa using congrArg (fun u : Module.End F M => u m) hc
+
+/-- A representation on a one-dimensional module has a scalar monoid character. -/
+private noncomputable def scalarMonoidHomOfFinrankEqOne
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) : G →* F where
+  toFun g := (LinearEquiv.smul_id_of_finrank_eq_one hdim).symm (ρ g)
+  map_one' := by
+    let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+    apply e.injective
+    ext m
+    simp [e]
+  map_mul' g h := by
+    let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+    let cg : F := e.symm (ρ g)
+    let ch : F := e.symm (ρ h)
+    have hg_apply : ∀ m : M, ρ g m = cg • m := by
+      intro m
+      have hg_eq : e cg = ρ g := by simp [cg]
+      simpa [e] using congrArg (fun u : Module.End F M => u m) hg_eq.symm
+    have hh_apply : ∀ m : M, ρ h m = ch • m := by
+      intro m
+      have hh_eq : e ch = ρ h := by simp [ch]
+      simpa [e] using congrArg (fun u : Module.End F M => u m) hh_eq.symm
+    apply e.injective
+    change e (e.symm (ρ (g * h))) = e (cg * ch)
+    rw [e.apply_symm_apply]
+    ext m
+    change ρ (g * h) m = (cg * ch) • m
+    rw [map_mul]
+    change ρ g (ρ h m) = (cg * ch) • m
+    rw [hh_apply, hg_apply]
+    exact (mul_smul cg ch m).symm
+
+/-- The scalar monoid character indeed describes the representation action. -/
+private theorem scalarMonoidHomOfFinrankEqOne_apply_smul
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) (g : G) (m : M) :
+    ρ g m = (scalarMonoidHomOfFinrankEqOne hdim ρ g : F) • m := by
+  let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+  change ρ g m = e (e.symm (ρ g)) m
+  rw [e.apply_symm_apply]
+
+/-- The scalar monoid character of a group representation on a one-dimensional module
+lands in units. -/
+private noncomputable def scalarCharacterOfFinrankEqOne
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) : G →* Fˣ :=
+  let ψ := scalarMonoidHomOfFinrankEqOne hdim ρ
+  { toFun := fun g =>
+      { val := ψ g
+        inv := ψ g⁻¹
+        val_inv := by
+          have h := map_mul ψ g g⁻¹
+          simpa using h.symm
+        inv_val := by
+          have h := map_mul ψ g⁻¹ g
+          simpa using h.symm }
+    map_one' := by
+      ext
+      simp [ψ]
+    map_mul' := by
+      intro g h
+      ext
+      exact map_mul ψ g h }
+
+/-- The unit-valued scalar character describes the representation action. -/
+private theorem scalarCharacterOfFinrankEqOne_apply_smul
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) (g : G) (m : M) :
+    ρ g m = (scalarCharacterOfFinrankEqOne hdim ρ g : F) • m :=
+  scalarMonoidHomOfFinrankEqOne_apply_smul hdim ρ g m
+
+/-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
+private theorem isPGroup_rank_one_representation_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) :
+    ∀ g : G, ∀ m : M, ρ g m = m := by
+  let φ := scalarCharacterOfFinrankEqOne hdim ρ
+  have hφ : φ = 1 := monoidHom_units_eq_one_of_isPGroup_charP hG φ
+  intro g m
+  calc
+    ρ g m = (φ g : F) • m := scalarCharacterOfFinrankEqOne_apply_smul hdim ρ g m
+    _ = m := by simp [hφ]
+
+/-- Submodule form of `isPGroup_rank_one_representation_trivial_of_charP`. -/
+private theorem isPGroup_rank_one_submodule_action_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F W] (hdimW : Module.finrank F W = 1)
+    (ρ : Representation F G V) (hW : ∀ g, W ≤ W.comap (ρ g)) :
+    ∀ g : G, ∀ w ∈ W, ρ g w = w := by
+  have htriv := isPGroup_rank_one_representation_trivial_of_charP hG hdimW
+    (ρ.subrepresentation W hW)
+  intro g w hw
+  have hsub := htriv g ⟨w, hw⟩
+  exact congrArg Subtype.val hsub
+
+/-- Quotient form of `isPGroup_rank_one_representation_trivial_of_charP`. -/
+private theorem isPGroup_rank_one_quotient_action_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F (V ⧸ W)]
+    (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    (ρ : Representation F G V) (hW : ∀ g, W ≤ W.comap (ρ g)) :
+    ∀ g : G, ∀ v : V, ρ g v - v ∈ W := by
+  have htriv := isPGroup_rank_one_representation_trivial_of_charP hG hdimQ
+    (ρ.quotient W hW)
+  intro g v
+  have hq := htriv g (Submodule.Quotient.mk v : V ⧸ W)
+  change Submodule.Quotient.mk (ρ g v) = Submodule.Quotient.mk v at hq
+  simpa [Submodule.Quotient.eq] using hq
+
+/-- If two endomorphisms are trivial on a submodule and on the quotient by it,
+then they commute.
+
+This is the linear-algebra core of BG Thm 2.6, q = p: the subgroup
+`C_G(W) ∩ C_G(V/W)` acts by maps `1 + n` where `n` kills `W` and has image in
+`W`; products of two such nilpotent parts vanish. -/
+private theorem end_commute_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (f g : Module.End F V)
+    (hfW : ∀ w ∈ W, f w = w) (hfQ : ∀ v, f v - v ∈ W)
+    (hgW : ∀ w ∈ W, g w = w) (hgQ : ∀ v, g v - v ∈ W) :
+    f * g = g * f := by
+  ext v
+  calc
+    (f * g) v = f (g v) := rfl
+    _ = f (v + (g v - v)) := by congr 1; abel
+    _ = f v + (g v - v) := by rw [map_add, hfW (g v - v) (hgQ v)]
+    _ = g v + (f v - v) := by abel
+    _ = g (v + (f v - v)) := by rw [map_add, hgW (f v - v) (hfQ v)]
+    _ = g (f v) := by congr 1; abel
+    _ = (g * f) v := rfl
+
+/-- Submonoid-level wrapper for
+`end_commute_of_fixed_on_submodule_and_quotient`. -/
+private theorem submonoid_commutative_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (S : Submonoid (Module.End F V))
+    (hS : ∀ f ∈ S, (∀ w ∈ W, f w = w) ∧ (∀ v, f v - v ∈ W)) :
+    Std.Commutative (· * · : S → S → S) := by
+  constructor
+  intro f g
+  apply Subtype.ext
+  exact end_commute_of_fixed_on_submodule_and_quotient W (f : Module.End F V)
+    (g : Module.End F V) (hS f f.2).1 (hS f f.2).2 (hS g g.2).1 (hS g g.2).2
+
+/-- Representation-range wrapper for
+`submonoid_commutative_of_fixed_on_submodule_and_quotient`.
+
+For monoid homs into `Module.End`, mathlib's range object is
+`MonoidHom.mrange` (a `Submonoid`). -/
+private theorem representation_mrange_commutative_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hρ : ∀ g : G, (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)) :
+    Std.Commutative
+      (· * · : MonoidHom.mrange ρ → MonoidHom.mrange ρ → MonoidHom.mrange ρ) := by
+  apply submonoid_commutative_of_fixed_on_submodule_and_quotient W (MonoidHom.mrange ρ)
+  intro f hf
+  obtain ⟨g, rfl⟩ := MonoidHom.mem_mrange.mp hf
+  exact hρ g
+
+/-- A faithful representation reflects commutativity from its endomorphism image. -/
+private theorem commutative_of_injective_representation_mrange_commutative
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hrange : Std.Commutative
+      (· * · : MonoidHom.mrange ρ → MonoidHom.mrange ρ → MonoidHom.mrange ρ)) :
+    Std.Commutative (· * · : G → G → G) := by
+  constructor
+  intro x y
+  apply hfaithful
+  have hcomm := hrange.comm
+    (⟨ρ x, MonoidHom.mem_mrange.mpr ⟨x, rfl⟩⟩ : MonoidHom.mrange ρ)
+    (⟨ρ y, MonoidHom.mem_mrange.mpr ⟨y, rfl⟩⟩ : MonoidHom.mrange ρ)
+  calc
+    ρ (x * y) = ρ x * ρ y := map_mul ρ x y
+    _ = ρ y * ρ x := congrArg Subtype.val hcomm
+    _ = ρ (y * x) := (map_mul ρ y x).symm
+
+/-- Faithful-representation form of the `C_G(W) ∩ C_G(V/W)` commutativity
+calculation used in BG Thm 2.6, q = p. -/
+private theorem commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hρ : ∀ g : G, (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_injective_representation_mrange_commutative ρ hfaithful
+    (representation_mrange_commutative_of_fixed_on_submodule_and_quotient W ρ hρ)
+
+/-- Subgroup-restriction form of
+`commutative_of_faithful_representation_fixed_on_submodule_and_quotient`.
+
+This is the shape needed for BG Thm 2.6, q = p, where
+`H = C_G(W) ∩ C_G(V/W)`. -/
+private theorem subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hH : ∀ h : H, (∀ w ∈ W, ρ h w = w) ∧ (∀ v, ρ h v - v ∈ W)) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply commutative_of_faithful_representation_fixed_on_submodule_and_quotient W
+    (ρ.comp H.subtype)
+  · intro x y hxy
+    apply Subtype.ext
+    exact hfaithful hxy
+  · exact hH
+
+/-- The subgroup acting trivially on `W` and on `V/W`.
+
+This is the Lean version of the `C_G(W) ∩ C_G(V/W)` subgroup appearing in
+BG Thm 2.6, q = p.  The quotient condition is written without choosing a
+quotient representation: `ρ g v - v ∈ W` for every `v`. -/
+private def fixedOnSubmoduleAndQuotientSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V) : Subgroup G where
+  carrier := {g | (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)}
+  one_mem' := by
+    constructor
+    · intro w _hw
+      simp
+    · intro v
+      simp
+  mul_mem' := by
+    intro a b ha hb
+    constructor
+    · intro w hw
+      simpa [map_mul, hb.1 w hw] using ha.1 w hw
+    · intro v
+      have haW : ρ a (ρ b v) - ρ b v ∈ W := ha.2 (ρ b v)
+      have hbW : ρ b v - v ∈ W := hb.2 v
+      have hsum : (ρ a (ρ b v) - ρ b v) + (ρ b v - v) ∈ W := W.add_mem haW hbW
+      have htarget :
+          ρ (a * b) v - v = (ρ a (ρ b v) - ρ b v) + (ρ b v - v) := by
+        rw [map_mul]
+        change ρ a (ρ b v) - v = (ρ a (ρ b v) - ρ b v) + (ρ b v - v)
+        abel
+      rwa [htarget]
+  inv_mem' := by
+    intro a ha
+    constructor
+    · intro w hw
+      have hdiff : w - ρ a⁻¹ w ∈ W := by
+        simpa [map_mul] using ha.2 (ρ a⁻¹ w)
+      have hinvW : ρ a⁻¹ w ∈ W := by
+        have htmp : w - (w - ρ a⁻¹ w) ∈ W := W.sub_mem hw hdiff
+        convert htmp using 1
+        abel
+      have hleft : ρ a (ρ a⁻¹ w) = w := by
+        calc
+          ρ a (ρ a⁻¹ w) = ((ρ a) * (ρ a⁻¹)) w := rfl
+          _ = ρ (a * a⁻¹) w := by rw [map_mul]
+          _ = w := by simp
+      have hfix := ha.1 (ρ a⁻¹ w) hinvW
+      rw [hleft] at hfix
+      exact hfix.symm
+    · intro v
+      have hdiff : v - ρ a⁻¹ v ∈ W := by
+        simpa [map_mul] using ha.2 (ρ a⁻¹ v)
+      simpa [sub_eq_add_neg, add_comm] using W.neg_mem hdiff
+
+private theorem mem_fixedOnSubmoduleAndQuotientSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    {W : Submodule F V} {ρ : Representation F G V} {g : G} :
+    g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ ↔
+      (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W) :=
+  Iff.rfl
+
+/-- The `C_G(W) ∩ C_G(V/W)` subgroup is abelian for a faithful representation. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_commutative
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) :
+    Std.Commutative
+      (· * · : fixedOnSubmoduleAndQuotientSubgroup W ρ →
+        fixedOnSubmoduleAndQuotientSubgroup W ρ →
+        fixedOnSubmoduleAndQuotientSubgroup W ρ) :=
+  subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ) W ρ hfaithful
+    (fun h => h.property)
+
+/-- If a p-subgroup acts by scalar characters on `W` and `V/W`, then in
+characteristic `p` it lies in `C_G(W) ∩ C_G(V/W)`.
+
+The scalar characters are passed as hypotheses rather than constructed here;
+BG obtains them from the fact that `W` and `V/W` are one-dimensional. -/
+private theorem subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hH : IsPGroup p H) (φW φQ : H →* Fˣ)
+    (hW : ∀ h : H, ∀ w ∈ W, ρ h w = (φW h : F) • w)
+    (hQ : ∀ h : H, ∀ v, ρ h v - (φQ h : F) • v ∈ W) :
+    H ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  intro g hg
+  rw [mem_fixedOnSubmoduleAndQuotientSubgroup]
+  let h : H := ⟨g, hg⟩
+  constructor
+  · intro w hw
+    have hφW : φW h = 1 :=
+      monoidHom_units_apply_eq_one_of_isPGroup_charP hH φW h
+    calc
+      ρ g w = (φW h : F) • w := hW h w hw
+      _ = w := by simp [hφW]
+  · intro v
+    have hφQ : φQ h = 1 :=
+      monoidHom_units_apply_eq_one_of_isPGroup_charP hH φQ h
+    simpa [hφQ] using hQ h v
+
+/-- Commutativity version of
+`subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions`
+for faithful representations. -/
+private theorem subgroup_commutative_of_isPGroup_scalar_actions
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hH : IsPGroup p H) (φW φQ : H →* Fˣ)
+    (hW : ∀ h : H, ∀ w ∈ W, ρ h w = (φW h : F) • w)
+    (hQ : ∀ h : H, ∀ v, ρ h v - (φQ h : F) • v ∈ W) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    H W ρ hfaithful
+  intro h
+  have hle := subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions
+    H W ρ hH φW φQ hW hQ h.property
+  exact (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hle)
+
+/-- If a p-subgroup acts on a rank-one invariant submodule and rank-one quotient,
+then it lies in `C_G(W) ∩ C_G(V/W)`. -/
+private theorem subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hH : IsPGroup p H)
+    (hW : ∀ h : H, W ≤ W.comap (ρ h))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    H ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  intro g hg
+  rw [mem_fixedOnSubmoduleAndQuotientSubgroup]
+  let h : H := ⟨g, hg⟩
+  constructor
+  · exact isPGroup_rank_one_submodule_action_trivial_of_charP hH W hdimW (ρ.comp H.subtype)
+      hW h
+  · exact isPGroup_rank_one_quotient_action_trivial_of_charP hH W hdimQ
+      (ρ.comp H.subtype) hW h
+
+/-- Commutativity consequence of
+`subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
+private theorem subgroup_commutative_of_rank_one_subquotients
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ) (hH : IsPGroup p H)
+    (hW : ∀ h : H, W ≤ W.comap (ρ h))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    H W ρ hfaithful
+  intro h
+  exact mem_fixedOnSubmoduleAndQuotientSubgroup.mp
+    (subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+      H W ρ hH hW hdimW hdimQ h.property)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
