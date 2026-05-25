@@ -349,9 +349,58 @@ private theorem lem73_aux
       obtain ⟨Q, hQ_inv⟩ :=
         OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (A := ↥P) (G := ↥L) (φ := φ) hCop
           (Or.inl hP_solvable) q
+      -- ## Step 1h: Q (Sylow q of ↥L) を G_ambient = GL(2, ZMod p) の subgroup に lift.
+      -- `Q' := Q.toSubgroup.map L.subtype` で「L 内で見ていた Q」を G の subgroup として復元.
+      let Q' : Subgroup _ := Q.toSubgroup.map L.subtype
+      -- Q' ≤ L: image of subgroup of ↥L through subtype is contained in L.
+      have hQ'_le_L : Q' ≤ L := by
+        rintro _ ⟨h, _, rfl⟩
+        exact h.2
+      -- Q' は q-群 (Q が Sylow q of ↥L で `IsPGroup` を持つ).
+      have hQ'_pgroup : IsPGroup q Q' := by
+        have hQ_pgroup : IsPGroup q Q.toSubgroup := Q.2
+        exact hQ_pgroup.map L.subtype
+      -- |Q'| = |Q.toSubgroup| (L.subtype は injective).
+      have hQ'_card : Nat.card ↥Q' = Nat.card ↥Q.toSubgroup :=
+        Nat.card_congr (Equiv.Set.image _ _ L.subtype_injective).symm
+      -- `φ` の定義レベルでの計算: `((φ a) h).val = a.val * h.val * a.val⁻¹` (in G).
+      -- これは `normalizerMonoidHom` の `MulDistribMulAction` action の `smul` から `rfl` で従う.
+      have hphi_val : ∀ (a : ↥P) (h : ↥L),
+          (((φ a) h : ↥L) : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
+            = (a : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
+              * (h : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
+              * (a : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))⁻¹ :=
+        fun _ _ => rfl
+      -- ## Step 1i: P normalizes Q' (translation of IsAInvariant via normalizerMonoidHom).
+      have hPnorm_Q' : P ≤ Subgroup.normalizer (Q' : Set _) := by
+        intro a ha
+        rw [Subgroup.mem_normalizer_iff]
+        intro y
+        constructor
+        · -- y ∈ Q' ⇒ a y a⁻¹ ∈ Q'.  Destructure y = L.subtype h with rfl.
+          rintro ⟨h, hhQ, rfl⟩
+          -- Goal: a * L.subtype h * a⁻¹ ∈ Q'.
+          have hsmul_mem : (φ ⟨a, ha⟩) h ∈ Q.toSubgroup := hQ_inv.smul_mem ⟨a, ha⟩ hhQ
+          refine ⟨(φ ⟨a, ha⟩) h, hsmul_mem, ?_⟩
+          -- L.subtype ((φ a) h) = a * L.subtype h * a⁻¹ by hphi_val.
+          exact hphi_val ⟨a, ha⟩ h
+        · -- a y a⁻¹ ∈ Q' ⇒ y ∈ Q'.
+          rintro ⟨h, hhQ, hh_eq⟩
+          -- hh_eq : L.subtype h = a * y * a⁻¹.  Apply (φ a)⁻¹ to h.
+          have hsmul_mem : (φ ⟨a, ha⟩)⁻¹ h ∈ Q.toSubgroup := hQ_inv.inv_smul_mem ⟨a, ha⟩ hhQ
+          refine ⟨(φ ⟨a, ha⟩)⁻¹ h, hsmul_mem, ?_⟩
+          -- Apply hphi_val to (φ a)⁻¹ h.
+          have h_aux := hphi_val ⟨a, ha⟩ ((φ ⟨a, ha⟩)⁻¹ h)
+          -- Simplify (φ a) ((φ a)⁻¹ h) = h on LHS, then convert L.subtype h ↔ ↑h via coe_subtype.
+          rw [show (φ ⟨a, ha⟩) ((φ ⟨a, ha⟩)⁻¹ h) = h from MulAut.apply_inv_self _ _ _]
+            at h_aux
+          simp only [Subgroup.coe_subtype] at hh_eq
+          -- h_aux : ↑h = a * ↑((φ a)⁻¹ h) * a⁻¹.   hh_eq : ↑h = a * y * a⁻¹.
+          rw [hh_eq] at h_aux
+          -- h_aux : a * y * a⁻¹ = a * ↑((φ a)⁻¹ h) * a⁻¹.  Cancel.
+          have := mul_right_cancel h_aux
+          exact (mul_left_cancel this).symm
       -- TODO (次 commit):
-      --   h. Q (Sylow q ↥L) を G_ambient (= GL(2,ZMod p)) の subgroup に持ち上げる.
-      --   i. Q が C_L(P) に含まれないことを確認 (`q | |L : C_L(P)|` から).
       --   j. IH を Q ⊊ L に適用 ⇒ P ≤ C(Q), 矛盾で `Q = L`, L が q-群.
       --   k. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
       --   l. `[L,P] = L` case: L ≤ SL(2,p) を導出.
