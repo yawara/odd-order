@@ -4172,6 +4172,77 @@ theorem oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
   exact (Subgroup.map_eq_bot_iff_of_injective Q H.subtype_injective).mp
     (by simpa [hK_def] using hK_bot)
 
+/-- **Isaacs Theorem 4.33** (p-local `p'`-core containment).
+
+If `G` is finite `p`-separable and `H` is `p`-local in `G`, then
+`O_{p'}(H) ≤ O_{p'}(G)`, expressed by mapping `O_{p'}(H)` from `↥H` back into
+`G`.
+
+The general case quotients by `N = O_{p'}(G)`.  Lemma 2.17 sends `p`-local
+subgroups to `p`-local subgroups modulo the `p'`-kernel, the reduced theorem
+above kills the `p'`-core in the quotient, and triviality of the quotient image
+is exactly containment in `N`. -/
+theorem oPiCore_compl_le_oPiCore_compl_of_isPLocal
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (H : Subgroup G) (hH : OddOrder.Isaacs.Ch02.IsPLocal p H) :
+    (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} H).map H.subtype ≤
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+  classical
+  set π' : Set ℕ := {q | q ∉ ({p} : Set ℕ)} with hπ'_def
+  set N : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore π' G with hN_def
+  set f : G →* G ⧸ N := QuotientGroup.mk' N with hf_def
+  set Hbar : Subgroup (G ⧸ N) := H.map f with hHbar_def
+  set Q : Subgroup H := OddOrder.Isaacs.Ch03.oPiCore π' H with hQ_def
+  change Q.map H.subtype ≤ N
+  have hN_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' N := by
+    rw [hN_def]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup π'
+  have hp_coprime_N : ¬ p ∣ Nat.card N := by
+    intro hp_dvd
+    have hp_pf : p ∈ (Nat.card N).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd, Nat.card_pos.ne'⟩
+    have hp_not : p ∈ π' := hN_pi' p hp_pf
+    rw [hπ'_def] at hp_not
+    exact hp_not (by simp)
+  have hHbar_pLocal : OddOrder.Isaacs.Ch02.IsPLocal p Hbar := by
+    rw [hHbar_def, hf_def]
+    exact OddOrder.Isaacs.Ch02.isPLocal_map_of_coprime_kernel hp_coprime_N hH
+  have hOpi'_Gbar_bot : OddOrder.Isaacs.Ch03.oPiCore π' (G ⧸ N) = ⊥ := by
+    simpa [hN_def] using OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot (G := G) π'
+  have hOpi'_Hbar_bot : OddOrder.Isaacs.Ch03.oPiCore π' Hbar = ⊥ := by
+    obtain ⟨Pbar, _hPbar_ne, hPbar_p, hHbar_eq⟩ := hHbar_pLocal
+    rw [hHbar_eq]
+    exact oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
+      (G := G ⧸ N) (p := p) hOpi'_Gbar_bot Pbar hPbar_p
+  let fH : H →* Hbar := f.subgroupMap H
+  have hfH_surj : Function.Surjective fH := f.subgroupMap_surjective H
+  haveI hQ_normal : Q.Normal := by
+    rw [hQ_def]
+    infer_instance
+  haveI hQbar_normal : (Q.map fH).Normal := hQ_normal.map fH hfH_surj
+  have hQ_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Q := by
+    rw [hQ_def]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup π'
+  have hQbar_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' (Q.map fH) := by
+    intro r hr
+    exact hQ_pi' r (Nat.primeFactors_mono (Q.card_map_dvd fH) Nat.card_pos.ne' hr)
+  have hQbar_le : Q.map fH ≤ OddOrder.Isaacs.Ch03.oPiCore π' Hbar :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hQbar_pi'
+  have hQbar_bot : Q.map fH = ⊥ := by
+    rw [hOpi'_Hbar_bot] at hQbar_le
+    exact le_bot_iff.mp hQbar_le
+  rintro y ⟨q, hq, rfl⟩
+  have hqbar_mem : fH q ∈ Q.map fH := ⟨q, hq, rfl⟩
+  rw [hQbar_bot, Subgroup.mem_bot] at hqbar_mem
+  have hfq_one : f (q : G) = 1 := by
+    change (f.subgroupMap H q).val = (1 : G ⧸ N)
+    rw [show f.subgroupMap H q = fH q from rfl, hqbar_mem]
+    rfl
+  change (q : G) ∈ N
+  rw [← QuotientGroup.eq_one_iff]
+  simpa [hf_def] using hfq_one
+
 /-- Strong-induction form of Isaacs Theorem 4.38. -/
 private theorem isaacs_thm_4_38_aux
     {A : Type*} [Group A] [Finite A]

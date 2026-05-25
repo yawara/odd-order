@@ -187,7 +187,7 @@ Ch.4 は **§ 4A–4D の 4 節構成** (Ch.2/Ch.3 と同様 subsection には�
 | 4.30 | Corollary | A faithful, `[G,A,...,A]=1`, coprime ⇒ \|A\| の各素因子は \|G\| を割る | L2634 |
 | 4.31 | Theorem (Thompson) | **P×Q lemma**: A=P×Q (P p-群, Q p'-群) acts on p-群 G, Q fixes every P-fixed element ⇒ Q trivial on G | L2640 |
 | 4.32 | Lemma | P p-群, G 非自明 p-群: `[G,P] < G` かつ `C_G(P) > 1` | L2644 |
-| 4.33 | Theorem | G p-solvable ⇒ 全 p-local 部分群 H で `O_{p'}(H) ⊆ O_{p'}(G)` | L2654 |
+| 4.33 | Theorem | ✅ `oPiCore_compl_le_oPiCore_compl_of_isPLocal`: G p-solvable ⇒ 全 p-local 部分群 H で `O_{p'}(H) ⊆ O_{p'}(G)` | L2654 |
 | 4.34 | Theorem (Fitting) | G abelian, coprime ⇒ `G = C_G(A) × [G,A]` | L2664 |
 | 4.35 | Corollary | G abelian p-群, A p'-群 が order p 元全部 fix ⇒ A trivial | L2688 |
 | 4.36 | Theorem | **p > 2**, G p-群, A p'-群 が order p 元全部 fix ⇒ A trivial | L2694 |
@@ -238,7 +238,7 @@ Ch.4 は **§ 4A–4D の 4 節構成** (Ch.2/Ch.3 と同様 subsection には�
 6. **Theorem 4.31 Thompson P×Q lemma** — Thompson critical subgroup / ZJ 系の基底道具. BG Thm 1.13 (Thompson critical) の前提で間接利用
 7. **Theorem 4.27 ([G,A] nilpotent for chain [G,A,...,A]=1)** — Isaacs 流の "stabilizes series ⇒ A^∞ trivial" の中核. BG Lemma 1.9 と精神同等
 8. **Theorem 4.22, 4.24 (faithful chain ⇒ A solvable / nilpotent)** — BG Lemma 1.9 が同精神の弱形
-9. **Theorem 4.33 (p-solvable: O_{p'}(H) ⊆ O_{p'}(G) for p-local H)** — Hall-Higman 1.2.3 (= Isaacs Lemma 3.21) を内部使用. BG Cor が同じ系列
+9. ✅ **Theorem 4.33 (p-solvable: O_{p'}(H) ⊆ O_{p'}(G) for p-local H)** — Hall-Higman 1.2.3 (= Isaacs Lemma 3.21) を内部使用. BG Cor が同じ系列
 10. **Lemma 4.37 Baer trick** — Thm 4.36 / 4.38 の証明ツール. 単体での下流引用は無いが Thm 4.36 とセットで必要
 11. **Theorem 4.38 (PxQ 強化, p>2, P 正規不要)** — 4.36 と同じく Baer 経由
 
