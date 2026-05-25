@@ -38,7 +38,7 @@
 - **2026-05-25**: `PGroupFixedVector.lean` を sorry-free 化. `IsPGroup.invariants_ne_bot` と `IsPGroup.exists_fixed_vector_ne_zero` は完成済みで、§2F Thm 2.6 の fixed-vector dependency は解消.
 - **2026-05-25**: mmd の `[MISSING_PAGE_FAIL:29]` は BG PDF p.29 を `pdftotext` で復元して解消. §2F の証明 sketch に q=p / q≠p / `G*` induction の分岐を反映済み.
 - **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 現在の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
-- **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. 次は subgroup/restricted representation 版へ接続する.
+- **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` / `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. 次は実際の `C_G(W) ∩ C_G(V/W)` predicate を作る.
 
 ## TL;DR
 
@@ -384,5 +384,5 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
-- subgroup `H ≤ G` への restricted representation に `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を適用し、`H` の可換性を返す helper を追加する.
+- q=p 分岐の `C_G(W) ∩ C_G(V/W)` を表す subgroup/predicate を定義し、上の subgroup helper に渡せる形にする.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
