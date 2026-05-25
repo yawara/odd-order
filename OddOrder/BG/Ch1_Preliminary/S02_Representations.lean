@@ -1031,6 +1031,56 @@ private theorem subgroup_commutative_of_normal_p_fixed_space_proper
   exact subgroup_commutative_of_finrank_two_invariant_submodule
     H W ρ hfaithful hH hW_invariant hdim hW_ne_bot hW_ne_top
 
+/-- In a faithful representation, a nontrivial subgroup cannot fix the whole
+space pointwise. -/
+private theorem invariants_ne_top_of_faithful_subgroup_ne_bot
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (K : Subgroup G) (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hK_ne_bot : K ≠ ⊥) :
+    Representation.invariants (ρ.comp K.subtype) ≠ ⊤ := by
+  intro htop
+  apply hK_ne_bot
+  ext g
+  constructor
+  · intro hg
+    let k : K := ⟨g, hg⟩
+    have hk_fixed : ∀ v : V, ρ g v = v := by
+      intro v
+      have hv : v ∈ Representation.invariants (ρ.comp K.subtype) := by
+        rw [htop]
+        exact Submodule.mem_top
+      simpa [k] using (Representation.mem_invariants (ρ.comp K.subtype) v).mp hv k
+    have hρg : ρ g = 1 := by
+      ext v
+      exact hk_fixed v
+    have hg_one : g = 1 := by
+      apply hfaithful
+      simp [hρg]
+    simp [hg_one]
+  · intro hg
+    have hg_one : g = 1 := by
+      simpa using hg
+    simp [hg_one]
+
+/-- Nontrivial-normal-subgroup version of
+`subgroup_commutative_of_normal_p_fixed_space_proper`.
+
+This is the closest current Lean entrypoint to BG Thm 2.6, q = p: once the
+nontrivial normal p-subgroup `K` is constructed, faithful two-dimensionality
+forces its fixed space to be nonzero and proper, hence every p-subgroup is
+abelian. -/
+private theorem subgroup_commutative_of_nontrivial_normal_p_fixed_space
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Module.Finite F V]
+    (K H : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K) (hH : IsPGroup p H)
+    (hdim : Module.finrank F V = 2) (hK_ne_bot : K ≠ ⊥) :
+    Std.Commutative (· * · : H → H → H) :=
+  subgroup_commutative_of_normal_p_fixed_space_proper K H ρ hfaithful hK hH hdim
+    (invariants_ne_top_of_faithful_subgroup_ne_bot K ρ hfaithful hK_ne_bot)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 

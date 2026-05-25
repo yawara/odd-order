@@ -53,6 +53,10 @@
   `subgroup_commutative_of_normal_p_fixed_space_proper` を追加済み.
   `K ⊴ G`, `K` p-group, `C_V(K) ≠ V` から `IsPGroup.invariants_ne_bot`
   と `Representation.le_comap_invariants` を組み合わせて p-subgroup の可換性へ接続する.
+- **2026-05-25**: faithful 表現で非自明 subgroup が全空間を点wise 固定できない補題
+  `invariants_ne_top_of_faithful_subgroup_ne_bot` と、それを使う直結版
+  `subgroup_commutative_of_nontrivial_normal_p_fixed_space` を追加済み.
+  q=p 分岐は非自明 normal p-subgroup `K` を構成できれば p-subgroup 可換性まで閉じる.
 
 ## TL;DR
 
