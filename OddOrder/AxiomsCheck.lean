@@ -110,6 +110,11 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- 後半: fixedPointsOfMulAut φ > ⊥ (C_G(P) > 1)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup
 
+-- Ch.4 (Commutators): Thm 4.36 ⭐⭐⭐ **= BG Thm 1.11, FT クリティカル**
+-- p > 2, G p-群, A p'-群 acts on G, A fixes all order-p elements ⇒ A trivial on G.
+-- Baer trick (Lem 4.37) + Cor 4.35 + 強帰納法 (Three-subgroups).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_36
+
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
 
