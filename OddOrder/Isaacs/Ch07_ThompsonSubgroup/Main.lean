@@ -730,6 +730,17 @@ private theorem lem73_aux
             prime_power_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
               (Fact.out : p.Prime) hq_prime hq_ne_p hq_ne_two ⟨kL, hL_card_qpow⟩ hq_dvd_L
               hL_card_dvd_SL_formula
+        have hL_card_le_p_succ_of_odd : q ≠ 2 → Nat.card ↥L ≤ p + 1 := by
+          intro hq_ne_two
+          have hp_pred_pos : 0 < p - 1 := by
+            have hp_two_le : 2 ≤ p := (Fact.out : p.Prime).two_le
+            omega
+          have hp_succ_pos : 0 < p + 1 := by omega
+          rcases hL_card_dvd_pred_or_succ_of_odd hq_ne_two with hL_dvd_pred | hL_dvd_succ
+          · have hle_pred : Nat.card ↥L ≤ p - 1 :=
+              Nat.le_of_dvd hp_pred_pos hL_dvd_pred
+            omega
+          · exact Nat.le_of_dvd hp_succ_pos hL_dvd_succ
         have hSL_card_dvd_GL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) ∣
             Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
