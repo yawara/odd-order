@@ -35,7 +35,6 @@ mathlib に「class function 上の G-action」「Inertia group」は不在 (Pet
 
 ## TODO (本 commit 範囲外)
 
-- `H ≤ inertia θ` (∵ H 内部 conjugation で θ 不変).
 - `inertia θ` の `H ⊴ inertia θ` (normal).
 - `MulAction G (ClassFunction ↥H k)` instance (要 H ⊴ G 抽象化).
 
@@ -112,6 +111,22 @@ def inertia (θ : ClassFunction ↥H k) : Subgroup G where
 
 @[simp] theorem mem_inertia {θ : ClassFunction ↥H k} {g : G} :
     g ∈ inertia θ ↔ conjBy g θ = θ := Iff.rfl
+
+/-- The normal subgroup `H` is contained in the inertia group of every class
+function on `H`, because class functions are invariant under conjugation by
+elements of `H`. -/
+theorem subgroup_le_inertia (θ : ClassFunction ↥H k) : H ≤ inertia θ := by
+  intro h hh
+  rw [mem_inertia]
+  ext x
+  let y : ↥H := ⟨h, hh⟩
+  have hconj :
+      (⟨h * (x : G) * h⁻¹, hH.conj_mem (x : G) x.property h⟩ : ↥H) =
+        y * x * y⁻¹ := by
+    apply Subtype.ext
+    rfl
+  rw [conjBy_apply, hconj]
+  exact θ.conj_eq x y
 
 end ClassFunction
 
