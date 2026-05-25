@@ -5276,6 +5276,35 @@ private lemma iterCommutator_inl_inr_lowerCentralSeriesInfty_eq_bot
             G ⋊[phiInfty φ] (lowerCentralSeriesInfty A)).range m = ⊥ :=
   iterCommutator_inl_inr_restrict_eq_bot (φ := φ) (lowerCentralSeriesInfty A) h_iter
 
+/-! #### Fixed-point subgroup `C := [G, A^∞] ∩ C_G(A)` and its properties -/
+
+/-- **Fixed-point subgroup**: `C := actionCommutatorInfty φ ⊓ fixedPointsOfMulAut φ`.
+
+This is the subgroup of `[G, A^∞]` consisting of elements fixed by the entire `A`-action.
+Used in the inductive step of Thm 4.24 as the kernel we factor out. -/
+private noncomputable def actionCommutatorInfty_fix
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) : Subgroup G :=
+  actionCommutatorInfty φ ⊓ Subgroup.fixedPointsOfMulAut φ
+
+/-- `C` is A-invariant. (Intersection of two A-invariant subgroups.) -/
+private lemma actionCommutatorInfty_fix_isAInvariant
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutatorInfty_fix φ) := by
+  refine OddOrder.Isaacs.Ch03.IsAInvariant.inf (actionCommutatorInfty_isAInvariant φ) ?_
+  -- fixedPointsOfMulAut φ is A-invariant: it is a characteristic-like subgroup w.r.t. A
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro b g hg
+  rw [Subgroup.mem_fixedPointsOfMulAut] at hg ⊢
+  intro a
+  -- Goal: (φ a) ((φ b) g) = (φ b) g.
+  -- Use: (φ a) ((φ b) g) = (φ (a * b)) g = (φ b) ((φ (b⁻¹ * a * b)) g) by composing,
+  -- and (φ (b⁻¹ * a * b)) g = g since g is fixed by every element of A.
+  have h_eq : (φ a) ((φ b) g) = (φ b) ((φ (b⁻¹ * a * b)) g) := by
+    rw [show φ (b⁻¹ * a * b) = (φ b)⁻¹ * (φ a) * (φ b) from by
+        rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self]
+  rw [h_eq, hg (b⁻¹ * a * b)]
+
 end /- §4C (続 II) -/
 
 end OddOrder.Isaacs.Ch04
