@@ -3176,15 +3176,7 @@ private lemma not_isCyclic_of_isElementaryAbelian_two_card_four
     {A : Type*} [Group A] [Finite A]
     (hElem : IsElementaryAbelian 2 A) (hCard : Nat.card A = 4) :
     ¬ IsCyclic A := by
-  intro hcyc
-  haveI : IsCyclic A := hcyc
-  have hExp_eq : Monoid.exponent A = Nat.card A := IsCyclic.exponent_eq_card
-  have hExp_dvd_two : Monoid.exponent A ∣ 2 := by
-    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
-    exact hElem.2
-  rw [hCard] at hExp_eq
-  rw [hExp_eq] at hExp_dvd_two
-  norm_num at hExp_dvd_two
+  exact hElem.not_isCyclic_of_card_prime_sq Nat.prime_two (by simpa using hCard)
 
 /-- If a quotient image of `E` is elementary abelian of order `4`, then `E` is not cyclic. -/
 private lemma not_isCyclic_of_quotient_commutator_image_four
