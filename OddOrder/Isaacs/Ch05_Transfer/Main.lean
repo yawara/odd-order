@@ -1254,6 +1254,23 @@ lemma APrime_le_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
   exact APrime_le (K := P.transferFocal.ker) inferInstance
     (Abelianization.commutator_subset_ker P.transferFocal) hker_index
 
+/-- **Isaacs Thm 5.20/5.21 bridge**: for a Sylow `p`-subgroup `P`,
+`A^p(G) ∩ P` is the focal subgroup of `P`.
+
+The forward inclusion uses `A^p(G) ≤ ker(transferFocal)`, and the reverse inclusion is
+the focal subgroup theorem `G' ∩ P = Foc_G(P)` together with `G' ≤ A^p(G)`. -/
+lemma APrime_inf_sylow_eq_focalSubgroup [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    APrime p G ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+  apply le_antisymm
+  · calc
+      APrime p G ⊓ (P : Subgroup G) ≤ P.transferFocal.ker ⊓ (P : Subgroup G) :=
+        inf_le_inf (APrime_le_transferFocal_ker P) le_rfl
+      _ = (P : Subgroup G).focalSubgroup :=
+        Subgroup.ker_transferFocal_inf_eq_focalSubgroup P
+  · rw [← Subgroup.commutator_inf_eq_focalSubgroup P]
+    exact inf_le_inf (commutator_le_APrime p G) le_rfl
+
 /-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
 
 This packages only the standard `A^p` consequence of the focal subgroup theorem, avoiding a
