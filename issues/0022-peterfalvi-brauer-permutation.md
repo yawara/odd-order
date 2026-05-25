@@ -15,10 +15,22 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
 
 ## やること
 
-- [ ] `ConjClasses.inv` / `ConjClasses.IsReal` API が proof に十分か確認する。
+- [x] `ConjClasses.inv` / `ConjClasses.IsReal` API が proof に十分か確認する。
 - [ ] `OddOrder.RepresentationTheory.brauer_permutation_lemma` を `sorry` なしにする。
 - [ ] Peterfalvi §3 (1.1) 用の odd-order specialization を追加するか、別 issue に切る。
 - [ ] §6 (4.5.b) で再利用できる statement 名と namespace を維持する。
+
+## 2026-05-25 update
+
+- class-side odd-order API を追加:
+  - `ConjClasses.eq_one_of_isConj_inv_of_odd_card`
+  - `ConjClasses.eq_one_of_isReal_of_odd_card`
+  - `ConjClasses.card_realClasses_eq_one_of_odd_card`
+- これで Brauer permutation lemma の後に必要になる
+  `Nat.card { C : ConjClasses G // ConjClasses.IsReal C } = 1` 側は
+  `sorry` なしで利用できる。
+- character-side の「実既約は trivial のみ」は
+  `brauer_permutation_lemma` 本体の後続として残す。
 
 ## 完了条件
 

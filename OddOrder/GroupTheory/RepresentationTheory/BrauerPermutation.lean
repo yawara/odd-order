@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Conj
+import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
@@ -51,6 +53,53 @@ namespace ConjClasses
 
 variable {G : Type*} [Group G]
 
+private theorem commute_of_sq_commute_of_odd_card [Finite G] (hodd : Odd (Nat.card G))
+    {x g : G} (hcomm : Commute (x ^ 2) g) : Commute x g := by
+  have hcop_card : Nat.Coprime 2 (Nat.card G) := hodd.coprime_two_left
+  have hcop_order : Nat.Coprime 2 (orderOf x) :=
+    hcop_card.coprime_dvd_right (orderOf_dvd_natCard x)
+  rcases exists_pow_eq_self_of_coprime (x := x) hcop_order with ⟨m, hm⟩
+  rw [← hm]
+  exact hcomm.pow_left m
+
+/-- In a finite group of odd order, an element conjugate to its inverse is trivial. -/
+theorem eq_one_of_isConj_inv_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) {g : G}
+    (hg : IsConj g⁻¹ g) : g = 1 := by
+  rw [isConj_iff] at hg
+  rcases hg with ⟨x, hx⟩
+  have hx_inv : x * g * x⁻¹ = g⁻¹ := by
+    have h := congrArg Inv.inv hx
+    simpa [mul_assoc] using h
+  have hx_sq_conj : x ^ 2 * g * (x ^ 2)⁻¹ = g := by
+    calc
+      x ^ 2 * g * (x ^ 2)⁻¹ = x * (x * g * x⁻¹) * x⁻¹ := by
+        rw [pow_two]
+        group
+      _ = x * g⁻¹ * x⁻¹ := by rw [hx_inv]
+      _ = g := hx
+  have hx_sq_comm : Commute (x ^ 2) g := by
+    rw [commute_iff_eq]
+    calc
+      x ^ 2 * g = (x ^ 2 * g * (x ^ 2)⁻¹) * x ^ 2 := by group
+      _ = g * x ^ 2 := by rw [hx_sq_conj]
+  have hx_comm : Commute x g := commute_of_sq_commute_of_odd_card hodd hx_sq_comm
+  have hg_self_inv : g = g⁻¹ := by
+    calc
+      g = x * g⁻¹ * x⁻¹ := hx.symm
+      _ = g⁻¹ := by
+        rw [(hx_comm.inv_right).eq]
+        group
+  have hg_sq : g ^ 2 = 1 := by
+    rw [pow_two]
+    exact (congrArg (fun y : G => g * y) hg_self_inv).trans (mul_inv_cancel g)
+  have hcop_card : Nat.Coprime 2 (Nat.card G) := hodd.coprime_two_left
+  have hcop_order : Nat.Coprime 2 (orderOf g) :=
+    hcop_card.coprime_dvd_right (orderOf_dvd_natCard g)
+  have horder_dvd_two : orderOf g ∣ 2 := orderOf_dvd_of_pow_eq_one hg_sq
+  have horder_one : orderOf g = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop_order horder_dvd_two (dvd_refl (orderOf g))
+  exact orderOf_eq_one_iff.mp horder_one
+
 /-- Conjugacy is preserved by inversion: if `a ~ b`, then `a⁻¹ ~ b⁻¹`. -/
 theorem isConj_inv {a b : G} (h : IsConj a b) : IsConj a⁻¹ b⁻¹ := by
   rw [isConj_iff] at h ⊢
@@ -88,6 +137,33 @@ theorem isReal_mk_iff (g : G) : IsReal (ConjClasses.mk g) ↔ IsConj g⁻¹ g :=
   rw [inv_mk, mk_eq_mk_iff_isConj]
 
 @[simp] theorem isReal_one : IsReal (1 : ConjClasses G) := inv_one
+
+/-- In a finite group of odd order, the only real conjugacy class is the
+identity class. -/
+theorem eq_one_of_isReal_of_odd_card [Finite G] (hodd : Odd (Nat.card G))
+    {C : ConjClasses G} (hC : IsReal C) : C = 1 := by
+  induction C using Quotient.inductionOn with
+  | _ g =>
+    have hg_conj : IsConj g⁻¹ g := (isReal_mk_iff g).mp hC
+    have hg_one : g = 1 := eq_one_of_isConj_inv_of_odd_card hodd hg_conj
+    change ConjClasses.mk g = ConjClasses.mk (1 : G)
+    simp [hg_one]
+
+/-- In a finite group of odd order, the subtype of real conjugacy classes is
+subsingleton. -/
+theorem subsingleton_realClasses_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) :
+    Subsingleton { C : ConjClasses G // IsReal C } where
+  allEq A B := by
+    exact Subtype.ext (by
+      rw [eq_one_of_isReal_of_odd_card hodd A.property,
+        eq_one_of_isReal_of_odd_card hodd B.property])
+
+/-- In a finite group of odd order, there is exactly one real conjugacy class:
+the identity class. -/
+theorem card_realClasses_eq_one_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) :
+    Nat.card { C : ConjClasses G // IsReal C } = 1 := by
+  letI := subsingleton_realClasses_of_odd_card (G := G) hodd
+  exact Nat.card_of_subsingleton ⟨1, isReal_one⟩
 
 end ConjClasses
 
