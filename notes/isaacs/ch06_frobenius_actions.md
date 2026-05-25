@@ -94,7 +94,7 @@ mmd 抽出失敗は無し (MISSING_PAGE marker ゼロ, ヘッダ欠落は §6B/�
 |---|---|---|
 | **`FrobeniusGroup`, `FrobeniusAction` 定義** | mathlib 完全未収載. 中核 def | **大** (Phase 1 の主要設計判断: TI-subset / disjoint conjugates / fixed-point free 等のいくつかの等価定義をどう選ぶか) |
 | 6.1 \|N\| ≡ 1 mod \|A\| | 新規 (def 依存) | 短 (counting 経由) |
-| 6.2 quotient Frobenius | 新規 (def 依存) | 短 |
+| 6.2 quotient Frobenius | ✅ `IsFrobeniusAction.quotient` (Cor 3.28 経由) | 完了 |
 | 6.3 even ⇒ involution + N abelian | 新規 (counting + involution 引数) | 中 |
 | **6.4 Frobenius 群の等価条件** | 中核補題 — 4 通りの等価定義. mathlib 未収載. **TI** 概念とも接続 | 大 |
 | 6.5, 6.6 counting (X = G − ⋃A^g) | 新規 (Burnside counting 流) | 中 |
@@ -259,6 +259,9 @@ FT クリティカル度 + 章内依存で並べる:
 - **action/subgroup-pair bridge**: `IsFrobeniusGroup.toFrobeniusAction`,
   `IsFrobeniusGroup.card_kernel_modEq_one`, `IsFrobeniusGroup.coprime_card_kernel_complement`.
   BG/Peterfalvi 側で subgroup-pair 形を使いつつ, Isaacs 6.1 の action 版 counting を再利用できる.
+- **Cor 6.2** `IsFrobeniusAction.quotient`: A-invariant normal quotient `N/M` への誘導作用を
+  `QuotientGroup.map` で構成し, `⟨a⟩` に制限して Ch.4 forward の
+  `coprime_fixedPoints_quotient` を適用. sorry-free.
 - **§6B infra: `OddOrder.GroupTheory.SemiDihedral` 新規** (~221 LOC):
   半二面体群 `SemiDihedralGroup n` (位数 `2^(n+1)`). mathlib `QuaternionGroup` template.
   constructors `c i` / `ca i` with twist `r := 2^(n-1) - 1` (n=0,1 override). Group + Fintype.
@@ -277,8 +280,6 @@ FT クリティカル度 + 章内依存で並べる:
   全部持っているため, Thm 6.3 は実質 30-40 行で完成.
 
 **現在の残タスク候補**:
-- 6.2 quotient Frobenius: A-invariant normal quotient action. 旧「Cor 3.28 待ち」だが,
-  Ch.3/Ch.4 が main に入ったので再評価可.
 - 6.7 centralizer-kernel criterion: Schur-Zassenhaus / Ch.5 normal p-complement 周辺が main に入ったので,
   statement 形から再設計する価値あり.
 - 6.8-6.10 partition counting → Frobenius complement 禁止構造.
