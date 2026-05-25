@@ -1831,13 +1831,152 @@ theorem semiDihedral_of_twistConjugation
   · exact ⟨semiDihedralIsoOfTwistSquareInvolution c a z k hk_two h_order h_idx
       h_a_notmem h_z_mem h_z_pow h_z_sq h_a_sq h_conj⟩
 
+private lemma exists_sq_ne_one_of_nonabelian
+    {P : Type*} [Group P] (h_nonab : ∃ x y : P, x * y ≠ y * x) :
+    ∃ c : P, c ^ 2 ≠ 1 := by
+  by_contra h
+  push Not at h
+  obtain ⟨x, y, hxy⟩ := h_nonab
+  have hx_inv : x⁻¹ = x := by
+    exact inv_eq_of_mul_eq_one_right (by rw [← pow_two, h x])
+  have hy_inv : y⁻¹ = y := by
+    exact inv_eq_of_mul_eq_one_right (by rw [← pow_two, h y])
+  have hxy_inv : (x * y)⁻¹ = x * y := by
+    exact inv_eq_of_mul_eq_one_right (by rw [← pow_two, h (x * y)])
+  apply hxy
+  calc x * y
+      = (x * y)⁻¹ := hxy_inv.symm
+    _ = y⁻¹ * x⁻¹ := by rw [mul_inv_rev]
+    _ = y * x := by rw [hy_inv, hx_inv]
+
+private lemma exists_orderOf_eq_four_of_card_eight_nonabelian
+    {P : Type*} [Group P] [Finite P]
+    (h_card : Nat.card P = 8) (h_nonab : ∃ x y : P, x * y ≠ y * x) :
+    ∃ c : P, orderOf c = 4 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hP : IsPGroup 2 P := IsPGroup.of_card (p := 2) (n := 3) (by
+    rw [h_card]
+    norm_num)
+  obtain ⟨c, hc_sq_ne⟩ := exists_sq_ne_one_of_nonabelian h_nonab
+  obtain ⟨k, h_order⟩ := (IsPGroup.iff_orderOf.mp hP) c
+  have hk_le : k ≤ 3 := by
+    have hdvd : 2 ^ k ∣ 2 ^ 3 := by
+      have hdvd0 : orderOf c ∣ 8 := by
+        rw [← h_card]
+        exact orderOf_dvd_natCard c
+      rw [h_order] at hdvd0
+      simpa using hdvd0
+    exact (Nat.pow_dvd_pow_iff_le_right one_lt_two).mp hdvd
+  have hk_two : 2 ≤ k := by
+    by_contra hk_not
+    have hk_cases : k = 0 ∨ k = 1 := by omega
+    rcases hk_cases with rfl | rfl
+    · rw [pow_zero] at h_order
+      have hc_one : c = 1 := orderOf_eq_one_iff.mp h_order
+      exact hc_sq_ne (by rw [hc_one, one_pow])
+    · rw [pow_one] at h_order
+      exact hc_sq_ne (orderOf_dvd_iff_pow_eq_one.mp (by rw [h_order]))
+  have hk_ne_three : k ≠ 3 := by
+    intro hk3
+    have hcyc : IsCyclic P := isCyclic_of_orderOf_eq_card c (by
+      rw [h_order, hk3, h_card]
+      norm_num)
+    obtain ⟨x, y, hxy⟩ := h_nonab
+    haveI : IsCyclic P := hcyc
+    exact hxy (Std.Commutative.comm x y)
+  have hk_eq : k = 2 := by omega
+  exact ⟨c, by rw [h_order, hk_eq]; norm_num⟩
+
+private lemma mem_zpowers_orderOf_four_eq_self_or_inv
+    {P : Type*} [Group P] [Finite P] {c y : P}
+    (h_order : orderOf c = 4)
+    (hy_mem : y ∈ Subgroup.zpowers c)
+    (hy_order : orderOf y = 4) :
+    y = c ∨ y = c⁻¹ := by
+  classical
+  have hy_range : y ∈ (Finset.range (orderOf c)).image (fun n : ℕ => c ^ n) :=
+    (mem_zpowers_iff_mem_range_orderOf (x := c) (y := y)).mp hy_mem
+  rcases Finset.mem_image.mp hy_range with ⟨m, hm_range, hm_eq⟩
+  have hm_lt : m < 4 := by
+    have := Finset.mem_range.mp hm_range
+    rwa [h_order] at this
+  have hm_cases : m = 0 ∨ m = 1 ∨ m = 2 ∨ m = 3 := by omega
+  rcases hm_cases with rfl | rfl | rfl | rfl
+  · rw [pow_zero] at hm_eq
+    rw [← hm_eq, orderOf_one] at hy_order
+    norm_num at hy_order
+  · left
+    simpa using hm_eq.symm
+  · have hy_sq : y ^ 2 = 1 := by
+      rw [← hm_eq, ← pow_mul]
+      change c ^ 4 = 1
+      rw [← h_order, pow_orderOf_eq_one]
+    have hdvd : 4 ∣ 2 := by
+      rw [← hy_order]
+      exact orderOf_dvd_of_pow_eq_one hy_sq
+    norm_num at hdvd
+  · right
+    rw [← hm_eq]
+    have hmul : c ^ 3 * c = 1 := by
+      rw [← pow_succ]
+      change c ^ 4 = 1
+      rw [← h_order, pow_orderOf_eq_one]
+    exact eq_inv_of_mul_eq_one_left hmul
+
 /-- **Isaacs Corollary 6.14**: A nonabelian group of order `8` is isomorphic to `D_8` or `Q_8`
 (i.e., `DihedralGroup 4` or `QuaternionGroup 2` in mathlib indexing). -/
 theorem dihedralOrQuaternion_of_card_eight
     {P : Type*} [Group P] [Finite P]
     (h_card : Nat.card P = 8) (h_nonab : ∃ x y : P, x * y ≠ y * x) :
     Nonempty (P ≃* DihedralGroup 4) ∨ Nonempty (P ≃* QuaternionGroup 2) := by
-  sorry
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hP : IsPGroup 2 P := IsPGroup.of_card (p := 2) (n := 3) (by
+    rw [h_card]
+    norm_num)
+  obtain ⟨c, h_order4⟩ :=
+    exists_orderOf_eq_four_of_card_eight_nonabelian h_card h_nonab
+  have h_idx : (Subgroup.zpowers c).index = 2 := by
+    have h := (Subgroup.zpowers c).index_mul_card
+    rw [Nat.card_zpowers, h_order4, h_card] at h
+    omega
+  obtain ⟨a, h_a_notmem, _h_cover⟩ :=
+    (Subgroup.index_eq_two_iff_exists_notMem_and.mp h_idx)
+  have h_a_inv_notmem : a⁻¹ ∉ Subgroup.zpowers c := by
+    intro ha
+    exact h_a_notmem ((Subgroup.zpowers c).inv_mem_iff.mp ha)
+  have h_ac_notmem : a * c ∉ Subgroup.zpowers c := by
+    rw [Subgroup.mul_mem_iff_of_index_two h_idx]
+    intro hiff
+    exact h_a_notmem (hiff.mpr (Subgroup.mem_zpowers c))
+  have hy_mem : a * c * a⁻¹ ∈ Subgroup.zpowers c := by
+    rw [Subgroup.mul_mem_iff_of_index_two h_idx]
+    exact iff_of_false h_ac_notmem h_a_inv_notmem
+  have hy_order : orderOf (a * c * a⁻¹) = 4 := by
+    have hsemi : SemiconjBy a c (a * c * a⁻¹) := by
+      change a * c = (a * c * a⁻¹) * a
+      group
+    exact (SemiconjBy.orderOf_eq a hsemi).symm.trans h_order4
+  rcases mem_zpowers_orderOf_four_eq_self_or_inv h_order4 hy_mem hy_order with h_conj_fixed | h_conj
+  · exfalso
+    have h_comm : Commute a c := by
+      change a * c = c * a
+      calc a * c = (a * c * a⁻¹) * a := by group
+        _ = c * a := by rw [h_conj_fixed]
+    obtain ⟨x, y, hxy⟩ := h_nonab
+    exact hxy (commutative_of_index_two_zpowers_of_commute_generator c a
+      h_idx h_a_notmem h_comm x y)
+  · rcases dihedralOrQuaternion_of_invertingConjugation hP c a h_idx h_a_notmem h_conj
+      with hD | hQ
+    · left
+      rw [h_order4] at hD
+      exact hD
+    · right
+      have h_half : orderOf c / 2 = 2 := by
+        rw [h_order4]
+      rw [h_half] at hQ
+      exact hQ
 
 end
 
