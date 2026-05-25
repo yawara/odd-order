@@ -1524,6 +1524,17 @@ private lemma zpowers_involution_eq_pow_pred_of_order_two_pow
     · simp [pow_succ]
   rw [h_z_half, h_order, hhalf]
 
+private lemma square_eq_one_or_unique_involution_of_square_sq_one
+    {P : Type*} [Group P] (c a z : P)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_z_unique : ∀ y ∈ Subgroup.zpowers c, y ^ 2 = 1 → y ≠ 1 → y = z)
+    (h_a_sq_sq : (a ^ 2) ^ 2 = 1) :
+    a ^ 2 = 1 ∨ a ^ 2 = z := by
+  by_cases h_a_sq_one : a ^ 2 = 1
+  · exact Or.inl h_a_sq_one
+  · exact Or.inr (h_z_unique (a ^ 2)
+      (Subgroup.sq_mem_of_index_two h_idx a) h_a_sq_sq h_a_sq_one)
+
 private noncomputable def semiDihedralIsoOfTwistInvolution
     {P : Type*} [Group P] [Finite P]
     (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
