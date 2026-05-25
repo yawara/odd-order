@@ -23,7 +23,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
 | 5A | Transfer 定義・welldefinedness・準同型性 | 5.1 – 5.4 | mathlib + ✅ Thm 5.3 + Cor 5.4 |
-| 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
+| 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | ✅ 5.8 + 5.9, mathlib + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
 | 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
@@ -213,12 +213,92 @@ section /- 5B: Central transfer, Schur, Dietzmann (pp. 153-159) -/
 
 - **Thm 5.6** (中心 transfer = `g ↦ g^n`): mathlib `MonoidHom.transferCenterPow` 直接.
 - **Lemma 5.8, Cor 5.9** (`Z(G)` transversal commutator 構造 + `|G:Z|`-乗 = 1):
-  形式化保留 (`Subgroup.LeftTransversal` projection の精緻化が要る. FT 経路で要求なし).
+  ✅ quotient `out` 代表元版 + transfer-kernel 版.
 - **Thm 5.7 Schur** (`|G:Z(G)| < ∞ ⇒ G' 有限`): mathlib
   `Subgroup.card_commutator_le_of_finite_commutatorSet` 直接 (bound 付き強化版).
 - **Thm 5.10 Dietzmann** (`X ⊆ G` 有限・共役閉・∃n, x^n=1 ⇒ `⟨X⟩` 有限):
   mathlib 未収載. Schur 5.7 の証明では mathlib `closureCommutatorRepresentatives` 経路
   で代替されているため独立 Dietzmann の必要なし. 形式化保留. -/
+
+/-- A central factor on the right of the left commutator input does not change the commutator. -/
+lemma commutatorElement_mul_center_left {z x y : G} (hz : z ∈ Subgroup.center G) :
+    ⁅x * z, y⁆ = ⁅x, y⁆ := by
+  have hzy : z * y = y * z := ((Subgroup.mem_center_iff.mp hz) y).symm
+  simp [commutatorElement_def, hzy, mul_assoc]
+
+/-- A central factor on the right of the right commutator input does not change the commutator. -/
+lemma commutatorElement_mul_center_right {x z y : G} (hz : z ∈ Subgroup.center G) :
+    ⁅x, y * z⁆ = ⁅x, y⁆ := by
+  have hzx : z * x⁻¹ = x⁻¹ * z := ((Subgroup.mem_center_iff.mp hz) x⁻¹).symm
+  simp [commutatorElement_def, hzx, mul_assoc]
+
+/-- **Isaacs Lemma 5.8** (representative form): every commutator is obtained from the
+chosen representatives of the two cosets in `G ⧸ Z(G)`.
+
+This is the quotient-`out` version of Isaacs' right-transversal statement. It avoids introducing
+a separate bridge API for transversals while retaining the useful formal content. -/
+theorem commutatorElement_eq_centerQuotient_out (x y : G) :
+    ⁅x, y⁆ =
+      ⁅(QuotientGroup.mk' (Subgroup.center G) x).out,
+        (QuotientGroup.mk' (Subgroup.center G) y).out⁆ := by
+  let qx : G ⧸ Subgroup.center G := QuotientGroup.mk' (Subgroup.center G) x
+  let qy : G ⧸ Subgroup.center G := QuotientGroup.mk' (Subgroup.center G) y
+  have hqx :
+      QuotientGroup.mk' (Subgroup.center G) qx.out =
+        QuotientGroup.mk' (Subgroup.center G) x := by
+    simp [qx]
+  have hqy :
+      QuotientGroup.mk' (Subgroup.center G) qy.out =
+        QuotientGroup.mk' (Subgroup.center G) y := by
+    simp [qy]
+  obtain ⟨zx, hzx, hx⟩ := (QuotientGroup.mk'_eq_mk' (Subgroup.center G)).mp hqx
+  obtain ⟨zy, hzy, hy⟩ := (QuotientGroup.mk'_eq_mk' (Subgroup.center G)).mp hqy
+  calc
+    ⁅x, y⁆ = ⁅qx.out * zx, y⁆ := by rw [hx]
+    _ = ⁅qx.out, y⁆ := commutatorElement_mul_center_left hzx
+    _ = ⁅qx.out, qy.out * zy⁆ := by rw [hy]
+    _ = ⁅qx.out, qy.out⁆ := commutatorElement_mul_center_right hzy
+    _ = ⁅(QuotientGroup.mk' (Subgroup.center G) x).out,
+          (QuotientGroup.mk' (Subgroup.center G) y).out⁆ := rfl
+
+/-- **Isaacs Lemma 5.8**: if `Z(G)` has finite index, then there are only finitely many
+commutators in `G`. -/
+theorem finite_commutatorSet_of_finiteIndex_center
+    [Subgroup.FiniteIndex (Subgroup.center G)] : Finite (commutatorSet G) := by
+  classical
+  letI := (Subgroup.center G).fintypeQuotientOfFiniteIndex
+  let f : (G ⧸ Subgroup.center G) × (G ⧸ Subgroup.center G) → G := fun q =>
+    ⁅q.1.out, q.2.out⁆
+  have hsubset : commutatorSet G ⊆ Set.range f := by
+    intro c hc
+    rcases (mem_commutatorSet_iff.mp hc) with ⟨x, y, rfl⟩
+    exact ⟨(QuotientGroup.mk' (Subgroup.center G) x,
+        QuotientGroup.mk' (Subgroup.center G) y),
+      (commutatorElement_eq_centerQuotient_out x y).symm⟩
+  exact ((Set.finite_range f).subset hsubset).to_subtype
+
+/-- **Isaacs Thm 5.7** (Schur): if `Z(G)` has finite index, then `G'` is finite. -/
+theorem finite_commutator_of_finiteIndex_center
+    [Subgroup.FiniteIndex (Subgroup.center G)] : Finite (commutator G) := by
+  haveI : Finite (commutatorSet G) := finite_commutatorSet_of_finiteIndex_center (G := G)
+  infer_instance
+
+/-- **Isaacs Cor 5.9** (subgroup form): if `Z(G)` has finite index, every element of `G'`
+is killed by the index `|G : Z(G)|`. -/
+theorem pow_index_center_eq_one_of_mem_commutator
+    [Subgroup.FiniteIndex (Subgroup.center G)] {g : G} (hg : g ∈ commutator G) :
+    g ^ (Subgroup.center G).index = 1 := by
+  have h := Abelianization.commutator_subset_ker (MonoidHom.transferCenterPow G) hg
+  simpa only [MonoidHom.mem_ker, Subtype.ext_iff] using h
+
+/-- **Isaacs Cor 5.9**: if `Z(G)` has finite index, every commutator has
+`|G : Z(G)|`-th power equal to `1`. -/
+theorem commutatorElement_pow_index_center_eq_one
+    [Subgroup.FiniteIndex (Subgroup.center G)] (x y : G) :
+    ⁅x, y⁆ ^ (Subgroup.center G).index = 1 := by
+  apply pow_index_center_eq_one_of_mem_commutator
+  rw [_root_.commutator_def]
+  exact Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
 
 end -- 5B
 
