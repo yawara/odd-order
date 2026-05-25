@@ -117,6 +117,13 @@ theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
   have hmN : (m : N) ≠ 1 := fun hmN => hm (Subtype.ext hmN)
   exact h a ha (m : N) hmN (Subtype.ext_iff.mp hfix)
 
+/-- A Frobenius action remains Frobenius after restricting the acting group to a subgroup. -/
+theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
+    IsFrobeniusAction B N := by
+  intro b hb n hn hfix
+  have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+  exact h (b : A) hbA n hn (by simpa using hfix)
+
 @[reducible] private def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) (a : A) : MulAut (N ⧸ M) := by
   let f : N ⧸ M →* N ⧸ M :=
@@ -1263,6 +1270,56 @@ theorem false_of_frobeniusAction_partition_of_coprime_card
   obtain ⟨u, hu⟩ :=
     exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
   exact false_of_frobeniusAction_partition_of_nontrivial_power hFrob partn hu
+
+/-- Isaacs Theorem 6.9 contradiction package: if the acting group has a subgroup partition
+whose part count is `1 + n` with `n ∣ |A|`, then it cannot act Frobeniusly on a nontrivial
+finite abelian group. -/
+theorem false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hdvd : partn.parts.card - 1 ∣ Nat.card A) :
+    False := by
+  have hcop_AU : (Nat.card A).Coprime (Nat.card U) := by
+    classical
+    haveI : Fintype A := Fintype.ofFinite A
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Fintype.card_eq_nat_card] using
+      (IsFrobeniusAction.coprime_card (A := A) (N := U) hFrob).symm
+  exact false_of_frobeniusAction_partition_of_coprime_card hFrob partn
+    (hcop_AU.coprime_dvd_left hdvd)
+
+/-- Same contradiction package, in the textual `|Π| = 1 + n` form used in Isaacs 6.9. -/
+theorem false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A) {n : ℕ}
+    (hcard : partn.parts.card = n + 1) (hdvd : n ∣ Nat.card A) :
+    False := by
+  apply false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card hFrob partn
+  rwa [hcard, Nat.add_sub_cancel]
+
+/-- Subgroup form of the Isaacs 6.9 contradiction package: a subgroup of the acting group with
+such a partition already contradicts a Frobenius action of the ambient group. -/
+theorem false_of_frobeniusAction_actorSubgroup_partition_of_sub_one_dvd_actor_card
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    (partn : SubgroupPartition B) (hdvd : partn.parts.card - 1 ∣ Nat.card B) :
+    False :=
+  false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card
+    (IsFrobeniusAction.actorSubgroup hFrob B) partn hdvd
+
+/-- Subgroup form of the Isaacs 6.9 contradiction package, with `|Π| = 1 + n`. -/
+theorem false_of_frobeniusAction_actorSubgroup_partition_of_card_eq_succ_and_dvd_actor_card
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    (partn : SubgroupPartition B) {n : ℕ}
+    (hcard : partn.parts.card = n + 1) (hdvd : n ∣ Nat.card B) :
+    False :=
+  false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    (IsFrobeniusAction.actorSubgroup hFrob B) partn hcard hdvd
 
 end
 

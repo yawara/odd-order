@@ -307,6 +307,10 @@ FT クリティカル度 + 章内依存で並べる:
   さらに 6.9 で使う
   `false_of_frobeniusAction_partition_of_coprime_card` まで接続済み:
   Frobenius action + `gcd(|Π|-1, |U|)=1` から直接矛盾を出せる.
+  6.9 本文の `|Π| = 1+n`, `n ∣ |A|` 形も
+  `false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card`
+  および subgroup actor 版まで実装済み. `IsFrobeniusAction.actorSubgroup`
+  で「A の部分群へ置き換える」本文操作も Lean 化した.
   残りは elementary abelian `p^2` / solvable Frobenius group から具体的な
   `SubgroupPartition` を作る 6.9 側の構成.
 
