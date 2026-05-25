@@ -223,23 +223,40 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
+## 前提章の再分類 (main 取り込み後)
+
+先行 chapter の進捗により, Ch.7 側で blocker と見なす対象を絞り直す:
+
+- ✅ **Ch.3 Hall-Higman 3.21**: `hall_higman_1_2_3` は sorry-free. Thm 7.5 / 7.6 の Hall-Higman step は利用側の接続問題.
+- ✅ **Ch.4 4.33 / 4.35**: p-local `p'`-core 押し込みと abelian p-group coprime action 補題は利用可能.
+- ✅ **Ch.5 5.26 + `HasNormalPComplement`**: Thm 7.1 の normal p-complement 側の基礎定義・Frobenius criterion は利用可能.
+- ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
+- 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
+- 🔴 **Ch.6 6.20**: Thm 7.6 Step 5 の blocker. abelian coprime action 補題.
+- 🔴 **`Aut(E) ≅ GL(2,p)` bridge**: Thm 7.5 の `|V| ≤ p^2`, noncyclic p-group ⇒ elementary abelian order `p^2` から Lem 7.3 へ渡すために必要.
+- 🟡 **Ω₁ / order-p fixed subgroup helper**: Thm 7.6 Step 7 で必要. Ch.6 6.11 実装で先に共通化できる可能性あり.
+
 ## 着手順 (提案)
 
 FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 
-1. **`def IsElementaryAbelian` + `def J(P)` (J(P) 定義)** — **設計の核**. `OddOrder.GroupTheory.ElementaryAbelian` を別ファイル化して将来 mathlib upstream を視野に. `def J (P : Subgroup G) : Subgroup G := ⨆ E ∈ {E : Subgroup G | E ⊆ P ∧ IsElementaryAbelian E ∧ ∀ F, F ⊆ P → IsElementaryAbelian F → Nat.card F ≤ Nat.card E}, E` の形.
-2. **7.2 J(P) char** — def 直後の短い系. ウォームアップ.
-3. **7.4 SL(2,q) -I unique** — mathlib `SpecialLinearGroup 2 (ZMod p)` 上の行列計算. Cayley-Hamilton + 最小多項式. 独立小テーマ.
-4. ✅ **7.3 GL(2,p) 補題** — induction on `|L|` + Sylow + コプライム作用 + 7.4.
-5. **7.5 normal-P theorem** — 8 step proof. **Aut(E) ≅ GL(n,p) 同型 (n=2)** + 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) + Hall-Higman 3.21. faithful action / `C_V(P)` bridge は着手済み. 章内重実装.
-6. **7.6 normal-J theorem** — 8 step proof. 7.5 + Ch.6 **6.20** (abelian coprime ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21. **章のハイライト**.
-7. **7.7 N/C `p'`-quotient** — Lem 2.17 (Ch.2) の拡張. correspondence theorem. 短い.
-8. **7.1 Thompson normal p-complement** — Steps 1-7. **Ch.5 5.26 Frobenius normal p-comp + 7.6 normal-J + 7.7**. Ch.6 6.23 の `axiom`/`sorry` をここで `theorem` 書き換え.
-9. **Ch.6 6.23 (Thompson char-X) を Ch.7 で書き換え** — Ch.7 完了時に Ch.6 へバックエッジ (6.23 = 7.1 系: 全 char X で `N_G(X)` が normal p-comp ⇒ Thm 7.1 適用で G が normal p-comp).
-10. **Ch.6 6.24 (Frobenius kernel nilpotent) 完備化** — 6.22 + 改良版 6.23 から導出. Ch.7 完了の波及効果.
-11. **7.8 Burnside `p^a q^b`** — 9 step proof. 7.6 + Ch.4 4.33 + Ch.2 2.13 Baer + Sylow / nilpotent 多用. Phase 1 完成度のため. **BG/Peterfalvi 直接被引用無いので最後**.
+1. ✅ **shared definitions + 7.2 / 7.4 / 7.3 / 7.7** — Ch.7 内の独立補題群は完了.
+2. 🔧 **7.5 normal-P theorem 前半** — Ch.6 6.11 に依存しない action / centralizer / quotient-action 側を先に固める.
+   - `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|`.
+   - `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`.
+   - `G = ⟨P,Q⟩` 仮定下で `G` が `U` に自明に作用し, quotient action `G ↷ V/U` を得る.
+   - kernel `K` について `[V,K,K]=1` までを Ch.4 action-commutator API と接続する.
+3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
+4. 🔴 **`Aut(E) ≅ GL(2,p)` bridge** — `|V| ≤ p^2` かつ noncyclic p-group から elementary abelian `p^2` を取り, Lem 7.3 に渡す.
+5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
+6. 🔴 **Ch.6 6.20** — 7.6 Step 5 の直接前提.
+7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
+8. **7.1 Thompson normal p-complement** — Ch.5 5.26 + 7.6 + 7.7. Ch.6 6.23 をここから backfill.
+9. **Ch.6 6.23 / 6.24 backfill** — 7.1 から Thompson char-X 版と Frobenius kernel nilpotent を完備化.
+10. **7.8 Burnside `p^a q^b`** — 7.6 + Ch.4 4.33 + Ch.2 2.13 Baer. **BG/Peterfalvi 直接被引用は薄いので最後**.
 
-優先度 (FT クリティカル度): **7.6 (normal-J) ≫ 7.1 (Thompson normal p-comp) > 7.5 (normal-P) > 7.3 (GL(2,p))** > 7.2, 7.4 (補題) > 7.7 (Ch.2 拡張) > 7.8 (Burnside, 系統外).
+優先度 (FT クリティカル度 + 現在の到達可能性):
+**7.5 前半補題** → **Ch.6 6.11 / Aut(E)≅GL(2,p)** → **7.5 本体** → **Ch.6 6.20** → **7.6** → **7.1 / Ch.6 backfill** → **7.8**.
 
 ## 開発時の注意点
 
