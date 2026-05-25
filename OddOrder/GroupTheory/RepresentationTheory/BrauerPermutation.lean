@@ -7,7 +7,7 @@ import Mathlib.Algebra.Group.Conj
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Brauer's permutation lemma
@@ -107,8 +107,8 @@ to relate the two compatible involutions `χ ↦ χ̄` on `Irr G` and `C ↦ C�
 (Proof deferred: requires the Wave 1a `SecondOrthogonality` module + a finite indexing
 API for `irreducibleCharacters G`.) -/
 theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G] :
-    Nat.card { φ : ClassFunction G ℂ //
-                 IsIrreducibleCharacter φ ∧ ClassFunction.IsReal φ } =
+    Nat.card { χ : IrreducibleCharacter G //
+                 ClassFunction.IsReal (χ : ClassFunction G ℂ) } =
     Nat.card { C : ConjClasses G // ConjClasses.IsReal C } := by
   sorry
 

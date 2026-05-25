@@ -9,7 +9,7 @@ import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Data.Complex.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Second orthogonality (column orthogonality) of irreducible characters
@@ -59,16 +59,16 @@ variable {G : Type*} [Group G]
 
 For `g, h ∈ G` with `g ~ h`, `∑_{χ ∈ Irr G} χ(g) · χ̄(h) = |C_G(g)|` in `ℂ`.
 
-The sum runs over a `Fintype` of the subtype of `ClassFunction G ℂ` carved out by
-`IsIrreducibleCharacter`. Such a `Fintype` is well-defined for finite `G`; supplying
-it as an explicit instance keeps this statement uncoupled from the indexing API for
-`Irr(G)` (TODO Wave 1a `IrrIndexing.lean`).
+The sum runs over `IrreducibleCharacter G`, the named subtype of `ClassFunction G ℂ`
+carved out by `IsIrreducibleCharacter`. Such a `Fintype` is well-defined for finite
+`G`; supplying it as an explicit instance keeps this statement uncoupled from the
+eventual existence proof for the indexing type.
 
 (Proof deferred: standard matrix-algebra route via invertibility of the character table.) -/
 theorem column_orthogonality_conj
-    [Fintype { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ }]
+    [Fintype (IrreducibleCharacter G)]
     {g h : G} (hgh : IsConj g h) :
-    ∑ χ : { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ },
+    ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
   sorry
@@ -77,9 +77,9 @@ theorem column_orthogonality_conj
 
 For `g, h ∈ G` with `g ≁ h`, `∑_{χ ∈ Irr G} χ(g) · χ̄(h) = 0` in `ℂ`. -/
 theorem column_orthogonality_not_conj
-    [Fintype { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ }]
+    [Fintype (IrreducibleCharacter G)]
     {g h : G} (hgh : ¬ IsConj g h) :
-    ∑ χ : { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ },
+    ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0 := by
   sorry
 
@@ -88,9 +88,9 @@ theorem column_orthogonality_not_conj
 This is `χ(g) · χ̄(g)` summed over irreducibles, equal to the centralizer size. Equivalently
 `∑_χ ‖χ(g)‖² = |C_G(g)|` (using `z * star z = ‖z‖²`). -/
 theorem column_orthogonality_diag
-    [Fintype { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ }]
+    [Fintype (IrreducibleCharacter G)]
     (g : G) :
-    ∑ χ : { φ : ClassFunction G ℂ // IsIrreducibleCharacter φ },
+    ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) :=
   column_orthogonality_conj (IsConj.refl g)

@@ -19,9 +19,9 @@ stub 群の最初の依存で、issue 0022 より先に片付ける。
       を `sorry` なしにする。
 - [ ] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_not_conj`
       を `sorry` なしにする。
-- [ ] 必要なら irreducible character indexing API を小さく追加する。
-- [ ] 既存 statement の `[Fintype {φ // IsIrreducibleCharacter φ}]` 仮定が妥当か確認し、
-      変更するなら downstream (`BrauerPermutation`) も同時に追従する。
+- [x] irreducible character indexing API を小さく追加する。
+- [x] 既存 statement の `[Fintype {φ // IsIrreducibleCharacter φ}]` 仮定を
+      named indexing type に変更し、downstream (`BrauerPermutation`) も追従する。
 
 ## 完了条件
 
@@ -33,5 +33,6 @@ stub 群の最初の依存で、issue 0022 より先に片付ける。
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
 - downstream: `issues/0022-peterfalvi-brauer-permutation.md`
+- `OddOrder/GroupTheory/RepresentationTheory/IrrIndexing.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/SecondOrthogonality.lean`
 - `notes/peterfalvi/s03_preliminary_character.md`

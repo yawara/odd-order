@@ -30,6 +30,7 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
 - depends on: `issues/0021-peterfalvi-second-orthogonality.md`
+- `OddOrder/GroupTheory/RepresentationTheory/IrrIndexing.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean`
 - `notes/peterfalvi/s03_preliminary_character.md`
 - `notes/peterfalvi/s06_dade_certain_subgroup.md`
