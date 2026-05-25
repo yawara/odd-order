@@ -66,6 +66,7 @@ Feit-Thompson 局所解析の中核を担う:
 namespace OddOrder.Isaacs.Ch07
 
 open scoped commutatorElement
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -1234,6 +1235,35 @@ theorem actionCentralizer_antitone {A V : Type*} [Group A] [Group V]
     actionCentralizer φ Q ≤ actionCentralizer φ P := by
   intro v hv p
   exact hv ⟨p, hPQ p.property⟩
+
+/-- If `Q = P^g`, then `C_V(Q) = C_V(P)^g` for the action `φ`.
+
+This is the Lean form of the first conjugacy step in Isaacs Thm 7.5. -/
+theorem actionCentralizer_map_conj {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P : Subgroup A) (g : A) :
+    actionCentralizer φ (P.map (MulAut.conj g).toMonoidHom) =
+      (φ g : MulAut V) • actionCentralizer φ P := by
+  ext v
+  constructor
+  · intro hv
+    refine ⟨(φ g)⁻¹ v, ?_, MulAut.apply_inv_self V (φ g) v⟩
+    intro p
+    have hfix := hv ⟨(MulAut.conj g) p,
+      Subgroup.mem_map_of_mem (MulAut.conj g).toMonoidHom p.property⟩
+    change (φ ((MulAut.conj g) (p : A))) v = v at hfix
+    have hfix'' : (φ (g * (p : A) * g⁻¹)) v = v := by
+      simpa [MulAut.conj_apply] using hfix
+    have h := congrArg (fun x : V => (φ g)⁻¹ x) hfix''
+    simpa [map_mul] using h
+  · rintro ⟨u, hu, rfl⟩ q
+    rcases q.property with ⟨p, hp, hq⟩
+    have hpfix := hu ⟨p, hp⟩
+    have h := congrArg (fun x : V => (φ g) x) hpfix
+    have hq' : q.val = g * p * g⁻¹ := by
+      simpa [MulAut.conj_apply] using hq.symm
+    change (φ q.val) ((φ g) u) = (φ g) u
+    rw [hq']
+    simpa [map_mul] using h
 
 end -- 7A
 

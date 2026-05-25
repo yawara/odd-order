@@ -216,8 +216,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `|L|`-induction + P-invariant Sylow + Ch.4 coprime action + Lem 7.4 + finite abelian
   2-group cyclicity branch + odd-q orbit-count branch.
 - 🔧 **Thm 7.5** action infrastructure 着手: faithful action `G ↪ Aut(V)` の Lean bridge
-  (`toMulAut_injective_of_faithful`, `subgroupOfMulAutAction`) と `C_V(P)` notation
-  (`actionCentralizer`) を sorry-free で追加. theorem statement / proof 本体は保留.
+  (`toMulAut_injective_of_faithful`, `subgroupOfMulAutAction`), `C_V(P)` notation
+  (`actionCentralizer`), conjugacy step `C_V(P^g)=C_V(P)^g`
+  (`actionCentralizer_map_conj`) を sorry-free で追加. theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
 ## 着手順 (提案)
