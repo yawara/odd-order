@@ -16,6 +16,7 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
@@ -694,6 +695,36 @@ theorem card_notConjugateSet_eq_index [Finite G]
       have := h_lagrange
       nlinarith
     omega
+
+end
+
+section /- 6B structural helper: finite abelian Z-groups -/
+
+/-! ### Finite abelian Z-group helpers
+
+Isaacs Lemma 6.20 uses Corollary 6.17 to show that the Sylow subgroups of an abelian
+Frobenius complement are cyclic, and then concludes that the complement itself is cyclic.
+Mathlib packages the Sylow-cyclic condition as `IsZGroup`; these helpers expose exactly the
+abelian specialization needed for the 6.20 route. -/
+
+/-- A finite abelian group whose Sylow subgroups are all cyclic is cyclic. -/
+theorem isCyclic_of_sylow_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hSylow : ∀ p : ℕ, p.Prime → ∀ P : Sylow p A, IsCyclic P) :
+    IsCyclic A := by
+  haveI : IsZGroup A := ⟨hSylow⟩
+  exact inferInstance
+
+/-- If a finite abelian group is not cyclic, then some Sylow subgroup is not cyclic. -/
+theorem exists_prime_sylow_not_isCyclic_of_not_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hA : ¬ IsCyclic A) :
+    ∃ p : ℕ, p.Prime ∧ ∃ P : Sylow p A, ¬ IsCyclic P := by
+  by_contra hnone
+  apply hA
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    by_contra hP
+    exact hnone ⟨p, hp, P, hP⟩
 
 end
 
