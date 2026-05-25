@@ -1265,6 +1265,19 @@ theorem actionCentralizer_map_conj {A V : Type*} [Group A] [Group V]
     rw [hq']
     simpa [map_mul] using h
 
+/-- Conjugate subgroups have action-centralizers of the same index. -/
+theorem actionCentralizer_map_conj_index {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P : Subgroup A) (g : A) :
+    (actionCentralizer φ (P.map (MulAut.conj g).toMonoidHom)).index =
+      (actionCentralizer φ P).index := by
+  rw [actionCentralizer_map_conj]
+  have h := Subgroup.relIndex_pointwise_smul (h := (φ g : MulAut V))
+    (J := actionCentralizer φ P) (K := (⊤ : Subgroup V))
+  have htop : (φ g : MulAut V) • (⊤ : Subgroup V) = ⊤ := by
+    rw [Subgroup.pointwise_smul_def]
+    exact Subgroup.map_top_of_surjective _ (fun v => ⟨(φ g)⁻¹ v, by simp⟩)
+  simpa [htop] using h
+
 /-- The fixed subgroup of a generated subgroup is the intersection of the fixed subgroups.
 
 This is the formal version of the Theorem 7.5 step: if both `P` and `Q` act trivially on `U`,
@@ -1294,6 +1307,35 @@ theorem actionCentralizer_sup {A V : Type*} [Group A] [Group V]
         (φ a⁻¹) v = (φ a)⁻¹ v := by rw [map_inv]
         _ = (φ a)⁻¹ ((φ a) v) := by rw [ha]
         _ = v := MulAut.inv_apply_self V (φ a) v
+
+/-- The index of the fixed subgroup for `P ⊔ Q` is bounded by the product of the two
+individual fixed-subgroup indices. -/
+theorem actionCentralizer_sup_index_le {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) :
+    (actionCentralizer φ (P ⊔ Q)).index ≤
+      (actionCentralizer φ P).index * (actionCentralizer φ Q).index := by
+  rw [actionCentralizer_sup]
+  exact Subgroup.index_inf_le
+
+/-- A packaged version of `actionCentralizer_sup_index_le` with external bounds. -/
+theorem actionCentralizer_sup_index_le_of_le {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) {m n : ℕ}
+    (hP : (actionCentralizer φ P).index ≤ m)
+    (hQ : (actionCentralizer φ Q).index ≤ n) :
+    (actionCentralizer φ (P ⊔ Q)).index ≤ m * n :=
+  (actionCentralizer_sup_index_le φ P Q).trans (Nat.mul_le_mul hP hQ)
+
+/-- The Theorem 7.5 index estimate: if both fixed subgroups have index at most `p`, then
+the fixed subgroup of `P ⊔ Q` has index at most `p^2`. -/
+theorem actionCentralizer_sup_index_le_sq {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) {p : ℕ}
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    (actionCentralizer φ (P ⊔ Q)).index ≤ p ^ 2 := by
+  calc
+    (actionCentralizer φ (P ⊔ Q)).index ≤ p * p :=
+      actionCentralizer_sup_index_le_of_le φ P Q hP hQ
+    _ = p ^ 2 := by ring
 
 end -- 7A
 
