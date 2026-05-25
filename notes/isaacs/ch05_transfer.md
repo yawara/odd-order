@@ -67,7 +67,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 |---|---|---|---|
 | 5.20 | Theorem | v: G → P/P' transfer ⇒ ker(v) = A^p(G) (G^{ab,p'} kernel) | L3130 |
 | 5.21 | Theorem | **Focal Subgroup Theorem (D. G. Higman)**: Foc_G(P) = P ∩ G' = P ∩ A^p(G) = P ∩ ker(v) | L3138 |
-| 5.22 | Corollary | P ⊆ H controls G-fusion in P ⇒ H controls p-transfer; \|G:O^p(G)\| = \|H:O^p(H)\| | L3180 |
+| 5.22 | Corollary | P ⊆ H controls G-fusion in P ⇒ H controls p-transfer; focal core `Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn` 実装済み, A^p/index equality は未 | L3180 |
 | 5.23 | Corollary | abelian Sylow_p ⇒ N_G(P) controls p-transfer (5.12 + 5.22) | L3186 |
 | 5.24 | Theorem | G 単純, H ⊆ G maximal nilpotent ⇒ H は p-group (Wielandt: 最大冪零部分群分類入口) | L3194 |
 
@@ -122,8 +122,8 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | **5.18 abelian Sylow 強化 Burnside** | ✅ 2 形式: (i) **弱形** `abelian_sylow_commutator_inf_eq_focal` (mathlib `commutator_inf_eq_focalSubgroup` alias, G' ∩ P = focal P 形); (ii) **強形** `eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (2026-05-23, ~80 LOC, Isaacs p.166 流) — `G' ∩ P ∩ Z(N_G(P)) = 1` の要素形式. 強形は transfer id : P→P + transfer_eq_pow に Lem 5.12 (N_G(P) controls C_G(P) fusion) + `Commute.pow_right` を組み合わせ. **下流 Cor 5.19 (cyclic Sylow_2 ⇒ G 非単純) を unblock** | ✅ |
 | 5.19 Sylow_2 direct product 系 ⇒ 非単純 | ✅ `not_isSimpleGroup_of_isCyclic_sylow_two` (2026-05-23, ~110 LOC, cyclic Sylow_2 特殊化). Helper `cyclic_finite_unique_order_two` (IsCyclic.card_orderOf_eq_totient + Nat.totient_two = 1). 主体: Cauchy + Thm 5.18 強形 + cyclic unique order-2. **axiom-free** (5.18 強形 + mathlib のみ, Ch.4 不要) | ✅ |
 | 5.20 ker(v) = A^p(G) | mathlib `Focal.lean` で `commutator_inf_eq_focalSubgroup` (L208 周辺) + 商の構造で導出可. A^p(G) 定義そのものが未収載 | 中 (`Subgroup.AStarP` 等の新規 def 必要) |
-| 5.22 H controls fusion ⇒ controls p-transfer | mathlib 未収載. Focal subgroup theorem + index 計算 | 中 |
-| 5.23 abelian Sylow ⇒ N controls p-transfer | 5.12 + 5.22 系. ラッパー | 短い |
+| 5.22 H controls fusion ⇒ controls p-transfer | 部分実装: `Subgroup.ControlsFusionIn` + focal core `Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn` (2026-05-25). 残りは `A^p(H)=H∩A^p(G)` / transfer image index equality への接続 | 中 |
+| 5.23 abelian Sylow ⇒ N controls p-transfer | 5.12 + 5.22 系. 5.22 の A^p/index equality 接続後に短く導出 | 短い |
 | **5.24 G simple maximal nilpotent ⇒ p-group** | mathlib 未収載. transfer + Sylow + nilpotent 引数. **BG/Peterfalvi 直接被引用無し** | 後回し可 |
 | 5.25 controls own fusion ⇔ normal p-comp | ✅ 完成 (2026-05-25). `OPrime`/`APrime` 定義 + `APrime_characteristic` + `A^p(N)=N` (`APrime_eq_top_of_eq_OPrime`) + transfer-focal kernel で Isaacs p.173 の `A^p(N)=N → Foc_N(Q)=Q` を bridge 過剰化せず実装. | ✅ |
 | **5.26 Frobenius normal p-complement** | ✅ 完成 (2026-05-25). `hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer` は 5.25 + 5.27 + 5.28 で sorry-free. 追加で Cor 5.29/5.30 共通入口 `hasNormalPComplement_of_prime_subgroups_centralize` も実装. | ✅ |

@@ -952,11 +952,63 @@ mathlib `Focal.lean` で Focal Subgroup Theorem が完全実装済 (Boyang Hu, 2
 **Thm 5.20** (ker(v) = A^p(G)) = `ker_restrict_transferFocal_eq_focalSubgroupOf` で同等内容
 (Isaacs 流は `A^p(G) = O^p(G) · G'` の表示だが, mathlib では `focalSubgroupOf` 表示で同値).
 
-**Cor 5.22, 5.23** (`H controls fusion ⇒ controls p-transfer`): mathlib transferFocal +
-Isaacs 流の "controls fusion" 定義の橋渡し. 形式化保留 (FT 経路で BG 直接引用なし).
+**Cor 5.22, 5.23** (`H controls fusion ⇒ controls p-transfer`): `ControlsFusionIn`
+と focal equality core は実装済み. transfer image / `A^p` index equality への接続は未.
 
 **Thm 5.24** (G simple, H maximal nilpotent ⇒ H は p-group; Wielandt): BG/Peterfalvi
 直接被引用無し. 保留. -/
+
+/-- "`K` controls `G`-fusion in `H`": any two elements of `H` conjugate in the
+ambient group `G` are already conjugate by an element of `K`.
+
+Isaacs §5C-§5D で使う fusion-control 条件. -/
+def _root_.Subgroup.ControlsFusionIn {G : Type*} [Group G] (K H : Subgroup G) : Prop :=
+  ∀ ⦃x y : G⦄, x ∈ H → y ∈ H →
+    (∃ g : G, g * x * g⁻¹ = y) →
+    (∃ u : G, u ∈ K ∧ u * x * u⁻¹ = y)
+
+/-- **Isaacs Cor 5.22 (focal-subgroup core)**:
+if `H` controls `G`-fusion in `P`, then the focal subgroup of `P` computed inside
+`H` maps to the focal subgroup of `P` computed inside `G`.
+
+This is the substantive focal-subgroup step in the proof that `H` controls
+`p`-transfer in `G`; the remaining book argument is an index/kernel comparison
+via the focal subgroup theorem. -/
+theorem _root_.Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn
+    {G : Type*} [Group G] {P H : Subgroup G} (hP_le_H : P ≤ H)
+    (hFusion : H.ControlsFusionIn P) :
+    (P.subgroupOf H).focalSubgroup.map H.subtype = P.focalSubgroup := by
+  apply le_antisymm
+  · rw [Subgroup.focalSubgroup_def, MonoidHom.map_closure, Subgroup.focalSubgroup_def]
+    apply Subgroup.closure_mono
+    rintro y ⟨z, hz, rfl⟩
+    rcases hz with ⟨hzPH, x, hxPH, u, rfl⟩
+    exact ⟨hzPH, (x : G), hxPH, (u : G), rfl⟩
+  · rw [Subgroup.focalSubgroup_def, Subgroup.closure_le]
+    rintro g ⟨hgP, x, hxP, u, rfl⟩
+    have hyP : u * x * u⁻¹ ∈ P := by
+      have hy_eq : u * x * u⁻¹ = (⁅x, u⁆)⁻¹ * x := by
+        rw [commutatorElement_def]
+        group
+      rw [hy_eq]
+      exact P.mul_mem (P.inv_mem hgP) hxP
+    obtain ⟨v, hvH, hv⟩ := hFusion hxP hyP ⟨u, rfl⟩
+    have hcomm_eq : ⁅x, u⁆ = ⁅x, v⁆ := by
+      rw [commutatorElement_def, commutatorElement_def]
+      calc
+        x * u * x⁻¹ * u⁻¹ = x * (u * x * u⁻¹)⁻¹ := by group
+        _ = x * (v * x * v⁻¹)⁻¹ := by rw [hv]
+        _ = x * v * x⁻¹ * v⁻¹ := by group
+    let xH : H := ⟨x, hP_le_H hxP⟩
+    let vH : H := ⟨v, hvH⟩
+    let gH : H := ⟨⁅x, u⁆, hP_le_H hgP⟩
+    have hgH_focal : gH ∈ (P.subgroupOf H).focalSubgroup := by
+      rw [Subgroup.focalSubgroup_def]
+      apply Subgroup.subset_closure
+      refine ⟨hgP, xH, hxP, vH, ?_⟩
+      apply Subtype.ext
+      exact hcomm_eq
+    exact Subgroup.mem_map_of_mem H.subtype hgH_focal
 
 end -- 5D
 
@@ -1252,9 +1304,7 @@ that are conjugate in `G`, they are already conjugate by some element of `P`.
 
 Isaacs §5C-§5E で頻出. mathlib 未収載のため新規定義. -/
 def _root_.Sylow.ControlsOwnFusion {p : ℕ} {G : Type*} [Group G] (P : Sylow p G) : Prop :=
-  ∀ ⦃x y : G⦄, x ∈ (P : Subgroup G) → y ∈ (P : Subgroup G) →
-    (∃ g : G, g * x * g⁻¹ = y) →
-    (∃ u : G, u ∈ (P : Subgroup G) ∧ u * x * u⁻¹ = y)
+  (P : Subgroup G).ControlsFusionIn (P : Subgroup G)
 
 /-- **Isaacs Thm 5.25 (⇒)**: G has normal p-complement ⇒ any Sylow_p `P` controls own fusion.
 
