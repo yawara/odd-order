@@ -100,6 +100,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- G π-separable + O_{π'}(G) = ⊥ ⇒ C_G(O_π(G)) ≤ O_π(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_higman_1_2_3
 
+-- Ch.3 (Split Extensions): π-core quotient reduction
+-- Quotienting by O_π(G) kills the π-radical.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot
+
 -- Ch.3 (Split Extensions): Thm 3.22 Hall-Higman π-length ≤ 1
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
@@ -118,10 +122,25 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- 後半: fixedPointsOfMulAut φ > ⊥ (C_G(P) > 1)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup
 
+-- Ch.4 (Commutators): Thm 4.33 setup
+-- Hall-Higman 1.2.3 specialized from `O_π` to the usual p-core `O_p(G)`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.hall_higman_opCore
+-- Normal p-subgroups commute with normal p'-subgroups in a finite group.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.commute_of_normal_isPGroup_of_normal_isPiCompl
+-- First 4.33 step: `O_{p'}(N_G(P))` centralizes `O_p(G)`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.oPiCore_compl_normalizer_le_centralizer_opCore
+-- Reduced 4.33 case after Hall-Higman: `O_{p'}(G)=1` ⇒ `O_{p'}(N_G(P))=1`.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
+
 -- Ch.4 (Commutators): Thm 4.36 ⭐⭐⭐ **= BG Thm 1.11, FT クリティカル**
 -- p > 2, G p-群, A p'-群 acts on G, A fixes all order-p elements ⇒ A trivial on G.
 -- Baer trick (Lem 4.37) + Cor 4.35 + 強帰納法 (Three-subgroups).
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_36
+
+-- Ch.4 (Commutators): Thm 4.38
+-- P p-subgroup, Q normal p'-subgroup, Q fixes all P-fixed elements ⇒ Q acts trivially.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_38
 
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion

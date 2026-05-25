@@ -1766,6 +1766,90 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 
 合計 ~750 行 LOC / 4-5 週. Phase 1 残予算と要相談. -/
 
+/-- A finite `p`-group is a `{p}`-group in the π-group sense. -/
+theorem isPiGroup_singleton_of_isPGroup {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} (hH : IsPGroup p H) :
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H := by
+  intro q hq
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := H)).mp hH
+  rw [hn] at hq
+  by_cases hn0 : n = 0
+  · simp [hn0] at hq
+  · rw [Nat.primeFactors_prime_pow hn0 Fact.out] at hq
+    simpa using hq
+
+/-- A finite `{p}`-group in the π-group sense is a `p`-group. -/
+theorem isPGroup_of_isPiGroup_singleton {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H) :
+    IsPGroup p H := by
+  rw [IsPGroup.iff_card]
+  exact ⟨(Nat.card H).primeFactorsList.length,
+    Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' (fun {q} hq_prime hq_dvd => by
+      have hq_pf : q ∈ (Nat.card H).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩
+      simpa using hH q hq_pf)⟩
+
+/-- Singleton π-core agrees with the usual `p`-core. -/
+theorem oPiCore_singleton_eq_opCore {G : Type*} [Group G] [Finite G]
+    (p : ℕ) [Fact p.Prime] :
+    OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G =
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  apply le_antisymm
+  · exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore
+      (isPGroup_of_isPiGroup_singleton (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup ({p} : Set ℕ)))
+  · exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore
+      (isPiGroup_singleton_of_isPGroup (OddOrder.Isaacs.Ch01.opCore_isPGroup p G))
+
+/-- Hall-Higman 1.2.3 specialized from `O_π` to the usual `p`-core. -/
+theorem hall_higman_opCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) ≤
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  rw [← oPiCore_singleton_eq_opCore (G := G) p]
+  exact OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hπ'
+
+/-- Normal `p`-subgroups commute with normal `p'`-subgroups in a finite group. -/
+theorem commute_of_normal_isPGroup_of_normal_isPiCompl
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {P Q : Subgroup G} [P.Normal] [Q.Normal]
+    (hP : IsPGroup p P)
+    (hQ : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} Q) :
+    ∀ x y : G, x ∈ P → y ∈ Q → Commute x y := by
+  have hPpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) P :=
+    isPiGroup_singleton_of_isPGroup hP
+  have hcop : Nat.Coprime (Nat.card P) (Nat.card Q) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hPpi hQ
+  have hdis : Disjoint P Q :=
+    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop)
+  intro x y hx hy
+  exact Subgroup.commute_of_normal_of_disjoint P Q inferInstance inferInstance hdis x y hx hy
+
+/-- centralizer ⊆ normalizer (mathlib v4.29.1 に直接の lemma 無し). -/
+private theorem centralizer_le_normalizer_subgroup {G : Type*} [Group G] (H : Subgroup G) :
+    Subgroup.centralizer (H : Set G) ≤ Subgroup.normalizer H := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hcomm : ∀ z ∈ H, z * x = x * z := Subgroup.mem_centralizer_iff.mp hx
+  have hx_inv_mem : x⁻¹ ∈ Subgroup.centralizer (H : Set G) :=
+    Subgroup.inv_mem _ hx
+  have hcomm_inv : ∀ z ∈ H, z * x⁻¹ = x⁻¹ * z :=
+    Subgroup.mem_centralizer_iff.mp hx_inv_mem
+  refine ⟨fun hy => ?_, fun hxyx => ?_⟩
+  · have hxy : x * y = y * x := (hcomm y hy).symm
+    have : x * y * x⁻¹ = y := by rw [hxy]; group
+    rw [this]; exact hy
+  · have hcomm_z : (x * y * x⁻¹) * x⁻¹ = x⁻¹ * (x * y * x⁻¹) :=
+      hcomm_inv (x * y * x⁻¹) hxyx
+    have h_eq : y * x⁻¹ = (x * y * x⁻¹) * x⁻¹ := by
+      rw [hcomm_z]; group
+    have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
+    rw [hy_eq]; exact hxyx
+
 /-- **作用交換子部分群** `[G, A]_φ` := 集合 `{g * (φ a) g⁻¹ : g ∈ G, a ∈ A}` の生成部分群.
 
 これは Γ = G ⋊[φ] A 内で `⁅inl(G), inr(A)⁆` を `inl : G →* Γ` 経由で pull back した
@@ -3614,6 +3698,94 @@ theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_prodLeft
           rw [map_mul, map_mul, map_inv],
         MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
 
+/-- If `Q ⊴ A`, then `[G,Q]` is invariant under the whole `A`-action. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_of_normal
+    {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G)
+    (Q : Subgroup A) [Q.Normal] :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator (φ.comp Q.subtype)) := by
+  apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
+  intro b
+  have key : ∀ g : G, ∀ q : Q,
+      (φ b) (g * (φ q.val) g⁻¹) =
+        (φ b) g * (φ (b * q.val * b⁻¹)) ((φ b) g)⁻¹ := by
+    intro g q
+    rw [map_mul (φ b)]
+    congr 1
+    rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
+        show φ (b * q.val * b⁻¹) = (φ b) * (φ q.val) * (φ b)⁻¹ from by
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.inv_apply_self]
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, q, rfl⟩, rfl⟩
+    have hbqb : b * q.val * b⁻¹ ∈ Q :=
+      (inferInstance : Q.Normal).conj_mem q.val q.property b
+    exact ⟨(φ b) g, ⟨b * q.val * b⁻¹, hbqb⟩, by simp⟩
+  · rintro ⟨g, q, hx⟩
+    have hx' : x = g * (φ q.val) g⁻¹ := by simpa using hx
+    rw [hx']
+    have hbqb : b⁻¹ * q.val * b ∈ Q := by
+      simpa using (inferInstance : Q.Normal).conj_mem q.val q.property b⁻¹
+    refine ⟨(φ b)⁻¹ g * (φ (b⁻¹ * q.val * b)) ((φ b)⁻¹ g)⁻¹,
+      ⟨(φ b)⁻¹ g, ⟨b⁻¹ * q.val * b, hbqb⟩, by simp⟩, ?_⟩
+    rw [map_mul (φ b)]
+    congr 1
+    · exact MulAut.apply_inv_self (M := G) (φ b) g
+    rw [show ((φ b)⁻¹ g)⁻¹ = (φ b)⁻¹ g⁻¹ from (map_inv ((φ b)⁻¹) g).symm,
+        show φ (b⁻¹ * q.val * b) = (φ b)⁻¹ * (φ q.val) * (φ b) from by
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
+
+/-- Abelian case of Isaacs Theorem 4.38.
+
+Let `P,Q ≤ A`, with `P` a p-group and `Q` normal p'. If every `P`-fixed
+point of the abelian p-group `G` is also `Q`-fixed, then `[G,Q]=1`. -/
+theorem actionCommutator_eq_bot_of_abelian_pgroup_of_subgroup_fixedPoints
+    {A G : Type*} [Group A] [CommGroup G] [Finite A] [Finite G]
+    {p : ℕ} [hp : Fact p.Prime] (φ : A →* MulAut G) (hG : IsPGroup p G)
+    (P Q : Subgroup A) [Q.Normal] (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (h_fix : ∀ g : G, (∀ x : P, (φ x.val) g = g) → ∀ y : Q, (φ y.val) g = g) :
+    actionCommutator (φ.comp Q.subtype) = ⊥ := by
+  let φQ : Q →* MulAut G := φ.comp Q.subtype
+  have hCop : Nat.Coprime (Nat.card Q) (Nat.card G) := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+    rw [hn]
+    exact (Nat.Coprime.pow_right n
+      (Nat.coprime_comm.mp (Nat.Prime.coprime_iff_not_dvd hp.out |>.mpr hQ_p')))
+  have h_inf_bot := fixedPoints_inf_actionCommutator_eq_bot_of_abelian φQ hCop
+  by_contra h_ne_bot
+  have h_ne_bot' : actionCommutator φQ ≠ ⊥ := by
+    simpa [φQ] using h_ne_bot
+  haveI hH_pgrp : IsPGroup p (actionCommutator φQ) := hG.to_subgroup _
+  haveI : Nontrivial (actionCommutator φQ) := by
+    rw [Subgroup.ne_bot_iff_exists_ne_one] at h_ne_bot'
+    obtain ⟨h, hh_ne⟩ := h_ne_bot'
+    exact ⟨h, 1, hh_ne⟩
+  have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator φQ) := by
+    simpa [φQ] using OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_of_normal φ Q
+  let φH : A →* MulAut (actionCommutator φQ) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+  let φP_H : P →* MulAut (actionCommutator φQ) := φH.comp P.subtype
+  have hP_fixed_ne :=
+    fixedPoints_ne_bot_of_pgroup_action_pgroup hH_pgrp hP φP_H
+  rw [Subgroup.ne_bot_iff_exists_ne_one] at hP_fixed_ne
+  obtain ⟨h, hh_ne⟩ := hP_fixed_ne
+  have hP_fix_G : ∀ x : P, (φ x.val) h.1.val = h.1.val := by
+    intro x
+    have hx := congr_arg (Subtype.val : actionCommutator φQ → G) (h.property x)
+    simpa [φP_H, φH] using hx
+  have hQ_fix_G : ∀ y : Q, (φ y.val) h.1.val = h.1.val :=
+    h_fix h.1.val hP_fix_G
+  have h_mem_inf : h.1.val ∈ Subgroup.fixedPointsOfMulAut φQ ⊓ actionCommutator φQ :=
+    Subgroup.mem_inf.mpr ⟨hQ_fix_G, h.1.property⟩
+  have h_val_one : h.1.val = 1 := by
+    rw [h_inf_bot, Subgroup.mem_bot] at h_mem_inf
+    exact h_mem_inf
+  apply hh_ne
+  apply Subtype.ext
+  apply Subtype.ext
+  exact h_val_one
+
 /-- Three-subgroups step for Isaacs Theorem 4.31 in external direct-product form.
 
 Let `P × Q` act on `G`. If the `Q`-factor acts trivially on `[G, P]`, then
@@ -3811,6 +3983,388 @@ theorem isaacs_thm_4_31_external
     (h_fix : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g) :
     actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ :=
   isaacs_thm_4_31_external_aux hP hQ_p' (Nat.card G) φ hG h_fix le_rfl
+
+/-- First step toward **Isaacs Theorem 4.33**: if `Q = O_{p'}(N_G(P))`, then `Q`
+centralizes the ambient `p`-core `O_p(G)`.
+
+The proof is the 4.33 argument up to the Hall-Higman step.  Let `H = N_G(P)`,
+`U = O_p(G)`, and `Q = O_{p'}(H)`.  Since `P ⊴ H` and `Q ⊴ H` have coprime
+types, they commute, so `P × Q` acts on `U` by conjugation.  If `u ∈ U` is
+fixed by `P`, then `u ∈ C_G(P) ≤ H`; hence `u ∈ U.subgroupOf H`, a normal
+`p`-subgroup of `H`, and therefore `Q` fixes `u`.  Isaacs 4.31 then makes
+the `Q`-action on `U` trivial. -/
+theorem oPiCore_compl_normalizer_le_centralizer_opCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Subgroup G) (hP : IsPGroup p P) :
+    (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)}
+        (Subgroup.normalizer (P : Set G))).map
+        (Subgroup.normalizer (P : Set G)).subtype ≤
+      Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) := by
+  classical
+  set H : Subgroup G := Subgroup.normalizer (P : Set G) with hH_def
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set PH : Subgroup H := P.subgroupOf H with hPH_def
+  set Q : Subgroup H :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} H with hQ_def
+  change Q.map H.subtype ≤ Subgroup.centralizer (U : Set G)
+  have hP_le_H : P ≤ H := by
+    rw [hH_def]
+    exact Subgroup.le_normalizer
+  haveI hPH_normal : PH.Normal := by
+    rw [hPH_def, hH_def]
+    exact Subgroup.normal_in_normalizer
+  haveI hQ_normal : Q.Normal := by
+    rw [hQ_def]
+    infer_instance
+  haveI hU_normal : U.Normal := by
+    rw [hU_def]
+    infer_instance
+  have hPH_p : IsPGroup p PH := by
+    rw [hPH_def]
+    exact hP.of_equiv (Subgroup.subgroupOfEquivOfLe hP_le_H).symm
+  have hQ_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} Q := by
+    rw [hQ_def]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ∉ ({p} : Set ℕ)}
+  have hQ_p' : ¬ p ∣ Nat.card Q := by
+    intro hp_dvd
+    have hp_pf : p ∈ (Nat.card Q).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd, Nat.card_pos.ne'⟩
+    exact hQ_pi p hp_pf (by simp)
+  have hPH_Q_comm : ∀ x y : H, x ∈ PH → y ∈ Q → Commute x y :=
+    commute_of_normal_isPGroup_of_normal_isPiCompl hPH_p hQ_pi
+  let pqMul : PH × Q →* H := {
+    toFun z := z.1.val * z.2.val
+    map_one' := by ext; simp
+    map_mul' := by
+      intro a b
+      ext
+      simp only [Prod.mul_def]
+      change (((a.1.val * b.1.val) * (a.2.val * b.2.val) : H) : G) =
+        (((a.1.val * a.2.val) * (b.1.val * b.2.val) : H) : G)
+      have hc : Commute (a.2.val : H) (b.1.val : H) :=
+        (hPH_Q_comm b.1.val a.2.val b.1.property a.2.property).symm
+      rw [mul_assoc, ← mul_assoc b.1.val a.2.val b.2.val, ← hc.eq]
+      group }
+  let ψ : PH × Q →* G := H.subtype.comp pqMul
+  let φ : PH × Q →* MulAut U := (MulAut.conjNormal : G →* MulAut U).comp ψ
+  have hU_p : IsPGroup p U := by
+    rw [hU_def]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p G
+  have hfix :
+      ∀ u : U, (∀ x : PH, (φ (x, 1)) u = u) → ∀ y : Q, (φ (1, y)) u = u := by
+    intro u hu y
+    have hu_cent : (u : G) ∈ Subgroup.centralizer (P : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro x hxP
+      have hfixed_x :=
+        congr_arg (Subtype.val : U → G) (hu ⟨⟨x, hP_le_H hxP⟩, by simpa [PH] using hxP⟩)
+      have hxconj : x * (u : G) * x⁻¹ = (u : G) := by
+        simpa [φ, ψ, pqMul, MulAut.conjNormal_apply] using hfixed_x
+      calc
+        x * (u : G) = (x * (u : G) * x⁻¹) * x := by group
+        _ = (u : G) * x := by rw [hxconj]
+    have huH : (u : G) ∈ H := by
+      rw [hH_def]
+      exact centralizer_le_normalizer_subgroup P hu_cent
+    let uH : H := ⟨u, huH⟩
+    set UH : Subgroup H := U.subgroupOf H with hUH_def
+    haveI hUH_normal : UH.Normal := by
+      rw [hUH_def]
+      exact (show U.Normal from inferInstance).subgroupOf H
+    let incUH_U : UH →* U := {
+      toFun x := ⟨x.val.val, x.property⟩
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl }
+    have hUH_p : IsPGroup p UH :=
+      hU_p.of_injective incUH_U (by
+        intro a b hab
+        apply Subtype.ext
+        apply Subtype.ext
+        exact congr_arg (Subtype.val : U → G) hab)
+    have hu_UH : uH ∈ UH := by
+      rw [hUH_def]
+      change (u : G) ∈ U
+      exact u.property
+    have hUH_Q_comm : ∀ x y : H, x ∈ UH → y ∈ Q → Commute x y :=
+      commute_of_normal_isPGroup_of_normal_isPiCompl hUH_p hQ_pi
+    have hcomm_u_y : Commute uH y.val :=
+      hUH_Q_comm uH y.val hu_UH y.property
+    apply Subtype.ext
+    have hyconj_H : (y.val : H) * uH * (y.val : H)⁻¹ = uH := by
+      have hyu : (y.val : H) * uH = uH * y.val := hcomm_u_y.symm.eq
+      calc
+        (y.val : H) * uH * (y.val : H)⁻¹ = (uH * y.val) * (y.val : H)⁻¹ := by rw [hyu]
+        _ = uH := by group
+    have hyconj_G := congr_arg (Subtype.val : H → G) hyconj_H
+    simpa [φ, ψ, pqMul, MulAut.conjNormal_apply] using hyconj_G
+  have hAC_bot : actionCommutator (φ.comp (prodRightHom PH Q)) = ⊥ :=
+    isaacs_thm_4_31_external φ hU_p hPH_p hQ_p' hfix
+  rw [actionCommutator_eq_bot_iff_acts_trivially] at hAC_bot
+  rintro g ⟨q, hq, rfl⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro u huU
+  let qQ : Q := ⟨q, hq⟩
+  let uU : U := ⟨u, huU⟩
+  have hqfix := congr_arg (Subtype.val : U → G) (hAC_bot qQ uU)
+  have hqconj : ((q : H) : G) * u * ((q : H) : G)⁻¹ = u := by
+    simpa [φ, ψ, pqMul, MulAut.conjNormal_apply] using hqfix
+  have hqu : ((q : H) : G) * u = u * ((q : H) : G) := by
+    calc
+      ((q : H) : G) * u =
+          (((q : H) : G) * u * ((q : H) : G)⁻¹) * ((q : H) : G) := by group
+      _ = u * ((q : H) : G) := by rw [hqconj]
+  exact hqu.symm
+
+/-- Reduced form of **Isaacs Theorem 4.33** after the Hall-Higman reduction:
+if `G` is `p`-separable and `O_{p'}(G) = 1`, then every normalizer of a
+`p`-subgroup has trivial `p'`-core.
+
+The preceding lemma puts the image of `O_{p'}(N_G(P))` inside
+`C_G(O_p(G))`; Hall-Higman puts this centralizer inside `O_p(G)`.  The image is
+therefore simultaneously a `p`-group and a `p'`-group, hence trivial. -/
+theorem oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥)
+    (P : Subgroup G) (hP : IsPGroup p P) :
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)}
+        (Subgroup.normalizer (P : Set G)) = ⊥ := by
+  classical
+  set H : Subgroup G := Subgroup.normalizer (P : Set G) with hH_def
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set Q : Subgroup H :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} H with hQ_def
+  set K : Subgroup G := Q.map H.subtype with hK_def
+  change Q = ⊥
+  have hK_le_cent : K ≤ Subgroup.centralizer (U : Set G) := by
+    rw [hK_def, hQ_def, hH_def, hU_def]
+    exact oPiCore_compl_normalizer_le_centralizer_opCore P hP
+  have hcent_le_U : Subgroup.centralizer (U : Set G) ≤ U := by
+    rw [hU_def]
+    exact hall_higman_opCore hπ'
+  have hK_le_U : K ≤ U := hK_le_cent.trans hcent_le_U
+  have hU_p : IsPGroup p U := by
+    rw [hU_def]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p G
+  have hK_p : IsPGroup p K := hU_p.to_le hK_le_U
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) K :=
+    isPiGroup_singleton_of_isPGroup hK_p
+  have hQ_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} Q := by
+    rw [hQ_def]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ∉ ({p} : Set ℕ)}
+  have hK_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} K := by
+    intro q hq
+    have hcard : Nat.card K = Nat.card Q := by
+      rw [hK_def]
+      exact Nat.card_congr
+        (Subgroup.equivMapOfInjective Q H.subtype H.subtype_injective).symm.toEquiv
+    rw [hcard] at hq
+    exact hQ_pi q hq
+  have hcop : Nat.Coprime (Nat.card K) (Nat.card K) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hK_pi hK_pi'
+  have hK_bot : K = ⊥ := by
+    have hInf : K ⊓ K = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+    simpa using hInf
+  exact (Subgroup.map_eq_bot_iff_of_injective Q H.subtype_injective).mp
+    (by simpa [hK_def] using hK_bot)
+
+/-- Strong-induction form of Isaacs Theorem 4.38. -/
+private theorem isaacs_thm_4_38_aux
+    {A : Type*} [Group A] [Finite A]
+    {p : ℕ} [hp : Fact p.Prime] (hp_odd : p ≠ 2)
+    (P Q : Subgroup A) [Q.Normal] (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q) :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G]
+    (φ : A →* MulAut G) (_ : IsPGroup p G)
+    (_ : ∀ g : G, (∀ x : P, (φ x.val) g = g) → ∀ y : Q, (φ y.val) g = g),
+    Nat.card G ≤ n → actionCommutator (φ.comp Q.subtype) = ⊥ := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ _ _ h_le
+    exfalso
+    have h_pos : 0 < Nat.card G := Nat.card_pos
+    omega
+  | succ m IH =>
+    intro G _ _ φ hG h_fix h_le
+    rcases Nat.lt_or_ge (Nat.card G) (m + 1) with h_lt | h_ge
+    · exact IH φ hG h_fix (Nat.le_of_lt_succ h_lt)
+    by_cases hG_nontriv : Nontrivial G
+    swap
+    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+      rw [actionCommutator_eq_bot_iff_acts_trivially]
+      intro q g
+      exact Subsingleton.elim _ _
+    letI : Nontrivial G := hG_nontriv
+    let φQ : Q →* MulAut G := φ.comp Q.subtype
+    have hCop : Nat.Coprime (Nat.card Q) (Nat.card G) := by
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+      rw [hk]
+      exact (((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hQ_p').symm).pow_right k
+    haveI hG_nilp : Group.IsNilpotent G := hG.isNilpotent
+    have hG_solv : IsSolvable G := IsNilpotent.to_isSolvable
+    have hSolv : IsSolvable Q ∨ IsSolvable G := Or.inr hG_solv
+    by_cases h_AC_top : actionCommutator φQ = ⊤
+    swap
+    · set H : Subgroup G := actionCommutator φQ with hH_def
+      have hH_card_lt : Nat.card H < Nat.card G := subgroup_card_lt_of_ne_top h_AC_top
+      have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+        rw [hH_def]
+        simpa [φQ] using OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_of_normal φ Q
+      let φH : A →* MulAut H :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+      have hH_pgrp : IsPGroup p H := hG.to_subgroup H
+      have h_fix_H :
+          ∀ h : H, (∀ x : P, (φH x.val) h = h) → ∀ y : Q, (φH y.val) h = h := by
+        intro h hP_fix y
+        apply Subtype.ext
+        have hP_fix_val : ∀ x : P, (φ x.val) h.val = h.val := by
+          intro x
+          have hx := congr_arg (Subtype.val : H → G) (hP_fix x)
+          simpa [φH] using hx
+        have hQ_fix := h_fix h.val hP_fix_val y
+        simpa [φH] using hQ_fix
+      have hIH_H := IH φH hH_pgrp h_fix_H
+        (Nat.le_of_lt_succ (hH_card_lt.trans_le h_le))
+      have h_triv : ∀ q : Q, ∀ x ∈ H, (φ q.val) x = x := by
+        intro q x hx
+        rw [actionCommutator_eq_bot_iff_acts_trivially] at hIH_H
+        have hact := congr_arg (Subtype.val : H → G) (hIH_H q ⟨x, hx⟩)
+        simpa [φH] using hact
+      exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+        (A := Q) (G := G) (φ := φQ) hCop hSolv h_triv
+    set G' : Subgroup G := commutator G with hG'_def
+    have hG'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ G' :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.derivedSeries φ 1
+    have h_G'_lt_top : G' < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial G
+    have h_G'_card_lt : Nat.card G' < Nat.card G :=
+      subgroup_card_lt_of_ne_top h_G'_lt_top.ne
+    let φG' : A →* MulAut G' :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hG'_inv
+    have hG'_pgrp : IsPGroup p G' := hG.to_subgroup G'
+    have h_fix_G' :
+        ∀ g' : G', (∀ x : P, (φG' x.val) g' = g') → ∀ y : Q, (φG' y.val) g' = g' := by
+      intro g' hP_fix y
+      apply Subtype.ext
+      have hP_fix_val : ∀ x : P, (φ x.val) g'.val = g'.val := by
+        intro x
+        have hx := congr_arg (Subtype.val : G' → G) (hP_fix x)
+        simpa [φG'] using hx
+      have hQ_fix := h_fix g'.val hP_fix_val y
+      simpa [φG'] using hQ_fix
+    have hIH_G' := IH φG' hG'_pgrp h_fix_G'
+      (Nat.le_of_lt_succ (h_G'_card_lt.trans_le h_le))
+    have h_triv_G' : ∀ q : Q, ∀ g' ∈ G', (φ q.val) g' = g' := by
+      intro q g' hg'
+      rw [actionCommutator_eq_bot_iff_acts_trivially] at hIH_G'
+      have hact := congr_arg (Subtype.val : G' → G) (hIH_G' q ⟨g', hg'⟩)
+      simpa [φG'] using hact
+    have h_class_le_2 : commutator G ≤ Subgroup.center G := by
+      set XG : Subgroup (G ⋊[φQ] Q) := (SemidirectProduct.inl : G →* G ⋊[φQ] Q).range
+      set YQ : Subgroup (G ⋊[φQ] Q) := (SemidirectProduct.inr : Q →* G ⋊[φQ] Q).range
+      set XG' : Subgroup (G ⋊[φQ] Q) := G'.map (SemidirectProduct.inl : G →* G ⋊[φQ] Q)
+      have h_G'_YQ : ⁅XG', YQ⁆ = ⊥ := by
+        rw [eq_bot_iff, Subgroup.commutator_le]
+        rintro _ ⟨k, hk, rfl⟩ _ ⟨q, rfl⟩
+        rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+        have h_fix' : (φQ q) k = k := by
+          simpa [φQ] using h_triv_G' q k hk
+        rw [show (φQ q) k⁻¹ = ((φQ q) k)⁻¹ from map_inv (φQ q) k,
+          h_fix', mul_inv_cancel]
+        exact map_one _
+      have h_GG'_le : ⁅XG, XG'⁆ ≤ XG' := by
+        rw [Subgroup.commutator_le]
+        rintro _ ⟨g, rfl⟩ _ ⟨k, hk, rfl⟩
+        rw [show (⁅(SemidirectProduct.inl g : G ⋊[φQ] Q), SemidirectProduct.inl k⁆ :
+            G ⋊[φQ] Q) = SemidirectProduct.inl ⁅g, k⁆ from by
+          simp [commutatorElement_def, ← map_mul, ← map_inv]]
+        refine ⟨⁅g, k⁆, ?_, rfl⟩
+        have hG'_normal : G'.Normal := inferInstance
+        have h_gkg : g * k * g⁻¹ ∈ G' := hG'_normal.conj_mem k hk g
+        have h_inv : k⁻¹ ∈ G' := G'.inv_mem hk
+        rw [commutatorElement_def]
+        exact G'.mul_mem h_gkg h_inv
+      have h12 : ⁅⁅XG, XG'⁆, YQ⁆ = ⊥ := by
+        rw [eq_bot_iff]
+        calc ⁅⁅XG, XG'⁆, YQ⁆ ≤ ⁅XG', YQ⁆ := Subgroup.commutator_mono h_GG'_le le_rfl
+          _ = ⊥ := h_G'_YQ
+      have h23 : ⁅⁅XG', YQ⁆, XG⁆ = ⊥ := by
+        rw [h_G'_YQ]
+        exact Subgroup.commutator_bot_left XG
+      have h_three : ⁅⁅YQ, XG⁆, XG'⁆ = ⊥ :=
+        Subgroup.commutator_commutator_eq_bot_of_rotate h12 h23
+      have h_XGYQ_eq_XG : ⁅XG, YQ⁆ = XG := by
+        rw [← actionCommutator_map_inl φQ, h_AC_top]
+        exact (MonoidHom.range_eq_map _).symm
+      have h_YQXG_eq_XG : ⁅YQ, XG⁆ = XG := by
+        rw [Subgroup.commutator_comm]
+        exact h_XGYQ_eq_XG
+      have h_XG_XG'_bot : ⁅XG, XG'⁆ = ⊥ := h_YQXG_eq_XG ▸ h_three
+      have h_top_G'_bot : ⁅(⊤ : Subgroup G), G'⁆ = ⊥ := by
+        apply Subgroup.map_injective (f := (SemidirectProduct.inl : G →* G ⋊[φQ] Q))
+          SemidirectProduct.inl_injective
+        rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.map_bot]
+        exact h_XG_XG'_bot
+      rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at h_top_G'_bot
+      intro x hx
+      rw [Subgroup.mem_center_iff]
+      intro y
+      have := h_top_G'_bot (Subgroup.mem_top y)
+      exact (this x hx).symm
+    have hOdd_p : Odd p := hp.out.odd_of_ne_two hp_odd
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+    have hOdd_card : Odd (Nat.card G) := by
+      rw [hk]
+      exact hOdd_p.pow
+    haveI : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
+    haveI : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨h_class_le_2⟩
+    set φ' : A →* MulAut (BaerMul G) := MonoidHom.toBaerMulLift φ with hφ'
+    have hG_baer : IsPGroup p (BaerMul G) := (BaerMul.isPGroup_iff p).mpr hG
+    have h_fix_baer :
+        ∀ g : BaerMul G, (∀ x : P, (φ' x.val) g = g) →
+          ∀ y : Q, (φ' y.val) g = g := by
+      intro g hP_fix y
+      have hP_fix_G : ∀ x : P, (φ x.val) (BaerMul.toG g) = BaerMul.toG g := by
+        intro x
+        have hx := congr_arg BaerMul.toG (hP_fix x)
+        simpa [hφ'] using hx
+      have h_fixed : (φ y.val) (BaerMul.toG g) = BaerMul.toG g :=
+        h_fix (BaerMul.toG g) hP_fix_G y
+      change BaerMul.ofG ((φ y.val) (BaerMul.toG g)) = g
+      rw [h_fixed]
+      exact BaerMul.ofG_toG g
+    have h_bot_baer :=
+      actionCommutator_eq_bot_of_abelian_pgroup_of_subgroup_fixedPoints
+        φ' hG_baer P Q hP hQ_p' h_fix_baer
+    rw [actionCommutator_eq_bot_iff_acts_trivially] at h_bot_baer
+    rw [actionCommutator_eq_bot_iff_acts_trivially]
+    intro q g
+    have h_act := h_bot_baer q (BaerMul.ofG g)
+    have h_eq : BaerMul.ofG ((φ q.val) g) = BaerMul.ofG g := by
+      have hkey : (φ' q.val) (BaerMul.ofG g) = BaerMul.ofG ((φ q.val) g) := by
+        change BaerMul.ofG ((φ q.val) (BaerMul.toG (BaerMul.ofG g))) =
+          BaerMul.ofG ((φ q.val) g)
+        rw [BaerMul.toG_ofG]
+      rw [← hkey]
+      exact h_act
+    exact BaerMul.ofG.injective h_eq
+
+/-- **Isaacs Theorem 4.38**.
+
+Let `A` act on the p-group `G` with `p > 2`. If `P ≤ A` is a p-group,
+`Q ⊴ A` is p', and every `P`-fixed point of `G` is `Q`-fixed, then `Q`
+acts trivially on `G`. -/
+theorem isaacs_thm_4_38
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
+    (φ : A →* MulAut G) (hG : IsPGroup p G)
+    (P Q : Subgroup A) [Q.Normal] (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (h_fix : ∀ g : G, (∀ x : P, (φ x.val) g = g) → ∀ y : Q, (φ y.val) g = g) :
+    actionCommutator (φ.comp Q.subtype) = ⊥ :=
+  isaacs_thm_4_38_aux hp_odd P Q hP hQ_p' (Nat.card G) φ hG h_fix le_rfl
 
 end -- 4D
 
