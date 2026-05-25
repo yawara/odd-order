@@ -20,6 +20,7 @@ import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.SemiDihedral
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # OddOrder.Isaacs.Ch06 — Frobenius Actions
@@ -31,8 +32,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 6
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.3/6.5 ✅, 6.4/6.6 未, 6.2/6.7 保留 |
-| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 未着手 |
+| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.2/6.3/6.4/6.5/6.6 ✅, 6.7 保留 |
+| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 進行中: 6.13/6.14/6.16 ✅ |
 | 6C | Frobenius kernel nilpotent + Thompson | 6.22 – 6.24 | 未着手 |
 
 ## 方針
@@ -45,8 +46,8 @@ mathlib カバレッジ薄 (~21%; `DihedralGroup`/`QuaternionGroup` の具体群
 
 ## 先行章依存
 
-本ファイル §6A の本実装範囲 (6.1, 6.3, 6.4, 6.5, 6.6) は **Isaacs 先行章への依存なし**.
-6.2 (Cor 3.28) と 6.7 (Schur-Zassenhaus) は Ch.3 完成後 / mathlib SZ 経由で別 commit.
+本ファイル §6A の実装済み範囲は, 6.2 が Ch.4 forward の Cor 3.28 を使う以外,
+大きな先行章依存なし. 6.7 (Schur-Zassenhaus / Ch.5 normal p-complement 周辺) は保留.
 
 ノート: [`notes/isaacs/ch06_frobenius_actions.md`](../../notes/isaacs/ch06_frobenius_actions.md)
 -/
@@ -98,6 +99,59 @@ theorem fixedBy_eq_singleton_one (h : IsFrobeniusAction A N) {a : A} (ha : a ≠
   refine ⟨fun hn => ?_, ?_⟩
   · by_contra hne; exact h a ha n hne hn
   · rintro rfl; exact smul_one a
+
+@[reducible] private def invariantSubgroupMulDistribMulAction (M : Subgroup N)
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A M := by
+  letI : SMul A M := ⟨fun a m => ⟨a • (m : N), hM a m m.2⟩⟩
+  exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+
+/-- A Frobenius action restricts to every invariant subgroup. -/
+theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) :
+    @IsFrobeniusAction A M _ _ (invariantSubgroupMulDistribMulAction M hM) := by
+  letI : MulDistribMulAction A M := invariantSubgroupMulDistribMulAction M hM
+  intro a ha m hm hfix
+  have hmN : (m : N) ≠ 1 := fun hmN => hm (Subtype.ext hmN)
+  exact h a ha (m : N) hmN (Subtype.ext_iff.mp hfix)
+
+@[reducible] private def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) (a : A) : MulAut (N ⧸ M) := by
+  let f : N ⧸ M →* N ⧸ M :=
+    QuotientGroup.map M M (MulDistribMulAction.toMulAut A N a).toMonoidHom
+      (by
+        intro m hm
+        exact hM a m hm)
+  let g : N ⧸ M →* N ⧸ M :=
+    QuotientGroup.map M M (MulDistribMulAction.toMulAut A N a⁻¹).toMonoidHom
+      (by
+        intro m hm
+        exact hM a⁻¹ m hm)
+  exact MonoidHom.toMulEquiv f g
+    (by
+      ext n
+      simp [f, g])
+    (by
+      ext n
+      simp [f, g])
+
+@[reducible] private def invariantQuotientMulAutHom (M : Subgroup N) [M.Normal]
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : A →* MulAut (N ⧸ M) where
+  toFun := invariantQuotientMulAut M hM
+  map_one' := by
+    ext q
+    refine QuotientGroup.induction_on q ?_
+    intro n
+    simp [invariantQuotientMulAut]
+  map_mul' := by
+    intro a b
+    ext q
+    refine QuotientGroup.induction_on q ?_
+    intro n
+    simp [invariantQuotientMulAut, mul_smul]
+
+@[reducible] private def invariantQuotientMulDistribMulAction (M : Subgroup N) [M.Normal]
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A (N ⧸ M) :=
+  MulDistribMulAction.compHom (N ⧸ M) (invariantQuotientMulAutHom M hM)
 
 /-- **Isaacs Lemma 6.1**: a Frobenius action gives `|N| ≡ 1 (mod |A|)`.
 
@@ -154,6 +208,97 @@ theorem coprime_card [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
     Nat.Coprime (Fintype.card N) (Fintype.card A) := by
   unfold Nat.Coprime
   rw [(card_modEq_one h).gcd_eq, Nat.gcd_one_left]
+
+/-- **Isaacs Corollary 6.2**: a Frobenius action descends to every invariant normal quotient. -/
+theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup N)
+    [M.Normal] (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) :
+    @IsFrobeniusAction A (N ⧸ M) _ _ (invariantQuotientMulDistribMulAction M hM) := by
+  classical
+  letI : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
+  intro a ha q hq_ne hfix
+  revert hq_ne hfix
+  refine QuotientGroup.induction_on q ?_
+  intro n hq_ne hfix
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let P : Subgroup A :=
+    { carrier := {b | ∃ m ∈ M, φ b n = n * m}
+      one_mem' := by
+        refine ⟨1, M.one_mem, ?_⟩
+        simp [φ]
+      mul_mem' := by
+        intro b c hb hc
+        rcases hb with ⟨mb, hmb, hb⟩
+        rcases hc with ⟨mc, hmc, hc⟩
+        refine ⟨mb * (φ b) mc, M.mul_mem hmb (hM b mc hmc), ?_⟩
+        calc
+          φ (b * c) n = φ b (φ c n) := by
+            change (b * c) • n = b • c • n
+            rw [mul_smul]
+          _ = φ b (n * mc) := by rw [hc]
+          _ = φ b n * φ b mc := by simp
+          _ = n * (mb * φ b mc) := by rw [hb]; group
+      inv_mem' := by
+        intro b hb
+        rcases hb with ⟨m, hm, hb⟩
+        refine ⟨((φ b⁻¹) m)⁻¹, M.inv_mem (hM b⁻¹ m hm), ?_⟩
+        have hb' : n = φ b⁻¹ n * φ b⁻¹ m := by
+          calc
+            n = φ b⁻¹ (φ b n) := by simp [φ]
+            _ = φ b⁻¹ (n * m) := by rw [hb]
+            _ = φ b⁻¹ n * φ b⁻¹ m := by simp
+        calc
+          φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
+          _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
+  have haP : a ∈ P := by
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
+      simpa [invariantQuotientMulDistribMulAction, invariantQuotientMulAutHom,
+        invariantQuotientMulAut] using hfix
+    have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
+    have hMN : M.Normal := inferInstance
+    have hm : n⁻¹ * (a • n) ∈ M := by
+      rw [← hMN.mem_comm_iff]
+      simpa [div_eq_mul_inv] using hdiv
+    refine ⟨n⁻¹ * (a • n), hm, ?_⟩
+    simp [φ]
+  let C : Subgroup A := Subgroup.zpowers a
+  let φC : C →* MulAut N := φ.comp C.subtype
+  have hC_le_P : C ≤ P := Subgroup.zpowers_le.mpr haP
+  have hM_inv_C : OddOrder.Isaacs.Ch03.IsAInvariant φC M := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro c m hm
+    exact hM (c : A) m hm
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype N := Fintype.ofFinite N
+  have hCopAN : Nat.Coprime (Nat.card A) (Nat.card N) := by
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    exact (coprime_card h).symm
+  have hCopCN : Nat.Coprime (Nat.card C) (Nat.card N) :=
+    hCopAN.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
+  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
+  letI : CommGroup C := IsCyclic.commGroup
+  have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
+  have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
+    intro c
+    simpa [φC] using hC_le_P c.2
+  obtain ⟨x, hx_fixed, hx_coset⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
+      (A := C) (G := N) (φ := φC) hCopCN hSolvC hM_inv_C hg_fix_C
+  have hx_ne : x ≠ 1 := by
+    intro hx_one
+    rcases hx_coset with ⟨m, hm, hx_eq⟩
+    have hn_eq : n = m⁻¹ := by
+      calc
+        n = n * m * m⁻¹ := by group
+        _ = x * m⁻¹ := by rw [hx_eq]
+        _ = m⁻¹ := by rw [hx_one, one_mul]
+    have hnM : n ∈ M := by
+      rw [hn_eq]
+      exact M.inv_mem hm
+    exact hq_ne ((QuotientGroup.eq_one_iff n).mpr hnM)
+  have hax : a • x = x := by
+    have := hx_fixed ⟨a, Subgroup.mem_zpowers a⟩
+    simpa [φC, φ] using this
+  exact h a ha x hx_ne hax
 
 /-! ### Theorem 6.3: even-order Frobenius complements
 
@@ -759,6 +904,48 @@ structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
 namespace IsFrobeniusGroup
 
 variable {G : Type*} [Group G] {N A : Subgroup G}
+
+/-- A subgroup-pair Frobenius group gives a Frobenius action of the complement on the kernel by
+conjugation. This is the bridge between the pair form of Isaacs Thm 6.4 and the action-based
+definition used for Lemma 6.1. -/
+theorem toFrobeniusAction (h : IsFrobeniusGroup G N A) :
+    letI : N.Normal := h.isNormal
+    @IsFrobeniusAction A N _ _
+      (MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)) := by
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  intro a ha n hn hfix
+  have haG : (a : G) ≠ 1 := fun haG => ha (Subtype.ext haG)
+  have hnG : (n : G) ≠ 1 := fun hnG => hn (Subtype.ext hnG)
+  have hfixG : (a : G) * (n : G) * (a : G)⁻¹ = n := Subtype.ext_iff.mp hfix
+  exact h.conj_frobenius (a : G) a.2 haG (n : G) n.2 hnG hfixG
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group,
+`|N| ≡ 1 (mod |A|)`. -/
+theorem card_kernel_modEq_one [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.card N ≡ 1 [MOD Nat.card A] := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.card_modEq_one (A := A) (N := N) h.toFrobeniusAction
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group, the kernel and
+complement have coprime orders. -/
+theorem coprime_card_kernel_complement [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.Coprime (Nat.card N) (Nat.card A) := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.coprime_card (A := A) (N := N) h.toFrobeniusAction
 
 /-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
 then the conjugation action of `A` on `N` is Frobenius. -/

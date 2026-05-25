@@ -1,7 +1,7 @@
 # Isaacs Ch.6: Frobenius Actions — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.6 (pp. 177-200).
-形式化先 (予定): `OddOrder/Isaacs/Ch06_FrobeniusActions/Main.lean` (未作成).
+形式化先: `OddOrder/Isaacs/Ch06_FrobeniusActions/Main.lean`.
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 3313-3712.
 ROADMAP 上の位置: **第 4 波 (Ch.4 → Ch.5 → Ch.6 シーケンス)** — Ch.6 → Ch.7 (Thompson, ZJ) と Ch.10 (More Transfer) への分岐点で **Phase 1 の山場の入口**. 前提は Ch.3 (Hall + coprime action, 特に Thm 3.23 A-invariant Sylow) + Ch.4 + Ch.5 (Thm 5.26 Frobenius normal p-complement).
 
@@ -94,7 +94,7 @@ mmd 抽出失敗は無し (MISSING_PAGE marker ゼロ, ヘッダ欠落は §6B/�
 |---|---|---|
 | **`FrobeniusGroup`, `FrobeniusAction` 定義** | mathlib 完全未収載. 中核 def | **大** (Phase 1 の主要設計判断: TI-subset / disjoint conjugates / fixed-point free 等のいくつかの等価定義をどう選ぶか) |
 | 6.1 \|N\| ≡ 1 mod \|A\| | 新規 (def 依存) | 短 (counting 経由) |
-| 6.2 quotient Frobenius | 新規 (def 依存) | 短 |
+| 6.2 quotient Frobenius | ✅ `IsFrobeniusAction.quotient` (Cor 3.28 経由) | 完了 |
 | 6.3 even ⇒ involution + N abelian | 新規 (counting + involution 引数) | 中 |
 | **6.4 Frobenius 群の等価条件** | 中核補題 — 4 通りの等価定義. mathlib 未収載. **TI** 概念とも接続 | 大 |
 | 6.5, 6.6 counting (X = G − ⋃A^g) | 新規 (Burnside counting 流) | 中 |
@@ -256,21 +256,35 @@ FT クリティカル度 + 章内依存で並べる:
 - **Thm 6.4 完全 TFAE 達成**: (1) ⇔ (2) ⇔ (3) ⇔ (4) all closed.
   Constructor 形 (`of_centralizer_*_le`) + projection 形 (`trivialIntersection`,
   `centralizer_complement_le`, `centralizer_kernel_le`) 揃った.
+- **action/subgroup-pair bridge**: `IsFrobeniusGroup.toFrobeniusAction`,
+  `IsFrobeniusGroup.card_kernel_modEq_one`, `IsFrobeniusGroup.coprime_card_kernel_complement`.
+  BG/Peterfalvi 側で subgroup-pair 形を使いつつ, Isaacs 6.1 の action 版 counting を再利用できる.
+- **Cor 6.2** `IsFrobeniusAction.quotient`: A-invariant normal quotient `N/M` への誘導作用を
+  `QuotientGroup.map` で構成し, `⟨a⟩` に制限して Ch.4 forward の
+  `coprime_fixedPoints_quotient` を適用. sorry-free.
 - **§6B infra: `OddOrder.GroupTheory.SemiDihedral` 新規** (~221 LOC):
   半二面体群 `SemiDihedralGroup n` (位数 `2^(n+1)`). mathlib `QuaternionGroup` template.
   constructors `c i` / `ca i` with twist `r := 2^(n-1) - 1` (n=0,1 override). Group + Fintype.
   Lem 6.13 / 6.14 / 6.17 の前提.
+- **Lem 6.13 D/Q/SD recognition 部分**:
+  `dihedralOrQuaternion_of_invertingConjugation` と
+  `semiDihedral_of_twistConjugation` が sorry-free. cyclic index-2 2-group の主要 split case は
+  既存 recognizer に落とせる状態.
+- **Cor 6.14** `dihedralOrQuaternion_of_card_eight`: 位数 8 非可換群は
+  `DihedralGroup 4` または `QuaternionGroup 2`. sorry-free.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
-  版 `IsFrobeniusGroup G N A` は Thm 6.4 等価関係を導いてから別途定義予定.
+  版 `IsFrobeniusGroup G N A` も導入済みで, `toFrobeniusAction` で action 版に接続する.
 - mathlib `FixedPointFree` モジュールが involution → invert + commute 部分の machinery を
   全部持っているため, Thm 6.3 は実質 30-40 行で完成.
 
-**未着手 (今回 scope 外)**:
-- 6.2 (Cor 3.28 dep), 6.7 (Schur-Zassenhaus dep) — 先行章完成待ち.
-- 6.4 (4-way equivalence) — `IsFrobeniusGroup` 定義 + 重い証明.
-- 6.5, 6.6 (counting in G) — 6.4 とセット.
+**現在の残タスク候補**:
+- 6.7 centralizer-kernel criterion: Schur-Zassenhaus / Ch.5 normal p-complement 周辺が main に入ったので,
+  statement 形から再設計する価値あり.
+- 6.8-6.10 partition counting → Frobenius complement 禁止構造.
+- 6.11/6.12 p-group classification: 6.13/6.14 の recognizer を使って大枠へ進める.
+- 6.17-6.21 Frobenius complement / coprime abelian action: Ch.7 の 6.20 使用箇所に向けた中期目標.
 
 ## 開発時の注意点
 
@@ -336,10 +350,14 @@ Phase 2a / 2b で頻繁に Frobenius を引用する:
 
 ## 未解決の疑問
 
-- **Frobenius 群定義の最適な Lean 形** — action ベース vs subgroup-pair ベース. mathlib upstream を視野に入れるなら BG / Peterfalvi 流の "G = KR with kernel K and complement R" を主にし, abstract action を補助にする方が自然. 一方 Isaacs 流の "A acts Frobenius on N" は action ベース. 着手時に決定.
+- ~~**Frobenius 群定義の最適な Lean 形**~~ → 解決:
+  action 版 `IsFrobeniusAction` と subgroup-pair 版 `IsFrobeniusGroup` を併用し,
+  `IsFrobeniusGroup.toFrobeniusAction` で接続する.
 - **6.11, 6.12 の証明スキーマ** — Isaacs の証明 (induction + 中心化群分析) を Lean で写す難度. mathlib `Quaternion.lean` の lemma 群との接続でどこまで短く書けるか実装時調査.
-- **`SemiDihedral` 新規定義** — `Mathlib/GroupTheory/SpecificGroups/SemiDihedral.lean` 相当として upstream 視野に入れた形 (`s · a · s = a^{2^{n-1} - 1}` 関係) で書く. mathlib スタイル踏襲.
-- **6.16 (i^p ≡ 1 mod p^e) の存在感** — Isaacs では Frobenius complement Sylow 構造 (6.17) で短く使う. mathlib `ZMod` 系で書き下せる範囲か, ε 程度の自作補題で済むかは実装時判断.
+- ~~**`SemiDihedral` 新規定義**~~ → 解決:
+  `OddOrder.GroupTheory.SemiDihedral` に `SemiDihedralGroup n` を追加済み.
+- ~~**6.16 (i^p ≡ 1 mod p^e) の存在感**~~ → 解決:
+  `pow_prime_modEq_one_cases` として Ch.6 file 内に sorry-free 実装済み.
 - ~~**6.21 (⟨C_N(a)⟩ = N) は Ch.7 で何回使われるか**~~ → **解決 (2026-05-22 audit)**: Ch.7 で **6.20 のみ使用** (Thm 7.6 Step 5). 6.21 は Ch.7 内で proof body 引用無し. (元 mmd grep ヒットは 6.20 の prose mention 内で 6.21 を comparison 引用していたためのノイズ.)
 - **Thm 6.23 の Ch.6 内での扱い** — `axiom` か `sorry` 経由のステートメントか, あるいは Ch.6 では skip して 6.24 だけ Ch.7 で 6.23 と一緒に証明する形にするか. 章間の依存最小化を考えると Ch.6 全部一度書いて 6.23 を Ch.7 完了時に書き換える運用が clean.
 
