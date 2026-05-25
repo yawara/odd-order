@@ -40,11 +40,13 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 
 階層: `OddOrder.Isaacs.Ch01`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peterfalvi.S04`。汎用補題は将来 `Subgroup.fitting` のように mathlib 階層へリネーム可能な形で書く。
 
-### mathlib ラッパー方針
+### ラッパー方針
 
 mathlib に直接対応がある定理の **薄いラッパー** (`theorem foo := mathlib_bar`、引数も型も同じ純粋なリネーム) は書かない。維持負担のみで価値が無いから (mathlib API 変更時の追従、同事実が 2 名で呼ばれて証明が分裂、将来 upstream するときどうせ消す)。
 
-教科書名 ↔ mathlib 名の対応は **section 冒頭の docstring** または **`notes/` の対応表** で記録する。書く価値がある例外:
+同じ原則は **本リポジトリ内の既存 theorem** にも適用する。たとえば BG/Peterfalvi で使うためだけに, 既存の `OddOrder.Isaacs.*` 定理を引数・型そのままで純粋リネームする wrapper は書かない。教科書間対応 (BG/Peterfalvi ↔ Isaacs) は section docstring または `notes/` の対応表に記録し、Lean 本体では既存 theorem を直接呼ぶ。
+
+教科書名 ↔ mathlib 名 / repo 内 theorem 名の対応は **section 冒頭の docstring** または **`notes/` の対応表** で記録する。書く価値がある例外:
 
 - **引数順 / convention 適応** — mathlib が `Disjoint M N` を明示引数で取るところを instance + positional で並べ替える等
 - **仮定特殊化** — `[Finite G]` などで mathlib の汎用版を狭く取り直す
