@@ -205,15 +205,16 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 7.6 → 7.8 (Burnside の Thompson factorization は 7.6 を maximal subgroup M に適用)
 - 6.23 (Ch.6) → 7.1 (Ch.7) → 6.24 (Ch.6 完備化) ← **Ch.6/Ch.7 間の唯一の双方向依存**
 
-## 着手状況 (2026-05-24)
+## 着手状況 (2026-05-25)
 
 - ✅ shared module `OddOrder/GroupTheory/ElementaryAbelian.lean` (`IsElementaryAbelian`).
 - ✅ shared module `OddOrder/GroupTheory/ThompsonSubgroup.lean` (`Subgroup.thompsonJ` def + Thm 7.2).
 - ✅ Thm 7.2 in [`Main.lean`](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean) (shared module wrapper).
 - ✅ **Lem 7.4** SL(2,q) odd の唯一 involution = -I (sorry-free, ~100 行).
 - ✅ **Lem 7.7** N/C 系 p'-quotient (`centralizer_map_of_coprime_kernel`, sorry-free, ~80 行).
-- 🚧 **Lem 7.3** statement + 証明 skeleton 配置済 (`gl2_pSubgroup_centralizes_of_normalizes`,
-  proof body は `sorry`). 別 commit で `|L|`-induction body を fill in.
+- ✅ **Lem 7.3** GL(2,p) 補題 (`gl2_pSubgroup_centralizes_of_normalizes`, sorry-free).
+  `|L|`-induction + P-invariant Sylow + Ch.4 coprime action + Lem 7.4 + finite abelian
+  2-group cyclicity branch + odd-q orbit-count branch.
 - Thm 7.1, 7.5, 7.6, 7.8: docstring + statement 保留.
 
 ## 着手順 (提案)
@@ -223,7 +224,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 1. **`def IsElementaryAbelian` + `def J(P)` (J(P) 定義)** — **設計の核**. `OddOrder.GroupTheory.ElementaryAbelian` を別ファイル化して将来 mathlib upstream を視野に. `def J (P : Subgroup G) : Subgroup G := ⨆ E ∈ {E : Subgroup G | E ⊆ P ∧ IsElementaryAbelian E ∧ ∀ F, F ⊆ P → IsElementaryAbelian F → Nat.card F ≤ Nat.card E}, E` の形.
 2. **7.2 J(P) char** — def 直後の短い系. ウォームアップ.
 3. **7.4 SL(2,q) -I unique** — mathlib `SpecialLinearGroup 2 (ZMod p)` 上の行列計算. Cayley-Hamilton + 最小多項式. 独立小テーマ.
-4. **7.3 GL(2,p) 補題** — induction on `|L|` + Sylow + コプライム作用 + 7.4 + **Hall-Higman 3.21**. Ch.3 完了 + 7.4 完了で実装可.
+4. ✅ **7.3 GL(2,p) 補題** — induction on `|L|` + Sylow + コプライム作用 + 7.4.
 5. **7.5 normal-P theorem** — 8 step proof. **Aut(E) ≅ GL(n,p) 同型 (n=2)** + 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) + Hall-Higman 3.21. 章内重実装.
 6. **7.6 normal-J theorem** — 8 step proof. 7.5 + Ch.6 **6.20** (abelian coprime ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21. **章のハイライト**.
 7. **7.7 N/C `p'`-quotient** — Lem 2.17 (Ch.2) の拡張. correspondence theorem. 短い.

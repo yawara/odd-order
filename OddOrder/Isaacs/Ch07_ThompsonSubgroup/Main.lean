@@ -54,11 +54,12 @@ Feit-Thompson 局所解析の中核を担う:
 1. ✅ Thm 7.2 (`thompsonJ` shared module 経由)
 2. ✅ Lem 7.4 SL(2,q) — 独立小テーマ (先行章不要)
 3. ✅ Lem 7.7 — Lem 2.17 拡張 (Ch.2 完成済から短い延長)
-4. 🚧 Lem 7.3 (statement + 証明 skeleton 配置, 本体は別 commit) → Thm 7.5 → Thm 7.6
-5. (Ch.5 §5E 5.26 完成後) Thm 7.1
-6. (上記完成後) Thm 7.8 Burnside
+4. ✅ Lem 7.3 GL(2,p) 補題 — `|L|`-induction + Lem 7.4 + Ch.4 coprime action
+5. Thm 7.5 normal-P → Thm 7.6 normal-J
+6. (Ch.5 §5E 5.26 完成後) Thm 7.1
+7. (上記完成後) Thm 7.8 Burnside
 
-各 statement の def 系前提 (`HasNormalPComplement`, `GeneralLinearGroup` 引数法,
+未着手 statement の def 系前提 (`HasNormalPComplement`, `GeneralLinearGroup` 引数法,
 `Aut(E) ≅ GL(n,p)`) は実装時に決める.
 -/
 
@@ -609,7 +610,7 @@ private theorem isCyclic_of_comm_two_group_unique_order_two
     exact isCyclic_pi_of_subsingleton
   exact e.isCyclic.mpr htarget
 
-/-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
+/-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + proof)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
 `L ≤ GL(2, ZMod p)`, `P ≤ N(L)`, `(|L|, p) = 1`, `L` の Sylow 2-subgroup abelian
@@ -629,8 +630,9 @@ private theorem isCyclic_of_comm_two_group_unique_order_two
    よって `|L| ≤ p+1`. P が L に非自明作用なら orbit が p 以上を持ち `|L| ≥ p+1`,
    即ち `|L| = p+1` で `|L|` even. 矛盾 (q odd).
 
-**現状**: statement + 証明戦略 docstring のみ. 各 step の実装 (P-invariant Sylow 取得,
-Lem 4.29 適用, q=2 / q-odd 場合分け) は別 commit で fill in. -/
+Lean proof は [`lem73_aux`](#) に集約し、公開 theorem
+`gl2_pSubgroup_centralizes_of_normalizes` は strong-induction bound を `Nat.card L` に
+特殊化する薄い wrapper. -/
 
 /-- **Isaacs Lemma 7.3 (`|L|`-induction aux)**: `Nat.card L ≤ n` をパラメータに取り,
 強い帰納法のための補助 form. p, P は外側で固定し L のみ帰納法で動かす. -/
@@ -1157,9 +1159,9 @@ p-subgroup が `L ≤ GL(2, ZMod p)` を normalize し, `(|L|, p) = 1` かつ `L
 (任意の 2-部分群は Sylow 2 に含まれ, abelian 群の部分群は abelian), 帰納法
 (IH 適用時の継承) で便利な形.
 
-**proof skeleton** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction を
-[`lem73_aux`](#) で展開. 各 step (P-invariant Sylow, Lem 4.29 適用, q=2 / q-odd) は
-別 commit で fill in. -/
+**proof** (詳細はファイル上部 §7A docstring 参照): `|L|`-strong induction を
+[`lem73_aux`](#) で展開. P-invariant Sylow 取得, proper commutator branch, `q = 2`
+cyclicity branch, odd `q` orbit-count branch をすべて同補助定理内で処理する. -/
 theorem gl2_pSubgroup_centralizes_of_normalizes
     {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 2)
     {P L : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))}
