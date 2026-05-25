@@ -233,17 +233,16 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16** (Z-group 構造): mathlib `IsZGroup` API 直接.
 - **Thm 5.17** (cyclic Sylow_p ⇒ p∤|G'| or p∤|G:G'|): ✅ `isaacs_thm_5_17`
-  (axiom on Ch.4 §4D Thm 4.34 Fitting + cyclic-chain helper).
+  (Ch.4 §4D Thm 4.28 + 4.34 Fitting + cyclic-chain helper).
 - **Cor 5.19** (Sylow_2 cyclic direct factor ⇒ 非単純): 形式化保留. -/
 
-/-! ### Forward axioms (Ch.4 §4D dep)
+/-! ### Ch.4 §4D adapter
 
-Thm 5.17 は Ch.4 §4D **Thm 4.34 Fitting** に依存. 当面 axiom 化, Ch.4 §4D 完成後に
-theorem 化する. -/
+Thm 5.17 は Ch.4 §4D **Thm 4.28 + 4.34 Fitting** に依存する. Ch.4 の
+`fixedPointsOfMulAut` / `actionCommutator` 形式を、Ch.5 の subgroup conjugation 形式へ
+ここで変換する. -/
 
-namespace _root_.OddOrder.Isaacs.Ch04
-
-/-- **Isaacs Thm 4.34 (Fitting)** — axiom 形 (Ch.4 §4D forward dep).
+/-- **Isaacs Thm 4.34 (Fitting)** — Ch.5 subgroup-conjugation adapter.
 
 `A` (= subgroup `K` of `G` with `K ≤ N_G(P)`) が abelian subgroup `P` に conjugation 経由で
 作用. `(|P|, |K|) = 1` (coprime) ⇒ `P = C_P(K) × ⁅P, K⁆` (internal direct product, element form).
@@ -256,14 +255,135 @@ namespace _root_.OddOrder.Isaacs.Ch04
 * ⇒ C_P(K) ⊓ ⁅P, K⁆ = ⊥.
 * p^|K| = θ(p) · h with h ∈ ⁅P, K⁆ (元素計算). Bezout で p ∈ C_P(K) · ⁅P, K⁆.
 
-**実装スケジュール**: Ch.4 §4D 着手時 ~150 LOC. 進捗は ROADMAP / `notes/isaacs/ch04_commutators.md`. -/
-axiom fitting_coprime_abelian_decomp
+This is the form needed by Isaacs Thm 5.17: a subgroup `K ≤ N_G(P)` acts on the
+abelian subgroup `P` by conjugation. Ch.4 gives the same result for an abstract
+automorphism action on the group `↥P`; this theorem translates fixed points to
+`C_G(K) ∩ P` and action-commutators to `⁅P, K⁆`. -/
+theorem fitting_coprime_abelian_decomp
     {G : Type*} [Group G] [Finite G]
     {P : Subgroup G} [IsMulCommutative ↥P]
-    {K : Subgroup G} (_hK_norm : K ≤ Subgroup.normalizer P)
-    (_h_coprime : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K)) :
+    {K : Subgroup G} (hK_norm : K ≤ Subgroup.normalizer P)
+    (h_coprime : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K)) :
     (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ ∧
-      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P := by
+  classical
+  let N : Subgroup G := Subgroup.normalizer (P : Set G)
+  let KN : Subgroup N := K.subgroupOf N
+  let φ : KN →* MulAut P := MulDistribMulAction.toMulAut KN P
+  have hKN_card : Nat.card KN = Nat.card K :=
+    Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (H := K) (K := N)
+        (by simpa [N] using hK_norm)).toEquiv
+  have hCop : Nat.Coprime (Nat.card KN) (Nat.card P) := by
+    rw [hKN_card]
+    exact h_coprime.symm
+  have hSolv : IsSolvable KN ∨ IsSolvable P := by
+    right
+    infer_instance
+  have h_inf_P :
+      Subgroup.fixedPointsOfMulAut φ ⊓
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    _root_.OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
+      φ hCop
+  have h_sup_P :
+      Subgroup.fixedPointsOfMulAut φ ⊔
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ :=
+    _root_.OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := φ) hCop hSolv
+  have h_fixed_map_le : (Subgroup.fixedPointsOfMulAut φ).map P.subtype ≤
+      Subgroup.centralizer (K : Set G) ⊓ P := by
+    intro x hx
+    rw [Subgroup.mem_inf]
+    rcases hx with ⟨xp, hxp_fixed, rfl⟩
+    constructor
+    · rw [Subgroup.mem_centralizer_iff]
+      intro y hyK
+      let yN : N := ⟨y, by simpa [N] using hK_norm hyK⟩
+      let yKN : KN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyK⟩
+      have hfix : (φ yKN) xp = xp := hxp_fixed yKN
+      have hconj : y * (xp : G) * y⁻¹ = (xp : G) := by
+        exact congrArg Subtype.val hfix
+      calc y * (xp : G) = (y * (xp : G) * y⁻¹) * y := by group
+        _ = (xp : G) * y := by rw [hconj]
+    · exact xp.property
+  have h_ac_map_le :
+      (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype ≤
+        (⁅P, K⁆ : Subgroup G) := by
+    rw [Subgroup.map_le_iff_le_comap,
+      _root_.OddOrder.Isaacs.Ch04.actionCommutator_le_iff]
+    intro a x
+    rw [Subgroup.mem_comap]
+    change ((a : N).val * (x : G) * (a : N).val⁻¹) * (x : G)⁻¹ ∈
+      (⁅P, K⁆ : Subgroup G)
+    have haK : ((a : N).val : G) ∈ K := by
+      have ha := a.property
+      rwa [Subgroup.mem_subgroupOf] at ha
+    have hxP : (x : G) ∈ P := x.property
+    have hcomm : (⁅(x : G), ((a : N).val : G)⁆ : G) ∈ (⁅P, K⁆ : Subgroup G) :=
+      Subgroup.commutator_mem_commutator hxP haK
+    convert (Subgroup.inv_mem _ hcomm) using 1
+    group
+  have h_comm_le_ac_map :
+      (⁅P, K⁆ : Subgroup G) ≤
+        (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype := by
+    rw [Subgroup.commutator_le]
+    intro x hxP y hyK
+    let yN : N := ⟨y, by simpa [N] using hK_norm hyK⟩
+    let yKN : KN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyK⟩
+    let xP : P := ⟨x, hxP⟩
+    have hgen : xP * (φ yKN) xP⁻¹ ∈
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ :=
+      Subgroup.subset_closure ⟨xP, yKN, rfl⟩
+    refine ⟨xP * (φ yKN) xP⁻¹, hgen, ?_⟩
+    dsimp [φ, xP, yKN, yN]
+    change x * (y * x⁻¹ * y⁻¹) = x * y * x⁻¹ * y⁻¹
+    group
+  have h_inf_bot :
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_bot]
+    rcases Subgroup.mem_inf.mp hx with ⟨hx_centP, hx_comm⟩
+    rcases Subgroup.mem_inf.mp hx_centP with ⟨hx_cent, hxP⟩
+    let xP : P := ⟨x, hxP⟩
+    have hx_fixed : xP ∈ Subgroup.fixedPointsOfMulAut φ := by
+      intro a
+      apply Subtype.ext
+      rcases a with ⟨⟨y, _hyN⟩, hyK⟩
+      have hcomm : y * x = x * y := by
+        rw [Subgroup.mem_centralizer_iff] at hx_cent
+        exact hx_cent y hyK
+      change y * x * y⁻¹ = x
+      rw [hcomm, mul_assoc, mul_inv_cancel, mul_one]
+    have hx_ac : xP ∈ _root_.OddOrder.Isaacs.Ch04.actionCommutator φ := by
+      have hx_map :
+          x ∈ (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype :=
+        h_comm_le_ac_map hx_comm
+      rcases hx_map with ⟨z, hz_ac, hz_val⟩
+      have hz_eq : z = xP := Subtype.ext hz_val
+      rwa [hz_eq] at hz_ac
+    have hxP_bot : xP ∈ (⊥ : Subgroup P) := by
+      rw [← h_inf_P]
+      exact ⟨hx_fixed, hx_ac⟩
+    exact congrArg Subtype.val (Subgroup.mem_bot.mp hxP_bot)
+  have h_sup_eq :
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P := by
+    apply le_antisymm
+    · exact sup_le inf_le_right (by
+        rw [Subgroup.commutator_le]
+        intro x hxP y hyK
+        have hyN : y ∈ N := by simpa [N] using hK_norm hyK
+        have hyxiy : y * x⁻¹ * y⁻¹ ∈ P :=
+          (Subgroup.mem_normalizer_iff.mp hyN x⁻¹).mp (P.inv_mem hxP)
+        have h_eq : x * y * x⁻¹ * y⁻¹ = x * (y * x⁻¹ * y⁻¹) := by group
+        rw [show (⁅x, y⁆ : G) = x * y * x⁻¹ * y⁻¹ from rfl, h_eq]
+        exact P.mul_mem hxP hyxiy)
+    · intro x hxP
+      have hx_map_top : x ∈ ((⊤ : Subgroup P).map P.subtype) := by
+        exact ⟨⟨x, hxP⟩, Subgroup.mem_top _, rfl⟩
+      rw [← h_sup_P, Subgroup.map_sup] at hx_map_top
+      exact (sup_le_sup h_fixed_map_le h_ac_map_le) hx_map_top
+  exact ⟨h_inf_bot, h_sup_eq⟩
 
 /-- **Cyclic p-group inf-eq-bot** (theorem 形, 2026-05-23 axiom → theorem 化).
 
@@ -373,8 +493,6 @@ theorem cyclic_pgroup_inf_eq_bot_iff
   rw [h_inf, Subgroup.mem_bot] at hh_inHK
   rw [hh_inHK, orderOf_one] at hh_ord_g
   exact (Nat.Prime.ne_one Fact.out) hh_ord_g.symm
-
-end _root_.OddOrder.Isaacs.Ch04
 
 /-- **Isaacs Lemma 5.11** (Hall transfer index): `H` が π-Hall 部分群 + `ϕ : H →* A`
 (`A` 可換有限群, `|A| ∣ |H|`) ⇒ `ker(transfer ϕ) · H = G`.
@@ -580,10 +698,11 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
 **証明** (Isaacs p.165, Fitting 4.34 + Burnside 5.13 経由):
 
 `N := N_G(P)`, `K` complement of `P` in `N` (Schur-Zassenhaus, `(|P|, |N:P|) = 1` since
-P Sylow_p). `K ≤ N`, `(|P|, |K|) = 1`. **Thm 4.34 Fitting** (axiom): `P = C_P(K) × ⁅P,K⁆`
+P Sylow_p). `K ≤ N`, `(|P|, |K|) = 1`. **Thm 4.34 Fitting** adapter:
+`P = C_P(K) × ⁅P,K⁆`
 (internal direct, `C_P(K) ⊓ ⁅P,K⁆ = ⊥` AND `C_P(K) ⊔ ⁅P,K⁆ = P`).
 
-`P` cyclic + axiom **cyclic_pgroup_inf_eq_bot_iff**: `C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒
+`P` cyclic + **cyclic_pgroup_inf_eq_bot_iff**: `C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒
 C_P(K) = ⊥ ∨ ⁅P,K⁆ = ⊥`.
 
 * **Case 1** `⁅P,K⁆ = ⊥`: `K` centralizes `P`. `N = PK` で全要素が `P` と可換 ⇒
@@ -594,8 +713,8 @@ C_P(K) = ⊥ ∨ ⁅P,K⁆ = ⊥`.
 * **Case 2** `C_P(K) = ⊥`: 4.34 sup より `P = ⁅P,K⁆ ⊆ commutator G`. `|G:G'| = |G|/|G'|`,
   Sylow_p 全体が `G'` に入る ⇒ `|G:G'|` の `p`-成分 = 1 ⇒ `p ∤ |G:G'|`.
 
-**FORWARD DEPENDENCY**: Thm 4.34 (Ch.4 §4D) + cyclic_pgroup_inf_eq_bot_iff (mathlib upstream
-候補) を axiom 化. 完成後 unconditional 化. -/
+**実装状態**: Ch.4 §4D Thm 4.28 + 4.34 を subgroup-conjugation adapter で接続済み.
+`cyclic_pgroup_inf_eq_bot_iff` も theorem 化済み. -/
 theorem isaacs_thm_5_17
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
     [hPcyc : IsCyclic ↥(P : Subgroup G)] :
@@ -645,9 +764,9 @@ theorem isaacs_thm_5_17
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_N).toEquiv
     rw [h_K_card, h_K'_card, ← h_PN_card]
     exact h_coprime_P_N
-  -- Apply Thm 4.34 (axiom)
+  -- Apply Thm 4.34 adapter.
   obtain ⟨h_inf_bot, h_sup_top⟩ :=
-    _root_.OddOrder.Isaacs.Ch04.fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
+    fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
   -- ⁅P, K⁆ ≤ P (since K ≤ N normalizes P, so conjugates of P-elements stay in P)
   have h_comm_le_P : (⁅(P : Subgroup G), K⁆ : Subgroup G) ≤ (P : Subgroup G) := by
     rw [Subgroup.commutator_le]
@@ -660,8 +779,8 @@ theorem isaacs_thm_5_17
     exact (P : Subgroup G).mul_mem hx hyxiy
   have h_cent_le_P : Subgroup.centralizer (K : Set G) ⊓ (P : Subgroup G) ≤ (P : Subgroup G) :=
     inf_le_right
-  -- Cyclic axiom: C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒ one of them is ⊥
-  rcases (_root_.OddOrder.Isaacs.Ch04.cyclic_pgroup_inf_eq_bot_iff P.isPGroup'
+  -- Cyclic p-group chain: C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒ one of them is ⊥.
+  rcases (cyclic_pgroup_inf_eq_bot_iff P.isPGroup'
       h_cent_le_P h_comm_le_P).mp h_inf_bot with h_cent_bot | h_comm_bot
   · -- Case 2 (h_cent_bot): C_P(K) = ⊥ ⇒ P = ⁅P,K⁆ ⊆ commutator G ⇒ p ∤ |G:G'|
     right
