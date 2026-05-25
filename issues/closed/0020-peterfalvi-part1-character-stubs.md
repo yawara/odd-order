@@ -22,9 +22,20 @@ Peterfalvi §3 (1.1), (1.2), (1.4), (1.5) と §6 (4.5.b) の前提になる。
 
 - [x] 上記 stub を依存単位の小 issue に分割する。
 - [x] issue 0021: `SecondOrthogonality.lean`
-- [ ] issue 0022: `BrauerPermutation.lean`
+- [x] issue 0022: `BrauerPermutation.lean`
 - [x] issue 0023: `Clifford.lean`
 - [x] issue 0024: `IsometryDifferencePair.lean`
+
+## 2026-05-26 update
+
+- 初期 Wave 1a stub 群はすべて、public API を `sorry` なしにするか、独立した
+  proof-core issue に分割済み。
+- 残る hard proof core は `issues/0022-peterfalvi-brauer-permutation.md`,
+  `issues/0025-peterfalvi-isometry-difference-core.md`,
+  `issues/0026-peterfalvi-clifford-core.md`,
+  `issues/0027-peterfalvi-column-orthogonality-core.md` で追跡する。
+- この parent issue は routing 完了として close する。上記 proof core の完了を
+  主張するものではない。
 
 ## 完了条件
 
