@@ -301,8 +301,12 @@ FT クリティカル度 + 章内依存で並べる:
   使って大枠へ進める.
 - 6.17-6.21 Frobenius complement / coprime abelian action: Ch.7 の 6.20 使用箇所に向けた中期目標.
 - 6.8 partition counting lemma: `SubgroupPartition`, 非単位元が一意な part に入る補題,
-  `orbitProduct φ H u ∈ actionFixedPoints φ H` まで sorry-free. 残りは
-  `∏_{X∈Π} u_X = u_A * u^(|Π|-1)` の counting identity と 6.9 への接続.
+  `orbitProduct φ H u ∈ actionFixedPoints φ H`, fixed-points antitone,
+  `actionFixedPoints φ H = ⊥ → orbitProduct φ H u = 1`, および
+  counting identity を仮定した
+  `exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity` まで sorry-free.
+  残りは `∏_{X∈Π} u_X = u_A * u^(|Π|-1)` の finite-product counting identity
+  そのものと 6.9 への接続.
 
 ## 開発時の注意点
 

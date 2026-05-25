@@ -805,6 +805,98 @@ theorem orbitProduct_mem_actionFixedPoints {A U : Type*} [Group A] [CommGroup U]
             (fun h : H => (φ (h : A)) u)
             (fun h => rfl)
 
+/-- Fixed points are antitone in the acting subgroup. -/
+theorem actionFixedPoints_antitone {A U : Type*} [Group A] [Group U]
+    {φ : A →* MulAut U} {H K : Subgroup A} (hHK : H ≤ K) :
+    actionFixedPoints φ K ≤ actionFixedPoints φ H := by
+  intro u hu h
+  exact hu ⟨h, hHK h.property⟩
+
+/-- If the fixed points of `H` are trivial, then Isaacs's orbit product over `H` is `1`. -/
+theorem orbitProduct_eq_one_of_actionFixedPoints_eq_bot
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U)
+    (hH : actionFixedPoints φ H = ⊥) :
+    orbitProduct φ H u = 1 := by
+  have hmem := orbitProduct_mem_actionFixedPoints φ H u
+  have : orbitProduct φ H u ∈ (⊥ : Subgroup U) := by
+    simpa [hH] using hmem
+  simpa using this
+
+/-- The product over all partition parts of the orbit products. -/
+noncomputable def partitionOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U :=
+  ∏ x ∈ partn.parts,
+    (letI : Fintype x := Fintype.ofFinite x
+     orbitProduct φ x u)
+
+/-- The orbit product over the top subgroup, with the finite instance supplied from `A`. -/
+noncomputable def topOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) : U :=
+  letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+  orbitProduct φ (⊤ : Subgroup A) u
+
+/-- If every partition part has trivial fixed points, then every part orbit product is `1`. -/
+theorem partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U)
+    (hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥) :
+    partitionOrbitProduct φ partn u = 1 := by
+  classical
+  rw [partitionOrbitProduct, Finset.prod_eq_one]
+  intro X hX
+  letI : Fintype X := Fintype.ofFinite X
+  exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ X u (hfix X hX)
+
+/-- If every partition part has trivial fixed points, then the full fixed-point subgroup is
+trivial. -/
+theorem actionFixedPoints_top_eq_bot_of_parts_fixedPoints_eq_bot
+    {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    (hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥) :
+    actionFixedPoints φ (⊤ : Subgroup A) = ⊥ := by
+  apply eq_bot_iff.mpr
+  intro u hu
+  obtain ⟨X, hX, _h1X⟩ := partn.cover (1 : A)
+  have huX : u ∈ actionFixedPoints φ X :=
+    actionFixedPoints_antitone (show X ≤ (⊤ : Subgroup A) from le_top) hu
+  simpa [hfix X hX] using huX
+
+/-- Once the Isaacs 6.8 counting identity is known, some part has nontrivial fixed points.
+
+This packages the non-counting half of Lemma 6.8: assuming the product identity
+`∏_{X∈Π} u_X = u_A * u^(|Π|-1)`, any `u` with `u^(|Π|-1) ≠ 1` forces a partition
+part whose action on `U` has nontrivial fixed points. -/
+theorem exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct φ partn u =
+        topOrbitProduct φ u * u ^ (partn.parts.card - 1))
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    ∃ X, X ∈ partn.parts ∧ actionFixedPoints φ X ≠ ⊥ := by
+  by_contra hnone
+  have hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥ := by
+    intro X hX
+    by_contra hne
+    exact hnone ⟨X, hX, hne⟩
+  have hprod :
+      partitionOrbitProduct φ partn u = 1 :=
+    partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot φ partn u hfix
+  have htop :
+      actionFixedPoints φ (⊤ : Subgroup A) = ⊥ :=
+    actionFixedPoints_top_eq_bot_of_parts_fixedPoints_eq_bot φ partn hfix
+  have htop_one :
+      topOrbitProduct φ u = 1 := by
+    rw [topOrbitProduct]
+    letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+    exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ (⊤ : Subgroup A) u htop
+  have hident := hidentity u
+  rw [hprod, htop_one, one_mul] at hident
+  exact hu hident.symm
+
 end
 
 section /- 6B structural helper: finite abelian Z-groups -/
