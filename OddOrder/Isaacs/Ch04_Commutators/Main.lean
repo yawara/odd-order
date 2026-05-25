@@ -1913,6 +1913,19 @@ theorem actionCommutator_le_iff_left {A G : Type*} [Group A] [Group G]
     rw [h_eq] at h'
     simpa using Subgroup.inv_mem _ h'
 
+/-- `actionCommutator φ = ⊥` iff `A` acts trivially on `G` (`∀ a g, (φ a) g = g`).
+
+Lem 4.20 left form を `N = ⊥` で特殊化. BaerMul wrapper への翻訳に基本. -/
+theorem actionCommutator_eq_bot_iff_acts_trivially {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) :
+    actionCommutator φ = ⊥ ↔ ∀ a : A, ∀ g : G, (φ a) g = g := by
+  rw [eq_bot_iff, actionCommutator_le_iff_left]
+  refine ⟨fun h a g => ?_, fun h a g => ?_⟩
+  · have hg := h a g
+    rw [Subgroup.mem_bot, inv_mul_eq_one] at hg
+    exact hg.symm
+  · rw [Subgroup.mem_bot, h a g, inv_mul_cancel]
+
 /-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
 (a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);
 (b) `∀ a x, (φ a) x ∈ xH` (left coset is A-invariant in element form);
@@ -2945,6 +2958,95 @@ instance BaerMul.instFinite {G : Type*} [Finite G] : Finite (BaerMul G) :=
   inferInstanceAs (Finite G)
 
 @[simp] lemma BaerMul.nat_card_eq {G : Type*} : Nat.card (BaerMul G) = Nat.card G := rfl
+
+/-- **Lem 4.37(c) wrapped**: G の multiplicative automorphism は `BaerMul G` 上でも
+multiplicative automorphism (= baerAdd 保存). 関数本体は同じ (恒等経由). -/
+noncomputable def MulAut.toBaerMul {G : Type*} [Group G] (f : G ≃* G) :
+    BaerMul G ≃* BaerMul G where
+  toFun x := BaerMul.ofG (f (BaerMul.toG x))
+  invFun x := BaerMul.ofG (f.symm (BaerMul.toG x))
+  left_inv x := by
+    show BaerMul.ofG (f.symm (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))) = x
+    simp only [BaerMul.toG_ofG, f.symm_apply_apply]
+    rfl
+  right_inv x := by
+    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (f.symm (BaerMul.toG x))))) = x
+    simp only [BaerMul.toG_ofG, f.apply_symm_apply]
+    rfl
+  map_mul' x y := by
+    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))) =
+        BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))
+          (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG y)))))
+    simp only [BaerMul.toG_ofG]
+    exact congr_arg BaerMul.ofG (baerAdd_mulEquiv_eq f (BaerMul.toG x) (BaerMul.toG y))
+
+/-- `MulAut.toBaerMul` は群準同型 (composition / 1 を保存). 下の `MonoidHom.toBaerMulLift`
+を構成するために使う. -/
+noncomputable def MulAut.toBaerMulHom {G : Type*} [Group G] :
+    MulAut G →* MulAut (BaerMul G) where
+  toFun f := MulAut.toBaerMul f
+  map_one' := by
+    ext x
+    show BaerMul.ofG ((1 : MulAut G) (BaerMul.toG x)) = x
+    show BaerMul.ofG (BaerMul.toG x) = x
+    exact BaerMul.ofG_toG x
+  map_mul' f g := by
+    ext x
+    show BaerMul.ofG ((f * g) (BaerMul.toG x)) =
+        BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (g (BaerMul.toG x)))))
+    simp only [BaerMul.toG_ofG]
+    rfl
+
+/-- φ : A →* MulAut G を BaerMul G への作用 φ' : A →* MulAut (BaerMul G) に lift する.
+関数本体は同じ (Lem 4.37(c)). -/
+noncomputable def MonoidHom.toBaerMulLift {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) : A →* MulAut (BaerMul G) :=
+  MulAut.toBaerMulHom.comp φ
+
+@[simp] lemma MonoidHom.toBaerMulLift_apply {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (a : A) (g : BaerMul G) :
+    (MonoidHom.toBaerMulLift φ a) g = BaerMul.ofG ((φ a) (BaerMul.toG g)) := rfl
+
+/-- **Lem 4.37(b) full form**: `BaerMul G` の自然冪 (baerAdd-iterate) = `G` の自然冪.
+`npow_succ` の帰納で示す. -/
+lemma BaerMul.npow_eq_pow {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)]
+    (x : BaerMul G) (n : ℕ) :
+    @HPow.hPow (BaerMul G) ℕ _ _ x n = BaerMul.ofG ((BaerMul.toG x) ^ n) := by
+  induction n with
+  | zero =>
+    rw [pow_zero, pow_zero]
+    rfl
+  | succ k ih =>
+    rw [pow_succ, ih]
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG ((BaerMul.toG x) ^ k))) (BaerMul.toG x)) =
+        BaerMul.ofG ((BaerMul.toG x) ^ (k + 1))
+    simp only [BaerMul.toG_ofG]
+    rw [baerAdd_pow_self_eq_pow_succ]
+
+/-- `BaerMul G` での `x^n = 1` ↔ `G` での `x^n = 1`. Cor 4.35 適用時の `g^p = 1` 翻訳に使用. -/
+lemma BaerMul.pow_eq_one_iff {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)]
+    (x : BaerMul G) (n : ℕ) :
+    @HPow.hPow (BaerMul G) ℕ _ _ x n = 1 ↔ (BaerMul.toG x) ^ n = 1 := by
+  rw [BaerMul.npow_eq_pow]
+  show BaerMul.ofG ((BaerMul.toG x) ^ n) = BaerMul.ofG 1 ↔ (BaerMul.toG x) ^ n = 1
+  exact BaerMul.ofG.apply_eq_iff_eq
+
+/-- `IsPGroup p (BaerMul G) ↔ IsPGroup p G`. BaerMul の構造を経由しても p-群性は不変. -/
+lemma BaerMul.isPGroup_iff {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)] (p : ℕ) :
+    IsPGroup p (BaerMul G) ↔ IsPGroup p G := by
+  unfold IsPGroup
+  refine ⟨fun h x => ?_, fun h x => ?_⟩
+  · obtain ⟨n, hn⟩ := h (BaerMul.ofG x)
+    refine ⟨n, ?_⟩
+    rw [BaerMul.pow_eq_one_iff] at hn
+    simpa [BaerMul.toG_ofG] using hn
+  · obtain ⟨n, hn⟩ := h (BaerMul.toG x)
+    refine ⟨n, ?_⟩
+    rw [BaerMul.pow_eq_one_iff]
+    exact hn
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
