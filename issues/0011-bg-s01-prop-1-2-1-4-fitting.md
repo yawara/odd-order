@@ -20,7 +20,7 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
 
 - [x] BG Prop 1.2 の正確な statement を `references/bg/local-analysis.mmd` で確認する。
 - [x] chief factor / centralizer / Fitting の既存 API を棚卸しする。
-- [ ] Prop 1.2 を実装するか、必要な shared module の最小スコープを決める。
+- [x] Prop 1.2 を実装するか、必要な shared module の最小スコープを決める。
 - [x] Prop 1.3 `C_G(F(G)) ⊆ F(G)` を実装する。
 - [ ] Prop 1.4 coprime automorphism faithful-on-Fitting を実装する。
 
@@ -35,7 +35,11 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
   Prop 1.2 経由ではなく、`C_G(F(G))` 内の最小正規反例 + Fitting 最大性で証明。
 - `lake build OddOrder.BG.Ch1_Preliminary.S01_Solvable` と
   `lake build OddOrder.AxiomsCheck` は成功。
-- Prop 1.2 は shared `ChiefSeries`/chief-factor centralizer module の設計が必要。
+- Prop 1.2 用の最小 shared module として `OddOrder.GroupTheory.ChiefFactor` を追加。
+  現時点では `IsChiefFactor U V` と ambient `chiefFactorCentralizer U V = C_G(U/V)`、
+  および map/comap 基本補題まで。
+- Prop 1.2 本体は、次に chief/composition series over normal intervals と
+  `F(G*) ≤ ⋂ C_{G*}(U/V)` の包含補題から進める。
 - Prop 1.4 は Prop 1.3 を使える状態になったが、semidirect product と Hall σ/core
   の形式化が残る。
 

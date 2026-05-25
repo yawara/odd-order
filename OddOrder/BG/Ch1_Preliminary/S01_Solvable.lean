@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.FrattiniPGroup
 import Mathlib.Order.Minimal
 import Mathlib.GroupTheory.PGroup
@@ -242,8 +243,9 @@ theorem centralizer_fitting_le_fitting
 /-!
 Prop. 1.2 and 1.4 remain routed through this §1A block.
 
-* Prop. 1.2 needs a shared chief-factor/centralizer API: chief factors `U/V` of `G`,
-  `C_{G*}(U/V)`, and composition/chief-series induction over normal intervals.
+* Prop. 1.2 now has the basic `OddOrder.GroupTheory.ChiefFactor` vocabulary:
+  chief factors `U/V` and ambient `C_G(U/V)`.  The remaining work is the
+  composition/chief-series induction over normal intervals.
 * Prop. 1.4 should then follow the book route through semidirect products and Prop. 1.3;
   the present file now supplies the required self-centralizing Fitting endpoint.
 -/

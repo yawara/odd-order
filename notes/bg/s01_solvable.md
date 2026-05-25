@@ -30,8 +30,10 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   `[K,K] ≤ F(G)`. Since `K` centralizes `F(G)`, `K ∩ F(G)` is central in `K`, and
   `K/(K∩F(G))` is abelian. Thus `K` is nilpotent, contradicting Fitting maximality.
 - **Prop 1.2 remains open**: exact BG statement checked at `local-analysis.mmd` L360-L378.
-  It needs chief factors `U/V`, centralizers `C_{G*}(U/V)`, and chief-series induction over
-  normal intervals.
+  The first shared module now exists: `OddOrder.GroupTheory.ChiefFactor` provides
+  `IsChiefFactor U V`, ambient `chiefFactorCentralizer U V = C_G(U/V)`, and quotient
+  image/comap helper lemmas.  Remaining work is chief-series induction over normal intervals
+  and the two inclusions in Prop 1.2.
 - **Prop 1.4 remains open**: with Prop 1.3 now available, the remaining work is the book's
   semidirect-product/Hall-σ route for coprime automorphism groups.
 
