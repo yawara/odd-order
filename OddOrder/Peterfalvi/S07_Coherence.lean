@@ -164,6 +164,28 @@ theorem difference_image_eq {hyp : Hypothesis (L := L) (G := G) S A}
           (hyp.difference_image hχ).nuClassFunction) :=
   (hyp.difference_image hχ).image_conjugateDifference
 
+theorem conjugate_mem {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    χ.conj ∈ S :=
+  hyp.conjugate_closed hχ
+
+theorem not_isReal {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    ¬ χ.IsReal :=
+  hyp.no_real_characters hχ
+
+theorem ne_conj {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    χ ≠ χ.conj := by
+  intro hχ_eq
+  exact hyp.not_isReal hχ hχ_eq.symm
+
+theorem conjugateDifference_ne_zero {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    OddOrder.Peterfalvi.S03.conjugateDifference χ ≠ 0 :=
+  (OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_iff_not_isReal χ).mpr
+    (hyp.not_isReal hχ)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.S07

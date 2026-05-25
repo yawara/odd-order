@@ -198,6 +198,14 @@ Coherent triple (τ_1, τ_2, τ_3)
 - **(e)** `φ ⊥ {χ, χ̄} ⇒ R(φ) ⊥ R(χ)`
   - 異なる character pair に対する R 集合が直交
 
+**Lean status (2026-05-26)**:
+- `OddOrder.Peterfalvi.S03.conjugateDifference_eq_zero_iff_isReal` and
+  `conjugateDifference_ne_zero_iff_not_isReal` identify the §7 expression
+  `χ - χ̄` with the real-character obstruction.
+- `OddOrder.Peterfalvi.S07.Hypothesis.conjugate_mem`,
+  `not_isReal`, `ne_conj`, and `conjugateDifference_ne_zero` expose (5.2.a)
+  as named, reusable API for later coherence proofs.
+
 ### (5.3) Lemma — Coherence の十分条件
 
 **(a) 既存 character の場合**:
@@ -507,4 +515,3 @@ lemma norm_bound_determines_zero (hyp : Hypothesis L G S A) {χ χ₁ : S}
 ---
 
 *작성: 2026-05-22. 출처: Peterfalvi `references/peterfalvi/04.7_pp_25_29_Coherence.mmd` (136 행), `references/peterfalvi/04.4_pp_10_14_*.mmd` (§4 Dade 참고), `notes/peterfalvi/_overview.md` (전체 구조), `notes/peterfalvi/s04_dade_isometry.md` (Dade 설계).*
-

@@ -85,4 +85,32 @@ def conjugateDifference (χ : ClassFunction G ℂ) : ClassFunction G ℂ :=
     conjugateDifference χ g = χ g - χ.conj g :=
   rfl
 
+@[simp] theorem conjugateDifference_conj (χ : ClassFunction G ℂ) :
+    conjugateDifference χ.conj = -conjugateDifference χ := by
+  ext g
+  simp [conjugateDifference, sub_eq_add_neg, add_comm]
+
+theorem conjugateDifference_eq_zero_iff_isReal (χ : ClassFunction G ℂ) :
+    conjugateDifference χ = 0 ↔ χ.IsReal := by
+  constructor
+  · intro hχ
+    rw [ClassFunction.IsReal.iff_forall]
+    intro g
+    have hχg := congrArg (fun φ : ClassFunction G ℂ => φ g) hχ
+    have hsub : χ g - star (χ g) = 0 := by
+      simpa [conjugateDifference] using hχg
+    exact (sub_eq_zero.mp hsub).symm
+  · intro hχ
+    ext g
+    have hχg := (ClassFunction.IsReal.iff_forall χ).mp hχ g
+    simp [conjugateDifference, hχg]
+
+theorem conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ) :
+    conjugateDifference χ ≠ 0 ↔ ¬ χ.IsReal := by
+  constructor
+  · intro hne hreal
+    exact hne ((conjugateDifference_eq_zero_iff_isReal χ).mpr hreal)
+  · intro hnot hzero
+    exact hnot ((conjugateDifference_eq_zero_iff_isReal χ).mp hzero)
+
 end OddOrder.Peterfalvi.S03
