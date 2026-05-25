@@ -26,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 |---|---|---|---|
 | 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 完成 |
 | 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 4.9-4.13 完成; Mann 後回し |
-| 4C | A acts on G via automorphisms | 4.20 – 4.27 | 4.20-4.23, 4.25 完成; 4.24/4.26/4.27 残 |
+| 4C | A acts on G via automorphisms | 4.20 – 4.27 | 4.20-4.23, 4.25-4.27 完成; 4.24 残 |
 | 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 完成 |
 
 ## Mathlib direct correspondence (no wrapper)
@@ -5040,5 +5040,111 @@ theorem isaacs_thm_4_38
   isaacs_thm_4_38_aux hp_odd P Q hP hQ_p' (Nat.card G) φ hG h_fix le_rfl
 
 end -- 4D
+
+/-! ### Isaacs §4C Thm 4.24 ⭐: faithful chain action ⇒ A nilpotent
+
+**ステートメント** (Isaacs p.139): `A`, `G` finite. `A` が `G` に faithful に作用 +
+`[G, A, ..., A]_m = 1` ⇒ `A` is nilpotent.
+
+**証明戦略**: `|G|`-induction で **`A^∞` acts trivially on `G`** (non-faithful generalized
+form) を示す. faithful 仮定下では `A^∞ ⊆ C_A(G) = ⊥` から `A` nilpotent.
+
+**Phase 1 (本ファイル)**: `lowerCentralSeriesInfty A := lcs A (Nat.card A)` の infra と
+stability lemma. Phase 2/3 (three-subgroups helpers + main theorem) は後続. -/
+
+section /- §4C (続): Theorem 4.24 — faithful chain action ⇒ `A` nilpotent (infra) -/
+
+variable {A : Type*} [Group A]
+
+/-- 真部分群は真に小さい濃度を持つ (`Set.Finite.card_lt_card` の Subgroup 版). -/
+private lemma nat_card_lt_of_subgroup_lt {G : Type*} [Group G] [Finite G]
+    {H₁ H₂ : Subgroup G} (h : H₁ < H₂) :
+    Nat.card H₁ < Nat.card H₂ := by
+  exact Set.Finite.card_lt_card (Set.toFinite _) (SetLike.coe_ssubset_coe.mpr h)
+
+/-- 鳩の巣論法: 有限群の lcs は `Nat.card A` step 以内に必ず stabilize する.
+    具体的には `lcs A (Nat.card A) = lcs A (Nat.card A + 1)`. -/
+private lemma lowerCentralSeries_card_eq_succ_card [Finite A] :
+    lowerCentralSeries A (Nat.card A) = lowerCentralSeries A (Nat.card A + 1) := by
+  -- antitone を使って ≤ は trivial. < は矛盾を導く.
+  refine le_antisymm ?_ (lowerCentralSeries_antitone (Nat.le_succ _))
+  -- by contradiction: もし lcs (N+1) < lcs N なら、それまで全 step も strict
+  -- かもしれない. しかしそうとは限らないので、別ルートで.
+  -- Claim: ∃ k ≤ Nat.card A, lcs k = lcs (k+1). これを取れば stability propagation.
+  suffices h : ∃ k ≤ Nat.card A, lowerCentralSeries A k = lowerCentralSeries A (k + 1) by
+    obtain ⟨k, hk_le, hk_eq⟩ := h
+    -- propagate: lcs k = lcs (k+1) ⇒ lcs (k+j) = lcs k for all j
+    have h_prop : ∀ j, lowerCentralSeries A (k + j) = lowerCentralSeries A k := by
+      intro j
+      induction j with
+      | zero => rfl
+      | succ j ih =>
+          have h1 : lowerCentralSeries A (k + (j + 1)) =
+              ⁅lowerCentralSeries A (k + j), ⊤⁆ := rfl
+          rw [h1, ih]
+          have h2 : lowerCentralSeries A (k + 1) = ⁅lowerCentralSeries A k, ⊤⁆ := rfl
+          rw [← h2, hk_eq]
+    -- want: lcs (Nat.card A) ≤ lcs (Nat.card A + 1)
+    -- show both = lcs k
+    have h_LHS : lowerCentralSeries A (Nat.card A) = lowerCentralSeries A k := by
+      have hN : Nat.card A = k + (Nat.card A - k) := by omega
+      rw [hN]; exact h_prop _
+    have h_RHS : lowerCentralSeries A (Nat.card A + 1) = lowerCentralSeries A k := by
+      have hN : Nat.card A + 1 = k + (Nat.card A - k + 1) := by omega
+      rw [hN]; exact h_prop _
+    rw [h_LHS, h_RHS]
+  -- prove existence: by contradiction (pigeonhole)
+  by_contra h_no_stable
+  push Not at h_no_stable
+  -- h_no_stable : ∀ k ≤ Nat.card A, lcs k ≠ lcs (k+1)
+  -- antitone + ≠ ⇒ strict at every step ≤ Nat.card A
+  have h_strict : ∀ k ≤ Nat.card A,
+      lowerCentralSeries A (k + 1) < lowerCentralSeries A k := fun k hk =>
+    lt_of_le_of_ne (lowerCentralSeries_antitone (Nat.le_succ k))
+      (fun heq => h_no_stable k hk heq.symm)
+  -- card bound: Nat.card (lcs k) ≤ Nat.card A - k for k ≤ Nat.card A + 1
+  have h_card_bound : ∀ k ≤ Nat.card A + 1,
+      Nat.card (lowerCentralSeries A k) + k ≤ Nat.card A + 1 := by
+    intro k hk
+    induction k with
+    | zero =>
+        simp only [Nat.add_zero]
+        have h_top : lowerCentralSeries A 0 = ⊤ := lowerCentralSeries_zero
+        rw [h_top]
+        have h_top_card : Nat.card (⊤ : Subgroup A) = Nat.card A :=
+          Nat.card_congr Subgroup.topEquiv.toEquiv
+        omega
+    | succ n ih =>
+        have hn : n ≤ Nat.card A := by omega
+        have hn_le : n ≤ Nat.card A + 1 := Nat.le_succ_of_le hn
+        have ih' : Nat.card (lowerCentralSeries A n) + n ≤ Nat.card A + 1 := ih hn_le
+        have h_strict_n := h_strict n hn
+        have h_card_lt := nat_card_lt_of_subgroup_lt h_strict_n
+        omega
+  -- Apply at k = Nat.card A + 1
+  have h_final := h_card_bound (Nat.card A + 1) le_rfl
+  have h_ge_one : 1 ≤ Nat.card (lowerCentralSeries A (Nat.card A + 1)) :=
+    Nat.card_pos
+  omega
+
+/-- The "infinity term" of the lower central series for a finite group `A`:
+`A^∞ := lowerCentralSeries A (Nat.card A)`. For a finite group this is the eventual
+stable value of the lower central series. -/
+noncomputable def lowerCentralSeriesInfty (A : Type*) [Group A] [Finite A] : Subgroup A :=
+  lowerCentralSeries A (Nat.card A)
+
+/-- `A^∞ = ⁅A^∞, ⊤⁆` (lcs の stable 性質の右作用形). -/
+lemma lowerCentralSeriesInfty_commutator_top [Finite A] :
+    ⁅lowerCentralSeriesInfty A, (⊤ : Subgroup A)⁆ = lowerCentralSeriesInfty A := by
+  unfold lowerCentralSeriesInfty
+  exact (lowerCentralSeries_card_eq_succ_card (A := A)).symm
+
+/-- `A^∞ = ⁅⊤, A^∞⁆` (lcs の stable 性質の左作用形, `commutator_comm` 経由). -/
+lemma commutator_top_lowerCentralSeriesInfty [Finite A] :
+    ⁅(⊤ : Subgroup A), lowerCentralSeriesInfty A⁆ = lowerCentralSeriesInfty A := by
+  rw [Subgroup.commutator_comm]
+  exact lowerCentralSeriesInfty_commutator_top
+
+end /- §4C (続) -/
 
 end OddOrder.Isaacs.Ch04
