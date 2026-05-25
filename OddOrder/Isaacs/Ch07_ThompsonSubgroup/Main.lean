@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
@@ -248,6 +249,79 @@ theorem sl2_unique_involution
       ext i j
       fin_cases i <;> fin_cases j <;> simp [Matrix.neg_apply]
     exact Subtype.ext (hM_eq.trans hneg_val.symm)
+
+private theorem card_sl2_mul_units_eq_card_gl2_zmod_prime
+    {p : ℕ} [Fact p.Prime] :
+    Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) * (p - 1) =
+      Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) := by
+  let detGL : Matrix.GeneralLinearGroup (Fin 2) (ZMod p) →* (ZMod p)ˣ :=
+    Matrix.GeneralLinearGroup.det
+  let toGLSL : Matrix.SpecialLinearGroup (Fin 2) (ZMod p) →*
+      Matrix.GeneralLinearGroup (Fin 2) (ZMod p) :=
+    Matrix.SpecialLinearGroup.toGL
+  have htoGL_range_eq_ker : toGLSL.range = detGL.ker := by
+    ext g
+    constructor
+    · rintro ⟨s, rfl⟩
+      simp [detGL, toGLSL]
+    · intro hg
+      rw [MonoidHom.mem_ker] at hg
+      have hgdet : ((g : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :
+          Matrix (Fin 2) (Fin 2) (ZMod p)).det = 1 := by
+        have := congrArg Units.val hg
+        simpa [detGL, Matrix.GeneralLinearGroup.val_det_apply] using this
+      refine ⟨⟨((g : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :
+        Matrix (Fin 2) (Fin 2) (ZMod p)), hgdet⟩, ?_⟩
+      exact Units.ext rfl
+  have htop_map_eq_range :
+      (⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))).map toGLSL =
+        toGLSL.range := by
+    ext g
+    simp [toGLSL]
+  have hcard_SL_range :
+      Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
+        Nat.card toGLSL.range := by
+    calc
+      Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))
+          = Nat.card (⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))) := by
+            rw [Subgroup.card_top]
+      _ = Nat.card ((⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))).map
+            toGLSL) := by
+            exact Nat.card_congr
+              (Subgroup.equivMapOfInjective
+                (⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))) toGLSL
+                Matrix.SpecialLinearGroup.toGL_injective).toEquiv
+      _ = Nat.card toGLSL.range := by
+            rw [htop_map_eq_range]
+  have hcard_SL_ker :
+      Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
+        Nat.card detGL.ker := by
+    rw [hcard_SL_range, htoGL_range_eq_ker]
+  have hdet_range_top : detGL.range = ⊤ := by
+    ext u
+    constructor
+    · intro _
+      trivial
+    · intro _
+      let A : Matrix (Fin 2) (Fin 2) (ZMod p) := !![(u : ZMod p), 0; 0, 1]
+      have hdetA_ne : A.det ≠ 0 := by
+        simp [A, Matrix.det_fin_two, u.ne_zero]
+      refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero A hdetA_ne, ?_⟩
+      ext
+      simp [detGL, A, Matrix.det_fin_two]
+  have hcard_range : Nat.card detGL.range = p - 1 := by
+    rw [hdet_range_top, Subgroup.card_top, Nat.card_eq_fintype_card, Fintype.card_units,
+      ZMod.card]
+  have hker_mul_range :
+      Nat.card detGL.ker * Nat.card detGL.range =
+        Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) := by
+    rw [← Subgroup.index_ker detGL]
+    exact Subgroup.card_mul_index detGL.ker
+  calc
+    Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) * (p - 1)
+        = Nat.card detGL.ker * Nat.card detGL.range := by
+          rw [hcard_SL_ker, hcard_range]
+    _ = Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) := hker_mul_range
 
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
@@ -532,6 +606,14 @@ private theorem lem73_aux
             (Subgroup.card_dvd_of_le
               (show L_SL ≤
                 (⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))) from le_top))
+        have hq_dvd_SL : q ∣
+            Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) :=
+          hq_dvd_L.trans hL_card_dvd_SL
+        have hSL_card_dvd_GL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) ∣
+            Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
+          ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
+        have hq_dvd_GL : q ∣ Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
+          hq_dvd_SL.trans hSL_card_dvd_GL
         sorry  -- Step l-n
       · -- Case [L, P] < L: IH 適用 → P ≤ C([L, P]) → Lem 4.29 で [L, P] = ⊥ → P ≤ C(L).
         have hLP_lt_L : LP_comm < L := lt_of_le_of_ne hLP_le_L hLP_eq_L
