@@ -1527,6 +1527,100 @@ private lemma twist_conj_zmod_pow
   rw [pow_eq_pow_iff_modEq, Nat.ModEq, h_order]
   rw [ZMod.val_mul, Nat.mod_mod]
 
+private lemma two_mul_eq_zero_of_twist_fixed
+    {k : ℕ} (hk : 3 ≤ k) {i : ZMod (2 ^ k)}
+    (hfix : SemiDihedralGroup.twist k * i = i) :
+    (2 : ZMod (2 ^ k)) * i = 0 := by
+  rcases k with _ | _ | _ | n
+  · omega
+  · omega
+  · omega
+  · change (2 : ZMod (2 ^ (n + 3))) * i = 0
+    change ((2 ^ (n + 2) : ZMod (2 ^ (n + 3))) - 1) * i = i at hfix
+    have hzero : (((2 ^ (n + 2) : ZMod (2 ^ (n + 3))) - 2) * i = 0) := by
+      have hcalc : (((2 ^ (n + 2) : ZMod (2 ^ (n + 3))) - 2) * i) =
+          (((2 ^ (n + 2) : ZMod (2 ^ (n + 3))) - 1) * i - i) := by
+        ring
+      rw [hcalc, hfix]
+      ring
+    have hfactor :
+        ((2 ^ (n + 2) : ZMod (2 ^ (n + 3))) - 2) =
+          (2 : ZMod (2 ^ (n + 3))) *
+            ((2 ^ (n + 1) - 1 : ℕ) : ZMod (2 ^ (n + 3))) := by
+      rw [Nat.cast_sub (by exact Nat.one_le_two_pow)]
+      push_cast
+      rw [pow_succ']
+      ring
+    rw [hfactor] at hzero
+    have hodd : Odd (2 ^ (n + 1) - 1) := by
+      have h_even : Even (2 ^ (n + 1)) :=
+        even_iff_two_dvd.mpr (dvd_pow_self 2 (by omega))
+      exact Nat.Even.sub_odd Nat.one_le_two_pow h_even odd_one
+    have hcop : Nat.Coprime (2 ^ (n + 1) - 1) (2 ^ (n + 3)) := by
+      rw [Nat.coprime_pow_right_iff (by omega), Nat.coprime_two_right]
+      exact hodd
+    let u := ZMod.unitOfCoprime (2 ^ (n + 1) - 1) hcop
+    have hu : (u : ZMod (2 ^ (n + 3))) =
+        ((2 ^ (n + 1) - 1 : ℕ) : ZMod (2 ^ (n + 3))) :=
+      ZMod.coe_unitOfCoprime _ _
+    have hzero' : (u : ZMod (2 ^ (n + 3))) * ((2 : ZMod (2 ^ (n + 3))) * i) = 0 := by
+      calc (u : ZMod (2 ^ (n + 3))) * ((2 : ZMod (2 ^ (n + 3))) * i)
+          = ((2 : ZMod (2 ^ (n + 3))) *
+              ((2 ^ (n + 1) - 1 : ℕ) : ZMod (2 ^ (n + 3)))) * i := by
+            rw [hu]
+            ring
+        _ = 0 := hzero
+    exact (Units.mul_right_eq_zero u).mp hzero'
+
+private lemma sq_eq_one_of_mem_zpowers_fixed_by_twist
+    {P : Type*} [Group P] [Finite P]
+    (c a z y : P) {k : ℕ} (hk_three : 3 ≤ k)
+    (h_order : orderOf c = 2 ^ k)
+    (h_z_pow : z = c ^ (2 ^ (k - 1)))
+    (h_conj : a * c * a⁻¹ = z * c⁻¹)
+    (hy_mem : y ∈ Subgroup.zpowers c)
+    (hy_fixed : a * y * a⁻¹ = y) :
+    y ^ 2 = 1 := by
+  classical
+  have hk_two : 2 ≤ k := by omega
+  have hy_range : y ∈ (Finset.range (orderOf c)).image (fun n : ℕ => c ^ n) :=
+    (mem_zpowers_iff_mem_range_orderOf (x := c) (y := y)).mp hy_mem
+  rcases Finset.mem_image.mp hy_range with ⟨m, hm_range, hm_eq⟩
+  have hm_lt : m < 2 ^ k := by
+    have := Finset.mem_range.mp hm_range
+    rwa [h_order] at this
+  let i : ZMod (2 ^ k) := m
+  have hi_val : i.val = m := by
+    rw [ZMod.val_natCast]
+    exact Nat.mod_eq_of_lt hm_lt
+  have hfix_pow : c ^ (SemiDihedralGroup.twist k * i).val = c ^ i.val := by
+    calc c ^ (SemiDihedralGroup.twist k * i).val
+        = a * c ^ i.val * a⁻¹ :=
+          (twist_conj_zmod_pow c a z hk_two h_order h_z_pow h_conj i).symm
+      _ = a * c ^ m * a⁻¹ := by rw [hi_val]
+      _ = a * y * a⁻¹ := by rw [hm_eq]
+      _ = y := hy_fixed
+      _ = c ^ m := hm_eq.symm
+      _ = c ^ i.val := by rw [hi_val]
+  have hfix : SemiDihedralGroup.twist k * i = i := by
+    have hmod : (SemiDihedralGroup.twist k * i).val ≡ i.val [MOD 2 ^ k] := by
+      have hmod0 : (SemiDihedralGroup.twist k * i).val ≡ i.val [MOD orderOf c] :=
+        (pow_eq_pow_iff_modEq).mp hfix_pow
+      rwa [h_order] at hmod0
+    unfold Nat.ModEq at hmod
+    rw [Nat.mod_eq_of_lt (ZMod.val_lt _), Nat.mod_eq_of_lt (ZMod.val_lt _)] at hmod
+    exact ZMod.val_injective (2 ^ k) hmod
+  have htwo : (2 : ZMod (2 ^ k)) * i = 0 :=
+    two_mul_eq_zero_of_twist_fixed hk_three hfix
+  have hii : i + i = 0 := by
+    simpa [two_mul] using htwo
+  have hc_addval : c ^ (i + i).val = c ^ i.val * c ^ i.val := by
+    rw [← pow_add, pow_eq_pow_iff_modEq, Nat.ModEq, h_order, ZMod.val_add, Nat.mod_mod]
+  calc y ^ 2
+      = c ^ i.val * c ^ i.val := by rw [← hm_eq, hi_val, pow_two]
+    _ = c ^ (i + i).val := hc_addval.symm
+    _ = 1 := by rw [hii, ZMod.val_zero, pow_zero]
+
 private lemma zpowers_involution_eq_pow_pred_of_order_two_pow
     {P : Type*} [Group P] [Finite P] (c z : P) {k : ℕ}
     (hk_pos : 0 < k) (h_order : orderOf c = 2 ^ k)
@@ -1725,7 +1819,10 @@ theorem semiDihedral_of_twistConjugation
     three_le_exponent_of_nonabelian_twist c a z h_nonab h_idx h_a_notmem
       hk_two h_z_pow h_conj
   have h_a_sq_sq : (a ^ 2) ^ 2 = 1 := by
-    sorry
+    exact sq_eq_one_of_mem_zpowers_fixed_by_twist c a z (a ^ 2)
+      hk_three h_order h_z_pow h_conj
+      (Subgroup.sq_mem_of_index_two h_idx a)
+      (by group)
   refine ⟨k, h_order.symm, ?_⟩
   rcases square_eq_one_or_unique_involution_of_square_sq_one c a z
       h_idx h_z_unique h_a_sq_sq with h_a_sq | h_a_sq
