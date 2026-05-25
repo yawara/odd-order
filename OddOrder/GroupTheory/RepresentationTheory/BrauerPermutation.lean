@@ -188,4 +188,15 @@ theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G] :
     Nat.card { C : ConjClasses G // ConjClasses.IsReal C } := by
   sorry
 
+/-- Odd-order cardinal specialization of Brauer's permutation lemma.
+
+In a finite group of odd order, there is exactly one real irreducible character.
+This is the cardinal form of Peterfalvi §3 (1.1); identifying the unique
+character with the trivial character is left to the later trivial-character API. -/
+theorem card_realIrreducibleCharacters_eq_one_of_odd_card {G : Type*} [Group G]
+    [Finite G] (hodd : Odd (Nat.card G)) :
+    Nat.card { χ : IrreducibleCharacter G //
+                 ClassFunction.IsReal (χ : ClassFunction G ℂ) } = 1 := by
+  rw [brauer_permutation_lemma, ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
+
 end OddOrder.RepresentationTheory
