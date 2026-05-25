@@ -82,7 +82,9 @@
   まで Lean helper で閉じた. 現 frontier は **非自明 normal p-subgroup `K`
   の構成**: `subgroup_commutative_of_nontrivial_normal_p_fixed_space` で Sylow
   可換性、`commutator_le_sylow_of_nontrivial_normal_p_fixed_space` で `G' ≤ P`
-  を得る.
+  を得る. これらを theorem 結論形にまとめる endpoint
+  `sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space`
+  も追加済み.
 
 ## TL;DR
 

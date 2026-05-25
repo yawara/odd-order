@@ -1394,6 +1394,27 @@ private theorem commutator_le_sylow_of_nontrivial_normal_p_fixed_space
           K ρ hfaithful hK hdim hK_ne_bot))
     P
 
+/-- q = p endpoint for BG Thm 2.6(b), conditional on the construction of a
+nontrivial normal p-subgroup `K`.
+
+The remaining theorem-level task is to construct the `K` supplied by the BG
+argument; once it exists, this lemma gives exactly the Sylow conclusion. -/
+private theorem sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (K : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K)
+    (hdim : Module.finrank F V = 2) (hK_ne_bot : K ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  constructor
+  · exact subgroup_commutative_of_nontrivial_normal_p_fixed_space
+      K (P : Subgroup G) ρ hfaithful hK P.2 hdim hK_ne_bot
+  · exact commutator_le_sylow_of_nontrivial_normal_p_fixed_space
+      K ρ hfaithful hK hdim hK_ne_bot P
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
