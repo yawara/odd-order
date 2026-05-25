@@ -666,6 +666,36 @@ private theorem isPGroup_rank_one_representation_trivial_of_charP
     ρ g m = (φ g : F) • m := scalarCharacterOfFinrankEqOne_apply_smul hdim ρ g m
     _ = m := by simp [hφ]
 
+/-- Submodule form of `isPGroup_rank_one_representation_trivial_of_charP`. -/
+private theorem isPGroup_rank_one_submodule_action_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F W] (hdimW : Module.finrank F W = 1)
+    (ρ : Representation F G V) (hW : ∀ g, W ≤ W.comap (ρ g)) :
+    ∀ g : G, ∀ w ∈ W, ρ g w = w := by
+  have htriv := isPGroup_rank_one_representation_trivial_of_charP hG hdimW
+    (ρ.subrepresentation W hW)
+  intro g w hw
+  have hsub := htriv g ⟨w, hw⟩
+  exact congrArg Subtype.val hsub
+
+/-- Quotient form of `isPGroup_rank_one_representation_trivial_of_charP`. -/
+private theorem isPGroup_rank_one_quotient_action_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F (V ⧸ W)]
+    (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    (ρ : Representation F G V) (hW : ∀ g, W ≤ W.comap (ρ g)) :
+    ∀ g : G, ∀ v : V, ρ g v - v ∈ W := by
+  have htriv := isPGroup_rank_one_representation_trivial_of_charP hG hdimQ
+    (ρ.quotient W hW)
+  intro g v
+  have hq := htriv g (Submodule.Quotient.mk v : V ⧸ W)
+  change Submodule.Quotient.mk (ρ g v) = Submodule.Quotient.mk v at hq
+  simpa [Submodule.Quotient.eq] using hq
+
 /-- If two endomorphisms are trivial on a submodule and on the quotient by it,
 then they commute.
 
@@ -890,6 +920,42 @@ private theorem subgroup_commutative_of_isPGroup_scalar_actions
   have hle := subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions
     H W ρ hH φW φQ hW hQ h.property
   exact (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hle)
+
+/-- If a p-subgroup acts on a rank-one invariant submodule and rank-one quotient,
+then it lies in `C_G(W) ∩ C_G(V/W)`. -/
+private theorem subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hH : IsPGroup p H)
+    (hW : ∀ h : H, W ≤ W.comap (ρ h))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    H ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  intro g hg
+  rw [mem_fixedOnSubmoduleAndQuotientSubgroup]
+  let h : H := ⟨g, hg⟩
+  constructor
+  · exact isPGroup_rank_one_submodule_action_trivial_of_charP hH W hdimW (ρ.comp H.subtype)
+      hW h
+  · exact isPGroup_rank_one_quotient_action_trivial_of_charP hH W hdimQ
+      (ρ.comp H.subtype) hW h
+
+/-- Commutativity consequence of
+`subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
+private theorem subgroup_commutative_of_rank_one_subquotients
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ) (hH : IsPGroup p H)
+    (hW : ∀ h : H, W ≤ W.comap (ρ h))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    H W ρ hfaithful
+  intro h
+  exact mem_fixedOnSubmoduleAndQuotientSubgroup.mp
+    (subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+      H W ρ hH hW hdimW hdimQ h.property)
 
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
