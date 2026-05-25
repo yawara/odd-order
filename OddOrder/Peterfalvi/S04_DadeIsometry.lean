@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Data.Fintype.Card
+import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
@@ -151,6 +152,68 @@ theorem isTISubset_of_forall_H_eq_bot (hyp : Hypothesis G A L)
   have hg_eq : (l : G) * y = g := by
     simp [y]
   exact hg_eq ▸ hg
+
+/-- The other direction of **Peterfalvi (2.3)** in the relative-normalizer API:
+from a TI-subset relative to `L`, build Hypothesis (2.2) with all `H(a)=⊥`.
+
+Peterfalvi also states `L = N_G(A)` when `A` is nonempty.  This file keeps
+`L` as an explicit normalizer-bound, so the theorem takes the required
+`A ⊆ L` and `L`-normalizes-`A` assumptions as fields. -/
+def of_isTISubset (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) :
+    Hypothesis G A L where
+  subset_sharp := hA_sharp
+  subset_L := hA_L
+  L_normalizes_A := hL_norm
+  H := fun _ => ⊥
+  conj_in_L := by
+    intro a b ha hb hconj
+    rcases isConj_iff.mp hconj with ⟨g, rfl⟩
+    exact ⟨⟨g, hTI g ⟨a, ha, hb⟩⟩, rfl⟩
+  centralizer_eq_sup := by
+    intro a
+    rw [bot_sup_eq]
+    ext x
+    constructor
+    · intro hx
+      have hx_comm : x * a.1 = a.1 * x := by
+        simpa [Subgroup.mem_centralizer_singleton_iff] using hx
+      have hx_conj : x * a.1 * x⁻¹ = a.1 := by
+        calc
+          x * a.1 * x⁻¹ = a.1 * x * x⁻¹ := by rw [hx_comm]
+          _ = a.1 := by group
+      have hx_L : x ∈ L := hTI x ⟨a.1, a.2, by simp [hx_conj, a.2]⟩
+      rw [mem_centralizerIn]
+      exact ⟨hx_L, hx_comm⟩
+    · intro hx
+      rw [mem_centralizerIn] at hx
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact hx.2
+  centralizer_disjoint := fun _ => disjoint_bot_left
+  centralizer_coprime := fun _ _ => by
+    simp
+
+@[simp] theorem of_isTISubset_H (hA_sharp : A ⊆ sharp (Set.univ : Set G))
+    (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) (a : {a : G // a ∈ A}) :
+    (of_isTISubset hA_sharp hA_L hL_norm hTI).H a = ⊥ :=
+  rfl
+
+/-- **Peterfalvi (2.3)**, expressed with this file's relative-normalizer
+predicate: under the ambient set and `L`-normalizer assumptions, `A` is TI
+relative to `L` iff Hypothesis (2.2) holds with all `H(a)` trivial. -/
+theorem isTISubset_iff_exists_hypothesis_with_trivial_H
+    (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A) :
+    OddOrder.GroupTheory.IsTISubset A L ↔
+      ∃ hyp : Hypothesis G A L, ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥ := by
+  constructor
+  · intro hTI
+    exact ⟨of_isTISubset hA_sharp hA_L hL_norm hTI, fun _ => rfl⟩
+  · rintro ⟨hyp, hH⟩
+    exact hyp.isTISubset_of_forall_H_eq_bot hH
 
 /-- Restrict Hypothesis (2.2) to an `L`-stable subset `A₁ ⊆ A`.
 
