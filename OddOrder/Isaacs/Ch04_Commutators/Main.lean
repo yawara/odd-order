@@ -4116,6 +4116,62 @@ theorem oPiCore_compl_normalizer_le_centralizer_opCore
       _ = u * ((q : H) : G) := by rw [hqconj]
   exact hqu.symm
 
+/-- Reduced form of **Isaacs Theorem 4.33** after the Hall-Higman reduction:
+if `G` is `p`-separable and `O_{p'}(G) = 1`, then every normalizer of a
+`p`-subgroup has trivial `p'`-core.
+
+The preceding lemma puts the image of `O_{p'}(N_G(P))` inside
+`C_G(O_p(G))`; Hall-Higman puts this centralizer inside `O_p(G)`.  The image is
+therefore simultaneously a `p`-group and a `p'`-group, hence trivial. -/
+theorem oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥)
+    (P : Subgroup G) (hP : IsPGroup p P) :
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)}
+        (Subgroup.normalizer (P : Set G)) = ⊥ := by
+  classical
+  set H : Subgroup G := Subgroup.normalizer (P : Set G) with hH_def
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set Q : Subgroup H :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} H with hQ_def
+  set K : Subgroup G := Q.map H.subtype with hK_def
+  change Q = ⊥
+  have hK_le_cent : K ≤ Subgroup.centralizer (U : Set G) := by
+    rw [hK_def, hQ_def, hH_def, hU_def]
+    exact oPiCore_compl_normalizer_le_centralizer_opCore P hP
+  have hcent_le_U : Subgroup.centralizer (U : Set G) ≤ U := by
+    rw [hU_def]
+    exact hall_higman_opCore hπ'
+  have hK_le_U : K ≤ U := hK_le_cent.trans hcent_le_U
+  have hU_p : IsPGroup p U := by
+    rw [hU_def]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p G
+  have hK_p : IsPGroup p K := hU_p.to_le hK_le_U
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) K :=
+    isPiGroup_singleton_of_isPGroup hK_p
+  have hQ_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} Q := by
+    rw [hQ_def]
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ∉ ({p} : Set ℕ)}
+  have hK_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} K := by
+    intro q hq
+    have hcard : Nat.card K = Nat.card Q := by
+      rw [hK_def]
+      exact Nat.card_congr
+        (Subgroup.equivMapOfInjective Q H.subtype H.subtype_injective).symm.toEquiv
+    rw [hcard] at hq
+    exact hQ_pi q hq
+  have hcop : Nat.Coprime (Nat.card K) (Nat.card K) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hK_pi hK_pi'
+  have hK_bot : K = ⊥ := by
+    have hInf : K ⊓ K = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+    simpa using hInf
+  exact (Subgroup.map_eq_bot_iff_of_injective Q H.subtype_injective).mp
+    (by simpa [hK_def] using hK_bot)
+
 /-- Strong-induction form of Isaacs Theorem 4.38. -/
 private theorem isaacs_thm_4_38_aux
     {A : Type*} [Group A] [Finite A]
