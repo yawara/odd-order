@@ -1312,14 +1312,86 @@ private noncomputable def quaternionIsoOfInverting
   let setEquiv : QuaternionGroup M ≃ P := Equiv.ofBijective fwd hbij
   exact (MulEquiv.mk' setEquiv hfwd_mul).symm
 
+private lemma eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one
+    {P : Type*} [Group P] [Finite P] (c y : P)
+    (hy_mem : y ∈ Subgroup.zpowers c) (hy_sq : y ^ 2 = 1) (hy_ne : y ≠ 1) :
+    y = c ^ (orderOf c / 2) ∧ orderOf c = 2 * (orderOf c / 2) ∧ 0 < orderOf c / 2 := by
+  classical
+  have hc_fin : IsOfFinOrder c := isOfFinOrder_of_finite c
+  have hN_pos : 0 < orderOf c := hc_fin.orderOf_pos
+  have hy_range : y ∈ (Finset.range (orderOf c)).image (fun n : ℕ => c ^ n) :=
+    (mem_zpowers_iff_mem_range_orderOf (x := c) (y := y)).mp hy_mem
+  rcases Finset.mem_image.mp hy_range with ⟨m, hm_range, hm_eq⟩
+  have hm_lt : m < orderOf c := Finset.mem_range.mp hm_range
+  have hpow2 : c ^ (2 * m) = 1 := by
+    have := hy_sq
+    rw [← hm_eq, pow_two, ← pow_add] at this
+    simpa [two_mul] using this
+  have h_dvd : orderOf c ∣ 2 * m := orderOf_dvd_of_pow_eq_one hpow2
+  have h_not_dvd : ¬ orderOf c ∣ m := by
+    intro hdm
+    apply hy_ne
+    rw [← hm_eq]
+    exact orderOf_dvd_iff_pow_eq_one.mp hdm
+  have hm_pos : 0 < m := by
+    by_contra hm_nonpos
+    have hm0 : m = 0 := Nat.eq_zero_of_not_pos hm_nonpos
+    exact h_not_dvd (by rw [hm0]; exact dvd_zero _)
+  rcases h_dvd with ⟨q, hq⟩
+  have hq_pos : 0 < q := by
+    by_contra hq_nonpos
+    have hq0 : q = 0 := Nat.eq_zero_of_not_pos hq_nonpos
+    nlinarith
+  have hq_lt_two : q < 2 := by
+    have hlt : orderOf c * q < orderOf c * 2 := by nlinarith
+    exact (Nat.mul_lt_mul_left hN_pos).mp hlt
+  have hq_eq : q = 1 := by omega
+  have htwo_m : 2 * m = orderOf c := by
+    rw [hq_eq, mul_one] at hq
+    exact hq
+  have hm_half : m = orderOf c / 2 := by omega
+  refine ⟨?_, ?_, ?_⟩
+  · rw [← hm_half]
+    exact hm_eq.symm
+  · omega
+  · omega
+
 theorem dihedralOrQuaternion_of_invertingConjugation
-    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {P : Type*} [Group P] [Finite P] (_hP : IsPGroup 2 P)
     (c a : P) (h_idx : (Subgroup.zpowers c).index = 2)
     (h_a_notmem : a ∉ Subgroup.zpowers c)
     (h_conj : a * c * a⁻¹ = c⁻¹) :
     Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
       Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) := by
-  sorry
+  classical
+  by_cases h_a_sq_one : a ^ 2 = 1
+  · left
+    exact ⟨dihedralIsoOfInverting c a h_idx h_a_notmem h_a_sq_one h_conj⟩
+  · right
+    have h_a_sq_mem : a ^ 2 ∈ Subgroup.zpowers c :=
+      Subgroup.sq_mem_of_index_two h_idx a
+    have h_conj_zpow : ∀ k : ℤ, a * c ^ k * a⁻¹ = c ^ (-k) := fun k => by
+      have step1 : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
+        have : Function.Bijective ((MulAut.conj a : P ≃* P) : P → P) :=
+          (MulAut.conj a : P ≃* P).bijective
+        simpa using (map_zpow (MulAut.conj a : P →* P) c k).symm
+      rw [step1, h_conj, inv_zpow, ← zpow_neg]
+    have h_a_sq_sq : (a ^ 2) ^ 2 = 1 := by
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp h_a_sq_mem
+      have h_fixed : a * (c ^ k) * a⁻¹ = c ^ k := by
+        rw [hk]
+        group
+      have h_inv : c ^ k = c ^ (-k) := by
+        rw [← h_fixed]
+        exact h_conj_zpow k
+      calc (a ^ 2) ^ 2 = c ^ k * c ^ k := by rw [← hk, pow_two]
+        _ = c ^ k * c ^ (-k) := congrArg (fun t => c ^ k * t) h_inv
+        _ = 1 := by rw [← zpow_add, add_neg_cancel, zpow_zero]
+    obtain ⟨h_a_sq_half, h_order, h_half_pos⟩ :=
+      eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one c (a ^ 2)
+        h_a_sq_mem h_a_sq_sq h_a_sq_one
+    exact ⟨quaternionIsoOfInverting c a (orderOf c / 2)
+      h_half_pos h_order h_idx h_a_notmem h_a_sq_half h_conj⟩
 
 /-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite 2-group with a cyclic subgroup
 `C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is the unique
