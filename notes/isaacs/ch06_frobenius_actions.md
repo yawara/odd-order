@@ -272,6 +272,20 @@ FT クリティカル度 + 章内依存で並べる:
   既存 recognizer に落とせる状態.
 - **Cor 6.14** `dihedralOrQuaternion_of_card_eight`: 位数 8 非可換群は
   `DihedralGroup 4` または `QuaternionGroup 2`. sorry-free.
+- **Lem 6.15** center-index `p^2` characteristic elementary-abelian subgroup:
+  odd `p` branch (`exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd`) と
+  `p=2` branch (`exists_characteristic_isElementaryAbelian_four_of_center_index_four`) が
+  sorry-free. `T/T'` lift, order-8 noncyclic extraction, D/Q 判定まで Ch.6 本体に接続済み.
+- **§6B shared helper surface** (`OddOrder.GroupTheory.ElementaryAbelian`):
+  `IsElementaryAbelian.isPGroup`, subgroup restriction, order `p^2` non-cyclicity,
+  order `p^2` subgroup extraction, order-`p` line 2 本の抽出, および
+  「order `p` subgroup が一意なら elementary abelian `p^2` subgroup は存在しない」
+  (`Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique`) を追加.
+  6.9 → 6.10 と 6.11 abelian branch の接続で使う.
+- **§6B / 6.20 abelian Z-group bridge**:
+  `isCyclic_of_sylow_isCyclic` と
+  `exists_prime_sylow_not_isCyclic_of_not_isCyclic` を追加. Cor 6.17 で Sylow cyclic
+  が得られた後, abelian Frobenius complement を cyclic と結論するための Lean bridge.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
@@ -283,7 +297,8 @@ FT クリティカル度 + 章内依存で並べる:
 - 6.7 centralizer-kernel criterion: Schur-Zassenhaus / Ch.5 normal p-complement 周辺が main に入ったので,
   statement 形から再設計する価値あり.
 - 6.8-6.10 partition counting → Frobenius complement 禁止構造.
-- 6.11/6.12 p-group classification: 6.13/6.14 の recognizer を使って大枠へ進める.
+- 6.11/6.12 p-group classification: 6.13/6.14/6.15 と elementary-abelian line helpers を
+  使って大枠へ進める.
 - 6.17-6.21 Frobenius complement / coprime abelian action: Ch.7 の 6.20 使用箇所に向けた中期目標.
 
 ## 開発時の注意点

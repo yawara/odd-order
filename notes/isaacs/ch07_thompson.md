@@ -243,7 +243,12 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Ch.5 5.26 + `HasNormalPComplement`**: Thm 7.1 の normal p-complement 側の基礎定義・Frobenius criterion は利用可能.
 - ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
 - 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
+  - 進捗: elementary abelian order `p^2` から order-`p` subgroup 2 本を抽出する
+    shared helper と, order-`p` subgroup 一意性から elementary abelian `p^2` subgroup を
+    排除する bridge は追加済み. abelian branch / 6.9→6.10 接続の土台はできた.
 - 🔴 **Ch.6 6.20**: Thm 7.6 Step 5 の blocker. abelian coprime action 補題.
+  - 進捗: finite abelian group の Sylow がすべて cyclic なら cyclic (`IsZGroup` bridge) と,
+    非 cyclic abelian group から非 cyclic Sylow を抽出する helper は追加済み.
 - ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
   automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
   `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
