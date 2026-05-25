@@ -768,6 +768,64 @@ theorem existsUnique_part_of_ne_one {g : G} (hg : g ≠ 1) :
   intro Y hY
   exact partn.eq_of_mem_ne_one hY.1 hX hY.2 hgX hg
 
+/-- The unique partition part containing a nonidentity element. -/
+noncomputable def partOfNeOne (g : {g : G // g ≠ 1}) :
+    {X : Subgroup G // X ∈ partn.parts} :=
+  ⟨(partn.existsUnique_part_of_ne_one g.2).choose,
+    (partn.existsUnique_part_of_ne_one g.2).choose_spec.1.1⟩
+
+/-- The chosen part really contains the nonidentity element. -/
+theorem mem_partOfNeOne (g : {g : G // g ≠ 1}) :
+    (g : G) ∈ (partn.partOfNeOne g).1 :=
+  (partn.existsUnique_part_of_ne_one g.2).choose_spec.1.2
+
+/-- Any partition part containing `g ≠ 1` is the chosen part. -/
+theorem partOfNeOne_eq_of_mem {g : {g : G // g ≠ 1}} {X : Subgroup G}
+    (hX : X ∈ partn.parts) (hgX : (g : G) ∈ X) :
+    partn.partOfNeOne g = ⟨X, hX⟩ := by
+  apply Subtype.ext
+  exact ((partn.existsUnique_part_of_ne_one g.2).choose_spec.2 X ⟨hX, hgX⟩).symm
+
+/-- Forget the partition part from a partition-indexed nonidentity element. -/
+def nonidentitySigmaTo
+    (p : Σ X : {X : Subgroup G // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) :
+    {g : G // g ≠ 1} :=
+  ⟨(p.2.1 : G), fun hg => p.2.2 (Subtype.ext hg)⟩
+
+/-- Forgetting the partition part is injective because nonidentity elements occur in a unique
+part. -/
+theorem nonidentitySigmaTo_injective :
+    Function.Injective partn.nonidentitySigmaTo := by
+  intro p q hpq
+  rcases p with ⟨X, x⟩
+  rcases q with ⟨Y, y⟩
+  have hxyA : ((x.1 : X.1) : G) = ((y.1 : Y.1) : G) :=
+    congrArg Subtype.val hpq
+  have hx_ne : ((x.1 : X.1) : G) ≠ 1 := fun hx => x.2 (Subtype.ext hx)
+  have hY_mem_x : ((x.1 : X.1) : G) ∈ Y.1 := by
+    simpa [hxyA] using y.1.2
+  have hXY : X = Y := by
+    apply Subtype.ext
+    exact partn.eq_of_mem_ne_one X.2 Y.2 x.1.2 hY_mem_x hx_ne
+  cases hXY
+  have hxy : x = y := by
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hxyA
+  cases hxy
+  rfl
+
+/-- Forgetting the partition part is surjective: choose the unique part containing `g`. -/
+theorem nonidentitySigmaTo_surjective :
+    Function.Surjective partn.nonidentitySigmaTo := by
+  intro g
+  refine ⟨⟨partn.partOfNeOne g,
+    ⟨⟨g.1, partn.mem_partOfNeOne g⟩, ?_⟩⟩, ?_⟩
+  · intro h
+    exact g.2 (congrArg Subtype.val h)
+  · ext
+    rfl
+
 end SubgroupPartition
 
 /-- Fixed points of the subgroup `H` under an action encoded by `φ : A →* MulAut U`. -/
@@ -785,6 +843,23 @@ theorem mem_actionFixedPoints {A U : Type*} [Group A] [Group U]
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
     (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
   ∏ h : H, (φ h) u
+
+/-- The orbit product over the nonidentity elements of a subgroup. -/
+noncomputable def subgroupNonidentityOrbitProduct
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
+  by
+    classical
+    exact ∏ h : {h : H // h ≠ 1}, (φ (h.1 : A)) u
+
+/-- The orbit product over the nonidentity elements of the whole group. -/
+noncomputable def nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) : U :=
+  by
+    classical
+    letI : Fintype A := Fintype.ofFinite A
+    exact ∏ a : {a : A // a ≠ 1}, (φ a.1) u
 
 /-- The orbit product `u_H` is fixed by every element of `H`. -/
 theorem orbitProduct_mem_actionFixedPoints {A U : Type*} [Group A] [CommGroup U]
@@ -804,6 +879,16 @@ theorem orbitProduct_mem_actionFixedPoints {A U : Type*} [Group A] [CommGroup U]
             (fun h : H => (φ ((x * h : H) : A)) u)
             (fun h : H => (φ (h : A)) u)
             (fun h => rfl)
+
+/-- Split an orbit product into the identity contribution and the nonidentity contributions. -/
+theorem orbitProduct_eq_mul_subgroupNonidentityOrbitProduct
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) :
+    orbitProduct φ H u = u * subgroupNonidentityOrbitProduct φ H u := by
+  classical
+  rw [orbitProduct, subgroupNonidentityOrbitProduct]
+  simpa using Fintype.prod_eq_mul_prod_subtype_ne
+    (fun h : H => (φ (h : A)) u) (1 : H)
 
 /-- Fixed points are antitone in the acting subgroup. -/
 theorem actionFixedPoints_antitone {A U : Type*} [Group A] [Group U]
@@ -831,12 +916,184 @@ noncomputable def partitionOrbitProduct
     (letI : Fintype x := Fintype.ofFinite x
      orbitProduct φ x u)
 
+/-- The product over all partition parts and all nonidentity elements in those parts. -/
+noncomputable def partitionNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U :=
+  ∏ X ∈ partn.parts,
+    (letI : Fintype X := Fintype.ofFinite X
+     subgroupNonidentityOrbitProduct φ X u)
+
+/-- The same nonidentity product, indexed by the sigma type of partition parts and
+nonidentity elements in each part. The finite instances are supplied internally so callers do
+not need to expose dependent `Fintype` arguments. -/
+noncomputable def partitionSigmaNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U := by
+  classical
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  exact ∏ p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}),
+    (φ ((p.2.1 : p.1.1) : A)) u
+
+/-- The partition nonidentity product is the sigma-indexed nonidentity product. -/
+theorem partitionNonidentityOrbitProduct_eq_partitionSigmaNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionNonidentityOrbitProduct φ partn u =
+      partitionSigmaNonidentityOrbitProduct φ partn u := by
+  classical
+  rw [partitionNonidentityOrbitProduct, partitionSigmaNonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  rw [Finset.prod_subtype partn.parts (fun X => Iff.rfl)
+    (fun X : Subgroup A =>
+      (letI : Fintype X := Fintype.ofFinite X
+       subgroupNonidentityOrbitProduct φ X u))]
+  change (∏ X : {X : Subgroup A // X ∈ partn.parts},
+      (letI : Fintype X.1 := Fintype.ofFinite X.1
+       subgroupNonidentityOrbitProduct φ X.1 u)) =
+    ∏ p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}),
+      (φ ((p.2.1 : p.1.1) : A)) u
+  simpa [subgroupNonidentityOrbitProduct] using
+    (Fintype.prod_sigma
+      (fun p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) =>
+        (φ ((p.2.1 : p.1.1) : A)) u)).symm
+
+/-- The sigma-indexed nonidentity product over a partition is the ordinary nonidentity product:
+nonidentity elements occur in exactly one partition part. -/
+theorem partitionSigmaNonidentityOrbitProduct_eq_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionSigmaNonidentityOrbitProduct φ partn u =
+      nonidentityOrbitProduct φ u := by
+  classical
+  rw [partitionSigmaNonidentityOrbitProduct, nonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  exact Fintype.prod_bijective partn.nonidentitySigmaTo
+    ⟨partn.nonidentitySigmaTo_injective, partn.nonidentitySigmaTo_surjective⟩
+    (fun p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) =>
+      (φ ((p.2.1 : p.1.1) : A)) u)
+    (fun a : {a : A // a ≠ 1} => (φ a.1) u)
+    (fun _ => rfl)
+
+/-- The nonidentity factors over a subgroup partition multiply to the nonidentity factors over
+the whole group. -/
+theorem partitionNonidentityOrbitProduct_eq_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionNonidentityOrbitProduct φ partn u =
+      nonidentityOrbitProduct φ u := by
+  rw [partitionNonidentityOrbitProduct_eq_partitionSigmaNonidentityOrbitProduct φ partn u,
+    partitionSigmaNonidentityOrbitProduct_eq_nonidentityOrbitProduct φ partn u]
+
 /-- The orbit product over the top subgroup, with the finite instance supplied from `A`. -/
 noncomputable def topOrbitProduct
     {A U : Type*} [Group A] [Finite A] [CommGroup U]
     (φ : A →* MulAut U) (u : U) : U :=
   letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
   orbitProduct φ (⊤ : Subgroup A) u
+
+/-- Split the top orbit product into the identity contribution and nonidentity contributions. -/
+theorem topOrbitProduct_eq_mul_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) :
+    topOrbitProduct φ u = u * nonidentityOrbitProduct φ u := by
+  classical
+  rw [topOrbitProduct, orbitProduct, nonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+  calc
+    (∏ h : (⊤ : Subgroup A), (φ (h : A)) u)
+        = ∏ a : A, (φ a) u := by
+            exact Fintype.prod_equiv Subgroup.topEquiv.toEquiv
+              (fun h : (⊤ : Subgroup A) => (φ (h : A)) u)
+              (fun a : A => (φ a) u)
+              (fun _ => rfl)
+    _ = u * ∏ a : {a : A // a ≠ 1}, (φ a.1) u := by
+          simpa using Fintype.prod_eq_mul_prod_subtype_ne
+            (fun a : A => (φ a) u) (1 : A)
+
+/-- Split the partition product into the identity contributions and the nonidentity
+contributions. -/
+theorem partitionOrbitProduct_eq_pow_mul_partitionNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionOrbitProduct φ partn u =
+      u ^ partn.parts.card * partitionNonidentityOrbitProduct φ partn u := by
+  classical
+  rw [partitionOrbitProduct, partitionNonidentityOrbitProduct]
+  calc
+    (∏ X ∈ partn.parts,
+      (letI : Fintype X := Fintype.ofFinite X
+       orbitProduct φ X u))
+        = ∏ X ∈ partn.parts,
+            (u *
+              (letI : Fintype X := Fintype.ofFinite X
+               subgroupNonidentityOrbitProduct φ X u)) := by
+            refine Finset.prod_congr rfl ?_
+            intro X hX
+            letI : Fintype X := Fintype.ofFinite X
+            exact orbitProduct_eq_mul_subgroupNonidentityOrbitProduct φ X u
+    _ = (∏ X ∈ partn.parts, u) *
+          ∏ X ∈ partn.parts,
+            (letI : Fintype X := Fintype.ofFinite X
+             subgroupNonidentityOrbitProduct φ X u) := by
+            simp_rw [Finset.prod_mul_distrib]
+    _ = u ^ partn.parts.card *
+          ∏ X ∈ partn.parts,
+            (letI : Fintype X := Fintype.ofFinite X
+             subgroupNonidentityOrbitProduct φ X u) := by
+            simp
+
+/-- Isaacs 6.8 counting identity for orbit products over a subgroup partition. -/
+theorem partitionOrbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionOrbitProduct φ partn u =
+      topOrbitProduct φ u * u ^ (partn.parts.card - 1) := by
+  classical
+  have hcard : partn.parts.card = partn.parts.card.pred.succ :=
+    (Nat.succ_pred_eq_of_pos partn.parts_card_pos).symm
+  have hpow : u ^ partn.parts.card = u * u ^ (partn.parts.card - 1) := by
+    calc
+      u ^ partn.parts.card
+          = u ^ partn.parts.card.pred.succ := by
+              exact congrArg (fun n => u ^ n) hcard
+      _ = u ^ partn.parts.card.pred * u := by
+            rw [pow_succ]
+      _ = u ^ (partn.parts.card - 1) * u := by
+            rw [Nat.pred_eq_sub_one]
+      _ = u * u ^ (partn.parts.card - 1) := by
+            rw [mul_comm]
+  calc
+    partitionOrbitProduct φ partn u
+        = u ^ partn.parts.card * partitionNonidentityOrbitProduct φ partn u := by
+            exact partitionOrbitProduct_eq_pow_mul_partitionNonidentityOrbitProduct φ partn u
+    _ = u ^ partn.parts.card * nonidentityOrbitProduct φ u := by
+          rw [partitionNonidentityOrbitProduct_eq_nonidentityOrbitProduct φ partn u]
+    _ = (u * u ^ (partn.parts.card - 1)) * nonidentityOrbitProduct φ u := by
+          rw [hpow]
+    _ = (u * nonidentityOrbitProduct φ u) * u ^ (partn.parts.card - 1) := by
+          ac_rfl
+    _ = topOrbitProduct φ u * u ^ (partn.parts.card - 1) := by
+          rw [← topOrbitProduct_eq_mul_nonidentityOrbitProduct φ u]
 
 /-- If every partition part has trivial fixed points, then every part orbit product is `1`. -/
 theorem partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot
@@ -896,6 +1153,16 @@ theorem exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
   have hident := hidentity u
   rw [hprod, htop_one, one_mul] at hident
   exact hu hident.symm
+
+/-- Isaacs Lemma 6.8: if `A` is partitioned by proper nonidentity subgroups and
+`u^(|Π|-1) ≠ 1`, then some partition part has nontrivial fixed points on `U`. -/
+theorem exists_part_actionFixedPoints_ne_bot
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    ∃ X, X ∈ partn.parts ∧ actionFixedPoints φ X ≠ ⊥ :=
+  exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity φ partn
+    (fun u => partitionOrbitProduct_identity φ partn u) hu
 
 /-- A nontrivial acting subgroup has trivial fixed points under a Frobenius action. -/
 theorem actionFixedPoints_eq_bot_of_isFrobeniusAction
@@ -962,6 +1229,16 @@ theorem false_of_frobeniusAction_orbitProduct_identity
     actionFixedPoints_eq_bot_of_isFrobeniusAction hFrob (partn.nontrivial X hX)
   exact hXfix_ne hXfix_eq
 
+/-- Lemma 6.8 rules out a Frobenius action whenever a subgroup partition has a part-count
+exponent detected by some element of `U`. -/
+theorem false_of_frobeniusAction_partition_of_nontrivial_power
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    False :=
+  false_of_frobeniusAction_orbitProduct_identity hFrob partn
+    (fun u => partitionOrbitProduct_identity (MulDistribMulAction.toMulAut A U) partn u) hu
+
 /-- Lemma 6.8 in the coprime form used in Theorem 6.9. -/
 theorem false_of_frobeniusAction_partition_identity_of_coprime_card
     {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
@@ -975,6 +1252,17 @@ theorem false_of_frobeniusAction_partition_identity_of_coprime_card
   obtain ⟨u, hu⟩ :=
     exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
   exact false_of_frobeniusAction_orbitProduct_identity hFrob partn hidentity hu
+
+/-- Lemma 6.8 in the coprime form used in Theorem 6.9, with the counting identity discharged. -/
+theorem false_of_frobeniusAction_partition_of_coprime_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hcop : (partn.parts.card - 1).Coprime (Nat.card U)) :
+    False := by
+  obtain ⟨u, hu⟩ :=
+    exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
+  exact false_of_frobeniusAction_partition_of_nontrivial_power hFrob partn hu
 
 end
 
