@@ -1184,7 +1184,56 @@ theorem gl2_pSubgroup_centralizes_of_normalizes
 **proof 戦略** (8 Step): Sylow conjugacy + GL(2,p) embedding + Hall-Higman 3.21
 + Lem 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion).
 
-着手は Lem 7.3 + Ch.6 6.11 完成後. -/
+本体 proof は Ch.6 6.11 完成後に着手予定. ここでは先に, proof 冒頭で必要になる
+faithful action / fixed subgroup の橋渡しだけを配置する. -/
+
+/-! #### Thm 7.5 action infrastructure
+
+Theorem 7.5 repeatedly uses the faithful action of `G` on the `p`-group `V` as an
+embedding `G ↪ Aut(V)`, and writes `C_V(P)` for the fixed subgroup of `P` acting on
+`V`.  The following helpers keep those two translations explicit. -/
+
+/-- A faithful action by automorphisms embeds the acting group into `MulAut V`. -/
+theorem toMulAut_injective_of_faithful {A V : Type*} [Group A] [Group V]
+    [MulDistribMulAction A V] [FaithfulSMul A V] :
+    Function.Injective (MulDistribMulAction.toMulAut A V) := by
+  intro a b hab
+  apply MulAction.toPerm_injective (α := A) (β := V)
+  ext v
+  have h := congrArg (fun ψ : MulAut V => ψ v) hab
+  simpa using h
+
+/-- Kernel form of `toMulAut_injective_of_faithful`. -/
+theorem toMulAut_ker_eq_bot_of_faithful {A V : Type*} [Group A] [Group V]
+    [MulDistribMulAction A V] [FaithfulSMul A V] :
+    (MulDistribMulAction.toMulAut A V).ker = ⊥ :=
+  (MonoidHom.ker_eq_bot_iff _).mpr toMulAut_injective_of_faithful
+
+/-- A faithful action by automorphisms realizes the acting group as a subgroup of `Aut(V)`. -/
+noncomputable def subgroupOfMulAutAction (A V : Type*) [Group A] [Group V]
+    [MulDistribMulAction A V] [FaithfulSMul A V] :
+    A ≃* (MulDistribMulAction.toMulAut A V).range :=
+  MulEquiv.ofLeftInverse' _
+    (Classical.choose_spec (toMulAut_injective_of_faithful (A := A) (V := V)).hasLeftInverse)
+
+/-- Action-centralizer notation for `C_V(P)`: the elements of `V` fixed by every element of `P`
+under `φ : A →* MulAut V`. -/
+def actionCentralizer {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P : Subgroup A) : Subgroup V :=
+  Subgroup.fixedPointsOfMulAut (φ.comp P.subtype)
+
+@[simp]
+theorem mem_actionCentralizer {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {P : Subgroup A} {v : V} :
+    v ∈ actionCentralizer φ P ↔ ∀ p : P, (φ p) v = v :=
+  Iff.rfl
+
+/-- If `P ≤ Q`, then `C_V(Q) ≤ C_V(P)`. -/
+theorem actionCentralizer_antitone {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {P Q : Subgroup A} (hPQ : P ≤ Q) :
+    actionCentralizer φ Q ≤ actionCentralizer φ P := by
+  intro v hv p
+  exact hv ⟨p, hPQ p.property⟩
 
 end -- 7A
 

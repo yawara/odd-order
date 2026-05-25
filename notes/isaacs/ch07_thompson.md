@@ -215,7 +215,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Lem 7.3** GL(2,p) 補題 (`gl2_pSubgroup_centralizes_of_normalizes`, sorry-free).
   `|L|`-induction + P-invariant Sylow + Ch.4 coprime action + Lem 7.4 + finite abelian
   2-group cyclicity branch + odd-q orbit-count branch.
-- Thm 7.1, 7.5, 7.6, 7.8: docstring + statement 保留.
+- 🔧 **Thm 7.5** action infrastructure 着手: faithful action `G ↪ Aut(V)` の Lean bridge
+  (`toMulAut_injective_of_faithful`, `subgroupOfMulAutAction`) と `C_V(P)` notation
+  (`actionCentralizer`) を sorry-free で追加. theorem statement / proof 本体は保留.
+- Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
 ## 着手順 (提案)
 
@@ -225,7 +228,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 2. **7.2 J(P) char** — def 直後の短い系. ウォームアップ.
 3. **7.4 SL(2,q) -I unique** — mathlib `SpecialLinearGroup 2 (ZMod p)` 上の行列計算. Cayley-Hamilton + 最小多項式. 独立小テーマ.
 4. ✅ **7.3 GL(2,p) 補題** — induction on `|L|` + Sylow + コプライム作用 + 7.4.
-5. **7.5 normal-P theorem** — 8 step proof. **Aut(E) ≅ GL(n,p) 同型 (n=2)** + 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) + Hall-Higman 3.21. 章内重実装.
+5. **7.5 normal-P theorem** — 8 step proof. **Aut(E) ≅ GL(n,p) 同型 (n=2)** + 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) + Hall-Higman 3.21. faithful action / `C_V(P)` bridge は着手済み. 章内重実装.
 6. **7.6 normal-J theorem** — 8 step proof. 7.5 + Ch.6 **6.20** (abelian coprime ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21. **章のハイライト**.
 7. **7.7 N/C `p'`-quotient** — Lem 2.17 (Ch.2) の拡張. correspondence theorem. 短い.
 8. **7.1 Thompson normal p-complement** — Steps 1-7. **Ch.5 5.26 Frobenius normal p-comp + 7.6 normal-J + 7.7**. Ch.6 6.23 の `axiom`/`sorry` をここで `theorem` 書き換え.
