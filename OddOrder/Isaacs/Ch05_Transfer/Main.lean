@@ -1127,28 +1127,6 @@ theorem _root_.Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn
       exact hcomm_eq
     exact Subgroup.mem_map_of_mem H.subtype hgH_focal
 
-end -- 5D
-
-section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
-
-/-! ### Isaacs §5E (Frobenius normal p-complement)
-
-**FT クリティカル**. mathlib 未収載で新規実装が必要.
-
-- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」(§5C で導入済み).
-- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
-  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
-- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
-- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
-  Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
-- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
-  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` + `lt_normalizer_of_pgroup_of_lt_top`.
-  main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
-  Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
-  二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
-- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
-- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
-
 /-- `OPrime p G` — the smallest normal subgroup of `G` with `p`-power index.
 For finite `G`, this is the intersection of all such normal subgroups (Isaacs §5D 冒頭, 'O^p(G)').
 
@@ -1379,6 +1357,22 @@ lemma APrime_inf_sylow_eq_focalSubgroup [Finite G] {p : ℕ} [Fact p.Prime]
   · rw [← Subgroup.commutator_inf_eq_focalSubgroup P]
     exact inf_le_inf (commutator_le_APrime p G) le_rfl
 
+/-- **Isaacs Thm 5.21 (Focal Subgroup Theorem)**:
+for a Sylow `p`-subgroup `P`, the focal subgroup is the common intersection of
+`P` with the commutator subgroup, with `A^p(G)`, and with the focal-transfer kernel.
+
+This is the downstream-facing Ch.5 entrypoint for BG Thm 1.17. It packages mathlib's
+`Subgroup.commutator_inf_eq_focalSubgroup` and
+`Subgroup.ker_transferFocal_inf_eq_focalSubgroup` together with this file's
+`A^p(G)` bridge. -/
+theorem focalSubgroupTheorem [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    _root_.commutator G ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup ∧
+      APrime p G ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup ∧
+      P.transferFocal.ker ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+  exact ⟨Subgroup.commutator_inf_eq_focalSubgroup P,
+    APrime_inf_sylow_eq_focalSubgroup P,
+    Subgroup.ker_transferFocal_inf_eq_focalSubgroup P⟩
+
 /-- **Isaacs Thm 5.20**: the focal transfer kernel is `A^p(G)`.
 
 This upgrades `A^p(G) ≤ ker(transferFocal)` to equality by comparing indices via a
@@ -1604,6 +1598,28 @@ theorem APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow
     exact normalizer_controls_centralizer_fusion P hxC hyC hgxy
   simpa [N] using
     APrime_eq_subgroupOf_APrime_of_controlsFusionIn (G := G) (p := p) P hP_le_N hFusion
+
+end -- 5D
+
+section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
+
+/-! ### Isaacs §5E (Frobenius normal p-complement)
+
+**FT クリティカル**. mathlib 未収載で新規実装が必要.
+
+- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」(§5C で導入済み).
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
+  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
+- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
+- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
+  Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
+- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
+  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` + `lt_normalizer_of_pgroup_of_lt_top`.
+  main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
+  Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
+  二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
+- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
+- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
 
 /-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
 

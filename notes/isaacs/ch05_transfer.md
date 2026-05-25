@@ -66,7 +66,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | # | 種別 | 内容 | mmd |
 |---|---|---|---|
 | 5.20 | Theorem | v: G → P/P' transfer ⇒ ker(v) = A^p(G) (G^{ab,p'} kernel); `APrime_eq_transferFocal_ker` | L3130 |
-| 5.21 | Theorem | **Focal Subgroup Theorem (D. G. Higman)**: Foc_G(P) = P ∩ G' = P ∩ A^p(G) = P ∩ ker(v); `APrime_inf_sylow_eq_focalSubgroup` | L3138 |
+| 5.21 | Theorem | **Focal Subgroup Theorem (D. G. Higman)**: Foc_G(P) = P ∩ G' = P ∩ A^p(G) = P ∩ ker(v); `focalSubgroupTheorem` | L3138 |
 | 5.22 | Corollary | P ⊆ H controls G-fusion in P ⇒ H controls p-transfer; `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` | L3180 |
 | 5.23 | Corollary | abelian Sylow_p ⇒ N_G(P) controls p-transfer; `APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow` | L3186 |
 | 5.24 | Theorem | G 単純, H ⊆ G maximal nilpotent ⇒ H は p-group (Wielandt: 最大冪零部分群分類入口) | L3194 |
@@ -102,7 +102,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.16 G ≅ semidirect product | `isZGroup_iff_exists_mulEquiv` (`ZGroup.lean:315`) | 直接 |
 | Foc_G(H) 定義 | `Subgroup.focalSubgroup` (`Focal.lean:58`), `focalSubgroupOf` (`Focal.lean:67`) | 直接 (元の生成 set はやや異なる: `{g ∈ H \| ∃ x ∈ H, u ∈ G, g = ⁅x, u⁆}`, Isaacs の `x^{-1}y` 形と同等) |
 | transfer to focal | `Subgroup.transferFocal` (`Focal.lean:151`) | 直接 |
-| **5.21 Focal Subgroup Theorem** | `Subgroup.commutator_inf_eq_focalSubgroup` (`Focal.lean`, ~L200) + `Subgroup.ker_transferFocal_inf_eq_focalSubgroup` (`Focal.lean:198`) | 直接 (Isaacs の 4 等式の core を 2 等式で抽出) |
+| **5.21 Focal Subgroup Theorem** | `Subgroup.commutator_inf_eq_focalSubgroup` (`Focal.lean`, ~L200) + `Subgroup.ker_transferFocal_inf_eq_focalSubgroup` (`Focal.lean:198`) + `focalSubgroupTheorem` | BG/Peterfalvi 入口まで完了 |
 | Foc(P) ⊆ G' | `Subgroup.focalSubgroup_le_commutator` (`Focal.lean:105`) | 直接 |
 | H/Foc(H) abelian | `IsMulCommutative (H ⧸ focalSubgroupOf H)` instance (`Focal.lean:146`) | 直接 |
 | transfer surjectivity | `Subgroup.transferFocal_surjective` (`Focal.lean:180`) | 直接 |
@@ -122,6 +122,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | **5.18 abelian Sylow 強化 Burnside** | ✅ 2 形式: (i) **弱形** `abelian_sylow_commutator_inf_eq_focal` (mathlib `commutator_inf_eq_focalSubgroup` alias, G' ∩ P = focal P 形); (ii) **強形** `eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (2026-05-23, ~80 LOC, Isaacs p.166 流) — `G' ∩ P ∩ Z(N_G(P)) = 1` の要素形式. 強形は transfer id : P→P + transfer_eq_pow に Lem 5.12 (N_G(P) controls C_G(P) fusion) + `Commute.pow_right` を組み合わせ. **下流 Cor 5.19 (cyclic Sylow_2 ⇒ G 非単純) を unblock** | ✅ |
 | 5.19 Sylow_2 direct product 系 ⇒ 非単純 | ✅ `not_isSimpleGroup_of_isCyclic_sylow_two` (2026-05-23, ~110 LOC, cyclic Sylow_2 特殊化). Helper `cyclic_finite_unique_order_two` (IsCyclic.card_orderOf_eq_totient + Nat.totient_two = 1). 主体: Cauchy + Thm 5.18 強形 + cyclic unique order-2. **axiom-free** (5.18 強形 + mathlib のみ, Ch.4 不要) | ✅ |
 | 5.20 ker(v) = A^p(G) | ✅ `APrime_eq_transferFocal_ker` (2026-05-25). 既存 `A^p(G) ≤ ker(transferFocal)` と `A^p(G) ∩ P = Foc_G(P)` に、normal p-power index subgroup の index 比較を加えて full kernel equality 化 | ✅ |
+| **5.21 Focal Subgroup Theorem** | ✅ `focalSubgroupTheorem` (2026-05-25). `G' ∩ P = Foc_G(P)`, `A^p(G) ∩ P = Foc_G(P)`, `ker(transferFocal) ∩ P = Foc_G(P)` を 1 つの BG §1.17 入口に package. | ✅ |
 | 5.22 H controls fusion ⇒ controls p-transfer | ✅ `Subgroup.ControlsFusionIn` + focal core + `A^p(H)=H∩A^p(G)` equality (2026-05-25). transfer image cardinal phrasingは別 predicate化せず `APrime` equalityで保持 | ✅ |
 | 5.23 abelian Sylow ⇒ N controls p-transfer | ✅ `APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow` (2026-05-25). Lem 5.12 + 5.22 | ✅ |
 | **5.24 G simple maximal nilpotent ⇒ p-group** | mathlib 未収載. transfer + Sylow + nilpotent 引数. **BG/Peterfalvi 直接被引用無し** | 後回し可 |
@@ -131,6 +132,8 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.28 (Lem, key Sylow 共役) | ✅ 完成 (2026-05-24 overnight ralph-loop, sorry+axiom-free, ~250 LOC). Steps 1-11 全実装: 1-2 (P/Q ⊓ N > D via normalizers grow), 3-4 (S, T : Sylow p ↥N, R : Sylow p G), 5 (S ⊔ C = ⊤ via helper), 6 (Sylow II in ↥N), 7 (n = yC·sS via mem_sup_of_normal_left), 8 (T = yC • S via smul_eq_iff_mem_normalizer), 9 (Q ⊓ N ≤ yR via Sylow.coe_subgroup_smul + mem_pointwise_smul_iff_inv_smul_mem + .val 翻訳 + convert), 10 (index strict via index_dvd_of_le + cancellation), 11 (二回 IH chain + c = x · yC⁻¹ · z; c ∈ C_G(D) from centralizer_le + yC centralizes D ⇒ D ⊆ yR via h_smul_eq). | ✅ |
 | 5.29 q ∤ p^e−1 ⇒ normal p-comp | ✅ 完成 (2026-05-25). `hasNormalPComplement_of_no_prime_dvd_pow_sub_one`: 5.26 の p-local criterion + `MulAction.fixedPoints` orbit counting (`IsPGroup.card_modEq_card_fixedPoints`) で非自明 q-作用から `q ∣ p^e - 1` を抽出. | ✅ |
 | 5.30 p odd, 全 order-p 元中心 ⇒ normal p-comp | ✅ 完成 (2026-05-25). main 由来 Ch.4 `isaacs_thm_4_36` を q-subgroup action `QN →* MulAut X` に適用し、`hasNormalPComplement_of_prime_subgroups_centralize` で閉じた. | ✅ |
+
+FT クリティカル公開面は `OddOrder.AxiomsCheck` で `focalSubgroupTheorem`, `hasNormalPComplement_iff_controlsOwnFusion`, `hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer`, `hasNormalPComplement_of_no_prime_dvd_pow_sub_one`, `normal_p_complement_of_order_p_central_odd` を確認対象に入れている.
 
 ### mathlib カバレッジ概観
 
