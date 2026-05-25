@@ -847,8 +847,9 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 **FT クリティカル**. mathlib 未収載で新規実装が必要.
 
 - **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
-- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 🟡 部分完成. `Sylow.ControlsOwnFusion` 定義 + (⇒) `controlsOwnFusion_of_hasNormalPComplement` ✅. (⇐) `hasNormalPComplement_of_controlsOwnFusion` sorry (O^p, A^p 定義必要).
-- **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
+  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
+- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
 - **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
   Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
 - **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
@@ -1037,6 +1038,95 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   obtain ⟨a, _, ha⟩ := (Nat.dvd_prime_pow Fact.out).mp h_idx_dvd
   exact ⟨a, ha⟩
 
+/-- For finite groups, `A^p(G)` is characteristic.
+
+This is the automorphism-invariance of Isaacs' defining family: normal subgroups containing
+`G'` with p-power index are preserved by every automorphism. -/
+lemma APrime_characteristic (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.Prime] :
+    (APrime p G).Characteristic := by
+  classical
+  rw [Subgroup.characteristic_iff_le_comap]
+  intro φ
+  let K : Subgroup G := (APrime p G).comap φ.toMonoidHom
+  have hK_normal : K.Normal := inferInstance
+  have hK_comm : commutator G ≤ K := by
+    intro x hx
+    rw [Subgroup.mem_comap]
+    have hxmap : φ x ∈ (commutator G).map φ.toMonoidHom :=
+      Subgroup.mem_map_of_mem φ.toMonoidHom hx
+    have hmap_comm : (commutator G).map φ.toMonoidHom = commutator G := by
+      rw [_root_.map_commutator_eq,
+        φ.toMonoidHom.range_eq_top_of_surjective φ.surjective,
+        ← _root_.commutator_def]
+    exact commutator_le_APrime p G (hmap_comm ▸ hxmap)
+  obtain ⟨k, hk⟩ := APrime_index_isPGroup p G
+  have hK_index : K.index = p ^ k := by
+    rw [Subgroup.index_comap_of_surjective (H := APrime p G)
+      (f := φ.toMonoidHom) φ.surjective, hk]
+  exact APrime_le (K := K) hK_normal hK_comm hK_index
+
+/-- The transfer-focal kernel contains `A^p(G)`.
+
+This is the `A^p` half of Isaacs Thm 5.21 in the mathlib formulation: the quotient
+`G / ker(V)` is isomorphic to the p-group `P / P*`, and `ker(V)` contains `G'`. -/
+lemma APrime_le_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) : APrime p G ≤ P.transferFocal.ker := by
+  classical
+  have hquot : IsPGroup p (G ⧸ P.transferFocal.ker) :=
+    (P.2.to_quotient P.focalSubgroupOf).of_equiv
+      (Subgroup.transferFocal.quotientKerMulEquivQuotientFocalSubroupOf P).symm
+  obtain ⟨k, hk⟩ := hquot.exists_card_eq
+  have hker_index : P.transferFocal.ker.index = p ^ k := by
+    rw [Subgroup.index_eq_card]
+    exact hk
+  exact APrime_le (K := P.transferFocal.ker) inferInstance
+    (Abelianization.commutator_subset_ker P.transferFocal) hker_index
+
+/-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
+
+This packages only the standard `A^p` consequence of the focal subgroup theorem, avoiding a
+separate public bridge through `G'`. -/
+lemma sylow_focalSubgroup_eq_self_of_APrime_eq_top [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hA : APrime p G = ⊤) :
+    P.focalSubgroup = (P : Subgroup G) := by
+  have hker_top : P.transferFocal.ker = ⊤ := by
+    apply eq_top_iff.mpr
+    simpa [hA] using APrime_le_transferFocal_ker (G := G) (p := p) P
+  rw [← Subgroup.ker_transferFocal_inf_eq_focalSubgroup P, hker_top, top_inf_eq]
+
+/-- **Isaacs Thm 5.25 proof step**: if `N = O^p(G)`, then `A^p(N)=N`.
+
+Isaacs p.173 uses that `A^p(N)` is characteristic in `N`, hence normal in `G`, and that
+`|G:A^p(N)| = |G:N| · |N:A^p(N)|` is a p-power. Minimality of `O^p(G)` then gives
+`N ≤ A^p(N).map subtype ≤ N`, so `A^p(N)=N` internally. -/
+lemma APrime_eq_top_of_eq_OPrime [Finite G] {p : ℕ} [Fact p.Prime]
+    {N : Subgroup G} [N.Normal] (hN : N = OPrime p G) :
+    APrime p N = ⊤ := by
+  classical
+  let A : Subgroup N := APrime p N
+  haveI hA_char : A.Characteristic := by
+    simpa [A] using APrime_characteristic (p := p) (G := N)
+  haveI hAmap_normal : (A.map N.subtype).Normal := inferInstance
+  have hAmap_le_N : A.map N.subtype ≤ N :=
+    Subgroup.map_subtype_le A
+  obtain ⟨a, hN_index⟩ : ∃ a : ℕ, N.index = p ^ a := by
+    rw [hN]
+    exact OPrime_index_isPGroup p G
+  obtain ⟨b, hA_index⟩ : ∃ b : ℕ, A.index = p ^ b := by
+    simpa [A] using APrime_index_isPGroup p N
+  have hAmap_index : (A.map N.subtype).index = p ^ (b + a) := by
+    rw [Subgroup.index_map_subtype, hA_index, hN_index, ← pow_add]
+  have hN_le_Amap : N ≤ A.map N.subtype := by
+    have hO_le_Amap : OPrime p G ≤ A.map N.subtype :=
+      OPrime_le hAmap_normal hAmap_index
+    exact hN.symm ▸ hO_le_Amap
+  have hAmap_eq_N : A.map N.subtype = N :=
+    le_antisymm hAmap_le_N hN_le_Amap
+  have hA_eq_top : A = ⊤ := by
+    apply (Subgroup.map_subtype_inj (H := N)).mp
+    rw [hAmap_eq_N, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  simpa [A] using hA_eq_top
+
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
 
@@ -1105,12 +1195,9 @@ assembly on top of this.
   defining family) ⇒ its `.map N.subtype` is normal in `G`. It has p-power index in `G`
   (= `|G:N| · |↥N : APrime|`), so by `OPrime` minimality `N ≤ (APrime).map subtype ≤ N`,
   hence equality, hence `APrime p ↥N = ⊤` in `↥N`.
-* **Q ≤ commutator ↥N**: APrime = ⊤ ⇒ no proper normal subgroup of `↥N` with p-power index
-  contains `commutator ↥N`. The p-part of `[↥N : commutator]` (abelianization) must be 1
-  (else the preimage of `p'`-part would be such a proper subgroup). Since `Q` is a p-group
-  and abelianization of `↥N` has trivial p-part, `Q` projects to `1`, so `Q ≤ commutator ↥N`.
-* **Focal Subgroup Theorem** (mathlib `commutator_inf_eq_focalSubgroup`):
-  `focalSubgroup Q = commutator ↥N ⊓ Q = Q` (using `Q ≤ commutator ↥N`).
+* **Focal Subgroup Theorem**: `APrime p ↥N = ⊤` and transfer-focal give
+  `focalSubgroup Q = Q`. This is the `A^p(N)=N` line in Isaacs followed by Thm 5.21,
+  without adding an extra public bridge through `commutator ↥N`.
 * **ControlsOwnFusion lift**: every generator `⁅x, u⁆ ∈ focalSubgroup Q` (with `x ∈ Q`,
   `u ∈ ↥N` such that `[x,u] ∈ Q`) can be rewritten using ControlsOwnFusion. Set
   `y := u x u⁻¹ ∈ Q ⊆ P`; controlsOwnFusion gives `v ∈ P` with `v x v⁻¹ = y`. Then
@@ -1124,8 +1211,8 @@ assembly on top of this.
   `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
   `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
 
-**TODO**: 内部の 6 ステップ (APrime = ⊤, Q ⊆ comm, focal ⊆ ⁅Q, P⁆, iteration, termination,
-final translate) を順に埋める. -/
+**TODO**: 内部の残りステップ (focal ⊆ ⁅Q, P⁆, iteration, termination, final translate) を順に
+埋める. -/
 lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
@@ -1154,10 +1241,10 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
         _ = x * v * x⁻¹ * v⁻¹ := by group
     rw [hcomm_eq]
     exact Subgroup.commutator_mem_commutator hxR hvP
-  -- **Crux** (Steps 1-4 combined, sorry): `R ≤ ⁅R, (P : Subgroup G)⁆`.
-  -- 内訳: APrime ↥N = ⊤ (char + OPrime minimality) → Q := R.subgroupOf N ⊆ commutator ↥N
-  -- → mathlib's `commutator_inf_eq_focalSubgroup` で focalSubgroup Q = Q → 各 focal generator
-  -- ⁅x, u⁆ (x ∈ Q, u ∈ ↥N) を ControlsOwnFusion で ⁅Q.map subtype, P⁆ 内 commutator に変換.
+  -- **Crux**: `R ≤ ⁅R, (P : Subgroup G)⁆`.
+  -- 内訳: APrime ↥N = ⊤ (char + OPrime minimality) → transfer-focal で
+  -- focalSubgroup Q = Q → 各 focal generator ⁅x, u⁆ (x ∈ Q, u ∈ ↥N) を
+  -- ControlsOwnFusion で ⁅Q.map subtype, P⁆ 内 commutator に変換.
   have h_R_le_comm : R ≤ ⁅R, (P : Subgroup G)⁆ := by
     have h_R_le_focal : R ≤ R.focalSubgroup := by
       have hR_le_N : R ≤ N := by
@@ -1199,19 +1286,14 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
       let RN : Sylow p N := hRN_pgroup.toSylow hRN_not_dvd
       have hRN_eq : (RN : Subgroup N) = R.subgroupOf N :=
         hRN_pgroup.toSylow_coe hRN_not_dvd
-      have hRN_le_comm : R.subgroupOf N ≤ _root_.commutator N := by
-        -- `APrime p ↥N = ⊤` forces the p-Sylow `R.subgroupOf N` into
-        -- `commutator N`; this is the remaining APrime/OPrime bridge.
-        sorry
+      have hAPrime_top : APrime p N = ⊤ :=
+        APrime_eq_top_of_eq_OPrime (G := G) (p := p) (N := N) hN_def
+      have hRN_focal_eq : RN.focalSubgroup = (RN : Subgroup N) :=
+        sylow_focalSubgroup_eq_self_of_APrime_eq_top RN hAPrime_top
       have hRN_le_focal : R.subgroupOf N ≤ RN.focalSubgroup := by
         intro x hx
-        have hxRN : x ∈ (RN : Subgroup N) := by
-          rw [hRN_eq]
-          exact hx
-        have hxInf : x ∈ _root_.commutator N ⊓ (RN : Subgroup N) :=
-          ⟨hRN_le_comm hx, hxRN⟩
-        rw [Subgroup.commutator_inf_eq_focalSubgroup RN] at hxInf
-        exact hxInf
+        rw [hRN_focal_eq, hRN_eq]
+        exact hx
       have hRN_focal_map_le : RN.focalSubgroup.map N.subtype ≤ R.focalSubgroup := by
         rw [Subgroup.focalSubgroup_def, MonoidHom.map_closure, Subgroup.focalSubgroup_def]
         apply Subgroup.closure_mono
@@ -1268,8 +1350,7 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
 (C) p ∤ |N| (任意 Sylow R で R ⊓ N = ⊥ + Cauchy 矛盾) → `|N| · |P'| = |G|` +
     `Nat.Coprime (|N|) (p^a)` → `Subgroup.isComplement'_of_coprime`. ✅
 
-**実装状態 (2026-05-25)**: Steps B + C 完成 (sorry-free).  Step A (heart) は helper の
-sorry に分離. -/
+**実装状態 (2026-05-25)**: Step A (heart) + Steps B/C 完成 (sorry-free). -/
 theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     HasNormalPComplement p G := by
@@ -1867,8 +1948,7 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
   `isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`
   (Lem 5.27 Part 2) で結論. ✅
 * (3) ⇒ (1): 任意 Sylow `P` で `P.ControlsOwnFusion` を示し (Lem 5.28 経由),
-  `hasNormalPComplement_of_controlsOwnFusion` (Thm 5.25 ⇐) で normal p-comp.
-  **Thm 5.25 (⇐) sorry のため (3⇒1) 方向は sorry**. -/
+  `hasNormalPComplement_of_controlsOwnFusion` (Thm 5.25 ⇐) で normal p-comp. ✅ -/
 theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
     [Finite G] {p : ℕ} [Fact p.Prime] :
     HasNormalPComplement p G ↔
@@ -1882,7 +1962,7 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
         (Subgroup.normalizer (Y : Set G)))
       X hXp
   · -- (3) ⇒ (1): Pick Sylow P, show P.ControlsOwnFusion via Lem 5.28,
-    -- then apply Thm 5.25 (⇐) (sorry).
+    -- then apply Thm 5.25 (⇐).
     obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
     refine (hasNormalPComplement_iff_controlsOwnFusion P).mpr ?_
     intro x y hx_P hy_P ⟨g, hgxy⟩
