@@ -620,6 +620,52 @@ private theorem scalarMonoidHomOfFinrankEqOne_apply_smul
   change ρ g m = e (e.symm (ρ g)) m
   rw [e.apply_symm_apply]
 
+/-- The scalar monoid character of a group representation on a one-dimensional module
+lands in units. -/
+private noncomputable def scalarCharacterOfFinrankEqOne
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) : G →* Fˣ :=
+  let ψ := scalarMonoidHomOfFinrankEqOne hdim ρ
+  { toFun := fun g =>
+      { val := ψ g
+        inv := ψ g⁻¹
+        val_inv := by
+          have h := map_mul ψ g g⁻¹
+          simpa using h.symm
+        inv_val := by
+          have h := map_mul ψ g⁻¹ g
+          simpa using h.symm }
+    map_one' := by
+      ext
+      simp [ψ]
+    map_mul' := by
+      intro g h
+      ext
+      exact map_mul ψ g h }
+
+/-- The unit-valued scalar character describes the representation action. -/
+private theorem scalarCharacterOfFinrankEqOne_apply_smul
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) (g : G) (m : M) :
+    ρ g m = (scalarCharacterOfFinrankEqOne hdim ρ g : F) • m :=
+  scalarMonoidHomOfFinrankEqOne_apply_smul hdim ρ g m
+
+/-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
+private theorem isPGroup_rank_one_representation_trivial_of_charP
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] (hG : IsPGroup p G)
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) :
+    ∀ g : G, ∀ m : M, ρ g m = m := by
+  let φ := scalarCharacterOfFinrankEqOne hdim ρ
+  have hφ : φ = 1 := monoidHom_units_eq_one_of_isPGroup_charP hG φ
+  intro g m
+  calc
+    ρ g m = (φ g : F) • m := scalarCharacterOfFinrankEqOne_apply_smul hdim ρ g m
+    _ = m := by simp [hφ]
+
 /-- If two endomorphisms are trivial on a submodule and on the quotient by it,
 then they commute.
 
