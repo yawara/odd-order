@@ -3064,6 +3064,54 @@ theorem exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_
   char_elementaryAbelian_4_of_noncyclic_abelian_2group
     hAb h_two hD_cyc hD_idx h_not_cyclic
 
+/-- **Isaacs Lemma 6.15** (`p = 2` quotient lift setup).
+
+Under the `p = 2` hypotheses through the first quotient step, applying the abelian index-two
+branch to `T/T'` produces a characteristic subgroup upstairs whose image in `T/T'` is elementary
+abelian of order `4`. -/
+theorem exists_characteristic_lift_quotient_commutator_four_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 := by
+  let D : Subgroup (T ⧸ _root_.commutator T) :=
+    C.map (QuotientGroup.mk' (_root_.commutator T))
+  have hD : IsCyclic D ∧ D.index = 2 := by
+    simpa [D] using
+      quotient_commutator_image_cyclic_index_two_of_center_index_four
+        h_idx hC_cyclic hC_lt_T hZ_lt_C
+  have hQ_ab : ∀ x y : T ⧸ _root_.commutator T, x * y = y * x :=
+    quotient_commutator_commutative
+  have hQ_two : IsPGroup 2 (T ⧸ _root_.commutator T) :=
+    hT_two.to_quotient (_root_.commutator T)
+  have hQ_not_cyclic : ¬ IsCyclic (T ⧸ _root_.commutator T) :=
+    quotient_commutator_not_isCyclic_of_center_index_prime_sq h_idx
+  obtain ⟨K, hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+      (A := T ⧸ _root_.commutator T) hQ_ab hQ_two
+      (D := D) hD.1 hD.2 hQ_not_cyclic
+  let E : Subgroup T := K.comap (QuotientGroup.mk' (_root_.commutator T))
+  have hE_map :
+      E.map (QuotientGroup.mk' (_root_.commutator T)) = K := by
+    dsimp [E]
+    exact Subgroup.map_comap_eq_self_of_surjective
+      (QuotientGroup.mk'_surjective (_root_.commutator T)) K
+  refine ⟨E, ?_, ?_, ?_, ?_⟩
+  · dsimp [E]
+    exact Subgroup.Characteristic.comap_quotient_mk hK_char
+  · intro x hx
+    dsimp [E]
+    change (x : T ⧸ _root_.commutator T) ∈ K
+    rw [show (x : T ⧸ _root_.commutator T) = 1 from
+      (QuotientGroup.eq_one_iff x).mpr hx]
+    exact K.one_mem
+  · rwa [hE_map]
+  · rwa [hE_map]
+
 end
 
 end OddOrder.Isaacs.Ch06
