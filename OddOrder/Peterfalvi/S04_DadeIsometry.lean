@@ -395,6 +395,52 @@ theorem hCoset_conj_mem_of_HConjInvariant (hyp : Hypothesis G A L)
   rw [hconj a l]
   simpa [MulAut.conj_apply] using hh_smul
 
+theorem hCoset_conj_mem_iff_of_HConjInvariant (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) {g : G} :
+    (l : G) * g * (l : G)⁻¹ ∈
+        hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ ↔
+      g ∈ hyp.hCoset a := by
+  refine ⟨fun hg => ?_, hyp.hCoset_conj_mem_of_HConjInvariant hconj a l⟩
+  have hg' := hyp.hCoset_conj_mem_of_HConjInvariant hconj
+    ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ l⁻¹ hg
+  obtain ⟨h, hh, heq⟩ := hg'
+  refine ⟨h, ?_, ?_⟩
+  · have idx_val :
+        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = a.1 := by
+      push_cast; group
+    have idx_eq :
+        (⟨((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹,
+          hyp.L_normalizes_A l⁻¹ (hyp.L_normalizes_A l a.2)⟩ : {a : G // a ∈ A}) = a :=
+      Subtype.ext idx_val
+    exact idx_eq ▸ hh
+  · have lhs_eq :
+        ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = g := by
+      push_cast; group
+    have rhs_eq :
+        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h = a.1 * h := by
+      push_cast; group
+    calc g = ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ := lhs_eq.symm
+      _ = ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h := heq
+      _ = a.1 * h := rhs_eq
+
+theorem hCoset_conj_eq_of_HConjInvariant (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) :
+    (fun g : G => (l : G) * g * (l : G)⁻¹) '' hyp.hCoset a =
+      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+  ext g
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact hyp.hCoset_conj_mem_of_HConjInvariant hconj a l hx
+  · intro hg
+    refine ⟨(l : G)⁻¹ * g * (l : G), ?_, by group⟩
+    have hg_eq : (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ = g := by
+      group
+    have hmem :
+        (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ ∈
+          hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+      simpa [hg_eq] using hg
+    exact (hyp.hCoset_conj_mem_iff_of_HConjInvariant hconj a l).mp hmem
+
 end Hypothesis
 
 section DadeMap
