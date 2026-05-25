@@ -1229,6 +1229,16 @@ theorem mem_actionCentralizer {A V : Type*} [Group A] [Group V]
     v ∈ actionCentralizer φ P ↔ ∀ p : P, (φ p) v = v :=
   Iff.rfl
 
+@[simp]
+theorem mem_actionCentralizer_top {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {v : V} :
+    v ∈ actionCentralizer φ (⊤ : Subgroup A) ↔ ∀ a : A, (φ a) v = v := by
+  constructor
+  · intro hv a
+    exact hv ⟨a, trivial⟩
+  · intro hv a
+    exact hv a
+
 /-- If `P ≤ Q`, then `C_V(Q) ≤ C_V(P)`. -/
 theorem actionCentralizer_antitone {A V : Type*} [Group A] [Group V]
     {φ : A →* MulAut V} {P Q : Subgroup A} (hPQ : P ≤ Q) :
@@ -1336,6 +1346,57 @@ theorem actionCentralizer_sup_index_le_sq {A V : Type*} [Group A] [Group V]
     (actionCentralizer φ (P ⊔ Q)).index ≤ p * p :=
       actionCentralizer_sup_index_le_of_le φ P Q hP hQ
     _ = p ^ 2 := by ring
+
+/-- The same Theorem 7.5 index estimate, in the `U = C_V(P) ∩ C_V(Q)` form used in
+the book proof. -/
+theorem actionCentralizer_inf_index_le_sq {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) {p : ℕ}
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    (actionCentralizer φ P ⊓ actionCentralizer φ Q).index ≤ p ^ 2 := by
+  rw [← actionCentralizer_sup]
+  exact actionCentralizer_sup_index_le_sq φ P Q hP hQ
+
+/-- Any subgroup fixed pointwise by the whole acting group is invariant under the action. -/
+theorem isAInvariant_of_le_actionCentralizer_top {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V}
+    (hU : U ≤ actionCentralizer φ (⊤ : Subgroup A)) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ U := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a u hu
+  rw [(mem_actionCentralizer_top.mp (hU hu)) a]
+  exact hu
+
+/-- If `G = ⟨P, Q⟩`, then `U = C_V(P) ∩ C_V(Q)` is invariant under the whole action.
+
+This is the invariant-subgroup bridge needed before passing to `V/U` in Isaacs Thm 7.5. -/
+theorem actionCentralizer_inf_isAInvariant_of_sup_eq_top
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {P Q : Subgroup A} (hPQ : P ⊔ Q = ⊤) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ
+      (actionCentralizer φ P ⊓ actionCentralizer φ Q) := by
+  apply isAInvariant_of_le_actionCentralizer_top
+  rw [← actionCentralizer_sup, hPQ]
+
+/-- If `U ≤ C`, then the image of `C` in `V/U` has the same index as `C`.
+
+This is the quotient-index bridge behind the Theorem 7.5 passage from `V` to `V/U`. -/
+theorem quotient_image_index_eq_of_le {V : Type*} [Group V]
+    {U C : Subgroup V} [U.Normal] (hUC : U ≤ C) :
+    (C.map (QuotientGroup.mk' U)).index = C.index :=
+  Subgroup.index_map_eq C (QuotientGroup.mk'_surjective U) (by
+    rw [QuotientGroup.ker_mk']
+    exact hUC)
+
+/-- Action-centralizer version of `quotient_image_index_eq_of_le`: if `U ≤ C_V(P)`,
+then `C_V(P)/U` has the same index in `V/U` as `C_V(P)` has in `V`. -/
+theorem actionCentralizer_quotient_image_index_eq_of_le
+    {A V : Type*} [Group A] [Group V] (φ : A →* MulAut V)
+    (P : Subgroup A) {U : Subgroup V} [U.Normal]
+    (hU : U ≤ actionCentralizer φ P) :
+    ((actionCentralizer φ P).map (QuotientGroup.mk' U)).index =
+      (actionCentralizer φ P).index :=
+  quotient_image_index_eq_of_le hU
 
 end -- 7A
 

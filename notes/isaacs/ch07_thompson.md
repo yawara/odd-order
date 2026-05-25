@@ -220,6 +220,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   (`actionCentralizer`), conjugacy step `C_V(P^g)=C_V(P)^g`
   (`actionCentralizer_map_conj`), generated-subgroup fixed-point step
   `C_V(P⊔Q)=C_V(P)∩C_V(Q)` (`actionCentralizer_sup`) を sorry-free で追加.
+  さらに `U=C_V(P)∩C_V(Q)` 形式の index bound
+  (`actionCentralizer_inf_index_le_sq`), `P⊔Q=⊤` から `U` が action-invariant になる bridge
+  (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`), 商 `V/U` 上の index 保存
+  (`actionCentralizer_quotient_image_index_eq_of_le`) まで追加済み.
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
@@ -242,10 +246,15 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 
 1. ✅ **shared definitions + 7.2 / 7.4 / 7.3 / 7.7** — Ch.7 内の独立補題群は完了.
 2. 🔧 **7.5 normal-P theorem 前半** — Ch.6 6.11 に依存しない action / centralizer / quotient-action 側を先に固める.
-   - `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|`.
-   - `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`.
-   - `G = ⟨P,Q⟩` 仮定下で `G` が `U` に自明に作用し, quotient action `G ↷ V/U` を得る.
-   - kernel `K` について `[V,K,K]=1` までを Ch.4 action-commutator API と接続する.
+   - ✅ `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|` (`actionCentralizer_map_conj_index`).
+   - ✅ `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`
+     (`actionCentralizer_sup`, `actionCentralizer_inf_index_le_sq`).
+   - ✅ `G = ⟨P,Q⟩` 仮定下で `U` が action-invariant になり, 既存
+     `IsAInvariant.quotientMulAutHom` で quotient action `G ↷ V/U` へ進める
+     (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`).
+   - ✅ 商 `V/U` 内の `C_V(P)/U` index 保存
+     (`actionCentralizer_quotient_image_index_eq_of_le`).
+   - 🔜 quotient action の kernel `K` と `[V,K,K]=1` / `K` p-group 化.
 3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
 4. 🔴 **`Aut(E) ≅ GL(2,p)` bridge** — `|V| ≤ p^2` かつ noncyclic p-group から elementary abelian `p^2` を取り, Lem 7.3 に渡す.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
