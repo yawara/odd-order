@@ -1511,6 +1511,59 @@ private lemma pow_twist_eq_pow_half_mul_inv
   · omega
   · simp [SemiDihedralGroup.twist]
 
+private noncomputable def semiDihedralIsoOfTwistInvolution
+    {P : Type*} [Group P] [Finite P]
+    (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_z_pow : z = c ^ (2 ^ (k - 1)))
+    (h_a_sq : a ^ 2 = 1)
+    (h_conj : a * c * a⁻¹ = z * c⁻¹) :
+    P ≃* SemiDihedralGroup k := by
+  refine semiDihedralIsoOfTwistNormalized c a k h_order h_idx h_a_notmem h_a_sq ?_
+  rw [h_conj, h_z_pow, ← pow_twist_eq_pow_half_mul_inv c hk h_order]
+
+private noncomputable def semiDihedralIsoOfTwistSquareInvolution
+    {P : Type*} [Group P] [Finite P]
+    (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_z_mem : z ∈ Subgroup.zpowers c)
+    (h_z_pow : z = c ^ (2 ^ (k - 1)))
+    (h_z_sq : z ^ 2 = 1)
+    (h_a_sq : a ^ 2 = z)
+    (h_conj : a * c * a⁻¹ = z * c⁻¹) :
+    P ≃* SemiDihedralGroup k := by
+  classical
+  have hz_comm : Commute z c := by
+    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp h_z_mem
+    rw [← hm]
+    exact Commute.zpow_self c m
+  have h_ca_notmem : c * a ∉ Subgroup.zpowers c := by
+    intro hca
+    apply h_a_notmem
+    have ha : a = c⁻¹ * (c * a) := by group
+    rw [ha]
+    exact Subgroup.mul_mem _
+      (Subgroup.inv_mem _ (Subgroup.mem_zpowers c))
+      hca
+  have h_ca_sq : (c * a) ^ 2 = 1 := by
+    calc (c * a) ^ 2
+        = (c * a) * (c * a) := by rw [pow_two]
+      _ = c * (a * c * a⁻¹) * a ^ 2 := by group
+      _ = c * (z * c⁻¹) * z := by rw [h_conj, h_a_sq]
+      _ = (c * z * c⁻¹) * z := by group
+      _ = z * z := by rw [hz_comm.symm.mul_inv_cancel]
+      _ = 1 := by rw [← pow_two, h_z_sq]
+  have h_ca_conj : (c * a) * c * (c * a)⁻¹ = z * c⁻¹ := by
+    calc (c * a) * c * (c * a)⁻¹
+        = c * (a * c * a⁻¹) * c⁻¹ := by group
+      _ = c * (z * c⁻¹) * c⁻¹ := by rw [h_conj]
+      _ = (c * z * c⁻¹) * c⁻¹ := by group
+      _ = z * c⁻¹ := by rw [hz_comm.symm.mul_inv_cancel]
+  exact semiDihedralIsoOfTwistInvolution c (c * a) z k hk h_order h_idx
+    h_ca_notmem h_z_pow h_ca_sq h_ca_conj
+
 /-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite nonabelian 2-group with a cyclic
 subgroup `C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is
 the unique involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
