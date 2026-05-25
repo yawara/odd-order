@@ -1,12 +1,17 @@
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
+import OddOrder.GroupTheory.TISubset
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
@@ -20,4 +25,8 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.Peterfalvi.S01_Introduction
+import OddOrder.Peterfalvi.S02_Notation
+import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.AxiomsCheck

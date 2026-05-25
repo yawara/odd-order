@@ -1,13 +1,13 @@
 # Isaacs Ch.5: Transfer — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.5 (pp. 147-180).
-形式化先 (予定): `OddOrder/Isaacs/Ch05_Transfer/Main.lean` (未作成).
+形式化先: `OddOrder/Isaacs/Ch05_Transfer/Main.lean`.
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 2799-3312.
 ROADMAP 上の位置: **第 4 波 (Ch.4 後の Ch.4 → Ch.5 → Ch.6 シーケンス)** — 前提は Ch.3 (Hall), Ch.4 (Commutators) 中心. mmd には "Transfer is mathlib 既存で速い" と注記済.
 
 ## TL;DR — mathlib 大半カバー、FT 経路の核は Focal Subgroup (5.21)
 
-**mathlib カバレッジは Ch.5 中で最も厚い**. `Mathlib/GroupTheory/Transfer.lean` (350 行) + `Focal.lean` (218 行) + `Schreier.lean` + `SpecificGroups/ZGroup.lean` で 主要結果 (transfer 定義・Burnside 5.13・cyclic Sylow 5.14・Focal Subgroup 5.21・Schur 5.7・Z-group 構造 5.15-5.16) を直接実装済. ⇒ ラッパー仕事中心、新規実装は **Thm 5.24 (nilpotent maximal)** などに残る. **§5E の Thm 5.25 / 5.26 と Cor 5.29 / 5.30 は 2026-05-25 に sorry-free 完成**.
+**mathlib カバレッジは Ch.5 中で最も厚い**. `Mathlib/GroupTheory/Transfer.lean` (350 行) + `Focal.lean` (218 行) + `Schreier.lean` + `SpecificGroups/ZGroup.lean` で 主要結果 (transfer 定義・Burnside 5.13・cyclic Sylow 5.14・Focal Subgroup 5.21・Schur 5.7・Z-group 構造 5.15-5.16) を直接実装済. ⇒ ラッパー仕事中心、新規実装は **Thm 5.24 (nilpotent maximal)** などに残る. **§5B の Lem 5.8 / Cor 5.9 と §5E の Thm 5.25 / 5.26, Cor 5.29 / 5.30 は 2026-05-25 に sorry-free 完成**.
 
 **FT 経路で最重要**: **Focal Subgroup Theorem (5.21)** — **BG が独自 Thm 1.17 として再述**し本文 3 ヶ所 (L2723, L5042, L5068) で使う. mathlib `commutator_inf_eq_focalSubgroup` / `ker_transferFocal_inf_eq_focalSubgroup` を BG 流ステートメントに橋渡しすれば足りる. **Burnside (5.13)** は BG が独自 Thm 1.18 として再述するが本文での明示利用は少ない (BG 索引と冒頭サマリ程度).
 
@@ -65,10 +65,10 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 
 | # | 種別 | 内容 | mmd |
 |---|---|---|---|
-| 5.20 | Theorem | v: G → P/P' transfer ⇒ ker(v) = A^p(G) (G^{ab,p'} kernel) | L3130 |
-| 5.21 | Theorem | **Focal Subgroup Theorem (D. G. Higman)**: Foc_G(P) = P ∩ G' = P ∩ A^p(G) = P ∩ ker(v) | L3138 |
-| 5.22 | Corollary | P ⊆ H controls G-fusion in P ⇒ H controls p-transfer; \|G:O^p(G)\| = \|H:O^p(H)\| | L3180 |
-| 5.23 | Corollary | abelian Sylow_p ⇒ N_G(P) controls p-transfer (5.12 + 5.22) | L3186 |
+| 5.20 | Theorem | v: G → P/P' transfer ⇒ ker(v) = A^p(G) (G^{ab,p'} kernel); `A^p(G) ∩ P = Foc_G(P)` bridge 実装済み | L3130 |
+| 5.21 | Theorem | **Focal Subgroup Theorem (D. G. Higman)**: Foc_G(P) = P ∩ G' = P ∩ A^p(G) = P ∩ ker(v); `APrime_inf_sylow_eq_focalSubgroup` | L3138 |
+| 5.22 | Corollary | P ⊆ H controls G-fusion in P ⇒ H controls p-transfer; `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` | L3180 |
+| 5.23 | Corollary | abelian Sylow_p ⇒ N_G(P) controls p-transfer; `APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow` | L3186 |
 | 5.24 | Theorem | G 単純, H ⊆ G maximal nilpotent ⇒ H は p-group (Wielandt: 最大冪零部分群分類入口) | L3194 |
 
 ### § 5E — Frobenius normal p-complement theorem + corollaries (lines 3229-3300)
@@ -95,7 +95,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.6 central transfer = pow | `MonoidHom.transfer_eq_pow` (`Transfer.lean:205`), `transfer_center_eq_pow` (`Transfer.lean:222`), `transferCenterPow` (`Transfer.lean:228`) | g ↦ g^n の準同型化 |
 | **5.13 Burnside** | `MonoidHom.ker_transferSylow_isComplement'` (`Transfer.lean:275`) | 直接 |
 | Burnside transfer (補) | `MonoidHom.transferSylow` (`Transfer.lean:244`) + `transferSylow_eq_pow` (`Transfer.lean:263`) | 5.13 の証明部品も完備 |
-| 5.7 Schur | `Subgroup.card_commutator_le_of_finite_commutatorSet` (`Schreier.lean:208`) + `Finite (commutator G)` instance (`Schreier.lean:222`) | 強化版 (bound 付き) |
+| 5.7 Schur | `Subgroup.card_commutator_le_of_finite_commutatorSet` (`Schreier.lean:208`) + `finite_commutator_of_finiteIndex_center` | mathlib bound 付き強化版 + Isaacs の finite-index-center 形 |
 | **5.14 cyclic Sylow smallest prime** | `IsCyclic.isComplement'` (`Transfer.lean:339`) + `IsCyclic.normalizer_le_centralizer` (`Transfer.lean:308`) | 直接 |
 | 5.15 Z-group solvable | `Mathlib/GroupTheory/SpecificGroups/ZGroup.lean` の `IsZGroup` API; `IsZGroup.isCyclic_commutator` (L144) と quotient cyclic で induct | 構造組み立てで導出可 |
 | 5.16 Z-group G', G/G' cyclic + coprime | `IsZGroup.isCyclic_commutator` (`ZGroup.lean:144`) + `IsZGroup.isCyclic_abelianization` (L133) + `IsZGroup.coprime_commutator_index` (L280) | 直接 (3 ピースを bundle) |
@@ -114,16 +114,16 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | 5.3 \|G' ∩ Z\| 素数 ⇒ Sylow 非可換 | ✅ `not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center` (2026-05-23, ~70 LOC). Cauchy in G' ∩ Z(G) + zpowers z normal (z central) + Sylow II conj + transfer id : P→P (P abelian) + transfer_eq_pow + map_commutatorElement | ✅ |
 | 5.4 Schur multiplier 弱形 | ✅ `not_isMulCommutative_sylow_of_le_commutator_inf_center` (2026-05-23, ~7 LOC). 5.3 hypothesis weakening via `Subgroup.card_dvd_of_le`. フル形 (Sylow_p(Γ/Z) noncyclic) は `commutative_of_cyclic_center_quotient` 経由で追加可 | ✅ |
 | 5.5 transfer-evaluation lemma | mathlib `transfer_eq_prod_quotient_orbitRel_zpowers_quot` で同等内容. Isaacs 流ステートメント (T_0 ⊆ T と n_t) への変換が必要 | 中 (ラッパー) |
-| 5.8, 5.9 Z(G) transversal の commutator 構造 | 短い補題. 5.7 Schur の証明部品で mathlib `closureCommutatorRepresentatives` 周辺と関連 | 短い |
+| 5.8, 5.9 Z(G) transversal の commutator 構造 | ✅ `commutatorElement_eq_centerQuotient_out`, `finite_commutatorSet_of_finiteIndex_center`, `pow_index_center_eq_one_of_mem_commutator`, `commutatorElement_pow_index_center_eq_one` (2026-05-25). `Subgroup.LeftTransversal` bridge は増やさず `G ⧸ Z(G)` の `out` 代表元で形式化 | ✅ |
 | 5.10 Dietzmann theorem | mathlib `Mathlib/GroupTheory` 全体を grep する限り Dietzmann 名は未登場. Schur 5.7 の証明で間接的に使用 (`Schreier.lean` で別経路の bound 経由) | **新規実装** (Isaacs §5B 末) |
 | 5.11 Hall transfer | ✅ `ker_transfer_sup_eq_top_of_hall` (2026-05-23). 1st iso + Lagrange + Lem 3.16. ~10 LOC. | ✅ |
 | 5.12 N_G(P) controls C_G(P) fusion | ✅ `normalizer_controls_centralizer_fusion` (2026-05-23). Sylow II in K = C_G(y) + `Sylow.smul_subtype` + `Sylow.subtype_injective` + `Sylow.smul_eq_iff_mem_normalizer` で ~50 LOC | ✅ |
 | 5.17 cyclic Sylow ⇒ p ∤ \|G'\|·\|G:G'\| | ✅ `isaacs_thm_5_17` (2026-05-23; axiom-free 化 2026-05-25). Ch.4 §4D Thm 4.28 + 4.34 を `fitting_coprime_abelian_decomp` adapter で subgroup conjugation 形へ変換し、cyclic-pgroup-chain theorem と合わせる. Schur-Zassenhaus + Fitting + cyclic chain で C_P(K) = ⊥ vs ⁅P,K⁆ = ⊥ 場合分け, Burnside (mathlib `ker_transferSylow_isComplement'`) for case 1, P ⊆ G' for case 2 | ✅ |
 | **5.18 abelian Sylow 強化 Burnside** | ✅ 2 形式: (i) **弱形** `abelian_sylow_commutator_inf_eq_focal` (mathlib `commutator_inf_eq_focalSubgroup` alias, G' ∩ P = focal P 形); (ii) **強形** `eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (2026-05-23, ~80 LOC, Isaacs p.166 流) — `G' ∩ P ∩ Z(N_G(P)) = 1` の要素形式. 強形は transfer id : P→P + transfer_eq_pow に Lem 5.12 (N_G(P) controls C_G(P) fusion) + `Commute.pow_right` を組み合わせ. **下流 Cor 5.19 (cyclic Sylow_2 ⇒ G 非単純) を unblock** | ✅ |
 | 5.19 Sylow_2 direct product 系 ⇒ 非単純 | ✅ `not_isSimpleGroup_of_isCyclic_sylow_two` (2026-05-23, ~110 LOC, cyclic Sylow_2 特殊化). Helper `cyclic_finite_unique_order_two` (IsCyclic.card_orderOf_eq_totient + Nat.totient_two = 1). 主体: Cauchy + Thm 5.18 強形 + cyclic unique order-2. **axiom-free** (5.18 強形 + mathlib のみ, Ch.4 不要) | ✅ |
-| 5.20 ker(v) = A^p(G) | mathlib `Focal.lean` で `commutator_inf_eq_focalSubgroup` (L208 周辺) + 商の構造で導出可. A^p(G) 定義そのものが未収載 | 中 (`Subgroup.AStarP` 等の新規 def 必要) |
-| 5.22 H controls fusion ⇒ controls p-transfer | mathlib 未収載. Focal subgroup theorem + index 計算 | 中 |
-| 5.23 abelian Sylow ⇒ N controls p-transfer | 5.12 + 5.22 系. ラッパー | 短い |
+| 5.20 ker(v) = A^p(G) | 部分実装: `A^p(G) ≤ ker(transferFocal)` と `A^p(G) ∩ P = Foc_G(P)` (`APrime_inf_sylow_eq_focalSubgroup`, 2026-05-25). full kernel equality は transferFocal kernel index 比較が未 | 中 |
+| 5.22 H controls fusion ⇒ controls p-transfer | ✅ `Subgroup.ControlsFusionIn` + focal core + `A^p(H)=H∩A^p(G)` equality (2026-05-25). transfer image cardinal phrasingは別 predicate化せず `APrime` equalityで保持 | ✅ |
+| 5.23 abelian Sylow ⇒ N controls p-transfer | ✅ `APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow` (2026-05-25). Lem 5.12 + 5.22 | ✅ |
 | **5.24 G simple maximal nilpotent ⇒ p-group** | mathlib 未収載. transfer + Sylow + nilpotent 引数. **BG/Peterfalvi 直接被引用無し** | 後回し可 |
 | 5.25 controls own fusion ⇔ normal p-comp | ✅ 完成 (2026-05-25). `OPrime`/`APrime` 定義 + `APrime_characteristic` + `A^p(N)=N` (`APrime_eq_top_of_eq_OPrime`) + transfer-focal kernel で Isaacs p.173 の `A^p(N)=N → Foc_N(Q)=Q` を bridge 過剰化せず実装. | ✅ |
 | **5.26 Frobenius normal p-complement** | ✅ 完成 (2026-05-25). `hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer` は 5.25 + 5.27 + 5.28 で sorry-free. 追加で Cor 5.29/5.30 共通入口 `hasNormalPComplement_of_prime_subgroups_centralize` も実装. | ✅ |
@@ -212,7 +212,7 @@ FT クリティカル度 + mathlib カバレッジ + 章内依存で並べる:
 
 1. **§5A 全 (5.1-5.4)**: mathlib `MonoidHom.transfer` のラッパー + 5.3, 5.4 を新規実装. ウォームアップ.
 2. **§5B 核 (5.5, 5.6, 5.7)**: mathlib `transfer_eq_prod_quotient_orbitRel_zpowers_quot`, `transfer_center_eq_pow`, `card_commutator_le_of_finite_commutatorSet` をラップ.
-3. **§5B 残り (5.8, 5.9, 5.10)**: 5.10 Dietzmann は新規実装が必要. 5.7 を mathlib の Schreier 経由で別証明にする選択肢もあり.
+3. **§5B 残り (5.8, 5.9, 5.10)**: 5.8/5.9 は quotient `out` 代表元版で完成. 5.10 Dietzmann は新規実装が必要だが、mathlib の Schreier 経路で 5.7 は既に閉じているため後回し可.
 4. **§5C 前半 (5.11, 5.12, 5.13, 5.14)**: 5.13 Burnside は `ker_transferSylow_isComplement'` 直接, 5.14 は `IsCyclic.isComplement'` 直接. 5.11, 5.12 は新規実装.
 5. **§5C 後半 (5.15, 5.16, 5.17)**: mathlib `IsZGroup` API でほぼ直接. 5.17 は単一 prime に分離.
 6. **§5D 核 (5.20, 5.21, 5.22, 5.23)**: **FT クリティカル**. mathlib `Focal.lean` の API を Isaacs ステートメントに橋渡し. 5.21 = BG Thm 1.17 として再述.

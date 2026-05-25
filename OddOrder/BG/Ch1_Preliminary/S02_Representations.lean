@@ -395,7 +395,7 @@ with `dim V = 2`. 以下が成立:
 (b) `char F = p ∣ |G|` ⟹ `G` の Sylow `p`-subgroup は abelian かつ
     `G'` を含む.
 
-**証明梗概** (BG L779-793, **MISSING_PAGE:29** あり): 帰納法 (|G| について).
+**証明梗概** (BG L779-793 + PDF p.29 補完): 帰納法 (|G| について).
 1. (L779-784) `G ⊆ GL(V, F)`. `G^* = G ∩ SL(V, F)`. `F` 代数閉と仮定可
    (tensor extension). `p = char F`.
 2. (L785-787) `O_q(G^*) ≠ 1` を仮定 (some prime q).
@@ -406,10 +406,20 @@ with `dim V = 2`. 以下が成立:
    `RepresentationTheory/PGroupFixedVector.lean` で構築 — mathlib
    `Representation.Coinvariants` から partial 構築可) ⟹ `W ≠ 0`.
    `dim V = 2` + `G` faithful ⟹ `dim W = dim V/W = 1`.
-4. **Case q ≠ p**: (MISSING_PAGE:29 以降) Sylow q-subgroup の coprime
-   action, induction.
-5. (L789-793, MISSING_PAGE 後の残部) `Q ⊆ GL(P)` 線型変換のうち
-   `v_1^β = λ_1·v_1`, `v_2^β = λ_2·v_2` (`λ_i^q = 1`) の形, から (a), (b).
+   `W` は `G`-invariant. `C = C_G(W) ∩ C_G(V/W)` は elementary abelian
+   p-group で, すべての p-element と `G'` を含む. よって (b).
+4. **Case q ≠ p**: Maschke + `K` abelian + `F` 代数閉より
+   `V = W₁ ⊕ W₂` (one-dimensional `FK`-modules). `x ∈ K#` の
+   固定する 1 次元部分空間は `W₁, W₂` のみ. `K ⊴ G` なので各 `g ∈ G`
+   はこれらを固定または交換するが, `|G|` が奇数なので交換できず固定する.
+   したがって `G` は abelian p'-group となり (a) を適用.
+5. 一般に `G^* ≠ 1` なら, `G^*` が p-group の場合は `O_p(G^*) ≠ 1`.
+   そうでなければ `q ≠ p` の Sylow `Q ≤ G^*` と `H = N_{G^*}(Q)` を取り,
+   `O_q(H) ≠ 1`. 前段落より `H` は abelian なので Burnside (Thm 1.18)
+   で `G^*` は `Q` の normal complement `N` を持つ. `N = 1` または
+   induction により `O_r(N) ≠ 1`, いずれも前段の normal q/r-core case に帰着.
+6. 最後に `G^* = 1` なら determinant で `G ↪ Fˣ`, よって `G` は abelian
+   p'-group.
 
 **形式化方針**:
 - mathlib `Sylow` ✓, `Matrix.GeneralLinearGroup` ✓, `Module.finrank` ✓.
@@ -419,8 +429,7 @@ with `dim V = 2`. 以下が成立:
   (~30 行) で新規構築.
 - 奇数位数: `Odd (Nat.card G)`.
 - 帰納構造: `(Nat.card G).strongRecOn` または `WellFoundedLT`.
-- MISSING_PAGE:29 内容: PDF p.28-29 を再 OCR or 別文献
-  (Aschbacher §35.4 等) で補完必要.
+- PDF p.29 は 2026-05-25 に `pdftotext -f 29 -l 29 -layout` で補完済み.
 
 **下流引用** (audit 実測):
 - §3 ×2 (Frobenius)
@@ -454,14 +463,75 @@ theorem odd_two_dim_sylow_abelian
     IsMulCommutative P ∧ commutator G ≤ (P : Subgroup G)
 ```
 
-**Lean stubs** (2026-05-24): `PGroupFixedVector` shared module skeleton 完成
+**Lean status** (2026-05-25): `PGroupFixedVector` shared module の
+`IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero` は sorry-free.
 ([OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean]
-(../../GroupTheory/RepresentationTheory/PGroupFixedVector.lean), stub),
-よって本節 Thm 2.6 (a)(b) の Lean signature を確定 + sorry 付き stub
-を配置. 残: (i) `PGroupFixedVector.invariants_ne_bot` の proof, (ii)
-帰納 + GL(2,F) 計算 + MISSING_PAGE:29 補完, (iii) `hchar` 引数の
+(../../GroupTheory/RepresentationTheory/PGroupFixedVector.lean)).
+本節 Thm 2.6 (a)(b) は Lean signature 確定済み, sorry 付き stub.
+残: (i) 帰納 + GL(2,F) 計算 + MISSING_PAGE:29 補完, (ii) `hchar` 引数の
 mathlib との型整合 (`CharP F p` vs `(ringChar F).Prime`) 確認.
 -/
+
+/-! ### §2F helper lemmas -/
+
+/-- A permutation of a two-point set with odd order is trivial.
+
+Used in BG Thm 2.6: if an odd-order group fixes or interchanges two
+one-dimensional subspaces, it must fix both. -/
+private theorem perm_fin_two_eq_one_of_odd_order
+    (σ : Equiv.Perm (Fin 2)) (hodd : Odd (orderOf σ)) : σ = 1 := by
+  have hcard : Nat.card (Equiv.Perm (Fin 2)) = 2 := by
+    rw [Nat.card_eq_fintype_card]
+    decide
+  have hdvd : orderOf σ ∣ 2 := by
+    simpa [hcard] using orderOf_dvd_natCard σ
+  have hle : orderOf σ ≤ 2 := Nat.le_of_dvd (by decide) hdvd
+  have hpos : 0 < orderOf σ := orderOf_pos σ
+  have hne2 : orderOf σ ≠ 2 := by
+    intro h
+    exact hodd.not_two_dvd_nat (by rw [h])
+  have horder : orderOf σ = 1 := by omega
+  exact orderOf_eq_one_iff.mp horder
+
+/-- An odd-order finite group acts trivially on any two-point set.
+
+This formalizes the BG p.29 step: an element of `G` cannot interchange the
+two one-dimensional `K`-submodules because that would induce a nontrivial
+permutation of order two. -/
+private theorem smul_fin_two_eq_self_of_odd_card
+    {G : Type*} [Group G] [Finite G] [MulAction G (Fin 2)]
+    (hodd : Odd (Nat.card G)) (g : G) (i : Fin 2) : g • i = i := by
+  let σ : Equiv.Perm (Fin 2) := MulAction.toPermHom G (Fin 2) g
+  have hgo : Odd (orderOf g) := hodd.of_dvd_nat (orderOf_dvd_natCard g)
+  have hσ_dvd : orderOf σ ∣ orderOf g := by
+    apply orderOf_dvd_of_pow_eq_one
+    change (MulAction.toPermHom G (Fin 2) g) ^ orderOf g = 1
+    rw [← map_pow, pow_orderOf_eq_one, map_one]
+  have hσodd : Odd (orderOf σ) := hgo.of_dvd_nat hσ_dvd
+  have hσ : σ = 1 := perm_fin_two_eq_one_of_odd_order σ hσodd
+  change σ i = i
+  rw [hσ]
+  rfl
+
+/-- In characteristic `p`, a field element whose `p^n`-th power is `1` is `1`.
+
+This is the scalar calculation used in BG Thm 2.6, q = p: the multiplicative
+group of a characteristic-`p` field has no nontrivial `p`-power torsion. -/
+private theorem eq_one_of_pow_prime_pow_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    (x : F) {n : ℕ} (hx : x ^ p ^ n = 1) : x = 1 := by
+  have hsub : (x - 1) ^ p ^ n = 0 := by
+    rw [sub_pow_char_pow_of_commute p n (Commute.one_right x), hx, one_pow, sub_self]
+  have hxsub : x - 1 = 0 := eq_zero_of_pow_eq_zero hsub
+  exact sub_eq_zero.mp hxsub
+
+/-- Unit-valued version of `eq_one_of_pow_prime_pow_eq_one`. -/
+private theorem unit_eq_one_of_pow_prime_pow_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    (u : Fˣ) {n : ℕ} (hu : u ^ p ^ n = 1) : u = 1 := by
+  ext
+  exact eq_one_of_pow_prime_pow_eq_one (p := p) (u : F) (by
+    simpa using congrArg Units.val hu)
 
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
