@@ -199,6 +199,12 @@ Coherent triple (τ_1, τ_2, τ_3)
   - 異なる character pair に対する R 集合が直交
 
 **Lean status (2026-05-26)**:
+- `OddOrder.Peterfalvi.S07.IsCoherent.nonzero` now requires an actual nonzero
+  witness `φ ∈ Z[S,A]`, matching (5.1)'s `Z[S,A] ≠ 0` condition rather than
+  the vacuous existence of `0`.
+- `mem_zSupportedSpan_iff`, `mem_zSpan_of_mem_zSupportedSpan`, and
+  `support_subset_of_mem_zSupportedSpan` expose the two projections of the
+  predicate-shaped `Z[S,A]`.
 - `OddOrder.Peterfalvi.S03.conjugateDifference_eq_zero_iff_isReal` and
   `conjugateDifference_ne_zero_iff_not_isReal` identify the §7 expression
   `χ - χ̄` with the real-character obstruction.

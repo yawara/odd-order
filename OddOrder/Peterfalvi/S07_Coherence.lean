@@ -40,6 +40,22 @@ def zSupportedSpan (S : Set (ClassFunction L ℂ)) (A : Set L) :
     Set (ClassFunction L ℂ) :=
   {φ | φ ∈ zSpan (L := L) S ∧ φ.support ⊆ A}
 
+theorem mem_zSupportedSpan_iff {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ : ClassFunction L ℂ} :
+    φ ∈ zSupportedSpan (L := L) S A ↔
+      φ ∈ zSpan (L := L) S ∧ φ.support ⊆ A :=
+  Iff.rfl
+
+theorem mem_zSpan_of_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ zSupportedSpan (L := L) S A) :
+    φ ∈ zSpan (L := L) S :=
+  hφ.1
+
+theorem support_subset_of_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ zSupportedSpan (L := L) S A) :
+    φ.support ⊆ A :=
+  hφ.2
+
 /-- An integral linear map between virtual-character lattices, represented at
 the class-function level. -/
 abbrev IntegralCharacterMap (L G : Type*) [Group L] [Group G] :=
@@ -157,7 +173,7 @@ structure IsCoherent (τ : IntegralCharacterMap L G)
     (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
-  nonzero : ∃ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A
+  nonzero : ∃ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A ∧ φ ≠ 0
   extension : IntegralCharacterMap L G
   extension_isometry : IsIntegralIsometry (L := L) (G := G) extension
   extends_on_supported :
@@ -168,6 +184,10 @@ namespace IsCoherent
 variable {τ : IntegralCharacterMap L G} {S : Set (ClassFunction L ℂ)} {A : Set L}
 variable [Fintype L] [Fintype G]
 variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+theorem exists_nonzero_supported (hτ : IsCoherent τ S A) :
+    ∃ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A ∧ φ ≠ 0 :=
+  hτ.nonzero
 
 theorem extension_agrees (hτ : IsCoherent τ S A)
     {φ : ClassFunction L ℂ} (hφ : φ ∈ zSupportedSpan (L := L) S A) :
