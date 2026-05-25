@@ -108,6 +108,14 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
 
+-- Ch.4 (Commutators): Lem 4.28 ⭐ **= BG Prop 1.6(a), FT クリティカル**
+-- coprime action + solvability ⇒ `G = C_G(A) · [G,A]`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+
+-- Ch.4 (Commutators): Lem 4.29 ⭐ **= BG Prop 1.6(b), FT クリティカル**
+-- coprime action + solvability ⇒ `[G,A,A] = [G,A]` in semidirect-product form.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one
+
 -- Ch.4 (Commutators): Cor 4.30
 -- faithful action + `[G, A, ..., A] = 1` ⇒ every prime divisor of |A| divides |G|.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
@@ -134,6 +142,15 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch04.oPiCore_compl_normalizer_eq_bot_of_oPiCore_compl_eq_bot
 -- Full 4.33: p-local `H` satisfies `O_{p'}(H) ≤ O_{p'}(G)`.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.oPiCore_compl_le_oPiCore_compl_of_isPLocal
+
+-- Ch.4 (Commutators): Thm 4.34 ⭐ **= BG Prop 1.6(d), FT クリティカル**
+-- abelian coprime action ⇒ `C_G(A) ∩ [G,A] = 1`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
+
+-- Ch.4 (Commutators): Cor 4.35 ⭐ **= BG Prop 1.6(e), FT クリティカル**
+-- abelian p-group + p'-group action fixing all order-p elements ⇒ trivial action.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
 
 -- Ch.4 (Commutators): Thm 4.36 ⭐⭐⭐ **= BG Thm 1.11, FT クリティカル**
 -- p > 2, G p-群, A p'-群 acts on G, A fixes all order-p elements ⇒ A trivial on G.

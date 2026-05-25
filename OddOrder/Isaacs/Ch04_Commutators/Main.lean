@@ -24,10 +24,10 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 部分 |
-| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 部分 |
-| 4C | A acts on G via automorphisms | 4.20 – 4.27 | TODO (coprime action machinery 要) |
-| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 部分 |
+| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 完成 |
+| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 4.9-4.13 完成; Mann 後回し |
+| 4C | A acts on G via automorphisms | 4.20 – 4.27 | 4.20-4.23, 4.25 完成; 4.24/4.26/4.27 残 |
+| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 完成 |
 
 ## Mathlib direct correspondence (no wrapper)
 
