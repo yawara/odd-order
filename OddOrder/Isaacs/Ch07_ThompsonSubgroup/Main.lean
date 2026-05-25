@@ -323,6 +323,36 @@ private theorem card_sl2_mul_units_eq_card_gl2_zmod_prime
           rw [hcard_SL_ker, hcard_range]
     _ = Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) := hker_mul_range
 
+private theorem card_gl2_zmod_prime {p : ℕ} [Fact p.Prime] :
+    Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) =
+      p * (p - 1) * (p - 1) * (p + 1) := by
+  rw [Matrix.card_GL_field (n := 2)]
+  rw [ZMod.card]
+  simp only [Fin.prod_univ_two, Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.zero_mod, pow_zero,
+    Nat.mod_succ, pow_one]
+  have h_sq_sub_one : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    simpa using Nat.sq_sub_sq p 1
+  have h_sq_sub_self : p ^ 2 - p = p * (p - 1) := by
+    calc
+      p ^ 2 - p = p * p - p * 1 := by rw [pow_two, mul_one]
+      _ = p * (p - 1) := (Nat.mul_sub_left_distrib p p 1).symm
+  rw [h_sq_sub_one, h_sq_sub_self]
+  ring
+
+private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
+    Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
+      p * (p - 1) * (p + 1) := by
+  have hp_pred_pos : 0 < p - 1 := by
+    have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
+    omega
+  apply Nat.mul_right_cancel hp_pred_pos
+  calc
+    Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) * (p - 1)
+        = Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
+          card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)
+    _ = p * (p - 1) * (p - 1) * (p + 1) := card_gl2_zmod_prime (p := p)
+    _ = (p * (p - 1) * (p + 1)) * (p - 1) := by ring
+
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
@@ -609,6 +639,8 @@ private theorem lem73_aux
         have hq_dvd_SL : q ∣
             Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) :=
           hq_dvd_L.trans hL_card_dvd_SL
+        have hq_dvd_SL_formula : q ∣ p * (p - 1) * (p + 1) := by
+          rwa [card_sl2_zmod_prime (p := p)] at hq_dvd_SL
         have hSL_card_dvd_GL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) ∣
             Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
