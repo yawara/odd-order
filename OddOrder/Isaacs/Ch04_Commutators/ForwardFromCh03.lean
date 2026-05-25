@@ -698,10 +698,11 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 /-- **Isaacs Thm 3.27**: A-invariant coset gN は C_G(A) の元を含む.
 
 `gN` が A-不変 (条件 `∀ a, ∃ n ∈ N, φ a g = g * n`) のとき, ∃ c ∈ gN かつ ∀ a, φ a c = c. -/
-theorem aInvariant_coset_mem_centralizer
-    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
-    {N : Subgroup G} (hN_inv : IsAInvariant φ N) {g : G}
+theorem aInvariant_coset_mem_centralizer_of_coprime_subgroup
+    {φ : A →* MulAut G} {N : Subgroup G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card ↥N))
+    (hSolv : IsSolvable A ∨ IsSolvable ↥N)
+    (hN_inv : IsAInvariant φ N) {g : G}
     (hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
   -- Ω := subtype of gN.
@@ -753,21 +754,12 @@ theorem aInvariant_coset_mem_centralizer
     apply Subtype.ext
     change ω₁.val * (n₂⁻¹ * n₁)⁻¹ = ω₂.val
     rw [hω₁_eq, hω₂_eq, mul_inv_rev, inv_inv, mul_assoc, ← mul_assoc n₁, mul_inv_cancel, one_mul]
-  -- Coprime |A| |N| (since |N| ∣ |G|).
-  have hCop' : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
-    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
-  -- IsSolvable A ∨ IsSolvable N.
-  have hSolv' : IsSolvable A ∨ IsSolvable ↥N := by
-    rcases hSolv with hA | hG
-    · exact Or.inl hA
-    · haveI := hG
-      exact Or.inr inferInstance
   -- Finite N.
   haveI hN_finite : Finite ↥N := Subtype.finite
   -- Apply Glauberman 3.24(a).
   obtain ⟨ω₀, hω₀_fix⟩ :=
     glauberman_fixed_point_exists (G := ↥N) (A := A) (φ := hN_inv.restrict)
-      hCop' hSolv' (Ω := Ω) hcompat hN_trans
+      hCop hSolv (Ω := Ω) hcompat hN_trans
   -- Extract: c := ω₀.val ∈ gN and ∀ a, φ a c = c.
   refine ⟨ω₀.val, ω₀.property, ?_⟩
   intro a
@@ -777,20 +769,57 @@ theorem aInvariant_coset_mem_centralizer
   have h_eq : ((a • ω₀ : Ω) : G) = (φ a) ω₀.val := rfl
   rw [← h_eq, this]
 
+/-- Backwards-compatible form of Isaacs Thm 3.27 using the stronger `(|A|, |G|)=1`
+hypothesis. -/
+theorem aInvariant_coset_mem_centralizer
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} (hN_inv : IsAInvariant φ N) {g : G}
+    (hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
+  have hCopN : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
+  have hSolvN : IsSolvable A ∨ IsSolvable ↥N := by
+    rcases hSolv with hA | hG
+    · exact Or.inl hA
+    · haveI := hG
+      exact Or.inr inferInstance
+  exact aInvariant_coset_mem_centralizer_of_coprime_subgroup
+    hCopN hSolvN hN_inv hgN_inv
+
 /-- **Isaacs Cor 3.28 (transitive blocker for Ch.4)**: 商の固定点は底群の固定点像.
 
 `N ⊴ G` A-不変, coprime + solvable のとき, `Ḡ = G/N` 上の A-fixed 元は `C_G(A)` の像と一致.
 ステートメント: A-fixed `ḡ ∈ Ḡ` ⇒ ∃ c ∈ C_G(A), c·N = g·N. -/
+theorem coprime_fixedPoints_quotient_of_coprime_normal
+    {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card ↥N))
+    (hSolv : IsSolvable A ∨ IsSolvable ↥N)
+    (hN_inv : IsAInvariant φ N) {g : G}
+    (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
+  obtain ⟨c, hc_coset, hc_fixed⟩ :=
+    aInvariant_coset_mem_centralizer_of_coprime_subgroup hCop hSolv hN_inv hg_fix
+  exact ⟨c, hc_fixed, hc_coset⟩
+
+/-- Backwards-compatible form of Isaacs Cor 3.28 using the stronger `(|A|, |G|)=1`
+hypothesis. -/
 theorem coprime_fixedPoints_quotient
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     (hSolv : IsSolvable A ∨ IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN_inv : IsAInvariant φ N) {g : G}
     (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
-  -- 3.27 のリオーダー版: (coset 性質, A-fixed) → (A-fixed, coset 性質).
-  obtain ⟨c, hc_coset, hc_fixed⟩ :=
-    aInvariant_coset_mem_centralizer hCop hSolv hN_inv hg_fix
-  exact ⟨c, hc_fixed, hc_coset⟩
+  have hCopN : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
+  have hSolvN : IsSolvable A ∨ IsSolvable ↥N := by
+    rcases hSolv with hA | hG
+    · exact Or.inl hA
+    · haveI := hG
+      exact Or.inr inferInstance
+  exact coprime_fixedPoints_quotient_of_coprime_normal
+    hCopN hSolvN hN_inv hg_fix
 
 end CosetFixed
 
