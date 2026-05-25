@@ -13,7 +13,7 @@ OddOrder/Mathlib/
   Subgroup.lean                    ★ NEW — H1, H2 helpers (汎用)
 OddOrder/GroupTheory/
   ChermakDelgado.lean              ★ NEW — §1G 本体
-OddOrder/Isaacs/Ch01_Sylow.lean    既存 §1G stub → 軽い再 export に置換 (or 削除)
+OddOrder/Isaacs/Ch01_Sylow/Main.lean    既存 §1G stub → 軽い再 export に置換 (or 削除)
 ```
 
 理由:
@@ -25,7 +25,7 @@ OddOrder/Isaacs/Ch01_Sylow.lean    既存 §1G stub → 軽い再 export に置�
   `chermakDelgadoSubgroup`) は **Isaacs §1G 主題でもあり mathlib upstream 概念でもある**.
   `OddOrder/GroupTheory/` は「将来 mathlib upstream 視野の shared concept」(`IsElementaryAbelian`,
   `Subgroup.thompsonJ` と同じパターン).
-- `Ch01_Sylow.lean`: 既存 §1G stub (L3196-3215) は本実装後, **`import` + 1 行 re-export +
+- `Ch01_Sylow/Main.lean`: 既存 §1G stub (L3196-3215) は本実装後, **`import` + 1 行 re-export +
   docstring** に置換. これで 1 章 = 1 ファイル規約も保たれる.
 
 ## 2. `OddOrder/Mathlib/Subgroup.lean` 内容
@@ -212,7 +212,7 @@ end Subgroup
 - **`IsMulCommutative` vs `IsAbelian`**: mathlib では `Subgroup.IsMulCommutative H` が abelian
   subgroup の標準形 (`Centralizer.lean:89` 等). `IsCommutative` 削除済 (mathlib 最近の rename).
 
-## 4. 既存 §1G stub (`Ch01_Sylow.lean:3196-3215`) の処理
+## 4. 既存 §1G stub (`Ch01_Sylow/Main.lean:3196-3215`) の処理
 
 選択肢 A: **削除** (file 分離, §1G 内容は `OddOrder.GroupTheory.ChermakDelgado` で完結).
 選択肢 B: **import + re-export** (1 章 = 1 ファイル規約整合):
@@ -258,7 +258,7 @@ Step 4 [~30 LOC]  Thm 1.44 (a), (b), (c)
 Step 5 [~30 LOC]  Cor 1.45 + characteristic instance
 Step 6 [~20 LOC]  Thm 1.41 (Cor 1.45 から index 計算)
 Step 7 [~20 LOC]  Cor 1.46
-Step 8 [~5 LOC]   Ch01_Sylow.lean §1G stub を re-export 形に書き換え
+Step 8 [~5 LOC]   Ch01_Sylow/Main.lean §1G stub を re-export 形に書き換え
 
 Step 9 (任意)     mathlib upstream PR 準備 (Phase 1 完成後)
 ```
@@ -293,7 +293,7 @@ Step 9 (任意)     mathlib upstream PR 準備 (Phase 1 完成後)
 
 - 元 audit: [`ch01_audit_2026_05_23.md`](ch01_audit_2026_05_23.md)
 - 元 ch.1 note: [`../isaacs/ch01_sylow.md`](../isaacs/ch01_sylow.md)
-- §1F (Brodkey, Chermak-Delgado の corollary): `Ch01_Sylow.lean:2900-3195` 既実装
+- §1F (Brodkey, Chermak-Delgado の corollary): `Ch01_Sylow/Main.lean:2900-3195` 既実装
   (`exists_pair_inf_eq_opCore_of_abelian`, `index_opCore_le_index_sylow_sq`)
 - mathlib 配置慣用: [`forward_dep_policy.md`](forward_dep_policy.md),
   [`chapter_investigation_framework.md`](chapter_investigation_framework.md) §6.3

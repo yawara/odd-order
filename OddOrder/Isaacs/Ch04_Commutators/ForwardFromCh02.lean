@@ -2,7 +2,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
 import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch02_Subnormality
+import OddOrder.Isaacs.Ch02_Subnormality.Main
 
 open scoped commutatorElement Pointwise
 

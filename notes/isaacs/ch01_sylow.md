@@ -1,7 +1,7 @@
 # Isaacs Ch.1: Sylow Theory — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.1 (pp. 1-44).
-形式化先: [`OddOrder/Isaacs/Ch01_Sylow.lean`](../../OddOrder/Isaacs/Ch01_Sylow.lean).
+形式化先: [`OddOrder/Isaacs/Ch01_Sylow/Main.lean`](../../OddOrder/Isaacs/Ch01_Sylow/Main.lean).
 
 ## 全 46 定理の分布 + 進捗
 

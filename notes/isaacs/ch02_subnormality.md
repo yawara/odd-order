@@ -1,12 +1,12 @@
 # Isaacs Ch.2: Subnormality — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.2 (pp. 45-64).
-形式化先: [`OddOrder/Isaacs/Ch02_Subnormality.lean`](../../OddOrder/Isaacs/Ch02_Subnormality.lean).
+形式化先: [`OddOrder/Isaacs/Ch02_Subnormality/Main.lean`](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 952-2123.
 
 ## 進捗 (2026-05-24 更新)
 
-**Ch.2 本体は sorry-free / axiom-free** (`Ch02_Subnormality.lean` 内に live `sorry` も `axiom` も無し).
+**Ch.2 本体は sorry-free / axiom-free** (`Ch02_Subnormality/Main.lean` 内に live `sorry` も `axiom` も無し).
 §2A 完成 (Thm 2.11 ✅). §2B 完成 (Lemma 2.14 は Matsuyama 用の焦点形式). **§2C 完成** (IsPLocal/IsLocal + Lemma 2.16 + Thm 2.15 + Lemma 2.17). §2D 完成 (Cor 2.19, Thm 2.18 Zenkov, Lucchini K > ⊥ structural reduction).
 
 **§2D 詳細**:

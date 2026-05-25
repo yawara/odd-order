@@ -9,7 +9,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Solvable
 import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup

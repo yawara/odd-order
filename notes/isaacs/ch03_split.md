@@ -1,7 +1,7 @@
 # Isaacs Ch.3: Split Extensions — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.3 (pp. 65-112) — Hall, Schur-Zassenhaus, coprime action。
-形式化先: [`OddOrder/Isaacs/Ch03_SplitExtensions.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean).
+形式化先: [`OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 1322-2123。
 
 ## 進捗 (2026-05-25 更新)

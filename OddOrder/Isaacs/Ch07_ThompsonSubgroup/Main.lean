@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Tactic.LinearCombination
 import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.Isaacs.Ch02_Subnormality
+import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!

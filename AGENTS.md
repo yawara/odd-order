@@ -20,9 +20,9 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 
 ### ファイル粒度
 
-- **Isaacs: 1 章 = 1 ファイル** (例: `OddOrder/Isaacs/Ch01_Sylow.lean`)
+- **Isaacs: 1 章 = 1 ディレクトリ**。入口は `Main.lean` (例: `OddOrder/Isaacs/Ch01_Sylow/Main.lean`)
 - **BG / Peterfalvi: 1 節 (§) = 1 ファイル** (例: `OddOrder/BG/Ch1_Preliminary/S03_FrobeniusActions.lean`)
-- 1500-2000 行を超えたら subsection 単位でディレクトリに昇格 (`Ch01_Sylow.lean` → `Ch01_Sylow/A_Existence.lean` + ...)。**先回り分割はしない**。
+- 章本体の `Main.lean` が 1500-2000 行を超えたら、subsection 単位の補助ファイルを同じ章ディレクトリ配下に切り出し、`Main.lean` から import する (`Ch01_Sylow/Main.lean` → `Ch01_Sylow/A_Existence.lean` + ...)。**先回り分割はしない**。
 
 ### トレーサビリティ (3 層)
 

@@ -128,7 +128,7 @@ CLAUDE.md 規約の以下の組:
 2. `section /- 1A: ラベル (pp. 1-10) -/` — subsection 構造ミラー
 3. `theorem` の docstring 冒頭 `**Isaacs Thm 1.4** (慣用名)` — 番号と慣用名
 
-500 行を超えた `Ch01_Sylow.lean` でも `grep "Thm 1.18"` で 1 秒で navigate.
+500 行を超えた `Ch01_Sylow/Main.lean` でも `grep "Thm 1.18"` で 1 秒で navigate.
 **新しい theorem を追加する時は必ずこの 3 層を埋めてから本体を書く**.
 
 ### 2.5 mathlib 互換命名
@@ -138,7 +138,7 @@ CLAUDE.md 規約: 識別子に **番号を入れない** (`thm_1_4` NG), 記述�
 
 ### 2.6 ファイル粒度
 
-Isaacs: 1 章 = 1 ファイル, 1500-2000 行で subsection 単位に分割.  
+Isaacs: 1 章 = 1 ディレクトリ, 入口は `Main.lean`. 1500-2000 行で subsection 単位に分割.
 BG / Peterfalvi: 1 節 = 1 ファイル. **先回り分割しない** — 育つかどうかは事前に読めない.
 
 ### 2.7 mathlib ラッパー方針 (2026-05-21 確定)
@@ -246,7 +246,7 @@ class formula で `Nat.card (Sylow p G) = Σ orbit_sizes` の和への変換は�
 固定点軌道 `{S}` を分離し残りを `(mod |S:S⊓T|)` で計算する Finset 操作 + `Quotient.out` の扱いがトリッキー.
 さらに `(stabilizer ↥S P : Subgroup ↥S)` を `S ⊓ P` の subtype と関連付ける `subgroupOf` の Nat.card 変換が必要. 60-80 行が見込まれる.
 
-参考実装: mathlib 内 `Sylow.card_modEq_card_normalizer` 系 (Sylow.lean:540-610) の類似 pattern. 詳細 TODO は OddOrder/Isaacs/Ch01_Sylow.lean L262- に breadcrumbs 込みで残してある.
+参考実装: mathlib 内 `Sylow.card_modEq_card_normalizer` 系 (Sylow.lean:540-610) の類似 pattern. 詳細 TODO は OddOrder/Isaacs/Ch01_Sylow/Main.lean L262- に breadcrumbs 込みで残してある.
 
 ---
 

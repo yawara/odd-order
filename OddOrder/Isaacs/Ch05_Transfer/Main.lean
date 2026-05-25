@@ -7,7 +7,7 @@ import Mathlib.GroupTheory.Transfer
 import Mathlib.GroupTheory.Focal
 import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
-import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 
 open scoped commutatorElement
 

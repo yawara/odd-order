@@ -12,7 +12,7 @@ import Mathlib.GroupTheory.Solvable
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Mathlib.Subgroup
 import OddOrder.Mathlib.SchurZassenhausConj
-import OddOrder.Isaacs.Ch02_Subnormality
+import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!

@@ -1,7 +1,7 @@
 # Isaacs §1D Fitting Subgroup `F(G)` — 設計ノート
 
 **スコープ**: Isaacs §1D の主要新規実装、Phase 1 で mathlib に無く本プロジェクト
-初の本格的な新規定義。形式化先: [`OddOrder/Isaacs/Ch01_Sylow.lean`](../../OddOrder/Isaacs/Ch01_Sylow.lean) §1D 内。
+初の本格的な新規定義。形式化先: [`OddOrder/Isaacs/Ch01_Sylow/Main.lean`](../../OddOrder/Isaacs/Ch01_Sylow/Main.lean) §1D 内。
 親ノート: [`ch01_sylow.md`](ch01_sylow.md).
 
 ## Isaacs における定義 (本書 p.27 §1D)
@@ -145,7 +145,7 @@ noncomputable def fitting (G : Type*) [Group G] : Subgroup G :=
 
 ## ファイル分割
 
-§1D が大きくなりそうなので、現在の `Ch01_Sylow.lean` 内で 1500 行を超えたら
+§1D が大きくなりそうなので、現在の `Ch01_Sylow/Main.lean` 内で 1500 行を超えたら
 [CLAUDE.md](../../CLAUDE.md) の規約通り `Ch01_Sylow/` ディレクトリに分割する。
 分割時の候補:
 

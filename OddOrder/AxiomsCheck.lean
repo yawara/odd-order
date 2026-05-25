@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 import Lean
 import OddOrder.GroupTheory.ChermakDelgado
-import OddOrder.Isaacs.Ch02_Subnormality
-import OddOrder.Isaacs.Ch03_SplitExtensions
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch05_Transfer
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # Axioms check for chapter flagship theorems

@@ -17,9 +17,9 @@ created: 2026-05-24
 | ファイル | 警告内容 | 数 |
 |---|---|---|
 | `OddOrder/Mathlib/Subgroup.lean` | `show` → `change` | 1 |
-| `OddOrder/Isaacs/Ch01_Sylow.lean` | `simp at` flexible tactic | 2 |
-| `OddOrder/Isaacs/Ch02_Subnormality.lean` | `show` → `change`, `push_neg` deprecated, 100 文字超 | 7-8 |
-| `OddOrder/Isaacs/Ch03_SplitExtensions.lean` | `show`, `simpa` → `simp`, unused simp args | 10+ |
+| `OddOrder/Isaacs/Ch01_Sylow/Main.lean` | `simp at` flexible tactic | 2 |
+| `OddOrder/Isaacs/Ch02_Subnormality/Main.lean` | `show` → `change`, `push_neg` deprecated, 100 文字超 | 7-8 |
+| `OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean` | `show`, `simpa` → `simp`, unused simp args | 10+ |
 | `OddOrder/Mathlib/SchurZassenhausConj.lean` | `show`, unused section vars, `push_neg` deprecated, 100 文字超, unused simp args | ~20+ |
 
 合計 ~40 件規模.
@@ -42,16 +42,16 @@ created: 2026-05-24
 ## 完了メモ
 
 `lake build OddOrder.AxiomsCheck` で以下の 0007 対象ファイルから warning が消えたことを確認:
-`OddOrder/Mathlib/Subgroup.lean`, `OddOrder/Isaacs/Ch01_Sylow.lean`,
-`OddOrder/Isaacs/Ch02_Subnormality.lean`, `OddOrder/Isaacs/Ch03_SplitExtensions.lean`,
+`OddOrder/Mathlib/Subgroup.lean`, `OddOrder/Isaacs/Ch01_Sylow/Main.lean`,
+`OddOrder/Isaacs/Ch02_Subnormality/Main.lean`, `OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean`,
 `OddOrder/Mathlib/SchurZassenhausConj.lean`.
 
 残る warning は Ch.4/Ch.5 側で, 本 issue の対象外.
 
 ## 参照
 
-- [OddOrder/Isaacs/Ch01_Sylow.lean](../OddOrder/Isaacs/Ch01_Sylow.lean)
-- [OddOrder/Isaacs/Ch02_Subnormality.lean](../OddOrder/Isaacs/Ch02_Subnormality.lean)
-- [OddOrder/Isaacs/Ch03_SplitExtensions.lean](../OddOrder/Isaacs/Ch03_SplitExtensions.lean)
+- [OddOrder/Isaacs/Ch01_Sylow/Main.lean](../OddOrder/Isaacs/Ch01_Sylow/Main.lean)
+- [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
+- [OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
 - [OddOrder/Mathlib/Subgroup.lean](../OddOrder/Mathlib/Subgroup.lean)
 - [OddOrder/Mathlib/SchurZassenhausConj.lean](../OddOrder/Mathlib/SchurZassenhausConj.lean)

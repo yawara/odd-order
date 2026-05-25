@@ -9,7 +9,7 @@ created: 2026-05-24
 
 ## 背景
 
-[Ch03_SplitExtensions.lean](../OddOrder/Isaacs/Ch03_SplitExtensions.lean) の
+[Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) の
 `piLength_le_one_of_abelian_pi_hall` は現状 fake placeholder:
 
 ```lean
@@ -56,12 +56,12 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
 
 - [x] `piLength_le_one_of_abelian_pi_hall` の戻り値型が `True` でない
 - [x] 実 body が `trivial` でなく, 数学的内容を持つ証明
-- [x] `lake build OddOrder.Isaacs.Ch03_SplitExtensions` が通る
+- [x] `lake build OddOrder.Isaacs.Ch03_SplitExtensions.Main` が通る
 - [x] `lake build OddOrder.AxiomsCheck` が通る
 
 ## 参照
 
-- [Ch03_SplitExtensions.lean](../OddOrder/Isaacs/Ch03_SplitExtensions.lean)
+- [Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
 - [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3D
 - Isaacs FGT p.95 (Thm 3.22)
 - 前提 issue: [`0005`](closed/0005-isaacs-3d-pi-separable-redefine.md),

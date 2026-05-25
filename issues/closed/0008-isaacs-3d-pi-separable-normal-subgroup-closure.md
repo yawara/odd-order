@@ -71,6 +71,6 @@ cardinality (π-group ⊓ π'-group = ⊥, 有限群で primeFactors 共通な�
 
 - 親 issue: [`closed/0005`](0005-isaacs-3d-pi-separable-redefine.md) (`IsPiSeparable` 正式定義).
 - 前回 commit: `25281b5` (helpers + quotient closure).
-- [Ch03_SplitExtensions.lean §3D](../../OddOrder/Isaacs/Ch03_SplitExtensions.lean) (`piFittingSeries` 周辺).
+- [Ch03_SplitExtensions/Main.lean §3D](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (`piFittingSeries` 周辺).
 - Isaacs FGT pp.89-95 §3D.
 - mathlib `Subgroup.inf_eq_bot_of_coprime` (`PGroup.lean:316`).

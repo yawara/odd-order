@@ -1,7 +1,7 @@
 # Isaacs Ch.5: Transfer — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.5 (pp. 147-180).
-形式化先 (予定): `OddOrder/Isaacs/Ch05_Transfer.lean` (未作成).
+形式化先 (予定): `OddOrder/Isaacs/Ch05_Transfer/Main.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 2799-3312.
 ROADMAP 上の位置: **第 4 波 (Ch.4 後の Ch.4 → Ch.5 → Ch.6 シーケンス)** — 前提は Ch.3 (Hall), Ch.4 (Commutators) 中心. mmd には "Transfer is mathlib 既存で速い" と注記済.
 

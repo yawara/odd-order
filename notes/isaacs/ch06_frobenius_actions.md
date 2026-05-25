@@ -1,7 +1,7 @@
 # Isaacs Ch.6: Frobenius Actions — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.6 (pp. 177-200).
-形式化先 (予定): `OddOrder/Isaacs/Ch06_FrobeniusActions.lean` (未作成).
+形式化先 (予定): `OddOrder/Isaacs/Ch06_FrobeniusActions/Main.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 3313-3712.
 ROADMAP 上の位置: **第 4 波 (Ch.4 → Ch.5 → Ch.6 シーケンス)** — Ch.6 → Ch.7 (Thompson, ZJ) と Ch.10 (More Transfer) への分岐点で **Phase 1 の山場の入口**. 前提は Ch.3 (Hall + coprime action, 特に Thm 3.23 A-invariant Sylow) + Ch.4 + Ch.5 (Thm 5.26 Frobenius normal p-complement).
 
@@ -216,7 +216,7 @@ FT クリティカル度 + 章内依存で並べる:
 
 ## 進捗 (2026-05-23 開始)
 
-ファイル: [`OddOrder/Isaacs/Ch06_FrobeniusActions.lean`](../../OddOrder/Isaacs/Ch06_FrobeniusActions.lean) 新規作成.
+ファイル: [`OddOrder/Isaacs/Ch06_FrobeniusActions/Main.lean`](../../OddOrder/Isaacs/Ch06_FrobeniusActions/Main.lean) 新規作成.
 
 **完成済 (no preceding-chapter dep)**:
 - `IsFrobeniusAction A N : Prop` — action ベース定義 (Isaacs p.177).

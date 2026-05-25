@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch01_Sylow
+import OddOrder.Isaacs.Ch01_Sylow.Main
 
 open OddOrder.Isaacs.Ch01
 
@@ -158,7 +158,7 @@ theorem isMinimalNormal_le_socle {M : Subgroup G} (hM : IsMinimalNormal M) :
   le_iSup (fun M : {M : Subgroup G // IsMinimalNormal M} => (M : Subgroup G)) ⟨M, hM⟩
 
 /-- `Soc(G)` は `G` の正規部分群. 各 minimal normal の正規性を `iSup_induction` で
-全体に持ち上げる. テンプレートは [`Ch01_Sylow.lean` `fitting.normal`](Ch01_Sylow.lean#L834). -/
+全体に持ち上げる. テンプレートは [`Ch01_Sylow/Main.lean` `fitting.normal`](Ch01_Sylow/Main.lean#L834). -/
 instance socle.normal : (socle G).Normal := by
   refine ⟨fun n hn g => ?_⟩
   refine Subgroup.iSup_induction _ (C := fun x => g * x * g⁻¹ ∈ socle G) hn

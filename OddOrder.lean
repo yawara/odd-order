@@ -10,11 +10,11 @@ import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
-import OddOrder.Isaacs.Ch01_Sylow
-import OddOrder.Isaacs.Ch02_Subnormality
-import OddOrder.Isaacs.Ch03_SplitExtensions
-import OddOrder.Isaacs.Ch05_Transfer
-import OddOrder.Isaacs.Ch06_FrobeniusActions
+import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
