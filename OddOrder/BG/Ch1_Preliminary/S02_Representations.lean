@@ -978,6 +978,74 @@ private theorem subgroup_commutative_of_rank_one_subquotients
     (subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
       H W ρ hH hW hdimW hdimQ h.property)
 
+/-- A scalar character into a field's unit group kills the commutator subgroup. -/
+private theorem commutator_le_ker_of_units_character
+    {F : Type*} [Field F] {G : Type*} [Group G] (φ : G →* Fˣ) :
+    commutator G ≤ φ.ker := by
+  rw [_root_.commutator_def, Subgroup.commutator_le]
+  intro x _hx y _hy
+  rw [MonoidHom.mem_ker, map_commutatorElement]
+  exact commutatorElement_eq_one_iff_mul_comm.mpr (mul_comm (φ x) (φ y))
+
+/-- If `G` preserves a rank-one submodule and rank-one quotient, then `G'`
+acts trivially on both.
+
+This is the `G' ≤ C_G(W) ∩ C_G(V/W)` half of BG Thm 2.6, q = p.  Unlike the
+p-subgroup bridge above, it does not use characteristic `p`: scalar characters
+to `Fˣ` kill commutators because `Fˣ` is abelian. -/
+private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    commutator G ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  let φW : G →* Fˣ :=
+    scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW)
+  let φQ : G →* Fˣ :=
+    scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW)
+  have hkerW : commutator G ≤ φW.ker :=
+    commutator_le_ker_of_units_character φW
+  have hkerQ : commutator G ≤ φQ.ker :=
+    commutator_le_ker_of_units_character φQ
+  intro g hg
+  rw [mem_fixedOnSubmoduleAndQuotientSubgroup]
+  constructor
+  · intro w hw
+    have hφW : φW g = 1 := MonoidHom.mem_ker.mp (hkerW hg)
+    have hsub :=
+      scalarCharacterOfFinrankEqOne_apply_smul hdimW
+        (ρ.subrepresentation W hW) g ⟨w, hw⟩
+    calc
+      ρ g w = (φW g : F) • w := congrArg Subtype.val hsub
+      _ = w := by simp [hφW]
+  · intro v
+    have hφQ : φQ g = 1 := MonoidHom.mem_ker.mp (hkerQ hg)
+    have hq :=
+      scalarCharacterOfFinrankEqOne_apply_smul hdimQ (ρ.quotient W hW) g
+        (Submodule.Quotient.mk v : V ⧸ W)
+    change Submodule.Quotient.mk (ρ g v) =
+      (φQ g : F) • (Submodule.Quotient.mk v : V ⧸ W) at hq
+    have hq_one :
+        (Submodule.Quotient.mk (ρ g v) : V ⧸ W) =
+          (Submodule.Quotient.mk v : V ⧸ W) := by
+      simpa [hφQ] using hq
+    simpa [Submodule.Quotient.eq] using hq_one
+
+/-- Two-dimensional form of
+`commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
+private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdim : Module.finrank F V = 2) (hW_ne_bot : W ≠ ⊥) (hW_ne_top : W ≠ ⊤) :
+    commutator G ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  rcases rank_one_subquotients_of_finrank_two W hdim hW_ne_bot hW_ne_top with
+    ⟨hdimW, hdimQ⟩
+  exact commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+    W ρ hW hdimW hdimQ
+
 /-- Two-dimensional wrapper for
 `subgroup_commutative_of_rank_one_subquotients`.
 
@@ -1080,6 +1148,40 @@ private theorem subgroup_commutative_of_nontrivial_normal_p_fixed_space
     Std.Commutative (· * · : H → H → H) :=
   subgroup_commutative_of_normal_p_fixed_space_proper K H ρ hfaithful hK hH hdim
     (invariants_ne_top_of_faithful_subgroup_ne_bot K ρ hfaithful hK_ne_bot)
+
+/-- Nontrivial-normal-p-subgroup form of
+`commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two`.
+
+This packages the `G' ≤ C_G(W) ∩ C_G(V/W)` bridge for the same
+`W = C_V(K)` used in BG Thm 2.6, q = p. -/
+private theorem
+    commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Module.Finite F V]
+    (K : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K)
+    (hdim : Module.finrank F V = 2) (hK_ne_bot : K ≠ ⊥) :
+    commutator G ≤
+      fixedOnSubmoduleAndQuotientSubgroup
+        (Representation.invariants (ρ.comp K.subtype)) ρ := by
+  let W : Submodule F V := Representation.invariants (ρ.comp K.subtype)
+  have hV_ne_bot : (⊤ : Submodule F V) ≠ ⊥ := by
+    intro hbot
+    have htop : Module.finrank F (⊤ : Submodule F V) = 2 := by
+      simp [hdim]
+    have hzero : Module.finrank F (⊤ : Submodule F V) = 0 := by
+      rw [hbot, finrank_bot]
+    omega
+  have hW_ne_bot : W ≠ ⊥ := by
+    simpa [W] using hK.invariants_ne_bot (ρ.comp K.subtype) hV_ne_bot
+  have hW_ne_top : W ≠ ⊤ := by
+    simpa [W] using invariants_ne_top_of_faithful_subgroup_ne_bot K ρ hfaithful hK_ne_bot
+  have hW_invariant : ∀ g : G, W ≤ W.comap (ρ g) := by
+    intro g
+    exact Representation.le_comap_invariants ρ K g
+  exact commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
+    W ρ hW_invariant hdim hW_ne_bot hW_ne_top
 
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.

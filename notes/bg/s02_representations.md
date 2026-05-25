@@ -57,6 +57,12 @@
   `invariants_ne_top_of_faithful_subgroup_ne_bot` と、それを使う直結版
   `subgroup_commutative_of_nontrivial_normal_p_fixed_space` を追加済み.
   q=p 分岐は非自明 normal p-subgroup `K` を構成できれば p-subgroup 可換性まで閉じる.
+- **2026-05-25**: rank-one submodule/quotient への scalar character が commutator を殺すことから、
+  `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`,
+  2 次元版 `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two`,
+  normal p-subgroup fixed-space 版
+  `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space`
+  を追加済み. q=p 分岐の `G' ≤ C_G(W) ∩ C_G(V/W)` 接続は Lean helper として閉じた.
 
 ## TL;DR
 
@@ -402,6 +408,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
-- q=p 分岐の `W = C_V(K)` が非零 proper かつ G-invariant になる段を小補題化する.
-- その後、p-elements と `G'` が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
+- q=p 分岐で非自明 normal p-subgroup `K` を作る段を小補題化する.
+- その後、p-elements / Sylow p-subgroup が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
