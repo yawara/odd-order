@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.GroupTheory.FiniteAbelian.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
@@ -502,11 +503,111 @@ private theorem cyclic_two_group_mulAut_isPGroup
     rw [IsCyclic.card_mulAut, hk, Nat.totient_prime_pow_succ Nat.prime_two]
     norm_num
 
+private theorem zmod_two_power_half_order_two {k : ℕ} (hk : 0 < k) :
+    orderOf (Multiplicative.ofAdd ((2 ^ (k - 1) : ℕ) : ZMod (2 ^ k))) = 2 := by
+  rw [orderOf_ofAdd_eq_addOrderOf]
+  rw [ZMod.addOrderOf_coe (2 ^ (k - 1)) (pow_ne_zero k (by norm_num : (2 : ℕ) ≠ 0))]
+  rw [Nat.gcd_eq_right (pow_dvd_pow 2 (Nat.sub_le k 1))]
+  have hpow : 2 ^ k = 2 ^ (k - 1) * 2 := by
+    rw [← pow_succ, Nat.sub_add_cancel hk]
+  rw [hpow]
+  exact Nat.mul_div_right _ (pow_pos (by norm_num : 0 < 2) _)
+
+private theorem zmod_eq_two_power_half_order_two {n k : ℕ} (hn : n = 2 ^ k) (hk : 0 < k) :
+    orderOf (Multiplicative.ofAdd ((2 ^ (k - 1) : ℕ) : ZMod n)) = 2 := by
+  subst n
+  exact zmod_two_power_half_order_two (k := k) hk
+
+private theorem isCyclic_pi_of_subsingleton
+    {ι : Type*} [Subsingleton ι]
+    {M : ι → Type*} [∀ i, Group (M i)] [∀ i, IsCyclic (M i)] :
+    IsCyclic (∀ i, M i) := by
+  by_cases hι : Nonempty ι
+  · classical
+    rcases hι with ⟨i⟩
+    haveI : Unique ι := uniqueOfSubsingleton i
+    let e : (∀ i, M i) ≃* M default :=
+      { toEquiv := Equiv.piUnique M
+        map_mul' := fun _ _ => rfl }
+    exact e.isCyclic.mpr inferInstance
+  · haveI : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
+    exact isCyclic_of_subsingleton
+
 private theorem isCyclic_of_comm_two_group_unique_order_two
     {G : Type*} [CommGroup G] [Finite G] (hG : IsPGroup 2 G)
     (huniq : ∀ x y : G, orderOf x = 2 → orderOf y = 2 → x = y) :
     IsCyclic G := by
-  sorry
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨ι, _, n, hn_gt, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite G
+  let T := (i : ι) → Multiplicative (ZMod (n i))
+  have hn_pow : ∀ i : ι, ∃ k, n i = 2 ^ k := by
+    intro i
+    let gen : T := Pi.mulSingle i (Multiplicative.ofAdd (1 : ZMod (n i)))
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp hG) (e.symm gen)
+    refine ⟨k, ?_⟩
+    have horder : orderOf (e.symm gen) = n i := by
+      rw [← e.orderOf_eq (e.symm gen)]
+      simp [gen, orderOf_piMulSingle, orderOf_ofAdd_eq_addOrderOf, ZMod.addOrderOf_one]
+    exact horder.symm.trans hk
+  have hι_sub : Subsingleton ι := by
+    by_contra hnot
+    haveI : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
+    obtain ⟨i, j, hij⟩ := exists_pair_ne ι
+    obtain ⟨ki, hki⟩ := hn_pow i
+    obtain ⟨kj, hkj⟩ := hn_pow j
+    have hki_pos : 0 < ki := by
+      cases ki with
+      | zero =>
+          have : 1 < (1 : ℕ) := by simpa [hki] using hn_gt i
+          omega
+      | succ ki => exact Nat.succ_pos _
+    have hkj_pos : 0 < kj := by
+      cases kj with
+      | zero =>
+          have : 1 < (1 : ℕ) := by simpa [hkj] using hn_gt j
+          omega
+      | succ kj => exact Nat.succ_pos _
+    let ai : Multiplicative (ZMod (n i)) :=
+      Multiplicative.ofAdd ((2 ^ (ki - 1) : ℕ) : ZMod (n i))
+    let aj : Multiplicative (ZMod (n j)) :=
+      Multiplicative.ofAdd ((2 ^ (kj - 1) : ℕ) : ZMod (n j))
+    have hai_order : orderOf ai = 2 := by
+      simpa [ai] using zmod_eq_two_power_half_order_two (n := n i) (k := ki) hki hki_pos
+    have haj_order : orderOf aj = 2 := by
+      simpa [aj] using zmod_eq_two_power_half_order_two (n := n j) (k := kj) hkj hkj_pos
+    let xi : T := Pi.mulSingle i ai
+    let xj : T := Pi.mulSingle j aj
+    have hxi_order : orderOf xi = 2 := by
+      simpa [xi, hai_order] using
+        (orderOf_piMulSingle
+          (M := fun t : ι => Multiplicative (ZMod (n t))) (i := i) (g := ai))
+    have hxj_order : orderOf xj = 2 := by
+      simpa [xj, haj_order] using
+        (orderOf_piMulSingle
+          (M := fun t : ι => Multiplicative (ZMod (n t))) (i := j) (g := aj))
+    have hxi_ne_xj : xi ≠ xj := by
+      intro h
+      have hi_coord := congrFun h i
+      have hai_ne_one : ai ≠ 1 := by
+        intro hai
+        have : orderOf ai = 1 := by simp [hai]
+        omega
+      apply hai_ne_one
+      simpa [xi, xj, hij] using hi_coord
+    have hpre_eq : e.symm xi = e.symm xj :=
+      huniq (e.symm xi) (e.symm xj)
+        (by
+          rw [← e.orderOf_eq (e.symm xi)]
+          simpa using hxi_order)
+        (by
+          rw [← e.orderOf_eq (e.symm xj)]
+          simpa using hxj_order)
+    exact hxi_ne_xj (by simpa using congrArg e hpre_eq)
+  have htarget : IsCyclic T := by
+    haveI : Subsingleton ι := hι_sub
+    exact isCyclic_pi_of_subsingleton
+  exact e.isCyclic.mpr htarget
 
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
