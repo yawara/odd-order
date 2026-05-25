@@ -453,5 +453,9 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `G*` が非自明 p-group の分岐を
   `sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup`
   に集約済み.
-- 次 frontier は `G* ≠ ⊥` の場合に `O_p(G*)` から非自明 normal p-subgroup
-  を作る段. ここは Fitting / p-core API 調査が必要.
+- `O_p(G*) ≠ ⊥` なら Ch.1 `opCore` の characteristic-in-normal を使って
+  `G` の非自明 normal p-subgroup を作る bridge
+  `sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot`
+  も sorry-free.
+- 次 frontier は BG proof の group-theoretic dichotomy:
+  `G* ≠ ⊥` から適切な `q` で `O_q(G*) ≠ ⊥` を得る段.

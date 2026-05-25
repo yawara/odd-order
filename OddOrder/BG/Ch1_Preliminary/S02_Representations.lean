@@ -13,6 +13,7 @@ import Mathlib.GroupTheory.Sylow
 import Mathlib.LinearAlgebra.Determinant
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # BG §2: General Results on Representations
@@ -1588,6 +1589,45 @@ private theorem sylow_commutative_and_commutator_le_of_nontrivial_determinantKer
     determinantKernelSubgroup_normal ρ
   exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
     (determinantKernelSubgroup ρ) ρ hfaithful hdet_p hdim hdet_ne_bot P
+
+/-- q = p endpoint when `O_p(G*)` is nontrivial.
+
+Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
+`G* ⊴ G`, its image in `G` is a nontrivial normal p-subgroup and can be fed to
+the fixed-space reduction. -/
+private theorem sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hop_ne_bot : OddOrder.Isaacs.Ch01.opCore p (determinantKernelSubgroup ρ) ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let K : Subgroup G := (OddOrder.Isaacs.Ch01.opCore p Gstar).map Gstar.subtype
+  haveI : Gstar.Normal := by
+    dsimp [Gstar]
+    exact determinantKernelSubgroup_normal ρ
+  haveI : (OddOrder.Isaacs.Ch01.opCore p Gstar).Characteristic :=
+    OddOrder.Isaacs.Ch01.opCore.characteristic p Gstar
+  have hKnormal : K.Normal := by
+    dsimp [K]
+    infer_instance
+  have hKp : IsPGroup p K := by
+    dsimp [K]
+    exact (OddOrder.Isaacs.Ch01.opCore_isPGroup p Gstar).map Gstar.subtype
+  have hK_ne_bot : K ≠ ⊥ := by
+    intro hK_bot
+    apply hop_ne_bot
+    have hmap :
+        (OddOrder.Isaacs.Ch01.opCore p Gstar).map Gstar.subtype =
+          (⊥ : Subgroup Gstar).map Gstar.subtype := by
+      simpa [K] using hK_bot
+    exact (Subgroup.map_subtype_inj (H := Gstar)).mp hmap
+  exact sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgroup
+    ρ hfaithful hdim ⟨K, hKnormal, hKp, hK_ne_bot⟩ P
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup
