@@ -104,11 +104,24 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
 
+-- Ch.4 (Commutators): Cor 4.30
+-- faithful action + `[G, A, ..., A] = 1` ⇒ every prime divisor of |A| divides |G|.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
+
+-- Ch.4 (Commutators): Thm 4.31 (external direct-product form)
+-- P p-group, Q p'-group, Q fixes all P-fixed elements ⇒ Q acts trivially.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_31_external
+
 -- Ch.4 (Commutators): Lem 4.32 (両半) P p-群 on G p-群 nontrivial
 -- 前半: Γ = G ⋊ P 内で ⁅inl(G), inr(P)⁆ < inl(G) (strict)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.commutator_inl_inr_lt_inl_of_pgroup_action
 -- 後半: fixedPointsOfMulAut φ > ⊥ (C_G(P) > 1)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup
+
+-- Ch.4 (Commutators): Thm 4.36 ⭐⭐⭐ **= BG Thm 1.11, FT クリティカル**
+-- p > 2, G p-群, A p'-群 acts on G, A fixes all order-p elements ⇒ A trivial on G.
+-- Baer trick (Lem 4.37) + Cor 4.35 + 強帰納法 (Three-subgroups).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_36
 
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion

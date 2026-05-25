@@ -24,10 +24,10 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 部分 (Lem 4.1, 4.3, 4.6 完成) |
-| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 部分 (Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13 完成) |
+| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 部分 |
+| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 部分 |
 | 4C | A acts on G via automorphisms | 4.20 – 4.27 | TODO (coprime action machinery 要) |
-| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 部分 (Lem 4.32 完成; 残 coprime action 要) |
+| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 部分 |
 
 ## Mathlib direct correspondence (no wrapper)
 
@@ -84,7 +84,7 @@ theorem subgroup_le_normalizer_commutator_self (H K : Subgroup G) :
         have hKH : ⁅k, h⁆ ∈ (⁅K, H⁆ : Subgroup G) :=
           Subgroup.commutator_mem_commutator hk hh
         rwa [Subgroup.commutator_comm] at hKH
-    | one => simpa using one_mem _
+    | one => simp
     | mul x y _ _ ihx ihy =>
       have eq : h * (x * y) * h⁻¹ = (h * x * h⁻¹) * (h * y * h⁻¹) := by group
       rw [eq]
@@ -239,8 +239,8 @@ Isaacs は `p`-群 + `n = p^e` で述べるが, 証明は class ≤ 2 + 任意 `
 全 `z` と可換 ⇒ `x^n ∈ Z(G)`. -/
 theorem pow_mem_center_of_class_le_two_of_commutator_pow
     {n : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hExp : ∀ c ∈ _root_.commutator G, c^n = 1) (x : G) :
-    x^n ∈ Subgroup.center G := by
+    (hExp : ∀ c ∈ _root_.commutator G, c ^ n = 1) (x : G) :
+    x ^ n ∈ Subgroup.center G := by
   rw [Subgroup.mem_center_iff]
   intro z
   rw [eq_comm, ← commutatorElement_eq_one_iff_mul_comm,
@@ -248,13 +248,13 @@ theorem pow_mem_center_of_class_le_two_of_commutator_pow
   exact hExp ⁅x, z⁆ (commutatorElement_mem_commutator_top x z)
 
 /-- **Isaacs Lemma 4.4** (elementary abelian corollary, "In particular" 部分):
-`commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c^p = 1)
+`commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c ^ p = 1)
 ⇒ `G/Z(G)` も `p`-elementary abelian.
 
 (Φ(G) ⊆ Z(G) への帰結は Lem 4.5 forward を経由: 後段 `frattini_le_center_of_...` 参照.) -/
 theorem isElementaryAbelian_quotient_center_of_class_le_two
     {p : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hExp : ∀ c ∈ _root_.commutator G, c^p = 1) :
+    (hExp : ∀ c ∈ _root_.commutator G, c ^ p = 1) :
     OddOrder.GroupTheory.IsElementaryAbelian p (G ⧸ Subgroup.center G) := by
   refine ⟨?_, ?_⟩
   · exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hC).comm
@@ -288,7 +288,7 @@ private lemma index_eq_prime_of_isCoatom_of_pgroup
   -- k ≥ 1 (else |P/M| = 1, so M = ⊤)
   have hk_pos : 1 ≤ k := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases k
     rw [pow_zero] at hk
     have hsub : Subsingleton (P ⧸ M) := Nat.card_eq_one_iff_unique.mp hk |>.1
@@ -452,7 +452,9 @@ private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
       Subgroup.relIndex_mul_index hMK_le
     rw [h_idx] at h_eq
     -- K.index ∣ p, so K.index = 1 or p
-    have h_dvd : K.index ∣ p := ⟨M.relIndex K, by linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]⟩
+    have h_dvd : K.index ∣ p := by
+      refine ⟨M.relIndex K, ?_⟩
+      linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]
     rcases hp.eq_one_or_self_of_dvd _ h_dvd with h1 | hp_eq
     · -- K.index = 1 ⇒ K = ⊤
       have hK_top : K = ⊤ := Subgroup.index_eq_one.mp h1
@@ -597,7 +599,7 @@ For finite `p`-group `P` of class ≤ 2 with `commutator P` `p`-elementary abeli
 theorem frattini_le_center_of_class_le_two_of_commutator_pow_eq_one
     {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
     (hC : _root_.commutator P ≤ Subgroup.center P)
-    (hExp : ∀ c ∈ _root_.commutator P, c^p = 1) :
+    (hExp : ∀ c ∈ _root_.commutator P, c ^ p = 1) :
     frattini P ≤ Subgroup.center P :=
   frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP
     (isElementaryAbelian_quotient_center_of_class_le_two hC hExp)
@@ -1029,7 +1031,7 @@ theorem lowerCentralSeries_map_eq_of_surjective {G H : Type*} [Group G] [Group H
 theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P)
     {A : Subgroup P} [A.Normal]
-    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCyc : IsCyclic (P ⧸ A))
     (hAcard : Nat.card A = p)
     (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
@@ -1065,7 +1067,7 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
   have hP_nontrivial : Nontrivial P := by
     obtain ⟨x, hx_in_A, hx_ne⟩ : ∃ x : P, x ∈ A ∧ x ≠ 1 := by
       by_contra h
-      push_neg at h
+      push Not at h
       apply hA_ne_bot
       rw [Subgroup.eq_bot_iff_forall]
       exact h
@@ -1107,7 +1109,7 @@ private lemma card_map_mk_mul_card_inf_eq_card {G : Type*} [Group G] [Finite G]
   rw [hker, hrange] at hQ
   rw [← hQ]; exact hLagr
 
-/-- **Isaacs Thm 4.7** ⭐: Let `A ⊴ P` abelian, `P` a p-group, `|A| = p^m`, `P/A` cyclic,
+/-- **Isaacs Thm 4.7** ⭐: Let `A ⊴ P` abelian, `P` a p-group, `|A| = p ^ m`, `P/A` cyclic,
 `|A ⊓ Z(P)| = p`. Then `Group.nilpotencyClass P = m`.
 
 **Proof** (Isaacs p.118-119): Induction on `m`.
@@ -1125,7 +1127,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCyc : IsCyclic (P ⧸ A))
-    (hAcard : Nat.card A = p^m)
+    (hAcard : Nat.card A = p ^ m)
     (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
     Group.nilpotencyClass P = m := by
   induction m generalizing P with
@@ -1324,7 +1326,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
           exact hx_notZ (Subgroup.mem_inf.mpr ⟨hx_in_A, hxZP⟩)
         -- So ∃ y, [x, y] ≠ 1 (x not in center)
         rw [Subgroup.mem_center_iff] at hx_notZP
-        push_neg at hx_notZP
+        push Not at hx_notZP
         obtain ⟨y, hxy⟩ := hx_notZP
         -- [x, y] ∈ ⁅lcs P (k-1), ⊤⁆ = lcs P k via lcs definition
         have h_xy_in_kp : ⁅x, y⁆ ∈ lowerCentralSeries P ((k - 1) + 1) := by
@@ -1342,7 +1344,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
       exact lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_lcs_P_kp1
     · -- ≥ : NOT (nilpotencyClass ≤ k)
       by_contra h
-      push_neg at h
+      push Not at h
       have : lowerCentralSeries P k = ⊥ :=
         lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (Nat.lt_succ_iff.mp h)
       exact h_lcs_P_k_ne this
@@ -1495,7 +1497,7 @@ def setOfPowEqOne (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ}
 仮定で `⁅y, x⁆^p = 1` + `p` odd ⇒ `p ∣ p(p-1)/2` ⇒ `⁅y, x⁆^(p(p-1)/2) = 1`.
 よって `(xy)^p = x^p · y^p`. `1^p = 1` は自明. -/
 def powPHom (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ} (hp : Odd p)
-    (hcomp : ∀ c ∈ _root_.commutator G, c^p = 1) : G →* G where
+    (hcomp : ∀ c ∈ _root_.commutator G, c ^ p = 1) : G →* G where
   toFun x := x^p
   map_one' := one_pow p
   map_mul' x y := by
@@ -1744,7 +1746,7 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 - **Lemma 4.28** ⭐ BG Prop 1.6(a): `(|G|,|A|) = 1` + (A or G solvable)
   ⇒ `G = C_G(A) · ⁅G, A⁆`.
 - **Lemma 4.29** ⭐ BG Prop 1.6(b): coprime ⇒ `⁅G, A, A⁆ = ⁅G, A⁆`.
-- **Cor 4.30**: A faithful + chain + coprime ⇒ `|A|` の素因子 ⊆ `|G|` の素因子.
+- **Cor 4.30**: A faithful + chain ⇒ `|A|` の素因子 ⊆ `|G|` の素因子.
 - **Thm 4.31 Thompson P×Q** ⭐: `A = P × Q` (P p-群, Q p'-群) acts on p-群 G,
   Q fixes every P-fixed element ⇒ Q trivial on G.
 - **Lemma 4.32**: P p-群, G 非自明 p-群: `⁅G, P⁆ < G` かつ `C_G(P) > 1`.
@@ -1842,6 +1844,29 @@ theorem actionCommutator_map_inl
     refine ⟨g * (φ a) g⁻¹, ⟨g, a, rfl⟩, ?_⟩
     exact (SemidirectProduct.commutator_inl_inr (φ := φ) g a).symm
 
+/-- Restricted-action version of `actionCommutator_map_inl`.
+
+If `B` acts on `G` through `i : B →* A` and `φ : A →* MulAut G`, then the
+`B`-action commutator maps into the same semidirect product `G ⋊[φ] A` as the
+commutator of `inl(G)` with the image of `B` inside `inr(A)`. -/
+theorem actionCommutator_map_inl_comp
+    {A B G : Type*} [Group A] [Group B] [Group G]
+    (φ : A →* MulAut G) (i : B →* A) :
+    (actionCommutator (φ.comp i)).map (SemidirectProduct.inl : G →* G ⋊[φ] A) =
+      ⁅(SemidirectProduct.inl : G →* G ⋊[φ] A).range,
+        ((SemidirectProduct.inr : A →* G ⋊[φ] A).comp i).range⁆ := by
+  rw [actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, b, rfl⟩, rfl⟩
+    refine ⟨SemidirectProduct.inl g, ⟨g, rfl⟩,
+      SemidirectProduct.inr (i b), ⟨b, rfl⟩, ?_⟩
+    exact SemidirectProduct.commutator_inl_inr (φ := φ) g (i b)
+  · rintro ⟨_, ⟨g, rfl⟩, _, ⟨b, rfl⟩, rfl⟩
+    refine ⟨g * (φ (i b)) g⁻¹, ⟨g, b, rfl⟩, ?_⟩
+    exact (SemidirectProduct.commutator_inl_inr (φ := φ) g (i b)).symm
+
 /-- **`actionCommutator φ` は G で normal subgroup**.
 
 経路: `actionCommutator_map_inl` で `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`,
@@ -1912,6 +1937,52 @@ theorem actionCommutator_le_iff_left {A G : Type*} [Group A] [Group G]
     have h_eq : x⁻¹⁻¹ * ((φ a) x)⁻¹ = ((φ a) x * x⁻¹)⁻¹ := by group
     rw [h_eq] at h'
     simpa using Subgroup.inv_mem _ h'
+
+/-- `actionCommutator φ = ⊥` iff `A` acts trivially on `G` (`∀ a g, (φ a) g = g`).
+
+Lem 4.20 left form を `N = ⊥` で特殊化. BaerMul wrapper への翻訳に基本. -/
+theorem actionCommutator_eq_bot_iff_acts_trivially {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) :
+    actionCommutator φ = ⊥ ↔ ∀ a : A, ∀ g : G, (φ a) g = g := by
+  rw [eq_bot_iff, actionCommutator_le_iff_left]
+  refine ⟨fun h a g => ?_, fun h a g => ?_⟩
+  · have hg := h a g
+    rw [Subgroup.mem_bot, inv_mul_eq_one] at hg
+    exact hg.symm
+  · rw [Subgroup.mem_bot, h a g, inv_mul_cancel]
+
+/-- **A-不変部分群への作用制限**: `φ : A →* MulAut G` + `IsAInvariant φ H` から
+`A →* MulAut ↥H` を構成. 関数本体は `(φ a)` を `H` に制限したもの.
+
+Thm 4.36 induction で IH を `[G, A] < G` 等の subgroup に適用するために必要. -/
+def OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group G]
+    {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) : A →* MulAut H where
+  toFun a := {
+    toFun := fun h => ⟨(φ a) h.val, hH.smul_mem a h.property⟩
+    invFun := fun h => ⟨(φ a)⁻¹ h.val, hH.inv_smul_mem a h.property⟩
+    left_inv := fun h => Subtype.ext (by
+      show (φ a)⁻¹ ((φ a) h.val) = h.val
+      simp)
+    right_inv := fun h => Subtype.ext (by
+      show (φ a) ((φ a)⁻¹ h.val) = h.val
+      simp)
+    map_mul' := fun x y => Subtype.ext (map_mul (φ a) x.val y.val)
+  }
+  map_one' := by
+    ext h
+    show ((φ 1 : MulAut G) h.val) = h.val
+    simp
+  map_mul' a b := by
+    ext h
+    show ((φ (a * b) : MulAut G) h.val) = ((φ a) ((φ b) h.val))
+    rw [map_mul]; rfl
+
+@[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) (a : A) (h : H) :
+    ((OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH a) h).val =
+      (φ a) h.val := rfl
 
 /-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
 (a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);
@@ -2441,6 +2512,131 @@ theorem iterCommutator_inl_inr_two_eq_one
       exact ⟨c * x * c⁻¹, h_cxc_ac, rfl⟩
     exact Subgroup.commutator_mem_commutator h_in_I1 ⟨a, rfl⟩
 
+private lemma iterCommutator_eq_one_of_two_eq_one
+    {E F : Subgroup G}
+    (h : iterCommutator E F 2 = iterCommutator E F 1) :
+    ∀ {m : ℕ}, 1 ≤ m → iterCommutator E F m = iterCommutator E F 1 := by
+  intro m hm
+  induction m with
+  | zero => omega
+  | succ n ih =>
+      rcases n with _ | n
+      · rfl
+      · have hn : 1 ≤ n + 1 := by omega
+        rw [iterCommutator_succ, ih hn]
+        simpa [iterCommutator_succ] using h
+
+private theorem iterCommutator_inl_inr_restrict_eq_bot
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    (P : Subgroup A) {m : ℕ}
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    let ψ : P →* MulAut G := φ.comp P.subtype
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+        (SemidirectProduct.inr : P →* G ⋊[ψ] P).range m = ⊥ := by
+  dsimp
+  let ψ : P →* MulAut G := φ.comp P.subtype
+  let F : G ⋊[ψ] P →* G ⋊[φ] A :=
+    SemidirectProduct.map (MonoidHom.id G) P.subtype (fun p => by
+      ext g
+      rfl)
+  let XGP : Subgroup (G ⋊[ψ] P) := (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+  let YPP : Subgroup (G ⋊[ψ] P) := (SemidirectProduct.inr : P →* G ⋊[ψ] P).range
+  let XGA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  let YAA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  have hF_inj : Function.Injective F := by
+    intro x y hxy
+    ext
+    · simpa [F] using congrArg (fun z : G ⋊[φ] A => z.left) hxy
+    · simpa [F] using congrArg (fun z : G ⋊[φ] A => z.right) hxy
+  have h_map_X : XGP.map F = XGA := by
+    ext x
+    constructor
+    · rintro ⟨_, ⟨g, rfl⟩, rfl⟩
+      exact ⟨g, by simp [F]⟩
+    · rintro ⟨g, rfl⟩
+      refine ⟨(SemidirectProduct.inl : G →* G ⋊[ψ] P) g, ⟨g, rfl⟩, ?_⟩
+      simp [F]
+  have h_map_Y : YPP.map F ≤ YAA := by
+    rintro _ ⟨_, ⟨p, rfl⟩, rfl⟩
+    exact ⟨p.1, by simp [F]⟩
+  have h_map_iter_all :
+      ∀ n : ℕ, (iterCommutator XGP YPP n).map F ≤ iterCommutator XGA YAA n := by
+    intro n
+    induction n with
+    | zero =>
+        simpa [iterCommutator_zero] using h_map_X.le
+    | succ n ih =>
+        rw [iterCommutator_succ, iterCommutator_succ, Subgroup.map_commutator]
+        exact Subgroup.commutator_mono ih h_map_Y
+  have h_map_bot : (iterCommutator XGP YPP m).map F = ⊥ := by
+    refine le_antisymm ?_ bot_le
+    exact (h_map_iter_all m).trans (le_of_eq h_iter)
+  exact (Subgroup.map_eq_bot_iff_of_injective (iterCommutator XGP YPP m) hF_inj).mp h_map_bot
+
+/-- **Isaacs Corollary 4.30**:
+Let `A` act faithfully on the finite group `G`. If an iterated commutator
+`[G, A, ..., A]` is trivial, then every prime divisor of `|A|` divides `|G|`.
+
+Proof: for a prime `p ∤ |G|`, restrict the action to a Sylow `p`-subgroup `P ≤ A`.
+The restricted action is coprime, and the chain hypothesis restricts from `A` to `P`.
+Lemma 4.29 collapses the restricted iterated commutator to `[G, P] = 1`, so `P`
+acts trivially. Faithfulness forces `P = 1`, hence `p ∤ |A|`. -/
+theorem prime_dvd_card_of_faithful_iterCommutator_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (h_inj : Function.Injective φ)
+    {m : ℕ} (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥)
+    {p : ℕ} (hp : p.Prime) (hpA : p ∣ Nat.card A) :
+    p ∣ Nat.card G := by
+  by_contra hpG
+  haveI : Fact p.Prime := ⟨hp⟩
+  let P : Sylow p A := default
+  let ψ : P →* MulAut G := φ.comp (P : Subgroup A).subtype
+  have h_iter_P :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range m = ⊥ := by
+    simpa [ψ] using
+      iterCommutator_inl_inr_restrict_eq_bot (φ := φ) (P : Subgroup A) h_iter
+  have hCop_PG : Nat.Coprime (Nat.card P) (Nat.card G) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    rw [hn]
+    exact Nat.Coprime.pow_left n ((Nat.Prime.coprime_iff_not_dvd hp).mpr hpG)
+  have hSolv : IsSolvable P ∨ IsSolvable G := by
+    left
+    haveI : Group.IsNilpotent P := P.isPGroup'.isNilpotent
+    infer_instance
+  have h_two :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 2 =
+        iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 1 :=
+    iterCommutator_inl_inr_two_eq_one (φ := ψ) hCop_PG hSolv
+  have h_iter_one :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 1 = ⊥ := by
+    have h_m := iterCommutator_eq_one_of_two_eq_one h_two hm
+    rw [h_m] at h_iter_P
+    exact h_iter_P
+  have hP_le_ker : (⊤ : Subgroup P) ≤ ψ.ker := by
+    rw [← SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker]
+    rw [show (⊤ : Subgroup P).map (SemidirectProduct.inr : P →* G ⋊[ψ] P) =
+        (SemidirectProduct.inr : P →* G ⋊[ψ] P).range from
+        (MonoidHom.range_eq_map _).symm]
+    rw [Subgroup.commutator_comm]
+    exact h_iter_one
+  have hP_bot : (P : Subgroup A) = ⊥ := by
+    rw [Subgroup.eq_bot_iff_forall]
+    intro a ha
+    let x : P := ⟨a, ha⟩
+    have hx_ker : x ∈ ψ.ker := hP_le_ker (Subgroup.mem_top x)
+    rw [MonoidHom.mem_ker] at hx_ker
+    have hφa : φ a = 1 := by
+      simpa [ψ, x] using hx_ker
+    exact h_inj (by simpa using hφa)
+  exact (P.ne_bot_of_dvd_card hpA) hP_bot
+
 /-! ### Isaacs §4D Thm 4.34 ⭐ (Fitting, BG Prop 1.6(d)): G abelian + coprime ⇒
 G = C_G(A) × [G, A] -/
 
@@ -2571,7 +2767,7 @@ theorem actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
   -- ∃ g ∈ actionCommutator with g ≠ 1
   obtain ⟨g_elem, hg_in, hg_ne⟩ : ∃ g ∈ actionCommutator φ, g ≠ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     apply h_ne_bot
     rw [Subgroup.eq_bot_iff_forall]
     exact h
@@ -2760,7 +2956,7 @@ RHS = `(xy·S_{yx}) * z * S_{(z, xy·S_{yx})}`:
 - `z` moves past central `S_{yx}` ⇒ `xyz·S_{yx}·S_{⁅z,x⁆·⁅z,y⁆}`
 - `S_{⁅z,x⁆·⁅z,y⁆} = S_{z,x} * S_{z,y}`. -/
 lemma baerAdd_assoc {G : Type*} [Group G] (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hOdd : Odd (Nat.card G)) (x y z : G) :
+    (x y z : G) :
     baerAdd x (baerAdd y z) = baerAdd (baerAdd x y) z := by
   -- Notation: S_{ab} = sqrtOdd ⁅a, b⁆
   set Syz : G := sqrtOdd ⁅z, y⁆
@@ -2850,14 +3046,445 @@ lemma baerAdd_mulEquiv_eq {G : Type*} [Group G] (f : G ≃* G) (x y : G) :
     f (baerAdd x y) = baerAdd (f x) (f y) :=
   baerAdd_map_eq f.toMonoidHom rfl x y
 
-/-! **Lem 4.37 AddCommGroup instance** + **(b) additive order = multiplicative order**:
-形式化 TODO.
+/-! ### Lem 4.37(b) element form + `BaerMul G` 型ラッパー (CommGroup 構造)
 
-教科書 (Isaacs p.142) (b) 証明: `nx = x + (n-1)x = x + x^(n-1) = x · x^(n-1) = x^n`
-(commute case で baerAdd_eq_mul_of_commute, induction on n). ⇒ AddOrderOf = OrderOf.
+Baer trick の "additive group" は実際には Lean 上では type wrapper 経由で実装する.
+`BaerMul G := G` (定義的に同型) に `CommGroup` インスタンスを `baerAdd` で与える.
+これにより Cor 4.35 (CommGroup 仮定) を そのまま `BaerMul G` に適用できる.
 
-実装メモ: `AddCommGroup G` 構築には `Zero G` (= 1) + `nsmul`, `zsmul` の field 完全実装が必要
-(`nsmulRec` 等 default は `Add G` instance 経由で nsmul = pow に reduce すべき). 別 session 完成. -/
+教科書 (Isaacs p.142) (b) 証明の鍵: `nx = x + (n-1)x = x · x^(n-1) = x^n`
+(commute case で `baerAdd_eq_mul_of_commute`). 実装では `npow x n := x^n` (G の冪) を直接採用し,
+`npow_succ : npow (n+1) x = baerAdd (npow n x) x` を `baerAdd_pow_self_eq_pow_succ` で提供. -/
+
+/-- **Lem 4.37(b) inductive step** (仮定不要): `baerAdd (x^n) x = x^(n+1)`.
+
+`x` と `x^n` は常に commute するので, `baerAdd x^n x = x^n * x * sqrtOdd ⁅x, x^n⁆ = x^n · x · 1 = x^{n+1}`.
+これが `BaerMul G` の `npow_succ` フィールドに対応する. -/
+lemma baerAdd_pow_self_eq_pow_succ {G : Type*} [Group G] (x : G) (n : ℕ) :
+    baerAdd (x ^ n) x = x ^ (n + 1) := by
+  have h_comm : Commute (x ^ n) x := Commute.pow_self x n
+  rw [baerAdd_eq_mul_of_commute h_comm, ← pow_succ]
+
+/-- **Baer trick type wrapper**: `BaerMul G := G` (定義的に同型).
+
+`G` が奇数位数 + class ≤ 2 のときに `BaerMul G` 上に `baerAdd` を乗法とする `CommGroup` 構造を
+与える (Lem 4.37). これにより mathlib の CommGroup 用 API (Cor 4.35 等) を `BaerMul G` に
+直接適用できる.
+
+Naming: 乗法的 wrapper として扱う ("multiplicative view of (G, +')"). -/
+def BaerMul (G : Type*) : Type _ := G
+
+namespace BaerMul
+
+variable {G : Type*}
+
+/-- Coercion `BaerMul G ≃ G` (identity at runtime). -/
+def toG : BaerMul G ≃ G := Equiv.refl _
+
+/-- Coercion `G ≃ BaerMul G` (identity at runtime). -/
+def ofG : G ≃ BaerMul G := Equiv.refl _
+
+@[simp] theorem toG_ofG (x : G) : toG (ofG x) = x := rfl
+@[simp] theorem ofG_toG (x : BaerMul G) : ofG (toG x) = x := rfl
+
+end BaerMul
+
+/-- `Mul (BaerMul G) = baerAdd`. -/
+noncomputable instance BaerMul.instMul {G : Type*} [Group G] : Mul (BaerMul G) where
+  mul x y := BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))
+
+/-- `1 : BaerMul G = ofG 1`. -/
+instance BaerMul.instOne {G : Type*} [One G] : One (BaerMul G) where
+  one := BaerMul.ofG 1
+
+/-- `(·)⁻¹ : BaerMul G → BaerMul G` is the same as G's inverse (Lem 4.37 で `baerAdd x⁻¹ x = 1`). -/
+instance BaerMul.instInv {G : Type*} [Inv G] : Inv (BaerMul G) where
+  inv x := BaerMul.ofG (BaerMul.toG x)⁻¹
+
+/-- **CommGroup instance for `BaerMul G`**: `G` が `Odd (Nat.card G)` + `commutator G ≤ Z(G)`
+を満たすとき, `(BaerMul G, baerAdd, 1, ·⁻¹)` は可換群.
+
+実装方針: 基本 `Mul / One / Inv` instance を別途与えて, ここでは **axiom フィールドのみ提供**.
+`npow / zpow` フィールドはデフォルト (`npowRec` / `zpowRec`) を使用. `npowRec` は `*`
+(我々の baerAdd) を `n` 回反復するので, BaerMul の pow = `baerAdd`-iterate.
+G の `x^n` との一致は Lem 4.37(b) (`baerAdd_pow_self_eq_pow_succ`) 経由で別途証明. -/
+noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
+    [hOdd : Fact (Odd (Nat.card G))]
+    [hC : Fact (_root_.commutator G ≤ Subgroup.center G)] : CommGroup (BaerMul G) where
+  mul_assoc x y z := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))
+        (BaerMul.toG z)) =
+      BaerMul.ofG (baerAdd (BaerMul.toG x)
+        (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG z)))))
+    simp only [BaerMul.toG_ofG]
+    exact congr_arg BaerMul.ofG
+      (baerAdd_assoc hC.out (BaerMul.toG x) (BaerMul.toG y) (BaerMul.toG z)).symm
+  one_mul x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG 1)) (BaerMul.toG x)) = x
+    simp only [BaerMul.toG_ofG, baerAdd_one_left]
+    rfl
+  mul_one x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG (BaerMul.ofG 1))) = x
+    simp only [BaerMul.toG_ofG, baerAdd_one_right]
+    rfl
+  mul_comm x y := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y)) =
+      BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG x))
+    exact congr_arg BaerMul.ofG (baerAdd_comm hC.out hOdd.out _ _)
+  inv_mul_cancel x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (BaerMul.toG x)⁻¹)) (BaerMul.toG x)) =
+      BaerMul.ofG 1
+    simp only [BaerMul.toG_ofG]
+    rw [baerAdd_inv_left]
+
+instance BaerMul.instFinite {G : Type*} [Finite G] : Finite (BaerMul G) :=
+  inferInstanceAs (Finite G)
+
+@[simp] lemma BaerMul.nat_card_eq {G : Type*} : Nat.card (BaerMul G) = Nat.card G := rfl
+
+/-- **Lem 4.37(c) wrapped**: G の multiplicative automorphism は `BaerMul G` 上でも
+multiplicative automorphism (= baerAdd 保存). 関数本体は同じ (恒等経由). -/
+noncomputable def MulAut.toBaerMul {G : Type*} [Group G] (f : G ≃* G) :
+    BaerMul G ≃* BaerMul G where
+  toFun x := BaerMul.ofG (f (BaerMul.toG x))
+  invFun x := BaerMul.ofG (f.symm (BaerMul.toG x))
+  left_inv x := by
+    show BaerMul.ofG (f.symm (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))) = x
+    simp only [BaerMul.toG_ofG, f.symm_apply_apply]
+    rfl
+  right_inv x := by
+    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (f.symm (BaerMul.toG x))))) = x
+    simp only [BaerMul.toG_ofG, f.apply_symm_apply]
+    rfl
+  map_mul' x y := by
+    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))) =
+        BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))
+          (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG y)))))
+    simp only [BaerMul.toG_ofG]
+    exact congr_arg BaerMul.ofG (baerAdd_mulEquiv_eq f (BaerMul.toG x) (BaerMul.toG y))
+
+/-- `MulAut.toBaerMul` は群準同型 (composition / 1 を保存). 下の `MonoidHom.toBaerMulLift`
+を構成するために使う. -/
+noncomputable def MulAut.toBaerMulHom {G : Type*} [Group G] :
+    MulAut G →* MulAut (BaerMul G) where
+  toFun f := MulAut.toBaerMul f
+  map_one' := by
+    ext x
+    show BaerMul.ofG ((1 : MulAut G) (BaerMul.toG x)) = x
+    show BaerMul.ofG (BaerMul.toG x) = x
+    exact BaerMul.ofG_toG x
+  map_mul' f g := by
+    ext x
+    show BaerMul.ofG ((f * g) (BaerMul.toG x)) =
+        BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (g (BaerMul.toG x)))))
+    simp only [BaerMul.toG_ofG]
+    rfl
+
+/-- φ : A →* MulAut G を BaerMul G への作用 φ' : A →* MulAut (BaerMul G) に lift する.
+関数本体は同じ (Lem 4.37(c)). -/
+noncomputable def MonoidHom.toBaerMulLift {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) : A →* MulAut (BaerMul G) :=
+  MulAut.toBaerMulHom.comp φ
+
+@[simp] lemma MonoidHom.toBaerMulLift_apply {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (a : A) (g : BaerMul G) :
+    (MonoidHom.toBaerMulLift φ a) g = BaerMul.ofG ((φ a) (BaerMul.toG g)) := rfl
+
+/-- **Lem 4.37(b) full form**: `BaerMul G` の自然冪 (baerAdd-iterate) = `G` の自然冪.
+`npow_succ` の帰納で示す. -/
+lemma BaerMul.npow_eq_pow {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)]
+    (x : BaerMul G) (n : ℕ) :
+    @HPow.hPow (BaerMul G) ℕ _ _ x n = BaerMul.ofG ((BaerMul.toG x) ^ n) := by
+  induction n with
+  | zero =>
+    rw [pow_zero, pow_zero]
+    rfl
+  | succ k ih =>
+    rw [pow_succ, ih]
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG ((BaerMul.toG x) ^ k))) (BaerMul.toG x)) =
+        BaerMul.ofG ((BaerMul.toG x) ^ (k + 1))
+    simp only [BaerMul.toG_ofG]
+    rw [baerAdd_pow_self_eq_pow_succ]
+
+/-- `BaerMul G` での `x^n = 1` ↔ `G` での `x^n = 1`. Cor 4.35 適用時の `g^p = 1` 翻訳に使用. -/
+lemma BaerMul.pow_eq_one_iff {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)]
+    (x : BaerMul G) (n : ℕ) :
+    @HPow.hPow (BaerMul G) ℕ _ _ x n = 1 ↔ (BaerMul.toG x) ^ n = 1 := by
+  rw [BaerMul.npow_eq_pow]
+  show BaerMul.ofG ((BaerMul.toG x) ^ n) = BaerMul.ofG 1 ↔ (BaerMul.toG x) ^ n = 1
+  exact BaerMul.ofG.apply_eq_iff_eq
+
+/-- `IsPGroup p (BaerMul G) ↔ IsPGroup p G`. BaerMul の構造を経由しても p-群性は不変. -/
+lemma BaerMul.isPGroup_iff {G : Type*} [Group G]
+    [Fact (Odd (Nat.card G))] [Fact (_root_.commutator G ≤ Subgroup.center G)] (p : ℕ) :
+    IsPGroup p (BaerMul G) ↔ IsPGroup p G := by
+  unfold IsPGroup
+  refine ⟨fun h x => ?_, fun h x => ?_⟩
+  · obtain ⟨n, hn⟩ := h (BaerMul.ofG x)
+    refine ⟨n, ?_⟩
+    rw [BaerMul.pow_eq_one_iff] at hn
+    simpa [BaerMul.toG_ofG] using hn
+  · obtain ⟨n, hn⟩ := h (BaerMul.toG x)
+    refine ⟨n, ?_⟩
+    rw [BaerMul.pow_eq_one_iff]
+    exact hn
+
+/-- **系 of Lem 4.28**: `A` が `actionCommutator φ` (= `[G, A]`) 上で trivial 作用するとき,
+coprime + (A or G solvable) 仮定下では `actionCommutator φ = ⊥` (= A trivial on whole G).
+
+**証明**: Lem 4.28 で G = C_G(A) · [G, A]. 各 g = c * x で `c ∈ C_G(A)` ⇒ `(φ a) c = c`,
+`x ∈ [G, A]` + 仮定 ⇒ `(φ a) x = x`. 故に `(φ a) g = (φ a)(c·x) = c·x = g`.
+
+Thm 4.36 induction の `[G, A] < G` ケースで使用 (IH ⇒ A trivial on [G, A] ⇒ A trivial on G). -/
+theorem actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_triv : ∀ a : A, ∀ h ∈ actionCommutator φ, (φ a) h = h) :
+    actionCommutator φ = ⊥ := by
+  rw [actionCommutator_eq_bot_iff_acts_trivially]
+  intro a g
+  have h_top : g ∈ Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ := by
+    rw [fixedPoints_sup_actionCommutator_eq_top hCop hSolv]
+    exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup_of_normal_right] at h_top
+  obtain ⟨c, hc_fix, x, hx_ac, h_eq⟩ := h_top
+  -- h_eq : c * x = g, hc_fix : c ∈ fixedPoints, hx_ac : x ∈ actionCommutator
+  rw [← h_eq, map_mul, hc_fix a, h_triv a x hx_ac]
+
+/-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
+A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
+
+Baer trick で `BaerMul G` を可換群として扱い, Cor 4.35 を適用. これが Thm 4.36 の核.
+
+`hp_odd : p ≠ 2` から `Odd p` → `Odd (p^k)` → `Odd (Nat.card G)`. `hC : class ≤ 2` を
+`Fact` 化して `BaerMul.instCommGroup` を呼び出し可能に. -/
+theorem actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {p : ℕ} [hp : Fact p.Prime] (hp_odd : p ≠ 2)
+    (hC : _root_.commutator G ≤ Subgroup.center G)
+    (φ : A →* MulAut G) (hG : IsPGroup p G) (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ g : G, g ^ p = 1 → ∀ a : A, (φ a) g = g) :
+    actionCommutator φ = ⊥ := by
+  -- Set up Fact (Odd (Nat.card G))
+  have hOdd_p : Odd p := hp.out.odd_of_ne_two hp_odd
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+  have hOdd_card : Odd (Nat.card G) := by rw [hk]; exact hOdd_p.pow
+  haveI : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
+  haveI : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨hC⟩
+  -- φ' : A →* MulAut (BaerMul G)
+  set φ' : A →* MulAut (BaerMul G) := MonoidHom.toBaerMulLift φ with hφ'
+  -- IsPGroup p (BaerMul G)
+  have hG' : IsPGroup p (BaerMul G) := (BaerMul.isPGroup_iff p).mpr hG
+  -- h_fix translated to BaerMul G
+  have h_fix' : ∀ g : BaerMul G, g ^ p = 1 → ∀ a : A, (φ' a) g = g := by
+    intro g hg a
+    have hg_G : (BaerMul.toG g) ^ p = 1 := (BaerMul.pow_eq_one_iff g p).mp hg
+    have h_fixed : (φ a) (BaerMul.toG g) = BaerMul.toG g := h_fix _ hg_G a
+    show BaerMul.ofG ((φ a) (BaerMul.toG g)) = g
+    rw [h_fixed]
+    exact BaerMul.ofG_toG g
+  -- Apply Cor 4.35 to BaerMul G
+  have h_bot_baer : actionCommutator φ' = ⊥ :=
+    actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p φ' hG' hA_p' h_fix'
+  -- Translate back to G via iff
+  rw [actionCommutator_eq_bot_iff_acts_trivially] at h_bot_baer
+  rw [actionCommutator_eq_bot_iff_acts_trivially]
+  intro a g
+  have h_act := h_bot_baer a (BaerMul.ofG g)
+  -- h_act : (φ' a) (ofG g) = ofG g
+  -- Unfold φ': (φ' a) (ofG g) = ofG ((φ a) (toG (ofG g))) = ofG ((φ a) g)
+  -- So: ofG ((φ a) g) = ofG g, hence (φ a) g = g by injectivity
+  have h_eq : BaerMul.ofG ((φ a) g) = BaerMul.ofG g := by
+    have hkey : (φ' a) (BaerMul.ofG g) = BaerMul.ofG ((φ a) g) := by
+      show BaerMul.ofG ((φ a) (BaerMul.toG (BaerMul.ofG g))) = BaerMul.ofG ((φ a) g)
+      rw [BaerMul.toG_ofG]
+    rw [← hkey]
+    exact h_act
+  exact BaerMul.ofG.injective h_eq
+
+/-- **強帰納法版** (`Nat.card G ≤ n` パラメータ化). Thm 4.36 本体の補助. -/
+private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
+    {p : ℕ} [hp : Fact p.Prime] (hp_odd : p ≠ 2) (hA_p' : ¬ p ∣ Nat.card A) :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G]
+    (φ : A →* MulAut G) (_ : IsPGroup p G)
+    (_ : ∀ g : G, g ^ p = 1 → ∀ a : A, (φ a) g = g),
+    Nat.card G ≤ n → actionCommutator φ = ⊥ := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ _ _ h_le
+    exfalso
+    have h_pos : 0 < Nat.card G := Nat.card_pos
+    omega
+  | succ m IH =>
+    intro G _ _ φ hG h_fix h_le
+    -- Case: |G| ≤ m, apply IH
+    rcases Nat.lt_or_ge (Nat.card G) (m + 1) with h_lt | h_ge
+    · exact IH φ hG h_fix (Nat.le_of_lt_succ h_lt)
+    have h_card_G : Nat.card G = m + 1 := le_antisymm h_le h_ge
+    -- Subcase: G trivial
+    by_cases hG_triv : Nontrivial G
+    swap
+    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_triv
+      rw [actionCommutator_eq_bot_iff_acts_trivially]
+      intro a g
+      exact Subsingleton.elim _ _
+    -- G nontrivial setup
+    have hCop : Nat.Coprime (Nat.card A) (Nat.card G) := by
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+      rw [hk]
+      exact (Nat.Coprime.pow_right k (Nat.coprime_comm.mp
+        (Nat.Prime.coprime_iff_not_dvd hp.out |>.mpr hA_p')))
+    haveI hG_nilp : Group.IsNilpotent G := hG.isNilpotent
+    have hG_solv : IsSolvable G := IsNilpotent.to_isSolvable
+    have hSolv : IsSolvable A ∨ IsSolvable G := Or.inr hG_solv
+    -- 補助: H ≠ ⊤ + Finite G ⇒ Nat.card ↥H < Nat.card G
+    have card_lt_of_ne_top : ∀ {H : Subgroup G}, H ≠ ⊤ → Nat.card ↥H < Nat.card G := by
+      intro H h_ne
+      have h_dvd : Nat.card ↥H ∣ Nat.card G :=
+        ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+      have h_le' : Nat.card ↥H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+      have h_ne' : Nat.card ↥H ≠ Nat.card G := fun heq =>
+        h_ne (Subgroup.eq_top_of_card_eq _ heq)
+      exact Nat.lt_of_le_of_ne h_le' h_ne'
+    -- Case分け: [G, A] < ⊤ vs ⊤
+    by_cases h_AC_top : actionCommutator φ = ⊤
+    swap
+    · -- [G, A] < ⊤: IH を actionCommutator に適用
+      set H : Subgroup G := actionCommutator φ
+      have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator φ
+      let φ_H : A →* MulAut ↥H :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+      have h_H_card_lt : Nat.card ↥H < Nat.card G := card_lt_of_ne_top h_AC_top
+      have hH_pgrp : IsPGroup p ↥H := hG.to_subgroup H
+      have h_fix_H : ∀ h : ↥H, h ^ p = 1 → ∀ a : A, (φ_H a) h = h := by
+        intro h hh_pow a
+        apply Subtype.ext
+        show (φ a) h.val = h.val
+        apply h_fix
+        have := congr_arg (Subtype.val : ↥H → G) hh_pow
+        simpa using this
+      have h_IH_H := IH φ_H hH_pgrp h_fix_H
+        (Nat.le_of_lt_succ (h_H_card_lt.trans_le h_le))
+      have h_triv : ∀ a : A, ∀ x ∈ H, (φ a) x = x := by
+        intro a x hx
+        rw [actionCommutator_eq_bot_iff_acts_trivially] at h_IH_H
+        have := h_IH_H a ⟨x, hx⟩
+        exact congr_arg Subtype.val this
+      exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime hCop hSolv h_triv
+    -- [G, A] = ⊤: G' < ⊤, IH を G' に適用, Three-subgroups で class ≤ 2
+    -- G' = commutator G
+    set G' : Subgroup G := commutator G with hG'_def
+    have hG'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ G' :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.derivedSeries φ 1
+    have h_G'_lt_top : G' < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial G
+    have h_G'_card_lt : Nat.card ↥G' < Nat.card G := card_lt_of_ne_top h_G'_lt_top.ne
+    let φ_G' : A →* MulAut ↥G' :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hG'_inv
+    have hG'_pgrp : IsPGroup p ↥G' := hG.to_subgroup G'
+    have h_fix_G' : ∀ g' : ↥G', g' ^ p = 1 → ∀ a : A, (φ_G' a) g' = g' := by
+      intro g' hg'_pow a
+      apply Subtype.ext
+      show (φ a) g'.val = g'.val
+      apply h_fix
+      have := congr_arg (Subtype.val : ↥G' → G) hg'_pow
+      simpa using this
+    have h_IH_G' := IH φ_G' hG'_pgrp h_fix_G'
+      (Nat.le_of_lt_succ (h_G'_card_lt.trans_le h_le))
+    have h_triv_G' : ∀ a : A, ∀ g' ∈ G', (φ a) g' = g' := by
+      intro a g' hg'
+      rw [actionCommutator_eq_bot_iff_acts_trivially] at h_IH_G'
+      have := h_IH_G' a ⟨g', hg'⟩
+      exact congr_arg Subtype.val this
+    -- Three-subgroups in Γ で G' ⊆ Z(G) を導く
+    have h_class_le_2 : commutator G ≤ Subgroup.center G := by
+      -- Γ = G ⋊[φ] A. XG = inl(G), YA = inr(A), XG' = inl(G').
+      set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+      set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+      set XG' : Subgroup (G ⋊[φ] A) := G'.map (SemidirectProduct.inl : G →* G ⋊[φ] A)
+      -- Step 1: ⁅XG', YA⁆ = ⊥ (h_triv_G' + generator computation)
+      have h_G'_YA : ⁅XG', YA⁆ = ⊥ := by
+        rw [eq_bot_iff, Subgroup.commutator_le]
+        rintro _ ⟨k, hk, rfl⟩ _ ⟨a, rfl⟩
+        rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+        have h_fix' : (φ a) k = k := h_triv_G' a k hk
+        rw [show (φ a) k⁻¹ = ((φ a) k)⁻¹ from map_inv (φ a) k, h_fix', mul_inv_cancel]
+        exact map_one _
+      -- Step 2: ⁅XG, XG'⁆ ≤ XG' (G' normal in G ⇒ inl の像でも保たれる)
+      have h_GG'_le : ⁅XG, XG'⁆ ≤ XG' := by
+        rw [Subgroup.commutator_le]
+        rintro _ ⟨g, rfl⟩ _ ⟨k, hk, rfl⟩
+        -- Goal: ⁅inl g, inl k⁆ ∈ XG' (= inl(G'))
+        rw [show (⁅(SemidirectProduct.inl g : G ⋊[φ] A), SemidirectProduct.inl k⁆ :
+            G ⋊[φ] A) = SemidirectProduct.inl ⁅g, k⁆ from by
+          simp [commutatorElement_def, ← map_mul, ← map_inv]]
+        refine ⟨⁅g, k⁆, ?_, rfl⟩
+        -- Since G' is normal, both `g * k * g⁻¹` and `k⁻¹` lie in G'.
+        have hG'_normal : G'.Normal := inferInstance
+        have h_gkg : g * k * g⁻¹ ∈ G' := hG'_normal.conj_mem k hk g
+        have h_inv : k⁻¹ ∈ G' := G'.inv_mem hk
+        rw [commutatorElement_def]
+        exact G'.mul_mem h_gkg h_inv
+      -- h12: ⁅⁅XG, XG'⁆, YA⁆ ⊆ ⁅XG', YA⁆ = ⊥
+      have h12 : ⁅⁅XG, XG'⁆, YA⁆ = ⊥ := by
+        rw [eq_bot_iff]
+        calc ⁅⁅XG, XG'⁆, YA⁆ ≤ ⁅XG', YA⁆ := Subgroup.commutator_mono h_GG'_le le_rfl
+          _ = ⊥ := h_G'_YA
+      -- h23: ⁅⁅XG', YA⁆, XG⁆ = ⁅⊥, XG⁆ = ⊥
+      have h23 : ⁅⁅XG', YA⁆, XG⁆ = ⊥ := by
+        rw [h_G'_YA]
+        exact Subgroup.commutator_bot_left XG
+      -- Three-subgroups: ⁅⁅YA, XG⁆, XG'⁆ = ⊥
+      have h_three : ⁅⁅YA, XG⁆, XG'⁆ = ⊥ :=
+        Subgroup.commutator_commutator_eq_bot_of_rotate h12 h23
+      -- ⁅YA, XG⁆ = ⁅XG, YA⁆ = XG (since actionCommutator = ⊤)
+      have h_XGYA_eq_XG : ⁅XG, YA⁆ = XG := by
+        rw [← actionCommutator_map_inl φ, h_AC_top]
+        exact (MonoidHom.range_eq_map _).symm
+      have h_YAXG_eq_XG : ⁅YA, XG⁆ = XG := by
+        rw [Subgroup.commutator_comm]; exact h_XGYA_eq_XG
+      -- So ⁅XG, XG'⁆ = ⊥ in Γ
+      have h_XG_XG'_bot : ⁅XG, XG'⁆ = ⊥ := h_YAXG_eq_XG ▸ h_three
+      -- Translate back to G: ⁅⊤, G'⁆ = ⊥ ⇒ G' ⊆ Z(G)
+      -- inl(⁅⊤, G'⁆) = ⁅inl(⊤), inl(G')⁆ = ⁅XG, XG'⁆ = ⊥, so ⁅⊤, G'⁆ = ⊥ by inl injective
+      have h_top_G'_bot : ⁅(⊤ : Subgroup G), G'⁆ = ⊥ := by
+        apply Subgroup.map_injective (f := (SemidirectProduct.inl : G →* G ⋊[φ] A))
+          SemidirectProduct.inl_injective
+        rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.map_bot]
+        exact h_XG_XG'_bot
+      rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at h_top_G'_bot
+      -- h_top_G'_bot : ⊤ ≤ G'.centralizer
+      intro x hx
+      rw [Subgroup.mem_center_iff]
+      intro y
+      have := h_top_G'_bot (Subgroup.mem_top y)
+      exact (this x hx).symm
+    -- Apply class ≤ 2 case
+    exact actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
+      hp_odd h_class_le_2 φ hG hA_p' h_fix
+
+/-- **Isaacs Theorem 4.36** ⭐ (= BG Thm 1.11, **FT クリティカル**):
+`p > 2`, `G` p-群, `A` p'-群 が `G` に作用. `A` が `G` の全 order-p 要素を fix するならば,
+`A` は `G` 上 trivial に作用する (`actionCommutator φ = ⊥`).
+
+**証明** (Isaacs p.142): 強帰納法 on `|G|`.
+- 自明 G: 即座.
+- `[G, A] < G`: IH を `actionCommutator` に適用 ⇒ A trivial on [G, A] ⇒ Lem 4.28 系で結論.
+- `[G, A] = G`: `G' < G` (G nontrivial nilpotent solvable). IH を G' に適用 ⇒ A trivial on G'.
+  Three-subgroups in Γ = G ⋊ A ([G', A] = 1, [G, G'] ⊆ G' から) ⇒ `[G, G'] = 1` ⇒ G' ⊆ Z(G)
+  ⇒ class ≤ 2. Baer trick + Cor 4.35 (class ≤ 2 case) で結論.
+
+下流: BG §1 Thm 1.11 (BG Cor 1.12 等), Ch.5 Cor 5.30 経由 normal p-complement (5.26). -/
+theorem isaacs_thm_4_36 {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {p : ℕ} [hp : Fact p.Prime] (hp_odd : p ≠ 2)
+    (φ : A →* MulAut G) (hG : IsPGroup p G) (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ g : G, g ^ p = 1 → ∀ a : A, (φ a) g = g) :
+    actionCommutator φ = ⊥ :=
+  isaacs_thm_4_36_aux hp_odd hA_p' (Nat.card G) φ hG h_fix le_rfl
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
@@ -2920,6 +3547,270 @@ theorem commutator_inl_inr_lt_inl_of_pgroup_action
   apply hg
   have : SemidirectProduct.inl g = (1 : G ⋊[φ] P) := Subtype.ext_iff.mp h
   exact SemidirectProduct.inl_injective this
+
+/-- The left factor inclusion `P →* P × Q`. -/
+def prodLeftHom (P Q : Type*) [Group P] [Group Q] : P →* P × Q where
+  toFun p := (p, 1)
+  map_one' := rfl
+  map_mul' _ _ := by
+    ext <;> simp
+
+@[simp]
+theorem prodLeftHom_apply {P Q : Type*} [Group P] [Group Q] (p : P) :
+    prodLeftHom P Q p = (p, 1) :=
+  by simp [prodLeftHom]
+
+/-- The right factor inclusion `Q →* P × Q`. -/
+def prodRightHom (P Q : Type*) [Group P] [Group Q] : Q →* P × Q where
+  toFun q := (1, q)
+  map_one' := rfl
+  map_mul' _ _ := by
+    ext <;> simp
+
+@[simp]
+theorem prodRightHom_apply {P Q : Type*} [Group P] [Group Q] (q : Q) :
+    prodRightHom P Q q = (1, q) :=
+  by simp [prodRightHom]
+
+/-- In an external direct-product action, `[G, P]` is invariant under the whole
+`P × Q` action. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] (φ : P × Q →* MulAut G) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator (φ.comp (prodLeftHom P Q))) := by
+  apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
+  intro b
+  have key : ∀ g : G, ∀ p : P,
+      (φ b) (g * (φ (prodLeftHom P Q p)) g⁻¹) =
+        (φ b) g * (φ (prodLeftHom P Q (b.1 * p * b.1⁻¹))) ((φ b) g)⁻¹ := by
+    intro g p
+    rw [map_mul (φ b)]
+    congr 1
+    rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
+        show φ (prodLeftHom P Q (b.1 * p * b.1⁻¹)) =
+            (φ b) * (φ (prodLeftHom P Q p)) * (φ b)⁻¹ from by
+          rw [show prodLeftHom P Q (b.1 * p * b.1⁻¹) =
+              b * prodLeftHom P Q p * b⁻¹ from by
+            ext <;> simp [prodLeftHom, mul_assoc]]
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.inv_apply_self]
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, p, rfl⟩, rfl⟩
+    exact ⟨(φ b) g, b.1 * p * b.1⁻¹, by simpa using key g p⟩
+  · rintro ⟨g, p, hx⟩
+    have hx' : x = g * (φ (prodLeftHom P Q p)) g⁻¹ := by simpa using hx
+    rw [hx']
+    refine ⟨(φ b)⁻¹ g * (φ (prodLeftHom P Q (b.1⁻¹ * p * b.1))) ((φ b)⁻¹ g)⁻¹,
+      ⟨(φ b)⁻¹ g, b.1⁻¹ * p * b.1, by simp⟩, ?_⟩
+    rw [map_mul (φ b)]
+    congr 1
+    · exact MulAut.apply_inv_self (M := G) (φ b) g
+    rw [show ((φ b)⁻¹ g)⁻¹ = (φ b)⁻¹ g⁻¹ from (map_inv ((φ b)⁻¹) g).symm,
+        show φ (prodLeftHom P Q (b.1⁻¹ * p * b.1)) =
+            (φ b)⁻¹ * (φ (prodLeftHom P Q p)) * (φ b) from by
+          rw [show prodLeftHom P Q (b.1⁻¹ * p * b.1) =
+              b⁻¹ * prodLeftHom P Q p * b from by
+            ext <;> simp [prodLeftHom, mul_assoc]]
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
+
+/-- Three-subgroups step for Isaacs Theorem 4.31 in external direct-product form.
+
+Let `P × Q` act on `G`. If the `Q`-factor acts trivially on `[G, P]`, then
+the `P`-factor acts trivially on `[G, Q]`. This is the semidirect-product
+calculation corresponding to `[G,P,Q]=1` and `[P,Q,G]=1`, hence `[Q,G,P]=1`. -/
+theorem prodLeft_fixes_actionCommutator_prodRight_of_prodRight_fixes_actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] (φ : P × Q →* MulAut G)
+    (hQ_on_GP : ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)),
+      (φ (1, q)) h = h) :
+    ∀ p : P, ∀ h ∈ actionCommutator (φ.comp (prodRightHom P Q)),
+      (φ (p, 1)) h = h := by
+  let iP : P →* P × Q := prodLeftHom P Q
+  let iQ : Q →* P × Q := prodRightHom P Q
+  set XG : Subgroup (G ⋊[φ] (P × Q)) :=
+    (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)).range
+  set YP : Subgroup (G ⋊[φ] (P × Q)) :=
+    ((SemidirectProduct.inr : P × Q →* G ⋊[φ] (P × Q)).comp iP).range
+  set YQ : Subgroup (G ⋊[φ] (P × Q)) :=
+    ((SemidirectProduct.inr : P × Q →* G ⋊[φ] (P × Q)).comp iQ).range
+  have h_GP_eq : (actionCommutator (φ.comp iP)).map
+      (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)) = ⁅XG, YP⁆ := by
+    simpa [XG, YP, iP] using actionCommutator_map_inl_comp φ iP
+  have h_GQ_eq : (actionCommutator (φ.comp iQ)).map
+      (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)) = ⁅XG, YQ⁆ := by
+    simpa [XG, YQ, iQ] using actionCommutator_map_inl_comp φ iQ
+  have h_GPYQ : ⁅⁅XG, YP⁆, YQ⁆ = ⊥ := by
+    rw [← h_GP_eq, eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨k, hk, rfl⟩ _ ⟨q, rfl⟩
+    change ⁅(SemidirectProduct.inl k : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iQ q)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q)))
+    rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+    have h_fix : (φ (iQ q)) k = k := by
+      simpa [iQ] using hQ_on_GP q k hk
+    rw [show (φ (iQ q)) k⁻¹ = ((φ (iQ q)) k)⁻¹ from map_inv (φ (iQ q)) k,
+      h_fix, mul_inv_cancel]
+    exact map_one _
+  have h_PQ : ⁅YP, YQ⁆ = ⊥ := by
+    rw [eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨p, rfl⟩ _ ⟨q, rfl⟩
+    change ⁅(SemidirectProduct.inr (iP p) : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iQ q)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q)))
+    rw [Subgroup.mem_bot]
+    ext <;> simp [commutatorElement_def, iP, iQ]
+  have h_PQXG : ⁅⁅YP, YQ⁆, XG⁆ = ⊥ := by
+    rw [h_PQ]
+    exact Subgroup.commutator_bot_left XG
+  have h_three : ⁅⁅YQ, XG⁆, YP⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate h_GPYQ h_PQXG
+  have h_GQYP : ⁅⁅XG, YQ⁆, YP⁆ = ⊥ := by
+    rwa [Subgroup.commutator_comm YQ XG] at h_three
+  intro p h hh
+  have h_in_GQ : (SemidirectProduct.inl h : G ⋊[φ] (P × Q)) ∈ ⁅XG, YQ⁆ := by
+    rw [← h_GQ_eq]
+    exact ⟨h, hh, rfl⟩
+  have h_comm_mem : ⁅(SemidirectProduct.inl h : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iP p)⁆ ∈ ⁅⁅XG, YQ⁆, YP⁆ :=
+    Subgroup.commutator_mem_commutator h_in_GQ ⟨p, rfl⟩
+  have h_comm_bot : ⁅(SemidirectProduct.inl h : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iP p)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q))) := by
+    rw [← h_GQYP]
+    exact h_comm_mem
+  rw [Subgroup.mem_bot, SemidirectProduct.commutator_inl_inr] at h_comm_bot
+  have h_mul : h * (φ (iP p)) h⁻¹ = 1 :=
+    SemidirectProduct.inl_injective (by simpa using h_comm_bot)
+  rw [show (φ (iP p)) h⁻¹ = ((φ (iP p)) h)⁻¹ from map_inv (φ (iP p)) h] at h_mul
+  rw [mul_inv_eq_one] at h_mul
+  simpa [iP] using h_mul.symm
+
+/-- Final coprime-action step for Isaacs Theorem 4.31 in external direct-product form.
+
+If `Q` is a `p'`-group acting on the `p`-group `G`, `Q` acts trivially on
+`[G,P]`, and every `P`-fixed element of `G` is `Q`-fixed, then `[G,Q] = 1`.
+Together with induction providing the first hypothesis, this is the last
+paragraph of Isaacs Thm 4.31. -/
+theorem actionCommutator_prodRight_eq_bot_of_prodRight_fixes_actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] [Finite G] [Finite Q]
+    {p : ℕ} [hp : Fact p.Prime] (φ : P × Q →* MulAut G)
+    (hG : IsPGroup p G) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (hQ_on_GP : ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)),
+      (φ (1, q)) h = h)
+    (h_fix : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g) :
+    actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ := by
+  let φQ : Q →* MulAut G := φ.comp (prodRightHom P Q)
+  have hP_on_GQ :
+      ∀ x : P, ∀ h ∈ actionCommutator (φ.comp (prodRightHom P Q)),
+        (φ (x, 1)) h = h :=
+    prodLeft_fixes_actionCommutator_prodRight_of_prodRight_fixes_actionCommutator_prodLeft
+      φ hQ_on_GP
+  have h_triv : ∀ q : Q, ∀ h ∈ actionCommutator φQ, (φQ q) h = h := by
+    intro q h hh
+    have hP_fix : ∀ x : P, (φ (x, 1)) h = h := by
+      intro x
+      exact hP_on_GQ x h (by simpa [φQ] using hh)
+    simpa [φQ] using h_fix h hP_fix q
+  have hCop : Nat.Coprime (Nat.card Q) (Nat.card G) := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+    rw [hk]
+    exact (((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hQ_p').symm).pow_right k
+  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have hSolv : IsSolvable Q ∨ IsSolvable G := Or.inr IsNilpotent.to_isSolvable
+  exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+    (A := Q) (G := G) (φ := φQ) hCop hSolv h_triv
+
+/-- Finite subgroup card strictly drops for a proper subgroup. -/
+private theorem subgroup_card_lt_of_ne_top {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hH : H ≠ ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- Strong-induction form of Isaacs Theorem 4.31 for external direct products. -/
+private theorem isaacs_thm_4_31_external_aux
+    {P Q : Type*} [Group P] [Group Q] [Finite P] [Finite Q]
+    {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q) :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G]
+    (φ : P × Q →* MulAut G) (_ : IsPGroup p G)
+    (_ : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g),
+    Nat.card G ≤ n → actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ _ _ h_le
+    exfalso
+    have h_pos : 0 < Nat.card G := Nat.card_pos
+    omega
+  | succ m IH =>
+    intro G _ _ φ hG h_fix h_le
+    rcases Nat.lt_or_ge (Nat.card G) (m + 1) with h_lt | h_ge
+    · exact IH φ hG h_fix (Nat.le_of_lt_succ h_lt)
+    have h_card_G : Nat.card G = m + 1 := le_antisymm h_le h_ge
+    by_cases hG_nontriv : Nontrivial G
+    swap
+    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+      rw [actionCommutator_eq_bot_iff_acts_trivially]
+      intro q g
+      exact Subsingleton.elim _ _
+    letI : Nontrivial G := hG_nontriv
+    let φP : P →* MulAut G := φ.comp (prodLeftHom P Q)
+    set H : Subgroup G := actionCommutator φP with hH_def
+    have h_lt_comm : ⁅(SemidirectProduct.inl : G →* G ⋊[φP] P).range,
+        (SemidirectProduct.inr : P →* G ⋊[φP] P).range⁆ <
+          (SemidirectProduct.inl : G →* G ⋊[φP] P).range :=
+      commutator_inl_inr_lt_inl_of_pgroup_action hG hP φP
+    have hH_ne_top : H ≠ ⊤ := by
+      intro htop
+      have hmap : H.map (SemidirectProduct.inl : G →* G ⋊[φP] P) =
+          (SemidirectProduct.inl : G →* G ⋊[φP] P).range := by
+        rw [htop]
+        exact (MonoidHom.range_eq_map _).symm
+      rw [hH_def, actionCommutator_map_inl] at hmap
+      exact h_lt_comm.ne hmap
+    have hH_card_lt : Nat.card H < Nat.card G := subgroup_card_lt_of_ne_top hH_ne_top
+    have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+      rw [hH_def]
+      simpa [φP] using OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_prodLeft φ
+    let φH : P × Q →* MulAut H :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+    have hH_pgrp : IsPGroup p H := hG.to_subgroup H
+    have h_fix_H :
+        ∀ h : H, (∀ x : P, (φH (x, 1)) h = h) → ∀ y : Q, (φH (1, y)) h = h := by
+      intro h hP_fix y
+      apply Subtype.ext
+      have hP_fix_val : ∀ x : P, (φ (x, 1)) h.val = h.val := by
+        intro x
+        have hx := congr_arg (Subtype.val : H → G) (hP_fix x)
+        simpa [φH] using hx
+      have hQ_fix := h_fix h.val hP_fix_val y
+      simpa [φH] using hQ_fix
+    have hIH_H := IH φH hH_pgrp h_fix_H
+      (Nat.le_of_lt_succ (hH_card_lt.trans_le h_le))
+    have hQ_on_GP :
+        ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)), (φ (1, q)) h = h := by
+      intro q h hh
+      rw [actionCommutator_eq_bot_iff_acts_trivially] at hIH_H
+      have h_in_H : h ∈ H := by
+        simpa [H, φP] using hh
+      have hact := congr_arg (Subtype.val : H → G) (hIH_H q ⟨h, h_in_H⟩)
+      simpa [φH] using hact
+    exact actionCommutator_prodRight_eq_bot_of_prodRight_fixes_actionCommutator_prodLeft
+      φ hG hQ_p' hQ_on_GP h_fix
+
+/-- **Isaacs Theorem 4.31** (external direct-product form).
+
+Let `P × Q` act on the `p`-group `G`, with `P` a `p`-group and `Q` a
+`p'`-group. If every element of `G` fixed by the `P`-factor is fixed by the
+`Q`-factor, then the `Q`-factor acts trivially on `G`. -/
+theorem isaacs_thm_4_31_external
+    {G P Q : Type*} [Group G] [Group P] [Group Q] [Finite G] [Finite P] [Finite Q]
+    {p : ℕ} [Fact p.Prime] (φ : P × Q →* MulAut G)
+    (hG : IsPGroup p G) (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (h_fix : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g) :
+    actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ :=
+  isaacs_thm_4_31_external_aux hP hQ_p' (Nat.card G) φ hG h_fix le_rfl
 
 end -- 4D
 
