@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.Focal
 import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.Isaacs.Ch04_Commutators.Main
 
 open scoped commutatorElement
 
@@ -25,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
-| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | docstring + 保留 (FT クリティカル) |
+| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
 
 ## 方針
 
@@ -232,17 +233,16 @@ section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16** (Z-group 構造): mathlib `IsZGroup` API 直接.
 - **Thm 5.17** (cyclic Sylow_p ⇒ p∤|G'| or p∤|G:G'|): ✅ `isaacs_thm_5_17`
-  (axiom on Ch.4 §4D Thm 4.34 Fitting + cyclic-chain helper).
+  (Ch.4 §4D Thm 4.28 + 4.34 Fitting + cyclic-chain helper).
 - **Cor 5.19** (Sylow_2 cyclic direct factor ⇒ 非単純): 形式化保留. -/
 
-/-! ### Forward axioms (Ch.4 §4D dep)
+/-! ### Ch.4 §4D adapter
 
-Thm 5.17 は Ch.4 §4D **Thm 4.34 Fitting** に依存. 当面 axiom 化, Ch.4 §4D 完成後に
-theorem 化する. -/
+Thm 5.17 は Ch.4 §4D **Thm 4.28 + 4.34 Fitting** に依存する. Ch.4 の
+`fixedPointsOfMulAut` / `actionCommutator` 形式を、Ch.5 の subgroup conjugation 形式へ
+ここで変換する. -/
 
-namespace _root_.OddOrder.Isaacs.Ch04
-
-/-- **Isaacs Thm 4.34 (Fitting)** — axiom 形 (Ch.4 §4D forward dep).
+/-- **Isaacs Thm 4.34 (Fitting)** — Ch.5 subgroup-conjugation adapter.
 
 `A` (= subgroup `K` of `G` with `K ≤ N_G(P)`) が abelian subgroup `P` に conjugation 経由で
 作用. `(|P|, |K|) = 1` (coprime) ⇒ `P = C_P(K) × ⁅P, K⁆` (internal direct product, element form).
@@ -255,14 +255,135 @@ namespace _root_.OddOrder.Isaacs.Ch04
 * ⇒ C_P(K) ⊓ ⁅P, K⁆ = ⊥.
 * p^|K| = θ(p) · h with h ∈ ⁅P, K⁆ (元素計算). Bezout で p ∈ C_P(K) · ⁅P, K⁆.
 
-**実装スケジュール**: Ch.4 §4D 着手時 ~150 LOC. 進捗は ROADMAP / `notes/isaacs/ch04_commutators.md`. -/
-axiom fitting_coprime_abelian_decomp
+This is the form needed by Isaacs Thm 5.17: a subgroup `K ≤ N_G(P)` acts on the
+abelian subgroup `P` by conjugation. Ch.4 gives the same result for an abstract
+automorphism action on the group `↥P`; this theorem translates fixed points to
+`C_G(K) ∩ P` and action-commutators to `⁅P, K⁆`. -/
+theorem fitting_coprime_abelian_decomp
     {G : Type*} [Group G] [Finite G]
     {P : Subgroup G} [IsMulCommutative ↥P]
-    {K : Subgroup G} (_hK_norm : K ≤ Subgroup.normalizer P)
-    (_h_coprime : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K)) :
+    {K : Subgroup G} (hK_norm : K ≤ Subgroup.normalizer P)
+    (h_coprime : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K)) :
     (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ ∧
-      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P := by
+  classical
+  let N : Subgroup G := Subgroup.normalizer (P : Set G)
+  let KN : Subgroup N := K.subgroupOf N
+  let φ : KN →* MulAut P := MulDistribMulAction.toMulAut KN P
+  have hKN_card : Nat.card KN = Nat.card K :=
+    Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (H := K) (K := N)
+        (by simpa [N] using hK_norm)).toEquiv
+  have hCop : Nat.Coprime (Nat.card KN) (Nat.card P) := by
+    rw [hKN_card]
+    exact h_coprime.symm
+  have hSolv : IsSolvable KN ∨ IsSolvable P := by
+    right
+    infer_instance
+  have h_inf_P :
+      Subgroup.fixedPointsOfMulAut φ ⊓
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    _root_.OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
+      φ hCop
+  have h_sup_P :
+      Subgroup.fixedPointsOfMulAut φ ⊔
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ :=
+    _root_.OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := φ) hCop hSolv
+  have h_fixed_map_le : (Subgroup.fixedPointsOfMulAut φ).map P.subtype ≤
+      Subgroup.centralizer (K : Set G) ⊓ P := by
+    intro x hx
+    rw [Subgroup.mem_inf]
+    rcases hx with ⟨xp, hxp_fixed, rfl⟩
+    constructor
+    · rw [Subgroup.mem_centralizer_iff]
+      intro y hyK
+      let yN : N := ⟨y, by simpa [N] using hK_norm hyK⟩
+      let yKN : KN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyK⟩
+      have hfix : (φ yKN) xp = xp := hxp_fixed yKN
+      have hconj : y * (xp : G) * y⁻¹ = (xp : G) := by
+        exact congrArg Subtype.val hfix
+      calc y * (xp : G) = (y * (xp : G) * y⁻¹) * y := by group
+        _ = (xp : G) * y := by rw [hconj]
+    · exact xp.property
+  have h_ac_map_le :
+      (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype ≤
+        (⁅P, K⁆ : Subgroup G) := by
+    rw [Subgroup.map_le_iff_le_comap,
+      _root_.OddOrder.Isaacs.Ch04.actionCommutator_le_iff]
+    intro a x
+    rw [Subgroup.mem_comap]
+    change ((a : N).val * (x : G) * (a : N).val⁻¹) * (x : G)⁻¹ ∈
+      (⁅P, K⁆ : Subgroup G)
+    have haK : ((a : N).val : G) ∈ K := by
+      have ha := a.property
+      rwa [Subgroup.mem_subgroupOf] at ha
+    have hxP : (x : G) ∈ P := x.property
+    have hcomm : (⁅(x : G), ((a : N).val : G)⁆ : G) ∈ (⁅P, K⁆ : Subgroup G) :=
+      Subgroup.commutator_mem_commutator hxP haK
+    convert (Subgroup.inv_mem _ hcomm) using 1
+    group
+  have h_comm_le_ac_map :
+      (⁅P, K⁆ : Subgroup G) ≤
+        (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype := by
+    rw [Subgroup.commutator_le]
+    intro x hxP y hyK
+    let yN : N := ⟨y, by simpa [N] using hK_norm hyK⟩
+    let yKN : KN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyK⟩
+    let xP : P := ⟨x, hxP⟩
+    have hgen : xP * (φ yKN) xP⁻¹ ∈
+        _root_.OddOrder.Isaacs.Ch04.actionCommutator φ :=
+      Subgroup.subset_closure ⟨xP, yKN, rfl⟩
+    refine ⟨xP * (φ yKN) xP⁻¹, hgen, ?_⟩
+    dsimp [φ, xP, yKN, yN]
+    change x * (y * x⁻¹ * y⁻¹) = x * y * x⁻¹ * y⁻¹
+    group
+  have h_inf_bot :
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊓ (⁅P, K⁆ : Subgroup G) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_bot]
+    rcases Subgroup.mem_inf.mp hx with ⟨hx_centP, hx_comm⟩
+    rcases Subgroup.mem_inf.mp hx_centP with ⟨hx_cent, hxP⟩
+    let xP : P := ⟨x, hxP⟩
+    have hx_fixed : xP ∈ Subgroup.fixedPointsOfMulAut φ := by
+      intro a
+      apply Subtype.ext
+      rcases a with ⟨⟨y, _hyN⟩, hyK⟩
+      have hcomm : y * x = x * y := by
+        rw [Subgroup.mem_centralizer_iff] at hx_cent
+        exact hx_cent y hyK
+      change y * x * y⁻¹ = x
+      rw [hcomm, mul_assoc, mul_inv_cancel, mul_one]
+    have hx_ac : xP ∈ _root_.OddOrder.Isaacs.Ch04.actionCommutator φ := by
+      have hx_map :
+          x ∈ (_root_.OddOrder.Isaacs.Ch04.actionCommutator φ).map P.subtype :=
+        h_comm_le_ac_map hx_comm
+      rcases hx_map with ⟨z, hz_ac, hz_val⟩
+      have hz_eq : z = xP := Subtype.ext hz_val
+      rwa [hz_eq] at hz_ac
+    have hxP_bot : xP ∈ (⊥ : Subgroup P) := by
+      rw [← h_inf_P]
+      exact ⟨hx_fixed, hx_ac⟩
+    exact congrArg Subtype.val (Subgroup.mem_bot.mp hxP_bot)
+  have h_sup_eq :
+      (Subgroup.centralizer (K : Set G) ⊓ P) ⊔ (⁅P, K⁆ : Subgroup G) = P := by
+    apply le_antisymm
+    · exact sup_le inf_le_right (by
+        rw [Subgroup.commutator_le]
+        intro x hxP y hyK
+        have hyN : y ∈ N := by simpa [N] using hK_norm hyK
+        have hyxiy : y * x⁻¹ * y⁻¹ ∈ P :=
+          (Subgroup.mem_normalizer_iff.mp hyN x⁻¹).mp (P.inv_mem hxP)
+        have h_eq : x * y * x⁻¹ * y⁻¹ = x * (y * x⁻¹ * y⁻¹) := by group
+        rw [show (⁅x, y⁆ : G) = x * y * x⁻¹ * y⁻¹ from rfl, h_eq]
+        exact P.mul_mem hxP hyxiy)
+    · intro x hxP
+      have hx_map_top : x ∈ ((⊤ : Subgroup P).map P.subtype) := by
+        exact ⟨⟨x, hxP⟩, Subgroup.mem_top _, rfl⟩
+      rw [← h_sup_P, Subgroup.map_sup] at hx_map_top
+      exact (sup_le_sup h_fixed_map_le h_ac_map_le) hx_map_top
+  exact ⟨h_inf_bot, h_sup_eq⟩
 
 /-- **Cyclic p-group inf-eq-bot** (theorem 形, 2026-05-23 axiom → theorem 化).
 
@@ -372,8 +493,6 @@ theorem cyclic_pgroup_inf_eq_bot_iff
   rw [h_inf, Subgroup.mem_bot] at hh_inHK
   rw [hh_inHK, orderOf_one] at hh_ord_g
   exact (Nat.Prime.ne_one Fact.out) hh_ord_g.symm
-
-end _root_.OddOrder.Isaacs.Ch04
 
 /-- **Isaacs Lemma 5.11** (Hall transfer index): `H` が π-Hall 部分群 + `ϕ : H →* A`
 (`A` 可換有限群, `|A| ∣ |H|`) ⇒ `ker(transfer ϕ) · H = G`.
@@ -579,10 +698,11 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
 **証明** (Isaacs p.165, Fitting 4.34 + Burnside 5.13 経由):
 
 `N := N_G(P)`, `K` complement of `P` in `N` (Schur-Zassenhaus, `(|P|, |N:P|) = 1` since
-P Sylow_p). `K ≤ N`, `(|P|, |K|) = 1`. **Thm 4.34 Fitting** (axiom): `P = C_P(K) × ⁅P,K⁆`
+P Sylow_p). `K ≤ N`, `(|P|, |K|) = 1`. **Thm 4.34 Fitting** adapter:
+`P = C_P(K) × ⁅P,K⁆`
 (internal direct, `C_P(K) ⊓ ⁅P,K⁆ = ⊥` AND `C_P(K) ⊔ ⁅P,K⁆ = P`).
 
-`P` cyclic + axiom **cyclic_pgroup_inf_eq_bot_iff**: `C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒
+`P` cyclic + **cyclic_pgroup_inf_eq_bot_iff**: `C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒
 C_P(K) = ⊥ ∨ ⁅P,K⁆ = ⊥`.
 
 * **Case 1** `⁅P,K⁆ = ⊥`: `K` centralizes `P`. `N = PK` で全要素が `P` と可換 ⇒
@@ -593,8 +713,8 @@ C_P(K) = ⊥ ∨ ⁅P,K⁆ = ⊥`.
 * **Case 2** `C_P(K) = ⊥`: 4.34 sup より `P = ⁅P,K⁆ ⊆ commutator G`. `|G:G'| = |G|/|G'|`,
   Sylow_p 全体が `G'` に入る ⇒ `|G:G'|` の `p`-成分 = 1 ⇒ `p ∤ |G:G'|`.
 
-**FORWARD DEPENDENCY**: Thm 4.34 (Ch.4 §4D) + cyclic_pgroup_inf_eq_bot_iff (mathlib upstream
-候補) を axiom 化. 完成後 unconditional 化. -/
+**実装状態**: Ch.4 §4D Thm 4.28 + 4.34 を subgroup-conjugation adapter で接続済み.
+`cyclic_pgroup_inf_eq_bot_iff` も theorem 化済み. -/
 theorem isaacs_thm_5_17
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
     [hPcyc : IsCyclic ↥(P : Subgroup G)] :
@@ -644,9 +764,9 @@ theorem isaacs_thm_5_17
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_N).toEquiv
     rw [h_K_card, h_K'_card, ← h_PN_card]
     exact h_coprime_P_N
-  -- Apply Thm 4.34 (axiom)
+  -- Apply Thm 4.34 adapter.
   obtain ⟨h_inf_bot, h_sup_top⟩ :=
-    _root_.OddOrder.Isaacs.Ch04.fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
+    fitting_coprime_abelian_decomp hK_le_N h_coprime_PK
   -- ⁅P, K⁆ ≤ P (since K ≤ N normalizes P, so conjugates of P-elements stay in P)
   have h_comm_le_P : (⁅(P : Subgroup G), K⁆ : Subgroup G) ≤ (P : Subgroup G) := by
     rw [Subgroup.commutator_le]
@@ -659,8 +779,8 @@ theorem isaacs_thm_5_17
     exact (P : Subgroup G).mul_mem hx hyxiy
   have h_cent_le_P : Subgroup.centralizer (K : Set G) ⊓ (P : Subgroup G) ≤ (P : Subgroup G) :=
     inf_le_right
-  -- Cyclic axiom: C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒ one of them is ⊥
-  rcases (_root_.OddOrder.Isaacs.Ch04.cyclic_pgroup_inf_eq_bot_iff P.isPGroup'
+  -- Cyclic p-group chain: C_P(K) ⊓ ⁅P,K⁆ = ⊥ ⇒ one of them is ⊥.
+  rcases (cyclic_pgroup_inf_eq_bot_iff P.isPGroup'
       h_cent_le_P h_comm_le_P).mp h_inf_bot with h_cent_bot | h_comm_bot
   · -- Case 2 (h_cent_bot): C_P(K) = ⊥ ⇒ P = ⁅P,K⁆ ⊆ commutator G ⇒ p ∤ |G:G'|
     right
@@ -847,8 +967,9 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 **FT クリティカル**. mathlib 未収載で新規実装が必要.
 
 - **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
-- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): 🟡 部分完成. `Sylow.ControlsOwnFusion` 定義 + (⇒) `controlsOwnFusion_of_hasNormalPComplement` ✅. (⇐) `hasNormalPComplement_of_controlsOwnFusion` sorry (O^p, A^p 定義必要).
-- **Thm 5.26 Frobenius** (3 同値条件): 形式化保留 (Lem 5.27 + Lem 5.28 + 5.25 経由).
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
+  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
+- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
 - **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
   Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
 - **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
@@ -856,8 +977,8 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
   main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
   Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
   二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
-- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
-- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
+- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
+- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
 
 /-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
 that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
@@ -1037,6 +1158,95 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   obtain ⟨a, _, ha⟩ := (Nat.dvd_prime_pow Fact.out).mp h_idx_dvd
   exact ⟨a, ha⟩
 
+/-- For finite groups, `A^p(G)` is characteristic.
+
+This is the automorphism-invariance of Isaacs' defining family: normal subgroups containing
+`G'` with p-power index are preserved by every automorphism. -/
+lemma APrime_characteristic (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.Prime] :
+    (APrime p G).Characteristic := by
+  classical
+  rw [Subgroup.characteristic_iff_le_comap]
+  intro φ
+  let K : Subgroup G := (APrime p G).comap φ.toMonoidHom
+  have hK_normal : K.Normal := inferInstance
+  have hK_comm : commutator G ≤ K := by
+    intro x hx
+    rw [Subgroup.mem_comap]
+    have hxmap : φ x ∈ (commutator G).map φ.toMonoidHom :=
+      Subgroup.mem_map_of_mem φ.toMonoidHom hx
+    have hmap_comm : (commutator G).map φ.toMonoidHom = commutator G := by
+      rw [_root_.map_commutator_eq,
+        φ.toMonoidHom.range_eq_top_of_surjective φ.surjective,
+        ← _root_.commutator_def]
+    exact commutator_le_APrime p G (hmap_comm ▸ hxmap)
+  obtain ⟨k, hk⟩ := APrime_index_isPGroup p G
+  have hK_index : K.index = p ^ k := by
+    rw [Subgroup.index_comap_of_surjective (H := APrime p G)
+      (f := φ.toMonoidHom) φ.surjective, hk]
+  exact APrime_le (K := K) hK_normal hK_comm hK_index
+
+/-- The transfer-focal kernel contains `A^p(G)`.
+
+This is the `A^p` half of Isaacs Thm 5.21 in the mathlib formulation: the quotient
+`G / ker(V)` is isomorphic to the p-group `P / P*`, and `ker(V)` contains `G'`. -/
+lemma APrime_le_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) : APrime p G ≤ P.transferFocal.ker := by
+  classical
+  have hquot : IsPGroup p (G ⧸ P.transferFocal.ker) :=
+    (P.2.to_quotient P.focalSubgroupOf).of_equiv
+      (Subgroup.transferFocal.quotientKerMulEquivQuotientFocalSubroupOf P).symm
+  obtain ⟨k, hk⟩ := hquot.exists_card_eq
+  have hker_index : P.transferFocal.ker.index = p ^ k := by
+    rw [Subgroup.index_eq_card]
+    exact hk
+  exact APrime_le (K := P.transferFocal.ker) inferInstance
+    (Abelianization.commutator_subset_ker P.transferFocal) hker_index
+
+/-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
+
+This packages only the standard `A^p` consequence of the focal subgroup theorem, avoiding a
+separate public bridge through `G'`. -/
+lemma sylow_focalSubgroup_eq_self_of_APrime_eq_top [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hA : APrime p G = ⊤) :
+    P.focalSubgroup = (P : Subgroup G) := by
+  have hker_top : P.transferFocal.ker = ⊤ := by
+    apply eq_top_iff.mpr
+    simpa [hA] using APrime_le_transferFocal_ker (G := G) (p := p) P
+  rw [← Subgroup.ker_transferFocal_inf_eq_focalSubgroup P, hker_top, top_inf_eq]
+
+/-- **Isaacs Thm 5.25 proof step**: if `N = O^p(G)`, then `A^p(N)=N`.
+
+Isaacs p.173 uses that `A^p(N)` is characteristic in `N`, hence normal in `G`, and that
+`|G:A^p(N)| = |G:N| · |N:A^p(N)|` is a p-power. Minimality of `O^p(G)` then gives
+`N ≤ A^p(N).map subtype ≤ N`, so `A^p(N)=N` internally. -/
+lemma APrime_eq_top_of_eq_OPrime [Finite G] {p : ℕ} [Fact p.Prime]
+    {N : Subgroup G} [N.Normal] (hN : N = OPrime p G) :
+    APrime p N = ⊤ := by
+  classical
+  let A : Subgroup N := APrime p N
+  haveI hA_char : A.Characteristic := by
+    simpa [A] using APrime_characteristic (p := p) (G := N)
+  haveI hAmap_normal : (A.map N.subtype).Normal := inferInstance
+  have hAmap_le_N : A.map N.subtype ≤ N :=
+    Subgroup.map_subtype_le A
+  obtain ⟨a, hN_index⟩ : ∃ a : ℕ, N.index = p ^ a := by
+    rw [hN]
+    exact OPrime_index_isPGroup p G
+  obtain ⟨b, hA_index⟩ : ∃ b : ℕ, A.index = p ^ b := by
+    simpa [A] using APrime_index_isPGroup p N
+  have hAmap_index : (A.map N.subtype).index = p ^ (b + a) := by
+    rw [Subgroup.index_map_subtype, hA_index, hN_index, ← pow_add]
+  have hN_le_Amap : N ≤ A.map N.subtype := by
+    have hO_le_Amap : OPrime p G ≤ A.map N.subtype :=
+      OPrime_le hAmap_normal hAmap_index
+    exact hN.symm ▸ hO_le_Amap
+  have hAmap_eq_N : A.map N.subtype = N :=
+    le_antisymm hAmap_le_N hN_le_Amap
+  have hA_eq_top : A = ⊤ := by
+    apply (Subgroup.map_subtype_inj (H := N)).mp
+    rw [hAmap_eq_N, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  simpa [A] using hA_eq_top
+
 /-- "Sylow `p`-subgroup `P` controls its own G-fusion": for any two elements `x, y ∈ P`
 that are conjugate in `G`, they are already conjugate by some element of `P`.
 
@@ -1094,25 +1304,239 @@ theorem controlsOwnFusion_of_hasNormalPComplement [Finite G] {p : ℕ} [Fact p.P
   refine ⟨q, hq_P, ?_⟩
   rw [h_y_eq, h_eq_one]
 
+/-- **Helper for Thm 5.25 (⇐)**: heart of the proof. Sylow_p `P` that controls its own G-fusion
+satisfies `P ⊓ OPrime p G = ⊥`. The rest of Thm 5.25 (⇐) is a Sylow-conjugacy + cardinality
+assembly on top of this.
+
+**証明スケッチ** (Isaacs p.173):
+* `N := OPrime p G`. `Q := (P ⊓ N).subgroupOf N` is Sylow `p` of `↥N` (cardinality argument:
+  `|P ⊓ N| = |P| / [G : N · P]` and `N · P = G` from `[G:N]` being p-power dividing `|P|`).
+* **APrime p ↥N = ⊤**: `APrime p ↥N` is characteristic in `↥N` (Aut(N) preserves the
+  defining family) ⇒ its `.map N.subtype` is normal in `G`. It has p-power index in `G`
+  (= `|G:N| · |↥N : APrime|`), so by `OPrime` minimality `N ≤ (APrime).map subtype ≤ N`,
+  hence equality, hence `APrime p ↥N = ⊤` in `↥N`.
+* **Focal Subgroup Theorem**: `APrime p ↥N = ⊤` and transfer-focal give
+  `focalSubgroup Q = Q`. This is the `A^p(N)=N` line in Isaacs followed by Thm 5.21,
+  without adding an extra public bridge through `commutator ↥N`.
+* **ControlsOwnFusion lift**: every generator `⁅x, u⁆ ∈ focalSubgroup Q` (with `x ∈ Q`,
+  `u ∈ ↥N` such that `[x,u] ∈ Q`) can be rewritten using ControlsOwnFusion. Set
+  `y := u x u⁻¹ ∈ Q ⊆ P`; controlsOwnFusion gives `v ∈ P` with `v x v⁻¹ = y`. Then
+  `[x, v⁻¹] = x⁻¹ y` is in `⁅Q.map N.subtype, (P : Subgroup G)⁆`. Hence
+  `focalSubgroup Q ≤ ⁅Q.map subtype, P⁆` (viewing all in `G`).
+* **Iteration**: Combine the previous two: `Q.map subtype ≤ ⁅Q.map subtype, P⁆` in `G`. By
+  induction on `n`, `Q.map subtype ≤ lowerCentralSeries (P : Subgroup G) n`.
+  (Base: `Q.map subtype ≤ P` since `Q ⊆ P`. Step: `Q.map subtype ≤ ⁅Q.map subtype, P⁆ ≤
+  ⁅lowerCentralSeries P n, ⊤⁆ = lowerCentralSeries P (n+1)`.)
+* **Termination**: `P` is a finite p-group ⇒ `IsNilpotent P` (`IsPGroup.isNilpotent`) ⇒
+  `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
+  `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
+
+The proof below implements these steps directly. -/
+lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (hP : P.ControlsOwnFusion) :
+    (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
+  set N : Subgroup G := OPrime p G with hN_def
+  haveI hN_normal : N.Normal := inferInstance
+  set R : Subgroup G := (P : Subgroup G) ⊓ N with hR_def
+  have hR_le_P : R ≤ (P : Subgroup G) := by
+    rw [hR_def]
+    exact inf_le_left
+  -- Controls-own-fusion converts focal generators of `R` into commutators with `P`.
+  have h_focal_R_le_comm : R.focalSubgroup ≤ ⁅R, (P : Subgroup G)⁆ := by
+    rw [Subgroup.focalSubgroup_def, Subgroup.closure_le]
+    rintro g ⟨hgR, x, hxR, u, rfl⟩
+    have hyR : u * x * u⁻¹ ∈ R := by
+      have hy_eq : u * x * u⁻¹ = (⁅x, u⁆)⁻¹ * x := by
+        rw [commutatorElement_def]
+        group
+      rw [hy_eq]
+      exact R.mul_mem (R.inv_mem hgR) hxR
+    obtain ⟨v, hvP, hv⟩ := hP (hR_le_P hxR) (hR_le_P hyR) ⟨u, rfl⟩
+    have hcomm_eq : ⁅x, u⁆ = ⁅x, v⁆ := by
+      rw [commutatorElement_def, commutatorElement_def]
+      calc
+        x * u * x⁻¹ * u⁻¹ = x * (u * x * u⁻¹)⁻¹ := by group
+        _ = x * (v * x * v⁻¹)⁻¹ := by rw [hv]
+        _ = x * v * x⁻¹ * v⁻¹ := by group
+    rw [hcomm_eq]
+    exact Subgroup.commutator_mem_commutator hxR hvP
+  -- **Crux**: `R ≤ ⁅R, (P : Subgroup G)⁆`.
+  -- 内訳: APrime ↥N = ⊤ (char + OPrime minimality) → transfer-focal で
+  -- focalSubgroup Q = Q → 各 focal generator ⁅x, u⁆ (x ∈ Q, u ∈ ↥N) を
+  -- ControlsOwnFusion で ⁅Q.map subtype, P⁆ 内 commutator に変換.
+  have h_R_le_comm : R ≤ ⁅R, (P : Subgroup G)⁆ := by
+    have h_R_le_focal : R ≤ R.focalSubgroup := by
+      have hR_le_N : R ≤ N := by
+        rw [hR_def]
+        exact inf_le_right
+      have hR_pgroup : IsPGroup p R :=
+        P.isPGroup'.to_le hR_le_P
+      have hRN_pgroup : IsPGroup p (R.subgroupOf N) :=
+        hR_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hR_le_N).symm
+      have hRN_not_dvd : ¬ p ∣ (R.subgroupOf N).index := by
+        obtain ⟨a, hN_idx_pow⟩ : ∃ a : ℕ, N.index = p ^ a := by
+          rw [hN_def]
+          exact OPrime_index_isPGroup p G
+        have hNP_coprime : Nat.Coprime N.index (P : Subgroup G).index := by
+          rw [hN_idx_pow]
+          exact (Nat.Prime.coprime_pow_of_not_dvd (m := a) Fact.out P.not_dvd_index).symm
+        have hNP_top : N ⊔ (P : Subgroup G) = ⊤ :=
+          OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hNP_coprime
+        have h_index_eq : (R.subgroupOf N).index = (P : Subgroup G).index := by
+          have hR_le_N' : R ≤ N := hR_le_N
+          have hR_rel_mul : R.relIndex N * N.index = R.index :=
+            Subgroup.relIndex_mul_index hR_le_N'
+          have hN_rel_P : N.relIndex (P : Subgroup G) = N.index := by
+            rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := N),
+              sup_comm, hNP_top, Subgroup.relIndex_top_right]
+          have hNP_rel_mul : N.relIndex (P : Subgroup G) * (P : Subgroup G).index =
+              R.index := by
+            have h := Subgroup.relIndex_inf_mul_relIndex (H := N)
+              (K := (P : Subgroup G)) (L := (⊤ : Subgroup G))
+            simpa [Subgroup.relIndex_top_right, hR_def, inf_comm] using h
+          have hmul : R.relIndex N * N.index = (P : Subgroup G).index * N.index := by
+            rw [hR_rel_mul, ← hNP_rel_mul, hN_rel_P, mul_comm N.index]
+          have hrel : R.relIndex N = (P : Subgroup G).index :=
+            Nat.eq_of_mul_eq_mul_right
+              (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
+          exact hrel
+        rw [h_index_eq]
+        exact P.not_dvd_index
+      let RN : Sylow p N := hRN_pgroup.toSylow hRN_not_dvd
+      have hRN_eq : (RN : Subgroup N) = R.subgroupOf N :=
+        hRN_pgroup.toSylow_coe hRN_not_dvd
+      have hAPrime_top : APrime p N = ⊤ :=
+        APrime_eq_top_of_eq_OPrime (G := G) (p := p) (N := N) hN_def
+      have hRN_focal_eq : RN.focalSubgroup = (RN : Subgroup N) :=
+        sylow_focalSubgroup_eq_self_of_APrime_eq_top RN hAPrime_top
+      have hRN_le_focal : R.subgroupOf N ≤ RN.focalSubgroup := by
+        intro x hx
+        rw [hRN_focal_eq, hRN_eq]
+        exact hx
+      have hRN_focal_map_le : RN.focalSubgroup.map N.subtype ≤ R.focalSubgroup := by
+        rw [Subgroup.focalSubgroup_def, MonoidHom.map_closure, Subgroup.focalSubgroup_def]
+        apply Subgroup.closure_mono
+        rintro y ⟨z, hz, rfl⟩
+        rcases hz with ⟨hzRN, x, hxRN, u, rfl⟩
+        have hzR : ((⁅x, u⁆ : N) : G) ∈ R := hzRN
+        have hxR : (x : G) ∈ R := by
+          have hxRN' : x ∈ R.subgroupOf N := by
+            rwa [hRN_eq] at hxRN
+          exact hxRN'
+        exact ⟨hzR, (x : G), hxR, (u : G), rfl⟩
+      intro r hr
+      let x : N := ⟨r, hR_le_N hr⟩
+      have hxRN : x ∈ R.subgroupOf N := hr
+      have hxFocal : x ∈ RN.focalSubgroup := hRN_le_focal hxRN
+      exact hRN_focal_map_le (Subgroup.mem_map_of_mem N.subtype hxFocal)
+    exact h_R_le_focal.trans h_focal_R_le_comm
+  -- Helper: `(⊤ : Subgroup ↥P).map P.subtype = P` (via `range_eq_map` + `range_subtype`).
+  have h_top_map : ((⊤ : Subgroup ↥(P : Subgroup G))).map (P : Subgroup G).subtype =
+      (P : Subgroup G) := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  -- **Step 5 (iteration)**: `∀ n, R ≤ (lowerCentralSeries ↥P n).map P.subtype`.
+  -- Base: R ⊆ P = ⊤.map subtype. Step: R ≤ ⁅R, P⁆ = ⁅R, ⊤.map subtype⁆ ≤ ⁅(lcs n).map, ⊤.map⁆
+  --       = (⁅lcs n, ⊤⁆).map = (lcs (n+1)).map.
+  have h_R_le_lcs : ∀ n : ℕ, R ≤ Subgroup.map (P : Subgroup G).subtype
+      (lowerCentralSeries ↥(P : Subgroup G) n) := by
+    intro n
+    induction n with
+    | zero =>
+      show R ≤ Subgroup.map (P : Subgroup G).subtype ⊤
+      rw [h_top_map]
+      exact inf_le_left
+    | succ n ih =>
+      change R ≤ Subgroup.map (P : Subgroup G).subtype
+        ⁅lowerCentralSeries ↥(P : Subgroup G) n, (⊤ : Subgroup ↥(P : Subgroup G))⁆
+      rw [Subgroup.map_commutator, h_top_map]
+      exact h_R_le_comm.trans (Subgroup.commutator_mono ih le_rfl)
+  -- **Step 6 (termination)**: `P` is a finite p-group ⇒ nilpotent ⇒ `∃ n, lcs ↥P n = ⊥`.
+  haveI hP_pgroup : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  haveI hP_nilp : Group.IsNilpotent ↥(P : Subgroup G) := hP_pgroup.isNilpotent
+  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hP_nilp
+  have : R ≤ ⊥ := by
+    have := h_R_le_lcs n
+    rw [hn, Subgroup.map_bot] at this
+    exact this
+  exact le_bot_iff.mp this
+
 /-- **Isaacs Thm 5.25 (⇐)**: any Sylow_p `P` controls own fusion ⇒ G has normal p-complement.
 
-**証明** (Isaacs p.173, harder direction): N := O^p(G) (smallest normal subgroup with
-p-power index). Q := N ⊓ P ∈ Sylow_p(N). A^p(N) := N の最小 normal subgroup で N/A^p(N)
-abelian + p-power index. A^p(N) characteristic in N ⇒ normal in G. |G:A^p(N)| = |G:N| · |N:A^p(N)|
-p-power ⇒ N = O^p(G) ⊆ A^p(N), hence A^p(N) = N.
+**証明** (Isaacs p.173, harder direction): `N := OPrime p G`. 主な仕事は
+`(P : Subgroup G) ⊓ N = ⊥` を示すことで, これが
+`OPrime_meet_sylow_eq_bot_of_controlsOwnFusion` (前置の helper). 残りは:
+(B) Sylow II + N normal で任意 Sylow `R` に拡張 (`g • (P ⊓ N) = (g • P) ⊓ N`). ✅
+(C) p ∤ |N| (任意 Sylow R で R ⊓ N = ⊥ + Cauchy 矛盾) → `|N| · |P'| = |G|` +
+    `Nat.Coprime (|N|) (p^a)` → `Subgroup.isComplement'_of_coprime`. ✅
 
-Focal Subgroup Theorem ⇒ Foc_N(Q) = Q ⊓ A^p(N) = Q ⊓ N = Q.
-
-For x, y ∈ Q N-conjugate: x⁻¹ y ∈ Foc_N(Q) (generator). x, y ∈ P G-conjugate, hypothesis
-で P-conjugate: y = x^u, u ∈ P. x⁻¹ y = [x, u] ∈ [Q, P]. So Foc_N(Q) ⊆ [Q, P].
-Combined: Q ⊆ [Q, P]. 反復: Q ⊆ [Q, P, P, ...] (lowerCentralSeries P n). P nilpotent finite
-⇒ ∃ n, lowerCentralSeries P n = ⊥. よって Q = ⊥, つまり N が normal p-complement.
-
-**実装状態 (2026-05-25)**: APrime + OPrime infrastructure 完成. 本体は sorry (次タスク). -/
+**実装状態 (2026-05-25)**: Step A (heart) + Steps B/C 完成 (sorry-free). -/
 theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     HasNormalPComplement p G := by
-  sorry
+  -- Set N := OPrime p G, the normal-p-complement witness.
+  set N : Subgroup G := OPrime p G with hN_def
+  haveI hN_normal : N.Normal := inferInstance
+  -- |G : N| is a p-power, say p^a.
+  obtain ⟨a, hN_idx_pow⟩ := OPrime_index_isPGroup p G
+  -- **Step A** (heart, deferred to helper): `(P : Subgroup G) ⊓ N = ⊥`.
+  have h_PN_bot : (P : Subgroup G) ⊓ N = ⊥ :=
+    OPrime_meet_sylow_eq_bot_of_controlsOwnFusion P hP
+  -- **Step B**: Conjugation propagates Step A to every Sylow `R` (Sylow II + N normal):
+  -- ∃ g, g • P = R. Then `(R ⊓ N) = (g • P) ⊓ (g • N) = g • (P ⊓ N) = g • ⊥ = ⊥`.
+  have h_all_sylow : ∀ R : Sylow p G, (R : Subgroup G) ⊓ N = ⊥ := fun R => by
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G P R
+    have h_R_eq : (R : Subgroup G) = MulAut.conj g • (P : Subgroup G) := by
+      rw [← hg, Sylow.coe_subgroup_smul]
+    have h_N_eq : MulAut.conj g • N = N := Subgroup.Normal.conj_smul_eq_self g N
+    calc (R : Subgroup G) ⊓ N
+        = MulAut.conj g • (P : Subgroup G) ⊓ N := by rw [h_R_eq]
+      _ = MulAut.conj g • (P : Subgroup G) ⊓ MulAut.conj g • N := by rw [h_N_eq]
+      _ = MulAut.conj g • ((P : Subgroup G) ⊓ N) := (Subgroup.smul_inf _ _ _).symm
+      _ = MulAut.conj g • (⊥ : Subgroup G) := by rw [h_PN_bot]
+      _ = ⊥ := Subgroup.smul_bot _
+  -- **Step C**: `p ∤ |N|` (any p-element in N would lie in some Sylow R, hence in R ⊓ N = ⊥)
+  -- ⇒ `|N| · p^c = |G|` where `c = (|G|).factorization p` ⇒ `c = a` ⇒ `|N| · |P'| = |G|`
+  -- + disjoint ⇒ `IsComplement' N P'`.
+  refine ⟨N, hN_normal, fun P' => ?_⟩
+  have h_P'N_bot : (P' : Subgroup G) ⊓ N = ⊥ := h_all_sylow P'
+  -- C.1: p ∤ |N|
+  have h_p_ndvd_N : ¬ p ∣ Nat.card ↥N := by
+    intro hp_dvd
+    obtain ⟨x, hx_order⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) p hp_dvd
+    have hx_ne : (x : ↥N) ≠ 1 := by
+      intro h; rw [h, orderOf_one] at hx_order
+      exact (Fact.out : p.Prime).one_lt.ne hx_order
+    -- (x : G) has the same order p (Subgroup.orderOf_coe)
+    have hx_order_G : orderOf (x : G) = p := (Subgroup.orderOf_coe x).trans hx_order
+    -- ⟨x.val⟩ as Subgroup G is a p-group (cyclic of order p)
+    have hpg : IsPGroup p (Subgroup.zpowers (x : G)) :=
+      IsPGroup.of_card ((Nat.card_zpowers (x : G)).trans hx_order_G |>.trans (pow_one p).symm)
+    obtain ⟨Q, hQ_le⟩ := hpg.exists_le_sylow
+    have hxQ : (x : G) ∈ (Q : Subgroup G) := hQ_le (Subgroup.mem_zpowers _)
+    have hxN : (x : G) ∈ N := x.property
+    have h_in : (x : G) ∈ (Q : Subgroup G) ⊓ N := ⟨hxQ, hxN⟩
+    rw [h_all_sylow Q, Subgroup.mem_bot] at h_in
+    exact hx_ne (Subtype.ext h_in)
+  -- C.2: factorization of |G| at p = a
+  have h_fact_a : (Nat.card G).factorization p = a := by
+    have hN_card_mul : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+    have h_total : Nat.card G = Nat.card ↥N * p ^ a := by rw [← hN_card_mul, hN_idx_pow]
+    rw [h_total, Nat.factorization_mul (Nat.card_pos (α := ↥N)).ne'
+      (pow_pos (Fact.out : p.Prime).pos a).ne', Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd h_p_ndvd_N,
+      Nat.Prime.factorization_pow (Fact.out : p.Prime),
+      Finsupp.single_apply]
+    simp
+  -- C.3: |P'| = p^a, hence |N| · |P'| = |G|
+  have hP'_card : Nat.card ↥(P' : Subgroup G) = p ^ a := by
+    rw [P'.card_eq_multiplicity, h_fact_a]
+  have h_card_mul : Nat.card ↥N * Nat.card ↥(P' : Subgroup G) = Nat.card G := by
+    rw [hP'_card, ← hN_idx_pow]; exact Subgroup.card_mul_index N
+  -- C.4: Coprime |N| |P'|
+  have h_coprime : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(P' : Subgroup G)) := by
+    rw [hP'_card]
+    exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_N).symm).pow_right a
+  exact Subgroup.isComplement'_of_coprime h_card_mul h_coprime
 
 /-- **Isaacs Thm 5.25**: G has normal p-complement ⇔ Sylow_p controls own fusion. -/
 theorem hasNormalPComplement_iff_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
@@ -1308,6 +1732,51 @@ theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
     -- C_n.index = p^b for some b ≤ a
     rcases (Nat.dvd_prime_pow Fact.out).mp (hKa ▸ hC_n_idx_dvd) with ⟨b, _, hb⟩
     exact ⟨b, hb⟩
+
+/-- Criterion after Isaacs Thm 5.26: to check
+`N_G(X) / C_G(X)` is a p-group, it suffices to show that every q-subgroup (`q ≠ p`)
+normalizing a p-subgroup `X` centralizes it.
+
+This is the formal version of the paragraph preceding Cor 5.29. -/
+theorem isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize
+    [Finite G] {p : ℕ} [Fact p.Prime]
+    (h : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ {X Q : Subgroup G}, IsPGroup p X → IsPGroup q Q →
+        Q ≤ Subgroup.normalizer (X : Set G) →
+        Q ≤ Subgroup.centralizer (X : Set G))
+    (X : Subgroup G) (hXp : IsPGroup p X) :
+    IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+      (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))) := by
+  classical
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  set C : Subgroup N := (Subgroup.centralizer (X : Set G)).subgroupOf N with hC_def
+  suffices h_idx_pow : ∃ b, C.index = p ^ b by
+    obtain ⟨b, hb⟩ := h_idx_pow
+    refine IsPGroup.of_card (n := b) ?_
+    rw [← Subgroup.index_eq_card]
+    exact hb
+  have hC_index_ne_zero : C.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  refine ⟨C.index.primeFactorsList.length, ?_⟩
+  rw [← List.prod_replicate, ← List.eq_replicate_of_mem ?_,
+    Nat.prod_primeFactorsList hC_index_ne_zero]
+  intro q hq
+  obtain ⟨hq_prime, hq_dvd_C_index⟩ := (Nat.mem_primeFactorsList hC_index_ne_zero).mp hq
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  by_contra hq_ne_p
+  obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
+  let Q : Subgroup G := (S : Subgroup N).map N.subtype
+  have hQ_q : IsPGroup q Q := S.isPGroup'.map N.subtype
+  have hQ_le_N : Q ≤ Subgroup.normalizer (X : Set G) := by
+    simpa [Q, hN_def] using Subgroup.map_subtype_le (H := N) (S : Subgroup N)
+  have hQ_le_CG : Q ≤ Subgroup.centralizer (X : Set G) :=
+    h hq_ne_p hXp hQ_q hQ_le_N
+  have hS_le_C : (S : Subgroup N) ≤ C := by
+    intro s hs
+    rw [hC_def, Subgroup.mem_subgroupOf]
+    exact hQ_le_CG (Subgroup.mem_map_of_mem N.subtype hs)
+  have hC_dvd_S_index : C.index ∣ (S : Subgroup N).index :=
+    Subgroup.index_dvd_of_le hS_le_C
+  exact S.not_dvd_index (hq_dvd_C_index.trans hC_dvd_S_index)
 
 /-- **N = S · C 補題**: `S : Sylow p N`, `C ⊴ N` で `N/C` が p-group ⇒
 `(S : Subgroup N) ⊔ C = ⊤`.
@@ -1643,8 +2112,7 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
   `isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`
   (Lem 5.27 Part 2) で結論. ✅
 * (3) ⇒ (1): 任意 Sylow `P` で `P.ControlsOwnFusion` を示し (Lem 5.28 経由),
-  `hasNormalPComplement_of_controlsOwnFusion` (Thm 5.25 ⇐) で normal p-comp.
-  **Thm 5.25 (⇐) sorry のため (3⇒1) 方向は sorry**. -/
+  `hasNormalPComplement_of_controlsOwnFusion` (Thm 5.25 ⇐) で normal p-comp. ✅ -/
 theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
     [Finite G] {p : ℕ} [Fact p.Prime] :
     HasNormalPComplement p G ↔
@@ -1658,7 +2126,7 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
         (Subgroup.normalizer (Y : Set G)))
       X hXp
   · -- (3) ⇒ (1): Pick Sylow P, show P.ControlsOwnFusion via Lem 5.28,
-    -- then apply Thm 5.25 (⇐) (sorry).
+    -- then apply Thm 5.25 (⇐).
     obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
     refine (hasNormalPComplement_iff_controlsOwnFusion P).mpr ?_
     intro x y hx_P hy_P ⟨g, hgxy⟩
@@ -1745,6 +2213,195 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
       _ = (c * g) * x * (c * g)⁻¹ := by rw [← hcg_val_eq]
       _ = y := h_y_eq_cgx.symm
 
+/-- Isaacs' p-local action criterion, packaged with Frobenius' normal p-complement theorem.
+
+If every q-subgroup (`q ≠ p`) normalizing a p-subgroup centralizes it, then `G` has a
+normal p-complement. This is the shared entry point for Cor 5.29 and Cor 5.30. -/
+theorem hasNormalPComplement_of_prime_subgroups_centralize
+    [Finite G] {p : ℕ} [Fact p.Prime]
+    (h : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ {X Q : Subgroup G}, IsPGroup p X → IsPGroup q Q →
+        Q ≤ Subgroup.normalizer (X : Set G) →
+        Q ≤ Subgroup.centralizer (X : Set G)) :
+    HasNormalPComplement p G :=
+  hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer.mpr
+    (fun X hXp =>
+      isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize h X hXp)
+
+/-- If a q-group acts on a finite set, then `q` divides the number of non-fixed points. -/
+private lemma prime_dvd_card_sub_card_fixedPoints_of_pgroup_action
+    {A X : Type*} [Group A] [Group X] [Finite X] [MulDistribMulAction A X]
+    {q : ℕ} [Fact q.Prime] (hA : IsPGroup q A) :
+    q ∣ Nat.card X - Nat.card (MulAction.fixedPoints A X) := by
+  have hmod := hA.card_modEq_card_fixedPoints X
+  have hle : Nat.card (MulAction.fixedPoints A X) ≤ Nat.card X :=
+    Nat.card_le_card_of_injective _ (fun _ _ h => Subtype.ext h)
+  exact (Nat.modEq_iff_dvd' hle).mp hmod.symm
+
+/-- Orbit-count step in Isaacs Cor 5.29.
+
+If a q-group acts nontrivially by automorphisms on a finite p-group `X`, and `|X| = p^k`
+with `k ≤ a`, then `q ∣ p^e - 1` for some `1 ≤ e ≤ a`. -/
+private lemma exists_prime_dvd_pow_sub_one_of_nontrivial_pgroup_action
+    {A X : Type*} [Group A] [Group X] [Finite X] [MulDistribMulAction A X]
+    {p q a : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hX : IsPGroup p X) (hA : IsPGroup q A) (hpq : q ≠ p)
+    (hX_bound : ∃ k, k ≤ a ∧ Nat.card X = p ^ k)
+    (hfix_ne : MulAction.fixedPoints A X ≠ Set.univ) :
+    ∃ e, 1 ≤ e ∧ e ≤ a ∧ q ∣ p ^ e - 1 := by
+  classical
+  let F : Subgroup X := {
+    carrier := MulAction.fixedPoints A X
+    one_mem' := by intro g; exact smul_one g
+    mul_mem' := by
+      intro x y hx hy g
+      rw [smul_mul', hx g, hy g]
+    inv_mem' := by
+      intro x hx g
+      rw [smul_inv', hx g] }
+  have hF_card_lt : Nat.card F < Nat.card X := by
+    change Nat.card (MulAction.fixedPoints A X) < Nat.card X
+    simpa [Nat.card_coe_set_eq] using Set.ncard_lt_card hfix_ne
+  have hF_index_ne_one : F.index ≠ 1 := by
+    intro hidx_one
+    have hidx := F.index_mul_card
+    rw [hidx_one, one_mul] at hidx
+    exact (Nat.lt_irrefl _ (hidx ▸ hF_card_lt))
+  obtain ⟨e, he_index⟩ := hX.index F
+  have he_pos : 1 ≤ e := by
+    cases e with
+    | zero =>
+        exfalso
+        exact hF_index_ne_one (by simpa using he_index)
+    | succ e => exact Nat.succ_le_succ (Nat.zero_le e)
+  obtain ⟨k, hk_le_a, hX_card⟩ := hX_bound
+  have hF_index_dvd_card : F.index ∣ Nat.card X := by
+    exact ⟨Nat.card F, F.index_mul_card.symm⟩
+  have he_le_k : e ≤ k := by
+    have hpow_dvd : p ^ e ∣ p ^ k := by
+      rw [← he_index, ← hX_card]
+      exact hF_index_dvd_card
+    exact (pow_dvd_pow_iff (Fact.out : p.Prime).ne_zero
+      (mt Nat.isUnit_iff.mp (Fact.out : p.Prime).ne_one)).mp hpow_dvd
+  have he_le_a : e ≤ a := he_le_k.trans hk_le_a
+  have hdiff_dvd := prime_dvd_card_sub_card_fixedPoints_of_pgroup_action (X := X) hA
+  have hcard_eq : Nat.card X = Nat.card F * p ^ e := by
+    calc
+      Nat.card X = F.index * Nat.card F := F.index_mul_card.symm
+      _ = p ^ e * Nat.card F := by rw [he_index]
+      _ = Nat.card F * p ^ e := by rw [mul_comm]
+  have hdiff_eq : Nat.card X - Nat.card (MulAction.fixedPoints A X) =
+      Nat.card F * (p ^ e - 1) := by
+    change Nat.card X - Nat.card F = Nat.card F * (p ^ e - 1)
+    rw [hcard_eq]
+    simpa [mul_one] using (Nat.mul_sub_left_distrib (Nat.card F) (p ^ e) 1).symm
+  have hq_dvd_mul : q ∣ Nat.card F * (p ^ e - 1) := by
+    rwa [← hdiff_eq]
+  obtain ⟨r, hF_card_pow⟩ := IsPGroup.iff_card.mp (hX.to_subgroup F)
+  have hq_coprime_cardF : q.Coprime (Nat.card F) := by
+    rw [hF_card_pow]
+    exact
+      ((Nat.coprime_primes (Fact.out : q.Prime) (Fact.out : p.Prime)).mpr hpq).pow_right r
+  have hq_dvd : q ∣ p ^ e - 1 := hq_coprime_cardF.dvd_of_dvd_mul_left hq_dvd_mul
+  exact ⟨e, he_pos, he_le_a, hq_dvd⟩
+
+/-- **Isaacs Cor 5.29**: If `|G| = p^a m`, `p ∤ m`, and no prime divisor `q`
+of `m` divides any `p^e - 1` with `1 ≤ e ≤ a`, then `G` has a normal
+p-complement.
+
+**Proof** (Isaacs p.179): use Frobenius' p-local criterion. If a q-subgroup `Q`
+normalizing a p-subgroup `X` acts nontrivially, then the fixed-point subgroup
+`C_X(Q)` is proper in `X`; orbit counting gives `q ∣ |X| - |C_X(Q)|`, hence
+`q ∣ p^e - 1` for `|X:C_X(Q)| = p^e`, contradiction. -/
+theorem hasNormalPComplement_of_no_prime_dvd_pow_sub_one
+    [Finite G] {p a m : ℕ} [Fact p.Prime]
+    (hcard : Nat.card G = p ^ a * m) (hpm : ¬ p ∣ m)
+    (hNo : ∀ {q e : ℕ}, q.Prime → q ∣ m → 1 ≤ e → e ≤ a →
+      ¬ q ∣ p ^ e - 1) :
+    HasNormalPComplement p G := by
+  classical
+  refine hasNormalPComplement_of_prime_subgroups_centralize
+    (fun {q} _ hq_ne_p {X Q} hXp hQq hQ_le_N => ?_)
+  by_contra hQ_not_le_C
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  let QN : Subgroup N := Q.subgroupOf N
+  have hQN_q : IsPGroup q QN := by
+    have h_iso : QN ≃* Q := Subgroup.subgroupOfEquivOfLe hQ_le_N
+    exact hQq.of_equiv h_iso.symm
+  have hfix_ne : MulAction.fixedPoints QN X ≠ Set.univ := by
+    intro hfix_univ
+    apply hQ_not_le_C
+    intro y hyQ
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hxX
+    let yN : N := ⟨y, by simpa [hN_def] using hQ_le_N hyQ⟩
+    let yQN : QN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyQ⟩
+    let xX : X := ⟨x, hxX⟩
+    have hfixed : yQN • xX = xX := by
+      have hx_fixed : xX ∈ MulAction.fixedPoints QN X := by
+        rw [hfix_univ]
+        exact Set.mem_univ xX
+      exact hx_fixed yQN
+    have hconj : y * x * y⁻¹ = x := by
+      exact congrArg Subtype.val hfixed
+    calc x * y = (y * x * y⁻¹) * y := by rw [hconj]
+      _ = y * x := by group
+  have hQ_ne_bot : Q ≠ ⊥ := by
+    intro hQ_bot
+    apply hQ_not_le_C
+    intro y hyQ
+    rw [Subgroup.mem_centralizer_iff]
+    intro x _hxX
+    have hy_one : y = 1 := by
+      rw [hQ_bot, Subgroup.mem_bot] at hyQ
+      exact hyQ
+    rw [hy_one, one_mul, mul_one]
+  have hQ_card_ne_one : Nat.card Q ≠ 1 := by
+    intro hcardQ
+    exact hQ_ne_bot (Subgroup.card_eq_one.mp hcardQ)
+  have hQ_card_gt_one : 1 < Nat.card Q := by
+    have hpos : 0 < Nat.card Q := Nat.card_pos
+    omega
+  haveI : Nontrivial Q := Finite.one_lt_card_iff_nontrivial.mp hQ_card_gt_one
+  obtain ⟨n, hn_pos, hQ_card_eq⟩ := hQq.nontrivial_iff_card.mp inferInstance
+  have hq_dvd_Q : q ∣ Nat.card Q := by
+    rw [hQ_card_eq]
+    exact dvd_pow_self q (ne_of_gt hn_pos)
+  have hq_dvd_G : q ∣ Nat.card G := by
+    have hQ_dvd_top : Nat.card Q ∣ Nat.card (⊤ : Subgroup G) :=
+      Subgroup.card_dvd_of_le (show Q ≤ (⊤ : Subgroup G) from le_top)
+    exact hq_dvd_Q.trans (by simpa using hQ_dvd_top)
+  have hq_dvd_m : q ∣ m := by
+    have hq_dvd_mul : q ∣ p ^ a * m := by
+      rwa [← hcard]
+    rcases (Fact.out : q.Prime).dvd_mul.mp hq_dvd_mul with hq_dvd_pa | hq_dvd_m
+    · have hcop_q_pa : q.Coprime (p ^ a) :=
+        ((Nat.coprime_primes (Fact.out : q.Prime) (Fact.out : p.Prime)).mpr
+          hq_ne_p).pow_right a
+      exact False.elim (((Fact.out : q.Prime).coprime_iff_not_dvd.mp hcop_q_pa) hq_dvd_pa)
+    · exact hq_dvd_m
+  have hX_bound : ∃ k, k ≤ a ∧ Nat.card X = p ^ k := by
+    obtain ⟨k, hkX⟩ := IsPGroup.iff_card.mp hXp
+    refine ⟨k, ?_, hkX⟩
+    have hX_card_dvd_G : Nat.card X ∣ Nat.card G := by
+      have hX_dvd_top : Nat.card X ∣ Nat.card (⊤ : Subgroup G) :=
+        Subgroup.card_dvd_of_le (show X ≤ (⊤ : Subgroup G) from le_top)
+      simpa using hX_dvd_top
+    have hpk_dvd_pa_m : p ^ k ∣ p ^ a * m := by
+      rw [← hcard, ← hkX]
+      exact hX_card_dvd_G
+    have hcop_pk_m : (p ^ k).Coprime m :=
+      ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hpm).pow_left k
+    have hpk_dvd_pa : p ^ k ∣ p ^ a :=
+      hcop_pk_m.dvd_of_dvd_mul_left (by rwa [mul_comm] at hpk_dvd_pa_m)
+    exact (pow_dvd_pow_iff (Fact.out : p.Prime).ne_zero
+      (mt Nat.isUnit_iff.mp (Fact.out : p.Prime).ne_one)).mp hpk_dvd_pa
+  obtain ⟨e, he_pos, he_le_a, hq_dvd_pe⟩ :=
+    exists_prime_dvd_pow_sub_one_of_nontrivial_pgroup_action
+      (A := QN) (X := X) hXp hQN_q hq_ne_p hX_bound hfix_ne
+  exact (hNo (q := q) (e := e) (Fact.out : q.Prime) hq_dvd_m he_pos he_le_a
+    hq_dvd_pe).elim
+
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
 
@@ -1753,12 +2410,57 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
 **Ch.4 Thm 4.36** (p>2 + p-群 G + p'-A が order-p 元固定 ⇒ A trivial) で示す. 仮定より
 order-p 元は中心で A 不変, 中心で固定 ⇒ Thm 4.36 適用条件成立.
 
-**実装状態**: Ch.4 §4D Thm 4.36 完成待ち. -/
+**実装状態**: Ch.4 §4D Thm 4.36 を q-subgroup action に適用して完成. -/
 theorem normal_p_complement_of_order_p_central_odd
-    [Finite G] {p : ℕ} [Fact p.Prime] (_hp_odd : p ≠ 2)
-    (_hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
+    [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
+    (hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
     HasNormalPComplement p G := by
-  sorry
+  classical
+  refine hasNormalPComplement_of_prime_subgroups_centralize
+    (fun {q} _ hq_ne_p {X Q} hXp hQq hQ_le_N => ?_)
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  let QN : Subgroup N := Q.subgroupOf N
+  have hQN_q : IsPGroup q QN := by
+    have h_iso : QN ≃* Q := Subgroup.subgroupOfEquivOfLe hQ_le_N
+    exact hQq.of_equiv h_iso.symm
+  let φ : QN →* MulAut X := MulDistribMulAction.toMulAut QN X
+  have hQN_p' : ¬ p ∣ Nat.card QN := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hQN_q
+    rw [hn]
+    exact (Fact.out : p.Prime).coprime_iff_not_dvd.mp
+      (((Nat.coprime_primes (Fact.out : p.Prime) (Fact.out : q.Prime)).mpr
+        hq_ne_p.symm).pow_right n)
+  have hfix : ∀ x : X, x ^ p = 1 → ∀ a : QN, (φ a) x = x := by
+    intro x hxpow a
+    apply Subtype.ext
+    have hxpowG : (x : G) ^ p = 1 := by
+      exact congrArg Subtype.val hxpow
+    have hxord_dvd : orderOf (x : G) ∣ p := orderOf_dvd_of_pow_eq_one hxpowG
+    change ((a : QN) • x : X).val = x.val
+    rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hxord_dvd with hxord1 | hxordp
+    · have hx_one : (x : G) = 1 := orderOf_eq_one_iff.mp hxord1
+      have hx_one_X : x = 1 := Subtype.ext hx_one
+      simp [hx_one_X]
+    · have hx_cent : (x : G) ∈ Subgroup.center G := hCent x hxordp
+      have hcomm : (a : N).val * (x : G) = (x : G) * (a : N).val :=
+        Subgroup.mem_center_iff.mp hx_cent (a : N).val
+      change (a : N).val * (x : G) * (a : N).val⁻¹ = (x : G)
+      rw [hcomm, mul_assoc, mul_inv_cancel, mul_one]
+  have hbot : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.Isaacs.Ch04.isaacs_thm_4_36 hp_odd φ hXp hQN_p' hfix
+  have htriv : ∀ a : QN, ∀ x : X, (φ a) x = x :=
+    (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially φ).mp hbot
+  intro y hyQ
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hxX
+  let yN : N := ⟨y, by simpa [hN_def] using hQ_le_N hyQ⟩
+  let yQN : QN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyQ⟩
+  let xX : X := ⟨x, hxX⟩
+  have hfixed : (φ yQN) xX = xX := htriv yQN xX
+  have hconj : y * x * y⁻¹ = x := by
+    exact congrArg Subtype.val hfixed
+  calc x * y = (y * x * y⁻¹) * y := by rw [hconj]
+    _ = y * x := by group
 
 end -- 5E
 
