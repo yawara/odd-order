@@ -25,7 +25,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5A | Transfer 定義・welldefinedness・準同型性 | 5.1 – 5.4 | mathlib + ✅ Thm 5.3 + Cor 5.4 |
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | ✅ 5.8 + 5.9, mathlib + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
-| 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
+| 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | ✅ 5.20-5.23; 5.24 保留 |
 | 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
 
 ## 方針
@@ -1350,6 +1350,73 @@ lemma APrime_inf_sylow_eq_focalSubgroup [Finite G] {p : ℕ} [Fact p.Prime]
         Subgroup.ker_transferFocal_inf_eq_focalSubgroup P
   · rw [← Subgroup.commutator_inf_eq_focalSubgroup P]
     exact inf_le_inf (commutator_le_APrime p G) le_rfl
+
+/-- **Isaacs Thm 5.20**: the focal transfer kernel is `A^p(G)`.
+
+This upgrades `A^p(G) ≤ ker(transferFocal)` to equality by comparing indices via a
+Sylow `p`-subgroup: both normal subgroups have p-power index, both join with `P` to
+give `G`, and both have the same intersection with `P`, namely the focal subgroup. -/
+theorem APrime_eq_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    APrime p G = P.transferFocal.ker := by
+  classical
+  let A : Subgroup G := APrime p G
+  let K : Subgroup G := P.transferFocal.ker
+  haveI : A.Normal := by
+    dsimp [A]
+    infer_instance
+  haveI : K.Normal := by
+    dsimp [K]
+    infer_instance
+  have hA_le_K : A ≤ K := by
+    simpa [A, K] using APrime_le_transferFocal_ker (G := G) (p := p) P
+  have hA_inf_P : A ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+    simpa [A] using APrime_inf_sylow_eq_focalSubgroup (G := G) (p := p) P
+  have hK_inf_P : K ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+    simpa [K] using Subgroup.ker_transferFocal_inf_eq_focalSubgroup P
+  have hA_index_pow : ∃ k : ℕ, A.index = p ^ k := by
+    simpa [A] using APrime_index_isPGroup p G
+  have hK_index_pow : ∃ k : ℕ, K.index = p ^ k := by
+    have hquot : IsPGroup p (G ⧸ P.transferFocal.ker) :=
+      (P.2.to_quotient P.focalSubgroupOf).of_equiv
+        (Subgroup.transferFocal.quotientKerMulEquivQuotientFocalSubroupOf P).symm
+    obtain ⟨k, hk⟩ := hquot.exists_card_eq
+    refine ⟨k, ?_⟩
+    change P.transferFocal.ker.index = p ^ k
+    rw [Subgroup.index_eq_card]
+    exact hk
+  have hPA_top : (P : Subgroup G) ⊔ A = ⊤ := by
+    obtain ⟨k, hk⟩ := hA_index_pow
+    have hcop : Nat.Coprime (P : Subgroup G).index A.index := by
+      rw [hk]
+      exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have hPK_top : (P : Subgroup G) ⊔ K = ⊤ := by
+    obtain ⟨k, hk⟩ := hK_index_pow
+    have hcop : Nat.Coprime (P : Subgroup G).index K.index := by
+      rw [hk]
+      exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have h_index_eq : A.index = K.index := by
+    calc
+      A.index = A.relIndex (P : Subgroup G) := by
+        rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := A),
+          hPA_top, Subgroup.relIndex_top_right]
+      _ = (A ⊓ (P : Subgroup G)).relIndex (P : Subgroup G) := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = (K ⊓ (P : Subgroup G)).relIndex (P : Subgroup G) := by
+        rw [hA_inf_P, hK_inf_P]
+      _ = K.relIndex (P : Subgroup G) := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = K.index := by
+        rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := K),
+          hPK_top, Subgroup.relIndex_top_right]
+  have hrel_eq_one : A.relIndex K = 1 := by
+    have hmul : A.relIndex K * K.index = 1 * K.index := by
+      rw [Subgroup.relIndex_mul_index hA_le_K, one_mul, h_index_eq]
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
+  exact le_antisymm hA_le_K (Subgroup.relIndex_eq_one.mp hrel_eq_one)
 
 /-- The always-available half of Isaacs Cor. 5.22:
 if a subgroup `H` contains a Sylow `p`-subgroup of `G`, then

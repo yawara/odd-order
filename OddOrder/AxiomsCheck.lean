@@ -168,6 +168,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
 
+-- Ch.5 (Transfer): Thm 5.20 (focal transfer kernel is A^p(G))
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.APrime_eq_transferFocal_ker
+
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
