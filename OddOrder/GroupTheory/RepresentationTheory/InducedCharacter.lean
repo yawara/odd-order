@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Units.Equiv
+import Mathlib.Algebra.GroupWithZero.Invertible
+import Mathlib.Data.Fintype.Card
+import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 
@@ -22,6 +25,8 @@ unscaled form is useful before choosing coefficients where `|H|` is invertible.
 
 * `ClassFunction.induceTerm H θ x g` — the `x`-summand in the induction formula.
 * `ClassFunction.induceSum H θ` — the unscaled induced class function on `G`.
+* `ClassFunction.induce H θ` — the normalized induced class function, when
+  `|H|` is invertible in the coefficient ring.
 * `ClassFunction.conjugatesInto H` — elements of `G` conjugate into `H`.
 * `ClassFunction.conjugatesIntoSet H A` — elements of `G` conjugate into `A ⊆ H`.
 
@@ -183,6 +188,69 @@ theorem support_induceSum_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥
   intro g hg
   by_contra hnot
   exact hg (induceSum_eq_zero_of_not_conjugatesIntoSet hθ hnot)
+
+section Normalized
+
+/-- The normalized classical induced class function.
+
+This is Peterfalvi's `Ind_H^G θ`: the unscaled induction sum multiplied by
+`|H|⁻¹`.  The invertibility assumption keeps this usable over any coefficient
+ring where `|H|` has a specified inverse. -/
+def induce (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) : ClassFunction G k :=
+  ⅟(Nat.card H : k) • induceSum H θ
+
+@[simp] theorem induce_apply (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) (g : G) :
+    induce H θ g = ⅟(Nat.card H : k) * ∑ x : G, induceTerm H θ x g :=
+  rfl
+
+@[simp] theorem card_smul_induce (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) :
+    (Nat.card H : k) • induce H θ = induceSum H θ := by
+  rw [induce, smul_smul, mul_invOf_self, one_smul]
+
+@[simp] theorem induce_zero (H : Subgroup G) [Invertible (Nat.card H : k)] :
+    induce H (0 : ClassFunction ↥H k) = 0 := by
+  rw [induce, induceSum_zero, smul_zero]
+
+theorem induce_add (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ ψ : ClassFunction ↥H k) :
+    induce H (θ + ψ) = induce H θ + induce H ψ := by
+  rw [induce, induce, induce, induceSum_add, smul_add]
+
+theorem induce_smul (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (c : k) (θ : ClassFunction ↥H k) :
+    induce H (c • θ) = c • induce H θ := by
+  rw [induce, induce, induceSum_smul, smul_smul, smul_smul, mul_comm]
+
+theorem induce_eq_zero_of_not_conjugatesInto {H : Subgroup G}
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) {g : G}
+    (hg : g ∉ conjugatesInto H) :
+    induce H θ g = 0 := by
+  rw [induce, smul_apply, induceSum_eq_zero_of_not_conjugatesInto θ hg, mul_zero]
+
+theorem support_induce_subset_conjugatesInto (H : Subgroup G)
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) :
+    (induce H θ).support ⊆ conjugatesInto H := by
+  intro g hg
+  by_contra hnot
+  exact hg (induce_eq_zero_of_not_conjugatesInto θ hnot)
+
+theorem induce_eq_zero_of_not_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
+    [Invertible (Nat.card H : k)] {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A)
+    {g : G} (hg : g ∉ conjugatesIntoSet H A) :
+    induce H θ g = 0 := by
+  rw [induce, smul_apply, induceSum_eq_zero_of_not_conjugatesIntoSet hθ hg, mul_zero]
+
+theorem support_induce_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
+    [Invertible (Nat.card H : k)] {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A) :
+    (induce H θ).support ⊆ conjugatesIntoSet H A := by
+  intro g hg
+  by_contra hnot
+  exact hg (induce_eq_zero_of_not_conjugatesIntoSet hθ hnot)
+
+end Normalized
 
 end ClassFunction
 
