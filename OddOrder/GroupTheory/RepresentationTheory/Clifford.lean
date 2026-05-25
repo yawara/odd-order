@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Clifford's theorem on irreducible characters of a normal subgroup
@@ -33,6 +33,9 @@ precise statement is left as a TODO since it requires extra setup
 * The Clifford decomposition `clifford_decomposition` is stated below; the proof is
   deferred. It will follow from `InducedCharacter` + `SecondOrthogonality` once those
   Wave 1a modules have working proofs.
+* `ClassFunction.restrictionMultiplicity`, `ClassFunction.IsRestrictionConstituent`,
+  and `IrreducibleCharacter.LiesOver` name the restriction-constituent API that the
+  proof core needs.
 * `clifford_orbit_subset_inertia` is immediate from `ClassFunction.subgroup_le_inertia`.
 * Proof-core routing: the remaining Clifford theorem proof is split into
   `issues/0026-peterfalvi-clifford-core.md`.  The blocker is not the current
@@ -43,6 +46,12 @@ precise statement is left as a TODO since it requires extra setup
 ## Main statements
 
 * `OddOrder.RepresentationTheory.clifford_decomposition` — the Clifford decomposition.
+* `OddOrder.RepresentationTheory.ClassFunction.IsRestrictionConstituent` — a
+  constituent of a restricted class function, expressed by inner product.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver` — irreducible-character
+  notation for the same nonzero restriction multiplicity.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
+  and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
 * `OddOrder.RepresentationTheory.clifford_orbit_subset_inertia` — `H ≤ I_G(θ)`.
 
 ## References
@@ -58,7 +67,90 @@ namespace OddOrder.RepresentationTheory
 
 open scoped BigOperators
 
-variable {G : Type*} [Group G] {H : Subgroup G} [hH : H.Normal]
+variable {G : Type*} [Group G]
+
+namespace ClassFunction
+
+variable (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
+
+/-- The normalized inner-product multiplicity of `θ` in `Res^G_H χ`.
+
+For irreducible characters this is the usual constituent multiplicity.  It is
+kept as a complex scalar here because the integral/nonnegative-integer
+multiplicity theorem is part of the later Clifford proof core. -/
+def restrictionMultiplicity (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) : ℂ :=
+  inner (restrict H χ) θ
+
+@[simp] theorem restrictionMultiplicity_def
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ θ = inner (restrict H χ) θ :=
+  rfl
+
+/-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
+by nonzero normalized inner product. -/
+def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    Prop :=
+  IsIrreducibleCharacter θ ∧ restrictionMultiplicity H χ θ ≠ 0
+
+theorem IsRestrictionConstituent.isIrreducible
+    {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
+    (hθ : IsRestrictionConstituent H χ θ) : IsIrreducibleCharacter θ :=
+  hθ.1
+
+theorem IsRestrictionConstituent.multiplicity_ne_zero
+    {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
+    (hθ : IsRestrictionConstituent H χ θ) : restrictionMultiplicity H χ θ ≠ 0 :=
+  hθ.2
+
+end ClassFunction
+
+namespace IrreducibleCharacter
+
+variable (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
+
+/-- An irreducible character `χ` of `G` **lies over** an irreducible character
+`θ` of `H` if `θ` occurs in `Res^G_H χ` with nonzero multiplicity. -/
+def LiesOver (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) : Prop :=
+  ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+      (θ : ClassFunction H ℂ) ≠ 0
+
+theorem liesOver_iff (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    LiesOver H χ θ ↔
+      ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+          (θ : ClassFunction H ℂ) ≠ 0 :=
+  Iff.rfl
+
+theorem liesOver_restrictionConstituent
+    {χ : IrreducibleCharacter G} {θ : IrreducibleCharacter H}
+    (hθ : LiesOver H χ θ) :
+    ClassFunction.IsRestrictionConstituent H (χ : ClassFunction G ℂ)
+      (θ : ClassFunction H ℂ) :=
+  ⟨θ.isIrreducible, hθ⟩
+
+end IrreducibleCharacter
+
+variable {H : Subgroup G} [hH : H.Normal]
+
+namespace IrreducibleCharacter
+
+variable [Fintype H] [Invertible (Nat.card H : ℂ)]
+
+/-- Predicate form of the Clifford conclusion that all irreducible constituents
+of `Res^G_H χ` lie in one `G`-conjugation orbit. -/
+def RestrictionConstituentsSingleOrbit (χ : IrreducibleCharacter G) : Prop :=
+  ∀ θ η : IrreducibleCharacter H,
+    LiesOver H χ θ → LiesOver H χ η →
+      ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
+        (η : ClassFunction H ℂ)
+
+/-- Predicate form of the Clifford conclusion that all constituents of
+`Res^G_H χ` occur with a common normalized inner-product multiplicity. -/
+def HasCommonRestrictionMultiplicity (χ : IrreducibleCharacter G) : Prop :=
+  ∃ e : ℂ, ∀ θ : IrreducibleCharacter H, LiesOver H χ θ →
+    ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+      (θ : ClassFunction H ℂ) = e
+
+end IrreducibleCharacter
 
 /-- **Clifford's theorem** ([Is] Thm 6.5): for `H ⊴ G` and `χ ∈ Irr G`, the restriction
 `Res_H^G χ` decomposes as a positive multiple of a `G`-orbit sum of irreducible characters

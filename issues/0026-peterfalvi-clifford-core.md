@@ -25,11 +25,21 @@ API がまだ不足している。
 
 ## やること
 
-- [ ] restriction inner product で constituent/multiplicity predicate を定義する。
+- [x] restriction inner product で constituent/multiplicity predicate を定義する。
 - [ ] `χ` irreducible なら restriction constituents are one `G`-orbit を statement 化する。
 - [ ] common multiplicity `e` と orbit-sum decomposition を証明する。
 - [ ] inertia induction bijectionの statement を切る。
 - [ ] `clifford_decomposition` に proof core を戻して `sorry` を消す。
+
+## 2026-05-26 update
+
+- `ClassFunction.restrictionMultiplicity H χ θ` を追加した。
+- `ClassFunction.IsRestrictionConstituent H χ θ` を追加した。
+- `IrreducibleCharacter.LiesOver H χ θ` を追加し、raw class-function
+  constituent predicate への bridge を証明した。
+- `IrreducibleCharacter.RestrictionConstituentsSingleOrbit` と
+  `IrreducibleCharacter.HasCommonRestrictionMultiplicity` を predicate として追加した。
+- 次の小単位は、これらの predicate を結論に持つ Clifford core theorem の statement 化。
 
 ## 完了条件
 
