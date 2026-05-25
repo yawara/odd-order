@@ -316,6 +316,43 @@ theorem conj_mem_dadeSupport (hyp : Hypothesis G A L) {g x : G}
   rcases hg with ⟨a, h, hh, hconj⟩
   exact ⟨a, h, hh, hconj.trans (isConj_iff.mpr ⟨x, rfl⟩)⟩
 
+/-- In the TI-specialized case `H(a)=1`, the coset `aH(a)` is the singleton
+`{a}`. -/
+theorem hCoset_eq_singleton_of_H_eq_bot (hyp : Hypothesis G A L)
+    {a : {a : G // a ∈ A}} (hH : hyp.H a = ⊥) :
+    hyp.hCoset a = {a.1} := by
+  ext g
+  constructor
+  · rintro ⟨h, hh, rfl⟩
+    have hh_one : h = 1 := by
+      have : h ∈ (⊥ : Subgroup G) := by
+        simpa [hH] using hh
+      exact Subgroup.mem_bot.mp this
+    simp [hh_one]
+  · intro hg
+    rw [Set.mem_singleton_iff] at hg
+    subst g
+    exact ⟨1, (hyp.H a).one_mem, by simp⟩
+
+/-- In the TI-specialized case `H(a)=1`, the Dade support is just the
+conjugacy-saturation of `A`. -/
+theorem dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
+    (hyp : Hypothesis G A L) (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥) :
+    hyp.dadeSupport = Group.conjugatesOfSet A := by
+  ext g
+  constructor
+  · intro hg
+    rcases hyp.mem_dadeSupport_iff.mp hg with ⟨a, h, hh, hconj⟩
+    have hh_one : h = 1 := by
+      have : h ∈ (⊥ : Subgroup G) := by
+        simpa [hH a] using hh
+      exact Subgroup.mem_bot.mp this
+    exact Group.mem_conjugatesOfSet_iff.mpr ⟨a.1, a.2, by simpa [hh_one] using hconj⟩
+  · intro hg
+    rcases Group.mem_conjugatesOfSet_iff.mp hg with ⟨a, ha, hconj⟩
+    exact hyp.mem_dadeSupport_iff.mpr
+      ⟨⟨a, ha⟩, 1, (hyp.H ⟨a, ha⟩).one_mem, by simpa using hconj⟩
+
 end Hypothesis
 
 section DadeMap
@@ -399,6 +436,35 @@ theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
         (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g hgsupp
 
 end IsDadeMap
+
+/-- In the TI-specialized case `H(a)=1`, the Dade-map equation is simply
+constant on `G`-conjugates of elements of `A`. -/
+theorem map_eq_of_isConj_of_forall_H_eq_bot {hyp : Hypothesis G A L}
+    {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {a g : G} (ha : a ∈ A)
+    (hconj : IsConj a g) :
+    τ α g = (α : ClassFunction L k) ⟨a, hyp.mem_L ha⟩ := by
+  simpa using hτ.map_eq_of_isConj_hCoset α g ⟨a, ha⟩ 1
+    (by simp [hH ⟨a, ha⟩]) (by simpa using hconj)
+
+theorem map_eq_of_mem_A_of_forall_H_eq_bot {hyp : Hypothesis G A L}
+    {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {a : G} (ha : a ∈ A) :
+    τ α a = (α : ClassFunction L k) ⟨a, hyp.mem_L ha⟩ :=
+  map_eq_of_isConj_of_forall_H_eq_bot hτ hH α ha (IsConj.refl a)
+
+/-- In the TI-specialized case `H(a)=1`, a Dade map vanishes outside the
+conjugacy-saturation of `A`. -/
+theorem map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {g : G}
+    (hg : g ∉ Group.conjugatesOfSet A) :
+    τ α g = 0 := by
+  apply hτ.map_eq_zero_of_not_mem_dadeSupport
+  rwa [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]
 
 end IsDadeMap
 
