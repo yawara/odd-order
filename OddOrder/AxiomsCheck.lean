@@ -10,6 +10,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -190,6 +191,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 -- Ch.5 (Transfer): Cor 5.30 (odd p, order-p elements central)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normal_p_complement_of_order_p_central_odd
+
+-- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
+-- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
+-- elementary abelian subgroup of order 4.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒

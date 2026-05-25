@@ -2991,6 +2991,23 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
       omega
     omega
 
+/-- **Isaacs Lemma 6.15** (`p = 2` abelian index-two branch).
+
+If `A` is a finite abelian `2`-group with a cyclic subgroup of index `2`, and `A` is
+not cyclic, then `A` contains a characteristic elementary abelian subgroup of order `4`.
+
+This is the standalone `p = 2` sub-lemma used in the full Lemma 6.15 proof and in the
+later `p`-group classification route toward Isaacs 6.11. -/
+theorem exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+    {A : Type*} [Group A] [Finite A] (hAb : ∀ x y : A, x * y = y * x)
+    (h_two : IsPGroup 2 A)
+    {D : Subgroup A} (hD_cyc : IsCyclic D) (hD_idx : D.index = 2)
+    (h_not_cyclic : ¬ IsCyclic A) :
+    ∃ K : Subgroup A, K.Characteristic ∧
+      IsElementaryAbelian 2 K ∧ Nat.card K = 4 :=
+  char_elementaryAbelian_4_of_noncyclic_abelian_2group
+    hAb h_two hD_cyc hD_idx h_not_cyclic
+
 end
 
 end OddOrder.Isaacs.Ch06
