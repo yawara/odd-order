@@ -1766,6 +1766,51 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 
 合計 ~750 行 LOC / 4-5 週. Phase 1 残予算と要相談. -/
 
+/-- A finite `p`-group is a `{p}`-group in the π-group sense. -/
+theorem isPiGroup_singleton_of_isPGroup {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} (hH : IsPGroup p H) :
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H := by
+  intro q hq
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := H)).mp hH
+  rw [hn] at hq
+  by_cases hn0 : n = 0
+  · simp [hn0] at hq
+  · rw [Nat.primeFactors_prime_pow hn0 Fact.out] at hq
+    simpa using hq
+
+/-- A finite `{p}`-group in the π-group sense is a `p`-group. -/
+theorem isPGroup_of_isPiGroup_singleton {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H) :
+    IsPGroup p H := by
+  rw [IsPGroup.iff_card]
+  exact ⟨(Nat.card H).primeFactorsList.length,
+    Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' (fun {q} hq_prime hq_dvd => by
+      have hq_pf : q ∈ (Nat.card H).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩
+      simpa using hH q hq_pf)⟩
+
+/-- Singleton π-core agrees with the usual `p`-core. -/
+theorem oPiCore_singleton_eq_opCore {G : Type*} [Group G] [Finite G]
+    (p : ℕ) [Fact p.Prime] :
+    OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G =
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  apply le_antisymm
+  · exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore
+      (isPGroup_of_isPiGroup_singleton (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup ({p} : Set ℕ)))
+  · exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore
+      (isPiGroup_singleton_of_isPGroup (OddOrder.Isaacs.Ch01.opCore_isPGroup p G))
+
+/-- Hall-Higman 1.2.3 specialized from `O_π` to the usual `p`-core. -/
+theorem hall_higman_opCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) ≤
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  rw [← oPiCore_singleton_eq_opCore (G := G) p]
+  exact OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hπ'
+
 /-- **作用交換子部分群** `[G, A]_φ` := 集合 `{g * (φ a) g⁻¹ : g ∈ G, a ∈ A}` の生成部分群.
 
 これは Γ = G ⋊[φ] A 内で `⁅inl(G), inr(A)⁆` を `inl : G →* Γ` 経由で pull back した

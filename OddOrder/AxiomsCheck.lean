@@ -118,6 +118,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- 後半: fixedPointsOfMulAut φ > ⊥ (C_G(P) > 1)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup
 
+-- Ch.4 (Commutators): Thm 4.33 setup
+-- Hall-Higman 1.2.3 specialized from `O_π` to the usual p-core `O_p(G)`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.hall_higman_opCore
+
 -- Ch.4 (Commutators): Thm 4.36 ⭐⭐⭐ **= BG Thm 1.11, FT クリティカル**
 -- p > 2, G p-群, A p'-群 acts on G, A fixes all order-p elements ⇒ A trivial on G.
 -- Baer trick (Lem 4.37) + Cor 4.35 + 強帰納法 (Three-subgroups).
