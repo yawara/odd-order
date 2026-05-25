@@ -31,8 +31,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 6
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.3/6.5 ✅, 6.4/6.6 未, 6.2/6.7 保留 |
-| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 未着手 |
+| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.3/6.4/6.5/6.6 ✅, 6.2/6.7 保留 |
+| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 進行中: 6.13/6.14/6.16 ✅ |
 | 6C | Frobenius kernel nilpotent + Thompson | 6.22 – 6.24 | 未着手 |
 
 ## 方針
@@ -759,6 +759,48 @@ structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
 namespace IsFrobeniusGroup
 
 variable {G : Type*} [Group G] {N A : Subgroup G}
+
+/-- A subgroup-pair Frobenius group gives a Frobenius action of the complement on the kernel by
+conjugation. This is the bridge between the pair form of Isaacs Thm 6.4 and the action-based
+definition used for Lemma 6.1. -/
+theorem toFrobeniusAction (h : IsFrobeniusGroup G N A) :
+    letI : N.Normal := h.isNormal
+    @IsFrobeniusAction A N _ _
+      (MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)) := by
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  intro a ha n hn hfix
+  have haG : (a : G) ≠ 1 := fun haG => ha (Subtype.ext haG)
+  have hnG : (n : G) ≠ 1 := fun hnG => hn (Subtype.ext hnG)
+  have hfixG : (a : G) * (n : G) * (a : G)⁻¹ = n := Subtype.ext_iff.mp hfix
+  exact h.conj_frobenius (a : G) a.2 haG (n : G) n.2 hnG hfixG
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group,
+`|N| ≡ 1 (mod |A|)`. -/
+theorem card_kernel_modEq_one [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.card N ≡ 1 [MOD Nat.card A] := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.card_modEq_one (A := A) (N := N) h.toFrobeniusAction
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group, the kernel and
+complement have coprime orders. -/
+theorem coprime_card_kernel_complement [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.Coprime (Nat.card N) (Nat.card A) := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.coprime_card (A := A) (N := N) h.toFrobeniusAction
 
 /-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
 then the conjugation action of `A` on `N` is Frobenius. -/
