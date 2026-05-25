@@ -2304,6 +2304,36 @@ theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
   haveI : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
   exact hxy (commutative_of_cyclic_center_quotient f hker x y)
 
+/-- **Lem 6.15 `p = 2` setup**: the image of Isaacs's cyclic subgroup `C` in `T/T'`
+is cyclic of index `2`.
+
+This supplies the `D ≤ T/T'` input for
+`exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group`. -/
+theorem quotient_commutator_image_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T]
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    IsCyclic (C.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      (C.map (QuotientGroup.mk' (_root_.commutator T))).index = 2 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  constructor
+  · haveI : IsCyclic C := hC_cyclic
+    exact isCyclic_of_surjective
+      ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap C)
+      ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective C)
+  · have hcomm_le_C : _root_.commutator T ≤ C :=
+      (commutator_le_center_of_index_pow_two (p := 2) h_idx).trans hZ_lt_C.le
+    calc
+      (C.map (QuotientGroup.mk' (_root_.commutator T))).index = C.index := by
+        exact Subgroup.index_map_eq C
+          (QuotientGroup.mk'_surjective (_root_.commutator T)) (by
+            rw [QuotientGroup.ker_mk']
+            exact hcomm_le_C)
+      _ = 2 :=
+        index_eq_prime_of_center_lt_of_center_index_pow_two
+          (p := 2) h_idx hZ_lt_C hC_lt_T
+
 /-- **Step 0 of Lem 6.15** (cardinality): under the hypothesis of Lem 6.15,
 `|commutator T| = p`. -/
 private lemma card_commutator_eq_prime_of_lem_6_15
