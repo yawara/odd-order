@@ -5547,6 +5547,26 @@ private lemma commutator_actionCommutatorInfty_fix_top_le_fixedPoints
   rw [map_inv] at h_aux
   exact (inv_injective h_aux)
 
+/-! #### Normality and nontriviality of C in G -/
+
+/-- **`C ⊴ G`** (Step 6 conclusion of Isaacs Thm 4.24):
+combining `⁅C, ⊤⁆ ≤ [G, A^∞]` (since `C ≤ [G, A^∞]` and `[G, A^∞]` is G-normal) with
+`⁅C, ⊤⁆ ≤ fixedPointsOfMulAut φ` (from
+`commutator_actionCommutatorInfty_fix_top_le_fixedPoints`) yields `⁅C, ⊤⁆ ≤ C`, hence
+`C` is normal in `G` by `Subgroup.commutator_top_right_le_iff`. -/
+private lemma actionCommutatorInfty_fix_normal_of_centralized
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    (actionCommutatorInfty_fix φ).Normal := by
+  rw [← Subgroup.commutator_top_right_le_iff]
+  refine le_inf ?_ (commutator_actionCommutatorInfty_fix_top_le_fixedPoints φ h)
+  haveI : (actionCommutatorInfty φ).Normal := actionCommutatorInfty_normal φ
+  calc ⁅actionCommutatorInfty_fix φ, (⊤ : Subgroup G)⁆
+      ≤ ⁅actionCommutatorInfty φ, (⊤ : Subgroup G)⁆ :=
+        Subgroup.commutator_mono inf_le_left le_rfl
+    _ ≤ actionCommutatorInfty φ :=
+        Subgroup.commutator_le_left _ _
+
 end /- §4C (続 II) -/
 
 end OddOrder.Isaacs.Ch04
