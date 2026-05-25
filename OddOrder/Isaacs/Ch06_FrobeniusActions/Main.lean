@@ -1039,10 +1039,153 @@ The iso constructions follow mathlib's `quaternionGroupZeroEquivDihedralGroupZer
 (Quaternion.lean L152): element-by-element mapping using the partition `P = C ⊔ aC`, then
 `map_mul'` verified by case analysis on the defining relations. -/
 
-/-- **Isaacs Lemma 6.13 (inverting case)**: Let `P` be a finite 2-group with a cyclic subgroup
-`C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = c⁻¹`. Then `P` is isomorphic to either
-the dihedral group `DihedralGroup (orderOf c)` or the generalized quaternion group
-`QuaternionGroup (orderOf c / 2)`. -/
+/-! ### Dihedral / quaternion recognition helpers -/
+
+/-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
+with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
+`P ≃* DihedralGroup (orderOf c)`. -/
+private noncomputable def dihedralIsoOfInverting
+    {P : Type*} [Group P] [Finite P]
+    (c a : P) (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_a_sq : a ^ 2 = 1) (h_conj : a * c * a⁻¹ = c⁻¹) :
+    P ≃* DihedralGroup (orderOf c) := by
+  classical
+  set N := orderOf c with hN_def
+  haveI : Fintype P := Fintype.ofFinite P
+  -- N > 0 since `P` is finite.
+  have hc_fin : IsOfFinOrder c := isOfFinOrder_of_finite c
+  have hN_pos : 0 < N := hc_fin.orderOf_pos
+  haveI : NeZero N := ⟨hN_pos.ne'⟩
+  -- Conjugation by `a` inverts every power of `c`.
+  have h_conj_zpow : ∀ k : ℤ, a * c ^ k * a⁻¹ = c ^ (-k) := fun k => by
+    have step1 : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
+      have : Function.Bijective ((MulAut.conj a : P ≃* P) : P → P) :=
+        (MulAut.conj a : P ≃* P).bijective
+      simpa using (map_zpow (MulAut.conj a : P →* P) c k).symm
+    rw [step1, h_conj, inv_zpow, ← zpow_neg]
+  -- Cardinality computation: |P| = 2 * N.
+  have hcard_P : Nat.card P = 2 * N := by
+    have h := (Subgroup.zpowers c).index_mul_card
+    rw [h_idx, Nat.card_zpowers] at h
+    omega
+  -- Forward map `DihedralGroup N → P`.
+  let fwd : DihedralGroup N → P
+    | DihedralGroup.r i => c ^ i.val
+    | DihedralGroup.sr i => a * c ^ i.val
+  -- Helper: `c ^ (i.val + j.val) = c ^ ((i + j).val)` for `i j : ZMod N`.
+  have hc_addval : ∀ i j : ZMod N, c ^ ((i + j).val) = c ^ i.val * c ^ j.val := by
+    intro i j
+    rw [← pow_add]
+    -- `c ^ k = c ^ (k % N)` via `pow_eq_pow_iff_modEq` (since `N = orderOf c`).
+    rw [pow_eq_pow_iff_modEq, Nat.ModEq, ← hN_def]
+    -- `(i + j).val % N = (i.val + j.val) % N` from `ZMod.val_add`.
+    rw [ZMod.val_add, Nat.mod_mod]
+  have hc_subval : ∀ i j : ZMod N, c ^ ((j - i).val) = c ^ j.val * (c ^ i.val)⁻¹ := by
+    intro i j
+    have h := hc_addval (j - i) i
+    rw [sub_add_cancel] at h
+    -- h : c ^ j.val = c ^ (j - i).val * c ^ i.val
+    exact eq_mul_inv_iff_mul_eq.mpr h.symm
+  -- `a⁻¹ = a` from `a² = 1`.
+  have ha_inv : a⁻¹ = a := by
+    have h1 : a * a = 1 := by rw [← sq, h_a_sq]
+    exact (eq_inv_of_mul_eq_one_right h1).symm
+  -- Commutation: `c ^ k * a = a * c ^ (-k)` for `k : ℤ`.
+  have h_zpow_a : ∀ k : ℤ, c ^ k * a = a * c ^ (-k) := fun k => by
+    have h := h_conj_zpow (-k)
+    rw [neg_neg] at h
+    -- h : a * c ^ (-k) * a⁻¹ = c ^ k
+    -- Goal: c ^ k * a = a * c ^ (-k)
+    rw [show (c ^ k : P) = a * c ^ (-k) * a⁻¹ from h.symm,
+        mul_assoc (a * c ^ (-k)), inv_mul_cancel, mul_one]
+  -- Bridge: `c ^ ((j - i).val) = c ^ j.val * (c ^ i.val)⁻¹` (already proved as `hc_subval`).
+  -- For `h_sr_r`: `c ^ i.val * a * c ^ j.val = a * c ^ (j - i).val`. Use the conjugation
+  -- relation, then bridge via `pow_eq_pow_iff_modEq` and ZMod-arithmetic.
+  have h_sr_r : ∀ i j : ZMod N, c ^ i.val * a * c ^ j.val = a * c ^ (j - i).val := by
+    intro i j
+    -- LHS = c^i.val * (a * c^j.val) = c^i.val * a * c^j.val (associativity)
+    -- Use h_zpow_a (i.val : ℤ): c^(i.val : ℤ) * a = a * c^(-(i.val : ℤ))
+    -- Then combine c^(-(i.val : ℤ)) * c^(j.val : ℤ) = c^(j.val - i.val : ℤ).
+    -- Finally show c^(j.val - i.val : ℤ) = c^((j - i).val : ℕ) via mod N.
+    have step1 : c ^ i.val * a = a * c ^ (-(i.val : ℤ)) := by
+      have := h_zpow_a (i.val : ℤ)
+      rw [zpow_natCast] at this; exact this
+    rw [step1, mul_assoc, ← zpow_natCast c j.val, ← zpow_add]
+    -- Goal: a * c ^ (-(i.val : ℤ) + (j.val : ℤ)) = a * c ^ (j - i).val
+    congr 1
+    rw [show (c ^ (j - i).val : P) = c ^ ((j - i).val : ℤ) from (zpow_natCast c _).symm,
+        zpow_eq_zpow_iff_modEq, ← hN_def]
+    -- Bridge `(-i.val + j.val : ℤ) ≡ ((j - i).val : ℤ) [ZMOD (N : ℤ)]` via ZMod equality.
+    rw [← ZMod.intCast_eq_intCast_iff]
+    push_cast
+    rw [ZMod.natCast_zmod_val, ZMod.natCast_zmod_val, ZMod.natCast_zmod_val]
+    ring
+  -- Injectivity: `fwd` does not collapse `c^i.val` and `a * c^j.val` (since `a ∉ ⟨c⟩`),
+  -- and is injective on each branch by `orderOf c = N`.
+  have hfwd_inj : Function.Injective fwd := by
+    rintro (i | i) (j | j) h <;> simp only [fwd] at h
+    · -- `c^i.val = c^j.val` ⇒ `i = j` via `pow_eq_pow_iff_modEq`
+      congr 1
+      have hmod : i.val ≡ j.val [MOD N] := (pow_eq_pow_iff_modEq).mp h
+      unfold Nat.ModEq at hmod
+      rw [Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)] at hmod
+      exact ZMod.val_injective N hmod
+    · -- `c^i.val = a * c^j.val` ⇒ `a ∈ ⟨c⟩`, contradiction
+      exfalso
+      apply h_a_notmem
+      have : a = c ^ i.val * (c ^ j.val)⁻¹ := by
+        rw [h]; group
+      rw [this]
+      exact Subgroup.mul_mem _
+        (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _)
+        (Subgroup.inv_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _))
+    · -- `a * c^i.val = c^j.val` ⇒ `a ∈ ⟨c⟩`, contradiction
+      exfalso
+      apply h_a_notmem
+      have : a = c ^ j.val * (c ^ i.val)⁻¹ := by
+        rw [← h]; group
+      rw [this]
+      exact Subgroup.mul_mem _
+        (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _)
+        (Subgroup.inv_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _))
+    · -- `a * c^i.val = a * c^j.val` ⇒ `i = j`
+      congr 1
+      have heq : c ^ i.val = c ^ j.val := mul_left_cancel h
+      have hmod : i.val ≡ j.val [MOD N] := (pow_eq_pow_iff_modEq).mp heq
+      unfold Nat.ModEq at hmod
+      rw [Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)] at hmod
+      exact ZMod.val_injective N hmod
+  -- Cardinality equality.
+  have hcard_eq : Nat.card (DihedralGroup N) = Nat.card P := by
+    rw [DihedralGroup.nat_card, hcard_P]
+  -- Build the Equiv via bijectivity.
+  have hbij : Function.Bijective fwd := by
+    rw [Fintype.bijective_iff_injective_and_card]
+    refine ⟨hfwd_inj, ?_⟩
+    rw [DihedralGroup.card]
+    rw [← Nat.card_eq_fintype_card, hcard_P]
+  -- Build map_mul (4 cases).
+  have hfwd_mul : ∀ x y : DihedralGroup N, fwd (x * y) = fwd x * fwd y := by
+    rintro (i | i) (j | j) <;> simp only [fwd]
+    · -- r i * r j = r (i+j)
+      show c ^ (i + j).val = c ^ i.val * c ^ j.val
+      exact hc_addval i j
+    · -- r i * sr j = sr (j - i)
+      show a * c ^ (j - i).val = c ^ i.val * (a * c ^ j.val)
+      rw [← mul_assoc]
+      exact (h_sr_r i j).symm
+    · -- sr i * r j = sr (i + j)
+      show a * c ^ (i + j).val = a * c ^ i.val * c ^ j.val
+      rw [mul_assoc, ← hc_addval]
+    · -- sr i * sr j = r (j - i)
+      show c ^ (j - i).val = a * c ^ i.val * (a * c ^ j.val)
+      rw [mul_assoc, ← mul_assoc (c ^ i.val), h_sr_r, ← mul_assoc]
+      rw [show a * a = 1 from by rw [← sq, h_a_sq], one_mul]
+  -- Assemble.
+  let setEquiv : DihedralGroup N ≃ P := Equiv.ofBijective fwd hbij
+  exact (MulEquiv.mk' setEquiv hfwd_mul).symm
+
 theorem dihedralOrQuaternion_of_invertingConjugation
     {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
     (c a : P) (h_idx : (Subgroup.zpowers c).index = 2)
