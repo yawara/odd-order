@@ -41,6 +41,7 @@
 - **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` / `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. さらに実際の subgroup `fixedOnSubmoduleAndQuotientSubgroup` とその可換性補題を追加済み.
 - **2026-05-25**: p-subgroup の `W` / `V/W` action が scalar characters で書けるなら char p で `fixedOnSubmoduleAndQuotientSubgroup` に入る補題 `subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions` と、faithful 版の可換性補題 `subgroup_commutative_of_isPGroup_scalar_actions` を追加済み. BG の「dim W = dim V/W = 1 なので scalar」段だけが次の橋渡し.
 - **2026-05-25**: rank-one representation 用に `scalarMonoidHomOfFinrankEqOne`, units 版 `scalarCharacterOfFinrankEqOne`, および char p の p-group rank-one 表現自明性 `isPGroup_rank_one_representation_trivial_of_charP` を追加済み. 次はこれを実際の submodule `W` と quotient `V/W` 表現へ適用する.
+- **2026-05-25**: `isPGroup_rank_one_submodule_action_trivial_of_charP`, `isPGroup_rank_one_quotient_action_trivial_of_charP`, `subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`, `subgroup_commutative_of_rank_one_subquotients` を追加済み. q=p 分岐で rank-one subquotient まで到達すれば、`C_G(W) ∩ C_G(V/W)` 可換性までは Lean helper で閉じる.
 
 ## TL;DR
 
@@ -386,6 +387,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
-- `isPGroup_rank_one_representation_trivial_of_charP` を `W` の subrepresentation と `V/W` の quotient representation に適用する helper を追加する.
-- その後、q=p 分岐で p-elements と `G'` が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
+- q=p 分岐の `W = C_V(K)` が G-invariant で、`dim W = dim V/W = 1` になる段を小補題化する.
+- その後、p-elements と `G'` が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
