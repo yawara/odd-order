@@ -302,13 +302,22 @@ theorem commutatorElement_pow_index_center_eq_one
 
 end -- 5B
 
+/-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
+that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
+
+For finite `G`, this is equivalent to existence of normal `N` with `|N|` coprime to `p`
+and `|G:N|` a `p`-power. mathlib 未収載のため新規定義. -/
+def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
+  ∃ N : Subgroup G, N.Normal ∧
+    ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
+
 section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 
 /-! ### Isaacs §5C (Hall transfer + Burnside)
 
 - **Lemma 5.11** (Hall index transfer): `ker_transfer_sup_eq_top_of_hall` ✅.
 - **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion` ✅.
-- **Thm 5.13 Burnside**: `MonoidHom.ker_transferSylow_isComplement'` 直接.
+- **Thm 5.13 Burnside**: `hasNormalPComplement_of_sylow_normalizer_le_centralizer` ✅.
 - **Cor 5.14**: `IsCyclic.isComplement'` 直接.
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16** (Z-group 構造): mathlib `IsZGroup` API 直接.
@@ -669,6 +678,34 @@ theorem normalizer_controls_centralizer_fusion
       _ = (c : G) * y * (c : G)⁻¹ := by rw [hgxy]
       _ = y * (c : G) * (c : G)⁻¹ := by rw [← hcy]
       _ = y := by group
+
+/-- **Isaacs Thm 5.13 (Burnside normal p-complement)**:
+if a Sylow `p`-subgroup centralizes its normalizer, then `G` has a normal
+`p`-complement.
+
+This adapts mathlib's `MonoidHom.ker_transferSylow_isComplement'`, which gives a
+complement for the chosen Sylow subgroup, to this file's `HasNormalPComplement`
+predicate requiring the same normal complement for every Sylow subgroup. -/
+theorem hasNormalPComplement_of_sylow_normalizer_le_centralizer
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤
+      Subgroup.centralizer ((P : Subgroup G) : Set G)) :
+    HasNormalPComplement p G := by
+  classical
+  let N : Subgroup G := (MonoidHom.transferSylow P hP).ker
+  have hNP : Subgroup.IsComplement' N (P : Subgroup G) := by
+    simpa [N] using MonoidHom.ker_transferSylow_isComplement' P hP
+  refine ⟨N, inferInstance, ?_⟩
+  intro Q
+  have hdisj : Disjoint N (Q : Subgroup G) := by
+    simpa [N] using MonoidHom.ker_transferSylow_disjoint P hP
+      (Q : Subgroup G) Q.isPGroup'
+  have hcardQ : Nat.card (Q : Subgroup G) = Nat.card (P : Subgroup G) := by
+    exact Nat.card_congr (Sylow.equiv Q P).toEquiv
+  have hcard : Nat.card N * Nat.card (Q : Subgroup G) = Nat.card G := by
+    rw [hcardQ]
+    exact hNP.card_mul
+  exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
 
 /-- mathlib `commutator_inf_eq_focalSubgroup` のリネーム (Focal Subgroup Theorem の
 Isaacs 5.18 弱形). 注: Isaacs 5.18 のフル statement は次の
@@ -1098,7 +1135,7 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
 
 **FT クリティカル**. mathlib 未収載で新規実装が必要.
 
-- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
+- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」(§5C で導入済み).
 - **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
   `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
 - **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
@@ -1111,15 +1148,6 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
   二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
 - **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
 - **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
-
-/-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
-that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
-
-For finite `G`, this is equivalent to existence of normal `N` with `|N|` coprime to `p`
-and `|G:N|` a `p`-power. mathlib 未収載のため新規定義. -/
-def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
-  ∃ N : Subgroup G, N.Normal ∧
-    ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
 
 /-- `OPrime p G` — the smallest normal subgroup of `G` with `p`-power index.
 For finite `G`, this is the intersection of all such normal subgroups (Isaacs §5D 冒頭, 'O^p(G)').

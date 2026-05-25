@@ -7,7 +7,7 @@ ROADMAP 上の位置: **第 4 波 (Ch.4 後の Ch.4 → Ch.5 → Ch.6 シーケ�
 
 ## TL;DR — mathlib 大半カバー、FT 経路の核は Focal Subgroup (5.21)
 
-**mathlib カバレッジは Ch.5 中で最も厚い**. `Mathlib/GroupTheory/Transfer.lean` (350 行) + `Focal.lean` (218 行) + `Schreier.lean` + `SpecificGroups/ZGroup.lean` で 主要結果 (transfer 定義・Burnside 5.13・cyclic Sylow 5.14・Focal Subgroup 5.21・Schur 5.7・Z-group 構造 5.15-5.16) を直接実装済. ⇒ ラッパー仕事中心、新規実装は **Thm 5.24 (nilpotent maximal)** などに残る. **§5D の Thm 5.20-5.23, §5E の Thm 5.25 / 5.26, Cor 5.29 / 5.30 は 2026-05-25 に sorry-free 完成**.
+**mathlib カバレッジは Ch.5 中で最も厚い**. `Mathlib/GroupTheory/Transfer.lean` (350 行) + `Focal.lean` (218 行) + `Schreier.lean` + `SpecificGroups/ZGroup.lean` で 主要結果 (transfer 定義・Burnside 5.13・cyclic Sylow 5.14・Focal Subgroup 5.21・Schur 5.7・Z-group 構造 5.15-5.16) を直接実装済. ⇒ ラッパー仕事中心、新規実装は **Thm 5.24 (nilpotent maximal)** などに残る. **§5C の Thm 5.13, §5D の Thm 5.20-5.23, §5E の Thm 5.25 / 5.26, Cor 5.29 / 5.30 は 2026-05-25 に sorry-free 完成**.
 
 **FT 経路で最重要**: **Focal Subgroup Theorem (5.21)** — **BG が独自 Thm 1.17 として再述**し本文 3 ヶ所 (L2723, L5042, L5068) で使う. mathlib `commutator_inf_eq_focalSubgroup` / `ker_transferFocal_inf_eq_focalSubgroup` を BG 流ステートメントに橋渡しすれば足りる. **Burnside (5.13)** は BG が独自 Thm 1.18 として再述するが本文での明示利用は少ない (BG 索引と冒頭サマリ程度).
 
@@ -93,7 +93,7 @@ mmd 抽出では `### 5a`, `Problems 5A`, `### 5b`, `Problems 5b`, `### 5c`, `**
 | transfer 定義 (5.1, 5.2) | `MonoidHom.transfer` (`Mathlib/GroupTheory/Transfer.lean:144`) | transversal 経由の welldef + 準同型性込み |
 | transfer evaluation (5.5) | `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot` (`Transfer.lean:161`) | orbital 分解 explicit 形 |
 | 5.6 central transfer = pow | `MonoidHom.transfer_eq_pow` (`Transfer.lean:205`), `transfer_center_eq_pow` (`Transfer.lean:222`), `transferCenterPow` (`Transfer.lean:228`) | g ↦ g^n の準同型化 |
-| **5.13 Burnside** | `MonoidHom.ker_transferSylow_isComplement'` (`Transfer.lean:275`) | 直接 |
+| **5.13 Burnside** | `MonoidHom.ker_transferSylow_isComplement'` (`Transfer.lean:275`) + `hasNormalPComplement_of_sylow_normalizer_le_centralizer` | project `HasNormalPComplement` 入口まで完了 |
 | Burnside transfer (補) | `MonoidHom.transferSylow` (`Transfer.lean:244`) + `transferSylow_eq_pow` (`Transfer.lean:263`) | 5.13 の証明部品も完備 |
 | 5.7 Schur | `Subgroup.card_commutator_le_of_finite_commutatorSet` (`Schreier.lean:208`) + `finite_commutator_of_finiteIndex_center` | mathlib bound 付き強化版 + Isaacs の finite-index-center 形 |
 | **5.14 cyclic Sylow smallest prime** | `IsCyclic.isComplement'` (`Transfer.lean:339`) + `IsCyclic.normalizer_le_centralizer` (`Transfer.lean:308`) | 直接 |
@@ -213,7 +213,7 @@ FT クリティカル度 + mathlib カバレッジ + 章内依存で並べる:
 1. **§5A 全 (5.1-5.4)**: mathlib `MonoidHom.transfer` のラッパー + 5.3, 5.4 を新規実装. ウォームアップ.
 2. **§5B 核 (5.5, 5.6, 5.7)**: mathlib `transfer_eq_prod_quotient_orbitRel_zpowers_quot`, `transfer_center_eq_pow`, `card_commutator_le_of_finite_commutatorSet` をラップ.
 3. **§5B 残り (5.8, 5.9, 5.10)**: 5.8/5.9 は quotient `out` 代表元版で完成. 5.10 Dietzmann は新規実装が必要だが、mathlib の Schreier 経路で 5.7 は既に閉じているため後回し可.
-4. **§5C 前半 (5.11, 5.12, 5.13, 5.14)**: 5.13 Burnside は `ker_transferSylow_isComplement'` 直接, 5.14 は `IsCyclic.isComplement'` 直接. 5.11, 5.12 は新規実装.
+4. **§5C 前半 (5.11, 5.12, 5.13, 5.14)**: 5.13 Burnside は `hasNormalPComplement_of_sylow_normalizer_le_centralizer` で project API 接続済み, 5.14 は `IsCyclic.isComplement'` 直接. 5.11, 5.12 は新規実装.
 5. **§5C 後半 (5.15, 5.16, 5.17)**: mathlib `IsZGroup` API でほぼ直接. 5.17 は単一 prime に分離.
 6. **§5D 核 (5.20, 5.21, 5.22, 5.23)**: **FT クリティカル**. `APrime_eq_transferFocal_ker` と mathlib `Focal.lean` の API を Isaacs ステートメントに橋渡し済み. 5.21 = BG Thm 1.17 として再述.
 7. **§5C/5D 残り (5.18, 5.19, 5.24)**: 5.18 が中. 5.24 は単独で重い証明だが Ch.6+ 被引用無いので後回し可.
@@ -243,7 +243,7 @@ Isaacs は **任意の subgroup H** に対して `Foc_G(H)` を定義 (L3132), m
 - **BG §1.18 Burnside**: Isaacs 5.13 を直接利用. 同様.
 - **Peterfalvi 05.4 Suzuki 付録**: transfer-evaluation を `T(x) = x^{|Q|+1}` 形で使う. その場で mathlib `transfer_eq_pow` をラップ.
 
-⇒ Phase 1 で Isaacs 5.13, 5.21 を BG 名と互換な記述的 Lean 名 (`focalSubgroupTheorem`, `burnsideNormalPComplement`) で揃えると, Phase 2a での橋渡しが滑らか.
+⇒ Phase 1 で Isaacs 5.13, 5.21 を BG 名と互換な記述的 Lean 名 (`hasNormalPComplement_of_sylow_normalizer_le_centralizer`, `focalSubgroupTheorem`) で揃えると, Phase 2a での橋渡しが滑らか.
 
 ## 未解決の疑問
 
