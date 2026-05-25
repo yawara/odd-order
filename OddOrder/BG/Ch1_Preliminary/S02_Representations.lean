@@ -395,7 +395,7 @@ with `dim V = 2`. 以下が成立:
 (b) `char F = p ∣ |G|` ⟹ `G` の Sylow `p`-subgroup は abelian かつ
     `G'` を含む.
 
-**証明梗概** (BG L779-793, **MISSING_PAGE:29** あり): 帰納法 (|G| について).
+**証明梗概** (BG L779-793 + PDF p.29 補完): 帰納法 (|G| について).
 1. (L779-784) `G ⊆ GL(V, F)`. `G^* = G ∩ SL(V, F)`. `F` 代数閉と仮定可
    (tensor extension). `p = char F`.
 2. (L785-787) `O_q(G^*) ≠ 1` を仮定 (some prime q).
@@ -406,10 +406,20 @@ with `dim V = 2`. 以下が成立:
    `RepresentationTheory/PGroupFixedVector.lean` で構築 — mathlib
    `Representation.Coinvariants` から partial 構築可) ⟹ `W ≠ 0`.
    `dim V = 2` + `G` faithful ⟹ `dim W = dim V/W = 1`.
-4. **Case q ≠ p**: (MISSING_PAGE:29 以降) Sylow q-subgroup の coprime
-   action, induction.
-5. (L789-793, MISSING_PAGE 後の残部) `Q ⊆ GL(P)` 線型変換のうち
-   `v_1^β = λ_1·v_1`, `v_2^β = λ_2·v_2` (`λ_i^q = 1`) の形, から (a), (b).
+   `W` は `G`-invariant. `C = C_G(W) ∩ C_G(V/W)` は elementary abelian
+   p-group で, すべての p-element と `G'` を含む. よって (b).
+4. **Case q ≠ p**: Maschke + `K` abelian + `F` 代数閉より
+   `V = W₁ ⊕ W₂` (one-dimensional `FK`-modules). `x ∈ K#` の
+   固定する 1 次元部分空間は `W₁, W₂` のみ. `K ⊴ G` なので各 `g ∈ G`
+   はこれらを固定または交換するが, `|G|` が奇数なので交換できず固定する.
+   したがって `G` は abelian p'-group となり (a) を適用.
+5. 一般に `G^* ≠ 1` なら, `G^*` が p-group の場合は `O_p(G^*) ≠ 1`.
+   そうでなければ `q ≠ p` の Sylow `Q ≤ G^*` と `H = N_{G^*}(Q)` を取り,
+   `O_q(H) ≠ 1`. 前段落より `H` は abelian なので Burnside (Thm 1.18)
+   で `G^*` は `Q` の normal complement `N` を持つ. `N = 1` または
+   induction により `O_r(N) ≠ 1`, いずれも前段の normal q/r-core case に帰着.
+6. 最後に `G^* = 1` なら determinant で `G ↪ Fˣ`, よって `G` は abelian
+   p'-group.
 
 **形式化方針**:
 - mathlib `Sylow` ✓, `Matrix.GeneralLinearGroup` ✓, `Module.finrank` ✓.
@@ -419,8 +429,7 @@ with `dim V = 2`. 以下が成立:
   (~30 行) で新規構築.
 - 奇数位数: `Odd (Nat.card G)`.
 - 帰納構造: `(Nat.card G).strongRecOn` または `WellFoundedLT`.
-- MISSING_PAGE:29 内容: PDF p.28-29 を再 OCR or 別文献
-  (Aschbacher §35.4 等) で補完必要.
+- PDF p.29 は 2026-05-25 に `pdftotext -f 29 -l 29 -layout` で補完済み.
 
 **下流引用** (audit 実測):
 - §3 ×2 (Frobenius)
