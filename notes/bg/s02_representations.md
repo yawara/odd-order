@@ -4,9 +4,9 @@
 
 形式化先 (予定): `OddOrder/BG/Ch1_Preliminary/S02_Representations.lean`.
 
-**ROADMAP 上の位置**: **Phase 2a 第 1 波 (optional 独立節)** — §3 (Frobenius 作用) の依存なし、独立して形式化可 (本文使用は限定的).
+**ROADMAP 上の位置**: **Phase 2a 第 1 波必須節** — §3 (Frobenius 作用), §4, §15, App.A から引用される前提節.
 
-**役割**: operator group の表現論基礎、Fong–Swan 系 (Thm 2.3)、extraspecial p-群の加群構造 (Thm 2.5)、odd-order 2-次元表現 (Thm 2.6). **§9 周辺で 1–2 箇所のみ被引用**, optional 節のため形式化は必要時のみ.
+**役割**: operator group の表現論基礎、Fong–Swan 系 (Thm 2.3)、extraspecial p-群の加群構造 (Thm 2.5)、odd-order 2-次元表現 (Thm 2.6). 監査で **8+ cites** を確認済みで、特に §3 と App.A への前提として優先度が高い.
 
 ## Audit log (2026-05-23 audit 訂正)
 
@@ -35,6 +35,9 @@
   - **`ker_ne_bot_of_pow_eq_zero`** (sorry-free): `f : Module.End F V` + `f^N = 0` + `[Nontrivial V]` ⇒ `LinearMap.ker f ≠ ⊥`. proof: `ker = ⊥ ⇒ Function.Injective f` (mathlib `LinearMap.ker_eq_bot`) ⇒ `Function.Injective (⇑(f^N))` を `Module.End.mul_apply` ベース induction で示し, `f^N v = 0` (∀v) と `v ≠ 0` で矛盾.
   - **main `invariants_ne_bot` step case**: `haveI : Nontrivial V` を `Submodule.exists_mem_ne_zero_of_ne_bot hV` 経由 instance 化 → `exists_ne (1 : Subgroup.center G)` で非自明 z 取得 → 新 helper 適用で `ker ((ρ z : Module.End F V) - 1) ≠ ⊥` まで sorry-free. **残 sorry**: (a) ker が G-invariant (z ∈ Z(G) で全 g と可換), (b) `G/⟨z⟩` 上の representation 構築 + |G/⟨z⟩| < |G| + 帰納仮定適用.
   - Build OK (2272 jobs, sorry 1 件のみ on `invariants_ne_bot` step case 内). 次 iter で残 sorry 2 段階に着手.
+- **2026-05-25**: `PGroupFixedVector.lean` を sorry-free 化. `IsPGroup.invariants_ne_bot` と `IsPGroup.exists_fixed_vector_ne_zero` は完成済みで、§2F Thm 2.6 の fixed-vector dependency は解消.
+- **2026-05-25**: mmd の `[MISSING_PAGE_FAIL:29]` は BG PDF p.29 を `pdftotext` で復元して解消. §2F の証明 sketch に q=p / q≠p / `G*` induction の分岐を反映済み.
+- **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 現在の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
 
 ## TL;DR
 
@@ -44,9 +47,9 @@
 - **Thm 2.5**: extraspecial p-群と cyclic H の semidirect product における加群構造制約
 - **Thm 2.6**: 奇数位数 2-次元加群 ⇒ G abelian or Sylow p-subgroup abelian (奇数位数限定)
 
-**mathlib カバレッジ**: **高い**. mathlib `RepresentationTheory.Basic`, `Maschke`, `FDRep` API で大部分既存 (Schur 補題、既約性、制限・誘導加群).
+**mathlib カバレッジ**: 基礎 API は使えるが、§2 の主結果は新規実装が多い. `RepresentationTheory.Basic`, `Maschke`, `FDRep` API は足場になり、§2F では p-群固定ベクトル補題を `OddOrder` 側で実装済み.
 
-**下流被引用**: §9 周辺 1–2 箇所のみ. 形式化優先度は **低い** (optional 節、本文必須性低).
+**下流被引用**: 監査実測で **8+ cites**. 形式化優先度は **高い**. ただし Prop 2.2 は Isaacs Ch.6 §6F Clifford 完成待ちで、Thm 2.3 は forward use 0 のため defer 可.
 
 ---
 
@@ -321,20 +324,19 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ---
 
-## §9 周辺への被引用
+## 下流被引用
 
-### 明示的引用 (予備調査)
+### 明示的引用 (2026-05-23 audit)
 
-**mmd grep** ("`Theorem 2\." or "Lemma 2\." + `§9|§8|§7` context):
-- **§9 L2511~**: "Thm 2.3 (Fong–Swan)" — characterization (없을 가능성, 재확인 필요)
-- **App.A L4500~**: "Prop 2.4 線型代数" — eigenspace 理論参照 (가능성)
+統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
 
-### 予想される使用場면
+実測:
+- §3: Prop 2.1, Prop 2.2, Thm 2.5, Thm 2.6 の引用が集中.
+- §4: Lem 4.17 で §2 を参照.
+- §15: Thm 15.7 で §2 を参照.
+- App.A: Thm A.1 proof で Thm 2.6 を参照.
 
-1. **§9 (Uniqueness) character theory**: Fong–Swan (Thm 2.3) で 可解성 + representation 次数 제약
-2. **App.A (p-Stability)**: Thm 2.5, 2.6 의 extraspecial structure 참조 (unlikely, 但し確인 필요)
-
-**현재判단**: 本文使用は **최소 1-2 箇所 (§9 중심)**, Thm 2.3 (Fong–Swan) のみ likely.
+**現在判断**: §2 は optional ではなく Phase 2a 第 1 波の前提節. ただし Lem 2.3 (Fong–Swan) は forward use 0 なので、§2 内では他結果より後回しでよい.
 
 ---
 
@@ -342,20 +344,21 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 優先度判定
 
-1. **Thm 2.1 (Schur + 既約)** ★★ — 기본, mathlib 기반, 短い. (2-3 日)
-2. **Thm 2.3 (Fong–Swan)** ★★ — 본문 사용 가능성, solvable context. (3-4 日)
-3. **Thm 2.2 (Clifford + cyclic)** ★ — 補助的, Thm 2.5 先행불必要. (2-3 日)
-4. **Prop 2.4 (eigenspace)** ★★★ — Thm 2.5 의존, 기술적. (5-7 日)
-5. **Thm 2.5 (extraspecial)** ★★★ — 非常に高難度, optional. (1-2 週)
-6. **Thm 2.6 (odd 2-dim)** ★★ — odd-order 限定, 형식화 가치. (4-5 日)
+1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. 現在 active. fixed-vector dependency と p-power torsion helper は完成、残りは 2 つの theorem stub.
+2. **Prop 2.4 (eigenspace)** ★★★ — Thm 2.5 の前提になる線型代数節.
+3. **Prop 2.1 (Schur + 既約)** ★★ — mathlib 基礎 API を活用できるが、Jacobson density 周辺は要注意.
+4. **Thm 2.5 (extraspecial)** ★★★ — §3 で使用. extraspecial 理論と Prop 2.4 に依存する高難度枠.
+5. **Prop 2.2 (Clifford + cyclic)** ★★ — §3 で使用するが、Isaacs Ch.6 §6F Clifford 完成待ち.
+6. **Thm 2.3 (Fong–Swan)** ★ — forward use 0. 後回し.
 
 ### 推奨スケジュール
 
-**§2 전체 형식化는 optional** (본문 1-2 箇所, Phase 2a 中盤以降):
-- **Short path** (§9 対応のみ): Thm 2.3 のみ (3-4 日, 必須性低)
-- **Full path** (complete module): Thm 2.1–2.6 all (3-4 週, 별도 담당者 가능)
+**§2 は Phase 2a 必須**:
+- **短期 path**: Thm 2.6 の dependency を先に固める (`PGroupFixedVector`, odd action helper, characteristic-p scalar helper).
+- **中期 path**: Prop 2.4 → Thm 2.5 → Prop 2.1.
+- **blocker path**: Prop 2.2 は Isaacs Ch.6 §6F Clifford 完成後に本実装.
 
-**권고**: **Phase 2a §1–§9 완료後**, §2 필요성 재평가 후 착수 (현재는 skip 추천).
+**推奨**: 現在は Thm 2.6 を続行. full theorem proof の前に、再利用できる小補題を 1–2 個ずつ sorry-free で積む.
 
 ---
 
@@ -364,8 +367,8 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 | 項目 | 状態 | 확인先 |
 |------|------|--------|
 | **Fong–Swan citation** | BG L657 "Fong and Swan [5, Theorem 72.1]" — citation 설정 필요 | BG references 재확인 |
-| **Lemma 2.6.3 (Gorenstein)** | BG L783 "G, Lemma 2.6.3, p. 31" — 내용 확인, Isaacs 대응 필요 | Isaacs FGT §2.6 재확인 |
-| **MISSING_PAGE:29 content** | L787 이후 페이지 내용 누락 (Thm 2.6 증명 중단) — mmd 재스캔 필요 | BG PDF pp. 28–29 재OCR |
+| **Lemma 2.6.3 (Gorenstein)** | 解消: `OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean` の `IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero` で再構築済み | Lean build 済み |
+| **MISSING_PAGE:29 content** | 解消: BG PDF p.29 を `pdftotext` で復元し、§2F proof sketch に反映済み | PDF p.29 |
 | **Prop 2.4(j)–(k) statement** | Thm 2.5 증명에서 핵심 but verbose. statement 정확성 재확인 | BG L696–712 정독 |
 | **mathlib `Maschke` API** | §2 에서 언급 가능성 (L1.20에서 phase 1 참조) | `Maschke.completely_reducible` 확인 |
 
@@ -379,7 +382,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/bg/_overview.md` (BG overview)
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
-**다음ステップ**: 
-- Phase 2a §1–§9 진행 상황에 따라 §2 형式化 필요성 재평가 (중기–후기 phase 2a)
-- Thm 2.3 (Fong–Swan) 만이라도 선제적 형式화 고려 (§9 character theory 지원)
-- Extraspecial 이론 (Thm 2.5) 형식화는 별도 스페셜리스트 담당 권고 (높은 난도)
+**次ステップ**:
+- Thm 2.6 の q=p case に使う characteristic-p scalar action helper を追加する.
+- その後、`C_G(W) ∩ C_G(V/W)` と determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
