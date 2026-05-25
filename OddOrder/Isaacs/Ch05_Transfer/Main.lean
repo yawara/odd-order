@@ -25,7 +25,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
-| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | docstring + 保留 (FT クリティカル) |
+| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.28; 5.29/5.30 保留 |
 
 ## 方針
 
@@ -1211,8 +1211,7 @@ assembly on top of this.
   `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
   `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
 
-**TODO**: 内部の残りステップ (focal ⊆ ⁅Q, P⁆, iteration, termination, final translate) を順に
-埋める. -/
+The proof below implements these steps directly. -/
 lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
@@ -1613,6 +1612,51 @@ theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
     -- C_n.index = p^b for some b ≤ a
     rcases (Nat.dvd_prime_pow Fact.out).mp (hKa ▸ hC_n_idx_dvd) with ⟨b, _, hb⟩
     exact ⟨b, hb⟩
+
+/-- Criterion after Isaacs Thm 5.26: to check
+`N_G(X) / C_G(X)` is a p-group, it suffices to show that every q-subgroup (`q ≠ p`)
+normalizing a p-subgroup `X` centralizes it.
+
+This is the formal version of the paragraph preceding Cor 5.29. -/
+theorem isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize
+    [Finite G] {p : ℕ} [Fact p.Prime]
+    (h : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ {X Q : Subgroup G}, IsPGroup p X → IsPGroup q Q →
+        Q ≤ Subgroup.normalizer (X : Set G) →
+        Q ≤ Subgroup.centralizer (X : Set G))
+    (X : Subgroup G) (hXp : IsPGroup p X) :
+    IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+      (Subgroup.centralizer (X : Set G)).subgroupOf (Subgroup.normalizer (X : Set G))) := by
+  classical
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  set C : Subgroup N := (Subgroup.centralizer (X : Set G)).subgroupOf N with hC_def
+  suffices h_idx_pow : ∃ b, C.index = p ^ b by
+    obtain ⟨b, hb⟩ := h_idx_pow
+    refine IsPGroup.of_card (n := b) ?_
+    rw [← Subgroup.index_eq_card]
+    exact hb
+  have hC_index_ne_zero : C.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  refine ⟨C.index.primeFactorsList.length, ?_⟩
+  rw [← List.prod_replicate, ← List.eq_replicate_of_mem ?_,
+    Nat.prod_primeFactorsList hC_index_ne_zero]
+  intro q hq
+  obtain ⟨hq_prime, hq_dvd_C_index⟩ := (Nat.mem_primeFactorsList hC_index_ne_zero).mp hq
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  by_contra hq_ne_p
+  obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
+  let Q : Subgroup G := (S : Subgroup N).map N.subtype
+  have hQ_q : IsPGroup q Q := S.isPGroup'.map N.subtype
+  have hQ_le_N : Q ≤ Subgroup.normalizer (X : Set G) := by
+    simpa [Q, hN_def] using Subgroup.map_subtype_le (H := N) (S : Subgroup N)
+  have hQ_le_CG : Q ≤ Subgroup.centralizer (X : Set G) :=
+    h hq_ne_p hXp hQ_q hQ_le_N
+  have hS_le_C : (S : Subgroup N) ≤ C := by
+    intro s hs
+    rw [hC_def, Subgroup.mem_subgroupOf]
+    exact hQ_le_CG (Subgroup.mem_map_of_mem N.subtype hs)
+  have hC_dvd_S_index : C.index ∣ (S : Subgroup N).index :=
+    Subgroup.index_dvd_of_le hS_le_C
+  exact S.not_dvd_index (hq_dvd_C_index.trans hC_dvd_S_index)
 
 /-- **N = S · C 補題**: `S : Sylow p N`, `C ⊴ N` で `N/C` が p-group ⇒
 `(S : Subgroup N) ⊔ C = ⊤`.
@@ -2048,6 +2092,21 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
       _ = ((t_N : G) * (u_N : G)) * x * ((t_N : G) * (u_N : G))⁻¹ := by group
       _ = (c * g) * x * (c * g)⁻¹ := by rw [← hcg_val_eq]
       _ = y := h_y_eq_cgx.symm
+
+/-- Isaacs' p-local action criterion, packaged with Frobenius' normal p-complement theorem.
+
+If every q-subgroup (`q ≠ p`) normalizing a p-subgroup centralizes it, then `G` has a
+normal p-complement. This is the shared entry point for Cor 5.29 and Cor 5.30. -/
+theorem hasNormalPComplement_of_prime_subgroups_centralize
+    [Finite G] {p : ℕ} [Fact p.Prime]
+    (h : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ {X Q : Subgroup G}, IsPGroup p X → IsPGroup q Q →
+        Q ≤ Subgroup.normalizer (X : Set G) →
+        Q ≤ Subgroup.centralizer (X : Set G)) :
+    HasNormalPComplement p G :=
+  hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer.mpr
+    (fun X hXp =>
+      isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize h X hXp)
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
