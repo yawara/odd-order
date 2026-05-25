@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.QuotientGroup.Basic
+import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
 
 /-!
@@ -27,6 +28,8 @@ The centralizer in a normal subgroup `G*` is obtained as
 -/
 
 namespace OddOrder.GroupTheory
+
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -71,6 +74,13 @@ namespace chiefFactorCentralizer
 
 variable {U V H : Subgroup G} [V.Normal]
 
+/-- If `U` is normal, then the ambient centralizer of `U/V` is normal. -/
+instance normal [U.Normal] : (chiefFactorCentralizer U V).Normal := by
+  change ((Subgroup.centralizer
+    (U.map (QuotientGroup.mk' V) : Subgroup (G ⧸ V))).comap
+      (QuotientGroup.mk' V)).Normal
+  infer_instance
+
 /-- Membership in `C_G(U/V)` is membership of the quotient image in the quotient centralizer. -/
 theorem mem_iff {g : G} :
     g ∈ chiefFactorCentralizer U V ↔
@@ -99,6 +109,47 @@ theorem le_of_map_le_centralizer
         ((U.map (QuotientGroup.mk' V) : Subgroup (G ⧸ V)) : Set (G ⧸ V))) :
     H ≤ chiefFactorCentralizer U V :=
   le_iff_map_le_centralizer.mpr hH
+
+/-- If `H ≤ C_G(U/V)`, then `[U, H] ≤ V`. -/
+theorem commutator_le_of_le (hH : H ≤ chiefFactorCentralizer U V) :
+    ⁅U, H⁆ ≤ V := by
+  rw [Subgroup.commutator_le]
+  intro u hu h hh
+  have hqh_cent :
+      (QuotientGroup.mk' V) h ∈
+        Subgroup.centralizer
+          ((U.map (QuotientGroup.mk' V) : Subgroup (G ⧸ V)) : Set (G ⧸ V)) :=
+    mem_iff.mp (hH hh)
+  have hmul :
+      (QuotientGroup.mk' V) u * (QuotientGroup.mk' V) h =
+        (QuotientGroup.mk' V) h * (QuotientGroup.mk' V) u :=
+    Subgroup.mem_centralizer_iff.mp hqh_cent
+      ((QuotientGroup.mk' V) u) ⟨u, hu, rfl⟩
+  apply (QuotientGroup.eq_one_iff ⁅u, h⁆).mp
+  change (QuotientGroup.mk' V) ⁅u, h⁆ = 1
+  rw [map_commutatorElement]
+  exact commutatorElement_eq_one_iff_mul_comm.mpr hmul
+
+/-- If `[U, H] ≤ V`, then `H ≤ C_G(U/V)`. -/
+theorem le_of_commutator_le (hcomm : ⁅U, H⁆ ≤ V) :
+    H ≤ chiefFactorCentralizer U V := by
+  rw [le_iff_map_le_centralizer]
+  intro qh hqh
+  rw [Subgroup.mem_centralizer_iff]
+  intro qu hqu
+  obtain ⟨h, hh, rfl⟩ := hqh
+  obtain ⟨u, hu, rfl⟩ := hqu
+  have hcomm_el : ⁅u, h⁆ ∈ V :=
+    Subgroup.commutator_le.mp hcomm u hu h hh
+  have hq_comm : ⁅(QuotientGroup.mk' V) u, (QuotientGroup.mk' V) h⁆ = 1 := by
+    rw [← map_commutatorElement]
+    exact (QuotientGroup.eq_one_iff ⁅u, h⁆).mpr hcomm_el
+  exact commutatorElement_eq_one_iff_mul_comm.mp hq_comm
+
+/-- A subgroup centralizes `U/V` iff its commutator with `U` lies in `V`. -/
+theorem le_iff_commutator_le :
+    H ≤ chiefFactorCentralizer U V ↔ ⁅U, H⁆ ≤ V :=
+  ⟨commutator_le_of_le, le_of_commutator_le⟩
 
 end chiefFactorCentralizer
 

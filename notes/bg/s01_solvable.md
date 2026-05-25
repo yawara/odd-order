@@ -36,6 +36,9 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
 - The forward inclusion is sorry-free as `fitting_map_subtype_le_chiefFactorCentralizer`:
   for every chief factor `U/V`, the image of `F(G*)` in `G/V` is nilpotent normal, hence
   lies in `F(G/V)`, and Lemma 1.1 puts `U/V` in the centralizer of `F(G/V)`.
+- Reverse-inclusion scaffolding now exists in `OddOrder.GroupTheory.ChiefFactor`:
+  `chiefFactorCentralizer.normal` and `chiefFactorCentralizer.le_iff_commutator_le`
+  identify centralizing `U/V` with the commutator containment `⁅U,H⁆ ≤ V`.
 - Remaining Prop 1.2 work is the reverse inclusion via chief-series induction over normal
   intervals: an element/subgroup centralizing all chief factors of `G` must lie in `F(G*)`.
 - **Prop 1.4 remains open**: with Prop 1.3 now available, the remaining work is the book's

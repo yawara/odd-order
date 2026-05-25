@@ -44,6 +44,9 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
   sorry-free 実装済み。chief factor `U/V` を `G/V` の minimal normal subgroup に写し、
   Lemma 1.1 で `U/V ≤ Z(F(G/V))`、さらに `F(G*)` の quotient image が nilpotent
   normal なので `F(G/V)` に入る、という本の順序に沿う証明。
+- Prop 1.2 逆包含の chief-series induction に向けて `OddOrder.GroupTheory.ChiefFactor`
+  に `chiefFactorCentralizer.normal` と
+  `chiefFactorCentralizer.le_iff_commutator_le` (`H ≤ C_G(U/V) ↔ ⁅U,H⁆ ≤ V`) を追加。
 - Prop 1.2 の残りは、次に chief/composition series over normal intervals と
   逆包含 `⋂ C_{G*}(U/V) ≤ F(G*)` の induction から進める。
 - Prop 1.4 は Prop 1.3 を使える状態になったが、semidirect product と Hall σ/core
