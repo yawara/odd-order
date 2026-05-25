@@ -45,6 +45,21 @@ G=KR が solvable Frobenius kernel K, complement R を持つとき, N⊳G で K�
 
 1. **First case (N⊆K)**:
    - Lemma 3.1 を quotient に適用: C_K̄(x̄)=1 ∀x∈R^# ⇒ Ḡ Frobenius
+   - Lean status (2026-05-25): `quotient_complement_of_normal_le_kernel`,
+     `quotient_kernel_map_ne_bot_of_not_le`,
+     `quotient_complement_map_ne_bot_of_le_kernel`,
+     `fixedPoint_lift_of_zpowers_quotient_fixed`,
+     `zpowers_quotient_fixed_of_generator_quotient_fixed`,
+     `fixedPoint_lift_of_generator_quotient_fixed`,
+     `quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift`,
+     `quotient_isFrobeniusGroup_of_le_kernel_of_centralizer`,
+     `quotient_isFrobeniusGroup_of_le_kernel_of_fixedPoint_lift`,
+     `quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers` を
+     `OddOrder.BG.Ch1.S03` に追加. Prop 1.5(d) / Isaacs Cor 3.28 の
+     cyclic-action 包装は完了し, first case は
+     `Nat.Coprime |⟨x⟩| |K|` と `IsSolvable K` を明示仮定に切り出した形まで
+     Lean 化済み. 残りはこの coprimality を Frobenius setup から導く補題と,
+     general case (`H := N ∩ K`) の合成.
 
 2. **General case**:
    - H:=N∩K とし, Ĝ:=G/H で同じ議論を反復
