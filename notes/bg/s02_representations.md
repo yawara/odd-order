@@ -440,3 +440,14 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - q=p 分岐で非自明 normal p-subgroup `K` を作る段を小補題化する.
 - その後、p-elements / Sylow p-subgroup が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
+
+## 2026-05-26 進捗ログ: determinant kernel `G*`
+
+- `S02_Representations.lean` に `representationToGeneralLinearGroup`,
+  `determinantCharacterOfRepresentation`, `determinantKernelSubgroup` を追加.
+- `G* = ker(det ∘ ρ)` は normal, かつ `G' ≤ G*` まで sorry-free.
+- `G* = ⊥` なら determinant character が `G ↪ Fˣ` になり `G` が abelian,
+  という BG Thm 2.6 の最終分岐を `commutative_of_determinantKernel_eq_bot`
+  として切り出し済み.
+- 次 frontier は `G* ≠ ⊥` の場合に `O_p(G*)` から非自明 normal p-subgroup
+  を作る段. ここは Fitting / p-core API 調査が必要.

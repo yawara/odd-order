@@ -10,6 +10,7 @@ import Mathlib.RepresentationTheory.Submodule
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
+import Mathlib.LinearAlgebra.Determinant
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
@@ -1057,6 +1058,103 @@ private theorem commutator_le_ker_of_units_character
   intro x _hx y _hy
   rw [MonoidHom.mem_ker, map_commutatorElement]
   exact commutatorElement_eq_one_iff_mul_comm.mpr (mul_comm (φ x) (φ y))
+
+/-- A representation as a group homomorphism into `GL(V)`.
+
+This is the determinant-facing form of a `Representation`; the inverse of
+`ρ g` is supplied by `ρ g⁻¹`. -/
+private def representationToGeneralLinearGroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) : G →* LinearMap.GeneralLinearGroup F V where
+  toFun g :=
+    { val := ρ g
+      inv := ρ g⁻¹
+      val_inv := by
+        rw [← map_mul, mul_inv_cancel, map_one]
+      inv_val := by
+        rw [← map_mul, inv_mul_cancel, map_one] }
+  map_one' := by
+    apply Units.ext
+    ext v
+    simp
+  map_mul' g h := by
+    apply Units.ext
+    ext v
+    simp [map_mul]
+
+/-- The determinant character attached to a representation.  BG writes its
+kernel as `G* = G ∩ SL(V, F)`. -/
+private noncomputable def determinantCharacterOfRepresentation
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) : G →* Fˣ :=
+  (LinearEquiv.det : (V ≃ₗ[F] V) →* Fˣ).comp
+    ((LinearMap.GeneralLinearGroup.generalLinearEquiv F V).toMonoidHom.comp
+      (representationToGeneralLinearGroup ρ))
+
+/-- Determinant-kernel subgroup `G*` from BG Thm 2.6. -/
+private noncomputable def determinantKernelSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) : Subgroup G :=
+  (determinantCharacterOfRepresentation ρ).ker
+
+private theorem mem_determinantKernelSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    {ρ : Representation F G V} {g : G} :
+    g ∈ determinantKernelSubgroup ρ ↔
+      determinantCharacterOfRepresentation ρ g = 1 :=
+  Iff.rfl
+
+private theorem determinantKernelSubgroup_normal
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) :
+    (determinantKernelSubgroup ρ).Normal := by
+  dsimp [determinantKernelSubgroup]
+  infer_instance
+
+/-- The commutator subgroup lies in the determinant kernel. -/
+private theorem commutator_le_determinantKernelSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) :
+    commutator G ≤ determinantKernelSubgroup ρ := by
+  simpa [determinantKernelSubgroup] using
+    (commutator_le_ker_of_units_character (determinantCharacterOfRepresentation ρ))
+
+/-- An injective character into `Fˣ` forces the source group to be abelian. -/
+private theorem commutative_of_injective_units_character
+    {F : Type*} [Field F] {G : Type*} [Group G] (φ : G →* Fˣ)
+    (hφ : Function.Injective φ) :
+    Std.Commutative (· * · : G → G → G) := by
+  constructor
+  intro x y
+  apply hφ
+  calc
+    φ (x * y) = φ x * φ y := map_mul φ x y
+    _ = φ y * φ x := by rw [mul_comm]
+    _ = φ (y * x) := (map_mul φ y x).symm
+
+private theorem determinantCharacter_injective_of_kernel_eq_bot
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hker : determinantKernelSubgroup ρ = ⊥) :
+    Function.Injective (determinantCharacterOfRepresentation ρ) :=
+  (MonoidHom.ker_eq_bot_iff _).mp (by
+    simpa [determinantKernelSubgroup] using hker)
+
+/-- BG Thm 2.6 determinant endpoint: if `G* = ker(det ∘ ρ)` is trivial, then
+the determinant character embeds `G` into the abelian group `Fˣ`. -/
+private theorem commutative_of_determinantKernel_eq_bot
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hker : determinantKernelSubgroup ρ = ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_injective_units_character (determinantCharacterOfRepresentation ρ)
+    (determinantCharacter_injective_of_kernel_eq_bot ρ hker)
 
 /-- If `G` preserves a rank-one submodule and rank-one quotient, then `G'`
 acts trivially on both.
