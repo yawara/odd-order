@@ -1,0 +1,171 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.Data.Fintype.Card
+import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.SetTheory.Cardinal.Finite
+import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.Peterfalvi.S02_Notation
+
+/-!
+# Peterfalvi §4: The Dade Isometry
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
+§4, pp. 10-14.
+
+This file starts the formal interface for the Dade isometry.  The full theorem
+has two parts:
+
+* **(2.6.a)** inner-product preservation for the map
+  `CF(L, A) → ClassFunction G`;
+* **(2.6.b)** preservation of virtual characters.
+
+The virtual-character lattice `Z[Irr G]` is not available yet, so the first
+slice records the `(2.2)` hypothesis and the inner-product/isometry interface.
+The `Z[Irr]` field should be added to this same interface once the Wave 1a
+`ZIrr` module lands.
+
+## Main declarations
+
+* `OddOrder.Peterfalvi.S04.centralizerIn` — `C_L(a)` as a subgroup of `G`.
+* `OddOrder.Peterfalvi.S04.supportInSubgroup` — the subset of `L` induced by
+  `A ⊆ G`.
+* `OddOrder.Peterfalvi.S04.SupportedClassFunctions` — Peterfalvi's `CF(L,A)`.
+* `OddOrder.Peterfalvi.S04.Hypothesis` — Peterfalvi Hypothesis (2.2), bundled.
+* `OddOrder.Peterfalvi.S04.DadeMap` and `IsDadeIsometry` — the current
+  inner-product part of the Dade isometry interface.
+
+Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
+-/
+
+namespace OddOrder.Peterfalvi.S04
+
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+/- 2: The Dade Isometry (pp. 10-14) -/
+
+/-- The nonidentity part `A# = A \ {1}`. -/
+def sharp (A : Set G) : Set G :=
+  A \ {1}
+
+@[simp] theorem mem_sharp {A : Set G} {g : G} :
+    g ∈ sharp A ↔ g ∈ A ∧ g ≠ 1 := by
+  simp [sharp]
+
+/-- `C_L(a)`, viewed as a subgroup of the ambient group `G`. -/
+def centralizerIn (L : Subgroup G) (a : G) : Subgroup G :=
+  L ⊓ Subgroup.centralizer ({a} : Set G)
+
+@[simp] theorem mem_centralizerIn {L : Subgroup G} {a x : G} :
+    x ∈ centralizerIn L a ↔ x ∈ L ∧ x * a = a * x := by
+  simp [centralizerIn, Subgroup.mem_centralizer_singleton_iff]
+
+/-- The subset of a subgroup `L` obtained by restricting an ambient subset
+`A ⊆ G` to elements of `L`. -/
+def supportInSubgroup (A : Set G) (L : Subgroup G) : Set L :=
+  {x | (x : G) ∈ A}
+
+@[simp] theorem mem_supportInSubgroup {A : Set G} {L : Subgroup G} {x : L} :
+    x ∈ supportInSubgroup A L ↔ (x : G) ∈ A := Iff.rfl
+
+/-- Peterfalvi's `CF(L,A)`: class functions on `L` supported on the ambient
+subset `A`. -/
+abbrev SupportedClassFunctions (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
+  ↥(ClassFunction.supportedSubmodule (G := L) (k := k) (supportInSubgroup A L))
+
+/-- **Peterfalvi Hypothesis (2.2).**
+
+The centralizer decomposition `(2.2.b)` is encoded as a product-like pair of
+fields:
+
+* `centralizer_eq_sup`: `C_G(a) = H(a) ⊔ C_L(a)`;
+* `centralizer_disjoint`: `H(a) ⊓ C_L(a) = ⊥` in `Disjoint` form.
+
+This keeps the statement usable before a dedicated semidirect-product predicate
+for internal subgroup products is introduced. -/
+structure Hypothesis (G : Type*) [Group G] [Fintype G] (A : Set G) (L : Subgroup G) where
+  subset_sharp : A ⊆ sharp (Set.univ : Set G)
+  subset_L : A ⊆ L
+  L_normalizes_A : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A
+  H : {a : G // a ∈ A} → Subgroup G
+  conj_in_L :
+    ∀ ⦃a b : G⦄, a ∈ A → b ∈ A → IsConj a b →
+      ∃ l : L, (l : G) * a * (l : G)⁻¹ = b
+  centralizer_eq_sup :
+    ∀ a : {a : G // a ∈ A},
+      Subgroup.centralizer ({a.1} : Set G) = H a ⊔ centralizerIn L a.1
+  centralizer_disjoint :
+    ∀ a : {a : G // a ∈ A}, Disjoint (H a) (centralizerIn L a.1)
+  centralizer_coprime :
+    ∀ a b : {a : G // a ∈ A},
+      Nat.Coprime (Nat.card (H a)) (Nat.card (centralizerIn L b.1))
+
+namespace Hypothesis
+
+variable {A A₁ : Set G} {L : Subgroup G}
+
+variable [Fintype G]
+
+theorem mem_L (hyp : Hypothesis G A L) {a : G} (ha : a ∈ A) : a ∈ L :=
+  hyp.subset_L ha
+
+theorem ne_one (hyp : Hypothesis G A L) {a : G} (ha : a ∈ A) : a ≠ 1 :=
+  (mem_sharp.mp (hyp.subset_sharp ha)).2
+
+/-- Restrict Hypothesis (2.2) to an `L`-stable subset `A₁ ⊆ A`.
+
+This is the setup part of Peterfalvi (2.11).  The equality of the corresponding
+Dade maps is stated later, once `dadeMap` is defined. -/
+def restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    Hypothesis G A₁ L where
+  subset_sharp := fun _ ha => hyp.subset_sharp (hA₁A ha)
+  subset_L := fun _ ha => hyp.subset_L (hA₁A ha)
+  L_normalizes_A := hA₁_norm
+  H := fun a => hyp.H ⟨a.1, hA₁A a.2⟩
+  conj_in_L := by
+    intro _ _ ha hb hconj
+    exact hyp.conj_in_L (hA₁A ha) (hA₁A hb) hconj
+  centralizer_eq_sup := fun a => hyp.centralizer_eq_sup ⟨a.1, hA₁A a.2⟩
+  centralizer_disjoint := fun a => hyp.centralizer_disjoint ⟨a.1, hA₁A a.2⟩
+  centralizer_coprime := fun a b =>
+    hyp.centralizer_coprime ⟨a.1, hA₁A a.2⟩ ⟨b.1, hA₁A b.2⟩
+
+@[simp] theorem restrict_H (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (a : {a : G // a ∈ A₁}) :
+    (hyp.restrict hA₁A hA₁_norm).H a = hyp.H ⟨a.1, hA₁A a.2⟩ :=
+  rfl
+
+end Hypothesis
+
+section DadeMap
+
+variable {A : Set G} {L : Subgroup G}
+/-- A candidate Dade map `τ : CF(L,A) → ClassFunction G`. -/
+abbrev DadeMap (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
+  SupportedClassFunctions (G := G) k A L → ClassFunction G k
+
+variable {k : Type*} [CommRing k] [StarRing k]
+variable [Fintype G] [Fintype L]
+
+/-- The currently available part of the Dade isometry interface: preservation
+of the unscaled class-function inner sum.
+
+Peterfalvi's normalized inner product divides both sides by group orders.  The
+normalization is intentionally postponed until the scalar field and denominator
+API for `ℂ` are fixed. -/
+structure IsDadeIsometry (τ : DadeMap (G := G) k A L) : Prop where
+  inner_sum_eq :
+    ∀ α β : SupportedClassFunctions (G := G) k A L,
+      ClassFunction.innerSum (τ α) (τ β) =
+        ClassFunction.innerSum (α : ClassFunction L k) (β : ClassFunction L k)
+
+end DadeMap
+
+end OddOrder.Peterfalvi.S04
