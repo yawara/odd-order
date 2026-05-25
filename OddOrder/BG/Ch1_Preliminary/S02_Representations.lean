@@ -589,6 +589,19 @@ private theorem end_commute_of_fixed_on_submodule_and_quotient
     _ = g (f v) := by congr 1; abel
     _ = (g * f) v := rfl
 
+/-- Submonoid-level wrapper for
+`end_commute_of_fixed_on_submodule_and_quotient`. -/
+private theorem submonoid_commutative_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (S : Submonoid (Module.End F V))
+    (hS : ∀ f ∈ S, (∀ w ∈ W, f w = w) ∧ (∀ v, f v - v ∈ W)) :
+    Std.Commutative (· * · : S → S → S) := by
+  constructor
+  intro f g
+  apply Subtype.ext
+  exact end_commute_of_fixed_on_submodule_and_quotient W (f : Module.End F V)
+    (g : Module.End F V) (hS f f.2).1 (hS f f.2).2 (hS g g.2).1 (hS g g.2).2
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
