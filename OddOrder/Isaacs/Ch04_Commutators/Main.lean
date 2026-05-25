@@ -5210,6 +5210,12 @@ private lemma actionCommutatorInfty_le_actionCommutator
     actionCommutatorInfty φ ≤ actionCommutator φ :=
   actionCommutator_comp_le φ _
 
+/-- `[G, A^∞]` is normal in G (inherited from `actionCommutator.normal`). -/
+private instance actionCommutatorInfty_normal
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) :
+    (actionCommutatorInfty φ).Normal :=
+  actionCommutator.normal (phiInfty φ)
+
 /-- `[G, A^∞]` is A-invariant (it is the image of an action commutator restricted to A^∞,
 which is itself characteristic in A, but more importantly, `(φ a) g * g⁻¹` for `a ∈ A^∞`
 is permuted under the broader A-action). -/
@@ -5304,6 +5310,242 @@ private lemma actionCommutatorInfty_fix_isAInvariant
         rw [map_mul, map_mul, map_inv],
         MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self]
   rw [h_eq, hg (b⁻¹ * a * b)]
+
+/-! #### Lemma: `K = [G, A^∞]` centralizes `[G, A]` (three-subgroups in Γ)
+
+Given the hypothesis that `A^∞` acts trivially on `[G, A]` (= IH applied to `[G, A]`),
+we derive that `[G, A^∞]` centralizes `[G, A]`, using a three-subgroups argument in Γ. -/
+
+/-- The hypothesis "A^∞ acts trivially on `[G, A]`" translated into a Γ-side commutator
+identity: `⁅inl([G, A]), inr(A^∞)⁆ = ⊥` in Γ. -/
+private lemma commutator_inl_GA_inr_Ainf_eq_bot_of_centralized
+    {A G : Type*} [Group A] [Group G] [Finite A] {φ : A →* MulAut G}
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    ⁅(actionCommutator φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+      (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A)⁆ = ⊥ := by
+  rw [eq_bot_iff, Subgroup.commutator_le]
+  rintro _ ⟨k, hk, rfl⟩ _ ⟨a, ha, rfl⟩
+  -- Goal: ⁅inl k, inr a⁆ ∈ ⊥
+  rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+  -- Need: k * (φ a) k⁻¹ = 1 (i.e., (φ a) k = k).
+  have h_fix : (φ a) k = k := by
+    have hk_fix := h hk
+    -- hk_fix : k ∈ fixedPointsOfMulAut (phiInfty φ), i.e., ∀ b : A^∞, (phiInfty φ b) k = k.
+    -- phiInfty φ ⟨a, ha⟩ k = (φ a) k by definition. Apply to b := ⟨a, ha⟩.
+    have := hk_fix ⟨a, ha⟩
+    exact this
+  rw [show (φ a) k⁻¹ = ((φ a) k)⁻¹ from map_inv (φ a) k, h_fix, mul_inv_cancel]
+  exact map_one _
+
+/-- **K = [G, A^∞] centralizes [G, A]**: given hypothesis (d) "A^∞ acts trivially on [G, A]",
+`⁅[G, A^∞], [G, A]⁆ = ⊥` in G.
+
+**Proof**: Three-subgroups in Γ = G ⋊[φ] A with H_1 = inr(A^∞) (lowerCentralSeriesInfty A
+mapped via inr), H_2 = inl(G).range, H_3 = inl([G, A]) = ⁅XG, YA⁆ (= GA_inl):
+- `⁅H_2, H_3, H_1⁆ ≤ ⁅H_3, H_1⁆ = ⁅GA_inl, H_1⁆ = ⊥` (hypothesis (d) via Γ-form).
+  Wait: `⁅H_3, H_1⁆ = ⁅GA_inl, inr(A^∞)⁆` and we have hypothesis as
+  `⁅GA_inl, inr(A^∞)⁆ = ⊥`, hence `⁅H_2, H_3, H_1⁆ ≤ ⁅⊤, ⊥⁆ = ⊥`... no, that's wrong.
+- Actually, `⁅H_2, H_3, H_1⁆ = ⁅⁅H_2, H_3⁆, H_1⁆`. We need to bound `⁅H_2, H_3⁆`.
+  Since `GA_inl ⊴ Γ` (using inl ⊔ inr = ⊤), `⁅XG, GA_inl⁆ ≤ GA_inl`.
+  So `⁅H_2, H_3⁆ ≤ GA_inl`, hence `⁅⁅H_2, H_3⁆, H_1⁆ ≤ ⁅GA_inl, inr(A^∞)⁆ = ⊥` (hypothesis (d)).
+- `⁅H_3, H_1, H_2⁆ = ⁅⁅GA_inl, inr(A^∞)⁆, XG⁆ = ⁅⊥, XG⁆ = ⊥` (hypothesis (d)).
+- Three-subgroups (rotate): `⁅⁅H_1, H_2⁆, H_3⁆ = ⊥`.
+- `⁅H_1, H_2⁆ = ⁅inr(A^∞), inl(G)⁆ = (commutator_comm) = ⁅inl(G), inr(A^∞)⁆
+  = inl([G, A^∞]) = inl(K)`.
+- So `⁅inl(K), GA_inl⁆ = ⁅inl(K), inl([G, A])⁆ = inl(⁅K, [G, A]⁆) = ⊥`.
+- By inl_injective, `⁅K, [G, A]⁆ = ⊥` in G. -/
+private theorem commutator_actionCommutatorInfty_actionCommutator_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    ⁅actionCommutatorInfty φ, actionCommutator φ⁆ = ⊥ := by
+  -- Set up
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YinfA : Subgroup (G ⋊[φ] A) :=
+    (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A)
+  set GA_inl : Subgroup (G ⋊[φ] A) :=
+    (actionCommutator φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) with hGA_inl
+  -- GA_inl = ⁅XG, inr(A).range⁆ (from actionCommutator_map_inl)
+  have hGA_inl_eq : GA_inl = ⁅XG, (SemidirectProduct.inr : A →* G ⋊[φ] A).range⁆ :=
+    actionCommutator_map_inl φ
+  -- Hypothesis (d): ⁅GA_inl, YinfA⁆ = ⊥
+  have hd_gamma : ⁅GA_inl, YinfA⁆ = ⊥ :=
+    commutator_inl_GA_inr_Ainf_eq_bot_of_centralized h
+  -- GA_inl is normal in Γ (it = ⁅XG, YA⁆ with XG ⊔ inr(A) = ⊤).
+  haveI hGA_norm : GA_inl.Normal := by
+    rw [hGA_inl_eq]
+    exact commutator_normal_of_sup_eq_top
+      SemidirectProduct.inl_range_sup_inr_range_eq_top
+  -- ⁅XG, GA_inl⁆ ≤ GA_inl (left commutator inclusion since GA_inl normal)
+  have h_inner : ⁅XG, GA_inl⁆ ≤ GA_inl := Subgroup.commutator_le_right XG GA_inl
+  -- ⁅⁅XG, GA_inl⁆, YinfA⁆ ≤ ⁅GA_inl, YinfA⁆ = ⊥
+  have h_three_b : ⁅⁅XG, GA_inl⁆, YinfA⁆ = ⊥ :=
+    le_bot_iff.mp <| le_trans (Subgroup.commutator_mono h_inner le_rfl) hd_gamma.le
+  -- ⁅⁅GA_inl, YinfA⁆, XG⁆ = ⊥ from hd_gamma
+  have h_three_a : ⁅⁅GA_inl, YinfA⁆, XG⁆ = ⊥ := by
+    rw [hd_gamma, Subgroup.commutator_bot_left]
+  -- Apply Subgroup.commutator_commutator_eq_bot_of_rotate
+  -- with H_1 := YinfA, H_2 := XG, H_3 := GA_inl:
+  -- - input1: ⁅⁅H_2, H_3⁆, H_1⁆ = ⁅⁅XG, GA_inl⁆, YinfA⁆ = h_three_b
+  -- - input2: ⁅⁅H_3, H_1⁆, H_2⁆ = ⁅⁅GA_inl, YinfA⁆, XG⁆ = h_three_a
+  -- - output: ⁅⁅H_1, H_2⁆, H_3⁆ = ⁅⁅YinfA, XG⁆, GA_inl⁆ = ⊥
+  have h_three : ⁅⁅YinfA, XG⁆, GA_inl⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate h_three_b h_three_a
+  -- ⁅YinfA, XG⁆ = (actionCommutatorInfty φ).map inl
+  have h_YinfA_XG_eq : ⁅YinfA, XG⁆ =
+      (actionCommutatorInfty φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) := by
+    -- ⁅YinfA, XG⁆ = ⁅XG, YinfA⁆ (commutator_comm).
+    -- ⁅XG, YinfA⁆ = ⁅XG, inr(A^∞ via subtype).range⁆ via image of range.
+    -- And this equals (actionCommutator (φ.comp subtype)).map inl
+    -- = actionCommutatorInfty.map inl (by definition).
+    have h_eq_range : YinfA =
+        ((SemidirectProduct.inr : A →* G ⋊[φ] A).comp
+          (lowerCentralSeriesInfty A).subtype).range := by
+      rw [MonoidHom.range_comp]
+      change (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A) =
+        ((lowerCentralSeriesInfty A).subtype.range).map _
+      rw [Subgroup.range_subtype]
+    rw [Subgroup.commutator_comm, h_eq_range]
+    have := actionCommutator_map_inl_comp φ (lowerCentralSeriesInfty A).subtype
+    -- this : (actionCommutator (φ.comp ((lowerCentralSeriesInfty A).subtype))).map inl =
+    --        ⁅XG, ((SemidirectProduct.inr).comp (lowerCentralSeriesInfty A).subtype).range⁆
+    -- We want LHS = (actionCommutatorInfty φ).map inl, which is the same since
+    -- actionCommutatorInfty φ := actionCommutator (phiInfty φ) := actionCommutator (φ.comp subtype).
+    exact this.symm
+  rw [h_YinfA_XG_eq, hGA_inl, ← Subgroup.map_commutator] at h_three
+  exact (Subgroup.map_eq_bot_iff_of_injective _ SemidirectProduct.inl_injective).mp h_three
+
+/-- **`[K, [G, A]] = ⊥` ⇒ `[[G, A], C] = ⊥`** (since C ≤ K). Just commutator monotonicity. -/
+private lemma commutator_actionCommutator_actionCommutatorInfty_fix_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    ⁅actionCommutator φ, actionCommutatorInfty_fix φ⁆ = ⊥ := by
+  have h_main := commutator_actionCommutatorInfty_actionCommutator_eq_bot φ h
+  have h_C_le : actionCommutatorInfty_fix φ ≤ actionCommutatorInfty φ := inf_le_left
+  -- Goal: ⁅actionCommutator φ, actionCommutatorInfty_fix φ⁆ = ⊥
+  rw [Subgroup.commutator_comm]
+  exact le_bot_iff.mp <|
+    le_trans (Subgroup.commutator_mono h_C_le le_rfl) h_main.le
+
+/-! #### C ⊴ G (Step 6 of Isaacs Thm 4.24)
+
+We now show `actionCommutatorInfty_fix φ` is normal in G via:
+(I) `[C, G] ≤ [G, A^∞]` (since C ≤ K and K is normal in G).
+(II) `[C, G] ≤ fixedPointsOfMulAut φ` (three-subgroups in Γ with H_1 = inl(G), H_2 = inr(A),
+H_3 = inl(C)). -/
+
+/-- **A centralizes [C, G] (in Γ-form): `⁅⁅XG, inl(C)⁆, inr(A)⁆ = ⊥`**.
+
+**Proof**: Three-subgroups in Γ with H_1 = XG, H_2 = inr(A), H_3 = inl(C):
+- `⁅H_1, H_2, H_3⁆ = ⁅⁅XG, inr(A)⁆, inl(C)⁆ = ⁅GA_inl, inl(C)⁆ = inl(⁅[G, A], C⁆) = ⊥`
+  (from `commutator_actionCommutator_actionCommutatorInfty_fix_eq_bot`).
+- `⁅H_2, H_3, H_1⁆ = ⁅⁅inr(A), inl(C)⁆, XG⁆ = ⁅⊥, XG⁆ = ⊥` (A centralizes C ⇒ ⁅inr(A), inl(C)⁆ = ⊥).
+- Three-subgroups rotate: `⁅⁅H_3, H_1⁆, H_2⁆ = ⁅⁅inl(C), XG⁆, inr(A)⁆ = ⊥`. -/
+private theorem commutator_inl_C_XG_inr_A_eq_bot_of_centralized
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    ⁅⁅(actionCommutatorInfty_fix φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range⁆,
+      (SemidirectProduct.inr : A →* G ⋊[φ] A).range⁆ = ⊥ := by
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  set Cinl : Subgroup (G ⋊[φ] A) :=
+    (actionCommutatorInfty_fix φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A)
+  -- Part A: ⁅YA, Cinl⁆ = ⊥ (A centralizes C in G)
+  have h_AC_bot : ⁅YA, Cinl⁆ = ⊥ := by
+    rw [eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨a, rfl⟩ _ ⟨c, hc, rfl⟩
+    obtain ⟨_, hc_fix⟩ := Subgroup.mem_inf.mp hc
+    have h_fix : (φ a) c = c := hc_fix a
+    -- Goal: ⁅inr a, inl c⁆ ∈ ⊥
+    rw [Subgroup.mem_bot]
+    -- Compute ⁅inr a, inl c⁆ = (inr a) * (inl c) * (inr a)⁻¹ * (inl c)⁻¹
+    -- = inl ((φ a) c) * inr a * (inr a)⁻¹ * (inl c)⁻¹  (by inl_aut)
+    -- = inl c * (inl c)⁻¹ = 1
+    have hi := SemidirectProduct.inl_aut (φ := φ) a c
+    -- hi : inl ((φ a) c) = inr a * inl c * inr a⁻¹
+    show (SemidirectProduct.inr a : G ⋊[φ] A) * SemidirectProduct.inl c *
+        (SemidirectProduct.inr a)⁻¹ * (SemidirectProduct.inl c)⁻¹ = 1
+    rw [show ((SemidirectProduct.inr a : G ⋊[φ] A))⁻¹ = SemidirectProduct.inr a⁻¹ from
+        (map_inv _ _).symm, ← hi, h_fix]
+    group
+  -- Part B: ⁅⁅XG, YA⁆, Cinl⁆ = ⊥
+  -- Use commutator_actionCommutator_actionCommutatorInfty_fix_eq_bot and bridge.
+  have h_actY_eq : ⁅XG, YA⁆ = (actionCommutator φ).map SemidirectProduct.inl :=
+    (actionCommutator_map_inl φ).symm
+  have h_C_actCom : ⁅(actionCommutator φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+      Cinl⁆ = ⊥ := by
+    -- = (⁅actionCommutator φ, actionCommutatorInfty_fix φ⁆).map inl = ⊥.map inl
+    rw [← Subgroup.map_commutator,
+        commutator_actionCommutator_actionCommutatorInfty_fix_eq_bot φ h]
+    simp
+  have h_XY_C_bot : ⁅⁅XG, YA⁆, Cinl⁆ = ⊥ := by
+    rw [h_actY_eq]; exact h_C_actCom
+  -- Apply three-subgroups (rotate) with H_1 = XG, H_2 = YA, H_3 = Cinl:
+  -- - input1: ⁅⁅H_2, H_3⁆, H_1⁆ = ⁅⁅YA, Cinl⁆, XG⁆ = ⁅⊥, XG⁆ = ⊥
+  -- - input2: ⁅⁅H_3, H_1⁆, H_2⁆ = ⁅⁅Cinl, XG⁆, YA⁆ — wait, this is what we want.
+  -- We need to swap. Three-subgroups: given ⁅⁅H_2, H_3⁆, H_1⁆ + ⁅⁅H_3, H_1⁆, H_2⁆ ⇒
+  -- ⁅⁅H_1, H_2⁆, H_3⁆.
+  -- We have ⁅⁅XG, YA⁆, Cinl⁆ = ⊥ which is ⁅⁅H_1, H_2⁆, H_3⁆. (output of rotate)
+  -- And ⁅⁅YA, Cinl⁆, XG⁆ = ⊥ which is ⁅⁅H_2, H_3⁆, H_1⁆. (input1)
+  -- We want ⁅⁅Cinl, XG⁆, YA⁆ = ⁅⁅H_3, H_1⁆, H_2⁆. (input2)
+  -- Three-subgroups can derive any one from the other two.
+  have h_input1 : ⁅⁅YA, Cinl⁆, XG⁆ = ⊥ := by
+    rw [h_AC_bot, Subgroup.commutator_bot_left]
+  -- The rotate lemma gives ⁅⁅H_1, H_2⁆, H_3⁆ from ⁅⁅H_2, H_3⁆, H_1⁆ + ⁅⁅H_3, H_1⁆, H_2⁆.
+  -- Apply with H_1' = YA, H_2' = Cinl, H_3' = XG:
+  -- gives ⁅⁅YA, Cinl⁆, XG⁆ from ⁅⁅Cinl, XG⁆, YA⁆ + ⁅⁅XG, YA⁆, Cinl⁆.
+  -- We want the inverse direction. Let's use:
+  -- H_1' = Cinl, H_2' = XG, H_3' = YA:
+  -- ⁅⁅H_2', H_3'⁆, H_1'⁆ = ⁅⁅XG, YA⁆, Cinl⁆ = ⊥ (h_XY_C_bot)
+  -- ⁅⁅H_3', H_1'⁆, H_2'⁆ = ⁅⁅YA, Cinl⁆, XG⁆ = ⊥ (h_input1)
+  -- ⇒ ⁅⁅H_1', H_2'⁆, H_3'⁆ = ⁅⁅Cinl, XG⁆, YA⁆ = ⊥.
+  exact Subgroup.commutator_commutator_eq_bot_of_rotate h_XY_C_bot h_input1
+
+/-- **[C, G] ⊆ fixedPointsOfMulAut φ**: from the three-subgroups conclusion above. -/
+private lemma commutator_actionCommutatorInfty_fix_top_le_fixedPoints
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (h : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ)) :
+    ⁅actionCommutatorInfty_fix φ, (⊤ : Subgroup G)⁆ ≤ Subgroup.fixedPointsOfMulAut φ := by
+  have h_three := commutator_inl_C_XG_inr_A_eq_bot_of_centralized φ h
+  -- We want: ∀ x ∈ ⁅C, ⊤⁆, ∀ a, (φ a) x = x.
+  intro x hx
+  rw [Subgroup.mem_fixedPointsOfMulAut]
+  intro a'
+  -- Use h_three: ⁅⁅inl(C), XG⁆, inr(A).range⁆ = ⊥, so for x ∈ ⁅C, ⊤⁆ (mapped under inl)
+  -- and any a', ⁅inl x, inr a'⁆ = 1 in Γ.
+  -- inl(⁅C, ⊤⁆) = ⁅inl(C), inl(⊤)⁆ = ⁅inl(C), XG⁆.
+  have h_x_inl_mem : (SemidirectProduct.inl x : G ⋊[φ] A) ∈
+      ⁅(actionCommutatorInfty_fix φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range⁆ := by
+    have h_map : ⁅(actionCommutatorInfty_fix φ).map
+          (SemidirectProduct.inl : G →* G ⋊[φ] A),
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range⁆ =
+        ⁅actionCommutatorInfty_fix φ, (⊤ : Subgroup G)⁆.map SemidirectProduct.inl := by
+      rw [MonoidHom.range_eq_map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+          ← Subgroup.map_commutator]
+    rw [h_map]
+    exact ⟨x, hx, rfl⟩
+  -- Now ⁅inl x, inr a'⁆ ∈ ⁅⁅inl(C), XG⁆, inr(A).range⁆ = ⊥
+  have h_x_a_bot : ⁅(SemidirectProduct.inl x : G ⋊[φ] A),
+      (SemidirectProduct.inr a' : G ⋊[φ] A)⁆ = (1 : G ⋊[φ] A) := by
+    have h_mem : ⁅(SemidirectProduct.inl x : G ⋊[φ] A),
+        (SemidirectProduct.inr a' : G ⋊[φ] A)⁆ ∈
+        (⊥ : Subgroup (G ⋊[φ] A)) := by
+      rw [← h_three]
+      exact Subgroup.commutator_mem_commutator h_x_inl_mem ⟨a', rfl⟩
+    exact Subgroup.mem_bot.mp h_mem
+  -- ⁅inl x, inr a'⁆ = inl(x * (φ a') x⁻¹). So inl(x * (φ a') x⁻¹) = 1, hence x * (φ a') x⁻¹ = 1.
+  rw [SemidirectProduct.commutator_inl_inr] at h_x_a_bot
+  have h_in_G : x * (φ a') x⁻¹ = 1 :=
+    SemidirectProduct.inl_injective (by rw [h_x_a_bot]; exact (map_one _).symm)
+  -- x * (φ a') x⁻¹ = 1 ⇒ (φ a') x⁻¹ = x⁻¹ ⇒ ((φ a') x)⁻¹ = x⁻¹ ⇒ (φ a') x = x.
+  have h_aux : (φ a') x⁻¹ = x⁻¹ := by
+    have := h_in_G
+    have := mul_left_cancel (a := x) (b := (φ a') x⁻¹) (c := x⁻¹)
+      (by rw [this, mul_inv_cancel])
+    exact this
+  rw [map_inv] at h_aux
+  exact (inv_injective h_aux)
 
 end /- §4C (続 II) -/
 
