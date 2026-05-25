@@ -25,7 +25,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
-| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.28; 5.29/5.30 保留 |
+| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.29; 5.30 保留 |
 
 ## 方針
 
@@ -857,7 +857,7 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
   main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
   Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
   二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
-- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): 5.26 + p-group action.
+- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
 - **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
 
 /-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
@@ -2107,6 +2107,180 @@ theorem hasNormalPComplement_of_prime_subgroups_centralize
   hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer.mpr
     (fun X hXp =>
       isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize h X hXp)
+
+/-- If a q-group acts on a finite set, then `q` divides the number of non-fixed points. -/
+private lemma prime_dvd_card_sub_card_fixedPoints_of_pgroup_action
+    {A X : Type*} [Group A] [Group X] [Finite X] [MulDistribMulAction A X]
+    {q : ℕ} [Fact q.Prime] (hA : IsPGroup q A) :
+    q ∣ Nat.card X - Nat.card (MulAction.fixedPoints A X) := by
+  have hmod := hA.card_modEq_card_fixedPoints X
+  have hle : Nat.card (MulAction.fixedPoints A X) ≤ Nat.card X :=
+    Nat.card_le_card_of_injective _ (fun _ _ h => Subtype.ext h)
+  exact (Nat.modEq_iff_dvd' hle).mp hmod.symm
+
+/-- Orbit-count step in Isaacs Cor 5.29.
+
+If a q-group acts nontrivially by automorphisms on a finite p-group `X`, and `|X| = p^k`
+with `k ≤ a`, then `q ∣ p^e - 1` for some `1 ≤ e ≤ a`. -/
+private lemma exists_prime_dvd_pow_sub_one_of_nontrivial_pgroup_action
+    {A X : Type*} [Group A] [Group X] [Finite X] [MulDistribMulAction A X]
+    {p q a : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hX : IsPGroup p X) (hA : IsPGroup q A) (hpq : q ≠ p)
+    (hX_bound : ∃ k, k ≤ a ∧ Nat.card X = p ^ k)
+    (hfix_ne : MulAction.fixedPoints A X ≠ Set.univ) :
+    ∃ e, 1 ≤ e ∧ e ≤ a ∧ q ∣ p ^ e - 1 := by
+  classical
+  let F : Subgroup X := {
+    carrier := MulAction.fixedPoints A X
+    one_mem' := by intro g; exact smul_one g
+    mul_mem' := by
+      intro x y hx hy g
+      rw [smul_mul', hx g, hy g]
+    inv_mem' := by
+      intro x hx g
+      rw [smul_inv', hx g] }
+  have hF_card_lt : Nat.card F < Nat.card X := by
+    change Nat.card (MulAction.fixedPoints A X) < Nat.card X
+    simpa [Nat.card_coe_set_eq] using Set.ncard_lt_card hfix_ne
+  have hF_index_ne_one : F.index ≠ 1 := by
+    intro hidx_one
+    have hidx := F.index_mul_card
+    rw [hidx_one, one_mul] at hidx
+    exact (Nat.lt_irrefl _ (hidx ▸ hF_card_lt))
+  obtain ⟨e, he_index⟩ := hX.index F
+  have he_pos : 1 ≤ e := by
+    cases e with
+    | zero =>
+        exfalso
+        exact hF_index_ne_one (by simpa using he_index)
+    | succ e => exact Nat.succ_le_succ (Nat.zero_le e)
+  obtain ⟨k, hk_le_a, hX_card⟩ := hX_bound
+  have hF_index_dvd_card : F.index ∣ Nat.card X := by
+    exact ⟨Nat.card F, F.index_mul_card.symm⟩
+  have he_le_k : e ≤ k := by
+    have hpow_dvd : p ^ e ∣ p ^ k := by
+      rw [← he_index, ← hX_card]
+      exact hF_index_dvd_card
+    exact (pow_dvd_pow_iff (Fact.out : p.Prime).ne_zero
+      (mt Nat.isUnit_iff.mp (Fact.out : p.Prime).ne_one)).mp hpow_dvd
+  have he_le_a : e ≤ a := he_le_k.trans hk_le_a
+  have hdiff_dvd := prime_dvd_card_sub_card_fixedPoints_of_pgroup_action (X := X) hA
+  have hcard_eq : Nat.card X = Nat.card F * p ^ e := by
+    calc
+      Nat.card X = F.index * Nat.card F := F.index_mul_card.symm
+      _ = p ^ e * Nat.card F := by rw [he_index]
+      _ = Nat.card F * p ^ e := by rw [mul_comm]
+  have hdiff_eq : Nat.card X - Nat.card (MulAction.fixedPoints A X) =
+      Nat.card F * (p ^ e - 1) := by
+    change Nat.card X - Nat.card F = Nat.card F * (p ^ e - 1)
+    rw [hcard_eq]
+    simpa [mul_one] using (Nat.mul_sub_left_distrib (Nat.card F) (p ^ e) 1).symm
+  have hq_dvd_mul : q ∣ Nat.card F * (p ^ e - 1) := by
+    rwa [← hdiff_eq]
+  obtain ⟨r, hF_card_pow⟩ := IsPGroup.iff_card.mp (hX.to_subgroup F)
+  have hq_coprime_cardF : q.Coprime (Nat.card F) := by
+    rw [hF_card_pow]
+    exact
+      ((Nat.coprime_primes (Fact.out : q.Prime) (Fact.out : p.Prime)).mpr hpq).pow_right r
+  have hq_dvd : q ∣ p ^ e - 1 := hq_coprime_cardF.dvd_of_dvd_mul_left hq_dvd_mul
+  exact ⟨e, he_pos, he_le_a, hq_dvd⟩
+
+/-- **Isaacs Cor 5.29**: If `|G| = p^a m`, `p ∤ m`, and no prime divisor `q`
+of `m` divides any `p^e - 1` with `1 ≤ e ≤ a`, then `G` has a normal
+p-complement.
+
+**Proof** (Isaacs p.179): use Frobenius' p-local criterion. If a q-subgroup `Q`
+normalizing a p-subgroup `X` acts nontrivially, then the fixed-point subgroup
+`C_X(Q)` is proper in `X`; orbit counting gives `q ∣ |X| - |C_X(Q)|`, hence
+`q ∣ p^e - 1` for `|X:C_X(Q)| = p^e`, contradiction. -/
+theorem hasNormalPComplement_of_no_prime_dvd_pow_sub_one
+    [Finite G] {p a m : ℕ} [Fact p.Prime]
+    (hcard : Nat.card G = p ^ a * m) (hpm : ¬ p ∣ m)
+    (hNo : ∀ {q e : ℕ}, q.Prime → q ∣ m → 1 ≤ e → e ≤ a →
+      ¬ q ∣ p ^ e - 1) :
+    HasNormalPComplement p G := by
+  classical
+  refine hasNormalPComplement_of_prime_subgroups_centralize
+    (fun {q} _ hq_ne_p {X Q} hXp hQq hQ_le_N => ?_)
+  by_contra hQ_not_le_C
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  let QN : Subgroup N := Q.subgroupOf N
+  have hQN_q : IsPGroup q QN := by
+    have h_iso : QN ≃* Q := Subgroup.subgroupOfEquivOfLe hQ_le_N
+    exact hQq.of_equiv h_iso.symm
+  have hfix_ne : MulAction.fixedPoints QN X ≠ Set.univ := by
+    intro hfix_univ
+    apply hQ_not_le_C
+    intro y hyQ
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hxX
+    let yN : N := ⟨y, by simpa [hN_def] using hQ_le_N hyQ⟩
+    let yQN : QN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyQ⟩
+    let xX : X := ⟨x, hxX⟩
+    have hfixed : yQN • xX = xX := by
+      have hx_fixed : xX ∈ MulAction.fixedPoints QN X := by
+        rw [hfix_univ]
+        exact Set.mem_univ xX
+      exact hx_fixed yQN
+    have hconj : y * x * y⁻¹ = x := by
+      exact congrArg Subtype.val hfixed
+    calc x * y = (y * x * y⁻¹) * y := by rw [hconj]
+      _ = y * x := by group
+  have hQ_ne_bot : Q ≠ ⊥ := by
+    intro hQ_bot
+    apply hQ_not_le_C
+    intro y hyQ
+    rw [Subgroup.mem_centralizer_iff]
+    intro x _hxX
+    have hy_one : y = 1 := by
+      rw [hQ_bot, Subgroup.mem_bot] at hyQ
+      exact hyQ
+    rw [hy_one, one_mul, mul_one]
+  have hQ_card_ne_one : Nat.card Q ≠ 1 := by
+    intro hcardQ
+    exact hQ_ne_bot (Subgroup.card_eq_one.mp hcardQ)
+  have hQ_card_gt_one : 1 < Nat.card Q := by
+    have hpos : 0 < Nat.card Q := Nat.card_pos
+    omega
+  haveI : Nontrivial Q := Finite.one_lt_card_iff_nontrivial.mp hQ_card_gt_one
+  obtain ⟨n, hn_pos, hQ_card_eq⟩ := hQq.nontrivial_iff_card.mp inferInstance
+  have hq_dvd_Q : q ∣ Nat.card Q := by
+    rw [hQ_card_eq]
+    exact dvd_pow_self q (ne_of_gt hn_pos)
+  have hq_dvd_G : q ∣ Nat.card G := by
+    have hQ_dvd_top : Nat.card Q ∣ Nat.card (⊤ : Subgroup G) :=
+      Subgroup.card_dvd_of_le (show Q ≤ (⊤ : Subgroup G) from le_top)
+    exact hq_dvd_Q.trans (by simpa using hQ_dvd_top)
+  have hq_dvd_m : q ∣ m := by
+    have hq_dvd_mul : q ∣ p ^ a * m := by
+      rwa [← hcard]
+    rcases (Fact.out : q.Prime).dvd_mul.mp hq_dvd_mul with hq_dvd_pa | hq_dvd_m
+    · have hcop_q_pa : q.Coprime (p ^ a) :=
+        ((Nat.coprime_primes (Fact.out : q.Prime) (Fact.out : p.Prime)).mpr
+          hq_ne_p).pow_right a
+      exact False.elim (((Fact.out : q.Prime).coprime_iff_not_dvd.mp hcop_q_pa) hq_dvd_pa)
+    · exact hq_dvd_m
+  have hX_bound : ∃ k, k ≤ a ∧ Nat.card X = p ^ k := by
+    obtain ⟨k, hkX⟩ := IsPGroup.iff_card.mp hXp
+    refine ⟨k, ?_, hkX⟩
+    have hX_card_dvd_G : Nat.card X ∣ Nat.card G := by
+      have hX_dvd_top : Nat.card X ∣ Nat.card (⊤ : Subgroup G) :=
+        Subgroup.card_dvd_of_le (show X ≤ (⊤ : Subgroup G) from le_top)
+      simpa using hX_dvd_top
+    have hpk_dvd_pa_m : p ^ k ∣ p ^ a * m := by
+      rw [← hcard, ← hkX]
+      exact hX_card_dvd_G
+    have hcop_pk_m : (p ^ k).Coprime m :=
+      ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hpm).pow_left k
+    have hpk_dvd_pa : p ^ k ∣ p ^ a :=
+      hcop_pk_m.dvd_of_dvd_mul_left (by rwa [mul_comm] at hpk_dvd_pa_m)
+    exact (pow_dvd_pow_iff (Fact.out : p.Prime).ne_zero
+      (mt Nat.isUnit_iff.mp (Fact.out : p.Prime).ne_one)).mp hpk_dvd_pa
+  obtain ⟨e, he_pos, he_le_a, hq_dvd_pe⟩ :=
+    exists_prime_dvd_pow_sub_one_of_nontrivial_pgroup_action
+      (A := QN) (X := X) hXp hQN_q hq_ne_p hX_bound hfix_ne
+  exact (hNo (q := q) (e := e) (Fact.out : q.Prime) hq_dvd_m he_pos he_le_a
+    hq_dvd_pe).elim
 
 /-- **Isaacs Cor 5.30** (p odd 中心化): ⭐ **FT 経路で奇数位数仮定との親和性**.
 `p` odd, 全 order-`p` 元が `Z(G)` 中心 ⇒ `G` は normal p-complement を持つ.
