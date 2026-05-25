@@ -472,6 +472,19 @@ private theorem lem73_aux
           (OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right L P)
       by_cases hLP_eq_L : LP_comm = L
       · -- Case [L, P] = L: 続く Step l, m, n へ.
+        -- Since the determinant map has abelian target, it kills commutators. Thus
+        -- `[L,P]=L` forces every element of L to have determinant 1.
+        let detGL : Matrix.GeneralLinearGroup (Fin 2) (ZMod p) →* (ZMod p)ˣ :=
+          Matrix.GeneralLinearGroup.det
+        have hLP_le_detKer : LP_comm ≤ detGL.ker := by
+          rw [hLP_comm_def, Subgroup.commutator_le]
+          intro x hxL y hyP
+          change detGL ⁅x, y⁆ = 1
+          rw [map_commutatorElement]
+          simp [commutatorElement_def, mul_assoc]
+        have hL_le_detKer : L ≤ detGL.ker := by
+          intro x hx
+          exact hLP_le_detKer (by rwa [hLP_eq_L])
         sorry  -- Step l-n
       · -- Case [L, P] < L: IH 適用 → P ≤ C([L, P]) → Lem 4.29 で [L, P] = ⊥ → P ≤ C(L).
         have hLP_lt_L : LP_comm < L := lt_of_le_of_ne hLP_le_L hLP_eq_L
