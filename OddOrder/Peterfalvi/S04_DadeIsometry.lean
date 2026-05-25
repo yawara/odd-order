@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Data.Fintype.Card
+import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
@@ -20,12 +23,13 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 This file starts the formal interface for the Dade isometry.  The full theorem
 has two parts:
 
-* **(2.6.a)** inner-product preservation for the map
+* **(2.6.a)** normalized inner-product preservation for the map
   `CF(L, A) → ClassFunction G`;
 * **(2.6.b)** preservation of virtual characters.
 
 The virtual-character lattice `Z[Irr G]` is not available yet, so the first
-slice records the `(2.2)` hypothesis and the inner-product/isometry interface.
+slice records the `(2.2)` hypothesis and the normalized inner-product/isometry
+interface.
 The `Z[Irr]` field should be added to this same interface once the Wave 1a
 `ZIrr` module lands.
 
@@ -35,9 +39,13 @@ The `Z[Irr]` field should be added to this same interface once the Wave 1a
 * `OddOrder.Peterfalvi.S04.supportInSubgroup` — the subset of `L` induced by
   `A ⊆ G`.
 * `OddOrder.Peterfalvi.S04.SupportedClassFunctions` — Peterfalvi's `CF(L,A)`.
+* `OddOrder.Peterfalvi.S04.SupportedClassFunctions.inclusion` — the natural map
+  `CF(L,A₁) → CF(L,A)` for `A₁ ⊆ A`.
 * `OddOrder.Peterfalvi.S04.Hypothesis` — Peterfalvi Hypothesis (2.2), bundled.
 * `OddOrder.Peterfalvi.S04.DadeMap` and `IsDadeIsometry` — the current
   inner-product part of the Dade isometry interface.
+* `OddOrder.Peterfalvi.S04.DadeIsometryData` — a bundled map with the current
+  Dade-map equations and normalized isometry property.
 
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
@@ -45,6 +53,7 @@ Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 namespace OddOrder.Peterfalvi.S04
 
 open OddOrder.RepresentationTheory
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -74,10 +83,44 @@ def supportInSubgroup (A : Set G) (L : Subgroup G) : Set L :=
 @[simp] theorem mem_supportInSubgroup {A : Set G} {L : Subgroup G} {x : L} :
     x ∈ supportInSubgroup A L ↔ (x : G) ∈ A := Iff.rfl
 
+theorem supportInSubgroup_mono {A₁ A : Set G} {L : Subgroup G} (hA₁A : A₁ ⊆ A) :
+    supportInSubgroup A₁ L ⊆ supportInSubgroup A L := fun _ hx => hA₁A hx
+
 /-- Peterfalvi's `CF(L,A)`: class functions on `L` supported on the ambient
 subset `A`. -/
 abbrev SupportedClassFunctions (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
   ↥(ClassFunction.supportedSubmodule (G := L) (k := k) (supportInSubgroup A L))
+
+namespace SupportedClassFunctions
+
+variable {k : Type*} [CommRing k]
+variable {A A₁ : Set G} {L : Subgroup G}
+
+/-- The natural inclusion `CF(L,A₁) → CF(L,A)` induced by `A₁ ⊆ A`.
+
+This is the domain map used by the restriction statement in Peterfalvi (2.11). -/
+def inclusion (hA₁A : A₁ ⊆ A) :
+    (SupportedClassFunctions (G := G) k A₁ L) →ₗ[k]
+      (SupportedClassFunctions (G := G) k A L) :=
+  Submodule.inclusion (by
+    intro φ hφ
+    exact fun x hx => hA₁A (hφ hx))
+
+@[simp] theorem coe_inclusion (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    ((inclusion (G := G) (k := k) (L := L) hA₁A α :
+        SupportedClassFunctions (G := G) k A L) : ClassFunction L k) =
+      (α : ClassFunction L k) :=
+  rfl
+
+@[simp] theorem inclusion_apply (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) (x : L) :
+    ((inclusion (G := G) (k := k) (L := L) hA₁A α :
+        SupportedClassFunctions (G := G) k A L) : ClassFunction L k) x =
+      (α : ClassFunction L k) x :=
+  rfl
+
+end SupportedClassFunctions
 
 /-- **Peterfalvi Hypothesis (2.2).**
 
@@ -152,6 +195,68 @@ theorem isTISubset_of_forall_H_eq_bot (hyp : Hypothesis G A L)
     simp [y]
   exact hg_eq ▸ hg
 
+/-- The other direction of **Peterfalvi (2.3)** in the relative-normalizer API:
+from a TI-subset relative to `L`, build Hypothesis (2.2) with all `H(a)=⊥`.
+
+Peterfalvi also states `L = N_G(A)` when `A` is nonempty.  This file keeps
+`L` as an explicit normalizer-bound, so the theorem takes the required
+`A ⊆ L` and `L`-normalizes-`A` assumptions as fields. -/
+def of_isTISubset (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) :
+    Hypothesis G A L where
+  subset_sharp := hA_sharp
+  subset_L := hA_L
+  L_normalizes_A := hL_norm
+  H := fun _ => ⊥
+  conj_in_L := by
+    intro a b ha hb hconj
+    rcases isConj_iff.mp hconj with ⟨g, rfl⟩
+    exact ⟨⟨g, hTI g ⟨a, ha, hb⟩⟩, rfl⟩
+  centralizer_eq_sup := by
+    intro a
+    rw [bot_sup_eq]
+    ext x
+    constructor
+    · intro hx
+      have hx_comm : x * a.1 = a.1 * x := by
+        simpa [Subgroup.mem_centralizer_singleton_iff] using hx
+      have hx_conj : x * a.1 * x⁻¹ = a.1 := by
+        calc
+          x * a.1 * x⁻¹ = a.1 * x * x⁻¹ := by rw [hx_comm]
+          _ = a.1 := by group
+      have hx_L : x ∈ L := hTI x ⟨a.1, a.2, by simp [hx_conj, a.2]⟩
+      rw [mem_centralizerIn]
+      exact ⟨hx_L, hx_comm⟩
+    · intro hx
+      rw [mem_centralizerIn] at hx
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact hx.2
+  centralizer_disjoint := fun _ => disjoint_bot_left
+  centralizer_coprime := fun _ _ => by
+    simp
+
+@[simp] theorem of_isTISubset_H (hA_sharp : A ⊆ sharp (Set.univ : Set G))
+    (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) (a : {a : G // a ∈ A}) :
+    (of_isTISubset hA_sharp hA_L hL_norm hTI).H a = ⊥ :=
+  rfl
+
+/-- **Peterfalvi (2.3)**, expressed with this file's relative-normalizer
+predicate: under the ambient set and `L`-normalizer assumptions, `A` is TI
+relative to `L` iff Hypothesis (2.2) holds with all `H(a)` trivial. -/
+theorem isTISubset_iff_exists_hypothesis_with_trivial_H
+    (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A) :
+    OddOrder.GroupTheory.IsTISubset A L ↔
+      ∃ hyp : Hypothesis G A L, ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥ := by
+  constructor
+  · intro hTI
+    exact ⟨of_isTISubset hA_sharp hA_L hL_norm hTI, fun _ => rfl⟩
+  · rintro ⟨hyp, hH⟩
+    exact hyp.isTISubset_of_forall_H_eq_bot hH
+
 /-- Restrict Hypothesis (2.2) to an `L`-stable subset `A₁ ⊆ A`.
 
 This is the setup part of Peterfalvi (2.11).  The equality of the corresponding
@@ -177,29 +282,315 @@ def restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
     (hyp.restrict hA₁A hA₁_norm).H a = hyp.H ⟨a.1, hA₁A a.2⟩ :=
   rfl
 
+/-- The coset `aH(a)` appearing in Peterfalvi (2.5), as an ambient subset of
+`G`. -/
+def hCoset (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) : Set G :=
+  {g | ∃ h : G, h ∈ hyp.H a ∧ g = a.1 * h}
+
+@[simp] theorem mem_hCoset (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
+    {g : G} :
+    g ∈ hyp.hCoset a ↔ ∃ h : G, h ∈ hyp.H a ∧ g = a.1 * h := Iff.rfl
+
+/-- The support candidate for the Dade map: the union of the `G`-conjugates of
+the cosets `aH(a)`. -/
+def dadeSupport (hyp : Hypothesis G A L) : Set G :=
+  ⋃ a : {a : G // a ∈ A}, Group.conjugatesOfSet (hyp.hCoset a)
+
+theorem mem_dadeSupport_iff (hyp : Hypothesis G A L) {g : G} :
+    g ∈ hyp.dadeSupport ↔
+      ∃ a : {a : G // a ∈ A}, ∃ h : G, h ∈ hyp.H a ∧ IsConj (a.1 * h) g := by
+  rw [dadeSupport, Set.mem_iUnion]
+  constructor
+  · rintro ⟨a, hg⟩
+    rcases Group.mem_conjugatesOfSet_iff.mp hg with ⟨y, hy, hconj⟩
+    rcases hy with ⟨h, hh, rfl⟩
+    exact ⟨a, h, hh, hconj⟩
+  · rintro ⟨a, h, hh, hconj⟩
+    exact ⟨a, Group.mem_conjugatesOfSet_iff.mpr ⟨a.1 * h, ⟨h, hh, rfl⟩, hconj⟩⟩
+
+theorem mem_dadeSupport_of_mem_hCoset (hyp : Hypothesis G A L)
+    {a : {a : G // a ∈ A}} {h : G} (hh : h ∈ hyp.H a) :
+    a.1 * h ∈ hyp.dadeSupport :=
+  hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, IsConj.refl _⟩
+
+theorem conj_mem_dadeSupport (hyp : Hypothesis G A L) {g x : G}
+    (hg : g ∈ hyp.dadeSupport) :
+    x * g * x⁻¹ ∈ hyp.dadeSupport := by
+  rw [hyp.mem_dadeSupport_iff] at hg ⊢
+  rcases hg with ⟨a, h, hh, hconj⟩
+  exact ⟨a, h, hh, hconj.trans (isConj_iff.mpr ⟨x, rfl⟩)⟩
+
+/-- In the TI-specialized case `H(a)=1`, the coset `aH(a)` is the singleton
+`{a}`. -/
+theorem hCoset_eq_singleton_of_H_eq_bot (hyp : Hypothesis G A L)
+    {a : {a : G // a ∈ A}} (hH : hyp.H a = ⊥) :
+    hyp.hCoset a = {a.1} := by
+  ext g
+  constructor
+  · rintro ⟨h, hh, rfl⟩
+    have hh_one : h = 1 := by
+      have : h ∈ (⊥ : Subgroup G) := by
+        simpa [hH] using hh
+      exact Subgroup.mem_bot.mp this
+    simp [hh_one]
+  · intro hg
+    rw [Set.mem_singleton_iff] at hg
+    subst g
+    exact ⟨1, (hyp.H a).one_mem, by simp⟩
+
+/-- In the TI-specialized case `H(a)=1`, the Dade support is just the
+conjugacy-saturation of `A`. -/
+theorem dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
+    (hyp : Hypothesis G A L) (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥) :
+    hyp.dadeSupport = Group.conjugatesOfSet A := by
+  ext g
+  constructor
+  · intro hg
+    rcases hyp.mem_dadeSupport_iff.mp hg with ⟨a, h, hh, hconj⟩
+    have hh_one : h = 1 := by
+      have : h ∈ (⊥ : Subgroup G) := by
+        simpa [hH a] using hh
+      exact Subgroup.mem_bot.mp this
+    exact Group.mem_conjugatesOfSet_iff.mpr ⟨a.1, a.2, by simpa [hh_one] using hconj⟩
+  · intro hg
+    rcases Group.mem_conjugatesOfSet_iff.mp hg with ⟨a, ha, hconj⟩
+    exact hyp.mem_dadeSupport_iff.mpr
+      ⟨⟨a, ha⟩, 1, (hyp.H ⟨a, ha⟩).one_mem, by simpa using hconj⟩
+
+/-- The formal shape of Peterfalvi (2.4.a): the subgroups `H(a)` are
+equivariant under conjugation by `L`.
+
+This is kept as a predicate for now because the proof in the book identifies
+`H(a)` with a `π'`-core of `C_G(a)`, and that π-core API is not yet part of the
+S04 scaffold. -/
+def HConjInvariant (hyp : Hypothesis G A L) : Prop :=
+  ∀ (a : {a : G // a ∈ A}) (l : L),
+    hyp.H ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ =
+      MulAut.conj (l : G) • hyp.H a
+
+theorem HConjInvariant.of_forall_H_eq_bot (hyp : Hypothesis G A L)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥) :
+    hyp.HConjInvariant := by
+  intro a l
+  rw [hH ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩, hH a,
+    Subgroup.smul_bot]
+
+theorem HConjInvariant.restrict {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
+    (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).HConjInvariant := by
+  intro a l
+  simpa [HConjInvariant] using hconj ⟨a.1, hA₁A a.2⟩ l
+
+theorem hCoset_conj_mem_of_HConjInvariant (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) {g : G}
+    (hg : g ∈ hyp.hCoset a) :
+    (l : G) * g * (l : G)⁻¹ ∈
+      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+  rcases hg with ⟨h, hh, rfl⟩
+  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, by group⟩
+  have hh_smul :
+      (MulAut.conj (l : G)) h ∈ MulAut.conj (l : G) • hyp.H a :=
+    Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hyp.H a) hh
+  rw [hconj a l]
+  simpa [MulAut.conj_apply] using hh_smul
+
 end Hypothesis
 
 section DadeMap
 
-variable {A : Set G} {L : Subgroup G}
+variable {A A₁ : Set G} {L : Subgroup G}
 /-- A candidate Dade map `τ : CF(L,A) → ClassFunction G`. -/
 abbrev DadeMap (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
   SupportedClassFunctions (G := G) k A L → ClassFunction G k
 
-variable {k : Type*} [CommRing k] [StarRing k]
+variable {k : Type*} [CommRing k]
+
+namespace DadeMap
+
+/-- Restrict the domain of a candidate Dade map along `A₁ ⊆ A`. -/
+def restrictDomain (τ : DadeMap (G := G) k A L) (hA₁A : A₁ ⊆ A) :
+    DadeMap (G := G) k A₁ L :=
+  fun α => τ (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α)
+
+@[simp] theorem restrictDomain_apply (τ : DadeMap (G := G) k A L) (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    restrictDomain (G := G) (k := k) (L := L) τ hA₁A α =
+      τ (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) :=
+  rfl
+
+end DadeMap
+
+section IsDadeMap
+
+variable [Fintype G]
+
+/-- Predicate form of Peterfalvi (2.5): a candidate map is the Dade map for
+`hyp` if it has the prescribed values on conjugates of `aH(a)` and is zero off
+their conjugacy-saturated union.
+
+The uniqueness/well-definedness proof from (2.4.b) is intentionally kept out of
+this predicate, so later work can either construct a map or assume one and use
+these equations directly. -/
+structure IsDadeMap (hyp : Hypothesis G A L) (τ : DadeMap (G := G) k A L) : Prop where
+  map_eq_of_isConj_hCoset :
+    ∀ (α : SupportedClassFunctions (G := G) k A L) (g : G)
+      (a : {a : G // a ∈ A}) (h : G),
+      h ∈ hyp.H a → IsConj (a.1 * h) g →
+        τ α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩
+  map_eq_zero_of_not_mem_dadeSupport :
+    ∀ (α : SupportedClassFunctions (G := G) k A L) (g : G),
+      g ∉ hyp.dadeSupport → τ α g = 0
+
+namespace IsDadeMap
+
+theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
+    (hτ : IsDadeMap hyp τ) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    IsDadeMap (hyp.restrict hA₁A hA₁_norm)
+      (DadeMap.restrictDomain (G := G) (k := k) (L := L) τ hA₁A) where
+  map_eq_of_isConj_hCoset α g a h hh hconj := by
+    simpa using hτ.map_eq_of_isConj_hCoset
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g
+      ⟨a.1, hA₁A a.2⟩ h hh hconj
+  map_eq_zero_of_not_mem_dadeSupport α g hg := by
+    by_cases hgsupp : g ∈ hyp.dadeSupport
+    · rcases hyp.mem_dadeSupport_iff.mp hgsupp with ⟨a, h, hh, hconj⟩
+      have ha_not : a.1 ∉ A₁ := by
+        intro ha₁
+        apply hg
+        have hh' : h ∈ (hyp.restrict hA₁A hA₁_norm).H ⟨a.1, ha₁⟩ := by
+          change h ∈ hyp.H ⟨a.1, hA₁A ha₁⟩
+          have ha_eq : (⟨a.1, hA₁A ha₁⟩ : {a : G // a ∈ A}) = a := Subtype.ext rfl
+          simpa [ha_eq] using hh
+        exact (hyp.restrict hA₁A hA₁_norm).mem_dadeSupport_iff.mpr
+          ⟨⟨a.1, ha₁⟩, h, hh', hconj⟩
+      have hα_zero :
+          (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ = 0 := by
+        by_contra hne
+        exact ha_not (α.property hne)
+      have hmap := hτ.map_eq_of_isConj_hCoset
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g a h
+        hh hconj
+      rw [DadeMap.restrictDomain_apply, hmap]
+      simpa using hα_zero
+    · exact hτ.map_eq_zero_of_not_mem_dadeSupport
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g hgsupp
+
+end IsDadeMap
+
+/-- In the TI-specialized case `H(a)=1`, the Dade-map equation is simply
+constant on `G`-conjugates of elements of `A`. -/
+theorem map_eq_of_isConj_of_forall_H_eq_bot {hyp : Hypothesis G A L}
+    {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {a g : G} (ha : a ∈ A)
+    (hconj : IsConj a g) :
+    τ α g = (α : ClassFunction L k) ⟨a, hyp.mem_L ha⟩ := by
+  simpa using hτ.map_eq_of_isConj_hCoset α g ⟨a, ha⟩ 1
+    (by simp [hH ⟨a, ha⟩]) (by simpa using hconj)
+
+theorem map_eq_of_mem_A_of_forall_H_eq_bot {hyp : Hypothesis G A L}
+    {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {a : G} (ha : a ∈ A) :
+    τ α a = (α : ClassFunction L k) ⟨a, hyp.mem_L ha⟩ :=
+  map_eq_of_isConj_of_forall_H_eq_bot hτ hH α ha (IsConj.refl a)
+
+/-- In the TI-specialized case `H(a)=1`, a Dade map vanishes outside the
+conjugacy-saturation of `A`. -/
+theorem map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L} (hτ : IsDadeMap hyp τ)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    (α : SupportedClassFunctions (G := G) k A L) {g : G}
+    (hg : g ∉ Group.conjugatesOfSet A) :
+    τ α g = 0 := by
+  apply hτ.map_eq_zero_of_not_mem_dadeSupport
+  rwa [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]
+
+end IsDadeMap
+
+variable [StarRing k]
 variable [Fintype G] [Fintype L]
+variable [Invertible (Nat.card G : k)] [Invertible (Nat.card L : k)]
 
 /-- The currently available part of the Dade isometry interface: preservation
-of the unscaled class-function inner sum.
+of Peterfalvi's normalized class-function inner product.
 
-Peterfalvi's normalized inner product divides both sides by group orders.  The
-normalization is intentionally postponed until the scalar field and denominator
-API for `ℂ` are fixed. -/
+The virtual-character preservation field from (2.6.b) is intentionally
+postponed until the `Z[Irr]` lattice is available. -/
 structure IsDadeIsometry (τ : DadeMap (G := G) k A L) : Prop where
-  inner_sum_eq :
+  inner_eq :
     ∀ α β : SupportedClassFunctions (G := G) k A L,
-      ClassFunction.innerSum (τ α) (τ β) =
-        ClassFunction.innerSum (α : ClassFunction L k) (β : ClassFunction L k)
+      ClassFunction.inner (τ α) (τ β) =
+        ClassFunction.inner (α : ClassFunction L k) (β : ClassFunction L k)
+
+namespace IsDadeIsometry
+
+/-- The inner-product part of a Dade isometry restricts along `A₁ ⊆ A`.
+
+This is the currently formalized part of Peterfalvi (2.11). -/
+theorem restrictDomain {τ : DadeMap (G := G) k A L} (hτ : IsDadeIsometry τ)
+    (hA₁A : A₁ ⊆ A) :
+    IsDadeIsometry (DadeMap.restrictDomain (G := G) (k := k) (L := L) τ hA₁A) where
+  inner_eq α β := by
+    simpa using hτ.inner_eq
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α)
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A β)
+
+end IsDadeIsometry
+
+/-- A bundled Dade isometry candidate relative to `hyp`.
+
+This packages the pointwise equations from Peterfalvi (2.5) together with the
+currently formalized normalized inner-product part of (2.6).  The
+virtual-character preservation field from (2.6.b) should be added once
+`Z[Irr]` is available. -/
+structure DadeIsometryData (hyp : Hypothesis G A L) where
+  toDadeMap : DadeMap (G := G) k A L
+  isDadeMap : IsDadeMap hyp toDadeMap
+  isDadeIsometry : IsDadeIsometry toDadeMap
+
+namespace DadeIsometryData
+
+variable {hyp : Hypothesis G A L}
+
+instance : CoeFun (DadeIsometryData (G := G) (k := k) hyp)
+    (fun _ => DadeMap (G := G) k A L) :=
+  ⟨fun τ => τ.toDadeMap⟩
+
+@[simp] theorem coe_mk (τ : DadeMap (G := G) k A L)
+    (hmap : IsDadeMap hyp τ) (hiso : IsDadeIsometry τ) :
+    ((DadeIsometryData.mk τ hmap hiso : DadeIsometryData (G := G) (k := k) hyp) :
+      DadeMap (G := G) k A L) = τ :=
+  rfl
+
+/-- Restrict a bundled Dade isometry to an `L`-stable subset `A₁ ⊆ A`.
+
+This is the bundled form of the currently available part of Peterfalvi (2.11). -/
+def restrict (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    DadeIsometryData (G := G) (k := k) (hyp.restrict hA₁A hA₁_norm) where
+  toDadeMap := DadeMap.restrictDomain (G := G) (k := k) (L := L) τ.toDadeMap hA₁A
+  isDadeMap := IsDadeMap.restrictDomain τ.isDadeMap hA₁A hA₁_norm
+  isDadeIsometry := IsDadeIsometry.restrictDomain τ.isDadeIsometry hA₁A
+
+@[simp] theorem restrict_toDadeMap
+    (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap =
+      DadeMap.restrictDomain (G := G) (k := k) (L := L) τ.toDadeMap hA₁A :=
+  rfl
+
+@[simp] theorem restrict_apply
+    (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap α =
+      τ.toDadeMap (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) :=
+  rfl
+
+end DadeIsometryData
 
 end DadeMap
 
