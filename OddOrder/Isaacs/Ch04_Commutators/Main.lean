@@ -1811,6 +1811,23 @@ theorem hall_higman_opCore
   rw [← oPiCore_singleton_eq_opCore (G := G) p]
   exact OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hπ'
 
+/-- Normal `p`-subgroups commute with normal `p'`-subgroups in a finite group. -/
+theorem commute_of_normal_isPGroup_of_normal_isPiCompl
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {P Q : Subgroup G} [P.Normal] [Q.Normal]
+    (hP : IsPGroup p P)
+    (hQ : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} Q) :
+    ∀ x y : G, x ∈ P → y ∈ Q → Commute x y := by
+  have hPpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) P :=
+    isPiGroup_singleton_of_isPGroup hP
+  have hcop : Nat.Coprime (Nat.card P) (Nat.card Q) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hPpi hQ
+  have hdis : Disjoint P Q :=
+    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop)
+  intro x y hx hy
+  exact Subgroup.commute_of_normal_of_disjoint P Q inferInstance inferInstance hdis x y hx hy
+
 /-- **作用交換子部分群** `[G, A]_φ` := 集合 `{g * (φ a) g⁻¹ : g ∈ G, a ∈ A}` の生成部分群.
 
 これは Γ = G ⋊[φ] A 内で `⁅inl(G), inr(A)⁆` を `inl : G →* Γ` 経由で pull back した
