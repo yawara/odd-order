@@ -365,6 +365,20 @@ private theorem prime_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
     · exact (hq_ne_p hq_eq_p).elim
   · exact hq.dvd_mul.mp hq_dvd_rest
 
+private theorem prime_not_dvd_pred_and_succ_of_ne_two
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq_ne_two : q ≠ 2) :
+    ¬ (q ∣ p - 1 ∧ q ∣ p + 1) := by
+  rintro ⟨hq_dvd_pred, hq_dvd_succ⟩
+  have hq_dvd_two : q ∣ 2 := by
+    have hsub : q ∣ (p + 1) - (p - 1) := Nat.dvd_sub hq_dvd_succ hq_dvd_pred
+    have hsub_eq : (p + 1) - (p - 1) = 2 := by
+      have hp2 : 2 ≤ p := hp.two_le
+      omega
+    rwa [hsub_eq] at hsub
+  rcases (Nat.dvd_prime Nat.prime_two).mp hq_dvd_two with hq_eq_one | hq_eq_two
+  · exact hq.ne_one hq_eq_one
+  · exact hq_ne_two hq_eq_two
+
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
@@ -656,6 +670,9 @@ private theorem lem73_aux
         have hq_dvd_pred_or_succ : q ∣ p - 1 ∨ q ∣ p + 1 :=
           prime_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
             (Fact.out : p.Prime) hq_prime hq_ne_p hq_dvd_SL_formula
+        have hq_not_dvd_both_of_odd : q ≠ 2 → ¬ (q ∣ p - 1 ∧ q ∣ p + 1) :=
+          fun hq_ne_two =>
+            prime_not_dvd_pred_and_succ_of_ne_two (Fact.out : p.Prime) hq_prime hq_ne_two
         have hSL_card_dvd_GL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) ∣
             Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
