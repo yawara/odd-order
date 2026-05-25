@@ -669,6 +669,82 @@ private theorem subgroup_commutative_of_faithful_representation_fixed_on_submodu
     exact hfaithful hxy
   · exact hH
 
+/-- The subgroup acting trivially on `W` and on `V/W`.
+
+This is the Lean version of the `C_G(W) ∩ C_G(V/W)` subgroup appearing in
+BG Thm 2.6, q = p.  The quotient condition is written without choosing a
+quotient representation: `ρ g v - v ∈ W` for every `v`. -/
+private def fixedOnSubmoduleAndQuotientSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V) : Subgroup G where
+  carrier := {g | (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)}
+  one_mem' := by
+    constructor
+    · intro w _hw
+      simp
+    · intro v
+      simp
+  mul_mem' := by
+    intro a b ha hb
+    constructor
+    · intro w hw
+      simpa [map_mul, hb.1 w hw] using ha.1 w hw
+    · intro v
+      have haW : ρ a (ρ b v) - ρ b v ∈ W := ha.2 (ρ b v)
+      have hbW : ρ b v - v ∈ W := hb.2 v
+      have hsum : (ρ a (ρ b v) - ρ b v) + (ρ b v - v) ∈ W := W.add_mem haW hbW
+      have htarget :
+          ρ (a * b) v - v = (ρ a (ρ b v) - ρ b v) + (ρ b v - v) := by
+        rw [map_mul]
+        change ρ a (ρ b v) - v = (ρ a (ρ b v) - ρ b v) + (ρ b v - v)
+        abel
+      rwa [htarget]
+  inv_mem' := by
+    intro a ha
+    constructor
+    · intro w hw
+      have hdiff : w - ρ a⁻¹ w ∈ W := by
+        simpa [map_mul] using ha.2 (ρ a⁻¹ w)
+      have hinvW : ρ a⁻¹ w ∈ W := by
+        have htmp : w - (w - ρ a⁻¹ w) ∈ W := W.sub_mem hw hdiff
+        convert htmp using 1
+        abel
+      have hleft : ρ a (ρ a⁻¹ w) = w := by
+        calc
+          ρ a (ρ a⁻¹ w) = ((ρ a) * (ρ a⁻¹)) w := rfl
+          _ = ρ (a * a⁻¹) w := by rw [map_mul]
+          _ = w := by simp
+      have hfix := ha.1 (ρ a⁻¹ w) hinvW
+      rw [hleft] at hfix
+      exact hfix.symm
+    · intro v
+      have hdiff : v - ρ a⁻¹ v ∈ W := by
+        simpa [map_mul] using ha.2 (ρ a⁻¹ v)
+      simpa [sub_eq_add_neg, add_comm] using W.neg_mem hdiff
+
+private theorem mem_fixedOnSubmoduleAndQuotientSubgroup
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    {W : Submodule F V} {ρ : Representation F G V} {g : G} :
+    g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ ↔
+      (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W) :=
+  Iff.rfl
+
+/-- The `C_G(W) ∩ C_G(V/W)` subgroup is abelian for a faithful representation. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_commutative
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) :
+    Std.Commutative
+      (· * · : fixedOnSubmoduleAndQuotientSubgroup W ρ →
+        fixedOnSubmoduleAndQuotientSubgroup W ρ →
+        fixedOnSubmoduleAndQuotientSubgroup W ρ) :=
+  subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ) W ρ hfaithful
+    (fun h => h.property)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
