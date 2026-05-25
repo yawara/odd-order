@@ -353,12 +353,128 @@ theorem fitting_map_subtype_le_chiefFactorCentralizer
   exact OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer
     hFstarGq_le_cent_Ubar
 
-/-!
-Prop. 1.2 and 1.4 remain routed through this §1A block.
+/-- **BG Proposition 1.2, reverse inclusion** (P. Hall): every `G`-normal subgroup `H ≤ G*`
+that centralizes every chief factor `U/V` of `G` with `U ⊆ F(G*)` is contained in `F(G*)`.
 
-* Prop. 1.2 now has the basic `OddOrder.GroupTheory.ChiefFactor` vocabulary:
-  chief factors `U/V` and ambient `C_G(U/V)`.  The remaining work is the
-  composition/chief-series induction over normal intervals.
+Together with `fitting_map_subtype_le_chiefFactorCentralizer`, this gives the full Hall
+characterization `F(G*) = ⋂_{U/V ∈ 𝒟*} C_{G*}(U/V)`.
+
+**Proof strategy** (BG L380-398, well-founded induction reformulation of the book's
+minimal-counterexample argument): It suffices to prove, for every `G`-normal `K ≤ H`,
+that `K ≤ F(G*)`.  Well-founded induction on `K`: at `K = ⊥` trivial; at `K > ⊥`, let
+`V₀ = chiefSeriesInside K 1` be the next step down in the chief series of `G` inside `K`.
+`V₀ < K`, so by IH, `V₀ ≤ F(G*)`.
+
+To show `K ≤ F(G*)`, prove `↥K` nilpotent (then `K.subgroupOf G* ⊴ G*` is nilpotent, hence
+`≤ F(G*)`).  Nilpotency comes from `isNilpotent_of_chief_factor_centralization`: every step
+`⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i+1)` holds, because
+
+* `i = 0`: `K/V₀` is a chief factor of solvable `G`, hence abelian.
+* `i ≥ 1`: `chiefSeriesInside K (i+1) ≤ V₀ ≤ F(G*)`, so the chief factor
+  `chiefSeriesInside K i / chiefSeriesInside K (i+1)` lies in `𝒟*`, and `K ≤ H`
+  centralizes it.
+
+Forward direction is `fitting_map_subtype_le_chiefFactorCentralizer` (already complete). -/
+theorem chiefFactorCentralizer_subset_le_fitting_of_isSolvable
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {Gstar H : Subgroup G} [Gstar.Normal] [H.Normal]
+    (hH_le_Gstar : H ≤ Gstar)
+    (hH_cent : ∀ U V : Subgroup G, [V.Normal] →
+      OddOrder.GroupTheory.IsChiefFactor U V →
+      U ≤ (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype →
+      H ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V) :
+    H ≤ (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype := by
+  -- Reduce to: ∀ `G`-normal `K ≤ H`, `K ≤ F(G*)`.
+  suffices h : ∀ K : Subgroup G, K.Normal → K ≤ H →
+      K ≤ (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype by
+    exact h H ‹H.Normal› le_rfl
+  intro K
+  induction K using WellFoundedLT.induction with
+  | _ K IH =>
+    intro hK_normal hK_le_H
+    by_cases hK_bot : K = ⊥
+    · rw [hK_bot]; exact bot_le
+    have hK_le_Gstar : K ≤ Gstar := hK_le_H.trans hH_le_Gstar
+    -- `V₀ = chiefSeriesInside K 1` is the first step down from `K` in the chief series.
+    set V₀ : Subgroup G := OddOrder.GroupTheory.chiefSeriesInside K 1 with hV₀_def
+    have hV₀_lt_K : V₀ < K :=
+      OddOrder.GroupTheory.chiefSeriesInside_lt_of_ne_bot hK_bot
+    have hV₀_normal : V₀.Normal :=
+      OddOrder.GroupTheory.chiefSeriesInside_instNormal K 1
+    have hV₀_le_H : V₀ ≤ H :=
+      (OddOrder.GroupTheory.chiefSeriesInside_le K 1).trans hK_le_H
+    -- IH gives `V₀ ≤ F(G*)`.
+    have hV₀_le_fitting : V₀ ≤ (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype :=
+      IH V₀ hV₀_lt_K hV₀_normal hV₀_le_H
+    -- Establish the centralization step `⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i+1)`.
+    have h_central : ∀ i : ℕ,
+        ⁅K, OddOrder.GroupTheory.chiefSeriesInside K i⁆ ≤
+          OddOrder.GroupTheory.chiefSeriesInside K (i + 1) := by
+      intro i
+      by_cases hbot_i : OddOrder.GroupTheory.chiefSeriesInside K i = ⊥
+      · rw [hbot_i, Subgroup.commutator_bot_right]; exact bot_le
+      · -- chiefSeriesInside K i ≠ ⊥: chief factor + (solvability for i = 0, hypothesis otherwise).
+        cases i with
+        | zero =>
+          -- `⁅K, K⁆ ≤ V₀` from `K/V₀` chief factor + `G` solvable.
+          have hK_ne : OddOrder.GroupTheory.chiefSeriesInside K 0 ≠ ⊥ := by
+            simpa [OddOrder.GroupTheory.chiefSeriesInside_zero] using hK_bot
+          have hChief :
+              OddOrder.GroupTheory.IsChiefFactor
+                (OddOrder.GroupTheory.chiefSeriesInside K 0)
+                (OddOrder.GroupTheory.chiefSeriesInside K 1) :=
+            OddOrder.GroupTheory.isChiefFactor_chiefSeriesInside hK_ne
+          have h_KK_le :
+              ⁅OddOrder.GroupTheory.chiefSeriesInside K 0,
+                OddOrder.GroupTheory.chiefSeriesInside K 0⁆ ≤
+                OddOrder.GroupTheory.chiefSeriesInside K 1 :=
+            hChief.commutator_le_of_isSolvable
+          simpa [OddOrder.GroupTheory.chiefSeriesInside_zero] using h_KK_le
+        | succ m =>
+          -- chiefSeriesInside K (m+1) ≤ V₀ ≤ F(G*); apply BG hypothesis.
+          have h1_le : (1 : ℕ) ≤ m + 1 := Nat.succ_le_succ (Nat.zero_le m)
+          have h_le_V₀ : OddOrder.GroupTheory.chiefSeriesInside K (m + 1) ≤ V₀ := by
+            have := OddOrder.GroupTheory.chiefSeriesInside_antitone K h1_le
+            simpa [V₀, hV₀_def] using this
+          have h_le_fitting :
+              OddOrder.GroupTheory.chiefSeriesInside K (m + 1) ≤
+                (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype :=
+            h_le_V₀.trans hV₀_le_fitting
+          have hChief :
+              OddOrder.GroupTheory.IsChiefFactor
+                (OddOrder.GroupTheory.chiefSeriesInside K (m + 1))
+                (OddOrder.GroupTheory.chiefSeriesInside K (m + 2)) :=
+            OddOrder.GroupTheory.isChiefFactor_chiefSeriesInside hbot_i
+          have h_H_cent :
+              H ≤ OddOrder.GroupTheory.chiefFactorCentralizer
+                  (OddOrder.GroupTheory.chiefSeriesInside K (m + 1))
+                  (OddOrder.GroupTheory.chiefSeriesInside K (m + 2)) :=
+            hH_cent _ _ hChief h_le_fitting
+          have h_K_cent := hK_le_H.trans h_H_cent
+          have h_comm := OddOrder.GroupTheory.chiefFactorCentralizer.commutator_le_of_le
+            h_K_cent
+          rw [Subgroup.commutator_comm]
+          exact h_comm
+    -- `↥K` is nilpotent.
+    have hK_isNilpotent : Group.IsNilpotent ↥K :=
+      OddOrder.GroupTheory.isNilpotent_of_chief_factor_centralization h_central
+    -- `K.subgroupOf G* ⊴ G*` is nilpotent (via `subgroupOfEquivOfLe`), so it is `≤ F(G*)`.
+    have hK_subg_nilp : Group.IsNilpotent ↥(K.subgroupOf Gstar) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_Gstar).symm
+    have hK_subg_le_fitting :
+        K.subgroupOf Gstar ≤ OddOrder.Isaacs.Ch01.fitting Gstar :=
+      OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+    have h_K_eq :
+        (K.subgroupOf Gstar).map Gstar.subtype = K :=
+      Subgroup.map_subgroupOf_eq_of_le hK_le_Gstar
+    rw [← h_K_eq]
+    exact Subgroup.map_mono hK_subg_le_fitting
+
+/-!
+Prop. 1.2 reverse direction (`chiefFactorCentralizer_subset_le_fitting_of_isSolvable`)
+combined with the forward direction (`fitting_map_subtype_le_chiefFactorCentralizer`)
+recovers Hall's equality `F(G*) = ⋂_{U/V ∈ 𝒟*} C_{G*}(U/V)`.
+
 * Prop. 1.4 should then follow the book route through semidirect products and Prop. 1.3;
   the present file now supplies the required self-centralizing Fitting endpoint.
 -/

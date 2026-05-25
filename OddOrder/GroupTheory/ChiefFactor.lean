@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.GroupTheory.Solvable
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Data.SetLike.Fintype
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 
 /-!
 # Chief factors
@@ -22,6 +27,10 @@ but it does not provide the group-level chief-factor centralizer API needed here
   strictly between `V` and `U`.
 * `chiefFactorCentralizer U V`: the ambient centralizer `C_G(U/V)`, defined as the
   preimage of the centralizer of the image of `U` in `G ⧸ V`.
+* `maxProperNormalOrBot K`: a maximal proper `G`-normal subgroup of `K`, or `⊥`
+  if no such subgroup exists.  Used to extract chief factors below `K`.
+* `chiefSeriesInside K n`: the chief series of `G` inside `K`, obtained by
+  iterating `maxProperNormalOrBot` starting from `K`.
 
 The centralizer in a normal subgroup `G*` is obtained as
 `G* ⊓ chiefFactorCentralizer U V`.
@@ -152,5 +161,295 @@ theorem le_iff_commutator_le :
   ⟨commutator_le_of_le, le_of_commutator_le⟩
 
 end chiefFactorCentralizer
+
+/-! ## Chief series inside a normal subgroup
+
+For BG §1 Prop. 1.2 reverse direction we need to walk through the chief factors
+of `G` that lie inside a normal subgroup `K`.  The construction iterates the
+choice of a maximal proper `G`-normal subgroup. -/
+
+section ChiefSeriesInside
+
+variable [Finite G]
+
+/-- A maximal `G`-normal subgroup strictly below `K`, chosen by classical
+selection from the finite set of `G`-normal subgroups `<K`.  Returns `⊥` when
+no proper `G`-normal subgroup of `K` exists (e.g. `K = ⊥`). -/
+noncomputable def maxProperNormalOrBot (K : Subgroup G) : Subgroup G := by
+  classical
+  by_cases h : ∃ L : Subgroup G, L.Normal ∧ L < K
+  · exact ((Set.toFinite {L : Subgroup G | L.Normal ∧ L < K}).exists_maximal h).choose
+  · exact ⊥
+
+private theorem maxProperNormalOrBot_choose_spec
+    {K : Subgroup G} (h : ∃ L : Subgroup G, L.Normal ∧ L < K) :
+    let L := ((Set.toFinite {L : Subgroup G | L.Normal ∧ L < K}).exists_maximal h).choose
+    L.Normal ∧ L < K ∧
+      ∀ W : Subgroup G, W.Normal → W < K → L ≤ W → W ≤ L := by
+  classical
+  intro L
+  have hspec :=
+    ((Set.toFinite {L : Subgroup G | L.Normal ∧ L < K}).exists_maximal h).choose_spec
+  refine ⟨hspec.1.1, hspec.1.2, ?_⟩
+  intro W hW_normal hW_lt hLW
+  have hW_mem : W ∈ {L : Subgroup G | L.Normal ∧ L < K} := ⟨hW_normal, hW_lt⟩
+  exact hspec.2 hW_mem hLW
+
+theorem maxProperNormalOrBot_normal (K : Subgroup G) :
+    (maxProperNormalOrBot K).Normal := by
+  classical
+  unfold maxProperNormalOrBot
+  by_cases h : ∃ L : Subgroup G, L.Normal ∧ L < K
+  · rw [dif_pos h]
+    exact (maxProperNormalOrBot_choose_spec h).1
+  · rw [dif_neg h]
+    exact inferInstance
+
+instance maxProperNormalOrBot_instNormal (K : Subgroup G) :
+    (maxProperNormalOrBot K).Normal := maxProperNormalOrBot_normal K
+
+theorem maxProperNormalOrBot_le (K : Subgroup G) :
+    maxProperNormalOrBot K ≤ K := by
+  classical
+  unfold maxProperNormalOrBot
+  by_cases h : ∃ L : Subgroup G, L.Normal ∧ L < K
+  · rw [dif_pos h]
+    exact (maxProperNormalOrBot_choose_spec h).2.1.le
+  · rw [dif_neg h]
+    exact bot_le
+
+theorem maxProperNormalOrBot_lt_of_ne_bot {K : Subgroup G} (hK : K ≠ ⊥) :
+    maxProperNormalOrBot K < K := by
+  classical
+  have h_exists : ∃ L : Subgroup G, L.Normal ∧ L < K :=
+    ⟨⊥, inferInstance, bot_lt_iff_ne_bot.mpr hK⟩
+  unfold maxProperNormalOrBot
+  rw [dif_pos h_exists]
+  exact (maxProperNormalOrBot_choose_spec h_exists).2.1
+
+theorem isChiefFactor_maxProperNormalOrBot
+    {K : Subgroup G} [hK_normal : K.Normal] (hK : K ≠ ⊥) :
+    IsChiefFactor K (maxProperNormalOrBot K) := by
+  classical
+  have h_exists : ∃ L : Subgroup G, L.Normal ∧ L < K :=
+    ⟨⊥, inferInstance, bot_lt_iff_ne_bot.mpr hK⟩
+  have hV_normal : (maxProperNormalOrBot K).Normal := maxProperNormalOrBot_normal K
+  have hV_lt : maxProperNormalOrBot K < K := maxProperNormalOrBot_lt_of_ne_bot hK
+  refine ⟨hK_normal, hV_normal, hV_lt, ?_⟩
+  intro W hW_normal hVW hWK
+  rcases lt_or_eq_of_le hWK with h_WK_lt | h_WK_eq
+  · -- W < K, so W is in the set, by maximality of V (= maxProperNormalOrBot K), W ≤ V
+    left
+    have hV_max : ∀ W' : Subgroup G, W'.Normal → W' < K →
+        maxProperNormalOrBot K ≤ W' → W' ≤ maxProperNormalOrBot K := by
+      unfold maxProperNormalOrBot
+      rw [dif_pos h_exists]
+      exact (maxProperNormalOrBot_choose_spec h_exists).2.2
+    exact le_antisymm (hV_max W hW_normal h_WK_lt hVW) hVW
+  · right
+    exact h_WK_eq
+
+/-- The chief series of `G` inside `K`: iterates `maxProperNormalOrBot` from `K`. -/
+noncomputable def chiefSeriesInside (K : Subgroup G) : ℕ → Subgroup G
+  | 0 => K
+  | n + 1 => maxProperNormalOrBot (chiefSeriesInside K n)
+
+@[simp]
+theorem chiefSeriesInside_zero (K : Subgroup G) : chiefSeriesInside K 0 = K := rfl
+
+theorem chiefSeriesInside_succ (K : Subgroup G) (n : ℕ) :
+    chiefSeriesInside K (n + 1) = maxProperNormalOrBot (chiefSeriesInside K n) := rfl
+
+instance chiefSeriesInside_instNormal (K : Subgroup G) [K.Normal] (n : ℕ) :
+    (chiefSeriesInside K n).Normal := by
+  induction n with
+  | zero => exact ‹K.Normal›
+  | succ n _ => rw [chiefSeriesInside_succ]; exact maxProperNormalOrBot_normal _
+
+theorem chiefSeriesInside_le (K : Subgroup G) [K.Normal] (n : ℕ) :
+    chiefSeriesInside K n ≤ K := by
+  induction n with
+  | zero => exact le_rfl
+  | succ n ih =>
+    rw [chiefSeriesInside_succ]
+    exact (maxProperNormalOrBot_le _).trans ih
+
+theorem chiefSeriesInside_antitone (K : Subgroup G) [K.Normal] :
+    Antitone (chiefSeriesInside K) := by
+  refine antitone_nat_of_succ_le ?_
+  intro n
+  rw [chiefSeriesInside_succ]
+  exact maxProperNormalOrBot_le _
+
+theorem chiefSeriesInside_lt_of_ne_bot {K : Subgroup G} [K.Normal] {n : ℕ}
+    (hne : chiefSeriesInside K n ≠ ⊥) :
+    chiefSeriesInside K (n + 1) < chiefSeriesInside K n := by
+  rw [chiefSeriesInside_succ]
+  exact maxProperNormalOrBot_lt_of_ne_bot hne
+
+theorem isChiefFactor_chiefSeriesInside {K : Subgroup G} [K.Normal] {n : ℕ}
+    (hne : chiefSeriesInside K n ≠ ⊥) :
+    IsChiefFactor (chiefSeriesInside K n) (chiefSeriesInside K (n + 1)) := by
+  rw [chiefSeriesInside_succ]
+  exact isChiefFactor_maxProperNormalOrBot hne
+
+/-- The chief series inside `K` eventually reaches `⊥`. -/
+theorem chiefSeriesInside_exists_eq_bot (K : Subgroup G) [K.Normal] :
+    ∃ N : ℕ, chiefSeriesInside K N = ⊥ := by
+  by_contra h
+  push_neg at h
+  have h_strict_anti : StrictAnti (chiefSeriesInside K) :=
+    strictAnti_nat_of_succ_lt (fun n => chiefSeriesInside_lt_of_ne_bot (h n))
+  -- `Finite (Subgroup G)` comes from `Finite G` via `SetLike` (Mathlib.Data.SetLike.Fintype).
+  have h_inj : Function.Injective (chiefSeriesInside K) := h_strict_anti.injective
+  have : Finite ℕ := Finite.of_injective _ h_inj
+  exact (Infinite.not_finite (α := ℕ)) this
+
+end ChiefSeriesInside
+
+/-! ## Chief factors of solvable groups
+
+A chief factor of a solvable group is elementary abelian, so its commutator
+vanishes in the bottom subgroup. -/
+
+section SolvableChiefFactor
+
+/-- Convert a `G`-chief factor `U/V` to a minimal normal subgroup of `G/V`. -/
+theorem IsChiefFactor.isMinimalNormal_map_quotient
+    {U V : Subgroup G} (hChief : IsChiefFactor U V) :
+    haveI : V.Normal := hChief.normal_bot
+    OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) := by
+  haveI hV_normal : V.Normal := hChief.normal_bot
+  refine ⟨hChief.normal_top.map _ QuotientGroup.mk_surjective, ?_, ?_⟩
+  · intro hbot
+    have hU_le_V : U ≤ V := by
+      intro u hu
+      have hu_map : (QuotientGroup.mk' V) u ∈ U.map (QuotientGroup.mk' V) :=
+        ⟨u, hu, rfl⟩
+      rw [hbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hu_map
+      exact hu_map
+    exact hChief.lt.not_ge hU_le_V
+  · intro N hN_normal hN_le_Ubar
+    let W : Subgroup G := N.comap (QuotientGroup.mk' V)
+    haveI hW_normal : W.Normal := hN_normal.comap _
+    have hV_le_W : V ≤ W := by
+      intro v hv
+      change (QuotientGroup.mk' V) v ∈ N
+      rw [show (QuotientGroup.mk' V) v = 1 from (QuotientGroup.eq_one_iff v).mpr hv]
+      exact N.one_mem
+    have hW_le_U : W ≤ U := by
+      intro g hg
+      have hqg_Ubar : (QuotientGroup.mk' V) g ∈ U.map (QuotientGroup.mk' V) :=
+        hN_le_Ubar hg
+      obtain ⟨u, hu, hqu⟩ := hqg_Ubar
+      have hg_u_inv : g * u⁻¹ ∈ V := by
+        apply (QuotientGroup.eq_one_iff (N := V) (g * u⁻¹)).mp
+        change (QuotientGroup.mk' V) (g * u⁻¹) = 1
+        rw [map_mul, map_inv, ← hqu, mul_inv_cancel]
+      have hgU : (g * u⁻¹) * u ∈ U := U.mul_mem (hChief.le hg_u_inv) hu
+      simpa [mul_assoc] using hgU
+    rcases hChief.eq_or_eq_of_normal hW_normal hV_le_W hW_le_U with hW_eq_V | hW_eq_U
+    · left
+      rw [eq_bot_iff]
+      intro n hn
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (N := V) n
+      have hgW : g ∈ W := hn
+      rw [hW_eq_V] at hgW
+      exact (QuotientGroup.eq_one_iff g).mpr hgW
+    · right
+      apply le_antisymm hN_le_Ubar
+      intro x hx
+      obtain ⟨g, hgU, rfl⟩ := hx
+      have hgW : g ∈ W := by
+        rw [hW_eq_U]
+        exact hgU
+      exact hgW
+
+/-- In a finite solvable group, a chief factor `U/V` is elementary abelian, in
+particular `[U, U] ≤ V`. -/
+theorem IsChiefFactor.commutator_le_of_isSolvable
+    [Finite G] [IsSolvable G] {U V : Subgroup G} (hChief : IsChiefFactor U V) :
+    ⁅U, U⁆ ≤ V := by
+  haveI hV_normal : V.Normal := hChief.normal_bot
+  haveI hU_normal : U.Normal := hChief.normal_top
+  -- `U.map (mk' V)` is a minimal normal subgroup of `G/V`, hence elementary
+  -- abelian (chief factor of a finite solvable group).
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
+    hChief.isMinimalNormal_map_quotient
+  obtain ⟨p, hp_prime, hElem⟩ :=
+    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+  -- `U/V` abelian ⇒ `[u, u'] ∈ V` for `u, u' ∈ U`.
+  rw [Subgroup.commutator_le]
+  intro u hu u' hu'
+  have hu_q : (QuotientGroup.mk' V) u ∈ U.map (QuotientGroup.mk' V) := ⟨u, hu, rfl⟩
+  have hu'_q : (QuotientGroup.mk' V) u' ∈ U.map (QuotientGroup.mk' V) := ⟨u', hu', rfl⟩
+  -- `U/V` elementary abelian ⇒ commutativity at the subtype level.
+  have hSubComm := hElem.comm
+    (⟨(QuotientGroup.mk' V) u, hu_q⟩ : ↥(U.map (QuotientGroup.mk' V)))
+    (⟨(QuotientGroup.mk' V) u', hu'_q⟩ : ↥(U.map (QuotientGroup.mk' V)))
+  have hComm : Commute ((QuotientGroup.mk' V) u) ((QuotientGroup.mk' V) u') :=
+    congr_arg Subtype.val hSubComm
+  apply (QuotientGroup.eq_one_iff ⁅u, u'⁆).mp
+  change (QuotientGroup.mk' V) ⁅u, u'⁆ = 1
+  rw [map_commutatorElement]
+  exact commutatorElement_eq_one_iff_mul_comm.mpr hComm
+
+end SolvableChiefFactor
+
+/-! ## Nilpotency from chief-factor centralization
+
+If `K ⊴ G` and the commutator `⁅K, V_i⁆` is contained in the next chief-series term
+`V_{i+1}` for every step of the chief series of `G` inside `K`, then `↥K` is nilpotent.
+This is the engine behind BG §1 Prop. 1.2 reverse direction. -/
+
+section NilpotencyFromCentralization
+
+variable [Finite G]
+
+/-- The chief series of `G` inside `K`, viewed in `↥K`. -/
+private noncomputable def chiefSeriesSubgroupOf (K : Subgroup G) (n : ℕ) : Subgroup ↥K :=
+  (chiefSeriesInside K n).subgroupOf K
+
+private theorem chiefSeriesSubgroupOf_zero (K : Subgroup G) [K.Normal] :
+    chiefSeriesSubgroupOf K 0 = ⊤ := by
+  unfold chiefSeriesSubgroupOf
+  rw [chiefSeriesInside_zero]
+  ext x
+  simp [Subgroup.mem_subgroupOf]
+
+private theorem chiefSeriesSubgroupOf_eq_bot_of_chiefSeriesInside_eq_bot
+    {K : Subgroup G} {N : ℕ} (h : chiefSeriesInside K N = ⊥) :
+    chiefSeriesSubgroupOf K N = ⊥ := by
+  unfold chiefSeriesSubgroupOf
+  rw [h]
+  ext x
+  simp [Subgroup.mem_subgroupOf, Subgroup.mem_bot]
+
+/-- **Nilpotency engine** for BG §1 Prop. 1.2 reverse direction: if `⁅K, V_i⁆ ≤ V_{i+1}`
+for every step of `chiefSeriesInside K`, then `↥K` is nilpotent. -/
+theorem isNilpotent_of_chief_factor_centralization
+    {K : Subgroup G} [K.Normal]
+    (h_cent : ∀ i : ℕ, ⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i + 1)) :
+    Group.IsNilpotent ↥K := by
+  obtain ⟨N, hN_bot⟩ := chiefSeriesInside_exists_eq_bot K
+  rw [nilpotent_iff_finite_descending_central_series]
+  refine ⟨N, chiefSeriesSubgroupOf K, ⟨?_, ?_⟩, ?_⟩
+  · exact chiefSeriesSubgroupOf_zero K
+  · intro x n hx g
+    have hx_val : (x : G) ∈ chiefSeriesInside K n := hx
+    have hg_val : (g : G) ∈ K := g.2
+    have h_subset : ⁅chiefSeriesInside K n, K⁆ ≤ chiefSeriesInside K (n + 1) := by
+      rw [Subgroup.commutator_comm]
+      exact h_cent n
+    have h_elem : ⁅(x : G), (g : G)⁆ ∈ chiefSeriesInside K (n + 1) :=
+      h_subset (Subgroup.commutator_mem_commutator hx_val hg_val)
+    show ((x * g * x⁻¹ * g⁻¹ : ↥K) : G) ∈ chiefSeriesInside K (n + 1)
+    have h_eq : ((x * g * x⁻¹ * g⁻¹ : ↥K) : G) = ⁅(x : G), (g : G)⁆ := by
+      simp [commutatorElement_def]
+    rw [h_eq]
+    exact h_elem
+  · exact chiefSeriesSubgroupOf_eq_bot_of_chiefSeriesInside_eq_bot hN_bot
+
+end NilpotencyFromCentralization
 
 end OddOrder.GroupTheory
