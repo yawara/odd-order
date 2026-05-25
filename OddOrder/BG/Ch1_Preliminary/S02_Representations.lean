@@ -544,6 +544,22 @@ private theorem monoidHom_units_eq_one_of_isPGroup_charP
     unit_eq_one_of_pow_prime_pow_eq_one (p := p) (φ g) (n := n) (by
       rw [← map_pow, hg, map_one])
 
+/-- Pointwise form of `monoidHom_units_eq_one_of_isPGroup_charP`. -/
+private theorem monoidHom_units_apply_eq_one_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) (g : G) : φ g = 1 :=
+  congrArg (fun ψ : G →* Fˣ => ψ g)
+    (monoidHom_units_eq_one_of_isPGroup_charP hG φ)
+
+/-- The image of a p-group scalar character is the trivial subgroup in characteristic `p`. -/
+private theorem monoidHom_units_range_eq_bot_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) : φ.range = ⊥ := by
+  rw [monoidHom_units_eq_one_of_isPGroup_charP hG φ]
+  simp
+
 /-- Sylow-subgroup specialization of `monoidHom_units_eq_one_of_isPGroup_charP`. -/
 private theorem sylow_monoidHom_units_eq_one_of_charP
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
