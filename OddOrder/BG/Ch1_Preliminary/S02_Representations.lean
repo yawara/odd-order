@@ -745,6 +745,53 @@ private theorem fixedOnSubmoduleAndQuotientSubgroup_commutative
     (fixedOnSubmoduleAndQuotientSubgroup W ρ) W ρ hfaithful
     (fun h => h.property)
 
+/-- If a p-subgroup acts by scalar characters on `W` and `V/W`, then in
+characteristic `p` it lies in `C_G(W) ∩ C_G(V/W)`.
+
+The scalar characters are passed as hypotheses rather than constructed here;
+BG obtains them from the fact that `W` and `V/W` are one-dimensional. -/
+private theorem subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hH : IsPGroup p H) (φW φQ : H →* Fˣ)
+    (hW : ∀ h : H, ∀ w ∈ W, ρ h w = (φW h : F) • w)
+    (hQ : ∀ h : H, ∀ v, ρ h v - (φQ h : F) • v ∈ W) :
+    H ≤ fixedOnSubmoduleAndQuotientSubgroup W ρ := by
+  intro g hg
+  rw [mem_fixedOnSubmoduleAndQuotientSubgroup]
+  let h : H := ⟨g, hg⟩
+  constructor
+  · intro w hw
+    have hφW : φW h = 1 :=
+      monoidHom_units_apply_eq_one_of_isPGroup_charP hH φW h
+    calc
+      ρ g w = (φW h : F) • w := hW h w hw
+      _ = w := by simp [hφW]
+  · intro v
+    have hφQ : φQ h = 1 :=
+      monoidHom_units_apply_eq_one_of_isPGroup_charP hH φQ h
+    simpa [hφQ] using hQ h v
+
+/-- Commutativity version of
+`subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions`
+for faithful representations. -/
+private theorem subgroup_commutative_of_isPGroup_scalar_actions
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hH : IsPGroup p H) (φW φQ : H →* Fˣ)
+    (hW : ∀ h : H, ∀ w ∈ W, ρ h w = (φW h : F) • w)
+    (hQ : ∀ h : H, ∀ v, ρ h v - (φQ h : F) • v ∈ W) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    H W ρ hfaithful
+  intro h
+  have hle := subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions
+    H W ρ hH φW φQ hW hQ h.property
+  exact (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hle)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
