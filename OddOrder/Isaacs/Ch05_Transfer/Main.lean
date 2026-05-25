@@ -1127,9 +1127,137 @@ assembly on top of this.
 **TODO**: 内部の 6 ステップ (APrime = ⊤, Q ⊆ comm, focal ⊆ ⁅Q, P⁆, iteration, termination,
 final translate) を順に埋める. -/
 lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
-    (P : Sylow p G) (_hP : P.ControlsOwnFusion) :
+    (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
-  sorry
+  set N : Subgroup G := OPrime p G with hN_def
+  haveI hN_normal : N.Normal := inferInstance
+  set R : Subgroup G := (P : Subgroup G) ⊓ N with hR_def
+  have hR_le_P : R ≤ (P : Subgroup G) := by
+    rw [hR_def]
+    exact inf_le_left
+  -- Controls-own-fusion converts focal generators of `R` into commutators with `P`.
+  have h_focal_R_le_comm : R.focalSubgroup ≤ ⁅R, (P : Subgroup G)⁆ := by
+    rw [Subgroup.focalSubgroup_def, Subgroup.closure_le]
+    rintro g ⟨hgR, x, hxR, u, rfl⟩
+    have hyR : u * x * u⁻¹ ∈ R := by
+      have hy_eq : u * x * u⁻¹ = (⁅x, u⁆)⁻¹ * x := by
+        rw [commutatorElement_def]
+        group
+      rw [hy_eq]
+      exact R.mul_mem (R.inv_mem hgR) hxR
+    obtain ⟨v, hvP, hv⟩ := hP (hR_le_P hxR) (hR_le_P hyR) ⟨u, rfl⟩
+    have hcomm_eq : ⁅x, u⁆ = ⁅x, v⁆ := by
+      rw [commutatorElement_def, commutatorElement_def]
+      calc
+        x * u * x⁻¹ * u⁻¹ = x * (u * x * u⁻¹)⁻¹ := by group
+        _ = x * (v * x * v⁻¹)⁻¹ := by rw [hv]
+        _ = x * v * x⁻¹ * v⁻¹ := by group
+    rw [hcomm_eq]
+    exact Subgroup.commutator_mem_commutator hxR hvP
+  -- **Crux** (Steps 1-4 combined, sorry): `R ≤ ⁅R, (P : Subgroup G)⁆`.
+  -- 内訳: APrime ↥N = ⊤ (char + OPrime minimality) → Q := R.subgroupOf N ⊆ commutator ↥N
+  -- → mathlib's `commutator_inf_eq_focalSubgroup` で focalSubgroup Q = Q → 各 focal generator
+  -- ⁅x, u⁆ (x ∈ Q, u ∈ ↥N) を ControlsOwnFusion で ⁅Q.map subtype, P⁆ 内 commutator に変換.
+  have h_R_le_comm : R ≤ ⁅R, (P : Subgroup G)⁆ := by
+    have h_R_le_focal : R ≤ R.focalSubgroup := by
+      have hR_le_N : R ≤ N := by
+        rw [hR_def]
+        exact inf_le_right
+      have hR_pgroup : IsPGroup p R :=
+        P.isPGroup'.to_le hR_le_P
+      have hRN_pgroup : IsPGroup p (R.subgroupOf N) :=
+        hR_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hR_le_N).symm
+      have hRN_not_dvd : ¬ p ∣ (R.subgroupOf N).index := by
+        obtain ⟨a, hN_idx_pow⟩ : ∃ a : ℕ, N.index = p ^ a := by
+          rw [hN_def]
+          exact OPrime_index_isPGroup p G
+        have hNP_coprime : Nat.Coprime N.index (P : Subgroup G).index := by
+          rw [hN_idx_pow]
+          exact (Nat.Prime.coprime_pow_of_not_dvd (m := a) Fact.out P.not_dvd_index).symm
+        have hNP_top : N ⊔ (P : Subgroup G) = ⊤ :=
+          OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hNP_coprime
+        have h_index_eq : (R.subgroupOf N).index = (P : Subgroup G).index := by
+          have hR_le_N' : R ≤ N := hR_le_N
+          have hR_rel_mul : R.relIndex N * N.index = R.index :=
+            Subgroup.relIndex_mul_index hR_le_N'
+          have hN_rel_P : N.relIndex (P : Subgroup G) = N.index := by
+            rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := N),
+              sup_comm, hNP_top, Subgroup.relIndex_top_right]
+          have hNP_rel_mul : N.relIndex (P : Subgroup G) * (P : Subgroup G).index =
+              R.index := by
+            have h := Subgroup.relIndex_inf_mul_relIndex (H := N)
+              (K := (P : Subgroup G)) (L := (⊤ : Subgroup G))
+            simpa [Subgroup.relIndex_top_right, hR_def, inf_comm] using h
+          have hmul : R.relIndex N * N.index = (P : Subgroup G).index * N.index := by
+            rw [hR_rel_mul, ← hNP_rel_mul, hN_rel_P, mul_comm N.index]
+          have hrel : R.relIndex N = (P : Subgroup G).index :=
+            Nat.eq_of_mul_eq_mul_right
+              (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
+          exact hrel
+        rw [h_index_eq]
+        exact P.not_dvd_index
+      let RN : Sylow p N := hRN_pgroup.toSylow hRN_not_dvd
+      have hRN_eq : (RN : Subgroup N) = R.subgroupOf N :=
+        hRN_pgroup.toSylow_coe hRN_not_dvd
+      have hRN_le_comm : R.subgroupOf N ≤ _root_.commutator N := by
+        -- `APrime p ↥N = ⊤` forces the p-Sylow `R.subgroupOf N` into
+        -- `commutator N`; this is the remaining APrime/OPrime bridge.
+        sorry
+      have hRN_le_focal : R.subgroupOf N ≤ RN.focalSubgroup := by
+        intro x hx
+        have hxRN : x ∈ (RN : Subgroup N) := by
+          rw [hRN_eq]
+          exact hx
+        have hxInf : x ∈ _root_.commutator N ⊓ (RN : Subgroup N) :=
+          ⟨hRN_le_comm hx, hxRN⟩
+        rw [Subgroup.commutator_inf_eq_focalSubgroup RN] at hxInf
+        exact hxInf
+      have hRN_focal_map_le : RN.focalSubgroup.map N.subtype ≤ R.focalSubgroup := by
+        rw [Subgroup.focalSubgroup_def, MonoidHom.map_closure, Subgroup.focalSubgroup_def]
+        apply Subgroup.closure_mono
+        rintro y ⟨z, hz, rfl⟩
+        rcases hz with ⟨hzRN, x, hxRN, u, rfl⟩
+        have hzR : ((⁅x, u⁆ : N) : G) ∈ R := hzRN
+        have hxR : (x : G) ∈ R := by
+          have hxRN' : x ∈ R.subgroupOf N := by
+            rwa [hRN_eq] at hxRN
+          exact hxRN'
+        exact ⟨hzR, (x : G), hxR, (u : G), rfl⟩
+      intro r hr
+      let x : N := ⟨r, hR_le_N hr⟩
+      have hxRN : x ∈ R.subgroupOf N := hr
+      have hxFocal : x ∈ RN.focalSubgroup := hRN_le_focal hxRN
+      exact hRN_focal_map_le (Subgroup.mem_map_of_mem N.subtype hxFocal)
+    exact h_R_le_focal.trans h_focal_R_le_comm
+  -- Helper: `(⊤ : Subgroup ↥P).map P.subtype = P` (via `range_eq_map` + `range_subtype`).
+  have h_top_map : ((⊤ : Subgroup ↥(P : Subgroup G))).map (P : Subgroup G).subtype =
+      (P : Subgroup G) := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  -- **Step 5 (iteration)**: `∀ n, R ≤ (lowerCentralSeries ↥P n).map P.subtype`.
+  -- Base: R ⊆ P = ⊤.map subtype. Step: R ≤ ⁅R, P⁆ = ⁅R, ⊤.map subtype⁆ ≤ ⁅(lcs n).map, ⊤.map⁆
+  --       = (⁅lcs n, ⊤⁆).map = (lcs (n+1)).map.
+  have h_R_le_lcs : ∀ n : ℕ, R ≤ Subgroup.map (P : Subgroup G).subtype
+      (lowerCentralSeries ↥(P : Subgroup G) n) := by
+    intro n
+    induction n with
+    | zero =>
+      show R ≤ Subgroup.map (P : Subgroup G).subtype ⊤
+      rw [h_top_map]
+      exact inf_le_left
+    | succ n ih =>
+      change R ≤ Subgroup.map (P : Subgroup G).subtype
+        ⁅lowerCentralSeries ↥(P : Subgroup G) n, (⊤ : Subgroup ↥(P : Subgroup G))⁆
+      rw [Subgroup.map_commutator, h_top_map]
+      exact h_R_le_comm.trans (Subgroup.commutator_mono ih le_rfl)
+  -- **Step 6 (termination)**: `P` is a finite p-group ⇒ nilpotent ⇒ `∃ n, lcs ↥P n = ⊥`.
+  haveI hP_pgroup : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  haveI hP_nilp : Group.IsNilpotent ↥(P : Subgroup G) := hP_pgroup.isNilpotent
+  obtain ⟨n, hn⟩ := nilpotent_iff_lowerCentralSeries.mp hP_nilp
+  have : R ≤ ⊥ := by
+    have := h_R_le_lcs n
+    rw [hn, Subgroup.map_bot] at this
+    exact this
+  exact le_bot_iff.mp this
 
 /-- **Isaacs Thm 5.25 (⇐)**: any Sylow_p `P` controls own fusion ⇒ G has normal p-complement.
 
