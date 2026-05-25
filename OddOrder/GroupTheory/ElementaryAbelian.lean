@@ -79,6 +79,48 @@ theorem not_isCyclic_of_card_prime_sq
     simpa using hp_pow
   exact (Nat.not_dvd_of_pos_of_lt hp.pos hp_lt_sq) hExp_dvd_p
 
+/-- An elementary abelian group of order `p^2` has at least two distinct subgroups of order `p`.
+-/
+theorem exists_distinct_subgroups_card_prime_of_card_prime_sq
+    [Finite G] (hp : p.Prime) (h : IsElementaryAbelian p G)
+    (hCard : Nat.card G = p ^ 2) :
+    ∃ H K : Subgroup G, Nat.card H = p ∧ Nat.card K = p ∧ H ≠ K := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hNotCyclic : ¬ IsCyclic G := h.not_isCyclic_of_card_prime_sq hp hCard
+  have hCard_gt_one : 1 < Nat.card G := by
+    rw [hCard]
+    exact one_lt_pow₀ hp.one_lt two_ne_zero
+  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
+  obtain ⟨x, hx_ne⟩ := exists_ne (1 : G)
+  let H : Subgroup G := Subgroup.zpowers x
+  have hx_order : orderOf x = p := orderOf_eq_prime (h.pow_eq_one x) hx_ne
+  have hH_card : Nat.card H = p := by
+    rw [show H = Subgroup.zpowers x from rfl, Nat.card_zpowers, hx_order]
+  have hH_ne_top : H ≠ ⊤ := by
+    intro hH_top
+    exact hNotCyclic ((isCyclic_iff_exists_zpowers_eq_top (α := G)).mpr ⟨x, hH_top⟩)
+  have h_exists_not_mem : ∃ y : G, y ∉ H := by
+    by_contra hAll
+    apply hH_ne_top
+    ext y
+    constructor
+    · intro hy
+      exact Subgroup.mem_top y
+    · intro _hy
+      by_contra hyH
+      exact hAll ⟨y, hyH⟩
+  obtain ⟨y, hy_not_mem⟩ := h_exists_not_mem
+  let K : Subgroup G := Subgroup.zpowers y
+  have hy_ne : y ≠ 1 := by
+    intro hy
+    exact hy_not_mem (hy ▸ H.one_mem)
+  have hy_order : orderOf y = p := orderOf_eq_prime (h.pow_eq_one y) hy_ne
+  have hK_card : Nat.card K = p := by
+    rw [show K = Subgroup.zpowers y from rfl, Nat.card_zpowers, hy_order]
+  refine ⟨H, K, hH_card, hK_card, ?_⟩
+  intro hHK
+  exact hy_not_mem (hHK ▸ Subgroup.mem_zpowers y)
+
 /-- A finite elementary abelian group of cardinality at least `p^2` contains an elementary
 abelian subgroup of order `p^2`. -/
 theorem exists_subgroup_card_prime_sq
