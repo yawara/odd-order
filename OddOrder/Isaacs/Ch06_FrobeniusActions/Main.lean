@@ -1511,6 +1511,19 @@ private lemma pow_twist_eq_pow_half_mul_inv
   · omega
   · simp [SemiDihedralGroup.twist]
 
+private lemma zpowers_involution_eq_pow_pred_of_order_two_pow
+    {P : Type*} [Group P] [Finite P] (c z : P) {k : ℕ}
+    (hk_pos : 0 < k) (h_order : orderOf c = 2 ^ k)
+    (h_z_mem : z ∈ Subgroup.zpowers c) (h_z_sq : z ^ 2 = 1) (h_z_ne : z ≠ 1) :
+    z = c ^ (2 ^ (k - 1)) := by
+  obtain ⟨h_z_half, _h_order_even, _h_half_pos⟩ :=
+    eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one c z h_z_mem h_z_sq h_z_ne
+  have hhalf : 2 ^ k / 2 = 2 ^ (k - 1) := by
+    rcases k with _ | k
+    · omega
+    · simp [pow_succ]
+  rw [h_z_half, h_order, hhalf]
+
 private noncomputable def semiDihedralIsoOfTwistInvolution
     {P : Type*} [Group P] [Finite P]
     (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
