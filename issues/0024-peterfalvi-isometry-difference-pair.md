@@ -16,12 +16,19 @@ isometry difference-pair 構造 lemma の stub を解消する。§7 coherence �
 
 ## やること
 
-- [ ] `isometry_difference_pair_structure` の statement が §3 (1.4) と §7 (5.6)
+- [x] `isometry_difference_pair_structure` の statement が §3 (1.4) と §7 (5.6)
       の両方に使える強さか確認する。
 - [ ] second orthogonality / finite orthonormal indexing への依存を明示する。
 - [ ] `isometry_difference_pair_structure` を `sorry` なしにする、または induction
       の combinatorial core を別 issue に分割する。
-- [ ] `OddOrder.Peterfalvi.S07.conjugateDifference` との接続 lemma の要否を確認する。
+- [x] `OddOrder.Peterfalvi.S03.conjugateDifference` との接続 lemma の要否を確認する。
+
+## 2026-05-25 update
+
+- `OddOrder.Peterfalvi.S07.CharacterDifferenceImage` を追加して、§7 (5.2.d) で
+  必要になる `χ - χ.conj` の像を `ε • (μ - ν)` として記録する interface にした。
+- `Hypothesis.difference_image_eq` が
+  `OddOrder.Peterfalvi.S03.conjugateDifference` との接続 lemma になる。
 
 ## 完了条件
 

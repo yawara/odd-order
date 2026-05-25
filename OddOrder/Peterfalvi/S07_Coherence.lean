@@ -53,6 +53,35 @@ structure IsIntegralIsometry (τ : IntegralCharacterMap L G)
     ∀ φ ψ : ClassFunction L ℂ,
       ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ
 
+/-- The Peterfalvi (5.2.d) image data for one character difference.
+
+For `χ ∈ S`, later applications prove that the image of `χ - χ̄` under the
+integral isometry is a signed difference of two irreducible characters of `G`.
+The hard existence theorem is supplied by
+`OddOrder.RepresentationTheory.isometry_difference_pair_structure`; this
+structure records the reusable conclusion in the coherence interface. -/
+structure CharacterDifferenceImage (τ : IntegralCharacterMap L G)
+    (χ : ClassFunction L ℂ) where
+  mu : ClassFunction G ℂ
+  nu : ClassFunction G ℂ
+  mu_irreducible : IsIrreducibleCharacter mu
+  nu_irreducible : IsIrreducibleCharacter nu
+  distinct : mu ≠ nu
+  sign : ℤ
+  sign_eq : sign = 1 ∨ sign = -1
+  image_eq : τ (χ - χ.conj) = sign • (mu - nu)
+
+namespace CharacterDifferenceImage
+
+variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+
+/-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
+theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) = hχ.sign • (hχ.mu - hχ.nu) := by
+  simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using hχ.image_eq
+
+end CharacterDifferenceImage
+
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
 isometric extension on `Z[S]` that agrees with `τ` on `Z[S,A]`. -/
 structure IsCoherent (τ : IntegralCharacterMap L G)
@@ -89,6 +118,8 @@ structure Hypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
   conjugate_closed : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S
   no_real_characters : OddOrder.Peterfalvi.S03.HasNoRealCharacters S
   pairwise_orthogonal : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S
+  difference_image :
+    ∀ ⦃χ : ClassFunction L ℂ⦄, χ ∈ S → CharacterDifferenceImage (L := L) (G := G) tau χ
 
 namespace Hypothesis
 
@@ -99,6 +130,15 @@ variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 /-- The map carried by a §7 hypothesis, as a coherence predicate target. -/
 abbrev IsCoherentTarget (hyp : Hypothesis (L := L) (G := G) S A) :=
   IsCoherent hyp.tau S A
+
+/-- The signed irreducible-difference image of `χ - χ̄` supplied by a §7
+hypothesis. -/
+theorem difference_image_eq {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
+      (hyp.difference_image hχ).sign •
+        ((hyp.difference_image hχ).mu - (hyp.difference_image hχ).nu) :=
+  (hyp.difference_image hχ).image_conjugateDifference
 
 end Hypothesis
 
