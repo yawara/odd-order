@@ -3171,6 +3171,154 @@ theorem exists_lift_quotient_commutator_order_eight_of_center_index_four
     card_lift_quotient_commutator_eq_eight_of_center_index_four
       h_idx hC_cyclic hC_lt_T hZ_lt_C hcomm_le_E hE_image_card⟩
 
+/-- A finite elementary abelian `2`-group of order `4` is not cyclic. -/
+private lemma not_isCyclic_of_isElementaryAbelian_two_card_four
+    {A : Type*} [Group A] [Finite A]
+    (hElem : IsElementaryAbelian 2 A) (hCard : Nat.card A = 4) :
+    ¬ IsCyclic A := by
+  intro hcyc
+  haveI : IsCyclic A := hcyc
+  have hExp_eq : Monoid.exponent A = Nat.card A := IsCyclic.exponent_eq_card
+  have hExp_dvd_two : Monoid.exponent A ∣ 2 := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+    exact hElem.2
+  rw [hCard] at hExp_eq
+  rw [hExp_eq] at hExp_dvd_two
+  norm_num at hExp_dvd_two
+
+/-- If a quotient image of `E` is elementary abelian of order `4`, then `E` is not cyclic. -/
+private lemma not_isCyclic_of_quotient_commutator_image_four
+    {T : Type*} [Group T] [Finite T] {E : Subgroup T}
+    (hE_image_elem :
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))))
+    (hE_image_card :
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4) :
+    ¬ IsCyclic E := by
+  have hImage_not :
+      ¬ IsCyclic (E.map (QuotientGroup.mk' (_root_.commutator T))) :=
+    not_isCyclic_of_isElementaryAbelian_two_card_four
+      hE_image_elem hE_image_card
+  intro hE_cyclic
+  haveI : IsCyclic E := hE_cyclic
+  exact hImage_not (isCyclic_of_surjective
+    ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap E)
+    ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective E))
+
+/-- The intersection of a subgroup with a cyclic subgroup, viewed inside the former, is cyclic. -/
+private lemma subgroupOf_isCyclic_of_isCyclic
+    {T : Type*} [Group T] {C E : Subgroup T} (hC_cyclic : IsCyclic C) :
+    IsCyclic (C.subgroupOf E) := by
+  haveI : IsCyclic C := hC_cyclic
+  let f : C.subgroupOf E →* C := {
+    toFun := fun x => ⟨((x : C.subgroupOf E) : E), by
+      have hx : ((x : C.subgroupOf E) : E) ∈ C.subgroupOf E := x.2
+      rwa [Subgroup.mem_subgroupOf] at hx⟩
+    map_one' := by ext; rfl
+    map_mul' := by intro x y; ext; rfl
+  }
+  exact isCyclic_of_injective f (by
+    intro x y hxy
+    apply Subtype.ext
+    have hT :
+        (((x : C.subgroupOf E) : E) : T) =
+          (((y : C.subgroupOf E) : E) : T) := by
+      simpa [f] using congrArg Subtype.val hxy
+    exact Subtype.ext hT)
+
+/-- If `C` has index `2` in `T` and `E` is not contained in `C`, then `C ∩ E` has
+index `2` in `E`. -/
+private lemma relIndex_eq_two_of_index_two_of_not_le
+    {T : Type*} [Group T] {C E : Subgroup T}
+    (hC_idx : C.index = 2) (hE_not_le_C : ¬ E ≤ C) :
+    C.relIndex E = 2 := by
+  rw [Subgroup.relIndex_eq_two_iff_exists_notMem_and]
+  rw [SetLike.le_def] at hE_not_le_C
+  push Not at hE_not_le_C
+  obtain ⟨a, haE, haC⟩ := hE_not_le_C
+  refine ⟨a, haE, haC, ?_⟩
+  intro b _hbE
+  by_cases hbC : b ∈ C
+  · exact Or.inr hbC
+  · left
+    rw [Subgroup.mul_mem_iff_of_index_two hC_idx]
+    exact iff_of_false hbC haC
+
+/-- If `C` has index `2`, then any subgroup properly between `C` and `⊤` is impossible. -/
+private lemma not_ge_of_ne_of_ne_top_of_index_two
+    {T : Type*} [Group T] [Finite T] {C E : Subgroup T}
+    (hC_idx : C.index = 2) (hE_ne_C : E ≠ C) (hE_ne_top : E ≠ ⊤) :
+    ¬ C ≤ E := by
+  intro hC_le_E
+  have hmul : C.relIndex E * E.index = 2 := by
+    rw [Subgroup.relIndex_mul_index hC_le_E, hC_idx]
+  have hrel_pos : 0 < C.relIndex E := by
+    exact Nat.pos_of_ne_zero (by
+      rw [Subgroup.relIndex]
+      exact Subgroup.index_ne_zero_of_finite)
+  have hidx_pos : 0 < E.index := by
+    exact Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite (H := E))
+  have hcases : C.relIndex E = 1 ∨ E.index = 1 := by
+    by_contra h
+    push Not at h
+    have hrel_ge_two : 2 ≤ C.relIndex E := by omega
+    have hidx_ge_two : 2 ≤ E.index := by omega
+    have hprod_ge : 4 ≤ C.relIndex E * E.index :=
+      Nat.mul_le_mul hrel_ge_two hidx_ge_two
+    omega
+  rcases hcases with hrel | hidx
+  · have hE_le_C : E ≤ C := Subgroup.relIndex_eq_one.mp hrel
+    exact hE_ne_C (le_antisymm hE_le_C hC_le_E)
+  · exact hE_ne_top (Subgroup.index_eq_one.mp hidx)
+
+/-- **Isaacs Lemma 6.15** (`p = 2`, second-step setup).
+
+The lifted subgroup `E` from `T/T'` is noncyclic and has order `8`; moreover
+`C ∩ E`, viewed as a subgroup of `E`, is cyclic of index `2`. -/
+theorem exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 ∧
+      ¬ IsCyclic E ∧
+      IsCyclic (C.subgroupOf E) ∧
+      (C.subgroupOf E).index = 2 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card⟩ :=
+    exists_lift_quotient_commutator_order_eight_of_center_index_four
+      hT_two h_idx hC_cyclic hC_lt_T hZ_lt_C
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_idx : C.index = 2 :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two
+      (p := 2) h_idx hZ_lt_C hC_lt_T
+  have hE_not_cyclic : ¬ IsCyclic E :=
+    not_isCyclic_of_quotient_commutator_image_four
+      hE_image_elem hE_image_card
+  have hE_ne_C : E ≠ C := by
+    intro hEq
+    apply hE_not_cyclic
+    rw [hEq]
+    exact hC_cyclic
+  have hE_ne_top : E ≠ ⊤ := by
+    intro hEq
+    apply hT_card_ne
+    simpa [hEq] using hE_card
+  have hC_not_le_E : ¬ C ≤ E :=
+    not_ge_of_ne_of_ne_top_of_index_two hC_idx hE_ne_C hE_ne_top
+  have hE_not_le_C : ¬ E ≤ C := by
+    intro hE_le_C
+    haveI : IsCyclic C := hC_cyclic
+    exact hE_not_cyclic (Subgroup.isCyclic_of_le hE_le_C)
+  have hCE_idx : (C.subgroupOf E).index = 2 := by
+    simpa [Subgroup.relIndex] using
+      relIndex_eq_two_of_index_two_of_not_le hC_idx hE_not_le_C
+  exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, subgroupOf_isCyclic_of_isCyclic hC_cyclic, hCE_idx⟩
+
 end
 
 end OddOrder.Isaacs.Ch06

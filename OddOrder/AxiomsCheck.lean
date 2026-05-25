@@ -210,6 +210,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.card_lift_quotient_commutator_eq_eight_of_center_index_four
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_lift_quotient_commutator_order_eight_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
