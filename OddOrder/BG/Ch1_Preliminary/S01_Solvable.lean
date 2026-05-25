@@ -37,7 +37,7 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 
 | BG | Isaacs FGT | mathlib | 本ファイル |
 |---|---|---|---|
-| **Lem 1.1** (部分) | Ch.3 Thm 3.11 + Ch.1 Fitting | — | ✅ **sorry-free 部分** (M elem ab + ≤ F(G); Z(F(G)) は Ch.4 待ち) |
+| **Lem 1.1** | Ch.3 Thm 3.11 + Ch.1 Fitting + Ch.4 Z(F(G)) | — | ✅ **sorry-free** |
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
 | **Lem 1.7(b)(c⇒)(d⊇)** | — | `OddOrder.GroupTheory.FrattiniPGroup` ✅ | ✅ **sorry-free shared module** |
@@ -69,7 +69,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 ## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1B §1C §1G 部分着手
 
 - **Skeleton** + **§1B/§1F docstring mapping** + **18 結果/補題 全 sorry-free**:
-  - **Lem 1.1 (部分)** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free (Z(F(G)) 部分は Ch.4 待ち)
+  - **Lem 1.1** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free
+    (`M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ M` elementary abelian)
   - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
   - **Lem 1.7(b)** `quotient_frattini_isElementaryAbelian` ⭐ sorry-free (shared module)
   - **Lem 1.7(c⇒)** `isElementaryAbelian_of_frattini_eq_bot` ⭐ sorry-free (shared module)
@@ -103,18 +104,16 @@ open Pointwise
 
 /-! ## §1A: Solvable group basics (Lem 1.1, Prop 1.2-1.4) -/
 
-/-- **BG Lemma 1.1 (部分; elementary abelian + ≤ F(G))**: 有限可解群 `G` の
-minimal normal `M` は (i) elementary abelian, (ii) `M ≤ F(G)` (Fitting absorbs).
-
-BG 原 statement の "M ⊆ Z(F(G))" 部分は Phase 1 Ch.4 `le_centralizer_of_isMinimalNormal`
-依存だが Ch.4 現状 parse error で import 不可. M ⊆ F(G) ⊓ C_G(F(G)) の完全形は将来.
+/-- **BG Lemma 1.1**: 有限可解群 `G` の minimal normal `M` は
+elementary abelian で `F(G)` の中心に入る.
 
 CLAUDE.md no-wrapper policy 例外: 異なる Ch.3 結果 + nilpotent_normal_le_fitting の合成
-+ 仮定特殊化 (`[IsSolvable G]`). -/
++ Ch.4 の `le_centralizer_of_isMinimalNormal` + 仮定特殊化 (`[IsSolvable G]`). -/
 theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
     {G : Type*} [Group G] [Finite G] [IsSolvable G]
     {M : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     M ≤ OddOrder.Isaacs.Ch01.fitting G ∧
+    M ≤ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ∧
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
   haveI hMnormal : M.Normal := hMin.1
   -- Elementary abelian (Ch.3)
@@ -127,7 +126,13 @@ theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
   -- ↥M nilpotent (finite p-group ⇒ nilpotent)
   haveI hM_nilp : Group.IsNilpotent ↥M := hM_pgroup.isNilpotent
   -- M ⊴ G + ↥M nilpotent ⇒ M ≤ F(G)
-  exact ⟨OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting, p, hp_prime, hM_elem⟩
+  have hM_le_fitting : M ≤ OddOrder.Isaacs.Ch01.fitting G :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hM_le_centralizer :
+      M ≤ Subgroup.centralizer
+        ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) :=
+    OddOrder.Isaacs.Ch04.le_centralizer_of_isMinimalNormal hMin hM_le_fitting
+  exact ⟨hM_le_fitting, hM_le_centralizer, p, hp_prime, hM_elem⟩
 
 /-! ## §1B: A-invariant Hall theory (Prop 1.5, Prop 1.6) — Isaacs Ch.4/§3E 既存 API 経由
 
