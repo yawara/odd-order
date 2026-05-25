@@ -21,6 +21,7 @@ import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main
 
 /-!
 # OddOrder.Isaacs.Ch06 — Frobenius Actions
@@ -2164,6 +2165,280 @@ theorem dihedralOrQuaternion_of_card_eight
         rw [h_order4]
       rw [h_half] at hQ
       exact hQ
+
+/-! ### Isaacs Lemma 6.15: characteristic elementary abelian `p²` subgroup
+
+mmd L3533-3541. Statement: `T` is a `p`-group with `|T| ≠ 8`, `|T : Z(T)| = p²`, and there is a
+cyclic subgroup `C` with `Z(T) < C < T`. Then `T` has a characteristic elementary abelian
+subgroup of order `p²`.
+
+The proof splits on `p`:
+- `p ≠ 2`: take `K = {x | x^p = 1}` (subgroup since `T` has class ≤ 2 by Step 0,
+  using `Ch04.setOfPowEqOne`). `K` is characteristic, and `|K| = p²` from the bounds
+  `θ(T) ⊆ Z(T)` (since `T/Z(T)` order `p²` noncyclic = elementary abelian) and `K ∩ C`
+  cyclic with `|K : K ∩ C| ≤ p`.
+- `p = 2`: apply twice the sub-lemma "noncyclic abelian 2-group with cyclic subgroup of
+  index 2 ⇒ `{a | a² = 1}` is characteristic elementary abelian of order 4". -/
+
+/-- **Step 0 of Lem 6.15**: under the hypothesis `Z(T) ≤ C` and `|T : Z(T)| = p²` with
+`Z(T) ≠ C`, we get `|T : C| = p`. -/
+private lemma index_eq_prime_of_center_lt_of_center_index_pow_two
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    C.index = p := by
+  -- C.index ∣ Z.index = p^2
+  have h_dvd : C.index ∣ (Subgroup.center T).index :=
+    Subgroup.index_dvd_of_le hZ_lt_C.le
+  rw [h_idx] at h_dvd
+  -- C.index ∈ {1, p, p^2}
+  rcases (Nat.dvd_prime_pow hp.out).mp h_dvd with ⟨k, hk, hkpow⟩
+  interval_cases k
+  · -- k = 0: C = ⊤
+    rw [pow_zero] at hkpow
+    have : C = ⊤ := Subgroup.index_eq_one.mp hkpow
+    exact absurd this hC_lt_T.ne
+  · rw [pow_one] at hkpow; exact hkpow
+  · -- k = 2: C = Z(T)
+    exfalso
+    rw [← h_idx] at hkpow
+    -- From C.index = (Z(T)).index = p^2 and index_mul_card, |C| = |Z(T)|.
+    have h_card_eq : Nat.card C = Nat.card (Subgroup.center T) := by
+      have h1 := C.index_mul_card
+      have h2 := (Subgroup.center T).index_mul_card
+      rw [hkpow, ← h2] at h1
+      have hidx_pos : 0 < (Subgroup.center T).index := by
+        rw [h_idx]; exact Nat.pos_of_ne_zero (pow_ne_zero _ hp.out.ne_zero)
+      exact Nat.eq_of_mul_eq_mul_left hidx_pos h1
+    have hZ_eq_C : Subgroup.center T = C :=
+      Subgroup.eq_of_le_of_card_ge hZ_lt_C.le (le_of_eq h_card_eq)
+    exact hZ_lt_C.ne hZ_eq_C
+
+/-- **Step 0 of Lem 6.15**: under the hypothesis of Lem 6.15, `commutator T ≤ Z(T)`
+(i.e. `T` has nilpotence class ≤ 2). -/
+private lemma commutator_le_center_of_index_pow_two
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2) :
+    _root_.commutator T ≤ Subgroup.center T := by
+  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  -- `T ⧸ Z(T)` of order p² is abelian.
+  have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
+    rw [← Subgroup.index_eq_card]; exact h_idx
+  have h_quot_comm : ∀ a b : T ⧸ Subgroup.center T, a * b = b * a :=
+    IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
+  exact hZnorm.quotient_commutative_iff_commutator_le.mp ⟨h_quot_comm⟩
+
+/-- **Helper for Lem 6.15**: if `|T : Z(T)| = p²` then `T` is nonabelian. -/
+private lemma exists_not_commute_of_center_index_pow_two
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2) :
+    ∃ x y : T, x * y ≠ y * x := by
+  by_contra h
+  push_neg at h
+  -- T abelian ⇒ Z(T) = ⊤ ⇒ index = 1.
+  have hZ_top : Subgroup.center T = ⊤ := by
+    rw [Subgroup.eq_top_iff']
+    intro x
+    rw [Subgroup.mem_center_iff]
+    exact fun y => (h y x)
+  rw [hZ_top, Subgroup.index_top] at h_idx
+  have hp1 : 1 < p := hp.out.one_lt
+  have hp_sq_lt : 1 < p ^ 2 := by
+    calc 1 = 1 ^ 2 := (one_pow 2).symm
+      _ < p ^ 2 := Nat.pow_lt_pow_left hp1 (by norm_num)
+  omega
+
+/-- **Step 0 of Lem 6.15** (cardinality): under the hypothesis of Lem 6.15,
+`|commutator T| = p`. -/
+private lemma card_commutator_eq_prime_of_lem_6_15
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} [C.Normal] (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    Nat.card (_root_.commutator T) = p := by
+  have hC_idx : C.index = p :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two h_idx hZ_lt_C hC_lt_T
+  -- Cyclic quotient T/C.
+  have hCT_card : Nat.card (T ⧸ C) = p := by rw [← Subgroup.index_eq_card]; exact hC_idx
+  haveI : IsCyclic (T ⧸ C) := isCyclic_of_prime_card hCT_card
+  -- Use Lem 4.6: |commutator T| · |C ⊓ Z(T)| = |C|.
+  have h_lem46 :
+      Nat.card (_root_.commutator T) * Nat.card (C ⊓ Subgroup.center T : Subgroup T)
+        = Nat.card C := by
+    refine
+      OddOrder.Isaacs.Ch04.card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+      (A := C) ?_ ?_
+    · -- C abelian (cyclic)
+      intro a ha b hb
+      haveI := hC_cyclic
+      letI : CommGroup C := IsCyclic.commGroup
+      have h_comm : ∀ x y : ↥C, x * y = y * x := mul_comm
+      exact congrArg (fun (z : ↥C) => (z : T)) (h_comm ⟨a, ha⟩ ⟨b, hb⟩)
+    · -- T/C cyclic
+      infer_instance
+  -- C ⊓ Z(T) = Z(T) since Z(T) ≤ C.
+  have h_inf : C ⊓ Subgroup.center T = Subgroup.center T := inf_eq_right.mpr hZ_lt_C.le
+  rw [h_inf] at h_lem46
+  -- |C| / |Z(T)| = p. From |T| = p²·|Z(T)| = p·|C|, we get |C| = p·|Z(T)|.
+  have h_card_T_Z : (Subgroup.center T).index * Nat.card (Subgroup.center T) = Nat.card T :=
+    Subgroup.index_mul_card _
+  have h_card_T_C : C.index * Nat.card C = Nat.card T := Subgroup.index_mul_card _
+  rw [h_idx] at h_card_T_Z
+  rw [hC_idx] at h_card_T_C
+  have h_card_C : Nat.card C = p * Nat.card (Subgroup.center T) := by
+    have hp_pos : 0 < p := hp.out.pos
+    have hT_eq : p ^ 2 * Nat.card (Subgroup.center T) = p * Nat.card C := by
+      rw [h_card_T_Z, h_card_T_C]
+    have hT_eq' : p * (p * Nat.card (Subgroup.center T)) = p * Nat.card C := by
+      have : p ^ 2 * Nat.card (Subgroup.center T) = p * (p * Nat.card (Subgroup.center T)) := by
+        ring
+      rw [← this]; exact hT_eq
+    exact (Nat.eq_of_mul_eq_mul_left hp_pos hT_eq').symm
+  rw [h_card_C] at h_lem46
+  -- Now: |commutator T| · |Z(T)| = p · |Z(T)|, so |commutator T| = p (since |Z(T)| > 0).
+  have hZ_pos : 0 < Nat.card (Subgroup.center T) := Nat.card_pos
+  exact Nat.eq_of_mul_eq_mul_right hZ_pos h_lem46
+
+/-! ### Odd p case of Lem 6.15 -/
+
+/-- **Lem 6.15 odd-p helper**: under the hypothesis of Lem 6.15 with `p` odd, the set
+`{x : T | x^p = 1}` is characteristic, i.e., preserved by any automorphism. The same set
+is also a subgroup (via `Ch04.setOfPowEqOne`); here we record characteristicity. -/
+private lemma setOfPowEqOne_characteristic_of_class_le_two_odd
+    {T : Type*} [Group T] {p : ℕ} (hp : Odd p)
+    (hC : _root_.commutator T ≤ Subgroup.center T) :
+    (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp).Characteristic := by
+  refine ⟨fun φ => ?_⟩
+  ext x
+  rw [Subgroup.mem_comap]
+  show (φ x) ^ p = 1 ↔ x ^ p = 1
+  refine ⟨fun hpx => ?_, fun hpx => ?_⟩
+  · -- φ x ^ p = 1 ⇒ φ (x^p) = 1 ⇒ x^p = 1 by injectivity
+    rw [← map_pow] at hpx
+    have : φ (x ^ p) = φ 1 := by rw [hpx, map_one]
+    exact φ.injective this
+  · rw [← map_pow, hpx, map_one]
+
+/-- **Lem 6.15 odd-p helper**: Under the hypothesis of Lem 6.15 with `p` odd,
+the image of `θ : T → T, θ(x) = x^p` is contained in `Z(T)`. -/
+private lemma pow_p_mem_center_of_index_pow_two_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2) (x : T) :
+    x ^ p ∈ Subgroup.center T := by
+  -- T/Z(T) has order p² and is noncyclic (otherwise T abelian, contradiction).
+  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
+    rw [← Subgroup.index_eq_card]; exact h_idx
+  -- Get T is nonabelian:
+  obtain ⟨a, b, hab⟩ := exists_not_commute_of_center_index_pow_two h_idx
+  -- The quotient T/Z(T) is not cyclic (because then T abelian).
+  have h_quot_not_cyclic : ¬ IsCyclic (T ⧸ Subgroup.center T) := by
+    intro h_cyc
+    let f : T →* T ⧸ Subgroup.center T := QuotientGroup.mk' (Subgroup.center T)
+    have hker : f.ker ≤ Subgroup.center T := by
+      rw [QuotientGroup.ker_mk']
+    have h_comm : ∀ a b : T, a * b = b * a :=
+      @commutative_of_cyclic_center_quotient T _ _ _ h_cyc f hker
+    exact hab (h_comm a b)
+  -- T/Z(T) of order p² noncyclic ⇒ exponent = p.
+  haveI hp_prime : Fact p.Prime := hp
+  have h_quot_exp : Monoid.exponent (T ⧸ Subgroup.center T) = p :=
+    (not_isCyclic_iff_exponent_eq_prime hp.out h_card_quot).mp h_quot_not_cyclic
+  -- So every element x : T satisfies (x : T/Z(T))^p = 1, i.e., x^p ∈ Z(T).
+  have h_pow_eq_one : (QuotientGroup.mk x : T ⧸ Subgroup.center T) ^ p = 1 := by
+    rw [← h_quot_exp]; exact Monoid.pow_exponent_eq_one _
+  rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at h_pow_eq_one
+  exact h_pow_eq_one
+
+/-- **Lem 6.15 odd-p helper**: the kernel of `θ : T → T, x ↦ x^p` has order ≥ p².
+Given the commutator structure (class ≤ 2) with `|commutator T| = p` (Step 0)
+and `|T : Z(T)| = p²`. -/
+private lemma card_setOfPowEqOne_ge_pow_two_of_index_pow_two_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (h_idx : (Subgroup.center T).index = p ^ 2)
+    (hC : _root_.commutator T ≤ Subgroup.center T)
+    (h_commp : ∀ c ∈ _root_.commutator T, c ^ p = 1) :
+    p ^ 2 ≤ Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) := by
+  -- Define θ : T → T as a homomorphism (Ch04.powPHom). Use Lagrange: |K| · |im| = |T|.
+  let θ := OddOrder.Isaacs.Ch04.powPHom hC hp_odd h_commp
+  -- ker θ = setOfPowEqOne
+  have h_ker_eq : θ.ker = OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd := by
+    ext x
+    constructor
+    · intro hx
+      change x ^ p = 1
+      exact hx
+    · intro hx
+      change x ^ p = 1 at hx
+      exact hx
+  -- im θ ⊆ Z(T)
+  have h_im_le_Z : θ.range ≤ Subgroup.center T := by
+    rintro _ ⟨x, rfl⟩
+    change x ^ p ∈ Subgroup.center T
+    exact pow_p_mem_center_of_index_pow_two_odd h_idx x
+  -- |ker| · |im| = |T| and |im| ≤ |Z(T)|, so |ker| ≥ |T| / |Z(T)| = p²
+  have h_lag : Nat.card θ.ker * θ.ker.index = Nat.card T :=
+    Subgroup.card_mul_index _
+  rw [Subgroup.index_ker] at h_lag
+  have h_im_card_le : Nat.card θ.range ≤ Nat.card (Subgroup.center T) :=
+    Subgroup.card_le_of_le h_im_le_Z
+  rw [h_ker_eq] at h_lag
+  -- |T| = (Z(T)).index * |Z(T)| = p² * |Z(T)|
+  have hT_card : Nat.card T = p ^ 2 * Nat.card (Subgroup.center T) := by
+    have := (Subgroup.center T).index_mul_card
+    rw [h_idx] at this
+    exact this.symm
+  rw [hT_card] at h_lag
+  -- p² * |Z(T)| ≤ |K| * |Z(T)| (using h_im_card_le and h_lag)
+  have hZ_pos : 0 < Nat.card (Subgroup.center T) := Nat.card_pos
+  by_contra hKlt
+  push_neg at hKlt
+  -- |K| < p² ⇒ |K| * |Z(T)| < p² * |Z(T)|. But |K| * |im θ| = |T| = p² * |Z(T)|
+  -- and |im θ| ≤ |Z(T)|.
+  have h_lt : Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) * Nat.card θ.range
+            < p ^ 2 * Nat.card (Subgroup.center T) := by
+    calc Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) * Nat.card θ.range
+        ≤ Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) * Nat.card (Subgroup.center T) :=
+          Nat.mul_le_mul_left _ h_im_card_le
+      _ < p ^ 2 * Nat.card (Subgroup.center T) := by
+          exact (Nat.mul_lt_mul_right hZ_pos).mpr hKlt
+  omega
+
+/-- **Lem 6.15 odd-p helper**: `K ⊓ C` has order ≤ p, where `K = {x | x^p = 1}` and
+`C` is cyclic. This uses: subgroup of cyclic is cyclic, and a cyclic group all of whose
+elements have order dividing p has order ≤ p. -/
+private lemma card_setOfPowEqOne_inf_le_prime
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (hC : _root_.commutator T ≤ Subgroup.center T)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C) :
+    Nat.card ((OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) ⊓ C : Subgroup T) ≤ p := by
+  -- The inf K ⊓ C is a subgroup of C (cyclic), hence cyclic.
+  set K := OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd with hK_def
+  -- Every element x ∈ K ⊓ C satisfies x^p = 1, so orderOf x ∣ p, i.e., orderOf x = 1 or p.
+  -- A finite cyclic group all of whose elements have order dividing p has order ≤ p.
+  -- Approach: take generator g of K ⊓ C (cyclic); g^p = 1; orderOf g ≤ p; |K ⊓ C| = orderOf g.
+  haveI : IsCyclic ((K ⊓ C : Subgroup T).subgroupOf C) :=
+    Subgroup.isCyclic_of_le (le_top : (K ⊓ C : Subgroup T).subgroupOf C ≤ ⊤)
+  -- The subgroup K ⊓ C ↪ C is cyclic.
+  haveI : IsCyclic (K ⊓ C : Subgroup T) := by
+    -- Use isCyclic_of_le with K ⊓ C ≤ C: but this needs a coercion from Subgroup C, while
+    -- here both K ⊓ C and C are subgroups of T. We use the equivalence via subgroupOf.
+    refine isCyclic_of_injective ((K ⊓ C : Subgroup T).inclusion (inf_le_right : K ⊓ C ≤ C)) ?_
+    exact Subgroup.inclusion_injective _
+  -- Every element x ∈ K ⊓ C satisfies x^p = 1, so the exponent of K ⊓ C divides p.
+  -- Since K ⊓ C is cyclic, its exponent equals its cardinality, hence |K ⊓ C| ≤ p.
+  have h_exp_dvd : Monoid.exponent (K ⊓ C : Subgroup T) ∣ p := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+    intro x
+    apply Subtype.ext
+    show ((x : T) ^ p : T) = (1 : T)
+    push_cast
+    have h_mem : (x : T) ∈ K := (Subgroup.mem_inf.mp x.2).1
+    exact h_mem
+  have h_card_eq : Nat.card (K ⊓ C : Subgroup T) = Monoid.exponent (K ⊓ C : Subgroup T) :=
+    (IsCyclic.exponent_eq_card (α := (K ⊓ C : Subgroup T))).symm
+  rw [h_card_eq]
+  exact Nat.le_of_dvd hp.out.pos h_exp_dvd
 
 end
 
