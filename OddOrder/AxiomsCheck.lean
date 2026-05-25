@@ -104,6 +104,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
 
+-- Ch.4 (Commutators): Cor 4.30
+-- faithful action + `[G, A, ..., A] = 1` ⇒ every prime divisor of |A| divides |G|.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
+
 -- Ch.4 (Commutators): Lem 4.32 (両半) P p-群 on G p-群 nontrivial
 -- 前半: Γ = G ⋊ P 内で ⁅inl(G), inr(P)⁆ < inl(G) (strict)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.commutator_inl_inr_lt_inl_of_pgroup_action

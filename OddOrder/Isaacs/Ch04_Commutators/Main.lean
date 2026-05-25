@@ -1746,7 +1746,7 @@ BG Prop 1.6(a)(b)(c)(d)(e) クラスタ + BG Thm 1.11 がこの section を占�
 - **Lemma 4.28** ⭐ BG Prop 1.6(a): `(|G|,|A|) = 1` + (A or G solvable)
   ⇒ `G = C_G(A) · ⁅G, A⁆`.
 - **Lemma 4.29** ⭐ BG Prop 1.6(b): coprime ⇒ `⁅G, A, A⁆ = ⁅G, A⁆`.
-- **Cor 4.30**: A faithful + chain + coprime ⇒ `|A|` の素因子 ⊆ `|G|` の素因子.
+- **Cor 4.30**: A faithful + chain ⇒ `|A|` の素因子 ⊆ `|G|` の素因子.
 - **Thm 4.31 Thompson P×Q** ⭐: `A = P × Q` (P p-群, Q p'-群) acts on p-群 G,
   Q fixes every P-fixed element ⇒ Q trivial on G.
 - **Lemma 4.32**: P p-群, G 非自明 p-群: `⁅G, P⁆ < G` かつ `C_G(P) > 1`.
@@ -2488,6 +2488,131 @@ theorem iterCommutator_inl_inr_two_eq_one
       rw [← this]
       exact ⟨c * x * c⁻¹, h_cxc_ac, rfl⟩
     exact Subgroup.commutator_mem_commutator h_in_I1 ⟨a, rfl⟩
+
+private lemma iterCommutator_eq_one_of_two_eq_one
+    {E F : Subgroup G}
+    (h : iterCommutator E F 2 = iterCommutator E F 1) :
+    ∀ {m : ℕ}, 1 ≤ m → iterCommutator E F m = iterCommutator E F 1 := by
+  intro m hm
+  induction m with
+  | zero => omega
+  | succ n ih =>
+      rcases n with _ | n
+      · rfl
+      · have hn : 1 ≤ n + 1 := by omega
+        rw [iterCommutator_succ, ih hn]
+        simpa [iterCommutator_succ] using h
+
+private theorem iterCommutator_inl_inr_restrict_eq_bot
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    (P : Subgroup A) {m : ℕ}
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    let ψ : P →* MulAut G := φ.comp P.subtype
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+        (SemidirectProduct.inr : P →* G ⋊[ψ] P).range m = ⊥ := by
+  dsimp
+  let ψ : P →* MulAut G := φ.comp P.subtype
+  let F : G ⋊[ψ] P →* G ⋊[φ] A :=
+    SemidirectProduct.map (MonoidHom.id G) P.subtype (fun p => by
+      ext g
+      rfl)
+  let XGP : Subgroup (G ⋊[ψ] P) := (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+  let YPP : Subgroup (G ⋊[ψ] P) := (SemidirectProduct.inr : P →* G ⋊[ψ] P).range
+  let XGA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  let YAA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  have hF_inj : Function.Injective F := by
+    intro x y hxy
+    ext
+    · simpa [F] using congrArg (fun z : G ⋊[φ] A => z.left) hxy
+    · simpa [F] using congrArg (fun z : G ⋊[φ] A => z.right) hxy
+  have h_map_X : XGP.map F = XGA := by
+    ext x
+    constructor
+    · rintro ⟨_, ⟨g, rfl⟩, rfl⟩
+      exact ⟨g, by simp [F]⟩
+    · rintro ⟨g, rfl⟩
+      refine ⟨(SemidirectProduct.inl : G →* G ⋊[ψ] P) g, ⟨g, rfl⟩, ?_⟩
+      simp [F]
+  have h_map_Y : YPP.map F ≤ YAA := by
+    rintro _ ⟨_, ⟨p, rfl⟩, rfl⟩
+    exact ⟨p.1, by simp [F]⟩
+  have h_map_iter_all :
+      ∀ n : ℕ, (iterCommutator XGP YPP n).map F ≤ iterCommutator XGA YAA n := by
+    intro n
+    induction n with
+    | zero =>
+        simpa [iterCommutator_zero] using h_map_X.le
+    | succ n ih =>
+        rw [iterCommutator_succ, iterCommutator_succ, Subgroup.map_commutator]
+        exact Subgroup.commutator_mono ih h_map_Y
+  have h_map_bot : (iterCommutator XGP YPP m).map F = ⊥ := by
+    refine le_antisymm ?_ bot_le
+    exact (h_map_iter_all m).trans (le_of_eq h_iter)
+  exact (Subgroup.map_eq_bot_iff_of_injective (iterCommutator XGP YPP m) hF_inj).mp h_map_bot
+
+/-- **Isaacs Corollary 4.30**:
+Let `A` act faithfully on the finite group `G`. If an iterated commutator
+`[G, A, ..., A]` is trivial, then every prime divisor of `|A|` divides `|G|`.
+
+Proof: for a prime `p ∤ |G|`, restrict the action to a Sylow `p`-subgroup `P ≤ A`.
+The restricted action is coprime, and the chain hypothesis restricts from `A` to `P`.
+Lemma 4.29 collapses the restricted iterated commutator to `[G, P] = 1`, so `P`
+acts trivially. Faithfulness forces `P = 1`, hence `p ∤ |A|`. -/
+theorem prime_dvd_card_of_faithful_iterCommutator_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (h_inj : Function.Injective φ)
+    {m : ℕ} (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥)
+    {p : ℕ} (hp : p.Prime) (hpA : p ∣ Nat.card A) :
+    p ∣ Nat.card G := by
+  by_contra hpG
+  haveI : Fact p.Prime := ⟨hp⟩
+  let P : Sylow p A := default
+  let ψ : P →* MulAut G := φ.comp (P : Subgroup A).subtype
+  have h_iter_P :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range m = ⊥ := by
+    simpa [ψ] using
+      iterCommutator_inl_inr_restrict_eq_bot (φ := φ) (P : Subgroup A) h_iter
+  have hCop_PG : Nat.Coprime (Nat.card P) (Nat.card G) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    rw [hn]
+    exact Nat.Coprime.pow_left n ((Nat.Prime.coprime_iff_not_dvd hp).mpr hpG)
+  have hSolv : IsSolvable P ∨ IsSolvable G := by
+    left
+    haveI : Group.IsNilpotent P := P.isPGroup'.isNilpotent
+    infer_instance
+  have h_two :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 2 =
+        iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 1 :=
+    iterCommutator_inl_inr_two_eq_one (φ := ψ) hCop_PG hSolv
+  have h_iter_one :
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
+          (SemidirectProduct.inr : P →* G ⋊[ψ] P).range 1 = ⊥ := by
+    have h_m := iterCommutator_eq_one_of_two_eq_one h_two hm
+    rw [h_m] at h_iter_P
+    exact h_iter_P
+  have hP_le_ker : (⊤ : Subgroup P) ≤ ψ.ker := by
+    rw [← SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker]
+    rw [show (⊤ : Subgroup P).map (SemidirectProduct.inr : P →* G ⋊[ψ] P) =
+        (SemidirectProduct.inr : P →* G ⋊[ψ] P).range from
+        (MonoidHom.range_eq_map _).symm]
+    rw [Subgroup.commutator_comm]
+    exact h_iter_one
+  have hP_bot : (P : Subgroup A) = ⊥ := by
+    rw [Subgroup.eq_bot_iff_forall]
+    intro a ha
+    let x : P := ⟨a, ha⟩
+    have hx_ker : x ∈ ψ.ker := hP_le_ker (Subgroup.mem_top x)
+    rw [MonoidHom.mem_ker] at hx_ker
+    have hφa : φ a = 1 := by
+      simpa [ψ, x] using hx_ker
+    exact h_inj (by simpa using hφa)
+  exact (P.ne_bot_of_dvd_card hpA) hP_bot
 
 /-! ### Isaacs §4D Thm 4.34 ⭐ (Fitting, BG Prop 1.6(d)): G abelian + coprime ⇒
 G = C_G(A) × [G, A] -/
