@@ -52,6 +52,8 @@ precise statement is left as a TODO since it requires extra setup
   notation for the same nonzero restriction multiplicity.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
+  the Peterfalvi §3 (1.7) cyclic inertia-quotient hypothesis.
 * `OddOrder.RepresentationTheory.clifford_orbit_subset_inertia` — `H ≤ I_G(θ)`.
 
 ## References
@@ -149,6 +151,12 @@ def HasCommonRestrictionMultiplicity (χ : IrreducibleCharacter G) : Prop :=
   ∃ e : ℂ, ∀ θ : IrreducibleCharacter H, LiesOver H χ θ →
     ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
       (θ : ClassFunction H ℂ) = e
+
+/-- The cyclic inertia-quotient hypothesis from Peterfalvi §3 (1.7):
+`I_G(θ)/H` is cyclic. -/
+def HasCyclicInertiaQuotient (θ : IrreducibleCharacter H) : Prop :=
+  IsCyclic (ClassFunction.inertiaQuotient (G := G) (H := H)
+    (θ : ClassFunction H ℂ))
 
 end IrreducibleCharacter
 

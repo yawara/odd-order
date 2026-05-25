@@ -39,6 +39,9 @@ API がまだ不足している。
   constituent predicate への bridge を証明した。
 - `IrreducibleCharacter.RestrictionConstituentsSingleOrbit` と
   `IrreducibleCharacter.HasCommonRestrictionMultiplicity` を predicate として追加した。
+- `ClassFunction.inertiaQuotient θ = I_G(θ)/H` と
+  `IrreducibleCharacter.HasCyclicInertiaQuotient` を追加し、§3 (1.7) の
+  cyclic inertia quotient hypothesis を名前にした。
 - 次の小単位は、これらの predicate を結論に持つ Clifford core theorem の statement 化。
 
 ## 完了条件

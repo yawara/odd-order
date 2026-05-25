@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 
 /-!
@@ -32,10 +33,10 @@ mathlib に「class function 上の G-action」「Inertia group」は不在 (Pet
 
 * `ClassFunction.conjBy g θ` — `θ` を `g ∈ G` で conjugate した class function (`H ⊴ G`).
 * `ClassFunction.inertia θ : Subgroup G` — stabilizer subgroup.
+* `ClassFunction.inertiaQuotient θ` — Peterfalvi's inertia quotient `I_G(θ)/H`.
 
 ## TODO (本 commit 範囲外)
 
-- `inertia θ` の `H ⊴ inertia θ` (normal).
 - `MulAction G (ClassFunction ↥H k)` instance (要 H ⊴ G 抽象化).
 
 ## References
@@ -127,6 +128,24 @@ theorem subgroup_le_inertia (θ : ClassFunction ↥H k) : H ≤ inertia θ := by
     rfl
   rw [conjBy_apply, hconj]
   exact θ.conj_eq x y
+
+/-- Since `H ⊴ G`, the subgroup `H` remains normal inside the inertia group
+`I_G(θ)`. -/
+theorem subgroupOf_inertia_normal (θ : ClassFunction ↥H k) :
+    (H.subgroupOf (inertia θ)).Normal :=
+  hH.subgroupOf (inertia θ)
+
+/-- Membership in `H` after viewing it as a subgroup of `I_G(θ)`. -/
+@[simp] theorem mem_subgroupOf_inertia {θ : ClassFunction ↥H k} {g : inertia θ} :
+    g ∈ H.subgroupOf (inertia θ) ↔ (g : G) ∈ H :=
+  Subgroup.mem_subgroupOf
+
+/-- Peterfalvi's inertia quotient `I_G(θ)/H`.
+
+This is used in §3 (1.7), especially for the cyclic inertia-quotient
+multiplicity-one specialization. -/
+abbrev inertiaQuotient (θ : ClassFunction ↥H k) :=
+  inertia θ ⧸ H.subgroupOf (inertia θ)
 
 end ClassFunction
 
