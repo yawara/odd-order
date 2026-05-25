@@ -31,15 +31,17 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 ## Status
 
 * The **statements** are given here (modulo a `Fintype` indexing the irreducible characters).
-* The **proof** is deferred: the classical route uses invertibility of the character table
-  (matrix algebra). The lemma is needed by `BrauerPermutation` and by Peterfalvi §3 (1.2).
+* The **proof core** is `column_orthogonality_cases`.  It is deferred and routed to
+  `issues/0027-peterfalvi-column-orthogonality-core.md`: the classical route uses
+  invertibility of the character table (matrix algebra). The derived public lemmas
+  below are kept `sorry`-free.
 
 ## Main statements
 
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
-  derived from the diagonal case by class-function invariance.
+  the sum equals `|C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_not_conj` — for non-conjugate
   `g, h`: the sum vanishes.
 
@@ -55,18 +57,34 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+/-- Primitive cases form of the second (column) orthogonality theorem.
+
+The two projections are the conjugate and non-conjugate columns of the character-table
+orthogonality relation.  Public named corollaries below are derived from this single
+deferred proof core. -/
+theorem column_orthogonality_cases
+    [Fintype (IrreducibleCharacter G)]
+    (g h : G) :
+    (IsConj g h →
+      ∑ χ : IrreducibleCharacter G,
+          ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
+    (¬ IsConj g h →
+      ∑ χ : IrreducibleCharacter G,
+          ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0) := by
+  sorry
+
 /-- Diagonal second (column) orthogonality:
 `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 
-This is the primitive deferred statement for the conjugate column case; the
-off-diagonal non-conjugate case is still a separate character-table theorem. -/
+This is the `g = h` specialization of `column_orthogonality_cases`. -/
 theorem column_orthogonality_diag
     [Fintype (IrreducibleCharacter G)]
     (g : G) :
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  sorry
+  exact (column_orthogonality_cases g g).1 (IsConj.refl g)
 
 /-- **Second (column) orthogonality**, conjugate case ([Is] Thm 2.18 / 6.10).
 
@@ -77,26 +95,14 @@ carved out by `IsIrreducibleCharacter`. Such a `Fintype` is well-defined for fin
 `G`; supplying it as an explicit instance keeps this statement uncoupled from the
 eventual existence proof for the indexing type.
 
-This is a direct consequence of the diagonal case because every class function is
-constant on conjugacy classes. -/
+This is the conjugate projection of `column_orthogonality_cases`. -/
 theorem column_orthogonality_conj
     [Fintype (IrreducibleCharacter G)]
     {g h : G} (hgh : IsConj g h) :
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  calc
-    ∑ χ : IrreducibleCharacter G,
-        ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h)
-        = ∑ χ : IrreducibleCharacter G,
-            ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) := by
-          refine Finset.sum_congr rfl ?_
-          intro χ _
-          have hχ : (χ : ClassFunction G ℂ) g = (χ : ClassFunction G ℂ) h :=
-            ClassFunction.of_isConj (χ : ClassFunction G ℂ) hgh
-          rw [← hχ]
-    _ = (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) :=
-        column_orthogonality_diag g
+  exact (column_orthogonality_cases g h).1 hgh
 
 /-- **Second (column) orthogonality**, non-conjugate case ([Is] Thm 2.18 / 6.10).
 
@@ -106,6 +112,6 @@ theorem column_orthogonality_not_conj
     {g h : G} (hgh : ¬ IsConj g h) :
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0 := by
-  sorry
+  exact (column_orthogonality_cases g h).2 hgh
 
 end OddOrder.RepresentationTheory

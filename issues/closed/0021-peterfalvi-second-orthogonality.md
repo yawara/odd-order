@@ -17,11 +17,20 @@ stub 群の最初の依存で、issue 0022 より先に片付ける。
 
 - [x] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_conj`
       を `sorry` なしにする。
-- [ ] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_not_conj`
+- [x] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_not_conj`
       を `sorry` なしにする。
 - [x] irreducible character indexing API を小さく追加する。
 - [x] 既存 statement の `[Fintype {φ // IsIrreducibleCharacter φ}]` 仮定を
       named indexing type に変更し、downstream (`BrauerPermutation`) も追従する。
+
+## 2026-05-25 update
+
+- `column_orthogonality_cases` を単一の deferred proof core として追加した。
+- `column_orthogonality_diag`, `column_orthogonality_conj`,
+  `column_orthogonality_not_conj` はすべて `column_orthogonality_cases` から
+  `sorry` なしで導く形にした。
+- character-table invertibility / matrix algebra の proof core は
+  `issues/0027-peterfalvi-column-orthogonality-core.md` に分割した。
 
 ## 完了条件
 
@@ -32,6 +41,7 @@ stub 群の最初の依存で、issue 0022 より先に片付ける。
 ## 参照
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
+- split: `issues/0027-peterfalvi-column-orthogonality-core.md`
 - downstream: `issues/0022-peterfalvi-brauer-permutation.md`
 - `OddOrder/GroupTheory/RepresentationTheory/IrrIndexing.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/SecondOrthogonality.lean`
