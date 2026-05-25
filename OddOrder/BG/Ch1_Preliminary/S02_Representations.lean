@@ -978,6 +978,25 @@ private theorem subgroup_commutative_of_rank_one_subquotients
     (subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
       H W ρ hH hW hdimW hdimQ h.property)
 
+/-- Two-dimensional wrapper for
+`subgroup_commutative_of_rank_one_subquotients`.
+
+This is the form needed in BG Thm 2.6, q = p, after constructing a nonzero
+proper invariant fixed-space `W = C_V(K)`. -/
+private theorem subgroup_commutative_of_finrank_two_invariant_submodule
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Module.Finite F V]
+    (H : Subgroup G) (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ) (hH : IsPGroup p H)
+    (hW : ∀ h : H, W ≤ W.comap (ρ h))
+    (hdim : Module.finrank F V = 2) (hW_ne_bot : W ≠ ⊥) (hW_ne_top : W ≠ ⊤) :
+    Std.Commutative (· * · : H → H → H) := by
+  rcases rank_one_subquotients_of_finrank_two W hdim hW_ne_bot hW_ne_top with
+    ⟨hdimW, hdimQ⟩
+  exact subgroup_commutative_of_rank_one_subquotients
+    H W ρ hfaithful hH hW hdimW hdimQ
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 

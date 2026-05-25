@@ -45,6 +45,10 @@
 - **2026-05-25**: 2 次元空間の非零 proper submodule から `dim W = dim V/W = 1` を出す
   `rank_one_subquotients_of_finrank_two` を追加済み. q=p 分岐は次に `W = C_V(K)`
   の非零性・proper 性・`G`-invariance を作れば、既存 rank-one subquotient helper へ接続できる.
+- **2026-05-25**: q=p 分岐用の入口として
+  `subgroup_commutative_of_finrank_two_invariant_submodule` を追加済み.
+  非零 proper な invariant submodule `W` ができれば、2 次元性から rank-one
+  subquotient helper へ直接接続して p-subgroup の可換性を得られる.
 
 ## TL;DR
 
