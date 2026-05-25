@@ -18,7 +18,7 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
 - [x] `ConjClasses.inv` / `ConjClasses.IsReal` API が proof に十分か確認する。
 - [ ] `OddOrder.RepresentationTheory.brauer_permutation_lemma` を `sorry` なしにする。
 - [x] Peterfalvi §3 (1.1) 用の odd-order specialization を追加するか、別 issue に切る。
-- [ ] §6 (4.5.b) で再利用できる statement 名と namespace を維持する。
+- [x] §6 (4.5.b) で再利用できる statement 名と namespace を維持する。
 
 ## 2026-05-25 update
 
@@ -34,6 +34,18 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
   unique real character が trivial character であることの明示は、trivial-character
   API の後続として残す。
 
+## 2026-05-26 update
+
+- `RealIrreducibleCharacter G` と `ConjClasses.RealClass G` を名前付き型にした。
+- `brauer_permutation_lemma` は
+  `Nat.card (RealIrreducibleCharacter G) = Nat.card (ConjClasses.RealClass G)`
+  という readable な statement に揃えた。
+- Peterfalvi §3 側に (1.1) の cardinal form
+  `OddOrder.Peterfalvi.S03.card_realIrreducibleCharacters_eq_one_of_odd_card`
+  を追加した。
+- Brauer lemma の proof 本体は引き続き `issues/0027-peterfalvi-column-orthogonality-core.md`
+  の character-table invertibility に依存する。
+
 ## 完了条件
 
 - `BrauerPermutation.lean` の `brauer_permutation_lemma` から `sorry` が消える。
@@ -43,7 +55,8 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
 ## 参照
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
-- depends on: `issues/0021-peterfalvi-second-orthogonality.md`
+- depends on: `issues/closed/0021-peterfalvi-second-orthogonality.md`
+- depends on: `issues/0027-peterfalvi-column-orthogonality-core.md`
 - `OddOrder/GroupTheory/RepresentationTheory/IrrIndexing.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean`
 - `notes/peterfalvi/s03_preliminary_character.md`

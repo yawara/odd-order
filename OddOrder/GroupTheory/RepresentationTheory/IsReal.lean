@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Star.Basic
 import Mathlib.Algebra.Star.Module
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Real (self-conjugate) class functions
@@ -29,7 +30,8 @@ ringhom レベルのみ). 本モジュールで `ClassFunction.conj` と `IsReal
 
 ## TODO
 
-- `Irr G` 型完成後, (1.1) の statement (`|G| odd → ∀ χ ∈ Irr G, χ ≠ 1 → ¬ IsReal χ`).
+- trivial character API 完成後, (1.1) の pointwise statement
+  (`|G| odd → ∀ χ ∈ Irr G, χ ≠ 1 → ¬ IsReal χ`).
 - Brauer permutation lemma ([Is] Thm 6.32) → (1.1) の証明には別 module 要.
 
 ## References
@@ -108,5 +110,48 @@ theorem IsReal.sub {φ ψ : ClassFunction G k} (hφ : φ.IsReal) (hψ : ψ.IsRea
   rw [conj_sub, hφ, hψ]
 
 end ClassFunction
+
+/-- The type of real irreducible complex characters of `G`.
+
+This is Peterfalvi's `χ ∈ Irr(G)` with `χ̄ = χ`, named so that Brauer's
+permutation lemma and the odd-order specializations do not repeat the raw
+subtype expression. -/
+abbrev RealIrreducibleCharacter (G : Type*) [Group G] :=
+  {χ : IrreducibleCharacter G // ClassFunction.IsReal (χ : ClassFunction G ℂ)}
+
+namespace RealIrreducibleCharacter
+
+variable {G : Type*} [Group G]
+
+instance : Coe (RealIrreducibleCharacter G) (IrreducibleCharacter G) :=
+  ⟨fun χ => χ.1⟩
+
+instance : Coe (RealIrreducibleCharacter G) (ClassFunction G ℂ) :=
+  ⟨fun χ => (χ.1 : ClassFunction G ℂ)⟩
+
+@[simp] theorem coe_mk (χ : IrreducibleCharacter G)
+    (hχ : ClassFunction.IsReal (χ : ClassFunction G ℂ)) :
+    ((⟨χ, hχ⟩ : RealIrreducibleCharacter G) : IrreducibleCharacter G) = χ :=
+  rfl
+
+@[simp] theorem coe_mk_classFunction (χ : IrreducibleCharacter G)
+    (hχ : ClassFunction.IsReal (χ : ClassFunction G ℂ)) :
+    ((⟨χ, hχ⟩ : RealIrreducibleCharacter G) : ClassFunction G ℂ) =
+      (χ : ClassFunction G ℂ) :=
+  rfl
+
+@[simp] theorem isReal (χ : RealIrreducibleCharacter G) :
+    ClassFunction.IsReal (χ : ClassFunction G ℂ) :=
+  χ.2
+
+@[simp] theorem isIrreducible (χ : RealIrreducibleCharacter G) :
+    IsIrreducibleCharacter (χ : ClassFunction G ℂ) :=
+  χ.1.isIrreducible
+
+@[ext] theorem ext {χ ψ : RealIrreducibleCharacter G}
+    (h : (χ : IrreducibleCharacter G) = (ψ : IrreducibleCharacter G)) : χ = ψ :=
+  Subtype.ext h
+
+end RealIrreducibleCharacter
 
 end OddOrder.RepresentationTheory

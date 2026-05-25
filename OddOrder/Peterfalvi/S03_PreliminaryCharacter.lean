@@ -56,6 +56,17 @@ def ClosedUnderConjugate (S : Set (ClassFunction G ℂ)) : Prop :=
 def HasNoRealCharacters (S : Set (ClassFunction G ℂ)) : Prop :=
   ∀ ⦃χ : ClassFunction G ℂ⦄, χ ∈ S → ¬ χ.IsReal
 
+/-- **Peterfalvi (1.1)**, cardinal form.
+
+If `G` has odd order, then there is exactly one real irreducible complex
+character.  The sharper textbook phrasing says that every nontrivial
+irreducible character is non-real; identifying this unique real character with
+the trivial character is routed to the later trivial-character API. -/
+theorem card_realIrreducibleCharacters_eq_one_of_odd_card [Finite G]
+    (hodd : Odd (Nat.card G)) :
+    Nat.card (RealIrreducibleCharacter G) = 1 :=
+  OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card hodd
+
 /-- Pairwise orthogonality for a set of class functions, using the normalized
 inner product. -/
 def PairwiseOrthogonal (S : Set (ClassFunction G ℂ))

@@ -59,6 +59,15 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 
 **形式化**: ~15 行 (Phase 1 Thm 6.32 + character conjugation).
 
+**Lean status (2026-05-26)**:
+- `OddOrder.RepresentationTheory.RealIrreducibleCharacter G` names the subtype
+  `{χ ∈ Irr(G) | χ̄ = χ}`.
+- `OddOrder.Peterfalvi.S03.card_realIrreducibleCharacters_eq_one_of_odd_card`
+  records the cardinal form of (1.1):
+  `Nat.card (RealIrreducibleCharacter G) = 1` for odd `Nat.card G`.
+- The pointwise textbook form (`χ ≠ 1_G → χ̄ ≠ χ`) still waits for the
+  trivial-character API identifying the unique real irreducible character.
+
 ### (1.4) Tau Isometry — Core Dade Preparation
 
 **主張**: H finite, X ⊆ Irr(H), |X| = n ≥ 2, all χ_i(1) equal. τ: Z[X,H^#] → Z[Irr G, G^#] isometry ⇒ ∃ distinct μ_i ∈ Irr(G), ε = ±1: (χ_i - χ_1)^τ = ε(μ_i - μ_1) for all i.

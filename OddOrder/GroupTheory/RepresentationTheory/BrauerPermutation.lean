@@ -35,6 +35,7 @@ left as `sorry` here.
 
 * `ConjClasses.inv` — `⟦g⟧ ↦ ⟦g⁻¹⟧`. Involutive.
 * `ConjClasses.IsReal` — `C` is real iff `inv C = C`.
+* `ConjClasses.RealClass` — the type of self-inverse conjugacy classes.
 
 ## Main results
 
@@ -138,6 +139,28 @@ theorem isReal_mk_iff (g : G) : IsReal (ConjClasses.mk g) ↔ IsConj g⁻¹ g :=
 
 @[simp] theorem isReal_one : IsReal (1 : ConjClasses G) := inv_one
 
+/-- The type of real (self-inverse) conjugacy classes of `G`. -/
+abbrev RealClass (G : Type*) [Group G] :=
+  {C : ConjClasses G // IsReal C}
+
+namespace RealClass
+
+instance : Coe (RealClass G) (ConjClasses G) :=
+  ⟨fun C => C.1⟩
+
+@[simp] theorem coe_mk (C : ConjClasses G) (hC : IsReal C) :
+    ((⟨C, hC⟩ : RealClass G) : ConjClasses G) = C :=
+  rfl
+
+@[simp] theorem isReal (C : RealClass G) : IsReal (C : ConjClasses G) :=
+  C.2
+
+@[ext] theorem ext {C D : RealClass G}
+    (h : (C : ConjClasses G) = (D : ConjClasses G)) : C = D :=
+  Subtype.ext h
+
+end RealClass
+
 /-- In a finite group of odd order, the only real conjugacy class is the
 identity class. -/
 theorem eq_one_of_isReal_of_odd_card [Finite G] (hodd : Odd (Nat.card G))
@@ -152,7 +175,7 @@ theorem eq_one_of_isReal_of_odd_card [Finite G] (hodd : Odd (Nat.card G))
 /-- In a finite group of odd order, the subtype of real conjugacy classes is
 subsingleton. -/
 theorem subsingleton_realClasses_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) :
-    Subsingleton { C : ConjClasses G // IsReal C } where
+    Subsingleton (RealClass G) where
   allEq A B := by
     exact Subtype.ext (by
       rw [eq_one_of_isReal_of_odd_card hodd A.property,
@@ -161,7 +184,7 @@ theorem subsingleton_realClasses_of_odd_card [Finite G] (hodd : Odd (Nat.card G)
 /-- In a finite group of odd order, there is exactly one real conjugacy class:
 the identity class. -/
 theorem card_realClasses_eq_one_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) :
-    Nat.card { C : ConjClasses G // IsReal C } = 1 := by
+    Nat.card (RealClass G) = 1 := by
   letI := subsingleton_realClasses_of_odd_card (G := G) hodd
   exact Nat.card_of_subsingleton ⟨1, isReal_one⟩
 
@@ -183,9 +206,7 @@ to relate the two compatible involutions `χ ↦ χ̄` on `Irr G` and `C ↦ C�
 (Proof deferred: requires the Wave 1a `SecondOrthogonality` module + a finite indexing
 API for `irreducibleCharacters G`.) -/
 theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G] :
-    Nat.card { χ : IrreducibleCharacter G //
-                 ClassFunction.IsReal (χ : ClassFunction G ℂ) } =
-    Nat.card { C : ConjClasses G // ConjClasses.IsReal C } := by
+    Nat.card (RealIrreducibleCharacter G) = Nat.card (ConjClasses.RealClass G) := by
   sorry
 
 /-- Odd-order cardinal specialization of Brauer's permutation lemma.
@@ -195,8 +216,7 @@ This is the cardinal form of Peterfalvi §3 (1.1); identifying the unique
 character with the trivial character is left to the later trivial-character API. -/
 theorem card_realIrreducibleCharacters_eq_one_of_odd_card {G : Type*} [Group G]
     [Finite G] (hodd : Odd (Nat.card G)) :
-    Nat.card { χ : IrreducibleCharacter G //
-                 ClassFunction.IsReal (χ : ClassFunction G ℂ) } = 1 := by
+    Nat.card (RealIrreducibleCharacter G) = 1 := by
   rw [brauer_permutation_lemma, ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
 
 end OddOrder.RepresentationTheory
