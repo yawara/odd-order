@@ -732,6 +732,26 @@ structure SubgroupPartition (G : Type*) [Group G] where
 
 namespace SubgroupPartition
 
+private theorem finite_subgroups_of_finite {G : Type*} [Group G] [Finite G] :
+    Finite (Subgroup G) :=
+  Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+
+private noncomputable def subgroupsOfCard (G : Type*) [Group G] [Finite G] (n : ℕ) :
+    Finset (Subgroup G) := by
+  classical
+  haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
+  haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
+  exact Finset.univ.filter fun H => Nat.card H = n
+
+private theorem mem_subgroupsOfCard {G : Type*} [Group G] [Finite G] {n : ℕ}
+    {H : Subgroup G} :
+    H ∈ subgroupsOfCard G n ↔ Nat.card H = n := by
+  classical
+  unfold subgroupsOfCard
+  haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
+  haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
+  simp
+
 variable {G : Type*} [Group G] (partn : SubgroupPartition G)
 
 /-- The set of parts is nonempty. -/
@@ -832,6 +852,149 @@ theorem nonidentitySigmaTo_surjective :
     exact g.2 (congrArg Subtype.val h)
   · ext
     rfl
+
+/-- The number of nonidentity elements in a finite group, as a subtype. -/
+private theorem card_ne_one_subtype {G : Type*} [Group G] [Finite G] :
+    Nat.card {g : G // g ≠ 1} = Nat.card G - 1 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hfilter :
+      (Finset.univ.filter fun g : G => g ≠ 1) = Finset.univ.erase 1 := by
+    ext g
+    simp
+  calc
+    Nat.card {g : G // g ≠ 1}
+        = Fintype.card {g : G // g ≠ 1} := Nat.card_eq_fintype_card
+    _ = (Finset.univ.filter fun g : G => g ≠ 1).card := Fintype.card_subtype _
+    _ = Fintype.card G - 1 := by
+      rw [hfilter, Finset.card_erase_of_mem (Finset.mem_univ (1 : G)), Finset.card_univ]
+    _ = Nat.card G - 1 := by rw [Nat.card_eq_fintype_card]
+
+/-- Counting nonidentity elements through a subgroup partition. If every part has size `c`,
+then `|Π| * (c - 1) = |G| - 1`. -/
+theorem parts_card_mul_sub_one_eq_card_sub_one [Finite G] {c : ℕ}
+    (hcard : ∀ X, X ∈ partn.parts → Nat.card X = c) :
+    partn.parts.card * (c - 1) = Nat.card G - 1 := by
+  classical
+  let domain :=
+    Σ X : {X : Subgroup G // X ∈ partn.parts}, {x : X.1 // x ≠ 1}
+  let codomain := {g : G // g ≠ 1}
+  haveI : Fintype {X : Subgroup G // X ∈ partn.parts} := inferInstance
+  have hdomain_sigma :
+      Nat.card domain =
+        ∑ X : {X : Subgroup G // X ∈ partn.parts}, Nat.card {x : X.1 // x ≠ 1} := by
+    rw [Nat.card_sigma]
+  have hdomain_const :
+      Nat.card domain = partn.parts.card * (c - 1) := by
+    calc
+      Nat.card domain
+          = ∑ X : {X : Subgroup G // X ∈ partn.parts},
+              Nat.card {x : X.1 // x ≠ 1} := hdomain_sigma
+      _ = ∑ _X : {X : Subgroup G // X ∈ partn.parts}, (c - 1) := by
+        refine Finset.sum_congr rfl ?_
+        intro X _hX
+        rw [card_ne_one_subtype (G := X.1), hcard X.1 X.2]
+      _ = Fintype.card {X : Subgroup G // X ∈ partn.parts} * (c - 1) := by
+        simp
+      _ = partn.parts.card * (c - 1) := by
+        rw [Fintype.card_coe partn.parts]
+  have hbij : Function.Bijective partn.nonidentitySigmaTo :=
+    ⟨partn.nonidentitySigmaTo_injective, partn.nonidentitySigmaTo_surjective⟩
+  have hdomain_codomain : Nat.card domain = Nat.card codomain :=
+    Nat.card_congr (Equiv.ofBijective partn.nonidentitySigmaTo hbij)
+  rw [hdomain_const, card_ne_one_subtype (G := G)] at hdomain_codomain
+  exact hdomain_codomain
+
+/-- The textbook partition of an elementary abelian group of order `p^2`: its parts are all
+subgroups of order `p`. -/
+noncomputable def elementaryAbelianPrimeSquare
+    {G : Type*} [Group G] [Finite G] {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p G) (hCard : Nat.card G = p ^ 2) :
+    SubgroupPartition G where
+  parts := subgroupsOfCard G p
+  nontrivial := by
+    intro X hX hX_bot
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hp_eq_one : p = 1 := by
+      rw [← hX_card, hX_bot, Subgroup.card_bot]
+    exact hp.ne_one hp_eq_one
+  proper := by
+    intro X hX hX_top
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hp_eq_sq : p = p ^ 2 := by
+      calc p = Nat.card X := hX_card.symm
+        _ = Nat.card G := by rw [hX_top, Subgroup.card_top]
+        _ = p ^ 2 := hCard
+    have hp_lt_sq : p < p ^ 2 := by
+      nth_rewrite 1 [← pow_one p]
+      exact pow_lt_pow_right₀ hp.one_lt (by norm_num : (1 : ℕ) < 2)
+    exact (ne_of_lt hp_lt_sq) hp_eq_sq
+  cover := by
+    haveI : Fact p.Prime := ⟨hp⟩
+    intro g
+    by_cases hg : g = 1
+    · have hCard_gt_one : 1 < Nat.card G := by
+        rw [hCard]
+        exact one_lt_pow₀ hp.one_lt two_ne_zero
+      haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
+      obtain ⟨x, hx_ne⟩ := exists_ne (1 : G)
+      let X : Subgroup G := Subgroup.zpowers x
+      have hX_card : Nat.card X = p := by
+        rw [show X = Subgroup.zpowers x from rfl, Nat.card_zpowers,
+          orderOf_eq_prime (hElem.pow_eq_one x) hx_ne]
+      refine ⟨X, mem_subgroupsOfCard.mpr hX_card, ?_⟩
+      rw [hg]
+      exact X.one_mem
+    · let X : Subgroup G := Subgroup.zpowers g
+      have hX_card : Nat.card X = p := by
+        rw [show X = Subgroup.zpowers g from rfl, Nat.card_zpowers,
+          orderOf_eq_prime (hElem.pow_eq_one g) hg]
+      exact ⟨X, mem_subgroupsOfCard.mpr hX_card, Subgroup.mem_zpowers g⟩
+  inf_eq_bot_of_ne := by
+    intro X Y hX hY hXY
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hY_card : Nat.card Y = p := mem_subgroupsOfCard.mp hY
+    by_contra hInf_ne
+    have hInf_gt_one : 1 < Nat.card (X ⊓ Y : Subgroup G) := by
+      have hpos : 0 < Nat.card (X ⊓ Y : Subgroup G) := Nat.card_pos
+      have hne_one : Nat.card (X ⊓ Y : Subgroup G) ≠ 1 := by
+        intro hcard
+        exact hInf_ne (Subgroup.eq_bot_of_card_eq (X ⊓ Y : Subgroup G) hcard)
+      omega
+    have hInf_dvd_X : Nat.card (X ⊓ Y : Subgroup G) ∣ Nat.card X :=
+      Subgroup.card_dvd_of_le inf_le_left
+    have hInf_card : Nat.card (X ⊓ Y : Subgroup G) = p := by
+      rw [hX_card] at hInf_dvd_X
+      rcases (Nat.dvd_prime hp).mp hInf_dvd_X with h | h
+      · exact False.elim ((not_lt_of_ge (le_of_eq h)) hInf_gt_one)
+      · exact h
+    have hInf_eq_X : X ⊓ Y = X := by
+      apply Subgroup.eq_of_le_of_card_ge inf_le_left
+      rw [hX_card, hInf_card]
+    have hX_le_Y : X ≤ Y := by
+      intro x hx
+      have hxInf : x ∈ X ⊓ Y := by simpa [hInf_eq_X] using hx
+      exact hxInf.2
+    have hXY_eq : X = Y := by
+      apply Subgroup.eq_of_le_of_card_ge hX_le_Y
+      rw [hX_card, hY_card]
+    exact hXY hXY_eq
+
+/-- The elementary abelian `p^2` partition has the textbook cardinality `p + 1`. -/
+theorem elementaryAbelianPrimeSquare_parts_card
+    {G : Type*} [Group G] [Finite G] {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p G) (hCard : Nat.card G = p ^ 2) :
+    (elementaryAbelianPrimeSquare hp hElem hCard).parts.card = p + 1 := by
+  let partn := elementaryAbelianPrimeSquare hp hElem hCard
+  have hcount :
+      partn.parts.card * (p - 1) = Nat.card G - 1 :=
+    parts_card_mul_sub_one_eq_card_sub_one (partn := partn)
+      (fun X hX => mem_subgroupsOfCard.mp hX)
+  have hfactor : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    simpa using (Nat.sq_sub_sq p 1)
+  have hmul : partn.parts.card * (p - 1) = (p + 1) * (p - 1) := by
+    rw [hcount, hCard, hfactor]
+  exact Nat.eq_of_mul_eq_mul_right (Nat.sub_pos_of_lt hp.one_lt) hmul
 
 end SubgroupPartition
 
@@ -1320,6 +1483,35 @@ theorem false_of_frobeniusAction_actorSubgroup_partition_of_card_eq_succ_and_dvd
     False :=
   false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
     (IsFrobeniusAction.actorSubgroup hFrob B) partn hcard hdvd
+
+/-- **Isaacs Thm 6.9**: a Frobenius actor cannot be elementary abelian of order `p^2`. -/
+theorem false_of_frobeniusAction_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p A) (hCard : Nat.card A = p ^ 2) :
+    False := by
+  let partn := SubgroupPartition.elementaryAbelianPrimeSquare hp hElem hCard
+  have hparts :
+      partn.parts.card = p + 1 :=
+    SubgroupPartition.elementaryAbelianPrimeSquare_parts_card hp hElem hCard
+  have hdvd : p ∣ Nat.card A := by
+    rw [hCard, pow_two]
+    exact dvd_mul_right p p
+  exact false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    hFrob partn hparts hdvd
+
+/-- Subgroup form of Isaacs Thm 6.9: an elementary abelian `p^2` subgroup cannot occur in a
+Frobenius actor. -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2) :
+    False :=
+  false_of_frobeniusAction_isElementaryAbelian_card_prime_sq
+    (IsFrobeniusAction.actorSubgroup hFrob B) hp hElem hCard
 
 end
 

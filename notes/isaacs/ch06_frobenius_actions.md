@@ -311,8 +311,13 @@ FT クリティカル度 + 章内依存で並べる:
   `false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card`
   および subgroup actor 版まで実装済み. `IsFrobeniusAction.actorSubgroup`
   で「A の部分群へ置き換える」本文操作も Lean 化した.
-  残りは elementary abelian `p^2` / solvable Frobenius group から具体的な
-  `SubgroupPartition` を作る 6.9 側の構成.
+- 6.9 elementary abelian `p^2` 分岐:
+  `SubgroupPartition.elementaryAbelianPrimeSquare` と
+  `elementaryAbelianPrimeSquare_parts_card` を実装. parts は位数 `p` の全 subgroup,
+  cardinality は `p + 1`. これを contradiction package に接続して
+  `false_of_frobeniusAction_isElementaryAbelian_card_prime_sq` / subgroup actor 版まで
+  sorry-free.
+  残りは solvable Frobenius group から具体的な `SubgroupPartition` を作る 6.9 側の構成.
 
 ## 開発時の注意点
 
