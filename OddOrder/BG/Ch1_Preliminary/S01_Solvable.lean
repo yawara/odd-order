@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.GroupTheory.FrattiniPGroup
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.QuotientGroup.Basic
@@ -39,6 +40,8 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | **Lem 1.1** (部分) | Ch.3 Thm 3.11 + Ch.1 Fitting | — | ✅ **sorry-free 部分** (M elem ab + ≤ F(G); Z(F(G)) は Ch.4 待ち) |
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
+| **Lem 1.7(b)(c⇒)(d⊇)** | — | `OddOrder.GroupTheory.FrattiniPGroup` ✅ | ✅ **sorry-free shared module** |
+| **Lem 1.7(c⇐)** | Isaacs Lem 4.5 | `frattini_le_iff_isElementaryAbelian_quotient_of_pgroup` ✅ | ✅ **sorry-free** |
 | Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
 | Thm 1.13 | (Thompson critical) | (Phase 1 未) | Phase 1 待ち |
 | **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
@@ -64,9 +67,13 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 
 ## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1B §1C §1G 部分着手
 
-- **Skeleton** + **§1B/§1F docstring mapping** + **13 結果 全 sorry-free**:
+- **Skeleton** + **§1B/§1F docstring mapping** + **16 結果/補題 全 sorry-free**:
   - **Lem 1.1 (部分)** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free (Z(F(G)) 部分は Ch.4 待ち)
   - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
+  - **Lem 1.7(b)** `quotient_frattini_isElementaryAbelian` ⭐ sorry-free (shared module)
+  - **Lem 1.7(c⇒)** `isElementaryAbelian_of_frattini_eq_bot` ⭐ sorry-free (shared module)
+  - **Lem 1.7(c)** `frattini_eq_bot_iff_isElementaryAbelian` ⭐ sorry-free (Ch.4 Lem 4.5)
+  - **Lem 1.7(d⊇)** `commutator_sup_pow_closure_le_frattini` ⭐ sorry-free (shared module)
   - **Thm 1.8** `burnside_operator` ⭐ sorry-free (Isaacs Cor 3.29 `aFixed_quotient_frattini` 経由)
   - **Lem 1.9 (2-step)** `coprime_actsTrivially_of_normal_and_quotient` ⭐ sorry-free (Isaacs Cor 3.28 経由)
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
@@ -151,6 +158,65 @@ BG 原 statement は R p-group の文脈だが proof は finite group で成立.
 theorem eq_top_of_sup_frattini_eq_top {G : Type*} [Group G] [Finite G]
     {H : Subgroup G} (h : H ⊔ frattini G = ⊤) : H = ⊤ :=
   frattini_nongenerating h
+
+/-- **BG Lemma 1.7(b)**: For a finite p-group `R`, `R/Φ(R)` is elementary abelian.
+
+The proof lives in the shared `OddOrder.GroupTheory.FrattiniPGroup` module because the same
+finite p-group Frattini facts are reused outside BG §1. -/
+theorem quotient_frattini_isElementaryAbelian
+    {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    (hR : IsPGroup p R) :
+    OddOrder.GroupTheory.IsElementaryAbelian p (R ⧸ frattini R) :=
+  OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian hR
+
+/-- **BG Lemma 1.7(c) (⇒ direction)**: For a finite p-group `R`,
+`Φ(R) = 1` implies that `R` is elementary abelian.
+
+The reverse direction needs the finite elementary abelian hyperplane/complement argument and is
+left to the later Frattini completion slice. -/
+theorem isElementaryAbelian_of_frattini_eq_bot
+    {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    (hR : IsPGroup p R) (hFrat : frattini R = ⊥) :
+    OddOrder.GroupTheory.IsElementaryAbelian p R :=
+  OddOrder.GroupTheory.IsPGroup.isElementaryAbelian_of_frattini_eq_bot hR hFrat
+
+private theorem quotient_bot_isElementaryAbelian
+    {p : ℕ} {R : Type*} [Group R]
+    (hR : OddOrder.GroupTheory.IsElementaryAbelian p R) :
+    OddOrder.GroupTheory.IsElementaryAbelian p (R ⧸ (⊥ : Subgroup R)) := by
+  refine ⟨?_, ?_⟩
+  · intro a b
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (⊥ : Subgroup R) a
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective (⊥ : Subgroup R) b
+    rw [← map_mul, hR.1 x y, map_mul]
+  · intro a
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (⊥ : Subgroup R) a
+    rw [← map_pow, hR.2 x, map_one]
+
+/-- **BG Lemma 1.7(c)**: For a finite p-group `R`, `Φ(R) = 1` iff `R` is elementary abelian.
+
+Forward direction is the direct Frattini p-group argument. Reverse direction uses Isaacs Lemma 4.5:
+`Φ(P) ≤ N ↔ P/N` is elementary abelian, with `N = ⊥`. -/
+theorem frattini_eq_bot_iff_isElementaryAbelian
+    {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    (hR : IsPGroup p R) :
+    frattini R = ⊥ ↔ OddOrder.GroupTheory.IsElementaryAbelian p R := by
+  refine ⟨isElementaryAbelian_of_frattini_eq_bot hR, fun hElem => ?_⟩
+  have hle : frattini R ≤ (⊥ : Subgroup R) :=
+    (OddOrder.Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup
+      (P := R) (p := p) (N := (⊥ : Subgroup R)) hR).2
+      (quotient_bot_isElementaryAbelian hElem)
+  exact le_antisymm hle bot_le
+
+/-- **BG Lemma 1.7(d) (⊇ direction)**: In a finite p-group `R`, the subgroup generated by
+commutators and p-th powers lies in `Φ(R)`.
+
+The reverse inclusion is deferred with Lemma 1.7(c) (⇐). -/
+theorem commutator_sup_pow_closure_le_frattini
+    {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
+    (hR : IsPGroup p R) :
+    commutator R ⊔ Subgroup.closure (Set.range (fun x : R => x ^ p)) ≤ frattini R :=
+  OddOrder.GroupTheory.IsPGroup.commutator_sup_pow_closure_le_frattini hR
 
 /-- **BG Theorem 1.8 (Burnside, operator on p-group)**: `A` を operator group とし,
 `R` を p-群とする. `(|A|, |R|) = 1` かつ `A` が `R/Φ(R)` に自明に作用するとき,
