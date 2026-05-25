@@ -57,6 +57,18 @@
 - **Thm 4.22 semidirect** `derivedSeries_le_ker_of_iter_inl_inr_eq_bot`: `iter (inl(G).range) (inr(A).range) m = ⊥ ⇒ derivedSeries A (m-1) ≤ φ.ker`. abstract form + bridge + transport (subtype_comp_rangeRestrict + map_derivedSeries_eq). Faithful 版 `derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful`. ~50 LOC.
 - 総 ~280 LOC. **残**: Thm 4.24 (A nilpotent, 要 lcs 安定値 A^∞ infra + |G|-induction).
 
+§4D **Thm 4.36 ⭐⭐⭐ 完成** (2026-05-25, **= BG Thm 1.11, FT クリティカル**): `p > 2`, `G` p-群, `A` p'-群 fixes order-p ⇒ A trivial on G.
+- **Lem 4.37(b) element form** `baerAdd_pow_self_eq_pow_succ`: `baerAdd (x^n) x = x^(n+1)` (仮定不要). Commute.pow_self + baerAdd_eq_mul_of_commute + pow_succ. ~5 LOC.
+- **`BaerMul G := G`** 型 wrapper + `CommGroup (BaerMul G)` instance under `Fact (Odd (Nat.card G))` + `Fact (commutator G ≤ Z(G))`. baerAdd を `*` とする可換群. npow は default (`npowRec` = baerAdd-iterate). ~80 LOC.
+- **Translation infra**: `actionCommutator_eq_bot_iff_acts_trivially` (汎用 iff), `MulAut.toBaerMul`, `MonoidHom.toBaerMulLift` (Lem 4.37(c) で φ : A →* MulAut G ⇒ A →* MulAut (BaerMul G)), `BaerMul.npow_eq_pow`, `BaerMul.pow_eq_one_iff`, `BaerMul.isPGroup_iff`. ~75 LOC.
+- **`IsAInvariant.toMulAutHom`**: A-不変 H への φ 制限 (A →* MulAut ↥H). 強帰納法 IH を subgroup に適用するため. ~25 LOC.
+- **`actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime`** (Lem 4.28 系): coprime + (A or G solvable) で A trivial on `actionCommutator φ` ⇒ A trivial on whole G. ~15 LOC.
+- **`actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p`** (Thm 4.36 **class ≤ 2 case**): BaerMul wrapper で `(G, +)` を可換群として扱い Cor 4.35 を適用. ~50 LOC.
+- **`isaacs_thm_4_36`** (full theorem, 強帰納法):
+  * [G,A] < G case: IH on actionCommutator + Lem 4.28 系
+  * [G,A] = G case: G' = commutator G < ⊤ (G nilpotent solvable), IH on G', Three-subgroups in Γ = G ⋊ A で ⁅XG, XG'⁆ = ⊥ ⇒ G' ⊆ Z(G) ⇒ class ≤ 2 ⇒ class ≤ 2 case 適用
+- AxiomsCheck flagship 入り (3 axiom all allowlist). 総計 ~440 LOC, 4 commit.
+
 §4D **`actionCommutator` 定義 + A-不変性 + G-Normal 完成** (2026-05-23): `[G, A]_φ` 記号の自然な実装.
 - `actionCommutator φ := Subgroup.closure {g * (φ a) g⁻¹ | g a}`. `Γ = G ⋊[φ] A` 内で
   `⁅inl(G), inr(A)⁆` を `inl` 経由で pull back したもの (∵ `[inl(g), inr(a)] = inl(g * (φ a) g⁻¹)`).
