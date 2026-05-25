@@ -1535,6 +1535,23 @@ private lemma square_eq_one_or_unique_involution_of_square_sq_one
   · exact Or.inr (h_z_unique (a ^ 2)
       (Subgroup.sq_mem_of_index_two h_idx a) h_a_sq_sq h_a_sq_one)
 
+private lemma two_le_exponent_of_nonabelian_index_two
+    {P : Type*} [Group P] [Finite P] (c : P) {k : ℕ}
+    (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_order : orderOf c = 2 ^ k)
+    (hk_pos : 0 < k) :
+    2 ≤ k := by
+  by_contra hk_not
+  have hk_eq : k = 1 := by omega
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hcard : Nat.card P = 2 ^ 2 := by
+    have h := (Subgroup.zpowers c).index_mul_card
+    rw [h_idx, Nat.card_zpowers, h_order, hk_eq] at h
+    omega
+  obtain ⟨x, y, hxy⟩ := h_nonab
+  exact hxy (IsPGroup.commutative_of_card_eq_prime_sq (p := 2) hcard x y)
+
 private noncomputable def semiDihedralIsoOfTwistInvolution
     {P : Type*} [Group P] [Finite P]
     (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
