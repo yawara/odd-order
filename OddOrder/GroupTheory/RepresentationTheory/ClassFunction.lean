@@ -159,6 +159,46 @@ theorem mem_support_of_isConj {φ : ClassFunction G k} {g₁ g₂ : G}
   rw [mem_support, ← φ.of_isConj hg]
   exact h
 
+/-- The support of a sum is contained in the union of the supports. -/
+theorem support_add_subset (φ ψ : ClassFunction G k) :
+    (φ + ψ).support ⊆ φ.support ∪ ψ.support := by
+  intro g hg
+  by_cases hφ : φ g = 0
+  · right
+    by_contra hψ
+    have hψ_zero : ψ g = 0 := by simpa [mem_support] using hψ
+    exact hg (by simp [hφ, hψ_zero])
+  · left
+    exact hφ
+
+/-- The support of a scalar multiple is contained in the original support. -/
+theorem support_smul_subset (c : k) (φ : ClassFunction G k) :
+    (c • φ).support ⊆ φ.support := by
+  intro g hg
+  by_contra hφ
+  have hφ_zero : φ g = 0 := by simpa [mem_support] using hφ
+  exact hg (by simp [hφ_zero])
+
+/-- The submodule of class functions supported on `A`.
+
+This is Peterfalvi's `CF(G, A)`. -/
+def supportedSubmodule (A : Set G) : Submodule k (ClassFunction G k) where
+  carrier := { φ | φ.support ⊆ A }
+  zero_mem' := by
+    intro g hg
+    simp [support] at hg
+  add_mem' {φ ψ} hφ hψ := by
+    intro g hg
+    rcases support_add_subset φ ψ hg with h | h
+    · exact hφ h
+    · exact hψ h
+  smul_mem' c φ hφ := by
+    intro g hg
+    exact hφ (support_smul_subset c φ hg)
+
+@[simp] theorem mem_supportedSubmodule {A : Set G} {φ : ClassFunction G k} :
+    φ ∈ supportedSubmodule (G := G) (k := k) A ↔ φ.support ⊆ A := Iff.rfl
+
 end Support
 
 section Inner
