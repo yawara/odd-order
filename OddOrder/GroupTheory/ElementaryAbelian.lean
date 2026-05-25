@@ -167,4 +167,31 @@ theorem exists_distinct_subgroups_card_prime_of_isElementaryAbelian_card_prime_s
   exact ⟨K, L, Subgroup.map_subtype_le K₀, Subgroup.map_subtype_le L₀,
     hK_card, hL_card, hKL_ne⟩
 
+/-- If `G` contains an elementary abelian subgroup of order `p^2`, then `G` contains two
+distinct subgroups of order `p`. -/
+theorem exists_distinct_subgroups_card_prime_of_exists_isElementaryAbelian_card_prime_sq
+    {p : ℕ} (hp : p.Prime)
+    (hExists : ∃ H : Subgroup G, H.IsElementaryAbelian p ∧ Nat.card H = p ^ 2) :
+    ∃ K L : Subgroup G, Nat.card K = p ∧ Nat.card L = p ∧ K ≠ L := by
+  obtain ⟨H, hH_elem, hH_card⟩ := hExists
+  haveI : Finite H := Nat.finite_of_card_ne_zero (by
+    rw [hH_card]
+    exact pow_ne_zero 2 hp.ne_zero)
+  obtain ⟨K, L, _hK_le, _hL_le, hK_card, hL_card, hKL_ne⟩ :=
+    exists_distinct_subgroups_card_prime_of_isElementaryAbelian_card_prime_sq
+      hp hH_elem hH_card
+  exact ⟨K, L, hK_card, hL_card, hKL_ne⟩
+
+/-- If `G` has at most one subgroup of order `p`, then it contains no elementary abelian
+subgroup of order `p^2`. -/
+theorem not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    {p : ℕ} (hp : p.Prime)
+    (hUnique : ∀ K L : Subgroup G, Nat.card K = p → Nat.card L = p → K = L) :
+    ¬ ∃ H : Subgroup G, H.IsElementaryAbelian p ∧ Nat.card H = p ^ 2 := by
+  intro hExists
+  obtain ⟨K, L, hK_card, hL_card, hKL_ne⟩ :=
+    exists_distinct_subgroups_card_prime_of_exists_isElementaryAbelian_card_prime_sq
+      hp hExists
+  exact hKL_ne (hUnique K L hK_card hL_card)
+
 end Subgroup
