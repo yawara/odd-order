@@ -43,6 +43,8 @@ The `Z[Irr]` field should be added to this same interface once the Wave 1a
 * `OddOrder.Peterfalvi.S04.Hypothesis` — Peterfalvi Hypothesis (2.2), bundled.
 * `OddOrder.Peterfalvi.S04.DadeMap` and `IsDadeIsometry` — the current
   inner-product part of the Dade isometry interface.
+* `OddOrder.Peterfalvi.S04.DadeIsometryData` — a bundled map with the current
+  Dade-map equations and normalized isometry property.
 
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
@@ -497,6 +499,58 @@ theorem restrictDomain {τ : DadeMap (G := G) k A L} (hτ : IsDadeIsometry τ)
       (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A β)
 
 end IsDadeIsometry
+
+/-- A bundled Dade isometry candidate relative to `hyp`.
+
+This packages the pointwise equations from Peterfalvi (2.5) together with the
+currently formalized normalized inner-product part of (2.6).  The
+virtual-character preservation field from (2.6.b) should be added once
+`Z[Irr]` is available. -/
+structure DadeIsometryData (hyp : Hypothesis G A L) where
+  toDadeMap : DadeMap (G := G) k A L
+  isDadeMap : IsDadeMap hyp toDadeMap
+  isDadeIsometry : IsDadeIsometry toDadeMap
+
+namespace DadeIsometryData
+
+variable {hyp : Hypothesis G A L}
+
+instance : CoeFun (DadeIsometryData (G := G) (k := k) hyp)
+    (fun _ => DadeMap (G := G) k A L) :=
+  ⟨fun τ => τ.toDadeMap⟩
+
+@[simp] theorem coe_mk (τ : DadeMap (G := G) k A L)
+    (hmap : IsDadeMap hyp τ) (hiso : IsDadeIsometry τ) :
+    ((DadeIsometryData.mk τ hmap hiso : DadeIsometryData (G := G) (k := k) hyp) :
+      DadeMap (G := G) k A L) = τ :=
+  rfl
+
+/-- Restrict a bundled Dade isometry to an `L`-stable subset `A₁ ⊆ A`.
+
+This is the bundled form of the currently available part of Peterfalvi (2.11). -/
+def restrict (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    DadeIsometryData (G := G) (k := k) (hyp.restrict hA₁A hA₁_norm) where
+  toDadeMap := DadeMap.restrictDomain (G := G) (k := k) (L := L) τ.toDadeMap hA₁A
+  isDadeMap := IsDadeMap.restrictDomain τ.isDadeMap hA₁A hA₁_norm
+  isDadeIsometry := IsDadeIsometry.restrictDomain τ.isDadeIsometry hA₁A
+
+@[simp] theorem restrict_toDadeMap
+    (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap =
+      DadeMap.restrictDomain (G := G) (k := k) (L := L) τ.toDadeMap hA₁A :=
+  rfl
+
+@[simp] theorem restrict_apply
+    (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap α =
+      τ.toDadeMap (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) :=
+  rfl
+
+end DadeIsometryData
 
 end DadeMap
 
