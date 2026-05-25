@@ -1001,10 +1001,34 @@ Focal/Burnside は Ch05 側に BG から引用する public entrypoint を置く
 
 /-! ## §1G: p-length one + p-group normal series (Lem 1.21, Lem 1.22)
 
-- **Lem 1.21** (p-length one の 5 性質): BG-unique def, 別ファイル `PLength.lean` (将来).
+- **Lem 1.21** (p-length one の 5 性質): `HasPLengthOne` として定義を固定.
 - **Lem 1.22** (p-group normal series): 本ファイル下記.
 
 ### Lem 1.22 implementation -/
+
+/-- The BG subgroup `O_{π',π,π'}(G)`.
+
+It is defined as the preimage of `O_{π'}` in `G / O_{π',π}(G)`, where
+`O_{π',π}` is the Phase 1 subgroup `OddOrder.Isaacs.Ch03.oPiPrimePiCore`. -/
+noncomputable def oPiPrimePiPiPrimeCore (π : Set ℕ) (G : Type*) [Group G] :
+    Subgroup G :=
+  Subgroup.comap
+    (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiPrimePiCore π G))
+    (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ π}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiPrimePiCore π G))
+
+instance oPiPrimePiPiPrimeCore.normal (π : Set ℕ) (G : Type*) [Group G] :
+    (oPiPrimePiPiPrimeCore π G).Normal := by
+  rw [oPiPrimePiPiPrimeCore]
+  infer_instance
+
+/-- BG `π`-length one: `G = O_{π',π,π'}(G)`. -/
+def HasPiLengthOne (π : Set ℕ) (G : Type*) [Group G] : Prop :=
+  oPiPrimePiPiPrimeCore π G = ⊤
+
+/-- BG `p`-length one: the singleton-prime specialization of `HasPiLengthOne`. -/
+def HasPLengthOne (p : ℕ) (G : Type*) [Group G] : Prop :=
+  HasPiLengthOne ({p} : Set ℕ) G
 
 variable {p : ℕ} [hp : Fact p.Prime] {G : Type*} [Group G] [Finite G]
 

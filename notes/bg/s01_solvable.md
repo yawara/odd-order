@@ -43,6 +43,10 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   intervals: an element/subgroup centralizing all chief factors of `G` must lie in `F(G*)`.
 - **Prop 1.4 remains open**: with Prop 1.3 now available, the remaining work is the book's
   semidirect-product/Hall-σ route for coprime automorphism groups.
+- **Lemma 1.21 definition fixed**: `O_{π',π,π'}(G)` is now
+  `oPiPrimePiPiPrimeCore π G`, and BG p-length one is `HasPLengthOne p G`
+  (`HasPiLengthOne {p} G`). This reuses Phase 1 `OddOrder.Isaacs.Ch03.oPiCore`
+  / `oPiPrimePiCore` instead of adding another O_π API.
 
 ## TL;DR
 
@@ -78,7 +82,7 @@ Isaacs Phase 1 と比較:
 | 1.18 | Thm | 513-545 | **Burnside normal p-complement**: S Sylow p ⊆ Z(N_G(S)) ⇒ ∃ normal p-complement | **Isaacs Thm 5.13** (完全一致) | (Burnside p-comp として参照) | high (mathlib `Transfer`) | ★ |
 | 1.19 | Cor | 547-554 | 1.18 系: (a) cyclic Sylow p ⇒ S ∩ G' = 1 or S ⊆ G' (b) Z-group ⇒ G' Hall | derived from 1.18 | (Cor) | high | ★ |
 | 1.20 | Thm | 556-560 | **Maschke**: char(F) = 0 or coprime to |G| ⇒ representation completely reducible | Isaacs / Gorenstein 3.3.2 / **mathlib** | §2 周辺 | **high** (mathlib `Maschke`) | ★ |
-| 1.21 | Lemma | 564-577 | **p-length basic properties** 5 部: (a) p-length 1 subgroup → p-length 1 (b) normal p'-sub + quotient p-length 1 ⇒ p-length 1 等 | Isaacs Ch.7 部分 / Gorenstein 基本 | §6, §16 (4回) | mid (p-length 定義 BG unique) | ★★ |
+| 1.21 | Lemma | 564-577 | **p-length basic properties** 5 部: (a) p-length 1 subgroup → p-length 1 (b) normal p'-sub + quotient p-length 1 ⇒ p-length 1 等 | Isaacs Ch.7 部分 / Gorenstein 基本 | §6, §16 (4回) | mid (`HasPLengthOne` 定義済) | ★★ |
 | 1.22 | Lemma | 580-583 | **p-group normal subgroup structure**: p-group G, N ⊴ G, |N|=p^k ⇒ ∀ r ≤ k, N contains normal subgroup of G with order p^r | Isaacs Ch.4 induction 部分 | Peterfalvi 04.11 (3回) | high | ★ |
 
 ## A-invariant Hall theory — BG §1 の核心 (Prop 1.5-1.6)
