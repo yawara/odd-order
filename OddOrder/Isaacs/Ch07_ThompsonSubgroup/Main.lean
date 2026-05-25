@@ -400,8 +400,52 @@ private theorem lem73_aux
           -- h_aux : a * y * a⁻¹ = a * ↑((φ a)⁻¹ h) * a⁻¹.  Cancel.
           have := mul_right_cancel h_aux
           exact (mul_left_cancel this).symm
+      -- ## Step 1j: Q' = L vs Q' ⊊ L の場合分け. Q' ⊊ L だと IH + 矛盾, つまり L が q-群.
+      have hQ'_eq_L : Q' = L := by
+        by_contra hne
+        have hQ'_lt_L : Q' < L := lt_of_le_of_ne hQ'_le_L hne
+        have hQ'_card_lt_L : Nat.card ↥Q' < Nat.card ↥L := by
+          rcases lt_or_eq_of_le (Subgroup.card_le_of_le hQ'_le_L) with h | h
+          · exact h
+          · exact absurd (Subgroup.eq_of_le_of_card_ge hQ'_le_L h.ge) hne
+        have hQ'_card_le_n : Nat.card ↥Q' ≤ n := by omega
+        -- IH 仮説の準備.
+        have hLcop_Q' : ¬ p ∣ Nat.card ↥Q' :=
+          fun hp_dvd => hLcop (hp_dvd.trans (Subgroup.card_dvd_of_le hQ'_le_L))
+        have hL2abelian_Q' :
+            ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+              S ≤ Q' → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x :=
+          fun S hS hS2 => hL2abelian S (hS.trans hQ'_le_L) hS2
+        -- IH 適用: P ≤ C(Q').
+        have hP_cent_Q' : P ≤ Subgroup.centralizer (Q' : Set _) :=
+          ih hPnorm_Q' hLcop_Q' hL2abelian_Q' hQ'_card_le_n
+        -- ⇒ Q' ≤ C(P).  C_L_P = L ⊓ C(P) なので Q' ≤ C_L_P.
+        have hQ'_le_C : Q' ≤ Subgroup.centralizer (P : Set _) :=
+          Subgroup.le_centralizer_iff.mpr hP_cent_Q'
+        have hQ'_le_C_L_P : Q' ≤ C_L_P := le_inf hQ'_le_L hQ'_le_C
+        -- |Q'| ∣ |C_L_P|.
+        have hQ'_dvd_C : Nat.card ↥Q' ∣ Nat.card ↥C_L_P :=
+          Subgroup.card_dvd_of_le hQ'_le_C_L_P
+        -- |C_L_P| ∣ |L| は hC_dvd.  div_dvd_div_left で |L|/|C_L_P| ∣ |L|/|Q'|.
+        have h_div_dvd_div : Nat.card ↥L / Nat.card ↥C_L_P ∣
+            Nat.card ↥L / Nat.card ↥Q' :=
+          Nat.div_dvd_div_left hC_dvd hQ'_dvd_C
+        -- Sylow.not_dvd_index: q ∤ Q.toSubgroup.index = |↥L|/|Q.toSubgroup| = |↥L|/|Q'|.
+        have hQ_not_dvd_idx : ¬ q ∣ Q.toSubgroup.index := Q.not_dvd_index
+        have hQ_idx_eq : Q.toSubgroup.index = Nat.card ↥L / Nat.card ↥Q' := by
+          have h1 : Nat.card ↥Q.toSubgroup * Q.toSubgroup.index = Nat.card ↥L :=
+            Subgroup.card_mul_index Q.toSubgroup
+          rw [← hQ'_card] at h1
+          have hpos : 0 < Nat.card ↥Q' := Nat.card_pos
+          have h2 : Nat.card ↥L = Q.toSubgroup.index * Nat.card ↥Q' := by
+            rw [← h1, mul_comm]
+          exact (Nat.div_eq_of_eq_mul_left hpos h2).symm
+        rw [hQ_idx_eq] at hQ_not_dvd_idx
+        -- hq_dvd_idx : q ∣ |L|/|C_L_P|.  h_div_dvd_div で q ∣ |L|/|Q'|.  矛盾.
+        exact hQ_not_dvd_idx (hq_dvd_idx.trans h_div_dvd_div)
+      -- Step j 後: Q' = L で `↥L` が q-群.
+      have hL_qgroup : IsPGroup q ↥L := hQ'_eq_L ▸ hQ'_pgroup
       -- TODO (次 commit):
-      --   j. IH を Q ⊊ L に適用 ⇒ P ≤ C(Q), 矛盾で `Q = L`, L が q-群.
       --   k. `[L,P] < L` case: IH + Lem 4.29 で P ≤ C(L), 終了.
       --   l. `[L,P] = L` case: L ≤ SL(2,p) を導出.
       --   m. q = 2: Lem 7.4 + cyclic 2-群 ⇒ Aut 2-群 ⇒ done.
