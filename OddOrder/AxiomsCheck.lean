@@ -168,6 +168,29 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
 
+-- Ch.5 (Transfer): Thm 5.13 (Burnside normal p-complement)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer
+
+-- Ch.5 (Transfer): Thm 5.20 (focal transfer kernel is A^p(G))
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.APrime_eq_transferFocal_ker
+
+-- Ch.5 (Transfer): Thm 5.21 (Focal Subgroup Theorem)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.focalSubgroupTheorem
+
+-- Ch.5 (Transfer): Thm 5.25 (normal p-complement iff Sylow controls own fusion)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion
+
+-- Ch.5 (Transfer): Thm 5.26 (Frobenius normal p-complement)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
+
+-- Ch.5 (Transfer): Cor 5.29 (prime-divisor obstruction gives normal p-complement)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.hasNormalPComplement_of_no_prime_dvd_pow_sub_one
+
+-- Ch.5 (Transfer): Cor 5.30 (odd p, order-p elements central)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normal_p_complement_of_order_p_central_odd
+
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
