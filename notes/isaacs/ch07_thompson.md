@@ -223,7 +223,11 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   さらに `U=C_V(P)∩C_V(Q)` 形式の index bound
   (`actionCentralizer_inf_index_le_sq`), `P⊔Q=⊤` から `U` が action-invariant になる bridge
   (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`), 商 `V/U` 上の index 保存
-  (`actionCentralizer_quotient_image_index_eq_of_le`) まで追加済み.
+  (`actionCentralizer_quotient_image_index_eq_of_le`), quotient action と kernel `K`
+  (`quotientActionHom`, `quotientActionKernel`), `[V,K]≤U` bridge
+  (`actionCommutator_quotientActionKernel_le`), `[V,K,K]=1` bridge
+  (`actionCommutator_quotientActionKernel_le_fixedPoints`), faithful action + `V` p-group から
+  `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
@@ -254,7 +258,10 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`).
    - ✅ 商 `V/U` 内の `C_V(P)/U` index 保存
      (`actionCentralizer_quotient_image_index_eq_of_le`).
-   - 🔜 quotient action の kernel `K` と `[V,K,K]=1` / `K` p-group 化.
+   - ✅ quotient action の kernel `K` と `[V,K]≤U` / `[V,K,K]=1` / `K` p-group 化
+     (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
+     `actionCommutator_quotientActionKernel_le_fixedPoints`,
+     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
 3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
 4. 🔴 **`Aut(E) ≅ GL(2,p)` bridge** — `|V| ≤ p^2` かつ noncyclic p-group から elementary abelian `p^2` を取り, Lem 7.3 に渡す.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
