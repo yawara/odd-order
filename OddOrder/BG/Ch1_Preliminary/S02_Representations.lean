@@ -533,6 +533,24 @@ private theorem unit_eq_one_of_pow_prime_pow_eq_one
   exact eq_one_of_pow_prime_pow_eq_one (p := p) (u : F) (by
     simpa using congrArg Units.val hu)
 
+/-- A p-group has no nontrivial scalar characters over a characteristic-`p` field. -/
+private theorem monoidHom_units_eq_one_of_isPGroup_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (hG : IsPGroup p G) {F : Type*} [Field F] [CharP F p]
+    (φ : G →* Fˣ) : φ = 1 := by
+  ext g
+  obtain ⟨n, hg⟩ := hG g
+  exact congrArg Units.val <|
+    unit_eq_one_of_pow_prime_pow_eq_one (p := p) (φ g) (n := n) (by
+      rw [← map_pow, hg, map_one])
+
+/-- Sylow-subgroup specialization of `monoidHom_units_eq_one_of_isPGroup_charP`. -/
+private theorem sylow_monoidHom_units_eq_one_of_charP
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    (P : Sylow p G) {F : Type*} [Field F] [CharP F p]
+    (φ : P →* Fˣ) : φ = 1 :=
+  monoidHom_units_eq_one_of_isPGroup_charP P.isPGroup' φ
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
