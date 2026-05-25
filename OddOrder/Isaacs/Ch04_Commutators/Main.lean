@@ -1844,6 +1844,29 @@ theorem actionCommutator_map_inl
     refine ⟨g * (φ a) g⁻¹, ⟨g, a, rfl⟩, ?_⟩
     exact (SemidirectProduct.commutator_inl_inr (φ := φ) g a).symm
 
+/-- Restricted-action version of `actionCommutator_map_inl`.
+
+If `B` acts on `G` through `i : B →* A` and `φ : A →* MulAut G`, then the
+`B`-action commutator maps into the same semidirect product `G ⋊[φ] A` as the
+commutator of `inl(G)` with the image of `B` inside `inr(A)`. -/
+theorem actionCommutator_map_inl_comp
+    {A B G : Type*} [Group A] [Group B] [Group G]
+    (φ : A →* MulAut G) (i : B →* A) :
+    (actionCommutator (φ.comp i)).map (SemidirectProduct.inl : G →* G ⋊[φ] A) =
+      ⁅(SemidirectProduct.inl : G →* G ⋊[φ] A).range,
+        ((SemidirectProduct.inr : A →* G ⋊[φ] A).comp i).range⁆ := by
+  rw [actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, b, rfl⟩, rfl⟩
+    refine ⟨SemidirectProduct.inl g, ⟨g, rfl⟩,
+      SemidirectProduct.inr (i b), ⟨b, rfl⟩, ?_⟩
+    exact SemidirectProduct.commutator_inl_inr (φ := φ) g (i b)
+  · rintro ⟨_, ⟨g, rfl⟩, _, ⟨b, rfl⟩, rfl⟩
+    refine ⟨g * (φ (i b)) g⁻¹, ⟨g, b, rfl⟩, ?_⟩
+    exact (SemidirectProduct.commutator_inl_inr (φ := φ) g (i b)).symm
+
 /-- **`actionCommutator φ` は G で normal subgroup**.
 
 経路: `actionCommutator_map_inl` で `(actionCommutator φ).map inl = ⁅inl.range, inr.range⁆`,
@@ -3524,6 +3547,270 @@ theorem commutator_inl_inr_lt_inl_of_pgroup_action
   apply hg
   have : SemidirectProduct.inl g = (1 : G ⋊[φ] P) := Subtype.ext_iff.mp h
   exact SemidirectProduct.inl_injective this
+
+/-- The left factor inclusion `P →* P × Q`. -/
+def prodLeftHom (P Q : Type*) [Group P] [Group Q] : P →* P × Q where
+  toFun p := (p, 1)
+  map_one' := rfl
+  map_mul' _ _ := by
+    ext <;> simp
+
+@[simp]
+theorem prodLeftHom_apply {P Q : Type*} [Group P] [Group Q] (p : P) :
+    prodLeftHom P Q p = (p, 1) :=
+  by simp [prodLeftHom]
+
+/-- The right factor inclusion `Q →* P × Q`. -/
+def prodRightHom (P Q : Type*) [Group P] [Group Q] : Q →* P × Q where
+  toFun q := (1, q)
+  map_one' := rfl
+  map_mul' _ _ := by
+    ext <;> simp
+
+@[simp]
+theorem prodRightHom_apply {P Q : Type*} [Group P] [Group Q] (q : Q) :
+    prodRightHom P Q q = (1, q) :=
+  by simp [prodRightHom]
+
+/-- In an external direct-product action, `[G, P]` is invariant under the whole
+`P × Q` action. -/
+theorem _root_.OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] (φ : P × Q →* MulAut G) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutator (φ.comp (prodLeftHom P Q))) := by
+  apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
+  intro b
+  have key : ∀ g : G, ∀ p : P,
+      (φ b) (g * (φ (prodLeftHom P Q p)) g⁻¹) =
+        (φ b) g * (φ (prodLeftHom P Q (b.1 * p * b.1⁻¹))) ((φ b) g)⁻¹ := by
+    intro g p
+    rw [map_mul (φ b)]
+    congr 1
+    rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
+        show φ (prodLeftHom P Q (b.1 * p * b.1⁻¹)) =
+            (φ b) * (φ (prodLeftHom P Q p)) * (φ b)⁻¹ from by
+          rw [show prodLeftHom P Q (b.1 * p * b.1⁻¹) =
+              b * prodLeftHom P Q p * b⁻¹ from by
+            ext <;> simp [prodLeftHom, mul_assoc]]
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.inv_apply_self]
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, p, rfl⟩, rfl⟩
+    exact ⟨(φ b) g, b.1 * p * b.1⁻¹, by simpa using key g p⟩
+  · rintro ⟨g, p, hx⟩
+    have hx' : x = g * (φ (prodLeftHom P Q p)) g⁻¹ := by simpa using hx
+    rw [hx']
+    refine ⟨(φ b)⁻¹ g * (φ (prodLeftHom P Q (b.1⁻¹ * p * b.1))) ((φ b)⁻¹ g)⁻¹,
+      ⟨(φ b)⁻¹ g, b.1⁻¹ * p * b.1, by simp⟩, ?_⟩
+    rw [map_mul (φ b)]
+    congr 1
+    · exact MulAut.apply_inv_self (M := G) (φ b) g
+    rw [show ((φ b)⁻¹ g)⁻¹ = (φ b)⁻¹ g⁻¹ from (map_inv ((φ b)⁻¹) g).symm,
+        show φ (prodLeftHom P Q (b.1⁻¹ * p * b.1)) =
+            (φ b)⁻¹ * (φ (prodLeftHom P Q p)) * (φ b) from by
+          rw [show prodLeftHom P Q (b.1⁻¹ * p * b.1) =
+              b⁻¹ * prodLeftHom P Q p * b from by
+            ext <;> simp [prodLeftHom, mul_assoc]]
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self, MulAut.apply_inv_self]
+
+/-- Three-subgroups step for Isaacs Theorem 4.31 in external direct-product form.
+
+Let `P × Q` act on `G`. If the `Q`-factor acts trivially on `[G, P]`, then
+the `P`-factor acts trivially on `[G, Q]`. This is the semidirect-product
+calculation corresponding to `[G,P,Q]=1` and `[P,Q,G]=1`, hence `[Q,G,P]=1`. -/
+theorem prodLeft_fixes_actionCommutator_prodRight_of_prodRight_fixes_actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] (φ : P × Q →* MulAut G)
+    (hQ_on_GP : ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)),
+      (φ (1, q)) h = h) :
+    ∀ p : P, ∀ h ∈ actionCommutator (φ.comp (prodRightHom P Q)),
+      (φ (p, 1)) h = h := by
+  let iP : P →* P × Q := prodLeftHom P Q
+  let iQ : Q →* P × Q := prodRightHom P Q
+  set XG : Subgroup (G ⋊[φ] (P × Q)) :=
+    (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)).range
+  set YP : Subgroup (G ⋊[φ] (P × Q)) :=
+    ((SemidirectProduct.inr : P × Q →* G ⋊[φ] (P × Q)).comp iP).range
+  set YQ : Subgroup (G ⋊[φ] (P × Q)) :=
+    ((SemidirectProduct.inr : P × Q →* G ⋊[φ] (P × Q)).comp iQ).range
+  have h_GP_eq : (actionCommutator (φ.comp iP)).map
+      (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)) = ⁅XG, YP⁆ := by
+    simpa [XG, YP, iP] using actionCommutator_map_inl_comp φ iP
+  have h_GQ_eq : (actionCommutator (φ.comp iQ)).map
+      (SemidirectProduct.inl : G →* G ⋊[φ] (P × Q)) = ⁅XG, YQ⁆ := by
+    simpa [XG, YQ, iQ] using actionCommutator_map_inl_comp φ iQ
+  have h_GPYQ : ⁅⁅XG, YP⁆, YQ⁆ = ⊥ := by
+    rw [← h_GP_eq, eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨k, hk, rfl⟩ _ ⟨q, rfl⟩
+    change ⁅(SemidirectProduct.inl k : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iQ q)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q)))
+    rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+    have h_fix : (φ (iQ q)) k = k := by
+      simpa [iQ] using hQ_on_GP q k hk
+    rw [show (φ (iQ q)) k⁻¹ = ((φ (iQ q)) k)⁻¹ from map_inv (φ (iQ q)) k,
+      h_fix, mul_inv_cancel]
+    exact map_one _
+  have h_PQ : ⁅YP, YQ⁆ = ⊥ := by
+    rw [eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨p, rfl⟩ _ ⟨q, rfl⟩
+    change ⁅(SemidirectProduct.inr (iP p) : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iQ q)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q)))
+    rw [Subgroup.mem_bot]
+    ext <;> simp [commutatorElement_def, iP, iQ]
+  have h_PQXG : ⁅⁅YP, YQ⁆, XG⁆ = ⊥ := by
+    rw [h_PQ]
+    exact Subgroup.commutator_bot_left XG
+  have h_three : ⁅⁅YQ, XG⁆, YP⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate h_GPYQ h_PQXG
+  have h_GQYP : ⁅⁅XG, YQ⁆, YP⁆ = ⊥ := by
+    rwa [Subgroup.commutator_comm YQ XG] at h_three
+  intro p h hh
+  have h_in_GQ : (SemidirectProduct.inl h : G ⋊[φ] (P × Q)) ∈ ⁅XG, YQ⁆ := by
+    rw [← h_GQ_eq]
+    exact ⟨h, hh, rfl⟩
+  have h_comm_mem : ⁅(SemidirectProduct.inl h : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iP p)⁆ ∈ ⁅⁅XG, YQ⁆, YP⁆ :=
+    Subgroup.commutator_mem_commutator h_in_GQ ⟨p, rfl⟩
+  have h_comm_bot : ⁅(SemidirectProduct.inl h : G ⋊[φ] (P × Q)),
+      SemidirectProduct.inr (iP p)⁆ ∈ (⊥ : Subgroup (G ⋊[φ] (P × Q))) := by
+    rw [← h_GQYP]
+    exact h_comm_mem
+  rw [Subgroup.mem_bot, SemidirectProduct.commutator_inl_inr] at h_comm_bot
+  have h_mul : h * (φ (iP p)) h⁻¹ = 1 :=
+    SemidirectProduct.inl_injective (by simpa using h_comm_bot)
+  rw [show (φ (iP p)) h⁻¹ = ((φ (iP p)) h)⁻¹ from map_inv (φ (iP p)) h] at h_mul
+  rw [mul_inv_eq_one] at h_mul
+  simpa [iP] using h_mul.symm
+
+/-- Final coprime-action step for Isaacs Theorem 4.31 in external direct-product form.
+
+If `Q` is a `p'`-group acting on the `p`-group `G`, `Q` acts trivially on
+`[G,P]`, and every `P`-fixed element of `G` is `Q`-fixed, then `[G,Q] = 1`.
+Together with induction providing the first hypothesis, this is the last
+paragraph of Isaacs Thm 4.31. -/
+theorem actionCommutator_prodRight_eq_bot_of_prodRight_fixes_actionCommutator_prodLeft
+    {G P Q : Type*} [Group G] [Group P] [Group Q] [Finite G] [Finite Q]
+    {p : ℕ} [hp : Fact p.Prime] (φ : P × Q →* MulAut G)
+    (hG : IsPGroup p G) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (hQ_on_GP : ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)),
+      (φ (1, q)) h = h)
+    (h_fix : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g) :
+    actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ := by
+  let φQ : Q →* MulAut G := φ.comp (prodRightHom P Q)
+  have hP_on_GQ :
+      ∀ x : P, ∀ h ∈ actionCommutator (φ.comp (prodRightHom P Q)),
+        (φ (x, 1)) h = h :=
+    prodLeft_fixes_actionCommutator_prodRight_of_prodRight_fixes_actionCommutator_prodLeft
+      φ hQ_on_GP
+  have h_triv : ∀ q : Q, ∀ h ∈ actionCommutator φQ, (φQ q) h = h := by
+    intro q h hh
+    have hP_fix : ∀ x : P, (φ (x, 1)) h = h := by
+      intro x
+      exact hP_on_GQ x h (by simpa [φQ] using hh)
+    simpa [φQ] using h_fix h hP_fix q
+  have hCop : Nat.Coprime (Nat.card Q) (Nat.card G) := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+    rw [hk]
+    exact (((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hQ_p').symm).pow_right k
+  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have hSolv : IsSolvable Q ∨ IsSolvable G := Or.inr IsNilpotent.to_isSolvable
+  exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+    (A := Q) (G := G) (φ := φQ) hCop hSolv h_triv
+
+/-- Finite subgroup card strictly drops for a proper subgroup. -/
+private theorem subgroup_card_lt_of_ne_top {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hH : H ≠ ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- Strong-induction form of Isaacs Theorem 4.31 for external direct products. -/
+private theorem isaacs_thm_4_31_external_aux
+    {P Q : Type*} [Group P] [Group Q] [Finite P] [Finite Q]
+    {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q) :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G]
+    (φ : P × Q →* MulAut G) (_ : IsPGroup p G)
+    (_ : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g),
+    Nat.card G ≤ n → actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ _ _ h_le
+    exfalso
+    have h_pos : 0 < Nat.card G := Nat.card_pos
+    omega
+  | succ m IH =>
+    intro G _ _ φ hG h_fix h_le
+    rcases Nat.lt_or_ge (Nat.card G) (m + 1) with h_lt | h_ge
+    · exact IH φ hG h_fix (Nat.le_of_lt_succ h_lt)
+    have h_card_G : Nat.card G = m + 1 := le_antisymm h_le h_ge
+    by_cases hG_nontriv : Nontrivial G
+    swap
+    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+      rw [actionCommutator_eq_bot_iff_acts_trivially]
+      intro q g
+      exact Subsingleton.elim _ _
+    letI : Nontrivial G := hG_nontriv
+    let φP : P →* MulAut G := φ.comp (prodLeftHom P Q)
+    set H : Subgroup G := actionCommutator φP with hH_def
+    have h_lt_comm : ⁅(SemidirectProduct.inl : G →* G ⋊[φP] P).range,
+        (SemidirectProduct.inr : P →* G ⋊[φP] P).range⁆ <
+          (SemidirectProduct.inl : G →* G ⋊[φP] P).range :=
+      commutator_inl_inr_lt_inl_of_pgroup_action hG hP φP
+    have hH_ne_top : H ≠ ⊤ := by
+      intro htop
+      have hmap : H.map (SemidirectProduct.inl : G →* G ⋊[φP] P) =
+          (SemidirectProduct.inl : G →* G ⋊[φP] P).range := by
+        rw [htop]
+        exact (MonoidHom.range_eq_map _).symm
+      rw [hH_def, actionCommutator_map_inl] at hmap
+      exact h_lt_comm.ne hmap
+    have hH_card_lt : Nat.card H < Nat.card G := subgroup_card_lt_of_ne_top hH_ne_top
+    have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+      rw [hH_def]
+      simpa [φP] using OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator_prodLeft φ
+    let φH : P × Q →* MulAut H :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+    have hH_pgrp : IsPGroup p H := hG.to_subgroup H
+    have h_fix_H :
+        ∀ h : H, (∀ x : P, (φH (x, 1)) h = h) → ∀ y : Q, (φH (1, y)) h = h := by
+      intro h hP_fix y
+      apply Subtype.ext
+      have hP_fix_val : ∀ x : P, (φ (x, 1)) h.val = h.val := by
+        intro x
+        have hx := congr_arg (Subtype.val : H → G) (hP_fix x)
+        simpa [φH] using hx
+      have hQ_fix := h_fix h.val hP_fix_val y
+      simpa [φH] using hQ_fix
+    have hIH_H := IH φH hH_pgrp h_fix_H
+      (Nat.le_of_lt_succ (hH_card_lt.trans_le h_le))
+    have hQ_on_GP :
+        ∀ q : Q, ∀ h ∈ actionCommutator (φ.comp (prodLeftHom P Q)), (φ (1, q)) h = h := by
+      intro q h hh
+      rw [actionCommutator_eq_bot_iff_acts_trivially] at hIH_H
+      have h_in_H : h ∈ H := by
+        simpa [H, φP] using hh
+      have hact := congr_arg (Subtype.val : H → G) (hIH_H q ⟨h, h_in_H⟩)
+      simpa [φH] using hact
+    exact actionCommutator_prodRight_eq_bot_of_prodRight_fixes_actionCommutator_prodLeft
+      φ hG hQ_p' hQ_on_GP h_fix
+
+/-- **Isaacs Theorem 4.31** (external direct-product form).
+
+Let `P × Q` act on the `p`-group `G`, with `P` a `p`-group and `Q` a
+`p'`-group. If every element of `G` fixed by the `P`-factor is fixed by the
+`Q`-factor, then the `Q`-factor acts trivially on `G`. -/
+theorem isaacs_thm_4_31_external
+    {G P Q : Type*} [Group G] [Group P] [Group Q] [Finite G] [Finite P] [Finite Q]
+    {p : ℕ} [Fact p.Prime] (φ : P × Q →* MulAut G)
+    (hG : IsPGroup p G) (hP : IsPGroup p P) (hQ_p' : ¬ p ∣ Nat.card Q)
+    (h_fix : ∀ g : G, (∀ x : P, (φ (x, 1)) g = g) → ∀ y : Q, (φ (1, y)) g = g) :
+    actionCommutator (φ.comp (prodRightHom P Q)) = ⊥ :=
+  isaacs_thm_4_31_external_aux hP hQ_p' (Nat.card G) φ hG h_fix le_rfl
 
 end -- 4D
 
