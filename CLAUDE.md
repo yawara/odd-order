@@ -1,4 +1,6 @@
-# CLAUDE.md
+# odd-order — エージェント向け指示書
+
+> このファイルは **CLAUDE.md** が正本. `AGENTS.md` は CLAUDE.md への symlink (Claude Code / codex 共通).
 
 このリポジトリ (`odd-order`) は **Feit-Thompson 定理 (奇数位数定理) の Lean 4 完全形式化**を AI エージェント駆動で長期的に進めるプロジェクト。詳細な計画とチェックリストは [ROADMAP.md](ROADMAP.md) を参照。
 
@@ -82,6 +84,16 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 - 採番 + scaffold: `bin/new-issue <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`
 - 状態 = 配置ディレクトリが source of truth: `issues/` (open) / `issues/pending/` / `issues/closed/`
 - 遷移は `git mv`. frontmatter に `status:` は持たない
+
+## 並行作業 (worktree)
+
+章 / 節を別エージェントセッションで並行進行させるときは `git worktree` を使う。詳細手順は [`notes/meta/worktree_setup.md`](notes/meta/worktree_setup.md)。
+
+- worktree path = `/Users/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (例: `isaacs-ch05`, `bg-s03`)
+- `.lake/packages` と `references` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)
+- `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)
+- **`lake update` は worktree で走らせない** (共有 mathlib rev を壊す)
+- forward axiom 経由で章をまたぐ並行作業は合流時の名前衝突に注意 ([`notes/meta/forward_dep_policy.md`](notes/meta/forward_dep_policy.md))
 
 ## 主要パス
 
