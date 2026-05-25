@@ -21,6 +21,8 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
 - [x] BG Prop 1.2 の正確な statement を `references/bg/local-analysis.mmd` で確認する。
 - [x] chief factor / centralizer / Fitting の既存 API を棚卸しする。
 - [x] Prop 1.2 を実装するか、必要な shared module の最小スコープを決める。
+- [x] Prop 1.2 の前半包含 `F(G*) ≤ C_G(U/V)` for every chief factor を実装する。
+- [ ] Prop 1.2 の逆包含を chief series / normal interval induction で実装する。
 - [x] Prop 1.3 `C_G(F(G)) ⊆ F(G)` を実装する。
 - [ ] Prop 1.4 coprime automorphism faithful-on-Fitting を実装する。
 
@@ -38,8 +40,12 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
 - Prop 1.2 用の最小 shared module として `OddOrder.GroupTheory.ChiefFactor` を追加。
   現時点では `IsChiefFactor U V` と ambient `chiefFactorCentralizer U V = C_G(U/V)`、
   および map/comap 基本補題まで。
-- Prop 1.2 本体は、次に chief/composition series over normal intervals と
-  `F(G*) ≤ ⋂ C_{G*}(U/V)` の包含補題から進める。
+- Prop 1.2 の前半包含は `fitting_map_subtype_le_chiefFactorCentralizer` として
+  sorry-free 実装済み。chief factor `U/V` を `G/V` の minimal normal subgroup に写し、
+  Lemma 1.1 で `U/V ≤ Z(F(G/V))`、さらに `F(G*)` の quotient image が nilpotent
+  normal なので `F(G/V)` に入る、という本の順序に沿う証明。
+- Prop 1.2 の残りは、次に chief/composition series over normal intervals と
+  逆包含 `⋂ C_{G*}(U/V) ≤ F(G*)` の induction から進める。
 - Prop 1.4 は Prop 1.3 を使える状態になったが、semidirect product と Hall σ/core
   の形式化が残る。
 

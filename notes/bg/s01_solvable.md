@@ -29,11 +29,15 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   `K ≤ C_G(F(G))` with `K ⊄ F(G)`. Solvability gives `[K,K] < K`; minimality forces
   `[K,K] ≤ F(G)`. Since `K` centralizes `F(G)`, `K ∩ F(G)` is central in `K`, and
   `K/(K∩F(G))` is abelian. Thus `K` is nilpotent, contradicting Fitting maximality.
-- **Prop 1.2 remains open**: exact BG statement checked at `local-analysis.mmd` L360-L378.
-  The first shared module now exists: `OddOrder.GroupTheory.ChiefFactor` provides
+- **Prop 1.2 partially completed**: exact BG statement checked at `local-analysis.mmd`
+  L360-L378.  The first shared module now exists: `OddOrder.GroupTheory.ChiefFactor` provides
   `IsChiefFactor U V`, ambient `chiefFactorCentralizer U V = C_G(U/V)`, and quotient
-  image/comap helper lemmas.  Remaining work is chief-series induction over normal intervals
-  and the two inclusions in Prop 1.2.
+  image/comap helper lemmas.
+- The forward inclusion is sorry-free as `fitting_map_subtype_le_chiefFactorCentralizer`:
+  for every chief factor `U/V`, the image of `F(G*)` in `G/V` is nilpotent normal, hence
+  lies in `F(G/V)`, and Lemma 1.1 puts `U/V` in the centralizer of `F(G/V)`.
+- Remaining Prop 1.2 work is the reverse inclusion via chief-series induction over normal
+  intervals: an element/subgroup centralizing all chief factors of `G` must lie in `F(G*)`.
 - **Prop 1.4 remains open**: with Prop 1.3 now available, the remaining work is the book's
   semidirect-product/Hall-σ route for coprime automorphism groups.
 

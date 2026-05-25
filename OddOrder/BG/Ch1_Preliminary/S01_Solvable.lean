@@ -40,6 +40,7 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | BG | Isaacs FGT | mathlib | 本ファイル |
 |---|---|---|---|
 | **Lem 1.1** | Ch.3 Thm 3.11 + Ch.1 Fitting + Ch.4 Z(F(G)) | — | ✅ **sorry-free** |
+| **Prop 1.2 forward** | chief factors + Fitting quotient image | — | ✅ **sorry-free partial** |
 | **Prop 1.3** | Ch.1 Fitting maximality + solvable commutator descent | — | ✅ **sorry-free** |
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
@@ -74,6 +75,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 - **Skeleton** + **§1B/§1F docstring mapping** + **18 結果/補題 全 sorry-free**:
   - **Lem 1.1** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free
     (`M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ M` elementary abelian)
+  - **Prop 1.2 forward inclusion** `fitting_map_subtype_le_chiefFactorCentralizer` ⭐
+    sorry-free partial (`F(G*)` centralizes every chief factor `U/V`)
   - **Prop 1.3** `centralizer_fitting_le_fitting` ⭐ sorry-free
   - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
   - **Lem 1.7(b)** `quotient_frattini_isElementaryAbelian` ⭐ sorry-free (shared module)
@@ -239,6 +242,116 @@ theorem centralizer_fitting_le_fitting
     OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
   apply hK_not_le_F
   simpa [F, hF_def] using hK_le_fitting
+
+/-- A chief factor `U/V` is a minimal normal subgroup of `G/V`. -/
+private theorem isMinimalNormal_map_quotient_of_isChiefFactor
+    {G : Type*} [Group G] {U V : Subgroup G} [V.Normal]
+    (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
+    OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) := by
+  refine ⟨hChief.normal_top.map _ QuotientGroup.mk_surjective, ?_, ?_⟩
+  · intro hbot
+    have hU_le_V : U ≤ V := by
+      intro u hu
+      have hu_map : (QuotientGroup.mk' V) u ∈ U.map (QuotientGroup.mk' V) :=
+        ⟨u, hu, rfl⟩
+      rw [hbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hu_map
+      exact hu_map
+    exact hChief.lt.not_ge hU_le_V
+  · intro N hN_normal hN_le_Ubar
+    let W : Subgroup G := N.comap (QuotientGroup.mk' V)
+    haveI hW_normal : W.Normal := hN_normal.comap _
+    have hV_le_W : V ≤ W := by
+      intro v hv
+      change (QuotientGroup.mk' V) v ∈ N
+      rw [show (QuotientGroup.mk' V) v = 1 from (QuotientGroup.eq_one_iff v).mpr hv]
+      exact N.one_mem
+    have hW_le_U : W ≤ U := by
+      intro g hg
+      have hqg_Ubar : (QuotientGroup.mk' V) g ∈ U.map (QuotientGroup.mk' V) :=
+        hN_le_Ubar hg
+      obtain ⟨u, hu, hqu⟩ := hqg_Ubar
+      have hg_u_inv : g * u⁻¹ ∈ V := by
+        apply (QuotientGroup.eq_one_iff (N := V) (g * u⁻¹)).mp
+        change (QuotientGroup.mk' V) (g * u⁻¹) = 1
+        rw [map_mul, map_inv, ← hqu, mul_inv_cancel]
+      have hgU : (g * u⁻¹) * u ∈ U := U.mul_mem (hChief.le hg_u_inv) hu
+      simpa [mul_assoc] using hgU
+    rcases hChief.eq_or_eq_of_normal hW_normal hV_le_W hW_le_U with hW_eq_V | hW_eq_U
+    · left
+      rw [eq_bot_iff]
+      intro n hn
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (N := V) n
+      have hgW : g ∈ W := hn
+      rw [hW_eq_V] at hgW
+      exact (QuotientGroup.eq_one_iff g).mpr hgW
+    · right
+      apply le_antisymm hN_le_Ubar
+      intro x hx
+      obtain ⟨g, hgU, rfl⟩ := hx
+      have hgW : g ∈ W := by
+        rw [hW_eq_U]
+        exact hgU
+      exact hgW
+
+/-- Nilpotence is inherited by a subgroup image. -/
+private theorem isNilpotent_subgroup_map
+    {G H : Type*} [Group G] [Group H] (K : Subgroup G) [Group.IsNilpotent K]
+    (f : G →* H) :
+    Group.IsNilpotent (K.map f) := by
+  let φ : K →* K.map f :=
+    { toFun := fun k => ⟨f k.1, ⟨k.1, k.2, rfl⟩⟩
+      map_one' := Subtype.ext (map_one f)
+      map_mul' := fun x y => Subtype.ext (map_mul f x.1 y.1) }
+  exact nilpotent_of_surjective φ (by
+    rintro ⟨_, x, hx, rfl⟩
+    exact ⟨⟨x, hx⟩, rfl⟩)
+
+/-- **BG Proposition 1.2, first inclusion**:
+`F(G*)` centralizes every chief factor `U/V` of `G`.
+
+This is the forward half of Hall's chief-factor characterization of the Fitting subgroup.
+The reverse inclusion still needs chief-series induction over normal intervals. -/
+theorem fitting_map_subtype_le_chiefFactorCentralizer
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {Gstar U V : Subgroup G} [Gstar.Normal] [V.Normal]
+    (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
+    (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype ≤
+      OddOrder.GroupTheory.chiefFactorCentralizer U V := by
+  haveI hV_normal : V.Normal := hChief.normal_bot
+  let q : G →* G ⧸ V := QuotientGroup.mk' V
+  let Ubar : Subgroup (G ⧸ V) := U.map q
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal Ubar := by
+    dsimp [Ubar, q]
+    exact isMinimalNormal_map_quotient_of_isChiefFactor hChief
+  have hUbar_le_cent :
+      Ubar ≤ Subgroup.centralizer
+        ((OddOrder.Isaacs.Ch01.fitting (G ⧸ V) : Subgroup (G ⧸ V)) : Set (G ⧸ V)) :=
+    (isMinimalNormal_le_fitting_and_isElementaryAbelian (G := G ⧸ V) hMin).2.1
+  have hFquot_le_cent_Ubar :
+      OddOrder.Isaacs.Ch01.fitting (G ⧸ V) ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) :=
+    Subgroup.le_centralizer_iff.mp hUbar_le_cent
+  let FstarG : Subgroup G := (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype
+  haveI hFstarG_normal : FstarG.Normal := by
+    dsimp [FstarG]
+    infer_instance
+  haveI hFstarGq_normal : (FstarG.map q).Normal :=
+    hFstarG_normal.map q QuotientGroup.mk_surjective
+  haveI hFstarGq_nilpotent : Group.IsNilpotent (FstarG.map q) := by
+    have hmap :
+        FstarG.map q =
+          (OddOrder.Isaacs.Ch01.fitting Gstar).map (q.comp Gstar.subtype) := by
+      dsimp [FstarG, q]
+      rw [Subgroup.map_map]
+    rw [hmap]
+    exact isNilpotent_subgroup_map (OddOrder.Isaacs.Ch01.fitting Gstar) (q.comp Gstar.subtype)
+  have hFstarGq_le_fitting :
+      FstarG.map q ≤ OddOrder.Isaacs.Ch01.fitting (G ⧸ V) :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hFstarGq_le_cent_Ubar : FstarG.map q ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) :=
+    hFstarGq_le_fitting.trans hFquot_le_cent_Ubar
+  change FstarG ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V
+  exact OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer
+    hFstarGq_le_cent_Ubar
 
 /-!
 Prop. 1.2 and 1.4 remain routed through this §1A block.
