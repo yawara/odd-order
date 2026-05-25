@@ -24,6 +24,14 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - [ ] square/invertible matrix argument で column orthogonality を導く。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
 
+## 2026-05-26 update
+
+- raw column sum に `characterTableColumnPairing g h` という名前を付けた。
+- `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
+- public API の raw sum theorem は `characterTableColumnPairing_diag`,
+  `characterTableColumnPairing_conj`,
+  `characterTableColumnPairing_not_conj` から `sorry` なしで導く形にした。
+
 ## 完了条件
 
 - `OddOrder.RepresentationTheory.column_orthogonality_cases` から `sorry` が消える。

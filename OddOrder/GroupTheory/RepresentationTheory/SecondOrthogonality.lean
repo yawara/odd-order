@@ -38,6 +38,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 
 ## Main statements
 
+* `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
+  `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
@@ -57,6 +59,20 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+/-- The character-table column pairing
+`∑_χ χ(g) · star (χ(h))`, summing over irreducible complex characters. -/
+noncomputable def characterTableColumnPairing
+    [Fintype (IrreducibleCharacter G)] (g h : G) : ℂ :=
+  ∑ χ : IrreducibleCharacter G,
+    ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h)
+
+@[simp] theorem characterTableColumnPairing_eq_sum
+    [Fintype (IrreducibleCharacter G)] (g h : G) :
+    characterTableColumnPairing g h =
+      ∑ χ : IrreducibleCharacter G,
+        ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) :=
+  rfl
+
 /-- Primitive cases form of the second (column) orthogonality theorem.
 
 The two projections are the conjugate and non-conjugate columns of the character-table
@@ -66,13 +82,34 @@ theorem column_orthogonality_cases
     [Fintype (IrreducibleCharacter G)]
     (g h : G) :
     (IsConj g h →
-      ∑ χ : IrreducibleCharacter G,
-          ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
+      characterTableColumnPairing g h =
       (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
     (¬ IsConj g h →
-      ∑ χ : IrreducibleCharacter G,
-          ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0) := by
+      characterTableColumnPairing g h = 0) := by
   sorry
+
+/-- Named-column form of the diagonal second orthogonality relation. -/
+theorem characterTableColumnPairing_diag
+    [Fintype (IrreducibleCharacter G)]
+    (g : G) :
+    characterTableColumnPairing g g =
+    (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  exact (column_orthogonality_cases g g).1 (IsConj.refl g)
+
+/-- Named-column form of the conjugate second orthogonality relation. -/
+theorem characterTableColumnPairing_conj
+    [Fintype (IrreducibleCharacter G)]
+    {g h : G} (hgh : IsConj g h) :
+    characterTableColumnPairing g h =
+    (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  exact (column_orthogonality_cases g h).1 hgh
+
+/-- Named-column form of the non-conjugate second orthogonality relation. -/
+theorem characterTableColumnPairing_not_conj
+    [Fintype (IrreducibleCharacter G)]
+    {g h : G} (hgh : ¬ IsConj g h) :
+    characterTableColumnPairing g h = 0 := by
+  exact (column_orthogonality_cases g h).2 hgh
 
 /-- Diagonal second (column) orthogonality:
 `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
@@ -84,7 +121,7 @@ theorem column_orthogonality_diag
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  exact (column_orthogonality_cases g g).1 (IsConj.refl g)
+  simpa using characterTableColumnPairing_diag (G := G) g
 
 /-- **Second (column) orthogonality**, conjugate case ([Is] Thm 2.18 / 6.10).
 
@@ -102,7 +139,7 @@ theorem column_orthogonality_conj
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  exact (column_orthogonality_cases g h).1 hgh
+  simpa using characterTableColumnPairing_conj (G := G) hgh
 
 /-- **Second (column) orthogonality**, non-conjugate case ([Is] Thm 2.18 / 6.10).
 
@@ -112,6 +149,6 @@ theorem column_orthogonality_not_conj
     {g h : G} (hgh : ¬ IsConj g h) :
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0 := by
-  exact (column_orthogonality_cases g h).2 hgh
+  simpa using characterTableColumnPairing_not_conj (G := G) hgh
 
 end OddOrder.RepresentationTheory
