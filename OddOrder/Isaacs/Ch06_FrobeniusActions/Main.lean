@@ -1393,11 +1393,12 @@ theorem dihedralOrQuaternion_of_invertingConjugation
     exact ⟨quaternionIsoOfInverting c a (orderOf c / 2)
       h_half_pos h_order h_idx h_a_notmem h_a_sq_half h_conj⟩
 
-/-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite 2-group with a cyclic subgroup
-`C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is the unique
-involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
+/-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite nonabelian 2-group with a cyclic
+subgroup `C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is
+the unique involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
 theorem semiDihedral_of_twistConjugation
     {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    (h_nonab : ∃ x y : P, x * y ≠ y * x)
     (c a z : P) (h_idx : (Subgroup.zpowers c).index = 2)
     (h_a_notmem : a ∉ Subgroup.zpowers c)
     (h_z_mem : z ∈ Subgroup.zpowers c) (h_z_sq : z ^ 2 = 1) (h_z_ne : z ≠ 1)
