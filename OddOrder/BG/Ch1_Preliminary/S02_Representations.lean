@@ -567,6 +567,28 @@ private theorem sylow_monoidHom_units_eq_one_of_charP
     (φ : P →* Fˣ) : φ = 1 :=
   monoidHom_units_eq_one_of_isPGroup_charP P.isPGroup' φ
 
+/-- If two endomorphisms are trivial on a submodule and on the quotient by it,
+then they commute.
+
+This is the linear-algebra core of BG Thm 2.6, q = p: the subgroup
+`C_G(W) ∩ C_G(V/W)` acts by maps `1 + n` where `n` kills `W` and has image in
+`W`; products of two such nilpotent parts vanish. -/
+private theorem end_commute_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (f g : Module.End F V)
+    (hfW : ∀ w ∈ W, f w = w) (hfQ : ∀ v, f v - v ∈ W)
+    (hgW : ∀ w ∈ W, g w = w) (hgQ : ∀ v, g v - v ∈ W) :
+    f * g = g * f := by
+  ext v
+  calc
+    (f * g) v = f (g v) := rfl
+    _ = f (v + (g v - v)) := by congr 1; abel
+    _ = f v + (g v - v) := by rw [map_add, hfW (g v - v) (hgQ v)]
+    _ = g v + (f v - v) := by abel
+    _ = g (v + (f v - v)) := by rw [map_add, hgW (f v - v) (hfQ v)]
+    _ = g (f v) := by congr 1; abel
+    _ = (g * f) v := rfl
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
