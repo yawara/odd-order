@@ -123,6 +123,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Baer trick (Lem 4.37) + Cor 4.35 + 強帰納法 (Three-subgroups).
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_36
 
+-- Ch.4 (Commutators): Thm 4.38
+-- P p-subgroup, Q normal p'-subgroup, Q fixes all P-fixed elements ⇒ Q acts trivially.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_38
+
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
 
