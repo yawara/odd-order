@@ -22,6 +22,8 @@ unscaled form is useful before choosing coefficients where `|H|` is invertible.
 
 * `ClassFunction.induceTerm H θ x g` — the `x`-summand in the induction formula.
 * `ClassFunction.induceSum H θ` — the unscaled induced class function on `G`.
+* `ClassFunction.conjugatesInto H` — elements of `G` conjugate into `H`.
+* `ClassFunction.conjugatesIntoSet H A` — elements of `G` conjugate into `A ⊆ H`.
 
 ## References
 
@@ -37,6 +39,15 @@ namespace OddOrder.RepresentationTheory
 namespace ClassFunction
 
 variable {G : Type*} [Group G] {k : Type*} [CommRing k]
+
+/-- Elements of `G` that are conjugate into the subgroup `H`. -/
+def conjugatesInto (H : Subgroup G) : Set G :=
+  { g | ∃ x : G, x⁻¹ * g * x ∈ H }
+
+/-- Elements of `G` that are conjugate into `A`, where `A` is a set of elements
+of the subgroup `H`. -/
+def conjugatesIntoSet (H : Subgroup G) (A : Set ↥H) : Set G :=
+  { g | ∃ (x : G) (hx : x⁻¹ * g * x ∈ H), (⟨x⁻¹ * g * x, hx⟩ : ↥H) ∈ A }
 
 /-- The `x`-summand in the classical induction formula. It is zero unless
 `x⁻¹ * g * x ∈ H`. -/
@@ -94,6 +105,27 @@ theorem induceTerm_smul (H : Subgroup G) (c : k) (θ : ClassFunction ↥H k) (x 
   · simp [induceTerm, hx]
   · simp [induceTerm, hx]
 
+theorem induceTerm_eq_zero_of_not_conjugatesInto {H : Subgroup G} (θ : ClassFunction ↥H k)
+    {g : G} (hg : g ∉ conjugatesInto H) (x : G) :
+    induceTerm H θ x g = 0 := by
+  classical
+  have hx : x⁻¹ * g * x ∉ H := by
+    intro hx
+    exact hg ⟨x, hx⟩
+  exact induceTerm_of_not_mem θ hx
+
+theorem induceTerm_eq_zero_of_not_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
+    {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A) {g : G}
+    (hg : g ∉ conjugatesIntoSet H A) (x : G) :
+    induceTerm H θ x g = 0 := by
+  classical
+  unfold induceTerm
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · rw [dif_pos hx]
+    by_contra hne
+    exact hg ⟨x, hx, hθ hne⟩
+  · rw [dif_neg hx]
+
 variable [Fintype G]
 
 /-- The unscaled classical induction sum.
@@ -127,6 +159,30 @@ theorem induceSum_smul (H : Subgroup G) (c : k) (θ : ClassFunction ↥H k) :
   rw [induceSum_apply, smul_apply, induceSum_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [induceTerm_smul]
+
+theorem induceSum_eq_zero_of_not_conjugatesInto {H : Subgroup G} (θ : ClassFunction ↥H k)
+    {g : G} (hg : g ∉ conjugatesInto H) :
+    induceSum H θ g = 0 := by
+  simp [induceSum, induceTerm_eq_zero_of_not_conjugatesInto θ hg]
+
+theorem support_induceSum_subset_conjugatesInto (H : Subgroup G) (θ : ClassFunction ↥H k) :
+    (induceSum H θ).support ⊆ conjugatesInto H := by
+  intro g hg
+  by_contra hnot
+  exact hg (induceSum_eq_zero_of_not_conjugatesInto θ hnot)
+
+theorem induceSum_eq_zero_of_not_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
+    {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A) {g : G}
+    (hg : g ∉ conjugatesIntoSet H A) :
+    induceSum H θ g = 0 := by
+  simp [induceSum, induceTerm_eq_zero_of_not_conjugatesIntoSet hθ hg]
+
+theorem support_induceSum_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
+    {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A) :
+    (induceSum H θ).support ⊆ conjugatesIntoSet H A := by
+  intro g hg
+  by_contra hnot
+  exact hg (induceSum_eq_zero_of_not_conjugatesIntoSet hθ hnot)
 
 end ClassFunction
 
