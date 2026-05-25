@@ -99,6 +99,20 @@ theorem fixedBy_eq_singleton_one (h : IsFrobeniusAction A N) {a : A} (ha : a ≠
   · by_contra hne; exact h a ha n hne hn
   · rintro rfl; exact smul_one a
 
+@[reducible] private def invariantSubgroupMulDistribMulAction (M : Subgroup N)
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A M := by
+  letI : SMul A M := ⟨fun a m => ⟨a • (m : N), hM a m m.2⟩⟩
+  exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+
+/-- A Frobenius action restricts to every invariant subgroup. -/
+theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) :
+    @IsFrobeniusAction A M _ _ (invariantSubgroupMulDistribMulAction M hM) := by
+  letI : MulDistribMulAction A M := invariantSubgroupMulDistribMulAction M hM
+  intro a ha m hm hfix
+  have hmN : (m : N) ≠ 1 := fun hmN => hm (Subtype.ext hmN)
+  exact h a ha (m : N) hmN (Subtype.ext_iff.mp hfix)
+
 /-- **Isaacs Lemma 6.1**: a Frobenius action gives `|N| ≡ 1 (mod |A|)`.
 
 Proof via Burnside's lemma:
