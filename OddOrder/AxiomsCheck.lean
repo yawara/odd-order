@@ -100,6 +100,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- G π-separable + O_{π'}(G) = ⊥ ⇒ C_G(O_π(G)) ≤ O_π(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_higman_1_2_3
 
+-- Ch.3 (Split Extensions): π-core quotient reduction
+-- Quotienting by O_π(G) kills the π-radical.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot
+
 -- Ch.3 (Split Extensions): Thm 3.22 Hall-Higman π-length ≤ 1
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall

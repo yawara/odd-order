@@ -1727,6 +1727,44 @@ theorem oPiCore.comap_le_of_injective {G H : Type*} [Group G] [Group H] [Finite 
     exact (oPiCore.isPiGroup π) p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
   exact Subgroup.IsPiGroup.le_oPiCore hPi
 
+/-- Quotienting by `O_π(G)` kills the π-radical. -/
+theorem oPiCore_quotient_self_eq_bot {G : Type*} [Group G] [Finite G] (π : Set ℕ) :
+    oPiCore π (G ⧸ oPiCore π G) = ⊥ := by
+  let N : Subgroup G := oPiCore π G
+  let q : G →* G ⧸ N := QuotientGroup.mk' N
+  let Kbar : Subgroup (G ⧸ N) := oPiCore π (G ⧸ N)
+  let K : Subgroup G := Kbar.comap q
+  haveI hN_normal : N.Normal := inferInstance
+  haveI hK_normal : K.Normal := inferInstance
+  have hN_le_K : N ≤ K := by
+    intro x hx
+    change q x ∈ Kbar
+    rw [show q x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+    exact Kbar.one_mem
+  have hK_map : K.map q = Kbar := by
+    dsimp [K, q]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) Kbar
+  have hKmap_pi : Subgroup.IsPiGroup π (K.map q) := by
+    rw [hK_map]
+    exact oPiCore.isPiGroup π
+  have hNsub_pi : Subgroup.IsPiGroup π (N.subgroupOf K) :=
+    Subgroup.IsPiGroup.subgroupOf hN_le_K (oPiCore.isPiGroup π)
+  have hKquot_pi :
+      ∀ p ∈ (Nat.card (↥K ⧸ N.subgroupOf K)).primeFactors, p ∈ π :=
+    Subgroup.IsPiGroup.primeFactors_quotient_subgroupOf hKmap_pi
+  have hK_pi : Subgroup.IsPiGroup π K :=
+    IsPiGroup.of_normal_quotient (N.subgroupOf K) hNsub_pi hKquot_pi
+  have hK_le_N : K ≤ N := hK_pi.le_oPiCore
+  have hK_eq_N : K = N := le_antisymm hK_le_N hN_le_K
+  have hN_map_bot : N.map q = ⊥ := by
+    rw [Subgroup.map_eq_bot_iff N]
+    dsimp [q]
+    rw [QuotientGroup.ker_mk']
+  calc
+    Kbar = K.map q := hK_map.symm
+    _ = N.map q := by rw [hK_eq_N]
+    _ = ⊥ := hN_map_bot
+
 /-- **`oPiCore π G ⊓ oPiCore π' G = ⊥`** for finite `G`.
 
 `oPiCore π G` は π-group, `oPiCore π' G` は π'-group なので primeFactors が排他的
