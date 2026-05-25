@@ -20,16 +20,23 @@ BG §1 Lemma 1.7(d) は有限 p-群 `R` について `Φ(R) = ⟨R', x^p | x ∈
 
 ## やること
 
-- [ ] `OddOrder.GroupTheory.FrattiniPGroup` に `frattini_le_commutator_sup_pow_closure`
+- [x] `OddOrder.BG.Ch1.S01` に `frattini_le_commutator_sup_pow_closure`
       方向を追加する。
-- [ ] `commutator_sup_pow_closure_eq_frattini` の等号版を追加する。
-- [ ] `OddOrder.BG.Ch1.S01` に BG Lemma 1.7(d) 完全形を露出する。
+- [x] `commutator_sup_pow_closure_eq_frattini` の等号版を追加する。
+- [x] `OddOrder.BG.Ch1.S01` に BG Lemma 1.7(d) 完全形を露出する。
+
+## 完了メモ
+
+`OddOrder.GroupTheory.FrattiniPGroup` は Ch.4 への依存を持たせないため、逆向きは BG §1 側で
+`OddOrder.Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup` を使って証明した。
+`K = R' ⊔ ⟨x^p | x ∈ R⟩` に対して `R/K` が elementary abelian であることを示し、
+Ch.4 Lemma 4.5 から `Φ(R) ≤ K` を得る。
 
 ## 完了条件
 
-- `lake build OddOrder.BG.Ch1_Preliminary.S01_Solvable` が通る。
-- `lake build OddOrder.AxiomsCheck` が通る。
-- `S01_Solvable.lean` の Lemma 1.7(d) コメントから「逆向き deferred」が消える。
+- [x] `lake build OddOrder.BG.Ch1_Preliminary.S01_Solvable` が通る。
+- [x] `lake build OddOrder.AxiomsCheck` が通る。
+- [x] `S01_Solvable.lean` の Lemma 1.7(d) コメントから「逆向き deferred」が消える。
 
 ## 参照
 
