@@ -67,6 +67,16 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `Nat.card (RealIrreducibleCharacter G) = 1` for odd `Nat.card G`.
 - The pointwise textbook form (`χ ≠ 1_G → χ̄ ≠ χ`) still waits for the
   trivial-character API identifying the unique real irreducible character.
+- `OddOrder.Peterfalvi.S03.characterDegree`, `SameDegreeFamily`, and
+  `HasUniformDegree` name the degree conditions used by (1.4), (1.5), and
+  §7 (5.7).
+- `centralizerInSubgroup` and `VanishesOnTrivialSubgroupCentralizers` encode the
+  target shape of (1.2) without adding a new proof stub.
+- `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
+  Fourier/induced-character expansion target; numerical Frobenius reciprocity
+  remains routed to `InducedCharacter`.
+- `characterKernel` and `SubsetCharacterKernel` encode the set-level kernel
+  containment shape needed for (1.6).
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 
