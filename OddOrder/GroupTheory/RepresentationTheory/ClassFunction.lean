@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Group.Conj
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Algebra.Module.Submodule.Basic
+import Mathlib.Algebra.Star.Basic
 
 /-!
 # Class functions on a group
@@ -31,9 +34,7 @@ mathlib に `ClassFunction G k` という型は **存在しない** (Peterfalvi 
 
 ## TODO (本 commit 範囲外)
 
-- `⟨φ, ψ⟩_G` (有限群 + 適切なスカラー).
 - `restrict (H : Subgroup G) : ClassFunction G k → ClassFunction H k`.
-- `Supp φ : Set G := { g | φ g ≠ 0 }`.
 - mathlib `Representation.character` からの coercion.
 
 ## References
@@ -106,6 +107,77 @@ theorem ext {φ ψ : ClassFunction G k} (h : ∀ g, φ g = ψ g) : φ = ψ :=
 
 @[simp] theorem smul_apply (c : k) (φ : ClassFunction G k) (g : G) :
     (c • φ) g = c * φ g := rfl
+
+section Support
+
+variable {G : Type*} [Group G] {k : Type*} [CommRing k]
+
+/-- The **support** of a class function: `{ g | φ g ≠ 0 }`. Closed under
+conjugation by the defining property. -/
+def support (φ : ClassFunction G k) : Set G := { g | φ g ≠ 0 }
+
+@[simp] theorem mem_support {φ : ClassFunction G k} {g : G} :
+    g ∈ φ.support ↔ φ g ≠ 0 := Iff.rfl
+
+theorem support_conj_iff (φ : ClassFunction G k) (g h : G) :
+    h * g * h⁻¹ ∈ φ.support ↔ g ∈ φ.support := by
+  simp [mem_support, φ.conj_eq]
+
+@[simp] theorem support_zero : (0 : ClassFunction G k).support = ∅ := by
+  ext g; simp
+
+theorem mem_support_of_isConj {φ : ClassFunction G k} {g₁ g₂ : G}
+    (hg : IsConj g₁ g₂) (h : g₁ ∈ φ.support) : g₂ ∈ φ.support := by
+  rw [mem_support, ← φ.of_isConj hg]
+  exact h
+
+end Support
+
+section Inner
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {k : Type*} [CommRing k] [StarRing k]
+
+/-- The **unscaled inner sum** of two class functions: `Σ_g φ(g) * star(ψ(g))`.
+
+Peterfalvi's `(α, β)_G = (1/|G|) Σ_g α(g) · β̄(g)` corresponds to this sum
+divided by `Nat.card G`. We expose the bare sum here so that the user can
+choose how to invert `|G|` (e.g. in a field of characteristic prime to `|G|`,
+or formally as `Nat.card G : ℂ`). -/
+def innerSum (φ ψ : ClassFunction G k) : k :=
+  ∑ g : G, φ g * star (ψ g)
+
+@[simp] theorem innerSum_zero_left (ψ : ClassFunction G k) :
+    innerSum (0 : ClassFunction G k) ψ = 0 := by
+  simp [innerSum]
+
+@[simp] theorem innerSum_zero_right (φ : ClassFunction G k) :
+    innerSum φ (0 : ClassFunction G k) = 0 := by
+  simp [innerSum]
+
+theorem innerSum_add_left (φ₁ φ₂ ψ : ClassFunction G k) :
+    innerSum (φ₁ + φ₂) ψ = innerSum φ₁ ψ + innerSum φ₂ ψ := by
+  simp [innerSum, add_mul, Finset.sum_add_distrib]
+
+theorem innerSum_add_right (φ ψ₁ ψ₂ : ClassFunction G k) :
+    innerSum φ (ψ₁ + ψ₂) = innerSum φ ψ₁ + innerSum φ ψ₂ := by
+  simp [innerSum, star_add, mul_add, Finset.sum_add_distrib]
+
+theorem innerSum_smul_left (c : k) (φ ψ : ClassFunction G k) :
+    innerSum (c • φ) ψ = c * innerSum φ ψ := by
+  rw [innerSum, innerSum, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  rw [smul_apply, mul_assoc]
+
+theorem innerSum_neg_left (φ ψ : ClassFunction G k) :
+    innerSum (-φ) ψ = -innerSum φ ψ := by
+  simp [innerSum, neg_mul, Finset.sum_neg_distrib]
+
+theorem innerSum_neg_right (φ ψ : ClassFunction G k) :
+    innerSum φ (-ψ) = -innerSum φ ψ := by
+  simp [innerSum, mul_neg, Finset.sum_neg_distrib]
+
+end Inner
 
 end ClassFunction
 
