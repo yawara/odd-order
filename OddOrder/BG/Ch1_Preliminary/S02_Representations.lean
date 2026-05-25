@@ -1545,6 +1545,67 @@ private theorem sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_
   exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
     K ρ hfaithful hK hdim hK_ne_bot P
 
+/-- q = p endpoint when the determinant kernel `G*` is trivial.
+
+This is the `G* = 1` branch in BG Thm 2.6: the determinant character embeds
+`G` into `Fˣ`, so `G` is abelian and hence every Sylow subgroup is abelian and
+contains `G'`. -/
+private theorem sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F]
+    {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hdet : determinantKernelSubgroup ρ = ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  have hGcomm := commutative_of_determinantKernel_eq_bot ρ hdet
+  constructor
+  · constructor
+    intro x y
+    exact Subtype.ext (hGcomm.comm x y)
+  · intro g hg
+    have hgdet := commutator_le_determinantKernelSubgroup ρ hg
+    rw [hdet] at hgdet
+    have hg_one : g = 1 := by simpa using hgdet
+    simp [hg_one]
+
+/-- q = p endpoint when the determinant kernel `G*` itself is a nontrivial
+p-subgroup.
+
+In this case `G*` is already the nontrivial normal p-subgroup needed by the
+fixed-space reduction. -/
+private theorem sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hdet_p : IsPGroup p (determinantKernelSubgroup ρ))
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  haveI : (determinantKernelSubgroup ρ).Normal :=
+    determinantKernelSubgroup_normal ρ
+  exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
+    (determinantKernelSubgroup ρ) ρ hfaithful hdet_p hdim hdet_ne_bot P
+
+/-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
+private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hcase : determinantKernelSubgroup ρ = ⊥ ∨
+      IsPGroup p (determinantKernelSubgroup ρ) ∧ determinantKernelSubgroup ρ ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  rcases hcase with hbot | ⟨hdet_p, hdet_ne_bot⟩
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot ρ hbot P
+  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
+      ρ hfaithful hdim hdet_p hdet_ne_bot P
+
 /-- Special case of the q = p endpoint when the ambient group itself is a
 p-group. -/
 private theorem sylow_commutative_and_commutator_le_of_isPGroup

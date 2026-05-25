@@ -449,5 +449,9 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `G* = ⊥` なら determinant character が `G ↪ Fˣ` になり `G` が abelian,
   という BG Thm 2.6 の最終分岐を `commutative_of_determinantKernel_eq_bot`
   として切り出し済み.
+- q=p theorem-facing endpoint として `G* = ⊥` 分岐と
+  `G*` が非自明 p-group の分岐を
+  `sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup`
+  に集約済み.
 - 次 frontier は `G* ≠ ⊥` の場合に `O_p(G*)` から非自明 normal p-subgroup
   を作る段. ここは Fitting / p-core API 調査が必要.
