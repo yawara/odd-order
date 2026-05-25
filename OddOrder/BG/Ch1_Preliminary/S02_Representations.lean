@@ -567,6 +567,27 @@ private theorem sylow_monoidHom_units_eq_one_of_charP
     (φ : P →* Fˣ) : φ = 1 :=
   monoidHom_units_eq_one_of_isPGroup_charP P.isPGroup' φ
 
+/-- A nonzero proper submodule of a two-dimensional vector space has dimension one,
+and so does its quotient. -/
+private theorem rank_one_subquotients_of_finrank_two
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) (hdim : Module.finrank F V = 2)
+    (hW_ne_bot : W ≠ ⊥) (hW_ne_top : W ≠ ⊤) :
+    Module.finrank F W = 1 ∧ Module.finrank F (V ⧸ W) = 1 := by
+  have hW_pos : 1 ≤ Module.finrank F W := by
+    rw [Submodule.one_le_finrank_iff]
+    exact hW_ne_bot
+  have hW_lt : Module.finrank F W < 2 := by
+    have hlt : Module.finrank F W < Module.finrank F V :=
+      Submodule.finrank_lt hW_ne_top
+    simpa [hdim] using hlt
+  have hdimW : Module.finrank F W = 1 := by
+    omega
+  have hsum : Module.finrank F (V ⧸ W) + Module.finrank F W = 2 := by
+    simpa [hdim] using W.finrank_quotient_add_finrank
+  refine ⟨hdimW, ?_⟩
+  omega
+
 /-- Pointwise scalar form of the rank-one endomorphism theorem. -/
 private theorem exists_scalar_apply_of_finrank_eq_one
     {F : Type*} [Field F] {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
