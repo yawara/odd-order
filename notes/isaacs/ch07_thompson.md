@@ -205,7 +205,7 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 7.6 → 7.8 (Burnside の Thompson factorization は 7.6 を maximal subgroup M に適用)
 - 6.23 (Ch.6) → 7.1 (Ch.7) → 6.24 (Ch.6 完備化) ← **Ch.6/Ch.7 間の唯一の双方向依存**
 
-## 着手状況 (2026-05-25)
+## 着手状況 (2026-05-26)
 
 - ✅ shared module `OddOrder/GroupTheory/ElementaryAbelian.lean` (`IsElementaryAbelian`).
 - ✅ shared module `OddOrder/GroupTheory/ThompsonSubgroup.lean` (`Subgroup.thompsonJ` def + Thm 7.2).
@@ -228,6 +228,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   (`actionCommutator_quotientActionKernel_le`), `[V,K,K]=1` bridge
   (`actionCommutator_quotientActionKernel_le_fixedPoints`), faithful action + `V` p-group から
   `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
+  さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
+  (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
+  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み.
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
@@ -241,7 +244,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
 - 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
 - 🔴 **Ch.6 6.20**: Thm 7.6 Step 5 の blocker. abelian coprime action 補題.
-- 🔴 **`Aut(E) ≅ GL(2,p)` bridge**: Thm 7.5 の `|V| ≤ p^2`, noncyclic p-group ⇒ elementary abelian order `p^2` から Lem 7.3 へ渡すために必要.
+- ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
+  automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
+  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
 - 🟡 **Ω₁ / order-p fixed subgroup helper**: Thm 7.6 Step 7 で必要. Ch.6 6.11 実装で先に共通化できる可能性あり.
 
 ## 着手順 (提案)
@@ -263,7 +268,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      `actionCommutator_quotientActionKernel_le_fixedPoints`,
      `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
 3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
-4. 🔴 **`Aut(E) ≅ GL(2,p)` bridge** — `|V| ≤ p^2` かつ noncyclic p-group から elementary abelian `p^2` を取り, Lem 7.3 に渡す.
+4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
+   `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
 6. 🔴 **Ch.6 6.20** — 7.6 Step 5 の直接前提.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.

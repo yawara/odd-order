@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Module.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.FiniteAbelian.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
@@ -1193,6 +1194,117 @@ faithful action / fixed subgroup の橋渡しだけを配置する. -/
 Theorem 7.5 repeatedly uses the faithful action of `G` on the `p`-group `V` as an
 embedding `G ↪ Aut(V)`, and writes `C_V(P)` for the fixed subgroup of `P` acting on
 `V`.  The following helpers keep those two translations explicit. -/
+
+/-- Reinterpret automorphisms of an abelian group of exponent dividing `p` as `ZMod p`-linear
+automorphisms of its additive type.
+
+The `ZMod p`-module structure is supplied explicitly because in Thm 7.5 it is built from the
+elementary-abelian hypothesis on a quotient. -/
+noncomputable def mulAutZModGeneralLinearEquiv
+    (V : Type*) [Group V] [IsMulCommutative V] (p : ℕ)
+    [Module (ZMod p) (Additive V)] :
+    MulAut V ≃* LinearMap.GeneralLinearGroup (ZMod p) (Additive V) where
+  toFun φ :=
+    (LinearMap.GeneralLinearGroup.generalLinearEquiv (ZMod p) (Additive V)).symm
+      ((MulEquiv.toAdditive φ).toLinearEquiv
+        (fun c x => ZMod.map_smul (MulEquiv.toAdditive φ).toAddMonoidHom c x))
+  invFun φ :=
+    (MulEquiv.toAdditive (G := V) (H := V)).symm φ.toLinearEquiv.toAddEquiv
+  left_inv φ := by
+    ext x
+    rfl
+  right_inv φ := by
+    ext x
+    rfl
+  map_mul' φ ψ := by
+    ext x
+    rfl
+
+/-- A chosen `ZMod p`-basis of size `2` identifies `Aut(V)` with `GL(2,p)`.
+
+This is the explicit bridge needed to feed the action on an elementary-abelian quotient into
+Isaacs Lemma 7.3 (`gl2_pSubgroup_centralizes_of_normalizes`). -/
+noncomputable def mulAutGLTwoEquivOfBasis
+    (V : Type*) [Group V] [IsMulCommutative V] (p : ℕ)
+    [Module (ZMod p) (Additive V)]
+    (b : Module.Basis (Fin 2) (ZMod p) (Additive V)) :
+    MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p) :=
+  (mulAutZModGeneralLinearEquiv V p).trans (Matrix.GeneralLinearGroup.toLin' b).symm
+
+/-- The `ZMod p` scalar-torsion condition supplied by an elementary-abelian multiplicative group.
+-/
+private lemma additive_nsmul_eq_zero_of_isElementaryAbelian
+    {V : Type*} [Group V] {p : ℕ}
+    (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) :
+    ∀ x : Additive V, (p : ℕ) • x = 0 := by
+  intro x
+  apply Additive.toMul.injective
+  show (p • x).toMul = (0 : Additive V).toMul
+  rw [toMul_nsmul, toMul_zero]
+  exact hV.pow_eq_one x.toMul
+
+/-- An elementary-abelian group of order `p^2` has automorphism group identified with `GL(2,p)`.
+
+The basis is chosen noncomputably from the finite `ZMod p`-vector-space structure on the
+additive type. -/
+noncomputable def mulAutGLTwoEquivOfIsElementaryAbelianCard
+    (V : Type*) [Group V] [Finite V] {p : ℕ} [Fact p.Prime]
+    (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) (hcard : Nat.card V = p ^ 2) :
+    MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p) := by
+  classical
+  haveI : IsMulCommutative V := ⟨⟨hV.comm⟩⟩
+  haveI : Fintype V := Fintype.ofFinite V
+  haveI : Fintype (Additive V) := Fintype.ofEquiv V Additive.ofMul
+  haveI : Module (ZMod p) (Additive V) :=
+    AddCommGroup.zmodModule (additive_nsmul_eq_zero_of_isElementaryAbelian hV)
+  have hfinrank : Module.finrank (ZMod p) (Additive V) = 2 := by
+    apply Nat.pow_right_injective (Fact.out : p.Prime).two_le
+    calc
+      p ^ Module.finrank (ZMod p) (Additive V)
+          = Fintype.card (ZMod p) ^ Module.finrank (ZMod p) (Additive V) := by
+              rw [ZMod.card]
+      _ = Fintype.card (Additive V) := (Module.card_eq_pow_finrank
+              (K := ZMod p) (V := Additive V)).symm
+      _ = Nat.card (Additive V) := by rw [Nat.card_eq_fintype_card]
+      _ = Nat.card V := (Nat.card_congr Additive.ofMul).symm
+      _ = p ^ 2 := hcard
+  let b0 := Module.Free.chooseBasis (ZMod p) (Additive V)
+  have hidx_card : Fintype.card (Module.Free.ChooseBasisIndex (ZMod p) (Additive V)) = 2 := by
+    rw [← Module.finrank_eq_card_chooseBasisIndex]
+    exact hfinrank
+  let eidx : Module.Free.ChooseBasisIndex (ZMod p) (Additive V) ≃ Fin 2 :=
+    Fintype.equivOfCardEq (by rw [hidx_card, Fintype.card_fin])
+  exact mulAutGLTwoEquivOfBasis V p (b0.reindex eidx)
+
+/-- Transport Isaacs Lemma 7.3 back from `GL(2,p)` to automorphism subgroups.
+
+The hypotheses are stated for the images of `P` and `L` under a chosen identification
+`Aut(V) ≃ GL(2,p)`.  The conclusion is the original centralizer statement in `Aut(V)`. -/
+theorem mulAut_centralizes_of_gl2_image_hypotheses
+    {V : Type*} [Group V] {p : ℕ} [Fact p.Prime]
+    (e : MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) (hp2 : p ≠ 2)
+    {P L : Subgroup (MulAut V)}
+    (hPp : IsPGroup p (P.map e.toMonoidHom))
+    (hPnorm : P.map e.toMonoidHom ≤
+      Subgroup.normalizer ((L.map e.toMonoidHom) : Set _))
+    (hLcop : ¬ p ∣ Nat.card (L.map e.toMonoidHom))
+    (hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ L.map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) :
+    P ≤ Subgroup.centralizer (L : Set _) := by
+  have hGL : P.map e.toMonoidHom ≤ Subgroup.centralizer ((L.map e.toMonoidHom) : Set _) :=
+    gl2_pSubgroup_centralizes_of_normalizes hp2 hPp hPnorm hLcop hL2abelian
+  intro x hxP
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hyL
+  have hxGL : e x ∈ P.map e.toMonoidHom :=
+    Subgroup.mem_map_of_mem e.toMonoidHom hxP
+  have hyGL : e y ∈ L.map e.toMonoidHom :=
+    Subgroup.mem_map_of_mem e.toMonoidHom hyL
+  have hcommGL : e y * e x = e x * e y :=
+    (Subgroup.mem_centralizer_iff.mp (hGL hxGL)) (e y) hyGL
+  apply e.injective
+  simpa [map_mul] using hcommGL
 
 /-- A faithful action by automorphisms embeds the acting group into `MulAut V`. -/
 theorem toMulAut_injective_of_faithful {A V : Type*} [Group A] [Group V]
