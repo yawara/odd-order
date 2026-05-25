@@ -1926,6 +1926,39 @@ theorem actionCommutator_eq_bot_iff_acts_trivially {A G : Type*} [Group A] [Grou
     exact hg.symm
   · rw [Subgroup.mem_bot, h a g, inv_mul_cancel]
 
+/-- **A-不変部分群への作用制限**: `φ : A →* MulAut G` + `IsAInvariant φ H` から
+`A →* MulAut ↥H` を構成. 関数本体は `(φ a)` を `H` に制限したもの.
+
+Thm 4.36 induction で IH を `[G, A] < G` 等の subgroup に適用するために必要. -/
+def OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group G]
+    {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) : A →* MulAut H where
+  toFun a := {
+    toFun := fun h => ⟨(φ a) h.val, hH.smul_mem a h.property⟩
+    invFun := fun h => ⟨(φ a)⁻¹ h.val, hH.inv_smul_mem a h.property⟩
+    left_inv := fun h => Subtype.ext (by
+      show (φ a)⁻¹ ((φ a) h.val) = h.val
+      simp)
+    right_inv := fun h => Subtype.ext (by
+      show (φ a) ((φ a)⁻¹ h.val) = h.val
+      simp)
+    map_mul' := fun x y => Subtype.ext (map_mul (φ a) x.val y.val)
+  }
+  map_one' := by
+    ext h
+    show ((φ 1 : MulAut G) h.val) = h.val
+    simp
+  map_mul' a b := by
+    ext h
+    show ((φ (a * b) : MulAut G) h.val) = ((φ a) ((φ b) h.val))
+    rw [map_mul]; rfl
+
+@[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) (a : A) (h : H) :
+    ((OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH a) h).val =
+      (φ a) h.val := rfl
+
 /-- **Isaacs Corollary 4.21**: For `H ≤ G`, the following are equivalent:
 (a) `∀ a x, (φ a) x ∈ Hx` (right coset is A-invariant in element form);
 (b) `∀ a x, (φ a) x ∈ xH` (left coset is A-invariant in element form);
