@@ -26,6 +26,15 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 
 §5 は §4 Dade isometry を **最重要特殊化** する. 仮説: `G` 有限群, `W = W₁ × W₂` が cyclic (odd order), `V = W - (W₁ ∪ W₂)` が TI-subset で `N_G(V) = W` となる case. **目標**: W が cyclic ⇒ `CF(W, V)` の basis `(α_{ij})` を explicit に構成し、induced characters `Ind_W^G α_{ij}` が orthonormal family `(χ_{ij})` を張る. **結果**: Dade map `τ` の image の orthogonality 構造が完全に決定される ⇒ §6-§8 で coherence 条件を精密に制御可能.
 
+## Lean status (2026-05-26)
+
+`OddOrder/Peterfalvi/S05_TICyclic.lean` は §5 の TI-cyclic setup を §4 Dade interface に接続している:
+
+- `TICyclicHypothesis.toDadeHypothesis`: `H(a)=1` specialization として `S04.Hypothesis` を作る。
+- `TICyclicHypothesis.SupportedOnV`: Peterfalvi `CF(W,V)` の Lean 名。
+- `TICyclicHypothesis.DadeApplication`: 係数 `k` に parametric な `S04.DadeIsometryData` を §5 carrier に載せる。
+- `TICyclicHypothesis.FullDadeApplication`: `k = ℂ` の `S04.FullDadeIsometryData` を載せ、`full_inner_eq` と `full_maps_virtualCharacter` で (2.6.a)/(2.6.b) を §5 側から使えるようにする。
+
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | phase2b 被引用 |
 |---|--------|------|-----------------|------|---------|---------------|
 | **(3.1)** | 3-5 | **Hypothesis** | G 有限群, W = W₁×W₂ cyclic odd, w₁,w₂ > 1, V = W-(W₁∪W₂) は TI-subset で norm=W | **Setup** | low | 全結果の前提 |
