@@ -1,6 +1,7 @@
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.OmegaSubgroup

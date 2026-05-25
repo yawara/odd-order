@@ -226,7 +226,7 @@ V: faithful FG-加群, dim V = 2
 (b) char F = p | |G| ⇒ Sylow p-subgroup abelian ∧ contains G'
 ```
 
-### 証明梗概 (BG L779–793, MISSING_PAGE:29 を含む)
+### 証明梗概 (BG L779–793 + PDF p.29 補完)
 
 **帰納法** (|G| について):
 
@@ -243,11 +243,31 @@ V: faithful FG-加群, dim V = 2
 - W = C_V(K) (K-不変部分加群)
 - G Lemma 2.6.3: W ≠ 0
 - dim V = 2, G faithful on V ⇒ dim W = 1 (L785–786)
-- dim W = dim V/W = 1 (orthogonal decomposition)
+- dim W = dim V/W = 1
+- W は G-invariant
+- C = C_G(W) ∩ C_G(V/W) は elementary abelian p-group
+- char F = p では Fˣ の p-power torsion は 1 のみなので, C は G の全 p-element を含む
+- Fˣ は abelian なので C は G' も含む
+- よって (b)
 
 **Step 3b: q ≠ p の場合**
-- Sylow q-subgroup の可解 action
-- induction 適用
+- Maschke + K abelian + F algebraically closed から V = W₁ ⊕ W₂
+  (two one-dimensional FK-modules)
+- x ∈ K# の eigenvalues λ₁, λ₂ は λ₁λ₂ = det x = 1 かつ x odd order なので distinct
+- x が固定する one-dimensional subspace は W₁, W₂ のみ
+- K ◁ G なので G は W₁, W₂ を固定または交換する; |G| odd なので交換できず固定
+- よって G は abelian p'-group, (a) に帰着
+
+**Step 4: G* ≠ 1 の一般処理**
+- G* が p-group なら O_p(G*) ≠ 1 で Step 3a
+- そうでなければ q ≠ p の Sylow Q ≤ G* と H = N_{G*}(Q) を取り, O_q(H) ≠ 1
+- Step 3b より H abelian, したがって Q は G* で normalizer の中心
+- Burnside (Thm 1.18) で G* は Q の normal complement N を持つ
+- N = 1 なら O_q(G*) = Q; N ≠ 1 なら induction で O_r(N) ≠ 1, hence O_r(G*) ≠ 1
+- どちらも Step 3 に帰着
+
+**Step 5: G* = 1**
+- determinant により G ↪ Fˣ, よって G は abelian p'-group
 
 ### 形式化対応
 
