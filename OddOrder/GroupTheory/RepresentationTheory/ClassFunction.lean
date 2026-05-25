@@ -34,7 +34,6 @@ mathlib に `ClassFunction G k` という型は **存在しない** (Peterfalvi 
 
 ## TODO (本 commit 範囲外)
 
-- `restrict (H : Subgroup G) : ClassFunction G k → ClassFunction H k`.
 - mathlib `Representation.character` からの coercion.
 
 ## References
@@ -107,6 +106,35 @@ theorem ext {φ ψ : ClassFunction G k} (h : ∀ g, φ g = ψ g) : φ = ψ :=
 
 @[simp] theorem smul_apply (c : k) (φ : ClassFunction G k) (g : G) :
     (c • φ) g = c * φ g := rfl
+
+section Restrict
+
+variable {G : Type*} [Group G] {k : Type*} [CommRing k]
+
+/-- The **restriction** `Res^G_H φ : ClassFunction ↥H k` of a class function on `G`
+to a subgroup `H ≤ G`. -/
+def restrict (H : Subgroup G) (φ : ClassFunction G k) : ClassFunction ↥H k :=
+  ⟨fun h => φ (h : G), fun h₁ h₂ => by
+    change φ ((h₂ : G) * (h₁ : G) * ((h₂⁻¹ : H) : G)) = φ (h₁ : G)
+    rw [show ((h₂⁻¹ : H) : G) = (h₂ : G)⁻¹ from rfl]
+    exact φ.conj_eq h₁ h₂⟩
+
+@[simp] theorem restrict_apply (H : Subgroup G) (φ : ClassFunction G k) (h : H) :
+    (restrict H φ) h = φ (h : G) := rfl
+
+@[simp] theorem restrict_zero (H : Subgroup G) :
+    restrict H (0 : ClassFunction G k) = 0 := by
+  ext h; simp
+
+theorem restrict_add (H : Subgroup G) (φ ψ : ClassFunction G k) :
+    restrict H (φ + ψ) = restrict H φ + restrict H ψ := by
+  ext h; simp
+
+theorem restrict_smul (H : Subgroup G) (c : k) (φ : ClassFunction G k) :
+    restrict H (c • φ) = c • restrict H φ := by
+  ext h; simp
+
+end Restrict
 
 section Support
 
