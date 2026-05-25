@@ -158,6 +158,15 @@ end DadeIsometry
 
 **推奨**: **候補 3 (predicate-based)**. §5-§8 への移行が最も柔軟, Phase 2b 形式化期間短縮.
 
+### Lean status (2026-05-26)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` は上記方針を次の二層 interface として実装済み:
+
+- `DadeIsometryData`: 係数 `k` に parametric なまま、Peterfalvi (2.5) の pointwise Dade-map equations と (2.6.a) の normalized inner-product preservation を束ねる。§6 の generic carrier はこれを使い続ける。
+- `PreservesVirtualCharacters` / `FullDadeIsometryData`: `k = ℂ` に特殊化し、Wave 1a `ZIrr` lattice を使って (2.6.b) の `τ : Z[Irr L, A] → Z[Irr G]` preservation を名前付き field として束ねる。
+
+`FullDadeIsometryData.restrict` は (2.11) の restriction 用に、inner-product preservation と virtual-character preservation の両方を `A₁ ⊆ A` へ降ろす。
+
 ## TI-subset の Peterfalvi 流定義
 
 **Peterfalvi §5 (3.1)-(3.5)** で cyclic normalizer 特殊化された TI-subset が扱われる:
@@ -185,7 +194,8 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
   { f : H → ℂ // ∀ h ∉ A, f h = 0 }
 ```
 
-**mathlib**: `Submodule` API は既存, `Z[Irr H]` 構造は要追加.
+**mathlib/project status**: `Submodule` API は既存. `Z[Irr H]` は mathlib には無いが、project-side
+`OddOrder.GroupTheory.RepresentationTheory.ZIrr` として追加済み.
 
 ## §5-§8 (Coherence) への橋渡し
 

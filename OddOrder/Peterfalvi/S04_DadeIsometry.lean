@@ -12,6 +12,7 @@ import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.Peterfalvi.S02_Notation
 
 /-!
@@ -27,11 +28,10 @@ has two parts:
   `CF(L, A) → ClassFunction G`;
 * **(2.6.b)** preservation of virtual characters.
 
-The virtual-character lattice `Z[Irr G]` is not available yet, so the first
-slice records the `(2.2)` hypothesis and the normalized inner-product/isometry
-interface.
-The `Z[Irr]` field should be added to this same interface once the Wave 1a
-`ZIrr` module lands.
+The coefficient-parametric interface records the `(2.2)` hypothesis and the
+normalized inner-product/isometry property from `(2.6.a)`.  The complex
+interface `FullDadeIsometryData` adds the virtual-character preservation
+property from `(2.6.b)` using the Wave 1a `ZIrr` lattice.
 
 ## Main declarations
 
@@ -46,6 +46,8 @@ The `Z[Irr]` field should be added to this same interface once the Wave 1a
   inner-product part of the Dade isometry interface.
 * `OddOrder.Peterfalvi.S04.DadeIsometryData` — a bundled map with the current
   Dade-map equations and normalized isometry property.
+* `OddOrder.Peterfalvi.S04.PreservesVirtualCharacters` and
+  `FullDadeIsometryData` — the complex-coefficient `(2.6.b)` interface.
 
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
@@ -556,15 +558,40 @@ theorem map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
 
 end IsDadeMap
 
+/-- Peterfalvi (2.6.b): a complex Dade map sends supported virtual characters
+on `L` to virtual characters of `G`.
+
+The domain is still represented by the complex supported class-function space
+`CF(L,A)`; the hypothesis says that, whenever such a supported class function
+also lies in the integral lattice `ℤ[Irr L]`, its image lies in `ℤ[Irr G]`. -/
+def PreservesVirtualCharacters (τ : DadeMap (G := G) ℂ A L) : Prop :=
+  ∀ α : SupportedClassFunctions (G := G) ℂ A L,
+    ((α : ClassFunction L ℂ) ∈ ZIrr L) → τ α ∈ ZIrr G
+
+namespace PreservesVirtualCharacters
+
+/-- Virtual-character preservation restricts along `A₁ ⊆ A`.
+
+This is the `(2.6.b)` companion to the restriction statement in Peterfalvi
+(2.11). -/
+theorem restrictDomain {τ : DadeMap (G := G) ℂ A L}
+    (hτ : PreservesVirtualCharacters (G := G) (A := A) (L := L) τ)
+    (hA₁A : A₁ ⊆ A) :
+    PreservesVirtualCharacters (G := G) (A := A₁) (L := L)
+      (DadeMap.restrictDomain (G := G) (k := ℂ) (L := L) τ hA₁A) := by
+  intro α hα
+  exact hτ
+    (SupportedClassFunctions.inclusion (G := G) (k := ℂ) (L := L) hA₁A α)
+    (by simpa using hα)
+
+end PreservesVirtualCharacters
+
 variable [StarRing k]
 variable [Fintype G] [Fintype L]
 variable [Invertible (Nat.card G : k)] [Invertible (Nat.card L : k)]
 
-/-- The currently available part of the Dade isometry interface: preservation
-of Peterfalvi's normalized class-function inner product.
-
-The virtual-character preservation field from (2.6.b) is intentionally
-postponed until the `Z[Irr]` lattice is available. -/
+/-- The coefficient-parametric part of the Dade isometry interface:
+preservation of Peterfalvi's normalized class-function inner product. -/
 structure IsDadeIsometry (τ : DadeMap (G := G) k A L) : Prop where
   inner_eq :
     ∀ α β : SupportedClassFunctions (G := G) k A L,
@@ -589,9 +616,9 @@ end IsDadeIsometry
 /-- A bundled Dade isometry candidate relative to `hyp`.
 
 This packages the pointwise equations from Peterfalvi (2.5) together with the
-currently formalized normalized inner-product part of (2.6).  The
-virtual-character preservation field from (2.6.b) should be added once
-`Z[Irr]` is available. -/
+coefficient-parametric normalized inner-product part of (2.6.a).  The
+complex-coefficient full bundle below adds the virtual-character preservation
+property from (2.6.b). -/
 structure DadeIsometryData (hyp : Hypothesis G A L) where
   toDadeMap : DadeMap (G := G) k A L
   isDadeMap : IsDadeMap hyp toDadeMap
@@ -637,6 +664,71 @@ def restrict (τ : DadeIsometryData (G := G) (k := k) hyp) (hA₁A : A₁ ⊆ A)
   rfl
 
 end DadeIsometryData
+
+variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)]
+
+/-- The full complex Dade-isometry interface used by Peterfalvi after (2.6):
+the Dade-map equations, normalized isometry, and preservation of virtual
+characters. -/
+structure FullDadeIsometryData (hyp : Hypothesis G A L) where
+  toDadeIsometryData : DadeIsometryData (G := G) (k := ℂ) hyp
+  preserves_virtualCharacters :
+    PreservesVirtualCharacters (G := G) (A := A) (L := L) toDadeIsometryData.toDadeMap
+
+namespace FullDadeIsometryData
+
+variable {hyp : Hypothesis G A L}
+
+/-- The underlying Dade map of a full complex Dade-isometry package. -/
+abbrev toDadeMap (τ : FullDadeIsometryData (G := G) hyp) : DadeMap (G := G) ℂ A L :=
+  τ.toDadeIsometryData.toDadeMap
+
+instance : CoeFun (FullDadeIsometryData (G := G) hyp)
+    (fun _ => DadeMap (G := G) ℂ A L) :=
+  ⟨fun τ => τ.toDadeMap⟩
+
+@[simp] theorem coe_mk (τ : DadeIsometryData (G := G) (k := ℂ) hyp)
+    (hvirt : PreservesVirtualCharacters (G := G) (A := A) (L := L) τ.toDadeMap) :
+    ((FullDadeIsometryData.mk τ hvirt : FullDadeIsometryData (G := G) hyp) :
+      DadeMap (G := G) ℂ A L) = τ.toDadeMap :=
+  rfl
+
+theorem inner_eq (τ : FullDadeIsometryData (G := G) hyp)
+    (α β : SupportedClassFunctions (G := G) ℂ A L) :
+    ClassFunction.inner (τ.toDadeMap α) (τ.toDadeMap β) =
+      ClassFunction.inner (α : ClassFunction L ℂ) (β : ClassFunction L ℂ) :=
+  τ.toDadeIsometryData.isDadeIsometry.inner_eq α β
+
+theorem maps_virtualCharacter (τ : FullDadeIsometryData (G := G) hyp)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    (hα : (α : ClassFunction L ℂ) ∈ ZIrr L) :
+    τ.toDadeMap α ∈ ZIrr G :=
+  τ.preserves_virtualCharacters α hα
+
+/-- Restrict a full complex Dade isometry to an `L`-stable subset `A₁ ⊆ A`. -/
+def restrict (τ : FullDadeIsometryData (G := G) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    FullDadeIsometryData (G := G) (hyp.restrict hA₁A hA₁_norm) where
+  toDadeIsometryData := τ.toDadeIsometryData.restrict hA₁A hA₁_norm
+  preserves_virtualCharacters :=
+    PreservesVirtualCharacters.restrictDomain τ.preserves_virtualCharacters hA₁A
+
+@[simp] theorem restrict_toDadeMap
+    (τ : FullDadeIsometryData (G := G) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap =
+      DadeMap.restrictDomain (G := G) (k := ℂ) (L := L) τ.toDadeMap hA₁A :=
+  by simp [restrict, toDadeMap, DadeIsometryData.restrict]
+
+@[simp] theorem restrict_apply
+    (τ : FullDadeIsometryData (G := G) hyp) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (α : SupportedClassFunctions (G := G) ℂ A₁ L) :
+    (τ.restrict hA₁A hA₁_norm).toDadeMap α =
+      τ.toDadeMap (SupportedClassFunctions.inclusion (G := G) (k := ℂ) (L := L) hA₁A α) :=
+  by simp [restrict, toDadeMap, DadeIsometryData.restrict]
+
+end FullDadeIsometryData
 
 end DadeMap
 
