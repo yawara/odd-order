@@ -3048,6 +3048,80 @@ lemma BaerMul.isPGroup_iff {G : Type*} [Group G]
     rw [BaerMul.pow_eq_one_iff]
     exact hn
 
+/-- **系 of Lem 4.28**: `A` が `actionCommutator φ` (= `[G, A]`) 上で trivial 作用するとき,
+coprime + (A or G solvable) 仮定下では `actionCommutator φ = ⊥` (= A trivial on whole G).
+
+**証明**: Lem 4.28 で G = C_G(A) · [G, A]. 各 g = c * x で `c ∈ C_G(A)` ⇒ `(φ a) c = c`,
+`x ∈ [G, A]` + 仮定 ⇒ `(φ a) x = x`. 故に `(φ a) g = (φ a)(c·x) = c·x = g`.
+
+Thm 4.36 induction の `[G, A] < G` ケースで使用 (IH ⇒ A trivial on [G, A] ⇒ A trivial on G). -/
+theorem actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_triv : ∀ a : A, ∀ h ∈ actionCommutator φ, (φ a) h = h) :
+    actionCommutator φ = ⊥ := by
+  rw [actionCommutator_eq_bot_iff_acts_trivially]
+  intro a g
+  have h_top : g ∈ Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ := by
+    rw [fixedPoints_sup_actionCommutator_eq_top hCop hSolv]
+    exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup_of_normal_right] at h_top
+  obtain ⟨c, hc_fix, x, hx_ac, h_eq⟩ := h_top
+  -- h_eq : c * x = g, hc_fix : c ∈ fixedPoints, hx_ac : x ∈ actionCommutator
+  rw [← h_eq, map_mul, hc_fix a, h_triv a x hx_ac]
+
+/-- **Isaacs Thm 4.36 (class ≤ 2 case)** ⭐: A acts on p-群 G of class ≤ 2 (p > 2),
+A is p'-group, A fixes every order-p element of G ⇒ A trivial on G.
+
+Baer trick で `BaerMul G` を可換群として扱い, Cor 4.35 を適用. これが Thm 4.36 の核.
+
+`hp_odd : p ≠ 2` から `Odd p` → `Odd (p^k)` → `Odd (Nat.card G)`. `hC : class ≤ 2` を
+`Fact` 化して `BaerMul.instCommGroup` を呼び出し可能に. -/
+theorem actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {p : ℕ} [hp : Fact p.Prime] (hp_odd : p ≠ 2)
+    (hC : _root_.commutator G ≤ Subgroup.center G)
+    (φ : A →* MulAut G) (hG : IsPGroup p G) (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ g : G, g ^ p = 1 → ∀ a : A, (φ a) g = g) :
+    actionCommutator φ = ⊥ := by
+  -- Set up Fact (Odd (Nat.card G))
+  have hOdd_p : Odd p := hp.out.odd_of_ne_two hp_odd
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
+  have hOdd_card : Odd (Nat.card G) := by rw [hk]; exact hOdd_p.pow
+  haveI : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
+  haveI : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨hC⟩
+  -- φ' : A →* MulAut (BaerMul G)
+  set φ' : A →* MulAut (BaerMul G) := MonoidHom.toBaerMulLift φ with hφ'
+  -- IsPGroup p (BaerMul G)
+  have hG' : IsPGroup p (BaerMul G) := (BaerMul.isPGroup_iff p).mpr hG
+  -- h_fix translated to BaerMul G
+  have h_fix' : ∀ g : BaerMul G, g ^ p = 1 → ∀ a : A, (φ' a) g = g := by
+    intro g hg a
+    have hg_G : (BaerMul.toG g) ^ p = 1 := (BaerMul.pow_eq_one_iff g p).mp hg
+    have h_fixed : (φ a) (BaerMul.toG g) = BaerMul.toG g := h_fix _ hg_G a
+    show BaerMul.ofG ((φ a) (BaerMul.toG g)) = g
+    rw [h_fixed]
+    exact BaerMul.ofG_toG g
+  -- Apply Cor 4.35 to BaerMul G
+  have h_bot_baer : actionCommutator φ' = ⊥ :=
+    actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p φ' hG' hA_p' h_fix'
+  -- Translate back to G via iff
+  rw [actionCommutator_eq_bot_iff_acts_trivially] at h_bot_baer
+  rw [actionCommutator_eq_bot_iff_acts_trivially]
+  intro a g
+  have h_act := h_bot_baer a (BaerMul.ofG g)
+  -- h_act : (φ' a) (ofG g) = ofG g
+  -- Unfold φ': (φ' a) (ofG g) = ofG ((φ a) (toG (ofG g))) = ofG ((φ a) g)
+  -- So: ofG ((φ a) g) = ofG g, hence (φ a) g = g by injectivity
+  have h_eq : BaerMul.ofG ((φ a) g) = BaerMul.ofG g := by
+    have hkey : (φ' a) (BaerMul.ofG g) = BaerMul.ofG ((φ a) g) := by
+      show BaerMul.ofG ((φ a) (BaerMul.toG (BaerMul.ofG g))) = BaerMul.ofG ((φ a) g)
+      rw [BaerMul.toG_ofG]
+    rw [← hkey]
+    exact h_act
+  exact BaerMul.ofG.injective h_eq
+
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
 
