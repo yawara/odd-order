@@ -62,22 +62,45 @@ The hard existence theorem is supplied by
 structure records the reusable conclusion in the coherence interface. -/
 structure CharacterDifferenceImage (τ : IntegralCharacterMap L G)
     (χ : ClassFunction L ℂ) where
-  mu : ClassFunction G ℂ
-  nu : ClassFunction G ℂ
-  mu_irreducible : IsIrreducibleCharacter mu
-  nu_irreducible : IsIrreducibleCharacter nu
+  mu : IrreducibleCharacter G
+  nu : IrreducibleCharacter G
   distinct : mu ≠ nu
   sign : ℤ
   sign_eq : sign = 1 ∨ sign = -1
-  image_eq : τ (χ - χ.conj) = sign • (mu - nu)
+  image_eq :
+    τ (χ - χ.conj) =
+      sign • ((mu : ClassFunction G ℂ) - (nu : ClassFunction G ℂ))
 
 namespace CharacterDifferenceImage
 
 variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
 
+/-- The first irreducible character appearing in the signed image, as a class
+function. -/
+abbrev muClassFunction (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction G ℂ :=
+  hχ.mu
+
+/-- The second irreducible character appearing in the signed image, as a class
+function. -/
+abbrev nuClassFunction (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction G ℂ :=
+  hχ.nu
+
+@[simp] theorem mu_irreducible
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    IsIrreducibleCharacter hχ.muClassFunction :=
+  hχ.mu.isIrreducible
+
+@[simp] theorem nu_irreducible
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    IsIrreducibleCharacter hχ.nuClassFunction :=
+  hχ.nu.isIrreducible
+
 /-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
 theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
-    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) = hχ.sign • (hχ.mu - hχ.nu) := by
+    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
+      hχ.sign • (hχ.muClassFunction - hχ.nuClassFunction) := by
   simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using hχ.image_eq
 
 end CharacterDifferenceImage
@@ -137,7 +160,8 @@ theorem difference_image_eq {hyp : Hypothesis (L := L) (G := G) S A}
     {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
     hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
       (hyp.difference_image hχ).sign •
-        ((hyp.difference_image hχ).mu - (hyp.difference_image hχ).nu) :=
+        ((hyp.difference_image hχ).muClassFunction -
+          (hyp.difference_image hχ).nuClassFunction) :=
   (hyp.difference_image hχ).image_conjugateDifference
 
 end Hypothesis

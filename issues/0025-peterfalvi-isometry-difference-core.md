@@ -37,6 +37,10 @@ created: 2026-05-25
 - `isometry_difference_pair_structure` の input/output を raw `ClassFunction`
   tuple から `IrreducibleCharacter` index と `SignedIrreducibleDifferenceFamily`
   に揃えた。
+- `SignedIrreducibleDifferenceFamily.classFunction_injective`,
+  `classFunction_ne`, `classFunction_irreducible` を追加した。
+- §7 の `CharacterDifferenceImage` も `mu`, `nu` を raw `ClassFunction` ではなく
+  `IrreducibleCharacter G` として持つ形に揃えた。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

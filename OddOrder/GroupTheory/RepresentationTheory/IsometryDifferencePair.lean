@@ -75,6 +75,26 @@ abbrev classFunction (data : SignedIrreducibleDifferenceFamily G n)
     data.classFunction i = (data.mu i : ClassFunction G ℂ) :=
   rfl
 
+/-- The class-function family underlying a signed irreducible-difference family
+is injective. -/
+theorem classFunction_injective (data : SignedIrreducibleDifferenceFamily G n) :
+    Function.Injective data.classFunction := by
+  intro i j hij
+  exact data.injective (IrreducibleCharacter.ext (by simpa [classFunction] using hij))
+
+/-- Distinct indices give distinct underlying class functions. -/
+theorem classFunction_ne (data : SignedIrreducibleDifferenceFamily G n)
+    {i j : Fin n} (hij : i ≠ j) :
+    data.classFunction i ≠ data.classFunction j := by
+  intro h
+  exact hij (data.classFunction_injective h)
+
+/-- Every member of a signed irreducible-difference family is irreducible. -/
+@[simp] theorem classFunction_irreducible
+    (data : SignedIrreducibleDifferenceFamily G n) (i : Fin n) :
+    IsIrreducibleCharacter (data.classFunction i) :=
+  (data.mu i).isIrreducible
+
 end SignedIrreducibleDifferenceFamily
 
 variable [Fintype G] [Fintype H]
