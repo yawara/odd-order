@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.Focal
 import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.Isaacs.Ch04_Commutators.Main
 
 open scoped commutatorElement
 
@@ -25,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | mathlib 直接 + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
 | 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
-| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.29; 5.30 保留 |
+| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
 
 ## 方針
 
@@ -858,7 +859,7 @@ section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
   Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
   二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
 - **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
-- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): 5.26 + Ch.4 §4D Thm 4.36 待ち. -/
+- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
 
 /-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
 that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
@@ -2290,12 +2291,57 @@ theorem hasNormalPComplement_of_no_prime_dvd_pow_sub_one
 **Ch.4 Thm 4.36** (p>2 + p-群 G + p'-A が order-p 元固定 ⇒ A trivial) で示す. 仮定より
 order-p 元は中心で A 不変, 中心で固定 ⇒ Thm 4.36 適用条件成立.
 
-**実装状態**: Ch.4 §4D Thm 4.36 完成待ち. -/
+**実装状態**: Ch.4 §4D Thm 4.36 を q-subgroup action に適用して完成. -/
 theorem normal_p_complement_of_order_p_central_odd
-    [Finite G] {p : ℕ} [Fact p.Prime] (_hp_odd : p ≠ 2)
-    (_hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
+    [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
+    (hCent : ∀ g : G, orderOf g = p → g ∈ Subgroup.center G) :
     HasNormalPComplement p G := by
-  sorry
+  classical
+  refine hasNormalPComplement_of_prime_subgroups_centralize
+    (fun {q} _ hq_ne_p {X Q} hXp hQq hQ_le_N => ?_)
+  set N : Subgroup G := Subgroup.normalizer (X : Set G) with hN_def
+  let QN : Subgroup N := Q.subgroupOf N
+  have hQN_q : IsPGroup q QN := by
+    have h_iso : QN ≃* Q := Subgroup.subgroupOfEquivOfLe hQ_le_N
+    exact hQq.of_equiv h_iso.symm
+  let φ : QN →* MulAut X := MulDistribMulAction.toMulAut QN X
+  have hQN_p' : ¬ p ∣ Nat.card QN := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hQN_q
+    rw [hn]
+    exact (Fact.out : p.Prime).coprime_iff_not_dvd.mp
+      (((Nat.coprime_primes (Fact.out : p.Prime) (Fact.out : q.Prime)).mpr
+        hq_ne_p.symm).pow_right n)
+  have hfix : ∀ x : X, x ^ p = 1 → ∀ a : QN, (φ a) x = x := by
+    intro x hxpow a
+    apply Subtype.ext
+    have hxpowG : (x : G) ^ p = 1 := by
+      exact congrArg Subtype.val hxpow
+    have hxord_dvd : orderOf (x : G) ∣ p := orderOf_dvd_of_pow_eq_one hxpowG
+    change ((a : QN) • x : X).val = x.val
+    rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hxord_dvd with hxord1 | hxordp
+    · have hx_one : (x : G) = 1 := orderOf_eq_one_iff.mp hxord1
+      have hx_one_X : x = 1 := Subtype.ext hx_one
+      simp [hx_one_X]
+    · have hx_cent : (x : G) ∈ Subgroup.center G := hCent x hxordp
+      have hcomm : (a : N).val * (x : G) = (x : G) * (a : N).val :=
+        Subgroup.mem_center_iff.mp hx_cent (a : N).val
+      change (a : N).val * (x : G) * (a : N).val⁻¹ = (x : G)
+      rw [hcomm, mul_assoc, mul_inv_cancel, mul_one]
+  have hbot : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.Isaacs.Ch04.isaacs_thm_4_36 hp_odd φ hXp hQN_p' hfix
+  have htriv : ∀ a : QN, ∀ x : X, (φ a) x = x :=
+    (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially φ).mp hbot
+  intro y hyQ
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hxX
+  let yN : N := ⟨y, by simpa [hN_def] using hQ_le_N hyQ⟩
+  let yQN : QN := ⟨yN, by rw [Subgroup.mem_subgroupOf]; exact hyQ⟩
+  let xX : X := ⟨x, hxX⟩
+  have hfixed : (φ yQN) xX = xX := htriv yQN xX
+  have hconj : y * x * y⁻¹ = x := by
+    exact congrArg Subtype.val hfixed
+  calc x * y = (y * x * y⁻¹) * y := by rw [hconj]
+    _ = y * x := by group
 
 end -- 5E
 
