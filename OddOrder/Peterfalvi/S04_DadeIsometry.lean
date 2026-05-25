@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Fintype.Card
 import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
@@ -52,6 +53,7 @@ Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 namespace OddOrder.Peterfalvi.S04
 
 open OddOrder.RepresentationTheory
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -354,6 +356,44 @@ theorem dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
     rcases Group.mem_conjugatesOfSet_iff.mp hg with ⟨a, ha, hconj⟩
     exact hyp.mem_dadeSupport_iff.mpr
       ⟨⟨a, ha⟩, 1, (hyp.H ⟨a, ha⟩).one_mem, by simpa using hconj⟩
+
+/-- The formal shape of Peterfalvi (2.4.a): the subgroups `H(a)` are
+equivariant under conjugation by `L`.
+
+This is kept as a predicate for now because the proof in the book identifies
+`H(a)` with a `π'`-core of `C_G(a)`, and that π-core API is not yet part of the
+S04 scaffold. -/
+def HConjInvariant (hyp : Hypothesis G A L) : Prop :=
+  ∀ (a : {a : G // a ∈ A}) (l : L),
+    hyp.H ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ =
+      MulAut.conj (l : G) • hyp.H a
+
+theorem HConjInvariant.of_forall_H_eq_bot (hyp : Hypothesis G A L)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥) :
+    hyp.HConjInvariant := by
+  intro a l
+  rw [hH ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩, hH a,
+    Subgroup.smul_bot]
+
+theorem HConjInvariant.restrict {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
+    (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).HConjInvariant := by
+  intro a l
+  simpa [HConjInvariant] using hconj ⟨a.1, hA₁A a.2⟩ l
+
+theorem hCoset_conj_mem_of_HConjInvariant (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) {g : G}
+    (hg : g ∈ hyp.hCoset a) :
+    (l : G) * g * (l : G)⁻¹ ∈
+      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+  rcases hg with ⟨h, hh, rfl⟩
+  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, by group⟩
+  have hh_smul :
+      (MulAut.conj (l : G)) h ∈ MulAut.conj (l : G) • hyp.H a :=
+    Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hyp.H a) hh
+  rw [hconj a l]
+  simpa [MulAut.conj_apply] using hh_smul
 
 end Hypothesis
 
