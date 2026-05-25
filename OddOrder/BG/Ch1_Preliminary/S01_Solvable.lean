@@ -484,15 +484,17 @@ recovers Hall's equality `F(G*) = ⋂_{U/V ∈ 𝒟*} C_{G*}(U/V)`.
 CLAUDE.md no-wrapper policy 準拠. BG Prop 1.5-1.6 は Isaacs §3E coprime action machinery
 で完全カバーされており, 個別 theorem は書かない (mapping は本 docstring に集約).
 
-| BG | Isaacs §3E | Lean (本リポ) | 備考 |
+| BG | Isaacs §3E / §4D | Lean (本リポ) | 備考 |
 |---|---|---|---|
 | Prop 1.5(a)(c) A-inv Hall 存在/共役 | Thm 3.23(a)(b) (Sylow), Lem 3.24 (Glauberman) | `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point_exists`, `glauberman_fixed_points_conj` | π = {p} 特殊化版が Ch.4 forward に存在; Hall π 一般版は §1B 内 Prop 1.5 完成時 |
 | Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
 | **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
 | Prop 1.5(e) C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | (新規) | (未実装) | Prop 1.5(e) は coprime + commutator structure, Hall API 整備後 |
-| Prop 1.6(a) G = C_G(A)[G,A] | Thm 3.27 / Cor 3.28 系 | (未実装) | Prop 1.5(d) を `H = [G,A]` で specialize |
-| Prop 1.6(b)(c) [G,A,A]=[G,A], =1 ⇒ trivial | Ch.4 §4C-§4D (lcs + Three-Sub Lemma) 待ち | (未実装) | Ch.4 §4D 完成依存 |
-| Prop 1.6(d)(e) abelian 直積分解 | (mathlib `MulAction.fixedPoints` + complement) | (未実装) | abelian 仮定下の direct product, Maschke 風 |
+| **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
+| **Prop 1.6(b) [G,A,A]=[G,A]** | **Lem 4.29** | **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅ | **無 wrapper**: SemidirectProduct Γ-form |
+| Prop 1.6(c) [G,A,A]=1 ⇒ trivial | (Three-Sub Lem 系) | (未実装) | Ch.4 §4D 完成依存 |
+| Prop 1.6(d) abelian 直積分解 | **Thm 4.34 Fitting** | (Ch.4 §4D に存在予定) | abelian 仮定下 G = C_G(A) × [G, A] |
+| **Prop 1.6(e) abelian p-群 + p'-A** | **Cor 4.35** | **`OddOrder.Isaacs.Ch04.*` (Ch.4 §4D 3422 行)** ✅ | **無 wrapper**: G abelian p-群 + A p'-群 fixes order-p elements |
 
 **使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
 (= Prop 1.5(d) + Lem 1.7(a) 合成 = Isaacs Cor 3.29) を直接呼び出す.
