@@ -1494,6 +1494,23 @@ private noncomputable def semiDihedralIsoOfTwistNormalized
   let setEquiv : SemiDihedralGroup k ≃ P := Equiv.ofBijective fwd hbij
   exact (MulEquiv.mk' setEquiv hfwd_mul).symm
 
+private lemma pow_twist_eq_pow_half_mul_inv
+    {P : Type*} [Group P] [Finite P] (c : P) {k : ℕ}
+    (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k) :
+    c ^ (SemiDihedralGroup.twist k).val = c ^ (2 ^ (k - 1)) * c⁻¹ := by
+  rw [← zpow_natCast]
+  have hrhs : c ^ (2 ^ (k - 1)) * c⁻¹ =
+      c ^ (((2 : ℕ) ^ (k - 1) : ℤ) - 1) := by
+    simpa [div_eq_mul_inv] using (zpow_natCast_sub_one c (2 ^ (k - 1))).symm
+  rw [hrhs, zpow_eq_zpow_iff_modEq, h_order]
+  rw [← ZMod.intCast_eq_intCast_iff]
+  push_cast
+  rw [ZMod.natCast_zmod_val]
+  rcases k with _ | _ | n
+  · omega
+  · omega
+  · simp [SemiDihedralGroup.twist]
+
 /-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite nonabelian 2-group with a cyclic
 subgroup `C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is
 the unique involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
