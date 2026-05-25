@@ -16,6 +16,7 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.PGroup
+import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
@@ -2595,6 +2596,382 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     have h_card_le : Nat.card K ≤ p ^ 2 :=
       card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd hp_odd h_idx hC hC_cyclic hZ_lt_C hC_lt_T
     exact le_antisymm h_card_le h_card_ge
+
+/-! ### `p = 2` case of Lem 6.15 -/
+
+/-- **Lem 6.15 `p = 2` sub-lemma**: a finite abelian 2-group with a cyclic subgroup of
+index 2 that is itself not cyclic has a characteristic elementary abelian subgroup of order 4
+(namely `{x | x² = 1}`).
+
+mmd L3535-3536: "If A is abelian noncyclic and B ⊆ A is cyclic of index 2, then {a | a² = 1}
+is characteristic elementary abelian of order 4 in A." -/
+private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
+    {A : Type*} [Group A] [Finite A] (hAb : ∀ x y : A, x * y = y * x)
+    (h_two : IsPGroup 2 A)
+    {D : Subgroup A} (hD_cyc : IsCyclic D) (hD_idx : D.index = 2)
+    (h_not_cyclic : ¬ IsCyclic A) :
+    ∃ K : Subgroup A, K.Characteristic ∧
+      IsElementaryAbelian 2 K ∧ Nat.card K = 4 := by
+  classical
+  -- Define K = {x : A | x^2 = 1} as a subgroup (uses abelianness).
+  let K : Subgroup A := {
+    carrier := {x : A | x ^ 2 = 1}
+    one_mem' := by show (1 : A) ^ 2 = 1; exact one_pow 2
+    inv_mem' := by
+      intro x (hx : x ^ 2 = 1)
+      show (x⁻¹) ^ 2 = 1
+      rw [inv_pow, hx, inv_one]
+    mul_mem' := by
+      intro x y (hx : x ^ 2 = 1) (hy : y ^ 2 = 1)
+      show (x * y) ^ 2 = 1
+      have h : (x * y) ^ 2 = x ^ 2 * y ^ 2 := by
+        rw [pow_two, pow_two, pow_two]
+        rw [mul_assoc, ← mul_assoc y x y, hAb y x, mul_assoc, ← mul_assoc]
+      rw [h, hx, hy, mul_one]
+  }
+  refine ⟨K, ?_, ?_, ?_⟩
+  · -- K is characteristic
+    refine ⟨fun φ => ?_⟩
+    ext x
+    rw [Subgroup.mem_comap]
+    show (φ x) ^ 2 = 1 ↔ x ^ 2 = 1
+    refine ⟨fun hpx => ?_, fun hpx => ?_⟩
+    · rw [← map_pow] at hpx
+      have : φ (x ^ 2) = φ 1 := by rw [hpx, map_one]
+      exact φ.injective this
+    · rw [← map_pow, hpx, map_one]
+  · -- K is elementary abelian
+    refine ⟨?_, ?_⟩
+    · -- commute
+      intro x y
+      apply Subtype.ext
+      show (x : A) * (y : A) = (y : A) * (x : A)
+      exact hAb _ _
+    · -- ∀ x : K, x^2 = 1
+      intro x
+      apply Subtype.ext
+      show ((x : A) ^ 2 : A) = (1 : A)
+      have h_mem : (x : A) ∈ K := x.2
+      change (x : A) ^ 2 = 1 at h_mem
+      exact h_mem
+  · -- |K| = 4. Strategy:
+    -- (a) D is normal in A (A abelian).
+    -- (b) |D| is a 2-power ≥ 2.
+    -- (c) |K ⊓ D| = 2: lower from involution z = d^(|D|/2); upper from cyclic K∩D / exponent 2.
+    -- (d) D.relIndex K ∣ D.index = 2 (D normal).
+    -- (e) For |K| ≥ 4: construct a' ∈ K \ D, then (K ⊓ D as sub of K) has index ≥ 2 in K.
+    haveI hD_norm : D.Normal := by
+      refine ⟨fun n hn g => ?_⟩
+      have h_eq : g * n * g⁻¹ = n := by
+        rw [hAb g n, mul_assoc, mul_inv_cancel, mul_one]
+      rw [h_eq]; exact hn
+    -- |D| is a 2-power.
+    haveI hp2 : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have hD_two : IsPGroup 2 (D : Subgroup A) := h_two.to_subgroup D
+    obtain ⟨kD, hD_pow⟩ := (IsPGroup.iff_card (p := 2) (G := (D : Subgroup A))).mp hD_two
+    -- |D| ≠ 1 (else |A| = 2 ⇒ cyclic).
+    have hD_card_ne_one : Nat.card (D : Subgroup A) ≠ 1 := by
+      intro h1
+      have hA_card : Nat.card A = 2 := by
+        have := D.card_mul_index
+        rw [hD_idx, h1] at this; omega
+      exact h_not_cyclic (isCyclic_of_prime_card hA_card)
+    have hkD_pos : 1 ≤ kD := by
+      by_contra hlt
+      push_neg at hlt
+      interval_cases kD
+      rw [pow_zero] at hD_pow
+      exact hD_card_ne_one hD_pow
+    -- |D| ≥ 2, |D| even.
+    have hD_card_ge_two : 2 ≤ Nat.card (D : Subgroup A) := by
+      rw [hD_pow]
+      calc (2 : ℕ) = 2 ^ 1 := by ring
+        _ ≤ 2 ^ kD := Nat.pow_le_pow_right (by norm_num) hkD_pos
+    have hD_card_even : 2 ∣ Nat.card (D : Subgroup A) := by
+      rw [hD_pow]; exact dvd_pow_self _ (by omega : kD ≠ 0)
+    have hA_card_eq : Nat.card A = 2 * Nat.card (D : Subgroup A) := by
+      have := D.index_mul_card
+      rw [hD_idx] at this; omega
+    set n := Nat.card (D : Subgroup A) with hn_def
+    -- Generator of D (in ↥D).
+    obtain ⟨d, hd_gen⟩ := IsCyclic.exists_generator (α := (D : Subgroup A))
+    have hd_order : orderOf d = n := by
+      rw [hn_def]; exact orderOf_eq_card_of_forall_mem_zpowers hd_gen
+    -- Involution z := d^(n/2) (in A; via the coercion).
+    set z : A := (d : A) ^ (n / 2) with hz_def
+    have hz_in_D : z ∈ D := pow_mem d.2 _
+    -- (d : A) ^ n = 1.
+    have hd_pow_n_amb : (d : A) ^ n = 1 := by
+      have h_in_D : (d : (D : Subgroup A)) ^ n = 1 := by
+        rw [← hd_order]; exact pow_orderOf_eq_one d
+      have : (((d : (D : Subgroup A)) ^ n : (D : Subgroup A)) : A) =
+          ((1 : (D : Subgroup A)) : A) := by
+        rw [h_in_D]
+      simpa [SubmonoidClass.coe_pow] using this
+    have hz_sq : z ^ 2 = 1 := by
+      rw [hz_def, ← pow_mul]
+      have h_mul : (n / 2) * 2 = n := by
+        have := Nat.mul_div_cancel' hD_card_even
+        omega
+      rw [h_mul]; exact hd_pow_n_amb
+    have hn_half_pos : 0 < n / 2 := by
+      have : 2 ≤ n := hD_card_ge_two; omega
+    have hn_half_lt : n / 2 < n := Nat.div_lt_self (by omega) (by norm_num)
+    have hz_ne_one : z ≠ 1 := by
+      intro h
+      have hd_pow_half : (d : (D : Subgroup A)) ^ (n / 2) = 1 := by
+        apply Subtype.ext
+        show (((d : (D : Subgroup A)) ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
+        rw [SubmonoidClass.coe_pow]; exact h
+      have hdvd : orderOf d ∣ (n / 2) := orderOf_dvd_of_pow_eq_one hd_pow_half
+      rw [hd_order] at hdvd
+      have := Nat.le_of_dvd hn_half_pos hdvd
+      omega
+    have hz_in_K : z ∈ K := hz_sq
+    -- |K ⊓ D| ≥ 2.
+    have h_inf_ge_two : 2 ≤ Nat.card (K ⊓ D : Subgroup A) := by
+      have h1_in : (1 : A) ∈ (K ⊓ D : Subgroup A) := Subgroup.one_mem _
+      have hz_in : z ∈ (K ⊓ D : Subgroup A) := Subgroup.mem_inf.mpr ⟨hz_in_K, hz_in_D⟩
+      have h_ne : (⟨z, hz_in⟩ : (K ⊓ D : Subgroup A)) ≠ ⟨1, h1_in⟩ := by
+        intro heq
+        exact hz_ne_one (Subtype.mk_eq_mk.mp heq)
+      have h_finset_card :
+          ({⟨1, h1_in⟩, ⟨z, hz_in⟩} : Finset (K ⊓ D : Subgroup A)).card = 2 := by
+        rw [Finset.card_insert_of_notMem, Finset.card_singleton]
+        intro hmem
+        rw [Finset.mem_singleton] at hmem
+        exact h_ne hmem.symm
+      haveI : Fintype (K ⊓ D : Subgroup A) := Fintype.ofFinite _
+      have h_le_card : ({⟨1, h1_in⟩, ⟨z, hz_in⟩} : Finset (K ⊓ D : Subgroup A)).card
+          ≤ Fintype.card (K ⊓ D : Subgroup A) := Finset.card_le_univ _
+      rw [Nat.card_eq_fintype_card]
+      omega
+    -- |K ⊓ D| ≤ 2: K ⊓ D ≤ D cyclic, exponent dvd 2.
+    have h_inf_le_two : Nat.card (K ⊓ D : Subgroup A) ≤ 2 := by
+      haveI : IsCyclic ((K ⊓ D : Subgroup A) : Subgroup A) := by
+        refine isCyclic_of_injective ((K ⊓ D : Subgroup A).inclusion
+          (inf_le_right : K ⊓ D ≤ D)) ?_
+        exact Subgroup.inclusion_injective _
+      have h_exp_dvd : Monoid.exponent (K ⊓ D : Subgroup A) ∣ 2 := by
+        rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+        intro x
+        apply Subtype.ext
+        show ((x : (K ⊓ D : Subgroup A)) : A) ^ 2 = (1 : A)
+        have h_mem : (x : A) ∈ K := (Subgroup.mem_inf.mp x.2).1
+        change (x : A) ^ 2 = 1 at h_mem
+        exact h_mem
+      have h_card_eq : Nat.card (K ⊓ D : Subgroup A) =
+          Monoid.exponent (K ⊓ D : Subgroup A) :=
+        (IsCyclic.exponent_eq_card (α := (K ⊓ D : Subgroup A))).symm
+      rw [h_card_eq]
+      exact Nat.le_of_dvd (by norm_num) h_exp_dvd
+    have h_inf_eq_two : Nat.card (K ⊓ D : Subgroup A) = 2 :=
+      le_antisymm h_inf_le_two h_inf_ge_two
+    -- D.relIndex K ∣ 2 (D normal).
+    have h_relIndex_dvd : D.relIndex K ∣ 2 := by
+      rw [← hD_idx]
+      exact Subgroup.relIndex_dvd_index_of_normal D K
+    have h_card_subgroupOf : Nat.card (D.subgroupOf K) = Nat.card (K ⊓ D : Subgroup A) := by
+      refine Nat.card_congr ?_
+      refine {
+        toFun := fun x => ⟨((x : K) : A), ?_⟩
+        invFun := fun y => ⟨⟨(y : A), (Subgroup.mem_inf.mp y.2).1⟩, ?_⟩
+        left_inv := ?_
+        right_inv := ?_
+      }
+      · refine Subgroup.mem_inf.mpr ⟨(x : K).2, ?_⟩
+        have := x.2
+        rw [Subgroup.mem_subgroupOf] at this
+        exact this
+      · rw [Subgroup.mem_subgroupOf]
+        exact (Subgroup.mem_inf.mp y.2).2
+      · intro x; rfl
+      · intro y; rfl
+    have h_lag :
+        (D.subgroupOf K).index * Nat.card (D.subgroupOf K) = Nat.card K :=
+      Subgroup.index_mul_card _
+    have h_relIndex_eq : D.relIndex K = (D.subgroupOf K).index := rfl
+    rw [h_card_subgroupOf, h_inf_eq_two] at h_lag
+    -- |K| ≤ 4 from D.relIndex K ≤ 2.
+    have h_relIndex_le : D.relIndex K ≤ 2 := Nat.le_of_dvd (by norm_num) h_relIndex_dvd
+    have h_K_le_4 : Nat.card K ≤ 4 := by
+      rw [h_relIndex_eq] at h_relIndex_le
+      have h_mul : (D.subgroupOf K).index * 2 ≤ 2 * 2 :=
+        Nat.mul_le_mul_right 2 (by rw [← h_relIndex_eq]; exact h_relIndex_le)
+      omega
+    -- |K| ≥ 4. Use existence of a' ∈ K \ D.
+    -- First, pick a ∈ A with a ∉ D.
+    obtain ⟨a, ha_notmem, _ha_or⟩ :=
+      (Subgroup.index_eq_two_iff_exists_notMem_and (H := D)).mp hD_idx
+    have ha_sq : a ^ 2 ∈ D := Subgroup.sq_mem_of_index_two hD_idx a
+    -- orderOf a < |A| (otherwise A cyclic).
+    have ha_order_lt : orderOf a < Nat.card A := by
+      by_contra hge
+      push_neg at hge
+      have h_le : orderOf a ≤ Nat.card A := orderOf_le_card
+      have ha_order_eq : orderOf a = Nat.card A := le_antisymm h_le hge
+      apply h_not_cyclic
+      refine ⟨⟨a, ?_⟩⟩
+      intro x
+      have hz_card : Nat.card (Subgroup.zpowers a) = Nat.card A := by
+        rw [Nat.card_zpowers, ha_order_eq]
+      have hz_top : Subgroup.zpowers a = ⊤ :=
+        (Subgroup.card_eq_iff_eq_top (H := Subgroup.zpowers a)).mp hz_card
+      have hxin : x ∈ Subgroup.zpowers a := by rw [hz_top]; trivial
+      rw [Subgroup.mem_zpowers_iff] at hxin
+      obtain ⟨k, hk⟩ := hxin
+      exact ⟨k, hk⟩
+    -- orderOf a is a 2-power.
+    obtain ⟨ka, ha_order_pow_eq⟩ := (IsPGroup.iff_orderOf.mp h_two) a
+    have hA_card_pow : Nat.card A = 2 ^ (kD + 1) := by
+      rw [hA_card_eq, hD_pow, pow_succ]; ring
+    have hka_le : ka ≤ kD := by
+      have h1 : 2 ^ ka < 2 ^ (kD + 1) := by
+        rw [← ha_order_pow_eq, ← hA_card_pow]; exact ha_order_lt
+      have := (Nat.pow_lt_pow_iff_right (by norm_num : 1 < 2)).mp h1
+      omega
+    have ha_order_dvd : orderOf a ∣ n := by
+      rw [ha_order_pow_eq]
+      have hn_pow : n = 2 ^ kD := by
+        simpa [hn_def] using hD_pow
+      rw [hn_pow]
+      exact pow_dvd_pow _ hka_le
+    have ha_pow_n : a ^ n = 1 := orderOf_dvd_iff_pow_eq_one.mp ha_order_dvd
+    -- (a^2)^(n/2) = a^n = 1.
+    have ha_sq_pow_half : (a ^ 2) ^ (n / 2) = 1 := by
+      rw [← pow_mul]
+      have h_mul : 2 * (n / 2) = n := Nat.mul_div_cancel' hD_card_even
+      rw [h_mul]; exact ha_pow_n
+    -- a^2 viewed in ↥D.
+    let a2D : (D : Subgroup A) := ⟨a ^ 2, ha_sq⟩
+    have ha2D_in_zpowers : a2D ∈ Subgroup.zpowers d := hd_gen a2D
+    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp ha2D_in_zpowers
+    -- (a2D)^(n/2) = 1 in ↥D.
+    have ha2D_pow_half : a2D ^ (n / 2) = 1 := by
+      apply Subtype.ext
+      show ((a2D ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
+      rw [SubmonoidClass.coe_pow]
+      show (a ^ 2) ^ (n / 2) = 1
+      exact ha_sq_pow_half
+    -- d^(m * (n/2)) = (d^m)^(n/2) = (a2D)^(n/2) = 1, so orderOf d ∣ m * (n/2), i.e. n ∣ m*(n/2).
+    have hm_two_dvd : (2 : ℤ) ∣ m := by
+      have h1 : d ^ (m * ((n / 2 : ℕ) : ℤ)) = 1 := by
+        rw [zpow_mul, hm, zpow_natCast]; exact ha2D_pow_half
+      have h2 : (orderOf d : ℤ) ∣ m * ((n / 2 : ℕ) : ℤ) :=
+        (orderOf_dvd_iff_zpow_eq_one (x := d)
+          (i := m * ((n / 2 : ℕ) : ℤ))).mpr h1
+      rw [hd_order] at h2
+      have hn_eq_int : (n : ℤ) = 2 * ((n / 2 : ℕ) : ℤ) := by
+        have hh := Nat.mul_div_cancel' hD_card_even
+        have : (2 * (n / 2) : ℕ) = n := hh
+        push_cast at this ⊢
+        omega
+      rw [hn_eq_int] at h2
+      have h2' : 2 * ((n / 2 : ℕ) : ℤ) ∣ m * ((n / 2 : ℕ) : ℤ) := h2
+      have hn_half_pos_int : (0 : ℤ) < ((n / 2 : ℕ) : ℤ) := by exact_mod_cast hn_half_pos
+      -- 2 * (n/2) ∣ m * (n/2)
+      obtain ⟨q, hq⟩ := h2'
+      -- 2 * (n/2) * q = m * (n/2)
+      have h_q : ((n / 2 : ℕ) : ℤ) * (2 * q) =
+          ((n / 2 : ℕ) : ℤ) * m := by
+        calc
+          ((n / 2 : ℕ) : ℤ) * (2 * q) = (2 * ((n / 2 : ℕ) : ℤ)) * q := by ring
+          _ = m * ((n / 2 : ℕ) : ℤ) := hq.symm
+          _ = ((n / 2 : ℕ) : ℤ) * m := by ring
+      have h_can : 2 * q = m := mul_left_cancel₀ hn_half_pos_int.ne' h_q
+      exact ⟨q, h_can.symm⟩
+    obtain ⟨m', hm'⟩ := hm_two_dvd
+    -- Define a' := a * d^(-m').
+    set a' : A := a * (d : A) ^ (-m') with ha'_def
+    -- (a')^2 = a^2 · d^(-2m') = d^m · d^(-2m') = 1 (using abelianness).
+    have ha2_eq_zpow : a ^ 2 = (d : A) ^ m := by
+      have h := congrArg (fun (x : (D : Subgroup A)) => (x : A)) hm
+      simp only [SubgroupClass.coe_zpow] at h
+      exact h.symm
+    have ha'_sq : a' ^ 2 = 1 := by
+      have hab : ∀ u v : A, u * v = v * u := hAb
+      have h_expand : a' * a' = a * a * ((d : A) ^ (-m') * (d : A) ^ (-m')) := by
+        rw [ha'_def]
+        rw [mul_assoc, ← mul_assoc ((d : A) ^ (-m')) a, hab ((d : A) ^ (-m')) a]
+        rw [mul_assoc, ← mul_assoc]
+      rw [pow_two, h_expand, ← pow_two, ← pow_two, ha2_eq_zpow]
+      have h_neg_sq : ((d : A) ^ (-m')) ^ 2 =
+          (d : A) ^ ((-m') * 2 : ℤ) := by
+        rw [← zpow_natCast ((d : A) ^ (-m')) 2, ← zpow_mul]
+        ring_nf
+      rw [h_neg_sq]
+      rw [← zpow_add]
+      have h_exp : m + (-m') * 2 = 0 := by rw [hm']; ring
+      rw [h_exp, zpow_zero]
+    -- a' ∉ D.
+    have ha'_notmem : a' ∉ D := by
+      intro hin
+      have h_d_inv : (d : A) ^ (-m') ∈ D := zpow_mem d.2 _
+      have h_a : a ∈ D := by
+        have : a = a' * ((d : A) ^ (-m'))⁻¹ := by
+          rw [ha'_def, mul_assoc, mul_inv_cancel, mul_one]
+        rw [this]
+        exact Subgroup.mul_mem _ hin (Subgroup.inv_mem _ h_d_inv)
+      exact ha_notmem h_a
+    have ha'_in_K : a' ∈ K := ha'_sq
+    -- K has at least 4 elements: 1, z, a', a'*z. Need them all distinct.
+    -- 1 ≠ z ✓ (hz_ne_one). 1 ∈ D, z ∈ D, a' ∉ D, a'*z ∉ D (else a' = (a'*z)*z⁻¹ ∈ D).
+    -- Also a' ≠ a'*z (else z = 1).
+    have hz_K_in : z ∈ K := hz_in_K
+    have ha'z_in_K : a' * z ∈ K := K.mul_mem ha'_in_K hz_K_in
+    have ha'z_notmem : a' * z ∉ D := by
+      intro hin
+      have hz_in_D' : z ∈ D := hz_in_D
+      have : a' ∈ D := by
+        have heq : a' = (a' * z) * z⁻¹ := by rw [mul_assoc, mul_inv_cancel, mul_one]
+        rw [heq]
+        exact Subgroup.mul_mem _ hin (Subgroup.inv_mem _ hz_in_D')
+      exact ha'_notmem this
+    -- Define the four elements as a Finset in K.
+    have h_one_in_K : (1 : A) ∈ K := K.one_mem
+    -- Now build the cardinality.
+    haveI : Fintype K := Fintype.ofFinite _
+    let S : Finset K :=
+      {⟨1, h_one_in_K⟩, ⟨z, hz_K_in⟩, ⟨a', ha'_in_K⟩, ⟨a' * z, ha'z_in_K⟩}
+    have hS_card : S.card = 4 := by
+      dsimp [S]
+      rw [Finset.card_insert_of_notMem, Finset.card_insert_of_notMem,
+        Finset.card_insert_of_notMem, Finset.card_singleton]
+      · -- ⟨a', ..⟩ ∉ {⟨a'*z, ..⟩}
+        intro h
+        rw [Finset.mem_singleton] at h
+        have heq : a' = a' * z := congrArg Subtype.val h
+        have hz_eq : z = 1 := by
+          have : a' * 1 = a' * z := by rw [mul_one]; exact heq
+          exact (mul_left_cancel this).symm
+        exact hz_ne_one hz_eq
+      · -- ⟨z, ..⟩ ∉ {⟨a', ..⟩, ⟨a'*z, ..⟩}
+        intro h
+        rw [Finset.mem_insert, Finset.mem_singleton] at h
+        rcases h with h | h
+        · have heq : z = a' := congrArg Subtype.val h
+          have : a' ∈ D := heq ▸ hz_in_D
+          exact ha'_notmem this
+        · have heq : z = a' * z := congrArg Subtype.val h
+          have : a' * z ∈ D := heq ▸ hz_in_D
+          exact ha'z_notmem this
+      · -- ⟨1, ..⟩ ∉ {⟨z, ..⟩, ⟨a', ..⟩, ⟨a'*z, ..⟩}
+        intro h
+        rw [Finset.mem_insert, Finset.mem_insert, Finset.mem_singleton] at h
+        rcases h with h | h | h
+        · have heq : (1 : A) = z := congrArg Subtype.val h
+          exact hz_ne_one heq.symm
+        · have heq : (1 : A) = a' := congrArg Subtype.val h
+          have : a' ∈ D := heq ▸ D.one_mem
+          exact ha'_notmem this
+        · have heq : (1 : A) = a' * z := congrArg Subtype.val h
+          have : a' * z ∈ D := heq ▸ D.one_mem
+          exact ha'z_notmem this
+    have h_K_ge_4 : 4 ≤ Nat.card K := by
+      rw [Nat.card_eq_fintype_card]
+      have := Finset.card_le_univ S
+      omega
+    omega
 
 end
 
