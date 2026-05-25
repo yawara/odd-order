@@ -2850,14 +2850,101 @@ lemma baerAdd_mulEquiv_eq {G : Type*} [Group G] (f : G ≃* G) (x y : G) :
     f (baerAdd x y) = baerAdd (f x) (f y) :=
   baerAdd_map_eq f.toMonoidHom rfl x y
 
-/-! **Lem 4.37 AddCommGroup instance** + **(b) additive order = multiplicative order**:
-形式化 TODO.
+/-! ### Lem 4.37(b) element form + `BaerMul G` 型ラッパー (CommGroup 構造)
 
-教科書 (Isaacs p.142) (b) 証明: `nx = x + (n-1)x = x + x^(n-1) = x · x^(n-1) = x^n`
-(commute case で baerAdd_eq_mul_of_commute, induction on n). ⇒ AddOrderOf = OrderOf.
+Baer trick の "additive group" は実際には Lean 上では type wrapper 経由で実装する.
+`BaerMul G := G` (定義的に同型) に `CommGroup` インスタンスを `baerAdd` で与える.
+これにより Cor 4.35 (CommGroup 仮定) を そのまま `BaerMul G` に適用できる.
 
-実装メモ: `AddCommGroup G` 構築には `Zero G` (= 1) + `nsmul`, `zsmul` の field 完全実装が必要
-(`nsmulRec` 等 default は `Add G` instance 経由で nsmul = pow に reduce すべき). 別 session 完成. -/
+教科書 (Isaacs p.142) (b) 証明の鍵: `nx = x + (n-1)x = x · x^(n-1) = x^n`
+(commute case で `baerAdd_eq_mul_of_commute`). 実装では `npow x n := x^n` (G の冪) を直接採用し,
+`npow_succ : npow (n+1) x = baerAdd (npow n x) x` を `baerAdd_pow_self_eq_pow_succ` で提供. -/
+
+/-- **Lem 4.37(b) inductive step** (仮定不要): `baerAdd (x^n) x = x^(n+1)`.
+
+`x` と `x^n` は常に commute するので, `baerAdd x^n x = x^n * x * sqrtOdd ⁅x, x^n⁆ = x^n · x · 1 = x^{n+1}`.
+これが `BaerMul G` の `npow_succ` フィールドに対応する. -/
+lemma baerAdd_pow_self_eq_pow_succ {G : Type*} [Group G] (x : G) (n : ℕ) :
+    baerAdd (x ^ n) x = x ^ (n + 1) := by
+  have h_comm : Commute (x ^ n) x := Commute.pow_self x n
+  rw [baerAdd_eq_mul_of_commute h_comm, ← pow_succ]
+
+/-- **Baer trick type wrapper**: `BaerMul G := G` (定義的に同型).
+
+`G` が奇数位数 + class ≤ 2 のときに `BaerMul G` 上に `baerAdd` を乗法とする `CommGroup` 構造を
+与える (Lem 4.37). これにより mathlib の CommGroup 用 API (Cor 4.35 等) を `BaerMul G` に
+直接適用できる.
+
+Naming: 乗法的 wrapper として扱う ("multiplicative view of (G, +')"). -/
+def BaerMul (G : Type*) : Type _ := G
+
+namespace BaerMul
+
+variable {G : Type*}
+
+/-- Coercion `BaerMul G ≃ G` (identity at runtime). -/
+def toG : BaerMul G ≃ G := Equiv.refl _
+
+/-- Coercion `G ≃ BaerMul G` (identity at runtime). -/
+def ofG : G ≃ BaerMul G := Equiv.refl _
+
+@[simp] theorem toG_ofG (x : G) : toG (ofG x) = x := rfl
+@[simp] theorem ofG_toG (x : BaerMul G) : ofG (toG x) = x := rfl
+
+end BaerMul
+
+/-- `Mul (BaerMul G) = baerAdd`. -/
+noncomputable instance BaerMul.instMul {G : Type*} [Group G] : Mul (BaerMul G) where
+  mul x y := BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))
+
+/-- `1 : BaerMul G = ofG 1`. -/
+instance BaerMul.instOne {G : Type*} [One G] : One (BaerMul G) where
+  one := BaerMul.ofG 1
+
+/-- `(·)⁻¹ : BaerMul G → BaerMul G` is the same as G's inverse (Lem 4.37 で `baerAdd x⁻¹ x = 1`). -/
+instance BaerMul.instInv {G : Type*} [Inv G] : Inv (BaerMul G) where
+  inv x := BaerMul.ofG (BaerMul.toG x)⁻¹
+
+/-- **CommGroup instance for `BaerMul G`**: `G` が `Odd (Nat.card G)` + `commutator G ≤ Z(G)`
+を満たすとき, `(BaerMul G, baerAdd, 1, ·⁻¹)` は可換群.
+
+実装方針: 基本 `Mul / One / Inv` instance を別途与えて, ここでは **axiom フィールドのみ提供**.
+`npow / zpow` フィールドはデフォルト (`npowRec` / `zpowRec`) を使用. `npowRec` は `*`
+(我々の baerAdd) を `n` 回反復するので, BaerMul の pow = `baerAdd`-iterate.
+G の `x^n` との一致は Lem 4.37(b) (`baerAdd_pow_self_eq_pow_succ`) 経由で別途証明. -/
+noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
+    [hOdd : Fact (Odd (Nat.card G))]
+    [hC : Fact (_root_.commutator G ≤ Subgroup.center G)] : CommGroup (BaerMul G) where
+  mul_assoc x y z := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))
+        (BaerMul.toG z)) =
+      BaerMul.ofG (baerAdd (BaerMul.toG x)
+        (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG z)))))
+    simp only [BaerMul.toG_ofG]
+    exact congr_arg BaerMul.ofG
+      (baerAdd_assoc hC.out hOdd.out (BaerMul.toG x) (BaerMul.toG y) (BaerMul.toG z)).symm
+  one_mul x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG 1)) (BaerMul.toG x)) = x
+    simp only [BaerMul.toG_ofG, baerAdd_one_left]
+    rfl
+  mul_one x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG (BaerMul.ofG 1))) = x
+    simp only [BaerMul.toG_ofG, baerAdd_one_right]
+    rfl
+  mul_comm x y := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y)) =
+      BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG x))
+    exact congr_arg BaerMul.ofG (baerAdd_comm hC.out hOdd.out _ _)
+  inv_mul_cancel x := by
+    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (BaerMul.toG x)⁻¹)) (BaerMul.toG x)) =
+      BaerMul.ofG 1
+    simp only [BaerMul.toG_ofG]
+    rw [baerAdd_inv_left]
+
+instance BaerMul.instFinite {G : Type*} [Finite G] : Finite (BaerMul G) :=
+  inferInstanceAs (Finite G)
+
+@[simp] lemma BaerMul.nat_card_eq {G : Type*} : Nat.card (BaerMul G) = Nat.card G := rfl
 
 /-- **Isaacs Lemma 4.32 (後半)** ⭐: `P` p-群 が `G` 非自明 p-群 に作用 ⇒
 `C_G(P)` (= fixed point subgroup) は非自明.
