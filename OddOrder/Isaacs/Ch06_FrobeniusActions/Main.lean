@@ -2597,6 +2597,24 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
       card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd hp_odd h_idx hC hC_cyclic hZ_lt_C hC_lt_T
     exact le_antisymm h_card_le h_card_ge
 
+/-- **Isaacs Lemma 6.15** (odd prime case).
+
+Let `T` be a finite group with `|T : Z(T)| = p^2` and a cyclic subgroup `C` with
+`Z(T) < C < T`. If `p` is odd, then `T` has a characteristic elementary abelian subgroup
+of order `p^2`.
+
+The full `p = 2` branch is handled separately below; this theorem exposes the completed
+odd-`p` half for later Ch.6/Ch.7 use. -/
+theorem exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 :=
+  char_elementaryAbelian_p_sq_of_index_p_sq_odd
+    hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
+
 /-! ### `p = 2` case of Lem 6.15 -/
 
 /-- **Lem 6.15 `p = 2` sub-lemma**: a finite abelian 2-group with a cyclic subgroup of
