@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Fintype.Card
 import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
@@ -36,6 +37,8 @@ The `Z[Irr]` field should be added to this same interface once the Wave 1a
 * `OddOrder.Peterfalvi.S04.supportInSubgroup` — the subset of `L` induced by
   `A ⊆ G`.
 * `OddOrder.Peterfalvi.S04.SupportedClassFunctions` — Peterfalvi's `CF(L,A)`.
+* `OddOrder.Peterfalvi.S04.SupportedClassFunctions.inclusion` — the natural map
+  `CF(L,A₁) → CF(L,A)` for `A₁ ⊆ A`.
 * `OddOrder.Peterfalvi.S04.Hypothesis` — Peterfalvi Hypothesis (2.2), bundled.
 * `OddOrder.Peterfalvi.S04.DadeMap` and `IsDadeIsometry` — the current
   inner-product part of the Dade isometry interface.
@@ -75,10 +78,44 @@ def supportInSubgroup (A : Set G) (L : Subgroup G) : Set L :=
 @[simp] theorem mem_supportInSubgroup {A : Set G} {L : Subgroup G} {x : L} :
     x ∈ supportInSubgroup A L ↔ (x : G) ∈ A := Iff.rfl
 
+theorem supportInSubgroup_mono {A₁ A : Set G} {L : Subgroup G} (hA₁A : A₁ ⊆ A) :
+    supportInSubgroup A₁ L ⊆ supportInSubgroup A L := fun _ hx => hA₁A hx
+
 /-- Peterfalvi's `CF(L,A)`: class functions on `L` supported on the ambient
 subset `A`. -/
 abbrev SupportedClassFunctions (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
   ↥(ClassFunction.supportedSubmodule (G := L) (k := k) (supportInSubgroup A L))
+
+namespace SupportedClassFunctions
+
+variable {k : Type*} [CommRing k]
+variable {A A₁ : Set G} {L : Subgroup G}
+
+/-- The natural inclusion `CF(L,A₁) → CF(L,A)` induced by `A₁ ⊆ A`.
+
+This is the domain map used by the restriction statement in Peterfalvi (2.11). -/
+def inclusion (hA₁A : A₁ ⊆ A) :
+    (SupportedClassFunctions (G := G) k A₁ L) →ₗ[k]
+      (SupportedClassFunctions (G := G) k A L) :=
+  Submodule.inclusion (by
+    intro φ hφ
+    exact fun x hx => hA₁A (hφ hx))
+
+@[simp] theorem coe_inclusion (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    ((inclusion (G := G) (k := k) (L := L) hA₁A α :
+        SupportedClassFunctions (G := G) k A L) : ClassFunction L k) =
+      (α : ClassFunction L k) :=
+  rfl
+
+@[simp] theorem inclusion_apply (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) (x : L) :
+    ((inclusion (G := G) (k := k) (L := L) hA₁A α :
+        SupportedClassFunctions (G := G) k A L) : ClassFunction L k) x =
+      (α : ClassFunction L k) x :=
+  rfl
+
+end SupportedClassFunctions
 
 /-- **Peterfalvi Hypothesis (2.2).**
 
@@ -244,12 +281,29 @@ end Hypothesis
 
 section DadeMap
 
-variable {A : Set G} {L : Subgroup G}
+variable {A A₁ : Set G} {L : Subgroup G}
 /-- A candidate Dade map `τ : CF(L,A) → ClassFunction G`. -/
 abbrev DadeMap (k : Type*) [CommRing k] (A : Set G) (L : Subgroup G) :=
   SupportedClassFunctions (G := G) k A L → ClassFunction G k
 
-variable {k : Type*} [CommRing k] [StarRing k]
+variable {k : Type*} [CommRing k]
+
+namespace DadeMap
+
+/-- Restrict the domain of a candidate Dade map along `A₁ ⊆ A`. -/
+def restrictDomain (τ : DadeMap (G := G) k A L) (hA₁A : A₁ ⊆ A) :
+    DadeMap (G := G) k A₁ L :=
+  fun α => τ (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α)
+
+@[simp] theorem restrictDomain_apply (τ : DadeMap (G := G) k A L) (hA₁A : A₁ ⊆ A)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    restrictDomain (G := G) (k := k) (L := L) τ hA₁A α =
+      τ (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) :=
+  rfl
+
+end DadeMap
+
+variable [StarRing k]
 variable [Fintype G] [Fintype L]
 
 /-- The currently available part of the Dade isometry interface: preservation
@@ -263,6 +317,21 @@ structure IsDadeIsometry (τ : DadeMap (G := G) k A L) : Prop where
     ∀ α β : SupportedClassFunctions (G := G) k A L,
       ClassFunction.innerSum (τ α) (τ β) =
         ClassFunction.innerSum (α : ClassFunction L k) (β : ClassFunction L k)
+
+namespace IsDadeIsometry
+
+/-- The inner-product part of a Dade isometry restricts along `A₁ ⊆ A`.
+
+This is the currently formalized part of Peterfalvi (2.11). -/
+theorem restrictDomain {τ : DadeMap (G := G) k A L} (hτ : IsDadeIsometry τ)
+    (hA₁A : A₁ ⊆ A) :
+    IsDadeIsometry (DadeMap.restrictDomain (G := G) (k := k) (L := L) τ hA₁A) where
+  inner_sum_eq α β := by
+    simpa using hτ.inner_sum_eq
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α)
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A β)
+
+end IsDadeIsometry
 
 end DadeMap
 
