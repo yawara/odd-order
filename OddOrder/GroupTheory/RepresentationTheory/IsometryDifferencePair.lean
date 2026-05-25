@@ -28,6 +28,11 @@ orthonormal-pair structures, up to a uniform sign.
 * Statement only; proof deferred. The classical proof proceeds by induction on `n`,
   using character orthogonality (`SecondOrthogonality`) and integer norm constraints
   on `τ (χ_i - χ_0)`.
+* Proof-core routing: the remaining work is split into
+  `issues/0025-peterfalvi-isometry-difference-core.md`.  The theorem needs
+  `IrreducibleCharacter` as the finite orthonormal index type, second
+  orthogonality to identify the irreducible-character basis coefficients, and a
+  separate finite integer-vector induction proving the uniform sign shape.
 
 ## Main statement
 

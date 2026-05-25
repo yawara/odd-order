@@ -18,8 +18,8 @@ isometry difference-pair 構造 lemma の stub を解消する。§7 coherence �
 
 - [x] `isometry_difference_pair_structure` の statement が §3 (1.4) と §7 (5.6)
       の両方に使える強さか確認する。
-- [ ] second orthogonality / finite orthonormal indexing への依存を明示する。
-- [ ] `isometry_difference_pair_structure` を `sorry` なしにする、または induction
+- [x] second orthogonality / finite orthonormal indexing への依存を明示する。
+- [x] `isometry_difference_pair_structure` を `sorry` なしにする、または induction
       の combinatorial core を別 issue に分割する。
 - [x] `OddOrder.Peterfalvi.S03.conjugateDifference` との接続 lemma の要否を確認する。
 
@@ -29,6 +29,10 @@ isometry difference-pair 構造 lemma の stub を解消する。§7 coherence �
   必要になる `χ - χ.conj` の像を `ε • (μ - ν)` として記録する interface にした。
 - `Hypothesis.difference_image_eq` が
   `OddOrder.Peterfalvi.S03.conjugateDifference` との接続 lemma になる。
+- proof core は `issues/0025-peterfalvi-isometry-difference-core.md` に分割した。
+  `IsometryDifferencePair.lean` の module doc に、
+  `IrreducibleCharacter` finite indexing、second orthogonality、integer-vector
+  induction への依存を明示した。
 
 ## 完了条件
 
@@ -41,6 +45,7 @@ isometry difference-pair 構造 lemma の stub を解消する。§7 coherence �
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
 - related: `issues/0021-peterfalvi-second-orthogonality.md`
+- split: `issues/0025-peterfalvi-isometry-difference-core.md`
 - `OddOrder/GroupTheory/RepresentationTheory/IsometryDifferencePair.lean`
 - `OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean`
 - `OddOrder/Peterfalvi/S07_Coherence.lean`
