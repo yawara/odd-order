@@ -16,12 +16,23 @@ module に置いたまま進める。
 
 ## やること
 
-- [ ] `OddOrder.RepresentationTheory.clifford_decomposition` の statement を現行
+- [x] `OddOrder.RepresentationTheory.clifford_decomposition` の statement を現行
       downstream に合う形で再確認する。
 - [x] 未使用 `[Fintype G]` warning を proof 方針に合わせて解消する。
-- [ ] `clifford_decomposition` を `sorry` なしにする、または必要な intermediate
+- [x] `clifford_decomposition` を `sorry` なしにする、または必要な intermediate
       lemmas を別 issue として切る。
-- [ ] `clifford_orbit_subset_inertia` との接続を確認する。
+- [x] `clifford_orbit_subset_inertia` との接続を確認する。
+
+## 2026-05-25 update
+
+- 現行 statement は Peterfalvi §3 (1.5)/(1.7) と BG §2 の共通 API として維持する:
+  `Res_H^G χ = e • ∑ θ_i`、各 `θ_i` は irreducible、かつ `θ_0` の `G`-orbit にある。
+- `clifford_orbit_subset_inertia` は
+  `ClassFunction.subgroup_le_inertia` そのもので、Clifford orbit/inertia setup の
+  basic connection として十分。
+- proof core は `issues/0026-peterfalvi-clifford-core.md` に分割した。残る blocker は
+  statement shape ではなく、character-level induction/restriction multiplicity と
+  inertia bijection の証明 API。
 
 ## 完了条件
 
@@ -33,6 +44,7 @@ module に置いたまま進める。
 ## 参照
 
 - parent: `issues/0020-peterfalvi-part1-character-stubs.md`
+- split: `issues/0026-peterfalvi-clifford-core.md`
 - `OddOrder/GroupTheory/RepresentationTheory/Clifford.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/Inertia.lean`
 - `notes/peterfalvi/s03_preliminary_character.md`

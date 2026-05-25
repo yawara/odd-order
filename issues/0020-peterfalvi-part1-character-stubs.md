@@ -23,7 +23,7 @@ Peterfalvi §3 (1.1), (1.2), (1.4), (1.5) と §6 (4.5.b) の前提になる。
 - [x] 上記 stub を依存単位の小 issue に分割する。
 - [ ] issue 0021: `SecondOrthogonality.lean`
 - [ ] issue 0022: `BrauerPermutation.lean`
-- [ ] issue 0023: `Clifford.lean`
+- [x] issue 0023: `Clifford.lean`
 - [ ] issue 0024: `IsometryDifferencePair.lean`
 
 ## 完了条件
@@ -37,7 +37,8 @@ Peterfalvi §3 (1.1), (1.2), (1.4), (1.5) と §6 (4.5.b) の前提になる。
 
 - `issues/0021-peterfalvi-second-orthogonality.md`
 - `issues/0022-peterfalvi-brauer-permutation.md`
-- `issues/0023-peterfalvi-clifford-decomposition.md`
+- `issues/closed/0023-peterfalvi-clifford-decomposition.md`
+- `issues/0026-peterfalvi-clifford-core.md`
 - `issues/0024-peterfalvi-isometry-difference-pair.md`
 - `notes/peterfalvi/s03_preliminary_character.md`
 - `notes/peterfalvi/s06_dade_certain_subgroup.md`

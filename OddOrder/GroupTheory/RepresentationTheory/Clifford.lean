@@ -34,6 +34,11 @@ precise statement is left as a TODO since it requires extra setup
   deferred. It will follow from `InducedCharacter` + `SecondOrthogonality` once those
   Wave 1a modules have working proofs.
 * `clifford_orbit_subset_inertia` is immediate from `ClassFunction.subgroup_le_inertia`.
+* Proof-core routing: the remaining Clifford theorem proof is split into
+  `issues/0026-peterfalvi-clifford-core.md`.  The blocker is not the current
+  statement shape; it is the missing character-level induction/restriction API:
+  numerical Frobenius reciprocity, restriction multiplicities, orbit equality of
+  irreducible constituents, and the inertia-bijection package.
 
 ## Main statements
 
