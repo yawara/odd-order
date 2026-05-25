@@ -1391,6 +1391,21 @@ private theorem centralizer_le_normalizer {G : Type*} [Group G] (H : Subgroup G)
     have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
     rw [hy_eq]; exact hxyx
 
+/-- **Isaacs Lem 7.7 (a)** (image of normalizer under p'-quotient).
+
+`N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
+`N_Ḡ(P̄) = (N_G(P)).map f`.
+
+This is exactly Isaacs Lemma 2.17 in the quotient form needed in Ch.7. -/
+theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
+    [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    Subgroup.normalizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.normalizer P).map (QuotientGroup.mk' N) :=
+  OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
+    hp_coprime hP_neBot hP_pgroup
+
 /-- **Isaacs Lem 7.7 (b)** (image of centralizer under p'-quotient).
 
 `N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
@@ -1479,6 +1494,23 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
     have hcp : c * p = p * c := (Subgroup.mem_centralizer_iff.mp hc p hp).symm
     rw [← map_mul, ← map_mul]
     exact congrArg f hcp.symm
+
+/-- **Isaacs Lem 7.7** (N/C theorem for p'-quotients).
+
+If `N ⊴ G` is a normal `p'`-subgroup and `P` is a nontrivial `p`-subgroup, then the
+normalizer and centralizer of `P` commute with passage to `G/N`. -/
+theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
+    {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    (Subgroup.normalizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.normalizer P).map (QuotientGroup.mk' N)) ∧
+    (Subgroup.centralizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N)) :=
+  ⟨normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup,
+    centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
 
 end -- 7C
 
