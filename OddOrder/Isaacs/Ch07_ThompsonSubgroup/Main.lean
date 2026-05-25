@@ -498,6 +498,35 @@ private theorem lem73_aux
           refine ⟨⟨((x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :
             Matrix (Fin 2) (Fin 2) (ZMod p)), hxdet⟩, ?_⟩
           exact Units.ext rfl
+        let toGLSL : Matrix.SpecialLinearGroup (Fin 2) (ZMod p) →*
+            Matrix.GeneralLinearGroup (Fin 2) (ZMod p) :=
+          Matrix.SpecialLinearGroup.toGL
+        let L_SL : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) :=
+          L.comap toGLSL
+        have hL_SL_map_eq : L_SL.map toGLSL = L := by
+          apply le_antisymm
+          · exact Subgroup.map_comap_le _ _
+          · intro x hx
+            rcases hL_le_SL_range hx with ⟨s, hs_eq⟩
+            refine ⟨s, ?_, hs_eq⟩
+            change toGLSL s ∈ L
+            rw [hs_eq]
+            exact hx
+        have hL_card_eq_LSL : Nat.card ↥L =
+            Nat.card ↥L_SL := by
+          have hmap_card : Nat.card ↥L_SL = Nat.card ↥(L_SL.map toGLSL) :=
+            Nat.card_congr
+              (Subgroup.equivMapOfInjective L_SL toGLSL
+                Matrix.SpecialLinearGroup.toGL_injective).toEquiv
+          rw [hL_SL_map_eq] at hmap_card
+          exact hmap_card.symm
+        have hL_card_dvd_SL : Nat.card ↥L ∣
+            Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) := by
+          rw [hL_card_eq_LSL]
+          simpa using
+            (Subgroup.card_dvd_of_le
+              (show L_SL ≤
+                (⊤ : Subgroup (Matrix.SpecialLinearGroup (Fin 2) (ZMod p))) from le_top))
         sorry  -- Step l-n
       · -- Case [L, P] < L: IH 適用 → P ≤ C([L, P]) → Lem 4.29 で [L, P] = ⊥ → P ≤ C(L).
         have hLP_lt_L : LP_comm < L := lt_of_le_of_ne hLP_le_L hLP_eq_L
