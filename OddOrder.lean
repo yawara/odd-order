@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
