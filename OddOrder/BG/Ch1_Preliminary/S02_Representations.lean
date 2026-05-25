@@ -472,6 +472,47 @@ theorem odd_two_dim_sylow_abelian
 mathlib との型整合 (`CharP F p` vs `(ringChar F).Prime`) 確認.
 -/
 
+/-! ### §2F helper lemmas -/
+
+/-- A permutation of a two-point set with odd order is trivial.
+
+Used in BG Thm 2.6: if an odd-order group fixes or interchanges two
+one-dimensional subspaces, it must fix both. -/
+private theorem perm_fin_two_eq_one_of_odd_order
+    (σ : Equiv.Perm (Fin 2)) (hodd : Odd (orderOf σ)) : σ = 1 := by
+  have hcard : Nat.card (Equiv.Perm (Fin 2)) = 2 := by
+    rw [Nat.card_eq_fintype_card]
+    decide
+  have hdvd : orderOf σ ∣ 2 := by
+    simpa [hcard] using orderOf_dvd_natCard σ
+  have hle : orderOf σ ≤ 2 := Nat.le_of_dvd (by decide) hdvd
+  have hpos : 0 < orderOf σ := orderOf_pos σ
+  have hne2 : orderOf σ ≠ 2 := by
+    intro h
+    exact hodd.not_two_dvd_nat (by rw [h])
+  have horder : orderOf σ = 1 := by omega
+  exact orderOf_eq_one_iff.mp horder
+
+/-- An odd-order finite group acts trivially on any two-point set.
+
+This formalizes the BG p.29 step: an element of `G` cannot interchange the
+two one-dimensional `K`-submodules because that would induce a nontrivial
+permutation of order two. -/
+private theorem smul_fin_two_eq_self_of_odd_card
+    {G : Type*} [Group G] [Finite G] [MulAction G (Fin 2)]
+    (hodd : Odd (Nat.card G)) (g : G) (i : Fin 2) : g • i = i := by
+  let σ : Equiv.Perm (Fin 2) := MulAction.toPermHom G (Fin 2) g
+  have hgo : Odd (orderOf g) := hodd.of_dvd_nat (orderOf_dvd_natCard g)
+  have hσ_dvd : orderOf σ ∣ orderOf g := by
+    apply orderOf_dvd_of_pow_eq_one
+    change (MulAction.toPermHom G (Fin 2) g) ^ orderOf g = 1
+    rw [← map_pow, pow_orderOf_eq_one, map_one]
+  have hσodd : Odd (orderOf σ) := hgo.of_dvd_nat hσ_dvd
+  have hσ : σ = 1 := perm_fin_two_eq_one_of_odd_order σ hσodd
+  change σ i = i
+  rw [hσ]
+  rfl
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
