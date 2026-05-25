@@ -19,17 +19,24 @@ abelian で `M ≤ F(G)` であるところまで完成している。
 
 ## やること
 
-- [ ] Ch.4 / Ch.1 の現行 API で minimal normal が Fitting を中心化する補題を探す。
-- [ ] 不足していれば、`M ≤ centralizer (fitting G : Set G)` または `M ≤ Subgroup.center (fitting G)`
+- [x] Ch.4 / Ch.1 の現行 API で minimal normal が Fitting を中心化する補題を探す。
+- [x] 不足していれば、`M ≤ centralizer (fitting G : Set G)` または `M ≤ Subgroup.center (fitting G)`
       へ繋ぐ補題を追加する。
-- [ ] BG Lemma 1.1 の full statement を `S01_Solvable.lean` に追加する。
-- [ ] 既存の「部分」コメントと status 表を更新する。
+- [x] BG Lemma 1.1 の full statement を `S01_Solvable.lean` に追加する。
+- [x] 既存の「部分」コメントと status 表を更新する。
+
+## 完了メモ
+
+Ch.4 側の `OddOrder.Isaacs.Ch04.le_centralizer_of_isMinimalNormal` が現在利用可能なので、
+新しい中心化補題は不要だった。既存の
+`isMinimalNormal_le_fitting_and_isElementaryAbelian` を full statement に拡張し、
+`M ≤ F(G)` と `M ≤ C_G(F(G))` と elementary abelian 結論を同時に返す形にした。
 
 ## 完了条件
 
-- BG Lemma 1.1 の `M ≤ Z(F(G))` までの statement が sorry-free。
-- `lake build OddOrder.BG.Ch1_Preliminary.S01_Solvable` が通る。
-- `lake build OddOrder.AxiomsCheck` が通る。
+- [x] BG Lemma 1.1 の `M ≤ Z(F(G))` までの statement が sorry-free。
+- [x] `lake build OddOrder.BG.Ch1_Preliminary.S01_Solvable` が通る。
+- [x] `lake build OddOrder.AxiomsCheck` が通る。
 
 ## 参照
 
