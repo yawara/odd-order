@@ -427,6 +427,69 @@ private theorem prime_power_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
       simpa [mul_assoc, mul_left_comm, mul_comm] using hn_dvd
     exact (hcop.dvd_mul_right).mp hn_dvd_rearr
 
+private theorem pgroup_action_card_ge_prime_succ_of_moved
+    {p : ℕ} [Fact p.Prime]
+    {A X : Type*} [Group A] [Group X] [MulDistribMulAction A X] [Finite X]
+    (hA : IsPGroup p A) {a : A} {x : X} (hmove : a • x ≠ x) :
+    p + 1 ≤ Nat.card X := by
+  have hx_ne_one : x ≠ 1 := by
+    intro hx
+    apply hmove
+    simp [hx]
+  have horbit_ne_one : ∀ y : MulAction.orbit A x, (y : X) ≠ 1 := by
+    intro y hy
+    rcases y.2 with ⟨b, hb⟩
+    apply hx_ne_one
+    calc
+      x = b⁻¹ • (b • x) := by simp
+      _ = b⁻¹ • (y : X) := congrArg (fun z : X => b⁻¹ • z) hb
+      _ = b⁻¹ • (1 : X) := by rw [hy]
+      _ = 1 := by simp
+  haveI : Nontrivial (MulAction.orbit A x) := by
+    refine ⟨⟨⟨x, MulAction.mem_orbit_self x⟩, ⟨a • x, MulAction.mem_orbit x a⟩, ?_⟩⟩
+    intro h
+    exact hmove (Subtype.ext_iff.mp h).symm
+  have horbit_card_gt_one : 1 < Nat.card (MulAction.orbit A x) :=
+    Finite.one_lt_card
+  obtain ⟨k, hk⟩ := hA.card_orbit x
+  have hk_pos : 0 < k := by
+    by_contra hk_not_pos
+    have hk_zero : k = 0 := Nat.eq_zero_of_not_pos hk_not_pos
+    have : Nat.card (MulAction.orbit A x) = 1 := by
+      rw [hk, hk_zero, pow_zero]
+    omega
+  have hp_le_orbit : p ≤ Nat.card (MulAction.orbit A x) := by
+    rw [hk]
+    cases k with
+    | zero => omega
+    | succ k =>
+        rw [pow_succ]
+        simpa [mul_comm] using
+          Nat.le_mul_of_pos_right p (Nat.pow_pos (Fact.out : p.Prime).pos)
+  let f : Option (MulAction.orbit A x) → X
+    | none => 1
+    | some y => y
+  have hf : Function.Injective f := by
+    intro u v huv
+    cases u with
+    | none =>
+        cases v with
+        | none => rfl
+        | some y =>
+            exfalso
+            exact horbit_ne_one y huv.symm
+    | some y =>
+        cases v with
+        | none =>
+            exfalso
+            exact horbit_ne_one y huv
+        | some z =>
+            exact congrArg some (Subtype.ext huv)
+  have hoption_le : Nat.card (Option (MulAction.orbit A x)) ≤ Nat.card X :=
+    Nat.card_le_card_of_injective f hf
+  rw [Finite.card_option] at hoption_le
+  exact (Nat.add_le_add_right hp_le_orbit 1).trans hoption_le
+
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
