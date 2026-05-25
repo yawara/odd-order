@@ -34,5 +34,10 @@ import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.AxiomsCheck

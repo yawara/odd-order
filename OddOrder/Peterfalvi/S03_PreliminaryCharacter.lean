@@ -1,0 +1,77 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.Peterfalvi.S02_Notation
+
+/-!
+# Peterfalvi §3: Preliminary Results from Character Theory
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
+§3, pp. 5-9.
+
+This file is the Lean entry point for Peterfalvi §3.  The numbered assertions
+(1.1)-(1.10) depend on the Wave 1a character-theory modules imported above:
+Brauer permutation, Clifford theory, induced characters, second orthogonality,
+and the isometry difference-pair lemma.
+
+The current slice records shared predicates and submodules used by §4-§8 while
+the deferred character-theory statements remain routed to those Wave 1a modules.
+
+Reference note: `notes/peterfalvi/s03_preliminary_character.md`.
+-/
+
+namespace OddOrder.Peterfalvi.S03
+
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G]
+
+/- 1: Preliminary character-theory notation (pp. 5-9) -/
+
+/-- The nonidentity part `G#`, used throughout Peterfalvi's reduced character
+spaces. -/
+def nonidentityElements (G : Type*) [One G] : Set G :=
+  {g | g ≠ 1}
+
+@[simp] theorem mem_nonidentityElements {g : G} :
+    g ∈ nonidentityElements G ↔ g ≠ 1 :=
+  Iff.rfl
+
+/-- Peterfalvi's reduced class-function space `CF(G, G#)`. -/
+abbrev ReducedClassFunctions (k : Type*) [CommRing k] (G : Type*) [Group G] :=
+  ↥(ClassFunction.supportedSubmodule (G := G) (k := k) (nonidentityElements G))
+
+/-- A set of class functions is closed under complex conjugation. -/
+def ClosedUnderConjugate (S : Set (ClassFunction G ℂ)) : Prop :=
+  ∀ ⦃χ : ClassFunction G ℂ⦄, χ ∈ S → χ.conj ∈ S
+
+/-- A set of class functions contains no real class functions. -/
+def HasNoRealCharacters (S : Set (ClassFunction G ℂ)) : Prop :=
+  ∀ ⦃χ : ClassFunction G ℂ⦄, χ ∈ S → ¬ χ.IsReal
+
+/-- Pairwise orthogonality for a set of class functions, using the normalized
+inner product. -/
+def PairwiseOrthogonal (S : Set (ClassFunction G ℂ))
+    [Fintype G] [Invertible (Nat.card G : ℂ)] : Prop :=
+  ∀ ⦃χ ψ : ClassFunction G ℂ⦄, χ ∈ S → ψ ∈ S → χ ≠ ψ →
+    ClassFunction.inner χ ψ = 0
+
+/-- The character difference `χ - χ.conj` that appears in Peterfalvi §7.
+
+This helper exists to keep later statements from accidentally using
+`χ - 1`, which is not the expression in §7. -/
+def conjugateDifference (χ : ClassFunction G ℂ) : ClassFunction G ℂ :=
+  χ - χ.conj
+
+@[simp] theorem conjugateDifference_apply (χ : ClassFunction G ℂ) (g : G) :
+    conjugateDifference χ g = χ g - χ.conj g :=
+  rfl
+
+end OddOrder.Peterfalvi.S03
