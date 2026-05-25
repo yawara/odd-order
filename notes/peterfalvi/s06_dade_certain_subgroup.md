@@ -32,6 +32,13 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 ---
 
+## Lean status (2026-05-26)
+
+`OddOrder/Peterfalvi/S06_DadeIsometryCertain.lean` は §4 interface を二段階で再利用する:
+
+- `CertainTypeHypothesis.DadeApplication`: 係数 `k` に parametric な `S04.DadeIsometryData` を持ち、pointwise Dade-map equations と inner-product preservation を §6 carrier に載せる。
+- `CertainTypeHypothesis.FullDadeApplication`: `k = ℂ` の `S04.FullDadeIsometryData` を持ち、virtual-character preservation も §6 側から `full_maps_virtualCharacter` で参照できる。
+
 ## §6 全 10 結果 (表) ⚠️ audit 訂正 (旧表「5 結果」は (4.6)-(4.10) 完全欠落)
 
 | # | 行数 | 種別 | statement 概要 | 役割 | §7-§16 被引用 |

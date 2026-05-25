@@ -11,9 +11,11 @@ import OddOrder.Peterfalvi.S05_TICyclic
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 §6, pp. 21-24.
 
-This module introduces the carrier structure for the "certain type" Dade
+This module introduces the carrier structures for the "certain type" Dade
 applications in §6.  It deliberately reuses the §4 bundled Dade data instead of
-creating a second isometry interface.
+creating a second isometry interface.  The coefficient-parametric
+`DadeApplication` records the pointwise and inner-product parts, while
+`FullDadeApplication` records the complex virtual-character preservation part.
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
@@ -64,6 +66,38 @@ instance (hyp : CertainTypeHypothesis (G := G) A L) :
     ((DadeApplication.mk tau : DadeApplication (G := G) (k := k) hyp) :
       OddOrder.Peterfalvi.S04.DadeMap (G := G) k A L) = tau.toDadeMap :=
   rfl
+
+variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)]
+
+/-- A complex §6 application package including the virtual-character part of
+the §4 Dade isometry theorem. -/
+structure FullDadeApplication (hyp : CertainTypeHypothesis (G := G) A L) where
+  tau : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp.dade
+
+instance (hyp : CertainTypeHypothesis (G := G) A L) :
+    CoeFun (FullDadeApplication (G := G) hyp)
+      (fun _ => OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L) :=
+  ⟨fun app => app.tau.toDadeMap⟩
+
+@[simp] theorem full_coe_mk (hyp : CertainTypeHypothesis (G := G) A L)
+    (tau : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp.dade) :
+    ((FullDadeApplication.mk tau : FullDadeApplication (G := G) hyp) :
+      OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L) = tau.toDadeMap :=
+  rfl
+
+theorem full_inner_eq {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : FullDadeApplication (G := G) hyp)
+    (α β : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L) :
+    ClassFunction.inner (app.tau.toDadeMap α) (app.tau.toDadeMap β) =
+      ClassFunction.inner (α : ClassFunction L ℂ) (β : ClassFunction L ℂ) :=
+  app.tau.inner_eq α β
+
+theorem full_maps_virtualCharacter {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : FullDadeApplication (G := G) hyp)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    (hα : (α : ClassFunction L ℂ) ∈ ZIrr L) :
+    app.tau.toDadeMap α ∈ ZIrr G :=
+  app.tau.maps_virtualCharacter α hα
 
 end CertainTypeHypothesis
 
