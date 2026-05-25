@@ -5147,4 +5147,135 @@ lemma commutator_top_lowerCentralSeriesInfty [Finite A] :
 
 end /- §4C (続) -/
 
+/-! ### §4C Thm 4.24 Phase 2: helpers for the main theorem -/
+
+section /- §4C (続 II): Thm 4.24 main theorem -/
+
+variable {A : Type*} [Group A]
+
+/-! #### iterated commutators with `A^∞` and the chain hypothesis -/
+
+/-- **Subgroup-valued iterated right commutator with a fixed subgroup**:
+`iterRightCommutator K m = ⁅...⁅K, F⁆, F⁆...⁆`. Specialisation of `iterCommutator`
+where we vary the left operand but keep the right operand fixed, used in the
+"sequence terminating at 1" step of Thm 4.24.
+
+This is definitionally `iterCommutator K F m`, but the explicit name aids
+readability around `Nat.find` of "last nontrivial in chain". -/
+private noncomputable def iterRightCommutator
+    (K F : Subgroup G) (m : ℕ) : Subgroup G :=
+  iterCommutator K F m
+
+private lemma iterRightCommutator_zero (K F : Subgroup G) :
+    iterRightCommutator K F 0 = K := rfl
+
+private lemma iterRightCommutator_succ (K F : Subgroup G) (m : ℕ) :
+    iterRightCommutator K F (m + 1) = ⁅iterRightCommutator K F m, F⁆ := rfl
+
+/-- **Monotonicity in the left operand**: if `K ≤ K'`, then `iterRightCommutator K F m ≤ iterRightCommutator K' F m`. -/
+private lemma iterRightCommutator_mono_left
+    {K K' F : Subgroup G} (h : K ≤ K') (m : ℕ) :
+    iterRightCommutator K F m ≤ iterRightCommutator K' F m := by
+  induction m with
+  | zero => simpa [iterRightCommutator_zero] using h
+  | succ m ih =>
+      rw [iterRightCommutator_succ, iterRightCommutator_succ]
+      exact Subgroup.commutator_mono ih le_rfl
+
+/-- **iterRightCommutator with shifted base**: `iterRightCommutator (iter K F j) F k = iter K F (j + k)`. -/
+private lemma iterRightCommutator_add (K F : Subgroup G) (j k : ℕ) :
+    iterRightCommutator (iterRightCommutator K F j) F k = iterRightCommutator K F (j + k) := by
+  induction k with
+  | zero => simp [iterRightCommutator_zero]
+  | succ k ih =>
+      rw [iterRightCommutator_succ, ih]
+      rw [show j + (k + 1) = (j + k) + 1 from by omega, iterRightCommutator_succ]
+
+/-! #### Restriction of the action to `A^∞ ≤ A` -/
+
+/-- The composed hom `lowerCentralSeriesInfty A →* MulAut G` obtained by restricting `φ`. -/
+private noncomputable def phiInfty {A G : Type*} [Group A] [Group G] [Finite A]
+    (φ : A →* MulAut G) :
+    (lowerCentralSeriesInfty A) →* MulAut G :=
+  φ.comp (lowerCentralSeriesInfty A).subtype
+
+/-- **A^∞ の作用 commutator** = `⁅G, A^∞⁆` (内部記法). Subgroup-typed. -/
+private noncomputable def actionCommutatorInfty {A G : Type*} [Group A] [Group G] [Finite A]
+    (φ : A →* MulAut G) : Subgroup G :=
+  actionCommutator (phiInfty φ)
+
+/-- `[G, A^∞] ≤ [G, A]` (作用 commutator は acting group の制限で縮む). -/
+private lemma actionCommutatorInfty_le_actionCommutator
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) :
+    actionCommutatorInfty φ ≤ actionCommutator φ :=
+  actionCommutator_comp_le φ _
+
+/-- `[G, A^∞]` is A-invariant (it is the image of an action commutator restricted to A^∞,
+which is itself characteristic in A, but more importantly, `(φ a) g * g⁻¹` for `a ∈ A^∞`
+is permuted under the broader A-action). -/
+private lemma actionCommutatorInfty_isAInvariant
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionCommutatorInfty φ) := by
+  -- Strategy: actionCommutatorInfty φ = ⁅⊤, lowerCentralSeriesInfty⁆ "viewed in G" via the action.
+  -- Use the fact that the generating set
+  -- {g * (φ a) g⁻¹ : g ∈ G, a ∈ A^∞}
+  -- is invariant under φ b for b ∈ A: (φ b) (g * (φ a) g⁻¹) = (φ b) g * (φ (b * a * b⁻¹)) ((φ b) g)⁻¹,
+  -- and b * a * b⁻¹ ∈ A^∞ because A^∞ is characteristic (hence normal) in A.
+  apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
+  intro b
+  -- Generator: x = g * (phiInfty φ) ⟨a, ha⟩ g⁻¹ with ⟨a, ha⟩ : A^∞. Equivalently g * (φ a) g⁻¹.
+  have h_norm : (lowerCentralSeriesInfty A).Normal := by
+    unfold lowerCentralSeriesInfty
+    exact (lowerCentralSeries A (Nat.card A)).normal_of_characteristic
+  have key : ∀ g : G, ∀ a : lowerCentralSeriesInfty A,
+      (φ b) (g * (phiInfty φ) a g⁻¹) =
+        (φ b) g * (phiInfty φ) ⟨b * a.val * b⁻¹, h_norm.conj_mem _ a.property _⟩
+          ((φ b) g)⁻¹ := by
+    intro g a
+    show (φ b) (g * (φ a.val) g⁻¹) = (φ b) g * (φ (b * a.val * b⁻¹)) ((φ b) g)⁻¹
+    rw [map_mul (φ b)]
+    congr 1
+    rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
+        show φ (b * a.val * b⁻¹) = (φ b) * (φ a.val) * (φ b)⁻¹ from by
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.inv_apply_self]
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    refine ⟨(φ b) g, ⟨b * a.val * b⁻¹, h_norm.conj_mem _ a.property _⟩, ?_⟩
+    exact key g a
+  · rintro ⟨g, a, rfl⟩
+    refine ⟨(φ b)⁻¹ g * (phiInfty φ)
+        ⟨b⁻¹ * a.val * b, by
+          have := h_norm.conj_mem _ a.property b⁻¹
+          simpa [mul_assoc] using this⟩
+        ((φ b)⁻¹ g)⁻¹,
+      ⟨(φ b)⁻¹ g, _, rfl⟩, ?_⟩
+    show (φ b) ((φ b)⁻¹ g * (φ (b⁻¹ * a.val * b)) ((φ b)⁻¹ g)⁻¹) =
+        g * (φ a.val) g⁻¹
+    rw [map_mul (φ b)]
+    congr 1
+    · exact MulAut.apply_inv_self (M := G) (φ b) g
+    rw [show ((φ b)⁻¹ g)⁻¹ = (φ b)⁻¹ g⁻¹ from (map_inv ((φ b)⁻¹) g).symm,
+        show φ (b⁻¹ * a.val * b) = (φ b)⁻¹ * (φ a.val) * (φ b) from by
+          rw [map_mul, map_mul, map_inv],
+        MulAut.mul_apply, MulAut.mul_apply, MulAut.apply_inv_self,
+        MulAut.apply_inv_self]
+
+/-- **Chain hypothesis descends to `A^∞`**: if `iterCommutator inl(G).range inr(A).range m = ⊥`
+then `iterCommutator inl(G).range inr(A^∞).range m = ⊥` (acting via `phiInfty`).
+
+Proof: `lowerCentralSeriesInfty A ≤ A` (as subgroup), and the chain hypothesis restricts. -/
+private lemma iterCommutator_inl_inr_lowerCentralSeriesInfty_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] {φ : A →* MulAut G} {m : ℕ}
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[phiInfty φ] (lowerCentralSeriesInfty A)).range
+        (SemidirectProduct.inr : (lowerCentralSeriesInfty A) →*
+            G ⋊[phiInfty φ] (lowerCentralSeriesInfty A)).range m = ⊥ :=
+  iterCommutator_inl_inr_restrict_eq_bot (φ := φ) (lowerCentralSeriesInfty A) h_iter
+
+end /- §4C (続 II) -/
+
 end OddOrder.Isaacs.Ch04
