@@ -952,8 +952,8 @@ mathlib `Focal.lean` で Focal Subgroup Theorem が完全実装済 (Boyang Hu, 2
 **Thm 5.20** (ker(v) = A^p(G)) = `ker_restrict_transferFocal_eq_focalSubgroupOf` で同等内容
 (Isaacs 流は `A^p(G) = O^p(G) · G'` の表示だが, mathlib では `focalSubgroupOf` 表示で同値).
 
-**Cor 5.22, 5.23** (`H controls fusion ⇒ controls p-transfer`): `ControlsFusionIn`
-と focal equality core は実装済み. transfer image / `A^p` index equality への接続は未.
+**Cor 5.22, 5.23** (`H controls fusion ⇒ controls p-transfer`): ✅ `A^p` equality
+form implemented (`A^p(H)=H∩A^p(G)`), without adding a separate transfer-control predicate.
 
 **Thm 5.24** (G simple, H maximal nilpotent ⇒ H は p-group; Wielandt): BG/Peterfalvi
 直接被引用無し. 保留. -/
@@ -1270,6 +1270,165 @@ lemma APrime_inf_sylow_eq_focalSubgroup [Finite G] {p : ℕ} [Fact p.Prime]
         Subgroup.ker_transferFocal_inf_eq_focalSubgroup P
   · rw [← Subgroup.commutator_inf_eq_focalSubgroup P]
     exact inf_le_inf (commutator_le_APrime p G) le_rfl
+
+/-- The always-available half of Isaacs Cor. 5.22:
+if a subgroup `H` contains a Sylow `p`-subgroup of `G`, then
+`A^p(H) ≤ H ∩ A^p(G)`.
+
+The proof follows Isaacs' paragraph before Cor. 5.22: since `P · A^p(G)=G`, also
+`H · A^p(G)=G`, so `H/(H ∩ A^p(G))` is an abelian p-group. -/
+lemma APrime_le_subgroupOf_APrime_of_sylow_le [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {H : Subgroup G} (hP_le_H : (P : Subgroup G) ≤ H) :
+    APrime p H ≤ (APrime p G).subgroupOf H := by
+  classical
+  let A : Subgroup G := APrime p G
+  haveI hA_normal : A.Normal := inferInstance
+  have hA_index_pow : ∃ k : ℕ, A.index = p ^ k := by
+    simpa [A] using APrime_index_isPGroup p G
+  have hPA_top : (P : Subgroup G) ⊔ A = ⊤ := by
+    obtain ⟨k, hk⟩ := hA_index_pow
+    have hcop : Nat.Coprime (P : Subgroup G).index A.index := by
+      rw [hk]
+      exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have hHA_top : H ⊔ A = ⊤ := by
+    rw [eq_top_iff, ← hPA_top]
+    exact sup_le_sup hP_le_H le_rfl
+  have hA_sub_H_index : ∃ k : ℕ, (A.subgroupOf H).index = p ^ k := by
+    obtain ⟨k, hk⟩ := hA_index_pow
+    refine ⟨k, ?_⟩
+    change A.relIndex H = p ^ k
+    rw [← Subgroup.relIndex_sup_right (H := H) (K := A), hHA_top,
+      Subgroup.relIndex_top_right, hk]
+  have hA_sub_H_normal : (A.subgroupOf H).Normal := hA_normal.subgroupOf H
+  have hcommH_le : commutator H ≤ A.subgroupOf H := by
+    intro x hx
+    change (x : G) ∈ A
+    have hxmap : (x : G) ∈ (commutator H).map H.subtype :=
+      Subgroup.mem_map_of_mem H.subtype hx
+    have hmap_le : (commutator H).map H.subtype ≤ commutator G := by
+      rw [Subgroup.map_subtype_commutator, _root_.commutator_def]
+      exact Subgroup.commutator_mono le_top le_top
+    exact commutator_le_APrime p G (hmap_le hxmap)
+  obtain ⟨k, hk⟩ := hA_sub_H_index
+  exact APrime_le (K := A.subgroupOf H) hA_sub_H_normal hcommH_le hk
+
+/-- **Isaacs Cor. 5.22 (`A^p` equality form)**:
+if `P ≤ H ≤ G` and `H` controls `G`-fusion in `P`, then
+`A^p(H) = H ∩ A^p(G)`.
+
+This is the transfer-control conclusion, stated without adding a separate
+`ControlsPTransfer` predicate. -/
+theorem APrime_eq_subgroupOf_APrime_of_controlsFusionIn [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {H : Subgroup G}
+    (hP_le_H : (P : Subgroup G) ≤ H)
+    (hFusion : H.ControlsFusionIn (P : Subgroup G)) :
+    APrime p H = (APrime p G).subgroupOf H := by
+  classical
+  let A : Subgroup G := APrime p G
+  let B : Subgroup H := APrime p H
+  let PH_sub : Subgroup H := (P : Subgroup G).subgroupOf H
+  have hB_le_AH : B ≤ A.subgroupOf H := by
+    simpa [A, B] using APrime_le_subgroupOf_APrime_of_sylow_le (G := G) (p := p) P hP_le_H
+  have hPH_pgroup : IsPGroup p PH_sub :=
+    P.isPGroup'.of_equiv (Subgroup.subgroupOfEquivOfLe hP_le_H).symm
+  have hPH_not_dvd : ¬ p ∣ PH_sub.index := by
+    intro hdiv
+    exact P.not_dvd_index (hdiv.trans (Subgroup.relIndex_dvd_index_of_le hP_le_H))
+  let PH : Sylow p H := hPH_pgroup.toSylow hPH_not_dvd
+  have hPH_eq : (PH : Subgroup H) = PH_sub :=
+    hPH_pgroup.toSylow_coe hPH_not_dvd
+  have hB_inf_PH : B ⊓ PH_sub = PH_sub.focalSubgroup := by
+    have h := APrime_inf_sylow_eq_focalSubgroup (G := H) (p := p) PH
+    simpa [B, hPH_eq] using h
+  have hAH_inf_PH : A.subgroupOf H ⊓ PH_sub = PH_sub.focalSubgroup := by
+    apply (Subgroup.map_subtype_inj (H := H)).mp
+    rw [Subgroup.map_inf _ _ H.subtype H.subtype_injective,
+      Subgroup.subgroupOf_map_subtype,
+      Subgroup.map_subgroupOf_eq_of_le hP_le_H,
+      Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn hP_le_H hFusion,
+      ← APrime_inf_sylow_eq_focalSubgroup (G := G) (p := p) P]
+    rw [inf_assoc, inf_comm H (P : Subgroup G), inf_eq_left.mpr hP_le_H]
+  have hB_sup_PH : B ⊔ PH_sub = ⊤ := by
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, B.index = p ^ k := by
+      simpa [B] using APrime_index_isPGroup p H
+    have hcop : Nat.Coprime B.index PH_sub.index := by
+      rw [hk]
+      exact (Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out hPH_not_dvd).symm
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have hAH_index_pow : ∃ k : ℕ, (A.subgroupOf H).index = p ^ k := by
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, A.index = p ^ k := by
+      simpa [A] using APrime_index_isPGroup p G
+    have hPA_top : (P : Subgroup G) ⊔ A = ⊤ := by
+      have hcop : Nat.Coprime (P : Subgroup G).index A.index := by
+        rw [hk]
+        exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+      exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+    have hHA_top : H ⊔ A = ⊤ := by
+      rw [eq_top_iff, ← hPA_top]
+      exact sup_le_sup hP_le_H le_rfl
+    refine ⟨k, ?_⟩
+    change A.relIndex H = p ^ k
+    rw [← Subgroup.relIndex_sup_right (H := H) (K := A), hHA_top,
+      Subgroup.relIndex_top_right, hk]
+  have hAH_sup_PH : A.subgroupOf H ⊔ PH_sub = ⊤ := by
+    obtain ⟨k, hk⟩ := hAH_index_pow
+    have hcop : Nat.Coprime (A.subgroupOf H).index PH_sub.index := by
+      rw [hk]
+      exact (Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out hPH_not_dvd).symm
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have h_index_eq : B.index = (A.subgroupOf H).index := by
+    calc
+      B.index = B.relIndex PH_sub := by
+        rw [← Subgroup.relIndex_sup_right (H := PH_sub) (K := B), sup_comm,
+          hB_sup_PH, Subgroup.relIndex_top_right]
+      _ = (B ⊓ PH_sub).relIndex PH_sub := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = (A.subgroupOf H ⊓ PH_sub).relIndex PH_sub := by
+        rw [hB_inf_PH, hAH_inf_PH]
+      _ = (A.subgroupOf H).relIndex PH_sub := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = (A.subgroupOf H).index := by
+        rw [← Subgroup.relIndex_sup_right (H := PH_sub) (K := A.subgroupOf H),
+          sup_comm, hAH_sup_PH, Subgroup.relIndex_top_right]
+  have hrel_eq_one : B.relIndex (A.subgroupOf H) = 1 := by
+    have hmul : B.relIndex (A.subgroupOf H) * (A.subgroupOf H).index =
+        1 * (A.subgroupOf H).index := by
+      rw [Subgroup.relIndex_mul_index hB_le_AH, one_mul, h_index_eq]
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
+  exact le_antisymm hB_le_AH (Subgroup.relIndex_eq_one.mp hrel_eq_one)
+
+/-- **Isaacs Cor. 5.23 (`A^p` equality form)**:
+if the Sylow `p`-subgroup `P` is abelian, then `N_G(P)` controls `p`-transfer,
+expressed as `A^p(N_G(P)) = N_G(P) ∩ A^p(G)`.
+
+This is Cor. 5.22 applied to Lemma 5.12, since an abelian `P` is contained in
+its own centralizer. -/
+theorem APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    [IsMulCommutative ↥(P : Subgroup G)] :
+    APrime p (Subgroup.normalizer ((P : Subgroup G) : Set G)) =
+      (APrime p G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+  classical
+  let N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G)
+  have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
+  have hFusion : N.ControlsFusionIn (P : Subgroup G) := by
+    intro x y hxP hyP hxy
+    obtain ⟨g, hgxy⟩ := hxy
+    have hxC : x ∈ Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro q hq
+      exact (congrArg Subtype.val
+        (mul_comm (⟨x, hxP⟩ : ↥(P : Subgroup G)) (⟨q, hq⟩ : ↥(P : Subgroup G)))).symm
+    have hyC : y ∈ Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro q hq
+      exact (congrArg Subtype.val
+        (mul_comm (⟨y, hyP⟩ : ↥(P : Subgroup G)) (⟨q, hq⟩ : ↥(P : Subgroup G)))).symm
+    exact normalizer_controls_centralizer_fusion P hxC hyC hgxy
+  simpa [N] using
+    APrime_eq_subgroupOf_APrime_of_controlsFusionIn (G := G) (p := p) P hP_le_N hFusion
 
 /-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
 
