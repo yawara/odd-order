@@ -1415,6 +1415,54 @@ private theorem sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed
   · exact commutator_le_sylow_of_nontrivial_normal_p_fixed_space
       K ρ hfaithful hK hdim hK_ne_bot P
 
+/-- A prime divisor of `|G|` makes `G` nontrivial, hence `⊤ : Subgroup G` is
+not `⊥`. -/
+private theorem top_ne_bot_of_prime_dvd_card
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hp_dvd : p ∣ Nat.card G) :
+    (⊤ : Subgroup G) ≠ ⊥ := by
+  have hcard_gt : 1 < Nat.card G :=
+    lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
+      (Nat.le_of_dvd Nat.card_pos hp_dvd)
+  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt
+  exact top_ne_bot
+
+/-- q = p endpoint phrased as the existence of a nontrivial normal p-subgroup.
+
+This is the theorem-facing reduction left after the fixed-space helpers: the
+full BG proof only has to produce such a subgroup, then this lemma supplies
+the Sylow conclusion. -/
+private theorem sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgroup
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hexists : ∃ K : Subgroup G, K.Normal ∧ IsPGroup p K ∧ K ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  rcases hexists with ⟨K, hKnormal, hK, hK_ne_bot⟩
+  haveI : K.Normal := hKnormal
+  exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
+    K ρ hfaithful hK hdim hK_ne_bot P
+
+/-- Special case of the q = p endpoint when the ambient group itself is a
+p-group. -/
+private theorem sylow_commutative_and_commutator_le_of_isPGroup
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hG : IsPGroup p G) (hp_dvd : p ∣ Nat.card G)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) :=
+  sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
+    (⊤ : Subgroup G) ρ hfaithful (hG.to_subgroup ⊤) hdim
+    (top_ne_bot_of_prime_dvd_card (p := p) hp_dvd) P
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 

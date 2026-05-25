@@ -85,6 +85,13 @@
   を得る. これらを theorem 結論形にまとめる endpoint
   `sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space`
   も追加済み.
+- **2026-05-26**: theorem 本体側で使いやすい reduction として
+  `sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgroup`
+  を追加し、q=p は「非自明 normal p-subgroup の存在」まで落とした.
+  さらに ambient group 自身が p-group の場合に `K = ⊤` を使う
+  `sylow_commutative_and_commutator_le_of_isPGroup` も追加済み.
+  次は determinant kernel `G* = G ∩ SL(V,F)` / `O_p(G*)` 側の構成を
+  Lean で切れる小補題に分割する.
 
 ## TL;DR
 
