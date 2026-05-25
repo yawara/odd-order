@@ -3383,6 +3383,63 @@ private lemma commutative_of_central_index_two_subgroup
       x * (x * y) = x * y * x := hcomm
       _ = x * (y * x) := by rw [mul_assoc])
 
+/-- Restrict an automorphism of `G` to a characteristic subgroup. -/
+private def characteristicRestrictMulEquiv
+    {G : Type*} [Group G] {H : Subgroup G} (hH : H.Characteristic)
+    (φ : G ≃* G) : H ≃* H where
+  toFun x := ⟨φ x, by
+    have hx : (x : G) ∈ H.comap φ.toMonoidHom := by
+      rw [hH.fixed φ]
+      exact x.2
+    exact hx⟩
+  invFun x := ⟨φ.symm x, by
+    have hx : (x : G) ∈ H.comap φ.symm.toMonoidHom := by
+      rw [hH.fixed φ.symm]
+      exact x.2
+    exact hx⟩
+  left_inv x := by
+    apply Subtype.ext
+    exact φ.symm_apply_apply (x : G)
+  right_inv x := by
+    apply Subtype.ext
+    exact φ.apply_symm_apply (x : G)
+  map_mul' x y := by
+    apply Subtype.ext
+    exact φ.map_mul (x : G) (y : G)
+
+/-- A characteristic subgroup of a characteristic subgroup is characteristic upstairs. -/
+private lemma characteristic_map_subtype_of_characteristic
+    {G : Type*} [Group G] {H : Subgroup G} {K : Subgroup H}
+    (hH : H.Characteristic) (hK : K.Characteristic) :
+    (K.map H.subtype).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_le]
+  intro φ y hy
+  rw [Subgroup.mem_map] at hy ⊢
+  obtain ⟨x, hxL, rfl⟩ := hy
+  rw [Subgroup.mem_map] at hxL
+  obtain ⟨k, hkK, rfl⟩ := hxL
+  let φH : H ≃* H := characteristicRestrictMulEquiv hH φ
+  have hk_image : φH k ∈ K := by
+    have hmem_map : φH k ∈ K.map φH.toMonoidHom :=
+      Subgroup.mem_map_of_mem φH.toMonoidHom hkK
+    exact (Subgroup.characteristic_iff_map_le.mp hK φH) hmem_map
+  refine ⟨φH k, hk_image, ?_⟩
+  rfl
+
+/-- Elementary abelian structure is transported across a multiplicative equivalence. -/
+private lemma isElementaryAbelian_of_mulEquiv
+    {p : ℕ} {A B : Type*} [Group A] [Group B]
+    (e : A ≃* B) (h : IsElementaryAbelian p A) :
+    IsElementaryAbelian p B := by
+  constructor
+  · intro x y
+    obtain ⟨x', rfl⟩ := e.surjective x
+    obtain ⟨y', rfl⟩ := e.surjective y
+    simpa using congrArg e (h.1 x' y')
+  · intro x
+    obtain ⟨x', rfl⟩ := e.surjective x
+    simpa using congrArg e (h.2 x')
+
 /-- **Isaacs Lemma 6.15** (`p = 2`, second-step setup).
 
 The lifted subgroup `E` from `T/T'` is noncyclic and has order `8`; moreover
@@ -3511,6 +3568,37 @@ theorem exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_ind
     commutative_of_central_index_two_subgroup hCE_le_centerE hCE_idx
   exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
     hE_not_cyclic, hE_ab, hCE_cyclic, hCE_idx⟩
+
+/-- **Isaacs Lemma 6.15** (`p = 2` branch).
+
+Let `T` be a finite `2`-group with `|T : Z(T)| = 4`, `|T| ≠ 8`, and a cyclic subgroup
+`C` with `Z(T) < C < T`. Then `T` contains a characteristic elementary abelian subgroup
+of order `4`. -/
+theorem exists_characteristic_isElementaryAbelian_four_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian 2 K ∧ Nat.card K = 4 := by
+  obtain ⟨E, hE_char, _hcomm_le_E, _hE_image_elem, _hE_image_card, _hE_card,
+    hE_not_cyclic, hE_ab, hCE_cyclic, hCE_idx⟩ :=
+    exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  obtain ⟨K, hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+      (A := E) hE_ab (hT_two.to_subgroup E)
+      (D := C.subgroupOf E) hCE_cyclic hCE_idx hE_not_cyclic
+  let L : Subgroup T := K.map E.subtype
+  refine ⟨L, ?_, ?_, ?_⟩
+  · dsimp [L]
+    exact characteristic_map_subtype_of_characteristic hE_char hK_char
+  · dsimp [L]
+    exact isElementaryAbelian_of_mulEquiv
+      (Subgroup.equivMapOfInjective K E.subtype E.subtype_injective) hK_elem
+  · dsimp [L]
+    rw [Subgroup.card_subtype, hK_card]
 
 end
 
