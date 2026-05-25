@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.Fintype.Card
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.Peterfalvi.S02_Notation
@@ -116,6 +117,40 @@ theorem mem_L (hyp : Hypothesis G A L) {a : G} (ha : a ∈ A) : a ∈ L :=
 
 theorem ne_one (hyp : Hypothesis G A L) {a : G} (ha : a ∈ A) : a ≠ 1 :=
   (mem_sharp.mp (hyp.subset_sharp ha)).2
+
+/-- One direction of **Peterfalvi (2.3)**: under Hypothesis (2.2), if all
+subgroups `H(a)` are trivial, then `A` is a TI-subset relative to `L`. -/
+theorem isTISubset_of_forall_H_eq_bot (hyp : Hypothesis G A L)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥) :
+    OddOrder.GroupTheory.IsTISubset A L := by
+  intro g hgap
+  rcases hgap with ⟨a, ha, hga⟩
+  have hconj : IsConj a (g * a * g⁻¹) := by
+    rw [isConj_iff]
+    exact ⟨g, rfl⟩
+  rcases hyp.conj_in_L ha hga hconj with ⟨l, hl⟩
+  let y : G := (l : G)⁻¹ * g
+  have hy_comm_left : a * y = y * a := by
+    change a * ((l : G)⁻¹ * g) = ((l : G)⁻¹ * g) * a
+    calc
+      a * ((l : G)⁻¹ * g) = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * g := by
+        group
+      _ = (l : G)⁻¹ * (g * a * g⁻¹) * g := by rw [hl]
+      _ = ((l : G)⁻¹ * g) * a := by
+        group
+  have hy_cent : y ∈ Subgroup.centralizer ({a} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    exact hy_comm_left.symm
+  have hcent_eq := hyp.centralizer_eq_sup ⟨a, ha⟩
+  rw [hH ⟨a, ha⟩, bot_sup_eq] at hcent_eq
+  have hy_in_centralizerIn : y ∈ centralizerIn L a := by
+    rw [← hcent_eq]
+    exact hy_cent
+  have hy_L : y ∈ L := (mem_centralizerIn.mp hy_in_centralizerIn).1
+  have hg : (l : G) * y ∈ L := L.mul_mem l.property hy_L
+  have hg_eq : (l : G) * y = g := by
+    simp [y]
+  exact hg_eq ▸ hg
 
 /-- Restrict Hypothesis (2.2) to an `L`-stable subset `A₁ ⊆ A`.
 
