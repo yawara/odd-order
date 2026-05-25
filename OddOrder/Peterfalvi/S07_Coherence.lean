@@ -73,7 +73,7 @@ structure CharacterDifferenceImage (τ : IntegralCharacterMap L G)
 
 namespace CharacterDifferenceImage
 
-variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
 
 /-- The first irreducible character appearing in the signed image, as a class
 function. -/
@@ -96,6 +96,52 @@ abbrev nuClassFunction (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) 
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     IsIrreducibleCharacter hχ.nuClassFunction :=
   hχ.nu.isIrreducible
+
+/-- The two irreducible characters appearing in the image of `χ - χ̄`.
+
+This is the current two-element form of Peterfalvi's `R(χ)` from (5.2.d). -/
+def imageSet (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    Set (ClassFunction G ℂ) :=
+  {hχ.muClassFunction, hχ.nuClassFunction}
+
+@[simp] theorem muClassFunction_mem_imageSet
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.muClassFunction ∈ hχ.imageSet := by
+  simp [imageSet]
+
+@[simp] theorem nuClassFunction_mem_imageSet
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.nuClassFunction ∈ hχ.imageSet := by
+  simp [imageSet]
+
+theorem mem_imageSet_iff
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    {φ : ClassFunction G ℂ} :
+    φ ∈ hχ.imageSet ↔ φ = hχ.muClassFunction ∨ φ = hχ.nuClassFunction := by
+  simp [imageSet]
+
+theorem imageSet_irreducible
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ hχ.imageSet) :
+    IsIrreducibleCharacter φ := by
+  rw [hχ.mem_imageSet_iff] at hφ
+  rcases hφ with rfl | rfl
+  · exact hχ.mu_irreducible
+  · exact hχ.nu_irreducible
+
+theorem muClassFunction_ne_nuClassFunction
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.muClassFunction ≠ hχ.nuClassFunction := by
+  intro h
+  exact hχ.distinct (IrreducibleCharacter.ext h)
+
+/-- Orthogonality of the two image sets `R(χ)` and `R(ψ)` from Peterfalvi
+(5.2.e). -/
+def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ)
+    [Fintype G] [Invertible (Nat.card G : ℂ)] : Prop :=
+  ∀ ⦃φ η : ClassFunction G ℂ⦄, φ ∈ hχ.imageSet → η ∈ hψ.imageSet →
+    ClassFunction.inner φ η = 0
 
 /-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
 theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
@@ -143,6 +189,10 @@ structure Hypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
   pairwise_orthogonal : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S
   difference_image :
     ∀ ⦃χ : ClassFunction L ℂ⦄, χ ∈ S → CharacterDifferenceImage (L := L) (G := G) tau χ
+  difference_images_orthogonal :
+    ∀ ⦃φ χ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hχ : χ ∈ S),
+      ClassFunction.inner φ χ = 0 → ClassFunction.inner φ χ.conj = 0 →
+        (difference_image hφ).Orthogonal (difference_image hχ)
 
 namespace Hypothesis
 
@@ -185,6 +235,14 @@ theorem conjugateDifference_ne_zero {hyp : Hypothesis (L := L) (G := G) S A}
     OddOrder.Peterfalvi.S03.conjugateDifference χ ≠ 0 :=
   (OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_iff_not_isReal χ).mpr
     (hyp.not_isReal hχ)
+
+theorem difference_images_orthogonal_of_inner_pair
+    {hyp : Hypothesis (L := L) (G := G) S A}
+    {φ χ : ClassFunction L ℂ} (hφ : φ ∈ S) (hχ : χ ∈ S)
+    (hφχ : ClassFunction.inner φ χ = 0)
+    (hφχ_conj : ClassFunction.inner φ χ.conj = 0) :
+    (hyp.difference_image hφ).Orthogonal (hyp.difference_image hχ) :=
+  hyp.difference_images_orthogonal hφ hχ hφχ hφχ_conj
 
 end Hypothesis
 

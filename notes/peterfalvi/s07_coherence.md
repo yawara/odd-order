@@ -205,6 +205,10 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `OddOrder.Peterfalvi.S07.Hypothesis.conjugate_mem`,
   `not_isReal`, `ne_conj`, and `conjugateDifference_ne_zero` expose (5.2.a)
   as named, reusable API for later coherence proofs.
+- `OddOrder.Peterfalvi.S07.CharacterDifferenceImage.imageSet` names the current
+  two-element `R(χ)`, and `CharacterDifferenceImage.Orthogonal` plus
+  `Hypothesis.difference_images_orthogonal` now encode the (5.2.e) image-set
+  orthogonality condition.
 
 ### (5.3) Lemma — Coherence の十分条件
 
