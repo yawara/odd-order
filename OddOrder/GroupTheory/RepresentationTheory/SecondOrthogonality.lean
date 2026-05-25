@@ -36,12 +36,12 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 
 ## Main statements
 
-* `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`:
-  the sum equals `|C_G(g)|`.
-* `OddOrder.RepresentationTheory.column_orthogonality_not_conj` — for non-conjugate
-  `g, h`: the sum vanishes.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
+* `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
+  derived from the diagonal case by class-function invariance.
+* `OddOrder.RepresentationTheory.column_orthogonality_not_conj` — for non-conjugate
+  `g, h`: the sum vanishes.
 
 ## References
 
@@ -55,6 +55,19 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+/-- Diagonal second (column) orthogonality:
+`∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
+
+This is the primitive deferred statement for the conjugate column case; the
+off-diagonal non-conjugate case is still a separate character-table theorem. -/
+theorem column_orthogonality_diag
+    [Fintype (IrreducibleCharacter G)]
+    (g : G) :
+    ∑ χ : IrreducibleCharacter G,
+        ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
+    (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  sorry
+
 /-- **Second (column) orthogonality**, conjugate case ([Is] Thm 2.18 / 6.10).
 
 For `g, h ∈ G` with `g ~ h`, `∑_{χ ∈ Irr G} χ(g) · χ̄(h) = |C_G(g)|` in `ℂ`.
@@ -64,14 +77,26 @@ carved out by `IsIrreducibleCharacter`. Such a `Fintype` is well-defined for fin
 `G`; supplying it as an explicit instance keeps this statement uncoupled from the
 eventual existence proof for the indexing type.
 
-(Proof deferred: standard matrix-algebra route via invertibility of the character table.) -/
+This is a direct consequence of the diagonal case because every class function is
+constant on conjugacy classes. -/
 theorem column_orthogonality_conj
     [Fintype (IrreducibleCharacter G)]
     {g h : G} (hgh : IsConj g h) :
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  sorry
+  calc
+    ∑ χ : IrreducibleCharacter G,
+        ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h)
+        = ∑ χ : IrreducibleCharacter G,
+            ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) := by
+          refine Finset.sum_congr rfl ?_
+          intro χ _
+          have hχ : (χ : ClassFunction G ℂ) g = (χ : ClassFunction G ℂ) h :=
+            ClassFunction.of_isConj (χ : ClassFunction G ℂ) hgh
+          rw [← hχ]
+    _ = (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) :=
+        column_orthogonality_diag g
 
 /-- **Second (column) orthogonality**, non-conjugate case ([Is] Thm 2.18 / 6.10).
 
@@ -82,17 +107,5 @@ theorem column_orthogonality_not_conj
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0 := by
   sorry
-
-/-- Diagonal specialization: `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
-
-This is `χ(g) · χ̄(g)` summed over irreducibles, equal to the centralizer size. Equivalently
-`∑_χ ‖χ(g)‖² = |C_G(g)|` (using `z * star z = ‖z‖²`). -/
-theorem column_orthogonality_diag
-    [Fintype (IrreducibleCharacter G)]
-    (g : G) :
-    ∑ χ : IrreducibleCharacter G,
-        ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
-    (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) :=
-  column_orthogonality_conj (IsConj.refl g)
 
 end OddOrder.RepresentationTheory

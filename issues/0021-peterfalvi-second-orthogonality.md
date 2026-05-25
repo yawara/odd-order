@@ -15,7 +15,7 @@ stub 群の最初の依存で、issue 0022 より先に片付ける。
 
 ## やること
 
-- [ ] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_conj`
+- [x] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_conj`
       を `sorry` なしにする。
 - [ ] `OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality.column_orthogonality_not_conj`
       を `sorry` なしにする。
