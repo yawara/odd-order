@@ -2228,6 +2228,35 @@ private lemma commutator_le_center_of_index_pow_two
     IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
   exact hZnorm.quotient_commutative_iff_commutator_le.mp ⟨h_quot_comm⟩
 
+/-- **Step 0 of Lem 6.15**: under the hypothesis `Z(T) ≤ C` and `|T : Z(T)| = p²`, `C` is
+normal in `T`. (Because `T/Z(T)` of order `p²` is abelian, so every subgroup of `T/Z(T)`
+is normal, and `C/Z(T)` lifts back to `C` normal in `T`.) -/
+private lemma normal_of_center_le_of_center_index_pow_two
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hZ_le_C : Subgroup.center T ≤ C) : C.Normal := by
+  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  -- T/Z(T) of order p² is abelian.
+  have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
+    rw [← Subgroup.index_eq_card]; exact h_idx
+  have hQuot_comm : ∀ a b : T ⧸ Subgroup.center T, a * b = b * a :=
+    IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
+  -- Image of C under the quotient map: C/Z(T) ≤ T/Z(T).
+  let C' : Subgroup (T ⧸ Subgroup.center T) := C.map (QuotientGroup.mk' (Subgroup.center T))
+  haveI hC'Norm : C'.Normal := by
+    -- Subgroups of an abelian quotient are normal: g*n*g⁻¹ = n via mul_comm.
+    refine ⟨fun n hn g => ?_⟩
+    have h_eq : g * n * g⁻¹ = n := by
+      rw [hQuot_comm g n, mul_assoc, mul_inv_cancel, mul_one]
+    rw [h_eq]; exact hn
+  -- C = preimage of C' under mk' Z(T) (because Z(T) ≤ C).
+  have h_comap_eq : C'.comap (QuotientGroup.mk' (Subgroup.center T)) = C := by
+    show ((C.map (QuotientGroup.mk' (Subgroup.center T))).comap _) = C
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+    exact sup_eq_left.mpr hZ_le_C
+  rw [← h_comap_eq]
+  exact hC'Norm.comap _
+
 /-- **Helper for Lem 6.15**: if `|T : Z(T)| = p²` then `T` is nonabelian. -/
 private lemma exists_not_commute_of_center_index_pow_two
     {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
@@ -2439,6 +2468,133 @@ private lemma card_setOfPowEqOne_inf_le_prime
     (IsCyclic.exponent_eq_card (α := (K ⊓ C : Subgroup T))).symm
   rw [h_card_eq]
   exact Nat.le_of_dvd hp.out.pos h_exp_dvd
+
+/-- **Lem 6.15 odd-p helper**: `|K| ≤ p²` where `K = {x | x^p = 1}`.
+Use `|K| = |K : K ⊓ C| · |K ⊓ C|`, `|K : K ⊓ C| = C.relIndex K ≤ C.index = p`, and
+`|K ⊓ C| ≤ p`. -/
+private lemma card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (h_idx : (Subgroup.center T).index = p ^ 2)
+    (hC : _root_.commutator T ≤ Subgroup.center T)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    Nat.card (OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd) ≤ p ^ 2 := by
+  set K := OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd with hK_def
+  have hC_idx : C.index = p :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two h_idx hZ_lt_C hC_lt_T
+  have h_int_le : Nat.card (K ⊓ C : Subgroup T) ≤ p :=
+    card_setOfPowEqOne_inf_le_prime hp_odd hC hC_cyclic
+  -- |K : K ⊓ C| · |K ⊓ C| = |K| in subgroup K. The standard fact is
+  -- (K ⊓ C).relIndex K = C.relIndex K, and `relIndex_le_of_le_right` then bounds
+  -- `C.relIndex K ≤ C.relIndex ⊤ = C.index = p`.
+  have hC_idx_ne_zero : C.index ≠ 0 := by rw [hC_idx]; exact hp.out.ne_zero
+  have hC_relIndex_le : C.relIndex K ≤ C.index := by
+    have h := Subgroup.relIndex_le_of_le_right (H := C) (K := K) (L := ⊤) le_top ?_
+    · simpa [Subgroup.relIndex_top_right] using h
+    · simp [Subgroup.relIndex_top_right, hC_idx_ne_zero]
+  -- (K ⊓ C).index_within_K equals C.relIndex K.
+  -- Use the Lagrange relation in K. Lemma: H ⊆ K' with H.subgroupOf K' has
+  -- (H.subgroupOf K').index = K'.relIndex (H ⊔ K') ... we'll just use:
+  -- |K| = (C.subgroupOf K).index * Nat.card (C.subgroupOf K) (subgroup of K)
+  -- But Nat.card (C.subgroupOf K) = Nat.card (K ⊓ C). Let's use directly.
+  have h_lag_in_K :
+      (C.subgroupOf K).index * Nat.card (C.subgroupOf K) = Nat.card K :=
+    Subgroup.index_mul_card _
+  -- (C.subgroupOf K).index = C.relIndex K by definition.
+  have h_relIndex_def : C.relIndex K = (C.subgroupOf K).index := rfl
+  -- Nat.card (C.subgroupOf K) = Nat.card (K ⊓ C : Subgroup T).
+  have h_card_subgroupOf : Nat.card (C.subgroupOf K) = Nat.card (K ⊓ C : Subgroup T) := by
+    refine Nat.card_congr ?_
+    refine {
+      toFun := fun x => ⟨((x : K) : T), ?_⟩
+      invFun := fun y => ⟨⟨(y : T), (Subgroup.mem_inf.mp y.2).1⟩, ?_⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
+    · -- ((x : K) : T) ∈ K ⊓ C
+      refine Subgroup.mem_inf.mpr ⟨(x : K).2, ?_⟩
+      have := x.2
+      rw [Subgroup.mem_subgroupOf] at this
+      exact this
+    · rw [Subgroup.mem_subgroupOf]
+      exact (Subgroup.mem_inf.mp y.2).2
+    · intro x; rfl
+    · intro y; rfl
+  rw [h_card_subgroupOf, ← h_relIndex_def] at h_lag_in_K
+  -- |K| = C.relIndex K * |K ⊓ C| ≤ p * p = p².
+  rw [← h_lag_in_K]
+  calc C.relIndex K * Nat.card (K ⊓ C : Subgroup T)
+      ≤ p * p := by
+        have h1 : C.relIndex K ≤ p := by rw [← hC_idx]; exact hC_relIndex_le
+        exact Nat.mul_le_mul h1 h_int_le
+    _ = p ^ 2 := by ring
+
+/-! ### Lem 6.15 — main theorem (odd case + dispatch). -/
+
+/-- **Isaacs Lemma 6.15** (odd `p` case): Let `T` be a group with `|T : Z(T)| = p²` and a
+cyclic subgroup `C` with `Z(T) < C < T`. If `p` is odd, then there is a characteristic
+elementary abelian subgroup of `T` of order `p²` (specifically `K = {x | x^p = 1}`). -/
+private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  have hC : _root_.commutator T ≤ Subgroup.center T :=
+    commutator_le_center_of_index_pow_two h_idx
+  haveI hC_normal : C.Normal :=
+    normal_of_center_le_of_center_index_pow_two h_idx hZ_lt_C.le
+  -- |commutator T| = p
+  have h_card_comm : Nat.card (_root_.commutator T) = p :=
+    card_commutator_eq_prime_of_lem_6_15 h_idx hC_cyclic hC_lt_T hZ_lt_C
+  -- Every element of commutator T has order ∣ p (Lagrange), so c^p = 1.
+  have h_commp : ∀ c ∈ _root_.commutator T, c ^ p = 1 := by
+    intro c hc
+    -- Work in the subgroup commutator T (as a group), use Nat.card.
+    have h_pow_in : (⟨c, hc⟩ : _root_.commutator T) ^ Nat.card (_root_.commutator T) = 1 :=
+      pow_card_eq_one'
+    rw [h_card_comm] at h_pow_in
+    have : ((⟨c, hc⟩ : _root_.commutator T) ^ p : _root_.commutator T) = (1 : _root_.commutator T) :=
+      h_pow_in
+    have h_pow' : (c : T) ^ p = 1 := by
+      have h1 := congrArg Subtype.val this
+      simpa using h1
+    exact h_pow'
+  -- K = ker (x ↦ x^p), realized as setOfPowEqOne.
+  set K := OddOrder.Isaacs.Ch04.setOfPowEqOne hC hp_odd with hK_def
+  refine ⟨K, ?_, ?_, ?_⟩
+  · exact setOfPowEqOne_characteristic_of_class_le_two_odd hp_odd hC
+  · -- K is elementary abelian: K commutes pointwise (subset of abelian T? No, T might be
+    -- nonabelian. But K ⊆ ... wait, the def of IsElementaryAbelian is commutativity in K,
+    -- and every element to the p is 1.)
+    -- We need: ∀ x y ∈ K, xy = yx; and ∀ x ∈ K, x^p = 1.
+    -- The second is by definition of K. The first: K ⊆ Z(T)? No, that's stronger than needed.
+    -- Actually: K has order p², so K of prime-square order is abelian (by mathlib
+    -- `IsPGroup.commutative_of_card_eq_prime_sq`).
+    -- But we need K's order. We have |K| ≥ p² and |K| ≤ p², so |K| = p².
+    have h_card_ge : p ^ 2 ≤ Nat.card K :=
+      card_setOfPowEqOne_ge_pow_two_of_index_pow_two_odd hp_odd h_idx hC h_commp
+    have h_card_le : Nat.card K ≤ p ^ 2 :=
+      card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd hp_odd h_idx hC hC_cyclic hZ_lt_C hC_lt_T
+    have h_card : Nat.card K = p ^ 2 := le_antisymm h_card_le h_card_ge
+    refine ⟨?_, ?_⟩
+    · -- commute
+      exact IsPGroup.commutative_of_card_eq_prime_sq (p := p) (G := K) h_card
+    · -- ∀ x : K, x^p = 1
+      intro x
+      apply Subtype.ext
+      show ((x : T) ^ p : T) = (1 : T)
+      push_cast
+      have h_mem : (x : T) ∈ K := x.2
+      change (x : T) ^ p = 1 at h_mem
+      exact h_mem
+  · -- |K| = p²
+    have h_card_ge : p ^ 2 ≤ Nat.card K :=
+      card_setOfPowEqOne_ge_pow_two_of_index_pow_two_odd hp_odd h_idx hC h_commp
+    have h_card_le : Nat.card K ≤ p ^ 2 :=
+      card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd hp_odd h_idx hC hC_cyclic hZ_lt_C hC_lt_T
+    exact le_antisymm h_card_le h_card_ge
 
 end
 
