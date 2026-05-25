@@ -447,6 +447,11 @@ private theorem lem73_aux
         exact hQ_not_dvd_idx (hq_dvd_idx.trans h_div_dvd_div)
       -- Step j 後: Q' = L で `↥L` が q-群.
       have hL_qgroup : IsPGroup q ↥L := hQ'_eq_L ▸ hQ'_pgroup
+      have hq_dvd_L : q ∣ Nat.card ↥L :=
+        hq_dvd_idx.trans (Nat.div_dvd_of_dvd hC_dvd)
+      have hq_ne_p : q ≠ p := by
+        intro hqp
+        exact hLcop (hqp ▸ hq_dvd_L)
       -- ## Step 1k: [L, P] の場合分け.
       -- [L, P] < L なら IH + Lem 4.29 で P ≤ C(L) (本ファイル内では未完成).
       -- [L, P] = L は Step l へ.
