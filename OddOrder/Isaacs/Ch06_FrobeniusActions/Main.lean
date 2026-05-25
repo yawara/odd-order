@@ -2278,6 +2278,32 @@ private lemma exists_not_commute_of_center_index_pow_two
       _ < p ^ 2 := Nat.pow_lt_pow_left hp1 (by norm_num)
   omega
 
+/-- **Lem 6.15 `p = 2` setup**: the quotient `T/T'` is abelian. -/
+theorem quotient_commutator_commutative
+    {T : Type*} [Group T] :
+    ∀ a b : T ⧸ _root_.commutator T, a * b = b * a := by
+  exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
+    (le_rfl : _root_.commutator T ≤ _root_.commutator T)).comm
+
+/-- **Lem 6.15 `p = 2` setup**: under the center-index hypothesis of Lemma 6.15,
+the quotient `T/T'` is not cyclic.
+
+This isolates Isaacs's observation that, once `T' ≤ Z(T)`, cyclicity of `T/T'` would make
+`T` itself abelian by `commutative_of_cyclic_center_quotient`, contradicting
+`|T : Z(T)| = p²`. -/
+theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2) :
+    ¬ IsCyclic (T ⧸ _root_.commutator T) := by
+  intro h_cyc
+  obtain ⟨x, y, hxy⟩ := exists_not_commute_of_center_index_pow_two h_idx
+  let f : T →* T ⧸ _root_.commutator T := QuotientGroup.mk' (_root_.commutator T)
+  have hker : f.ker ≤ Subgroup.center T := by
+    rw [QuotientGroup.ker_mk']
+    exact commutator_le_center_of_index_pow_two h_idx
+  haveI : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
+  exact hxy (commutative_of_cyclic_center_quotient f hker x y)
+
 /-- **Step 0 of Lem 6.15** (cardinality): under the hypothesis of Lem 6.15,
 `|commutator T| = p`. -/
 private lemma card_commutator_eq_prime_of_lem_6_15
