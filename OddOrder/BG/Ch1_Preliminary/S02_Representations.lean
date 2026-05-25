@@ -567,6 +567,59 @@ private theorem sylow_monoidHom_units_eq_one_of_charP
     (φ : P →* Fˣ) : φ = 1 :=
   monoidHom_units_eq_one_of_isPGroup_charP P.isPGroup' φ
 
+/-- Pointwise scalar form of the rank-one endomorphism theorem. -/
+private theorem exists_scalar_apply_of_finrank_eq_one
+    {F : Type*} [Field F] {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (f : Module.End F M) :
+    ∃ c : F, ∀ m : M, f m = c • m := by
+  obtain ⟨c, hc, _⟩ := LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one hdim f
+  refine ⟨c, ?_⟩
+  intro m
+  simpa using congrArg (fun u : Module.End F M => u m) hc
+
+/-- A representation on a one-dimensional module has a scalar monoid character. -/
+private noncomputable def scalarMonoidHomOfFinrankEqOne
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) : G →* F where
+  toFun g := (LinearEquiv.smul_id_of_finrank_eq_one hdim).symm (ρ g)
+  map_one' := by
+    let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+    apply e.injective
+    ext m
+    simp [e]
+  map_mul' g h := by
+    let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+    let cg : F := e.symm (ρ g)
+    let ch : F := e.symm (ρ h)
+    have hg_apply : ∀ m : M, ρ g m = cg • m := by
+      intro m
+      have hg_eq : e cg = ρ g := by simp [cg]
+      simpa [e] using congrArg (fun u : Module.End F M => u m) hg_eq.symm
+    have hh_apply : ∀ m : M, ρ h m = ch • m := by
+      intro m
+      have hh_eq : e ch = ρ h := by simp [ch]
+      simpa [e] using congrArg (fun u : Module.End F M => u m) hh_eq.symm
+    apply e.injective
+    change e (e.symm (ρ (g * h))) = e (cg * ch)
+    rw [e.apply_symm_apply]
+    ext m
+    change ρ (g * h) m = (cg * ch) • m
+    rw [map_mul]
+    change ρ g (ρ h m) = (cg * ch) • m
+    rw [hh_apply, hg_apply]
+    exact (mul_smul cg ch m).symm
+
+/-- The scalar monoid character indeed describes the representation action. -/
+private theorem scalarMonoidHomOfFinrankEqOne_apply_smul
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (ρ : Representation F G M) (g : G) (m : M) :
+    ρ g m = (scalarMonoidHomOfFinrankEqOne hdim ρ g : F) • m := by
+  let e := LinearEquiv.smul_id_of_finrank_eq_one hdim
+  change ρ g m = e (e.symm (ρ g)) m
+  rw [e.apply_symm_apply]
+
 /-- If two endomorphisms are trivial on a submodule and on the quotient by it,
 then they commute.
 
