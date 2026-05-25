@@ -41,6 +41,9 @@ created: 2026-05-25
   `classFunction_ne`, `classFunction_irreducible` を追加した。
 - §7 の `CharacterDifferenceImage` も `mu`, `nu` を raw `ClassFunction` ではなく
   `IrreducibleCharacter G` として持つ形に揃えた。
+- `SignedIrreducibleDifferenceFamily.difference` と `signedDifference` を追加し、
+  基準成分 `μ_i - μ_0`、符号付き差分、`difference_ne_zero`,
+  `sign_ne_zero`, `sign_mul_self` を名前付き API にした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

@@ -95,6 +95,52 @@ theorem classFunction_ne (data : SignedIrreducibleDifferenceFamily G n)
     IsIrreducibleCharacter (data.classFunction i) :=
   (data.mu i).isIrreducible
 
+/-- The difference `μ_i - μ_0` attached to a signed irreducible-difference
+family. -/
+abbrev difference (data : SignedIrreducibleDifferenceFamily G n)
+    [NeZero n] (i : Fin n) : ClassFunction G ℂ :=
+  data.classFunction i - data.classFunction 0
+
+@[simp] theorem difference_apply
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.difference i = data.classFunction i - data.classFunction 0 :=
+  rfl
+
+@[simp] theorem difference_zero
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] :
+    data.difference 0 = 0 := by
+  simp [difference]
+
+theorem difference_ne_zero
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n} (hi : i ≠ 0) :
+    data.difference i ≠ 0 := by
+  intro h
+  have hclass : data.classFunction i = data.classFunction 0 := sub_eq_zero.mp h
+  exact hi (data.classFunction_injective hclass)
+
+/-- The signed target difference `ε • (μ_i - μ_0)`. -/
+abbrev signedDifference (data : SignedIrreducibleDifferenceFamily G n)
+    [NeZero n] (i : Fin n) : ClassFunction G ℂ :=
+  data.sign • data.difference i
+
+@[simp] theorem signedDifference_apply
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.signedDifference i = data.sign • data.difference i :=
+  rfl
+
+@[simp] theorem signedDifference_zero
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] :
+    data.signedDifference 0 = 0 := by
+  simp [signedDifference]
+
+theorem sign_ne_zero (data : SignedIrreducibleDifferenceFamily G n) :
+    data.sign ≠ 0 := by
+  rcases data.sign_eq with hsign | hsign <;> simp [hsign]
+
+theorem sign_mul_self (data : SignedIrreducibleDifferenceFamily G n) :
+    data.sign * data.sign = 1 := by
+  rcases data.sign_eq with hsign | hsign <;> simp [hsign]
+
 end SignedIrreducibleDifferenceFamily
 
 variable [Fintype G] [Fintype H]
@@ -127,7 +173,7 @@ theorem isometry_difference_pair_structure
           ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) :
     ∃ data : SignedIrreducibleDifferenceFamily G n,
       ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
-        data.sign • (data.classFunction i - data.classFunction 0) := by
+        data.signedDifference i := by
   sorry
 
 end OddOrder.RepresentationTheory
