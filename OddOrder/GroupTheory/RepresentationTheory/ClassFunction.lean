@@ -1,0 +1,112 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.Algebra.Group.Conj
+import Mathlib.Algebra.Module.Pi
+import Mathlib.Algebra.Module.Submodule.Basic
+
+/-!
+# Class functions on a group
+
+A **class function** on a group `G` valued in a commutative ring `k` is a function
+`G → k` that is constant on conjugacy classes: `f (h * g * h⁻¹) = f g`.
+
+## mathlib v4.29.1 状況
+
+mathlib に `ClassFunction G k` という型は **存在しない** (Peterfalvi audit 2026-05-23).
+`Mathlib/RepresentationTheory/Character.lean` の `Representation.character` は単に関数
+`G → k` で, conj-invariance は `Representation.char_conj` 補題として持つのみ.
+
+本モジュールは **Peterfalvi Wave 1a 起点** として `ClassFunction G k` を新規定義し,
+§3-§8 (Dade isometry / Coherence) で頻出する `CF(G) / CF(G, A) / ⟨α, β⟩_G` を統一的に
+扱えるようにする.
+
+## Main definitions
+
+* `classFunctionSubmodule G k` — conj-invariant な `G → k` 全体 (`Submodule k (G → k)`).
+* `ClassFunction G k` — 同 submodule の元の型. `AddCommGroup`, `Module k` instance 付き.
+* `CoeFun` — `(φ : ClassFunction G k) (g : G) : k` を `φ g` で書ける.
+
+## TODO (本 commit 範囲外)
+
+- `⟨φ, ψ⟩_G` (有限群 + 適切なスカラー).
+- `restrict (H : Subgroup G) : ClassFunction G k → ClassFunction H k`.
+- `Supp φ : Set G := { g | φ g ≠ 0 }`.
+- mathlib `Representation.character` からの coercion.
+
+## References
+
+* Peterfalvi §2 (notation).
+* Audit: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`]
+  (../../../notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md) §3.1, §6.1.
+
+-/
+
+namespace OddOrder.RepresentationTheory
+
+/-- The submodule of class functions on `G` valued in `k`:
+functions `f : G → k` satisfying `f (h * g * h⁻¹) = f g`. -/
+def classFunctionSubmodule (G : Type*) [Group G] (k : Type*) [CommRing k] :
+    Submodule k (G → k) where
+  carrier := { f | ∀ g h : G, f (h * g * h⁻¹) = f g }
+  add_mem' {f₁ f₂} h₁ h₂ g h := by
+    simp only [Pi.add_apply]
+    rw [h₁ g h, h₂ g h]
+  zero_mem' _ _ := rfl
+  smul_mem' c f hf g h := by
+    simp only [Pi.smul_apply]
+    rw [hf]
+
+/-- A **class function** on `G` valued in `k`: a function `G → k` constant on
+conjugacy classes. -/
+def ClassFunction (G : Type*) [Group G] (k : Type*) [CommRing k] : Type _ :=
+  ↥(classFunctionSubmodule G k)
+
+namespace ClassFunction
+
+variable {G : Type*} [Group G] {k : Type*} [CommRing k]
+
+instance instAddCommGroup : AddCommGroup (ClassFunction G k) :=
+  inferInstanceAs (AddCommGroup ↥(classFunctionSubmodule G k))
+
+instance instModule : Module k (ClassFunction G k) :=
+  inferInstanceAs (Module k ↥(classFunctionSubmodule G k))
+
+instance : CoeFun (ClassFunction G k) (fun _ => G → k) :=
+  ⟨fun φ => (φ.val : G → k)⟩
+
+@[simp] theorem coe_mk (f : G → k) (hf) :
+    ((⟨f, hf⟩ : ClassFunction G k) : G → k) = f := rfl
+
+/-- Conjugation invariance: the defining property of a class function. -/
+theorem conj_eq (φ : ClassFunction G k) (g h : G) : φ (h * g * h⁻¹) = φ g :=
+  φ.property g h
+
+/-- A class function is constant on conjugacy classes (`IsConj` form). -/
+theorem of_isConj (φ : ClassFunction G k) {g₁ g₂ : G} (hg : IsConj g₁ g₂) :
+    φ g₁ = φ g₂ := by
+  obtain ⟨h, rfl⟩ := isConj_iff.mp hg
+  exact (φ.conj_eq g₁ h).symm
+
+@[ext]
+theorem ext {φ ψ : ClassFunction G k} (h : ∀ g, φ g = ψ g) : φ = ψ :=
+  Subtype.ext (funext h)
+
+@[simp] theorem zero_apply (g : G) : (0 : ClassFunction G k) g = 0 := rfl
+
+@[simp] theorem add_apply (φ ψ : ClassFunction G k) (g : G) :
+    (φ + ψ) g = φ g + ψ g := rfl
+
+@[simp] theorem neg_apply (φ : ClassFunction G k) (g : G) : (-φ) g = -φ g := rfl
+
+@[simp] theorem sub_apply (φ ψ : ClassFunction G k) (g : G) :
+    (φ - ψ) g = φ g - ψ g := rfl
+
+@[simp] theorem smul_apply (c : k) (φ : ClassFunction G k) (g : G) :
+    (c • φ) g = c * φ g := rfl
+
+end ClassFunction
+
+end OddOrder.RepresentationTheory
