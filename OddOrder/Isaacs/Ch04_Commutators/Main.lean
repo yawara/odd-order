@@ -5567,6 +5567,217 @@ private lemma actionCommutatorInfty_fix_normal_of_centralized
     _ ≤ actionCommutatorInfty φ :=
         Subgroup.commutator_le_left _ _
 
+/-! #### Phase 2D-2: nontriviality of C -/
+
+/-- **`iterCommutator` monotonicity in the left operand**: if `K₁ ≤ K₂`, then
+`iter K₁ F m ≤ iter K₂ F m`. -/
+private lemma iterCommutator_mono_left {G : Type*} [Group G]
+    {K₁ K₂ F : Subgroup G} (h : K₁ ≤ K₂) (m : ℕ) :
+    iterCommutator K₁ F m ≤ iterCommutator K₂ F m := by
+  induction m with
+  | zero => simpa [iterCommutator_zero] using h
+  | succ m ih =>
+      rw [iterCommutator_succ, iterCommutator_succ]
+      exact Subgroup.commutator_mono ih le_rfl
+
+/-- **`C ≠ ⊥` when `[G, A^∞] ≠ ⊥`**: if `actionCommutatorInfty φ ≠ ⊥`, then there is a
+nontrivial `A`-fixed subgroup of `G` contained in `[G, A^∞]`.
+
+**Strategy** (in Γ = G ⋊[φ] A): set `K_inl := (actionCommutatorInfty φ).map inl ≠ ⊥`
+(injectivity of `inl`). Consider the chain `f k := iterCommutator K_inl inr(A).range k`.
+- `f 0 = K_inl ≠ ⊥`.
+- `f m = ⊥` because `K_inl ≤ inl(G).range = iter inl(G).range inr(A).range 0`, hence
+  `f k ≤ iter inl(G).range inr(A).range k`, and the chain hypothesis gives `f m = ⊥`.
+- Let `k₀ := Nat.find` of the smallest `k` with `f k = ⊥`. Then `k₀ ≥ 1` and `f (k₀ - 1) ≠ ⊥`
+  but `⁅f (k₀ - 1), inr(A).range⁆ = f k₀ = ⊥`.
+- `f (k₀ - 1) ≤ inl(G).range` (induction: `K_inl ≤ inl(G).range`, and `inl(G).range` is normal
+  in Γ since `actionCommutator_map_inl φ` shows `⁅inl(G).range, inr(A).range⁆ ≤ inl(G).range`
+  — actually `inl(G).range` is normal in Γ by `commutator_normal_of_sup_eq_top` applied to
+  `⁅inl(G).range, inl(G).range⁆` is trivially in `inl(G).range`; here we use that
+  `inl(G).range ⊴ Γ` via `SemidirectProduct.inl_range_normal`).
+- Pull `f (k₀ - 1)` back to `L ≤ G` via `inl` (= preimage), so `inl(L) = f (k₀ - 1)`.
+- `⁅L, ⊤⁆ = ⊥` and every `l ∈ L` is `A`-fixed (from `f k₀ = ⊥` element-wise).
+- `L ≤ actionCommutatorInfty φ` (induction: `f j ≤ K_inl`, but actually we need
+  `f j ≤ K_inl` — `f` is decreasing because `K_inl ≤ ?`. Let me use `f (k₀ - 1) ≤ K_inl`
+  directly via `iterCommutator_succ_le_self`-style.) -/
+private lemma actionCommutatorInfty_fix_ne_bot_of_ne_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G] {φ : A →* MulAut G}
+    {m : ℕ}
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥)
+    (hK : actionCommutatorInfty φ ≠ ⊥) :
+    actionCommutatorInfty_fix φ ≠ ⊥ := by
+  classical
+  -- Setup in Γ
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range with hXG_def
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range with hYA_def
+  set K_inl : Subgroup (G ⋊[φ] A) :=
+    (actionCommutatorInfty φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) with hK_inl_def
+  -- f k := iter K_inl YA k
+  set f : ℕ → Subgroup (G ⋊[φ] A) := fun k => iterCommutator K_inl YA k with hf_def
+  -- K_inl ≠ ⊥
+  have hK_inl_ne : K_inl ≠ ⊥ := by
+    intro h
+    apply hK
+    exact (Subgroup.map_eq_bot_iff_of_injective (actionCommutatorInfty φ)
+      SemidirectProduct.inl_injective).mp h
+  -- K_inl ≤ XG
+  have hK_inl_le_XG : K_inl ≤ XG := by
+    rintro _ ⟨g, _, rfl⟩
+    exact ⟨g, rfl⟩
+  -- f k ≤ iter XG YA k for all k
+  have hf_le_iter : ∀ k, f k ≤ iterCommutator XG YA k := fun k =>
+    iterCommutator_mono_left hK_inl_le_XG k
+  -- f m = ⊥
+  have hfm_bot : f m = ⊥ := by
+    have h := hf_le_iter m
+    rw [h_iter] at h
+    exact le_bot_iff.mp h
+  -- ∃ k, f k = ⊥
+  have h_exists : ∃ k, f k = ⊥ := ⟨m, hfm_bot⟩
+  -- k₀ := Nat.find
+  let k₀ := Nat.find h_exists
+  have hk₀_spec : f k₀ = ⊥ := Nat.find_spec h_exists
+  have hk₀_min : ∀ j < k₀, f j ≠ ⊥ := fun j hj => Nat.find_min h_exists hj
+  -- f 0 = K_inl ≠ ⊥, so k₀ ≥ 1
+  have hf0 : f 0 = K_inl := by simp [hf_def, iterCommutator_zero]
+  have hk₀_pos : 1 ≤ k₀ := by
+    rcases Nat.eq_zero_or_pos k₀ with hzero | hpos
+    · exfalso
+      have := hk₀_spec
+      rw [hzero, hf0] at this
+      exact hK_inl_ne this
+    · exact hpos
+  -- Let k := k₀ - 1
+  set k := k₀ - 1 with hk_def
+  have hk_succ : k + 1 = k₀ := by omega
+  -- f k ≠ ⊥
+  have hfk_ne : f k ≠ ⊥ := hk₀_min k (by omega)
+  -- f (k+1) = ⊥
+  have hfk1_bot : f (k + 1) = ⊥ := by rw [hk_succ]; exact hk₀_spec
+  -- ⁅f k, YA⁆ = f (k+1) = ⊥
+  have h_comm_fk_YA : ⁅f k, YA⁆ = ⊥ := by
+    have : f (k + 1) = ⁅f k, YA⁆ := iterCommutator_succ _ _ _
+    rw [← this]
+    exact hfk1_bot
+  -- f k ≤ XG (induction). XG is normal in Γ, so iter preserves XG-containment.
+  haveI hXG_normal : XG.Normal := by
+    simp only [hXG_def]
+    infer_instance
+  have hXG_comm_YA_le : ⁅XG, YA⁆ ≤ XG := Subgroup.commutator_le_left XG YA
+  have hfk_le_XG : ∀ j, f j ≤ XG := by
+    intro j
+    induction j with
+    | zero =>
+        simp only [hf_def, iterCommutator_zero]
+        exact hK_inl_le_XG
+    | succ j ih =>
+        have ih' : iterCommutator K_inl YA j ≤ XG := by
+          simpa [hf_def] using ih
+        change iterCommutator K_inl YA (j + 1) ≤ XG
+        rw [iterCommutator_succ]
+        exact (Subgroup.commutator_mono ih' le_rfl).trans hXG_comm_YA_le
+  have hfk_le_XG_now : f k ≤ XG := hfk_le_XG k
+  -- f k ≤ K_inl (induction using iter_succ_le for normal K_inl-style)
+  -- Actually K_inl may not be normal in Γ. We use a different strategy: extract L ≤ G
+  -- with inl L = f k via the fact that f k ≤ XG = inl.range.
+  -- Define L : Subgroup G as the preimage of f k under inl.
+  let L : Subgroup G := (f k).comap (SemidirectProduct.inl : G →* G ⋊[φ] A)
+  have hL_map : L.map (SemidirectProduct.inl : G →* G ⋊[φ] A) = f k := by
+    -- map ∘ comap = inf with range; range = XG; f k ≤ XG
+    rw [Subgroup.map_comap_eq, hXG_def.symm]
+    show XG ⊓ f k = f k
+    exact inf_eq_right.mpr hfk_le_XG_now
+  have hL_ne_bot : L ≠ ⊥ := by
+    intro hL
+    apply hfk_ne
+    rw [← hL_map, hL, Subgroup.map_bot]
+  -- L ≤ actionCommutatorInfty φ: use that f j ≤ K_inl for all j (since K_inl is "stable
+  -- enough" — iter K_inl YA j ≤ K_inl needs K_inl to be Normal in Γ. K_inl might not be normal,
+  -- but iter K_inl YA j ≤ K_inl.subgroupClosure... Use the fact that
+  -- iter K_inl YA j ⊆ (closure (K_inl ∪ YA)) — no, that's not what we want.
+  --
+  -- Alternative: K_inl is normal in XG (since XG ≅ G via inl, and actionCommutatorInfty φ
+  -- is normal in G). So XG-conjugation preserves K_inl. But YA conjugation might not.
+  -- However, the iter chain is built by commutators with YA. We claim:
+  -- iter K_inl YA j ⊆ K_inl (within XG). Proof: induction. iter K_inl YA (j+1) =
+  -- ⁅iter K_inl YA j, YA⁆. iter K_inl YA j ⊆ K_inl ⊆ XG (by IH and inl-image normality).
+  -- ⁅K_inl, YA⁆ = ?. Compute generators: ⁅inl k, inr a⁆ = inl(k * (φ a) k⁻¹). k ∈ acInfty
+  -- which is A-invariant via phiInfty, so (φ a) k... wait we need this for general a ∈ A,
+  -- not just a ∈ A^∞. But acInfty is A-invariant (Phase 2A `actionCommutatorInfty_isAInvariant`)!
+  -- So (φ a) k ∈ acInfty, so k * (φ a) k⁻¹ ∈ acInfty (closed under product/inv).
+  -- Therefore ⁅K_inl, YA⁆ ⊆ K_inl.
+  have hKinl_YA_le_Kinl : ⁅K_inl, YA⁆ ≤ K_inl := by
+    rw [Subgroup.commutator_le]
+    rintro _ ⟨g, hg, rfl⟩ _ ⟨a, rfl⟩
+    -- Goal: ⁅inl g, inr a⁆ ∈ K_inl. ⁅inl g, inr a⁆ = inl (g * (φ a) g⁻¹).
+    rw [SemidirectProduct.commutator_inl_inr]
+    -- Need: g * (φ a) g⁻¹ ∈ actionCommutatorInfty φ.
+    have h_inv := OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mp
+      (actionCommutatorInfty_isAInvariant φ)
+    -- (φ a) g ∈ actionCommutatorInfty φ
+    have h_phi_g : (φ a) g ∈ actionCommutatorInfty φ := h_inv a g hg
+    -- g * (φ a) g⁻¹ ∈ actionCommutatorInfty φ
+    have h_phi_g_inv : (φ a) g⁻¹ = ((φ a) g)⁻¹ := map_inv (φ a) g
+    rw [h_phi_g_inv]
+    exact ⟨g * ((φ a) g)⁻¹,
+      (actionCommutatorInfty φ).mul_mem hg ((actionCommutatorInfty φ).inv_mem h_phi_g),
+      rfl⟩
+  have hfk_le_Kinl : ∀ j, f j ≤ K_inl := by
+    intro j
+    induction j with
+    | zero => simp [hf_def, iterCommutator_zero]
+    | succ j ih =>
+        have ih' : iterCommutator K_inl YA j ≤ K_inl := by
+          simpa [hf_def] using ih
+        change iterCommutator K_inl YA (j + 1) ≤ K_inl
+        rw [iterCommutator_succ]
+        exact (Subgroup.commutator_mono ih' le_rfl).trans hKinl_YA_le_Kinl
+  -- L ≤ actionCommutatorInfty φ: take l ∈ L, then inl l ∈ f k ≤ K_inl = inl(acInfty),
+  -- so by inl_injective, l ∈ acInfty.
+  have hL_le_acInfty : L ≤ actionCommutatorInfty φ := by
+    intro l hl
+    have hinl : (SemidirectProduct.inl l : G ⋊[φ] A) ∈ f k := hl
+    have hinl_Kinl : (SemidirectProduct.inl l : G ⋊[φ] A) ∈ K_inl := hfk_le_Kinl k hinl
+    obtain ⟨l', hl', heq⟩ := hinl_Kinl
+    have : l = l' := SemidirectProduct.inl_injective heq.symm
+    rw [this]
+    exact hl'
+  -- L ≤ fixedPointsOfMulAut φ: from ⁅f k, YA⁆ = ⊥, take l ∈ L, then for any a,
+  -- ⁅inl l, inr a⁆ = 1. Since ⁅inl l, inr a⁆ = inl(l * (φ a) l⁻¹), inl_injective
+  -- gives l * (φ a) l⁻¹ = 1, hence (φ a) l = l.
+  have hL_le_fix : L ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro l hl
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    -- inl l ∈ f k
+    have hinl : (SemidirectProduct.inl l : G ⋊[φ] A) ∈ f k := hl
+    -- ⁅inl l, inr a⁆ ∈ ⁅f k, YA⁆ = ⊥
+    have h_comm_mem : ⁅(SemidirectProduct.inl l : G ⋊[φ] A),
+        (SemidirectProduct.inr a : G ⋊[φ] A)⁆ ∈ (⁅f k, YA⁆ : Subgroup (G ⋊[φ] A)) :=
+      Subgroup.commutator_mem_commutator hinl ⟨a, rfl⟩
+    rw [h_comm_fk_YA, Subgroup.mem_bot] at h_comm_mem
+    -- ⁅inl l, inr a⁆ = inl (l * (φ a) l⁻¹) = 1
+    rw [SemidirectProduct.commutator_inl_inr] at h_comm_mem
+    -- l * (φ a) l⁻¹ = 1 in G
+    have h_one_G : l * (φ a) l⁻¹ = 1 := by
+      have := h_comm_mem
+      have h_inl_one : (SemidirectProduct.inl (1 : G) : G ⋊[φ] A) = 1 := map_one _
+      have := this.trans h_inl_one.symm
+      exact SemidirectProduct.inl_injective this
+    -- (φ a) l⁻¹ = l⁻¹, so (φ a) l = l
+    have h_aux : (φ a) l⁻¹ = l⁻¹ :=
+      mul_left_cancel (a := l) (b := (φ a) l⁻¹) (c := l⁻¹)
+        (by rw [h_one_G, mul_inv_cancel])
+    rw [map_inv] at h_aux
+    exact inv_injective h_aux
+  -- L ≤ actionCommutatorInfty_fix φ = actionCommutatorInfty φ ⊓ fixedPointsOfMulAut φ
+  have hL_le_C : L ≤ actionCommutatorInfty_fix φ := le_inf hL_le_acInfty hL_le_fix
+  -- L ≠ ⊥, hence C ≠ ⊥
+  intro hC_bot
+  apply hL_ne_bot
+  exact le_bot_iff.mp (hL_le_C.trans hC_bot.le)
+
 end /- §4C (続 II) -/
 
 end OddOrder.Isaacs.Ch04
