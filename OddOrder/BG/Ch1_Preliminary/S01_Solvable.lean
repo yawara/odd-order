@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.FrattiniPGroup
+import Mathlib.Order.Minimal
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.QuotientGroup.Basic
@@ -37,7 +39,9 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 
 | BG | Isaacs FGT | mathlib | 本ファイル |
 |---|---|---|---|
-| **Lem 1.1** (部分) | Ch.3 Thm 3.11 + Ch.1 Fitting | — | ✅ **sorry-free 部分** (M elem ab + ≤ F(G); Z(F(G)) は Ch.4 待ち) |
+| **Lem 1.1** | Ch.3 Thm 3.11 + Ch.1 Fitting + Ch.4 Z(F(G)) | — | ✅ **sorry-free** |
+| **Prop 1.2 forward** | chief factors + Fitting quotient image | — | ✅ **sorry-free partial** |
+| **Prop 1.3** | Ch.1 Fitting maximality + solvable commutator descent | — | ✅ **sorry-free** |
 | Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
 | **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
 | **Lem 1.7(b)(c⇒)(d⊇)** | — | `OddOrder.GroupTheory.FrattiniPGroup` ✅ | ✅ **sorry-free shared module** |
@@ -69,7 +73,11 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 ## 実装 status (2026-05-24) — §1E 全 sorry-free 完成 ⭐ + §1A §1B §1C §1G 部分着手
 
 - **Skeleton** + **§1B/§1F docstring mapping** + **18 結果/補題 全 sorry-free**:
-  - **Lem 1.1 (部分)** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free (Z(F(G)) 部分は Ch.4 待ち)
+  - **Lem 1.1** `isMinimalNormal_le_fitting_and_isElementaryAbelian` ⭐ sorry-free
+    (`M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ M` elementary abelian)
+  - **Prop 1.2 forward inclusion** `fitting_map_subtype_le_chiefFactorCentralizer` ⭐
+    sorry-free partial (`F(G*)` centralizes every chief factor `U/V`)
+  - **Prop 1.3** `centralizer_fitting_le_fitting` ⭐ sorry-free
   - **Lem 1.7(a)** `eq_top_of_sup_frattini_eq_top` ⭐ sorry-free (mathlib finite 特殊化)
   - **Lem 1.7(b)** `quotient_frattini_isElementaryAbelian` ⭐ sorry-free (shared module)
   - **Lem 1.7(c⇒)** `isElementaryAbelian_of_frattini_eq_bot` ⭐ sorry-free (shared module)
@@ -103,18 +111,16 @@ open Pointwise
 
 /-! ## §1A: Solvable group basics (Lem 1.1, Prop 1.2-1.4) -/
 
-/-- **BG Lemma 1.1 (部分; elementary abelian + ≤ F(G))**: 有限可解群 `G` の
-minimal normal `M` は (i) elementary abelian, (ii) `M ≤ F(G)` (Fitting absorbs).
-
-BG 原 statement の "M ⊆ Z(F(G))" 部分は Phase 1 Ch.4 `le_centralizer_of_isMinimalNormal`
-依存だが Ch.4 現状 parse error で import 不可. M ⊆ F(G) ⊓ C_G(F(G)) の完全形は将来.
+/-- **BG Lemma 1.1**: 有限可解群 `G` の minimal normal `M` は
+elementary abelian で `F(G)` の中心に入る.
 
 CLAUDE.md no-wrapper policy 例外: 異なる Ch.3 結果 + nilpotent_normal_le_fitting の合成
-+ 仮定特殊化 (`[IsSolvable G]`). -/
++ Ch.4 の `le_centralizer_of_isMinimalNormal` + 仮定特殊化 (`[IsSolvable G]`). -/
 theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
     {G : Type*} [Group G] [Finite G] [IsSolvable G]
     {M : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     M ≤ OddOrder.Isaacs.Ch01.fitting G ∧
+    M ≤ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ∧
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
   haveI hMnormal : M.Normal := hMin.1
   -- Elementary abelian (Ch.3)
@@ -127,7 +133,235 @@ theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
   -- ↥M nilpotent (finite p-group ⇒ nilpotent)
   haveI hM_nilp : Group.IsNilpotent ↥M := hM_pgroup.isNilpotent
   -- M ⊴ G + ↥M nilpotent ⇒ M ≤ F(G)
-  exact ⟨OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting, p, hp_prime, hM_elem⟩
+  have hM_le_fitting : M ≤ OddOrder.Isaacs.Ch01.fitting G :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hM_le_centralizer :
+      M ≤ Subgroup.centralizer
+        ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) :=
+    OddOrder.Isaacs.Ch04.le_centralizer_of_isMinimalNormal hMin hM_le_fitting
+  exact ⟨hM_le_fitting, hM_le_centralizer, p, hp_prime, hM_elem⟩
+
+/-- Minimal `G`-normal subgroup inside `C` but not inside `F`.
+
+This is a finite-lattice helper for BG Prop. 1.3.  It is intentionally local to §1A:
+the full chief-factor series API needed for Prop. 1.2 will live in a shared module. -/
+private theorem exists_minimal_normal_le_not_le
+    {G : Type*} [Group G] [Finite G] {C F : Subgroup G} [C.Normal]
+    (hC_not_le_F : ¬ C ≤ F) :
+    ∃ K : Subgroup G, K.Normal ∧ K ≤ C ∧ ¬ K ≤ F ∧
+      ∀ K' : Subgroup G, K'.Normal → K' ≤ K → ¬ K' ≤ F → K ≤ K' := by
+  classical
+  let S : Set (Subgroup G) := {K | K.Normal ∧ K ≤ C ∧ ¬ K ≤ F}
+  have hS_fin : S.Finite := Set.toFinite S
+  have hS_nonempty : S.Nonempty := ⟨C, inferInstance, le_rfl, hC_not_le_F⟩
+  obtain ⟨K, hK_min⟩ := hS_fin.exists_minimal hS_nonempty
+  obtain ⟨⟨hK_normal, hK_le_C, hK_not_le_F⟩, hK_minimal⟩ := hK_min
+  refine ⟨K, hK_normal, hK_le_C, hK_not_le_F, ?_⟩
+  intro K' hK'_normal hK'_le hK'_not_le_F
+  have hK'_mem : K' ∈ S := ⟨hK'_normal, hK'_le.trans hK_le_C, hK'_not_le_F⟩
+  exact hK_minimal hK'_mem hK'_le
+
+/-- If `K ≤ C_G(F)`, then `K ∩ F` is central in `K`. -/
+private theorem inf_subgroupOf_le_center_of_le_centralizer
+    {G : Type*} [Group G] {K F : Subgroup G}
+    (hK_le_C : K ≤ Subgroup.centralizer (F : Set G)) :
+    (K ⊓ F).subgroupOf K ≤ Subgroup.center K := by
+  intro x hx
+  rw [Subgroup.mem_center_iff]
+  intro y
+  apply Subtype.ext
+  have hx_inf : (x : G) ∈ K ⊓ F := hx
+  have hxF : (x : G) ∈ F := hx_inf.2
+  have hyC : (y : G) ∈ Subgroup.centralizer (F : Set G) := hK_le_C y.2
+  exact (Subgroup.mem_centralizer_iff.mp hyC (x : G) hxF).symm
+
+/-- **BG Proposition 1.3** (P. Hall): for a finite solvable group, the Fitting subgroup
+self-centralizes: `C_G(F(G)) ≤ F(G)`.
+
+This proof avoids the still-missing chief-factor intersection API of Prop. 1.2.  If
+`C_G(F(G))` had a normal subgroup `K` minimal among those not contained in `F(G)`, then
+`[K,K] < K` by solvability and minimality forces `[K,K] ≤ F(G)`.  Since `K ≤ C_G(F(G))`,
+`K ∩ F(G)` is central in `K`, and `K/(K ∩ F(G))` is abelian; hence `K` is nilpotent,
+contradicting maximality of `F(G)`. -/
+theorem centralizer_fitting_le_fitting
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] :
+    Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ≤
+      OddOrder.Isaacs.Ch01.fitting G := by
+  classical
+  set F : Subgroup G := OddOrder.Isaacs.Ch01.fitting G with hF_def
+  set C : Subgroup G := Subgroup.centralizer (F : Set G) with hC_def
+  haveI hF_normal : F.Normal := by
+    dsimp [F]
+    infer_instance
+  haveI hC_normal : C.Normal := by
+    dsimp [C]
+    exact Subgroup.normal_centralizer
+  by_contra hC_not_le_F
+  obtain ⟨K, hK_normal, hK_le_C, hK_not_le_F, hK_min⟩ :=
+    exists_minimal_normal_le_not_le (C := C) (F := F) hC_not_le_F
+  haveI hK_normal_inst : K.Normal := hK_normal
+  have hK_ne_bot : K ≠ ⊥ := by
+    intro hK_bot
+    apply hK_not_le_F
+    rw [hK_bot]
+    exact bot_le
+  have hcomm_lt : ⁅K, K⁆ < K := IsSolvable.commutator_lt_of_ne_bot hK_ne_bot
+  have hcomm_le_F : ⁅K, K⁆ ≤ F := by
+    by_contra hcomm_not_le_F
+    have hK_le_comm : K ≤ ⁅K, K⁆ :=
+      hK_min ⁅K, K⁆ inferInstance (Subgroup.commutator_le_left K K) hcomm_not_le_F
+    exact hcomm_lt.not_ge hK_le_comm
+  let N : Subgroup K := (K ⊓ F).subgroupOf K
+  haveI hN_normal : N.Normal := by
+    dsimp [N]
+    infer_instance
+  have hN_le_center : N ≤ Subgroup.center K := by
+    dsimp [N]
+    exact inf_subgroupOf_le_center_of_le_centralizer hK_le_C
+  have hcomm_K_le_N : commutator K ≤ N := by
+    intro x hx
+    have hx_map : (x : G) ∈ (commutator K).map K.subtype := ⟨x, hx, rfl⟩
+    rw [Subgroup.map_subtype_commutator] at hx_map
+    exact ⟨x.2, hcomm_le_F hx_map⟩
+  have hquot_mul_comm : ∀ x y : K ⧸ N, x * y = y * x :=
+    (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_K_le_N).comm
+  haveI hquot_nilpotent : Group.IsNilpotent (K ⧸ N) := by
+    rw [nilpotent_iff_lowerCentralSeries]
+    refine ⟨1, ?_⟩
+    rw [lowerCentralSeries_one, commutator_eq_bot_iff_center_eq_top, eq_top_iff]
+    intro q _
+    rw [Subgroup.mem_center_iff]
+    intro r
+    exact hquot_mul_comm r q
+  have hker_le_center : (QuotientGroup.mk' N).ker ≤ Subgroup.center K := by
+    rw [QuotientGroup.ker_mk']
+    exact hN_le_center
+  haveI hK_nilpotent : Group.IsNilpotent K :=
+    isNilpotent_of_ker_le_center (QuotientGroup.mk' N) hker_le_center
+  have hK_le_fitting : K ≤ OddOrder.Isaacs.Ch01.fitting G :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  apply hK_not_le_F
+  simpa [F, hF_def] using hK_le_fitting
+
+/-- A chief factor `U/V` is a minimal normal subgroup of `G/V`. -/
+private theorem isMinimalNormal_map_quotient_of_isChiefFactor
+    {G : Type*} [Group G] {U V : Subgroup G} [V.Normal]
+    (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
+    OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) := by
+  refine ⟨hChief.normal_top.map _ QuotientGroup.mk_surjective, ?_, ?_⟩
+  · intro hbot
+    have hU_le_V : U ≤ V := by
+      intro u hu
+      have hu_map : (QuotientGroup.mk' V) u ∈ U.map (QuotientGroup.mk' V) :=
+        ⟨u, hu, rfl⟩
+      rw [hbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hu_map
+      exact hu_map
+    exact hChief.lt.not_ge hU_le_V
+  · intro N hN_normal hN_le_Ubar
+    let W : Subgroup G := N.comap (QuotientGroup.mk' V)
+    haveI hW_normal : W.Normal := hN_normal.comap _
+    have hV_le_W : V ≤ W := by
+      intro v hv
+      change (QuotientGroup.mk' V) v ∈ N
+      rw [show (QuotientGroup.mk' V) v = 1 from (QuotientGroup.eq_one_iff v).mpr hv]
+      exact N.one_mem
+    have hW_le_U : W ≤ U := by
+      intro g hg
+      have hqg_Ubar : (QuotientGroup.mk' V) g ∈ U.map (QuotientGroup.mk' V) :=
+        hN_le_Ubar hg
+      obtain ⟨u, hu, hqu⟩ := hqg_Ubar
+      have hg_u_inv : g * u⁻¹ ∈ V := by
+        apply (QuotientGroup.eq_one_iff (N := V) (g * u⁻¹)).mp
+        change (QuotientGroup.mk' V) (g * u⁻¹) = 1
+        rw [map_mul, map_inv, ← hqu, mul_inv_cancel]
+      have hgU : (g * u⁻¹) * u ∈ U := U.mul_mem (hChief.le hg_u_inv) hu
+      simpa [mul_assoc] using hgU
+    rcases hChief.eq_or_eq_of_normal hW_normal hV_le_W hW_le_U with hW_eq_V | hW_eq_U
+    · left
+      rw [eq_bot_iff]
+      intro n hn
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (N := V) n
+      have hgW : g ∈ W := hn
+      rw [hW_eq_V] at hgW
+      exact (QuotientGroup.eq_one_iff g).mpr hgW
+    · right
+      apply le_antisymm hN_le_Ubar
+      intro x hx
+      obtain ⟨g, hgU, rfl⟩ := hx
+      have hgW : g ∈ W := by
+        rw [hW_eq_U]
+        exact hgU
+      exact hgW
+
+/-- Nilpotence is inherited by a subgroup image. -/
+private theorem isNilpotent_subgroup_map
+    {G H : Type*} [Group G] [Group H] (K : Subgroup G) [Group.IsNilpotent K]
+    (f : G →* H) :
+    Group.IsNilpotent (K.map f) := by
+  let φ : K →* K.map f :=
+    { toFun := fun k => ⟨f k.1, ⟨k.1, k.2, rfl⟩⟩
+      map_one' := Subtype.ext (map_one f)
+      map_mul' := fun x y => Subtype.ext (map_mul f x.1 y.1) }
+  exact nilpotent_of_surjective φ (by
+    rintro ⟨_, x, hx, rfl⟩
+    exact ⟨⟨x, hx⟩, rfl⟩)
+
+/-- **BG Proposition 1.2, first inclusion**:
+`F(G*)` centralizes every chief factor `U/V` of `G`.
+
+This is the forward half of Hall's chief-factor characterization of the Fitting subgroup.
+The reverse inclusion still needs chief-series induction over normal intervals. -/
+theorem fitting_map_subtype_le_chiefFactorCentralizer
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {Gstar U V : Subgroup G} [Gstar.Normal] [V.Normal]
+    (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
+    (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype ≤
+      OddOrder.GroupTheory.chiefFactorCentralizer U V := by
+  haveI hV_normal : V.Normal := hChief.normal_bot
+  let q : G →* G ⧸ V := QuotientGroup.mk' V
+  let Ubar : Subgroup (G ⧸ V) := U.map q
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal Ubar := by
+    dsimp [Ubar, q]
+    exact isMinimalNormal_map_quotient_of_isChiefFactor hChief
+  have hUbar_le_cent :
+      Ubar ≤ Subgroup.centralizer
+        ((OddOrder.Isaacs.Ch01.fitting (G ⧸ V) : Subgroup (G ⧸ V)) : Set (G ⧸ V)) :=
+    (isMinimalNormal_le_fitting_and_isElementaryAbelian (G := G ⧸ V) hMin).2.1
+  have hFquot_le_cent_Ubar :
+      OddOrder.Isaacs.Ch01.fitting (G ⧸ V) ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) :=
+    Subgroup.le_centralizer_iff.mp hUbar_le_cent
+  let FstarG : Subgroup G := (OddOrder.Isaacs.Ch01.fitting Gstar).map Gstar.subtype
+  haveI hFstarG_normal : FstarG.Normal := by
+    dsimp [FstarG]
+    infer_instance
+  haveI hFstarGq_normal : (FstarG.map q).Normal :=
+    hFstarG_normal.map q QuotientGroup.mk_surjective
+  haveI hFstarGq_nilpotent : Group.IsNilpotent (FstarG.map q) := by
+    have hmap :
+        FstarG.map q =
+          (OddOrder.Isaacs.Ch01.fitting Gstar).map (q.comp Gstar.subtype) := by
+      dsimp [FstarG, q]
+      rw [Subgroup.map_map]
+    rw [hmap]
+    exact isNilpotent_subgroup_map (OddOrder.Isaacs.Ch01.fitting Gstar) (q.comp Gstar.subtype)
+  have hFstarGq_le_fitting :
+      FstarG.map q ≤ OddOrder.Isaacs.Ch01.fitting (G ⧸ V) :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  have hFstarGq_le_cent_Ubar : FstarG.map q ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) :=
+    hFstarGq_le_fitting.trans hFquot_le_cent_Ubar
+  change FstarG ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V
+  exact OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer
+    hFstarGq_le_cent_Ubar
+
+/-!
+Prop. 1.2 and 1.4 remain routed through this §1A block.
+
+* Prop. 1.2 now has the basic `OddOrder.GroupTheory.ChiefFactor` vocabulary:
+  chief factors `U/V` and ambient `C_G(U/V)`.  The remaining work is the
+  composition/chief-series induction over normal intervals.
+* Prop. 1.4 should then follow the book route through semidirect products and Prop. 1.3;
+  the present file now supplies the required self-centralizing Fitting endpoint.
+-/
 
 /-! ## §1B: A-invariant Hall theory (Prop 1.5, Prop 1.6) — Isaacs Ch.4/§3E 既存 API 経由
 

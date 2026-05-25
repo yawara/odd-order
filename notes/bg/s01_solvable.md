@@ -16,8 +16,33 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
 - mathlib "high" for Lem 1.7 → **partial** ((b)(d) 不在; 新規 `FrattiniPGroup.lean` 要).
 - Cor 1.19(b) "derived" → **`IsZGroup.coprime_commutator_index` 直接ヒット** (`SpecificGroups/ZGroup.lean:280`).
 - Prop 1.15 ★★★ → **★** (Phase 1 Ch.3 `hall_higman_1_2_3` ✅ 2026-05-23 完成, (a) は thin wrap).
-- 未捕捉: chief factor / CompositionSeries / Omega1 mathlib **不在**. 新規 shared module `ChiefSeries.lean`, `OmegaSubgroup.lean`, `MinimalNormal.lean`, `InvariantSubgroup.lean` 要.
+- 未捕捉: chief factor / Omega1 mathlib **不在**. `Order.JordanHolder.CompositionSeries`
+  は抽象 lattice 版のみで、群の chief factor centralizer API は新規 shared module
+  `ChiefSeries.lean`, `OmegaSubgroup.lean`, `MinimalNormal.lean`, `InvariantSubgroup.lean` 要.
 - 内部 hub は **Prop 1.5(d)** (6 §1 proofs), Lemma 1.1 ではない.
+
+## Implementation log (2026-05-25 bg-s01)
+
+- **Prop 1.3 completed**: Lean theorem `centralizer_fitting_le_fitting` is sorry-free in
+  `OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean`.
+- Proof route is independent of Prop 1.2: choose a finite-lattice minimal `G`-normal
+  `K ≤ C_G(F(G))` with `K ⊄ F(G)`. Solvability gives `[K,K] < K`; minimality forces
+  `[K,K] ≤ F(G)`. Since `K` centralizes `F(G)`, `K ∩ F(G)` is central in `K`, and
+  `K/(K∩F(G))` is abelian. Thus `K` is nilpotent, contradicting Fitting maximality.
+- **Prop 1.2 partially completed**: exact BG statement checked at `local-analysis.mmd`
+  L360-L378.  The first shared module now exists: `OddOrder.GroupTheory.ChiefFactor` provides
+  `IsChiefFactor U V`, ambient `chiefFactorCentralizer U V = C_G(U/V)`, and quotient
+  image/comap helper lemmas.
+- The forward inclusion is sorry-free as `fitting_map_subtype_le_chiefFactorCentralizer`:
+  for every chief factor `U/V`, the image of `F(G*)` in `G/V` is nilpotent normal, hence
+  lies in `F(G/V)`, and Lemma 1.1 puts `U/V` in the centralizer of `F(G/V)`.
+- Reverse-inclusion scaffolding now exists in `OddOrder.GroupTheory.ChiefFactor`:
+  `chiefFactorCentralizer.normal` and `chiefFactorCentralizer.le_iff_commutator_le`
+  identify centralizing `U/V` with the commutator containment `⁅U,H⁆ ≤ V`.
+- Remaining Prop 1.2 work is the reverse inclusion via chief-series induction over normal
+  intervals: an element/subgroup centralizing all chief factors of `G` must lie in `F(G*)`.
+- **Prop 1.4 remains open**: with Prop 1.3 now available, the remaining work is the book's
+  semidirect-product/Hall-σ route for coprime automorphism groups.
 
 ## TL;DR
 
@@ -35,7 +60,7 @@ Isaacs Phase 1 と比較:
 |---|------|--------|----------|--------------|-------------|---------|--------|
 | 1.1 | Lemma | 356-358 | min normal solvable ⇒ elementary abelian ⊆ Z(F(G)) | Isaacs Ch.1 基本 | §2, §3, App.A 他 (43+回) | high | ★★ |
 | 1.2 | Prop | 360-378 | Hall centralizer characterization of F(G^*): Σ C_{G^*}(U/V) over chief factors = F(G^*) | Isaacs 3.13 / Gorenstein 6.4.1 | §8, §9 (22回) | high | ★★ |
-| 1.3 | Prop | 380-382 | solvable ⇒ C_G(F(G)) ⊆ F(G) | Isaacs 3.13 系 | §6, §15 (7回) | high | ★★ |
+| 1.3 | Prop | 380-382 | solvable ⇒ C_G(F(G)) ⊆ F(G) | `centralizer_fitting_le_fitting` ✅ | §6, §15 (7回) | high | ★★ |
 | 1.4 | Prop | 384-398 | coprime auto ⇒ faithful on F(G) | Isaacs Ch.3 系 (3.13 経由) | §6 周辺 (5回) | high | ★ |
 | **1.5** | **Prop** | **400-414** | **A-invariant Hall π-subgroup 定理 5 部構成**: (a) existence (b) containment (c) conjugacy (d) quotient (e) π-separated commutativity | **Isaacs 3.13-3.14 Hall-Schur-Zassenhaus** (BG が coprime action 版に再構成) | **§3, §4, 全章 (28+回) — 最多引用** | **mid** (mathlib Hall basic, A-inv 版新規) | **★★★** |
 | **1.6** | **Prop** | **416-424** | **coprime action commutator 定理 5 部構成**: (a) G = C_G(A)[G,A] (b) [G,A,A]=[G,A] (c) [G,A,A]=1⇒trivial (d) abelian ⇒ direct product (e) abelian + prime order ⇒ trivial | Isaacs 3.13-3.14, **Ch.5 Thm 5.3.6** (abelian 版) | §2 (16回), Peterfalvi 04.3-04.16 多数 | **mid** | **★★★** |
@@ -214,8 +239,8 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 
 ### 優先度 S2 (§1 内依存性あり)
 
-6. **Prop 1.4** — coprime faithful on F(G). Prop 1.3, 1.2 依存.
-7. **Prop 1.3** — C_G(F(G)) ⊆ F(G). 基本だが Prop 1.2 後.
+6. **Prop 1.4** — coprime faithful on F(G). Prop 1.3 ✅, Prop 1.2/semidirect route 依存.
+7. **Prop 1.3** — C_G(F(G)) ⊆ F(G). ✅ `centralizer_fitting_le_fitting`.
 8. **Prop 1.10** — nilpotent + operator trivial. Lemma 1.9 + 基本.
 9. **Lemma 1.9** — operator series ⇒ π-group. Prop 1.5 応用.
 10. **Thm 1.11** — Ω₁ triviality. Isaacs 4.36 再引用.
