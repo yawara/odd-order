@@ -148,6 +148,8 @@ Frobenius Actions であって Clifford 章ではない). したがって本節�
 
 namespace OddOrder.BG.Ch1.S02
 
+open scoped Pointwise
+
 /-! ## §2A: Schur + Absolute Irreducibility (Prop 2.1, mmd L598-612)
 
 **BG Prop 2.1**: `G` 群, `F` 体, `M` 既約 `FG`-加群. 以下が成立:
@@ -1046,6 +1048,64 @@ private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
   exact commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
     W ρ hW hdimW hdimQ
 
+/-- If `G'` acts trivially on a submodule and quotient, then that common
+fixed-on-subquotients subgroup is normal.  This packages the normality shape
+needed in the q = p branch of BG Thm 2.6. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_normal_of_rank_one_subquotients
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ).Normal :=
+  Subgroup.Normal.of_commutator_le
+    (G := G)
+    (H := fixedOnSubmoduleAndQuotientSubgroup W ρ)
+    (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+      W ρ hW hdimW hdimQ)
+
+/-- Two-dimensional normality form of
+`fixedOnSubmoduleAndQuotientSubgroup_normal_of_rank_one_subquotients`. -/
+private theorem fixedOnSubmoduleAndQuotientSubgroup_normal_of_finrank_two
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdim : Module.finrank F V = 2) (hW_ne_bot : W ≠ ⊥) (hW_ne_top : W ≠ ⊤) :
+    (fixedOnSubmoduleAndQuotientSubgroup W ρ).Normal :=
+  Subgroup.Normal.of_commutator_le
+    (G := G)
+    (H := fixedOnSubmoduleAndQuotientSubgroup W ρ)
+    (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
+      W ρ hW hdim hW_ne_bot hW_ne_top)
+
+/-- A normal p-subgroup is contained in every Sylow p-subgroup.
+
+This is the Sylow-conjugacy bridge used in BG Thm 2.6(b) after a normal
+p-subgroup containing `G'` has been constructed. -/
+private theorem normal_pSubgroup_le_sylow
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite (Sylow p G)]
+    (N : Subgroup G) (hNnormal : N.Normal) (hN : IsPGroup p N) (P : Sylow p G) :
+    N ≤ (P : Subgroup G) := by
+  haveI : N.Normal := hNnormal
+  obtain ⟨Q, hNQ⟩ := hN.exists_le_sylow
+  obtain ⟨g, hgQ⟩ := MulAction.exists_smul_eq G Q P
+  calc (N : Subgroup G)
+      = MulAut.conj g • N := (Subgroup.Normal.conj_smul_eq_self g N).symm
+    _ ≤ MulAut.conj g • (Q : Subgroup G) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hNQ
+    _ = ↑(g • Q) := Sylow.coe_subgroup_smul.symm
+    _ = ↑P := by rw [hgQ]
+
+/-- If `G'` lies in a normal p-subgroup, then `G'` lies in every Sylow
+p-subgroup. -/
+private theorem commutator_le_sylow_of_le_normal_pSubgroup
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite (Sylow p G)]
+    (N : Subgroup G) (hNnormal : N.Normal) (hN : IsPGroup p N)
+    (hcomm : commutator G ≤ N) (P : Sylow p G) :
+    commutator G ≤ (P : Subgroup G) :=
+  hcomm.trans (normal_pSubgroup_le_sylow N hNnormal hN P)
+
 /-- Two-dimensional wrapper for
 `subgroup_commutative_of_rank_one_subquotients`.
 
@@ -1182,6 +1242,25 @@ private theorem
     exact Representation.le_comap_invariants ρ K g
   exact commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
     W ρ hW_invariant hdim hW_ne_bot hW_ne_top
+
+/-- Nontrivial-normal-p-subgroup normality form for the same
+`W = C_V(K)` used in BG Thm 2.6, q = p. -/
+private theorem
+    fixedOnSubmoduleAndQuotientSubgroup_normal_of_nontrivial_normal_p_fixed_space
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Module.Finite F V]
+    (K : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K)
+    (hdim : Module.finrank F V = 2) (hK_ne_bot : K ≠ ⊥) :
+    (fixedOnSubmoduleAndQuotientSubgroup
+      (Representation.invariants (ρ.comp K.subtype)) ρ).Normal :=
+  Subgroup.Normal.of_commutator_le
+    (G := G)
+    (H := fixedOnSubmoduleAndQuotientSubgroup
+      (Representation.invariants (ρ.comp K.subtype)) ρ)
+    (commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space
+      K ρ hfaithful hK hdim hK_ne_bot)
 
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.

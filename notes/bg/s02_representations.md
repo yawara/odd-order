@@ -63,6 +63,15 @@
   normal p-subgroup fixed-space 版
   `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space`
   を追加済み. q=p 分岐の `G' ≤ C_G(W) ∩ C_G(V/W)` 接続は Lean helper として閉じた.
+- **2026-05-26**: q=p 分岐で Sylow 包含へ進むため、
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_rank_one_subquotients`,
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_finrank_two`,
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_nontrivial_normal_p_fixed_space`
+  を追加済み. さらに Sylow D + Sylow conjugacy + 正規性を組み合わせる
+  `normal_pSubgroup_le_sylow` と、`G' ≤ N` を任意の Sylow 包含へ運ぶ
+  `commutator_le_sylow_of_le_normal_pSubgroup` を追加した. 次の未解決点は
+  `C = C_G(W) ∩ C_G(V/W)` が char p で p-subgroup になることを示し、
+  `commutator_le_sylow_of_le_normal_pSubgroup C ...` へ渡すこと.
 
 ## TL;DR
 
