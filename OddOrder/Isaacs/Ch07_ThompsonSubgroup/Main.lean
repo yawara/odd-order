@@ -485,6 +485,19 @@ private theorem lem73_aux
         have hL_le_detKer : L ≤ detGL.ker := by
           intro x hx
           exact hLP_le_detKer (by rwa [hLP_eq_L])
+        have hL_le_SL_range :
+            L ≤ (Matrix.SpecialLinearGroup.toGL :
+              Matrix.SpecialLinearGroup (Fin 2) (ZMod p) →*
+                Matrix.GeneralLinearGroup (Fin 2) (ZMod p)).range := by
+          intro x hx
+          have hxdetGL : detGL x = 1 := hL_le_detKer hx
+          have hxdet : ((x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :
+              Matrix (Fin 2) (Fin 2) (ZMod p)).det = 1 := by
+            have := congrArg Units.val hxdetGL
+            simpa [detGL, Matrix.GeneralLinearGroup.val_det_apply] using this
+          refine ⟨⟨((x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :
+            Matrix (Fin 2) (Fin 2) (ZMod p)), hxdet⟩, ?_⟩
+          exact Units.ext rfl
         sorry  -- Step l-n
       · -- Case [L, P] < L: IH 適用 → P ≤ C([L, P]) → Lem 4.29 で [L, P] = ⊥ → P ≤ C(L).
         have hLP_lt_L : LP_comm < L := lt_of_le_of_ne hLP_le_L hLP_eq_L
