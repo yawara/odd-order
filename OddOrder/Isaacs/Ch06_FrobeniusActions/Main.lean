@@ -1393,6 +1393,107 @@ theorem dihedralOrQuaternion_of_invertingConjugation
     exact ⟨quaternionIsoOfInverting c a (orderOf c / 2)
       h_half_pos h_order h_idx h_a_notmem h_a_sq_half h_conj⟩
 
+/-- **Semidihedral recognition helper** (normalised twist case): given a finite group `P`
+with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`,
+`orderOf c = 2^k`, and conjugation by `a` sends `c` to the semidihedral twist
+`c ^ (SemiDihedralGroup.twist k).val`, then `P ≃* SemiDihedralGroup k`. -/
+private noncomputable def semiDihedralIsoOfTwistNormalized
+    {P : Type*} [Group P] [Finite P]
+    (c a : P) (k : ℕ) (h_order : orderOf c = 2 ^ k)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_a_sq : a ^ 2 = 1)
+    (h_conj : a * c * a⁻¹ = c ^ (SemiDihedralGroup.twist k).val) :
+    P ≃* SemiDihedralGroup k := by
+  classical
+  haveI : Fintype P := Fintype.ofFinite P
+  have hN_pos : 0 < 2 ^ k := Nat.two_pow_pos k
+  haveI : NeZero (2 ^ k) := ⟨hN_pos.ne'⟩
+  set r : ZMod (2 ^ k) := SemiDihedralGroup.twist k with hr_def
+  have hcard_P : Nat.card P = 2 * 2 ^ k := by
+    have h := (Subgroup.zpowers c).index_mul_card
+    rw [h_idx, Nat.card_zpowers, h_order] at h
+    omega
+  let fwd : SemiDihedralGroup k → P
+    | SemiDihedralGroup.c i => c ^ i.val
+    | SemiDihedralGroup.ca i => a * c ^ i.val
+  have hc_addval : ∀ i j : ZMod (2 ^ k), c ^ ((i + j).val) = c ^ i.val * c ^ j.val := by
+    intro i j
+    rw [← pow_add, pow_eq_pow_iff_modEq, Nat.ModEq, h_order, ZMod.val_add, Nat.mod_mod]
+  have h_conj_pow :
+      ∀ i : ZMod (2 ^ k), a * c ^ i.val * a⁻¹ = c ^ (r * i).val := by
+    intro i
+    have h_map : a * c ^ i.val * a⁻¹ = (a * c * a⁻¹) ^ i.val := by
+      simpa using (map_pow (MulAut.conj a : P →* P) c i.val).symm
+    rw [h_map, h_conj, ← pow_mul]
+    rw [pow_eq_pow_iff_modEq, Nat.ModEq, h_order]
+    rw [ZMod.val_mul, Nat.mod_mod]
+  have ha_inv : a⁻¹ = a := by
+    have h1 : a * a = 1 := by rw [← sq, h_a_sq]
+    exact (eq_inv_of_mul_eq_one_right h1).symm
+  have h_pow_a : ∀ i : ZMod (2 ^ k), c ^ i.val * a = a * c ^ (r * i).val := by
+    intro i
+    have h := h_conj_pow i
+    rw [ha_inv] at h
+    calc c ^ i.val * a
+        = (a * a) * c ^ i.val * a := by rw [show a * a = 1 from by rw [← sq, h_a_sq], one_mul]
+      _ = a * (a * c ^ i.val * a) := by group
+      _ = a * c ^ (r * i).val := by rw [h]
+  have hfwd_inj : Function.Injective fwd := by
+    rintro (i | i) (j | j) h <;> simp only [fwd] at h
+    · congr 1
+      have hmod : i.val ≡ j.val [MOD 2 ^ k] := by
+        have hmod0 : i.val ≡ j.val [MOD orderOf c] := (pow_eq_pow_iff_modEq).mp h
+        rwa [h_order] at hmod0
+      unfold Nat.ModEq at hmod
+      rw [Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)] at hmod
+      exact ZMod.val_injective (2 ^ k) hmod
+    · exfalso; apply h_a_notmem
+      have : a = c ^ i.val * (c ^ j.val)⁻¹ := by rw [h]; group
+      rw [this]
+      exact Subgroup.mul_mem _
+        (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _)
+        (Subgroup.inv_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _))
+    · exfalso; apply h_a_notmem
+      have : a = c ^ j.val * (c ^ i.val)⁻¹ := by rw [← h]; group
+      rw [this]
+      exact Subgroup.mul_mem _
+        (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _)
+        (Subgroup.inv_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _))
+    · congr 1
+      have heq : c ^ i.val = c ^ j.val := mul_left_cancel h
+      have hmod : i.val ≡ j.val [MOD 2 ^ k] := by
+        have hmod0 : i.val ≡ j.val [MOD orderOf c] := (pow_eq_pow_iff_modEq).mp heq
+        rwa [h_order] at hmod0
+      unfold Nat.ModEq at hmod
+      rw [Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)] at hmod
+      exact ZMod.val_injective (2 ^ k) hmod
+  have hbij : Function.Bijective fwd := by
+    rw [Fintype.bijective_iff_injective_and_card]
+    refine ⟨hfwd_inj, ?_⟩
+    rw [SemiDihedralGroup.card, ← Nat.card_eq_fintype_card, hcard_P]
+    rw [pow_succ, mul_comm]
+  have hfwd_mul : ∀ x y : SemiDihedralGroup k, fwd (x * y) = fwd x * fwd y := by
+    rintro (i | i) (j | j) <;> simp only [fwd, SemiDihedralGroup.c_mul_c,
+      SemiDihedralGroup.c_mul_ca, SemiDihedralGroup.ca_mul_c, SemiDihedralGroup.ca_mul_ca,
+      ← hr_def]
+    · change c ^ (i + j).val = c ^ i.val * c ^ j.val
+      exact hc_addval i j
+    · change a * c ^ (r * i + j).val = c ^ i.val * (a * c ^ j.val)
+      rw [← mul_assoc, h_pow_a, mul_assoc, ← hc_addval]
+    · change a * c ^ (i + j).val = a * c ^ i.val * c ^ j.val
+      rw [mul_assoc, ← hc_addval]
+    · change c ^ (r * i + j).val = a * c ^ i.val * (a * c ^ j.val)
+      calc c ^ (r * i + j).val
+          = c ^ (r * i).val * c ^ j.val := hc_addval (r * i) j
+        _ = (a * a) * c ^ (r * i).val * c ^ j.val := by
+          rw [show a * a = 1 from by rw [← sq, h_a_sq], one_mul]
+        _ = a * (a * c ^ (r * i).val) * c ^ j.val := by group
+        _ = a * (c ^ i.val * a) * c ^ j.val := by rw [h_pow_a]
+        _ = a * c ^ i.val * (a * c ^ j.val) := by group
+  let setEquiv : SemiDihedralGroup k ≃ P := Equiv.ofBijective fwd hbij
+  exact (MulEquiv.mk' setEquiv hfwd_mul).symm
+
 /-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite nonabelian 2-group with a cyclic
 subgroup `C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is
 the unique involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
