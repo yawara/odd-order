@@ -1690,7 +1690,33 @@ theorem semiDihedral_of_twistConjugation
     (h_z_unique : ∀ y ∈ Subgroup.zpowers c, y ^ 2 = 1 → y ≠ 1 → y = z)
     (h_conj : a * c * a⁻¹ = z * c⁻¹) :
     ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k) := by
-  sorry
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨k, h_order⟩ := (IsPGroup.iff_orderOf.mp hP) c
+  have hk_pos : 0 < k := by
+    obtain ⟨_h_z_half, _h_order_even, h_half_pos⟩ :=
+      eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one c z h_z_mem h_z_sq h_z_ne
+    by_contra hk_not
+    have hk0 : k = 0 := Nat.eq_zero_of_not_pos hk_not
+    rw [h_order, hk0] at h_half_pos
+    norm_num at h_half_pos
+  have hk_two : 2 ≤ k :=
+    two_le_exponent_of_nonabelian_index_two c h_nonab h_idx h_order hk_pos
+  have h_z_pow : z = c ^ (2 ^ (k - 1)) :=
+    zpowers_involution_eq_pow_pred_of_order_two_pow c z hk_pos h_order
+      h_z_mem h_z_sq h_z_ne
+  have hk_three : 3 ≤ k :=
+    three_le_exponent_of_nonabelian_twist c a z h_nonab h_idx h_a_notmem
+      hk_two h_z_pow h_conj
+  have h_a_sq_sq : (a ^ 2) ^ 2 = 1 := by
+    sorry
+  refine ⟨k, h_order.symm, ?_⟩
+  rcases square_eq_one_or_unique_involution_of_square_sq_one c a z
+      h_idx h_z_unique h_a_sq_sq with h_a_sq | h_a_sq
+  · exact ⟨semiDihedralIsoOfTwistInvolution c a z k hk_two h_order h_idx
+      h_a_notmem h_z_pow h_a_sq h_conj⟩
+  · exact ⟨semiDihedralIsoOfTwistSquareInvolution c a z k hk_two h_order h_idx
+      h_a_notmem h_z_mem h_z_pow h_z_sq h_a_sq h_conj⟩
 
 /-- **Isaacs Corollary 6.14**: A nonabelian group of order `8` is isomorphic to `D_8` or `Q_8`
 (i.e., `DihedralGroup 4` or `QuaternionGroup 2` in mathlib indexing). -/
