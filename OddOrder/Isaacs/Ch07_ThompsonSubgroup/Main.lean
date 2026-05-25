@@ -379,6 +379,54 @@ private theorem prime_not_dvd_pred_and_succ_of_ne_two
   · exact hq.ne_one hq_eq_one
   · exact hq_ne_two hq_eq_two
 
+private theorem prime_power_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
+    {p q n : ℕ} (hp : p.Prime) (hq : q.Prime) (hq_ne_p : q ≠ p) (hq_ne_two : q ≠ 2)
+    (hn_qpow : ∃ k, n = q ^ k) (hq_dvd_n : q ∣ n)
+    (hn_dvd : n ∣ p * (p - 1) * (p + 1)) :
+    n ∣ p - 1 ∨ n ∣ p + 1 := by
+  rcases hn_qpow with ⟨k, rfl⟩
+  by_cases hk0 : k = 0
+  · left
+    simp [hk0]
+  have hq_not_dvd_p : ¬ q ∣ p := by
+    intro hq_dvd_p
+    rcases (Nat.dvd_prime hp).mp hq_dvd_p with hq_eq_one | hq_eq_p
+    · exact hq.ne_one hq_eq_one
+    · exact hq_ne_p hq_eq_p
+  have hq_dvd_formula : q ∣ p * (p - 1) * (p + 1) :=
+    hq_dvd_n.trans hn_dvd
+  have hq_dvd_pred_or_succ : q ∣ p - 1 ∨ q ∣ p + 1 :=
+    prime_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ hp hq hq_ne_p hq_dvd_formula
+  have hq_not_both : ¬ (q ∣ p - 1 ∧ q ∣ p + 1) :=
+    prime_not_dvd_pred_and_succ_of_ne_two hp hq hq_ne_two
+  rcases hq_dvd_pred_or_succ with hq_dvd_pred | hq_dvd_succ
+  · left
+    have hq_not_dvd_succ : ¬ q ∣ p + 1 :=
+      fun hq_dvd_succ => hq_not_both ⟨hq_dvd_pred, hq_dvd_succ⟩
+    have hq_not_dvd_p_succ : ¬ q ∣ p * (p + 1) := by
+      intro hq_dvd_p_succ
+      rcases (hq.dvd_mul.mp hq_dvd_p_succ) with hq_dvd_p | hq_dvd_succ
+      · exact hq_not_dvd_p hq_dvd_p
+      · exact hq_not_dvd_succ hq_dvd_succ
+    have hcop : Nat.Coprime (q ^ k) (p * (p + 1)) :=
+      (Nat.Prime.coprime_pow_of_not_dvd hq hq_not_dvd_p_succ).symm
+    have hn_dvd_rearr : q ^ k ∣ (p - 1) * (p * (p + 1)) := by
+      simpa [mul_assoc, mul_left_comm, mul_comm] using hn_dvd
+    exact (hcop.dvd_mul_right).mp hn_dvd_rearr
+  · right
+    have hq_not_dvd_pred : ¬ q ∣ p - 1 :=
+      fun hq_dvd_pred => hq_not_both ⟨hq_dvd_pred, hq_dvd_succ⟩
+    have hq_not_dvd_p_pred : ¬ q ∣ p * (p - 1) := by
+      intro hq_dvd_p_pred
+      rcases (hq.dvd_mul.mp hq_dvd_p_pred) with hq_dvd_p | hq_dvd_pred
+      · exact hq_not_dvd_p hq_dvd_p
+      · exact hq_not_dvd_pred hq_dvd_pred
+    have hcop : Nat.Coprime (q ^ k) (p * (p - 1)) :=
+      (Nat.Prime.coprime_pow_of_not_dvd hq hq_not_dvd_p_pred).symm
+    have hn_dvd_rearr : q ^ k ∣ (p + 1) * (p * (p - 1)) := by
+      simpa [mul_assoc, mul_left_comm, mul_comm] using hn_dvd
+    exact (hcop.dvd_mul_right).mp hn_dvd_rearr
+
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
@@ -577,6 +625,7 @@ private theorem lem73_aux
         exact hQ_not_dvd_idx (hq_dvd_idx.trans h_div_dvd_div)
       -- Step j 後: Q' = L で `↥L` が q-群.
       have hL_qgroup : IsPGroup q ↥L := hQ'_eq_L ▸ hQ'_pgroup
+      obtain ⟨kL, hL_card_qpow⟩ := IsPGroup.iff_card.mp hL_qgroup
       have hq_dvd_L : q ∣ Nat.card ↥L :=
         hq_dvd_idx.trans (Nat.div_dvd_of_dvd hC_dvd)
       have hq_ne_p : q ≠ p := by
@@ -673,6 +722,14 @@ private theorem lem73_aux
         have hq_not_dvd_both_of_odd : q ≠ 2 → ¬ (q ∣ p - 1 ∧ q ∣ p + 1) :=
           fun hq_ne_two =>
             prime_not_dvd_pred_and_succ_of_ne_two (Fact.out : p.Prime) hq_prime hq_ne_two
+        have hL_card_dvd_SL_formula : Nat.card ↥L ∣ p * (p - 1) * (p + 1) := by
+          rwa [card_sl2_zmod_prime (p := p)] at hL_card_dvd_SL
+        have hL_card_dvd_pred_or_succ_of_odd :
+            q ≠ 2 → Nat.card ↥L ∣ p - 1 ∨ Nat.card ↥L ∣ p + 1 :=
+          fun hq_ne_two =>
+            prime_power_dvd_pred_or_succ_of_dvd_prime_mul_pred_succ
+              (Fact.out : p.Prime) hq_prime hq_ne_p hq_ne_two ⟨kL, hL_card_qpow⟩ hq_dvd_L
+              hL_card_dvd_SL_formula
         have hSL_card_dvd_GL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) ∣
             Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
