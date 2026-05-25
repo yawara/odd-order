@@ -1,12 +1,12 @@
 # Isaacs Ch.4: Commutators — mini-roadmap
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.4 (pp. 113-146) — 交換子部分群と下降中心列, three-subgroups lemma, Mann の定理, 自己準同型作用での `[G,A]`, 互素作用の Fitting 分解, Thompson P×Q lemma, Baer trick。
-形式化先 (予定): [`OddOrder/Isaacs/Ch04_Commutators.lean`](../../OddOrder/Isaacs/Ch04_Commutators.lean) (未着手)。
+形式化先: [`OddOrder/Isaacs/Ch04_Commutators/Main.lean`](../../OddOrder/Isaacs/Ch04_Commutators/Main.lean)。
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 2124-2798。
 
-## 進捗 (2026-05-23 更新)
+## 進捗 (2026-05-25 更新)
 
-§4A 部分完成 + §4B Cor 4.10, **Thm 4.11** 完成:
+Ch04 の FT-critical な §4D は 4.28-4.38 まで sorry-free。残る大きな本体タスクは §4C の 4.24/4.26/4.27 と、低優先の Mann 4.14-4.19。
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -40,7 +40,7 @@
 - 新規 import: `OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03` (Cor 3.28 用).
 - 総 ~40 LOC. 下流: Lem 4.29, Cor 4.30, Thm 4.34 ⭐, Thm 4.31 P×Q.
 
-§4D **Phase A.3 大部分完成** (2026-05-24, commits `e0ac1d0`, `9dbd721`, `ca7dc06`): Baer trick (Lem 4.37) — sqrtOdd + baerAdd + comm + assoc + Lem 4.37(a)(c).
+§4D **Baer trick (Lem 4.37) 完成** (2026-05-24/25): sqrtOdd + baerAdd + comm + assoc + Lem 4.37(a)(b)(c).
 - **`sqrtOdd`** (noncomputable): `sqrtOdd x := x^((Nat.card G + 1) / 2)`. 基本性質: `sqrtOdd_sq` (square), `sqrtOdd_one`, `sqrtOdd_inv`, `sqrtOdd_mul_of_commute`, `sqrtOdd_mem_subgroup/center`, `sqrtOdd_apply_mulEquiv` (Aut 保存), `sqrtOdd_commutator_inv`.
 - **`baerAdd`** (noncomputable): `baerAdd x y := x * y * sqrtOdd ⁅y, x⁆` (mathlib commutator 規約). 基本: `baerAdd_one_left/right`, `baerAdd_inv_left/right`.
 - **Lem 4.37(a)** `baerAdd_eq_mul_of_commute`: commute ⇒ `x +' y = x * y`.
@@ -48,7 +48,9 @@
 - **associativity** `baerAdd_assoc` ⭐: class ≤ 2 + odd order ⇒ associative. 戦略: 両辺 = `x * y * z * Sxy * Sxz * Syz` via 左/右 hom of commutator + sqrtOdd 中心化 + sqrtOdd 中心積分配 + 中心 commute 入れ替え.
 - **`commutatorElement_mul_right_of_class_le_two`** (helper): class ≤ 2 で右 hom (左 hom + `commutatorElement_inv`).
 - **Lem 4.37(c)** `baerAdd_map_eq` / `baerAdd_mulEquiv_eq`: 任意 group hom (同濃度) / 自己同型は baerAdd を保存.
-- 総 ~265 LOC. **残**: AddCommGroup G instance def (要 nsmul/zsmul field 実装) + Lem 4.37(b) (additive order = multiplicative order, induction on n).
+- **Lem 4.37(b)** `BaerMul.npow_eq_pow` / `BaerMul.pow_eq_one_iff`: BaerMul wrapper 上の自然冪と元の群の冪を同一視。
+- **`BaerMul G := G`** wrapper + `CommGroup (BaerMul G)` instance: Cor 4.35 を class ≤ 2 の非可換群へ移植するための加法群構造。
+- 総 ~350 LOC。Thm 4.36/4.38 の証明で使用済み。
 
 §4C **Phase A.2 完成** (2026-05-24, commit `e3f8ce6`): Thm 4.22 (chain ⇒ A solvable) + Cor 4.23.
 - **Bridge lemma** `SemidirectProduct.commutator_inr_inl_range_eq_bot_iff_le_ker`: `K ≤ A` について `⁅K.map inr, (inl : G →* Γ).range⁆ = ⊥ ↔ K ≤ φ.ker`. inl_aut + commutator_eq_bot_iff_le_centralizer 経由. ~50 LOC.
@@ -187,7 +189,7 @@ Ch.4 は **§ 4A–4D の 4 節構成** (Ch.2/Ch.3 と同様 subsection には�
 | 4.30 | Corollary | A faithful, `[G,A,...,A]=1`, coprime ⇒ \|A\| の各素因子は \|G\| を割る | L2634 |
 | 4.31 | Theorem (Thompson) | **P×Q lemma**: A=P×Q (P p-群, Q p'-群) acts on p-群 G, Q fixes every P-fixed element ⇒ Q trivial on G | L2640 |
 | 4.32 | Lemma | P p-群, G 非自明 p-群: `[G,P] < G` かつ `C_G(P) > 1` | L2644 |
-| 4.33 | Theorem | G p-solvable ⇒ 全 p-local 部分群 H で `O_{p'}(H) ⊆ O_{p'}(G)` | L2654 |
+| 4.33 | Theorem | ✅ `oPiCore_compl_le_oPiCore_compl_of_isPLocal`: G p-solvable ⇒ 全 p-local 部分群 H で `O_{p'}(H) ⊆ O_{p'}(G)` | L2654 |
 | 4.34 | Theorem (Fitting) | G abelian, coprime ⇒ `G = C_G(A) × [G,A]` | L2664 |
 | 4.35 | Corollary | G abelian p-群, A p'-群 が order p 元全部 fix ⇒ A trivial | L2688 |
 | 4.36 | Theorem | **p > 2**, G p-群, A p'-群 が order p 元全部 fix ⇒ A trivial | L2694 |
@@ -230,17 +232,17 @@ Ch.4 は **§ 4A–4D の 4 節構成** (Ch.2/Ch.3 と同様 subsection には�
 
 順序は重要度・FT クリティカル度:
 
-1. **Lemma 4.28 (`G = C_G(A)[G,A]` for coprime)** — BG Prop 1.6(a) として明示引用. **FT クリティカル**
-2. **Lemma 4.29 (`[G,A,A] = [G,A]` for coprime)** — BG Prop 1.6(b). **FT クリティカル**
-3. **Theorem 4.34 Fitting decomposition (`G = C_G(A) × [G,A]` for abelian + coprime)** — BG Prop 1.6(d). **FT クリティカル**
-4. **Corollary 4.35 (abelian p-群 + p'-A が Ω₁ fix ⇒ trivial)** — BG Prop 1.6(e). **FT クリティカル**
-5. **Theorem 4.36 (p>2 一般 p-群版)** — BG Thm 1.11 として明示引用. **FT クリティカル** (BG では Gorenstein 5.3.10 として参照)
-6. **Theorem 4.31 Thompson P×Q lemma** — Thompson critical subgroup / ZJ 系の基底道具. BG Thm 1.13 (Thompson critical) の前提で間接利用
+1. ✅ **Lemma 4.28 (`G = C_G(A)[G,A]` for coprime)** — BG Prop 1.6(a) として明示引用. **FT クリティカル**
+2. ✅ **Lemma 4.29 (`[G,A,A] = [G,A]` for coprime)** — BG Prop 1.6(b). **FT クリティカル**
+3. ✅ **Theorem 4.34 Fitting decomposition (`G = C_G(A) × [G,A]` for abelian + coprime)** — BG Prop 1.6(d). **FT クリティカル**
+4. ✅ **Corollary 4.35 (abelian p-群 + p'-A が Ω₁ fix ⇒ trivial)** — BG Prop 1.6(e). **FT クリティカル**
+5. ✅ **Theorem 4.36 (p>2 一般 p-群版)** — BG Thm 1.11 として明示引用. **FT クリティカル** (BG では Gorenstein 5.3.10 として参照)
+6. ✅ **Theorem 4.31 Thompson P×Q lemma** — Thompson critical subgroup / ZJ 系の基底道具. BG Thm 1.13 (Thompson critical) の前提で間接利用
 7. **Theorem 4.27 ([G,A] nilpotent for chain [G,A,...,A]=1)** — Isaacs 流の "stabilizes series ⇒ A^∞ trivial" の中核. BG Lemma 1.9 と精神同等
 8. **Theorem 4.22, 4.24 (faithful chain ⇒ A solvable / nilpotent)** — BG Lemma 1.9 が同精神の弱形
-9. **Theorem 4.33 (p-solvable: O_{p'}(H) ⊆ O_{p'}(G) for p-local H)** — Hall-Higman 1.2.3 (= Isaacs Lemma 3.21) を内部使用. BG Cor が同じ系列
-10. **Lemma 4.37 Baer trick** — Thm 4.36 / 4.38 の証明ツール. 単体での下流引用は無いが Thm 4.36 とセットで必要
-11. **Theorem 4.38 (PxQ 強化, p>2, P 正規不要)** — 4.36 と同じく Baer 経由
+9. ✅ **Theorem 4.33 (p-solvable: O_{p'}(H) ⊆ O_{p'}(G) for p-local H)** — Hall-Higman 1.2.3 (= Isaacs Lemma 3.21) を内部使用. BG Cor が同じ系列
+10. ✅ **Lemma 4.37 Baer trick** — Thm 4.36 / 4.38 の証明ツール. 単体での下流引用は無いが Thm 4.36 とセットで必要
+11. ✅ **Theorem 4.38 (PxQ 強化, p>2, P 正規不要)** — 4.36 と同じく Baer 経由
 
 ### `IsPSolvable` クラスについて
 
@@ -333,13 +335,13 @@ Ch.1, Ch.2 完了かつ Ch.3 §3E (coprime action) が一通り終わってか�
 4. **§4B (Lemmas 4.9-4.13)** — three-subgroups は mathlib 既存. Thm 4.11 と Cor 4.13 (derived ⊆ lcs) を新規実装. mmd 上は短いが mathlib `lowerCentralSeries` のオフセット (mathlib 0=⊤, Isaacs 1=G) に注意.
 5. **§4B 後半 (Mann 4.14-4.19)** — Isaacs 独自集約. 下流引用無し. **後回し可** (Phase 1 内では skip しても問題なし).
 6. **§4C (4.20-4.27)** — A が自己準同型作用する場合の `[G,A]` 設計. mathlib に "subgroup of automorphism group acting" の慣用がどう書かれているか先に偵察 (semidirect product 経由が標準?). **設計判断が要る重要 section**.
-7. **§4D 前半 (4.28-4.30)** — **FT クリティカル最重要部分**. BG Prop 1.6(a)(b)(c) の中核. 互素作用前提のもとで証明.
-8. **§4D 中盤 (Thm 4.31 Thompson P×Q + Lemma 4.32)** — Thompson critical subgroup (Ch.7) と ZJ の前提.
-9. **§4D 後半 1 (Thm 4.33)** — Hall-Higman 1.2.3 (Ch.3 Lemma 3.21) 完成後. p-solvable definition 設計を Ch.3 と共有.
-10. **§4D 後半 2 (Thm 4.34 Fitting + Cor 4.35)** — BG Prop 1.6(d)(e). **FT クリティカル**.
-11. **§4D 終盤 (Thm 4.36 + Lemma 4.37 Baer trick + Thm 4.38)** — BG Thm 1.11 そのもの. Baer trick は odd order 専門なので形式化のスタイル確認 (`Odd (Fintype.card G)` の前提下で `√` を定義).
+7. ✅ **§4D 前半 (4.28-4.30)** — **FT クリティカル最重要部分**. BG Prop 1.6(a)(b)(c) の中核. 互素作用前提のもとで証明.
+8. ✅ **§4D 中盤 (Thm 4.31 Thompson P×Q + Lemma 4.32)** — Thompson critical subgroup (Ch.7) と ZJ の前提.
+9. ✅ **§4D 後半 1 (Thm 4.33)** — Hall-Higman 1.2.3 (Ch.3 Lemma 3.21) 完成後. p-solvable definition 設計を Ch.3 と共有.
+10. ✅ **§4D 後半 2 (Thm 4.34 Fitting + Cor 4.35)** — BG Prop 1.6(d)(e). **FT クリティカル**.
+11. ✅ **§4D 終盤 (Thm 4.36 + Lemma 4.37 Baer trick + Thm 4.38)** — BG Thm 1.11 そのもの. Baer trick は odd order 専門なので形式化のスタイル確認 (`Odd (Fintype.card G)` の前提下で `√` を定義).
 
-**FT クリティカル優先**: 4.28, 4.29, 4.34, 4.35, 4.36 > 4.31, 4.27, 4.33 > その他.
+**FT クリティカル優先の現状**: §4D は完了。次に狙うなら §4C の **4.26 → 4.27**（`[G,A]` p-group / nilpotent）で、4.24 は faithful-action 版の Hall nilpotence として別軸。
 
 ## 逆引き: 他章から Ch.4 へ要求される補題
 
