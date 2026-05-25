@@ -14,7 +14,7 @@ owner chapter 規則により Ch.4 dir に物理配置された:
 
 - Ch.2 内: `lucchini_K_pos_reduction` (K > ⊥ structural reduction, subgroup correspondence のみ) ✅
 - Ch.4 dir 内 ([Ch04_Commutators/ForwardFromCh02.lean](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean)):
-  - `lucchini_K_bot_aux` (K = ⊥ case) — **private theorem with `sorry`** (現状)
+  - `lucchini_K_bot_aux` (K = ⊥ case) — **private theorem, sorry-free**
   - `lucchini_aux` + `lucchini_index_normalCore_lt_index` (`|G|`-induction wrapper + 本体 theorem)
 
 K = ⊥ branch の完全証明には Ch.4 §4A-§4B の lower central series 加法性
@@ -26,11 +26,11 @@ K = ⊥ branch の完全証明には Ch.4 §4A-§4B の lower central series 加
 
 ## やること
 
-- [ ] Ch.4 §4A-§4B (lcs 加法性) 完成を待つ
+- [x] Ch.4 §4A-§4B (lcs 加法性) 完成を待つ
 - [x] `lucchini_K_bot_aux` を `axiom` から `private theorem` + `sorry` に置換し, 関連補題を Ch.4 dir に寄せる
-- [ ] `lucchini_K_bot_aux` の body を埋めて `sorry` を消す
-- [ ] AxiomsCheck.lean に Thm 2.20 / Thm 3.3 の flagship 追加 (現状はどちらも未登録)
-- [ ] `#print axioms OddOrder.Isaacs.Ch03.horosevskii_aut_order_lt` が標準 3 公理のみに依存することを確認
+- [x] `lucchini_K_bot_aux` の body を埋めて `sorry` を消す
+- [x] AxiomsCheck.lean に Thm 2.20 / Thm 3.3 の flagship 追加
+- [x] `lake build OddOrder.AxiomsCheck` で `OddOrder.Isaacs.Ch03.horosevskii_aut_order_lt` が標準 3 公理のみに依存することを確認
 
 ## 完了条件
 
