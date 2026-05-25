@@ -955,49 +955,49 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-/-- **Isaacs Thm 1.30** (前半).  `|G| = p · q` で `q < p` がともに素数ならば,
-`G` の Sylow `p`-部分群は正規 (一意).
+/-- **Isaacs Thm 1.30** (前半, uniqueness form).  `|G| = p · q` で `q < p` が
+ともに素数ならば, `G` の Sylow `p`-部分群は一意. -/
+theorem sylow_p_subsingleton_of_card_eq_mul_prime_lt
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hqp : q < p) (hcard : Nat.card G = p * q) :
+    Subsingleton (Sylow p G) := by
+  haveI : Finite (Sylow p G) := inferInstance
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  have hPcard : Nat.card P = p := by
+    have hmul := P.card_eq_multiplicity (G := G)
+    rw [hcard, Nat.factorization_mul (Fact.out (p := p.Prime)).ne_zero
+        (Fact.out (p := q.Prime)).ne_zero] at hmul
+    simp only [Finsupp.coe_add, Pi.add_apply,
+               Nat.Prime.factorization_self (Fact.out (p := p.Prime)),
+               (Fact.out (p := q.Prime)).factorization,
+               Finsupp.single_apply, if_neg hqp.ne] at hmul
+    simpa using hmul
+  have hPindex : (P : Subgroup G).index = q := by
+    have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+      Subgroup.card_mul_index _
+    rw [hcard, hPcard] at h1
+    exact Nat.eq_of_mul_eq_mul_left (Fact.out (p := p.Prime)).pos h1
+  have hdvd : Nat.card (Sylow p G) ∣ q := hPindex ▸ P.card_dvd_index
+  have hmod : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
+  rcases (Nat.dvd_prime (Fact.out (p := q.Prime))).mp hdvd with hn1 | hnq
+  · exact (Nat.card_eq_one_iff_unique.mp hn1).1
+  · exfalso
+    rw [hnq] at hmod
+    have hge : 1 ≤ q := (Fact.out (p := q.Prime)).pos
+    have hdvd' : p ∣ q - 1 := (Nat.modEq_iff_dvd' hge).mp hmod.symm
+    have hlt : q - 1 < p := by omega
+    have hq1 : q - 1 = 0 := Nat.eq_zero_of_dvd_of_lt hdvd' hlt
+    have hq_eq : q = 1 := by omega
+    exact (Fact.out (p := q.Prime)).one_lt.ne' hq_eq
 
-証明: Sylow C / III により `n_p := |Syl_p(G)| ∣ q` かつ `n_p ≡ 1 (mod p)`.
-`q` は素数なので `n_p ∈ {1, q}`. `n_p = q` ならば `q ≡ 1 (mod p)`,
-すなわち `p ∣ q − 1`. しかし `q < p` より `q − 1 < p`, 唯一 `q − 1 = 0`
-すなわち `q = 1` だが `q` は素数で矛盾. ゆえに `n_p = 1`, Sylow `p` 一意. -/
+/-- **Isaacs Thm 1.30** (前半).  `|G| = p·q` で `q < p` がともに素数なら,
+`G` の Sylow `p`-部分群は正規 (一意). -/
 theorem sylow_normal_of_card_eq_mul_prime_lt
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hqp : q < p) (hcard : Nat.card G = p * q) (P : Sylow p G) :
     (P : Subgroup G).Normal := by
-  haveI : Subsingleton (Sylow p G) := by
-    -- まず Finite (Sylow p G) を確保
-    haveI : Finite (Sylow p G) := inferInstance
-    -- P.index = q を取り出す
-    have hPcard : Nat.card P = p := by
-      have hmul := P.card_eq_multiplicity (G := G)
-      rw [hcard, Nat.factorization_mul (Fact.out (p := p.Prime)).ne_zero
-          (Fact.out (p := q.Prime)).ne_zero] at hmul
-      simp only [Finsupp.coe_add, Pi.add_apply,
-                 Nat.Prime.factorization_self (Fact.out (p := p.Prime)),
-                 (Fact.out (p := q.Prime)).factorization,
-                 Finsupp.single_apply, if_neg hqp.ne] at hmul
-      simpa using hmul
-    have hPindex : (P : Subgroup G).index = q := by
-      have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
-        Subgroup.card_mul_index _
-      rw [hcard, hPcard] at h1
-      exact Nat.eq_of_mul_eq_mul_left (Fact.out (p := p.Prime)).pos h1
-    have hdvd : Nat.card (Sylow p G) ∣ q := hPindex ▸ P.card_dvd_index
-    have hmod : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
-    rcases (Nat.dvd_prime (Fact.out (p := q.Prime))).mp hdvd with hn1 | hnq
-    · -- n = 1 ⇒ Subsingleton (Sylow p G は非空なので)
-      exact (Nat.card_eq_one_iff_unique.mp hn1).1
-    · -- n = q ⇒ q ≡ 1 [MOD p] ⇒ 矛盾
-      exfalso
-      rw [hnq] at hmod
-      have hge : 1 ≤ q := (Fact.out (p := q.Prime)).pos
-      have hdvd' : p ∣ q - 1 := (Nat.modEq_iff_dvd' hge).mp hmod.symm
-      have hlt : q - 1 < p := by omega
-      have hq1 : q - 1 = 0 := Nat.eq_zero_of_dvd_of_lt hdvd' hlt
-      have hq_eq : q = 1 := by omega
-      exact (Fact.out (p := q.Prime)).one_lt.ne' hq_eq
+  haveI : Subsingleton (Sylow p G) :=
+    sylow_p_subsingleton_of_card_eq_mul_prime_lt hqp hcard
   exact Sylow.normal_of_subsingleton P
 
 /-- **Isaacs Thm 1.30** (後半).  `|G| = p·q` (`q < p` 素), `q ∤ (p − 1)` ⇒ `G` 巡回.
@@ -1553,7 +1553,7 @@ private lemma sylow_q_disjoint_of_prime_card
     exact Sylow.ext h.symm
 
 /-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `p` subgroup has order `p^3`. -/
-private theorem sylow_p_card_of_card_eq_cube_mul_prime
+theorem card_sylow_p_of_card_eq_cube_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (P : Sylow p G) :
     Nat.card P = p ^ 3 := by
@@ -1568,7 +1568,7 @@ private theorem sylow_p_card_of_card_eq_cube_mul_prime
   simpa using hmul
 
 /-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `q` subgroup has order `q`. -/
-private theorem sylow_q_card_of_card_eq_cube_mul_prime
+theorem card_sylow_q_of_card_eq_cube_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (Q : Sylow q G) :
     Nat.card Q = q := by
@@ -1580,6 +1580,28 @@ private theorem sylow_q_card_of_card_eq_cube_mul_prime
   simp only [Finsupp.coe_add, Pi.add_apply,
              Finsupp.single_apply, if_neg hpq] at hmul
   simpa [(Fact.out (p := q.Prime)).factorization_self] using hmul
+
+/-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `p` subgroup has index `q`. -/
+theorem index_sylow_p_of_card_eq_cube_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (P : Sylow p G) :
+    (P : Subgroup G).index = q := by
+  have hPcard := card_sylow_p_of_card_eq_cube_mul_prime hpq hcard P
+  have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  rw [hcard, hPcard] at h1
+  exact Nat.eq_of_mul_eq_mul_left (pow_pos (Fact.out (p := p.Prime)).pos 3) h1
+
+/-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `q` subgroup has index `p^3`. -/
+theorem index_sylow_q_of_card_eq_cube_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) (Q : Sylow q G) :
+    (Q : Subgroup G).index = p ^ 3 := by
+  have hQcard := card_sylow_q_of_card_eq_cube_mul_prime hpq hcard Q
+  have h1 : Nat.card (Q : Subgroup G) * (Q : Subgroup G).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  rw [hcard, hQcard, mul_comm (p ^ 3) q] at h1
+  exact Nat.eq_of_mul_eq_mul_left (Fact.out (p := q.Prime)).pos h1
 
 /-- For `|G| = p^3 · q` (p, q 異素数) with `n_q = p^3`, the Sylow `p`-subgroup is normal.
 
@@ -1604,9 +1626,9 @@ private lemma sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube
   have hq_pos : 0 < q := hqprime.pos
   have hp3_pos : 0 < p ^ 3 := pow_pos hp_pos 3
   have hcard_Sq : ∀ Q : Sylow q G, Nat.card (Q : Subgroup G) = q :=
-    fun Q => sylow_q_card_of_card_eq_cube_mul_prime hpq hcard Q
+    fun Q => card_sylow_q_of_card_eq_cube_mul_prime hpq hcard Q
   have hcard_Sp : ∀ P : Sylow p G, Nat.card (P : Subgroup G) = p ^ 3 :=
-    fun P => sylow_p_card_of_card_eq_cube_mul_prime hpq hcard P
+    fun P => card_sylow_p_of_card_eq_cube_mul_prime hpq hcard P
   have hfin_Sq : ∀ Q : Sylow q G, Fintype.card (Q : Subgroup G) = q := by
     intro Q; rw [← Nat.card_eq_fintype_card]; exact hcard_Sq Q
   have hfin_Sp : ∀ P : Sylow p G, Fintype.card (P : Subgroup G) = p ^ 3 := by
@@ -1796,19 +1818,10 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
   haveI : Finite (Sylow q G) := inferInstance
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
-  have hPcard : Nat.card P = p ^ 3 := sylow_p_card_of_card_eq_cube_mul_prime hpq hcard P
-  have hQcard : Nat.card Q = q := sylow_q_card_of_card_eq_cube_mul_prime hpq hcard Q
-  have hPindex : (P : Subgroup G).index = q := by
-    have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
-      Subgroup.card_mul_index _
-    rw [hcard, hPcard] at h1
-    have hpos : 0 < p ^ 3 := pow_pos (Fact.out (p := p.Prime)).pos 3
-    exact Nat.eq_of_mul_eq_mul_left hpos h1
-  have hQindex : (Q : Subgroup G).index = p ^ 3 := by
-    have h1 : Nat.card (Q : Subgroup G) * (Q : Subgroup G).index = Nat.card G :=
-      Subgroup.card_mul_index _
-    rw [hcard, hQcard, mul_comm q ((Q : Subgroup G).index)] at h1
-    exact Nat.eq_of_mul_eq_mul_right (Fact.out (p := q.Prime)).pos h1
+  have hPindex : (P : Subgroup G).index = q :=
+    index_sylow_p_of_card_eq_cube_mul_prime hpq hcard P
+  have hQindex : (Q : Subgroup G).index = p ^ 3 :=
+    index_sylow_q_of_card_eq_cube_mul_prime hpq hcard Q
   have hnp_dvd : Nat.card (Sylow p G) ∣ q := hPindex ▸ P.card_dvd_index
   have hnp_mod : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
   have hnq_dvd : Nat.card (Sylow q G) ∣ p ^ 3 := hQindex ▸ Q.card_dvd_index
@@ -2667,8 +2680,8 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
   rw [hbot, le_bot_iff] at hD_le_op
   exact hD_ne hD_le_op
 
-/-- **Isaacs Thm 1.36**.  有限群 `G` で `|G| = p^a · q` (p, q 異素数, a ≥ 1) ならば
-`G` は単純でない.
+/-- **Isaacs Thm 1.36** (strong form).  有限群 `G` で
+`|G| = p^a · q` (p, q 異素数, a ≥ 1) ならば `G` は非自明な真正規部分群を持つ.
 
 証明 (Isaacs p.34): `n_p(G)` を Sylow `p` の個数とする.  Sylow C/III より
 `n_p ∣ q` かつ `n_p ≡ 1 (mod p)`.  q は素数なので `n_p ∈ {1, q}`.
@@ -2681,13 +2694,12 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
   Sylow `q` 正規.  Sylow `q` の位数は `q < p^a q = |G|`, 真部分群で矛盾.
 * (b) D ≠ ⊥: helper `opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot` で
   `opCore p G ≠ ⊥`.  `opCore p G ≤ S` で `|S| = p^a < |G|` より `opCore ≠ ⊤`.
-  どちらの場合も真部分の正規部分群が存在し, 単純性と矛盾. -/
-theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
+  どちらの場合も真部分の正規部分群が存在する. -/
+theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     {a : ℕ} (ha : 1 ≤ a) (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q) :
-    ¬ IsSimpleGroup G := by
+    ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊥ ∧ N ≠ ⊤ := by
   classical
-  intro h_simple
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Fintype (Sylow p G) := Fintype.ofFinite _
   haveI : Fintype (Sylow q G) := Fintype.ofFinite _
@@ -2764,20 +2776,21 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
         rw [← Nat.card_eq_fintype_card]; omega)
     obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
     have hP_normal : (P : Subgroup G).Normal := P.normal_of_subsingleton
-    -- (P : Subgroup G) is bot or top by IsSimpleGroup.
-    rcases hP_normal.eq_bot_or_eq_top with hPbot | hPtop
-    · -- |P| = p^a > 1, can't be bot.
+    have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := by
+      intro hPbot
       have : Nat.card (P : Subgroup G) = 1 := by
         rw [hPbot]; exact Subgroup.card_bot
       rw [hcard_Sp P] at this
       omega
-    · -- |P| = p^a, |G| = p^a q, q > 1, can't be top.
+    have hP_ne_top : (P : Subgroup G) ≠ ⊤ := by
+      intro hPtop
       have hcardP : Nat.card (P : Subgroup G) = Nat.card G := by
         rw [hPtop, Subgroup.card_top]
       rw [hcard_Sp P, hcard] at hcardP
       have : p ^ a * 1 = p ^ a * q := by rw [mul_one]; exact hcardP
       have : 1 = q := Nat.eq_of_mul_eq_mul_left hpa_pos this
       omega
+    exact ⟨P, hP_normal, hP_ne_bot, hP_ne_top⟩
   · -- (ii) np = q.
     -- Sub-case split on D = ⊥ vs D ≠ ⊥.
     by_cases hAllDisj : ∀ S T : Sylow p G, S ≠ T →
@@ -2785,13 +2798,16 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
     · -- D = ⊥ all.  Helper gives Sylow q normal.
       obtain ⟨Q, hQ_normal⟩ := sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
         ha hpq hcard hnp_eq_q hcard_Sp hcard_Sq hAllDisj
-      rcases hQ_normal.eq_bot_or_eq_top with hQbot | hQtop
-      · have hQ1 : Nat.card (Q : Subgroup G) = 1 := by
+      have hQ_ne_bot : (Q : Subgroup G) ≠ ⊥ := by
+        intro hQbot
+        have hQ1 : Nat.card (Q : Subgroup G) = 1 := by
           rw [hQbot]; exact Subgroup.card_bot
         rw [hcard_Sq Q] at hQ1
         have : q ≥ 2 := hqprime.two_le
         omega
-      · have hcardQ : Nat.card (Q : Subgroup G) = Nat.card G := by
+      have hQ_ne_top : (Q : Subgroup G) ≠ ⊤ := by
+        intro hQtop
+        have hcardQ : Nat.card (Q : Subgroup G) = Nat.card G := by
           rw [hQtop, Subgroup.card_top]
         rw [hcard_Sq Q, hcard] at hcardQ
         -- hcardQ : q = p^a * q.  p^a ≥ 2 so contradiction.
@@ -2801,6 +2817,7 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
             _ ≥ 2 := hpprime.two_le
         have hqpos : 1 ≤ q := hq_pos
         nlinarith [hcardQ, hpa, hqpos]
+      exact ⟨Q, hQ_normal, hQ_ne_bot, hQ_ne_top⟩
     · -- D ≠ ⊥ for some (S, T).
       push Not at hAllDisj
       obtain ⟨S, T, hST_ne, hD_ne⟩ := hAllDisj
@@ -2842,9 +2859,9 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
           ha hpq hcard hnp_eq_q hcard_Sp hST'_ne hmax hD'_ne
       -- opCore p G ≤ S' for any S' Sylow, so |opCore| ≤ p^a < |G|, hence ≠ ⊤.
       have hopCore_normal : (opCore p G).Normal := opCore.normal p G
-      rcases hopCore_normal.eq_bot_or_eq_top with hbot | htop
-      · exact hopCore_ne hbot
-      · have hop_le : opCore p G ≤ (S' : Subgroup G) := opCore_le S'
+      have hopCore_ne_top : opCore p G ≠ ⊤ := by
+        intro htop
+        have hop_le : opCore p G ≤ (S' : Subgroup G) := opCore_le S'
         rw [htop] at hop_le
         have htop_le_S' : (⊤ : Subgroup G) ≤ (S' : Subgroup G) := hop_le
         have h_top_S' : (S' : Subgroup G) = ⊤ := top_le_iff.mp htop_le_S'
@@ -2854,6 +2871,21 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
         have : p ^ a * 1 = p ^ a * q := by rw [mul_one]; exact hcardS'
         have hone_eq_q : 1 = q := Nat.eq_of_mul_eq_mul_left hpa_pos this
         omega
+      exact ⟨opCore p G, hopCore_normal, hopCore_ne, hopCore_ne_top⟩
+
+/-- **Isaacs Thm 1.36**.  有限群 `G` で `|G| = p^a · q` (p, q 異素数, a ≥ 1) ならば
+`G` は単純でない. -/
+theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {a : ℕ} (ha : 1 ≤ a) (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q) :
+    ¬ IsSimpleGroup G := by
+  intro h_simple
+  obtain ⟨N, hN_normal, hN_ne_bot, hN_ne_top⟩ :=
+    exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime ha hpq hcard
+  haveI : IsSimpleGroup G := h_simple
+  rcases hN_normal.eq_bot_or_eq_top with hbot | htop
+  · exact hN_ne_bot hbot
+  · exact hN_ne_top htop
 
 /-- **Isaacs Lemma 1.34**.  `G` が有限集合 `Ω` に作用し, ある元 `x ∈ G` が
 `Ω` 上で奇置換 (`Equiv.Perm.sign = -1`) を引き起こすなら, `G` は指数 2 の
