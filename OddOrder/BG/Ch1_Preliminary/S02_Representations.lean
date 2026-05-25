@@ -602,6 +602,54 @@ private theorem submonoid_commutative_of_fixed_on_submodule_and_quotient
   exact end_commute_of_fixed_on_submodule_and_quotient W (f : Module.End F V)
     (g : Module.End F V) (hS f f.2).1 (hS f f.2).2 (hS g g.2).1 (hS g g.2).2
 
+/-- Representation-range wrapper for
+`submonoid_commutative_of_fixed_on_submodule_and_quotient`.
+
+For monoid homs into `Module.End`, mathlib's range object is
+`MonoidHom.mrange` (a `Submonoid`). -/
+private theorem representation_mrange_commutative_of_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hρ : ∀ g : G, (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)) :
+    Std.Commutative
+      (· * · : MonoidHom.mrange ρ → MonoidHom.mrange ρ → MonoidHom.mrange ρ) := by
+  apply submonoid_commutative_of_fixed_on_submodule_and_quotient W (MonoidHom.mrange ρ)
+  intro f hf
+  obtain ⟨g, rfl⟩ := MonoidHom.mem_mrange.mp hf
+  exact hρ g
+
+/-- A faithful representation reflects commutativity from its endomorphism image. -/
+private theorem commutative_of_injective_representation_mrange_commutative
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hrange : Std.Commutative
+      (· * · : MonoidHom.mrange ρ → MonoidHom.mrange ρ → MonoidHom.mrange ρ)) :
+    Std.Commutative (· * · : G → G → G) := by
+  constructor
+  intro x y
+  apply hfaithful
+  have hcomm := hrange.comm
+    (⟨ρ x, MonoidHom.mem_mrange.mpr ⟨x, rfl⟩⟩ : MonoidHom.mrange ρ)
+    (⟨ρ y, MonoidHom.mem_mrange.mpr ⟨y, rfl⟩⟩ : MonoidHom.mrange ρ)
+  calc
+    ρ (x * y) = ρ x * ρ y := map_mul ρ x y
+    _ = ρ y * ρ x := congrArg Subtype.val hcomm
+    _ = ρ (y * x) := (map_mul ρ y x).symm
+
+/-- Faithful-representation form of the `C_G(W) ∩ C_G(V/W)` commutativity
+calculation used in BG Thm 2.6, q = p. -/
+private theorem commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Monoid G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hρ : ∀ g : G, (∀ w ∈ W, ρ g w = w) ∧ (∀ v, ρ g v - v ∈ W)) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_injective_representation_mrange_commutative ρ hfaithful
+    (representation_mrange_commutative_of_fixed_on_submodule_and_quotient W ρ hρ)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
