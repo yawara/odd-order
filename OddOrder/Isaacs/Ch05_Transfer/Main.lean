@@ -1094,24 +1094,71 @@ theorem controlsOwnFusion_of_hasNormalPComplement [Finite G] {p : ℕ} [Fact p.P
   refine ⟨q, hq_P, ?_⟩
   rw [h_y_eq, h_eq_one]
 
+/-- **Helper for Thm 5.25 (⇐)**: heart of the proof. Sylow_p `P` that controls its own G-fusion
+satisfies `P ⊓ OPrime p G = ⊥`. The rest of Thm 5.25 (⇐) is a Sylow-conjugacy + cardinality
+assembly on top of this.
+
+**証明スケッチ** (Isaacs p.173):
+* `N := OPrime p G`. `Q := (P ⊓ N).subgroupOf N` is Sylow `p` of `↥N` (cardinality argument:
+  `|P ⊓ N| = |P| / [G : N · P]` and `N · P = G` from `[G:N]` being p-power dividing `|P|`).
+* **APrime p ↥N = ⊤**: `APrime p ↥N` is characteristic in `↥N` (Aut(N) preserves the
+  defining family) ⇒ its `.map N.subtype` is normal in `G`. It has p-power index in `G`
+  (= `|G:N| · |↥N : APrime|`), so by `OPrime` minimality `N ≤ (APrime).map subtype ≤ N`,
+  hence equality, hence `APrime p ↥N = ⊤` in `↥N`.
+* **Q ≤ commutator ↥N**: APrime = ⊤ ⇒ no proper normal subgroup of `↥N` with p-power index
+  contains `commutator ↥N`. The p-part of `[↥N : commutator]` (abelianization) must be 1
+  (else the preimage of `p'`-part would be such a proper subgroup). Since `Q` is a p-group
+  and abelianization of `↥N` has trivial p-part, `Q` projects to `1`, so `Q ≤ commutator ↥N`.
+* **Focal Subgroup Theorem** (mathlib `commutator_inf_eq_focalSubgroup`):
+  `focalSubgroup Q = commutator ↥N ⊓ Q = Q` (using `Q ≤ commutator ↥N`).
+* **ControlsOwnFusion lift**: every generator `⁅x, u⁆ ∈ focalSubgroup Q` (with `x ∈ Q`,
+  `u ∈ ↥N` such that `[x,u] ∈ Q`) can be rewritten using ControlsOwnFusion. Set
+  `y := u x u⁻¹ ∈ Q ⊆ P`; controlsOwnFusion gives `v ∈ P` with `v x v⁻¹ = y`. Then
+  `[x, v⁻¹] = x⁻¹ y` is in `⁅Q.map N.subtype, (P : Subgroup G)⁆`. Hence
+  `focalSubgroup Q ≤ ⁅Q.map subtype, P⁆` (viewing all in `G`).
+* **Iteration**: Combine the previous two: `Q.map subtype ≤ ⁅Q.map subtype, P⁆` in `G`. By
+  induction on `n`, `Q.map subtype ≤ lowerCentralSeries (P : Subgroup G) n`.
+  (Base: `Q.map subtype ≤ P` since `Q ⊆ P`. Step: `Q.map subtype ≤ ⁅Q.map subtype, P⁆ ≤
+  ⁅lowerCentralSeries P n, ⊤⁆ = lowerCentralSeries P (n+1)`.)
+* **Termination**: `P` is a finite p-group ⇒ `IsNilpotent P` (`IsPGroup.isNilpotent`) ⇒
+  `∃ n, lowerCentralSeries P n = ⊥` (`nilpotent_iff_lowerCentralSeries`). Hence
+  `Q.map subtype = ⊥` in `G`, so `(P : Subgroup G) ⊓ N = ⊥`.
+
+**TODO**: 内部の 6 ステップ (APrime = ⊤, Q ⊆ comm, focal ⊆ ⁅Q, P⁆, iteration, termination,
+final translate) を順に埋める. -/
+lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (_hP : P.ControlsOwnFusion) :
+    (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
+  sorry
+
 /-- **Isaacs Thm 5.25 (⇐)**: any Sylow_p `P` controls own fusion ⇒ G has normal p-complement.
 
-**証明** (Isaacs p.173, harder direction): N := O^p(G) (smallest normal subgroup with
-p-power index). Q := N ⊓ P ∈ Sylow_p(N). A^p(N) := N の最小 normal subgroup で N/A^p(N)
-abelian + p-power index. A^p(N) characteristic in N ⇒ normal in G. |G:A^p(N)| = |G:N| · |N:A^p(N)|
-p-power ⇒ N = O^p(G) ⊆ A^p(N), hence A^p(N) = N.
+**証明** (Isaacs p.173, harder direction): `N := OPrime p G`. 主な仕事は
+`(P : Subgroup G) ⊓ N = ⊥` を示すことで, これが
+`OPrime_meet_sylow_eq_bot_of_controlsOwnFusion` (前置の helper). 残りは:
+(B) Sylow II + N normal で任意 Sylow `P'` に拡張 (`g • (P ⊓ N) = (g • P) ⊓ N`).
+(C) `|N| · |P'| = |G|` (`N.index = p^a = |P'|`) + disjoint で `IsComplement'`.
 
-Focal Subgroup Theorem ⇒ Foc_N(Q) = Q ⊓ A^p(N) = Q ⊓ N = Q.
-
-For x, y ∈ Q N-conjugate: x⁻¹ y ∈ Foc_N(Q) (generator). x, y ∈ P G-conjugate, hypothesis
-で P-conjugate: y = x^u, u ∈ P. x⁻¹ y = [x, u] ∈ [Q, P]. So Foc_N(Q) ⊆ [Q, P].
-Combined: Q ⊆ [Q, P]. 反復: Q ⊆ [Q, P, P, ...] (lowerCentralSeries P n). P nilpotent finite
-⇒ ∃ n, lowerCentralSeries P n = ⊥. よって Q = ⊥, つまり N が normal p-complement.
-
-**実装状態 (2026-05-25)**: APrime + OPrime infrastructure 完成. 本体は sorry (次タスク). -/
+**実装状態 (2026-05-25)**: scaffolding + 2 つの sorry (Step B, Step C). Heart の Step A
+は helper の sorry に分離. -/
 theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     HasNormalPComplement p G := by
+  -- Set N := OPrime p G, the normal-p-complement witness.
+  set N : Subgroup G := OPrime p G with hN_def
+  haveI hN_normal : N.Normal := inferInstance
+  -- |G : N| is a p-power, say p^a.
+  obtain ⟨a, hN_idx_pow⟩ := OPrime_index_isPGroup p G
+  refine ⟨N, hN_normal, fun P' => ?_⟩
+  -- **Step A** (heart, deferred to helper): `(P : Subgroup G) ⊓ N = ⊥`.
+  have h_PN_bot : (P : Subgroup G) ⊓ N = ⊥ :=
+    OPrime_meet_sylow_eq_bot_of_controlsOwnFusion P hP
+  -- **Step B**: Conjugation propagates Step A to arbitrary Sylow P' (Sylow II + N normal):
+  -- ∃ g, P' = g • P, hence N ⊓ P' = g • (N ⊓ P) = g • ⊥ = ⊥.
+  have h_P'N_bot : (P' : Subgroup G) ⊓ N = ⊥ := by
+    sorry
+  -- **Step C**: Compute |N| · |P'| = |G| from N.index = p^a = |P'|.
+  -- Combined with Step B's disjointness, this gives IsComplement'.
   sorry
 
 /-- **Isaacs Thm 5.25**: G has normal p-complement ⇔ Sylow_p controls own fusion. -/
