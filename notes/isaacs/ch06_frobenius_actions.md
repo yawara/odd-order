@@ -305,8 +305,12 @@ FT クリティカル度 + 章内依存で並べる:
   `actionFixedPoints φ H = ⊥ → orbitProduct φ H u = 1`, および
   counting identity を仮定した
   `exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity` まで sorry-free.
+  さらに 6.9 で使う
+  `false_of_frobeniusAction_partition_identity_of_coprime_card` まで接続済み:
+  Frobenius action + `gcd(|Π|-1, |U|)=1` + counting identity から矛盾を出せる.
   残りは `∏_{X∈Π} u_X = u_A * u^(|Π|-1)` の finite-product counting identity
-  そのものと 6.9 への接続.
+  そのもの, および elementary abelian `p^2` / solvable Frobenius group から
+  具体的な `SubgroupPartition` を作る 6.9 側の構成.
 
 ## 開発時の注意点
 

@@ -897,6 +897,85 @@ theorem exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
   rw [hprod, htop_one, one_mul] at hident
   exact hu hident.symm
 
+/-- A nontrivial acting subgroup has trivial fixed points under a Frobenius action. -/
+theorem actionFixedPoints_eq_bot_of_isFrobeniusAction
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {H : Subgroup A} (hH : H ≠ ⊥) :
+    actionFixedPoints (MulDistribMulAction.toMulAut A U) H = ⊥ := by
+  apply eq_bot_iff.mpr
+  intro u hu
+  by_contra hu_ne
+  obtain ⟨a, haH, ha_ne⟩ : ∃ a : A, a ∈ H ∧ a ≠ 1 := by
+    by_contra hnone
+    push Not at hnone
+    apply hH
+    ext a
+    constructor
+    · intro ha
+      rw [hnone a ha]
+      exact Subgroup.one_mem ⊥
+    · intro ha
+      rw [Subgroup.mem_bot] at ha
+      rw [ha]
+      exact H.one_mem
+  have hfix := hu ⟨a, haH⟩
+  have hsmul : a • u = u := by
+    simpa using hfix
+  exact hFrob a ha_ne u hu_ne hsmul
+
+/-- In a finite group, an element whose order is coprime to `n` cannot satisfy `u ^ n = 1`. -/
+theorem pow_ne_one_of_ne_one_of_coprime_natCard
+    {U : Type*} [Group U] [Finite U] {n : ℕ}
+    (hcop : n.Coprime (Nat.card U)) {u : U} (hu : u ≠ 1) :
+    u ^ n ≠ 1 := by
+  intro hpow
+  have horder_n : orderOf u ∣ n := orderOf_dvd_of_pow_eq_one hpow
+  have horder_card : orderOf u ∣ Nat.card U := orderOf_dvd_natCard u
+  have horder_eq_one : orderOf u = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop.symm horder_card horder_n
+  exact hu (orderOf_eq_one_iff.mp horder_eq_one)
+
+/-- A nontrivial finite group has an element with `u ^ n ≠ 1` whenever `n` is coprime to
+its order. -/
+theorem exists_pow_ne_one_of_nontrivial_coprime_natCard
+    {U : Type*} [Group U] [Finite U] [Nontrivial U] {n : ℕ}
+    (hcop : n.Coprime (Nat.card U)) :
+    ∃ u : U, u ^ n ≠ 1 := by
+  obtain ⟨u, hu⟩ := exists_ne (1 : U)
+  exact ⟨u, pow_ne_one_of_ne_one_of_coprime_natCard hcop hu⟩
+
+/-- Lemma 6.8 immediately contradicts a Frobenius action once the counting identity supplies
+a suitable element. -/
+theorem false_of_frobeniusAction_orbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct (MulDistribMulAction.toMulAut A U) partn u =
+        topOrbitProduct (MulDistribMulAction.toMulAut A U) u * u ^ (partn.parts.card - 1))
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    False := by
+  obtain ⟨X, hX, hXfix_ne⟩ :=
+    exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
+      (MulDistribMulAction.toMulAut A U) partn hidentity hu
+  have hXfix_eq :
+      actionFixedPoints (MulDistribMulAction.toMulAut A U) X = ⊥ :=
+    actionFixedPoints_eq_bot_of_isFrobeniusAction hFrob (partn.nontrivial X hX)
+  exact hXfix_ne hXfix_eq
+
+/-- Lemma 6.8 in the coprime form used in Theorem 6.9. -/
+theorem false_of_frobeniusAction_partition_identity_of_coprime_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct (MulDistribMulAction.toMulAut A U) partn u =
+        topOrbitProduct (MulDistribMulAction.toMulAut A U) u * u ^ (partn.parts.card - 1))
+    (hcop : (partn.parts.card - 1).Coprime (Nat.card U)) :
+    False := by
+  obtain ⟨u, hu⟩ :=
+    exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
+  exact false_of_frobeniusAction_orbitProduct_identity hFrob partn hidentity hu
+
 end
 
 section /- 6B structural helper: finite abelian Z-groups -/
