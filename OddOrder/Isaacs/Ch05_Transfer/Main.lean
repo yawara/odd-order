@@ -1136,11 +1136,12 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
 **証明** (Isaacs p.173, harder direction): `N := OPrime p G`. 主な仕事は
 `(P : Subgroup G) ⊓ N = ⊥` を示すことで, これが
 `OPrime_meet_sylow_eq_bot_of_controlsOwnFusion` (前置の helper). 残りは:
-(B) Sylow II + N normal で任意 Sylow `P'` に拡張 (`g • (P ⊓ N) = (g • P) ⊓ N`).
-(C) `|N| · |P'| = |G|` (`N.index = p^a = |P'|`) + disjoint で `IsComplement'`.
+(B) Sylow II + N normal で任意 Sylow `R` に拡張 (`g • (P ⊓ N) = (g • P) ⊓ N`). ✅
+(C) p ∤ |N| (任意 Sylow R で R ⊓ N = ⊥ + Cauchy 矛盾) → `|N| · |P'| = |G|` +
+    `Nat.Coprime (|N|) (p^a)` → `Subgroup.isComplement'_of_coprime`. ✅
 
-**実装状態 (2026-05-25)**: scaffolding + 2 つの sorry (Step B, Step C). Heart の Step A
-は helper の sorry に分離. -/
+**実装状態 (2026-05-25)**: Steps B + C 完成 (sorry-free).  Step A (heart) は helper の
+sorry に分離. -/
 theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     HasNormalPComplement p G := by
@@ -1149,17 +1150,65 @@ theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.P
   haveI hN_normal : N.Normal := inferInstance
   -- |G : N| is a p-power, say p^a.
   obtain ⟨a, hN_idx_pow⟩ := OPrime_index_isPGroup p G
-  refine ⟨N, hN_normal, fun P' => ?_⟩
   -- **Step A** (heart, deferred to helper): `(P : Subgroup G) ⊓ N = ⊥`.
   have h_PN_bot : (P : Subgroup G) ⊓ N = ⊥ :=
     OPrime_meet_sylow_eq_bot_of_controlsOwnFusion P hP
-  -- **Step B**: Conjugation propagates Step A to arbitrary Sylow P' (Sylow II + N normal):
-  -- ∃ g, P' = g • P, hence N ⊓ P' = g • (N ⊓ P) = g • ⊥ = ⊥.
-  have h_P'N_bot : (P' : Subgroup G) ⊓ N = ⊥ := by
-    sorry
-  -- **Step C**: Compute |N| · |P'| = |G| from N.index = p^a = |P'|.
-  -- Combined with Step B's disjointness, this gives IsComplement'.
-  sorry
+  -- **Step B**: Conjugation propagates Step A to every Sylow `R` (Sylow II + N normal):
+  -- ∃ g, g • P = R. Then `(R ⊓ N) = (g • P) ⊓ (g • N) = g • (P ⊓ N) = g • ⊥ = ⊥`.
+  have h_all_sylow : ∀ R : Sylow p G, (R : Subgroup G) ⊓ N = ⊥ := fun R => by
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G P R
+    have h_R_eq : (R : Subgroup G) = MulAut.conj g • (P : Subgroup G) := by
+      rw [← hg, Sylow.coe_subgroup_smul]
+    have h_N_eq : MulAut.conj g • N = N := Subgroup.Normal.conj_smul_eq_self g N
+    calc (R : Subgroup G) ⊓ N
+        = MulAut.conj g • (P : Subgroup G) ⊓ N := by rw [h_R_eq]
+      _ = MulAut.conj g • (P : Subgroup G) ⊓ MulAut.conj g • N := by rw [h_N_eq]
+      _ = MulAut.conj g • ((P : Subgroup G) ⊓ N) := (Subgroup.smul_inf _ _ _).symm
+      _ = MulAut.conj g • (⊥ : Subgroup G) := by rw [h_PN_bot]
+      _ = ⊥ := Subgroup.smul_bot _
+  -- **Step C**: `p ∤ |N|` (any p-element in N would lie in some Sylow R, hence in R ⊓ N = ⊥)
+  -- ⇒ `|N| · p^c = |G|` where `c = (|G|).factorization p` ⇒ `c = a` ⇒ `|N| · |P'| = |G|`
+  -- + disjoint ⇒ `IsComplement' N P'`.
+  refine ⟨N, hN_normal, fun P' => ?_⟩
+  have h_P'N_bot : (P' : Subgroup G) ⊓ N = ⊥ := h_all_sylow P'
+  -- C.1: p ∤ |N|
+  have h_p_ndvd_N : ¬ p ∣ Nat.card ↥N := by
+    intro hp_dvd
+    obtain ⟨x, hx_order⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) p hp_dvd
+    have hx_ne : (x : ↥N) ≠ 1 := by
+      intro h; rw [h, orderOf_one] at hx_order
+      exact (Fact.out : p.Prime).one_lt.ne hx_order
+    -- (x : G) has the same order p (Subgroup.orderOf_coe)
+    have hx_order_G : orderOf (x : G) = p := (Subgroup.orderOf_coe x).trans hx_order
+    -- ⟨x.val⟩ as Subgroup G is a p-group (cyclic of order p)
+    have hpg : IsPGroup p (Subgroup.zpowers (x : G)) :=
+      IsPGroup.of_card ((Nat.card_zpowers (x : G)).trans hx_order_G |>.trans (pow_one p).symm)
+    obtain ⟨Q, hQ_le⟩ := hpg.exists_le_sylow
+    have hxQ : (x : G) ∈ (Q : Subgroup G) := hQ_le (Subgroup.mem_zpowers _)
+    have hxN : (x : G) ∈ N := x.property
+    have h_in : (x : G) ∈ (Q : Subgroup G) ⊓ N := ⟨hxQ, hxN⟩
+    rw [h_all_sylow Q, Subgroup.mem_bot] at h_in
+    exact hx_ne (Subtype.ext h_in)
+  -- C.2: factorization of |G| at p = a
+  have h_fact_a : (Nat.card G).factorization p = a := by
+    have hN_card_mul : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+    have h_total : Nat.card G = Nat.card ↥N * p ^ a := by rw [← hN_card_mul, hN_idx_pow]
+    rw [h_total, Nat.factorization_mul (Nat.card_pos (α := ↥N)).ne'
+      (pow_pos (Fact.out : p.Prime).pos a).ne', Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd h_p_ndvd_N,
+      Nat.Prime.factorization_pow (Fact.out : p.Prime),
+      Finsupp.single_apply]
+    simp
+  -- C.3: |P'| = p^a, hence |N| · |P'| = |G|
+  have hP'_card : Nat.card ↥(P' : Subgroup G) = p ^ a := by
+    rw [P'.card_eq_multiplicity, h_fact_a]
+  have h_card_mul : Nat.card ↥N * Nat.card ↥(P' : Subgroup G) = Nat.card G := by
+    rw [hP'_card, ← hN_idx_pow]; exact Subgroup.card_mul_index N
+  -- C.4: Coprime |N| |P'|
+  have h_coprime : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(P' : Subgroup G)) := by
+    rw [hP'_card]
+    exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h_p_ndvd_N).symm).pow_right a
+  exact Subgroup.isComplement'_of_coprime h_card_mul h_coprime
 
 /-- **Isaacs Thm 5.25**: G has normal p-complement ⇔ Sylow_p controls own fusion. -/
 theorem hasNormalPComplement_iff_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.Prime]
