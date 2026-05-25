@@ -278,6 +278,44 @@ def restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
     (hyp.restrict hA₁A hA₁_norm).H a = hyp.H ⟨a.1, hA₁A a.2⟩ :=
   rfl
 
+/-- The coset `aH(a)` appearing in Peterfalvi (2.5), as an ambient subset of
+`G`. -/
+def hCoset (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) : Set G :=
+  {g | ∃ h : G, h ∈ hyp.H a ∧ g = a.1 * h}
+
+@[simp] theorem mem_hCoset (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
+    {g : G} :
+    g ∈ hyp.hCoset a ↔ ∃ h : G, h ∈ hyp.H a ∧ g = a.1 * h := Iff.rfl
+
+/-- The support candidate for the Dade map: the union of the `G`-conjugates of
+the cosets `aH(a)`. -/
+def dadeSupport (hyp : Hypothesis G A L) : Set G :=
+  ⋃ a : {a : G // a ∈ A}, Group.conjugatesOfSet (hyp.hCoset a)
+
+theorem mem_dadeSupport_iff (hyp : Hypothesis G A L) {g : G} :
+    g ∈ hyp.dadeSupport ↔
+      ∃ a : {a : G // a ∈ A}, ∃ h : G, h ∈ hyp.H a ∧ IsConj (a.1 * h) g := by
+  rw [dadeSupport, Set.mem_iUnion]
+  constructor
+  · rintro ⟨a, hg⟩
+    rcases Group.mem_conjugatesOfSet_iff.mp hg with ⟨y, hy, hconj⟩
+    rcases hy with ⟨h, hh, rfl⟩
+    exact ⟨a, h, hh, hconj⟩
+  · rintro ⟨a, h, hh, hconj⟩
+    exact ⟨a, Group.mem_conjugatesOfSet_iff.mpr ⟨a.1 * h, ⟨h, hh, rfl⟩, hconj⟩⟩
+
+theorem mem_dadeSupport_of_mem_hCoset (hyp : Hypothesis G A L)
+    {a : {a : G // a ∈ A}} {h : G} (hh : h ∈ hyp.H a) :
+    a.1 * h ∈ hyp.dadeSupport :=
+  hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, IsConj.refl _⟩
+
+theorem conj_mem_dadeSupport (hyp : Hypothesis G A L) {g x : G}
+    (hg : g ∈ hyp.dadeSupport) :
+    x * g * x⁻¹ ∈ hyp.dadeSupport := by
+  rw [hyp.mem_dadeSupport_iff] at hg ⊢
+  rcases hg with ⟨a, h, hh, hconj⟩
+  exact ⟨a, h, hh, hconj.trans (isConj_iff.mpr ⟨x, rfl⟩)⟩
+
 end Hypothesis
 
 section DadeMap
@@ -303,6 +341,66 @@ def restrictDomain (τ : DadeMap (G := G) k A L) (hA₁A : A₁ ⊆ A) :
   rfl
 
 end DadeMap
+
+section IsDadeMap
+
+variable [Fintype G]
+
+/-- Predicate form of Peterfalvi (2.5): a candidate map is the Dade map for
+`hyp` if it has the prescribed values on conjugates of `aH(a)` and is zero off
+their conjugacy-saturated union.
+
+The uniqueness/well-definedness proof from (2.4.b) is intentionally kept out of
+this predicate, so later work can either construct a map or assume one and use
+these equations directly. -/
+structure IsDadeMap (hyp : Hypothesis G A L) (τ : DadeMap (G := G) k A L) : Prop where
+  map_eq_of_isConj_hCoset :
+    ∀ (α : SupportedClassFunctions (G := G) k A L) (g : G)
+      (a : {a : G // a ∈ A}) (h : G),
+      h ∈ hyp.H a → IsConj (a.1 * h) g →
+        τ α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩
+  map_eq_zero_of_not_mem_dadeSupport :
+    ∀ (α : SupportedClassFunctions (G := G) k A L) (g : G),
+      g ∉ hyp.dadeSupport → τ α g = 0
+
+namespace IsDadeMap
+
+theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
+    (hτ : IsDadeMap hyp τ) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    IsDadeMap (hyp.restrict hA₁A hA₁_norm)
+      (DadeMap.restrictDomain (G := G) (k := k) (L := L) τ hA₁A) where
+  map_eq_of_isConj_hCoset α g a h hh hconj := by
+    simpa using hτ.map_eq_of_isConj_hCoset
+      (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g
+      ⟨a.1, hA₁A a.2⟩ h hh hconj
+  map_eq_zero_of_not_mem_dadeSupport α g hg := by
+    by_cases hgsupp : g ∈ hyp.dadeSupport
+    · rcases hyp.mem_dadeSupport_iff.mp hgsupp with ⟨a, h, hh, hconj⟩
+      have ha_not : a.1 ∉ A₁ := by
+        intro ha₁
+        apply hg
+        have hh' : h ∈ (hyp.restrict hA₁A hA₁_norm).H ⟨a.1, ha₁⟩ := by
+          change h ∈ hyp.H ⟨a.1, hA₁A ha₁⟩
+          have ha_eq : (⟨a.1, hA₁A ha₁⟩ : {a : G // a ∈ A}) = a := Subtype.ext rfl
+          simpa [ha_eq] using hh
+        exact (hyp.restrict hA₁A hA₁_norm).mem_dadeSupport_iff.mpr
+          ⟨⟨a.1, ha₁⟩, h, hh', hconj⟩
+      have hα_zero :
+          (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ = 0 := by
+        by_contra hne
+        exact ha_not (α.property hne)
+      have hmap := hτ.map_eq_of_isConj_hCoset
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g a h
+        hh hconj
+      rw [DadeMap.restrictDomain_apply, hmap]
+      simpa using hα_zero
+    · exact hτ.map_eq_zero_of_not_mem_dadeSupport
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) g hgsupp
+
+end IsDadeMap
+
+end IsDadeMap
 
 variable [StarRing k]
 variable [Fintype G] [Fintype L]
