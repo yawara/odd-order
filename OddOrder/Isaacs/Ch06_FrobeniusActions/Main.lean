@@ -1511,6 +1511,22 @@ private lemma pow_twist_eq_pow_half_mul_inv
   · omega
   · simp [SemiDihedralGroup.twist]
 
+private lemma twist_conj_zmod_pow
+    {P : Type*} [Group P] [Finite P]
+    (c a z : P) {k : ℕ} (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
+    (h_z_pow : z = c ^ (2 ^ (k - 1)))
+    (h_conj : a * c * a⁻¹ = z * c⁻¹) :
+    ∀ i : ZMod (2 ^ k),
+      a * c ^ i.val * a⁻¹ = c ^ (SemiDihedralGroup.twist k * i).val := by
+  intro i
+  have h_conj_twist : a * c * a⁻¹ = c ^ (SemiDihedralGroup.twist k).val := by
+    rw [h_conj, h_z_pow, ← pow_twist_eq_pow_half_mul_inv c hk h_order]
+  have h_map : a * c ^ i.val * a⁻¹ = (a * c * a⁻¹) ^ i.val := by
+    simpa using (map_pow (MulAut.conj a : P →* P) c i.val).symm
+  rw [h_map, h_conj_twist, ← pow_mul]
+  rw [pow_eq_pow_iff_modEq, Nat.ModEq, h_order]
+  rw [ZMod.val_mul, Nat.mod_mod]
+
 private lemma zpowers_involution_eq_pow_pred_of_order_two_pow
     {P : Type*} [Group P] [Finite P] (c z : P) {k : ℕ}
     (hk_pos : 0 < k) (h_order : orderOf c = 2 ^ k)
