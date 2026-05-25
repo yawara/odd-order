@@ -300,6 +300,9 @@ FT クリティカル度 + 章内依存で並べる:
 - 6.11/6.12 p-group classification: 6.13/6.14/6.15 と elementary-abelian line helpers を
   使って大枠へ進める.
 - 6.17-6.21 Frobenius complement / coprime abelian action: Ch.7 の 6.20 使用箇所に向けた中期目標.
+- 6.8 partition counting lemma: `SubgroupPartition`, 非単位元が一意な part に入る補題,
+  `orbitProduct φ H u ∈ actionFixedPoints φ H` まで sorry-free. 残りは
+  `∏_{X∈Π} u_X = u_A * u^(|Π|-1)` の counting identity と 6.9 への接続.
 
 ## 開発時の注意点
 

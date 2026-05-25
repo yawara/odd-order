@@ -698,6 +698,115 @@ theorem card_notConjugateSet_eq_index [Finite G]
 
 end
 
+section /- 6B structural helper: subgroup partitions and orbit products -/
+
+/-! ### Subgroup partitions and orbit products
+
+Isaacs Lemma 6.8 is the counting lemma for a finite group partitioned by proper nonidentity
+subgroups. The final counting argument is still downstream, but the following definitions and
+lemmas fix the exact Lean surface: a partition is represented by a finite set of subgroups, and
+for an action on an abelian group the product `u_H = ∏ h ∈ H, h • u` is fixed by `H`.
+-/
+
+/-- A finite partition of a group by proper nonidentity subgroups, in the sense of Isaacs §6B.
+
+The parts are a `Finset` because Lemma 6.8 uses the cardinality of the partition. -/
+structure SubgroupPartition (G : Type*) [Group G] where
+  /-- The finite set of subgroup parts. -/
+  parts : Finset (Subgroup G)
+  /-- Every part is nonidentity. -/
+  nontrivial : ∀ X, X ∈ parts → X ≠ ⊥
+  /-- Every part is proper. -/
+  proper : ∀ X, X ∈ parts → X ≠ ⊤
+  /-- The parts cover the whole group. -/
+  cover : ∀ g : G, ∃ X, X ∈ parts ∧ g ∈ X
+  /-- Distinct parts intersect trivially. -/
+  inf_eq_bot_of_ne : ∀ {X Y}, X ∈ parts → Y ∈ parts → X ≠ Y → X ⊓ Y = ⊥
+
+namespace SubgroupPartition
+
+variable {G : Type*} [Group G] (partn : SubgroupPartition G)
+
+/-- The set of parts is nonempty. -/
+theorem parts_card_pos : 0 < partn.parts.card := by
+  obtain ⟨X, hX, _⟩ := partn.cover (1 : G)
+  exact Finset.card_pos.mpr ⟨X, hX⟩
+
+/-- Every part contains a nonidentity element. -/
+theorem exists_ne_one_mem {X : Subgroup G} (hX : X ∈ partn.parts) :
+    ∃ x : G, x ∈ X ∧ x ≠ 1 := by
+  by_contra h
+  push Not at h
+  apply partn.nontrivial X hX
+  ext x
+  constructor
+  · intro hx
+    rw [h x hx]
+    exact Subgroup.one_mem ⊥
+  · intro hx
+    rw [Subgroup.mem_bot] at hx
+    rw [hx]
+    exact X.one_mem
+
+/-- A nonidentity element cannot lie in two distinct parts. -/
+theorem eq_of_mem_ne_one {X Y : Subgroup G}
+    (hX : X ∈ partn.parts) (hY : Y ∈ partn.parts)
+    {g : G} (hgX : g ∈ X) (hgY : g ∈ Y) (hg : g ≠ 1) :
+    X = Y := by
+  by_contra hXY
+  have hInf : X ⊓ Y = ⊥ := partn.inf_eq_bot_of_ne hX hY hXY
+  have hgInf : g ∈ X ⊓ Y := ⟨hgX, hgY⟩
+  have hg_one : g = 1 := by
+    simpa [hInf] using hgInf
+  exact hg hg_one
+
+/-- Every nonidentity element lies in a unique partition part. -/
+theorem existsUnique_part_of_ne_one {g : G} (hg : g ≠ 1) :
+    ∃! X : Subgroup G, X ∈ partn.parts ∧ g ∈ X := by
+  obtain ⟨X, hX, hgX⟩ := partn.cover g
+  refine ⟨X, ⟨hX, hgX⟩, ?_⟩
+  intro Y hY
+  exact partn.eq_of_mem_ne_one hY.1 hX hY.2 hgX hg
+
+end SubgroupPartition
+
+/-- Fixed points of the subgroup `H` under an action encoded by `φ : A →* MulAut U`. -/
+def actionFixedPoints {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) (H : Subgroup A) : Subgroup U :=
+  Subgroup.fixedPointsOfMulAut (φ.comp H.subtype)
+
+@[simp]
+theorem mem_actionFixedPoints {A U : Type*} [Group A] [Group U]
+    {φ : A →* MulAut U} {H : Subgroup A} {u : U} :
+    u ∈ actionFixedPoints φ H ↔ ∀ h : H, (φ h) u = u :=
+  Iff.rfl
+
+/-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
+noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
+  ∏ h : H, (φ h) u
+
+/-- The orbit product `u_H` is fixed by every element of `H`. -/
+theorem orbitProduct_mem_actionFixedPoints {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) :
+    orbitProduct φ H u ∈ actionFixedPoints φ H := by
+  intro x
+  calc
+    (φ (x : A)) (orbitProduct φ H u)
+        = ∏ h : H, (φ (x : A)) ((φ h) u) := by
+            simp [orbitProduct]
+    _ = ∏ h : H, (φ ((x * h : H) : A)) u := by
+          refine Finset.prod_congr rfl ?_
+          intro h _hh
+          simp [map_mul]
+    _ = ∏ h : H, (φ (h : A)) u := by
+          exact Fintype.prod_equiv (Equiv.mulLeft x)
+            (fun h : H => (φ ((x * h : H) : A)) u)
+            (fun h : H => (φ (h : A)) u)
+            (fun h => rfl)
+
+end
+
 section /- 6B structural helper: finite abelian Z-groups -/
 
 /-! ### Finite abelian Z-group helpers
