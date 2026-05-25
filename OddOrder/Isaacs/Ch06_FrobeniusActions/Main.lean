@@ -1552,6 +1552,79 @@ private lemma two_le_exponent_of_nonabelian_index_two
   obtain ⟨x, y, hxy⟩ := h_nonab
   exact hxy (IsPGroup.commutative_of_card_eq_prime_sq (p := 2) hcard x y)
 
+private lemma commutative_of_index_two_zpowers_of_commute_generator
+    {P : Type*} [Group P] (c a : P)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_comm : Commute a c) :
+    ∀ x y : P, x * y = y * x := by
+  let C := Subgroup.zpowers c
+  have h_a_inv_notmem : a⁻¹ ∉ C := by
+    intro ha
+    exact h_a_notmem (C.inv_mem_iff.mp ha)
+  have h_repr : ∀ x : P, (∃ m : ℤ, c ^ m = x) ∨ ∃ m : ℤ, x = a * c ^ m := by
+    intro x
+    by_cases hx : x ∈ C
+    · left
+      exact Subgroup.mem_zpowers_iff.mp hx
+    · right
+      have hax : a⁻¹ * x ∈ C := by
+        rw [Subgroup.mul_mem_iff_of_index_two h_idx]
+        exact iff_of_false h_a_inv_notmem hx
+      obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hax
+      exact ⟨m, by
+        calc x = a * (a⁻¹ * x) := by group
+          _ = a * c ^ m := by rw [← hm]⟩
+  intro x y
+  rcases h_repr x with ⟨m, rfl⟩ | ⟨m, rfl⟩
+  · rcases h_repr y with ⟨n, rfl⟩ | ⟨n, rfl⟩
+    · exact (Commute.zpow_zpow_self c m n).eq
+    · have hcm_a : Commute (c ^ m) a := h_comm.symm.zpow_left m
+      calc c ^ m * (a * c ^ n)
+          = a * (c ^ m * c ^ n) := hcm_a.left_comm (c ^ n)
+        _ = a * (c ^ n * c ^ m) := by rw [(Commute.zpow_zpow_self c m n).eq]
+        _ = a * c ^ n * c ^ m := by group
+  · rcases h_repr y with ⟨n, rfl⟩ | ⟨n, rfl⟩
+    · have hcn_a : Commute (c ^ n) a := h_comm.symm.zpow_left n
+      calc (a * c ^ m) * c ^ n
+          = a * (c ^ m * c ^ n) := by group
+        _ = a * (c ^ n * c ^ m) := by rw [(Commute.zpow_zpow_self c m n).eq]
+        _ = c ^ n * (a * c ^ m) := by rw [hcn_a.left_comm]
+    · have ham : Commute a (c ^ m) := h_comm.zpow_right m
+      have han : Commute a (c ^ n) := h_comm.zpow_right n
+      calc (a * c ^ m) * (a * c ^ n)
+          = a * a * (c ^ m * c ^ n) := by
+            rw [mul_assoc, ham.symm.left_comm]
+            group
+        _ = a * a * (c ^ n * c ^ m) := by rw [(Commute.zpow_zpow_self c m n).eq]
+        _ = a * (a * c ^ n) * c ^ m := by group
+        _ = a * (c ^ n * a) * c ^ m := by rw [han.eq]
+        _ = (a * c ^ n) * (a * c ^ m) := by
+            group
+
+private lemma three_le_exponent_of_nonabelian_twist
+    {P : Type*} [Group P] [Finite P] (c a z : P) {k : ℕ}
+    (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (hk : 2 ≤ k)
+    (h_z_pow : z = c ^ (2 ^ (k - 1)))
+    (h_conj : a * c * a⁻¹ = z * c⁻¹) :
+    3 ≤ k := by
+  by_contra hk_not
+  have hk_eq : k = 2 := by omega
+  have h_conj_c : a * c * a⁻¹ = c := by
+    rw [h_conj, h_z_pow, hk_eq]
+    norm_num
+    group
+  have h_comm : Commute a c := by
+    change a * c = c * a
+    calc a * c = (a * c * a⁻¹) * a := by group
+      _ = c * a := by rw [h_conj_c]
+  obtain ⟨x, y, hxy⟩ := h_nonab
+  exact hxy (commutative_of_index_two_zpowers_of_commute_generator c a
+    h_idx h_a_notmem h_comm x y)
+
 private noncomputable def semiDihedralIsoOfTwistInvolution
     {P : Type*} [Group P] [Finite P]
     (c a z : P) (k : ℕ) (hk : 2 ≤ k) (h_order : orderOf c = 2 ^ k)
