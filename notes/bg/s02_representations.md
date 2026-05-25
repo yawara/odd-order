@@ -39,6 +39,7 @@
 - **2026-05-25**: mmd の `[MISSING_PAGE_FAIL:29]` は BG PDF p.29 を `pdftotext` で復元して解消. §2F の証明 sketch に q=p / q≠p / `G*` induction の分岐を反映済み.
 - **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 現在の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
 - **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` / `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. さらに実際の subgroup `fixedOnSubmoduleAndQuotientSubgroup` とその可換性補題を追加済み.
+- **2026-05-25**: p-subgroup の `W` / `V/W` action が scalar characters で書けるなら char p で `fixedOnSubmoduleAndQuotientSubgroup` に入る補題 `subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions` と、faithful 版の可換性補題 `subgroup_commutative_of_isPGroup_scalar_actions` を追加済み. BG の「dim W = dim V/W = 1 なので scalar」段だけが次の橋渡し.
 
 ## TL;DR
 
@@ -384,5 +385,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
-- q=p 分岐で `fixedOnSubmoduleAndQuotientSubgroup` が p-elements と `G'` を含むことを、scalar character helper と determinant/scalar action から接続する.
+- `dim W = 1` / `dim V/W = 1` から subgroup action の scalar character を構成する helper を追加する.
+- その後、q=p 分岐で p-elements と `G'` が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
