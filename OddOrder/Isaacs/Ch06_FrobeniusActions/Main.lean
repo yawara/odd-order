@@ -3112,6 +3112,65 @@ theorem exists_characteristic_lift_quotient_commutator_four_of_center_index_four
   · rwa [hE_map]
   · rwa [hE_map]
 
+/-- **Isaacs Lemma 6.15** (`p = 2` lift cardinality).
+
+If a subgroup `E` contains `T'` and its image in `T/T'` has order `4`, then in the
+Lemma 6.15 `p = 2` setup `E` has order `8`. -/
+theorem card_lift_quotient_commutator_eq_eight_of_center_index_four
+    {T : Type*} [Group T] [Finite T]
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C E : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C)
+    (hcomm_le_E : _root_.commutator T ≤ E)
+    (hE_image_card :
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4) :
+    Nat.card E = 8 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : C.Normal :=
+    normal_of_center_le_of_center_index_pow_two (p := 2) h_idx hZ_lt_C.le
+  have hcomm_card : Nat.card (_root_.commutator T) = 2 :=
+    card_commutator_eq_prime_of_lem_6_15
+      (p := 2) h_idx hC_cyclic hC_lt_T hZ_lt_C
+  have hquot_card :
+      Nat.card (E ⧸ (_root_.commutator T).subgroupOf E) = 4 := by
+    rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map
+      (_root_.commutator T) E]
+    exact hE_image_card
+  have hsub_card :
+      Nat.card ((_root_.commutator T).subgroupOf E) = 2 := by
+    exact (Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe hcomm_le_E).toEquiv).trans hcomm_card
+  have hsplit :
+      Nat.card E =
+        Nat.card (E ⧸ (_root_.commutator T).subgroupOf E) *
+          Nat.card ((_root_.commutator T).subgroupOf E) :=
+    ((_root_.commutator T).subgroupOf E).card_eq_card_quotient_mul_card_subgroup
+  rw [hquot_card, hsub_card] at hsplit
+  norm_num at hsplit
+  exact hsplit
+
+/-- **Isaacs Lemma 6.15** (`p = 2` first lifted subgroup).
+
+The first application of the abelian index-two branch to `T/T'` yields a characteristic
+subgroup `E ≤ T` whose quotient image is elementary abelian of order `4`, and whose own
+order is `8`. -/
+theorem exists_lift_quotient_commutator_order_eight_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_elem, hE_image_card⟩ :=
+    exists_characteristic_lift_quotient_commutator_four_of_center_index_four
+      hT_two h_idx hC_cyclic hC_lt_T hZ_lt_C
+  exact ⟨E, hE_char, hcomm_le_E, hE_elem, hE_image_card,
+    card_lift_quotient_commutator_eq_eight_of_center_index_four
+      h_idx hC_cyclic hC_lt_T hZ_lt_C hcomm_le_E hE_image_card⟩
+
 end
 
 end OddOrder.Isaacs.Ch06
