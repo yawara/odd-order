@@ -67,7 +67,6 @@ The data `(t, e, θ)` provided by the conclusion:
 
 (Proof deferred: requires `InducedCharacter` + `SecondOrthogonality` machinery.) -/
 theorem clifford_decomposition
-    [Fintype G]
     {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) :
     ∃ (t : ℕ) (h_pos : 0 < t) (e : ℕ) (_ : 0 < e) (θ : Fin t → ClassFunction ↥H ℂ),
       Function.Injective θ ∧

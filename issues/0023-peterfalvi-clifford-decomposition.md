@@ -18,7 +18,7 @@ module に置いたまま進める。
 
 - [ ] `OddOrder.RepresentationTheory.clifford_decomposition` の statement を現行
       downstream に合う形で再確認する。
-- [ ] 未使用 `[Fintype G]` warning を proof 方針に合わせて解消する。
+- [x] 未使用 `[Fintype G]` warning を proof 方針に合わせて解消する。
 - [ ] `clifford_decomposition` を `sorry` なしにする、または必要な intermediate
       lemmas を別 issue として切る。
 - [ ] `clifford_orbit_subset_inertia` との接続を確認する。
