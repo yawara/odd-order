@@ -513,6 +513,26 @@ private theorem smul_fin_two_eq_self_of_odd_card
   rw [hσ]
   rfl
 
+/-- In characteristic `p`, a field element whose `p^n`-th power is `1` is `1`.
+
+This is the scalar calculation used in BG Thm 2.6, q = p: the multiplicative
+group of a characteristic-`p` field has no nontrivial `p`-power torsion. -/
+private theorem eq_one_of_pow_prime_pow_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    (x : F) {n : ℕ} (hx : x ^ p ^ n = 1) : x = 1 := by
+  have hsub : (x - 1) ^ p ^ n = 0 := by
+    rw [sub_pow_char_pow_of_commute p n (Commute.one_right x), hx, one_pow, sub_self]
+  have hxsub : x - 1 = 0 := eq_zero_of_pow_eq_zero hsub
+  exact sub_eq_zero.mp hxsub
+
+/-- Unit-valued version of `eq_one_of_pow_prime_pow_eq_one`. -/
+private theorem unit_eq_one_of_pow_prime_pow_eq_one
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    (u : Fˣ) {n : ℕ} (hu : u ^ p ^ n = 1) : u = 1 := by
+  ext
+  exact eq_one_of_pow_prime_pow_eq_one (p := p) (u : F) (by
+    simpa using congrArg Units.val hu)
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
