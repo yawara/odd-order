@@ -45,6 +45,12 @@ G=KR が solvable Frobenius kernel K, complement R を持つとき, N⊳G で K�
 
 1. **First case (N⊆K)**:
    - Lemma 3.1 を quotient に適用: C_K̄(x̄)=1 ∀x∈R^# ⇒ Ḡ Frobenius
+   - Lean status (2026-05-25): `quotient_complement_of_normal_le_kernel`,
+     `quotient_kernel_map_ne_bot_of_not_le`,
+     `quotient_complement_map_ne_bot_of_le_kernel`,
+     `quotient_isFrobeniusGroup_of_le_kernel_of_centralizer` を
+     `OddOrder.BG.Ch1.S03` に追加. 残りは Prop 1.5(d) / Isaacs Cor 3.28 を
+     cyclic action に包装して quotient centralizer 条件を作る部分.
 
 2. **General case**:
    - H:=N∩K とし, Ĝ:=G/H で同じ議論を反復

@@ -26,13 +26,15 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 ## Current status
 
 This file starts the BG §3 layer over the existing Isaacs Ch.6 Frobenius API.
-The first implemented result is the BG Lemma 3.1 equivalence between the
+The first implemented results are the BG Lemma 3.1 equivalence between the
 Frobenius group structure on `G = K R` and the fixed-point-free conjugation
-condition `C_K(x) = 1` for every nonidentity `x ∈ R`.
+condition `C_K(x) = 1` for every nonidentity `x ∈ R`, plus quotient setup
+lemmas for the `N ≤ K` branch of BG Lemma 3.2.
 
 The representation-dependent results 3.3-3.6 and 3.10 will later depend on
 BG §2 representation infrastructure; this initial file intentionally imports
-only the Frobenius infrastructure needed for 3.1.
+only the Frobenius infrastructure needed for 3.1 and the first quotient setup
+for 3.2.
 
 References:
 - BG mmd `references/bg/local-analysis.mmd` L795-1358.
@@ -100,5 +102,123 @@ theorem isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot
           Subgroup.mem_inf.mpr ⟨hy_centralizes, hyK⟩
         rw [hcentral x hxR hx_ne, Subgroup.mem_bot] at hy_inf
         exact hy_ne hy_inf }
+
+/-! ### BG Lemma 3.2 quotient setup: the case `N ≤ K` -/
+
+/-- **BG Lemma 3.2 (quotient setup, `N ≤ K`)**: if `K` and `R` complement each
+other in `G`, and `N ⊴ G` lies in `K`, then their images in `G/N` still
+complement each other.
+
+This is the elementary complement part of the `N ≤ K` branch of BG Lemma 3.2.
+The fixed-point-free centralizer condition in the quotient is supplied by
+BG Prop. 1.5(d) / Isaacs Cor. 3.28 in the next step. -/
+theorem quotient_complement_of_normal_le_kernel
+    {G : Type*} [Group G] {K R N : Subgroup G} [K.Normal] [N.Normal]
+    (hC : Subgroup.IsComplement' K R) (hNK : N ≤ K) :
+    Subgroup.IsComplement'
+      (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    ext q
+    constructor
+    · intro hq
+      rw [Subgroup.mem_inf] at hq
+      obtain ⟨hqK, hqR⟩ := hq
+      obtain ⟨k, hkK, hkq⟩ := hqK
+      obtain ⟨r, hrR, hrq⟩ := hqR
+      rw [Subgroup.mem_bot]
+      have h_eq : (QuotientGroup.mk' N) k = (QuotientGroup.mk' N) r := by
+        rw [hkq, hrq]
+      have h_div : k / r ∈ N :=
+        (QuotientGroup.eq_iff_div_mem (N := N)).mp h_eq
+      have h_divK : k / r ∈ K := hNK h_div
+      have hrK : r ∈ K := by
+        have hrinvK : r⁻¹ ∈ K := by
+          have hmem : k⁻¹ * (k / r) ∈ K :=
+            K.mul_mem (K.inv_mem hkK) h_divK
+          have h_eq_inv : k⁻¹ * (k / r) = r⁻¹ := by
+            rw [div_eq_mul_inv, ← mul_assoc, inv_mul_cancel, one_mul]
+          rwa [h_eq_inv] at hmem
+        simpa using K.inv_mem hrinvK
+      have hr_one : r = 1 := Subgroup.disjoint_def.mp hC.disjoint hrK hrR
+      rw [← hrq, hr_one]
+      simp
+    · intro hq
+      rw [Subgroup.mem_bot] at hq
+      rw [hq]
+      exact Subgroup.one_mem _
+  · rw [Set.eq_univ_iff_forall]
+    intro q
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
+    have hg_top : g ∈ (K ⊔ R : Subgroup G) := by
+      rw [hC.sup_eq_top]
+      trivial
+    rw [Subgroup.mem_sup_of_normal_left] at hg_top
+    obtain ⟨k, hkK, r, hrR, hkr⟩ := hg_top
+    refine ⟨QuotientGroup.mk k, ?_, QuotientGroup.mk r, ?_, ?_⟩
+    · exact Subgroup.mem_map.mpr ⟨k, hkK, rfl⟩
+    · exact Subgroup.mem_map.mpr ⟨r, hrR, rfl⟩
+    · change (QuotientGroup.mk k : G ⧸ N) * QuotientGroup.mk r = QuotientGroup.mk g
+      rw [← QuotientGroup.mk_mul, hkr]
+
+/-- If `K` is not contained in `N`, then the image of `K` in `G/N` is
+nontrivial. -/
+theorem quotient_kernel_map_ne_bot_of_not_le
+    {G : Type*} [Group G] {K N : Subgroup G} [N.Normal]
+    (hKN : ¬ K ≤ N) :
+    K.map (QuotientGroup.mk' N) ≠ ⊥ := by
+  intro hbot
+  apply hKN
+  intro k hkK
+  have hkmap : (QuotientGroup.mk' N) k ∈ K.map (QuotientGroup.mk' N) :=
+    Subgroup.mem_map.mpr ⟨k, hkK, rfl⟩
+  rw [hbot, Subgroup.mem_bot] at hkmap
+  exact (QuotientGroup.eq_one_iff k).mp hkmap
+
+/-- If `R` is nontrivial and complements `K`, then the image of `R` in `G/N`
+is still nontrivial whenever `N ≤ K`. -/
+theorem quotient_complement_map_ne_bot_of_le_kernel
+    {G : Type*} [Group G] {K R N : Subgroup G} [N.Normal]
+    (hC : Subgroup.IsComplement' K R) (hNK : N ≤ K) (hR_ne : R ≠ ⊥) :
+    R.map (QuotientGroup.mk' N) ≠ ⊥ := by
+  intro hbot
+  apply hR_ne
+  rw [← le_bot_iff]
+  intro r hrR
+  have hrmap : (QuotientGroup.mk' N) r ∈ R.map (QuotientGroup.mk' N) :=
+    Subgroup.mem_map.mpr ⟨r, hrR, rfl⟩
+  rw [hbot, Subgroup.mem_bot] at hrmap
+  have hrN : r ∈ N := (QuotientGroup.eq_one_iff r).mp hrmap
+  have hrK : r ∈ K := hNK hrN
+  exact Subgroup.disjoint_def.mp hC.disjoint hrK hrR
+
+/-- **BG Lemma 3.2 (quotient Frobenius assembly, `N ≤ K`)**: in the easy branch
+where `N ⊴ G` lies in the Frobenius kernel `K`, the quotient is a Frobenius
+group as soon as the quotient centralizer condition is known.
+
+The missing input is exactly the BG Prop. 1.5(d) / Isaacs Cor. 3.28 step:
+`C_{K/N}(\bar x)=1` for every nonidentity `\bar x ∈ RN/N`. -/
+theorem quotient_isFrobeniusGroup_of_le_kernel_of_centralizer
+    {G : Type*} [Group G] {K R N : Subgroup G} [N.Normal]
+    (h : IsFrobeniusGroup G K R) (hNK : N ≤ K) (hKN : ¬ K ≤ N)
+    (hcentral :
+      ∀ x ∈ R.map (QuotientGroup.mk' N), x ≠ 1 →
+        Subgroup.centralizer ({x} : Set (G ⧸ N)) ⊓
+          K.map (QuotientGroup.mk' N) = ⊥) :
+    IsFrobeniusGroup
+      (G ⧸ N) (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  letI : K.Normal := h.isNormal
+  have hK_normal : (K.map (QuotientGroup.mk' N)).Normal := inferInstance
+  have hC :
+      Subgroup.IsComplement'
+        (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) :=
+    quotient_complement_of_normal_le_kernel h.isComplement hNK
+  have hK_ne : K.map (QuotientGroup.mk' N) ≠ ⊥ :=
+    quotient_kernel_map_ne_bot_of_not_le hKN
+  have hR_ne : R.map (QuotientGroup.mk' N) ≠ ⊥ :=
+    quotient_complement_map_ne_bot_of_le_kernel h.isComplement hNK h.ne_bot_complement
+  exact
+    (isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot
+      hK_normal hC hK_ne hR_ne).mpr hcentral
 
 end OddOrder.BG.Ch1.S03
