@@ -218,7 +218,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 🔧 **Thm 7.5** action infrastructure 着手: faithful action `G ↪ Aut(V)` の Lean bridge
   (`toMulAut_injective_of_faithful`, `subgroupOfMulAutAction`), `C_V(P)` notation
   (`actionCentralizer`), conjugacy step `C_V(P^g)=C_V(P)^g`
-  (`actionCentralizer_map_conj`) を sorry-free で追加. theorem statement / proof 本体は保留.
+  (`actionCentralizer_map_conj`), generated-subgroup fixed-point step
+  `C_V(P⊔Q)=C_V(P)∩C_V(Q)` (`actionCentralizer_sup`) を sorry-free で追加.
+  theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
 ## 着手順 (提案)

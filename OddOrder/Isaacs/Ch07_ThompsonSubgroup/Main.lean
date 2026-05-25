@@ -1265,6 +1265,36 @@ theorem actionCentralizer_map_conj {A V : Type*} [Group A] [Group V]
     rw [hq']
     simpa [map_mul] using h
 
+/-- The fixed subgroup of a generated subgroup is the intersection of the fixed subgroups.
+
+This is the formal version of the Theorem 7.5 step: if both `P` and `Q` act trivially on `U`,
+then so does `⟨P, Q⟩`. -/
+theorem actionCentralizer_sup {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) :
+    actionCentralizer φ (P ⊔ Q) = actionCentralizer φ P ⊓ actionCentralizer φ Q := by
+  ext v
+  constructor
+  · intro hv
+    exact ⟨actionCentralizer_antitone (show P ≤ P ⊔ Q from le_sup_left) hv,
+      actionCentralizer_antitone (show Q ≤ P ⊔ Q from le_sup_right) hv⟩
+  · rintro ⟨hP, hQ⟩ x
+    have hx : (x : A) ∈ Subgroup.closure ((P : Set A) ∪ (Q : Set A)) := by
+      simpa [Subgroup.sup_eq_closure] using x.property
+    refine Subgroup.closure_induction
+      (p := fun a _ => (φ a) v = v) ?mem ?one ?mul ?inv hx
+    · intro a ha
+      rcases ha with ha | ha
+      · exact hP ⟨a, ha⟩
+      · exact hQ ⟨a, ha⟩
+    · simp
+    · intro a b _ _ ha hb
+      simp [map_mul, hb, ha]
+    · intro a _ ha
+      calc
+        (φ a⁻¹) v = (φ a)⁻¹ v := by rw [map_inv]
+        _ = (φ a)⁻¹ ((φ a) v) := by rw [ha]
+        _ = v := MulAut.inv_apply_self V (φ a) v
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
