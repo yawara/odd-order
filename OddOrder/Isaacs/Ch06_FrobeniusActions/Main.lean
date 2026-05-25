@@ -15,9 +15,11 @@ import Mathlib.GroupTheory.GroupAction.FixedPoints
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
 import Mathlib.SetTheory.Cardinal.Finite
+import OddOrder.GroupTheory.SemiDihedral
 
 /-!
 # OddOrder.Isaacs.Ch06 — Frobenius Actions
@@ -1010,6 +1012,66 @@ theorem centralizer_kernel_le [Finite G] (h : IsFrobeniusGroup G N A) :
   exact h.conj_frobenius a haA ha_ne m hmN hm_ne h_am
 
 end IsFrobeniusGroup
+
+end
+
+section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/
+
+open OddOrder.GroupTheory
+
+/-! ### Isaacs Lemma 6.13 + Cor 6.14: D / Q / SD recognition
+
+mmd L3523-3531 (Lem 6.13) + L3533 (Cor 6.14).
+
+Lem 6.13 takes a finite 2-group `P` with a cyclic subgroup `C = ⟨c⟩` of index 2 and an element
+`a ∈ P − C`, and classifies `P` according to the action of `a` on `c`:
+
+- If `a * c * a⁻¹ = c⁻¹`, then `P ≃* DihedralGroup (orderOf c)` (when `a² = 1`) or
+  `P ≃* QuaternionGroup (orderOf c / 2)` (when `a² ≠ 1`, in which case `a² = z`, the unique
+  involution in `C`).
+- If `a * c * a⁻¹ = z * c⁻¹` where `z` is the unique involution in `C`, then
+  `P ≃* SemiDihedralGroup k` with `2^k = orderOf c`.
+
+Cor 6.14 specializes to `|P| = 8` nonabelian and concludes `P ≃* D_8` or `P ≃* Q_8`
+(i.e., `DihedralGroup 4` or `QuaternionGroup 2` in mathlib indexing).
+
+The iso constructions follow mathlib's `quaternionGroupZeroEquivDihedralGroupZero` pattern
+(Quaternion.lean L152): element-by-element mapping using the partition `P = C ⊔ aC`, then
+`map_mul'` verified by case analysis on the defining relations. -/
+
+/-- **Isaacs Lemma 6.13 (inverting case)**: Let `P` be a finite 2-group with a cyclic subgroup
+`C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = c⁻¹`. Then `P` is isomorphic to either
+the dihedral group `DihedralGroup (orderOf c)` or the generalized quaternion group
+`QuaternionGroup (orderOf c / 2)`. -/
+theorem dihedralOrQuaternion_of_invertingConjugation
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    (c a : P) (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_conj : a * c * a⁻¹ = c⁻¹) :
+    Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
+      Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) := by
+  sorry
+
+/-- **Isaacs Lemma 6.13 (twist case)**: Let `P` be a finite 2-group with a cyclic subgroup
+`C = ⟨c⟩` of index `2`, and `a ∈ P − C` with `a * c * a⁻¹ = z * c⁻¹` where `z` is the unique
+involution in `C`. Then `P ≃* SemiDihedralGroup k` where `2 ^ k = orderOf c`. -/
+theorem semiDihedral_of_twistConjugation
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    (c a z : P) (h_idx : (Subgroup.zpowers c).index = 2)
+    (h_a_notmem : a ∉ Subgroup.zpowers c)
+    (h_z_mem : z ∈ Subgroup.zpowers c) (h_z_sq : z ^ 2 = 1) (h_z_ne : z ≠ 1)
+    (h_z_unique : ∀ y ∈ Subgroup.zpowers c, y ^ 2 = 1 → y ≠ 1 → y = z)
+    (h_conj : a * c * a⁻¹ = z * c⁻¹) :
+    ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k) := by
+  sorry
+
+/-- **Isaacs Corollary 6.14**: A nonabelian group of order `8` is isomorphic to `D_8` or `Q_8`
+(i.e., `DihedralGroup 4` or `QuaternionGroup 2` in mathlib indexing). -/
+theorem dihedralOrQuaternion_of_card_eight
+    {P : Type*} [Group P] [Finite P]
+    (h_card : Nat.card P = 8) (h_nonab : ∃ x y : P, x * y ≠ y * x) :
+    Nonempty (P ≃* DihedralGroup 4) ∨ Nonempty (P ≃* QuaternionGroup 2) := by
+  sorry
 
 end
 
