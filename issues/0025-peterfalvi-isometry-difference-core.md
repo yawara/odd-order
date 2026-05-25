@@ -24,11 +24,21 @@ created: 2026-05-25
 
 ## やること
 
-- [ ] integer coefficient vector 用の小さな structure / predicate を決める。
+- [x] integer coefficient vector 用の小さな structure / predicate を決める。
 - [ ] `n = 2` の norm `2` case を証明する。
 - [ ] `n = 3` の common component 共有 case を証明する。
 - [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する。
 - [ ] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消す。
+
+## 2026-05-26 update
+
+- `SignedIrreducibleDifferenceFamily G n` を追加し、結論側の
+  `μ : Fin n → Irr(G)` と uniform sign `ε = ±1` を structure 化した。
+- `isometry_difference_pair_structure` の input/output を raw `ClassFunction`
+  tuple から `IrreducibleCharacter` index と `SignedIrreducibleDifferenceFamily`
+  に揃えた。
+- proof core は引き続き `n = 2`, `n = 3`, induction step の finite
+  combinatorial argument。
 
 ## 完了条件
 
@@ -40,7 +50,8 @@ created: 2026-05-25
 ## 参照
 
 - parent: `issues/0024-peterfalvi-isometry-difference-pair.md`
-- depends on: `issues/0021-peterfalvi-second-orthogonality.md`
+- depends on: `issues/closed/0021-peterfalvi-second-orthogonality.md`
+- depends on: `issues/0027-peterfalvi-column-orthogonality-core.md`
 - `OddOrder/GroupTheory/RepresentationTheory/IsometryDifferencePair.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/IrrIndexing.lean`
 - `OddOrder/GroupTheory/RepresentationTheory/SecondOrthogonality.lean`
