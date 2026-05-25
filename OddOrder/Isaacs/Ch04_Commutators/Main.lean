@@ -26,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 |---|---|---|---|
 | 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 完成 |
 | 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 4.9-4.13 完成; Mann 後回し |
-| 4C | A acts on G via automorphisms | 4.20 – 4.27 | 4.20-4.23, 4.25-4.27 完成; 4.24 残 |
+| 4C | A acts on G via automorphisms | 4.20 – 4.27 | 完成 |
 | 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 完成 |
 
 ## Mathlib direct correspondence (no wrapper)
@@ -5777,6 +5777,296 @@ private lemma actionCommutatorInfty_fix_ne_bot_of_ne_bot
   intro hC_bot
   apply hL_ne_bot
   exact le_bot_iff.mp (hL_le_C.trans hC_bot.le)
+
+/-! #### Phase 3: quotient induction and the main nilpotence theorem -/
+
+/-- **Quotient descent for the chain hypothesis**:
+if `[G,A,...,A]_m = 1`, then the same iterated commutator is trivial for the
+induced action on `G/N`, provided `N` is normal and `A`-invariant. -/
+private theorem iterCommutator_inl_inr_quotient_eq_bot
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal]
+    (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) {m : ℕ}
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    let φbar : A →* MulAut (G ⧸ N) :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+    iterCommutator (SemidirectProduct.inl : G ⧸ N →* (G ⧸ N) ⋊[φbar] A).range
+        (SemidirectProduct.inr : A →* (G ⧸ N) ⋊[φbar] A).range m = ⊥ := by
+  dsimp
+  let φbar : A →* MulAut (G ⧸ N) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+  let F : G ⋊[φ] A →* (G ⧸ N) ⋊[φbar] A :=
+    SemidirectProduct.map (QuotientGroup.mk' N) (MonoidHom.id A) (fun a => by
+      ext g
+      rfl)
+  let XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  let YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  let Xbar : Subgroup ((G ⧸ N) ⋊[φbar] A) :=
+    (SemidirectProduct.inl : G ⧸ N →* (G ⧸ N) ⋊[φbar] A).range
+  let YAbar : Subgroup ((G ⧸ N) ⋊[φbar] A) :=
+    (SemidirectProduct.inr : A →* (G ⧸ N) ⋊[φbar] A).range
+  have h_map_X : XG.map F = Xbar := by
+    ext x
+    constructor
+    · rintro ⟨_, ⟨g, rfl⟩, rfl⟩
+      exact ⟨QuotientGroup.mk' N g, by simp [F]⟩
+    · rintro ⟨q, rfl⟩
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+      refine ⟨(SemidirectProduct.inl : G →* G ⋊[φ] A) g, ⟨g, rfl⟩, ?_⟩
+      simp [F]
+  have h_map_Y : YA.map F = YAbar := by
+    ext x
+    constructor
+    · rintro ⟨_, ⟨a, rfl⟩, rfl⟩
+      exact ⟨a, by simp [F]⟩
+    · rintro ⟨a, rfl⟩
+      refine ⟨(SemidirectProduct.inr : A →* G ⋊[φ] A) a, ⟨a, rfl⟩, ?_⟩
+      simp [F]
+  have h_map_iter :
+      ∀ n : ℕ, (iterCommutator XG YA n).map F = iterCommutator Xbar YAbar n := by
+    intro n
+    induction n with
+    | zero =>
+        simpa [iterCommutator_zero] using h_map_X
+    | succ n ih =>
+        rw [iterCommutator_succ, iterCommutator_succ, Subgroup.map_commutator, ih, h_map_Y]
+  have h_map_bot : (iterCommutator XG YA m).map F = ⊥ := by
+    rw [h_iter, Subgroup.map_bot]
+  rwa [h_map_iter m] at h_map_bot
+
+/-- If `N` is `A`-invariant, then it is also invariant for the restricted `A^∞`-action. -/
+private lemma isAInvariant_phiInfty_of_isAInvariant
+    {A G : Type*} [Group A] [Group G] [Finite A] {φ : A →* MulAut G}
+    {N : Subgroup G} (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
+    OddOrder.Isaacs.Ch03.IsAInvariant (phiInfty φ) N := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a g hg
+  exact hN.smul_mem a.val hg
+
+/-- **`[G/N, A^∞]` is the image of `[G, A^∞]`** for an `A`-invariant normal subgroup `N`. -/
+private lemma actionCommutatorInfty_quotient_eq_map
+    {A G : Type*} [Group A] [Group G] [Finite A] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal]
+    (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
+    actionCommutatorInfty
+        (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
+      (actionCommutatorInfty φ).map (QuotientGroup.mk' N) := by
+  change actionCommutator
+        (phiInfty (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN)) =
+      (actionCommutator (phiInfty φ)).map (QuotientGroup.mk' N)
+  rw [actionCommutator, actionCommutator, MonoidHom.map_closure]
+  congr 1
+  ext y
+  constructor
+  · rintro ⟨q, a, rfl⟩
+    refine QuotientGroup.induction_on q ?_
+    intro g
+    refine ⟨g * (phiInfty φ a) g⁻¹, ⟨g, a, rfl⟩, ?_⟩
+    simp [map_mul, phiInfty]
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    exact ⟨QuotientGroup.mk' N g, a, by simp [map_mul, phiInfty]⟩
+
+/-- Γ-side form of "`A` centralizes `[G,A^∞]`". -/
+private lemma commutator_inl_GAinf_inr_A_eq_bot_of_fixed
+    {A G : Type*} [Group A] [Group G] [Finite A] {φ : A →* MulAut G}
+    (h : actionCommutatorInfty φ ≤ Subgroup.fixedPointsOfMulAut φ) :
+    ⁅(actionCommutatorInfty φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A),
+      (SemidirectProduct.inr : A →* G ⋊[φ] A).range⁆ = ⊥ := by
+  rw [eq_bot_iff, Subgroup.commutator_le]
+  rintro _ ⟨k, hk, rfl⟩ _ ⟨a, rfl⟩
+  rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+  have h_fix : (φ a) k = k := h hk a
+  rw [show (φ a) k⁻¹ = ((φ a) k)⁻¹ from map_inv (φ a) k, h_fix, mul_inv_cancel]
+  exact map_one _
+
+/-- Γ-side bridge: `⁅inl(G), inr(A^∞)⁆ = inl([G,A^∞])`. -/
+private lemma commutator_inl_range_inr_lowerCentralSeriesInfty_eq_actionCommutatorInfty_map
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G) :
+    ⁅(SemidirectProduct.inl : G →* G ⋊[φ] A).range,
+      (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A)⁆ =
+        (actionCommutatorInfty φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) := by
+  have h_eq_range :
+      (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A) =
+        ((SemidirectProduct.inr : A →* G ⋊[φ] A).comp
+          (lowerCentralSeriesInfty A).subtype).range := by
+    rw [MonoidHom.range_comp]
+    rw [Subgroup.range_subtype]
+  rw [h_eq_range]
+  exact (actionCommutator_map_inl_comp φ (lowerCentralSeriesInfty A).subtype).symm
+
+/-- If `A^∞` centralizes `[G,A]` and `A` centralizes `[G,A^∞]`, then `A^∞` acts
+trivially on `G`. This is the final three-subgroups step in Isaacs Thm 4.24. -/
+private theorem actionCommutatorInfty_eq_bot_of_centralized_and_fixed
+    {A G : Type*} [Group A] [Group G] [Finite A] (φ : A →* MulAut G)
+    (hGA : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ))
+    (hKA : actionCommutatorInfty φ ≤ Subgroup.fixedPointsOfMulAut φ) :
+    actionCommutatorInfty φ = ⊥ := by
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  set YinfA : Subgroup (G ⋊[φ] A) :=
+    (lowerCentralSeriesInfty A).map (SemidirectProduct.inr : A →* G ⋊[φ] A)
+  have h_XG_YA_Yinf : ⁅⁅XG, YA⁆, YinfA⁆ = ⊥ := by
+    have h := commutator_inl_GA_inr_Ainf_eq_bot_of_centralized (φ := φ) hGA
+    simpa [XG, YA, YinfA, actionCommutator_map_inl (φ := φ)] using h
+  have h_YA_XG_Yinf : ⁅⁅YA, XG⁆, YinfA⁆ = ⊥ := by
+    rw [Subgroup.commutator_comm YA XG]
+    exact h_XG_YA_Yinf
+  have h_XG_Yinf_eq :
+      ⁅XG, YinfA⁆ =
+        (actionCommutatorInfty φ).map (SemidirectProduct.inl : G →* G ⋊[φ] A) := by
+    simpa [XG, YinfA] using
+      commutator_inl_range_inr_lowerCentralSeriesInfty_eq_actionCommutatorInfty_map φ
+  have h_XG_Yinf_YA : ⁅⁅XG, YinfA⁆, YA⁆ = ⊥ := by
+    have h := commutator_inl_GAinf_inr_A_eq_bot_of_fixed (φ := φ) hKA
+    simpa [YA, h_XG_Yinf_eq] using h
+  have h_three : ⁅⁅YinfA, YA⁆, XG⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate h_YA_XG_Yinf h_XG_Yinf_YA
+  have h_Yinf_YA : ⁅YinfA, YA⁆ = YinfA := by
+    simp only [YinfA, YA]
+    rw [MonoidHom.range_eq_map (SemidirectProduct.inr : A →* G ⋊[φ] A),
+      ← Subgroup.map_commutator, lowerCentralSeriesInfty_commutator_top]
+  rw [h_Yinf_YA, Subgroup.commutator_comm YinfA XG, h_XG_Yinf_eq] at h_three
+  exact (Subgroup.map_eq_bot_iff_of_injective _ SemidirectProduct.inl_injective).mp h_three
+
+/-- **General form of Isaacs Thm 4.24**: under the chain hypothesis, the stable lower
+central term `A^∞` acts trivially on `G` (no faithfulness assumption). -/
+private theorem actionCommutatorInfty_eq_bot_of_iter_eq_bot_aux :
+    ∀ n : ℕ, ∀ {A G : Type*} [Group A] [Finite A] [Group G] [Finite G],
+      (φ : A →* MulAut G) → ∀ {m : ℕ}, 1 ≤ m →
+      iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥ →
+      Nat.card G ≤ n → actionCommutatorInfty φ = ⊥ := by
+  intro n
+  induction n with
+  | zero =>
+      intro A G _ _ _ _ φ m hm h_iter h_le
+      exact False.elim (Nat.not_succ_le_zero _ (Nat.card_pos.trans_le h_le))
+  | succ n ih =>
+      intro A G _ _ _ _ φ m hm h_iter h_le
+      by_cases hG_nontriv : Nontrivial G
+      swap
+      · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+        change actionCommutator (phiInfty φ) = ⊥
+        rw [actionCommutator_eq_bot_iff_acts_trivially]
+        intro a g
+        exact Subsingleton.elim _ _
+      haveI : Nontrivial G := hG_nontriv
+      set H : Subgroup G := actionCommutator φ with hH_def
+      have hH_ne_top : H ≠ ⊤ := by
+        intro htop
+        have hH_bot : H = ⊥ := by
+          simpa [H, hH_def] using
+            actionCommutator_eq_bot_of_eq_top_iterCommutator_eq_bot φ hm
+              (by simpa [H, hH_def] using htop) h_iter
+        have htop_bot : (⊤ : Subgroup G) = ⊥ := by
+          rw [← htop, hH_bot]
+        exact (top_ne_bot : (⊤ : Subgroup G) ≠ ⊥) htop_bot
+      have hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+        simpa [H, hH_def] using OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator φ
+      let ψH : A →* MulAut H := OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH_inv
+      have h_iter_H :
+          iterCommutator (SemidirectProduct.inl : H →* H ⋊[ψH] A).range
+              (SemidirectProduct.inr : A →* H ⋊[ψH] A).range m = ⊥ := by
+        simpa [ψH] using iterCommutator_inl_inr_restrict_base_eq_bot
+          (φ := φ) (H := H) hH_inv h_iter
+      have hH_card_lt : Nat.card H < Nat.card G :=
+        subgroup_card_lt_of_ne_top hH_ne_top
+      have hH_card_le_n : Nat.card H ≤ n :=
+        Nat.le_of_lt_succ (hH_card_lt.trans_le h_le)
+      have hIH_H : actionCommutatorInfty ψH = ⊥ :=
+        ih ψH hm h_iter_H hH_card_le_n
+      have hGA_fixed_by_Ainf : actionCommutator φ ≤ Subgroup.fixedPointsOfMulAut (phiInfty φ) := by
+        intro g hg
+        rw [Subgroup.mem_fixedPointsOfMulAut]
+        intro a
+        have htriv := (actionCommutator_eq_bot_iff_acts_trivially (phiInfty ψH)).mp
+          hIH_H a ⟨g, by simpa [H, hH_def] using hg⟩
+        have hval := congrArg Subtype.val htriv
+        simpa [ψH, phiInfty] using hval
+      by_cases hK_bot : actionCommutatorInfty φ = ⊥
+      · exact hK_bot
+      let C : Subgroup G := actionCommutatorInfty_fix φ
+      have hC_normal : C.Normal := by
+        simpa [C] using actionCommutatorInfty_fix_normal_of_centralized φ hGA_fixed_by_Ainf
+      haveI : C.Normal := hC_normal
+      have hC_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ C := by
+        simpa [C] using actionCommutatorInfty_fix_isAInvariant φ
+      have hC_ne_bot : C ≠ ⊥ := by
+        simpa [C] using actionCommutatorInfty_fix_ne_bot_of_ne_bot
+          (φ := φ) (m := m) h_iter hK_bot
+      let φbar : A →* MulAut (G ⧸ C) :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hC_inv
+      have h_iter_bar :
+          iterCommutator (SemidirectProduct.inl : G ⧸ C →* (G ⧸ C) ⋊[φbar] A).range
+              (SemidirectProduct.inr : A →* (G ⧸ C) ⋊[φbar] A).range m = ⊥ := by
+        simpa [φbar] using iterCommutator_inl_inr_quotient_eq_bot
+          (φ := φ) (N := C) hC_inv h_iter
+      have hC_card_gt_one : 1 < Nat.card C := by
+        have hC_card_ne_one : Nat.card C ≠ 1 := fun hcard =>
+          hC_ne_bot (Subgroup.card_eq_one.mp hcard)
+        have hpos : 0 < Nat.card C := Nat.card_pos
+        omega
+      have hquot_lt : Nat.card (G ⧸ C) < Nat.card G := by
+        have hcard_eq : Nat.card G = Nat.card (G ⧸ C) * Nat.card C :=
+          C.card_eq_card_quotient_mul_card_subgroup
+        have hq_pos : 0 < Nat.card (G ⧸ C) := Nat.card_pos
+        rw [hcard_eq]
+        simpa [mul_comm] using
+          Nat.mul_lt_mul_of_pos_right hC_card_gt_one hq_pos
+      have hquot_le_n : Nat.card (G ⧸ C) ≤ n :=
+        Nat.le_of_lt_succ (hquot_lt.trans_le h_le)
+      have hIH_bar : actionCommutatorInfty φbar = ⊥ :=
+        ih φbar hm h_iter_bar hquot_le_n
+      have hK_le_C : actionCommutatorInfty φ ≤ C := by
+        have hmap_bot : (actionCommutatorInfty φ).map (QuotientGroup.mk' C) = ⊥ := by
+          rw [← actionCommutatorInfty_quotient_eq_map (φ := φ) (N := C) hC_inv,
+            hIH_bar]
+        have hle_ker : actionCommutatorInfty φ ≤ (QuotientGroup.mk' C).ker :=
+          (Subgroup.map_eq_bot_iff (actionCommutatorInfty φ)).mp hmap_bot
+        simpa [QuotientGroup.ker_mk'] using hle_ker
+      have hK_fixed_by_A : actionCommutatorInfty φ ≤ Subgroup.fixedPointsOfMulAut φ :=
+        hK_le_C.trans (by simp [C, actionCommutatorInfty_fix])
+      exact actionCommutatorInfty_eq_bot_of_centralized_and_fixed φ
+        hGA_fixed_by_Ainf hK_fixed_by_A
+
+/-- **Isaacs Thm 4.24, non-faithful form**:
+under the iterated-commutator chain hypothesis, `A^∞` lies in the kernel of the action. -/
+theorem lowerCentralSeriesInfty_le_ker_of_iter_inl_inr_eq_bot
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    (φ : A →* MulAut G) {m : ℕ} (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    lowerCentralSeriesInfty A ≤ φ.ker := by
+  have hbot : actionCommutatorInfty φ = ⊥ :=
+    actionCommutatorInfty_eq_bot_of_iter_eq_bot_aux (Nat.card G) φ hm h_iter le_rfl
+  change actionCommutator (phiInfty φ) = ⊥ at hbot
+  rw [actionCommutator_eq_bot_iff_acts_trivially] at hbot
+  intro a ha
+  rw [MonoidHom.mem_ker]
+  ext g
+  exact hbot ⟨a, ha⟩ g
+
+/-- **Isaacs Theorem 4.24**: if finite `A` acts faithfully on finite `G` and
+`[G,A,...,A]=1`, then `A` is nilpotent. -/
+theorem isaacs_thm_4_24
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    (φ : A →* MulAut G) (hfaithful : Function.Injective φ)
+    {m : ℕ} (hm : 1 ≤ m)
+    (h_iter : iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range m = ⊥) :
+    Group.IsNilpotent A := by
+  have hAinf_le_ker := lowerCentralSeriesInfty_le_ker_of_iter_inl_inr_eq_bot
+    (φ := φ) hm h_iter
+  have hAinf_bot : lowerCentralSeriesInfty A = ⊥ := by
+    rw [eq_bot_iff]
+    intro a ha
+    have hker : φ a = 1 := by
+      simpa [MonoidHom.mem_ker] using hAinf_le_ker ha
+    have ha_one : a = 1 := hfaithful (by rw [hker, map_one])
+    simp [ha_one]
+  rw [nilpotent_iff_lowerCentralSeries]
+  exact ⟨Nat.card A, by simpa [lowerCentralSeriesInfty] using hAinf_bot⟩
 
 end /- §4C (続 II) -/
 

@@ -120,6 +120,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- faithful action + `[G, A, ..., A] = 1` ⇒ every prime divisor of |A| divides |G|.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
 
+-- Ch.4 (Commutators): Thm 4.24
+-- finite faithful action + `[G, A, ..., A] = 1` ⇒ `A` is nilpotent.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_24
+
 -- Ch.4 (Commutators): Thm 4.31 (external direct-product form)
 -- P p-group, Q p'-group, Q fixes all P-fixed elements ⇒ Q acts trivially.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_31_external

@@ -6,7 +6,7 @@
 
 ## 進捗 (2026-05-25 更新)
 
-Ch04 の FT-critical な §4D は 4.28-4.38 まで sorry-free。残る大きな本体タスクは §4C の 4.24/4.26/4.27 と、低優先の Mann 4.14-4.19。
+Ch04 の FT-critical な §4D は 4.28-4.38 まで sorry-free。§4C は 4.20-4.27 まで sorry-free 完成。残る大きな本体タスクは低優先の Mann 4.14-4.19。
 
 | # | 状態 | 実装 |
 |---|---|---|
@@ -57,7 +57,13 @@ Ch04 の FT-critical な §4D は 4.28-4.38 まで sorry-free。残る大きな�
 - **Cor 4.23** `commutator_le_ker_of_acts_trivially_on_actionCommutator`: `[G, A, A] = 1 ⇒ commutator A ≤ φ.ker`. Faithful 版 `commutator_eq_bot_of_acts_trivially_on_actionCommutator_of_faithful`. 証明: Γ 内 three-subgroups で `⁅⁅YA, YA⁆, XG⁆ = ⊥` (Lem 4.25 と同 Step 1 + Three-subgroups direct application). ~40 LOC.
 - **Thm 4.22 abstract** `derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot`: 任意 H 内 E, X (X ≤ E.normalizer) で `iterCommutator E X m = ⊥ ⇒ ⁅(derivedSeries ↥X (m-1)).map X.subtype, E⁆ = ⊥`. Induction on m: base m=1 trivial, step m=k+1 で `E' := ⁅E, X⁆` + Lem 4.3 + IH + Three-subgroups (H₁=H₂=D, H₃=E). ~80 LOC. helper `iterCommutator_add`.
 - **Thm 4.22 semidirect** `derivedSeries_le_ker_of_iter_inl_inr_eq_bot`: `iter (inl(G).range) (inr(A).range) m = ⊥ ⇒ derivedSeries A (m-1) ≤ φ.ker`. abstract form + bridge + transport (subtype_comp_rangeRestrict + map_derivedSeries_eq). Faithful 版 `derivedSeries_eq_bot_of_iter_inl_inr_eq_bot_of_faithful`. ~50 LOC.
-- 総 ~280 LOC. **残**: Thm 4.24 (A nilpotent, 要 lcs 安定値 A^∞ infra + |G|-induction).
+- 総 ~280 LOC. 後続の Thm 4.24 で lcs 安定値 `A^∞` infra を使用。
+
+§4C **Thm 4.24 完成** (2026-05-25): faithful chain action ⇒ A nilpotent.
+- **`lowerCentralSeriesInfty A` infra**: `lcs A (Nat.card A)` の安定性 `lowerCentralSeriesInfty_commutator_top` / `commutator_top_lowerCentralSeriesInfty`.
+- **`actionCommutatorInfty φ` / `actionCommutatorInfty_fix φ`**: `[G,A^∞]` と `C = C_[G,A∞](A)` を subgroup として実装。`C` は A-invariant、`A^∞` が `[G,A]` を centralize する仮定下で `C ⊴ G`、かつ `[G,A^∞] ≠ ⊥` なら `C ≠ ⊥`。
+- **quotient induction**: `iterCommutator_inl_inr_quotient_eq_bot` と `actionCommutatorInfty_quotient_eq_map` で `G/C` に chain hypothesis を降ろし、IH から `[G,A^∞] ≤ C` を取得。
+- **final three-subgroups step**: `A^∞` centralizes `[G,A]` と `A` centralizes `[G,A^∞]` から `actionCommutatorInfty_eq_bot_of_centralized_and_fixed` を導き、non-faithful form `lowerCentralSeriesInfty_le_ker_of_iter_inl_inr_eq_bot` を証明。faithful 版 `isaacs_thm_4_24` は AxiomsCheck 入り。
 
 §4D **Thm 4.36 ⭐⭐⭐ 完成** (2026-05-25, **= BG Thm 1.11, FT クリティカル**): `p > 2`, `G` p-群, `A` p'-群 fixes order-p ⇒ A trivial on G.
 - **Lem 4.37(b) element form** `baerAdd_pow_self_eq_pow_succ`: `baerAdd (x^n) x = x^(n+1)` (仮定不要). Commute.pow_self + baerAdd_eq_mul_of_commute + pow_succ. ~5 LOC.
@@ -341,7 +347,7 @@ Ch.1, Ch.2 完了かつ Ch.3 §3E (coprime action) が一通り終わってか�
 10. ✅ **§4D 後半 2 (Thm 4.34 Fitting + Cor 4.35)** — BG Prop 1.6(d)(e). **FT クリティカル**.
 11. ✅ **§4D 終盤 (Thm 4.36 + Lemma 4.37 Baer trick + Thm 4.38)** — BG Thm 1.11 そのもの. Baer trick は odd order 専門なので形式化のスタイル確認 (`Odd (Fintype.card G)` の前提下で `√` を定義).
 
-**FT クリティカル優先の現状**: §4D は完了。次に狙うなら §4C の **4.26 → 4.27**（`[G,A]` p-group / nilpotent）で、4.24 は faithful-action 版の Hall nilpotence として別軸。
+**FT クリティカル優先の現状**: §4C と §4D は完了。Ch04 で残るのは下流直接引用の薄い Mann 4.14-4.19。
 
 ## 逆引き: 他章から Ch.4 へ要求される補題
 
