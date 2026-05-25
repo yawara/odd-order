@@ -997,6 +997,40 @@ private theorem subgroup_commutative_of_finrank_two_invariant_submodule
   exact subgroup_commutative_of_rank_one_subquotients
     H W ρ hfaithful hH hW hdimW hdimQ
 
+/-- If a normal p-subgroup has a proper fixed space in a faithful two-dimensional
+representation over characteristic `p`, then every p-subgroup preserving that
+fixed space is abelian.
+
+In BG Thm 2.6, q = p, this is applied to
+`K = Ω₁(Z(O_p(G^*)))` and `W = C_V(K)`.  Nontriviality of `W` is supplied by
+`IsPGroup.invariants_ne_bot`; normality of `K` supplies `G`-invariance. -/
+private theorem subgroup_commutative_of_normal_p_fixed_space_proper
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] {V : Type*} [AddCommGroup V] [Module F V]
+    [Module.Finite F V]
+    (K H : Subgroup G) [K.Normal] (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hK : IsPGroup p K) (hH : IsPGroup p H)
+    (hdim : Module.finrank F V = 2)
+    (hfixed_ne_top : Representation.invariants (ρ.comp K.subtype) ≠ ⊤) :
+    Std.Commutative (· * · : H → H → H) := by
+  let W : Submodule F V := Representation.invariants (ρ.comp K.subtype)
+  have hV_ne_bot : (⊤ : Submodule F V) ≠ ⊥ := by
+    intro hbot
+    have htop : Module.finrank F (⊤ : Submodule F V) = 2 := by
+      simp [hdim]
+    have hzero : Module.finrank F (⊤ : Submodule F V) = 0 := by
+      rw [hbot, finrank_bot]
+    omega
+  have hW_ne_bot : W ≠ ⊥ := by
+    simpa [W] using hK.invariants_ne_bot (ρ.comp K.subtype) hV_ne_bot
+  have hW_ne_top : W ≠ ⊤ := by
+    simpa [W] using hfixed_ne_top
+  have hW_invariant : ∀ h : H, W ≤ W.comap (ρ h) := by
+    intro h
+    exact Representation.le_comap_invariants ρ K h
+  exact subgroup_commutative_of_finrank_two_invariant_submodule
+    H W ρ hfaithful hH hW_invariant hdim hW_ne_bot hW_ne_top
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 

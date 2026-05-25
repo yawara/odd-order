@@ -49,6 +49,10 @@
   `subgroup_commutative_of_finrank_two_invariant_submodule` を追加済み.
   非零 proper な invariant submodule `W` ができれば、2 次元性から rank-one
   subquotient helper へ直接接続して p-subgroup の可換性を得られる.
+- **2026-05-25**: normal p-subgroup の fixed space を直接扱う
+  `subgroup_commutative_of_normal_p_fixed_space_proper` を追加済み.
+  `K ⊴ G`, `K` p-group, `C_V(K) ≠ V` から `IsPGroup.invariants_ne_bot`
+  と `Representation.le_comap_invariants` を組み合わせて p-subgroup の可換性へ接続する.
 
 ## TL;DR
 
