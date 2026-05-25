@@ -144,4 +144,27 @@ the subtype `↥H` is `p`-elementary abelian as a group. -/
 def IsElementaryAbelian (H : Subgroup G) (p : ℕ) : Prop :=
   OddOrder.GroupTheory.IsElementaryAbelian p ↥H
 
+/-- An elementary abelian subgroup of order `p^2` contains two distinct ambient subgroups of
+order `p`. -/
+theorem exists_distinct_subgroups_card_prime_of_isElementaryAbelian_card_prime_sq
+    {H : Subgroup G} [Finite H] {p : ℕ} (hp : p.Prime)
+    (hH : H.IsElementaryAbelian p) (hCard : Nat.card H = p ^ 2) :
+    ∃ K L : Subgroup G, K ≤ H ∧ L ≤ H ∧
+      Nat.card K = p ∧ Nat.card L = p ∧ K ≠ L := by
+  obtain ⟨K₀, L₀, hK₀_card, hL₀_card, hK₀L₀_ne⟩ :=
+    hH.exists_distinct_subgroups_card_prime_of_card_prime_sq hp hCard
+  let K : Subgroup G := K₀.map H.subtype
+  let L : Subgroup G := L₀.map H.subtype
+  have hK_card : Nat.card K = p := by
+    rw [show K = K₀.map H.subtype from rfl,
+      Subgroup.card_map_of_injective H.subtype_injective, hK₀_card]
+  have hL_card : Nat.card L = p := by
+    rw [show L = L₀.map H.subtype from rfl,
+      Subgroup.card_map_of_injective H.subtype_injective, hL₀_card]
+  have hKL_ne : K ≠ L := by
+    intro hKL
+    exact hK₀L₀_ne (Subgroup.map_injective H.subtype_injective hKL)
+  exact ⟨K, L, Subgroup.map_subtype_le K₀, Subgroup.map_subtype_le L₀,
+    hK_card, hL_card, hKL_ne⟩
+
 end Subgroup
