@@ -24,10 +24,10 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 部分 (Lem 4.1, 4.3, 4.6 完成) |
-| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 部分 (Cor 4.10, Thm 4.11, Cor 4.12, Cor 4.13 完成) |
+| 4A | 交換子の基礎 + 下降中心列 + maximal class p-群 + Ω_r | 4.1 – 4.8 | 部分 |
+| 4B | Hall-Witt + three-subgroups lemma + Mann | 4.9 – 4.19 | 部分 |
 | 4C | A acts on G via automorphisms | 4.20 – 4.27 | TODO (coprime action machinery 要) |
-| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 部分 (Lem 4.32 完成; 残 coprime action 要) |
+| 4D | Coprime action: Fitting + Thompson P×Q + Baer | 4.28 – 4.38 | 部分 |
 
 ## Mathlib direct correspondence (no wrapper)
 
@@ -84,7 +84,7 @@ theorem subgroup_le_normalizer_commutator_self (H K : Subgroup G) :
         have hKH : ⁅k, h⁆ ∈ (⁅K, H⁆ : Subgroup G) :=
           Subgroup.commutator_mem_commutator hk hh
         rwa [Subgroup.commutator_comm] at hKH
-    | one => simpa using one_mem _
+    | one => simp
     | mul x y _ _ ihx ihy =>
       have eq : h * (x * y) * h⁻¹ = (h * x * h⁻¹) * (h * y * h⁻¹) := by group
       rw [eq]
@@ -239,8 +239,8 @@ Isaacs は `p`-群 + `n = p^e` で述べるが, 証明は class ≤ 2 + 任意 `
 全 `z` と可換 ⇒ `x^n ∈ Z(G)`. -/
 theorem pow_mem_center_of_class_le_two_of_commutator_pow
     {n : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hExp : ∀ c ∈ _root_.commutator G, c^n = 1) (x : G) :
-    x^n ∈ Subgroup.center G := by
+    (hExp : ∀ c ∈ _root_.commutator G, c ^ n = 1) (x : G) :
+    x ^ n ∈ Subgroup.center G := by
   rw [Subgroup.mem_center_iff]
   intro z
   rw [eq_comm, ← commutatorElement_eq_one_iff_mul_comm,
@@ -248,13 +248,13 @@ theorem pow_mem_center_of_class_le_two_of_commutator_pow
   exact hExp ⁅x, z⁆ (commutatorElement_mem_commutator_top x z)
 
 /-- **Isaacs Lemma 4.4** (elementary abelian corollary, "In particular" 部分):
-`commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c^p = 1)
+`commutator G ≤ Z(G)` + `P'` が `p`-elementary abelian (∀ c ∈ G', c ^ p = 1)
 ⇒ `G/Z(G)` も `p`-elementary abelian.
 
 (Φ(G) ⊆ Z(G) への帰結は Lem 4.5 forward を経由: 後段 `frattini_le_center_of_...` 参照.) -/
 theorem isElementaryAbelian_quotient_center_of_class_le_two
     {p : ℕ} (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hExp : ∀ c ∈ _root_.commutator G, c^p = 1) :
+    (hExp : ∀ c ∈ _root_.commutator G, c ^ p = 1) :
     OddOrder.GroupTheory.IsElementaryAbelian p (G ⧸ Subgroup.center G) := by
   refine ⟨?_, ?_⟩
   · exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hC).comm
@@ -288,7 +288,7 @@ private lemma index_eq_prime_of_isCoatom_of_pgroup
   -- k ≥ 1 (else |P/M| = 1, so M = ⊤)
   have hk_pos : 1 ≤ k := by
     by_contra h
-    push_neg at h
+    push Not at h
     interval_cases k
     rw [pow_zero] at hk
     have hsub : Subsingleton (P ⧸ M) := Nat.card_eq_one_iff_unique.mp hk |>.1
@@ -452,7 +452,9 @@ private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
       Subgroup.relIndex_mul_index hMK_le
     rw [h_idx] at h_eq
     -- K.index ∣ p, so K.index = 1 or p
-    have h_dvd : K.index ∣ p := ⟨M.relIndex K, by linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]⟩
+    have h_dvd : K.index ∣ p := by
+      refine ⟨M.relIndex K, ?_⟩
+      linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]
     rcases hp.eq_one_or_self_of_dvd _ h_dvd with h1 | hp_eq
     · -- K.index = 1 ⇒ K = ⊤
       have hK_top : K = ⊤ := Subgroup.index_eq_one.mp h1
@@ -597,7 +599,7 @@ For finite `p`-group `P` of class ≤ 2 with `commutator P` `p`-elementary abeli
 theorem frattini_le_center_of_class_le_two_of_commutator_pow_eq_one
     {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
     (hC : _root_.commutator P ≤ Subgroup.center P)
-    (hExp : ∀ c ∈ _root_.commutator P, c^p = 1) :
+    (hExp : ∀ c ∈ _root_.commutator P, c ^ p = 1) :
     frattini P ≤ Subgroup.center P :=
   frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP
     (isElementaryAbelian_quotient_center_of_class_le_two hC hExp)
@@ -1029,7 +1031,7 @@ theorem lowerCentralSeries_map_eq_of_surjective {G H : Type*} [Group G] [Group H
 theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P)
     {A : Subgroup P} [A.Normal]
-    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCyc : IsCyclic (P ⧸ A))
     (hAcard : Nat.card A = p)
     (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
@@ -1065,7 +1067,7 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
   have hP_nontrivial : Nontrivial P := by
     obtain ⟨x, hx_in_A, hx_ne⟩ : ∃ x : P, x ∈ A ∧ x ≠ 1 := by
       by_contra h
-      push_neg at h
+      push Not at h
       apply hA_ne_bot
       rw [Subgroup.eq_bot_iff_forall]
       exact h
@@ -1107,7 +1109,7 @@ private lemma card_map_mk_mul_card_inf_eq_card {G : Type*} [Group G] [Finite G]
   rw [hker, hrange] at hQ
   rw [← hQ]; exact hLagr
 
-/-- **Isaacs Thm 4.7** ⭐: Let `A ⊴ P` abelian, `P` a p-group, `|A| = p^m`, `P/A` cyclic,
+/-- **Isaacs Thm 4.7** ⭐: Let `A ⊴ P` abelian, `P` a p-group, `|A| = p ^ m`, `P/A` cyclic,
 `|A ⊓ Z(P)| = p`. Then `Group.nilpotencyClass P = m`.
 
 **Proof** (Isaacs p.118-119): Induction on `m`.
@@ -1125,7 +1127,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCyc : IsCyclic (P ⧸ A))
-    (hAcard : Nat.card A = p^m)
+    (hAcard : Nat.card A = p ^ m)
     (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
     Group.nilpotencyClass P = m := by
   induction m generalizing P with
@@ -1324,7 +1326,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
           exact hx_notZ (Subgroup.mem_inf.mpr ⟨hx_in_A, hxZP⟩)
         -- So ∃ y, [x, y] ≠ 1 (x not in center)
         rw [Subgroup.mem_center_iff] at hx_notZP
-        push_neg at hx_notZP
+        push Not at hx_notZP
         obtain ⟨y, hxy⟩ := hx_notZP
         -- [x, y] ∈ ⁅lcs P (k-1), ⊤⁆ = lcs P k via lcs definition
         have h_xy_in_kp : ⁅x, y⁆ ∈ lowerCentralSeries P ((k - 1) + 1) := by
@@ -1342,7 +1344,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
       exact lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp h_lcs_P_kp1
     · -- ≥ : NOT (nilpotencyClass ≤ k)
       by_contra h
-      push_neg at h
+      push Not at h
       have : lowerCentralSeries P k = ⊥ :=
         lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (Nat.lt_succ_iff.mp h)
       exact h_lcs_P_k_ne this
@@ -1495,7 +1497,7 @@ def setOfPowEqOne (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ}
 仮定で `⁅y, x⁆^p = 1` + `p` odd ⇒ `p ∣ p(p-1)/2` ⇒ `⁅y, x⁆^(p(p-1)/2) = 1`.
 よって `(xy)^p = x^p · y^p`. `1^p = 1` は自明. -/
 def powPHom (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ} (hp : Odd p)
-    (hcomp : ∀ c ∈ _root_.commutator G, c^p = 1) : G →* G where
+    (hcomp : ∀ c ∈ _root_.commutator G, c ^ p = 1) : G →* G where
   toFun x := x^p
   map_one' := one_pow p
   map_mul' x y := by
@@ -2617,7 +2619,7 @@ theorem actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
   -- ∃ g ∈ actionCommutator with g ≠ 1
   obtain ⟨g_elem, hg_in, hg_ne⟩ : ∃ g ∈ actionCommutator φ, g ≠ 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     apply h_ne_bot
     rw [Subgroup.eq_bot_iff_forall]
     exact h
@@ -2806,7 +2808,7 @@ RHS = `(xy·S_{yx}) * z * S_{(z, xy·S_{yx})}`:
 - `z` moves past central `S_{yx}` ⇒ `xyz·S_{yx}·S_{⁅z,x⁆·⁅z,y⁆}`
 - `S_{⁅z,x⁆·⁅z,y⁆} = S_{z,x} * S_{z,y}`. -/
 lemma baerAdd_assoc {G : Type*} [Group G] (hC : _root_.commutator G ≤ Subgroup.center G)
-    (hOdd : Odd (Nat.card G)) (x y z : G) :
+    (x y z : G) :
     baerAdd x (baerAdd y z) = baerAdd (baerAdd x y) z := by
   -- Notation: S_{ab} = sqrtOdd ⁅a, b⁆
   set Syz : G := sqrtOdd ⁅z, y⁆
@@ -2968,7 +2970,7 @@ noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
         (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG z)))))
     simp only [BaerMul.toG_ofG]
     exact congr_arg BaerMul.ofG
-      (baerAdd_assoc hC.out hOdd.out (BaerMul.toG x) (BaerMul.toG y) (BaerMul.toG z)).symm
+      (baerAdd_assoc hC.out (BaerMul.toG x) (BaerMul.toG y) (BaerMul.toG z)).symm
   one_mul x := by
     show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG 1)) (BaerMul.toG x)) = x
     simp only [BaerMul.toG_ofG, baerAdd_one_left]
@@ -3273,8 +3275,7 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
             G ⋊[φ] A) = SemidirectProduct.inl ⁅g, k⁆ from by
           simp [commutatorElement_def, ← map_mul, ← map_inv]]
         refine ⟨⁅g, k⁆, ?_, rfl⟩
-        -- ⁅g, k⁆ ∈ G': G' = commutator G is normal, k ∈ G', g ∈ G ⇒ ⁅g, k⁆ ∈ G'
-        -- Actually: ⁅g, k⁆ = g k g⁻¹ k⁻¹. Since k ∈ G' and G' normal, g k g⁻¹ ∈ G'. Then (g k g⁻¹) * k⁻¹ ∈ G'.
+        -- Since G' is normal, both `g * k * g⁻¹` and `k⁻¹` lie in G'.
         have hG'_normal : G'.Normal := inferInstance
         have h_gkg : g * k * g⁻¹ ∈ G' := hG'_normal.conj_mem k hk g
         have h_inv : k⁻¹ ∈ G' := G'.inv_mem hk
