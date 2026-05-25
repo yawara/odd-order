@@ -6,9 +6,12 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Group.Conj
+import Mathlib.Algebra.GroupWithZero.Invertible
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.Algebra.Star.Basic
+import Mathlib.Data.Fintype.Card
+import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Class functions on a group
@@ -215,6 +218,23 @@ or formally as `Nat.card G : ℂ`). -/
 def innerSum (φ ψ : ClassFunction G k) : k :=
   ∑ g : G, φ g * star (ψ g)
 
+/-- Peterfalvi's normalized class-function inner product.
+
+The explicit `Invertible` assumption keeps the definition available over any
+coefficient ring where `|G|` has a chosen inverse. -/
+def inner [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) : k :=
+  ⅟(Nat.card G : k) * innerSum φ ψ
+
+@[simp] theorem inner_eq_inv_card_mul_innerSum [Invertible (Nat.card G : k)]
+    (φ ψ : ClassFunction G k) :
+    inner φ ψ = ⅟(Nat.card G : k) * innerSum φ ψ :=
+  rfl
+
+@[simp] theorem card_mul_inner [Invertible (Nat.card G : k)]
+    (φ ψ : ClassFunction G k) :
+    (Nat.card G : k) * inner φ ψ = innerSum φ ψ := by
+  rw [inner, ← mul_assoc, mul_invOf_self, one_mul]
+
 @[simp] theorem innerSum_zero_left (ψ : ClassFunction G k) :
     innerSum (0 : ClassFunction G k) ψ = 0 := by
   simp [innerSum]
@@ -244,6 +264,38 @@ theorem innerSum_neg_left (φ ψ : ClassFunction G k) :
 theorem innerSum_neg_right (φ ψ : ClassFunction G k) :
     innerSum φ (-ψ) = -innerSum φ ψ := by
   simp [innerSum, mul_neg, Finset.sum_neg_distrib]
+
+@[simp] theorem inner_zero_left [Invertible (Nat.card G : k)] (ψ : ClassFunction G k) :
+    inner (0 : ClassFunction G k) ψ = 0 := by
+  simp [inner]
+
+@[simp] theorem inner_zero_right [Invertible (Nat.card G : k)] (φ : ClassFunction G k) :
+    inner φ (0 : ClassFunction G k) = 0 := by
+  simp [inner]
+
+theorem inner_add_left [Invertible (Nat.card G : k)]
+    (φ₁ φ₂ ψ : ClassFunction G k) :
+    inner (φ₁ + φ₂) ψ = inner φ₁ ψ + inner φ₂ ψ := by
+  simp [inner, innerSum_add_left, mul_add]
+
+theorem inner_add_right [Invertible (Nat.card G : k)]
+    (φ ψ₁ ψ₂ : ClassFunction G k) :
+    inner φ (ψ₁ + ψ₂) = inner φ ψ₁ + inner φ ψ₂ := by
+  simp [inner, innerSum_add_right, mul_add]
+
+theorem inner_smul_left [Invertible (Nat.card G : k)]
+    (c : k) (φ ψ : ClassFunction G k) :
+  inner (c • φ) ψ = c * inner φ ψ := by
+  rw [inner, innerSum_smul_left, inner]
+  rw [← mul_assoc, mul_comm (⅟(Nat.card G : k)) c, mul_assoc]
+
+theorem inner_neg_left [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
+    inner (-φ) ψ = -inner φ ψ := by
+  simp [inner, innerSum_neg_left]
+
+theorem inner_neg_right [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
+    inner φ (-ψ) = -inner φ ψ := by
+  simp [inner, innerSum_neg_right]
 
 end Inner
 

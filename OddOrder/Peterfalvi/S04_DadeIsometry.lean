@@ -22,12 +22,13 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 This file starts the formal interface for the Dade isometry.  The full theorem
 has two parts:
 
-* **(2.6.a)** inner-product preservation for the map
+* **(2.6.a)** normalized inner-product preservation for the map
   `CF(L, A) → ClassFunction G`;
 * **(2.6.b)** preservation of virtual characters.
 
 The virtual-character lattice `Z[Irr G]` is not available yet, so the first
-slice records the `(2.2)` hypothesis and the inner-product/isometry interface.
+slice records the `(2.2)` hypothesis and the normalized inner-product/isometry
+interface.
 The `Z[Irr]` field should be added to this same interface once the Wave 1a
 `ZIrr` module lands.
 
@@ -305,18 +306,18 @@ end DadeMap
 
 variable [StarRing k]
 variable [Fintype G] [Fintype L]
+variable [Invertible (Nat.card G : k)] [Invertible (Nat.card L : k)]
 
 /-- The currently available part of the Dade isometry interface: preservation
-of the unscaled class-function inner sum.
+of Peterfalvi's normalized class-function inner product.
 
-Peterfalvi's normalized inner product divides both sides by group orders.  The
-normalization is intentionally postponed until the scalar field and denominator
-API for `ℂ` are fixed. -/
+The virtual-character preservation field from (2.6.b) is intentionally
+postponed until the `Z[Irr]` lattice is available. -/
 structure IsDadeIsometry (τ : DadeMap (G := G) k A L) : Prop where
-  inner_sum_eq :
+  inner_eq :
     ∀ α β : SupportedClassFunctions (G := G) k A L,
-      ClassFunction.innerSum (τ α) (τ β) =
-        ClassFunction.innerSum (α : ClassFunction L k) (β : ClassFunction L k)
+      ClassFunction.inner (τ α) (τ β) =
+        ClassFunction.inner (α : ClassFunction L k) (β : ClassFunction L k)
 
 namespace IsDadeIsometry
 
@@ -326,8 +327,8 @@ This is the currently formalized part of Peterfalvi (2.11). -/
 theorem restrictDomain {τ : DadeMap (G := G) k A L} (hτ : IsDadeIsometry τ)
     (hA₁A : A₁ ⊆ A) :
     IsDadeIsometry (DadeMap.restrictDomain (G := G) (k := k) (L := L) τ hA₁A) where
-  inner_sum_eq α β := by
-    simpa using hτ.inner_sum_eq
+  inner_eq α β := by
+    simpa using hτ.inner_eq
       (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α)
       (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A β)
 
