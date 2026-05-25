@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
@@ -490,6 +491,23 @@ private theorem pgroup_action_card_ge_prime_succ_of_moved
   rw [Finite.card_option] at hoption_le
   exact (Nat.add_le_add_right hp_le_orbit 1).trans hoption_le
 
+private theorem cyclic_two_group_mulAut_isPGroup
+    {G : Type*} [Group G] [Finite G] [IsCyclic G] (hG : IsPGroup 2 G) :
+    IsPGroup 2 (MulAut G) := by
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hG
+  rcases k with _ | k
+  · apply IsPGroup.of_card (p := 2) (n := 0)
+    rw [IsCyclic.card_mulAut, hk, pow_zero, Nat.totient_one]
+  · apply IsPGroup.of_card (p := 2) (n := k)
+    rw [IsCyclic.card_mulAut, hk, Nat.totient_prime_pow_succ Nat.prime_two]
+    norm_num
+
+private theorem isCyclic_of_comm_two_group_unique_order_two
+    {G : Type*} [CommGroup G] [Finite G] (hG : IsPGroup 2 G)
+    (huniq : ∀ x y : G, orderOf x = 2 → orderOf y = 2 → x = y) :
+    IsCyclic G := by
+  sorry
+
 /-! ### Isaacs Lem 7.3 — GL(2,p) 補題 (formal statement + skeleton)
 
 **Isaacs Lem 7.3** (mmd L3739): `p ≠ 2` prime, `P ≤ GL(2, ZMod p)` p-subgroup,
@@ -831,7 +849,111 @@ private theorem lem73_aux
             y * x = (y * x * y⁻¹) * y := by group
             _ = x * y := by rw [hconj]
         by_cases hq_eq_two : q = 2
-        · sorry  -- Step l: q = 2, cyclic 2-group / automorphism group branch.
+        · have hL_2group : IsPGroup 2 ↥L := by
+            simpa [hq_eq_two] using hL_qgroup
+          have hL_comm : ∀ x y : ↥L, x * y = y * x :=
+            hL2abelian L le_rfl hL_2group
+          letI : CommGroup ↥L := { (inferInstance : Group ↥L) with mul_comm := hL_comm }
+          have hzmod_two_ne_zero : (2 : ZMod p) ≠ 0 := by
+            intro hzero
+            have hp_dvd_two : p ∣ 2 := (ZMod.natCast_eq_zero_iff 2 p).mp hzero
+            rcases (Nat.dvd_prime Nat.prime_two).mp hp_dvd_two with hp_eq_one | hp_eq_two
+            · exact (Fact.out : p.Prime).ne_one hp_eq_one
+            · exact hp2 hp_eq_two
+          have hL_unique_order_two :
+              ∀ x y : ↥L, orderOf x = 2 → orderOf y = 2 → x = y := by
+            intro x y hx_order hy_order
+            rcases hL_le_SL_range x.2 with ⟨sx, hsx⟩
+            rcases hL_le_SL_range y.2 with ⟨sy, hsy⟩
+            have hx_ne_one : x ≠ 1 := by
+              intro hx_one
+              have : orderOf x = 1 := by simp [hx_one]
+              omega
+            have hy_ne_one : y ≠ 1 := by
+              intro hy_one
+              have : orderOf y = 1 := by simp [hy_one]
+              omega
+            have hxGL_sq :
+                ((x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) ^ 2) = 1 := by
+              have h := congrArg (fun z : ↥L =>
+                (z : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) (pow_orderOf_eq_one x)
+              simpa [hx_order] using h
+            have hyGL_sq :
+                ((y : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) ^ 2) = 1 := by
+              have h := congrArg (fun z : ↥L =>
+                (z : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) (pow_orderOf_eq_one y)
+              simpa [hy_order] using h
+            have hsx_sq : sx ^ 2 = 1 := by
+              apply Matrix.SpecialLinearGroup.toGL_injective
+              change toGLSL (sx ^ 2) = toGLSL 1
+              rw [map_pow, map_one, hsx]
+              exact hxGL_sq
+            have hsy_sq : sy ^ 2 = 1 := by
+              apply Matrix.SpecialLinearGroup.toGL_injective
+              change toGLSL (sy ^ 2) = toGLSL 1
+              rw [map_pow, map_one, hsy]
+              exact hyGL_sq
+            have hsx_ne_one : sx ≠ 1 := by
+              intro hsx_one
+              apply hx_ne_one
+              have hx_val : (x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) = 1 := by
+                calc
+                  (x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) = toGLSL sx := hsx.symm
+                  _ = toGLSL 1 := by rw [hsx_one]
+                  _ = 1 := map_one toGLSL
+              exact Subtype.ext hx_val
+            have hsy_ne_one : sy ≠ 1 := by
+              intro hsy_one
+              apply hy_ne_one
+              have hy_val : (y : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) = 1 := by
+                calc
+                  (y : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) = toGLSL sy := hsy.symm
+                  _ = toGLSL 1 := by rw [hsy_one]
+                  _ = 1 := map_one toGLSL
+              exact Subtype.ext hy_val
+            have hsx_eq_neg : sx = -1 :=
+              sl2_unique_involution hzmod_two_ne_zero hsx_sq hsx_ne_one
+            have hsy_eq_neg : sy = -1 :=
+              sl2_unique_involution hzmod_two_ne_zero hsy_sq hsy_ne_one
+            apply Subtype.ext
+            change (x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) =
+              (y : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
+            rw [← hsx, ← hsy, hsx_eq_neg, hsy_eq_neg]
+          haveI hL_cyclic : IsCyclic ↥L :=
+            isCyclic_of_comm_two_group_unique_order_two hL_2group hL_unique_order_two
+          have hAut_2 : IsPGroup 2 (MulAut ↥L) :=
+            cyclic_two_group_mulAut_isPGroup hL_2group
+          have htop_P_p : IsPGroup p (⊤ : Subgroup ↥P) :=
+            hPp.to_subgroup ⊤
+          have hRange_p : IsPGroup p φ.range := by
+            rw [φ.range_eq_map]
+            exact htop_P_p.map φ
+          have hRange_2 : IsPGroup 2 φ.range :=
+            hAut_2.to_subgroup φ.range
+          have hRange_coprime :
+              Nat.Coprime (Nat.card ↥φ.range) (Nat.card ↥φ.range) :=
+            IsPGroup.coprime_card_of_ne p 2 hp2 φ.range φ.range hRange_p hRange_2
+          have hRange_card_one : Nat.card ↥φ.range = 1 :=
+            Nat.eq_one_of_dvd_coprimes hRange_coprime dvd_rfl dvd_rfl
+          have hRange_bot : φ.range = ⊥ :=
+            Subgroup.card_eq_one.mp hRange_card_one
+          have hphi_triv : φ = 1 :=
+            MonoidHom.range_eq_bot_iff.mp hRange_bot
+          intro a ha
+          rw [Subgroup.mem_centralizer_iff]
+          intro l hl
+          have hfix : (φ ⟨a, ha⟩) ⟨l, hl⟩ = ⟨l, hl⟩ := by
+            rw [hphi_triv]
+            simp
+          have hconj : a * l * a⁻¹ = l := by
+            have := congrArg (fun z : ↥L =>
+              (z : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) hfix
+            simpa [hphi_val ⟨a, ha⟩ ⟨l, hl⟩] using this
+          have hcomm : a * l = l * a := by
+            calc
+              a * l = (a * l * a⁻¹) * a := by group
+              _ = l * a := by rw [hconj]
+          exact hcomm.symm
         · exfalso
           obtain ⟨a_move, x_move, hmove⟩ := hP_moves_L
           have hL_card_ge_p_succ : p + 1 ≤ Nat.card ↥L :=
