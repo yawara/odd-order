@@ -650,6 +650,25 @@ private theorem commutative_of_faithful_representation_fixed_on_submodule_and_qu
   commutative_of_injective_representation_mrange_commutative ρ hfaithful
     (representation_mrange_commutative_of_fixed_on_submodule_and_quotient W ρ hρ)
 
+/-- Subgroup-restriction form of
+`commutative_of_faithful_representation_fixed_on_submodule_and_quotient`.
+
+This is the shape needed for BG Thm 2.6, q = p, where
+`H = C_G(W) ∩ C_G(V/W)`. -/
+private theorem subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (H : Subgroup G) (W : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hH : ∀ h : H, (∀ w ∈ W, ρ h w = w) ∧ (∀ v, ρ h v - v ∈ W)) :
+    Std.Commutative (· * · : H → H → H) := by
+  apply commutative_of_faithful_representation_fixed_on_submodule_and_quotient W
+    (ρ.comp H.subtype)
+  · intro x y hxy
+    apply Subtype.ext
+    exact hfaithful hxy
+  · exact hH
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
