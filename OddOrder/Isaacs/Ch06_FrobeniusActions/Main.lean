@@ -3270,6 +3270,119 @@ private lemma not_ge_of_ne_of_ne_top_of_index_two
     exact hE_ne_C (le_antisymm hE_le_C hC_le_E)
   · exact hE_ne_top (Subgroup.index_eq_one.mp hidx)
 
+/-- Finite subgroup cardinality strictly drops for a proper subgroup. -/
+private lemma subgroup_card_lt_of_lt_top
+    {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H < ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH.ne (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- In a finite cyclic group, the subgroup cut out by `x ^ |K| = 1` is exactly `K`. -/
+private lemma mem_of_pow_card_eq_one_of_isCyclic_subgroup
+    {A : Type*} [Group A] [Finite A] (hA_cyclic : IsCyclic A)
+    (K : Subgroup A) {x : A} (hx : x ^ Nat.card K = 1) :
+    x ∈ K := by
+  classical
+  haveI : IsCyclic A := hA_cyclic
+  haveI : Fintype A := Fintype.ofFinite A
+  letI : CommGroup A := IsCyclic.commGroup
+  let P : Subgroup A := {
+    carrier := {x | x ^ Nat.card K = 1}
+    one_mem' := by simp
+    mul_mem' := by
+      intro x y hx hy
+      change (x * y) ^ Nat.card K = 1
+      rw [mul_pow, hx, hy, mul_one]
+    inv_mem' := by
+      intro x hx
+      change x⁻¹ ^ Nat.card K = 1
+      rw [inv_pow, hx, inv_one]
+  }
+  have hK_le_P : K ≤ P := by
+    intro y hy
+    dsimp [P]
+    have h_sub :
+        (⟨y, hy⟩ : K) ^ Nat.card K = 1 := pow_card_eq_one'
+    exact congrArg Subtype.val h_sub
+  have hP_card_le : Nat.card P ≤ Nat.card K := by
+    haveI : Fintype P := Fintype.ofFinite P
+    have hroot :=
+      (IsCyclic.card_pow_eq_one_le (α := A) (n := Nat.card K) Nat.card_pos)
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    dsimp [P]
+    rw [Fintype.card_subtype]
+    simpa [Nat.card_eq_fintype_card] using hroot
+  have hKP : K = P := Subgroup.eq_of_le_of_card_ge hK_le_P hP_card_le
+  rw [hKP]
+  exact hx
+
+/-- In a finite cyclic `2`-group, every proper subgroup lies in any subgroup of index `2`. -/
+private lemma le_index_two_subgroup_of_lt_top_of_cyclic_two_group
+    {A : Type*} [Group A] [Finite A] (hA_two : IsPGroup 2 A) (hA_cyclic : IsCyclic A)
+    {Z H : Subgroup A} (hZ_idx : Z.index = 2) (hH_lt_top : H < ⊤) :
+    H ≤ Z := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨kA, hA_card⟩ := (IsPGroup.iff_card (p := 2) (G := A)).mp hA_two
+  obtain ⟨kH, hH_card⟩ := (IsPGroup.iff_card (p := 2) (G := H)).mp
+    (hA_two.to_subgroup H)
+  obtain ⟨kZ, hZ_card⟩ := (IsPGroup.iff_card (p := 2) (G := Z)).mp
+    (hA_two.to_subgroup Z)
+  have hZ_mul : 2 * Nat.card Z = Nat.card A := by
+    simpa [hZ_idx] using Z.index_mul_card
+  have hkA_eq : kA = kZ + 1 := by
+    have hpow : 2 ^ (kZ + 1) = 2 ^ kA := by
+      calc
+        2 ^ (kZ + 1) = 2 * 2 ^ kZ := by
+          rw [pow_succ']
+        _ = 2 * Nat.card Z := by rw [hZ_card]
+        _ = Nat.card A := hZ_mul
+        _ = 2 ^ kA := hA_card
+    exact Nat.pow_right_injective (by norm_num : 2 ≤ 2) hpow.symm
+  have hH_card_lt : Nat.card H < Nat.card A :=
+    subgroup_card_lt_of_lt_top hH_lt_top
+  have hkH_lt_A : kH < kA := by
+    have hpow : 2 ^ kH < 2 ^ kA := by
+      rw [← hH_card, ← hA_card]
+      exact hH_card_lt
+    exact (Nat.pow_lt_pow_iff_right (by norm_num : 1 < 2)).mp hpow
+  have hkH_le_Z : kH ≤ kZ := by omega
+  have hH_dvd_Z : Nat.card H ∣ Nat.card Z := by
+    rw [hH_card, hZ_card]
+    exact pow_dvd_pow 2 hkH_le_Z
+  intro x hx
+  have hx_order_dvd_H : orderOf x ∣ Nat.card H :=
+    H.orderOf_dvd_natCard hx
+  have hx_order_dvd_Z : orderOf x ∣ Nat.card Z :=
+    dvd_trans hx_order_dvd_H hH_dvd_Z
+  exact mem_of_pow_card_eq_one_of_isCyclic_subgroup hA_cyclic Z
+    (orderOf_dvd_iff_pow_eq_one.mp hx_order_dvd_Z)
+
+/-- If a central subgroup has index `2`, then the ambient group is abelian. -/
+private lemma commutative_of_central_index_two_subgroup
+    {A : Type*} [Group A] {D : Subgroup A}
+    (hD_le_center : D ≤ Subgroup.center A) (hD_idx : D.index = 2) :
+    ∀ x y : A, x * y = y * x := by
+  intro x y
+  by_cases hxD : x ∈ D
+  · have hx_center : x ∈ Subgroup.center A := hD_le_center hxD
+    exact (Subgroup.mem_center_iff.mp hx_center y).symm
+  by_cases hyD : y ∈ D
+  · have hy_center : y ∈ Subgroup.center A := hD_le_center hyD
+    exact Subgroup.mem_center_iff.mp hy_center x
+  have hxyD : x * y ∈ D := by
+    rw [Subgroup.mul_mem_iff_of_index_two hD_idx]
+    exact iff_of_false hxD hyD
+  have hxy_center : x * y ∈ Subgroup.center A := hD_le_center hxyD
+  have hcomm := Subgroup.mem_center_iff.mp hxy_center x
+  exact mul_left_cancel (a := x) (by
+    calc
+      x * (x * y) = x * y * x := hcomm
+      _ = x * (y * x) := by rw [mul_assoc])
+
 /-- **Isaacs Lemma 6.15** (`p = 2`, second-step setup).
 
 The lifted subgroup `E` from `T/T'` is noncyclic and has order `8`; moreover
@@ -3318,6 +3431,86 @@ theorem exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
       relIndex_eq_two_of_index_two_of_not_le hC_idx hE_not_le_C
   exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
     hE_not_cyclic, subgroupOf_isCyclic_of_isCyclic hC_cyclic, hCE_idx⟩
+
+/-- **Isaacs Lemma 6.15** (`p = 2`, lifted subgroup is abelian).
+
+In the second `p = 2` step, the lifted subgroup `E` is noncyclic of order `8`, `C ∩ E`
+has index `2` in `E`, and the cyclic `2`-group maximality argument forces `C ∩ E ≤ Z(E)`.
+Thus `E` is abelian, matching the corresponding sentence in Isaacs Lemma 6.15. -/
+theorem exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 ∧
+      ¬ IsCyclic E ∧
+      (∀ x y : E, x * y = y * x) ∧
+      IsCyclic (C.subgroupOf E) ∧
+      (C.subgroupOf E).index = 2 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, hCE_cyclic, hCE_idx⟩ :=
+    exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_idx : C.index = 2 :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two
+      (p := 2) h_idx hZ_lt_C hC_lt_T
+  have hE_ne_C : E ≠ C := by
+    intro hEq
+    apply hE_not_cyclic
+    rw [hEq]
+    exact hC_cyclic
+  have hE_ne_top : E ≠ ⊤ := by
+    intro hEq
+    apply hT_card_ne
+    simpa [hEq] using hE_card
+  have hC_not_le_E : ¬ C ≤ E :=
+    not_ge_of_ne_of_ne_top_of_index_two hC_idx hE_ne_C hE_ne_top
+  have hZ_rel : (Subgroup.center T).relIndex C = 2 := by
+    have hmul :
+        (Subgroup.center T).relIndex C * C.index = (Subgroup.center T).index := by
+      rw [Subgroup.relIndex_mul_index hZ_lt_C.le]
+    rw [hC_idx, h_idx] at hmul
+    norm_num at hmul
+    omega
+  have hZC_idx : ((Subgroup.center T).subgroupOf C).index = 2 := by
+    simpa [Subgroup.relIndex] using hZ_rel
+  have hEC_lt_top : E.subgroupOf C < ⊤ := by
+    refine lt_of_le_of_ne le_top ?_
+    intro htop
+    apply hC_not_le_E
+    intro x hxC
+    have hx_sub : (⟨x, hxC⟩ : C) ∈ E.subgroupOf C := by
+      rw [htop]
+      trivial
+    rwa [Subgroup.mem_subgroupOf] at hx_sub
+  have hEC_le_ZC : E.subgroupOf C ≤ (Subgroup.center T).subgroupOf C :=
+    le_index_two_subgroup_of_lt_top_of_cyclic_two_group
+      (A := C) (hT_two.to_subgroup C) hC_cyclic hZC_idx hEC_lt_top
+  have hCE_le_centerE : C.subgroupOf E ≤ Subgroup.center E := by
+    intro e he
+    rw [Subgroup.mem_center_iff]
+    intro y
+    have heC : ((e : E) : T) ∈ C := by
+      simpa [Subgroup.mem_subgroupOf] using he
+    let eC : C := ⟨((e : E) : T), heC⟩
+    have heC_in_EC : eC ∈ E.subgroupOf C := by
+      rw [Subgroup.mem_subgroupOf]
+      exact e.2
+    have heC_in_ZC : eC ∈ (Subgroup.center T).subgroupOf C :=
+      hEC_le_ZC heC_in_EC
+    have he_center_T : ((e : E) : T) ∈ Subgroup.center T := by
+      simpa [Subgroup.mem_subgroupOf, eC] using heC_in_ZC
+    exact Subtype.ext (Subgroup.mem_center_iff.mp he_center_T ((y : E) : T))
+  have hE_ab : ∀ x y : E, x * y = y * x :=
+    commutative_of_central_index_two_subgroup hCE_le_centerE hCE_idx
+  exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, hE_ab, hCE_cyclic, hCE_idx⟩
 
 end
 
