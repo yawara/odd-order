@@ -809,7 +809,51 @@ private theorem lem73_aux
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
         have hq_dvd_GL : q ∣ Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           hq_dvd_SL.trans hSL_card_dvd_GL
-        sorry  -- Step l-n
+        letI : MulDistribMulAction ↥P ↥L := MulDistribMulAction.compHom ↥L φ
+        have hP_moves_L : ∃ (a : ↥P) (x : ↥L), a • x ≠ x := by
+          by_contra h_no_move
+          apply hL_in_C
+          intro x hxL
+          rw [Subgroup.mem_centralizer_iff]
+          intro y hyP
+          have hfix : (⟨y, hyP⟩ : ↥P) • (⟨x, hxL⟩ : ↥L) = ⟨x, hxL⟩ := by
+            by_contra hne
+            exact h_no_move ⟨⟨y, hyP⟩, ⟨x, hxL⟩, hne⟩
+          have hconj : y * x * y⁻¹ = x := by
+            have hval := congrArg (fun z : ↥L =>
+              (z : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) hfix
+            change
+              (((φ ⟨y, hyP⟩) ⟨x, hxL⟩ : ↥L) :
+                Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) = x at hval
+            rw [hphi_val] at hval
+            exact hval
+          calc
+            y * x = (y * x * y⁻¹) * y := by group
+            _ = x * y := by rw [hconj]
+        by_cases hq_eq_two : q = 2
+        · sorry  -- Step l: q = 2, cyclic 2-group / automorphism group branch.
+        · exfalso
+          obtain ⟨a_move, x_move, hmove⟩ := hP_moves_L
+          have hL_card_ge_p_succ : p + 1 ≤ Nat.card ↥L :=
+            pgroup_action_card_ge_prime_succ_of_moved hPp hmove
+          have hL_card_eq_p_succ : Nat.card ↥L = p + 1 :=
+            le_antisymm (hL_card_le_p_succ_of_odd hq_eq_two) hL_card_ge_p_succ
+          have htwo_dvd_p_succ : 2 ∣ p + 1 := by
+            rcases (Fact.out : p.Prime).odd_of_ne_two hp2 with ⟨m, hm⟩
+            rw [hm]
+            exact ⟨m + 1, by omega⟩
+          have htwo_not_dvd_q : ¬ 2 ∣ q := by
+            intro htwo_dvd_q
+            have htwo_eq_q : 2 = q :=
+              (Nat.prime_dvd_prime_iff_eq Nat.prime_two hq_prime).mp htwo_dvd_q
+            exact hq_eq_two htwo_eq_q.symm
+          have htwo_not_dvd_L : ¬ 2 ∣ Nat.card ↥L := by
+            rw [hL_card_qpow]
+            intro htwo_dvd_qpow
+            exact htwo_not_dvd_q (Nat.prime_two.dvd_of_dvd_pow htwo_dvd_qpow)
+          exact htwo_not_dvd_L (by
+            rw [hL_card_eq_p_succ]
+            exact htwo_dvd_p_succ)
       · -- Case [L, P] < L: IH 適用 → P ≤ C([L, P]) → Lem 4.29 で [L, P] = ⊥ → P ≤ C(L).
         have hLP_lt_L : LP_comm < L := lt_of_le_of_ne hLP_le_L hLP_eq_L
         have hLP_card_lt_L : Nat.card ↥LP_comm < Nat.card ↥L := by
