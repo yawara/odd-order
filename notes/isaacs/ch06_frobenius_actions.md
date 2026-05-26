@@ -541,6 +541,13 @@ FT クリティカル度 + 章内依存で並べる:
   渡すことで, **Isaacs Thm 6.12**
   `isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic` を
   sorry-free 化した.
+  さらに 6.11 の odd-prime / odd-order application 向け surface として,
+  order-`p` subgroup 一意性を各 normal abelian subgroup へ制限し, 6.12 の
+  D/Q/SD alternatives が `p = 2` を強制することから
+  `isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two` と
+  `isCyclic_of_subgroups_card_prime_unique_of_odd` を sorry-free 化した.
+  full 6.11 の `p = 2` case は, unique order-2 subgroup 仮定のもとで D/SD を排除し
+  quaternion-only branch を cyclic/generalized quaternion conclusion へ接続する段階が残る.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

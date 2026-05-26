@@ -7361,6 +7361,39 @@ theorem isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyc
     · obtain ⟨k, _hk_order, hSD⟩ := hSD
       exact Or.inr (Or.inr ⟨k, hSD⟩)
 
+/-! ### Odd-prime corollary toward Theorem 6.11 -/
+
+/-- **Isaacs Thm 6.11, odd-prime corollary**: if `p ≠ 2`, a finite `p`-group with
+at most one subgroup of order `p` is cyclic.
+
+The order-`p` subgroup uniqueness hypothesis makes every abelian subgroup cyclic, so
+Theorem 6.12 applies.  Its noncyclic alternatives force `p = 2`, which is excluded here. -/
+theorem isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) (hp_ne_two : p ≠ 2)
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = p → Nat.card L = p → K = L) :
+    IsCyclic P := by
+  have hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B := by
+    intro B _hB_normal hB_comm
+    haveI : IsMulCommutative B := hB_comm
+    exact hP.isCyclic_subgroup_of_subgroups_card_prime_unique hUnique B
+  rcases isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
+      hP hcyc with hP_cyclic | htwo
+  · exact hP_cyclic
+  · exact False.elim (hp_ne_two htwo.1)
+
+/-- **Isaacs Thm 6.11, odd-prime corollary** in the form used by odd-order applications. -/
+theorem isCyclic_of_subgroups_card_prime_unique_of_odd
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) (hp_odd : Odd p)
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = p → Nat.card L = p → K = L) :
+    IsCyclic P :=
+  isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two hP
+    (fun hp_eq_two => by
+      rw [hp_eq_two] at hp_odd
+      rcases hp_odd with ⟨k, hk⟩
+      omega) hUnique
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
