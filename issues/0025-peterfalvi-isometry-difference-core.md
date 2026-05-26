@@ -46,6 +46,10 @@ created: 2026-05-25
   `sign_ne_zero`, `sign_mul_self` を名前付き API にした。
 - `signedDifference_ne_zero` と `signedDifference_eq_zero_iff` を追加し、結論側の
   signed target difference が `i = 0` でのみ消えることを `sorry` なしで使えるようにした。
+- `difference_injective`, `signedDifference_injective`,
+  `signedDifference_eq_signedDifference_iff`, `signedDifference_ne` を追加し、
+  §3 (1.4) の結論側 target tuple が符号付き差分に移った後も index の区別を
+  失わないことを `sorry` なしで使えるようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 
