@@ -282,8 +282,12 @@
   `span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one` で直接閉じた.
   `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition for `aeval g`
   を使うため、単なる semisimple/diagonalization API の rename ではない.
-  残る Prop. 2.4(a) は directness と span を theorem-facing な direct-sum
-  statement に束ねる段.
+- **2026-05-26**: Prop. 2.4(a) の theorem-facing 形式として
+  `cyclicEigenspaceFin_isInternal_of_pow_eq_one` を追加し、上の directness
+  と span を mathlib の `DirectSum.IsInternal` に接続した. これで
+  finite-order + primitive-root 仮定から BG の表示分解
+  `V = ⊕_{0≤i<h} V_i` を直接渡せる.  次はこの decomposition を使う
+  Prop. 2.4(c)-(k) の block/dimension identities.
 
 ## TL;DR
 
@@ -889,5 +893,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   の top 条件を相互に使えるようにした. さらに primitive-root factorization
   `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition により、
   `g^h = 1` から直接 `⨆ i, V_i = ⊤` と `span (⋃ V_i) = ⊤` を得た.
-  残る Prop. 2.4(a) の主作業は directness/span を theorem-facing な
-  direct-sum statement に束ねる部分.
+  `cyclicEigenspaceFin_isInternal_of_pow_eq_one` で `DirectSum.IsInternal`
+  形式にも束ねたため、Prop. 2.4(a) は後続が消費できる形まで揃った.
+  次は `E_i` / `E_{i,t}` 側の direct-sum と dimension identities.

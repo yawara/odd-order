@@ -7,6 +7,7 @@ import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Algebra.Polynomial.RingDivision
 import Mathlib.FieldTheory.KummerExtension
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
@@ -384,6 +385,21 @@ theorem span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one
     Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) = ⊤ := by
   rw [span_cyclicEigenspaceFinUnion_eq_iSup]
   exact cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one hepsilon hgpow
+
+/-- BG Prop 2.4(a), internal direct-sum form.
+
+The finite displayed eigenspaces `V_0, ..., V_{h-1}` form an internal direct
+sum decomposition of `V` when `g ^ h = 1` and `epsilon` is a primitive
+`h`-th root.  This packages the independent-eigenspace and finite-order
+spanning halves into mathlib's `DirectSum.IsInternal` API. -/
+theorem cyclicEigenspaceFin_isInternal_of_pow_eq_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1) :
+    DirectSum.IsInternal fun i : Fin h => cyclicEigenspaceFin epsilon g i := by
+  classical
+  exact DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top
+    (cyclicEigenspaceFin_iSupIndep (F := F) (V := V) (g := g) hepsilon)
+    (cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one (F := F) (V := V) hepsilon hgpow)
 
 /-- BG Prop 2.4 notation `E_{i,t}` over the finite index range
 `0 ≤ i,t ≤ h - 1`.

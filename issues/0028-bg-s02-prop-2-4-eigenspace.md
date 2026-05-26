@@ -68,6 +68,11 @@ to Prop 2.4.
   `X^h - 1` as `∏ (X - ε^i)` using the primitive root, then uses coprime
   kernel decomposition for `aeval g`; this replaces the previous placeholder
   "diagonalization" input for Prop. 2.4(a)'s spanning half.
+- 2026-05-26: Packaged Prop. 2.4(a) in theorem-facing internal direct-sum form
+  as `cyclicEigenspaceFin_isInternal_of_pow_eq_one`.  This combines the
+  primitive-root eigenspace independence and the finite-order span theorem via
+  mathlib's `DirectSum.IsInternal` API, so downstream block/dimension work can
+  consume the displayed decomposition directly.
 
 ## 完了条件
 
