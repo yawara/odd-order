@@ -690,3 +690,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   abelian になる q≠p determinant-core endpoint を sorry-free にした.
   残る theorem-level frontier は、元の体から algebraic closure へ移す route と、
   group-theoretic core spine を `odd_two_dim_sylow_abelian` 本体へ接続する段.
+- `sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneKSubmodules`
+  と `sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed`
+  を追加. theorem-level determinant-kernel spine は古い `RankOneLinePairData`
+  入力ではなく、Maschke が返す complementary rank-one `K`-submodule data から
+  Sylow conclusion まで進めるようになった. algebraically closed 版ではこの data
+  を `exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char` で直接供給する.
+  残る frontier は (1) normalizer `H=N_{G*}(Q)` への q≠p endpoint の制限適用,
+  (2) induction hypothesis `hind` の theorem 本体への供給, (3) 元の体から
+  algebraic closure へ移す route.

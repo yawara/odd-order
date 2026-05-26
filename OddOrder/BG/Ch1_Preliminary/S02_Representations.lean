@@ -3519,6 +3519,101 @@ private theorem
           ρ hfaithful hodd hcore_ne_bot (hline (q := q) hq_ne_p))
       P
 
+/-- Theorem-facing determinant-kernel reduction using `K`-submodule data.
+
+This is the successor of
+`sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneLinePair`
+after the q≠p branch has been moved below the permutation-action interface:
+the only remaining linear-algebra input is the pair of complementary rank-one
+`K`-submodules for every nontrivial `q`-core in `G*`. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneKSubmodules
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (hline : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
+        IsPGroup q K → K ≠ ⊥ → Std.Commutative (· * · : K → K → K) →
+        ∃ W : Subrepresentation (ρ.comp K.subtype),
+        ∃ U : Subrepresentation (ρ.comp K.subtype),
+          Nonempty (Module.Free F W.toSubmodule) ∧
+          Nonempty (Module.Free F U.toSubmodule) ∧
+          Nonempty (Module.Finite F W.toSubmodule) ∧
+          Nonempty (Module.Finite F U.toSubmodule) ∧
+          Nonempty (Module.Free F (V ⧸ W.toSubmodule)) ∧
+          Nonempty (Module.Free F (V ⧸ U.toSubmodule)) ∧
+          IsCompl W.toSubmodule U.toSubmodule ∧
+          Module.finrank F W.toSubmodule = 1 ∧
+          Module.finrank F U.toSubmodule = 1 ∧
+          Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
+          Module.finrank F (V ⧸ U.toSubmodule) = 1)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
+      ρ hdet_bot P
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_core_spine
+      ρ hfaithful hdim hdet_bot hnormalizer hind
+      (fun {q} _hq_prime hq_ne_p hcore_ne_bot =>
+        commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
+          ρ hfaithful hodd hcore_ne_bot (hline (q := q) hq_ne_p))
+      P
+
+/-- Algebraically closed determinant-kernel spine for BG Thm 2.6(b).
+
+Over an algebraically closed field, the q≠p Maschke branch supplies the
+rank-one `K`-submodule input directly.  What remains outside this bridge is
+the group-theoretic normalizer/induction spine inside `G*`. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) :=
+  sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneKSubmodules
+    ρ hfaithful hodd hdim hnormalizer hind
+    (fun {q} _hq_prime hq_ne_p K _hKnormal _hKle hKq _hK_ne_bot hKcomm =>
+      exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
+        (p := p) (q := q) ρ hdim K hKq hq_ne_p hKcomm)
+    P
+
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
