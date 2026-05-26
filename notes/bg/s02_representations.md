@@ -197,6 +197,14 @@
   induction 出力 `hind` のみになった. 残 frontier は (1) theorem 本体でこの
   `hind` を実際に供給すること、(2) 元の体から algebraic closure へ移す
   base-change route を整理すること.
+- **2026-05-26**: base-change route の最初の sorry-free infrastructure として
+  `baseChangeRepresentation` と `baseChangeRepresentation_faithful` を追加した.
+  前者は field extension `K/F` に沿って表現を `K ⊗[F] V` へ実際に延長し、
+  後者は faithfully flat な `K/F` で faithful 性が保たれることを示す. これは
+  mathlib theorem の単純 rename ではなく、代数閉包上の reduction を元の
+  faithful 表現へ接続するための具体的な tensor bridge. 次は
+  `AlgebraicClosure F` での `CharP`/`finrank`/determinant-kernel compatibility を
+  同じ粒度で足す.
 
 ## TL;DR
 
