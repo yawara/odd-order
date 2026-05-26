@@ -466,6 +466,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_two_subgroup_abelian
+#assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotient_card_le_prime_sq_of_actionCentralizer_inf

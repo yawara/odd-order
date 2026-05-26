@@ -240,6 +240,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   counterexample 仮定と矛盾することを使う bridge
   (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
   `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`) も追加済み.
+  商群側の任意の 2-subgroup abelian 仮定は Sylow lift 経由で
+  `quotient_two_subgroup_abelian` により継承可能. p-separable 仮定は Ch03 既存
+  `quotient_isPiSeparable` instance を直接使えばよく, Ch07 wrapper は不要.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
@@ -331,6 +334,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      distinctness として残り, quotient image の normality は元の `P` normality に戻って矛盾
      (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
      `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`).
+   - ✅ quotient theorem-condition inheritance: p-separable は Ch03
+     `quotient_isPiSeparable`; 任意の 2-subgroup abelian は `quotient_two_subgroup_abelian`.
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から

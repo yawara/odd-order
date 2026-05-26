@@ -2300,6 +2300,75 @@ theorem quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
     (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
       (G := G) (p := p) P (K := K) hK (by simpa using hPbar))
 
+/-- The hypothesis that every `2`-subgroup is abelian descends to a quotient.
+
+This is the Sylow-lift bridge needed in Isaacs Thm 7.5 for applying the reduced theorem to
+`G/K`: a `2`-subgroup of `G/K` is the image of a Sylow `2`-subgroup of its preimage, and
+that Sylow subgroup is abelian by the upstairs hypothesis. -/
+theorem quotient_two_subgroup_abelian
+    {G : Type*} [Group G] [Finite G] {K : Subgroup G} [K.Normal]
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (S : Subgroup (G ⧸ K)) (hS2 : IsPGroup 2 S) :
+    ∀ x y : ↥S, x * y = y * x := by
+  let q : G →* G ⧸ K := QuotientGroup.mk' K
+  let T : Subgroup G := Subgroup.comap q S
+  let f : T →* S :=
+    { toFun := fun t => ⟨q t, t.property⟩
+      map_one' := by
+        ext
+        simp [q]
+      map_mul' := by
+        intro a b
+        ext
+        simp [q] }
+  have hf : Function.Surjective f := by
+    intro s
+    obtain ⟨g, hg⟩ := QuotientGroup.mk'_surjective K (s : G ⧸ K)
+    refine ⟨⟨g, ?_⟩, ?_⟩
+    · change q g ∈ S
+      simp [q, hg, s.property]
+    · ext
+      simpa [f, q] using hg
+  let R : Sylow 2 T := default
+  let Rbar : Sylow 2 S := R.mapSurjective hf
+  have hRbar_top : (Rbar : Subgroup S) = ⊤ := by
+    have htop2 : IsPGroup 2 (⊤ : Subgroup S) := hS2.to_subgroup ⊤
+    exact (Rbar.is_maximal' htop2 le_top).symm
+  have hRcomm : ∀ a b : ↥R, a * b = b * a := by
+    have hRG2 : IsPGroup 2 ((R : Subgroup T).map T.subtype) :=
+      R.isPGroup'.map T.subtype
+    have hRGcomm := h2abelian ((R : Subgroup T).map T.subtype) hRG2
+    intro a b
+    apply Subtype.ext
+    apply Subtype.ext
+    let ag : ↥((R : Subgroup T).map T.subtype) :=
+      ⟨((a : T) : G), ⟨(a : T), a.property, rfl⟩⟩
+    let bg : ↥((R : Subgroup T).map T.subtype) :=
+      ⟨((b : T) : G), ⟨(b : T), b.property, rfl⟩⟩
+    have h := congrArg (fun z : ↥((R : Subgroup T).map T.subtype) => (z : G))
+      (hRGcomm ag bg)
+    simpa using h
+  intro x y
+  have hxRbar : x ∈ (Rbar : Subgroup S) := by
+    rw [hRbar_top]
+    trivial
+  have hyRbar : y ∈ (Rbar : Subgroup S) := by
+    rw [hRbar_top]
+    trivial
+  rw [Sylow.coe_mapSurjective] at hxRbar hyRbar
+  rcases hxRbar with ⟨rx, hrx, hfx⟩
+  rcases hyRbar with ⟨ry, hry, hfy⟩
+  let rxR : R := ⟨rx, hrx⟩
+  let ryR : R := ⟨ry, hry⟩
+  have hxyT : rx * ry = ry * rx :=
+    congrArg (fun z : ↥R => (z : T)) (hRcomm rxR ryR)
+  calc
+    x * y = f rx * f ry := by rw [← hfx, ← hfy]
+    _ = f (rx * ry) := by rw [map_mul]
+    _ = f (ry * rx) := by rw [hxyT]
+    _ = f ry * f rx := by rw [map_mul]
+    _ = y * x := by rw [hfy, hfx]
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
