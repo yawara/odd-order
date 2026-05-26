@@ -3343,6 +3343,16 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- `U.map (mk' U) = ⊥`: the image of `U = O_p(G)` in `G̅ = G/U` is trivial. -/
+theorem opCore_map_mk_oPiCore_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    (OddOrder.Isaacs.Ch01.opCore p G).map
+        (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥ := by
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+  rw [show OddOrder.Isaacs.Ch01.opCore p G =
+        OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G from
+      (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm]
+
 /-- Intersection with any subgroup preserves `IsElementaryAbelian`: if `A` is
 elementary abelian then `A ⊓ B` is elementary abelian.  Used in Step 7 to
 get `D = A ⊓ U`, `E = A ⊓ V` elementary abelian. -/
