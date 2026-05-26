@@ -110,6 +110,15 @@
   submodule に適用してから representation 側へ戻す. 次はこの rank-one line を
   2 次元 faithful 表現の line pair (`V = W₁ ⊕ W₂`) と odd-order line
   permutation helper へ接続する.
+- **2026-05-26**: Maschke complement まで進め、
+  `finrank_eq_one_of_simple_submodule_of_commutative_group` に scalar-instance
+  bridge を切り出した上で、
+  `exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char`
+  を追加済み. これは finite abelian q-group `K`, `q ≠ p`, `finrank V = 2`
+  から `K`-subrepresentation として `V = W₁ ⊕ W₂`、`finrank W₁ = 1`,
+  `finrank (V/W₁) = 1` を返す段. 次は `K ⊴ G` と determinant kernel 条件
+  (`K ≤ G*`) を使い、ambient `G` がこの二つの line を permute することを
+  `RankOneLinePairData` へ接続する.
 
 ## TL;DR
 
