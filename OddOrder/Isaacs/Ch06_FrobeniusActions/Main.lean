@@ -2566,6 +2566,19 @@ theorem subgroups_card_prime_unique_of_frobeniusAction_sylow
       (A := P) (U := U) (IsFrobeniusAction.actorSubgroup hFrob (P : Subgroup A))
       E hp.out hE_elem hE_card
 
+/-- **Isaacs Thm 6.11 (abelian branch, in Frobenius-complement form)**: a commutative
+Sylow `p`-subgroup of a finite Frobenius complement is cyclic.  Corollary 6.10 supplies the
+unique order-`p` subgroup hypothesis, and the finite abelian p-group structure theorem turns it
+into cyclicity. -/
+theorem sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [Fact p.Prime]
+    (P : Sylow p A) [IsMulCommutative P] :
+    IsCyclic P :=
+  P.isPGroup'.isCyclic_of_subgroups_card_prime_unique
+    (subgroups_card_prime_unique_of_frobeniusAction_sylow hFrob P)
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/

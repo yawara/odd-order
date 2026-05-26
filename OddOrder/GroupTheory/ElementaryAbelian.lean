@@ -3,6 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.FiniteAbelian.Basic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
@@ -153,6 +155,135 @@ namespace IsPGroup
 variable {p : ℕ} {G : Type*} [Group G]
 
 open scoped Pointwise
+
+private theorem zmod_prime_power_top_order_prime {p k : ℕ} [Fact p.Prime] (hk : 0 < k) :
+    orderOf (Multiplicative.ofAdd ((p ^ (k - 1) : ℕ) : ZMod (p ^ k))) = p := by
+  rw [orderOf_ofAdd_eq_addOrderOf]
+  rw [ZMod.addOrderOf_coe (p ^ (k - 1)) (pow_ne_zero k (Fact.out : p.Prime).ne_zero)]
+  rw [Nat.gcd_eq_right (pow_dvd_pow p (Nat.sub_le k 1))]
+  have hpow : p ^ k = p ^ (k - 1) * p := by
+    rw [← pow_succ, Nat.sub_add_cancel hk]
+  rw [hpow]
+  exact Nat.mul_div_right _ (pow_pos (Fact.out : p.Prime).pos _)
+
+private theorem zmod_eq_prime_power_top_order_prime {p n k : ℕ} [Fact p.Prime]
+    (hn : n = p ^ k) (hk : 0 < k) :
+    orderOf (Multiplicative.ofAdd ((p ^ (k - 1) : ℕ) : ZMod n)) = p := by
+  subst n
+  exact zmod_prime_power_top_order_prime (p := p) (k := k) hk
+
+private theorem isCyclic_pi_of_subsingleton
+    {ι : Type*} [Subsingleton ι]
+    {M : ι → Type*} [∀ i, Group (M i)] [∀ i, IsCyclic (M i)] :
+    IsCyclic (∀ i, M i) := by
+  by_cases hι : Nonempty ι
+  · classical
+    rcases hι with ⟨i⟩
+    haveI : Unique ι := uniqueOfSubsingleton i
+    let e : (∀ i, M i) ≃* M default :=
+      { toEquiv := Equiv.piUnique M
+        map_mul' := fun _ _ => rfl }
+    exact e.isCyclic.mpr inferInstance
+  · haveI : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
+    exact isCyclic_of_subsingleton
+
+/-- A finite commutative `p`-group with at most one subgroup of order `p` is cyclic.
+
+This is the abelian branch used in Isaacs Thm 6.11: in the finite abelian decomposition, two
+nontrivial cyclic factors would give two distinct order-`p` subgroups, one in each factor. -/
+theorem isCyclic_of_subgroups_card_prime_unique
+    [Finite G] [IsMulCommutative G] [Fact p.Prime] (hG : IsPGroup p G)
+    (hUnique : ∀ K L : Subgroup G, Nat.card K = p → Nat.card L = p → K = L) :
+    IsCyclic G := by
+  classical
+  obtain ⟨ι, _, n, hn_gt, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite G
+  let T := (i : ι) → Multiplicative (ZMod (n i))
+  have hn_pow : ∀ i : ι, ∃ k, n i = p ^ k := by
+    intro i
+    let gen : T := Pi.mulSingle i (Multiplicative.ofAdd (1 : ZMod (n i)))
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp hG) (e.symm gen)
+    refine ⟨k, ?_⟩
+    have horder : orderOf (e.symm gen) = n i := by
+      rw [← e.orderOf_eq (e.symm gen)]
+      simp [gen, orderOf_piMulSingle, orderOf_ofAdd_eq_addOrderOf, ZMod.addOrderOf_one]
+    exact horder.symm.trans hk
+  have hι_sub : Subsingleton ι := by
+    by_contra hnot
+    haveI : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
+    obtain ⟨i, j, hij⟩ := exists_pair_ne ι
+    obtain ⟨ki, hki⟩ := hn_pow i
+    obtain ⟨kj, hkj⟩ := hn_pow j
+    have hki_pos : 0 < ki := by
+      cases ki with
+      | zero =>
+          have : 1 < (1 : ℕ) := by simpa [hki] using hn_gt i
+          omega
+      | succ ki => exact Nat.succ_pos _
+    have hkj_pos : 0 < kj := by
+      cases kj with
+      | zero =>
+          have : 1 < (1 : ℕ) := by simpa [hkj] using hn_gt j
+          omega
+      | succ kj => exact Nat.succ_pos _
+    let ai : Multiplicative (ZMod (n i)) :=
+      Multiplicative.ofAdd ((p ^ (ki - 1) : ℕ) : ZMod (n i))
+    let aj : Multiplicative (ZMod (n j)) :=
+      Multiplicative.ofAdd ((p ^ (kj - 1) : ℕ) : ZMod (n j))
+    have hai_order : orderOf ai = p := by
+      simpa [ai] using
+        zmod_eq_prime_power_top_order_prime (p := p) (n := n i) (k := ki) hki hki_pos
+    have haj_order : orderOf aj = p := by
+      simpa [aj] using
+        zmod_eq_prime_power_top_order_prime (p := p) (n := n j) (k := kj) hkj hkj_pos
+    let xi : T := Pi.mulSingle i ai
+    let xj : T := Pi.mulSingle j aj
+    have hxi_order : orderOf xi = p := by
+      simpa [xi, hai_order] using
+        (orderOf_piMulSingle
+          (M := fun t : ι => Multiplicative (ZMod (n t))) (i := i) (g := ai))
+    have hxj_order : orderOf xj = p := by
+      simpa [xj, haj_order] using
+        (orderOf_piMulSingle
+          (M := fun t : ι => Multiplicative (ZMod (n t))) (i := j) (g := aj))
+    let Xi : Subgroup G := Subgroup.zpowers (e.symm xi)
+    let Xj : Subgroup G := Subgroup.zpowers (e.symm xj)
+    have hXi_card : Nat.card Xi = p := by
+      rw [show Xi = Subgroup.zpowers (e.symm xi) from rfl, Nat.card_zpowers]
+      rw [← e.orderOf_eq (e.symm xi)]
+      simpa using hxi_order
+    have hXj_card : Nat.card Xj = p := by
+      rw [show Xj = Subgroup.zpowers (e.symm xj) from rfl, Nat.card_zpowers]
+      rw [← e.orderOf_eq (e.symm xj)]
+      simpa using hxj_order
+    have hXiXj : Xi = Xj := hUnique Xi Xj hXi_card hXj_card
+    have hmem : e.symm xi ∈ Subgroup.zpowers (e.symm xj) := by
+      have hmemXj : e.symm xi ∈ Xj := by
+        rw [← hXiXj]
+        exact Subgroup.mem_zpowers _
+      simpa [Xj] using hmemXj
+    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hmem
+    have hxi_eq : xi = xj ^ m := by
+      have := congrArg e hm
+      simpa using this.symm
+    have hai_ne_one : ai ≠ 1 := by
+      intro hai
+      have hai_order_one : orderOf ai = 1 := by simp [hai]
+      exact (Fact.out : p.Prime).ne_one (hai_order.symm.trans hai_order_one)
+    apply hai_ne_one
+    have hcoord := congrFun hxi_eq i
+    have hxj_i : xj i = 1 := by
+      simp [xj, hij]
+    have hpow_i : (xj ^ m) i = 1 := by
+      rw [Pi.pow_apply, hxj_i]
+      simp
+    calc
+      ai = xi i := by simp [xi]
+      _ = (xj ^ m) i := hcoord
+      _ = 1 := hpow_i
+  have htarget : IsCyclic T := by
+    haveI : Subsingleton ι := hι_sub
+    exact isCyclic_pi_of_subsingleton
+  exact e.isCyclic.mpr htarget
 
 private theorem subgroup_normal_of_le_center {H : Subgroup G} (hH : H ≤ Subgroup.center G) :
     H.Normal := by

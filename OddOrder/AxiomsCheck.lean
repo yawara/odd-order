@@ -213,6 +213,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.subgroups_card_prime_unique_of_frobeniusAction_sylow
 
+-- Ch.6 route to Thm 6.11: finite commutative p-groups with unique order-`p`
+-- subgroup are cyclic, and hence commutative Sylow subgroups of Frobenius complements are cyclic.
+#assert_only_allowed_axioms IsPGroup.isCyclic_of_subgroups_card_prime_unique
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
 -- elementary abelian subgroup of order 4.

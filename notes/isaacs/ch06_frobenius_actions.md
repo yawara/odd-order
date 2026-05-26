@@ -342,6 +342,14 @@ FT クリティカル度 + 章内依存で並べる:
   (p-group 内に位数 `p` 部分群が 2 つあれば, 中心の位数 `p` 部分群と合わせて
   elementary abelian `p^2` 部分群を作る). これを 6.9 elementary branch に接続して
   `subgroups_card_prime_unique_of_frobeniusAction_sylow` を sorry-free で閉じた.
+- 6.11 可換 `p` 群分岐:
+  有限可換 `p` 群で位数 `p` 部分群が一意なら巡回であることを
+  `IsPGroup.isCyclic_of_subgroups_card_prime_unique` として共有補題化. mathlib の
+  finite abelian group structure theorem
+  `CommGroup.equiv_prod_multiplicative_zmod_of_finite` を直接使い, cyclic factor が 2 個以上
+  あると各 factor の top-order element から異なる位数 `p` 部分群が出る, という本文の
+  fundamental theorem branch を Lean 化した. これを 6.10 と接続して
+  `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` まで sorry-free.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
