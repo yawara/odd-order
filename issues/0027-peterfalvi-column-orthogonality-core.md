@@ -118,7 +118,10 @@ entry point to the public theorem.  Closing `column_orthogonality_cases` require
 - `CharacterTableRowOrthogonality (G := G)`.  mathlib has
   `Representation.char_orthonormal`, but the local `IrreducibleCharacter` API still
   needs the bridge from witness representations to equality of class functions /
-  representation equivalence before this can be used directly.
+  representation equivalence before this can be used directly.  The conventions
+  also differ: mathlib's theorem uses `χ(g) * ψ(g⁻¹)`, while local
+  `ClassFunction.inner` uses Peterfalvi's `χ(g) * star (ψ g)`, so the bridge also
+  needs the finite complex character identity `ψ(g⁻¹) = star (ψ g)`.
 
 ## 完了条件
 
