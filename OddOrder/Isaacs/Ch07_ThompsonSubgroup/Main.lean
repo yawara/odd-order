@@ -3351,6 +3351,15 @@ instance centralizer_omega1ZCenterOpCore_normal
     (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)).Normal :=
   Subgroup.normal_centralizer
 
+/-- **Isaacs Thm 7.6 Step 6 conclusion** (mmd L3882): if `K = C_G(V)` is a
+`p`-group, then `K ≤ O_p(G)` via `normal_pgroup_le_opCore`. -/
+theorem centralizer_omega1ZCenterOpCore_le_opCore_of_isPGroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hK_pg : IsPGroup p (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G))) :
+    Subgroup.centralizer (omega1ZCenterOpCore G p : Set G) ≤
+      OddOrder.Isaacs.Ch01.opCore p G :=
+  OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK_pg
+
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
 Once Step 5-6 produce the triviality of the `A`-action on `V = Z(L)`, the book:
