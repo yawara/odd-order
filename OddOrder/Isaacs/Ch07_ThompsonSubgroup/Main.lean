@@ -3410,6 +3410,15 @@ theorem cor_4_35_for_zCenterOpCoreSubgroup
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (zCenterOpCoreSubgroup_isPGroup p) hA_p' h_fix
 
+/-- Generic: a subgroup-level `IsElementaryAbelian p H` upgrades the ambient
+`Group ↥H` to a `CommGroup ↥H` using the commutativity component.  Local
+construction used when applying CommGroup-requiring lemmas (e.g., index
+calculations) on elementary abelian subgroups. -/
+@[reducible] def isElementaryAbelian_commGroup
+    {G : Type*} [Group G] {p : ℕ} {H : Subgroup G} (hH : H.IsElementaryAbelian p) :
+    CommGroup ↥H :=
+  { (inferInstance : Group ↥H) with mul_comm := hH.1 }
+
 /-- `O_p(G) ⊓ O_{p'}(G) = ⊥`: the `p`-core and the `p'`-core of `G` are
 disjoint, by coprime cardinalities.  Specialization of `oPiCore.coprime_inf`. -/
 theorem opCore_inf_oPiCorePrime_eq_bot
