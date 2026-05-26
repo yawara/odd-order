@@ -3354,6 +3354,25 @@ theorem quotient_commutative_of_isCyclic_of_self_centralizing
   letI : CommGroup (P ⧸ C) := ψ.commGroupOfInjective hψ_inj
   exact mul_comm
 
+/-- **Isaacs Thm 6.12 setup**: a maximal normal cyclic subgroup `C` makes `P/C`
+abelian.
+
+This packages the first paragraph of the proof of Theorem 6.12: maximal normal abelian
+subgroups self-centralize in a finite `p`-group, and a cyclic self-centralizing subgroup
+forces the quotient to embed in the abelian automorphism group of `C`. -/
+theorem quotient_commutative_of_maximal_normal_isCyclic
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal] (hC_cyclic : IsCyclic C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False) :
+    ∀ x y : P ⧸ C, x * y = y * x := by
+  have hC_comm : IsMulCommutative C := by
+    haveI : IsCyclic C := hC_cyclic
+    infer_instance
+  have hCent : Subgroup.centralizer (C : Set P) = C :=
+    centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
+  exact quotient_commutative_of_isCyclic_of_self_centralizing hC_cyclic hCent
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

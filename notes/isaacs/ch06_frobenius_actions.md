@@ -427,7 +427,9 @@ FT クリティカル度 + 章内依存で並べる:
   `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. さらに self-centralizing
   cyclic `C` に対して conjugation map `P → Aut(C)` の kernel が `C` であることから
   `P/C ↪ Aut(C)` を作り, `Aut(C)` の可換性で `P/C` 可換性を取り出す
-  `quotient_commutative_of_isCyclic_of_self_centralizing` も追加済み.
+  `quotient_commutative_of_isCyclic_of_self_centralizing` も追加済み. これらを合成し,
+  maximal normal cyclic `C` から直接 `P/C` 可換性を得る
+  `quotient_commutative_of_maximal_normal_isCyclic` も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
