@@ -1943,6 +1943,63 @@ private theorem rank_one_subrepresentation_eq_left_or_right_of_determinantKernel
     (ρ.comp K.subtype) hρK_faithful W U hcompl hdimW hdimU hdimQ
     hxdet hoddx hx_ne_one
 
+/-- Determinant-kernel uniqueness forces every ambient conjugate of one Maschke
+line to be one of the two Maschke lines.
+
+This is the next BG Thm 2.6 q ≠ p bridge after choosing a nontrivial
+`x : K`: normality makes the conjugate a `K`-subrepresentation, and the
+distinct-scalar uniqueness pins it to `W` or `U`. -/
+private theorem conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F U.toSubmodule] [Module.Free F (V ⧸ W.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQ : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) (g : G) :
+    conjugateSubrepresentationOfNormal K hKnormal ρ W g = W ∨
+      conjugateSubrepresentationOfNormal K hKnormal ρ W g = U := by
+  exact conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique
+    K hKnormal ρ W U hdimW
+    (rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+      ρ hfaithful hodd K hKle W U hcompl hdimW hdimU hdimQ hx_ne_one)
+    g
+
+/-- `comap` form of
+`conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup`.
+
+This is the shape required by `RankOneLinePairData.permutes` for one of the
+two lines. -/
+private theorem le_comap_left_or_right_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F U.toSubmodule] [Module.Free F (V ⧸ W.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQ : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) (g : G) :
+    W.toSubmodule ≤ W.toSubmodule.comap (ρ g) ∨
+      W.toSubmodule ≤ U.toSubmodule.comap (ρ g) := by
+  rcases conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+      ρ hfaithful hodd K hKnormal hKle W U hcompl hdimW hdimU hdimQ
+      hx_ne_one g with hleft | hright
+  · left
+    exact le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W W hleft
+  · right
+    exact le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W U hright
+
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup
     {F : Type*} [Field F] {G : Type*} [Group G]

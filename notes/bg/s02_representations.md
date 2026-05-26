@@ -179,6 +179,14 @@
   `K`-subrepresentation が二つの Maschke line のどちらかであることを返す.
   次はこれを `conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique` に
   接続し、ambient `g : G` が二本の line を permute する形へ進める.
+- **2026-05-26**: normal conjugate 側の接続として
+  `conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup` と
+  `le_comap_left_or_right_of_determinantKernel_subgroup` を追加済み.
+  `K ⊴ G`, `K ≤ G*`, 非自明 `x : K` から、ambient `g : G` による
+  `W` の conjugate が `W` または `U` に一致すること、さらに
+  `RankOneLinePairData.permutes` が要求する `comap` 形の片側を得られる.
+  次は反対側 line も同様に扱える quotient/free/finrank 入力を整え、
+  `Fin 2` の permutation action としてまとめる.
 
 ## TL;DR
 
