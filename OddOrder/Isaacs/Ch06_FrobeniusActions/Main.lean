@@ -6174,6 +6174,59 @@ theorem conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
   · exact ⟨htwo.1, Or.inl htwo.2⟩
   · exact ⟨htwo.1, Or.inr htwo.2⟩
 
+/-- **Isaacs Thm 6.12 setup**: both `2`-adic alternatives from Lemma 6.16 make
+`i * 2 ≡ -2 (mod 2^e)`. -/
+private lemma mul_two_modEq_neg_two_of_two_adic_conj_cases
+    {e : ℕ} (he : 0 < e) {i : ℤ}
+    (hcases :
+      i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) :
+    i * (2 : ℤ) ≡ (-2 : ℤ) [ZMOD ((2 : ℤ) ^ e)] := by
+  rcases hcases with hi | hi
+  · simpa using hi.mul_right (2 : ℤ)
+  · have hrhs :
+        ((2 : ℤ) ^ (e - 1) - 1) * (2 : ℤ) ≡
+          (-2 : ℤ) [ZMOD ((2 : ℤ) ^ e)] := by
+      refine Int.modEq_iff_dvd.mpr ?_
+      refine ⟨-1, ?_⟩
+      have hpow : (2 : ℤ) ^ e = (2 : ℤ) ^ (e - 1) * (2 : ℤ) := by
+        rw [← pow_succ, Nat.sub_add_cancel he]
+      rw [hpow]
+      ring
+    exact (hi.mul_right (2 : ℤ)).trans hrhs
+
+/-- **Isaacs Thm 6.12 setup**: after the Lemma 6.16 dispatch, conjugation by `a`
+inverts `c^2`.
+
+This formalizes the sentence following the congruence computation in the proof of Theorem 6.12:
+`i ≡ -1 (mod 2^(e-1))`, hence `(c^2)^a = (c^2)⁻¹`. -/
+theorem conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
+    {G : Type*} [Group G] {p e : ℕ} (hp : p.Prime) (he : 0 < e)
+    {a c : G} {i : ℤ}
+    (h_order : orderOf c = p ^ e)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (ha_pow : a ^ p ∈ Subgroup.zpowers c)
+    (hpow_ne : a * c ^ p * a⁻¹ ≠ c ^ p) :
+    p = 2 ∧ a * c ^ 2 * a⁻¹ = (c ^ 2)⁻¹ := by
+  obtain ⟨hp_eq_two, hcases⟩ :=
+    conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
+      hp he h_order h_conj ha_pow hpow_ne
+  refine ⟨hp_eq_two, ?_⟩
+  have hmod_two :
+      i * (2 : ℤ) ≡ (-2 : ℤ) [ZMOD ((2 : ℤ) ^ e)] :=
+    mul_two_modEq_neg_two_of_two_adic_conj_cases he hcases
+  have hmod_order : i * (2 : ℤ) ≡ (-2 : ℤ) [ZMOD orderOf c] := by
+    simpa [h_order, hp_eq_two] using hmod_two
+  have hzpow : a * c ^ (2 : ℤ) * a⁻¹ = (c ^ (2 : ℤ))⁻¹ := by
+    calc
+      a * c ^ (2 : ℤ) * a⁻¹ = c ^ (i * (2 : ℤ)) :=
+        conj_zpow_eq_zpow_mul_of_conj_eq_zpow h_conj
+      _ = c ^ (-2 : ℤ) := by
+        rw [zpow_eq_zpow_iff_modEq]
+        exact hmod_order
+      _ = (c ^ (2 : ℤ))⁻¹ := by rw [zpow_neg]
+  simpa [zpow_ofNat] using hzpow
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.

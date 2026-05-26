@@ -461,6 +461,9 @@ FT クリティカル度 + 章内依存で並べる:
   `conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne` まで sorry-free.
   これは 6.12 本文の `c = c^{a^p} = c^{i^p}` と `c^p ∉ Z(T)` をつなぐ実質的な
   bridge であり, 既存 theorem の純粋 wrapper ではない.
+  さらに二つの 2-adic alternative がどちらも `i*2 ≡ -2 (mod 2^e)` を与えることを使い,
+  本文直後の `((c^2)^a = (c^2)⁻¹)` も
+  `conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne` として追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
