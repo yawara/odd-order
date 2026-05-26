@@ -71,6 +71,32 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   `characterTableColumnPairing_conj`,
   `characterTableColumnPairing_not_conj` から `sorry` なしで導く形にした。
 
+## 2026-05-26 update — 残 blocker 詳細 (deep dive)
+
+`column_orthogonality_cases` を実際に sorry-free にするのに残るギャップを sub-agent 調査で詳細化:
+
+1. **signature に `[Finite G]` を追加** — 現在は `[Fintype (IrreducibleCharacter G)]` のみ.
+   RHS の `Nat.card (Subgroup.centralizer ({g} : Set G))` と matrix square 議論には
+   `[Finite G]` が必要. 3 つの named corollary も同様.
+2. **`CharacterTableIndexing G` を構成する補題が無い**:
+   matrix 全部品が `idx : CharacterTableIndexing G` パラメータ. これを構成するには
+   classical な **`Nat.card (IrreducibleCharacter G) = Nat.card (ConjClasses G)`** が必要だが
+   mathlib v4.29.1 にも本 repo にも無い. `BrauerPermutation.lean:208` も同じ gap.
+3. **`CharacterTableWeightedRowOrthogonality idx` のコンストラクタが無い**:
+   `characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal` は
+   これを仮定として取るが, mathlib `FDRep.char_orthonormal` から作る bridge が無い.
+   - `IrreducibleCharacter G` → simple `FDRep ℂ G` 関数 (Classical.choice on existential)
+   - 異なる `IrreducibleCharacter` ⇒ 同型でない FDRep simples (so `char_orthonormal` が δ)
+   - universe 整合 (`IsIrreducibleCharacter` Type 0 vs `FDRep` parameterized universe)
+   - `χ(g⁻¹) = star (χ(g))` (`[IsAlgClosed ℂ]` + finite-order ⇒ root of unity)
+   が必要.
+4. **`IsIrreducibleCharacter` ↔ `FDRep.Simple` の接続が wire されていない**:
+   `ZIrr.lean:94` は `Representation.IsIrreducible` 経由, `FDRep.char_orthonormal` は
+   `CategoryTheory.Simple` 経由. これら 2 つの同値性 lemma が無い.
+
+**推定**: 残作業 200-400 行, 少なくとも 1 件の新規 connector ファイル.
+sub-agent 結論: 4 件の blocker は **structural (pre-proof gaps)** で「gymnastics」ではない.
+
 ## 完了条件
 
 - `OddOrder.RepresentationTheory.column_orthogonality_cases` から `sorry` が消える。

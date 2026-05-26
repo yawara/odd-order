@@ -921,3 +921,4 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   endomorphism から `(i,t)` 成分を切り出す
   `cyclicHomBlockFinProjection` も入った.  次は projection の総和による
   reconstruction と全 block の direct-sum decomposition.
+- 2026-05-26 (本セッション): BG §2 representation theory shared module の skeleton 3 件を追加 ([`AbsolutelyIrreducible.lean`](../../OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean), [`ExtraspecialFaithful.lean`](../../OddOrder/GroupTheory/RepresentationTheory/ExtraspecialFaithful.lean), [`OddTwoDimRepr.lean`](../../OddOrder/GroupTheory/RepresentationTheory/OddTwoDimRepr.lean)). いずれも namespace + docstring (BG ↔ mathlib mapping + 該当 tracking issue ポインタ #33 / #34 / #35) のみで sorry / 内容なし. Item 6a ("files exist") を満たすため. 内容は issues 経由で follow-up.
