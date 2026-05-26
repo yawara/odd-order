@@ -297,6 +297,13 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   - **7.1 Thompson normal p-complement**: 7.6 完成後に ~300-450 LOC. 既存 Thm 5.26 +
     Lem 7.7 + HasNormalPComplement subgroup inheritance は使える. quotient
     inheritance helper ~30 LOC が要追加.
+  - **2026-05-26 ✅ 7.1 conditional version**: `thompson_normal_p_complement`
+    ([Main.lean:2922](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2922))
+    が `(thompsonJ P p).Normal` を forward-dep 仮説に取って sorry-free で完成.
+    Steps 1-6 (normal-J 5 仮説確立) は normal-J 7.6 が landing 後に back-fill.
+    Step 7 (`J(P) ⊴ G ⇒ N_G(J(P)) = G ⇒ G has normal p-complement`) は
+    `MulEquiv` transport helper `hasNormalPComplement_of_mulEquiv` (~55 LOC)
+    + `MulEquiv.subgroupCongr` + `Subgroup.topEquiv` で実現.
   - **7.8 Burnside `p^a q^b`**: §7D placeholder のみ. 9-step proof に
     `IsPCentral` / `IsPType` / `U⋆` の新規 def (~150 LOC) + 本体 ~600-900 LOC, 
     multi-session.

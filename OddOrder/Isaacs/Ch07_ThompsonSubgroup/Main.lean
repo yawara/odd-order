@@ -19,6 +19,7 @@ import Mathlib.Tactic.LinearCombination
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # OddOrder.Isaacs.Ch07 — The Thompson Subgroup
@@ -2835,6 +2836,111 @@ theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
       = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N)) :=
   ⟨normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup,
     centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
+
+/-- Transport `OddOrder.Isaacs.Ch05.HasNormalPComplement` across a `MulEquiv`.
+
+If `e : G ≃* H` and `G` has a normal `p`-complement, so does `H`. The complement is the
+image of `G`'s complement under `e`. -/
+private theorem hasNormalPComplement_of_mulEquiv
+    {G' H : Type*} [Group G'] [Group H]
+    [Finite G'] [Finite H] {p : ℕ} [Fact p.Prime] (e : G' ≃* H)
+    (hG : OddOrder.Isaacs.Ch05.HasNormalPComplement p G') :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p H := by
+  classical
+  obtain ⟨N, hN_normal, hN_compl⟩ := hG
+  refine ⟨N.map e.toMonoidHom, ?_, ?_⟩
+  · -- `N.map e` is normal in `H` because `e` is surjective.
+    exact Subgroup.Normal.map hN_normal _ e.surjective
+  · intro Q
+    -- Pull `Q` back to a Sylow `p`-subgroup of `G'` via `e`.
+    have h_range_top : (e.toMonoidHom).range = ⊤ :=
+      MonoidHom.range_eq_top.mpr e.surjective
+    have hQ_le_range : (Q : Subgroup H) ≤ (e.toMonoidHom).range := by
+      rw [h_range_top]; exact le_top
+    let Q' : Sylow p G' := Q.comapOfInjective e.toMonoidHom e.injective hQ_le_range
+    have hQ'_compl : Subgroup.IsComplement' N (Q' : Subgroup G') := hN_compl Q'
+    -- The image of Q' under e equals Q.
+    have hQ'_eq : (Q' : Subgroup G') = (Q : Subgroup H).comap e.toMonoidHom := by
+      simp [Q', Sylow.coe_comapOfInjective]
+    have hQ_map : (Q' : Subgroup G').map e.toMonoidHom = (Q : Subgroup H) := by
+      rw [hQ'_eq, Subgroup.map_comap_eq, h_range_top, top_inf_eq]
+    -- |G'| = |H|, |N.map e| = |N|, |Q| = |Q'|.
+    have hG_card : Nat.card G' = Nat.card H := Nat.card_congr e.toEquiv
+    have hN_card : Nat.card (N.map e.toMonoidHom : Subgroup H) = Nat.card N := by
+      exact
+        (Nat.card_congr
+          (Subgroup.equivMapOfInjective N e.toMonoidHom e.injective).toEquiv).symm
+    have hQ_card : Nat.card (Q : Subgroup H) = Nat.card (Q' : Subgroup G') := by
+      rw [← hQ_map]
+      exact
+        (Nat.card_congr
+          (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).toEquiv).symm
+    -- Multiplicativity: |N.map e| * |Q| = |H|.
+    have h_card_eq :
+        Nat.card N * Nat.card (Q' : Subgroup G') = Nat.card G' :=
+      hQ'_compl.card_mul_card
+    have h_card_H :
+        Nat.card (N.map e.toMonoidHom : Subgroup H) * Nat.card (Q : Subgroup H) =
+          Nat.card H := by
+      rw [hN_card, hQ_card, h_card_eq, hG_card]
+    -- Coprimality: |N| coprime to p (from complement in G' with p-Sylow Q').
+    have hp_ndvd_N : ¬ p ∣ Nat.card N := by
+      rw [← hQ'_compl.index_eq_card]; exact Q'.not_dvd_index
+    obtain ⟨k, hQ'_pow⟩ := IsPGroup.iff_card.mp Q'.isPGroup'
+    have hp_prime : p.Prime := Fact.out
+    have h_coprime' : Nat.Coprime (Nat.card N) (Nat.card (Q' : Subgroup G')) := by
+      rw [hQ'_pow]
+      exact ((hp_prime.coprime_iff_not_dvd.mpr hp_ndvd_N).symm).pow_right k
+    have h_coprime :
+        Nat.Coprime (Nat.card (N.map e.toMonoidHom : Subgroup H))
+          (Nat.card (Q : Subgroup H)) := by
+      rw [hN_card, hQ_card]; exact h_coprime'
+    exact Subgroup.isComplement'_of_coprime h_card_H h_coprime
+
+/-- **Isaacs Thm 7.1** (Thompson normal `p`-complement theorem, conditional on Thm 7.6).
+
+The full theorem (Isaacs L3721, proved L3913 — §7C) states:
+
+> Let `p ≠ 2`, `P ∈ Syl_p(G)`. If `C_G(Z(P))` and `N_G(J(P))` both have normal
+> `p`-complements, then `G` has a normal `p`-complement.
+
+The textbook proof (Isaacs p.215-217) proceeds by a 7-step minimum-counterexample
+argument that establishes the five hypotheses of the **normal-J theorem (Thm 7.6)** for
+`G`, then concludes `J(P) ⊴ G`, and finally observes `G = N_G(J(P))` has a normal
+`p`-complement.
+
+**This formalization takes `J(P) ⊴ G` as a forward-dependency hypothesis**
+(`hJ_normal`), which is precisely the conclusion of normal-J 7.6 applied to the
+minimal counterexample. The Steps 1-6 establishing the normal-J hypotheses (`O_{p'}(G)
+= 1`, `P = C_G(Z(P))`, abelian Sylow-2, p-solvability, ...) require Thm 7.5 +
+Hall-Higman + Lem 7.7 + Frobenius 5.26 and will be back-filled when §7B normal-J
+lands (see `notes/isaacs/ch07_thompson.md`).
+
+Given the J(P)-normality hypothesis, the conclusion is immediate: `J(P) ⊴ G` ⇒
+`N_G(J(P)) = ⊤` ⇒ `↥(N_G(J(P))) ≃* G` ⇒ `HasNormalPComplement` transports from
+`N_G(J(P))` to `G`. -/
+theorem thompson_normal_p_complement
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hNJP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.normalizer
+          ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G)))
+    (hJ_normal : (Subgroup.thompsonJ (P : Subgroup G) p).Normal) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  classical
+  -- J(P) ⊴ G implies N_G(J(P)) = ⊤.
+  have h_norm_top :
+      Subgroup.normalizer
+        ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G) = ⊤ :=
+    Subgroup.normalizer_eq_top_iff.mpr hJ_normal
+  set NG : Subgroup G :=
+    Subgroup.normalizer
+      ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G) with hNG_def
+  -- Compose ↥NG ≃* ↥⊤ ≃* G.
+  let eqEquiv : NG ≃* (⊤ : Subgroup G) := MulEquiv.subgroupCongr h_norm_top
+  let topToG : (⊤ : Subgroup G) ≃* G := Subgroup.topEquiv
+  let e : ↥NG ≃* G := eqEquiv.trans topToG
+  exact hasNormalPComplement_of_mulEquiv e hNJP
 
 end -- 7C
 
