@@ -6557,6 +6557,58 @@ theorem exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelia
       (Fact.out : p.Prime) he h_order h_conj ha_pow_z hpow_ne
   exact ⟨a, i, haT, ha_notmem, ha_pow_C, h_conj, hp_eq_two, hcases⟩
 
+/-- **Isaacs Thm 6.12 setup**: after excluding `|C| = 4`, the cyclic subgroup
+`C = ⟨c⟩` has exponent at least `p³` in the main nonabelian branch.
+
+The proof uses the Lemma 6.15 bridge `c^p ∉ Z(T)` to exclude `e = 0, 1`, while the
+Lemma 6.16 exponent dispatch gives `p = 2`; then `e = 2` is exactly the excluded
+`|C| = 4` case. -/
+theorem three_le_exponent_of_zpowers_relIndex_of_normal_abelian_cyclic
+    {P : Type*} [Group P] [Finite P] {p e : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal] {c : P}
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (hT_normal : T.Normal)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c) (hcT : c ∈ T)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T)
+    (hC_card_ne : Nat.card C ≠ 4)
+    (h_order : orderOf c = p ^ e) :
+    3 ≤ e := by
+  classical
+  let cT : T := ⟨c, hcT⟩
+  have hc_pow_not_center : cT ^ p ∉ Subgroup.center T :=
+    pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
+      hT hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_rel hT_not_comm
+  have he_pos : 0 < e := by
+    by_contra he_not
+    have he0 : e = 0 := Nat.eq_zero_of_not_pos he_not
+    have hc_one : c = 1 := by
+      apply orderOf_eq_one_iff.mp
+      rw [h_order, he0, pow_zero]
+    have hcp_one : cT ^ p = 1 := by
+      apply Subtype.ext
+      simp [cT, hc_one]
+    exact hc_pow_not_center (by rw [hcp_one]; exact Subgroup.one_mem _)
+  obtain ⟨_a, _i, _haT, _ha_notmem, _ha_pow_C, _h_conj, hp_eq_two, _hcases⟩ :=
+    exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic
+      hT hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_rel hT_not_comm
+      h_order he_pos
+  by_contra he_not
+  have he_cases : e = 0 ∨ e = 1 ∨ e = 2 := by omega
+  rcases he_cases with he0 | he1 | he2
+  · omega
+  · have hc_pow_one : c ^ p = 1 := by
+      rw [← orderOf_dvd_iff_pow_eq_one, h_order, he1, pow_one]
+    have hcp_one : cT ^ p = 1 := by
+      apply Subtype.ext
+      simpa [cT] using hc_pow_one
+    exact hc_pow_not_center (by rw [hcp_one]; exact Subgroup.one_mem _)
+  · have hC_card : Nat.card C = 4 := by
+      rw [hC_eq, Nat.card_zpowers, h_order, hp_eq_two, he2]
+      norm_num
+    exact hC_card_ne hC_card
+
 /-- **Isaacs Thm 6.12 setup**: both `2`-adic alternatives from Lemma 6.16 make
 `i * 2 ≡ -2 (mod 2^e)`. -/
 private lemma mul_two_modEq_neg_two_of_two_adic_conj_cases
@@ -7165,6 +7217,52 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top
       ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
         Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8 :=
     quotient_involution_comap_card_ne_eight_of_card_ne_four hC_card_ne
+  exact dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
+    hP h_nonab hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_max
+    hC_rel hT_not_comm hT_card_ne_quot h_order he
+
+/-- **Isaacs Thm 6.12 setup**: the maximal normal cyclic branch reaches the
+dihedral/quaternion/semidihedral classification surface after excluding `|C| = 4`.
+
+This is the same branch as
+`dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top`, but it derives the
+needed exponent bound `3 ≤ e` from the normal-abelian-cyclic hypothesis instead of taking it
+as an external assumption. -/
+theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four
+    {P : Type*} [Group P] [Finite P] {p e : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    {C : Subgroup P} [C.Normal] {c : P}
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hC_lt_top : C < ⊤) (hC_card_ne : Nat.card C ≠ 4)
+    (h_order : orderOf c = p ^ e) :
+    p = 2 ∧
+      (Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
+        Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) ∨
+          ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k)) := by
+  classical
+  have hC_cyclic : IsCyclic C := by
+    rw [hC_eq]
+    exact Subgroup.isCyclic_zpowers c
+  have hC_comm : IsMulCommutative C := by
+    haveI : IsCyclic C := hC_cyclic
+    infer_instance
+  have hCent : Subgroup.centralizer (C : Set P) = C :=
+    centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
+  obtain ⟨T, hT_normal, hcT, hC_le_T, hC_rel, hT_not_comm⟩ :=
+    exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
+      hP hC_eq hC_max hC_lt_top
+  have hT_card_ne : Nat.card T ≠ 8 :=
+    card_ne_eight_of_relIndex_prime_of_card_ne_four hC_le_T hC_rel hC_card_ne
+  have hT_card_ne_quot :
+      ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+        Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8 :=
+    quotient_involution_comap_card_ne_eight_of_card_ne_four hC_card_ne
+  have he : 3 ≤ e :=
+    three_le_exponent_of_zpowers_relIndex_of_normal_abelian_cyclic
+      (hP.to_subgroup T) hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent
+      hC_rel hT_not_comm hC_card_ne h_order
   exact dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
     hP h_nonab hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_max
     hC_rel hT_not_comm hT_card_ne_quot h_order he

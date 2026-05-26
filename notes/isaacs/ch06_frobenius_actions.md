@@ -514,7 +514,10 @@ FT クリティカル度 + 章内依存で並べる:
   本文の `a ∈ T-C`, `a^p ∈ C`, `c^a=c^i`, Lemma 6.16 の `p=2` + 2-adic alternatives を
   一括で取り出す
   `exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic` も
-  追加済み.
+  追加済み. さらに `c^p ∉ Z(T)` で `e=0,1` を除外し, この 6.16 dispatch で `p=2`,
+  `|C|≠4` で `e≠2` を得ることで, 以降の quotient involution/cyclic quotient branch が
+  要求する `3 ≤ e` を返す
+  `three_le_exponent_of_zpowers_relIndex_of_normal_abelian_cyclic` も追加済み.
   さらにこれを cyclic quotient branch theorem へ接続する
   `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient`
   も追加済み.
@@ -525,6 +528,9 @@ FT クリティカル度 + 章内依存で並べる:
   maximal normal cyclic setup から `T`, self-centralizing, `|T| ≠ 8`, quotient-involution
   order-8 除外をすべて供給し, D/Q/SD 分類 surface に到達する
   `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top` も追加済み.
+  さらに外部仮定だった `3 ≤ e` も上記 exponent lower bound で内部供給する
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four`
+  まで追加済み.
   次は abelian `P` branch と maximal normal abelian subgroup の存在を含めた
   6.12 全体 statement への整理.
 - 6.9 solvable Frobenius group 分岐:
