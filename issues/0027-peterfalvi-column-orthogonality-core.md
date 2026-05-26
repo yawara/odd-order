@@ -99,6 +99,9 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality` を追加し、
   ordinary row orthogonality から matrix proof core が要求する
   class-weighted row orthogonality input までを `sorry` なしで接続した。
+- `column_orthogonality_cases_ofRowOrthogonality` を追加し、conditional
+  primitive cases theorem の入力を weighted row orthogonality から ordinary
+  row orthogonality まで下げた。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,

@@ -1034,6 +1034,24 @@ theorem column_orthogonality_cases_of_weightedRowOrthogonality
   · intro hgh
     exact characterTableColumnPairing_not_conj_of_weightedRowOrthogonality (G := G) idx hrow hgh
 
+/-- Conditional primitive cases form of column orthogonality, using ordinary row
+orthogonality as input. -/
+theorem column_orthogonality_cases_ofRowOrthogonality
+    [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (g h : G) :
+    letI := idx.irrFintype
+    (IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
+    (¬ IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h = 0) := by
+  let hweighted :=
+    CharacterTableWeightedRowOrthogonality.ofRowOrthogonality (G := G) idx hrow
+  simpa using column_orthogonality_cases_of_weightedRowOrthogonality
+    (G := G) idx hweighted g h
+
 /-- Primitive cases form of the second (column) orthogonality theorem.
 
 The two projections are the conjugate and non-conjugate columns of the character-table
