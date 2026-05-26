@@ -3343,6 +3343,24 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- `V ⊆ centralizer U` in `G`: since `V ⊆ Z(U)`, every element of `V`
+commutes with every element of `U`.  Used in Step 7 to argue `V * D`
+is abelian (`V ⊆ centralizer U ⊇ D`). -/
+theorem omega1ZCenterOpCore_centralizes_opCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    omega1ZCenterOpCore G p ≤
+      Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) := by
+  intro x hx
+  have hx_ZU : x ∈ zCenterOpCoreSubgroup G p :=
+    omega1ZCenterOpCore_le_zCenterOpCore hx
+  rcases hx_ZU with ⟨⟨z, hz_U⟩, hz_center, rfl⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro u hu
+  have hcomm : (⟨u, hu⟩ : ↥(OddOrder.Isaacs.Ch01.opCore p G)) * ⟨z, hz_U⟩ =
+      ⟨z, hz_U⟩ * ⟨u, hu⟩ :=
+    Subgroup.mem_center_iff.mp hz_center _
+  exact congr_arg Subtype.val hcomm
+
 /-- `U.map (mk' U) = ⊥`: the image of `U = O_p(G)` in `G̅ = G/U` is trivial. -/
 theorem opCore_map_mk_oPiCore_eq_bot
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
