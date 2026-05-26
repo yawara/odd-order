@@ -807,3 +807,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `O_q(G*) ≠ ⊥` を、`AlgebraicClosure F` 上の theorem-facing endpoint へ
   直接運べる. 残る frontier は、`G* ≠ ⊥` から適切な prime core を作る
   char-away 用 group-theoretic spine と、その normalizer branch の制限適用.
+- algebraically closed 上の char-away normalizer branch を追加.
+  `commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determinantKernel_eq_top`
+  で determinant が自明な subgroup 上の `O_q ≠ ⊥` endpoint を作り、
+  `determinantKernel_sylow_normalizer_commutative_of_isAlgClosed_charAway` で
+  `H = N_{G*}(Q)` への制限表現に適用した. `hchar` は
+  `|H| ∣ |G*| ∣ |G|` で制限している. 次 frontier はこの normalizer branch を
+  char-away 用 determinant-kernel/core spine に渡すこと.
