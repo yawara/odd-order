@@ -3410,6 +3410,20 @@ theorem cor_4_35_for_zCenterOpCoreSubgroup
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (zCenterOpCoreSubgroup_isPGroup p) hA_p' h_fix
 
+/-- `O_p(G) ⊓ O_{p'}(G) = ⊥`: the `p`-core and the `p'`-core of `G` are
+disjoint, by coprime cardinalities.  Specialization of `oPiCore.coprime_inf`. -/
+theorem opCore_inf_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    OddOrder.Isaacs.Ch01.opCore p G ⊓
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥ := by
+  have h1 : OddOrder.Isaacs.Ch01.opCore p G =
+      OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
+  have hπeq : ({q : ℕ | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} := by
+    ext q; simp
+  rw [h1, ← hπeq]
+  exact OddOrder.Isaacs.Ch03.oPiCore.coprime_inf ({p} : Set ℕ)
+
 /-- If `Q ⊆ K = C_G(V)`, conjugation by elements of `Q` fixes every element
 of `V = Ω₁ Z(U)` pointwise in `G`. -/
 theorem conj_fixes_omega1ZCenterOpCore_of_le_centralizer
