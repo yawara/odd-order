@@ -233,6 +233,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
   `|V| ≤ p^2` reduction 用に
   `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
+  も追加済み. `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
+  abelian order `p^2` へ落とす
+  `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
+  `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`
   も追加済み. cyclic quotient branch は
   `subgroup_normal_of_injective_mulAut_of_isCyclic` で
   `Aut(V) ≃ (ZMod |V|)ˣ` から acting group 可換, したがって `P ⊴ G` まで閉じられる.

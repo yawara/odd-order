@@ -1484,6 +1484,38 @@ theorem actionCentralizer_inf_index_le_sq {A V : Type*} [Group A] [Group V]
   rw [← actionCentralizer_sup]
   exact actionCentralizer_sup_index_le_sq φ P Q hP hQ
 
+/-- Quotient-cardinality form of the Theorem 7.5 index estimate:
+if both `C_V(P)` and `C_V(Q)` have index at most `p`, then
+`|V / (C_V(P) ∩ C_V(Q))| ≤ p²`. -/
+theorem quotient_card_le_prime_sq_of_actionCentralizer_inf
+    {A V : Type*} [Group A] [Group V] (φ : A →* MulAut V) (P Q : Subgroup A)
+    {p : ℕ} [(actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal]
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    Nat.card (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) ≤ p ^ 2 := by
+  simpa [Subgroup.index_eq_card] using actionCentralizer_inf_index_le_sq φ P Q hP hQ
+
+/-- The Theorem 7.5 quotient reduction: in the `U = C_V(P) ∩ C_V(Q)` quotient, if the
+quotient is noncyclic then it is elementary abelian of order `p²`.
+
+This packages the index estimate with the small-order noncyclic `p`-group bridge from
+`OddOrder.GroupTheory.ElementaryAbelian`. -/
+theorem quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic
+    {A V : Type*} [Group A] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime] (φ : A →* MulAut V) (P Q : Subgroup A)
+    [(actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal]
+    (hV : IsPGroup p V)
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p)
+    (hNotCyclic : ¬ IsCyclic (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q))) :
+    OddOrder.GroupTheory.IsElementaryAbelian p
+        (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) ∧
+      Nat.card (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) = p ^ 2 :=
+  IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
+    (hV.to_quotient (actionCentralizer φ P ⊓ actionCentralizer φ Q))
+    (quotient_card_le_prime_sq_of_actionCentralizer_inf φ P Q hP hQ)
+    hNotCyclic
+
 /-- Any subgroup fixed pointwise by the whole acting group is invariant under the action. -/
 theorem isAInvariant_of_le_actionCentralizer_top {A V : Type*} [Group A] [Group V]
     {φ : A →* MulAut V} {U : Subgroup V}
