@@ -3365,6 +3365,23 @@ theorem zCenterOpCoreSubgroup_comm_subtype
   { (inferInstance : Group ↥(zCenterOpCoreSubgroup G p)) with
     mul_comm := zCenterOpCoreSubgroup_comm_subtype }
 
+/-- **Isaacs Cor 4.35 specialized for Z(U) = Z(O_p(G))**.
+
+Given a `p'`-group `A` acting on `Z(U)` and fixing every element of order
+`p` (= elements of `V = Ω₁ Z(U)`), `actionCommutator φ = ⊥`. -/
+theorem cor_4_35_for_zCenterOpCoreSubgroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Type*} [Group A] [Finite A]
+    (φ : A →* MulAut ↥(zCenterOpCoreSubgroup G p))
+    (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ v : ↥(zCenterOpCoreSubgroup G p), v ^ p = 1 →
+      ∀ a : A, (φ a) v = v) :
+    OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+  let _ : CommGroup ↥(zCenterOpCoreSubgroup G p) :=
+    zCenterOpCoreSubgroup_commGroup G p
+  OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
+    (p := p) φ (zCenterOpCoreSubgroup_isPGroup p) hA_p' h_fix
+
 /-- `V ⊆ centralizer U` in `G`: since `V ⊆ Z(U)`, every element of `V`
 commutes with every element of `U`.  Used in Step 7 to argue `V * D`
 is abelian (`V ⊆ centralizer U ⊇ D`). -/
