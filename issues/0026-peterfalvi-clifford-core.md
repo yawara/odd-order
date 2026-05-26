@@ -42,6 +42,10 @@ API がまだ不足している。
 - `ClassFunction.inertiaQuotient θ = I_G(θ)/H` と
   `IrreducibleCharacter.HasCyclicInertiaQuotient` を追加し、§3 (1.7) の
   cyclic inertia quotient hypothesis を名前にした。
+- `liesOver_iff_restrictionConstituent`,
+  `RestrictionConstituentsSingleOrbit.exists_conj`, and
+  `HasCommonRestrictionMultiplicity.eq_of_liesOver` を追加し、Clifford core
+  の predicate 結論を unfold せずに使えるようにした。
 - 次の小単位は、これらの predicate を結論に持つ Clifford core theorem の statement 化。
 
 ## 完了条件

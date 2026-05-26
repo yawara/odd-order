@@ -129,6 +129,16 @@ theorem liesOver_restrictionConstituent
       (θ : ClassFunction H ℂ) :=
   ⟨θ.isIrreducible, hθ⟩
 
+theorem liesOver_iff_restrictionConstituent
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    LiesOver H χ θ ↔
+      ClassFunction.IsRestrictionConstituent H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) := by
+  constructor
+  · exact liesOver_restrictionConstituent (H := H)
+  · intro hθ
+    exact hθ.multiplicity_ne_zero
+
 end IrreducibleCharacter
 
 variable {H : Subgroup G} [hH : H.Normal]
@@ -157,6 +167,28 @@ def HasCommonRestrictionMultiplicity (χ : IrreducibleCharacter G) : Prop :=
 def HasCyclicInertiaQuotient (θ : IrreducibleCharacter H) : Prop :=
   IsCyclic (ClassFunction.inertiaQuotient (G := G) (H := H)
     (θ : ClassFunction H ℂ))
+
+theorem RestrictionConstituentsSingleOrbit.exists_conj
+    {χ : IrreducibleCharacter G}
+    (hχ : RestrictionConstituentsSingleOrbit (H := H) χ)
+    {θ η : IrreducibleCharacter H}
+    (hθ : LiesOver H χ θ) (hη : LiesOver H χ η) :
+    ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
+      (η : ClassFunction H ℂ) :=
+  hχ θ η hθ hη
+
+omit hH in
+theorem HasCommonRestrictionMultiplicity.eq_of_liesOver
+    {χ : IrreducibleCharacter G}
+    (hχ : HasCommonRestrictionMultiplicity (H := H) χ)
+    {θ η : IrreducibleCharacter H}
+    (hθ : LiesOver H χ θ) (hη : LiesOver H χ η) :
+    ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) =
+      ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (η : ClassFunction H ℂ) := by
+  rcases hχ with ⟨e, he⟩
+  rw [he θ hθ, he η hη]
 
 end IrreducibleCharacter
 
