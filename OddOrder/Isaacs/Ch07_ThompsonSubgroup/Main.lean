@@ -4250,7 +4250,7 @@ dividing `p^a * q^b` (with `p ≠ q` prime) has its order divisible by both
 `p` and `q`. -/
 theorem p_and_q_dvd_card_of_simple_nonsolvable
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
     {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b) :
     p ∣ Nat.card H ∧ q ∣ Nat.card H := by
@@ -4375,7 +4375,8 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
   have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
     hPpg.center_nontrivial
   -- Pick a nontrivial center element.
-  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ := exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
+  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ :=
+    exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
   -- c ∈ G, c ∈ (Subgroup.center P).map P.subtype, c ≠ 1.
   refine ⟨c, ?_, P, ?_⟩
   · -- c ≠ 1 since (⟨⟨c, hc_mem⟩, hc_in_center⟩) ≠ 1 inside center.
