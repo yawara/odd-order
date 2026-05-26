@@ -2873,6 +2873,25 @@ theorem AbarInf_LBar_eq_bot
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 
+/-- **Isaacs Thm 7.6 Step 5 nontriviality** (mmd L3874): if `A ⊄ U`
+(= `oPiCore {p} G`), then the image `Ā = A.map (mk' U)` is nontrivial.
+
+Contrapositive: `Ā = ⊥ ⇒ A ≤ ker mk' = U`. -/
+theorem Abar_ne_bot_of_not_le
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G}
+    (hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :
+    A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) ≠ ⊥ := by
+  intro h_eq
+  apply hA_not_le
+  intro x hx
+  have hmem :
+      (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) x ∈
+        A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) :=
+    ⟨x, hx, rfl⟩
+  rw [h_eq, Subgroup.mem_bot] at hmem
+  exact (QuotientGroup.eq_one_iff x).mp hmem
+
 /-- **Isaacs Thm 7.6 Step 5 faithfulness** (mmd L3874): for any `p`-subgroup
 `A ≤ G`, the image `Ā = A.map (mk' U)` acts faithfully on `L̅ = O_{p'}(G̅)`,
 i.e., `Ā ⊓ C_{G̅}(L̅) = ⊥`.
