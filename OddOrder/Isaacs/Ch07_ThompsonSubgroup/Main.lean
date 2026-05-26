@@ -2189,6 +2189,61 @@ theorem sylow_normal_of_quotient_image_normal_of_normal_isPGroup
     P.Normal :=
   normal_of_quotient_image_normal_of_le (normal_isPGroup_le_sylow hK P) hPbar
 
+/-- If two subgroups both contain the quotient kernel, equality of their images in the
+quotient implies equality upstairs.
+
+This is the subgroup-correspondence step used in Isaacs Thm 7.5 to keep the two Sylow
+subgroups distinct after quotienting by the action kernel. -/
+theorem quotient_images_ne_of_ne_of_le
+    {G : Type*} [Group G] {K P Q : Subgroup G} [K.Normal]
+    (hKP : K ≤ P) (hKQ : K ≤ Q) (hPQ : P ≠ Q) :
+    P.map (QuotientGroup.mk' K) ≠ Q.map (QuotientGroup.mk' K) := by
+  intro hmap
+  apply hPQ
+  have hPcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (P.map (QuotientGroup.mk' K)) = P := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKP
+  have hQcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (Q.map (QuotientGroup.mk' K)) = Q := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKQ
+  rw [← hPcomap, ← hQcomap, hmap]
+
+/-- Quotienting by a normal `p`-subgroup preserves distinctness of Sylow images. -/
+theorem quotient_sylow_images_ne_of_ne_of_normal_isPGroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {P Q : Sylow p G} (hPQ : P ≠ Q)
+    {K : Subgroup G} [K.Normal] (hK : IsPGroup p K) :
+    P.mapSurjective (QuotientGroup.mk'_surjective K) ≠
+      Q.mapSurjective (QuotientGroup.mk'_surjective K) := by
+  intro hmap
+  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  have hsub_ne :
+      (P : Subgroup G).map (QuotientGroup.mk' K) ≠
+        (Q : Subgroup G).map (QuotientGroup.mk' K) :=
+    quotient_images_ne_of_ne_of_le
+      (normal_isPGroup_le_sylow hK P)
+      (normal_isPGroup_le_sylow hK Q)
+      (fun hsub => hPQ (Sylow.ext hsub))
+  apply hsub_ne
+  have hsub_eq := congrArg
+    (fun R : Sylow p (G ⧸ K) => (R : Subgroup (G ⧸ K))) hmap
+  simpa using hsub_eq
+
+/-- If the quotient image of `P` were normal, then `P` would already be normal upstairs. -/
+theorem quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {K : Subgroup G} [K.Normal] (hK : IsPGroup p K)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) :
+    ¬ (((P.mapSurjective (QuotientGroup.mk'_surjective K) :
+          Sylow p (G ⧸ K)) : Subgroup (G ⧸ K)).Normal) := by
+  intro hPbar
+  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  exact hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := K) hK (by simpa using hPbar))
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/

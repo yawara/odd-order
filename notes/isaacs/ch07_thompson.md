@@ -233,6 +233,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   商 `G/K` 側で得た Sylow image の normality を元の `P` に戻す quotient/Sylow bridge
   (`normal_of_quotient_image_normal_of_le`,
   `sylow_normal_of_quotient_image_normal_of_normal_isPGroup`) も追加済み.
+  さらに quotient 後も `P̄,Q̄` が異なる Sylow として残り, `P̄` normality が元の
+  counterexample 仮定と矛盾することを使う bridge
+  (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
+  `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`) も追加済み.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
@@ -317,6 +321,10 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ quotient/Sylow normality pullback: `K` が normal `p`-subgroup なら `K ≤ P`;
      `G/K` 側の `P̄` normality から元の `P` normality へ戻す
      (`sylow_normal_of_quotient_image_normal_of_normal_isPGroup`).
+   - ✅ quotient counterexample bridge: `K ≤ P,Q` なら `P ≠ Q` は quotient image の
+     distinctness として残り, quotient image の normality は元の `P` normality に戻って矛盾
+     (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
+     `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`).
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から
