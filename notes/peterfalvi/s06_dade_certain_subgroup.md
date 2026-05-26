@@ -38,6 +38,11 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 - `CertainTypeHypothesis.DadeApplication`: 係数 `k` に parametric な `S04.DadeIsometryData` を持ち、pointwise Dade-map equations と inner-product preservation を §6 carrier に載せる。
 - `CertainTypeHypothesis.FullDadeApplication`: `k = ℂ` の `S04.FullDadeIsometryData` を持ち、virtual-character preservation も §6 側から `full_maps_virtualCharacter` で参照できる。
+- `map_eq_of_mem_hCoset` / `full_map_eq_of_mem_hCoset`: §4 (2.5) の
+  `aH(a)` 上の値指定を §6 carrier から直接使う。
+- `map_eq_zero_of_not_mem_dadeSupport` /
+  `full_map_eq_zero_of_not_mem_dadeSupport`: §4 Dade support の外で値が 0
+  になることを §6 carrier から直接使う。
 
 ## §6 全 10 結果 (表) ⚠️ audit 訂正 (旧表「5 結果」は (4.6)-(4.10) 完全欠落)
 

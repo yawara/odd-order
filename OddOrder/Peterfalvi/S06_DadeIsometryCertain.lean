@@ -67,6 +67,22 @@ instance (hyp : CertainTypeHypothesis (G := G) A L) :
       OddOrder.Peterfalvi.S04.DadeMap (G := G) k A L) = tau.toDadeMap :=
   rfl
 
+theorem map_eq_of_mem_hCoset {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : DadeApplication (G := G) (k := k) hyp)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) k A L)
+    (a : {a : G // a ∈ A}) {g : G} (hg : g ∈ hyp.dade.hCoset a) :
+    app.tau.toDadeMap α g =
+      (α : ClassFunction L k) ⟨a.1, hyp.dade.mem_L a.2⟩ :=
+  OddOrder.Peterfalvi.S04.IsDadeMap.map_eq_of_mem_hCoset
+    app.tau.isDadeMap α a hg
+
+theorem map_eq_zero_of_not_mem_dadeSupport {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : DadeApplication (G := G) (k := k) hyp)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) k A L)
+    {g : G} (hg : g ∉ hyp.dade.dadeSupport) :
+    app.tau.toDadeMap α g = 0 :=
+  app.tau.isDadeMap.map_eq_zero_of_not_mem_dadeSupport α g hg
+
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)]
 
 /-- A complex §6 application package including the virtual-character part of
@@ -84,6 +100,23 @@ instance (hyp : CertainTypeHypothesis (G := G) A L) :
     ((FullDadeApplication.mk tau : FullDadeApplication (G := G) hyp) :
       OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L) = tau.toDadeMap :=
   rfl
+
+theorem full_map_eq_of_mem_hCoset {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : FullDadeApplication (G := G) hyp)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    (a : {a : G // a ∈ A}) {g : G} (hg : g ∈ hyp.dade.hCoset a) :
+    app.tau.toDadeMap α g =
+      (α : ClassFunction L ℂ) ⟨a.1, hyp.dade.mem_L a.2⟩ :=
+  OddOrder.Peterfalvi.S04.IsDadeMap.map_eq_of_mem_hCoset
+    app.tau.toDadeIsometryData.isDadeMap α a hg
+
+theorem full_map_eq_zero_of_not_mem_dadeSupport
+    {hyp : CertainTypeHypothesis (G := G) A L}
+    (app : FullDadeApplication (G := G) hyp)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    {g : G} (hg : g ∉ hyp.dade.dadeSupport) :
+    app.tau.toDadeMap α g = 0 :=
+  app.tau.toDadeIsometryData.isDadeMap.map_eq_zero_of_not_mem_dadeSupport α g hg
 
 theorem full_inner_eq {hyp : CertainTypeHypothesis (G := G) A L}
     (app : FullDadeApplication (G := G) hyp)
