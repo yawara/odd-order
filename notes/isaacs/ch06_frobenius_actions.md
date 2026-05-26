@@ -327,9 +327,11 @@ FT クリティカル度 + 章内依存で並べる:
   `false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup`
   を追加: Frobenius actor の部分群 `B` が Frobenius group で, target 側に非自明
   `B`-invariant abelian subgroup があれば矛盾.
-  残りは Ch.3 Thm 3.23(a) の A-invariant Sylow 存在を実装し,
+  Ch.4 側の `exists_aInvariant_sylow` (Isaacs Thm 3.23(a)) を使い,
   `R > 1` から `Z(R) > 1` と characteristic invariance をつないで,
-  本文通り target を `Z(R)` に落とす部分.
+  `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup` まで
+  sorry-free. これで 6.9 の「solvable Frobenius group subgroup は不可」分岐は
+  abelian reduction を含めて閉じた.
 - wrapper 監査:
   今回追加した `ncard_conjugates_eq_index_of_TI` は 6.5 の conjugate counting proof を
   6.9 の Frobenius partition cardinality でも使うための private proof extraction.

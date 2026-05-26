@@ -193,6 +193,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.5 (Transfer): Cor 5.30 (odd p, order-p elements central)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normal_p_complement_of_order_p_central_odd
 
+-- Ch.6 (Frobenius Actions): Thm 6.9 solvable Frobenius subgroup obstruction
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
 -- elementary abelian subgroup of order 4.

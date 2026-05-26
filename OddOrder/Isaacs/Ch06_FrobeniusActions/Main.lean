@@ -2276,6 +2276,58 @@ theorem false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abe
     exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
   exact false_of_frobeniusAction_isFrobeniusGroup_on_abelian hFrobM hGroup
 
+/-- **Isaacs Thm 6.9** (solvable Frobenius-group branch): a Frobenius actor cannot contain a
+solvable Frobenius group.  This is the full reduction in L3495: choose an invariant Sylow
+subgroup `R` of the target by Isaacs Thm 3.23, pass to the nontrivial invariant abelian subgroup
+`Z(R)`, and apply the abelian-target Frobenius-group contradiction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B]
+    {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C) :
+    False := by
+  classical
+  let φ : B →* MulAut U := MulDistribMulAction.toMulAut B U
+  have hFrobB : IsFrobeniusAction B U := IsFrobeniusAction.actorSubgroup hFrob B
+  have hCop : Nat.Coprime (Nat.card B) (Nat.card U) := by
+    haveI : Fintype B := Fintype.ofFinite B
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Nat.card_eq_fintype_card] using
+      (IsFrobeniusAction.coprime_card (A := B) (N := U) hFrobB).symm
+  have hU_gt_one : 1 < Nat.card U :=
+    Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  obtain ⟨p, hp, hp_dvd⟩ := Nat.exists_prime_and_dvd hU_gt_one.ne'
+  letI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨R, hR_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := U) (A := B) (φ := φ)
+      hCop (Or.inl (inferInstance : IsSolvable B)) p
+  let M : Subgroup U := (Subgroup.center R).map (R : Subgroup U).subtype
+  have hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M := by
+    simpa [M] using
+      (OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
+        (φ := φ) hR_inv (K := Subgroup.center R))
+  have hR_ne_bot : (R : Subgroup U) ≠ ⊥ := R.ne_bot_of_dvd_card hp_dvd
+  haveI hR_nontrivial : Nontrivial R :=
+    (Subgroup.nontrivial_iff_ne_bot (R : Subgroup U)).mpr hR_ne_bot
+  haveI hCenter_nontrivial : Nontrivial (Subgroup.center R) :=
+    R.isPGroup'.center_nontrivial
+  have hM_ne_bot : M ≠ ⊥ := by
+    dsimp [M]
+    rw [Subgroup.map_eq_bot_iff_of_injective
+      (H := Subgroup.center R) (R : Subgroup U).subtype_injective]
+    exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center R)).mp hCenter_nontrivial
+  haveI hM_nontrivial : Nontrivial M :=
+    (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  haveI hM_comm : IsMulCommutative M := by
+    dsimp [M]
+    infer_instance
+  exact
+    false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
+      hFrob B hGroup M
+      (by
+        intro b m hm
+        simpa [φ] using hM_inv.smul_mem b hm)
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/
