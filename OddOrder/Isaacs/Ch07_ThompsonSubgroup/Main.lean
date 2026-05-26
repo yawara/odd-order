@@ -3343,6 +3343,13 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- `Z(U) = Z(O_p(G))` is a `p`-group: it is a subgroup of `U = O_p(G)`,
+which is a `p`-group. -/
+theorem zCenterOpCoreSubgroup_isPGroup
+    {G : Type*} [Group G] [Finite G] (p : ℕ) [Fact p.Prime] :
+    IsPGroup p (zCenterOpCoreSubgroup G p) :=
+  (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).to_le zCenterOpCoreSubgroup_le_opCore
+
 /-- `V ⊆ centralizer U` in `G`: since `V ⊆ Z(U)`, every element of `V`
 commutes with every element of `U`.  Used in Step 7 to argue `V * D`
 is abelian (`V ⊆ centralizer U ⊇ D`). -/
