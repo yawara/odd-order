@@ -2458,6 +2458,209 @@ theorem false_of_quotient_isCyclic_of_sylow_not_normal
       (G := G) (p := p) P (K := quotientActionKernel φ hU) hK
       (quotient_sylow_normal_of_isCyclic_of_actionKernel hU P))
 
+/-- Descend the action-centralizer index hypothesis from `G` to a subgroup `H`.
+
+For every Sylow `R : Sylow p H`, the image `R.map H.subtype` is a `p`-subgroup of `G`,
+hence contained in some Sylow `S : Sylow p G`.  Antitonicity of `actionCentralizer`
+then gives `(actionCentralizer (φ.comp H.subtype) R).index ≤ (actionCentralizer φ S).index`,
+which is bounded by `p` by the upstairs hypothesis. -/
+private theorem actionCentralizer_comp_subtype_index_le_of_globalHypothesis
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V}
+    (h_centralizer_index :
+      ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+    (H : Subgroup G) (R : Sylow p H) :
+    (actionCentralizer (φ.comp H.subtype) (R : Subgroup H)).index ≤ p := by
+  -- The image of `R` in `G` is a `p`-subgroup of `G`.
+  have hRG_p : IsPGroup p ((R : Subgroup H).map H.subtype) :=
+    R.isPGroup'.map H.subtype
+  obtain ⟨S, hS_le⟩ := hRG_p.exists_le_sylow
+  have h_eq :
+      actionCentralizer (φ.comp H.subtype) (R : Subgroup H) =
+        actionCentralizer φ ((R : Subgroup H).map H.subtype) := by
+    ext v
+    simp only [mem_actionCentralizer]
+    constructor
+    · intro hv g
+      rcases g.property with ⟨r, hrR, hrg⟩
+      have hfix := hv ⟨r, hrR⟩
+      change (φ ((r : H) : G)) v = v at hfix
+      rw [show (g : G) = ((r : H) : G) from hrg.symm]
+      exact hfix
+    · intro hv r
+      have hr_mem : ((r : H) : G) ∈ (R : Subgroup H).map H.subtype :=
+        Subgroup.mem_map_of_mem H.subtype r.property
+      exact hv ⟨((r : H) : G), hr_mem⟩
+  rw [h_eq]
+  -- Antitonicity in P direction: bigger P → smaller actionCentralizer.
+  have h_anti :
+      actionCentralizer φ (S : Subgroup G) ≤
+        actionCentralizer φ ((R : Subgroup H).map H.subtype) :=
+    actionCentralizer_antitone hS_le
+  exact (Subgroup.index_antitone h_anti).trans (h_centralizer_index S)
+
+/-- **Isaacs Thm 7.5** (normal-P theorem).
+
+If `G` is `p`-solvable with `p ≠ 2`, every `2`-subgroup of `G` is abelian, `G` acts
+faithfully on a finite `p`-group `V`, and `|V : C_V(P)| ≤ p` for every Sylow `p`-subgroup
+`P`, then every Sylow `p`-subgroup of `G` is normal.
+
+The proof is by strong induction on `|G|`.  If `G` has a unique Sylow `p`-subgroup, the
+result is trivial.  Otherwise pick two distinct Sylows `P, Q`.  If `⟨P, Q⟩ ≠ G`, descend
+to the subgroup `⟨P, Q⟩` and apply the induction hypothesis there.  When `⟨P, Q⟩ = G`,
+the action-centralizer index estimate forces `|V/U| ≤ p²` for `U := C_V(P) ∩ C_V(Q)`, and
+splitting on whether `V/U` is cyclic produces the contradiction via the elementary-abelian
+or cyclic branch built up above. -/
+theorem sylow_normal_of_elementary_normal_P_theorem
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} (hφ : Function.Injective φ)
+    (hV : IsPGroup p V)
+    (h_centralizer_index :
+      ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+    (P : Sylow p G) : (P : Subgroup G).Normal := by
+  classical
+  -- Strong induction on |G|, using an explicit motive.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (G : Type _) [Group G] [Finite G] [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+      (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+      (φ : G →* MulAut V) (_hφ : Function.Injective φ)
+      (_h_centralizer_index :
+        ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+      (P : Sylow p G), Nat.card G = n → (P : Subgroup G).Normal
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G h2abelian φ hφ h_centralizer_index P rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih G _ _ _ h2abelian φ hφ h_centralizer_index P hcard
+  by_contra hP_not_normal
+  -- Sylows are not subsingleton, else `P` would be normal.
+  have hNotSub : ¬ Subsingleton (Sylow p G) := by
+    intro hSub
+    exact hP_not_normal (Sylow.normal_of_subsingleton P)
+  -- Pick Q ≠ P.
+  haveI : Nontrivial (Sylow p G) := not_subsingleton_iff_nontrivial.mp hNotSub
+  obtain ⟨Q, hQP⟩ := exists_ne P
+  -- We have Q ≠ P; consider H := ⟨P, Q⟩ = P ⊔ Q.
+  set H : Subgroup G := (P : Subgroup G) ⊔ (Q : Subgroup G) with hH_def
+  by_cases hH_top : H = ⊤
+  · -- §7A closing branch: H = ⊤.
+    -- U := C_V(P) ∩ C_V(Q) is normal, A-invariant, with |V/U| ≤ p².
+    have hPidx : (actionCentralizer φ (P : Subgroup G)).index ≤ p :=
+      h_centralizer_index P
+    have hQidx : (actionCentralizer φ (Q : Subgroup G)).index ≤ p :=
+      h_centralizer_index Q
+    haveI hU_normal :
+        (actionCentralizer φ (P : Subgroup G) ⊓
+            actionCentralizer φ (Q : Subgroup G)).Normal :=
+      actionCentralizer_inf_normal_of_index_le_prime hV hPidx hQidx
+    have hPQ_top : (P : Subgroup G) ⊔ (Q : Subgroup G) = ⊤ := by
+      simpa [H, hH_def] using hH_top
+    have hU_invariant :
+        OddOrder.Isaacs.Ch03.IsAInvariant φ
+          (actionCentralizer φ (P : Subgroup G) ⊓
+            actionCentralizer φ (Q : Subgroup G)) :=
+      actionCentralizer_inf_isAInvariant_of_sup_eq_top hPQ_top
+    -- The action kernel K on V/U is a p-group.
+    have hK_p :
+        IsPGroup p (quotientActionKernel φ hU_invariant) := by
+      have := actionCentralizer_inf_quotientActionKernel_isPGroup_of_sup_eq_top
+        (φ := φ) (P := (P : Subgroup G)) (Q := (Q : Subgroup G))
+        hPQ_top hφ hV
+      simpa using this
+    -- Split on cyclicity of V/U.
+    by_cases hVU_cyclic :
+        IsCyclic (V ⧸ (actionCentralizer φ (P : Subgroup G) ⊓
+          actionCentralizer φ (Q : Subgroup G)))
+    · -- Cyclic branch.
+      haveI := hVU_cyclic
+      exact
+        false_of_quotient_isCyclic_of_sylow_not_normal
+          (φ := φ) hU_invariant hK_p P hP_not_normal
+    · -- Non-cyclic ⇒ elementary abelian of order p².
+      obtain ⟨hVU_elem, hVU_card⟩ :=
+        quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic
+          φ (P : Subgroup G) (Q : Subgroup G) hV hPidx hQidx hVU_cyclic
+      exact
+        false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
+          (φ := φ) hp2 h2abelian hU_invariant hK_p hVU_elem hVU_card P hP_not_normal
+  · -- Generation reduction: descend to H = ⟨P, Q⟩ ≠ ⊤.
+    have hHidx_gt : 1 < H.index :=
+      Subgroup.one_lt_index_of_ne_top hH_top
+    have hH_card_lt : Nat.card H < Nat.card G := by
+      have hmul : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+      have hcard_pos : 0 < Nat.card H := Nat.card_pos
+      calc
+        Nat.card H = Nat.card H * 1 := (mul_one _).symm
+        _ < Nat.card H * H.index := (Nat.mul_lt_mul_left hcard_pos).mpr hHidx_gt
+        _ = Nat.card G := hmul
+    -- P and Q sit inside H.
+    have hP_le_H : (P : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_left
+    have hQ_le_H : (Q : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_right
+    -- View P as a Sylow of H.
+    let P' : Sylow p H := P.subtype hP_le_H
+    -- Descend hypothesis (i): IsPiSeparable on H.
+    haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
+      OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable ({p} : Set ℕ) H
+    -- Descend hypothesis (iii): 2-subgroup abelian.
+    have h2abelian' :
+        ∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
+      intro S hS2
+      have hSG2 : IsPGroup 2 (S.map H.subtype) := hS2.map H.subtype
+      have hSGcomm := h2abelian (S.map H.subtype) hSG2
+      intro a b
+      apply Subtype.ext
+      apply Subtype.ext
+      let ag : ↥(S.map H.subtype) :=
+        ⟨((a : H) : G), ⟨(a : H), a.property, rfl⟩⟩
+      let bg : ↥(S.map H.subtype) :=
+        ⟨((b : H) : G), ⟨(b : H), b.property, rfl⟩⟩
+      have h := congrArg (fun z : ↥(S.map H.subtype) => (z : G)) (hSGcomm ag bg)
+      simpa using h
+    -- Descend hypothesis (iv): φ ∘ H.subtype is injective.
+    have hφ' : Function.Injective (φ.comp H.subtype) := by
+      intro a b hab
+      apply Subtype.ext
+      exact hφ hab
+    -- Descend hypothesis (v).
+    have h_centralizer_index' :
+        ∀ (R : Sylow p H), (actionCentralizer (φ.comp H.subtype)
+          (R : Subgroup H)).index ≤ p :=
+      fun R =>
+        actionCentralizer_comp_subtype_index_le_of_globalHypothesis
+          (φ := φ) h_centralizer_index H R
+    have hcard_lt : Nat.card H < n := by rw [← hcard]; exact hH_card_lt
+    -- Apply IH to H.
+    have hP'_normal : (P' : Subgroup H).Normal :=
+      ih (Nat.card H) hcard_lt H h2abelian' (φ.comp H.subtype) hφ'
+        h_centralizer_index' P' rfl
+    -- The same IH applied to Q.
+    let Q' : Sylow p H := Q.subtype hQ_le_H
+    have hQ'_normal : (Q' : Subgroup H).Normal :=
+      ih (Nat.card H) hcard_lt H h2abelian' (φ.comp H.subtype) hφ'
+        h_centralizer_index' Q' rfl
+    -- In `H`, both `P'` and `Q'` are normal Sylow p-subgroups, hence equal.
+    have hPQ_eq : P' = Q' := by
+      haveI := Sylow.unique_of_normal P' hP'_normal
+      exact Subsingleton.elim P' Q'
+    have hPQsubgroup_eq : (P : Subgroup G) = (Q : Subgroup G) := by
+      have h := congrArg (fun R : Sylow p H => (R : Subgroup H)) hPQ_eq
+      simp only [P', Q', Sylow.coe_subtype] at h
+      have hPmap :
+          ((P : Subgroup G).subgroupOf H).map H.subtype = (P : Subgroup G) := by
+        rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, H.range_subtype]
+        exact inf_eq_right.mpr hP_le_H
+      have hQmap :
+          ((Q : Subgroup G).subgroupOf H).map H.subtype = (Q : Subgroup G) := by
+        rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, H.range_subtype]
+        exact inf_eq_right.mpr hQ_le_H
+      have := congrArg (fun K : Subgroup H => K.map H.subtype) h
+      simpa [hPmap, hQmap] using this
+    exact hQP (Sylow.ext hPQsubgroup_eq.symm)
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
