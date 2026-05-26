@@ -14,6 +14,7 @@ import Mathlib.LinearAlgebra.Determinant
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §2: General Results on Representations
@@ -1666,6 +1667,27 @@ private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
   haveI : Finite (Sylow q G) := inferInstance
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   exact ⟨q, hq_prime, hq_ne_p, Q, opCore_ne_bot_of_sylow_normalizer Q hq_dvd⟩
+
+/-- Burnside bridge for BG Thm 2.6: an abelian Sylow normalizer gives a normal
+`p`-complement.
+
+BG phrases the step as "`H = N_G(Q)` is abelian, so by Burnside ..."; Ch.5's
+formal entry point expects `N_G(Q) ≤ C_G(Q)`. -/
+private theorem hasNormalPComplement_of_sylow_normalizer_commutative
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (Q : Sylow p G)
+    (hN_comm : Std.Commutative
+      (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
+        Subgroup.normalizer ((Q : Subgroup G) : Set G) →
+        Subgroup.normalizer ((Q : Subgroup G) : Set G))) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  refine OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer
+    Q ?_
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  exact (congr_arg Subtype.val
+    (hN_comm.comm ⟨x, hx⟩ ⟨y, Q.le_normalizer hy⟩)).symm
 
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
