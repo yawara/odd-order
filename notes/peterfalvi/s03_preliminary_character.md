@@ -149,6 +149,12 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 inputs for the combinatorial core on both sides: nonzero source/target
 differences have norm `2`, and two distinct nonzero source/target differences
 have inner product `1`.
+`irreducibleCharacterDifference` and `isometryDifferenceImage` now name
+`χ_i - χ_0` and its `τ` image, and
+`isometryDifferenceImage_inner_self_of_ne_zero` /
+`isometryDifferenceImage_inner_of_ne_zero_of_ne` transfer the source-side
+norm/inner values across `h_isom` without unfolding the raw class-function
+differences.
 
 **形式化**: ~60-80 行 (非自明だが self-contained).
 

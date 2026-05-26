@@ -74,6 +74,12 @@ created: 2026-05-25
   `Orthogonal.image_conjugateDifference_inner_eq_zero` を追加し、(5.2.d/e)
   の image norm `2` と image-set 直交性を hypothesis carrier から直接使える
   ようにした。
+- `irreducibleCharacterDifference` と `isometryDifferenceImage` を追加し、
+  §3 (1.4) の source difference とその `τ` image を名前付きにした。
+  `isometryDifferenceImage_inner_self_of_ne_zero` と
+  `isometryDifferenceImage_inner_of_ne_zero_of_ne` により、`h_isom` と source
+  row orthogonality から image 側 norm `2` / mutual inner `1` を直接取り出せる。
+  `isometry_difference_pair_structure` の statement もこの named interface へ寄せた。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

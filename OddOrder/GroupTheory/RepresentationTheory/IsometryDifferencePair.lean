@@ -100,6 +100,109 @@ theorem irreducibleCharacter_difference_inner_of_ne_zero_of_ne
   rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
   simp [hi, hj, hij, eq_comm]
 
+/-- The source-side difference `χ_i - χ_0` used in Peterfalvi §3 (1.4). -/
+abbrev irreducibleCharacterDifference {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter G) (i : Fin n) : ClassFunction G ℂ :=
+  (χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)
+
+@[simp] theorem irreducibleCharacterDifference_zero
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G) :
+    irreducibleCharacterDifference χ 0 = 0 := by
+  simp [irreducibleCharacterDifference]
+
+theorem irreducibleCharacterDifference_ne_zero
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    irreducibleCharacterDifference χ i ≠ 0 := by
+  intro h
+  have hclass : (χ i : ClassFunction G ℂ) = (χ 0 : ClassFunction G ℂ) :=
+    sub_eq_zero.mp h
+  exact hi (hχ (IrreducibleCharacter.ext hclass))
+
+theorem irreducibleCharacterDifference_eq_zero_iff
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) (i : Fin n) :
+    irreducibleCharacterDifference χ i = 0 ↔ i = 0 := by
+  constructor
+  · intro h
+    by_contra hi
+    exact irreducibleCharacterDifference_ne_zero χ hχ hi h
+  · intro hi
+    subst hi
+    simp
+
+theorem irreducibleCharacterDifference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (irreducibleCharacterDifference χ i)
+        (irreducibleCharacterDifference χ i) = 2 := by
+  exact irreducibleCharacter_difference_inner_self_of_ne_zero (G := G) hrow χ hχ hi
+
+theorem irreducibleCharacterDifference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i j : Fin n}
+    (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (irreducibleCharacterDifference χ i)
+        (irreducibleCharacterDifference χ j) = 1 := by
+  exact irreducibleCharacter_difference_inner_of_ne_zero_of_ne
+    (G := G) hrow χ hχ hi hj hij
+
+/-- The image under an integral isometry of a source-side difference `χ_i - χ_0`. -/
+abbrev isometryDifferenceImage {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) (i : Fin n) : ClassFunction G ℂ :=
+  τ (irreducibleCharacterDifference χ i)
+
+@[simp] theorem isometryDifferenceImage_zero {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) :
+    isometryDifferenceImage τ χ 0 = 0 := by
+  simp [isometryDifferenceImage]
+
+theorem isometryDifferenceImage_inner_self_of_ne_zero
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j))
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (isometryDifferenceImage τ χ i)
+        (isometryDifferenceImage τ χ i) = 2 := by
+  rw [h_isom i i]
+  exact irreducibleCharacterDifference_inner_self_of_ne_zero
+    (G := H) hrow χ hχ hi
+
+theorem isometryDifferenceImage_inner_of_ne_zero_of_ne
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j))
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (isometryDifferenceImage τ χ i)
+        (isometryDifferenceImage τ χ j) = 1 := by
+  rw [h_isom i j]
+  exact irreducibleCharacterDifference_inner_of_ne_zero_of_ne
+    (G := H) hrow χ hχ hi hj hij
+
 /-- A signed `n`-tuple of irreducible characters of `G`, used as the target
 shape in Peterfalvi's difference-pair lemmas.
 
@@ -378,15 +481,12 @@ theorem isometry_difference_pair_structure
         ((χ 0 : ClassFunction H ℂ) : H → ℂ) 1)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
     (h_isom : ∀ i j,
-        ClassFunction.inner
-          (τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)))
-          (τ ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) =
-        ClassFunction.inner
-          ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))
-          ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) :
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j)) :
     ∃ data : SignedIrreducibleDifferenceFamily G n,
-      ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
-        data.signedDifference i := by
+      ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i := by
   sorry
 
 end OddOrder.RepresentationTheory
