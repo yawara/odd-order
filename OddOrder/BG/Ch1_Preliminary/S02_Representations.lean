@@ -2063,6 +2063,98 @@ private theorem both_lines_le_comap_left_or_right_of_determinantKernel_subgroup
     · left
       exact hswap
 
+/-- The two conjugate-line alternatives are coherent: an ambient element either
+preserves both Maschke lines or swaps them.
+
+The impossible mixed cases would make the two conjugate complementary lines
+land on the same nonzero rank-one line. -/
+private theorem conjugateSubrepresentations_stay_or_swap_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F W.toSubmodule] [Module.Finite F U.toSubmodule]
+    [Module.Free F (V ⧸ W.toSubmodule)] [Module.Free F (V ⧸ U.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQW : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    (hdimQU : Module.finrank F (V ⧸ U.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) (g : G) :
+    (conjugateSubrepresentationOfNormal K hKnormal ρ W g = W ∧
+      conjugateSubrepresentationOfNormal K hKnormal ρ U g = U) ∨
+    (conjugateSubrepresentationOfNormal K hKnormal ρ W g = U ∧
+      conjugateSubrepresentationOfNormal K hKnormal ρ U g = W) := by
+  have hW_ne_bot : W.toSubmodule ≠ ⊥ := by
+    rw [← Submodule.one_le_finrank_iff]
+    omega
+  have hU_ne_bot : U.toSubmodule ≠ ⊥ := by
+    rw [← Submodule.one_le_finrank_iff]
+    omega
+  have hcomplg :
+      IsCompl
+        (conjugateSubrepresentationOfNormal K hKnormal ρ W g).toSubmodule
+        (conjugateSubrepresentationOfNormal K hKnormal ρ U g).toSubmodule :=
+    isCompl_conjugateSubrepresentationOfNormal K hKnormal ρ W U g hcompl
+  rcases conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+      ρ hfaithful hodd K hKnormal hKle W U hcompl hdimW hdimU hdimQW
+      hx_ne_one g with hWW | hWU
+  · rcases conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+        ρ hfaithful hodd K hKnormal hKle U W hcompl.symm hdimU hdimW hdimQU
+        hx_ne_one g with hUU | hUW
+    · exact Or.inl ⟨hWW, hUU⟩
+    · exfalso
+      have hW_bot : W.toSubmodule = ⊥ := by
+        have hleft := congrArg Subrepresentation.toSubmodule hWW
+        have hright := congrArg Subrepresentation.toSubmodule hUW
+        simpa [hleft, hright] using hcomplg.inf_eq_bot
+      exact hW_ne_bot hW_bot
+  · rcases conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+        ρ hfaithful hodd K hKnormal hKle U W hcompl.symm hdimU hdimW hdimQU
+        hx_ne_one g with hUU | hUW
+    · exfalso
+      have hU_bot : U.toSubmodule = ⊥ := by
+        have hleft := congrArg Subrepresentation.toSubmodule hWU
+        have hright := congrArg Subrepresentation.toSubmodule hUU
+        simpa [hleft, hright] using hcomplg.inf_eq_bot
+      exact hU_ne_bot hU_bot
+    · exact Or.inr ⟨hWU, hUW⟩
+
+/-- Coherent `comap` form of the two-line alternatives: each ambient element
+either preserves both lines or swaps them. -/
+private theorem both_lines_le_comap_stay_or_swap_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F W.toSubmodule] [Module.Finite F U.toSubmodule]
+    [Module.Free F (V ⧸ W.toSubmodule)] [Module.Free F (V ⧸ U.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQW : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    (hdimQU : Module.finrank F (V ⧸ U.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) (g : G) :
+    (W.toSubmodule ≤ W.toSubmodule.comap (ρ g) ∧
+      U.toSubmodule ≤ U.toSubmodule.comap (ρ g)) ∨
+    (W.toSubmodule ≤ U.toSubmodule.comap (ρ g) ∧
+      U.toSubmodule ≤ W.toSubmodule.comap (ρ g)) := by
+  rcases conjugateSubrepresentations_stay_or_swap_of_determinantKernel_subgroup
+      ρ hfaithful hodd K hKnormal hKle W U hcompl hdimW hdimU hdimQW hdimQU
+      hx_ne_one g with hstay | hswap
+  · exact Or.inl
+      ⟨le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W W hstay.1,
+        le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ U U hstay.2⟩
+  · exact Or.inr
+      ⟨le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W U hswap.1,
+        le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ U W hswap.2⟩
+
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup
     {F : Type*} [Field F] {G : Type*} [Group G]

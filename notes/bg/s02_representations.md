@@ -653,3 +653,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   送る comap alternatives を同時に返す.
 - 次 frontier はこの「両 line の alternatives」を coherent な `Fin 2` permutation
   action にまとめ、`RankOneLinePairData.permutes` へ渡す段.
+- `conjugateSubrepresentations_stay_or_swap_of_determinantKernel_subgroup` と
+  `both_lines_le_comap_stay_or_swap_of_determinantKernel_subgroup` を追加.
+  前単位の左右独立な alternatives から、`IsCompl` と rank-one 非零性で混合ケースを
+  排除し、各 `g : G` が二つの line を「両方固定」または「両方交換」するところまで
+  coherent にした.
+- 次 frontier はこの per-element stay/swap dichotomy から odd-order で swap case を
+  排除する段. ここを直接証明するか、必要なら `Fin 2` action を構成して
+  既存の `smul_fin_two_eq_self_of_odd_card` へ渡す.
