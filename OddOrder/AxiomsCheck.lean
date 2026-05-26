@@ -309,6 +309,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_involution_conj_square_eq_inv_of_zpowers
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_eq_inv_or_twist_of_two_adic_cases
 #assert_only_allowed_axioms

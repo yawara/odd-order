@@ -6516,6 +6516,121 @@ theorem conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
   exact conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
     hp he h_order h_conj ha_pow_z hpow_ne
 
+/-- **Isaacs Thm 6.12 setup**: a quotient involution inverts `c²`.
+
+For a nontrivial involution `q ∈ P/C`, pull back `⟨q⟩` to a subgroup `T`. Then
+`|T : C| = 2`.  Lemma 6.15 gives `c² ∉ Z(T)`, and since `T = C ⊔ ⟨a⟩` for any
+representative `a` of `q`, the representative cannot centralize `c²`.  The preceding
+exponent-free bridge then gives `(c²)^a = (c²)⁻¹`. -/
+theorem quotient_involution_conj_square_eq_inv_of_zpowers
+    {P : Type*} [Group P] [Finite P]
+    {C : Subgroup P} [C.Normal] {c : P} {e : ℕ}
+    (hP : IsPGroup 2 P)
+    (hC_eq : C = Subgroup.zpowers c)
+    (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (h_order : orderOf c = 2 ^ e) (he : 0 < e)
+    (hT_card_ne :
+      ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+        Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8)
+    {q : P ⧸ C} (hq_ne : q ≠ 1) (hq_sq : q ^ 2 = 1)
+    {a : P} (haq : QuotientGroup.mk' C a = q) :
+    a * c ^ 2 * a⁻¹ = (c ^ 2)⁻¹ := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let Q : Subgroup (P ⧸ C) := Subgroup.zpowers q
+  let T : Subgroup P := Q.comap (QuotientGroup.mk' C)
+  have hC_le_T : C ≤ T := QuotientGroup.le_comap_mk' C Q
+  have hT_map : T.map (QuotientGroup.mk' C) = Q :=
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective C) Q
+  have hq_order : orderOf q = 2 := orderOf_eq_prime (p := 2) hq_sq hq_ne
+  have hC_rel : C.relIndex T = 2 := by
+    have hrel : C.relIndex T = Nat.card Q := by
+      have hrel_ker :
+          (QuotientGroup.mk' C).ker.relIndex T = Nat.card Q := by
+        rw [Subgroup.relIndex_ker, hT_map]
+      simpa [QuotientGroup.ker_mk'] using hrel_ker
+    rw [hrel]
+    change Nat.card (Subgroup.zpowers q) = 2
+    rw [Nat.card_zpowers, hq_order]
+  have haT : a ∈ T := by
+    change QuotientGroup.mk' C a ∈ Q
+    rw [haq]
+    exact Subgroup.mem_zpowers q
+  have ha_notmem_C : a ∉ C := by
+    intro haC
+    apply hq_ne
+    rw [← haq]
+    exact (QuotientGroup.eq_one_iff a).mpr haC
+  have hC_lt_T : C < T := by
+    refine lt_of_le_of_ne hC_le_T ?_
+    intro h_eq
+    exact ha_notmem_C (by simpa [h_eq] using haT)
+  have hC_cyclic : IsCyclic C := by
+    rw [hC_eq]
+    exact Subgroup.isCyclic_zpowers c
+  have hquot_comm : ∀ x y : P ⧸ C, x * y = y * x :=
+    quotient_commutative_of_isCyclic_of_self_centralizing hC_cyclic hCent
+  have hT_normal : T.Normal :=
+    normal_of_le_of_quotient_commutative hC_le_T hquot_comm
+  have hT_not_comm : ¬ IsMulCommutative T := by
+    intro hT_comm
+    exact hC_max T hT_normal hT_comm hC_lt_T
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have hcT : c ∈ T := hC_le_T hcC
+  have hQ_eq : Q = (Subgroup.zpowers a).map (QuotientGroup.mk' C) := by
+    rw [MonoidHom.map_zpowers, haq]
+  have hT_eq : T = C ⊔ Subgroup.zpowers a := by
+    dsimp [T]
+    rw [hQ_eq, QuotientGroup.comap_map_mk']
+  have hc_pow_not_center : (⟨c, hcT⟩ : T) ^ 2 ∉ Subgroup.center T :=
+    pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
+      (hP.to_subgroup T) (hT_card_ne q hq_ne hq_sq) hT_normal hcyc hC_eq hcT
+      hC_le_T hCent hC_rel hT_not_comm
+  have hpow_ne : a * c ^ 2 * a⁻¹ ≠ c ^ 2 := by
+    intro hfix
+    apply hc_pow_not_center
+    rw [Subgroup.mem_center_iff]
+    intro t
+    apply Subtype.ext
+    have ht_sup : (t : P) ∈ C ⊔ Subgroup.zpowers a := by
+      rw [← hT_eq]
+      exact t.2
+    obtain ⟨y, hyC, z, hzA, hyz⟩ :=
+      (Subgroup.mem_sup_of_normal_left (s := C) (t := Subgroup.zpowers a)).mp ht_sup
+    have hy_zpowers : y ∈ Subgroup.zpowers c := by
+      simpa [hC_eq] using hyC
+    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hy_zpowers
+    have hcomm_y : Commute y (c ^ 2) := by
+      rw [← hm]
+      exact (Commute.zpow_self c m).pow_right 2
+    have hcomm_a : Commute a (c ^ 2) := by
+      calc
+        a * c ^ 2 = (a * c ^ 2 * a⁻¹) * a := by group
+        _ = c ^ 2 * a := by rw [hfix]
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hzA
+    have hcomm_z : Commute z (c ^ 2) := by
+      rw [← hn]
+      exact hcomm_a.zpow_left n
+    have ht_comm : (t : P) * c ^ 2 = c ^ 2 * (t : P) := by
+      calc
+        (t : P) * c ^ 2 = (y * z) * c ^ 2 := by rw [hyz]
+        _ = y * (z * c ^ 2) := by group
+        _ = y * (c ^ 2 * z) := by rw [hcomm_z.eq]
+        _ = (y * c ^ 2) * z := by group
+        _ = (c ^ 2 * y) * z := by rw [hcomm_y.eq]
+        _ = c ^ 2 * (y * z) := by group
+        _ = c ^ 2 * (t : P) := by rw [hyz]
+    simpa using ht_comm
+  have ha_pow : a ^ 2 ∈ C := by
+    have h := C.pow_relIndex_mem (K := T) haT
+    simpa [hC_rel] using h
+  exact (conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
+    (p := 2) (e := e) Nat.prime_two hC_eq h_order he ha_pow hpow_ne).2
+
 /-- **Isaacs Thm 6.12 setup**: the two `2`-adic alternatives from Lemma 6.16 are
 exactly the inversion and semidihedral-twist conjugation alternatives used by Lemma 6.13. -/
 theorem conj_eq_inv_or_twist_of_two_adic_cases
