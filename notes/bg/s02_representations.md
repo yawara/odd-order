@@ -264,6 +264,11 @@
   `Fin h → epsilon^i` の injectivity を作り、BG の有限 family `V_i`
   に落とす bridge.  残る Prop. 2.4(a) 入力は
   `g` の有限位数 + primitive root からの span/diagonalization.
+- **2026-05-26**: Prop. 2.4(a) の span 入力を後続の direct-sum API と
+  揃えるため、`span_cyclicEigenspaceFinUnion_eq_iSup` と top-iff 版を追加した.
+  既存の block 計算は `span (⋃ V_i) = ⊤` を仮定し、directness 側は
+  `⨆ i, V_i` を使うので、この二つを同じ入力として扱えるようにした.
+  残る重い部分は finite-order hypothesis からの diagonalization.
 
 ## TL;DR
 

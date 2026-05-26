@@ -186,6 +186,29 @@ def cyclicEigenspaceFinUnion (epsilon : F) (g : Module.End F V) (h : ℕ) :
     Set V :=
   {v | ∃ i : Fin h, v ∈ cyclicEigenspaceFin epsilon g i}
 
+/-- The set-level span of the displayed finite union is the supremum of the
+finite eigenspace family.
+
+Earlier block calculations use `span (⋃ V_i) = ⊤` because they prove equality
+of endomorphisms by checking the displayed eigenvectors.  Direct-sum work uses
+`⨆ i, V_i = ⊤`.  This lemma keeps those two Prop 2.4(a) inputs aligned. -/
+theorem span_cyclicEigenspaceFinUnion_eq_iSup (epsilon : F) (g : Module.End F V)
+    (h : ℕ) :
+    Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) =
+      ⨆ i : Fin h, cyclicEigenspaceFin epsilon g i := by
+  rw [Submodule.iSup_eq_span]
+  congr 1
+  ext v
+  simp [cyclicEigenspaceFinUnion]
+
+/-- Top-span form and `iSup` form of BG Prop 2.4(a)'s spanning input are
+equivalent. -/
+theorem span_cyclicEigenspaceFinUnion_eq_top_iff (epsilon : F) (g : Module.End F V)
+    (h : ℕ) :
+    Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) = ⊤ ↔
+      (⨆ i : Fin h, cyclicEigenspaceFin epsilon g i) = ⊤ := by
+  rw [span_cyclicEigenspaceFinUnion_eq_iSup]
+
 /-- BG Prop 2.4 notation `E_{i,t}` over the finite index range
 `0 ≤ i,t ≤ h - 1`.
 

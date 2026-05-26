@@ -48,6 +48,12 @@ to Prop 2.4.
   injectivity of the eigenvalues with mathlib's eigenspace independence
   theorem; it is not a thin rename.  The remaining Prop. 2.4(a) input is
   span/diagonalization from the finite-order hypothesis on `g`.
+- 2026-05-26: Added the span/supremum bridge
+  `span_cyclicEigenspaceFinUnion_eq_iSup` and its top-iff form.  Existing block
+  calculations use `span (⋃ V_i) = ⊤`, while direct-sum work naturally uses
+  `⨆ i, V_i = ⊤`; the two Prop. 2.4(a) spanning inputs are now connected.
+  The remaining heavy input is diagonalization from the finite-order hypothesis
+  on `g`.
 
 ## 完了条件
 
