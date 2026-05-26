@@ -39,17 +39,47 @@ Step 7 の中身 (axiom):
 
 ## やること
 
-- [ ] `notes/isaacs/ch07_thompson.md` に Step 7 の詳細 strategy を書く
-- [ ] `actionCommutator` (Ch.4) と `MulAut.conjNormal` (mathlib) で A の
-      V への conjugation action を formalize
-- [ ] Step 5-6 application: Ch.4 Cor 4.35
-      (`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`)
-      + Ch.6 Thm 6.20 (`isCyclic_of_faithful_trivial_on_proper_invariant`)
-      を実際に使って「[A, V] = 1」を導出
-- [ ] Step 7 counting: A · Ω₁(Z(L)) の elementary abelian 拡大が
-      `maxElemAbelianIn P p` の最大性に矛盾することを示す
+- [ ] **Step infrastructure (新規)**: `V := Ω₁(Z(O_p(G)))` の subgroup 化.
+      既存 `OddOrder.GroupTheory.Omega G p 1 = ⟨{g : g^p = 1}⟩` (closure 形) は
+      G 全体の Ω₁ で V := Ω₁(Z(L)) と異なる. Z(L) 上で `g^p = 1` を満たす
+      pointwise predicate を Z(L) の subgroup として明示構成 (abelian 内なら
+      `{g | g^p = 1}` は subgroup, mathlib `Subgroup.mk` で具体化) 要 ~80-150 LOC.
+- [ ] **Step 6 (Q-trivial on Z(U))**: `K = C_G(V)` の Sylow q (q ≠ p) `Q` が
+      `Z(U)` に自明作用を示す.
+      Cor 4.35 (`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`)
+      を適用するため Q の Z(U) への共役作用 `Q →* MulAut Z(U)` を構成 (~100-150 LOC).
+- [ ] **Step 6 (K = p-group)**: 各 q ≠ p で Sylow q が trivial, hence K is p-group.
+      Cauchy / Sylow 経由 (~50 LOC).
+- [ ] **Step 6 (K ≤ U)**: `K ⊴ G ∧ K p-group ⇒ K ≤ O_p(G)` (mathlib 既存
+      `Subgroup.normal_le_opCore` 系) (~20 LOC).
+- [ ] **Step 6 (Ḡ ↷ V faithful)**: `K̄ = 1` from `K̄ = K/U = ⊥` since `K ≤ U`.
+      φ : Ḡ → MulAut V faithful (~50-100 LOC).
+- [ ] **Step 7 counting**: `D = U ∩ A`, `E = V ∩ A`. `D` elementary abelian,
+      `V` central elementary abelian ⇒ `VD` elementary abelian.
+      `|VD| ≤ |A|` (maximality) ⇒ `|VD : D| ≤ |A : D| = p`.
+      `|V : E| = |VD : D| ≤ p` (~150-200 LOC).
+- [ ] **Step 8 (centralizer index ≤ p)**: `P̄ = Ā` (since P = UA), `Ā` abelian
+      centralizes `V ∩ A = E`, so `|V : C_V(P̄)| ≤ |V : E| ≤ p` (~50 LOC).
+- [ ] **Step 8 (Thm 7.5 application)**: `P̄ ⊴ Ḡ` via
+      `sylow_normal_of_elementary_normal_P_theorem` (Main.lean:2516) (~80 LOC).
+- [ ] **Step 8 (pull back)**: `P̄ ⊴ Ḡ ⇒ P ⊴ G` via correspondence theorem,
+      then `A ⊆ P ⊆ O_p(G) = U` contradicts `A ⊄ U` (~50 LOC).
+- [ ] **Step 4-5 重要 missing**: `G = LA` と `P = UA` (mmd L3870) と
+      `|Ā| = p` (mmd L3874) も Step 7-8 で必要.
+      Hall-Higman 3.21 + Lemma 6.20 (`isCyclic_of_faithful_trivial_on_proper_invariant`)
+      適用 (~200-300 LOC).
+- [ ] **A ∈ E(P) extraction**: `J(P) ⊄ U ⇒ ∃ A ∈ maxElemAbelianIn P p, A ⊄ U`.
+      `Subgroup.thompsonJ` def 展開 + iSup_le_iff (~30-50 LOC).
 - [ ] `axiom thompsonJ_le_opCore_of_normal_J_hypotheses` を `theorem` に格上げ
 - [ ] `OddOrder/AxiomsCheck.lean` に `normal_J` を追加して axiom-free を CI gate
+
+## 着手見積もり (2026-05-27)
+
+- **総 LOC**: ~900-1300 (新規 bridge lemmas + 主証明).
+- **必要 build iterations**: 各 bridge lemma あたり 2-3 iter で 25+ iter 必要.
+- 単一セッション 8 iter 制限内では closure 不可. **複数セッションに分割必須**.
+- 推奨分割: (A) V subgroup 構成 + Cor 4.35 wrapper, (B) Step 4 (G=LA) +
+  Step 5 (|Ā|=p), (C) Step 6 faithful action, (D) Step 7 counting + Step 8 closure.
 
 ## 完了条件
 
