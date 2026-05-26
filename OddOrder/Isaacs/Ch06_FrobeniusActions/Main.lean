@@ -5497,6 +5497,48 @@ theorem exists_characteristic_isElementaryAbelian_four_of_center_index_four
   · dsimp [L]
     rw [Subgroup.card_subtype, hK_card]
 
+/-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
+
+/-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
+
+If a finite `p`-group has a unique subgroup of order `p`, then the odd-prime case of Lemma 6.15
+cannot occur: the characteristic elementary abelian subgroup of order `p²` would contain two
+distinct subgroups of order `p`. This is one of the exclusion steps in the route from Thm 6.12
+to Thm 6.11. -/
+theorem false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (hUnique :
+      ∀ K L : Subgroup T, Nat.card K = p → Nat.card L = p → K = L)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+      hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := p) (Fact.out : p.Prime) hUnique ⟨K, hK_elem, hK_card⟩
+
+/-- **Isaacs Lemma 6.15**, `p = 2` contradiction form.
+
+Under the unique order-`2` subgroup hypothesis, the `p = 2`, `|T| ≠ 8` branch of Lemma 6.15
+cannot occur. This packages the part of Isaacs' 6.11 route that rules out the elementary
+abelian obstruction produced by the center-index-four argument. -/
+theorem false_of_unique_subgroups_card_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hUnique : ∀ K L : Subgroup T, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := 2) Nat.prime_two hUnique ⟨K, hK_elem, by
+      simpa using hK_card⟩
+
 end
 
 end OddOrder.Isaacs.Ch06
