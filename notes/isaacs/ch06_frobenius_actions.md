@@ -477,6 +477,11 @@ FT クリティカル度 + 章内依存で並べる:
   また 6.16 の二つの 2-adic alternative を, Lemma 6.13 が要求する
   `c^a=c⁻¹` / `c^a=c^(2^(e-1))*c⁻¹` の二分岐へ変換する
   `conj_eq_inv_or_twist_of_two_adic_cases` も追加済み.
+  `P/C` cyclic 後の `|P/C|=2` 段階に向けて, 有限 cyclic 2-group で位数が 2 より
+  大きければ非自明 involution は square である
+  `exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two` も追加済み.
+  次は quotient 上でこの square root を取り, conjugation exponent が `j^2` になることを
+  2-adic alternative と mod 4 矛盾させる bridge.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

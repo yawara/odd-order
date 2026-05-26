@@ -4227,6 +4227,44 @@ private lemma zpowers_involution_eq_pow_pred_of_order_two_pow
     · simp [pow_succ]
   rw [h_z_half, h_order, hhalf]
 
+/-- In a finite cyclic `2`-group of order larger than `2`, the nontrivial involution is a
+square.
+
+This is the cyclic-quotient square-root step in Isaacs Thm 6.12: if the cyclic quotient
+`P/C` has order larger than `2`, then its unique involution coset is a square. -/
+theorem exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
+    {Q : Type*} [Group Q] [Finite Q] (hQ : IsPGroup 2 Q) [IsCyclic Q]
+    {x : Q} (hx_ne : x ≠ 1) (hx_sq : x ^ 2 = 1) (hcard_ne_two : Nat.card Q ≠ 2) :
+    ∃ y : Q, y ^ 2 = x := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨g, hg_gen⟩ := IsCyclic.exists_generator (α := Q)
+  obtain ⟨k, hcard⟩ := (IsPGroup.iff_card (p := 2) (G := Q)).mp hQ
+  have hcard_ne_one : Nat.card Q ≠ 1 := by
+    intro hcard_one
+    haveI : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp hcard_one).1
+    exact hx_ne (Subsingleton.elim x 1)
+  have hk_pos : 0 < k := by
+    by_contra hk_not
+    have hk_zero : k = 0 := Nat.eq_zero_of_not_pos hk_not
+    apply hcard_ne_one
+    rw [hcard, hk_zero, pow_zero]
+  have hk_ne_one : k ≠ 1 := by
+    intro hk_one
+    apply hcard_ne_two
+    rw [hcard, hk_one, pow_one]
+  have hk_two : 2 ≤ k := by omega
+  have hg_order : orderOf g = 2 ^ k := by
+    rw [← hcard]
+    exact orderOf_eq_card_of_forall_mem_zpowers hg_gen
+  have hx_mem : x ∈ Subgroup.zpowers g := hg_gen x
+  have hx_eq : x = g ^ (2 ^ (k - 1)) :=
+    zpowers_involution_eq_pow_pred_of_order_two_pow g x hk_pos hg_order hx_mem hx_sq hx_ne
+  refine ⟨g ^ (2 ^ (k - 2)), ?_⟩
+  rw [hx_eq, ← pow_mul]
+  congr 1
+  rw [show k - 1 = k - 2 + 1 by omega, pow_succ]
+
 private lemma square_eq_one_or_unique_involution_of_square_sq_one
     {P : Type*} [Group P] (c a z : P)
     (h_idx : (Subgroup.zpowers c).index = 2)
