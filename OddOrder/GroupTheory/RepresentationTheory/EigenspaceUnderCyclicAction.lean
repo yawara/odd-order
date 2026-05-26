@@ -60,6 +60,11 @@ abbrev cyclicEigenspaceFin (epsilon : F) (g : Module.End F V) {h : ℕ}
     (i : Fin h) : Submodule F V :=
   cyclicEigenspace epsilon g i.1
 
+/-- The displayed finite family of eigenspaces in BG Prop 2.4(a). -/
+abbrev cyclicEigenspaceFinFamily (epsilon : F) (g : Module.End F V) (h : ℕ) :
+    Fin h → Submodule F V :=
+  fun i => cyclicEigenspaceFin epsilon g i
+
 /-- Fin-indexed version of `cyclicEigenspaceDim`. -/
 noncomputable abbrev cyclicEigenspaceFinDim (epsilon : F) (g : Module.End F V)
     {h : ℕ} (i : Fin h) : ℕ :=
@@ -443,6 +448,83 @@ theorem mem_cyclicHomBlockFin_iff {epsilon : F} {g : Module.End F V}
       ∀ j : Fin h, j ≠ i → ∀ v : V,
         v ∈ cyclicEigenspaceFin epsilon g j → e v = 0 := by
   rfl
+
+/-- The decomposition map attached to the internal direct sum
+`V = ⊕ᵢ V_i` from BG Prop 2.4(a). -/
+noncomputable def cyclicEigenspaceFinDecomposition
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h)) :
+    V ≃ₗ[F] DirectSum (Fin h) (fun i => cyclicEigenspaceFinFamily epsilon g h i) :=
+  (LinearEquiv.ofBijective
+    (DirectSum.coeLinearMap (cyclicEigenspaceFinFamily epsilon g h)) hV).symm
+
+/-- Extend a map `V_i → V_t` by zero on every other displayed eigenspace.
+
+This is the constructive block-matrix map used for BG Prop 2.4(c)(d): after
+choosing the internal decomposition from Prop 2.4(a), a homomorphism between
+two displayed eigenspaces gives an endomorphism supported only on the
+`(i,t)`-block. -/
+noncomputable def cyclicHomBlockFinOfHom
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    (cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) →ₗ[F]
+      Module.End F V where
+  toFun φ :=
+    (cyclicEigenspaceFin epsilon g t).subtype.comp <|
+      φ.comp <|
+        (DirectSum.component F (Fin h)
+          (fun i => cyclicEigenspaceFinFamily epsilon g h i) i).comp
+          (cyclicEigenspaceFinDecomposition hV).toLinearMap
+  map_add' φ ψ := by
+    ext v
+    simp [LinearMap.add_apply]
+  map_smul' a φ := by
+    ext v
+    simp [LinearMap.smul_apply]
+
+@[simp]
+theorem cyclicHomBlockFinOfHom_apply_of_mem_same
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i t : Fin h}
+    (φ : cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t)
+    {v : V} (hv : v ∈ cyclicEigenspaceFin epsilon g i) :
+    cyclicHomBlockFinOfHom hV i t φ v = φ ⟨v, hv⟩ := by
+  change
+    ((φ ((cyclicEigenspaceFinDecomposition hV v) i) :
+        cyclicEigenspaceFin epsilon g t) : V) = φ ⟨v, hv⟩
+  rw [cyclicEigenspaceFinDecomposition]
+  simp [DirectSum.IsInternal.ofBijective_coeLinearMap_of_mem hV hv]
+
+theorem cyclicHomBlockFinOfHom_apply_of_mem_ne
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i j t : Fin h} (hji : j ≠ i)
+    (φ : cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t)
+    {v : V} (hv : v ∈ cyclicEigenspaceFin epsilon g j) :
+    cyclicHomBlockFinOfHom hV i t φ v = 0 := by
+  change
+    ((φ ((cyclicEigenspaceFinDecomposition hV v) i) :
+        cyclicEigenspaceFin epsilon g t) : V) = 0
+  rw [cyclicEigenspaceFinDecomposition]
+  rw [DirectSum.IsInternal.ofBijective_coeLinearMap_of_mem_ne hV hji hv]
+  simp
+
+/-- The extension-by-zero map lands in the displayed block `E_{i,t}`. -/
+theorem cyclicHomBlockFinOfHom_mem
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i t : Fin h}
+    (φ : cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) :
+    cyclicHomBlockFinOfHom hV i t φ ∈ cyclicHomBlockFin epsilon g i t := by
+  rw [mem_cyclicHomBlockFin_iff]
+  constructor
+  · intro v hv
+    rw [cyclicHomBlockFinOfHom_apply_of_mem_same hV φ hv]
+    exact (φ ⟨v, hv⟩).2
+  · intro j hji v hv
+    exact cyclicHomBlockFinOfHom_apply_of_mem_ne hV hji φ hv
 
 private theorem inv_mem_cyclicEigenspaceFin {epsilon : F}
     {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i : Fin h} {v : V}

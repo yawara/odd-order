@@ -288,6 +288,12 @@
   finite-order + primitive-root 仮定から BG の表示分解
   `V = ⊕_{0≤i<h} V_i` を直接渡せる.  次はこの decomposition を使う
   Prop. 2.4(c)-(k) の block/dimension identities.
+- **2026-05-26**: Prop. 2.4(c)(d) の block-matrix 層として
+  `cyclicHomBlockFinOfHom` と `cyclicHomBlockFinOfHom_mem` を追加した.
+  Prop. 2.4(a) の `DirectSum.IsInternal` decomposition を使い、
+  任意の `V_i → V_t` を他の `V_j` 上で 0 に延長して `E_{i,t}` の元を
+  作る.  次はこの construction の逆向き restriction と linear equivalence
+  を作れば `dim E_{i,t} = n_i n_t` に進める.
 
 ## TL;DR
 
@@ -895,4 +901,6 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `g^h = 1` から直接 `⨆ i, V_i = ⊤` と `span (⋃ V_i) = ⊤` を得た.
   `cyclicEigenspaceFin_isInternal_of_pow_eq_one` で `DirectSum.IsInternal`
   形式にも束ねたため、Prop. 2.4(a) は後続が消費できる形まで揃った.
-  次は `E_i` / `E_{i,t}` 側の direct-sum と dimension identities.
+  さらに `cyclicHomBlockFinOfHom` で `V_i → V_t` を `E_{i,t}` へ
+  extension-by-zero する向きも追加した.  次は restriction 側を合わせた
+  linear equivalence と dimension identity.

@@ -73,6 +73,11 @@ to Prop 2.4.
   primitive-root eigenspace independence and the finite-order span theorem via
   mathlib's `DirectSum.IsInternal` API, so downstream block/dimension work can
   consume the displayed decomposition directly.
+- 2026-05-26: Started the Prop. 2.4(c)(d) block-matrix layer with
+  `cyclicHomBlockFinOfHom`.  Given the internal decomposition from Prop. 2.4(a),
+  a linear map `V_i → V_t` is extended by zero on all other displayed
+  eigenspaces, and `cyclicHomBlockFinOfHom_mem` proves the resulting
+  endomorphism lies in `E_{i,t}`.
 
 ## 完了条件
 
