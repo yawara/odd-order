@@ -275,6 +275,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.mulAut_centralizes_of_gl2_image_hypotheses
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.subgroup_normal_of_injective_mulAut_of_isCyclic
+#assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**

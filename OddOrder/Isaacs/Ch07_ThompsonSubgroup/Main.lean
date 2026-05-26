@@ -1306,6 +1306,21 @@ theorem mulAut_centralizes_of_gl2_image_hypotheses
   apply e.injective
   simpa [map_mul] using hcommGL
 
+/-- Cyclic branch of Isaacs Thm 7.5: a group acting faithfully by automorphisms on a cyclic
+group is commutative, hence every acting subgroup is normal.
+
+The proof uses mathlib's explicit `Aut(V) ≃ (ZMod |V|)ˣ` identification for cyclic groups.
+This is the formal version of the book step "if `V` is cyclic, then `Aut(V)` is abelian, so
+`G` is abelian and `P` is normal." -/
+theorem subgroup_normal_of_injective_mulAut_of_isCyclic
+    {A V : Type*} [Group A] [Group V] [IsCyclic V]
+    {φ : A →* MulAut V} (hφ : Function.Injective φ) (P : Subgroup A) :
+    P.Normal := by
+  let e := IsCyclic.mulAutMulEquiv V
+  letI : CommGroup (MulAut V) := e.toMonoidHom.commGroupOfInjective e.injective
+  letI : CommGroup A := φ.commGroupOfInjective hφ
+  infer_instance
+
 /-- A faithful action by automorphisms embeds the acting group into `MulAut V`. -/
 theorem toMulAut_injective_of_faithful {A V : Type*} [Group A] [Group V]
     [MulDistribMulAction A V] [FaithfulSMul A V] :
