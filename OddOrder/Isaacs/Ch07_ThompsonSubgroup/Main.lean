@@ -3365,6 +3365,16 @@ theorem zCenterOpCoreSubgroup_comm_subtype
   { (inferInstance : Group ↥(zCenterOpCoreSubgroup G p)) with
     mul_comm := zCenterOpCoreSubgroup_comm_subtype }
 
+/-- Centralizer-conjugation lemma: `q ∈ centralizer s` ⇒ `q * z * q⁻¹ = z`
+for every `z ∈ s`.  Generic. -/
+theorem conj_eq_self_of_mem_centralizer
+    {G : Type*} [Group G] {s : Set G}
+    {q : G} (hq : q ∈ Subgroup.centralizer s) {z : G} (hz : z ∈ s) :
+    q * z * q⁻¹ = z := by
+  have hcomm : z * q = q * z := Subgroup.mem_centralizer_iff.mp hq z hz
+  calc q * z * q⁻¹ = z * q * q⁻¹ := by rw [hcomm]
+    _ = z := by group
+
 /-- **Isaacs Cor 4.35 specialized for Z(U) = Z(O_p(G))**.
 
 Given a `p'`-group `A` acting on `Z(U)` and fixing every element of order
