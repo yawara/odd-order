@@ -3343,6 +3343,14 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- **Isaacs Thm 7.6 Step 6 setup** (mmd L3879): `K := C_G(V)` (where
+`V = Ω₁(Z(O_p(G)))`) is `G`-normal.  Trivial: centralizers of normal subgroups
+are normal. -/
+instance centralizer_omega1ZCenterOpCore_normal
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)).Normal :=
+  Subgroup.normal_centralizer
+
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
 Once Step 5-6 produce the triviality of the `A`-action on `V = Z(L)`, the book:
