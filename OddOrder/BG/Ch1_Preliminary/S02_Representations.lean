@@ -3018,6 +3018,55 @@ private theorem exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
     intro q _hq_prime hq_dvd hq_char
     exact hp_dvd ((CharP.eq F hq_char hchar) ▸ hq_dvd)
 
+/-- Proper determinant-kernel subgroups receive the induction output in the
+shape required by the core spine.
+
+For a normal `N < G*`, the restricted representation is still faithful and `N`
+has odd order.  Thus the two BG Thm 2.6 induction outputs for that restricted
+representation give the nontrivial prime core required by the determinant-kernel
+normal-complement spine. -/
+private theorem determinantKernel_hind_of_odd_two_dim_induction_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hab_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 →
+        (∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q) →
+        Std.Commutative (· * · : N → N → N))
+    (hsyl_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 → p ∣ Nat.card N → (P : Sylow p N) →
+        Std.Commutative (· * · : P → P → P) ∧
+          commutator N ≤ (P : Subgroup N))
+    (N : Subgroup (determinantKernelSubgroup ρ))
+    (hNnormal : N.Normal) (hN_ne_bot : N ≠ ⊥) (hN_ne_top : N ≠ ⊤) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥ := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
+  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have hfaithfulN : Function.Injective ρN := by
+    intro x y hxy
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hfaithful (by simpa [ρN, Gstar] using hxy)
+  have hoddN : Odd (Nat.card N) := by
+    have hN_dvd_Gstar : Nat.card N ∣ Nat.card Gstar :=
+      Subgroup.card_subgroup_dvd_card N
+    have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+      Subgroup.card_subgroup_dvd_card Gstar
+    exact hodd.of_dvd_nat (hN_dvd_Gstar.trans hGstar_dvd_G)
+  exact exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
+    (p := p) (F := F) (G := N)
+    (fun hcharN => hab_ind N hNnormal hN_ne_bot hN_ne_top hoddN
+      ρN hfaithfulN hdim hcharN)
+    (fun hpN P => hsyl_ind N hNnormal hN_ne_bot hN_ne_top hoddN
+      ρN hfaithfulN hdim hpN P)
+
 /-- A nontrivial `p`-core in a normal subgroup gives a nontrivial `p`-core
 in the ambient group.
 

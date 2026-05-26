@@ -233,6 +233,13 @@
   適用し、この `hind` を
   `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
   へ渡して最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch に接続すること.
+- **2026-05-26**: proper subgroup への restriction step として
+  `determinantKernel_hind_of_odd_two_dim_induction_outputs` を追加した.
+  `N < G*` に対して `ρ|_N` の faithful 性を `Subtype.ext` で戻し、`|N|` が奇数で
+  あることを `|N| ∣ |G*| ∣ |G|` から作った上で、帰納出力を上の
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` に渡す. 次は public theorem を
+  well-founded/strong induction 形に整理し、この subgroup 専用の `hab_ind`/`hsyl_ind`
+  を実際に供給する段.
 
 ## TL;DR
 
@@ -758,3 +765,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
   を `odd_two_dim_sylow_abelian` の残 branch
   (`G* ≠ ⊥` かつ `¬ IsPGroup p G*`) に接続できる.
+- `determinantKernel_hind_of_odd_two_dim_induction_outputs` で restriction bridge も
+  Lean 側に追加済み. ここでは `ρ|_N` の faithful 性と `Odd (Nat.card N)` を
+  実際に証明している. 残る未接続点は、public theorem を強帰納/最小反例の形へ
+  畳み直し、proper subgroup `N` への帰納出力をこの bridge に渡すこと.
