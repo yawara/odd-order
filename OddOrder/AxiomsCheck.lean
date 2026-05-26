@@ -306,6 +306,9 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch06.exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_eq_inv_or_twist_of_two_adic_cases
 #assert_only_allowed_axioms

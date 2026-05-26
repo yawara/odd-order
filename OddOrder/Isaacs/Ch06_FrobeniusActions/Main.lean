@@ -6488,6 +6488,34 @@ theorem conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
       _ = (c ^ (2 : ℤ))⁻¹ := by rw [zpow_neg]
   simpa [zpow_ofNat] using hzpow
 
+/-- **Isaacs Thm 6.12 setup**: normality of `C = ⟨c⟩` supplies the missing conjugation
+exponent for the square-inversion step.
+
+This is the quotient-involution bridge used later in Thm 6.12: once a representative `a`
+has `a^p ∈ C` and does not fix `c^p`, normality of `C` writes `a c a⁻¹ = c^i`, so the
+Lemma 6.16 dispatch inverts `c²`. -/
+theorem conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
+    {G : Type*} [Group G] {p e : ℕ} (hp : p.Prime)
+    {C : Subgroup G} [C.Normal] {a c : G}
+    (hC_eq : C = Subgroup.zpowers c)
+    (h_order : orderOf c = p ^ e) (he : 0 < e)
+    (ha_pow : a ^ p ∈ C)
+    (hpow_ne : a * c ^ p * a⁻¹ ≠ c ^ p) :
+    p = 2 ∧ a * c ^ 2 * a⁻¹ = (c ^ 2)⁻¹ := by
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have h_conj_mem_C : a * c * a⁻¹ ∈ C :=
+    (inferInstance : C.Normal).conj_mem c hcC a
+  have h_conj_mem_z : a * c * a⁻¹ ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using h_conj_mem_C
+  obtain ⟨i, h_conj_symm⟩ := Subgroup.mem_zpowers_iff.mp h_conj_mem_z
+  have h_conj : a * c * a⁻¹ = c ^ i := h_conj_symm.symm
+  have ha_pow_z : a ^ p ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using ha_pow
+  exact conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
+    hp he h_order h_conj ha_pow_z hpow_ne
+
 /-- **Isaacs Thm 6.12 setup**: the two `2`-adic alternatives from Lemma 6.16 are
 exactly the inversion and semidihedral-twist conjugation alternatives used by Lemma 6.13. -/
 theorem conj_eq_inv_or_twist_of_two_adic_cases
