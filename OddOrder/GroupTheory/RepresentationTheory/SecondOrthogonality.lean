@@ -78,6 +78,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
   `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality` — the same
   conditional relations transported back to element representatives.
+* `OddOrder.RepresentationTheory.column_orthogonality_cases_of_weightedRowOrthogonality`
+  — the conditional primitive cases theorem, matching the final proof-core shape.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
@@ -900,6 +902,29 @@ theorem characterTableColumnPairing_conj_of_weightedRowOrthogonality
   rw [characterTableColumnPairing_of_isConj_right (G := G) (g := g) (h₁ := h) (h₂ := g)
     hgh.symm]
   exact characterTableColumnPairing_diag_of_weightedRowOrthogonality (G := G) idx hrow g
+
+/-- Conditional primitive cases form of column orthogonality, assuming the finite
+indexing package and weighted row orthogonality input. -/
+theorem column_orthogonality_cases_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (g h : G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    (IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
+    (¬ IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h = 0) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  constructor
+  · intro hgh
+    exact characterTableColumnPairing_conj_of_weightedRowOrthogonality (G := G) idx hrow hgh
+  · intro hgh
+    exact characterTableColumnPairing_not_conj_of_weightedRowOrthogonality (G := G) idx hrow hgh
 
 /-- Primitive cases form of the second (column) orthogonality theorem.
 

@@ -120,8 +120,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality`,
   `characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
   `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
-  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality`.  The
-  remaining `column_orthogonality_cases` stub is now the input-supply layer:
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality`; these are
+  bundled by `column_orthogonality_cases_of_weightedRowOrthogonality` in the
+  same pair-of-cases shape as the final theorem.  The remaining
+  `column_orthogonality_cases` stub is now the input-supply layer:
   providing canonical finite/indexing and weighted row orthogonality data under
   the public theorem's assumptions.
 
