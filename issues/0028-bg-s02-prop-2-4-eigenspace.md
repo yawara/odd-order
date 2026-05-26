@@ -37,6 +37,12 @@ to Prop 2.4.
   `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio`, plus the
   non-wrapping `t = i + m` specialization.  The remaining Prop 2.4(e)
   work is modular-index bookkeeping and the Prop 2.4(a) span/direct-sum input.
+- 2026-05-26: Added modular-index bookkeeping
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq`.  A congruence
+  `i + m ≡ t (mod h)` plus `epsilon^h = 1` now feeds the ratio bridge and
+  gives the theorem-facing inclusion `E_{i,t} ≤ E_m`.  Remaining work for the
+  full Prop. 2.4 package is the Prop. 2.4(a) span/direct-sum input and the
+  later direct-sum/dimension identities.
 
 ## 完了条件
 

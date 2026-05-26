@@ -251,6 +251,13 @@
   `sorry` を除去した. Proper subgroup の Sylow branch は再帰的に処理し、
   char-away branch は現時点では `odd_two_dim_abelian` に依存する. これにより
   `S02_Representations.lean` の残 public sorry は `odd_two_dim_abelian` 1 件のみ.
+- **2026-05-26**: Prop. 2.4(e) の有限 index bookkeeping として
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq` を追加した.
+  既存の ratio bridge に、`i + m ≡ t (mod h)` と `epsilon^h = 1` から
+  `(epsilon^t)/(epsilon^i) = epsilon^m` を作る段を接続し、
+  BG の `E_{i,t} ⊆ E_{t-i}` を Lean で使うための modular 版 inclusion
+  まで進めた. これは theorem の単純 rename ではなく、前 commit の線型代数計算と
+  Prop. 2.4(e) の合同条件をつなぐ実質的な bridge.
 
 ## TL;DR
 

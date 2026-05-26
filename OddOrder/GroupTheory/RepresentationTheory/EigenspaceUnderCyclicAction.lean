@@ -385,6 +385,35 @@ theorem cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio
   rw [cyclicEndConj_eq_smul_ratio_of_mem_cyclicHomBlockFin_of_span
     hepsilon_ne_zero hspan he, hratio]
 
+/-- Modular-index form of BG Prop 2.4(e).
+
+If `i + m ≡ t (mod h)`, then the scalar ratio on `E_{i,t}` is `epsilon^m`,
+so the block lies in the `m`-th eigenspace for conjugation.  This is the
+finite-index bookkeeping needed to turn the pointwise calculation into BG's
+`E_{i,t} ⊆ E_{t-i}` statement. -/
+theorem cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq
+    {epsilon : F} (hepsilon_ne_zero : epsilon ≠ 0)
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i t : Fin h} {m : ℕ}
+    (hspan : Submodule.span F
+      (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (hperiod : epsilon ^ h = 1) (hmod : i.1 + m ≡ t.1 [MOD h]) :
+    cyclicHomBlockFin epsilon (g : Module.End F V) i t ≤
+      cyclicEndConjEigenspace epsilon g m := by
+  refine cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio
+    hepsilon_ne_zero hspan ?_
+  have hi : epsilon ^ i.1 ≠ 0 := pow_ne_zero _ hepsilon_ne_zero
+  have hpow : epsilon ^ (i.1 + m) = epsilon ^ t.1 :=
+    pow_eq_pow_of_modEq hmod hperiod
+  have hmul : epsilon ^ i.1 * epsilon ^ m = epsilon ^ t.1 := by
+    simpa [pow_add] using hpow
+  calc
+    (epsilon ^ t.1) / (epsilon ^ i.1)
+        = (epsilon ^ i.1 * epsilon ^ m) * (epsilon ^ i.1)⁻¹ := by
+          rw [hmul, div_eq_mul_inv]
+    _ = epsilon ^ m := by
+          rw [mul_assoc, mul_comm (epsilon ^ m) ((epsilon ^ i.1)⁻¹), ← mul_assoc,
+            mul_inv_cancel₀ hi, one_mul]
+
 /-- Non-wrapping form of BG Prop 2.4(e): if `t = i + m` inside the displayed
 finite index range, then `E_{i,t}` lies in `E_m`.
 
