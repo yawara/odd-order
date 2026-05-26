@@ -3273,6 +3273,32 @@ theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
         exact hC_sub_le_center)
   exact ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel, ⟨⟨hB_comm⟩⟩⟩
 
+/-- **Isaacs Thm 6.12 setup**: a maximal normal abelian subgroup `C` of a finite `p`-group
+is self-centralizing.
+
+The maximality hypothesis is stated in the form needed for the proof: no strictly larger
+normal abelian subgroup contains `C`.  If `C < C_P(C)`, the preceding theorem produces such
+a larger normal abelian subgroup, contradiction. -/
+theorem centralizer_eq_of_maximal_normal_isMulCommutative
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal] (hC_comm : IsMulCommutative C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False) :
+    Subgroup.centralizer (C : Set P) = C := by
+  have hC_le_cent : C ≤ Subgroup.centralizer (C : Set P) := by
+    haveI : IsMulCommutative C := hC_comm
+    exact Subgroup.le_centralizer (H := C)
+  have hcent_le_C : Subgroup.centralizer (C : Set P) ≤ C := by
+    by_contra hnot
+    have hne : C ≠ Subgroup.centralizer (C : Set P) := by
+      intro h_eq
+      exact hnot (le_of_eq h_eq.symm)
+    have hlt : C < Subgroup.centralizer (C : Set P) := lt_of_le_of_ne hC_le_cent hne
+    obtain ⟨B, hB_normal, hC_lt_B, _hB_le_cent, _hC_rel, hB_comm⟩ :=
+      exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer hP hlt
+    exact hC_max B hB_normal hB_comm hC_lt_B
+  exact le_antisymm hcent_le_C hC_le_cent
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

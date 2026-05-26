@@ -259,6 +259,8 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution_of_index_two
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

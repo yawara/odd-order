@@ -423,6 +423,9 @@ FT クリティカル度 + 章内依存で並べる:
   `exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer` を追加済み.
   これは mathlib 定理の純粋 rename ではなく, Ch01 の p-group intermediate subgroup
   construction と 6.12 の centralizer obstruction を直接つなぐ bridge.
+  この bridge から, maximal normal abelian subgroup `C` は self-centralizing である
+  `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. 次の残りは
+  `P/C` の faithful embedding into `Aut(C)` と abelian quotient extraction.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
