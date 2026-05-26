@@ -443,6 +443,9 @@ FT クリティカル度 + 章内依存で並べる:
   さらに `C < P` から Ch01 Lemma 1.23 で `C.relIndex T = p` の normal intermediate
   subgroup `T` を取り, maximality で `T` 非可換まで返す
   `exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top` も追加済み.
+  また本文の `|C| ≠ 4` case split を `C.relIndex T = p` の branch に移し,
+  `|T| ≠ 8` を返す算術 bridge
+  `card_ne_eight_of_relIndex_prime_of_card_ne_four` も追加済み.
   続く「`T/C ≤ P/C` なので
   `T ⊴ P`」の quotient correspondence step として, `C ≤ T` と `P/C` 可換性から
   `T.Normal` を引く `normal_of_le_of_quotient_commutative` も追加済み. Lemma 6.15 適用条件の

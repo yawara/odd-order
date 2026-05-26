@@ -3503,6 +3503,37 @@ theorem exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
     exact hC_max T hT_normal hT_comm hC_lt_T
   exact ⟨T, hT_normal, hC_lt_T.le hcC, hC_lt_T.le, hC_rel, hT_not_comm⟩
 
+/-- **Isaacs Thm 6.12 setup**: if `|T : C| = p` and `|C| ≠ 4`, then `|T| ≠ 8`.
+
+This is the small cardinal step in the proof of Theorem 6.12: after excluding the
+`|C| = 4` case, the chosen subgroup `T/C` of order `p` cannot have total order `8`. -/
+theorem card_ne_eight_of_relIndex_prime_of_card_ne_four
+    {P : Type*} [Group P] {p : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} (hC_le_T : C ≤ T) (hC_rel : C.relIndex T = p)
+    (hC_card_ne : Nat.card C ≠ 4) :
+    Nat.card T ≠ 8 := by
+  intro hT_card
+  let Csub : Subgroup T := C.subgroupOf T
+  have hCsub_index : Csub.index = p := by
+    simpa [Csub] using hC_rel
+  have hquot_card : Nat.card (T ⧸ Csub) = p := by
+    rw [← Subgroup.index_eq_card]
+    exact hCsub_index
+  have hCsub_card : Nat.card Csub = Nat.card C :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hC_le_T).toEquiv
+  have hsplit : Nat.card T = Nat.card (T ⧸ Csub) * Nat.card Csub :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup Csub
+  have hp_mul : p * Nat.card C = 8 := by
+    rw [hquot_card, hCsub_card] at hsplit
+    exact hsplit.symm.trans hT_card
+  have hp_dvd : p ∣ 8 := ⟨Nat.card C, hp_mul.symm⟩
+  have hp_eq_two : p = 2 :=
+    Nat.prime_eq_prime_of_dvd_pow (m := 3) (p := p) (q := 2)
+      (Fact.out : p.Prime) Nat.prime_two (by simpa using hp_dvd)
+  rw [hp_eq_two] at hp_mul
+  have hC_card : Nat.card C = 4 := by omega
+  exact hC_card_ne hC_card
+
 /-- **Isaacs Thm 6.12 setup**: if `C ≤ T` and `P/C` is abelian, then `T ⊴ P`.
 
 This is the quotient-correspondence step used after choosing `T/C ≤ P/C`: in an abelian

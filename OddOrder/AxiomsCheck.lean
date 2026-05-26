@@ -275,6 +275,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.card_ne_eight_of_relIndex_prime_of_card_ne_four
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.normal_of_le_of_quotient_commutative
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
