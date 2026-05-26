@@ -48,6 +48,10 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - `characterTableClassColumnPairingOfIndexing` and
   `characterTableSquareColumnPairing` を追加し、class-indexed column pairing と
   square reindexed matrix の column Gram を相互変換できるようにした。
+- `characterTableClassColumnPairingOfIndexing_mk`,
+  `characterTableClassColumnPairingOfIndexing_eq_columnPairing_representatives`, and
+  `characterTableSquareColumnPairing_eq_columnPairing_representatives` を追加し、
+  matrix/class indexed column pairing を既存の element representative API に戻せるようにした。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,

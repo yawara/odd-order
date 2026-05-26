@@ -338,6 +338,19 @@ noncomputable def characterTableClassColumnPairingOfIndexing
         characterTableEntry χ C * star (characterTableEntry χ D) :=
   rfl
 
+@[simp] theorem characterTableClassColumnPairingOfIndexing_mk
+    (idx : CharacterTableIndexing G) (g h : G) :
+    characterTableClassColumnPairingOfIndexing idx (ConjClasses.mk g) (ConjClasses.mk h) =
+      @characterTableColumnPairing G _ idx.irrFintype g h := by
+  simp [characterTableClassColumnPairingOfIndexing]
+
+theorem characterTableClassColumnPairingOfIndexing_eq_columnPairing_representatives
+    (idx : CharacterTableIndexing G) (C D : ConjClasses G) :
+    characterTableClassColumnPairingOfIndexing idx C D =
+      @characterTableColumnPairing G _ idx.irrFintype
+        (conjugacyClassRepresentative C) (conjugacyClassRepresentative D) :=
+  rfl
+
 /-- The column pairing of the square reindexed character table. -/
 noncomputable def characterTableSquareColumnPairing
     (idx : CharacterTableIndexing G) (ψ η : IrreducibleCharacter G) : ℂ :=
@@ -360,6 +373,15 @@ theorem characterTableClassColumnPairingOfIndexing_eq_squareColumnPairing
         (idx.rowColumnEquiv.symm C) (idx.rowColumnEquiv.symm D) := by
   simp [characterTableSquareColumnPairing, characterTableClassColumnPairingOfIndexing,
     characterTableClassColumnPairing]
+
+theorem characterTableSquareColumnPairing_eq_columnPairing_representatives
+    (idx : CharacterTableIndexing G) (ψ η : IrreducibleCharacter G) :
+    characterTableSquareColumnPairing idx ψ η =
+      @characterTableColumnPairing G _ idx.irrFintype
+        (conjugacyClassRepresentative (idx.rowColumnEquiv ψ))
+        (conjugacyClassRepresentative (idx.rowColumnEquiv η)) := by
+  rw [characterTableSquareColumnPairing_eq_classColumnPairing]
+  rfl
 
 theorem characterTableColumnPairing_of_isConj_left
     [Fintype (IrreducibleCharacter G)]
