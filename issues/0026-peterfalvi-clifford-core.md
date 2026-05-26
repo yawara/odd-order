@@ -69,6 +69,10 @@ API がまだ不足している。
 - `IrreducibleCharacter.inertia`, `subgroup_le_inertia`, `inertiaQuotient`, and
   `conjBy_eq_conjBy_iff_mul_inv_mem_inertia` を追加し、`Irr(H)` 上の orbit
   representative equality を `g*h⁻¹ ∈ I_G(θ)` で扱えるようにした。
+- `IrreducibleCharacter.conjByOrbit`,
+  `conjByOrbitEquivRightCosets`, and `conjByOrbitEquivLeftCosets` を追加し、
+  `θ` の `G`-orbit を `I_G(θ)` の coset quotient で parametrized できるようにした。
+  次はこの同値から finite transversal / orbit sum の API を切る。
 - 次の小単位は、restriction constituents が単一 orbit になる Clifford core
   theorem の statement/proof 入力、または inertia induction bijection の API 化。
 

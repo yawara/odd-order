@@ -54,6 +54,9 @@ precise statement is left as a TODO since it requires extra setup
   action on irreducible characters of a normal subgroup.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.inertia` and `inertiaQuotient` —
   the stabilizer `I_G(θ)` and quotient `I_G(θ)/H` at the irreducible-character level.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.conjByOrbit`,
+  `conjByOrbitEquivRightCosets`, and `conjByOrbitEquivLeftCosets` — the `G`-orbit
+  of `θ` and its quotient-by-inertia parametrization.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
@@ -365,6 +368,72 @@ theorem conjBy_eq_conjBy_iff_mul_inv_mem_inertia
               (conjBy (G := G) (H := H) g θ)).symm
       _ = conjBy (G := G) (H := H) h θ := by
             rw [hcalc]
+
+/-- The ambient `G`-orbit of an irreducible character of a normal subgroup. -/
+def conjByOrbit (θ : IrreducibleCharacter H) : Set (IrreducibleCharacter H) :=
+  Set.range fun g : G => conjBy (G := G) (H := H) g θ
+
+@[simp] theorem mem_conjByOrbit {θ η : IrreducibleCharacter H} :
+    η ∈ conjByOrbit (G := G) (H := H) θ ↔
+      ∃ g : G, conjBy (G := G) (H := H) g θ = η :=
+  Iff.rfl
+
+theorem conjBy_mem_conjByOrbit (θ : IrreducibleCharacter H) (g : G) :
+    conjBy (G := G) (H := H) g θ ∈ conjByOrbit (G := G) (H := H) θ :=
+  ⟨g, rfl⟩
+
+/-- The orbit of `θ` is parametrized by right cosets of its inertia subgroup.
+
+The right-coset convention matches `conjBy_eq_conjBy_iff_mul_inv_mem_inertia`,
+which identifies `θ^g` and `θ^h` exactly when `g * h⁻¹ ∈ I_G(θ)`. -/
+noncomputable def conjByOrbitEquivRightCosets (θ : IrreducibleCharacter H) :
+    Quotient (QuotientGroup.rightRel (inertia (G := G) (H := H) θ)) ≃
+      {η : IrreducibleCharacter H // η ∈ conjByOrbit (G := G) (H := H) θ} where
+  toFun :=
+    Quotient.lift
+      (fun g : G =>
+        ⟨conjBy (G := G) (H := H) g θ, conjBy_mem_conjByOrbit (G := G) (H := H) θ g⟩)
+      (by
+        intro g h hgh
+        apply Subtype.ext
+        have hmem : h * g⁻¹ ∈ inertia (G := G) (H := H) θ :=
+          QuotientGroup.rightRel_apply.mp hgh
+        have hchg :
+            conjBy (G := G) (H := H) h θ =
+              conjBy (G := G) (H := H) g θ :=
+          Iff.mpr (conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+            (G := G) (H := H) θ h g) hmem
+        exact hchg.symm)
+  invFun η := Quotient.mk'' (Classical.choose η.property)
+  left_inv := by
+    intro q
+    refine Quotient.inductionOn' q ?_
+    intro g
+    dsimp
+    have hchoose :
+        conjBy (G := G) (H := H) (Classical.choose
+          (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)) θ =
+            conjBy (G := G) (H := H) g θ :=
+      Classical.choose_spec (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)
+    apply Quotient.sound'
+    rw [QuotientGroup.rightRel_apply]
+    exact Iff.mp (conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+      (G := G) (H := H) θ g
+      (Classical.choose (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)))
+        hchoose.symm
+  right_inv := by
+    intro η
+    apply Subtype.ext
+    exact Classical.choose_spec η.property
+
+/-- The same orbit parametrization, expressed with mathlib's standard left-coset
+quotient notation `G ⧸ I_G(θ)`. -/
+noncomputable def conjByOrbitEquivLeftCosets (θ : IrreducibleCharacter H) :
+    G ⧸ inertia (G := G) (H := H) θ ≃
+      {η : IrreducibleCharacter H // η ∈ conjByOrbit (G := G) (H := H) θ} :=
+  (QuotientGroup.quotientRightRelEquivQuotientLeftRel
+    (inertia (G := G) (H := H) θ)).symm.trans
+      (conjByOrbitEquivRightCosets (G := G) (H := H) θ)
 
 variable [Fintype H] [Invertible (Nat.card H : ℂ)]
 

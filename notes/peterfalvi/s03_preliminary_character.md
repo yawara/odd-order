@@ -101,7 +101,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `subgroup_le_inertia`, `inertiaQuotient`, and
   `conjBy_eq_conjBy_iff_mul_inv_mem_inertia` expose the stabilizer and
   orbit-representative equality criterion needed for the Clifford transversal
-  formulation.
+  formulation.  `conjByOrbit`, `conjByOrbitEquivRightCosets`, and
+  `conjByOrbitEquivLeftCosets` identify this orbit with the right-coset
+  quotient and the standard `G ⧸ I_G(θ)` quotient, fixing the parametrization
+  needed for the orbit-sum side of Clifford decomposition.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.
