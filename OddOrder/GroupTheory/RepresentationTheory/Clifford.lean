@@ -88,6 +88,71 @@ def restrictionMultiplicity (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ
     restrictionMultiplicity H χ θ = inner (restrict H χ) θ :=
   rfl
 
+@[simp] theorem restrictionMultiplicity_zero_left (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (0 : ClassFunction G ℂ) θ = 0 := by
+  simp [restrictionMultiplicity]
+
+@[simp] theorem restrictionMultiplicity_zero_right (χ : ClassFunction G ℂ) :
+    restrictionMultiplicity H χ (0 : ClassFunction H ℂ) = 0 := by
+  simp [restrictionMultiplicity]
+
+theorem restrictionMultiplicity_add_left
+    (χ₁ χ₂ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (χ₁ + χ₂) θ =
+      restrictionMultiplicity H χ₁ θ + restrictionMultiplicity H χ₂ θ := by
+  rw [restrictionMultiplicity, restrict_add]
+  exact inner_add_left (restrict H χ₁) (restrict H χ₂) θ
+
+theorem restrictionMultiplicity_neg_left
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (-χ) θ = -restrictionMultiplicity H χ θ := by
+  rw [restrictionMultiplicity, restrict_neg]
+  exact inner_neg_left (restrict H χ) θ
+
+theorem restrictionMultiplicity_sub_left
+    (χ₁ χ₂ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (χ₁ - χ₂) θ =
+      restrictionMultiplicity H χ₁ θ - restrictionMultiplicity H χ₂ θ := by
+  rw [restrictionMultiplicity, restrict_sub]
+  exact inner_sub_left (restrict H χ₁) (restrict H χ₂) θ
+
+theorem restrictionMultiplicity_smul_left
+    (c : ℂ) (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (c • χ) θ = c * restrictionMultiplicity H χ θ := by
+  rw [restrictionMultiplicity, restrict_smul]
+  exact inner_smul_left c (restrict H χ) θ
+
+theorem restrictionMultiplicity_add_right
+    (χ : ClassFunction G ℂ) (θ₁ θ₂ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (θ₁ + θ₂) =
+      restrictionMultiplicity H χ θ₁ + restrictionMultiplicity H χ θ₂ :=
+  inner_add_right (restrict H χ) θ₁ θ₂
+
+theorem restrictionMultiplicity_neg_right
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (-θ) = -restrictionMultiplicity H χ θ :=
+  inner_neg_right (restrict H χ) θ
+
+theorem restrictionMultiplicity_sub_right
+    (χ : ClassFunction G ℂ) (θ₁ θ₂ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (θ₁ - θ₂) =
+      restrictionMultiplicity H χ θ₁ - restrictionMultiplicity H χ θ₂ :=
+  inner_sub_right (restrict H χ) θ₁ θ₂
+
+theorem restrictionMultiplicity_conjBy_right [H.Normal]
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) (g : G) :
+    restrictionMultiplicity H χ (conjBy (G := G) (H := H) g θ) =
+      restrictionMultiplicity H χ θ := by
+  change inner (restrict H χ) (conjBy (G := G) (H := H) g θ) =
+    inner (restrict H χ) θ
+  calc
+    inner (restrict H χ) (conjBy (G := G) (H := H) g θ) =
+        inner (conjBy (G := G) (H := H) g (restrict H χ))
+          (conjBy (G := G) (H := H) g θ) := by
+          rw [conjBy_restrict (G := G) (H := H) g χ]
+    _ = inner (restrict H χ) θ :=
+        inner_conjBy_conjBy (G := G) (H := H) g (restrict H χ) θ
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
@@ -103,6 +168,16 @@ theorem IsRestrictionConstituent.multiplicity_ne_zero
     {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
     (hθ : IsRestrictionConstituent H χ θ) : restrictionMultiplicity H χ θ ≠ 0 :=
   hθ.2
+
+theorem IsRestrictionConstituent.conjBy [H.Normal]
+    {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
+    (hθ : IsRestrictionConstituent H χ θ) (g : G)
+    (hirr : IsIrreducibleCharacter (conjBy (G := G) (H := H) g θ)) :
+    IsRestrictionConstituent H χ (conjBy (G := G) (H := H) g θ) := by
+  constructor
+  · exact hirr
+  · rw [restrictionMultiplicity_conjBy_right (H := H) χ θ g]
+    exact hθ.multiplicity_ne_zero
 
 end ClassFunction
 

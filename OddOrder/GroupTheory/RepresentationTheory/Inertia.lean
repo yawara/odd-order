@@ -75,6 +75,24 @@ def conjBy (g : G) (θ : ClassFunction ↥H k) : ClassFunction ↥H k where
 @[simp] theorem conjBy_apply (g : G) (θ : ClassFunction ↥H k) (h : ↥H) :
     (conjBy g θ) h = θ ⟨g * (h : G) * g⁻¹, hH.conj_mem (h : G) h.property g⟩ := rfl
 
+/-- The permutation of `H` induced by conjugation by an ambient element `g : G`.
+
+Normality of `H` is exactly what makes this an equivalence of the subtype `H`. -/
+def conjByEquiv (g : G) : H ≃ H where
+  toFun h := ⟨g * (h : G) * g⁻¹, hH.conj_mem (h : G) h.property g⟩
+  invFun h := ⟨g⁻¹ * (h : G) * g, by
+    simpa using hH.conj_mem (h : G) h.property g⁻¹⟩
+  left_inv h := by
+    apply Subtype.ext
+    group
+  right_inv h := by
+    apply Subtype.ext
+    group
+
+@[simp] theorem conjByEquiv_apply (g : G) (h : H) :
+    (conjByEquiv (G := G) (H := H) g h : G) = g * (h : G) * g⁻¹ :=
+  rfl
+
 @[simp] theorem conjBy_one (θ : ClassFunction ↥H k) : conjBy (1 : G) θ = θ := by
   ext h
   simp
@@ -89,6 +107,36 @@ theorem conjBy_mul (g₁ g₂ : G) (θ : ClassFunction ↥H k) :
   apply Subtype.ext
   change (g₁ * g₂) * (h : G) * (g₁ * g₂)⁻¹ = g₁ * (g₂ * (h : G) * g₂⁻¹) * g₁⁻¹
   group
+
+/-- Restricting an ambient class function to a normal subgroup gives a function
+invariant under all ambient conjugations, not only conjugations by subgroup
+elements. -/
+theorem conjBy_restrict (g : G) (χ : ClassFunction G k) :
+    conjBy (G := G) (H := H) g (restrict H χ) = restrict H χ := by
+  ext h
+  exact χ.conj_eq (h : G) g
+
+section Inner
+
+variable [Fintype H] [StarRing k]
+
+theorem innerSum_conjBy_conjBy (g : G) (φ ψ : ClassFunction H k) :
+    innerSum (conjBy (G := G) (H := H) g φ) (conjBy (G := G) (H := H) g ψ) =
+      innerSum φ ψ := by
+  simpa [innerSum, conjByEquiv] using
+    Fintype.sum_equiv (conjByEquiv (G := G) (H := H) g)
+      (fun h : H => φ (conjByEquiv (G := G) (H := H) g h) *
+        star (ψ (conjByEquiv (G := G) (H := H) g h)))
+      (fun h : H => φ h * star (ψ h))
+      (fun _ => rfl)
+
+theorem inner_conjBy_conjBy [Invertible (Nat.card H : k)]
+    (g : G) (φ ψ : ClassFunction H k) :
+    inner (conjBy (G := G) (H := H) g φ) (conjBy (G := G) (H := H) g ψ) =
+      inner φ ψ := by
+  simp [inner, innerSum_conjBy_conjBy]
+
+end Inner
 
 /-- The **inertia group** of a class function `θ` under `G`-conjugation:
 `I_G(θ) = { g ∈ G | θ^g = θ }`. -/

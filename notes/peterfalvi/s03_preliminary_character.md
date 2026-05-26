@@ -89,6 +89,11 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `support_neg`, `support_sub_subset`, `support_restrict`,
   `support_restrict_subset`, `supportedSubmodule_mono`, and
   `restrict_mem_supportedSubmodule`.
+- The Clifford proof-core API now exposes restriction-multiplicity algebra in
+  both arguments, scalar multiplication in the ambient character argument, and
+  ambient conjugation invariance for normal subgroups via
+  `restrictionMultiplicity_conjBy_right`.  `IsRestrictionConstituent.conjBy`
+  transports constituents once irreducibility of the conjugate is supplied.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.

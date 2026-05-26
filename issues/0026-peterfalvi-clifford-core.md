@@ -46,7 +46,17 @@ API がまだ不足している。
   `RestrictionConstituentsSingleOrbit.exists_conj`, and
   `HasCommonRestrictionMultiplicity.eq_of_liesOver` を追加し、Clifford core
   の predicate 結論を unfold せずに使えるようにした。
-- 次の小単位は、これらの predicate を結論に持つ Clifford core theorem の statement 化。
+- `ClassFunction.conjByEquiv`, `conjBy_restrict`, `innerSum_conjBy_conjBy`,
+  and `inner_conjBy_conjBy` を追加し、normal subgroup 上の ambient conjugation を
+  finite sum / inner product の permutation として扱えるようにした。
+- `restrictionMultiplicity` の add/sub/neg/smul API と
+  `restrictionMultiplicity_conjBy_right` を追加し、restriction constituent の
+  nonzero multiplicity が ambient conjugation で保たれることを直接使えるようにした。
+- `IsRestrictionConstituent.conjBy` を追加し、conjugate 側の irreducibility が
+  supply されれば restriction constituent を transport できるようにした。
+- 次の小単位は、`conjBy` が irreducible character を保つ補題、または
+  restriction constituents が単一 orbit になる Clifford core theorem の
+  statement/proof 入力。
 
 ## 完了条件
 
