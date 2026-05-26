@@ -20,13 +20,18 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 ## やること
 
 - [ ] `IrreducibleCharacter G` と `ConjClasses G` の finite cardinal/indexing をそろえる。
-- [ ] first orthogonality から character-table matrix の row orthogonality を statement 化する。
+- [x] first orthogonality から character-table matrix の row orthogonality を statement 化する。
 - [ ] square/invertible matrix argument で column orthogonality を導く。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
 
 ## 2026-05-26 update
 
 - raw column sum に `characterTableColumnPairing g h` という名前を付けた。
+- `characterTableRowPairing` and `CharacterTableRowOrthogonality` を追加し、
+  matrix proof core が使う row-side input を statement 化した。
+- `characterTableColumnPairing_of_isConj_left/right` and
+  `characterTableColumnPairing_conj_left/right` を追加し、column pairing の
+  conjugacy invariance を unfold せずに使えるようにした。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,

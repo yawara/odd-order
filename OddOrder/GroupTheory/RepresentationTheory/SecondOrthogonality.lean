@@ -38,6 +38,10 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 
 ## Main statements
 
+* `OddOrder.RepresentationTheory.characterTableRowPairing` — the normalized row pairing
+  of two irreducible-character rows.
+* `OddOrder.RepresentationTheory.CharacterTableRowOrthogonality` — the first
+  orthogonality statement in a form usable by the later matrix proof.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
@@ -59,6 +63,54 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+/-- The normalized character-table row pairing of two irreducible complex
+characters.  This is the row side of the Schur orthogonality matrix argument. -/
+noncomputable def characterTableRowPairing
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (χ ψ : IrreducibleCharacter G) : ℂ :=
+  ClassFunction.inner (χ : ClassFunction G ℂ) (ψ : ClassFunction G ℂ)
+
+@[simp] theorem characterTableRowPairing_eq_inner
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (χ ψ : IrreducibleCharacter G) :
+    characterTableRowPairing χ ψ =
+      ClassFunction.inner (χ : ClassFunction G ℂ) (ψ : ClassFunction G ℂ) :=
+  rfl
+
+theorem characterTableRowPairing_eq_inv_card_sum
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (χ ψ : IrreducibleCharacter G) :
+    characterTableRowPairing χ ψ =
+      ⅟(Nat.card G : ℂ) *
+        ∑ g : G, ((χ : ClassFunction G ℂ) g) *
+          star ((ψ : ClassFunction G ℂ) g) :=
+  rfl
+
+/-- The first, row-side character orthogonality statement, separated from the
+column theorem so the later character-table invertibility proof can take it as
+the input row relation. -/
+def CharacterTableRowOrthogonality
+    [Fintype G] [Invertible (Nat.card G : ℂ)] : Prop :=
+  (∀ χ : IrreducibleCharacter G, characterTableRowPairing χ χ = 1) ∧
+    ∀ ⦃χ ψ : IrreducibleCharacter G⦄,
+      χ ≠ ψ → characterTableRowPairing χ ψ = 0
+
+namespace CharacterTableRowOrthogonality
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+theorem diagonal (hrow : CharacterTableRowOrthogonality (G := G))
+    (χ : IrreducibleCharacter G) :
+    characterTableRowPairing χ χ = 1 :=
+  hrow.1 χ
+
+theorem offDiagonal (hrow : CharacterTableRowOrthogonality (G := G))
+    {χ ψ : IrreducibleCharacter G} (hχψ : χ ≠ ψ) :
+    characterTableRowPairing χ ψ = 0 :=
+  hrow.2 hχψ
+
+end CharacterTableRowOrthogonality
+
 /-- The character-table column pairing
 `∑_χ χ(g) · star (χ(h))`, summing over irreducible complex characters. -/
 noncomputable def characterTableColumnPairing
@@ -72,6 +124,38 @@ noncomputable def characterTableColumnPairing
       ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) :=
   rfl
+
+theorem characterTableColumnPairing_of_isConj_left
+    [Fintype (IrreducibleCharacter G)]
+    {g₁ g₂ h : G} (hg : IsConj g₁ g₂) :
+    characterTableColumnPairing g₁ h =
+      characterTableColumnPairing g₂ h := by
+  simp only [characterTableColumnPairing]
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  rw [((χ : ClassFunction G ℂ).of_isConj hg)]
+
+theorem characterTableColumnPairing_of_isConj_right
+    [Fintype (IrreducibleCharacter G)]
+    {g h₁ h₂ : G} (hh : IsConj h₁ h₂) :
+    characterTableColumnPairing g h₁ =
+      characterTableColumnPairing g h₂ := by
+  simp only [characterTableColumnPairing]
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  rw [((χ : ClassFunction G ℂ).of_isConj hh)]
+
+theorem characterTableColumnPairing_conj_left
+    [Fintype (IrreducibleCharacter G)] (x g h : G) :
+    characterTableColumnPairing (x * g * x⁻¹) h =
+      characterTableColumnPairing g h :=
+  characterTableColumnPairing_of_isConj_left
+    (isConj_iff.mpr ⟨x⁻¹, by simp [mul_assoc]⟩)
+
+theorem characterTableColumnPairing_conj_right
+    [Fintype (IrreducibleCharacter G)] (x g h : G) :
+    characterTableColumnPairing g (x * h * x⁻¹) =
+      characterTableColumnPairing g h :=
+  characterTableColumnPairing_of_isConj_right
+    (isConj_iff.mpr ⟨x⁻¹, by simp [mul_assoc]⟩)
 
 /-- Primitive cases form of the second (column) orthogonality theorem.
 
