@@ -2729,6 +2729,20 @@ theorem centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot
   rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p] at hHH
   exact hHH
 
+/-- **Isaacs Thm 7.6 Step 1** (mmd L3837): `Z(P) ≤ O_p(G)` under `O_{p'}(G) = ⊥`.
+
+Composition of `center_sylow_le_centralizer_opCore` (structural) and
+`centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot` (Hall-Higman 3.21).
+This is the core conclusion of Step 1 in the 8-step proof of Thm 7.6. -/
+theorem center_sylow_le_opCore_of_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥) (P : Sylow p G) :
+    (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype ≤
+      OddOrder.Isaacs.Ch01.opCore p G :=
+  (center_sylow_le_centralizer_opCore P).trans
+    (centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot hOp')
+
 /-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
 
 The full theorem (Isaacs L3832) states:
