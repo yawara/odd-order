@@ -126,6 +126,12 @@
   `K`-subrepresentation で、finrank も保存される. 次の未形式化部分は
   determinant kernel の eigenvalue 議論を使い、この conjugate line が
   Maschke complement の二つの rank-one line のどちらかに一致すること.
+- **2026-05-26**: q=p Sylow 結論側の theorem-facing reduction として
+  `sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneLinePair`
+  を追加済み. `G* = ⊥` は determinant character で abelian、`G* ≠ ⊥` は
+  core spine に渡し、`r = p` は fixed-space endpoint、`r ≠ p` は
+  `RankOneLinePairData` 経由で ambient `G` abelian にする. 残る入力は
+  normalizer/induction spine と、q≠p の line-pair construction.
 
 ## TL;DR
 
