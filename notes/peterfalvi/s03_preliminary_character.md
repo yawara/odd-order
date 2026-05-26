@@ -144,6 +144,11 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 
 **mathlib 状況**: **完全新規**. Peterfalvi 独自の補題で「isometry が orthonormal basis を保存する構造」を抽出. 基本 character orthogonality + 有限次元線形代数は mathlib にあり.
 
+**Lean status**: `SignedIrreducibleDifferenceFamily` now names the target
+`ε • (μ_i - μ_0)` family.  Its row-orthogonality API exposes the key numerical
+inputs for the combinatorial core: nonzero target differences have norm `2`, and
+two distinct nonzero target differences have inner product `1`.
+
 **形式化**: ~60-80 行 (非自明だが self-contained).
 
 **重要性**: **(1.4) は §4 Dade isometry の主定理 (2.6) への "isometry 構造 lemma"**. これにより、「TI-subset 上の virtual character 等距 → 既約成分への分解保存」が言える.

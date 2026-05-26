@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # Isometry on orthonormal difference pairs
@@ -226,6 +227,82 @@ theorem sign_ne_zero (data : SignedIrreducibleDifferenceFamily G n) :
 theorem sign_mul_self (data : SignedIrreducibleDifferenceFamily G n) :
     data.sign * data.sign = 1 := by
   rcases data.sign_eq with hsign | hsign <;> simp [hsign]
+
+theorem classFunction_inner_eq_if
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) (i j : Fin n) :
+    ClassFunction.inner (data.classFunction i) (data.classFunction j) =
+      if i = j then 1 else 0 := by
+  by_cases hij : i = j
+  · subst j
+    simpa [classFunction, characterTableRowPairing] using
+      CharacterTableRowOrthogonality.diagonal (G := G) hrow (data.mu i)
+  · have hμ : data.mu i ≠ data.mu j := fun h => hij (data.injective h)
+    rw [if_neg hij]
+    simpa [classFunction, characterTableRowPairing] using
+      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+
+theorem difference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (data.difference i) (data.difference i) = 2 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [classFunction_inner_eq_if (G := G) hrow data i i]
+  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 i]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  simp [hi, eq_comm]
+  norm_num
+
+theorem difference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (data.difference i) (data.difference j) = 1 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [classFunction_inner_eq_if (G := G) hrow data i j]
+  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 j]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  simp [hi, hj, hij, eq_comm]
+
+theorem signedDifference_inner_signedDifference
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i j : Fin n) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference j) =
+      ClassFunction.inner (data.difference i) (data.difference j) := by
+  rcases data.sign_eq with hsign | hsign
+  · simp [signedDifference, hsign]
+  · calc
+      ClassFunction.inner (data.signedDifference i) (data.signedDifference j) =
+          ClassFunction.inner (-data.difference i) (-data.difference j) := by
+            simp [signedDifference, hsign]
+      _ = ClassFunction.inner (data.difference i) (data.difference j) := by
+            rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg]
+
+theorem signedDifference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference i) = 2 := by
+  rw [signedDifference_inner_signedDifference]
+  exact difference_inner_self_of_ne_zero (G := G) hrow data hi
+
+theorem signedDifference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference j) = 1 := by
+  rw [signedDifference_inner_signedDifference]
+  exact difference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
 
 end SignedIrreducibleDifferenceFamily
 

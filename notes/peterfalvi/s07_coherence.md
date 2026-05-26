@@ -225,6 +225,10 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `Hypothesis.difference_image_ne_zero` and
   `signed_difference_image_ne_zero` lift that nonzero image API to the §7
   hypothesis carrier, avoiding repeated unpacking of `difference_image hχ`.
+- `SignedIrreducibleDifferenceFamily.signedDifference_inner_self_of_ne_zero` and
+  `signedDifference_inner_of_ne_zero_of_ne` provide the target-side norm/inner
+  values needed when §7 reduces image differences to the shared §3 (1.4)
+  isometry-difference structure.
 - `IsCoherent.extension_inner_eq` exposes the inner-product preservation of
   the extension map, while `IsCoherent.inner_eq_on_supported` transfers it
   back to the original `τ` on `Z[S,A]` using `extends_on_supported`.

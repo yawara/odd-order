@@ -55,6 +55,13 @@ created: 2026-05-25
   unfold なしで進められるようにした。
 - `ClassFunction.innerSum_sub_left/right` と `inner_sub_left/right` を追加し、
   `χ_i - χ_0` 型の差分内積を後続 proof core で直接展開できるようにした。
+- `SignedIrreducibleDifferenceFamily.classFunction_inner_eq_if`,
+  `difference_inner_self_of_ne_zero`, `difference_inner_of_ne_zero_of_ne`,
+  `signedDifference_inner_signedDifference`,
+  `signedDifference_inner_self_of_ne_zero`, and
+  `signedDifference_inner_of_ne_zero_of_ne` を追加し、row orthogonality input
+  の下で target side の norm `2` と distinct nonzero difference inner product
+  `1` を unfold なしで取り出せるようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 
