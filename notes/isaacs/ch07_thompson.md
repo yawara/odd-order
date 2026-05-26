@@ -284,7 +284,22 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 2026-05-26: 7.5 minimal-counterexample reduction 用に Ch03 側へ
   `Subgroup.isPiSeparable_of_isPiSeparable` を追加済み. これで `G` を
   `⟨P,Q⟩` に置き換えるときの p-separable 仮定は `P⊔Q` 専用 wrapper なしで継承できる.
+- **2026-05-26 ✅ Thm 7.5 top-level 完成**: `sylow_normal_of_elementary_normal_P_theorem`
+  ([Main.lean:2515](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2515),
+  ~150 LOC + 1 helper `actionCentralizer_comp_subtype_index_le_of_globalHypothesis`).
+  Proof: strong induction on `Nat.card G` + generation reduction `⟨P,Q⟩ ≠ ⊤` を
+  IH に落とす + closing branch (`⟨P,Q⟩ = ⊤`) で `U = C_V(P) ⊓ C_V(Q)` から
+  cyclic/elementary p² の dichotomy を `false_of_quotient_*` で閉じる.
+  既存 §7A bridge (1568-2460) を 1 行も追加せず assembly のみ. Sorry-free.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
+  - **7.6 normal-J**: §7B 未着手 (docstring placeholder のみ). 8-step proof は
+    Hall-Higman corollaries + Ω₁ + adapters ~800-1500 LOC 規模, multi-session.
+  - **7.1 Thompson normal p-complement**: 7.6 完成後に ~300-450 LOC. 既存 Thm 5.26 +
+    Lem 7.7 + HasNormalPComplement subgroup inheritance は使える. quotient
+    inheritance helper ~30 LOC が要追加.
+  - **7.8 Burnside `p^a q^b`**: §7D placeholder のみ. 9-step proof に
+    `IsPCentral` / `IsPType` / `U⋆` の新規 def (~150 LOC) + 本体 ~600-900 LOC, 
+    multi-session.
 
 ## 前提章の再分類 (main 取り込み後)
 
