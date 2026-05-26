@@ -1685,6 +1685,86 @@ private theorem scalarCharacters_mul_eq_one_of_mem_determinantKernel
     mem_determinantKernelSubgroup.mp hg
   simpa [hdet] using hgdet
 
+/-- On a preserved complement, the scalar character of the quotient `V/W`
+is the same as the scalar character on the complementary line.
+
+This is the bridge needed in BG Thm 2.6 q ≠ p to replace the determinant
+formula's quotient scalar by the actual scalar on the second Maschke line. -/
+private theorem scalarCharacter_quotient_eq_complement_of_isCompl
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W U : Submodule F V) [Module.Free F U] [Module.Finite F U]
+    [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V)
+    (hcompl : IsCompl W U)
+    (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hU : ∀ g : G, U ≤ U.comap (ρ g))
+    (hdimU : Module.finrank F U = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    (g : G) :
+    scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW) g =
+      scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U hU) g := by
+  let φQ : G →* Fˣ := scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW)
+  let φU : G →* Fˣ := scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U hU)
+  have hU_ne_bot : U ≠ ⊥ := by
+    rw [← Submodule.one_le_finrank_iff]
+    omega
+  rcases Submodule.nonzero_mem_of_bot_lt (bot_lt_iff_ne_bot.mpr hU_ne_bot) with
+    ⟨u, hu_ne_zero⟩
+  have hmk_ne_zero :
+      (Submodule.Quotient.mk (u : V) : V ⧸ W) ≠ 0 := by
+    intro hmk
+    have huW : (u : V) ∈ W := by
+      simpa [Submodule.Quotient.mk_eq_zero] using hmk
+    have huInf : (u : V) ∈ W ⊓ U := ⟨huW, u.2⟩
+    have huBot : (u : V) ∈ (⊥ : Submodule F V) := by
+      simpa [hcompl.inf_eq_bot] using huInf
+    exact hu_ne_zero (Subtype.ext (by simpa using huBot))
+  have hquot :=
+    scalarCharacterOfFinrankEqOne_apply_smul hdimQ (ρ.quotient W hW) g
+      (Submodule.Quotient.mk (u : V) : V ⧸ W)
+  change
+      (Submodule.Quotient.mk (ρ g (u : V)) : V ⧸ W) =
+        (φQ g : F) • (Submodule.Quotient.mk (u : V) : V ⧸ W) at hquot
+  have hsub :=
+    scalarCharacterOfFinrankEqOne_apply_smul hdimU (ρ.subrepresentation U hU) g u
+  have hsubV : ρ g (u : V) = (φU g : F) • (u : V) :=
+    congrArg Subtype.val hsub
+  have hscalar :
+      (φU g : F) • (Submodule.Quotient.mk (u : V) : V ⧸ W) =
+        (φQ g : F) • (Submodule.Quotient.mk (u : V) : V ⧸ W) := by
+    simpa [hsubV] using hquot
+  ext
+  have hdiff :
+      ((φU g : F) - (φQ g : F)) •
+          (Submodule.Quotient.mk (u : V) : V ⧸ W) = 0 := by
+    rw [sub_smul, sub_eq_zero]
+    exact hscalar
+  have hcoeff : (φU g : F) - (φQ g : F) = 0 := by
+    exact (smul_eq_zero.mp hdiff).resolve_right hmk_ne_zero
+  exact (sub_eq_zero.mp hcoeff).symm
+
+/-- Determinant-kernel elements have inverse scalar characters on two preserved
+complementary rank-one lines. -/
+private theorem scalarCharacters_complement_mul_eq_one_of_mem_determinantKernel
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W U : Submodule F V) [Module.Free F W] [Module.Free F U] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V)
+    (hcompl : IsCompl W U)
+    (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hU : ∀ g : G, U ≤ U.comap (ρ g))
+    (hdimW : Module.finrank F W = 1)
+    (hdimU : Module.finrank F U = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    {g : G} (hg : g ∈ determinantKernelSubgroup ρ) :
+    scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g *
+        scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U hU) g = 1 := by
+  have hprod :=
+    scalarCharacters_mul_eq_one_of_mem_determinantKernel W ρ hW hdimW hdimQ hg
+  have hquot_eq :=
+    scalarCharacter_quotient_eq_complement_of_isCompl W U ρ hcompl hW hU
+      hdimU hdimQ g
+  simpa [hquot_eq] using hprod
+
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup
     {F : Type*} [Field F] {G : Type*} [Group G]

@@ -156,6 +156,13 @@
   scalar character の積が `1` であることを Lean で取り出せるようになった.
   次は `x ∈ K#` で二つの scalar が等しいと faithful action に反する、という
   distinct scalar witness を作る.
+- **2026-05-26**: quotient scalar を補空 line 上の scalar に移す橋として、
+  `scalarCharacter_quotient_eq_complement_of_isCompl` と
+  `scalarCharacters_complement_mul_eq_one_of_mem_determinantKernel` を追加済み.
+  `W ⊕ U = V` かつ両 line が保存される状況で、determinant kernel の積公式を
+  quotient ではなく二つの Maschke line 上の scalar character の積 `= 1` として
+  直接使える. 次はこの積公式と「二つの scalar が等しい」という仮定から
+  odd order / faithful action の矛盾を取り出す.
 
 ## TL;DR
 
