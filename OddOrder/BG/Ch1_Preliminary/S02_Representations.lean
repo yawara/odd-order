@@ -4111,6 +4111,59 @@ private theorem determinantKernelSubgroup_baseChangeRepresentation
       _ = algebraMap F K ((determinantCharacterOfRepresentation ρ g : F)) := by rw [hdetF]
       _ = 1 := by simp [hgF]
 
+/-- A prime characteristic on the algebraic closure descends to the base field. -/
+private theorem not_charP_algebraicClosure_of_not_charP
+    {F : Type*} [Field F] {q : ℕ} (hchar : ¬ CharP F q) :
+    ¬ CharP (AlgebraicClosure F) q := by
+  intro hq
+  exact hchar ((Algebra.charP_iff F (AlgebraicClosure F) q).mpr hq)
+
+/-- The BG Thm 2.6(a) characteristic-away hypothesis survives algebraic closure. -/
+private theorem charAway_algebraicClosure
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
+    ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP (AlgebraicClosure F) q :=
+  fun q hq_prime hq_dvd =>
+    not_charP_algebraicClosure_of_not_charP (hchar q hq_prime hq_dvd)
+
+/-- Algebraic-closure reduction for the characteristic-away determinant-core
+endpoint.
+
+This transports BG Thm 2.6(a)'s linear-algebra branch to `AlgebraicClosure F`
+while keeping the determinant kernel, hence the nontrivial `O_q(G*)`, unchanged. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  let ρK : Representation (AlgebraicClosure F) G
+      (TensorProduct F (AlgebraicClosure F) V) :=
+    baseChangeRepresentation (AlgebraicClosure F) ρ
+  have hfaithfulK : Function.Injective ρK := by
+    simpa [ρK] using
+      baseChangeRepresentation_faithful (AlgebraicClosure F) ρ hfaithful
+  have hdimK :
+      Module.finrank (AlgebraicClosure F)
+        (TensorProduct F (AlgebraicClosure F) V) = 2 := by
+    exact
+      (Module.finrank_baseChange (R := AlgebraicClosure F) (S := F) (M' := V)).trans hdim
+  have hcoreK :
+      OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρK) ≠ ⊥ := by
+    change
+      OddOrder.Isaacs.Ch01.opCore q
+          (determinantKernelSubgroup (baseChangeRepresentation (AlgebraicClosure F) ρ)) ≠
+        ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hcore_ne_bot
+  exact
+    commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway
+      ρK hfaithfulK hodd hdimK (charAway_algebraicClosure hchar) hcoreK
+
 /-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
 
 This keeps the remaining induction hypothesis explicit but moves the field

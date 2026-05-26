@@ -800,3 +800,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway` を追加.
   次 frontier は char-away branch 側の core spine/normalizer 制限をこの endpoint
   へ接続し、`odd_two_dim_abelian` の public `sorry` を畳むこと.
+- char-away endpoint の base-change 側として
+  `not_charP_algebraicClosure_of_not_charP`, `charAway_algebraicClosure`,
+  `commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway`
+  を追加. これで `F` 上の `∀ q, q ∣ |G| → ¬ CharP F q` 仮定と
+  `O_q(G*) ≠ ⊥` を、`AlgebraicClosure F` 上の theorem-facing endpoint へ
+  直接運べる. 残る frontier は、`G* ≠ ⊥` から適切な prime core を作る
+  char-away 用 group-theoretic spine と、その normalizer branch の制限適用.
