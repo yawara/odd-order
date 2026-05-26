@@ -239,6 +239,8 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も追加済み.
   さらに `O_p(G)=1` から Hall-Higman を `π={p}'` 側へ適用する
   `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も追加済み.
+  その結論で `P ≤ O_{p'}(G)` になった後の coprime contradiction
+  `sylow_eq_bot_of_le_oPiCore_compl` も追加済み.
   `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
   abelian order `p^2` へ落とす
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と

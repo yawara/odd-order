@@ -460,6 +460,32 @@ theorem centralizer_oPiCore_compl_le_of_opCore_eq_bot
   simpa [π', hπ'_def] using
     (OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G) π' hCoreCompl)
 
+/-- A Sylow `p`-subgroup contained in `O_{p'}(G)` is trivial.
+
+This is the final coprime contradiction in Isaacs Thm 7.5 after Hall-Higman puts
+`C_G(O_{p'}(G))` inside `O_{p'}(G)`. -/
+theorem sylow_eq_bot_of_le_oPiCore_compl
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP_le :
+      (P : Subgroup G) ≤
+        OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) :
+    (P : Subgroup G) = ⊥ := by
+  have hP_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch04.isPiGroup_singleton_of_isPGroup P.isPGroup'
+  have hL_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)}
+        (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) :=
+    OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ∉ ({p} : Set ℕ)}
+  have hP_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hP_le hL_pi
+  have hcop : Nat.Coprime (Nat.card (P : Subgroup G)) (Nat.card (P : Subgroup G)) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hP_pi hP_pi'
+  have hInf : (P : Subgroup G) ⊓ (P : Subgroup G) = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime hcop
+  simpa using hInf
+
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
       p * (p - 1) * (p + 1) := by
