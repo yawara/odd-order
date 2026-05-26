@@ -62,6 +62,11 @@ created: 2026-05-25
   `signedDifference_inner_of_ne_zero_of_ne` を追加し、row orthogonality input
   の下で target side の norm `2` と distinct nonzero difference inner product
   `1` を unfold なしで取り出せるようにした。
+- `irreducibleCharacter_inner_eq_if`,
+  `irreducibleCharacter_difference_inner_self_of_ne_zero`, and
+  `irreducibleCharacter_difference_inner_of_ne_zero_of_ne` を追加し、input side
+  の `χ_i - χ_0` についても同じ norm `2` / inner `1` values を named API
+  として取り出せるようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

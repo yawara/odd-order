@@ -50,6 +50,56 @@ namespace OddOrder.RepresentationTheory
 
 variable {G H : Type*} [Group G] [Group H]
 
+theorem irreducibleCharacter_inner_eq_if
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} (χ : Fin n → IrreducibleCharacter G) (hχ : Function.Injective χ)
+    (i j : Fin n) :
+    ClassFunction.inner (χ i : ClassFunction G ℂ) (χ j : ClassFunction G ℂ) =
+      if i = j then 1 else 0 := by
+  by_cases hij : i = j
+  · subst j
+    simpa [characterTableRowPairing] using
+      CharacterTableRowOrthogonality.diagonal (G := G) hrow (χ i)
+  · have hμ : χ i ≠ χ j := fun h => hij (hχ h)
+    rw [if_neg hij]
+    simpa [characterTableRowPairing] using
+      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+
+theorem irreducibleCharacter_difference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ))
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 2 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  simp [hi, eq_comm]
+  norm_num
+
+theorem irreducibleCharacter_difference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i j : Fin n}
+    (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ))
+        ((χ j : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 1 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  simp [hi, hj, hij, eq_comm]
+
 /-- A signed `n`-tuple of irreducible characters of `G`, used as the target
 shape in Peterfalvi's difference-pair lemmas.
 
