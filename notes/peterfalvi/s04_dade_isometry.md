@@ -167,6 +167,15 @@ end DadeIsometry
 
 `FullDadeIsometryData.restrict` は (2.11) の restriction 用に、inner-product preservation と virtual-character preservation の両方を `A₁ ⊆ A` へ降ろす。
 
+追加の support API (2026-05-26):
+
+- `Hypothesis.hCoset_subset_dadeSupport`: 各 `aH(a)` は `dadeSupport` に含まれる。
+- `Hypothesis.mem_dadeSupport_conj_iff`, `dadeSupport_conj_eq`,
+  `preimage_dadeSupport_conj_eq`: `dadeSupport` の共役不変性を membership /
+  image / preimage の 3 形で expose。
+- `IsDadeMap.map_eq_of_mem_hCoset`: (2.5) の値指定を `IsConj` witness なしで
+  coset membership から直接使える形にした。
+
 ## TI-subset の Peterfalvi 流定義
 
 **Peterfalvi §5 (3.1)-(3.5)** で cyclic normalizer 特殊化された TI-subset が扱われる:

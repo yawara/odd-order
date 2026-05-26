@@ -315,12 +315,44 @@ theorem mem_dadeSupport_of_mem_hCoset (hyp : Hypothesis G A L)
     a.1 * h ∈ hyp.dadeSupport :=
   hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, IsConj.refl _⟩
 
+theorem hCoset_subset_dadeSupport (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) :
+    hyp.hCoset a ⊆ hyp.dadeSupport := by
+  rintro _ ⟨h, hh, rfl⟩
+  exact hyp.mem_dadeSupport_of_mem_hCoset hh
+
 theorem conj_mem_dadeSupport (hyp : Hypothesis G A L) {g x : G}
     (hg : g ∈ hyp.dadeSupport) :
     x * g * x⁻¹ ∈ hyp.dadeSupport := by
   rw [hyp.mem_dadeSupport_iff] at hg ⊢
   rcases hg with ⟨a, h, hh, hconj⟩
   exact ⟨a, h, hh, hconj.trans (isConj_iff.mpr ⟨x, rfl⟩)⟩
+
+theorem mem_dadeSupport_conj_iff (hyp : Hypothesis G A L) {g x : G} :
+    x * g * x⁻¹ ∈ hyp.dadeSupport ↔ g ∈ hyp.dadeSupport := by
+  constructor
+  · intro hg
+    have hg' := hyp.conj_mem_dadeSupport (x := x⁻¹) hg
+    convert hg' using 1
+    group
+  · intro hg
+    exact hyp.conj_mem_dadeSupport (x := x) hg
+
+theorem dadeSupport_conj_eq (hyp : Hypothesis G A L) (x : G) :
+    (fun g : G => x * g * x⁻¹) '' hyp.dadeSupport = hyp.dadeSupport := by
+  ext g
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    exact hyp.conj_mem_dadeSupport hy
+  · intro hg
+    refine ⟨x⁻¹ * g * x, ?_, by group⟩
+    have hg' := hyp.conj_mem_dadeSupport (x := x⁻¹) hg
+    simpa using hg'
+
+theorem preimage_dadeSupport_conj_eq (hyp : Hypothesis G A L) (x : G) :
+    (fun g : G => x * g * x⁻¹) ⁻¹' hyp.dadeSupport = hyp.dadeSupport := by
+  ext g
+  exact hyp.mem_dadeSupport_conj_iff
 
 /-- In the TI-specialized case `H(a)=1`, the coset `aH(a)` is the singleton
 `{a}`. -/
@@ -491,6 +523,13 @@ structure IsDadeMap (hyp : Hypothesis G A L) (τ : DadeMap (G := G) k A L) : Pro
       g ∉ hyp.dadeSupport → τ α g = 0
 
 namespace IsDadeMap
+
+theorem map_eq_of_mem_hCoset {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
+    (hτ : IsDadeMap hyp τ) (α : SupportedClassFunctions (G := G) k A L)
+    (a : {a : G // a ∈ A}) {g : G} (hg : g ∈ hyp.hCoset a) :
+    τ α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ := by
+  rcases hg with ⟨h, hh, rfl⟩
+  exact hτ.map_eq_of_isConj_hCoset α (a.1 * h) a h hh (IsConj.refl _)
 
 theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
     (hτ : IsDadeMap hyp τ) (hA₁A : A₁ ⊆ A)
