@@ -593,6 +593,126 @@ private theorem rank_one_subquotients_of_finrank_two
   refine ⟨hdimW, ?_⟩
   omega
 
+/-- Two rank-one submodules with nonzero intersection are equal. -/
+private theorem eq_of_rank_one_submodules_inf_ne_bot
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    {W U : Submodule F V}
+    (hWdim : Module.finrank F W = 1) (hUdim : Module.finrank F U = 1)
+    (hinf : W ⊓ U ≠ ⊥) :
+    W = U := by
+  have hinf_pos : 1 ≤ Module.finrank F (W ⊓ U : Submodule F V) := by
+    rw [Submodule.one_le_finrank_iff]
+    exact hinf
+  have hinf_le_W :
+      Module.finrank F (W ⊓ U : Submodule F V) ≤ Module.finrank F W :=
+    Submodule.finrank_mono inf_le_left
+  have hinf_le_U :
+      Module.finrank F (W ⊓ U : Submodule F V) ≤ Module.finrank F U :=
+    Submodule.finrank_mono inf_le_right
+  have hinf_dim_W :
+      Module.finrank F (W ⊓ U : Submodule F V) = Module.finrank F W := by
+    omega
+  have hinf_dim_U :
+      Module.finrank F (W ⊓ U : Submodule F V) = Module.finrank F U := by
+    omega
+  have hW : W ⊓ U = W :=
+    Submodule.eq_of_le_of_finrank_eq inf_le_left hinf_dim_W
+  have hU : W ⊓ U = U :=
+    Submodule.eq_of_le_of_finrank_eq inf_le_right hinf_dim_U
+  exact hW.symm.trans hU
+
+/-- A rank-one invariant submodule of a two-line diagonal action lies on one
+of the two eigenspaces.
+
+This is the linear-algebra core of the BG Thm 2.6 q≠p sentence that, after
+choosing `x ∈ K#` with distinct eigenvalues on the two Maschke lines, those
+two lines are the only one-dimensional `K`-submodules. -/
+private theorem rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W U L : Submodule F V) (f : Module.End F V)
+    (hcompl : IsCompl W U)
+    (hWdim : Module.finrank F W = 1) (hUdim : Module.finrank F U = 1)
+    (hLdim : Module.finrank F L = 1)
+    (hLstable : L ≤ L.comap f)
+    (a b : F) (hab : a ≠ b)
+    (hWscalar : ∀ w ∈ W, f w = a • w)
+    (hUscalar : ∀ u ∈ U, f u = b • u) :
+    L = W ∨ L = U := by
+  have hL_ne_bot : L ≠ ⊥ := by
+    rw [← Submodule.one_le_finrank_iff]
+    omega
+  rcases Submodule.nonzero_mem_of_bot_lt (bot_lt_iff_ne_bot.mpr hL_ne_bot) with
+    ⟨l, hl_ne_zero⟩
+  let v : V := l
+  have hvL : v ∈ L := l.2
+  obtain ⟨w, u, hv, _huniq⟩ := Submodule.existsUnique_add_of_isCompl hcompl v
+  have hab_sub : a - b ≠ 0 := sub_ne_zero.mpr hab
+  have hba_sub : b - a ≠ 0 := sub_ne_zero.mpr hab.symm
+  have hw_mem_L : (w : V) ∈ L := by
+    have hdiff_mem : f v - b • v ∈ L :=
+      L.sub_mem (hLstable hvL) (L.smul_mem b hvL)
+    have hdiff_eq : f v - b • v = (a - b) • (w : V) := by
+      rw [← hv, map_add, hWscalar (w : V) w.2, hUscalar (u : V) u.2]
+      module
+    have hscaled : (a - b) • (w : V) ∈ L := by
+      simpa [hdiff_eq] using hdiff_mem
+    exact (L.smul_mem_iff hab_sub).mp hscaled
+  have hu_mem_L : (u : V) ∈ L := by
+    have hdiff_mem : f v - a • v ∈ L :=
+      L.sub_mem (hLstable hvL) (L.smul_mem a hvL)
+    have hdiff_eq : f v - a • v = (b - a) • (u : V) := by
+      rw [← hv, map_add, hWscalar (w : V) w.2, hUscalar (u : V) u.2]
+      module
+    have hscaled : (b - a) • (u : V) ∈ L := by
+      simpa [hdiff_eq] using hdiff_mem
+    exact (L.smul_mem_iff hba_sub).mp hscaled
+  by_cases hw_zero : (w : V) = 0
+  · right
+    have hvU : v ∈ U := by
+      rw [← hv, hw_zero, zero_add]
+      exact u.2
+    apply eq_of_rank_one_submodules_inf_ne_bot hLdim hUdim
+    intro hbot
+    have hv_inf : v ∈ L ⊓ U := ⟨hvL, hvU⟩
+    have hv_zero : v = 0 := by
+      have : v ∈ (⊥ : Submodule F V) := by simpa [hbot] using hv_inf
+      simpa using this
+    exact hl_ne_zero (Subtype.ext hv_zero)
+  by_cases hu_zero : (u : V) = 0
+  · left
+    have hvW : v ∈ W := by
+      rw [← hv, hu_zero, add_zero]
+      exact w.2
+    apply eq_of_rank_one_submodules_inf_ne_bot hLdim hWdim
+    intro hbot
+    have hv_inf : v ∈ L ⊓ W := ⟨hvL, hvW⟩
+    have hv_zero : v = 0 := by
+      have : v ∈ (⊥ : Submodule F V) := by simpa [hbot] using hv_inf
+      simpa using this
+    exact hl_ne_zero (Subtype.ext hv_zero)
+  · have hLW : L = W := by
+      apply eq_of_rank_one_submodules_inf_ne_bot hLdim hWdim
+      intro hbot
+      have hw_inf : (w : V) ∈ L ⊓ W := ⟨hw_mem_L, w.2⟩
+      have hw_bot : (w : V) ∈ (⊥ : Submodule F V) := by
+        simpa [hbot] using hw_inf
+      exact hw_zero (by simpa using hw_bot)
+    have hLU : L = U := by
+      apply eq_of_rank_one_submodules_inf_ne_bot hLdim hUdim
+      intro hbot
+      have hu_inf : (u : V) ∈ L ⊓ U := ⟨hu_mem_L, u.2⟩
+      have hu_bot : (u : V) ∈ (⊥ : Submodule F V) := by
+        simpa [hbot] using hu_inf
+      exact hu_zero (by simpa using hu_bot)
+    have hWU : W = U := hLW.symm.trans hLU
+    have hW_ne_bot : W ≠ ⊥ := by
+      rw [← Submodule.one_le_finrank_iff]
+      omega
+    have hW_eq_bot : W = ⊥ := by
+      have hWinf : W ⊓ U = W := by rw [hWU, inf_idem]
+      simpa [hcompl.inf_eq_bot] using hWinf.symm
+    exact False.elim (hW_ne_bot hW_eq_bot)
+
 /-- Pointwise scalar form of the rank-one endomorphism theorem. -/
 private theorem exists_scalar_apply_of_finrank_eq_one
     {F : Type*} [Field F] {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]

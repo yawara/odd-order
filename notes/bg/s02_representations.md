@@ -132,6 +132,13 @@
   core spine に渡し、`r = p` は fixed-space endpoint、`r ≠ p` は
   `RankOneLinePairData` 経由で ambient `G` abelian にする. 残る入力は
   normalizer/induction spine と、q≠p の line-pair construction.
+- **2026-05-26**: PDF p.29 の q≠p line-pair uniqueness に向けて、
+  `eq_of_rank_one_submodules_inf_ne_bot` と
+  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars`
+  を追加済み. 2 本の補空 rank-one line 上で異なる scalar によって作用する
+  線形写像について、任意の rank-one invariant submodule は左右どちらかに限られる.
+  次は determinant kernel + faithful action から `x ∈ K#` の二つの scalar が
+  distinct であることを取り出し、この uniqueness を `K ⊴ G` の conjugate line に適用する.
 
 ## TL;DR
 
