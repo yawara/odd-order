@@ -950,6 +950,47 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_isP
       hW_ne_top_sub).2
   exact ⟨W, U, hW_ne_bot, hcompl, hWdim, hQdim⟩
 
+/-- Conjugating a `K`-subrepresentation by an ambient element of `G`.
+
+This is the normality bridge in the q≠p branch of BG Thm 2.6: if `K ⊴ G`,
+then the image of a `K`-stable line under any `g : G` is again `K`-stable.
+The next step is to combine this with uniqueness of the two rank-one
+`K`-submodules. -/
+private def conjugateSubrepresentationOfNormal
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    (K : Subgroup G) (hKnormal : K.Normal)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (W : Subrepresentation (ρ.comp K.subtype)) (g : G) :
+    Subrepresentation (ρ.comp K.subtype) where
+  toSubmodule := W.toSubmodule.map (ρ g)
+  apply_mem_toSubmodule k {v} hv := by
+    rcases Submodule.mem_map.mp hv with ⟨w, hw, rfl⟩
+    let kg : K := ⟨g⁻¹ * (k : G) * g, hKnormal.conj_mem' (k : G) k.2 g⟩
+    refine Submodule.mem_map.mpr ⟨ρ (kg : G) w, W.apply_mem_toSubmodule kg hw, ?_⟩
+    have hmul : g * (kg : G) = (k : G) * g := by
+      dsimp [kg]
+      group
+    calc
+      ρ g (ρ (kg : G) w) = ρ (g * (kg : G)) w := by
+        simp [← Module.End.mul_apply, ← map_mul]
+      _ = ρ ((k : G) * g) w := by rw [hmul]
+      _ = ρ (k : G) (ρ g w) := by
+        simp [← Module.End.mul_apply, ← map_mul]
+
+/-- Conjugating a subrepresentation by a group element preserves finrank. -/
+private theorem finrank_conjugateSubrepresentationOfNormal
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    (K : Subgroup G) (hKnormal : K.Normal)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (W : Subrepresentation (ρ.comp K.subtype)) (g : G) :
+    Module.finrank F (conjugateSubrepresentationOfNormal K hKnormal ρ W g).toSubmodule =
+      Module.finrank F W.toSubmodule := by
+  let e : V ≃ₗ[F] V := LinearEquiv.ofBijective (ρ g) (ρ.apply_bijective g)
+  simpa [conjugateSubrepresentationOfNormal, e] using
+    (LinearEquiv.finrank_map_eq e W.toSubmodule)
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]

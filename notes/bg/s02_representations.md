@@ -119,6 +119,13 @@
   `finrank (V/W₁) = 1` を返す段. 次は `K ⊴ G` と determinant kernel 条件
   (`K ≤ G*`) を使い、ambient `G` がこの二つの line を permute することを
   `RankOneLinePairData` へ接続する.
+- **2026-05-26**: normality bridge として
+  `conjugateSubrepresentationOfNormal` と
+  `finrank_conjugateSubrepresentationOfNormal` を追加済み. `K ⊴ G` なら
+  ambient `g : G` で `K`-subrepresentation を移した像が再び
+  `K`-subrepresentation で、finrank も保存される. 次の未形式化部分は
+  determinant kernel の eigenvalue 議論を使い、この conjugate line が
+  Maschke complement の二つの rank-one line のどちらかに一致すること.
 
 ## TL;DR
 
