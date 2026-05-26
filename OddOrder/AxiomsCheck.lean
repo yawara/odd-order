@@ -242,6 +242,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_faithful_trivial_on_proper_invariant
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

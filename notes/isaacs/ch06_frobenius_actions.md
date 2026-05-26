@@ -326,6 +326,11 @@ FT クリティカル度 + 章内依存で並べる:
   `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial` を strong induction で
   sorry-free 化し, trivial `N=1` を加えた
   `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic` で 6.21 statement を閉じた.
+- **§6B / 6.20 corollary from 6.21**:
+  `isCyclic_of_faithful_trivial_on_proper_invariant` を追加. 6.21 で
+  `⟨C_N(a) | a ≠ 1⟩ = N` を得たあと, abelian 性で各 `C_N(a)` が invariant,
+  faithful 性で proper, 仮定で `C_N(A)` に入り, 最後に faithful 性から `A = 1` として
+  noncyclic 仮定を矛盾させる本文通りの corollary.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
