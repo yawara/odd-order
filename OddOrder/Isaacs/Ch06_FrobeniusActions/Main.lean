@@ -5497,6 +5497,32 @@ theorem exists_characteristic_isElementaryAbelian_four_of_center_index_four
   · dsimp [L]
     rw [Subgroup.card_subtype, hK_card]
 
+/-! ### Lem 6.15 — main dispatch -/
+
+/-- **Isaacs Lemma 6.15**.
+
+Let `T` be a finite `p`-group with order different from `8`, and suppose
+`|T : Z(T)| = p²`. If `C` is cyclic and `Z(T) < C < T`, then `T` contains a
+characteristic elementary abelian subgroup of order `p²`.
+
+The proof dispatches to the already-formalized odd-prime branch and the separate `p = 2`
+center-index-four branch. -/
+theorem exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  rcases (Fact.out : p.Prime).eq_two_or_odd' with hp_two | hp_odd
+  · subst p
+    simpa using
+      exists_characteristic_isElementaryAbelian_four_of_center_index_four
+        hT hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  · exact exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+      hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
@@ -5538,6 +5564,26 @@ theorem false_of_unique_subgroups_card_two_of_center_index_four
   exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
     (G := T) (p := 2) Nat.prime_two hUnique ⟨K, hK_elem, by
       simpa using hK_card⟩
+
+/-- **Isaacs Lemma 6.15**, contradiction form used in the route to Thm 6.11.
+
+Under the unique order-`p` subgroup hypothesis, the full Lemma 6.15 configuration cannot occur,
+because the characteristic elementary abelian subgroup of order `p²` would contain two distinct
+subgroups of order `p`. -/
+theorem false_of_unique_subgroups_card_prime_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hT : IsPGroup p T)
+    (hUnique : ∀ K L : Subgroup T, Nat.card K = p → Nat.card L = p → K = L)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+      hT hT_card_ne h_idx hC_cyclic hZ_lt_C hC_lt_T
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := p) (Fact.out : p.Prime) hUnique ⟨K, hK_elem, hK_card⟩
 
 end
 

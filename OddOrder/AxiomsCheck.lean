@@ -274,9 +274,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_four_of_center_index_four
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_prime_of_center_index_prime_sq
 
 -- Ch.7 (Thompson Subgroup): Thm 7.5 GL(2,p) bridge for automorphism subgroups.
 #assert_only_allowed_axioms

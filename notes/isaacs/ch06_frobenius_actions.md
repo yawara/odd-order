@@ -399,10 +399,13 @@ FT クリティカル度 + 章内依存で並べる:
   `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み. 6.12 への接続として,
   ambient の order-`p` subgroup 一意性を任意の可換部分群に制限し cyclic を得る
   `IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique` も追加済み.
-  Lem 6.15 が作る characteristic elementary abelian `p^2` subgroup を order-`p`
-  subgroup 一意性で即矛盾にする
+  odd branch / `p=2` branch を束ねた Lem 6.15 本体
+  `exists_characteristic_isElementaryAbelian_of_center_index_prime_sq` を追加し,
+  さらに Lem 6.15 が作る characteristic elementary abelian `p^2` subgroup を order-`p`
+  subgroup 一意性で即矛盾にする branch-specific / full contradiction forms
   `false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd` と
-  `false_of_unique_subgroups_card_two_of_center_index_four` も追加済み.
+  `false_of_unique_subgroups_card_two_of_center_index_four`,
+  `false_of_unique_subgroups_card_prime_of_center_index_prime_sq` も追加済み.
   さらに 6.12 → 6.11 の dihedral / semidihedral 排除用に, cyclic subgroup 外の involution
   と内部の非自明 involution から異なる order-2 subgroups を作る
   `exists_distinct_subgroups_card_two_of_external_involution` を追加済み.
