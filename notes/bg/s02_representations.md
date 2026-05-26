@@ -474,6 +474,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `N ⊴ G` かつ `O_p(N) ≠ ⊥` なら `O_p(G) ≠ ⊥` を得る
   `opCore_ne_bot_of_normal_subgroup_opCore_ne_bot` を追加済み.
   既存の determinant-kernel `O_p(G*)` bridge もこの汎用補題経由に整理した.
+- Burnside normal complement 後の分岐を theorem-facing にまとめる
+  `exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction` も追加済み.
+  `N = ⊥` なら complement 条件から Sylow が `⊤` なので `O_p(G) ≠ ⊥`,
+  `N ≠ ⊥` なら induction で得る `O_r(N) ≠ ⊥` を ambient lift で
+  `O_r(G) ≠ ⊥` に戻す.
 - 次 frontier は BG proof の group-theoretic dichotomy:
   `G* ≠ ⊥` から Sylow normalizer / Burnside normal complement / induction を通じて
   適切な `q` で `O_q(G*) ≠ ⊥` を得る段.

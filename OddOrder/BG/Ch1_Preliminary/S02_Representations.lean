@@ -1719,6 +1719,39 @@ private theorem hasNormalPComplement_of_sylow_normalizer_commutative
   exact (congr_arg Subtype.val
     (hN_comm.comm ⟨x, hx⟩ ⟨y, Q.le_normalizer hy⟩)).symm
 
+/-- Burnside normal-complement branch for BG Thm 2.6.
+
+If `G` has a normal `p`-complement and `p ∣ |G|`, then either the complement is
+trivial, giving `O_p(G) ≠ 1`, or the induction result on the nontrivial normal
+complement lifts back to `G`.  The hypothesis `hind` is exactly the induction
+output used in the text for `N ≠ 1`. -/
+private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    (hp_dvd : p ∣ Nat.card G)
+    (hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement p G)
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  rcases hcomp with ⟨N, hNnormal, hNcompl⟩
+  by_cases hN_bot : N = ⊥
+  · obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    have hPtop : (P : Subgroup G) = ⊤ := by
+      simpa [hN_bot] using hNcompl P
+    haveI : (P : Subgroup G).Normal := by
+      rw [hPtop]
+      infer_instance
+    exact ⟨p, Fact.out,
+      opCore_ne_bot_of_nontrivial_normal_pSubgroup
+        (G := G) (K := (P : Subgroup G)) P.2
+        (P.ne_bot_of_dvd_card hp_dvd)⟩
+  · haveI : N.Normal := hNnormal
+    rcases hind N hNnormal hN_bot with ⟨r, hr_prime, hNcore_ne_bot⟩
+    haveI : Fact r.Prime := ⟨hr_prime⟩
+    haveI : Finite (Sylow r G) := inferInstance
+    exact ⟨r, hr_prime,
+      opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
+        (p := r) (G := G) N hNcore_ne_bot⟩
+
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
 Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
