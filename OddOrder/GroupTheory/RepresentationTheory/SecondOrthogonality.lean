@@ -54,8 +54,12 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   to a square matrix via `CharacterTableIndexing.rowColumnEquiv`.
 * `OddOrder.RepresentationTheory.characterTableDeterminant` — determinant of the square
   character table for the matrix-invertibility proof.
+* `OddOrder.RepresentationTheory.characterTableWeightedRowPairing` — the class-weighted
+  row pairing used by the character-table matrix argument.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
+* `OddOrder.RepresentationTheory.characterTableSquareColumnPairing` — the same column
+  pairing after reindexing columns by irreducible characters.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
@@ -139,6 +143,10 @@ theorem conjugacyClassRepresentative_mk_eq (C : ConjClasses G) :
     ConjClasses.mk (conjugacyClassRepresentative C) = C :=
   Classical.choose_spec (ConjClasses.exists_rep C)
 
+/-- The size of a conjugacy class, as a natural number. -/
+noncomputable def conjugacyClassSize (C : ConjClasses G) : ℕ :=
+  Nat.card C.carrier
+
 /-- The character-table entry indexed by an irreducible character and a conjugacy class. -/
 noncomputable def characterTableEntry
     (χ : IrreducibleCharacter G) (C : ConjClasses G) : ℂ :=
@@ -192,6 +200,47 @@ theorem characterTableMatrixInvertible_iff_det_ne_zero
     (idx : CharacterTableIndexing G) :
     CharacterTableMatrixInvertible idx ↔ characterTableDeterminant idx ≠ 0 :=
   Iff.rfl
+
+/-- The class-weighted row pairing of two character-table rows.  This is the matrix form
+of summing over group elements after collecting terms by conjugacy class. -/
+noncomputable def characterTableWeightedRowPairing
+    (idx : CharacterTableIndexing G) (χ ψ : IrreducibleCharacter G) : ℂ :=
+  letI := idx.classFintype
+  ∑ C : ConjClasses G,
+    (conjugacyClassSize C : ℂ) * characterTableEntry χ C * star (characterTableEntry ψ C)
+
+@[simp] theorem characterTableWeightedRowPairing_eq_sum
+    (idx : CharacterTableIndexing G) (χ ψ : IrreducibleCharacter G) :
+    characterTableWeightedRowPairing idx χ ψ =
+      letI := idx.classFintype
+      ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) * characterTableEntry χ C *
+          star (characterTableEntry ψ C) :=
+  rfl
+
+/-- Row orthogonality in the class-weighted matrix form.  This is the exact input used
+to prove nonvanishing of the character-table determinant. -/
+def CharacterTableWeightedRowOrthogonality (idx : CharacterTableIndexing G) : Prop :=
+  (∀ χ : IrreducibleCharacter G,
+    characterTableWeightedRowPairing idx χ χ = (Nat.card G : ℂ)) ∧
+    ∀ ⦃χ ψ : IrreducibleCharacter G⦄,
+      χ ≠ ψ → characterTableWeightedRowPairing idx χ ψ = 0
+
+namespace CharacterTableWeightedRowOrthogonality
+
+theorem diagonal {idx : CharacterTableIndexing G}
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (χ : IrreducibleCharacter G) :
+    characterTableWeightedRowPairing idx χ χ = (Nat.card G : ℂ) :=
+  hrow.1 χ
+
+theorem offDiagonal {idx : CharacterTableIndexing G}
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    {χ ψ : IrreducibleCharacter G} (hχψ : χ ≠ ψ) :
+    characterTableWeightedRowPairing idx χ ψ = 0 :=
+  hrow.2 hχψ
+
+end CharacterTableWeightedRowOrthogonality
 
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/
@@ -273,6 +322,44 @@ theorem characterTableClassColumnPairing_eq_columnPairing_representatives
       characterTableColumnPairing
         (conjugacyClassRepresentative C) (conjugacyClassRepresentative D) := by
   rfl
+
+/-- The class-column pairing using the irreducible-character indexing bundled in
+`CharacterTableIndexing`. -/
+noncomputable def characterTableClassColumnPairingOfIndexing
+    (idx : CharacterTableIndexing G) (C D : ConjClasses G) : ℂ :=
+  letI := idx.irrFintype
+  characterTableClassColumnPairing C D
+
+@[simp] theorem characterTableClassColumnPairingOfIndexing_eq_sum
+    (idx : CharacterTableIndexing G) (C D : ConjClasses G) :
+    characterTableClassColumnPairingOfIndexing idx C D =
+      letI := idx.irrFintype
+      ∑ χ : IrreducibleCharacter G,
+        characterTableEntry χ C * star (characterTableEntry χ D) :=
+  rfl
+
+/-- The column pairing of the square reindexed character table. -/
+noncomputable def characterTableSquareColumnPairing
+    (idx : CharacterTableIndexing G) (ψ η : IrreducibleCharacter G) : ℂ :=
+  letI := idx.irrFintype
+  ∑ χ : IrreducibleCharacter G,
+    characterTableSquareMatrix idx χ ψ * star (characterTableSquareMatrix idx χ η)
+
+@[simp] theorem characterTableSquareColumnPairing_eq_classColumnPairing
+    (idx : CharacterTableIndexing G) (ψ η : IrreducibleCharacter G) :
+    characterTableSquareColumnPairing idx ψ η =
+      characterTableClassColumnPairingOfIndexing idx
+        (idx.rowColumnEquiv ψ) (idx.rowColumnEquiv η) := by
+  simp [characterTableSquareColumnPairing, characterTableClassColumnPairingOfIndexing,
+    characterTableClassColumnPairing]
+
+theorem characterTableClassColumnPairingOfIndexing_eq_squareColumnPairing
+    (idx : CharacterTableIndexing G) (C D : ConjClasses G) :
+    characterTableClassColumnPairingOfIndexing idx C D =
+      characterTableSquareColumnPairing idx
+        (idx.rowColumnEquiv.symm C) (idx.rowColumnEquiv.symm D) := by
+  simp [characterTableSquareColumnPairing, characterTableClassColumnPairingOfIndexing,
+    characterTableClassColumnPairing]
 
 theorem characterTableColumnPairing_of_isConj_left
     [Fintype (IrreducibleCharacter G)]

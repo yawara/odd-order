@@ -42,6 +42,12 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   invertibility 用の正方行列へ reindex する橋を用意した。
 - `characterTableDeterminant` and `CharacterTableMatrixInvertible` を追加し、
   row orthogonality から det nonzero を示す次段の interface を固定した。
+- `conjugacyClassSize`, `characterTableWeightedRowPairing`, and
+  `CharacterTableWeightedRowOrthogonality` を追加し、first orthogonality を
+  class-weighted matrix row Gram の形で使うための interface を固定した。
+- `characterTableClassColumnPairingOfIndexing` and
+  `characterTableSquareColumnPairing` を追加し、class-indexed column pairing と
+  square reindexed matrix の column Gram を相互変換できるようにした。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,
