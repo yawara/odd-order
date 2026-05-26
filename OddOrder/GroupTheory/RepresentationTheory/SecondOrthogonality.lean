@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Data.Complex.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
@@ -42,6 +43,10 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   of two irreducible-character rows.
 * `OddOrder.RepresentationTheory.CharacterTableRowOrthogonality` — the first
   orthogonality statement in a form usable by the later matrix proof.
+* `OddOrder.RepresentationTheory.CharacterTableIndexing` — finite square indexing data
+  for rows `IrreducibleCharacter G` and columns `ConjClasses G`.
+* `OddOrder.RepresentationTheory.characterTableEntry` — a character-table entry indexed
+  by an irreducible character and a conjugacy class.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
@@ -62,6 +67,75 @@ namespace OddOrder.RepresentationTheory
 open scoped BigOperators
 
 variable {G : Type*} [Group G]
+
+/-- The conjugacy-class side of the character table has a finite indexing for a finite
+group.  Keeping this as a named non-instance avoids changing instance search in later
+matrix proofs. -/
+@[reducible]
+noncomputable def conjClassesFintypeOfFinite (G : Type*) [Group G] [Finite G] :
+    Fintype (ConjClasses G) :=
+  Fintype.ofFinite (ConjClasses G)
+
+/-- Finite square indexing data for the character table: rows are irreducible complex
+characters and columns are conjugacy classes, with the two finite cardinalities aligned.
+
+The eventual proof of second orthogonality supplies this data from the standard theorem
+that the number of irreducible characters equals the number of conjugacy classes. -/
+structure CharacterTableIndexing (G : Type*) [Group G] where
+  irrFintype : Fintype (IrreducibleCharacter G)
+  classFintype : Fintype (ConjClasses G)
+  card_eq :
+    @Fintype.card (IrreducibleCharacter G) irrFintype =
+      @Fintype.card (ConjClasses G) classFintype
+
+namespace CharacterTableIndexing
+
+/-- Number of character-table rows under a chosen indexing package. -/
+def rowCount (idx : CharacterTableIndexing G) : ℕ :=
+  @Fintype.card (IrreducibleCharacter G) idx.irrFintype
+
+/-- Number of character-table columns under a chosen indexing package. -/
+def columnCount (idx : CharacterTableIndexing G) : ℕ :=
+  @Fintype.card (ConjClasses G) idx.classFintype
+
+theorem rowCount_eq_columnCount (idx : CharacterTableIndexing G) :
+    idx.rowCount = idx.columnCount :=
+  idx.card_eq
+
+/-- Build character-table indexing data from a finite group, a finite irreducible-character
+indexing, and the cardinal equality theorem. -/
+noncomputable def ofFinite [Finite G] [Fintype (IrreducibleCharacter G)]
+    (hcard :
+      @Fintype.card (IrreducibleCharacter G) inferInstance =
+        @Fintype.card (ConjClasses G) (conjClassesFintypeOfFinite G)) :
+    CharacterTableIndexing G where
+  irrFintype := inferInstance
+  classFintype := conjClassesFintypeOfFinite G
+  card_eq := hcard
+
+end CharacterTableIndexing
+
+/-- A fixed representative of a conjugacy class, used only to define class-indexed
+character-table entries. -/
+noncomputable def conjugacyClassRepresentative (C : ConjClasses G) : G :=
+  Classical.choose (ConjClasses.exists_rep C)
+
+theorem conjugacyClassRepresentative_mk_eq (C : ConjClasses G) :
+    ConjClasses.mk (conjugacyClassRepresentative C) = C :=
+  Classical.choose_spec (ConjClasses.exists_rep C)
+
+/-- The character-table entry indexed by an irreducible character and a conjugacy class. -/
+noncomputable def characterTableEntry
+    (χ : IrreducibleCharacter G) (C : ConjClasses G) : ℂ :=
+  (χ : ClassFunction G ℂ) (conjugacyClassRepresentative C)
+
+@[simp] theorem characterTableEntry_mk (χ : IrreducibleCharacter G) (g : G) :
+    characterTableEntry χ (ConjClasses.mk g) =
+      (χ : ClassFunction G ℂ) g := by
+  simpa [characterTableEntry] using
+    ((χ : ClassFunction G ℂ).of_isConj
+      (ConjClasses.mk_eq_mk_iff_isConj.mp
+        (conjugacyClassRepresentative_mk_eq (C := ConjClasses.mk g))))
 
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/
@@ -123,6 +197,25 @@ noncomputable def characterTableColumnPairing
     characterTableColumnPairing g h =
       ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) :=
+  rfl
+
+/-- The column pairing indexed by conjugacy classes instead of chosen representatives. -/
+noncomputable def characterTableClassColumnPairing
+    [Fintype (IrreducibleCharacter G)] (C D : ConjClasses G) : ℂ :=
+  ∑ χ : IrreducibleCharacter G,
+    characterTableEntry χ C * star (characterTableEntry χ D)
+
+@[simp] theorem characterTableClassColumnPairing_mk
+    [Fintype (IrreducibleCharacter G)] (g h : G) :
+    characterTableClassColumnPairing (ConjClasses.mk g) (ConjClasses.mk h) =
+      characterTableColumnPairing g h := by
+  simp [characterTableClassColumnPairing, characterTableColumnPairing]
+
+theorem characterTableClassColumnPairing_eq_columnPairing_representatives
+    [Fintype (IrreducibleCharacter G)] (C D : ConjClasses G) :
+    characterTableClassColumnPairing C D =
+      characterTableColumnPairing
+        (conjugacyClassRepresentative C) (conjugacyClassRepresentative D) := by
   rfl
 
 theorem characterTableColumnPairing_of_isConj_left
