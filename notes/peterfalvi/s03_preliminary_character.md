@@ -122,10 +122,14 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
   `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality`; these are
   bundled by `column_orthogonality_cases_of_weightedRowOrthogonality` in the
-  same pair-of-cases shape as the final theorem.  The remaining
-  `column_orthogonality_cases` stub is now the input-supply layer:
-  providing canonical finite/indexing and weighted row orthogonality data under
-  the public theorem's assumptions.
+  same pair-of-cases shape as the final theorem.
+- `conjClassesSigmaCarrierEquiv`, `classFunction_innerSum_eq_sum_conjClasses`,
+  `characterTableWeightedRowPairing_eq_innerSum`, and
+  `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality` now connect
+  ordinary row orthogonality to the class-weighted row orthogonality input used
+  by the matrix proof core.  The remaining `column_orthogonality_cases` stub is
+  now the input-supply layer: providing canonical finite/indexing and row
+  orthogonality data under the public theorem's assumptions.
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 

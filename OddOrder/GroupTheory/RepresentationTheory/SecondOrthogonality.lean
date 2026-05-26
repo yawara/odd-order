@@ -167,6 +167,76 @@ theorem conjugacyClassRepresentative_mk_eq (C : ConjClasses G) :
 noncomputable def conjugacyClassSize (C : ConjClasses G) : ℕ :=
   Nat.card C.carrier
 
+/-- Splitting a finite group element by its conjugacy class and its membership in that
+class recovers the original element. -/
+noncomputable def conjClassesSigmaCarrierEquiv :
+    (Σ C : ConjClasses G, C.carrier) ≃ G where
+  toFun x := x.2.1
+  invFun g := ⟨ConjClasses.mk g, ⟨g, ConjClasses.mem_carrier_mk⟩⟩
+  left_inv := by
+    rintro ⟨C, ⟨g, hg⟩⟩
+    exact Sigma.subtype_ext (ConjClasses.mem_carrier_iff_mk_eq.mp hg) rfl
+  right_inv := by
+    intro g
+    rfl
+
+/-- Collect the unnormalized class-function inner product by conjugacy classes. -/
+theorem classFunction_innerSum_eq_sum_conjClasses
+    [Finite G] [Fintype G] [Fintype (ConjClasses G)]
+    (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.innerSum φ ψ =
+      ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          φ (conjugacyClassRepresentative C) *
+            star (ψ (conjugacyClassRepresentative C)) := by
+  classical
+  letI : ∀ C : ConjClasses G, Fintype C.carrier := fun _ => Fintype.ofFinite _
+  let f : G → ℂ := fun g => φ g * star (ψ g)
+  have hconst (C : ConjClasses G) (x : C.carrier) :
+      f x.1 = f (conjugacyClassRepresentative C) := by
+    have hxC : ConjClasses.mk x.1 = C :=
+      ConjClasses.mem_carrier_iff_mk_eq.mp x.2
+    have hrepC : ConjClasses.mk (conjugacyClassRepresentative C) = C :=
+      conjugacyClassRepresentative_mk_eq (G := G) C
+    have hxrep : IsConj x.1 (conjugacyClassRepresentative C) :=
+      ConjClasses.mk_eq_mk_iff_isConj.mp (hxC.trans hrepC.symm)
+    have hφ : φ x.1 = φ (conjugacyClassRepresentative C) :=
+      φ.of_isConj hxrep
+    have hψ : ψ x.1 = ψ (conjugacyClassRepresentative C) :=
+      ψ.of_isConj hxrep
+    simp [f, hφ, hψ]
+  have hfiber (C : ConjClasses G) :
+      (∑ x : C.carrier, f x.1) =
+        (conjugacyClassSize C : ℂ) *
+          f (conjugacyClassRepresentative C) := by
+    calc
+      (∑ x : C.carrier, f x.1) =
+          ∑ _x : C.carrier, f (conjugacyClassRepresentative C) := by
+            apply Finset.sum_congr rfl
+            intro x _hx
+            exact hconst C x
+      _ = (conjugacyClassSize C : ℂ) *
+            f (conjugacyClassRepresentative C) := by
+            simp [conjugacyClassSize, Nat.card_eq_fintype_card]
+  calc
+    ClassFunction.innerSum φ ψ = ∑ g : G, f g := rfl
+    _ = ∑ x : (Σ C : ConjClasses G, C.carrier), f x.2.1 := by
+      simpa [conjClassesSigmaCarrierEquiv] using
+        ((conjClassesSigmaCarrierEquiv (G := G)).sum_comp f).symm
+    _ = ∑ C : ConjClasses G, ∑ x : C.carrier, f x.1 := by
+      rw [Fintype.sum_sigma]
+    _ = ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          f (conjugacyClassRepresentative C) := by
+      apply Finset.sum_congr rfl
+      intro C _hC
+      exact hfiber C
+    _ = ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          φ (conjugacyClassRepresentative C) *
+            star (ψ (conjugacyClassRepresentative C)) := by
+      simp [f, mul_assoc]
+
 /-- A conjugacy class of a finite group is nonempty, hence has positive size. -/
 theorem conjugacyClassSize_pos [Finite G] (C : ConjClasses G) :
     0 < conjugacyClassSize C := by
@@ -306,6 +376,19 @@ noncomputable def characterTableWeightedRowPairing
         (conjugacyClassSize C : ℂ) * characterTableEntry χ C *
           star (characterTableEntry ψ C) :=
   rfl
+
+/-- The class-weighted row pairing is the ordinary unnormalized row inner sum after
+collecting group elements by conjugacy class. -/
+theorem characterTableWeightedRowPairing_eq_innerSum
+    [Finite G] [Fintype G] (idx : CharacterTableIndexing G)
+    (χ ψ : IrreducibleCharacter G) :
+    characterTableWeightedRowPairing idx χ ψ =
+      ClassFunction.innerSum (χ : ClassFunction G ℂ) (ψ : ClassFunction G ℂ) := by
+  classical
+  letI := idx.classFintype
+  rw [classFunction_innerSum_eq_sum_conjClasses
+    (G := G) (φ := (χ : ClassFunction G ℂ)) (ψ := (ψ : ClassFunction G ℂ))]
+  simp [characterTableWeightedRowPairing, characterTableEntry, mul_assoc]
 
 /-- Row orthogonality in the class-weighted matrix form.  This is the exact input used
 to prove nonvanishing of the character-table determinant. -/
@@ -601,6 +684,31 @@ theorem offDiagonal (hrow : CharacterTableRowOrthogonality (G := G))
   hrow.2 hχψ
 
 end CharacterTableRowOrthogonality
+
+namespace CharacterTableWeightedRowOrthogonality
+
+variable [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- Ordinary row orthogonality implies the class-weighted row orthogonality used by the
+matrix proof of column orthogonality. -/
+theorem ofRowOrthogonality (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableRowOrthogonality (G := G)) :
+    CharacterTableWeightedRowOrthogonality idx := by
+  constructor
+  · intro χ
+    rw [characterTableWeightedRowPairing_eq_innerSum]
+    rw [← ClassFunction.card_mul_inner]
+    rw [← characterTableRowPairing_eq_inner]
+    rw [CharacterTableRowOrthogonality.diagonal hrow χ]
+    simp
+  · intro χ ψ hχψ
+    rw [characterTableWeightedRowPairing_eq_innerSum]
+    rw [← ClassFunction.card_mul_inner]
+    rw [← characterTableRowPairing_eq_inner]
+    rw [CharacterTableRowOrthogonality.offDiagonal hrow hχψ]
+    simp
+
+end CharacterTableWeightedRowOrthogonality
 
 /-- The character-table column pairing
 `∑_χ χ(g) · star (χ(h))`, summing over irreducible complex characters. -/

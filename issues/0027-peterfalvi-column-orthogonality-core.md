@@ -27,7 +27,7 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   element representative pairing へ戻す。
 - [x] 条件付き theorem として `column_orthogonality_cases` と同じ primitive cases
   shape へ束ねる。
-- [ ] finite/indexing と weighted row orthogonality input を public
+- [ ] finite/indexing と row orthogonality input を public
   `column_orthogonality_cases` の仮定へ供給する。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
 
@@ -93,6 +93,12 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   pairing に戻した。
 - `column_orthogonality_cases_of_weightedRowOrthogonality` を追加し、条件付き版を
   final `column_orthogonality_cases` と同じ pair-of-cases shape に束ねた。
+- `conjClassesSigmaCarrierEquiv`,
+  `classFunction_innerSum_eq_sum_conjClasses`,
+  `characterTableWeightedRowPairing_eq_innerSum`, and
+  `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality` を追加し、
+  ordinary row orthogonality から matrix proof core が要求する
+  class-weighted row orthogonality input までを `sorry` なしで接続した。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,
