@@ -3343,6 +3343,12 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- `Z(U) = Z(O_p(G))` is `G`-normal: it is the image of the center
+of the (`G`-normal) `O_p(G)`, transported up via `center_opCore_map_normal`. -/
+instance zCenterOpCoreSubgroup_normal
+    {G : Type*} [Group G] {p : ℕ} :
+    (zCenterOpCoreSubgroup G p).Normal := center_opCore_map_normal
+
 /-- `Z(U) = Z(O_p(G))` is a `p`-group: it is a subgroup of `U = O_p(G)`,
 which is a `p`-group. -/
 theorem zCenterOpCoreSubgroup_isPGroup
