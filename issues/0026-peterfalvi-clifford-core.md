@@ -28,6 +28,30 @@ API がまだ不足している。
 - [x] restriction inner product で constituent/multiplicity predicate を定義する。
 - [ ] `χ` irreducible なら restriction constituents are one `G`-orbit を statement 化する。
 - [ ] common multiplicity `e` と orbit-sum decomposition を証明する。
+
+## 2026-05-26 update — sub-agent 調査結果 (6 件の API ギャップ)
+
+1. **`IsIrreducibleCharacter` の module-theoretic provenance**: `ZIrr.lean` で
+   `IsIrreducibleCharacter χ` は finite-dim irreducible `Representation ℂ G V` の存在を
+   主張するのみで, 後で `V` / `Module (MonoidAlgebra ℂ G) V` / `Res^G_H V` の module
+   分解で使う API が無い.
+2. **`G`-action on `ℂ[H]`-summands of `Res V`** (semisimplicity bridge): mathlib
+   `Maschke` はあるが「`Res V` の simple `ℂ[H]`-submodule は `G` で transitive に
+   permute される」の statement / proof が無い. `Inertia.lean` は `ClassFunction ↥H ℂ`
+   レベルにとどまり, 実 representation には届かない.
+3. **`Irr H` の linear independence**: `θ_1, …, θ_t` distinct ⇒ `∑ c_i θ_i = 0 ⇒ c_i = 0`.
+   mathlib `FDRep.char_orthonormal` 経由で出るが `ClassFunction`-level lemma が無い.
+4. **numerical Frobenius reciprocity**: `InducedCharacter.lean` の `induce`/`induceSum`
+   は定義済みだが `⟨induce H θ, χ⟩ = ⟨θ, restrict H χ⟩` の statement が無い.
+5. **multiplicity ∈ ℤ⁺**: `restrictionMultiplicity` は `ℂ` 値. Clifford は `e : ℕ ∧ 0 < e`
+   が必要. 「irreducible 同士の inner product は非負整数」の lemma が無い.
+6. **signature に `[Finite G]` が無い**: `H` finite だけでは `[G : I_G(θ_0)]` 有限性が
+   出ない. 実は `χ` irreducible で `Res V` 有限次元 ⇒ `H`-isotype は有限個, から `t : ℕ`
+   抽出は可能だが finiteness 引数を明示する必要.
+
+**結論**: sub-agent 判断は「multi-stage formalization task, not a single proof attempt」.
+順番案: (1) `RepresentationOfIsIrreducibleCharacter` glue → (2) Maschke + isotype API →
+(3) `G`-action on simple submodules → (4) orbit-stabilizer → (5) character計算 + 線形独立.
 - [ ] inertia induction bijectionの statement を切る。
 - [ ] `clifford_decomposition` に proof core を戻して `sorry` を消す。
 
