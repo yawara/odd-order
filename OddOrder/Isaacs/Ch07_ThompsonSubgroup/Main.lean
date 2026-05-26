@@ -4253,6 +4253,26 @@ theorem p_and_q_dvd_card_of_simple_nonsolvable
     · exact ⟨hr₂p ▸ hr₂_dvd, hr₁q ▸ hr₁_dvd⟩
     · exact absurd (hr₁q.trans hr₂q.symm) hr_ne
 
+/-- **§7D Step 2 helper** — in a simple group, the normal closure of any
+nontrivial subgroup is the whole group.
+
+Used in Step 2 to argue: if `H' = ⟨V, Q⟩ < G` contains all `G`-conjugates of
+`V` (which it does in Step 2's setup), then `H'` contains `V^G = G`, contradiction. -/
+theorem normalClosure_eq_top_of_simple_of_ne_bot
+    {G : Type*} [Group G] [hG : IsSimpleGroup G]
+    {V : Subgroup G} (hV_ne_bot : V ≠ ⊥) :
+    Subgroup.normalClosure (V : Set G) = ⊤ := by
+  haveI := Subgroup.normalClosure_normal (s := (V : Set G))
+  rcases Subgroup.Normal.eq_bot_or_eq_top
+    (Subgroup.normalClosure_normal (s := (V : Set G))) with h | h
+  · -- V ≤ normalClosure V = ⊥ ⇒ V = ⊥, contradiction.
+    exfalso
+    apply hV_ne_bot
+    apply le_antisymm _ bot_le
+    calc V ≤ Subgroup.normalClosure (V : Set G) := Subgroup.le_normalClosure
+      _ = ⊥ := h
+  · exact h
+
 /-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
 non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
 there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
