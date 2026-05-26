@@ -196,6 +196,19 @@ def IsometryDifferenceImagesVanishAtOne {G H : Type*} [Group G] [Group H]
     (χ : Fin n → IrreducibleCharacter H) : Prop :=
   ∀ i, isometryDifferenceImage τ χ i (1 : G) = 0
 
+/-- The virtual-character hypothesis for the images in Peterfalvi §3 (1.4).
+
+Peterfalvi's `τ : ℤ[X, H#] → ℤ[Irr G]` carries virtual characters to virtual
+characters; the integer-linear formulation `τ : ClassFunction H ℂ →ₗ[ℤ]
+ClassFunction G ℂ` is broader, so the virtual-character target needs to be
+recorded as a separate hypothesis on the inputs we feed into the structure
+theorem. -/
+def IsometryDifferenceImagesAreVirtual {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) : Prop :=
+  ∀ i, isometryDifferenceImage τ χ i ∈ ZIrr G
+
 theorem isometryDifferenceImage_inner_self_of_ne_zero
     [Fintype G] [Fintype H]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
@@ -637,20 +650,27 @@ variable [Fintype G] [Fintype H]
 ([Peterfalvi §3 (1.4)] abstracted, also used in §5 (3.2), §6 (4.5), §7 (5.6)).
 
 Given `n ≥ 2` distinct irreducible characters `χ : Fin n → Irr(H)`, all of
-equal degree, and a `ℤ`-linear `τ : ClassFunction H ℂ → ClassFunction G ℂ` that preserves
-the normalized inner product on the differences `χ i - χ 0`, the image of these
-differences is built from a new orthonormal `n`-tuple `μ : Fin n → Irr(G)`
-times a uniform sign `ε = ±1`.
+equal degree, and a `ℤ`-linear `τ : ClassFunction H ℂ → ClassFunction G ℂ` such
+that, on each difference `χ_i - χ_0`, the image lies in `ZIrr G`, vanishes at
+`1 : G`, and preserves the normalized inner product, the conclusion is the
+existence of a `SignedIrreducibleDifferenceFamily G n` whose signed differences
+coincide with the images.  Equivalently: the image is built from a new
+orthonormal `n`-tuple `μ : Fin n → Irr(G)` times a uniform sign `ε = ±1`.
 
-This conditional form takes the signed irreducible-difference family `data`
-together with the witnessing equalities `h_data : ∀ i, τ (χ i - χ 0) = data.signedDifference i`
-as explicit hypotheses, mirroring the forward-dep pattern used elsewhere in
-the project (e.g. Ch.7 `normal_J`, `thompson_normal_p_complement`,
-`burnside_p_pow_q_pow`).  The actual construction of `data` from the isometry
-hypothesis requires `SecondOrthogonality` + induction on `n` (split into
-`issues/0025-peterfalvi-isometry-difference-core.md`).  Downstream consumers
-in §3 (1.4) / §5 (3.2) / §6 (4.5) / §7 (5.6) apply this theorem by supplying
-`data` and `h_data` from their own contexts. -/
+The three hypotheses on `τ` correspond to Peterfalvi's textbook setup:
+
+* `h_image_virtual` — Peterfalvi's `τ : ℤ[X, H#] → ℤ[Irr G]` is virtual-character
+  preserving; required to identify the image in `ZIrr G`.
+* `h_image_degree_zero` — character differences vanish at `1` on the source,
+  and the isometry preserves this.
+* `h_isom` — the normalized inner product is preserved on the `χ_i - χ_0`.
+
+The proof of this theorem is split into `n = 2`, `n = 3`, and an induction
+step over `n`, and uses `SecondOrthogonality` to extract the orthonormal
+image components.  See
+`issues/0025-peterfalvi-isometry-difference-core.md` for the proof plan.
+Downstream consumers in §3 (1.4) / §5 (3.2) / §6 (4.5) / §7 (5.6) apply this
+theorem by supplying the three hypotheses from their own contexts. -/
 theorem isometry_difference_pair_structure
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
     {n : ℕ} [NeZero n] (_hn : 2 ≤ n)
@@ -660,6 +680,7 @@ theorem isometry_difference_pair_structure
       ∀ i, ((χ i : ClassFunction H ℂ) : H → ℂ) 1 =
         ((χ 0 : ClassFunction H ℂ) : H → ℂ) 1)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_image_virtual : IsometryDifferenceImagesAreVirtual τ χ)
     (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ)
     (h_isom : ∀ i j,
         ClassFunction.inner (isometryDifferenceImage τ χ i)

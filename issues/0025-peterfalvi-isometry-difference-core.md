@@ -25,12 +25,12 @@ created: 2026-05-25
 ## やること
 
 - [x] integer coefficient vector 用の小さな structure / predicate を決める。
-- [ ] **statement-level gap を埋める**: `τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ`
-      の現状定式化は **証明不可能**.  Peterfalvi 原文 (1.4) は `τ : ℤ[X, H^#] → ℤ[Irr G]`
-      で「`τ` が virtual character を virtual character に送る」が組み込まれているが,
-      Lean 統計には欠落.  対策: `(h_image_diff : ∀ i, τ ((χ i) - (χ 0)) ∈ ZIrr G)` を
-      仮説に追加 (または `(h_image_subset : ∀ φ ∈ ZIrr H, τ φ ∈ ZIrr G)`).
-      `S07_Coherence.lean:109-114` の `IsIntegralIsometry` consumer も並行 patch 必要.
+- [x] **statement-level gap を埋める**: `IsometryDifferenceImagesAreVirtual τ χ` predicate を
+      `IsometryDifferenceImagesVanishAtOne` と並べて追加し,
+      `isometry_difference_pair_structure` に `h_image_virtual` 仮説を組み込んだ。
+      これで Peterfalvi 原文 (1.4) の `τ : ℤ[X, H^#] → ℤ[Irr G]` 条件が
+      Lean statement に表現される。S07 consumer 側の patch は invoke 時点で行う
+      (現状 invoke 無し)。
 - [ ] **prerequisite lemmas (statement fix の後)**:
    - `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge
      (mathlib `FDRep.char_orthonormal` ⇒ `ClassFunction.inner`, ~80-150 LOC)
