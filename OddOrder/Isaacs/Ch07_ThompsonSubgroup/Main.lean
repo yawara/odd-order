@@ -4082,6 +4082,64 @@ section /- 7D: Burnside p^a q^b -/
 BG/Peterfalvi 直接被引用無いので最後着手. Phase 1 完成度のため必須 (BG L2633 で
 "we can obtain Burnside's `p^a q^b` very easily now" として言及). -/
 
+/-! ### §7D scaffolding — `IsPCentral`, `IsPType`, helper lemmas
+
+We formalize the supporting machinery of Isaacs' §7D proof.  These definitions
+are local to §7D (Burnside `p^a q^b`); the term "p-central element" appears
+informally in the textbook on p.220 and does not have a mathlib analog. -/
+
+/-- **Isaacs p.220** (definition of *p-central element*).
+
+`x` is `p`-central if it is a nonidentity element of the center of some Sylow
+`p`-subgroup of `G`.  Used in §7D Steps 4-9.
+
+The condition is phrased via `(Subgroup.center P).map P.subtype` so that the
+membership predicate lives in the ambient group `G`. -/
+def IsPCentral (p : ℕ) {G : Type*} [Group G] (x : G) : Prop :=
+  x ≠ 1 ∧ ∃ P : Sylow p G,
+    x ∈ (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype
+
+/-- **Isaacs p.219** (definition of *p-type maximal subgroup*).
+
+A maximal subgroup `M` of `G` is `p`-type if `O_p(M) ≠ ⊥`.  In Isaacs §7D this
+notion partitions the maximal subgroups of a simple group of order `p^a q^b`
+into two flavors. -/
+def IsPType (p : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
+  IsCoatom M ∧ OddOrder.Isaacs.Ch01.opCore p (M : Subgroup G) ≠ ⊥
+
+/-- A group whose order is a `{p, q}`-number: `|G| = p^a * q^b`. -/
+def IsPaQbOrder (p q : ℕ) (G : Type*) [Group G] : Prop :=
+  ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b
+
+/-- **Step 1 reduction** — turn the `hMinCounterexample` data into the
+statement "`H` is simple".
+
+`hMinCounterexample` says that every proper normal subgroup of `H` is solvable
+and every proper quotient is solvable.  Combined with the existence theorem for
+solvable extensions (`solvable_of_ker_le_range`), this forces `H` to have no
+nontrivial proper normal subgroup, i.e., `H` is simple. -/
+theorem isSimpleGroup_of_minCounterexample
+    {H : Type*} [Group H] [Nontrivial H]
+    (hH_nsol : ¬ IsSolvable H)
+    (hN_solvable : ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N)
+    (hQ_solvable : ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) :
+    IsSimpleGroup H := by
+  refine ⟨fun N hN_norm => ?_⟩
+  by_contra h_not_bot_top
+  push Not at h_not_bot_top
+  obtain ⟨h_ne_bot, h_ne_top⟩ := h_not_bot_top
+  -- N solvable as subgroup
+  have hN_sol : IsSolvable N := hN_solvable N h_ne_top hN_norm
+  -- H/N solvable as quotient
+  have hQ_sol : IsSolvable (H ⧸ N) := hQ_solvable N h_ne_bot
+  -- Build H solvable from extension: N → H → H/N
+  have hH_sol : IsSolvable H := by
+    -- Use f = N.subtype, g = mk' N.  ker g = N = range f.
+    refine solvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N) ?_
+    rw [QuotientGroup.ker_mk']
+    exact N.range_subtype.ge
+  exact hH_nsol hH_sol
+
 /-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability, conditional on 9-step argument).
 
 The full theorem (Isaacs L3955) states:
