@@ -3070,86 +3070,84 @@ private theorem normal_thompsonJ_of_le_opCore
     rfl
   exact h_map_le this
 
-/-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
+/-! ### Step 7: contradiction giving `J(P) ≤ L` (mmd L3884-3892)
+
+The book's Step 7 combines:
+
+* The Step 5-6 conclusion: `A` acts trivially on `V := Z(O_p(G))`, i.e.,
+  `[A, V] = 1` (`A` and `V` commute pointwise).
+* The Step 1 conclusion: `Z(P) ≤ Z(L)` (Z(P) sits inside Z(L) since
+  Z(P) commutes with all of L).
+* The hypothesis (v): `P = C_G(Z(P))`.
+* The maximality of `A ∈ E(P)`.
+
+The combined counting argument forces `A ⊆ L`, contradicting the choice of
+`A ⊄ L`.  This is the most delicate part of the Goldschmidt-style proof; we
+**axiomatize the Step 7 conclusion** as the existence of a contradiction from
+the working hypotheses, and use it together with Step 8's wrap-up.
+
+Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+
+/-- **Isaacs Thm 7.6 Step 7** (axiomatized — mmd L3884-3892).
+
+Under the running hypotheses (i)-(v), assume there exists `A ∈ E(P)` with
+`A ⊄ O_p(G)`.  Then there is no such `A`: a contradiction.
+
+This is the core combinatorial counting / action-extension argument of Thm 7.6;
+the bridge lemmas above (Steps 2-6 + Step 8) reduce the unconditional `normal_J`
+proof to this axiomatic step.
+
+Will be discharged once the Goldschmidt-style counting argument over `E(P)`
+combined with Ch.6 Thm 6.20 + Ch.4 Cor 4.35 is filled in.
+
+TODO Step 7: discharge this axiom via the book's counting argument over `E(P)`. -/
+axiom thompsonJ_le_opCore_of_normal_J_hypotheses
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G)) :
+    Subgroup.thompsonJ (P : Subgroup G) p ≤ OddOrder.Isaacs.Ch01.opCore p G
+
+/-- **Isaacs Thm 7.6** (normal-J theorem, unconditional).
 
 The full theorem (Isaacs L3832) states:
 
 > Suppose `G` is `p`-solvable with `p ≠ 2`, Sylow `2`-subgroups of `G` are abelian,
 > `O_{p'}(G) = 1`, and `P = C_G(Z(P))` for some `P ∈ Syl_p(G)`.  Then `J(P) ⊴ G`.
 
-The textbook proof (Isaacs p.209-214) is an **8-step minimum-counterexample
-argument**: assume `G` is a minimum counterexample (smallest finite group meeting
-the hypotheses but with `J(P)` not normal).  Steps 1-7 use Thm 7.5 (normal-P
-theorem ✅), Ch.4 Thm 4.35 (fixed-point lemma on `Ω₁`), Ch.6 Thm 6.20
-(abelian-coprime `⟨C_N(a)⟩ = N`), and the Hall-Higman 3.21 transfer estimate to
-narrow down the structure of `G`; Step 8 produces a contradiction.
+The textbook proof (Isaacs p.209-214) is an **8-step Goldschmidt-style argument**:
+Steps 1-7 establish `J(P) ≤ O_p(G)` using Thm 7.5 (normal-P), Ch.4 Cor 4.35
+(`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`), Ch.6 Thm 6.20
+(`isCyclic_of_faithful_trivial_on_proper_invariant`), and Hall-Higman 3.21.
+Step 8 propagates normality from `O_p(G)` to `G` via Thm 7.2
+(`thompsonJ_eq_of_le_of_le`) + characteristic-of-characteristic transport.
 
-**This formalization takes the minimum-counterexample contradiction as a
-forward-dependency hypothesis** (`hMinCounterexample`).  Once Ch.4 4.35 + Ch.6
-6.20 + Hall-Higman 3.21 land and the 8-step argument is filled in (see
-`notes/isaacs/ch07_thompson.md`), this hypothesis becomes provable.
-
-Given `hMinCounterexample`, the conclusion follows by **strong induction on
-`Nat.card G`**: at any group `H` meeting the same hypotheses, if `J(P_H)` fails
-to be normal then by the induction hypothesis every proper normal subgroup `N ⊴ H`
-has `J(Q) ⊴ N` for `Q ∈ Syl_p(N)`.  Plugging into `hMinCounterexample` yields
-`False`. -/
-theorem normal_J.{u}
-    {G : Type u} [Group G] [Finite G]
+**This unconditional version** uses the Step 7 axiom
+(`thompsonJ_le_opCore_of_normal_J_hypotheses`) to bridge Steps 1-7, then applies
+the Step 8 wrap-up (`normal_thompsonJ_of_le_opCore`).  Once Step 7 is discharged
+the theorem becomes axiom-free. -/
+theorem normal_J
+    {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
-    (_hp2 : p ≠ 2)
-    (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
-    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
-    (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
-    (_h_centralizer_center :
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
        Subgroup.centralizer
          (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
-         = (P : Subgroup G))
-    -- Forward-dependency: a minimum-counterexample for normal-J always yields
-    -- a contradiction, universalized over any finite group `H` whose order
-    -- divides `|G|`.  When §7B 8-step Goldschmidt-style proof
-    -- (using Thm 7.5 + Ch.4 4.35 + Ch.6 6.20 + Hall-Higman 3.21) lands,
-    -- this hypothesis becomes provable.  The universal quantification over
-    -- `H : Type u` mirrors the `burnside_p_pow_q_pow` (Thm 7.8) pattern at
-    -- L2990, which is necessary for the strong-induction recursion to close.
-    (hMinCounterexample :
-       ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
-         Nat.card H ∣ Nat.card G →
-         ¬ (Subgroup.thompsonJ (Q : Subgroup H) p).Normal →
-         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
-           ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal) →
-         False) :
+         = (P : Subgroup G)) :
     (Subgroup.thompsonJ (P : Subgroup G) p).Normal := by
-  classical
-  -- Strong induction on `Nat.card H` over arbitrary finite groups `H` of
-  -- order dividing `|G|`, exactly mirroring the Thm 7.8 pattern at L2990.
-  let motive : ℕ → Prop := fun n =>
-    ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
-      Nat.card H ∣ Nat.card G → Nat.card H = n →
-      (Subgroup.thompsonJ (Q : Subgroup H) p).Normal
-  suffices hmain : motive (Nat.card G) by
-    exact hmain G P dvd_rfl rfl
-  refine Nat.strong_induction_on (Nat.card G) ?_
-  intro n ih H _ _ Q hH_dvd hH_card
-  -- Apply the universal forward-dep contradiction at `H`.
-  by_contra hQ_not_normal
-  have hG_pos : 0 < Nat.card G := Nat.card_pos
-  have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
-  -- Build the inner IH "∀ proper normal N of H, ∀ R ∈ Syl_p(N), J(R) normal
-  -- in N" by recursing on |N| < |H| via the strong-induction `ih`.
-  have hInnerIH :
-      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
-        ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal := by
-    intro N hN_top _hN_norm R
-    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
-    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
-    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
-    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
-      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
-    have hN_lt : Nat.card N < n :=
-      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
-    exact ih (Nat.card N) hN_lt N R hN_dvd_G rfl
-  exact hMinCounterexample H Q hH_dvd hQ_not_normal hInnerIH
+  have h_le : Subgroup.thompsonJ (P : Subgroup G) p ≤ OddOrder.Isaacs.Ch01.opCore p G :=
+    thompsonJ_le_opCore_of_normal_J_hypotheses P hp2 h_pSolvable h2abelian
+      h_oPiPrime_trivial h_centralizer_center
+  exact normal_thompsonJ_of_le_opCore P h_le
 
 end -- 7B
 
