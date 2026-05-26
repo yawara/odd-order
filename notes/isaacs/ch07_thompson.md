@@ -230,7 +230,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
-  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
+  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
+  元の作用群側へ戻す
+  (`le_centralizer_of_map_le_centralizer_of_injective`,
+  `subgroup_centralizes_of_mulAut_gl2_image_hypotheses`) を追加済み. 7.5 の
   `|V| ≤ p^2` reduction 用に
   `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
   も追加済み. さらに `GL(2,p)` に埋めた後の cardinality step
@@ -272,7 +275,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   6.21 から faithful abelian coprime action 補題を sorry-free 化済み.
 - ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
   automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
-  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
+  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み. faithful action で
+  元の作用群側の中心化結論へ戻す
+  `subgroup_centralizes_of_mulAut_gl2_image_hypotheses` も利用可能.
 - 🟡 **Ω₁ / order-p fixed subgroup helper**: Thm 7.6 Step 7 で必要. Ch.6 6.11 実装で先に共通化できる可能性あり.
 
 ## 着手順 (提案)
@@ -304,6 +309,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 3. ✅ **Ch.6 6.11** — 7.5 final reduction に必要な cyclic/quaternion 分岐は利用可能.
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
+   faithful action から元の作用群側の centralizer 結論へ戻す bridge も完了.
    `GL(2,p)` 内の `p`-subgroup cardinality bound `gl2_pSubgroup_card_le_prime` も追加済み.
    その bound から `O_p(G)=1` に落とす bridge
    `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も利用可能.

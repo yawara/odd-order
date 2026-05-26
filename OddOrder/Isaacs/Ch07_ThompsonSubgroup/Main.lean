@@ -1449,6 +1449,45 @@ theorem mulAut_centralizes_of_gl2_image_hypotheses
   apply e.injective
   simpa [map_mul] using hcommGL
 
+/-- Pull a centralizer conclusion back through an injective homomorphism.
+
+This is the faithful-action transfer used in Isaacs Thm 7.5: once the images of `P` and
+`L` centralize inside `Aut(V)`, the original subgroups centralize in the acting group. -/
+theorem le_centralizer_of_map_le_centralizer_of_injective
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} (hφ : Function.Injective φ)
+    {P L : Subgroup A}
+    (hmap : P.map φ ≤ Subgroup.centralizer ((L.map φ) : Set B)) :
+    P ≤ Subgroup.centralizer (L : Set A) := by
+  intro x hxP
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hyL
+  have hxmap : φ x ∈ P.map φ := Subgroup.mem_map_of_mem φ hxP
+  have hymap : φ y ∈ L.map φ := Subgroup.mem_map_of_mem φ hyL
+  have hcomm : φ y * φ x = φ x * φ y :=
+    (Subgroup.mem_centralizer_iff.mp (hmap hxmap)) (φ y) hymap
+  apply hφ
+  simpa [map_mul] using hcomm
+
+/-- Isaacs Thm 7.5 GL(2,p) centralizer step for a faithful action.
+
+This combines the `Aut(V) ≃ GL(2,p)` bridge with the injective-action transfer, so the
+conclusion is directly in the acting group rather than in `MulAut V`. -/
+theorem subgroup_centralizes_of_mulAut_gl2_image_hypotheses
+    {A V : Type*} [Group A] [Group V] {p : ℕ} [Fact p.Prime]
+    {φ : A →* MulAut V} (hφ : Function.Injective φ)
+    (e : MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) (hp2 : p ≠ 2)
+    {P L : Subgroup A}
+    (hPp : IsPGroup p ((P.map φ).map e.toMonoidHom))
+    (hPnorm : (P.map φ).map e.toMonoidHom ≤
+      Subgroup.normalizer (((L.map φ).map e.toMonoidHom) : Set _))
+    (hLcop : ¬ p ∣ Nat.card ((L.map φ).map e.toMonoidHom))
+    (hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ (L.map φ).map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) :
+    P ≤ Subgroup.centralizer (L : Set A) :=
+  le_centralizer_of_map_le_centralizer_of_injective hφ
+    (mulAut_centralizes_of_gl2_image_hypotheses e hp2 hPp hPnorm hLcop hL2abelian)
+
 /-- Cyclic branch of Isaacs Thm 7.5: a group acting faithfully by automorphisms on a cyclic
 group is commutative, hence every acting subgroup is normal.
 
