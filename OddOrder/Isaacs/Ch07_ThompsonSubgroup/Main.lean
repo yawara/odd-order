@@ -4117,6 +4117,31 @@ abbrev IsQType (q : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
 def IsPaQbOrder (p q : ℕ) (G : Type*) [Group G] : Prop :=
   ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b
 
+/-- A `p`-central element is nonidentity. -/
+theorem IsPCentral.ne_one {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) : x ≠ 1 := hx.1
+
+/-- A `p`-central element lies in the center of some Sylow `p`-subgroup. -/
+theorem IsPCentral.mem_center {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) :
+    ∃ P : Sylow p G,
+      x ∈ (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype :=
+  hx.2
+
+/-- A `p`-central element of `G` lies in the chosen Sylow `p`-subgroup `P`. -/
+theorem IsPCentral.mem_sylow {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) :
+    ∃ P : Sylow p G, x ∈ (P : Subgroup G) := by
+  obtain ⟨P, hP_mem⟩ := hx.2
+  refine ⟨P, ?_⟩
+  obtain ⟨⟨y, hy⟩, _, rfl⟩ := hP_mem
+  exact hy
+
+-- Note: `IsPCentral.conj` (conjugation preserves p-central) would be a
+-- natural lemma but its proof requires careful threading of Sylow
+-- conjugation (`Sylow.coe_subgroup_smul`) which is somewhat involved.
+-- Deferred until needed in Step 4.
+
 /-- **Step 1 reduction** — turn the `hMinCounterexample` data into the
 statement "`H` is simple".
 
