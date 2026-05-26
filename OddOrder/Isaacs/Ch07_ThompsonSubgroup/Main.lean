@@ -3350,6 +3350,21 @@ theorem zCenterOpCoreSubgroup_isPGroup
     IsPGroup p (zCenterOpCoreSubgroup G p) :=
   (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).to_le zCenterOpCoreSubgroup_le_opCore
 
+/-- Pairwise commutativity on the subtype ↥(Z(U)). -/
+theorem zCenterOpCoreSubgroup_comm_subtype
+    {G : Type*} [Group G] {p : ℕ} :
+    ∀ x y : ↥(zCenterOpCoreSubgroup G p), x * y = y * x := by
+  intro x y
+  apply Subtype.ext
+  exact zCenterOpCoreSubgroup_comm _ x.2 _ y.2
+
+/-- `Z(U)` as a `CommGroup`. -/
+@[reducible] def zCenterOpCoreSubgroup_commGroup
+    (G : Type*) [Group G] (p : ℕ) :
+    CommGroup ↥(zCenterOpCoreSubgroup G p) :=
+  { (inferInstance : Group ↥(zCenterOpCoreSubgroup G p)) with
+    mul_comm := zCenterOpCoreSubgroup_comm_subtype }
+
 /-- `V ⊆ centralizer U` in `G`: since `V ⊆ Z(U)`, every element of `V`
 commutes with every element of `U`.  Used in Step 7 to argue `V * D`
 is abelian (`V ⊆ centralizer U ⊇ D`). -/
