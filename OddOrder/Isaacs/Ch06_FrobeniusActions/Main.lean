@@ -3454,6 +3454,82 @@ theorem center_index_eq_prime_sq_of_subgroupOf_relIndex_prime
   rw [hZ_rel, hCsub_index] at hmul
   simpa [pow_two] using hmul.symm
 
+/-- **Isaacs Thm 6.12 setup**: if `C = ⟨c⟩` and `c^p ∈ Z(T)`, then
+`|C : Z(T)| = p`.
+
+The quotient `C / (Z(T) ∩ C)` is cyclic.  The image of `c` has `p`-th power `1`, so
+the quotient cardinal divides `p`; because it is also a nontrivial quotient of a `p`-group,
+`p` divides its cardinal. -/
+theorem center_relIndex_zpowers_eq_prime_of_pow_mem_center
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hT : IsPGroup p T) {c : T}
+    (hZ_lt_C : Subgroup.center T < Subgroup.zpowers c)
+    (hcp : c ^ p ∈ Subgroup.center T) :
+    (Subgroup.center T).relIndex (Subgroup.zpowers c) = p := by
+  let C : Subgroup T := Subgroup.zpowers c
+  let ZC : Subgroup C := (Subgroup.center T).subgroupOf C
+  change (Subgroup.center T).relIndex C = p
+  have hZC_le_center : ZC ≤ Subgroup.center C := by
+    intro z hz
+    rw [Subgroup.mem_center_iff]
+    intro x
+    apply Subtype.ext
+    have hz_center : ((z : C) : T) ∈ Subgroup.center T := by
+      simpa [ZC, Subgroup.mem_subgroupOf] using hz
+    exact Subgroup.mem_center_iff.mp hz_center ((x : C) : T)
+  haveI hZC_normal : ZC.Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hn_center : n ∈ Subgroup.center C := hZC_le_center hn
+    have hgn : g * n = n * g := Subgroup.mem_center_iff.mp hn_center g
+    have hconj : g * n * g⁻¹ = n := by
+      calc
+        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hgn]
+        _ = n := by simp
+    rwa [hconj]
+  let Q := C ⧸ ZC
+  haveI hC_cyclic : IsCyclic C := Subgroup.isCyclic_zpowers c
+  haveI hQ_cyclic : IsCyclic Q :=
+    isCyclic_of_surjective (QuotientGroup.mk' ZC) (QuotientGroup.mk'_surjective ZC)
+  have hQ_exp_dvd : Monoid.exponent Q ∣ p := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+    intro q
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective ZC q
+    rw [← map_pow]
+    refine (QuotientGroup.eq_one_iff (N := ZC) (x ^ p)).mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    change ((x : T) ^ p) ∈ Subgroup.center T
+    have hx_mem : (x : T) ∈ Subgroup.zpowers c := x.2
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hx_mem
+    have hxpow : (x : T) ^ p = (c ^ p) ^ k := by
+      rw [← hk]
+      calc
+        (c ^ k) ^ p = (c ^ k) ^ (p : ℤ) := by rw [zpow_natCast]
+        _ = c ^ (k * (p : ℤ)) := by rw [← zpow_mul]
+        _ = c ^ ((p : ℤ) * k) := by rw [mul_comm]
+        _ = (c ^ (p : ℤ)) ^ k := by rw [zpow_mul]
+        _ = (c ^ p) ^ k := by rw [zpow_natCast]
+    simpa [hxpow] using zpow_mem hcp k
+  have hQ_card_dvd_p : Nat.card Q ∣ p := by
+    have hcard_exp : Nat.card Q = Monoid.exponent Q :=
+      (IsCyclic.exponent_eq_card (α := Q)).symm
+    rw [hcard_exp]
+    exact hQ_exp_dvd
+  have hrel_card : (Subgroup.center T).relIndex C = Nat.card Q := by
+    change ZC.index = Nat.card (C ⧸ ZC)
+    rw [Subgroup.index_eq_card]
+  have hrel_ne_one : (Subgroup.center T).relIndex C ≠ 1 := by
+    intro hrel
+    have hC_le_Z : C ≤ Subgroup.center T := Subgroup.relIndex_eq_one.mp hrel
+    exact hZ_lt_C.ne (le_antisymm hZ_lt_C.le hC_le_Z)
+  have hp_dvd_Q_card : p ∣ Nat.card Q := by
+    have hQ_p : IsPGroup p Q := (hT.to_subgroup C).to_quotient ZC
+    rcases hQ_p.card_eq_or_dvd with hQ_card_one | hdiv
+    · exfalso
+      exact hrel_ne_one (by rw [hrel_card, hQ_card_one])
+    · exact hdiv
+  rw [hrel_card]
+  exact Nat.dvd_antisymm hQ_card_dvd_p hp_dvd_Q_card
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

@@ -438,6 +438,9 @@ FT クリティカル度 + 章内依存で並べる:
   また `|T:C|=p` と `|C:Z(T)|=p` から `|T:Z(T)|=p^2` を得る index 算術を
   `center_index_eq_prime_sq_of_subgroupOf_relIndex_prime` として分離済み. 次は `c^p ∈ Z(T)`
   から後者の `|C:Z(T)|=p` を作る段階.
+  この後者も `C=⟨c⟩` の quotient `C/(Z(T)∩C)` が cyclic で exponent が `p` を割り,
+  かつ非自明な `p`-group quotient であることから
+  `center_relIndex_zpowers_eq_prime_of_pow_mem_center` として追加済み.
   さらに ambient な `C ≤ T ≤ P` と `C.relIndex T = p` から, `C.subgroupOf T < ⊤`,
   cyclicity の `subgroupOf` への移送, および上記 `Z(T)<C` を束ねて Lemma 6.15 本体へ渡す
   `exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime` も追加済み.
