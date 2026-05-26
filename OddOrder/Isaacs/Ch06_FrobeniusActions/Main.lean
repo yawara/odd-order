@@ -3373,6 +3373,28 @@ theorem quotient_commutative_of_maximal_normal_isCyclic
     centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
   exact quotient_commutative_of_isCyclic_of_self_centralizing hC_cyclic hCent
 
+/-- **Isaacs Thm 6.12 setup**: if `C ≤ T` and `P/C` is abelian, then `T ⊴ P`.
+
+This is the quotient-correspondence step used after choosing `T/C ≤ P/C`: in an abelian
+quotient every subgroup is normal, and normality pulls back along the quotient map. -/
+theorem normal_of_le_of_quotient_commutative
+    {P : Type*} [Group P] {C T : Subgroup P} [C.Normal]
+    (hC_le_T : C ≤ T) (hquot_comm : ∀ x y : P ⧸ C, x * y = y * x) :
+    T.Normal := by
+  let Q : Subgroup (P ⧸ C) := T.map (QuotientGroup.mk' C)
+  have hQ_normal : Q.Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hconj : g * n * g⁻¹ = n := by
+      rw [hquot_comm g n, mul_assoc, mul_inv_cancel, mul_one]
+    rw [hconj]
+    exact hn
+  have hcomap : Q.comap (QuotientGroup.mk' C) = T := by
+    dsimp [Q]
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hC_le_T
+  rw [← hcomap]
+  exact hQ_normal.comap (QuotientGroup.mk' C)
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/
