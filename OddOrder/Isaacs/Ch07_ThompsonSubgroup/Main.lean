@@ -2873,6 +2873,27 @@ theorem AbarInf_LBar_eq_bot
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 
+/-- The image of an elementary abelian subgroup under a group hom is
+elementary abelian.  Generic for `Subgroup.IsElementaryAbelian`. -/
+theorem isElementaryAbelian_map_of_isElementaryAbelian
+    {G H : Type*} [Group G] [Group H] {p : ℕ} (f : G →* H)
+    {A : Subgroup G} (hA : A.IsElementaryAbelian p) :
+    (A.map f).IsElementaryAbelian p := by
+  refine ⟨?_, ?_⟩
+  · rintro ⟨_, a₁, ha₁, rfl⟩ ⟨_, a₂, ha₂, rfl⟩
+    apply Subtype.ext
+    show f a₁ * f a₂ = f a₂ * f a₁
+    rw [← f.map_mul, ← f.map_mul]
+    have hcomm : (⟨a₁, ha₁⟩ : A) * ⟨a₂, ha₂⟩ = ⟨a₂, ha₂⟩ * ⟨a₁, ha₁⟩ :=
+      hA.1 ⟨a₁, ha₁⟩ ⟨a₂, ha₂⟩
+    exact congr_arg f (congr_arg Subtype.val hcomm)
+  · rintro ⟨_, a, ha, rfl⟩
+    apply Subtype.ext
+    show (f a) ^ p = 1
+    rw [← f.map_pow, ← f.map_one]
+    have hpow : (⟨a, ha⟩ : A) ^ p = 1 := hA.2 ⟨a, ha⟩
+    exact congr_arg f (congr_arg Subtype.val hpow)
+
 /-- **Isaacs Thm 7.6 Step 5 nontriviality** (mmd L3874): if `A ⊄ U`
 (= `oPiCore {p} G`), then the image `Ā = A.map (mk' U)` is nontrivial.
 
