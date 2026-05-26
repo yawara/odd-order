@@ -265,6 +265,14 @@ theorem innerSum_neg_right (φ ψ : ClassFunction G k) :
     innerSum φ (-ψ) = -innerSum φ ψ := by
   simp [innerSum, mul_neg, Finset.sum_neg_distrib]
 
+theorem innerSum_sub_left (φ₁ φ₂ ψ : ClassFunction G k) :
+    innerSum (φ₁ - φ₂) ψ = innerSum φ₁ ψ - innerSum φ₂ ψ := by
+  simp [sub_eq_add_neg, innerSum_add_left, innerSum_neg_left]
+
+theorem innerSum_sub_right (φ ψ₁ ψ₂ : ClassFunction G k) :
+    innerSum φ (ψ₁ - ψ₂) = innerSum φ ψ₁ - innerSum φ ψ₂ := by
+  simp [sub_eq_add_neg, innerSum_add_right, innerSum_neg_right]
+
 @[simp] theorem inner_zero_left [Invertible (Nat.card G : k)] (ψ : ClassFunction G k) :
     inner (0 : ClassFunction G k) ψ = 0 := by
   simp [inner]
@@ -296,6 +304,16 @@ theorem inner_neg_left [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k)
 theorem inner_neg_right [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
     inner φ (-ψ) = -inner φ ψ := by
   simp [inner, innerSum_neg_right]
+
+theorem inner_sub_left [Invertible (Nat.card G : k)]
+    (φ₁ φ₂ ψ : ClassFunction G k) :
+    inner (φ₁ - φ₂) ψ = inner φ₁ ψ - inner φ₂ ψ := by
+  rw [sub_eq_add_neg, inner_add_left, inner_neg_left, sub_eq_add_neg]
+
+theorem inner_sub_right [Invertible (Nat.card G : k)]
+    (φ ψ₁ ψ₂ : ClassFunction G k) :
+    inner φ (ψ₁ - ψ₂) = inner φ ψ₁ - inner φ ψ₂ := by
+  rw [sub_eq_add_neg, inner_add_right, inner_neg_right, sub_eq_add_neg]
 
 end Inner
 
