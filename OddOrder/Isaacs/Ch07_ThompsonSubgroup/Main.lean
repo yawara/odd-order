@@ -2817,6 +2817,18 @@ theorem oPiCore_p_le_opPpPrimeCore
   exact (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
     (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)).one_mem
 
+/-- `L.map (mk' U) = L̅`: the image of `L = O_{p',p}(G)` in `G̅ = G/U`
+is exactly `L̅ = O_{p'}(G̅)`.  Follows from `map_comap_eq_self_of_surjective`. -/
+theorem opPpPrimeCore_map_eq_LBar
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    (opPpPrimeCore G p).map
+        (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) =
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+        (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
+  unfold opPpPrimeCore
+  exact Subgroup.map_comap_eq_self_of_surjective
+    (QuotientGroup.mk'_surjective _) _
+
 /-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
 
 We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
