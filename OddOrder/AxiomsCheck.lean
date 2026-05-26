@@ -81,6 +81,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
 #assert_only_allowed_axioms Subgroup.chermakDelgado
+#assert_only_allowed_axioms Subgroup.card_quotient_lt_of_ne_bot
 
 -- Ch.2 (Subnormality): Thm 2.13 Matsuyama
 -- 奇素数位数 inversion `x^t = x⁻¹` の存在 (`t ∉ O_2(G)` 下)

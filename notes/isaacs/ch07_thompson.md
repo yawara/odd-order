@@ -243,6 +243,8 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   商群側の任意の 2-subgroup abelian 仮定は Sylow lift 経由で
   `quotient_two_subgroup_abelian` により継承可能. p-separable 仮定は Ch03 既存
   `quotient_isPiSeparable` instance を直接使えばよく, Ch07 wrapper は不要.
+  minimal-counterexample descent 用の `|G/K| < |G|` は repo-local mathlib helper
+  `Subgroup.card_quotient_lt_of_ne_bot` に集約済み.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
@@ -336,6 +338,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`).
    - ✅ quotient theorem-condition inheritance: p-separable は Ch03
      `quotient_isPiSeparable`; 任意の 2-subgroup abelian は `quotient_two_subgroup_abelian`.
+   - ✅ minimality cardinal descent: `K ≠ ⊥` なら `|G/K| < |G|`
+     (`Subgroup.card_quotient_lt_of_ne_bot`).
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から

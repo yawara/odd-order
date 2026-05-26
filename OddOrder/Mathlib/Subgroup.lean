@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Coset.Card
 import Mathlib.GroupTheory.Complement
@@ -30,6 +31,8 @@ mathlib v4.29.1 に不在の汎用 `Subgroup` 補題. 主に
   `C_G(C_G(C_G(H))) = C_G(H)`.
 * `Subgroup.centralizer_sup`: `C_G(H ⊔ K) = C_G(H) ⊓ C_G(K)`
   (mathlib には Subalgebra 版のみ).
+* `Subgroup.card_quotient_lt_of_ne_bot`: a finite quotient by a nontrivial subgroup
+  has strictly smaller cardinality.
 
 将来 mathlib 本体へ寄与する際の配置候補:
 
@@ -258,6 +261,23 @@ theorem nat_card_quotient_subgroupOf_eq_card_map {G : Type*} [Group G] [Finite G
   conv_lhs => rw [show N.subgroupOf K = f0.ker from hker.symm]
   conv_rhs => rw [show K.map (QuotientGroup.mk' N) = f0.range from hrange.symm]
   exact hEq
+
+/-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
+
+This is the induction/minimal-counterexample termination bridge used repeatedly when passing
+from `G` to `G/K`. Normality is intentionally not required for the cardinal statement. -/
+theorem card_quotient_lt_of_ne_bot {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} (hK : K ≠ ⊥) :
+    Nat.card (G ⧸ K) < Nat.card G := by
+  have h_eq : Nat.card (G ⧸ K) * Nat.card K = Nat.card G :=
+    (Subgroup.card_eq_card_quotient_mul_card_subgroup K).symm
+  have hK_gt : 1 < Nat.card K := (Subgroup.one_lt_card_iff_ne_bot K).mpr hK
+  have hQ_pos : 0 < Nat.card (G ⧸ K) := Nat.card_pos
+  calc
+    Nat.card (G ⧸ K) = Nat.card (G ⧸ K) * 1 := (mul_one _).symm
+    _ < Nat.card (G ⧸ K) * Nat.card K :=
+      (Nat.mul_lt_mul_left hQ_pos).mpr hK_gt
+    _ = Nat.card G := h_eq
 
 /-- **`H` is normal when complement of normal `N` with elementwise commute**:
 `N ⊴ G`, `H` complement of `N`, `∀ n ∈ N h ∈ H, n*h = h*n` ⇒ `H ⊴ G`.
