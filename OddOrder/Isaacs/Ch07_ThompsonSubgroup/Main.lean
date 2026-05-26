@@ -4310,6 +4310,54 @@ theorem eq_top_of_contains_all_conjugates_of_simple
   rw [h_top]
   exact Subgroup.mem_top x
 
+/-- **§7D IsPCentral existence** — in a finite group with `p ∣ |G|`, every
+Sylow `p`-subgroup has a nontrivial element in its center (since a nontrivial
+finite `p`-group has nontrivial center), and any such nontrivial center
+element is `p`-central. -/
+theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hp_dvd : p ∣ Nat.card G) :
+    ∃ x : G, IsPCentral p x := by
+  classical
+  haveI : Nontrivial G := by
+    rw [← Finite.one_lt_card_iff_nontrivial]
+    exact lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
+      (Nat.le_of_dvd Nat.card_pos hp_dvd)
+  -- Pick a Sylow p-subgroup.
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  -- P is nontrivial (as |P| = p^k where p^k is max p-power dividing |G|, k ≥ 1).
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := by
+    intro h
+    have : Nat.card (P : Subgroup G) = 1 := by rw [h]; exact Subgroup.card_bot
+    have h_eq := P.card_eq_multiplicity
+    rw [this] at h_eq
+    have h_mult : (Nat.card G).factorization p = 0 := by
+      have : (1 : ℕ) = p ^ 0 := by simp
+      rw [this] at h_eq
+      exact (Nat.pow_right_injective (Fact.out (p := p.Prime)).two_le h_eq).symm
+    -- But p ∣ |G| ⇒ factorization p ≥ 1, contradiction
+    have hp_prime : p.Prime := Fact.out
+    have h_pos : 0 < (Nat.card G).factorization p :=
+      hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
+    omega
+  -- P is a finite nontrivial p-group, so its center is nontrivial.
+  haveI : Nontrivial ↥(P : Subgroup G) := P.toSubgroup.nontrivial_iff_ne_bot.mpr hP_ne_bot
+  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
+    hPpg.center_nontrivial
+  -- Pick a nontrivial center element.
+  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ := exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
+  -- c ∈ G, c ∈ (Subgroup.center P).map P.subtype, c ≠ 1.
+  refine ⟨c, ?_, P, ?_⟩
+  · -- c ≠ 1 since (⟨⟨c, hc_mem⟩, hc_in_center⟩) ≠ 1 inside center.
+    intro hc1
+    apply hc_ne_one
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hc1
+  · -- c ∈ (Subgroup.center P).map P.subtype
+    exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
+
 /-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
 non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
 there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
@@ -4331,6 +4379,7 @@ theorem matsuyama_of_simple_nonsolvable_q_two
     rw [hO2_bot, Subgroup.mem_bot]
     exact ht_ne_one
   exact OddOrder.Isaacs.Ch02.matsuyama ht_sq ht_notin
+
 
 /-- **§7D core axiom** — *no finite simple non-solvable group has order
 dividing `p^a * q^b`*.
