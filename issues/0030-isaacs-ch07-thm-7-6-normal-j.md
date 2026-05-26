@@ -34,6 +34,25 @@ App.A で 7 ヶ所超で直接引用 (L2456, L2480, L2482, L2511, L2515, L5014, 
   8. Conclude J(P) ⊴ G.
 - [ ] Add top-level theorem `OddOrder.Isaacs.Ch07.normal_J_*`.
 
+## 2026-05-26 update — sub-agent investigation 結果
+
+- **Cor 4.35** は `OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p` で
+  sorry-free 提供済み (`Ch04_Commutators/Main.lean:3437`).  Step 6 hypothesis 直接適合.
+- **§7B (Main.lean:2463-2482) は docstring placeholder のみ, bridge ゼロ**.
+- 8-step proof は §7A 流の 1100+ LOC bridge accumulation 相当を必要とする:
+  - Step 1: Hall-Higman 3.21 3 bridges (`Z(P) ≤ U`, `O_{p'}(H)=1`, `C_{G/U}(L/U) ≤ L/U`)
+  - Step 2: J(P) char-in-P + characteristic-through-normal 強化
+  - Step 3-4: Subgroup `H = LA`, Sylow-p of H, induction + conjugation commutator
+  - Step 5: 6.20 adapter
+  - Step 6: 4.35 adapter + Ω₁(Z(U)) def (Ch.7 ch07_thompson.md L507 design open)
+  - Step 7: |VD| ≤ |A| from A ∈ E(P) maximality
+  - Step 8: Thm 7.5 direct application
+- **推定**: ~800-1500 LOC of new bridges, **multi-session work** even after 7.5 lands.
+- 着手順案: Step 1 (Hall-Higman corollaries) → Ω₁ design → Step 5/6/8 (existing Ch.4/Ch.6/7.5 adapters).
+- 候補識別子: `thompsonJ_normal_of_centralizer_center_eq_of_oPiCoreCompl_eq_bot` (long form)
+  または `thompsonJ_normal_of_self_centralizing` (short).  `^theorem normal_J…` 規則を
+  満たすには `normal_J_of_self_centralizing` 等にリネーム.
+
 ## 完了条件
 
 - Top-level theorem matching goal-grep `^theorem normal_J…`.
