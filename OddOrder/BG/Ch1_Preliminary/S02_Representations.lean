@@ -18,6 +18,7 @@ import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main

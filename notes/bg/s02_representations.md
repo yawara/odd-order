@@ -582,7 +582,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 | **Fong–Swan citation** | BG L657 "Fong and Swan [5, Theorem 72.1]" — citation 설정 필요 | BG references 재확인 |
 | **Lemma 2.6.3 (Gorenstein)** | 解消: `OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean` の `IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero` で再構築済み | Lean build 済み |
 | **MISSING_PAGE:29 content** | 解消: BG PDF p.29 を `pdftotext` で復元し、§2F proof sketch に反映済み | PDF p.29 |
-| **Prop 2.4(j)–(k) statement** | Thm 2.5 증명에서 핵심 but verbose. statement 정확성 재확인 | BG L696–712 정독 |
+| **Prop 2.4 package** | 着手: issue 0028. `V_i` / `n_i` 記法と periodicity から shared module 化 | BG L671–714 |
 | **mathlib `Maschke` API** | §2 에서 언급 가능성 (L1.20에서 phase 1 참조) | `Maschke.completely_reducible` 확인 |
 
 ---
@@ -831,3 +831,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   を輸送する. `odd_two_dim_abelian_strong_induction` は proper normal
   `N < G*` に帰納仮定を適用し、可換性から nontrivial prime core を作る.
   これにより §2F Thm 2.6 (a)(b) は Lean 上で actual `sorry` 無し.
+- Prop 2.4 用 shared module
+  `OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction` を開始.
+  BG の `V_i = {v | vg = epsilon^i v}` と `n_i = dim V_i` を
+  `cyclicEigenspace` / `cyclicEigenspaceDim` として定義し、
+  primitive root の `epsilon^h = 1` から `V_{i+h}=V_i`,
+  `n_{i+h}=n_i` を sorry-free で証明した. これは Prop 2.4(b) の基礎層で、
+  次は `E_i` と `E_{i,t}` の定義および (e) の conjugation eigenvalue 計算へ進む.
