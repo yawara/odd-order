@@ -2744,6 +2744,46 @@ theorem center_sylow_le_opCore_of_oPiCorePrime_eq_bot
   (center_sylow_le_centralizer_opCore P).trans
     (centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot hOp')
 
+/-- **Isaacs Thm 7.6 Step 1(c)** (mmd L3839): in the quotient
+`G̅ := G / O_p(G)`, the centralizer of `L̅ := O_{p'}(G̅)` is contained in `L̅`.
+
+Stated with the quotient taken at `oPiCore ({p} : Set ℕ) G` (the canonical
+form recognized by `oPiCore_quotient_self_eq_bot`).  Use sites that work with
+`opCore p G` should transport across `oPiCore_singleton_eq_opCore` via
+`QuotientGroup.quotientMulEquivOfEq` before calling. -/
+theorem step1_c_centralizer_oPiPrime_quotient_le_self
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G] :
+    Subgroup.centralizer
+        (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+            (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :
+          Set (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) ≤
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+        (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
+  -- (1) `{p}`-separability passes to the quotient (mathlib instance).
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := inferInstance
+  -- (2) Take complement: `IsPiSeparable π G → IsPiSeparable {p | p ∉ π} G`.
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({q | q ≠ p} : Set ℕ)
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
+    have hcompl := OddOrder.Isaacs.Ch03.isPiSeparable_compl
+      ({p} : Set ℕ) (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) inferInstance
+    have hπeq : ({q : ℕ | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} := by
+      ext q; simp
+    rw [hπeq] at hcompl
+    exact hcompl
+  -- (3) Hall-Higman complement: `O_{{p}}(G̅) = ⊥` (self-quotient kills radical).
+  have hπ'bot :
+      OddOrder.Isaacs.Ch03.oPiCore
+          ({q : ℕ | q ∉ ({q | q ≠ p} : Set ℕ)} : Set ℕ)
+          (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) = ⊥ := by
+    have hπ'eq : ({q : ℕ | q ∉ ({q | q ≠ p} : Set ℕ)} : Set ℕ) = ({p} : Set ℕ) := by
+      ext q; simp
+    rw [hπ'eq]
+    exact OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot ({p} : Set ℕ)
+  -- (4) Apply Hall-Higman 3.21 to `G̅` with `π = {q | q ≠ p}`.
+  exact OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({q | q ≠ p} : Set ℕ) hπ'bot
+
 /-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
 
 We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
