@@ -541,3 +541,8 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   既存の odd-order no-interchange bridge で `G` abelian まで進む.
   これは mathlib/Isaacs の単純 wrapper ではなく、q≠p branch の未形式化部分を
   line-pair construction だけに絞る theorem-facing interface.
+- `finrank_eq_one_of_irreducible_representation_of_commutative_group` を追加.
+  BG p.29 の「`K` abelian + `F` algebraically closed ⇒ irreducible `FK`-module は
+  one-dimensional」に対応する bridge. mathlib の algebra representation 側の Schur
+  型結果へ、`Representation F K M` と手元の `Std.Commutative K` から渡すための
+  型変換を含むので、純粋な theorem rename ではない.

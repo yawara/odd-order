@@ -678,6 +678,36 @@ private theorem scalarCharacterOfFinrankEqOne_apply_smul
     ρ g m = (scalarCharacterOfFinrankEqOne hdim ρ g : F) • m :=
   scalarMonoidHomOfFinrankEqOne_apply_smul hdim ρ g m
 
+/-- Irreducible representations of an abelian group over an algebraically closed
+field are one-dimensional.
+
+This is the BG Thm 2.6 q≠p input from **G**, Thm 3.2.4, expressed for
+mathlib `Representation`s.  The proof crosses to the group algebra module and
+uses the commutativity of the group algebra, so it is not just a theorem rename. -/
+private theorem finrank_eq_one_of_irreducible_representation_of_commutative_group
+    {F : Type*} [Field F] [IsAlgClosed F] {K : Type*} [Group K]
+    (hKcomm : Std.Commutative (· * · : K → K → K))
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Finite F M]
+    (σ : Representation F K M) [Representation.IsIrreducible σ] :
+    Module.finrank F M = 1 := by
+  haveI : IsMulCommutative K := ⟨hKcomm⟩
+  letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
+  letI : Module F σ.asModule := Representation.instModuleAsModule σ
+  letI : Module (MonoidAlgebra F K) σ.asModule :=
+    Representation.instModuleMonoidAlgebraAsModule σ
+  have hfinite : Module.Finite F σ.asModule := inferInstance
+  haveI : IsMulCommutative (MonoidAlgebra F K) := ⟨CommMagma.to_isCommutative⟩
+  have hmodule :
+      Module.finrank F σ.asModule = 1 :=
+    @IsSimpleModule.finrank_eq_one_of_isMulCommutative
+      (MonoidAlgebra F K) σ.asModule F
+      inferInstance inferInstance inferInstance
+      (Representation.instAddCommGroupAsModule σ)
+      (Representation.instModuleAsModule σ)
+      (Representation.instModuleMonoidAlgebraAsModule σ)
+      inferInstance inferInstance hfinite inferInstance inferInstance
+  simpa [Representation.asModule] using hmodule
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
