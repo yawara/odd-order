@@ -4144,6 +4144,53 @@ theorem odd_two_dim_abelian
     Std.Commutative (· * · : G → G → G) := by
   sorry
 
+/-- Finite subgroup cardinality strictly drops for a proper subgroup. -/
+private lemma subgroup_card_lt_of_lt_top
+    {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H < ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH.ne (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- Strong-induction form of BG Thm 2.6(b), using Thm 2.6(a) for the
+characteristic-away branch on proper subgroups.
+
+This is not the final theorem (a) proof; it isolates the remaining dependency of
+the q=p theorem on the abelian branch and supplies the proper-subgroup Sylow
+branch recursively. -/
+private theorem odd_two_dim_sylow_abelian_strong_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)],
+      Nat.card G = n → Odd (Nat.card G) → Module.finrank F V = 2 →
+      (ρ : Representation F G V) → Function.Injective ρ →
+      p ∣ Nat.card G → (P : Sylow p G) →
+      Std.Commutative (· * · : P → P → P) ∧
+        commutator G ≤ (P : Subgroup G) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro G _ _ _ hcard hodd hdim ρ hfaithful hp_dvd P
+    refine
+      odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs
+        (p := p) (F := F) (G := G) hodd hdim ρ hfaithful ?_ ?_ P
+    · intro N _hNnormal _hN_ne_bot _hN_ne_top hoddN σ hfaithfulN hdimN hcharN
+      exact odd_two_dim_abelian hoddN hdimN σ hfaithfulN hcharN
+    · intro N _hNnormal _hN_ne_bot hN_ne_top hoddN σ hfaithfulN hdimN hpN PN
+      let Gstar : Subgroup G := determinantKernelSubgroup ρ
+      have hN_card_lt_Gstar : Nat.card N < Nat.card Gstar := by
+        have hN_lt_top : N < ⊤ := lt_top_iff_ne_top.mpr hN_ne_top
+        exact subgroup_card_lt_of_lt_top hN_lt_top
+      have hGstar_card_le_G : Nat.card Gstar ≤ Nat.card G :=
+        Subgroup.card_le_card_group Gstar
+      have hN_card_lt_G : Nat.card N < Nat.card G :=
+        lt_of_lt_of_le hN_card_lt_Gstar hGstar_card_le_G
+      exact ih (Nat.card N) (by simpa [hcard] using hN_card_lt_G)
+        (G := N) rfl hoddN hdimN σ hfaithfulN hpN PN
+
 /-- **BG Theorem 2.6 (b)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F = p` が `|G|` を割るなら, `G` の `p`-Sylow
 は abelian かつ `G'` を含む.
@@ -4152,20 +4199,18 @@ stub: 詳細 proof は §2F section docstring の "證明梗概" + Case q = p
 (BG L785-787) 参照. -/
 theorem odd_two_dim_sylow_abelian
     {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
-    (_hodd : Odd (Nat.card G))
+    (hodd : Odd (Nat.card G))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
     (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
     (hfaithful : Function.Injective ρ)
-    {p : ℕ} [Fact p.Prime] (_hp_dvd : p ∣ Nat.card G)
-    (_hchar : CharP F p) (P : Sylow p G) :
+    {p : ℕ} [Fact p.Prime] (hp_dvd : p ∣ Nat.card G)
+    (hchar : CharP F p) (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
-  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
-  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
-      ρ hdet_bot P
-  by_cases hdet_p : IsPGroup p (determinantKernelSubgroup ρ)
-  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
-      ρ hfaithful hdim hdet_p hdet_bot P
-  sorry
+  haveI : CharP F p := hchar
+  exact
+    odd_two_dim_sylow_abelian_strong_induction
+      (p := p) (F := F) (V := V) (Nat.card G)
+      (G := G) rfl hodd hdim ρ hfaithful hp_dvd P
 
 end OddOrder.BG.Ch1.S02

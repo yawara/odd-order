@@ -37,7 +37,7 @@
   - Build OK (2272 jobs, sorry 1 件のみ on `invariants_ne_bot` step case 内). 次 iter で残 sorry 2 段階に着手.
 - **2026-05-25**: `PGroupFixedVector.lean` を sorry-free 化. `IsPGroup.invariants_ne_bot` と `IsPGroup.exists_fixed_vector_ne_zero` は完成済みで、§2F Thm 2.6 の fixed-vector dependency は解消.
 - **2026-05-25**: mmd の `[MISSING_PAGE_FAIL:29]` は BG PDF p.29 を `pdftotext` で復元して解消. §2F の証明 sketch に q=p / q≠p / `G*` induction の分岐を反映済み.
-- **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 現在の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
+- **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 当時の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
 - **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` / `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. さらに実際の subgroup `fixedOnSubmoduleAndQuotientSubgroup` とその可換性補題を追加済み.
 - **2026-05-25**: p-subgroup の `W` / `V/W` action が scalar characters で書けるなら char p で `fixedOnSubmoduleAndQuotientSubgroup` に入る補題 `subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions` と、faithful 版の可換性補題 `subgroup_commutative_of_isPGroup_scalar_actions` を追加済み. BG の「dim W = dim V/W = 1 なので scalar」段だけが次の橋渡し.
 - **2026-05-25**: rank-one representation 用に `scalarMonoidHomOfFinrankEqOne`, units 版 `scalarCharacterOfFinrankEqOne`, および char p の p-group rank-one 表現自明性 `isPGroup_rank_one_representation_trivial_of_charP` を追加済み. 次はこれを実際の submodule `W` と quotient `V/W` 表現へ適用する.
@@ -246,6 +246,11 @@
   既存 endpoint、残りは algebraic-closure original-kernel spine + 上の `hind`
   bridge に流す. 次の実装単位は、public theorem を strong induction に畳み直して
   `hab_ind`/`hsyl_ind` を供給すること.
+- **2026-05-26**: public theorem
+  `odd_two_dim_sylow_abelian` を strong induction に接続し、同 theorem の
+  `sorry` を除去した. Proper subgroup の Sylow branch は再帰的に処理し、
+  char-away branch は現時点では `odd_two_dim_abelian` に依存する. これにより
+  `S02_Representations.lean` の残 public sorry は `odd_two_dim_abelian` 1 件のみ.
 
 ## TL;DR
 
@@ -552,7 +557,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 優先度判定
 
-1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. 現在 active. fixed-vector dependency と p-power torsion helper は完成、残りは 2 つの theorem stub.
+1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. 現在 active. fixed-vector dependency と p-power torsion helper は完成、`odd_two_dim_sylow_abelian` も strong induction で sorry-free. 残りは `odd_two_dim_abelian` の char-away branch.
 2. **Prop 2.4 (eigenspace)** ★★★ — Thm 2.5 の前提になる線型代数節.
 3. **Prop 2.1 (Schur + 既約)** ★★ — mathlib 基礎 API を活用できるが、Jacobson density 周辺は要注意.
 4. **Thm 2.5 (extraspecial)** ★★★ — §3 で使用. extraspecial 理論と Prop 2.4 に依存する高難度枠.
@@ -779,3 +784,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   q=p theorem 本体の determinant-kernel split は、明示的な proper-subgroup
   induction outputs を仮定すれば sorry-free で閉じる. 残 frontier はこの
   endpoint の仮定を well-founded induction から作ることに縮小した.
+- `odd_two_dim_sylow_abelian_strong_induction` を追加し、上の endpoint の
+  well-founded induction 仮定を実際に供給した. Public
+  `odd_two_dim_sylow_abelian` は `sorry` 無しで、残る依存は char-away branch
+  `odd_two_dim_abelian` のみ.
