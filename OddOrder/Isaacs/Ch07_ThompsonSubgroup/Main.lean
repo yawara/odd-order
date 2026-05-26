@@ -4383,6 +4383,33 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
   · -- c ∈ (Subgroup.center P).map P.subtype
     exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
 
+/-- **§7D Sylow extraction** — in a finite simple non-solvable group of order
+dividing `p^a * q^b`, every Sylow `p`-subgroup is nontrivial.
+
+This is a thin specialization of the divisibility helper combined with the
+`factorization_pos_of_dvd` argument from `exists_isPCentral`. -/
+theorem sylow_ne_bot_of_simple_nonsolvable_paqb
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b)
+    (P : Sylow p H) : (P : Subgroup H) ≠ ⊥ := by
+  intro hP_bot
+  have hp_prime : p.Prime := Fact.out
+  have hp_dvd : p ∣ Nat.card H :=
+    (p_and_q_dvd_card_of_simple_nonsolvable hpq hH_simple hH_nsol hH_dvd).1
+  -- P is bot ⇒ Nat.card P = 1, contradicting Sylow.card_eq_multiplicity.
+  have h_card : Nat.card (P : Subgroup H) = 1 := by rw [hP_bot]; exact Subgroup.card_bot
+  have h_eq := P.card_eq_multiplicity
+  rw [h_card] at h_eq
+  have h_pos : 0 < (Nat.card H).factorization p :=
+    hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
+  have : (1 : ℕ) = p ^ 0 := by simp
+  rw [this] at h_eq
+  have h_mult_zero : (Nat.card H).factorization p = 0 :=
+    (Nat.pow_right_injective hp_prime.two_le h_eq).symm
+  omega
+
 /-- **§7D auxiliary observation** (Isaacs L3965) — if `M` is a maximal subgroup
 of a simple group `G` and `K ≤ M` is a nontrivial subgroup normalized by every
 element of `M`, then `M = N_G(K)`.
