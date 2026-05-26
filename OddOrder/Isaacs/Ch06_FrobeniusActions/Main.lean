@@ -6056,6 +6056,124 @@ theorem pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
     (not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic
       hT_normal hcyc) h_exists
 
+/-! ### The conjugation congruence step in Theorem 6.12 -/
+
+/-- **Isaacs Thm 6.12 setup**: if conjugation by `a` sends `c` to `c^i`, then it sends
+`c^k` to `c^(i*k)`. -/
+private lemma conj_zpow_eq_zpow_mul_of_conj_eq_zpow
+    {G : Type*} [Group G] {a c : G} {i k : ℤ}
+    (h_conj : a * c * a⁻¹ = c ^ i) :
+    a * c ^ k * a⁻¹ = c ^ (i * k) := by
+  have hmap : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
+    simp
+  rw [hmap, h_conj, zpow_mul]
+
+/-- **Isaacs Thm 6.12 setup**: iterating the conjugation exponent. -/
+private lemma conj_pow_eq_zpow_pow_of_conj_eq_zpow
+    {G : Type*} [Group G] {a c : G} {i : ℤ}
+    (h_conj : a * c * a⁻¹ = c ^ i) (n : ℕ) :
+    a ^ n * c * (a ^ n)⁻¹ = c ^ (i ^ n : ℤ) := by
+  induction n with
+  | zero =>
+      simp
+  | succ n ih =>
+      calc
+        a ^ (n + 1) * c * (a ^ (n + 1))⁻¹ =
+            a * (a ^ n * c * (a ^ n)⁻¹) * a⁻¹ := by
+          rw [pow_succ']
+          group
+        _ = a * c ^ (i ^ n : ℤ) * a⁻¹ := by rw [ih]
+        _ = c ^ (i * (i ^ n : ℤ)) :=
+          conj_zpow_eq_zpow_mul_of_conj_eq_zpow h_conj
+        _ = c ^ (i ^ (n + 1) : ℤ) := by
+          congr 1
+          rw [pow_succ']
+
+/-- **Isaacs Thm 6.12 setup**: if `a^p ∈ ⟨c⟩` and conjugation by `a` sends `c` to
+`c^i`, then `i^p ≡ 1 (mod |c|)`.
+
+In the proof of Theorem 6.12 this is the line `c = c^{a^p} = c^{i^p}`. -/
+theorem conj_exponent_pow_modEq_one_of_pow_mem_zpowers
+    {G : Type*} [Group G] {p e : ℕ} {a c : G} {i : ℤ}
+    (h_order : orderOf c = p ^ e)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (ha_pow : a ^ p ∈ Subgroup.zpowers c) :
+    i ^ p ≡ 1 [ZMOD ((p : ℤ) ^ e)] := by
+  obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp ha_pow
+  have hcomm : a ^ p * c * (a ^ p)⁻¹ = c := by
+    rw [← hm]
+    have hzc : c ^ m * c = c * c ^ m := (Commute.zpow_self c m).eq
+    calc
+      c ^ m * c * (c ^ m)⁻¹ = c * c ^ m * (c ^ m)⁻¹ := by rw [hzc]
+      _ = c := by simp [mul_assoc]
+  have hiter : a ^ p * c * (a ^ p)⁻¹ = c ^ (i ^ p : ℤ) :=
+    conj_pow_eq_zpow_pow_of_conj_eq_zpow h_conj p
+  have hpow_eq : c ^ (i ^ p : ℤ) = c := hiter.symm.trans hcomm
+  have hmod : i ^ p ≡ (1 : ℤ) [ZMOD orderOf c] := by
+    rw [← zpow_eq_zpow_iff_modEq]
+    simpa using hpow_eq
+  simpa [h_order] using hmod
+
+/-- **Isaacs Thm 6.12 setup**: if conjugation by `a` does not fix `c^p`, the exponent `i`
+cannot be `1` modulo `p^(e-1)`. -/
+theorem conj_exponent_not_modEq_one_of_pow_conj_ne
+    {G : Type*} [Group G] {p e : ℕ} (he : 0 < e)
+    {a c : G} {i : ℤ}
+    (h_order : orderOf c = p ^ e)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (hpow_ne : a * c ^ p * a⁻¹ ≠ c ^ p) :
+    ¬ i ≡ 1 [ZMOD ((p : ℤ) ^ (e - 1))] := by
+  intro hmod
+  have hmod_mul : i * (p : ℤ) ≡ (p : ℤ) [ZMOD ((p : ℤ) ^ e)] := by
+    obtain ⟨m, hm⟩ := hmod.symm.dvd
+    refine Int.modEq_iff_dvd.mpr ?_
+    refine ⟨-m, ?_⟩
+    have hpow : (p : ℤ) ^ e = (p : ℤ) ^ (e - 1) * (p : ℤ) := by
+      rw [← pow_succ, Nat.sub_add_cancel he]
+    calc
+      (p : ℤ) - i * (p : ℤ)
+          = -((i - 1) * (p : ℤ)) := by ring
+      _ = -(((p : ℤ) ^ (e - 1) * m) * (p : ℤ)) := by rw [hm]
+      _ = ((p : ℤ) ^ e) * -m := by
+        rw [hpow]
+        ring
+  have hmod_order : i * (p : ℤ) ≡ (p : ℤ) [ZMOD orderOf c] := by
+    simpa [h_order] using hmod_mul
+  have hfix : a * c ^ p * a⁻¹ = c ^ p := by
+    calc
+      a * c ^ p * a⁻¹ = a * c ^ (p : ℤ) * a⁻¹ := by rw [zpow_natCast]
+      _ = c ^ (i * (p : ℤ)) :=
+        conj_zpow_eq_zpow_mul_of_conj_eq_zpow h_conj
+      _ = c ^ (p : ℤ) := by
+        rw [zpow_eq_zpow_iff_modEq]
+        exact hmod_order
+      _ = c ^ p := by rw [zpow_natCast]
+  exact hpow_ne hfix
+
+/-- **Isaacs Thm 6.12 setup**: the Lemma 6.16 dispatch for the conjugation exponent.
+
+From `a^p ∈ ⟨c⟩`, conjugation by `a` as `c ↦ c^i`, and non-fixity of `c^p`, Lemma 6.16
+forces `p = 2` and leaves only the two `2`-adic alternatives for `i`. -/
+theorem conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
+    {G : Type*} [Group G] {p e : ℕ} (hp : p.Prime) (he : 0 < e)
+    {a c : G} {i : ℤ}
+    (h_order : orderOf c = p ^ e)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (ha_pow : a ^ p ∈ Subgroup.zpowers c)
+    (hpow_ne : a * c ^ p * a⁻¹ ≠ c ^ p) :
+    p = 2 ∧
+      (i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) := by
+  have hpow_mod : i ^ p ≡ 1 [ZMOD ((p : ℤ) ^ e)] :=
+    conj_exponent_pow_modEq_one_of_pow_mem_zpowers h_order h_conj ha_pow
+  have hnot_mod :
+      ¬ i ≡ 1 [ZMOD ((p : ℤ) ^ (e - 1))] :=
+    conj_exponent_not_modEq_one_of_pow_conj_ne he h_order h_conj hpow_ne
+  rcases pow_prime_modEq_one_cases hp he hpow_mod with hmod_one | htwo | htwo
+  · exact (hnot_mod hmod_one).elim
+  · exact ⟨htwo.1, Or.inl htwo.2⟩
+  · exact ⟨htwo.1, Or.inr htwo.2⟩
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.

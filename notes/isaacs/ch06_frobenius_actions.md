@@ -452,6 +452,15 @@ FT クリティカル度 + 章内依存で並べる:
   `not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic`
   として分離し, これと直前 bridge から本文の `c^p ∉ Z(T)` 結論を
   `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` として追加済み.
+  続けて本文の conjugation exponent 段階も,
+  `a^p ∈ ⟨c⟩` と `c^a = c^i` から `i^p ≡ 1 (mod p^e)` を得る
+  `conj_exponent_pow_modEq_one_of_pow_mem_zpowers`, `c^p` の非固定性から
+  `i ≠ 1 (mod p^(e-1))` を得る
+  `conj_exponent_not_modEq_one_of_pow_conj_ne`, そして Lemma 6.16 に dispatch して
+  `p=2` と二つの 2-adic alternative へ落とす
+  `conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne` まで sorry-free.
+  これは 6.12 本文の `c = c^{a^p} = c^{i^p}` と `c^p ∉ Z(T)` をつなぐ実質的な
+  bridge であり, 既存 theorem の純粋 wrapper ではない.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
