@@ -215,6 +215,9 @@ Coherent triple (τ_1, τ_2, τ_3)
   two-element `R(χ)`, and `CharacterDifferenceImage.Orthogonal` plus
   `Hypothesis.difference_images_orthogonal` now encode the (5.2.e) image-set
   orthogonality condition.
+- `CharacterDifferenceImage.signed_image_ne_zero` and
+  `image_conjugateDifference_ne_zero` expose the immediate consequence of
+  (5.2.d): the signed difference image of `χ - χ̄` is nonzero.
 
 ### (5.3) Lemma — Coherence の十分条件
 

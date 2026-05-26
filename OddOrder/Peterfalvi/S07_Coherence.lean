@@ -151,6 +151,16 @@ theorem muClassFunction_ne_nuClassFunction
   intro h
   exact hχ.distinct (IrreducibleCharacter.ext h)
 
+theorem signed_image_ne_zero
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.sign • (hχ.muClassFunction - hχ.nuClassFunction) ≠ 0 := by
+  have hdiff : hχ.muClassFunction - hχ.nuClassFunction ≠ 0 :=
+    sub_ne_zero.mpr hχ.muClassFunction_ne_nuClassFunction
+  rcases hχ.sign_eq with hsign | hsign
+  · simpa [hsign] using hdiff
+  · have hneg : -(hχ.muClassFunction - hχ.nuClassFunction) ≠ 0 := neg_ne_zero.mpr hdiff
+    simpa [hsign] using hneg
+
 /-- Orthogonality of the two image sets `R(χ)` and `R(ψ)` from Peterfalvi
 (5.2.e). -/
 def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
@@ -164,6 +174,12 @@ theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G :=
     τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
       hχ.sign • (hχ.muClassFunction - hχ.nuClassFunction) := by
   simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using hχ.image_eq
+
+theorem image_conjugateDifference_ne_zero
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) ≠ 0 := by
+  rw [hχ.image_conjugateDifference]
+  exact hχ.signed_image_ne_zero
 
 end CharacterDifferenceImage
 
