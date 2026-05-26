@@ -444,6 +444,9 @@ FT クリティカル度 + 章内依存で並べる:
   さらに ambient な `C ≤ T ≤ P` と `C.relIndex T = p` から, `C.subgroupOf T < ⊤`,
   cyclicity の `subgroupOf` への移送, および上記 `Z(T)<C` を束ねて Lemma 6.15 本体へ渡す
   `exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime` も追加済み.
+  続けて `C=⟨c⟩` と `c^p ∈ Z(T)` の index 計算をこの ambient bridge へ直結する
+  `exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center`
+  も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

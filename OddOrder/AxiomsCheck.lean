@@ -277,6 +277,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

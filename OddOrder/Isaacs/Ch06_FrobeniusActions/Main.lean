@@ -5950,6 +5950,57 @@ theorem exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_
   exact exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
     hT hT_card_ne h_idx hCsub_cyclic hZ_lt_C hCsub_lt_top
 
+/-- **Isaacs Thm 6.12 setup**: Lemma 6.15 applied after the `c^p ∈ Z(T)` index
+calculation.
+
+This packages the proof step where `C = ⟨c⟩`, `|T : C| = p`, and `c^p ∈ Z(T)` give
+`|T : Z(T)| = p²`, so the characteristic elementary abelian subgroup supplied by
+Lemma 6.15 can be invoked. -/
+theorem exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal] {c : P}
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (hC_eq : C = Subgroup.zpowers c) (hcT : c ∈ T)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T)
+    (hcp : (⟨c, hcT⟩ : T) ^ p ∈ Subgroup.center T) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  let cT : T := ⟨c, hcT⟩
+  have hCsub_eq : C.subgroupOf T = Subgroup.zpowers cT := by
+    ext x
+    constructor
+    · intro hx
+      rw [Subgroup.mem_subgroupOf] at hx
+      rw [hC_eq] at hx
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hx
+      rw [Subgroup.mem_zpowers_iff]
+      refine ⟨k, ?_⟩
+      apply Subtype.ext
+      simpa [cT] using hk
+    · intro hx
+      rw [Subgroup.mem_subgroupOf, hC_eq]
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hx
+      refine Subgroup.mem_zpowers_iff.mpr ⟨k, ?_⟩
+      have hk_val := congrArg Subtype.val hk
+      simpa [cT] using hk_val
+  have hZ_lt_C : Subgroup.center T < C.subgroupOf T :=
+    center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative
+      hC_le_T hCent hC_rel hT_not_comm
+  have hZ_lt_zpowers : Subgroup.center T < Subgroup.zpowers cT := by
+    simpa [hCsub_eq] using hZ_lt_C
+  have hZ_rel_zpowers : (Subgroup.center T).relIndex (Subgroup.zpowers cT) = p :=
+    center_relIndex_zpowers_eq_prime_of_pow_mem_center hT hZ_lt_zpowers hcp
+  have hZ_rel_C : (Subgroup.center T).relIndex (C.subgroupOf T) = p := by
+    simpa [hCsub_eq] using hZ_rel_zpowers
+  have h_idx : (Subgroup.center T).index = p ^ 2 :=
+    center_index_eq_prime_sq_of_subgroupOf_relIndex_prime hC_rel hZ_lt_C.le hZ_rel_C
+  have hC_cyclic : IsCyclic C := by
+    rw [hC_eq]
+    exact Subgroup.isCyclic_zpowers c
+  exact exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime
+    hT hT_card_ne h_idx hC_le_T hCent hC_rel hC_cyclic hT_not_comm
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
