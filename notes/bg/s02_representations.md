@@ -534,3 +534,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   normality を同時に確保した.
 - 次 frontier はこの ambient `K` を使い、q≠p + Maschke + algebraic closedness で
   `V` を二つの rank-one `K`-submodules に分解する statement へ進むこと.
+- その受け口として `RankOneLinePairData` と
+  `commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePair` を追加.
+  `O_q(G*) ≠ ⊥` から得た ambient `K` に対し、Maschke 側が
+  「二つの rank-one line と `G` による permutation」を返せば、
+  既存の odd-order no-interchange bridge で `G` abelian まで進む.
+  これは mathlib/Isaacs の単純 wrapper ではなく、q≠p branch の未形式化部分を
+  line-pair construction だけに絞る theorem-facing interface.

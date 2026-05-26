@@ -1293,6 +1293,22 @@ private theorem commutative_of_faithful_representation_permuted_rank_one_complem
   exact commutative_of_faithful_representation_preserves_rank_one_complement
     (W 0) (W 1) ρ hfaithful hcompl hW0 hW1 hdimW hdimQ
 
+/-- Data produced by the q≠p Maschke/algebraically-closed step in BG Thm 2.6.
+
+The two lines are allowed to be permuted by `G`; odd order later forces the
+permutation action on `Fin 2` to be trivial. -/
+private structure RankOneLinePairData
+    {F : Type*} [Field F] {G : Type*} [Group G] [MulAction G (Fin 2)]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) : Type _ where
+  W : Fin 2 → Submodule F V
+  freeW0 : Module.Free F (W 0)
+  freeQ0 : Module.Free F (V ⧸ W 0)
+  isCompl : IsCompl (W 0) (W 1)
+  permutes : ∀ (g : G) (i : Fin 2), W i ≤ (W (g • i)).comap (ρ g)
+  finrankW0 : Module.finrank F (W 0) = 1
+  finrankQ0 : Module.finrank F (V ⧸ W 0) = 1
+
 /-- Two-dimensional form of
 `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
 private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two
@@ -1884,6 +1900,32 @@ private theorem exists_ambient_normal_commutative_qSubgroup_le_determinantKernel
     simpa using (congr_arg Subtype.val
       (Subgroup.mem_center_iff.mp hxO_center yO)).symm
   exact ⟨K, hKnormal, hK_le_Gstar, hKp, hK_ne_bot, hKcomm⟩
+
+/-- q≠p core branch reduced to the Maschke line-pair construction.
+
+After `O_q(G*) ≠ 1` supplies an abelian normal q-subgroup `K ≤ G*`, it remains
+to construct the two rank-one `K`-module lines and prove that `G` permutes
+them.  This theorem connects exactly that future line-pair data to the
+already-formalized odd-order no-interchange bridge. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePair
+    {q : ℕ} [Fact q.Prime] {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G] [MulAction G (Fin 2)]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥)
+    (hline : ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
+      IsPGroup q K → K ≠ ⊥ → Std.Commutative (· * · : K → K → K) →
+      RankOneLinePairData ρ) :
+    Std.Commutative (· * · : G → G → G) := by
+  rcases exists_ambient_normal_commutative_qSubgroup_le_determinantKernel_of_opCore_ne_bot
+      ρ hcore_ne_bot with
+    ⟨K, hKnormal, hK_le_Gstar, hKq, hK_ne_bot, hKcomm⟩
+  let D := hline K hKnormal hK_le_Gstar hKq hK_ne_bot hKcomm
+  letI : Module.Free F (D.W 0) := D.freeW0
+  letI : Module.Free F (V ⧸ D.W 0) := D.freeQ0
+  exact commutative_of_faithful_representation_permuted_rank_one_complement_of_odd
+    D.W ρ hfaithful hodd D.isCompl D.permutes D.finrankW0 D.finrankQ0
 
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
