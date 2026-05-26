@@ -74,6 +74,21 @@ under the numerical and class-sum hypotheses. -/
 abbrev CoherenceTarget (hyp : SibleySetup (L := L) (G := G) S A) :=
   OddOrder.Peterfalvi.S07.Hypothesis.IsCoherentTarget hyp.coherence
 
+theorem coherence_tau_inner_eq (hyp : SibleySetup (L := L) (G := G) S A)
+    (φ ψ : ClassFunction L ℂ) :
+    ClassFunction.inner (hyp.coherence.tau φ) (hyp.coherence.tau ψ) =
+      ClassFunction.inner φ ψ :=
+  hyp.coherence.tau_inner_eq φ ψ
+
+theorem coherence_inner_eq_on_supported
+    (hyp : SibleySetup (L := L) (G := G) S A)
+    (hcoh : hyp.CoherenceTarget) {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A)
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A) :
+    ClassFunction.inner (hyp.coherence.tau φ) (hyp.coherence.tau ψ) =
+      ClassFunction.inner φ ψ :=
+  hcoh.inner_eq_on_supported hφ hψ
+
 end SibleySetup
 
 end OddOrder.Peterfalvi.S08

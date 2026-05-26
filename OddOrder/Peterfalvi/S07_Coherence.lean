@@ -210,6 +210,20 @@ theorem extension_agrees (hτ : IsCoherent τ S A)
     hτ.extension φ = τ φ :=
   hτ.extends_on_supported φ hφ
 
+theorem extension_inner_eq (hτ : IsCoherent τ S A)
+    (φ ψ : ClassFunction L ℂ) :
+    ClassFunction.inner (hτ.extension φ) (hτ.extension ψ) =
+      ClassFunction.inner φ ψ :=
+  hτ.extension_isometry.inner_eq φ ψ
+
+theorem inner_eq_on_supported (hτ : IsCoherent τ S A)
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S A)
+    (hψ : ψ ∈ zSupportedSpan (L := L) S A) :
+    ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ := by
+  rw [← hτ.extension_agrees hφ, ← hτ.extension_agrees hψ]
+  exact hτ.extension_inner_eq φ ψ
+
 end IsCoherent
 
 /-- Peterfalvi (5.2)-style hypotheses for coherence applications.  This is a
@@ -239,6 +253,11 @@ variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 /-- The map carried by a §7 hypothesis, as a coherence predicate target. -/
 abbrev IsCoherentTarget (hyp : Hypothesis (L := L) (G := G) S A) :=
   IsCoherent hyp.tau S A
+
+theorem tau_inner_eq (hyp : Hypothesis (L := L) (G := G) S A)
+    (φ ψ : ClassFunction L ℂ) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ :=
+  hyp.tau_isometry.inner_eq φ ψ
 
 /-- The signed irreducible-difference image of `χ - χ̄` supplied by a §7
 hypothesis. -/

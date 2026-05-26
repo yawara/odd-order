@@ -39,6 +39,20 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§7 Coherence 完成直後).
 
 **FT 必須度**: ☆☆ (§8 自体は局所的に完結しているが、§9-§16 では頻出. 特に (6.8) が §10-§14 の Type I-V 構造分析の土台)
 
+## Lean status (2026-05-26)
+
+`OddOrder/Peterfalvi/S08_CoherenceTheorems.lean` currently records the carrier
+structures for §8:
+
+- `DescentHypothesis`: (6.1) の solvable-normal filtration setup。
+- `OddOrderSpecialization`: (6.4) の odd-order specialization carrier。
+- `SibleySetup`: (6.8) の final setup with TI-subset condition。
+- `SibleySetup.CoherenceTarget`: §7 `IsCoherent` target attached to the setup。
+- `coherence_tau_inner_eq`: §7 hypothesis に含まれる `tau_isometry` を §8
+  setup から直接使う。
+- `coherence_inner_eq_on_supported`: proved coherence target があるとき、
+  `Z[S,A]` 上で `τ` 自身が inner product を保存することを §8 setup から直接使う。
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

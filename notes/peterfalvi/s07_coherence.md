@@ -221,6 +221,11 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `Hypothesis.difference_image_ne_zero` and
   `signed_difference_image_ne_zero` lift that nonzero image API to the §7
   hypothesis carrier, avoiding repeated unpacking of `difference_image hχ`.
+- `IsCoherent.extension_inner_eq` exposes the inner-product preservation of
+  the extension map, while `IsCoherent.inner_eq_on_supported` transfers it
+  back to the original `τ` on `Z[S,A]` using `extends_on_supported`.
+- `Hypothesis.tau_inner_eq` names the inner-product preservation field carried
+  by the §7 hypothesis, so downstream files do not unpack `tau_isometry`.
 
 ### (5.3) Lemma — Coherence の十分条件
 
