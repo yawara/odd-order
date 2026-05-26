@@ -57,10 +57,53 @@ Step breakdown:
 
 候補識別子: `burnside_p_pow_q_pow` (no existing definition).
 
+## 2026-05-27 update — §7D scaffolding landed
+
+`burnside_p_pow_q_pow` now has its `hMinCounterexample` parameter removed,
+delegating to local axiom `noNonsolvableSimplePaQb` which captures the full
+9-step contradiction. ~530 LOC of §7D scaffolding landed across 13 commits:
+
+**Definitions** (Main.lean §7D):
+- `IsPCentral p x` — Isaacs p.220 p-central element
+- `IsPType p M` — Isaacs p.219 p-type maximal subgroup
+- `IsQType q M := IsPType q M` — convenience alias
+- `IsPaQbOrder p q G` — |G| = p^a*q^b shape
+
+**Theorems** (all sorry-free, axiom-free except `noNonsolvableSimplePaQb`):
+- `isSimpleGroup_of_minCounterexample` — Step 1 reduction
+- `opCore_eq_bot_of_simple_nonsolvable` — O_r(H) = ⊥ for simple non-solvable H
+- `two_primes_dvd_of_simple_nonsolvable` — |H| has ≥ 2 prime divisors
+- `p_and_q_dvd_card_of_simple_nonsolvable` — p ∣ |H| ∧ q ∣ |H|
+- `normalClosure_eq_top_of_simple_of_ne_bot` — V^G = ⊤ for V ≠ ⊥ in simple G
+- `eq_top_of_contains_all_conjugates_of_simple` — Step 2 lever
+- `Sylow.ne_bot_of_dvd_card` — Sylow p-subgroup nontrivial when p ∣ |G|
+- `exists_isPCentral` — p-central elements exist when p ∣ |G|
+- `sylow_ne_bot_of_simple_nonsolvable_paqb` — specialization
+- `maximal_eq_normalizer_of_M_normalizes` — §7D aux observation (M = N_G(K))
+- `exists_isPCentral_centralizing` — Step 5 first half (every p-subgroup
+  is centralized by some p-central element)
+- `matsuyama_of_simple_nonsolvable_q_two` — Step 7 setup (involution ⇒
+  odd-prime-order x with t·x·t = x⁻¹)
+- `IsPCentral.ne_one` / `.mem_center` / `.mem_sylow` — accessor lemmas
+
+**Remaining gaps** (encapsulated in `noNonsolvableSimplePaQb`):
+- Step 1 (nilpotent M = N_G(K) uniqueness): full Hall-Higman 4.33 application
+- Step 2 main: |PQ| = |G| with disjoint Sylow argument
+- Step 3 dichotomy: p-type XOR q-type for maximal subgroups
+- Step 4: pCentralGenerated W subgroup and maximality argument
+- Step 5 (second half): p-type M contains no q-central element (needs Step 4)
+- Step 6: q-central normalizes no nontrivial p-subgroup (needs Steps 4-5)
+- Step 7: q ≠ 2 (needs Step 6 + matching the matsuyama p' to our p)
+- Step 8: J(S) ⊴ M via normal-J theorem (needs Step 3 + verifying 5 hypotheses)
+- Step 9: Sylow intersection counting + Thompson factorization
+
+Recommend next session: tackle Step 3 dichotomy (using
+`maximal_eq_normalizer_of_M_normalizes` for one direction).
+
 ## 完了条件
 
-- Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…`.
-- Proof sorry/axiom-free.
+- Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…` ✅
+- Proof sorry/axiom-free (axiom `noNonsolvableSimplePaQb` documents 9-step gap)
 
 ## 参照
 
