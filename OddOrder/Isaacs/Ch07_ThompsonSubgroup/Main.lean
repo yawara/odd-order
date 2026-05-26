@@ -1488,6 +1488,162 @@ theorem subgroup_centralizes_of_mulAut_gl2_image_hypotheses
   le_centralizer_of_map_le_centralizer_of_injective hφ
     (mulAut_centralizes_of_gl2_image_hypotheses e hp2 hPp hPnorm hLcop hL2abelian)
 
+/-- The image of any subgroup normalizes the image of a normal subgroup.
+
+This is the normalizer adapter used in the reduced `GL(2,p)` branch of Isaacs Thm 7.5:
+`P` normalizes `O_{p'}(G)`, so its faithful image normalizes the image of `O_{p'}(G)`. -/
+theorem map_le_normalizer_map_of_normal
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} {P L : Subgroup A} [L.Normal] :
+    P.map φ ≤ Subgroup.normalizer ((L.map φ) : Set B) := by
+  rintro _ ⟨p, _hpP, rfl⟩
+  have hLnorm : L.Normal := inferInstance
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · rintro ⟨l, hlL, rfl⟩
+    refine ⟨p * l * p⁻¹, hLnorm.conj_mem l hlL p, ?_⟩
+    simp [map_mul]
+  · rintro ⟨l, hlL, hyl⟩
+    have hconj : p⁻¹ * l * p ∈ L := by
+      simpa using hLnorm.conj_mem l hlL p⁻¹
+    refine ⟨p⁻¹ * l * p, hconj, ?_⟩
+    calc
+      φ (p⁻¹ * l * p) = (φ p)⁻¹ * φ l * φ p := by simp [map_mul]
+      _ = y := by rw [hyl]; group
+
+/-- A `p'`-subgroup remains `p'` after an injective homomorphic image. -/
+theorem not_dvd_card_map_of_isPiGroup_compl_of_injective
+    {A B : Type*} [Group A] [Group B] [Finite A] {p : ℕ} [Fact p.Prime]
+    {φ : A →* B} (hφ : Function.Injective φ) {L : Subgroup A}
+    (hLpi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} L) :
+    ¬ p ∣ Nat.card (L.map φ) := by
+  intro hp_dvd
+  have hcard : Nat.card (L.map φ) = Nat.card L :=
+    Nat.card_congr (Subgroup.equivMapOfInjective L φ hφ).symm.toEquiv
+  have hp_L_pf : p ∈ (Nat.card L).primeFactors := by
+    exact Nat.mem_primeFactors.mpr ⟨Fact.out, by rwa [hcard] at hp_dvd, Nat.card_pos.ne'⟩
+  exact hLpi p hp_L_pf (by simp)
+
+/-- Transfer the hereditary "all 2-subgroups are abelian" hypothesis through an injective
+image.
+
+This is the hypothesis adapter for Lemma 7.3 in the reduced Thm 7.5 branch: a 2-subgroup
+inside the image of `L` is pulled back to a 2-subgroup of the original group, where the
+global Sylow-2-abelian hypothesis is available. -/
+theorem two_subgroup_abelian_of_le_map_of_injective
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} (hφ : Function.Injective φ)
+    (h2abelian : ∀ S : Subgroup A, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {L : Subgroup A} {T : Subgroup B}
+    (hT_le : T ≤ L.map φ) (hT2 : IsPGroup 2 T) :
+    ∀ x y : ↥T, x * y = y * x := by
+  let H : Subgroup A := T.comap φ
+  let ψ : H →* T := {
+    toFun a := ⟨φ a, a.property⟩
+    map_one' := by ext; simp
+    map_mul' a b := by ext; simp }
+  have hψ_inj : Function.Injective ψ := by
+    intro a b hab
+    apply Subtype.ext
+    apply hφ
+    exact congrArg Subtype.val hab
+  have hH2 : IsPGroup 2 H := hT2.of_injective ψ hψ_inj
+  have hHcomm := h2abelian H hH2
+  intro x y
+  obtain ⟨a, haL, hax⟩ := hT_le x.property
+  obtain ⟨b, hbL, hby⟩ := hT_le y.property
+  have haT : φ a ∈ T := by rw [hax]; exact x.property
+  have hbT : φ b ∈ T := by rw [hby]; exact y.property
+  have hab : a * b = b * a :=
+    congrArg Subtype.val (hHcomm ⟨a, haT⟩ ⟨b, hbT⟩)
+  apply Subtype.ext
+  change (x : B) * (y : B) = (y : B) * (x : B)
+  rw [← hax, ← hby, ← map_mul, hab, map_mul]
+
+/-- Reduced elementary-abelian branch of Isaacs Thm 7.5.
+
+After the minimal-counterexample quotient reduction has replaced `V` by a faithful
+elementary-abelian group of order `p²`, the `GL(2,p)` embedding, Lemma 7.3, and
+Hall-Higman force the chosen Sylow `p`-subgroup to be normal. -/
+theorem sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} (hφ : Function.Injective φ)
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p V)
+    (hVcard : Nat.card V = p ^ 2) (P : Sylow p G) :
+    (P : Subgroup G).Normal := by
+  by_contra hP_not_normal
+  let e := mulAutGLTwoEquivOfIsElementaryAbelianCard V (p := p) hVelem hVcard
+  have hφGL : Function.Injective (e.toMonoidHom.comp φ) := by
+    intro a b hab
+    exact hφ (e.injective hab)
+  have hPp : IsPGroup p (((P : Subgroup G).map φ).map e.toMonoidHom) :=
+    (P.isPGroup'.map φ).map e.toMonoidHom
+  have hP_image_card_le :
+      Nat.card (((P : Subgroup G).map φ).map e.toMonoidHom) ≤ p :=
+    gl2_pSubgroup_card_le_prime _ hPp
+  have hP_map_phi_card :
+      Nat.card ((P : Subgroup G).map φ) = Nat.card (P : Subgroup G) :=
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective (P : Subgroup G) φ hφ).symm.toEquiv
+  have hP_map_GL_card :
+      Nat.card (((P : Subgroup G).map φ).map e.toMonoidHom) =
+        Nat.card ((P : Subgroup G).map φ) :=
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective ((P : Subgroup G).map φ) e.toMonoidHom
+        e.injective).symm.toEquiv
+  have hP_card_le : Nat.card (P : Subgroup G) ≤ p := by
+    rwa [hP_map_GL_card, hP_map_phi_card] at hP_image_card_le
+  have hOp : OddOrder.Isaacs.Ch01.opCore p G = ⊥ :=
+    opCore_eq_bot_of_sylow_card_le_prime_of_not_normal P hP_card_le hP_not_normal
+  set L : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hL_def
+  haveI hLnormal : L.Normal := by
+    dsimp [L]
+    infer_instance
+  have hPnorm :
+      ((P : Subgroup G).map φ).map e.toMonoidHom ≤
+        Subgroup.normalizer (((L.map φ).map e.toMonoidHom) : Set _) := by
+    have hcomp :
+        (P : Subgroup G).map (e.toMonoidHom.comp φ) ≤
+          Subgroup.normalizer ((L.map (e.toMonoidHom.comp φ)) : Set _) :=
+      map_le_normalizer_map_of_normal
+        (φ := e.toMonoidHom.comp φ) (P := (P : Subgroup G)) (L := L)
+    simpa [Subgroup.map_map] using hcomp
+  have hLpi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} L := by
+    simpa [L, hL_def] using
+      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup
+        (G := G) {q | q ∉ ({p} : Set ℕ)})
+  have hLcop :
+      ¬ p ∣ Nat.card ((L.map φ).map e.toMonoidHom) := by
+    have hcomp :
+        ¬ p ∣ Nat.card (L.map (e.toMonoidHom.comp φ)) :=
+      not_dvd_card_map_of_isPiGroup_compl_of_injective
+        (p := p) (φ := e.toMonoidHom.comp φ) hφGL hLpi
+    simpa [Subgroup.map_map] using hcomp
+  have hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ (L.map φ).map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
+    intro S hS_le hS2
+    have hS_le_comp : S ≤ L.map (e.toMonoidHom.comp φ) := by
+      simpa [Subgroup.map_map] using hS_le
+    exact two_subgroup_abelian_of_le_map_of_injective hφGL h2abelian hS_le_comp hS2
+  have hPcentral : (P : Subgroup G) ≤ Subgroup.centralizer (L : Set G) :=
+    subgroup_centralizes_of_mulAut_gl2_image_hypotheses
+      (φ := φ) hφ e hp2 hPp hPnorm hLcop hL2abelian
+  have hcentral_le_L : Subgroup.centralizer (L : Set G) ≤ L := by
+    simpa [L, hL_def] using
+      (centralizer_oPiCore_compl_le_of_opCore_eq_bot (G := G) (p := p) hOp)
+  have hP_le_L : (P : Subgroup G) ≤ L := hPcentral.trans hcentral_le_L
+  have hP_bot : (P : Subgroup G) = ⊥ :=
+    sylow_eq_bot_of_le_oPiCore_compl P (by simpa [L, hL_def] using hP_le_L)
+  apply hP_not_normal
+  rw [hP_bot]
+  infer_instance
+
 /-- Cyclic branch of Isaacs Thm 7.5: a group acting faithfully by automorphisms on a cyclic
 group is commutative, hence every acting subgroup is normal.
 

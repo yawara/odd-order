@@ -434,6 +434,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.subgroup_centralizes_of_mulAut_gl2_image_hypotheses
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.map_le_normalizer_map_of_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.not_dvd_card_map_of_isPiGroup_compl_of_injective
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.two_subgroup_abelian_of_le_map_of_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.subgroup_normal_of_injective_mulAut_of_isCyclic
 #assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic

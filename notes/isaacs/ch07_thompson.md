@@ -244,6 +244,11 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も追加済み.
   その結論で `P ≤ O_{p'}(G)` になった後の coprime contradiction
   `sylow_eq_bot_of_le_oPiCore_compl` も追加済み.
+  さらに reduced elementary-abelian branch の Lem 7.3 仮説 adapter
+  (`map_le_normalizer_map_of_normal`,
+  `not_dvd_card_map_of_isPiGroup_compl_of_injective`,
+  `two_subgroup_abelian_of_le_map_of_injective`) と, 7.5 後半そのものを閉じる
+  `sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful` を追加済み.
   `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
   abelian order `p^2` へ落とす
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
@@ -315,7 +320,10 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も利用可能.
    final Hall-Higman step 用の `p'`-core self-centralizing bridge
    `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も利用可能.
+   reduced elementary-abelian case から normality を返す
+   `sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful` まで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
+   残りは minimal-counterexample / quotient-kernel reduction をこの reduced branch へ接続する部分.
 6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
 8. **7.1 Thompson normal p-complement** — Ch.5 5.26 + 7.6 + 7.7. Ch.6 6.23 をここから backfill.
