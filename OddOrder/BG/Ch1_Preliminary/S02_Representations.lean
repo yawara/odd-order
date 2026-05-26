@@ -1203,6 +1203,69 @@ private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_su
       simpa [hφQ] using hq
     simpa [Submodule.Quotient.eq] using hq_one
 
+/-- An element acting trivially on a submodule and on the quotient is the identity
+if it also preserves a complementary submodule.
+
+This is the diagonal-form bridge for BG Thm 2.6, q ≠ p: once the two
+one-dimensional `K`-submodules are both `G`-invariant, a commutator that is
+trivial on one line and on the quotient is trivial on the complementary line
+as well. -/
+private theorem eq_one_of_mem_fixedOnSubmoduleAndQuotientSubgroup_of_preserves_complement
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W U : Submodule F V) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ) (hcompl : IsCompl W U)
+    (hU : ∀ g : G, U ≤ U.comap (ρ g))
+    {g : G} (hg : g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ) :
+    g = 1 := by
+  apply hfaithful
+  ext v
+  obtain ⟨w, u, hv, _huniq⟩ := Submodule.existsUnique_add_of_isCompl hcompl v
+  have hgW : ∀ w ∈ W, ρ g w = w :=
+    (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hg).1
+  have hgQ : ∀ v, ρ g v - v ∈ W :=
+    (mem_fixedOnSubmoduleAndQuotientSubgroup.mp hg).2
+  have hfixU : ρ g (u : V) = (u : V) := by
+    have hdiffW : ρ g (u : V) - (u : V) ∈ W := hgQ u
+    have hdiffU : ρ g (u : V) - (u : V) ∈ U :=
+      U.sub_mem (hU g u.2) u.2
+    have hdiff_bot : ρ g (u : V) - (u : V) ∈ (⊥ : Submodule F V) := by
+      simpa [hcompl.inf_eq_bot] using (show ρ g (u : V) - (u : V) ∈ W ⊓ U from
+        ⟨hdiffW, hdiffU⟩)
+    exact sub_eq_zero.mp (by simpa using hdiff_bot)
+  calc
+    ρ g v = ρ g ((w : V) + (u : V)) := by rw [hv]
+    _ = ρ g (w : V) + ρ g (u : V) := map_add (ρ g) (w : V) (u : V)
+    _ = (w : V) + (u : V) := by rw [hgW (w : V) w.2, hfixU]
+    _ = v := hv
+    _ = (ρ 1) v := by simp
+
+/-- If a faithful representation preserves complementary one-dimensional
+submodules, then the group is abelian.
+
+In the q≠p branch of BG Thm 2.6, Maschke and algebraic closedness give
+`V = W₁ ⊕ W₂` with both lines `G`-invariant.  The two rank-one scalar
+characters kill commutators on `W₁` and on `V/W₁`; the complement prevents any
+remaining unipotent shear. -/
+private theorem commutative_of_faithful_representation_preserves_rank_one_complement
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W U : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hcompl : IsCompl W U) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hU : ∀ g : G, U ≤ U.comap (ρ g))
+    (hdimW : Module.finrank F W = 1)
+    (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    Std.Commutative (· * · : G → G → G) := by
+  constructor
+  intro x y
+  rw [← commutatorElement_eq_one_iff_mul_comm]
+  apply eq_one_of_mem_fixedOnSubmoduleAndQuotientSubgroup_of_preserves_complement
+    W U ρ hfaithful hcompl hU
+  exact commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients
+    W ρ hW hdimW hdimQ
+    (Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y))
+
 /-- Two-dimensional form of
 `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
 private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two

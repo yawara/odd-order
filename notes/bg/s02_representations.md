@@ -503,3 +503,16 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   core-level branch (`O_q(G*) ≠ ⊥`, `q ≠ p` から ambient `G` が abelian) を
   Lean statement に分ける段. induction 仮定は theorem-facing helper に入ったので、
   次は q≠p の線型代数そのものに集中できる.
+- PDF p.29 の q≠p branch 後半
+  (`V = W₁ ⊕ W₂`, `G` が両方の 1 次元部分空間を固定 ⇒ `G` abelian)
+  を Lean 側の対角化 bridge として
+  `commutative_of_faithful_representation_preserves_rank_one_complement`
+  に切り出した. これは rank-one scalar character が commutator を
+  `fixedOnSubmoduleAndQuotientSubgroup W₁ ρ` に入れる既存補題に、
+  補空間 `W₂` の不変性と `IsCompl W₁ W₂` を足して、残る shear を消すもの.
+  `eq_one_of_mem_fixedOnSubmoduleAndQuotientSubgroup_of_preserves_complement`
+  がその局所計算.
+- 次 frontier は前半: `O_q(G*) ≠ ⊥`, `q ≠ p` から
+  abelian normal q-subgroup `K` を取り、Maschke + algebraic closedness で
+  complementary rank-one `K`-submodules `W₁ W₂` を作る段と、
+  `K ⊴ G` + odd order により `G` が `W₁,W₂` を交換せず固定する段.
