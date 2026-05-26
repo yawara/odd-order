@@ -302,6 +302,9 @@ FT クリティカル度 + 章内依存で並べる:
   “fixed points come from fixed points” から
   `C_{N/K}(a) = 1` を得る部分を, Ch.4 Cor 3.28
   (`coprime_fixedPoints_quotient_of_coprime_normal`) で直接閉じた.
+- **§6B / 6.21 normality bridge**:
+  `normal_of_commutator_le` を追加. `N' ≤ K` から `K ⊴ N` を得る本文ステップを,
+  mathlib の `Subgroup.commutator_top_left_le_iff` に接続する小補題として閉じた.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair

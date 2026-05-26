@@ -228,6 +228,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_invariant_of_commutative
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_isFrobeniusAction_of_fixedBy_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.normal_of_commutator_le
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

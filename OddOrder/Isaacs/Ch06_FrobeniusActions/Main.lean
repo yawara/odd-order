@@ -1201,6 +1201,15 @@ theorem quotient_isFrobeniusAction_of_fixedBy_le
     group
   exact hq_ne ((QuotientGroup.eq_one_iff n).mpr hnM)
 
+/-- A subgroup containing the commutator subgroup is normal.
+
+This is the group-theoretic step used in Isaacs Thm 6.21 after proving `N' ≤ K`. -/
+theorem normal_of_commutator_le {G : Type*} [Group G] {K : Subgroup G}
+    (hcomm : _root_.commutator G ≤ K) : K.Normal := by
+  rw [_root_.commutator_def] at hcomm
+  exact (Subgroup.commutator_top_left_le_iff (H := K)).mp
+    ((Subgroup.commutator_mono le_rfl (show K ≤ (⊤ : Subgroup G) from le_top)).trans hcomm)
+
 /-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
     (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
