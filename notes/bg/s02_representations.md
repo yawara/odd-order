@@ -846,3 +846,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `epsilon^i • (e^g) = epsilon^t • e` の pointwise / span 上の map-level
   形を sorry-free で追加した. これは Prop 2.4(e) の計算部で、次は
   Prop 2.4(a) の direct-sum/span 仮定を実際に供給する diagonalization 側へ進む.
+- 上の計算を `E_m` inclusion に接続する bridge として
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio` と非 wrap 版
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_eq_add` を追加.
+  これで scalar ratio が `epsilon^m` に同定できた場合は
+  `E_{i,t} ≤ E_m` まで sorry-free で渡せる. 残る Prop 2.4(e) の主作業は
+  `m ≡ t - i (mod h)` の有限 index bookkeeping と、Prop 2.4(a) の span/direct-sum
+  仮定を供給する diagonalization 部分.

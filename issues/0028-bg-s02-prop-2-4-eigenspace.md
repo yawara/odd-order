@@ -33,6 +33,10 @@ to Prop 2.4.
   `cyclicEndConjEigenspace` and `cyclicHomBlockFin`.  The Prop 2.4(e)
   conjugation calculation is available in scalar-multiplied pointwise form and
   in a span-based map-level form.
+- 2026-05-26: Added the inclusion bridge
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio`, plus the
+  non-wrapping `t = i + m` specialization.  The remaining Prop 2.4(e)
+  work is modular-index bookkeeping and the Prop 2.4(a) span/direct-sum input.
 
 ## 完了条件
 

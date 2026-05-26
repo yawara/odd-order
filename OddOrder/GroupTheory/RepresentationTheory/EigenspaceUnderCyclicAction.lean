@@ -367,6 +367,44 @@ theorem cyclicEndConj_eq_smul_ratio_of_mem_cyclicHomBlockFin_of_span
     _ = ((epsilon ^ t.1) / (epsilon ^ i.1)) • e := by
           rw [smul_smul, div_eq_mul_inv, mul_comm]
 
+/-- Inclusion form of BG Prop 2.4(e), with the modular arithmetic separated.
+
+If the scalar ratio attached to a block `E_{i,t}` is already identified with
+`epsilon^m`, then the block lies in the `m`-th conjugation eigenspace.  Later
+Prop 2.4 work can supply the congruence calculation `m ≡ t - i (mod h)`. -/
+theorem cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio
+    {epsilon : F} (hepsilon_ne_zero : epsilon ≠ 0)
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i t : Fin h} {m : ℕ}
+    (hspan : Submodule.span F
+      (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (hratio : (epsilon ^ t.1) / (epsilon ^ i.1) = epsilon ^ m) :
+    cyclicHomBlockFin epsilon (g : Module.End F V) i t ≤
+      cyclicEndConjEigenspace epsilon g m := by
+  intro e he
+  rw [mem_cyclicEigenspace_iff]
+  rw [cyclicEndConj_eq_smul_ratio_of_mem_cyclicHomBlockFin_of_span
+    hepsilon_ne_zero hspan he, hratio]
+
+/-- Non-wrapping form of BG Prop 2.4(e): if `t = i + m` inside the displayed
+finite index range, then `E_{i,t}` lies in `E_m`.
+
+The full BG statement uses indices modulo `h`; this lemma isolates the linear
+algebra from the later modular-index bookkeeping. -/
+theorem cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_eq_add
+    {epsilon : F} (hepsilon_ne_zero : epsilon ≠ 0)
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i t : Fin h} {m : ℕ}
+    (hspan : Submodule.span F
+      (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (ht : t.1 = i.1 + m) :
+    cyclicHomBlockFin epsilon (g : Module.End F V) i t ≤
+      cyclicEndConjEigenspace epsilon g m := by
+  refine cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio
+    hepsilon_ne_zero hspan ?_
+  have hi : epsilon ^ i.1 ≠ 0 := pow_ne_zero _ hepsilon_ne_zero
+  rw [ht, pow_add, div_eq_mul_inv, mul_assoc,
+    mul_comm (epsilon ^ m) ((epsilon ^ i.1)⁻¹), ← mul_assoc,
+    mul_inv_cancel₀ hi, one_mul]
+
 end EigenspaceUnderCyclicAction
 end RepresentationTheory
 end OddOrder
