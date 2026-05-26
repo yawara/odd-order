@@ -1527,6 +1527,29 @@ private theorem top_ne_bot_of_prime_dvd_card
   haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt
   exact top_ne_bot
 
+/-- If the ambient group is abelian, then the Sylow conclusion of
+BG Thm 2.6(b) is immediate. -/
+private theorem sylow_commutative_and_commutator_le_of_commutative
+    {p : ℕ} {G : Type*} [Group G]
+    (hGcomm : Std.Commutative (· * · : G → G → G))
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  constructor
+  · constructor
+    intro x y
+    exact Subtype.ext (hGcomm.comm x y)
+  · intro g hg
+    have hcomm_bot : commutator G = ⊥ := by
+      rw [commutator_eq_bot_iff_center_eq_top, Subgroup.eq_top_iff']
+      intro x
+      rw [Subgroup.mem_center_iff]
+      intro y
+      exact hGcomm.comm y x
+    rw [hcomm_bot] at hg
+    have hg_one : g = 1 := by simpa using hg
+    simp [hg_one]
+
 /-- q = p endpoint phrased as the existence of a nontrivial normal p-subgroup.
 
 This is the theorem-facing reduction left after the fixed-space helpers: the
@@ -1559,16 +1582,8 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
-  have hGcomm := commutative_of_determinantKernel_eq_bot ρ hdet
-  constructor
-  · constructor
-    intro x y
-    exact Subtype.ext (hGcomm.comm x y)
-  · intro g hg
-    have hgdet := commutator_le_determinantKernelSubgroup ρ hg
-    rw [hdet] at hgdet
-    have hg_one : g = 1 := by simpa using hgdet
-    simp [hg_one]
+  exact sylow_commutative_and_commutator_le_of_commutative
+    (commutative_of_determinantKernel_eq_bot ρ hdet) P
 
 /-- q = p endpoint when the determinant kernel `G*` itself is a nontrivial
 p-subgroup.
@@ -1914,6 +1929,51 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_opCore_
     ρ hfaithful hdim
     ⟨OddOrder.Isaacs.Ch01.opCore p G, inferInstance,
       OddOrder.Isaacs.Ch01.opCore_isPGroup p G, hGcore_ne_bot⟩ P
+
+/-- Determinant-kernel core dispatch for the Sylow conclusion of BG Thm 2.6(b).
+
+Once the group-theoretic spine has produced a nontrivial prime core in `G*`,
+the `r = p` branch feeds the fixed-space endpoint.  The only remaining
+theorem-specific input for `r ≠ p` is the linear-algebra branch from the text:
+a nontrivial `q`-core in `G*`, with `q ≠ p`, makes the ambient group abelian. -/
+private theorem sylow_commutative_and_commutator_le_of_determinantKernel_core_spine
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (hcore_ne_p_comm : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥ →
+      Std.Commutative (· * · : G → G → G))
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  rcases exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
+      (p := p) ρ hdet_ne_bot hnormalizer hind with
+    ⟨r, hr_prime, hcore_ne_bot⟩
+  by_cases hr_eq_p : r = p
+  · subst r
+    exact sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot
+      ρ hfaithful hdim hcore_ne_bot P
+  · haveI : Fact r.Prime := ⟨hr_prime⟩
+    exact sylow_commutative_and_commutator_le_of_commutative
+      (hcore_ne_p_comm (q := r) hr_eq_p hcore_ne_bot) P
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup

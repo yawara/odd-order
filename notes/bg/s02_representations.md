@@ -490,6 +490,16 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - この spine を `determinantKernelSubgroup ρ` (`G*`) に接続する
   `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` も追加済み.
   `G*` が p-group なら `O_p(G*) ≠ ⊥`, そうでなければ normalizer spine に渡す.
+- `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` の出力を
+  theorem conclusion へ渡す dispatch として、
+  `sylow_commutative_and_commutator_le_of_determinantKernel_core_spine` を追加.
+  `r = p` なら既存の `O_p(G*)` fixed-space endpoint に渡し、`r ≠ p` は
+  書籍の q≠p 線型代数 branch
+  (`O_r(G*) ≠ ⊥` から ambient `G` が abelian) を仮定入力として残す.
+  併せて ambient group が abelian なら Sylow conclusion が従う
+  `sylow_commutative_and_commutator_le_of_commutative` を共通化した.
 - 次 frontier は前段 q≠p case の線形代数入力
   (`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian) と、
-  induction 仮定を theorem statement 側へどう渡すかを整理する段.
+  core-level branch (`O_q(G*) ≠ ⊥`, `q ≠ p` から ambient `G` が abelian) を
+  Lean statement に分ける段. induction 仮定は theorem-facing helper に入ったので、
+  次は q≠p の線型代数そのものに集中できる.
