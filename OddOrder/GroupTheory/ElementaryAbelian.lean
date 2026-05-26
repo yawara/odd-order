@@ -285,6 +285,25 @@ theorem isCyclic_of_subgroups_card_prime_unique
     exact isCyclic_pi_of_subsingleton
   exact e.isCyclic.mpr htarget
 
+/-- If a finite `p`-group has at most one subgroup of order `p`, then every commutative
+subgroup is cyclic.
+
+This is the bridge used before Isaacs Thm 6.12: the ambient uniqueness hypothesis descends to
+each abelian subgroup by mapping its order-`p` subgroups back into the ambient group. -/
+theorem isCyclic_subgroup_of_subgroups_card_prime_unique
+    [Finite G] [Fact p.Prime] (hG : IsPGroup p G)
+    (hUnique : ∀ K L : Subgroup G, Nat.card K = p → Nat.card L = p → K = L)
+    (H : Subgroup G) [IsMulCommutative H] :
+    IsCyclic H := by
+  apply (hG.to_subgroup H).isCyclic_of_subgroups_card_prime_unique
+  intro K L hK_card hL_card
+  have hK_map_card : Nat.card (K.map H.subtype) = p := by
+    rw [Subgroup.card_map_of_injective H.subtype_injective, hK_card]
+  have hL_map_card : Nat.card (L.map H.subtype) = p := by
+    rw [Subgroup.card_map_of_injective H.subtype_injective, hL_card]
+  exact Subgroup.map_injective H.subtype_injective
+    (hUnique (K.map H.subtype) (L.map H.subtype) hK_map_card hL_map_card)
+
 /-- A noncyclic finite `p`-group of order at most `p²` is elementary abelian of order `p²`.
 
 This is the small-order reduction used in Isaacs Thm 7.5 after quotienting to

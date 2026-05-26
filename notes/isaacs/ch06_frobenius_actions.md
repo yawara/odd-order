@@ -396,7 +396,9 @@ FT クリティカル度 + 章内依存で並べる:
   fundamental theorem branch を Lean 化した. これを 6.10 と接続して
   `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` まで sorry-free. さらに Sylow ごとに
   貼り合わせて, 6.17 後の観察「可換 Frobenius complement は巡回」を
-  `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み.
+  `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み. 6.12 への接続として,
+  ambient の order-`p` subgroup 一意性を任意の可換部分群に制限し cyclic を得る
+  `IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique` も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

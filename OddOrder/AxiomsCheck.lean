@@ -216,6 +216,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.6 route to Thm 6.11: finite commutative p-groups with unique order-`p`
 -- subgroup are cyclic, and hence commutative Sylow subgroups of Frobenius complements are cyclic.
 #assert_only_allowed_axioms IsPGroup.isCyclic_of_subgroups_card_prime_unique
+#assert_only_allowed_axioms IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
 #assert_only_allowed_axioms
