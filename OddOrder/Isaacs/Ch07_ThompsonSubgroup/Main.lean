@@ -4101,11 +4101,17 @@ def IsPCentral (p : ℕ) {G : Type*} [Group G] (x : G) : Prop :=
 
 /-- **Isaacs p.219** (definition of *p-type maximal subgroup*).
 
-A maximal subgroup `M` of `G` is `p`-type if `O_p(M) ≠ ⊥`.  In Isaacs §7D this
-notion partitions the maximal subgroups of a simple group of order `p^a q^b`
-into two flavors. -/
+A maximal subgroup `M` of `G` is `p`-type if `O_p(M) ≠ ⊥` (where `O_p(M)`
+denotes the largest normal `p`-subgroup of `M` as a group in its own right).
+In Isaacs §7D this notion partitions the maximal subgroups of a simple group
+of order `p^a q^b` into two flavors. -/
 def IsPType (p : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
-  IsCoatom M ∧ OddOrder.Isaacs.Ch01.opCore p (M : Subgroup G) ≠ ⊥
+  IsCoatom M ∧ OddOrder.Isaacs.Ch01.opCore p ↥M ≠ ⊥
+
+/-- Dual of `IsPType` with roles of `p` and `q` swapped (just a convenience
+re-export of `IsPType q`). -/
+abbrev IsQType (q : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
+  IsPType q M
 
 /-- A group whose order is a `{p, q}`-number: `|G| = p^a * q^b`. -/
 def IsPaQbOrder (p q : ℕ) (G : Type*) [Group G] : Prop :=
@@ -4224,13 +4230,20 @@ this axiom requires:
   for distinct Sylow `p`-subgroups) combined with Thompson factorization.
 
 Issue `0032-isaacs-ch07-thm-7-8-burnside.md` tracks the full discharge plan
-(estimated ~600-900 LOC across multiple sessions). -/
+(estimated ~600-900 LOC across multiple sessions).
+
+The `_hSubgroupsSolvable` hypothesis captures the minimum-counterexample
+status: every proper subgroup is solvable (textbook L3959: "the order of every
+proper subgroup of G also has at most two prime divisors, every such subgroup
+must be solvable").  Combined with simplicity, this gives Isaacs §7D the full
+working hypotheses for the 9-step argument. -/
 axiom noNonsolvableSimplePaQb.{u}
     {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     (H : Type u) [Group H] [Finite H]
     (_hH_simple : IsSimpleGroup H)
     (_hH_nsol : ¬ IsSolvable H)
-    (_hH_order : ∃ a b : ℕ, Nat.card H ∣ p ^ a * q ^ b) :
+    (_hH_order : ∃ a b : ℕ, Nat.card H ∣ p ^ a * q ^ b)
+    (_hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K) :
     False
 
 /-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability).
@@ -4271,18 +4284,21 @@ theorem burnside_p_pow_q_pow.{u}
   have hG_pos : 0 < Nat.card G := Nat.card_pos
   have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
   -- Subgroup orders divide the ambient order; use Lagrange + IH.
+  -- Every proper subgroup (not necessarily normal) is solvable.
+  have hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K := by
+    intro K hK_top
+    have hK_dvd_H : Nat.card K ∣ Nat.card H := K.card_subgroup_dvd_card
+    have hK_dvd_G : Nat.card K ∣ Nat.card G := hK_dvd_H.trans hH_dvd
+    have hK_le : Nat.card K ≤ Nat.card H := Nat.le_of_dvd hH_pos hK_dvd_H
+    have hK_ne : Nat.card K ≠ Nat.card H := fun h_eq =>
+      hK_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hK_lt : Nat.card K < n :=
+      (lt_of_le_of_ne hK_le hK_ne).trans_eq hH_card
+    exact ih (Nat.card K) hK_lt K hK_dvd_G rfl
+  -- Restriction of the above to normal proper subgroups.
   have hN_solvable :
-      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := by
-    intro N hN_top _hN_norm
-    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
-    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
-    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
-    -- |N| ≠ |H| since N ≠ ⊤ (in a finite group).
-    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
-      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
-    have hN_lt : Nat.card N < n :=
-      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
-    exact ih (Nat.card N) hN_lt N hN_dvd_G rfl
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := fun N hN _ =>
+    hSubgroupsSolvable N hN
   -- Quotient orders divide the ambient order; use index-bound + IH.
   have hQ_solvable :
       ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N) := by
@@ -4318,6 +4334,7 @@ theorem burnside_p_pow_q_pow.{u}
     ⟨a, b, hG_card ▸ hH_dvd⟩
   -- Invoke the §7D core axiom.
   exact noNonsolvableSimplePaQb hpq H hH_simple hH_nsol hH_dvd_paqb
+    hSubgroupsSolvable
 
 end -- 7D
 
