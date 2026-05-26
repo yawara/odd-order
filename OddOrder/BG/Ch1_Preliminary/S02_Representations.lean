@@ -593,6 +593,32 @@ private theorem rank_one_subquotients_of_finrank_two
   refine ⟨hdimW, ?_⟩
   omega
 
+/-- If a rank-one submodule has a complement in a two-dimensional space, then
+the complementary submodule and its quotient are rank one as well. -/
+private theorem complement_rank_one_right_subquotients_of_finrank_two
+    {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W U : Submodule F V) (hdim : Module.finrank F V = 2)
+    (hcompl : IsCompl W U) (hWdim : Module.finrank F W = 1) :
+    Module.finrank F U = 1 ∧ Module.finrank F (V ⧸ U) = 1 := by
+  have hsum : Module.finrank F W + Module.finrank F U = Module.finrank F V := by
+    simpa using Submodule.finrank_add_eq_of_isCompl hcompl
+  have hUdim : Module.finrank F U = 1 := by
+    omega
+  have hU_ne_bot : U ≠ ⊥ := by
+    rw [← Submodule.one_le_finrank_iff]
+    omega
+  have hU_ne_top : U ≠ ⊤ := by
+    intro hU_top
+    have h12 : (1 : ℕ) = 2 := by
+      calc
+        1 = Module.finrank F U := hUdim.symm
+        _ = Module.finrank F (⊤ : Submodule F V) := by rw [hU_top]
+        _ = Module.finrank F V := finrank_top F V
+        _ = 2 := hdim
+    omega
+  exact ⟨hUdim,
+    (rank_one_subquotients_of_finrank_two U hdim hU_ne_bot hU_ne_top).2⟩
+
 /-- Two rank-one submodules with nonzero intersection are equal. -/
 private theorem eq_of_rank_one_submodules_inf_ne_bot
     {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
@@ -1999,6 +2025,43 @@ private theorem le_comap_left_or_right_of_determinantKernel_subgroup
     exact le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W W hleft
   · right
     exact le_comap_of_conjugateSubrepresentation_eq K hKnormal ρ W U hright
+
+/-- Symmetric `comap` form for both Maschke lines.
+
+This packages the two applications of
+`le_comap_left_or_right_of_determinantKernel_subgroup`, once for each line, so
+the next step can choose a coherent permutation of the two labels. -/
+private theorem both_lines_le_comap_left_or_right_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F W.toSubmodule] [Module.Finite F U.toSubmodule]
+    [Module.Free F (V ⧸ W.toSubmodule)] [Module.Free F (V ⧸ U.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQW : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    (hdimQU : Module.finrank F (V ⧸ U.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) (g : G) :
+    (W.toSubmodule ≤ W.toSubmodule.comap (ρ g) ∨
+      W.toSubmodule ≤ U.toSubmodule.comap (ρ g)) ∧
+    (U.toSubmodule ≤ W.toSubmodule.comap (ρ g) ∨
+      U.toSubmodule ≤ U.toSubmodule.comap (ρ g)) := by
+  constructor
+  · exact le_comap_left_or_right_of_determinantKernel_subgroup
+      ρ hfaithful hodd K hKnormal hKle W U hcompl hdimW hdimU hdimQW
+      hx_ne_one g
+  · rcases le_comap_left_or_right_of_determinantKernel_subgroup
+        ρ hfaithful hodd K hKnormal hKle U W hcompl.symm hdimU hdimW hdimQU
+        hx_ne_one g with hstay | hswap
+    · right
+      exact hstay
+    · left
+      exact hswap
 
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup

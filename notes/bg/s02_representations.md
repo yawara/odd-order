@@ -645,3 +645,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   q≠p branch の Maschke 前提 `NeZero (Nat.card K : F)` を、`K` が q-group で
   `CharP F p` かつ `q ≠ p` であることから作る算術 bridge. `|K| = q^n` と
   `CharP.cast_eq_zero_iff` を接続するもので、薄い wrapper ではない.
+- `complement_rank_one_right_subquotients_of_finrank_two` と
+  `both_lines_le_comap_left_or_right_of_determinantKernel_subgroup` を追加.
+  前者は `V = W ⊕ U`, `dim V = 2`, `dim W = 1` から補線 `U` と `V/U` の
+  rank-one data を作る bridge. 後者は determinant-kernel uniqueness を
+  `W` と `U` の両方へ適用し、各 `g : G` が各 line を `W`/`U` のどちらかへ
+  送る comap alternatives を同時に返す.
+- 次 frontier はこの「両 line の alternatives」を coherent な `Fin 2` permutation
+  action にまとめ、`RankOneLinePairData.permutes` へ渡す段.
