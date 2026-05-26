@@ -546,10 +546,10 @@ def cyclicHomBlockFinToHom
         exact (e : Module.End F V).map_smul a v }
   map_add' e f := by
     ext v
-    rfl
+    simp [LinearMap.add_apply]
   map_smul' a e := by
     ext v
-    rfl
+    simp [LinearMap.smul_apply]
 
 /-- The extension-by-zero map, with codomain restricted to the block submodule. -/
 noncomputable def cyclicHomBlockFinOfHomLinear
@@ -637,6 +637,59 @@ theorem finrank_cyclicHomBlockFin
       (R := F) (S := F)
       (M := cyclicEigenspaceFin epsilon g i)
       (N := cyclicEigenspaceFin epsilon g t))
+
+/-- The `(i,t)` matrix coefficient of an endomorphism, relative to
+`V = ⊕ᵢ V_i`.
+
+It restricts the source to `V_i`, applies the endomorphism, decomposes the
+result, and keeps the `V_t` component. -/
+noncomputable def cyclicHomBlockFinProjectionHom
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    Module.End F V →ₗ[F]
+      (cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) where
+  toFun e :=
+    (DirectSum.component F (Fin h)
+      (fun i => cyclicEigenspaceFinFamily epsilon g h i) t).comp <|
+      (cyclicEigenspaceFinDecomposition hV).toLinearMap.comp <|
+        e.comp (cyclicEigenspaceFin epsilon g i).subtype
+  map_add' e f := by
+    ext v
+    simp [LinearMap.add_apply]
+  map_smul' a e := by
+    ext v
+    simp [LinearMap.smul_apply]
+
+/-- The `(i,t)` block projection of an endomorphism. -/
+noncomputable def cyclicHomBlockFinProjection
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    Module.End F V →ₗ[F] cyclicHomBlockFin epsilon g i t :=
+  (cyclicHomBlockFinOfHomLinear hV i t).comp
+    (cyclicHomBlockFinProjectionHom hV i t)
+
+@[simp]
+theorem cyclicHomBlockFinProjection_apply_of_mem_same
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i t : Fin h} (e : Module.End F V)
+    {v : V} (hv : v ∈ cyclicEigenspaceFin epsilon g i) :
+    (cyclicHomBlockFinProjection hV i t e : Module.End F V) v =
+      ((cyclicEigenspaceFinDecomposition hV (e v)) t :
+        cyclicEigenspaceFin epsilon g t) := by
+  exact cyclicHomBlockFinOfHom_apply_of_mem_same hV
+    (cyclicHomBlockFinProjectionHom hV i t e) hv
+
+theorem cyclicHomBlockFinProjection_apply_of_mem_ne
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i j t : Fin h} (hji : j ≠ i) (e : Module.End F V)
+    {v : V} (hv : v ∈ cyclicEigenspaceFin epsilon g j) :
+    (cyclicHomBlockFinProjection hV i t e : Module.End F V) v = 0 :=
+  cyclicHomBlockFinOfHom_apply_of_mem_ne hV hji
+    (cyclicHomBlockFinProjectionHom hV i t e) hv
 
 private theorem inv_mem_cyclicEigenspaceFin {epsilon : F}
     {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i : Fin h} {v : V}

@@ -86,6 +86,13 @@ to Prop 2.4.
   `dim E_{i,t} = n_i n_t` for finite-dimensional `V`.  Remaining work for
   Prop. 2.4(c) is the global direct-sum decomposition of `End_F(V)` over all
   `(i,t)` blocks.
+- 2026-05-26: Added the block projection entrypoints
+  `cyclicHomBlockFinProjectionHom` and `cyclicHomBlockFinProjection`.  For any
+  endomorphism `e`, these take the `V_i → V_t` matrix coefficient relative to
+  the internal decomposition and extend it back to an element of `E_{i,t}`.
+  The apply lemmas on source eigenspaces are in place; the next Prop. 2.4(c)
+  step is the reconstruction formula summing these projections over all
+  `(i,t)`.
 
 ## 完了条件
 
