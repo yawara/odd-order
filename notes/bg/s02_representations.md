@@ -300,6 +300,12 @@
   の下で `finrank_cyclicHomBlockFin` が `dim E_{i,t}=n_i n_t` を返す.
   次は Prop. 2.4(c) の `End_F(V) = ⊕_{i,t} E_{i,t}` を global block
   decomposition として束ねる.
+- **2026-05-26**: global block decomposition の入口として
+  `cyclicHomBlockFinProjectionHom` と `cyclicHomBlockFinProjection` を追加.
+  任意の `e : End_F(V)` から `V_i → V_t` 成分を取り出し、
+  extension-by-zero で `E_{i,t}` に戻す.  `*_apply_of_mem_same/ne` により
+  source eigenspace 上の値も確認済み.  次は全 `(i,t)` 成分の和が `e` に
+  戻る reconstruction lemma.
 
 ## TL;DR
 
@@ -911,5 +917,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   extension-by-zero する向きも追加し、`cyclicHomBlockFinToHom` と
   `cyclicHomBlockFinLinearEquiv` で restriction 側も合わせた.
   `finrank_cyclicHomBlockFin` により個別 block の dimension identity
-  `dim E_{i,t}=n_i n_t` は theorem-facing に使える.  次は全 block の
-  direct-sum decomposition.
+  `dim E_{i,t}=n_i n_t` は theorem-facing に使える.  さらに任意の
+  endomorphism から `(i,t)` 成分を切り出す
+  `cyclicHomBlockFinProjection` も入った.  次は projection の総和による
+  reconstruction と全 block の direct-sum decomposition.
