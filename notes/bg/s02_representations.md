@@ -674,3 +674,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   Maschke 側が `K ≤ G*` 上の complementary rank-one `K`-submodules と非自明元を
   返せば、そのまま q≠p core branch を閉じられる形にした. 次 frontier は
   `K` からこの二つの rank-one line を作る Maschke/algebraically-closed step.
+- `commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules` を追加.
+  `O_q(G*) ≠ ⊥` から取った abelian normal `q`-subgroup `K ≤ G*` に対して,
+  Maschke 側が二つの complementary rank-one `K`-subrepresentations を返せば,
+  action を別途構成せず ambient `G` abelian まで進む interface. これで次の
+  Lean frontier は BG p.16 の
+  "V is a direct sum of irreducible FK-modules" と
+  "irreducible FK-modules are one-dimensional" の実装に集中できる.

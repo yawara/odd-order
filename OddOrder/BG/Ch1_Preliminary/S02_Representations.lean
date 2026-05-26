@@ -3091,6 +3091,56 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePai
   exact commutative_of_faithful_representation_permuted_rank_one_complement_of_odd
     D.W ρ hfaithful hodd D.isCompl D.permutes D.finrankW0 D.finrankQ0
 
+/-- q≠p core branch reduced to constructing complementary rank-one
+`K`-submodules.
+
+This is the action-free successor to
+`commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePair`: the
+Maschke/algebraically-closed step only has to provide two complementary
+rank-one subrepresentations for the normal abelian `q`-subgroup `K ≤ G*`.
+The determinant-kernel uniqueness and odd-order no-swap arguments then make
+the ambient group abelian. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
+    {q : ℕ} [Fact q.Prime] {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥)
+    (hline : ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
+      IsPGroup q K → K ≠ ⊥ → Std.Commutative (· * · : K → K → K) →
+      ∃ W : Subrepresentation (ρ.comp K.subtype),
+      ∃ U : Subrepresentation (ρ.comp K.subtype),
+        Nonempty (Module.Free F W.toSubmodule) ∧
+        Nonempty (Module.Free F U.toSubmodule) ∧
+        Nonempty (Module.Finite F W.toSubmodule) ∧
+        Nonempty (Module.Finite F U.toSubmodule) ∧
+        Nonempty (Module.Free F (V ⧸ W.toSubmodule)) ∧
+        Nonempty (Module.Free F (V ⧸ U.toSubmodule)) ∧
+        IsCompl W.toSubmodule U.toSubmodule ∧
+        Module.finrank F W.toSubmodule = 1 ∧
+        Module.finrank F U.toSubmodule = 1 ∧
+        Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
+        Module.finrank F (V ⧸ U.toSubmodule) = 1) :
+    Std.Commutative (· * · : G → G → G) := by
+  rcases exists_ambient_normal_commutative_qSubgroup_le_determinantKernel_of_opCore_ne_bot
+      ρ hcore_ne_bot with
+    ⟨K, hKnormal, hK_le_Gstar, hKq, hK_ne_bot, hKcomm⟩
+  rcases hline K hKnormal hK_le_Gstar hKq hK_ne_bot hKcomm with
+    ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
+      hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
+  letI : Module.Free F W.toSubmodule := hfreeW.some
+  letI : Module.Free F U.toSubmodule := hfreeU.some
+  letI : Module.Finite F W.toSubmodule := hfiniteW.some
+  letI : Module.Finite F U.toSubmodule := hfiniteU.some
+  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
+  exact commutative_of_determinantKernel_subgroup_rank_one_complement
+    ρ hfaithful hodd K hKnormal hK_le_Gstar W U hcompl
+    hdimW hdimU hdimQW hdimQU hx_ne_one
+
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
 This isolates the group-theoretic part of BG Thm 2.6 where, after choosing
