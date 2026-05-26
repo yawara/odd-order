@@ -229,6 +229,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_isFrobeniusAction_of_fixedBy_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.normal_of_commutator_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.sylow_not_le_of_prime_dvd_index
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

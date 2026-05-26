@@ -1210,6 +1210,43 @@ theorem normal_of_commutator_le {G : Type*} [Group G] {K : Subgroup G}
   exact (Subgroup.commutator_top_left_le_iff (H := K)).mp
     ((Subgroup.commutator_mono le_rfl (show K ≤ (⊤ : Subgroup G) from le_top)).trans hcomm)
 
+/-- If `p` divides the index of `K`, no Sylow `p`-subgroup can lie inside `K`. -/
+theorem sylow_not_le_of_prime_dvd_index
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {K : Subgroup G} (hpK : p ∣ K.index) :
+    ¬ (P : Subgroup G) ≤ K := by
+  intro hPK
+  exact P.not_dvd_index (hpK.trans (Subgroup.index_dvd_of_le hPK))
+
+/-- The Sylow step in Isaacs Thm 6.21.
+
+If every proper `A`-invariant subgroup of `N` lies in `K`, and `p ∣ |N : K|`, then the
+`A`-invariant Sylow `p`-subgroup supplied by Isaacs Thm 3.23(a) is all of `N`. -/
+theorem exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [MulDistribMulAction A N]
+    {K : Subgroup N} {p : ℕ} [Fact p.Prime]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hSolv : IsSolvable A ∨ IsSolvable N)
+    (hpK : p ∣ K.index)
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
+    ∃ P : Sylow p N,
+      OddOrder.Isaacs.Ch03.IsAInvariant (MulDistribMulAction.toMulAut A N) (P : Subgroup N) ∧
+        (P : Subgroup N) = ⊤ := by
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  obtain ⟨P, hP_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := N) (A := A) (φ := φ)
+      hCop hSolv p
+  refine ⟨P, hP_inv, ?_⟩
+  by_contra hP_top
+  have hP_smul : ∀ a : A, ∀ n ∈ (P : Subgroup N), a • n ∈ (P : Subgroup N) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem] at hP_inv
+    intro a n hn
+    simpa [φ] using hP_inv a n hn
+  have hP_le_K : (P : Subgroup N) ≤ K :=
+    hproper (P : Subgroup N) hP_smul hP_top
+  exact sylow_not_le_of_prime_dvd_index P hpK hP_le_K
+
 /-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
     (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=

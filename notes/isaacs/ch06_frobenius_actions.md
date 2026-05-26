@@ -305,6 +305,11 @@ FT クリティカル度 + 章内依存で並べる:
 - **§6B / 6.21 normality bridge**:
   `normal_of_commutator_le` を追加. `N' ≤ K` から `K ⊴ N` を得る本文ステップを,
   mathlib の `Subgroup.commutator_top_left_le_iff` に接続する小補題として閉じた.
+- **§6B / 6.21 Sylow push step**:
+  `sylow_not_le_of_prime_dvd_index` と
+  `exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le` を追加.
+  `p ∣ |N:K|` なら Sylow `p`-subgroupは `K` に含まれず, proper A-invariant subgroup が全て
+  `K` に含まれる帰納仮定下では, Ch.4 Thm 3.23(a) の A-invariant Sylow が `⊤` になる.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
