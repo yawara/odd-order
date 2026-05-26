@@ -75,6 +75,13 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 - `OddOrder.Peterfalvi.S03.characterDegree`, `SameDegreeFamily`, and
   `HasUniformDegree` name the degree conditions used by (1.4), (1.5), and
   §7 (5.7).
+- Basic set and degree helpers are available without unfolding:
+  `ClosedUnderConjugate.conj_mem`, `ClosedUnderConjugate.conj_mem_iff`,
+  `HasNoRealCharacters.mono`, `HasNoRealCharacters.not_mem_of_isReal`,
+  `SameDegreeFamily.eq`, `sameDegreeFamily_const`,
+  `sameDegreeFamily_of_characterDegree_eq`, `HasUniformDegree.eq_of_mem`,
+  `HasUniformDegree.mono`, `hasUniformDegree_empty`, and
+  `hasUniformDegree_singleton`.
 - `centralizerInSubgroup` and `VanishesOnTrivialSubgroupCentralizers` encode the
   target shape of (1.2) without adding a new proof stub.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)

@@ -57,6 +57,32 @@ def ClosedUnderConjugate (S : Set (ClassFunction G ℂ)) : Prop :=
 def HasNoRealCharacters (S : Set (ClassFunction G ℂ)) : Prop :=
   ∀ ⦃χ : ClassFunction G ℂ⦄, χ ∈ S → ¬ χ.IsReal
 
+theorem ClosedUnderConjugate.conj_mem {S : Set (ClassFunction G ℂ)}
+    (hS : ClosedUnderConjugate S) {χ : ClassFunction G ℂ} (hχ : χ ∈ S) :
+    χ.conj ∈ S :=
+  hS hχ
+
+theorem ClosedUnderConjugate.conj_mem_iff {S : Set (ClassFunction G ℂ)}
+    (hS : ClosedUnderConjugate S) {χ : ClassFunction G ℂ} :
+    χ.conj ∈ S ↔ χ ∈ S := by
+  constructor
+  · intro hχ
+    simpa using hS hχ
+  · intro hχ
+    exact hS hχ
+
+theorem HasNoRealCharacters.mono {S T : Set (ClassFunction G ℂ)}
+    (hS : HasNoRealCharacters S) (hTS : T ⊆ S) :
+    HasNoRealCharacters T := by
+  intro χ hχ
+  exact hS (hTS hχ)
+
+theorem HasNoRealCharacters.not_mem_of_isReal {S : Set (ClassFunction G ℂ)}
+    (hS : HasNoRealCharacters S) {χ : ClassFunction G ℂ} (hχ : χ.IsReal) :
+    χ ∉ S := by
+  intro hmem
+  exact hS hmem hχ
+
 /-- **Peterfalvi (1.1)**, cardinal form.
 
 If `G` has odd order, then there is exactly one real irreducible complex
@@ -101,9 +127,55 @@ def characterDegree (χ : ClassFunction G ℂ) : ℂ :=
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=
   ∀ i j, characterDegree (χ i) = characterDegree (χ j)
 
+theorem SameDegreeFamily.eq {ι : Type*} {χ : ι → ClassFunction G ℂ}
+    (hχ : SameDegreeFamily χ) (i j : ι) :
+    characterDegree (χ i) = characterDegree (χ j) :=
+  hχ i j
+
+theorem sameDegreeFamily_const {ι : Type*} (χ : ClassFunction G ℂ) :
+    SameDegreeFamily (fun _ : ι => χ) := by
+  intro i j
+  rfl
+
+theorem sameDegreeFamily_of_characterDegree_eq {ι : Type*}
+    {χ : ι → ClassFunction G ℂ} {d : ℂ}
+    (hχ : ∀ i, characterDegree (χ i) = d) :
+    SameDegreeFamily χ := by
+  intro i j
+  rw [hχ i, hχ j]
+
 /-- A set of class functions has constant degree. -/
 def HasUniformDegree (S : Set (ClassFunction G ℂ)) : Prop :=
   ∃ d : ℂ, ∀ ⦃χ : ClassFunction G ℂ⦄, χ ∈ S → characterDegree χ = d
+
+theorem HasUniformDegree.eq_of_mem {S : Set (ClassFunction G ℂ)}
+    (hS : HasUniformDegree S) {χ ψ : ClassFunction G ℂ}
+    (hχ : χ ∈ S) (hψ : ψ ∈ S) :
+    characterDegree χ = characterDegree ψ := by
+  rcases hS with ⟨d, hd⟩
+  rw [hd hχ, hd hψ]
+
+theorem HasUniformDegree.mono {S T : Set (ClassFunction G ℂ)}
+    (hS : HasUniformDegree S) (hTS : T ⊆ S) :
+    HasUniformDegree T := by
+  rcases hS with ⟨d, hd⟩
+  exact ⟨d, by
+    intro χ hχ
+    exact hd (hTS hχ)⟩
+
+theorem hasUniformDegree_empty :
+    HasUniformDegree (∅ : Set (ClassFunction G ℂ)) := by
+  exact ⟨0, by
+    intro χ hχ
+    exact False.elim hχ⟩
+
+theorem hasUniformDegree_singleton (χ : ClassFunction G ℂ) :
+    HasUniformDegree ({χ} : Set (ClassFunction G ℂ)) := by
+  refine ⟨characterDegree χ, ?_⟩
+  intro ψ hψ
+  rw [Set.mem_singleton_iff] at hψ
+  subst hψ
+  rfl
 
 /-- `C_H(g)`, viewed as a subgroup of the ambient group `G`.  This is the
 centralizer expression in Peterfalvi (1.2). -/
