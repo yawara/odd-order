@@ -15,15 +15,24 @@ to Prop 2.4.
 
 ## やること
 
-- [ ] Add `OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction`
+- [x] Add `OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction`
       with BG notation for the spaces `V_i`, dimensions `n_i`, and the
       endomorphism spaces used in Prop 2.4.
-- [ ] Prove the first reusable facts sorry-free, starting with membership and
+- [x] Prove the first reusable facts sorry-free, starting with membership and
       periodicity of `V_i` under a primitive root of unity.
-- [ ] Keep the public BG §2 file as the traceability surface by importing the
+- [x] Keep the public BG §2 file as the traceability surface by importing the
       shared module and updating `notes/bg/s02_representations.md`.
 - [ ] Later split out the heavier direct-sum and arithmetic parts (Prop 2.4
       (c)-(k)) into separate commits or issues if needed.
+
+## 進捗
+
+- 2026-05-26: `V_i`, `n_i`, finite-indexed `V_i`, and periodicity
+  `V_{i+h}=V_i`, `n_{i+h}=n_i` added.
+- 2026-05-26: `E_i` / `E_{i,t}` entrypoints added as
+  `cyclicEndConjEigenspace` and `cyclicHomBlockFin`.  The Prop 2.4(e)
+  conjugation calculation is available in scalar-multiplied pointwise form and
+  in a span-based map-level form.
 
 ## 完了条件
 

@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
+import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
@@ -18,8 +20,8 @@ The proposition fixes an invertible linear transformation `g` of finite order
 `V_i = {v | v * g = epsilon^i v}` and `n_i = dim V_i`.
 
 This file starts the Lean package for that notation.  The first facts are the
-periodicity facts needed before the direct-sum and block-matrix parts of Prop
-2.4 can be stated cleanly.
+periodicity facts and the first endomorphism-block definitions needed before
+the direct-sum and block-matrix parts of Prop 2.4 can be stated cleanly.
 -/
 
 namespace OddOrder
@@ -27,6 +29,10 @@ namespace RepresentationTheory
 namespace EigenspaceUnderCyclicAction
 
 variable {F V : Type*} [Field F] [AddCommGroup V] [Module F V]
+
+private abbrev glInvEnd (g : LinearMap.GeneralLinearGroup F V) :
+    Module.End F V :=
+  g.toLinearEquiv.symm
 
 /-- BG Prop 2.4 notation `V_i`: the `epsilon^i` eigenspace of `g`.
 
@@ -121,6 +127,245 @@ theorem cyclicEigenspaceDim_add_mul_period {epsilon : F} {g : Module.End F V}
     {h : ℕ} (hepsilon : IsPrimitiveRoot epsilon h) (i k : ℕ) :
     cyclicEigenspaceDim epsilon g (i + k * h) = cyclicEigenspaceDim epsilon g i :=
   cyclicEigenspaceDim_add_mul_period_of_pow_eq_one hepsilon.pow_eq_one i k
+
+/-! ### Endomorphism blocks `E_i` and `E_{i,t}` -/
+
+/-- BG Prop 2.4 conjugation action on `E = End_F(V)`.
+
+BG writes vectors and endomorphisms on the right and defines
+`e^g = g^{-1} e g`.  Since the rest of this Lean file uses left actions, the
+corresponding operator on endomorphisms is `e ↦ g * e * g⁻¹`. -/
+def cyclicEndConj (g : LinearMap.GeneralLinearGroup F V) :
+    Module.End F (Module.End F V) where
+  toFun e := (g : Module.End F V) * e * glInvEnd g
+  map_add' e f := by
+    ext v
+    simp [Module.End.mul_apply, map_add]
+  map_smul' a e := by
+    ext v
+    simp [Module.End.mul_apply]
+
+@[simp]
+theorem cyclicEndConj_apply (g : LinearMap.GeneralLinearGroup F V)
+    (e : Module.End F V) (v : V) :
+    cyclicEndConj g e v = (g : Module.End F V) (e (glInvEnd g v)) := by
+  rfl
+
+/-- BG Prop 2.4 notation `E_i`: the `epsilon^i` eigenspace for the
+conjugation action on `End_F(V)`. -/
+abbrev cyclicEndConjEigenspace (epsilon : F)
+    (g : LinearMap.GeneralLinearGroup F V) (i : ℕ) :
+    Submodule F (Module.End F V) :=
+  cyclicEigenspace epsilon (cyclicEndConj g) i
+
+/-- Fin-indexed version of `cyclicEndConjEigenspace`. -/
+abbrev cyclicEndConjEigenspaceFin (epsilon : F)
+    (g : LinearMap.GeneralLinearGroup F V) {h : ℕ} (i : Fin h) :
+    Submodule F (Module.End F V) :=
+  cyclicEndConjEigenspace epsilon g i.1
+
+/-- The displayed finite family `⋃_{0≤i<h} V_i` from BG Prop 2.4. -/
+def cyclicEigenspaceFinUnion (epsilon : F) (g : Module.End F V) (h : ℕ) :
+    Set V :=
+  {v | ∃ i : Fin h, v ∈ cyclicEigenspaceFin epsilon g i}
+
+/-- BG Prop 2.4 notation `E_{i,t}` over the finite index range
+`0 ≤ i,t ≤ h - 1`.
+
+An endomorphism in this block sends `V_i` into `V_t` and kills every other
+`V_j` in the displayed finite family. -/
+def cyclicHomBlockFin (epsilon : F) (g : Module.End F V) {h : ℕ}
+    (i t : Fin h) : Submodule F (Module.End F V) where
+  carrier :=
+    {e | (∀ v : V, v ∈ cyclicEigenspaceFin epsilon g i →
+          e v ∈ cyclicEigenspaceFin epsilon g t) ∧
+      ∀ j : Fin h, j ≠ i → ∀ v : V,
+        v ∈ cyclicEigenspaceFin epsilon g j → e v = 0}
+  zero_mem' := by
+    constructor
+    · intro v hv
+      simp
+    · intro j hj v hv
+      simp
+  add_mem' := by
+    intro e f he hf
+    constructor
+    · intro v hv
+      exact (cyclicEigenspaceFin epsilon g t).add_mem (he.1 v hv) (hf.1 v hv)
+    · intro j hj v hv
+      rw [LinearMap.add_apply, he.2 j hj v hv, hf.2 j hj v hv, add_zero]
+  smul_mem' := by
+    intro a e he
+    constructor
+    · intro v hv
+      exact (cyclicEigenspaceFin epsilon g t).smul_mem a (he.1 v hv)
+    · intro j hj v hv
+      rw [LinearMap.smul_apply, he.2 j hj v hv, smul_zero]
+
+@[simp]
+theorem mem_cyclicHomBlockFin_iff {epsilon : F} {g : Module.End F V}
+    {h : ℕ} {i t : Fin h} {e : Module.End F V} :
+    e ∈ cyclicHomBlockFin epsilon g i t ↔
+      (∀ v : V, v ∈ cyclicEigenspaceFin epsilon g i →
+        e v ∈ cyclicEigenspaceFin epsilon g t) ∧
+      ∀ j : Fin h, j ≠ i → ∀ v : V,
+        v ∈ cyclicEigenspaceFin epsilon g j → e v = 0 := by
+  rfl
+
+private theorem inv_mem_cyclicEigenspaceFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i : Fin h} {v : V}
+    (hv : v ∈ cyclicEigenspaceFin epsilon (g : Module.End F V) i) :
+    glInvEnd g v ∈
+      cyclicEigenspaceFin epsilon (g : Module.End F V) i := by
+  rw [mem_cyclicEigenspaceFin_iff] at hv ⊢
+  have hleft :
+      (g : Module.End F V) (glInvEnd g v) = v := by
+    change g.toLinearEquiv (g.toLinearEquiv.symm v) = v
+    exact g.toLinearEquiv.apply_symm_apply v
+  have hright :
+      glInvEnd g ((g : Module.End F V) v) = v := by
+    change g.toLinearEquiv.symm (g.toLinearEquiv v) = v
+    exact g.toLinearEquiv.symm_apply_apply v
+  have hv_apply :
+      glInvEnd g ((g : Module.End F V) v) =
+          (epsilon ^ i.1) • glInvEnd g v := by
+    rw [hv]
+    simp [glInvEnd]
+  calc
+    (g : Module.End F V) (glInvEnd g v) = v := by
+      exact hleft
+    _ = (epsilon ^ i.1) • glInvEnd g v := by
+      exact hright.symm.trans hv_apply
+
+private theorem smul_inv_mem_eq_of_mem_cyclicEigenspaceFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i : Fin h} {v : V}
+    (hv : v ∈ cyclicEigenspaceFin epsilon (g : Module.End F V) i) :
+    (epsilon ^ i.1) • glInvEnd g v = v := by
+  rw [mem_cyclicEigenspaceFin_iff] at hv
+  have hright :
+      glInvEnd g ((g : Module.End F V) v) = v := by
+    change g.toLinearEquiv.symm (g.toLinearEquiv v) = v
+    exact g.toLinearEquiv.symm_apply_apply v
+  have hv_apply :
+      glInvEnd g ((g : Module.End F V) v) = (epsilon ^ i.1) • glInvEnd g v := by
+    rw [hv]
+    simp [glInvEnd]
+  calc
+    (epsilon ^ i.1) • glInvEnd g v
+        = glInvEnd g ((g : Module.End F V) v) := by
+          exact hv_apply.symm
+    _ = v := by
+      exact hright
+
+/-- Conjugation preserves each finite BG block `E_{i,t}`. -/
+theorem cyclicEndConj_mem_cyclicHomBlockFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i t : Fin h}
+    {e : Module.End F V}
+    (he : e ∈ cyclicHomBlockFin epsilon (g : Module.End F V) i t) :
+    cyclicEndConj g e ∈ cyclicHomBlockFin epsilon (g : Module.End F V) i t := by
+  rw [mem_cyclicHomBlockFin_iff] at he ⊢
+  constructor
+  · intro v hv
+    have hv_mem := hv
+    rw [mem_cyclicEigenspaceFin_iff] at hv
+    have hinv :
+        glInvEnd g v ∈
+          cyclicEigenspaceFin epsilon (g : Module.End F V) i :=
+      inv_mem_cyclicEigenspaceFin hv_mem
+    have himage := he.1 (glInvEnd g v) hinv
+    have himage_eq := mem_cyclicEigenspaceFin_iff.mp himage
+    rw [cyclicEndConj_apply, himage_eq]
+    exact (cyclicEigenspaceFin epsilon (g : Module.End F V) t).smul_mem _ himage
+  · intro j hj v hv
+    have hinv :
+        glInvEnd g v ∈
+          cyclicEigenspaceFin epsilon (g : Module.End F V) j :=
+      inv_mem_cyclicEigenspaceFin hv
+    rw [cyclicEndConj_apply,
+      he.2 j hj (glInvEnd g v) hinv,
+      map_zero]
+
+/-- Pointwise scalar relation behind BG Prop 2.4(e).
+
+If `e ∈ E_{i,t}` and `v ∈ V_i`, then conjugating `e` by `g` multiplies its
+value on `v` by the ratio of the two eigenvalues.  This formulation avoids
+division and is the most robust form over a field. -/
+theorem smul_cyclicEndConj_apply_of_mem_cyclicHomBlockFin
+    {epsilon : F} {g : LinearMap.GeneralLinearGroup F V} {h : ℕ}
+    {i t : Fin h} {e : Module.End F V}
+    (he : e ∈ cyclicHomBlockFin epsilon (g : Module.End F V) i t)
+    {v : V} (hv : v ∈ cyclicEigenspaceFin epsilon (g : Module.End F V) i) :
+    (epsilon ^ i.1) • cyclicEndConj g e v = (epsilon ^ t.1) • e v := by
+  rw [mem_cyclicHomBlockFin_iff] at he
+  have hinv :
+      glInvEnd g v ∈
+        cyclicEigenspaceFin epsilon (g : Module.End F V) i :=
+    inv_mem_cyclicEigenspaceFin hv
+  have hsource :
+      (epsilon ^ i.1) • glInvEnd g v = v :=
+    smul_inv_mem_eq_of_mem_cyclicEigenspaceFin hv
+  have htarget := he.1 (glInvEnd g v) hinv
+  rw [mem_cyclicEigenspaceFin_iff] at htarget
+  have htarget_v := he.1 v hv
+  rw [mem_cyclicEigenspaceFin_iff] at htarget_v
+  calc
+    (epsilon ^ i.1) • cyclicEndConj g e v
+        = (g : Module.End F V)
+            ((epsilon ^ i.1) •
+              e (glInvEnd g v)) := by
+          simp [cyclicEndConj_apply]
+    _ = (g : Module.End F V) (e v) := by
+          rw [← map_smul, hsource]
+    _ = (epsilon ^ t.1) • e v := htarget_v
+
+/-- Map-level scalar relation for a block endomorphism, assuming the displayed
+eigenspaces span `V`.
+
+This is the theorem-facing form of the calculation used in BG Prop 2.4(e);
+later direct-sum work can provide the `span` hypothesis from Prop 2.4(a). -/
+theorem smul_cyclicEndConj_eq_of_mem_cyclicHomBlockFin_of_span
+    {epsilon : F} {g : LinearMap.GeneralLinearGroup F V} {h : ℕ}
+    {i t : Fin h} {e : Module.End F V}
+    (hspan : Submodule.span F
+      (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (he : e ∈ cyclicHomBlockFin epsilon (g : Module.End F V) i t) :
+    (epsilon ^ i.1) • cyclicEndConj g e = (epsilon ^ t.1) • e := by
+  rw [Submodule.linearMap_eq_iff_of_span_eq_top _ _ hspan]
+  intro v
+  rcases v.2 with ⟨j, hvj⟩
+  by_cases hji : j = i
+  · subst hji
+    exact smul_cyclicEndConj_apply_of_mem_cyclicHomBlockFin he hvj
+  · rw [mem_cyclicHomBlockFin_iff] at he
+    have hconj := (mem_cyclicHomBlockFin_iff.mp
+      (cyclicEndConj_mem_cyclicHomBlockFin he)).2 j hji v hvj
+    have hezero := he.2 j hji v hvj
+    simp [hconj, hezero]
+
+/-- Division form of `smul_cyclicEndConj_eq_of_mem_cyclicHomBlockFin_of_span`.
+
+This is convenient when later identifying the ratio with `epsilon^(t-i)`, or
+with the corresponding residue class modulo the period. -/
+theorem cyclicEndConj_eq_smul_ratio_of_mem_cyclicHomBlockFin_of_span
+    {epsilon : F} (hepsilon_ne_zero : epsilon ≠ 0)
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ}
+    {i t : Fin h} {e : Module.End F V}
+    (hspan : Submodule.span F
+      (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (he : e ∈ cyclicHomBlockFin epsilon (g : Module.End F V) i t) :
+    cyclicEndConj g e = ((epsilon ^ t.1) / (epsilon ^ i.1)) • e := by
+  have hscalar :=
+    smul_cyclicEndConj_eq_of_mem_cyclicHomBlockFin_of_span
+      (g := g) (i := i) (t := t) hspan he
+  have hi : epsilon ^ i.1 ≠ 0 := pow_ne_zero _ hepsilon_ne_zero
+  calc
+    cyclicEndConj g e
+        = (epsilon ^ i.1)⁻¹ • ((epsilon ^ i.1) • cyclicEndConj g e) := by
+          rw [smul_smul, inv_mul_cancel₀ hi, one_smul]
+    _ = (epsilon ^ i.1)⁻¹ • ((epsilon ^ t.1) • e) := by
+          rw [hscalar]
+    _ = ((epsilon ^ t.1) / (epsilon ^ i.1)) • e := by
+          rw [smul_smul, div_eq_mul_inv, mul_comm]
 
 end EigenspaceUnderCyclicAction
 end RepresentationTheory

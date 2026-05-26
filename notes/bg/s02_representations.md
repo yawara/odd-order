@@ -838,3 +838,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   primitive root の `epsilon^h = 1` から `V_{i+h}=V_i`,
   `n_{i+h}=n_i` を sorry-free で証明した. これは Prop 2.4(b) の基礎層で、
   次は `E_i` と `E_{i,t}` の定義および (e) の conjugation eigenvalue 計算へ進む.
+- 同 module に BG の `E_i` / `E_{i,t}` の入口を追加.
+  `cyclicEndConj` は右作用の `e^g = g^{-1}eg` を左作用の
+  `e ↦ g * e * g⁻¹` として定義し、`cyclicEndConjEigenspace` が `E_i`,
+  `cyclicHomBlockFin` が有限 index 範囲の `E_{i,t}` を表す.
+  `E_{i,t}` が conjugation で保存されることと、
+  `epsilon^i • (e^g) = epsilon^t • e` の pointwise / span 上の map-level
+  形を sorry-free で追加した. これは Prop 2.4(e) の計算部で、次は
+  Prop 2.4(a) の direct-sum/span 仮定を実際に供給する diagonalization 側へ進む.
