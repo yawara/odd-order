@@ -435,6 +435,9 @@ FT クリティカル度 + 章内依存で並べる:
   `Z(T) < C` についても, self-centralizing `C` から `Z(T) ≤ C` を引き, `T/C` prime cyclic と
   `T` 非可換性で strict にする
   `center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative` を追加済み.
+  また `|T:C|=p` と `|C:Z(T)|=p` から `|T:Z(T)|=p^2` を得る index 算術を
+  `center_index_eq_prime_sq_of_subgroupOf_relIndex_prime` として分離済み. 次は `c^p ∈ Z(T)`
+  から後者の `|C:Z(T)|=p` を作る段階.
   さらに ambient な `C ≤ T ≤ P` と `C.relIndex T = p` から, `C.subgroupOf T < ⊤`,
   cyclicity の `subgroupOf` への移送, および上記 `Z(T)<C` を束ねて Lemma 6.15 本体へ渡す
   `exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime` も追加済み.

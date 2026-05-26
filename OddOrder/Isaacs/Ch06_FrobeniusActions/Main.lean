@@ -3433,6 +3433,27 @@ theorem center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMul
     exact hT_not_comm ⟨⟨hT_comm⟩⟩
   exact lt_of_le_of_ne hZ_le_C hne
 
+/-- **Isaacs Thm 6.12 setup**: the relative-index computation used before applying
+Lemma 6.15.
+
+If `C.subgroupOf T` has index `p` in `T` and `Z(T)` has index `p` in `C.subgroupOf T`,
+then `|T : Z(T)| = p²`. -/
+theorem center_index_eq_prime_sq_of_subgroupOf_relIndex_prime
+    {P : Type*} [Group P] {p : ℕ}
+    {C T : Subgroup P}
+    (hC_rel : C.relIndex T = p)
+    (hZ_le_C : Subgroup.center T ≤ C.subgroupOf T)
+    (hZ_rel : (Subgroup.center T).relIndex (C.subgroupOf T) = p) :
+    (Subgroup.center T).index = p ^ 2 := by
+  have hCsub_index : (C.subgroupOf T).index = p := by
+    simpa [Subgroup.relIndex] using hC_rel
+  have hmul :
+      (Subgroup.center T).relIndex (C.subgroupOf T) * (C.subgroupOf T).index =
+        (Subgroup.center T).index :=
+    Subgroup.relIndex_mul_index hZ_le_C
+  rw [hZ_rel, hCsub_index] at hmul
+  simpa [pow_two] using hmul.symm
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/
