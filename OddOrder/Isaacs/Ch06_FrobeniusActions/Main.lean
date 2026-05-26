@@ -3135,6 +3135,22 @@ theorem exists_distinct_subgroups_card_two_of_external_involution
       rw [← h_eq]
       exact Subgroup.mem_zpowers a))
 
+/-- If a group has a unique subgroup of order `2`, then it cannot have a nontrivial involution
+inside `C` and another involution outside `C`.
+
+This is the contradiction form of the preceding bridge, used when deriving Isaacs Thm 6.11
+from Thm 6.12: the dihedral and semidihedral alternatives supply such an outside involution. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution
+    {P : Type*} [Group P] [Finite P] {C : Subgroup P} {a z : P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1)
+    (hz_mem : z ∈ C) (hz_sq : z ^ 2 = 1) (hz_ne : z ≠ 1) :
+    False := by
+  obtain ⟨K, L, hK_card, hL_card, hKL_ne⟩ :=
+    exists_distinct_subgroups_card_two_of_external_involution
+      ha_notmem ha_sq hz_mem hz_sq hz_ne
+  exact hKL_ne (hUnique K L hK_card hL_card)
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

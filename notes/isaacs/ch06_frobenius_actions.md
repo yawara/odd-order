@@ -408,7 +408,8 @@ FT クリティカル度 + 章内依存で並べる:
   `false_of_unique_subgroups_card_prime_of_center_index_prime_sq` も追加済み.
   さらに 6.12 → 6.11 の dihedral / semidihedral 排除用に, cyclic subgroup 外の involution
   と内部の非自明 involution から異なる order-2 subgroups を作る
-  `exists_distinct_subgroups_card_two_of_external_involution` を追加済み.
+  `exists_distinct_subgroups_card_two_of_external_involution` と, order-2 subgroup 一意性への
+  contradiction form `false_of_unique_subgroups_card_two_of_external_involution` を追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

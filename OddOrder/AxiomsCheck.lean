@@ -223,6 +223,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
 -- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.actionFixedBy_eq_actionFixedPoints_zpowers
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_le_iff
