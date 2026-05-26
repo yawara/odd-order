@@ -287,6 +287,14 @@ FT クリティカル度 + 章内依存で並べる:
   `exists_prime_sylow_not_isCyclic_of_not_isCyclic` を追加. 6.11 可換 branch と 6.10 から直接
   `isCyclic_of_frobeniusAction_of_isMulCommutative` も閉じたため, 6.21 の
   「noncyclic abelian Frobenius complement は存在しない」矛盾に使える.
+- **§6B / 6.21 fixed-centralizer generation setup**:
+  `actionFixedBy φ a = C_U(a)` を単一作用元の固定点部分群として追加し,
+  `nontrivialActionFixedByClosure φ = ⟨C_U(a) | a ≠ 1⟩` を Isaacs 6.21 の `K` として
+  Lean 化. `K ≤ L` の判定 (`nontrivialActionFixedByClosure_le_iff`) と,
+  `A` 可換なら `K` が `A`-invariant である補題
+  (`nontrivialActionFixedByClosure_invariant_of_commutative`) まで sorry-free.
+  これは 6.21 proof 中の「`K` は A-invariant since uniquely determined by `A,N`」を
+  wrapper ではなく本文通りの生成部分群で閉じるための surface.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
