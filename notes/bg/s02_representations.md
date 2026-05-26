@@ -187,6 +187,16 @@
   `RankOneLinePairData.permutes` が要求する `comap` 形の片側を得られる.
   次は反対側 line も同様に扱える quotient/free/finrank 入力を整え、
   `Fin 2` の permutation action としてまとめる.
+- **2026-05-26**: algebraically closed q≠p spine の normalizer branch を閉じた.
+  `commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel_eq_top` で
+  determinant が自明な subgroup 上の q≠p endpoint を切り出し、
+  `determinantKernel_sylow_normalizer_commutative_of_isAlgClosed` で
+  `H = N_{G*}(Q)` への制限表現に適用した. これにより
+  `sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction`
+  は normalizer branch を内部で解決し、残入力は `G*` の非自明正規部分群への
+  induction 出力 `hind` のみになった. 残 frontier は (1) theorem 本体でこの
+  `hind` を実際に供給すること、(2) 元の体から algebraic closure へ移す
+  base-change route を整理すること.
 
 ## TL;DR
 

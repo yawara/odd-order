@@ -3207,6 +3207,47 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed
       exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
         ρ hdim K hKq hq_ne_p hKcomm)
 
+/-- Algebraically closed q≠p endpoint when the determinant is already trivial.
+
+This is the normalizer form of the q≠p branch: for subgroups lying inside
+`G*`, the restricted representation has determinant kernel equal to the whole
+group.  A nontrivial `O_q(G)` then supplies the abelian normal `q`-subgroup
+needed by the same Maschke line argument. -/
+private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel_eq_top
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hq_ne_p : q ≠ p)
+    (hdet_top : determinantKernelSubgroup ρ = ⊤)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q G ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  haveI : Finite (Sylow q G) := inferInstance
+  rcases exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
+      (q := q) (G := G) hcore_ne_bot with
+    ⟨K, hKnormal, hKq, hK_ne_bot, hKcomm⟩
+  have hKle : K ≤ determinantKernelSubgroup ρ := by
+    intro x _hx
+    rw [hdet_top]
+    trivial
+  rcases exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
+      (p := p) (q := q) ρ hdim K hKq hq_ne_p hKcomm with
+    ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
+      hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
+  letI : Module.Free F W.toSubmodule := hfreeW.some
+  letI : Module.Free F U.toSubmodule := hfreeU.some
+  letI : Module.Finite F W.toSubmodule := hfiniteW.some
+  letI : Module.Finite F U.toSubmodule := hfiniteU.some
+  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
+  exact commutative_of_determinantKernel_subgroup_rank_one_complement
+    ρ hfaithful hodd K hKnormal hKle W U hcompl
+    hdimW hdimU hdimQW hdimQU hx_ne_one
+
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
 This isolates the group-theoretic part of BG Thm 2.6 where, after choosing
@@ -3234,6 +3275,62 @@ private theorem opCore_ne_bot_of_sylow_normalizer
       Subgroup.map_subgroupOf_eq_of_le Q.le_normalizer] using hmap
   exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
     (G := N) (K := (QN : Subgroup N)) QN.2 hQN_ne_bot
+
+/-- q≠p normalizer branch inside the determinant kernel.
+
+For `Q ∈ Syl_q(G*)`, set `H = N_{G*}(Q)`.  Since `H ≤ G*`, the determinant of
+the restricted representation on `H` is trivial.  Thus the algebraically
+closed q≠p endpoint applies directly to `H` once `O_q(H) ≠ 1`. -/
+private theorem determinantKernel_sylow_normalizer_commutative_of_isAlgClosed
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hq_ne_p : q ≠ p)
+    (Q : Sylow q (determinantKernelSubgroup ρ))
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q
+      (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+        Set (determinantKernelSubgroup ρ))) ≠ ⊥) :
+    Std.Commutative
+      (· * · :
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ)) →
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ)) →
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let H : Subgroup Gstar := Subgroup.normalizer ((Q : Subgroup Gstar) : Set Gstar)
+  let ρH : Representation F H V := ρ.comp (Gstar.subtype.comp H.subtype)
+  have hfaithfulH : Function.Injective ρH := by
+    intro x y hxy
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hfaithful (by simpa [ρH] using hxy)
+  have hoddH : Odd (Nat.card H) := by
+    have hH_dvd_Gstar : Nat.card H ∣ Nat.card Gstar :=
+      Subgroup.card_subgroup_dvd_card H
+    have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+      Subgroup.card_subgroup_dvd_card Gstar
+    exact hodd.of_dvd_nat (hH_dvd_Gstar.trans hGstar_dvd_G)
+  have hdet_top : determinantKernelSubgroup ρH = ⊤ := by
+    ext x
+    constructor
+    · intro _hx
+      trivial
+    · intro _hx
+      rw [mem_determinantKernelSubgroup]
+      have hxdetG : (((x : H) : Gstar) : G) ∈ determinantKernelSubgroup ρ :=
+        ((x : H) : Gstar).2
+      rw [mem_determinantKernelSubgroup] at hxdetG
+      simpa [ρH, determinantCharacterOfRepresentation,
+        representationToGeneralLinearGroup] using hxdetG
+  simpa [H] using
+    commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel_eq_top
+      (p := p) (q := q) ρH hfaithfulH hoddH hdim hq_ne_p hdet_top
+      hcore_ne_bot
 
 /-- A finite group that is not a `p`-group has a prime divisor different from `p`.
 
@@ -3613,6 +3710,31 @@ private theorem
       exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
         (p := p) (q := q) ρ hdim K hKq hq_ne_p hKcomm)
     P
+
+/-- Algebraically closed determinant-kernel spine with the normalizer branch closed.
+
+The q≠p normalizer step is now supplied by restricting the representation to
+`H = N_{G*}(Q)`, where the determinant is trivial because `H ≤ G*`.  The only
+remaining theorem-level input in this algebraically closed reduction is the
+induction output on nontrivial normal subgroups of `G*`. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) :=
+  sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed
+    ρ hfaithful hodd hdim
+    (fun {q} _hq_prime hq_ne_p Q hQcore =>
+      determinantKernel_sylow_normalizer_commutative_of_isAlgClosed
+        (q := q) ρ hfaithful hodd hdim hq_ne_p Q hQcore)
+    hind P
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup
