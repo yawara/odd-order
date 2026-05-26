@@ -80,6 +80,9 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.
+- `inductionCoefficient_zero_left/right`, `inductionCoefficient_add_left/right`,
+  `inductionCoefficient_smul_left`, and `inductionCoefficient_trivial_right`
+  expose the elementary coefficient algebra needed by the (1.3) expansion.
 - `characterKernel` and `SubsetCharacterKernel` encode the set-level kernel
   containment shape needed for (1.6).
 - Kernel basics are now available without unfolding:

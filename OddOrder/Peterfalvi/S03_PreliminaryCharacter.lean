@@ -207,6 +207,49 @@ def inductionCoefficient (H : Subgroup G) [Fintype H]
       ClassFunction.inner ψ (ClassFunction.restrict H χ) :=
   rfl
 
+@[simp] theorem restrict_trivialClassFunction (H : Subgroup G) :
+    ClassFunction.restrict H (trivialClassFunction G) = trivialClassFunction H := by
+  ext h
+  simp
+
+@[simp] theorem inductionCoefficient_zero_left (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (χ : ClassFunction G ℂ) :
+    inductionCoefficient H (0 : ClassFunction H ℂ) χ = 0 := by
+  simp [inductionCoefficient]
+
+@[simp] theorem inductionCoefficient_zero_right (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (ψ : ClassFunction H ℂ) :
+    inductionCoefficient H ψ (0 : ClassFunction G ℂ) = 0 := by
+  simp [inductionCoefficient]
+
+theorem inductionCoefficient_add_left (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)]
+    (ψ₁ ψ₂ : ClassFunction H ℂ) (χ : ClassFunction G ℂ) :
+    inductionCoefficient H (ψ₁ + ψ₂) χ =
+      inductionCoefficient H ψ₁ χ + inductionCoefficient H ψ₂ χ := by
+  exact ClassFunction.inner_add_left ψ₁ ψ₂ (ClassFunction.restrict H χ)
+
+theorem inductionCoefficient_add_right (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)]
+    (ψ : ClassFunction H ℂ) (χ₁ χ₂ : ClassFunction G ℂ) :
+    inductionCoefficient H ψ (χ₁ + χ₂) =
+      inductionCoefficient H ψ χ₁ + inductionCoefficient H ψ χ₂ := by
+  rw [inductionCoefficient, ClassFunction.restrict_add]
+  exact ClassFunction.inner_add_right ψ (ClassFunction.restrict H χ₁)
+    (ClassFunction.restrict H χ₂)
+
+theorem inductionCoefficient_smul_left (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)]
+    (c : ℂ) (ψ : ClassFunction H ℂ) (χ : ClassFunction G ℂ) :
+    inductionCoefficient H (c • ψ) χ = c * inductionCoefficient H ψ χ := by
+  exact ClassFunction.inner_smul_left c ψ (ClassFunction.restrict H χ)
+
+@[simp] theorem inductionCoefficient_trivial_right (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (ψ : ClassFunction H ℂ) :
+    inductionCoefficient H ψ (trivialClassFunction G) =
+      ClassFunction.inner ψ (trivialClassFunction H) := by
+  simp [inductionCoefficient]
+
 /-- Peterfalvi (1.3)-style induced-character expansion data.
 
 `basis` is the family whose restrictions provide the coefficients, while

@@ -133,6 +133,14 @@ theorem restrict_add (H : Subgroup G) (φ ψ : ClassFunction G k) :
     restrict H (φ + ψ) = restrict H φ + restrict H ψ := by
   ext h; simp
 
+theorem restrict_neg (H : Subgroup G) (φ : ClassFunction G k) :
+    restrict H (-φ) = -restrict H φ := by
+  ext h; simp
+
+theorem restrict_sub (H : Subgroup G) (φ ψ : ClassFunction G k) :
+    restrict H (φ - ψ) = restrict H φ - restrict H ψ := by
+  ext h; simp
+
 theorem restrict_smul (H : Subgroup G) (c : k) (φ : ClassFunction G k) :
     restrict H (c • φ) = c • restrict H φ := by
   ext h; simp
