@@ -170,6 +170,10 @@ theorem mem_support_of_isConj {φ : ClassFunction G k} {g₁ g₂ : G}
   rw [mem_support, ← φ.of_isConj hg]
   exact h
 
+@[simp] theorem support_neg (φ : ClassFunction G k) : (-φ).support = φ.support := by
+  ext g
+  simp [support]
+
 /-- The support of a sum is contained in the union of the supports. -/
 theorem support_add_subset (φ ψ : ClassFunction G k) :
     (φ + ψ).support ⊆ φ.support ∪ ψ.support := by
@@ -190,6 +194,19 @@ theorem support_smul_subset (c : k) (φ : ClassFunction G k) :
   have hφ_zero : φ g = 0 := by simpa [mem_support] using hφ
   exact hg (by simp [hφ_zero])
 
+theorem support_sub_subset (φ ψ : ClassFunction G k) :
+    (φ - ψ).support ⊆ φ.support ∪ ψ.support := by
+  simpa [sub_eq_add_neg] using support_add_subset φ (-ψ)
+
+@[simp] theorem support_restrict (H : Subgroup G) (φ : ClassFunction G k) :
+    (restrict H φ).support = {h : H | (h : G) ∈ φ.support} := by
+  ext h
+  rfl
+
+theorem support_restrict_subset (H : Subgroup G) (φ : ClassFunction G k) :
+    (restrict H φ).support ⊆ {h : H | (h : G) ∈ φ.support} := by
+  rw [support_restrict]
+
 /-- The submodule of class functions supported on `A`.
 
 This is Peterfalvi's `CF(G, A)`. -/
@@ -209,6 +226,17 @@ def supportedSubmodule (A : Set G) : Submodule k (ClassFunction G k) where
 
 @[simp] theorem mem_supportedSubmodule {A : Set G} {φ : ClassFunction G k} :
     φ ∈ supportedSubmodule (G := G) (k := k) A ↔ φ.support ⊆ A := Iff.rfl
+
+theorem supportedSubmodule_mono {A B : Set G} (hAB : A ⊆ B) :
+    supportedSubmodule (G := G) (k := k) A ≤ supportedSubmodule (G := G) (k := k) B :=
+  fun _ hφ => hφ.trans hAB
+
+theorem restrict_mem_supportedSubmodule {H : Subgroup G} {A : Set G}
+    {φ : ClassFunction G k} (hφ : φ.support ⊆ A) :
+    restrict H φ ∈
+      supportedSubmodule (G := H) (k := k) {h : H | (h : G) ∈ A} := by
+  intro h hh
+  exact hφ hh
 
 end Support
 

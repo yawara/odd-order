@@ -84,6 +84,11 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `hasUniformDegree_singleton`.
 - `centralizerInSubgroup` and `VanishesOnTrivialSubgroupCentralizers` encode the
   target shape of (1.2) without adding a new proof stub.
+- The shared `ClassFunction` infrastructure now exposes support/restriction
+  helpers needed by the Clifford and induced-character proof cores:
+  `support_neg`, `support_sub_subset`, `support_restrict`,
+  `support_restrict_subset`, `supportedSubmodule_mono`, and
+  `restrict_mem_supportedSubmodule`.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.
