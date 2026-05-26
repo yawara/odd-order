@@ -4273,6 +4273,43 @@ theorem normalClosure_eq_top_of_simple_of_ne_bot
       _ = ⊥ := h
   · exact h
 
+/-- **§7D Step 2 main consequence** — in a simple group, if a subgroup `K`
+contains every conjugate `g * v * g⁻¹` of a nontrivial subgroup `V`, then
+`K = ⊤`.
+
+This is the cleanest form of Step 2's argument: `V` nontrivial and simple `G`
+imply `V^G = ⊤`, so any `K` containing `V^G` (equivalently, all conjugates of
+elements of `V`) must be `⊤`. -/
+theorem eq_top_of_contains_all_conjugates_of_simple
+    {G : Type*} [Group G] [IsSimpleGroup G]
+    {V K : Subgroup G} (hV_ne_bot : V ≠ ⊥)
+    (h_contains : ∀ g : G, ∀ v ∈ V, g * v * g⁻¹ ∈ K) :
+    K = ⊤ := by
+  have h_top : Subgroup.normalClosure (V : Set G) = ⊤ :=
+    normalClosure_eq_top_of_simple_of_ne_bot hV_ne_bot
+  -- K contains the normalClosure since K is closed under containing conjugates.
+  have hK_normal_aux : ∀ x : G, x ∈ Subgroup.normalClosure (V : Set G) → x ∈ K := by
+    intro x hx
+    refine Subgroup.closure_induction (p := fun y _ => y ∈ K)
+      (fun y hy_conj => ?_) ?_ ?_ ?_ hx
+    · -- y is a conjugate of some v ∈ V
+      rcases (Group.mem_conjugatesOfSet_iff (s := (V : Set G)) (x := y)).mp hy_conj with
+        ⟨a, ha_inV, hConj⟩
+      obtain ⟨g, hg⟩ := isConj_iff.mp hConj
+      -- y = g * a * g⁻¹
+      rw [← hg]
+      exact h_contains g a ha_inV
+    · exact K.one_mem
+    · intro x y _ _ hx hy
+      exact K.mul_mem hx hy
+    · intro x _ hx
+      exact K.inv_mem hx
+  rw [eq_top_iff]
+  intro x _
+  apply hK_normal_aux
+  rw [h_top]
+  exact Subgroup.mem_top x
+
 /-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
 non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
 there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
