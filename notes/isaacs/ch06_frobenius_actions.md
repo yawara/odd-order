@@ -494,6 +494,9 @@ FT クリティカル度 + 章内依存で並べる:
   `C.relIndex T = 2` と `T = C ⊔ ⟨a⟩` を作り, 任意の代表元 `a` が `c^2` を
   反転する
   `quotient_involution_conj_square_eq_inv_of_zpowers` も追加済み.
+  これを conjugation action `P/C ↷ C` 上の involution-cyclicity criterion に渡し,
+  `c^2` の非 involution 性 (`e ≥ 3`) と合わせて `P/C` cyclic を返す
+  `quotient_isCyclic_of_involutions_invert_zpowers_square` も追加済み.
   また `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` の非中心性から
   本文の `a ∈ T-C`, `a^p ∈ C`, `c^a=c^i`, Lemma 6.16 の `p=2` + 2-adic alternatives を
   一括で取り出す

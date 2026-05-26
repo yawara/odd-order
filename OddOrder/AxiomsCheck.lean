@@ -312,6 +312,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_involution_conj_square_eq_inv_of_zpowers
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_isCyclic_of_involutions_invert_zpowers_square
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_eq_inv_or_twist_of_two_adic_cases
 #assert_only_allowed_axioms

@@ -6631,6 +6631,85 @@ theorem quotient_involution_conj_square_eq_inv_of_zpowers
   exact (conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
     (p := 2) (e := e) Nat.prime_two hC_eq h_order he ha_pow hpow_ne).2
 
+/-- **Isaacs Thm 6.12 setup**: the quotient `P/C` is cyclic once all quotient
+involutions are handled.
+
+The action is the conjugation action of `P/C` on `C`.  The preceding theorem proves every
+nontrivial involution in `P/C` inverts `c²`; since `e ≥ 3`, the element `c² ∈ C` has square
+not equal to `1`.  Thus `P/C` has a unique involution, and the commutative finite `2`-group
+cyclicity criterion applies. -/
+theorem quotient_isCyclic_of_involutions_invert_zpowers_square
+    {P : Type*} [Group P] [Finite P]
+    {C : Subgroup P} [C.Normal] {c : P} {e : ℕ}
+    (hP : IsPGroup 2 P)
+    (hC_eq : C = Subgroup.zpowers c)
+    (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (h_order : orderOf c = 2 ^ e) (he : 3 ≤ e)
+    (hT_card_ne :
+      ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+        Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8) :
+    IsCyclic (P ⧸ C) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_cyclic : IsCyclic C := by
+    rw [hC_eq]
+    exact Subgroup.isCyclic_zpowers c
+  have hquot_comm : ∀ x y : P ⧸ C, x * y = y * x :=
+    quotient_commutative_of_isCyclic_of_self_centralizing hC_cyclic hCent
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have hc2C : c ^ 2 ∈ C := C.pow_mem hcC 2
+  let n : C := ⟨c ^ 2, hc2C⟩
+  have hn_sq_ne : n ^ 2 ≠ 1 := by
+    intro hn
+    have hc4 : c ^ 4 = 1 := by
+      have hval := congrArg Subtype.val hn
+      calc
+        c ^ 4 = (c ^ 2) ^ 2 := by group
+        _ = 1 := by simpa [n] using hval
+    have hdvd : orderOf c ∣ 4 := orderOf_dvd_iff_pow_eq_one.mpr hc4
+    rw [h_order] at hdvd
+    have hlt : 4 < 2 ^ e := by
+      calc
+        4 = 2 ^ 2 := by norm_num
+        _ < 2 ^ e := Nat.pow_lt_pow_right (by norm_num) (by omega)
+    exact (not_le_of_gt hlt) (Nat.le_of_dvd (by norm_num) hdvd)
+  let φ : P →* MulAut C := MulAut.conjNormal (H := C)
+  have hC_le_ker : C ≤ φ.ker := by
+    intro g hg
+    rw [MonoidHom.mem_ker]
+    ext x
+    have hcomm : g * (x : P) = (x : P) * g := by
+      haveI : IsCyclic C := hC_cyclic
+      have hmul : (⟨g, hg⟩ : C) * x = x * ⟨g, hg⟩ := mul_comm _ _
+      exact congrArg Subtype.val hmul
+    calc
+      ((φ g x : C) : P) = g * (x : P) * g⁻¹ := by rfl
+      _ = ((x : P) * g) * g⁻¹ := by rw [hcomm]
+      _ = (x : P) := by simp [mul_assoc]
+      _ = (((1 : MulAut C) x : C) : P) := by rfl
+  let ψ : P ⧸ C →* MulAut C := QuotientGroup.lift C φ hC_le_ker
+  letI : MulDistribMulAction (P ⧸ C) C := MulDistribMulAction.compHom C ψ
+  have hinv : ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 → q • n = n⁻¹ := by
+    intro q hq_ne hq_sq
+    obtain ⟨a, haq⟩ := QuotientGroup.mk'_surjective C q
+    have hconj :
+        a * c ^ 2 * a⁻¹ = (c ^ 2)⁻¹ :=
+      quotient_involution_conj_square_eq_inv_of_zpowers
+        hP hC_eq hCent hC_max hcyc h_order (by omega) hT_card_ne hq_ne hq_sq haq
+    apply Subtype.ext
+    calc
+      ((q • n : C) : P) = a * c ^ 2 * a⁻¹ := by
+        rw [← haq]
+        rfl
+      _ = (c ^ 2)⁻¹ := hconj
+      _ = ((n⁻¹ : C) : P) := by rfl
+  exact isCyclic_of_comm_two_group_involutions_invert_element
+    (hP.to_quotient C) hquot_comm hn_sq_ne hinv
+
 /-- **Isaacs Thm 6.12 setup**: the two `2`-adic alternatives from Lemma 6.16 are
 exactly the inversion and semidihedral-twist conjugation alternatives used by Lemma 6.13. -/
 theorem conj_eq_inv_or_twist_of_two_adic_cases
