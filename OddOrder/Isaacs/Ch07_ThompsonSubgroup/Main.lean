@@ -5299,6 +5299,98 @@ theorem matsuyama_of_simple_nonsolvable_q_two
     exact ht_ne_one
   exact OddOrder.Isaacs.Ch02.matsuyama ht_sq ht_notin
 
+/-! ### §7D Steps 2-9 — per-step decomposition of the 9-step argument
+
+The original monolithic axiom `noNonsolvableSimplePaQb` (the entire
+Goldschmidt-Bender-Matsuyama argument) is here decomposed into the individual
+textbook steps.  Steps that are provable from the landed infrastructure appear
+as theorems; the heavier steps (4, 8, 9) remain as fine-grained local axioms,
+each tracked in issue 0032.  The steps are wired together into
+`noNonsolvableSimplePaQb` (now a *theorem*) at the end. -/
+
+/-- **§7D Step 2 — complementary Sylow product** (Isaacs L3973).
+
+In a finite group of order `p^a * q^b` (`p ≠ q` prime), a Sylow `p`-subgroup
+and a Sylow `q`-subgroup are complementary: `|P| * |Q| = |G|` and they are
+disjoint, so `(P, Q)` is a complement pair.  This packages the textbook fact
+"`|PQ| = |P||Q| = |G|` since `P ∩ Q = 1`, and thus `PQ = G`". -/
+theorem sylow_isComplement_of_paqb
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (P : Sylow p H) (Q : Sylow q H) :
+    Subgroup.IsComplement' (P : Subgroup H) (Q : Subgroup H) := by
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  have hp_ne_dvd_q : ¬ p ∣ q := by
+    rw [Nat.prime_dvd_prime_iff_eq hp_prime hq_prime]; exact hpq
+  have hq_ne_dvd_p : ¬ q ∣ p := by
+    rw [Nat.prime_dvd_prime_iff_eq hq_prime hp_prime]; exact (Ne.symm hpq)
+  -- factorization of p^a * q^b at p is a, at q is b.
+  have hfact_p : (p ^ a * q ^ b).factorization p = a := by
+    rw [Nat.factorization_mul (pow_ne_zero a hp_prime.ne_zero)
+        (pow_ne_zero b hq_prime.ne_zero), Finsupp.add_apply,
+        Nat.factorization_pow_self hp_prime,
+        Nat.factorization_pow, Finsupp.smul_apply,
+        Nat.factorization_eq_zero_of_not_dvd hp_ne_dvd_q, smul_eq_mul, mul_zero, add_zero]
+  have hfact_q : (p ^ a * q ^ b).factorization q = b := by
+    rw [Nat.factorization_mul (pow_ne_zero a hp_prime.ne_zero)
+        (pow_ne_zero b hq_prime.ne_zero), Finsupp.add_apply,
+        Nat.factorization_pow_self hq_prime,
+        Nat.factorization_pow, Finsupp.smul_apply,
+        Nat.factorization_eq_zero_of_not_dvd hq_ne_dvd_p, smul_eq_mul, mul_zero, zero_add]
+  -- |P| = p ^ a, |Q| = q ^ b.
+  have hP_card : Nat.card (P : Subgroup H) = p ^ a := by
+    rw [P.card_eq_multiplicity, hH_card, hfact_p]
+  have hQ_card : Nat.card (Q : Subgroup H) = q ^ b := by
+    rw [Q.card_eq_multiplicity, hH_card, hfact_q]
+  -- |P| * |Q| = |G| and coprime ⇒ complement.
+  refine Subgroup.isComplement'_of_coprime ?_ ?_
+  · rw [hP_card, hQ_card, hH_card]
+  · rw [hP_card, hQ_card]
+    exact Nat.Coprime.pow a b (hp_prime.coprime_iff_not_dvd.mpr hp_ne_dvd_q)
+
+/-- **§7D Step 2 — join with Sylow `q` is everything** (Isaacs L3973-3978).
+
+If `P ∈ Syl_p(H)` normalizes a nontrivial subgroup `V` of a finite simple
+group `H` of order `p^a q^b`, then `⟨V, Q⟩ = H` for every `Q ∈ Syl_q(H)`.
+
+Proof (textbook): `H = PQ`, so for `g = xy` (`x ∈ P`, `y ∈ Q`),
+`V^g = V^{xy} = V^y ⊆ ⟨V,Q⟩` since `P` normalizes `V`.  Thus `⟨V,Q⟩` contains
+all `H`-conjugates of `V`; by simplicity `V^H = H`, so `⟨V,Q⟩ = H`. -/
+theorem step2_join_sylow_q_eq_top
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (P : Sylow p H) (Q : Sylow q H)
+    {V : Subgroup H} (hV_ne_bot : V ≠ ⊥)
+    (hP_norm : (P : Subgroup H) ≤ Subgroup.normalizer V) :
+    V ⊔ (Q : Subgroup H) = ⊤ := by
+  -- (Q, P) is a complement pair, so every g factors as y * x with y ∈ Q, x ∈ P.
+  have hcompl : Subgroup.IsComplement' (Q : Subgroup H) (P : Subgroup H) :=
+    (sylow_isComplement_of_paqb hpq hH_card P Q).symm
+  -- ⟨V, Q⟩ = V ⊔ Q contains all conjugates of V.
+  have h_contains : ∀ g : H, ∀ v ∈ V, g * v * g⁻¹ ∈ V ⊔ (Q : Subgroup H) := by
+    intro g v hv
+    -- Factor g = y * x, y ∈ Q, x ∈ P.
+    obtain ⟨⟨⟨y, hy⟩, ⟨x, hx⟩⟩, hyx⟩ := hcompl.2 g
+    simp only at hyx
+    subst hyx
+    -- g v g⁻¹ = (y x) v (y x)⁻¹ = y (x v x⁻¹) y⁻¹.
+    have hgvg : (y * x) * v * (y * x)⁻¹ = y * (x * v * x⁻¹) * y⁻¹ := by group
+    rw [hgvg]
+    -- x ∈ P ≤ N(V) ⇒ x * v * x⁻¹ ∈ V.
+    have hx_norm : x ∈ Subgroup.normalizer V := hP_norm hx
+    have hxvx_mem_V : x * v * x⁻¹ ∈ V :=
+      (Subgroup.mem_normalizer_iff.mp hx_norm v).mp hv
+    -- Now y * (x v x⁻¹) * y⁻¹ ∈ ⟨V, Q⟩ since x v x⁻¹ ∈ V ≤ join, y ∈ Q ≤ join.
+    have hy_join : y ∈ V ⊔ (Q : Subgroup H) := Subgroup.mem_sup_right hy
+    have hxvx_join : x * v * x⁻¹ ∈ V ⊔ (Q : Subgroup H) := Subgroup.mem_sup_left hxvx_mem_V
+    exact (V ⊔ (Q : Subgroup H)).mul_mem
+      ((V ⊔ (Q : Subgroup H)).mul_mem hy_join hxvx_join)
+      ((V ⊔ (Q : Subgroup H)).inv_mem hy_join)
+  exact eq_top_of_contains_all_conjugates_of_simple hV_ne_bot h_contains
+
 
 /-- **§7D core axiom** — *no finite simple non-solvable group has order
 dividing `p^a * q^b`*.
