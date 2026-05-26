@@ -2873,6 +2873,36 @@ theorem AbarInf_LBar_eq_bot
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 
+/-- **Step 5 conclusion synthesizer** (mmd L3874): a nontrivial, finite,
+elementary abelian, cyclic `p`-group has order exactly `p`.  Generic. -/
+theorem card_eq_prime_of_isElementaryAbelian_isCyclic_nontrivial
+    {p : ℕ} [Fact p.Prime] {H : Type*} [Group H] [Finite H] [Nontrivial H]
+    (hH_el : OddOrder.GroupTheory.IsElementaryAbelian p H) (hH_cyc : IsCyclic H) :
+    Nat.card H = p := by
+  -- Get generator; |H| = orderOf g for cyclic.
+  obtain ⟨g, hg⟩ := hH_cyc.exists_generator
+  have hzgen : Subgroup.zpowers g = ⊤ := by
+    ext x
+    exact ⟨fun _ => Subgroup.mem_top _, fun _ => hg x⟩
+  have hcard : Nat.card H = orderOf g := by
+    have hcard_zpow : Nat.card (Subgroup.zpowers g) = Nat.card H := by
+      rw [hzgen]
+      exact Nat.card_congr Subgroup.topEquiv.toEquiv
+    rw [← hcard_zpow, Nat.card_zpowers]
+  -- g^p = 1 ⇒ orderOf g ∣ p.
+  have hpow : g ^ p = 1 := hH_el.pow_eq_one g
+  have hdvd : orderOf g ∣ p := orderOf_dvd_of_pow_eq_one hpow
+  -- p prime + orderOf g ∣ p ⇒ orderOf g = 1 or p.
+  rcases (Nat.dvd_prime Fact.out).mp hdvd with h1 | hp'
+  · -- orderOf g = 1 ⇒ g = 1 ⇒ zpowers g = ⊥; but zpowers g = ⊤ (hzgen), contradict.
+    exfalso
+    have hg_eq : g = 1 := orderOf_eq_one_iff.mp h1
+    have hbot : Subgroup.zpowers g = ⊥ := by
+      rw [hg_eq, Subgroup.zpowers_one_eq_bot]
+    have hcontra : (⊤ : Subgroup H) = ⊥ := hzgen.symm.trans hbot
+    exact absurd hcontra top_ne_bot
+  · rw [hcard, hp']
+
 /-- `A ≤ P` propagates to images: `Ā ≤ P̄`.  Pure monotonicity of `Subgroup.map`. -/
 theorem map_le_map_of_le
     {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
