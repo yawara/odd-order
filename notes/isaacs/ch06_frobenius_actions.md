@@ -410,6 +410,11 @@ FT クリティカル度 + 章内依存で並べる:
   と内部の非自明 involution から異なる order-2 subgroups を作る
   `exists_distinct_subgroups_card_two_of_external_involution` と, order-2 subgroup 一意性への
   contradiction form `false_of_unique_subgroups_card_two_of_external_involution` を追加済み.
+  その内部 involution を有限 `2`-群の非自明部分群から取り出す
+  `exists_involution_mem_of_nontrivial_two_subgroup` と, 外側 involution だけを渡せば
+  一意 order-2 subgroup 仮定へ矛盾させる
+  `false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup`
+  も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

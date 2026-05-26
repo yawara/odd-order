@@ -3110,6 +3110,40 @@ The iso constructions follow mathlib's `quaternionGroupZeroEquivDihedralGroupZer
 
 /-! ### Dihedral / quaternion recognition helpers -/
 
+/-- A nontrivial subgroup of a finite `2`-group contains an involution.
+
+This is the internal-involution half of the Isaacs 6.12 → 6.11 reduction: once a
+dihedral or semidihedral alternative supplies an involution outside the cyclic index-two
+subgroup, this lemma supplies the nontrivial involution inside that subgroup. -/
+theorem exists_involution_mem_of_nontrivial_two_subgroup
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P} (hC_ne : C ≠ ⊥) :
+    ∃ z : P, z ∈ C ∧ z ^ 2 = 1 ∧ z ≠ 1 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_two : IsPGroup 2 C := hP.to_subgroup C
+  have hC_card_ne_one : Nat.card C ≠ 1 := by
+    intro hC_card
+    exact hC_ne (Subgroup.eq_bot_of_card_eq C hC_card)
+  have hC_card_gt_one : 1 < Nat.card C := by
+    have hC_pos : 0 < Nat.card C := Nat.card_pos
+    omega
+  haveI : Nontrivial C := Finite.one_lt_card_iff_nontrivial.mp hC_card_gt_one
+  obtain ⟨n, hn_pos, hC_card⟩ := hC_two.nontrivial_iff_card.mp inferInstance
+  have h_two_dvd_card : 2 ∣ Nat.card C := by
+    rw [hC_card]
+    cases n with
+    | zero => omega
+    | succ n => exact ⟨2 ^ n, by rw [pow_succ']⟩
+  obtain ⟨z, hz_order⟩ := exists_prime_orderOf_dvd_card' (G := C) 2 h_two_dvd_card
+  refine ⟨(z : P), z.2, ?_, ?_⟩
+  · have hz_sq : z ^ 2 = 1 := by
+      rw [← hz_order, pow_orderOf_eq_one]
+    exact congrArg Subtype.val hz_sq
+  · intro hz_eq_one
+    have hz_eq_one' : z = 1 := Subtype.ext hz_eq_one
+    have : orderOf z = 1 := by rw [hz_eq_one', orderOf_one]
+    exact Nat.prime_two.ne_one (hz_order.symm.trans this)
+
 /-- If a subgroup `C` contains a nontrivial involution `z` and there is another involution `a`
 outside `C`, then the ambient group has two distinct subgroups of order `2`.
 
@@ -3150,6 +3184,23 @@ theorem false_of_unique_subgroups_card_two_of_external_involution
     exists_distinct_subgroups_card_two_of_external_involution
       ha_notmem ha_sq hz_mem hz_sq hz_ne
   exact hKL_ne (hUnique K L hK_card hL_card)
+
+/-- If a finite `2`-group has a unique subgroup of order `2`, then no nontrivial subgroup `C`
+can have an involution outside it.
+
+This is the packaged 6.12 → 6.11 exclusion used for the dihedral and semidihedral
+alternatives: `C` supplies the internal involution, while the alternative supplies the external
+one. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hC_ne : C ≠ ⊥) {a : P} (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1) :
+    False := by
+  obtain ⟨z, hz_mem, hz_sq, hz_ne⟩ :=
+    exists_involution_mem_of_nontrivial_two_subgroup hP hC_ne
+  exact false_of_unique_subgroups_card_two_of_external_involution
+    hUnique ha_notmem ha_sq hz_mem hz_sq hz_ne
 
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
