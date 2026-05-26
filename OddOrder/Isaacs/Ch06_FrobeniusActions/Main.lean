@@ -3202,6 +3202,28 @@ theorem false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_
   exact false_of_unique_subgroups_card_two_of_external_involution
     hUnique ha_notmem ha_sq hz_mem hz_sq hz_ne
 
+/-- Index-two form of the external-involution obstruction.
+
+If `C` has index `2` in a finite `2`-group of order not equal to `2`, then `C` is nontrivial.
+Thus any involution outside `C` contradicts uniqueness of the subgroup of order `2`.
+This is the exact shape needed for the dihedral and semidihedral alternatives in the
+Isaacs 6.12 → 6.11 reduction. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution_of_index_two
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hC_index : C.index = 2) (hP_card_ne_two : Nat.card P ≠ 2)
+    {a : P} (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1) :
+    False := by
+  have hC_ne : C ≠ ⊥ := by
+    intro hC_bot
+    apply hP_card_ne_two
+    have hcard := C.index_mul_card
+    rw [hC_index, hC_bot, Subgroup.card_bot] at hcard
+    simpa using hcard.symm
+  exact false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
+    hP hUnique hC_ne ha_notmem ha_sq
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

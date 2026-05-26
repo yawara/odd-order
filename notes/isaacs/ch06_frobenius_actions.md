@@ -414,7 +414,9 @@ FT クリティカル度 + 章内依存で並べる:
   `exists_involution_mem_of_nontrivial_two_subgroup` と, 外側 involution だけを渡せば
   一意 order-2 subgroup 仮定へ矛盾させる
   `false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup`
-  も追加済み.
+  も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
+  直接合う
+  `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
