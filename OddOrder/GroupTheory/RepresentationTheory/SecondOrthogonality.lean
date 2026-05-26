@@ -8,6 +8,7 @@ import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Data.Complex.Basic
+import Mathlib.Data.Matrix.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
@@ -47,6 +48,9 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   for rows `IrreducibleCharacter G` and columns `ConjClasses G`.
 * `OddOrder.RepresentationTheory.characterTableEntry` — a character-table entry indexed
   by an irreducible character and a conjugacy class.
+* `OddOrder.RepresentationTheory.characterTableMatrix` — the rectangular character table.
+* `OddOrder.RepresentationTheory.characterTableSquareMatrix` — the same table reindexed
+  to a square matrix via `CharacterTableIndexing.rowColumnEquiv`.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
@@ -102,6 +106,14 @@ theorem rowCount_eq_columnCount (idx : CharacterTableIndexing G) :
     idx.rowCount = idx.columnCount :=
   idx.card_eq
 
+/-- A noncomputable equivalence between row and column index types, extracted from the
+cardinality equality in a character-table indexing package. -/
+noncomputable def rowColumnEquiv (idx : CharacterTableIndexing G) :
+    IrreducibleCharacter G ≃ ConjClasses G := by
+  letI := idx.irrFintype
+  letI := idx.classFintype
+  exact Fintype.equivOfCardEq idx.card_eq
+
 /-- Build character-table indexing data from a finite group, a finite irreducible-character
 indexing, and the cardinal equality theorem. -/
 noncomputable def ofFinite [Finite G] [Fintype (IrreducibleCharacter G)]
@@ -136,6 +148,31 @@ noncomputable def characterTableEntry
     ((χ : ClassFunction G ℂ).of_isConj
       (ConjClasses.mk_eq_mk_iff_isConj.mp
         (conjugacyClassRepresentative_mk_eq (C := ConjClasses.mk g))))
+
+/-- The character table as a rectangular matrix whose columns are conjugacy classes. -/
+noncomputable def characterTableMatrix (G : Type*) [Group G] :
+    Matrix (IrreducibleCharacter G) (ConjClasses G) ℂ :=
+  Matrix.of fun χ C => characterTableEntry χ C
+
+@[simp] theorem characterTableMatrix_apply
+    (χ : IrreducibleCharacter G) (C : ConjClasses G) :
+    characterTableMatrix G χ C = characterTableEntry χ C :=
+  rfl
+
+/-- The character table reindexed as a square matrix on irreducible characters.
+
+The column equivalence is arbitrary but fixed by `idx`; determinant/invertibility arguments
+can use this square form and transport conclusions back to `ConjClasses G`. -/
+noncomputable def characterTableSquareMatrix (idx : CharacterTableIndexing G) :
+    Matrix (IrreducibleCharacter G) (IrreducibleCharacter G) ℂ :=
+  (Matrix.reindex (Equiv.refl (IrreducibleCharacter G)) idx.rowColumnEquiv.symm)
+    (characterTableMatrix G)
+
+@[simp] theorem characterTableSquareMatrix_apply
+    (idx : CharacterTableIndexing G) (χ ψ : IrreducibleCharacter G) :
+    characterTableSquareMatrix idx χ ψ =
+      characterTableEntry χ (idx.rowColumnEquiv ψ) := by
+  simp [characterTableSquareMatrix]
 
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/

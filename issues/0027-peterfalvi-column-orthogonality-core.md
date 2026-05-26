@@ -37,6 +37,9 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   data にまとめた。
 - `characterTableEntry` and `characterTableClassColumnPairing` を追加し、
   matrix proof core が conjugacy class indexed columns を直接参照できるようにした。
+- `CharacterTableIndexing.rowColumnEquiv`, `characterTableMatrix`, and
+  `characterTableSquareMatrix` を追加し、cardinality equality から determinant /
+  invertibility 用の正方行列へ reindex する橋を用意した。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,
