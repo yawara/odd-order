@@ -2873,6 +2873,13 @@ theorem AbarInf_LBar_eq_bot
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 
+/-- `A ≤ P` propagates to images: `Ā ≤ P̄`.  Pure monotonicity of `Subgroup.map`. -/
+theorem map_le_map_of_le
+    {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {P A : Subgroup G} (hA_le_P : A ≤ P) :
+    A.map (QuotientGroup.mk' N) ≤ P.map (QuotientGroup.mk' N) :=
+  Subgroup.map_mono hA_le_P
+
 /-- **Step 2 entry / Step 7 closure**: `J(P) ≤ X` iff every elementary abelian
 maximal `E ∈ E(P)` is contained in `X`.  Pure unfold of the iSup definition. -/
 theorem thompsonJ_le_iff
