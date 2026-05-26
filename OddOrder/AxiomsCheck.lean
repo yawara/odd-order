@@ -416,6 +416,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.opCore_eq_bot_of_sylow_card_le_prime_of_not_normal
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.centralizer_oPiCore_compl_le_of_opCore_eq_bot
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.normal_of_isPGroup_index_le_prime
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms

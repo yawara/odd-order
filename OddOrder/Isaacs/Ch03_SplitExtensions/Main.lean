@@ -1696,6 +1696,66 @@ theorem oPiCore.map_le_of_surjective {G H : Type*} [Group G] [Finite G] [Group H
     fun p hp => hKpi p (Nat.primeFactors_mono (K.card_map_dvd f) Nat.card_pos.ne' hp)
   exact Subgroup.IsPiGroup.le_oPiCore hKmapPi
 
+/-- The π-Fitting series is contained in the complementary π-Fitting series.
+
+The successor step maps the quotient by `F_n(π)` onto the quotient by `F_n(π')`;
+`O_π` and `O_{π'}` are then carried into the two summands on the complementary side. -/
+theorem piFittingSeries_le_compl (π : Set ℕ) (G : Type*) [Group G] [Finite G] :
+    ∀ n, piFittingSeries π G n ≤ piFittingSeries {p | p ∉ π} G n := by
+  intro n
+  induction n with
+  | zero =>
+      rw [piFittingSeries_zero, piFittingSeries_zero]
+  | succ n ih =>
+      intro x hx
+      set π' : Set ℕ := {p | p ∉ π} with hπ'_def
+      set F : Subgroup G := piFittingSeries π G n with hF_def
+      set F' : Subgroup G := piFittingSeries π' G n with hF'_def
+      have hF_le_F' : F ≤ F' := by
+        intro y hy
+        exact ih hy
+      set Q : G ⧸ F →* G ⧸ F' :=
+        QuotientGroup.map F F' (MonoidHom.id G) hF_le_F' with hQ_def
+      have hQsurj : Function.Surjective Q := by
+        intro y
+        rcases QuotientGroup.mk'_surjective F' y with ⟨g, rfl⟩
+        exact ⟨QuotientGroup.mk' F g, by simp [Q]⟩
+      have hQ_eq : (QuotientGroup.mk' F') x = Q ((QuotientGroup.mk' F) x) := by
+        simp [Q]
+      rw [piFittingSeries_succ, Subgroup.mem_comap] at hx
+      rw [piFittingSeries_succ, Subgroup.mem_comap]
+      rw [show ({q | q ∉ π'} : Set ℕ) = π by
+        ext q
+        simp [π']]
+      change (QuotientGroup.mk' F') x ∈
+        oPiCore π' (G ⧸ F') ⊔ oPiCore π (G ⧸ F')
+      rw [hQ_eq]
+      have hxF : (QuotientGroup.mk' F) x ∈
+          oPiCore π (G ⧸ F) ⊔ oPiCore π' (G ⧸ F) := by
+        simpa [F, π', hπ'_def] using hx
+      have hMapSup :
+          (oPiCore π (G ⧸ F) ⊔ oPiCore π' (G ⧸ F)).map Q ≤
+            oPiCore π' (G ⧸ F') ⊔ oPiCore π (G ⧸ F') := by
+        calc
+          (oPiCore π (G ⧸ F) ⊔ oPiCore π' (G ⧸ F)).map Q =
+              (oPiCore π (G ⧸ F)).map Q ⊔ (oPiCore π' (G ⧸ F)).map Q := by
+            rw [Subgroup.map_sup]
+          _ ≤ oPiCore π (G ⧸ F') ⊔ oPiCore π' (G ⧸ F') :=
+            sup_le_sup (oPiCore.map_le_of_surjective π Q hQsurj)
+              (oPiCore.map_le_of_surjective π' Q hQsurj)
+          _ = oPiCore π' (G ⧸ F') ⊔ oPiCore π (G ⧸ F') := by
+            rw [sup_comm]
+      exact hMapSup ⟨_, hxF, rfl⟩
+
+/-- π-separability is symmetric under replacing `π` by its complement. -/
+theorem isPiSeparable_compl (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    (hG : IsPiSeparable π G) : IsPiSeparable {p | p ∉ π} G := by
+  rcases hG.exists_top with ⟨n, hn⟩
+  refine ⟨n, ?_⟩
+  have hle := piFittingSeries_le_compl π G n
+  rw [hn] at hle
+  exact top_le_iff.mp hle
+
 /-- `O_π` is invariant under group isomorphism. -/
 theorem oPiCore.map_eq_of_mulEquiv {G H : Type*} [Group G] [Finite G] [Group H] [Finite H]
     (π : Set ℕ) (e : G ≃* H) :

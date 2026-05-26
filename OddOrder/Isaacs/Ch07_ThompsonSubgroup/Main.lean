@@ -436,6 +436,30 @@ theorem opCore_eq_bot_of_sylow_card_le_prime_of_not_normal
   rw [← hOp_eq_P]
   infer_instance
 
+/-- Hall-Higman final-step form for Isaacs Thm 7.5.
+
+If the usual `p`-core is trivial, then Hall-Higman can be applied with
+`π = {p}'`, so the `p'`-core is self-centralizing. -/
+theorem centralizer_oPiCore_compl_le_of_opCore_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp : OddOrder.Isaacs.Ch01.opCore p G = ⊥) :
+    Subgroup.centralizer
+        (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G : Set G) ≤
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+  classical
+  set π' : Set ℕ := {q | q ∉ ({p} : Set ℕ)} with hπ'_def
+  haveI hPiSepCompl : OddOrder.Isaacs.Ch03.IsPiSeparable π' G :=
+    OddOrder.Isaacs.Ch03.isPiSeparable_compl ({p} : Set ℕ) G inferInstance
+  have hCoreCompl : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ π'} G = ⊥ := by
+    rw [show ({q | q ∉ π'} : Set ℕ) = ({p} : Set ℕ) by
+      ext q
+      simp [π']]
+    rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p]
+    exact hOp
+  simpa [π', hπ'_def] using
+    (OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G) π' hCoreCompl)
+
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
       p * (p - 1) * (p + 1) := by

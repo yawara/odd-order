@@ -237,6 +237,8 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `gl2_pSubgroup_card_le_prime` (`p`-subgroup of `GL(2,p)` has order `≤ p`) も追加済み.
   この bound と `P` 非正規性から `O_p(G)=1` へ落とす
   `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も追加済み.
+  さらに `O_p(G)=1` から Hall-Higman を `π={p}'` 側へ適用する
+  `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も追加済み.
   `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
   abelian order `p^2` へ落とす
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
@@ -300,6 +302,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    `GL(2,p)` 内の `p`-subgroup cardinality bound `gl2_pSubgroup_card_le_prime` も追加済み.
    その bound から `O_p(G)=1` に落とす bridge
    `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も利用可能.
+   final Hall-Higman step 用の `p'`-core self-centralizing bridge
+   `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も利用可能.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
 6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
