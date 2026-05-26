@@ -66,6 +66,9 @@ API がまだ不足している。
   直接使えるようにした。
 - `liesOver_conjBy` / `liesOver_conjBy_iff` を追加し、`LiesOver` が
   `G`-conjugation orbit に沿って不変であることを theorem 化した。
+- `IrreducibleCharacter.inertia`, `subgroup_le_inertia`, `inertiaQuotient`, and
+  `conjBy_eq_conjBy_iff_mul_inv_mem_inertia` を追加し、`Irr(H)` 上の orbit
+  representative equality を `g*h⁻¹ ∈ I_G(θ)` で扱えるようにした。
 - 次の小単位は、restriction constituents が単一 orbit になる Clifford core
   theorem の statement/proof 入力、または inertia induction bijection の API 化。
 

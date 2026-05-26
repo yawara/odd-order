@@ -52,6 +52,8 @@ precise statement is left as a TODO since it requires extra setup
   notation for the same nonzero restriction multiplicity.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy` — the ambient conjugation
   action on irreducible characters of a normal subgroup.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.inertia` and `inertiaQuotient` —
+  the stabilizer `I_G(θ)` and quotient `I_G(θ)/H` at the irreducible-character level.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
@@ -289,6 +291,17 @@ def conjBy (g : G) (θ : IrreducibleCharacter H) : IrreducibleCharacter H :=
       ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ) :=
   rfl
 
+@[simp] theorem conjBy_one (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) (1 : G) θ = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
+theorem conjBy_mul (g₁ g₂ : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) (g₁ * g₂) θ =
+      conjBy (G := G) (H := H) g₂ (conjBy (G := G) (H := H) g₁ θ) := by
+  apply IrreducibleCharacter.ext
+  exact ClassFunction.conjBy_mul (G := G) (H := H) g₁ g₂ (θ : ClassFunction H ℂ)
+
 @[simp] theorem conjBy_inv_conjBy (g : G) (θ : IrreducibleCharacter H) :
     conjBy (G := G) (H := H) g⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
   apply IrreducibleCharacter.ext
@@ -298,6 +311,60 @@ def conjBy (g : G) (θ : IrreducibleCharacter H) : IrreducibleCharacter H :=
     conjBy (G := G) (H := H) g (conjBy (G := G) (H := H) g⁻¹ θ) = θ := by
   apply IrreducibleCharacter.ext
   simp
+
+/-- The inertia subgroup of an irreducible character, viewed at the
+irreducible-character level. -/
+abbrev inertia (θ : IrreducibleCharacter H) : Subgroup G :=
+  ClassFunction.inertia (G := G) (H := H) (θ : ClassFunction H ℂ)
+
+@[simp] theorem mem_inertia {θ : IrreducibleCharacter H} {g : G} :
+    g ∈ inertia (G := G) (H := H) θ ↔
+      conjBy (G := G) (H := H) g θ = θ := by
+  change ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ) =
+      (θ : ClassFunction H ℂ) ↔
+        conjBy (G := G) (H := H) g θ = θ
+  constructor
+  · intro h
+    exact IrreducibleCharacter.ext h
+  · intro h
+    exact congrArg (fun η : IrreducibleCharacter H => (η : ClassFunction H ℂ)) h
+
+theorem subgroup_le_inertia (θ : IrreducibleCharacter H) :
+    H ≤ inertia (G := G) (H := H) θ :=
+  ClassFunction.subgroup_le_inertia (θ : ClassFunction H ℂ)
+
+/-- Peterfalvi's inertia quotient `I_G(θ)/H`, lifted from class functions to
+irreducible characters. -/
+abbrev inertiaQuotient (θ : IrreducibleCharacter H) :=
+  ClassFunction.inertiaQuotient (G := G) (H := H) (θ : ClassFunction H ℂ)
+
+theorem conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+    (θ : IrreducibleCharacter H) (g h : G) :
+    conjBy (G := G) (H := H) g θ = conjBy (G := G) (H := H) h θ ↔
+      g * h⁻¹ ∈ inertia (G := G) (H := H) θ := by
+  constructor
+  · intro hgh
+    rw [mem_inertia]
+    calc
+      conjBy (G := G) (H := H) (g * h⁻¹) θ =
+          conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ) :=
+            conjBy_mul (G := G) (H := H) g h⁻¹ θ
+      _ = conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) h θ) := by
+            rw [hgh]
+      _ = θ := conjBy_inv_conjBy (G := G) (H := H) h θ
+  · intro hmem
+    rw [mem_inertia] at hmem
+    have hcalc :
+        conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
+      rwa [← conjBy_mul (G := G) (H := H) g h⁻¹ θ]
+    calc
+      conjBy (G := G) (H := H) g θ =
+          conjBy (G := G) (H := H) h
+            (conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ)) := by
+            exact (conjBy_conjBy_inv (G := G) (H := H) h
+              (conjBy (G := G) (H := H) g θ)).symm
+      _ = conjBy (G := G) (H := H) h θ := by
+            rw [hcalc]
 
 variable [Fintype H] [Invertible (Nat.card H : ℂ)]
 
@@ -318,8 +385,7 @@ def HasCommonRestrictionMultiplicity (χ : IrreducibleCharacter G) : Prop :=
 /-- The cyclic inertia-quotient hypothesis from Peterfalvi §3 (1.7):
 `I_G(θ)/H` is cyclic. -/
 def HasCyclicInertiaQuotient (θ : IrreducibleCharacter H) : Prop :=
-  IsCyclic (ClassFunction.inertiaQuotient (G := G) (H := H)
-    (θ : ClassFunction H ℂ))
+  IsCyclic (inertiaQuotient (G := G) (H := H) θ)
 
 theorem RestrictionConstituentsSingleOrbit.exists_conj
     {χ : IrreducibleCharacter G}
