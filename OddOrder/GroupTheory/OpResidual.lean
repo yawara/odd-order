@@ -65,4 +65,16 @@ theorem self_le_opPi (π : Set ℕ) [Finite G] {N : Subgroup G}
     N ≤ opPi G π :=
   le_iSup_of_le ⟨N, hN_normal, hN_pi⟩ le_rfl
 
+/-- `opPi` is monotone in `π`: enlarging the allowed prime set enlarges the residual. -/
+theorem opPi_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) [Finite G] :
+    opPi G π₁ ≤ opPi G π₂ := by
+  refine iSup_le ?_
+  rintro ⟨N, hN_normal, hN_pi⟩
+  haveI := hN_normal
+  exact self_le_opPi π₂ (hN_pi.mono h)
+
+/-- The bottom subgroup is in the indexing family for `opPi`. -/
+theorem bot_le_opPi (π : Set ℕ) [Finite G] : (⊥ : Subgroup G) ≤ opPi G π :=
+  self_le_opPi π IsPiSubgroup.bot
+
 end Subgroup
