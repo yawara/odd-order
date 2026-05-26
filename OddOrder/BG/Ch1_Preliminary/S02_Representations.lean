@@ -898,23 +898,56 @@ private theorem neZero_nat_card_cast_of_isPGroup_ne_char
   have hp_dvd_q : p ∣ q := hp_prime.dvd_of_dvd_pow hp_dvd_card
   exact hq_ne_p ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp hp_dvd_q).symm
 
-/-- Maschke simple-constituent extraction for the BG Thm 2.6 q≠p branch.
+/-- Maschke cardinality bridge from a theorem-level characteristic-away
+hypothesis.
 
-For a finite q-group acting on a nonzero vector space over a field of
-characteristic `p ≠ q`, the corresponding group-algebra module has a simple
-submodule.  This packages the q-group/characteristic-away check with mathlib's
-Maschke theorem and the `Representation.asModule` bridge. -/
-private theorem exists_simple_submodule_of_isPGroup_ne_char
-    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {F : Type*} [Field F] [CharP F p]
+If no prime divisor of `|K|` is the characteristic of `F`, then `|K|` is
+nonzero in `F`.  This is the exact bridge from BG Thm 2.6(a)'s hypothesis to
+Maschke's typeclass premise. -/
+private theorem neZero_nat_card_cast_of_forall_prime_not_char
+    {F : Type*} [Field F] {K : Type*} [Group K] [Finite K]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card K → ¬ CharP F q) :
+    NeZero (Nat.card K : F) := by
+  rcases CharP.exists' F with hzero | hpos
+  · haveI : CharZero F := hzero
+    refine ⟨?_⟩
+    intro hcast
+    exact (Nat.card_pos (α := K)).ne'
+      (CharZero.cast_injective (by simpa using hcast))
+  · rcases hpos with ⟨p, hp_prime, hp_char⟩
+    haveI : CharP F p := hp_char
+    refine NeZero.of_not_dvd (R := F) (p := p) (n := Nat.card K) ?_
+    intro hp_dvd
+    exact (hchar p hp_prime.out hp_dvd) hp_char
+
+/-- Subgroup form of `neZero_nat_card_cast_of_forall_prime_not_char`.
+
+The theorem-level hypothesis in BG Thm 2.6(a) is stated for `G`; Maschke is
+applied to normal q-subgroups `K ≤ G`. -/
+private theorem neZero_nat_card_cast_of_subgroup_forall_prime_not_char
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q)
+    (K : Subgroup G) :
+    NeZero (Nat.card K : F) := by
+  exact neZero_nat_card_cast_of_forall_prime_not_char
+    (F := F) (K := K)
+    (fun q hq_prime hq_dvd =>
+      hchar q hq_prime (hq_dvd.trans (Subgroup.card_subgroup_dvd_card K)))
+
+/-- Maschke simple-constituent extraction from the exact cardinality premise.
+
+This is the Maschke core needed in BG Thm 2.6: if `|K|` is nonzero in the
+field, then the group-algebra module attached to a nonzero representation has
+a simple submodule.  Characteristic-specific lemmas below only have to supply
+this `NeZero` instance. -/
+private theorem exists_simple_submodule_of_neZero_card
+    {F : Type*} [Field F]
     {K : Type*} [Group K] [Finite K]
-    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    [NeZero (Nat.card K : F)]
     (σ : Representation F K V) :
     ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
       IsSimpleModule (MonoidAlgebra F K) N := by
-  haveI : NeZero (Nat.card K : F) :=
-    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
   letI : Module F σ.asModule := Representation.instModuleAsModule σ
   letI : Module (MonoidAlgebra F K) σ.asModule :=
@@ -932,6 +965,25 @@ private theorem exists_simple_submodule_of_isPGroup_ne_char
       (MonoidAlgebra F K) inferInstance σ.asModule
       (Representation.instAddCommGroupAsModule σ)
       (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv
+
+/-- Maschke simple-constituent extraction for the BG Thm 2.6 q≠p branch.
+
+For a finite q-group acting on a nonzero vector space over a field of
+characteristic `p ≠ q`, the corresponding group-algebra module has a simple
+submodule.  This packages the q-group/characteristic-away check with mathlib's
+Maschke theorem and the `Representation.asModule` bridge. -/
+private theorem exists_simple_submodule_of_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) :
+    ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
+      IsSimpleModule (MonoidAlgebra F K) N := by
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact exists_simple_submodule_of_neZero_card (K := K) σ
 
 /-- Scalar-instance bridge for a simple group-algebra submodule of an abelian group.
 
@@ -1035,44 +1087,29 @@ private theorem exists_rank_one_subrepresentation_of_commutative_isPGroup_ne_cha
   exact exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group
     hKcomm σ N hNsimple
 
-/-- Maschke complement extraction for the BG Thm 2.6 q≠p branch.
+/-- Maschke complement extraction from the exact cardinality premise.
 
-For a two-dimensional representation of an abelian finite q-group in
-characteristic `p ≠ q`, Maschke gives an invariant complement to a simple
-rank-one constituent.  This is the `K`-module form of the textbook line
-`V = W₁ ⊕ W₂`; the remaining ambient step is proving that normality of `K`
-makes `G` permute these two lines. -/
-private theorem exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
-    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+For a two-dimensional representation of an abelian finite group whose order is
+nonzero in the field, Maschke gives an invariant complement to a simple
+rank-one constituent.  This is the characteristic-free core behind both the
+q≠p branch and the characteristic-away branch of BG Thm 2.6(a). -/
+private theorem exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+    {F : Type*} [Field F] [IsAlgClosed F]
     {K : Type*} [Group K] [Finite K]
-    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
     (hKcomm : Std.Commutative (· * · : K → K → K))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    [NeZero (Nat.card K : F)]
     (σ : Representation F K V) (hdim : Module.finrank F V = 2) :
     ∃ W U : Subrepresentation σ,
       W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
         Module.finrank F W.toSubmodule = 1 ∧
         Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
-  haveI : NeZero (Nat.card K : F) :=
-    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
   letI : Module F σ.asModule := Representation.instModuleAsModule σ
   letI : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
   letI : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
-  have hnontriv : Nontrivial σ.asModule := by
-    change Nontrivial V
-    infer_instance
-  have hsemi :
-      @IsSemisimpleModule (MonoidAlgebra F K) inferInstance σ.asModule
-        (Representation.instAddCommGroupAsModule σ)
-        (Representation.instModuleMonoidAlgebraAsModule σ) := by
-    infer_instance
-  rcases @IsSemisimpleModule.exists_simple_submodule
-      (MonoidAlgebra F K) inferInstance σ.asModule
-      (Representation.instAddCommGroupAsModule σ)
-      (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv with
+  rcases exists_simple_submodule_of_neZero_card (K := K) σ with
     ⟨N, hNsimple⟩
   rcases (@MonoidAlgebra.Submodule.exists_isCompl F inferInstance K inferInstance
       inferInstance inferInstance σ.asModule (Representation.instAddCommGroupAsModule σ)
@@ -1118,7 +1155,72 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_isP
       hW_ne_top_sub).2
   exact ⟨W, U, hW_ne_bot, hcompl, hWdim, hQdim⟩
 
+/-- Maschke complement extraction for the BG Thm 2.6 q≠p branch.
+
+For a two-dimensional representation of an abelian finite q-group in
+characteristic `p ≠ q`, Maschke gives an invariant complement to a simple
+rank-one constituent.  This is the `K`-module form of the textbook line
+`V = W₁ ⊕ W₂`; the remaining ambient step is proving that normality of `K`
+makes `G` permute these two lines. -/
+private theorem exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    (hKcomm : Std.Commutative (· * · : K → K → K))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) (hdim : Module.finrank F V = 2) :
+    ∃ W U : Subrepresentation σ,
+      W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
+        Module.finrank F W.toSubmodule = 1 ∧
+        Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact
+    exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+      (K := K) hKcomm σ hdim
+
 /-- Maschke complement extraction packaged in the theorem-facing data shape.
+
+This is the cardinality-premise version of the rank-one data bridge.  It
+keeps the linear-algebra input aligned with Maschke's actual hypothesis,
+allowing theorem-level characteristic-away assumptions to supply `NeZero`
+without manufacturing a separate characteristic prime. -/
+private theorem exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hdim : Module.finrank F V = 2)
+    (K : Subgroup G) [NeZero (Nat.card K : F)]
+    (hKcomm : Std.Commutative (· * · : K → K → K)) :
+    ∃ W : Subrepresentation (ρ.comp K.subtype),
+    ∃ U : Subrepresentation (ρ.comp K.subtype),
+      Nonempty (Module.Free F W.toSubmodule) ∧
+      Nonempty (Module.Free F U.toSubmodule) ∧
+      Nonempty (Module.Finite F W.toSubmodule) ∧
+      Nonempty (Module.Finite F U.toSubmodule) ∧
+      Nonempty (Module.Free F (V ⧸ W.toSubmodule)) ∧
+      Nonempty (Module.Free F (V ⧸ U.toSubmodule)) ∧
+      IsCompl W.toSubmodule U.toSubmodule ∧
+      Module.finrank F W.toSubmodule = 1 ∧
+      Module.finrank F U.toSubmodule = 1 ∧
+      Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
+      Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
+  have hVpos : 0 < Module.finrank F V := by
+    rw [hdim]
+    norm_num
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  rcases exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+      (F := F) (K := K) hKcomm (ρ.comp K.subtype) hdim with
+    ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
+  rcases complement_rank_one_right_subquotients_of_finrank_two
+      W.toSubmodule U.toSubmodule hdim hcompl hdimW with
+    ⟨hdimU, hdimQU⟩
+  exact ⟨W, U, ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩,
+    ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩, hcompl, hdimW,
+    hdimU, hdimQW, hdimQU⟩
+
+/-- q≠p Maschke complement extraction packaged in the theorem-facing data shape.
 
 This strengthens `exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char`
 by also supplying the symmetric rank-one data for the complementary line and
@@ -1146,20 +1248,10 @@ private theorem exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
       Module.finrank F U.toSubmodule = 1 ∧
       Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
       Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
-  have hVpos : 0 < Module.finrank F V := by
-    rw [hdim]
-    norm_num
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
-  rcases exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
-      (p := p) (q := q) (F := F) (K := K)
-      hKq hq_ne_p hKcomm (ρ.comp K.subtype) hdim with
-    ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
-  rcases complement_rank_one_right_subquotients_of_finrank_two
-      W.toSubmodule U.toSubmodule hdim hcompl hdimW with
-    ⟨hdimU, hdimQU⟩
-  exact ⟨W, U, ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩,
-    ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩, hcompl, hdimW,
-    hdimU, hdimQW, hdimQU⟩
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+    ρ hdim K hKcomm
 
 /-- Conjugating a `K`-subrepresentation by an ambient element of `G`.
 
@@ -3339,6 +3431,31 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed
     (fun K _hKnormal _hKle hKq _hK_ne_bot hKcomm =>
       exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
         ρ hdim K hKq hq_ne_p hKcomm)
+
+/-- Algebraically closed characteristic-away determinant-core endpoint for
+BG Thm 2.6(a).
+
+If the characteristic of `F` is not any prime divisor of `|G|`, a nontrivial
+`O_q(G*)` supplies an abelian normal q-subgroup `K ≤ G*` whose order is
+nonzero in `F`; Maschke then gives the same rank-one data as in the q≠p
+branch. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
+    ρ hfaithful hodd hcore_ne_bot
+    (fun K _hKnormal _hKle _hKq _hK_ne_bot hKcomm =>
+      letI : NeZero (Nat.card K : F) :=
+        neZero_nat_card_cast_of_subgroup_forall_prime_not_char hchar K
+      exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+        ρ hdim K hKcomm)
 
 /-- Algebraically closed q≠p endpoint when the determinant is already trivial.
 

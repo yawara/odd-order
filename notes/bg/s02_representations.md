@@ -788,3 +788,15 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   well-founded induction 仮定を実際に供給した. Public
   `odd_two_dim_sylow_abelian` は `sorry` 無しで、残る依存は char-away branch
   `odd_two_dim_abelian` のみ.
+- char-away branch 用に Maschke bridge を `NeZero (Nat.card K : F)` 前提へ
+  一般化した. `exists_simple_submodule_of_neZero_card`,
+  `exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card`,
+  `exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card` が core で,
+  既存の q≠p helper は `IsPGroup` + `q ≠ p` からこの `NeZero` を供給する
+  adapter になった. さらに `odd_two_dim_abelian` の仮定
+  `∀ q, q ∣ |G| → ¬ CharP F q` から subgroup `K ≤ G` の `NeZero` を得る
+  `neZero_nat_card_cast_of_subgroup_forall_prime_not_char` と,
+  algebraically closed 版 endpoint
+  `commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway` を追加.
+  次 frontier は char-away branch 側の core spine/normalizer 制限をこの endpoint
+  へ接続し、`odd_two_dim_abelian` の public `sorry` を畳むこと.
