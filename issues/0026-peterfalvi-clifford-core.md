@@ -54,9 +54,15 @@ API がまだ不足している。
   nonzero multiplicity が ambient conjugation で保たれることを直接使えるようにした。
 - `IsRestrictionConstituent.conjBy` を追加し、conjugate 側の irreducibility が
   supply されれば restriction constituent を transport できるようにした。
-- 次の小単位は、`conjBy` が irreducible character を保つ補題、または
-  restriction constituents が単一 orbit になる Clifford core theorem の
-  statement/proof 入力。
+- `ClassFunction.conjByMulEquiv` を追加し、ambient conjugation を `H ≃* H`
+  として使えるようにした。
+- `Representation.IsIrreducible.comp_mulEquiv` と
+  `ClassFunction.IsIrreducibleCharacter.conjBy` を追加し、`conjBy` が
+  irreducible character を保つことを証明した。
+- `IsRestrictionConstituent.conjBy` から conjugate 側 irreducibility 引数を消し、
+  restriction constituent の orbit transport をそのまま使える形にした。
+- 次の小単位は、restriction constituents が単一 orbit になる Clifford core
+  theorem の statement/proof 入力、または inertia induction bijection の API 化。
 
 ## 完了条件
 

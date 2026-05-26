@@ -93,6 +93,17 @@ def conjByEquiv (g : G) : H ≃ H where
     (conjByEquiv (G := G) (H := H) g h : G) = g * (h : G) * g⁻¹ :=
   rfl
 
+/-- The group automorphism of `H` induced by conjugation by an ambient element. -/
+def conjByMulEquiv (g : G) : H ≃* H where
+  __ := conjByEquiv (G := G) (H := H) g
+  map_mul' h₁ h₂ := by
+    apply Subtype.ext
+    simp [conjByEquiv]
+
+@[simp] theorem conjByMulEquiv_apply (g : G) (h : H) :
+    (conjByMulEquiv (G := G) (H := H) g h : G) = g * (h : G) * g⁻¹ :=
+  rfl
+
 @[simp] theorem conjBy_one (θ : ClassFunction ↥H k) : conjBy (1 : G) θ = θ := by
   ext h
   simp

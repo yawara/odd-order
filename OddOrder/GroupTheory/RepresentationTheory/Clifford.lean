@@ -71,6 +71,43 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+namespace Representation
+
+variable {k : Type*} [Field k]
+variable {V : Type*} [AddCommGroup V] [Module k V]
+
+/-- Pulling a representation back along a group automorphism preserves irreducibility. -/
+theorem IsIrreducible.comp_mulEquiv
+    (ρ : Representation k G V) [Representation.IsIrreducible ρ] (e : G ≃* G) :
+    Representation.IsIrreducible (ρ.comp e.toMonoidHom) := by
+  change IsSimpleOrder (Subrepresentation (ρ.comp e.toMonoidHom))
+  refine { toNontrivial := ?_, eq_bot_or_eq_top := ?_ }
+  · refine ⟨⟨⊥, ⊤, ?_⟩⟩
+    intro hbot
+    have hsub :
+        ((⊥ : Subrepresentation (ρ.comp e.toMonoidHom)).toSubmodule) =
+          ((⊤ : Subrepresentation (ρ.comp e.toMonoidHom)).toSubmodule) :=
+      congrArg Subrepresentation.toSubmodule hbot
+    have hρbot : (⊥ : Subrepresentation ρ) = ⊤ := by
+      apply Subrepresentation.toSubmodule_injective
+      simpa using hsub
+    exact IsSimpleOrder.bot_ne_top hρbot
+  · intro W
+    let Wρ : Subrepresentation ρ := {
+      toSubmodule := W.toSubmodule
+      apply_mem_toSubmodule h {v} hv := by
+        rcases e.surjective h with ⟨h', rfl⟩
+        exact W.apply_mem_toSubmodule h' hv }
+    rcases IsSimpleOrder.eq_bot_or_eq_top Wρ with hbot | htop
+    · left
+      apply Subrepresentation.toSubmodule_injective
+      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) hbot
+    · right
+      apply Subrepresentation.toSubmodule_injective
+      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) htop
+
+end Representation
+
 namespace ClassFunction
 
 variable (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
@@ -169,13 +206,30 @@ theorem IsRestrictionConstituent.multiplicity_ne_zero
     (hθ : IsRestrictionConstituent H χ θ) : restrictionMultiplicity H χ θ ≠ 0 :=
   hθ.2
 
+omit [Fintype H] [Invertible (Nat.card H : ℂ)] in
+theorem IsIrreducibleCharacter.conjBy [H.Normal]
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) (g : G) :
+    IsIrreducibleCharacter (conjBy (G := G) (H := H) g θ) := by
+  rcases hθ with ⟨V, hVAdd, hVModule, hVFinite, ρ, hρ, hchar⟩
+  letI : AddCommGroup V := hVAdd
+  letI : Module ℂ V := hVModule
+  letI : FiniteDimensional ℂ V := hVFinite
+  let ρg : Representation ℂ H V :=
+    ρ.comp (conjByMulEquiv (G := G) (H := H) g).toMonoidHom
+  refine ⟨V, inferInstance, inferInstance, inferInstance, ρg, ?_, ?_⟩
+  · exact Representation.IsIrreducible.comp_mulEquiv ρ
+      (conjByMulEquiv (G := G) (H := H) g)
+  · funext h
+    change θ (conjByMulEquiv (G := G) (H := H) g h) = ρg.character h
+    rw [hchar]
+    rfl
+
 theorem IsRestrictionConstituent.conjBy [H.Normal]
     {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
-    (hθ : IsRestrictionConstituent H χ θ) (g : G)
-    (hirr : IsIrreducibleCharacter (conjBy (G := G) (H := H) g θ)) :
+    (hθ : IsRestrictionConstituent H χ θ) (g : G) :
     IsRestrictionConstituent H χ (conjBy (G := G) (H := H) g θ) := by
   constructor
-  · exact hirr
+  · exact IsIrreducibleCharacter.conjBy (H := H) hθ.isIrreducible g
   · rw [restrictionMultiplicity_conjBy_right (H := H) χ θ g]
     exact hθ.multiplicity_ne_zero
 
