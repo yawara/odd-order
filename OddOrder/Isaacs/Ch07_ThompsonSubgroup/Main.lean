@@ -3360,6 +3360,7 @@ noncomputable def conjActionOnZCenterOpCoreSubgroup
     Q →* MulAut ↥(zCenterOpCoreSubgroup G p) :=
   MulAut.conjNormal.comp Q.subtype
 
+
 /-- `Z(U) = Z(O_p(G))` is a `p`-group: it is a subgroup of `U = O_p(G)`,
 which is a `p`-group. -/
 theorem zCenterOpCoreSubgroup_isPGroup
@@ -3408,6 +3409,16 @@ theorem cor_4_35_for_zCenterOpCoreSubgroup
     zCenterOpCoreSubgroup_commGroup G p
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (zCenterOpCoreSubgroup_isPGroup p) hA_p' h_fix
+
+/-- If `Q ⊆ K = C_G(V)`, conjugation by elements of `Q` fixes every element
+of `V = Ω₁ Z(U)` pointwise in `G`. -/
+theorem conj_fixes_omega1ZCenterOpCore_of_le_centralizer
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q : Subgroup G}
+    (hQ_le_K : Q ≤ Subgroup.centralizer (omega1ZCenterOpCore G p : Set G))
+    (q : ↥Q) {v : G} (hv : v ∈ omega1ZCenterOpCore G p) :
+    (q : G) * v * (q : G)⁻¹ = v :=
+  conj_eq_self_of_mem_centralizer (hQ_le_K q.2) hv
 
 /-- `V ⊆ centralizer U` in `G`: since `V ⊆ Z(U)`, every element of `V`
 commutes with every element of `U`.  Used in Step 7 to argue `V * D`
