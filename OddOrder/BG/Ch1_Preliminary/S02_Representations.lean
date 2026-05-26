@@ -765,6 +765,86 @@ private theorem exists_simple_submodule_of_isPGroup_ne_char
       (Representation.instAddCommGroupAsModule σ)
       (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv
 
+/-- A simple group-algebra submodule for an abelian group gives a rank-one
+subrepresentation over an algebraically closed field.
+
+This is the scalar-instance bridge after Maschke in the BG Thm 2.6 q≠p branch:
+mathlib's commutative Schur result applies to the group-algebra submodule, then
+`Subrepresentation.ofSubmodule'` transports it back to the representation. -/
+private theorem exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group
+    {F : Type*} [Field F] [IsAlgClosed F] {K : Type*} [Group K]
+    (hKcomm : Std.Commutative (· * · : K → K → K))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (σ : Representation F K V)
+    (N : Submodule (MonoidAlgebra F K) σ.asModule)
+    (hNsimple : IsSimpleModule (MonoidAlgebra F K) N) :
+    ∃ W : Subrepresentation σ, W ≠ ⊥ ∧ Module.finrank F W.toSubmodule = 1 := by
+  let W : Subrepresentation σ := Subrepresentation.ofSubmodule' N
+  haveI : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
+  letI : Module F N :=
+    @Submodule.module' F (MonoidAlgebra F K) σ.asModule
+      inferInstance inferInstance
+      (Representation.instModuleMonoidAlgebraAsModule σ)
+      N inferInstance inferInstance (Representation.instModuleAsModule σ) inferInstance
+  letI : IsScalarTower F (MonoidAlgebra F K) N :=
+    @Submodule.isScalarTower F (MonoidAlgebra F K) σ.asModule
+      inferInstance inferInstance (Representation.instModuleMonoidAlgebraAsModule σ)
+      N inferInstance inferInstance inferInstance
+  have hfiniteN : Module.Finite F N := by
+    let NF : Submodule F σ.asModule :=
+      @Submodule.restrictScalars F (MonoidAlgebra F K) σ.asModule
+        inferInstance inferInstance inferInstance
+        (Representation.instModuleAsModule σ)
+        (Representation.instModuleMonoidAlgebraAsModule σ)
+        inferInstance inferInstance N
+    have hfiniteAs : Module.Finite F σ.asModule := .equiv σ.asModuleEquiv.symm
+    have hfiniteTop : Module.Finite F (⊤ : Submodule F σ.asModule) :=
+      @Module.Finite.top F σ.asModule inferInstance inferInstance
+        (Representation.instModuleAsModule σ) hfiniteAs
+    have hfiniteNF : Module.Finite F NF :=
+      @Submodule.finiteDimensional_of_le F σ.asModule
+        inferInstance inferInstance (Representation.instModuleAsModule σ)
+        NF ⊤ hfiniteTop le_top
+    simpa [NF, Submodule.restrictScalars] using hfiniteNF
+  haveI : IsMulCommutative K := ⟨hKcomm⟩
+  haveI : IsMulCommutative (MonoidAlgebra F K) := ⟨CommMagma.to_isCommutative⟩
+  have hNdim : Module.finrank F N = 1 :=
+    @IsSimpleModule.finrank_eq_one_of_isMulCommutative
+      (MonoidAlgebra F K) N F
+      inferInstance inferInstance inferInstance
+      inferInstance inferInstance inferInstance
+      inferInstance inferInstance hfiniteN inferInstance inferInstance
+  refine ⟨W, ?_, ?_⟩
+  · have hN_nontrivial : Nontrivial N :=
+      IsSimpleModule.nontrivial (MonoidAlgebra F K) N
+    have hW_nontrivial : Nontrivial W.toSubmodule := by
+      change Nontrivial N
+      exact hN_nontrivial
+    have hW_ne_bot : W.toSubmodule ≠ ⊥ :=
+      W.toSubmodule.nontrivial_iff_ne_bot.mp hW_nontrivial
+    intro hW_bot
+    exact hW_ne_bot (congrArg Subrepresentation.toSubmodule hW_bot)
+  · simpa [W, Subrepresentation.ofSubmodule'] using hNdim
+
+/-- Maschke + algebraic-closedness line extraction for the BG Thm 2.6 q≠p branch.
+
+For an abelian finite q-group acting on a nonzero finite-dimensional vector
+space over an algebraically closed field of characteristic `p ≠ q`, there is a
+nonzero one-dimensional subrepresentation. -/
+private theorem exists_rank_one_subrepresentation_of_commutative_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    (hKcomm : Std.Commutative (· * · : K → K → K))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) :
+    ∃ W : Subrepresentation σ, W ≠ ⊥ ∧ Module.finrank F W.toSubmodule = 1 := by
+  rcases exists_simple_submodule_of_isPGroup_ne_char hKq hq_ne_p σ with
+    ⟨N, hNsimple⟩
+  exact exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group
+    hKcomm σ N hNsimple
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]

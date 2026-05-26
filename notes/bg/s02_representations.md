@@ -99,9 +99,17 @@
   `Representation.asModule` の group-algebra module から simple constituent
   を取る. これは薄い theorem rename ではなく、BG Thm 2.6 の
   q≠p 証明で必要な「char-away ⇒ Maschke ⇒ irreducible constituent」段.
-  次の未解決点は、abelian `K` + algebraically closed `F` からこの constituent
-  を `finrank = 1` subrepresentation/subspace として戻す scalar-instance
-  bridge.
+- **2026-05-26**: 上の simple constituent を abelian `K` + algebraically
+  closed `F` で `finrank = 1` subrepresentation へ戻す
+  `exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group`
+  と、q≠p 分岐の直結入口
+  `exists_rank_one_subrepresentation_of_commutative_isPGroup_ne_char` を追加済み.
+  `Submodule.module'` / `restrictScalars` / `Subrepresentation.ofSubmodule'`
+  の scalar instance を明示し、mathlib の
+  `IsSimpleModule.finrank_eq_one_of_isMulCommutative` を group algebra の simple
+  submodule に適用してから representation 側へ戻す. 次はこの rank-one line を
+  2 次元 faithful 表現の line pair (`V = W₁ ⊕ W₂`) と odd-order line
+  permutation helper へ接続する.
 
 ## TL;DR
 
