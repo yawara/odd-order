@@ -3343,6 +3343,18 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- `V ⊆ K = C_G(V)`: abelian subgroup is contained in its own centralizer. -/
+theorem omega1ZCenterOpCore_le_centralizer_self
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    omega1ZCenterOpCore G p ≤
+      Subgroup.centralizer (omega1ZCenterOpCore G p : Set G) := by
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  have hcomm : (⟨y, hy⟩ : ↥(omega1ZCenterOpCore G p)) * ⟨x, hx⟩ =
+      ⟨x, hx⟩ * ⟨y, hy⟩ := omega1ZCenterOpCore_comm _ _
+  exact congr_arg Subtype.val hcomm
+
 /-- **Isaacs Thm 7.6 Step 6 setup** (mmd L3879): `K := C_G(V)` (where
 `V = Ω₁(Z(O_p(G)))`) is `G`-normal.  Trivial: centralizers of normal subgroups
 are normal. -/
