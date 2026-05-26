@@ -436,10 +436,14 @@ FT クリティカル度 + 章内依存で並べる:
   この bridge から, maximal normal abelian subgroup `C` は self-centralizing である
   `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. さらに self-centralizing
   cyclic `C` に対して conjugation map `P → Aut(C)` の kernel が `C` であることから
-  `P/C ↪ Aut(C)` を作り, `Aut(C)` の可換性で `P/C` 可換性を取り出す
+  `P/C ↪ Aut(C)` を作る cardinal bridge
+  `quotient_card_le_mulAut_of_self_centralizing`, および `Aut(C)` の可換性で `P/C` 可換性を取り出す
   `quotient_commutative_of_isCyclic_of_self_centralizing` も追加済み. これらを合成し,
   maximal normal cyclic `C` から直接 `P/C` 可換性を得る
   `quotient_commutative_of_maximal_normal_isCyclic` も追加済み.
+  また本文の `|C| = 4` branch は, `|Aut(C)| = 2` と `C < P` から
+  `|P/C| = 2`, `|P| = 8` を導いて Cor 6.14 に接続する
+  `dihedralOrQuaternion_of_self_centralizing_cyclic_card_four` として追加済み.
   さらに `C < P` から Ch01 Lemma 1.23 で `C.relIndex T = p` の normal intermediate
   subgroup `T` を取り, maximality で `T` 非可換まで返す
   `exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top` も追加済み.
@@ -521,7 +525,8 @@ FT クリティカル度 + 章内依存で並べる:
   maximal normal cyclic setup から `T`, self-centralizing, `|T| ≠ 8`, quotient-involution
   order-8 除外をすべて供給し, D/Q/SD 分類 surface に到達する
   `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top` も追加済み.
-  次は `|C| = 4` branch / abelian `P` branch を含めた 6.12 全体 statement への整理.
+  次は abelian `P` branch と maximal normal abelian subgroup の存在を含めた
+  6.12 全体 statement への整理.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

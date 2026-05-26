@@ -3403,6 +3403,65 @@ theorem centralizer_eq_of_maximal_normal_isMulCommutative
     exact hC_max B hB_normal hB_comm hC_lt_B
   exact le_antisymm hcent_le_C hC_le_cent
 
+private lemma conjNormal_ker_eq_of_self_centralizing
+    {P : Type*} [Group P]
+    {C : Subgroup P} [C.Normal]
+    (hCent : Subgroup.centralizer (C : Set P) = C) :
+    (MulAut.conjNormal (H := C) : P →* MulAut C).ker = C := by
+  let φ : P →* MulAut C := MulAut.conjNormal (H := C)
+  change φ.ker = C
+  ext g
+  constructor
+  · intro hg
+    rw [MonoidHom.mem_ker] at hg
+    have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro c hc
+      let cC : C := ⟨c, hc⟩
+      have hfix : φ g cC = cC := by
+        have h := congrArg (fun ψ : MulAut C => ψ cC) hg
+        simpa using h
+      have hconj : g * c * g⁻¹ = c := by
+        have hval := congrArg Subtype.val hfix
+        simpa [φ, cC] using hval
+      have hgc : g * c = c * g := by
+        calc g * c = (g * c * g⁻¹) * g := by simp [mul_assoc]
+          _ = c * g := by rw [hconj]
+      exact hgc.symm
+    simpa [hCent] using hg_cent
+  · intro hgC
+    rw [MonoidHom.mem_ker]
+    ext c
+    have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
+      simpa [hCent] using hgC
+    have hcomm : (c : P) * g = g * (c : P) :=
+      (Subgroup.mem_centralizer_iff.mp hg_cent) (c : P) c.2
+    calc ((φ g c : C) : P) = g * (c : P) * g⁻¹ := by rfl
+      _ = ((c : P) * g) * g⁻¹ := by rw [← hcomm]
+      _ = (c : P) := by simp [mul_assoc]
+      _ = (((1 : MulAut C) c : C) : P) := by rfl
+
+/-- **Isaacs Thm 6.12 setup**: if `C` is self-centralizing in `P`, then
+`|P/C| ≤ |Aut(C)|`.
+
+The conjugation homomorphism `P → Aut(C)` has kernel `C_P(C)`. Under the
+self-centralizing hypothesis this kernel is exactly `C`, so it induces an embedding
+`P/C ↪ Aut(C)`. -/
+theorem quotient_card_le_mulAut_of_self_centralizing
+    {P : Type*} [Group P] [Finite P]
+    {C : Subgroup P} [C.Normal]
+    (hCent : Subgroup.centralizer (C : Set P) = C) :
+    Nat.card (P ⧸ C) ≤ Nat.card (MulAut C) := by
+  let φ : P →* MulAut C := MulAut.conjNormal (H := C)
+  have hker : φ.ker = C := conjNormal_ker_eq_of_self_centralizing hCent
+  let ψ : P ⧸ C →* MulAut C := QuotientGroup.lift C φ (by rw [hker])
+  have hψ_inj : Function.Injective ψ := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    dsimp [ψ]
+    rw [QuotientGroup.ker_lift, hker]
+    simp
+  exact Nat.card_le_card_of_injective ψ hψ_inj
+
 /-- **Isaacs Thm 6.12 setup**: if `C` is cyclic and self-centralizing in `P`, then
 `P/C` is abelian.
 
@@ -3415,37 +3474,7 @@ theorem quotient_commutative_of_isCyclic_of_self_centralizing
     (hCent : Subgroup.centralizer (C : Set P) = C) :
     ∀ x y : P ⧸ C, x * y = y * x := by
   let φ : P →* MulAut C := MulAut.conjNormal (H := C)
-  have hker : φ.ker = C := by
-    ext g
-    constructor
-    · intro hg
-      rw [MonoidHom.mem_ker] at hg
-      have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
-        rw [Subgroup.mem_centralizer_iff]
-        intro c hc
-        let cC : C := ⟨c, hc⟩
-        have hfix : φ g cC = cC := by
-          have h := congrArg (fun ψ : MulAut C => ψ cC) hg
-          simpa using h
-        have hconj : g * c * g⁻¹ = c := by
-          have hval := congrArg Subtype.val hfix
-          simpa [φ, cC] using hval
-        have hgc : g * c = c * g := by
-          calc g * c = (g * c * g⁻¹) * g := by simp [mul_assoc]
-            _ = c * g := by rw [hconj]
-        exact hgc.symm
-      simpa [hCent] using hg_cent
-    · intro hgC
-      rw [MonoidHom.mem_ker]
-      ext c
-      have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
-        simpa [hCent] using hgC
-      have hcomm : (c : P) * g = g * (c : P) :=
-        (Subgroup.mem_centralizer_iff.mp hg_cent) (c : P) c.2
-      calc ((φ g c : C) : P) = g * (c : P) * g⁻¹ := by rfl
-        _ = ((c : P) * g) * g⁻¹ := by rw [← hcomm]
-        _ = (c : P) := by simp [mul_assoc]
-        _ = (((1 : MulAut C) c : C) : P) := by rfl
+  have hker : φ.ker = C := conjNormal_ker_eq_of_self_centralizing hCent
   let ψ : P ⧸ C →* MulAut C := QuotientGroup.lift C φ (by rw [hker])
   have hψ_inj : Function.Injective ψ := by
     rw [← MonoidHom.ker_eq_bot_iff]
@@ -4665,6 +4694,42 @@ theorem dihedralOrQuaternion_of_card_eight
         rw [h_order4]
       rw [h_half] at hQ
       exact hQ
+
+/-- **Isaacs Thm 6.12, `|C| = 4` branch**: a self-centralizing normal cyclic subgroup
+of order `4` in a nonabelian finite group forces the ambient group to have order `8`, so
+Corollary 6.14 applies. -/
+theorem dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
+    {P : Type*} [Group P] [Finite P]
+    {C : Subgroup P} [C.Normal]
+    (hC_cyclic : IsCyclic C)
+    (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_card : Nat.card C = 4)
+    (h_nonab : ∃ x y : P, x * y ≠ y * x) :
+    Nonempty (P ≃* DihedralGroup 4) ∨ Nonempty (P ≃* QuaternionGroup 2) := by
+  classical
+  have hquot_le : Nat.card (P ⧸ C) ≤ Nat.card (MulAut C) :=
+    quotient_card_le_mulAut_of_self_centralizing hCent
+  have hmulAut_card : Nat.card (MulAut C) = 2 := by
+    haveI : IsCyclic C := hC_cyclic
+    rw [IsCyclic.card_mulAut, hC_card]
+    decide
+  have hquot_le_two : Nat.card (P ⧸ C) ≤ 2 := by
+    rwa [hmulAut_card] at hquot_le
+  have hC_ne_top : C ≠ ⊤ := by
+    intro hC_top
+    have hP_cyclic : IsCyclic P := by
+      rw [← Subgroup.topEquiv.isCyclic]
+      rwa [← hC_top]
+    obtain ⟨x, y, hxy⟩ := h_nonab
+    haveI : IsCyclic P := hP_cyclic
+    exact hxy (Std.Commutative.comm x y)
+  have hquot_gt_one : 1 < Nat.card (P ⧸ C) :=
+    Finite.one_lt_card_iff_nontrivial.mpr
+      (Subgroup.nontrivial_quotient_of_ne_top hC_ne_top)
+  have hquot_card : Nat.card (P ⧸ C) = 2 := by omega
+  have hP_card : Nat.card P = 8 := by
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup C, hquot_card, hC_card]
+  exact dihedralOrQuaternion_of_card_eight hP_card h_nonab
 
 /-! ### Isaacs Lemma 6.15: characteristic elementary abelian `p²` subgroup
 

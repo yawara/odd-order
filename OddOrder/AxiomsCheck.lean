@@ -268,9 +268,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_card_le_mulAut_of_self_centralizing
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_commutative_of_isCyclic_of_self_centralizing
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_commutative_of_maximal_normal_isCyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
