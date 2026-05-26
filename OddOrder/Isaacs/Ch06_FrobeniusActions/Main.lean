@@ -3110,6 +3110,31 @@ The iso constructions follow mathlib's `quaternionGroupZeroEquivDihedralGroupZer
 
 /-! ### Dihedral / quaternion recognition helpers -/
 
+/-- If a subgroup `C` contains a nontrivial involution `z` and there is another involution `a`
+outside `C`, then the ambient group has two distinct subgroups of order `2`.
+
+This is the small bridge used to eliminate the dihedral and semidihedral alternatives when
+deducing Isaacs Thm 6.11 from Thm 6.12: those groups have an involution outside their cyclic
+index-`2` subgroup, whereas generalized quaternion groups do not. -/
+theorem exists_distinct_subgroups_card_two_of_external_involution
+    {P : Type*} [Group P] [Finite P] {C : Subgroup P} {a z : P}
+    (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1)
+    (hz_mem : z ∈ C) (hz_sq : z ^ 2 = 1) (hz_ne : z ≠ 1) :
+    ∃ K L : Subgroup P, Nat.card K = 2 ∧ Nat.card L = 2 ∧ K ≠ L := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have ha_ne : a ≠ 1 := by
+    intro ha
+    exact ha_notmem (ha ▸ C.one_mem)
+  have ha_order : orderOf a = 2 := orderOf_eq_prime (p := 2) ha_sq ha_ne
+  have hz_order : orderOf z = 2 := orderOf_eq_prime (p := 2) hz_sq hz_ne
+  refine ⟨Subgroup.zpowers a, Subgroup.zpowers z, ?_, ?_, ?_⟩
+  · rw [Nat.card_zpowers, ha_order]
+  · rw [Nat.card_zpowers, hz_order]
+  · intro h_eq
+    exact ha_notmem ((Subgroup.zpowers_le.mpr hz_mem) (by
+      rw [← h_eq]
+      exact Subgroup.mem_zpowers a))
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/

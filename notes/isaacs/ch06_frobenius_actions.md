@@ -399,6 +399,9 @@ FT クリティカル度 + 章内依存で並べる:
   `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み. 6.12 への接続として,
   ambient の order-`p` subgroup 一意性を任意の可換部分群に制限し cyclic を得る
   `IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique` も追加済み.
+  さらに 6.12 → 6.11 の dihedral / semidihedral 排除用に, cyclic subgroup 外の involution
+  と内部の非自明 involution から異なる order-2 subgroups を作る
+  `exists_distinct_subgroups_card_two_of_external_involution` を追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
