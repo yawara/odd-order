@@ -546,3 +546,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   one-dimensional」に対応する bridge. mathlib の algebra representation 側の Schur
   型結果へ、`Representation F K M` と手元の `Std.Commutative K` から渡すための
   型変換を含むので、純粋な theorem rename ではない.
+- `neZero_nat_card_cast_of_isPGroup_ne_char` を追加.
+  q≠p branch の Maschke 前提 `NeZero (Nat.card K : F)` を、`K` が q-group で
+  `CharP F p` かつ `q ≠ p` であることから作る算術 bridge. `|K| = q^n` と
+  `CharP.cast_eq_zero_iff` を接続するもので、薄い wrapper ではない.

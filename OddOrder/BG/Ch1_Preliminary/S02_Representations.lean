@@ -708,6 +708,28 @@ private theorem finrank_eq_one_of_irreducible_representation_of_commutative_grou
       inferInstance inferInstance hfinite inferInstance inferInstance
   simpa [Representation.asModule] using hmodule
 
+/-- Characteristic-away bridge for Maschke in the BG Thm 2.6 q≠p branch.
+
+If `K` is a finite q-group and the field has characteristic `p ≠ q`, then
+`|K|` is nonzero in the field.  This is the exact typeclass premise needed by
+mathlib's Maschke theorem. -/
+private theorem neZero_nat_card_cast_of_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p]
+    {K : Type*} [Group K] [Finite K]
+    (hK : IsPGroup q K) (hq_ne_p : q ≠ p) :
+    NeZero (Nat.card K : F) := by
+  refine ⟨?_⟩
+  intro hzero
+  have hp_dvd_card : p ∣ Nat.card K :=
+    (CharP.cast_eq_zero_iff F p (Nat.card K)).mp hzero
+  rcases (IsPGroup.iff_card (p := q) (G := K)).mp hK with ⟨n, hcard⟩
+  rw [hcard] at hp_dvd_card
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  have hp_dvd_q : p ∣ q := hp_prime.dvd_of_dvd_pow hp_dvd_card
+  exact hq_ne_p ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp hp_dvd_q).symm
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
