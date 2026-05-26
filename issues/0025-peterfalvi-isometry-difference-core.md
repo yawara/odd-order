@@ -50,6 +50,9 @@ created: 2026-05-25
   `signedDifference_eq_signedDifference_iff`, `signedDifference_ne` を追加し、
   §3 (1.4) の結論側 target tuple が符号付き差分に移った後も index の区別を
   失わないことを `sorry` なしで使えるようにした。
+- `difference_eq_zero_iff`, `signedDifference_eq_difference_or_neg`, and
+  `sign_smul_signedDifference` を追加し、uniform sign を外す後続計算を
+  unfold なしで進められるようにした。
 - `ClassFunction.innerSum_sub_left/right` と `inner_sub_left/right` を追加し、
   `χ_i - χ_0` 型の差分内積を後続 proof core で直接展開できるようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite

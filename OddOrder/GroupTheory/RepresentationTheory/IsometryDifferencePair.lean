@@ -118,6 +118,17 @@ theorem difference_ne_zero
   have hclass : data.classFunction i = data.classFunction 0 := sub_eq_zero.mp h
   exact hi (data.classFunction_injective hclass)
 
+theorem difference_eq_zero_iff
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.difference i = 0 ↔ i = 0 := by
+  constructor
+  · intro h
+    by_contra hi
+    exact data.difference_ne_zero hi h
+  · intro hi
+    subst hi
+    simp
+
 /-- The difference family `μ_i - μ_0` is still injective. -/
 theorem difference_injective
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] :
@@ -190,6 +201,23 @@ theorem signedDifference_ne
     data.signedDifference i ≠ data.signedDifference j := by
   intro h
   exact hij (data.signedDifference_injective h)
+
+theorem signedDifference_eq_difference_or_neg
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.signedDifference i = data.difference i ∨
+      data.signedDifference i = -data.difference i := by
+  rcases data.sign_eq with hsign | hsign
+  · left
+    simp [signedDifference, hsign]
+  · right
+    simp [signedDifference, hsign]
+
+theorem sign_smul_signedDifference
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.sign • data.signedDifference i = data.difference i := by
+  rcases data.sign_eq with hsign | hsign
+  · simp [signedDifference, hsign]
+  · simp [signedDifference, hsign]
 
 theorem sign_ne_zero (data : SignedIrreducibleDifferenceFamily G n) :
     data.sign ≠ 0 := by
