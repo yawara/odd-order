@@ -3860,7 +3860,8 @@ private theorem sup_le_centralizer_self_of_centralizing
   -- Strategy: show V ∪ D ⊆ centralizer (V ⊔ D), then by closure of centralizer.
   -- centralizer is a subgroup, so closure (V ∪ D) ⊆ centralizer (V ⊔ D).
   -- V ⊔ D = closure (V ∪ D), giving the conclusion.
-  have h_VuD_in_cent : (V : Set G) ∪ (D : Set G) ⊆ Subgroup.centralizer ((V ⊔ D : Subgroup G) : Set G) := by
+  have h_VuD_in_cent : (V : Set G) ∪ (D : Set G) ⊆
+      Subgroup.centralizer ((V ⊔ D : Subgroup G) : Set G) := by
     -- Show each element of V ∪ D commutes with every element of V ⊔ D.
     intro w hw
     rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
@@ -3942,7 +3943,7 @@ private theorem sup_isElementaryAbelian_of_centralizing
   · -- Exponent p.  In V ⊔ D, every element w has w^p = 1.
     intro w
     apply Subtype.ext
-    show (w.val : G) ^ p = 1
+    change (w.val : G) ^ p = 1
     -- w = v * d for some v ∈ V, d ∈ D.
     obtain ⟨v, hv_V, d, hd_D, hvd_eq⟩ := h_decomp w.val w.2
     rw [← hvd_eq]
