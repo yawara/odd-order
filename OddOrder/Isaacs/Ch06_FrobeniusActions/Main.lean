@@ -2857,6 +2857,57 @@ theorem isCyclic_of_frobeniusAction_of_isMulCommutative
       exact mul_comm (x : A) (y : A)⟩⟩
     exact sylow_isCyclic_of_frobeniusAction_of_isMulCommutative hFrob P
 
+/-- The contradiction step in Isaacs Thm 6.21 after the induction hypothesis has shown that
+every proper `A`-invariant subgroup of `N` lies in `K = ⟨C_N(a) | a ≠ 1⟩`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+    {A N : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A)
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ →
+        P ≤ nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N)) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let K : Subgroup N := nontrivialActionFixedByClosure φ
+  change K = ⊤
+  by_contra hK_ne_top
+  have hidx_gt : 1 < K.index := Subgroup.one_lt_index_of_ne_top hK_ne_top
+  obtain ⟨p, hp_prime, hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd (Nat.ne_of_gt hidx_gt)
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hSolvA : IsSolvable A := isSolvable_of_comm fun a b : A => mul_comm a b
+  obtain ⟨P, _hP_inv, hP_top⟩ :=
+    exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+      (A := A) (N := N) (K := K) (p := p) hCop (Or.inl hSolvA) hp_dvd
+      (by simpa [K, φ] using hproper)
+  have hN_pgroup : IsPGroup p N := by
+    have hP_pgroup : IsPGroup p (P : Subgroup N) := P.isPGroup'
+    rw [hP_top] at hP_pgroup
+    exact hP_pgroup.of_equiv Subgroup.topEquiv
+  have hN_solv : IsSolvable N := by
+    haveI : Group.IsNilpotent N := hN_pgroup.isNilpotent
+    exact IsNilpotent.to_isSolvable
+  letI : IsSolvable N := hN_solv
+  have hcomm : _root_.commutator N ≤ K :=
+    commutator_le_of_proper_invariant_le_of_isSolvable (A := A) (N := N) (K := K)
+      (by simpa [K, φ] using hproper)
+  letI : K.Normal := normal_of_commutator_le hcomm
+  have hK_inv : ∀ a : A, ∀ n ∈ K, a • n ∈ K := by
+    simpa [K, φ] using nontrivialActionFixedByClosure_invariant_of_commutative φ
+  have hCopAK : Nat.Coprime (Nat.card A) (Nat.card K) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card K)
+  have hfixed : ∀ a : A, a ≠ 1 → actionFixedBy φ a ≤ K := by
+    intro a ha
+    exact actionFixedBy_le_nontrivialActionFixedByClosure (φ := φ) ha
+  letI : MulDistribMulAction A (N ⧸ K) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction K hK_inv
+  haveI : Nontrivial (N ⧸ K) := Subgroup.nontrivial_quotient_of_ne_top hK_ne_top
+  have hFrobQuot : IsFrobeniusAction A (N ⧸ K) :=
+    quotient_isFrobeniusAction_of_fixedBy_le (A := A) (N := N) (M := K)
+      hK_inv hCopAK hfixed
+  exact hNotCyclic (isCyclic_of_frobeniusAction_of_isMulCommutative hFrobQuot)
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/

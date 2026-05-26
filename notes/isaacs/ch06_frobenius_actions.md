@@ -314,6 +314,11 @@ FT クリティカル度 + 章内依存で並べる:
   `commutator_le_of_proper_invariant_le_of_isSolvable` を追加. solvable nontrivial `N` では
   `N' < N` かつ `N'` は A-invariant なので, proper A-invariant subgroup が全て `K` に入る
   帰納仮定から `N' ≤ K` を得る.
+- **§6B / 6.21 final contradiction step**:
+  `nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le` を追加. 帰納仮定
+  (`proper A-invariant P ≤ K`) を入力に, `K < N` から A-invariant Sylow が `N` 全体,
+  `N' ≤ K`, `K ⊴ N`, `A ↷ N/K` Frobenius, abelian noncyclic Frobenius complement 禁止までを
+  本文通りに接続して `K = N` を得る.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
