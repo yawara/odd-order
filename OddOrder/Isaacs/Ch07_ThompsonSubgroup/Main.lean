@@ -3343,6 +3343,36 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- **Isaacs Thm 7.6 Step 6 prep** (mmd L3881): `Z(P) ⊆ Z(U)` (in the image
+form): under hypothesis (iv), `Z(P)` lies inside `Z(O_p(G)) = Z(U)`.
+
+`Z(P) ⊆ U` by Step 1(a) (`center_sylow_le_opCore_of_oPiCorePrime_eq_bot`),
+and any `z ∈ Z(P)` commutes with every `u ∈ U ⊆ P`. -/
+theorem center_sylow_le_zCenterOpCoreSubgroup_of_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥) (P : Sylow p G) :
+    (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype ≤
+      zCenterOpCoreSubgroup G p := by
+  rintro _ ⟨⟨z', hz'_P⟩, hz'_center, rfl⟩
+  -- z' ∈ U by Step 1(a).
+  have hz_in_U : (z' : G) ∈ OddOrder.Isaacs.Ch01.opCore p G :=
+    center_sylow_le_opCore_of_oPiCorePrime_eq_bot hOp' P
+      ⟨⟨z', hz'_P⟩, hz'_center, rfl⟩
+  -- ⟨z', hz_in_U⟩ ∈ Z(U) because z' commutes with each u ∈ U ⊆ P.
+  refine ⟨⟨(z' : G), hz_in_U⟩, ?_, rfl⟩
+  show (⟨(z' : G), hz_in_U⟩ : ↥(OddOrder.Isaacs.Ch01.opCore p G)) ∈
+      Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G)
+  rw [Subgroup.mem_center_iff]
+  intro u
+  apply Subtype.ext
+  show ((u : G) * (z' : G)) = ((z' : G) * (u : G))
+  have hu_P : (u : G) ∈ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P u.2
+  have hcomm : (⟨(u : G), hu_P⟩ : (P : Subgroup G)) * ⟨z', hz'_P⟩
+      = ⟨z', hz'_P⟩ * ⟨(u : G), hu_P⟩ :=
+    Subgroup.mem_center_iff.mp hz'_center _
+  exact congr_arg Subtype.val hcomm
+
 /-- `V ⊆ K = C_G(V)`: abelian subgroup is contained in its own centralizer. -/
 theorem omega1ZCenterOpCore_le_centralizer_self
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
