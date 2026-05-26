@@ -466,7 +466,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `H = N_{G*}(Q)` を取る段) に合わせて、
   `exists_prime_ne_dvd_card_of_not_isPGroup` と
   `exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup` を追加済み.
-  ここまでは Burnside normal complement 前の分岐選択だけを sorry-free で切り出した.
+  後者は後続の Burnside 分岐に必要な `q ∣ |G*|` も保持する.
 - 書籍の「`H` は abelian なので Burnside」という段を Ch.5 の formal entrypoint
   (`N_G(Q) ≤ C_G(Q)` から normal p-complement) に渡す bridge
   `hasNormalPComplement_of_sylow_normalizer_commutative` も追加済み.
@@ -479,6 +479,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `N = ⊥` なら complement 条件から Sylow が `⊤` なので `O_p(G) ≠ ⊥`,
   `N ≠ ⊥` なら induction で得る `O_r(N) ≠ ⊥` を ambient lift で
   `O_r(G) ≠ ⊥` に戻す.
-- 次 frontier は BG proof の group-theoretic dichotomy:
-  `G* ≠ ⊥` から Sylow normalizer / Burnside normal complement / induction を通じて
-  適切な `q` で `O_q(G*) ≠ ⊥` を得る段.
+- `G*` が p-group でない場合の step 5 全体を
+  `exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers` にまとめた.
+  残る入力は「`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian」
+  という前段 q≠p case の線形代数側と、normal complement `N` への induction 出力.
+- 次 frontier はこの spine を `determinantKernelSubgroup ρ` (`G*`) に接続し、
+  前段 q≠p case の線形代数入力
+  (`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian) を整理する段.

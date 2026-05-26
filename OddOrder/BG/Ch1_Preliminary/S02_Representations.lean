@@ -1688,7 +1688,7 @@ BG Thm 2.6 before the Burnside normal-complement/induction step. -/
 private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
     (hnot_pgroup : ¬ IsPGroup p G) :
-    ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ ∃ Q : Sylow q G,
+    ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ q ∣ Nat.card G ∧ ∃ Q : Sylow q G,
       OddOrder.Isaacs.Ch01.opCore q
         (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ := by
   rcases exists_prime_ne_dvd_card_of_not_isPGroup (p := p) (G := G) hnot_pgroup with
@@ -1696,7 +1696,8 @@ private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
   haveI : Fact q.Prime := ⟨hq_prime⟩
   haveI : Finite (Sylow q G) := inferInstance
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
-  exact ⟨q, hq_prime, hq_ne_p, Q, opCore_ne_bot_of_sylow_normalizer Q hq_dvd⟩
+  exact ⟨q, hq_prime, hq_ne_p, hq_dvd, Q,
+    opCore_ne_bot_of_sylow_normalizer Q hq_dvd⟩
 
 /-- Burnside bridge for BG Thm 2.6: an abelian Sylow normalizer gives a normal
 `p`-complement.
@@ -1751,6 +1752,35 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
     exact ⟨r, hr_prime,
       opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
         (p := r) (G := G) N hNcore_ne_bot⟩
+
+/-- BG Thm 2.6 step 5 as a group-theoretic spine.
+
+When `G` is not a `p`-group, choose `q ≠ p` and `Q ∈ Syl_q(G)`, use the
+previous `O_q(N_G(Q)) ≠ 1` branch to make `N_G(Q)` abelian, apply Burnside, and
+then return the normal-complement induction output to `G`. -/
+private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hnot_pgroup : ¬ IsPGroup p G)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p → (Q : Sylow q G) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ →
+      Std.Commutative
+        (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
+          Subgroup.normalizer ((Q : Subgroup G) : Set G) →
+          Subgroup.normalizer ((Q : Subgroup G) : Set G)))
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  rcases exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
+      (p := p) (G := G) hnot_pgroup with
+    ⟨q, hq_prime, hq_ne_p, hq_dvd, Q, hQcore_ne_bot⟩
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  haveI : Finite (Sylow q G) := inferInstance
+  have hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement q G :=
+    hasNormalPComplement_of_sylow_normalizer_commutative
+      Q (hnormalizer hq_ne_p Q hQcore_ne_bot)
+  exact exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
+    (p := q) (G := G) hq_dvd hcomp hind
 
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
