@@ -224,6 +224,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_unique_involution
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.unique_involution_of_comm_of_involutions_invert_element
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution

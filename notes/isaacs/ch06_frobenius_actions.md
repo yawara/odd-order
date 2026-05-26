@@ -422,6 +422,11 @@ FT クリティカル度 + 章内依存で並べる:
   `isCyclic_of_comm_two_group_unique_involution` も追加済み. これは pure rename ではなく,
   各 order-2 subgroup から generator involution を取り出し, element-level uniqueness で
   subgroup equality を戻す adapter.
+  続けて「全 involution が `c^2` を反転する」から quotient involution 一意性を得る
+  action-theoretic bridge
+  `unique_involution_of_comm_of_involutions_invert_element` と, それを cyclicity へ直結する
+  `isCyclic_of_comm_two_group_involutions_invert_element` も追加済み. 2 個の involution の積が
+  `c^2` を固定する一方, 仮定上は反転しなければならない, という 6.12 本文の実質部分.
   6.12 本文冒頭の maximal normal abelian subgroup argument に向けて,
   `C < C_P(C)` から Ch01 Lemma 1.23 で `C < B ≤ C_P(C)`, `C.relIndex B = p`,
   `B ⊴ P` を取り, `C ≤ Z(B)` と prime quotient cyclicity から `B` 可換を導く

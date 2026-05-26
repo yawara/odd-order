@@ -3193,6 +3193,61 @@ theorem isCyclic_of_comm_two_group_unique_involution
     rw [hL_card, Nat.card_zpowers, hy_order_P]
   rw [← hK_zpowers, ← hL_zpowers, hxy]
 
+/-- If every nontrivial involution in a commutative actor inverts a fixed element whose square
+is nontrivial, then that actor has a unique nontrivial involution.
+
+This is the action-theoretic core of the Isaacs 6.12 quotient argument: two distinct
+involutions would have a product that fixes the element, while the hypothesis says that the
+product must invert it. -/
+theorem unique_involution_of_comm_of_involutions_invert_element
+    {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+    (hcomm : ∀ a b : A, a * b = b * a) {n : N} (hn_sq_ne : n ^ 2 ≠ 1)
+    (hinv : ∀ a : A, a ≠ 1 → a ^ 2 = 1 → a • n = n⁻¹) :
+    ∀ a b : A, a ≠ 1 → a ^ 2 = 1 → b ≠ 1 → b ^ 2 = 1 → a = b := by
+  intro a b ha_ne ha_sq hb_ne hb_sq
+  by_contra hab
+  have hb_inv : b⁻¹ = b := by
+    rw [inv_eq_iff_mul_eq_one, ← sq, hb_sq]
+  have hab_prod_ne : a * b ≠ 1 := by
+    intro hprod
+    apply hab
+    calc a = a * 1 := by rw [mul_one]
+      _ = a * (b * b⁻¹) := by rw [mul_inv_cancel]
+      _ = (a * b) * b⁻¹ := by group
+      _ = b := by rw [hprod, one_mul, hb_inv]
+  have hab_prod_sq : (a * b) ^ 2 = 1 := by
+    calc (a * b) ^ 2 = a * b * (a * b) := by rw [pow_two]
+      _ = a * (b * a) * b := by group
+      _ = a * (a * b) * b := by rw [hcomm b a]
+      _ = a ^ 2 * b ^ 2 := by
+        simp [pow_two, mul_assoc]
+      _ = 1 := by rw [ha_sq, hb_sq, one_mul]
+  have ha_inv : a • n = n⁻¹ := hinv a ha_ne ha_sq
+  have hb_inv_n : b • n = n⁻¹ := hinv b hb_ne hb_sq
+  have hab_prod_inv : (a * b) • n = n⁻¹ :=
+    hinv (a * b) hab_prod_ne hab_prod_sq
+  have hab_prod_fix : (a * b) • n = n := by
+    rw [mul_smul, hb_inv_n, smul_inv', ha_inv, inv_inv]
+  have hn_eq_inv : n = n⁻¹ := hab_prod_fix.symm.trans hab_prod_inv
+  apply hn_sq_ne
+  rw [pow_two]
+  nth_rewrite 1 [hn_eq_inv]
+  exact inv_mul_cancel n
+
+/-- A finite commutative `2`-group acting with all involutions inverting a fixed element of
+square not equal to `1` is cyclic.
+
+This packages the two Isaacs 6.12 quotient steps: inversion of `c²` gives uniqueness of the
+quotient involution, and a commutative finite `2`-group with a unique involution is cyclic. -/
+theorem isCyclic_of_comm_two_group_involutions_invert_element
+    {A N : Type*} [Group A] [Finite A] [Group N] [MulDistribMulAction A N]
+    (hA : IsPGroup 2 A) (hcomm : ∀ a b : A, a * b = b * a)
+    {n : N} (hn_sq_ne : n ^ 2 ≠ 1)
+    (hinv : ∀ a : A, a ≠ 1 → a ^ 2 = 1 → a • n = n⁻¹) :
+    IsCyclic A :=
+  isCyclic_of_comm_two_group_unique_involution hA hcomm
+    (unique_involution_of_comm_of_involutions_invert_element hcomm hn_sq_ne hinv)
+
 /-- If a subgroup `C` contains a nontrivial involution `z` and there is another involution `a`
 outside `C`, then the ambient group has two distinct subgroups of order `2`.
 
