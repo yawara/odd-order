@@ -417,6 +417,12 @@ FT クリティカル度 + 章内依存で並べる:
   も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
   直接合う
   `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
+  この obstruction を具体群の D/SD alternatives に接続する
+  `false_of_unique_subgroups_card_two_of_dihedral_of_not_isCyclic` と
+  `false_of_unique_subgroups_card_two_of_semiDihedral_of_not_isCyclic` も追加済み.
+  Semidihedral 側は `OddOrder.GroupTheory.SemiDihedral` の
+  `SemiDihedralGroup.ca_zero_not_mem_zpowers_c_one` と degenerate case
+  `SemiDihedralGroup.zero_isCyclic` を使う.
   さらに 6.12 本文の「唯一の involution を持つ 2-group は cyclic」という element-level
   hypothesis を, 6.11 で共有している order-2 subgroup 一意性 route へ変換する
   `isCyclic_of_comm_two_group_unique_involution` も追加済み. これは pure rename ではなく,
@@ -546,8 +552,9 @@ FT クリティカル度 + 章内依存で並べる:
   D/Q/SD alternatives が `p = 2` を強制することから
   `isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two` と
   `isCyclic_of_subgroups_card_prime_unique_of_odd` を sorry-free 化した.
-  full 6.11 の `p = 2` case は, unique order-2 subgroup 仮定のもとで D/SD を排除し
-  quaternion-only branch を cyclic/generalized quaternion conclusion へ接続する段階が残る.
+  さらに unique order-`2` subgroup 仮定で D/SD alternatives を排除し,
+  **Isaacs Thm 6.11** full statement
+  `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` まで sorry-free 化した.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
