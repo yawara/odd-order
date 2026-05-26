@@ -2784,6 +2784,39 @@ theorem step1_c_centralizer_oPiPrime_quotient_le_self
   -- (4) Apply Hall-Higman 3.21 to `G̅` with `π = {q | q ≠ p}`.
   exact OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({q | q ≠ p} : Set ℕ) hπ'bot
 
+/-! ### §7B Step 4 setup: the subgroup `L = O_{p',p}(G)`.
+
+Following Isaacs L3835 the book sets `L̅ = O_{p'}(G̅)` (where `G̅ = G/U`,
+`U = O_p(G)`) and defines `L` to be the unique preimage of `L̅` in `G`
+containing `U`.  We work with the comap-along-`mk'` form. -/
+
+/-- `L = O_{p',p}(G)` defined as the preimage of `L̅ = O_{p'}(G̅)` along
+the quotient map `G →* G/(O_p(G))`.  This is the second term of the lower
+`p`-radical series of `G` (with `O_p` first, `O_{p'}` second). -/
+noncomputable def opPpPrimeCore (G : Type*) [Group G] [Finite G] (p : ℕ)
+    [Fact p.Prime] : Subgroup G :=
+  (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)).comap
+    (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))
+
+/-- `L = O_{p',p}(G)` is `G`-normal (comap of normal subgroup is normal). -/
+instance opPpPrimeCore_normal {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] : (opPpPrimeCore G p).Normal := by
+  unfold opPpPrimeCore
+  infer_instance
+
+/-- `U = O_p(G) ≤ L = O_{p',p}(G)`: the kernel of the quotient map lies in the
+preimage of any subgroup of the quotient. -/
+theorem oPiCore_p_le_opPpPrimeCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G ≤ opPpPrimeCore G p := by
+  unfold opPpPrimeCore
+  intro x hx
+  rw [Subgroup.mem_comap]
+  rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
+  exact (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+    (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)).one_mem
+
 /-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
 
 We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
