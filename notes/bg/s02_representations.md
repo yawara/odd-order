@@ -457,5 +457,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `G` の非自明 normal p-subgroup を作る bridge
   `sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot`
   も sorry-free.
+- q≠p 側の最初の group-theoretic bridge として、
+  非自明 normal p-subgroup から `O_p` 非自明を得る
+  `opCore_ne_bot_of_nontrivial_normal_pSubgroup` と、
+  `Q ∈ Syl_q(G)` なら `O_q(N_G(Q)) ≠ ⊥` を得る
+  `opCore_ne_bot_of_sylow_normalizer` を追加済み.
 - 次 frontier は BG proof の group-theoretic dichotomy:
-  `G* ≠ ⊥` から適切な `q` で `O_q(G*) ≠ ⊥` を得る段.
+  `G* ≠ ⊥` から Sylow normalizer / Burnside normal complement / induction を通じて
+  適切な `q` で `O_q(G*) ≠ ⊥` を得る段.

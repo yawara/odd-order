@@ -1590,6 +1590,49 @@ private theorem sylow_commutative_and_commutator_le_of_nontrivial_determinantKer
   exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
     (determinantKernelSubgroup ρ) ρ hfaithful hdet_p hdim hdet_ne_bot P
 
+/-- A nontrivial normal `p`-subgroup forces the `p`-core to be nontrivial.
+
+This is the small `O_p` bridge used twice in BG Thm 2.6: once for `O_p(G*)`,
+and once inside the normalizer of a Sylow `q`-subgroup in the `q ≠ p` branch. -/
+private theorem opCore_ne_bot_of_nontrivial_normal_pSubgroup
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite (Sylow p G)]
+    {K : Subgroup G} [K.Normal] (hK : IsPGroup p K) (hK_ne_bot : K ≠ ⊥) :
+    OddOrder.Isaacs.Ch01.opCore p G ≠ ⊥ := by
+  intro hop_bot
+  apply hK_ne_bot
+  refine le_bot_iff.mp ?_
+  intro x hx
+  rw [← hop_bot]
+  exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK hx
+
+/-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
+
+This isolates the group-theoretic part of BG Thm 2.6 where, after choosing
+`q ≠ p` and a Sylow `q`-subgroup `Q ≤ G*`, one sets `H = N_{G*}(Q)` and needs
+`O_q(H) ≠ 1`. -/
+private theorem opCore_ne_bot_of_sylow_normalizer
+    {q : ℕ} [Fact q.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow q G)]
+    (Q : Sylow q G) (hq_dvd : q ∣ Nat.card G) :
+    OddOrder.Isaacs.Ch01.opCore q
+      (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ := by
+  let N : Subgroup G := Subgroup.normalizer ((Q : Subgroup G) : Set G)
+  let QN : Sylow q N := Q.subtype Q.le_normalizer
+  haveI : Finite (Sylow q N) := inferInstance
+  haveI : (QN : Subgroup N).Normal := by
+    change ((Q : Subgroup G).subgroupOf N).Normal
+    infer_instance
+  have hQ_ne_bot : (Q : Subgroup G) ≠ ⊥ := Q.ne_bot_of_dvd_card hq_dvd
+  have hQN_ne_bot : (QN : Subgroup N) ≠ ⊥ := by
+    intro hbot
+    apply hQ_ne_bot
+    have hmap :
+        ((QN : Subgroup N).map N.subtype) = (⊥ : Subgroup N).map N.subtype := by
+      rw [hbot]
+    simpa [QN, N, Sylow.coe_subtype,
+      Subgroup.map_subgroupOf_eq_of_le Q.le_normalizer] using hmap
+  exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
+    (G := N) (K := (QN : Subgroup N)) QN.2 hQN_ne_bot
+
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
 Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
