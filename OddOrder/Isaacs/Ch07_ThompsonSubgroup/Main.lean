@@ -1188,8 +1188,9 @@ theorem gl2_pSubgroup_centralizes_of_normalizes
 **proof 戦略** (8 Step): Sylow conjugacy + GL(2,p) embedding + Hall-Higman 3.21
 + Lem 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion).
 
-本体 proof は Ch.6 6.11 完成後に着手予定. ここでは先に, proof 冒頭で必要になる
-faithful action / fixed subgroup の橋渡しだけを配置する. -/
+Ch.6 6.11 は `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` として利用可能.
+残る作業は, 下の action / fixed subgroup bridge 群を使って Thm 7.5 の本体 statement と
+book proof の contradiction assembly を Lean に載せること. -/
 
 /-! #### Thm 7.5 action infrastructure
 

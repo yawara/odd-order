@@ -251,10 +251,11 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Ch.4 4.33 / 4.35**: p-local `p'`-core 押し込みと abelian p-group coprime action 補題は利用可能.
 - ✅ **Ch.5 5.26 + `HasNormalPComplement`**: Thm 7.1 の normal p-complement 側の基礎定義・Frobenius criterion は利用可能.
 - ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
-- 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
-  - 進捗: elementary abelian order `p^2` から order-`p` subgroup 2 本を抽出する
-    shared helper と, order-`p` subgroup 一意性から elementary abelian `p^2` subgroup を
-    排除する bridge は追加済み. abelian branch / 6.9→6.10 接続の土台はできた.
+- ✅ **Ch.6 6.11**: Thm 7.5 final reduction の blocker は解消.
+  `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` として,
+  `p`-group with at most one subgroup of order `p` ⇒ cyclic / `p = 2`
+  generalized quaternion を sorry-free 化済み. 7.5 では `p ≠ 2` 仮定により cyclic
+  branch だけを使えばよい.
 - ✅ **Ch.6 6.20**: Thm 7.6 Step 5 の blocker は解消.
   `isCyclic_of_faithful_trivial_on_proper_invariant` として, Lemma 6.20 の本文通り
   6.21 から faithful abelian coprime action 補題を sorry-free 化済み.
@@ -289,7 +290,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から
      acting group 可換, よって `P` normal.
-3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
+3. ✅ **Ch.6 6.11** — 7.5 final reduction に必要な cyclic/quaternion 分岐は利用可能.
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
@@ -300,7 +301,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 10. **7.8 Burnside `p^a q^b`** — 7.6 + Ch.4 4.33 + Ch.2 2.13 Baer. **BG/Peterfalvi 直接被引用は薄いので最後**.
 
 優先度 (FT クリティカル度 + 現在の到達可能性):
-**7.5 前半補題** → **Ch.6 6.11 / Aut(E)≅GL(2,p)** → **7.5 本体** → **Ch.6 6.20** → **7.6** → **7.1 / Ch.6 backfill** → **7.8**.
+**7.5 本体 assembly** → **7.6** → **7.1 / Ch.6 backfill** → **7.8**.
 
 ## 開発時の注意点
 
