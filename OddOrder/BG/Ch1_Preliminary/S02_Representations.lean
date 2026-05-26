@@ -11,6 +11,7 @@ import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
+import Mathlib.LinearAlgebra.Charpoly.BaseChange
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.TensorProduct.Finiteness
@@ -3795,6 +3796,65 @@ private theorem baseChangeRepresentation_faithful
     (fun f : TensorProduct F K V →ₗ[K] TensorProduct F K V => f (1 ⊗ₜ[F] v)) hgh
   simpa [baseChangeRepresentation] using hmap
 
+/-- Scalar extension preserves the determinant kernel.
+
+This is the determinant compatibility needed to move the BG Thm 2.6(b) spine to
+an algebraic closure: the base-changed determinant is the algebra-map image of
+the original determinant, and field extensions have injective algebra maps. -/
+private theorem determinantKernelSubgroup_baseChangeRepresentation
+    {F : Type*} [Field F] (K : Type*) [Field K] [Algebra F K]
+    {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) :
+    determinantKernelSubgroup (baseChangeRepresentation K ρ) =
+      determinantKernelSubgroup ρ := by
+  ext g
+  rw [mem_determinantKernelSubgroup, mem_determinantKernelSubgroup]
+  constructor
+  · intro hg
+    apply Units.ext
+    apply (algebraMap F K).injective
+    have hdetF :
+        ((determinantCharacterOfRepresentation ρ g : F) =
+          LinearMap.det (ρ g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hdetK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          LinearMap.det ((baseChangeRepresentation K ρ) g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hgK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          1) := by
+      simpa using congrArg Units.val hg
+    calc
+      algebraMap F K ((determinantCharacterOfRepresentation ρ g : F))
+          = algebraMap F K (LinearMap.det (ρ g)) := by rw [hdetF]
+      _ = LinearMap.det ((ρ g).baseChange K) := by rw [LinearMap.det_baseChange]
+      _ = LinearMap.det ((baseChangeRepresentation K ρ) g) := rfl
+      _ = (determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) :=
+        hdetK.symm
+      _ = 1 := hgK
+      _ = algebraMap F K (1 : F) := by simp
+  · intro hg
+    apply Units.ext
+    have hdetF :
+        ((determinantCharacterOfRepresentation ρ g : F) =
+          LinearMap.det (ρ g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hdetK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          LinearMap.det ((baseChangeRepresentation K ρ) g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hgF : ((determinantCharacterOfRepresentation ρ g : F) = 1) := by
+      simpa using congrArg Units.val hg
+    calc
+      (determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K)
+          = LinearMap.det ((baseChangeRepresentation K ρ) g) := hdetK
+      _ = LinearMap.det ((ρ g).baseChange K) := rfl
+      _ = algebraMap F K (LinearMap.det (ρ g)) := by rw [LinearMap.det_baseChange]
+      _ = algebraMap F K ((determinantCharacterOfRepresentation ρ g : F)) := by rw [hdetF]
+      _ = 1 := by simp [hgF]
+
 /-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
 
 This keeps the remaining induction hypothesis explicit but moves the field
@@ -3831,6 +3891,31 @@ private theorem
   exact
     sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction
       ρK hfaithfulK hodd hdimK hind P
+
+/-- Algebraic-closure reduction with the induction hypothesis stated on the
+original determinant kernel.
+
+The preceding determinant-kernel compatibility identifies the determinant
+kernel after scalar extension with the original `G*`, so the theorem-facing
+induction hypothesis no longer has to mention the base-changed representation. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ →
+        ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  refine
+    sylow_commutative_and_commutator_le_of_algebraicClosure_induction
+      ρ hfaithful hodd hdim ?_ P
+  rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+  exact hind
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup

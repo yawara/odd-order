@@ -213,6 +213,16 @@
   単純 wrapper ではない. 残 frontier は determinant-kernel subgroup と
   base-changed representation の互換性、および theorem 本体から induction 仮定
   `hind` を供給する段.
+- **2026-05-26**: base-change 後の determinant-kernel 互換性を
+  `determinantKernelSubgroup_baseChangeRepresentation` として証明した.
+  `LinearMap.det_baseChange` と field extension の injective algebraMap を使い、
+  `G*` が scalar extension で変わらないことを示す bridge で、薄い wrapper ではない.
+  さらに `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  で、algebraic-closure reduction の induction 仮定を base-changed `G*` ではなく
+  元の `determinantKernelSubgroup ρ` 上に戻した. 残 frontier は theorem 本体で
+  この original-kernel induction 仮定をどう供給するか、および
+  `odd_two_dim_sylow_abelian` の最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch へ
+  接続する段.
 
 ## TL;DR
 
