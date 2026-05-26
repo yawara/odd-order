@@ -557,7 +557,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 優先度判定
 
-1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. 現在 active. fixed-vector dependency と p-power torsion helper は完成、`odd_two_dim_sylow_abelian` も strong induction で sorry-free. 残りは `odd_two_dim_abelian` の char-away branch.
+1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. `odd_two_dim_abelian` / `odd_two_dim_sylow_abelian` は Lean 上で sorry-free.
 2. **Prop 2.4 (eigenspace)** ★★★ — Thm 2.5 の前提になる線型代数節.
 3. **Prop 2.1 (Schur + 既約)** ★★ — mathlib 基礎 API を活用できるが、Jacobson density 周辺は要注意.
 4. **Thm 2.5 (extraspecial)** ★★★ — §3 で使用. extraspecial 理論と Prop 2.4 に依存する高難度枠.
@@ -571,7 +571,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - **中期 path**: Prop 2.4 → Thm 2.5 → Prop 2.1.
 - **blocker path**: Prop 2.2 は Isaacs Ch.6 §6F Clifford 完成後に本実装.
 
-**推奨**: 現在は Thm 2.6 を続行. full theorem proof の前に、再利用できる小補題を 1–2 個ずつ sorry-free で積む.
+**推奨**: Thm 2.6 は閉じたため、次は Prop 2.4 (eigenspace) へ移る.
 
 ---
 
@@ -823,3 +823,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `O_r(G*) ≠ ⊥` を algebraic-closure Maschke endpoint へ渡す.
   次 frontier は public `odd_two_dim_abelian` 本体で normalizer branch と
   proper subgroup induction 出力を供給し、この char-away spineへ接続すること.
+- public `odd_two_dim_abelian` を strong induction へ接続して sorry-free 化.
+  `commutative_of_determinantKernel_core_spine_isAlgClosed_charAway` で
+  algebraically closed 上の normalizer branch を自動供給し、
+  `commutative_of_determinantKernel_core_spine_algebraicClosure_charAway` で
+  元の体から algebraic closure へ faithful 性・次元・determinant kernel・`hind`
+  を輸送する. `odd_two_dim_abelian_strong_induction` は proper normal
+  `N < G*` に帰納仮定を適用し、可換性から nontrivial prime core を作る.
+  これにより §2F Thm 2.6 (a)(b) は Lean 上で actual `sorry` 無し.

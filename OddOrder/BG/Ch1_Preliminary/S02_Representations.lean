@@ -4346,6 +4346,80 @@ private theorem commutative_of_determinantKernel_core_spine_charAway
   exact commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
     ρ hfaithful hodd hdim hchar hcore_ne_bot
 
+/-- Algebraically closed characteristic-away determinant-kernel spine with the
+normalizer branch closed.
+
+The normalizer step is supplied by restricting the representation to
+`N_{G*}(Q)`, where the determinant is trivial.  The remaining input is only the
+proper-normal-subgroup induction output inside `G*`. -/
+private theorem commutative_of_determinantKernel_core_spine_isAlgClosed_charAway
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_determinantKernel_core_spine_charAway
+    ρ hfaithful hodd hdim hchar hdet_ne_bot
+    (fun {q} _hq_prime Q hQcore =>
+      determinantKernel_sylow_normalizer_commutative_of_isAlgClosed_charAway
+        (q := q) ρ hfaithful hodd hdim hchar Q hQcore)
+    hind
+
+/-- Algebraic-closure reduction for the characteristic-away determinant-kernel
+spine, with the induction hypothesis stated on the original determinant kernel.
+
+This is the theorem-facing bridge for BG Thm 2.6(a): scalar extension preserves
+faithfulness, dimension, and the determinant kernel, so the algebraically closed
+normalizer branch can be used without changing the group-theoretic spine. -/
+private theorem commutative_of_determinantKernel_core_spine_algebraicClosure_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  let ρK : Representation (AlgebraicClosure F) G
+      (TensorProduct F (AlgebraicClosure F) V) :=
+    baseChangeRepresentation (AlgebraicClosure F) ρ
+  have hfaithfulK : Function.Injective ρK := by
+    simpa [ρK] using
+      baseChangeRepresentation_faithful (AlgebraicClosure F) ρ hfaithful
+  have hdimK :
+      Module.finrank (AlgebraicClosure F)
+        (TensorProduct F (AlgebraicClosure F) V) = 2 := by
+    exact
+      (Module.finrank_baseChange (R := AlgebraicClosure F) (S := F) (M' := V)).trans hdim
+  have hdetK_ne_bot : determinantKernelSubgroup ρK ≠ ⊥ := by
+    change
+      determinantKernelSubgroup (baseChangeRepresentation (AlgebraicClosure F) ρ) ≠ ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hdet_ne_bot
+  have hindK :
+      ∀ N : Subgroup (determinantKernelSubgroup ρK),
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+          ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥ := by
+    change
+      ∀ N : Subgroup
+          (determinantKernelSubgroup
+            (baseChangeRepresentation (AlgebraicClosure F) ρ)),
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+          ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hind
+  exact
+    commutative_of_determinantKernel_core_spine_isAlgClosed_charAway
+      ρK hfaithfulK hodd hdimK (charAway_algebraicClosure hchar)
+      hdetK_ne_bot hindK
+
 /-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
 
 This keeps the remaining induction hypothesis explicit but moves the field
@@ -4482,20 +4556,6 @@ private theorem odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs
       (determinantKernel_hind_of_odd_two_dim_induction_outputs
         ρ hfaithful hodd hdim hab_ind hsyl_ind) P
 
-/-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
-faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
-
-stub: 詳細 proof は §2F section docstring の "證明梗概" 参照. -/
-theorem odd_two_dim_abelian
-    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
-    (_hodd : Odd (Nat.card G))
-    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
-    (_hdim : Module.finrank F V = 2) (ρ : Representation F G V)
-    (_hfaithful : Function.Injective ρ)
-    (_hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
-    Std.Commutative (· * · : G → G → G) := by
-  sorry
-
 /-- Finite subgroup cardinality strictly drops for a proper subgroup. -/
 private lemma subgroup_card_lt_of_lt_top
     {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H < ⊤) :
@@ -4506,6 +4566,72 @@ private lemma subgroup_card_lt_of_lt_top
   have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
     hH.ne (Subgroup.eq_top_of_card_eq _ heq)
   exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- Strong-induction form of BG Thm 2.6(a).
+
+The determinant-kernel branch uses the characteristic-away core spine.  Proper
+normal subgroups of `G*` are handled by the induction hypothesis and then
+converted into a nontrivial prime core. -/
+private theorem odd_two_dim_abelian_strong_induction
+    {F : Type*} [Field F]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G],
+      Nat.card G = n → Odd (Nat.card G) → Module.finrank F V = 2 →
+      (ρ : Representation F G V) → Function.Injective ρ →
+      (∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) →
+      Std.Commutative (· * · : G → G → G) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro G _ _ hcard hodd hdim ρ hfaithful hchar
+    by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+    · exact commutative_of_determinantKernel_eq_bot ρ hdet_bot
+    · refine
+        commutative_of_determinantKernel_core_spine_algebraicClosure_charAway
+          ρ hfaithful hodd hdim hchar hdet_bot ?_
+      intro N hNnormal hN_ne_bot hN_ne_top
+      let Gstar : Subgroup G := determinantKernelSubgroup ρ
+      let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
+      haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+      have hfaithfulN : Function.Injective ρN := by
+        intro x y hxy
+        apply Subtype.ext
+        apply Subtype.ext
+        exact hfaithful (by simpa [ρN, Gstar] using hxy)
+      have hN_dvd_Gstar : Nat.card N ∣ Nat.card Gstar :=
+        Subgroup.card_subgroup_dvd_card N
+      have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+        Subgroup.card_subgroup_dvd_card Gstar
+      have hoddN : Odd (Nat.card N) :=
+        hodd.of_dvd_nat (hN_dvd_Gstar.trans hGstar_dvd_G)
+      have hcharN :
+          ∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q := by
+        intro q hq_prime hq_dvd
+        exact hchar q hq_prime (hq_dvd.trans (hN_dvd_Gstar.trans hGstar_dvd_G))
+      have hN_card_lt_Gstar : Nat.card N < Nat.card Gstar := by
+        have hN_lt_top : N < ⊤ := lt_top_iff_ne_top.mpr hN_ne_top
+        exact subgroup_card_lt_of_lt_top hN_lt_top
+      have hGstar_card_le_G : Nat.card Gstar ≤ Nat.card G :=
+        Subgroup.card_le_card_group Gstar
+      have hN_card_lt_G : Nat.card N < Nat.card G :=
+        lt_of_lt_of_le hN_card_lt_Gstar hGstar_card_le_G
+      have hNcomm : Std.Commutative (· * · : N → N → N) :=
+        ih (Nat.card N) (by simpa [hcard] using hN_card_lt_G)
+          (G := N) rfl hoddN hdim ρN hfaithfulN hcharN
+      exact exists_prime_opCore_ne_bot_of_commutative hNcomm
+
+/-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
+faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian. -/
+theorem odd_two_dim_abelian
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (hodd : Odd (Nat.card G))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
+    Std.Commutative (· * · : G → G → G) :=
+  odd_two_dim_abelian_strong_induction
+    (F := F) (V := V) (Nat.card G) (G := G) rfl hodd hdim ρ hfaithful hchar
 
 /-- Strong-induction form of BG Thm 2.6(b), using Thm 2.6(a) for the
 characteristic-away branch on proper subgroups.
