@@ -246,9 +246,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   - 進捗: elementary abelian order `p^2` から order-`p` subgroup 2 本を抽出する
     shared helper と, order-`p` subgroup 一意性から elementary abelian `p^2` subgroup を
     排除する bridge は追加済み. abelian branch / 6.9→6.10 接続の土台はできた.
-- 🔴 **Ch.6 6.20**: Thm 7.6 Step 5 の blocker. abelian coprime action 補題.
-  - 進捗: finite abelian group の Sylow がすべて cyclic なら cyclic (`IsZGroup` bridge) と,
-    非 cyclic abelian group から非 cyclic Sylow を抽出する helper は追加済み.
+- ✅ **Ch.6 6.20**: Thm 7.6 Step 5 の blocker は解消.
+  `isCyclic_of_faithful_trivial_on_proper_invariant` として, Lemma 6.20 の本文通り
+  6.21 から faithful abelian coprime action 補題を sorry-free 化済み.
 - ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
   automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
   `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
@@ -276,7 +276,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
-6. 🔴 **Ch.6 6.20** — 7.6 Step 5 の直接前提.
+6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
 8. **7.1 Thompson normal p-complement** — Ch.5 5.26 + 7.6 + 7.7. Ch.6 6.23 をここから backfill.
 9. **Ch.6 6.23 / 6.24 backfill** — 7.1 から Thompson char-X 版と Frobenius kernel nilpotent を完備化.
