@@ -107,6 +107,19 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   `characterTableColumnPairing_conj`,
   `characterTableColumnPairing_not_conj` から `sorry` なしで導く形にした。
 
+### Remaining input-supply blockers
+
+`column_orthogonality_cases_ofRowOrthogonality` is now the closest `sorry`-free
+entry point to the public theorem.  Closing `column_orthogonality_cases` requires:
+
+- a `CharacterTableIndexing G` package from the public assumptions, i.e. a finite
+  `IrreducibleCharacter G` indexing plus
+  `Fintype.card (IrreducibleCharacter G) = Fintype.card (ConjClasses G)`;
+- `CharacterTableRowOrthogonality (G := G)`.  mathlib has
+  `Representation.char_orthonormal`, but the local `IrreducibleCharacter` API still
+  needs the bridge from witness representations to equality of class functions /
+  representation equivalence before this can be used directly.
+
 ## 完了条件
 
 - `OddOrder.RepresentationTheory.column_orthogonality_cases` から `sorry` が消える。
