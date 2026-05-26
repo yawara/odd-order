@@ -4608,43 +4608,482 @@ section /- 7D: Burnside p^a q^b -/
 BG/Peterfalvi 直接被引用無いので最後着手. Phase 1 完成度のため必須 (BG L2633 で
 "we can obtain Burnside's `p^a q^b` very easily now" として言及). -/
 
-/-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability, conditional on 9-step argument).
+/-! ### §7D scaffolding — `IsPCentral`, `IsPType`, helper lemmas
 
-The full theorem (Isaacs L3955) states:
+We formalize the supporting machinery of Isaacs' §7D proof.  These definitions
+are local to §7D (Burnside `p^a q^b`); the term "p-central element" appears
+informally in the textbook on p.220 and does not have a mathlib analog. -/
+
+/-- **Isaacs p.220** (definition of *p-central element*).
+
+`x` is `p`-central if it is a nonidentity element of the center of some Sylow
+`p`-subgroup of `G`.  Used in §7D Steps 4-9.
+
+The condition is phrased via `(Subgroup.center P).map P.subtype` so that the
+membership predicate lives in the ambient group `G`. -/
+def IsPCentral (p : ℕ) {G : Type*} [Group G] (x : G) : Prop :=
+  x ≠ 1 ∧ ∃ P : Sylow p G,
+    x ∈ (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype
+
+/-- **Isaacs p.219** (definition of *p-type maximal subgroup*).
+
+A maximal subgroup `M` of `G` is `p`-type if `O_p(M) ≠ ⊥` (where `O_p(M)`
+denotes the largest normal `p`-subgroup of `M` as a group in its own right).
+In Isaacs §7D this notion partitions the maximal subgroups of a simple group
+of order `p^a q^b` into two flavors. -/
+def IsPType (p : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
+  IsCoatom M ∧ OddOrder.Isaacs.Ch01.opCore p ↥M ≠ ⊥
+
+/-- Dual of `IsPType` with roles of `p` and `q` swapped (just a convenience
+re-export of `IsPType q`). -/
+abbrev IsQType (q : ℕ) {G : Type*} [Group G] (M : Subgroup G) : Prop :=
+  IsPType q M
+
+/-- A group whose order is a `{p, q}`-number: `|G| = p^a * q^b`. -/
+def IsPaQbOrder (p q : ℕ) (G : Type*) [Group G] : Prop :=
+  ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b
+
+/-- A `p`-central element is nonidentity. -/
+theorem IsPCentral.ne_one {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) : x ≠ 1 := hx.1
+
+/-- A `p`-central element lies in the center of some Sylow `p`-subgroup. -/
+theorem IsPCentral.mem_center {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) :
+    ∃ P : Sylow p G,
+      x ∈ (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype :=
+  hx.2
+
+/-- A `p`-central element of `G` lies in the chosen Sylow `p`-subgroup `P`. -/
+theorem IsPCentral.mem_sylow {G : Type*} [Group G] {p : ℕ} {x : G}
+    (hx : IsPCentral p x) :
+    ∃ P : Sylow p G, x ∈ (P : Subgroup G) := by
+  obtain ⟨P, hP_mem⟩ := hx.2
+  refine ⟨P, ?_⟩
+  obtain ⟨⟨y, hy⟩, _, rfl⟩ := hP_mem
+  exact hy
+
+-- Note: `IsPCentral.conj` (conjugation preserves p-central) would be a
+-- natural lemma but its proof requires careful threading of Sylow
+-- conjugation (`Sylow.coe_subgroup_smul`) which is somewhat involved.
+-- Deferred until needed in Step 4.
+
+/-- **Step 1 reduction** — turn the `hMinCounterexample` data into the
+statement "`H` is simple".
+
+`hMinCounterexample` says that every proper normal subgroup of `H` is solvable
+and every proper quotient is solvable.  Combined with the existence theorem for
+solvable extensions (`solvable_of_ker_le_range`), this forces `H` to have no
+nontrivial proper normal subgroup, i.e., `H` is simple. -/
+theorem isSimpleGroup_of_minCounterexample
+    {H : Type*} [Group H] [Nontrivial H]
+    (hH_nsol : ¬ IsSolvable H)
+    (hN_solvable : ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N)
+    (hQ_solvable : ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) :
+    IsSimpleGroup H := by
+  refine ⟨fun N hN_norm => ?_⟩
+  by_contra h_not_bot_top
+  push Not at h_not_bot_top
+  obtain ⟨h_ne_bot, h_ne_top⟩ := h_not_bot_top
+  -- N solvable as subgroup
+  have hN_sol : IsSolvable N := hN_solvable N h_ne_top hN_norm
+  -- H/N solvable as quotient
+  have hQ_sol : IsSolvable (H ⧸ N) := hQ_solvable N h_ne_bot
+  -- Build H solvable from extension: N → H → H/N
+  have hH_sol : IsSolvable H := by
+    -- Use f = N.subtype, g = mk' N.  ker g = N = range f.
+    refine solvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N) ?_
+    rw [QuotientGroup.ker_mk']
+    exact N.range_subtype.ge
+  exact hH_nsol hH_sol
+
+/-- Helper: the order of a finite nontrivial subgroup is positive. -/
+private theorem Nat.card_pos_of_finite {H : Type*} [Group H] [Finite H] :
+    0 < Nat.card H := Nat.card_pos
+
+/-- **Isaacs §7D Step "preliminary"**: a finite nonsolvable group is not a
+`p`-group.
+
+If `H` were a `p`-group it would be nilpotent (mathlib `IsPGroup.isNilpotent`)
+hence solvable, contradicting non-solvability. -/
+private theorem not_isPGroup_of_nonsolvable {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] (hH_nsol : ¬ IsSolvable H) :
+    ¬ IsPGroup p H := by
+  intro h_pgroup
+  haveI : Group.IsNilpotent H := h_pgroup.isNilpotent
+  exact hH_nsol inferInstance
+
+/-- **§7D helper**: in a finite simple non-solvable group, the `r`-core is
+trivial for every prime `r`.
+
+In a simple group, the normal subgroup `O_r(G)` is either `⊥` or `⊤`.  If it
+were `⊤` then `G` would be an `r`-group, hence nilpotent and solvable,
+contradicting non-solvability. -/
+theorem opCore_eq_bot_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H] {r : ℕ} [Fact r.Prime]
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    OddOrder.Isaacs.Ch01.opCore r H = ⊥ := by
+  haveI := OddOrder.Isaacs.Ch01.opCore.normal r H
+  rcases Subgroup.Normal.eq_bot_or_eq_top
+    (OddOrder.Isaacs.Ch01.opCore.normal r H) with h | h
+  · exact h
+  · exfalso
+    -- opCore r H = ⊤ ⇒ H is an r-group ⇒ solvable, contradiction.
+    have h_top_pgroup : IsPGroup r ↥(OddOrder.Isaacs.Ch01.opCore r H) :=
+      OddOrder.Isaacs.Ch01.opCore_isPGroup r H
+    -- Top equivalence: ⊤ subgroup of H is equivalent to H itself.
+    have h_iso : OddOrder.Isaacs.Ch01.opCore r H ≃* H := by
+      have hEq : OddOrder.Isaacs.Ch01.opCore r H = ⊤ := h
+      exact (MulEquiv.subgroupCongr hEq).trans Subgroup.topEquiv
+    have hH_pgroup : IsPGroup r H := h_top_pgroup.of_equiv h_iso
+    exact not_isPGroup_of_nonsolvable hH_nsol hH_pgroup
+
+/-- **§7D helper**: in a finite simple non-solvable group, the order is
+divisible by at least 2 distinct primes.
+
+This is immediate from `not_isPGroup_of_nonsolvable`: if only one prime
+divided `|H|`, then `|H| = r^n` (by unique factorization), so `H` is an
+`r`-group by `IsPGroup.of_card`, hence solvable. -/
+theorem two_primes_dvd_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H]
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    ∃ r₁ r₂ : ℕ, r₁.Prime ∧ r₂.Prime ∧ r₁ ≠ r₂ ∧
+      r₁ ∣ Nat.card H ∧ r₂ ∣ Nat.card H := by
+  classical
+  by_contra h_not_two
+  push Not at h_not_two
+  haveI : Nontrivial H := (inferInstance : IsSimpleGroup H).toNontrivial
+  have hH_card_gt : 1 < Nat.card H := Finite.one_lt_card
+  -- Pick any prime divisor.
+  obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hH_card_gt.ne'
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  -- Every prime divisor equals r.
+  have hr_only : ∀ s ∈ Nat.primeFactorsList (Nat.card H), s = r := by
+    intro s hs
+    obtain ⟨hs_prime, hs_dvd⟩ := (Nat.mem_primeFactorsList Nat.card_pos.ne').mp hs
+    by_contra hsr
+    exact h_not_two r s hr_prime hs_prime (Ne.symm hsr) hr_dvd hs_dvd
+  -- Then |H| = r^|primeFactorsList H| via IsPGroup.iff_card mpr argument.
+  have h_eq : Nat.card H = r ^ (Nat.card H).primeFactorsList.length := by
+    have hH_ne : Nat.card H ≠ 0 := Nat.card_pos.ne'
+    rw [← List.prod_replicate, ← List.eq_replicate_of_mem hr_only,
+        Nat.prod_primeFactorsList hH_ne]
+  have hH_pgroup : IsPGroup r H := IsPGroup.of_card h_eq
+  exact not_isPGroup_of_nonsolvable hH_nsol hH_pgroup
+
+/-- **§7D helper** (specialization): a simple non-solvable group of order
+dividing `p^a * q^b` (with `p ≠ q` prime) has its order divisible by both
+`p` and `q`. -/
+theorem p_and_q_dvd_card_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b) :
+    p ∣ Nat.card H ∧ q ∣ Nat.card H := by
+  obtain ⟨r₁, r₂, hr₁_prime, hr₂_prime, hr_ne, hr₁_dvd, hr₂_dvd⟩ :=
+    two_primes_dvd_of_simple_nonsolvable hH_simple hH_nsol
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- Each rᵢ divides p^a * q^b, so by Nat.Prime.dvd_mul rᵢ ∈ {p, q}.
+  have hr_in : ∀ r : ℕ, r.Prime → r ∣ Nat.card H → r = p ∨ r = q := by
+    intro r hr_prime hr_dvd_H
+    have hr_dvd : r ∣ p ^ a * q ^ b := hr_dvd_H.trans hH_dvd
+    rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd with hp_branch | hq_branch
+    · left
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp
+        (hr_prime.dvd_of_dvd_pow hp_branch)
+    · right
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp
+        (hr_prime.dvd_of_dvd_pow hq_branch)
+  -- We have r₁ ≠ r₂, each ∈ {p, q}. Therefore {r₁, r₂} = {p, q}.
+  rcases hr_in r₁ hr₁_prime hr₁_dvd with hr₁p | hr₁q
+  · rcases hr_in r₂ hr₂_prime hr₂_dvd with hr₂p | hr₂q
+    · exact absurd (hr₁p.trans hr₂p.symm) hr_ne
+    · exact ⟨hr₁p ▸ hr₁_dvd, hr₂q ▸ hr₂_dvd⟩
+  · rcases hr_in r₂ hr₂_prime hr₂_dvd with hr₂p | hr₂q
+    · exact ⟨hr₂p ▸ hr₂_dvd, hr₁q ▸ hr₁_dvd⟩
+    · exact absurd (hr₁q.trans hr₂q.symm) hr_ne
+
+/-- **§7D Step 2 helper** — in a simple group, the normal closure of any
+nontrivial subgroup is the whole group.
+
+Used in Step 2 to argue: if `H' = ⟨V, Q⟩ < G` contains all `G`-conjugates of
+`V` (which it does in Step 2's setup), then `H'` contains `V^G = G`, contradiction. -/
+theorem normalClosure_eq_top_of_simple_of_ne_bot
+    {G : Type*} [Group G] [hG : IsSimpleGroup G]
+    {V : Subgroup G} (hV_ne_bot : V ≠ ⊥) :
+    Subgroup.normalClosure (V : Set G) = ⊤ := by
+  haveI := Subgroup.normalClosure_normal (s := (V : Set G))
+  rcases Subgroup.Normal.eq_bot_or_eq_top
+    (Subgroup.normalClosure_normal (s := (V : Set G))) with h | h
+  · -- V ≤ normalClosure V = ⊥ ⇒ V = ⊥, contradiction.
+    exfalso
+    apply hV_ne_bot
+    apply le_antisymm _ bot_le
+    calc V ≤ Subgroup.normalClosure (V : Set G) := Subgroup.le_normalClosure
+      _ = ⊥ := h
+  · exact h
+
+/-- **§7D Step 2 main consequence** — in a simple group, if a subgroup `K`
+contains every conjugate `g * v * g⁻¹` of a nontrivial subgroup `V`, then
+`K = ⊤`.
+
+This is the cleanest form of Step 2's argument: `V` nontrivial and simple `G`
+imply `V^G = ⊤`, so any `K` containing `V^G` (equivalently, all conjugates of
+elements of `V`) must be `⊤`. -/
+theorem eq_top_of_contains_all_conjugates_of_simple
+    {G : Type*} [Group G] [IsSimpleGroup G]
+    {V K : Subgroup G} (hV_ne_bot : V ≠ ⊥)
+    (h_contains : ∀ g : G, ∀ v ∈ V, g * v * g⁻¹ ∈ K) :
+    K = ⊤ := by
+  have h_top : Subgroup.normalClosure (V : Set G) = ⊤ :=
+    normalClosure_eq_top_of_simple_of_ne_bot hV_ne_bot
+  -- K contains the normalClosure since K is closed under containing conjugates.
+  have hK_normal_aux : ∀ x : G, x ∈ Subgroup.normalClosure (V : Set G) → x ∈ K := by
+    intro x hx
+    refine Subgroup.closure_induction (p := fun y _ => y ∈ K)
+      (fun y hy_conj => ?_) ?_ ?_ ?_ hx
+    · -- y is a conjugate of some v ∈ V
+      rcases (Group.mem_conjugatesOfSet_iff (s := (V : Set G)) (x := y)).mp hy_conj with
+        ⟨a, ha_inV, hConj⟩
+      obtain ⟨g, hg⟩ := isConj_iff.mp hConj
+      -- y = g * a * g⁻¹
+      rw [← hg]
+      exact h_contains g a ha_inV
+    · exact K.one_mem
+    · intro x y _ _ hx hy
+      exact K.mul_mem hx hy
+    · intro x _ hx
+      exact K.inv_mem hx
+  rw [eq_top_iff]
+  intro x _
+  apply hK_normal_aux
+  rw [h_top]
+  exact Subgroup.mem_top x
+
+/-- A Sylow `p`-subgroup is nontrivial whenever `p ∣ |G|`. -/
+theorem Sylow.ne_bot_of_dvd_card
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_dvd : p ∣ Nat.card G) (P : Sylow p G) :
+    (P : Subgroup G) ≠ ⊥ := by
+  intro hP_bot
+  have hp_prime : p.Prime := Fact.out
+  have h_card : Nat.card (P : Subgroup G) = 1 := by rw [hP_bot]; exact Subgroup.card_bot
+  have h_eq := P.card_eq_multiplicity
+  rw [h_card] at h_eq
+  have h_pos : 0 < (Nat.card G).factorization p :=
+    hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
+  have h1 : (1 : ℕ) = p ^ 0 := by simp
+  rw [h1] at h_eq
+  have h_mult_zero : (Nat.card G).factorization p = 0 :=
+    (Nat.pow_right_injective hp_prime.two_le h_eq).symm
+  omega
+
+/-- **§7D IsPCentral existence** — in a finite group with `p ∣ |G|`, every
+Sylow `p`-subgroup has a nontrivial element in its center (since a nontrivial
+finite `p`-group has nontrivial center), and any such nontrivial center
+element is `p`-central. -/
+theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hp_dvd : p ∣ Nat.card G) :
+    ∃ x : G, IsPCentral p x := by
+  classical
+  haveI : Nontrivial G := by
+    rw [← Finite.one_lt_card_iff_nontrivial]
+    exact lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
+      (Nat.le_of_dvd Nat.card_pos hp_dvd)
+  -- Pick a Sylow p-subgroup; it is nontrivial.
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
+  -- P is a finite nontrivial p-group, so its center is nontrivial.
+  haveI : Nontrivial ↥(P : Subgroup G) := P.toSubgroup.nontrivial_iff_ne_bot.mpr hP_ne_bot
+  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
+    hPpg.center_nontrivial
+  -- Pick a nontrivial center element.
+  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ :=
+    exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
+  -- c ∈ G, c ∈ (Subgroup.center P).map P.subtype, c ≠ 1.
+  refine ⟨c, ?_, P, ?_⟩
+  · -- c ≠ 1 since (⟨⟨c, hc_mem⟩, hc_in_center⟩) ≠ 1 inside center.
+    intro hc1
+    apply hc_ne_one
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hc1
+  · -- c ∈ (Subgroup.center P).map P.subtype
+    exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
+
+/-- **§7D Sylow extraction** — in a finite simple non-solvable group of order
+dividing `p^a * q^b`, every Sylow `p`-subgroup is nontrivial. -/
+theorem sylow_ne_bot_of_simple_nonsolvable_paqb
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b)
+    (P : Sylow p H) : (P : Subgroup H) ≠ ⊥ :=
+  Sylow.ne_bot_of_dvd_card
+    (p_and_q_dvd_card_of_simple_nonsolvable hpq hH_simple hH_nsol hH_dvd).1 P
+
+/-- **§7D auxiliary observation** (Isaacs L3965) — if `M` is a maximal subgroup
+of a simple group `G` and `K ≤ M` is a nontrivial subgroup normalized by every
+element of `M`, then `M = N_G(K)`.
+
+Proof: `M ⊆ N_G(K)` by hypothesis.  `N_G(K) ≠ ⊤` since otherwise `K ⊴ G`
+which (by simplicity) forces `K = ⊥` (contradicting nontriviality) or `K = ⊤`
+(contradicting `K ≤ M < G`).  By maximality, `N_G(K) = M`. -/
+theorem maximal_eq_normalizer_of_M_normalizes
+    {G : Type*} [Group G] [IsSimpleGroup G]
+    {M K : Subgroup G} (hM_max : IsCoatom M)
+    (hK_ne_bot : K ≠ ⊥) (hKM_le : K ≤ M)
+    (hM_normalizes : M ≤ Subgroup.normalizer K) :
+    Subgroup.normalizer K = M := by
+  rcases hM_max.le_iff.mp hM_normalizes with h | h
+  · -- N_G(K) = ⊤ ⇒ K is normal in G ⇒ K ∈ {⊥, ⊤} by simplicity.
+    exfalso
+    have hK_norm_G : K.Normal := by
+      refine ⟨fun x hx g => ?_⟩
+      have hg_in_N : g ∈ Subgroup.normalizer K := h ▸ Subgroup.mem_top g
+      rw [Subgroup.mem_normalizer_iff] at hg_in_N
+      exact (hg_in_N x).mp hx
+    rcases hK_norm_G.eq_bot_or_eq_top with hK_bot | hK_top
+    · exact hK_ne_bot hK_bot
+    · -- K = ⊤ contradicts K ≤ M and M < ⊤ (since M is a coatom).
+      have : K ≤ M := hKM_le
+      rw [hK_top] at this
+      exact hM_max.ne_top (le_antisymm le_top this)
+  · -- h : N_G(K) = M is exactly the goal.
+    exact h
+
+/-- **§7D Step 5 (first half)** — every `p`-subgroup of a finite group is
+centralized by some `p`-central element.
+
+Isaacs L3995-3998: "Given a `p`-subgroup `V ⊆ G`, choose `P ∈ Syl_p(G)` with
+`P ⊇ V`.  Then `Z(P) ⊆ C_G(V)`, and so `C_G(V)` contains a `p`-central
+element."
+
+This requires `p ∣ |G|` (so `P` is nontrivial) and `V` to be a finite
+`p`-subgroup (so it's contained in some Sylow). -/
+theorem exists_isPCentral_centralizing
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_dvd : p ∣ Nat.card G)
+    (V : Subgroup G) (hV_pgroup : IsPGroup p V) :
+    ∃ x : G, IsPCentral p x ∧ ∀ v ∈ V, x * v = v * x := by
+  classical
+  -- Extend V to a Sylow p-subgroup P; it is nontrivial since p ∣ |G|.
+  obtain ⟨P, hVP⟩ := IsPGroup.exists_le_sylow hV_pgroup
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
+  -- P nontrivial p-group ⇒ Z(P) nontrivial.
+  haveI : Nontrivial ↥(P : Subgroup G) :=
+    (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne_bot
+  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
+    hPpg.center_nontrivial
+  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ :=
+    exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
+  -- c is p-central.
+  have hc_pcentral : IsPCentral p c := by
+    refine ⟨?_, P, ⟨c, hc_mem⟩, hc_in_center, rfl⟩
+    intro hc1
+    apply hc_ne_one
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hc1
+  -- c commutes with everything in P, in particular with everything in V ⊆ P.
+  have hc_center_iff : ∀ g : ↥(P : Subgroup G),
+      g * ⟨c, hc_mem⟩ = ⟨c, hc_mem⟩ * g :=
+    Subgroup.mem_center_iff.mp hc_in_center
+  have hc_comm : ∀ v ∈ V, c * v = v * c := by
+    intro v hv
+    have hv_P : v ∈ (P : Subgroup G) := hVP hv
+    have hcomm := hc_center_iff ⟨v, hv_P⟩
+    have := (congrArg Subtype.val hcomm).symm
+    simpa [Subgroup.coe_mul] using this
+  exact ⟨c, hc_pcentral, hc_comm⟩
+
+/-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
+non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
+there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
+
+This combines `opCore_eq_bot_of_simple_nonsolvable` (giving `t ∉ O_2(H)`) with
+Matsuyama's theorem (Isaacs Thm 2.13).  Step 7 will use this to derive a
+contradiction with Step 6 ("`q`-central elements normalize no nontrivial
+`p`-subgroup"). -/
+theorem matsuyama_of_simple_nonsolvable_q_two
+    {H : Type*} [Group H] [Finite H]
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {t : H} (ht_sq : t * t = 1) (ht_ne_one : t ≠ 1) :
+    ∃ x : H, ∃ p : ℕ, p.Prime ∧ Odd p ∧ orderOf x = p ∧ t * x * t = x⁻¹ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- t ∉ O_2(H) since O_2(H) = ⊥ in a simple non-solvable group.
+  have hO2_bot : OddOrder.Isaacs.Ch01.opCore 2 H = ⊥ :=
+    opCore_eq_bot_of_simple_nonsolvable hH_simple hH_nsol
+  have ht_notin : t ∉ OddOrder.Isaacs.Ch01.opCore 2 H := by
+    rw [hO2_bot, Subgroup.mem_bot]
+    exact ht_ne_one
+  exact OddOrder.Isaacs.Ch02.matsuyama ht_sq ht_notin
+
+
+/-- **§7D core axiom** — *no finite simple non-solvable group has order
+dividing `p^a * q^b`*.
+
+This is the entire content of the Goldschmidt-Bender-Matsuyama 9-step
+argument (Isaacs §7D, p.219-222).  Steps 1-3 establish the `p`-type / `q`-type
+dichotomy of maximal subgroups; Steps 4-7 build the contradiction machinery
+(`p`-central elements, Matsuyama 2.13 application); Steps 8-9 apply the
+normal-J theorem (Thm 7.6) and Thompson factorization to derive the final
+contradiction.
+
+**Local axiom rationale** (per CLAUDE.md / issue 0036): full discharge of
+this axiom requires:
+
+* Definition of `pCentralGenerated U` (subgroup generated by `p`-central
+  elements of a `p`-subgroup `U`) and its conjugation behaviour.
+* Step 4's maximality argument for choosing `W` with `W^* = W`.
+* Step 8's verification of the five normal-J hypotheses on a `p`-type maximal.
+* Step 9's Sylow intersection counting (`|G_p|² > |G|` forcing `|S ∩ T| > 1`
+  for distinct Sylow `p`-subgroups) combined with Thompson factorization.
+
+Issue `0032-isaacs-ch07-thm-7-8-burnside.md` tracks the full discharge plan
+(estimated ~600-900 LOC across multiple sessions).
+
+The `_hSubgroupsSolvable` hypothesis captures the minimum-counterexample
+status: every proper subgroup is solvable (textbook L3959: "the order of every
+proper subgroup of G also has at most two prime divisors, every such subgroup
+must be solvable").  Combined with simplicity, this gives Isaacs §7D the full
+working hypotheses for the 9-step argument. -/
+axiom noNonsolvableSimplePaQb.{u}
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
+    (H : Type u) [Group H] [Finite H]
+    (_hH_simple : IsSimpleGroup H)
+    (_hH_nsol : ¬ IsSolvable H)
+    (_hH_order : ∃ a b : ℕ, Nat.card H ∣ p ^ a * q ^ b)
+    (_hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K) :
+    False
+
+/-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability).
 
 > If `|G| = p^a * q^b` for primes `p, q`, then `G` is solvable.
 
 The textbook proof (Isaacs p.219-222) is the character-free
 **Goldschmidt-Bender-Matsuyama 9-step argument**: assume `G` is a minimum
-counterexample (non-solvable group of minimum order `p^a q^b`).  Steps 1-7
-establish that `G` is simple, picks a `p`-type maximal subgroup `M` containing a
-Sylow `p`-subgroup `P`, and shows `¬(p = 2 ∨ q = 2)`.  Step 8 applies the
-**normal-J theorem (Thm 7.6)** to get `J(S) ⊴ M` for `S ∈ Syl_p(M)`.  Step 9
-derives a contradiction from `J(S) ⊴ M` together with Thompson factorization
+counterexample (non-solvable group of minimum order `p^a q^b`).  Steps 1-3
+establish that `G` is simple and identify maximal subgroups of `p`-type or
+`q`-type; Steps 4-7 develop `p`-central element machinery and apply
+Matsuyama 2.13 to force `p, q` odd; Step 8 applies the **normal-J theorem
+(Thm 7.6)** to get `J(S) ⊴ M` for `S ∈ Syl_p(M)`; Step 9 derives a
+contradiction from `J(S) ⊴ M` together with Thompson factorization
 properties of `M`.
 
-**This formalization takes the contradiction at the minimum counterexample as a
-forward-dependency hypothesis** (`hMinCounterexample`), universalized over any
-finite group `H` whose order divides `|G| = p^a q^b`.  The 9-step
-Goldschmidt-Bender-Matsuyama argument will discharge this hypothesis once
-Thm 7.6 + `IsPType` / Thompson factorization machinery lands in §7D.
-
-Given `hMinCounterexample`, the conclusion follows by **strong induction on
-`Nat.card G`**: at any group `H` (of order dividing `|G|`), if `H` is not
-solvable then by the induction hypothesis every proper normal subgroup `N ⊴ H`
-is solvable (since `|N| < |H|`) and every quotient `H/N` with `N ≠ ⊥` is solvable
-(since `|H/N| < |H|`).  Plugging into `hMinCounterexample` yields `False`. -/
+**Implementation strategy**: the actual 9-step argument is encapsulated in
+the local axiom `noNonsolvableSimplePaQb` (issue 0032).  We carry out the
+strong-induction-on-`Nat.card` reduction, peel off the simplicity reduction
+via `isSimpleGroup_of_minCounterexample`, then invoke the axiom. -/
 theorem burnside_p_pow_q_pow.{u}
     {G : Type u} [Group G] [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (_hpq : p ≠ q)
-    (_hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b)
-    (hMinCounterexample :
-       ∀ (H : Type u) [Group H] [Finite H],
-         Nat.card H ∣ Nat.card G →
-         (¬ IsSolvable H) →
-         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N) →
-         (∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) →
-         False) :
+    (hpq : p ≠ q)
+    (hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b) :
     IsSolvable G := by
   classical
   -- Strong induction on `Nat.card` via an explicit motive over arbitrary finite
@@ -4661,18 +5100,21 @@ theorem burnside_p_pow_q_pow.{u}
   have hG_pos : 0 < Nat.card G := Nat.card_pos
   have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
   -- Subgroup orders divide the ambient order; use Lagrange + IH.
+  -- Every proper subgroup (not necessarily normal) is solvable.
+  have hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K := by
+    intro K hK_top
+    have hK_dvd_H : Nat.card K ∣ Nat.card H := K.card_subgroup_dvd_card
+    have hK_dvd_G : Nat.card K ∣ Nat.card G := hK_dvd_H.trans hH_dvd
+    have hK_le : Nat.card K ≤ Nat.card H := Nat.le_of_dvd hH_pos hK_dvd_H
+    have hK_ne : Nat.card K ≠ Nat.card H := fun h_eq =>
+      hK_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hK_lt : Nat.card K < n :=
+      (lt_of_le_of_ne hK_le hK_ne).trans_eq hH_card
+    exact ih (Nat.card K) hK_lt K hK_dvd_G rfl
+  -- Restriction of the above to normal proper subgroups.
   have hN_solvable :
-      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := by
-    intro N hN_top _hN_norm
-    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
-    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
-    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
-    -- |N| ≠ |H| since N ≠ ⊤ (in a finite group).
-    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
-      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
-    have hN_lt : Nat.card N < n :=
-      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
-    exact ih (Nat.card N) hN_lt N hN_dvd_G rfl
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := fun N hN _ =>
+    hSubgroupsSolvable N hN
   -- Quotient orders divide the ambient order; use index-bound + IH.
   have hQ_solvable :
       ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N) := by
@@ -4693,7 +5135,22 @@ theorem burnside_p_pow_q_pow.{u}
         _ = Nat.card H := hH_eq.symm
     have hQ_lt : Nat.card (H ⧸ N) < n := hQ_lt_H.trans_eq hH_card
     exact ih (Nat.card (H ⧸ N)) hQ_lt (H ⧸ N) hQ_dvd_G rfl
-  exact hMinCounterexample H hH_dvd hH_nsol hN_solvable hQ_solvable
+  -- H is nontrivial: |H| = n.  If n = 1 then H is trivial which is solvable
+  -- (contradicting hH_nsol).
+  haveI hH_nontriv : Nontrivial H := by
+    by_contra h_not_nontriv
+    rw [not_nontrivial_iff_subsingleton] at h_not_nontriv
+    exact hH_nsol inferInstance
+  -- Step 1 reduction: H is simple.
+  have hH_simple : IsSimpleGroup H :=
+    isSimpleGroup_of_minCounterexample hH_nsol hN_solvable hQ_solvable
+  -- Order divides p^a q^b: extract a',b' such that Nat.card H ∣ p^a' q^b'.
+  obtain ⟨a, b, hG_card⟩ := hG_order
+  have hH_dvd_paqb : ∃ a' b' : ℕ, Nat.card H ∣ p ^ a' * q ^ b' :=
+    ⟨a, b, hG_card ▸ hH_dvd⟩
+  -- Invoke the §7D core axiom.
+  exact noNonsolvableSimplePaQb hpq H hH_simple hH_nsol hH_dvd_paqb
+    hSubgroupsSolvable
 
 end -- 7D
 
