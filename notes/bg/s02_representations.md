@@ -487,6 +487,9 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers` にまとめた.
   残る入力は「`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian」
   という前段 q≠p case の線形代数側と、normal complement `N` への induction 出力.
-- 次 frontier はこの spine を `determinantKernelSubgroup ρ` (`G*`) に接続し、
-  前段 q≠p case の線形代数入力
-  (`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian) を整理する段.
+- この spine を `determinantKernelSubgroup ρ` (`G*`) に接続する
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` も追加済み.
+  `G*` が p-group なら `O_p(G*) ≠ ⊥`, そうでなければ normalizer spine に渡す.
+- 次 frontier は前段 q≠p case の線形代数入力
+  (`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian) と、
+  induction 仮定を theorem statement 側へどう渡すかを整理する段.

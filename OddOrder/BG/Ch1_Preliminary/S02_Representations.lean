@@ -1841,6 +1841,53 @@ private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
   exact exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
     (p := q) (G := G) hq_dvd hcomp hind
 
+/-- BG Thm 2.6 step 5 specialized to the determinant kernel `G*`.
+
+If `G*` is nontrivial, then either it is a `p`-group, giving
+`O_p(G*) ≠ 1`, or the non-`p`-group normalizer spine supplies a prime `r` with
+`O_r(G*) ≠ 1`.  The two hypotheses are precisely the remaining theorem-level
+inputs from the text: the q≠p linear-algebra normalizer step and the induction
+output on normal complements. -/
+private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    ∃ r : ℕ, r.Prime ∧
+      OddOrder.Isaacs.Ch01.opCore r (determinantKernelSubgroup ρ) ≠ ⊥ := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  have hGstar_ne_bot : Gstar ≠ ⊥ := by
+    simpa [Gstar] using hdet_ne_bot
+  by_cases hGstar_p : IsPGroup p Gstar
+  · haveI : Finite (Sylow p Gstar) := inferInstance
+    haveI : Nontrivial Gstar :=
+      (Subgroup.nontrivial_iff_ne_bot Gstar).mpr hGstar_ne_bot
+    exact ⟨p, Fact.out,
+      opCore_ne_bot_of_nontrivial_normal_pSubgroup
+        (G := Gstar) (K := (⊤ : Subgroup Gstar))
+        (hGstar_p.to_subgroup ⊤) top_ne_bot⟩
+  · exact exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
+      (p := p) (G := Gstar) hGstar_p
+      (fun {q} hq_prime hq_ne_p Q hQcore =>
+        hnormalizer (q := q) hq_ne_p Q hQcore)
+      hind
+
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
 Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
