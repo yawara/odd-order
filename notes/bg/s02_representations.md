@@ -92,6 +92,16 @@
   `sylow_commutative_and_commutator_le_of_isPGroup` も追加済み.
   次は determinant kernel `G* = G ∩ SL(V,F)` / `O_p(G*)` 側の構成を
   Lean で切れる小補題に分割する.
+- **2026-05-26**: q≠p 分岐用に
+  `exists_simple_submodule_of_isPGroup_ne_char` を追加済み. `K` が finite
+  q-group で `q ≠ p` のとき、`neZero_nat_card_cast_of_isPGroup_ne_char`
+  から Maschke の `NeZero (Nat.card K : F)` 前提を作り、
+  `Representation.asModule` の group-algebra module から simple constituent
+  を取る. これは薄い theorem rename ではなく、BG Thm 2.6 の
+  q≠p 証明で必要な「char-away ⇒ Maschke ⇒ irreducible constituent」段.
+  次の未解決点は、abelian `K` + algebraically closed `F` からこの constituent
+  を `finrank = 1` subrepresentation/subspace として戻す scalar-instance
+  bridge.
 
 ## TL;DR
 

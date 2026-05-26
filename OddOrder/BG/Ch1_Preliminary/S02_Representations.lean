@@ -730,6 +730,41 @@ private theorem neZero_nat_card_cast_of_isPGroup_ne_char
   have hp_dvd_q : p ∣ q := hp_prime.dvd_of_dvd_pow hp_dvd_card
   exact hq_ne_p ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp hp_dvd_q).symm
 
+/-- Maschke simple-constituent extraction for the BG Thm 2.6 q≠p branch.
+
+For a finite q-group acting on a nonzero vector space over a field of
+characteristic `p ≠ q`, the corresponding group-algebra module has a simple
+submodule.  This packages the q-group/characteristic-away check with mathlib's
+Maschke theorem and the `Representation.asModule` bridge. -/
+private theorem exists_simple_submodule_of_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) :
+    ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
+      IsSimpleModule (MonoidAlgebra F K) N := by
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
+  letI : Module F σ.asModule := Representation.instModuleAsModule σ
+  letI : Module (MonoidAlgebra F K) σ.asModule :=
+    Representation.instModuleMonoidAlgebraAsModule σ
+  letI : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
+  have hnontriv : Nontrivial σ.asModule := by
+    change Nontrivial V
+    infer_instance
+  have hsemi :
+      @IsSemisimpleModule (MonoidAlgebra F K) inferInstance σ.asModule
+        (Representation.instAddCommGroupAsModule σ)
+        (Representation.instModuleMonoidAlgebraAsModule σ) := by
+    infer_instance
+  exact @IsSemisimpleModule.exists_simple_submodule
+      (MonoidAlgebra F K) inferInstance σ.asModule
+      (Representation.instAddCommGroupAsModule σ)
+      (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
