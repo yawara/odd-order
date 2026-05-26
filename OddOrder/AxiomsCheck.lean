@@ -267,6 +267,9 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch06.quotient_commutative_of_maximal_normal_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.normal_of_le_of_quotient_commutative
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

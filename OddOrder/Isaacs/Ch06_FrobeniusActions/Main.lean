@@ -3395,6 +3395,44 @@ theorem normal_of_le_of_quotient_commutative
   rw [← hcomap]
   exact hQ_normal.comap (QuotientGroup.mk' C)
 
+/-- **Isaacs Thm 6.12 setup**: after choosing `T/C` of order `p`, a self-centralizing
+`C` satisfies `Z(T) < C`.
+
+The inclusion `Z(T) ≤ C` comes from self-centralizing: any central element of `T` centralizes
+`C`.  It is strict because otherwise `T/C` is cyclic of prime order and central, forcing `T`
+to be abelian. -/
+theorem center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal]
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T) :
+    Subgroup.center T < C.subgroupOf T := by
+  have hZ_le_C : Subgroup.center T ≤ C.subgroupOf T := by
+    intro z hz
+    rw [Subgroup.mem_subgroupOf]
+    have hz_cent : ((z : T) : P) ∈ Subgroup.centralizer (C : Set P) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro c hc
+      have hcomm_T :
+          (⟨c, hC_le_T hc⟩ : T) * z = z * ⟨c, hC_le_T hc⟩ :=
+        Subgroup.mem_center_iff.mp hz ⟨c, hC_le_T hc⟩
+      exact congrArg Subtype.val hcomm_T
+    simpa [hCent] using hz_cent
+  have hne : Subgroup.center T ≠ C.subgroupOf T := by
+    intro hEq
+    haveI hCsub_normal : (C.subgroupOf T).Normal := inferInstance
+    have h_card_quot : Nat.card (T ⧸ C.subgroupOf T) = p := by
+      rw [← Subgroup.index_eq_card]
+      simpa [Subgroup.relIndex] using hC_rel
+    haveI : IsCyclic (T ⧸ C.subgroupOf T) := isCyclic_of_prime_card h_card_quot
+    have hker_le : (QuotientGroup.mk' (C.subgroupOf T)).ker ≤ Subgroup.center T := by
+      rw [QuotientGroup.ker_mk']
+      exact le_of_eq hEq.symm
+    have hT_comm : ∀ x y : T, x * y = y * x :=
+      commutative_of_cyclic_center_quotient (QuotientGroup.mk' (C.subgroupOf T)) hker_le
+    exact hT_not_comm ⟨⟨hT_comm⟩⟩
+  exact lt_of_le_of_ne hZ_le_C hne
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/
