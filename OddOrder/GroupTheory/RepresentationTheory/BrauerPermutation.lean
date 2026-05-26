@@ -6,10 +6,12 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Group.Conj
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.LinearAlgebra.Matrix.Permutation
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # Brauer's permutation lemma
@@ -26,21 +28,27 @@ the compatibility of two involutions:
 * on `Irr G`, `χ ↦ χ̄` (complex conjugation of values).
 
 This module provides the inversion involution on `ConjClasses G`, the predicate
-`ConjClasses.IsReal`, and states the main theorem. The proof requires character
-orthogonality infrastructure (second orthogonality / column relations), which is
-scheduled for the follow-up Wave 1a `SecondOrthogonality.lean` module, and is therefore
-left as `sorry` here.
+`ConjClasses.IsReal`, and the main theorem. The proof is the matrix-algebra
+core: a trace argument on `P_σ * A = A * P_τ` using the just-proved
+`SecondOrthogonality` character-table invertibility. The remaining external
+gap is constructing the conjugation involution `σ : χ ↦ χ̄` on
+`IrreducibleCharacter G` and its compatibility with class inversion; these are
+taken as explicit hypotheses here.
 
 ## Main definitions
 
 * `ConjClasses.inv` — `⟦g⟧ ↦ ⟦g⁻¹⟧`. Involutive.
 * `ConjClasses.IsReal` — `C` is real iff `inv C = C`.
 * `ConjClasses.RealClass` — the type of self-inverse conjugacy classes.
+* `OddOrder.RepresentationTheory.classInvPerm` — class inversion pulled back to
+  `IrreducibleCharacter G` via a `CharacterTableIndexing` row-column equiv.
 
 ## Main results
 
-* `OddOrder.RepresentationTheory.brauer_permutation_lemma` — equality of cardinalities
-  (proof deferred).
+* `OddOrder.RepresentationTheory.brauer_permutation_lemma` — equality of cardinalities,
+  conditional on a `CharacterTableIndexing` package, weighted row orthogonality, the
+  conjugation involution `σ` on `IrreducibleCharacter G`, and the compatibility
+  identity `χ̄(C) = χ(C⁻¹)`.
 
 ## References
 
@@ -192,6 +200,46 @@ end ConjClasses
 
 namespace OddOrder.RepresentationTheory
 
+/-- The class-inversion permutation pulled back to the `IrreducibleCharacter G`
+side via a `CharacterTableIndexing` row-column equivalence. -/
+noncomputable def classInvPerm {G : Type*} [Group G] (idx : CharacterTableIndexing G) :
+    Equiv.Perm (IrreducibleCharacter G) :=
+  (idx.rowColumnEquiv.trans
+    (Function.Involutive.toPerm
+      (ConjClasses.inv : ConjClasses G → ConjClasses G) ConjClasses.inv_involutive)).trans
+    idx.rowColumnEquiv.symm
+
+@[simp] theorem classInvPerm_apply {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) (ψ : IrreducibleCharacter G) :
+    classInvPerm idx ψ = idx.rowColumnEquiv.symm (ConjClasses.inv (idx.rowColumnEquiv ψ)) :=
+  rfl
+
+theorem classInvPerm_involutive {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) : Function.Involutive (classInvPerm idx) := by
+  intro ψ
+  simp [ConjClasses.inv_involutive _]
+
+theorem classInvPerm_symm {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) : (classInvPerm idx).symm = classInvPerm idx :=
+  Function.Involutive.symm_eq_self_of_involutive _ (classInvPerm_involutive idx)
+
+/-- Fixed points of `classInvPerm idx` are in bijection with real conjugacy classes
+via the row-column equivalence. -/
+noncomputable def realClassEquivFixedPointsClassInv {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) :
+    ConjClasses.RealClass G ≃ {ψ : IrreducibleCharacter G // classInvPerm idx ψ = ψ} where
+  toFun C := ⟨idx.rowColumnEquiv.symm (C : ConjClasses G), by
+    have h : ConjClasses.inv (C : ConjClasses G) = (C : ConjClasses G) := C.2
+    simp [h]⟩
+  invFun ψ := ⟨idx.rowColumnEquiv (ψ : IrreducibleCharacter G), by
+    have hψ : classInvPerm idx (ψ : IrreducibleCharacter G) =
+        (ψ : IrreducibleCharacter G) := ψ.2
+    have h := congrArg idx.rowColumnEquiv hψ
+    simp only [classInvPerm_apply, Equiv.apply_symm_apply] at h
+    exact h⟩
+  left_inv C := by ext; simp
+  right_inv ψ := by ext; simp
+
 /-- **Brauer's permutation lemma** ([Is] Thm 6.32).
 
 For a finite group `G`, the number of real irreducible complex characters equals the
@@ -203,11 +251,93 @@ The classical proof uses the invertibility of the character table (Schur orthogo
 to relate the two compatible involutions `χ ↦ χ̄` on `Irr G` and `C ↦ C⁻¹` on
 `ConjClasses G`.
 
-(Proof deferred: requires the Wave 1a `SecondOrthogonality` module + a finite indexing
-API for `irreducibleCharacters G`.) -/
-theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G] :
+The signature takes a `CharacterTableIndexing` package, the weighted row orthogonality
+hypothesis (which yields character-table invertibility), the conjugation permutation `σ`
+on `IrreducibleCharacter G`, the equivalence `σ χ = χ ↔ χ.IsReal`, and the compatibility
+identity
+`characterTableEntry (σ χ) C = characterTableEntry χ (inv C)`.  Bridging these
+hypotheses to mathlib's representation theory (complex conjugation of unitary
+representations, `χ ↦ χ̄`) is the remaining external gap.
+
+The proof itself is the matrix-algebra core of Brauer's lemma: the trace of a permutation
+matrix counts fixed points, and conjugate permutation matrices share traces. -/
+theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G]
+    (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (σ : Equiv.Perm (IrreducibleCharacter G))
+    (h_real_irr : ∀ χ : IrreducibleCharacter G,
+      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C)) :
     Nat.card (RealIrreducibleCharacter G) = Nat.card (ConjClasses.RealClass G) := by
-  sorry
+  letI := idx.irrFintype
+  letI := idx.classFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := Classical.decEq (ConjClasses G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  -- Class-inversion permutation, pulled back to IrreducibleCharacter G via rowColumnEquiv.
+  set τ : Equiv.Perm (IrreducibleCharacter G) := classInvPerm idx with hτ_def
+  have hτ_invol : Function.Involutive τ := classInvPerm_involutive idx
+  have hτ_symm : τ.symm = τ := classInvPerm_symm idx
+  -- Matrix identity (entry form): A (σ χ) ψ = A χ (τ ψ).
+  have hentry : ∀ (χ ψ : IrreducibleCharacter G),
+      characterTableSquareMatrix idx (σ χ) ψ =
+        characterTableSquareMatrix idx χ (τ ψ) := by
+    intro χ ψ
+    simp [characterTableSquareMatrix_apply, hτ_def, classInvPerm_apply, h_compat]
+  -- Matrix product identity: σ.permMatrix * A = A * τ.permMatrix.
+  have hmat : σ.permMatrix ℂ * characterTableSquareMatrix idx =
+      characterTableSquareMatrix idx * τ.permMatrix ℂ := by
+    ext χ ψ
+    rw [show σ.permMatrix ℂ = σ.toPEquiv.toMatrix from rfl,
+      show τ.permMatrix ℂ = τ.toPEquiv.toMatrix from rfl,
+      PEquiv.toMatrix_toPEquiv_mul, PEquiv.mul_toMatrix_toPEquiv,
+      Matrix.submatrix_apply, Matrix.submatrix_apply, id, id, hτ_symm]
+    exact hentry χ ψ
+  -- Multiply on the right by A⁻¹ to isolate σ.permMatrix.
+  have hσ_conj : σ.permMatrix ℂ =
+      characterTableSquareMatrix idx * τ.permMatrix ℂ *
+        (characterTableSquareMatrix idx)⁻¹ := by
+    have h := congrArg (fun M => M * (characterTableSquareMatrix idx)⁻¹) hmat
+    simp only at h
+    rw [Matrix.mul_assoc (σ.permMatrix ℂ), Matrix.mul_inv_of_invertible, Matrix.mul_one] at h
+    exact h
+  -- Take trace.
+  have htrace : Matrix.trace (σ.permMatrix ℂ) = Matrix.trace (τ.permMatrix ℂ) := by
+    rw [hσ_conj]
+    rw [Matrix.trace_mul_cycle]
+    rw [Matrix.inv_mul_of_invertible, Matrix.one_mul]
+  -- Identify traces with fixed point counts.
+  have hσ_tr : Matrix.trace (σ.permMatrix ℂ) =
+      ((Function.fixedPoints σ).ncard : ℂ) := Matrix.trace_permutation σ
+  have hτ_tr : Matrix.trace (τ.permMatrix ℂ) =
+      ((Function.fixedPoints τ).ncard : ℂ) := Matrix.trace_permutation τ
+  have hncard_cast :
+      ((Function.fixedPoints σ).ncard : ℂ) = ((Function.fixedPoints τ).ncard : ℂ) := by
+    rw [← hσ_tr, ← hτ_tr]; exact htrace
+  have hncard : (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard := by
+    exact_mod_cast hncard_cast
+  -- Translate to Nat.card.
+  have hσ_nat : Nat.card (Function.fixedPoints σ) = Nat.card (RealIrreducibleCharacter G) := by
+    rw [Nat.card_coe_set_eq]
+    refine Eq.symm ?_
+    apply Nat.card_congr
+    exact (Equiv.subtypeEquivRight h_real_irr).symm
+  have hτ_nat : Nat.card (Function.fixedPoints τ) = Nat.card (ConjClasses.RealClass G) := by
+    rw [Nat.card_coe_set_eq]
+    refine Eq.symm ?_
+    apply Nat.card_congr
+    -- realClassEquivFixedPointsClassInv idx : RealClass G ≃ {ψ // classInvPerm idx ψ = ψ}
+    -- need: RealClass G ≃ Function.fixedPoints τ = {ψ // τ ψ = ψ}
+    -- These are the same since τ = classInvPerm idx.
+    exact (realClassEquivFixedPointsClassInv idx).trans
+      (Equiv.subtypeEquivRight (fun ψ => Iff.rfl))
+  calc Nat.card (RealIrreducibleCharacter G)
+      = Nat.card (Function.fixedPoints σ) := hσ_nat.symm
+    _ = (Function.fixedPoints σ).ncard := Nat.card_coe_set_eq _
+    _ = (Function.fixedPoints τ).ncard := hncard
+    _ = Nat.card (Function.fixedPoints τ) := (Nat.card_coe_set_eq _).symm
+    _ = Nat.card (ConjClasses.RealClass G) := hτ_nat
 
 /-- Odd-order cardinal specialization of Brauer's permutation lemma.
 
@@ -215,18 +345,34 @@ In a finite group of odd order, there is exactly one real irreducible character.
 This is the cardinal form of Peterfalvi §3 (1.1); identifying the unique
 character with the trivial character is left to the later trivial-character API. -/
 theorem card_realIrreducibleCharacters_eq_one_of_odd_card {G : Type*} [Group G]
-    [Finite G] (hodd : Odd (Nat.card G)) :
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (σ : Equiv.Perm (IrreducibleCharacter G))
+    (h_real_irr : ∀ χ : IrreducibleCharacter G,
+      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C))
+    (hodd : Odd (Nat.card G)) :
     Nat.card (RealIrreducibleCharacter G) = 1 := by
-  rw [brauer_permutation_lemma, ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
+  rw [brauer_permutation_lemma idx hrow σ h_real_irr h_compat,
+    ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
 
 /-- In a finite group of odd order, every real irreducible character is the
 trivial irreducible character. -/
 theorem realIrreducibleCharacter_eq_trivial_of_odd_card {G : Type*} [Group G]
-    [Finite G] (hodd : Odd (Nat.card G)) (χ : RealIrreducibleCharacter G) :
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (σ : Equiv.Perm (IrreducibleCharacter G))
+    (h_real_irr : ∀ χ : IrreducibleCharacter G,
+      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C))
+    (hodd : Odd (Nat.card G)) (χ : RealIrreducibleCharacter G) :
     (χ : IrreducibleCharacter G) = trivialIrreducibleCharacter G := by
   obtain ⟨η, hη⟩ :=
     Nat.card_eq_one_iff_exists.mp
-      (card_realIrreducibleCharacters_eq_one_of_odd_card (G := G) hodd)
+      (card_realIrreducibleCharacters_eq_one_of_odd_card (G := G) idx hrow σ
+        h_real_irr h_compat hodd)
   have hχ : χ = η := hη χ
   have htriv : trivialRealIrreducibleCharacter G = η := hη (trivialRealIrreducibleCharacter G)
   exact congrArg (fun ξ : RealIrreducibleCharacter G => (ξ : IrreducibleCharacter G))
@@ -235,10 +381,18 @@ theorem realIrreducibleCharacter_eq_trivial_of_odd_card {G : Type*} [Group G]
 /-- Pointwise odd-order specialization of Brauer's permutation lemma:
 a nontrivial irreducible character is not real. -/
 theorem not_isReal_of_ne_trivial_of_odd_card {G : Type*} [Group G]
-    [Finite G] (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (σ : Equiv.Perm (IrreducibleCharacter G))
+    (h_real_irr : ∀ χ : IrreducibleCharacter G,
+      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C))
+    (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
     (hχ : χ ≠ trivialIrreducibleCharacter G) :
     ¬ ClassFunction.IsReal (χ : ClassFunction G ℂ) := by
   intro hreal
-  exact hχ (realIrreducibleCharacter_eq_trivial_of_odd_card (G := G) hodd ⟨χ, hreal⟩)
+  exact hχ (realIrreducibleCharacter_eq_trivial_of_odd_card (G := G) idx hrow σ
+    h_real_irr h_compat hodd ⟨χ, hreal⟩)
 
 end OddOrder.RepresentationTheory
