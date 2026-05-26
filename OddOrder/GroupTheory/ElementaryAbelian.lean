@@ -60,6 +60,18 @@ theorem to_subgroup (h : IsElementaryAbelian p G) (H : Subgroup G) :
     ext
     exact h.pow_eq_one (x : G)
 
+/-- A noncyclic finite group of order `p^2` is elementary abelian. -/
+theorem of_card_prime_sq_of_not_isCyclic
+    [Finite G] (hp : p.Prime) (hCard : Nat.card G = p ^ 2)
+    (hNotCyclic : ¬ IsCyclic G) :
+    IsElementaryAbelian p G := by
+  letI : Fact p.Prime := ⟨hp⟩
+  have hExp : Monoid.exponent G = p :=
+    (not_isCyclic_iff_exponent_eq_prime hp hCard).mp hNotCyclic
+  refine ⟨IsPGroup.commutative_of_card_eq_prime_sq (p := p) hCard, ?_⟩
+  intro x
+  simpa [hExp] using (Monoid.pow_exponent_eq_one x)
+
 /-- A finite elementary abelian group of order `p^2` is not cyclic. -/
 theorem not_isCyclic_of_card_prime_sq
     [Finite G] (hp : p.Prime) (h : IsElementaryAbelian p G)

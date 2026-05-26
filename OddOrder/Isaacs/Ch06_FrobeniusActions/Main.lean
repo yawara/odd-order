@@ -2254,6 +2254,52 @@ theorem false_of_frobeniusAction_isFrobeniusGroup_on_abelian
   exact false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
     hFrob partn hparts hdvd
 
+/-- **Isaacs Thm 6.9** reduction step: if a solvable subgroup `B` of the actor acts
+Frobeniusly on a finite nontrivial target, then the target contains a nontrivial abelian
+`B`-invariant subgroup.  This is the reusable form of the textbook move in L3495: choose an
+invariant Sylow subgroup `R` by Isaacs Thm 3.23, then pass to `Z(R)`. -/
+theorem exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B] :
+    ∃ M : Subgroup U, Nontrivial M ∧ IsMulCommutative M ∧
+      ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M := by
+  classical
+  let φ : B →* MulAut U := MulDistribMulAction.toMulAut B U
+  have hFrobB : IsFrobeniusAction B U := IsFrobeniusAction.actorSubgroup hFrob B
+  have hCop : Nat.Coprime (Nat.card B) (Nat.card U) := by
+    haveI : Fintype B := Fintype.ofFinite B
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Nat.card_eq_fintype_card] using
+      (IsFrobeniusAction.coprime_card (A := B) (N := U) hFrobB).symm
+  have hU_gt_one : 1 < Nat.card U :=
+    Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  obtain ⟨p, hp, hp_dvd⟩ := Nat.exists_prime_and_dvd hU_gt_one.ne'
+  letI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨R, hR_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := U) (A := B) (φ := φ)
+      hCop (Or.inl (inferInstance : IsSolvable B)) p
+  let M : Subgroup U := (Subgroup.center R).map (R : Subgroup U).subtype
+  have hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M := by
+    simpa [M] using
+      (OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
+        (φ := φ) hR_inv (K := Subgroup.center R))
+  have hR_ne_bot : (R : Subgroup U) ≠ ⊥ := R.ne_bot_of_dvd_card hp_dvd
+  haveI hR_nontrivial : Nontrivial R :=
+    (Subgroup.nontrivial_iff_ne_bot (R : Subgroup U)).mpr hR_ne_bot
+  haveI hCenter_nontrivial : Nontrivial (Subgroup.center R) :=
+    R.isPGroup'.center_nontrivial
+  have hM_ne_bot : M ≠ ⊥ := by
+    dsimp [M]
+    rw [Subgroup.map_eq_bot_iff_of_injective
+      (H := Subgroup.center R) (R : Subgroup U).subtype_injective]
+    exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center R)).mp hCenter_nontrivial
+  refine ⟨M, (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot, ?_, ?_⟩
+  · dsimp [M]
+    infer_instance
+  · intro b m hm
+    simpa [φ] using hM_inv.smul_mem b hm
+
 /-- **Isaacs Thm 6.9** reduction hook: if a subgroup `B` of the Frobenius actor is itself a
 Frobenius group and the target contains a nontrivial `B`-invariant abelian subgroup, then the
 Frobenius action is impossible.  The remaining textbook step is to obtain such a subgroup as
@@ -2286,47 +2332,72 @@ theorem false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
     (B : Subgroup A) [Finite B] [IsSolvable B]
     {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C) :
     False := by
-  classical
-  let φ : B →* MulAut U := MulDistribMulAction.toMulAut B U
-  have hFrobB : IsFrobeniusAction B U := IsFrobeniusAction.actorSubgroup hFrob B
-  have hCop : Nat.Coprime (Nat.card B) (Nat.card U) := by
-    haveI : Fintype B := Fintype.ofFinite B
-    haveI : Fintype U := Fintype.ofFinite U
-    simpa only [Nat.card_eq_fintype_card] using
-      (IsFrobeniusAction.coprime_card (A := B) (N := U) hFrobB).symm
-  have hU_gt_one : 1 < Nat.card U :=
-    Finite.one_lt_card_iff_nontrivial.mpr inferInstance
-  obtain ⟨p, hp, hp_dvd⟩ := Nat.exists_prime_and_dvd hU_gt_one.ne'
-  letI : Fact p.Prime := ⟨hp⟩
-  obtain ⟨R, hR_inv⟩ :=
-    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := U) (A := B) (φ := φ)
-      hCop (Or.inl (inferInstance : IsSolvable B)) p
-  let M : Subgroup U := (Subgroup.center R).map (R : Subgroup U).subtype
-  have hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M := by
-    simpa [M] using
-      (OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
-        (φ := φ) hR_inv (K := Subgroup.center R))
-  have hR_ne_bot : (R : Subgroup U) ≠ ⊥ := R.ne_bot_of_dvd_card hp_dvd
-  haveI hR_nontrivial : Nontrivial R :=
-    (Subgroup.nontrivial_iff_ne_bot (R : Subgroup U)).mpr hR_ne_bot
-  haveI hCenter_nontrivial : Nontrivial (Subgroup.center R) :=
-    R.isPGroup'.center_nontrivial
-  have hM_ne_bot : M ≠ ⊥ := by
-    dsimp [M]
-    rw [Subgroup.map_eq_bot_iff_of_injective
-      (H := Subgroup.center R) (R : Subgroup U).subtype_injective]
-    exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center R)).mp hCenter_nontrivial
-  haveI hM_nontrivial : Nontrivial M :=
-    (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
-  haveI hM_comm : IsMulCommutative M := by
-    dsimp [M]
-    infer_instance
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
   exact
     false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
-      hFrob B hGroup M
-      (by
-        intro b m hm
-        simpa [φ] using hM_inv.smul_mem b hm)
+      hFrob B hGroup M hM_inv
+
+/-- **Isaacs Thm 6.9** reduction hook for the elementary-abelian branch: if a subgroup `B` of
+the Frobenius actor is elementary abelian of order `p^2` and the target contains a nontrivial
+`B`-invariant abelian subgroup, then the action is impossible. -/
+theorem false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2)
+    (M : Subgroup U) [Finite M] [Nontrivial M] [IsMulCommutative M]
+    (hM : ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M) :
+    False := by
+  letI : CommGroup M := inferInstance
+  letI : MulDistribMulAction B M := by
+    letI : SMul B M := ⟨fun b m => ⟨(b : A) • (m : U), hM b m m.2⟩⟩
+    exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+  have hFrobM : IsFrobeniusAction B M := by
+    intro b hb m hm hfix
+    have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+    have hmU : (m : U) ≠ 1 := fun hmU => hm (Subtype.ext hmU)
+    exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
+  exact false_of_frobeniusAction_isElementaryAbelian_card_prime_sq hFrobM hp hElem hCard
+
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, finite target): a Frobenius actor cannot
+contain an elementary abelian subgroup of order `p^2`.  The abelian-target partition argument is
+applied after the invariant-Sylow-center reduction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2) :
+    False := by
+  haveI : IsMulCommutative B := ⟨⟨fun x y => hElem.comm x y⟩⟩
+  letI : CommGroup B := inferInstance
+  haveI : IsSolvable B := inferInstance
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
+  exact
+    false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+      hFrob B hp hElem hCard M hM_inv
+
+/-- **Isaacs Thm 6.9** (`p = q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p^2`; hence such a subgroup must be cyclic. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime) (hCard : Nat.card B = p ^ 2)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      hFrob B hp
+      (OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic
+        hp hCard hNotCyclic)
+      hCard
 
 end
 
