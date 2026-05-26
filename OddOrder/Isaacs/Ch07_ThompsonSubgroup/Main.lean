@@ -4383,6 +4383,36 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
   · -- c ∈ (Subgroup.center P).map P.subtype
     exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
 
+/-- **§7D auxiliary observation** (Isaacs L3965) — if `M` is a maximal subgroup
+of a simple group `G` and `K ≤ M` is a nontrivial subgroup normalized by every
+element of `M`, then `M = N_G(K)`.
+
+Proof: `M ⊆ N_G(K)` by hypothesis.  `N_G(K) ≠ ⊤` since otherwise `K ⊴ G`
+which (by simplicity) forces `K = ⊥` (contradicting nontriviality) or `K = ⊤`
+(contradicting `K ≤ M < G`).  By maximality, `N_G(K) = M`. -/
+theorem maximal_eq_normalizer_of_M_normalizes
+    {G : Type*} [Group G] [IsSimpleGroup G]
+    {M K : Subgroup G} (hM_max : IsCoatom M)
+    (hK_ne_bot : K ≠ ⊥) (hKM_le : K ≤ M)
+    (hM_normalizes : M ≤ Subgroup.normalizer K) :
+    Subgroup.normalizer K = M := by
+  rcases hM_max.le_iff.mp hM_normalizes with h | h
+  · -- N_G(K) = ⊤ ⇒ K is normal in G ⇒ K ∈ {⊥, ⊤} by simplicity.
+    exfalso
+    have hK_norm_G : K.Normal := by
+      refine ⟨fun x hx g => ?_⟩
+      have hg_in_N : g ∈ Subgroup.normalizer K := h ▸ Subgroup.mem_top g
+      rw [Subgroup.mem_normalizer_iff] at hg_in_N
+      exact (hg_in_N x).mp hx
+    rcases hK_norm_G.eq_bot_or_eq_top with hK_bot | hK_top
+    · exact hK_ne_bot hK_bot
+    · -- K = ⊤ contradicts K ≤ M and M < ⊤ (since M is a coatom).
+      have : K ≤ M := hKM_le
+      rw [hK_top] at this
+      exact hM_max.ne_top (le_antisymm le_top this)
+  · -- h : N_G(K) = M is exactly the goal.
+    exact h
+
 /-- **§7D Step 5 (first half)** — every `p`-subgroup of a finite group is
 centralized by some `p`-central element.
 
