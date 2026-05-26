@@ -4383,6 +4383,66 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
   · -- c ∈ (Subgroup.center P).map P.subtype
     exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
 
+/-- **§7D Step 5 (first half)** — every `p`-subgroup of a finite group is
+centralized by some `p`-central element.
+
+Isaacs L3995-3998: "Given a `p`-subgroup `V ⊆ G`, choose `P ∈ Syl_p(G)` with
+`P ⊇ V`.  Then `Z(P) ⊆ C_G(V)`, and so `C_G(V)` contains a `p`-central
+element."
+
+This requires `p ∣ |G|` (so `P` is nontrivial) and `V` to be a finite
+`p`-subgroup (so it's contained in some Sylow). -/
+theorem exists_isPCentral_centralizing
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_dvd : p ∣ Nat.card G)
+    (V : Subgroup G) (hV_pgroup : IsPGroup p V) :
+    ∃ x : G, IsPCentral p x ∧ ∀ v ∈ V, x * v = v * x := by
+  classical
+  -- Extend V to a Sylow p-subgroup P.
+  obtain ⟨P, hVP⟩ := IsPGroup.exists_le_sylow hV_pgroup
+  -- P is nontrivial since p ∣ |G|.
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := by
+    intro h
+    have h_card : Nat.card (P : Subgroup G) = 1 := by rw [h]; exact Subgroup.card_bot
+    have h_eq := P.card_eq_multiplicity
+    rw [h_card] at h_eq
+    have hp_prime : p.Prime := Fact.out
+    have h_pos : 0 < (Nat.card G).factorization p :=
+      hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
+    have : (1 : ℕ) = p ^ 0 := by simp
+    rw [this] at h_eq
+    have h_mult_zero : (Nat.card G).factorization p = 0 :=
+      (Nat.pow_right_injective hp_prime.two_le h_eq).symm
+    omega
+  -- P nontrivial p-group ⇒ Z(P) nontrivial.
+  haveI : Nontrivial ↥(P : Subgroup G) :=
+    (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne_bot
+  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
+    hPpg.center_nontrivial
+  obtain ⟨⟨⟨c, hc_mem⟩, hc_in_center⟩, hc_ne_one⟩ :=
+    exists_ne (1 : Subgroup.center ↥(P : Subgroup G))
+  -- c is p-central.
+  have hc_pcentral : IsPCentral p c := by
+    refine ⟨?_, P, ⟨c, hc_mem⟩, hc_in_center, rfl⟩
+    intro hc1
+    apply hc_ne_one
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hc1
+  -- c commutes with everything in P, in particular with everything in V ⊆ P.
+  have hc_center_iff : ∀ g : ↥(P : Subgroup G),
+      g * ⟨c, hc_mem⟩ = ⟨c, hc_mem⟩ * g :=
+    Subgroup.mem_center_iff.mp hc_in_center
+  have hc_comm : ∀ v ∈ V, c * v = v * c := by
+    intro v hv
+    have hv_P : v ∈ (P : Subgroup G) := hVP hv
+    have hcomm := hc_center_iff ⟨v, hv_P⟩
+    have := (congrArg Subtype.val hcomm).symm
+    simpa [Subgroup.coe_mul] using this
+  exact ⟨c, hc_pcentral, hc_comm⟩
+
 /-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
 non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
 there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
