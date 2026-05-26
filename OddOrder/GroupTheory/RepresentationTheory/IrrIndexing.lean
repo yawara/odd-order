@@ -28,6 +28,10 @@ variable (G : Type*) [Group G]
 abbrev IrreducibleCharacter :=
   {φ : ClassFunction G ℂ // IsIrreducibleCharacter φ}
 
+/-- The trivial irreducible character of `G`. -/
+def trivialIrreducibleCharacter : IrreducibleCharacter G :=
+  ⟨trivialClassFunction G, trivialClassFunction_isIrreducible⟩
+
 namespace IrreducibleCharacter
 
 variable {G}
@@ -38,6 +42,11 @@ abbrev toClassFunction (χ : IrreducibleCharacter G) : ClassFunction G ℂ :=
 
 instance : Coe (IrreducibleCharacter G) (ClassFunction G ℂ) :=
   ⟨toClassFunction⟩
+
+@[simp] theorem coe_trivialIrreducibleCharacter :
+    ((trivialIrreducibleCharacter G : IrreducibleCharacter G) : ClassFunction G ℂ) =
+      trivialClassFunction G :=
+  rfl
 
 @[simp] theorem coe_mk (φ : ClassFunction G ℂ) (hφ : IsIrreducibleCharacter φ) :
     ((⟨φ, hφ⟩ : IrreducibleCharacter G) : ClassFunction G ℂ) = φ :=

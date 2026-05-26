@@ -43,6 +43,12 @@ character table の可逆性を使うため、issue 0021 の後続として扱�
 - Peterfalvi §3 側に (1.1) の cardinal form
   `OddOrder.Peterfalvi.S03.card_realIrreducibleCharacters_eq_one_of_odd_card`
   を追加した。
+- `trivialClassFunction`, `trivialIrreducibleCharacter`,
+  `trivialRealIrreducibleCharacter` を追加し、Brauer odd-order specialization
+  から `realIrreducibleCharacter_eq_trivial_of_odd_card` と
+  `not_isReal_of_ne_trivial_of_odd_card` を導いた。
+- Peterfalvi §3 側にも (1.1) の pointwise form
+  `not_isReal_of_ne_trivial_irreducible_of_odd_card` を追加した。
 - Brauer lemma の proof 本体は引き続き `issues/0027-peterfalvi-column-orthogonality-core.md`
   の character-table invertibility に依存する。
 

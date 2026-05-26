@@ -219,4 +219,26 @@ theorem card_realIrreducibleCharacters_eq_one_of_odd_card {G : Type*} [Group G]
     Nat.card (RealIrreducibleCharacter G) = 1 := by
   rw [brauer_permutation_lemma, ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
 
+/-- In a finite group of odd order, every real irreducible character is the
+trivial irreducible character. -/
+theorem realIrreducibleCharacter_eq_trivial_of_odd_card {G : Type*} [Group G]
+    [Finite G] (hodd : Odd (Nat.card G)) (χ : RealIrreducibleCharacter G) :
+    (χ : IrreducibleCharacter G) = trivialIrreducibleCharacter G := by
+  obtain ⟨η, hη⟩ :=
+    Nat.card_eq_one_iff_exists.mp
+      (card_realIrreducibleCharacters_eq_one_of_odd_card (G := G) hodd)
+  have hχ : χ = η := hη χ
+  have htriv : trivialRealIrreducibleCharacter G = η := hη (trivialRealIrreducibleCharacter G)
+  exact congrArg (fun ξ : RealIrreducibleCharacter G => (ξ : IrreducibleCharacter G))
+    (hχ.trans htriv.symm)
+
+/-- Pointwise odd-order specialization of Brauer's permutation lemma:
+a nontrivial irreducible character is not real. -/
+theorem not_isReal_of_ne_trivial_of_odd_card {G : Type*} [Group G]
+    [Finite G] (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
+    (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    ¬ ClassFunction.IsReal (χ : ClassFunction G ℂ) := by
+  intro hreal
+  exact hχ (realIrreducibleCharacter_eq_trivial_of_odd_card (G := G) hodd ⟨χ, hreal⟩)
+
 end OddOrder.RepresentationTheory

@@ -68,6 +68,16 @@ theorem card_realIrreducibleCharacters_eq_one_of_odd_card [Finite G]
     Nat.card (RealIrreducibleCharacter G) = 1 :=
   OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card hodd
 
+/-- **Peterfalvi (1.1)**, pointwise form.
+
+If `G` has odd order, then every nontrivial irreducible complex character is
+non-real. -/
+theorem not_isReal_of_ne_trivial_irreducible_of_odd_card [Finite G]
+    (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
+    (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    ¬ ClassFunction.IsReal (χ : ClassFunction G ℂ) :=
+  OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card hodd hχ
+
 /-- The degree of a complex class function, i.e. its value at the identity.
 
 For genuine characters this is the representation degree.  Naming it here keeps

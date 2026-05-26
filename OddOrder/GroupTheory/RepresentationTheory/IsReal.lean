@@ -111,6 +111,14 @@ theorem IsReal.sub {φ ψ : ClassFunction G k} (hφ : φ.IsReal) (hψ : ψ.IsRea
 
 end ClassFunction
 
+variable {G : Type*} [Group G]
+
+@[simp] theorem trivialClassFunction_isReal :
+    ClassFunction.IsReal (trivialClassFunction G) := by
+  unfold ClassFunction.IsReal
+  ext g
+  simp [trivialClassFunction]
+
 /-- The type of real irreducible complex characters of `G`.
 
 This is Peterfalvi's `χ ∈ Irr(G)` with `χ̄ = χ`, named so that Brauer's
@@ -118,6 +126,11 @@ permutation lemma and the odd-order specializations do not repeat the raw
 subtype expression. -/
 abbrev RealIrreducibleCharacter (G : Type*) [Group G] :=
   {χ : IrreducibleCharacter G // ClassFunction.IsReal (χ : ClassFunction G ℂ)}
+
+/-- The trivial real irreducible character of `G`. -/
+def trivialRealIrreducibleCharacter (G : Type*) [Group G] :
+    RealIrreducibleCharacter G :=
+  ⟨trivialIrreducibleCharacter G, by simp⟩
 
 namespace RealIrreducibleCharacter
 
@@ -132,6 +145,11 @@ instance : Coe (RealIrreducibleCharacter G) (ClassFunction G ℂ) :=
 @[simp] theorem coe_mk (χ : IrreducibleCharacter G)
     (hχ : ClassFunction.IsReal (χ : ClassFunction G ℂ)) :
     ((⟨χ, hχ⟩ : RealIrreducibleCharacter G) : IrreducibleCharacter G) = χ :=
+  rfl
+
+@[simp] theorem coe_trivialRealIrreducibleCharacter :
+    ((trivialRealIrreducibleCharacter G : RealIrreducibleCharacter G) :
+      IrreducibleCharacter G) = trivialIrreducibleCharacter G :=
   rfl
 
 @[simp] theorem coe_mk_classFunction (χ : IrreducibleCharacter G)
