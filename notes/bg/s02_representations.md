@@ -139,6 +139,15 @@
   線形写像について、任意の rank-one invariant submodule は左右どちらかに限られる.
   次は determinant kernel + faithful action から `x ∈ K#` の二つの scalar が
   distinct であることを取り出し、この uniqueness を `K ⊴ G` の conjugate line に適用する.
+- **2026-05-26**: q≠p line-pair construction の normality 側の橋として、
+  `isCompl_conjugateSubrepresentationOfNormal`,
+  `conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique`,
+  `le_comap_of_conjugateSubrepresentation_eq` を追加済み. これらは
+  mathlib/Isaacs の純リネームではなく、`K ⊴ G` による conjugate line を
+  rank-one uniqueness で `W₁`/`W₂` のどちらかへ落とし、
+  `RankOneLinePairData.permutes` が要求する `comap` 形へ変換するための接続補題.
+  次は determinant-kernel 条件から distinct scalars を取り出して
+  uniqueness 仮定を作る.
 
 ## TL;DR
 

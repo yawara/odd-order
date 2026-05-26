@@ -1111,6 +1111,65 @@ private theorem finrank_conjugateSubrepresentationOfNormal
   simpa [conjugateSubrepresentationOfNormal, e] using
     (LinearEquiv.finrank_map_eq e W.toSubmodule)
 
+/-- Conjugating complementary `K`-subrepresentations by an ambient element
+preserves complementarity. -/
+private theorem isCompl_conjugateSubrepresentationOfNormal
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    (K : Subgroup G) (hKnormal : K.Normal)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (W U : Subrepresentation (ρ.comp K.subtype)) (g : G)
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule) :
+    IsCompl
+      (conjugateSubrepresentationOfNormal K hKnormal ρ W g).toSubmodule
+      (conjugateSubrepresentationOfNormal K hKnormal ρ U g).toSubmodule := by
+  have hinj : Function.Injective (ρ g) := (ρ.apply_bijective g).1
+  have hsurj : Function.Surjective (ρ g) := (ρ.apply_bijective g).2
+  refine IsCompl.of_eq ?_ ?_
+  · change W.toSubmodule.map (ρ g) ⊓ U.toSubmodule.map (ρ g) =
+      (⊥ : Submodule F V)
+    rw [← Submodule.map_inf (ρ g) hinj, hcompl.inf_eq_bot, Submodule.map_bot]
+  · change W.toSubmodule.map (ρ g) ⊔ U.toSubmodule.map (ρ g) =
+      (⊤ : Submodule F V)
+    rw [← (Submodule.map_sup (p := W.toSubmodule) (p' := U.toSubmodule) (f := ρ g)),
+      hcompl.sup_eq_top, Submodule.map_top]
+    exact LinearMap.range_eq_top.mpr hsurj
+
+/-- If the rank-one `K`-subrepresentations are exhausted by a pair `W, U`,
+then every conjugate of `W` is one of that pair. -/
+private theorem conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    (K : Subgroup G) (hKnormal : K.Normal)
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    (hWdim : Module.finrank F W.toSubmodule = 1)
+    (hunique : ∀ L : Subrepresentation (ρ.comp K.subtype),
+      Module.finrank F L.toSubmodule = 1 → L = W ∨ L = U)
+    (g : G) :
+    conjugateSubrepresentationOfNormal K hKnormal ρ W g = W ∨
+      conjugateSubrepresentationOfNormal K hKnormal ρ W g = U := by
+  apply hunique
+  exact (finrank_conjugateSubrepresentationOfNormal K hKnormal ρ W g).trans hWdim
+
+/-- Equality of a conjugate line with a target line gives the `comap` form used
+by `RankOneLinePairData.permutes`. -/
+private theorem le_comap_of_conjugateSubrepresentation_eq
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    (K : Subgroup G) (hKnormal : K.Normal)
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (W T : Subrepresentation (ρ.comp K.subtype)) {g : G}
+    (hconj : conjugateSubrepresentationOfNormal K hKnormal ρ W g = T) :
+    W.toSubmodule ≤ T.toSubmodule.comap (ρ g) := by
+  intro w hw
+  have hmem :
+      ρ g w ∈ (conjugateSubrepresentationOfNormal K hKnormal ρ W g).toSubmodule :=
+    Submodule.mem_map.mpr ⟨w, hw, rfl⟩
+  have hsub :=
+    congrArg Subrepresentation.toSubmodule hconj
+  simpa [hsub] using hmem
+
 /-- In characteristic `p`, a p-group acts trivially on every one-dimensional representation. -/
 private theorem isPGroup_rank_one_representation_trivial_of_charP
     {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
