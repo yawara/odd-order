@@ -38,6 +38,7 @@ orthonormal-pair structures, up to a uniform sign.
 
 ## Main statement
 
+* `OddOrder.RepresentationTheory.IsometryDifferencePairNumerics`.
 * `OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily`.
 * `OddOrder.RepresentationTheory.IsometryDifferenceImagesVanishAtOne`.
 * `OddOrder.RepresentationTheory.isometry_difference_pair_structure`.
@@ -232,6 +233,68 @@ theorem isometryDifferenceImage_inner_of_ne_zero_of_ne
   rw [h_isom i j]
   exact irreducibleCharacterDifference_inner_of_ne_zero_of_ne
     (G := H) hrow χ hχ hi hj hij
+
+/-- The numeric data carried by the image differences in Peterfalvi §3 (1.4).
+
+This is the interface between character theory and the finite combinatorial
+argument: the zero row, degree-zero condition, norm `2`, and mutual inner
+product `1` for distinct nonzero differences. -/
+structure IsometryDifferencePairNumerics {n : ℕ} [NeZero n] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (v : Fin n → ClassFunction G ℂ) : Prop where
+  zero : v 0 = 0
+  degree_zero : ∀ i, v i (1 : G) = 0
+  inner_self_of_ne_zero :
+    ∀ ⦃i : Fin n⦄, i ≠ 0 → ClassFunction.inner (v i) (v i) = 2
+  inner_of_ne_zero_of_ne :
+    ∀ ⦃i j : Fin n⦄, i ≠ 0 → j ≠ 0 → i ≠ j →
+      ClassFunction.inner (v i) (v j) = 1
+
+namespace IsometryDifferencePairNumerics
+
+variable {n : ℕ} [NeZero n] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {v : Fin n → ClassFunction G ℂ}
+
+theorem inner_self (hv : IsometryDifferencePairNumerics v)
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (v i) (v i) = 2 :=
+  hv.inner_self_of_ne_zero hi
+
+theorem inner_of_ne (hv : IsometryDifferencePairNumerics v)
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (v i) (v j) = 1 :=
+  hv.inner_of_ne_zero_of_ne hi hj hij
+
+end IsometryDifferencePairNumerics
+
+/-- The image differences of an isometric family satisfy the finite numeric
+conditions needed by the later combinatorial proof core. -/
+theorem isometryDifferencePairNumerics_of_isometryDifferenceImage
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j)) :
+    IsometryDifferencePairNumerics
+      (fun i => isometryDifferenceImage τ χ i) where
+  zero := by
+    simp
+  degree_zero := h_image_degree_zero
+  inner_self_of_ne_zero := by
+    intro i hi
+    exact isometryDifferenceImage_inner_self_of_ne_zero
+      (G := G) (H := H) hrow χ hχ τ h_isom hi
+  inner_of_ne_zero_of_ne := by
+    intro i j hi hj hij
+    exact isometryDifferenceImage_inner_of_ne_zero_of_ne
+      (G := G) (H := H) hrow χ hχ τ h_isom hi hj hij
 
 /-- A signed `n`-tuple of irreducible characters of `G`, used as the target
 shape in Peterfalvi's difference-pair lemmas.
@@ -522,7 +585,51 @@ theorem signedDifference_inner_of_ne_zero_of_ne
   rw [signedDifference_inner_signedDifference]
   exact difference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
 
+/-- A signed irreducible-difference family satisfies the same finite numeric
+conditions once the degree-zero condition is supplied separately. -/
+theorem numerics_of_signedDifference_vanishAtOne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    (hvanish : ∀ i, data.signedDifference i (1 : G) = 0) :
+    IsometryDifferencePairNumerics
+      (fun i => data.signedDifference i) where
+  zero := by
+    simp
+  degree_zero := hvanish
+  inner_self_of_ne_zero := by
+    intro i hi
+    exact signedDifference_inner_self_of_ne_zero (G := G) hrow data hi
+  inner_of_ne_zero_of_ne := by
+    intro i j hi hj hij
+    exact signedDifference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
+
 end SignedIrreducibleDifferenceFamily
+
+theorem signedDifference_vanishAtOne_of_isometryDifferenceImage_eq
+    {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter H)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (h_image : ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ) :
+    ∀ i, data.signedDifference i (1 : G) = 0 := by
+  intro i
+  rw [← h_image i]
+  exact h_image_degree_zero i
+
+theorem difference_vanishAtOne_of_isometryDifferenceImage_eq
+    {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter H)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (h_image : ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ) :
+    ∀ i, data.difference i (1 : G) = 0 := by
+  intro i
+  exact data.difference_apply_one_eq_zero_of_signedDifference
+    (signedDifference_vanishAtOne_of_isometryDifferenceImage_eq
+      (G := G) (H := H) χ τ data h_image h_image_degree_zero i)
 
 variable [Fintype G] [Fintype H]
 

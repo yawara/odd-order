@@ -176,6 +176,12 @@ differences.  `irreducibleCharacterDifference_apply_one_of_same_degree`,
 record the degree-zero side of (1.4); the abstract structure theorem now
 expects the image-side condition `τ(χ_i-χ_0)(1)=0`, matching the reduced
 target lattice used in Peterfalvi's proof.
+`IsometryDifferencePairNumerics` packages the finite combinatorial inputs for
+the next proof-core layer: the zero row, degree-zero condition, norm `2` for
+nonzero differences, and mutual inner product `1` for distinct nonzero
+differences.  Constructors from `isometryDifferenceImage` and from
+`SignedIrreducibleDifferenceFamily.signedDifference` keep the character-theory
+orthogonality layer separate from the remaining finite induction.
 
 **形式化**: ~60-80 行 (非自明だが self-contained).
 

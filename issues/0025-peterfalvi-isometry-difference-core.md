@@ -85,6 +85,13 @@ created: 2026-05-25
   `SignedIrreducibleDifferenceFamily.signedDifference_apply_one_eq_zero_iff` を追加した。
   §3 (1.4) の `e₂ + e₃` 除外で使う degree-zero 条件を明示し、
   `isometry_difference_pair_structure` には image 側 `τ(χ_i-χ_0)(1)=0` 仮定を追加した。
+- `IsometryDifferencePairNumerics` を追加し、zero row, degree-zero, nonzero
+  difference norm `2`, distinct nonzero mutual inner `1` を finite combinatorial
+  core 用の単一 predicate にまとめた。
+  `isometryDifferencePairNumerics_of_isometryDifferenceImage` で `h_isom` と source
+  row orthogonality から image 側 numerics を作り、
+  `SignedIrreducibleDifferenceFamily.numerics_of_signedDifference_vanishAtOne` で
+  target signed family から同じ numerics を取り出せる。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 
