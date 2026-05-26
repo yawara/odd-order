@@ -488,8 +488,13 @@ FT クリティカル度 + 章内依存で並べる:
   (`conj_eq_inv_or_twist_of_two_adic_cases`) に渡す
   `dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases` も追加し,
   6.12 の cyclic-quotient branch は D/Q/SD 分類 surface まで接続済み.
-  次は 6.12 本文全体の maximal normal cyclic subgroup setup からこの branch theorem へ
-  必要な `a`, `e`, `i` を供給する wrapper ではない実質 assembly を切る.
+  また `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` の非中心性から
+  本文の `a ∈ T-C`, `a^p ∈ C`, `c^a=c^i`, Lemma 6.16 の `p=2` + 2-adic alternatives を
+  一括で取り出す
+  `exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic` も
+  追加済み.
+  次はこの witness extraction と cyclic quotient branch theorem をつなぐ assembly, その後
+  maximal normal cyclic subgroup setup から `T` と `P/C` cyclic を供給する段階.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

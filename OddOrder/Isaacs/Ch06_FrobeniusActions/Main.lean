@@ -6361,6 +6361,80 @@ theorem conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
   · exact ⟨htwo.1, Or.inl htwo.2⟩
   · exact ⟨htwo.1, Or.inr htwo.2⟩
 
+/-- **Isaacs Thm 6.12 setup**: extracting the element `a` and conjugation exponent `i`
+from the noncentrality of `c^p`.
+
+Under the normal-abelian-cyclic hypothesis, the preceding Lemma 6.15 bridge shows that
+`c^p` is not central in `T`. This theorem chooses an element `a ∈ T` witnessing that
+noncentrality, proves `a ∉ C`, uses `|T : C| = p` to get `a^p ∈ C = ⟨c⟩`, writes
+`a c a⁻¹ = c^i`, and dispatches Lemma 6.16 to obtain `p = 2` and the two 2-adic
+alternatives for `i`. -/
+theorem exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic
+    {P : Type*} [Group P] [Finite P] {p e : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal] {c : P}
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (hT_normal : T.Normal)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c) (hcT : c ∈ T)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T)
+    (h_order : orderOf c = p ^ e) (he : 0 < e) :
+    ∃ a : P, ∃ i : ℤ, a ∈ T ∧ a ∉ C ∧ a ^ p ∈ C ∧
+      a * c * a⁻¹ = c ^ i ∧ p = 2 ∧
+        (i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+          i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) := by
+  classical
+  let cT : T := ⟨c, hcT⟩
+  have hc_pow_not_center : cT ^ p ∉ Subgroup.center T :=
+    pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
+      hT hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_rel hT_not_comm
+  obtain ⟨aT, haT_noncomm⟩ : ∃ aT : T, aT * cT ^ p ≠ cT ^ p * aT := by
+    by_contra hno
+    push Not at hno
+    apply hc_pow_not_center
+    rw [Subgroup.mem_center_iff]
+    intro x
+    exact hno x
+  let a : P := aT
+  have haT : a ∈ T := aT.2
+  have hpow_ne : a * c ^ p * a⁻¹ ≠ c ^ p := by
+    intro hfix
+    apply haT_noncomm
+    apply Subtype.ext
+    have hcommP : a * c ^ p = c ^ p * a := by
+      calc
+        a * c ^ p = (a * c ^ p * a⁻¹) * a := by group
+        _ = c ^ p * a := by rw [hfix]
+    simpa [a, cT] using hcommP
+  have ha_notmem : a ∉ C := by
+    intro haC
+    apply hpow_ne
+    have ha_z : a ∈ Subgroup.zpowers c := by
+      simpa [hC_eq] using haC
+    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp ha_z
+    rw [← hm]
+    have hcomm : Commute (c ^ m) (c ^ p) :=
+      (Commute.zpow_self c m).pow_right p
+    rw [hcomm.eq, mul_assoc, mul_inv_cancel, mul_one]
+  have ha_pow_C : a ^ p ∈ C := by
+    have hpow := C.pow_relIndex_mem (K := T) haT
+    simpa [hC_rel] using hpow
+  have ha_pow_z : a ^ p ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using ha_pow_C
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have h_conj_mem_C : a * c * a⁻¹ ∈ C := by
+    exact (inferInstance : C.Normal).conj_mem c hcC a
+  have h_conj_mem_z : a * c * a⁻¹ ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using h_conj_mem_C
+  obtain ⟨i, h_conj_symm⟩ := Subgroup.mem_zpowers_iff.mp h_conj_mem_z
+  have h_conj : a * c * a⁻¹ = c ^ i := h_conj_symm.symm
+  obtain ⟨hp_eq_two, hcases⟩ :=
+    conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
+      (Fact.out : p.Prime) he h_order h_conj ha_pow_z hpow_ne
+  exact ⟨a, i, haT, ha_notmem, ha_pow_C, h_conj, hp_eq_two, hcases⟩
+
 /-- **Isaacs Thm 6.12 setup**: both `2`-adic alternatives from Lemma 6.16 make
 `i * 2 ≡ -2 (mod 2^e)`. -/
 private lemma mul_two_modEq_neg_two_of_two_adic_conj_cases
