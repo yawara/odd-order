@@ -5391,6 +5391,52 @@ theorem step2_join_sylow_q_eq_top
       ((V ⊔ (Q : Subgroup H)).inv_mem hy_join)
   exact eq_top_of_contains_all_conjugates_of_simple hV_ne_bot h_contains
 
+/-- **§7D Step 2 — a full Sylow `p`-subgroup normalizes no nontrivial
+`q`-subgroup** (Isaacs L3978-3980, the "in particular" clause).
+
+If `P ∈ Syl_p(H)` (`H` finite simple of order `p^a q^b`) normalized a
+nontrivial `q`-subgroup `V`, then by `step2_join_sylow_q_eq_top` we would have
+`V ⊔ Q = ⊤` for a suitable `Q ∈ Syl_q` chosen to contain `V`; but then
+`V ⊔ Q = Q ≠ ⊤`, a contradiction. -/
+theorem step2_pSylow_not_normalizes_nontrivial_qSubgroup
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hp_dvd : p ∣ Nat.card H)
+    (P : Sylow p H) {V : Subgroup H} (hV_ne_bot : V ≠ ⊥)
+    (hV_qgroup : IsPGroup q V)
+    (hP_norm : (P : Subgroup H) ≤ Subgroup.normalizer V) :
+    False := by
+  -- Pick a Sylow q-subgroup Q ⊇ V.
+  obtain ⟨Q, hVQ⟩ := IsPGroup.exists_le_sylow hV_qgroup
+  -- Step 2: V ⊔ Q = ⊤.
+  have h_top : V ⊔ (Q : Subgroup H) = ⊤ :=
+    step2_join_sylow_q_eq_top hpq hH_card P Q hV_ne_bot hP_norm
+  -- But V ≤ Q, so V ⊔ Q = Q, forcing Q = ⊤.
+  have h_join_eq_Q : V ⊔ (Q : Subgroup H) = (Q : Subgroup H) := sup_eq_right.mpr hVQ
+  rw [h_join_eq_Q] at h_top
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  have hp_ne_dvd_q : ¬ p ∣ q := by
+    rw [Nat.prime_dvd_prime_iff_eq hp_prime hq_prime]; exact hpq
+  have hq_ne_dvd_p : ¬ q ∣ p := by
+    rw [Nat.prime_dvd_prime_iff_eq hq_prime hp_prime]; exact (Ne.symm hpq)
+  -- Q = ⊤ ⇒ |H| = |Q| = q^b.  But p ∣ |H| = q^b ⇒ p ∣ q, contradiction.
+  have hQ_card : Nat.card (Q : Subgroup H) = q ^ b := by
+    rw [Q.card_eq_multiplicity, hH_card]
+    congr 1
+    rw [Nat.factorization_mul (pow_ne_zero a hp_prime.ne_zero)
+        (pow_ne_zero b hq_prime.ne_zero), Finsupp.add_apply,
+        Nat.factorization_pow_self hq_prime,
+        Nat.factorization_pow, Finsupp.smul_apply,
+        Nat.factorization_eq_zero_of_not_dvd hq_ne_dvd_p, smul_eq_mul, mul_zero, zero_add]
+  have hH_card_eq_qb : Nat.card H = q ^ b := by
+    have : Nat.card (Q : Subgroup H) = Nat.card H := by
+      rw [h_top]; exact Nat.card_congr (Subgroup.topEquiv).toEquiv
+    rw [← this, hQ_card]
+  rw [hH_card_eq_qb] at hp_dvd
+  exact hp_ne_dvd_q (hp_prime.dvd_of_dvd_pow hp_dvd)
+
 
 /-- **§7D core axiom** — *no finite simple non-solvable group has order
 dividing `p^a * q^b`*.
