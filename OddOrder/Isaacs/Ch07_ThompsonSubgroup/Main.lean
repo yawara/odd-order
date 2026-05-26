@@ -2369,6 +2369,61 @@ theorem quotient_two_subgroup_abelian
     _ = f ry * f rx := by rw [map_mul]
     _ = y * x := by rw [hfy, hfx]
 
+/-- Elementary-abelian quotient branch of Isaacs Thm 7.5 after passing to the faithful
+action of `G/K` on `V/U`.
+
+This is the quotient-condition bundle for the reduced theorem:
+`p`-separability descends by Ch03, the `2`-subgroup abelian hypothesis descends by
+`quotient_two_subgroup_abelian`, and faithfulness is by construction of
+`quotientActionFaithfulHom`. -/
+theorem quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p (V ⧸ U))
+    (hVcard : Nat.card (V ⧸ U) = p ^ 2) (P : Sylow p G) :
+    (((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+          Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+          (G ⧸ quotientActionKernel φ hU))).Normal := by
+  haveI hSepQuot :
+      OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
+        (G ⧸ quotientActionKernel φ hU) :=
+    OddOrder.Isaacs.Ch03.quotient_isPiSeparable
+      ({p} : Set ℕ) G (quotientActionKernel φ hU)
+  exact sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+    (G := G ⧸ quotientActionKernel φ hU) (V := V ⧸ U) (p := p)
+    hp2 (quotient_two_subgroup_abelian h2abelian)
+    (φ := quotientActionFaithfulHom φ hU)
+    (quotientActionFaithfulHom_injective hU) hVelem hVcard
+    (P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)))
+
+/-- Contradiction form of the elementary-abelian quotient branch of Isaacs Thm 7.5.
+
+If the action kernel `K` is a normal `p`-subgroup and the faithful quotient action on `V/U`
+has elementary-abelian order `p²`, the reduced branch proves the image of `P` normal in
+`G/K`; pulling normality back contradicts a counterexample assumption upstairs. -/
+theorem false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hK : IsPGroup p (quotientActionKernel φ hU))
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p (V ⧸ U))
+    (hVcard : Nat.card (V ⧸ U) = p ^ 2) (P : Sylow p G)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) : False :=
+  hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := quotientActionKernel φ hU) hK
+      (quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
+        hp2 h2abelian hU hVelem hVcard P))
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
