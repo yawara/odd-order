@@ -310,6 +310,10 @@ FT クリティカル度 + 章内依存で並べる:
   `exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le` を追加.
   `p ∣ |N:K|` なら Sylow `p`-subgroupは `K` に含まれず, proper A-invariant subgroup が全て
   `K` に含まれる帰納仮定下では, Ch.4 Thm 3.23(a) の A-invariant Sylow が `⊤` になる.
+- **§6B / 6.21 commutator proper step**:
+  `commutator_le_of_proper_invariant_le_of_isSolvable` を追加. solvable nontrivial `N` では
+  `N' < N` かつ `N'` は A-invariant なので, proper A-invariant subgroup が全て `K` に入る
+  帰納仮定から `N' ≤ K` を得る.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair

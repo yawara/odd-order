@@ -1247,6 +1247,27 @@ theorem exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
     hproper (P : Subgroup N) hP_smul hP_top
   exact sylow_not_le_of_prime_dvd_index P hpK hP_le_K
 
+/-- The commutator subgroup is the proper invariant subgroup used in Isaacs Thm 6.21.
+
+In the theorem's p-group case, `N` is solvable, so `N' < N`; invariance is functorial under
+automorphisms. -/
+theorem commutator_le_of_proper_invariant_le_of_isSolvable
+    {A N : Type*} [Group A] [Group N] [Finite N] [Nontrivial N] [IsSolvable N]
+    [MulDistribMulAction A N] {K : Subgroup N}
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
+    _root_.commutator N ≤ K := by
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  have hcomm_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ (_root_.commutator N) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.commutator_self φ
+  have hcomm_smul :
+      ∀ a : A, ∀ n ∈ _root_.commutator N, a • n ∈ _root_.commutator N := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem] at hcomm_inv
+    intro a n hn
+    simpa [φ] using hcomm_inv a n hn
+  exact hproper (_root_.commutator N) hcomm_smul
+    (IsSolvable.commutator_lt_top_of_nontrivial N).ne
+
 /-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
     (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
