@@ -277,6 +277,13 @@
   (`i : Fin h`) に落とし、BG の有限 family `V_i` の span/top へ渡せる.
   残る重い部分は finite-order / split-polynomial hypothesis から
   all-eigenspace top を作る段.
+- **2026-05-26**: Prop. 2.4(a) の span 側を
+  `cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one` と
+  `span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one` で直接閉じた.
+  `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition for `aeval g`
+  を使うため、単なる semisimple/diagonalization API の rename ではない.
+  残る Prop. 2.4(a) は directness と span を theorem-facing な direct-sum
+  statement に束ねる段.
 
 ## TL;DR
 
@@ -879,8 +886,8 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `E_{i,t} ≤ E_m` まで sorry-free で渡せる.
 - Prop. 2.4(a) 用に、primitive root から有限 family `V_i` の directness
   (`cyclicEigenspaceFin_iSupIndep`) を作り、`span (⋃ V_i)` と `⨆ i, V_i`
-  の top 条件を相互に使えるようにした. さらに finite-order spectrum bridge により、
-  `⨆ μ, eigenspace g μ = ⊤` が別途得られれば、`g^h = 1` から
-  BG の有限 family へ top/span を落とせる. 残る Prop. 2.4(a) の主作業は、
-  finite-order / split-polynomial hypothesis から all-eigenspace top を供給する
-  diagonalization 部分.
+  の top 条件を相互に使えるようにした. さらに primitive-root factorization
+  `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition により、
+  `g^h = 1` から直接 `⨆ i, V_i = ⊤` と `span (⋃ V_i) = ⊤` を得た.
+  残る Prop. 2.4(a) の主作業は directness/span を theorem-facing な
+  direct-sum statement に束ねる部分.

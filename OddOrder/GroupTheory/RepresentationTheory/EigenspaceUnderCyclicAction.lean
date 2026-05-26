@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.Algebra.Polynomial.RingDivision
+import Mathlib.FieldTheory.KummerExtension
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
@@ -27,6 +29,9 @@ the direct-sum and block-matrix parts of Prop 2.4 can be stated cleanly.
 namespace OddOrder
 namespace RepresentationTheory
 namespace EigenspaceUnderCyclicAction
+
+open Polynomial
+open scoped Function
 
 variable {F V : Type*} [Field F] [AddCommGroup V] [Module F V]
 
@@ -280,6 +285,105 @@ theorem span_cyclicEigenspaceFinUnion_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq
   rw [span_cyclicEigenspaceFinUnion_eq_iSup]
   exact cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one
     hepsilon hgpow hall
+
+private theorem finset_sup_ker_aeval_eq_ker_aeval_prod_of_pairwise_coprime
+    {ι : Type*} (s : Finset ι) (p : ι → Polynomial F)
+    (g : Module.End F V)
+    (hcop : (s : Set ι).Pairwise (IsCoprime on p)) :
+    s.sup (fun i => LinearMap.ker (aeval g (p i))) =
+      LinearMap.ker (aeval g (∏ i ∈ s, p i)) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+      simp only [Finset.sup_empty, Finset.prod_empty, map_one]
+      exact (LinearMap.ker_eq_bot.mpr (by intro x y h; simpa using h)).symm
+  | insert a s ha ih =>
+      have hcop_s : (s : Set ι).Pairwise (IsCoprime on p) := by
+        exact hcop.mono (by intro i hi; exact Finset.mem_insert_of_mem hi)
+      have hcop_prod : IsCoprime (p a) (∏ i ∈ s, p i) := by
+        exact IsCoprime.prod_right (fun i hi => hcop (Finset.mem_insert_self a s)
+          (Finset.mem_insert_of_mem hi) (by intro hai; exact ha (hai ▸ hi)))
+      rw [Finset.sup_insert, Finset.prod_insert ha, ih hcop_s]
+      exact Polynomial.sup_ker_aeval_eq_ker_aeval_mul_of_coprime g hcop_prod
+
+private theorem ker_sub_algebraMap_pow_eq_cyclicEigenspace {epsilon : F}
+    {g : Module.End F V} {i : ℕ} :
+    LinearMap.ker (g - (algebraMap F (Module.End F V)) epsilon ^ i) =
+      cyclicEigenspace epsilon g i := by
+  ext v
+  simp only [LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero,
+    mem_cyclicEigenspace_iff]
+  have hpow : (((algebraMap F (Module.End F V)) epsilon) ^ i) v =
+      (epsilon ^ i) • v := by
+    rw [← map_pow, Module.algebraMap_end_apply]
+  rw [hpow]
+
+private theorem ker_aeval_X_sub_C_eq_cyclicEigenspace {epsilon : F}
+    {g : Module.End F V} {i : ℕ} :
+    LinearMap.ker (aeval g (Polynomial.X - Polynomial.C (epsilon ^ i))) =
+      cyclicEigenspace epsilon g i := by
+  simpa [map_sub, aeval_X, aeval_C] using
+    (ker_sub_algebraMap_pow_eq_cyclicEigenspace (epsilon := epsilon) (g := g) (i := i))
+
+private theorem finset_sup_ker_X_sub_C_powers_eq_ker_X_pow_sub_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) :
+    (Finset.univ : Finset (Fin h)).sup
+        (fun i => LinearMap.ker (aeval g (Polynomial.X - Polynomial.C (epsilon ^ i.1)))) =
+      LinearMap.ker (aeval g (Polynomial.X ^ h - Polynomial.C (1 : F))) := by
+  classical
+  have hinj : Function.Injective fun i : Fin h => epsilon ^ i.1 := by
+    intro i j hij
+    exact Fin.ext (hepsilon.pow_inj i.2 j.2 hij)
+  have hcop : ((Finset.univ : Finset (Fin h)) : Set (Fin h)).Pairwise
+      (IsCoprime on fun i : Fin h => Polynomial.X - Polynomial.C (epsilon ^ i.1 : F)) := by
+    exact Polynomial.pairwise_coprime_X_sub_C hinj |>.set_pairwise _
+  have hsup := finset_sup_ker_aeval_eq_ker_aeval_prod_of_pairwise_coprime
+    (F := F) (V := V) (Finset.univ : Finset (Fin h))
+    (fun i : Fin h => Polynomial.X - Polynomial.C (epsilon ^ i.1 : F)) g hcop
+  have hprod :
+      (∏ i : Fin h, (Polynomial.X - Polynomial.C (epsilon ^ i.1 : F))) =
+        Polynomial.X ^ h - Polynomial.C (1 : F) := by
+    calc
+      (∏ i : Fin h, (Polynomial.X - Polynomial.C (epsilon ^ i.1 : F)))
+          = ∏ i ∈ Finset.range h, (Polynomial.X - Polynomial.C (epsilon ^ i : F)) := by
+            simpa using (Fin.prod_univ_eq_prod_range
+              (fun i => Polynomial.X - Polynomial.C (epsilon ^ i : F)) h)
+      _ = Polynomial.X ^ h - Polynomial.C (1 : F) := by
+            simpa using (X_pow_sub_C_eq_prod hepsilon (NeZero.pos h) (one_pow h)).symm
+  rw [hprod] at hsup
+  simpa using hsup
+
+/-- BG Prop 2.4(a)'s spanning input.
+
+If `g` has finite order dividing `h` and `epsilon` is a primitive `h`-th root,
+then the displayed finite family of eigenspaces `V_i`, `i : Fin h`, spans the
+whole space.  The proof factors `X^h - 1` into the distinct linear factors
+`X - epsilon^i` and uses coprime kernel decomposition for polynomial
+functional calculus. -/
+theorem cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1) :
+    (⨆ i : Fin h, cyclicEigenspaceFin epsilon g i) = ⊤ := by
+  classical
+  have hsup := finset_sup_ker_X_sub_C_powers_eq_ker_X_pow_sub_one
+    (F := F) (V := V) (epsilon := epsilon) (g := g) (h := h) hepsilon
+  rw [Finset.sup_univ_eq_iSup] at hsup
+  have hker : LinearMap.ker (aeval g (Polynomial.X ^ h - Polynomial.C (1 : F))) = ⊤ := by
+    have hae : aeval g (Polynomial.X ^ h - Polynomial.C (1 : F)) = 0 := by
+      simp [hgpow]
+    rw [hae, LinearMap.ker_zero]
+  rw [hker] at hsup
+  simpa [cyclicEigenspaceFin, ker_aeval_X_sub_C_eq_cyclicEigenspace,
+    ker_sub_algebraMap_pow_eq_cyclicEigenspace] using hsup
+
+/-- Span form of BG Prop 2.4(a)'s finite-order spanning input. -/
+theorem span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1) :
+    Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) = ⊤ := by
+  rw [span_cyclicEigenspaceFinUnion_eq_iSup]
+  exact cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one hepsilon hgpow
 
 /-- BG Prop 2.4 notation `E_{i,t}` over the finite index range
 `0 ≤ i,t ≤ h - 1`.

@@ -62,6 +62,12 @@ to Prop 2.4.
   restrict that top span to the displayed BG family `V_0, ..., V_{h-1}`.
   Remaining work is to produce the all-eigenspace top span from the finite-order
   / split-polynomial hypothesis.
+- 2026-05-26: Closed the finite-order span input directly as
+  `cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one` and
+  `span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one`.  The proof factors
+  `X^h - 1` as `∏ (X - ε^i)` using the primitive root, then uses coprime
+  kernel decomposition for `aeval g`; this replaces the previous placeholder
+  "diagonalization" input for Prop. 2.4(a)'s spanning half.
 
 ## 完了条件
 
