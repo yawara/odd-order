@@ -417,6 +417,12 @@ FT クリティカル度 + 章内依存で並べる:
   も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
   直接合う
   `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
+  6.12 本文冒頭の maximal normal abelian subgroup argument に向けて,
+  `C < C_P(C)` から Ch01 Lemma 1.23 で `C < B ≤ C_P(C)`, `C.relIndex B = p`,
+  `B ⊴ P` を取り, `C ≤ Z(B)` と prime quotient cyclicity から `B` 可換を導く
+  `exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer` を追加済み.
+  これは mathlib 定理の純粋 rename ではなく, Ch01 の p-group intermediate subgroup
+  construction と 6.12 の centralizer obstruction を直接つなぐ bridge.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

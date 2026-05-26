@@ -3224,6 +3224,55 @@ theorem false_of_unique_subgroups_card_two_of_external_involution_of_index_two
   exact false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
     hP hUnique hC_ne ha_notmem ha_sq
 
+/-! ### The first enlargement step in Theorem 6.12 -/
+
+/-- **Isaacs Thm 6.12 setup**: if `C` is a normal subgroup of a finite `p`-group `P` and
+`C < C_P(C)`, then there is a normal abelian subgroup `B` with `C < B ≤ C_P(C)` and
+`|B : C| = p`.
+
+This is the formal version of the first paragraph of the proof of Thm 6.12.  Ch.1 Lemma 1.23
+supplies the normal intermediate subgroup of prime relative index; since `B ≤ C_P(C)`,
+`C` is central in `B`, and the prime quotient `B/C` is cyclic, so `B` is abelian by
+`commutative_of_cyclic_center_quotient`. -/
+theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal]
+    (hC_lt_cent : C < Subgroup.centralizer (C : Set P)) :
+    ∃ B : Subgroup P, B.Normal ∧ C < B ∧ B ≤ Subgroup.centralizer (C : Set P) ∧
+      C.relIndex B = p ∧ IsMulCommutative B := by
+  haveI hCent_normal : (Subgroup.centralizer (C : Set P)).Normal :=
+    Subgroup.normal_centralizer
+  obtain ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel⟩ :=
+    OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_index_eq_prime
+      hP (N := C) (M := Subgroup.centralizer (C : Set P)) hC_lt_cent
+  haveI hC_sub_normal : (C.subgroupOf B).Normal := inferInstance
+  have hC_sub_le_center : C.subgroupOf B ≤ Subgroup.center B := by
+    intro c hc
+    rw [Subgroup.mem_center_iff]
+    intro b
+    apply Subtype.ext
+    have hb_cent : ((b : B) : P) ∈ Subgroup.centralizer (C : Set P) :=
+      hB_le_cent b.2
+    have hc_mem : ((c : B) : P) ∈ C := by
+      simpa [Subgroup.mem_subgroupOf] using hc
+    have h_comm :
+        ((c : B) : P) * ((b : B) : P) = ((b : B) : P) * ((c : B) : P) :=
+      (Subgroup.mem_centralizer_iff.mp hb_cent) ((c : B) : P) hc_mem
+    exact h_comm.symm
+  have h_card_quot : Nat.card (B ⧸ C.subgroupOf B) = p := by
+    rw [← Subgroup.index_eq_card]
+    simpa [Subgroup.relIndex] using hC_rel
+  have h_cyclic_quot : IsCyclic (B ⧸ C.subgroupOf B) :=
+    isCyclic_of_prime_card h_card_quot
+  have hB_comm : ∀ x y : B, x * y = y * x := by
+    haveI : IsCyclic (B ⧸ C.subgroupOf B) := h_cyclic_quot
+    exact commutative_of_cyclic_center_quotient
+      (QuotientGroup.mk' (C.subgroupOf B)) (by
+        rw [QuotientGroup.ker_mk']
+        exact hC_sub_le_center)
+  exact ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel, ⟨⟨hB_comm⟩⟩⟩
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/
