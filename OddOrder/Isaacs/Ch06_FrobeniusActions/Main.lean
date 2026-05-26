@@ -3299,6 +3299,61 @@ theorem centralizer_eq_of_maximal_normal_isMulCommutative
     exact hC_max B hB_normal hB_comm hC_lt_B
   exact le_antisymm hcent_le_C hC_le_cent
 
+/-- **Isaacs Thm 6.12 setup**: if `C` is cyclic and self-centralizing in `P`, then
+`P/C` is abelian.
+
+The conjugation homomorphism `P → Aut(C)` has kernel `C_P(C)`.  Under the self-centralizing
+hypothesis this kernel is exactly `C`, so it induces an embedding `P/C ↪ Aut(C)`.  Since the
+automorphism group of a cyclic group is abelian, the quotient `P/C` is abelian. -/
+theorem quotient_commutative_of_isCyclic_of_self_centralizing
+    {P : Type*} [Group P]
+    {C : Subgroup P} [C.Normal] (hC_cyclic : IsCyclic C)
+    (hCent : Subgroup.centralizer (C : Set P) = C) :
+    ∀ x y : P ⧸ C, x * y = y * x := by
+  let φ : P →* MulAut C := MulAut.conjNormal (H := C)
+  have hker : φ.ker = C := by
+    ext g
+    constructor
+    · intro hg
+      rw [MonoidHom.mem_ker] at hg
+      have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro c hc
+        let cC : C := ⟨c, hc⟩
+        have hfix : φ g cC = cC := by
+          have h := congrArg (fun ψ : MulAut C => ψ cC) hg
+          simpa using h
+        have hconj : g * c * g⁻¹ = c := by
+          have hval := congrArg Subtype.val hfix
+          simpa [φ, cC] using hval
+        have hgc : g * c = c * g := by
+          calc g * c = (g * c * g⁻¹) * g := by simp [mul_assoc]
+            _ = c * g := by rw [hconj]
+        exact hgc.symm
+      simpa [hCent] using hg_cent
+    · intro hgC
+      rw [MonoidHom.mem_ker]
+      ext c
+      have hg_cent : g ∈ Subgroup.centralizer (C : Set P) := by
+        simpa [hCent] using hgC
+      have hcomm : (c : P) * g = g * (c : P) :=
+        (Subgroup.mem_centralizer_iff.mp hg_cent) (c : P) c.2
+      calc ((φ g c : C) : P) = g * (c : P) * g⁻¹ := by rfl
+        _ = ((c : P) * g) * g⁻¹ := by rw [← hcomm]
+        _ = (c : P) := by simp [mul_assoc]
+        _ = (((1 : MulAut C) c : C) : P) := by rfl
+  let ψ : P ⧸ C →* MulAut C := QuotientGroup.lift C φ (by rw [hker])
+  have hψ_inj : Function.Injective ψ := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    dsimp [ψ]
+    rw [QuotientGroup.ker_lift, hker]
+    simp
+  haveI : IsCyclic C := hC_cyclic
+  let e := IsCyclic.mulAutMulEquiv C
+  letI : CommGroup (MulAut C) := e.toMonoidHom.commGroupOfInjective e.injective
+  letI : CommGroup (P ⧸ C) := ψ.commGroupOfInjective hψ_inj
+  exact mul_comm
+
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
 `P ≃* DihedralGroup (orderOf c)`. -/
