@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Elementary Abelian Groups
@@ -146,6 +147,154 @@ theorem exists_subgroup_card_prime_sq
 end IsElementaryAbelian
 
 end OddOrder.GroupTheory
+
+namespace IsPGroup
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+open scoped Pointwise
+
+private theorem subgroup_normal_of_le_center {H : Subgroup G} (hH : H ≤ Subgroup.center G) :
+    H.Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  have hn_center : n ∈ Subgroup.center G := hH hn
+  have hgn : g * n = n * g := Subgroup.mem_center_iff.mp hn_center g
+  have hconj : g * n * g⁻¹ = n := by
+    calc
+      g * n * g⁻¹ = n * g * g⁻¹ := by rw [hgn]
+      _ = n := by simp
+  rwa [hconj]
+
+/-- A nontrivial finite `p`-group contains a central subgroup of order `p`. -/
+theorem exists_subgroup_le_center_card_prime
+    [Finite G] [Fact p.Prime] (hG : IsPGroup p G) [Nontrivial G] :
+    ∃ Z : Subgroup G, Z ≤ Subgroup.center G ∧ Nat.card Z = p := by
+  haveI hCenter_nontrivial : Nontrivial (Subgroup.center G) := hG.center_nontrivial
+  have hCenter_card_gt : 1 < Nat.card (Subgroup.center G) :=
+    Finite.one_lt_card_iff_nontrivial.mpr hCenter_nontrivial
+  have hCenter_pgroup : IsPGroup p (Subgroup.center G) := hG.to_subgroup _
+  have hp_dvd_center : p ∣ Nat.card (Subgroup.center G) := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hCenter_pgroup
+    rw [hn] at hCenter_card_gt ⊢
+    have hn_pos : 0 < n := by
+      cases n with
+      | zero =>
+          simp at hCenter_card_gt
+      | succ n =>
+          exact Nat.succ_pos n
+    exact dvd_pow_self p hn_pos.ne'
+  obtain ⟨z, hz_order⟩ :=
+    exists_prime_orderOf_dvd_card' (G := Subgroup.center G) p hp_dvd_center
+  let Z : Subgroup G := Subgroup.zpowers (z : G)
+  have hZ_le_center : Z ≤ Subgroup.center G := Subgroup.zpowers_le.mpr z.2
+  have hZ_card : Nat.card Z = p := by
+    rw [show Z = Subgroup.zpowers (z : G) from rfl, Nat.card_zpowers]
+    exact (Subgroup.orderOf_coe z).trans hz_order
+  exact ⟨Z, hZ_le_center, hZ_card⟩
+
+/-- If a finite `p`-group has two distinct subgroups of order `p`, then it contains an
+elementary abelian subgroup of order `p^2`. -/
+theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+    [Finite G] [Fact p.Prime] (hG : IsPGroup p G)
+    {K L : Subgroup G} (hK_card : Nat.card K = p) (hL_card : Nat.card L = p)
+    (hKL_ne : K ≠ L) :
+    ∃ E : Subgroup G, OddOrder.GroupTheory.IsElementaryAbelian p E ∧ Nat.card E = p ^ 2 := by
+  classical
+  haveI : Nontrivial K := by
+    apply Finite.one_lt_card_iff_nontrivial.mp
+    rw [hK_card]
+    exact (Fact.out : p.Prime).one_lt
+  obtain ⟨k, hk_ne⟩ := exists_ne (1 : K)
+  haveI : Nontrivial G := ⟨⟨(k : G), 1, fun hk => hk_ne (Subtype.ext hk)⟩⟩
+  obtain ⟨Z, hZ_le_center, hZ_card⟩ := hG.exists_subgroup_le_center_card_prime
+  let U : Subgroup G := if Z = K then L else K
+  have hU_card : Nat.card U = p := by
+    by_cases hZK : Z = K
+    · simp [U, hZK, hL_card]
+    · simp [U, hZK, hK_card]
+  have hZU_ne : Z ≠ U := by
+    by_cases hZK : Z = K
+    · simp [U, hZK, hKL_ne]
+    · simp [U, hZK]
+  have hInf_bot : Z ⊓ U = ⊥ := by
+    have hInf_dvd : Nat.card (Z ⊓ U : Subgroup G) ∣ p := by
+      rw [← hU_card]
+      exact Subgroup.card_dvd_of_le inf_le_right
+    rcases (Nat.dvd_prime Fact.out).mp hInf_dvd with hInf_card | hInf_card
+    · exact Subgroup.eq_bot_of_card_eq _ hInf_card
+    · exfalso
+      have hInf_eq_Z : Z ⊓ U = Z :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hInf_card, hZ_card])
+      have hInf_eq_U : Z ⊓ U = U :=
+        Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [hInf_card, hU_card])
+      exact hZU_ne (hInf_eq_Z.symm.trans hInf_eq_U)
+  haveI hZ_normal : Z.Normal := subgroup_normal_of_le_center hZ_le_center
+  let E : Subgroup G := Z ⊔ U
+  have hE_card : Nat.card E = p ^ 2 := by
+    have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Z U
+    rw [← Subgroup.normal_mul Z U, hInf_bot, Subgroup.card_bot, hZ_card, hU_card, mul_one] at hcard
+    simpa [E, pow_two] using hcard
+  have hE_set : (E : Set G) = (Z : Set G) * (U : Set G) := by
+    simpa [E] using (Subgroup.normal_mul Z U)
+  have hZ_pow : ∀ z ∈ Z, z ^ p = 1 := by
+    intro z hz
+    have hz_pow := pow_card_eq_one' (G := Z) (x := (⟨z, hz⟩ : Z))
+    have hz_pow_coe := congrArg Subtype.val hz_pow
+    simpa [hZ_card] using hz_pow_coe
+  have hU_pow : ∀ u ∈ U, u ^ p = 1 := by
+    intro u hu
+    have hu_pow := pow_card_eq_one' (G := U) (x := (⟨u, hu⟩ : U))
+    have hu_pow_coe := congrArg Subtype.val hu_pow
+    simpa [hU_card] using hu_pow_coe
+  have hZ_comm : ∀ z ∈ Z, ∀ g : G, z * g = g * z := by
+    intro z hz g
+    exact (Subgroup.mem_center_iff.mp (hZ_le_center hz) g).symm
+  have hU_comm : ∀ u₁ ∈ U, ∀ u₂ ∈ U, u₁ * u₂ = u₂ * u₁ := by
+    haveI : IsCyclic U := isCyclic_of_prime_card hU_card
+    letI : CommGroup U := IsCyclic.commGroup
+    intro u₁ hu₁ u₂ hu₂
+    have hcomm : (⟨u₁, hu₁⟩ : U) * ⟨u₂, hu₂⟩ = ⟨u₂, hu₂⟩ * ⟨u₁, hu₁⟩ :=
+      mul_comm _ _
+    exact congrArg Subtype.val hcomm
+  refine ⟨E, ?_, hE_card⟩
+  constructor
+  · intro x y
+    obtain ⟨zx, hzx, ux, hux, hx_prod⟩ : ∃ zx ∈ Z, ∃ ux ∈ U, zx * ux = (x : G) := by
+      have hx_mem : (x : G) ∈ (Z : Set G) * (U : Set G) := by
+        rw [← hE_set]
+        exact x.2
+      simpa only [Set.mem_mul] using hx_mem
+    obtain ⟨zy, hzy, uy, huy, hy_prod⟩ : ∃ zy ∈ Z, ∃ uy ∈ U, zy * uy = (y : G) := by
+      have hy_mem : (y : G) ∈ (Z : Set G) * (U : Set G) := by
+        rw [← hE_set]
+        exact y.2
+      simpa only [Set.mem_mul] using hy_mem
+    apply Subtype.ext
+    change (x : G) * (y : G) = (y : G) * (x : G)
+    rw [← hx_prod, ← hy_prod]
+    have hux_zy : Commute ux zy := (hZ_comm zy hzy ux).symm
+    have hzx_zy : Commute zx zy := hZ_comm zx hzx zy
+    have hux_uy : Commute ux uy := hU_comm ux hux uy huy
+    have hzx_uy : Commute zx uy := hZ_comm zx hzx uy
+    calc
+      (zx * ux) * (zy * uy) = zx * ux * (zy * uy) := by rw [mul_assoc]
+      _ = zx * zy * (ux * uy) := hux_zy.mul_mul_mul_comm zx uy
+      _ = zy * zx * (uy * ux) := by rw [hzx_zy.eq, hux_uy.eq]
+      _ = zy * uy * (zx * ux) := hzx_uy.mul_mul_mul_comm zy ux
+      _ = (zy * uy) * (zx * ux) := by rw [mul_assoc]
+  · intro x
+    obtain ⟨z, hz, u, hu, hx_prod⟩ : ∃ z ∈ Z, ∃ u ∈ U, z * u = (x : G) := by
+      have hx_mem : (x : G) ∈ (Z : Set G) * (U : Set G) := by
+        rw [← hE_set]
+        exact x.2
+      simpa only [Set.mem_mul] using hx_mem
+    apply Subtype.ext
+    change ((x : G) ^ p) = 1
+    rw [← hx_prod]
+    have hzu : Commute z u := hZ_comm z hz u
+    rw [hzu.mul_pow, hZ_pow z hz, hU_pow u hu, one_mul]
+
+end IsPGroup
 
 namespace Subgroup
 

@@ -209,6 +209,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
 
+-- Ch.6 (Frobenius Actions): Cor 6.10 Sylow subgroups have unique order-`p` subgroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.subgroups_card_prime_unique_of_frobeniusAction_sylow
+
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
 -- elementary abelian subgroup of order 4.

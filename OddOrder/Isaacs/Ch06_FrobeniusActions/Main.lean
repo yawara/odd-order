@@ -2549,6 +2549,23 @@ theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
       false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
         (p := p) (q := q) hFrob B hqp hCard hNotCyclic
 
+/-- **Isaacs Cor 6.10**: if `P` is a Sylow `p`-subgroup of a finite Frobenius
+complement, then `P` contains at most one subgroup of order `p`. -/
+theorem subgroups_card_prime_unique_of_frobeniusAction_sylow
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [hp : Fact p.Prime] (P : Sylow p A) :
+    ∀ K L : Subgroup P, Nat.card K = p → Nat.card L = p → K = L := by
+  intro K L hK_card hL_card
+  by_contra hKL_ne
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    P.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+      hK_card hL_card hKL_ne
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := P) (U := U) (IsFrobeniusAction.actorSubgroup hFrob (P : Subgroup A))
+      E hp.out hE_elem hE_card
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/

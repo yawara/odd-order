@@ -337,6 +337,11 @@ FT クリティカル度 + 章内依存で並べる:
   `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime` で `p=q`,
   `p<q`, `p>q` を統合し, 6.9 本文の「位数 `pq` の部分群は巡回」分岐を
   contradiction form で閉じた.
+- 6.10 Sylow `p` 部分群の位数 `p` 部分群一意性:
+  `IsPGroup.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne` を共有補題化
+  (p-group 内に位数 `p` 部分群が 2 つあれば, 中心の位数 `p` 部分群と合わせて
+  elementary abelian `p^2` 部分群を作る). これを 6.9 elementary branch に接続して
+  `subgroups_card_prime_unique_of_frobeniusAction_sylow` を sorry-free で閉じた.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
