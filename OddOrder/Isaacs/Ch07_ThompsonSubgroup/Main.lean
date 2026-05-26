@@ -4339,6 +4339,50 @@ private axiom step4_5_normal_J_hypotheses
     OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G) ∧
       (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p
 
+/-! ### Step 8 action setup: `Ḡ →* MulAut V` (mmd L3879)
+
+The book's Step 8 builds the conjugation action `Ḡ ↷ V` and checks
+faithfulness (Step 6).  Below we lift `MulAut.conjNormal : G →* MulAut V` to a
+homomorphism `Ḡ →* MulAut V` via `QuotientGroup.lift`, using `U ≤ ker` (which
+holds because `V ⊆ Z(U)`). -/
+
+/-- `O_p(G) ≤ ker (MulAut.conjNormal : G →* MulAut V)`: every `u ∈ U`
+centralizes `V = Ω₁ Z(U)` (since `V ⊆ Z(U)`). -/
+private theorem opCore_le_ker_conjNormal_omega1ZCenterOpCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    OddOrder.Isaacs.Ch01.opCore p G ≤
+      (MulAut.conjNormal (H := omega1ZCenterOpCore G p)).ker := by
+  intro u hu_U
+  rw [MonoidHom.mem_ker]
+  apply MulEquiv.ext
+  intro v
+  -- Goal: (MulAut.conjNormal u) v = (1 : MulAut V) v = v
+  apply Subtype.ext
+  -- Goal: ↑((MulAut.conjNormal u) v) = ↑v
+  rw [MulAut.conjNormal_apply]
+  -- Goal: u * v * u⁻¹ = v
+  have hv_cent : (v : G) ∈ Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) :=
+    omega1ZCenterOpCore_centralizes_opCore v.property
+  have hvu : (u : G) * (v : G) = (v : G) * (u : G) :=
+    (Subgroup.mem_centralizer_iff.mp hv_cent) u hu_U
+  -- Convert "(1 : MulAut V) v" on the RHS.
+  show (u : G) * (v : G) * (u : G)⁻¹ = (v : G)
+  calc (u : G) * (v : G) * (u : G)⁻¹
+      = (v : G) * (u : G) * (u : G)⁻¹ := by rw [hvu]
+    _ = (v : G) := by group
+
+/-- **The factored action `Ḡ →* MulAut V`**: lifts `MulAut.conjNormal` via
+`U ≤ ker`. -/
+private noncomputable def conjActionOnOmega1ZCenter_quotient
+    (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime] :
+    (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) →*
+      MulAut ↥(omega1ZCenterOpCore G p) :=
+  QuotientGroup.lift _ MulAut.conjNormal (by
+    rw [show OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G =
+        OddOrder.Isaacs.Ch01.opCore p G from
+      OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p]
+    exact opCore_le_ker_conjNormal_omega1ZCenterOpCore)
+
 /-- **Isaacs Thm 7.6 Step 8a** (local axiom — mmd L3893-3895): apply Thm 7.5.
 
 Given Step 4-5-6-7 outputs:
