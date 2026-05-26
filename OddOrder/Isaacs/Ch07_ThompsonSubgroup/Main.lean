@@ -2948,7 +2948,7 @@ end -- 7C
 
 section /- 7D: Burnside p^a q^b -/
 
-/-! ### Thm 7.8 — Burnside `p^a q^b` ⇒ solvable (statement 保留)
+/-! ### Thm 7.8 — Burnside `p^a q^b` ⇒ solvable (conditional on 9-step argument)
 
 **Isaacs Thm 7.8** (mmd L3955):
 
@@ -2960,6 +2960,93 @@ section /- 7D: Burnside p^a q^b -/
 
 BG/Peterfalvi 直接被引用無いので最後着手. Phase 1 完成度のため必須 (BG L2633 で
 "we can obtain Burnside's `p^a q^b` very easily now" として言及). -/
+
+/-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability, conditional on 9-step argument).
+
+The full theorem (Isaacs L3955) states:
+
+> If `|G| = p^a * q^b` for primes `p, q`, then `G` is solvable.
+
+The textbook proof (Isaacs p.219-222) is the character-free
+**Goldschmidt-Bender-Matsuyama 9-step argument**: assume `G` is a minimum
+counterexample (non-solvable group of minimum order `p^a q^b`).  Steps 1-7
+establish that `G` is simple, picks a `p`-type maximal subgroup `M` containing a
+Sylow `p`-subgroup `P`, and shows `¬(p = 2 ∨ q = 2)`.  Step 8 applies the
+**normal-J theorem (Thm 7.6)** to get `J(S) ⊴ M` for `S ∈ Syl_p(M)`.  Step 9
+derives a contradiction from `J(S) ⊴ M` together with Thompson factorization
+properties of `M`.
+
+**This formalization takes the contradiction at the minimum counterexample as a
+forward-dependency hypothesis** (`hMinCounterexample`), universalized over any
+finite group `H` whose order divides `|G| = p^a q^b`.  The 9-step
+Goldschmidt-Bender-Matsuyama argument will discharge this hypothesis once
+Thm 7.6 + `IsPType` / Thompson factorization machinery lands in §7D.
+
+Given `hMinCounterexample`, the conclusion follows by **strong induction on
+`Nat.card G`**: at any group `H` (of order dividing `|G|`), if `H` is not
+solvable then by the induction hypothesis every proper normal subgroup `N ⊴ H`
+is solvable (since `|N| < |H|`) and every quotient `H/N` with `N ≠ ⊥` is solvable
+(since `|H/N| < |H|`).  Plugging into `hMinCounterexample` yields `False`. -/
+theorem burnside_p_pow_q_pow.{u}
+    {G : Type u} [Group G] [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (_hpq : p ≠ q)
+    (_hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b)
+    (hMinCounterexample :
+       ∀ (H : Type u) [Group H] [Finite H],
+         Nat.card H ∣ Nat.card G →
+         (¬ IsSolvable H) →
+         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N) →
+         (∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) →
+         False) :
+    IsSolvable G := by
+  classical
+  -- Strong induction on `Nat.card` via an explicit motive over arbitrary finite
+  -- groups whose order divides `|G|`.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (H : Type u) [Group H] [Finite H],
+      Nat.card H ∣ Nat.card G → Nat.card H = n → IsSolvable H
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G dvd_rfl rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih H _ _ hH_dvd hH_card
+  -- Apply the minimum-counterexample contradiction.
+  by_contra hH_nsol
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
+  -- Subgroup orders divide the ambient order; use Lagrange + IH.
+  have hN_solvable :
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := by
+    intro N hN_top _hN_norm
+    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
+    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
+    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
+    -- |N| ≠ |H| since N ≠ ⊤ (in a finite group).
+    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
+      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hN_lt : Nat.card N < n :=
+      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
+    exact ih (Nat.card N) hN_lt N hN_dvd_G rfl
+  -- Quotient orders divide the ambient order; use index-bound + IH.
+  have hQ_solvable :
+      ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N) := by
+    intro N hN_norm hN_bot
+    have hQ_dvd_H : Nat.card (H ⧸ N) ∣ Nat.card H := N.card_quotient_dvd_card
+    have hQ_dvd_G : Nat.card (H ⧸ N) ∣ Nat.card G := hQ_dvd_H.trans hH_dvd
+    -- |H| = |H/N| * |N| with |N| ≥ 2 ⇒ |H/N| < |H|.
+    have hN_card_two : 1 < Nat.card N := N.one_lt_card_iff_ne_bot.mpr hN_bot
+    have hH_eq : Nat.card H = Nat.card (H ⧸ N) * Nat.card N :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup N
+    have hQ_pos : 0 < Nat.card (H ⧸ N) :=
+      Nat.pos_of_dvd_of_pos hQ_dvd_H hH_pos
+    have hQ_lt_H : Nat.card (H ⧸ N) < Nat.card H := by
+      calc Nat.card (H ⧸ N)
+          = Nat.card (H ⧸ N) * 1 := (Nat.mul_one _).symm
+        _ < Nat.card (H ⧸ N) * Nat.card N :=
+            Nat.mul_lt_mul_of_pos_left hN_card_two hQ_pos
+        _ = Nat.card H := hH_eq.symm
+    have hQ_lt : Nat.card (H ⧸ N) < n := hQ_lt_H.trans_eq hH_card
+    exact ih (Nat.card (H ⧸ N)) hQ_lt (H ⧸ N) hQ_dvd_G rfl
+  exact hMinCounterexample H hH_dvd hH_nsol hN_solvable hQ_solvable
 
 end -- 7D
 
