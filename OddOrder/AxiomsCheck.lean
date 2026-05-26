@@ -445,6 +445,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.subgroup_normal_of_injective_mulAut_of_isCyclic
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotientActionKernel_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotientActionFaithfulHom_injective
+#assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotient_card_le_prime_sq_of_actionCentralizer_inf

@@ -1968,6 +1968,41 @@ noncomputable def quotientActionKernel {A V : Type*} [Group A] [Group V]
     (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) : Subgroup A :=
   (quotientActionHom φ hU).ker
 
+/-- The kernel of the induced quotient action is normal in the acting group. -/
+instance quotientActionKernel_normal {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    (quotientActionKernel φ hU).Normal := by
+  change (quotientActionHom φ hU).ker.Normal
+  infer_instance
+
+/-- The faithful action of `A/K` on `V/U`, where `K` is the kernel of the induced action.
+
+This is the formal version of the Thm 7.5 step "the quotient group `G/K` acts faithfully on
+`V/U`". -/
+noncomputable def quotientActionFaithfulHom {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    A ⧸ quotientActionKernel φ hU →* MulAut (V ⧸ U) :=
+  QuotientGroup.kerLift (quotientActionHom φ hU)
+
+@[simp]
+theorem quotientActionFaithfulHom_mk' {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (a : A) :
+    quotientActionFaithfulHom φ hU
+        (QuotientGroup.mk' (quotientActionKernel φ hU) a) =
+      quotientActionHom φ hU a :=
+  rfl
+
+/-- The action of `A/K` on `V/U` is faithful by construction. -/
+theorem quotientActionFaithfulHom_injective {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    Function.Injective (quotientActionFaithfulHom φ hU) := by
+  dsimp [quotientActionFaithfulHom, quotientActionKernel]
+  exact QuotientGroup.kerLift_injective (quotientActionHom φ hU)
+
 /-- If `K` lies in the kernel of the quotient action on `V/U`, then `[V,K] ≤ U`.
 
 This is the formal quotient-kernel bridge used in Isaacs Thm 7.5 after passing from

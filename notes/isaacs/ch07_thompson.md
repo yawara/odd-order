@@ -228,6 +228,8 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   (`actionCommutator_quotientActionKernel_le`), `[V,K,K]=1` bridge
   (`actionCommutator_quotientActionKernel_le_fixedPoints`), faithful action + `V` p-group から
   `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
+  また quotient-by-kernel action の faithful form
+  (`quotientActionFaithfulHom`, `quotientActionFaithfulHom_injective`) も追加済み.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
@@ -307,6 +309,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
      `actionCommutator_quotientActionKernel_le_fixedPoints`,
      `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は上記 bridge で供給.
+   - ✅ quotient-by-kernel action: `G/K` が `V/U` に faithful に作用する
+     (`quotientActionFaithfulHom_injective`).
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から
