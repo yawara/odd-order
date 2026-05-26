@@ -4187,6 +4187,72 @@ theorem opCore_eq_bot_of_simple_nonsolvable
     have hH_pgroup : IsPGroup r H := h_top_pgroup.of_equiv h_iso
     exact not_isPGroup_of_nonsolvable hH_nsol hH_pgroup
 
+/-- **§7D helper**: in a finite simple non-solvable group, the order is
+divisible by at least 2 distinct primes.
+
+This is immediate from `not_isPGroup_of_nonsolvable`: if only one prime
+divided `|H|`, then `|H| = r^n` (by unique factorization), so `H` is an
+`r`-group by `IsPGroup.of_card`, hence solvable. -/
+theorem two_primes_dvd_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H]
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    ∃ r₁ r₂ : ℕ, r₁.Prime ∧ r₂.Prime ∧ r₁ ≠ r₂ ∧
+      r₁ ∣ Nat.card H ∧ r₂ ∣ Nat.card H := by
+  classical
+  by_contra h_not_two
+  push Not at h_not_two
+  haveI : Nontrivial H := (inferInstance : IsSimpleGroup H).toNontrivial
+  have hH_card_gt : 1 < Nat.card H := Finite.one_lt_card
+  -- Pick any prime divisor.
+  obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hH_card_gt.ne'
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  -- Every prime divisor equals r.
+  have hr_only : ∀ s ∈ Nat.primeFactorsList (Nat.card H), s = r := by
+    intro s hs
+    obtain ⟨hs_prime, hs_dvd⟩ := (Nat.mem_primeFactorsList Nat.card_pos.ne').mp hs
+    by_contra hsr
+    exact h_not_two r s hr_prime hs_prime (Ne.symm hsr) hr_dvd hs_dvd
+  -- Then |H| = r^|primeFactorsList H| via IsPGroup.iff_card mpr argument.
+  have h_eq : Nat.card H = r ^ (Nat.card H).primeFactorsList.length := by
+    have hH_ne : Nat.card H ≠ 0 := Nat.card_pos.ne'
+    rw [← List.prod_replicate, ← List.eq_replicate_of_mem hr_only,
+        Nat.prod_primeFactorsList hH_ne]
+  have hH_pgroup : IsPGroup r H := IsPGroup.of_card h_eq
+  exact not_isPGroup_of_nonsolvable hH_nsol hH_pgroup
+
+/-- **§7D helper** (specialization): a simple non-solvable group of order
+dividing `p^a * q^b` (with `p ≠ q` prime) has its order divisible by both
+`p` and `q`. -/
+theorem p_and_q_dvd_card_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b) :
+    p ∣ Nat.card H ∧ q ∣ Nat.card H := by
+  obtain ⟨r₁, r₂, hr₁_prime, hr₂_prime, hr_ne, hr₁_dvd, hr₂_dvd⟩ :=
+    two_primes_dvd_of_simple_nonsolvable hH_simple hH_nsol
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- Each rᵢ divides p^a * q^b, so by Nat.Prime.dvd_mul rᵢ ∈ {p, q}.
+  have hr_in : ∀ r : ℕ, r.Prime → r ∣ Nat.card H → r = p ∨ r = q := by
+    intro r hr_prime hr_dvd_H
+    have hr_dvd : r ∣ p ^ a * q ^ b := hr_dvd_H.trans hH_dvd
+    rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd with hp_branch | hq_branch
+    · left
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp
+        (hr_prime.dvd_of_dvd_pow hp_branch)
+    · right
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp
+        (hr_prime.dvd_of_dvd_pow hq_branch)
+  -- We have r₁ ≠ r₂, each ∈ {p, q}. Therefore {r₁, r₂} = {p, q}.
+  rcases hr_in r₁ hr₁_prime hr₁_dvd with hr₁p | hr₁q
+  · rcases hr_in r₂ hr₂_prime hr₂_dvd with hr₂p | hr₂q
+    · exact absurd (hr₁p.trans hr₂p.symm) hr_ne
+    · exact ⟨hr₁p ▸ hr₁_dvd, hr₂q ▸ hr₂_dvd⟩
+  · rcases hr_in r₂ hr₂_prime hr₂_dvd with hr₂p | hr₂q
+    · exact ⟨hr₂p ▸ hr₂_dvd, hr₁q ▸ hr₁_dvd⟩
+    · exact absurd (hr₁q.trans hr₂q.symm) hr_ne
+
 /-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
 non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
 there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
