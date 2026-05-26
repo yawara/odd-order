@@ -272,6 +272,10 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|` (`actionCentralizer_map_conj_index`).
    - ✅ `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`
      (`actionCentralizer_sup`, `actionCentralizer_inf_index_le_sq`).
+   - ✅ `V` が finite `p`-group で `|V:C_V(P)|, |V:C_V(Q)| ≤ p` なら
+     `U = C_V(P) ∩ C_V(Q)` は normal:
+     `normal_of_isPGroup_index_le_prime` と
+     `actionCentralizer_inf_normal_of_index_le_prime` で `[U.Normal]` を供給可能.
    - ✅ `G = ⟨P,Q⟩` 仮定下で `U` が action-invariant になり, 既存
      `IsAInvariant.quotientMulAutHom` で quotient action `G ↷ V/U` へ進める
      (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`).
@@ -280,7 +284,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ quotient action の kernel `K` と `[V,K]≤U` / `[V,K,K]=1` / `K` p-group 化
      (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
      `actionCommutator_quotientActionKernel_le_fixedPoints`,
-     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
+     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は上記 bridge で供給.
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から

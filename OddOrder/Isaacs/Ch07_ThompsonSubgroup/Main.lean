@@ -7,6 +7,8 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.FiniteAbelian.Basic
+import Mathlib.GroupTheory.IndexNormal
+import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
@@ -1337,6 +1339,38 @@ theorem toMulAut_ker_eq_bot_of_faithful {A V : Type*} [Group A] [Group V]
     (MulDistribMulAction.toMulAut A V).ker = ⊥ :=
   (MonoidHom.ker_eq_bot_iff _).mpr toMulAut_injective_of_faithful
 
+/-- A subgroup of a finite `p`-group with index at most `p` is normal. -/
+theorem normal_of_isPGroup_index_le_prime
+    {V : Type*} [Group V] [Finite V] {p : ℕ} [Fact p.Prime]
+    (hV : IsPGroup p V) {H : Subgroup V} (hH : H.index ≤ p) :
+    H.Normal := by
+  haveI : H.FiniteIndex := inferInstance
+  obtain ⟨n, hn⟩ := hV.index H
+  rcases n with _ | n
+  · exact Subgroup.normal_of_index_eq_one (by simpa using hn)
+  rcases n with _ | n
+  · have hindex : H.index = p := by simpa using hn
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hV
+    have hm_ne_zero : m ≠ 0 := by
+      intro hm_zero
+      have hcard_one : Nat.card V = 1 := by
+        rw [hm, hm_zero, pow_zero]
+      have hdiv : p ∣ 1 := by
+        rw [← hcard_one, ← hindex]
+        exact H.index_dvd_card
+      exact (Fact.out : Nat.Prime p).not_dvd_one hdiv
+    have hmin : (Nat.card V).minFac = p := by
+      rw [hm, (Fact.out : Nat.Prime p).pow_minFac hm_ne_zero]
+    exact Subgroup.normal_of_index_eq_minFac_card (by rw [hindex, hmin])
+  · have hpow_le : p ^ 2 ≤ p := by
+      have hpow : p ^ 2 ≤ p ^ (n + 2) := by
+        exact Nat.pow_le_pow_right (Nat.Prime.pos (Fact.out : Nat.Prime p)) (by omega)
+      have hindex_le : p ^ (n + 2) ≤ p := by
+        simpa [hn, pow_succ] using hH
+      exact hpow.trans hindex_le
+    have hp_two : 2 ≤ p := (Fact.out : Nat.Prime p).two_le
+    nlinarith [hpow_le, hp_two]
+
 /-- A faithful action by automorphisms realizes the acting group as a subgroup of `Aut(V)`. -/
 noncomputable def subgroupOfMulAutAction (A V : Type*) [Group A] [Group V]
     [MulDistribMulAction A V] [FaithfulSMul A V] :
@@ -1483,6 +1517,25 @@ theorem actionCentralizer_inf_index_le_sq {A V : Type*} [Group A] [Group V]
     (actionCentralizer φ P ⊓ actionCentralizer φ Q).index ≤ p ^ 2 := by
   rw [← actionCentralizer_sup]
   exact actionCentralizer_sup_index_le_sq φ P Q hP hQ
+
+/-- If `V` is a finite `p`-group and both `C_V(P)` and `C_V(Q)` have index at most `p`,
+then `C_V(P) ∩ C_V(Q)` is normal in `V`.
+
+This supplies the `U ⊴ V` bridge before the quotient `V/U` in Isaacs Thm 7.5. -/
+theorem actionCentralizer_inf_normal_of_index_le_prime
+    {A V : Type*} [Group A] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime] (hV : IsPGroup p V)
+    {φ : A →* MulAut V} {P Q : Subgroup A}
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    (actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal := by
+  have hPN : (actionCentralizer φ P).Normal :=
+    normal_of_isPGroup_index_le_prime hV hP
+  have hQN : (actionCentralizer φ Q).Normal :=
+    normal_of_isPGroup_index_le_prime hV hQ
+  letI : (actionCentralizer φ P).Normal := hPN
+  letI : (actionCentralizer φ Q).Normal := hQN
+  infer_instance
 
 /-- Quotient-cardinality form of the Theorem 7.5 index estimate:
 if both `C_V(P)` and `C_V(Q)` have index at most `p`, then
