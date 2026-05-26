@@ -1266,6 +1266,33 @@ private theorem commutative_of_faithful_representation_preserves_rank_one_comple
     W ρ hW hdimW hdimQ
     (Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y))
 
+/-- Odd-order no-interchange bridge for the q≠p branch of BG Thm 2.6.
+
+If `G` permutes two complementary rank-one submodules, then the induced
+permutation action on the two labels is trivial because `|G|` is odd.  Hence
+`G` preserves both lines and the diagonal complement bridge makes `G` abelian. -/
+private theorem commutative_of_faithful_representation_permuted_rank_one_complement_of_odd
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G] [MulAction G (Fin 2)]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W : Fin 2 → Submodule F V)
+    [Module.Free F (W 0)] [Module.Free F (V ⧸ W 0)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hcompl : IsCompl (W 0) (W 1))
+    (hperm : ∀ (g : G) (i : Fin 2), W i ≤ (W (g • i)).comap (ρ g))
+    (hdimW : Module.finrank F (W 0) = 1)
+    (hdimQ : Module.finrank F (V ⧸ W 0) = 1) :
+    Std.Commutative (· * · : G → G → G) := by
+  have hW0 : ∀ g : G, W 0 ≤ (W 0).comap (ρ g) := by
+    intro g
+    simpa [smul_fin_two_eq_self_of_odd_card hodd g (0 : Fin 2)] using
+      hperm g (0 : Fin 2)
+  have hW1 : ∀ g : G, W 1 ≤ (W 1).comap (ρ g) := by
+    intro g
+    simpa [smul_fin_two_eq_self_of_odd_card hodd g (1 : Fin 2)] using
+      hperm g (1 : Fin 2)
+  exact commutative_of_faithful_representation_preserves_rank_one_complement
+    (W 0) (W 1) ρ hfaithful hcompl hW0 hW1 hdimW hdimQ
+
 /-- Two-dimensional form of
 `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`. -/
 private theorem commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two

@@ -516,3 +516,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   abelian normal q-subgroup `K` を取り、Maschke + algebraic closedness で
   complementary rank-one `K`-submodules `W₁ W₂` を作る段と、
   `K ⊴ G` + odd order により `G` が `W₁,W₂` を交換せず固定する段.
+- `K ⊴ G` から「各 `g` は `W₁,W₂` を固定または交換する」ところを
+  Fin 2 上の permutation action として渡せれば、odd order で交換を排除して
+  対角化 bridge へ渡す
+  `commutative_of_faithful_representation_permuted_rank_one_complement_of_odd`
+  も追加済み. 既存の `smul_fin_two_eq_self_of_odd_card` を使い、薄い wrapper ではなく
+  q≠p branch の line-permutation step を theorem-facing input にしたもの.
+- 次 frontier はさらに前半へ移動: q≠p core から abelian normal q-subgroup `K` を選び、
+  Maschke + algebraic closedness + `dim V = 2` で「`K`-module の二つの rank-one
+  summand が一意」という形の input を作る段.
