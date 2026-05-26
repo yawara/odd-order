@@ -37,10 +37,12 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 ## Status
 
 * The **statements** are given here (modulo a `Fintype` indexing the irreducible characters).
-* The **proof core** is `column_orthogonality_cases`.  It is deferred and routed to
-  `issues/0027-peterfalvi-column-orthogonality-core.md`: the classical route uses
-  invertibility of the character table (matrix algebra). The derived public lemmas
-  below are kept `sorry`-free.
+* The **column-side proof core** `column_orthogonality_cases` and its named corollaries are
+  conditional on weighted row orthogonality `CharacterTableWeightedRowOrthogonality idx`.
+  The conditional proof itself is closed via the matrix algebra in this file. Bridging
+  this hypothesis to mathlib's `Representation.char_orthonormal` (which provides row
+  orthogonality directly) is the remaining gap; see
+  `issues/0027-peterfalvi-column-orthogonality-core.md`.
 
 ## Main statements
 
@@ -1052,82 +1054,221 @@ theorem column_orthogonality_cases_ofRowOrthogonality
   simpa using column_orthogonality_cases_of_weightedRowOrthogonality
     (G := G) idx hweighted g h
 
-/-- Primitive cases form of the second (column) orthogonality theorem.
+/-- Primitive cases form of the second (column) orthogonality theorem
+([Is] Thm 2.18 / 6.10).
 
-The two projections are the conjugate and non-conjugate columns of the character-table
-orthogonality relation.  Public named corollaries below are derived from this single
-deferred proof core. -/
+Both projections (conjugate and non-conjugate columns) are derived from the matrix
+identity `D · Aᴴ · A = (Nat.card G : ℂ) • 1`, where `A` is the (square) reindexed
+character table and `D` is the diagonal of conjugacy-class sizes. The matrix
+identity is `characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal`
+multiplied on the right by `A`.
+
+Takes a `CharacterTableIndexing` together with weighted row orthogonality
+`CharacterTableWeightedRowOrthogonality idx` as explicit hypotheses; supplying these
+keeps the statement uncoupled from the existence/finiteness proof for the indexing
+type and from the row orthogonality proof. -/
 theorem column_orthogonality_cases
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     (g h : G) :
+    letI := idx.irrFintype
     (IsConj g h →
       characterTableColumnPairing g h =
       (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
     (¬ IsConj g h →
       characterTableColumnPairing g h = 0) := by
-  sorry
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  -- Existing matrix bridge: D · Aᴴ = A⁻¹ · cardDiag.
+  have hbridge :
+      characterTableClassSizeSquareMatrix idx *
+          Matrix.conjTranspose (characterTableSquareMatrix idx) =
+        (characterTableSquareMatrix idx)⁻¹ *
+          Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ)) :=
+    characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal idx hrow
+  -- cardDiag is `(Nat.card G : ℂ) • 1`, so it commutes with A.
+  have hcardDiag_scalar :
+      (Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ))) =
+        (Nat.card G : ℂ) •
+          (1 : Matrix (IrreducibleCharacter G) (IrreducibleCharacter G) ℂ) := by
+    ext χ ψ
+    by_cases hχψ : χ = ψ
+    · subst hχψ; simp
+    · simp [Matrix.diagonal_apply_ne _ hχψ, Matrix.one_apply_ne hχψ]
+  -- Multiply on the right by A: D · Aᴴ · A = A⁻¹ · cardDiag · A = cardDiag.
+  have hkey :
+      characterTableClassSizeSquareMatrix idx *
+          (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+            characterTableSquareMatrix idx) =
+        Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ)) := by
+    rw [← Matrix.mul_assoc, hbridge, hcardDiag_scalar]
+    rw [Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.inv_mul_of_invertible]
+  -- Extract entry at (ψh, ηg).
+  set Ch : ConjClasses G := ConjClasses.mk h with hCh_def
+  set Cg : ConjClasses G := ConjClasses.mk g with hCg_def
+  set ψh : IrreducibleCharacter G := idx.rowColumnEquiv.symm Ch with hψh_def
+  set ηg : IrreducibleCharacter G := idx.rowColumnEquiv.symm Cg with hηg_def
+  have hψh_eq : idx.rowColumnEquiv ψh = Ch := by simp [hψh_def]
+  have hηg_eq : idx.rowColumnEquiv ηg = Cg := by simp [hηg_def]
+  -- LHS entry: (D · (Aᴴ · A)) ψh ηg = (|Ch| : ℂ) · column_pairing g h.
+  have hAtA_entry :
+      (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+        characterTableSquareMatrix idx) ψh ηg =
+      characterTableColumnPairing g h := by
+    rw [Matrix.mul_apply]
+    simp only [Matrix.conjTranspose_apply, characterTableSquareMatrix_apply,
+      hψh_eq, hηg_eq, hCh_def, hCg_def, characterTableEntry_mk]
+    rw [characterTableColumnPairing_eq_sum]
+    refine Finset.sum_congr rfl fun χ _ => ?_
+    rw [mul_comm]
+  have hLHS :
+      (characterTableClassSizeSquareMatrix idx *
+        (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx)) ψh ηg =
+      (conjugacyClassSize Ch : ℂ) * characterTableColumnPairing g h := by
+    -- characterTableClassSizeSquareMatrix idx is defeq to a Matrix.diagonal.
+    change (Matrix.diagonal
+        (fun ψ => (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ)) *
+        (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx)) ψh ηg = _
+    rw [Matrix.diagonal_mul, hψh_eq, hAtA_entry]
+  -- RHS entry: cardDiag ψh ηg = if ψh = ηg then |G| else 0.
+  have hRHS :
+      (Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ))) ψh ηg =
+        if ψh = ηg then (Nat.card G : ℂ) else 0 := by
+    rw [Matrix.diagonal_apply]
+  -- Apply both to the matrix entry equation.
+  have hentry : (characterTableClassSizeSquareMatrix idx *
+        (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx)) ψh ηg =
+      (Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ))) ψh ηg := by
+    rw [hkey]
+  rw [hLHS, hRHS] at hentry
+  -- Nonzero class sizes.
+  have hsize_h_pos : 0 < conjugacyClassSize Ch := by
+    rw [conjugacyClassSize]
+    exact Nat.card_pos_iff.mpr ⟨⟨h, ConjClasses.mem_carrier_mk⟩, inferInstance⟩
+  have hsize_h_ne : (conjugacyClassSize Ch : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr hsize_h_pos.ne'
+  refine ⟨?_, ?_⟩
+  · -- Conjugate case.
+    intro hgh
+    have hCheq : Ch = Cg := by
+      change ConjClasses.mk h = ConjClasses.mk g
+      exact ConjClasses.mk_eq_mk_iff_isConj.mpr (IsConj.symm hgh)
+    have hpsi : ψh = ηg := by
+      change idx.rowColumnEquiv.symm Ch = idx.rowColumnEquiv.symm Cg
+      rw [hCheq]
+    rw [if_pos hpsi] at hentry
+    -- hentry: (|Ch| : ℂ) * pairing = |G|. Use |Ch| = |Cg|.
+    have hSize_eq : (conjugacyClassSize Ch : ℂ) = (conjugacyClassSize Cg : ℂ) := by
+      rw [hCheq]
+    rw [hSize_eq] at hentry
+    have hsize_g_pos : 0 < conjugacyClassSize Cg := by
+      change 0 < conjugacyClassSize (ConjClasses.mk g)
+      rw [conjugacyClassSize]
+      exact Nat.card_pos_iff.mpr ⟨⟨g, ConjClasses.mem_carrier_mk⟩, inferInstance⟩
+    have hsize_g_ne : (conjugacyClassSize Cg : ℂ) ≠ 0 :=
+      Nat.cast_ne_zero.mpr hsize_g_pos.ne'
+    have hcent : (Nat.card G : ℂ) / (conjugacyClassSize Cg : ℂ) =
+        (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+      change (Nat.card G : ℂ) / (conjugacyClassSize (ConjClasses.mk g) : ℂ) = _
+      exact card_centralizer_eq_card_div_conjugacyClassSize_cast (G := G) g
+    -- Solve for pairing using hentry and hcent.
+    rw [← hcent, eq_div_iff hsize_g_ne, mul_comm]
+    exact hentry
+  · -- Non-conjugate case.
+    intro hgh
+    have hCne : Ch ≠ Cg := by
+      intro he
+      apply hgh
+      have : IsConj h g := ConjClasses.mk_eq_mk_iff_isConj.mp he
+      exact this.symm
+    have hpsi_ne : ψh ≠ ηg := by
+      change idx.rowColumnEquiv.symm Ch ≠ idx.rowColumnEquiv.symm Cg
+      intro he
+      exact hCne (idx.rowColumnEquiv.symm.injective he)
+    rw [if_neg hpsi_ne] at hentry
+    exact (mul_eq_zero.mp hentry).resolve_left hsize_h_ne
 
 /-- Named-column form of the diagonal second orthogonality relation. -/
 theorem characterTableColumnPairing_diag
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     (g : G) :
+    letI := idx.irrFintype
     characterTableColumnPairing g g =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  exact (column_orthogonality_cases g g).1 (IsConj.refl g)
+  letI := idx.irrFintype
+  exact (column_orthogonality_cases idx hrow g g).1 (IsConj.refl g)
 
 /-- Named-column form of the conjugate second orthogonality relation. -/
 theorem characterTableColumnPairing_conj
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     {g h : G} (hgh : IsConj g h) :
+    letI := idx.irrFintype
     characterTableColumnPairing g h =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  exact (column_orthogonality_cases g h).1 hgh
+  letI := idx.irrFintype
+  exact (column_orthogonality_cases idx hrow g h).1 hgh
 
 /-- Named-column form of the non-conjugate second orthogonality relation. -/
 theorem characterTableColumnPairing_not_conj
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     {g h : G} (hgh : ¬ IsConj g h) :
+    letI := idx.irrFintype
     characterTableColumnPairing g h = 0 := by
-  exact (column_orthogonality_cases g h).2 hgh
+  letI := idx.irrFintype
+  exact (column_orthogonality_cases idx hrow g h).2 hgh
 
 /-- Diagonal second (column) orthogonality:
 `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 
 This is the `g = h` specialization of `column_orthogonality_cases`. -/
 theorem column_orthogonality_diag
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     (g : G) :
+    letI := idx.irrFintype
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) g) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  simpa using characterTableColumnPairing_diag (G := G) g
+  letI := idx.irrFintype
+  simpa using characterTableColumnPairing_diag (G := G) idx hrow g
 
 /-- **Second (column) orthogonality**, conjugate case ([Is] Thm 2.18 / 6.10).
 
 For `g, h ∈ G` with `g ~ h`, `∑_{χ ∈ Irr G} χ(g) · χ̄(h) = |C_G(g)|` in `ℂ`.
 
 The sum runs over `IrreducibleCharacter G`, the named subtype of `ClassFunction G ℂ`
-carved out by `IsIrreducibleCharacter`. Such a `Fintype` is well-defined for finite
-`G`; supplying it as an explicit instance keeps this statement uncoupled from the
-eventual existence proof for the indexing type.
+carved out by `IsIrreducibleCharacter`.
 
 This is the conjugate projection of `column_orthogonality_cases`. -/
 theorem column_orthogonality_conj
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     {g h : G} (hgh : IsConj g h) :
+    letI := idx.irrFintype
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) =
     (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
-  simpa using characterTableColumnPairing_conj (G := G) hgh
+  letI := idx.irrFintype
+  simpa using characterTableColumnPairing_conj (G := G) idx hrow hgh
 
 /-- **Second (column) orthogonality**, non-conjugate case ([Is] Thm 2.18 / 6.10).
 
 For `g, h ∈ G` with `g ≁ h`, `∑_{χ ∈ Irr G} χ(g) · χ̄(h) = 0` in `ℂ`. -/
 theorem column_orthogonality_not_conj
-    [Fintype (IrreducibleCharacter G)]
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
     {g h : G} (hgh : ¬ IsConj g h) :
+    letI := idx.irrFintype
     ∑ χ : IrreducibleCharacter G,
         ((χ : ClassFunction G ℂ) g) * star ((χ : ClassFunction G ℂ) h) = 0 := by
-  simpa using characterTableColumnPairing_not_conj (G := G) hgh
+  letI := idx.irrFintype
+  simpa using characterTableColumnPairing_not_conj (G := G) idx hrow hgh
 
 end OddOrder.RepresentationTheory

@@ -11,12 +11,14 @@ import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
+import Mathlib.LinearAlgebra.Charpoly.BaseChange
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main
@@ -897,23 +899,56 @@ private theorem neZero_nat_card_cast_of_isPGroup_ne_char
   have hp_dvd_q : p ∣ q := hp_prime.dvd_of_dvd_pow hp_dvd_card
   exact hq_ne_p ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp hp_dvd_q).symm
 
-/-- Maschke simple-constituent extraction for the BG Thm 2.6 q≠p branch.
+/-- Maschke cardinality bridge from a theorem-level characteristic-away
+hypothesis.
 
-For a finite q-group acting on a nonzero vector space over a field of
-characteristic `p ≠ q`, the corresponding group-algebra module has a simple
-submodule.  This packages the q-group/characteristic-away check with mathlib's
-Maschke theorem and the `Representation.asModule` bridge. -/
-private theorem exists_simple_submodule_of_isPGroup_ne_char
-    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {F : Type*} [Field F] [CharP F p]
+If no prime divisor of `|K|` is the characteristic of `F`, then `|K|` is
+nonzero in `F`.  This is the exact bridge from BG Thm 2.6(a)'s hypothesis to
+Maschke's typeclass premise. -/
+private theorem neZero_nat_card_cast_of_forall_prime_not_char
+    {F : Type*} [Field F] {K : Type*} [Group K] [Finite K]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card K → ¬ CharP F q) :
+    NeZero (Nat.card K : F) := by
+  rcases CharP.exists' F with hzero | hpos
+  · haveI : CharZero F := hzero
+    refine ⟨?_⟩
+    intro hcast
+    exact (Nat.card_pos (α := K)).ne'
+      (CharZero.cast_injective (by simpa using hcast))
+  · rcases hpos with ⟨p, hp_prime, hp_char⟩
+    haveI : CharP F p := hp_char
+    refine NeZero.of_not_dvd (R := F) (p := p) (n := Nat.card K) ?_
+    intro hp_dvd
+    exact (hchar p hp_prime.out hp_dvd) hp_char
+
+/-- Subgroup form of `neZero_nat_card_cast_of_forall_prime_not_char`.
+
+The theorem-level hypothesis in BG Thm 2.6(a) is stated for `G`; Maschke is
+applied to normal q-subgroups `K ≤ G`. -/
+private theorem neZero_nat_card_cast_of_subgroup_forall_prime_not_char
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q)
+    (K : Subgroup G) :
+    NeZero (Nat.card K : F) := by
+  exact neZero_nat_card_cast_of_forall_prime_not_char
+    (F := F) (K := K)
+    (fun q hq_prime hq_dvd =>
+      hchar q hq_prime (hq_dvd.trans (Subgroup.card_subgroup_dvd_card K)))
+
+/-- Maschke simple-constituent extraction from the exact cardinality premise.
+
+This is the Maschke core needed in BG Thm 2.6: if `|K|` is nonzero in the
+field, then the group-algebra module attached to a nonzero representation has
+a simple submodule.  Characteristic-specific lemmas below only have to supply
+this `NeZero` instance. -/
+private theorem exists_simple_submodule_of_neZero_card
+    {F : Type*} [Field F]
     {K : Type*} [Group K] [Finite K]
-    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    [NeZero (Nat.card K : F)]
     (σ : Representation F K V) :
     ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
       IsSimpleModule (MonoidAlgebra F K) N := by
-  haveI : NeZero (Nat.card K : F) :=
-    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
   letI : Module F σ.asModule := Representation.instModuleAsModule σ
   letI : Module (MonoidAlgebra F K) σ.asModule :=
@@ -931,6 +966,25 @@ private theorem exists_simple_submodule_of_isPGroup_ne_char
       (MonoidAlgebra F K) inferInstance σ.asModule
       (Representation.instAddCommGroupAsModule σ)
       (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv
+
+/-- Maschke simple-constituent extraction for the BG Thm 2.6 q≠p branch.
+
+For a finite q-group acting on a nonzero vector space over a field of
+characteristic `p ≠ q`, the corresponding group-algebra module has a simple
+submodule.  This packages the q-group/characteristic-away check with mathlib's
+Maschke theorem and the `Representation.asModule` bridge. -/
+private theorem exists_simple_submodule_of_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) :
+    ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
+      IsSimpleModule (MonoidAlgebra F K) N := by
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact exists_simple_submodule_of_neZero_card (K := K) σ
 
 /-- Scalar-instance bridge for a simple group-algebra submodule of an abelian group.
 
@@ -1034,44 +1088,29 @@ private theorem exists_rank_one_subrepresentation_of_commutative_isPGroup_ne_cha
   exact exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group
     hKcomm σ N hNsimple
 
-/-- Maschke complement extraction for the BG Thm 2.6 q≠p branch.
+/-- Maschke complement extraction from the exact cardinality premise.
 
-For a two-dimensional representation of an abelian finite q-group in
-characteristic `p ≠ q`, Maschke gives an invariant complement to a simple
-rank-one constituent.  This is the `K`-module form of the textbook line
-`V = W₁ ⊕ W₂`; the remaining ambient step is proving that normality of `K`
-makes `G` permute these two lines. -/
-private theorem exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
-    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+For a two-dimensional representation of an abelian finite group whose order is
+nonzero in the field, Maschke gives an invariant complement to a simple
+rank-one constituent.  This is the characteristic-free core behind both the
+q≠p branch and the characteristic-away branch of BG Thm 2.6(a). -/
+private theorem exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+    {F : Type*} [Field F] [IsAlgClosed F]
     {K : Type*} [Group K] [Finite K]
-    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
     (hKcomm : Std.Commutative (· * · : K → K → K))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    [NeZero (Nat.card K : F)]
     (σ : Representation F K V) (hdim : Module.finrank F V = 2) :
     ∃ W U : Subrepresentation σ,
       W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
         Module.finrank F W.toSubmodule = 1 ∧
         Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
-  haveI : NeZero (Nat.card K : F) :=
-    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
   letI : Module F σ.asModule := Representation.instModuleAsModule σ
   letI : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
   letI : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
-  have hnontriv : Nontrivial σ.asModule := by
-    change Nontrivial V
-    infer_instance
-  have hsemi :
-      @IsSemisimpleModule (MonoidAlgebra F K) inferInstance σ.asModule
-        (Representation.instAddCommGroupAsModule σ)
-        (Representation.instModuleMonoidAlgebraAsModule σ) := by
-    infer_instance
-  rcases @IsSemisimpleModule.exists_simple_submodule
-      (MonoidAlgebra F K) inferInstance σ.asModule
-      (Representation.instAddCommGroupAsModule σ)
-      (Representation.instModuleMonoidAlgebraAsModule σ) hsemi hnontriv with
+  rcases exists_simple_submodule_of_neZero_card (K := K) σ with
     ⟨N, hNsimple⟩
   rcases (@MonoidAlgebra.Submodule.exists_isCompl F inferInstance K inferInstance
       inferInstance inferInstance σ.asModule (Representation.instAddCommGroupAsModule σ)
@@ -1117,7 +1156,72 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_isP
       hW_ne_top_sub).2
   exact ⟨W, U, hW_ne_bot, hcompl, hWdim, hQdim⟩
 
+/-- Maschke complement extraction for the BG Thm 2.6 q≠p branch.
+
+For a two-dimensional representation of an abelian finite q-group in
+characteristic `p ≠ q`, Maschke gives an invariant complement to a simple
+rank-one constituent.  This is the `K`-module form of the textbook line
+`V = W₁ ⊕ W₂`; the remaining ambient step is proving that normality of `K`
+makes `G` permute these two lines. -/
+private theorem exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {K : Type*} [Group K] [Finite K]
+    (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    (hKcomm : Std.Commutative (· * · : K → K → K))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (σ : Representation F K V) (hdim : Module.finrank F V = 2) :
+    ∃ W U : Subrepresentation σ,
+      W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
+        Module.finrank F W.toSubmodule = 1 ∧
+        Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact
+    exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+      (K := K) hKcomm σ hdim
+
 /-- Maschke complement extraction packaged in the theorem-facing data shape.
+
+This is the cardinality-premise version of the rank-one data bridge.  It
+keeps the linear-algebra input aligned with Maschke's actual hypothesis,
+allowing theorem-level characteristic-away assumptions to supply `NeZero`
+without manufacturing a separate characteristic prime. -/
+private theorem exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hdim : Module.finrank F V = 2)
+    (K : Subgroup G) [NeZero (Nat.card K : F)]
+    (hKcomm : Std.Commutative (· * · : K → K → K)) :
+    ∃ W : Subrepresentation (ρ.comp K.subtype),
+    ∃ U : Subrepresentation (ρ.comp K.subtype),
+      Nonempty (Module.Free F W.toSubmodule) ∧
+      Nonempty (Module.Free F U.toSubmodule) ∧
+      Nonempty (Module.Finite F W.toSubmodule) ∧
+      Nonempty (Module.Finite F U.toSubmodule) ∧
+      Nonempty (Module.Free F (V ⧸ W.toSubmodule)) ∧
+      Nonempty (Module.Free F (V ⧸ U.toSubmodule)) ∧
+      IsCompl W.toSubmodule U.toSubmodule ∧
+      Module.finrank F W.toSubmodule = 1 ∧
+      Module.finrank F U.toSubmodule = 1 ∧
+      Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
+      Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
+  have hVpos : 0 < Module.finrank F V := by
+    rw [hdim]
+    norm_num
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  rcases exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
+      (F := F) (K := K) hKcomm (ρ.comp K.subtype) hdim with
+    ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
+  rcases complement_rank_one_right_subquotients_of_finrank_two
+      W.toSubmodule U.toSubmodule hdim hcompl hdimW with
+    ⟨hdimU, hdimQU⟩
+  exact ⟨W, U, ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩,
+    ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩, hcompl, hdimW,
+    hdimU, hdimQW, hdimQU⟩
+
+/-- q≠p Maschke complement extraction packaged in the theorem-facing data shape.
 
 This strengthens `exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char`
 by also supplying the symmetric rank-one data for the complementary line and
@@ -1145,20 +1249,10 @@ private theorem exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
       Module.finrank F U.toSubmodule = 1 ∧
       Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
       Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
-  have hVpos : 0 < Module.finrank F V := by
-    rw [hdim]
-    norm_num
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
-  rcases exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
-      (p := p) (q := q) (F := F) (K := K)
-      hKq hq_ne_p hKcomm (ρ.comp K.subtype) hdim with
-    ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
-  rcases complement_rank_one_right_subquotients_of_finrank_two
-      W.toSubmodule U.toSubmodule hdim hcompl hdimW with
-    ⟨hdimU, hdimQU⟩
-  exact ⟨W, U, ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩,
-    ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩, hcompl, hdimW,
-    hdimU, hdimQW, hdimQU⟩
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
+  exact exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+    ρ hdim K hKcomm
 
 /-- Conjugating a `K`-subrepresentation by an ambient element of `G`.
 
@@ -2939,6 +3033,133 @@ private theorem opCore_ne_bot_of_nontrivial_normal_pSubgroup
   rw [← hop_bot]
   exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK hx
 
+/-- A finite nontrivial abelian group has a nontrivial prime core.
+
+This is one half of the induction-output bridge for BG Thm 2.6: when an
+inductive subgroup is abelian, any nontrivial Sylow subgroup is normal, hence it
+lies in the corresponding `O_r`. -/
+private theorem exists_prime_opCore_ne_bot_of_commutative
+    {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    (hGcomm : Std.Commutative (· * · : G → G → G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  have hcard_ne_one : Nat.card G ≠ 1 := (Finite.one_lt_card (α := G)).ne'
+  obtain ⟨r, hr_prime, hr_dvd⟩ :=
+    Nat.exists_prime_and_dvd hcard_ne_one
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  haveI : Finite (Sylow r G) := inferInstance
+  obtain ⟨P⟩ := Sylow.nonempty (p := r) (G := G)
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hr_dvd
+  have hPnormal : (P : Subgroup G).Normal := by
+    refine ⟨fun x hx g => ?_⟩
+    change g * x * g⁻¹ ∈ (P : Subgroup G)
+    rw [hGcomm.comm g x]
+    simpa [mul_assoc] using hx
+  haveI : (P : Subgroup G).Normal := hPnormal
+  exact ⟨r, hr_prime,
+    opCore_ne_bot_of_nontrivial_normal_pSubgroup
+      (G := G) (K := (P : Subgroup G)) P.2 hP_ne_bot⟩
+
+/-- A BG Thm 2.6(b)-style Sylow conclusion supplies a nontrivial prime core.
+
+If `G'` is nontrivial then `G' ≤ P` makes the derived subgroup a nontrivial
+normal `p`-subgroup.  If `G' = 1`, the group is abelian, so a nontrivial Sylow
+subgroup gives a nontrivial prime core.  This is the form needed to turn the
+induction theorem's Sylow conclusion back into the `hind` input used by the
+determinant-kernel spine. -/
+private theorem exists_prime_opCore_ne_bot_of_commutator_le_sylow
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    [Finite (Sylow p G)] (P : Sylow p G)
+    (hcomm_le : commutator G ≤ (P : Subgroup G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  by_cases hcomm_bot : commutator G = ⊥
+  · apply exists_prime_opCore_ne_bot_of_commutative
+    constructor
+    intro x y
+    have hxcenter : x ∈ Subgroup.center G := by
+      rw [(commutator_eq_bot_iff_center_eq_top (G := G)).mp hcomm_bot]
+      trivial
+    exact (Subgroup.mem_center_iff.mp hxcenter y).symm
+  · haveI : (commutator G).Normal :=
+      Subgroup.Normal.of_commutator_le (G := G) (H := commutator G) le_rfl
+    have hcomm_p : IsPGroup p (commutator G) := P.2.to_le hcomm_le
+    exact ⟨p, Fact.out,
+      opCore_ne_bot_of_nontrivial_normal_pSubgroup
+        (G := G) (K := commutator G) hcomm_p hcomm_bot⟩
+
+/-- The combined BG Thm 2.6 induction outputs imply a nontrivial prime core.
+
+For a smaller subgroup in the induction, either the ambient characteristic does
+not divide its order and the abelian branch supplies a normal Sylow subgroup, or
+the characteristic prime divides the order and the Sylow branch supplies
+`G' ≤ P`.  Both cases produce some nontrivial `O_r(G)`. -/
+private theorem exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [hchar : CharP F p]
+    {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    (hab : (∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) →
+      Std.Commutative (· * · : G → G → G))
+    (hsyl : p ∣ Nat.card G → (P : Sylow p G) →
+      Std.Commutative (· * · : P → P → P) ∧
+        commutator G ≤ (P : Subgroup G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  by_cases hp_dvd : p ∣ Nat.card G
+  · haveI : Finite (Sylow p G) := inferInstance
+    obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    exact exists_prime_opCore_ne_bot_of_commutator_le_sylow
+      (p := p) P (hsyl hp_dvd P).2
+  · apply exists_prime_opCore_ne_bot_of_commutative
+    apply hab
+    intro q _hq_prime hq_dvd hq_char
+    exact hp_dvd ((CharP.eq F hq_char hchar) ▸ hq_dvd)
+
+/-- Proper determinant-kernel subgroups receive the induction output in the
+shape required by the core spine.
+
+For a normal `N < G*`, the restricted representation is still faithful and `N`
+has odd order.  Thus the two BG Thm 2.6 induction outputs for that restricted
+representation give the nontrivial prime core required by the determinant-kernel
+normal-complement spine. -/
+private theorem determinantKernel_hind_of_odd_two_dim_induction_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hab_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 →
+        (∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q) →
+        Std.Commutative (· * · : N → N → N))
+    (hsyl_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 → p ∣ Nat.card N → (P : Sylow p N) →
+        Std.Commutative (· * · : P → P → P) ∧
+          commutator N ≤ (P : Subgroup N))
+    (N : Subgroup (determinantKernelSubgroup ρ))
+    (hNnormal : N.Normal) (hN_ne_bot : N ≠ ⊥) (hN_ne_top : N ≠ ⊤) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥ := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
+  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have hfaithfulN : Function.Injective ρN := by
+    intro x y hxy
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hfaithful (by simpa [ρN, Gstar] using hxy)
+  have hoddN : Odd (Nat.card N) := by
+    have hN_dvd_Gstar : Nat.card N ∣ Nat.card Gstar :=
+      Subgroup.card_subgroup_dvd_card N
+    have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+      Subgroup.card_subgroup_dvd_card Gstar
+    exact hodd.of_dvd_nat (hN_dvd_Gstar.trans hGstar_dvd_G)
+  exact exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
+    (p := p) (F := F) (G := N)
+    (fun hcharN => hab_ind N hNnormal hN_ne_bot hN_ne_top hoddN
+      ρN hfaithfulN hdim hcharN)
+    (fun hpN P => hsyl_ind N hNnormal hN_ne_bot hN_ne_top hoddN
+      ρN hfaithfulN hdim hpN P)
+
 /-- A nontrivial `p`-core in a normal subgroup gives a nontrivial `p`-core
 in the ambient group.
 
@@ -3212,6 +3433,31 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed
       exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
         ρ hdim K hKq hq_ne_p hKcomm)
 
+/-- Algebraically closed characteristic-away determinant-core endpoint for
+BG Thm 2.6(a).
+
+If the characteristic of `F` is not any prime divisor of `|G|`, a nontrivial
+`O_q(G*)` supplies an abelian normal q-subgroup `K ≤ G*` whose order is
+nonzero in `F`; Maschke then gives the same rank-one data as in the q≠p
+branch. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
+    ρ hfaithful hodd hcore_ne_bot
+    (fun K _hKnormal _hKle _hKq _hK_ne_bot hKcomm =>
+      letI : NeZero (Nat.card K : F) :=
+        neZero_nat_card_cast_of_subgroup_forall_prime_not_char hchar K
+      exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+        ρ hdim K hKcomm)
+
 /-- Algebraically closed q≠p endpoint when the determinant is already trivial.
 
 This is the normalizer form of the q≠p branch: for subgroups lying inside
@@ -3239,6 +3485,49 @@ private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel
     trivial
   rcases exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
       (p := p) (q := q) ρ hdim K hKq hq_ne_p hKcomm with
+    ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
+      hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
+  letI : Module.Free F W.toSubmodule := hfreeW.some
+  letI : Module.Free F U.toSubmodule := hfreeU.some
+  letI : Module.Finite F W.toSubmodule := hfiniteW.some
+  letI : Module.Finite F U.toSubmodule := hfiniteU.some
+  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
+  exact commutative_of_determinantKernel_subgroup_rank_one_complement
+    ρ hfaithful hodd K hKnormal hKle W U hcompl
+    hdimW hdimU hdimQW hdimQU hx_ne_one
+
+/-- Algebraically closed characteristic-away endpoint when the determinant is
+already trivial.
+
+This is the determinant-trivial subgroup form needed by the normalizer branch
+of BG Thm 2.6(a): `O_q(G) ≠ 1` supplies the abelian normal q-subgroup, while
+the theorem-level `hchar` hypothesis supplies Maschke's `NeZero` premise. -/
+private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determinantKernel_eq_top
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_top : determinantKernelSubgroup ρ = ⊤)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q G ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  haveI : Finite (Sylow q G) := inferInstance
+  rcases exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
+      (q := q) (G := G) hcore_ne_bot with
+    ⟨K, hKnormal, _hKq, hK_ne_bot, hKcomm⟩
+  have hKle : K ≤ determinantKernelSubgroup ρ := by
+    intro x _hx
+    rw [hdet_top]
+    trivial
+  haveI : NeZero (Nat.card K : F) :=
+    neZero_nat_card_cast_of_subgroup_forall_prime_not_char hchar K
+  rcases exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
+      ρ hdim K hKcomm with
     ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
       hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
   letI : Module.Free F W.toSubmodule := hfreeW.some
@@ -3337,6 +3626,66 @@ private theorem determinantKernel_sylow_normalizer_commutative_of_isAlgClosed
       (p := p) (q := q) ρH hfaithfulH hoddH hdim hq_ne_p hdet_top
       hcore_ne_bot
 
+/-- Characteristic-away normalizer branch inside the determinant kernel.
+
+This is the BG Thm 2.6(a) analogue of
+`determinantKernel_sylow_normalizer_commutative_of_isAlgClosed`: for
+`H = N_{G*}(Q)`, the determinant is trivial on `H`, and the characteristic-away
+hypothesis restricts from `G` to `H`. -/
+private theorem determinantKernel_sylow_normalizer_commutative_of_isAlgClosed_charAway
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (Q : Sylow q (determinantKernelSubgroup ρ))
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q
+      (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+        Set (determinantKernelSubgroup ρ))) ≠ ⊥) :
+    Std.Commutative
+      (· * · :
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ)) →
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ)) →
+        Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let H : Subgroup Gstar := Subgroup.normalizer ((Q : Subgroup Gstar) : Set Gstar)
+  let ρH : Representation F H V := ρ.comp (Gstar.subtype.comp H.subtype)
+  have hfaithfulH : Function.Injective ρH := by
+    intro x y hxy
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hfaithful (by simpa [ρH] using hxy)
+  have hH_dvd_Gstar : Nat.card H ∣ Nat.card Gstar :=
+    Subgroup.card_subgroup_dvd_card H
+  have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+    Subgroup.card_subgroup_dvd_card Gstar
+  have hoddH : Odd (Nat.card H) :=
+    hodd.of_dvd_nat (hH_dvd_Gstar.trans hGstar_dvd_G)
+  have hcharH :
+      ∀ r : ℕ, r.Prime → r ∣ Nat.card H → ¬ CharP F r := by
+    intro r hr_prime hr_dvd
+    exact hchar r hr_prime (hr_dvd.trans (hH_dvd_Gstar.trans hGstar_dvd_G))
+  have hdet_top : determinantKernelSubgroup ρH = ⊤ := by
+    ext x
+    constructor
+    · intro _hx
+      trivial
+    · intro _hx
+      rw [mem_determinantKernelSubgroup]
+      have hxdetG : (((x : H) : Gstar) : G) ∈ determinantKernelSubgroup ρ :=
+        ((x : H) : Gstar).2
+      rw [mem_determinantKernelSubgroup] at hxdetG
+      simpa [ρH, determinantCharacterOfRepresentation,
+        representationToGeneralLinearGroup] using hxdetG
+  simpa [H] using
+    commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determinantKernel_eq_top
+      (q := q) ρH hfaithfulH hoddH hdim hcharH hdet_top hcore_ne_bot
+
 /-- A finite group that is not a `p`-group has a prime divisor different from `p`.
 
 This is the arithmetic half of the `G*` dichotomy in BG Thm 2.6. -/
@@ -3403,7 +3752,7 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
     (hp_dvd : p ∣ Nat.card G)
     (hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement p G)
-    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
   rcases hcomp with ⟨N, hNnormal, hNcompl⟩
@@ -3419,7 +3768,19 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
         (G := G) (K := (P : Subgroup G)) P.2
         (P.ne_bot_of_dvd_card hp_dvd)⟩
   · haveI : N.Normal := hNnormal
-    rcases hind N hNnormal hN_bot with ⟨r, hr_prime, hNcore_ne_bot⟩
+    have hN_ne_top : N ≠ ⊤ := by
+      intro hN_top
+      obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+      have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hp_dvd
+      apply hP_ne_bot
+      refine le_bot_iff.mp ?_
+      have hP_le_N : (P : Subgroup G) ≤ N := by
+        rw [hN_top]
+        exact le_top
+      have hP_le_inf : (P : Subgroup G) ≤ N ⊓ (P : Subgroup G) :=
+        le_inf hP_le_N le_rfl
+      simpa [(hNcompl P).isCompl.inf_eq_bot] using hP_le_inf
+    rcases hind N hNnormal hN_bot hN_ne_top with ⟨r, hr_prime, hNcore_ne_bot⟩
     haveI : Fact r.Prime := ⟨hr_prime⟩
     haveI : Finite (Sylow r G) := inferInstance
     exact ⟨r, hr_prime,
@@ -3441,7 +3802,7 @@ private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
         (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
           Subgroup.normalizer ((Q : Subgroup G) : Set G) →
           Subgroup.normalizer ((Q : Subgroup G) : Set G)))
-    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
   rcases exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
@@ -3481,7 +3842,7 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧
       OddOrder.Isaacs.Ch01.opCore r (determinantKernelSubgroup ρ) ≠ ⊥ := by
@@ -3501,6 +3862,49 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
       (fun {q} hq_prime hq_ne_p Q hQcore =>
         hnormalizer (q := q) hq_ne_p Q hQcore)
       hind
+
+/-- Characteristic-away determinant-kernel core spine.
+
+This is the BG Thm 2.6(a) version of
+`exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot`: since there is no
+distinguished field characteristic prime, we choose any prime divisor of
+`|G*|` and reuse the p-parametrized normalizer spine. -/
+private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime],
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    ∃ r : ℕ, r.Prime ∧
+      OddOrder.Isaacs.Ch01.opCore r (determinantKernelSubgroup ρ) ≠ ⊥ := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  have hGstar_ne_bot : Gstar ≠ ⊥ := by
+    simpa [Gstar] using hdet_ne_bot
+  haveI : Nontrivial Gstar :=
+    (Subgroup.nontrivial_iff_ne_bot Gstar).mpr hGstar_ne_bot
+  obtain ⟨p, hp_prime, _hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd (Finite.one_lt_card (α := Gstar)).ne'
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  exact exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
+    (p := p) ρ hdet_ne_bot
+    (fun {q} _hq_prime _hq_ne_p Q hQcore =>
+      hnormalizer (q := q) Q hQcore)
+    hind
 
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
@@ -3555,7 +3959,7 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_core_sp
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hcore_ne_p_comm : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥ →
@@ -3602,7 +4006,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hline : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
@@ -3648,7 +4052,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hline : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
@@ -3704,7 +4108,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3729,7 +4133,7 @@ private theorem
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
     (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
     (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3795,6 +4199,228 @@ private theorem baseChangeRepresentation_faithful
     (fun f : TensorProduct F K V →ₗ[K] TensorProduct F K V => f (1 ⊗ₜ[F] v)) hgh
   simpa [baseChangeRepresentation] using hmap
 
+/-- Scalar extension preserves the determinant kernel.
+
+This is the determinant compatibility needed to move the BG Thm 2.6(b) spine to
+an algebraic closure: the base-changed determinant is the algebra-map image of
+the original determinant, and field extensions have injective algebra maps. -/
+private theorem determinantKernelSubgroup_baseChangeRepresentation
+    {F : Type*} [Field F] (K : Type*) [Field K] [Algebra F K]
+    {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) :
+    determinantKernelSubgroup (baseChangeRepresentation K ρ) =
+      determinantKernelSubgroup ρ := by
+  ext g
+  rw [mem_determinantKernelSubgroup, mem_determinantKernelSubgroup]
+  constructor
+  · intro hg
+    apply Units.ext
+    apply (algebraMap F K).injective
+    have hdetF :
+        ((determinantCharacterOfRepresentation ρ g : F) =
+          LinearMap.det (ρ g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hdetK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          LinearMap.det ((baseChangeRepresentation K ρ) g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hgK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          1) := by
+      simpa using congrArg Units.val hg
+    calc
+      algebraMap F K ((determinantCharacterOfRepresentation ρ g : F))
+          = algebraMap F K (LinearMap.det (ρ g)) := by rw [hdetF]
+      _ = LinearMap.det ((ρ g).baseChange K) := by rw [LinearMap.det_baseChange]
+      _ = LinearMap.det ((baseChangeRepresentation K ρ) g) := rfl
+      _ = (determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) :=
+        hdetK.symm
+      _ = 1 := hgK
+      _ = algebraMap F K (1 : F) := by simp
+  · intro hg
+    apply Units.ext
+    have hdetF :
+        ((determinantCharacterOfRepresentation ρ g : F) =
+          LinearMap.det (ρ g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hdetK :
+        ((determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K) =
+          LinearMap.det ((baseChangeRepresentation K ρ) g)) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    have hgF : ((determinantCharacterOfRepresentation ρ g : F) = 1) := by
+      simpa using congrArg Units.val hg
+    calc
+      (determinantCharacterOfRepresentation (baseChangeRepresentation K ρ) g : K)
+          = LinearMap.det ((baseChangeRepresentation K ρ) g) := hdetK
+      _ = LinearMap.det ((ρ g).baseChange K) := rfl
+      _ = algebraMap F K (LinearMap.det (ρ g)) := by rw [LinearMap.det_baseChange]
+      _ = algebraMap F K ((determinantCharacterOfRepresentation ρ g : F)) := by rw [hdetF]
+      _ = 1 := by simp [hgF]
+
+/-- A prime characteristic on the algebraic closure descends to the base field. -/
+private theorem not_charP_algebraicClosure_of_not_charP
+    {F : Type*} [Field F] {q : ℕ} (hchar : ¬ CharP F q) :
+    ¬ CharP (AlgebraicClosure F) q := by
+  intro hq
+  exact hchar ((Algebra.charP_iff F (AlgebraicClosure F) q).mpr hq)
+
+/-- The BG Thm 2.6(a) characteristic-away hypothesis survives algebraic closure. -/
+private theorem charAway_algebraicClosure
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
+    ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP (AlgebraicClosure F) q :=
+  fun q hq_prime hq_dvd =>
+    not_charP_algebraicClosure_of_not_charP (hchar q hq_prime hq_dvd)
+
+/-- Algebraic-closure reduction for the characteristic-away determinant-core
+endpoint.
+
+This transports BG Thm 2.6(a)'s linear-algebra branch to `AlgebraicClosure F`
+while keeping the determinant kernel, hence the nontrivial `O_q(G*)`, unchanged. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
+    {q : ℕ} [Fact q.Prime]
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  let ρK : Representation (AlgebraicClosure F) G
+      (TensorProduct F (AlgebraicClosure F) V) :=
+    baseChangeRepresentation (AlgebraicClosure F) ρ
+  have hfaithfulK : Function.Injective ρK := by
+    simpa [ρK] using
+      baseChangeRepresentation_faithful (AlgebraicClosure F) ρ hfaithful
+  have hdimK :
+      Module.finrank (AlgebraicClosure F)
+        (TensorProduct F (AlgebraicClosure F) V) = 2 := by
+    exact
+      (Module.finrank_baseChange (R := AlgebraicClosure F) (S := F) (M' := V)).trans hdim
+  have hcoreK :
+      OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρK) ≠ ⊥ := by
+    change
+      OddOrder.Isaacs.Ch01.opCore q
+          (determinantKernelSubgroup (baseChangeRepresentation (AlgebraicClosure F) ρ)) ≠
+        ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hcore_ne_bot
+  exact
+    commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway
+      ρK hfaithfulK hodd hdimK (charAway_algebraicClosure hchar) hcoreK
+
+/-- Characteristic-away dispatch once the determinant-kernel core spine has
+produced a nontrivial prime core.
+
+The resulting `O_r(G*) ≠ 1` is sent to the algebraic-closure Maschke endpoint,
+which returns commutativity of the original group. -/
+private theorem commutative_of_determinantKernel_core_spine_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime],
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  rcases exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
+      ρ hdet_ne_bot hnormalizer hind with
+    ⟨r, hr_prime, hcore_ne_bot⟩
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  exact commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
+    ρ hfaithful hodd hdim hchar hcore_ne_bot
+
+/-- Algebraically closed characteristic-away determinant-kernel spine with the
+normalizer branch closed.
+
+The normalizer step is supplied by restricting the representation to
+`N_{G*}(Q)`, where the determinant is trivial.  The remaining input is only the
+proper-normal-subgroup induction output inside `G*`. -/
+private theorem commutative_of_determinantKernel_core_spine_isAlgClosed_charAway
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_determinantKernel_core_spine_charAway
+    ρ hfaithful hodd hdim hchar hdet_ne_bot
+    (fun {q} _hq_prime Q hQcore =>
+      determinantKernel_sylow_normalizer_commutative_of_isAlgClosed_charAway
+        (q := q) ρ hfaithful hodd hdim hchar Q hQcore)
+    hind
+
+/-- Algebraic-closure reduction for the characteristic-away determinant-kernel
+spine, with the induction hypothesis stated on the original determinant kernel.
+
+This is the theorem-facing bridge for BG Thm 2.6(a): scalar extension preserves
+faithfulness, dimension, and the determinant kernel, so the algebraically closed
+normalizer branch can be used without changing the group-theoretic spine. -/
+private theorem commutative_of_determinantKernel_core_spine_algebraicClosure_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  let ρK : Representation (AlgebraicClosure F) G
+      (TensorProduct F (AlgebraicClosure F) V) :=
+    baseChangeRepresentation (AlgebraicClosure F) ρ
+  have hfaithfulK : Function.Injective ρK := by
+    simpa [ρK] using
+      baseChangeRepresentation_faithful (AlgebraicClosure F) ρ hfaithful
+  have hdimK :
+      Module.finrank (AlgebraicClosure F)
+        (TensorProduct F (AlgebraicClosure F) V) = 2 := by
+    exact
+      (Module.finrank_baseChange (R := AlgebraicClosure F) (S := F) (M' := V)).trans hdim
+  have hdetK_ne_bot : determinantKernelSubgroup ρK ≠ ⊥ := by
+    change
+      determinantKernelSubgroup (baseChangeRepresentation (AlgebraicClosure F) ρ) ≠ ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hdet_ne_bot
+  have hindK :
+      ∀ N : Subgroup (determinantKernelSubgroup ρK),
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+          ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥ := by
+    change
+      ∀ N : Subgroup
+          (determinantKernelSubgroup
+            (baseChangeRepresentation (AlgebraicClosure F) ρ)),
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+          ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥
+    rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+    exact hind
+  exact
+    commutative_of_determinantKernel_core_spine_isAlgClosed_charAway
+      ρK hfaithfulK hodd hdimK (charAway_algebraicClosure hchar)
+      hdetK_ne_bot hindK
+
 /-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
 
 This keeps the remaining induction hypothesis explicit but moves the field
@@ -3812,7 +4438,7 @@ private theorem
       ∀ N : Subgroup
           (determinantKernelSubgroup
             (baseChangeRepresentation (AlgebraicClosure F) ρ)),
-        N.Normal → N ≠ ⊥ →
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
         ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3831,6 +4457,31 @@ private theorem
   exact
     sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction
       ρK hfaithfulK hodd hdimK hind P
+
+/-- Algebraic-closure reduction with the induction hypothesis stated on the
+original determinant kernel.
+
+The preceding determinant-kernel compatibility identifies the determinant
+kernel after scalar extension with the original `G*`, so the theorem-facing
+induction hypothesis no longer has to mention the base-changed representation. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+        ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  refine
+    sylow_commutative_and_commutator_le_of_algebraicClosure_induction
+      ρ hfaithful hodd hdim ?_ P
+  rw [determinantKernelSubgroup_baseChangeRepresentation (AlgebraicClosure F) ρ]
+  exact hind
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup
@@ -3865,19 +4516,159 @@ private theorem sylow_commutative_and_commutator_le_of_isPGroup
     (⊤ : Subgroup G) ρ hfaithful (hG.to_subgroup ⊤) hdim
     (top_ne_bot_of_prime_dvd_card (p := p) hp_dvd) P
 
-/-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
-faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
+/-- BG Thm 2.6(b) with the proper-subgroup induction outputs supplied
+explicitly.
 
-stub: 詳細 proof は §2F section docstring の "證明梗概" 参照. -/
+This is the theorem-facing endpoint for the remaining `G* ≠ 1` and
+`G*` non-`p`-group branch.  The hypotheses `hab_ind` and `hsyl_ind` are exactly
+the strong-induction outputs for proper normal subgroups of the determinant
+kernel, phrased on the restricted faithful representation. -/
+private theorem odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    (hodd : Odd (Nat.card G))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hab_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 →
+        (∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q) →
+        Std.Commutative (· * · : N → N → N))
+    (hsyl_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 → p ∣ Nat.card N → (P : Sylow p N) →
+        Std.Commutative (· * · : P → P → P) ∧
+          commutator N ≤ (P : Subgroup N))
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
+      ρ hdet_bot P
+  by_cases hdet_p : IsPGroup p (determinantKernelSubgroup ρ)
+  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
+      ρ hfaithful hdim hdet_p hdet_bot P
+  exact
+    sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction
+      ρ hfaithful hodd hdim
+      (determinantKernel_hind_of_odd_two_dim_induction_outputs
+        ρ hfaithful hodd hdim hab_ind hsyl_ind) P
+
+/-- Finite subgroup cardinality strictly drops for a proper subgroup. -/
+private lemma subgroup_card_lt_of_lt_top
+    {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H < ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH.ne (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- Strong-induction form of BG Thm 2.6(a).
+
+The determinant-kernel branch uses the characteristic-away core spine.  Proper
+normal subgroups of `G*` are handled by the induction hypothesis and then
+converted into a nontrivial prime core. -/
+private theorem odd_two_dim_abelian_strong_induction
+    {F : Type*} [Field F]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G],
+      Nat.card G = n → Odd (Nat.card G) → Module.finrank F V = 2 →
+      (ρ : Representation F G V) → Function.Injective ρ →
+      (∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) →
+      Std.Commutative (· * · : G → G → G) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro G _ _ hcard hodd hdim ρ hfaithful hchar
+    by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+    · exact commutative_of_determinantKernel_eq_bot ρ hdet_bot
+    · refine
+        commutative_of_determinantKernel_core_spine_algebraicClosure_charAway
+          ρ hfaithful hodd hdim hchar hdet_bot ?_
+      intro N hNnormal hN_ne_bot hN_ne_top
+      let Gstar : Subgroup G := determinantKernelSubgroup ρ
+      let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
+      haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+      have hfaithfulN : Function.Injective ρN := by
+        intro x y hxy
+        apply Subtype.ext
+        apply Subtype.ext
+        exact hfaithful (by simpa [ρN, Gstar] using hxy)
+      have hN_dvd_Gstar : Nat.card N ∣ Nat.card Gstar :=
+        Subgroup.card_subgroup_dvd_card N
+      have hGstar_dvd_G : Nat.card Gstar ∣ Nat.card G :=
+        Subgroup.card_subgroup_dvd_card Gstar
+      have hoddN : Odd (Nat.card N) :=
+        hodd.of_dvd_nat (hN_dvd_Gstar.trans hGstar_dvd_G)
+      have hcharN :
+          ∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q := by
+        intro q hq_prime hq_dvd
+        exact hchar q hq_prime (hq_dvd.trans (hN_dvd_Gstar.trans hGstar_dvd_G))
+      have hN_card_lt_Gstar : Nat.card N < Nat.card Gstar := by
+        have hN_lt_top : N < ⊤ := lt_top_iff_ne_top.mpr hN_ne_top
+        exact subgroup_card_lt_of_lt_top hN_lt_top
+      have hGstar_card_le_G : Nat.card Gstar ≤ Nat.card G :=
+        Subgroup.card_le_card_group Gstar
+      have hN_card_lt_G : Nat.card N < Nat.card G :=
+        lt_of_lt_of_le hN_card_lt_Gstar hGstar_card_le_G
+      have hNcomm : Std.Commutative (· * · : N → N → N) :=
+        ih (Nat.card N) (by simpa [hcard] using hN_card_lt_G)
+          (G := N) rfl hoddN hdim ρN hfaithfulN hcharN
+      exact exists_prime_opCore_ne_bot_of_commutative hNcomm
+
+/-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
+faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian. -/
 theorem odd_two_dim_abelian
     {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
-    (_hodd : Odd (Nat.card G))
+    (hodd : Odd (Nat.card G))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
-    (_hdim : Module.finrank F V = 2) (ρ : Representation F G V)
-    (_hfaithful : Function.Injective ρ)
-    (_hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
-    Std.Commutative (· * · : G → G → G) := by
-  sorry
+    (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) :
+    Std.Commutative (· * · : G → G → G) :=
+  odd_two_dim_abelian_strong_induction
+    (F := F) (V := V) (Nat.card G) (G := G) rfl hodd hdim ρ hfaithful hchar
+
+/-- Strong-induction form of BG Thm 2.6(b), using Thm 2.6(a) for the
+characteristic-away branch on proper subgroups.
+
+This is not the final theorem (a) proof; it isolates the remaining dependency of
+the q=p theorem on the abelian branch and supplies the proper-subgroup Sylow
+branch recursively. -/
+private theorem odd_two_dim_sylow_abelian_strong_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V] :
+    ∀ n : ℕ, ∀ {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)],
+      Nat.card G = n → Odd (Nat.card G) → Module.finrank F V = 2 →
+      (ρ : Representation F G V) → Function.Injective ρ →
+      p ∣ Nat.card G → (P : Sylow p G) →
+      Std.Commutative (· * · : P → P → P) ∧
+        commutator G ≤ (P : Subgroup G) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro G _ _ _ hcard hodd hdim ρ hfaithful hp_dvd P
+    refine
+      odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs
+        (p := p) (F := F) (G := G) hodd hdim ρ hfaithful ?_ ?_ P
+    · intro N _hNnormal _hN_ne_bot _hN_ne_top hoddN σ hfaithfulN hdimN hcharN
+      exact odd_two_dim_abelian hoddN hdimN σ hfaithfulN hcharN
+    · intro N _hNnormal _hN_ne_bot hN_ne_top hoddN σ hfaithfulN hdimN hpN PN
+      let Gstar : Subgroup G := determinantKernelSubgroup ρ
+      have hN_card_lt_Gstar : Nat.card N < Nat.card Gstar := by
+        have hN_lt_top : N < ⊤ := lt_top_iff_ne_top.mpr hN_ne_top
+        exact subgroup_card_lt_of_lt_top hN_lt_top
+      have hGstar_card_le_G : Nat.card Gstar ≤ Nat.card G :=
+        Subgroup.card_le_card_group Gstar
+      have hN_card_lt_G : Nat.card N < Nat.card G :=
+        lt_of_lt_of_le hN_card_lt_Gstar hGstar_card_le_G
+      exact ih (Nat.card N) (by simpa [hcard] using hN_card_lt_G)
+        (G := N) rfl hoddN hdimN σ hfaithfulN hpN PN
 
 /-- **BG Theorem 2.6 (b)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F = p` が `|G|` を割るなら, `G` の `p`-Sylow
@@ -3887,20 +4678,18 @@ stub: 詳細 proof は §2F section docstring の "證明梗概" + Case q = p
 (BG L785-787) 参照. -/
 theorem odd_two_dim_sylow_abelian
     {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
-    (_hodd : Odd (Nat.card G))
+    (hodd : Odd (Nat.card G))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
     (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
     (hfaithful : Function.Injective ρ)
-    {p : ℕ} [Fact p.Prime] (_hp_dvd : p ∣ Nat.card G)
-    (_hchar : CharP F p) (P : Sylow p G) :
+    {p : ℕ} [Fact p.Prime] (hp_dvd : p ∣ Nat.card G)
+    (hchar : CharP F p) (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
-  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
-  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
-      ρ hdet_bot P
-  by_cases hdet_p : IsPGroup p (determinantKernelSubgroup ρ)
-  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
-      ρ hfaithful hdim hdet_p hdet_bot P
-  sorry
+  haveI : CharP F p := hchar
+  exact
+    odd_two_dim_sylow_abelian_strong_induction
+      (p := p) (F := F) (V := V) (Nat.card G)
+      (G := G) rfl hodd hdim ρ hfaithful hp_dvd P
 
 end OddOrder.BG.Ch1.S02

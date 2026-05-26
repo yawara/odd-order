@@ -12,6 +12,7 @@ import Mathlib.Algebra.CharP.Algebra
 import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.Algebra.Module.Torsion.Free
 import Mathlib.FieldTheory.Finite.Basic
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # p-Group Fixed Vector on a char-p Vector Space
@@ -171,22 +172,6 @@ private theorem zpowers_normal_of_mem_center
   rw [(hgz.zpow_right k).eq, mul_inv_cancel_right]
   exact Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) k
 
-omit [Fact p.Prime] [Module.Finite F V] [CharP F p] in
-/-- The quotient by a non-trivial normal subgroup of a finite group has strictly
-smaller `Nat.card`. Used to discharge the induction-hypothesis side condition
-in `invariants_ne_bot`. -/
-private theorem card_quotient_lt_of_ne_bot
-    {S : Subgroup G} [S.Normal] (hS : S ≠ ⊥) :
-    Nat.card (G ⧸ S) < Nat.card G := by
-  have h_eq : Nat.card (G ⧸ S) * Nat.card S = Nat.card G :=
-    (Subgroup.card_eq_card_quotient_mul_card_subgroup S).symm
-  have hS_gt : 1 < Nat.card S := (Subgroup.one_lt_card_iff_ne_bot _).mpr hS
-  have hQ_pos : 0 < Nat.card (G ⧸ S) := Nat.card_pos
-  calc Nat.card (G ⧸ S)
-      = Nat.card (G ⧸ S) * 1 := (mul_one _).symm
-    _ < Nat.card (G ⧸ S) * Nat.card S := (Nat.mul_lt_mul_left hQ_pos).mpr hS_gt
-    _ = Nat.card G := h_eq
-
 omit [Fact p.Prime] [Finite G] [Module.Finite F V] [CharP F p] in
 /-- A nonzero submodule is a nonzero module when viewed as a type. -/
 private theorem top_ne_bot_of_submodule_ne_bot
@@ -236,7 +221,7 @@ theorem invariants_ne_bot
     haveI hZ_normal : Z.Normal := zpowers_normal_of_mem_center z.2
     have hZ_ne_bot : Z ≠ ⊥ := Subgroup.zpowers_ne_bot.mpr hz_ne_coe
     have _hZ_card_lt : Nat.card (G ⧸ Z) < Nat.card G :=
-      card_quotient_lt_of_ne_bot hZ_ne_bot
+      Subgroup.card_quotient_lt_of_ne_bot hZ_ne_bot
     -- (ρ z - 1)^(p^k) = 0
     obtain ⟨k, hk_pow⟩ := exists_pow_sub_one_eq_zero hG ρ (z : G)
     -- W := ker (ρ z - 1) は ⊥ でない

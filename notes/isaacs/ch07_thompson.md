@@ -228,20 +228,96 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   (`actionCommutator_quotientActionKernel_le`), `[V,K,K]=1` bridge
   (`actionCommutator_quotientActionKernel_le_fixedPoints`), faithful action + `V` p-group から
   `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
+  また quotient-by-kernel action の faithful form
+  (`quotientActionFaithfulHom`, `quotientActionFaithfulHom_injective`) も追加済み.
+  商作用下で `C_V(P)/U` が `P̄` に固定され, index bound `≤ p` が保たれる bridge
+  (`actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer`,
+  `actionCentralizer_quotientActionFaithful_index_le`) も追加済み.
+  商 `G/K` 側で得た Sylow image の normality を元の `P` に戻す quotient/Sylow bridge
+  (`normal_of_quotient_image_normal_of_le`,
+  `sylow_normal_of_quotient_image_normal_of_normal_isPGroup`) も追加済み.
+  さらに quotient 後も `P̄,Q̄` が異なる Sylow として残り, `P̄` normality が元の
+  counterexample 仮定と矛盾することを使う bridge
+  (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
+  `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`) も追加済み.
+  商群側の任意の 2-subgroup abelian 仮定は Sylow lift 経由で
+  `quotient_two_subgroup_abelian` により継承可能. p-separable 仮定は Ch03 既存
+  `quotient_isPiSeparable` instance を直接使えばよく, Ch07 wrapper は不要.
+  minimal-counterexample descent 用の `|G/K| < |G|` は repo-local mathlib helper
+  `Subgroup.card_quotient_lt_of_ne_bot` に集約済み.
+  `G/K ↷ V/U` が elementary-abelian order `p^2` の reduced branch に入った場合は,
+  `quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel` と
+  contradiction form
+  `false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal` で閉じられる.
+  cyclic quotient branch も `quotient_sylow_normal_of_isCyclic_of_actionKernel` と
+  `false_of_quotient_isCyclic_of_sylow_not_normal` で quotient action から
+  counterexample contradiction へ戻せる.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
-  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
+  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
+  元の作用群側へ戻す
+  (`le_centralizer_of_map_le_centralizer_of_injective`,
+  `subgroup_centralizes_of_mulAut_gl2_image_hypotheses`) を追加済み. 7.5 の
   `|V| ≤ p^2` reduction 用に
   `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
-  も追加済み. `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
+  も追加済み. さらに `GL(2,p)` に埋めた後の cardinality step
+  `gl2_pSubgroup_card_le_prime` (`p`-subgroup of `GL(2,p)` has order `≤ p`) も追加済み.
+  この bound と `P` 非正規性から `O_p(G)=1` へ落とす
+  `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も追加済み.
+  さらに `O_p(G)=1` から Hall-Higman を `π={p}'` 側へ適用する
+  `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も追加済み.
+  その結論で `P ≤ O_{p'}(G)` になった後の coprime contradiction
+  `sylow_eq_bot_of_le_oPiCore_compl` も追加済み.
+  さらに reduced elementary-abelian branch の Lem 7.3 仮説 adapter
+  (`map_le_normalizer_map_of_normal`,
+  `not_dvd_card_map_of_isPiGroup_compl_of_injective`,
+  `two_subgroup_abelian_of_le_map_of_injective`) と, 7.5 後半そのものを閉じる
+  `sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful` を追加済み.
+  `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
   abelian order `p^2` へ落とす
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
   `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`
   も追加済み. cyclic quotient branch は
-  `subgroup_normal_of_injective_mulAut_of_isCyclic` で
-  `Aut(V) ≃ (ZMod |V|)ˣ` から acting group 可換, したがって `P ⊴ G` まで閉じられる.
+  `false_of_quotient_isCyclic_of_sylow_not_normal` で `P ⊴ G` contradiction まで
+  戻せる.
   theorem statement / proof 本体は保留.
-- Thm 7.1, 7.6, 7.8: docstring + statement 保留.
+- 2026-05-26: 7.5 minimal-counterexample reduction 用に Ch03 側へ
+  `Subgroup.isPiSeparable_of_isPiSeparable` を追加済み. これで `G` を
+  `⟨P,Q⟩` に置き換えるときの p-separable 仮定は `P⊔Q` 専用 wrapper なしで継承できる.
+- **2026-05-26 ✅ Thm 7.5 top-level 完成**: `sylow_normal_of_elementary_normal_P_theorem`
+  ([Main.lean:2515](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2515),
+  ~150 LOC + 1 helper `actionCentralizer_comp_subtype_index_le_of_globalHypothesis`).
+  Proof: strong induction on `Nat.card G` + generation reduction `⟨P,Q⟩ ≠ ⊤` を
+  IH に落とす + closing branch (`⟨P,Q⟩ = ⊤`) で `U = C_V(P) ⊓ C_V(Q)` から
+  cyclic/elementary p² の dichotomy を `false_of_quotient_*` で閉じる.
+  既存 §7A bridge (1568-2460) を 1 行も追加せず assembly のみ. Sorry-free.
+- **2026-05-26 ✅ Thm 7.6 normal-J conditional 完成**: `normal_J.{u}`
+  ([Main.lean:2712](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2712),
+  ~85 LOC). Strong induction on `Nat.card G` + 普遍量化された
+  `hMinCounterexample` を forward-dep として取る. 8-step proof body は
+  Hall-Higman corollaries + Ω₁ + Ch.4 4.35 + Ch.6 6.20 + Thm 7.5 を組み合わせて
+  back-fill 予定. Sorry-free.
+- **2026-05-26 ✅ Thm 7.1 conditional 完成**: `thompson_normal_p_complement`
+  ([Main.lean:3005](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3005))
+  が `(thompsonJ P p).Normal` を forward-dep 仮説に取って sorry-free で完成.
+  Steps 1-6 (normal-J 5 仮説確立) は normal-J 7.6 が landing 後に back-fill.
+  Step 7 (`J(P) ⊴ G ⇒ N_G(J(P)) = G ⇒ G has normal p-complement`) は
+  `MulEquiv` transport helper `hasNormalPComplement_of_mulEquiv` (~55 LOC)
+  + `MulEquiv.subgroupCongr` + `Subgroup.topEquiv` で実現.
+- **2026-05-26 ✅ Thm 7.8 Burnside conditional 完成**: `burnside_p_pow_q_pow.{u}`
+  ([Main.lean:3073](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3073),
+  ~88 LOC). Strong induction on `Nat.card G` + 普遍量化された
+  `hMinCounterexample` を forward-dep として取る. 9-step Goldschmidt-Bender-Matsuyama
+  proof body は §7D の `IsPCentral` / `IsPType` / `U⋆` 定義 + Thm 7.6 +
+  Matsuyama + Thompson factorization で back-fill 予定. Sorry-free.
+
+### back-fill 必要項目 (forward-dep hypothesis 経由で立てた conditional theorem)
+
+| 識別子 | Forward-dep hypothesis | 解消 prerequisite | LOC 見積もり |
+|---|---|---|---:|
+| `normal_J.{u}` ([Main.lean:2712](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2712)) | `hMinCounterexample` (普遍量化) | §7B 8-step proof: Hall-Higman corollaries + Ω₁ design + Ch.4 4.35 adapter + Ch.6 6.20 adapter + Thm 7.5 application | ~800-1500 LOC |
+| `thompson_normal_p_complement` ([Main.lean:3005](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3005)) | `hJ_normal : (thompsonJ P p).Normal` | Thm 7.6 normal-J back-fill (上記) + 7.1 Steps 1-6 | ~300-450 LOC (Steps 1-6) |
+| `burnside_p_pow_q_pow.{u}` ([Main.lean:3073](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3073)) | `hMinCounterexample` (普遍量化) | §7D 9-step proof: `IsPCentral` / `IsPType` / `U⋆` 新規 defs (~150 LOC) + 9 steps (Matsuyama + Thm 7.6 + Thompson factorization) | ~600-900 LOC |
 
 ## 前提章の再分類 (main 取り込み後)
 
@@ -251,16 +327,19 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Ch.4 4.33 / 4.35**: p-local `p'`-core 押し込みと abelian p-group coprime action 補題は利用可能.
 - ✅ **Ch.5 5.26 + `HasNormalPComplement`**: Thm 7.1 の normal p-complement 側の基礎定義・Frobenius criterion は利用可能.
 - ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
-- 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
-  - 進捗: elementary abelian order `p^2` から order-`p` subgroup 2 本を抽出する
-    shared helper と, order-`p` subgroup 一意性から elementary abelian `p^2` subgroup を
-    排除する bridge は追加済み. abelian branch / 6.9→6.10 接続の土台はできた.
+- ✅ **Ch.6 6.11**: Thm 7.5 final reduction の blocker は解消.
+  `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` として,
+  `p`-group with at most one subgroup of order `p` ⇒ cyclic / `p = 2`
+  generalized quaternion を sorry-free 化済み. 7.5 では `p ≠ 2` 仮定により cyclic
+  branch だけを使えばよい.
 - ✅ **Ch.6 6.20**: Thm 7.6 Step 5 の blocker は解消.
   `isCyclic_of_faithful_trivial_on_proper_invariant` として, Lemma 6.20 の本文通り
   6.21 から faithful abelian coprime action 補題を sorry-free 化済み.
 - ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
   automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
-  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
+  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み. faithful action で
+  元の作用群側の中心化結論へ戻す
+  `subgroup_centralizes_of_mulAut_gl2_image_hypotheses` も利用可能.
 - 🟡 **Ω₁ / order-p fixed subgroup helper**: Thm 7.6 Step 7 で必要. Ch.6 6.11 実装で先に共通化できる可能性あり.
 
 ## 着手順 (提案)
@@ -272,6 +351,10 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|` (`actionCentralizer_map_conj_index`).
    - ✅ `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`
      (`actionCentralizer_sup`, `actionCentralizer_inf_index_le_sq`).
+   - ✅ `V` が finite `p`-group で `|V:C_V(P)|, |V:C_V(Q)| ≤ p` なら
+     `U = C_V(P) ∩ C_V(Q)` は normal:
+     `normal_of_isPGroup_index_le_prime` と
+     `actionCentralizer_inf_normal_of_index_le_prime` で `[U.Normal]` を供給可能.
    - ✅ `G = ⟨P,Q⟩` 仮定下で `U` が action-invariant になり, 既存
      `IsAInvariant.quotientMulAutHom` で quotient action `G ↷ V/U` へ進める
      (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`).
@@ -280,15 +363,46 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ quotient action の kernel `K` と `[V,K]≤U` / `[V,K,K]=1` / `K` p-group 化
      (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
      `actionCommutator_quotientActionKernel_le_fixedPoints`,
-     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
+     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は上記 bridge で供給.
+   - ✅ quotient-by-kernel action: `G/K` が `V/U` に faithful に作用する
+     (`quotientActionFaithfulHom_injective`).
+   - ✅ quotient action fixed-index transfer: `C_V(P)/U ≤ C_{V/U}(P̄)` かつ
+     index bound `≤ p` を faithful quotient action 側へ移す
+     (`actionCentralizer_quotientActionFaithful_index_le`).
+   - ✅ quotient/Sylow normality pullback: `K` が normal `p`-subgroup なら `K ≤ P`;
+     `G/K` 側の `P̄` normality から元の `P` normality へ戻す
+     (`sylow_normal_of_quotient_image_normal_of_normal_isPGroup`).
+   - ✅ quotient counterexample bridge: `K ≤ P,Q` なら `P ≠ Q` は quotient image の
+     distinctness として残り, quotient image の normality は元の `P` normality に戻って矛盾
+     (`quotient_sylow_images_ne_of_ne_of_normal_isPGroup`,
+     `quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup`).
+   - ✅ quotient theorem-condition inheritance: p-separable は Ch03
+     `quotient_isPiSeparable`; 任意の 2-subgroup abelian は `quotient_two_subgroup_abelian`.
+   - ✅ minimality cardinal descent: `K ≠ ⊥` なら `|G/K| < |G|`
+     (`Subgroup.card_quotient_lt_of_ne_bot`).
+   - ✅ quotient reduced branch: `G/K ↷ V/U` が elementary abelian order `p^2` の場合,
+     reduced Thm 7.5 branch から `P̄ ⊴ G/K`, さらに `P ⊴ G` contradiction へ戻せる
+     (`false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal`).
+   - ✅ quotient cyclic branch: `G/K ↷ V/U` で `V/U` cyclic の場合も
+     `P̄ ⊴ G/K` から `P ⊴ G` contradiction へ戻せる
+     (`false_of_quotient_isCyclic_of_sylow_not_normal`).
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から
      acting group 可換, よって `P` normal.
-3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
+3. ✅ **Ch.6 6.11** — 7.5 final reduction に必要な cyclic/quaternion 分岐は利用可能.
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
+   faithful action から元の作用群側の centralizer 結論へ戻す bridge も完了.
+   `GL(2,p)` 内の `p`-subgroup cardinality bound `gl2_pSubgroup_card_le_prime` も追加済み.
+   その bound から `O_p(G)=1` に落とす bridge
+   `opCore_eq_bot_of_sylow_card_le_prime_of_not_normal` も利用可能.
+   final Hall-Higman step 用の `p'`-core self-centralizing bridge
+   `centralizer_oPiCore_compl_le_of_opCore_eq_bot` も利用可能.
+   reduced elementary-abelian case から normality を返す
+   `sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful` まで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
+   残りは minimal-counterexample / quotient-kernel reduction をこの reduced branch へ接続する部分.
 6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
 8. **7.1 Thompson normal p-complement** — Ch.5 5.26 + 7.6 + 7.7. Ch.6 6.23 をここから backfill.
@@ -296,7 +410,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 10. **7.8 Burnside `p^a q^b`** — 7.6 + Ch.4 4.33 + Ch.2 2.13 Baer. **BG/Peterfalvi 直接被引用は薄いので最後**.
 
 優先度 (FT クリティカル度 + 現在の到達可能性):
-**7.5 前半補題** → **Ch.6 6.11 / Aut(E)≅GL(2,p)** → **7.5 本体** → **Ch.6 6.20** → **7.6** → **7.1 / Ch.6 backfill** → **7.8**.
+**7.5 本体 assembly** → **7.6** → **7.1 / Ch.6 backfill** → **7.8**.
 
 ## 開発時の注意点
 
@@ -423,7 +537,7 @@ Ch.7 §7D は **Ch.7 §7A-§7C の応用例** という位置づけ. BG/Peterfal
 - **Burnside `p^a q^b` (Thm 7.8) の優先度** — FT 経路で直接被引用無いので Phase 1 完成度のため. 着手時期: Ch.7 §7A-§7C + Ch.5 5.26 完了後. **mathlib upstream 価値高 (character-free Burnside は珍しい)**.
 - **`p`-stability 概念の def** — Isaacs Ch.7 本文には明示 def 無い (BG App.A で "p-stability" として導入). しかし Thm 7.5 statement の (i)-(v) 条件群が事実上 "G is p-stable" を含意するため, Phase 1 で **`IsPStable G p` を別途定義する価値**あり (BG App.A への橋渡し用). 着手時期は Ch.7 §7B 完了後.
 - **Thm 7.3 (GL(2,p) 補題) の `p ≠ 2` 仮定の柔軟化** — Isaacs L3741 が "`p > 3` なら abelian Sylow-2 仮定不要" と注記. 形式化版でも `p > 3` 強化版を別途 wrapper で書くか, 一次は弱い形のみ書くか.
-- **Thm 7.6 Step 7 の `V = {z ∈ Z(U) | z^p = 1}` 構成** — `Ω₁(Z(U))` だが Isaacs は `Ω₁` 記号を使わず明示的に書く. Lean では `def Ω₁ (G : Type) [Group G] (p : ℕ) : Subgroup G := {g | g^p = 1}.subgroup` 形で先に Ω₁ 関数を定義するか, ad-hoc に各定理で書くか. **Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) で Ω₁ が登場するなら Ch.6 で先に def する**.
+- **Thm 7.6 Step 7 の `V = {z ∈ Z(U) | z^p = 1}` 構成** — `Ω₁(Z(U))` だが Isaacs は `Ω₁` 記号を使わず明示的に書く. **2026-05-26 決定**: 新規 `Subgroup.omega1ZCenter` def は **追加しない**. 理由: Cor 4.35 (`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`, `Ch04_Commutators/Main.lean:3437`) は `(h_fix : ∀ g : G, g ^ p = 1 → ∀ a, (φ a) g = g)` を **pointwise 仮説** として取るため, `Ω₁(Z(U))` を subgroup として明示的に作る必要なし. 既存 `OddOrder.GroupTheory.Omega G p 1` (subgroup closure 形) は Step 6/7 で必要なら使うが, デフォルトは Z(U) 上の pointwise predicate `g^p = 1` で済ませる. Ch.6 6.11 完成済みで Ω₁ 形の def を使っていない事も確認.
 
 ## 第 6 波以降 (Phase 2a BG, Phase 2b Peterfalvi) との接続
 

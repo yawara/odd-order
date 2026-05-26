@@ -81,6 +81,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
 #assert_only_allowed_axioms Subgroup.chermakDelgado
+#assert_only_allowed_axioms Subgroup.card_quotient_lt_of_ne_bot
 
 -- Ch.2 (Subnormality): Thm 2.13 Matsuyama
 -- 奇素数位数 inversion `x^t = x⁻¹` の存在 (`t ∉ O_2(G)` 下)
@@ -105,6 +106,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.3 (Split Extensions): π-core quotient reduction
 -- Quotienting by O_π(G) kills the π-radical.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot
+
+-- Ch.3 (Split Extensions): π-separability passes to arbitrary subgroups.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable
 
 -- Ch.3 (Split Extensions): Thm 3.22 Hall-Higman π-length ≤ 1
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
@@ -222,6 +226,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_unique_involution
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.unique_involution_of_comm_of_involutions_invert_element
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
@@ -257,10 +267,118 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution_of_index_two
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_dihedral_of_not_isCyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_semiDihedral_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_card_le_mulAut_of_self_centralizing
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_commutative_of_isCyclic_of_self_centralizing
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_commutative_of_maximal_normal_isCyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.card_ne_eight_of_relIndex_prime_of_card_ne_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_le_of_quotient_commutative
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.center_index_eq_prime_sq_of_subgroupOf_relIndex_prime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.center_relIndex_zpowers_eq_prime_of_pow_mem_center
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
+-- Thm 6.12 conjugation exponent dispatch: `a^p ∈ ⟨c⟩` gives `i^p ≡ 1`, while
+-- non-fixity of `c^p` excludes `i ≡ 1`, so Lem 6.16 forces the two 2-adic cases.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_exponent_pow_modEq_one_of_pow_mem_zpowers
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_exponent_not_modEq_one_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.three_le_exponent_of_zpowers_relIndex_of_normal_abelian_cyclic
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_involution_comap_card_ne_eight_of_card_ne_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_involution_conj_square_eq_inv_of_zpowers
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_isCyclic_of_involutions_invert_zpowers_square
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_eq_inv_or_twist_of_two_adic_cases
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_exponent_modEq_sq_of_quotient_sq_eq
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
@@ -298,9 +416,68 @@ set_option linter.style.longLine false in
 
 -- Ch.7 (Thompson Subgroup): Thm 7.5 GL(2,p) bridge for automorphism subgroups.
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.gl2_pSubgroup_card_le_prime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.opCore_eq_bot_of_sylow_card_le_prime_of_not_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.centralizer_oPiCore_compl_le_of_opCore_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.sylow_eq_bot_of_le_oPiCore_compl
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.normal_of_isPGroup_index_le_prime
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_inf_normal_of_index_le_prime
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.mulAut_centralizes_of_gl2_image_hypotheses
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.le_centralizer_of_map_le_centralizer_of_injective
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.subgroup_centralizes_of_mulAut_gl2_image_hypotheses
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.map_le_normalizer_map_of_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.not_dvd_card_map_of_isPiGroup_compl_of_injective
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.two_subgroup_abelian_of_le_map_of_injective
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.subgroup_normal_of_injective_mulAut_of_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotientActionKernel_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotientActionFaithfulHom_injective
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotient_image_le_quotientActionHom_actionCentralizer
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotientActionFaithful_index_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.normal_of_quotient_image_normal_of_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_images_ne_of_ne_of_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_sylow_images_ne_of_ne_of_normal_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_two_subgroup_abelian
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_sylow_normal_of_isCyclic_of_actionKernel
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.false_of_quotient_isCyclic_of_sylow_not_normal
 #assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 #assert_only_allowed_axioms

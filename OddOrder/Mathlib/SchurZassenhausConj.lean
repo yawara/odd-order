@@ -159,23 +159,7 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
   let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
   exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
 
-/-! ### Helper lemmas for IH termination -/
-
 variable [Finite G]
-
-/-- `L ≠ ⊥ ⇒ |G ⧸ L| < |G|` for finite `G`. -/
-private theorem card_quotient_lt_of_ne_bot {L : Subgroup G} [L.Normal] (hL : L ≠ ⊥) :
-    Nat.card (G ⧸ L) < Nat.card G := by
-  change L.index < Nat.card G
-  have h_L_gt : 1 < Nat.card ↥L := (Subgroup.one_lt_card_iff_ne_bot _).mpr hL
-  have h_L_idx_pos : 0 < L.index := by
-    rw [Nat.pos_iff_ne_zero]
-    intro h
-    have : Nat.card G = 0 := by rw [← L.card_mul_index, h]; ring
-    exact absurd this Nat.card_pos.ne'
-  calc L.index = L.index * 1 := (mul_one _).symm
-    _ < L.index * Nat.card ↥L := (Nat.mul_lt_mul_left h_L_idx_pos).mpr h_L_gt
-    _ = Nat.card G := L.index_mul_card
 
 variable {N : Subgroup G} [N.Normal]
 
@@ -270,7 +254,7 @@ private theorem step_factor
     {L : Subgroup G} [L.Normal] (hL_ne_bot : L ≠ ⊥) :
     ∃ g : G, g ∈ N ∧ (K.map (MulAut.conj g).toMonoidHom) ⊔ L = K' ⊔ L := by
   -- |G/L| < |G|.
-  have hcard_lt := card_quotient_lt_of_ne_bot hL_ne_bot
+  have hcard_lt := Subgroup.card_quotient_lt_of_ne_bot hL_ne_bot
   -- Coprime cardinalities for Helper B.
   have h_NK_cop : Nat.Coprime (Nat.card N) (Nat.card K) := by
     rw [show Nat.card K = N.index from hK.symm.index_eq_card.symm]

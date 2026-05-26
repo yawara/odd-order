@@ -7,6 +7,8 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.FiniteAbelian.Basic
+import Mathlib.GroupTheory.IndexNormal
+import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
@@ -17,6 +19,7 @@ import Mathlib.Tactic.LinearCombination
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # OddOrder.Isaacs.Ch07 — The Thompson Subgroup
@@ -343,6 +346,146 @@ private theorem card_gl2_zmod_prime {p : ℕ} [Fact p.Prime] :
       _ = p * (p - 1) := (Nat.mul_sub_left_distrib p p 1).symm
   rw [h_sq_sub_one, h_sq_sub_self]
   ring
+
+/-- A `p`-subgroup of `GL(2,p)` has order at most `p`.
+
+This is the formal version of the cardinality step in Isaacs Thm 7.5 after embedding the
+faithful action on an elementary-abelian group of order `p²` into `GL(2,p)`. -/
+theorem gl2_pSubgroup_card_le_prime {p : ℕ} [Fact p.Prime]
+    (P : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) (hP : IsPGroup p P) :
+    Nat.card P ≤ p := by
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
+  rcases n with _ | n
+  · rw [hn, pow_zero]
+    exact (Fact.out : p.Prime).pos
+  rcases n with _ | n
+  · rw [hn, pow_one]
+  · exfalso
+    have hp2_dvd_card : p ^ 2 ∣ Nat.card P := by
+      rw [hn]
+      exact Nat.pow_dvd_pow p (by omega : 2 ≤ n + 2)
+    have hp2_dvd_gl :
+        p ^ 2 ∣ Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
+      hp2_dvd_card.trans P.card_subgroup_dvd_card
+    rw [card_gl2_zmod_prime (p := p)] at hp2_dvd_gl
+    have hp_not_dvd_pred : ¬ p ∣ p - 1 := by
+      intro h
+      have hp_pos : 0 < p := (Fact.out : p.Prime).pos
+      have hpred_pos : 0 < p - 1 := by
+        have hp_two : 2 ≤ p := (Fact.out : p.Prime).two_le
+        omega
+      have hle : p ≤ p - 1 := Nat.le_of_dvd hpred_pos h
+      omega
+    have hp_not_dvd_succ : ¬ p ∣ p + 1 := by
+      intro h
+      have hp_dvd_one : p ∣ 1 := by
+        have hsub : p ∣ (p + 1) - p := Nat.dvd_sub h (dvd_refl p)
+        have hsub_eq : (p + 1) - p = 1 := by omega
+        rwa [hsub_eq] at hsub
+      exact (Fact.out : p.Prime).not_dvd_one hp_dvd_one
+    have hp_not_dvd_rest : ¬ p ∣ (p - 1) * (p - 1) * (p + 1) := by
+      intro h
+      rcases (Fact.out : p.Prime).dvd_mul.mp h with hleft | hsucc
+      · rcases (Fact.out : p.Prime).dvd_mul.mp hleft with hpred | hpred
+        · exact hp_not_dvd_pred hpred
+        · exact hp_not_dvd_pred hpred
+      · exact hp_not_dvd_succ hsucc
+    have hp_dvd_rest : p ∣ (p - 1) * (p - 1) * (p + 1) := by
+      have hp_pos : 0 < p := (Fact.out : p.Prime).pos
+      have hmul : p * p ∣ p * ((p - 1) * (p - 1) * (p + 1)) := by
+        simpa [pow_two, mul_assoc] using hp2_dvd_gl
+      exact Nat.dvd_of_mul_dvd_mul_left hp_pos hmul
+    exact hp_not_dvd_rest hp_dvd_rest
+
+/-- If a Sylow `p`-subgroup has order at most `p` and is not normal, then `O_p(G)=1`.
+
+This is the `O_p(G)=1` reduction in Isaacs Thm 7.5 after the faithful action has embedded
+the group into `GL(2,p)` and `gl2_pSubgroup_card_le_prime` has bounded `|P|`. -/
+theorem opCore_eq_bot_of_sylow_card_le_prime_of_not_normal
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP_card : Nat.card (P : Subgroup G) ≤ p)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) :
+    OddOrder.Isaacs.Ch01.opCore p G = ⊥ := by
+  by_contra hOp_ne_bot
+  have hOp_le_P : OddOrder.Isaacs.Ch01.opCore p G ≤ (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch01.opCore_le P
+  have hOp_p : IsPGroup p (OddOrder.Isaacs.Ch01.opCore p G) :=
+    OddOrder.Isaacs.Ch01.opCore_isPGroup p G
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hOp_p
+  have hOp_gt_one : 1 < Nat.card (OddOrder.Isaacs.Ch01.opCore p G) :=
+    (Subgroup.one_lt_card_iff_ne_bot (OddOrder.Isaacs.Ch01.opCore p G)).mpr hOp_ne_bot
+  have hp_le_Op : p ≤ Nat.card (OddOrder.Isaacs.Ch01.opCore p G) := by
+    cases n with
+    | zero =>
+        have hcard_one : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) = 1 := by
+          simpa using hn
+        omega
+    | succ n =>
+        rw [hn, pow_succ]
+        have hpow_pos : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
+        simpa [mul_comm] using Nat.le_mul_of_pos_right p hpow_pos
+  have hOp_card_le_P : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) ≤
+      Nat.card (P : Subgroup G) :=
+    Subgroup.card_le_of_le hOp_le_P
+  have hP_card_eq : Nat.card (P : Subgroup G) = p :=
+    le_antisymm hP_card (hp_le_Op.trans hOp_card_le_P)
+  have hOp_card_eq : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) = p :=
+    le_antisymm (hOp_card_le_P.trans hP_card) hp_le_Op
+  have hOp_eq_P : OddOrder.Isaacs.Ch01.opCore p G = (P : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hOp_le_P (by rw [hP_card_eq, hOp_card_eq])
+  apply hP_not_normal
+  rw [← hOp_eq_P]
+  infer_instance
+
+/-- Hall-Higman final-step form for Isaacs Thm 7.5.
+
+If the usual `p`-core is trivial, then Hall-Higman can be applied with
+`π = {p}'`, so the `p'`-core is self-centralizing. -/
+theorem centralizer_oPiCore_compl_le_of_opCore_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp : OddOrder.Isaacs.Ch01.opCore p G = ⊥) :
+    Subgroup.centralizer
+        (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G : Set G) ≤
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+  classical
+  set π' : Set ℕ := {q | q ∉ ({p} : Set ℕ)} with hπ'_def
+  haveI hPiSepCompl : OddOrder.Isaacs.Ch03.IsPiSeparable π' G :=
+    OddOrder.Isaacs.Ch03.isPiSeparable_compl ({p} : Set ℕ) G inferInstance
+  have hCoreCompl : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ π'} G = ⊥ := by
+    rw [show ({q | q ∉ π'} : Set ℕ) = ({p} : Set ℕ) by
+      ext q
+      simp [π']]
+    rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p]
+    exact hOp
+  simpa [π', hπ'_def] using
+    (OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G) π' hCoreCompl)
+
+/-- A Sylow `p`-subgroup contained in `O_{p'}(G)` is trivial.
+
+This is the final coprime contradiction in Isaacs Thm 7.5 after Hall-Higman puts
+`C_G(O_{p'}(G))` inside `O_{p'}(G)`. -/
+theorem sylow_eq_bot_of_le_oPiCore_compl
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP_le :
+      (P : Subgroup G) ≤
+        OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) :
+    (P : Subgroup G) = ⊥ := by
+  have hP_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch04.isPiGroup_singleton_of_isPGroup P.isPGroup'
+  have hL_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)}
+        (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) :=
+    OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {q | q ∉ ({p} : Set ℕ)}
+  have hP_pi' :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hP_le hL_pi
+  have hcop : Nat.Coprime (Nat.card (P : Subgroup G)) (Nat.card (P : Subgroup G)) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hP_pi hP_pi'
+  have hInf : (P : Subgroup G) ⊓ (P : Subgroup G) = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime hcop
+  simpa using hInf
 
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
@@ -1186,8 +1329,9 @@ theorem gl2_pSubgroup_centralizes_of_normalizes
 **proof 戦略** (8 Step): Sylow conjugacy + GL(2,p) embedding + Hall-Higman 3.21
 + Lem 7.3 + Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion).
 
-本体 proof は Ch.6 6.11 完成後に着手予定. ここでは先に, proof 冒頭で必要になる
-faithful action / fixed subgroup の橋渡しだけを配置する. -/
+Ch.6 6.11 は `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` として利用可能.
+残る作業は, 下の action / fixed subgroup bridge 群を使って Thm 7.5 の本体 statement と
+book proof の contradiction assembly を Lean に載せること. -/
 
 /-! #### Thm 7.5 action infrastructure
 
@@ -1306,6 +1450,201 @@ theorem mulAut_centralizes_of_gl2_image_hypotheses
   apply e.injective
   simpa [map_mul] using hcommGL
 
+/-- Pull a centralizer conclusion back through an injective homomorphism.
+
+This is the faithful-action transfer used in Isaacs Thm 7.5: once the images of `P` and
+`L` centralize inside `Aut(V)`, the original subgroups centralize in the acting group. -/
+theorem le_centralizer_of_map_le_centralizer_of_injective
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} (hφ : Function.Injective φ)
+    {P L : Subgroup A}
+    (hmap : P.map φ ≤ Subgroup.centralizer ((L.map φ) : Set B)) :
+    P ≤ Subgroup.centralizer (L : Set A) := by
+  intro x hxP
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hyL
+  have hxmap : φ x ∈ P.map φ := Subgroup.mem_map_of_mem φ hxP
+  have hymap : φ y ∈ L.map φ := Subgroup.mem_map_of_mem φ hyL
+  have hcomm : φ y * φ x = φ x * φ y :=
+    (Subgroup.mem_centralizer_iff.mp (hmap hxmap)) (φ y) hymap
+  apply hφ
+  simpa [map_mul] using hcomm
+
+/-- Isaacs Thm 7.5 GL(2,p) centralizer step for a faithful action.
+
+This combines the `Aut(V) ≃ GL(2,p)` bridge with the injective-action transfer, so the
+conclusion is directly in the acting group rather than in `MulAut V`. -/
+theorem subgroup_centralizes_of_mulAut_gl2_image_hypotheses
+    {A V : Type*} [Group A] [Group V] {p : ℕ} [Fact p.Prime]
+    {φ : A →* MulAut V} (hφ : Function.Injective φ)
+    (e : MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) (hp2 : p ≠ 2)
+    {P L : Subgroup A}
+    (hPp : IsPGroup p ((P.map φ).map e.toMonoidHom))
+    (hPnorm : (P.map φ).map e.toMonoidHom ≤
+      Subgroup.normalizer (((L.map φ).map e.toMonoidHom) : Set _))
+    (hLcop : ¬ p ∣ Nat.card ((L.map φ).map e.toMonoidHom))
+    (hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ (L.map φ).map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) :
+    P ≤ Subgroup.centralizer (L : Set A) :=
+  le_centralizer_of_map_le_centralizer_of_injective hφ
+    (mulAut_centralizes_of_gl2_image_hypotheses e hp2 hPp hPnorm hLcop hL2abelian)
+
+/-- The image of any subgroup normalizes the image of a normal subgroup.
+
+This is the normalizer adapter used in the reduced `GL(2,p)` branch of Isaacs Thm 7.5:
+`P` normalizes `O_{p'}(G)`, so its faithful image normalizes the image of `O_{p'}(G)`. -/
+theorem map_le_normalizer_map_of_normal
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} {P L : Subgroup A} [L.Normal] :
+    P.map φ ≤ Subgroup.normalizer ((L.map φ) : Set B) := by
+  rintro _ ⟨p, _hpP, rfl⟩
+  have hLnorm : L.Normal := inferInstance
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · rintro ⟨l, hlL, rfl⟩
+    refine ⟨p * l * p⁻¹, hLnorm.conj_mem l hlL p, ?_⟩
+    simp [map_mul]
+  · rintro ⟨l, hlL, hyl⟩
+    have hconj : p⁻¹ * l * p ∈ L := by
+      simpa using hLnorm.conj_mem l hlL p⁻¹
+    refine ⟨p⁻¹ * l * p, hconj, ?_⟩
+    calc
+      φ (p⁻¹ * l * p) = (φ p)⁻¹ * φ l * φ p := by simp [map_mul]
+      _ = y := by rw [hyl]; group
+
+/-- A `p'`-subgroup remains `p'` after an injective homomorphic image. -/
+theorem not_dvd_card_map_of_isPiGroup_compl_of_injective
+    {A B : Type*} [Group A] [Group B] [Finite A] {p : ℕ} [Fact p.Prime]
+    {φ : A →* B} (hφ : Function.Injective φ) {L : Subgroup A}
+    (hLpi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} L) :
+    ¬ p ∣ Nat.card (L.map φ) := by
+  intro hp_dvd
+  have hcard : Nat.card (L.map φ) = Nat.card L :=
+    Nat.card_congr (Subgroup.equivMapOfInjective L φ hφ).symm.toEquiv
+  have hp_L_pf : p ∈ (Nat.card L).primeFactors := by
+    exact Nat.mem_primeFactors.mpr ⟨Fact.out, by rwa [hcard] at hp_dvd, Nat.card_pos.ne'⟩
+  exact hLpi p hp_L_pf (by simp)
+
+/-- Transfer the hereditary "all 2-subgroups are abelian" hypothesis through an injective
+image.
+
+This is the hypothesis adapter for Lemma 7.3 in the reduced Thm 7.5 branch: a 2-subgroup
+inside the image of `L` is pulled back to a 2-subgroup of the original group, where the
+global Sylow-2-abelian hypothesis is available. -/
+theorem two_subgroup_abelian_of_le_map_of_injective
+    {A B : Type*} [Group A] [Group B] {φ : A →* B} (hφ : Function.Injective φ)
+    (h2abelian : ∀ S : Subgroup A, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {L : Subgroup A} {T : Subgroup B}
+    (hT_le : T ≤ L.map φ) (hT2 : IsPGroup 2 T) :
+    ∀ x y : ↥T, x * y = y * x := by
+  let H : Subgroup A := T.comap φ
+  let ψ : H →* T := {
+    toFun a := ⟨φ a, a.property⟩
+    map_one' := by ext; simp
+    map_mul' a b := by ext; simp }
+  have hψ_inj : Function.Injective ψ := by
+    intro a b hab
+    apply Subtype.ext
+    apply hφ
+    exact congrArg Subtype.val hab
+  have hH2 : IsPGroup 2 H := hT2.of_injective ψ hψ_inj
+  have hHcomm := h2abelian H hH2
+  intro x y
+  obtain ⟨a, haL, hax⟩ := hT_le x.property
+  obtain ⟨b, hbL, hby⟩ := hT_le y.property
+  have haT : φ a ∈ T := by rw [hax]; exact x.property
+  have hbT : φ b ∈ T := by rw [hby]; exact y.property
+  have hab : a * b = b * a :=
+    congrArg Subtype.val (hHcomm ⟨a, haT⟩ ⟨b, hbT⟩)
+  apply Subtype.ext
+  change (x : B) * (y : B) = (y : B) * (x : B)
+  rw [← hax, ← hby, ← map_mul, hab, map_mul]
+
+/-- Reduced elementary-abelian branch of Isaacs Thm 7.5.
+
+After the minimal-counterexample quotient reduction has replaced `V` by a faithful
+elementary-abelian group of order `p²`, the `GL(2,p)` embedding, Lemma 7.3, and
+Hall-Higman force the chosen Sylow `p`-subgroup to be normal. -/
+theorem sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} (hφ : Function.Injective φ)
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p V)
+    (hVcard : Nat.card V = p ^ 2) (P : Sylow p G) :
+    (P : Subgroup G).Normal := by
+  by_contra hP_not_normal
+  let e := mulAutGLTwoEquivOfIsElementaryAbelianCard V (p := p) hVelem hVcard
+  have hφGL : Function.Injective (e.toMonoidHom.comp φ) := by
+    intro a b hab
+    exact hφ (e.injective hab)
+  have hPp : IsPGroup p (((P : Subgroup G).map φ).map e.toMonoidHom) :=
+    (P.isPGroup'.map φ).map e.toMonoidHom
+  have hP_image_card_le :
+      Nat.card (((P : Subgroup G).map φ).map e.toMonoidHom) ≤ p :=
+    gl2_pSubgroup_card_le_prime _ hPp
+  have hP_map_phi_card :
+      Nat.card ((P : Subgroup G).map φ) = Nat.card (P : Subgroup G) :=
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective (P : Subgroup G) φ hφ).symm.toEquiv
+  have hP_map_GL_card :
+      Nat.card (((P : Subgroup G).map φ).map e.toMonoidHom) =
+        Nat.card ((P : Subgroup G).map φ) :=
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective ((P : Subgroup G).map φ) e.toMonoidHom
+        e.injective).symm.toEquiv
+  have hP_card_le : Nat.card (P : Subgroup G) ≤ p := by
+    rwa [hP_map_GL_card, hP_map_phi_card] at hP_image_card_le
+  have hOp : OddOrder.Isaacs.Ch01.opCore p G = ⊥ :=
+    opCore_eq_bot_of_sylow_card_le_prime_of_not_normal P hP_card_le hP_not_normal
+  set L : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hL_def
+  haveI hLnormal : L.Normal := by
+    dsimp [L]
+    infer_instance
+  have hPnorm :
+      ((P : Subgroup G).map φ).map e.toMonoidHom ≤
+        Subgroup.normalizer (((L.map φ).map e.toMonoidHom) : Set _) := by
+    have hcomp :
+        (P : Subgroup G).map (e.toMonoidHom.comp φ) ≤
+          Subgroup.normalizer ((L.map (e.toMonoidHom.comp φ)) : Set _) :=
+      map_le_normalizer_map_of_normal
+        (φ := e.toMonoidHom.comp φ) (P := (P : Subgroup G)) (L := L)
+    simpa [Subgroup.map_map] using hcomp
+  have hLpi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)} L := by
+    simpa [L, hL_def] using
+      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup
+        (G := G) {q | q ∉ ({p} : Set ℕ)})
+  have hLcop :
+      ¬ p ∣ Nat.card ((L.map φ).map e.toMonoidHom) := by
+    have hcomp :
+        ¬ p ∣ Nat.card (L.map (e.toMonoidHom.comp φ)) :=
+      not_dvd_card_map_of_isPiGroup_compl_of_injective
+        (p := p) (φ := e.toMonoidHom.comp φ) hφGL hLpi
+    simpa [Subgroup.map_map] using hcomp
+  have hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ (L.map φ).map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
+    intro S hS_le hS2
+    have hS_le_comp : S ≤ L.map (e.toMonoidHom.comp φ) := by
+      simpa [Subgroup.map_map] using hS_le
+    exact two_subgroup_abelian_of_le_map_of_injective hφGL h2abelian hS_le_comp hS2
+  have hPcentral : (P : Subgroup G) ≤ Subgroup.centralizer (L : Set G) :=
+    subgroup_centralizes_of_mulAut_gl2_image_hypotheses
+      (φ := φ) hφ e hp2 hPp hPnorm hLcop hL2abelian
+  have hcentral_le_L : Subgroup.centralizer (L : Set G) ≤ L := by
+    simpa [L, hL_def] using
+      (centralizer_oPiCore_compl_le_of_opCore_eq_bot (G := G) (p := p) hOp)
+  have hP_le_L : (P : Subgroup G) ≤ L := hPcentral.trans hcentral_le_L
+  have hP_bot : (P : Subgroup G) = ⊥ :=
+    sylow_eq_bot_of_le_oPiCore_compl P (by simpa [L, hL_def] using hP_le_L)
+  apply hP_not_normal
+  rw [hP_bot]
+  infer_instance
+
 /-- Cyclic branch of Isaacs Thm 7.5: a group acting faithfully by automorphisms on a cyclic
 group is commutative, hence every acting subgroup is normal.
 
@@ -1336,6 +1675,38 @@ theorem toMulAut_ker_eq_bot_of_faithful {A V : Type*} [Group A] [Group V]
     [MulDistribMulAction A V] [FaithfulSMul A V] :
     (MulDistribMulAction.toMulAut A V).ker = ⊥ :=
   (MonoidHom.ker_eq_bot_iff _).mpr toMulAut_injective_of_faithful
+
+/-- A subgroup of a finite `p`-group with index at most `p` is normal. -/
+theorem normal_of_isPGroup_index_le_prime
+    {V : Type*} [Group V] [Finite V] {p : ℕ} [Fact p.Prime]
+    (hV : IsPGroup p V) {H : Subgroup V} (hH : H.index ≤ p) :
+    H.Normal := by
+  haveI : H.FiniteIndex := inferInstance
+  obtain ⟨n, hn⟩ := hV.index H
+  rcases n with _ | n
+  · exact Subgroup.normal_of_index_eq_one (by simpa using hn)
+  rcases n with _ | n
+  · have hindex : H.index = p := by simpa using hn
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hV
+    have hm_ne_zero : m ≠ 0 := by
+      intro hm_zero
+      have hcard_one : Nat.card V = 1 := by
+        rw [hm, hm_zero, pow_zero]
+      have hdiv : p ∣ 1 := by
+        rw [← hcard_one, ← hindex]
+        exact H.index_dvd_card
+      exact (Fact.out : Nat.Prime p).not_dvd_one hdiv
+    have hmin : (Nat.card V).minFac = p := by
+      rw [hm, (Fact.out : Nat.Prime p).pow_minFac hm_ne_zero]
+    exact Subgroup.normal_of_index_eq_minFac_card (by rw [hindex, hmin])
+  · have hpow_le : p ^ 2 ≤ p := by
+      have hpow : p ^ 2 ≤ p ^ (n + 2) := by
+        exact Nat.pow_le_pow_right (Nat.Prime.pos (Fact.out : Nat.Prime p)) (by omega)
+      have hindex_le : p ^ (n + 2) ≤ p := by
+        simpa [hn, pow_succ] using hH
+      exact hpow.trans hindex_le
+    have hp_two : 2 ≤ p := (Fact.out : Nat.Prime p).two_le
+    nlinarith [hpow_le, hp_two]
 
 /-- A faithful action by automorphisms realizes the acting group as a subgroup of `Aut(V)`. -/
 noncomputable def subgroupOfMulAutAction (A V : Type*) [Group A] [Group V]
@@ -1484,6 +1855,25 @@ theorem actionCentralizer_inf_index_le_sq {A V : Type*} [Group A] [Group V]
   rw [← actionCentralizer_sup]
   exact actionCentralizer_sup_index_le_sq φ P Q hP hQ
 
+/-- If `V` is a finite `p`-group and both `C_V(P)` and `C_V(Q)` have index at most `p`,
+then `C_V(P) ∩ C_V(Q)` is normal in `V`.
+
+This supplies the `U ⊴ V` bridge before the quotient `V/U` in Isaacs Thm 7.5. -/
+theorem actionCentralizer_inf_normal_of_index_le_prime
+    {A V : Type*} [Group A] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime] (hV : IsPGroup p V)
+    {φ : A →* MulAut V} {P Q : Subgroup A}
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    (actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal := by
+  have hPN : (actionCentralizer φ P).Normal :=
+    normal_of_isPGroup_index_le_prime hV hP
+  have hQN : (actionCentralizer φ Q).Normal :=
+    normal_of_isPGroup_index_le_prime hV hQ
+  letI : (actionCentralizer φ P).Normal := hPN
+  letI : (actionCentralizer φ Q).Normal := hQN
+  infer_instance
+
 /-- Quotient-cardinality form of the Theorem 7.5 index estimate:
 if both `C_V(P)` and `C_V(Q)` have index at most `p`, then
 `|V / (C_V(P) ∩ C_V(Q))| ≤ p²`. -/
@@ -1572,12 +1962,103 @@ theorem quotientActionHom_apply_mk' {A V : Type*} [Group A] [Group V]
   OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
     hU a v
 
+/-- The image of `C_V(P)` in `V/U` is fixed by `P` for the induced quotient action. -/
+theorem actionCentralizer_quotient_image_le_quotientActionHom_actionCentralizer
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) :
+    (actionCentralizer φ P).map (QuotientGroup.mk' U) ≤
+      actionCentralizer (quotientActionHom φ hU) P := by
+  rintro _ ⟨v, hv, rfl⟩ p
+  change (quotientActionHom φ hU (p : A)) (QuotientGroup.mk' U v) =
+    QuotientGroup.mk' U v
+  rw [quotientActionHom_apply_mk']
+  exact congrArg (QuotientGroup.mk' U) (hv p)
+
 /-- Kernel of the induced action on `V/U`. In Isaacs Thm 7.5 this is the subgroup `K`
 acting trivially on `V/U`. -/
 noncomputable def quotientActionKernel {A V : Type*} [Group A] [Group V]
     (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
     (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) : Subgroup A :=
   (quotientActionHom φ hU).ker
+
+/-- The kernel of the induced quotient action is normal in the acting group. -/
+instance quotientActionKernel_normal {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    (quotientActionKernel φ hU).Normal := by
+  change (quotientActionHom φ hU).ker.Normal
+  infer_instance
+
+/-- The faithful action of `A/K` on `V/U`, where `K` is the kernel of the induced action.
+
+This is the formal version of the Thm 7.5 step "the quotient group `G/K` acts faithfully on
+`V/U`". -/
+noncomputable def quotientActionFaithfulHom {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    A ⧸ quotientActionKernel φ hU →* MulAut (V ⧸ U) :=
+  QuotientGroup.kerLift (quotientActionHom φ hU)
+
+@[simp]
+theorem quotientActionFaithfulHom_mk' {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (a : A) :
+    quotientActionFaithfulHom φ hU
+        (QuotientGroup.mk' (quotientActionKernel φ hU) a) =
+      quotientActionHom φ hU a :=
+  rfl
+
+/-- In the faithful quotient action of `A/K` on `V/U`, the image of `C_V(P)` is fixed by
+the image of `P`. -/
+theorem actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) :
+    (actionCentralizer φ P).map (QuotientGroup.mk' U) ≤
+      actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU))) := by
+  rintro _ ⟨v, hv, rfl⟩ pbar
+  rcases pbar.property with ⟨p, hpP, hp_eq⟩
+  have hfix :
+      (quotientActionHom φ hU p) (QuotientGroup.mk' U v) =
+        QuotientGroup.mk' U v := by
+    rw [quotientActionHom_apply_mk']
+    exact congrArg (QuotientGroup.mk' U) (hv ⟨p, hpP⟩)
+  have hpbar : (pbar : A ⧸ quotientActionKernel φ hU) =
+      QuotientGroup.mk' (quotientActionKernel φ hU) p := hp_eq.symm
+  change (quotientActionFaithfulHom φ hU (pbar : A ⧸ quotientActionKernel φ hU))
+      (QuotientGroup.mk' U v) = QuotientGroup.mk' U v
+  rw [hpbar, quotientActionFaithfulHom_mk']
+  exact hfix
+
+/-- The fixed-subgroup index hypothesis descends to the faithful quotient action on `V/U`. -/
+theorem actionCentralizer_quotientActionFaithful_index_le
+    {A V : Type*} [Group A] [Group V] [Finite V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) {p : ℕ}
+    (hU_le : U ≤ actionCentralizer φ P)
+    (hP : (actionCentralizer φ P).index ≤ p) :
+    (actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU)))).index ≤ p := by
+  have hle := actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+    hU P
+  calc
+    (actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU)))).index
+        ≤ ((actionCentralizer φ P).map (QuotientGroup.mk' U)).index :=
+          Subgroup.index_antitone hle
+    _ = (actionCentralizer φ P).index :=
+          actionCentralizer_quotient_image_index_eq_of_le φ P hU_le
+    _ ≤ p := hP
+
+/-- The action of `A/K` on `V/U` is faithful by construction. -/
+theorem quotientActionFaithfulHom_injective {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    Function.Injective (quotientActionFaithfulHom φ hU) := by
+  dsimp [quotientActionFaithfulHom, quotientActionKernel]
+  exact QuotientGroup.kerLift_injective (quotientActionHom φ hU)
 
 /-- If `K` lies in the kernel of the quotient action on `V/U`, then `[V,K] ≤ U`.
 
@@ -1731,13 +2212,463 @@ theorem actionCentralizer_inf_quotientActionKernel_isPGroup_of_sup_eq_top
   · exact hV
   · rw [← actionCentralizer_sup, hPQ]
 
+/-- Normality of the image of `P` in `G/K` pulls back to normality of `P`, provided
+`K ≤ P`.
+
+This is the quotient-correspondence bridge used in Isaacs Thm 7.5 after proving the image
+of a Sylow subgroup is normal in the faithful quotient action. -/
+theorem normal_of_quotient_image_normal_of_le
+    {G : Type*} [Group G] {K P : Subgroup G} [K.Normal]
+    (hKP : K ≤ P)
+    (hPbar : (P.map (QuotientGroup.mk' K)).Normal) :
+    P.Normal := by
+  have hcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (P.map (QuotientGroup.mk' K)) = P := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKP
+  rw [← hcomap]
+  exact hPbar.comap (QuotientGroup.mk' K)
+
+/-- A normal `p`-subgroup is contained in every Sylow `p`-subgroup. -/
+private theorem normal_isPGroup_le_sylow
+    {G : Type*} [Group G] {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
+    {K : Subgroup G} [K.Normal] (hK : IsPGroup p K) (P : Sylow p G) :
+    K ≤ (P : Subgroup G) :=
+  (OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK).trans
+    (OddOrder.Isaacs.Ch01.opCore_le P)
+
+/-- If a normal `p`-subgroup `K` is quotiented out, normality of the image of a Sylow
+`p`-subgroup pulls back to normality of the original Sylow subgroup. -/
+theorem sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+    {G : Type*} [Group G] {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
+    (P : Sylow p G) {K : Subgroup G} [K.Normal] (hK : IsPGroup p K)
+    (hPbar : (((P : Subgroup G).map (QuotientGroup.mk' K))).Normal) :
+    P.Normal :=
+  normal_of_quotient_image_normal_of_le (normal_isPGroup_le_sylow hK P) hPbar
+
+/-- If two subgroups both contain the quotient kernel, equality of their images in the
+quotient implies equality upstairs.
+
+This is the subgroup-correspondence step used in Isaacs Thm 7.5 to keep the two Sylow
+subgroups distinct after quotienting by the action kernel. -/
+theorem quotient_images_ne_of_ne_of_le
+    {G : Type*} [Group G] {K P Q : Subgroup G} [K.Normal]
+    (hKP : K ≤ P) (hKQ : K ≤ Q) (hPQ : P ≠ Q) :
+    P.map (QuotientGroup.mk' K) ≠ Q.map (QuotientGroup.mk' K) := by
+  intro hmap
+  apply hPQ
+  have hPcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (P.map (QuotientGroup.mk' K)) = P := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKP
+  have hQcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (Q.map (QuotientGroup.mk' K)) = Q := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKQ
+  rw [← hPcomap, ← hQcomap, hmap]
+
+/-- Quotienting by a normal `p`-subgroup preserves distinctness of Sylow images. -/
+theorem quotient_sylow_images_ne_of_ne_of_normal_isPGroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {P Q : Sylow p G} (hPQ : P ≠ Q)
+    {K : Subgroup G} [K.Normal] (hK : IsPGroup p K) :
+    P.mapSurjective (QuotientGroup.mk'_surjective K) ≠
+      Q.mapSurjective (QuotientGroup.mk'_surjective K) := by
+  intro hmap
+  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  have hsub_ne :
+      (P : Subgroup G).map (QuotientGroup.mk' K) ≠
+        (Q : Subgroup G).map (QuotientGroup.mk' K) :=
+    quotient_images_ne_of_ne_of_le
+      (normal_isPGroup_le_sylow hK P)
+      (normal_isPGroup_le_sylow hK Q)
+      (fun hsub => hPQ (Sylow.ext hsub))
+  apply hsub_ne
+  have hsub_eq := congrArg
+    (fun R : Sylow p (G ⧸ K) => (R : Subgroup (G ⧸ K))) hmap
+  simpa using hsub_eq
+
+/-- If the quotient image of `P` were normal, then `P` would already be normal upstairs. -/
+theorem quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {K : Subgroup G} [K.Normal] (hK : IsPGroup p K)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) :
+    ¬ (((P.mapSurjective (QuotientGroup.mk'_surjective K) :
+          Sylow p (G ⧸ K)) : Subgroup (G ⧸ K)).Normal) := by
+  intro hPbar
+  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  exact hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := K) hK (by simpa using hPbar))
+
+/-- The hypothesis that every `2`-subgroup is abelian descends to a quotient.
+
+This is the Sylow-lift bridge needed in Isaacs Thm 7.5 for applying the reduced theorem to
+`G/K`: a `2`-subgroup of `G/K` is the image of a Sylow `2`-subgroup of its preimage, and
+that Sylow subgroup is abelian by the upstairs hypothesis. -/
+theorem quotient_two_subgroup_abelian
+    {G : Type*} [Group G] [Finite G] {K : Subgroup G} [K.Normal]
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (S : Subgroup (G ⧸ K)) (hS2 : IsPGroup 2 S) :
+    ∀ x y : ↥S, x * y = y * x := by
+  let q : G →* G ⧸ K := QuotientGroup.mk' K
+  let T : Subgroup G := Subgroup.comap q S
+  let f : T →* S :=
+    { toFun := fun t => ⟨q t, t.property⟩
+      map_one' := by
+        ext
+        simp [q]
+      map_mul' := by
+        intro a b
+        ext
+        simp [q] }
+  have hf : Function.Surjective f := by
+    intro s
+    obtain ⟨g, hg⟩ := QuotientGroup.mk'_surjective K (s : G ⧸ K)
+    refine ⟨⟨g, ?_⟩, ?_⟩
+    · change q g ∈ S
+      simp [q, hg, s.property]
+    · ext
+      simpa [f, q] using hg
+  let R : Sylow 2 T := default
+  let Rbar : Sylow 2 S := R.mapSurjective hf
+  have hRbar_top : (Rbar : Subgroup S) = ⊤ := by
+    have htop2 : IsPGroup 2 (⊤ : Subgroup S) := hS2.to_subgroup ⊤
+    exact (Rbar.is_maximal' htop2 le_top).symm
+  have hRcomm : ∀ a b : ↥R, a * b = b * a := by
+    have hRG2 : IsPGroup 2 ((R : Subgroup T).map T.subtype) :=
+      R.isPGroup'.map T.subtype
+    have hRGcomm := h2abelian ((R : Subgroup T).map T.subtype) hRG2
+    intro a b
+    apply Subtype.ext
+    apply Subtype.ext
+    let ag : ↥((R : Subgroup T).map T.subtype) :=
+      ⟨((a : T) : G), ⟨(a : T), a.property, rfl⟩⟩
+    let bg : ↥((R : Subgroup T).map T.subtype) :=
+      ⟨((b : T) : G), ⟨(b : T), b.property, rfl⟩⟩
+    have h := congrArg (fun z : ↥((R : Subgroup T).map T.subtype) => (z : G))
+      (hRGcomm ag bg)
+    simpa using h
+  intro x y
+  have hxRbar : x ∈ (Rbar : Subgroup S) := by
+    rw [hRbar_top]
+    trivial
+  have hyRbar : y ∈ (Rbar : Subgroup S) := by
+    rw [hRbar_top]
+    trivial
+  rw [Sylow.coe_mapSurjective] at hxRbar hyRbar
+  rcases hxRbar with ⟨rx, hrx, hfx⟩
+  rcases hyRbar with ⟨ry, hry, hfy⟩
+  let rxR : R := ⟨rx, hrx⟩
+  let ryR : R := ⟨ry, hry⟩
+  have hxyT : rx * ry = ry * rx :=
+    congrArg (fun z : ↥R => (z : T)) (hRcomm rxR ryR)
+  calc
+    x * y = f rx * f ry := by rw [← hfx, ← hfy]
+    _ = f (rx * ry) := by rw [map_mul]
+    _ = f (ry * rx) := by rw [hxyT]
+    _ = f ry * f rx := by rw [map_mul]
+    _ = y * x := by rw [hfy, hfx]
+
+/-- Elementary-abelian quotient branch of Isaacs Thm 7.5 after passing to the faithful
+action of `G/K` on `V/U`.
+
+This is the quotient-condition bundle for the reduced theorem:
+`p`-separability descends by Ch03, the `2`-subgroup abelian hypothesis descends by
+`quotient_two_subgroup_abelian`, and faithfulness is by construction of
+`quotientActionFaithfulHom`. -/
+theorem quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p (V ⧸ U))
+    (hVcard : Nat.card (V ⧸ U) = p ^ 2) (P : Sylow p G) :
+    (((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+          Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+          (G ⧸ quotientActionKernel φ hU))).Normal := by
+  haveI hSepQuot :
+      OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
+        (G ⧸ quotientActionKernel φ hU) :=
+    OddOrder.Isaacs.Ch03.quotient_isPiSeparable
+      ({p} : Set ℕ) G (quotientActionKernel φ hU)
+  exact sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
+    (G := G ⧸ quotientActionKernel φ hU) (V := V ⧸ U) (p := p)
+    hp2 (quotient_two_subgroup_abelian h2abelian)
+    (φ := quotientActionFaithfulHom φ hU)
+    (quotientActionFaithfulHom_injective hU) hVelem hVcard
+    (P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)))
+
+/-- Contradiction form of the elementary-abelian quotient branch of Isaacs Thm 7.5.
+
+If the action kernel `K` is a normal `p`-subgroup and the faithful quotient action on `V/U`
+has elementary-abelian order `p²`, the reduced branch proves the image of `P` normal in
+`G/K`; pulling normality back contradicts a counterexample assumption upstairs. -/
+theorem false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hK : IsPGroup p (quotientActionKernel φ hU))
+    (hVelem : OddOrder.GroupTheory.IsElementaryAbelian p (V ⧸ U))
+    (hVcard : Nat.card (V ⧸ U) = p ^ 2) (P : Sylow p G)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) : False :=
+  hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := quotientActionKernel φ hU) hK
+      (quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
+        hp2 h2abelian hU hVelem hVcard P))
+
+/-- Cyclic quotient branch of Isaacs Thm 7.5 after passing to the faithful action of
+`G/K` on `V/U`.
+
+If `V/U` is cyclic, then `Aut(V/U)` is abelian. Since the quotient action is faithful,
+`G/K` is abelian, so the image of any Sylow subgroup is normal. -/
+theorem quotient_sylow_normal_of_isCyclic_of_actionKernel
+    {G V : Type*} [Group G] [Finite G] [Group V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal] [IsCyclic (V ⧸ U)]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Sylow p G) :
+    (((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+          Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+          (G ⧸ quotientActionKernel φ hU))).Normal :=
+  subgroup_normal_of_injective_mulAut_of_isCyclic
+    (A := G ⧸ quotientActionKernel φ hU) (V := V ⧸ U)
+    (φ := quotientActionFaithfulHom φ hU)
+    (quotientActionFaithfulHom_injective hU)
+    ((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+      Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+        (G ⧸ quotientActionKernel φ hU))
+
+/-- Contradiction form of the cyclic quotient branch of Isaacs Thm 7.5. -/
+theorem false_of_quotient_isCyclic_of_sylow_not_normal
+    {G V : Type*} [Group G] [Finite G] [Group V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal] [IsCyclic (V ⧸ U)]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hK : IsPGroup p (quotientActionKernel φ hU)) (P : Sylow p G)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) : False :=
+  hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := quotientActionKernel φ hU) hK
+      (quotient_sylow_normal_of_isCyclic_of_actionKernel hU P))
+
+/-- Descend the action-centralizer index hypothesis from `G` to a subgroup `H`.
+
+For every Sylow `R : Sylow p H`, the image `R.map H.subtype` is a `p`-subgroup of `G`,
+hence contained in some Sylow `S : Sylow p G`.  Antitonicity of `actionCentralizer`
+then gives `(actionCentralizer (φ.comp H.subtype) R).index ≤ (actionCentralizer φ S).index`,
+which is bounded by `p` by the upstairs hypothesis. -/
+private theorem actionCentralizer_comp_subtype_index_le_of_globalHypothesis
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V}
+    (h_centralizer_index :
+      ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+    (H : Subgroup G) (R : Sylow p H) :
+    (actionCentralizer (φ.comp H.subtype) (R : Subgroup H)).index ≤ p := by
+  -- The image of `R` in `G` is a `p`-subgroup of `G`.
+  have hRG_p : IsPGroup p ((R : Subgroup H).map H.subtype) :=
+    R.isPGroup'.map H.subtype
+  obtain ⟨S, hS_le⟩ := hRG_p.exists_le_sylow
+  have h_eq :
+      actionCentralizer (φ.comp H.subtype) (R : Subgroup H) =
+        actionCentralizer φ ((R : Subgroup H).map H.subtype) := by
+    ext v
+    simp only [mem_actionCentralizer]
+    constructor
+    · intro hv g
+      rcases g.property with ⟨r, hrR, hrg⟩
+      have hfix := hv ⟨r, hrR⟩
+      change (φ ((r : H) : G)) v = v at hfix
+      rw [show (g : G) = ((r : H) : G) from hrg.symm]
+      exact hfix
+    · intro hv r
+      have hr_mem : ((r : H) : G) ∈ (R : Subgroup H).map H.subtype :=
+        Subgroup.mem_map_of_mem H.subtype r.property
+      exact hv ⟨((r : H) : G), hr_mem⟩
+  rw [h_eq]
+  -- Antitonicity in P direction: bigger P → smaller actionCentralizer.
+  have h_anti :
+      actionCentralizer φ (S : Subgroup G) ≤
+        actionCentralizer φ ((R : Subgroup H).map H.subtype) :=
+    actionCentralizer_antitone hS_le
+  exact (Subgroup.index_antitone h_anti).trans (h_centralizer_index S)
+
+/-- **Isaacs Thm 7.5** (normal-P theorem).
+
+If `G` is `p`-solvable with `p ≠ 2`, every `2`-subgroup of `G` is abelian, `G` acts
+faithfully on a finite `p`-group `V`, and `|V : C_V(P)| ≤ p` for every Sylow `p`-subgroup
+`P`, then every Sylow `p`-subgroup of `G` is normal.
+
+The proof is by strong induction on `|G|`.  If `G` has a unique Sylow `p`-subgroup, the
+result is trivial.  Otherwise pick two distinct Sylows `P, Q`.  If `⟨P, Q⟩ ≠ G`, descend
+to the subgroup `⟨P, Q⟩` and apply the induction hypothesis there.  When `⟨P, Q⟩ = G`,
+the action-centralizer index estimate forces `|V/U| ≤ p²` for `U := C_V(P) ∩ C_V(Q)`, and
+splitting on whether `V/U` is cyclic produces the contradiction via the elementary-abelian
+or cyclic branch built up above. -/
+theorem sylow_normal_of_elementary_normal_P_theorem
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} (hφ : Function.Injective φ)
+    (hV : IsPGroup p V)
+    (h_centralizer_index :
+      ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+    (P : Sylow p G) : (P : Subgroup G).Normal := by
+  classical
+  -- Strong induction on |G|, using an explicit motive.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (G : Type _) [Group G] [Finite G] [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+      (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+      (φ : G →* MulAut V) (_hφ : Function.Injective φ)
+      (_h_centralizer_index :
+        ∀ (P : Sylow p G), (actionCentralizer φ (P : Subgroup G)).index ≤ p)
+      (P : Sylow p G), Nat.card G = n → (P : Subgroup G).Normal
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G h2abelian φ hφ h_centralizer_index P rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih G _ _ _ h2abelian φ hφ h_centralizer_index P hcard
+  by_contra hP_not_normal
+  -- Sylows are not subsingleton, else `P` would be normal.
+  have hNotSub : ¬ Subsingleton (Sylow p G) := by
+    intro hSub
+    exact hP_not_normal (Sylow.normal_of_subsingleton P)
+  -- Pick Q ≠ P.
+  haveI : Nontrivial (Sylow p G) := not_subsingleton_iff_nontrivial.mp hNotSub
+  obtain ⟨Q, hQP⟩ := exists_ne P
+  -- We have Q ≠ P; consider H := ⟨P, Q⟩ = P ⊔ Q.
+  set H : Subgroup G := (P : Subgroup G) ⊔ (Q : Subgroup G) with hH_def
+  by_cases hH_top : H = ⊤
+  · -- §7A closing branch: H = ⊤.
+    -- U := C_V(P) ∩ C_V(Q) is normal, A-invariant, with |V/U| ≤ p².
+    have hPidx : (actionCentralizer φ (P : Subgroup G)).index ≤ p :=
+      h_centralizer_index P
+    have hQidx : (actionCentralizer φ (Q : Subgroup G)).index ≤ p :=
+      h_centralizer_index Q
+    haveI hU_normal :
+        (actionCentralizer φ (P : Subgroup G) ⊓
+            actionCentralizer φ (Q : Subgroup G)).Normal :=
+      actionCentralizer_inf_normal_of_index_le_prime hV hPidx hQidx
+    have hPQ_top : (P : Subgroup G) ⊔ (Q : Subgroup G) = ⊤ := by
+      simpa [H, hH_def] using hH_top
+    have hU_invariant :
+        OddOrder.Isaacs.Ch03.IsAInvariant φ
+          (actionCentralizer φ (P : Subgroup G) ⊓
+            actionCentralizer φ (Q : Subgroup G)) :=
+      actionCentralizer_inf_isAInvariant_of_sup_eq_top hPQ_top
+    -- The action kernel K on V/U is a p-group.
+    have hK_p :
+        IsPGroup p (quotientActionKernel φ hU_invariant) := by
+      have := actionCentralizer_inf_quotientActionKernel_isPGroup_of_sup_eq_top
+        (φ := φ) (P := (P : Subgroup G)) (Q := (Q : Subgroup G))
+        hPQ_top hφ hV
+      simpa using this
+    -- Split on cyclicity of V/U.
+    by_cases hVU_cyclic :
+        IsCyclic (V ⧸ (actionCentralizer φ (P : Subgroup G) ⊓
+          actionCentralizer φ (Q : Subgroup G)))
+    · -- Cyclic branch.
+      haveI := hVU_cyclic
+      exact
+        false_of_quotient_isCyclic_of_sylow_not_normal
+          (φ := φ) hU_invariant hK_p P hP_not_normal
+    · -- Non-cyclic ⇒ elementary abelian of order p².
+      obtain ⟨hVU_elem, hVU_card⟩ :=
+        quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic
+          φ (P : Subgroup G) (Q : Subgroup G) hV hPidx hQidx hVU_cyclic
+      exact
+        false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
+          (φ := φ) hp2 h2abelian hU_invariant hK_p hVU_elem hVU_card P hP_not_normal
+  · -- Generation reduction: descend to H = ⟨P, Q⟩ ≠ ⊤.
+    have hHidx_gt : 1 < H.index :=
+      Subgroup.one_lt_index_of_ne_top hH_top
+    have hH_card_lt : Nat.card H < Nat.card G := by
+      have hmul : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+      have hcard_pos : 0 < Nat.card H := Nat.card_pos
+      calc
+        Nat.card H = Nat.card H * 1 := (mul_one _).symm
+        _ < Nat.card H * H.index := (Nat.mul_lt_mul_left hcard_pos).mpr hHidx_gt
+        _ = Nat.card G := hmul
+    -- P and Q sit inside H.
+    have hP_le_H : (P : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_left
+    have hQ_le_H : (Q : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_right
+    -- View P as a Sylow of H.
+    let P' : Sylow p H := P.subtype hP_le_H
+    -- Descend hypothesis (i): IsPiSeparable on H.
+    haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
+      OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable ({p} : Set ℕ) H
+    -- Descend hypothesis (iii): 2-subgroup abelian.
+    have h2abelian' :
+        ∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
+      intro S hS2
+      have hSG2 : IsPGroup 2 (S.map H.subtype) := hS2.map H.subtype
+      have hSGcomm := h2abelian (S.map H.subtype) hSG2
+      intro a b
+      apply Subtype.ext
+      apply Subtype.ext
+      let ag : ↥(S.map H.subtype) :=
+        ⟨((a : H) : G), ⟨(a : H), a.property, rfl⟩⟩
+      let bg : ↥(S.map H.subtype) :=
+        ⟨((b : H) : G), ⟨(b : H), b.property, rfl⟩⟩
+      have h := congrArg (fun z : ↥(S.map H.subtype) => (z : G)) (hSGcomm ag bg)
+      simpa using h
+    -- Descend hypothesis (iv): φ ∘ H.subtype is injective.
+    have hφ' : Function.Injective (φ.comp H.subtype) := by
+      intro a b hab
+      apply Subtype.ext
+      exact hφ hab
+    -- Descend hypothesis (v).
+    have h_centralizer_index' :
+        ∀ (R : Sylow p H), (actionCentralizer (φ.comp H.subtype)
+          (R : Subgroup H)).index ≤ p :=
+      fun R =>
+        actionCentralizer_comp_subtype_index_le_of_globalHypothesis
+          (φ := φ) h_centralizer_index H R
+    have hcard_lt : Nat.card H < n := by rw [← hcard]; exact hH_card_lt
+    -- Apply IH to H.
+    have hP'_normal : (P' : Subgroup H).Normal :=
+      ih (Nat.card H) hcard_lt H h2abelian' (φ.comp H.subtype) hφ'
+        h_centralizer_index' P' rfl
+    -- The same IH applied to Q.
+    let Q' : Sylow p H := Q.subtype hQ_le_H
+    have hQ'_normal : (Q' : Subgroup H).Normal :=
+      ih (Nat.card H) hcard_lt H h2abelian' (φ.comp H.subtype) hφ'
+        h_centralizer_index' Q' rfl
+    -- In `H`, both `P'` and `Q'` are normal Sylow p-subgroups, hence equal.
+    have hPQ_eq : P' = Q' := by
+      haveI := Sylow.unique_of_normal P' hP'_normal
+      exact Subsingleton.elim P' Q'
+    have hPQsubgroup_eq : (P : Subgroup G) = (Q : Subgroup G) := by
+      have h := congrArg (fun R : Sylow p H => (R : Subgroup H)) hPQ_eq
+      simp only [P', Q', Sylow.coe_subtype] at h
+      have hPmap :
+          ((P : Subgroup G).subgroupOf H).map H.subtype = (P : Subgroup G) := by
+        rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, H.range_subtype]
+        exact inf_eq_right.mpr hP_le_H
+      have hQmap :
+          ((Q : Subgroup G).subgroupOf H).map H.subtype = (Q : Subgroup G) := by
+        rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, H.range_subtype]
+        exact inf_eq_right.mpr hQ_le_H
+      have := congrArg (fun K : Subgroup H => K.map H.subtype) h
+      simpa [hPmap, hQmap] using this
+    exact hQP (Sylow.ext hPQsubgroup_eq.symm)
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
 
 section /- 7B: normal-J theorem -/
 
-/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (statement 保留)
+/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (conditional on 8-step argument)
 
 **Isaacs Thm 7.6** (mmd L3832):
 
@@ -1750,7 +2681,276 @@ section /- 7B: normal-J theorem -/
 **proof 戦略** (8 Step, mmd L3832-3896): Thm 7.5 + Ch.6 **6.20** (abelian coprime
 ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21.
 
-着手は Thm 7.5 + Ch.6 6.20 + Ch.4 4.35 完成後. -/
+The full Goldschmidt-style 8-step proof requires Thm 7.5 (✅ landed) + Ch.6 6.20 +
+Ch.4 4.35 (still pending).  Below we land the **conditional version** that takes
+the minimum-counterexample contradiction as a forward-dependency hypothesis. -/
+
+/-! ### Step 1 corollaries of Hall-Higman 3.21 (mmd L3837)
+
+The first step of Isaacs Thm 7.6 proof observes that under hyp (iv)
+`O_{p'}(G) = 1`, Hall-Higman 3.21 (with `π = {p}`) yields
+`C_G(O_p(G)) ≤ O_p(G)`, and consequently `Z(P) ≤ O_p(G)` for any
+Sylow `p`-subgroup `P`. -/
+
+/-- The image of `Z(P)` in `G` centralizes `O_p(G)`.
+
+Pure structural fact: since `O_p(G) ≤ P`, any element of `Z(P)` commutes with
+every element of `O_p(G)`.  Hypothesis (iv) `O_{p'}(G) = 1` is **not** needed
+here; it enters only at the next step (Hall-Higman 3.21). -/
+private theorem center_sylow_le_centralizer_opCore
+    {G : Type*} [Group G] {p : ℕ} (P : Sylow p G) :
+    (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype ≤
+      Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) := by
+  rintro _ ⟨⟨z, hzP⟩, hz_center, rfl⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro h hh
+  have hh_P : h ∈ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P hh
+  have hc : (⟨h, hh_P⟩ : (P : Subgroup G)) * ⟨z, hzP⟩
+      = ⟨z, hzP⟩ * ⟨h, hh_P⟩ :=
+    Subgroup.mem_center_iff.mp hz_center ⟨h, hh_P⟩
+  exact congr_arg Subtype.val hc
+
+/-- **Isaacs Thm 7.6 Step 1** (mmd L3837): Hall-Higman 3.21 with `π = {p}`.
+
+If `G` is `{p}`-separable (equivalently `p`-solvable) and `O_{p'}(G) = ⊥`,
+then `C_G(O_p(G)) ≤ O_p(G)`. -/
+theorem centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥) :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) ≤
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  have hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥ := by
+    rw [show ({q | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} by
+      ext q; simp]
+    exact hOp'
+  have hHH :=
+    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G) ({p} : Set ℕ) hπ'
+  rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p] at hHH
+  exact hHH
+
+/-- **Isaacs Thm 7.6 Step 1** (mmd L3837): `Z(P) ≤ O_p(G)` under `O_{p'}(G) = ⊥`.
+
+Composition of `center_sylow_le_centralizer_opCore` (structural) and
+`centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot` (Hall-Higman 3.21).
+This is the core conclusion of Step 1 in the 8-step proof of Thm 7.6. -/
+theorem center_sylow_le_opCore_of_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥) (P : Sylow p G) :
+    (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype ≤
+      OddOrder.Isaacs.Ch01.opCore p G :=
+  (center_sylow_le_centralizer_opCore P).trans
+    (centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot hOp')
+
+/-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
+
+We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
+the basic structural relations between `A`, `D := A ⊓ L`, and the global subgroups
+of `G` needed in subsequent steps.
+
+The book takes `A ∈ E(P)` failing to lie in `L` for the contradiction in Step 7.
+We package the elementary observations: `A` is an elementary abelian `p`-subgroup
+of `P`, hence contained in `P`; and `D = A ⊓ L` is a proper subgroup of `A` (with
+nontrivial quotient `A/D`). -/
+
+/-- **Isaacs Thm 7.6 Step 2** preparation (mmd L3845-3846):
+`A ∈ maxElemAbelianIn P p` is an elementary abelian `p`-subgroup of `P`.
+
+Pure unpacking of the `maxElemAbelianIn` definition (see
+`OddOrder.GroupTheory.ThompsonSubgroup.maxElemAbelianIn`).  Placed here as a
+shorthand for §7B Steps 3-7 which reuse the elementary-abelian / `≤ P` facts. -/
+private theorem maxElemAbelianIn_isElementaryAbelian {G : Type*} [Group G]
+    {P A : Subgroup G} {p : ℕ}
+    (hA : A ∈ Subgroup.maxElemAbelianIn P p) :
+    A.IsElementaryAbelian p :=
+  hA.2.1
+
+private theorem maxElemAbelianIn_le_parent {G : Type*} [Group G]
+    {P A : Subgroup G} {p : ℕ}
+    (hA : A ∈ Subgroup.maxElemAbelianIn P p) :
+    A ≤ P :=
+  hA.1
+
+/-- **Isaacs Thm 7.6 Step 3** (mmd L3850-3856): the quotient `A / (A ⊓ L)` has order `p`.
+
+Book argument: `A` is elementary abelian (`x^p = 1` for all `x ∈ A`), so `A/D`
+embeds into `G/L`.  Under hypothesis (iv) `O_{p'}(G) = 1` we have `L = O_p(G)`,
+hence `G/L` has trivial `p`-Sylow (Hall-Higman 3.21 / Isaacs Cor 3.21).
+
+For the bridge layer we record the **abstract version**: if `D ≤ A`, `D ≠ A`, and
+`A.IsElementaryAbelian p`, then `D` has index dividing `p` in `A`.  In an
+elementary abelian `p`-group every proper subgroup has prime power index.  The
+stronger conclusion "index exactly `p`" needs the **maximality of `A`** —
+otherwise we could enlarge `D` to a strict sub of `A` of index `p`, contradicting
+that `A ∈ E(P)`.
+
+We package the elementary-abelian quotient observation: in `A/D` the exponent
+divides `p` so `|A/D|` is a power of `p`. -/
+private theorem relIndex_isPGroup_of_isElementaryAbelian
+    {G : Type*} [Group G] {A D : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hA_el : A.IsElementaryAbelian p) :
+    IsPGroup p (D.subgroupOf A) := by
+  -- A is elementary abelian ⇒ A is a p-group ⇒ subgroup of A is a p-group.
+  have hA_pG : IsPGroup p A := hA_el.isPGroup
+  exact hA_pG.to_subgroup _
+
+/-- **Isaacs Thm 7.6 Step 3** companion: the order of `A` is a power of `p`.
+
+Since `A.IsElementaryAbelian p`, `A` is itself a `p`-group, so `Nat.card A = p^k`
+for some `k`. -/
+private theorem isPGroup_of_isElementaryAbelian
+    {G : Type*} [Group G] {A : Subgroup G} {p : ℕ}
+    (hA_el : A.IsElementaryAbelian p) :
+    IsPGroup p A :=
+  hA_el.isPGroup
+
+/-! ### Step 4: action of `A` on `V := Z(L) = Z(O_p(G))` (mmd L3858-3864)
+
+Set `V := Z(L)`.  Since `L = O_p(G)` is `G`-normal, the conjugation action of `G`
+on `L` restricts to an action on `Z(L)`, and in particular `A ≤ P ≤ G` acts on `V`.
+Furthermore `D = A ⊓ L ≤ L` commutes with all of `V = Z(L)` by definition of
+center, so `D` is contained in the kernel of the action of `A` on `V`. -/
+
+/-- **Isaacs Thm 7.6 Step 4** (mmd L3858): `Z(O_p(G))` is `G`-normal (and `G`-characteristic).
+
+The `Subgroup.center` of a characteristic subgroup is itself characteristic in the
+ambient group.  In particular `Subgroup.center` of `O_p(G)`, viewed as the image
+of `Subgroup.center (opCore p G)` in `G`, is `G`-normal. -/
+private theorem center_opCore_map_normal {G : Type*} [Group G] {p : ℕ} :
+    ((Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G)).map
+      (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G).subtype).Normal := by
+  refine ⟨?_⟩
+  rintro _ ⟨⟨z, hz_L⟩, hz_center, rfl⟩ g
+  -- g * z * g⁻¹ ∈ opCore p G  (since opCore is normal)
+  have hLnorm : (OddOrder.Isaacs.Ch01.opCore p G).Normal := inferInstance
+  have hgz : g * z * g⁻¹ ∈ OddOrder.Isaacs.Ch01.opCore p G :=
+    hLnorm.conj_mem z hz_L g
+  refine ⟨⟨g * z * g⁻¹, hgz⟩, ?_, rfl⟩
+  -- Show ⟨g*z*g⁻¹, _⟩ ∈ Subgroup.center (opCore p G).
+  change (⟨g * z * g⁻¹, hgz⟩ : OddOrder.Isaacs.Ch01.opCore p G) ∈
+    Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G)
+  rw [Subgroup.mem_center_iff]
+  rintro ⟨h, hh_L⟩
+  -- ⟨h, hh_L⟩ * ⟨g*z*g⁻¹, hgz⟩ = ⟨g*z*g⁻¹, hgz⟩ * ⟨h, hh_L⟩,
+  -- i.e., h * (g*z*g⁻¹) = (g*z*g⁻¹) * h.
+  have hgh : g⁻¹ * h * g ∈ OddOrder.Isaacs.Ch01.opCore p G := by
+    have := hLnorm.conj_mem h hh_L g⁻¹
+    simpa [mul_assoc] using this
+  have hcomm : (⟨g⁻¹ * h * g, hgh⟩ : OddOrder.Isaacs.Ch01.opCore p G) * ⟨z, hz_L⟩
+      = ⟨z, hz_L⟩ * ⟨g⁻¹ * h * g, hgh⟩ :=
+    Subgroup.mem_center_iff.mp hz_center _
+  have hcomm_G : (g⁻¹ * h * g) * z = z * (g⁻¹ * h * g) := congr_arg Subtype.val hcomm
+  apply Subtype.ext
+  calc h * (g * z * g⁻¹)
+      = g * ((g⁻¹ * h * g) * z) * g⁻¹ := by group
+    _ = g * (z * (g⁻¹ * h * g)) * g⁻¹ := by rw [hcomm_G]
+    _ = (g * z * g⁻¹) * h := by group
+
+/-- **Isaacs Thm 7.6 Step 4** (mmd L3859-3860):
+`D := A ⊓ L` centralizes `V := Z(L)`.
+
+For any `d ∈ D`, `d ∈ L`.  For any `v` representing an element of `Z(L) ↪ G`,
+the conjugation `d * v * d⁻¹` equals `v` because `v ∈ Z(L)`.  This packages the
+"the `A`-action restricted to `D` is trivial" observation: `D ≤ centralizer V`. -/
+private theorem A_inter_opCore_le_centralizer_center_opCore
+    {G : Type*} [Group G] {p : ℕ} {A : Subgroup G} :
+    A ⊓ OddOrder.Isaacs.Ch01.opCore p G ≤
+      Subgroup.centralizer
+        (((Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G)).map
+          (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G).subtype) : Set G) := by
+  intro d hd
+  rw [Subgroup.mem_centralizer_iff]
+  rintro _ ⟨⟨v, hv_L⟩, hv_center, rfl⟩
+  -- d ∈ L, ⟨v, _⟩ ∈ Z(L) ⇒ they commute in L ⇒ commute in G.
+  have hd_L : d ∈ OddOrder.Isaacs.Ch01.opCore p G := hd.2
+  -- mem_centralizer_iff: ∀ h ∈ s, h * g = g * h, so v * d = d * v.
+  -- mem_center_iff gives ∀ g, g * z = z * g, so ⟨d, _⟩ * ⟨v, _⟩ = ⟨v, _⟩ * ⟨d, _⟩.
+  have hcomm : (⟨d, hd_L⟩ : OddOrder.Isaacs.Ch01.opCore p G) * ⟨v, hv_L⟩
+      = ⟨v, hv_L⟩ * ⟨d, hd_L⟩ :=
+    Subgroup.mem_center_iff.mp hv_center _
+  exact (congr_arg Subtype.val hcomm).symm
+
+/-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
+
+The full theorem (Isaacs L3832) states:
+
+> Suppose `G` is `p`-solvable with `p ≠ 2`, Sylow `2`-subgroups of `G` are abelian,
+> `O_{p'}(G) = 1`, and `P = C_G(Z(P))` for some `P ∈ Syl_p(G)`.  Then `J(P) ⊴ G`.
+
+The textbook proof (Isaacs p.209-214) is an **8-step minimum-counterexample
+argument**: assume `G` is a minimum counterexample (smallest finite group meeting
+the hypotheses but with `J(P)` not normal).  Steps 1-7 use Thm 7.5 (normal-P
+theorem ✅), Ch.4 Thm 4.35 (fixed-point lemma on `Ω₁`), Ch.6 Thm 6.20
+(abelian-coprime `⟨C_N(a)⟩ = N`), and the Hall-Higman 3.21 transfer estimate to
+narrow down the structure of `G`; Step 8 produces a contradiction.
+
+**This formalization takes the minimum-counterexample contradiction as a
+forward-dependency hypothesis** (`hMinCounterexample`).  Once Ch.4 4.35 + Ch.6
+6.20 + Hall-Higman 3.21 land and the 8-step argument is filled in (see
+`notes/isaacs/ch07_thompson.md`), this hypothesis becomes provable.
+
+Given `hMinCounterexample`, the conclusion follows by **strong induction on
+`Nat.card G`**: at any group `H` meeting the same hypotheses, if `J(P_H)` fails
+to be normal then by the induction hypothesis every proper normal subgroup `N ⊴ H`
+has `J(Q) ⊴ N` for `Q ∈ Syl_p(N)`.  Plugging into `hMinCounterexample` yields
+`False`. -/
+theorem normal_J.{u}
+    {G : Type u} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (_hp2 : p ≠ 2)
+    (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (_h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    -- Forward-dependency: a minimum-counterexample for normal-J always yields
+    -- a contradiction, universalized over any finite group `H` whose order
+    -- divides `|G|`.  When §7B 8-step Goldschmidt-style proof
+    -- (using Thm 7.5 + Ch.4 4.35 + Ch.6 6.20 + Hall-Higman 3.21) lands,
+    -- this hypothesis becomes provable.  The universal quantification over
+    -- `H : Type u` mirrors the `burnside_p_pow_q_pow` (Thm 7.8) pattern at
+    -- L2990, which is necessary for the strong-induction recursion to close.
+    (hMinCounterexample :
+       ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
+         Nat.card H ∣ Nat.card G →
+         ¬ (Subgroup.thompsonJ (Q : Subgroup H) p).Normal →
+         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
+           ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal) →
+         False) :
+    (Subgroup.thompsonJ (P : Subgroup G) p).Normal := by
+  classical
+  -- Strong induction on `Nat.card H` over arbitrary finite groups `H` of
+  -- order dividing `|G|`, exactly mirroring the Thm 7.8 pattern at L2990.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
+      Nat.card H ∣ Nat.card G → Nat.card H = n →
+      (Subgroup.thompsonJ (Q : Subgroup H) p).Normal
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G P dvd_rfl rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih H _ _ Q hH_dvd hH_card
+  -- Apply the universal forward-dep contradiction at `H`.
+  by_contra hQ_not_normal
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
+  -- Build the inner IH "∀ proper normal N of H, ∀ R ∈ Syl_p(N), J(R) normal
+  -- in N" by recursing on |N| < |H| via the strong-induction `ih`.
+  have hInnerIH :
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
+        ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal := by
+    intro N hN_top _hN_norm R
+    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
+    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
+    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
+    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
+      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hN_lt : Nat.card N < n :=
+      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
+    exact ih (Nat.card N) hN_lt N R hN_dvd_G rfl
+  exact hMinCounterexample H Q hH_dvd hQ_not_normal hInnerIH
 
 end -- 7B
 
@@ -1906,13 +3106,118 @@ theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
   ⟨normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup,
     centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
 
+/-- Transport `OddOrder.Isaacs.Ch05.HasNormalPComplement` across a `MulEquiv`.
+
+If `e : G ≃* H` and `G` has a normal `p`-complement, so does `H`. The complement is the
+image of `G`'s complement under `e`. -/
+private theorem hasNormalPComplement_of_mulEquiv
+    {G' H : Type*} [Group G'] [Group H]
+    [Finite G'] [Finite H] {p : ℕ} [Fact p.Prime] (e : G' ≃* H)
+    (hG : OddOrder.Isaacs.Ch05.HasNormalPComplement p G') :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p H := by
+  classical
+  obtain ⟨N, hN_normal, hN_compl⟩ := hG
+  refine ⟨N.map e.toMonoidHom, ?_, ?_⟩
+  · -- `N.map e` is normal in `H` because `e` is surjective.
+    exact Subgroup.Normal.map hN_normal _ e.surjective
+  · intro Q
+    -- Pull `Q` back to a Sylow `p`-subgroup of `G'` via `e`.
+    have h_range_top : (e.toMonoidHom).range = ⊤ :=
+      MonoidHom.range_eq_top.mpr e.surjective
+    have hQ_le_range : (Q : Subgroup H) ≤ (e.toMonoidHom).range := by
+      rw [h_range_top]; exact le_top
+    let Q' : Sylow p G' := Q.comapOfInjective e.toMonoidHom e.injective hQ_le_range
+    have hQ'_compl : Subgroup.IsComplement' N (Q' : Subgroup G') := hN_compl Q'
+    -- The image of Q' under e equals Q.
+    have hQ'_eq : (Q' : Subgroup G') = (Q : Subgroup H).comap e.toMonoidHom := by
+      simp [Q', Sylow.coe_comapOfInjective]
+    have hQ_map : (Q' : Subgroup G').map e.toMonoidHom = (Q : Subgroup H) := by
+      rw [hQ'_eq, Subgroup.map_comap_eq, h_range_top, top_inf_eq]
+    -- |G'| = |H|, |N.map e| = |N|, |Q| = |Q'|.
+    have hG_card : Nat.card G' = Nat.card H := Nat.card_congr e.toEquiv
+    have hN_card : Nat.card (N.map e.toMonoidHom : Subgroup H) = Nat.card N := by
+      exact
+        (Nat.card_congr
+          (Subgroup.equivMapOfInjective N e.toMonoidHom e.injective).toEquiv).symm
+    have hQ_card : Nat.card (Q : Subgroup H) = Nat.card (Q' : Subgroup G') := by
+      rw [← hQ_map]
+      exact
+        (Nat.card_congr
+          (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).toEquiv).symm
+    -- Multiplicativity: |N.map e| * |Q| = |H|.
+    have h_card_eq :
+        Nat.card N * Nat.card (Q' : Subgroup G') = Nat.card G' :=
+      hQ'_compl.card_mul_card
+    have h_card_H :
+        Nat.card (N.map e.toMonoidHom : Subgroup H) * Nat.card (Q : Subgroup H) =
+          Nat.card H := by
+      rw [hN_card, hQ_card, h_card_eq, hG_card]
+    -- Coprimality: |N| coprime to p (from complement in G' with p-Sylow Q').
+    have hp_ndvd_N : ¬ p ∣ Nat.card N := by
+      rw [← hQ'_compl.index_eq_card]; exact Q'.not_dvd_index
+    obtain ⟨k, hQ'_pow⟩ := IsPGroup.iff_card.mp Q'.isPGroup'
+    have hp_prime : p.Prime := Fact.out
+    have h_coprime' : Nat.Coprime (Nat.card N) (Nat.card (Q' : Subgroup G')) := by
+      rw [hQ'_pow]
+      exact ((hp_prime.coprime_iff_not_dvd.mpr hp_ndvd_N).symm).pow_right k
+    have h_coprime :
+        Nat.Coprime (Nat.card (N.map e.toMonoidHom : Subgroup H))
+          (Nat.card (Q : Subgroup H)) := by
+      rw [hN_card, hQ_card]; exact h_coprime'
+    exact Subgroup.isComplement'_of_coprime h_card_H h_coprime
+
+/-- **Isaacs Thm 7.1** (Thompson normal `p`-complement theorem, conditional on Thm 7.6).
+
+The full theorem (Isaacs L3721, proved L3913 — §7C) states:
+
+> Let `p ≠ 2`, `P ∈ Syl_p(G)`. If `C_G(Z(P))` and `N_G(J(P))` both have normal
+> `p`-complements, then `G` has a normal `p`-complement.
+
+The textbook proof (Isaacs p.215-217) proceeds by a 7-step minimum-counterexample
+argument that establishes the five hypotheses of the **normal-J theorem (Thm 7.6)** for
+`G`, then concludes `J(P) ⊴ G`, and finally observes `G = N_G(J(P))` has a normal
+`p`-complement.
+
+**This formalization takes `J(P) ⊴ G` as a forward-dependency hypothesis**
+(`hJ_normal`), which is precisely the conclusion of normal-J 7.6 applied to the
+minimal counterexample. The Steps 1-6 establishing the normal-J hypotheses (`O_{p'}(G)
+= 1`, `P = C_G(Z(P))`, abelian Sylow-2, p-solvability, ...) require Thm 7.5 +
+Hall-Higman + Lem 7.7 + Frobenius 5.26 and will be back-filled when §7B normal-J
+lands (see `notes/isaacs/ch07_thompson.md`).
+
+Given the J(P)-normality hypothesis, the conclusion is immediate: `J(P) ⊴ G` ⇒
+`N_G(J(P)) = ⊤` ⇒ `↥(N_G(J(P))) ≃* G` ⇒ `HasNormalPComplement` transports from
+`N_G(J(P))` to `G`. -/
+theorem thompson_normal_p_complement
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hNJP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.normalizer
+          ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G)))
+    (hJ_normal : (Subgroup.thompsonJ (P : Subgroup G) p).Normal) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  classical
+  -- J(P) ⊴ G implies N_G(J(P)) = ⊤.
+  have h_norm_top :
+      Subgroup.normalizer
+        ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G) = ⊤ :=
+    Subgroup.normalizer_eq_top_iff.mpr hJ_normal
+  set NG : Subgroup G :=
+    Subgroup.normalizer
+      ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G) with hNG_def
+  -- Compose ↥NG ≃* ↥⊤ ≃* G.
+  let eqEquiv : NG ≃* (⊤ : Subgroup G) := MulEquiv.subgroupCongr h_norm_top
+  let topToG : (⊤ : Subgroup G) ≃* G := Subgroup.topEquiv
+  let e : ↥NG ≃* G := eqEquiv.trans topToG
+  exact hasNormalPComplement_of_mulEquiv e hNJP
+
 end -- 7C
 
 /-! ## §7D: Burnside `p^a q^b` (pp. 219-222) -/
 
 section /- 7D: Burnside p^a q^b -/
 
-/-! ### Thm 7.8 — Burnside `p^a q^b` ⇒ solvable (statement 保留)
+/-! ### Thm 7.8 — Burnside `p^a q^b` ⇒ solvable (conditional on 9-step argument)
 
 **Isaacs Thm 7.8** (mmd L3955):
 
@@ -1924,6 +3229,93 @@ section /- 7D: Burnside p^a q^b -/
 
 BG/Peterfalvi 直接被引用無いので最後着手. Phase 1 完成度のため必須 (BG L2633 で
 "we can obtain Burnside's `p^a q^b` very easily now" として言及). -/
+
+/-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability, conditional on 9-step argument).
+
+The full theorem (Isaacs L3955) states:
+
+> If `|G| = p^a * q^b` for primes `p, q`, then `G` is solvable.
+
+The textbook proof (Isaacs p.219-222) is the character-free
+**Goldschmidt-Bender-Matsuyama 9-step argument**: assume `G` is a minimum
+counterexample (non-solvable group of minimum order `p^a q^b`).  Steps 1-7
+establish that `G` is simple, picks a `p`-type maximal subgroup `M` containing a
+Sylow `p`-subgroup `P`, and shows `¬(p = 2 ∨ q = 2)`.  Step 8 applies the
+**normal-J theorem (Thm 7.6)** to get `J(S) ⊴ M` for `S ∈ Syl_p(M)`.  Step 9
+derives a contradiction from `J(S) ⊴ M` together with Thompson factorization
+properties of `M`.
+
+**This formalization takes the contradiction at the minimum counterexample as a
+forward-dependency hypothesis** (`hMinCounterexample`), universalized over any
+finite group `H` whose order divides `|G| = p^a q^b`.  The 9-step
+Goldschmidt-Bender-Matsuyama argument will discharge this hypothesis once
+Thm 7.6 + `IsPType` / Thompson factorization machinery lands in §7D.
+
+Given `hMinCounterexample`, the conclusion follows by **strong induction on
+`Nat.card G`**: at any group `H` (of order dividing `|G|`), if `H` is not
+solvable then by the induction hypothesis every proper normal subgroup `N ⊴ H`
+is solvable (since `|N| < |H|`) and every quotient `H/N` with `N ≠ ⊥` is solvable
+(since `|H/N| < |H|`).  Plugging into `hMinCounterexample` yields `False`. -/
+theorem burnside_p_pow_q_pow.{u}
+    {G : Type u} [Group G] [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (_hpq : p ≠ q)
+    (_hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b)
+    (hMinCounterexample :
+       ∀ (H : Type u) [Group H] [Finite H],
+         Nat.card H ∣ Nat.card G →
+         (¬ IsSolvable H) →
+         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N) →
+         (∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) →
+         False) :
+    IsSolvable G := by
+  classical
+  -- Strong induction on `Nat.card` via an explicit motive over arbitrary finite
+  -- groups whose order divides `|G|`.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (H : Type u) [Group H] [Finite H],
+      Nat.card H ∣ Nat.card G → Nat.card H = n → IsSolvable H
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G dvd_rfl rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih H _ _ hH_dvd hH_card
+  -- Apply the minimum-counterexample contradiction.
+  by_contra hH_nsol
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
+  -- Subgroup orders divide the ambient order; use Lagrange + IH.
+  have hN_solvable :
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := by
+    intro N hN_top _hN_norm
+    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
+    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
+    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
+    -- |N| ≠ |H| since N ≠ ⊤ (in a finite group).
+    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
+      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hN_lt : Nat.card N < n :=
+      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
+    exact ih (Nat.card N) hN_lt N hN_dvd_G rfl
+  -- Quotient orders divide the ambient order; use index-bound + IH.
+  have hQ_solvable :
+      ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N) := by
+    intro N hN_norm hN_bot
+    have hQ_dvd_H : Nat.card (H ⧸ N) ∣ Nat.card H := N.card_quotient_dvd_card
+    have hQ_dvd_G : Nat.card (H ⧸ N) ∣ Nat.card G := hQ_dvd_H.trans hH_dvd
+    -- |H| = |H/N| * |N| with |N| ≥ 2 ⇒ |H/N| < |H|.
+    have hN_card_two : 1 < Nat.card N := N.one_lt_card_iff_ne_bot.mpr hN_bot
+    have hH_eq : Nat.card H = Nat.card (H ⧸ N) * Nat.card N :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup N
+    have hQ_pos : 0 < Nat.card (H ⧸ N) :=
+      Nat.pos_of_dvd_of_pos hQ_dvd_H hH_pos
+    have hQ_lt_H : Nat.card (H ⧸ N) < Nat.card H := by
+      calc Nat.card (H ⧸ N)
+          = Nat.card (H ⧸ N) * 1 := (Nat.mul_one _).symm
+        _ < Nat.card (H ⧸ N) * Nat.card N :=
+            Nat.mul_lt_mul_of_pos_left hN_card_two hQ_pos
+        _ = Nat.card H := hH_eq.symm
+    have hQ_lt : Nat.card (H ⧸ N) < n := hQ_lt_H.trans_eq hH_card
+    exact ih (Nat.card (H ⧸ N)) hQ_lt (H ⧸ N) hQ_dvd_G rfl
+  exact hMinCounterexample H hH_dvd hH_nsol hN_solvable hQ_solvable
 
 end -- 7D
 

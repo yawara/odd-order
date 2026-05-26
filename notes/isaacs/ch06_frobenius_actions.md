@@ -417,6 +417,22 @@ FT クリティカル度 + 章内依存で並べる:
   も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
   直接合う
   `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
+  この obstruction を具体群の D/SD alternatives に接続する
+  `false_of_unique_subgroups_card_two_of_dihedral_of_not_isCyclic` と
+  `false_of_unique_subgroups_card_two_of_semiDihedral_of_not_isCyclic` も追加済み.
+  Semidihedral 側は `OddOrder.GroupTheory.SemiDihedral` の
+  `SemiDihedralGroup.ca_zero_not_mem_zpowers_c_one` と degenerate case
+  `SemiDihedralGroup.zero_isCyclic` を使う.
+  さらに 6.12 本文の「唯一の involution を持つ 2-group は cyclic」という element-level
+  hypothesis を, 6.11 で共有している order-2 subgroup 一意性 route へ変換する
+  `isCyclic_of_comm_two_group_unique_involution` も追加済み. これは pure rename ではなく,
+  各 order-2 subgroup から generator involution を取り出し, element-level uniqueness で
+  subgroup equality を戻す adapter.
+  続けて「全 involution が `c^2` を反転する」から quotient involution 一意性を得る
+  action-theoretic bridge
+  `unique_involution_of_comm_of_involutions_invert_element` と, それを cyclicity へ直結する
+  `isCyclic_of_comm_two_group_involutions_invert_element` も追加済み. 2 個の involution の積が
+  `c^2` を固定する一方, 仮定上は反転しなければならない, という 6.12 本文の実質部分.
   6.12 本文冒頭の maximal normal abelian subgroup argument に向けて,
   `C < C_P(C)` から Ch01 Lemma 1.23 で `C < B ≤ C_P(C)`, `C.relIndex B = p`,
   `B ⊴ P` を取り, `C ≤ Z(B)` と prime quotient cyclicity から `B` 可換を導く
@@ -424,8 +440,121 @@ FT クリティカル度 + 章内依存で並べる:
   これは mathlib 定理の純粋 rename ではなく, Ch01 の p-group intermediate subgroup
   construction と 6.12 の centralizer obstruction を直接つなぐ bridge.
   この bridge から, maximal normal abelian subgroup `C` は self-centralizing である
-  `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. 次の残りは
-  `P/C` の faithful embedding into `Aut(C)` と abelian quotient extraction.
+  `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. さらに self-centralizing
+  cyclic `C` に対して conjugation map `P → Aut(C)` の kernel が `C` であることから
+  `P/C ↪ Aut(C)` を作る cardinal bridge
+  `quotient_card_le_mulAut_of_self_centralizing`, および `Aut(C)` の可換性で `P/C` 可換性を取り出す
+  `quotient_commutative_of_isCyclic_of_self_centralizing` も追加済み. これらを合成し,
+  maximal normal cyclic `C` から直接 `P/C` 可換性を得る
+  `quotient_commutative_of_maximal_normal_isCyclic` も追加済み.
+  また本文の `|C| = 4` branch は, `|Aut(C)| = 2` と `C < P` から
+  `|P/C| = 2`, `|P| = 8` を導いて Cor 6.14 に接続する
+  `dihedralOrQuaternion_of_self_centralizing_cyclic_card_four` として追加済み.
+  さらに `C < P` から Ch01 Lemma 1.23 で `C.relIndex T = p` の normal intermediate
+  subgroup `T` を取り, maximality で `T` 非可換まで返す
+  `exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top` も追加済み.
+  また本文の `|C| ≠ 4` case split を `C.relIndex T = p` の branch に移し,
+  `|T| ≠ 8` を返す算術 bridge
+  `card_ne_eight_of_relIndex_prime_of_card_ne_four` も追加済み.
+  続く「`T/C ≤ P/C` なので
+  `T ⊴ P`」の quotient correspondence step として, `C ≤ T` と `P/C` 可換性から
+  `T.Normal` を引く `normal_of_le_of_quotient_commutative` も追加済み. Lemma 6.15 適用条件の
+  `Z(T) < C` についても, self-centralizing `C` から `Z(T) ≤ C` を引き, `T/C` prime cyclic と
+  `T` 非可換性で strict にする
+  `center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative` を追加済み.
+  また `|T:C|=p` と `|C:Z(T)|=p` から `|T:Z(T)|=p^2` を得る index 算術を
+  `center_index_eq_prime_sq_of_subgroupOf_relIndex_prime` として分離済み. 次は `c^p ∈ Z(T)`
+  から後者の `|C:Z(T)|=p` を作る段階.
+  この後者も `C=⟨c⟩` の quotient `C/(Z(T)∩C)` が cyclic で exponent が `p` を割り,
+  かつ非自明な `p`-group quotient であることから
+  `center_relIndex_zpowers_eq_prime_of_pow_mem_center` として追加済み.
+  さらに ambient な `C ≤ T ≤ P` と `C.relIndex T = p` から, `C.subgroupOf T < ⊤`,
+  cyclicity の `subgroupOf` への移送, および上記 `Z(T)<C` を束ねて Lemma 6.15 本体へ渡す
+  `exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime` も追加済み.
+  続けて `C=⟨c⟩` と `c^p ∈ Z(T)` の index 計算をこの ambient bridge へ直結する
+  `exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center`
+  も追加済み.
+  さらに「全 normal abelian subgroup が cyclic」という 6.12 仮定のもとで,
+  `T ⊴ P` 内に characteristic elementary abelian `p^2` subgroup が存在できないことを
+  `not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic`
+  として分離し, これと直前 bridge から本文の `c^p ∉ Z(T)` 結論を
+  `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` として追加済み.
+  続けて本文の conjugation exponent 段階も,
+  `a^p ∈ ⟨c⟩` と `c^a = c^i` から `i^p ≡ 1 (mod p^e)` を得る
+  `conj_exponent_pow_modEq_one_of_pow_mem_zpowers`, `c^p` の非固定性から
+  `i ≠ 1 (mod p^(e-1))` を得る
+  `conj_exponent_not_modEq_one_of_pow_conj_ne`, そして Lemma 6.16 に dispatch して
+  `p=2` と二つの 2-adic alternative へ落とす
+  `conj_exponent_two_cases_of_pow_mem_zpowers_of_pow_conj_ne` まで sorry-free.
+  これは 6.12 本文の `c = c^{a^p} = c^{i^p}` と `c^p ∉ Z(T)` をつなぐ実質的な
+  bridge であり, 既存 theorem の純粋 wrapper ではない.
+  さらに二つの 2-adic alternative がどちらも `i*2 ≡ -2 (mod 2^e)` を与えることを使い,
+  本文直後の `((c^2)^a = (c^2)⁻¹)` も
+  `conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne` として追加済み.
+  また 6.16 の二つの 2-adic alternative を, Lemma 6.13 が要求する
+  `c^a=c⁻¹` / `c^a=c^(2^(e-1))*c⁻¹` の二分岐へ変換する
+  `conj_eq_inv_or_twist_of_two_adic_cases` も追加済み.
+  `P/C` cyclic 後の `|P/C|=2` 段階に向けて, 有限 cyclic 2-group で位数が 2 より
+  大きければ非自明 involution は square である
+  `exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two` も追加済み.
+  さらに quotient 上でこの square root を取り, conjugation exponent が `j^2` になる
+  `conj_exponent_modEq_sq_of_quotient_sq_eq` と, 2-adic alternative を mod 4 で矛盾させて
+  cyclic quotient branch から `C.index = 2` を返す
+  `index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases` まで追加済み.
+  この `index = 2` 結論を既存 Lemma 6.13 recognizer
+  (`conj_eq_inv_or_twist_of_two_adic_cases`) に渡す
+  `dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases` も追加し,
+  6.12 の cyclic-quotient branch は D/Q/SD 分類 surface まで接続済み.
+  quotient-involution branch で使う exponent-free square inversion bridge
+  `conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne` も追加済み.
+  さらに `q ∈ P/C` が非自明 involution のとき, `T = comap ⟨q⟩` で
+  `C.relIndex T = 2` と `T = C ⊔ ⟨a⟩` を作り, 任意の代表元 `a` が `c^2` を
+  反転する
+  `quotient_involution_conj_square_eq_inv_of_zpowers` も追加済み.
+  `|C| ≠ 4` から同じ comap `T` の `|T| ≠ 8` を供給する
+  `quotient_involution_comap_card_ne_eight_of_card_ne_four` も追加済み.
+  これを conjugation action `P/C ↷ C` 上の involution-cyclicity criterion に渡し,
+  `c^2` の非 involution 性 (`e ≥ 3`) と合わせて `P/C` cyclic を返す
+  `quotient_isCyclic_of_involutions_invert_zpowers_square` も追加済み.
+  また `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` の非中心性から
+  本文の `a ∈ T-C`, `a^p ∈ C`, `c^a=c^i`, Lemma 6.16 の `p=2` + 2-adic alternatives を
+  一括で取り出す
+  `exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic` も
+  追加済み. さらに `c^p ∉ Z(T)` で `e=0,1` を除外し, この 6.16 dispatch で `p=2`,
+  `|C|≠4` で `e≠2` を得ることで, 以降の quotient involution/cyclic quotient branch が
+  要求する `3 ≤ e` を返す
+  `three_le_exponent_of_zpowers_relIndex_of_normal_abelian_cyclic` も追加済み.
+  さらにこれを cyclic quotient branch theorem へ接続する
+  `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient`
+  も追加済み.
+  さらに quotient-involution theorem から `P/C` cyclic を内部で作り,
+  `p=2` の抽出から Lemma 6.13 分類までを直結する p-general assembly
+  `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions`
+  も追加済み.
+  maximal normal cyclic setup から `T`, self-centralizing, `|T| ≠ 8`, quotient-involution
+  order-8 除外をすべて供給し, D/Q/SD 分類 surface に到達する
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top` も追加済み.
+  さらに外部仮定だった `3 ≤ e` も上記 exponent lower bound で内部供給する
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four`
+  まで追加済み.
+  続けて maximal normal abelian subgroup の有限選択を
+  `exists_maximal_normal_isMulCommutative` として切り出し, abelian `P` branch は
+  `⊤` に normal-abelian-cyclic 仮定を適用して cyclic として閉じた. 非 cyclic branch では
+  maximal subgroup `C` から `C = ⟨c⟩`, `C < ⊤`, `orderOf c = p^e` を取り出し,
+  `|C| = 4` branch を `dihedralOrQuaternion_of_self_centralizing_cyclic_card_four` へ,
+  `|C| ≠ 4` branch を
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four` へ
+  渡すことで, **Isaacs Thm 6.12**
+  `isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic` を
+  sorry-free 化した.
+  さらに 6.11 の odd-prime / odd-order application 向け surface として,
+  order-`p` subgroup 一意性を各 normal abelian subgroup へ制限し, 6.12 の
+  D/Q/SD alternatives が `p = 2` を強制することから
+  `isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two` と
+  `isCyclic_of_subgroups_card_prime_unique_of_odd` を sorry-free 化した.
+  さらに unique order-`2` subgroup 仮定で D/SD alternatives を排除し,
+  **Isaacs Thm 6.11** full statement
+  `isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` まで sorry-free 化した.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

@@ -37,7 +37,7 @@
   - Build OK (2272 jobs, sorry 1 件のみ on `invariants_ne_bot` step case 内). 次 iter で残 sorry 2 段階に着手.
 - **2026-05-25**: `PGroupFixedVector.lean` を sorry-free 化. `IsPGroup.invariants_ne_bot` と `IsPGroup.exists_fixed_vector_ne_zero` は完成済みで、§2F Thm 2.6 の fixed-vector dependency は解消.
 - **2026-05-25**: mmd の `[MISSING_PAGE_FAIL:29]` は BG PDF p.29 を `pdftotext` で復元して解消. §2F の証明 sketch に q=p / q≠p / `G*` induction の分岐を反映済み.
-- **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 現在の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
+- **2026-05-25**: §2F 用 helper を追加済み: `perm_fin_two_eq_one_of_odd_order`, `smul_fin_two_eq_self_of_odd_card`, `eq_one_of_pow_prime_pow_eq_one`, `unit_eq_one_of_pow_prime_pow_eq_one`. 当時の残 sorry は `odd_two_dim_abelian` と `odd_two_dim_sylow_abelian` の 2 件.
 - **2026-05-25**: q=p 分岐用に scalar character helper 群 (`monoidHom_units_eq_one_of_isPGroup_charP` ほか) と、`C_G(W) ∩ C_G(V/W)` の可換性に対応する補題 `end_commute_of_fixed_on_submodule_and_quotient` / `submonoid_commutative_of_fixed_on_submodule_and_quotient` / `commutative_of_faithful_representation_fixed_on_submodule_and_quotient` / `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` を追加済み. さらに実際の subgroup `fixedOnSubmoduleAndQuotientSubgroup` とその可換性補題を追加済み.
 - **2026-05-25**: p-subgroup の `W` / `V/W` action が scalar characters で書けるなら char p で `fixedOnSubmoduleAndQuotientSubgroup` に入る補題 `subgroup_le_fixedOnSubmoduleAndQuotientSubgroup_of_isPGroup_scalar_actions` と、faithful 版の可換性補題 `subgroup_commutative_of_isPGroup_scalar_actions` を追加済み. BG の「dim W = dim V/W = 1 なので scalar」段だけが次の橋渡し.
 - **2026-05-25**: rank-one representation 用に `scalarMonoidHomOfFinrankEqOne`, units 版 `scalarCharacterOfFinrankEqOne`, および char p の p-group rank-one 表現自明性 `isPGroup_rank_one_representation_trivial_of_charP` を追加済み. 次はこれを実際の submodule `W` と quotient `V/W` 表現へ適用する.
@@ -213,6 +213,99 @@
   単純 wrapper ではない. 残 frontier は determinant-kernel subgroup と
   base-changed representation の互換性、および theorem 本体から induction 仮定
   `hind` を供給する段.
+- **2026-05-26**: base-change 後の determinant-kernel 互換性を
+  `determinantKernelSubgroup_baseChangeRepresentation` として証明した.
+  `LinearMap.det_baseChange` と field extension の injective algebraMap を使い、
+  `G*` が scalar extension で変わらないことを示す bridge で、薄い wrapper ではない.
+  さらに `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  で、algebraic-closure reduction の induction 仮定を base-changed `G*` ではなく
+  元の `determinantKernelSubgroup ρ` 上に戻した. 残 frontier は theorem 本体で
+  この original-kernel induction 仮定をどう供給するか、および
+  `odd_two_dim_sylow_abelian` の最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch へ
+  接続する段.
+- **2026-05-26**: induction 出力を determinant-kernel spine の `O_r ≠ ⊥`
+  入力へ戻す bridge として
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` を追加した. abelian branch は
+  normal Sylow から、Sylow branch は `G' ≤ P` と `G'=1` の場合分けから
+  非自明な prime core を作る. 併せて determinant-kernel spine の `hind` は
+  Burnside normal complement の帰納で本当に必要な **proper nontrivial normal subgroup**
+  に狭めた. 次 frontier は theorem 本体で proper subgroup への制限表現に帰納仮定を
+  適用し、この `hind` を
+  `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  へ渡して最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch に接続すること.
+- **2026-05-26**: proper subgroup への restriction step として
+  `determinantKernel_hind_of_odd_two_dim_induction_outputs` を追加した.
+  `N < G*` に対して `ρ|_N` の faithful 性を `Subtype.ext` で戻し、`|N|` が奇数で
+  あることを `|N| ∣ |G*| ∣ |G|` から作った上で、帰納出力を上の
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` に渡す. 次は public theorem を
+  well-founded/strong induction 形に整理し、この subgroup 専用の `hab_ind`/`hsyl_ind`
+  を実際に供給する段.
+- **2026-05-26**: `odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs`
+  を追加し、public theorem の残 branch を「proper subgroup への帰納出力があれば
+  Sylow conclusion が閉じる」endpoint にまとめた. `G* = ⊥` と `G*` p-group は
+  既存 endpoint、残りは algebraic-closure original-kernel spine + 上の `hind`
+  bridge に流す. 次の実装単位は、public theorem を strong induction に畳み直して
+  `hab_ind`/`hsyl_ind` を供給すること.
+- **2026-05-26**: public theorem
+  `odd_two_dim_sylow_abelian` を strong induction に接続し、同 theorem の
+  `sorry` を除去した. Proper subgroup の Sylow branch は再帰的に処理し、
+  char-away branch は現時点では `odd_two_dim_abelian` に依存する. これにより
+  `S02_Representations.lean` の残 public sorry は `odd_two_dim_abelian` 1 件のみ.
+- **2026-05-26**: Prop. 2.4(e) の有限 index bookkeeping として
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq` を追加した.
+  既存の ratio bridge に、`i + m ≡ t (mod h)` と `epsilon^h = 1` から
+  `(epsilon^t)/(epsilon^i) = epsilon^m` を作る段を接続し、
+  BG の `E_{i,t} ⊆ E_{t-i}` を Lean で使うための modular 版 inclusion
+  まで進めた. これは theorem の単純 rename ではなく、前 commit の線型代数計算と
+  Prop. 2.4(e) の合同条件をつなぐ実質的な bridge.
+- **2026-05-26**: Prop. 2.4(a) の directness 側として
+  `cyclicEigenspaceFin_iSupIndep` を追加した. これは mathlib の
+  `eigenspaces_iSupIndep` の単純 rename ではなく、primitive root から
+  `Fin h → epsilon^i` の injectivity を作り、BG の有限 family `V_i`
+  に落とす bridge.  残る Prop. 2.4(a) 入力は
+  `g` の有限位数 + primitive root からの span/diagonalization.
+- **2026-05-26**: Prop. 2.4(a) の span 入力を後続の direct-sum API と
+  揃えるため、`span_cyclicEigenspaceFinUnion_eq_iSup` と top-iff 版を追加した.
+  既存の block 計算は `span (⋃ V_i) = ⊤` を仮定し、directness 側は
+  `⨆ i, V_i` を使うので、この二つを同じ入力として扱えるようにした.
+  残る重い部分は finite-order hypothesis からの diagonalization.
+- **2026-05-26**: Prop. 2.4(a) の finite-spectrum bridge として
+  `eigenvalue_eq_power_of_primitiveRoot_of_pow_eq_one`,
+  `cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one`,
+  span 版を追加した.  対角化側が `⨆ μ, eigenspace g μ = ⊤` を供給すれば、
+  `g^h = 1` と primitive root から実際の eigenvalue を `epsilon^i`
+  (`i : Fin h`) に落とし、BG の有限 family `V_i` の span/top へ渡せる.
+  残る重い部分は finite-order / split-polynomial hypothesis から
+  all-eigenspace top を作る段.
+- **2026-05-26**: Prop. 2.4(a) の span 側を
+  `cyclicEigenspaceFin_iSup_eq_top_of_pow_eq_one` と
+  `span_cyclicEigenspaceFinUnion_eq_top_of_pow_eq_one` で直接閉じた.
+  `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition for `aeval g`
+  を使うため、単なる semisimple/diagonalization API の rename ではない.
+- **2026-05-26**: Prop. 2.4(a) の theorem-facing 形式として
+  `cyclicEigenspaceFin_isInternal_of_pow_eq_one` を追加し、上の directness
+  と span を mathlib の `DirectSum.IsInternal` に接続した. これで
+  finite-order + primitive-root 仮定から BG の表示分解
+  `V = ⊕_{0≤i<h} V_i` を直接渡せる.  次はこの decomposition を使う
+  Prop. 2.4(c)-(k) の block/dimension identities.
+- **2026-05-26**: Prop. 2.4(c)(d) の block-matrix 層として
+  `cyclicHomBlockFinOfHom` と `cyclicHomBlockFinOfHom_mem` を追加した.
+  Prop. 2.4(a) の `DirectSum.IsInternal` decomposition を使い、
+  任意の `V_i → V_t` を他の `V_j` 上で 0 に延長して `E_{i,t}` の元を
+  作る.  次はこの construction の逆向き restriction と linear equivalence
+  を作れば `dim E_{i,t} = n_i n_t` に進める.
+- **2026-05-26**: 上の逆向き restriction として `cyclicHomBlockFinToHom`
+  を追加し、`cyclicHomBlockFinLinearEquiv` で
+  `Hom_F(V_i,V_t) ≃ₗ E_{i,t}` を得た.  さらに finite-dimensional `V`
+  の下で `finrank_cyclicHomBlockFin` が `dim E_{i,t}=n_i n_t` を返す.
+  次は Prop. 2.4(c) の `End_F(V) = ⊕_{i,t} E_{i,t}` を global block
+  decomposition として束ねる.
+- **2026-05-26**: global block decomposition の入口として
+  `cyclicHomBlockFinProjectionHom` と `cyclicHomBlockFinProjection` を追加.
+  任意の `e : End_F(V)` から `V_i → V_t` 成分を取り出し、
+  extension-by-zero で `E_{i,t}` に戻す.  `*_apply_of_mem_same/ne` により
+  source eigenspace 上の値も確認済み.  次は全 `(i,t)` 成分の和が `e` に
+  戻る reconstruction lemma.
 
 ## TL;DR
 
@@ -519,7 +612,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 優先度判定
 
-1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. 現在 active. fixed-vector dependency と p-power torsion helper は完成、残りは 2 つの theorem stub.
+1. **Thm 2.6 (odd 2-dim)** ★★★ — §3/App.A で直接使用. `odd_two_dim_abelian` / `odd_two_dim_sylow_abelian` は Lean 上で sorry-free.
 2. **Prop 2.4 (eigenspace)** ★★★ — Thm 2.5 の前提になる線型代数節.
 3. **Prop 2.1 (Schur + 既約)** ★★ — mathlib 基礎 API を活用できるが、Jacobson density 周辺は要注意.
 4. **Thm 2.5 (extraspecial)** ★★★ — §3 で使用. extraspecial 理論と Prop 2.4 に依存する高難度枠.
@@ -533,7 +626,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - **中期 path**: Prop 2.4 → Thm 2.5 → Prop 2.1.
 - **blocker path**: Prop 2.2 は Isaacs Ch.6 §6F Clifford 完成後に本実装.
 
-**推奨**: 現在は Thm 2.6 を続行. full theorem proof の前に、再利用できる小補題を 1–2 個ずつ sorry-free で積む.
+**推奨**: Thm 2.6 は閉じたため、次は Prop 2.4 (eigenspace) へ移る.
 
 ---
 
@@ -544,7 +637,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 | **Fong–Swan citation** | BG L657 "Fong and Swan [5, Theorem 72.1]" — citation 설정 필요 | BG references 재확인 |
 | **Lemma 2.6.3 (Gorenstein)** | 解消: `OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean` の `IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero` で再構築済み | Lean build 済み |
 | **MISSING_PAGE:29 content** | 解消: BG PDF p.29 を `pdftotext` で復元し、§2F proof sketch に反映済み | PDF p.29 |
-| **Prop 2.4(j)–(k) statement** | Thm 2.5 증명에서 핵심 but verbose. statement 정확성 재확인 | BG L696–712 정독 |
+| **Prop 2.4 package** | 着手: issue 0028. `V_i` / `n_i` 記法と periodicity から shared module 化 | BG L671–714 |
 | **mathlib `Maschke` API** | §2 에서 언급 가능성 (L1.20에서 phase 1 참조) | `Maschke.completely_reducible` 확인 |
 
 ---
@@ -725,3 +818,107 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   残る frontier は (1) normalizer `H=N_{G*}(Q)` への q≠p endpoint の制限適用,
   (2) induction hypothesis `hind` の theorem 本体への供給, (3) 元の体から
   algebraic closure へ移す route.
+- determinant-kernel spine の `hind` を proper nontrivial normal subgroup 用に
+  狭めた. `exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction` では
+  normal complement `N` が `⊤` でないことを complement 条件から証明してから
+  induction に渡す. さらに induction theorem の二つの出力
+  (`odd_two_dim_abelian` 型の abelian conclusion と
+  `odd_two_dim_sylow_abelian` 型の Sylow/commutator conclusion) から
+  `∃ r, O_r(N) ≠ ⊥` を作る
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` を追加した.
+- 次 frontier は theorem 本体で、`N < G*` への制限表現に帰納仮定を適用して
+  上の bridge へ渡すこと. それができれば
+  `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  を `odd_two_dim_sylow_abelian` の残 branch
+  (`G* ≠ ⊥` かつ `¬ IsPGroup p G*`) に接続できる.
+- `determinantKernel_hind_of_odd_two_dim_induction_outputs` で restriction bridge も
+  Lean 側に追加済み. ここでは `ρ|_N` の faithful 性と `Odd (Nat.card N)` を
+  実際に証明している. 残る未接続点は、public theorem を強帰納/最小反例の形へ
+  畳み直し、proper subgroup `N` への帰納出力をこの bridge に渡すこと.
+- `odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs` により、
+  q=p theorem 本体の determinant-kernel split は、明示的な proper-subgroup
+  induction outputs を仮定すれば sorry-free で閉じる. 残 frontier はこの
+  endpoint の仮定を well-founded induction から作ることに縮小した.
+- `odd_two_dim_sylow_abelian_strong_induction` を追加し、上の endpoint の
+  well-founded induction 仮定を実際に供給した. Public
+  `odd_two_dim_sylow_abelian` は `sorry` 無しで、残る依存は char-away branch
+  `odd_two_dim_abelian` のみ.
+- char-away branch 用に Maschke bridge を `NeZero (Nat.card K : F)` 前提へ
+  一般化した. `exists_simple_submodule_of_neZero_card`,
+  `exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card`,
+  `exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card` が core で,
+  既存の q≠p helper は `IsPGroup` + `q ≠ p` からこの `NeZero` を供給する
+  adapter になった. さらに `odd_two_dim_abelian` の仮定
+  `∀ q, q ∣ |G| → ¬ CharP F q` から subgroup `K ≤ G` の `NeZero` を得る
+  `neZero_nat_card_cast_of_subgroup_forall_prime_not_char` と,
+  algebraically closed 版 endpoint
+  `commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway` を追加.
+  次 frontier は char-away branch 側の core spine/normalizer 制限をこの endpoint
+  へ接続し、`odd_two_dim_abelian` の public `sorry` を畳むこと.
+- char-away endpoint の base-change 側として
+  `not_charP_algebraicClosure_of_not_charP`, `charAway_algebraicClosure`,
+  `commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway`
+  を追加. これで `F` 上の `∀ q, q ∣ |G| → ¬ CharP F q` 仮定と
+  `O_q(G*) ≠ ⊥` を、`AlgebraicClosure F` 上の theorem-facing endpoint へ
+  直接運べる. 残る frontier は、`G* ≠ ⊥` から適切な prime core を作る
+  char-away 用 group-theoretic spine と、その normalizer branch の制限適用.
+- algebraically closed 上の char-away normalizer branch を追加.
+  `commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determinantKernel_eq_top`
+  で determinant が自明な subgroup 上の `O_q ≠ ⊥` endpoint を作り、
+  `determinantKernel_sylow_normalizer_commutative_of_isAlgClosed_charAway` で
+  `H = N_{G*}(Q)` への制限表現に適用した. `hchar` は
+  `|H| ∣ |G*| ∣ |G|` で制限している. 次 frontier はこの normalizer branch を
+  char-away 用 determinant-kernel/core spine に渡すこと.
+- char-away 用 determinant-kernel/core spine を追加.
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway` は
+  `G* ≠ ⊥` から任意の prime divisor を選び、既存の p-parametrized spine
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` を、`q ≠ p` 条件なしの
+  normalizer 仮定で再利用する. さらに
+  `commutative_of_determinantKernel_core_spine_charAway` は得られた
+  `O_r(G*) ≠ ⊥` を algebraic-closure Maschke endpoint へ渡す.
+  次 frontier は public `odd_two_dim_abelian` 本体で normalizer branch と
+  proper subgroup induction 出力を供給し、この char-away spineへ接続すること.
+- public `odd_two_dim_abelian` を strong induction へ接続して sorry-free 化.
+  `commutative_of_determinantKernel_core_spine_isAlgClosed_charAway` で
+  algebraically closed 上の normalizer branch を自動供給し、
+  `commutative_of_determinantKernel_core_spine_algebraicClosure_charAway` で
+  元の体から algebraic closure へ faithful 性・次元・determinant kernel・`hind`
+  を輸送する. `odd_two_dim_abelian_strong_induction` は proper normal
+  `N < G*` に帰納仮定を適用し、可換性から nontrivial prime core を作る.
+  これにより §2F Thm 2.6 (a)(b) は Lean 上で actual `sorry` 無し.
+- Prop 2.4 用 shared module
+  `OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction` を開始.
+  BG の `V_i = {v | vg = epsilon^i v}` と `n_i = dim V_i` を
+  `cyclicEigenspace` / `cyclicEigenspaceDim` として定義し、
+  primitive root の `epsilon^h = 1` から `V_{i+h}=V_i`,
+  `n_{i+h}=n_i` を sorry-free で証明した. これは Prop 2.4(b) の基礎層で、
+  次は `E_i` と `E_{i,t}` の定義および (e) の conjugation eigenvalue 計算へ進む.
+- 同 module に BG の `E_i` / `E_{i,t}` の入口を追加.
+  `cyclicEndConj` は右作用の `e^g = g^{-1}eg` を左作用の
+  `e ↦ g * e * g⁻¹` として定義し、`cyclicEndConjEigenspace` が `E_i`,
+  `cyclicHomBlockFin` が有限 index 範囲の `E_{i,t}` を表す.
+  `E_{i,t}` が conjugation で保存されることと、
+  `epsilon^i • (e^g) = epsilon^t • e` の pointwise / span 上の map-level
+  形を sorry-free で追加した. これは Prop 2.4(e) の計算部で、次は
+  Prop 2.4(a) の direct-sum/span 仮定を実際に供給する diagonalization 側へ進む.
+- 上の計算を `E_m` inclusion に接続する bridge として
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio` と非 wrap 版
+  `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_eq_add` を追加.
+  これで scalar ratio が `epsilon^m` に同定できた場合は
+  `E_{i,t} ≤ E_m` まで sorry-free で渡せる.
+- Prop. 2.4(a) 用に、primitive root から有限 family `V_i` の directness
+  (`cyclicEigenspaceFin_iSupIndep`) を作り、`span (⋃ V_i)` と `⨆ i, V_i`
+  の top 条件を相互に使えるようにした. さらに primitive-root factorization
+  `X^h - 1 = ∏ (X - ε^i)` と coprime kernel decomposition により、
+  `g^h = 1` から直接 `⨆ i, V_i = ⊤` と `span (⋃ V_i) = ⊤` を得た.
+  `cyclicEigenspaceFin_isInternal_of_pow_eq_one` で `DirectSum.IsInternal`
+  形式にも束ねたため、Prop. 2.4(a) は後続が消費できる形まで揃った.
+  さらに `cyclicHomBlockFinOfHom` で `V_i → V_t` を `E_{i,t}` へ
+  extension-by-zero する向きも追加し、`cyclicHomBlockFinToHom` と
+  `cyclicHomBlockFinLinearEquiv` で restriction 側も合わせた.
+  `finrank_cyclicHomBlockFin` により個別 block の dimension identity
+  `dim E_{i,t}=n_i n_t` は theorem-facing に使える.  さらに任意の
+  endomorphism から `(i,t)` 成分を切り出す
+  `cyclicHomBlockFinProjection` も入った.  次は projection の総和による
+  reconstruction と全 block の direct-sum decomposition.
+- 2026-05-26 (本セッション): BG §2 representation theory shared module の skeleton 3 件を追加 ([`AbsolutelyIrreducible.lean`](../../OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean), [`ExtraspecialFaithful.lean`](../../OddOrder/GroupTheory/RepresentationTheory/ExtraspecialFaithful.lean), [`OddTwoDimRepr.lean`](../../OddOrder/GroupTheory/RepresentationTheory/OddTwoDimRepr.lean)). いずれも namespace + docstring (BG ↔ mathlib mapping + 該当 tracking issue ポインタ #33 / #34 / #35) のみで sorry / 内容なし. Item 6a ("files exist") を満たすため. 内容は issues 経由で follow-up.

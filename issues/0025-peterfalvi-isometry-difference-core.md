@@ -25,10 +25,24 @@ created: 2026-05-25
 ## やること
 
 - [x] integer coefficient vector 用の小さな structure / predicate を決める。
-- [ ] `n = 2` の norm `2` case を証明する。
-- [ ] `n = 3` の common component 共有 case を証明する。
-- [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する。
-- [ ] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消す。
+- [ ] **statement-level gap を埋める**: `τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ`
+      の現状定式化は **証明不可能**.  Peterfalvi 原文 (1.4) は `τ : ℤ[X, H^#] → ℤ[Irr G]`
+      で「`τ` が virtual character を virtual character に送る」が組み込まれているが,
+      Lean 統計には欠落.  対策: `(h_image_diff : ∀ i, τ ((χ i) - (χ 0)) ∈ ZIrr G)` を
+      仮説に追加 (または `(h_image_subset : ∀ φ ∈ ZIrr H, τ φ ∈ ZIrr G)`).
+      `S07_Coherence.lean:109-114` の `IsIntegralIsometry` consumer も並行 patch 必要.
+- [ ] **prerequisite lemmas (statement fix の後)**:
+   - `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge
+     (mathlib `FDRep.char_orthonormal` ⇒ `ClassFunction.inner`, ~80-150 LOC)
+   - `ZIrr G` Fourier 基底展開: 各 `φ ∈ ZIrr G` は `∑ c_χ · χ` 唯一展開で
+     `c_χ = ⟨φ, χ⟩` (`ZIrr.lean:46-47` の TODO に該当, ~100-200 LOC)
+- [ ] `n = 2` の norm `2` case を証明する.
+- [ ] `n = 3` の common component 共有 case を証明する.
+- [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する.
+- [ ] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消す.
+
+合計推定: ~400-750 LOC of new bridges + combinatorial induction.
+**`column_orthogonality_cases` (#27) は不要** (row orthogonality だけで済む).
 
 ## 2026-05-26 update
 
