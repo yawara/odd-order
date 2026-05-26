@@ -3360,6 +3360,23 @@ theorem centralizer_omega1ZCenterOpCore_le_opCore_of_isPGroup
       OddOrder.Isaacs.Ch01.opCore p G :=
   OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK_pg
 
+/-- **Isaacs Thm 7.6 Step 6 faithfulness** (mmd L3884): `K̄ = ⊥` in `Ḡ` given
+`K ≤ U`.  This is the final Step 6 conclusion: the Ḡ-action on V is faithful
+because its kernel `K̄ = (K.map mk')` is trivial. -/
+theorem centralizer_omega1ZCenterOpCore_map_eq_bot_of_le_opCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hK_le_U : Subgroup.centralizer (omega1ZCenterOpCore G p : Set G) ≤
+        OddOrder.Isaacs.Ch01.opCore p G) :
+    (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)).map
+        (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥ := by
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+  -- Goal: K ≤ oPiCore {p} G
+  intro x hx
+  have hx_U : x ∈ OddOrder.Isaacs.Ch01.opCore p G := hK_le_U hx
+  rwa [show OddOrder.Isaacs.Ch01.opCore p G =
+        OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G from
+      (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm] at hx_U
+
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
 Once Step 5-6 produce the triviality of the `A`-action on `V = Z(L)`, the book:
