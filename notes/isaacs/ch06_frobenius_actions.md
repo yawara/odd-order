@@ -447,6 +447,11 @@ FT クリティカル度 + 章内依存で並べる:
   続けて `C=⟨c⟩` と `c^p ∈ Z(T)` の index 計算をこの ambient bridge へ直結する
   `exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center`
   も追加済み.
+  さらに「全 normal abelian subgroup が cyclic」という 6.12 仮定のもとで,
+  `T ⊴ P` 内に characteristic elementary abelian `p^2` subgroup が存在できないことを
+  `not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic`
+  として分離し, これと直前 bridge から本文の `c^p ∉ Z(T)` 結論を
+  `pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic` として追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

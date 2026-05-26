@@ -6001,6 +6001,61 @@ theorem exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_ce
   exact exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime
     hT hT_card_ne h_idx hC_le_T hCent hC_rel hC_cyclic hT_not_comm
 
+/-- **Isaacs Thm 6.12 setup**: if every normal abelian subgroup of `P` is cyclic, then a
+normal subgroup `T` has no characteristic elementary abelian subgroup of order `p²`.
+
+Indeed, such a subgroup is normal in `P` because it is characteristic in `T` and `T ⊴ P`;
+as an elementary abelian group of order `p²`, it is not cyclic. -/
+theorem not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] {T : Subgroup P}
+    (hT_normal : T.Normal)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B) :
+    ¬ ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  rintro ⟨K, hK_char, hK_elem, hK_card⟩
+  let B : Subgroup P := K.map T.subtype
+  haveI : T.Normal := hT_normal
+  haveI : K.Characteristic := hK_char
+  have hB_normal : B.Normal := by
+    dsimp [B]
+    infer_instance
+  have hB_elem : IsElementaryAbelian p B := by
+    dsimp [B]
+    exact isElementaryAbelian_of_mulEquiv
+      (Subgroup.equivMapOfInjective K T.subtype T.subtype_injective) hK_elem
+  have hB_comm : IsMulCommutative B := ⟨⟨fun x y => hB_elem.comm x y⟩⟩
+  have hB_card : Nat.card B = p ^ 2 := by
+    dsimp [B]
+    rw [Subgroup.card_subtype, hK_card]
+  exact (hB_elem.not_isCyclic_of_card_prime_sq (Fact.out : p.Prime) hB_card)
+    (hcyc B hB_normal hB_comm)
+
+/-- **Isaacs Thm 6.12 setup**: under the normal-abelian-cyclic hypothesis, the element
+`c^p` is not central in `T` in the main 6.12 configuration.
+
+This is the sentence in the proof of Theorem 6.12 where Lemma 6.15 is applied by
+contradiction: if `c^p ∈ Z(T)`, the preceding bridge produces a characteristic elementary
+abelian subgroup of `T` of order `p²`, contradicting the ambient hypothesis. -/
+theorem pow_not_mem_center_of_zpowers_relIndex_of_normal_abelian_cyclic
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal] {c : P}
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (hT_normal : T.Normal)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c) (hcT : c ∈ T)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T) :
+    (⟨c, hcT⟩ : T) ^ p ∉ Subgroup.center T := by
+  intro hcp
+  have h_exists :
+      ∃ K : Subgroup T, K.Characteristic ∧
+        IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 :=
+    exists_characteristic_isElementaryAbelian_of_zpowers_relIndex_pow_mem_center
+      hT hT_card_ne hC_eq hcT hC_le_T hCent hC_rel hT_not_comm hcp
+  exact
+    (not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_abelian_cyclic
+      hT_normal hcyc) h_exists
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
