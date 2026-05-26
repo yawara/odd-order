@@ -50,6 +50,8 @@ precise statement is left as a TODO since it requires extra setup
   constituent of a restricted class function, expressed by inner product.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver` — irreducible-character
   notation for the same nonzero restriction multiplicity.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy` — the ambient conjugation
+  action on irreducible characters of a normal subgroup.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
@@ -274,6 +276,29 @@ variable {H : Subgroup G} [hH : H.Normal]
 
 namespace IrreducibleCharacter
 
+/-- Conjugate an irreducible character of `H` by an ambient element of `G`.
+
+The underlying class function is `ClassFunction.conjBy`; irreducibility is preserved by
+pulling the representing module back along the induced automorphism of `H`. -/
+def conjBy (g : G) (θ : IrreducibleCharacter H) : IrreducibleCharacter H :=
+  ⟨ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ),
+    ClassFunction.IsIrreducibleCharacter.conjBy (H := H) θ.isIrreducible g⟩
+
+@[simp] theorem coe_conjBy (g : G) (θ : IrreducibleCharacter H) :
+    (conjBy (G := G) (H := H) g θ : ClassFunction H ℂ) =
+      ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ) :=
+  rfl
+
+@[simp] theorem conjBy_inv_conjBy (g : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) g⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
+@[simp] theorem conjBy_conjBy_inv (g : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) g (conjBy (G := G) (H := H) g⁻¹ θ) = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
 variable [Fintype H] [Invertible (Nat.card H : ℂ)]
 
 /-- Predicate form of the Clifford conclusion that all irreducible constituents
@@ -281,8 +306,7 @@ of `Res^G_H χ` lie in one `G`-conjugation orbit. -/
 def RestrictionConstituentsSingleOrbit (χ : IrreducibleCharacter G) : Prop :=
   ∀ θ η : IrreducibleCharacter H,
     LiesOver H χ θ → LiesOver H χ η →
-      ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
-        (η : ClassFunction H ℂ)
+      ∃ g : G, conjBy (G := G) (H := H) g θ = η
 
 /-- Predicate form of the Clifford conclusion that all constituents of
 `Res^G_H χ` occur with a common normalized inner-product multiplicity. -/
@@ -302,9 +326,28 @@ theorem RestrictionConstituentsSingleOrbit.exists_conj
     (hχ : RestrictionConstituentsSingleOrbit (H := H) χ)
     {θ η : IrreducibleCharacter H}
     (hθ : LiesOver H χ θ) (hη : LiesOver H χ η) :
-    ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
-      (η : ClassFunction H ℂ) :=
+    ∃ g : G, conjBy (G := G) (H := H) g θ = η :=
   hχ θ η hθ hη
+
+theorem liesOver_conjBy
+    {χ : IrreducibleCharacter G} {θ : IrreducibleCharacter H}
+    (hθ : LiesOver H χ θ) (g : G) :
+    LiesOver H χ (conjBy (G := G) (H := H) g θ) := by
+  change ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+      (ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ)) ≠ 0
+  rw [ClassFunction.restrictionMultiplicity_conjBy_right
+    (H := H) (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) g]
+  exact hθ
+
+theorem liesOver_conjBy_iff
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) (g : G) :
+    LiesOver H χ (conjBy (G := G) (H := H) g θ) ↔ LiesOver H χ θ := by
+  constructor
+  · intro hθ
+    have hθ' := liesOver_conjBy (H := H) hθ g⁻¹
+    simpa using hθ'
+  · intro hθ
+    exact liesOver_conjBy (H := H) hθ g
 
 omit hH in
 theorem HasCommonRestrictionMultiplicity.eq_of_liesOver

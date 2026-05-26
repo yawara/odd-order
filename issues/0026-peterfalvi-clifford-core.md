@@ -61,6 +61,11 @@ API がまだ不足している。
   irreducible character を保つことを証明した。
 - `IsRestrictionConstituent.conjBy` から conjugate 側 irreducibility 引数を消し、
   restriction constituent の orbit transport をそのまま使える形にした。
+- `ClassFunction.conjBy_inv_conjBy` / `conjBy_conjBy_inv` と
+  `IrreducibleCharacter.conjBy` を追加し、`Irr(H)` 上で ambient conjugation を
+  直接使えるようにした。
+- `liesOver_conjBy` / `liesOver_conjBy_iff` を追加し、`LiesOver` が
+  `G`-conjugation orbit に沿って不変であることを theorem 化した。
 - 次の小単位は、restriction constituents が単一 orbit になる Clifford core
   theorem の statement/proof 入力、または inertia induction bijection の API 化。
 

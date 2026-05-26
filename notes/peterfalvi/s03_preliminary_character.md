@@ -94,7 +94,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   ambient conjugation invariance for normal subgroups via
   `restrictionMultiplicity_conjBy_right`.  `IsRestrictionConstituent.conjBy`
   transports constituents, with conjugate irreducibility now supplied by
-  `IsIrreducibleCharacter.conjBy`.
+  `IsIrreducibleCharacter.conjBy`.  At the irreducible-character level,
+  `IrreducibleCharacter.conjBy`, `liesOver_conjBy`, and `liesOver_conjBy_iff`
+  make the `G`-orbit action on constituents usable without returning to raw
+  class-function equalities.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.

@@ -119,6 +119,14 @@ theorem conjBy_mul (g₁ g₂ : G) (θ : ClassFunction ↥H k) :
   change (g₁ * g₂) * (h : G) * (g₁ * g₂)⁻¹ = g₁ * (g₂ * (h : G) * g₂⁻¹) * g₁⁻¹
   group
 
+@[simp] theorem conjBy_inv_conjBy (g : G) (θ : ClassFunction ↥H k) :
+    conjBy (G := G) (H := H) g⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
+  simpa using (conjBy_mul (G := G) (H := H) g g⁻¹ θ).symm
+
+@[simp] theorem conjBy_conjBy_inv (g : G) (θ : ClassFunction ↥H k) :
+    conjBy (G := G) (H := H) g (conjBy (G := G) (H := H) g⁻¹ θ) = θ := by
+  simpa using (conjBy_mul (G := G) (H := H) g⁻¹ g θ).symm
+
 /-- Restricting an ambient class function to a normal subgroup gives a function
 invariant under all ambient conjugations, not only conjugations by subgroup
 elements. -/
