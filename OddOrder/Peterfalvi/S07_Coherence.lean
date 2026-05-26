@@ -250,6 +250,18 @@ theorem difference_image_eq {hyp : Hypothesis (L := L) (G := G) S A}
           (hyp.difference_image hχ).nuClassFunction) :=
   (hyp.difference_image hχ).image_conjugateDifference
 
+theorem difference_image_ne_zero {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ) ≠ 0 :=
+  (hyp.difference_image hχ).image_conjugateDifference_ne_zero
+
+theorem signed_difference_image_ne_zero {hyp : Hypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    (hyp.difference_image hχ).sign •
+        ((hyp.difference_image hχ).muClassFunction -
+          (hyp.difference_image hχ).nuClassFunction) ≠ 0 :=
+  (hyp.difference_image hχ).signed_image_ne_zero
+
 theorem conjugate_mem {hyp : Hypothesis (L := L) (G := G) S A}
     {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
     χ.conj ∈ S :=

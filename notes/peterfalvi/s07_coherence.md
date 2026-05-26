@@ -218,6 +218,9 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `CharacterDifferenceImage.signed_image_ne_zero` and
   `image_conjugateDifference_ne_zero` expose the immediate consequence of
   (5.2.d): the signed difference image of `χ - χ̄` is nonzero.
+- `Hypothesis.difference_image_ne_zero` and
+  `signed_difference_image_ne_zero` lift that nonzero image API to the §7
+  hypothesis carrier, avoiding repeated unpacking of `difference_image hχ`.
 
 ### (5.3) Lemma — Coherence の十分条件
 
