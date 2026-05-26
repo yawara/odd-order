@@ -45,6 +45,174 @@
 - **2026-05-25**: 2 次元空間の非零 proper submodule から `dim W = dim V/W = 1` を出す
   `rank_one_subquotients_of_finrank_two` を追加済み. q=p 分岐は次に `W = C_V(K)`
   の非零性・proper 性・`G`-invariance を作れば、既存 rank-one subquotient helper へ接続できる.
+- **2026-05-25**: q=p 分岐用の入口として
+  `subgroup_commutative_of_finrank_two_invariant_submodule` を追加済み.
+  非零 proper な invariant submodule `W` ができれば、2 次元性から rank-one
+  subquotient helper へ直接接続して p-subgroup の可換性を得られる.
+- **2026-05-25**: normal p-subgroup の fixed space を直接扱う
+  `subgroup_commutative_of_normal_p_fixed_space_proper` を追加済み.
+  `K ⊴ G`, `K` p-group, `C_V(K) ≠ V` から `IsPGroup.invariants_ne_bot`
+  と `Representation.le_comap_invariants` を組み合わせて p-subgroup の可換性へ接続する.
+- **2026-05-25**: faithful 表現で非自明 subgroup が全空間を点wise 固定できない補題
+  `invariants_ne_top_of_faithful_subgroup_ne_bot` と、それを使う直結版
+  `subgroup_commutative_of_nontrivial_normal_p_fixed_space` を追加済み.
+  q=p 分岐は非自明 normal p-subgroup `K` を構成できれば p-subgroup 可換性まで閉じる.
+- **2026-05-25**: rank-one submodule/quotient への scalar character が commutator を殺すことから、
+  `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_rank_one_subquotients`,
+  2 次元版 `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_finrank_two`,
+  normal p-subgroup fixed-space 版
+  `commutator_le_fixedOnSubmoduleAndQuotientSubgroup_of_nontrivial_normal_p_fixed_space`
+  を追加済み. q=p 分岐の `G' ≤ C_G(W) ∩ C_G(V/W)` 接続は Lean helper として閉じた.
+- **2026-05-26**: q=p 分岐で Sylow 包含へ進むため、
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_rank_one_subquotients`,
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_finrank_two`,
+  `fixedOnSubmoduleAndQuotientSubgroup_normal_of_nontrivial_normal_p_fixed_space`
+  を追加済み. さらに Sylow D + Sylow conjugacy + 正規性を組み合わせる
+  `normal_pSubgroup_le_sylow` と、`G' ≤ N` を任意の Sylow 包含へ運ぶ
+  `commutator_le_sylow_of_le_normal_pSubgroup` を追加した. 次の未解決点は
+  `C = C_G(W) ∩ C_G(V/W)` が char p で p-subgroup になることを示し、
+  `commutator_le_sylow_of_le_normal_pSubgroup C ...` へ渡すこと.
+- **2026-05-26**: 上の未解決点を解消. `g ∈ C_G(W) ∩ C_G(V/W)` なら
+  `n = ρ(g)-1` が `n^2 = 0` となり、char p で `(ρ(g))^p = 1`、faithful
+  なら `g^p=1` となることから
+  `fixedOnSubmoduleAndQuotientSubgroup_isPGroup_of_faithful` を追加した.
+  これにより 2 次元 invariant submodule 版
+  `commutator_le_sylow_of_finrank_two_invariant_submodule` と、q=p で使う
+  fixed-space 版 `commutator_le_sylow_of_nontrivial_normal_p_fixed_space`
+  まで Lean helper で閉じた. 現 frontier は **非自明 normal p-subgroup `K`
+  の構成**: `subgroup_commutative_of_nontrivial_normal_p_fixed_space` で Sylow
+  可換性、`commutator_le_sylow_of_nontrivial_normal_p_fixed_space` で `G' ≤ P`
+  を得る. これらを theorem 結論形にまとめる endpoint
+  `sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space`
+  も追加済み.
+- **2026-05-26**: theorem 本体側で使いやすい reduction として
+  `sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgroup`
+  を追加し、q=p は「非自明 normal p-subgroup の存在」まで落とした.
+  さらに ambient group 自身が p-group の場合に `K = ⊤` を使う
+  `sylow_commutative_and_commutator_le_of_isPGroup` も追加済み.
+  次は determinant kernel `G* = G ∩ SL(V,F)` / `O_p(G*)` 側の構成を
+  Lean で切れる小補題に分割する.
+- **2026-05-26**: q≠p 分岐用に
+  `exists_simple_submodule_of_isPGroup_ne_char` を追加済み. `K` が finite
+  q-group で `q ≠ p` のとき、`neZero_nat_card_cast_of_isPGroup_ne_char`
+  から Maschke の `NeZero (Nat.card K : F)` 前提を作り、
+  `Representation.asModule` の group-algebra module から simple constituent
+  を取る. これは薄い theorem rename ではなく、BG Thm 2.6 の
+  q≠p 証明で必要な「char-away ⇒ Maschke ⇒ irreducible constituent」段.
+- **2026-05-26**: 上の simple constituent を abelian `K` + algebraically
+  closed `F` で `finrank = 1` subrepresentation へ戻す
+  `exists_rank_one_subrepresentation_of_simple_submodule_of_commutative_group`
+  と、q≠p 分岐の直結入口
+  `exists_rank_one_subrepresentation_of_commutative_isPGroup_ne_char` を追加済み.
+  `Submodule.module'` / `restrictScalars` / `Subrepresentation.ofSubmodule'`
+  の scalar instance を明示し、mathlib の
+  `IsSimpleModule.finrank_eq_one_of_isMulCommutative` を group algebra の simple
+  submodule に適用してから representation 側へ戻す. 次はこの rank-one line を
+  2 次元 faithful 表現の line pair (`V = W₁ ⊕ W₂`) と odd-order line
+  permutation helper へ接続する.
+- **2026-05-26**: Maschke complement まで進め、
+  `finrank_eq_one_of_simple_submodule_of_commutative_group` に scalar-instance
+  bridge を切り出した上で、
+  `exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char`
+  を追加済み. これは finite abelian q-group `K`, `q ≠ p`, `finrank V = 2`
+  から `K`-subrepresentation として `V = W₁ ⊕ W₂`、`finrank W₁ = 1`,
+  `finrank (V/W₁) = 1` を返す段. 次は `K ⊴ G` と determinant kernel 条件
+  (`K ≤ G*`) を使い、ambient `G` がこの二つの line を permute することを
+  `RankOneLinePairData` へ接続する.
+- **2026-05-26**: normality bridge として
+  `conjugateSubrepresentationOfNormal` と
+  `finrank_conjugateSubrepresentationOfNormal` を追加済み. `K ⊴ G` なら
+  ambient `g : G` で `K`-subrepresentation を移した像が再び
+  `K`-subrepresentation で、finrank も保存される. 次の未形式化部分は
+  determinant kernel の eigenvalue 議論を使い、この conjugate line が
+  Maschke complement の二つの rank-one line のどちらかに一致すること.
+- **2026-05-26**: q=p Sylow 結論側の theorem-facing reduction として
+  `sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneLinePair`
+  を追加済み. `G* = ⊥` は determinant character で abelian、`G* ≠ ⊥` は
+  core spine に渡し、`r = p` は fixed-space endpoint、`r ≠ p` は
+  `RankOneLinePairData` 経由で ambient `G` abelian にする. 残る入力は
+  normalizer/induction spine と、q≠p の line-pair construction.
+- **2026-05-26**: PDF p.29 の q≠p line-pair uniqueness に向けて、
+  `eq_of_rank_one_submodules_inf_ne_bot` と
+  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars`
+  を追加済み. 2 本の補空 rank-one line 上で異なる scalar によって作用する
+  線形写像について、任意の rank-one invariant submodule は左右どちらかに限られる.
+  次は determinant kernel + faithful action から `x ∈ K#` の二つの scalar が
+  distinct であることを取り出し、この uniqueness を `K ⊴ G` の conjugate line に適用する.
+- **2026-05-26**: q≠p line-pair construction の normality 側の橋として、
+  `isCompl_conjugateSubrepresentationOfNormal`,
+  `conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique`,
+  `le_comap_of_conjugateSubrepresentation_eq` を追加済み. これらは
+  mathlib/Isaacs の純リネームではなく、`K ⊴ G` による conjugate line を
+  rank-one uniqueness で `W₁`/`W₂` のどちらかへ落とし、
+  `RankOneLinePairData.permutes` が要求する `comap` 形へ変換するための接続補題.
+  次は determinant-kernel 条件から distinct scalars を取り出して
+  uniqueness 仮定を作る.
+- **2026-05-26**: determinant kernel と rank-one scalar character の接続として、
+  `det_eq_scalar_of_finrank_eq_one`,
+  `determinantCharacter_eq_scalarCharacter_mul_quotient`,
+  `scalarCharacters_mul_eq_one_of_mem_determinantKernel` を追加済み.
+  `g ∈ G*` から、invariant rank-one submodule と quotient 上の二つの
+  scalar character の積が `1` であることを Lean で取り出せるようになった.
+  次は `x ∈ K#` で二つの scalar が等しいと faithful action に反する、という
+  distinct scalar witness を作る.
+- **2026-05-26**: quotient scalar を補空 line 上の scalar に移す橋として、
+  `scalarCharacter_quotient_eq_complement_of_isCompl` と
+  `scalarCharacters_complement_mul_eq_one_of_mem_determinantKernel` を追加済み.
+  `W ⊕ U = V` かつ両 line が保存される状況で、determinant kernel の積公式を
+  quotient ではなく二つの Maschke line 上の scalar character の積 `= 1` として
+  直接使える. 次はこの積公式と「二つの scalar が等しい」という仮定から
+  odd order / faithful action の矛盾を取り出す.
+- **2026-05-26**: distinct scalar witness として
+  `scalarCharacters_ne_of_mem_determinantKernel_of_ne_one` を追加済み.
+  非自明な odd-order 元 `g ∈ G*` が二つの preserved rank-one complement 上で
+  同じ scalar を持つと、determinant product から common scalar の二乗が `1`,
+  odd order から scalar が `1`, faithfulness から `g = 1` となり矛盾する.
+  次はこの witness を
+  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars` と
+  normal conjugate line bridge に渡して `RankOneLinePairData.permutes` を作る.
+- **2026-05-26**: witness から rank-one uniqueness への接続として
+  `rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_element` と
+  `rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_subgroup`
+  を追加済み. 後者は ambient `K ≤ G*` と odd-order `G` から restricted
+  `K`-representation に降ろし、非自明 `x : K` を使って任意の rank-one
+  `K`-subrepresentation が二つの Maschke line のどちらかであることを返す.
+  次はこれを `conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique` に
+  接続し、ambient `g : G` が二本の line を permute する形へ進める.
+- **2026-05-26**: normal conjugate 側の接続として
+  `conjugateSubrepresentation_eq_left_or_right_of_determinantKernel_subgroup` と
+  `le_comap_left_or_right_of_determinantKernel_subgroup` を追加済み.
+  `K ⊴ G`, `K ≤ G*`, 非自明 `x : K` から、ambient `g : G` による
+  `W` の conjugate が `W` または `U` に一致すること、さらに
+  `RankOneLinePairData.permutes` が要求する `comap` 形の片側を得られる.
+  次は反対側 line も同様に扱える quotient/free/finrank 入力を整え、
+  `Fin 2` の permutation action としてまとめる.
+- **2026-05-26**: algebraically closed q≠p spine の normalizer branch を閉じた.
+  `commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel_eq_top` で
+  determinant が自明な subgroup 上の q≠p endpoint を切り出し、
+  `determinantKernel_sylow_normalizer_commutative_of_isAlgClosed` で
+  `H = N_{G*}(Q)` への制限表現に適用した. これにより
+  `sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction`
+  は normalizer branch を内部で解決し、残入力は `G*` の非自明正規部分群への
+  induction 出力 `hind` のみになった. 残 frontier は (1) theorem 本体でこの
+  `hind` を実際に供給すること、(2) 元の体から algebraic closure へ移す
+  base-change route を整理すること.
+- **2026-05-26**: base-change route の最初の sorry-free infrastructure として
+  `baseChangeRepresentation` と `baseChangeRepresentation_faithful` を追加した.
+  前者は field extension `K/F` に沿って表現を `K ⊗[F] V` へ実際に延長し、
+  後者は faithfully flat な `K/F` で faithful 性が保たれることを示す. これは
+  mathlib theorem の単純 rename ではなく、代数閉包上の reduction を元の
+  faithful 表現へ接続するための具体的な tensor bridge. 次は
+  `AlgebraicClosure F` での `CharP`/`finrank`/determinant-kernel compatibility を
+  同じ粒度で足す.
+- **2026-05-26**: `sylow_commutative_and_commutator_le_of_algebraicClosure_induction`
+  を追加し、元の体 `F` 上の faithful 2-dimensional representation から
+  `AlgebraicClosure F` 上の normalizer/induction spine へ渡す reduction を
+  sorry-free にした. 内容は faithful scalar extension と `finrank` transport を
+  実際に行って algebraically closed 版 endpoint へ接続するもので、既存 theorem の
+  単純 wrapper ではない. 残 frontier は determinant-kernel subgroup と
+  base-changed representation の互換性、および theorem 本体から induction 仮定
+  `hind` を供給する段.
 
 ## TL;DR
 
@@ -390,6 +558,170 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
-- q=p 分岐の `W = C_V(K)` が非零 proper かつ G-invariant になる段を小補題化する.
-- その後、p-elements と `G'` が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
+- q=p 分岐で非自明 normal p-subgroup `K` を作る段を小補題化する.
+- その後、p-elements / Sylow p-subgroup が `fixedOnSubmoduleAndQuotientSubgroup` に入るところへ接続する.
 - その後、determinant / `G*` 分岐のうち、Lean で切れる小補題へ分解する.
+
+## 2026-05-26 進捗ログ: determinant kernel `G*`
+
+- `S02_Representations.lean` に `representationToGeneralLinearGroup`,
+  `determinantCharacterOfRepresentation`, `determinantKernelSubgroup` を追加.
+- `G* = ker(det ∘ ρ)` は normal, かつ `G' ≤ G*` まで sorry-free.
+- `G* = ⊥` なら determinant character が `G ↪ Fˣ` になり `G` が abelian,
+  という BG Thm 2.6 の最終分岐を `commutative_of_determinantKernel_eq_bot`
+  として切り出し済み.
+- q=p theorem-facing endpoint として `G* = ⊥` 分岐と
+  `G*` が非自明 p-group の分岐を
+  `sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup`
+  に集約済み.
+- `O_p(G*) ≠ ⊥` なら Ch.1 `opCore` の characteristic-in-normal を使って
+  `G` の非自明 normal p-subgroup を作る bridge
+  `sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot`
+  も sorry-free.
+- q≠p 側の最初の group-theoretic bridge として、
+  非自明 normal p-subgroup から `O_p` 非自明を得る
+  `opCore_ne_bot_of_nontrivial_normal_pSubgroup` と、
+  `Q ∈ Syl_q(G)` なら `O_q(N_G(Q)) ≠ ⊥` を得る
+  `opCore_ne_bot_of_sylow_normalizer` を追加済み.
+- 書籍 step 5 (`G*` が p-group でない場合に `q ≠ p` の Sylow `Q` と
+  `H = N_{G*}(Q)` を取る段) に合わせて、
+  `exists_prime_ne_dvd_card_of_not_isPGroup` と
+  `exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup` を追加済み.
+  後者は後続の Burnside 分岐に必要な `q ∣ |G*|` も保持する.
+- 書籍の「`H` は abelian なので Burnside」という段を Ch.5 の formal entrypoint
+  (`N_G(Q) ≤ C_G(Q)` から normal p-complement) に渡す bridge
+  `hasNormalPComplement_of_sylow_normalizer_commutative` も追加済み.
+- normal complement 後の induction result を戻すため、
+  `N ⊴ G` かつ `O_p(N) ≠ ⊥` なら `O_p(G) ≠ ⊥` を得る
+  `opCore_ne_bot_of_normal_subgroup_opCore_ne_bot` を追加済み.
+  既存の determinant-kernel `O_p(G*)` bridge もこの汎用補題経由に整理した.
+- `O_q(G) ≠ ⊥` から BG の `K = Ω₁(Z(O_q(G)))` へ進む前段として、
+  `Z(O_q(G))` の image から非自明 abelian normal q-subgroup を取り出す
+  `exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot` を追加済み.
+  まだ `Ω₁` は定義せず、線形代数側に渡す abelian normal q-subgroup の足場に留めた.
+- Burnside normal complement 後の分岐を theorem-facing にまとめる
+  `exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction` も追加済み.
+  `N = ⊥` なら complement 条件から Sylow が `⊤` なので `O_p(G) ≠ ⊥`,
+  `N ≠ ⊥` なら induction で得る `O_r(N) ≠ ⊥` を ambient lift で
+  `O_r(G) ≠ ⊥` に戻す.
+- `G*` が p-group でない場合の step 5 全体を
+  `exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers` にまとめた.
+  残る入力は「`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian」
+  という前段 q≠p case の線形代数側と、normal complement `N` への induction 出力.
+- この spine を `determinantKernelSubgroup ρ` (`G*`) に接続する
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` も追加済み.
+  `G*` が p-group なら `O_p(G*) ≠ ⊥`, そうでなければ normalizer spine に渡す.
+- `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` の出力を
+  theorem conclusion へ渡す dispatch として、
+  `sylow_commutative_and_commutator_le_of_determinantKernel_core_spine` を追加.
+  `r = p` なら既存の `O_p(G*)` fixed-space endpoint に渡し、`r ≠ p` は
+  書籍の q≠p 線型代数 branch
+  (`O_r(G*) ≠ ⊥` から ambient `G` が abelian) を仮定入力として残す.
+  併せて ambient group が abelian なら Sylow conclusion が従う
+  `sylow_commutative_and_commutator_le_of_commutative` を共通化した.
+- 次 frontier は前段 q≠p case の線形代数入力
+  (`O_q(N_{G*}(Q)) ≠ ⊥` から `N_{G*}(Q)` が abelian) と、
+  core-level branch (`O_q(G*) ≠ ⊥`, `q ≠ p` から ambient `G` が abelian) を
+  Lean statement に分ける段. induction 仮定は theorem-facing helper に入ったので、
+  次は q≠p の線型代数そのものに集中できる.
+- PDF p.29 の q≠p branch 後半
+  (`V = W₁ ⊕ W₂`, `G` が両方の 1 次元部分空間を固定 ⇒ `G` abelian)
+  を Lean 側の対角化 bridge として
+  `commutative_of_faithful_representation_preserves_rank_one_complement`
+  に切り出した. これは rank-one scalar character が commutator を
+  `fixedOnSubmoduleAndQuotientSubgroup W₁ ρ` に入れる既存補題に、
+  補空間 `W₂` の不変性と `IsCompl W₁ W₂` を足して、残る shear を消すもの.
+  `eq_one_of_mem_fixedOnSubmoduleAndQuotientSubgroup_of_preserves_complement`
+  がその局所計算.
+- 次 frontier は前半: `O_q(G*) ≠ ⊥`, `q ≠ p` から
+  abelian normal q-subgroup `K` を取り、Maschke + algebraic closedness で
+  complementary rank-one `K`-submodules `W₁ W₂` を作る段と、
+  `K ⊴ G` + odd order により `G` が `W₁,W₂` を交換せず固定する段.
+- `K ⊴ G` から「各 `g` は `W₁,W₂` を固定または交換する」ところを
+  Fin 2 上の permutation action として渡せれば、odd order で交換を排除して
+  対角化 bridge へ渡す
+  `commutative_of_faithful_representation_permuted_rank_one_complement_of_odd`
+  も追加済み. 既存の `smul_fin_two_eq_self_of_odd_card` を使い、薄い wrapper ではなく
+  q≠p branch の line-permutation step を theorem-facing input にしたもの.
+- 次 frontier はさらに前半へ移動: q≠p core から abelian normal q-subgroup `K` を選び、
+  Maschke + algebraic closedness + `dim V = 2` で「`K`-module の二つの rank-one
+  summand が一意」という形の input を作る段.
+- `O_q(G*) ≠ ⊥` から BG の `K = Ω₁(Z(O_q(G*)))` に向かう前段として、
+  `exists_ambient_normal_commutative_qSubgroup_le_determinantKernel_of_opCore_ne_bot`
+  を追加済み. これは `O_q(G*)` を ambient `G` に持ち上げ、その中心を取ることで
+  `K ⊴ G`, `K ≤ G*`, `K` abelian q-subgroup, `K ≠ ⊥` を得る bridge.
+  まだ `Ω₁` / elementary abelian 化はしないが、p.29 の `x ∈ K#` で
+  `det x = 1` を使うための `K ≤ G*` と、`K ⊴ G` から line permutation へ進む
+  normality を同時に確保した.
+- 次 frontier はこの ambient `K` を使い、q≠p + Maschke + algebraic closedness で
+  `V` を二つの rank-one `K`-submodules に分解する statement へ進むこと.
+- その受け口として `RankOneLinePairData` と
+  `commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePair` を追加.
+  `O_q(G*) ≠ ⊥` から得た ambient `K` に対し、Maschke 側が
+  「二つの rank-one line と `G` による permutation」を返せば、
+  既存の odd-order no-interchange bridge で `G` abelian まで進む.
+  これは mathlib/Isaacs の単純 wrapper ではなく、q≠p branch の未形式化部分を
+  line-pair construction だけに絞る theorem-facing interface.
+- `finrank_eq_one_of_irreducible_representation_of_commutative_group` を追加.
+  BG p.29 の「`K` abelian + `F` algebraically closed ⇒ irreducible `FK`-module は
+  one-dimensional」に対応する bridge. mathlib の algebra representation 側の Schur
+  型結果へ、`Representation F K M` と手元の `Std.Commutative K` から渡すための
+  型変換を含むので、純粋な theorem rename ではない.
+- `neZero_nat_card_cast_of_isPGroup_ne_char` を追加.
+  q≠p branch の Maschke 前提 `NeZero (Nat.card K : F)` を、`K` が q-group で
+  `CharP F p` かつ `q ≠ p` であることから作る算術 bridge. `|K| = q^n` と
+  `CharP.cast_eq_zero_iff` を接続するもので、薄い wrapper ではない.
+- `complement_rank_one_right_subquotients_of_finrank_two` と
+  `both_lines_le_comap_left_or_right_of_determinantKernel_subgroup` を追加.
+  前者は `V = W ⊕ U`, `dim V = 2`, `dim W = 1` から補線 `U` と `V/U` の
+  rank-one data を作る bridge. 後者は determinant-kernel uniqueness を
+  `W` と `U` の両方へ適用し、各 `g : G` が各 line を `W`/`U` のどちらかへ
+  送る comap alternatives を同時に返す.
+- 次 frontier はこの「両 line の alternatives」を coherent な `Fin 2` permutation
+  action にまとめ、`RankOneLinePairData.permutes` へ渡す段.
+- `conjugateSubrepresentations_stay_or_swap_of_determinantKernel_subgroup` と
+  `both_lines_le_comap_stay_or_swap_of_determinantKernel_subgroup` を追加.
+  前単位の左右独立な alternatives から、`IsCompl` と rank-one 非零性で混合ケースを
+  排除し、各 `g : G` が二つの line を「両方固定」または「両方交換」するところまで
+  coherent にした.
+- 次 frontier はこの per-element stay/swap dichotomy から odd-order で swap case を
+  排除する段. ここを直接証明するか、必要なら `Fin 2` action を構成して
+  既存の `smul_fin_two_eq_self_of_odd_card` へ渡す.
+- `odd_two_dim_sylow_abelian` 本体の q=p determinant-kernel branch を既存の
+  sorry-free endpoint に接続した. `G* = ⊥` は determinant character で ambient
+  abelian, `G*` が非自明 p-group なら fixed-space endpoint で Sylow conclusion.
+  残る `sorry` は `G* ≠ ⊥` かつ `¬ IsPGroup p G*` の branch に集中した.
+- q≠p の line permutation 後半を action-free な bridge として
+  `commutative_of_faithful_representation_stay_or_swap_rank_one_complement_of_odd`
+  に切り出した. 既存の determinant-kernel uniqueness が出す
+  per-element stay/swap dichotomy から, odd order で swap を排除し, diagonal
+  complement bridge で ambient `G` abelian まで進む.
+- さらに `commutative_of_determinantKernel_subgroup_rank_one_complement` を追加し,
+  Maschke 側が `K ≤ G*` 上の complementary rank-one `K`-submodules と非自明元を
+  返せば、そのまま q≠p core branch を閉じられる形にした. 次 frontier は
+  `K` からこの二つの rank-one line を作る Maschke/algebraically-closed step.
+- `commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules` を追加.
+  `O_q(G*) ≠ ⊥` から取った abelian normal `q`-subgroup `K ≤ G*` に対して,
+  Maschke 側が二つの complementary rank-one `K`-subrepresentations を返せば,
+  action を別途構成せず ambient `G` abelian まで進む interface. これで次の
+  Lean frontier は BG p.16 の
+  "V is a direct sum of irreducible FK-modules" と
+  "irreducible FK-modules are one-dimensional" の実装に集中できる.
+- `exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char` で、
+  既存の Maschke complement extraction を theorem-facing input shape に接続した.
+  `W` 側だけでなく補線 `U` と `V/U` の rank-one data, さらに必要な
+  `Free`/`Finite` evidence をまとめて返す.
+- `commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed` を追加し、
+  `F` が algebraically closed で `q ≠ p`, `O_q(G*) ≠ ⊥` なら ambient `G` が
+  abelian になる q≠p determinant-core endpoint を sorry-free にした.
+  残る theorem-level frontier は、元の体から algebraic closure へ移す route と、
+  group-theoretic core spine を `odd_two_dim_sylow_abelian` 本体へ接続する段.
+- `sylow_commutative_and_commutator_le_of_determinantKernel_spine_rankOneKSubmodules`
+  と `sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed`
+  を追加. theorem-level determinant-kernel spine は古い `RankOneLinePairData`
+  入力ではなく、Maschke が返す complementary rank-one `K`-submodule data から
+  Sylow conclusion まで進めるようになった. algebraically closed 版ではこの data
+  を `exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char` で直接供給する.
+  残る frontier は (1) normalizer `H=N_{G*}(Q)` への q≠p endpoint の制限適用,
+  (2) induction hypothesis `hind` の theorem 本体への供給, (3) 元の体から
+  algebraic closure へ移す route.
