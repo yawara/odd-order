@@ -33,10 +33,13 @@ orthonormal-pair structures, up to a uniform sign.
   `issues/0025-peterfalvi-isometry-difference-core.md`.  The theorem needs
   second orthogonality to identify the irreducible-character basis coefficients
   and a separate finite integer-vector induction proving the uniform sign shape.
+  The statement also carries the degree-zero input used in Peterfalvi's
+  `e₂ + e₃` exclusion: every image `τ (χ_i - χ_0)` vanishes at `1`.
 
 ## Main statement
 
 * `OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily`.
+* `OddOrder.RepresentationTheory.IsometryDifferenceImagesVanishAtOne`.
 * `OddOrder.RepresentationTheory.isometry_difference_pair_structure`.
 
 ## References
@@ -131,6 +134,22 @@ theorem irreducibleCharacterDifference_eq_zero_iff
     subst hi
     simp
 
+@[simp] theorem irreducibleCharacterDifference_apply_one
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G) (i : Fin n) :
+    irreducibleCharacterDifference χ i (1 : G) =
+      ((χ i : ClassFunction G ℂ) : G → ℂ) 1 -
+        ((χ 0 : ClassFunction G ℂ) : G → ℂ) 1 :=
+  rfl
+
+theorem irreducibleCharacterDifference_apply_one_of_same_degree
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (h_same_degree :
+      ∀ i, ((χ i : ClassFunction G ℂ) : G → ℂ) 1 =
+        ((χ 0 : ClassFunction G ℂ) : G → ℂ) 1)
+    (i : Fin n) :
+    irreducibleCharacterDifference χ i (1 : G) = 0 := by
+  simp [h_same_degree i]
+
 theorem irreducibleCharacterDifference_inner_self_of_ne_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hrow : CharacterTableRowOrthogonality (G := G))
@@ -164,6 +183,17 @@ abbrev isometryDifferenceImage {G H : Type*} [Group G] [Group H]
     (χ : Fin n → IrreducibleCharacter H) :
     isometryDifferenceImage τ χ 0 = 0 := by
   simp [isometryDifferenceImage]
+
+/-- The degree-zero hypothesis for the images in Peterfalvi §3 (1.4).
+
+In the textbook this comes from the map landing in the reduced virtual-character
+lattice on `G#`; here it is kept as an explicit class-function condition until
+that lattice target is part of the theorem statement. -/
+def IsometryDifferenceImagesVanishAtOne {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) : Prop :=
+  ∀ i, isometryDifferenceImage τ χ i (1 : G) = 0
 
 theorem isometryDifferenceImage_inner_self_of_ne_zero
     [Fintype G] [Fintype H]
@@ -302,6 +332,41 @@ abbrev signedDifference (data : SignedIrreducibleDifferenceFamily G n)
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
     data.signedDifference i = data.sign • data.difference i :=
   rfl
+
+@[simp] theorem difference_apply_one
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.difference i (1 : G) =
+      data.classFunction i (1 : G) - data.classFunction 0 (1 : G) :=
+  rfl
+
+theorem signedDifference_apply_one_eq_zero_iff
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.signedDifference i (1 : G) = 0 ↔ data.difference i (1 : G) = 0 := by
+  rcases data.sign_eq with hsign | hsign
+  · simp [signedDifference, hsign]
+  · constructor
+    · intro h
+      have hneg : (-data.difference i) (1 : G) = 0 := by
+        simpa [signedDifference, hsign] using h
+      change -(data.difference i (1 : G)) = 0 at hneg
+      exact neg_eq_zero.mp hneg
+    · intro h
+      have hneg : (-data.difference i) (1 : G) = 0 := by
+        change -(data.difference i (1 : G)) = 0
+        rw [h, neg_zero]
+      simpa [signedDifference, hsign] using hneg
+
+theorem signedDifference_apply_one_eq_zero_of_difference
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n}
+    (hi : data.difference i (1 : G) = 0) :
+    data.signedDifference i (1 : G) = 0 :=
+  (data.signedDifference_apply_one_eq_zero_iff i).mpr hi
+
+theorem difference_apply_one_eq_zero_of_signedDifference
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n}
+    (hi : data.signedDifference i (1 : G) = 0) :
+    data.difference i (1 : G) = 0 :=
+  (data.signedDifference_apply_one_eq_zero_iff i).mp hi
 
 @[simp] theorem signedDifference_zero
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] :
@@ -480,6 +545,7 @@ theorem isometry_difference_pair_structure
       ∀ i, ((χ i : ClassFunction H ℂ) : H → ℂ) 1 =
         ((χ 0 : ClassFunction H ℂ) : H → ℂ) 1)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ)
     (h_isom : ∀ i j,
         ClassFunction.inner (isometryDifferenceImage τ χ i)
           (isometryDifferenceImage τ χ j) =

@@ -80,6 +80,11 @@ created: 2026-05-25
   `isometryDifferenceImage_inner_of_ne_zero_of_ne` により、`h_isom` と source
   row orthogonality から image 側 norm `2` / mutual inner `1` を直接取り出せる。
   `isometry_difference_pair_structure` の statement もこの named interface へ寄せた。
+- `irreducibleCharacterDifference_apply_one_of_same_degree`,
+  `IsometryDifferenceImagesVanishAtOne`, and
+  `SignedIrreducibleDifferenceFamily.signedDifference_apply_one_eq_zero_iff` を追加した。
+  §3 (1.4) の `e₂ + e₃` 除外で使う degree-zero 条件を明示し、
+  `isometry_difference_pair_structure` には image 側 `τ(χ_i-χ_0)(1)=0` 仮定を追加した。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

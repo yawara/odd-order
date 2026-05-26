@@ -170,7 +170,12 @@ have inner product `1`.
 `isometryDifferenceImage_inner_self_of_ne_zero` /
 `isometryDifferenceImage_inner_of_ne_zero_of_ne` transfer the source-side
 norm/inner values across `h_isom` without unfolding the raw class-function
-differences.
+differences.  `irreducibleCharacterDifference_apply_one_of_same_degree`,
+`IsometryDifferenceImagesVanishAtOne`, and
+`SignedIrreducibleDifferenceFamily.signedDifference_apply_one_eq_zero_iff`
+record the degree-zero side of (1.4); the abstract structure theorem now
+expects the image-side condition `τ(χ_i-χ_0)(1)=0`, matching the reduced
+target lattice used in Peterfalvi's proof.
 
 **形式化**: ~60-80 行 (非自明だが self-contained).
 
