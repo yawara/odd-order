@@ -16,6 +16,7 @@ import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Tactic.LinearCombination
+import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -2922,6 +2923,137 @@ private theorem center_opCore_comm
   -- hcomm : (y : _) * (x : _) = (x : _) * (y : _).  Want x * y = y * x in Z(L).
   apply Subtype.ext
   exact hcomm.symm
+
+/-! ### Step 7 preparation: `V := Ω₁(Z(O_p(G)))` as a subgroup of `G` (sub-session A)
+
+For the Step 5-6 application of Cor 4.35 we need
+`V := Ω₁(Z(O_p(G)))`, i.e., `{z ∈ Z(O_p(G)) | z^p = 1}`.  Since `Z(O_p(G))`
+is abelian (it is a center), this set forms a subgroup of `G` directly,
+without taking a closure.  We package it as `omega1ZCenterOpCore` together
+with its key properties: normal in `G`, contained in `O_p(G)`, abelian as
+a group, and a `p`-group.
+
+These are the structural ingredients for **Isaacs Thm 7.6 Step 7 sub-session
+(A)**.  The downstream application combines `V` with Cor 4.35
+(`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`) to derive
+`[A, V] = ⊥` from the fixed-point hypothesis. -/
+
+/-- Local notation shorthand inside §7B: the underlying subgroup of `Z(O_p(G))`
+viewed inside `G` (i.e., the image of `Subgroup.center (opCore p G)` under
+the inclusion `opCore p G ↪ G`). -/
+private def zCenterOpCoreSubgroup (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
+  (Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G)).map
+    (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G).subtype
+
+private theorem zCenterOpCoreSubgroup_le_opCore
+    {G : Type*} [Group G] {p : ℕ} :
+    zCenterOpCoreSubgroup G p ≤ OddOrder.Isaacs.Ch01.opCore p G := by
+  rintro _ ⟨⟨z, hz_L⟩, _, rfl⟩
+  exact hz_L
+
+private theorem zCenterOpCoreSubgroup_comm
+    {G : Type*} [Group G] {p : ℕ} :
+    ∀ x ∈ zCenterOpCoreSubgroup G p,
+      ∀ y ∈ zCenterOpCoreSubgroup G p, x * y = y * x := by
+  rintro _ ⟨⟨x, hx_L⟩, hx_center, rfl⟩ _ ⟨⟨y, hy_L⟩, hy_center, rfl⟩
+  -- ⟨x, _⟩ ∈ Z(L) so commutes with ⟨y, _⟩ in L; project to G.
+  -- mem_center_iff: x ∈ center ↔ ∀ g, g * x = x * g.
+  have hcomm :
+      (⟨y, hy_L⟩ : OddOrder.Isaacs.Ch01.opCore p G) * ⟨x, hx_L⟩ =
+        ⟨x, hx_L⟩ * ⟨y, hy_L⟩ :=
+    Subgroup.mem_center_iff.mp hx_center _
+  exact (congr_arg Subtype.val hcomm).symm
+
+/-- **V := Ω₁(Z(O_p(G)))** as a subgroup of `G`.
+
+The set `{g ∈ Z(O_p(G)) | g^p = 1}`, viewed inside `G`.  Since `Z(O_p(G))`
+is abelian, this is a subgroup of `G` directly (no closure required).
+
+This is the `V` of **Isaacs Thm 7.6 Step 7 sub-session (A)**: the bottom
+layer `Ω₁` of the center of the `p`-core, on which the action of
+`A ∈ E(P)` will be analyzed via Cor 4.35. -/
+def omega1ZCenterOpCore (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
+  OddOrder.GroupTheory.omega1OfAbelian G (zCenterOpCoreSubgroup G p) p
+    zCenterOpCoreSubgroup_comm
+
+/-- Membership characterization for `V := Ω₁(Z(O_p(G)))`. -/
+theorem mem_omega1ZCenterOpCore {G : Type*} [Group G] {p : ℕ} {g : G} :
+    g ∈ omega1ZCenterOpCore G p ↔
+      g ∈ zCenterOpCoreSubgroup G p ∧ g ^ p = 1 := by
+  unfold omega1ZCenterOpCore
+  exact OddOrder.GroupTheory.mem_omega1OfAbelian
+
+/-- `V ≤ Z(O_p(G))` (the bottom layer is contained in the center it sits in). -/
+theorem omega1ZCenterOpCore_le_zCenterOpCore
+    {G : Type*} [Group G] {p : ℕ} :
+    omega1ZCenterOpCore G p ≤ zCenterOpCoreSubgroup G p :=
+  OddOrder.GroupTheory.omega1OfAbelian_le
+
+/-- `V ≤ O_p(G)`: immediate via the chain `V ≤ Z(O_p(G)) ≤ O_p(G)`. -/
+theorem omega1ZCenterOpCore_le_opCore
+    {G : Type*} [Group G] {p : ℕ} :
+    omega1ZCenterOpCore G p ≤ OddOrder.Isaacs.Ch01.opCore p G :=
+  omega1ZCenterOpCore_le_zCenterOpCore.trans zCenterOpCoreSubgroup_le_opCore
+
+/-- **Isaacs Thm 7.6 Step 7 sub-session (A)**: `V := Ω₁(Z(O_p(G)))` is normal in `G`.
+
+Proof: `Z(O_p(G))` (as `zCenterOpCoreSubgroup`) is normal in `G` (already in
+`center_opCore_map_normal`).  Conjugation by `g ∈ G` preserves the power map
+`x ↦ x^p`, so it sends `{z ∈ Z(O_p(G)) | z^p = 1}` to itself. -/
+instance omega1ZCenterOpCore_normal {G : Type*} [Group G] {p : ℕ} :
+    (omega1ZCenterOpCore G p).Normal := by
+  refine ⟨?_⟩
+  intro n hn g
+  rw [mem_omega1ZCenterOpCore] at hn ⊢
+  refine ⟨?_, ?_⟩
+  · -- Z(O_p(G)) is normal (center_opCore_map_normal).
+    have h_norm : (zCenterOpCoreSubgroup G p).Normal := center_opCore_map_normal
+    exact h_norm.conj_mem _ hn.1 g
+  · -- (g * n * g⁻¹) ^ p = g * n^p * g⁻¹ = g * 1 * g⁻¹ = 1.
+    calc (g * n * g⁻¹) ^ p
+        = g * n ^ p * g⁻¹ := by rw [conj_pow]
+      _ = g * 1 * g⁻¹ := by rw [hn.2]
+      _ = 1 := by group
+
+/-- `V := Ω₁(Z(O_p(G)))` is a `p`-group.
+
+Direct consequence of `V ≤ O_p(G)` and `O_p(G)` being a `p`-group. -/
+theorem omega1ZCenterOpCore_isPGroup
+    {G : Type*} [Group G] (p : ℕ) [Fact p.Prime] :
+    IsPGroup p (omega1ZCenterOpCore G p) :=
+  (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).of_injective
+    (Subgroup.inclusion omega1ZCenterOpCore_le_opCore)
+    (Subgroup.inclusion_injective _)
+
+/-- The elements of `V := Ω₁(Z(O_p(G)))` commute pairwise (V is abelian).
+
+Inherited from the fact that they sit in `Z(O_p(G))`. -/
+theorem omega1ZCenterOpCore_comm {G : Type*} [Group G] {p : ℕ} :
+    ∀ x y : ↥(omega1ZCenterOpCore G p), x * y = y * x := by
+  intro x y
+  apply Subtype.ext
+  have hx : (x : G) ∈ zCenterOpCoreSubgroup G p :=
+    omega1ZCenterOpCore_le_zCenterOpCore x.2
+  have hy : (y : G) ∈ zCenterOpCoreSubgroup G p :=
+    omega1ZCenterOpCore_le_zCenterOpCore y.2
+  exact zCenterOpCoreSubgroup_comm _ hx _ hy
+
+/-- `V := Ω₁(Z(O_p(G)))` as a `CommGroup`.
+
+The pairwise-commutativity from `omega1ZCenterOpCore_comm` upgrades the
+ambient `Group ↥V` structure to `CommGroup`. -/
+@[reducible] def omega1ZCenterOpCore_commGroup (G : Type*) [Group G] (p : ℕ) :
+    CommGroup ↥(omega1ZCenterOpCore G p) :=
+  { (inferInstance : Group ↥(omega1ZCenterOpCore G p)) with
+    mul_comm := omega1ZCenterOpCore_comm }
+
+/-- Every element of `V := Ω₁(Z(O_p(G)))` has order dividing `p`.
+
+Pure unpacking of `mem_omega1ZCenterOpCore.2`. -/
+theorem pow_p_eq_one_of_mem_omega1ZCenterOpCore
+    {G : Type*} [Group G] {p : ℕ} {g : G}
+    (hg : g ∈ omega1ZCenterOpCore G p) : g ^ p = 1 :=
+  ((mem_omega1ZCenterOpCore).mp hg).2
 
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
