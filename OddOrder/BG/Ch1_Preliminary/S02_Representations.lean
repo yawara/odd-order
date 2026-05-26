@@ -1636,6 +1636,65 @@ private theorem opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
   exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
     (G := G) (K := K) hKp hK_ne_bot
 
+/-- A nontrivial `q`-core contains a nontrivial abelian normal `q`-subgroup.
+
+This is the group-theoretic precursor to BG's
+`K = Ω₁(Z(O_q(G^*)))`: before introducing `Ω₁`, the center of `O_q(G)` already
+gives a nontrivial abelian normal `q`-subgroup. -/
+private theorem exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
+    {q : ℕ} [Fact q.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow q G)]
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q G ≠ ⊥) :
+    ∃ K : Subgroup G, K.Normal ∧ IsPGroup q K ∧ K ≠ ⊥ ∧
+      Std.Commutative (· * · : K → K → K) := by
+  set O : Subgroup G := OddOrder.Isaacs.Ch01.opCore q G with hO_def
+  have hO_ne_bot : O ≠ ⊥ := by
+    simpa [hO_def] using hcore_ne_bot
+  have hO_p : IsPGroup q O := by
+    rw [hO_def]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup q G
+  have hO_nontrivial : Nontrivial O :=
+    (Subgroup.nontrivial_iff_ne_bot O).mpr hO_ne_bot
+  haveI : Nontrivial O := hO_nontrivial
+  have hcenter_nontrivial : Nontrivial (Subgroup.center O) := by
+    have htop_nontrivial : Nontrivial (⊤ : Subgroup O) :=
+      (Subgroup.nontrivial_iff_ne_bot (⊤ : Subgroup O)).mpr top_ne_bot
+    have h :=
+      OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial
+        (P := O) (p := q) (N := (⊤ : Subgroup O))
+        hO_p htop_nontrivial
+    simpa using h
+  let Z : Subgroup G := (Subgroup.center O).map O.subtype
+  haveI : O.Normal := by
+    rw [hO_def]
+    infer_instance
+  haveI : (Subgroup.center O).Characteristic := Subgroup.centerCharacteristic
+  have hZnormal : Z.Normal := by
+    dsimp [Z]
+    infer_instance
+  have hZp : IsPGroup q Z := by
+    dsimp [Z]
+    exact (hO_p.to_subgroup (Subgroup.center O)).map O.subtype
+  have hZ_ne_bot : Z ≠ ⊥ := by
+    intro hZ_bot
+    have hcenter_ne_bot : Subgroup.center O ≠ ⊥ :=
+      (Subgroup.nontrivial_iff_ne_bot (Subgroup.center O)).mp hcenter_nontrivial
+    apply hcenter_ne_bot
+    have hmap :
+        (Subgroup.center O).map O.subtype = (⊥ : Subgroup O).map O.subtype := by
+      simpa [Z] using hZ_bot
+    exact (Subgroup.map_subtype_inj (H := O)).mp hmap
+  have hZcomm : Std.Commutative (· * · : Z → Z → Z) := by
+    constructor
+    intro x y
+    apply Subtype.ext
+    rcases x.property with ⟨xO, hxO_center, hx_eq⟩
+    rcases y.property with ⟨yO, _hyO_center, hy_eq⟩
+    change (x : G) * (y : G) = (y : G) * (x : G)
+    rw [← hx_eq, ← hy_eq]
+    simpa using (congr_arg Subtype.val
+      (Subgroup.mem_center_iff.mp hxO_center yO)).symm
+  exact ⟨Z, hZnormal, hZp, hZ_ne_bot, hZcomm⟩
+
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
 This isolates the group-theoretic part of BG Thm 2.6 where, after choosing

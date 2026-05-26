@@ -474,6 +474,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `N ⊴ G` かつ `O_p(N) ≠ ⊥` なら `O_p(G) ≠ ⊥` を得る
   `opCore_ne_bot_of_normal_subgroup_opCore_ne_bot` を追加済み.
   既存の determinant-kernel `O_p(G*)` bridge もこの汎用補題経由に整理した.
+- `O_q(G) ≠ ⊥` から BG の `K = Ω₁(Z(O_q(G)))` へ進む前段として、
+  `Z(O_q(G))` の image から非自明 abelian normal q-subgroup を取り出す
+  `exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot` を追加済み.
+  まだ `Ω₁` は定義せず、線形代数側に渡す abelian normal q-subgroup の足場に留めた.
 - Burnside normal complement 後の分岐を theorem-facing にまとめる
   `exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction` も追加済み.
   `N = ⊥` なら complement 条件から Sylow が `⊤` なので `O_p(G) ≠ ⊥`,
