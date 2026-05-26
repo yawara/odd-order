@@ -317,7 +317,23 @@ FT クリティカル度 + 章内依存で並べる:
   cardinality は `p + 1`. これを contradiction package に接続して
   `false_of_frobeniusAction_isElementaryAbelian_card_prime_sq` / subgroup actor 版まで
   sorry-free.
-  残りは solvable Frobenius group から具体的な `SubgroupPartition` を作る 6.9 側の構成.
+- 6.9 solvable Frobenius group 分岐:
+  Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
+  `SubgroupPartition.frobeniusGroup` として実装し,
+  `frobeniusGroup_parts_card` で `|Π| = 1 + |N|` まで sorry-free.
+  これを 6.8 contradiction package に接続して,
+  `false_of_frobeniusAction_isFrobeniusGroup_on_abelian` まで実装済み.
+  さらに L3495 の reduction 用に,
+  `false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup`
+  を追加: Frobenius actor の部分群 `B` が Frobenius group で, target 側に非自明
+  `B`-invariant abelian subgroup があれば矛盾.
+  残りは Ch.3 Thm 3.23(a) の A-invariant Sylow 存在を実装し,
+  `R > 1` から `Z(R) > 1` と characteristic invariance をつないで,
+  本文通り target を `Z(R)` に落とす部分.
+- wrapper 監査:
+  今回追加した `ncard_conjugates_eq_index_of_TI` は 6.5 の conjugate counting proof を
+  6.9 の Frobenius partition cardinality でも使うための private proof extraction.
+  mathlib theorem / 既存 theorem の純粋リネーム wrapper は追加していない.
 
 ## 開発時の注意点
 
