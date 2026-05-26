@@ -1961,6 +1961,19 @@ theorem quotientActionHom_apply_mk' {A V : Type*} [Group A] [Group V]
   OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
     hU a v
 
+/-- The image of `C_V(P)` in `V/U` is fixed by `P` for the induced quotient action. -/
+theorem actionCentralizer_quotient_image_le_quotientActionHom_actionCentralizer
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) :
+    (actionCentralizer φ P).map (QuotientGroup.mk' U) ≤
+      actionCentralizer (quotientActionHom φ hU) P := by
+  rintro _ ⟨v, hv, rfl⟩ p
+  change (quotientActionHom φ hU (p : A)) (QuotientGroup.mk' U v) =
+    QuotientGroup.mk' U v
+  rw [quotientActionHom_apply_mk']
+  exact congrArg (QuotientGroup.mk' U) (hv p)
+
 /-- Kernel of the induced action on `V/U`. In Isaacs Thm 7.5 this is the subgroup `K`
 acting trivially on `V/U`. -/
 noncomputable def quotientActionKernel {A V : Type*} [Group A] [Group V]
@@ -1994,6 +2007,49 @@ theorem quotientActionFaithfulHom_mk' {A V : Type*} [Group A] [Group V]
         (QuotientGroup.mk' (quotientActionKernel φ hU) a) =
       quotientActionHom φ hU a :=
   rfl
+
+/-- In the faithful quotient action of `A/K` on `V/U`, the image of `C_V(P)` is fixed by
+the image of `P`. -/
+theorem actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) :
+    (actionCentralizer φ P).map (QuotientGroup.mk' U) ≤
+      actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU))) := by
+  rintro _ ⟨v, hv, rfl⟩ pbar
+  rcases pbar.property with ⟨p, hpP, hp_eq⟩
+  have hfix :
+      (quotientActionHom φ hU p) (QuotientGroup.mk' U v) =
+        QuotientGroup.mk' U v := by
+    rw [quotientActionHom_apply_mk']
+    exact congrArg (QuotientGroup.mk' U) (hv ⟨p, hpP⟩)
+  have hpbar : (pbar : A ⧸ quotientActionKernel φ hU) =
+      QuotientGroup.mk' (quotientActionKernel φ hU) p := hp_eq.symm
+  change (quotientActionFaithfulHom φ hU (pbar : A ⧸ quotientActionKernel φ hU))
+      (QuotientGroup.mk' U v) = QuotientGroup.mk' U v
+  rw [hpbar, quotientActionFaithfulHom_mk']
+  exact hfix
+
+/-- The fixed-subgroup index hypothesis descends to the faithful quotient action on `V/U`. -/
+theorem actionCentralizer_quotientActionFaithful_index_le
+    {A V : Type*} [Group A] [Group V] [Finite V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Subgroup A) {p : ℕ}
+    (hU_le : U ≤ actionCentralizer φ P)
+    (hP : (actionCentralizer φ P).index ≤ p) :
+    (actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU)))).index ≤ p := by
+  have hle := actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+    hU P
+  calc
+    (actionCentralizer (quotientActionFaithfulHom φ hU)
+        (P.map (QuotientGroup.mk' (quotientActionKernel φ hU)))).index
+        ≤ ((actionCentralizer φ P).map (QuotientGroup.mk' U)).index :=
+          Subgroup.index_antitone hle
+    _ = (actionCentralizer φ P).index :=
+          actionCentralizer_quotient_image_index_eq_of_le φ P hU_le
+    _ ≤ p := hP
 
 /-- The action of `A/K` on `V/U` is faithful by construction. -/
 theorem quotientActionFaithfulHom_injective {A V : Type*} [Group A] [Group V]

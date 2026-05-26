@@ -449,6 +449,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotientActionFaithfulHom_injective
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotient_image_le_quotientActionHom_actionCentralizer
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotient_image_le_quotientActionFaithful_actionCentralizer
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.actionCentralizer_quotientActionFaithful_index_le
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.normal_of_quotient_image_normal_of_le
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.sylow_normal_of_quotient_image_normal_of_normal_isPGroup
