@@ -163,6 +163,14 @@
   quotient ではなく二つの Maschke line 上の scalar character の積 `= 1` として
   直接使える. 次はこの積公式と「二つの scalar が等しい」という仮定から
   odd order / faithful action の矛盾を取り出す.
+- **2026-05-26**: distinct scalar witness として
+  `scalarCharacters_ne_of_mem_determinantKernel_of_ne_one` を追加済み.
+  非自明な odd-order 元 `g ∈ G*` が二つの preserved rank-one complement 上で
+  同じ scalar を持つと、determinant product から common scalar の二乗が `1`,
+  odd order から scalar が `1`, faithfulness から `g = 1` となり矛盾する.
+  次はこの witness を
+  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars` と
+  normal conjugate line bridge に渡して `RankOneLinePairData.permutes` を作る.
 
 ## TL;DR
 

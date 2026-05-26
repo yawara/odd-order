@@ -1765,6 +1765,83 @@ private theorem scalarCharacters_complement_mul_eq_one_of_mem_determinantKernel
       hdimU hdimQ g
   simpa [hquot_eq] using hprod
 
+/-- A nontrivial odd-order determinant-kernel element has distinct scalars on
+two preserved complementary rank-one lines.
+
+This is the BG Thm 2.6 q ≠ p eigenvalue step: if the two scalars were equal,
+their determinant product would make the common scalar square to one; odd order
+then forces both scalars to be one, and faithfulness makes the element trivial. -/
+private theorem scalarCharacters_ne_of_mem_determinantKernel_of_ne_one
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W U : Submodule F V) [Module.Free F W] [Module.Free F U]
+    [Module.Finite F U] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hcompl : IsCompl W U)
+    (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hU : ∀ g : G, U ≤ U.comap (ρ g))
+    (hdimW : Module.finrank F W = 1)
+    (hdimU : Module.finrank F U = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    {g : G} (hgdet : g ∈ determinantKernelSubgroup ρ)
+    (hoddg : Odd (orderOf g)) (hg_ne_one : g ≠ 1) :
+    scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g ≠
+      scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U hU) g := by
+  let φW : G →* Fˣ := scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW)
+  let φU : G →* Fˣ := scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U hU)
+  intro hsame
+  have hprod :
+      φW g * φU g = 1 :=
+    scalarCharacters_complement_mul_eq_one_of_mem_determinantKernel
+      W U ρ hcompl hW hU hdimW hdimU hdimQ hgdet
+  have hsq : (φW g) ^ 2 = 1 := by
+    simpa [φW, φU, pow_two, hsame] using hprod
+  have hpow_order : (φW g) ^ orderOf g = 1 := by
+    rw [← map_pow, pow_orderOf_eq_one, map_one]
+  have horder_dvd_two : orderOf (φW g) ∣ 2 := by
+    rw [orderOf_dvd_iff_pow_eq_one]
+    exact hsq
+  have horder_dvd_g : orderOf (φW g) ∣ orderOf g :=
+    orderOf_dvd_of_pow_eq_one hpow_order
+  have hodd_scalar : Odd (orderOf (φW g)) :=
+    hoddg.of_dvd_nat horder_dvd_g
+  have horder_pos : 0 < orderOf (φW g) := Odd.pos hodd_scalar
+  have horder_le_two : orderOf (φW g) ≤ 2 :=
+    Nat.le_of_dvd (by decide) horder_dvd_two
+  have horder_ne_two : orderOf (φW g) ≠ 2 := by
+    intro htwo
+    rw [htwo] at hodd_scalar
+    exact (by norm_num : ¬ Odd (2 : ℕ)) hodd_scalar
+  have horder_one : orderOf (φW g) = 1 := by omega
+  have hφW_one : φW g = 1 := orderOf_eq_one_iff.mp horder_one
+  have hφU_one : φU g = 1 := by
+    simpa [φW, φU, hsame] using hφW_one
+  have hg_one : g = 1 := by
+    apply hfaithful
+    ext v
+    obtain ⟨w, u, hv, _huniq⟩ := Submodule.existsUnique_add_of_isCompl hcompl v
+    have hw_fix : ρ g (w : V) = (w : V) := by
+      have hw_scalar :=
+        scalarCharacterOfFinrankEqOne_apply_smul hdimW
+          (ρ.subrepresentation W hW) g w
+      calc
+        ρ g (w : V) = (φW g : F) • (w : V) := congrArg Subtype.val hw_scalar
+        _ = (w : V) := by simp [hφW_one]
+    have hu_fix : ρ g (u : V) = (u : V) := by
+      have hu_scalar :=
+        scalarCharacterOfFinrankEqOne_apply_smul hdimU
+          (ρ.subrepresentation U hU) g u
+      calc
+        ρ g (u : V) = (φU g : F) • (u : V) := congrArg Subtype.val hu_scalar
+        _ = (u : V) := by simp [hφU_one]
+    calc
+      ρ g v = ρ g ((w : V) + (u : V)) := by rw [hv]
+      _ = ρ g (w : V) + ρ g (u : V) := map_add (ρ g) (w : V) (u : V)
+      _ = (w : V) + (u : V) := by rw [hw_fix, hu_fix]
+      _ = v := hv
+      _ = (ρ 1) v := by simp
+  exact hg_ne_one hg_one
+
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup
     {F : Type*} [Field F] {G : Type*} [Group G]
