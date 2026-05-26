@@ -396,6 +396,46 @@ theorem gl2_pSubgroup_card_le_prime {p : ℕ} [Fact p.Prime]
       exact Nat.dvd_of_mul_dvd_mul_left hp_pos hmul
     exact hp_not_dvd_rest hp_dvd_rest
 
+/-- If a Sylow `p`-subgroup has order at most `p` and is not normal, then `O_p(G)=1`.
+
+This is the `O_p(G)=1` reduction in Isaacs Thm 7.5 after the faithful action has embedded
+the group into `GL(2,p)` and `gl2_pSubgroup_card_le_prime` has bounded `|P|`. -/
+theorem opCore_eq_bot_of_sylow_card_le_prime_of_not_normal
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP_card : Nat.card (P : Subgroup G) ≤ p)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) :
+    OddOrder.Isaacs.Ch01.opCore p G = ⊥ := by
+  by_contra hOp_ne_bot
+  have hOp_le_P : OddOrder.Isaacs.Ch01.opCore p G ≤ (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch01.opCore_le P
+  have hOp_p : IsPGroup p (OddOrder.Isaacs.Ch01.opCore p G) :=
+    OddOrder.Isaacs.Ch01.opCore_isPGroup p G
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hOp_p
+  have hOp_gt_one : 1 < Nat.card (OddOrder.Isaacs.Ch01.opCore p G) :=
+    (Subgroup.one_lt_card_iff_ne_bot (OddOrder.Isaacs.Ch01.opCore p G)).mpr hOp_ne_bot
+  have hp_le_Op : p ≤ Nat.card (OddOrder.Isaacs.Ch01.opCore p G) := by
+    cases n with
+    | zero =>
+        have hcard_one : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) = 1 := by
+          simpa using hn
+        omega
+    | succ n =>
+        rw [hn, pow_succ]
+        have hpow_pos : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
+        simpa [mul_comm] using Nat.le_mul_of_pos_right p hpow_pos
+  have hOp_card_le_P : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) ≤
+      Nat.card (P : Subgroup G) :=
+    Subgroup.card_le_of_le hOp_le_P
+  have hP_card_eq : Nat.card (P : Subgroup G) = p :=
+    le_antisymm hP_card (hp_le_Op.trans hOp_card_le_P)
+  have hOp_card_eq : Nat.card (OddOrder.Isaacs.Ch01.opCore p G) = p :=
+    le_antisymm (hOp_card_le_P.trans hP_card) hp_le_Op
+  have hOp_eq_P : OddOrder.Isaacs.Ch01.opCore p G = (P : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hOp_le_P (by rw [hP_card_eq, hOp_card_eq])
+  apply hP_not_normal
+  rw [← hOp_eq_P]
+  infer_instance
+
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
       p * (p - 1) * (p + 1) := by
