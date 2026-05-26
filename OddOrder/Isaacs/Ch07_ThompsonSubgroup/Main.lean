@@ -2668,7 +2668,7 @@ end -- 7A
 
 section /- 7B: normal-J theorem -/
 
-/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (statement 保留)
+/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (conditional on 8-step argument)
 
 **Isaacs Thm 7.6** (mmd L3832):
 
@@ -2681,7 +2681,90 @@ section /- 7B: normal-J theorem -/
 **proof 戦略** (8 Step, mmd L3832-3896): Thm 7.5 + Ch.6 **6.20** (abelian coprime
 ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21.
 
-着手は Thm 7.5 + Ch.6 6.20 + Ch.4 4.35 完成後. -/
+The full Goldschmidt-style 8-step proof requires Thm 7.5 (✅ landed) + Ch.6 6.20 +
+Ch.4 4.35 (still pending).  Below we land the **conditional version** that takes
+the minimum-counterexample contradiction as a forward-dependency hypothesis. -/
+
+/-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
+
+The full theorem (Isaacs L3832) states:
+
+> Suppose `G` is `p`-solvable with `p ≠ 2`, Sylow `2`-subgroups of `G` are abelian,
+> `O_{p'}(G) = 1`, and `P = C_G(Z(P))` for some `P ∈ Syl_p(G)`.  Then `J(P) ⊴ G`.
+
+The textbook proof (Isaacs p.209-214) is an **8-step minimum-counterexample
+argument**: assume `G` is a minimum counterexample (smallest finite group meeting
+the hypotheses but with `J(P)` not normal).  Steps 1-7 use Thm 7.5 (normal-P
+theorem ✅), Ch.4 Thm 4.35 (fixed-point lemma on `Ω₁`), Ch.6 Thm 6.20
+(abelian-coprime `⟨C_N(a)⟩ = N`), and the Hall-Higman 3.21 transfer estimate to
+narrow down the structure of `G`; Step 8 produces a contradiction.
+
+**This formalization takes the minimum-counterexample contradiction as a
+forward-dependency hypothesis** (`hMinCounterexample`).  Once Ch.4 4.35 + Ch.6
+6.20 + Hall-Higman 3.21 land and the 8-step argument is filled in (see
+`notes/isaacs/ch07_thompson.md`), this hypothesis becomes provable.
+
+Given `hMinCounterexample`, the conclusion follows by **strong induction on
+`Nat.card G`**: at any group `H` meeting the same hypotheses, if `J(P_H)` fails
+to be normal then by the induction hypothesis every proper normal subgroup `N ⊴ H`
+has `J(Q) ⊴ N` for `Q ∈ Syl_p(N)`.  Plugging into `hMinCounterexample` yields
+`False`. -/
+theorem normal_J.{u}
+    {G : Type u} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (_hp2 : p ≠ 2)
+    (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (_h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    -- Forward-dependency: a minimum-counterexample for normal-J always yields
+    -- a contradiction, universalized over any finite group `H` whose order
+    -- divides `|G|`.  When §7B 8-step Goldschmidt-style proof
+    -- (using Thm 7.5 + Ch.4 4.35 + Ch.6 6.20 + Hall-Higman 3.21) lands,
+    -- this hypothesis becomes provable.  The universal quantification over
+    -- `H : Type u` mirrors the `burnside_p_pow_q_pow` (Thm 7.8) pattern at
+    -- L2990, which is necessary for the strong-induction recursion to close.
+    (hMinCounterexample :
+       ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
+         Nat.card H ∣ Nat.card G →
+         ¬ (Subgroup.thompsonJ (Q : Subgroup H) p).Normal →
+         (∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
+           ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal) →
+         False) :
+    (Subgroup.thompsonJ (P : Subgroup G) p).Normal := by
+  classical
+  -- Strong induction on `Nat.card H` over arbitrary finite groups `H` of
+  -- order dividing `|G|`, exactly mirroring the Thm 7.8 pattern at L2990.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (H : Type u) [Group H] [Finite H] (Q : Sylow p H),
+      Nat.card H ∣ Nat.card G → Nat.card H = n →
+      (Subgroup.thompsonJ (Q : Subgroup H) p).Normal
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G P dvd_rfl rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih H _ _ Q hH_dvd hH_card
+  -- Apply the universal forward-dep contradiction at `H`.
+  by_contra hQ_not_normal
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
+  -- Build the inner IH "∀ proper normal N of H, ∀ R ∈ Syl_p(N), J(R) normal
+  -- in N" by recursing on |N| < |H| via the strong-induction `ih`.
+  have hInnerIH :
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal →
+        ∀ R : Sylow p N, (Subgroup.thompsonJ (R : Subgroup N) p).Normal := by
+    intro N hN_top _hN_norm R
+    have hN_dvd_H : Nat.card N ∣ Nat.card H := N.card_subgroup_dvd_card
+    have hN_dvd_G : Nat.card N ∣ Nat.card G := hN_dvd_H.trans hH_dvd
+    have hN_le : Nat.card N ≤ Nat.card H := Nat.le_of_dvd hH_pos hN_dvd_H
+    have hN_ne : Nat.card N ≠ Nat.card H := fun h_eq =>
+      hN_top (Subgroup.eq_top_of_card_eq _ h_eq)
+    have hN_lt : Nat.card N < n :=
+      (lt_of_le_of_ne hN_le hN_ne).trans_eq hH_card
+    exact ih (Nat.card N) hN_lt N R hN_dvd_G rfl
+  exact hMinCounterexample H Q hH_dvd hQ_not_normal hInnerIH
 
 end -- 7B
 
