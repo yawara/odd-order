@@ -44,6 +44,8 @@ created: 2026-05-25
 - `SignedIrreducibleDifferenceFamily.difference` と `signedDifference` を追加し、
   基準成分 `μ_i - μ_0`、符号付き差分、`difference_ne_zero`,
   `sign_ne_zero`, `sign_mul_self` を名前付き API にした。
+- `signedDifference_ne_zero` と `signedDifference_eq_zero_iff` を追加し、結論側の
+  signed target difference が `i = 0` でのみ消えることを `sorry` なしで使えるようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

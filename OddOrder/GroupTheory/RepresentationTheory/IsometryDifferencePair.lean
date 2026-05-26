@@ -133,6 +133,27 @@ abbrev signedDifference (data : SignedIrreducibleDifferenceFamily G n)
     data.signedDifference 0 = 0 := by
   simp [signedDifference]
 
+theorem signedDifference_ne_zero
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n} (hi : i ≠ 0) :
+    data.signedDifference i ≠ 0 := by
+  rcases data.sign_eq with hsign | hsign
+  · simpa [signedDifference, hsign] using data.difference_ne_zero hi
+  · have hdiff : data.difference i ≠ 0 := data.difference_ne_zero hi
+    have hneg : -data.difference i ≠ 0 := neg_ne_zero.mpr hdiff
+    simpa [signedDifference, difference, hsign, sub_eq_add_neg, add_comm, add_left_comm,
+      add_assoc] using hneg
+
+theorem signedDifference_eq_zero_iff
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.signedDifference i = 0 ↔ i = 0 := by
+  constructor
+  · intro h
+    by_contra hi
+    exact data.signedDifference_ne_zero hi h
+  · intro hi
+    subst hi
+    simp
+
 theorem sign_ne_zero (data : SignedIrreducibleDifferenceFamily G n) :
     data.sign ≠ 0 := by
   rcases data.sign_eq with hsign | hsign <;> simp [hsign]
