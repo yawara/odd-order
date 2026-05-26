@@ -417,6 +417,11 @@ FT クリティカル度 + 章内依存で並べる:
   も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
   直接合う
   `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
+  さらに 6.12 本文の「唯一の involution を持つ 2-group は cyclic」という element-level
+  hypothesis を, 6.11 で共有している order-2 subgroup 一意性 route へ変換する
+  `isCyclic_of_comm_two_group_unique_involution` も追加済み. これは pure rename ではなく,
+  各 order-2 subgroup から generator involution を取り出し, element-level uniqueness で
+  subgroup equality を戻す adapter.
   6.12 本文冒頭の maximal normal abelian subgroup argument に向けて,
   `C < C_P(C)` から Ch01 Lemma 1.23 で `C < B ≤ C_P(C)`, `C.relIndex B = p`,
   `B ⊴ P` を取り, `C ≤ Z(B)` と prime quotient cyclicity から `B` 可換を導く

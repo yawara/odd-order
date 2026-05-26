@@ -222,6 +222,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_unique_involution
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution

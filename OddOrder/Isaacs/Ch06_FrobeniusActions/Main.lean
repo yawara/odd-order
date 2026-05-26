@@ -3144,6 +3144,55 @@ theorem exists_involution_mem_of_nontrivial_two_subgroup
     have : orderOf z = 1 := by rw [hz_eq_one', orderOf_one]
     exact Nat.prime_two.ne_one (hz_order.symm.trans this)
 
+/-- A finite commutative `2`-group with a unique nontrivial involution is cyclic.
+
+This is the element-level version needed in Isaacs Thm 6.12: it adapts the textbook
+“unique involution” hypothesis to the subgroup-level uniqueness used by the finite abelian
+`p`-group structure bridge from Thm 6.11. -/
+theorem isCyclic_of_comm_two_group_unique_involution
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    (hcomm : ∀ x y : P, x * y = y * x)
+    (hUnique : ∀ x y : P, x ≠ 1 → x ^ 2 = 1 → y ≠ 1 → y ^ 2 = 1 → x = y) :
+    IsCyclic P := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : IsMulCommutative P := ⟨⟨hcomm⟩⟩
+  refine hP.isCyclic_of_subgroups_card_prime_unique ?_
+  intro K L hK_card hL_card
+  have hK_two_dvd : 2 ∣ Nat.card K := by rw [hK_card]
+  have hL_two_dvd : 2 ∣ Nat.card L := by rw [hL_card]
+  obtain ⟨x, hx_order⟩ := exists_prime_orderOf_dvd_card' (G := K) 2 hK_two_dvd
+  obtain ⟨y, hy_order⟩ := exists_prime_orderOf_dvd_card' (G := L) 2 hL_two_dvd
+  have hx_sq : (x : P) ^ 2 = 1 := by
+    have hx_sq_sub : x ^ 2 = 1 := by
+      rw [← hx_order, pow_orderOf_eq_one]
+    exact congrArg Subtype.val hx_sq_sub
+  have hy_sq : (y : P) ^ 2 = 1 := by
+    have hy_sq_sub : y ^ 2 = 1 := by
+      rw [← hy_order, pow_orderOf_eq_one]
+    exact congrArg Subtype.val hy_sq_sub
+  have hx_ne : (x : P) ≠ 1 := by
+    intro hx_eq_one
+    have hx_eq_one' : x = 1 := Subtype.ext hx_eq_one
+    have : orderOf x = 1 := by rw [hx_eq_one', orderOf_one]
+    exact Nat.prime_two.ne_one (hx_order.symm.trans this)
+  have hy_ne : (y : P) ≠ 1 := by
+    intro hy_eq_one
+    have hy_eq_one' : y = 1 := Subtype.ext hy_eq_one
+    have : orderOf y = 1 := by rw [hy_eq_one', orderOf_one]
+    exact Nat.prime_two.ne_one (hy_order.symm.trans this)
+  have hxy : (x : P) = (y : P) :=
+    hUnique (x : P) (y : P) hx_ne hx_sq hy_ne hy_sq
+  have hx_order_P : orderOf (x : P) = 2 := orderOf_eq_prime (p := 2) hx_sq hx_ne
+  have hy_order_P : orderOf (y : P) = 2 := orderOf_eq_prime (p := 2) hy_sq hy_ne
+  have hK_zpowers : Subgroup.zpowers (x : P) = K := by
+    apply Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr x.2)
+    rw [hK_card, Nat.card_zpowers, hx_order_P]
+  have hL_zpowers : Subgroup.zpowers (y : P) = L := by
+    apply Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr y.2)
+    rw [hL_card, Nat.card_zpowers, hy_order_P]
+  rw [← hK_zpowers, ← hL_zpowers, hxy]
+
 /-- If a subgroup `C` contains a nontrivial involution `z` and there is another involution `a`
 outside `C`, then the ambient group has two distinct subgroups of order `2`.
 
