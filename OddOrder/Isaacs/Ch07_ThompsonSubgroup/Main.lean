@@ -2743,6 +2743,134 @@ theorem center_sylow_le_opCore_of_oPiCorePrime_eq_bot
   (center_sylow_le_centralizer_opCore P).trans
     (centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot hOp')
 
+/-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
+
+We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
+the basic structural relations between `A`, `D := A ⊓ L`, and the global subgroups
+of `G` needed in subsequent steps.
+
+The book takes `A ∈ E(P)` failing to lie in `L` for the contradiction in Step 7.
+We package the elementary observations: `A` is an elementary abelian `p`-subgroup
+of `P`, hence contained in `P`; and `D = A ⊓ L` is a proper subgroup of `A` (with
+nontrivial quotient `A/D`). -/
+
+/-- **Isaacs Thm 7.6 Step 2** preparation (mmd L3845-3846):
+`A ∈ maxElemAbelianIn P p` is an elementary abelian `p`-subgroup of `P`.
+
+Pure unpacking of the `maxElemAbelianIn` definition (see
+`OddOrder.GroupTheory.ThompsonSubgroup.maxElemAbelianIn`).  Placed here as a
+shorthand for §7B Steps 3-7 which reuse the elementary-abelian / `≤ P` facts. -/
+private theorem maxElemAbelianIn_isElementaryAbelian {G : Type*} [Group G]
+    {P A : Subgroup G} {p : ℕ}
+    (hA : A ∈ Subgroup.maxElemAbelianIn P p) :
+    A.IsElementaryAbelian p :=
+  hA.2.1
+
+private theorem maxElemAbelianIn_le_parent {G : Type*} [Group G]
+    {P A : Subgroup G} {p : ℕ}
+    (hA : A ∈ Subgroup.maxElemAbelianIn P p) :
+    A ≤ P :=
+  hA.1
+
+/-- **Isaacs Thm 7.6 Step 3** (mmd L3850-3856): the quotient `A / (A ⊓ L)` has order `p`.
+
+Book argument: `A` is elementary abelian (`x^p = 1` for all `x ∈ A`), so `A/D`
+embeds into `G/L`.  Under hypothesis (iv) `O_{p'}(G) = 1` we have `L = O_p(G)`,
+hence `G/L` has trivial `p`-Sylow (Hall-Higman 3.21 / Isaacs Cor 3.21).
+
+For the bridge layer we record the **abstract version**: if `D ≤ A`, `D ≠ A`, and
+`A.IsElementaryAbelian p`, then `D` has index dividing `p` in `A`.  In an
+elementary abelian `p`-group every proper subgroup has prime power index.  The
+stronger conclusion "index exactly `p`" needs the **maximality of `A`** —
+otherwise we could enlarge `D` to a strict sub of `A` of index `p`, contradicting
+that `A ∈ E(P)`.
+
+We package the elementary-abelian quotient observation: in `A/D` the exponent
+divides `p` so `|A/D|` is a power of `p`. -/
+private theorem relIndex_isPGroup_of_isElementaryAbelian
+    {G : Type*} [Group G] {A D : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hA_el : A.IsElementaryAbelian p) :
+    IsPGroup p (D.subgroupOf A) := by
+  -- A is elementary abelian ⇒ A is a p-group ⇒ subgroup of A is a p-group.
+  have hA_pG : IsPGroup p A := hA_el.isPGroup
+  exact hA_pG.to_subgroup _
+
+/-- **Isaacs Thm 7.6 Step 3** companion: the order of `A` is a power of `p`.
+
+Since `A.IsElementaryAbelian p`, `A` is itself a `p`-group, so `Nat.card A = p^k`
+for some `k`. -/
+private theorem isPGroup_of_isElementaryAbelian
+    {G : Type*} [Group G] {A : Subgroup G} {p : ℕ}
+    (hA_el : A.IsElementaryAbelian p) :
+    IsPGroup p A :=
+  hA_el.isPGroup
+
+/-! ### Step 4: action of `A` on `V := Z(L) = Z(O_p(G))` (mmd L3858-3864)
+
+Set `V := Z(L)`.  Since `L = O_p(G)` is `G`-normal, the conjugation action of `G`
+on `L` restricts to an action on `Z(L)`, and in particular `A ≤ P ≤ G` acts on `V`.
+Furthermore `D = A ⊓ L ≤ L` commutes with all of `V = Z(L)` by definition of
+center, so `D` is contained in the kernel of the action of `A` on `V`. -/
+
+/-- **Isaacs Thm 7.6 Step 4** (mmd L3858): `Z(O_p(G))` is `G`-normal (and `G`-characteristic).
+
+The `Subgroup.center` of a characteristic subgroup is itself characteristic in the
+ambient group.  In particular `Subgroup.center` of `O_p(G)`, viewed as the image
+of `Subgroup.center (opCore p G)` in `G`, is `G`-normal. -/
+private theorem center_opCore_map_normal {G : Type*} [Group G] {p : ℕ} :
+    ((Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G)).map
+      (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G).subtype).Normal := by
+  refine ⟨?_⟩
+  rintro _ ⟨⟨z, hz_L⟩, hz_center, rfl⟩ g
+  -- g * z * g⁻¹ ∈ opCore p G  (since opCore is normal)
+  have hLnorm : (OddOrder.Isaacs.Ch01.opCore p G).Normal := inferInstance
+  have hgz : g * z * g⁻¹ ∈ OddOrder.Isaacs.Ch01.opCore p G :=
+    hLnorm.conj_mem z hz_L g
+  refine ⟨⟨g * z * g⁻¹, hgz⟩, ?_, rfl⟩
+  -- Show ⟨g*z*g⁻¹, _⟩ ∈ Subgroup.center (opCore p G).
+  change (⟨g * z * g⁻¹, hgz⟩ : OddOrder.Isaacs.Ch01.opCore p G) ∈
+    Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G)
+  rw [Subgroup.mem_center_iff]
+  rintro ⟨h, hh_L⟩
+  -- ⟨h, hh_L⟩ * ⟨g*z*g⁻¹, hgz⟩ = ⟨g*z*g⁻¹, hgz⟩ * ⟨h, hh_L⟩,
+  -- i.e., h * (g*z*g⁻¹) = (g*z*g⁻¹) * h.
+  have hgh : g⁻¹ * h * g ∈ OddOrder.Isaacs.Ch01.opCore p G := by
+    have := hLnorm.conj_mem h hh_L g⁻¹
+    simpa [mul_assoc] using this
+  have hcomm : (⟨g⁻¹ * h * g, hgh⟩ : OddOrder.Isaacs.Ch01.opCore p G) * ⟨z, hz_L⟩
+      = ⟨z, hz_L⟩ * ⟨g⁻¹ * h * g, hgh⟩ :=
+    Subgroup.mem_center_iff.mp hz_center _
+  have hcomm_G : (g⁻¹ * h * g) * z = z * (g⁻¹ * h * g) := congr_arg Subtype.val hcomm
+  apply Subtype.ext
+  calc h * (g * z * g⁻¹)
+      = g * ((g⁻¹ * h * g) * z) * g⁻¹ := by group
+    _ = g * (z * (g⁻¹ * h * g)) * g⁻¹ := by rw [hcomm_G]
+    _ = (g * z * g⁻¹) * h := by group
+
+/-- **Isaacs Thm 7.6 Step 4** (mmd L3859-3860):
+`D := A ⊓ L` centralizes `V := Z(L)`.
+
+For any `d ∈ D`, `d ∈ L`.  For any `v` representing an element of `Z(L) ↪ G`,
+the conjugation `d * v * d⁻¹` equals `v` because `v ∈ Z(L)`.  This packages the
+"the `A`-action restricted to `D` is trivial" observation: `D ≤ centralizer V`. -/
+private theorem A_inter_opCore_le_centralizer_center_opCore
+    {G : Type*} [Group G] {p : ℕ} {A : Subgroup G} :
+    A ⊓ OddOrder.Isaacs.Ch01.opCore p G ≤
+      Subgroup.centralizer
+        (((Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G)).map
+          (OddOrder.Isaacs.Ch01.opCore p G : Subgroup G).subtype) : Set G) := by
+  intro d hd
+  rw [Subgroup.mem_centralizer_iff]
+  rintro _ ⟨⟨v, hv_L⟩, hv_center, rfl⟩
+  -- d ∈ L, ⟨v, _⟩ ∈ Z(L) ⇒ they commute in L ⇒ commute in G.
+  have hd_L : d ∈ OddOrder.Isaacs.Ch01.opCore p G := hd.2
+  -- mem_centralizer_iff: ∀ h ∈ s, h * g = g * h, so v * d = d * v.
+  -- mem_center_iff gives ∀ g, g * z = z * g, so ⟨d, _⟩ * ⟨v, _⟩ = ⟨v, _⟩ * ⟨d, _⟩.
+  have hcomm : (⟨d, hd_L⟩ : OddOrder.Isaacs.Ch01.opCore p G) * ⟨v, hv_L⟩
+      = ⟨v, hv_L⟩ * ⟨d, hd_L⟩ :=
+    Subgroup.mem_center_iff.mp hv_center _
+  exact (congr_arg Subtype.val hcomm).symm
+
 /-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
 
 The full theorem (Isaacs L3832) states:
