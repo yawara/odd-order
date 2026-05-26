@@ -505,7 +505,12 @@ FT クリティカル度 + 章内依存で並べる:
   さらにこれを cyclic quotient branch theorem へ接続する
   `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient`
   も追加済み.
-  次は maximal normal cyclic subgroup setup から `T` と `P/C` cyclic を供給する段階.
+  さらに quotient-involution theorem から `P/C` cyclic を内部で作り,
+  `p=2` の抽出から Lemma 6.13 分類までを直結する p-general assembly
+  `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions`
+  も追加済み.
+  次は maximal normal cyclic subgroup setup から `T` と quotient-involution branch の
+  order-8 除外条件を供給する段階.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

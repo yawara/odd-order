@@ -6940,6 +6940,45 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient
   exact dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases
     hP h_nonab hC_eq hquot_cyclic h_order he ha_notmem ha_sq_mem h_conj hcases
 
+/-- **Isaacs Thm 6.12 setup**: the quotient-involution computation supplies the
+cyclic-quotient input for the Lemma 6.13 classification branch.
+
+This is the assembly point after proving that every nontrivial involution in `P/C` inverts
+`c²`: it removes the theorem-stage assumption `P/C` cyclic from
+`dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient`. -/
+theorem dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
+    {P : Type*} [Group P] [Finite P] {p e : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    {C T : Subgroup P} [C.Normal] {c : P}
+    (hT_card_ne : Nat.card T ≠ 8) (hT_normal : T.Normal)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c) (hcT : c ∈ T)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hC_rel : C.relIndex T = p) (hT_not_comm : ¬ IsMulCommutative T)
+    (hT_card_ne_quot :
+      ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+        Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8)
+    (h_order : orderOf c = p ^ e) (he : 3 ≤ e) :
+    p = 2 ∧
+      (Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
+        Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) ∨
+          ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k)) := by
+  classical
+  obtain ⟨a, i, _haT, ha_notmem, ha_pow_C, h_conj, hp_eq_two, hcases⟩ :=
+    exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic
+      (hP.to_subgroup T) hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent
+      hC_rel hT_not_comm h_order (by omega)
+  cases hp_eq_two
+  have hquot_cyclic : IsCyclic (P ⧸ C) :=
+    quotient_isCyclic_of_involutions_invert_zpowers_square
+      hP hC_eq hCent hC_max hcyc h_order he hT_card_ne_quot
+  refine ⟨rfl, ?_⟩
+  have ha_sq_mem : a ^ 2 ∈ C := by
+    simpa using ha_pow_C
+  exact dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases
+    hP h_nonab hC_eq hquot_cyclic h_order he ha_notmem ha_sq_mem h_conj hcases
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
