@@ -2685,6 +2685,31 @@ The full Goldschmidt-style 8-step proof requires Thm 7.5 (✅ landed) + Ch.6 6.2
 Ch.4 4.35 (still pending).  Below we land the **conditional version** that takes
 the minimum-counterexample contradiction as a forward-dependency hypothesis. -/
 
+/-! ### Step 1 corollaries of Hall-Higman 3.21 (mmd L3837)
+
+The first step of Isaacs Thm 7.6 proof observes that under hyp (iv)
+`O_{p'}(G) = 1`, Hall-Higman 3.21 (with `π = {p}`) yields
+`C_G(O_p(G)) ≤ O_p(G)`, and consequently `Z(P) ≤ O_p(G)` for any
+Sylow `p`-subgroup `P`. -/
+
+/-- The image of `Z(P)` in `G` centralizes `O_p(G)`.
+
+Pure structural fact: since `O_p(G) ≤ P`, any element of `Z(P)` commutes with
+every element of `O_p(G)`.  Hypothesis (iv) `O_{p'}(G) = 1` is **not** needed
+here; it enters only at the next step (Hall-Higman 3.21). -/
+private theorem center_sylow_le_centralizer_opCore
+    {G : Type*} [Group G] {p : ℕ} (P : Sylow p G) :
+    (Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype ≤
+      Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) := by
+  rintro _ ⟨⟨z, hzP⟩, hz_center, rfl⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro h hh
+  have hh_P : h ∈ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P hh
+  have hc : (⟨h, hh_P⟩ : (P : Subgroup G)) * ⟨z, hzP⟩
+      = ⟨z, hzP⟩ * ⟨h, hh_P⟩ :=
+    Subgroup.mem_center_iff.mp hz_center ⟨h, hh_P⟩
+  exact congr_arg Subtype.val hc
+
 /-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
 
 The full theorem (Isaacs L3832) states:
