@@ -7,10 +7,13 @@ import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.RepresentationTheory.Maschke
 import Mathlib.RepresentationTheory.Submodule
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
 import Mathlib.LinearAlgebra.Determinant
+import Mathlib.LinearAlgebra.Dimension.Constructions
+import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.GroupTheory.IsExtraspecial
@@ -3791,6 +3794,43 @@ private theorem baseChangeRepresentation_faithful
   have hmap := congrArg
     (fun f : TensorProduct F K V →ₗ[K] TensorProduct F K V => f (1 ⊗ₜ[F] v)) hgh
   simpa [baseChangeRepresentation] using hmap
+
+/-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
+
+This keeps the remaining induction hypothesis explicit but moves the field
+from `F` to `AlgebraicClosure F`, where the q≠p Maschke/eigenline branch is
+available.  The content is the faithful scalar-extension and dimension
+transport, not a theorem rename. -/
+private theorem
+    sylow_commutative_and_commutator_le_of_algebraicClosure_induction
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hind :
+      ∀ N : Subgroup
+          (determinantKernelSubgroup
+            (baseChangeRepresentation (AlgebraicClosure F) ρ)),
+        N.Normal → N ≠ ⊥ →
+        ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  let ρK : Representation (AlgebraicClosure F) G
+      (TensorProduct F (AlgebraicClosure F) V) :=
+    baseChangeRepresentation (AlgebraicClosure F) ρ
+  have hfaithfulK : Function.Injective ρK := by
+    simpa [ρK] using
+      baseChangeRepresentation_faithful (AlgebraicClosure F) ρ hfaithful
+  have hdimK :
+      Module.finrank (AlgebraicClosure F)
+        (TensorProduct F (AlgebraicClosure F) V) = 2 := by
+    exact
+      (Module.finrank_baseChange (R := AlgebraicClosure F) (S := F) (M' := V)).trans hdim
+  exact
+    sylow_commutative_and_commutator_le_of_determinantKernel_spine_isAlgClosed_induction
+      ρK hfaithfulK hodd hdimK hind P
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup

@@ -205,6 +205,14 @@
   faithful 表現へ接続するための具体的な tensor bridge. 次は
   `AlgebraicClosure F` での `CharP`/`finrank`/determinant-kernel compatibility を
   同じ粒度で足す.
+- **2026-05-26**: `sylow_commutative_and_commutator_le_of_algebraicClosure_induction`
+  を追加し、元の体 `F` 上の faithful 2-dimensional representation から
+  `AlgebraicClosure F` 上の normalizer/induction spine へ渡す reduction を
+  sorry-free にした. 内容は faithful scalar extension と `finrank` transport を
+  実際に行って algebraically closed 版 endpoint へ接続するもので、既存 theorem の
+  単純 wrapper ではない. 残 frontier は determinant-kernel subgroup と
+  base-changed representation の互換性、および theorem 本体から induction 仮定
+  `hind` を供給する段.
 
 ## TL;DR
 
