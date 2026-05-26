@@ -197,6 +197,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
 
+-- Ch.6 (Frobenius Actions): Thm 6.9 elementary abelian subgroup obstruction
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq
+
 -- Ch.6 (Frobenius Actions): Thm 6.9 `p = q` order-`pq` branch
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq

@@ -2383,6 +2383,24 @@ theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq
     false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
       hFrob B hp hElem hCard M hM_inv
 
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, large order): a Frobenius actor cannot
+contain an elementary abelian `p`-subgroup whose order is at least `p^2`.  This packages the
+textbook reduction "replace by a subgroup so that `e = 2`". -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B)
+    (hCard : p ^ 2 ≤ Nat.card B) :
+    False := by
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    hElem.exists_subgroup_card_prime_sq hp hCard
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := B) (U := U) (IsFrobeniusAction.actorSubgroup hFrob B)
+      E hp hE_elem hE_card
+
 /-- **Isaacs Thm 6.9** (`p = q` branch for subgroups of order `pq`): a Frobenius actor cannot
 contain a noncyclic subgroup of order `p^2`; hence such a subgroup must be cyclic. -/
 theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq

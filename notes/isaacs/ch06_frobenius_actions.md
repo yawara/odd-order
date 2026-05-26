@@ -322,6 +322,9 @@ FT クリティカル度 + 章内依存で並べる:
   まで一般 target に持ち上げた. 共有補題
   `OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic`
   (非巡回な位数 `p^2` 群は elementary abelian) も追加し,
+  `IsElementaryAbelian.exists_subgroup_card_prime_sq` で `p^2` 部分群へ落として
+  `false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq` まで
+  閉じた. これで本文の「order exceeding `p`」は `p^2 ≤ |B|` 形で使用可能.
   `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq` で
   6.9 本文の `p = q` branch (`|B| = p^2` なら巡回) を閉じた.
 - 6.9 order `pq` 巡回分岐:
