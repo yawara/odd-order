@@ -537,7 +537,7 @@ Ch.7 §7D は **Ch.7 §7A-§7C の応用例** という位置づけ. BG/Peterfal
 - **Burnside `p^a q^b` (Thm 7.8) の優先度** — FT 経路で直接被引用無いので Phase 1 完成度のため. 着手時期: Ch.7 §7A-§7C + Ch.5 5.26 完了後. **mathlib upstream 価値高 (character-free Burnside は珍しい)**.
 - **`p`-stability 概念の def** — Isaacs Ch.7 本文には明示 def 無い (BG App.A で "p-stability" として導入). しかし Thm 7.5 statement の (i)-(v) 条件群が事実上 "G is p-stable" を含意するため, Phase 1 で **`IsPStable G p` を別途定義する価値**あり (BG App.A への橋渡し用). 着手時期は Ch.7 §7B 完了後.
 - **Thm 7.3 (GL(2,p) 補題) の `p ≠ 2` 仮定の柔軟化** — Isaacs L3741 が "`p > 3` なら abelian Sylow-2 仮定不要" と注記. 形式化版でも `p > 3` 強化版を別途 wrapper で書くか, 一次は弱い形のみ書くか.
-- **Thm 7.6 Step 7 の `V = {z ∈ Z(U) | z^p = 1}` 構成** — `Ω₁(Z(U))` だが Isaacs は `Ω₁` 記号を使わず明示的に書く. Lean では `def Ω₁ (G : Type) [Group G] (p : ℕ) : Subgroup G := {g | g^p = 1}.subgroup` 形で先に Ω₁ 関数を定義するか, ad-hoc に各定理で書くか. **Ch.6 6.11 (p-group ≤1 subgroup p ⇒ cyclic/quaternion) で Ω₁ が登場するなら Ch.6 で先に def する**.
+- **Thm 7.6 Step 7 の `V = {z ∈ Z(U) | z^p = 1}` 構成** — `Ω₁(Z(U))` だが Isaacs は `Ω₁` 記号を使わず明示的に書く. **2026-05-26 決定**: 新規 `Subgroup.omega1ZCenter` def は **追加しない**. 理由: Cor 4.35 (`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`, `Ch04_Commutators/Main.lean:3437`) は `(h_fix : ∀ g : G, g ^ p = 1 → ∀ a, (φ a) g = g)` を **pointwise 仮説** として取るため, `Ω₁(Z(U))` を subgroup として明示的に作る必要なし. 既存 `OddOrder.GroupTheory.Omega G p 1` (subgroup closure 形) は Step 6/7 で必要なら使うが, デフォルトは Z(U) 上の pointwise predicate `g^p = 1` で済ませる. Ch.6 6.11 完成済みで Ω₁ 形の def を使っていない事も確認.
 
 ## 第 6 波以降 (Phase 2a BG, Phase 2b Peterfalvi) との接続
 
