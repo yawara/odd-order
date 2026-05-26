@@ -3349,6 +3349,17 @@ instance zCenterOpCoreSubgroup_normal
     {G : Type*} [Group G] {p : ℕ} :
     (zCenterOpCoreSubgroup G p).Normal := center_opCore_map_normal
 
+/-- The conjugation action of an arbitrary subgroup `Q ≤ G` on `Z(U) = Z(O_p(G))`:
+`Q →* MulAut Z(U)` via `MulAut.conjNormal ∘ Q.subtype`.
+
+Used in Step 6: `Q` (a Sylow `q`-subgroup of `K = C_G(V)`, `q ≠ p`) acts on
+`Z(U)` by conjugation; combined with `Q` fixing `V = Ω₁ Z(U)` (from `Q ⊆ K`),
+Cor 4.35 yields `Q` acts trivially on `Z(U)`. -/
+noncomputable def conjActionOnZCenterOpCoreSubgroup
+    {G : Type*} [Group G] {p : ℕ} (Q : Subgroup G) :
+    Q →* MulAut ↥(zCenterOpCoreSubgroup G p) :=
+  MulAut.conjNormal.comp Q.subtype
+
 /-- `Z(U) = Z(O_p(G))` is a `p`-group: it is a subgroup of `U = O_p(G)`,
 which is a `p`-group. -/
 theorem zCenterOpCoreSubgroup_isPGroup
