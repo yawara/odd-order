@@ -40,6 +40,8 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - `CharacterTableIndexing.rowColumnEquiv`, `characterTableMatrix`, and
   `characterTableSquareMatrix` を追加し、cardinality equality から determinant /
   invertibility 用の正方行列へ reindex する橋を用意した。
+- `characterTableDeterminant` and `CharacterTableMatrixInvertible` を追加し、
+  row orthogonality から det nonzero を示す次段の interface を固定した。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,

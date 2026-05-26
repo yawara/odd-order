@@ -10,6 +10,7 @@ import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
@@ -51,6 +52,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 * `OddOrder.RepresentationTheory.characterTableMatrix` — the rectangular character table.
 * `OddOrder.RepresentationTheory.characterTableSquareMatrix` — the same table reindexed
   to a square matrix via `CharacterTableIndexing.rowColumnEquiv`.
+* `OddOrder.RepresentationTheory.characterTableDeterminant` — determinant of the square
+  character table for the matrix-invertibility proof.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
@@ -173,6 +176,22 @@ noncomputable def characterTableSquareMatrix (idx : CharacterTableIndexing G) :
     characterTableSquareMatrix idx χ ψ =
       characterTableEntry χ (idx.rowColumnEquiv ψ) := by
   simp [characterTableSquareMatrix]
+
+/-- Determinant of a square reindexing of the character table.  The value depends on the
+chosen row-column equivalence only up to sign, so nonvanishing is the intended invariant. -/
+noncomputable def characterTableDeterminant (idx : CharacterTableIndexing G) : ℂ :=
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  Matrix.det (characterTableSquareMatrix idx)
+
+/-- Matrix-invertibility input needed for the classical proof of column orthogonality. -/
+noncomputable def CharacterTableMatrixInvertible (idx : CharacterTableIndexing G) : Prop :=
+  characterTableDeterminant idx ≠ 0
+
+theorem characterTableMatrixInvertible_iff_det_ne_zero
+    (idx : CharacterTableIndexing G) :
+    CharacterTableMatrixInvertible idx ↔ characterTableDeterminant idx ≠ 0 :=
+  Iff.rfl
 
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/
