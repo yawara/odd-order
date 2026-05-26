@@ -5821,6 +5821,38 @@ theorem exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
   · exact exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
       hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
 
+/-- **Isaacs Thm 6.12 setup**: Lemma 6.15 applied to an ambient self-centralizing
+subgroup `C ≤ T ≤ P`.
+
+In the proof of Thm 6.12, after choosing `T/C` of order `p`, this packages the
+translation from the ambient cyclic self-centralizing subgroup `C : Subgroup P` to the
+subgroup `C.subgroupOf T` required by Lemma 6.15. -/
+theorem exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    {C T : Subgroup P} [C.Normal]
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    (hC_le_T : C ≤ T) (hCent : Subgroup.centralizer (C : Set P) = C)
+    (hC_rel : C.relIndex T = p) (hC_cyclic : IsCyclic C)
+    (hT_not_comm : ¬ IsMulCommutative T) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  have hZ_lt_C : Subgroup.center T < C.subgroupOf T :=
+    center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative
+      hC_le_T hCent hC_rel hT_not_comm
+  have hCsub_index : (C.subgroupOf T).index = p := by
+    simpa [Subgroup.relIndex] using hC_rel
+  have hCsub_lt_top : C.subgroupOf T < ⊤ := by
+    refine lt_of_le_of_ne le_top ?_
+    intro htop
+    have hidx_one : (C.subgroupOf T).index = 1 := by
+      rw [htop, Subgroup.index_top]
+    exact (Fact.out : p.Prime).ne_one (hCsub_index.symm.trans hidx_one)
+  have hCsub_cyclic : IsCyclic (C.subgroupOf T) :=
+    subgroupOf_isCyclic_of_isCyclic hC_cyclic
+  exact exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+    hT hT_card_ne h_idx hCsub_cyclic hZ_lt_C hCsub_lt_top
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.

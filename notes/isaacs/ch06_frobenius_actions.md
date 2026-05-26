@@ -435,6 +435,9 @@ FT クリティカル度 + 章内依存で並べる:
   `Z(T) < C` についても, self-centralizing `C` から `Z(T) ≤ C` を引き, `T/C` prime cyclic と
   `T` 非可換性で strict にする
   `center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMulCommutative` を追加済み.
+  さらに ambient な `C ≤ T ≤ P` と `C.relIndex T = p` から, `C.subgroupOf T < ⊤`,
+  cyclicity の `subgroupOf` への移送, および上記 `Z(T)<C` を束ねて Lemma 6.15 本体へ渡す
+  `exists_characteristic_isElementaryAbelian_of_self_centralizing_relIndex_prime` も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
