@@ -67,6 +67,13 @@ created: 2026-05-25
   `irreducibleCharacter_difference_inner_of_ne_zero_of_ne` を追加し、input side
   の `χ_i - χ_0` についても同じ norm `2` / inner `1` values を named API
   として取り出せるようにした。
+- §7 の two-element `CharacterDifferenceImage` 側にも `difference`,
+  `signedDifference`, `image_eq_signedDifference`,
+  `difference_inner_self`, `signedDifference_inner_self`,
+  `image_conjugateDifference_inner_self`, and
+  `Orthogonal.image_conjugateDifference_inner_eq_zero` を追加し、(5.2.d/e)
+  の image norm `2` と image-set 直交性を hypothesis carrier から直接使える
+  ようにした。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

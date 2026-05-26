@@ -222,9 +222,20 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `CharacterDifferenceImage.signed_image_ne_zero` and
   `image_conjugateDifference_ne_zero` expose the immediate consequence of
   (5.2.d): the signed difference image of `χ - χ̄` is nonzero.
+- `CharacterDifferenceImage.difference`, `signedDifference`,
+  `image_eq_signedDifference`, `difference_inner_self`,
+  `signedDifference_inner_self`, `image_conjugateDifference_inner_self`,
+  `Orthogonal.difference_inner_eq_zero`,
+  `Orthogonal.signedDifference_inner_eq_zero`, and
+  `Orthogonal.image_conjugateDifference_inner_eq_zero` now expose the norm
+  `2` and orthogonal-image inner product `0` calculations for the two-element
+  `R(χ)` interface without unfolding the underlying pair of irreducibles.
 - `Hypothesis.difference_image_ne_zero` and
   `signed_difference_image_ne_zero` lift that nonzero image API to the §7
   hypothesis carrier, avoiding repeated unpacking of `difference_image hχ`.
+- `Hypothesis.difference_image_inner_self` and
+  `difference_images_inner_eq_zero_of_inner_pair` lift the same norm and
+  orthogonality calculations to the §7 hypothesis carrier.
 - `SignedIrreducibleDifferenceFamily.signedDifference_inner_self_of_ne_zero` and
   `signedDifference_inner_of_ne_zero_of_ne` provide the target-side norm/inner
   values needed when §7 reduces image differences to the shared §3 (1.4)
