@@ -52,6 +52,22 @@ theorem mono_apply (F : FiltrationData (L := L) S) {A B : Subgroup L}
     (hAB : A ≤ B) : F.carrier B ⊆ F.carrier A :=
   F.mono hAB
 
+theorem zSupportedSpan_subset_base (F : FiltrationData (L := L) S)
+    (A : Subgroup L) (B : Set L) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) (F.carrier A) B ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S B := by
+  intro φ hφ
+  exact OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left (L := L)
+    (F.subset_base A) hφ
+
+theorem zSupportedSpan_mono_apply (F : FiltrationData (L := L) S)
+    {A₁ A₂ : Subgroup L} (hA : A₁ ≤ A₂) (B : Set L) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) (F.carrier A₂) B ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) (F.carrier A₁) B := by
+  intro φ hφ
+  exact OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left (L := L)
+    (F.mono hA) hφ
+
 end FiltrationData
 
 /-- Peterfalvi (6.1): solvable-normal filtration setup for applying coherence
@@ -84,6 +100,23 @@ theorem filtration_mono (hyp : DescentHypothesis (L := L) (G := G) S A)
     {A₁ A₂ : Subgroup L} (hA : A₁ ≤ A₂) :
     hyp.filtration.carrier A₂ ⊆ hyp.filtration.carrier A₁ :=
   hyp.filtration.mono hA
+
+theorem filtration_zSupportedSpan_subset_base
+    (hyp : DescentHypothesis (L := L) (G := G) S A)
+    (A' : Subgroup L) (B : Set L) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := L)
+        (hyp.filtration.carrier A') B ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S B :=
+  hyp.filtration.zSupportedSpan_subset_base A' B
+
+theorem filtration_zSupportedSpan_mono
+    (hyp : DescentHypothesis (L := L) (G := G) S A)
+    {A₁ A₂ : Subgroup L} (hA : A₁ ≤ A₂) (B : Set L) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := L)
+        (hyp.filtration.carrier A₂) B ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L)
+        (hyp.filtration.carrier A₁) B :=
+  hyp.filtration.zSupportedSpan_mono_apply hA B
 
 end DescentHypothesis
 

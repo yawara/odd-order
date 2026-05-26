@@ -47,6 +47,8 @@ structures for §8:
 - `DescentHypothesis`: (6.1) の solvable-normal filtration setup。
 - `FiltrationData`: (6.1) の `S(A)` を、基底集合 `S` への包含と
   `A ≤ B → S(B) ⊆ S(A)` という kernel filtration の向き付きで保持。
+  `zSupportedSpan` への lift も持つので、`Z[S(A),B]` から `Z[S,B]`
+  への戻しと filtration の単調性を直接使える。
 - `OddOrderSpecialization`: (6.4) の odd-order specialization carrier。
 - `SibleySetup`: (6.8) の final setup with TI-subset condition。
 - `SibleySetup.CoherenceTarget`: §7 `IsCoherent` target attached to the setup。
