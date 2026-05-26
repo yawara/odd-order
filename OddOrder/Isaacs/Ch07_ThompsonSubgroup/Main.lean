@@ -3055,6 +3055,40 @@ theorem pow_p_eq_one_of_mem_omega1ZCenterOpCore
     (hg : g ∈ omega1ZCenterOpCore G p) : g ^ p = 1 :=
   ((mem_omega1ZCenterOpCore).mp hg).2
 
+/-! ### Step 7 sub-session (A): Cor 4.35 wrapper for `V := Ω₁(Z(O_p(G)))`
+
+We specialize **Isaacs Cor 4.35**
+(`OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`)
+to `V := Ω₁(Z(O_p(G)))`: any `p'`-group `A` acting on `V` that fixes every
+element of order `p` (= every element of `V`!) has `actionCommutator φ = ⊥`.
+
+The wrapper packages the `CommGroup`, `IsPGroup p`, `Finite` instances on `V`
+so callers only need to supply the action `φ : A →* MulAut ↥V` and the
+hypotheses `¬ p ∣ |A|` and the fixed-point property. -/
+
+/-- **Isaacs Thm 7.6 Step 7 sub-session (A)**: Cor 4.35 specialized to
+`V := Ω₁(Z(O_p(G)))`.
+
+Given a finite group `A` with `p ∤ |A|` acting on `V` via `φ : A →* MulAut ↥V`,
+if every element of order `p` (equivalently every element of `V`, since
+`V = Ω₁(...)`) is fixed by every `a ∈ A`, then `actionCommutator φ = ⊥`.
+
+Reduces to Cor 4.35
+(`OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`)
+once the abelian + `p`-group instances on `V` are produced. -/
+theorem cor_4_35_for_omega1ZCenterOpCore
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Type*} [Group A] [Finite A]
+    (φ : A →* MulAut ↥(omega1ZCenterOpCore G p))
+    (hA_p' : ¬ p ∣ Nat.card A)
+    (h_fix : ∀ v : ↥(omega1ZCenterOpCore G p), v ^ p = 1 →
+      ∀ a : A, (φ a) v = v) :
+    OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+  let _ : CommGroup ↥(omega1ZCenterOpCore G p) :=
+    omega1ZCenterOpCore_commGroup G p
+  OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
+    (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
+
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
 Once Step 5-6 produce the triviality of the `A`-action on `V = Z(L)`, the book:
