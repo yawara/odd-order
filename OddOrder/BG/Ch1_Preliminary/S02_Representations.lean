@@ -3862,6 +3862,49 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
         hnormalizer (q := q) hq_ne_p Q hQcore)
       hind
 
+/-- Characteristic-away determinant-kernel core spine.
+
+This is the BG Thm 2.6(a) version of
+`exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot`: since there is no
+distinguished field characteristic prime, we choose any prime divisor of
+`|G*|` and reuse the p-parametrized normalizer spine. -/
+private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime],
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    ∃ r : ℕ, r.Prime ∧
+      OddOrder.Isaacs.Ch01.opCore r (determinantKernelSubgroup ρ) ≠ ⊥ := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  have hGstar_ne_bot : Gstar ≠ ⊥ := by
+    simpa [Gstar] using hdet_ne_bot
+  haveI : Nontrivial Gstar :=
+    (Subgroup.nontrivial_iff_ne_bot Gstar).mpr hGstar_ne_bot
+  obtain ⟨p, hp_prime, _hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd (Finite.one_lt_card (α := Gstar)).ne'
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  exact exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
+    (p := p) ρ hdet_ne_bot
+    (fun {q} _hq_prime _hq_ne_p Q hQcore =>
+      hnormalizer (q := q) Q hQcore)
+    hind
+
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
 Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
@@ -4266,6 +4309,42 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosu
   exact
     commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed_charAway
       ρK hfaithfulK hodd hdimK (charAway_algebraicClosure hchar) hcoreK
+
+/-- Characteristic-away dispatch once the determinant-kernel core spine has
+produced a nontrivial prime core.
+
+The resulting `O_r(G*) ≠ 1` is sent to the algebraic-closure Maschke endpoint,
+which returns commutativity of the original group. -/
+private theorem commutative_of_determinantKernel_core_spine_charAway
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hchar : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → ¬ CharP F r)
+    (hdet_ne_bot : determinantKernelSubgroup ρ ≠ ⊥)
+    (hnormalizer : ∀ {q : ℕ} [Fact q.Prime],
+      (Q : Sylow q (determinantKernelSubgroup ρ)) →
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+          Set (determinantKernelSubgroup ρ))) ≠ ⊥ →
+      Std.Commutative
+        (· * · :
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ)) →
+          Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
+            Set (determinantKernelSubgroup ρ))))
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
+      ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) := by
+  rcases exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
+      ρ hdet_ne_bot hnormalizer hind with
+    ⟨r, hr_prime, hcore_ne_bot⟩
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  exact commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
+    ρ hfaithful hodd hdim hchar hcore_ne_bot
 
 /-- Algebraic-closure reduction for the current BG Thm 2.6(b) spine.
 

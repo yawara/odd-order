@@ -814,3 +814,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `H = N_{G*}(Q)` への制限表現に適用した. `hchar` は
   `|H| ∣ |G*| ∣ |G|` で制限している. 次 frontier はこの normalizer branch を
   char-away 用 determinant-kernel/core spine に渡すこと.
+- char-away 用 determinant-kernel/core spine を追加.
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway` は
+  `G* ≠ ⊥` から任意の prime divisor を選び、既存の p-parametrized spine
+  `exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot` を、`q ≠ p` 条件なしの
+  normalizer 仮定で再利用する. さらに
+  `commutative_of_determinantKernel_core_spine_charAway` は得られた
+  `O_r(G*) ≠ ⊥` を algebraic-closure Maschke endpoint へ渡す.
+  次 frontier は public `odd_two_dim_abelian` 本体で normalizer branch と
+  proper subgroup induction 出力を供給し、この char-away spineへ接続すること.
