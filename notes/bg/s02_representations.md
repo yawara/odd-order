@@ -525,3 +525,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - 次 frontier はさらに前半へ移動: q≠p core から abelian normal q-subgroup `K` を選び、
   Maschke + algebraic closedness + `dim V = 2` で「`K`-module の二つの rank-one
   summand が一意」という形の input を作る段.
+- `O_q(G*) ≠ ⊥` から BG の `K = Ω₁(Z(O_q(G*)))` に向かう前段として、
+  `exists_ambient_normal_commutative_qSubgroup_le_determinantKernel_of_opCore_ne_bot`
+  を追加済み. これは `O_q(G*)` を ambient `G` に持ち上げ、その中心を取ることで
+  `K ⊴ G`, `K ≤ G*`, `K` abelian q-subgroup, `K ≠ ⊥` を得る bridge.
+  まだ `Ω₁` / elementary abelian 化はしないが、p.29 の `x ∈ K#` で
+  `det x = 1` を使うための `K ≤ G*` と、`K ⊴ G` から line permutation へ進む
+  normality を同時に確保した.
+- 次 frontier はこの ambient `K` を使い、q≠p + Maschke + algebraic closedness で
+  `V` を二つの rank-one `K`-submodules に分解する statement へ進むこと.

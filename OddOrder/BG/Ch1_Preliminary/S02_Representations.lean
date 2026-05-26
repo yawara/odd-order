@@ -1800,6 +1800,91 @@ private theorem exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
       (Subgroup.mem_center_iff.mp hxO_center yO)).symm
   exact ⟨Z, hZnormal, hZp, hZ_ne_bot, hZcomm⟩
 
+/-- Determinant-kernel q-core bridge for BG Thm 2.6, q≠p.
+
+From `O_q(G*) ≠ 1`, construct a nontrivial abelian normal q-subgroup of the
+ambient group `G` that still lies in `G*`.  This is the formal counterpart of
+BG's choice `K = Ω₁(Z(O_q(G*)))`, stopping just before the `Ω₁` refinement. -/
+private theorem exists_ambient_normal_commutative_qSubgroup_le_determinantKernel_of_opCore_ne_bot
+    {q : ℕ} [Fact q.Prime] {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (ρ : Representation F G V)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    ∃ K : Subgroup G, K.Normal ∧ K ≤ determinantKernelSubgroup ρ ∧
+      IsPGroup q K ∧ K ≠ ⊥ ∧ Std.Commutative (· * · : K → K → K) := by
+  let Gstar : Subgroup G := determinantKernelSubgroup ρ
+  let Ostar : Subgroup Gstar := OddOrder.Isaacs.Ch01.opCore q Gstar
+  let Oamb : Subgroup G := Ostar.map Gstar.subtype
+  haveI : Gstar.Normal := by
+    dsimp [Gstar]
+    exact determinantKernelSubgroup_normal ρ
+  haveI : Ostar.Characteristic := by
+    dsimp [Ostar]
+    exact OddOrder.Isaacs.Ch01.opCore.characteristic q Gstar
+  have hOamb_normal : Oamb.Normal := by
+    dsimp [Oamb]
+    infer_instance
+  have hOamb_p : IsPGroup q Oamb := by
+    dsimp [Oamb, Ostar]
+    exact (OddOrder.Isaacs.Ch01.opCore_isPGroup q Gstar).map Gstar.subtype
+  have hOamb_ne_bot : Oamb ≠ ⊥ := by
+    intro hOamb_bot
+    apply hcore_ne_bot
+    have hmap :
+        Ostar.map Gstar.subtype = (⊥ : Subgroup Gstar).map Gstar.subtype := by
+      simpa [Oamb] using hOamb_bot
+    exact (Subgroup.map_subtype_inj (H := Gstar)).mp hmap
+  have hOamb_nontrivial : Nontrivial Oamb :=
+    (Subgroup.nontrivial_iff_ne_bot Oamb).mpr hOamb_ne_bot
+  haveI : Nontrivial Oamb := hOamb_nontrivial
+  have hcenter_nontrivial : Nontrivial (Subgroup.center Oamb) := by
+    have htop_nontrivial : Nontrivial (⊤ : Subgroup Oamb) :=
+      (Subgroup.nontrivial_iff_ne_bot (⊤ : Subgroup Oamb)).mpr top_ne_bot
+    have h :=
+      OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial
+        (P := Oamb) (p := q) (N := (⊤ : Subgroup Oamb))
+        hOamb_p htop_nontrivial
+    simpa using h
+  let K : Subgroup G := (Subgroup.center Oamb).map Oamb.subtype
+  haveI : Oamb.Normal := hOamb_normal
+  haveI : (Subgroup.center Oamb).Characteristic := Subgroup.centerCharacteristic
+  have hKnormal : K.Normal := by
+    dsimp [K]
+    infer_instance
+  have hOamb_le_Gstar : Oamb ≤ Gstar := by
+    intro x hx
+    rcases hx with ⟨xstar, _hxstar, rfl⟩
+    exact xstar.2
+  have hK_le_Gstar : K ≤ Gstar := by
+    intro x hx
+    rcases hx with ⟨xO, _hxO_center, rfl⟩
+    exact hOamb_le_Gstar xO.2
+  have hKp : IsPGroup q K := by
+    dsimp [K]
+    exact (hOamb_p.to_subgroup (Subgroup.center Oamb)).map Oamb.subtype
+  have hK_ne_bot : K ≠ ⊥ := by
+    intro hK_bot
+    have hcenter_ne_bot : Subgroup.center Oamb ≠ ⊥ :=
+      (Subgroup.nontrivial_iff_ne_bot (Subgroup.center Oamb)).mp hcenter_nontrivial
+    apply hcenter_ne_bot
+    have hmap :
+        (Subgroup.center Oamb).map Oamb.subtype =
+          (⊥ : Subgroup Oamb).map Oamb.subtype := by
+      simpa [K] using hK_bot
+    exact (Subgroup.map_subtype_inj (H := Oamb)).mp hmap
+  have hKcomm : Std.Commutative (· * · : K → K → K) := by
+    constructor
+    intro x y
+    apply Subtype.ext
+    rcases x.property with ⟨xO, hxO_center, hx_eq⟩
+    rcases y.property with ⟨yO, _hyO_center, hy_eq⟩
+    change (x : G) * (y : G) = (y : G) * (x : G)
+    rw [← hx_eq, ← hy_eq]
+    simpa using (congr_arg Subtype.val
+      (Subgroup.mem_center_iff.mp hxO_center yO)).symm
+  exact ⟨K, hKnormal, hK_le_Gstar, hKp, hK_ne_bot, hKcomm⟩
+
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
 This isolates the group-theoretic part of BG Thm 2.6 where, after choosing
