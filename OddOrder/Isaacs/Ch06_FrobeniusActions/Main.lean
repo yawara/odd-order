@@ -124,7 +124,7 @@ theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
   have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
   exact h (b : A) hbA n hn (by simpa using hfix)
 
-@[reducible] private def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
+@[reducible] def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) (a : A) : MulAut (N ⧸ M) := by
   let f : N ⧸ M →* N ⧸ M :=
     QuotientGroup.map M M (MulDistribMulAction.toMulAut A N a).toMonoidHom
@@ -144,7 +144,7 @@ theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
       ext n
       simp [f, g])
 
-@[reducible] private def invariantQuotientMulAutHom (M : Subgroup N) [M.Normal]
+@[reducible] def invariantQuotientMulAutHom (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : A →* MulAut (N ⧸ M) where
   toFun := invariantQuotientMulAut M hM
   map_one' := by
@@ -159,7 +159,7 @@ theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
     intro n
     simp [invariantQuotientMulAut, mul_smul]
 
-@[reducible] private def invariantQuotientMulDistribMulAction (M : Subgroup N) [M.Normal]
+@[reducible] def invariantQuotientMulDistribMulAction (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A (N ⧸ M) :=
   MulDistribMulAction.compHom (N ⧸ M) (invariantQuotientMulAutHom M hM)
 
@@ -1108,6 +1108,98 @@ theorem nontrivialActionFixedByClosure_invariant_of_commutative
     simpa [map_mul] using Subgroup.mul_mem _ hu hv
   · intro u _ hu
     simpa [map_inv] using Subgroup.inv_mem _ hu
+
+/-- If every nonidentity fixed subgroup lies in an invariant normal subgroup `M`, then the
+induced action on `N/M` is Frobenius.
+
+This is the formal "fixed points come from fixed points" step in Isaacs Thm 6.21. -/
+theorem quotient_isFrobeniusAction_of_fixedBy_le
+    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [MulDistribMulAction A N]
+    {M : Subgroup N} [M.Normal]
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M)
+    (hCopAM : Nat.Coprime (Nat.card A) (Nat.card M))
+    (hfixed : ∀ a : A, a ≠ 1 →
+      actionFixedBy (MulDistribMulAction.toMulAut A N) a ≤ M) :
+    @IsFrobeniusAction A (N ⧸ M) _ _
+      (IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM) := by
+  classical
+  letI : MulDistribMulAction A (N ⧸ M) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM
+  intro a ha q hq_ne hfix
+  revert hq_ne hfix
+  refine QuotientGroup.induction_on q ?_
+  intro n hq_ne hfix
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let P : Subgroup A :=
+    { carrier := {b | ∃ m ∈ M, φ b n = n * m}
+      one_mem' := by
+        refine ⟨1, M.one_mem, ?_⟩
+        simp [φ]
+      mul_mem' := by
+        intro b c hb hc
+        rcases hb with ⟨mb, hmb, hb⟩
+        rcases hc with ⟨mc, hmc, hc⟩
+        refine ⟨mb * (φ b) mc, M.mul_mem hmb (hM b mc hmc), ?_⟩
+        calc
+          φ (b * c) n = φ b (φ c n) := by
+            change (b * c) • n = b • c • n
+            rw [mul_smul]
+          _ = φ b (n * mc) := by rw [hc]
+          _ = φ b n * φ b mc := by simp
+          _ = n * (mb * φ b mc) := by rw [hb]; group
+      inv_mem' := by
+        intro b hb
+        rcases hb with ⟨m, hm, hb⟩
+        refine ⟨((φ b⁻¹) m)⁻¹, M.inv_mem (hM b⁻¹ m hm), ?_⟩
+        have hb' : n = φ b⁻¹ n * φ b⁻¹ m := by
+          calc
+            n = φ b⁻¹ (φ b n) := by simp [φ]
+            _ = φ b⁻¹ (n * m) := by rw [hb]
+            _ = φ b⁻¹ n * φ b⁻¹ m := by simp
+        calc
+          φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
+          _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
+  have haP : a ∈ P := by
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
+      simpa [IsFrobeniusAction.invariantQuotientMulDistribMulAction,
+        IsFrobeniusAction.invariantQuotientMulAutHom,
+        IsFrobeniusAction.invariantQuotientMulAut] using hfix
+    have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
+    have hMN : M.Normal := inferInstance
+    have hm : n⁻¹ * (a • n) ∈ M := by
+      rw [← hMN.mem_comm_iff]
+      simpa [div_eq_mul_inv] using hdiv
+    refine ⟨n⁻¹ * (a • n), hm, ?_⟩
+    simp [φ]
+  let C : Subgroup A := Subgroup.zpowers a
+  let φC : C →* MulAut N := φ.comp C.subtype
+  have hC_le_P : C ≤ P := Subgroup.zpowers_le.mpr haP
+  have hM_inv_C : OddOrder.Isaacs.Ch03.IsAInvariant φC M := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro c m hm
+    exact hM (c : A) m hm
+  have hCopCM : Nat.Coprime (Nat.card C) (Nat.card M) :=
+    hCopAM.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
+  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
+  letI : CommGroup C := IsCyclic.commGroup
+  have hSolvC : IsSolvable C ∨ IsSolvable M := Or.inl inferInstance
+  have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
+    intro c
+    simpa [φC] using hC_le_P c.2
+  obtain ⟨x, hx_fixed, hx_coset⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+      (A := C) (G := N) (φ := φC) hCopCM hSolvC hM_inv_C hg_fix_C
+  have hxM : x ∈ M :=
+    hfixed a ha (by
+      have := hx_fixed ⟨a, Subgroup.mem_zpowers a⟩
+      simpa [φC, φ] using this)
+  rcases hx_coset with ⟨m, hm, hx_eq⟩
+  have hnM : n ∈ M := by
+    have hxm : x * m⁻¹ ∈ M := M.mul_mem hxM (M.inv_mem hm)
+    convert hxm using 1
+    rw [hx_eq]
+    group
+  exact hq_ne ((QuotientGroup.eq_one_iff n).mpr hnM)
 
 /-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]

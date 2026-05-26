@@ -295,6 +295,13 @@ FT クリティカル度 + 章内依存で並べる:
   (`nontrivialActionFixedByClosure_invariant_of_commutative`) まで sorry-free.
   これは 6.21 proof 中の「`K` は A-invariant since uniquely determined by `A,N`」を
   wrapper ではなく本文通りの生成部分群で閉じるための surface.
+- **§6B / 6.21 quotient Frobenius bridge**:
+  `quotient_isFrobeniusAction_of_fixedBy_le` を追加. `M ⊴ N` が `A`-invariant で,
+  `|A|` と `|M|` が coprime, かつ全 `a ≠ 1` で `C_N(a) ≤ M` なら,
+  `A` の `N/M` への誘導作用は Frobenius. 6.21 本文の
+  “fixed points come from fixed points” から
+  `C_{N/K}(a) = 1` を得る部分を, Ch.4 Cor 3.28
+  (`coprime_fixedPoints_quotient_of_coprime_normal`) で直接閉じた.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
