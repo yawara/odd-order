@@ -28,6 +28,32 @@ variable {L G : Type*} [Group L] [Group G]
 
 /- 6: Some coherence theorems (pp. 30-37) -/
 
+/-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
+`S`.  In the text, larger kernel conditions give smaller subsets:
+if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
+structure FiltrationData (S : Set (ClassFunction L ℂ)) where
+  carrier : Subgroup L → Set (ClassFunction L ℂ)
+  subset_base : ∀ A, carrier A ⊆ S
+  mono : ∀ ⦃A B : Subgroup L⦄, A ≤ B → carrier B ⊆ carrier A
+
+namespace FiltrationData
+
+variable {S : Set (ClassFunction L ℂ)}
+
+theorem subset_base_apply (F : FiltrationData (L := L) S) (A : Subgroup L) :
+    F.carrier A ⊆ S :=
+  F.subset_base A
+
+theorem mem_base (F : FiltrationData (L := L) S) {A : Subgroup L}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ F.carrier A) : χ ∈ S :=
+  F.subset_base A hχ
+
+theorem mono_apply (F : FiltrationData (L := L) S) {A B : Subgroup L}
+    (hAB : A ≤ B) : F.carrier B ⊆ F.carrier A :=
+  F.mono hAB
+
+end FiltrationData
+
 /-- Peterfalvi (6.1): solvable-normal filtration setup for applying coherence
 descent. -/
 structure DescentHypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
@@ -37,7 +63,29 @@ structure DescentHypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
   K : Subgroup L
   K_normal : K.Normal
   K_solvable : IsSolvable K
-  filtration : Subgroup L → Set (ClassFunction L ℂ)
+  filtration : FiltrationData (L := L) S
+
+namespace DescentHypothesis
+
+variable {S : Set (ClassFunction L ℂ)} {A : Set L}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+theorem filtration_subset_base (hyp : DescentHypothesis (L := L) (G := G) S A)
+    (A' : Subgroup L) : hyp.filtration.carrier A' ⊆ S :=
+  hyp.filtration.subset_base A'
+
+theorem filtration_mem_base (hyp : DescentHypothesis (L := L) (G := G) S A)
+    {A' : Subgroup L} {χ : ClassFunction L ℂ}
+    (hχ : χ ∈ hyp.filtration.carrier A') : χ ∈ S :=
+  hyp.filtration.mem_base hχ
+
+theorem filtration_mono (hyp : DescentHypothesis (L := L) (G := G) S A)
+    {A₁ A₂ : Subgroup L} (hA : A₁ ≤ A₂) :
+    hyp.filtration.carrier A₂ ⊆ hyp.filtration.carrier A₁ :=
+  hyp.filtration.mono hA
+
+end DescentHypothesis
 
 /-- Peterfalvi (6.4): the odd-order specialization used before (6.5)-(6.6). -/
 structure OddOrderSpecialization (S : Set (ClassFunction L ℂ)) (A : Set L)
