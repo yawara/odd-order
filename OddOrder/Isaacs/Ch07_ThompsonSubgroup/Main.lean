@@ -5437,6 +5437,71 @@ theorem step2_pSylow_not_normalizes_nontrivial_qSubgroup
   rw [hH_card_eq_qb] at hp_dvd
   exact hp_ne_dvd_q (hp_prime.dvd_of_dvd_pow hp_dvd)
 
+/-- **§7D helper axiom** — a nontrivial finite solvable group has nontrivial
+Fitting subgroup.
+
+This is a standard fact (Isaacs Cor 3.9 / the structure theory of solvable
+groups): a minimal normal subgroup of a solvable group is an elementary abelian
+`p`-group, hence nilpotent, hence contained in `F(G)`; therefore `F(G) ≠ 1`.
+The repo's minimal-normal-subgroup machinery (`SchurZassenhausConj.lean`,
+`minimal_normal_isPGroup_of_solvable`) is currently `private`; this small axiom
+captures the consequence pending a public re-export.  Tracked in issue 0032. -/
+axiom fitting_ne_bot_of_solvable_nontrivial
+    (M : Type*) [Group M] [Finite M] [Nontrivial M] [IsSolvable M] :
+    OddOrder.Isaacs.Ch01.fitting M ≠ ⊥
+
+/-- **§7D Steps 2-3 partition setup** — every maximal subgroup `M` of a simple
+group of order `p^a q^b` is `p`-type or `q`-type (Isaacs L3963-3967).
+
+`M` is solvable (proper subgroup, all proper subgroups solvable) and nontrivial,
+so its Fitting subgroup is nontrivial; since `|M| ∣ p^a q^b` has prime factors
+only among `{p, q}`, and `F(M) = ⨆_{r ∈ primeFactors |M|} O_r(M)`, at least one
+of `O_p(M)`, `O_q(M)` is nontrivial. -/
+theorem maximal_isPType_or_isQType
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    {M : Subgroup H} (hM_max : IsCoatom M) (hM_ne_bot : M ≠ ⊥)
+    (hM_solvable : IsSolvable M) :
+    IsPType p M ∨ IsQType q M := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- M is nontrivial since M ≠ ⊥ (in the §7D application H is non-solvable, so
+  -- |H| is not prime and a maximal subgroup is never trivial).
+  haveI hM_nontriv : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  -- F(M) ≠ ⊥.
+  have hF_ne_bot : OddOrder.Isaacs.Ch01.fitting ↥M ≠ ⊥ :=
+    fitting_ne_bot_of_solvable_nontrivial ↥M
+  -- F(M) = ⨆_{r ∈ primeFactors |M|} O_r(M).
+  rw [OddOrder.Isaacs.Ch01.fitting_eq_iSup_primeFactors] at hF_ne_bot
+  -- primeFactors |M| ⊆ {p, q}.
+  have hM_card_dvd : Nat.card ↥M ∣ p ^ a * q ^ b := by
+    rw [← hH_card]; exact M.card_subgroup_dvd_card
+  have hpf_sub : ∀ r ∈ (Nat.card ↥M).primeFactors, r = p ∨ r = q := by
+    intro r hr
+    obtain ⟨hr_prime, hr_dvd, _⟩ := Nat.mem_primeFactors.mp hr
+    have hr_dvd_paqb : r ∣ p ^ a * q ^ b := hr_dvd.trans hM_card_dvd
+    rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
+    · left; exact (Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp (hr_prime.dvd_of_dvd_pow h)
+    · right; exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow h)
+  -- Some O_r(M) ≠ ⊥ with r ∈ {p,q}.
+  by_contra h_neither
+  push Not at h_neither
+  obtain ⟨h_notP, h_notQ⟩ := h_neither
+  -- h_notP : ¬ IsPType p M, i.e., ¬(IsCoatom M ∧ opCore p ↥M ≠ ⊥).
+  have hOp_bot : OddOrder.Isaacs.Ch01.opCore p ↥M = ⊥ := by
+    by_contra hne; exact h_notP ⟨hM_max, hne⟩
+  have hOq_bot : OddOrder.Isaacs.Ch01.opCore q ↥M = ⊥ := by
+    by_contra hne; exact h_notQ ⟨hM_max, hne⟩
+  -- Then every generator opCore r ↥M (r ∈ primeFactors) is ⊥, so the sup is ⊥.
+  apply hF_ne_bot
+  rw [eq_bot_iff]
+  refine iSup_le (fun r => ?_)
+  rcases hpf_sub r r.2 with hrp | hrq
+  · rw [show (r : ℕ) = p from hrp, hOp_bot]
+  · rw [show (r : ℕ) = q from hrq, hOq_bot]
+
 
 /-- **§7D core axiom** — *no finite simple non-solvable group has order
 dividing `p^a * q^b`*.
