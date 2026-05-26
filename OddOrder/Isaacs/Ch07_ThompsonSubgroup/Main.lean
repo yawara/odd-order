@@ -4269,20 +4269,77 @@ the working hypotheses, and use it together with Step 8's wrap-up.
 
 Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
 
-/-- **Isaacs Thm 7.6 Step 7** (axiomatized — mmd L3884-3892).
+/-! ### Step 4-5-8 closing axiom (mmd L3870-3896)
 
-Under the running hypotheses (i)-(v), assume there exists `A ∈ E(P)` with
-`A ⊄ O_p(G)`.  Then there is no such `A`: a contradiction.
+The Goldschmidt-style closing argument combines:
 
-This is the core combinatorial counting / action-extension argument of Thm 7.6;
-the bridge lemmas above (Steps 2-6 + Step 8) reduce the unconditional `normal_J`
-proof to this axiomatic step.
+* **Step 4** (mmd L3870): `G = LA` and `P = UA` (using induction hypothesis on
+  the proper subgroup `H = LA` to reach a contradiction unless `H = G`).
+* **Step 5** (mmd L3874): `|Ā| = p`, using Lemma 6.20 (cyclic faithful coprime
+  action) applied to `Ā ↷ L̅` (faithful by Step 1(c), coprime by p / p').  The
+  Step 6.20 hypothesis "trivial on every proper invariant subgroup" comes from
+  Step 3 applied to `MA` for any `Ā`-invariant `M̅ < L̅`.
+* **Step 8** (mmd L3893-3896): combines |V : V∩A| ≤ p (Step 7, landed) with
+  `P̄ = Ā` (from Step 4) and `Ā` abelian centralizing `V∩A` to derive
+  `|V : C_V(P̄)| ≤ p`, then applies Thm 7.5 (`sylow_normal_of_elementary_normal_P_theorem`)
+  to get `P̄ ⊴ Ḡ`, then pulls back to `P ⊴ G` and `A ⊆ P ⊆ U`, contradicting
+  `A ⊄ U`.
 
-Will be discharged once the Goldschmidt-style counting argument over `E(P)`
-combined with Ch.6 Thm 6.20 + Ch.4 Cor 4.35 is filled in.
+We isolate the Step 4-5-8 closing argument as a **local axiom** parametrized by:
+* The full Thm 7.6 hypotheses (i)-(v) on the running `G`.
+* The induction hypothesis: Thm 7.6 holds for all proper subgroups `H < G` that
+  satisfy the descended hypotheses.
+* A chosen `A ∈ E(P)` with `A ⊄ U` (Step 2 extraction).
 
-TODO Step 7: discharge this axiom via the book's counting argument over `E(P)`. -/
-axiom thompsonJ_le_opCore_of_normal_J_hypotheses
+The conclusion is `False`.  This bundles **Steps 3-8** (Step 3 is the only step
+that uses the IH).
+
+Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+
+/-- **Isaacs Thm 7.6 Steps 3-8 contradiction** (local axiom — mmd L3858-3896).
+
+Bundles the Goldschmidt-style closing argument of Thm 7.6 once an `A ∈ E(P)`
+with `A ⊄ U = O_p(G)` has been picked (Step 2), and the induction hypothesis
+(Thm 7.6 for smaller groups) is available (Step 3 uses it).
+
+Reduces to the textbook Steps 4, 5, 6 (= V faithfulness — already landed as
+`centralizer_omega1ZCenterOpCore_isPGroup` + `..._le_opCore_of_isPGroup` +
+`..._map_eq_bot_of_le_opCore`), Step 7 (= |V : V∩A| ≤ p — already landed as
+`omega1ZCenterOpCore_relIndex_inter_A_le`), and Step 8 (= Thm 7.5 application
++ pull-back). -/
+private axiom step3to8_contradiction_of_normal_J_hypotheses
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (_hp2 : p ≠ 2)
+    (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (_h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    (_ih : ∀ (H : Type*) [Group H] [Finite H]
+      [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H],
+      Nat.card H < Nat.card G →
+      (∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H = ⊥ →
+      ∀ (Q : Sylow p H),
+        Subgroup.centralizer
+            (((Subgroup.center (Q : Subgroup H)).map
+              (Q : Subgroup H).subtype) : Set H)
+          = (Q : Subgroup H) →
+        (Subgroup.thompsonJ (Q : Subgroup H) p).Normal)
+    {A : Subgroup G}
+    (_hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    (_hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G) :
+    False
+
+/-- **Isaacs Thm 7.6 Step 1-7 conclusion**: `J(P) ≤ O_p(G)`.
+
+Proved by strong induction on `Nat.card G` plus Step 2 extraction (`thompsonJ_le_iff`)
+plus the Steps 3-8 closing contradiction
+(`step3to8_contradiction_of_normal_J_hypotheses`). -/
+theorem thompsonJ_le_opCore_of_normal_J_hypotheses
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     (hp2 : p ≠ 2)
@@ -4293,7 +4350,60 @@ axiom thompsonJ_le_opCore_of_normal_J_hypotheses
        Subgroup.centralizer
          (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
          = (P : Subgroup G)) :
-    Subgroup.thompsonJ (P : Subgroup G) p ≤ OddOrder.Isaacs.Ch01.opCore p G
+    Subgroup.thompsonJ (P : Subgroup G) p ≤ OddOrder.Isaacs.Ch01.opCore p G := by
+  classical
+  -- Strong induction on `Nat.card G`, with the motive parametrized over arbitrary
+  -- groups whose order is less than `|G|` and which satisfy the descended hypotheses.
+  let motive : ℕ → Prop := fun n =>
+    ∀ (H : Type _) [Group H] [Finite H] [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H]
+      (_h2abelian : ∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+      (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H = ⊥)
+      (Q : Sylow p H)
+      (_h_centralizer_center :
+         Subgroup.centralizer
+           (((Subgroup.center (Q : Subgroup H)).map (Q : Subgroup H).subtype) : Set H)
+           = (Q : Subgroup H)),
+      Nat.card H = n → Subgroup.thompsonJ (Q : Subgroup H) p ≤ OddOrder.Isaacs.Ch01.opCore p H
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G h2abelian h_oPiPrime_trivial P h_centralizer_center rfl
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih H _ _ _ h2abelian' h_oPiPrime_trivial' Q h_centralizer_center' hcard
+  -- The induction hypothesis at the "normal_J" level (i.e., normality of J(Q')
+  -- in H' for groups H' with order < n).
+  have ih_normal :
+      ∀ (H' : Type _) [Group H'] [Finite H']
+        [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H'],
+      Nat.card H' < Nat.card H →
+      (∀ S : Subgroup H', IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H' = ⊥ →
+      ∀ (Q' : Sylow p H'),
+        Subgroup.centralizer
+            (((Subgroup.center (Q' : Subgroup H')).map
+              (Q' : Subgroup H').subtype) : Set H')
+          = (Q' : Subgroup H') →
+        (Subgroup.thompsonJ (Q' : Subgroup H') p).Normal := by
+    intro H' _ _ _ hH'_lt h2abelian'' h_oPiPrime_trivial'' Q' h_centralizer_center''
+    have hH'_lt_n : Nat.card H' < n := hH'_lt.trans_eq hcard
+    have h_le_op' :=
+      ih (Nat.card H') hH'_lt_n H' h2abelian'' h_oPiPrime_trivial'' Q' h_centralizer_center'' rfl
+    exact normal_thompsonJ_of_le_opCore Q' h_le_op'
+  -- Now prove `J(Q) ≤ U` on the running group `H` of order `n` using Step 2 extraction
+  -- + the Steps 3-8 closing contradiction.
+  haveI h_pSolvable_in_H : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
+    inferInstance
+  rw [thompsonJ_le_iff]
+  intro A hA_mem
+  by_contra hA_not_le
+  -- Step 2 has already extracted `A`; apply the Steps 3-8 contradiction.
+  refine step3to8_contradiction_of_normal_J_hypotheses (G := H) Q
+    ?_ h_pSolvable_in_H h2abelian' h_oPiPrime_trivial' h_centralizer_center'
+    ?_ hA_mem hA_not_le
+  · -- We need `p ≠ 2`, which is the running hypothesis (independent of `H`).
+    exact hp2
+  · -- The induction hypothesis at the "normal_J" level for proper subgroups
+    -- of `H` (with `Nat.card H' < Nat.card H = n`).
+    intro H' _ _ _ hH'_lt h2abelian'' h_oPiPrime_trivial'' Q' h_centralizer_center''
+    exact ih_normal H' hH'_lt h2abelian'' h_oPiPrime_trivial'' Q' h_centralizer_center''
 
 /-- **Isaacs Thm 7.6** (normal-J theorem, unconditional).
 
@@ -4309,10 +4419,9 @@ Steps 1-7 establish `J(P) ≤ O_p(G)` using Thm 7.5 (normal-P), Ch.4 Cor 4.35
 Step 8 propagates normality from `O_p(G)` to `G` via Thm 7.2
 (`thompsonJ_eq_of_le_of_le`) + characteristic-of-characteristic transport.
 
-**This unconditional version** uses the Step 7 axiom
-(`thompsonJ_le_opCore_of_normal_J_hypotheses`) to bridge Steps 1-7, then applies
-the Step 8 wrap-up (`normal_thompsonJ_of_le_opCore`).  Once Step 7 is discharged
-the theorem becomes axiom-free. -/
+The named `step3to8_contradiction_of_normal_J_hypotheses` is a *local axiom*
+that bundles textbook Steps 3-8 (the Step 3 part uses the strong induction
+hypothesis explicitly).  All earlier landed bridge lemmas are unconditional. -/
 theorem normal_J
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
