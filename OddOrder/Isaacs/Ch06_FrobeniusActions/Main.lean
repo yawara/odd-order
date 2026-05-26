@@ -2579,6 +2579,21 @@ theorem sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
   P.isPGroup'.isCyclic_of_subgroups_card_prime_unique
     (subgroups_card_prime_unique_of_frobeniusAction_sylow hFrob P)
 
+/-- **Isaacs Cor 6.17 observation (abelian complement branch)**: a finite abelian Frobenius
+complement is cyclic.  This is the part needed later in Theorem 6.21 to rule out a noncyclic
+abelian group acting Frobeniusly. -/
+theorem isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group U] [Finite U] [Nontrivial U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) :
+    IsCyclic A := by
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : IsMulCommutative P := ⟨⟨fun x y => by
+      ext
+      exact mul_comm (x : A) (y : A)⟩⟩
+    exact sylow_isCyclic_of_frobeniusAction_of_isMulCommutative hFrob P
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/

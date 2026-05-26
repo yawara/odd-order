@@ -218,6 +218,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms IsPGroup.isCyclic_of_subgroups_card_prime_unique
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

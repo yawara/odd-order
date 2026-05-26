@@ -284,8 +284,9 @@ FT クリティカル度 + 章内依存で並べる:
   6.9 → 6.10 と 6.11 abelian branch の接続で使う.
 - **§6B / 6.20 abelian Z-group bridge**:
   `isCyclic_of_sylow_isCyclic` と
-  `exists_prime_sylow_not_isCyclic_of_not_isCyclic` を追加. Cor 6.17 で Sylow cyclic
-  が得られた後, abelian Frobenius complement を cyclic と結論するための Lean bridge.
+  `exists_prime_sylow_not_isCyclic_of_not_isCyclic` を追加. 6.11 可換 branch と 6.10 から直接
+  `isCyclic_of_frobeniusAction_of_isMulCommutative` も閉じたため, 6.21 の
+  「noncyclic abelian Frobenius complement は存在しない」矛盾に使える.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
@@ -349,7 +350,9 @@ FT クリティカル度 + 章内依存で並べる:
   `CommGroup.equiv_prod_multiplicative_zmod_of_finite` を直接使い, cyclic factor が 2 個以上
   あると各 factor の top-order element から異なる位数 `p` 部分群が出る, という本文の
   fundamental theorem branch を Lean 化した. これを 6.10 と接続して
-  `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` まで sorry-free.
+  `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` まで sorry-free. さらに Sylow ごとに
+  貼り合わせて, 6.17 後の観察「可換 Frobenius complement は巡回」を
+  `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
