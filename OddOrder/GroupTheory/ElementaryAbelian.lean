@@ -285,6 +285,48 @@ theorem isCyclic_of_subgroups_card_prime_unique
     exact isCyclic_pi_of_subsingleton
   exact e.isCyclic.mpr htarget
 
+/-- A noncyclic finite `p`-group of order at most `p²` is elementary abelian of order `p²`.
+
+This is the small-order reduction used in Isaacs Thm 7.5 after quotienting to
+`|V : U| ≤ p²`: the cyclic cases have order `1` or `p`, so a noncyclic `p`-group must have
+exactly order `p²`, where the prime-square classification makes it elementary abelian. -/
+theorem isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
+    [Finite G] [Fact p.Prime] (hG : IsPGroup p G)
+    (hCard_le : Nat.card G ≤ p ^ 2) (hNotCyclic : ¬ IsCyclic G) :
+    OddOrder.GroupTheory.IsElementaryAbelian p G ∧ Nat.card G = p ^ 2 := by
+  obtain ⟨n, hcard⟩ := IsPGroup.iff_card.mp hG
+  have hp : p.Prime := Fact.out
+  have hn_ge_two : 2 ≤ n := by
+    by_contra hnot
+    have hn_lt_two : n < 2 := Nat.lt_of_not_ge hnot
+    have hcyc : IsCyclic G := by
+      interval_cases n
+      · have hcard_one : Nat.card G = 1 := by
+          simpa using hcard
+        exact @isCyclic_of_subsingleton G _ (Nat.card_eq_one_iff_unique.mp hcard_one).1
+      · have hcard_p : Nat.card G = p := by
+          simpa using hcard
+        exact isCyclic_of_prime_card hcard_p
+    exact hNotCyclic hcyc
+  have hn_le_two : n ≤ 2 := by
+    by_contra hnot
+    have hthree_le : 3 ≤ n := by omega
+    have hpow_le : p ^ 3 ≤ p ^ n :=
+      pow_le_pow_right₀ hp.one_lt.le hthree_le
+    have hp_sq_lt_cube : p ^ 2 < p ^ 3 :=
+      pow_lt_pow_right₀ hp.one_lt (by norm_num : (2 : ℕ) < 3)
+    have hcube_le_sq : p ^ 3 ≤ p ^ 2 := by
+      calc
+        p ^ 3 ≤ p ^ n := hpow_le
+        _ = Nat.card G := hcard.symm
+        _ ≤ p ^ 2 := hCard_le
+    exact (not_lt_of_ge hcube_le_sq) hp_sq_lt_cube
+  have hn_eq_two : n = 2 := le_antisymm hn_le_two hn_ge_two
+  have hCard : Nat.card G = p ^ 2 := by
+    simpa [hn_eq_two] using hcard
+  exact ⟨OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic
+    hp hCard hNotCyclic, hCard⟩
+
 private theorem subgroup_normal_of_le_center {H : Subgroup G} (hH : H ≤ Subgroup.center G) :
     H.Normal := by
   refine ⟨fun n hn g => ?_⟩

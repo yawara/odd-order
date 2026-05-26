@@ -230,7 +230,10 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
-  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み.
+  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
+  `|V| ≤ p^2` reduction 用に
+  `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
+  も追加済み.
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
@@ -272,6 +275,8 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
      (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
      `actionCommutator_quotientActionKernel_le_fixedPoints`,
      `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
+   - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
+     elementary abelian order `p^2` へ落とす small-order bridge.
 3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
