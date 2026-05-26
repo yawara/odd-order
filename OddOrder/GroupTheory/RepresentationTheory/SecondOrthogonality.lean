@@ -13,6 +13,7 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.LinearAlgebra.Matrix.ConjTranspose
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
@@ -64,6 +65,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   row Gram matrix `A * W * Aᴴ` for the square reindexed character table.
 * `OddOrder.RepresentationTheory.characterTableDeterminant_ne_zero_of_weightedRowOrthogonality`
   — determinant nonvanishing from weighted row orthogonality.
+* `OddOrder.RepresentationTheory.characterTableSquareMatrixInvertibleOfDet` — the
+  `[Invertible]` instance bridge extracted from determinant nonvanishing.
 * `OddOrder.RepresentationTheory.characterTableColumnPairing` — the column pairing
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.characterTableSquareColumnPairing` — the same column
@@ -253,6 +256,22 @@ theorem characterTableMatrixInvertible_iff_det_ne_zero
     CharacterTableMatrixInvertible idx ↔ characterTableDeterminant idx ≠ 0 :=
   Iff.rfl
 
+/-- Turn determinant nonvanishing of the square character table into the matrix
+`[Invertible]` instance used by the later inverse-matrix argument. -/
+@[implicit_reducible]
+noncomputable def characterTableSquareMatrixInvertibleOfDet
+    (idx : CharacterTableIndexing G) (hinv : CharacterTableMatrixInvertible idx) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    Invertible (characterTableSquareMatrix idx) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  have hdet : Matrix.det (characterTableSquareMatrix idx) ≠ 0 := by
+    simpa [CharacterTableMatrixInvertible, characterTableDeterminant] using hinv
+  letI : Invertible (Matrix.det (characterTableSquareMatrix idx)) :=
+    invertibleOfNonzero hdet
+  exact Matrix.invertibleOfDetInvertible (characterTableSquareMatrix idx)
+
 /-- The class-weighted row pairing of two character-table rows.  This is the matrix form
 of summing over group elements after collecting terms by conjugacy class. -/
 noncomputable def characterTableWeightedRowPairing
@@ -424,6 +443,39 @@ theorem characterTableDeterminant_ne_zero_of_weightedRowOrthogonality
     rw [characterTableWeightedRowGramMatrix, Matrix.det_mul, Matrix.det_mul, hdetA]
     simp
   exact hgram hzero
+
+/-- The square character table is `[Invertible]` once weighted row orthogonality is
+available. -/
+@[implicit_reducible]
+noncomputable def characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    Invertible (characterTableSquareMatrix idx) :=
+  characterTableSquareMatrixInvertibleOfDet idx
+    (characterTableDeterminant_ne_zero_of_weightedRowOrthogonality (G := G) idx hrow)
+
+/-- Cancel the left character-table factor in the weighted row Gram identity.  This is
+the matrix-algebra bridge from row orthogonality toward column orthogonality. -/
+theorem characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableClassSizeSquareMatrix idx *
+        Matrix.conjTranspose (characterTableSquareMatrix idx) =
+      (characterTableSquareMatrix idx)⁻¹ *
+        Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ)) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hgram := characterTableWeightedRowGramMatrix_eq_diagonal idx hrow
+  have hleft :=
+    congrArg (fun M =>
+      (characterTableSquareMatrix idx)⁻¹ * M) hgram
+  simpa [characterTableWeightedRowGramMatrix, Matrix.mul_assoc] using hleft
 
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/

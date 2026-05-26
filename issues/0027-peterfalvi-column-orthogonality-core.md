@@ -54,6 +54,11 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - `conjugacyClassSize_mk_mul_card_centralizer` and
   `card_centralizer_eq_card_div_conjugacyClassSize_cast` を追加し、conjugacy
   class size と `|C_G(g)|` の変換を column diagonal 用 API として固定した。
+- `characterTableSquareMatrixInvertibleOfDet`,
+  `characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality`, and
+  `characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal`
+  を追加し、row Gram identity の左側 character-table factor を逆行列で消す
+  matrix algebra bridge を固定した。
 - `characterTableClassColumnPairingOfIndexing` and
   `characterTableSquareColumnPairing` を追加し、class-indexed column pairing と
   square reindexed matrix の column Gram を相互変換できるようにした。
