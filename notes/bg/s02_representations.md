@@ -665,3 +665,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   sorry-free endpoint に接続した. `G* = ⊥` は determinant character で ambient
   abelian, `G*` が非自明 p-group なら fixed-space endpoint で Sylow conclusion.
   残る `sorry` は `G* ≠ ⊥` かつ `¬ IsPGroup p G*` の branch に集中した.
+- q≠p の line permutation 後半を action-free な bridge として
+  `commutative_of_faithful_representation_stay_or_swap_rank_one_complement_of_odd`
+  に切り出した. 既存の determinant-kernel uniqueness が出す
+  per-element stay/swap dichotomy から, odd order で swap を排除し, diagonal
+  complement bridge で ambient `G` abelian まで進む.
+- さらに `commutative_of_determinantKernel_subgroup_rank_one_complement` を追加し,
+  Maschke 側が `K ≤ G*` 上の complementary rank-one `K`-submodules と非自明元を
+  返せば、そのまま q≠p core branch を閉じられる形にした. 次 frontier は
+  `K` からこの二つの rank-one line を作る Maschke/algebraically-closed step.

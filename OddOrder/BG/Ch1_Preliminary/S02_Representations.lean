@@ -2303,6 +2303,133 @@ private theorem commutative_of_faithful_representation_preserves_rank_one_comple
     W ρ hW hdimW hdimQ
     (Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y))
 
+/-- Odd order turns a stay/swap dichotomy for two complementary lines into
+actual preservation of both lines.
+
+This is the line-permutation step in BG Thm 2.6, q ≠ p, stated without
+choosing an explicit `Fin 2` action.  If an element swapped the two lines, then
+its square would preserve them; since the element has odd order, the element
+itself is a power of its square, contradiction with the nonzero first line and
+the direct-sum decomposition. -/
+private theorem preserves_of_stay_or_swap_rank_one_complement_of_odd
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W U : Submodule F V) [Module.Finite F W]
+    (ρ : Representation F G V)
+    (hodd : Odd (Nat.card G)) (hcompl : IsCompl W U)
+    (hstay_swap : ∀ g : G,
+      (W ≤ W.comap (ρ g) ∧ U ≤ U.comap (ρ g)) ∨
+      (W ≤ U.comap (ρ g) ∧ U ≤ W.comap (ρ g)))
+    (hdimW : Module.finrank F W = 1) :
+    ∀ g : G, W ≤ W.comap (ρ g) ∧ U ≤ U.comap (ρ g) := by
+  intro g
+  rcases hstay_swap g with hstay | hswap
+  · exact hstay
+  · exfalso
+    have hW_ne_bot : W ≠ ⊥ := by
+      rw [← Submodule.one_le_finrank_iff]
+      omega
+    have hg2W : W ≤ W.comap (ρ (g ^ 2)) := by
+      intro w hw
+      rw [pow_two, map_mul]
+      exact hswap.2 (hswap.1 hw)
+    have hpowW : ∀ n : ℕ, W ≤ W.comap (ρ ((g ^ 2) ^ n)) := by
+      intro n
+      induction n with
+      | zero =>
+          intro w hw
+          simpa using hw
+      | succ n ih =>
+          intro w hw
+          rw [pow_succ, map_mul]
+          exact ih (hg2W hw)
+    have hoddg : Odd (orderOf g) := hodd.of_dvd_nat (orderOf_dvd_natCard g)
+    rcases hoddg with ⟨k, hk⟩
+    have hg_pow_square : g = (g ^ 2) ^ (k + 1) := by
+      calc
+        g = g ^ (orderOf g + 1) := by
+          rw [pow_succ, pow_orderOf_eq_one, one_mul]
+        _ = g ^ (2 * (k + 1)) := by
+          congr 1
+          omega
+        _ = (g ^ 2) ^ (k + 1) := by
+          rw [pow_mul]
+    have hgW : W ≤ W.comap (ρ g) := by
+      rw [hg_pow_square]
+      exact hpowW (k + 1)
+    rcases Submodule.exists_mem_ne_zero_of_ne_bot hW_ne_bot with ⟨w, hwW, hw_ne_zero⟩
+    have hρgw_bot : ρ g w ∈ (⊥ : Submodule F V) := by
+      have hρgw_inf : ρ g w ∈ W ⊓ U := ⟨hgW hwW, hswap.1 hwW⟩
+      simpa [hcompl.inf_eq_bot] using hρgw_inf
+    have hρgw_zero : ρ g w = 0 := by
+      simpa using hρgw_bot
+    have hw_zero : w = 0 := by
+      have hleft : ρ g⁻¹ (ρ g w) = w := by
+        calc
+          ρ g⁻¹ (ρ g w) = ((ρ g⁻¹) * (ρ g)) w := rfl
+          _ = ρ (g⁻¹ * g) w := by rw [map_mul]
+          _ = w := by simp
+      simpa [hleft] using congrArg (ρ g⁻¹) hρgw_zero
+    exact hw_ne_zero hw_zero
+
+/-- Stay/swap form of the odd-order two-line bridge.
+
+This avoids building a separate `Fin 2` action when the proof has already
+produced the concrete dichotomy that every element preserves both lines or
+swaps them. -/
+private theorem commutative_of_faithful_representation_stay_or_swap_rank_one_complement_of_odd
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (W U : Submodule F V) [Module.Free F W] [Module.Finite F W]
+    [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hcompl : IsCompl W U)
+    (hstay_swap : ∀ g : G,
+      (W ≤ W.comap (ρ g) ∧ U ≤ U.comap (ρ g)) ∨
+      (W ≤ U.comap (ρ g) ∧ U ≤ W.comap (ρ g)))
+    (hdimW : Module.finrank F W = 1)
+    (hdimQ : Module.finrank F (V ⧸ W) = 1) :
+    Std.Commutative (· * · : G → G → G) := by
+  have hpreserve :=
+    preserves_of_stay_or_swap_rank_one_complement_of_odd
+      W U ρ hodd hcompl hstay_swap hdimW
+  exact commutative_of_faithful_representation_preserves_rank_one_complement
+    W U ρ hfaithful hcompl
+    (fun g => (hpreserve g).1) (fun g => (hpreserve g).2) hdimW hdimQ
+
+/-- Determinant-kernel line-pair bridge for the q≠p branch.
+
+Once Maschke has produced two complementary rank-one `K`-submodules and a
+nontrivial element of the normal subgroup `K ≤ G*`, the determinant-kernel
+uniqueness argument gives a stay/swap dichotomy for every ambient group
+element.  Odd order removes the swap case, so the faithful diagonal bridge
+makes `G` abelian. -/
+private theorem commutative_of_determinantKernel_subgroup_rank_one_complement
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKnormal : K.Normal) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F W.toSubmodule] [Module.Finite F U.toSubmodule]
+    [Module.Free F (V ⧸ W.toSubmodule)] [Module.Free F (V ⧸ U.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQW : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    (hdimQU : Module.finrank F (V ⧸ U.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) :
+    Std.Commutative (· * · : G → G → G) := by
+  exact
+    commutative_of_faithful_representation_stay_or_swap_rank_one_complement_of_odd
+      W.toSubmodule U.toSubmodule ρ hfaithful hodd hcompl
+      (fun g =>
+        both_lines_le_comap_stay_or_swap_of_determinantKernel_subgroup
+          ρ hfaithful hodd K hKnormal hKle W U hcompl hdimW hdimU hdimQW hdimQU
+          hx_ne_one g)
+      hdimW hdimQW
+
 /-- Odd-order no-interchange bridge for the q≠p branch of BG Thm 2.6.
 
 If `G` permutes two complementary rank-one submodules, then the induced
