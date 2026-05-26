@@ -1606,6 +1606,36 @@ private theorem opCore_ne_bot_of_nontrivial_normal_pSubgroup
   rw [← hop_bot]
   exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK hx
 
+/-- A nontrivial `p`-core in a normal subgroup gives a nontrivial `p`-core
+in the ambient group.
+
+This is the ambient-lift needed after the induction step in BG Thm 2.6: if a
+normal complement `N ⊴ G*` has `O_r(N) ≠ 1`, then `O_r(G*) ≠ 1`. -/
+private theorem opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite (Sylow p G)]
+    (N : Subgroup G) [N.Normal]
+    (hNcore : OddOrder.Isaacs.Ch01.opCore p N ≠ ⊥) :
+    OddOrder.Isaacs.Ch01.opCore p G ≠ ⊥ := by
+  let K : Subgroup G := (OddOrder.Isaacs.Ch01.opCore p N).map N.subtype
+  haveI : (OddOrder.Isaacs.Ch01.opCore p N).Characteristic :=
+    OddOrder.Isaacs.Ch01.opCore.characteristic p N
+  have hKnormal : K.Normal := by
+    dsimp [K]
+    infer_instance
+  have hKp : IsPGroup p K := by
+    dsimp [K]
+    exact (OddOrder.Isaacs.Ch01.opCore_isPGroup p N).map N.subtype
+  have hK_ne_bot : K ≠ ⊥ := by
+    intro hK_bot
+    apply hNcore
+    have hmap :
+        (OddOrder.Isaacs.Ch01.opCore p N).map N.subtype =
+          (⊥ : Subgroup N).map N.subtype := by
+      simpa [K] using hK_bot
+    exact (Subgroup.map_subtype_inj (H := N)).mp hmap
+  exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
+    (G := G) (K := K) hKp hK_ne_bot
+
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
 This isolates the group-theoretic part of BG Thm 2.6 where, after choosing
@@ -1705,28 +1735,16 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_opCore_
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
   let Gstar : Subgroup G := determinantKernelSubgroup ρ
-  let K : Subgroup G := (OddOrder.Isaacs.Ch01.opCore p Gstar).map Gstar.subtype
   haveI : Gstar.Normal := by
     dsimp [Gstar]
     exact determinantKernelSubgroup_normal ρ
-  haveI : (OddOrder.Isaacs.Ch01.opCore p Gstar).Characteristic :=
-    OddOrder.Isaacs.Ch01.opCore.characteristic p Gstar
-  have hKnormal : K.Normal := by
-    dsimp [K]
-    infer_instance
-  have hKp : IsPGroup p K := by
-    dsimp [K]
-    exact (OddOrder.Isaacs.Ch01.opCore_isPGroup p Gstar).map Gstar.subtype
-  have hK_ne_bot : K ≠ ⊥ := by
-    intro hK_bot
-    apply hop_ne_bot
-    have hmap :
-        (OddOrder.Isaacs.Ch01.opCore p Gstar).map Gstar.subtype =
-          (⊥ : Subgroup Gstar).map Gstar.subtype := by
-      simpa [K] using hK_bot
-    exact (Subgroup.map_subtype_inj (H := Gstar)).mp hmap
+  have hGcore_ne_bot : OddOrder.Isaacs.Ch01.opCore p G ≠ ⊥ :=
+    opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
+      (p := p) (G := G) Gstar hop_ne_bot
   exact sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgroup
-    ρ hfaithful hdim ⟨K, hKnormal, hKp, hK_ne_bot⟩ P
+    ρ hfaithful hdim
+    ⟨OddOrder.Isaacs.Ch01.opCore p G, inferInstance,
+      OddOrder.Isaacs.Ch01.opCore_isPGroup p G, hGcore_ne_bot⟩ P
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/
 private theorem sylow_commutative_and_commutator_le_of_determinantKernel_bot_or_pGroup

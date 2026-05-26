@@ -470,6 +470,10 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - 書籍の「`H` は abelian なので Burnside」という段を Ch.5 の formal entrypoint
   (`N_G(Q) ≤ C_G(Q)` から normal p-complement) に渡す bridge
   `hasNormalPComplement_of_sylow_normalizer_commutative` も追加済み.
+- normal complement 後の induction result を戻すため、
+  `N ⊴ G` かつ `O_p(N) ≠ ⊥` なら `O_p(G) ≠ ⊥` を得る
+  `opCore_ne_bot_of_normal_subgroup_opCore_ne_bot` を追加済み.
+  既存の determinant-kernel `O_p(G*)` bridge もこの汎用補題経由に整理した.
 - 次 frontier は BG proof の group-theoretic dichotomy:
   `G* ≠ ⊥` から Sylow normalizer / Burnside normal complement / induction を通じて
   適切な `q` で `O_q(G*) ≠ ⊥` を得る段.
