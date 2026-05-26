@@ -449,6 +449,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotientActionFaithfulHom_injective
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.normal_of_quotient_image_normal_of_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+#assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotient_card_le_prime_sq_of_actionCentralizer_inf

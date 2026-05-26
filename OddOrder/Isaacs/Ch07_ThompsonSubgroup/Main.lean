@@ -2155,6 +2155,40 @@ theorem actionCentralizer_inf_quotientActionKernel_isPGroup_of_sup_eq_top
   · exact hV
   · rw [← actionCentralizer_sup, hPQ]
 
+/-- Normality of the image of `P` in `G/K` pulls back to normality of `P`, provided
+`K ≤ P`.
+
+This is the quotient-correspondence bridge used in Isaacs Thm 7.5 after proving the image
+of a Sylow subgroup is normal in the faithful quotient action. -/
+theorem normal_of_quotient_image_normal_of_le
+    {G : Type*} [Group G] {K P : Subgroup G} [K.Normal]
+    (hKP : K ≤ P)
+    (hPbar : (P.map (QuotientGroup.mk' K)).Normal) :
+    P.Normal := by
+  have hcomap :
+      Subgroup.comap (QuotientGroup.mk' K) (P.map (QuotientGroup.mk' K)) = P := by
+    rw [QuotientGroup.comap_map_mk']
+    exact sup_eq_right.mpr hKP
+  rw [← hcomap]
+  exact hPbar.comap (QuotientGroup.mk' K)
+
+/-- A normal `p`-subgroup is contained in every Sylow `p`-subgroup. -/
+private theorem normal_isPGroup_le_sylow
+    {G : Type*} [Group G] {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
+    {K : Subgroup G} [K.Normal] (hK : IsPGroup p K) (P : Sylow p G) :
+    K ≤ (P : Subgroup G) :=
+  (OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK).trans
+    (OddOrder.Isaacs.Ch01.opCore_le P)
+
+/-- If a normal `p`-subgroup `K` is quotiented out, normality of the image of a Sylow
+`p`-subgroup pulls back to normality of the original Sylow subgroup. -/
+theorem sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+    {G : Type*} [Group G] {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
+    (P : Sylow p G) {K : Subgroup G} [K.Normal] (hK : IsPGroup p K)
+    (hPbar : (((P : Subgroup G).map (QuotientGroup.mk' K))).Normal) :
+    P.Normal :=
+  normal_of_quotient_image_normal_of_le (normal_isPGroup_le_sylow hK P) hPbar
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
