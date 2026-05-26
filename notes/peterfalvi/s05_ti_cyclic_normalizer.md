@@ -34,6 +34,9 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 - `TICyclicHypothesis.SupportedOnV`: Peterfalvi `CF(W,V)` の Lean 名。
 - `TICyclicHypothesis.DadeApplication`: 係数 `k` に parametric な `S04.DadeIsometryData` を §5 carrier に載せる。
 - `TICyclicHypothesis.FullDadeApplication`: `k = ℂ` の `S04.FullDadeIsometryData` を載せ、`full_inner_eq` と `full_maps_virtualCharacter` で (2.6.a)/(2.6.b) を §5 側から使えるようにする。
+- `map_eq_of_mem_V` / `full_map_eq_of_mem_V`: `H(a)=1` の §4 Dade-map equation を §5 側に直接 expose し、`v ∈ V` 上では `τ α v = α v` と使える。
+- `map_eq_zero_of_not_mem_conjugatesOfSet_V` /
+  `full_map_eq_zero_of_not_mem_conjugatesOfSet_V`: `V` の共役飽和の外で Dade map が 0 になることを §5 carrier から直接使える。
 
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | phase2b 被引用 |
 |---|--------|------|-----------------|------|---------|---------------|

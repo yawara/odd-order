@@ -99,6 +99,24 @@ instance (hyp : TICyclicHypothesis G) [Fintype hyp.W] [Invertible (Nat.card hyp.
       OddOrder.Peterfalvi.S04.DadeMap (G := G) k hyp.V hyp.W) = tau.toDadeMap :=
   rfl
 
+theorem map_eq_of_mem_V {hyp : TICyclicHypothesis G}
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : k)]
+    (app : DadeApplication (G := G) (k := k) hyp)
+    (α : SupportedOnV (G := G) k hyp) {v : G} (hv : v ∈ hyp.V) :
+    app.tau.toDadeMap α v =
+      (α : ClassFunction hyp.W k) ⟨v, hyp.V_subset_W hv⟩ := by
+  exact OddOrder.Peterfalvi.S04.map_eq_of_mem_A_of_forall_H_eq_bot
+    app.tau.isDadeMap (fun a => hyp.toDadeHypothesis_H a) α hv
+
+theorem map_eq_zero_of_not_mem_conjugatesOfSet_V {hyp : TICyclicHypothesis G}
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : k)]
+    (app : DadeApplication (G := G) (k := k) hyp)
+    (α : SupportedOnV (G := G) k hyp) {g : G}
+    (hg : g ∉ Group.conjugatesOfSet hyp.V) :
+    app.tau.toDadeMap α g = 0 :=
+  OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    app.tau.isDadeMap (fun a => hyp.toDadeHypothesis_H a) α hg
+
 variable [Invertible (Nat.card G : ℂ)]
 
 /-- A complex §5 application package including the virtual-character part of
@@ -120,6 +138,26 @@ instance (hyp : TICyclicHypothesis G) [Fintype hyp.W] [Invertible (Nat.card hyp.
     ((FullDadeApplication.mk tau : FullDadeApplication (G := G) hyp) :
       OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ hyp.V hyp.W) = tau.toDadeMap :=
   rfl
+
+theorem full_map_eq_of_mem_V {hyp : TICyclicHypothesis G}
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV (G := G) ℂ hyp) {v : G} (hv : v ∈ hyp.V) :
+    app.tau.toDadeMap α v =
+      (α : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ := by
+  exact OddOrder.Peterfalvi.S04.map_eq_of_mem_A_of_forall_H_eq_bot
+    app.tau.toDadeIsometryData.isDadeMap
+    (fun a => hyp.toDadeHypothesis_H a) α hv
+
+theorem full_map_eq_zero_of_not_mem_conjugatesOfSet_V {hyp : TICyclicHypothesis G}
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV (G := G) ℂ hyp) {g : G}
+    (hg : g ∉ Group.conjugatesOfSet hyp.V) :
+    app.tau.toDadeMap α g = 0 :=
+  OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    app.tau.toDadeIsometryData.isDadeMap
+    (fun a => hyp.toDadeHypothesis_H a) α hg
 
 theorem full_inner_eq {hyp : TICyclicHypothesis G}
     [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
