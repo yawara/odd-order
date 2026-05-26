@@ -82,6 +82,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   remains routed to `InducedCharacter`.
 - `characterKernel` and `SubsetCharacterKernel` encode the set-level kernel
   containment shape needed for (1.6).
+- Kernel basics are now available without unfolding:
+  `characterKernel_trivialClassFunction`, `characterKernel_conj`,
+  `subsetCharacterKernel_trivialClassFunction`,
+  `subsetCharacterKernel_conj_iff`, and `SubsetCharacterKernel.mono`.
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 

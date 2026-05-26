@@ -93,6 +93,10 @@ def characterDegree (χ : ClassFunction G ℂ) : ℂ :=
     characterDegree χ.conj = star (characterDegree χ) :=
   rfl
 
+@[simp] theorem characterDegree_trivialClassFunction :
+    characterDegree (trivialClassFunction G) = 1 :=
+  rfl
+
 /-- A family of class functions has constant degree. -/
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=
   ∀ i j, characterDegree (χ i) = characterDegree (χ j)
@@ -130,10 +134,53 @@ def characterKernel (χ : ClassFunction G ℂ) : Set G :=
     (1 : G) ∈ characterKernel χ :=
   rfl
 
+@[simp] theorem characterKernel_trivialClassFunction :
+    characterKernel (trivialClassFunction G) = Set.univ := by
+  ext g
+  simp [characterKernel, characterDegree]
+
+@[simp] theorem characterKernel_conj (χ : ClassFunction G ℂ) :
+    characterKernel χ.conj = characterKernel χ := by
+  ext g
+  change star (χ g) = star (χ 1) ↔ χ g = χ 1
+  exact star_inj
+
 /-- A subset is contained in the character kernel.  This is the set-level shape
 used in Peterfalvi (1.6). -/
 def SubsetCharacterKernel (A : Set G) (χ : ClassFunction G ℂ) : Prop :=
   A ⊆ characterKernel χ
+
+theorem subsetCharacterKernel_iff {A : Set G} {χ : ClassFunction G ℂ} :
+    SubsetCharacterKernel A χ ↔ A ⊆ characterKernel χ :=
+  Iff.rfl
+
+theorem SubsetCharacterKernel.mono {A B : Set G} {χ : ClassFunction G ℂ}
+    (hχ : SubsetCharacterKernel B χ) (hAB : A ⊆ B) :
+    SubsetCharacterKernel A χ :=
+  fun _ hg => hχ (hAB hg)
+
+theorem subsetCharacterKernel_empty (χ : ClassFunction G ℂ) :
+    SubsetCharacterKernel (∅ : Set G) χ := by
+  intro g hg
+  exact False.elim hg
+
+theorem subsetCharacterKernel_trivialClassFunction (A : Set G) :
+    SubsetCharacterKernel A (trivialClassFunction G) := by
+  intro g hg
+  simp
+
+@[simp] theorem subsetCharacterKernel_conj_iff {A : Set G} {χ : ClassFunction G ℂ} :
+    SubsetCharacterKernel A χ.conj ↔ SubsetCharacterKernel A χ := by
+  simp [SubsetCharacterKernel]
+
+theorem subsetCharacterKernel_univ_iff {χ : ClassFunction G ℂ} :
+    SubsetCharacterKernel (Set.univ : Set G) χ ↔ characterKernel χ = Set.univ := by
+  constructor
+  · intro hχ
+    exact Set.eq_univ_iff_forall.mpr fun g => hχ (Set.mem_univ g)
+  · intro hχ g _
+    rw [hχ]
+    exact Set.mem_univ g
 
 /-- Pairwise orthogonality for a set of class functions, using the normalized
 inner product. -/
