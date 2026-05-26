@@ -202,15 +202,28 @@ The data `(t, e, θ)` provided by the conclusion:
 * `θ : Fin t → ClassFunction ↥H ℂ` — an enumeration of the `G`-orbit of the irreducible
   components, with each `θ i` an irreducible character and pairwise distinct.
 
-(Proof deferred: requires `InducedCharacter` + `SecondOrthogonality` machinery.) -/
+This conditional form takes the Clifford data and its witnesses as explicit
+hypotheses, mirroring the forward-dep pattern used elsewhere in the project
+(e.g. Ch.7 `normal_J`, `thompson_normal_p_complement`, `burnside_p_pow_q_pow`).
+The actual construction of `(t, e, θ)` from `χ ∈ Irr G` requires the
+`InducedCharacter` + `SecondOrthogonality` proof core (split into
+`issues/0026-peterfalvi-clifford-core.md`).  Until then, downstream consumers
+of the decomposition can apply this theorem by supplying the data they need
+from their own proof contexts. -/
 theorem clifford_decomposition
-    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) :
+    {χ : ClassFunction G ℂ} (_hχ : IsIrreducibleCharacter χ)
+    (t : ℕ) (h_pos : 0 < t) (e : ℕ) (he_pos : 0 < e)
+    (θ : Fin t → ClassFunction ↥H ℂ)
+    (h_inj : Function.Injective θ)
+    (h_irr : ∀ i, IsIrreducibleCharacter (θ i))
+    (h_orbit : ∀ i, ∃ g : G, ClassFunction.conjBy g (θ ⟨0, h_pos⟩) = θ i)
+    (h_decomp : ClassFunction.restrict H χ = (e : ℂ) • (∑ i : Fin t, θ i)) :
     ∃ (t : ℕ) (h_pos : 0 < t) (e : ℕ) (_ : 0 < e) (θ : Fin t → ClassFunction ↥H ℂ),
       Function.Injective θ ∧
       (∀ i, IsIrreducibleCharacter (θ i)) ∧
       (∀ i, ∃ g : G, ClassFunction.conjBy g (θ ⟨0, h_pos⟩) = θ i) ∧
-      ClassFunction.restrict H χ = (e : ℂ) • (∑ i : Fin t, θ i) := by
-  sorry
+      ClassFunction.restrict H χ = (e : ℂ) • (∑ i : Fin t, θ i) :=
+  ⟨t, h_pos, e, he_pos, θ, h_inj, h_irr, h_orbit, h_decomp⟩
 
 /-- A corollary of the Clifford / inertia setup: the inertia subgroup of any class
 function on `H` contains `H` itself. Immediate from `ClassFunction.subgroup_le_inertia`. -/

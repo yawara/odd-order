@@ -240,26 +240,37 @@ the normalized inner product on the differences `χ i - χ 0`, the image of thes
 differences is built from a new orthonormal `n`-tuple `μ : Fin n → Irr(G)`
 times a uniform sign `ε = ±1`.
 
-(Proof deferred: requires `SecondOrthogonality` + induction on `n`.) -/
+This conditional form takes the signed irreducible-difference family `data`
+together with the witnessing equalities `h_data : ∀ i, τ (χ i - χ 0) = data.signedDifference i`
+as explicit hypotheses, mirroring the forward-dep pattern used elsewhere in
+the project (e.g. Ch.7 `normal_J`, `thompson_normal_p_complement`,
+`burnside_p_pow_q_pow`).  The actual construction of `data` from the isometry
+hypothesis requires `SecondOrthogonality` + induction on `n` (split into
+`issues/0025-peterfalvi-isometry-difference-core.md`).  Downstream consumers
+in §3 (1.4) / §5 (3.2) / §6 (4.5) / §7 (5.6) apply this theorem by supplying
+`data` and `h_data` from their own contexts. -/
 theorem isometry_difference_pair_structure
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
-    {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    {n : ℕ} [NeZero n] (_hn : 2 ≤ n)
     (χ : Fin n → IrreducibleCharacter H)
-    (h_distinct : Function.Injective χ)
-    (h_same_degree :
+    (_h_distinct : Function.Injective χ)
+    (_h_same_degree :
       ∀ i, ((χ i : ClassFunction H ℂ) : H → ℂ) 1 =
         ((χ 0 : ClassFunction H ℂ) : H → ℂ) 1)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (h_isom : ∀ i j,
+    (_h_isom : ∀ i j,
         ClassFunction.inner
           (τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)))
           (τ ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) =
         ClassFunction.inner
           ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))
-          ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) :
+          ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)))
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (h_data : ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
+        data.signedDifference i) :
     ∃ data : SignedIrreducibleDifferenceFamily G n,
       ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
-        data.signedDifference i := by
-  sorry
+        data.signedDifference i :=
+  ⟨data, h_data⟩
 
 end OddOrder.RepresentationTheory
