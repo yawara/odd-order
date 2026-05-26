@@ -661,3 +661,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - 次 frontier はこの per-element stay/swap dichotomy から odd-order で swap case を
   排除する段. ここを直接証明するか、必要なら `Fin 2` action を構成して
   既存の `smul_fin_two_eq_self_of_odd_card` へ渡す.
+- `odd_two_dim_sylow_abelian` 本体の q=p determinant-kernel branch を既存の
+  sorry-free endpoint に接続した. `G* = ⊥` は determinant character で ambient
+  abelian, `G*` が非自明 p-group なら fixed-space endpoint で Sylow conclusion.
+  残る `sorry` は `G* ≠ ⊥` かつ `¬ IsPGroup p G*` の branch に集中した.

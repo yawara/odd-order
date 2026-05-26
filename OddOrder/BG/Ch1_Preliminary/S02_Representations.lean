@@ -3333,12 +3333,18 @@ theorem odd_two_dim_sylow_abelian
     {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
     (_hodd : Odd (Nat.card G))
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
-    (_hdim : Module.finrank F V = 2) (ρ : Representation F G V)
-    (_hfaithful : Function.Injective ρ)
+    (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
     {p : ℕ} [Fact p.Prime] (_hp_dvd : p ∣ Nat.card G)
     (_hchar : CharP F p) (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
+  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
+      ρ hdet_bot P
+  by_cases hdet_p : IsPGroup p (determinantKernelSubgroup ρ)
+  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
+      ρ hfaithful hdim hdet_p hdet_bot P
   sorry
 
 end OddOrder.BG.Ch1.S02
