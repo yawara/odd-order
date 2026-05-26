@@ -4366,7 +4366,7 @@ private theorem opCore_le_ker_conjNormal_omega1ZCenterOpCore
   have hvu : (u : G) * (v : G) = (v : G) * (u : G) :=
     (Subgroup.mem_centralizer_iff.mp hv_cent) u hu_U
   -- Convert "(1 : MulAut V) v" on the RHS.
-  show (u : G) * (v : G) * (u : G)⁻¹ = (v : G)
+  change (u : G) * (v : G) * (u : G)⁻¹ = (v : G)
   calc (u : G) * (v : G) * (u : G)⁻¹
       = (v : G) * (u : G) * (u : G)⁻¹ := by rw [hvu]
     _ = (v : G) := by group
@@ -4388,7 +4388,8 @@ private noncomputable def conjActionOnOmega1ZCenter_quotient
 Given Step 4-5-6-7 outputs:
 * `P = UA` (Step 4)
 * `|Ā| = p` (Step 5)
-* The Ḡ-action on V is faithful (= Step 6, landed via `centralizer_omega1ZCenterOpCore_map_eq_bot_of_le_opCore`)
+* The Ḡ-action on V is faithful (= Step 6, landed via
+  `centralizer_omega1ZCenterOpCore_map_eq_bot_of_le_opCore`)
 * `|V : V ∩ A| ≤ p` (Step 7, landed via `omega1ZCenterOpCore_relIndex_inter_A_le`)
 plus the running Thm 7.6 hypotheses (i)-(v),
 
