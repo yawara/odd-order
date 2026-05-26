@@ -81,4 +81,53 @@ theorem mono {m n : ℕ} (h : m ≤ n) : Omega G p m ≤ Omega G p n := by
 
 end Omega
 
+/-! ## `Ω₁` of an abelian subgroup
+
+When `H ≤ G` is abelian (carries a `CommGroup` structure), the set
+`{h ∈ H | h^p = 1}` is itself a subgroup of `G`.  This is the standard
+`Ω₁(H)` for abelian `H`; without abelianness `(xy)^p ≠ x^p y^p` in general
+and one must fall back to the closure form `Omega G p 1`.
+
+This is the form needed for **Isaacs Thm 7.6 Step 7** where
+`V := Ω₁(Z(O_p(G)))` and `Z(O_p(G))` is abelian. -/
+
+/-- **`Ω₁` of an abelian subgroup**: given a subgroup `H ≤ G` whose
+underlying group is commutative (witnessed by `hH : ∀ x y ∈ H, x * y = y * x`),
+the set `{g ∈ H | g^p = 1}` is a subgroup of `G`.
+
+This wraps the standard abelian-group fact `(xy)^p = x^p * y^p` and packages
+it with the membership-in-`H` predicate to land directly in `Subgroup G`. -/
+def omega1OfAbelian (G : Type*) [Group G] (H : Subgroup G) (p : ℕ)
+    (hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x) :
+    Subgroup G where
+  carrier := {g : G | g ∈ H ∧ g ^ p = 1}
+  mul_mem' := by
+    rintro x y ⟨hxH, hxp⟩ ⟨hyH, hyp⟩
+    refine ⟨H.mul_mem hxH hyH, ?_⟩
+    have hcomm : Commute x y := hH x hxH y hyH
+    rw [hcomm.mul_pow, hxp, hyp, mul_one]
+  one_mem' := ⟨H.one_mem, one_pow p⟩
+  inv_mem' := by
+    rintro x ⟨hxH, hxp⟩
+    refine ⟨H.inv_mem hxH, ?_⟩
+    rw [inv_pow, hxp, inv_one]
+
+variable {p : ℕ}
+
+@[simp]
+theorem mem_omega1OfAbelian {H : Subgroup G} {p : ℕ}
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} {g : G} :
+    g ∈ omega1OfAbelian G H p hH ↔ g ∈ H ∧ g ^ p = 1 :=
+  Iff.rfl
+
+theorem omega1OfAbelian_le {H : Subgroup G} {p : ℕ}
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} :
+    omega1OfAbelian G H p hH ≤ H :=
+  fun _ hg => hg.1
+
+theorem pow_eq_one_of_mem_omega1OfAbelian {H : Subgroup G} {p : ℕ}
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} {g : G}
+    (hg : g ∈ omega1OfAbelian G H p hH) : g ^ p = 1 :=
+  hg.2
+
 end OddOrder.GroupTheory
