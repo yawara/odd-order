@@ -681,3 +681,12 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   Lean frontier は BG p.16 の
   "V is a direct sum of irreducible FK-modules" と
   "irreducible FK-modules are one-dimensional" の実装に集中できる.
+- `exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char` で、
+  既存の Maschke complement extraction を theorem-facing input shape に接続した.
+  `W` 側だけでなく補線 `U` と `V/U` の rank-one data, さらに必要な
+  `Free`/`Finite` evidence をまとめて返す.
+- `commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed` を追加し、
+  `F` が algebraically closed で `q ≠ p`, `O_q(G*) ≠ ⊥` なら ambient `G` が
+  abelian になる q≠p determinant-core endpoint を sorry-free にした.
+  残る theorem-level frontier は、元の体から algebraic closure へ移す route と、
+  group-theoretic core spine を `odd_two_dim_sylow_abelian` 本体へ接続する段.

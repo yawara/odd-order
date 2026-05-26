@@ -1112,6 +1112,49 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_isP
       hW_ne_top_sub).2
   exact ⟨W, U, hW_ne_bot, hcompl, hWdim, hQdim⟩
 
+/-- Maschke complement extraction packaged in the theorem-facing data shape.
+
+This strengthens `exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char`
+by also supplying the symmetric rank-one data for the complementary line and
+the local `Free`/`Finite` evidence needed by the determinant-kernel uniqueness
+bridges.  It is the exact input shape consumed by
+`commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules`. -/
+private theorem exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hdim : Module.finrank F V = 2)
+    (K : Subgroup G) (hKq : IsPGroup q K) (hq_ne_p : q ≠ p)
+    (hKcomm : Std.Commutative (· * · : K → K → K)) :
+    ∃ W : Subrepresentation (ρ.comp K.subtype),
+    ∃ U : Subrepresentation (ρ.comp K.subtype),
+      Nonempty (Module.Free F W.toSubmodule) ∧
+      Nonempty (Module.Free F U.toSubmodule) ∧
+      Nonempty (Module.Finite F W.toSubmodule) ∧
+      Nonempty (Module.Finite F U.toSubmodule) ∧
+      Nonempty (Module.Free F (V ⧸ W.toSubmodule)) ∧
+      Nonempty (Module.Free F (V ⧸ U.toSubmodule)) ∧
+      IsCompl W.toSubmodule U.toSubmodule ∧
+      Module.finrank F W.toSubmodule = 1 ∧
+      Module.finrank F U.toSubmodule = 1 ∧
+      Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
+      Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
+  have hVpos : 0 < Module.finrank F V := by
+    rw [hdim]
+    norm_num
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  rcases exists_rank_one_complement_subrepresentations_of_commutative_isPGroup_ne_char
+      (p := p) (q := q) (F := F) (K := K)
+      hKq hq_ne_p hKcomm (ρ.comp K.subtype) hdim with
+    ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
+  rcases complement_rank_one_right_subquotients_of_finrank_two
+      W.toSubmodule U.toSubmodule hdim hcompl hdimW with
+    ⟨hdimU, hdimQU⟩
+  exact ⟨W, U, ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩,
+    ⟨inferInstance⟩, ⟨inferInstance⟩, ⟨inferInstance⟩, hcompl, hdimW,
+    hdimU, hdimQW, hdimQU⟩
+
 /-- Conjugating a `K`-subrepresentation by an ambient element of `G`.
 
 This is the normality bridge in the q≠p branch of BG Thm 2.6: if `K ⊴ G`,
@@ -3140,6 +3183,29 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmod
   exact commutative_of_determinantKernel_subgroup_rank_one_complement
     ρ hfaithful hodd K hKnormal hK_le_Gstar W U hcompl
     hdimW hdimU hdimQW hdimQU hx_ne_one
+
+/-- Algebraically closed q≠p determinant-core endpoint for BG Thm 2.6.
+
+If `O_q(G*)` is nontrivial for a prime `q ≠ p`, Maschke and algebraic
+closedness produce the two rank-one `K`-submodules required by the
+determinant-kernel uniqueness bridge.  The ambient group is therefore abelian.
+The remaining theorem-level work is to route the original field to this
+algebraically closed setting and then dispatch the group-theoretic core spine. -/
+private theorem commutative_of_determinantKernel_opCore_ne_bot_of_isAlgClosed
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {F : Type*} [Field F] [CharP F p] [IsAlgClosed F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
+    (hq_ne_p : q ≠ p)
+    (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥) :
+    Std.Commutative (· * · : G → G → G) :=
+  commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
+    ρ hfaithful hodd hcore_ne_bot
+    (fun K _hKnormal _hKle hKq _hK_ne_bot hKcomm =>
+      exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
+        ρ hdim K hKq hq_ne_p hKcomm)
 
 /-- If `Q ∈ Syl_q(G)` is nontrivial, then `O_q(N_G(Q))` is nontrivial.
 
