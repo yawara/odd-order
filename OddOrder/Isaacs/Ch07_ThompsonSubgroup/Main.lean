@@ -3343,6 +3343,25 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- Intersection with any subgroup preserves `IsElementaryAbelian`: if `A` is
+elementary abelian then `A ⊓ B` is elementary abelian.  Used in Step 7 to
+get `D = A ⊓ U`, `E = A ⊓ V` elementary abelian. -/
+theorem inf_isElementaryAbelian_of_isElementaryAbelian
+    {G : Type*} [Group G] {p : ℕ} {A : Subgroup G} (hA : A.IsElementaryAbelian p)
+    (B : Subgroup G) :
+    (A ⊓ B).IsElementaryAbelian p := by
+  refine ⟨?_, ?_⟩
+  · rintro ⟨x, hxA, _hxB⟩ ⟨y, hyA, _hyB⟩
+    apply Subtype.ext
+    -- Goal in G: x * y = y * x
+    have hcomm_A : (⟨x, hxA⟩ : ↥A) * ⟨y, hyA⟩ = ⟨y, hyA⟩ * ⟨x, hxA⟩ := hA.1 _ _
+    exact (congr_arg (Subtype.val (p := fun x => x ∈ A)) hcomm_A : (x * y : G) = y * x)
+  · rintro ⟨x, hxA, _hxB⟩
+    apply Subtype.ext
+    -- Goal in G: x^p = 1
+    have hpow_A : (⟨x, hxA⟩ : ↥A) ^ p = 1 := hA.2 _
+    exact (congr_arg (Subtype.val (p := fun x => x ∈ A)) hpow_A : (x ^ p : G) = 1)
+
 /-- **V is elementary abelian**: every element has order dividing `p`,
 and the group is commutative (it lies inside the center `Z(O_p(G))`).
 Used in Step 7 (`VD` elementary abelian counting argument). -/
