@@ -240,6 +240,12 @@
   `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` に渡す. 次は public theorem を
   well-founded/strong induction 形に整理し、この subgroup 専用の `hab_ind`/`hsyl_ind`
   を実際に供給する段.
+- **2026-05-26**: `odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs`
+  を追加し、public theorem の残 branch を「proper subgroup への帰納出力があれば
+  Sylow conclusion が閉じる」endpoint にまとめた. `G* = ⊥` と `G*` p-group は
+  既存 endpoint、残りは algebraic-closure original-kernel spine + 上の `hind`
+  bridge に流す. 次の実装単位は、public theorem を strong induction に畳み直して
+  `hab_ind`/`hsyl_ind` を供給すること.
 
 ## TL;DR
 
@@ -769,3 +775,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   Lean 側に追加済み. ここでは `ρ|_N` の faithful 性と `Odd (Nat.card N)` を
   実際に証明している. 残る未接続点は、public theorem を強帰納/最小反例の形へ
   畳み直し、proper subgroup `N` への帰納出力をこの bridge に渡すこと.
+- `odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs` により、
+  q=p theorem 本体の determinant-kernel split は、明示的な proper-subgroup
+  induction outputs を仮定すれば sorry-free で閉じる. 残 frontier はこの
+  endpoint の仮定を well-founded induction から作ることに縮小した.

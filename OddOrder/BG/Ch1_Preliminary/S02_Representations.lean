@@ -4089,6 +4089,47 @@ private theorem sylow_commutative_and_commutator_le_of_isPGroup
     (⊤ : Subgroup G) ρ hfaithful (hG.to_subgroup ⊤) hdim
     (top_ne_bot_of_prime_dvd_card (p := p) hp_dvd) P
 
+/-- BG Thm 2.6(b) with the proper-subgroup induction outputs supplied
+explicitly.
+
+This is the theorem-facing endpoint for the remaining `G* ≠ 1` and
+`G*` non-`p`-group branch.  The hypotheses `hab_ind` and `hsyl_ind` are exactly
+the strong-induction outputs for proper normal subgroups of the determinant
+kernel, phrased on the restricted faithful representation. -/
+private theorem odd_two_dim_sylow_abelian_of_determinantKernel_induction_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [CharP F p]
+    {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
+    (hodd : Odd (Nat.card G))
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (hdim : Module.finrank F V = 2) (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (hab_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 →
+        (∀ q : ℕ, q.Prime → q ∣ Nat.card N → ¬ CharP F q) →
+        Std.Commutative (· * · : N → N → N))
+    (hsyl_ind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ → Odd (Nat.card N) →
+        (σ : Representation F N V) → Function.Injective σ →
+        Module.finrank F V = 2 → p ∣ Nat.card N → (P : Sylow p N) →
+        Std.Commutative (· * · : P → P → P) ∧
+          commutator N ≤ (P : Subgroup N))
+    (P : Sylow p G) :
+    Std.Commutative (· * · : P → P → P) ∧
+      commutator G ≤ (P : Subgroup G) := by
+  by_cases hdet_bot : determinantKernelSubgroup ρ = ⊥
+  · exact sylow_commutative_and_commutator_le_of_determinantKernel_eq_bot
+      ρ hdet_bot P
+  by_cases hdet_p : IsPGroup p (determinantKernelSubgroup ρ)
+  · exact sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGroup
+      ρ hfaithful hdim hdet_p hdet_bot P
+  exact
+    sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction
+      ρ hfaithful hodd hdim
+      (determinantKernel_hind_of_odd_two_dim_induction_outputs
+        ρ hfaithful hodd hdim hab_ind hsyl_ind) P
+
 /-- **BG Theorem 2.6 (a)**: 奇数位数の有限群 `G` が体 `F` 上 2 次元の
 faithful 表現を持ち, char `F` が `|G|` を割らないなら, `G` は abelian.
 
