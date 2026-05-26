@@ -2424,6 +2424,40 @@ theorem false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
       (quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
         hp2 h2abelian hU hVelem hVcard P))
 
+/-- Cyclic quotient branch of Isaacs Thm 7.5 after passing to the faithful action of
+`G/K` on `V/U`.
+
+If `V/U` is cyclic, then `Aut(V/U)` is abelian. Since the quotient action is faithful,
+`G/K` is abelian, so the image of any Sylow subgroup is normal. -/
+theorem quotient_sylow_normal_of_isCyclic_of_actionKernel
+    {G V : Type*} [Group G] [Finite G] [Group V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal] [IsCyclic (V ⧸ U)]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (P : Sylow p G) :
+    (((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+          Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+          (G ⧸ quotientActionKernel φ hU))).Normal :=
+  subgroup_normal_of_injective_mulAut_of_isCyclic
+    (A := G ⧸ quotientActionKernel φ hU) (V := V ⧸ U)
+    (φ := quotientActionFaithfulHom φ hU)
+    (quotientActionFaithfulHom_injective hU)
+    ((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
+      Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
+        (G ⧸ quotientActionKernel φ hU))
+
+/-- Contradiction form of the cyclic quotient branch of Isaacs Thm 7.5. -/
+theorem false_of_quotient_isCyclic_of_sylow_not_normal
+    {G V : Type*} [Group G] [Finite G] [Group V]
+    {p : ℕ} [Fact p.Prime]
+    {φ : G →* MulAut V} {U : Subgroup V} [U.Normal] [IsCyclic (V ⧸ U)]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hK : IsPGroup p (quotientActionKernel φ hU)) (P : Sylow p G)
+    (hP_not_normal : ¬ (P : Subgroup G).Normal) : False :=
+  hP_not_normal
+    (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
+      (G := G) (p := p) P (K := quotientActionKernel φ hU) hK
+      (quotient_sylow_normal_of_isCyclic_of_actionKernel hU P))
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/

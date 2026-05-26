@@ -249,6 +249,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel` と
   contradiction form
   `false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal` で閉じられる.
+  cyclic quotient branch も `quotient_sylow_normal_of_isCyclic_of_actionKernel` と
+  `false_of_quotient_isCyclic_of_sylow_not_normal` で quotient action から
+  counterexample contradiction へ戻せる.
   さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
   (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`), さらに faithful action 経由で
@@ -275,8 +278,8 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
   `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`
   も追加済み. cyclic quotient branch は
-  `subgroup_normal_of_injective_mulAut_of_isCyclic` で
-  `Aut(V) ≃ (ZMod |V|)ˣ` から acting group 可換, したがって `P ⊴ G` まで閉じられる.
+  `false_of_quotient_isCyclic_of_sylow_not_normal` で `P ⊴ G` contradiction まで
+  戻せる.
   theorem statement / proof 本体は保留.
 - 2026-05-26: 7.5 minimal-counterexample reduction 用に Ch03 側へ
   `Subgroup.isPiSeparable_of_isPiSeparable` を追加済み. これで `G` を
@@ -347,6 +350,9 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
    - ✅ quotient reduced branch: `G/K ↷ V/U` が elementary abelian order `p^2` の場合,
      reduced Thm 7.5 branch から `P̄ ⊴ G/K`, さらに `P ⊴ G` contradiction へ戻せる
      (`false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal`).
+   - ✅ quotient cyclic branch: `G/K ↷ V/U` で `V/U` cyclic の場合も
+     `P̄ ⊴ G/K` から `P ⊴ G` contradiction へ戻せる
+     (`false_of_quotient_isCyclic_of_sylow_not_normal`).
    - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
      elementary abelian order `p^2` へ落とす small-order bridge.
    - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から

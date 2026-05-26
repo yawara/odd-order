@@ -475,6 +475,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.false_of_quotient_elementaryAbelian_card_prime_sq_of_sylow_not_normal
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_sylow_normal_of_isCyclic_of_actionKernel
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.false_of_quotient_isCyclic_of_sylow_not_normal
+#assert_only_allowed_axioms
   IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.quotient_card_le_prime_sq_of_actionCentralizer_inf
