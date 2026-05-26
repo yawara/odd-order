@@ -205,6 +205,10 @@ Coherent triple (τ_1, τ_2, τ_3)
 - `mem_zSupportedSpan_iff`, `mem_zSpan_of_mem_zSupportedSpan`, and
   `support_subset_of_mem_zSupportedSpan` expose the two projections of the
   predicate-shaped `Z[S,A]`.
+- `zero_mem_zSupportedSpan`, `add_mem_zSupportedSpan`,
+  `neg_mem_zSupportedSpan`, `sub_mem_zSupportedSpan`,
+  `zSupportedSpan_mono_left`, and `zSupportedSpan_mono_right` provide the
+  basic closure and monotonicity API for manipulating `Z[S,A]`.
 - `OddOrder.Peterfalvi.S03.conjugateDifference_eq_zero_iff_isReal` and
   `conjugateDifference_ne_zero_iff_not_isReal` identify the §7 expression
   `χ - χ̄` with the real-character obstruction.

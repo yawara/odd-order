@@ -56,6 +56,50 @@ theorem support_subset_of_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A 
     φ.support ⊆ A :=
   hφ.2
 
+theorem zero_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L} :
+    (0 : ClassFunction L ℂ) ∈ zSupportedSpan (L := L) S A := by
+  exact ⟨Submodule.zero_mem _, by simp⟩
+
+theorem neg_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ zSupportedSpan (L := L) S A) :
+    -φ ∈ zSupportedSpan (L := L) S A := by
+  constructor
+  · exact Submodule.neg_mem _ hφ.1
+  · intro x hx
+    exact hφ.2 (by simpa [ClassFunction.mem_support] using hx)
+
+theorem add_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S A)
+    (hψ : ψ ∈ zSupportedSpan (L := L) S A) :
+    φ + ψ ∈ zSupportedSpan (L := L) S A := by
+  constructor
+  · exact Submodule.add_mem _ hφ.1 hψ.1
+  · intro x hx
+    rcases ClassFunction.support_add_subset φ ψ hx with hxφ | hxψ
+    · exact hφ.2 hxφ
+    · exact hψ.2 hxψ
+
+theorem sub_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S A)
+    (hψ : ψ ∈ zSupportedSpan (L := L) S A) :
+    φ - ψ ∈ zSupportedSpan (L := L) S A := by
+  simpa [sub_eq_add_neg] using
+    add_mem_zSupportedSpan (L := L) hφ (neg_mem_zSupportedSpan (L := L) hψ)
+
+theorem zSupportedSpan_mono_left {S₁ S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hS : S₁ ⊆ S) {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S₁ A) :
+    φ ∈ zSupportedSpan (L := L) S A :=
+  ⟨Submodule.span_mono hS hφ.1, hφ.2⟩
+
+theorem zSupportedSpan_mono_right {S : Set (ClassFunction L ℂ)} {A₁ A : Set L}
+    (hA : A₁ ⊆ A) {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S A₁) :
+    φ ∈ zSupportedSpan (L := L) S A :=
+  ⟨hφ.1, hφ.2.trans hA⟩
+
 /-- An integral linear map between virtual-character lattices, represented at
 the class-function level. -/
 abbrev IntegralCharacterMap (L G : Type*) [Group L] [Group G] :=
