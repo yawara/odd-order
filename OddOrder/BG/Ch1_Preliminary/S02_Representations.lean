@@ -2940,6 +2940,84 @@ private theorem opCore_ne_bot_of_nontrivial_normal_pSubgroup
   rw [← hop_bot]
   exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK hx
 
+/-- A finite nontrivial abelian group has a nontrivial prime core.
+
+This is one half of the induction-output bridge for BG Thm 2.6: when an
+inductive subgroup is abelian, any nontrivial Sylow subgroup is normal, hence it
+lies in the corresponding `O_r`. -/
+private theorem exists_prime_opCore_ne_bot_of_commutative
+    {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    (hGcomm : Std.Commutative (· * · : G → G → G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  have hcard_ne_one : Nat.card G ≠ 1 := (Finite.one_lt_card (α := G)).ne'
+  obtain ⟨r, hr_prime, hr_dvd⟩ :=
+    Nat.exists_prime_and_dvd hcard_ne_one
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  haveI : Finite (Sylow r G) := inferInstance
+  obtain ⟨P⟩ := Sylow.nonempty (p := r) (G := G)
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hr_dvd
+  have hPnormal : (P : Subgroup G).Normal := by
+    refine ⟨fun x hx g => ?_⟩
+    change g * x * g⁻¹ ∈ (P : Subgroup G)
+    rw [hGcomm.comm g x]
+    simpa [mul_assoc] using hx
+  haveI : (P : Subgroup G).Normal := hPnormal
+  exact ⟨r, hr_prime,
+    opCore_ne_bot_of_nontrivial_normal_pSubgroup
+      (G := G) (K := (P : Subgroup G)) P.2 hP_ne_bot⟩
+
+/-- A BG Thm 2.6(b)-style Sylow conclusion supplies a nontrivial prime core.
+
+If `G'` is nontrivial then `G' ≤ P` makes the derived subgroup a nontrivial
+normal `p`-subgroup.  If `G' = 1`, the group is abelian, so a nontrivial Sylow
+subgroup gives a nontrivial prime core.  This is the form needed to turn the
+induction theorem's Sylow conclusion back into the `hind` input used by the
+determinant-kernel spine. -/
+private theorem exists_prime_opCore_ne_bot_of_commutator_le_sylow
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    [Finite (Sylow p G)] (P : Sylow p G)
+    (hcomm_le : commutator G ≤ (P : Subgroup G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  by_cases hcomm_bot : commutator G = ⊥
+  · apply exists_prime_opCore_ne_bot_of_commutative
+    constructor
+    intro x y
+    have hxcenter : x ∈ Subgroup.center G := by
+      rw [(commutator_eq_bot_iff_center_eq_top (G := G)).mp hcomm_bot]
+      trivial
+    exact (Subgroup.mem_center_iff.mp hxcenter y).symm
+  · haveI : (commutator G).Normal :=
+      Subgroup.Normal.of_commutator_le (G := G) (H := commutator G) le_rfl
+    have hcomm_p : IsPGroup p (commutator G) := P.2.to_le hcomm_le
+    exact ⟨p, Fact.out,
+      opCore_ne_bot_of_nontrivial_normal_pSubgroup
+        (G := G) (K := commutator G) hcomm_p hcomm_bot⟩
+
+/-- The combined BG Thm 2.6 induction outputs imply a nontrivial prime core.
+
+For a smaller subgroup in the induction, either the ambient characteristic does
+not divide its order and the abelian branch supplies a normal Sylow subgroup, or
+the characteristic prime divides the order and the Sylow branch supplies
+`G' ≤ P`.  Both cases produce some nontrivial `O_r(G)`. -/
+private theorem exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
+    {p : ℕ} [Fact p.Prime] {F : Type*} [Field F] [hchar : CharP F p]
+    {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    (hab : (∀ q : ℕ, q.Prime → q ∣ Nat.card G → ¬ CharP F q) →
+      Std.Commutative (· * · : G → G → G))
+    (hsyl : p ∣ Nat.card G → (P : Sylow p G) →
+      Std.Commutative (· * · : P → P → P) ∧
+        commutator G ≤ (P : Subgroup G)) :
+    ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
+  by_cases hp_dvd : p ∣ Nat.card G
+  · haveI : Finite (Sylow p G) := inferInstance
+    obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    exact exists_prime_opCore_ne_bot_of_commutator_le_sylow
+      (p := p) P (hsyl hp_dvd P).2
+  · apply exists_prime_opCore_ne_bot_of_commutative
+    apply hab
+    intro q _hq_prime hq_dvd hq_char
+    exact hp_dvd ((CharP.eq F hq_char hchar) ▸ hq_dvd)
+
 /-- A nontrivial `p`-core in a normal subgroup gives a nontrivial `p`-core
 in the ambient group.
 
@@ -3404,7 +3482,7 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow p G)]
     (hp_dvd : p ∣ Nat.card G)
     (hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement p G)
-    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
   rcases hcomp with ⟨N, hNnormal, hNcompl⟩
@@ -3420,7 +3498,19 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
         (G := G) (K := (P : Subgroup G)) P.2
         (P.ne_bot_of_dvd_card hp_dvd)⟩
   · haveI : N.Normal := hNnormal
-    rcases hind N hNnormal hN_bot with ⟨r, hr_prime, hNcore_ne_bot⟩
+    have hN_ne_top : N ≠ ⊤ := by
+      intro hN_top
+      obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+      have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hp_dvd
+      apply hP_ne_bot
+      refine le_bot_iff.mp ?_
+      have hP_le_N : (P : Subgroup G) ≤ N := by
+        rw [hN_top]
+        exact le_top
+      have hP_le_inf : (P : Subgroup G) ≤ N ⊓ (P : Subgroup G) :=
+        le_inf hP_le_N le_rfl
+      simpa [(hNcompl P).isCompl.inf_eq_bot] using hP_le_inf
+    rcases hind N hNnormal hN_bot hN_ne_top with ⟨r, hr_prime, hNcore_ne_bot⟩
     haveI : Fact r.Prime := ⟨hr_prime⟩
     haveI : Finite (Sylow r G) := inferInstance
     exact ⟨r, hr_prime,
@@ -3442,7 +3532,7 @@ private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
         (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
           Subgroup.normalizer ((Q : Subgroup G) : Set G) →
           Subgroup.normalizer ((Q : Subgroup G) : Set G)))
-    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
   rcases exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
@@ -3482,7 +3572,7 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧
       OddOrder.Isaacs.Ch01.opCore r (determinantKernelSubgroup ρ) ≠ ⊥ := by
@@ -3556,7 +3646,7 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_core_sp
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hcore_ne_p_comm : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       OddOrder.Isaacs.Ch01.opCore q (determinantKernelSubgroup ρ) ≠ ⊥ →
@@ -3603,7 +3693,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hline : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
@@ -3649,7 +3739,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (hline : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
       ∀ K : Subgroup G, K.Normal → K ≤ determinantKernelSubgroup ρ →
@@ -3705,7 +3795,7 @@ private theorem
             Set (determinantKernelSubgroup ρ)) →
           Subgroup.normalizer ((Q : Subgroup (determinantKernelSubgroup ρ)) :
             Set (determinantKernelSubgroup ρ))))
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3730,7 +3820,7 @@ private theorem
     {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
     (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
     (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
-    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ →
+    (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ), N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3872,7 +3962,7 @@ private theorem
       ∀ N : Subgroup
           (determinantKernelSubgroup
             (baseChangeRepresentation (AlgebraicClosure F) ρ)),
-        N.Normal → N ≠ ⊥ →
+        N.Normal → N ≠ ⊥ → N ≠ ⊤ →
         ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
@@ -3906,7 +3996,7 @@ private theorem
     (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
     (hodd : Odd (Nat.card G)) (hdim : Module.finrank F V = 2)
     (hind : ∀ N : Subgroup (determinantKernelSubgroup ρ),
-      N.Normal → N ≠ ⊥ →
+      N.Normal → N ≠ ⊥ → N ≠ ⊤ →
         ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥)
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧

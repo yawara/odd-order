@@ -223,6 +223,16 @@
   この original-kernel induction 仮定をどう供給するか、および
   `odd_two_dim_sylow_abelian` の最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch へ
   接続する段.
+- **2026-05-26**: induction 出力を determinant-kernel spine の `O_r ≠ ⊥`
+  入力へ戻す bridge として
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` を追加した. abelian branch は
+  normal Sylow から、Sylow branch は `G' ≤ P` と `G'=1` の場合分けから
+  非自明な prime core を作る. 併せて determinant-kernel spine の `hind` は
+  Burnside normal complement の帰納で本当に必要な **proper nontrivial normal subgroup**
+  に狭めた. 次 frontier は theorem 本体で proper subgroup への制限表現に帰納仮定を
+  適用し、この `hind` を
+  `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  へ渡して最後の `G* ≠ ⊥ ∧ ¬ IsPGroup p G*` branch に接続すること.
 
 ## TL;DR
 
@@ -735,3 +745,16 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   残る frontier は (1) normalizer `H=N_{G*}(Q)` への q≠p endpoint の制限適用,
   (2) induction hypothesis `hind` の theorem 本体への供給, (3) 元の体から
   algebraic closure へ移す route.
+- determinant-kernel spine の `hind` を proper nontrivial normal subgroup 用に
+  狭めた. `exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction` では
+  normal complement `N` が `⊤` でないことを complement 条件から証明してから
+  induction に渡す. さらに induction theorem の二つの出力
+  (`odd_two_dim_abelian` 型の abelian conclusion と
+  `odd_two_dim_sylow_abelian` 型の Sylow/commutator conclusion) から
+  `∃ r, O_r(N) ≠ ⊥` を作る
+  `exists_prime_opCore_ne_bot_of_odd_two_dim_outputs` を追加した.
+- 次 frontier は theorem 本体で、`N < G*` への制限表現に帰納仮定を適用して
+  上の bridge へ渡すこと. それができれば
+  `sylow_commutative_and_commutator_le_of_algebraicClosure_original_induction`
+  を `odd_two_dim_sylow_abelian` の残 branch
+  (`G* ≠ ⊥` かつ `¬ IsPGroup p G*`) に接続できる.
