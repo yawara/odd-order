@@ -269,6 +269,14 @@
   既存の block 計算は `span (⋃ V_i) = ⊤` を仮定し、directness 側は
   `⨆ i, V_i` を使うので、この二つを同じ入力として扱えるようにした.
   残る重い部分は finite-order hypothesis からの diagonalization.
+- **2026-05-26**: Prop. 2.4(a) の finite-spectrum bridge として
+  `eigenvalue_eq_power_of_primitiveRoot_of_pow_eq_one`,
+  `cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one`,
+  span 版を追加した.  対角化側が `⨆ μ, eigenspace g μ = ⊤` を供給すれば、
+  `g^h = 1` と primitive root から実際の eigenvalue を `epsilon^i`
+  (`i : Fin h`) に落とし、BG の有限 family `V_i` の span/top へ渡せる.
+  残る重い部分は finite-order / split-polynomial hypothesis から
+  all-eigenspace top を作る段.
 
 ## TL;DR
 
@@ -868,6 +876,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_ratio` と非 wrap 版
   `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_eq_add` を追加.
   これで scalar ratio が `epsilon^m` に同定できた場合は
-  `E_{i,t} ≤ E_m` まで sorry-free で渡せる. 残る Prop 2.4(e) の主作業は
-  `m ≡ t - i (mod h)` の有限 index bookkeeping と、Prop 2.4(a) の span/direct-sum
-  仮定を供給する diagonalization 部分.
+  `E_{i,t} ≤ E_m` まで sorry-free で渡せる.
+- Prop. 2.4(a) 用に、primitive root から有限 family `V_i` の directness
+  (`cyclicEigenspaceFin_iSupIndep`) を作り、`span (⋃ V_i)` と `⨆ i, V_i`
+  の top 条件を相互に使えるようにした. さらに finite-order spectrum bridge により、
+  `⨆ μ, eigenspace g μ = ⊤` が別途得られれば、`g^h = 1` から
+  BG の有限 family へ top/span を落とせる. 残る Prop. 2.4(a) の主作業は、
+  finite-order / split-polynomial hypothesis から all-eigenspace top を供給する
+  diagonalization 部分.

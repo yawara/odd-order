@@ -209,6 +209,78 @@ theorem span_cyclicEigenspaceFinUnion_eq_top_iff (epsilon : F) (g : Module.End F
       (⨆ i : Fin h, cyclicEigenspaceFin epsilon g i) = ⊤ := by
   rw [span_cyclicEigenspaceFinUnion_eq_iSup]
 
+/-- A finite-order operator has no eigenvalues outside the cyclic group generated
+by a primitive root with the same period.
+
+This is the spectrum-classification bridge used in BG Prop 2.4(a): after
+diagonalization supplies spanning by all eigenspaces, finite order and the
+primitive root restrict the relevant eigenvalues to the displayed finite list
+`epsilon^0, ..., epsilon^(h-1)`. -/
+theorem eigenvalue_eq_power_of_primitiveRoot_of_pow_eq_one {epsilon : F}
+    {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1)
+    {mu : F} (hmu : g.HasEigenvalue mu) :
+    ∃ i : Fin h, mu = epsilon ^ i.1 := by
+  rcases hmu.exists_hasEigenvector with ⟨v, hv⟩
+  have hpow_apply := hv.pow_apply h
+  have hmu_pow_smul : (mu ^ h) • v = v := by
+    rw [hgpow] at hpow_apply
+    simpa using hpow_apply.symm
+  have hmu_pow_eq_one : mu ^ h = 1 := by
+    have hzero : (mu ^ h - 1) • v = 0 := by
+      rw [sub_smul, one_smul, hmu_pow_smul, sub_self]
+    exact sub_eq_zero.mp ((smul_eq_zero.mp hzero).resolve_right hv.2)
+  rcases hepsilon.eq_pow_of_pow_eq_one hmu_pow_eq_one with ⟨i, hi, hpow⟩
+  exact ⟨⟨i, hi⟩, hpow.symm⟩
+
+/-- If all eigenspaces of `g` span `V`, and every actual eigenvalue is among the
+displayed powers of `epsilon`, then the BG finite family `V_i` spans `V`.
+
+This isolates the finite-index bookkeeping from the heavier diagonalization
+input needed for Prop 2.4(a). -/
+theorem cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hall : (⨆ mu : F, g.eigenspace mu) = ⊤)
+    (hspectrum : ∀ mu : F, g.HasEigenvalue mu →
+      ∃ i : Fin h, mu = epsilon ^ i.1) :
+    (⨆ i : Fin h, cyclicEigenspaceFin epsilon g i) = ⊤ := by
+  rw [← hall]
+  refine le_antisymm ?_ ?_
+  · exact iSup_le fun i => le_iSup (fun mu : F => g.eigenspace mu) (epsilon ^ i.1)
+  · refine iSup_le fun mu => ?_
+    by_cases hmu : g.HasEigenvalue mu
+    · rcases hspectrum mu hmu with ⟨i, rfl⟩
+      exact le_iSup (fun i : Fin h => cyclicEigenspaceFin epsilon g i) i
+    · have hbot : g.eigenspace mu = ⊥ := by
+        rw [← not_ne_iff]
+        exact hmu
+      rw [hbot]
+      exact bot_le
+
+/-- Finite-order version of the finite-family spanning bridge.
+
+Once a separate diagonalization argument gives `⨆ mu, eigenspace g mu = ⊤`,
+finite order plus a primitive root restricts that top span to the BG family
+indexed by `Fin h`. -/
+theorem cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1)
+    (hall : (⨆ mu : F, g.eigenspace mu) = ⊤) :
+    (⨆ i : Fin h, cyclicEigenspaceFin epsilon g i) = ⊤ :=
+  cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top hall fun _ hmu =>
+    eigenvalue_eq_power_of_primitiveRoot_of_pow_eq_one hepsilon hgpow hmu
+
+/-- Span form of the finite-order spanning bridge, matching the hypotheses used
+by the block endomorphism calculations below. -/
+theorem span_cyclicEigenspaceFinUnion_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one
+    {epsilon : F} {g : Module.End F V} {h : ℕ} [NeZero h]
+    (hepsilon : IsPrimitiveRoot epsilon h) (hgpow : g ^ h = 1)
+    (hall : (⨆ mu : F, g.eigenspace mu) = ⊤) :
+    Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) = ⊤ := by
+  rw [span_cyclicEigenspaceFinUnion_eq_iSup]
+  exact cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one
+    hepsilon hgpow hall
+
 /-- BG Prop 2.4 notation `E_{i,t}` over the finite index range
 `0 ≤ i,t ≤ h - 1`.
 

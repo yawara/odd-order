@@ -54,6 +54,14 @@ to Prop 2.4.
   `⨆ i, V_i = ⊤`; the two Prop. 2.4(a) spanning inputs are now connected.
   The remaining heavy input is diagonalization from the finite-order hypothesis
   on `g`.
+- 2026-05-26: Added the finite-spectrum bridge
+  `eigenvalue_eq_power_of_primitiveRoot_of_pow_eq_one`, plus
+  `cyclicEigenspaceFin_iSup_eq_top_of_iSup_eigenspace_eq_top_of_pow_eq_one`
+  and the span form.  Once a diagonalization argument gives
+  `⨆ μ, eigenspace g μ = ⊤`, finite order `g^h = 1` and the primitive root now
+  restrict that top span to the displayed BG family `V_0, ..., V_{h-1}`.
+  Remaining work is to produce the all-eigenspace top span from the finite-order
+  / split-polynomial hypothesis.
 
 ## 完了条件
 
