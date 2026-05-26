@@ -412,6 +412,8 @@ set_option linter.style.longLine false in
 
 -- Ch.7 (Thompson Subgroup): Thm 7.5 GL(2,p) bridge for automorphism subgroups.
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.gl2_pSubgroup_card_le_prime
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.normal_of_isPGroup_index_le_prime
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms

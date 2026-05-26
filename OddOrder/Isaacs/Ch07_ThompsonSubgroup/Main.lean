@@ -346,6 +346,56 @@ private theorem card_gl2_zmod_prime {p : ℕ} [Fact p.Prime] :
   rw [h_sq_sub_one, h_sq_sub_self]
   ring
 
+/-- A `p`-subgroup of `GL(2,p)` has order at most `p`.
+
+This is the formal version of the cardinality step in Isaacs Thm 7.5 after embedding the
+faithful action on an elementary-abelian group of order `p²` into `GL(2,p)`. -/
+theorem gl2_pSubgroup_card_le_prime {p : ℕ} [Fact p.Prime]
+    (P : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p))) (hP : IsPGroup p P) :
+    Nat.card P ≤ p := by
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
+  rcases n with _ | n
+  · rw [hn, pow_zero]
+    exact (Fact.out : p.Prime).pos
+  rcases n with _ | n
+  · rw [hn, pow_one]
+  · exfalso
+    have hp2_dvd_card : p ^ 2 ∣ Nat.card P := by
+      rw [hn]
+      exact Nat.pow_dvd_pow p (by omega : 2 ≤ n + 2)
+    have hp2_dvd_gl :
+        p ^ 2 ∣ Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
+      hp2_dvd_card.trans P.card_subgroup_dvd_card
+    rw [card_gl2_zmod_prime (p := p)] at hp2_dvd_gl
+    have hp_not_dvd_pred : ¬ p ∣ p - 1 := by
+      intro h
+      have hp_pos : 0 < p := (Fact.out : p.Prime).pos
+      have hpred_pos : 0 < p - 1 := by
+        have hp_two : 2 ≤ p := (Fact.out : p.Prime).two_le
+        omega
+      have hle : p ≤ p - 1 := Nat.le_of_dvd hpred_pos h
+      omega
+    have hp_not_dvd_succ : ¬ p ∣ p + 1 := by
+      intro h
+      have hp_dvd_one : p ∣ 1 := by
+        have hsub : p ∣ (p + 1) - p := Nat.dvd_sub h (dvd_refl p)
+        have hsub_eq : (p + 1) - p = 1 := by omega
+        rwa [hsub_eq] at hsub
+      exact (Fact.out : p.Prime).not_dvd_one hp_dvd_one
+    have hp_not_dvd_rest : ¬ p ∣ (p - 1) * (p - 1) * (p + 1) := by
+      intro h
+      rcases (Fact.out : p.Prime).dvd_mul.mp h with hleft | hsucc
+      · rcases (Fact.out : p.Prime).dvd_mul.mp hleft with hpred | hpred
+        · exact hp_not_dvd_pred hpred
+        · exact hp_not_dvd_pred hpred
+      · exact hp_not_dvd_succ hsucc
+    have hp_dvd_rest : p ∣ (p - 1) * (p - 1) * (p + 1) := by
+      have hp_pos : 0 < p := (Fact.out : p.Prime).pos
+      have hmul : p * p ∣ p * ((p - 1) * (p - 1) * (p + 1)) := by
+        simpa [pow_two, mul_assoc] using hp2_dvd_gl
+      exact Nat.dvd_of_mul_dvd_mul_left hp_pos hmul
+    exact hp_not_dvd_rest hp_dvd_rest
+
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) (ZMod p)) =
       p * (p - 1) * (p + 1) := by

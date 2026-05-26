@@ -233,7 +233,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
   `|V| ≤ p^2` reduction 用に
   `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
-  も追加済み. `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
+  も追加済み. さらに `GL(2,p)` に埋めた後の cardinality step
+  `gl2_pSubgroup_card_le_prime` (`p`-subgroup of `GL(2,p)` has order `≤ p`) も追加済み.
+  `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
   abelian order `p^2` へ落とす
   `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
   `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`
@@ -293,6 +295,7 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 3. ✅ **Ch.6 6.11** — 7.5 final reduction に必要な cyclic/quaternion 分岐は利用可能.
 4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
    `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
+   `GL(2,p)` 内の `p`-subgroup cardinality bound `gl2_pSubgroup_card_le_prime` も追加済み.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
 6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
