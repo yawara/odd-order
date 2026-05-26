@@ -2399,6 +2399,138 @@ theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
         hp hCard hNotCyclic)
       hCard
 
+private lemma orderOf_eq_prime_of_mem_subgroup_card_prime
+    {G : Type*} [Group G] {H : Subgroup G} [Finite H] {p : ℕ}
+    (hp : p.Prime) (hH_card : Nat.card H = p)
+    {x : G} (hxH : x ∈ H) (hx : x ≠ 1) :
+    orderOf x = p := by
+  let xH : H := ⟨x, hxH⟩
+  have hxH_ne : xH ≠ 1 := fun hxH_one => hx (Subtype.ext_iff.mp hxH_one)
+  have h_dvd : orderOf xH ∣ p := by
+    simpa [hH_card] using orderOf_dvd_natCard xH
+  have h_order : orderOf xH = p := by
+    rcases (Nat.dvd_prime hp).mp h_dvd with h_one | h_prime
+    · exact False.elim (hxH_ne (orderOf_eq_one_iff.mp h_one))
+    · exact h_prime
+  exact (Subgroup.orderOf_coe xH).trans h_order
+
+/-- **Isaacs Thm 6.9** (`p > q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p*q` with `q < p`.  Such a subgroup would be a solvable
+Frobenius group: its Sylow `p`-subgroup is normal, a Sylow `q`-subgroup is a complement, and any
+fixed nonidentity pair would generate the whole group cyclically. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hqp : q < p) (hCard : Nat.card B = p * q)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  classical
+  have hpq_ne : p ≠ q := fun hpq => (Nat.lt_irrefl q (hpq ▸ hqp))
+  have hcop_qp : Nat.Coprime q p := (Nat.coprime_primes hq.out hp.out).mpr hpq_ne.symm
+  have hcop_pq : Nat.Coprime p q := hcop_qp.symm
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := B)
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := B)
+  have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+  have hfact_p : (Nat.card B).factorization p = 1 := by
+    rw [hCard, Nat.factorization_mul_apply_of_coprime hcop_pq,
+        hp.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne ((Nat.prime_dvd_prime_iff_eq hp.out hq.out).mp hd))]
+  have hfact_q : (Nat.card B).factorization q = 1 := by
+    rw [hCard', Nat.factorization_mul_apply_of_coprime hcop_qp,
+        hq.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne.symm ((Nat.prime_dvd_prime_iff_eq hq.out hp.out).mp hd))]
+  have hP_card : Nat.card (P : Subgroup B) = p := by
+    rw [P.card_eq_multiplicity, hfact_p, pow_one]
+  have hQ_card : Nat.card (Q : Subgroup B) = q := by
+    rw [Q.card_eq_multiplicity, hfact_q, pow_one]
+  have hP_normal : (P : Subgroup B).Normal :=
+    OddOrder.Isaacs.Ch01.sylow_normal_of_card_eq_mul_prime_lt
+      (G := B) hqp hCard P
+  have h_disjoint : Disjoint (P : Subgroup B) (Q : Subgroup B) :=
+    IsPGroup.disjoint_of_ne p q hpq_ne _ _ P.isPGroup' Q.isPGroup'
+  have h_compl : Subgroup.IsComplement' (P : Subgroup B) (Q : Subgroup B) :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint
+      (by rw [hP_card, hQ_card, hCard]) h_disjoint
+  have hP_ne_bot : (P : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hp_eq_one : p = 1 := by
+      rw [← hP_card, hbot]
+      simp
+    exact hp.out.ne_one hp_eq_one
+  have hQ_ne_bot : (Q : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hq_eq_one : q = 1 := by
+      rw [← hQ_card, hbot]
+      simp
+    exact hq.out.ne_one hq_eq_one
+  letI : (P : Subgroup B).Normal := hP_normal
+  have hFrobGroup : IsFrobeniusGroup B (P : Subgroup B) (Q : Subgroup B) := by
+    refine
+      { isNormal := hP_normal
+        isComplement := h_compl
+        ne_bot_kernel := hP_ne_bot
+        ne_bot_complement := hQ_ne_bot
+        conj_frobenius := ?_ }
+    intro a haQ ha_ne n hnP hn_ne h_conj
+    have h_an : a * n = n * a := by
+      have := congrArg (fun x => x * a) h_conj
+      simpa [mul_assoc] using this
+    have hcomm : Commute n a := h_an.symm
+    have hn_order : orderOf n = p :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hp.out hP_card hnP hn_ne
+    have ha_order : orderOf a = q :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hq.out hQ_card haQ ha_ne
+    have hcop_orders : Nat.Coprime (orderOf n) (orderOf a) := by
+      rw [hn_order, ha_order]
+      exact hcop_pq
+    have horder : orderOf (n * a) = p * q := by
+      rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders,
+        hn_order, ha_order]
+    exact hNotCyclic (isCyclic_of_orderOf_eq_card (n * a) (by rw [horder, hCard]))
+  haveI : IsSolvable B := by
+    haveI : IsCyclic (P : Subgroup B) := isCyclic_of_prime_card hP_card
+    have hP_index : (P : Subgroup B).index = q := by
+      have hmul := (P : Subgroup B).card_mul_index
+      rw [hP_card, hCard] at hmul
+      exact Nat.eq_of_mul_eq_mul_left hp.out.pos hmul
+    have hquot_card : Nat.card (B ⧸ (P : Subgroup B)) = q := by
+      rw [← Subgroup.index_eq_card, hP_index]
+    haveI : IsCyclic (B ⧸ (P : Subgroup B)) := isCyclic_of_prime_card hquot_card
+    letI : CommGroup (P : Subgroup B) := IsCyclic.commGroup
+    letI : CommGroup (B ⧸ (P : Subgroup B)) := IsCyclic.commGroup
+    exact solvable_of_ker_le_range (P : Subgroup B).subtype
+      (QuotientGroup.mk' (P : Subgroup B)) (by
+        rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+  exact
+    false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+      hFrob B hFrobGroup
+
+/-- **Isaacs Thm 6.9** (order `pq` branch): a Frobenius actor cannot contain a noncyclic
+subgroup of order `p*q`, for primes `p` and `q` that may be equal. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hCard : Nat.card B = p * q) (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  rcases lt_trichotomy p q with hpq | hpq | hqp
+  · have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := q) (q := p) hFrob B hpq hCard' hNotCyclic
+  · subst q
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+        hFrob B hp.out (by simpa [pow_two] using hCard) hNotCyclic
+  · exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := p) (q := q) hFrob B hqp hCard hNotCyclic
+
 end
 
 section /- 6B: Lemma 6.13 + Cor 6.14 — D / Q / SD recognition (pp. 192-193) -/

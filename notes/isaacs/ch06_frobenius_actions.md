@@ -324,6 +324,16 @@ FT クリティカル度 + 章内依存で並べる:
   (非巡回な位数 `p^2` 群は elementary abelian) も追加し,
   `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq` で
   6.9 本文の `p = q` branch (`|B| = p^2` なら巡回) を閉じた.
+- 6.9 order `pq` 巡回分岐:
+  `p > q` branch は `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt`
+  として実装. Ch.1 の `sylow_normal_of_card_eq_mul_prime_lt` で Sylow `p` を正規化し,
+  Sylow `q` と complement を作る. 固定点を持つ非単位 `a ∈ Q`, `n ∈ P` があれば
+  `orderOf (n*a) = p*q = |B|` となり `B` が巡回, 非巡回仮定に矛盾するため,
+  `B` は Frobenius group になる. `P` と `B/P` が prime order cyclic であることから
+  `B` は solvable, 既存の solvable Frobenius group obstruction に接続.
+  `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime` で `p=q`,
+  `p<q`, `p>q` を統合し, 6.9 本文の「位数 `pq` の部分群は巡回」分岐を
+  contradiction form で閉じた.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
@@ -346,6 +356,8 @@ FT クリティカル度 + 章内依存で並べる:
   6.9 の Frobenius partition cardinality でも使うための private proof extraction.
   `exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable` は
   Ch.4/Thm 3.23 から `Z(R)` を構成する実質的な reduction であり, 純粋リネームではない.
+  private `orderOf_eq_prime_of_mem_subgroup_card_prime` は `p*q` branch 内の
+  prime-order subgroup element order extraction 用で, theorem alias ではない.
   mathlib theorem / 既存 theorem の純粋リネーム wrapper は追加していない.
 
 ## 開発時の注意点
