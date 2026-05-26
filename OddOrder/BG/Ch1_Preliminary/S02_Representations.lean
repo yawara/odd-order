@@ -1842,6 +1842,107 @@ private theorem scalarCharacters_ne_of_mem_determinantKernel_of_ne_one
       _ = (ρ 1) v := by simp
   exact hg_ne_one hg_one
 
+/-- A nontrivial odd-order determinant-kernel element with two complementary
+rank-one eigenspaces exhausts the rank-one subrepresentations.
+
+This packages the BG Thm 2.6 q ≠ p step that the distinct eigenvalues of
+`x ∈ K#` make the two Maschke lines the only one-dimensional `K`-submodules. -/
+private theorem rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_element
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V)
+    (hfaithful : Function.Injective ρ)
+    (W U : Subrepresentation ρ)
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F U.toSubmodule] [Module.Free F (V ⧸ W.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQ : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    {x : G} (hxdet : x ∈ determinantKernelSubgroup ρ)
+    (hoddx : Odd (orderOf x)) (hx_ne_one : x ≠ 1) :
+    ∀ L : Subrepresentation ρ,
+      Module.finrank F L.toSubmodule = 1 → L = W ∨ L = U := by
+  have hW : ∀ g : G, W.toSubmodule ≤ W.toSubmodule.comap (ρ g) := by
+    intro g v hv
+    exact W.apply_mem_toSubmodule g hv
+  have hU : ∀ g : G, U.toSubmodule ≤ U.toSubmodule.comap (ρ g) := by
+    intro g v hv
+    exact U.apply_mem_toSubmodule g hv
+  let φW : G →* Fˣ :=
+    scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W.toSubmodule hW)
+  let φU : G →* Fˣ :=
+    scalarCharacterOfFinrankEqOne hdimU (ρ.subrepresentation U.toSubmodule hU)
+  have hdistinct_units : φW x ≠ φU x :=
+    scalarCharacters_ne_of_mem_determinantKernel_of_ne_one
+      W.toSubmodule U.toSubmodule ρ hfaithful hcompl hW hU hdimW hdimU hdimQ
+      hxdet hoddx hx_ne_one
+  have hdistinct : (φW x : F) ≠ (φU x : F) := by
+    intro hval
+    exact hdistinct_units (Units.ext hval)
+  intro L hLdim
+  have hLstable : L.toSubmodule ≤ L.toSubmodule.comap (ρ x) := by
+    intro v hv
+    exact L.apply_mem_toSubmodule x hv
+  have hWscalar : ∀ w ∈ W.toSubmodule, ρ x w = (φW x : F) • w := by
+    intro w hw
+    have hw_scalar :=
+      scalarCharacterOfFinrankEqOne_apply_smul hdimW
+        (ρ.subrepresentation W.toSubmodule hW) x ⟨w, hw⟩
+    exact congrArg Subtype.val hw_scalar
+  have hUscalar : ∀ u ∈ U.toSubmodule, ρ x u = (φU x : F) • u := by
+    intro u hu
+    have hu_scalar :=
+      scalarCharacterOfFinrankEqOne_apply_smul hdimU
+        (ρ.subrepresentation U.toSubmodule hU) x ⟨u, hu⟩
+    exact congrArg Subtype.val hu_scalar
+  rcases rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars
+      W.toSubmodule U.toSubmodule L.toSubmodule (ρ x)
+      hcompl hdimW hdimU hLdim hLstable (φW x : F) (φU x : F)
+      hdistinct hWscalar hUscalar with hLW | hLU
+  · left
+    exact Subrepresentation.toSubmodule_injective hLW
+  · right
+    exact Subrepresentation.toSubmodule_injective hLU
+
+/-- Ambient form of
+`rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_element`.
+
+If `K ≤ G*` and `G` has odd order, a nontrivial element of `K` supplies the
+distinct-scalar witness for the restricted `K`-representation.  This is the
+form needed before applying the normal-conjugate line bridge. -/
+private theorem rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_subgroup
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (ρ : Representation F G V) (hfaithful : Function.Injective ρ)
+    (hodd : Odd (Nat.card G))
+    (K : Subgroup G) (hKle : K ≤ determinantKernelSubgroup ρ)
+    (W U : Subrepresentation (ρ.comp K.subtype))
+    [Module.Free F W.toSubmodule] [Module.Free F U.toSubmodule]
+    [Module.Finite F U.toSubmodule] [Module.Free F (V ⧸ W.toSubmodule)]
+    (hcompl : IsCompl W.toSubmodule U.toSubmodule)
+    (hdimW : Module.finrank F W.toSubmodule = 1)
+    (hdimU : Module.finrank F U.toSubmodule = 1)
+    (hdimQ : Module.finrank F (V ⧸ W.toSubmodule) = 1)
+    {x : K} (hx_ne_one : x ≠ 1) :
+    ∀ L : Subrepresentation (ρ.comp K.subtype),
+      Module.finrank F L.toSubmodule = 1 → L = W ∨ L = U := by
+  have hρK_faithful : Function.Injective (ρ.comp K.subtype) := by
+    intro a b hab
+    apply Subtype.ext
+    exact hfaithful (by simpa using hab)
+  have hxdet : x ∈ determinantKernelSubgroup (ρ.comp K.subtype) := by
+    have hxdetG : (x : G) ∈ determinantKernelSubgroup ρ := hKle x.2
+    rw [mem_determinantKernelSubgroup] at hxdetG ⊢
+    simpa [determinantCharacterOfRepresentation, representationToGeneralLinearGroup] using hxdetG
+  have hoddxG : Odd (orderOf (x : G)) :=
+    hodd.of_dvd_nat (orderOf_dvd_natCard (x : G))
+  have hoddx : Odd (orderOf x) := by
+    simpa [Subgroup.orderOf_coe x] using hoddxG
+  exact rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_element
+    (ρ.comp K.subtype) hρK_faithful W U hcompl hdimW hdimU hdimQ
+    hxdet hoddx hx_ne_one
+
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup
     {F : Type*} [Field F] {G : Type*} [Group G]

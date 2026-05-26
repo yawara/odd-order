@@ -171,6 +171,14 @@
   次はこの witness を
   `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars` と
   normal conjugate line bridge に渡して `RankOneLinePairData.permutes` を作る.
+- **2026-05-26**: witness から rank-one uniqueness への接続として
+  `rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_element` と
+  `rank_one_subrepresentation_eq_left_or_right_of_determinantKernel_subgroup`
+  を追加済み. 後者は ambient `K ≤ G*` と odd-order `G` から restricted
+  `K`-representation に降ろし、非自明 `x : K` を使って任意の rank-one
+  `K`-subrepresentation が二つの Maschke line のどちらかであることを返す.
+  次はこれを `conjugateSubrepresentation_eq_left_or_right_of_rank_one_unique` に
+  接続し、ambient `g : G` が二本の line を permute する形へ進める.
 
 ## TL;DR
 
