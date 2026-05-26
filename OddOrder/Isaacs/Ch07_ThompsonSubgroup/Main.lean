@@ -4144,9 +4144,8 @@ theorem isSimpleGroup_of_minCounterexample
 private theorem Nat.card_pos_of_finite {H : Type*} [Group H] [Finite H] :
     0 < Nat.card H := Nat.card_pos
 
-/-- **Isaacs §7D Step "preliminary"**: a finite nonsolvable simple group whose
-order divides `p^a * q^b` (with `p ≠ q` prime) has at least one factor of each
-prime, i.e., is not a `p`-group and not a `q`-group.
+/-- **Isaacs §7D Step "preliminary"**: a finite nonsolvable group is not a
+`p`-group.
 
 If `H` were a `p`-group it would be nilpotent (mathlib `IsPGroup.isNilpotent`)
 hence solvable, contradicting non-solvability. -/
@@ -4156,6 +4155,53 @@ private theorem not_isPGroup_of_nonsolvable {H : Type*} [Group H] [Finite H]
   intro h_pgroup
   haveI : Group.IsNilpotent H := h_pgroup.isNilpotent
   exact hH_nsol inferInstance
+
+/-- **§7D helper**: in a finite simple non-solvable group, the `r`-core is
+trivial for every prime `r`.
+
+In a simple group, the normal subgroup `O_r(G)` is either `⊥` or `⊤`.  If it
+were `⊤` then `G` would be an `r`-group, hence nilpotent and solvable,
+contradicting non-solvability. -/
+theorem opCore_eq_bot_of_simple_nonsolvable
+    {H : Type*} [Group H] [Finite H] {r : ℕ} [Fact r.Prime]
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    OddOrder.Isaacs.Ch01.opCore r H = ⊥ := by
+  haveI := OddOrder.Isaacs.Ch01.opCore.normal r H
+  rcases Subgroup.Normal.eq_bot_or_eq_top
+    (OddOrder.Isaacs.Ch01.opCore.normal r H) with h | h
+  · exact h
+  · exfalso
+    -- opCore r H = ⊤ ⇒ H is an r-group ⇒ solvable, contradiction.
+    have h_top_pgroup : IsPGroup r ↥(OddOrder.Isaacs.Ch01.opCore r H) :=
+      OddOrder.Isaacs.Ch01.opCore_isPGroup r H
+    -- Top equivalence: ⊤ subgroup of H is equivalent to H itself.
+    have h_iso : OddOrder.Isaacs.Ch01.opCore r H ≃* H := by
+      have hEq : OddOrder.Isaacs.Ch01.opCore r H = ⊤ := h
+      exact (MulEquiv.subgroupCongr hEq).trans Subgroup.topEquiv
+    have hH_pgroup : IsPGroup r H := h_top_pgroup.of_equiv h_iso
+    exact not_isPGroup_of_nonsolvable hH_nsol hH_pgroup
+
+/-- **§7D Step 7 (q = 2 application of Matsuyama)** — if `H` is a finite simple
+non-solvable group and `q = 2`, then for any involution `t ∈ H` with `t ≠ 1`,
+there exists an element `x` of odd prime order with `t * x * t = x⁻¹`.
+
+This combines `opCore_eq_bot_of_simple_nonsolvable` (giving `t ∉ O_2(H)`) with
+Matsuyama's theorem (Isaacs Thm 2.13).  Step 7 will use this to derive a
+contradiction with Step 6 ("`q`-central elements normalize no nontrivial
+`p`-subgroup"). -/
+theorem matsuyama_of_simple_nonsolvable_q_two
+    {H : Type*} [Group H] [Finite H]
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    {t : H} (ht_sq : t * t = 1) (ht_ne_one : t ≠ 1) :
+    ∃ x : H, ∃ p : ℕ, p.Prime ∧ Odd p ∧ orderOf x = p ∧ t * x * t = x⁻¹ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- t ∉ O_2(H) since O_2(H) = ⊥ in a simple non-solvable group.
+  have hO2_bot : OddOrder.Isaacs.Ch01.opCore 2 H = ⊥ :=
+    opCore_eq_bot_of_simple_nonsolvable hH_simple hH_nsol
+  have ht_notin : t ∉ OddOrder.Isaacs.Ch01.opCore 2 H := by
+    rw [hO2_bot, Subgroup.mem_bot]
+    exact ht_ne_one
+  exact OddOrder.Isaacs.Ch02.matsuyama ht_sq ht_notin
 
 /-- **§7D core axiom** — *no finite simple non-solvable group has order
 dividing `p^a * q^b`*.
@@ -4178,7 +4224,7 @@ this axiom requires:
   for distinct Sylow `p`-subgroups) combined with Thompson factorization.
 
 Issue `0032-isaacs-ch07-thm-7-8-burnside.md` tracks the full discharge plan
-(estimated ~600-900 LOC across multiple sessions).  -/
+(estimated ~600-900 LOC across multiple sessions). -/
 axiom noNonsolvableSimplePaQb.{u}
     {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     (H : Type u) [Group H] [Finite H]
