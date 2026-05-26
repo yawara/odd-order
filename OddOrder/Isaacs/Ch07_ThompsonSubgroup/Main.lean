@@ -4335,6 +4335,24 @@ theorem eq_top_of_contains_all_conjugates_of_simple
   rw [h_top]
   exact Subgroup.mem_top x
 
+/-- A Sylow `p`-subgroup is nontrivial whenever `p ∣ |G|`. -/
+theorem Sylow.ne_bot_of_dvd_card
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_dvd : p ∣ Nat.card G) (P : Sylow p G) :
+    (P : Subgroup G) ≠ ⊥ := by
+  intro hP_bot
+  have hp_prime : p.Prime := Fact.out
+  have h_card : Nat.card (P : Subgroup G) = 1 := by rw [hP_bot]; exact Subgroup.card_bot
+  have h_eq := P.card_eq_multiplicity
+  rw [h_card] at h_eq
+  have h_pos : 0 < (Nat.card G).factorization p :=
+    hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
+  have h1 : (1 : ℕ) = p ^ 0 := by simp
+  rw [h1] at h_eq
+  have h_mult_zero : (Nat.card G).factorization p = 0 :=
+    (Nat.pow_right_injective hp_prime.two_le h_eq).symm
+  omega
+
 /-- **§7D IsPCentral existence** — in a finite group with `p ∣ |G|`, every
 Sylow `p`-subgroup has a nontrivial element in its center (since a nontrivial
 finite `p`-group has nontrivial center), and any such nontrivial center
@@ -4347,23 +4365,9 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
     rw [← Finite.one_lt_card_iff_nontrivial]
     exact lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
       (Nat.le_of_dvd Nat.card_pos hp_dvd)
-  -- Pick a Sylow p-subgroup.
+  -- Pick a Sylow p-subgroup; it is nontrivial.
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
-  -- P is nontrivial (as |P| = p^k where p^k is max p-power dividing |G|, k ≥ 1).
-  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := by
-    intro h
-    have : Nat.card (P : Subgroup G) = 1 := by rw [h]; exact Subgroup.card_bot
-    have h_eq := P.card_eq_multiplicity
-    rw [this] at h_eq
-    have h_mult : (Nat.card G).factorization p = 0 := by
-      have : (1 : ℕ) = p ^ 0 := by simp
-      rw [this] at h_eq
-      exact (Nat.pow_right_injective (Fact.out (p := p.Prime)).two_le h_eq).symm
-    -- But p ∣ |G| ⇒ factorization p ≥ 1, contradiction
-    have hp_prime : p.Prime := Fact.out
-    have h_pos : 0 < (Nat.card G).factorization p :=
-      hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
-    omega
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
   -- P is a finite nontrivial p-group, so its center is nontrivial.
   haveI : Nontrivial ↥(P : Subgroup G) := P.toSubgroup.nontrivial_iff_ne_bot.mpr hP_ne_bot
   haveI : Finite ↥(P : Subgroup G) := inferInstance
@@ -4384,31 +4388,15 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
     exact ⟨⟨c, hc_mem⟩, hc_in_center, rfl⟩
 
 /-- **§7D Sylow extraction** — in a finite simple non-solvable group of order
-dividing `p^a * q^b`, every Sylow `p`-subgroup is nontrivial.
-
-This is a thin specialization of the divisibility helper combined with the
-`factorization_pos_of_dvd` argument from `exists_isPCentral`. -/
+dividing `p^a * q^b`, every Sylow `p`-subgroup is nontrivial. -/
 theorem sylow_ne_bot_of_simple_nonsolvable_paqb
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
     {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b)
-    (P : Sylow p H) : (P : Subgroup H) ≠ ⊥ := by
-  intro hP_bot
-  have hp_prime : p.Prime := Fact.out
-  have hp_dvd : p ∣ Nat.card H :=
-    (p_and_q_dvd_card_of_simple_nonsolvable hpq hH_simple hH_nsol hH_dvd).1
-  -- P is bot ⇒ Nat.card P = 1, contradicting Sylow.card_eq_multiplicity.
-  have h_card : Nat.card (P : Subgroup H) = 1 := by rw [hP_bot]; exact Subgroup.card_bot
-  have h_eq := P.card_eq_multiplicity
-  rw [h_card] at h_eq
-  have h_pos : 0 < (Nat.card H).factorization p :=
-    hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
-  have : (1 : ℕ) = p ^ 0 := by simp
-  rw [this] at h_eq
-  have h_mult_zero : (Nat.card H).factorization p = 0 :=
-    (Nat.pow_right_injective hp_prime.two_le h_eq).symm
-  omega
+    (P : Sylow p H) : (P : Subgroup H) ≠ ⊥ :=
+  Sylow.ne_bot_of_dvd_card
+    (p_and_q_dvd_card_of_simple_nonsolvable hpq hH_simple hH_nsol hH_dvd).1 P
 
 /-- **§7D auxiliary observation** (Isaacs L3965) — if `M` is a maximal subgroup
 of a simple group `G` and `K ≤ M` is a nontrivial subgroup normalized by every
@@ -4455,22 +4443,9 @@ theorem exists_isPCentral_centralizing
     (V : Subgroup G) (hV_pgroup : IsPGroup p V) :
     ∃ x : G, IsPCentral p x ∧ ∀ v ∈ V, x * v = v * x := by
   classical
-  -- Extend V to a Sylow p-subgroup P.
+  -- Extend V to a Sylow p-subgroup P; it is nontrivial since p ∣ |G|.
   obtain ⟨P, hVP⟩ := IsPGroup.exists_le_sylow hV_pgroup
-  -- P is nontrivial since p ∣ |G|.
-  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := by
-    intro h
-    have h_card : Nat.card (P : Subgroup G) = 1 := by rw [h]; exact Subgroup.card_bot
-    have h_eq := P.card_eq_multiplicity
-    rw [h_card] at h_eq
-    have hp_prime : p.Prime := Fact.out
-    have h_pos : 0 < (Nat.card G).factorization p :=
-      hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd
-    have : (1 : ℕ) = p ^ 0 := by simp
-    rw [this] at h_eq
-    have h_mult_zero : (Nat.card G).factorization p = 0 :=
-      (Nat.pow_right_injective hp_prime.two_le h_eq).symm
-    omega
+  have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
   -- P nontrivial p-group ⇒ Z(P) nontrivial.
   haveI : Nontrivial ↥(P : Subgroup G) :=
     (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne_bot
