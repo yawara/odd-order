@@ -4383,6 +4383,34 @@ private noncomputable def conjActionOnOmega1ZCenter_quotient
       OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p]
     exact opCore_le_ker_conjNormal_omega1ZCenterOpCore)
 
+/-- The kernel of `MulAut.conjNormal : G →* MulAut V` (for a normal subgroup `V`)
+is exactly `C_G(V)`: `g` acts trivially on `V` iff `g` centralizes `V`. -/
+private theorem conjNormal_ker_eq_centralizer
+    {G : Type*} [Group G] {V : Subgroup G} [V.Normal] :
+    (MulAut.conjNormal (H := V)).ker = Subgroup.centralizer (V : Set G) := by
+  ext g
+  rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hg v hv
+    -- `conjNormal g = 1` ⇒ `g * v * g⁻¹ = v`, i.e. `g * v = v * g`.
+    have hfix : (MulAut.conjNormal g (⟨v, hv⟩ : V) : G) = ((⟨v, hv⟩ : V) : G) := by
+      rw [hg]; rfl
+    rw [MulAut.conjNormal_apply] at hfix
+    -- `g * v * g⁻¹ = v` ⇒ `g * v = v * g`.
+    have : g * v * g⁻¹ * g = v * g := by rw [hfix]
+    have hcomm : g * v = v * g := by simpa [mul_assoc] using this
+    exact hcomm.symm
+  · intro hg
+    -- Every `v ∈ V` is fixed: `g * v * g⁻¹ = v`.
+    apply MulEquiv.ext
+    intro v
+    apply Subtype.ext
+    simp only [MulAut.one_apply]
+    rw [MulAut.conjNormal_apply]
+    have hcomm : (v : G) * g = g * (v : G) := hg (v : G) v.property
+    -- `g * v * g⁻¹ = v * g * g⁻¹ = v`.
+    rw [← hcomm]; group
+
 /-- **Isaacs Thm 7.6 Step 8a** (local axiom — mmd L3893-3895): apply Thm 7.5.
 
 Given Step 4-5-6-7 outputs:
@@ -4395,28 +4423,120 @@ plus the running Thm 7.6 hypotheses (i)-(v),
 
 apply Thm 7.5 (`sylow_normal_of_elementary_normal_P_theorem`) to derive
 `P̄ ⊴ Ḡ`. -/
-private axiom step8a_PBar_normal_GBar
+private theorem step8a_PBar_normal_GBar
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
-    (_hp2 : p ≠ 2)
+    (hp2 : p ≠ 2)
     (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
-    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
     (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
     (_h_centralizer_center :
        Subgroup.centralizer
          (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
          = (P : Subgroup G))
     {A : Subgroup G}
-    (_hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
-    (_h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G))
+    (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    (h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G))
     (_h_Abar_card_eq_p :
        (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p)
-    (_h_V_inter_A_le_p : A.relIndex (omega1ZCenterOpCore G p) ≤ p)
-    (_h_K_map_eq_bot :
+    (h_V_inter_A_le_p : A.relIndex (omega1ZCenterOpCore G p) ≤ p)
+    (h_K_map_eq_bot :
        (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)).map
          (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥) :
     ((P : Subgroup G).map
-      (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))).Normal
+      (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))).Normal := by
+  classical
+  -- Abbreviations: `U = O_p(G) = O_{{p}}(G)`, `Ḡ = G/U`, `V = Ω₁(Z(U))`,
+  -- `φ : Ḡ →* MulAut V` the lifted conjugation action.
+  set U : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G with hU_def
+  set mk : G →* G ⧸ U := QuotientGroup.mk' U with hmk_def
+  set V : Subgroup G := omega1ZCenterOpCore G p with hV_def
+  set φ : (G ⧸ U) →* MulAut ↥V := conjActionOnOmega1ZCenter_quotient G p with hφ_def
+  -- `U = O_p(G)` definitionally.
+  have hU_eq : U = OddOrder.Isaacs.Ch01.opCore p G :=
+    OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p
+  -- (Hypothesis 1) `Ḡ` is `p`-separable: instance from `quotient_isPiSeparable`.
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G ⧸ U) := inferInstance
+  -- (Hypothesis 3) Every `2`-subgroup of `Ḡ` is abelian, by `quotient_two_subgroup_abelian`.
+  have h2abelian_bar :
+      ∀ S : Subgroup (G ⧸ U), IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x :=
+    fun S hS2 => quotient_two_subgroup_abelian h2abelian S hS2
+  -- (Hypothesis 4) `φ` is faithful: `ker φ = C_G(V).map mk = ⊥`.
+  have hφ_inj : Function.Injective φ := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    -- `ker φ = (conjNormal).ker.map mk = C_G(V).map mk`.
+    have hker : φ.ker = (Subgroup.centralizer (V : Set G)).map mk := by
+      rw [hφ_def, hmk_def]
+      unfold conjActionOnOmega1ZCenter_quotient
+      rw [QuotientGroup.ker_lift, conjNormal_ker_eq_centralizer]
+    rw [hker]
+    exact h_K_map_eq_bot
+  -- (Hypothesis 5 ingredient) `V` is a `p`-group.
+  have hV_pg : IsPGroup p ↥V := omega1ZCenterOpCore_isPGroup p
+  -- The candidate normal Sylow `P̄ = P.map mk` as a `Sylow p Ḡ`.
+  set PBar : Sylow p (G ⧸ U) := P.mapSurjective (QuotientGroup.mk'_surjective U) with hPBar_def
+  have hPBar_coe : (PBar : Subgroup (G ⧸ U)) = (P : Subgroup G).map mk := by
+    rw [hPBar_def, Sylow.coe_mapSurjective]
+  -- `P̄ = Ā` since `Ū = ⊥` and `P = UA`.
+  have hPBar_eq_Abar : (PBar : Subgroup (G ⧸ U)) = A.map mk := by
+    rw [hPBar_coe, ← h_P_eq_UA, ← hU_eq, Subgroup.map_sup]
+    -- `U.map mk = ⊥`.
+    have hU_map : U.map mk = ⊥ := by
+      rw [hmk_def, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    rw [hU_map, bot_sup_eq]
+  -- `A` is abelian (it is elementary abelian).
+  have hA_comm : ∀ a b : ↥A, a * b = b * a := (hA_mem.2.1).comm
+  -- Key step: `(actionCentralizer φ P̄).index ≤ p`, because `E = V ∩ A` is fixed by `P̄ = Ā`.
+  -- Membership: every `v : ↥V` whose underlying element lies in `A` is `P̄`-fixed.
+  have hE_le_centralizer :
+      (A.subgroupOf V) ≤ actionCentralizer φ (PBar : Subgroup (G ⧸ U)) := by
+    intro v hv
+    -- `hv : (v : G) ∈ A` (membership of the subgroupOf).
+    rw [Subgroup.mem_subgroupOf] at hv
+    rw [mem_actionCentralizer]
+    intro q
+    -- `q ∈ P̄ = Ā`, so `q = mk a` for some `a ∈ A`.
+    have hq_mem : (q : G ⧸ U) ∈ A.map mk := hPBar_eq_Abar ▸ q.property
+    obtain ⟨a, ha_A, ha_eq⟩ := hq_mem
+    -- `φ q v = φ (mk a) v = conjNormal a v = a * v * a⁻¹ = v` (A abelian).
+    apply Subtype.ext
+    have hφq : φ (q : G ⧸ U) = MulAut.conjNormal a := by
+      rw [hφ_def]
+      unfold conjActionOnOmega1ZCenter_quotient
+      rw [← ha_eq, hmk_def]
+      exact QuotientGroup.lift_mk' _ _ a
+    rw [hφq, MulAut.conjNormal_apply]
+    -- `a * v * a⁻¹ = v` since `a, v ∈ A` and `A` is abelian.
+    have hcomm : a * (v : G) = (v : G) * a :=
+      congrArg Subtype.val (hA_comm ⟨a, ha_A⟩ ⟨(v : G), hv⟩)
+    rw [hcomm]; group
+  -- `(actionCentralizer φ P̄).index ≤ (A.subgroupOf V).index = A.relIndex V ≤ p`.
+  have hPBar_index : (actionCentralizer φ (PBar : Subgroup (G ⧸ U))).index ≤ p := by
+    have h1 : (actionCentralizer φ (PBar : Subgroup (G ⧸ U))).index ≤
+        (A.subgroupOf V).index := Subgroup.index_antitone hE_le_centralizer
+    calc (actionCentralizer φ (PBar : Subgroup (G ⧸ U))).index
+        ≤ (A.subgroupOf V).index := h1
+      _ = A.relIndex V := rfl
+      _ ≤ p := h_V_inter_A_le_p
+  -- Extend the bound to *every* Sylow of `Ḡ` via conjugacy.
+  have h_centralizer_index :
+      ∀ R : Sylow p (G ⧸ U), (actionCentralizer φ (R : Subgroup (G ⧸ U))).index ≤ p := by
+    intro R
+    -- `R` and `P̄` are conjugate: `R = ḡ • P̄`.
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (G ⧸ U) PBar R
+    have hR_eq : (R : Subgroup (G ⧸ U)) =
+        (PBar : Subgroup (G ⧸ U)).map (MulAut.conj g).toMonoidHom := by
+      rw [← hg]
+      rw [Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def]
+      rfl
+    rw [hR_eq, actionCentralizer_map_conj_index]
+    exact hPBar_index
+  -- Apply Theorem 7.5 to `φ : Ḡ →* MulAut V` and the Sylow `P̄`.
+  have hPBar_normal : (PBar : Subgroup (G ⧸ U)).Normal :=
+    sylow_normal_of_elementary_normal_P_theorem hp2 h2abelian_bar hφ_inj hV_pg
+      h_centralizer_index PBar
+  -- Transport normality to `(P : Subgroup G).map mk`.
+  rwa [hPBar_coe] at hPBar_normal
 
 /-- **Isaacs Thm 7.6 Step 8b** (mmd L3896): pull back `P̄ ⊴ Ḡ` to derive `False`.
 
