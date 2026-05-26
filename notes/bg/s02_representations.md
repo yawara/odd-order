@@ -258,6 +258,12 @@
   BG の `E_{i,t} ⊆ E_{t-i}` を Lean で使うための modular 版 inclusion
   まで進めた. これは theorem の単純 rename ではなく、前 commit の線型代数計算と
   Prop. 2.4(e) の合同条件をつなぐ実質的な bridge.
+- **2026-05-26**: Prop. 2.4(a) の directness 側として
+  `cyclicEigenspaceFin_iSupIndep` を追加した. これは mathlib の
+  `eigenspaces_iSupIndep` の単純 rename ではなく、primitive root から
+  `Fin h → epsilon^i` の injectivity を作り、BG の有限 family `V_i`
+  に落とす bridge.  残る Prop. 2.4(a) 入力は
+  `g` の有限位数 + primitive root からの span/diagonalization.
 
 ## TL;DR
 

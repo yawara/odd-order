@@ -128,6 +128,23 @@ theorem cyclicEigenspaceDim_add_mul_period {epsilon : F} {g : Module.End F V}
     cyclicEigenspaceDim epsilon g (i + k * h) = cyclicEigenspaceDim epsilon g i :=
   cyclicEigenspaceDim_add_mul_period_of_pow_eq_one hepsilon.pow_eq_one i k
 
+/-! ### Finite eigenspace family -/
+
+/-- The displayed finite family `V_i`, `0 ≤ i < h`, is independent when
+`epsilon` is a primitive `h`-th root.
+
+This is the directness part behind BG Prop 2.4(a).  The spanning part is a
+separate diagonalization input; here we only use primitive-root injectivity of
+the eigenvalues and mathlib's independence theorem for eigenspaces. -/
+theorem cyclicEigenspaceFin_iSupIndep {epsilon : F} {g : Module.End F V}
+    {h : ℕ} (hepsilon : IsPrimitiveRoot epsilon h) :
+    iSupIndep fun i : Fin h => cyclicEigenspaceFin epsilon g i := by
+  have hinj : Function.Injective fun i : Fin h => epsilon ^ i.1 := by
+    intro i j hij
+    exact Fin.ext (hepsilon.pow_inj i.2 j.2 hij)
+  simpa [cyclicEigenspaceFin, cyclicEigenspace, Function.comp_def] using
+    (g.eigenspaces_iSupIndep.comp hinj)
+
 /-! ### Endomorphism blocks `E_i` and `E_{i,t}` -/
 
 /-- BG Prop 2.4 conjugation action on `E = End_F(V)`.

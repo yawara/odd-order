@@ -43,6 +43,11 @@ to Prop 2.4.
   gives the theorem-facing inclusion `E_{i,t} ≤ E_m`.  Remaining work for the
   full Prop. 2.4 package is the Prop. 2.4(a) span/direct-sum input and the
   later direct-sum/dimension identities.
+- 2026-05-26: Added the directness half of Prop. 2.4(a) as
+  `cyclicEigenspaceFin_iSupIndep`.  The proof combines primitive-root
+  injectivity of the eigenvalues with mathlib's eigenspace independence
+  theorem; it is not a thin rename.  The remaining Prop. 2.4(a) input is
+  span/diagonalization from the finite-order hypothesis on `g`.
 
 ## 完了条件
 
