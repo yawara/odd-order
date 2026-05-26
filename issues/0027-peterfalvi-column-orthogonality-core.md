@@ -23,6 +23,8 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - [x] first orthogonality から character-table matrix の row orthogonality を statement 化する。
 - [x] square/invertible matrix argument で、weighted row orthogonality input から
   square-indexed column diagonal/off-diagonal relation を導く。
+- [x] square-indexed column relation を conjugacy-class indexed pairing と
+  element representative pairing へ戻す。
 - [ ] finite/indexing と weighted row orthogonality input を public
   `column_orthogonality_cases` の仮定へ供給する。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
@@ -80,6 +82,13 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality` and
   `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality` を追加し、
   weighted row orthogonality input の下で square-indexed column relation を取り出せるようにした。
+- `characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality`,
+  `characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality` を追加し、
+  square-indexed relation を conjugacy-class indexed pairing と element representative
+  pairing に戻した。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,

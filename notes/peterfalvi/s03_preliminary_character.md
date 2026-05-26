@@ -113,9 +113,17 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality`, and
   `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality`.
   These close the square/invertible matrix algebra step from weighted row
-  orthogonality to square-indexed column diagonal/off-diagonal relations; the
-  remaining `column_orthogonality_cases` stub is now the input-supply/transport
-  layer back to element representatives.
+  orthogonality to square-indexed column diagonal/off-diagonal relations.
+- The same conditional relations are now transported back to class-indexed and
+  element-representative pairings via
+  `characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality`,
+  `characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality`.  The
+  remaining `column_orthogonality_cases` stub is now the input-supply layer:
+  providing canonical finite/indexing and weighted row orthogonality data under
+  the public theorem's assumptions.
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 
