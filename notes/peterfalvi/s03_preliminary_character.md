@@ -105,6 +105,17 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterKernel_trivialClassFunction`, `characterKernel_conj`,
   `subsetCharacterKernel_trivialClassFunction`,
   `subsetCharacterKernel_conj_iff`, and `SubsetCharacterKernel.mono`.
+- `SecondOrthogonality` now exposes the next matrix proof-core bridge:
+  `conjugacyClassSize_pos`,
+  `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,
+  `conjugacyClassSize_mul_characterTableColumnGram_apply`,
+  `characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing`,
+  `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality`, and
+  `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality`.
+  These close the square/invertible matrix algebra step from weighted row
+  orthogonality to square-indexed column diagonal/off-diagonal relations; the
+  remaining `column_orthogonality_cases` stub is now the input-supply/transport
+  layer back to element representatives.
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 

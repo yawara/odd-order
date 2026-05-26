@@ -21,7 +21,10 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 
 - [x] `IrreducibleCharacter G` と `ConjClasses G` の finite cardinal/indexing をそろえる。
 - [x] first orthogonality から character-table matrix の row orthogonality を statement 化する。
-- [ ] square/invertible matrix argument で column orthogonality を導く。
+- [x] square/invertible matrix argument で、weighted row orthogonality input から
+  square-indexed column diagonal/off-diagonal relation を導く。
+- [ ] finite/indexing と weighted row orthogonality input を public
+  `column_orthogonality_cases` の仮定へ供給する。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
 
 ## 2026-05-26 update
@@ -66,6 +69,17 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   `characterTableClassColumnPairingOfIndexing_eq_columnPairing_representatives`, and
   `characterTableSquareColumnPairing_eq_columnPairing_representatives` を追加し、
   matrix/class indexed column pairing を既存の element representative API に戻せるようにした。
+- `conjugacyClassSize_pos` を追加し、class-size division で使う非零性を再利用可能にした。
+- `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal` and
+  `conjugacyClassSize_mul_characterTableColumnGram_apply` を追加し、
+  row Gram の cancel bridge から `W * (Aᴴ A) = |G| I` とその entrywise 形までを
+  `sorry` なしで接続した。
+- `characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing` を追加し、
+  matrix column Gram convention と既存 `characterTableSquareColumnPairing` convention の
+  complex conjugation bridge を固定した。
+- `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality` and
+  `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality` を追加し、
+  weighted row orthogonality input の下で square-indexed column relation を取り出せるようにした。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,
