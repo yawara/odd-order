@@ -316,6 +316,9 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch06.conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_involution_comap_card_ne_eight_of_card_ne_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_involution_conj_square_eq_inv_of_zpowers
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -338,6 +341,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

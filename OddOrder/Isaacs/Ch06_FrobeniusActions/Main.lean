@@ -6573,6 +6573,33 @@ theorem conj_square_eq_inv_of_normal_zpowers_of_pow_mem_of_pow_conj_ne
   exact conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
     hp he h_order h_conj ha_pow_z hpow_ne
 
+/-- **Isaacs Thm 6.12 setup**: the pullback of a quotient involution does not have
+order `8` once the `|C| = 4` case has been excluded. -/
+theorem quotient_involution_comap_card_ne_eight_of_card_ne_four
+    {P : Type*} [Group P] {C : Subgroup P} [C.Normal]
+    (hC_card_ne : Nat.card C ≠ 4) :
+    ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+      Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  intro q hq_ne hq_sq
+  let Q : Subgroup (P ⧸ C) := Subgroup.zpowers q
+  let T : Subgroup P := Q.comap (QuotientGroup.mk' C)
+  have hC_le_T : C ≤ T := QuotientGroup.le_comap_mk' C Q
+  have hT_map : T.map (QuotientGroup.mk' C) = Q :=
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective C) Q
+  have hq_order : orderOf q = 2 := orderOf_eq_prime (p := 2) hq_sq hq_ne
+  have hC_rel : C.relIndex T = 2 := by
+    have hrel : C.relIndex T = Nat.card Q := by
+      have hrel_ker :
+          (QuotientGroup.mk' C).ker.relIndex T = Nat.card Q := by
+        rw [Subgroup.relIndex_ker, hT_map]
+      simpa [QuotientGroup.ker_mk'] using hrel_ker
+    rw [hrel]
+    change Nat.card (Subgroup.zpowers q) = 2
+    rw [Nat.card_zpowers, hq_order]
+  exact card_ne_eight_of_relIndex_prime_of_card_ne_four hC_le_T hC_rel hC_card_ne
+
 /-- **Isaacs Thm 6.12 setup**: a quotient involution inverts `c²`.
 
 For a nontrivial involution `q ∈ P/C`, pull back `⟨q⟩` to a subgroup `T`. Then
@@ -7035,6 +7062,47 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_invol
     simpa using ha_pow_C
   exact dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases
     hP h_nonab hC_eq hquot_cyclic h_order he ha_notmem ha_sq_mem h_conj hcases
+
+/-- **Isaacs Thm 6.12 setup**: the maximal normal cyclic branch reaches the
+dihedral/quaternion/semidihedral classification surface.
+
+This assembles the proof paragraph after excluding the `|C| = 4` case: choose `T/C` of
+order `p`, derive `T` nonabelian and `|T| ≠ 8`, derive the quotient-involution order-`8`
+exclusion from `|C| ≠ 4`, and feed the result into the quotient-involution branch. -/
+theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top
+    {P : Type*} [Group P] [Finite P] {p e : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P) (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    {C : Subgroup P} [C.Normal] {c : P}
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B)
+    (hC_eq : C = Subgroup.zpowers c)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hC_lt_top : C < ⊤) (hC_card_ne : Nat.card C ≠ 4)
+    (h_order : orderOf c = p ^ e) (he : 3 ≤ e) :
+    p = 2 ∧
+      (Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
+        Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) ∨
+          ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k)) := by
+  classical
+  have hC_cyclic : IsCyclic C := by
+    rw [hC_eq]
+    exact Subgroup.isCyclic_zpowers c
+  have hC_comm : IsMulCommutative C := by
+    haveI : IsCyclic C := hC_cyclic
+    infer_instance
+  have hCent : Subgroup.centralizer (C : Set P) = C :=
+    centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
+  obtain ⟨T, hT_normal, hcT, hC_le_T, hC_rel, hT_not_comm⟩ :=
+    exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
+      hP hC_eq hC_max hC_lt_top
+  have hT_card_ne : Nat.card T ≠ 8 :=
+    card_ne_eight_of_relIndex_prime_of_card_ne_four hC_le_T hC_rel hC_card_ne
+  have hT_card_ne_quot :
+      ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
+        Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8 :=
+    quotient_involution_comap_card_ne_eight_of_card_ne_four hC_card_ne
+  exact dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
+    hP h_nonab hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_max
+    hC_rel hT_not_comm hT_card_ne_quot h_order he
 
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 

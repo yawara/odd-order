@@ -501,6 +501,8 @@ FT クリティカル度 + 章内依存で並べる:
   `C.relIndex T = 2` と `T = C ⊔ ⟨a⟩` を作り, 任意の代表元 `a` が `c^2` を
   反転する
   `quotient_involution_conj_square_eq_inv_of_zpowers` も追加済み.
+  `|C| ≠ 4` から同じ comap `T` の `|T| ≠ 8` を供給する
+  `quotient_involution_comap_card_ne_eight_of_card_ne_four` も追加済み.
   これを conjugation action `P/C ↷ C` 上の involution-cyclicity criterion に渡し,
   `c^2` の非 involution 性 (`e ≥ 3`) と合わせて `P/C` cyclic を返す
   `quotient_isCyclic_of_involutions_invert_zpowers_square` も追加済み.
@@ -516,8 +518,10 @@ FT クリティカル度 + 章内依存で並べる:
   `p=2` の抽出から Lemma 6.13 分類までを直結する p-general assembly
   `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions`
   も追加済み.
-  次は maximal normal cyclic subgroup setup から `T` と quotient-involution branch の
-  order-8 除外条件を供給する段階.
+  maximal normal cyclic setup から `T`, self-centralizing, `|T| ≠ 8`, quotient-involution
+  order-8 除外をすべて供給し, D/Q/SD 分類 surface に到達する
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top` も追加済み.
+  次は `|C| = 4` branch / abelian `P` branch を含めた 6.12 全体 statement への整理.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
