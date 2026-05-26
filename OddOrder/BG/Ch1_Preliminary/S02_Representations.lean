@@ -798,6 +798,22 @@ private theorem scalarCharacterOfFinrankEqOne_apply_smul
     ρ g m = (scalarCharacterOfFinrankEqOne hdim ρ g : F) • m :=
   scalarMonoidHomOfFinrankEqOne_apply_smul hdim ρ g m
 
+/-- A scalar endomorphism of a one-dimensional module has that scalar as determinant. -/
+private theorem det_eq_scalar_of_finrank_eq_one
+    {F : Type*} [Field F]
+    {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
+    (hdim : Module.finrank F M = 1) (f : Module.End F M) (c : F)
+    (hf : ∀ m : M, f m = c • m) :
+    LinearMap.det f = c := by
+  have hf_eq : f = c • (LinearMap.id : Module.End F M) := by
+    ext m
+    simpa using hf m
+  calc
+    LinearMap.det f = LinearMap.det (c • (LinearMap.id : Module.End F M)) := by
+      rw [hf_eq]
+    _ = c := by
+      simp [hdim]
+
 /-- Irreducible representations of an abelian group over an algebraically closed
 field are one-dimensional.
 
@@ -1609,6 +1625,65 @@ private theorem determinantKernelSubgroup_normal
     (determinantKernelSubgroup ρ).Normal := by
   dsimp [determinantKernelSubgroup]
   infer_instance
+
+/-- On an invariant rank-one submodule and rank-one quotient, the determinant
+character is the product of the two scalar characters. -/
+private theorem determinantCharacter_eq_scalarCharacter_mul_quotient
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    (g : G) :
+    determinantCharacterOfRepresentation ρ g =
+      scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g *
+        scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW) g := by
+  ext
+  have hdet :
+      LinearMap.det (ρ g) =
+        LinearMap.det ((ρ g).restrict (hW g)) *
+          LinearMap.det (W.mapQ W (ρ g) (hW g)) :=
+    LinearMap.det_eq_det_mul_det W (ρ g) (hW g)
+  have hdetW :
+      LinearMap.det ((ρ g).restrict (hW g)) =
+        (scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g : F) := by
+    apply det_eq_scalar_of_finrank_eq_one hdimW
+    intro w
+    simpa [Representation.subrepresentation] using
+      scalarCharacterOfFinrankEqOne_apply_smul hdimW
+        (ρ.subrepresentation W hW) g w
+  have hdetQ :
+      LinearMap.det (W.mapQ W (ρ g) (hW g)) =
+        (scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW) g : F) := by
+    apply det_eq_scalar_of_finrank_eq_one hdimQ
+    intro v
+    simpa [Representation.quotient] using
+      scalarCharacterOfFinrankEqOne_apply_smul hdimQ (ρ.quotient W hW) g v
+  calc
+    (determinantCharacterOfRepresentation ρ g : F) = LinearMap.det (ρ g) := by
+      simp [determinantCharacterOfRepresentation, representationToGeneralLinearGroup]
+    _ = LinearMap.det ((ρ g).restrict (hW g)) *
+        LinearMap.det (W.mapQ W (ρ g) (hW g)) := hdet
+    _ = (scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g : F) *
+        (scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW) g : F) := by
+      rw [hdetW, hdetQ]
+
+/-- Membership in the determinant kernel forces the two rank-one scalar
+characters to have product one. -/
+private theorem scalarCharacters_mul_eq_one_of_mem_determinantKernel
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] [Module.Finite F V]
+    (W : Submodule F V) [Module.Free F W] [Module.Free F (V ⧸ W)]
+    (ρ : Representation F G V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    (hdimW : Module.finrank F W = 1) (hdimQ : Module.finrank F (V ⧸ W) = 1)
+    {g : G} (hg : g ∈ determinantKernelSubgroup ρ) :
+    scalarCharacterOfFinrankEqOne hdimW (ρ.subrepresentation W hW) g *
+        scalarCharacterOfFinrankEqOne hdimQ (ρ.quotient W hW) g = 1 := by
+  have hdet :=
+    determinantCharacter_eq_scalarCharacter_mul_quotient W ρ hW hdimW hdimQ g
+  have hgdet : determinantCharacterOfRepresentation ρ g = 1 :=
+    mem_determinantKernelSubgroup.mp hg
+  simpa [hdet] using hgdet
 
 /-- The commutator subgroup lies in the determinant kernel. -/
 private theorem commutator_le_determinantKernelSubgroup

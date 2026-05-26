@@ -148,6 +148,14 @@
   `RankOneLinePairData.permutes` が要求する `comap` 形へ変換するための接続補題.
   次は determinant-kernel 条件から distinct scalars を取り出して
   uniqueness 仮定を作る.
+- **2026-05-26**: determinant kernel と rank-one scalar character の接続として、
+  `det_eq_scalar_of_finrank_eq_one`,
+  `determinantCharacter_eq_scalarCharacter_mul_quotient`,
+  `scalarCharacters_mul_eq_one_of_mem_determinantKernel` を追加済み.
+  `g ∈ G*` から、invariant rank-one submodule と quotient 上の二つの
+  scalar character の積が `1` であることを Lean で取り出せるようになった.
+  次は `x ∈ K#` で二つの scalar が等しいと faithful action に反する、という
+  distinct scalar witness を作る.
 
 ## TL;DR
 
