@@ -24,7 +24,7 @@ representations of extraspecial `p`-groups.
   extraspecial `p`-group `E` of order `p^{1+2n}` has dimension exactly `p^n`.
   The proof routes through Clifford's theorem applied to the center `Z(E)`
   (already available in `OddOrder.RepresentationTheory.Clifford` modulo the
-  sorry on `clifford_decomposition`, see issue #26).
+  Clifford decomposition placeholder; see issue #26).
 * The bridging data is the `OddOrder.GroupTheory.IsExtraspecial` predicate
   already in the repo.
 -/
