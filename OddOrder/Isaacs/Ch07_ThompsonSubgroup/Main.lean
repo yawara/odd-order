@@ -2829,6 +2829,50 @@ theorem opPpPrimeCore_map_eq_LBar
   exact Subgroup.map_comap_eq_self_of_surjective
     (QuotientGroup.mk'_surjective _) _
 
+/-- **Isaacs Thm 7.6 Step 5 prep** (mmd L3873): for any `p`-subgroup `A ≤ G`,
+the image `Ā = A.map (mk' U)` is disjoint from `L̅ = O_{p'}(G̅)` in `G̅ = G/U`.
+
+`Ā` is a `p`-group (image of `p`-group `A`), and `L̅` is a `{q | q ≠ p}`-group
+by `oPiCore.isPiGroup`.  Their cardinalities are coprime, hence the
+intersection is trivial. -/
+theorem AbarInf_LBar_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA_pg : IsPGroup p A) :
+    A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) ⊓
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+        (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) = ⊥ := by
+  -- A̅ is a p-group, hence {p}-IsPiGroup.
+  have hAbar_pg : IsPGroup p
+      (A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))) :=
+    hA_pg.map _
+  have hAbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
+      (A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))) := by
+    intro q hq
+    have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq
+    have hq_dvd : q ∣ Nat.card
+        (A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))) :=
+      Nat.dvd_of_mem_primeFactors hq
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hAbar_pg
+    rw [hk] at hq_dvd
+    have hq_eq_p : q = p :=
+      (Nat.prime_dvd_prime_iff_eq hq_prime Fact.out).mp
+        (hq_prime.dvd_of_dvd_pow hq_dvd)
+    simp [hq_eq_p]
+  -- L̅ is a {q | q ≠ p}-group; rewrite as `{q | q ∉ {p}}` for the coprime lemma.
+  have hLbar_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup
+      ({q : ℕ | q ∉ ({p} : Set ℕ)} : Set ℕ)
+      (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+        (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) := by
+    have hLbar_pi := OddOrder.Isaacs.Ch03.oPiCore.isPiGroup
+      (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) ({q | q ≠ p} : Set ℕ)
+    have hπeq : ({q : ℕ | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} := by
+      ext q; simp
+    rw [hπeq]; exact hLbar_pi
+  -- Apply `inf_eq_bot_of_coprime` + `coprime_of_isPiGroup_of_isPiGroup_compl`.
+  apply Subgroup.inf_eq_bot_of_coprime
+  exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
+
 /-! ### Step 2-3: structural bridges for `A ∈ E(P)`, `A ⊄ L` (mmd L3845-3858)
 
 We pick `A ∈ maxElemAbelianIn P p` with `A ⊄ L = O_p(G)`.  These bridges express
