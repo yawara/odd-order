@@ -3830,6 +3830,138 @@ theorem centralizer_omega1ZCenterOpCore_map_eq_bot_of_le_opCore
         OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G from
       (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm] at hx_U
 
+/-! ### Step 7 counting argument: `|V : V ∩ A| ≤ p` (mmd L3886-3892)
+
+The book's Step 7 derives a counting bound on `V := Ω₁ Z(O_p(G))`:
+
+> Write `D = U ∩ A` and `E = V ∩ A`.  Then `|V:E| = |V:V∩D| = |VD:D|`.  Now
+> `D` is elementary abelian in `U`, and `V` is a central elementary abelian
+> subgroup of `U`, so `VD` is elementary abelian.  By `A ∈ E(P)`, `|VD| ≤ |A|`,
+> hence `|VD:D| ≤ |A:D| = |Ā| = p`.
+
+We package this combinatorial step as `omega1ZCenterOpCore_relIndex_inter_A_le`,
+isolating from the broader Goldschmidt argument the part that only needs
+elementary-abelian structure, `V ≤ centralizer U`, and the maximality of
+`A ∈ maxElemAbelianIn P p`.
+
+The hypothesis `|A : A ⊓ U| ≤ p` is supplied externally (it is the Step 5
+conclusion `|Ā| = p`). -/
+
+/-- **Subgroup `V ⊔ D` is contained in its own centralizer** when `V`
+centralizes `D`, `V` is commutative, and `D` is commutative.
+
+This packages `V ⊔ D ≤ centralizer (V ⊔ D)`, i.e., `V ⊔ D` is abelian. -/
+private theorem sup_le_centralizer_self_of_centralizing
+    {G : Type*} [Group G] {V D : Subgroup G}
+    (hV_comm : ∀ x y : ↥V, x * y = y * x)
+    (hD_comm : ∀ x y : ↥D, x * y = y * x)
+    (hVD : V ≤ Subgroup.centralizer (D : Set G)) :
+    (V ⊔ D : Subgroup G) ≤ Subgroup.centralizer ((V ⊔ D : Subgroup G) : Set G) := by
+  -- Strategy: show V ∪ D ⊆ centralizer (V ⊔ D), then by closure of centralizer.
+  -- centralizer is a subgroup, so closure (V ∪ D) ⊆ centralizer (V ⊔ D).
+  -- V ⊔ D = closure (V ∪ D), giving the conclusion.
+  have h_VuD_in_cent : (V : Set G) ∪ (D : Set G) ⊆ Subgroup.centralizer ((V ⊔ D : Subgroup G) : Set G) := by
+    -- Show each element of V ∪ D commutes with every element of V ⊔ D.
+    intro w hw
+    rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+    intro x hx
+    -- x ∈ V ⊔ D ⟺ x ∈ closure (V ∪ D). Use closure_induction.
+    have hx_clos : x ∈ Subgroup.closure ((V : Set G) ∪ (D : Set G)) := by
+      rwa [← Subgroup.sup_eq_closure]
+    clear hx
+    -- w ∈ V ∪ D, x ∈ closure (V ∪ D). Goal: x * w = w * x.
+    induction hx_clos using Subgroup.closure_induction with
+    | mem y hy =>
+      -- Both w and y are in V ∪ D, show they commute.
+      rcases hw with hw_V | hw_D
+      · rcases hy with hy_V | hy_D
+        · have := hV_comm ⟨y, hy_V⟩ ⟨w, hw_V⟩
+          exact congr_arg Subtype.val this
+        · -- w ∈ V, y ∈ D: hVD says V centralizes D.
+          have h_w_cent := hVD hw_V
+          rw [Subgroup.mem_centralizer_iff] at h_w_cent
+          exact h_w_cent y hy_D
+      · rcases hy with hy_V | hy_D
+        · -- w ∈ D, y ∈ V: hVD says V centralizes D.
+          have h_y_cent := hVD hy_V
+          rw [Subgroup.mem_centralizer_iff] at h_y_cent
+          exact (h_y_cent w hw_D).symm
+        · have := hD_comm ⟨y, hy_D⟩ ⟨w, hw_D⟩
+          exact congr_arg Subtype.val this
+    | one => rw [one_mul, mul_one]
+    | mul a b _ _ ha hb =>
+      calc (a * b) * w = a * (b * w) := by group
+        _ = a * (w * b) := by rw [hb]
+        _ = (a * w) * b := by group
+        _ = (w * a) * b := by rw [ha]
+        _ = w * (a * b) := by group
+    | inv a _ ha =>
+      have hcomm : a * w = w * a := ha
+      calc a⁻¹ * w = a⁻¹ * (w * a) * a⁻¹ := by group
+        _ = a⁻¹ * (a * w) * a⁻¹ := by rw [hcomm]
+        _ = w * a⁻¹ := by group
+  -- Now centralizer is a subgroup, so closure (V ∪ D) ⊆ centralizer (V ⊔ D).
+  -- The result follows because V ⊔ D = closure (V ∪ D).
+  intro x hx
+  -- Convert hx to closure form, apply h_VuD_in_cent + closure_le.
+  have hx_clos : x ∈ Subgroup.closure ((V : Set G) ∪ (D : Set G)) := by
+    rwa [← Subgroup.sup_eq_closure]
+  exact (Subgroup.closure_le _).mpr h_VuD_in_cent hx_clos
+
+/-- **VD is elementary abelian**: if `V` centralizes `D`, both `V` and `D` are
+elementary abelian `p`-groups, and `V` is normal in `G`, then `V ⊔ D` is also
+elementary abelian.
+
+Proof: by `mul_normal`, every element of `V ⊔ D` is `v * d` for some `v ∈ V`,
+`d ∈ D`.  Commutativity in `V ⊔ D` and exponent `p` both follow from `V` and
+`D` commuting pointwise. -/
+private theorem sup_isElementaryAbelian_of_centralizing
+    {G : Type*} [Group G] {p : ℕ} {V D : Subgroup G} [V.Normal]
+    (hV : V.IsElementaryAbelian p) (hD : D.IsElementaryAbelian p)
+    (hVD : V ≤ Subgroup.centralizer (D : Set G)) :
+    (V ⊔ D : Subgroup G).IsElementaryAbelian p := by
+  have h_VD_comm : (V ⊔ D : Subgroup G) ≤
+      Subgroup.centralizer ((V ⊔ D : Subgroup G) : Set G) :=
+    sup_le_centralizer_self_of_centralizing hV.1 hD.1 hVD
+  -- Element decomposition: every element of V ⊔ D is v*d for v ∈ V, d ∈ D.
+  have h_decomp : ∀ x ∈ (V ⊔ D : Subgroup G), ∃ v ∈ V, ∃ d ∈ D, (v * d : G) = x := by
+    intro x hx
+    have h_mul : (↑(V ⊔ D) : Set G) = V * D := Subgroup.normal_mul V D
+    have hx_set : x ∈ (↑(V ⊔ D) : Set G) := hx
+    rw [h_mul] at hx_set
+    obtain ⟨v, hv, d, hd, hvd⟩ := hx_set
+    exact ⟨v, hv, d, hd, hvd⟩
+  refine ⟨?_, ?_⟩
+  · -- Commutativity in V ⊔ D.
+    intro x y
+    apply Subtype.ext
+    have hxy_cent := h_VD_comm x.2
+    rw [Subgroup.mem_centralizer_iff] at hxy_cent
+    have : (y : G) * x = x * y := hxy_cent y y.2
+    exact this.symm
+  · -- Exponent p.  In V ⊔ D, every element w has w^p = 1.
+    intro w
+    apply Subtype.ext
+    show (w.val : G) ^ p = 1
+    -- w = v * d for some v ∈ V, d ∈ D.
+    obtain ⟨v, hv_V, d, hd_D, hvd_eq⟩ := h_decomp w.val w.2
+    rw [← hvd_eq]
+    -- (v * d)^p = v^p * d^p (since v and d commute), and v^p = 1, d^p = 1.
+    have hv_d_comm : v * d = d * v := by
+      have hv_cent := hVD hv_V
+      rw [Subgroup.mem_centralizer_iff] at hv_cent
+      exact (hv_cent d hd_D).symm
+    have hCom : Commute v d := hv_d_comm
+    have : (v * d) ^ p = v ^ p * d ^ p := Commute.mul_pow hCom p
+    rw [this]
+    have hv_p : v ^ p = 1 := by
+      have := hV.2 ⟨v, hv_V⟩
+      exact congr_arg Subtype.val this
+    have hd_p : d ^ p = 1 := by
+      have := hD.2 ⟨d, hd_D⟩
+      exact congr_arg Subtype.val this
+    rw [hv_p, hd_p, mul_one]
+
 /-! ### Step 7-8: closing reductions (mmd L3884-3896)
 
 Once Step 5-6 produce the triviality of the `A`-action on `V = Z(L)`, the book:
