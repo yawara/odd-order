@@ -2710,6 +2710,25 @@ private theorem center_sylow_le_centralizer_opCore
     Subgroup.mem_center_iff.mp hz_center ⟨h, hh_P⟩
   exact congr_arg Subtype.val hc
 
+/-- **Isaacs Thm 7.6 Step 1** (mmd L3837): Hall-Higman 3.21 with `π = {p}`.
+
+If `G` is `{p}`-separable (equivalently `p`-solvable) and `O_{p'}(G) = ⊥`,
+then `C_G(O_p(G)) ≤ O_p(G)`. -/
+theorem centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥) :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch01.opCore p G : Set G) ≤
+      OddOrder.Isaacs.Ch01.opCore p G := by
+  have hπ' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥ := by
+    rw [show ({q | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} by
+      ext q; simp]
+    exact hOp'
+  have hHH :=
+    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G) ({p} : Set ℕ) hπ'
+  rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p] at hHH
+  exact hHH
+
 /-- **Isaacs Thm 7.6** (normal-J theorem, conditional on 8-step minimum-counterexample argument).
 
 The full theorem (Isaacs L3832) states:
