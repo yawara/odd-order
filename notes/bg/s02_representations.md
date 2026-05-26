@@ -294,6 +294,12 @@
   任意の `V_i → V_t` を他の `V_j` 上で 0 に延長して `E_{i,t}` の元を
   作る.  次はこの construction の逆向き restriction と linear equivalence
   を作れば `dim E_{i,t} = n_i n_t` に進める.
+- **2026-05-26**: 上の逆向き restriction として `cyclicHomBlockFinToHom`
+  を追加し、`cyclicHomBlockFinLinearEquiv` で
+  `Hom_F(V_i,V_t) ≃ₗ E_{i,t}` を得た.  さらに finite-dimensional `V`
+  の下で `finrank_cyclicHomBlockFin` が `dim E_{i,t}=n_i n_t` を返す.
+  次は Prop. 2.4(c) の `End_F(V) = ⊕_{i,t} E_{i,t}` を global block
+  decomposition として束ねる.
 
 ## TL;DR
 
@@ -902,5 +908,8 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `cyclicEigenspaceFin_isInternal_of_pow_eq_one` で `DirectSum.IsInternal`
   形式にも束ねたため、Prop. 2.4(a) は後続が消費できる形まで揃った.
   さらに `cyclicHomBlockFinOfHom` で `V_i → V_t` を `E_{i,t}` へ
-  extension-by-zero する向きも追加した.  次は restriction 側を合わせた
-  linear equivalence と dimension identity.
+  extension-by-zero する向きも追加し、`cyclicHomBlockFinToHom` と
+  `cyclicHomBlockFinLinearEquiv` で restriction 側も合わせた.
+  `finrank_cyclicHomBlockFin` により個別 block の dimension identity
+  `dim E_{i,t}=n_i n_t` は theorem-facing に使える.  次は全 block の
+  direct-sum decomposition.

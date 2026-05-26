@@ -78,6 +78,14 @@ to Prop 2.4.
   a linear map `V_i → V_t` is extended by zero on all other displayed
   eigenspaces, and `cyclicHomBlockFinOfHom_mem` proves the resulting
   endomorphism lies in `E_{i,t}`.
+- 2026-05-26: Completed the restriction side of the block package:
+  `cyclicHomBlockFinToHom`, `cyclicHomBlockFinOfHomLinear`, and
+  `cyclicHomBlockFinLinearEquiv` identify `E_{i,t}` with
+  `Hom_F(V_i,V_t)` under the internal decomposition.  The dimension statement
+  `finrank_cyclicHomBlockFin` now gives Prop. 2.4(d)'s block formula
+  `dim E_{i,t} = n_i n_t` for finite-dimensional `V`.  Remaining work for
+  Prop. 2.4(c) is the global direct-sum decomposition of `End_F(V)` over all
+  `(i,t)` blocks.
 
 ## 完了条件
 

@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.Algebra.DirectSum.Module
@@ -525,6 +526,117 @@ theorem cyclicHomBlockFinOfHom_mem
     exact (φ ⟨v, hv⟩).2
   · intro j hji v hv
     exact cyclicHomBlockFinOfHom_apply_of_mem_ne hV hji φ hv
+
+/-- Restrict a block endomorphism `E_{i,t}` to a map `V_i → V_t`. -/
+def cyclicHomBlockFinToHom
+    {epsilon : F} {g : Module.End F V} {h : ℕ} (i t : Fin h) :
+    cyclicHomBlockFin epsilon g i t →ₗ[F]
+      (cyclicEigenspaceFin epsilon g i →ₗ[F]
+        cyclicEigenspaceFin epsilon g t) where
+  toFun e :=
+    { toFun := fun v =>
+        ⟨(e : Module.End F V) v, (mem_cyclicHomBlockFin_iff.mp e.2).1 v v.2⟩
+      map_add' := by
+        intro v w
+        ext
+        exact (e : Module.End F V).map_add v w
+      map_smul' := by
+        intro a v
+        ext
+        exact (e : Module.End F V).map_smul a v }
+  map_add' e f := by
+    ext v
+    rfl
+  map_smul' a e := by
+    ext v
+    rfl
+
+/-- The extension-by-zero map, with codomain restricted to the block submodule. -/
+noncomputable def cyclicHomBlockFinOfHomLinear
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    (cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) →ₗ[F]
+      cyclicHomBlockFin epsilon g i t :=
+  (cyclicHomBlockFinOfHom hV i t).codRestrict
+    (cyclicHomBlockFin epsilon g i t)
+    (fun φ => cyclicHomBlockFinOfHom_mem hV φ)
+
+@[simp]
+theorem cyclicHomBlockFinToHom_ofHomLinear
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i t : Fin h}
+    (φ : cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) :
+    cyclicHomBlockFinToHom i t (cyclicHomBlockFinOfHomLinear hV i t φ) = φ := by
+  ext v
+  change cyclicHomBlockFinOfHom hV i t φ (v : V) = (φ v : V)
+  exact cyclicHomBlockFinOfHom_apply_of_mem_same hV φ v.2
+
+/-- Internal direct-sum form implies the displayed eigenspaces span `V`. -/
+theorem span_cyclicEigenspaceFinUnion_eq_top_of_isInternal
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h)) :
+    Submodule.span F (cyclicEigenspaceFinUnion epsilon g h) = ⊤ := by
+  rw [span_cyclicEigenspaceFinUnion_eq_iSup]
+  simpa [cyclicEigenspaceFinFamily] using hV.submodule_iSup_eq_top
+
+@[simp]
+theorem cyclicHomBlockFinOfHomLinear_toHom
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    {i t : Fin h}
+    (e : cyclicHomBlockFin epsilon g i t) :
+    cyclicHomBlockFinOfHomLinear hV i t (cyclicHomBlockFinToHom i t e) = e := by
+  apply Subtype.ext
+  rw [Submodule.linearMap_eq_iff_of_span_eq_top _ _
+    (span_cyclicEigenspaceFinUnion_eq_top_of_isInternal hV)]
+  intro v
+  rcases v.2 with ⟨j, hvj⟩
+  by_cases hji : j = i
+  · subst hji
+    change
+      cyclicHomBlockFinOfHom hV j t (cyclicHomBlockFinToHom j t e) (v : V) =
+        (e : Module.End F V) v
+    rw [cyclicHomBlockFinOfHom_apply_of_mem_same hV
+      (cyclicHomBlockFinToHom j t e) hvj]
+    rfl
+  · have hleft :
+        ((cyclicHomBlockFinOfHomLinear hV i t
+          (cyclicHomBlockFinToHom i t e) : Module.End F V) v) = 0 := by
+      simpa [cyclicHomBlockFinOfHomLinear] using
+        cyclicHomBlockFinOfHom_apply_of_mem_ne hV hji
+          (cyclicHomBlockFinToHom i t e) hvj
+    have hright : (e : Module.End F V) v = 0 :=
+      (mem_cyclicHomBlockFin_iff.mp e.2).2 j hji v hvj
+    rw [hleft, hright]
+
+/-- Block endomorphisms are linearly equivalent to homomorphisms `V_i → V_t`. -/
+noncomputable def cyclicHomBlockFinLinearEquiv
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    (cyclicEigenspaceFin epsilon g i →ₗ[F] cyclicEigenspaceFin epsilon g t) ≃ₗ[F]
+      cyclicHomBlockFin epsilon g i t :=
+  { cyclicHomBlockFinOfHomLinear hV i t with
+    invFun := cyclicHomBlockFinToHom i t
+    left_inv := cyclicHomBlockFinToHom_ofHomLinear hV
+    right_inv := cyclicHomBlockFinOfHomLinear_toHom hV }
+
+/-- Dimension form of BG Prop 2.4(d) for a displayed block. -/
+theorem finrank_cyclicHomBlockFin
+    {epsilon : F} {g : Module.End F V} {h : ℕ}
+    [FiniteDimensional F V]
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (i t : Fin h) :
+    Module.finrank F (cyclicHomBlockFin epsilon g i t) =
+      cyclicEigenspaceFinDim epsilon g i * cyclicEigenspaceFinDim epsilon g t := by
+  rw [← (cyclicHomBlockFinLinearEquiv hV i t).finrank_eq]
+  simpa [cyclicEigenspaceFinDim] using
+    (Module.finrank_linearMap
+      (R := F) (S := F)
+      (M := cyclicEigenspaceFin epsilon g i)
+      (N := cyclicEigenspaceFin epsilon g t))
 
 private theorem inv_mem_cyclicEigenspaceFin {epsilon : F}
     {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} {i : Fin h} {v : V}
