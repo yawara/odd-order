@@ -103,7 +103,7 @@ theorem fixedBy_eq_singleton_one (h : IsFrobeniusAction A N) {a : A} (ha : a ≠
   · by_contra hne; exact h a ha n hne hn
   · rintro rfl; exact smul_one a
 
-@[reducible] private def invariantSubgroupMulDistribMulAction (M : Subgroup N)
+@[reducible] def invariantSubgroupMulDistribMulAction (M : Subgroup N)
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A M := by
   letI : SMul A M := ⟨fun a m => ⟨a • (m : N), hM a m m.2⟩⟩
   exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
@@ -1076,6 +1076,39 @@ theorem nontrivialActionFixedByClosure_le_iff
     exact (Subgroup.closure_le _).mpr (by
       rintro u ⟨a, ha, hu⟩
       exact h a ha hu)
+
+/-- If an invariant subgroup satisfies the Isaacs 6.21 generated-centralizer conclusion
+internally, then it lies in the ambient generated-centralizer subgroup. -/
+theorem subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+    {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+    {M : Subgroup N} [MulDistribMulAction A M]
+    (hcompat : ∀ a : A, ∀ m : M, ((a • m : M) : N) = a • (m : N))
+    (hMtop : nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A M) = ⊤) :
+    M ≤ nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) := by
+  let φM : A →* MulAut M := MulDistribMulAction.toMulAut A M
+  let φN : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let K : Subgroup N := nontrivialActionFixedByClosure φN
+  intro n hn
+  let m : M := ⟨n, hn⟩
+  have hm : m ∈ nontrivialActionFixedByClosure φM := by
+    rw [hMtop]
+    exact Subgroup.mem_top m
+  rw [nontrivialActionFixedByClosure] at hm
+  have hmK : (m : N) ∈ K := by
+    refine Subgroup.closure_induction
+      (p := fun (x : M) _ => (x : N) ∈ K) ?mem ?one ?mul ?inv hm
+    · rintro x ⟨a, ha, hx⟩
+      have hxN : a • (x : N) = (x : N) := by
+        have hx' := congrArg (fun y : M => (y : N)) hx
+        simpa [φM, hcompat a x] using hx'
+      exact Subgroup.subset_closure ⟨a, ha, by simpa [φN] using hxN⟩
+    · simp [K]
+    · intro x y _ _ hx hy
+      exact K.mul_mem hx hy
+    · intro x _ hx
+      exact K.inv_mem hx
+  change (m : N) ∈ K
+  exact hmK
 
 /-- If two acting elements commute, the second preserves the fixed subgroup of the first. -/
 theorem actionFixedBy_invariant_of_commute
@@ -2907,6 +2940,75 @@ theorem nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
     quotient_isFrobeniusAction_of_fixedBy_le (A := A) (N := N) (M := K)
       hK_inv hCopAK hfixed
   exact hNotCyclic (isCyclic_of_frobeniusAction_of_isMulCommutative hFrobQuot)
+
+universe uA uN
+
+/-- **Isaacs Thm 6.21** (nontrivial case): if a finite abelian noncyclic group `A` acts
+coprimely on a finite nontrivial group `N`, then the subgroups `C_N(a)` for `a ≠ 1`
+generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let motive : ℕ → Prop := fun n =>
+    ∀ (N : Type uN) [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N],
+      Nat.card N = n →
+      Nat.Coprime (Nat.card A) (Nat.card N) →
+      nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤
+  have hmain : motive (Nat.card N) := by
+    refine Nat.strong_induction_on (Nat.card N) ?_
+    intro n ih N _ _ _ _ hcard hCopN
+    refine nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+      (A := A) (N := N) hCopN hNotCyclic ?_
+    intro M hM hM_ne_top
+    by_cases hM_nontriv : Nontrivial M
+    · letI : Nontrivial M := hM_nontriv
+      letI : MulDistribMulAction A M :=
+        IsFrobeniusAction.invariantSubgroupMulDistribMulAction M hM
+      have hM_card_lt_N : Nat.card M < Nat.card N := by
+        have h_dvd : Nat.card M ∣ Nat.card N := Subgroup.card_subgroup_dvd_card M
+        have h_le : Nat.card M ≤ Nat.card N := Nat.le_of_dvd Nat.card_pos h_dvd
+        have h_ne : Nat.card M ≠ Nat.card N := fun heq =>
+          hM_ne_top (Subgroup.eq_top_of_card_eq M heq)
+        exact Nat.lt_of_le_of_ne h_le h_ne
+      have hM_card_lt : Nat.card M < n := by
+        simpa [hcard] using hM_card_lt_N
+      have hCopM : Nat.Coprime (Nat.card A) (Nat.card M) :=
+        hCopN.coprime_dvd_right (Subgroup.card_subgroup_dvd_card M)
+      have hMtop :
+          nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A M) = ⊤ :=
+        (ih (Nat.card M) hM_card_lt) M rfl hCopM
+      exact
+        subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+          (M := M) (by intro a m; rfl) hMtop
+    · haveI : Subsingleton M := not_nontrivial_iff_subsingleton.mp hM_nontriv
+      intro n hn
+      have hn_one : n = 1 := by
+        have hsub : (⟨n, hn⟩ : M) = 1 := Subsingleton.elim _ _
+        exact congrArg Subtype.val hsub
+      rw [hn_one]
+      exact Subgroup.one_mem _
+  exact hmain N rfl hCop
+
+/-- **Isaacs Thm 6.21**: if a finite abelian noncyclic group `A` acts coprimely on a finite
+group `N`, then the subgroups `C_N(a)` for `a ≠ 1` generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  by_cases hN_nontriv : Nontrivial N
+  · letI : Nontrivial N := hN_nontriv
+    exact nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+      hCop hNotCyclic
+  · haveI : Subsingleton N := not_nontrivial_iff_subsingleton.mp hN_nontriv
+    rw [eq_top_iff]
+    intro n _hn
+    have hn_one : n = 1 := Subsingleton.elim n 1
+    rw [hn_one]
+    exact Subgroup.one_mem _
 
 end
 

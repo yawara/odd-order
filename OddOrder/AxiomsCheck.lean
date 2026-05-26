@@ -223,6 +223,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.actionFixedBy_eq_actionFixedPoints_zpowers
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_le_iff
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.actionFixedBy_invariant_of_commute
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_invariant_of_commutative
@@ -236,6 +238,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.commutator_le_of_proper_invariant_le_of_isSolvable
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

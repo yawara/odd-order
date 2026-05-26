@@ -319,6 +319,13 @@ FT クリティカル度 + 章内依存で並べる:
   (`proper A-invariant P ≤ K`) を入力に, `K < N` から A-invariant Sylow が `N` 全体,
   `N' ≤ K`, `K ⊴ N`, `A ↷ N/K` Frobenius, abelian noncyclic Frobenius complement 禁止までを
   本文通りに接続して `K = N` を得る.
+- **§6B / 6.21 theorem (nontrivial case)**:
+  `IsFrobeniusAction.invariantSubgroupMulDistribMulAction` を公開 constructor にし,
+  `subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top` で proper invariant subgroup
+  の帰納結果を ambient `K` に戻す橋を追加. その上で
+  `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial` を strong induction で
+  sorry-free 化し, trivial `N=1` を加えた
+  `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic` で 6.21 statement を閉じた.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
