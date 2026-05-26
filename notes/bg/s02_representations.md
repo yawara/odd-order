@@ -462,6 +462,11 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   `opCore_ne_bot_of_nontrivial_normal_pSubgroup` と、
   `Q ∈ Syl_q(G)` なら `O_q(N_G(Q)) ≠ ⊥` を得る
   `opCore_ne_bot_of_sylow_normalizer` を追加済み.
+- 書籍 step 5 (`G*` が p-group でない場合に `q ≠ p` の Sylow `Q` と
+  `H = N_{G*}(Q)` を取る段) に合わせて、
+  `exists_prime_ne_dvd_card_of_not_isPGroup` と
+  `exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup` を追加済み.
+  ここまでは Burnside normal complement 前の分岐選択だけを sorry-free で切り出した.
 - 次 frontier は BG proof の group-theoretic dichotomy:
   `G* ≠ ⊥` から Sylow normalizer / Burnside normal complement / induction を通じて
   適切な `q` で `O_q(G*) ≠ ⊥` を得る段.

@@ -1633,6 +1633,40 @@ private theorem opCore_ne_bot_of_sylow_normalizer
   exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
     (G := N) (K := (QN : Subgroup N)) QN.2 hQN_ne_bot
 
+/-- A finite group that is not a `p`-group has a prime divisor different from `p`.
+
+This is the arithmetic half of the `G*` dichotomy in BG Thm 2.6. -/
+private theorem exists_prime_ne_dvd_card_of_not_isPGroup
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hnot_pgroup : ¬ IsPGroup p G) :
+    ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ q ∣ Nat.card G := by
+  by_contra hnone
+  apply hnot_pgroup
+  rw [IsPGroup.iff_card]
+  refine ⟨(Nat.card G).primeFactorsList.length,
+    Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' ?_⟩
+  intro q hq_prime hq_dvd
+  by_contra hq_ne_p
+  exact hnone ⟨q, hq_prime, hq_ne_p, hq_dvd⟩
+
+/-- If a finite group is not a `p`-group, one can choose `q ≠ p` and
+`Q ∈ Syl_q(G)` with nontrivial `O_q(N_G(Q))`.
+
+This packages the first two group-theoretic moves in the `q ≠ p` branch of
+BG Thm 2.6 before the Burnside normal-complement/induction step. -/
+private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hnot_pgroup : ¬ IsPGroup p G) :
+    ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ ∃ Q : Sylow q G,
+      OddOrder.Isaacs.Ch01.opCore q
+        (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ := by
+  rcases exists_prime_ne_dvd_card_of_not_isPGroup (p := p) (G := G) hnot_pgroup with
+    ⟨q, hq_prime, hq_ne_p, hq_dvd⟩
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  haveI : Finite (Sylow q G) := inferInstance
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+  exact ⟨q, hq_prime, hq_ne_p, Q, opCore_ne_bot_of_sylow_normalizer Q hq_dvd⟩
+
 /-- q = p endpoint when `O_p(G*)` is nontrivial.
 
 Here `G* = ker(det ∘ ρ)`.  The Ch.1 `opCore` is characteristic in `G*`; since
