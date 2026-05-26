@@ -493,8 +493,10 @@ FT クリティカル度 + 章内依存で並べる:
   一括で取り出す
   `exists_conj_exponent_two_adic_cases_of_zpowers_relIndex_of_normal_abelian_cyclic` も
   追加済み.
-  次はこの witness extraction と cyclic quotient branch theorem をつなぐ assembly, その後
-  maximal normal cyclic subgroup setup から `T` と `P/C` cyclic を供給する段階.
+  さらにこれを cyclic quotient branch theorem へ接続する
+  `dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_cyclic_quotient`
+  も追加済み.
+  次は maximal normal cyclic subgroup setup から `T` と `P/C` cyclic を供給する段階.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
