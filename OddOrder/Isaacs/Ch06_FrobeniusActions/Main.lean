@@ -6542,6 +6542,75 @@ theorem index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases
     simpa [h_order] using hij_order
   exact square_root_two_adic_cases_false he hij hcases
 
+/-- **Isaacs Thm 6.12 setup**: the cyclic-quotient 2-adic branch feeds into the
+Lemma 6.13 recognizers.
+
+The previous theorem gives `C.index = 2`; the two 2-adic alternatives then become either
+inversion, handled by `dihedralOrQuaternion_of_invertingConjugation`, or the semidihedral
+twist, handled by `semiDihedral_of_twistConjugation` using the unique involution
+`c^(2^(e-1))` in `⟨c⟩`. -/
+theorem dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    (h_nonab : ∃ x y : P, x * y ≠ y * x)
+    {C : Subgroup P} [C.Normal] {c a : P} {e : ℕ} {i : ℤ}
+    (hC_eq : C = Subgroup.zpowers c)
+    (hquot_cyclic : IsCyclic (P ⧸ C))
+    (h_order : orderOf c = 2 ^ e) (he : 3 ≤ e)
+    (ha_notmem : a ∉ C) (ha_sq_mem : a ^ 2 ∈ C)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (hcases :
+      i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) :
+    Nonempty (P ≃* DihedralGroup (orderOf c)) ∨
+      Nonempty (P ≃* QuaternionGroup (orderOf c / 2)) ∨
+        ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k) := by
+  classical
+  have h_idx_C : C.index = 2 :=
+    index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases hP hC_eq hquot_cyclic
+      h_order he ha_notmem ha_sq_mem h_conj hcases
+  have h_idx : (Subgroup.zpowers c).index = 2 := by
+    simpa [hC_eq] using h_idx_C
+  have h_a_notmem_z : a ∉ Subgroup.zpowers c := by
+    intro ha
+    exact ha_notmem (by simpa [hC_eq] using ha)
+  rcases conj_eq_inv_or_twist_of_two_adic_cases h_order h_conj hcases with h_inv | h_twist
+  · rcases dihedralOrQuaternion_of_invertingConjugation hP c a h_idx h_a_notmem_z h_inv
+      with hD | hQ
+    · exact Or.inl hD
+    · exact Or.inr (Or.inl hQ)
+  · right
+    right
+    let z : P := c ^ (2 ^ (e - 1))
+    have h_z_mem : z ∈ Subgroup.zpowers c := by
+      exact Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _
+    have h_z_sq : z ^ 2 = 1 := by
+      dsimp [z]
+      change (c ^ (2 ^ (e - 1))) ^ (2 : ℕ) = 1
+      rw [← pow_mul]
+      have hmul : 2 ^ (e - 1) * 2 = 2 ^ e := by
+        rw [← pow_succ]
+        congr 1
+        omega
+      rw [hmul, ← h_order, pow_orderOf_eq_one]
+    have h_z_ne : z ≠ 1 := by
+      dsimp [z]
+      intro hz_one
+      have hdvd : orderOf c ∣ 2 ^ (e - 1) :=
+        orderOf_dvd_iff_pow_eq_one.mpr hz_one
+      rw [h_order] at hdvd
+      have hlt : 2 ^ (e - 1) < 2 ^ e :=
+        Nat.pow_lt_pow_right (by norm_num) (by omega)
+      have hpos : 0 < 2 ^ (e - 1) := Nat.two_pow_pos _
+      exact (not_le_of_gt hlt) (Nat.le_of_dvd hpos hdvd)
+    have h_z_unique :
+        ∀ y ∈ Subgroup.zpowers c, y ^ 2 = 1 → y ≠ 1 → y = z := by
+      intro y hy_mem hy_sq hy_ne
+      dsimp [z]
+      exact zpowers_involution_eq_pow_pred_of_order_two_pow c y (by omega)
+        h_order hy_mem hy_sq hy_ne
+    exact semiDihedral_of_twistConjugation hP h_nonab c a z h_idx h_a_notmem_z
+      h_z_mem h_z_sq h_z_ne h_z_unique (by simpa [z] using h_twist)
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.

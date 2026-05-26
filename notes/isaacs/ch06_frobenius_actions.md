@@ -484,9 +484,12 @@ FT クリティカル度 + 章内依存で並べる:
   `conj_exponent_modEq_sq_of_quotient_sq_eq` と, 2-adic alternative を mod 4 で矛盾させて
   cyclic quotient branch から `C.index = 2` を返す
   `index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases` まで追加済み.
-  次はこの `index = 2` 結論を既存 Lemma 6.13 recognizer
-  (`conj_eq_inv_or_twist_of_two_adic_cases`) に渡し, 6.12 の cyclic-quotient branch を
-  D/Q/SD exclusion へ接続する.
+  この `index = 2` 結論を既存 Lemma 6.13 recognizer
+  (`conj_eq_inv_or_twist_of_two_adic_cases`) に渡す
+  `dihedralOrQuaternionOrSemiDihedral_of_cyclic_quotient_two_adic_conj_cases` も追加し,
+  6.12 の cyclic-quotient branch は D/Q/SD 分類 surface まで接続済み.
+  次は 6.12 本文全体の maximal normal cyclic subgroup setup からこの branch theorem へ
+  必要な `a`, `e`, `i` を供給する wrapper ではない実質 assembly を切る.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
