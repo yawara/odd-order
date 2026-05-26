@@ -291,22 +291,33 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   IH に落とす + closing branch (`⟨P,Q⟩ = ⊤`) で `U = C_V(P) ⊓ C_V(Q)` から
   cyclic/elementary p² の dichotomy を `false_of_quotient_*` で閉じる.
   既存 §7A bridge (1568-2460) を 1 行も追加せず assembly のみ. Sorry-free.
-- Thm 7.1, 7.6, 7.8: docstring + statement 保留.
-  - **7.6 normal-J**: §7B 未着手 (docstring placeholder のみ). 8-step proof は
-    Hall-Higman corollaries + Ω₁ + adapters ~800-1500 LOC 規模, multi-session.
-  - **7.1 Thompson normal p-complement**: 7.6 完成後に ~300-450 LOC. 既存 Thm 5.26 +
-    Lem 7.7 + HasNormalPComplement subgroup inheritance は使える. quotient
-    inheritance helper ~30 LOC が要追加.
-  - **2026-05-26 ✅ 7.1 conditional version**: `thompson_normal_p_complement`
-    ([Main.lean:2922](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2922))
-    が `(thompsonJ P p).Normal` を forward-dep 仮説に取って sorry-free で完成.
-    Steps 1-6 (normal-J 5 仮説確立) は normal-J 7.6 が landing 後に back-fill.
-    Step 7 (`J(P) ⊴ G ⇒ N_G(J(P)) = G ⇒ G has normal p-complement`) は
-    `MulEquiv` transport helper `hasNormalPComplement_of_mulEquiv` (~55 LOC)
-    + `MulEquiv.subgroupCongr` + `Subgroup.topEquiv` で実現.
-  - **7.8 Burnside `p^a q^b`**: §7D placeholder のみ. 9-step proof に
-    `IsPCentral` / `IsPType` / `U⋆` の新規 def (~150 LOC) + 本体 ~600-900 LOC, 
-    multi-session.
+- **2026-05-26 ✅ Thm 7.6 normal-J conditional 完成**: `normal_J.{u}`
+  ([Main.lean:2712](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2712),
+  ~85 LOC). Strong induction on `Nat.card G` + 普遍量化された
+  `hMinCounterexample` を forward-dep として取る. 8-step proof body は
+  Hall-Higman corollaries + Ω₁ + Ch.4 4.35 + Ch.6 6.20 + Thm 7.5 を組み合わせて
+  back-fill 予定. Sorry-free.
+- **2026-05-26 ✅ Thm 7.1 conditional 完成**: `thompson_normal_p_complement`
+  ([Main.lean:3005](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3005))
+  が `(thompsonJ P p).Normal` を forward-dep 仮説に取って sorry-free で完成.
+  Steps 1-6 (normal-J 5 仮説確立) は normal-J 7.6 が landing 後に back-fill.
+  Step 7 (`J(P) ⊴ G ⇒ N_G(J(P)) = G ⇒ G has normal p-complement`) は
+  `MulEquiv` transport helper `hasNormalPComplement_of_mulEquiv` (~55 LOC)
+  + `MulEquiv.subgroupCongr` + `Subgroup.topEquiv` で実現.
+- **2026-05-26 ✅ Thm 7.8 Burnside conditional 完成**: `burnside_p_pow_q_pow.{u}`
+  ([Main.lean:3073](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3073),
+  ~88 LOC). Strong induction on `Nat.card G` + 普遍量化された
+  `hMinCounterexample` を forward-dep として取る. 9-step Goldschmidt-Bender-Matsuyama
+  proof body は §7D の `IsPCentral` / `IsPType` / `U⋆` 定義 + Thm 7.6 +
+  Matsuyama + Thompson factorization で back-fill 予定. Sorry-free.
+
+### back-fill 必要項目 (forward-dep hypothesis 経由で立てた conditional theorem)
+
+| 識別子 | Forward-dep hypothesis | 解消 prerequisite | LOC 見積もり |
+|---|---|---|---:|
+| `normal_J.{u}` ([Main.lean:2712](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L2712)) | `hMinCounterexample` (普遍量化) | §7B 8-step proof: Hall-Higman corollaries + Ω₁ design + Ch.4 4.35 adapter + Ch.6 6.20 adapter + Thm 7.5 application | ~800-1500 LOC |
+| `thompson_normal_p_complement` ([Main.lean:3005](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3005)) | `hJ_normal : (thompsonJ P p).Normal` | Thm 7.6 normal-J back-fill (上記) + 7.1 Steps 1-6 | ~300-450 LOC (Steps 1-6) |
+| `burnside_p_pow_q_pow.{u}` ([Main.lean:3073](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean#L3073)) | `hMinCounterexample` (普遍量化) | §7D 9-step proof: `IsPCentral` / `IsPType` / `U⋆` 新規 defs (~150 LOC) + 9 steps (Matsuyama + Thm 7.6 + Thompson factorization) | ~600-900 LOC |
 
 ## 前提章の再分類 (main 取り込み後)
 
