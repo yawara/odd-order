@@ -17,6 +17,46 @@ Step 7 (mmd L3884-3892 = Isaacs p.213-214 の最終 contradiction 引数) だけ
 これを discharge することで `normal_J` (Isaacs Thm 7.6) は完全 axiom-free
 (`#assert_only_allowed_axioms` を通る) になる.
 
+## 2026-05-27 セッション進捗
+
+1. **`axiom thompsonJ_le_opCore_of_normal_J_hypotheses` を `theorem` に変換**
+   (commit 7d0b3fb). `Nat.card G` の strong induction で再構造化, Step 2
+   抽出 (`thompsonJ_le_iff`) と IH を持つ closing axiom にまとめた.
+2. **closing axiom を Step 4-5 + Step 8 に分割** (commit 819067d):
+   - `step4_5_normal_J_hypotheses` (private axiom): `P = UA ∧ A.relIndex U = p`
+   - `step8_normal_J_closure` (private axiom): Step 7 bound から `False`
+3. **Step 8 を Step 8a (axiom) + Step 8b (theorem) に分割** (commit 6a71ca3):
+   - `step8a_PBar_normal_GBar` (private axiom): Thm 7.5 適用 → `P̄ ⊴ Ḡ`
+   - `step8b_pullback_normal_P` (**theorem**, 約 30 LOC): correspondence
+     theorem で `P ⊴ G` を引き出し, `normal_pgroup_le_opCore` で `P ≤ U` を
+     得て `A ≤ P ≤ U` で矛盾.
+
+**現在の axiom 状況** (`OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean`):
+- `step4_5_normal_J_hypotheses` (textbook Steps 4-5, Lem 6.20 + Step 3 IH)
+- `step8a_PBar_normal_GBar` (textbook Step 8 Thm 7.5 application)
+- `noNonsolvableSimplePaQb` (§7D の別議題, Burnside)
+
+両方の Step 4-5 / 8a axiom は前 axiom よりも狭い範囲を扱い, 独立に discharge
+可能.
+
+## 次のセッションで取り組むべきこと
+
+### Step 8a discharge (~200-300 LOC)
+
+Thm 7.5 (`sylow_normal_of_elementary_normal_P_theorem`) を `Ḡ ↷ V` に適用する
+ためのハイポセシス降下 + action setup:
+1. `φ : Ḡ →* MulAut V` を construct (V = `omega1ZCenterOpCore G p`).
+2. `φ` が injective を Step 6 (`...map_eq_bot_of_le_opCore`) から導出.
+3. Ḡ-Sylow `P̄` を G の Sylow `P` の image として取得.
+4. `∀ Sylow p Q̄ of Ḡ, (actionCentralizer φ Q̄).index ≤ p` を Step 7 + Step 5
+   から推論. 共役対称性 (`actionCentralizer_map_conj_index`) を使う.
+5. Thm 7.5 を呼んで `P̄ ⊴ Ḡ` を得る.
+
+### Step 4-5 discharge (~600-800 LOC)
+
+最も大規模. 内部で Step 3 を使うので, 先に Step 3 を分離するか, 一気に
+書き下すか戦略選択. Step 5 の "Lemma 6.20 適用" 部分が肝.
+
 ## 書籍での議論
 
 Isaacs FGT p.213-214 (mmd L3884-3892):
