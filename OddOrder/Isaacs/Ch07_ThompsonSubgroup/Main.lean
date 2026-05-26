@@ -3343,6 +3343,18 @@ theorem cor_4_35_for_omega1ZCenterOpCore
   OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     (p := p) φ (omega1ZCenterOpCore_isPGroup p) hA_p' h_fix
 
+/-- **V is elementary abelian**: every element has order dividing `p`,
+and the group is commutative (it lies inside the center `Z(O_p(G))`).
+Used in Step 7 (`VD` elementary abelian counting argument). -/
+theorem omega1ZCenterOpCore_isElementaryAbelian
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] :
+    (omega1ZCenterOpCore G p).IsElementaryAbelian p := by
+  refine ⟨omega1ZCenterOpCore_comm, ?_⟩
+  intro x
+  apply Subtype.ext
+  show ((x : G) ^ p) = 1
+  exact pow_p_eq_one_of_mem_omega1ZCenterOpCore x.2
+
 /-- **Isaacs Thm 7.6 Step 6 prep** (mmd L3881): `Z(P) ⊆ Z(U)` (in the image
 form): under hypothesis (iv), `Z(P)` lies inside `Z(O_p(G)) = Z(U)`.
 
