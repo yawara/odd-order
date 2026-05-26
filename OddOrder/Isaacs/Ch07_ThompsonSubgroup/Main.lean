@@ -2873,6 +2873,27 @@ theorem AbarInf_LBar_eq_bot
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 
+/-- **Step 2 entry / Step 7 closure**: `J(P) ≤ X` iff every elementary abelian
+maximal `E ∈ E(P)` is contained in `X`.  Pure unfold of the iSup definition. -/
+theorem thompsonJ_le_iff
+    {G : Type*} [Group G] (P X : Subgroup G) (p : ℕ) :
+    Subgroup.thompsonJ P p ≤ X ↔
+      ∀ E ∈ Subgroup.maxElemAbelianIn P p, E ≤ X := by
+  unfold Subgroup.thompsonJ
+  exact iSup₂_le_iff
+
+/-- Contrapositive of `thompsonJ_le_iff`: if `J(P) ⊄ X` then some maximal
+elementary abelian member is not contained in `X`.  This is the Step 2
+entry of the Thm 7.6 counterexample-minimum argument: assuming `G` is a
+counterexample, `J(P) ⊄ U`, hence we can pick `A ∈ E(P)` with `A ⊄ U`. -/
+theorem exists_maxElemAbelianIn_not_le_of_thompsonJ_not_le
+    {G : Type*} [Group G] (P X : Subgroup G) (p : ℕ)
+    (h : ¬ Subgroup.thompsonJ P p ≤ X) :
+    ∃ E ∈ Subgroup.maxElemAbelianIn P p, ¬ E ≤ X := by
+  by_contra h_all
+  push_neg at h_all
+  exact h ((thompsonJ_le_iff P X p).mpr h_all)
+
 /-- The image of an elementary abelian subgroup under a group hom is
 elementary abelian.  Generic for `Subgroup.IsElementaryAbelian`. -/
 theorem isElementaryAbelian_map_of_isElementaryAbelian
