@@ -464,6 +464,9 @@ FT クリティカル度 + 章内依存で並べる:
   さらに二つの 2-adic alternative がどちらも `i*2 ≡ -2 (mod 2^e)` を与えることを使い,
   本文直後の `((c^2)^a = (c^2)⁻¹)` も
   `conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne` として追加済み.
+  また 6.16 の二つの 2-adic alternative を, Lemma 6.13 が要求する
+  `c^a=c⁻¹` / `c^a=c^(2^(e-1))*c⁻¹` の二分岐へ変換する
+  `conj_eq_inv_or_twist_of_two_adic_cases` も追加済み.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,

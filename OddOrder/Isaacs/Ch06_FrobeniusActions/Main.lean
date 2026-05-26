@@ -6227,6 +6227,40 @@ theorem conj_square_eq_inv_of_pow_mem_zpowers_of_pow_conj_ne
       _ = (c ^ (2 : ℤ))⁻¹ := by rw [zpow_neg]
   simpa [zpow_ofNat] using hzpow
 
+/-- **Isaacs Thm 6.12 setup**: the two `2`-adic alternatives from Lemma 6.16 are
+exactly the inversion and semidihedral-twist conjugation alternatives used by Lemma 6.13. -/
+theorem conj_eq_inv_or_twist_of_two_adic_cases
+    {G : Type*} [Group G] {c a : G} {e : ℕ} {i : ℤ}
+    (h_order : orderOf c = 2 ^ e)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (hcases :
+      i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) :
+    a * c * a⁻¹ = c⁻¹ ∨
+      a * c * a⁻¹ = c ^ (2 ^ (e - 1)) * c⁻¹ := by
+  rcases hcases with hi | hi
+  · left
+    have hpow : c ^ i = c ^ (-1 : ℤ) := by
+      rw [zpow_eq_zpow_iff_modEq]
+      simpa [h_order] using hi
+    calc
+      a * c * a⁻¹ = c ^ i := h_conj
+      _ = c ^ (-1 : ℤ) := hpow
+      _ = c⁻¹ := by rw [zpow_neg_one]
+  · right
+    have hpow : c ^ i = c ^ ((2 : ℤ) ^ (e - 1) - 1) := by
+      rw [zpow_eq_zpow_iff_modEq]
+      simpa [h_order] using hi
+    have hpow_cast : ((2 : ℤ) ^ (e - 1)) = ((2 ^ (e - 1) : ℕ) : ℤ) := by
+      norm_num
+    calc
+      a * c * a⁻¹ = c ^ i := h_conj
+      _ = c ^ ((2 : ℤ) ^ (e - 1) - 1) := hpow
+      _ = c ^ ((2 : ℤ) ^ (e - 1)) * c⁻¹ := by
+        rw [zpow_sub, zpow_one]
+      _ = c ^ (2 ^ (e - 1)) * c⁻¹ := by
+        rw [hpow_cast, zpow_natCast]
+
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
 /-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
