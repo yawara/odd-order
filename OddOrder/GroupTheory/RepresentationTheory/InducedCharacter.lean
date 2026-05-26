@@ -54,6 +54,34 @@ of the subgroup `H`. -/
 def conjugatesIntoSet (H : Subgroup G) (A : Set ↥H) : Set G :=
   { g | ∃ (x : G) (hx : x⁻¹ * g * x ∈ H), (⟨x⁻¹ * g * x, hx⟩ : ↥H) ∈ A }
 
+theorem conjugatesIntoSet_mono {H : Subgroup G} {A B : Set ↥H} (hAB : A ⊆ B) :
+    conjugatesIntoSet H A ⊆ conjugatesIntoSet H B := by
+  rintro g ⟨x, hx, hA⟩
+  exact ⟨x, hx, hAB hA⟩
+
+theorem conjugatesIntoSet_subset_conjugatesInto (H : Subgroup G) (A : Set ↥H) :
+    conjugatesIntoSet H A ⊆ conjugatesInto H := by
+  rintro g ⟨x, hx, _⟩
+  exact ⟨x, hx⟩
+
+@[simp] theorem conjugatesIntoSet_empty (H : Subgroup G) :
+    conjugatesIntoSet H (∅ : Set ↥H) = ∅ := by
+  ext g
+  constructor
+  · rintro ⟨_, _, hA⟩
+    exact False.elim hA
+  · intro hg
+    exact False.elim hg
+
+@[simp] theorem conjugatesIntoSet_univ (H : Subgroup G) :
+    conjugatesIntoSet H (Set.univ : Set ↥H) = conjugatesInto H := by
+  ext g
+  constructor
+  · intro hg
+    exact conjugatesIntoSet_subset_conjugatesInto H Set.univ hg
+  · rintro ⟨x, hx⟩
+    exact ⟨x, hx, Set.mem_univ _⟩
+
 /-- The `x`-summand in the classical induction formula. It is zero unless
 `x⁻¹ * g * x ∈ H`. -/
 def induceTerm (H : Subgroup G) (θ : ClassFunction ↥H k) (x g : G) : k :=

@@ -92,6 +92,10 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.
+- The induced-character support API includes `conjugatesIntoSet_mono`,
+  `conjugatesIntoSet_subset_conjugatesInto`, `conjugatesIntoSet_empty`, and
+  `conjugatesIntoSet_univ`, matching the support-control shape used by Dade
+  maps.
 - `inductionCoefficient_zero_left/right`, `inductionCoefficient_add_left/right`,
   `inductionCoefficient_smul_left`, and `inductionCoefficient_trivial_right`
   expose the elementary coefficient algebra needed by the (1.3) expansion.
