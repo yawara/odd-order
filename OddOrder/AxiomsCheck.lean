@@ -266,6 +266,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_card_le_mulAut_of_self_centralizing
@@ -355,6 +357,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

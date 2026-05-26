@@ -3377,6 +3377,26 @@ theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
         exact hC_sub_le_center)
   exact ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel, ⟨⟨hB_comm⟩⟩⟩
 
+/-- **Isaacs Thm 6.12 setup**: in a finite group, choose a maximal normal abelian
+subgroup.
+
+The conclusion is in the strict-maximality form used by the proof of Theorem 6.12: no
+strictly larger normal abelian subgroup contains the chosen subgroup. -/
+theorem exists_maximal_normal_isMulCommutative
+    {P : Type*} [Group P] [Finite P] :
+    ∃ C : Subgroup P, C.Normal ∧ IsMulCommutative C ∧
+      ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False := by
+  classical
+  let S : Set (Subgroup P) := {C | C.Normal ∧ IsMulCommutative C}
+  have hS_nonempty : S.Nonempty := by
+    refine ⟨⊥, ?_⟩
+    exact ⟨inferInstance, inferInstance⟩
+  obtain ⟨C, hC_max⟩ := (Set.toFinite S).exists_maximal hS_nonempty
+  refine ⟨C, hC_max.1.1, hC_max.1.2, ?_⟩
+  intro B hB_normal hB_comm hC_lt_B
+  have hB_mem : B ∈ S := ⟨hB_normal, hB_comm⟩
+  exact hC_lt_B.not_ge (hC_max.2 hB_mem hC_lt_B.le)
+
 /-- **Isaacs Thm 6.12 setup**: a maximal normal abelian subgroup `C` of a finite `p`-group
 is self-centralizing.
 
@@ -7266,6 +7286,80 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card
   exact dihedralOrQuaternionOrSemiDihedral_of_zpowers_relIndex_of_quotient_involutions
     hP h_nonab hT_card_ne hT_normal hcyc hC_eq hcT hC_le_T hCent hC_max
     hC_rel hT_not_comm hT_card_ne_quot h_order he
+
+/-- **Isaacs Thm 6.12**: if every normal abelian subgroup of a finite `p`-group is cyclic,
+then the group is cyclic, or `p = 2` and the group is dihedral, generalized quaternion, or
+semidihedral.
+
+This theorem assembles the already-formalized proof branches: choose a maximal normal abelian
+subgroup `C`; if `C = P`, the group is cyclic; if `|C| = 4`, Corollary 6.14 applies; otherwise
+the maximal-normal-cyclic branch reaches the dihedral/quaternion/semidihedral classification. -/
+theorem isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    (hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B) :
+    IsCyclic P ∨
+      p = 2 ∧
+        ((∃ n : ℕ, Nonempty (P ≃* DihedralGroup n)) ∨
+          (∃ n : ℕ, Nonempty (P ≃* QuaternionGroup n)) ∨
+            ∃ k : ℕ, Nonempty (P ≃* SemiDihedralGroup k)) := by
+  classical
+  by_cases hP_cyclic : IsCyclic P
+  · exact Or.inl hP_cyclic
+  right
+  have hP_not_comm : ¬ IsMulCommutative P := by
+    intro hP_comm
+    apply hP_cyclic
+    have htop_cyclic : IsCyclic (⊤ : Subgroup P) := by
+      apply hcyc
+      · infer_instance
+      · haveI : IsMulCommutative P := hP_comm
+        infer_instance
+    rw [← Subgroup.topEquiv.isCyclic]
+    exact htop_cyclic
+  have h_nonab : ∃ x y : P, x * y ≠ y * x := by
+    by_contra hnone
+    exact hP_not_comm ⟨⟨fun x y => by
+      by_contra hxy
+      exact hnone ⟨x, y, hxy⟩⟩⟩
+  obtain ⟨C, hC_normal, hC_comm, hC_max⟩ :=
+    exists_maximal_normal_isMulCommutative (P := P)
+  haveI hC_normal_inst : C.Normal := hC_normal
+  have hC_cyclic : IsCyclic C := hcyc C hC_normal hC_comm
+  have hC_ne_top : C ≠ ⊤ := by
+    intro hC_top
+    apply hP_cyclic
+    rw [← Subgroup.topEquiv.isCyclic]
+    rwa [← hC_top]
+  have hC_lt_top : C < ⊤ := lt_top_iff_ne_top.mpr hC_ne_top
+  have hCent : Subgroup.centralizer (C : Set P) = C :=
+    centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
+  by_cases hC_card : Nat.card C = 4
+  · have hp_eq_two : p = 2 := by
+      have hC_pgroup : IsPGroup p C := hP.to_subgroup C
+      have hp_dvd : p ∣ Nat.card C := by
+        rcases hC_pgroup.card_eq_or_dvd with hC_card_one | hdiv
+        · rw [hC_card] at hC_card_one
+          omega
+        · exact hdiv
+      exact Nat.prime_eq_prime_of_dvd_pow (m := 2) (p := p) (q := 2)
+        (Fact.out : p.Prime) Nat.prime_two (by simpa [hC_card] using hp_dvd)
+    obtain hD | hQ :=
+      dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
+        hC_cyclic hCent hC_card h_nonab
+    · exact ⟨hp_eq_two, Or.inl ⟨4, hD⟩⟩
+    · exact ⟨hp_eq_two, Or.inr (Or.inl ⟨2, hQ⟩)⟩
+  · obtain ⟨c, hC_eq⟩ := (Subgroup.isCyclic_iff_exists_zpowers_eq_top C).mp hC_cyclic
+    obtain ⟨e, h_order⟩ := (IsPGroup.iff_orderOf.mp hP) c
+    obtain ⟨hp_eq_two, hclass⟩ :=
+      dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four
+        hP h_nonab hcyc hC_eq.symm hC_max hC_lt_top hC_card h_order
+    refine ⟨hp_eq_two, ?_⟩
+    rcases hclass with hD | hQ | hSD
+    · exact Or.inl ⟨orderOf c, hD⟩
+    · exact Or.inr (Or.inl ⟨orderOf c / 2, hQ⟩)
+    · obtain ⟨k, _hk_order, hSD⟩ := hSD
+      exact Or.inr (Or.inr ⟨k, hSD⟩)
 
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 

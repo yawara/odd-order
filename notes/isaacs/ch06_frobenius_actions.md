@@ -531,8 +531,16 @@ FT クリティカル度 + 章内依存で並べる:
   さらに外部仮定だった `3 ≤ e` も上記 exponent lower bound で内部供給する
   `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four`
   まで追加済み.
-  次は abelian `P` branch と maximal normal abelian subgroup の存在を含めた
-  6.12 全体 statement への整理.
+  続けて maximal normal abelian subgroup の有限選択を
+  `exists_maximal_normal_isMulCommutative` として切り出し, abelian `P` branch は
+  `⊤` に normal-abelian-cyclic 仮定を適用して cyclic として閉じた. 非 cyclic branch では
+  maximal subgroup `C` から `C = ⟨c⟩`, `C < ⊤`, `orderOf c = p^e` を取り出し,
+  `|C| = 4` branch を `dihedralOrQuaternion_of_self_centralizing_cyclic_card_four` へ,
+  `|C| ≠ 4` branch を
+  `dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card_ne_four` へ
+  渡すことで, **Isaacs Thm 6.12**
+  `isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic` を
+  sorry-free 化した.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
