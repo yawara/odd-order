@@ -3477,6 +3477,32 @@ theorem quotient_commutative_of_maximal_normal_isCyclic
     centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
   exact quotient_commutative_of_isCyclic_of_self_centralizing hC_cyclic hCent
 
+/-- **Isaacs Thm 6.12 setup**: from a proper maximal normal cyclic subgroup `C`, choose
+the nonabelian normal subgroup `T` with `|T : C| = p`.
+
+This packages the choice of `T/C` of order `p` in the proof of Theorem 6.12.  Ch.1
+Lemma 1.23 supplies the normal intermediate subgroup, and maximality of `C` among normal
+abelian subgroups makes `T` nonabelian. -/
+theorem exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal] {c : P}
+    (hC_eq : C = Subgroup.zpowers c)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False)
+    (hC_lt_top : C < ⊤) :
+    ∃ T : Subgroup P, T.Normal ∧ c ∈ T ∧ C ≤ T ∧ C.relIndex T = p ∧
+      ¬ IsMulCommutative T := by
+  obtain ⟨T, hT_normal, hC_lt_T, _hT_le_top, hC_rel⟩ :=
+    OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_index_eq_prime
+      hP (N := C) (M := ⊤) hC_lt_top
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have hT_not_comm : ¬ IsMulCommutative T := by
+    intro hT_comm
+    exact hC_max T hT_normal hT_comm hC_lt_T
+  exact ⟨T, hT_normal, hC_lt_T.le hcC, hC_lt_T.le, hC_rel, hT_not_comm⟩
+
 /-- **Isaacs Thm 6.12 setup**: if `C ≤ T` and `P/C` is abelian, then `T ⊴ P`.
 
 This is the quotient-correspondence step used after choosing `T/C ≤ P/C`: in an abelian

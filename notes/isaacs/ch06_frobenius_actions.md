@@ -439,7 +439,11 @@ FT クリティカル度 + 章内依存で並べる:
   `P/C ↪ Aut(C)` を作り, `Aut(C)` の可換性で `P/C` 可換性を取り出す
   `quotient_commutative_of_isCyclic_of_self_centralizing` も追加済み. これらを合成し,
   maximal normal cyclic `C` から直接 `P/C` 可換性を得る
-  `quotient_commutative_of_maximal_normal_isCyclic` も追加済み. 続く「`T/C ≤ P/C` なので
+  `quotient_commutative_of_maximal_normal_isCyclic` も追加済み.
+  さらに `C < P` から Ch01 Lemma 1.23 で `C.relIndex T = p` の normal intermediate
+  subgroup `T` を取り, maximality で `T` 非可換まで返す
+  `exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top` も追加済み.
+  続く「`T/C ≤ P/C` なので
   `T ⊴ P`」の quotient correspondence step として, `C ≤ T` と `P/C` 可換性から
   `T.Normal` を引く `normal_of_le_of_quotient_commutative` も追加済み. Lemma 6.15 適用条件の
   `Z(T) < C` についても, self-centralizing `C` から `Z(T) ≤ C` を引き, `T/C` prime cyclic と

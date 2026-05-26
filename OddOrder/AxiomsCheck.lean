@@ -271,6 +271,9 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch06.quotient_commutative_of_isCyclic_of_self_centralizing
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.quotient_commutative_of_maximal_normal_isCyclic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_normal_noncomm_relIndex_prime_of_maximal_normal_zpowers_lt_top
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.normal_of_le_of_quotient_commutative
 set_option linter.style.longLine false in
