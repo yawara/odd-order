@@ -9,6 +9,7 @@ import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
+import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.LinearAlgebra.Matrix.ConjTranspose
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
@@ -50,6 +51,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   for rows `IrreducibleCharacter G` and columns `ConjClasses G`.
 * `OddOrder.RepresentationTheory.characterTableEntry` — a character-table entry indexed
   by an irreducible character and a conjugacy class.
+* `OddOrder.RepresentationTheory.conjugacyClassSize_mk_mul_card_centralizer` — the
+  class-size/centralizer cardinality bridge for later column diagonal entries.
 * `OddOrder.RepresentationTheory.characterTableMatrix` — the rectangular character table.
 * `OddOrder.RepresentationTheory.characterTableSquareMatrix` — the same table reindexed
   to a square matrix via `CharacterTableIndexing.rowColumnEquiv`.
@@ -151,6 +154,50 @@ theorem conjugacyClassRepresentative_mk_eq (C : ConjClasses G) :
 /-- The size of a conjugacy class, as a natural number. -/
 noncomputable def conjugacyClassSize (C : ConjClasses G) : ℕ :=
   Nat.card C.carrier
+
+/-- A conjugacy class has size `|G| / |C_G(g)|`, equivalently
+`|class(g)| * |C_G(g)| = |G|`.  This form avoids committing later matrix arguments to
+natural-number division. -/
+theorem conjugacyClassSize_mk_mul_card_centralizer [Finite G] (g : G) :
+    conjugacyClassSize (ConjClasses.mk g) *
+      Nat.card (Subgroup.centralizer ({g} : Set G)) = Nat.card G := by
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Fintype (ConjClasses.mk g).carrier := Fintype.ofFinite _
+  letI : Fintype (MulAction.orbit (ConjAct G) g) := Fintype.ofFinite _
+  letI : Fintype (MulAction.stabilizer (ConjAct G) g) := Fintype.ofFinite _
+  rw [conjugacyClassSize, Nat.card_eq_fintype_card, ConjClasses.card_carrier]
+  have hstabNat :
+      Nat.card (Subgroup.centralizer ({g} : Set G)) =
+        Nat.card (MulAction.stabilizer (ConjAct G) g) := by
+    rw [Subgroup.centralizer_eq_comap_stabilizer]
+    rfl
+  have hstab :
+      Nat.card (Subgroup.centralizer ({g} : Set G)) =
+        Fintype.card (MulAction.stabilizer (ConjAct G) g) := by
+    rw [hstabNat, Nat.card_eq_fintype_card]
+  rw [hstab, Nat.card_eq_fintype_card]
+  exact Nat.div_mul_cancel
+    ⟨Fintype.card (MulAction.orbit (ConjAct G) g), by
+      rw [mul_comm]
+      exact (MulAction.card_orbit_mul_card_stabilizer_eq_card_group (ConjAct G) g).symm⟩
+
+theorem conjugacyClassSize_mk_mul_card_centralizer_cast [Finite G] (g : G) :
+    (conjugacyClassSize (ConjClasses.mk g) : ℂ) *
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) =
+        (Nat.card G : ℂ) := by
+  exact_mod_cast conjugacyClassSize_mk_mul_card_centralizer (G := G) g
+
+theorem card_centralizer_eq_card_div_conjugacyClassSize_cast [Finite G] (g : G) :
+    (Nat.card G : ℂ) / (conjugacyClassSize (ConjClasses.mk g) : ℂ) =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  have hmul := conjugacyClassSize_mk_mul_card_centralizer_cast (G := G) g
+  have hclass_pos : 0 < conjugacyClassSize (ConjClasses.mk g) := by
+    rw [conjugacyClassSize]
+    exact Nat.card_pos_iff.mpr ⟨⟨g, ConjClasses.mem_carrier_mk⟩, inferInstance⟩
+  have hclass_ne : (conjugacyClassSize (ConjClasses.mk g) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr hclass_pos.ne'
+  rw [div_eq_iff hclass_ne]
+  simpa [mul_comm] using hmul.symm
 
 /-- The character-table entry indexed by an irreducible character and a conjugacy class. -/
 noncomputable def characterTableEntry
