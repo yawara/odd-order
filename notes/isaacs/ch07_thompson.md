@@ -205,7 +205,7 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - 7.6 → 7.8 (Burnside の Thompson factorization は 7.6 を maximal subgroup M に適用)
 - 6.23 (Ch.6) → 7.1 (Ch.7) → 6.24 (Ch.6 完備化) ← **Ch.6/Ch.7 間の唯一の双方向依存**
 
-## 着手状況 (2026-05-25)
+## 着手状況 (2026-05-26)
 
 - ✅ shared module `OddOrder/GroupTheory/ElementaryAbelian.lean` (`IsElementaryAbelian`).
 - ✅ shared module `OddOrder/GroupTheory/ThompsonSubgroup.lean` (`Subgroup.thompsonJ` def + Thm 7.2).
@@ -220,6 +220,26 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   (`actionCentralizer`), conjugacy step `C_V(P^g)=C_V(P)^g`
   (`actionCentralizer_map_conj`), generated-subgroup fixed-point step
   `C_V(P⊔Q)=C_V(P)∩C_V(Q)` (`actionCentralizer_sup`) を sorry-free で追加.
+  さらに `U=C_V(P)∩C_V(Q)` 形式の index bound
+  (`actionCentralizer_inf_index_le_sq`), `P⊔Q=⊤` から `U` が action-invariant になる bridge
+  (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`), 商 `V/U` 上の index 保存
+  (`actionCentralizer_quotient_image_index_eq_of_le`), quotient action と kernel `K`
+  (`quotientActionHom`, `quotientActionKernel`), `[V,K]≤U` bridge
+  (`actionCommutator_quotientActionKernel_le`), `[V,K,K]=1` bridge
+  (`actionCommutator_quotientActionKernel_le_fixedPoints`), faithful action + `V` p-group から
+  `K` p-group まで (`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`) 追加済み.
+  さらに order `p^2` の elementary abelian quotient の `Aut(V) ≃ GL(2,p)` bridge
+  (`mulAutGLTwoEquivOfIsElementaryAbelianCard`) と, Lem 7.3 の GL 側結論を `Aut(V)` 側へ戻す
+  transfer (`mulAut_centralizes_of_gl2_image_hypotheses`) を追加済み. 7.5 の
+  `|V| ≤ p^2` reduction 用に
+  `IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`
+  も追加済み. `U=C_V(P)∩C_V(Q)` quotient で `|V/U|≤p^2`, 非巡回なら elementary
+  abelian order `p^2` へ落とす
+  `quotient_card_le_prime_sq_of_actionCentralizer_inf` と
+  `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`
+  も追加済み. cyclic quotient branch は
+  `subgroup_normal_of_injective_mulAut_of_isCyclic` で
+  `Aut(V) ≃ (ZMod |V|)ˣ` から acting group 可換, したがって `P ⊴ G` まで閉じられる.
   theorem statement / proof 本体は保留.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
@@ -232,8 +252,15 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
 - ✅ **Ch.5 5.26 + `HasNormalPComplement`**: Thm 7.1 の normal p-complement 側の基礎定義・Frobenius criterion は利用可能.
 - ✅ **Ch.7 Lem 7.3 / 7.4 / 7.7**: 7.5 の GL(2,p) 補題と 7.1 の N/C quotient 補題は Ch.7 内で利用可能.
 - 🔴 **Ch.6 6.11**: Thm 7.5 final reduction の blocker. `p`-group with at most one subgroup of order `p` ⇒ cyclic / generalized quaternion.
-- 🔴 **Ch.6 6.20**: Thm 7.6 Step 5 の blocker. abelian coprime action 補題.
-- 🔴 **`Aut(E) ≅ GL(2,p)` bridge**: Thm 7.5 の `|V| ≤ p^2`, noncyclic p-group ⇒ elementary abelian order `p^2` から Lem 7.3 へ渡すために必要.
+  - 進捗: elementary abelian order `p^2` から order-`p` subgroup 2 本を抽出する
+    shared helper と, order-`p` subgroup 一意性から elementary abelian `p^2` subgroup を
+    排除する bridge は追加済み. abelian branch / 6.9→6.10 接続の土台はできた.
+- ✅ **Ch.6 6.20**: Thm 7.6 Step 5 の blocker は解消.
+  `isCyclic_of_faithful_trivial_on_proper_invariant` として, Lemma 6.20 の本文通り
+  6.21 から faithful abelian coprime action 補題を sorry-free 化済み.
+- ✅ **`Aut(E) ≅ GL(2,p)` bridge**: elementary abelian order `p^2` から Lem 7.3 へ渡す
+  automorphism-group bridge は `mulAutGLTwoEquivOfIsElementaryAbelianCard` と
+  `mulAut_centralizes_of_gl2_image_hypotheses` として追加済み.
 - 🟡 **Ω₁ / order-p fixed subgroup helper**: Thm 7.6 Step 7 で必要. Ch.6 6.11 実装で先に共通化できる可能性あり.
 
 ## 着手順 (提案)
@@ -242,14 +269,27 @@ FT クリティカル度 + 章内依存 + 前提章完了状態で並べる:
 
 1. ✅ **shared definitions + 7.2 / 7.4 / 7.3 / 7.7** — Ch.7 内の独立補題群は完了.
 2. 🔧 **7.5 normal-P theorem 前半** — Ch.6 6.11 に依存しない action / centralizer / quotient-action 側を先に固める.
-   - `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|`.
-   - `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`.
-   - `G = ⟨P,Q⟩` 仮定下で `G` が `U` に自明に作用し, quotient action `G ↷ V/U` を得る.
-   - kernel `K` について `[V,K,K]=1` までを Ch.4 action-commutator API と接続する.
+   - ✅ `Q = P^g` から `|V:C_V(Q)| = |V:C_V(P)|` (`actionCentralizer_map_conj_index`).
+   - ✅ `U = C_V(P) ∩ C_V(Q) = C_V(⟨P,Q⟩)` と `|V:U| ≤ |V:C_V(P)| |V:C_V(Q)| ≤ p^2`
+     (`actionCentralizer_sup`, `actionCentralizer_inf_index_le_sq`).
+   - ✅ `G = ⟨P,Q⟩` 仮定下で `U` が action-invariant になり, 既存
+     `IsAInvariant.quotientMulAutHom` で quotient action `G ↷ V/U` へ進める
+     (`actionCentralizer_inf_isAInvariant_of_sup_eq_top`).
+   - ✅ 商 `V/U` 内の `C_V(P)/U` index 保存
+     (`actionCentralizer_quotient_image_index_eq_of_le`).
+   - ✅ quotient action の kernel `K` と `[V,K]≤U` / `[V,K,K]=1` / `K` p-group 化
+     (`quotientActionKernel`, `actionCommutator_quotientActionKernel_le`,
+     `actionCommutator_quotientActionKernel_le_fixedPoints`,
+     `quotientActionKernel_isPGroup_of_faithful_of_isPGroup`). `U ⊴ V` は明示仮定.
+   - ✅ `|V| ≤ p^2` かつ非 cyclic な finite `p`-group から
+     elementary abelian order `p^2` へ落とす small-order bridge.
+   - ✅ cyclic quotient branch: faithful/injective action into `Aut(V)` と `V` cyclic から
+     acting group 可換, よって `P` normal.
 3. 🔴 **Ch.6 6.11** — 7.5 final reduction に必要. ここを閉じるまで 7.5 本体の最後は保留.
-4. 🔴 **`Aut(E) ≅ GL(2,p)` bridge** — `|V| ≤ p^2` かつ noncyclic p-group から elementary abelian `p^2` を取り, Lem 7.3 に渡す.
+4. ✅ **`Aut(E) ≅ GL(2,p)` bridge** — elementary abelian order `p^2` の `Aut(E)` を
+   `GL(2,p)` に移し, Lem 7.3 の centralizer 結論を戻すところまで完了.
 5. **7.5 normal-P theorem 本体** — 7.3 + Ch.6 6.11 + Hall-Higman 3.21 で contradiction を閉じる.
-6. 🔴 **Ch.6 6.20** — 7.6 Step 5 の直接前提.
+6. ✅ **Ch.6 6.20** — 7.6 Step 5 の直接前提は利用可能.
 7. **7.6 normal-J theorem** — 7.5 + Ch.6 6.20 + Ch.4 4.35 + Hall-Higman 3.21. **章のハイライト**.
 8. **7.1 Thompson normal p-complement** — Ch.5 5.26 + 7.6 + 7.7. Ch.6 6.23 をここから backfill.
 9. **Ch.6 6.23 / 6.24 backfill** — 7.1 から Thompson char-X 版と Frobenius kernel nilpotent を完備化.

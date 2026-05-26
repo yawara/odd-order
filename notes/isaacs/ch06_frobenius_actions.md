@@ -272,6 +272,65 @@ FT クリティカル度 + 章内依存で並べる:
   既存 recognizer に落とせる状態.
 - **Cor 6.14** `dihedralOrQuaternion_of_card_eight`: 位数 8 非可換群は
   `DihedralGroup 4` または `QuaternionGroup 2`. sorry-free.
+- **Lem 6.15** center-index `p^2` characteristic elementary-abelian subgroup:
+  odd `p` branch (`exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd`) と
+  `p=2` branch (`exists_characteristic_isElementaryAbelian_four_of_center_index_four`) が
+  sorry-free. `T/T'` lift, order-8 noncyclic extraction, D/Q 判定まで Ch.6 本体に接続済み.
+- **§6B shared helper surface** (`OddOrder.GroupTheory.ElementaryAbelian`):
+  `IsElementaryAbelian.isPGroup`, subgroup restriction, order `p^2` non-cyclicity,
+  order `p^2` subgroup extraction, order-`p` line 2 本の抽出, および
+  「order `p` subgroup が一意なら elementary abelian `p^2` subgroup は存在しない」
+  (`Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique`) を追加.
+  6.9 → 6.10 と 6.11 abelian branch の接続で使う.
+- **§6B / 6.20 abelian Z-group bridge**:
+  `isCyclic_of_sylow_isCyclic` と
+  `exists_prime_sylow_not_isCyclic_of_not_isCyclic` を追加. 6.11 可換 branch と 6.10 から直接
+  `isCyclic_of_frobeniusAction_of_isMulCommutative` も閉じたため, 6.21 の
+  「noncyclic abelian Frobenius complement は存在しない」矛盾に使える.
+- **§6B / 6.21 fixed-centralizer generation setup**:
+  `actionFixedBy φ a = C_U(a)` を単一作用元の固定点部分群として追加し,
+  `nontrivialActionFixedByClosure φ = ⟨C_U(a) | a ≠ 1⟩` を Isaacs 6.21 の `K` として
+  Lean 化. `K ≤ L` の判定 (`nontrivialActionFixedByClosure_le_iff`) と,
+  `A` 可換なら `K` が `A`-invariant である補題
+  (`nontrivialActionFixedByClosure_invariant_of_commutative`) まで sorry-free.
+  これは 6.21 proof 中の「`K` は A-invariant since uniquely determined by `A,N`」を
+  wrapper ではなく本文通りの生成部分群で閉じるための surface.
+- **§6B / 6.21 quotient Frobenius bridge**:
+  `quotient_isFrobeniusAction_of_fixedBy_le` を追加. `M ⊴ N` が `A`-invariant で,
+  `|A|` と `|M|` が coprime, かつ全 `a ≠ 1` で `C_N(a) ≤ M` なら,
+  `A` の `N/M` への誘導作用は Frobenius. 6.21 本文の
+  “fixed points come from fixed points” から
+  `C_{N/K}(a) = 1` を得る部分を, Ch.4 Cor 3.28
+  (`coprime_fixedPoints_quotient_of_coprime_normal`) で直接閉じた.
+- **§6B / 6.21 normality bridge**:
+  `normal_of_commutator_le` を追加. `N' ≤ K` から `K ⊴ N` を得る本文ステップを,
+  mathlib の `Subgroup.commutator_top_left_le_iff` に接続する小補題として閉じた.
+- **§6B / 6.21 Sylow push step**:
+  `sylow_not_le_of_prime_dvd_index` と
+  `exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le` を追加.
+  `p ∣ |N:K|` なら Sylow `p`-subgroupは `K` に含まれず, proper A-invariant subgroup が全て
+  `K` に含まれる帰納仮定下では, Ch.4 Thm 3.23(a) の A-invariant Sylow が `⊤` になる.
+- **§6B / 6.21 commutator proper step**:
+  `commutator_le_of_proper_invariant_le_of_isSolvable` を追加. solvable nontrivial `N` では
+  `N' < N` かつ `N'` は A-invariant なので, proper A-invariant subgroup が全て `K` に入る
+  帰納仮定から `N' ≤ K` を得る.
+- **§6B / 6.21 final contradiction step**:
+  `nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le` を追加. 帰納仮定
+  (`proper A-invariant P ≤ K`) を入力に, `K < N` から A-invariant Sylow が `N` 全体,
+  `N' ≤ K`, `K ⊴ N`, `A ↷ N/K` Frobenius, abelian noncyclic Frobenius complement 禁止までを
+  本文通りに接続して `K = N` を得る.
+- **§6B / 6.21 theorem (nontrivial case)**:
+  `IsFrobeniusAction.invariantSubgroupMulDistribMulAction` を公開 constructor にし,
+  `subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top` で proper invariant subgroup
+  の帰納結果を ambient `K` に戻す橋を追加. その上で
+  `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial` を strong induction で
+  sorry-free 化し, trivial `N=1` を加えた
+  `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic` で 6.21 statement を閉じた.
+- **§6B / 6.20 corollary from 6.21**:
+  `isCyclic_of_faithful_trivial_on_proper_invariant` を追加. 6.21 で
+  `⟨C_N(a) | a ≠ 1⟩ = N` を得たあと, abelian 性で各 `C_N(a)` が invariant,
+  faithful 性で proper, 仮定で `C_N(A)` に入り, 最後に faithful 性から `A = 1` として
+  noncyclic 仮定を矛盾させる本文通りの corollary.
 
 **設計判断**:
 - **action ベース** (`IsFrobeniusAction A N` on `MulDistribMulAction A N`) を採用. subgroup-pair
@@ -283,8 +342,115 @@ FT クリティカル度 + 章内依存で並べる:
 - 6.7 centralizer-kernel criterion: Schur-Zassenhaus / Ch.5 normal p-complement 周辺が main に入ったので,
   statement 形から再設計する価値あり.
 - 6.8-6.10 partition counting → Frobenius complement 禁止構造.
-- 6.11/6.12 p-group classification: 6.13/6.14 の recognizer を使って大枠へ進める.
+- 6.11/6.12 p-group classification: 6.13/6.14/6.15 と elementary-abelian line helpers を
+  使って大枠へ進める.
 - 6.17-6.21 Frobenius complement / coprime abelian action: Ch.7 の 6.20 使用箇所に向けた中期目標.
+- 6.8 partition counting lemma: `SubgroupPartition`, 非単位元が一意な part に入る補題,
+  sigma 型への forgetful bijection, identity / nonidentity orbit product split,
+  `partitionOrbitProduct_identity`, および identity を仮定しない
+  `exists_part_actionFixedPoints_ne_bot` まで sorry-free.
+  さらに 6.9 で使う
+  `false_of_frobeniusAction_partition_of_coprime_card` まで接続済み:
+  Frobenius action + `gcd(|Π|-1, |U|)=1` から直接矛盾を出せる.
+  6.9 本文の `|Π| = 1+n`, `n ∣ |A|` 形も
+  `false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card`
+  および subgroup actor 版まで実装済み. `IsFrobeniusAction.actorSubgroup`
+  で「A の部分群へ置き換える」本文操作も Lean 化した.
+- 6.9 elementary abelian `p^2` 分岐:
+  `SubgroupPartition.elementaryAbelianPrimeSquare` と
+  `elementaryAbelianPrimeSquare_parts_card` を実装. parts は位数 `p` の全 subgroup,
+  cardinality は `p + 1`. これを contradiction package に接続して
+  `false_of_frobeniusAction_isElementaryAbelian_card_prime_sq` / subgroup actor 版まで
+  sorry-free.
+  さらに L3495 の invariant Sylow center reduction を通して,
+  `false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target`
+  まで一般 target に持ち上げた. 共有補題
+  `OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic`
+  (非巡回な位数 `p^2` 群は elementary abelian) も追加し,
+  `IsElementaryAbelian.exists_subgroup_card_prime_sq` で `p^2` 部分群へ落として
+  `false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq` まで
+  閉じた. これで本文の「order exceeding `p`」は `p^2 ≤ |B|` 形で使用可能.
+  `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq` で
+  6.9 本文の `p = q` branch (`|B| = p^2` なら巡回) を閉じた.
+- 6.9 order `pq` 巡回分岐:
+  `p > q` branch は `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt`
+  として実装. Ch.1 の `sylow_normal_of_card_eq_mul_prime_lt` で Sylow `p` を正規化し,
+  Sylow `q` と complement を作る. 固定点を持つ非単位 `a ∈ Q`, `n ∈ P` があれば
+  `orderOf (n*a) = p*q = |B|` となり `B` が巡回, 非巡回仮定に矛盾するため,
+  `B` は Frobenius group になる. `P` と `B/P` が prime order cyclic であることから
+  `B` は solvable, 既存の solvable Frobenius group obstruction に接続.
+  `false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime` で `p=q`,
+  `p<q`, `p>q` を統合し, 6.9 本文の「位数 `pq` の部分群は巡回」分岐を
+  contradiction form で閉じた.
+- 6.10 Sylow `p` 部分群の位数 `p` 部分群一意性:
+  `IsPGroup.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne` を共有補題化
+  (p-group 内に位数 `p` 部分群が 2 つあれば, 中心の位数 `p` 部分群と合わせて
+  elementary abelian `p^2` 部分群を作る). これを 6.9 elementary branch に接続して
+  `subgroups_card_prime_unique_of_frobeniusAction_sylow` を sorry-free で閉じた.
+- 6.11 可換 `p` 群分岐:
+  有限可換 `p` 群で位数 `p` 部分群が一意なら巡回であることを
+  `IsPGroup.isCyclic_of_subgroups_card_prime_unique` として共有補題化. mathlib の
+  finite abelian group structure theorem
+  `CommGroup.equiv_prod_multiplicative_zmod_of_finite` を直接使い, cyclic factor が 2 個以上
+  あると各 factor の top-order element から異なる位数 `p` 部分群が出る, という本文の
+  fundamental theorem branch を Lean 化した. これを 6.10 と接続して
+  `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` まで sorry-free. さらに Sylow ごとに
+  貼り合わせて, 6.17 後の観察「可換 Frobenius complement は巡回」を
+  `isCyclic_of_frobeniusAction_of_isMulCommutative` として先行実装済み. 6.12 への接続として,
+  ambient の order-`p` subgroup 一意性を任意の可換部分群に制限し cyclic を得る
+  `IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique` も追加済み.
+  odd branch / `p=2` branch を束ねた Lem 6.15 本体
+  `exists_characteristic_isElementaryAbelian_of_center_index_prime_sq` を追加し,
+  さらに Lem 6.15 が作る characteristic elementary abelian `p^2` subgroup を order-`p`
+  subgroup 一意性で即矛盾にする branch-specific / full contradiction forms
+  `false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd` と
+  `false_of_unique_subgroups_card_two_of_center_index_four`,
+  `false_of_unique_subgroups_card_prime_of_center_index_prime_sq` も追加済み.
+  さらに 6.12 → 6.11 の dihedral / semidihedral 排除用に, cyclic subgroup 外の involution
+  と内部の非自明 involution から異なる order-2 subgroups を作る
+  `exists_distinct_subgroups_card_two_of_external_involution` と, order-2 subgroup 一意性への
+  contradiction form `false_of_unique_subgroups_card_two_of_external_involution` を追加済み.
+  その内部 involution を有限 `2`-群の非自明部分群から取り出す
+  `exists_involution_mem_of_nontrivial_two_subgroup` と, 外側 involution だけを渡せば
+  一意 order-2 subgroup 仮定へ矛盾させる
+  `false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup`
+  も追加済み. さらに dihedral / semidihedral の実際の形 (`C.index = 2`, `|P| ≠ 2`) に
+  直接合う
+  `false_of_unique_subgroups_card_two_of_external_involution_of_index_two` も追加済み.
+  6.12 本文冒頭の maximal normal abelian subgroup argument に向けて,
+  `C < C_P(C)` から Ch01 Lemma 1.23 で `C < B ≤ C_P(C)`, `C.relIndex B = p`,
+  `B ⊴ P` を取り, `C ≤ Z(B)` と prime quotient cyclicity から `B` 可換を導く
+  `exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer` を追加済み.
+  これは mathlib 定理の純粋 rename ではなく, Ch01 の p-group intermediate subgroup
+  construction と 6.12 の centralizer obstruction を直接つなぐ bridge.
+  この bridge から, maximal normal abelian subgroup `C` は self-centralizing である
+  `centralizer_eq_of_maximal_normal_isMulCommutative` も追加済み. 次の残りは
+  `P/C` の faithful embedding into `Aut(C)` と abelian quotient extraction.
+- 6.9 solvable Frobenius group 分岐:
+  Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
+  `SubgroupPartition.frobeniusGroup` として実装し,
+  `frobeniusGroup_parts_card` で `|Π| = 1 + |N|` まで sorry-free.
+  これを 6.8 contradiction package に接続して,
+  `false_of_frobeniusAction_isFrobeniusGroup_on_abelian` まで実装済み.
+  さらに L3495 の reduction を
+  `exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable` として
+  切り出し,
+  `false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup`
+  に接続: Frobenius actor の部分群 `B` が Frobenius group で, target 側に非自明
+  `B`-invariant abelian subgroup があれば矛盾.
+  Ch.4 側の `exists_aInvariant_sylow` (Isaacs Thm 3.23(a)) を使い,
+  `R > 1` から `Z(R) > 1` と characteristic invariance をつないで,
+  `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup` まで
+  sorry-free. これで 6.9 の「solvable Frobenius group subgroup は不可」分岐は
+  abelian reduction を含めて閉じた.
+- wrapper 監査:
+  今回追加した `ncard_conjugates_eq_index_of_TI` は 6.5 の conjugate counting proof を
+  6.9 の Frobenius partition cardinality でも使うための private proof extraction.
+  `exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable` は
+  Ch.4/Thm 3.23 から `Z(R)` を構成する実質的な reduction であり, 純粋リネームではない.
+  private `orderOf_eq_prime_of_mem_subgroup_card_prime` は `p*q` branch 内の
+  prime-order subgroup element order extraction 用で, theorem alias ではない.
+  mathlib theorem / 既存 theorem の純粋リネーム wrapper は追加していない.
 
 ## 開発時の注意点
 

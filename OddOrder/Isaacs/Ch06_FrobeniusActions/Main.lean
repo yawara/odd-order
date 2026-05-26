@@ -16,6 +16,7 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.NumberTheory.Multiplicity
@@ -102,7 +103,7 @@ theorem fixedBy_eq_singleton_one (h : IsFrobeniusAction A N) {a : A} (ha : a ≠
   · by_contra hne; exact h a ha n hne hn
   · rintro rfl; exact smul_one a
 
-@[reducible] private def invariantSubgroupMulDistribMulAction (M : Subgroup N)
+@[reducible] def invariantSubgroupMulDistribMulAction (M : Subgroup N)
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A M := by
   letI : SMul A M := ⟨fun a m => ⟨a • (m : N), hM a m m.2⟩⟩
   exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
@@ -116,7 +117,14 @@ theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
   have hmN : (m : N) ≠ 1 := fun hmN => hm (Subtype.ext hmN)
   exact h a ha (m : N) hmN (Subtype.ext_iff.mp hfix)
 
-@[reducible] private def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
+/-- A Frobenius action remains Frobenius after restricting the acting group to a subgroup. -/
+theorem actorSubgroup (h : IsFrobeniusAction A N) (B : Subgroup A) :
+    IsFrobeniusAction B N := by
+  intro b hb n hn hfix
+  have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+  exact h (b : A) hbA n hn (by simpa using hfix)
+
+@[reducible] def invariantQuotientMulAut (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) (a : A) : MulAut (N ⧸ M) := by
   let f : N ⧸ M →* N ⧸ M :=
     QuotientGroup.map M M (MulDistribMulAction.toMulAut A N a).toMonoidHom
@@ -136,7 +144,7 @@ theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
       ext n
       simp [f, g])
 
-@[reducible] private def invariantQuotientMulAutHom (M : Subgroup N) [M.Normal]
+@[reducible] def invariantQuotientMulAutHom (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : A →* MulAut (N ⧸ M) where
   toFun := invariantQuotientMulAut M hM
   map_one' := by
@@ -151,7 +159,7 @@ theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
     intro n
     simp [invariantQuotientMulAut, mul_smul]
 
-@[reducible] private def invariantQuotientMulDistribMulAction (M : Subgroup N) [M.Normal]
+@[reducible] def invariantQuotientMulDistribMulAction (M : Subgroup N) [M.Normal]
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) : MulDistribMulAction A (N ⧸ M) :=
   MulDistribMulAction.compHom (N ⧸ M) (invariantQuotientMulAutHom M hM)
 
@@ -479,6 +487,71 @@ private lemma TI_conjugate
   rw [← hk_smul]
   exact hsmul.symm
 
+/-- Under the TI condition, the number of conjugates of `A` is `[G : A]`.
+
+This is the conjugate-counting part of Isaacs Lemma 6.5, extracted because the same count is
+also the cardinality calculation for the Frobenius-group partition in §6B. -/
+private theorem ncard_conjugates_eq_index_of_TI [Finite G]
+    {A : Subgroup G} (hA_ne : A ≠ ⊥)
+    (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
+    (Set.range (fun g : G => MulAut.conj g • A)).ncard = A.index := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hNGA : Subgroup.normalizer A = A := normalizer_eq_self_of_TI hA_ne h_TI
+  set conjs : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • A) with hconjs_def
+  -- Define `f : G → conjs` by `g ↦ ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩`.
+  -- `f g₁ = f g₂ ↔ g₂⁻¹ * g₁ ∈ N_G(A) = A ↔ g₁, g₂ in the same left coset of `A`.
+  let f : G → conjs := fun g => ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩
+  have hf_lift : ∀ g₁ g₂ : G, (QuotientGroup.leftRel A) g₁ g₂ → f g₁ = f g₂ := by
+    intro g₁ g₂ hrel
+    rw [QuotientGroup.leftRel_apply] at hrel
+    have h_in_N : g₁⁻¹ * g₂ ∈ Subgroup.normalizer A := by rw [hNGA]; exact hrel
+    have h_conj : MulAut.conj (g₁⁻¹ * g₂) • A = A :=
+      Subgroup.conj_smul_eq_self_of_mem (by rw [hNGA] at h_in_N; exact h_in_N)
+    ext1
+    simp only [f]
+    have heq : MulAut.conj g₂ = MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂) := by
+      rw [← map_mul]; congr 1; group
+    calc (MulAut.conj g₁ • A : Subgroup G)
+        = MulAut.conj g₁ • (MulAut.conj (g₁⁻¹ * g₂) • A) := by rw [h_conj]
+      _ = (MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂)) • A := by rw [mul_smul]
+      _ = MulAut.conj g₂ • A := by rw [← heq]
+  let f' : G ⧸ A → conjs := Quotient.lift f (fun a b => hf_lift a b)
+  have hf_surj : Function.Surjective f' := by
+    rintro ⟨B, g, rfl⟩
+    exact ⟨⟦g⟧, rfl⟩
+  have hf_inj : Function.Injective f' := by
+    rintro ⟨g₁⟩ ⟨g₂⟩ hfeq
+    change f g₁ = f g₂ at hfeq
+    have hsub : (MulAut.conj g₁ • A : Subgroup G) = MulAut.conj g₂ • A := by
+      exact Subtype.ext_iff.mp hfeq
+    have h_step : (MulAut.conj (g₂⁻¹ * g₁) • A : Subgroup G) = A := by
+      have heq : MulAut.conj (g₂⁻¹ * g₁) = MulAut.conj g₂⁻¹ * MulAut.conj g₁ := by
+        rw [← map_mul]
+      rw [heq, mul_smul, hsub, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    have h_mem : g₂⁻¹ * g₁ ∈ Subgroup.normalizer A := by
+      rw [Subgroup.mem_normalizer_iff'']
+      intro y
+      have hmem : y ∈ MulAut.conj (g₂⁻¹ * g₁) • A ↔ y ∈ A := by rw [h_step]
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hmem
+      have hcalc : (MulAut.conj (g₂⁻¹ * g₁))⁻¹ • y = (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁) := by
+        change (MulAut.conj (g₂⁻¹ * g₁)).symm y = _
+        rw [MulAut.conj_symm_apply]
+      rw [hcalc] at hmem
+      exact hmem.symm
+    rw [hNGA] at h_mem
+    apply Quotient.sound
+    change (QuotientGroup.leftRel A) g₁ g₂
+    rw [QuotientGroup.leftRel_apply]
+    have : (g₂⁻¹ * g₁)⁻¹ ∈ A := A.inv_mem h_mem
+    simpa [mul_inv_rev] using this
+  have hbij : Function.Bijective f' := ⟨hf_inj, hf_surj⟩
+  have h_card_eq : Nat.card conjs = Nat.card (G ⧸ A) :=
+    (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
+  have h_card_conjs : conjs.ncard = A.index := by
+    rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
+  simpa [hconjs_def] using h_card_conjs
+
 /-- **Isaacs Lemma 6.5**: Let `A` be a subgroup of a finite group `G`, and suppose `A ∩ A^g = 1`
 for all `g ∈ G \ A`. Then the set of elements of `G` not conjugate to any nonidentity element of `A`
 has cardinality `|G : A|`. -/
@@ -500,7 +573,6 @@ theorem card_notConjugateSet_eq_index [Finite G]
   · -- Case `A ≠ ⊥`.  Build the orbit of `A` under conjugation; counted to give `A.index`.
     -- The complement of `notConjugateSet A` is `⋃_{B ∈ orbit} (B.carrier \ {1})`.
     -- Pairwise disjoint outside `{1}`; sum gives `index · (|A| - 1)`.
-    have hNGA : Subgroup.normalizer A = A := normalizer_eq_self_of_TI hA_ne h_TI
     -- The set of conjugates of `A` (indexed as subgroups of `G`).
     set conjs : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • A) with hconjs_def
     -- (Step a) Identify the complement.
@@ -590,76 +662,8 @@ theorem card_notConjugateSet_eq_index [Finite G]
       rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
           Set.ncard_singleton, h_card_B]
     -- (Step e) Cardinality of `conjs` is `A.index`.
-    -- We build a bijection `G ⧸ A ≃ conjs` directly using `hNGA`.
     have h_card_conjs : conjs.ncard = A.index := by
-      -- Define `f : G → conjs` by `g ↦ ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩`.
-      -- `f g₁ = f g₂ ↔ g₂⁻¹ * g₁ ∈ N_G(A) = A ↔ g₁, g₂ in same left coset of A`.
-      let f : G → conjs := fun g => ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩
-      -- `f` factors through `G ⧸ A` as a function.
-      have hf_lift : ∀ g₁ g₂ : G, (QuotientGroup.leftRel A) g₁ g₂ → f g₁ = f g₂ := by
-        intro g₁ g₂ hrel
-        rw [QuotientGroup.leftRel_apply] at hrel
-        -- hrel : g₁⁻¹ * g₂ ∈ A, so g₁⁻¹ * g₂ ∈ N_G(A), so conjugation is trivial.
-        have h_in_N : g₁⁻¹ * g₂ ∈ Subgroup.normalizer A := by rw [hNGA]; exact hrel
-        -- `MulAut.conj (g₁⁻¹ * g₂) • A = A`.
-        have h_conj : MulAut.conj (g₁⁻¹ * g₂) • A = A :=
-          Subgroup.conj_smul_eq_self_of_mem (by rw [hNGA] at h_in_N; exact h_in_N)
-        ext1
-        simp only [f]
-        -- `MulAut.conj g₁ • A = MulAut.conj g₂ • A`:
-        -- `MulAut.conj g₂ = MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂)`.
-        have heq : MulAut.conj g₂ = MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂) := by
-          rw [← map_mul]; congr 1; group
-        calc (MulAut.conj g₁ • A : Subgroup G)
-            = MulAut.conj g₁ • (MulAut.conj (g₁⁻¹ * g₂) • A) := by rw [h_conj]
-          _ = (MulAut.conj g₁ * MulAut.conj (g₁⁻¹ * g₂)) • A := by rw [mul_smul]
-          _ = MulAut.conj g₂ • A := by rw [← heq]
-      -- Now lift `f` to `G ⧸ A → conjs`.
-      let f' : G ⧸ A → conjs := Quotient.lift f (fun a b => hf_lift a b)
-      -- `f'` is surjective.
-      have hf_surj : Function.Surjective f' := by
-        rintro ⟨B, g, rfl⟩
-        exact ⟨⟦g⟧, rfl⟩
-      -- `f'` is injective.
-      have hf_inj : Function.Injective f' := by
-        rintro ⟨g₁⟩ ⟨g₂⟩ hfeq
-        change f g₁ = f g₂ at hfeq
-        -- `MulAut.conj g₁ • A = MulAut.conj g₂ • A`, so g₂⁻¹ * g₁ ∈ N_G(A) = A.
-        have hsub : (MulAut.conj g₁ • A : Subgroup G) = MulAut.conj g₂ • A := by
-          exact Subtype.ext_iff.mp hfeq
-        -- Rearrange: `MulAut.conj (g₂⁻¹ * g₁) • A = A`.
-        have h_step : (MulAut.conj (g₂⁻¹ * g₁) • A : Subgroup G) = A := by
-          have heq : MulAut.conj (g₂⁻¹ * g₁) = MulAut.conj g₂⁻¹ * MulAut.conj g₁ := by
-            rw [← map_mul]
-          rw [heq, mul_smul, hsub, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
-        -- So g₂⁻¹ * g₁ ∈ N_G(A) = A.
-        have h_mem : g₂⁻¹ * g₁ ∈ Subgroup.normalizer A := by
-          rw [Subgroup.mem_normalizer_iff'']
-          intro y
-          -- Want: `y ∈ A ↔ (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁) ∈ A`.
-          -- From `h_step : MulAut.conj (g₂⁻¹ * g₁) • A = A`, membership in either side
-          -- agrees: `y ∈ MulAut.conj (g₂⁻¹ * g₁) • A ↔ y ∈ A`.
-          have hmem : y ∈ MulAut.conj (g₂⁻¹ * g₁) • A ↔ y ∈ A := by rw [h_step]
-          rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hmem
-          -- Now `(MulAut.conj (g₂⁻¹ * g₁))⁻¹ • y = (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁)`.
-          have hcalc : (MulAut.conj (g₂⁻¹ * g₁))⁻¹ • y = (g₂⁻¹ * g₁)⁻¹ * y * (g₂⁻¹ * g₁) := by
-            change (MulAut.conj (g₂⁻¹ * g₁)).symm y = _
-            rw [MulAut.conj_symm_apply]
-          rw [hcalc] at hmem
-          exact hmem.symm
-        rw [hNGA] at h_mem
-        -- Conclude: g₁ ≈ g₂ in G ⧸ A.
-        apply Quotient.sound
-        change (QuotientGroup.leftRel A) g₁ g₂
-        rw [QuotientGroup.leftRel_apply]
-        -- `g₁⁻¹ * g₂` ∈ A. We have `g₂⁻¹ * g₁ ∈ A`; take inverse.
-        have : (g₂⁻¹ * g₁)⁻¹ ∈ A := A.inv_mem h_mem
-        simpa [mul_inv_rev] using this
-      -- So `G ⧸ A ≃ conjs`, giving `Nat.card conjs = Nat.card (G ⧸ A) = A.index`.
-      have hbij : Function.Bijective f' := ⟨hf_inj, hf_surj⟩
-      have h_card_eq : Nat.card conjs = Nat.card (G ⧸ A) :=
-        (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
-      rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
+      simpa [hconjs_def] using ncard_conjugates_eq_index_of_TI hA_ne h_TI
     -- (Step f) Apply `Set.Finite.ncard_biUnion` (disjoint union counting).
     have h_card_union :
         (⋃ B ∈ conjs, ((B : Set G) \ {1})).ncard = ∑ᶠ B ∈ conjs, ((B : Set G) \ {1}).ncard :=
@@ -694,6 +698,1142 @@ theorem card_notConjugateSet_eq_index [Finite G]
       have := h_lagrange
       nlinarith
     omega
+
+end
+
+section /- 6B structural helper: subgroup partitions and orbit products -/
+
+/-! ### Subgroup partitions and orbit products
+
+Isaacs Lemma 6.8 is the counting lemma for a finite group partitioned by proper nonidentity
+subgroups. The final counting argument is still downstream, but the following definitions and
+lemmas fix the exact Lean surface: a partition is represented by a finite set of subgroups, and
+for an action on an abelian group the product `u_H = ∏ h ∈ H, h • u` is fixed by `H`.
+-/
+
+/-- A finite partition of a group by proper nonidentity subgroups, in the sense of Isaacs §6B.
+
+The parts are a `Finset` because Lemma 6.8 uses the cardinality of the partition. -/
+structure SubgroupPartition (G : Type*) [Group G] where
+  /-- The finite set of subgroup parts. -/
+  parts : Finset (Subgroup G)
+  /-- Every part is nonidentity. -/
+  nontrivial : ∀ X, X ∈ parts → X ≠ ⊥
+  /-- Every part is proper. -/
+  proper : ∀ X, X ∈ parts → X ≠ ⊤
+  /-- The parts cover the whole group. -/
+  cover : ∀ g : G, ∃ X, X ∈ parts ∧ g ∈ X
+  /-- Distinct parts intersect trivially. -/
+  inf_eq_bot_of_ne : ∀ {X Y}, X ∈ parts → Y ∈ parts → X ≠ Y → X ⊓ Y = ⊥
+
+namespace SubgroupPartition
+
+private theorem finite_subgroups_of_finite {G : Type*} [Group G] [Finite G] :
+    Finite (Subgroup G) :=
+  Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+
+private noncomputable def subgroupsOfCard (G : Type*) [Group G] [Finite G] (n : ℕ) :
+    Finset (Subgroup G) := by
+  classical
+  haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
+  haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
+  exact Finset.univ.filter fun H => Nat.card H = n
+
+private theorem mem_subgroupsOfCard {G : Type*} [Group G] [Finite G] {n : ℕ}
+    {H : Subgroup G} :
+    H ∈ subgroupsOfCard G n ↔ Nat.card H = n := by
+  classical
+  unfold subgroupsOfCard
+  haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
+  haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
+  simp
+
+variable {G : Type*} [Group G] (partn : SubgroupPartition G)
+
+/-- The set of parts is nonempty. -/
+theorem parts_card_pos : 0 < partn.parts.card := by
+  obtain ⟨X, hX, _⟩ := partn.cover (1 : G)
+  exact Finset.card_pos.mpr ⟨X, hX⟩
+
+/-- Every part contains a nonidentity element. -/
+theorem exists_ne_one_mem {X : Subgroup G} (hX : X ∈ partn.parts) :
+    ∃ x : G, x ∈ X ∧ x ≠ 1 := by
+  by_contra h
+  push Not at h
+  apply partn.nontrivial X hX
+  ext x
+  constructor
+  · intro hx
+    rw [h x hx]
+    exact Subgroup.one_mem ⊥
+  · intro hx
+    rw [Subgroup.mem_bot] at hx
+    rw [hx]
+    exact X.one_mem
+
+/-- A nonidentity element cannot lie in two distinct parts. -/
+theorem eq_of_mem_ne_one {X Y : Subgroup G}
+    (hX : X ∈ partn.parts) (hY : Y ∈ partn.parts)
+    {g : G} (hgX : g ∈ X) (hgY : g ∈ Y) (hg : g ≠ 1) :
+    X = Y := by
+  by_contra hXY
+  have hInf : X ⊓ Y = ⊥ := partn.inf_eq_bot_of_ne hX hY hXY
+  have hgInf : g ∈ X ⊓ Y := ⟨hgX, hgY⟩
+  have hg_one : g = 1 := by
+    simpa [hInf] using hgInf
+  exact hg hg_one
+
+/-- Every nonidentity element lies in a unique partition part. -/
+theorem existsUnique_part_of_ne_one {g : G} (hg : g ≠ 1) :
+    ∃! X : Subgroup G, X ∈ partn.parts ∧ g ∈ X := by
+  obtain ⟨X, hX, hgX⟩ := partn.cover g
+  refine ⟨X, ⟨hX, hgX⟩, ?_⟩
+  intro Y hY
+  exact partn.eq_of_mem_ne_one hY.1 hX hY.2 hgX hg
+
+/-- The unique partition part containing a nonidentity element. -/
+noncomputable def partOfNeOne (g : {g : G // g ≠ 1}) :
+    {X : Subgroup G // X ∈ partn.parts} :=
+  ⟨(partn.existsUnique_part_of_ne_one g.2).choose,
+    (partn.existsUnique_part_of_ne_one g.2).choose_spec.1.1⟩
+
+/-- The chosen part really contains the nonidentity element. -/
+theorem mem_partOfNeOne (g : {g : G // g ≠ 1}) :
+    (g : G) ∈ (partn.partOfNeOne g).1 :=
+  (partn.existsUnique_part_of_ne_one g.2).choose_spec.1.2
+
+/-- Any partition part containing `g ≠ 1` is the chosen part. -/
+theorem partOfNeOne_eq_of_mem {g : {g : G // g ≠ 1}} {X : Subgroup G}
+    (hX : X ∈ partn.parts) (hgX : (g : G) ∈ X) :
+    partn.partOfNeOne g = ⟨X, hX⟩ := by
+  apply Subtype.ext
+  exact ((partn.existsUnique_part_of_ne_one g.2).choose_spec.2 X ⟨hX, hgX⟩).symm
+
+/-- Forget the partition part from a partition-indexed nonidentity element. -/
+def nonidentitySigmaTo
+    (p : Σ X : {X : Subgroup G // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) :
+    {g : G // g ≠ 1} :=
+  ⟨(p.2.1 : G), fun hg => p.2.2 (Subtype.ext hg)⟩
+
+/-- Forgetting the partition part is injective because nonidentity elements occur in a unique
+part. -/
+theorem nonidentitySigmaTo_injective :
+    Function.Injective partn.nonidentitySigmaTo := by
+  intro p q hpq
+  rcases p with ⟨X, x⟩
+  rcases q with ⟨Y, y⟩
+  have hxyA : ((x.1 : X.1) : G) = ((y.1 : Y.1) : G) :=
+    congrArg Subtype.val hpq
+  have hx_ne : ((x.1 : X.1) : G) ≠ 1 := fun hx => x.2 (Subtype.ext hx)
+  have hY_mem_x : ((x.1 : X.1) : G) ∈ Y.1 := by
+    simpa [hxyA] using y.1.2
+  have hXY : X = Y := by
+    apply Subtype.ext
+    exact partn.eq_of_mem_ne_one X.2 Y.2 x.1.2 hY_mem_x hx_ne
+  cases hXY
+  have hxy : x = y := by
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hxyA
+  cases hxy
+  rfl
+
+/-- Forgetting the partition part is surjective: choose the unique part containing `g`. -/
+theorem nonidentitySigmaTo_surjective :
+    Function.Surjective partn.nonidentitySigmaTo := by
+  intro g
+  refine ⟨⟨partn.partOfNeOne g,
+    ⟨⟨g.1, partn.mem_partOfNeOne g⟩, ?_⟩⟩, ?_⟩
+  · intro h
+    exact g.2 (congrArg Subtype.val h)
+  · ext
+    rfl
+
+/-- The number of nonidentity elements in a finite group, as a subtype. -/
+private theorem card_ne_one_subtype {G : Type*} [Group G] [Finite G] :
+    Nat.card {g : G // g ≠ 1} = Nat.card G - 1 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hfilter :
+      (Finset.univ.filter fun g : G => g ≠ 1) = Finset.univ.erase 1 := by
+    ext g
+    simp
+  calc
+    Nat.card {g : G // g ≠ 1}
+        = Fintype.card {g : G // g ≠ 1} := Nat.card_eq_fintype_card
+    _ = (Finset.univ.filter fun g : G => g ≠ 1).card := Fintype.card_subtype _
+    _ = Fintype.card G - 1 := by
+      rw [hfilter, Finset.card_erase_of_mem (Finset.mem_univ (1 : G)), Finset.card_univ]
+    _ = Nat.card G - 1 := by rw [Nat.card_eq_fintype_card]
+
+/-- Counting nonidentity elements through a subgroup partition. If every part has size `c`,
+then `|Π| * (c - 1) = |G| - 1`. -/
+theorem parts_card_mul_sub_one_eq_card_sub_one [Finite G] {c : ℕ}
+    (hcard : ∀ X, X ∈ partn.parts → Nat.card X = c) :
+    partn.parts.card * (c - 1) = Nat.card G - 1 := by
+  classical
+  let domain :=
+    Σ X : {X : Subgroup G // X ∈ partn.parts}, {x : X.1 // x ≠ 1}
+  let codomain := {g : G // g ≠ 1}
+  haveI : Fintype {X : Subgroup G // X ∈ partn.parts} := inferInstance
+  have hdomain_sigma :
+      Nat.card domain =
+        ∑ X : {X : Subgroup G // X ∈ partn.parts}, Nat.card {x : X.1 // x ≠ 1} := by
+    rw [Nat.card_sigma]
+  have hdomain_const :
+      Nat.card domain = partn.parts.card * (c - 1) := by
+    calc
+      Nat.card domain
+          = ∑ X : {X : Subgroup G // X ∈ partn.parts},
+              Nat.card {x : X.1 // x ≠ 1} := hdomain_sigma
+      _ = ∑ _X : {X : Subgroup G // X ∈ partn.parts}, (c - 1) := by
+        refine Finset.sum_congr rfl ?_
+        intro X _hX
+        rw [card_ne_one_subtype (G := X.1), hcard X.1 X.2]
+      _ = Fintype.card {X : Subgroup G // X ∈ partn.parts} * (c - 1) := by
+        simp
+      _ = partn.parts.card * (c - 1) := by
+        rw [Fintype.card_coe partn.parts]
+  have hbij : Function.Bijective partn.nonidentitySigmaTo :=
+    ⟨partn.nonidentitySigmaTo_injective, partn.nonidentitySigmaTo_surjective⟩
+  have hdomain_codomain : Nat.card domain = Nat.card codomain :=
+    Nat.card_congr (Equiv.ofBijective partn.nonidentitySigmaTo hbij)
+  rw [hdomain_const, card_ne_one_subtype (G := G)] at hdomain_codomain
+  exact hdomain_codomain
+
+/-- The textbook partition of an elementary abelian group of order `p^2`: its parts are all
+subgroups of order `p`. -/
+noncomputable def elementaryAbelianPrimeSquare
+    {G : Type*} [Group G] [Finite G] {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p G) (hCard : Nat.card G = p ^ 2) :
+    SubgroupPartition G where
+  parts := subgroupsOfCard G p
+  nontrivial := by
+    intro X hX hX_bot
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hp_eq_one : p = 1 := by
+      rw [← hX_card, hX_bot, Subgroup.card_bot]
+    exact hp.ne_one hp_eq_one
+  proper := by
+    intro X hX hX_top
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hp_eq_sq : p = p ^ 2 := by
+      calc p = Nat.card X := hX_card.symm
+        _ = Nat.card G := by rw [hX_top, Subgroup.card_top]
+        _ = p ^ 2 := hCard
+    have hp_lt_sq : p < p ^ 2 := by
+      nth_rewrite 1 [← pow_one p]
+      exact pow_lt_pow_right₀ hp.one_lt (by norm_num : (1 : ℕ) < 2)
+    exact (ne_of_lt hp_lt_sq) hp_eq_sq
+  cover := by
+    haveI : Fact p.Prime := ⟨hp⟩
+    intro g
+    by_cases hg : g = 1
+    · have hCard_gt_one : 1 < Nat.card G := by
+        rw [hCard]
+        exact one_lt_pow₀ hp.one_lt two_ne_zero
+      haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
+      obtain ⟨x, hx_ne⟩ := exists_ne (1 : G)
+      let X : Subgroup G := Subgroup.zpowers x
+      have hX_card : Nat.card X = p := by
+        rw [show X = Subgroup.zpowers x from rfl, Nat.card_zpowers,
+          orderOf_eq_prime (hElem.pow_eq_one x) hx_ne]
+      refine ⟨X, mem_subgroupsOfCard.mpr hX_card, ?_⟩
+      rw [hg]
+      exact X.one_mem
+    · let X : Subgroup G := Subgroup.zpowers g
+      have hX_card : Nat.card X = p := by
+        rw [show X = Subgroup.zpowers g from rfl, Nat.card_zpowers,
+          orderOf_eq_prime (hElem.pow_eq_one g) hg]
+      exact ⟨X, mem_subgroupsOfCard.mpr hX_card, Subgroup.mem_zpowers g⟩
+  inf_eq_bot_of_ne := by
+    intro X Y hX hY hXY
+    have hX_card : Nat.card X = p := mem_subgroupsOfCard.mp hX
+    have hY_card : Nat.card Y = p := mem_subgroupsOfCard.mp hY
+    by_contra hInf_ne
+    have hInf_gt_one : 1 < Nat.card (X ⊓ Y : Subgroup G) := by
+      have hpos : 0 < Nat.card (X ⊓ Y : Subgroup G) := Nat.card_pos
+      have hne_one : Nat.card (X ⊓ Y : Subgroup G) ≠ 1 := by
+        intro hcard
+        exact hInf_ne (Subgroup.eq_bot_of_card_eq (X ⊓ Y : Subgroup G) hcard)
+      omega
+    have hInf_dvd_X : Nat.card (X ⊓ Y : Subgroup G) ∣ Nat.card X :=
+      Subgroup.card_dvd_of_le inf_le_left
+    have hInf_card : Nat.card (X ⊓ Y : Subgroup G) = p := by
+      rw [hX_card] at hInf_dvd_X
+      rcases (Nat.dvd_prime hp).mp hInf_dvd_X with h | h
+      · exact False.elim ((not_lt_of_ge (le_of_eq h)) hInf_gt_one)
+      · exact h
+    have hInf_eq_X : X ⊓ Y = X := by
+      apply Subgroup.eq_of_le_of_card_ge inf_le_left
+      rw [hX_card, hInf_card]
+    have hX_le_Y : X ≤ Y := by
+      intro x hx
+      have hxInf : x ∈ X ⊓ Y := by simpa [hInf_eq_X] using hx
+      exact hxInf.2
+    have hXY_eq : X = Y := by
+      apply Subgroup.eq_of_le_of_card_ge hX_le_Y
+      rw [hX_card, hY_card]
+    exact hXY hXY_eq
+
+/-- The elementary abelian `p^2` partition has the textbook cardinality `p + 1`. -/
+theorem elementaryAbelianPrimeSquare_parts_card
+    {G : Type*} [Group G] [Finite G] {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p G) (hCard : Nat.card G = p ^ 2) :
+    (elementaryAbelianPrimeSquare hp hElem hCard).parts.card = p + 1 := by
+  let partn := elementaryAbelianPrimeSquare hp hElem hCard
+  have hcount :
+      partn.parts.card * (p - 1) = Nat.card G - 1 :=
+    parts_card_mul_sub_one_eq_card_sub_one (partn := partn)
+      (fun X hX => mem_subgroupsOfCard.mp hX)
+  have hfactor : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    simpa using (Nat.sq_sub_sq p 1)
+  have hmul : partn.parts.card * (p - 1) = (p + 1) * (p - 1) := by
+    rw [hcount, hCard, hfactor]
+  exact Nat.eq_of_mul_eq_mul_right (Nat.sub_pos_of_lt hp.one_lt) hmul
+
+end SubgroupPartition
+
+/-- Fixed points of the subgroup `H` under an action encoded by `φ : A →* MulAut U`. -/
+def actionFixedPoints {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) (H : Subgroup A) : Subgroup U :=
+  Subgroup.fixedPointsOfMulAut (φ.comp H.subtype)
+
+@[simp]
+theorem mem_actionFixedPoints {A U : Type*} [Group A] [Group U]
+    {φ : A →* MulAut U} {H : Subgroup A} {u : U} :
+    u ∈ actionFixedPoints φ H ↔ ∀ h : H, (φ h) u = u :=
+  Iff.rfl
+
+/-- Fixed points of a single acting element, i.e. the action-centralizer `C_U(a)`. -/
+def actionFixedBy {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) (a : A) : Subgroup U where
+  carrier := {u | (φ a) u = u}
+  one_mem' := map_one (φ a)
+  mul_mem' := by
+    intro u v hu hv
+    change (φ a) (u * v) = u * v
+    rw [map_mul, hu, hv]
+  inv_mem' := by
+    intro u hu
+    change (φ a) u⁻¹ = u⁻¹
+    rw [map_inv, hu]
+
+@[simp]
+theorem mem_actionFixedBy {A U : Type*} [Group A] [Group U]
+    {φ : A →* MulAut U} {a : A} {u : U} :
+    u ∈ actionFixedBy φ a ↔ (φ a) u = u :=
+  Iff.rfl
+
+/-- The centralizer of an element equals the fixed subgroup of its cyclic closure. -/
+theorem actionFixedBy_eq_actionFixedPoints_zpowers
+    {A U : Type*} [Group A] [Group U] (φ : A →* MulAut U) (a : A) :
+    actionFixedBy φ a = actionFixedPoints φ (Subgroup.zpowers a) := by
+  ext u
+  constructor
+  · intro hu h
+    have hh : (h : A) ∈ Subgroup.closure ({a} : Set A) := by
+      simpa [Subgroup.zpowers_eq_closure] using h.property
+    refine Subgroup.closure_induction
+      (p := fun b _ => (φ b) u = u) ?mem ?one ?mul ?inv hh
+    · intro b hb
+      rw [Set.mem_singleton_iff.mp hb]
+      exact hu
+    · simp
+    · intro b c _ _ hb hc
+      simp [map_mul, hc, hb]
+    · intro b _ hb
+      calc
+        (φ b⁻¹) u = (φ b)⁻¹ u := by rw [map_inv]
+        _ = (φ b)⁻¹ ((φ b) u) := by rw [hb]
+        _ = u := by simp
+  · intro hu
+    exact hu ⟨a, Subgroup.mem_zpowers a⟩
+
+/-- `K = ⟨ C_U(a) | 1 ≠ a ∈ A ⟩`, the subgroup generated by all nontrivial
+single-element action-centralizers. This is the subgroup denoted `K` in Isaacs Thm 6.21. -/
+def nontrivialActionFixedByClosure {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) : Subgroup U :=
+  Subgroup.closure {u | ∃ a : A, a ≠ 1 ∧ u ∈ actionFixedBy φ a}
+
+/-- Each nonidentity element's action-centralizer is contained in the generated subgroup `K`. -/
+theorem actionFixedBy_le_nontrivialActionFixedByClosure
+    {A U : Type*} [Group A] [Group U] {φ : A →* MulAut U} {a : A} (ha : a ≠ 1) :
+    actionFixedBy φ a ≤ nontrivialActionFixedByClosure φ := by
+  intro u hu
+  exact Subgroup.subset_closure ⟨a, ha, hu⟩
+
+/-- To show `K ≤ L`, it is enough and necessary to show `C_U(a) ≤ L` for every `a ≠ 1`. -/
+theorem nontrivialActionFixedByClosure_le_iff
+    {A U : Type*} [Group A] [Group U] {φ : A →* MulAut U} {L : Subgroup U} :
+    nontrivialActionFixedByClosure φ ≤ L ↔
+      ∀ a : A, a ≠ 1 → actionFixedBy φ a ≤ L := by
+  constructor
+  · intro h a ha
+    exact (actionFixedBy_le_nontrivialActionFixedByClosure (φ := φ) ha).trans h
+  · intro h
+    rw [nontrivialActionFixedByClosure]
+    exact (Subgroup.closure_le _).mpr (by
+      rintro u ⟨a, ha, hu⟩
+      exact h a ha hu)
+
+/-- If an invariant subgroup satisfies the Isaacs 6.21 generated-centralizer conclusion
+internally, then it lies in the ambient generated-centralizer subgroup. -/
+theorem subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+    {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+    {M : Subgroup N} [MulDistribMulAction A M]
+    (hcompat : ∀ a : A, ∀ m : M, ((a • m : M) : N) = a • (m : N))
+    (hMtop : nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A M) = ⊤) :
+    M ≤ nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) := by
+  let φM : A →* MulAut M := MulDistribMulAction.toMulAut A M
+  let φN : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let K : Subgroup N := nontrivialActionFixedByClosure φN
+  intro n hn
+  let m : M := ⟨n, hn⟩
+  have hm : m ∈ nontrivialActionFixedByClosure φM := by
+    rw [hMtop]
+    exact Subgroup.mem_top m
+  rw [nontrivialActionFixedByClosure] at hm
+  have hmK : (m : N) ∈ K := by
+    refine Subgroup.closure_induction
+      (p := fun (x : M) _ => (x : N) ∈ K) ?mem ?one ?mul ?inv hm
+    · rintro x ⟨a, ha, hx⟩
+      have hxN : a • (x : N) = (x : N) := by
+        have hx' := congrArg (fun y : M => (y : N)) hx
+        simpa [φM, hcompat a x] using hx'
+      exact Subgroup.subset_closure ⟨a, ha, by simpa [φN] using hxN⟩
+    · simp [K]
+    · intro x y _ _ hx hy
+      exact K.mul_mem hx hy
+    · intro x _ hx
+      exact K.inv_mem hx
+  change (m : N) ∈ K
+  exact hmK
+
+/-- If two acting elements commute, the second preserves the fixed subgroup of the first. -/
+theorem actionFixedBy_invariant_of_commute
+    {A U : Type*} [Group A] [Group U] {φ : A →* MulAut U}
+    {a b : A} (hab : a * b = b * a) :
+    ∀ u ∈ actionFixedBy φ a, (φ b) u ∈ actionFixedBy φ a := by
+  intro u hu
+  calc
+    (φ a) ((φ b) u) = (φ (a * b)) u := by simp [map_mul]
+    _ = (φ (b * a)) u := by rw [hab]
+    _ = (φ b) ((φ a) u) := by simp [map_mul]
+    _ = (φ b) u := by rw [hu]
+
+/-- For abelian `A`, Isaacs's subgroup `K = ⟨C_U(a) | a ≠ 1⟩` is invariant under `A`. -/
+theorem nontrivialActionFixedByClosure_invariant_of_commutative
+    {A U : Type*} [Group A] [Group U] [IsMulCommutative A] (φ : A →* MulAut U) :
+    ∀ b : A, ∀ u ∈ nontrivialActionFixedByClosure φ,
+      (φ b) u ∈ nontrivialActionFixedByClosure φ := by
+  intro b u hu
+  rw [nontrivialActionFixedByClosure] at hu ⊢
+  refine Subgroup.closure_induction
+    (p := fun u _ => (φ b) u ∈
+      Subgroup.closure {u | ∃ a : A, a ≠ 1 ∧ u ∈ actionFixedBy φ a})
+    ?mem ?one ?mul ?inv hu
+  · rintro u ⟨a, ha, hu⟩
+    exact Subgroup.subset_closure
+      ⟨a, ha, actionFixedBy_invariant_of_commute (φ := φ) (mul_comm a b) u hu⟩
+  · simp
+  · intro u v _ _ hu hv
+    simpa [map_mul] using Subgroup.mul_mem _ hu hv
+  · intro u _ hu
+    simpa [map_inv] using Subgroup.inv_mem _ hu
+
+/-- If every nonidentity fixed subgroup lies in an invariant normal subgroup `M`, then the
+induced action on `N/M` is Frobenius.
+
+This is the formal "fixed points come from fixed points" step in Isaacs Thm 6.21. -/
+theorem quotient_isFrobeniusAction_of_fixedBy_le
+    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [MulDistribMulAction A N]
+    {M : Subgroup N} [M.Normal]
+    (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M)
+    (hCopAM : Nat.Coprime (Nat.card A) (Nat.card M))
+    (hfixed : ∀ a : A, a ≠ 1 →
+      actionFixedBy (MulDistribMulAction.toMulAut A N) a ≤ M) :
+    @IsFrobeniusAction A (N ⧸ M) _ _
+      (IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM) := by
+  classical
+  letI : MulDistribMulAction A (N ⧸ M) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM
+  intro a ha q hq_ne hfix
+  revert hq_ne hfix
+  refine QuotientGroup.induction_on q ?_
+  intro n hq_ne hfix
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let P : Subgroup A :=
+    { carrier := {b | ∃ m ∈ M, φ b n = n * m}
+      one_mem' := by
+        refine ⟨1, M.one_mem, ?_⟩
+        simp [φ]
+      mul_mem' := by
+        intro b c hb hc
+        rcases hb with ⟨mb, hmb, hb⟩
+        rcases hc with ⟨mc, hmc, hc⟩
+        refine ⟨mb * (φ b) mc, M.mul_mem hmb (hM b mc hmc), ?_⟩
+        calc
+          φ (b * c) n = φ b (φ c n) := by
+            change (b * c) • n = b • c • n
+            rw [mul_smul]
+          _ = φ b (n * mc) := by rw [hc]
+          _ = φ b n * φ b mc := by simp
+          _ = n * (mb * φ b mc) := by rw [hb]; group
+      inv_mem' := by
+        intro b hb
+        rcases hb with ⟨m, hm, hb⟩
+        refine ⟨((φ b⁻¹) m)⁻¹, M.inv_mem (hM b⁻¹ m hm), ?_⟩
+        have hb' : n = φ b⁻¹ n * φ b⁻¹ m := by
+          calc
+            n = φ b⁻¹ (φ b n) := by simp [φ]
+            _ = φ b⁻¹ (n * m) := by rw [hb]
+            _ = φ b⁻¹ n * φ b⁻¹ m := by simp
+        calc
+          φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
+          _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
+  have haP : a ∈ P := by
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
+      simpa [IsFrobeniusAction.invariantQuotientMulDistribMulAction,
+        IsFrobeniusAction.invariantQuotientMulAutHom,
+        IsFrobeniusAction.invariantQuotientMulAut] using hfix
+    have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
+    have hMN : M.Normal := inferInstance
+    have hm : n⁻¹ * (a • n) ∈ M := by
+      rw [← hMN.mem_comm_iff]
+      simpa [div_eq_mul_inv] using hdiv
+    refine ⟨n⁻¹ * (a • n), hm, ?_⟩
+    simp [φ]
+  let C : Subgroup A := Subgroup.zpowers a
+  let φC : C →* MulAut N := φ.comp C.subtype
+  have hC_le_P : C ≤ P := Subgroup.zpowers_le.mpr haP
+  have hM_inv_C : OddOrder.Isaacs.Ch03.IsAInvariant φC M := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro c m hm
+    exact hM (c : A) m hm
+  have hCopCM : Nat.Coprime (Nat.card C) (Nat.card M) :=
+    hCopAM.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
+  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
+  letI : CommGroup C := IsCyclic.commGroup
+  have hSolvC : IsSolvable C ∨ IsSolvable M := Or.inl inferInstance
+  have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
+    intro c
+    simpa [φC] using hC_le_P c.2
+  obtain ⟨x, hx_fixed, hx_coset⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+      (A := C) (G := N) (φ := φC) hCopCM hSolvC hM_inv_C hg_fix_C
+  have hxM : x ∈ M :=
+    hfixed a ha (by
+      have := hx_fixed ⟨a, Subgroup.mem_zpowers a⟩
+      simpa [φC, φ] using this)
+  rcases hx_coset with ⟨m, hm, hx_eq⟩
+  have hnM : n ∈ M := by
+    have hxm : x * m⁻¹ ∈ M := M.mul_mem hxM (M.inv_mem hm)
+    convert hxm using 1
+    rw [hx_eq]
+    group
+  exact hq_ne ((QuotientGroup.eq_one_iff n).mpr hnM)
+
+/-- A subgroup containing the commutator subgroup is normal.
+
+This is the group-theoretic step used in Isaacs Thm 6.21 after proving `N' ≤ K`. -/
+theorem normal_of_commutator_le {G : Type*} [Group G] {K : Subgroup G}
+    (hcomm : _root_.commutator G ≤ K) : K.Normal := by
+  rw [_root_.commutator_def] at hcomm
+  exact (Subgroup.commutator_top_left_le_iff (H := K)).mp
+    ((Subgroup.commutator_mono le_rfl (show K ≤ (⊤ : Subgroup G) from le_top)).trans hcomm)
+
+/-- If `p` divides the index of `K`, no Sylow `p`-subgroup can lie inside `K`. -/
+theorem sylow_not_le_of_prime_dvd_index
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {K : Subgroup G} (hpK : p ∣ K.index) :
+    ¬ (P : Subgroup G) ≤ K := by
+  intro hPK
+  exact P.not_dvd_index (hpK.trans (Subgroup.index_dvd_of_le hPK))
+
+/-- The Sylow step in Isaacs Thm 6.21.
+
+If every proper `A`-invariant subgroup of `N` lies in `K`, and `p ∣ |N : K|`, then the
+`A`-invariant Sylow `p`-subgroup supplied by Isaacs Thm 3.23(a) is all of `N`. -/
+theorem exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [MulDistribMulAction A N]
+    {K : Subgroup N} {p : ℕ} [Fact p.Prime]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hSolv : IsSolvable A ∨ IsSolvable N)
+    (hpK : p ∣ K.index)
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
+    ∃ P : Sylow p N,
+      OddOrder.Isaacs.Ch03.IsAInvariant (MulDistribMulAction.toMulAut A N) (P : Subgroup N) ∧
+        (P : Subgroup N) = ⊤ := by
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  obtain ⟨P, hP_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := N) (A := A) (φ := φ)
+      hCop hSolv p
+  refine ⟨P, hP_inv, ?_⟩
+  by_contra hP_top
+  have hP_smul : ∀ a : A, ∀ n ∈ (P : Subgroup N), a • n ∈ (P : Subgroup N) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem] at hP_inv
+    intro a n hn
+    simpa [φ] using hP_inv a n hn
+  have hP_le_K : (P : Subgroup N) ≤ K :=
+    hproper (P : Subgroup N) hP_smul hP_top
+  exact sylow_not_le_of_prime_dvd_index P hpK hP_le_K
+
+/-- The commutator subgroup is the proper invariant subgroup used in Isaacs Thm 6.21.
+
+In the theorem's p-group case, `N` is solvable, so `N' < N`; invariance is functorial under
+automorphisms. -/
+theorem commutator_le_of_proper_invariant_le_of_isSolvable
+    {A N : Type*} [Group A] [Group N] [Finite N] [Nontrivial N] [IsSolvable N]
+    [MulDistribMulAction A N] {K : Subgroup N}
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
+    _root_.commutator N ≤ K := by
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  have hcomm_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ (_root_.commutator N) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.commutator_self φ
+  have hcomm_smul :
+      ∀ a : A, ∀ n ∈ _root_.commutator N, a • n ∈ _root_.commutator N := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem] at hcomm_inv
+    intro a n hn
+    simpa [φ] using hcomm_inv a n hn
+  exact hproper (_root_.commutator N) hcomm_smul
+    (IsSolvable.commutator_lt_top_of_nontrivial N).ne
+
+/-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
+noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
+  ∏ h : H, (φ h) u
+
+/-- The orbit product over the nonidentity elements of a subgroup. -/
+noncomputable def subgroupNonidentityOrbitProduct
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) : U :=
+  by
+    classical
+    exact ∏ h : {h : H // h ≠ 1}, (φ (h.1 : A)) u
+
+/-- The orbit product over the nonidentity elements of the whole group. -/
+noncomputable def nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) : U :=
+  by
+    classical
+    letI : Fintype A := Fintype.ofFinite A
+    exact ∏ a : {a : A // a ≠ 1}, (φ a.1) u
+
+/-- The orbit product `u_H` is fixed by every element of `H`. -/
+theorem orbitProduct_mem_actionFixedPoints {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) :
+    orbitProduct φ H u ∈ actionFixedPoints φ H := by
+  intro x
+  calc
+    (φ (x : A)) (orbitProduct φ H u)
+        = ∏ h : H, (φ (x : A)) ((φ h) u) := by
+            simp [orbitProduct]
+    _ = ∏ h : H, (φ ((x * h : H) : A)) u := by
+          refine Finset.prod_congr rfl ?_
+          intro h _hh
+          simp [map_mul]
+    _ = ∏ h : H, (φ (h : A)) u := by
+          exact Fintype.prod_equiv (Equiv.mulLeft x)
+            (fun h : H => (φ ((x * h : H) : A)) u)
+            (fun h : H => (φ (h : A)) u)
+            (fun h => rfl)
+
+/-- Split an orbit product into the identity contribution and the nonidentity contributions. -/
+theorem orbitProduct_eq_mul_subgroupNonidentityOrbitProduct
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) :
+    orbitProduct φ H u = u * subgroupNonidentityOrbitProduct φ H u := by
+  classical
+  rw [orbitProduct, subgroupNonidentityOrbitProduct]
+  simpa using Fintype.prod_eq_mul_prod_subtype_ne
+    (fun h : H => (φ (h : A)) u) (1 : H)
+
+/-- Fixed points are antitone in the acting subgroup. -/
+theorem actionFixedPoints_antitone {A U : Type*} [Group A] [Group U]
+    {φ : A →* MulAut U} {H K : Subgroup A} (hHK : H ≤ K) :
+    actionFixedPoints φ K ≤ actionFixedPoints φ H := by
+  intro u hu h
+  exact hu ⟨h, hHK h.property⟩
+
+/-- If the fixed points of `H` are trivial, then Isaacs's orbit product over `H` is `1`. -/
+theorem orbitProduct_eq_one_of_actionFixedPoints_eq_bot
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U)
+    (hH : actionFixedPoints φ H = ⊥) :
+    orbitProduct φ H u = 1 := by
+  have hmem := orbitProduct_mem_actionFixedPoints φ H u
+  have : orbitProduct φ H u ∈ (⊥ : Subgroup U) := by
+    simpa [hH] using hmem
+  simpa using this
+
+/-- The product over all partition parts of the orbit products. -/
+noncomputable def partitionOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U :=
+  ∏ x ∈ partn.parts,
+    (letI : Fintype x := Fintype.ofFinite x
+     orbitProduct φ x u)
+
+/-- The product over all partition parts and all nonidentity elements in those parts. -/
+noncomputable def partitionNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U :=
+  ∏ X ∈ partn.parts,
+    (letI : Fintype X := Fintype.ofFinite X
+     subgroupNonidentityOrbitProduct φ X u)
+
+/-- The same nonidentity product, indexed by the sigma type of partition parts and
+nonidentity elements in each part. The finite instances are supplied internally so callers do
+not need to expose dependent `Fintype` arguments. -/
+noncomputable def partitionSigmaNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) : U := by
+  classical
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  exact ∏ p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}),
+    (φ ((p.2.1 : p.1.1) : A)) u
+
+/-- The partition nonidentity product is the sigma-indexed nonidentity product. -/
+theorem partitionNonidentityOrbitProduct_eq_partitionSigmaNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionNonidentityOrbitProduct φ partn u =
+      partitionSigmaNonidentityOrbitProduct φ partn u := by
+  classical
+  rw [partitionNonidentityOrbitProduct, partitionSigmaNonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  rw [Finset.prod_subtype partn.parts (fun X => Iff.rfl)
+    (fun X : Subgroup A =>
+      (letI : Fintype X := Fintype.ofFinite X
+       subgroupNonidentityOrbitProduct φ X u))]
+  change (∏ X : {X : Subgroup A // X ∈ partn.parts},
+      (letI : Fintype X.1 := Fintype.ofFinite X.1
+       subgroupNonidentityOrbitProduct φ X.1 u)) =
+    ∏ p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}),
+      (φ ((p.2.1 : p.1.1) : A)) u
+  simpa [subgroupNonidentityOrbitProduct] using
+    (Fintype.prod_sigma
+      (fun p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) =>
+        (φ ((p.2.1 : p.1.1) : A)) u)).symm
+
+/-- The sigma-indexed nonidentity product over a partition is the ordinary nonidentity product:
+nonidentity elements occur in exactly one partition part. -/
+theorem partitionSigmaNonidentityOrbitProduct_eq_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionSigmaNonidentityOrbitProduct φ partn u =
+      nonidentityOrbitProduct φ u := by
+  classical
+  rw [partitionSigmaNonidentityOrbitProduct, nonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+    fun X => Fintype.ofFinite X.1
+  letI :
+      ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
+    fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
+  exact Fintype.prod_bijective partn.nonidentitySigmaTo
+    ⟨partn.nonidentitySigmaTo_injective, partn.nonidentitySigmaTo_surjective⟩
+    (fun p : (Σ X : {X : Subgroup A // X ∈ partn.parts}, {x : X.1 // x ≠ 1}) =>
+      (φ ((p.2.1 : p.1.1) : A)) u)
+    (fun a : {a : A // a ≠ 1} => (φ a.1) u)
+    (fun _ => rfl)
+
+/-- The nonidentity factors over a subgroup partition multiply to the nonidentity factors over
+the whole group. -/
+theorem partitionNonidentityOrbitProduct_eq_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionNonidentityOrbitProduct φ partn u =
+      nonidentityOrbitProduct φ u := by
+  rw [partitionNonidentityOrbitProduct_eq_partitionSigmaNonidentityOrbitProduct φ partn u,
+    partitionSigmaNonidentityOrbitProduct_eq_nonidentityOrbitProduct φ partn u]
+
+/-- The orbit product over the top subgroup, with the finite instance supplied from `A`. -/
+noncomputable def topOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) : U :=
+  letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+  orbitProduct φ (⊤ : Subgroup A) u
+
+/-- Split the top orbit product into the identity contribution and nonidentity contributions. -/
+theorem topOrbitProduct_eq_mul_nonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (u : U) :
+    topOrbitProduct φ u = u * nonidentityOrbitProduct φ u := by
+  classical
+  rw [topOrbitProduct, orbitProduct, nonidentityOrbitProduct]
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+  calc
+    (∏ h : (⊤ : Subgroup A), (φ (h : A)) u)
+        = ∏ a : A, (φ a) u := by
+            exact Fintype.prod_equiv Subgroup.topEquiv.toEquiv
+              (fun h : (⊤ : Subgroup A) => (φ (h : A)) u)
+              (fun a : A => (φ a) u)
+              (fun _ => rfl)
+    _ = u * ∏ a : {a : A // a ≠ 1}, (φ a.1) u := by
+          simpa using Fintype.prod_eq_mul_prod_subtype_ne
+            (fun a : A => (φ a) u) (1 : A)
+
+/-- Split the partition product into the identity contributions and the nonidentity
+contributions. -/
+theorem partitionOrbitProduct_eq_pow_mul_partitionNonidentityOrbitProduct
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionOrbitProduct φ partn u =
+      u ^ partn.parts.card * partitionNonidentityOrbitProduct φ partn u := by
+  classical
+  rw [partitionOrbitProduct, partitionNonidentityOrbitProduct]
+  calc
+    (∏ X ∈ partn.parts,
+      (letI : Fintype X := Fintype.ofFinite X
+       orbitProduct φ X u))
+        = ∏ X ∈ partn.parts,
+            (u *
+              (letI : Fintype X := Fintype.ofFinite X
+               subgroupNonidentityOrbitProduct φ X u)) := by
+            refine Finset.prod_congr rfl ?_
+            intro X hX
+            letI : Fintype X := Fintype.ofFinite X
+            exact orbitProduct_eq_mul_subgroupNonidentityOrbitProduct φ X u
+    _ = (∏ X ∈ partn.parts, u) *
+          ∏ X ∈ partn.parts,
+            (letI : Fintype X := Fintype.ofFinite X
+             subgroupNonidentityOrbitProduct φ X u) := by
+            simp_rw [Finset.prod_mul_distrib]
+    _ = u ^ partn.parts.card *
+          ∏ X ∈ partn.parts,
+            (letI : Fintype X := Fintype.ofFinite X
+             subgroupNonidentityOrbitProduct φ X u) := by
+            simp
+
+/-- Isaacs 6.8 counting identity for orbit products over a subgroup partition. -/
+theorem partitionOrbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U) :
+    partitionOrbitProduct φ partn u =
+      topOrbitProduct φ u * u ^ (partn.parts.card - 1) := by
+  classical
+  have hcard : partn.parts.card = partn.parts.card.pred.succ :=
+    (Nat.succ_pred_eq_of_pos partn.parts_card_pos).symm
+  have hpow : u ^ partn.parts.card = u * u ^ (partn.parts.card - 1) := by
+    calc
+      u ^ partn.parts.card
+          = u ^ partn.parts.card.pred.succ := by
+              exact congrArg (fun n => u ^ n) hcard
+      _ = u ^ partn.parts.card.pred * u := by
+            rw [pow_succ]
+      _ = u ^ (partn.parts.card - 1) * u := by
+            rw [Nat.pred_eq_sub_one]
+      _ = u * u ^ (partn.parts.card - 1) := by
+            rw [mul_comm]
+  calc
+    partitionOrbitProduct φ partn u
+        = u ^ partn.parts.card * partitionNonidentityOrbitProduct φ partn u := by
+            exact partitionOrbitProduct_eq_pow_mul_partitionNonidentityOrbitProduct φ partn u
+    _ = u ^ partn.parts.card * nonidentityOrbitProduct φ u := by
+          rw [partitionNonidentityOrbitProduct_eq_nonidentityOrbitProduct φ partn u]
+    _ = (u * u ^ (partn.parts.card - 1)) * nonidentityOrbitProduct φ u := by
+          rw [hpow]
+    _ = (u * nonidentityOrbitProduct φ u) * u ^ (partn.parts.card - 1) := by
+          ac_rfl
+    _ = topOrbitProduct φ u * u ^ (partn.parts.card - 1) := by
+          rw [← topOrbitProduct_eq_mul_nonidentityOrbitProduct φ u]
+
+/-- If every partition part has trivial fixed points, then every part orbit product is `1`. -/
+theorem partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A) (u : U)
+    (hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥) :
+    partitionOrbitProduct φ partn u = 1 := by
+  classical
+  rw [partitionOrbitProduct, Finset.prod_eq_one]
+  intro X hX
+  letI : Fintype X := Fintype.ofFinite X
+  exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ X u (hfix X hX)
+
+/-- If every partition part has trivial fixed points, then the full fixed-point subgroup is
+trivial. -/
+theorem actionFixedPoints_top_eq_bot_of_parts_fixedPoints_eq_bot
+    {A U : Type*} [Group A] [Group U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    (hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥) :
+    actionFixedPoints φ (⊤ : Subgroup A) = ⊥ := by
+  apply eq_bot_iff.mpr
+  intro u hu
+  obtain ⟨X, hX, _h1X⟩ := partn.cover (1 : A)
+  have huX : u ∈ actionFixedPoints φ X :=
+    actionFixedPoints_antitone (show X ≤ (⊤ : Subgroup A) from le_top) hu
+  simpa [hfix X hX] using huX
+
+/-- Once the Isaacs 6.8 counting identity is known, some part has nontrivial fixed points.
+
+This packages the non-counting half of Lemma 6.8: assuming the product identity
+`∏_{X∈Π} u_X = u_A * u^(|Π|-1)`, any `u` with `u^(|Π|-1) ≠ 1` forces a partition
+part whose action on `U` has nontrivial fixed points. -/
+theorem exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct φ partn u =
+        topOrbitProduct φ u * u ^ (partn.parts.card - 1))
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    ∃ X, X ∈ partn.parts ∧ actionFixedPoints φ X ≠ ⊥ := by
+  by_contra hnone
+  have hfix : ∀ X, X ∈ partn.parts → actionFixedPoints φ X = ⊥ := by
+    intro X hX
+    by_contra hne
+    exact hnone ⟨X, hX, hne⟩
+  have hprod :
+      partitionOrbitProduct φ partn u = 1 :=
+    partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot φ partn u hfix
+  have htop :
+      actionFixedPoints φ (⊤ : Subgroup A) = ⊥ :=
+    actionFixedPoints_top_eq_bot_of_parts_fixedPoints_eq_bot φ partn hfix
+  have htop_one :
+      topOrbitProduct φ u = 1 := by
+    rw [topOrbitProduct]
+    letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+    exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ (⊤ : Subgroup A) u htop
+  have hident := hidentity u
+  rw [hprod, htop_one, one_mul] at hident
+  exact hu hident.symm
+
+/-- Isaacs Lemma 6.8: if `A` is partitioned by proper nonidentity subgroups and
+`u^(|Π|-1) ≠ 1`, then some partition part has nontrivial fixed points on `U`. -/
+theorem exists_part_actionFixedPoints_ne_bot
+    {A U : Type*} [Group A] [Finite A] [CommGroup U]
+    (φ : A →* MulAut U) (partn : SubgroupPartition A)
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    ∃ X, X ∈ partn.parts ∧ actionFixedPoints φ X ≠ ⊥ :=
+  exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity φ partn
+    (fun u => partitionOrbitProduct_identity φ partn u) hu
+
+/-- A nontrivial acting subgroup has trivial fixed points under a Frobenius action. -/
+theorem actionFixedPoints_eq_bot_of_isFrobeniusAction
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {H : Subgroup A} (hH : H ≠ ⊥) :
+    actionFixedPoints (MulDistribMulAction.toMulAut A U) H = ⊥ := by
+  apply eq_bot_iff.mpr
+  intro u hu
+  by_contra hu_ne
+  obtain ⟨a, haH, ha_ne⟩ : ∃ a : A, a ∈ H ∧ a ≠ 1 := by
+    by_contra hnone
+    push Not at hnone
+    apply hH
+    ext a
+    constructor
+    · intro ha
+      rw [hnone a ha]
+      exact Subgroup.one_mem ⊥
+    · intro ha
+      rw [Subgroup.mem_bot] at ha
+      rw [ha]
+      exact H.one_mem
+  have hfix := hu ⟨a, haH⟩
+  have hsmul : a • u = u := by
+    simpa using hfix
+  exact hFrob a ha_ne u hu_ne hsmul
+
+/-- In a finite group, an element whose order is coprime to `n` cannot satisfy `u ^ n = 1`. -/
+theorem pow_ne_one_of_ne_one_of_coprime_natCard
+    {U : Type*} [Group U] [Finite U] {n : ℕ}
+    (hcop : n.Coprime (Nat.card U)) {u : U} (hu : u ≠ 1) :
+    u ^ n ≠ 1 := by
+  intro hpow
+  have horder_n : orderOf u ∣ n := orderOf_dvd_of_pow_eq_one hpow
+  have horder_card : orderOf u ∣ Nat.card U := orderOf_dvd_natCard u
+  have horder_eq_one : orderOf u = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop.symm horder_card horder_n
+  exact hu (orderOf_eq_one_iff.mp horder_eq_one)
+
+/-- A nontrivial finite group has an element with `u ^ n ≠ 1` whenever `n` is coprime to
+its order. -/
+theorem exists_pow_ne_one_of_nontrivial_coprime_natCard
+    {U : Type*} [Group U] [Finite U] [Nontrivial U] {n : ℕ}
+    (hcop : n.Coprime (Nat.card U)) :
+    ∃ u : U, u ^ n ≠ 1 := by
+  obtain ⟨u, hu⟩ := exists_ne (1 : U)
+  exact ⟨u, pow_ne_one_of_ne_one_of_coprime_natCard hcop hu⟩
+
+/-- Lemma 6.8 immediately contradicts a Frobenius action once the counting identity supplies
+a suitable element. -/
+theorem false_of_frobeniusAction_orbitProduct_identity
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct (MulDistribMulAction.toMulAut A U) partn u =
+        topOrbitProduct (MulDistribMulAction.toMulAut A U) u * u ^ (partn.parts.card - 1))
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    False := by
+  obtain ⟨X, hX, hXfix_ne⟩ :=
+    exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
+      (MulDistribMulAction.toMulAut A U) partn hidentity hu
+  have hXfix_eq :
+      actionFixedPoints (MulDistribMulAction.toMulAut A U) X = ⊥ :=
+    actionFixedPoints_eq_bot_of_isFrobeniusAction hFrob (partn.nontrivial X hX)
+  exact hXfix_ne hXfix_eq
+
+/-- Lemma 6.8 rules out a Frobenius action whenever a subgroup partition has a part-count
+exponent detected by some element of `U`. -/
+theorem false_of_frobeniusAction_partition_of_nontrivial_power
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    {u : U} (hu : u ^ (partn.parts.card - 1) ≠ 1) :
+    False :=
+  false_of_frobeniusAction_orbitProduct_identity hFrob partn
+    (fun u => partitionOrbitProduct_identity (MulDistribMulAction.toMulAut A U) partn u) hu
+
+/-- Lemma 6.8 in the coprime form used in Theorem 6.9. -/
+theorem false_of_frobeniusAction_partition_identity_of_coprime_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hidentity : ∀ u : U,
+      partitionOrbitProduct (MulDistribMulAction.toMulAut A U) partn u =
+        topOrbitProduct (MulDistribMulAction.toMulAut A U) u * u ^ (partn.parts.card - 1))
+    (hcop : (partn.parts.card - 1).Coprime (Nat.card U)) :
+    False := by
+  obtain ⟨u, hu⟩ :=
+    exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
+  exact false_of_frobeniusAction_orbitProduct_identity hFrob partn hidentity hu
+
+/-- Lemma 6.8 in the coprime form used in Theorem 6.9, with the counting identity discharged. -/
+theorem false_of_frobeniusAction_partition_of_coprime_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hcop : (partn.parts.card - 1).Coprime (Nat.card U)) :
+    False := by
+  obtain ⟨u, hu⟩ :=
+    exists_pow_ne_one_of_nontrivial_coprime_natCard (U := U) hcop
+  exact false_of_frobeniusAction_partition_of_nontrivial_power hFrob partn hu
+
+/-- Isaacs Theorem 6.9 contradiction package: if the acting group has a subgroup partition
+whose part count is `1 + n` with `n ∣ |A|`, then it cannot act Frobeniusly on a nontrivial
+finite abelian group. -/
+theorem false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A)
+    (hdvd : partn.parts.card - 1 ∣ Nat.card A) :
+    False := by
+  have hcop_AU : (Nat.card A).Coprime (Nat.card U) := by
+    classical
+    haveI : Fintype A := Fintype.ofFinite A
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Fintype.card_eq_nat_card] using
+      (IsFrobeniusAction.coprime_card (A := A) (N := U) hFrob).symm
+  exact false_of_frobeniusAction_partition_of_coprime_card hFrob partn
+    (hcop_AU.coprime_dvd_left hdvd)
+
+/-- Same contradiction package, in the textual `|Π| = 1 + n` form used in Isaacs 6.9. -/
+theorem false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (partn : SubgroupPartition A) {n : ℕ}
+    (hcard : partn.parts.card = n + 1) (hdvd : n ∣ Nat.card A) :
+    False := by
+  apply false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card hFrob partn
+  rwa [hcard, Nat.add_sub_cancel]
+
+/-- Subgroup form of the Isaacs 6.9 contradiction package: a subgroup of the acting group with
+such a partition already contradicts a Frobenius action of the ambient group. -/
+theorem false_of_frobeniusAction_actorSubgroup_partition_of_sub_one_dvd_actor_card
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    (partn : SubgroupPartition B) (hdvd : partn.parts.card - 1 ∣ Nat.card B) :
+    False :=
+  false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card
+    (IsFrobeniusAction.actorSubgroup hFrob B) partn hdvd
+
+/-- Subgroup form of the Isaacs 6.9 contradiction package, with `|Π| = 1 + n`. -/
+theorem false_of_frobeniusAction_actorSubgroup_partition_of_card_eq_succ_and_dvd_actor_card
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    (partn : SubgroupPartition B) {n : ℕ}
+    (hcard : partn.parts.card = n + 1) (hdvd : n ∣ Nat.card B) :
+    False :=
+  false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    (IsFrobeniusAction.actorSubgroup hFrob B) partn hcard hdvd
+
+/-- **Isaacs Thm 6.9**: a Frobenius actor cannot be elementary abelian of order `p^2`. -/
+theorem false_of_frobeniusAction_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p A) (hCard : Nat.card A = p ^ 2) :
+    False := by
+  let partn := SubgroupPartition.elementaryAbelianPrimeSquare hp hElem hCard
+  have hparts :
+      partn.parts.card = p + 1 :=
+    SubgroupPartition.elementaryAbelianPrimeSquare_parts_card hp hElem hCard
+  have hdvd : p ∣ Nat.card A := by
+    rw [hCard, pow_two]
+    exact dvd_mul_right p p
+  exact false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    hFrob partn hparts hdvd
+
+/-- Subgroup form of Isaacs Thm 6.9: an elementary abelian `p^2` subgroup cannot occur in a
+Frobenius actor. -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2) :
+    False :=
+  false_of_frobeniusAction_isElementaryAbelian_card_prime_sq
+    (IsFrobeniusAction.actorSubgroup hFrob B) hp hElem hCard
+
+end
+
+section /- 6B structural helper: finite abelian Z-groups -/
+
+/-! ### Finite abelian Z-group helpers
+
+Isaacs Lemma 6.20 uses Corollary 6.17 to show that the Sylow subgroups of an abelian
+Frobenius complement are cyclic, and then concludes that the complement itself is cyclic.
+Mathlib packages the Sylow-cyclic condition as `IsZGroup`; these helpers expose exactly the
+abelian specialization needed for the 6.20 route. -/
+
+/-- A finite abelian group whose Sylow subgroups are all cyclic is cyclic. -/
+theorem isCyclic_of_sylow_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hSylow : ∀ p : ℕ, p.Prime → ∀ P : Sylow p A, IsCyclic P) :
+    IsCyclic A := by
+  haveI : IsZGroup A := ⟨hSylow⟩
+  exact inferInstance
+
+/-- If a finite abelian group is not cyclic, then some Sylow subgroup is not cyclic. -/
+theorem exists_prime_sylow_not_isCyclic_of_not_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hA : ¬ IsCyclic A) :
+    ∃ p : ℕ, p.Prime ∧ ∃ P : Sylow p A, ¬ IsCyclic P := by
+  by_contra hnone
+  apply hA
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    by_contra hP
+    exact hnone ⟨p, hp, P, hP⟩
 
 end
 
@@ -1200,7 +2340,747 @@ theorem centralizer_kernel_le [Finite G] (h : IsFrobeniusGroup G N A) :
       _ = m := mul_inv_cancel_right m a
   exact h.conj_frobenius a haA ha_ne m hmN hm_ne h_am
 
+open scoped Pointwise
+
+/-- In a Frobenius group, the kernel has trivial intersection with every conjugate of the
+complement. This is the `N ∩ A^g = 1` part used in the partition construction of §6B. -/
+theorem disjoint_kernel_conjugate_complement (h : IsFrobeniusGroup G N A) (g : G) :
+    Disjoint N (MulAut.conj g • A : Subgroup G) := by
+  rw [Subgroup.disjoint_def]
+  intro x hxN hxAconj
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hxAconj
+  have haN : (MulAut.conj g)⁻¹ x ∈ N := by
+    have hx_conj_N := h.isNormal.conj_mem x hxN g⁻¹
+    change (MulAut.conj g).symm x ∈ N
+    simpa [MulAut.conj_symm_apply] using hx_conj_N
+  have hdisj : Disjoint N A := h.isComplement.disjoint
+  have ha_one : (MulAut.conj g)⁻¹ x = 1 :=
+    Subgroup.disjoint_def.mp hdisj haN hxAconj
+  have hx_one : x = 1 := by
+    have hraw : g⁻¹ * x * g = 1 := by
+      simpa [MulAut.conj_symm_apply] using ha_one
+    calc
+      x = g * (g⁻¹ * x * g) * g⁻¹ := by group
+      _ = 1 := by
+        rw [hraw]
+        group
+  exact hx_one
+
 end IsFrobeniusGroup
+
+namespace SubgroupPartition
+
+open scoped Pointwise
+
+variable {G : Type*} [Group G]
+
+private theorem exists_ne_one_mem_of_ne_bot {H : Subgroup G} (hH : H ≠ ⊥) :
+    ∃ x : G, x ∈ H ∧ x ≠ 1 := by
+  by_contra hnone
+  push Not at hnone
+  apply hH
+  exact (Subgroup.eq_bot_iff_forall H).mpr fun x hx => hnone x hx
+
+private noncomputable def conjugatesFinset [Finite G] (A : Subgroup G) :
+    Finset (Subgroup G) := by
+  classical
+  exact (Set.finite_range (fun g : G => MulAut.conj g • A)).toFinset
+
+private theorem mem_conjugatesFinset [Finite G] {A B : Subgroup G} :
+    B ∈ conjugatesFinset A ↔ ∃ g : G, B = MulAut.conj g • A := by
+  classical
+  unfold conjugatesFinset
+  rw [Set.Finite.mem_toFinset, Set.mem_range]
+  constructor
+  · rintro ⟨g, rfl⟩
+    exact ⟨g, rfl⟩
+  · rintro ⟨g, rfl⟩
+    exact ⟨g, rfl⟩
+
+private theorem conjugatesFinset_card_eq_index [Finite G] {A : Subgroup G}
+    (hA_ne : A ≠ ⊥)
+    (hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
+    (conjugatesFinset A).card = A.index := by
+  classical
+  have hcard :=
+    Set.ncard_eq_toFinset_card
+      (Set.range (fun g : G => MulAut.conj g • A)) (Set.finite_range _)
+  rw [conjugatesFinset, ← hcard]
+  exact ncard_conjugates_eq_index_of_TI hA_ne hTI
+
+/-- Isaacs §6B partition attached to a Frobenius group: the kernel together with all conjugates
+of the complement. -/
+noncomputable def frobeniusGroup [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) :
+    SubgroupPartition G where
+  parts := by
+    classical
+    exact insert N (conjugatesFinset A)
+  nontrivial := by
+    classical
+    intro X hX hX_bot
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · apply h.ne_bot_kernel
+      rw [← hXN]
+      exact hX_bot
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      obtain ⟨a, haA, ha_ne⟩ := exists_ne_one_mem_of_ne_bot h.ne_bot_complement
+      apply ha_ne
+      have hmem_conj : MulAut.conj g a ∈ (MulAut.conj g • A : Subgroup G) := by
+        simpa using Subgroup.smul_mem_pointwise_smul a (MulAut.conj g) A haA
+      have hmem : MulAut.conj g a ∈ (⊥ : Subgroup G) := by
+        simpa [hX_bot] using hmem_conj
+      rw [Subgroup.mem_bot] at hmem
+      have ha_one : a = 1 := by
+        have hraw : g⁻¹ * (g * a * g⁻¹) * g = 1 := by
+          simpa [MulAut.conj_apply, MulAut.conj_symm_apply] using
+            congrArg (MulAut.conj g).symm hmem
+        calc
+          a = g⁻¹ * (g * a * g⁻¹) * g := by group
+          _ = 1 := hraw
+      exact ha_one
+  proper := by
+    classical
+    intro X hX hX_top
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · apply h.ne_bot_complement
+      exact (Subgroup.eq_bot_iff_forall A).mpr fun a haA => by
+        have haN : a ∈ N := by
+          rw [← hXN, hX_top]
+          exact Subgroup.mem_top a
+        exact Subgroup.disjoint_def.mp h.isComplement.disjoint haN haA
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      apply h.ne_bot_kernel
+      exact (Subgroup.eq_bot_iff_forall N).mpr fun n hnN => by
+        have hnAconj : n ∈ (MulAut.conj g • A : Subgroup G) := by
+          rw [hX_top]
+          exact Subgroup.mem_top n
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hnN hnAconj
+  cover := by
+    classical
+    intro x
+    by_cases hxN : x ∈ N
+    · exact ⟨N, Finset.mem_insert_self _ _, hxN⟩
+    · have hkernel := h.kernel_eq_notConjugateSet
+      have hx_not : x ∉ notConjugateSet A := by
+        intro hx
+        have hxN' : x ∈ (N : Set G) := by
+          rw [hkernel]
+          exact hx
+        exact hxN hxN'
+      simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hx_not
+      obtain ⟨a, haA, ha_ne, hconj⟩ := hx_not
+      rw [isConj_iff] at hconj
+      obtain ⟨g, hgax⟩ := hconj
+      refine ⟨MulAut.conj g • A, ?_, ?_⟩
+      · exact Finset.mem_insert.mpr (Or.inr (mem_conjugatesFinset.mpr ⟨g, rfl⟩))
+      · rw [← hgax]
+        simpa using Subgroup.smul_mem_pointwise_smul a (MulAut.conj g) A haA
+  inf_eq_bot_of_ne := by
+    classical
+    intro X Y hX hY hXY
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · rcases Finset.mem_insert.mp hY with hYN | hY
+      · exact False.elim (hXY (hXN.trans hYN.symm))
+      · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hY
+        rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_inf] at hx
+        have hxN : x ∈ N := by
+          rw [← hXN]
+          exact hx.1
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hxN hx.2
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      rcases Finset.mem_insert.mp hY with hYN | hY
+      · rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_inf] at hx
+        have hxN : x ∈ N := by
+          rw [← hYN]
+          exact hx.2
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hxN hx.1
+      · obtain ⟨k, rfl⟩ := mem_conjugatesFinset.mp hY
+        have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
+          intro g hg
+          simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+        exact TI_conjugate hTI g k hXY
+
+/-- The Frobenius-group partition has cardinality `1 + |N|`, where `N` is the kernel. -/
+theorem frobeniusGroup_parts_card [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) :
+    (frobeniusGroup h).parts.card = Nat.card N + 1 := by
+  classical
+  have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
+    intro g hg
+    simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+  have hN_not_mem : N ∉ conjugatesFinset A := by
+    intro hNmem
+    obtain ⟨g, hNg⟩ := mem_conjugatesFinset.mp hNmem
+    apply h.ne_bot_kernel
+    exact (Subgroup.eq_bot_iff_forall N).mpr fun n hnN => by
+      have hnAconj : n ∈ (MulAut.conj g • A : Subgroup G) := by
+        rw [← hNg]
+        exact hnN
+      exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hnN hnAconj
+  have hindex : A.index = Nat.card N := by
+    have hn : Nat.card N = (N : Set G).ncard := by
+      simpa using (Nat.card_coe_set_eq (N : Set G))
+    rw [hn, h.isComplement.ncard_left]
+  rw [frobeniusGroup, Finset.card_insert_of_notMem hN_not_mem,
+    conjugatesFinset_card_eq_index h.ne_bot_complement hTI, hindex]
+
+end SubgroupPartition
+
+/-- **Isaacs Thm 6.9** (Frobenius-group branch, abelian target): a Frobenius actor cannot
+itself be a Frobenius group.  The proof uses the §6B partition by the kernel and conjugates of
+the complement, whose part count is `1 + |N|`. -/
+theorem false_of_frobeniusAction_isFrobeniusGroup_on_abelian
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    {N C : Subgroup A} (hGroup : IsFrobeniusGroup A N C) :
+    False := by
+  let partn := SubgroupPartition.frobeniusGroup hGroup
+  have hparts :
+      partn.parts.card = Nat.card N + 1 :=
+    SubgroupPartition.frobeniusGroup_parts_card hGroup
+  have hdvd : Nat.card N ∣ Nat.card A := by
+    have htop : Nat.card N ∣ Nat.card (⊤ : Subgroup A) :=
+      Subgroup.card_dvd_of_le (show N ≤ (⊤ : Subgroup A) from le_top)
+    simpa [Subgroup.card_top] using htop
+  exact false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    hFrob partn hparts hdvd
+
+/-- **Isaacs Thm 6.9** reduction step: if a solvable subgroup `B` of the actor acts
+Frobeniusly on a finite nontrivial target, then the target contains a nontrivial abelian
+`B`-invariant subgroup.  This is the reusable form of the textbook move in L3495: choose an
+invariant Sylow subgroup `R` by Isaacs Thm 3.23, then pass to `Z(R)`. -/
+theorem exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B] :
+    ∃ M : Subgroup U, Nontrivial M ∧ IsMulCommutative M ∧
+      ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M := by
+  classical
+  let φ : B →* MulAut U := MulDistribMulAction.toMulAut B U
+  have hFrobB : IsFrobeniusAction B U := IsFrobeniusAction.actorSubgroup hFrob B
+  have hCop : Nat.Coprime (Nat.card B) (Nat.card U) := by
+    haveI : Fintype B := Fintype.ofFinite B
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Nat.card_eq_fintype_card] using
+      (IsFrobeniusAction.coprime_card (A := B) (N := U) hFrobB).symm
+  have hU_gt_one : 1 < Nat.card U :=
+    Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  obtain ⟨p, hp, hp_dvd⟩ := Nat.exists_prime_and_dvd hU_gt_one.ne'
+  letI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨R, hR_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := U) (A := B) (φ := φ)
+      hCop (Or.inl (inferInstance : IsSolvable B)) p
+  let M : Subgroup U := (Subgroup.center R).map (R : Subgroup U).subtype
+  have hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M := by
+    simpa [M] using
+      (OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
+        (φ := φ) hR_inv (K := Subgroup.center R))
+  have hR_ne_bot : (R : Subgroup U) ≠ ⊥ := R.ne_bot_of_dvd_card hp_dvd
+  haveI hR_nontrivial : Nontrivial R :=
+    (Subgroup.nontrivial_iff_ne_bot (R : Subgroup U)).mpr hR_ne_bot
+  haveI hCenter_nontrivial : Nontrivial (Subgroup.center R) :=
+    R.isPGroup'.center_nontrivial
+  have hM_ne_bot : M ≠ ⊥ := by
+    dsimp [M]
+    rw [Subgroup.map_eq_bot_iff_of_injective
+      (H := Subgroup.center R) (R : Subgroup U).subtype_injective]
+    exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center R)).mp hCenter_nontrivial
+  refine ⟨M, (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot, ?_, ?_⟩
+  · dsimp [M]
+    infer_instance
+  · intro b m hm
+    simpa [φ] using hM_inv.smul_mem b hm
+
+/-- **Isaacs Thm 6.9** reduction hook: if a subgroup `B` of the Frobenius actor is itself a
+Frobenius group and the target contains a nontrivial `B`-invariant abelian subgroup, then the
+Frobenius action is impossible.  The remaining textbook step is to obtain such a subgroup as
+`Z(R)` from an invariant Sylow subgroup `R` via Isaacs Thm 3.23. -/
+theorem false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C)
+    (M : Subgroup U) [Finite M] [Nontrivial M] [IsMulCommutative M]
+    (hM : ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M) :
+    False := by
+  letI : CommGroup M := inferInstance
+  letI : MulDistribMulAction B M := by
+    letI : SMul B M := ⟨fun b m => ⟨(b : A) • (m : U), hM b m m.2⟩⟩
+    exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+  have hFrobM : IsFrobeniusAction B M := by
+    intro b hb m hm hfix
+    have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+    have hmU : (m : U) ≠ 1 := fun hmU => hm (Subtype.ext hmU)
+    exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
+  exact false_of_frobeniusAction_isFrobeniusGroup_on_abelian hFrobM hGroup
+
+/-- **Isaacs Thm 6.9** (solvable Frobenius-group branch): a Frobenius actor cannot contain a
+solvable Frobenius group.  This is the full reduction in L3495: choose an invariant Sylow
+subgroup `R` of the target by Isaacs Thm 3.23, pass to the nontrivial invariant abelian subgroup
+`Z(R)`, and apply the abelian-target Frobenius-group contradiction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B]
+    {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C) :
+    False := by
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
+  exact
+    false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
+      hFrob B hGroup M hM_inv
+
+/-- **Isaacs Thm 6.9** reduction hook for the elementary-abelian branch: if a subgroup `B` of
+the Frobenius actor is elementary abelian of order `p^2` and the target contains a nontrivial
+`B`-invariant abelian subgroup, then the action is impossible. -/
+theorem false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2)
+    (M : Subgroup U) [Finite M] [Nontrivial M] [IsMulCommutative M]
+    (hM : ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M) :
+    False := by
+  letI : CommGroup M := inferInstance
+  letI : MulDistribMulAction B M := by
+    letI : SMul B M := ⟨fun b m => ⟨(b : A) • (m : U), hM b m m.2⟩⟩
+    exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+  have hFrobM : IsFrobeniusAction B M := by
+    intro b hb m hm hfix
+    have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+    have hmU : (m : U) ≠ 1 := fun hmU => hm (Subtype.ext hmU)
+    exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
+  exact false_of_frobeniusAction_isElementaryAbelian_card_prime_sq hFrobM hp hElem hCard
+
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, finite target): a Frobenius actor cannot
+contain an elementary abelian subgroup of order `p^2`.  The abelian-target partition argument is
+applied after the invariant-Sylow-center reduction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2) :
+    False := by
+  haveI : IsMulCommutative B := ⟨⟨fun x y => hElem.comm x y⟩⟩
+  letI : CommGroup B := inferInstance
+  haveI : IsSolvable B := inferInstance
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
+  exact
+    false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+      hFrob B hp hElem hCard M hM_inv
+
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, large order): a Frobenius actor cannot
+contain an elementary abelian `p`-subgroup whose order is at least `p^2`.  This packages the
+textbook reduction "replace by a subgroup so that `e = 2`". -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B)
+    (hCard : p ^ 2 ≤ Nat.card B) :
+    False := by
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    hElem.exists_subgroup_card_prime_sq hp hCard
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := B) (U := U) (IsFrobeniusAction.actorSubgroup hFrob B)
+      E hp hE_elem hE_card
+
+/-- **Isaacs Thm 6.9** (`p = q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p^2`; hence such a subgroup must be cyclic. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime) (hCard : Nat.card B = p ^ 2)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      hFrob B hp
+      (OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic
+        hp hCard hNotCyclic)
+      hCard
+
+private lemma orderOf_eq_prime_of_mem_subgroup_card_prime
+    {G : Type*} [Group G] {H : Subgroup G} [Finite H] {p : ℕ}
+    (hp : p.Prime) (hH_card : Nat.card H = p)
+    {x : G} (hxH : x ∈ H) (hx : x ≠ 1) :
+    orderOf x = p := by
+  let xH : H := ⟨x, hxH⟩
+  have hxH_ne : xH ≠ 1 := fun hxH_one => hx (Subtype.ext_iff.mp hxH_one)
+  have h_dvd : orderOf xH ∣ p := by
+    simpa [hH_card] using orderOf_dvd_natCard xH
+  have h_order : orderOf xH = p := by
+    rcases (Nat.dvd_prime hp).mp h_dvd with h_one | h_prime
+    · exact False.elim (hxH_ne (orderOf_eq_one_iff.mp h_one))
+    · exact h_prime
+  exact (Subgroup.orderOf_coe xH).trans h_order
+
+/-- **Isaacs Thm 6.9** (`p > q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p*q` with `q < p`.  Such a subgroup would be a solvable
+Frobenius group: its Sylow `p`-subgroup is normal, a Sylow `q`-subgroup is a complement, and any
+fixed nonidentity pair would generate the whole group cyclically. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hqp : q < p) (hCard : Nat.card B = p * q)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  classical
+  have hpq_ne : p ≠ q := fun hpq => (Nat.lt_irrefl q (hpq ▸ hqp))
+  have hcop_qp : Nat.Coprime q p := (Nat.coprime_primes hq.out hp.out).mpr hpq_ne.symm
+  have hcop_pq : Nat.Coprime p q := hcop_qp.symm
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := B)
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := B)
+  have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+  have hfact_p : (Nat.card B).factorization p = 1 := by
+    rw [hCard, Nat.factorization_mul_apply_of_coprime hcop_pq,
+        hp.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne ((Nat.prime_dvd_prime_iff_eq hp.out hq.out).mp hd))]
+  have hfact_q : (Nat.card B).factorization q = 1 := by
+    rw [hCard', Nat.factorization_mul_apply_of_coprime hcop_qp,
+        hq.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne.symm ((Nat.prime_dvd_prime_iff_eq hq.out hp.out).mp hd))]
+  have hP_card : Nat.card (P : Subgroup B) = p := by
+    rw [P.card_eq_multiplicity, hfact_p, pow_one]
+  have hQ_card : Nat.card (Q : Subgroup B) = q := by
+    rw [Q.card_eq_multiplicity, hfact_q, pow_one]
+  have hP_normal : (P : Subgroup B).Normal :=
+    OddOrder.Isaacs.Ch01.sylow_normal_of_card_eq_mul_prime_lt
+      (G := B) hqp hCard P
+  have h_disjoint : Disjoint (P : Subgroup B) (Q : Subgroup B) :=
+    IsPGroup.disjoint_of_ne p q hpq_ne _ _ P.isPGroup' Q.isPGroup'
+  have h_compl : Subgroup.IsComplement' (P : Subgroup B) (Q : Subgroup B) :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint
+      (by rw [hP_card, hQ_card, hCard]) h_disjoint
+  have hP_ne_bot : (P : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hp_eq_one : p = 1 := by
+      rw [← hP_card, hbot]
+      simp
+    exact hp.out.ne_one hp_eq_one
+  have hQ_ne_bot : (Q : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hq_eq_one : q = 1 := by
+      rw [← hQ_card, hbot]
+      simp
+    exact hq.out.ne_one hq_eq_one
+  letI : (P : Subgroup B).Normal := hP_normal
+  have hFrobGroup : IsFrobeniusGroup B (P : Subgroup B) (Q : Subgroup B) := by
+    refine
+      { isNormal := hP_normal
+        isComplement := h_compl
+        ne_bot_kernel := hP_ne_bot
+        ne_bot_complement := hQ_ne_bot
+        conj_frobenius := ?_ }
+    intro a haQ ha_ne n hnP hn_ne h_conj
+    have h_an : a * n = n * a := by
+      have := congrArg (fun x => x * a) h_conj
+      simpa [mul_assoc] using this
+    have hcomm : Commute n a := h_an.symm
+    have hn_order : orderOf n = p :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hp.out hP_card hnP hn_ne
+    have ha_order : orderOf a = q :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hq.out hQ_card haQ ha_ne
+    have hcop_orders : Nat.Coprime (orderOf n) (orderOf a) := by
+      rw [hn_order, ha_order]
+      exact hcop_pq
+    have horder : orderOf (n * a) = p * q := by
+      rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders,
+        hn_order, ha_order]
+    exact hNotCyclic (isCyclic_of_orderOf_eq_card (n * a) (by rw [horder, hCard]))
+  haveI : IsSolvable B := by
+    haveI : IsCyclic (P : Subgroup B) := isCyclic_of_prime_card hP_card
+    have hP_index : (P : Subgroup B).index = q := by
+      have hmul := (P : Subgroup B).card_mul_index
+      rw [hP_card, hCard] at hmul
+      exact Nat.eq_of_mul_eq_mul_left hp.out.pos hmul
+    have hquot_card : Nat.card (B ⧸ (P : Subgroup B)) = q := by
+      rw [← Subgroup.index_eq_card, hP_index]
+    haveI : IsCyclic (B ⧸ (P : Subgroup B)) := isCyclic_of_prime_card hquot_card
+    letI : CommGroup (P : Subgroup B) := IsCyclic.commGroup
+    letI : CommGroup (B ⧸ (P : Subgroup B)) := IsCyclic.commGroup
+    exact solvable_of_ker_le_range (P : Subgroup B).subtype
+      (QuotientGroup.mk' (P : Subgroup B)) (by
+        rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+  exact
+    false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+      hFrob B hFrobGroup
+
+/-- **Isaacs Thm 6.9** (order `pq` branch): a Frobenius actor cannot contain a noncyclic
+subgroup of order `p*q`, for primes `p` and `q` that may be equal. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hCard : Nat.card B = p * q) (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  rcases lt_trichotomy p q with hpq | hpq | hqp
+  · have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := q) (q := p) hFrob B hpq hCard' hNotCyclic
+  · subst q
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+        hFrob B hp.out (by simpa [pow_two] using hCard) hNotCyclic
+  · exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := p) (q := q) hFrob B hqp hCard hNotCyclic
+
+/-- **Isaacs Cor 6.10**: if `P` is a Sylow `p`-subgroup of a finite Frobenius
+complement, then `P` contains at most one subgroup of order `p`. -/
+theorem subgroups_card_prime_unique_of_frobeniusAction_sylow
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [hp : Fact p.Prime] (P : Sylow p A) :
+    ∀ K L : Subgroup P, Nat.card K = p → Nat.card L = p → K = L := by
+  intro K L hK_card hL_card
+  by_contra hKL_ne
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    P.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+      hK_card hL_card hKL_ne
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := P) (U := U) (IsFrobeniusAction.actorSubgroup hFrob (P : Subgroup A))
+      E hp.out hE_elem hE_card
+
+/-- **Isaacs Thm 6.11 (abelian branch, in Frobenius-complement form)**: a commutative
+Sylow `p`-subgroup of a finite Frobenius complement is cyclic.  Corollary 6.10 supplies the
+unique order-`p` subgroup hypothesis, and the finite abelian p-group structure theorem turns it
+into cyclicity. -/
+theorem sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [Fact p.Prime]
+    (P : Sylow p A) [IsMulCommutative P] :
+    IsCyclic P :=
+  P.isPGroup'.isCyclic_of_subgroups_card_prime_unique
+    (subgroups_card_prime_unique_of_frobeniusAction_sylow hFrob P)
+
+/-- **Isaacs Cor 6.17 observation (abelian complement branch)**: a finite abelian Frobenius
+complement is cyclic.  This is the part needed later in Theorem 6.21 to rule out a noncyclic
+abelian group acting Frobeniusly. -/
+theorem isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group U] [Finite U] [Nontrivial U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) :
+    IsCyclic A := by
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : IsMulCommutative P := ⟨⟨fun x y => by
+      ext
+      exact mul_comm (x : A) (y : A)⟩⟩
+    exact sylow_isCyclic_of_frobeniusAction_of_isMulCommutative hFrob P
+
+/-- The contradiction step in Isaacs Thm 6.21 after the induction hypothesis has shown that
+every proper `A`-invariant subgroup of `N` lies in `K = ⟨C_N(a) | a ≠ 1⟩`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+    {A N : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A)
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ →
+        P ≤ nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N)) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let K : Subgroup N := nontrivialActionFixedByClosure φ
+  change K = ⊤
+  by_contra hK_ne_top
+  have hidx_gt : 1 < K.index := Subgroup.one_lt_index_of_ne_top hK_ne_top
+  obtain ⟨p, hp_prime, hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd (Nat.ne_of_gt hidx_gt)
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hSolvA : IsSolvable A := isSolvable_of_comm fun a b : A => mul_comm a b
+  obtain ⟨P, _hP_inv, hP_top⟩ :=
+    exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+      (A := A) (N := N) (K := K) (p := p) hCop (Or.inl hSolvA) hp_dvd
+      (by simpa [K, φ] using hproper)
+  have hN_pgroup : IsPGroup p N := by
+    have hP_pgroup : IsPGroup p (P : Subgroup N) := P.isPGroup'
+    rw [hP_top] at hP_pgroup
+    exact hP_pgroup.of_equiv Subgroup.topEquiv
+  have hN_solv : IsSolvable N := by
+    haveI : Group.IsNilpotent N := hN_pgroup.isNilpotent
+    exact IsNilpotent.to_isSolvable
+  letI : IsSolvable N := hN_solv
+  have hcomm : _root_.commutator N ≤ K :=
+    commutator_le_of_proper_invariant_le_of_isSolvable (A := A) (N := N) (K := K)
+      (by simpa [K, φ] using hproper)
+  letI : K.Normal := normal_of_commutator_le hcomm
+  have hK_inv : ∀ a : A, ∀ n ∈ K, a • n ∈ K := by
+    simpa [K, φ] using nontrivialActionFixedByClosure_invariant_of_commutative φ
+  have hCopAK : Nat.Coprime (Nat.card A) (Nat.card K) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card K)
+  have hfixed : ∀ a : A, a ≠ 1 → actionFixedBy φ a ≤ K := by
+    intro a ha
+    exact actionFixedBy_le_nontrivialActionFixedByClosure (φ := φ) ha
+  letI : MulDistribMulAction A (N ⧸ K) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction K hK_inv
+  haveI : Nontrivial (N ⧸ K) := Subgroup.nontrivial_quotient_of_ne_top hK_ne_top
+  have hFrobQuot : IsFrobeniusAction A (N ⧸ K) :=
+    quotient_isFrobeniusAction_of_fixedBy_le (A := A) (N := N) (M := K)
+      hK_inv hCopAK hfixed
+  exact hNotCyclic (isCyclic_of_frobeniusAction_of_isMulCommutative hFrobQuot)
+
+universe uA uN
+
+/-- **Isaacs Thm 6.21** (nontrivial case): if a finite abelian noncyclic group `A` acts
+coprimely on a finite nontrivial group `N`, then the subgroups `C_N(a)` for `a ≠ 1`
+generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let motive : ℕ → Prop := fun n =>
+    ∀ (N : Type uN) [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N],
+      Nat.card N = n →
+      Nat.Coprime (Nat.card A) (Nat.card N) →
+      nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤
+  have hmain : motive (Nat.card N) := by
+    refine Nat.strong_induction_on (Nat.card N) ?_
+    intro n ih N _ _ _ _ hcard hCopN
+    refine nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+      (A := A) (N := N) hCopN hNotCyclic ?_
+    intro M hM hM_ne_top
+    by_cases hM_nontriv : Nontrivial M
+    · letI : Nontrivial M := hM_nontriv
+      letI : MulDistribMulAction A M :=
+        IsFrobeniusAction.invariantSubgroupMulDistribMulAction M hM
+      have hM_card_lt_N : Nat.card M < Nat.card N := by
+        have h_dvd : Nat.card M ∣ Nat.card N := Subgroup.card_subgroup_dvd_card M
+        have h_le : Nat.card M ≤ Nat.card N := Nat.le_of_dvd Nat.card_pos h_dvd
+        have h_ne : Nat.card M ≠ Nat.card N := fun heq =>
+          hM_ne_top (Subgroup.eq_top_of_card_eq M heq)
+        exact Nat.lt_of_le_of_ne h_le h_ne
+      have hM_card_lt : Nat.card M < n := by
+        simpa [hcard] using hM_card_lt_N
+      have hCopM : Nat.Coprime (Nat.card A) (Nat.card M) :=
+        hCopN.coprime_dvd_right (Subgroup.card_subgroup_dvd_card M)
+      have hMtop :
+          nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A M) = ⊤ :=
+        (ih (Nat.card M) hM_card_lt) M rfl hCopM
+      exact
+        subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+          (M := M) (by intro a m; rfl) hMtop
+    · haveI : Subsingleton M := not_nontrivial_iff_subsingleton.mp hM_nontriv
+      intro n hn
+      have hn_one : n = 1 := by
+        have hsub : (⟨n, hn⟩ : M) = 1 := Subsingleton.elim _ _
+        exact congrArg Subtype.val hsub
+      rw [hn_one]
+      exact Subgroup.one_mem _
+  exact hmain N rfl hCop
+
+/-- **Isaacs Thm 6.21**: if a finite abelian noncyclic group `A` acts coprimely on a finite
+group `N`, then the subgroups `C_N(a)` for `a ≠ 1` generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  by_cases hN_nontriv : Nontrivial N
+  · letI : Nontrivial N := hN_nontriv
+    exact nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+      hCop hNotCyclic
+  · haveI : Subsingleton N := not_nontrivial_iff_subsingleton.mp hN_nontriv
+    rw [eq_top_iff]
+    intro n _hn
+    have hn_one : n = 1 := Subsingleton.elim n 1
+    rw [hn_one]
+    exact Subgroup.one_mem _
+
+/-- **Isaacs Lem 6.20**: if a finite abelian group acts faithfully and coprimely on `N`,
+and acts trivially on every proper invariant subgroup of `N`, then it is cyclic. -/
+theorem isCyclic_of_faithful_trivial_on_proper_invariant
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [MulDistribMulAction A N] [FaithfulSMul A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hproper :
+      ∀ M : Subgroup N,
+        (∀ a : A, ∀ n ∈ M, a • n ∈ M) →
+        M ≠ ⊤ →
+        ∀ a : A, ∀ n ∈ M, a • n = n) :
+    IsCyclic A := by
+  classical
+  by_contra hNotCyclic
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let fixedTop : Subgroup N := actionFixedPoints φ ⊤
+  have hKtop : nontrivialActionFixedByClosure φ = ⊤ :=
+    nontrivialActionFixedByClosure_eq_top_of_not_isCyclic hCop hNotCyclic
+  have hK_le_fixedTop : nontrivialActionFixedByClosure φ ≤ fixedTop := by
+    rw [nontrivialActionFixedByClosure_le_iff]
+    intro a ha
+    let M : Subgroup N := actionFixedBy φ a
+    have hM_inv : ∀ b : A, ∀ n ∈ M, b • n ∈ M := by
+      intro b n hn
+      have hmem :
+          (φ b) n ∈ actionFixedBy φ a :=
+        actionFixedBy_invariant_of_commute (φ := φ) (a := a) (b := b)
+          (mul_comm a b) n hn
+      simpa [φ, M] using hmem
+    have hM_ne_top : M ≠ ⊤ := by
+      intro hMtop
+      have ha_one : a = 1 := by
+        exact eq_of_smul_eq_smul fun n : N => by
+          have hn : n ∈ M := by
+            rw [hMtop]
+            exact Subgroup.mem_top n
+          change (φ a) n = n at hn
+          simpa [φ] using hn
+      exact ha ha_one
+    have hM_trivial := hproper M hM_inv hM_ne_top
+    intro n hn
+    change ∀ b : (⊤ : Subgroup A), (φ b) n = n
+    intro b
+    have hfix := hM_trivial (b : A) n hn
+    simpa [φ] using hfix
+  have hfixedTop_eq_top : fixedTop = ⊤ := by
+    rw [eq_top_iff]
+    intro n _hn
+    exact hK_le_fixedTop (by
+      rw [hKtop]
+      exact Subgroup.mem_top n)
+  have hA_subsingleton : Subsingleton A := by
+    refine ⟨fun a b => ?_⟩
+    have ha : a = 1 := by
+      exact eq_of_smul_eq_smul fun n : N => by
+        have hn : n ∈ fixedTop := by
+          rw [hfixedTop_eq_top]
+          exact Subgroup.mem_top n
+        have hfix := hn ⟨a, Subgroup.mem_top a⟩
+        change (φ a) n = n at hfix
+        simpa [φ] using hfix
+    have hb : b = 1 := by
+      exact eq_of_smul_eq_smul fun n : N => by
+        have hn : n ∈ fixedTop := by
+          rw [hfixedTop_eq_top]
+          exact Subgroup.mem_top n
+        have hfix := hn ⟨b, Subgroup.mem_top b⟩
+        change (φ b) n = n at hfix
+        simpa [φ] using hfix
+    exact ha.trans hb.symm
+  exact hNotCyclic (@isCyclic_of_subsingleton A _ hA_subsingleton)
 
 end
 
@@ -1229,6 +3109,195 @@ The iso constructions follow mathlib's `quaternionGroupZeroEquivDihedralGroupZer
 `map_mul'` verified by case analysis on the defining relations. -/
 
 /-! ### Dihedral / quaternion recognition helpers -/
+
+/-- A nontrivial subgroup of a finite `2`-group contains an involution.
+
+This is the internal-involution half of the Isaacs 6.12 → 6.11 reduction: once a
+dihedral or semidihedral alternative supplies an involution outside the cyclic index-two
+subgroup, this lemma supplies the nontrivial involution inside that subgroup. -/
+theorem exists_involution_mem_of_nontrivial_two_subgroup
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P} (hC_ne : C ≠ ⊥) :
+    ∃ z : P, z ∈ C ∧ z ^ 2 = 1 ∧ z ≠ 1 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_two : IsPGroup 2 C := hP.to_subgroup C
+  have hC_card_ne_one : Nat.card C ≠ 1 := by
+    intro hC_card
+    exact hC_ne (Subgroup.eq_bot_of_card_eq C hC_card)
+  have hC_card_gt_one : 1 < Nat.card C := by
+    have hC_pos : 0 < Nat.card C := Nat.card_pos
+    omega
+  haveI : Nontrivial C := Finite.one_lt_card_iff_nontrivial.mp hC_card_gt_one
+  obtain ⟨n, hn_pos, hC_card⟩ := hC_two.nontrivial_iff_card.mp inferInstance
+  have h_two_dvd_card : 2 ∣ Nat.card C := by
+    rw [hC_card]
+    cases n with
+    | zero => omega
+    | succ n => exact ⟨2 ^ n, by rw [pow_succ']⟩
+  obtain ⟨z, hz_order⟩ := exists_prime_orderOf_dvd_card' (G := C) 2 h_two_dvd_card
+  refine ⟨(z : P), z.2, ?_, ?_⟩
+  · have hz_sq : z ^ 2 = 1 := by
+      rw [← hz_order, pow_orderOf_eq_one]
+    exact congrArg Subtype.val hz_sq
+  · intro hz_eq_one
+    have hz_eq_one' : z = 1 := Subtype.ext hz_eq_one
+    have : orderOf z = 1 := by rw [hz_eq_one', orderOf_one]
+    exact Nat.prime_two.ne_one (hz_order.symm.trans this)
+
+/-- If a subgroup `C` contains a nontrivial involution `z` and there is another involution `a`
+outside `C`, then the ambient group has two distinct subgroups of order `2`.
+
+This is the small bridge used to eliminate the dihedral and semidihedral alternatives when
+deducing Isaacs Thm 6.11 from Thm 6.12: those groups have an involution outside their cyclic
+index-`2` subgroup, whereas generalized quaternion groups do not. -/
+theorem exists_distinct_subgroups_card_two_of_external_involution
+    {P : Type*} [Group P] [Finite P] {C : Subgroup P} {a z : P}
+    (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1)
+    (hz_mem : z ∈ C) (hz_sq : z ^ 2 = 1) (hz_ne : z ≠ 1) :
+    ∃ K L : Subgroup P, Nat.card K = 2 ∧ Nat.card L = 2 ∧ K ≠ L := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have ha_ne : a ≠ 1 := by
+    intro ha
+    exact ha_notmem (ha ▸ C.one_mem)
+  have ha_order : orderOf a = 2 := orderOf_eq_prime (p := 2) ha_sq ha_ne
+  have hz_order : orderOf z = 2 := orderOf_eq_prime (p := 2) hz_sq hz_ne
+  refine ⟨Subgroup.zpowers a, Subgroup.zpowers z, ?_, ?_, ?_⟩
+  · rw [Nat.card_zpowers, ha_order]
+  · rw [Nat.card_zpowers, hz_order]
+  · intro h_eq
+    exact ha_notmem ((Subgroup.zpowers_le.mpr hz_mem) (by
+      rw [← h_eq]
+      exact Subgroup.mem_zpowers a))
+
+/-- If a group has a unique subgroup of order `2`, then it cannot have a nontrivial involution
+inside `C` and another involution outside `C`.
+
+This is the contradiction form of the preceding bridge, used when deriving Isaacs Thm 6.11
+from Thm 6.12: the dihedral and semidihedral alternatives supply such an outside involution. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution
+    {P : Type*} [Group P] [Finite P] {C : Subgroup P} {a z : P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1)
+    (hz_mem : z ∈ C) (hz_sq : z ^ 2 = 1) (hz_ne : z ≠ 1) :
+    False := by
+  obtain ⟨K, L, hK_card, hL_card, hKL_ne⟩ :=
+    exists_distinct_subgroups_card_two_of_external_involution
+      ha_notmem ha_sq hz_mem hz_sq hz_ne
+  exact hKL_ne (hUnique K L hK_card hL_card)
+
+/-- If a finite `2`-group has a unique subgroup of order `2`, then no nontrivial subgroup `C`
+can have an involution outside it.
+
+This is the packaged 6.12 → 6.11 exclusion used for the dihedral and semidihedral
+alternatives: `C` supplies the internal involution, while the alternative supplies the external
+one. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hC_ne : C ≠ ⊥) {a : P} (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1) :
+    False := by
+  obtain ⟨z, hz_mem, hz_sq, hz_ne⟩ :=
+    exists_involution_mem_of_nontrivial_two_subgroup hP hC_ne
+  exact false_of_unique_subgroups_card_two_of_external_involution
+    hUnique ha_notmem ha_sq hz_mem hz_sq hz_ne
+
+/-- Index-two form of the external-involution obstruction.
+
+If `C` has index `2` in a finite `2`-group of order not equal to `2`, then `C` is nontrivial.
+Thus any involution outside `C` contradicts uniqueness of the subgroup of order `2`.
+This is the exact shape needed for the dihedral and semidihedral alternatives in the
+Isaacs 6.12 → 6.11 reduction. -/
+theorem false_of_unique_subgroups_card_two_of_external_involution_of_index_two
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P}
+    (hUnique : ∀ K L : Subgroup P, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hC_index : C.index = 2) (hP_card_ne_two : Nat.card P ≠ 2)
+    {a : P} (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1) :
+    False := by
+  have hC_ne : C ≠ ⊥ := by
+    intro hC_bot
+    apply hP_card_ne_two
+    have hcard := C.index_mul_card
+    rw [hC_index, hC_bot, Subgroup.card_bot] at hcard
+    simpa using hcard.symm
+  exact false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
+    hP hUnique hC_ne ha_notmem ha_sq
+
+/-! ### The first enlargement step in Theorem 6.12 -/
+
+/-- **Isaacs Thm 6.12 setup**: if `C` is a normal subgroup of a finite `p`-group `P` and
+`C < C_P(C)`, then there is a normal abelian subgroup `B` with `C < B ≤ C_P(C)` and
+`|B : C| = p`.
+
+This is the formal version of the first paragraph of the proof of Thm 6.12.  Ch.1 Lemma 1.23
+supplies the normal intermediate subgroup of prime relative index; since `B ≤ C_P(C)`,
+`C` is central in `B`, and the prime quotient `B/C` is cyclic, so `B` is abelian by
+`commutative_of_cyclic_center_quotient`. -/
+theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal]
+    (hC_lt_cent : C < Subgroup.centralizer (C : Set P)) :
+    ∃ B : Subgroup P, B.Normal ∧ C < B ∧ B ≤ Subgroup.centralizer (C : Set P) ∧
+      C.relIndex B = p ∧ IsMulCommutative B := by
+  haveI hCent_normal : (Subgroup.centralizer (C : Set P)).Normal :=
+    Subgroup.normal_centralizer
+  obtain ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel⟩ :=
+    OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_index_eq_prime
+      hP (N := C) (M := Subgroup.centralizer (C : Set P)) hC_lt_cent
+  haveI hC_sub_normal : (C.subgroupOf B).Normal := inferInstance
+  have hC_sub_le_center : C.subgroupOf B ≤ Subgroup.center B := by
+    intro c hc
+    rw [Subgroup.mem_center_iff]
+    intro b
+    apply Subtype.ext
+    have hb_cent : ((b : B) : P) ∈ Subgroup.centralizer (C : Set P) :=
+      hB_le_cent b.2
+    have hc_mem : ((c : B) : P) ∈ C := by
+      simpa [Subgroup.mem_subgroupOf] using hc
+    have h_comm :
+        ((c : B) : P) * ((b : B) : P) = ((b : B) : P) * ((c : B) : P) :=
+      (Subgroup.mem_centralizer_iff.mp hb_cent) ((c : B) : P) hc_mem
+    exact h_comm.symm
+  have h_card_quot : Nat.card (B ⧸ C.subgroupOf B) = p := by
+    rw [← Subgroup.index_eq_card]
+    simpa [Subgroup.relIndex] using hC_rel
+  have h_cyclic_quot : IsCyclic (B ⧸ C.subgroupOf B) :=
+    isCyclic_of_prime_card h_card_quot
+  have hB_comm : ∀ x y : B, x * y = y * x := by
+    haveI : IsCyclic (B ⧸ C.subgroupOf B) := h_cyclic_quot
+    exact commutative_of_cyclic_center_quotient
+      (QuotientGroup.mk' (C.subgroupOf B)) (by
+        rw [QuotientGroup.ker_mk']
+        exact hC_sub_le_center)
+  exact ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel, ⟨⟨hB_comm⟩⟩⟩
+
+/-- **Isaacs Thm 6.12 setup**: a maximal normal abelian subgroup `C` of a finite `p`-group
+is self-centralizing.
+
+The maximality hypothesis is stated in the form needed for the proof: no strictly larger
+normal abelian subgroup contains `C`.  If `C < C_P(C)`, the preceding theorem produces such
+a larger normal abelian subgroup, contradiction. -/
+theorem centralizer_eq_of_maximal_normal_isMulCommutative
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
+    (hP : IsPGroup p P)
+    {C : Subgroup P} [C.Normal] (hC_comm : IsMulCommutative C)
+    (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False) :
+    Subgroup.centralizer (C : Set P) = C := by
+  have hC_le_cent : C ≤ Subgroup.centralizer (C : Set P) := by
+    haveI : IsMulCommutative C := hC_comm
+    exact Subgroup.le_centralizer (H := C)
+  have hcent_le_C : Subgroup.centralizer (C : Set P) ≤ C := by
+    by_contra hnot
+    have hne : C ≠ Subgroup.centralizer (C : Set P) := by
+      intro h_eq
+      exact hnot (le_of_eq h_eq.symm)
+    have hlt : C < Subgroup.centralizer (C : Set P) := lt_of_le_of_ne hC_le_cent hne
+    obtain ⟨B, hB_normal, hC_lt_B, _hB_le_cent, _hC_rel, hB_comm⟩ :=
+      exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer hP hlt
+    exact hC_max B hB_normal hB_comm hC_lt_B
+  exact le_antisymm hcent_le_C hC_le_cent
 
 /-- **Dihedral recognition helper** (used in Lem 6.13 inverting case): given a finite group `P`
 with `c, a ∈ P` such that `⟨c⟩` has index `2`, `a ∉ ⟨c⟩`, `a² = 1`, and `a c a⁻¹ = c⁻¹`, then
@@ -2278,6 +4347,62 @@ private lemma exists_not_commute_of_center_index_pow_two
       _ < p ^ 2 := Nat.pow_lt_pow_left hp1 (by norm_num)
   omega
 
+/-- **Lem 6.15 `p = 2` setup**: the quotient `T/T'` is abelian. -/
+theorem quotient_commutator_commutative
+    {T : Type*} [Group T] :
+    ∀ a b : T ⧸ _root_.commutator T, a * b = b * a := by
+  exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
+    (le_rfl : _root_.commutator T ≤ _root_.commutator T)).comm
+
+/-- **Lem 6.15 `p = 2` setup**: under the center-index hypothesis of Lemma 6.15,
+the quotient `T/T'` is not cyclic.
+
+This isolates Isaacs's observation that, once `T' ≤ Z(T)`, cyclicity of `T/T'` would make
+`T` itself abelian by `commutative_of_cyclic_center_quotient`, contradicting
+`|T : Z(T)| = p²`. -/
+theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (h_idx : (Subgroup.center T).index = p ^ 2) :
+    ¬ IsCyclic (T ⧸ _root_.commutator T) := by
+  intro h_cyc
+  obtain ⟨x, y, hxy⟩ := exists_not_commute_of_center_index_pow_two h_idx
+  let f : T →* T ⧸ _root_.commutator T := QuotientGroup.mk' (_root_.commutator T)
+  have hker : f.ker ≤ Subgroup.center T := by
+    rw [QuotientGroup.ker_mk']
+    exact commutator_le_center_of_index_pow_two h_idx
+  haveI : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
+  exact hxy (commutative_of_cyclic_center_quotient f hker x y)
+
+/-- **Lem 6.15 `p = 2` setup**: the image of Isaacs's cyclic subgroup `C` in `T/T'`
+is cyclic of index `2`.
+
+This supplies the `D ≤ T/T'` input for
+`exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group`. -/
+theorem quotient_commutator_image_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T]
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    IsCyclic (C.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      (C.map (QuotientGroup.mk' (_root_.commutator T))).index = 2 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  constructor
+  · haveI : IsCyclic C := hC_cyclic
+    exact isCyclic_of_surjective
+      ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap C)
+      ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective C)
+  · have hcomm_le_C : _root_.commutator T ≤ C :=
+      (commutator_le_center_of_index_pow_two (p := 2) h_idx).trans hZ_lt_C.le
+    calc
+      (C.map (QuotientGroup.mk' (_root_.commutator T))).index = C.index := by
+        exact Subgroup.index_map_eq C
+          (QuotientGroup.mk'_surjective (_root_.commutator T)) (by
+            rw [QuotientGroup.ker_mk']
+            exact hcomm_le_C)
+      _ = 2 :=
+        index_eq_prime_of_center_lt_of_center_index_pow_two
+          (p := 2) h_idx hZ_lt_C hC_lt_T
+
 /-- **Step 0 of Lem 6.15** (cardinality): under the hypothesis of Lem 6.15,
 `|commutator T| = p`. -/
 private lemma card_commutator_eq_prime_of_lem_6_15
@@ -2596,6 +4721,24 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     have h_card_le : Nat.card K ≤ p ^ 2 :=
       card_setOfPowEqOne_le_pow_two_of_index_pow_two_odd hp_odd h_idx hC hC_cyclic hZ_lt_C hC_lt_T
     exact le_antisymm h_card_le h_card_ge
+
+/-- **Isaacs Lemma 6.15** (odd prime case).
+
+Let `T` be a finite group with `|T : Z(T)| = p^2` and a cyclic subgroup `C` with
+`Z(T) < C < T`. If `p` is odd, then `T` has a characteristic elementary abelian subgroup
+of order `p^2`.
+
+The full `p = 2` branch is handled separately below; this theorem exposes the completed
+odd-`p` half for later Ch.6/Ch.7 use. -/
+theorem exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 :=
+  char_elementaryAbelian_p_sq_of_index_p_sq_odd
+    hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
 
 /-! ### `p = 2` case of Lem 6.15 -/
 
@@ -2972,6 +5115,639 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
       have := Finset.card_le_univ S
       omega
     omega
+
+/-- **Isaacs Lemma 6.15** (`p = 2` abelian index-two branch).
+
+If `A` is a finite abelian `2`-group with a cyclic subgroup of index `2`, and `A` is
+not cyclic, then `A` contains a characteristic elementary abelian subgroup of order `4`.
+
+This is the standalone `p = 2` sub-lemma used in the full Lemma 6.15 proof and in the
+later `p`-group classification route toward Isaacs 6.11. -/
+theorem exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+    {A : Type*} [Group A] [Finite A] (hAb : ∀ x y : A, x * y = y * x)
+    (h_two : IsPGroup 2 A)
+    {D : Subgroup A} (hD_cyc : IsCyclic D) (hD_idx : D.index = 2)
+    (h_not_cyclic : ¬ IsCyclic A) :
+    ∃ K : Subgroup A, K.Characteristic ∧
+      IsElementaryAbelian 2 K ∧ Nat.card K = 4 :=
+  char_elementaryAbelian_4_of_noncyclic_abelian_2group
+    hAb h_two hD_cyc hD_idx h_not_cyclic
+
+/-- **Isaacs Lemma 6.15** (`p = 2` quotient lift setup).
+
+Under the `p = 2` hypotheses through the first quotient step, applying the abelian index-two
+branch to `T/T'` produces a characteristic subgroup upstairs whose image in `T/T'` is elementary
+abelian of order `4`. -/
+theorem exists_characteristic_lift_quotient_commutator_four_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 := by
+  let D : Subgroup (T ⧸ _root_.commutator T) :=
+    C.map (QuotientGroup.mk' (_root_.commutator T))
+  have hD : IsCyclic D ∧ D.index = 2 := by
+    simpa [D] using
+      quotient_commutator_image_cyclic_index_two_of_center_index_four
+        h_idx hC_cyclic hC_lt_T hZ_lt_C
+  have hQ_ab : ∀ x y : T ⧸ _root_.commutator T, x * y = y * x :=
+    quotient_commutator_commutative
+  have hQ_two : IsPGroup 2 (T ⧸ _root_.commutator T) :=
+    hT_two.to_quotient (_root_.commutator T)
+  have hQ_not_cyclic : ¬ IsCyclic (T ⧸ _root_.commutator T) :=
+    quotient_commutator_not_isCyclic_of_center_index_prime_sq h_idx
+  obtain ⟨K, hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+      (A := T ⧸ _root_.commutator T) hQ_ab hQ_two
+      (D := D) hD.1 hD.2 hQ_not_cyclic
+  let E : Subgroup T := K.comap (QuotientGroup.mk' (_root_.commutator T))
+  have hE_map :
+      E.map (QuotientGroup.mk' (_root_.commutator T)) = K := by
+    dsimp [E]
+    exact Subgroup.map_comap_eq_self_of_surjective
+      (QuotientGroup.mk'_surjective (_root_.commutator T)) K
+  refine ⟨E, ?_, ?_, ?_, ?_⟩
+  · dsimp [E]
+    exact Subgroup.Characteristic.comap_quotient_mk hK_char
+  · intro x hx
+    dsimp [E]
+    change (x : T ⧸ _root_.commutator T) ∈ K
+    rw [show (x : T ⧸ _root_.commutator T) = 1 from
+      (QuotientGroup.eq_one_iff x).mpr hx]
+    exact K.one_mem
+  · rwa [hE_map]
+  · rwa [hE_map]
+
+/-- **Isaacs Lemma 6.15** (`p = 2` lift cardinality).
+
+If a subgroup `E` contains `T'` and its image in `T/T'` has order `4`, then in the
+Lemma 6.15 `p = 2` setup `E` has order `8`. -/
+theorem card_lift_quotient_commutator_eq_eight_of_center_index_four
+    {T : Type*} [Group T] [Finite T]
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C E : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C)
+    (hcomm_le_E : _root_.commutator T ≤ E)
+    (hE_image_card :
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4) :
+    Nat.card E = 8 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : C.Normal :=
+    normal_of_center_le_of_center_index_pow_two (p := 2) h_idx hZ_lt_C.le
+  have hcomm_card : Nat.card (_root_.commutator T) = 2 :=
+    card_commutator_eq_prime_of_lem_6_15
+      (p := 2) h_idx hC_cyclic hC_lt_T hZ_lt_C
+  have hquot_card :
+      Nat.card (E ⧸ (_root_.commutator T).subgroupOf E) = 4 := by
+    rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map
+      (_root_.commutator T) E]
+    exact hE_image_card
+  have hsub_card :
+      Nat.card ((_root_.commutator T).subgroupOf E) = 2 := by
+    exact (Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe hcomm_le_E).toEquiv).trans hcomm_card
+  have hsplit :
+      Nat.card E =
+        Nat.card (E ⧸ (_root_.commutator T).subgroupOf E) *
+          Nat.card ((_root_.commutator T).subgroupOf E) :=
+    ((_root_.commutator T).subgroupOf E).card_eq_card_quotient_mul_card_subgroup
+  rw [hquot_card, hsub_card] at hsplit
+  norm_num at hsplit
+  exact hsplit
+
+/-- **Isaacs Lemma 6.15** (`p = 2` first lifted subgroup).
+
+The first application of the abelian index-two branch to `T/T'` yields a characteristic
+subgroup `E ≤ T` whose quotient image is elementary abelian of order `4`, and whose own
+order is `8`. -/
+theorem exists_lift_quotient_commutator_order_eight_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_elem, hE_image_card⟩ :=
+    exists_characteristic_lift_quotient_commutator_four_of_center_index_four
+      hT_two h_idx hC_cyclic hC_lt_T hZ_lt_C
+  exact ⟨E, hE_char, hcomm_le_E, hE_elem, hE_image_card,
+    card_lift_quotient_commutator_eq_eight_of_center_index_four
+      h_idx hC_cyclic hC_lt_T hZ_lt_C hcomm_le_E hE_image_card⟩
+
+/-- A finite elementary abelian `2`-group of order `4` is not cyclic. -/
+private lemma not_isCyclic_of_isElementaryAbelian_two_card_four
+    {A : Type*} [Group A] [Finite A]
+    (hElem : IsElementaryAbelian 2 A) (hCard : Nat.card A = 4) :
+    ¬ IsCyclic A := by
+  exact hElem.not_isCyclic_of_card_prime_sq Nat.prime_two (by simpa using hCard)
+
+/-- If a quotient image of `E` is elementary abelian of order `4`, then `E` is not cyclic. -/
+private lemma not_isCyclic_of_quotient_commutator_image_four
+    {T : Type*} [Group T] [Finite T] {E : Subgroup T}
+    (hE_image_elem :
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))))
+    (hE_image_card :
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4) :
+    ¬ IsCyclic E := by
+  have hImage_not :
+      ¬ IsCyclic (E.map (QuotientGroup.mk' (_root_.commutator T))) :=
+    not_isCyclic_of_isElementaryAbelian_two_card_four
+      hE_image_elem hE_image_card
+  intro hE_cyclic
+  haveI : IsCyclic E := hE_cyclic
+  exact hImage_not (isCyclic_of_surjective
+    ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap E)
+    ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective E))
+
+/-- The intersection of a subgroup with a cyclic subgroup, viewed inside the former, is cyclic. -/
+private lemma subgroupOf_isCyclic_of_isCyclic
+    {T : Type*} [Group T] {C E : Subgroup T} (hC_cyclic : IsCyclic C) :
+    IsCyclic (C.subgroupOf E) := by
+  haveI : IsCyclic C := hC_cyclic
+  let f : C.subgroupOf E →* C := {
+    toFun := fun x => ⟨((x : C.subgroupOf E) : E), by
+      have hx : ((x : C.subgroupOf E) : E) ∈ C.subgroupOf E := x.2
+      rwa [Subgroup.mem_subgroupOf] at hx⟩
+    map_one' := by ext; rfl
+    map_mul' := by intro x y; ext; rfl
+  }
+  exact isCyclic_of_injective f (by
+    intro x y hxy
+    apply Subtype.ext
+    have hT :
+        (((x : C.subgroupOf E) : E) : T) =
+          (((y : C.subgroupOf E) : E) : T) := by
+      simpa [f] using congrArg Subtype.val hxy
+    exact Subtype.ext hT)
+
+/-- If `C` has index `2` in `T` and `E` is not contained in `C`, then `C ∩ E` has
+index `2` in `E`. -/
+private lemma relIndex_eq_two_of_index_two_of_not_le
+    {T : Type*} [Group T] {C E : Subgroup T}
+    (hC_idx : C.index = 2) (hE_not_le_C : ¬ E ≤ C) :
+    C.relIndex E = 2 := by
+  rw [Subgroup.relIndex_eq_two_iff_exists_notMem_and]
+  rw [SetLike.le_def] at hE_not_le_C
+  push Not at hE_not_le_C
+  obtain ⟨a, haE, haC⟩ := hE_not_le_C
+  refine ⟨a, haE, haC, ?_⟩
+  intro b _hbE
+  by_cases hbC : b ∈ C
+  · exact Or.inr hbC
+  · left
+    rw [Subgroup.mul_mem_iff_of_index_two hC_idx]
+    exact iff_of_false hbC haC
+
+/-- If `C` has index `2`, then any subgroup properly between `C` and `⊤` is impossible. -/
+private lemma not_ge_of_ne_of_ne_top_of_index_two
+    {T : Type*} [Group T] [Finite T] {C E : Subgroup T}
+    (hC_idx : C.index = 2) (hE_ne_C : E ≠ C) (hE_ne_top : E ≠ ⊤) :
+    ¬ C ≤ E := by
+  intro hC_le_E
+  have hmul : C.relIndex E * E.index = 2 := by
+    rw [Subgroup.relIndex_mul_index hC_le_E, hC_idx]
+  have hrel_pos : 0 < C.relIndex E := by
+    exact Nat.pos_of_ne_zero (by
+      rw [Subgroup.relIndex]
+      exact Subgroup.index_ne_zero_of_finite)
+  have hidx_pos : 0 < E.index := by
+    exact Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite (H := E))
+  have hcases : C.relIndex E = 1 ∨ E.index = 1 := by
+    by_contra h
+    push Not at h
+    have hrel_ge_two : 2 ≤ C.relIndex E := by omega
+    have hidx_ge_two : 2 ≤ E.index := by omega
+    have hprod_ge : 4 ≤ C.relIndex E * E.index :=
+      Nat.mul_le_mul hrel_ge_two hidx_ge_two
+    omega
+  rcases hcases with hrel | hidx
+  · have hE_le_C : E ≤ C := Subgroup.relIndex_eq_one.mp hrel
+    exact hE_ne_C (le_antisymm hE_le_C hC_le_E)
+  · exact hE_ne_top (Subgroup.index_eq_one.mp hidx)
+
+/-- Finite subgroup cardinality strictly drops for a proper subgroup. -/
+private lemma subgroup_card_lt_of_lt_top
+    {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H < ⊤) :
+    Nat.card H < Nat.card G := by
+  have h_dvd : Nat.card H ∣ Nat.card G :=
+    ⟨H.index, by rw [mul_comm, H.index_mul_card]⟩
+  have h_le : Nat.card H ≤ Nat.card G := Nat.le_of_dvd Nat.card_pos h_dvd
+  have h_ne : Nat.card H ≠ Nat.card G := fun heq =>
+    hH.ne (Subgroup.eq_top_of_card_eq _ heq)
+  exact Nat.lt_of_le_of_ne h_le h_ne
+
+/-- In a finite cyclic group, the subgroup cut out by `x ^ |K| = 1` is exactly `K`. -/
+private lemma mem_of_pow_card_eq_one_of_isCyclic_subgroup
+    {A : Type*} [Group A] [Finite A] (hA_cyclic : IsCyclic A)
+    (K : Subgroup A) {x : A} (hx : x ^ Nat.card K = 1) :
+    x ∈ K := by
+  classical
+  haveI : IsCyclic A := hA_cyclic
+  haveI : Fintype A := Fintype.ofFinite A
+  letI : CommGroup A := IsCyclic.commGroup
+  let P : Subgroup A := {
+    carrier := {x | x ^ Nat.card K = 1}
+    one_mem' := by simp
+    mul_mem' := by
+      intro x y hx hy
+      change (x * y) ^ Nat.card K = 1
+      rw [mul_pow, hx, hy, mul_one]
+    inv_mem' := by
+      intro x hx
+      change x⁻¹ ^ Nat.card K = 1
+      rw [inv_pow, hx, inv_one]
+  }
+  have hK_le_P : K ≤ P := by
+    intro y hy
+    dsimp [P]
+    have h_sub :
+        (⟨y, hy⟩ : K) ^ Nat.card K = 1 := pow_card_eq_one'
+    exact congrArg Subtype.val h_sub
+  have hP_card_le : Nat.card P ≤ Nat.card K := by
+    haveI : Fintype P := Fintype.ofFinite P
+    have hroot :=
+      (IsCyclic.card_pow_eq_one_le (α := A) (n := Nat.card K) Nat.card_pos)
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    dsimp [P]
+    rw [Fintype.card_subtype]
+    simpa [Nat.card_eq_fintype_card] using hroot
+  have hKP : K = P := Subgroup.eq_of_le_of_card_ge hK_le_P hP_card_le
+  rw [hKP]
+  exact hx
+
+/-- In a finite cyclic `2`-group, every proper subgroup lies in any subgroup of index `2`. -/
+private lemma le_index_two_subgroup_of_lt_top_of_cyclic_two_group
+    {A : Type*} [Group A] [Finite A] (hA_two : IsPGroup 2 A) (hA_cyclic : IsCyclic A)
+    {Z H : Subgroup A} (hZ_idx : Z.index = 2) (hH_lt_top : H < ⊤) :
+    H ≤ Z := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨kA, hA_card⟩ := (IsPGroup.iff_card (p := 2) (G := A)).mp hA_two
+  obtain ⟨kH, hH_card⟩ := (IsPGroup.iff_card (p := 2) (G := H)).mp
+    (hA_two.to_subgroup H)
+  obtain ⟨kZ, hZ_card⟩ := (IsPGroup.iff_card (p := 2) (G := Z)).mp
+    (hA_two.to_subgroup Z)
+  have hZ_mul : 2 * Nat.card Z = Nat.card A := by
+    simpa [hZ_idx] using Z.index_mul_card
+  have hkA_eq : kA = kZ + 1 := by
+    have hpow : 2 ^ (kZ + 1) = 2 ^ kA := by
+      calc
+        2 ^ (kZ + 1) = 2 * 2 ^ kZ := by
+          rw [pow_succ']
+        _ = 2 * Nat.card Z := by rw [hZ_card]
+        _ = Nat.card A := hZ_mul
+        _ = 2 ^ kA := hA_card
+    exact Nat.pow_right_injective (by norm_num : 2 ≤ 2) hpow.symm
+  have hH_card_lt : Nat.card H < Nat.card A :=
+    subgroup_card_lt_of_lt_top hH_lt_top
+  have hkH_lt_A : kH < kA := by
+    have hpow : 2 ^ kH < 2 ^ kA := by
+      rw [← hH_card, ← hA_card]
+      exact hH_card_lt
+    exact (Nat.pow_lt_pow_iff_right (by norm_num : 1 < 2)).mp hpow
+  have hkH_le_Z : kH ≤ kZ := by omega
+  have hH_dvd_Z : Nat.card H ∣ Nat.card Z := by
+    rw [hH_card, hZ_card]
+    exact pow_dvd_pow 2 hkH_le_Z
+  intro x hx
+  have hx_order_dvd_H : orderOf x ∣ Nat.card H :=
+    H.orderOf_dvd_natCard hx
+  have hx_order_dvd_Z : orderOf x ∣ Nat.card Z :=
+    dvd_trans hx_order_dvd_H hH_dvd_Z
+  exact mem_of_pow_card_eq_one_of_isCyclic_subgroup hA_cyclic Z
+    (orderOf_dvd_iff_pow_eq_one.mp hx_order_dvd_Z)
+
+/-- If a central subgroup has index `2`, then the ambient group is abelian. -/
+private lemma commutative_of_central_index_two_subgroup
+    {A : Type*} [Group A] {D : Subgroup A}
+    (hD_le_center : D ≤ Subgroup.center A) (hD_idx : D.index = 2) :
+    ∀ x y : A, x * y = y * x := by
+  intro x y
+  by_cases hxD : x ∈ D
+  · have hx_center : x ∈ Subgroup.center A := hD_le_center hxD
+    exact (Subgroup.mem_center_iff.mp hx_center y).symm
+  by_cases hyD : y ∈ D
+  · have hy_center : y ∈ Subgroup.center A := hD_le_center hyD
+    exact Subgroup.mem_center_iff.mp hy_center x
+  have hxyD : x * y ∈ D := by
+    rw [Subgroup.mul_mem_iff_of_index_two hD_idx]
+    exact iff_of_false hxD hyD
+  have hxy_center : x * y ∈ Subgroup.center A := hD_le_center hxyD
+  have hcomm := Subgroup.mem_center_iff.mp hxy_center x
+  exact mul_left_cancel (a := x) (by
+    calc
+      x * (x * y) = x * y * x := hcomm
+      _ = x * (y * x) := by rw [mul_assoc])
+
+/-- Restrict an automorphism of `G` to a characteristic subgroup. -/
+private def characteristicRestrictMulEquiv
+    {G : Type*} [Group G] {H : Subgroup G} (hH : H.Characteristic)
+    (φ : G ≃* G) : H ≃* H where
+  toFun x := ⟨φ x, by
+    have hx : (x : G) ∈ H.comap φ.toMonoidHom := by
+      rw [hH.fixed φ]
+      exact x.2
+    exact hx⟩
+  invFun x := ⟨φ.symm x, by
+    have hx : (x : G) ∈ H.comap φ.symm.toMonoidHom := by
+      rw [hH.fixed φ.symm]
+      exact x.2
+    exact hx⟩
+  left_inv x := by
+    apply Subtype.ext
+    exact φ.symm_apply_apply (x : G)
+  right_inv x := by
+    apply Subtype.ext
+    exact φ.apply_symm_apply (x : G)
+  map_mul' x y := by
+    apply Subtype.ext
+    exact φ.map_mul (x : G) (y : G)
+
+/-- A characteristic subgroup of a characteristic subgroup is characteristic upstairs. -/
+private lemma characteristic_map_subtype_of_characteristic
+    {G : Type*} [Group G] {H : Subgroup G} {K : Subgroup H}
+    (hH : H.Characteristic) (hK : K.Characteristic) :
+    (K.map H.subtype).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_le]
+  intro φ y hy
+  rw [Subgroup.mem_map] at hy ⊢
+  obtain ⟨x, hxL, rfl⟩ := hy
+  rw [Subgroup.mem_map] at hxL
+  obtain ⟨k, hkK, rfl⟩ := hxL
+  let φH : H ≃* H := characteristicRestrictMulEquiv hH φ
+  have hk_image : φH k ∈ K := by
+    have hmem_map : φH k ∈ K.map φH.toMonoidHom :=
+      Subgroup.mem_map_of_mem φH.toMonoidHom hkK
+    exact (Subgroup.characteristic_iff_map_le.mp hK φH) hmem_map
+  refine ⟨φH k, hk_image, ?_⟩
+  rfl
+
+/-- Elementary abelian structure is transported across a multiplicative equivalence. -/
+private lemma isElementaryAbelian_of_mulEquiv
+    {p : ℕ} {A B : Type*} [Group A] [Group B]
+    (e : A ≃* B) (h : IsElementaryAbelian p A) :
+    IsElementaryAbelian p B := by
+  constructor
+  · intro x y
+    obtain ⟨x', rfl⟩ := e.surjective x
+    obtain ⟨y', rfl⟩ := e.surjective y
+    simpa using congrArg e (h.1 x' y')
+  · intro x
+    obtain ⟨x', rfl⟩ := e.surjective x
+    simpa using congrArg e (h.2 x')
+
+/-- **Isaacs Lemma 6.15** (`p = 2`, second-step setup).
+
+The lifted subgroup `E` from `T/T'` is noncyclic and has order `8`; moreover
+`C ∩ E`, viewed as a subgroup of `E`, is cyclic of index `2`. -/
+theorem exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 ∧
+      ¬ IsCyclic E ∧
+      IsCyclic (C.subgroupOf E) ∧
+      (C.subgroupOf E).index = 2 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card⟩ :=
+    exists_lift_quotient_commutator_order_eight_of_center_index_four
+      hT_two h_idx hC_cyclic hC_lt_T hZ_lt_C
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_idx : C.index = 2 :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two
+      (p := 2) h_idx hZ_lt_C hC_lt_T
+  have hE_not_cyclic : ¬ IsCyclic E :=
+    not_isCyclic_of_quotient_commutator_image_four
+      hE_image_elem hE_image_card
+  have hE_ne_C : E ≠ C := by
+    intro hEq
+    apply hE_not_cyclic
+    rw [hEq]
+    exact hC_cyclic
+  have hE_ne_top : E ≠ ⊤ := by
+    intro hEq
+    apply hT_card_ne
+    simpa [hEq] using hE_card
+  have hC_not_le_E : ¬ C ≤ E :=
+    not_ge_of_ne_of_ne_top_of_index_two hC_idx hE_ne_C hE_ne_top
+  have hE_not_le_C : ¬ E ≤ C := by
+    intro hE_le_C
+    haveI : IsCyclic C := hC_cyclic
+    exact hE_not_cyclic (Subgroup.isCyclic_of_le hE_le_C)
+  have hCE_idx : (C.subgroupOf E).index = 2 := by
+    simpa [Subgroup.relIndex] using
+      relIndex_eq_two_of_index_two_of_not_le hC_idx hE_not_le_C
+  exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, subgroupOf_isCyclic_of_isCyclic hC_cyclic, hCE_idx⟩
+
+/-- **Isaacs Lemma 6.15** (`p = 2`, lifted subgroup is abelian).
+
+In the second `p = 2` step, the lifted subgroup `E` is noncyclic of order `8`, `C ∩ E`
+has index `2` in `E`, and the cyclic `2`-group maximality argument forces `C ∩ E ≤ Z(E)`.
+Thus `E` is abelian, matching the corresponding sentence in Isaacs Lemma 6.15. -/
+theorem exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ E : Subgroup T, E.Characteristic ∧
+      _root_.commutator T ≤ E ∧
+      IsElementaryAbelian 2 (E.map (QuotientGroup.mk' (_root_.commutator T))) ∧
+      Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4 ∧
+      Nat.card E = 8 ∧
+      ¬ IsCyclic E ∧
+      (∀ x y : E, x * y = y * x) ∧
+      IsCyclic (C.subgroupOf E) ∧
+      (C.subgroupOf E).index = 2 := by
+  obtain ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, hCE_cyclic, hCE_idx⟩ :=
+    exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hC_idx : C.index = 2 :=
+    index_eq_prime_of_center_lt_of_center_index_pow_two
+      (p := 2) h_idx hZ_lt_C hC_lt_T
+  have hE_ne_C : E ≠ C := by
+    intro hEq
+    apply hE_not_cyclic
+    rw [hEq]
+    exact hC_cyclic
+  have hE_ne_top : E ≠ ⊤ := by
+    intro hEq
+    apply hT_card_ne
+    simpa [hEq] using hE_card
+  have hC_not_le_E : ¬ C ≤ E :=
+    not_ge_of_ne_of_ne_top_of_index_two hC_idx hE_ne_C hE_ne_top
+  have hZ_rel : (Subgroup.center T).relIndex C = 2 := by
+    have hmul :
+        (Subgroup.center T).relIndex C * C.index = (Subgroup.center T).index := by
+      rw [Subgroup.relIndex_mul_index hZ_lt_C.le]
+    rw [hC_idx, h_idx] at hmul
+    norm_num at hmul
+    omega
+  have hZC_idx : ((Subgroup.center T).subgroupOf C).index = 2 := by
+    simpa [Subgroup.relIndex] using hZ_rel
+  have hEC_lt_top : E.subgroupOf C < ⊤ := by
+    refine lt_of_le_of_ne le_top ?_
+    intro htop
+    apply hC_not_le_E
+    intro x hxC
+    have hx_sub : (⟨x, hxC⟩ : C) ∈ E.subgroupOf C := by
+      rw [htop]
+      trivial
+    rwa [Subgroup.mem_subgroupOf] at hx_sub
+  have hEC_le_ZC : E.subgroupOf C ≤ (Subgroup.center T).subgroupOf C :=
+    le_index_two_subgroup_of_lt_top_of_cyclic_two_group
+      (A := C) (hT_two.to_subgroup C) hC_cyclic hZC_idx hEC_lt_top
+  have hCE_le_centerE : C.subgroupOf E ≤ Subgroup.center E := by
+    intro e he
+    rw [Subgroup.mem_center_iff]
+    intro y
+    have heC : ((e : E) : T) ∈ C := by
+      simpa [Subgroup.mem_subgroupOf] using he
+    let eC : C := ⟨((e : E) : T), heC⟩
+    have heC_in_EC : eC ∈ E.subgroupOf C := by
+      rw [Subgroup.mem_subgroupOf]
+      exact e.2
+    have heC_in_ZC : eC ∈ (Subgroup.center T).subgroupOf C :=
+      hEC_le_ZC heC_in_EC
+    have he_center_T : ((e : E) : T) ∈ Subgroup.center T := by
+      simpa [Subgroup.mem_subgroupOf, eC] using heC_in_ZC
+    exact Subtype.ext (Subgroup.mem_center_iff.mp he_center_T ((y : E) : T))
+  have hE_ab : ∀ x y : E, x * y = y * x :=
+    commutative_of_central_index_two_subgroup hCE_le_centerE hCE_idx
+  exact ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card,
+    hE_not_cyclic, hE_ab, hCE_cyclic, hCE_idx⟩
+
+/-- **Isaacs Lemma 6.15** (`p = 2` branch).
+
+Let `T` be a finite `2`-group with `|T : Z(T)| = 4`, `|T| ≠ 8`, and a cyclic subgroup
+`C` with `Z(T) < C < T`. Then `T` contains a characteristic elementary abelian subgroup
+of order `4`. -/
+theorem exists_characteristic_isElementaryAbelian_four_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian 2 K ∧ Nat.card K = 4 := by
+  obtain ⟨E, hE_char, _hcomm_le_E, _hE_image_elem, _hE_image_card, _hE_card,
+    hE_not_cyclic, hE_ab, hCE_cyclic, hCE_idx⟩ :=
+    exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  obtain ⟨K, hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+      (A := E) hE_ab (hT_two.to_subgroup E)
+      (D := C.subgroupOf E) hCE_cyclic hCE_idx hE_not_cyclic
+  let L : Subgroup T := K.map E.subtype
+  refine ⟨L, ?_, ?_, ?_⟩
+  · dsimp [L]
+    exact characteristic_map_subtype_of_characteristic hE_char hK_char
+  · dsimp [L]
+    exact isElementaryAbelian_of_mulEquiv
+      (Subgroup.equivMapOfInjective K E.subtype E.subtype_injective) hK_elem
+  · dsimp [L]
+    rw [Subgroup.card_subtype, hK_card]
+
+/-! ### Lem 6.15 — main dispatch -/
+
+/-- **Isaacs Lemma 6.15**.
+
+Let `T` be a finite `p`-group with order different from `8`, and suppose
+`|T : Z(T)| = p²`. If `C` is cyclic and `Z(T) < C < T`, then `T` contains a
+characteristic elementary abelian subgroup of order `p²`.
+
+The proof dispatches to the already-formalized odd-prime branch and the separate `p = 2`
+center-index-four branch. -/
+theorem exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hT : IsPGroup p T) (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    ∃ K : Subgroup T, K.Characteristic ∧
+      IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
+  rcases (Fact.out : p.Prime).eq_two_or_odd' with hp_two | hp_odd
+  · subst p
+    simpa using
+      exists_characteristic_isElementaryAbelian_four_of_center_index_four
+        hT hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  · exact exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+      hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
+
+/-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
+
+/-- **Isaacs Lemma 6.15**, odd-prime contradiction form.
+
+If a finite `p`-group has a unique subgroup of order `p`, then the odd-prime case of Lemma 6.15
+cannot occur: the characteristic elementary abelian subgroup of order `p²` would contain two
+distinct subgroups of order `p`. This is one of the exclusion steps in the route from Thm 6.12
+to Thm 6.11. -/
+theorem false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hp_odd : Odd p) (hUnique :
+      ∀ K L : Subgroup T, Nat.card K = p → Nat.card L = p → K = L)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_of_center_index_prime_sq_odd
+      hp_odd h_idx hC_cyclic hZ_lt_C hC_lt_T
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := p) (Fact.out : p.Prime) hUnique ⟨K, hK_elem, hK_card⟩
+
+/-- **Isaacs Lemma 6.15**, `p = 2` contradiction form.
+
+Under the unique order-`2` subgroup hypothesis, the `p = 2`, `|T| ≠ 8` branch of Lemma 6.15
+cannot occur. This packages the part of Isaacs' 6.11 route that rules out the elementary
+abelian obstruction produced by the center-index-four argument. -/
+theorem false_of_unique_subgroups_card_two_of_center_index_four
+    {T : Type*} [Group T] [Finite T] (hT_two : IsPGroup 2 T)
+    (hUnique : ∀ K L : Subgroup T, Nat.card K = 2 → Nat.card L = 2 → K = L)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = 2 ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_four_of_center_index_four
+      hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := 2) Nat.prime_two hUnique ⟨K, hK_elem, by
+      simpa using hK_card⟩
+
+/-- **Isaacs Lemma 6.15**, contradiction form used in the route to Thm 6.11.
+
+Under the unique order-`p` subgroup hypothesis, the full Lemma 6.15 configuration cannot occur,
+because the characteristic elementary abelian subgroup of order `p²` would contain two distinct
+subgroups of order `p`. -/
+theorem false_of_unique_subgroups_card_prime_of_center_index_prime_sq
+    {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
+    (hT : IsPGroup p T)
+    (hUnique : ∀ K L : Subgroup T, Nat.card K = p → Nat.card L = p → K = L)
+    (hT_card_ne : Nat.card T ≠ 8)
+    (h_idx : (Subgroup.center T).index = p ^ 2)
+    {C : Subgroup T} (hC_cyclic : IsCyclic C)
+    (hZ_lt_C : Subgroup.center T < C) (hC_lt_T : C < ⊤) :
+    False := by
+  obtain ⟨K, _hK_char, hK_elem, hK_card⟩ :=
+    exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+      hT hT_card_ne h_idx hC_cyclic hZ_lt_C hC_lt_T
+  exact Subgroup.not_exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_unique
+    (G := T) (p := p) (Fact.out : p.Prime) hUnique ⟨K, hK_elem, hK_card⟩
 
 end
 

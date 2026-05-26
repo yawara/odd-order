@@ -52,8 +52,8 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
 | **Lem 1.14** 易方向 | — | `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer` | ✅ **sorry-free 5 行** |
 | **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | ✅ **sorry-free thin wrap** (π = {p} 特殊化) |
-| Thm 1.17 | Thm 5.21 | `commutator_inf_eq_focalSubgroup` ✅ | no-wrapper, docstring 参照 |
-| Thm 1.18 | Thm 5.13 | `ker_transferSylow_isComplement'` ✅ | no-wrapper |
+| Thm 1.17 | Thm 5.21 | `OddOrder.Isaacs.Ch05.focalSubgroupTheorem` ✅ | Ch05 public entrypoint |
+| Thm 1.18 | Thm 5.13 | `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer` ✅ | Ch05 public entrypoint |
 | Cor 1.19(b) | — | `IsZGroup.coprime_commutator_index` ✅ | no-wrapper, audit 発見 |
 | Thm 1.20 | — | `Maschke` ✅ | no-wrapper |
 | **Lem 1.22** | (Ch.1 系) | `IsPGroup.normal_inf_center_nontrivial` + Cauchy + 帰納 | ✅ **proof 完成** |
@@ -988,24 +988,47 @@ theorem hall_higman_solvable_specialization
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
   OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hp'
 
-/-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20) — mathlib 直接, no-wrapper
+/-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20)
 
-CLAUDE.md no-mathlib-wrapper policy により 4 結果とも個別 theorem は書かない.
+Focal/Burnside は Ch05 側に BG から引用する public entrypoint を置く.
 
-- **BG Thm 1.17** (Focal Subgroup): mathlib `Subgroup.commutator_inf_eq_focalSubgroup`.
-  Phase 1 wrapper: `OddOrder.Isaacs.Ch05.abelian_sylow_commutator_inf_eq_focal`.
-- **BG Thm 1.18** (Burnside p-complement): mathlib `MonoidHom.ker_transferSylow_isComplement'`
-  (`Mathlib/GroupTheory/Transfer.lean:275`).
+- **BG Thm 1.17** (Focal Subgroup): `OddOrder.Isaacs.Ch05.focalSubgroupTheorem`.
+- **BG Thm 1.18** (Burnside p-complement):
+  `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`.
 - **BG Cor 1.19(b)** (Z-group ⇒ G' Hall): mathlib `IsZGroup.coprime_commutator_index`
   (`Mathlib/GroupTheory/SpecificGroups/ZGroup.lean:280`).
 - **BG Thm 1.20** (Maschke): mathlib `Mathlib/RepresentationTheory/Maschke.lean`. -/
 
 /-! ## §1G: p-length one + p-group normal series (Lem 1.21, Lem 1.22)
 
-- **Lem 1.21** (p-length one の 5 性質): BG-unique def, 別ファイル `PLength.lean` (将来).
+- **Lem 1.21** (p-length one の 5 性質): `HasPLengthOne` として定義を固定.
 - **Lem 1.22** (p-group normal series): 本ファイル下記.
 
 ### Lem 1.22 implementation -/
+
+/-- The BG subgroup `O_{π',π,π'}(G)`.
+
+It is defined as the preimage of `O_{π'}` in `G / O_{π',π}(G)`, where
+`O_{π',π}` is the Phase 1 subgroup `OddOrder.Isaacs.Ch03.oPiPrimePiCore`. -/
+noncomputable def oPiPrimePiPiPrimeCore (π : Set ℕ) (G : Type*) [Group G] :
+    Subgroup G :=
+  Subgroup.comap
+    (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiPrimePiCore π G))
+    (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ π}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiPrimePiCore π G))
+
+instance oPiPrimePiPiPrimeCore.normal (π : Set ℕ) (G : Type*) [Group G] :
+    (oPiPrimePiPiPrimeCore π G).Normal := by
+  rw [oPiPrimePiPiPrimeCore]
+  infer_instance
+
+/-- BG `π`-length one: `G = O_{π',π,π'}(G)`. -/
+def HasPiLengthOne (π : Set ℕ) (G : Type*) [Group G] : Prop :=
+  oPiPrimePiPiPrimeCore π G = ⊤
+
+/-- BG `p`-length one: the singleton-prime specialization of `HasPiLengthOne`. -/
+def HasPLengthOne (p : ℕ) (G : Type*) [Group G] : Prop :=
+  HasPiLengthOne ({p} : Set ℕ) G
 
 variable {p : ℕ} [hp : Fact p.Prime] {G : Type*} [Group G] [Finite G]
 

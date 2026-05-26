@@ -141,9 +141,9 @@ CLAUDE.md 規約: 識別子に **番号を入れない** (`thm_1_4` NG), 記述�
 Isaacs: 1 章 = 1 ディレクトリ, 入口は `Main.lean`. 1500-2000 行で subsection 単位に分割.
 BG / Peterfalvi: 1 節 = 1 ファイル. **先回り分割しない** — 育つかどうかは事前に読めない.
 
-### 2.7 mathlib ラッパー方針 (2026-05-21 確定)
+### 2.7 ラッパー方針 (2026-05-21 確定, 2026-05-25 拡張)
 
-CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` の規約に対応する詳細。
+CLAUDE.md `## 開発規約 ### ラッパー方針` の規約に対応する詳細。
 
 #### 書かない (デフォルト)
 
@@ -152,6 +152,10 @@ CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` の規約に対応す
 theorem inf_isSubnormal {S T} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
     (S ⊓ T).IsSubnormal := hS.inf hT
 ```
+
+この禁止は mathlib だけでなく, 本リポジトリ内の既存 theorem にも適用する。
+たとえば BG/Peterfalvi 側で使うためだけに既存の `OddOrder.Isaacs.*` 定理を
+引数・型そのままで再命名する wrapper は書かない。
 
 理由:
 - mathlib API 変更時の追従コスト
@@ -165,6 +169,7 @@ theorem inf_isSubnormal {S T} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
 |---|---|
 | 引数順 / convention 適応 | `commute_of_disjoint_normal` — mathlib `commute_of_normal_of_disjoint M N` を Isaacs 流の `[Normal] + Disjoint` で取り直す |
 | 仮定特殊化 | `cauchy [Finite G]` — mathlib `exists_prime_orderOf_dvd_card'` を Finite 仮定に specialize して呼び出しを短くする |
+| 教科書間の実質的な適応 | BG の仮定・notation・quotient 形に合わせて Isaacs theorem を合成/特殊化する |
 | 章内で 2 回以上呼ぶ慣用名 | `sylow_nonempty` — Isaacs Thm 1.7 として呼びたい場合 |
 
 **判定基準**: 「章内で 2 回以上呼ぶ **かつ** 適応が必要」 ⇒ ラッパー OK。
@@ -172,7 +177,8 @@ theorem inf_isSubnormal {S T} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
 
 #### 書かない場合のトレーサビリティ
 
-教科書 ↔ mathlib の対応は以下のいずれかで残す (どちらか必須、両方やる必要は無い):
+教科書 ↔ mathlib / repo 内 theorem の対応は以下のいずれかで残す
+(どちらか必須、両方やる必要は無い):
 
 1. **`notes/{book}/{chXX,sNN}_*.md` の対応表** (一次ソース、章/節単位):
    ```markdown

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Module.ZMod
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.FiniteAbelian.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
@@ -1194,6 +1195,132 @@ Theorem 7.5 repeatedly uses the faithful action of `G` on the `p`-group `V` as a
 embedding `G ↪ Aut(V)`, and writes `C_V(P)` for the fixed subgroup of `P` acting on
 `V`.  The following helpers keep those two translations explicit. -/
 
+/-- Reinterpret automorphisms of an abelian group of exponent dividing `p` as `ZMod p`-linear
+automorphisms of its additive type.
+
+The `ZMod p`-module structure is supplied explicitly because in Thm 7.5 it is built from the
+elementary-abelian hypothesis on a quotient. -/
+noncomputable def mulAutZModGeneralLinearEquiv
+    (V : Type*) [Group V] [IsMulCommutative V] (p : ℕ)
+    [Module (ZMod p) (Additive V)] :
+    MulAut V ≃* LinearMap.GeneralLinearGroup (ZMod p) (Additive V) where
+  toFun φ :=
+    (LinearMap.GeneralLinearGroup.generalLinearEquiv (ZMod p) (Additive V)).symm
+      ((MulEquiv.toAdditive φ).toLinearEquiv
+        (fun c x => ZMod.map_smul (MulEquiv.toAdditive φ).toAddMonoidHom c x))
+  invFun φ :=
+    (MulEquiv.toAdditive (G := V) (H := V)).symm φ.toLinearEquiv.toAddEquiv
+  left_inv φ := by
+    ext x
+    rfl
+  right_inv φ := by
+    ext x
+    rfl
+  map_mul' φ ψ := by
+    ext x
+    rfl
+
+/-- A chosen `ZMod p`-basis of size `2` identifies `Aut(V)` with `GL(2,p)`.
+
+This is the explicit bridge needed to feed the action on an elementary-abelian quotient into
+Isaacs Lemma 7.3 (`gl2_pSubgroup_centralizes_of_normalizes`). -/
+noncomputable def mulAutGLTwoEquivOfBasis
+    (V : Type*) [Group V] [IsMulCommutative V] (p : ℕ)
+    [Module (ZMod p) (Additive V)]
+    (b : Module.Basis (Fin 2) (ZMod p) (Additive V)) :
+    MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p) :=
+  (mulAutZModGeneralLinearEquiv V p).trans (Matrix.GeneralLinearGroup.toLin' b).symm
+
+/-- The `ZMod p` scalar-torsion condition supplied by an elementary-abelian multiplicative group.
+-/
+private lemma additive_nsmul_eq_zero_of_isElementaryAbelian
+    {V : Type*} [Group V] {p : ℕ}
+    (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) :
+    ∀ x : Additive V, (p : ℕ) • x = 0 := by
+  intro x
+  apply Additive.toMul.injective
+  show (p • x).toMul = (0 : Additive V).toMul
+  rw [toMul_nsmul, toMul_zero]
+  exact hV.pow_eq_one x.toMul
+
+/-- An elementary-abelian group of order `p^2` has automorphism group identified with `GL(2,p)`.
+
+The basis is chosen noncomputably from the finite `ZMod p`-vector-space structure on the
+additive type. -/
+noncomputable def mulAutGLTwoEquivOfIsElementaryAbelianCard
+    (V : Type*) [Group V] [Finite V] {p : ℕ} [Fact p.Prime]
+    (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) (hcard : Nat.card V = p ^ 2) :
+    MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p) := by
+  classical
+  haveI : IsMulCommutative V := ⟨⟨hV.comm⟩⟩
+  haveI : Fintype V := Fintype.ofFinite V
+  haveI : Fintype (Additive V) := Fintype.ofEquiv V Additive.ofMul
+  haveI : Module (ZMod p) (Additive V) :=
+    AddCommGroup.zmodModule (additive_nsmul_eq_zero_of_isElementaryAbelian hV)
+  have hfinrank : Module.finrank (ZMod p) (Additive V) = 2 := by
+    apply Nat.pow_right_injective (Fact.out : p.Prime).two_le
+    calc
+      p ^ Module.finrank (ZMod p) (Additive V)
+          = Fintype.card (ZMod p) ^ Module.finrank (ZMod p) (Additive V) := by
+              rw [ZMod.card]
+      _ = Fintype.card (Additive V) := (Module.card_eq_pow_finrank
+              (K := ZMod p) (V := Additive V)).symm
+      _ = Nat.card (Additive V) := by rw [Nat.card_eq_fintype_card]
+      _ = Nat.card V := (Nat.card_congr Additive.ofMul).symm
+      _ = p ^ 2 := hcard
+  let b0 := Module.Free.chooseBasis (ZMod p) (Additive V)
+  have hidx_card : Fintype.card (Module.Free.ChooseBasisIndex (ZMod p) (Additive V)) = 2 := by
+    rw [← Module.finrank_eq_card_chooseBasisIndex]
+    exact hfinrank
+  let eidx : Module.Free.ChooseBasisIndex (ZMod p) (Additive V) ≃ Fin 2 :=
+    Fintype.equivOfCardEq (by rw [hidx_card, Fintype.card_fin])
+  exact mulAutGLTwoEquivOfBasis V p (b0.reindex eidx)
+
+/-- Transport Isaacs Lemma 7.3 back from `GL(2,p)` to automorphism subgroups.
+
+The hypotheses are stated for the images of `P` and `L` under a chosen identification
+`Aut(V) ≃ GL(2,p)`.  The conclusion is the original centralizer statement in `Aut(V)`. -/
+theorem mulAut_centralizes_of_gl2_image_hypotheses
+    {V : Type*} [Group V] {p : ℕ} [Fact p.Prime]
+    (e : MulAut V ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) (hp2 : p ≠ 2)
+    {P L : Subgroup (MulAut V)}
+    (hPp : IsPGroup p (P.map e.toMonoidHom))
+    (hPnorm : P.map e.toMonoidHom ≤
+      Subgroup.normalizer ((L.map e.toMonoidHom) : Set _))
+    (hLcop : ¬ p ∣ Nat.card (L.map e.toMonoidHom))
+    (hL2abelian :
+      ∀ S : Subgroup (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)),
+        S ≤ L.map e.toMonoidHom → IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) :
+    P ≤ Subgroup.centralizer (L : Set _) := by
+  have hGL : P.map e.toMonoidHom ≤ Subgroup.centralizer ((L.map e.toMonoidHom) : Set _) :=
+    gl2_pSubgroup_centralizes_of_normalizes hp2 hPp hPnorm hLcop hL2abelian
+  intro x hxP
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hyL
+  have hxGL : e x ∈ P.map e.toMonoidHom :=
+    Subgroup.mem_map_of_mem e.toMonoidHom hxP
+  have hyGL : e y ∈ L.map e.toMonoidHom :=
+    Subgroup.mem_map_of_mem e.toMonoidHom hyL
+  have hcommGL : e y * e x = e x * e y :=
+    (Subgroup.mem_centralizer_iff.mp (hGL hxGL)) (e y) hyGL
+  apply e.injective
+  simpa [map_mul] using hcommGL
+
+/-- Cyclic branch of Isaacs Thm 7.5: a group acting faithfully by automorphisms on a cyclic
+group is commutative, hence every acting subgroup is normal.
+
+The proof uses mathlib's explicit `Aut(V) ≃ (ZMod |V|)ˣ` identification for cyclic groups.
+This is the formal version of the book step "if `V` is cyclic, then `Aut(V)` is abelian, so
+`G` is abelian and `P` is normal." -/
+theorem subgroup_normal_of_injective_mulAut_of_isCyclic
+    {A V : Type*} [Group A] [Group V] [IsCyclic V]
+    {φ : A →* MulAut V} (hφ : Function.Injective φ) (P : Subgroup A) :
+    P.Normal := by
+  let e := IsCyclic.mulAutMulEquiv V
+  letI : CommGroup (MulAut V) := e.toMonoidHom.commGroupOfInjective e.injective
+  letI : CommGroup A := φ.commGroupOfInjective hφ
+  infer_instance
+
 /-- A faithful action by automorphisms embeds the acting group into `MulAut V`. -/
 theorem toMulAut_injective_of_faithful {A V : Type*} [Group A] [Group V]
     [MulDistribMulAction A V] [FaithfulSMul A V] :
@@ -1228,6 +1355,16 @@ theorem mem_actionCentralizer {A V : Type*} [Group A] [Group V]
     {φ : A →* MulAut V} {P : Subgroup A} {v : V} :
     v ∈ actionCentralizer φ P ↔ ∀ p : P, (φ p) v = v :=
   Iff.rfl
+
+@[simp]
+theorem mem_actionCentralizer_top {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {v : V} :
+    v ∈ actionCentralizer φ (⊤ : Subgroup A) ↔ ∀ a : A, (φ a) v = v := by
+  constructor
+  · intro hv a
+    exact hv ⟨a, trivial⟩
+  · intro hv a
+    exact hv a
 
 /-- If `P ≤ Q`, then `C_V(Q) ≤ C_V(P)`. -/
 theorem actionCentralizer_antitone {A V : Type*} [Group A] [Group V]
@@ -1337,6 +1474,263 @@ theorem actionCentralizer_sup_index_le_sq {A V : Type*} [Group A] [Group V]
       actionCentralizer_sup_index_le_of_le φ P Q hP hQ
     _ = p ^ 2 := by ring
 
+/-- The same Theorem 7.5 index estimate, in the `U = C_V(P) ∩ C_V(Q)` form used in
+the book proof. -/
+theorem actionCentralizer_inf_index_le_sq {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) (P Q : Subgroup A) {p : ℕ}
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    (actionCentralizer φ P ⊓ actionCentralizer φ Q).index ≤ p ^ 2 := by
+  rw [← actionCentralizer_sup]
+  exact actionCentralizer_sup_index_le_sq φ P Q hP hQ
+
+/-- Quotient-cardinality form of the Theorem 7.5 index estimate:
+if both `C_V(P)` and `C_V(Q)` have index at most `p`, then
+`|V / (C_V(P) ∩ C_V(Q))| ≤ p²`. -/
+theorem quotient_card_le_prime_sq_of_actionCentralizer_inf
+    {A V : Type*} [Group A] [Group V] (φ : A →* MulAut V) (P Q : Subgroup A)
+    {p : ℕ} [(actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal]
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p) :
+    Nat.card (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) ≤ p ^ 2 := by
+  simpa [Subgroup.index_eq_card] using actionCentralizer_inf_index_le_sq φ P Q hP hQ
+
+/-- The Theorem 7.5 quotient reduction: in the `U = C_V(P) ∩ C_V(Q)` quotient, if the
+quotient is noncyclic then it is elementary abelian of order `p²`.
+
+This packages the index estimate with the small-order noncyclic `p`-group bridge from
+`OddOrder.GroupTheory.ElementaryAbelian`. -/
+theorem quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic
+    {A V : Type*} [Group A] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime] (φ : A →* MulAut V) (P Q : Subgroup A)
+    [(actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal]
+    (hV : IsPGroup p V)
+    (hP : (actionCentralizer φ P).index ≤ p)
+    (hQ : (actionCentralizer φ Q).index ≤ p)
+    (hNotCyclic : ¬ IsCyclic (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q))) :
+    OddOrder.GroupTheory.IsElementaryAbelian p
+        (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) ∧
+      Nat.card (V ⧸ (actionCentralizer φ P ⊓ actionCentralizer φ Q)) = p ^ 2 :=
+  IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
+    (hV.to_quotient (actionCentralizer φ P ⊓ actionCentralizer φ Q))
+    (quotient_card_le_prime_sq_of_actionCentralizer_inf φ P Q hP hQ)
+    hNotCyclic
+
+/-- Any subgroup fixed pointwise by the whole acting group is invariant under the action. -/
+theorem isAInvariant_of_le_actionCentralizer_top {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V}
+    (hU : U ≤ actionCentralizer φ (⊤ : Subgroup A)) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ U := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a u hu
+  rw [(mem_actionCentralizer_top.mp (hU hu)) a]
+  exact hu
+
+/-- If `G = ⟨P, Q⟩`, then `U = C_V(P) ∩ C_V(Q)` is invariant under the whole action.
+
+This is the invariant-subgroup bridge needed before passing to `V/U` in Isaacs Thm 7.5. -/
+theorem actionCentralizer_inf_isAInvariant_of_sup_eq_top
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {P Q : Subgroup A} (hPQ : P ⊔ Q = ⊤) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ
+      (actionCentralizer φ P ⊓ actionCentralizer φ Q) := by
+  apply isAInvariant_of_le_actionCentralizer_top
+  rw [← actionCentralizer_sup, hPQ]
+
+/-- If `U ≤ C`, then the image of `C` in `V/U` has the same index as `C`.
+
+This is the quotient-index bridge behind the Theorem 7.5 passage from `V` to `V/U`. -/
+theorem quotient_image_index_eq_of_le {V : Type*} [Group V]
+    {U C : Subgroup V} [U.Normal] (hUC : U ≤ C) :
+    (C.map (QuotientGroup.mk' U)).index = C.index :=
+  Subgroup.index_map_eq C (QuotientGroup.mk'_surjective U) (by
+    rw [QuotientGroup.ker_mk']
+    exact hUC)
+
+/-- Action-centralizer version of `quotient_image_index_eq_of_le`: if `U ≤ C_V(P)`,
+then `C_V(P)/U` has the same index in `V/U` as `C_V(P)` has in `V`. -/
+theorem actionCentralizer_quotient_image_index_eq_of_le
+    {A V : Type*} [Group A] [Group V] (φ : A →* MulAut V)
+    (P : Subgroup A) {U : Subgroup V} [U.Normal]
+    (hU : U ≤ actionCentralizer φ P) :
+    ((actionCentralizer φ P).map (QuotientGroup.mk' U)).index =
+      (actionCentralizer φ P).index :=
+  quotient_image_index_eq_of_le hU
+
+/-- The induced action on `V/U` for an invariant normal subgroup `U`. -/
+noncomputable def quotientActionHom {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) : A →* MulAut (V ⧸ U) :=
+  OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hU
+
+@[simp]
+theorem quotientActionHom_apply_mk' {A V : Type*} [Group A] [Group V]
+    {φ : A →* MulAut V} {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) (a : A) (v : V) :
+    (quotientActionHom φ hU a) (QuotientGroup.mk' U v) =
+      QuotientGroup.mk' U ((φ a) v) :=
+  OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
+    hU a v
+
+/-- Kernel of the induced action on `V/U`. In Isaacs Thm 7.5 this is the subgroup `K`
+acting trivially on `V/U`. -/
+noncomputable def quotientActionKernel {A V : Type*} [Group A] [Group V]
+    (φ : A →* MulAut V) {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) : Subgroup A :=
+  (quotientActionHom φ hU).ker
+
+/-- If `K` lies in the kernel of the quotient action on `V/U`, then `[V,K] ≤ U`.
+
+This is the formal quotient-kernel bridge used in Isaacs Thm 7.5 after passing from
+`V` to `V/U`. -/
+theorem actionCommutator_le_of_le_quotientActionKernel
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    {K : Subgroup A} (hK : K ≤ quotientActionKernel φ hU) :
+    OddOrder.Isaacs.Ch04.actionCommutator (φ.comp K.subtype) ≤ U := by
+  rw [OddOrder.Isaacs.Ch04.actionCommutator_le_iff_left]
+  intro k v
+  have hk : quotientActionHom φ hU (k : A) = 1 := by
+    change (k : A) ∈ (quotientActionHom φ hU).ker
+    exact hK k.property
+  have hq :
+      quotientActionHom φ hU (k : A) (QuotientGroup.mk' U v) =
+        (1 : MulAut (V ⧸ U)) (QuotientGroup.mk' U v) := by
+    rw [hk]
+  rw [quotientActionHom_apply_mk'] at hq
+  simp only [MulAut.one_apply] at hq
+  change (((φ (k : A)) v : V) : V ⧸ U) = (v : V ⧸ U) at hq
+  rw [QuotientGroup.eq] at hq
+  simpa [mul_inv_rev] using U.inv_mem hq
+
+/-- Kernel-specialized form of `actionCommutator_le_of_le_quotientActionKernel`. -/
+theorem actionCommutator_quotientActionKernel_le
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    OddOrder.Isaacs.Ch04.actionCommutator
+      (φ.comp (quotientActionKernel φ hU).subtype) ≤ U :=
+  actionCommutator_le_of_le_quotientActionKernel hU le_rfl
+
+/-- If `U` is fixed pointwise by the whole acting group and `K` acts trivially on `V/U`,
+then `K` acts trivially on `[V,K]`.
+
+This is the Ch07-side formalization of the Thm 7.5 step `[V,K,K] = 1`. -/
+theorem actionCommutator_le_fixedPoints_of_le_quotientActionKernel
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hU_top : U ≤ actionCentralizer φ (⊤ : Subgroup A))
+    {K : Subgroup A} (hK : K ≤ quotientActionKernel φ hU) :
+    OddOrder.Isaacs.Ch04.actionCommutator (φ.comp K.subtype) ≤
+      Subgroup.fixedPointsOfMulAut (φ.comp K.subtype) := by
+  intro v hv k
+  have hvU : v ∈ U := actionCommutator_le_of_le_quotientActionKernel hU hK hv
+  exact (mem_actionCentralizer_top.mp (hU_top hvU)) (k : A)
+
+/-- Kernel-specialized form: the kernel `K` of the quotient action satisfies `[V,K,K]=1`
+when `U` is fixed pointwise by the original action. -/
+theorem actionCommutator_quotientActionKernel_le_fixedPoints
+    {A V : Type*} [Group A] [Group V] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hU_top : U ≤ actionCentralizer φ (⊤ : Subgroup A)) :
+    OddOrder.Isaacs.Ch04.actionCommutator
+        (φ.comp (quotientActionKernel φ hU).subtype) ≤
+      Subgroup.fixedPointsOfMulAut (φ.comp (quotientActionKernel φ hU).subtype) :=
+  actionCommutator_le_fixedPoints_of_le_quotientActionKernel hU hU_top le_rfl
+
+/-- Semidirect-product bridge: the condition `[V,A,A]=1`, expressed as
+`[V,A] ≤ C_V(A)`, gives the length-two iterated commutator vanishing used by the Ch.4
+faithful-action prime-divisor theorem. -/
+theorem iterCommutator_inl_inr_two_eq_bot_of_actionCommutator_le_fixedPoints
+    {A V : Type*} [Group A] [Group V] (φ : A →* MulAut V)
+    (h_triv : OddOrder.Isaacs.Ch04.actionCommutator φ ≤
+      Subgroup.fixedPointsOfMulAut φ) :
+    OddOrder.Isaacs.Ch04.iterCommutator
+        (SemidirectProduct.inl : V →* V ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* V ⋊[φ] A).range 2 = ⊥ := by
+  rw [OddOrder.Isaacs.Ch04.iterCommutator_succ,
+    OddOrder.Isaacs.Ch04.iterCommutator_succ,
+    OddOrder.Isaacs.Ch04.iterCommutator_zero]
+  rw [← OddOrder.Isaacs.Ch04.actionCommutator_map_inl φ]
+  rw [eq_bot_iff, Subgroup.commutator_le]
+  rintro _ ⟨v, hv, rfl⟩ _ ⟨a, rfl⟩
+  rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+  have h_fix : (φ a) v = v := h_triv hv a
+  rw [show (φ a) v⁻¹ = ((φ a) v)⁻¹ from map_inv (φ a) v,
+    h_fix, mul_inv_cancel]
+  exact map_one _
+
+/-- If a faithful finite group action on a finite `p`-group has quotient-action kernel `K`
+with `[V,K,K]=1`, then `K` is a `p`-group.
+
+This packages the Ch.4 faithful iterated-commutator theorem for the kernel arising in
+Isaacs Thm 7.5. -/
+theorem quotientActionKernel_isPGroup_of_faithful_of_isPGroup
+    {A V : Type*} [Group A] [Group V] [Finite A] [Finite V]
+    {p : ℕ} [Fact p.Prime] {φ : A →* MulAut V}
+    {U : Subgroup V} [U.Normal]
+    (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hφ : Function.Injective φ) (hV : IsPGroup p V)
+    (hU_top : U ≤ actionCentralizer φ (⊤ : Subgroup A)) :
+    IsPGroup p (quotientActionKernel φ hU) := by
+  set K : Subgroup A := quotientActionKernel φ hU with hK_def
+  let ψ : K →* MulAut V := φ.comp K.subtype
+  have hψ : Function.Injective ψ := by
+    intro x y hxy
+    apply Subtype.ext
+    exact hφ hxy
+  have h_triv : OddOrder.Isaacs.Ch04.actionCommutator ψ ≤
+      Subgroup.fixedPointsOfMulAut ψ := by
+    simpa [ψ, K, hK_def] using
+      actionCommutator_quotientActionKernel_le_fixedPoints hU hU_top
+  have h_iter :
+      OddOrder.Isaacs.Ch04.iterCommutator
+          (SemidirectProduct.inl : V →* V ⋊[ψ] K).range
+          (SemidirectProduct.inr : K →* V ⋊[ψ] K).range 2 = ⊥ :=
+    iterCommutator_inl_inr_two_eq_bot_of_actionCommutator_le_fixedPoints ψ h_triv
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
+      (⊤ : Subgroup K) := by
+    intro q hq
+    have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq
+    have hq_dvd_K : q ∣ Nat.card K := by
+      simpa [Subgroup.card_top] using Nat.dvd_of_mem_primeFactors hq
+    have hq_dvd_V : q ∣ Nat.card V :=
+      OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
+        ψ hψ (m := 2) (by norm_num) h_iter hq_prime hq_dvd_K
+    have hV_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
+        (⊤ : Subgroup V) :=
+      OddOrder.Isaacs.Ch04.isPiGroup_singleton_of_isPGroup
+        (G := V) (H := (⊤ : Subgroup V)) (hV.to_subgroup _)
+    have hqV : q ∈ (Nat.card (⊤ : Subgroup V)).primeFactors := by
+      rw [Subgroup.card_top]
+      exact Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd_V, Nat.card_pos.ne'⟩
+    exact hV_pi q hqV
+  have hK_top_p : IsPGroup p (⊤ : Subgroup K) :=
+    OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton
+      (G := K) (H := (⊤ : Subgroup K)) hK_pi
+  simpa [K, hK_def] using hK_top_p.of_equiv Subgroup.topEquiv
+
+/-- The `U = C_V(P) ∩ C_V(Q)` specialization of
+`quotientActionKernel_isPGroup_of_faithful_of_isPGroup`.
+
+Normality of this fixed-point intersection is kept as an explicit hypothesis; in the book proof
+this is the preceding `U ⊴ V` step. -/
+theorem actionCentralizer_inf_quotientActionKernel_isPGroup_of_sup_eq_top
+    {A V : Type*} [Group A] [Group V] [Finite A] [Finite V]
+    {p : ℕ} [Fact p.Prime] {φ : A →* MulAut V}
+    {P Q : Subgroup A}
+    [hU_normal : (actionCentralizer φ P ⊓ actionCentralizer φ Q).Normal]
+    (hPQ : P ⊔ Q = ⊤) (hφ : Function.Injective φ) (hV : IsPGroup p V) :
+    IsPGroup p (quotientActionKernel φ
+      (actionCentralizer_inf_isAInvariant_of_sup_eq_top (φ := φ) hPQ)) := by
+  apply quotientActionKernel_isPGroup_of_faithful_of_isPGroup
+  · exact hφ
+  · exact hV
+  · rw [← actionCentralizer_sup, hPQ]
+
 end -- 7A
 
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
@@ -1390,6 +1784,21 @@ private theorem centralizer_le_normalizer {G : Type*} [Group G] (H : Subgroup G)
       rw [hcomm_z]; group
     have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
     rw [hy_eq]; exact hxyx
+
+/-- **Isaacs Lem 7.7 (a)** (image of normalizer under p'-quotient).
+
+`N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
+`N_Ḡ(P̄) = (N_G(P)).map f`.
+
+This is exactly Isaacs Lemma 2.17 in the quotient form needed in Ch.7. -/
+theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
+    [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    Subgroup.normalizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.normalizer P).map (QuotientGroup.mk' N) :=
+  OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
+    hp_coprime hP_neBot hP_pgroup
 
 /-- **Isaacs Lem 7.7 (b)** (image of centralizer under p'-quotient).
 
@@ -1479,6 +1888,23 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
     have hcp : c * p = p * c := (Subgroup.mem_centralizer_iff.mp hc p hp).symm
     rw [← map_mul, ← map_mul]
     exact congrArg f hcp.symm
+
+/-- **Isaacs Lem 7.7** (N/C theorem for p'-quotients).
+
+If `N ⊴ G` is a normal `p'`-subgroup and `P` is a nontrivial `p`-subgroup, then the
+normalizer and centralizer of `P` commute with passage to `G/N`. -/
+theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
+    {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    (Subgroup.normalizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.normalizer P).map (QuotientGroup.mk' N)) ∧
+    (Subgroup.centralizer
+        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
+      = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N)) :=
+  ⟨normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup,
+    centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
 
 end -- 7C
 

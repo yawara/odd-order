@@ -17,10 +17,21 @@ BG Lemma 1.21 は p-length one の基本性質 5 部。BG 固有の definition
 
 ## やること
 
-- [ ] `p-length one` の定義を `OddOrder.GroupTheory` または BG §1 ローカルに置くか決める。
-- [ ] `O_{p',p,p'}` を既存 `oPiCore` API でどう表すか決める。
+- [x] `p-length one` の定義を `OddOrder.GroupTheory` または BG §1 ローカルに置くか決める。
+- [x] `O_{p',p,p'}` を既存 `oPiCore` API でどう表すか決める。
 - [ ] Lemma 1.21(a)-(e) の statement を分割して実装する。
 - [ ] 後続 BG §6 / App.A で使う名前を notes に記録する。
+
+## 進捗
+
+2026-05-25 bg-ch1-ch2:
+
+- 定義場所は `OddOrder.BG.Ch1.S01` ローカルに決定。
+- `O_{π',π,π'}(G)` は `oPiPrimePiPiPrimeCore π G` として、既存の
+  `OddOrder.Isaacs.Ch03.oPiPrimePiCore` の quotient 上の `oPiCore π'` の preimage
+  で定義。
+- BG p-length one は `HasPLengthOne p G`; π-set 一般版は `HasPiLengthOne π G`。
+- 既存 Phase 1 API と重複する untracked `OddOrder/GroupTheory/OpResidual.lean` は使わない方針。
 
 ## 完了条件
 

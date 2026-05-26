@@ -10,6 +10,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -167,6 +169,145 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
+
+-- Ch.5 (Transfer): Thm 5.13 (Burnside normal p-complement)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer
+
+-- Ch.5 (Transfer): Thm 5.20 (focal transfer kernel is A^p(G))
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.APrime_eq_transferFocal_ker
+
+-- Ch.5 (Transfer): Thm 5.21 (Focal Subgroup Theorem)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.focalSubgroupTheorem
+
+-- Ch.5 (Transfer): Thm 5.25 (normal p-complement iff Sylow controls own fusion)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion
+
+-- Ch.5 (Transfer): Thm 5.26 (Frobenius normal p-complement)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
+
+-- Ch.5 (Transfer): Cor 5.29 (prime-divisor obstruction gives normal p-complement)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.hasNormalPComplement_of_no_prime_dvd_pow_sub_one
+
+-- Ch.5 (Transfer): Cor 5.30 (odd p, order-p elements central)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normal_p_complement_of_order_p_central_odd
+
+-- Ch.6 (Frobenius Actions): Thm 6.9 solvable Frobenius subgroup obstruction
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+
+-- Ch.6 (Frobenius Actions): Thm 6.9 elementary abelian subgroup obstruction
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq
+
+-- Ch.6 (Frobenius Actions): Thm 6.9 `p = q` order-`pq` branch
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+
+-- Ch.6 (Frobenius Actions): Thm 6.9 full order-`pq` branch
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
+
+-- Ch.6 (Frobenius Actions): Cor 6.10 Sylow subgroups have unique order-`p` subgroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.subgroups_card_prime_unique_of_frobeniusAction_sylow
+
+-- Ch.6 route to Thm 6.11: finite commutative p-groups with unique order-`p`
+-- subgroup are cyclic, and hence commutative Sylow subgroups of Frobenius complements are cyclic.
+#assert_only_allowed_axioms IsPGroup.isCyclic_of_subgroups_card_prime_unique
+#assert_only_allowed_axioms IsPGroup.isCyclic_subgroup_of_subgroups_card_prime_unique
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
+-- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.actionFixedBy_eq_actionFixedPoints_zpowers
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_le_iff
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.actionFixedBy_invariant_of_commute
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_invariant_of_commutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_isFrobeniusAction_of_fixedBy_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.normal_of_commutator_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.sylow_not_le_of_prime_dvd_index
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.commutator_le_of_proper_invariant_le_of_isSolvable
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_of_faithful_trivial_on_proper_invariant
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_involution_mem_of_nontrivial_two_subgroup
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution_of_nontrivial_two_subgroup
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution_of_index_two
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative
+
+-- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
+-- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic
+-- elementary abelian subgroup of order 4.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_four_of_noncyclic_abelian_two_group
+-- Lem 6.15 p=2 setup: `T/T'` is abelian, and it is noncyclic under the center-index
+-- hypothesis.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.quotient_commutator_commutative
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_commutator_not_isCyclic_of_center_index_prime_sq
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.quotient_commutator_image_cyclic_index_two_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_lift_quotient_commutator_four_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.card_lift_quotient_commutator_eq_eight_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_lift_quotient_commutator_order_eight_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_four_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.exists_characteristic_isElementaryAbelian_of_center_index_prime_sq
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_prime_of_center_index_prime_sq_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_center_index_four
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_prime_of_center_index_prime_sq
+
+-- Ch.7 (Thompson Subgroup): Thm 7.5 GL(2,p) bridge for automorphism subgroups.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.mulAut_centralizes_of_gl2_image_hypotheses
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.subgroup_normal_of_injective_mulAut_of_isCyclic
+#assert_only_allowed_axioms
+  IsPGroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_card_le_prime_sq_of_actionCentralizer_inf
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒

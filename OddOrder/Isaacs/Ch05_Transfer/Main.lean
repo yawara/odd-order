@@ -25,7 +25,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 | 5A | Transfer 定義・welldefinedness・準同型性 | 5.1 – 5.4 | mathlib + ✅ Thm 5.3 + Cor 5.4 |
 | 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | ✅ 5.8 + 5.9, mathlib + 5.10 保留 |
 | 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ Lem 5.11 + Lem 5.12 + Thm 5.17 + Thm 5.18 (強形+弱形) + Cor 5.19 (cyclic Sylow_2 版) |
-| 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | mathlib `Focal.lean` 直接 |
+| 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | ✅ 5.20-5.23; 5.24 保留 |
 | 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
 
 ## 方針
@@ -302,13 +302,22 @@ theorem commutatorElement_pow_index_center_eq_one
 
 end -- 5B
 
+/-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
+that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
+
+For finite `G`, this is equivalent to existence of normal `N` with `|N|` coprime to `p`
+and `|G:N|` a `p`-power. mathlib 未収載のため新規定義. -/
+def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
+  ∃ N : Subgroup G, N.Normal ∧
+    ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
+
 section /- 5C: Hall transfer, Burnside, cyclic / abelian Sylow (pp. 159-167) -/
 
 /-! ### Isaacs §5C (Hall transfer + Burnside)
 
 - **Lemma 5.11** (Hall index transfer): `ker_transfer_sup_eq_top_of_hall` ✅.
 - **Lemma 5.12** (`N_G(P)` controls `C_G(P)` fusion): `normalizer_controls_centralizer_fusion` ✅.
-- **Thm 5.13 Burnside**: `MonoidHom.ker_transferSylow_isComplement'` 直接.
+- **Thm 5.13 Burnside**: `hasNormalPComplement_of_sylow_normalizer_le_centralizer` ✅.
 - **Cor 5.14**: `IsCyclic.isComplement'` 直接.
 - **Cor 5.15** (Z-group solvable): mathlib `IsZGroup` instance 直接.
 - **Thm 5.16** (Z-group 構造): mathlib `IsZGroup` API 直接.
@@ -669,6 +678,34 @@ theorem normalizer_controls_centralizer_fusion
       _ = (c : G) * y * (c : G)⁻¹ := by rw [hgxy]
       _ = y * (c : G) * (c : G)⁻¹ := by rw [← hcy]
       _ = y := by group
+
+/-- **Isaacs Thm 5.13 (Burnside normal p-complement)**:
+if a Sylow `p`-subgroup centralizes its normalizer, then `G` has a normal
+`p`-complement.
+
+This adapts mathlib's `MonoidHom.ker_transferSylow_isComplement'`, which gives a
+complement for the chosen Sylow subgroup, to this file's `HasNormalPComplement`
+predicate requiring the same normal complement for every Sylow subgroup. -/
+theorem hasNormalPComplement_of_sylow_normalizer_le_centralizer
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hP : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤
+      Subgroup.centralizer ((P : Subgroup G) : Set G)) :
+    HasNormalPComplement p G := by
+  classical
+  let N : Subgroup G := (MonoidHom.transferSylow P hP).ker
+  have hNP : Subgroup.IsComplement' N (P : Subgroup G) := by
+    simpa [N] using MonoidHom.ker_transferSylow_isComplement' P hP
+  refine ⟨N, inferInstance, ?_⟩
+  intro Q
+  have hdisj : Disjoint N (Q : Subgroup G) := by
+    simpa [N] using MonoidHom.ker_transferSylow_disjoint P hP
+      (Q : Subgroup G) Q.isPGroup'
+  have hcardQ : Nat.card (Q : Subgroup G) = Nat.card (P : Subgroup G) := by
+    exact Nat.card_congr (Sylow.equiv Q P).toEquiv
+  have hcard : Nat.card N * Nat.card (Q : Subgroup G) = Nat.card G := by
+    rw [hcardQ]
+    exact hNP.card_mul
+  exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
 
 /-- mathlib `commutator_inf_eq_focalSubgroup` のリネーム (Focal Subgroup Theorem の
 Isaacs 5.18 弱形). 注: Isaacs 5.18 のフル statement は次の
@@ -1090,37 +1127,6 @@ theorem _root_.Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn
       exact hcomm_eq
     exact Subgroup.mem_map_of_mem H.subtype hgH_focal
 
-end -- 5D
-
-section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
-
-/-! ### Isaacs §5E (Frobenius normal p-complement)
-
-**FT クリティカル**. mathlib 未収載で新規実装が必要.
-
-- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」.
-- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
-  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
-- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
-- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
-  Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
-- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
-  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` + `lt_normalizer_of_pgroup_of_lt_top`.
-  main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
-  Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
-  二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
-- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
-- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
-
-/-- "G has a normal p-complement" — there exists a normal subgroup `N : Subgroup G` such
-that for every Sylow `p`-subgroup `P`, `(N, P)` form a complement pair (`IsComplement'`).
-
-For finite `G`, this is equivalent to existence of normal `N` with `|N|` coprime to `p`
-and `|G:N|` a `p`-power. mathlib 未収載のため新規定義. -/
-def HasNormalPComplement (p : ℕ) (G : Type*) [Group G] : Prop :=
-  ∃ N : Subgroup G, N.Normal ∧
-    ∀ P : Sylow p G, Subgroup.IsComplement' N (P : Subgroup G)
-
 /-- `OPrime p G` — the smallest normal subgroup of `G` with `p`-power index.
 For finite `G`, this is the intersection of all such normal subgroups (Isaacs §5D 冒頭, 'O^p(G)').
 
@@ -1351,6 +1357,89 @@ lemma APrime_inf_sylow_eq_focalSubgroup [Finite G] {p : ℕ} [Fact p.Prime]
   · rw [← Subgroup.commutator_inf_eq_focalSubgroup P]
     exact inf_le_inf (commutator_le_APrime p G) le_rfl
 
+/-- **Isaacs Thm 5.21 (Focal Subgroup Theorem)**:
+for a Sylow `p`-subgroup `P`, the focal subgroup is the common intersection of
+`P` with the commutator subgroup, with `A^p(G)`, and with the focal-transfer kernel.
+
+This is the downstream-facing Ch.5 entrypoint for BG Thm 1.17. It packages mathlib's
+`Subgroup.commutator_inf_eq_focalSubgroup` and
+`Subgroup.ker_transferFocal_inf_eq_focalSubgroup` together with this file's
+`A^p(G)` bridge. -/
+theorem focalSubgroupTheorem [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    _root_.commutator G ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup ∧
+      APrime p G ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup ∧
+      P.transferFocal.ker ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+  exact ⟨Subgroup.commutator_inf_eq_focalSubgroup P,
+    APrime_inf_sylow_eq_focalSubgroup P,
+    Subgroup.ker_transferFocal_inf_eq_focalSubgroup P⟩
+
+/-- **Isaacs Thm 5.20**: the focal transfer kernel is `A^p(G)`.
+
+This upgrades `A^p(G) ≤ ker(transferFocal)` to equality by comparing indices via a
+Sylow `p`-subgroup: both normal subgroups have p-power index, both join with `P` to
+give `G`, and both have the same intersection with `P`, namely the focal subgroup. -/
+theorem APrime_eq_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    APrime p G = P.transferFocal.ker := by
+  classical
+  let A : Subgroup G := APrime p G
+  let K : Subgroup G := P.transferFocal.ker
+  haveI : A.Normal := by
+    dsimp [A]
+    infer_instance
+  haveI : K.Normal := by
+    dsimp [K]
+    infer_instance
+  have hA_le_K : A ≤ K := by
+    simpa [A, K] using APrime_le_transferFocal_ker (G := G) (p := p) P
+  have hA_inf_P : A ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+    simpa [A] using APrime_inf_sylow_eq_focalSubgroup (G := G) (p := p) P
+  have hK_inf_P : K ⊓ (P : Subgroup G) = (P : Subgroup G).focalSubgroup := by
+    simpa [K] using Subgroup.ker_transferFocal_inf_eq_focalSubgroup P
+  have hA_index_pow : ∃ k : ℕ, A.index = p ^ k := by
+    simpa [A] using APrime_index_isPGroup p G
+  have hK_index_pow : ∃ k : ℕ, K.index = p ^ k := by
+    have hquot : IsPGroup p (G ⧸ P.transferFocal.ker) :=
+      (P.2.to_quotient P.focalSubgroupOf).of_equiv
+        (Subgroup.transferFocal.quotientKerMulEquivQuotientFocalSubroupOf P).symm
+    obtain ⟨k, hk⟩ := hquot.exists_card_eq
+    refine ⟨k, ?_⟩
+    change P.transferFocal.ker.index = p ^ k
+    rw [Subgroup.index_eq_card]
+    exact hk
+  have hPA_top : (P : Subgroup G) ⊔ A = ⊤ := by
+    obtain ⟨k, hk⟩ := hA_index_pow
+    have hcop : Nat.Coprime (P : Subgroup G).index A.index := by
+      rw [hk]
+      exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have hPK_top : (P : Subgroup G) ⊔ K = ⊤ := by
+    obtain ⟨k, hk⟩ := hK_index_pow
+    have hcop : Nat.Coprime (P : Subgroup G).index K.index := by
+      rw [hk]
+      exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+    exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+  have h_index_eq : A.index = K.index := by
+    calc
+      A.index = A.relIndex (P : Subgroup G) := by
+        rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := A),
+          hPA_top, Subgroup.relIndex_top_right]
+      _ = (A ⊓ (P : Subgroup G)).relIndex (P : Subgroup G) := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = (K ⊓ (P : Subgroup G)).relIndex (P : Subgroup G) := by
+        rw [hA_inf_P, hK_inf_P]
+      _ = K.relIndex (P : Subgroup G) := by
+        rw [Subgroup.inf_relIndex_right]
+      _ = K.index := by
+        rw [← Subgroup.relIndex_sup_right (H := (P : Subgroup G)) (K := K),
+          hPK_top, Subgroup.relIndex_top_right]
+  have hrel_eq_one : A.relIndex K = 1 := by
+    have hmul : A.relIndex K * K.index = 1 * K.index := by
+      rw [Subgroup.relIndex_mul_index hA_le_K, one_mul, h_index_eq]
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
+  exact le_antisymm hA_le_K (Subgroup.relIndex_eq_one.mp hrel_eq_one)
+
 /-- The always-available half of Isaacs Cor. 5.22:
 if a subgroup `H` contains a Sylow `p`-subgroup of `G`, then
 `A^p(H) ≤ H ∩ A^p(G)`.
@@ -1509,6 +1598,28 @@ theorem APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow
     exact normalizer_controls_centralizer_fusion P hxC hyC hgxy
   simpa [N] using
     APrime_eq_subgroupOf_APrime_of_controlsFusionIn (G := G) (p := p) P hP_le_N hFusion
+
+end -- 5D
+
+section /- 5E: Frobenius normal p-complement (pp. 173-180) -/
+
+/-! ### Isaacs §5E (Frobenius normal p-complement)
+
+**FT クリティカル**. mathlib 未収載で新規実装が必要.
+
+- **Def** `HasNormalPComplement p G` — 「G は normal p-complement を持つ」(§5C で導入済み).
+- **Thm 5.25** (Sylow controls own fusion ⇔ normal p-comp): ✅ 完成.
+  `controlsOwnFusion_of_hasNormalPComplement` + `hasNormalPComplement_of_controlsOwnFusion`.
+- **Thm 5.26 Frobenius** (3 同値条件): ✅ 完成 (Lem 5.27 + Lem 5.28 + 5.25 経由).
+- **Lem 5.27** (1 ⇒ 2 ⇒ 3 易方向): ✅ 完成. Part 1 (`hasNormalPComplement_of_subgroup`) +
+  Part 2 (`isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`).
+- **Lem 5.28** (3 ⇒ Sylow 共役 via C_G(P ⊓ Q)): ✅ 完成 (sorry-free).
+  helper `sylow_sup_normal_eq_top_of_quot_isPGroup` + `lt_normalizer_of_pgroup_of_lt_top`.
+  main body Steps 1-11 全実装: P ⊓ N > D, Sylow S/T/R 設定, N=SC 分解,
+  Sylow II in ↥N, T = yC • S, conjugation translation to G, index strict ineq,
+  二回 IH chain (P, R) と (yR, Q), 結合 c = x · yC⁻¹ · z.
+- **Cor 5.29** (q ∤ p^e-1 ⇒ normal p-comp): ✅ 完成 (5.26 + p-group action).
+- **Cor 5.30** (p odd, 全 order-p 中心 ⇒ normal p-comp): ✅ 完成 (Ch.4 §4D Thm 4.36). -/
 
 /-- If `A^p(G)=G`, then a Sylow p-subgroup is equal to its focal subgroup.
 
