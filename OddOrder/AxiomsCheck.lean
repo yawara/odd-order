@@ -306,7 +306,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.conj_eq_inv_or_twist_of_two_adic_cases
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.conj_exponent_modEq_sq_of_quotient_sq_eq
+#assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases
 
 -- Ch.6 (Frobenius Actions): Lem 6.15 p=2 abelian index-two branch
 -- finite abelian noncyclic 2-group with cyclic index-two subgroup has characteristic

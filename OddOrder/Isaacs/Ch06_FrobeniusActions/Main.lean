@@ -6231,6 +6231,51 @@ private lemma conj_pow_eq_zpow_pow_of_conj_eq_zpow
           congr 1
           rw [pow_succ']
 
+/-- **Isaacs Thm 6.12 setup**: if `aC = (bC)^2` in `P/C`, and conjugation by
+`a` and `b` sends `c` to `c^i` and `c^j`, respectively, then `i ≡ j² (mod |c|)`.
+
+This is the square-root bridge used after the cyclic quotient step: an element of `C = ⟨c⟩`
+commutes with every power of `c`, so replacing `a` by a representative `c^m * b²` makes
+conjugation by `a` agree with conjugation by `b²` on `c`. -/
+theorem conj_exponent_modEq_sq_of_quotient_sq_eq
+    {P : Type*} [Group P] {C : Subgroup P} [C.Normal] {a b c : P} {i j : ℤ}
+    (hC_eq : C = Subgroup.zpowers c)
+    (hquot : QuotientGroup.mk' C a = (QuotientGroup.mk' C b) ^ 2)
+    (h_conj_a : a * c * a⁻¹ = c ^ i)
+    (h_conj_b : b * c * b⁻¹ = c ^ j) :
+    i ≡ j ^ 2 [ZMOD orderOf c] := by
+  classical
+  have hquot' : QuotientGroup.mk' C a = QuotientGroup.mk' C (b ^ 2) := by
+    simpa [QuotientGroup.mk_pow] using hquot
+  have hdiv : a / b ^ 2 ∈ C :=
+    (QuotientGroup.eq_iff_div_mem (N := C)).mp hquot'
+  have hz_mem : a / b ^ 2 ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using hdiv
+  obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hz_mem
+  have ha_eq : a = c ^ m * b ^ 2 := by
+    calc
+      a = (a / b ^ 2) * b ^ 2 := by
+        rw [div_eq_mul_inv, mul_assoc, inv_mul_cancel, mul_one]
+      _ = c ^ m * b ^ 2 := by rw [← hm]
+  have hb2_conj : b ^ 2 * c * (b ^ 2)⁻¹ = c ^ (j ^ 2 : ℤ) :=
+    conj_pow_eq_zpow_pow_of_conj_eq_zpow h_conj_b 2
+  have hsame : a * c * a⁻¹ = b ^ 2 * c * (b ^ 2)⁻¹ := by
+    rw [ha_eq]
+    calc
+      (c ^ m * b ^ 2) * c * (c ^ m * b ^ 2)⁻¹ =
+          c ^ m * (b ^ 2 * c * (b ^ 2)⁻¹) * (c ^ m)⁻¹ := by
+        group
+      _ = c ^ m * c ^ (j ^ 2 : ℤ) * (c ^ m)⁻¹ := by rw [hb2_conj]
+      _ = c ^ (j ^ 2 : ℤ) := by
+        have hcomm : Commute (c ^ m) (c ^ (j ^ 2 : ℤ)) :=
+          (Commute.zpow_self c m).zpow_right (j ^ 2 : ℤ)
+        rw [hcomm.eq, mul_assoc, mul_inv_cancel, mul_one]
+      _ = b ^ 2 * c * (b ^ 2)⁻¹ := hb2_conj.symm
+  have hpow_eq : c ^ i = c ^ (j ^ 2 : ℤ) := by
+    rw [← h_conj_a, hsame, hb2_conj]
+  rw [← zpow_eq_zpow_iff_modEq]
+  exact hpow_eq
+
 /-- **Isaacs Thm 6.12 setup**: if `a^p ∈ ⟨c⟩` and conjugation by `a` sends `c` to
 `c^i`, then `i^p ≡ 1 (mod |c|)`.
 
@@ -6402,6 +6447,100 @@ theorem conj_eq_inv_or_twist_of_two_adic_cases
         rw [zpow_sub, zpow_one]
       _ = c ^ (2 ^ (e - 1)) * c⁻¹ := by
         rw [hpow_cast, zpow_natCast]
+
+/-- The two 2-adic alternatives in Isaacs Lemma 6.16 cannot be a square modulo `2^e`
+when `e ≥ 3`.
+
+The proof reduces modulo `4`: both alternatives are `-1 mod 4`, but no square in
+`ZMod 4` is `-1`. -/
+private lemma square_root_two_adic_cases_false
+    {e : ℕ} (he : 3 ≤ e) {i j : ℤ}
+    (hij : i ≡ j ^ 2 [ZMOD ((2 : ℤ) ^ e)])
+    (hcases :
+      i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) :
+    False := by
+  have h4_dvd : (4 : ℤ) ∣ (2 : ℤ) ^ e := by
+    have hle : 2 ≤ e := le_trans (by norm_num) he
+    simpa [show (4 : ℤ) = (2 : ℤ) ^ 2 by norm_num] using
+      pow_dvd_pow (2 : ℤ) hle
+  have hij4 : i ≡ j ^ 2 [ZMOD (4 : ℤ)] := hij.of_dvd h4_dvd
+  have hi4 : i ≡ -1 [ZMOD (4 : ℤ)] := by
+    rcases hcases with hi | hi
+    · exact hi.of_dvd h4_dvd
+    · have hsemi :
+          ((2 : ℤ) ^ (e - 1) - 1) ≡ (-1 : ℤ) [ZMOD (4 : ℤ)] := by
+        refine Int.modEq_iff_dvd.mpr ?_
+        have hle : 2 ≤ e - 1 := Nat.le_sub_of_add_le he
+        have h4 : (4 : ℤ) ∣ (2 : ℤ) ^ (e - 1) := by
+          simpa [show (4 : ℤ) = (2 : ℤ) ^ 2 by norm_num] using
+            pow_dvd_pow (2 : ℤ) hle
+        convert dvd_neg.mpr h4 using 1
+        ring
+      exact (hi.of_dvd h4_dvd).trans hsemi
+  have hsq : (j ^ 2 : ℤ) ≡ (-1 : ℤ) [ZMOD (4 : ℤ)] :=
+    hij4.symm.trans hi4
+  have hZcast : ((j ^ 2 : ℤ) : ZMod 4) = (-1 : ZMod 4) :=
+    (ZMod.intCast_eq_intCast_iff (j ^ 2) (-1) 4).mpr hsq
+  have hZ : ((j : ZMod 4) ^ 2) = (-1 : ZMod 4) := by
+    simpa using hZcast
+  have hbad : ∀ x : ZMod 4, x ^ 2 ≠ (-1 : ZMod 4) := by
+    decide
+  exact hbad (j : ZMod 4) hZ
+
+/-- **Isaacs Thm 6.12 setup**: in the cyclic quotient branch, the 2-adic conjugation
+alternatives force `|P/C| = 2`.
+
+If `P/C` had order larger than `2`, the nontrivial involution `aC` would be a square
+`(bC)^2`. Conjugation by `b` on `C = ⟨c⟩` has some exponent `j`, so
+`conj_exponent_modEq_sq_of_quotient_sq_eq` gives `i ≡ j² (mod |c|)`. Since the two
+2-adic alternatives both reduce to `-1 mod 4`, this is impossible. -/
+theorem index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {C : Subgroup P} [C.Normal] {c a : P} {e : ℕ} {i : ℤ}
+    (hC_eq : C = Subgroup.zpowers c)
+    (hquot_cyclic : IsCyclic (P ⧸ C))
+    (h_order : orderOf c = 2 ^ e) (he : 3 ≤ e)
+    (ha_notmem : a ∉ C) (ha_sq_mem : a ^ 2 ∈ C)
+    (h_conj : a * c * a⁻¹ = c ^ i)
+    (hcases :
+      i ≡ -1 [ZMOD ((2 : ℤ) ^ e)] ∨
+        i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) :
+    C.index = 2 := by
+  classical
+  rw [Subgroup.index_eq_card]
+  by_contra hcard_ne_two
+  let q : P ⧸ C := QuotientGroup.mk' C a
+  have hq_ne : q ≠ 1 := by
+    intro hq_one
+    exact ha_notmem ((QuotientGroup.eq_one_iff a).mp hq_one)
+  have hq_sq : q ^ 2 = 1 := by
+    change ((a : P ⧸ C) ^ 2 = 1)
+    rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    exact ha_sq_mem
+  have hQ : IsPGroup 2 (P ⧸ C) := hP.to_quotient C
+  haveI : IsCyclic (P ⧸ C) := hquot_cyclic
+  obtain ⟨r, hr_sq⟩ :=
+    exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
+      (Q := P ⧸ C) hQ hq_ne hq_sq hcard_ne_two
+  obtain ⟨b, hb⟩ := QuotientGroup.mk'_surjective C r
+  have hquot : QuotientGroup.mk' C a = (QuotientGroup.mk' C b) ^ 2 := by
+    rw [hb]
+    exact hr_sq.symm
+  have hcC : c ∈ C := by
+    rw [hC_eq]
+    exact Subgroup.mem_zpowers c
+  have hb_conj_mem_C : b * c * b⁻¹ ∈ C := by
+    exact (inferInstance : C.Normal).conj_mem c hcC b
+  have hb_conj_mem_z : b * c * b⁻¹ ∈ Subgroup.zpowers c := by
+    simpa [hC_eq] using hb_conj_mem_C
+  obtain ⟨j, h_conj_b_symm⟩ := Subgroup.mem_zpowers_iff.mp hb_conj_mem_z
+  have h_conj_b : b * c * b⁻¹ = c ^ j := h_conj_b_symm.symm
+  have hij_order : i ≡ j ^ 2 [ZMOD orderOf c] :=
+    conj_exponent_modEq_sq_of_quotient_sq_eq hC_eq hquot h_conj h_conj_b
+  have hij : i ≡ j ^ 2 [ZMOD ((2 : ℤ) ^ e)] := by
+    simpa [h_order] using hij_order
+  exact square_root_two_adic_cases_false he hij hcases
 
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 

@@ -480,8 +480,13 @@ FT クリティカル度 + 章内依存で並べる:
   `P/C` cyclic 後の `|P/C|=2` 段階に向けて, 有限 cyclic 2-group で位数が 2 より
   大きければ非自明 involution は square である
   `exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two` も追加済み.
-  次は quotient 上でこの square root を取り, conjugation exponent が `j^2` になることを
-  2-adic alternative と mod 4 矛盾させる bridge.
+  さらに quotient 上でこの square root を取り, conjugation exponent が `j^2` になる
+  `conj_exponent_modEq_sq_of_quotient_sq_eq` と, 2-adic alternative を mod 4 で矛盾させて
+  cyclic quotient branch から `C.index = 2` を返す
+  `index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases` まで追加済み.
+  次はこの `index = 2` 結論を既存 Lemma 6.13 recognizer
+  (`conj_eq_inv_or_twist_of_two_adic_cases`) に渡し, 6.12 の cyclic-quotient branch を
+  D/Q/SD exclusion へ接続する.
 - 6.9 solvable Frobenius group 分岐:
   Isaacs L3475 の「kernel `N` と complement conjugates 全体」の partition を
   `SubgroupPartition.frobeniusGroup` として実装し,
