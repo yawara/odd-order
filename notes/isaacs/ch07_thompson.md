@@ -247,6 +247,9 @@ Peterfalvi 付録 (05.X, 06.0, 07.0) でも Ch.7 内容は直接使われない 
   `subgroup_normal_of_injective_mulAut_of_isCyclic` で
   `Aut(V) ≃ (ZMod |V|)ˣ` から acting group 可換, したがって `P ⊴ G` まで閉じられる.
   theorem statement / proof 本体は保留.
+- 2026-05-26: 7.5 minimal-counterexample reduction 用に Ch03 側へ
+  `Subgroup.isPiSeparable_of_isPiSeparable` を追加済み. これで `G` を
+  `⟨P,Q⟩` に置き換えるときの p-separable 仮定は `P⊔Q` 専用 wrapper なしで継承できる.
 - Thm 7.1, 7.6, 7.8: docstring + statement 保留.
 
 ## 前提章の再分類 (main 取り込み後)

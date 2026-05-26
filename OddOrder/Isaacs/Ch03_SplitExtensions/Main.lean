@@ -1898,7 +1898,7 @@ private theorem decompose_pi_pi'_exists_zpow {Q : Type*} [Group Q] [Finite Q] (�
 private lemma image_subgroupOf_le_oPiCore (π : Set ℕ) {G : Type*} [Group G] [Finite G]
     {F : Subgroup G} [F.Normal] {H : Subgroup G} [H.Normal] (_hFH : F ≤ H)
     (hH_pi : Subgroup.IsPiGroup π (H.map (QuotientGroup.mk' F)))
-    {N : Subgroup G} [N.Normal] {F' : Subgroup ↥N} [F'.Normal]
+    {N : Subgroup G} {F' : Subgroup ↥N} [F'.Normal]
     (hF'_le : F.subgroupOf N ≤ F') :
     (H.subgroupOf N).map (QuotientGroup.mk' F') ≤ oPiCore π (↥N ⧸ F') := by
   apply Subgroup.IsPiGroup.le_oPiCore
@@ -1995,22 +1995,22 @@ instance quotient_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
     rw [hn, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)] at hmap
     exact top_le_iff.mp hmap
 
-/-! ### Normal subgroup 閉包
+/-! ### Subgroup 閉包
 
-`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]`.
+`[IsPiSeparable π G] {N ≤ G} ⇒ [IsPiSeparable π ↥N]`.
 
 数学的内容 (Isaacs Lem 3.18 piFittingSeries 版): `(piFittingSeries π G n).subgroupOf N`
 は `↥N` の正規列で各因子が "A_π ⊔ A_π'" 構造. 各層で Bezout 分解
 (`decompose_pi_pi'_exists_zpow`) により `x = x^k₁ * x^k₂` と π-part × π'-part に分け,
 `image_subgroupOf_le_oPiCore` で各 part が `oPiCore π` / `oPiCore π'` に入ることを示す. -/
 
-/-- **`piFittingSeries` の normal subgroup 制限**:
-`N ⊴ G` で `(piFittingSeries π G n).subgroupOf N ≤ piFittingSeries π N n`.
+/-- **`piFittingSeries` の subgroup 制限**:
+`N ≤ G` で `(piFittingSeries π G n).subgroupOf N ≤ piFittingSeries π N n`.
 
 帰納法: succ ステップで Bezout 分解で `x · F_n = π-part · π'-part` を整数指数で実現,
 各 part の image を `image_subgroupOf_le_oPiCore` で `O_π` / `O_π'` に押し込む. -/
-private theorem piFittingSeries_subgroupOf_le_of_normal (π : Set ℕ)
-    (G : Type*) [Group G] [Finite G] (N : Subgroup G) [N.Normal] : ∀ n,
+private theorem piFittingSeries_subgroupOf_le (π : Set ℕ)
+    (G : Type*) [Group G] [Finite G] (N : Subgroup G) : ∀ n,
     (piFittingSeries π G n).subgroupOf N ≤ piFittingSeries π N n := by
   intro n
   induction n with
@@ -2099,16 +2099,23 @@ private theorem piFittingSeries_subgroupOf_le_of_normal (π : Set ℕ)
       (hT1 ⟨x^k₁, hy1_in, rfl⟩)
       (hT2 ⟨x^k₂, hy2_in, rfl⟩)
 
-/-- **`IsPiSeparable` の normal subgroup 閉包**:
-`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]`. -/
-instance normalSubgroup_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
-    (N : Subgroup G) [N.Normal] [IsPiSeparable π G] : IsPiSeparable π ↥N where
+/-- **`IsPiSeparable` の subgroup 閉包**:
+`[IsPiSeparable π G] {N ≤ G} ⇒ [IsPiSeparable π ↥N]`. -/
+theorem Subgroup.isPiSeparable_of_isPiSeparable (π : Set ℕ)
+    {G : Type*} [Group G] [Finite G] (N : Subgroup G) [IsPiSeparable π G] :
+    IsPiSeparable π ↥N where
   exists_top := by
     obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
     refine ⟨n, ?_⟩
-    have hle := piFittingSeries_subgroupOf_le_of_normal π G N n
+    have hle := piFittingSeries_subgroupOf_le π G N n
     rw [hn, Subgroup.top_subgroupOf] at hle
     exact top_le_iff.mp hle
+
+/-- **`IsPiSeparable` の normal subgroup 閉包**:
+`[IsPiSeparable π G] {N ⊴ G} ⇒ [IsPiSeparable π ↥N]`. -/
+instance normalSubgroup_isPiSeparable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] [IsPiSeparable π G] : IsPiSeparable π ↥N :=
+  Subgroup.isPiSeparable_of_isPiSeparable π N
 
 /-- 補助: `piFittingSeries π G (n+1)` が `piFittingSeries π G n` を真に拡張する条件は,
 `G/Fₙ` 上の `O_π ⊔ O_{π'}` が非自明であることと同値. -/

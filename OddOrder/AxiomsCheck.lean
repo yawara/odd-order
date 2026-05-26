@@ -106,6 +106,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Quotienting by O_π(G) kills the π-radical.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot
 
+-- Ch.3 (Split Extensions): π-separability passes to arbitrary subgroups.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable
+
 -- Ch.3 (Split Extensions): Thm 3.22 Hall-Higman π-length ≤ 1
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
