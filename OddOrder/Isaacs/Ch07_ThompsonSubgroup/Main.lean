@@ -4339,7 +4339,7 @@ private axiom step4_5_normal_J_hypotheses
     OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G) ∧
       (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p
 
-/-- **Isaacs Thm 7.6 Step 8** (local axiom — mmd L3893-3896).
+/-- **Isaacs Thm 7.6 Step 8a** (local axiom — mmd L3893-3895): apply Thm 7.5.
 
 Given Step 4-5-6-7 outputs:
 * `P = UA` (Step 4)
@@ -4349,9 +4349,8 @@ Given Step 4-5-6-7 outputs:
 plus the running Thm 7.6 hypotheses (i)-(v),
 
 apply Thm 7.5 (`sylow_normal_of_elementary_normal_P_theorem`) to derive
-`P̄ ⊴ Ḡ`, then pull back to get `P ⊴ G`, then `A ⊆ P ⊆ O_p(G) = U`,
-which contradicts `A ⊄ U`. -/
-private axiom step8_normal_J_closure
+`P̄ ⊴ Ḡ`. -/
+private axiom step8a_PBar_normal_GBar
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     (_hp2 : p ≠ 2)
@@ -4364,7 +4363,6 @@ private axiom step8_normal_J_closure
          = (P : Subgroup G))
     {A : Subgroup G}
     (_hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
-    (_hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G)
     (_h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G))
     (_h_Abar_card_eq_p :
        (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p)
@@ -4372,7 +4370,53 @@ private axiom step8_normal_J_closure
     (_h_K_map_eq_bot :
        (Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)).map
          (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥) :
-    False
+    ((P : Subgroup G).map
+      (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))).Normal
+
+/-- **Isaacs Thm 7.6 Step 8b** (mmd L3896): pull back `P̄ ⊴ Ḡ` to derive `False`.
+
+Once `P̄ ⊴ Ḡ` is established (Step 8a), correspondence-theorem reasoning gives
+`P ⊴ G` (since `U ≤ P`, the preimage of `P̄` is `P`).  Then `P.Normal` and
+`IsPGroup p P` give `P ≤ opCore p G = U` via `normal_pgroup_le_opCore`.
+Combined with `A ≤ P`, this contradicts `A ⊄ U`. -/
+theorem step8b_pullback_normal_P
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    {A : Subgroup G}
+    (hA_le_P : A ≤ (P : Subgroup G))
+    (hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G)
+    (hPBar_normal :
+       ((P : Subgroup G).map
+         (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))).Normal) :
+    False := by
+  -- (1) U ≤ P (general).
+  have hU_le_P : OddOrder.Isaacs.Ch01.opCore p G ≤ (P : Subgroup G) :=
+    OddOrder.Isaacs.Ch01.opCore_le P
+  -- (2) U ≤ oPiCore_p (definitionally equal).
+  have hU_eq : OddOrder.Isaacs.Ch01.opCore p G =
+      OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
+  -- (3) (P.map mk').comap mk' = P (since U ≤ P, and U = kernel of mk').
+  have hP_preimage :
+      ((P : Subgroup G).map
+        (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))).comap
+          (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) =
+        (P : Subgroup G) := by
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+    -- Goal: P ⊔ oPiCore {p} G = P. Use U ≤ P.
+    rw [← hU_eq]
+    exact sup_eq_left.mpr hU_le_P
+  -- (4) P̄ ⊴ Ḡ ⇒ comap P̄ = P is normal in G.
+  have hP_normal : (P : Subgroup G).Normal := by
+    rw [← hP_preimage]
+    exact hPBar_normal.comap (QuotientGroup.mk' _)
+  -- (5) P is a normal p-group ⇒ P ≤ opCore p G = U.
+  have hP_pg : IsPGroup p (P : Subgroup G) := P.isPGroup'
+  haveI := hP_normal
+  have hP_le_U : (P : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G :=
+    OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hP_pg
+  -- (6) A ≤ P ≤ U contradicts hA_not_le.
+  exact hA_not_le (hA_le_P.trans hP_le_U)
 
 /-- **Isaacs Thm 7.6 Step 1-7 conclusion**: `J(P) ≤ O_p(G)`.
 
@@ -4471,10 +4515,15 @@ theorem thompsonJ_le_opCore_of_normal_J_hypotheses
       (Subgroup.centralizer (omega1ZCenterOpCore H p : Set H)).map
         (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) H)) = ⊥ :=
     centralizer_omega1ZCenterOpCore_map_eq_bot_of_le_opCore h_K_le_U
-  -- (Step 8): apply Thm 7.5, then pull back to get A ⊆ U, contradicting hA_not_le.
-  exact step8_normal_J_closure (G := H) Q hp2 h_pSolvable_in_H h2abelian'
-    h_oPiPrime_trivial' h_centralizer_center' hA_mem hA_not_le h_P_eq_UA h_Abar_card_eq_p
-    hV_inter_A_le_p h_K_map_eq_bot
+  -- (Step 8a): apply Thm 7.5 to get P̄ ⊴ Ḡ.
+  have hPBar_normal :
+      ((Q : Subgroup H).map (QuotientGroup.mk'
+        (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) H))).Normal :=
+    step8a_PBar_normal_GBar (G := H) Q hp2 h_pSolvable_in_H h2abelian'
+      h_oPiPrime_trivial' h_centralizer_center' hA_mem h_P_eq_UA h_Abar_card_eq_p
+      hV_inter_A_le_p h_K_map_eq_bot
+  -- (Step 8b): pull back P̄ ⊴ Ḡ to derive `False` from `A ⊆ P ⊆ U`.
+  exact step8b_pullback_normal_P Q hA_mem.1 hA_not_le hPBar_normal
 
 /-- **Isaacs Thm 7.6** (normal-J theorem, unconditional).
 
