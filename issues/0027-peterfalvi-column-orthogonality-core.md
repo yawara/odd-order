@@ -45,6 +45,12 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 - `conjugacyClassSize`, `characterTableWeightedRowPairing`, and
   `CharacterTableWeightedRowOrthogonality` を追加し、first orthogonality を
   class-weighted matrix row Gram の形で使うための interface を固定した。
+- `characterTableClassSizeSquareMatrix`, `characterTableSquareWeightedRowPairing`,
+  and `characterTableWeightedRowGramMatrix` を追加し、row Gram を
+  `A * W * Aᴴ` として明示した。
+- `characterTableDeterminant_ne_zero_of_weightedRowOrthogonality` を追加し、
+  class-weighted row orthogonality から character-table determinant nonzero
+  (`CharacterTableMatrixInvertible`) までを `sorry` なしで接続した。
 - `characterTableClassColumnPairingOfIndexing` and
   `characterTableSquareColumnPairing` を追加し、class-indexed column pairing と
   square reindexed matrix の column Gram を相互変換できるようにした。
