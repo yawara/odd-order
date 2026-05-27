@@ -13,10 +13,19 @@
 
 いずれも `OddOrder.Isaacs.Ch07.{normal_J, thompsonJ_le_opCore_of_normal_J_hypotheses}` を呼び、奇数位数+solvable で自動充足する 2 仮説 (`h2abelian` / `h_pSolvable` via `isPiSeparable_of_solvable` instance) を discharge した特殊化。
 
-**残課題**:
-1. **Thm 6.2 一般形** `Z(J(S))·O_{p'}(G) ⊴ G` (任意 S): `O_{p'}(G)` で商を取り reduced case (`normalJ_normal_of_odd`) に簡約。`Z(J(S))` の扱い + quotient lift が中核。
-2. **Thm 6.1 一般形** `O_{p',p}(G) ⊇ S の abelian normal 部分群` (任意 S, C_G(Z(P)) 不要): `opCore p G ≤ oPiPrimePiCore {p} G` 橋 (`oPiCore_singleton_eq_opCore` + quotient) + 任意 abelian normal の thompsonJ 包含。
-3. Thm 6.4, 6.7 + Lem 6.5, 6.6 (solvable + p-length 1 系)。
+**残課題 (2026-05-27 difficulty 再評価 — 前回見立て訂正)**:
+
+⚠️ **重要訂正**: Thm 6.1/6.2 の一般形は repo の `Isaacs.Ch07.normal_J` への単純簡約では**到達しない**。原文精読 (mmd L1971-1977) で判明:
+- BG **Thm 6.1** = Hall-Higman (Gorenstein **6.5.2**)、BG **Thm 6.2** = Glauberman ZJ (Gorenstein **6.5.1** + 8.2.11)。いずれも「任意 Sylow S・`P=C_G(Z(P))` 仮定なし」の**完全形**。
+- repo の `normal_J` は Isaacs **Thm 7.6**(仮説 `O_{p'}=1` ∧ `P=C_G(Z(P))` ⇒ `J(P)⊴G`)で、Isaacs はこれを **Thompson normal p-complement (7.1) の補題**として使う。一般 ZJ とは別物。`P=C_G(Z(P))` ギャップは O_{p'}-商簡約では埋まらない。
+- ⇒ **Thm 6.1 (Hall-Higman) / Thm 6.2 (ZJ) はともに実質的な新規証明**。今回の reduced case (`normalJ_normal_of_odd` 等) は J(P)-instance の特殊形で、一般形の足場ではあるが直接の前段ではない。
+
+残タスク (難度順):
+1. **(infra)** `opCore p G ≤ oPiPrimePiCore {p} G` 橋 (O_p ≤ O_{p',p})。`IsPiGroup.le_oPiCore` + `IsPGroup.map` + `map_le_iff_le_comap`。注意: `oPiPrimePiCore` の `{q | q ∉ {p}}` と `normal_J` の `{q | q ≠ p}` の set 同値 (`Set.mem_singleton_iff`)。自己完結・再利用可。
+2. **Lem 6.3** (solvable: normal Hall H + complement K, H⊆G' ⇒ H=[H,K] ∧ C_H(K)⊆H')。BG Prop 1.5(d)/1.6(d) = Ch04 (`fixedPoints_sup/inf_actionCommutator`) 済で**最も tractable**。
+3. **Thm 6.1** (Hall-Higman 一般形): §7B internals (`centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot` = HH 3.21, `center_sylow_le_opCore_of_oPiCorePrime_eq_bot`) を再利用して abelian normal A ≤ O_{p',p} を構築。中規模。
+4. **Thm 6.2** (Glauberman ZJ 一般形): 最大。完全 ZJ argument。Thm 6.1 + §7B 機械 + 新規。
+5. Thm 6.4 (J₁/J₂ 共役, 長い帰納), Lem 6.5/6.6 (p-length 1 系)。
 
 **ROADMAP 上の位置**: **Phase 2a 第 2 波** (Phase 1 Ch.7 完成必須, §1+§3+§4 完了直後).
 
