@@ -149,6 +149,63 @@ theorem thompsonJ_eq_of_le_of_le [Finite G] {P Q : Subgroup G} {p : ℕ}
     intro F hF_Q hF_el
     exact hE_P.2.2 F (hF_Q.trans hQP) hF_el
 
+/-- **`J(P) ≠ ⊥` for a nontrivial finite `p`-group `P`**.
+
+A nontrivial `p`-group contains an element of order `p` (Cauchy), generating a
+cyclic — hence `p`-elementary abelian — subgroup of order `p`.  Thus the
+maximum-order elementary abelian subgroup of `P` has order `≥ p > 1`, so
+`J(P) ≠ ⊥`. -/
+theorem thompsonJ_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] {P : Subgroup G}
+    (hP_pgroup : IsPGroup p ↥P) (hP_ne_bot : P ≠ ⊥) :
+    thompsonJ P p ≠ ⊥ := by
+  classical
+  -- A maximum-order elementary abelian subgroup `E` of `P` exists.
+  obtain ⟨E, hE_le, hE_el, hE_max⟩ := maxElemAbelianIn_nonempty P p
+  -- `p ∣ |P|` (nontrivial `p`-group), so there is an order-`p` element `x ∈ P`.
+  have hp_dvd : p ∣ Nat.card ↥P := by
+    obtain ⟨n, hn⟩ := hP_pgroup.exists_card_eq
+    have hn_pos : 0 < n := by
+      rcases Nat.eq_zero_or_pos n with h0 | h
+      · exfalso
+        rw [h0, pow_zero] at hn
+        exact hP_ne_bot (Subgroup.card_eq_one.mp hn)
+      · exact h
+    rw [hn]; exact dvd_pow_self p hn_pos.ne'
+  obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  -- `C := zpowers x.val ≤ P` is `p`-elementary abelian of order `p`.
+  set C : Subgroup G := Subgroup.zpowers (x : G) with hC_def
+  have hxG_ord : orderOf (x : G) = p := by rw [Subgroup.orderOf_coe, hx_ord]
+  have hC_le_P : C ≤ P := by
+    rw [hC_def]
+    exact (Subgroup.zpowers_le).mpr x.2
+  have hC_card : Nat.card ↥C = p := by rw [hC_def, Nat.card_zpowers, hxG_ord]
+  have hC_el : C.IsElementaryAbelian p := by
+    refine ⟨fun a b => ?_, fun a => ?_⟩
+    · -- `C = zpowers x` is commutative: `↑a, ↑b` are powers of `x`, which commute.
+      apply Subtype.ext
+      have ha : (a : G) ∈ Subgroup.zpowers (x : G) := a.2
+      have hb : (b : G) ∈ Subgroup.zpowers (x : G) := b.2
+      obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp ha
+      obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hb
+      simp only [Subgroup.coe_mul, ← hi, ← hj, ← zpow_add, add_comm]
+    · -- every element of `C` has order dividing `p`, so `a ^ p = 1`.
+      have hdvd : orderOf a ∣ p := by
+        rw [← hC_card]; exact _root_.orderOf_dvd_natCard a
+      obtain ⟨k, hk⟩ := hdvd
+      rw [hk, pow_mul, pow_orderOf_eq_one, one_pow]
+  -- `|C| = p ≤ |E|`, so `E ≠ ⊥`, and `E ≤ J(P)`.
+  have hp_le_E : p ≤ Nat.card ↥E := hC_card ▸ hE_max C hC_le_P hC_el
+  have hE_ne_bot : E ≠ ⊥ := by
+    intro hbot
+    rw [hbot] at hp_le_E
+    simp only [Subgroup.card_bot] at hp_le_E
+    exact (Fact.out (p := p.Prime)).one_lt.not_ge hp_le_E
+  have hE_le_J : E ≤ thompsonJ P p :=
+    le_thompsonJ_of_mem_maxElemAbelianIn ⟨hE_le, hE_el, hE_max⟩
+  intro hJ_bot
+  rw [hJ_bot, le_bot_iff] at hE_le_J
+  exact hE_ne_bot hE_le_J
+
 /-- **`J` commutes with injective images**: for an injective homomorphism
 `f : G →* N` and a subgroup `P ≤ G`, `J(f(P)) = f(J(P))`.
 
