@@ -55,13 +55,32 @@ Step 7 (mmd L3884-3892 = Isaacs p.213-214 の最終 contradiction 引数) だけ
    - `step5_Abar_card_eq_p` (private axiom): Step 5 (`|Ā| = p` via Lemma 6.20).
    - 新規 helper `relIndex_sup_of_inf_eq_bot` (diamond: `|NA:A| = |N|`).
 
-**現在の axiom 状況** (`OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean`):
-- `step3_Abar_centralizes_inter_LBar` (textbook Step 3, IH-適用 core) ← **NEW**
-- `step5_Abar_card_eq_p` (textbook Step 5, Lem 6.20 + MulDistribMulAction plumbing) ← **NEW**
-- `noNonsolvableSimplePaQb` (§7D の別議題, Burnside)
+## 2026-05-27 セッション進捗 (続き: Step 3 + Step 5 discharge → normal_J 完全 axiom-free)
 
-`step8a_PBar_normal_GBar` と `step4_5_normal_J_hypotheses` は **両方 theorem 化済み**.
-残る §7B axiom は Step 3 と Step 5 の 2 つ (どちらも前より狭く focused).
+7. **`step3_Abar_centralizes_inter_LBar` を `axiom` → `theorem` 化** (前セッション,
+   commit 56cd924).
+8. **`step5_Abar_card_eq_p` を `axiom` → `theorem` 化** (commit d5f34d4, ~290 LOC).
+   - `subgroupConjActionOnNormal` (新規 def): subgroup `Q` が normal subgroup `N` に
+     共役で作用する `MulDistribMulAction ↥Q ↥N` (`MulAut.conjNormal ∘ Q.subtype`).
+   - faithful: `AbarInf_centralizer_LBar_eq_bot` + `eq_of_inv_mul_eq_one`.
+   - coprime: `Ā` p-power vs `L̄` p'-number.
+   - `hproper` = 新規 `step5_Abar_centralizes_invariant_proper` (Ā-invariant proper
+     `W < L̄` に対し Step 3 を `H = MA` (M = `W.comap mk`) に適用 → `⁅W, Ā⁆ = ⊥`).
+     properness は新規 `inf_sup_eq_of_le_normalizer_of_inf_eq_bot` (非可換 modular
+     law: `A ≤ N(W)`, `W ≤ L`, `A ⊓ L = ⊥` ⇒ `(W ⊔ A) ⊓ L = W`), Sylow は
+     `Sylow.subtype` (`P = UA ⊆ H`).
+   - Lem 6.20 → `IsCyclic Ā` → `card Ā = p` → `relIndex` 変換 (`Subgroup.index_ker`).
+   - `import OddOrder.Isaacs.Ch06_FrobeniusActions.Main` 追加 (Lem 6.20 用).
+   - AxiomsCheck に `#assert_only_allowed_axioms OddOrder.Isaacs.Ch07.normal_J` 追加.
+
+**`normal_J` (Isaacs Thm 7.6) は完全 axiom-free** になった:
+`#print axioms` = `[propext, Classical.choice, Quot.sound]`. §7B (Thm 7.6) の
+focused axiom は **すべて discharge 済み**. この issue (Step 7) の目標達成.
+
+**現在の axiom 状況** (`OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean`):
+- §7B: **axiom 無し** (Steps 1-8 全 landed, `normal_J` unconditional).
+- §7D (別議題, Burnside `p^a q^b`): `step3_not_both_opCore_ne_bot`,
+  `step5b_pType_no_qCentral`, `step8_normalJ_and_fullSylow`, `step9_contradiction`.
 
 ### 残り 2 axiom の discharge 方針 (次セッション)
 
