@@ -491,6 +491,12 @@ set_option linter.style.longLine false in
 -- Goldschmidt 帰納 (Steps 1-8) を full discharge; §7B 内に focused axiom 残無し.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch07.normal_J
 
+-- Ch.7 (Thompson Subgroup): Thm 7.8 Burnside p^a q^b solvability ⭐⭐⭐ **character-free**
+-- |G| = p^a q^b ⇒ G solvable.  Goldschmidt-Bender-Matsuyama 9-step proof (no character
+-- theory).  Steps 1-9 + Step 3 の faithful-action 分岐まで full discharge; §7D 内に
+-- sorry / project-axiom 残無し ⇒ 真に unconditional.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow
+
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.

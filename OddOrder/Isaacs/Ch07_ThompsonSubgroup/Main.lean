@@ -164,6 +164,7 @@ private theorem prime_lt_of_pGroup_faithful_on_cyclic
 private def zCenterOpCoreH {H : Type*} [Group H] (M : Subgroup H) (p : ℕ) : Subgroup H :=
   (zCenterOpCoreSubgroup ↥M p).map M.subtype
 
+open OddOrder.Isaacs.Ch06 in
 /-- **§7D Step 3 core** — the asymmetric construction; see the section docstring. -/
 theorem step3_main
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
@@ -427,7 +428,83 @@ theorem step3_main
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q) (G := ↥ZqH)).mp hZqH_qgroup
     rw [hm, hn]
     exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hp_prime hq_prime).mpr hpq)
-  sorry
+  -- L6 key: for `1 ≠ a ∈ A`, anything commuting with `a` lies in `M^g`.
+  -- Write `a = g z g⁻¹` with `1 ≠ z ∈ Z_p ⊆ Z`; then `C_H(a) = C_H(z)^g ⊆ M^g`
+  -- since `C_H(z) ⊆ M` (L3).
+  have hcomm_mem_Mg : ∀ a : H, a ∈ A → a ≠ 1 → ∀ x : H, a * x = x * a → x ∈ Mg := by
+    intro a ha ha1 x hax
+    rw [hA_def, Subgroup.mem_smul_pointwise_iff_exists] at ha
+    obtain ⟨z, hz, hza⟩ := ha
+    rw [ConjAct.toConjAct_smul] at hza
+    have hz1 : z ≠ 1 := by
+      rintro rfl
+      exact ha1 (by rw [← hza]; group)
+    rw [hmem_Mg]
+    refine hL3 z (hZpH_le_Z hz) hz1 ?_
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    rw [Set.mem_singleton_iff] at hw; subst w
+    have h : g * z * g⁻¹ * x = x * (g * z * g⁻¹) := by rw [hza]; exact hax
+    calc z * (g⁻¹ * x * g)
+        = g⁻¹ * (g * z * g⁻¹ * x) * g := by group
+      _ = g⁻¹ * (x * (g * z * g⁻¹)) * g := by rw [h]
+      _ = (g⁻¹ * x * g) * z := by group
+  -- `Z_p ⊆ S = S^g ⊆ M^g` (`g` normalizes `S`, `S ⊆ M`).
+  have hZpH_le_Mg : ZpH ≤ Mg := fun z hz => by
+    rw [hmem_Mg]
+    exact hSH_le_M ((Subgroup.mem_normalizer_iff''.mp hg_normSH z).mp (hZpH_le_SH hz))
+  -- If `Z_q ⊆ M^g` then `Z ⊆ M^g`, so `M^g = M` (uniqueness), so `g ∈ N_H(M) = M`: absurd.
+  have hZqH_le_Mg_imp_False : ZqH ≤ Mg → False := by
+    intro hZqH_le_Mg
+    have hZ_le_Mg : Z ≤ Mg := sup_le hZpH_le_Mg hZqH_le_Mg
+    exact hg_notM (hg_in_M_of_Mg_eq (hZ_unique Mg hMg_coatom hZ_le_Mg))
+  -- L7. **Dichotomy** (Isaacs L3987-3993). If `A` is non-cyclic, or acts non-faithfully on
+  -- `Z_q`, then `Z_q = ⟨C_{Z_q}(a) : 1≠a∈A⟩ ⊆ M^g`, contradicting L6.  So `A` is cyclic and
+  -- faithful.  Bridge: `⟨C_{Z_q}(a)⟩ = ⊤` (internally in `Z_q`) ⇒ `Z_q ⊆ M^g`, via L6's
+  -- `hcomm_mem_Mg` (`C_G(a) ⊆ M^g`) applied to each generator.
+  have hclosure_imp : nontrivialActionFixedByClosure φ = ⊤ → ZqH ≤ Mg := by
+    intro htop w hw
+    have hle : nontrivialActionFixedByClosure φ ≤ Mg.comap ZqH.subtype := by
+      rw [nontrivialActionFixedByClosure_le_iff]
+      intro c hc n hn
+      rw [Subgroup.mem_comap]
+      -- `n ∈ C_{Z_q}(c)` ⇒ `↑n` commutes with `↑c`, so `↑n ∈ M^g` by L6.
+      have hsm : c • n = n := hn
+      have hcoe := hsmul_coe c n
+      rw [hsm] at hcoe
+      have hcomm : (↑c : H) * ↑n = ↑n * ↑c := by
+        have h := hcoe.symm
+        calc (↑c : H) * ↑n = ((↑c : H) * ↑n * (↑c)⁻¹) * ↑c := by group
+          _ = ↑n * ↑c := by rw [h]
+      exact hcomm_mem_Mg ↑c c.2 (fun h => hc (OneMemClass.coe_eq_one.mp h)) ↑n hcomm
+    have hmem : (⟨w, hw⟩ : ↥ZqH) ∈ Mg.comap ZqH.subtype := by
+      rw [htop] at hle; exact hle (Subgroup.mem_top _)
+    rwa [Subgroup.mem_comap] at hmem
+  -- `A` is cyclic: else Thm 6.21 (`nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`)
+  -- gives `⟨C_{Z_q}(a)⟩ = ⊤`, hence `Z_q ⊆ M^g` — contradiction with L6.
+  have hA_cyclic : IsCyclic ↥A := by
+    by_contra hnc
+    refine hZqH_le_Mg_imp_False (hclosure_imp ?_)
+    rw [hφ_def]
+    exact nontrivialActionFixedByClosure_eq_top_of_not_isCyclic hcop hnc
+  -- `A` acts faithfully on `Z_q`: else some `1 ≠ c ∈ A` fixes all of `Z_q`
+  -- (`C_{Z_q}(c) = ⊤`), so again `⟨C_{Z_q}(a)⟩ = ⊤` and `Z_q ⊆ M^g` — contradiction.
+  have hA_faithful : Function.Injective φ := by
+    by_contra hni
+    rw [injective_iff_map_eq_one] at hni
+    push_neg at hni
+    obtain ⟨c, hc1, hc_ne⟩ := hni
+    refine hZqH_le_Mg_imp_False (hclosure_imp ?_)
+    have hfix_top : actionFixedBy φ c = ⊤ := by
+      ext n; rw [mem_actionFixedBy, hc1]; simp
+    rw [eq_top_iff, ← hfix_top]
+    exact actionFixedBy_le_nontrivialActionFixedByClosure hc_ne
+  -- Conclusion: `A ≅ Z_p` (so `Z_p` cyclic); and a faithful nontrivial `p`-group acting on
+  -- the cyclic `Z_q` forces `p < q` (arithmetic helper).
+  haveI := hA_cyclic
+  refine ⟨isCyclic_of_surjective eA.symm.toMonoidHom eA.symm.surjective, fun hZq_cyc => ?_⟩
+  haveI := hZq_cyc
+  exact prime_lt_of_pGroup_faithful_on_cyclic hA_pgroup hA_nt hZqH_qgroup hpq φ hA_faithful
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
 
