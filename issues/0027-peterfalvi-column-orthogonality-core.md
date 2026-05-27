@@ -21,7 +21,14 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
 
 - [x] `IrreducibleCharacter G` と `ConjClasses G` の finite cardinal/indexing をそろえる。
 - [x] first orthogonality から character-table matrix の row orthogonality を statement 化する。
-- [ ] square/invertible matrix argument で column orthogonality を導く。
+- [x] square/invertible matrix argument で、weighted row orthogonality input から
+  square-indexed column diagonal/off-diagonal relation を導く。
+- [x] square-indexed column relation を conjugacy-class indexed pairing と
+  element representative pairing へ戻す。
+- [x] 条件付き theorem として `column_orthogonality_cases` と同じ primitive cases
+  shape へ束ねる。
+- [ ] finite/indexing と row orthogonality input を public
+  `column_orthogonality_cases` の仮定へ供給する。
 - [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
 
 ## 2026-05-26 update
@@ -66,10 +73,55 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   `characterTableClassColumnPairingOfIndexing_eq_columnPairing_representatives`, and
   `characterTableSquareColumnPairing_eq_columnPairing_representatives` を追加し、
   matrix/class indexed column pairing を既存の element representative API に戻せるようにした。
+- `conjugacyClassSize_pos` を追加し、class-size division で使う非零性を再利用可能にした。
+- `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal` and
+  `conjugacyClassSize_mul_characterTableColumnGram_apply` を追加し、
+  row Gram の cancel bridge から `W * (Aᴴ A) = |G| I` とその entrywise 形までを
+  `sorry` なしで接続した。
+- `characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing` を追加し、
+  matrix column Gram convention と既存 `characterTableSquareColumnPairing` convention の
+  complex conjugation bridge を固定した。
+- `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality` and
+  `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality` を追加し、
+  weighted row orthogonality input の下で square-indexed column relation を取り出せるようにした。
+- `characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality`,
+  `characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality` を追加し、
+  square-indexed relation を conjugacy-class indexed pairing と element representative
+  pairing に戻した。
+- `column_orthogonality_cases_of_weightedRowOrthogonality` を追加し、条件付き版を
+  final `column_orthogonality_cases` と同じ pair-of-cases shape に束ねた。
+- `conjClassesSigmaCarrierEquiv`,
+  `classFunction_innerSum_eq_sum_conjClasses`,
+  `characterTableWeightedRowPairing_eq_innerSum`, and
+  `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality` を追加し、
+  ordinary row orthogonality から matrix proof core が要求する
+  class-weighted row orthogonality input までを `sorry` なしで接続した。
+- `column_orthogonality_cases_ofRowOrthogonality` を追加し、conditional
+  primitive cases theorem の入力を weighted row orthogonality から ordinary
+  row orthogonality まで下げた。
 - `column_orthogonality_cases` の proof core は named column pairing を結論にする形へ整理した。
 - public API の raw sum theorem は `characterTableColumnPairing_diag`,
   `characterTableColumnPairing_conj`,
   `characterTableColumnPairing_not_conj` から `sorry` なしで導く形にした。
+
+### Remaining input-supply blockers
+
+`column_orthogonality_cases_ofRowOrthogonality` is now the closest `sorry`-free
+entry point to the public theorem.  Closing `column_orthogonality_cases` requires:
+
+- a `CharacterTableIndexing G` package from the public assumptions, i.e. a finite
+  `IrreducibleCharacter G` indexing plus
+  `Fintype.card (IrreducibleCharacter G) = Fintype.card (ConjClasses G)`;
+- `CharacterTableRowOrthogonality (G := G)`.  mathlib has
+  `Representation.char_orthonormal`, but the local `IrreducibleCharacter` API still
+  needs the bridge from witness representations to equality of class functions /
+  representation equivalence before this can be used directly.  The conventions
+  also differ: mathlib's theorem uses `χ(g) * ψ(g⁻¹)`, while local
+  `ClassFunction.inner` uses Peterfalvi's `χ(g) * star (ψ g)`, so the bridge also
+  needs the finite complex character identity `ψ(g⁻¹) = star (ψ g)`.
 
 ## 2026-05-26 update — 残 blocker 詳細 (deep dive)
 

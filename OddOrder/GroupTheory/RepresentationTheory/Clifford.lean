@@ -50,6 +50,13 @@ precise statement is left as a TODO since it requires extra setup
   constituent of a restricted class function, expressed by inner product.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver` — irreducible-character
   notation for the same nonzero restriction multiplicity.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy` — the ambient conjugation
+  action on irreducible characters of a normal subgroup.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.inertia` and `inertiaQuotient` —
+  the stabilizer `I_G(θ)` and quotient `I_G(θ)/H` at the irreducible-character level.
+* `OddOrder.RepresentationTheory.IrreducibleCharacter.conjByOrbit`,
+  `conjByOrbitEquivRightCosets`, and `conjByOrbitEquivLeftCosets` — the `G`-orbit
+  of `θ` and its quotient-by-inertia parametrization.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
@@ -71,6 +78,43 @@ open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
+namespace Representation
+
+variable {k : Type*} [Field k]
+variable {V : Type*} [AddCommGroup V] [Module k V]
+
+/-- Pulling a representation back along a group automorphism preserves irreducibility. -/
+theorem IsIrreducible.comp_mulEquiv
+    (ρ : Representation k G V) [Representation.IsIrreducible ρ] (e : G ≃* G) :
+    Representation.IsIrreducible (ρ.comp e.toMonoidHom) := by
+  change IsSimpleOrder (Subrepresentation (ρ.comp e.toMonoidHom))
+  refine { toNontrivial := ?_, eq_bot_or_eq_top := ?_ }
+  · refine ⟨⟨⊥, ⊤, ?_⟩⟩
+    intro hbot
+    have hsub :
+        ((⊥ : Subrepresentation (ρ.comp e.toMonoidHom)).toSubmodule) =
+          ((⊤ : Subrepresentation (ρ.comp e.toMonoidHom)).toSubmodule) :=
+      congrArg Subrepresentation.toSubmodule hbot
+    have hρbot : (⊥ : Subrepresentation ρ) = ⊤ := by
+      apply Subrepresentation.toSubmodule_injective
+      simpa using hsub
+    exact IsSimpleOrder.bot_ne_top hρbot
+  · intro W
+    let Wρ : Subrepresentation ρ := {
+      toSubmodule := W.toSubmodule
+      apply_mem_toSubmodule h {v} hv := by
+        rcases e.surjective h with ⟨h', rfl⟩
+        exact W.apply_mem_toSubmodule h' hv }
+    rcases IsSimpleOrder.eq_bot_or_eq_top Wρ with hbot | htop
+    · left
+      apply Subrepresentation.toSubmodule_injective
+      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) hbot
+    · right
+      apply Subrepresentation.toSubmodule_injective
+      simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) htop
+
+end Representation
+
 namespace ClassFunction
 
 variable (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
@@ -88,6 +132,71 @@ def restrictionMultiplicity (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ
     restrictionMultiplicity H χ θ = inner (restrict H χ) θ :=
   rfl
 
+@[simp] theorem restrictionMultiplicity_zero_left (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (0 : ClassFunction G ℂ) θ = 0 := by
+  simp [restrictionMultiplicity]
+
+@[simp] theorem restrictionMultiplicity_zero_right (χ : ClassFunction G ℂ) :
+    restrictionMultiplicity H χ (0 : ClassFunction H ℂ) = 0 := by
+  simp [restrictionMultiplicity]
+
+theorem restrictionMultiplicity_add_left
+    (χ₁ χ₂ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (χ₁ + χ₂) θ =
+      restrictionMultiplicity H χ₁ θ + restrictionMultiplicity H χ₂ θ := by
+  rw [restrictionMultiplicity, restrict_add]
+  exact inner_add_left (restrict H χ₁) (restrict H χ₂) θ
+
+theorem restrictionMultiplicity_neg_left
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (-χ) θ = -restrictionMultiplicity H χ θ := by
+  rw [restrictionMultiplicity, restrict_neg]
+  exact inner_neg_left (restrict H χ) θ
+
+theorem restrictionMultiplicity_sub_left
+    (χ₁ χ₂ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (χ₁ - χ₂) θ =
+      restrictionMultiplicity H χ₁ θ - restrictionMultiplicity H χ₂ θ := by
+  rw [restrictionMultiplicity, restrict_sub]
+  exact inner_sub_left (restrict H χ₁) (restrict H χ₂) θ
+
+theorem restrictionMultiplicity_smul_left
+    (c : ℂ) (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H (c • χ) θ = c * restrictionMultiplicity H χ θ := by
+  rw [restrictionMultiplicity, restrict_smul]
+  exact inner_smul_left c (restrict H χ) θ
+
+theorem restrictionMultiplicity_add_right
+    (χ : ClassFunction G ℂ) (θ₁ θ₂ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (θ₁ + θ₂) =
+      restrictionMultiplicity H χ θ₁ + restrictionMultiplicity H χ θ₂ :=
+  inner_add_right (restrict H χ) θ₁ θ₂
+
+theorem restrictionMultiplicity_neg_right
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (-θ) = -restrictionMultiplicity H χ θ :=
+  inner_neg_right (restrict H χ) θ
+
+theorem restrictionMultiplicity_sub_right
+    (χ : ClassFunction G ℂ) (θ₁ θ₂ : ClassFunction H ℂ) :
+    restrictionMultiplicity H χ (θ₁ - θ₂) =
+      restrictionMultiplicity H χ θ₁ - restrictionMultiplicity H χ θ₂ :=
+  inner_sub_right (restrict H χ) θ₁ θ₂
+
+theorem restrictionMultiplicity_conjBy_right [H.Normal]
+    (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) (g : G) :
+    restrictionMultiplicity H χ (conjBy (G := G) (H := H) g θ) =
+      restrictionMultiplicity H χ θ := by
+  change inner (restrict H χ) (conjBy (G := G) (H := H) g θ) =
+    inner (restrict H χ) θ
+  calc
+    inner (restrict H χ) (conjBy (G := G) (H := H) g θ) =
+        inner (conjBy (G := G) (H := H) g (restrict H χ))
+          (conjBy (G := G) (H := H) g θ) := by
+          rw [conjBy_restrict (G := G) (H := H) g χ]
+    _ = inner (restrict H χ) θ :=
+        inner_conjBy_conjBy (G := G) (H := H) g (restrict H χ) θ
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
@@ -103,6 +212,33 @@ theorem IsRestrictionConstituent.multiplicity_ne_zero
     {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
     (hθ : IsRestrictionConstituent H χ θ) : restrictionMultiplicity H χ θ ≠ 0 :=
   hθ.2
+
+omit [Fintype H] [Invertible (Nat.card H : ℂ)] in
+theorem IsIrreducibleCharacter.conjBy [H.Normal]
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) (g : G) :
+    IsIrreducibleCharacter (conjBy (G := G) (H := H) g θ) := by
+  rcases hθ with ⟨V, hVAdd, hVModule, hVFinite, ρ, hρ, hchar⟩
+  letI : AddCommGroup V := hVAdd
+  letI : Module ℂ V := hVModule
+  letI : FiniteDimensional ℂ V := hVFinite
+  let ρg : Representation ℂ H V :=
+    ρ.comp (conjByMulEquiv (G := G) (H := H) g).toMonoidHom
+  refine ⟨V, inferInstance, inferInstance, inferInstance, ρg, ?_, ?_⟩
+  · exact Representation.IsIrreducible.comp_mulEquiv ρ
+      (conjByMulEquiv (G := G) (H := H) g)
+  · funext h
+    change θ (conjByMulEquiv (G := G) (H := H) g h) = ρg.character h
+    rw [hchar]
+    rfl
+
+theorem IsRestrictionConstituent.conjBy [H.Normal]
+    {χ : ClassFunction G ℂ} {θ : ClassFunction H ℂ}
+    (hθ : IsRestrictionConstituent H χ θ) (g : G) :
+    IsRestrictionConstituent H χ (conjBy (G := G) (H := H) g θ) := by
+  constructor
+  · exact IsIrreducibleCharacter.conjBy (H := H) hθ.isIrreducible g
+  · rw [restrictionMultiplicity_conjBy_right (H := H) χ θ g]
+    exact hθ.multiplicity_ne_zero
 
 end ClassFunction
 
@@ -145,6 +281,160 @@ variable {H : Subgroup G} [hH : H.Normal]
 
 namespace IrreducibleCharacter
 
+/-- Conjugate an irreducible character of `H` by an ambient element of `G`.
+
+The underlying class function is `ClassFunction.conjBy`; irreducibility is preserved by
+pulling the representing module back along the induced automorphism of `H`. -/
+def conjBy (g : G) (θ : IrreducibleCharacter H) : IrreducibleCharacter H :=
+  ⟨ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ),
+    ClassFunction.IsIrreducibleCharacter.conjBy (H := H) θ.isIrreducible g⟩
+
+@[simp] theorem coe_conjBy (g : G) (θ : IrreducibleCharacter H) :
+    (conjBy (G := G) (H := H) g θ : ClassFunction H ℂ) =
+      ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ) :=
+  rfl
+
+@[simp] theorem conjBy_one (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) (1 : G) θ = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
+theorem conjBy_mul (g₁ g₂ : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) (g₁ * g₂) θ =
+      conjBy (G := G) (H := H) g₂ (conjBy (G := G) (H := H) g₁ θ) := by
+  apply IrreducibleCharacter.ext
+  exact ClassFunction.conjBy_mul (G := G) (H := H) g₁ g₂ (θ : ClassFunction H ℂ)
+
+@[simp] theorem conjBy_inv_conjBy (g : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) g⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
+@[simp] theorem conjBy_conjBy_inv (g : G) (θ : IrreducibleCharacter H) :
+    conjBy (G := G) (H := H) g (conjBy (G := G) (H := H) g⁻¹ θ) = θ := by
+  apply IrreducibleCharacter.ext
+  simp
+
+/-- The inertia subgroup of an irreducible character, viewed at the
+irreducible-character level. -/
+abbrev inertia (θ : IrreducibleCharacter H) : Subgroup G :=
+  ClassFunction.inertia (G := G) (H := H) (θ : ClassFunction H ℂ)
+
+@[simp] theorem mem_inertia {θ : IrreducibleCharacter H} {g : G} :
+    g ∈ inertia (G := G) (H := H) θ ↔
+      conjBy (G := G) (H := H) g θ = θ := by
+  change ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ) =
+      (θ : ClassFunction H ℂ) ↔
+        conjBy (G := G) (H := H) g θ = θ
+  constructor
+  · intro h
+    exact IrreducibleCharacter.ext h
+  · intro h
+    exact congrArg (fun η : IrreducibleCharacter H => (η : ClassFunction H ℂ)) h
+
+theorem subgroup_le_inertia (θ : IrreducibleCharacter H) :
+    H ≤ inertia (G := G) (H := H) θ :=
+  ClassFunction.subgroup_le_inertia (θ : ClassFunction H ℂ)
+
+/-- Peterfalvi's inertia quotient `I_G(θ)/H`, lifted from class functions to
+irreducible characters. -/
+abbrev inertiaQuotient (θ : IrreducibleCharacter H) :=
+  ClassFunction.inertiaQuotient (G := G) (H := H) (θ : ClassFunction H ℂ)
+
+theorem conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+    (θ : IrreducibleCharacter H) (g h : G) :
+    conjBy (G := G) (H := H) g θ = conjBy (G := G) (H := H) h θ ↔
+      g * h⁻¹ ∈ inertia (G := G) (H := H) θ := by
+  constructor
+  · intro hgh
+    rw [mem_inertia]
+    calc
+      conjBy (G := G) (H := H) (g * h⁻¹) θ =
+          conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ) :=
+            conjBy_mul (G := G) (H := H) g h⁻¹ θ
+      _ = conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) h θ) := by
+            rw [hgh]
+      _ = θ := conjBy_inv_conjBy (G := G) (H := H) h θ
+  · intro hmem
+    rw [mem_inertia] at hmem
+    have hcalc :
+        conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ) = θ := by
+      rwa [← conjBy_mul (G := G) (H := H) g h⁻¹ θ]
+    calc
+      conjBy (G := G) (H := H) g θ =
+          conjBy (G := G) (H := H) h
+            (conjBy (G := G) (H := H) h⁻¹ (conjBy (G := G) (H := H) g θ)) := by
+            exact (conjBy_conjBy_inv (G := G) (H := H) h
+              (conjBy (G := G) (H := H) g θ)).symm
+      _ = conjBy (G := G) (H := H) h θ := by
+            rw [hcalc]
+
+/-- The ambient `G`-orbit of an irreducible character of a normal subgroup. -/
+def conjByOrbit (θ : IrreducibleCharacter H) : Set (IrreducibleCharacter H) :=
+  Set.range fun g : G => conjBy (G := G) (H := H) g θ
+
+@[simp] theorem mem_conjByOrbit {θ η : IrreducibleCharacter H} :
+    η ∈ conjByOrbit (G := G) (H := H) θ ↔
+      ∃ g : G, conjBy (G := G) (H := H) g θ = η :=
+  Iff.rfl
+
+theorem conjBy_mem_conjByOrbit (θ : IrreducibleCharacter H) (g : G) :
+    conjBy (G := G) (H := H) g θ ∈ conjByOrbit (G := G) (H := H) θ :=
+  ⟨g, rfl⟩
+
+/-- The orbit of `θ` is parametrized by right cosets of its inertia subgroup.
+
+The right-coset convention matches `conjBy_eq_conjBy_iff_mul_inv_mem_inertia`,
+which identifies `θ^g` and `θ^h` exactly when `g * h⁻¹ ∈ I_G(θ)`. -/
+noncomputable def conjByOrbitEquivRightCosets (θ : IrreducibleCharacter H) :
+    Quotient (QuotientGroup.rightRel (inertia (G := G) (H := H) θ)) ≃
+      {η : IrreducibleCharacter H // η ∈ conjByOrbit (G := G) (H := H) θ} where
+  toFun :=
+    Quotient.lift
+      (fun g : G =>
+        ⟨conjBy (G := G) (H := H) g θ, conjBy_mem_conjByOrbit (G := G) (H := H) θ g⟩)
+      (by
+        intro g h hgh
+        apply Subtype.ext
+        have hmem : h * g⁻¹ ∈ inertia (G := G) (H := H) θ :=
+          QuotientGroup.rightRel_apply.mp hgh
+        have hchg :
+            conjBy (G := G) (H := H) h θ =
+              conjBy (G := G) (H := H) g θ :=
+          Iff.mpr (conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+            (G := G) (H := H) θ h g) hmem
+        exact hchg.symm)
+  invFun η := Quotient.mk'' (Classical.choose η.property)
+  left_inv := by
+    intro q
+    refine Quotient.inductionOn' q ?_
+    intro g
+    dsimp
+    have hchoose :
+        conjBy (G := G) (H := H) (Classical.choose
+          (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)) θ =
+            conjBy (G := G) (H := H) g θ :=
+      Classical.choose_spec (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)
+    apply Quotient.sound'
+    rw [QuotientGroup.rightRel_apply]
+    exact Iff.mp (conjBy_eq_conjBy_iff_mul_inv_mem_inertia
+      (G := G) (H := H) θ g
+      (Classical.choose (conjBy_mem_conjByOrbit (G := G) (H := H) θ g)))
+        hchoose.symm
+  right_inv := by
+    intro η
+    apply Subtype.ext
+    exact Classical.choose_spec η.property
+
+/-- The same orbit parametrization, expressed with mathlib's standard left-coset
+quotient notation `G ⧸ I_G(θ)`. -/
+noncomputable def conjByOrbitEquivLeftCosets (θ : IrreducibleCharacter H) :
+    G ⧸ inertia (G := G) (H := H) θ ≃
+      {η : IrreducibleCharacter H // η ∈ conjByOrbit (G := G) (H := H) θ} :=
+  (QuotientGroup.quotientRightRelEquivQuotientLeftRel
+    (inertia (G := G) (H := H) θ)).symm.trans
+      (conjByOrbitEquivRightCosets (G := G) (H := H) θ)
+
 variable [Fintype H] [Invertible (Nat.card H : ℂ)]
 
 /-- Predicate form of the Clifford conclusion that all irreducible constituents
@@ -152,8 +442,7 @@ of `Res^G_H χ` lie in one `G`-conjugation orbit. -/
 def RestrictionConstituentsSingleOrbit (χ : IrreducibleCharacter G) : Prop :=
   ∀ θ η : IrreducibleCharacter H,
     LiesOver H χ θ → LiesOver H χ η →
-      ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
-        (η : ClassFunction H ℂ)
+      ∃ g : G, conjBy (G := G) (H := H) g θ = η
 
 /-- Predicate form of the Clifford conclusion that all constituents of
 `Res^G_H χ` occur with a common normalized inner-product multiplicity. -/
@@ -165,17 +454,35 @@ def HasCommonRestrictionMultiplicity (χ : IrreducibleCharacter G) : Prop :=
 /-- The cyclic inertia-quotient hypothesis from Peterfalvi §3 (1.7):
 `I_G(θ)/H` is cyclic. -/
 def HasCyclicInertiaQuotient (θ : IrreducibleCharacter H) : Prop :=
-  IsCyclic (ClassFunction.inertiaQuotient (G := G) (H := H)
-    (θ : ClassFunction H ℂ))
+  IsCyclic (inertiaQuotient (G := G) (H := H) θ)
 
 theorem RestrictionConstituentsSingleOrbit.exists_conj
     {χ : IrreducibleCharacter G}
     (hχ : RestrictionConstituentsSingleOrbit (H := H) χ)
     {θ η : IrreducibleCharacter H}
     (hθ : LiesOver H χ θ) (hη : LiesOver H χ η) :
-    ∃ g : G, ClassFunction.conjBy g (θ : ClassFunction H ℂ) =
-      (η : ClassFunction H ℂ) :=
+    ∃ g : G, conjBy (G := G) (H := H) g θ = η :=
   hχ θ η hθ hη
+
+theorem liesOver_conjBy
+    {χ : IrreducibleCharacter G} {θ : IrreducibleCharacter H}
+    (hθ : LiesOver H χ θ) (g : G) :
+    LiesOver H χ (conjBy (G := G) (H := H) g θ) := by
+  change ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+      (ClassFunction.conjBy (G := G) (H := H) g (θ : ClassFunction H ℂ)) ≠ 0
+  rw [ClassFunction.restrictionMultiplicity_conjBy_right
+    (H := H) (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) g]
+  exact hθ
+
+theorem liesOver_conjBy_iff
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) (g : G) :
+    LiesOver H χ (conjBy (G := G) (H := H) g θ) ↔ LiesOver H χ θ := by
+  constructor
+  · intro hθ
+    have hθ' := liesOver_conjBy (H := H) hθ g⁻¹
+    simpa using hθ'
+  · intro hθ
+    exact liesOver_conjBy (H := H) hθ g
 
 omit hH in
 theorem HasCommonRestrictionMultiplicity.eq_of_liesOver

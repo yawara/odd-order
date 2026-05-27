@@ -147,6 +147,16 @@ abbrev nuClassFunction (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) 
     ClassFunction G ℂ :=
   hχ.nu
 
+/-- The unsigned difference `μ - ν` attached to the image of `χ - χ̄`. -/
+abbrev difference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction G ℂ :=
+  hχ.muClassFunction - hχ.nuClassFunction
+
+/-- The signed difference `ε • (μ - ν)` attached to the image of `χ - χ̄`. -/
+abbrev signedDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction G ℂ :=
+  hχ.sign • hχ.difference
+
 @[simp] theorem mu_irreducible
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     IsIrreducibleCharacter hχ.muClassFunction :=
@@ -195,15 +205,80 @@ theorem muClassFunction_ne_nuClassFunction
   intro h
   exact hχ.distinct (IrreducibleCharacter.ext h)
 
+theorem difference_ne_zero
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.difference ≠ 0 :=
+  sub_ne_zero.mpr hχ.muClassFunction_ne_nuClassFunction
+
+theorem sign_ne_zero
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.sign ≠ 0 := by
+  rcases hχ.sign_eq with hsign | hsign <;> simp [hsign]
+
+theorem sign_mul_self
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.sign * hχ.sign = 1 := by
+  rcases hχ.sign_eq with hsign | hsign <;> simp [hsign]
+
+theorem image_eq_signedDifference
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    τ (χ - χ.conj) = hχ.signedDifference := by
+  simpa [signedDifference, difference] using hχ.image_eq
+
 theorem signed_image_ne_zero
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
-    hχ.sign • (hχ.muClassFunction - hχ.nuClassFunction) ≠ 0 := by
-  have hdiff : hχ.muClassFunction - hχ.nuClassFunction ≠ 0 :=
-    sub_ne_zero.mpr hχ.muClassFunction_ne_nuClassFunction
+    hχ.signedDifference ≠ 0 := by
   rcases hχ.sign_eq with hsign | hsign
-  · simpa [hsign] using hdiff
-  · have hneg : -(hχ.muClassFunction - hχ.nuClassFunction) ≠ 0 := neg_ne_zero.mpr hdiff
-    simpa [hsign] using hneg
+  · simpa [signedDifference, hsign] using hχ.difference_ne_zero
+  · have hneg : -hχ.difference ≠ 0 := neg_ne_zero.mpr hχ.difference_ne_zero
+    simpa [signedDifference, hsign] using hneg
+
+theorem difference_inner_self
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction.inner hχ.difference hχ.difference = 2 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  have hμμ :
+      ClassFunction.inner hχ.muClassFunction hχ.muClassFunction = 1 := by
+    simpa [muClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+      OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+        (G := G) hrow hχ.mu
+  have hμν :
+      ClassFunction.inner hχ.muClassFunction hχ.nuClassFunction = 0 := by
+    simpa [muClassFunction, nuClassFunction,
+      OddOrder.RepresentationTheory.characterTableRowPairing] using
+      OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+        (G := G) hrow hχ.distinct
+  have hνμ :
+      ClassFunction.inner hχ.nuClassFunction hχ.muClassFunction = 0 := by
+    simpa [muClassFunction, nuClassFunction,
+      OddOrder.RepresentationTheory.characterTableRowPairing] using
+      OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+        (G := G) hrow (Ne.symm hχ.distinct)
+  have hνν :
+      ClassFunction.inner hχ.nuClassFunction hχ.nuClassFunction = 1 := by
+    simpa [nuClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+      OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+        (G := G) hrow hχ.nu
+  rw [hμμ, hμν, hνμ, hνν]
+  norm_num
+
+theorem signedDifference_inner_self
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction.inner hχ.signedDifference hχ.signedDifference = 2 := by
+  rcases hχ.sign_eq with hsign | hsign
+  · simpa [signedDifference, hsign] using hχ.difference_inner_self hrow
+  · calc
+      ClassFunction.inner hχ.signedDifference hχ.signedDifference =
+          ClassFunction.inner (-hχ.difference) (-hχ.difference) := by
+            simp [signedDifference, hsign]
+      _ = ClassFunction.inner hχ.difference hχ.difference := by
+            rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg]
+      _ = 2 := hχ.difference_inner_self hrow
 
 /-- Orthogonality of the two image sets `R(χ)` and `R(ψ)` from Peterfalvi
 (5.2.e). -/
@@ -216,14 +291,78 @@ def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
 /-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
 theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
-      hχ.sign • (hχ.muClassFunction - hχ.nuClassFunction) := by
-  simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using hχ.image_eq
+      hχ.signedDifference := by
+  simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using hχ.image_eq_signedDifference
 
 theorem image_conjugateDifference_ne_zero
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) ≠ 0 := by
   rw [hχ.image_conjugateDifference]
   exact hχ.signed_image_ne_zero
+
+theorem image_conjugateDifference_inner_self
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    ClassFunction.inner
+        (τ (OddOrder.Peterfalvi.S03.conjugateDifference χ))
+        (τ (OddOrder.Peterfalvi.S03.conjugateDifference χ)) = 2 := by
+  rw [hχ.image_conjugateDifference]
+  exact hχ.signedDifference_inner_self hrow
+
+theorem Orthogonal.difference_inner_eq_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {hχ : CharacterDifferenceImage (L := L) (G := G) τ χ}
+    {hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ}
+    (horth : hχ.Orthogonal hψ) :
+    ClassFunction.inner hχ.difference hψ.difference = 0 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [horth hχ.muClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet]
+  rw [horth hχ.muClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet]
+  rw [horth hχ.nuClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet]
+  rw [horth hχ.nuClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet]
+  simp
+
+theorem Orthogonal.signedDifference_inner_eq_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {hχ : CharacterDifferenceImage (L := L) (G := G) τ χ}
+    {hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ}
+    (horth : hχ.Orthogonal hψ) :
+    ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0 := by
+  rcases hχ.sign_eq with hχsign | hχsign <;>
+    rcases hψ.sign_eq with hψsign | hψsign
+  · simpa [signedDifference, hχsign, hψsign] using horth.difference_inner_eq_zero
+  · calc
+      ClassFunction.inner hχ.signedDifference hψ.signedDifference =
+          ClassFunction.inner hχ.difference (-hψ.difference) := by
+            simp [signedDifference, hχsign, hψsign]
+      _ = 0 := by
+            rw [ClassFunction.inner_neg_right, horth.difference_inner_eq_zero, neg_zero]
+  · calc
+      ClassFunction.inner hχ.signedDifference hψ.signedDifference =
+          ClassFunction.inner (-hχ.difference) hψ.difference := by
+            simp [signedDifference, hχsign, hψsign]
+      _ = 0 := by
+            rw [ClassFunction.inner_neg_left, horth.difference_inner_eq_zero, neg_zero]
+  · calc
+      ClassFunction.inner hχ.signedDifference hψ.signedDifference =
+          ClassFunction.inner (-hχ.difference) (-hψ.difference) := by
+            simp [signedDifference, hχsign, hψsign]
+      _ = ClassFunction.inner hχ.difference hψ.difference := by
+            rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg]
+      _ = 0 := horth.difference_inner_eq_zero
+
+theorem Orthogonal.image_conjugateDifference_inner_eq_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {hχ : CharacterDifferenceImage (L := L) (G := G) τ χ}
+    {hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ}
+    (horth : hχ.Orthogonal hψ) :
+    ClassFunction.inner
+        (τ (OddOrder.Peterfalvi.S03.conjugateDifference χ))
+        (τ (OddOrder.Peterfalvi.S03.conjugateDifference ψ)) = 0 := by
+  rw [hχ.image_conjugateDifference, hψ.image_conjugateDifference]
+  exact horth.signedDifference_inner_eq_zero
 
 end CharacterDifferenceImage
 
@@ -354,6 +493,26 @@ theorem difference_images_orthogonal_of_inner_pair
     (hφχ_conj : ClassFunction.inner φ χ.conj = 0) :
     (hyp.difference_image hφ).Orthogonal (hyp.difference_image hχ) :=
   hyp.difference_images_orthogonal hφ hχ hφχ hφχ_conj
+
+theorem difference_image_inner_self
+    {hyp : Hypothesis (L := L) (G := G) S A}
+    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    ClassFunction.inner
+        (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ))
+        (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ)) = 2 :=
+  (hyp.difference_image hχ).image_conjugateDifference_inner_self hrow
+
+theorem difference_images_inner_eq_zero_of_inner_pair
+    {hyp : Hypothesis (L := L) (G := G) S A}
+    {φ χ : ClassFunction L ℂ} (hφ : φ ∈ S) (hχ : χ ∈ S)
+    (hφχ : ClassFunction.inner φ χ = 0)
+    (hφχ_conj : ClassFunction.inner φ χ.conj = 0) :
+    ClassFunction.inner
+        (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference φ))
+        (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ)) = 0 :=
+  CharacterDifferenceImage.Orthogonal.image_conjugateDifference_inner_eq_zero
+    (hyp.difference_images_orthogonal_of_inner_pair hφ hχ hφχ hφχ_conj)
 
 end Hypothesis
 

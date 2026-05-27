@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # Isometry on orthonormal difference pairs
@@ -32,10 +33,14 @@ orthonormal-pair structures, up to a uniform sign.
   `issues/0025-peterfalvi-isometry-difference-core.md`.  The theorem needs
   second orthogonality to identify the irreducible-character basis coefficients
   and a separate finite integer-vector induction proving the uniform sign shape.
+  The statement also carries the degree-zero input used in Peterfalvi's
+  `e₂ + e₃` exclusion: every image `τ (χ_i - χ_0)` vanishes at `1`.
 
 ## Main statement
 
+* `OddOrder.RepresentationTheory.IsometryDifferencePairNumerics`.
 * `OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily`.
+* `OddOrder.RepresentationTheory.IsometryDifferenceImagesVanishAtOne`.
 * `OddOrder.RepresentationTheory.isometry_difference_pair_structure`.
 
 ## References
@@ -48,6 +53,261 @@ orthonormal-pair structures, up to a uniform sign.
 namespace OddOrder.RepresentationTheory
 
 variable {G H : Type*} [Group G] [Group H]
+
+theorem irreducibleCharacter_inner_eq_if
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} (χ : Fin n → IrreducibleCharacter G) (hχ : Function.Injective χ)
+    (i j : Fin n) :
+    ClassFunction.inner (χ i : ClassFunction G ℂ) (χ j : ClassFunction G ℂ) =
+      if i = j then 1 else 0 := by
+  by_cases hij : i = j
+  · subst j
+    simpa [characterTableRowPairing] using
+      CharacterTableRowOrthogonality.diagonal (G := G) hrow (χ i)
+  · have hμ : χ i ≠ χ j := fun h => hij (hχ h)
+    rw [if_neg hij]
+    simpa [characterTableRowPairing] using
+      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+
+theorem irreducibleCharacter_difference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ))
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 2 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  simp [hi, eq_comm]
+  norm_num
+
+theorem irreducibleCharacter_difference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i j : Fin n}
+    (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner
+        ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ))
+        ((χ j : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 1 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  simp [hi, hj, hij, eq_comm]
+
+/-- The source-side difference `χ_i - χ_0` used in Peterfalvi §3 (1.4). -/
+abbrev irreducibleCharacterDifference {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter G) (i : Fin n) : ClassFunction G ℂ :=
+  (χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)
+
+@[simp] theorem irreducibleCharacterDifference_zero
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G) :
+    irreducibleCharacterDifference χ 0 = 0 := by
+  simp [irreducibleCharacterDifference]
+
+theorem irreducibleCharacterDifference_ne_zero
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    irreducibleCharacterDifference χ i ≠ 0 := by
+  intro h
+  have hclass : (χ i : ClassFunction G ℂ) = (χ 0 : ClassFunction G ℂ) :=
+    sub_eq_zero.mp h
+  exact hi (hχ (IrreducibleCharacter.ext hclass))
+
+theorem irreducibleCharacterDifference_eq_zero_iff
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) (i : Fin n) :
+    irreducibleCharacterDifference χ i = 0 ↔ i = 0 := by
+  constructor
+  · intro h
+    by_contra hi
+    exact irreducibleCharacterDifference_ne_zero χ hχ hi h
+  · intro hi
+    subst hi
+    simp
+
+@[simp] theorem irreducibleCharacterDifference_apply_one
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G) (i : Fin n) :
+    irreducibleCharacterDifference χ i (1 : G) =
+      ((χ i : ClassFunction G ℂ) : G → ℂ) 1 -
+        ((χ 0 : ClassFunction G ℂ) : G → ℂ) 1 :=
+  rfl
+
+theorem irreducibleCharacterDifference_apply_one_of_same_degree
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (h_same_degree :
+      ∀ i, ((χ i : ClassFunction G ℂ) : G → ℂ) 1 =
+        ((χ 0 : ClassFunction G ℂ) : G → ℂ) 1)
+    (i : Fin n) :
+    irreducibleCharacterDifference χ i (1 : G) = 0 := by
+  simp [h_same_degree i]
+
+theorem irreducibleCharacterDifference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (irreducibleCharacterDifference χ i)
+        (irreducibleCharacterDifference χ i) = 2 := by
+  exact irreducibleCharacter_difference_inner_self_of_ne_zero (G := G) hrow χ hχ hi
+
+theorem irreducibleCharacterDifference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
+    (hχ : Function.Injective χ) {i j : Fin n}
+    (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (irreducibleCharacterDifference χ i)
+        (irreducibleCharacterDifference χ j) = 1 := by
+  exact irreducibleCharacter_difference_inner_of_ne_zero_of_ne
+    (G := G) hrow χ hχ hi hj hij
+
+/-- The image under an integral isometry of a source-side difference `χ_i - χ_0`. -/
+abbrev isometryDifferenceImage {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) (i : Fin n) : ClassFunction G ℂ :=
+  τ (irreducibleCharacterDifference χ i)
+
+@[simp] theorem isometryDifferenceImage_zero {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) :
+    isometryDifferenceImage τ χ 0 = 0 := by
+  simp [isometryDifferenceImage]
+
+/-- The degree-zero hypothesis for the images in Peterfalvi §3 (1.4).
+
+In the textbook this comes from the map landing in the reduced virtual-character
+lattice on `G#`; here it is kept as an explicit class-function condition until
+that lattice target is part of the theorem statement. -/
+def IsometryDifferenceImagesVanishAtOne {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) : Prop :=
+  ∀ i, isometryDifferenceImage τ χ i (1 : G) = 0
+
+/-- The virtual-character hypothesis for the images in Peterfalvi §3 (1.4).
+
+Peterfalvi's `τ : ℤ[X, H#] → ℤ[Irr G]` carries virtual characters to virtual
+characters; the integer-linear formulation `τ : ClassFunction H ℂ →ₗ[ℤ]
+ClassFunction G ℂ` is broader, so the virtual-character target needs to be
+recorded as a separate hypothesis on the inputs we feed into the structure
+theorem. -/
+def IsometryDifferenceImagesAreVirtual {G H : Type*} [Group G] [Group H]
+    {n : ℕ} [NeZero n]
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (χ : Fin n → IrreducibleCharacter H) : Prop :=
+  ∀ i, isometryDifferenceImage τ χ i ∈ ZIrr G
+
+theorem isometryDifferenceImage_inner_self_of_ne_zero
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j))
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (isometryDifferenceImage τ χ i)
+        (isometryDifferenceImage τ χ i) = 2 := by
+  rw [h_isom i i]
+  exact irreducibleCharacterDifference_inner_self_of_ne_zero
+    (G := H) hrow χ hχ hi
+
+theorem isometryDifferenceImage_inner_of_ne_zero_of_ne
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j))
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (isometryDifferenceImage τ χ i)
+        (isometryDifferenceImage τ χ j) = 1 := by
+  rw [h_isom i j]
+  exact irreducibleCharacterDifference_inner_of_ne_zero_of_ne
+    (G := H) hrow χ hχ hi hj hij
+
+/-- The numeric data carried by the image differences in Peterfalvi §3 (1.4).
+
+This is the interface between character theory and the finite combinatorial
+argument: the zero row, degree-zero condition, norm `2`, and mutual inner
+product `1` for distinct nonzero differences. -/
+structure IsometryDifferencePairNumerics {n : ℕ} [NeZero n] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (v : Fin n → ClassFunction G ℂ) : Prop where
+  zero : v 0 = 0
+  degree_zero : ∀ i, v i (1 : G) = 0
+  inner_self_of_ne_zero :
+    ∀ ⦃i : Fin n⦄, i ≠ 0 → ClassFunction.inner (v i) (v i) = 2
+  inner_of_ne_zero_of_ne :
+    ∀ ⦃i j : Fin n⦄, i ≠ 0 → j ≠ 0 → i ≠ j →
+      ClassFunction.inner (v i) (v j) = 1
+
+namespace IsometryDifferencePairNumerics
+
+variable {n : ℕ} [NeZero n] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {v : Fin n → ClassFunction G ℂ}
+
+theorem inner_self (hv : IsometryDifferencePairNumerics v)
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (v i) (v i) = 2 :=
+  hv.inner_self_of_ne_zero hi
+
+theorem inner_of_ne (hv : IsometryDifferencePairNumerics v)
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (v i) (v j) = 1 :=
+  hv.inner_of_ne_zero_of_ne hi hj hij
+
+end IsometryDifferencePairNumerics
+
+/-- The image differences of an isometric family satisfy the finite numeric
+conditions needed by the later combinatorial proof core. -/
+theorem isometryDifferencePairNumerics_of_isometryDifferenceImage
+    [Fintype G] [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := H))
+    {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
+    (hχ : Function.Injective χ)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j)) :
+    IsometryDifferencePairNumerics
+      (fun i => isometryDifferenceImage τ χ i) where
+  zero := by
+    simp
+  degree_zero := h_image_degree_zero
+  inner_self_of_ne_zero := by
+    intro i hi
+    exact isometryDifferenceImage_inner_self_of_ne_zero
+      (G := G) (H := H) hrow χ hχ τ h_isom hi
+  inner_of_ne_zero_of_ne := by
+    intro i j hi hj hij
+    exact isometryDifferenceImage_inner_of_ne_zero_of_ne
+      (G := G) (H := H) hrow χ hχ τ h_isom hi hj hij
 
 /-- A signed `n`-tuple of irreducible characters of `G`, used as the target
 shape in Peterfalvi's difference-pair lemmas.
@@ -149,6 +409,41 @@ abbrev signedDifference (data : SignedIrreducibleDifferenceFamily G n)
     data.signedDifference i = data.sign • data.difference i :=
   rfl
 
+@[simp] theorem difference_apply_one
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.difference i (1 : G) =
+      data.classFunction i (1 : G) - data.classFunction 0 (1 : G) :=
+  rfl
+
+theorem signedDifference_apply_one_eq_zero_iff
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i : Fin n) :
+    data.signedDifference i (1 : G) = 0 ↔ data.difference i (1 : G) = 0 := by
+  rcases data.sign_eq with hsign | hsign
+  · simp [signedDifference, hsign]
+  · constructor
+    · intro h
+      have hneg : (-data.difference i) (1 : G) = 0 := by
+        simpa [signedDifference, hsign] using h
+      change -(data.difference i (1 : G)) = 0 at hneg
+      exact neg_eq_zero.mp hneg
+    · intro h
+      have hneg : (-data.difference i) (1 : G) = 0 := by
+        change -(data.difference i (1 : G)) = 0
+        rw [h, neg_zero]
+      simpa [signedDifference, hsign] using hneg
+
+theorem signedDifference_apply_one_eq_zero_of_difference
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n}
+    (hi : data.difference i (1 : G) = 0) :
+    data.signedDifference i (1 : G) = 0 :=
+  (data.signedDifference_apply_one_eq_zero_iff i).mpr hi
+
+theorem difference_apply_one_eq_zero_of_signedDifference
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] {i : Fin n}
+    (hi : data.signedDifference i (1 : G) = 0) :
+    data.difference i (1 : G) = 0 :=
+  (data.signedDifference_apply_one_eq_zero_iff i).mp hi
+
 @[simp] theorem signedDifference_zero
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] :
     data.signedDifference 0 = 0 := by
@@ -227,7 +522,127 @@ theorem sign_mul_self (data : SignedIrreducibleDifferenceFamily G n) :
     data.sign * data.sign = 1 := by
   rcases data.sign_eq with hsign | hsign <;> simp [hsign]
 
+theorem classFunction_inner_eq_if
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) (i j : Fin n) :
+    ClassFunction.inner (data.classFunction i) (data.classFunction j) =
+      if i = j then 1 else 0 := by
+  by_cases hij : i = j
+  · subst j
+    simpa [classFunction, characterTableRowPairing] using
+      CharacterTableRowOrthogonality.diagonal (G := G) hrow (data.mu i)
+  · have hμ : data.mu i ≠ data.mu j := fun h => hij (data.injective h)
+    rw [if_neg hij]
+    simpa [classFunction, characterTableRowPairing] using
+      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+
+theorem difference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (data.difference i) (data.difference i) = 2 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [classFunction_inner_eq_if (G := G) hrow data i i]
+  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 i]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  simp [hi, eq_comm]
+  norm_num
+
+theorem difference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (data.difference i) (data.difference j) = 1 := by
+  rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  rw [classFunction_inner_eq_if (G := G) hrow data i j]
+  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 j]
+  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  simp [hi, hj, hij, eq_comm]
+
+theorem signedDifference_inner_signedDifference
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n] (i j : Fin n) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference j) =
+      ClassFunction.inner (data.difference i) (data.difference j) := by
+  rcases data.sign_eq with hsign | hsign
+  · simp [signedDifference, hsign]
+  · calc
+      ClassFunction.inner (data.signedDifference i) (data.signedDifference j) =
+          ClassFunction.inner (-data.difference i) (-data.difference j) := by
+            simp [signedDifference, hsign]
+      _ = ClassFunction.inner (data.difference i) (data.difference j) := by
+            rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg]
+
+theorem signedDifference_inner_self_of_ne_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i : Fin n} (hi : i ≠ 0) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference i) = 2 := by
+  rw [signedDifference_inner_signedDifference]
+  exact difference_inner_self_of_ne_zero (G := G) hrow data hi
+
+theorem signedDifference_inner_of_ne_zero_of_ne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
+    ClassFunction.inner (data.signedDifference i) (data.signedDifference j) = 1 := by
+  rw [signedDifference_inner_signedDifference]
+  exact difference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
+
+/-- A signed irreducible-difference family satisfies the same finite numeric
+conditions once the degree-zero condition is supplied separately. -/
+theorem numerics_of_signedDifference_vanishAtOne
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
+    (hvanish : ∀ i, data.signedDifference i (1 : G) = 0) :
+    IsometryDifferencePairNumerics
+      (fun i => data.signedDifference i) where
+  zero := by
+    simp
+  degree_zero := hvanish
+  inner_self_of_ne_zero := by
+    intro i hi
+    exact signedDifference_inner_self_of_ne_zero (G := G) hrow data hi
+  inner_of_ne_zero_of_ne := by
+    intro i j hi hj hij
+    exact signedDifference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
+
 end SignedIrreducibleDifferenceFamily
+
+theorem signedDifference_vanishAtOne_of_isometryDifferenceImage_eq
+    {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter H)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (h_image : ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ) :
+    ∀ i, data.signedDifference i (1 : G) = 0 := by
+  intro i
+  rw [← h_image i]
+  exact h_image_degree_zero i
+
+theorem difference_vanishAtOne_of_isometryDifferenceImage_eq
+    {n : ℕ} [NeZero n]
+    (χ : Fin n → IrreducibleCharacter H)
+    (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (data : SignedIrreducibleDifferenceFamily G n)
+    (h_image : ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ) :
+    ∀ i, data.difference i (1 : G) = 0 := by
+  intro i
+  exact data.difference_apply_one_eq_zero_of_signedDifference
+    (signedDifference_vanishAtOne_of_isometryDifferenceImage_eq
+      (G := G) (H := H) χ τ data h_image h_image_degree_zero i)
 
 variable [Fintype G] [Fintype H]
 
@@ -235,20 +650,27 @@ variable [Fintype G] [Fintype H]
 ([Peterfalvi §3 (1.4)] abstracted, also used in §5 (3.2), §6 (4.5), §7 (5.6)).
 
 Given `n ≥ 2` distinct irreducible characters `χ : Fin n → Irr(H)`, all of
-equal degree, and a `ℤ`-linear `τ : ClassFunction H ℂ → ClassFunction G ℂ` that preserves
-the normalized inner product on the differences `χ i - χ 0`, the image of these
-differences is built from a new orthonormal `n`-tuple `μ : Fin n → Irr(G)`
-times a uniform sign `ε = ±1`.
+equal degree, and a `ℤ`-linear `τ : ClassFunction H ℂ → ClassFunction G ℂ` such
+that, on each difference `χ_i - χ_0`, the image lies in `ZIrr G`, vanishes at
+`1 : G`, and preserves the normalized inner product, the conclusion is the
+existence of a `SignedIrreducibleDifferenceFamily G n` whose signed differences
+coincide with the images.  Equivalently: the image is built from a new
+orthonormal `n`-tuple `μ : Fin n → Irr(G)` times a uniform sign `ε = ±1`.
 
-This conditional form takes the signed irreducible-difference family `data`
-together with the witnessing equalities `h_data : ∀ i, τ (χ i - χ 0) = data.signedDifference i`
-as explicit hypotheses, mirroring the forward-dep pattern used elsewhere in
-the project (e.g. Ch.7 `normal_J`, `thompson_normal_p_complement`,
-`burnside_p_pow_q_pow`).  The actual construction of `data` from the isometry
-hypothesis requires `SecondOrthogonality` + induction on `n` (split into
-`issues/0025-peterfalvi-isometry-difference-core.md`).  Downstream consumers
-in §3 (1.4) / §5 (3.2) / §6 (4.5) / §7 (5.6) apply this theorem by supplying
-`data` and `h_data` from their own contexts. -/
+The three hypotheses on `τ` correspond to Peterfalvi's textbook setup:
+
+* `h_image_virtual` — Peterfalvi's `τ : ℤ[X, H#] → ℤ[Irr G]` is virtual-character
+  preserving; required to identify the image in `ZIrr G`.
+* `h_image_degree_zero` — character differences vanish at `1` on the source,
+  and the isometry preserves this.
+* `h_isom` — the normalized inner product is preserved on the `χ_i - χ_0`.
+
+The proof of this theorem is split into `n = 2`, `n = 3`, and an induction
+step over `n`, and uses `SecondOrthogonality` to extract the orthonormal
+image components.  See
+`issues/0025-peterfalvi-isometry-difference-core.md` for the proof plan.
+Downstream consumers in §3 (1.4) / §5 (3.2) / §6 (4.5) / §7 (5.6) apply this
+theorem by supplying the three hypotheses from their own contexts. -/
 theorem isometry_difference_pair_structure
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
     {n : ℕ} [NeZero n] (_hn : 2 ≤ n)
@@ -258,19 +680,15 @@ theorem isometry_difference_pair_structure
       ∀ i, ((χ i : ClassFunction H ℂ) : H → ℂ) 1 =
         ((χ 0 : ClassFunction H ℂ) : H → ℂ) 1)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (_h_isom : ∀ i j,
-        ClassFunction.inner
-          (τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)))
-          (τ ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))) =
-        ClassFunction.inner
-          ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ))
-          ((χ j : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)))
-    (data : SignedIrreducibleDifferenceFamily G n)
-    (h_data : ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
-        data.signedDifference i) :
+    (h_image_virtual : IsometryDifferenceImagesAreVirtual τ χ)
+    (h_image_degree_zero : IsometryDifferenceImagesVanishAtOne τ χ)
+    (h_isom : ∀ i j,
+        ClassFunction.inner (isometryDifferenceImage τ χ i)
+          (isometryDifferenceImage τ χ j) =
+        ClassFunction.inner (irreducibleCharacterDifference χ i)
+          (irreducibleCharacterDifference χ j)) :
     ∃ data : SignedIrreducibleDifferenceFamily G n,
-      ∀ i, τ ((χ i : ClassFunction H ℂ) - (χ 0 : ClassFunction H ℂ)) =
-        data.signedDifference i :=
-  ⟨data, h_data⟩
+      ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i := by
+  sorry
 
 end OddOrder.RepresentationTheory

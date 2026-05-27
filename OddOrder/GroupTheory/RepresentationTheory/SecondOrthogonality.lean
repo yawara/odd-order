@@ -73,6 +73,15 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
   `∑_χ χ(g) · star (χ(h))`.
 * `OddOrder.RepresentationTheory.characterTableSquareColumnPairing` — the same column
   pairing after reindexing columns by irreducible characters.
+* `OddOrder.RepresentationTheory.characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality`
+  and `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality` —
+  the conditional column relations extracted from the matrix proof core.
+* `OddOrder.RepresentationTheory.characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality` — the same
+  conditional relations transported back to element representatives.
+* `OddOrder.RepresentationTheory.column_orthogonality_cases_of_weightedRowOrthogonality`
+  — the conditional primitive cases theorem, matching the final proof-core shape.
 * `OddOrder.RepresentationTheory.column_orthogonality_diag` — diagonal case
   `∑_{χ ∈ Irr G} χ(g) · star (χ(g)) = |C_G(g)|`.
 * `OddOrder.RepresentationTheory.column_orthogonality_conj` — for conjugate `g, h`,
@@ -160,6 +169,86 @@ theorem conjugacyClassRepresentative_mk_eq (C : ConjClasses G) :
 noncomputable def conjugacyClassSize (C : ConjClasses G) : ℕ :=
   Nat.card C.carrier
 
+/-- Splitting a finite group element by its conjugacy class and its membership in that
+class recovers the original element. -/
+noncomputable def conjClassesSigmaCarrierEquiv :
+    (Σ C : ConjClasses G, C.carrier) ≃ G where
+  toFun x := x.2.1
+  invFun g := ⟨ConjClasses.mk g, ⟨g, ConjClasses.mem_carrier_mk⟩⟩
+  left_inv := by
+    rintro ⟨C, ⟨g, hg⟩⟩
+    exact Sigma.subtype_ext (ConjClasses.mem_carrier_iff_mk_eq.mp hg) rfl
+  right_inv := by
+    intro g
+    rfl
+
+/-- Collect the unnormalized class-function inner product by conjugacy classes. -/
+theorem classFunction_innerSum_eq_sum_conjClasses
+    [Finite G] [Fintype G] [Fintype (ConjClasses G)]
+    (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.innerSum φ ψ =
+      ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          φ (conjugacyClassRepresentative C) *
+            star (ψ (conjugacyClassRepresentative C)) := by
+  classical
+  letI : ∀ C : ConjClasses G, Fintype C.carrier := fun _ => Fintype.ofFinite _
+  let f : G → ℂ := fun g => φ g * star (ψ g)
+  have hconst (C : ConjClasses G) (x : C.carrier) :
+      f x.1 = f (conjugacyClassRepresentative C) := by
+    have hxC : ConjClasses.mk x.1 = C :=
+      ConjClasses.mem_carrier_iff_mk_eq.mp x.2
+    have hrepC : ConjClasses.mk (conjugacyClassRepresentative C) = C :=
+      conjugacyClassRepresentative_mk_eq (G := G) C
+    have hxrep : IsConj x.1 (conjugacyClassRepresentative C) :=
+      ConjClasses.mk_eq_mk_iff_isConj.mp (hxC.trans hrepC.symm)
+    have hφ : φ x.1 = φ (conjugacyClassRepresentative C) :=
+      φ.of_isConj hxrep
+    have hψ : ψ x.1 = ψ (conjugacyClassRepresentative C) :=
+      ψ.of_isConj hxrep
+    simp [f, hφ, hψ]
+  have hfiber (C : ConjClasses G) :
+      (∑ x : C.carrier, f x.1) =
+        (conjugacyClassSize C : ℂ) *
+          f (conjugacyClassRepresentative C) := by
+    calc
+      (∑ x : C.carrier, f x.1) =
+          ∑ _x : C.carrier, f (conjugacyClassRepresentative C) := by
+            apply Finset.sum_congr rfl
+            intro x _hx
+            exact hconst C x
+      _ = (conjugacyClassSize C : ℂ) *
+            f (conjugacyClassRepresentative C) := by
+            simp [conjugacyClassSize, Nat.card_eq_fintype_card]
+  calc
+    ClassFunction.innerSum φ ψ = ∑ g : G, f g := rfl
+    _ = ∑ x : (Σ C : ConjClasses G, C.carrier), f x.2.1 := by
+      simpa [conjClassesSigmaCarrierEquiv] using
+        ((conjClassesSigmaCarrierEquiv (G := G)).sum_comp f).symm
+    _ = ∑ C : ConjClasses G, ∑ x : C.carrier, f x.1 := by
+      rw [Fintype.sum_sigma]
+    _ = ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          f (conjugacyClassRepresentative C) := by
+      apply Finset.sum_congr rfl
+      intro C _hC
+      exact hfiber C
+    _ = ∑ C : ConjClasses G,
+        (conjugacyClassSize C : ℂ) *
+          φ (conjugacyClassRepresentative C) *
+            star (ψ (conjugacyClassRepresentative C)) := by
+      simp [f, mul_assoc]
+
+/-- A conjugacy class of a finite group is nonempty, hence has positive size. -/
+theorem conjugacyClassSize_pos [Finite G] (C : ConjClasses G) :
+    0 < conjugacyClassSize C := by
+  rw [conjugacyClassSize]
+  rcases ConjClasses.exists_rep C with ⟨g, hg⟩
+  exact Nat.card_pos_iff.mpr
+    ⟨⟨g, by
+      rw [← hg]
+      exact ConjClasses.mem_carrier_mk⟩, inferInstance⟩
+
 /-- A conjugacy class has size `|G| / |C_G(g)|`, equivalently
 `|class(g)| * |C_G(g)| = |G|`.  This form avoids committing later matrix arguments to
 natural-number division. -/
@@ -196,9 +285,8 @@ theorem card_centralizer_eq_card_div_conjugacyClassSize_cast [Finite G] (g : G) 
     (Nat.card G : ℂ) / (conjugacyClassSize (ConjClasses.mk g) : ℂ) =
       (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
   have hmul := conjugacyClassSize_mk_mul_card_centralizer_cast (G := G) g
-  have hclass_pos : 0 < conjugacyClassSize (ConjClasses.mk g) := by
-    rw [conjugacyClassSize]
-    exact Nat.card_pos_iff.mpr ⟨⟨g, ConjClasses.mem_carrier_mk⟩, inferInstance⟩
+  have hclass_pos : 0 < conjugacyClassSize (ConjClasses.mk g) :=
+    conjugacyClassSize_pos (G := G) (ConjClasses.mk g)
   have hclass_ne : (conjugacyClassSize (ConjClasses.mk g) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr hclass_pos.ne'
   rw [div_eq_iff hclass_ne]
@@ -290,6 +378,19 @@ noncomputable def characterTableWeightedRowPairing
         (conjugacyClassSize C : ℂ) * characterTableEntry χ C *
           star (characterTableEntry ψ C) :=
   rfl
+
+/-- The class-weighted row pairing is the ordinary unnormalized row inner sum after
+collecting group elements by conjugacy class. -/
+theorem characterTableWeightedRowPairing_eq_innerSum
+    [Finite G] [Fintype G] (idx : CharacterTableIndexing G)
+    (χ ψ : IrreducibleCharacter G) :
+    characterTableWeightedRowPairing idx χ ψ =
+      ClassFunction.innerSum (χ : ClassFunction G ℂ) (ψ : ClassFunction G ℂ) := by
+  classical
+  letI := idx.classFintype
+  rw [classFunction_innerSum_eq_sum_conjClasses
+    (G := G) (φ := (χ : ClassFunction G ℂ)) (ψ := (ψ : ClassFunction G ℂ))]
+  simp [characterTableWeightedRowPairing, characterTableEntry, mul_assoc]
 
 /-- Row orthogonality in the class-weighted matrix form.  This is the exact input used
 to prove nonvanishing of the character-table determinant. -/
@@ -479,6 +580,65 @@ theorem characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDia
       (characterTableSquareMatrix idx)⁻¹ * M) hgram
   simpa [characterTableWeightedRowGramMatrix, Matrix.mul_assoc] using hleft
 
+/-- Multiplying the column Gram matrix by the class-size diagonal gives the scalar
+diagonal matrix `|G| I`.
+
+This is the next matrix-algebra step after canceling the left character-table factor in the
+weighted row Gram identity.  Entrywise, it says
+`|C| * (Aᴴ A)_{C,D} = |G| δ_{C,D}` after square reindexing. -/
+theorem characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableClassSizeSquareMatrix idx *
+        (Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx) =
+      Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ)) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hbridge :=
+    characterTableClassSizeSquareMatrix_mul_conjTranspose_eq_inv_mul_cardDiagonal
+      (G := G) idx hrow
+  have hmul := congrArg (fun M =>
+    M * characterTableSquareMatrix idx) hbridge
+  have hdiag :
+      Matrix.diagonal (fun _ : IrreducibleCharacter G => (Nat.card G : ℂ)) =
+        (Nat.card G : ℂ) • (1 : Matrix (IrreducibleCharacter G)
+          (IrreducibleCharacter G) ℂ) :=
+    (Matrix.smul_one_eq_diagonal (m := IrreducibleCharacter G) (Nat.card G : ℂ)).symm
+  rw [hdiag] at hmul ⊢
+  simpa [Matrix.mul_assoc, Matrix.smul_mul] using hmul
+
+/-- Entrywise form of
+`characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`. -/
+theorem conjugacyClassSize_mul_characterTableColumnGram_apply
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (ψ η : IrreducibleCharacter G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) *
+        ((Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx) ψ η) =
+      if ψ = η then (Nat.card G : ℂ) else 0 := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hmatrix :=
+    characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal (G := G) idx hrow
+  have hentry := congrFun (congrFun hmatrix ψ) η
+  by_cases hψη : ψ = η
+  · subst η
+    simpa only [characterTableClassSizeSquareMatrix, Matrix.diagonal_mul,
+      Matrix.diagonal_apply_eq, if_true] using hentry
+  · rw [if_neg hψη]
+    simpa only [characterTableClassSizeSquareMatrix, Matrix.diagonal_mul,
+      Matrix.diagonal_apply_ne _ hψη] using hentry
+
 /-- The normalized character-table row pairing of two irreducible complex
 characters.  This is the row side of the Schur orthogonality matrix argument. -/
 noncomputable def characterTableRowPairing
@@ -526,6 +686,31 @@ theorem offDiagonal (hrow : CharacterTableRowOrthogonality (G := G))
   hrow.2 hχψ
 
 end CharacterTableRowOrthogonality
+
+namespace CharacterTableWeightedRowOrthogonality
+
+variable [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- Ordinary row orthogonality implies the class-weighted row orthogonality used by the
+matrix proof of column orthogonality. -/
+theorem ofRowOrthogonality (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableRowOrthogonality (G := G)) :
+    CharacterTableWeightedRowOrthogonality idx := by
+  constructor
+  · intro χ
+    rw [characterTableWeightedRowPairing_eq_innerSum]
+    rw [← ClassFunction.card_mul_inner]
+    rw [← characterTableRowPairing_eq_inner]
+    rw [CharacterTableRowOrthogonality.diagonal hrow χ]
+    simp
+  · intro χ ψ hχψ
+    rw [characterTableWeightedRowPairing_eq_innerSum]
+    rw [← ClassFunction.card_mul_inner]
+    rw [← characterTableRowPairing_eq_inner]
+    rw [CharacterTableRowOrthogonality.offDiagonal hrow hχψ]
+    simp
+
+end CharacterTableWeightedRowOrthogonality
 
 /-- The character-table column pairing
 `∑_χ χ(g) · star (χ(h))`, summing over irreducible complex characters. -/
@@ -620,6 +805,82 @@ theorem characterTableSquareColumnPairing_eq_columnPairing_representatives
   rw [characterTableSquareColumnPairing_eq_classColumnPairing]
   rfl
 
+/-- The usual matrix column Gram entry is the complex conjugate of the
+`characterTableSquareColumnPairing` convention used in this file. -/
+theorem characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing
+    (idx : CharacterTableIndexing G) (ψ η : IrreducibleCharacter G) :
+    letI := idx.irrFintype
+    ((Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx) ψ η) =
+      star (characterTableSquareColumnPairing idx ψ η) := by
+  letI := idx.irrFintype
+  simp [Matrix.mul_apply, characterTableSquareColumnPairing, Matrix.conjTranspose_apply,
+    star_sum, star_mul, mul_comm]
+
+/-- Conditional off-diagonal column orthogonality in the square indexed table,
+assuming the weighted row orthogonality input. -/
+theorem characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    {ψ η : IrreducibleCharacter G} (hψη : ψ ≠ η) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableSquareColumnPairing idx ψ η = 0 := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hmul :=
+    conjugacyClassSize_mul_characterTableColumnGram_apply (G := G) idx hrow ψ η
+  rw [if_neg hψη] at hmul
+  have hclass_ne : (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (conjugacyClassSize_pos (G := G) (idx.rowColumnEquiv ψ)).ne'
+  have hgram :
+      ((Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx) ψ η) = 0 :=
+    (mul_eq_zero.mp hmul).resolve_left hclass_ne
+  have hstar : star (characterTableSquareColumnPairing idx ψ η) = 0 := by
+    simpa [characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing]
+      using hgram
+  exact star_eq_zero.mp hstar
+
+/-- Conditional diagonal column orthogonality in the square indexed table,
+assuming the weighted row orthogonality input. -/
+theorem characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (ψ : IrreducibleCharacter G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableSquareColumnPairing idx ψ ψ =
+      (Nat.card G : ℂ) / (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hmul :=
+    conjugacyClassSize_mul_characterTableColumnGram_apply (G := G) idx hrow ψ ψ
+  rw [if_pos rfl] at hmul
+  have hclass_ne : (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (conjugacyClassSize_pos (G := G) (idx.rowColumnEquiv ψ)).ne'
+  have hgram :
+      ((Matrix.conjTranspose (characterTableSquareMatrix idx) *
+          characterTableSquareMatrix idx) ψ ψ) =
+        (Nat.card G : ℂ) / (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) := by
+    rw [eq_div_iff hclass_ne]
+    simpa [mul_comm] using hmul
+  have hstar :
+      star (characterTableSquareColumnPairing idx ψ ψ) =
+        (Nat.card G : ℂ) / (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) := by
+    simpa [characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing]
+      using hgram
+  have hstar_rhs :
+      star ((Nat.card G : ℂ) / (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ)) =
+        (Nat.card G : ℂ) / (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) := by
+    simp
+  rw [← hstar_rhs, ← hstar]
+  simp
+
 theorem characterTableColumnPairing_of_isConj_left
     [Fintype (IrreducibleCharacter G)]
     {g₁ g₂ h : G} (hg : IsConj g₁ g₂) :
@@ -648,9 +909,150 @@ theorem characterTableColumnPairing_conj_left
 theorem characterTableColumnPairing_conj_right
     [Fintype (IrreducibleCharacter G)] (x g h : G) :
     characterTableColumnPairing g (x * h * x⁻¹) =
-      characterTableColumnPairing g h :=
+    characterTableColumnPairing g h :=
   characterTableColumnPairing_of_isConj_right
     (isConj_iff.mpr ⟨x⁻¹, by simp [mul_assoc]⟩)
+
+/-- Conditional diagonal column orthogonality for class-indexed columns,
+assuming the weighted row orthogonality input. -/
+theorem characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (C : ConjClasses G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableClassColumnPairingOfIndexing idx C C =
+      (Nat.card G : ℂ) / (conjugacyClassSize C : ℂ) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have h :=
+    characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality
+      (G := G) idx hrow (idx.rowColumnEquiv.symm C)
+  simpa [characterTableClassColumnPairingOfIndexing_eq_squareColumnPairing] using h
+
+/-- Conditional off-diagonal column orthogonality for class-indexed columns,
+assuming the weighted row orthogonality input. -/
+theorem characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    {C D : ConjClasses G} (hCD : C ≠ D) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    characterTableClassColumnPairingOfIndexing idx C D = 0 := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hne : idx.rowColumnEquiv.symm C ≠ idx.rowColumnEquiv.symm D := by
+    intro h
+    exact hCD (by simpa using congrArg idx.rowColumnEquiv h)
+  have h :=
+    characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality
+      (G := G) idx hrow hne
+  simpa [characterTableClassColumnPairingOfIndexing_eq_squareColumnPairing] using h
+
+/-- Conditional diagonal column orthogonality for element representatives,
+assuming the weighted row orthogonality input. -/
+theorem characterTableColumnPairing_diag_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (g : G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    @characterTableColumnPairing G _ idx.irrFintype g g =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have h :=
+    characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality
+      (G := G) idx hrow (ConjClasses.mk g)
+  rw [characterTableClassColumnPairingOfIndexing_mk] at h
+  rw [← card_centralizer_eq_card_div_conjugacyClassSize_cast (G := G) g]
+  exact h
+
+/-- Conditional non-conjugate column orthogonality for element representatives,
+assuming the weighted row orthogonality input. -/
+theorem characterTableColumnPairing_not_conj_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    {g h : G} (hgh : ¬ IsConj g h) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    @characterTableColumnPairing G _ idx.irrFintype g h = 0 := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  have hCD : ConjClasses.mk g ≠ ConjClasses.mk h := by
+    intro hC
+    exact hgh (ConjClasses.mk_eq_mk_iff_isConj.mp hC)
+  have h :=
+    characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality
+      (G := G) idx hrow hCD
+  simpa [characterTableClassColumnPairingOfIndexing_mk] using h
+
+/-- Conditional conjugate column orthogonality for element representatives,
+assuming the weighted row orthogonality input. -/
+theorem characterTableColumnPairing_conj_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    {g h : G} (hgh : IsConj g h) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    @characterTableColumnPairing G _ idx.irrFintype g h =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  rw [characterTableColumnPairing_of_isConj_right (G := G) (g := g) (h₁ := h) (h₂ := g)
+    hgh.symm]
+  exact characterTableColumnPairing_diag_of_weightedRowOrthogonality (G := G) idx hrow g
+
+/-- Conditional primitive cases form of column orthogonality, assuming the finite
+indexing package and weighted row orthogonality input. -/
+theorem column_orthogonality_cases_of_weightedRowOrthogonality
+    [Finite G] (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (g h : G) :
+    letI := idx.irrFintype
+    letI := Classical.decEq (IrreducibleCharacter G)
+    letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+    (IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
+    (¬ IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h = 0) := by
+  letI := idx.irrFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  constructor
+  · intro hgh
+    exact characterTableColumnPairing_conj_of_weightedRowOrthogonality (G := G) idx hrow hgh
+  · intro hgh
+    exact characterTableColumnPairing_not_conj_of_weightedRowOrthogonality (G := G) idx hrow hgh
+
+/-- Conditional primitive cases form of column orthogonality, using ordinary row
+orthogonality as input. -/
+theorem column_orthogonality_cases_ofRowOrthogonality
+    [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableRowOrthogonality (G := G))
+    (g h : G) :
+    letI := idx.irrFintype
+    (IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h =
+      (Nat.card (Subgroup.centralizer ({g} : Set G)) : ℂ)) ∧
+    (¬ IsConj g h →
+      @characterTableColumnPairing G _ idx.irrFintype g h = 0) := by
+  let hweighted :=
+    CharacterTableWeightedRowOrthogonality.ofRowOrthogonality (G := G) idx hrow
+  simpa using column_orthogonality_cases_of_weightedRowOrthogonality
+    (G := G) idx hweighted g h
 
 /-- Primitive cases form of the second (column) orthogonality theorem
 ([Is] Thm 2.18 / 6.10).

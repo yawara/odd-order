@@ -25,12 +25,12 @@ created: 2026-05-25
 ## やること
 
 - [x] integer coefficient vector 用の小さな structure / predicate を決める。
-- [ ] **statement-level gap を埋める**: `τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ`
-      の現状定式化は **証明不可能**.  Peterfalvi 原文 (1.4) は `τ : ℤ[X, H^#] → ℤ[Irr G]`
-      で「`τ` が virtual character を virtual character に送る」が組み込まれているが,
-      Lean 統計には欠落.  対策: `(h_image_diff : ∀ i, τ ((χ i) - (χ 0)) ∈ ZIrr G)` を
-      仮説に追加 (または `(h_image_subset : ∀ φ ∈ ZIrr H, τ φ ∈ ZIrr G)`).
-      `S07_Coherence.lean:109-114` の `IsIntegralIsometry` consumer も並行 patch 必要.
+- [x] **statement-level gap を埋める**: `IsometryDifferenceImagesAreVirtual τ χ` predicate を
+      `IsometryDifferenceImagesVanishAtOne` と並べて追加し,
+      `isometry_difference_pair_structure` に `h_image_virtual` 仮説を組み込んだ。
+      これで Peterfalvi 原文 (1.4) の `τ : ℤ[X, H^#] → ℤ[Irr G]` 条件が
+      Lean statement に表現される。S07 consumer 側の patch は invoke 時点で行う
+      (現状 invoke 無し)。
 - [ ] **prerequisite lemmas (statement fix の後)**:
    - `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge
      (mathlib `FDRep.char_orthonormal` ⇒ `ClassFunction.inner`, ~80-150 LOC)
@@ -69,6 +69,43 @@ created: 2026-05-25
   unfold なしで進められるようにした。
 - `ClassFunction.innerSum_sub_left/right` と `inner_sub_left/right` を追加し、
   `χ_i - χ_0` 型の差分内積を後続 proof core で直接展開できるようにした。
+- `SignedIrreducibleDifferenceFamily.classFunction_inner_eq_if`,
+  `difference_inner_self_of_ne_zero`, `difference_inner_of_ne_zero_of_ne`,
+  `signedDifference_inner_signedDifference`,
+  `signedDifference_inner_self_of_ne_zero`, and
+  `signedDifference_inner_of_ne_zero_of_ne` を追加し、row orthogonality input
+  の下で target side の norm `2` と distinct nonzero difference inner product
+  `1` を unfold なしで取り出せるようにした。
+- `irreducibleCharacter_inner_eq_if`,
+  `irreducibleCharacter_difference_inner_self_of_ne_zero`, and
+  `irreducibleCharacter_difference_inner_of_ne_zero_of_ne` を追加し、input side
+  の `χ_i - χ_0` についても同じ norm `2` / inner `1` values を named API
+  として取り出せるようにした。
+- §7 の two-element `CharacterDifferenceImage` 側にも `difference`,
+  `signedDifference`, `image_eq_signedDifference`,
+  `difference_inner_self`, `signedDifference_inner_self`,
+  `image_conjugateDifference_inner_self`, and
+  `Orthogonal.image_conjugateDifference_inner_eq_zero` を追加し、(5.2.d/e)
+  の image norm `2` と image-set 直交性を hypothesis carrier から直接使える
+  ようにした。
+- `irreducibleCharacterDifference` と `isometryDifferenceImage` を追加し、
+  §3 (1.4) の source difference とその `τ` image を名前付きにした。
+  `isometryDifferenceImage_inner_self_of_ne_zero` と
+  `isometryDifferenceImage_inner_of_ne_zero_of_ne` により、`h_isom` と source
+  row orthogonality から image 側 norm `2` / mutual inner `1` を直接取り出せる。
+  `isometry_difference_pair_structure` の statement もこの named interface へ寄せた。
+- `irreducibleCharacterDifference_apply_one_of_same_degree`,
+  `IsometryDifferenceImagesVanishAtOne`, and
+  `SignedIrreducibleDifferenceFamily.signedDifference_apply_one_eq_zero_iff` を追加した。
+  §3 (1.4) の `e₂ + e₃` 除外で使う degree-zero 条件を明示し、
+  `isometry_difference_pair_structure` には image 側 `τ(χ_i-χ_0)(1)=0` 仮定を追加した。
+- `IsometryDifferencePairNumerics` を追加し、zero row, degree-zero, nonzero
+  difference norm `2`, distinct nonzero mutual inner `1` を finite combinatorial
+  core 用の単一 predicate にまとめた。
+  `isometryDifferencePairNumerics_of_isometryDifferenceImage` で `h_isom` と source
+  row orthogonality から image 側 numerics を作り、
+  `SignedIrreducibleDifferenceFamily.numerics_of_signedDifference_vanishAtOne` で
+  target signed family から同じ numerics を取り出せる。
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 

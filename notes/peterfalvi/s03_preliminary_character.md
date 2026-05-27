@@ -89,6 +89,22 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `support_neg`, `support_sub_subset`, `support_restrict`,
   `support_restrict_subset`, `supportedSubmodule_mono`, and
   `restrict_mem_supportedSubmodule`.
+- The Clifford proof-core API now exposes restriction-multiplicity algebra in
+  both arguments, scalar multiplication in the ambient character argument, and
+  ambient conjugation invariance for normal subgroups via
+  `restrictionMultiplicity_conjBy_right`.  `IsRestrictionConstituent.conjBy`
+  transports constituents, with conjugate irreducibility now supplied by
+  `IsIrreducibleCharacter.conjBy`.  At the irreducible-character level,
+  `IrreducibleCharacter.conjBy`, `liesOver_conjBy`, and `liesOver_conjBy_iff`
+  make the `G`-orbit action on constituents usable without returning to raw
+  class-function equalities.  `IrreducibleCharacter.inertia`,
+  `subgroup_le_inertia`, `inertiaQuotient`, and
+  `conjBy_eq_conjBy_iff_mul_inv_mem_inertia` expose the stabilizer and
+  orbit-representative equality criterion needed for the Clifford transversal
+  formulation.  `conjByOrbit`, `conjByOrbitEquivRightCosets`, and
+  `conjByOrbitEquivLeftCosets` identify this orbit with the right-coset
+  quotient and the standard `G ⧸ I_G(θ)` quotient, fixing the parametrization
+  needed for the orbit-sum side of Clifford decomposition.
 - `inductionCoefficient` and `IsInductionExpansion` encode the (1.3)
   Fourier/induced-character expansion target; numerical Frobenius reciprocity
   remains routed to `InducedCharacter`.
@@ -105,6 +121,33 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterKernel_trivialClassFunction`, `characterKernel_conj`,
   `subsetCharacterKernel_trivialClassFunction`,
   `subsetCharacterKernel_conj_iff`, and `SubsetCharacterKernel.mono`.
+- `SecondOrthogonality` now exposes the next matrix proof-core bridge:
+  `conjugacyClassSize_pos`,
+  `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,
+  `conjugacyClassSize_mul_characterTableColumnGram_apply`,
+  `characterTableConjTranspose_mul_squareMatrix_apply_eq_star_squareColumnPairing`,
+  `characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality`, and
+  `characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonality`.
+  These close the square/invertible matrix algebra step from weighted row
+  orthogonality to square-indexed column diagonal/off-diagonal relations.
+- The same conditional relations are now transported back to class-indexed and
+  element-representative pairings via
+  `characterTableClassColumnPairingOfIndexing_diag_of_weightedRowOrthogonality`,
+  `characterTableClassColumnPairingOfIndexing_eq_zero_of_ne_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_diag_of_weightedRowOrthogonality`,
+  `characterTableColumnPairing_conj_of_weightedRowOrthogonality`, and
+  `characterTableColumnPairing_not_conj_of_weightedRowOrthogonality`; these are
+  bundled by `column_orthogonality_cases_of_weightedRowOrthogonality` in the
+  same pair-of-cases shape as the final theorem.
+- `conjClassesSigmaCarrierEquiv`, `classFunction_innerSum_eq_sum_conjClasses`,
+  `characterTableWeightedRowPairing_eq_innerSum`, and
+  `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality` now connect
+  ordinary row orthogonality to the class-weighted row orthogonality input used
+  by the matrix proof core.  `column_orthogonality_cases_ofRowOrthogonality`
+  bundles the conditional primitive cases with ordinary row orthogonality input.
+  The remaining `column_orthogonality_cases` stub is now the input-supply layer:
+  providing canonical finite/indexing and row orthogonality data under the
+  public theorem's assumptions.
 
 ### (1.4) Tau Isometry — Core Dade Preparation
 
@@ -116,6 +159,29 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 - **n > 3, induction**: 各 χ_k (k > 3) について ((χ_k - χ_1)^τ, (χ_i - χ_1)^τ) = 1 for i < k. 2 ケースのみ: (χ_k - χ_1)^τ = e_k - e_1 or e_2 + e_3. 後者は (e_2 + e_3)(1) = 0 = (e_2 - e_3)(1), so e_2(1) = 0 が矛盾.
 
 **mathlib 状況**: **完全新規**. Peterfalvi 独自の補題で「isometry が orthonormal basis を保存する構造」を抽出. 基本 character orthogonality + 有限次元線形代数は mathlib にあり.
+
+**Lean status**: `SignedIrreducibleDifferenceFamily` now names the target
+`ε • (μ_i - μ_0)` family.  The row-orthogonality API exposes the key numerical
+inputs for the combinatorial core on both sides: nonzero source/target
+differences have norm `2`, and two distinct nonzero source/target differences
+have inner product `1`.
+`irreducibleCharacterDifference` and `isometryDifferenceImage` now name
+`χ_i - χ_0` and its `τ` image, and
+`isometryDifferenceImage_inner_self_of_ne_zero` /
+`isometryDifferenceImage_inner_of_ne_zero_of_ne` transfer the source-side
+norm/inner values across `h_isom` without unfolding the raw class-function
+differences.  `irreducibleCharacterDifference_apply_one_of_same_degree`,
+`IsometryDifferenceImagesVanishAtOne`, and
+`SignedIrreducibleDifferenceFamily.signedDifference_apply_one_eq_zero_iff`
+record the degree-zero side of (1.4); the abstract structure theorem now
+expects the image-side condition `τ(χ_i-χ_0)(1)=0`, matching the reduced
+target lattice used in Peterfalvi's proof.
+`IsometryDifferencePairNumerics` packages the finite combinatorial inputs for
+the next proof-core layer: the zero row, degree-zero condition, norm `2` for
+nonzero differences, and mutual inner product `1` for distinct nonzero
+differences.  Constructors from `isometryDifferenceImage` and from
+`SignedIrreducibleDifferenceFamily.signedDifference` keep the character-theory
+orthogonality layer separate from the remaining finite induction.
 
 **形式化**: ~60-80 行 (非自明だが self-contained).
 
