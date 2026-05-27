@@ -7253,15 +7253,85 @@ theorem step1_unique_maximal_containing_nilpotent
           M hM_max hL_le_M
       rw [← hNL_eq_X, ← hM_eq_NL]
 
-/-! ### §7D Steps 3-9 — per-step axioms + Step 7 theorem + final wiring
+/-! ### §7D Step 3 — *not both cores nontrivial* (Isaacs L3982-3993)
 
-The remaining heavier steps (3, 4, 6, 8, 9) are stated as fine-grained local
-axioms with textbook-faithful signatures.  Step 7 (`p, q` both odd) is *proven*
-from the Step 6 axiom and the landed Matsuyama application.  All steps are
-threaded into `noNonsolvableSimplePaQb` (now a theorem) at the end.  Each axiom
-is tracked in issue 0032. -/
+The asymmetric core `step3_main` does the full construction once (`Z = Z_p Z_q`
+abelian normal, `M = N_G(Z)` unique maximal by Step 1, `S ∈ Syl_p(M)` not full,
+the `N_P(S) > S` conjugation `g ∈ G - M` with `S^g = S`, `A = Z_p^g`), then
+splits on whether `A` acts faithfully on `Z_q`:
+- not faithful (or non-cyclic): `Z_q = ⟨C_{Z_q}(a)⟩ ⊆ M^g`, `Z_p ⊆ M^g`, so
+  `Z ⊆ M^g`, forcing `M = M^g`, `g ∈ M` — contradiction;
+- faithful: `A` (nontrivial `p`-group) acts faithfully on the cyclic `Z_q`, so
+  `p ∣ q-1`, i.e. `p < q`.
 
-/-- **§7D Step 3 axiom** (Isaacs L3982-3993) — *not both cores nontrivial*.
+It returns `IsCyclic Z_p ∧ (IsCyclic Z_q → p < q)`.  `step3_not_both_opCore_ne_bot`
+applies it with `(p,q)` and `(q,p)` (same `M`): `Z_p, Z_q` cyclic and `p < q`,
+`q < p` — contradiction. -/
+
+/-- `Z(O_p(M))` viewed in `H` (for a subgroup `M ≤ H`): the image of
+`zCenterOpCoreSubgroup ↥M p` under `M.subtype`. -/
+private def zCenterOpCoreH {H : Type*} [Group H] (M : Subgroup H) (p : ℕ) : Subgroup H :=
+  (zCenterOpCoreSubgroup ↥M p).map M.subtype
+
+/-- **§7D Step 3 core** — the asymmetric construction; see the section docstring. -/
+theorem step3_main
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    {M : Subgroup H} (hM_max : IsCoatom M)
+    (hOp : OddOrder.Isaacs.Ch01.opCore p ↥M ≠ ⊥)
+    (hOq : OddOrder.Isaacs.Ch01.opCore q ↥M ≠ ⊥) :
+    IsCyclic ↥(zCenterOpCoreH M p) ∧
+      (IsCyclic ↥(zCenterOpCoreH M q) → p < q) := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  haveI : Nontrivial ↥M := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hMbot
+    apply hOp
+    have : Subsingleton ↥M := by rw [hMbot]; infer_instance
+    exact Subgroup.eq_bot_of_subsingleton _
+  have hM_ne_top : M ≠ ⊤ := hM_max.1
+  -- `Z_p = Z(O_p(M))`, `Z_q = Z(O_q(M))` as subgroups of `↥M`.
+  set Zp : Subgroup ↥M := zCenterOpCoreSubgroup ↥M p with hZp_def
+  set Zq : Subgroup ↥M := zCenterOpCoreSubgroup ↥M q with hZq_def
+  -- their `H`-images.
+  set ZpH : Subgroup H := zCenterOpCoreH M p with hZpH_def
+  set ZqH : Subgroup H := zCenterOpCoreH M q with hZqH_def
+  have hZpH_eq : ZpH = Zp.map M.subtype := rfl
+  have hZqH_eq : ZqH = Zq.map M.subtype := rfl
+  -- `Z_p, Z_q` nontrivial (nontrivial p-/q-group has nontrivial center).
+  have hZp_ne_bot : Zp ≠ ⊥ := by
+    rw [hZp_def, zCenterOpCoreSubgroup, Ne, Subgroup.map_eq_bot_iff_of_injective _
+      (OddOrder.Isaacs.Ch01.opCore p ↥M).subtype_injective]
+    haveI : Nontrivial ↥(OddOrder.Isaacs.Ch01.opCore p ↥M) :=
+      (OddOrder.Isaacs.Ch01.opCore p ↥M).nontrivial_iff_ne_bot.mpr hOp
+    exact (Subgroup.center _).nontrivial_iff_ne_bot.mp
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup p ↥M).center_nontrivial
+  have hZq_ne_bot : Zq ≠ ⊥ := by
+    rw [hZq_def, zCenterOpCoreSubgroup, Ne, Subgroup.map_eq_bot_iff_of_injective _
+      (OddOrder.Isaacs.Ch01.opCore q ↥M).subtype_injective]
+    haveI : Nontrivial ↥(OddOrder.Isaacs.Ch01.opCore q ↥M) :=
+      (OddOrder.Isaacs.Ch01.opCore q ↥M).nontrivial_iff_ne_bot.mpr hOq
+    exact (Subgroup.center _).nontrivial_iff_ne_bot.mp
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup q ↥M).center_nontrivial
+  -- `ZpH, ZqH` nontrivial, `p`-/`q`-groups.
+  have hZpH_ne_bot : ZpH ≠ ⊥ := by
+    rw [hZpH_eq, Ne, Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective]; exact hZp_ne_bot
+  have hZqH_ne_bot : ZqH ≠ ⊥ := by
+    rw [hZqH_eq, Ne, Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective]; exact hZq_ne_bot
+  have hZpH_pgroup : IsPGroup p ZpH := by
+    rw [hZpH_eq]; exact (zCenterOpCoreSubgroup_isPGroup p).map M.subtype
+  have hZqH_qgroup : IsPGroup q ZqH := by
+    rw [hZqH_eq]; exact (zCenterOpCoreSubgroup_isPGroup q).map M.subtype
+  -- `Z_p ⊴ M`, `Z_q ⊴ M` (the centers of the cores are `M`-normal).
+  haveI hZp_normal : Zp.Normal := by rw [hZp_def]; exact zCenterOpCoreSubgroup_normal
+  haveI hZq_normal : Zq.Normal := by rw [hZq_def]; exact zCenterOpCoreSubgroup_normal
+  sorry
+
+/-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
 
 For a maximal subgroup `M` of a simple group of order `p^a q^b`, it is **not**
 the case that both `O_p(M)` and `O_q(M)` are nontrivial.  Combined with the
@@ -7273,14 +7343,26 @@ Textbook proof: assuming both nontrivial, set `Z = Z(O_p(M)) · Z(O_q(M))`
 (Step 1).  A Sylow `p`-subgroup `S` of `M` normalizes the nontrivial `q`-group
 `Z_q`, so by Step 2 `S` is not a full Sylow `p`; the `N_P(S) > S` argument
 produces `g ∈ G - M` with `S^g = S`, forcing `Z^g ⊆ M^g` and (via Thm 6.20 /
-faithful-action analysis) `Z ⊆ M^g`, so `M = M^g` and `g ∈ M`, contradiction. -/
-axiom step3_not_both_opCore_ne_bot
+faithful-action analysis) `Z ⊆ M^g`, so `M = M^g` and `g ∈ M`, contradiction.
+
+**Now a theorem** (was an axiom): applies the asymmetric core `step3_main` with
+`(p,q)` and `(q,p)` for the same `M`, yielding `p < q` and `q < p`. -/
+theorem step3_not_both_opCore_ne_bot
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
     {M : Subgroup H} (hM_max : IsCoatom M) :
-    OddOrder.Isaacs.Ch01.opCore p ↥M = ⊥ ∨ OddOrder.Isaacs.Ch01.opCore q ↥M = ⊥
+    OddOrder.Isaacs.Ch01.opCore p ↥M = ⊥ ∨ OddOrder.Isaacs.Ch01.opCore q ↥M = ⊥ := by
+  by_contra h
+  push Not at h
+  obtain ⟨hOp, hOq⟩ := h
+  obtain ⟨hZp_cyc, h_imp_pq⟩ := step3_main hpq hH_card hSubgroupsSolvable hM_max hOp hOq
+  obtain ⟨hZq_cyc, h_imp_qp⟩ :=
+    step3_main hpq.symm (by rw [mul_comm]; exact hH_card) hSubgroupsSolvable hM_max hOq hOp
+  have hpq_lt : p < q := h_imp_pq hZq_cyc
+  have hqp_lt : q < p := h_imp_qp hZp_cyc
+  omega
 
 /-- **§7D Steps 2-3 dichotomy** (Isaacs L4022-4026) — *every maximal subgroup
 has exactly one type*.
