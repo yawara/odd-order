@@ -6669,6 +6669,64 @@ theorem step7_p_ne_two_and_q_ne_two
     intro hq2
     exact key q p (Ne.symm hpq) a b hH_card hq2
 
+/-! ### §7D Step 8 — normal `J` for `p`-type maximals (Isaacs L4045-4063)
+
+Helper lemmas toward discharging Step 8 (the `normal_J` hypotheses for `M`). -/
+
+/-- **§7D Step 8 helper** — for a `p`-type maximal `M` of a simple group of order
+`p^a q^b`, the `p'`-core of `M` is trivial: `O_{p'}(M) = ⊥`.
+
+`O_{p'}(M) = oPiCore {r ≠ p} ↥M` is a normal `{r ≠ p}`-subgroup of `↥M`.  Since
+`|M| ∣ p^a q^b`, its only prime factors lie in `{p, q}`; intersecting with
+`{r ≠ p}` leaves only `q`, so `O_{p'}(M)` is a `q`-group, hence `≤ O_q(M)`.  By
+the dichotomy, `M` `p`-type ⇒ `O_q(M) = ⊥`. -/
+theorem oPiCore_pPrime_eq_bot_of_isPType
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    {M : Subgroup H} (hM_pType : IsPType p M) :
+    OddOrder.Isaacs.Ch03.oPiCore {r | r ≠ p} ↥M = ⊥ := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  have hM_ne_bot : M ≠ ⊥ := by
+    intro hMbot
+    have : Subsingleton ↥M := by rw [hMbot]; infer_instance
+    exact hM_pType.2 (Subgroup.eq_bot_of_subsingleton _)
+  -- `O_q(M) = ⊥` by the dichotomy (`M` p-type ⇒ not q-type ⇒ O_q(M) = ⊥).
+  have hOq_bot : OddOrder.Isaacs.Ch01.opCore q ↥M = ⊥ := by
+    rcases maximal_isPType_xor_isQType hpq hH_card hSubgroupsSolvable hM_pType.1 hM_ne_bot with
+      h | h
+    · by_contra hne
+      exact h.2 ⟨hM_pType.1, hne⟩
+    · exact absurd hM_pType h.2
+  set K := OddOrder.Isaacs.Ch03.oPiCore {r | r ≠ p} ↥M with hK_def
+  have hM_card_dvd : Nat.card ↥M ∣ p ^ a * q ^ b := by
+    rw [← hH_card]; exact M.card_subgroup_dvd_card
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {r | r ≠ p} K :=
+    OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {r | r ≠ p}
+  -- `K` is a `q`-group: any prime factor `r ∣ |K|` is `≠ p`, divides `|M| ∣ p^a q^b`,
+  -- hence `r = q`.
+  have hK_q_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({q} : Set ℕ) K := by
+    intro r hr
+    obtain ⟨hr_prime, hr_dvd_K, _⟩ := Nat.mem_primeFactors.mp hr
+    have hr_ne_p : r ≠ p := hK_pi r hr
+    have hr_dvd_M : r ∣ Nat.card ↥M := hr_dvd_K.trans K.card_subgroup_dvd_card
+    have hr_dvd_paqb : r ∣ p ^ a * q ^ b := hr_dvd_M.trans hM_card_dvd
+    rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
+    · exact absurd ((Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp
+        (hr_prime.dvd_of_dvd_pow h)) hr_ne_p
+    · simp only [Set.mem_singleton_iff]
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow h)
+  have hK_qgroup : IsPGroup q K :=
+    OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton hK_q_pi
+  haveI : K.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal {r | r ≠ p} ↥M
+  have hK_le : K ≤ OddOrder.Isaacs.Ch01.opCore q ↥M :=
+    OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hK_qgroup
+  rw [hOq_bot, le_bot_iff] at hK_le
+  exact hK_le
+
 /-- **§7D Step 8 axiom** (Isaacs L4045-4063) — *normal `J` and full Sylow for a
 `p`-type maximal*.
 
