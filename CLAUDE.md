@@ -113,7 +113,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 ## ツールチェイン
 
-- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.29.1`)
+- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.30.0-rc2`、2026-05-27 に v4.29.1 から bump; 手順 [`notes/meta/mathlib_rc2_migration.md`](notes/meta/mathlib_rc2_migration.md))
 - mathlib: [`lakefile.toml`](lakefile.toml) の `[[require]]` 参照
 - ビルド: `lake build OddOrder`
 - mathlib キャッシュ: `lake exe cache get` (mathlib 更新時に再取得)

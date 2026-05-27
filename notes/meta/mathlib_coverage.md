@@ -1,6 +1,6 @@
 # mathlib カバレッジ (Feit-Thompson 形式化向け)
 
-mathlib (`v4.29.1`, ローカルパス `.lake/packages/mathlib/Mathlib/`) における Feit-Thompson 関連項目の網羅調査結果。**2026-05-21** 実施。mathlib は更新が速いので 3 ヶ月以上経ったら再監査推奨。
+mathlib (調査時 `v4.29.1`; **2026-05-27 に `v4.30.0-rc2` へ bump 済** — 本調査自体は v4.29.1 時点のスナップショット, ローカルパス `.lake/packages/mathlib/Mathlib/`) における Feit-Thompson 関連項目の網羅調査結果。**2026-05-21** 実施。mathlib は更新が速いので 3 ヶ月以上経ったら再監査推奨。
 
 ## ✓ 完全に揃っているもの (そのまま使える)
 

@@ -89,6 +89,8 @@ Peterfalvi 全 140 結果 (本文 113 + 付録 27) の引用パターン:
 
 ## 4. Phase 1 Isaacs ↔ Phase 2 対応表
 
+> **2026-05-27 更新**: 下表「形式化進捗」列の "Phase 1 Ch.X" は作成当時の予定。現状は **Isaacs Ch.1–7 全て sorry-free 完成** (Thm 7.6 `normal_J` / 7.8 Burnside / Ch.6 Frobenius / Hall-Higman 3.21 / Hall-C 3.14 / Schur-Zassenhaus 3.12 含む)、**BG §1–§3 完成**、Peterfalvi §1–§6 着手。被引用構造 (どの定理がどこで使われるか) は引き続き有効。
+
 Phase 1 で形式化済 (or 予定) の Isaacs 結果と、Phase 2 での被引用箇所:
 
 | Isaacs | BG での参照 | Peterfalvi での参照 | FT クリティカル度 | 形式化進捗 |
