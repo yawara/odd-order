@@ -225,13 +225,48 @@ normal (via `Subgroup.commute_of_normal_of_disjoint`, coprime ⇒ disjoint);
 theorem, (2) state the faithful-action generation as a focused sub-axiom (or
 prove via Ch06), (3) wire Step 3 from them.
 
+## 2026-05-27 update — Step 1 landed, Step 3 axiom→sorry; burnside depends only on `sorryAx`
+
+旧 worktree 群の合流 + Ch07 ファイル分割 (issue 0038) 後の現状を実測で整理:
+
+- **§7D の per-step axiom は全て discharge 済み (Ch07 全体で `axiom` 宣言ゼロ)。**
+  `#print axioms OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow` =
+  `[propext, sorryAx, Classical.choice, Quot.sound]` — 非標準依存は **`sorryAx`
+  ただ 1 つ**、project 固有 axiom はゼロ。
+- AxiomsCheck の allowlist は標準 3 公理 (`propext`/`Classical.choice`/`Quot.sound`)
+  のみ。前提 (`matsuyama` / `hall_higman_*` / Thm 4.33 / `normal_J`(Thm 7.6)) は
+  すべて `#assert_only_allowed_axioms` 済み = 真に unconditional。
+- **§7D Step 1** (`step1_unique_maximal_containing_nilpotent`, nilpotent-uniqueness)
+  を証明・合流済み — 前回 update で Step 3 の主要前提として挙げていたもの。
+- **`step3_not_both_opCore_ne_bot` は axiom → theorem 化**。新 `step3_main`
+  (asymmetric construction; `(p,q)` と `(q,p)` で適用し `p<q ∧ q<p` 矛盾) に reduce。
+
+**残る唯一の gap = `step3_main` の `sorry` 1 個** (Ch07/Main.lean §7D Step 3 core):
+- scaffold 着地済み: `Z_p=Z(O_p M)`, `Z_q=Z(O_q M)` の設定 (nontrivial / normal /
+  p-group, H-image 化)。返り値 `IsCyclic Z_p ∧ (IsCyclic Z_q → p<q)`。
+- 残りコア論証: `Z=Z_p·Z_q` abelian normal → `M=N_G(Z)` 一意 (Step 1) →
+  `S∈Syl_p(M)` not full (Step 2) → `N_P(S)>S` 共役 `g∈G−M, S^g=S` → `A=Z_p^g` の
+  faithful / non-faithful 分岐。
+- **未形式化の深い前提**: *faithful-action generation* — 非巡回 abelian `A` の
+  coprime 作用 ⇒ `Z_q = ⟨C_{Z_q}(a) : 1≠a∈A⟩`。Ch06 Thm 6.20
+  (`isCyclic_of_faithful_trivial_on_proper_invariant`) は cyclicity のみ提供、
+  generation には追加の Ch06 作業 (or focused sub-axiom 化) が要る。
+
+**unconditional への道 (この 1 sorry を潰せば完了)**:
+1. faithful-action generation lemma を Ch06 に形式化 (最深部; or 一時 sub-axiom)。
+2. `step3_main` コアを wire (Step 1 一意性 + Step 2 + `N_P(S)>S` 共役 + 分岐)。
+3. `#assert_only_allowed_axioms OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow` を
+   AxiomsCheck.lean に追加して固定 (回帰ガード)。
+
 ## 完了条件
 
 - Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…` ✅
 - `noNonsolvableSimplePaQb` is now a theorem (was the monolith axiom) ✅
-- Steps 4, 5b, 8, 9 all discharged (axiom-free theorems); **only Step 3
-  (`step3_not_both_opCore_ne_bot`) remains** as the sole §7D axiom under
-  `burnside_p_pow_q_pow`.
+- Steps 1, 2, 4, 5b, 6, 7, 8, 9 全て axiom-free theorem 化済み。**Step 3
+  (`step3_not_both_opCore_ne_bot`) も axiom → theorem 化**され、残りは
+  `step3_main` 内の `sorry` 1 個のみ (= `burnside` の唯一の `sorryAx` 源)。
+- 最終: `step3_main` の sorry を埋め、`burnside_p_pow_q_pow` が標準 3 公理のみ依存
+  (`#assert_only_allowed_axioms` 通過) になれば **unconditional 完成**。
 
 ## 参照
 
