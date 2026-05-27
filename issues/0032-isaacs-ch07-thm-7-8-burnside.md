@@ -100,10 +100,48 @@ delegating to local axiom `noNonsolvableSimplePaQb` which captures the full
 Recommend next session: tackle Step 3 dichotomy (using
 `maximal_eq_normalizer_of_M_normalizes` for one direction).
 
+## 2026-05-27 update — monolith decomposed into per-step axioms
+
+`noNonsolvableSimplePaQb` is **no longer an axiom**: it is now a *theorem*
+threading a fine-grained per-step decomposition.  `burnside_p_pow_q_pow`
+(Thm 7.8) bottoms out at the per-step axioms below rather than one monolith.
+
+**Proven (sorry-free theorems)**:
+- Step 2: `sylow_isComplement_of_paqb` (P,Q complement when |G|=p^a q^b),
+  `step2_join_sylow_q_eq_top` (P normalizes V ⇒ V ⊔ Q = ⊤),
+  `step2_pSylow_not_normalizes_nontrivial_qSubgroup`.
+- partition: `maximal_isPType_or_isQType` (every maximal is p- or q-type;
+  uses the `fitting_ne_bot_of_solvable_nontrivial` helper axiom).
+- dichotomy: `maximal_isPType_xor_isQType` (Xor' form, partition + Step 3).
+- Step 6: `step6_qCentral_not_normalizes_nontrivial_pSubgroup` — proven from
+  the Step 5b axiom + dichotomy + landed `exists_isPCentral_centralizing`.
+- Step 7: `step7_p_ne_two_and_q_ne_two` — proven from Step 6 + landed Matsuyama
+  (2-central involution from Z(Syl_2), Matsuyama ⇒ odd-prime ⟨x⟩, contradiction).
+- arithmetic helper `card_eq_pow_mul_pow_of_dvd`.
+
+**Remaining per-step axioms** (each small + textbook-faithful, tracked here):
+- `fitting_ne_bot_of_solvable_nontrivial` — solvable nontrivial ⇒ F ≠ ⊥
+  (minimal-normal-subgroup theory in SchurZassenhausConj.lean is `private`;
+  re-export it publicly to discharge).
+- `step3_not_both_opCore_ne_bot` (Step 3): not both O_p(M), O_q(M) nontrivial.
+- `step4_qCentral_normalizes_no_pCentral` (Step 4): the W-maximality argument.
+- `step5b_pType_no_qCentral` (Step 5 second half): p-type maximal has no
+  q-central element (needs Hall-Higman `hall_higman_opCore` + Step 4 + the
+  N_G(O_p(M)) = M identification).
+- `step8_normalJ_and_fullSylow` (Step 8): apply normal-J (Thm 7.6) to p-type M.
+- `step9_contradiction` (Step 9): Sylow-intersection counting + Thompson
+  factorization (helpers `opCore_ne_bot_of_card_sylow_sq_gt`,
+  `index_opCore_le_index_sylow_sq` in Ch01 §1F are available).
+
+Next: Step 5b (Hall-Higman is landed) and Step 8 (normal_J is landed) are the
+most tractable remaining. Step 3, 4, 9 are the deepest.
+
 ## 完了条件
 
 - Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…` ✅
-- Proof sorry/axiom-free (axiom `noNonsolvableSimplePaQb` documents 9-step gap)
+- `noNonsolvableSimplePaQb` is now a theorem (was the monolith axiom) ✅
+- Remaining gaps captured in fine-grained per-step axioms (Steps 3,4,5b,8,9 +
+  Fitting helper), as many earlier steps proven as theorems.
 
 ## 参照
 
