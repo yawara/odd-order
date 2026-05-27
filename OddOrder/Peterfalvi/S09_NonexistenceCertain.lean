@@ -1,0 +1,257 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.TISubset
+
+/-!
+# Peterfalvi §9: Non-existence of a Certain Type of Group of Odd Order
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
+§9, pp. 38-43.
+
+This section is **purely character-theoretic**.  Building on the Dade isometry
+(§4), TI-subsets (§5-§6), and coherence (§7-§8), it proves a non-existence
+result for a configuration of Frobenius subgroups — Peterfalvi's packaging of
+the Feit-Thompson final contradiction.
+
+The results, with Peterfalvi's numbering:
+
+* **(7.1)-(7.3)** — the auxiliary map `ρ : CF(G) → CF(L,A)`, `χ^ρ(a) = |H(a)|⁻¹ Σ χ(ax)`,
+  its relation to the Dade isometry `τ` (`τρ = id` on `CF(L,A)`, `‖χ^ρ‖² ≤ ‖χ‖²`),
+  and the integral inequality `|G|⁻¹ Σ_{A^τ} |χ|² ≥ ‖χ^ρ‖²`.
+* **(7.4)-(7.5)** — a family `(L_i)_{i∈I}` each satisfying (7.1), with pairwise
+  disjoint `A_iᵗ`, and the master inequality on `Σ_{G₀} |χ|²`.
+* **(7.6)-(7.8)** — the normal-subgroup case `A = H^#`, with `T = {Ind_H^L θ}`
+  coherent; explicit formula for `χ^ρ` and the norm estimates
+  `‖ζ^{νρ}‖² ≥ 1 - e/h`, `‖Γ‖² ≤ e - 1`.
+* **(7.9)** — for `I = {1,2}` and `G` of **odd order**, two coherent families
+  cannot both be orthogonal: `(β₁, ζ₂^{ν₂}) ≠ 0` or `(β₂, ζ₁^{ν₁}) ≠ 0`.
+* **(7.10)** — `k ≥ 2` Frobenius subgroups `L_i` (kernel `H_i`, `H_i^#` a TI-subset
+  with normalizer `L_i`, pairwise coprime `|H_i|`) force, for some `i`,
+  `(|G₀| - 1)/|G| ≥ (e-1)((h-2e-1)/(eh) + 2/(h(h+2)))`.
+* **(7.11)** — the **main theorem**: no such configuration has `G₀ = {1}`.
+
+## Scope of this file (statement preparation)
+
+The headline results **(7.10)** and **(7.11)** have purely group-theoretic
+*statements* (Frobenius group + TI-subset + cardinalities); in particular they do
+**not** reference the Dade isometry, so they are statable independently of the
+character-theory layer.  Their *proofs* require (7.1)-(7.9) and hence the
+`OddOrder.RepresentationTheory` Dade/coherence machinery (§4-§8), which is why
+they are left `sorry` here.  Results (7.1)-(7.9) — the `ℂ`-valued proof apparatus
+— are documented but not yet stated, to avoid coupling to the in-progress
+coherence numerical layer.
+
+## Relation to BG Appendix C  ⚠️
+
+BG App.C (= Peterfalvi's 1984 paper, as edited by Carlip-Wheeler) proves the
+*same* final contradiction by a **different route**: a finite-field
+generator-relation argument over `F_{p^q}` with the Frobenius group `H = P ⋊ U`
+(additive `P`, norm-1 `U`), culminating in **Theorem C: `p ≤ q`**.  That is a
+*different statement* from (7.11) — they are two formulations that both close the
+Feit-Thompson proof, **not** literally equivalent theorems.  (The earlier draft of
+`notes/peterfalvi/s09_nonexistence_certain.md`, written 2026-05-22 before the
+Phase-2b §3-§8 audit, conflated the two and described §9 in terms of the
+finite-field `H = PU` / `p ≤ q` content; that content belongs to BG App.C, not
+here.)  A Phase-3 bridge lemma relating the two formulations is deferred.
+
+Reference note: `notes/peterfalvi/s09_nonexistence_certain.md` (⚠️ pre-audit draft
+conflates §9 with BG App.C; this header is the corrected account).
+-/
+
+namespace OddOrder.Peterfalvi.S09
+
+open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
+open OddOrder.GroupTheory (IsTISubset)
+
+variable {G : Type*} [Group G]
+
+/- (7.1)-(7.9): the character-theoretic proof apparatus.
+
+These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
+(7.5), and the coherence/norm estimates (7.6)-(7.9).  Their statements live over
+`ℂ`-valued class functions and depend on the Dade isometry / coherence layer
+(`OddOrder.RepresentationTheory`, §4-§8).  They are deferred here; see the module
+docstring.  The §9 headline results (7.10)-(7.11) below do not reference them. -/
+
+/- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
+
+/-- **Peterfalvi (7.10) hypothesis.** A family of `k` Frobenius subgroups of `G`
+whose kernels are pairwise-coprime TI-subsets.
+
+This bundles conditions (a)-(c) of (7.10):
+* `(a)` each `L i` is a Frobenius group with kernel `H i` (`isFrobenius`);
+* `(b)` `H i` is `L i`-normal with `L i = N_G(H i)`, and `(H i)^#` is a TI-subset
+  of `G` with normalizer `L i` (`normalizer_eq`, `isTI`);
+* `(c)` the kernel orders `|H i|` are pairwise coprime (`coprime_kernel`),
+together with `k ≥ 2` (`two_le`).  Condition (d) — the definition of `G₀` — is
+recorded separately as `FrobeniusFamily.G0`. -/
+structure FrobeniusFamily (G : Type*) [Group G] (k : ℕ) where
+  /-- The Frobenius subgroups `L_i ≤ G`. -/
+  L : Fin k → Subgroup G
+  /-- The Frobenius kernels `H_i ⊴ L_i`. -/
+  H : Fin k → Subgroup G
+  /-- (7.10): the family has at least two members. -/
+  two_le : 2 ≤ k
+  /-- Each kernel sits inside its host. -/
+  kernel_le : ∀ i, H i ≤ L i
+  /-- (7.10)(a): each `L_i` is a Frobenius group with kernel `H_i`, for some
+  Frobenius complement `C`. -/
+  isFrobenius : ∀ i, ∃ C : Subgroup ↥(L i),
+    IsFrobeniusGroup ↥(L i) ((H i).subgroupOf (L i)) C
+  /-- (7.10)(b), host part: `L_i` is the normalizer of `H_i` in `G`. -/
+  normalizer_eq : ∀ i, L i = Subgroup.normalizer (H i : Set G)
+  /-- (7.10)(b), TI part: `H_i^#` is a TI-subset of `G` with normalizer `L_i`. -/
+  isTI : ∀ i, IsTISubset ((H i : Set G) \ {1}) (L i)
+  /-- (7.10)(c): the kernel orders are pairwise coprime. -/
+  coprime_kernel : ∀ ⦃i j⦄, i ≠ j → Nat.Coprime (Nat.card (H i)) (Nat.card (H j))
+
+namespace FrobeniusFamily
+
+variable {k : ℕ}
+
+/-- `(H_i^#)^G`: the set of `G`-conjugates of nonidentity elements of the `i`-th
+kernel `H_i`. -/
+def kernelSpread (F : FrobeniusFamily G k) (i : Fin k) : Set G :=
+  {x : G | ∃ g : G, g * x * g⁻¹ ∈ (F.H i : Set G) \ {1}}
+
+/-- **(7.10)(d).** `G₀ = G - ⋃_i (H_i^#)^G`: the elements not conjugate into any
+kernel. -/
+def G0 (F : FrobeniusFamily G k) : Set G :=
+  {x : G | ∀ i, x ∉ F.kernelSpread i}
+
+/-- Kernel order `h_i = |H_i|`. -/
+noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
+
+/-- Complement index `e_i = |L_i : H_i|` (exact, since `H_i ≤ L_i`). -/
+noncomputable def e (F : FrobeniusFamily G k) (i : Fin k) : ℕ :=
+  Nat.card (F.L i) / Nat.card (F.H i)
+
+/-- `e_i = |L_i : H_i|` equals the order of the Frobenius complement `C`. -/
+lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
+    {C : Subgroup ↥(F.L i)} (hC : IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    F.e i = Nat.card C := by
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]; exact hC.isComplement.card_mul
+  have h := Nat.mul_div_cancel_left (Nat.card C) (Nat.card_pos (α := F.H i))
+  rw [hprod] at h
+  exact h
+
+/-- The Frobenius complement of `L_i` is nontrivial, so `e_i = |L_i : H_i| ≥ 2`. -/
+lemma two_le_e [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.e i := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  rw [F.e_eq_card_complement i hC]
+  have hnt : Nontrivial C := (Subgroup.nontrivial_iff_ne_bot C).mpr hC.ne_bot_complement
+  have h1 : 1 < Nat.card C := Finite.one_lt_card_iff_nontrivial.mpr hnt
+  omega
+
+/-- `2 e_i + 1 ≤ h_i`.  From `e_i ∣ h_i - 1` (Frobenius: `|H_i| ≡ 1 mod e_i`)
+together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
+quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
+lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) : 2 * F.e i + 1 ≤ F.h i := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]; exact hC.isComplement.card_mul
+  have he_eq : F.e i = Nat.card C := F.e_eq_card_complement i hC
+  have hh_eq : F.h i = Nat.card (F.H i) := rfl
+  -- `|L_i|` is odd (a subgroup of the odd-order group `G`), so `|H_i|` and `|C|` are odd.
+  have hLodd : Odd (Nat.card ↥(F.L i)) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  obtain ⟨hHodd, hCodd⟩ := Nat.odd_mul.mp (hprod ▸ hLodd)
+  -- `|C| ∣ |H_i| - 1`.
+  have hmod : Nat.card (F.H i) ≡ 1 [MOD Nat.card C] := by
+    have := hC.card_kernel_modEq_one; rwa [hN_card] at this
+  have hdvd : Nat.card C ∣ Nat.card (F.H i) - 1 :=
+    (Nat.modEq_iff_dvd' (Nat.card_pos (α := F.H i))).mp hmod.symm
+  -- `|H_i| ≥ 2` (nontrivial kernel).
+  have hHge2 : 2 ≤ Nat.card (F.H i) := by
+    rw [← hN_card]
+    have hnt : Nontrivial ((F.H i).subgroupOf (F.L i)) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hC.ne_bot_kernel
+    have h1 : 1 < Nat.card ((F.H i).subgroupOf (F.L i)) :=
+      Finite.one_lt_card_iff_nontrivial.mpr hnt
+    omega
+  -- The cofactor `m = (|H_i|-1)/|C|` is even and positive, hence `≥ 2`.
+  obtain ⟨m, hm⟩ := hdvd
+  have hHsub_even : Even (Nat.card (F.H i) - 1) := by
+    obtain ⟨j, hj⟩ := hHodd; exact ⟨j, by omega⟩
+  have hm_even : Even m := by
+    rw [hm] at hHsub_even
+    rcases Nat.even_mul.mp hHsub_even with h | h
+    · exact absurd h (Nat.not_even_iff_odd.mpr hCodd)
+    · exact h
+  have hmpos : 0 < m := by
+    rcases Nat.eq_zero_or_pos m with h0 | h0
+    · rw [h0, Nat.mul_zero] at hm; omega
+    · exact h0
+  have hm_ge2 : 2 ≤ m := by
+    rcases hm_even with ⟨t, ht⟩; omega
+  have hmul : Nat.card C * 2 ≤ Nat.card C * m := Nat.mul_le_mul_left _ hm_ge2
+  rw [he_eq, hh_eq]
+  omega
+
+end FrobeniusFamily
+
+/-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
+an index `i` for which, writing `e = e_i` and `h = h_i`,
+
+`(|G₀| - 1)/|G| ≥ (e - 1) · ((h - 2e - 1)/(e·h) + 2/(h·(h+2)))`.
+
+This is the quantitative heart of §9; its proof uses the Dade isometry and the
+coherence estimates (7.5)-(7.9). -/
+theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  sorry
+
+/-- **Peterfalvi (7.11)** — the §9 main theorem.
+
+There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups
+(as in `FrobeniusFamily`) whose kernels' conjugate-spreads cover everything except
+the identity, i.e. with `G₀ = {1}`.
+
+Proof (in the text): if `G₀ = {1}` then `|G₀| = 1`, so the left side of (7.10)
+vanishes; but `e ≥ 2` (the Frobenius complement is nontrivial and `|G|` is odd)
+and `e ∣ h - 1` with `h` odd give `(h - 2e - 1)/(eh) ≥ 0`, whence the right side
+of (7.10) is strictly positive — a contradiction. -/
+theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (hG0 : F.G0 = {(1 : G)}) : False := by
+  obtain ⟨i, hi⟩ := card_G0_lower_bound F hodd
+  -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
+  have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
+  -- The two arithmetic facts coming from the Frobenius structure.
+  have he2 : (2 : ℚ) ≤ (F.e i : ℚ) := by exact_mod_cast F.two_le_e i
+  have hh2 : 2 * (F.e i : ℚ) + 1 ≤ (F.h i : ℚ) := by
+    exact_mod_cast F.two_mul_e_add_one_le_h hodd i
+  have hepos : (0 : ℚ) < (F.e i : ℚ) := by linarith
+  have hhpos : (0 : ℚ) < (F.h i : ℚ) := by linarith
+  have heh : (0 : ℚ) < (F.e i : ℚ) * (F.h i : ℚ) := mul_pos hepos hhpos
+  have hh2pos : (0 : ℚ) < (F.h i : ℚ) * ((F.h i : ℚ) + 2) := mul_pos hhpos (by linarith)
+  -- The right-hand side of (7.10) is then strictly positive.
+  have hRHS : 0 < ((F.e i : ℚ) - 1) *
+      (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
+        2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+    refine mul_pos (by linarith) ?_
+    have h1 : 0 ≤ ((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) :=
+      div_nonneg (by linarith) (le_of_lt heh)
+    have h2 : 0 < (2 : ℚ) / ((F.h i : ℚ) * ((F.h i : ℚ) + 2)) := div_pos (by norm_num) hh2pos
+    linarith
+  -- But (7.10) says it is `≤ 0` — contradiction.
+  rw [hcard] at hi
+  have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
+  rw [hlhs, zero_div] at hi
+  linarith [hi, hRHS]
+
+end OddOrder.Peterfalvi.S09
