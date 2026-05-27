@@ -527,6 +527,48 @@ theorem isConj_in_L_of_mul_H (hyp : Hypothesis G A L) {a b : G} (ha : a ∈ A)
       (hyp.commute_of_mem_H ⟨b, hb⟩ hv) (hcop_CL ha) (hcop_CL hb) hum hvm hconj
   exact hyp.conj_in_L ha hb hab
 
+/-- **`|C_G(a)| = |H(a)| · |C_L(a)|`.**  The semidirect decomposition `(2.2.b)`
+`C_G(a) = H(a) ⋊ C_L(a)` is order-multiplicative: `H(a)` is normal in `C_G(a)`
+(`H_normalized`) and meets `C_L(a)` trivially (`centralizer_disjoint`), so the
+multiplication map `H(a) × C_L(a) → C_G(a)` is a bijection. -/
+theorem card_centralizer_eq (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
+    Nat.card (Subgroup.centralizer ({a.1} : Set G))
+      = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := by
+  classical
+  have hHC : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+  have hCLC : centralizerIn L a.1 ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_right
+  have hnorm : centralizerIn L a.1 ≤ Subgroup.normalizer (hyp.H a) := by
+    intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    have hcC : c ∈ Subgroup.centralizer ({a.1} : Set G) := hCLC hc
+    refine ⟨fun hh => hyp.H_normalized a c hcC h hh, fun hh => ?_⟩
+    have hmem := hyp.H_normalized a c⁻¹ (Subgroup.inv_mem _ hcC) _ hh
+    have heq : c⁻¹ * (c * h * c⁻¹) * (c⁻¹)⁻¹ = h := by group
+    rwa [heq] at hmem
+  have hcoe : (↑(Subgroup.centralizer ({a.1} : Set G)) : Set G)
+      = ↑(hyp.H a) * ↑(centralizerIn L a.1) := by
+    rw [hyp.centralizer_eq_sup a]
+    exact Subgroup.coe_mul_of_right_le_normalizer_left (hyp.H a) (centralizerIn L a.1) hnorm
+  let f : (hyp.H a) × (centralizerIn L a.1) → Subgroup.centralizer ({a.1} : Set G) :=
+    fun p => ⟨(p.1 : G) * (p.2 : G),
+      (Subgroup.centralizer ({a.1} : Set G)).mul_mem (hHC p.1.2) (hCLC p.2.2)⟩
+  have hf : Function.Bijective f := by
+    refine ⟨fun p q hpq => ?_, fun g => ?_⟩
+    · have hval : (p.1 : G) * (p.2 : G) = (q.1 : G) * (q.2 : G) :=
+        congrArg Subtype.val hpq
+      exact Subgroup.mul_injective_of_disjoint (hyp.centralizer_disjoint a) hval
+    · have hmem : (g : G) ∈ (↑(hyp.H a) * ↑(centralizerIn L a.1) : Set G) := by
+        rw [← hcoe]; exact g.2
+      obtain ⟨h, hh, c, hc, hgeq⟩ := hmem
+      exact ⟨(⟨h, hh⟩, ⟨c, hc⟩), Subtype.ext hgeq⟩
+  calc Nat.card (Subgroup.centralizer ({a.1} : Set G))
+      = Nat.card ((hyp.H a) × (centralizerIn L a.1)) :=
+        (Nat.card_congr (Equiv.ofBijective f hf)).symm
+    _ = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := Nat.card_prod _ _
+
 end Hypothesis
 
 section DadeMap
