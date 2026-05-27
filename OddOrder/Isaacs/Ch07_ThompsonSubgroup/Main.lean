@@ -225,6 +225,38 @@ theorem step3_main
   have hM_norm_Z : M ≤ Subgroup.normalizer Z :=
     (le_inf hM_norm_ZpH hM_norm_ZqH).trans
       (Subgroup.normalizer_inf_normalizer_le_normalizer_sup ZpH ZqH)
+  -- `Z` is abelian (centers of `O_p,O_q` are commutative and commute), hence nilpotent.
+  haveI hZp_comm : IsMulCommutative Zp := by
+    rw [hZp_def]; unfold zCenterOpCoreSubgroup; infer_instance
+  haveI hZq_comm : IsMulCommutative Zq := by
+    rw [hZq_def]; unfold zCenterOpCoreSubgroup; infer_instance
+  haveI hZpH_comm : IsMulCommutative ZpH := by rw [hZpH_eq]; infer_instance
+  haveI hZqH_comm : IsMulCommutative ZqH := by rw [hZqH_eq]; infer_instance
+  have hdisjM : Disjoint Zp Zq :=
+    IsPGroup.disjoint_of_ne p q hpq Zp Zq
+      (zCenterOpCoreSubgroup_isPGroup p) (zCenterOpCoreSubgroup_isPGroup q)
+  have hcross : ∀ a ∈ ZpH, ∀ b ∈ ZqH, Commute a b := by
+    intro a ha b hb
+    rw [hZpH_eq, Subgroup.mem_map] at ha
+    rw [hZqH_eq, Subgroup.mem_map] at hb
+    obtain ⟨x, hx, rfl⟩ := ha
+    obtain ⟨y, hy, rfl⟩ := hb
+    exact (Subgroup.commute_of_normal_of_disjoint Zp Zq hZp_normal hZq_normal hdisjM
+      x y hx hy).map M.subtype
+  have hZ_le_cent : Z ≤ Subgroup.centralizer (Z : Set H) := by
+    rw [hZ_def,
+      show (↑(ZpH ⊔ ZqH) : Set H) = ↑(Subgroup.closure (↑ZpH ∪ ↑ZqH : Set H)) by
+        rw [Subgroup.sup_eq_closure],
+      Subgroup.centralizer_closure, Subgroup.sup_eq_closure, Subgroup.closure_le]
+    rintro g (hg | hg) <;> rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff] <;>
+      rintro h (hh | hh)
+    · exact Subgroup.mul_comm_of_mem_isMulCommutative (H := ZpH) hh hg
+    · exact (hcross g hg h hh).symm
+    · exact hcross h hh g hg
+    · exact Subgroup.mul_comm_of_mem_isMulCommutative (H := ZqH) hh hg
+  haveI hZ_comm : IsMulCommutative Z :=
+    Subgroup.le_centralizer_iff_isMulCommutative.mp hZ_le_cent
+  haveI hZ_nilp : Group.IsNilpotent ↥Z := inferInstance
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
