@@ -178,12 +178,60 @@ N_H(J(SH)) = M`, hence `t ∈ M ∩ PH = SH` — contradiction; so `SH = PH`.
 is gone.  (The Fitting helper `fitting_ne_bot_of_solvable_nontrivial` and
 Thm 7.6's `step5_Abar_card_eq_p` are separate, already-theorem / Thm-7.6 items.)
 
+## 2026-05-27 update — Steps 9, 5b→4, 4 discharged; only Step 3 remains
+
+Major progress: `burnside_p_pow_q_pow` now depends on **exactly one** §7D axiom,
+`step3_not_both_opCore_ne_bot` (plus [propext, Classical.choice, Quot.sound]).
+
+**Newly proven (sorry-free theorems)**:
+- **Step 9** (`step9_contradiction`, was axiom → theorem): WLOG dispatcher
+  (`step9_contradiction`) over `step9_core` (the |G|_q < |G|_p branch), plus six
+  helpers: `sylow_p_card_eq_of_paqb`, `sylow_inter_ne_bot_of_card_sq_gt`,
+  `lt_normalizer_inf_sylow_of_lt`, `exists_thompsonJ_ne`,
+  `exists_sylowM_of_full_sylow_le`, `thompsonJ_eq_of_full_sylow_le_pType`.
+- **Step 5b** (`step5b_pType_no_qCentral`, was axiom → theorem): proven from a
+  new atomic Step 4 axiom + Hall-Higman (`centralizer_opCore_le_opCore_…`) +
+  `M = N_H(O_p(M))`.
+- **Step 4** (`step4_qCentral_normalizes_no_pCentral`, introduced then
+  discharged → theorem): the full W-maximality argument (~200 LOC) on the new
+  `pCentralGenerated` (U⋆) infrastructure.
+- **Infrastructure**: `IsPCentral.conj` (removes the old deferred note),
+  `pCentralGenerated` + `pCentralGenerated_le` / `mem_pCentralGenerated` /
+  `pCentralGenerated_normalized_by_normalizer` / `pCentralGenerated_idem`.
+
+**Remaining: Step 3 only** (`step3_not_both_opCore_ne_bot`, Isaacs L3982-3993).
+The single blocker.  Its full discharge needs two deep prerequisites, neither
+yet formalized:
+- **§7D Step 1** (nilpotent-uniqueness, Isaacs L3969-3981): `K ≤ H` nilpotent,
+  `M = N_H(K)` maximal, `p,q ∣ |K|` ⇒ `M` is the *unique* maximal ⊇ `K`.  Proven
+  in the book by strong induction on `K` maximal-among-counterexamples, using
+  **Thm 4.33** (`oPiCore_compl_le_oPiCore_compl_of_isPLocal`, landed) on the
+  p-local `M ∩ X = N_X(K_p)`, plus the nilpotent `K = O_p(K) × O_q(K)` split.
+  Estimate ~150 LOC; the induction + Thm-4.33 IsPLocal/oPiCore threading is the
+  hard part.
+- **Faithful-action generation**: for abelian `A` acting on abelian `Z_q`
+  (coprime), non-cyclic `A` ⇒ `Z_q = ⟨C_{Z_q}(a) : 1≠a∈A⟩`.  Repo Thm 6.20
+  (`isCyclic_of_faithful_trivial_on_proper_invariant`) gives *cyclicity* from
+  trivial-on-proper-invariant, but is phrased with `MulDistribMulAction A N`;
+  bridging the conjugation action `A = Z_p^g` on `Z_q` and obtaining the
+  *generation* (not just cyclicity) needs additional Ch06 work.
+
+The Step 3 *wiring* (provable, ~150 LOC): `Z = Z(O_p M) ⊔ Z(O_q M)` abelian
+normal (via `Subgroup.commute_of_normal_of_disjoint`, coprime ⇒ disjoint);
+`C_G(z) ⊆ M` for `1≠z∈Z`; the `N_P(S) > S` conjugation (reuse
+`lt_normalizer_inf_sylow_of_lt`) giving `g ∈ G-M` with `S^g = S`; the
+`Z = Z^g ⊆ M^g ⇒ M = M^g` step (Step 1 uniqueness); the cyclic arithmetic
+`p ∣ q-1 ∧ q ∣ p-1 ⇒ False`.  A future session should: (1) prove §7D Step 1 as a
+theorem, (2) state the faithful-action generation as a focused sub-axiom (or
+prove via Ch06), (3) wire Step 3 from them.
+
 ## 完了条件
 
 - Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…` ✅
 - `noNonsolvableSimplePaQb` is now a theorem (was the monolith axiom) ✅
-- Remaining gaps captured in fine-grained per-step axioms (Steps 3,4,5b,8,9 +
-  Fitting helper), as many earlier steps proven as theorems.
+- Steps 4, 5b, 8, 9 all discharged (axiom-free theorems); **only Step 3
+  (`step3_not_both_opCore_ne_bot`) remains** as the sole §7D axiom under
+  `burnside_p_pow_q_pow`.
 
 ## 参照
 
