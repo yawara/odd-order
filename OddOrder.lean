@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
