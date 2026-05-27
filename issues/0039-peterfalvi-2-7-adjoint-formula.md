@@ -57,11 +57,25 @@ orbit-stabilizer で `P = |Stab|·|orbit| = |C_G(a)|`.
 - [x] (2.4.b): cross-rigidity `isConj_of_isConj_mul` (commit b531ca5) +
       S04 `Hypothesis.isConj_in_L_of_mul_H` (commit 18ee01c).
       付随 helper: `commute_of_mem_H`, `orderOf_dvd_card_centralizerIn`
-- [ ] **⚠ Hypothesis 符号化の修正が必要 (BLOCKER)**: 下記参照
-- [ ] `|C_G(a)| = |H(a)|·|C_L(a)|` (正規性フィールド追加後)
-- [ ] `|a^L|·|C_L(a)| = |L|` (L 内 orbit-stabilizer)
+- [x] **Hypothesis 符号化の修正**: `H_normalized` field 追加 (commit 3deaa9e)
+- [ ] `|C_G(a)| = |H(a)|·|C_L(a)|` (正規性 field 追加済みで実装可能)
+      経路: `centralizerIn L a ≤ (H a).normalizer` (H_normalized 両方向) →
+      `Subgroup.coe_mul_of_right_le_normalizer_left` で `↑(H⊔C_L)=↑H*↑C_L` →
+      `mul_injective_of_disjoint` (centralizer_disjoint) + 全射 → 全単射 →
+      `Nat.card_prod`. (~50 行)
+- [ ] `|a^L|·|C_L(a)| = |L|` (L 内 ConjAct orbit-stabilizer;
+      a^L = orbit, C_L(a)=stabilizer)
 - [ ] S04 で三重和 double-count 組立 + 正規化 (star/inv, supportedness, ψ averaging)
-      + `adjoint_formula` に `HConjInvariant` 前提を追加
+      + `adjoint_formula` に `HConjInvariant` 前提を追加.
+      **これが最大の残作業** (~150-250 行): `card_conj_fiber` で W(g) を評価し、
+      `S_g = {a∈A : g∈(aH(a))^G} = a₀^L` (= [2.4.b] ⊆ + [HConjInvariant] ⊇) を使う.
+
+## 進捗メモ (2026-05-27 セッション)
+
+このマシンは初回 mathlib 取得が必要だった (`lake exe cache get` 済み).
+核心の数え上げ infra (rigidity, fiber count, cross-rigidity) は完成・コミット済み.
+教科書が "on taking (2.4) into account" の一行で済ませる部分の実体が `card_conj_fiber`.
+残りは「標準的だが煩雑」な集計 (card product, orbit-stabilizer, 三重和組立).
 
 ## ⚠ 発見: Hypothesis 符号化が (2.2.b) の ⋊ より弱い
 
