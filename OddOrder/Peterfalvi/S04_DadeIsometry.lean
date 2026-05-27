@@ -1065,15 +1065,156 @@ This lemma is Peterfalvi §4's heaviest external export: §7 (5.4), §9 (7.2.b),
 §12 (9.5) ×2, §13 (10.3), §16 (14.1) ×2 all apply it directly (audit
 2026-05-23). -/
 theorem adjoint_formula
-    (τ : DadeMap (G := G) (k := ℂ) A L) (_hτ : IsDadeMap hyp τ)
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant)
     (α : SupportedClassFunctions (G := G) ℂ A L)
     (χ : ClassFunction G ℂ) (ψ : ClassFunction L ℂ)
-    (_hψ : ∀ a : {a : G // a ∈ A},
+    (hψ : ∀ a : {a : G // a ∈ A},
         ψ ⟨a.1, hyp.subset_L a.2⟩ =
           adjointAverageFun hyp χ ⟨a.1, hyp.subset_L a.2⟩) :
     ClassFunction.inner (τ α) χ =
       ClassFunction.inner (α : ClassFunction L ℂ) ψ := by
-  sorry
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  set aα : {a : G // a ∈ A} → ℂ :=
+    fun a => (α : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ with haα
+  set F : G → ℂ := fun g => (τ α) g * star (χ g) with hF
+  set M : ℂ := ∑ a : {a : G // a ∈ A}, ∑ x : hyp.H a, ∑ t : G,
+      (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+        star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)) with hM
+  -- |H(a)| ≠ 0 in ℂ
+  have hHne : ∀ a : {a : G // a ∈ A}, (Nat.card (hyp.H a) : ℂ) ≠ 0 := by
+    intro a
+    have : 0 < Nat.card (hyp.H a) := Nat.card_pos
+    exact_mod_cast this.ne'
+  -- the averaging value, unfolded
+  have hψa : ∀ a : {a : G // a ∈ A},
+      ψ ⟨a.1, hyp.subset_L a.2⟩
+        = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : hyp.H a, χ (a.1 * (x : G)) := by
+    intro a
+    rw [hψ a]
+    simp only [adjointAverageFun]
+    rw [dif_pos a.2]
+  -- support reindexing of the L-inner sum
+  have hISL : ClassFunction.innerSum (α : ClassFunction L ℂ) ψ
+      = ∑ a : {a : G // a ∈ A}, aα a * star (ψ ⟨a.1, hyp.subset_L a.2⟩) := by
+    rw [ClassFunction.innerSum]
+    rw [← Finset.sum_subset
+      (Finset.filter_subset (fun ℓ : L => (ℓ : G) ∈ A) Finset.univ)
+      (fun ℓ _ hℓ => by
+        have hα0 : (α : ClassFunction L ℂ) ℓ = 0 := by
+          by_contra hne
+          exact hℓ (Finset.mem_filter.mpr ⟨Finset.mem_univ _, α.2 hne⟩)
+        rw [hα0, zero_mul])]
+    refine (Finset.sum_bij (fun a _ => (⟨a.1, hyp.subset_L a.2⟩ : L)) ?_ ?_ ?_ ?_).symm
+    · intro a _; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, a.2⟩
+    · intro a _ b _ hab; exact Subtype.ext (by simpa using congrArg Subtype.val hab)
+    · intro ℓ hℓ
+      exact ⟨⟨ℓ.1, (Finset.mem_filter.mp hℓ).2⟩, Finset.mem_univ _, Subtype.ext rfl⟩
+    · intro a _; rfl
+  -- WAY 1: M = |G| · ⟨α, ψ⟩_L
+  have way1 : M = (Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ := by
+    rw [hISL, Finset.mul_sum, hM]
+    refine Finset.sum_congr rfl (fun a _ => ?_)
+    have hstar_psi : star (ψ ⟨a.1, hyp.subset_L a.2⟩)
+        = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : hyp.H a, star (χ (a.1 * (x : G))) := by
+      rw [hψa a, star_mul', star_sum, star_inv₀, star_natCast]
+    calc ∑ x : hyp.H a, ∑ t : G, (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+            star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹))
+        = ∑ x : hyp.H a, (Nat.card G : ℂ) *
+            ((Nat.card (hyp.H a) : ℂ)⁻¹ * aα a * star (χ (a.1 * (x : G)))) := by
+          refine Finset.sum_congr rfl (fun x _ => ?_)
+          simp only [ClassFunction.conj_eq]
+          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← Nat.card_eq_fintype_card]
+      _ = (Nat.card G : ℂ) * (aα a * star (ψ ⟨a.1, hyp.subset_L a.2⟩)) := by
+          rw [hstar_psi, ← Finset.mul_sum]
+          congr 1
+          rw [Finset.mul_sum, Finset.mul_sum]
+          refine Finset.sum_congr rfl (fun x _ => ?_)
+          ring
+  -- substitution aα a = (τ α)(t (a x) t⁻¹)
+  have hsub : ∀ (a : {a : G // a ∈ A}) (x : hyp.H a) (t : G),
+      aα a = (τ α) ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹) := by
+    intro a x t
+    rw [haα]
+    exact (hτ.map_eq_of_isConj_hCoset α _ a (x : G) x.2
+      (isConj_iff.mpr ⟨(t : G), rfl⟩)).symm
+  -- WAY 2: M = |L| · ⟨τ α, χ⟩_G
+  have way2 : M = (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ := by
+    have step : M = ∑ a : {a : G // a ∈ A},
+        ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+          (Nat.card (centralizerIn L a.1) : ℂ) * F b := by
+      rw [hM]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      have e1 : (∑ x : hyp.H a, ∑ t : G, (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+              star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)))
+          = (Nat.card (hyp.H a) : ℂ)⁻¹ *
+              ∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹) := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun t _ => ?_)
+        rw [hsub a x t, hF]
+        ring
+      rw [e1, hyp.fiber_regroup a F, Finset.mul_sum]
+      refine Finset.sum_congr rfl (fun b _ => ?_)
+      rw [← mul_assoc]
+      congr 1
+      rw [hyp.card_centralizer_eq a, Nat.cast_mul, ← mul_assoc,
+        inv_mul_cancel₀ (hHne a), one_mul]
+    rw [step]
+    -- turn inner filtered sum into an if-sum, then swap
+    have step2 : (∑ a : {a : G // a ∈ A},
+          ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+            (Nat.card (centralizerIn L a.1) : ℂ) * F b)
+        = ∑ b : G, ∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) * F b else 0) := by
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      rw [Finset.sum_filter]
+    rw [step2, show (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ
+          = ∑ b : G, (Nat.card L : ℂ) * F b from by
+        rw [ClassFunction.innerSum, Finset.mul_sum]]
+    refine Finset.sum_congr rfl (fun b _ => ?_)
+    -- ∑_a (if Q then |C_L a| * F b else 0) = |L| * F b
+    have factor : (∑ a : {a : G // a ∈ A},
+          (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+            then (Nat.card (centralizerIn L a.1) : ℂ) * F b else 0))
+        = (∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) else 0)) * F b := by
+      rw [Finset.sum_mul]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      split <;> simp
+    rw [factor]
+    by_cases hb : b ∈ hyp.dadeSupport
+    · have hN : (∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) else 0)) = (Nat.card L : ℂ) := by
+        rw [← Finset.sum_filter, ← Nat.cast_sum, hyp.sum_card_centralizerIn_eq hconj hb]
+      rw [hN, mul_comm]
+    · have hF0 : F b = 0 := by
+        rw [hF]
+        simp only
+        rw [hτ.map_eq_zero_of_not_mem_dadeSupport α b hb, zero_mul]
+      rw [hF0, mul_zero, mul_zero]
+  -- combine and divide by |G|, |L|
+  have hcombine : (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ
+      = (Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ :=
+    way2.symm.trans way1
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.inner_eq_inv_card_mul_innerSum]
+  calc ⅟(Nat.card G : ℂ) * ClassFunction.innerSum (τ α) χ
+      = ⅟(Nat.card G : ℂ) * ⅟(Nat.card L : ℂ) *
+          ((Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ) := by
+        rw [mul_assoc, ← mul_assoc (⅟(Nat.card L : ℂ)), invOf_mul_self, one_mul]
+    _ = ⅟(Nat.card G : ℂ) * ⅟(Nat.card L : ℂ) *
+          ((Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ) := by
+        rw [hcombine]
+    _ = ⅟(Nat.card L : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ := by
+        rw [mul_comm (⅟(Nat.card G : ℂ)) (⅟(Nat.card L : ℂ)), mul_assoc,
+          ← mul_assoc (⅟(Nat.card G : ℂ)), invOf_mul_self, one_mul]
 
 end AdjointFormula
 
