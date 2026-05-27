@@ -109,6 +109,80 @@ created: 2026-05-25
 - proof core は引き続き `n = 2`, `n = 3`, induction step の finite
   combinatorial argument。
 
+## 2026-05-28 progress: 層 1a 完了 (CharacterConjugate)、1b が次 — HANDOFF
+
+**Branch**: `peterfalvi-s09` (本作業は §9 → §3 経由の前提として同ブランチで進行中).
+
+### 全体の層構造 (bottom-up, ユーザー合意の攻め順)
+
+`isometry_difference_pair_structure` (`IsometryDifferencePair.lean:674` の sorry) を埋めるには:
+
+- **層 1a** `χ(g⁻¹) = conj(χ(g))` — ✅ **完了** (commit `d9330fa`).
+  `OddOrder/GroupTheory/RepresentationTheory/CharacterConjugate.lean`,
+  `theorem OddOrder.RepresentationTheory.character_inv`. sorry-free, OddOrder に wiring 済.
+  証明: 固有値を使わず **行列 S-ユニタリ・トリック** (基底で `Mₕ=toMatrix(ρ h)`,
+  `S=∑ₕ MₕᴴMₕ` PosDef, `Mᴴ S M=S`, `M⁻¹=S⁻¹MᴴS`, trace 巡回 + `trace_conjTranspose`).
+- **層 1b** orthonormality discharge — ⬜ **次の着手点** (recipe 下記).
+- **層 2** ZIrr Fourier/係数 API — ⬜.
+- **層 3** combinatorial core (n=2/3/帰納) — ⬜.
+- → §3 (1.4) `isometry_difference_pair_structure` の sorry 解消.
+
+### 層 1b 着手 recipe (orthonormality discharge)
+
+**目標**: `CharacterTableRowOrthogonality (G := G)` (`SecondOrthogonality.lean:668`) を
+*仮説でなく定理として* 証明 → S07 / IsometryDifferencePair の `hrow` 仮説を全て discharge.
+
+`CharacterTableRowOrthogonality` = `(∀ χ, characterTableRowPairing χ χ = 1) ∧ (∀ χ ψ, χ≠ψ → ... = 0)`.
+`characterTableRowPairing χ ψ = ⅟(card:ℂ) * ∑ g, (χ:CF) g · star((ψ:CF) g)` (`_eq_inv_card_sum`, L656).
+
+```lean
+-- 配置案: 新ファイル RowOrthogonality.lean (CharacterConjugate + SecondOrthogonality を import)
+--   ※ SecondOrthogonality.lean 本体に足すと CharacterConjugate→…→循環の恐れ要確認
+theorem characterTableRowOrthogonality {G} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] : CharacterTableRowOrthogonality (G := G) := by
+  refine ⟨fun χ => ?_, fun χ ψ hχψ => ?_⟩
+  · -- 対角 = 1
+    obtain ⟨V,_,_,_, ρ, hρ, hχ⟩ := χ.isIrreducible
+    haveI : Representation.IsIrreducible ρ := hρ
+    -- pairing を ⅟card·∑ ρ.char g · star(ρ.char g) に直し、
+    -- character_inv で star(ρ.char g)=ρ.char g⁻¹、char_orthonormal ρ ρ で =1。
+  · -- 非対角 = 0
+    obtain ⟨Vχ,_,_,_, ρ, hρ, hχ⟩ := χ.isIrreducible
+    obtain ⟨Vψ,_,_,_, σ, hσ, hψ⟩ := ψ.isIrreducible
+    haveI := hρ; haveI := hσ
+    -- char_orthonormal ρ σ で if Nonempty(σ.Equiv ρ) then 1 else 0。
+    -- Equiv σ ρ → σ.character=ρ.character (Representation.char_iso) → (ψ:CF)=(χ:CF) → χ=ψ で矛盾 → 0。
+```
+
+**使う mathlib 補題**:
+- `Representation.char_orthonormal [IsIrreducible ρ] [IsIrreducible σ] [Fintype G] [Invertible (Nat.card G:ℂ)] [IsAlgClosed ℂ] : (Nat.card G:ℂ)⁻¹ * ∑ g, ρ.character g * σ.character g⁻¹ = if Nonempty (σ.Equiv ρ) then 1 else 0` — `Mathlib/RepresentationTheory/Character.lean:230`.
+- repo `character_inv ρ g : ρ.character g⁻¹ = star (ρ.character g)` (層 1a) — `star ↔ g⁻¹` の橋渡し.
+- `Representation.char_iso (φ : ρ.Equiv σ) : ρ.character = σ.character` — `Character.lean:171` (非対角の矛盾用).
+- `characterTableRowPairing_eq_inv_card_sum` — `SecondOrthogonality.lean:656`.
+- `⅟(card:ℂ) = (card:ℂ)⁻¹`: `invOf_eq_inv`.
+
+**型/インスタンスの注意 (1a で踏んだ罠の再掲)**:
+- `IrreducibleCharacter G := {φ : ClassFunction G ℂ // IsIrreducibleCharacter φ}` (`IrrIndexing.lean:28`).
+  `χ.isIrreducible : IsIrreducibleCharacter (χ:CF)`,
+  `IsIrreducibleCharacter φ := ∃ V _ _ _ (ρ : Representation ℂ G V), Representation.IsIrreducible ρ ∧ (φ:G→ℂ)=ρ.character`.
+  `(χ:CF) g = ρ.character g` は `hχ` を `congrFun`/funext で適用.
+- `char_orthonormal` は `[IsIrreducible ρ]` を **instance** 要求 → `haveI : Representation.IsIrreducible ρ := hρ`.
+- `[Invertible (Nat.card G:ℂ)]`: `CharacterTableRowOrthogonality` 仮説に既出 → 定理にも同仮説で OK. 常時 discharge したいなら `invertibleOfNonzero` で構成.
+- `[IsAlgClosed ℂ]` を char_orthonormal が要求 → 適切な import (`Mathlib.Analysis.SpecialFunctions.Complex.Circle` 系か `Complex.isAlgClosed`).
+- `χ ≠ ψ` (Subtype) → `(χ:CF) ≠ (ψ:CF)`: `fun h => hχψ (Subtype.ext h)`.
+- **ℂ 一般の罠 (1a で判明)**: `open scoped ComplexOrder` は順序/PosDef 用 (1b では不要のはず); `RCLike ℂ` インスタンスは `Mathlib.Analysis.Complex.Basic` 由来 (RCLike.Basic でない).
+
+**進め方**: まず `characterTableRowOrthogonality` 定理単体を green + commit. その後、`hrow` を取る箇所 (S07 (5.x) / numerics / 最終的に (1.4)) に供給して仮説を消すのは段階的に.
+
+### mathlib ギャップ (層 2-3 で再燃する確認済み事実)
+- mathlib に「既約指標が類関数の基底」「#Irr=#共役類」は **無い**. ただし **層 2 (ZIrr Fourier) は orthonormality + 一次独立で済み、全張る性 (spanning) は不要** (`v_i ∈ ZIrr` の span membership のみ使う) — これは朗報.
+- 「trace=固有値和 (重複度付)」「spectral mapping」「trace_adjoint」「群平均ユニタリ化」も mathlib 不在 (層 1a はこれらを S-ユニタリ行列トリックで回避).
+
+### このセッションの commit (peterfalvi-s09 ブランチ、いずれも未 push)
+- `39a3ccb` docs: §9 ノート訂正 (§9 は character-theoretic、App.C 内容との混同を除去)
+- `72a9864` Peterfalvi S09: (7.10)/(7.11) statements; (7.11) を (7.10) modulo で sorry-free 証明
+- `d9330fa` CharacterConjugate: `χ(g⁻¹)=conj χ(g)` (層 1a)
+
 ## 完了条件
 
 - `OddOrder.RepresentationTheory.isometry_difference_pair_structure` の proof core が
