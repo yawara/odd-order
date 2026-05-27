@@ -769,6 +769,55 @@ def restrict (τ : FullDadeIsometryData (G := G) hyp) (hA₁A : A₁ ⊆ A)
 
 end FullDadeIsometryData
 
+section AdjointFormula
+
+variable (hyp : Hypothesis G A L)
+
+/-- The Peterfalvi (2.7) **adjoint averaging map**: given `χ : ClassFunction G ℂ`,
+this is the function `L → ℂ` defined on `A` by `a ↦ |H(a)|⁻¹ ∑_{x ∈ H(a)} χ(ax)`,
+and zero off `A`.  Classical logic is used to decide membership in `A` and to
+provide a `Fintype` for `↥(hyp.H a)` from `[Fintype G]`. -/
+noncomputable def adjointAverageFun (χ : ClassFunction G ℂ) : L → ℂ := by
+  intro ℓ
+  classical
+  exact if h : (ℓ : G) ∈ A then
+    (Nat.card ↥(hyp.H ⟨(ℓ : G), h⟩) : ℂ)⁻¹ *
+      ∑ x : ↥(hyp.H ⟨(ℓ : G), h⟩), χ ((ℓ : G) * (x : G))
+  else 0
+
+/-- **Peterfalvi (2.7) adjoint formula.**
+
+Given a candidate Dade map `τ` satisfying the (2.5) defining equations on the
+support of `α : CF(L, A)`, a class function `χ : ClassFunction G ℂ`, and a
+class function `ψ : ClassFunction L ℂ` whose values on `A` average `χ` along
+the cosets `aH(a)`:
+
+    ψ(a) = |H(a)|⁻¹ · ∑_{x ∈ H(a)} χ(ax)    (a ∈ A),
+
+the inner products satisfy `⟨τ α, χ⟩_G = ⟨α, ψ⟩_L`.
+
+In Peterfalvi's textbook this is proved by rewriting `⟨τ α, χ⟩_G` as a sum over
+G-conjugacy class representatives of `A`, using (2.4) and the defining equation
+(2.5).  The Lean statement keeps `ψ` as an explicit input; the special case
+`ψ = Res_L^G χ` (with `χ` constant on each `aH(a)`) is the form used in the
+proof of Theorem (2.6.a).
+
+This lemma is Peterfalvi §4's heaviest external export: §7 (5.4), §9 (7.2.b),
+§12 (9.5) ×2, §13 (10.3), §16 (14.1) ×2 all apply it directly (audit
+2026-05-23). -/
+theorem adjoint_formula
+    (τ : DadeMap (G := G) (k := ℂ) A L) (_hτ : IsDadeMap hyp τ)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    (χ : ClassFunction G ℂ) (ψ : ClassFunction L ℂ)
+    (_hψ : ∀ a : {a : G // a ∈ A},
+        ψ ⟨a.1, hyp.subset_L a.2⟩ =
+          adjointAverageFun hyp χ ⟨a.1, hyp.subset_L a.2⟩) :
+    ClassFunction.inner (τ α) χ =
+      ClassFunction.inner (α : ClassFunction L ℂ) ψ := by
+  sorry
+
+end AdjointFormula
+
 end DadeMap
 
 end OddOrder.Peterfalvi.S04
