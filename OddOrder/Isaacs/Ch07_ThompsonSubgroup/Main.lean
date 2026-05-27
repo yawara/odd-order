@@ -85,6 +85,37 @@ It returns `IsCyclic Z_p ∧ (IsCyclic Z_q → p < q)`.  `step3_not_both_opCore_
 applies it with `(p,q)` and `(q,p)` (same `M`): `Z_p, Z_q` cyclic and `p < q`,
 `q < p` — contradiction. -/
 
+/-- **§7D helper** — normalizer-grows. If `D < ↑S` for a finite `p`-group Sylow `S`,
+then `D` is strictly contained in `N_H(D) ⊓ ↑S`. -/
+theorem lt_normalizer_inf_sylow_of_lt
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (S : Sylow p H) {D : Subgroup H} (hD_lt : D < (S : Subgroup H)) :
+    D < Subgroup.normalizer D ⊓ (S : Subgroup H) := by
+  classical
+  haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
+  have hNC : NormalizerCondition ↥(S : Subgroup H) :=
+    normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
+  -- D.subgroupOf S < ⊤.
+  have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
+  have hsub_lt_top : D.subgroupOf (S : Subgroup H) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
+  have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  -- ↑t ∈ N_H(D) ⊓ ↑S, ↑t ∉ D.
+  refine lt_of_le_of_ne (le_inf ?_ hD_le) ?_
+  · -- D ≤ N_H(D).
+    exact Subgroup.le_normalizer
+  · intro heq
+    apply ht_not
+    have : (t : H) ∈ Subgroup.normalizer D ⊓ (S : Subgroup H) := ⟨ht_norm, t.2⟩
+    rw [← heq] at this
+    exact this
+
 /-- **§7D Step 3 arithmetic** — a nontrivial `p`-group `A` acting faithfully on a
 cyclic `q`-group `C` (via an injective `A →* MulAut C`) forces `p < q`.
 
@@ -295,6 +326,26 @@ theorem step3_main
       (IsCoatomic.eq_top_or_exists_le_coatom
         (Subgroup.centralizer ({z} : Set H))).resolve_left hCz_ne_top
     exact (hZ_unique X hX_coatom (hZ_le_Cz.trans hCzX)) ▸ hCzX
+  -- L4. `S ∈ Syl_p(M)` (as an `H`-subgroup) is not a full Sylow `p` of `H`
+  -- (it normalizes the nontrivial `q`-group `Z_q`, Step 2), so `N_P(S) > S`.
+  obtain ⟨SM⟩ : Nonempty (Sylow p ↥M) := inferInstance
+  set SH : Subgroup H := (SM : Subgroup ↥M).map M.subtype with hSH_def
+  have hSH_le_M : SH ≤ M := by rw [hSH_def]; exact Subgroup.map_subtype_le _
+  have hSH_pgroup : IsPGroup p SH := by rw [hSH_def]; exact SM.isPGroup'.map M.subtype
+  have hZp_le_SM : Zp ≤ (SM : Subgroup ↥M) :=
+    le_trans (by rw [hZp_def]; unfold zCenterOpCoreSubgroup; exact Subgroup.map_subtype_le _)
+      (OddOrder.Isaacs.Ch01.opCore_le SM)
+  have hZpH_le_SH : ZpH ≤ SH := by rw [hZpH_eq, hSH_def]; exact Subgroup.map_mono hZp_le_SM
+  have hp_dvd_H : p ∣ Nat.card H := hp_dvd_Z.trans (Subgroup.card_subgroup_dvd_card Z)
+  obtain ⟨P, hSHP⟩ := hSH_pgroup.exists_le_sylow
+  have hSH_lt : SH < (P : Subgroup H) := by
+    rcases eq_or_lt_of_le hSHP with h | h
+    · exact absurd (h ▸ (le_trans hSH_le_M hM_norm_ZqH))
+        (fun hPnorm => step2_pSylow_not_normalizes_nontrivial_qSubgroup hpq hH_card
+          hp_dvd_H P hZqH_ne_bot hZqH_qgroup hPnorm)
+    · exact h
+  have hNPS_gt : SH < Subgroup.normalizer SH ⊓ (P : Subgroup H) :=
+    lt_normalizer_inf_sylow_of_lt P hSH_lt
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
@@ -469,37 +520,6 @@ theorem pCentralGenerated_idem {p : ℕ} {G : Type*} [Group G] (U : Subgroup G) 
   obtain ⟨hxU, hx_pc⟩ := hx
   have hx_in_Ustar : x ∈ pCentralGenerated p U := mem_pCentralGenerated hxU hx_pc
   exact mem_pCentralGenerated hx_in_Ustar hx_pc
-
-/-- **§7D helper** — normalizer-grows. If `D < ↑S` for a finite `p`-group Sylow `S`,
-then `D` is strictly contained in `N_H(D) ⊓ ↑S`. -/
-theorem lt_normalizer_inf_sylow_of_lt
-    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
-    (S : Sylow p H) {D : Subgroup H} (hD_lt : D < (S : Subgroup H)) :
-    D < Subgroup.normalizer D ⊓ (S : Subgroup H) := by
-  classical
-  haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
-  have hNC : NormalizerCondition ↥(S : Subgroup H) :=
-    normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
-  -- D.subgroupOf S < ⊤.
-  have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
-  have hsub_lt_top : D.subgroupOf (S : Subgroup H) < ⊤ := by
-    rw [lt_top_iff_ne_top]
-    intro htop
-    rw [Subgroup.subgroupOf_eq_top] at htop
-    exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
-  have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
-  rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
-  rw [Subgroup.mem_subgroupOf] at ht_not
-  -- ↑t ∈ N_H(D) ⊓ ↑S, ↑t ∉ D.
-  refine lt_of_le_of_ne (le_inf ?_ hD_le) ?_
-  · -- D ≤ N_H(D).
-    exact Subgroup.le_normalizer
-  · intro heq
-    apply ht_not
-    have : (t : H) ∈ Subgroup.normalizer D ⊓ (S : Subgroup H) := ⟨ht_norm, t.2⟩
-    rw [← heq] at this
-    exact this
 
 /-- **§7D Step 4** (Isaacs L4001-4019) — *a `q`-central element normalizing a
 `p`-subgroup forbids `p`-central elements*.  **Now a theorem** (the `W`-maximality
