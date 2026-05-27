@@ -83,6 +83,44 @@ theorem conj_fixes_of_commute {a x x' t : G} (hx : Commute a x) (hx' : Commute a
     _ = t * (a * x) * t⁻¹ := by group
     _ = a * x' := hconj
 
+/-- **Cross conjugacy rigidity** (Peterfalvi (2.4.b) core): if `a * u` is conjugate
+to `b * v`, where `u` commutes with `a`, `v` commutes with `b`, both `u, v` have
+order dividing some `m` coprime to `orderOf a` and to `orderOf b`, then already
+`a` is conjugate to `b`.
+
+Peterfalvi extracts the `π`-parts `a = (a u)_π` and `b = (b v)_π`; here a single
+CRT exponent `k`, built modulo `lcm (orderOf a) (orderOf b)` and `m`, plays that
+role. -/
+theorem isConj_of_isConj_mul {a b u v : G} (hu : Commute a u) (hv : Commute b v)
+    {m : ℕ} (ham : Nat.Coprime (orderOf a) m) (hbm : Nat.Coprime (orderOf b) m)
+    (hum : orderOf u ∣ m) (hvm : orderOf v ∣ m)
+    (h : IsConj (a * u) (b * v)) : IsConj a b := by
+  obtain ⟨t, ht⟩ := isConj_iff.mp h
+  have modEq_of_dvd : ∀ {x y d M : ℕ}, d ∣ M → x ≡ y [MOD M] → x ≡ y [MOD d] := by
+    intro x y d M hd hxy
+    rw [Nat.modEq_iff_dvd] at hxy ⊢
+    exact (Int.natCast_dvd_natCast.mpr hd).trans hxy
+  have hlcmcop : Nat.Coprime (Nat.lcm (orderOf a) (orderOf b)) m :=
+    Nat.Coprime.coprime_dvd_left
+      (Nat.lcm_dvd (dvd_mul_right _ _) (dvd_mul_left _ _))
+      (Nat.coprime_mul_iff_left.mpr ⟨ham, hbm⟩)
+  obtain ⟨k, hk1, hk0⟩ := Nat.chineseRemainder hlcmcop 1 0
+  have hak : a ^ k = a := by
+    have : a ^ k = a ^ 1 :=
+      pow_eq_pow_iff_modEq.mpr (modEq_of_dvd (dvd_lcm_left _ _) hk1)
+    simpa using this
+  have hbk : b ^ k = b := by
+    have : b ^ k = b ^ 1 :=
+      pow_eq_pow_iff_modEq.mpr (modEq_of_dvd (dvd_lcm_right _ _) hk1)
+    simpa using this
+  have hmk : m ∣ k := (Nat.modEq_zero_iff_dvd).mp hk0
+  have huk : u ^ k = 1 := orderOf_dvd_iff_pow_eq_one.mp (hum.trans hmk)
+  have hvk : v ^ k = 1 := orderOf_dvd_iff_pow_eq_one.mp (hvm.trans hmk)
+  refine isConj_iff.mpr ⟨t, ?_⟩
+  have hpow : (t * (a * u) * t⁻¹) ^ k = (b * v) ^ k := by rw [ht]
+  rw [conj_pow, hu.mul_pow, hv.mul_pow, hak, hbk, huk, hvk, mul_one, mul_one] at hpow
+  exact hpow
+
 /-- The set of elements conjugating a fixed `g₀` to `g` is, when nonempty, a left
 coset of the centralizer of `g₀`; hence has the same cardinality. -/
 theorem card_conjugatorBy_eq_card_centralizer {g₀ g : G} (h : IsConj g₀ g) :
