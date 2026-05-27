@@ -48,11 +48,26 @@ wall ≈ 5s (固定費) + ~2ms/行
 
 ## やること
 
-- [ ] `Ch06_FrobeniusActions/Main.lean` (7603 行) を依存に沿って 1500-2000 行ピースに分割
-- [ ] `Ch07_ThompsonSubgroup/Main.lean` (7153 行) を同様に分割 (※ 別エージェントが編集中・破損状態なら合流後に着手)
-- [ ] 分割後に inner-loop レイテンシを再測定し、想定どおり ~20s → ~8s に下がるか確認
-- [ ] (任意) 同時ビルド数 / 1 エージェントあたり `-j` の上限ポリシーを検討し worktree 運用ノートに記録
-- [ ] (任意) 他の 1500-2000 行超ファイル (Ch04 6073 行, BG S02 4695 行 等) の分割要否を棚卸し
+- [x] `Ch06_FrobeniusActions/Main.lean` (7603 行) を 5 ファイルに分割 — FrobeniusActionTI / FrobeniusGroup / DQSDRecognition / Lemma615 / Main (各 1292-1784 行). commit 355dcb2
+- [x] `Ch07_ThompsonSubgroup/Main.lean` (合流後 **9211 行**に増) を 6 ファイルに分割 — S7A1 / S7A2 / S7B1 / S7B2 / S7D1 / Main (各 1280-2027 行). commit e926cb8
+- [x] inner-loop 再測定 (下記「結果」). §7D leaf 編集 **9s** / Ch06 leaf 編集 **7s** / no-op 2s — 想定どおり ~20s → ~8s 達成
+- [ ] (任意・未) 同時ビルド数 / 1 エージェントあたり `-j` の上限ポリシーを検討し worktree 運用ノートに記録
+- [x] (棚卸しのみ) 他の >1500 行: Ch04 6073, BG S02 4695, Ch02 3844, Ch03 3480, Ch01 3293, Ch05 2884. 今回スコープ外 (Ch06/Ch07 のみ依頼) — 将来の分割候補
+
+## 結果 (2026-05-27)
+
+10 コア / 32GB マシンで 1-行 dirty rebuild (`lake build OddOrder`) を実測:
+
+| 編集対象 | 行数 | dirty rebuild | 旧 monolith |
+|---|---|---|---|
+| `Ch07/Main.lean` (§7D leaf) | 2027 | **9s** | ~21-25s (9211 行) |
+| `Ch06/Main.lean` | 1374 | **7s** | ~21s (7603 行) |
+| no-op (全キャッシュ) | — | 2s | 2s |
+
+- 性能モデル `5s + 2ms/行` どおり、leaf 編集は 7-9s に収束 (旧 ~20s から **~2.5-3x 高速**)。
+- **下流連鎖再ビルドは起きない**: trailing-comment 編集では exported interface 不変のため Lean が下流をスキップ (Ch06.Main 編集でも 7s)。`Ch07/Main.lean` の逆依存は `AxiomsCheck.lean` のみ。
+- 分割方針: §7A-§7D / §6 セクション境界に沿った依存順チェーン。アクティブな §7D を Ch07 chain の leaf (Main) に配置。境界を越える file-private helper (Ch07: 3, Ch06: 6) のみ de-privatize、証明内容は不変。
+- 既知の限定 (任意の後続作業): `Ch07/S7A1` が `Ch06.Main` を import するため、Ch06 の**宣言を実質変更**すると Ch07 chain が再ビルドされる。完全分離は S7A1 の import を必要な Ch06 ピースに絞れば可能。
 
 ## 完了条件
 
