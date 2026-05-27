@@ -5,6 +5,16 @@
 ROADMAP 上の位置: **Phase 2a 第 2 波** (Phase 1 Isaacs Ch.7 完成必須, §6 と並行 or 直後).
 役割: **Isaacs Ch.7 と BG §6-§16 の橋渡し**; **p-stability 概念の正式定義**; **Thm A.4(b) ≡ Isaacs Thm 7.6 の odd-order 再述**.
 
+## ⚠️ 2026-05-28 訂正: A.4(b)/(c) は Isaacs import では出ない(7.3 reduction が要る)
+
+下記 TL;DR / 形式化戦略 (L78-90「選択肢1 推奨: Isaacs 7.6 import for A.4(b)」) は**過度に楽観的**。
+判明事項:
+- **Isaacs FGT は Glauberman Z(J)-定理 (= BG Thm 6.2) と Gorenstein §6.5/§3.8 を持たない** (Isaacs p.217 明記)。repo `normal_J` は Isaacs 7.6(`P=C_G(Z(P))` 付き特殊形)で、6.2 一般形でも A.4(b)/(c) でもない。
+- **A.4(b)(= Thm 6.1)も A.4(c) も Gorenstein §6.5 の special case**で、BG App.A は証明本体を書かず "G §6.5 を A.3 で置換し we obtain" とするのみ(A.2/A.3 も "G §3.8 を辿れ")。⇒ **Isaacs import では出ない**。
+- ただし**最深部(SL(2,p) = Dickson/G 3.8.1)は repo に既証**: `Isaacs.Ch07.gl2_pSubgroup_centralizes_of_normalizes`(Lem 7.3)。A.4(b)/(c) は **7.3 を核とする新規 reduction**(bounded)。A.4(c) は **Isaacs 7.5 の系ではない**(兄弟定理、共通核が 7.3)。A.2/A.3/A.4(a) は直接構築すれば**迂回可**。
+- 詳細・依存閉包(App.B 完備、ゲート = A.4(b)+A.4(c))・J→L 大域置換の検証は
+  [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).

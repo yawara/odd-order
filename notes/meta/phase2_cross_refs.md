@@ -31,7 +31,7 @@ BG 全 138 結果のうち、外部引用 (Gorenstein/Isaacs 経由) と Peterfa
 | §10-§13 | Maximal Subgroups | 0 件外部, §6/§9 internal | 0 件 | 内部 |
 | §14-§16 | Family / Main | (App.C へ橋渡し) | 0 件 (本文) / App.C で Peterfalvi 編集再録 | 内部 |
 | App.A | p-Stability | **A.4(b) は Isaacs Thm 7.6 の corollary** (同値ではない) *(2026-05-23 audit 訂正)* | 0 件 | §6 (上流) |
-| ~~App.B~~ | ~~Puig L(S)~~ | **Phase 2a スキップ推奨** (FT-orphan, B.3+B.4 が Thm A.5 cite; J(S)⊆L(S) のみで equal ではない) *(2026-05-23 audit 訂正)* | 0 件 | (Thm A.5) |
+| **App.B** | Puig L(S) | **Thm 6.2 の自己完結代替の本線** (Thm B.4)。~~Phase 2a スキップ推奨~~ は **2026-05-28 撤回**: Isaacs が Z(J) を省くため必須。B.3+B.4 が Thm A.5 cite; J(S)⊆L(S) (equal でない) → §8-§16 を L(S) で formalize。詳細 [`bg_s6_appAB_route_2026_05_28.md`](bg_s6_appAB_route_2026_05_28.md) | 0 件 | (Thm A.5) |
 | App.C | Final Contradiction | 0 件 | **= [Pe] 編集再録 (Carlip-Wheeler 編)** | 自己完結 |
 | App.D | Cn-Groups | (Suzuki 1957 ベース) | 0 件 | 独立 |
 | App.E | Further Results | 雑多な発展. FT 後の話題 | 0 件 | 独立 |

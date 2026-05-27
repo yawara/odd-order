@@ -3,7 +3,17 @@
 **スコープ**: BG Appendix B (pp. 139-144), mmd L4517-4758, **4 主要結果 (Lem B.1-B.3, Thm B.4)**.
 形式化先 (予定): `OddOrder/BG/AppB_Puig.lean` (~350-500 行想定).
 ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 完了後 optional).
-役割: **J(S) の一般化代替** Puig L(S); **Thm B.4 = Thm 6.2 substitute**; **Lem B.1-B.5 系**: L(G), L_*(G) の再帰演算とその基本性質.
+役割: **J(S) の一般化代替** Puig L(S); **Thm B.4 = Thm 6.2 substitute**; **Lem B.1-B.4 系**: L(G), L_*(G) の再帰演算とその基本性質.
+
+## ⚠️ 2026-05-28 訂正: App.B は「スキップ」ではなく Thm 6.2 の本線
+
+下記 Audit log (L19) の **「App.B + Thm A.5 を Phase 2a スキップ推奨」は撤回**。
+**Isaacs FGT は Glauberman Z(J)-定理(= BG Thm 6.2)を明示的に省く**ため (Isaacs p.217)、
+no-Gorenstein 方針下では **App.B (Puig L(S), Thm B.4) こそが Thm 6.2 の唯一の自己完結代替**で
+スキップ不可。App.B 自体は **完全な証明が BG にあり**(B.1-B.4 written, 実質依存は A.5 のみ、
+B.4 は Isaacs 本人の未公刊証明)。FT-citation-orphan の観察 (L17-18) は正しいが、**「Gorenstein
+依存を断つ代替」という役割を見落とした**のが旧監査の誤り。詳細・依存閉包・J→L 大域置換の検証は
+[`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
 
 ---
 
@@ -16,7 +26,7 @@ ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 �
 - **"J(S) = L(S)" (L76 等)** → **誤り**. **`J(S) ⊆ L(S)` のみ**. `Z(J(S)) ⊆ Z(L(S))` substitutable but **NOT equal**. L 再帰, J 一回最大.
 - **App.B is COMPLETELY ORPHANED in FT path**: §1-§16 + App.C + App.E から 0 cite, Peterfalvi 0 cite. 本文使用箇所は **§6 L1979 (advertisement only)** + **App.D L5014 (FT 無関係 "may substitute")** の 2 箇所のみ.
 - **L374 "A.5 が BG §6-§16 で使わない"** → True, さらに **A.5 自体も App.B 唯一の消費者** ⇒ **A.5 + App.B が共に orphan**.
-- **Recommendation revision**: 既存「optional 補強, Phase 2a 第 6 波」 → **完全に Phase 2a スキップ推奨**. ~570 行, ~10-13 日節約. Phase 4 または mathlib upstream pivot 時に revisit. App.A docstring に skip rationale 残す.
+- **Recommendation revision**: 既存「optional 補強, Phase 2a 第 6 波」 → **完全に Phase 2a スキップ推奨**. ~570 行, ~10-13 日節約. Phase 4 または mathlib upstream pivot 時に revisit. App.A docstring に skip rationale 残す. **【2026-05-28 再撤回: この skip 推奨は誤り。Isaacs が Z(J) を省くため App.B が 6.2 代替の本線で必須。冒頭 banner + [`bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md) 参照】**
 
 ## TL;DR — J(S) の代替, optional 補強節
 

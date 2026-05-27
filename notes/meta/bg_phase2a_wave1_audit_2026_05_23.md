@@ -4,7 +4,11 @@ BG Phase 2a 第 1 波の 6 節 (§1 Solvable / §2 Representations / §4 p-Group
 
 ## 統合観点での最重要 5 点
 
-1. **App.B + Thm A.5 を Phase 2a で完全スキップ可** (~570 行, ~10-13 日節約): App.B は **FT 経路で完全孤立**. 唯一の本文使用箇所は §6 L1979 (advertisement) と App.D L5014 (FT 無関係, "may substitute L(P) for J(P)"). overview L95「App.B は App.A 不要で独立着手可」は **誤り** (Lem B.3 L4666 + Thm B.4 Step 3 L4735 が Thm A.5 cite). A.5 自体も App.B 唯一の消費者. **両方 skip し AppA docstring に omission note**.
+> **⚠️ 2026-05-28 反転 (点1)**: 下記「App.B + Thm A.5 を Phase 2a で完全スキップ可」は **撤回**。
+> FT-citation-orphan の観察は正しいが、**Isaacs FGT が Glauberman Z(J)-定理 (= BG Thm 6.2) を省く** (Isaacs p.217) ため、no-Gorenstein 方針下では **App.B (Puig L(S), Thm B.4) こそが Thm 6.2 の唯一の自己完結代替**で必須。本監査は「App.B が Gorenstein 依存を断つ代替」という役割を見落とした。
+> 詳細・依存閉包・J→L 大域置換の検証: [`bg_s6_appAB_route_2026_05_28.md`](bg_s6_appAB_route_2026_05_28.md)。
+
+1. **App.B + Thm A.5 を Phase 2a で完全スキップ可** (~570 行, ~10-13 日節約): App.B は **FT 経路で完全孤立**. 唯一の本文使用箇所は §6 L1979 (advertisement) と App.D L5014 (FT 無関係, "may substitute L(P) for J(P)"). overview L95「App.B は App.A 不要で独立着手可」は **誤り** (Lem B.3 L4666 + Thm B.4 Step 3 L4735 が Thm A.5 cite). A.5 自体も App.B 唯一の消費者. **両方 skip し AppA docstring に omission note**. **【2026-05-28 撤回: 上記 banner 参照。App.B は 6.2 代替の本線で必須】**
 
 2. **App.A は §6 の "下流" ではなく "上流"**. 既存 appA ノート L13-14「下流被引用 Thm 6.1, 6.2」は方向逆. BG 序文 L4452: "Theorems 6.1 and 6.2 ... are obtained by use of p-stability ... we outline these shorter proofs". したがって **Phase 2a 着手順は §1 + §2 → App.A → §6** (App.A は §6 直前, 並行ではない). さらに App.A は **BG §1 Prop 1.8 + Prop 1.15(b) + BG §2 Thm 2.6 完成必須**, 既存ノートが未捕捉.
 

@@ -15,6 +15,8 @@
 
 **残課題 (2026-05-27 difficulty 再評価 — 前回見立て訂正)**:
 
+> **2026-05-28 追記**: §6 → App.A+B(Puig)で Gorenstein 依存を捨てる経路の設計決定・依存閉包・J→L 大域置換の検証は [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md) に集約。要点: Isaacs は Z(J) を省くため 6.2 は **App.B Thm B.4(Puig L(S))**で代替、ゲートは **A.4(b)+A.4(c)**(7.3 reduction、最深部 7.3 は repo 既証)。
+
 ⚠️ **重要訂正**: Thm 6.1/6.2 の一般形は repo の `Isaacs.Ch07.normal_J` への単純簡約では**到達しない**。原文精読 (mmd L1971-1977) で判明:
 - BG **Thm 6.1** = Hall-Higman (Gorenstein **6.5.2**)、BG **Thm 6.2** = Glauberman ZJ (Gorenstein **6.5.1** + 8.2.11)。いずれも「任意 Sylow S・`P=C_G(Z(P))` 仮定なし」の**完全形**。
 - repo の `normal_J` は Isaacs **Thm 7.6**(仮説 `O_{p'}=1` ∧ `P=C_G(Z(P))` ⇒ `J(P)⊴G`)で、Isaacs はこれを **Thompson normal p-complement (7.1) の補題**として使う。一般 ZJ とは別物。`P=C_G(Z(P))` ギャップは O_{p'}-商簡約では埋まらない。
