@@ -622,6 +622,66 @@ theorem card_centralizer_eq (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
         (Nat.card_congr (Equiv.ofBijective f hf)).symm
     _ = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := Nat.card_prod _ _
 
+open Classical in
+/-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,
+the centralizers `|C_L(a)|`, summed over the `a ∈ A` whose coset `aH(a)` meets
+the `G`-conjugacy class of `g`, total `|L|`.
+
+The index set `{a : g ∈ (aH(a))^G}` is a single `L`-conjugacy class `a₀^L`
+(`[2.4.b]` for `⊆`, `HConjInvariant` for `⊇`).  Mapping `l ↦ l a₀ l⁻¹` from `L`
+onto it has fibers that are `C_L(a₀)`-cosets (`card_conjugatorIn_L`), and the
+summand `|C_L(a)|` is constant `= |C_L(a₀)|` on the class
+(`card_centralizerIn_conj`); fiberwise counting then gives `|L|`. -/
+theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
+    (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant) {g : G}
+    (hg : g ∈ hyp.dadeSupport) :
+    ∑ a ∈ Finset.univ.filter
+        (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g),
+      Nat.card (centralizerIn L a.1) = Nat.card L := by
+  classical
+  letI : Fintype L := Fintype.ofFinite L
+  obtain ⟨a₀, x₀, hx₀, hca₀⟩ := hyp.mem_dadeSupport_iff.mp hg
+  let φ : L → {a : G // a ∈ A} :=
+    fun l => ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
+  set S := Finset.univ.filter
+    (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g) with hS
+  have hmaps : ∀ l : L, φ l ∈ S := by
+    intro l
+    rw [hS, Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, (l : G) * x₀ * (l : G)⁻¹, ?_, ?_⟩
+    · change (l : G) * x₀ * (l : G)⁻¹ ∈
+        hyp.H ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
+      rw [hconj a₀ l]
+      exact Subgroup.smul_mem_pointwise_smul x₀ (MulAut.conj (l : G)) (hyp.H a₀) hx₀
+    · have heq : (φ l).1 * ((l : G) * x₀ * (l : G)⁻¹)
+          = (l : G) * (a₀.1 * x₀) * (l : G)⁻¹ := by
+        change ((l : G) * a₀.1 * (l : G)⁻¹) * ((l : G) * x₀ * (l : G)⁻¹)
+          = (l : G) * (a₀.1 * x₀) * (l : G)⁻¹
+        group
+      have h1 : IsConj (a₀.1 * x₀) ((φ l).1 * ((l : G) * x₀ * (l : G)⁻¹)) := by
+        rw [heq]; exact isConj_iff.mpr ⟨(l : G), rfl⟩
+      exact h1.symm.trans hca₀
+  have horbit : ∀ a ∈ S, ∃ l : L, (l : G) * a₀.1 * (l : G)⁻¹ = a.1 := by
+    intro a ha
+    rw [hS, Finset.mem_filter] at ha
+    obtain ⟨x, hx, hax⟩ := ha.2
+    exact hyp.isConj_in_L_of_mul_H a₀.2 a.2 hx₀ hx (hca₀.trans hax.symm)
+  have hfiber : ∀ a ∈ S, (Finset.univ.filter (fun l : L => φ l = a)).card
+      = Nat.card (centralizerIn L a.1) := by
+    intro a ha
+    obtain ⟨lₐ, hlₐ⟩ := horbit a ha
+    have hcard1 : (Finset.univ.filter (fun l : L => φ l = a)).card
+        = Nat.card {l : L // (l : G) * a₀.1 * (l : G)⁻¹ = a.1} := by
+      rw [Nat.card_eq_fintype_card, ← Fintype.card_subtype (fun l : L => φ l = a)]
+      apply Fintype.card_congr
+      exact Equiv.subtypeEquivRight (fun l => Subtype.ext_iff)
+    rw [hcard1, card_conjugatorIn_L ⟨lₐ, hlₐ⟩, ← hlₐ, card_centralizerIn_conj lₐ.2 a₀.1]
+  have hsum := Finset.card_eq_sum_card_fiberwise
+    (f := φ) (s := (Finset.univ : Finset L)) (t := S) (fun l _ => hmaps l)
+  rw [Finset.card_univ, ← Nat.card_eq_fintype_card] at hsum
+  rw [hsum]
+  exact Finset.sum_congr rfl (fun a ha => (hfiber a ha).symm)
+
 end Hypothesis
 
 section DadeMap
