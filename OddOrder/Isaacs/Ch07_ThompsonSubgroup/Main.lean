@@ -6727,7 +6727,277 @@ theorem oPiCore_pPrime_eq_bot_of_isPType
   rw [hOq_bot, le_bot_iff] at hK_le
   exact hK_le
 
-/-- **§7D Step 8 axiom** (Isaacs L4045-4063) — *normal `J` and full Sylow for a
+/-- **§7D Step 8 helper** — `2 ∤ |M|` for a subgroup `M` of a simple `p^a q^b`
+group with `p, q` both odd.  Hence Sylow-`2` subgroups of `M` are trivial. -/
+theorem two_not_dvd_card_subgroup_of_odd_primes
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hp2 : p ≠ 2) (hq2 : q ≠ 2) (M : Subgroup H) :
+    ¬ (2 : ℕ) ∣ Nat.card ↥M := by
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  intro h2_dvd
+  have h2_dvd_H : (2 : ℕ) ∣ Nat.card H := h2_dvd.trans M.card_subgroup_dvd_card
+  rw [hH_card] at h2_dvd_H
+  rcases (Nat.Prime.dvd_mul Nat.prime_two).mp h2_dvd_H with h | h
+  · exact hp2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hp_prime).mp
+      (Nat.prime_two.dvd_of_dvd_pow h)).symm
+  · exact hq2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hq_prime).mp
+      (Nat.prime_two.dvd_of_dvd_pow h)).symm
+
+/-- **§7D Step 8 helper** — Sylow-`2` subgroups of `M` are abelian (in fact
+trivial) when `2 ∤ |M|`.  Phrased as the `normal_J` hypothesis. -/
+theorem sylow2_abelian_of_two_not_dvd
+    {M : Type*} [Group M] [Finite M]
+    (h2 : ¬ (2 : ℕ) ∣ Nat.card M) :
+    ∀ S : Subgroup M, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  intro S hS x y
+  -- `S` is a `2`-group; `|S| ∣ |M|`; since `2 ∤ |M|`, `|S| = 1`, so `S` is trivial.
+  obtain ⟨n, hn⟩ := hS.exists_card_eq
+  have hS_dvd : Nat.card ↥S ∣ Nat.card M := S.card_subgroup_dvd_card
+  have hn0 : n = 0 := by
+    by_contra hne
+    exact h2 ((hn ▸ dvd_pow_self 2 hne).trans hS_dvd)
+  have hS_card_one : Nat.card ↥S = 1 := by rw [hn, hn0, pow_zero]
+  haveI : Subsingleton ↥S := Nat.card_eq_one_iff_unique.mp hS_card_one |>.1
+  exact Subsingleton.elim (x * y) (y * x)
+
+/-- **§7D Step 8 — fifth normal-J hypothesis** (Isaacs L4055-4063): for a
+`p`-type maximal `M` and `S ∈ Syl_p(M)`, the centralizer of `Z(S)` in `M`
+is exactly `S`: `C_M(Z(S)) = S`.
+
+Textbook proof: `S ⊆ C_M(Z(S))` always.  For the reverse it suffices that
+`C_M(Z(S))` is a `p`-group (a `p`-subgroup of `M` containing the Sylow `S` must
+equal `S`).  Otherwise an order-`q` element `y ∈ C_M(Z(S))` gives a nontrivial
+`q`-subgroup `Y = ⟨y⟩` normalized by `Z(S)`; choosing `P ∈ Syl_p(H)` with
+`S = M ∩ P` and `M = N_H(O_p(M))`, the nontrivial center `Z(P)` lies in
+`M ∩ P = S` and centralizes `S`, hence `Z(S)` contains a `p`-central element `x`
+of `H`.  Then `x` normalizes `Y`, contradicting Step 6 (with `p, q` swapped). -/
+theorem step8_centralizer_center_eq_sylow
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hH_nsol : ¬ IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    {M : Subgroup H} (hM_pType : IsPType p M)
+    (S : Sylow p ↥M) :
+    Subgroup.centralizer
+      (((Subgroup.center (S : Subgroup ↥M)).map (S : Subgroup ↥M).subtype) : Set ↥M)
+      = (S : Subgroup ↥M) := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- `p ∣ |H|`, `q ∣ |H|`.
+  obtain ⟨hp_dvd, hq_dvd⟩ :=
+    p_and_q_dvd_card_of_simple_nonsolvable hpq inferInstance hH_nsol (dvd_of_eq hH_card)
+  -- Abbreviations.
+  set ZS : Subgroup ↥M :=
+    (Subgroup.center (S : Subgroup ↥M)).map (S : Subgroup ↥M).subtype with hZS_def
+  set C : Subgroup ↥M := Subgroup.centralizer (ZS : Set ↥M) with hC_def
+  -- (A) `S ≤ C_M(Z(S))`: every `s ∈ S` commutes with `Z(S)`.
+  have hS_le_C : (S : Subgroup ↥M) ≤ C := by
+    intro s hs
+    rw [hC_def, Subgroup.mem_centralizer_iff]
+    intro z hz
+    -- `z ∈ Z(S).map subtype`: `z = ↑z₀` with `z₀ ∈ center S`.
+    obtain ⟨z₀, hz₀_center, rfl⟩ := hz
+    -- `z₀` central in `S` ⇒ commutes with `⟨s, hs⟩`.
+    have := (Subgroup.mem_center_iff.mp hz₀_center) ⟨s, hs⟩
+    -- push to `↥M`.
+    have h2 := congrArg (Subgroup.subtype (S : Subgroup ↥M)) this
+    simpa [mul_comm] using h2.symm
+  -- (B) `C` is a `p`-group.  Suppose not, and derive a contradiction via Step 6.
+  have hC_pgroup : IsPGroup p C := by
+    by_contra hC_not_p
+    -- `q ∣ |C|`: a prime `r ∣ |C|` with `r ≠ p` must be `q` (since `|C| ∣ |M| ∣ p^a q^b`).
+    -- Some prime `r ∣ |C|` is `≠ p` (else `C` would be a `p`-group).
+    have hq_dvd_C : q ∣ Nat.card ↥C := by
+      by_contra hq_ndvd
+      -- Every prime factor of `|C|` is `p`, so `C` is a `p`-group — contradiction.
+      apply hC_not_p
+      apply OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton (G := ↥M) (p := p)
+      intro r hr
+      obtain ⟨hr_prime, hr_dvd_C, _⟩ := Nat.mem_primeFactors.mp hr
+      have hr_dvd_M : r ∣ Nat.card ↥M := hr_dvd_C.trans C.card_subgroup_dvd_card
+      have hr_dvd_paqb : r ∣ p ^ a * q ^ b := by
+        rw [← hH_card]; exact hr_dvd_M.trans M.card_subgroup_dvd_card
+      simp only [Set.mem_singleton_iff]
+      rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
+      · exact (Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp (hr_prime.dvd_of_dvd_pow h)
+      · exact absurd ((Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp
+          (hr_prime.dvd_of_dvd_pow h) ▸ hr_dvd_C) hq_ndvd
+    -- Cauchy: an order-`q` element `y₀ ∈ C`.
+    haveI : Fact q.Prime := ⟨hq_prime⟩
+    obtain ⟨y₀, hy₀_ord⟩ := exists_prime_orderOf_dvd_card' q hq_dvd_C
+    -- `Y₀ = ⟨y₀.val⟩` is a nontrivial `q`-subgroup of `↥M`; map to `H`.
+    set yM : ↥M := (y₀ : ↥M) with hyM_def
+    have hyM_ord : orderOf yM = q := by rw [hyM_def, Subgroup.orderOf_coe, hy₀_ord]
+    have hyM_ne_one : yM ≠ 1 := by
+      intro h1; rw [h1, orderOf_one] at hyM_ord; exact hq_prime.ne_one hyM_ord.symm
+    set Y₀ : Subgroup ↥M := Subgroup.zpowers yM with hY₀_def
+    have hY₀_q : IsPGroup q Y₀ := by
+      apply IsPGroup.of_card (n := 1)
+      rw [pow_one, hY₀_def, Nat.card_zpowers, hyM_ord]
+    set YH : Subgroup H := Y₀.map M.subtype with hYH_def
+    have hYH_q : IsPGroup q YH := hY₀_q.map M.subtype
+    -- `YH ≠ ⊥` (since `yM ≠ 1` maps to `↑yM ≠ 1`).
+    have hYH_ne_bot : YH ≠ ⊥ := by
+      rw [hYH_def, hY₀_def]
+      intro hbot
+      apply hyM_ne_one
+      have : (M.subtype yM) = 1 := by
+        have hmem : M.subtype yM ∈ (Subgroup.zpowers yM).map M.subtype :=
+          ⟨yM, Subgroup.mem_zpowers yM, rfl⟩
+        rw [hbot, Subgroup.mem_bot] at hmem; exact hmem
+      simpa using this
+    -- Build the ambient `p`-central element `x ∈ Z(S) ⊆ M ∩ P` normalizing `YH`.
+    -- (i) `M = N_H(V)` for `V = O_p(M).map subtype`.
+    set K₀ : Subgroup ↥M := OddOrder.Isaacs.Ch01.opCore p ↥M with hK₀_def
+    haveI hK₀_normal : K₀.Normal := by rw [hK₀_def]; infer_instance
+    set V : Subgroup H := K₀.map M.subtype with hV_def
+    have hV_ne_bot : V ≠ ⊥ := by
+      intro hbot
+      -- `V = ⊥` and `subtype` injective ⇒ `K₀ = ⊥`, contradicting `IsPType`.
+      have hK₀_bot : K₀ = ⊥ := by
+        rw [hV_def] at hbot
+        exact (Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp hbot
+      exact hM_pType.2 hK₀_bot
+    have hV_le_M : V ≤ M := by rw [hV_def]; exact Subgroup.map_subtype_le _
+    have hM_norm_V : (M : Subgroup H) ≤ Subgroup.normalizer V := by
+      -- `K₀ ⊴ ↥M` ⇒ `normalizer K₀ = ⊤`; map by `subtype` lands in `normalizer V`.
+      have h1 : (Subgroup.normalizer (K₀ : Set ↥M)).map M.subtype
+          ≤ Subgroup.normalizer ((K₀.map M.subtype : Subgroup H) : Set H) :=
+        Subgroup.le_normalizer_map M.subtype
+      rw [Subgroup.normalizer_eq_top_iff.mpr hK₀_normal] at h1
+      have h3 : (⊤ : Subgroup ↥M).map M.subtype = M := by
+        rw [← MonoidHom.range_eq_map, M.range_subtype]
+      rw [h3] at h1
+      rw [hV_def]
+      exact h1
+    have hM_eq_NV : Subgroup.normalizer V = M :=
+      maximal_eq_normalizer_of_M_normalizes hM_pType.1 hV_ne_bot hV_le_M hM_norm_V
+    -- (ii) `S_H := S.map subtype` extends to `P_H ∈ Syl_p(H)`.
+    set SH : Subgroup H := (S : Subgroup ↥M).map M.subtype with hSH_def
+    have hSH_p : IsPGroup p SH := S.isPGroup'.map M.subtype
+    obtain ⟨PH, hSH_le_PH⟩ := IsPGroup.exists_le_sylow hSH_p
+    have hPH_ne_bot : (PH : Subgroup H) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd PH
+    -- (iii) `V ≤ SH ≤ PH` (since `K₀ = O_p(↥M) ≤ S`).
+    have hV_le_SH : V ≤ SH := by
+      rw [hV_def, hSH_def]
+      exact Subgroup.map_mono (hK₀_def ▸ OddOrder.Isaacs.Ch01.opCore_le S)
+    have hV_le_PH : V ≤ (PH : Subgroup H) := hV_le_SH.trans hSH_le_PH
+    -- (iv) Nontrivial `Z(PH)` element `x`, `p`-central.
+    haveI : Nontrivial ↥(PH : Subgroup H) :=
+      (PH : Subgroup H).nontrivial_iff_ne_bot.mpr hPH_ne_bot
+    have hPHpg : IsPGroup p ↥(PH : Subgroup H) := PH.isPGroup'
+    have hZPH_nt : Nontrivial (Subgroup.center ↥(PH : Subgroup H)) := hPHpg.center_nontrivial
+    obtain ⟨⟨⟨x, hx_mem_PH⟩, hx_center⟩, hx_ne_one⟩ :=
+      exists_ne (1 : Subgroup.center ↥(PH : Subgroup H))
+    have hx_ne_one' : x ≠ 1 := by
+      intro h1; apply hx_ne_one; apply Subtype.ext; apply Subtype.ext; exact h1
+    have hx_pcentral : IsPCentral p x := ⟨hx_ne_one', PH, ⟨x, hx_mem_PH⟩, hx_center, rfl⟩
+    -- (v) `x ∈ M` (since `x ∈ Z(PH) ⊆ C_H(V) ⊆ N_H(V) = M`).
+    have hx_centralizes_V : x ∈ Subgroup.centralizer (V : Set H) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro v hv
+      have hv_PH : v ∈ (PH : Subgroup H) := hV_le_PH hv
+      have hcomm := (Subgroup.mem_center_iff.mp hx_center) ⟨v, hv_PH⟩
+      have := congrArg (Subgroup.subtype (PH : Subgroup H)) hcomm
+      simpa [Subgroup.coe_mul] using this
+    have hx_in_NV : x ∈ Subgroup.normalizer V := centralizer_le_normalizer V hx_centralizes_V
+    have hx_in_M : x ∈ M := hM_eq_NV ▸ hx_in_NV
+    -- (vi) `S = PH.subgroupOf M` (a `p`-subgroup of `↥M` containing the Sylow `S`).
+    set xM : ↥M := ⟨x, hx_in_M⟩ with hxM_def
+    have hPH_subOf_p : IsPGroup p ((PH : Subgroup H).subgroupOf M) :=
+      hPHpg.comap_subtype
+    have hS_le_PH_subOf : (S : Subgroup ↥M) ≤ (PH : Subgroup H).subgroupOf M := by
+      intro s hs
+      -- `↑s ∈ SH ≤ PH`.
+      have : M.subtype s ∈ SH := ⟨s, hs, rfl⟩
+      exact hSH_le_PH this
+    have hS_eq : (PH : Subgroup H).subgroupOf M = (S : Subgroup ↥M) :=
+      S.is_maximal' hPH_subOf_p hS_le_PH_subOf
+    -- `xM ∈ S` since `↑xM = x ∈ PH`, i.e. `xM ∈ PH.subgroupOf M = S`.
+    have hxM_in_S : xM ∈ (S : Subgroup ↥M) := by
+      rw [← hS_eq, Subgroup.mem_subgroupOf]; exact hx_mem_PH
+    -- (vii) `xM ∈ Z(S)`: `xM` centralizes `S` because `x ∈ Z(PH)` centralizes `PH ⊇ SH`.
+    have hxM_center_S : (⟨xM, hxM_in_S⟩ : ↥(S : Subgroup ↥M)) ∈
+        Subgroup.center (S : Subgroup ↥M) := by
+      rw [Subgroup.mem_center_iff]
+      intro s
+      apply Subtype.ext
+      apply Subtype.ext
+      -- Reduce to commutation in `H`: `x * ↑s = ↑s * x`.
+      have hs_PH : M.subtype (s : ↥M) ∈ (PH : Subgroup H) := by
+        have : M.subtype (s : ↥M) ∈ SH := ⟨(s : ↥M), s.2, rfl⟩
+        exact hSH_le_PH this
+      have hcomm := (Subgroup.mem_center_iff.mp hx_center) ⟨M.subtype (s : ↥M), hs_PH⟩
+      have hcomm' := congrArg (Subgroup.subtype (PH : Subgroup H)) hcomm
+      simp only [Subgroup.coe_mul, Subgroup.coe_subtype] at hcomm'
+      -- `hcomm' : x * ↑s = ↑s * x`; goal is `↑s * x = x * ↑s`.
+      simpa [Subgroup.coe_mul, hxM_def] using hcomm'
+    have hxM_in_ZS : xM ∈ ZS :=
+      ⟨⟨xM, hxM_in_S⟩, hxM_center_S, rfl⟩
+    -- (viii) `xM` centralizes `yM` (since `yM ∈ C = C_M(Z(S))` and `xM ∈ Z(S)`).
+    have hyM_in_C : yM ∈ C := y₀.2
+    have hxM_comm_yM : x * M.subtype yM = M.subtype yM * x := by
+      rw [hC_def, Subgroup.mem_centralizer_iff] at hyM_in_C
+      have hcomm := hyM_in_C xM hxM_in_ZS
+      -- `hcomm : xM * yM = yM * xM` in `↥M`; push to `H`.
+      have := congrArg (Subgroup.subtype M) hcomm
+      simp only [Subgroup.coe_mul, Subgroup.coe_subtype] at this
+      -- `↑xM = x`.
+      simpa [hxM_def] using this
+    -- (ix) `x` centralizes `↑yM`, hence `x ∈ N_H(YH)`.
+    have hx_norm_YH : x ∈ Subgroup.normalizer YH := by
+      apply centralizer_le_normalizer YH
+      rw [Subgroup.mem_centralizer_iff]
+      intro w hw
+      rw [hYH_def] at hw
+      obtain ⟨w₀, hw₀_mem, rfl⟩ := hw
+      -- `w₀ ∈ ⟨yM⟩`, so `w₀ = yM ^ k`; `x` commutes with `↑yM` ⇒ with `↑w₀`.
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hw₀_mem
+      -- `M.subtype (yM ^ k) = (M.subtype yM) ^ k`; `x` commutes with `M.subtype yM`.
+      rw [map_zpow]
+      -- goal: `(M.subtype yM)^k * x = x * (M.subtype yM)^k`.
+      have hcx : Commute x (M.subtype yM) := hxM_comm_yM
+      exact (hcx.zpow_right k).symm
+    -- (x) Step 6 swapped: `x` `p`-central normalizing nontrivial `q`-subgroup `YH` ⇒ False.
+    exact step6_qCentral_not_normalizes_nontrivial_pSubgroup (p := q) (q := p) (a := b) (b := a)
+      (Ne.symm hpq) (by rw [hH_card]; ring) hH_nsol hSubgroupsSolvable hx_pcentral
+      hYH_ne_bot hYH_q hx_norm_YH
+  -- (C) `C` is a `p`-subgroup of `↥M` containing the Sylow `S`, hence `C = S`.
+  exact S.is_maximal' hC_pgroup hS_le_C
+
+/-- **§7D Step 8 — full Sylow** (Isaacs L4060-4063): for a `p`-type maximal `M`
+and `S ∈ Syl_p(M)`, the image `S.map subtype` is a *full* Sylow `p`-subgroup of
+the ambient group `H`.
+
+Textbook proof: by the first part of Step 8, `J(S) ⊴ M`, and since `M` is
+maximal with `J(S) ≤ M` nontrivial and `M`-normalized, `N_H(J(S)) = M`.  If
+`S_H := S.map subtype` were not a full Sylow of `H`, then `S_H ◁ T` for a
+`p`-subgroup `T ⊋ S_H`; as `J(S_H)` is characteristic in `S_H`, `T` normalizes
+`J(S_H)`, so `T ⊆ N_H(J(S_H)) = M`, making `T` a `p`-subgroup of `M` properly
+containing the Sylow `S` — contradiction.
+
+This relies on the commutation of `thompsonJ` with the injective map `subtype`
+(`J(S_H) = J(S).map subtype`), a `Subgroup.thompsonJ`-map lemma not yet in the
+shared module; tracked as a residual axiom in issue 0032. -/
+axiom step8_sylow_full
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hH_nsol : ¬ IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    {M : Subgroup H} (hM_pType : IsPType p M)
+    (S : Sylow p ↥M)
+    (hJ_normal : (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
+    ((S : Subgroup ↥M).map M.subtype) ∈
+      Set.range (fun P : Sylow p H => (P : Subgroup H))
+
+/-- **§7D Step 8** (Isaacs L4045-4063) — *normal `J` and full Sylow for a
 `p`-type maximal*.
 
 Let `M` be a `p`-type maximal subgroup and `S ∈ Syl_p(M)`.  Then `J(S) ⊴ M` and
@@ -6740,17 +7010,57 @@ Step 6: `Z(S)` contains a `p`-central element, so a hypothetical order-`q`
 subgroup `Y ⊆ C_M(Z(S))` would be normalized by `Z(S)`, contradicting Step 6).
 Then `J(S) ⊴ M` by Thm 7.6, and `S` full Sylow since `T > S` would give
 `T ⊆ N_G(J(S)) = M`. -/
-axiom step8_normalJ_and_fullSylow
+theorem step8_normalJ_and_fullSylow
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hH_nsol : ¬ IsSolvable H)
     (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
     {M : Subgroup H} (hM_pType : IsPType p M)
     (S : Sylow p ↥M) :
     (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal ∧
       IsPGroup p ((S : Subgroup ↥M).map M.subtype) ∧
       ((S : Subgroup ↥M).map M.subtype) ∈
-        Set.range (fun P : Sylow p H => (P : Subgroup H))
+        Set.range (fun P : Sylow p H => (P : Subgroup H)) := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- `M ≠ ⊥`, `M ≠ ⊤`, `M` solvable.
+  have hM_ne_bot : M ≠ ⊥ := by
+    intro hMbot
+    have : Subsingleton ↥M := by rw [hMbot]; infer_instance
+    exact hM_pType.2 (Subgroup.eq_bot_of_subsingleton _)
+  have hM_ne_top : M ≠ ⊤ := hM_pType.1.ne_top
+  haveI hM_sol : IsSolvable ↥M := hSubgroupsSolvable M hM_ne_top
+  -- Step 7: both primes odd.
+  obtain ⟨hp2, hq2⟩ := step7_p_ne_two_and_q_ne_two hpq hH_card hH_nsol hSubgroupsSolvable
+  -- The five normal-J hypotheses on the group `↥M`.
+  -- (1) `↥M` is `p`-solvable (it is solvable).
+  haveI hM_pSep : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) ↥M := inferInstance
+  -- (2) `p ≠ 2`.
+  -- (3) Sylow-`2` subgroups abelian (trivial since `2 ∤ |M|`).
+  have h2_not_dvd : ¬ (2 : ℕ) ∣ Nat.card ↥M :=
+    two_not_dvd_card_subgroup_of_odd_primes hpq hH_card hp2 hq2 M
+  have h2abelian : ∀ T : Subgroup ↥M, IsPGroup 2 T → ∀ x y : ↥T, x * y = y * x :=
+    sylow2_abelian_of_two_not_dvd h2_not_dvd
+  -- (4) `O_{p'}(M) = ⊥`.
+  have h_oPiPrime : OddOrder.Isaacs.Ch03.oPiCore {r | r ≠ p} ↥M = ⊥ :=
+    oPiCore_pPrime_eq_bot_of_isPType hpq hH_card hSubgroupsSolvable hM_pType
+  -- The `normal_J` 4th hypothesis is phrased with `{q | q ≠ p}`; align the set.
+  have h_oPiPrime' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} ↥M = ⊥ := h_oPiPrime
+  -- (5) `C_M(Z(S)) = S`.
+  have h_centralizer : Subgroup.centralizer
+      (((Subgroup.center (S : Subgroup ↥M)).map (S : Subgroup ↥M).subtype) : Set ↥M)
+      = (S : Subgroup ↥M) :=
+    step8_centralizer_center_eq_sylow hpq hH_card hH_nsol hSubgroupsSolvable hM_pType S
+  -- Conclude `J(S) ⊴ M` by the normal-J theorem.
+  have hJ_normal : (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal :=
+    normal_J S hp2 hM_pSep h2abelian h_oPiPrime' h_centralizer
+  refine ⟨hJ_normal, ?_, ?_⟩
+  · -- (2) `S.map M.subtype` is a `p`-group (image of the `p`-group `S`).
+    exact (S.isPGroup'.map M.subtype)
+  · -- (3) `S.map M.subtype` is a full Sylow `p`-subgroup of `H` (Step 8 second half).
+    exact step8_sylow_full hpq hH_card hH_nsol hSubgroupsSolvable hM_pType S hJ_normal
 
 /-- **§7D Step 9 axiom** (Isaacs L4065-4093) — *the final contradiction*.
 
@@ -6817,7 +7127,7 @@ theorem noNonsolvableSimplePaQb.{u}
   have hStep8 : ∀ {M : Subgroup H} (_ : IsPType p M) (S : Sylow p ↥M),
       (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal := by
     intro M hM_pType S
-    exact (step8_normalJ_and_fullSylow hpq hH_card hSubgroupsSolvable hM_pType S).1
+    exact (step8_normalJ_and_fullSylow hpq hH_card hH_nsol hSubgroupsSolvable hM_pType S).1
   -- Step 9: terminal contradiction.
   exact step9_contradiction hpq hH_card hH_nsol hSubgroupsSolvable hp2 hq2
     hStep8 hPartition
