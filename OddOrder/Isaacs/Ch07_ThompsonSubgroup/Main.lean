@@ -387,6 +387,20 @@ theorem step3_main
   have hA_ne_bot : A ≠ ⊥ := A.nontrivial_iff_ne_bot.mp hA_nt
   haveI hA_comm : IsMulCommutative A :=
     ⟨⟨fun x y => eA.symm.injective (by rw [map_mul, map_mul, mul_comm])⟩⟩
+  -- L6 prerequisites: `N_H(M) = M` (M maximal in simple H), and `M^g := M.map (conj g)`
+  -- is again maximal.
+  have hNM_eq_M : Subgroup.normalizer M = M := by
+    rcases eq_or_lt_of_le Subgroup.le_normalizer with h | h
+    · exact h.symm
+    · exfalso
+      have hNtop : Subgroup.normalizer M = ⊤ := hM_max.2 _ h
+      have hMnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hb | ht
+      · exact (M.nontrivial_iff_ne_bot.mp inferInstance) hb
+      · exact hM_max.1 ht
+  set Mg : Subgroup H := M.map (MulAut.conj g) with hMg_def
+  have hMg_coatom : IsCoatom Mg := by
+    rw [hMg_def]; exact (Subgroup.isCoatom_map (MulAut.conj g)).mpr hM_max
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
