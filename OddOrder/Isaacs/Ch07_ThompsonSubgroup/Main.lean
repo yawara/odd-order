@@ -189,6 +189,42 @@ theorem step3_main
   -- `Z_p ⊴ M`, `Z_q ⊴ M` (the centers of the cores are `M`-normal).
   haveI hZp_normal : Zp.Normal := by rw [hZp_def]; exact zCenterOpCoreSubgroup_normal
   haveI hZq_normal : Zq.Normal := by rw [hZq_def]; exact zCenterOpCoreSubgroup_normal
+  -- L1. `Z := Z_p · Z_q ≤ M`, nontrivial (Isaacs L3983).
+  have hZpH_le_M : ZpH ≤ M := by rw [hZpH_eq]; exact Subgroup.map_subtype_le _
+  have hZqH_le_M : ZqH ≤ M := by rw [hZqH_eq]; exact Subgroup.map_subtype_le _
+  set Z : Subgroup H := ZpH ⊔ ZqH with hZ_def
+  have hZpH_le_Z : ZpH ≤ Z := le_sup_left
+  have hZqH_le_Z : ZqH ≤ Z := le_sup_right
+  have hZ_le_M : Z ≤ M := sup_le hZpH_le_M hZqH_le_M
+  have hZ_ne_bot : Z ≠ ⊥ := by
+    intro h; exact hZpH_ne_bot (le_bot_iff.mp (h ▸ hZpH_le_Z))
+  -- `p, q ∣ |Z|` (nontrivial `p`-/`q`-subgroups `ZpH, ZqH ≤ Z`).
+  have hp_dvd_Z : p ∣ Nat.card ↥Z := by
+    haveI : Nontrivial ↥ZpH := ZpH.nontrivial_iff_ne_bot.mpr hZpH_ne_bot
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := ↥ZpH)).mp hZpH_pgroup
+    have hn0 : n ≠ 0 := by
+      rintro rfl; rw [pow_zero] at hn
+      exact absurd hn (Finite.one_lt_card_iff_nontrivial.mpr ‹_›).ne'
+    exact (hn ▸ dvd_pow_self p hn0).trans (Subgroup.card_dvd_of_le hZpH_le_Z)
+  have hq_dvd_Z : q ∣ Nat.card ↥Z := by
+    haveI : Nontrivial ↥ZqH := ZqH.nontrivial_iff_ne_bot.mpr hZqH_ne_bot
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q) (G := ↥ZqH)).mp hZqH_qgroup
+    have hn0 : n ≠ 0 := by
+      rintro rfl; rw [pow_zero] at hn
+      exact absurd hn (Finite.one_lt_card_iff_nontrivial.mpr ‹_›).ne'
+    exact (hn ▸ dvd_pow_self q hn0).trans (Subgroup.card_dvd_of_le hZqH_le_Z)
+  -- `M ≤ N_H(Z)` (`Z_p, Z_q` are `M`-normal, so `M` normalizes their join).
+  have hM_norm_ZpH : M ≤ Subgroup.normalizer ZpH := by
+    have h := map_le_normalizer_map_of_normal (φ := M.subtype) (P := ⊤) (L := Zp)
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype] at h
+    rwa [← hZpH_eq] at h
+  have hM_norm_ZqH : M ≤ Subgroup.normalizer ZqH := by
+    have h := map_le_normalizer_map_of_normal (φ := M.subtype) (P := ⊤) (L := Zq)
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype] at h
+    rwa [← hZqH_eq] at h
+  have hM_norm_Z : M ≤ Subgroup.normalizer Z :=
+    (le_inf hM_norm_ZpH hM_norm_ZqH).trans
+      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup ZpH ZqH)
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
