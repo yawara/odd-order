@@ -129,12 +129,42 @@ threading a fine-grained per-step decomposition.  `burnside_p_pow_q_pow`
   q-central element (needs Hall-Higman `hall_higman_opCore` + Step 4 + the
   N_G(O_p(M)) = M identification).
 - `step8_normalJ_and_fullSylow` (Step 8): apply normal-J (Thm 7.6) to p-type M.
+  **(2026-05-27: now a theorem — see update below; only `step8_sylow_full`
+  residual remains.)**
 - `step9_contradiction` (Step 9): Sylow-intersection counting + Thompson
   factorization (helpers `opCore_ne_bot_of_card_sylow_sq_gt`,
   `index_opCore_le_index_sylow_sq` in Ch01 §1F are available).
 
 Next: Step 5b (Hall-Higman is landed) and Step 8 (normal_J is landed) are the
 most tractable remaining. Step 3, 4, 9 are the deepest.
+
+## 2026-05-27 update — Step 8 core discharged
+
+`step8_normalJ_and_fullSylow` is **no longer an axiom**: it is now a *theorem*.
+The big monolith is replaced by a proof of the two load-bearing conjuncts
+(`J(S) ⊴ M`, `S` a p-group) + one sharply-scoped residual sub-axiom for the
+non-load-bearing full-Sylow conjunct.
+
+**Proven (sorry-free)**:
+- `oPiCore_pPrime_eq_bot_of_isPType` — normal-J hyp (4): `O_{p'}(M) = ⊥` for
+  p-type M (O_{p'}(M) is a {q}-group ≤ O_q(M) = ⊥ via the dichotomy).
+- `two_not_dvd_card_subgroup_of_odd_primes` + `sylow2_abelian_of_two_not_dvd`
+  — normal-J hyps (2),(3): `2 ∤ |M|` (p,q odd) ⇒ Sylow-2 of M trivial/abelian.
+- `step8_centralizer_center_eq_sylow` — normal-J hyp (5) `C_M(Z(S)) = S`, the
+  hard part (~140 LOC): `C_M(Z(S))` is a p-group, else Cauchy gives an order-q
+  `y ∈ C_M(Z(S))`; `Y = ⟨y⟩` nontrivial q-subgroup of H; with `S = P_H ∩ M`
+  and `M = N_H(O_p(M))`, nontrivial `Z(P_H) ⊆ S` gives a p-central element `x`
+  of H with `x ∈ Z(S)`, which centralizes (so normalizes) `Y`, contradicting
+  Step 6 with p,q swapped. Sylow maximality then forces `C_M(Z(S)) = S`.
+- `step8_normalJ_and_fullSylow` — wires hyps 1-5 through `normal_J` (Thm 7.6)
+  to `J(S) ⊴ M`, plus the trivial p-group conjunct; `hH_nsol` threaded from
+  the caller `noNonsolvableSimplePaQb`.
+
+**New residual sub-axiom** `step8_sylow_full` (Step 8 second half, conjunct 3):
+`S.map subtype` is a *full* Sylow p-subgroup of H. Blocked only on a
+`Subgroup.thompsonJ`-map commutation lemma (`J(S.map f) = (J S).map f` for
+injective f) not yet in the shared `ThompsonSubgroup` module. **Not consumed**
+by `noNonsolvableSimplePaQb` (that wiring uses only the `J(S) ⊴ M` conjunct).
 
 ## 完了条件
 
