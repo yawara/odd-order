@@ -11,6 +11,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 namespace OddOrder.Isaacs.Ch06
 
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup/Monoid now scoped
+
 section /- 6B structural helper: finite abelian Z-groups -/
 
 /-! ### Finite abelian Z-group helpers

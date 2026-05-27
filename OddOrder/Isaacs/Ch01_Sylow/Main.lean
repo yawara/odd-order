@@ -175,7 +175,7 @@ theorem card_sylow_modEq_one_of_max_inter
     intro Q
     -- stabilizer ↥Ssub Q を (N_G(Q)).subgroupOf Ssub と同定する.
     have hstab_eq : MulAction.stabilizer Ssub Q
-        = (Subgroup.normalizer (Q : Subgroup G)).subgroupOf Ssub := by
+        = (Subgroup.normalizer (Q : Set G)).subgroupOf Ssub := by
       ext ⟨g, hg⟩
       have hsmul : (⟨g, hg⟩ : Ssub) • Q = g • Q := rfl
       rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf, hsmul,
@@ -187,9 +187,9 @@ theorem card_sylow_modEq_one_of_max_inter
       -- ((N_G Q).subgroupOf Ssub).index = (N_G Q).relIndex Ssub  (定義).
       -- = (Ssub ⊓ N_G Q).relIndex Ssub (`inf_relIndex_right`).
       -- = (Ssub ⊓ Q).relIndex Ssub (`IsPGroup.inf_normalizer_sylow`).
-      change (Subgroup.normalizer (Q : Subgroup G)).relIndex Ssub
+      change (Subgroup.normalizer (Q : Set G)).relIndex Ssub
         = (Ssub ⊓ (Q : Subgroup G)).relIndex Ssub
-      rw [← Subgroup.inf_relIndex_right (Subgroup.normalizer (Q : Subgroup G)) Ssub, inf_comm,
+      rw [← Subgroup.inf_relIndex_right (Subgroup.normalizer (Q : Set G)) Ssub, inf_comm,
           S.2.inf_normalizer_sylow Q]
     rw [Nat.card_coe_set_eq, ← MulAction.index_stabilizer, hstab]
   -- d は p 冪. (S は p-群なので Ssub の任意の部分群の index も p 冪.)
@@ -2029,14 +2029,14 @@ private lemma card_sylow_three_of_card_eq_twenty_four
 private lemma card_normalizer_sylow_three_of_card_eq_twenty_four
     [Finite G] (hcard : Nat.card G = 24) (hn3 : 1 < Nat.card (Sylow 3 G))
     (P : Sylow 3 G) :
-    Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G)) = 6 := by
+    Nat.card (Subgroup.normalizer (P : Set G)) = 6 := by
   haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   have hn3_eq : Nat.card (Sylow 3 G) = 4 :=
     card_sylow_three_of_card_eq_twenty_four hcard hn3
-  have hidx : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index = 4 := by
+  have hidx : (Subgroup.normalizer (P : Set G)).index = 4 := by
     rw [← P.card_eq_index_normalizer]; exact hn3_eq
-  have h1 : Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G)) *
-      (Subgroup.normalizer ((P : Subgroup G) : Set G)).index = Nat.card G :=
+  have h1 : Nat.card (Subgroup.normalizer (P : Set G)) *
+      (Subgroup.normalizer (P : Set G)).index = Nat.card G :=
     Subgroup.card_mul_index _
   rw [hcard, hidx] at h1
   omega
@@ -2070,7 +2070,7 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
   obtain ⟨P⟩ := Sylow.nonempty (p := 3) (G := G)
   have hPcard : Nat.card (P : Subgroup G) = 3 :=
     card_sylow_three_of_card_twenty_four hcard P
-  set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_def
+  set N : Subgroup G := Subgroup.normalizer (P : Set G) with hN_def
   have hN_card : Nat.card N = 6 :=
     card_normalizer_sylow_three_of_card_eq_twenty_four hcard hn3 P
   have hN_index : N.index = 4 := by
@@ -2758,7 +2758,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     -- And gcd(np, p) = 1 by Sylow's third theorem.
     -- So np ∣ q.
     obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
-    have hidx_dvd : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index ∣ Nat.card G :=
+    have hidx_dvd : (Subgroup.normalizer (P : Set G)).index ∣ Nat.card G :=
       Subgroup.index_dvd_card _
     rw [← P.card_eq_index_normalizer, hcard] at hidx_dvd
     -- np ∣ p^a q, gcd(np, p) = 1 ⇒ np ∣ q.

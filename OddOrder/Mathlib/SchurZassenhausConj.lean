@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
 open scoped Pointwise
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid/CommGroup is now scoped
 
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)

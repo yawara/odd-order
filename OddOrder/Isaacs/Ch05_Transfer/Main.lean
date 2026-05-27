@@ -11,6 +11,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 
 open scoped commutatorElement
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup/Monoid now scoped
 
 /-!
 # OddOrder.Isaacs.Ch05 — Transfer
@@ -146,7 +147,7 @@ theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
   -- mathlib transferSylow パターンと同じ @ explicit 形で typeclass diamond 回避
   let v : G →* (P : Subgroup G) :=
     @MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
-      (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+      ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
         (MonoidHom.id (P : Subgroup G)) _
   -- transfer_eq_pow for z central: v(z) val = z^|G:P|
   have h_key : ∀ (k : ℕ) (g₀ : G), g₀⁻¹ * z₀.val ^ k * g₀ ∈ (P : Subgroup G) →
@@ -162,10 +163,10 @@ theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
       _ = z₀.val ^ k := by group
   have hv_z_val : (v z₀.val).val = z₀.val ^ (P : Subgroup G).index := by
     show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
-        (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+        ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
           (MonoidHom.id (P : Subgroup G)) _) z₀.val).val = _
     rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)
-          (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+          ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
             (MonoidHom.id (P : Subgroup G)) _ z₀.val h_key]
     rfl
   -- v hom to abelian ⇒ commutator G ≤ ker v ⇒ v(z) = 1
@@ -623,7 +624,7 @@ theorem normalizer_controls_centralizer_fusion
     (hx : x ∈ Subgroup.centralizer (P : Set G))
     (hy : y ∈ Subgroup.centralizer (P : Set G))
     (hgxy : g * x * g⁻¹ = y) :
-    ∃ n : G, n ∈ Subgroup.normalizer (P : Subgroup G) ∧ n * x * n⁻¹ = y := by
+    ∃ n : G, n ∈ Subgroup.normalizer (P : Set G) ∧ n * x * n⁻¹ = y := by
   set K : Subgroup G := Subgroup.centralizer ({y} : Set G) with hK_def
   -- y ∈ C_G(P) ⇒ P ≤ K = C_G(y)
   have hP_le_K : (P : Subgroup G) ≤ K := by
@@ -688,7 +689,7 @@ complement for the chosen Sylow subgroup, to this file's `HasNormalPComplement`
 predicate requiring the same normal complement for every Sylow subgroup. -/
 theorem hasNormalPComplement_of_sylow_normalizer_le_centralizer
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
-    (hP : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤
+    (hP : Subgroup.normalizer (P : Set G) ≤
       Subgroup.centralizer ((P : Subgroup G) : Set G)) :
     HasNormalPComplement p G := by
   classical
@@ -731,12 +732,12 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) [P.FiniteIndex]
     [hPab : IsMulCommutative (P : Subgroup G)]
     {x : G} (hx_comm : x ∈ commutator G) (hx_P : x ∈ (P : Subgroup G))
-    (hx_central_N : ∀ n ∈ Subgroup.normalizer (P : Subgroup G), n * x = x * n) :
+    (hx_central_N : ∀ n ∈ Subgroup.normalizer (P : Set G), n * x = x * n) :
     x = 1 := by
   -- Setup transfer v : G →* ↥P (P abelian)
   let v : G →* (P : Subgroup G) :=
     @MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
-      (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+      ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
         (MonoidHom.id (P : Subgroup G)) _
   -- P abelian ⇒ P ⊆ centralizer P
   have hP_le_centP : (P : Subgroup G) ≤ Subgroup.centralizer (P : Set G) := by
@@ -770,10 +771,10 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
   -- v(x).val = x^|G:P|
   have hv_x_val : (v x).val = x ^ (P : Subgroup G).index := by
     show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
-        (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+        ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
           (MonoidHom.id (P : Subgroup G)) _) x).val = _
     rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)
-          (@CommGroup.ofIsMulCommutative ↥(P : Subgroup G) _ hPab)
+          ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
             (MonoidHom.id (P : Subgroup G)) _ x h_key]
     rfl
   -- v(x) = 1 (x ∈ G', v hom to abelian)
@@ -839,7 +840,7 @@ theorem isaacs_thm_5_17
   -- P abelian (cyclic)
   haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
   -- N := N_G(P), P_N := P.subgroupOf N (normal in N)
-  set N := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_def
+  set N := Subgroup.normalizer (P : Set G) with hN_def
   set P_N : Subgroup ↥N := (P : Subgroup G).subgroupOf N with hP_N_def
   haveI hP_N_normal : P_N.Normal := Subgroup.normal_in_normalizer
   haveI : Finite ↥N := inferInstance
@@ -1013,7 +1014,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
     intro h_eq; rw [h_eq, orderOf_one] at ht_ord_g; norm_num at ht_ord_g
   -- t ∈ Z(N(P)): for n ∈ N(P), n * t * n⁻¹ = t (cyclic unique order-2)
   have ht_central :
-      ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), n * t = t * n := by
+      ∀ n ∈ Subgroup.normalizer (P : Set G), n * t = t * n := by
     intro n hn
     have hntn_inP : n * t * n⁻¹ ∈ (P : Subgroup G) :=
       (Subgroup.mem_normalizer_iff.mp hn t).mp ht_inP
@@ -1577,10 +1578,10 @@ its own centralizer. -/
 theorem APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow
     [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     [IsMulCommutative ↥(P : Subgroup G)] :
-    APrime p (Subgroup.normalizer ((P : Subgroup G) : Set G)) =
-      (APrime p G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+    APrime p (Subgroup.normalizer (P : Set G)) =
+      (APrime p G).subgroupOf (Subgroup.normalizer (P : Set G)) := by
   classical
-  let N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G)
+  let N : Subgroup G := Subgroup.normalizer (P : Set G)
   have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
   have hFusion : N.ControlsFusionIn (P : Subgroup G) := by
     intro x y hxP hyP hxy
@@ -2564,10 +2565,10 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
     -- c centralizes y
     have hcy : c * y = y * c := (Subgroup.mem_centralizer_iff.mp hc_C y hy_in_PgP).symm
     -- cg ∈ N(P): c • gP = P ⇒ (c * g) • P = P ⇒ cg ∈ normalizer
-    have hcg_in_N : c * g ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := by
+    have hcg_in_N : c * g ∈ Subgroup.normalizer (P : Set G) := by
       rw [← Sylow.smul_eq_iff_mem_normalizer, mul_smul, ← hgP_def]
       exact hc_smul
-    set N_P : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_P_def
+    set N_P : Subgroup G := Subgroup.normalizer (P : Set G) with hN_P_def
     -- P ≤ N(P) (general)
     have hP_le_N : (P : Subgroup G) ≤ N_P := Subgroup.le_normalizer
     -- P as Sylow of ↥N(P)

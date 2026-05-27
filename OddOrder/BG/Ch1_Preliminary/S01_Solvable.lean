@@ -224,7 +224,7 @@ theorem centralizer_fitting_le_fitting
     rw [Subgroup.map_subtype_commutator] at hx_map
     exact ⟨x.2, hcomm_le_F hx_map⟩
   have hquot_mul_comm : ∀ x y : K ⧸ N, x * y = y * x :=
-    (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_K_le_N).comm
+    (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_K_le_N).is_comm.comm
   haveI hquot_nilpotent : Group.IsNilpotent (K ⧸ N) := by
     rw [nilpotent_iff_lowerCentralSeries]
     refine ⟨1, ?_⟩
@@ -605,7 +605,7 @@ theorem frattini_le_commutator_sup_pow_closure
     · have hcomm_le : commutator R ≤ K := by
         dsimp [K]
         exact le_sup_left
-      exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_le).comm
+      exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_le).is_comm.comm
     · intro q
       obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
       rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
