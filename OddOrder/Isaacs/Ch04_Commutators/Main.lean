@@ -257,7 +257,7 @@ theorem isElementaryAbelian_quotient_center_of_class_le_two
     (hExp : ∀ c ∈ _root_.commutator G, c ^ p = 1) :
     OddOrder.GroupTheory.IsElementaryAbelian p (G ⧸ Subgroup.center G) := by
   refine ⟨?_, ?_⟩
-  · exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hC).comm
+  · exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hC).is_comm.comm
   · intro a
     obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
     have hxp : x^p ∈ Subgroup.center G :=
@@ -375,7 +375,7 @@ private lemma commutator_le_of_isCoatom_of_pgroup
   -- commutator P ≤ M iff P/M abelian
   rw [← Subgroup.Normal.quotient_commutative_iff_commutator_le]
   letI := IsCyclic.commGroup (α := P ⧸ M)
-  exact ⟨mul_comm⟩
+  exact ⟨⟨mul_comm⟩⟩
 
 /-- For finite `p`-group `P` and maximal `M`, `x^p ∈ M` for all `x : P`. -/
 private lemma pow_p_mem_of_isCoatom_of_pgroup
@@ -423,7 +423,7 @@ theorem isElementaryAbelian_quotient_of_frattini_le_of_pgroup
   · -- P/N abelian
     have h_comm_le : _root_.commutator P ≤ N :=
       le_trans (commutator_le_frattini_of_pgroup hP) hΦ
-    exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr h_comm_le).comm
+    exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr h_comm_le).is_comm.comm
   · -- ∀ q : P/N, q^p = 1
     intro q
     obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
@@ -472,6 +472,9 @@ private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
         exact le_antisymm hMK_le this
       exact absurd hM_eq_K (ne_of_lt hMK)
 
+-- rc2: scoped `IsMulCommutative → CommGroup` (consistent with the ambient `Group`,
+-- unlike an explicit `{ … with mul_comm }` which makes a diamond).
+open scoped IsMulCommutative in
 /-- **Isaacs Lemma 4.5 forward**: For finite `p`-group `P` and `N ⊴ P`,
 `P/N` is `p`-elementary abelian ⇒ `Φ(P) ⊆ N`.
 
@@ -1154,7 +1157,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     -- Step 1: commutator P ≤ A (P/A cyclic ⇒ abelian)
     have hG'_le_A : _root_.commutator P ≤ A := by
       letI : CommGroup (P ⧸ A) := IsCyclic.commGroup
-      exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨mul_comm⟩
+      exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
     -- Step 2: |commutator P| = p^k via Lem 4.6 cardinality
     have hG'_card : Nat.card (_root_.commutator P) = p^k := by
       have h := card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
@@ -1823,7 +1826,9 @@ private theorem isPiGroup_compl_top_of_isMulCommutative_opCore_eq_bot
     Nat.dvd_of_mem_primeFactors hq
   have hp_dvd : p ∣ Nat.card G := by simpa using hp_dvd_top
   let P : Sylow p G := default
-  letI : CommGroup G := @CommGroup.ofIsMulCommutative G _ ‹IsMulCommutative G›
+  -- rc2: `CommGroup.ofIsMulCommutative` removed; build CommGroup from the IsMulCommutative.
+  letI : CommGroup G :=
+    { (inferInstance : Group G) with mul_comm := ‹IsMulCommutative G›.is_comm.comm }
   haveI : (P : Subgroup G).Normal := Subgroup.normal_of_comm _
   have hP_le : (P : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G :=
     OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore P.isPGroup'
