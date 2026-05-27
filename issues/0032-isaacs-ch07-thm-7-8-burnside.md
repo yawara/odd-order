@@ -129,8 +129,7 @@ threading a fine-grained per-step decomposition.  `burnside_p_pow_q_pow`
   q-central element (needs Hall-Higman `hall_higman_opCore` + Step 4 + the
   N_G(O_p(M)) = M identification).
 - `step8_normalJ_and_fullSylow` (Step 8): apply normal-J (Thm 7.6) to p-type M.
-  **(2026-05-27: now a theorem — see update below; only `step8_sylow_full`
-  residual remains.)**
+  **(2026-05-27: fully discharged as a theorem — axiom-free; see updates below.)**
 - `step9_contradiction` (Step 9): Sylow-intersection counting + Thompson
   factorization (helpers `opCore_ne_bot_of_card_sylow_sq_gt`,
   `index_opCore_le_index_sylow_sq` in Ch01 §1F are available).
@@ -160,11 +159,24 @@ non-load-bearing full-Sylow conjunct.
   to `J(S) ⊴ M`, plus the trivial p-group conjunct; `hH_nsol` threaded from
   the caller `noNonsolvableSimplePaQb`.
 
-**New residual sub-axiom** `step8_sylow_full` (Step 8 second half, conjunct 3):
-`S.map subtype` is a *full* Sylow p-subgroup of H. Blocked only on a
-`Subgroup.thompsonJ`-map commutation lemma (`J(S.map f) = (J S).map f` for
-injective f) not yet in the shared `ThompsonSubgroup` module. **Not consumed**
-by `noNonsolvableSimplePaQb` (that wiring uses only the `J(S) ⊴ M` conjunct).
+**Update (same day): `step8_sylow_full` also discharged — Step 8 is now
+axiom-free.** Added three reusable lemmas to the shared `ThompsonSubgroup` /
+`ElementaryAbelian` modules:
+- `IsElementaryAbelian.of_mulEquiv`, `Subgroup.IsElementaryAbelian.map`/`.of_map`
+  — elementary-abelian transports across group isos / injective maps.
+- `Subgroup.thompsonJ_map_of_injective` — `J(f(P)) = f(J(P))` for injective `f`.
+- `Subgroup.thompsonJ_ne_bot` — `J(P) ≠ ⊥` for nontrivial finite p-groups.
+- `Subgroup.thompsonJ_map_conj_eq_of_mem_normalizer` — `g ∈ N(P) ⇒ g·J(P)·g⁻¹ =
+  J(P)`.
+With these, `step8_sylow_full` is a theorem: `SH := S.map subtype` extends to
+`PH ∈ Syl_p(H)`; if `SH < PH` the normalizer condition for the nilpotent
+p-group `PH` gives `t ∈ N_PH(SH) \ SH` normalizing `J(SH)`, so `t ∈
+N_H(J(SH)) = M`, hence `t ∈ M ∩ PH = SH` — contradiction; so `SH = PH`.
+
+**§7D axiom count is now 3** (`step3_not_both_opCore_ne_bot`,
+`step5b_pType_no_qCentral`, `step9_contradiction`); the whole Step 8 monolith
+is gone.  (The Fitting helper `fitting_ne_bot_of_solvable_nontrivial` and
+Thm 7.6's `step5_Abar_card_eq_p` are separate, already-theorem / Thm-7.6 items.)
 
 ## 完了条件
 
