@@ -8,6 +8,9 @@ import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
+-- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
+open scoped IsMulCommutative
+
 /-!
 # Elementary Abelian Groups
 
