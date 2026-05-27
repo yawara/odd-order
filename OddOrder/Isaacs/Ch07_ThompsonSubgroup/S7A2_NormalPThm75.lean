@@ -13,6 +13,7 @@ namespace OddOrder.Isaacs.Ch07
 
 open scoped commutatorElement
 open scoped Pointwise
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid (for Additive V) now scoped
 
 variable {G : Type*} [Group G]
 
