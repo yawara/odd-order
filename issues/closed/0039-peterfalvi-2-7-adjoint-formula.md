@@ -58,17 +58,16 @@ orbit-stabilizer で `P = |Stab|·|orbit| = |C_G(a)|`.
       S04 `Hypothesis.isConj_in_L_of_mul_H` (commit 18ee01c).
       付随 helper: `commute_of_mem_H`, `orderOf_dvd_card_centralizerIn`
 - [x] **Hypothesis 符号化の修正**: `H_normalized` field 追加 (commit 3deaa9e)
-- [ ] `|C_G(a)| = |H(a)|·|C_L(a)|` (正規性 field 追加済みで実装可能)
-      経路: `centralizerIn L a ≤ (H a).normalizer` (H_normalized 両方向) →
-      `Subgroup.coe_mul_of_right_le_normalizer_left` で `↑(H⊔C_L)=↑H*↑C_L` →
-      `mul_injective_of_disjoint` (centralizer_disjoint) + 全射 → 全単射 →
-      `Nat.card_prod`. (~50 行)
-- [ ] `|a^L|·|C_L(a)| = |L|` (L 内 ConjAct orbit-stabilizer;
-      a^L = orbit, C_L(a)=stabilizer)
-- [ ] S04 で三重和 double-count 組立 + 正規化 (star/inv, supportedness, ψ averaging)
-      + `adjoint_formula` に `HConjInvariant` 前提を追加.
-      **これが最大の残作業** (~150-250 行): `card_conj_fiber` で W(g) を評価し、
-      `S_g = {a∈A : g∈(aH(a))^G} = a₀^L` (= [2.4.b] ⊆ + [HConjInvariant] ⊇) を使う.
+- [x] `|C_G(a)| = |H(a)|·|C_L(a)|` → `Hypothesis.card_centralizer_eq`
+      (`centralizerIn L a ≤ normalizer (H a)` from H_normalized →
+      `coe_mul_of_right_le_normalizer_left` → mul bijection `H×C_L ≃ C_G(a)`) — commit 40211fe
+- [x] `∑_{a∈S_g}|C_L(a)| = |L|` → `Hypothesis.sum_card_centralizerIn_eq`
+      (S_g = a₀^L via [2.4.b]⊆ + HConjInvariant⊇; fiberwise count of the
+      conjugation map L→A with `card_conjugatorIn_L` + `card_centralizerIn_conj`)
+      — commits 02d54e5, b259509
+- [x] S04 三重和 double-count 組立 + 正規化 + `adjoint_formula` に `HConjInvariant`
+      前提を追加.  `fiber_regroup` (per-a 半分) + `sum_card_centralizerIn_eq`
+      (multiplicity |L|) で完成 — commits 83ffc6b, 0d8307e
 
 ## 進捗メモ (2026-05-27 セッション)
 
@@ -96,10 +95,15 @@ H_normalized : ∀ (a : {a // a ∈ A}) (c : G),
 - `restrict`: H 不変なので持ち越し.
 これで `|C_G(a)|=|H||C_L|` (H 正規 ⟹ join=集合積 ⟹ 位数積) と fiber count 適用が可能.
 
-## 完了条件
+## 完了条件 ✅ 達成 (2026-05-27)
 
 `adjoint_formula` の `sorry` が消え、`lake build OddOrder.Peterfalvi.S04_DadeIsometry`
-が通る.
+が sorry/警告なしで通る.  §4 The Dade Isometry は (2.1)-(2.7) まで形式化完了.
+(2.8)-(2.11) は別 issue / Task で対応.
+
+追加した補題 (all in S04_DadeIsometry.lean):
+`card_centralizerIn_conj`, `card_conjugatorIn_L`, `Hypothesis.card_centralizer_eq`,
+`Hypothesis.sum_card_centralizerIn_eq`, `Hypothesis.fiber_regroup`.
 
 ## 参照
 
