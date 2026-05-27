@@ -374,6 +374,19 @@ theorem step3_main
     exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hZpH_le_SH
   have hA_le_M : A ≤ M := hA_le_SH.trans hSH_le_M
   have hA_norm_Zq : A ≤ Subgroup.normalizer ZqH := hA_le_M.trans hM_norm_ZqH
+  -- A's algebraic properties via the conjugation iso `ZpH ≃* A`.
+  have eA : ZpH ≃* A := by rw [hA_def]; exact Subgroup.equivSMul (ConjAct.toConjAct g) ZpH
+  have hcardA : Nat.card ↥A = Nat.card ↥ZpH := Nat.card_congr eA.symm.toEquiv
+  have hA_pgroup : IsPGroup p A := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := ↥ZpH)).mp hZpH_pgroup
+    exact IsPGroup.iff_card.mpr ⟨n, by rw [hcardA, hn]⟩
+  haveI hZpH_nt : Nontrivial ↥ZpH := ZpH.nontrivial_iff_ne_bot.mpr hZpH_ne_bot
+  haveI hA_nt : Nontrivial ↥A := by
+    rw [← Finite.one_lt_card_iff_nontrivial, hcardA]
+    exact Finite.one_lt_card_iff_nontrivial.mpr hZpH_nt
+  have hA_ne_bot : A ≠ ⊥ := A.nontrivial_iff_ne_bot.mp hA_nt
+  haveI hA_comm : IsMulCommutative A :=
+    ⟨⟨fun x y => eA.symm.injective (by rw [map_mul, map_mul, mul_comm])⟩⟩
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
