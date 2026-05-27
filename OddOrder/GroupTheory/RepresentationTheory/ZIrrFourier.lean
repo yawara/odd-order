@@ -241,4 +241,56 @@ theorem irreducibleCharacter_apply_one_eq_pos_natCast (χ : IrreducibleCharacter
   exact ⟨Module.finrank ℂ V, finrank_pos_of_isIrreducible ρ hρ, by
     rw [congrFun hχ 1, ρ.char_one]⟩
 
+/-- **Norm-2 virtual character is a difference of two distinct irreducible characters.**
+If `φ ∈ ZIrr G` has squared norm `2` and vanishes at `1`, then `φ = α - β` for distinct
+irreducible characters `α, β`.  This is the layer-2 → layer-3 bridge for Peterfalvi §3
+(1.4): each isometric image `τ (χ_i - χ_0)` becomes a named difference of irreducibles. -/
+theorem exists_irr_sub_irr_of_inner_self_two {φ : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 2) (hone : φ (1 : G) = 0) :
+    ∃ α β : IrreducibleCharacter G, α ≠ β ∧
+      φ = (α : ClassFunction G ℂ) - (β : ClassFunction G ℂ) := by
+  classical
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 2 := hsq.symm.trans hnorm
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsumC
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨α₀, β₀, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two hne hsumZ
+  have hα₀ : α₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβ₀ : β₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  rw [hs, Finset.sum_pair hαβ] at hrepr
+  obtain ⟨dα, hdα, hα1⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨α₀, hα₀⟩ : IrreducibleCharacter G)
+  obtain ⟨dβ, hdβ, hβ1⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨β₀, hβ₀⟩ : IrreducibleCharacter G)
+  simp only [IrreducibleCharacter.coe_mk] at hα1 hβ1
+  have hone' : (c α₀ : ℂ) * (dα : ℂ) + (c β₀ : ℂ) * (dβ : ℂ) = 0 := by
+    have h := hone
+    rw [hrepr] at h
+    simpa only [ClassFunction.add_apply, ClassFunction.smul_apply, hα1, hβ1] using h
+  have hdegne : ((dα + dβ : ℕ) : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; omega
+  rcases hcα with hcα | hcα <;> rcases hcβ with hcβ | hcβ
+  · -- (+1, +1): impossible by degree positivity
+    exfalso
+    rw [hcα, hcβ] at hone'
+    simp only [Int.cast_one, one_mul] at hone'
+    rw [← Nat.cast_add] at hone'
+    exact hdegne hone'
+  · -- (+1, -1): φ = α₀ - β₀
+    refine ⟨⟨α₀, hα₀⟩, ⟨β₀, hβ₀⟩, fun h => hαβ (congrArg Subtype.val h), ?_⟩
+    rw [hrepr, hcα, hcβ]
+    simp only [IrreducibleCharacter.coe_mk, Int.cast_one, Int.cast_neg, one_smul, neg_one_smul]
+    abel
+  · -- (-1, +1): φ = β₀ - α₀
+    refine ⟨⟨β₀, hβ₀⟩, ⟨α₀, hα₀⟩, fun h => hαβ (congrArg Subtype.val h).symm, ?_⟩
+    rw [hrepr, hcα, hcβ]
+    simp only [IrreducibleCharacter.coe_mk, Int.cast_one, Int.cast_neg, one_smul, neg_one_smul]
+    abel
+  · -- (-1, -1): impossible by degree positivity
+    exfalso
+    rw [hcα, hcβ] at hone'
+    simp only [Int.cast_neg, Int.cast_one, neg_one_mul] at hone'
+    have h2 : (dα : ℂ) + (dβ : ℂ) = 0 := by linear_combination -hone'
+    rw [← Nat.cast_add] at h2
+    exact hdegne h2
+
 end OddOrder.RepresentationTheory
