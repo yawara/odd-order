@@ -367,6 +367,13 @@ theorem step3_main
   obtain ⟨g, hg_NPS, hg_notM⟩ := SetLike.not_le_iff_exists.mp hNPS_not_le_M
   rw [hNPS_def, Subgroup.mem_inf] at hg_NPS
   have hg_normSH : g ∈ Subgroup.normalizer SH := hg_NPS.1
+  -- L5. `A := Z_p^g ⊆ S^g = S ⊆ M`, normalizing `Z_q`.
+  set A : Subgroup H := ConjAct.toConjAct g • ZpH with hA_def
+  have hA_le_SH : A ≤ SH := by
+    rw [hA_def, ← Subgroup.conjAct_pointwise_smul_eq_self hg_normSH]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hZpH_le_SH
+  have hA_le_M : A ≤ M := hA_le_SH.trans hSH_le_M
+  have hA_norm_Zq : A ≤ Subgroup.normalizer ZqH := hA_le_M.trans hM_norm_ZqH
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
