@@ -129,4 +129,54 @@ theorem inner_eq_coeff_of_repr (χ : IrreducibleCharacter G)
   · rw [if_pos hmem]
   · rw [if_neg hmem, Finsupp.notMem_support_iff.mp hmem, Int.cast_zero]
 
+omit [Finite G] in
+/-- Conjugate-linearity of `ClassFunction.inner` over a scalar in the right argument. -/
+theorem inner_smul_right (c : ℂ) (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner φ (c • ψ) = star c * ClassFunction.inner φ ψ := by
+  have h : ClassFunction.innerSum φ (c • ψ) = star c * ClassFunction.innerSum φ ψ := by
+    rw [ClassFunction.innerSum, ClassFunction.innerSum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [ClassFunction.smul_apply, star_mul']
+    ring
+  rw [ClassFunction.inner, ClassFunction.inner, h]; ring
+
+omit [Finite G] in
+/-- Right-linearity of `ClassFunction.inner` over a finite sum. -/
+theorem inner_sum_right {ι : Type*} (φ : ClassFunction G ℂ) (s : Finset ι)
+    (f : ι → ClassFunction G ℂ) :
+    ClassFunction.inner φ (∑ i ∈ s, f i) =
+      ∑ i ∈ s, ClassFunction.inner φ (f i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.inner_add_right, ih]
+
+/-- **Parseval (norm form)** for an integer span representation: the squared norm is the
+sum of squared integer coefficients. -/
+theorem inner_self_eq_sum_sq_of_repr {c : ClassFunction G ℂ →₀ ℤ}
+    (hsupp : ↑c.support ⊆ irreducibleCharacters G) :
+    ClassFunction.inner (∑ a ∈ c.support, (c a : ℂ) • a)
+        (∑ a ∈ c.support, (c a : ℂ) • a) =
+      ∑ a ∈ c.support, (c a : ℂ) ^ 2 := by
+  rw [inner_sum_right]
+  refine Finset.sum_congr rfl fun b hb => ?_
+  rw [inner_smul_right]
+  have hb' : b ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr hb)
+  have hcoeff : ClassFunction.inner (∑ a ∈ c.support, (c a : ℂ) • a) b = (c b : ℂ) := by
+    have h := inner_eq_coeff_of_repr (⟨b, hb'⟩ : IrreducibleCharacter G) hsupp
+    rwa [show ((⟨b, hb'⟩ : IrreducibleCharacter G) : ClassFunction G ℂ) = b from rfl] at h
+  rw [hcoeff, star_intCast]; ring
+
+/-- A virtual character `φ ∈ ZIrr G` has integer Fourier coefficients and its squared norm
+is the sum of their squares. -/
+theorem mem_ZIrr_inner_self_eq_sum_sq {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    ∃ c : ClassFunction G ℂ →₀ ℤ, (↑c.support ⊆ irreducibleCharacters G) ∧
+      φ = ∑ a ∈ c.support, (c a : ℂ) • a ∧
+      ClassFunction.inner φ φ = ∑ a ∈ c.support, (c a : ℂ) ^ 2 := by
+  obtain ⟨c, hsupp, hrepr⟩ := mem_ZIrr_repr hφ
+  refine ⟨c, hsupp, hrepr, ?_⟩
+  rw [hrepr]
+  exact inner_self_eq_sum_sq_of_repr hsupp
+
 end OddOrder.RepresentationTheory
