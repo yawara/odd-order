@@ -78,6 +78,59 @@ def centralizerIn (L : Subgroup G) (a : G) : Subgroup G :=
     x ∈ centralizerIn L a ↔ x ∈ L ∧ x * a = a * x := by
   simp [centralizerIn, Subgroup.mem_centralizer_singleton_iff]
 
+/-- Conjugation by `l ∈ L` is an order-preserving bijection
+`C_L(l a l⁻¹) ≃ C_L(a)`, so `|C_L(l a l⁻¹)| = |C_L(a)|`.  Used to see that the
+centralizers `C_L(a)` are constant on each `L`-conjugacy class. -/
+theorem card_centralizerIn_conj {L : Subgroup G} {l : G} (hl : l ∈ L) (a : G) :
+    Nat.card (centralizerIn L (l * a * l⁻¹)) = Nat.card (centralizerIn L a) := by
+  apply Nat.card_congr
+  refine
+    { toFun := fun c => ⟨l⁻¹ * c.1 * l, ?_⟩
+      invFun := fun c => ⟨l * c.1 * l⁻¹, ?_⟩
+      left_inv := fun c => Subtype.ext (by group)
+      right_inv := fun c => Subtype.ext (by group) }
+  · obtain ⟨hcL, hcomm⟩ := mem_centralizerIn.mp c.2
+    refine mem_centralizerIn.mpr ⟨L.mul_mem (L.mul_mem (L.inv_mem hl) hcL) hl, ?_⟩
+    calc (l⁻¹ * c.1 * l) * a
+        = l⁻¹ * (c.1 * (l * a * l⁻¹)) * l := by group
+      _ = l⁻¹ * ((l * a * l⁻¹) * c.1) * l := by rw [hcomm]
+      _ = a * (l⁻¹ * c.1 * l) := by group
+  · obtain ⟨hcL, hcomm⟩ := mem_centralizerIn.mp c.2
+    refine mem_centralizerIn.mpr ⟨L.mul_mem (L.mul_mem hl hcL) (L.inv_mem hl), ?_⟩
+    calc (l * c.1 * l⁻¹) * (l * a * l⁻¹)
+        = l * (c.1 * a) * l⁻¹ := by group
+      _ = l * (a * c.1) * l⁻¹ := by rw [hcomm]
+      _ = (l * a * l⁻¹) * (l * c.1 * l⁻¹) := by group
+
+/-- **`L`-conjugator count.**  If `b` lies in the `L`-conjugacy class of `a`, the
+set of `l ∈ L` conjugating `a` to `b` is a left coset of `C_L(a)`, hence has
+cardinality `|C_L(a)|`. -/
+theorem card_conjugatorIn_L {L : Subgroup G} {a b : G}
+    (h : ∃ l : L, (l : G) * a * (l : G)⁻¹ = b) :
+    Nat.card {l : L // (l : G) * a * (l : G)⁻¹ = b}
+      = Nat.card (centralizerIn L a) := by
+  obtain ⟨l₀, hl₀⟩ := h
+  apply Nat.card_congr
+  refine
+    { toFun := fun l => ⟨(l₀ : G)⁻¹ * (l.1 : G), ?_⟩
+      invFun := fun c => ⟨⟨(l₀ : G) * c.1, L.mul_mem l₀.2 (mem_centralizerIn.mp c.2).1⟩, ?_⟩
+      left_inv := fun l => Subtype.ext (Subtype.ext (by group))
+      right_inv := fun c => Subtype.ext (by group) }
+  · refine mem_centralizerIn.mpr ⟨L.mul_mem (L.inv_mem l₀.2) l.1.2, ?_⟩
+    have e1 : (l.1 : G) * a * (l.1 : G)⁻¹ = (l₀ : G) * a * (l₀ : G)⁻¹ := by rw [l.2, hl₀]
+    have hsas : ((l₀ : G)⁻¹ * (l.1 : G)) * a * ((l₀ : G)⁻¹ * (l.1 : G))⁻¹ = a := by
+      calc ((l₀ : G)⁻¹ * (l.1 : G)) * a * ((l₀ : G)⁻¹ * (l.1 : G))⁻¹
+          = (l₀ : G)⁻¹ * ((l.1 : G) * a * (l.1 : G)⁻¹) * (l₀ : G) := by group
+        _ = (l₀ : G)⁻¹ * ((l₀ : G) * a * (l₀ : G)⁻¹) * (l₀ : G) := by rw [e1]
+        _ = a := by group
+    exact mul_inv_eq_iff_eq_mul.mp hsas
+  · have hc : c.1 * a = a * c.1 := (mem_centralizerIn.mp c.2).2
+    calc ((l₀ : G) * c.1) * a * ((l₀ : G) * c.1)⁻¹
+        = (l₀ : G) * (c.1 * a * c.1⁻¹) * (l₀ : G)⁻¹ := by group
+      _ = (l₀ : G) * a * (l₀ : G)⁻¹ := by
+          rw [show c.1 * a * c.1⁻¹ = a from by rw [hc]; group]
+      _ = b := hl₀
+
 /-- The subset of a subgroup `L` obtained by restricting an ambient subset
 `A ⊆ G` to elements of `L`. -/
 def supportInSubgroup (A : Set G) (L : Subgroup G) : Set L :=
