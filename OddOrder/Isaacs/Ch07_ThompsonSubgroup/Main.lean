@@ -264,6 +264,37 @@ theorem step3_main
   have hZ_unique : ∀ X : Subgroup H, IsCoatom X → Z ≤ X → X = M := fun X hX hZX =>
     (step1_unique_maximal_containing_nilpotent hpq hH_card hSubgroupsSolvable
       hZ_nilp hp_dvd_Z hq_dvd_Z hcoatom hX hZX).trans hNZ_eq_M
+  -- L3. `Z(H) = ⊥` (else `H` abelian ⇒ `M` proper nontrivial normal, contra simplicity),
+  -- hence `1 ≠ z ∈ Z ⇒ C_H(z) < H`, contained in a maximal ⊇ Z, which is `M`.
+  have hcenter_bot : Subgroup.center H = ⊥ := by
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.center H) inferInstance
+      with h | h
+    · exact h
+    · exfalso
+      have hMnorm : M.Normal := by
+        refine ⟨fun n hn g => ?_⟩
+        have hg : g * n = n * g := (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top g) n).symm
+        rw [hg, mul_inv_cancel_right]; exact hn
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hM | hM
+      · exact absurd hM (M.nontrivial_iff_ne_bot.mp inferInstance)
+      · exact hM_max.1 hM
+  have hL3 : ∀ z ∈ Z, z ≠ 1 → Subgroup.centralizer ({z} : Set H) ≤ M := by
+    intro z hz hz1
+    have hZ_le_Cz : Z ≤ Subgroup.centralizer ({z} : Set H) :=
+      hZ_le_cent.trans (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hz))
+    have hCz_ne_top : Subgroup.centralizer ({z} : Set H) ≠ ⊤ := by
+      intro htop
+      refine hz1 ?_
+      have hz_center : z ∈ Subgroup.center H := by
+        rw [Subgroup.mem_center_iff]
+        intro w
+        have hw : w ∈ Subgroup.centralizer ({z} : Set H) := htop ▸ Subgroup.mem_top w
+        exact (Subgroup.mem_centralizer_iff.mp hw z (Set.mem_singleton z)).symm
+      rw [hcenter_bot, Subgroup.mem_bot] at hz_center; exact hz_center
+    obtain ⟨X, hX_coatom, hCzX⟩ :=
+      (IsCoatomic.eq_top_or_exists_le_coatom
+        (Subgroup.centralizer ({z} : Set H))).resolve_left hCz_ne_top
+    exact (hZ_unique X hX_coatom (hZ_le_Cz.trans hCzX)) ▸ hCzX
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
