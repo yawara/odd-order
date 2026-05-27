@@ -41,9 +41,14 @@ created: 2026-05-25
    `inner_eq_coeff_of_repr` (`⟨φ,χ⟩ = c_χ`), `inner_self_eq_sum_sq_of_repr` /
    `mem_ZIrr_inner_self_eq_sum_sq` (Parseval norm `⟨φ,φ⟩ = ∑ c_a²`).
    全張る性 (spanning) は不要だった (span membership + orthonormality のみ)。
-- [ ] `n = 2` の norm `2` case を証明する.
-- [ ] `n = 3` の common component 共有 case を証明する.
-- [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する.
+- [x] **層 3 前提 + 橋渡し補題 (完了)**: `ZIrrFourier.lean` に
+   `exists_pair_of_sum_sq_eq_two` (整数組合せ: `∑ c_a²=2` ⇒ 係数2つで ±1),
+   `irreducibleCharacter_apply_one_eq_pos_natCast` (既約指標の次数 > 0),
+   `exists_irr_sub_irr_of_inner_self_two` (**橋渡し**: `φ∈ZIrr`, `⟨φ,φ⟩=2`, `φ(1)=0`
+   ⇒ `φ = α - β`, α,β 相異なる既約指標)。各 `τ(χ_i-χ_0)` が *名前付き* 既約の差になる。
+- [ ] **combinatorial core 本体 (残り、最大の塊)**: 名前付き差分
+   `v_i = α_i - β_i` を共通成分解析で uniform sign family に組み立てる
+   (n=2 / n=3 / induction)。下記 recipe 参照。
 - [ ] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消す.
 
 合計推定: ~400-750 LOC of new bridges + combinatorial induction.
@@ -279,6 +284,50 @@ SecondOrthogonality←RowOrthogonality の依存があるため逆 import は循
 - `3b0613d` — 層 2: 係数整数性
 - `68d90a0` — 層 2: reconstruction + 係数公式
 - `290a5e6` — 層 2: Parseval norm
+
+## 2026-05-28 progress (cont. 3): 層 3 前提 + 橋渡し補題 完了 — combinatorial core が残り
+
+**層 3 の前提群と核心の橋渡し補題を完了**した (`ZIrrFourier.lean`、4 commit、未 push):
+
+- `exists_pair_of_sum_sq_eq_two` — 整数組合せ: 有限集合上の非零整数係数で平方和 `=2`
+  ⇒ 集合は丁度 2 元、各係数 `±1`。(2 が平方数でないこと + 平方 ≥ 1 の card bound。)
+- `finrank_pos_of_isIrreducible` / `irreducibleCharacter_apply_one_eq_pos_natCast` —
+  既約指標の次数は正の整数 (`irreducible_iff_isSimpleModule_asModule` +
+  `IsSimpleModule.nontrivial`; `asModule` synonym のため
+  `set_option backward.isDefEq.respectTransparency false` が必要)。
+- **`exists_irr_sub_irr_of_inner_self_two`** — 橋渡し: `φ∈ZIrr G`, `⟨φ,φ⟩=2`, `φ(1)=0`
+  ⇒ `∃ α β : Irr, α≠β ∧ φ = α - β`。これで各 `v_i = τ(χ_i-χ_0)` が名前付き既約の差。
+
+**層構造**: 1a ✅ / 1b ✅ / 2 ✅ / 3 前提+橋 ✅ / **combinatorial core 本体 ⬜**。
+
+### combinatorial core 本体 recipe — 次の着手点 (最大かつ最難)
+
+**入力** (全て無条件で取れる): `IsometryDifferencePairNumerics (fun i => v_i)`
+(= `isometryDifferencePairNumerics_of_isometryDifferenceImage`, 無条件化済) +
+`h_image_virtual` (`v_i ∈ ZIrr G`) + degree-zero。橋渡し補題で各 `v_i` (i≠0) を
+`α_i - β_i` (名前付き既約, α_i≠β_i) に分解できる。
+
+**目標**: `∃ data : SignedIrreducibleDifferenceFamily G n, ∀ i, v_i = data.signedDifference i`
+(= `ε•(μ_i - μ_0)`, μ injective, ε=±1)。
+
+**戦略** (Peterfalvi / Isaacs coherence の標準論法):
+1. **cross 内積の展開**: i≠j (共に≠0) で `⟨v_i,v_j⟩ = ⟨α_i-β_i, α_j-β_j⟩
+   = [α_i=α_j]-[α_i=β_j]-[β_i=α_j]+[β_i=β_j] = 1` (名前付き既約の
+   `irreducibleCharacter_inner_eq_ite` で各項 δ)。この整数等式が共有成分を強制。
+2. **n=2**: `v_0=0` のみ非自明は `v_1=α_1-β_1`。`μ_0:=β_1, μ_1:=α_1, ε:=1`。
+3. **共通成分 μ_0 の同定**: 全 `v_i` が一つの既約 `μ_0` を共有し、`v_i = ε(μ_i - μ_0)`
+   (同一 ε)。cross 内積 `=1` から `e₂+e₃` 型 (符号が割れる) を degree-zero で排除。
+4. **induction on n**。
+
+**配置**: combinatorial core は `SignedIrreducibleDifferenceFamily` /
+`IsometryDifferencePairNumerics` を使うので `IsometryDifferencePair.lean` に
+`import ZIrrFourier` を足してそこで証明 → `isometry_difference_pair_structure` の
+sorry (現 IsometryDifferencePair.lean:679) を埋める。推定 ~200-400 LOC、本 issue 最大の塊。
+
+### このセッション (継続) の追加 commit (peterfalvi-s09、未 push)
+- `beab244` 層3: 整数組合せ (`exists_pair_of_sum_sq_eq_two`)
+- `ab77c1e` 層3: 既約指標の次数正値性
+- `e0b8c70` 層3: 橋渡し (`exists_irr_sub_irr_of_inner_self_two`)
 
 ## 完了条件
 
