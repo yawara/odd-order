@@ -31,11 +31,14 @@ created: 2026-05-25
       これで Peterfalvi 原文 (1.4) の `τ : ℤ[X, H^#] → ℤ[Irr G]` 条件が
       Lean statement に表現される。S07 consumer 側の patch は invoke 時点で行う
       (現状 invoke 無し)。
-- [ ] **prerequisite lemmas (statement fix の後)**:
-   - `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge
-     (mathlib `FDRep.char_orthonormal` ⇒ `ClassFunction.inner`, ~80-150 LOC)
-   - `ZIrr G` Fourier 基底展開: 各 `φ ∈ ZIrr G` は `∑ c_χ · χ` 唯一展開で
-     `c_χ = ⟨φ, χ⟩` (`ZIrr.lean:46-47` の TODO に該当, ~100-200 LOC)
+- [x] **prerequisite lemma 1 (層 1b 完了)**:
+   `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge.
+   → `characterTableRowOrthogonality` (`RowOrthogonality.lean`) で証明し、
+   IsometryDifferencePair / S07 の inner-product helper を全て無条件化した。
+- [ ] **prerequisite lemma 2 (層 2)**:
+   `ZIrr G` Fourier 基底展開: 各 `φ ∈ ZIrr G` は `∑ c_χ · χ` 唯一展開で
+   `c_χ = ⟨φ, χ⟩` (`ZIrr.lean:46-47` の TODO に該当, ~100-200 LOC).
+   全張る性 (spanning) は不要、orthonormality + 一次独立で済む (handoff 参照)。
 - [ ] `n = 2` の norm `2` case を証明する.
 - [ ] `n = 3` の common component 共有 case を証明する.
 - [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する.
@@ -182,6 +185,47 @@ theorem characterTableRowOrthogonality {G} [Group G] [Finite G] [Fintype G]
 - `39a3ccb` docs: §9 ノート訂正 (§9 は character-theoretic、App.C 内容との混同を除去)
 - `72a9864` Peterfalvi S09: (7.10)/(7.11) statements; (7.11) を (7.10) modulo で sorry-free 証明
 - `d9330fa` CharacterConjugate: `χ(g⁻¹)=conj χ(g)` (層 1a)
+
+## 2026-05-28 progress (cont.): 層 1b 完了 — 層 2 が次
+
+**層 1b (orthonormality discharge) を完了**した (3 commit、`peterfalvi-s09`、未 push):
+
+- `893a502` `characterTableRowOrthogonality` を *定理として* 証明
+  (新ファイル `OddOrder/GroupTheory/RepresentationTheory/RowOrthogonality.lean`)。
+  recipe 通り: mathlib `Representation.char_orthonormal` (引数 `σ.char g⁻¹` 形) を
+  `character_inv` (層 1a, `star ↔ g⁻¹`) で Peterfalvi の複素共役内積
+  `characterTableRowPairing` に橋渡し。対角 `1` は `Representation.Equiv.refl`、
+  非対角 `0` は `Equiv σ ρ` から `char_iso` で両指標 (→指標 index) が一致して矛盾。
+  RowOrthogonality は **leaf** (SecondOrthogonality + CharacterConjugate のみ import、
+  循環なし)、`OddOrder.lean` に wiring 済。
+- `c9ab339` `IsometryDifferencePair.lean` の 13 inner-product helper から `hrow`
+  仮説を除去 (定理を内部で invoke、`(G:=G)`/`(G:=H)` 両方 OK、`Finite` は `Fintype`
+  から derived)。norm `2` / mutual-inner `1` の numeric API が無条件化。
+- `3599d95` `S07_Coherence.lean` の 4 つの `CharacterDifferenceImage` norm helper
+  からも `hrow` を除去。
+
+**注意 (scope)**: `SecondOrthogonality.lean:1044`
+(`column_orthogonality_cases_ofRowOrthogonality`) 等の `hrow` は **column
+orthogonality (#27、本 issue で「不要」と明記) 用なので対象外**。かつ
+SecondOrthogonality←RowOrthogonality の依存があるため逆 import は循環で discharge 不可
+(正しく conditional のまま残す)。
+
+**層構造の現状**: 1a ✅ / 1b ✅ / 層 2 (ZIrr Fourier) ⬜ / 層 3 (combinatorial core) ⬜。
+
+### 層 2 着手 recipe (ZIrr Fourier 係数 API) — 次の着手点
+
+**目標**: `φ ∈ ZIrr G` を既約指標の `ℤ`-一次結合に一意展開し、係数を内積
+`c_χ = ⟨φ, χ⟩` で取り出す API。これで `τ(χ_i-χ_0)` (∈ `ZIrr G`, `h_image_virtual`)
+の各既約成分の整数係数を取り出せ、層 3 の combinatorial core に渡せる。
+
+- `characterTableRowOrthogonality` が **使える前提**になった (層 1b の成果):
+  `ClassFunction.inner χ ψ = δ` を無条件に使える。
+- **spanning は不要**: `v_i ∈ ZIrr` の span membership から得る有限台の
+  `ℤ`-結合 (`Submodule.span` の `mem_span` 展開) に対し、orthonormality で
+  係数 = 内積を取り出すだけ。`#Irr = #conjclasses` や「既約が類関数の基底」は不要
+  (mathlib にも無い、handoff 参照)。
+- 配置案: `ZIrr.lean` に Fourier 係数補題を足す or 新ファイル。
+  `ZIrr.lean:46-47` の TODO 参照。
 
 ## 完了条件
 
