@@ -257,6 +257,13 @@ theorem step3_main
   haveI hZ_comm : IsMulCommutative Z :=
     Subgroup.le_centralizer_iff_isMulCommutative.mp hZ_le_cent
   haveI hZ_nilp : Group.IsNilpotent ↥Z := inferInstance
+  -- L2. `M = N_H(Z)`, and `M` is the unique maximal subgroup containing `Z` (Step 1).
+  have hNZ_eq_M : Subgroup.normalizer Z = M :=
+    maximal_eq_normalizer_of_M_normalizes hM_max hZ_ne_bot hZ_le_M hM_norm_Z
+  have hcoatom : IsCoatom (Subgroup.normalizer (Z : Set H)) := by rw [hNZ_eq_M]; exact hM_max
+  have hZ_unique : ∀ X : Subgroup H, IsCoatom X → Z ≤ X → X = M := fun X hX hZX =>
+    (step1_unique_maximal_containing_nilpotent hpq hH_card hSubgroupsSolvable
+      hZ_nilp hp_dvd_Z hq_dvd_Z hcoatom hX hZX).trans hNZ_eq_M
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
