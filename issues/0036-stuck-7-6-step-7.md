@@ -31,13 +31,54 @@ Step 7 (mmd L3884-3892 = Isaacs p.213-214 の最終 contradiction 引数) だけ
      theorem で `P ⊴ G` を引き出し, `normal_pgroup_le_opCore` で `P ≤ U` を
      得て `A ≤ P ≤ U` で矛盾.
 
+## 2026-05-27 セッション進捗 (続き: step8a + step4 discharge)
+
+4. **`step8a_PBar_normal_GBar` を `axiom` → `theorem` に変換** (commit c21d250,
+   ~128 LOC). Thm 7.5 (`sylow_normal_of_elementary_normal_P_theorem`) を
+   `Ḡ = G/U ↷ V = Ω₁(Z(O_p(G)))` の faithful action に適用. 5 仮説を全て discharge:
+   - (i) p-separable: `quotient_isPiSeparable` instance.
+   - (iii) Sylow-2 abelian: `quotient_two_subgroup_abelian` (landed).
+   - (iv) faithful: `ker φ = C_G(V).map mk' = ⊥` を新規 `conjNormal_ker_eq_centralizer`
+     + Step 6 (`h_K_map_eq_bot`) で.
+   - (v) `|V:C_V(R̄)| ≤ p` (全 Sylow R̄): P̄ = Ā が E = V∩A を centralize し,
+     `(actionCentralizer φ P̄).index ≤ A.relIndex V ≤ p`, 共役で全 Sylow に拡張
+     (`actionCentralizer_map_conj_index`).
+5. **`oPiCorePrime_subgroup_eq_bot_of_opCore_le` (Step 1(b)) を proven** (commit
+   c5f4d67, ~82 LOC). `U ≤ H ≤ G` で `O_{p'}(↥H) = 1`. M, U.subgroupOf H が
+   disjoint normal (coprime cards) で commute → M は C_G(U) ≤ U に入り p-group内の
+   p'-group なので trivial.
+6. **`step4_5_normal_J_hypotheses` を `axiom` → `theorem` に変換** (commit 50a746d,
+   ~313 LOC). **Step 4** (`O_p(G) ⊔ A = P`) を完全証明. 残りを 2 つの focused
+   axiom に分割:
+   - `step3_Abar_centralizes_inter_LBar` (private axiom): Step 3 の IH-適用 core
+     (`⁅L ⊓ H, A⁆ ≤ U` for proper `H ⊇ UA` with `H ∩ P` Sylow).
+   - `step5_Abar_card_eq_p` (private axiom): Step 5 (`|Ā| = p` via Lemma 6.20).
+   - 新規 helper `relIndex_sup_of_inf_eq_bot` (diamond: `|NA:A| = |N|`).
+
 **現在の axiom 状況** (`OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean`):
-- `step4_5_normal_J_hypotheses` (textbook Steps 4-5, Lem 6.20 + Step 3 IH)
-- `step8a_PBar_normal_GBar` (textbook Step 8 Thm 7.5 application)
+- `step3_Abar_centralizes_inter_LBar` (textbook Step 3, IH-適用 core) ← **NEW**
+- `step5_Abar_card_eq_p` (textbook Step 5, Lem 6.20 + MulDistribMulAction plumbing) ← **NEW**
 - `noNonsolvableSimplePaQb` (§7D の別議題, Burnside)
 
-両方の Step 4-5 / 8a axiom は前 axiom よりも狭い範囲を扱い, 独立に discharge
-可能.
+`step8a_PBar_normal_GBar` と `step4_5_normal_J_hypotheses` は **両方 theorem 化済み**.
+残る §7B axiom は Step 3 と Step 5 の 2 つ (どちらも前より狭く focused).
+
+### 残り 2 axiom の discharge 方針 (次セッション)
+
+**`step3_Abar_centralizes_inter_LBar`** (~250-350 LOC, 最難): `↥H` 上で IH を適用.
+最大の難所は **仮説 (v)** `C_↥H(Z(S)) = S` (S = (H⊓P).subgroupOf H の Sylow). triple
+nesting `↥(S : Subgroup ↥H)` が痛い. 推奨: (v) を独立 lemma に切り出し
+(`Z(P) ⊆ U ⊆ S ⊆ P` → `Z(P) ⊆ Z(S)` → `C_↥H(Z(S)) ⊆ C_G(Z(P)) = P` → S Sylow で =S).
+その後 IH 適用 → `J(S) ⊴ ↥H`, `A.subgroupOf H ≤ J(S)`, commutator chain
+`⁅L.subgroupOf H, A.subgroupOf H⁆ ≤ (L.subgroupOf H) ⊓ J(S) ≤ U.subgroupOf H`
+(`commutator_le_inf` for normal + `L ⊓ p-subgroup ≤ U` since L/U is p').
+
+**`step5_Abar_card_eq_p`** (~300+ LOC): `MulDistribMulAction Ā L̄` instance を構成し
+Lemma 6.20 (`isCyclic_of_faithful_trivial_on_proper_invariant`) を適用. 既存 piece:
+`AbarInf_centralizer_LBar_eq_bot` (faithful), `Abar_ne_bot_of_not_le` (nontrivial),
+`card_eq_prime_of_isElementaryAbelian_isCyclic_nontrivial`. "trivial on proper
+invariant `M̄ < L̄`" 仮説 = Step 3 を `H = MA` に適用 (M ⊇ U の preimage, `|L:M|` p'-number
+>1 で proper). Step 3 を先に discharge すると Step 5 で再利用できる.
 
 ## 次のセッションで取り組むべきこと
 
