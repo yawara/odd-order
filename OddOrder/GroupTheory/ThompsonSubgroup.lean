@@ -284,4 +284,30 @@ theorem thompsonJ_map_of_injective [Finite G] {N : Type*} [Group N]
     rw [← Subgroup.map_le_iff_le_comap]
     exact le_thompsonJ_of_mem_maxElemAbelianIn (key_map E hE)
 
+/-- **Conjugation by a normalizing element fixes `J(P)`**: if `g ∈ N(P)`, then
+`g · J(P) · g⁻¹ = J(P)` (as `(thompsonJ P p).map (conj g) = thompsonJ P p`).
+
+`J` commutes with the injective automorphism `conj g` (`thompsonJ_map_of_injective`),
+and `g ∈ N(P)` gives `P.map (conj g) = P`. -/
+theorem thompsonJ_map_conj_eq_of_mem_normalizer [Finite G] {p : ℕ} {P : Subgroup G}
+    {g : G} (hg : g ∈ Subgroup.normalizer P) :
+    (thompsonJ P p).map (MulAut.conj g).toMonoidHom = thompsonJ P p := by
+  have hg_iff : ∀ n, n ∈ P ↔ g * n * g⁻¹ ∈ P := Subgroup.mem_normalizer_iff.mp hg
+  have hP_conj : P.map (MulAut.conj g).toMonoidHom = P := by
+    ext y
+    simp only [Subgroup.mem_map, MulAut.conj_apply, MonoidHom.coe_coe]
+    constructor
+    · rintro ⟨z, hz, rfl⟩
+      exact (hg_iff z).mp hz
+    · intro hy
+      refine ⟨g⁻¹ * y * g, ?_, ?_⟩
+      · have hmem : g * (g⁻¹ * y * g) * g⁻¹ ∈ P := by
+          have heq : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
+          rw [heq]; exact hy
+        exact (hg_iff (g⁻¹ * y * g)).mpr hmem
+      · show g * (g⁻¹ * y * g) * g⁻¹ = y
+        group
+  have hinj : Function.Injective (MulAut.conj g).toMonoidHom := (MulAut.conj g).injective
+  rw [← thompsonJ_map_of_injective hinj P p, hP_conj]
+
 end Subgroup
