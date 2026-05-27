@@ -179,4 +179,46 @@ theorem mem_ZIrr_inner_self_eq_sum_sq {φ : ClassFunction G ℂ} (hφ : φ ∈ Z
   rw [hrepr]
   exact inner_self_eq_sum_sq_of_repr hsupp
 
+/-- Finite integer-vector combinatorics: if integer coefficients on a finite set `s`
+are all nonzero and their squares sum to `2`, then `s` has exactly two elements, each
+with coefficient `±1`. -/
+theorem exists_pair_of_sum_sq_eq_two {ι : Type*} [DecidableEq ι] {s : Finset ι} {c : ι → ℤ}
+    (hne : ∀ a ∈ s, c a ≠ 0) (hsum : ∑ a ∈ s, c a ^ 2 = 2) :
+    ∃ α β : ι, α ≠ β ∧ s = {α, β} ∧
+      (c α = 1 ∨ c α = -1) ∧ (c β = 1 ∨ c β = -1) := by
+  classical
+  have hsq2 : ∀ n : ℤ, n ^ 2 ≠ 2 := by
+    intro n hn
+    have h1 : (n - 1) * (n + 1) = 1 := by linear_combination hn
+    rcases Int.eq_one_or_neg_one_of_mul_eq_one' h1 with ⟨ha, hb⟩ | ⟨ha, hb⟩ <;> omega
+  have hge : ∀ a ∈ s, 1 ≤ c a ^ 2 := fun a ha => by
+    have h := Int.one_le_abs (hne a ha)
+    calc (1 : ℤ) = 1 ^ 2 := by ring
+      _ ≤ |c a| ^ 2 := by gcongr
+      _ = c a ^ 2 := sq_abs (c a)
+  have hcard2 : s.card ≤ 2 := by
+    have hle : (s.card : ℤ) ≤ ∑ a ∈ s, c a ^ 2 := by
+      calc (s.card : ℤ) = ∑ _a ∈ s, (1 : ℤ) := by
+            rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+        _ ≤ ∑ a ∈ s, c a ^ 2 := Finset.sum_le_sum hge
+    rw [hsum] at hle
+    omega
+  have hcard : s.card = 2 := by
+    rcases Nat.lt_or_ge s.card 2 with hlt | hge2
+    · interval_cases hc : s.card
+      · rw [Finset.card_eq_zero] at hc; subst hc; simp at hsum
+      · obtain ⟨a, rfl⟩ := Finset.card_eq_one.mp hc
+        rw [Finset.sum_singleton] at hsum
+        exact absurd hsum (hsq2 (c a))
+    · omega
+  obtain ⟨α, β, hαβ, rfl⟩ := Finset.card_eq_two.mp hcard
+  rw [Finset.sum_pair hαβ] at hsum
+  have h1 := hge α (by simp)
+  have h2 := hge β (by simp)
+  have hα1 : c α ^ 2 = 1 := by omega
+  have hβ1 : c β ^ 2 = 1 := by omega
+  refine ⟨α, β, hαβ, rfl, ?_, ?_⟩
+  · rw [pow_two] at hα1; exact mul_self_eq_one_iff.mp hα1
+  · rw [pow_two] at hβ1; exact mul_self_eq_one_iff.mp hβ1
+
 end OddOrder.RepresentationTheory
