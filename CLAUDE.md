@@ -24,7 +24,7 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 
 - **Isaacs: 1 章 = 1 ディレクトリ**。入口は `Main.lean` (例: `OddOrder/Isaacs/Ch01_Sylow/Main.lean`)
 - **BG / Peterfalvi: 1 節 (§) = 1 ファイル** (例: `OddOrder/BG/Ch1_Preliminary/S03_FrobeniusActions.lean`)
-- 章本体の `Main.lean` が 1500-2000 行を超えたら、subsection 単位の補助ファイルを同じ章ディレクトリ配下に切り出し、`Main.lean` から import する (`Ch01_Sylow/Main.lean` → `Ch01_Sylow/A_Existence.lean` + ...)。**先回り分割はしない**。
+- **分割は行数でなく「編集局所性 + 再ビルドレイテンシ」で判断する**。`lake build` はファイル単位で全再 elaboration するので、コストは 1 edit-cycle のレイテンシ (≈ 5s 固定 + ~2ms/行、証明密度で変動)。トリガーは「**今まさに伸ばしている章** かつ **leaf 再ビルドが痛い** (目安 >~4000 行 or rebuild >~12-15s)」。**休眠中の巨大ファイルは行数だけでは割らない** (キャッシュされ無害、今割るのは 先回り分割)。割るときは **active frontier を小さな leaf `Main.lean` に残し、完成・凍結した subsection を上流ファイルへ押し出す** (`Ch01_Sylow/Main.lean` → 凍結部を `A_Existence.lean` 等に出し `Main` が import)。細分化 (<~800-1000 行が乱立) は固定 5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md) と memory `build-perf-bottleneck`。
 
 ### トレーサビリティ (3 層)
 

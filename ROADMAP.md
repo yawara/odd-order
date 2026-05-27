@@ -148,21 +148,34 @@ Namespace 階層: `OddOrder.Isaacs.Ch01`, `OddOrder.BG.Ch1.S03`, `OddOrder.Peter
 | BG | 1 節 (§) | 節が 3-16 ページと小さく、節境界が明確 |
 | Peterfalvi | 1 節 (§) | 同上 (1-12 ページ) |
 
-### 育ってから分割
+### 育ってから分割 (編集局所性 + レイテンシ基準, 2026-05-27 改訂)
 
-章本体の `Main.lean` が概ね **1500-2000 行** を超えた段階で、subsection 単位で同じ章ディレクトリ配下に切り出す:
+分割の良し悪しを決めるのは **行数ではなく 1 edit-cycle の再ビルドレイテンシ**。`lake build` は
+olean = ファイル単位なので、1 行直すとそのファイル全体 + 下流 importer が再 elaboration される
+(コスト ≈ 5s 固定 + ~2ms/行、証明密度で大きく変動)。エージェント駆動は edit-build を多数回すので、
+この **サイクルレイテンシが唯一の本質的な分割理由**。LLM の可読性は律速ではない (6000 行でも
+ページング Read + 文字列マッチ Edit で扱える)。
+
+**いつ割るか**: 「**今まさに伸ばしている章** かつ **leaf 再ビルドが痛い**」とき。目安は >~4000 行
+または rebuild >~12-15s。**休眠中の巨大ファイル (編集していない完成章) は行数だけでは割らない** —
+キャッシュされて無害で、今割るのは「先回り分割」。行数は粗い代理指標で、重い `simp`/`omega`/
+typeclass 探索の多いファイルは行数あたりコストが高い点に注意。
+
+**どう割るか**: import トポロジが効く。線形チェーンだと上流ファイルの編集が下流全部を再ビルドし、
+固定 5s × N で **単一ファイルより遅くなりうる**。したがって **active frontier を小さな leaf
+`Main.lean` (章内で他から import されない側) に残し、完成・凍結した subsection を上流へ押し出す**:
 
 ```
-OddOrder/Isaacs/Ch01_Sylow/Main.lean
-        ↓
 OddOrder/Isaacs/Ch01_Sylow/
-                ├── Main.lean
-                ├── A_Existence.lean
-                ├── B_Normalizer.lean
-                └── ...
+                ├── A_Existence.lean    (凍結 subsection, build 1 回でキャッシュ)
+                ├── B_Normalizer.lean   (凍結 subsection)
+                └── Main.lean           (A,B を import; active frontier = leaf, ここを伸ばす)
 ```
 
-先回りで全部 subsection 分割するのは避ける (本によって subsection 区切りが緩いところがあり、無駄な分割になりやすい)。
+細分化しすぎ (<~800-1000 行が乱立) は固定 5s/ファイルが効いて逆効果。mathlib upstream 観点でも
+focused なファイルは好まれる (soft な副次理由、明確な行数上限は無い)。前例: Ch06/Ch07 分割
+([issues/closed/0038](issues/closed/0038-build-perf-bottleneck.md)) — active §7D を Ch07 leaf
+`Main` に置き、leaf-edit を ~20s → ~7-9s に短縮。
 
 ### トレーサビリティ慣習 (3 層)
 
