@@ -2,7 +2,21 @@
 
 **スコープ**: BG §6 (mmd L1957-2128, PDF pp. 49-66 + blank p.67), **7 結果** (Thm 6.1, 6.2, 6.3, 6.4, 6.7 + Lem 6.5, 6.6 — ナンバリング注: 6.3 は Lemma, 飛び番号 6.8+ は存在せず).
 
-形式化先 (予定): `OddOrder/BG/Ch1_Preliminary/S06_Additional.lean`.
+形式化先: [`OddOrder/BG/Ch1_Preliminary/S06_Additional.lean`](../../OddOrder/BG/Ch1_Preliminary/S06_Additional.lean) (着手済).
+
+## 実装状況 (2026-05-27)
+
+**core results 3 件 sorry-free 完成・配線済** (commit `b3a51b2`):
+- `comm_of_isPGroup_two_of_odd` (helper): 奇数位数 ⇒ 2-部分群自明 ⇒ 可換 (`normal_J` の `h2abelian` discharge)。
+- `thompsonJ_le_opCore_of_odd` (**Thm 6.1 reduced case**): 奇数 solvable, p≠2, P∈Syl_p, O_{p'}=⊥, P=C_G(Z(P)) ⇒ `J(P) ≤ O_p(G)`。
+- `normalJ_normal_of_odd` (**Thm 6.2 reduced case**): 同仮説 ⇒ `J(P) ⊴ G`。
+
+いずれも `OddOrder.Isaacs.Ch07.{normal_J, thompsonJ_le_opCore_of_normal_J_hypotheses}` を呼び、奇数位数+solvable で自動充足する 2 仮説 (`h2abelian` / `h_pSolvable` via `isPiSeparable_of_solvable` instance) を discharge した特殊化。
+
+**残課題**:
+1. **Thm 6.2 一般形** `Z(J(S))·O_{p'}(G) ⊴ G` (任意 S): `O_{p'}(G)` で商を取り reduced case (`normalJ_normal_of_odd`) に簡約。`Z(J(S))` の扱い + quotient lift が中核。
+2. **Thm 6.1 一般形** `O_{p',p}(G) ⊇ S の abelian normal 部分群` (任意 S, C_G(Z(P)) 不要): `opCore p G ≤ oPiPrimePiCore {p} G` 橋 (`oPiCore_singleton_eq_opCore` + quotient) + 任意 abelian normal の thompsonJ 包含。
+3. Thm 6.4, 6.7 + Lem 6.5, 6.6 (solvable + p-length 1 系)。
 
 **ROADMAP 上の位置**: **Phase 2a 第 2 波** (Phase 1 Ch.7 完成必須, §1+§3+§4 完了直後).
 
