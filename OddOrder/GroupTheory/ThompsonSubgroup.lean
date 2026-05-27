@@ -295,7 +295,7 @@ theorem thompsonJ_map_conj_eq_of_mem_normalizer [Finite G] {p : ℕ} {P : Subgro
   have hg_iff : ∀ n, n ∈ P ↔ g * n * g⁻¹ ∈ P := Subgroup.mem_normalizer_iff.mp hg
   have hP_conj : P.map (MulAut.conj g).toMonoidHom = P := by
     ext y
-    simp only [Subgroup.mem_map, MulAut.conj_apply, MonoidHom.coe_coe]
+    rw [Subgroup.mem_map]
     constructor
     · rintro ⟨z, hz, rfl⟩
       exact (hg_iff z).mp hz
@@ -305,7 +305,7 @@ theorem thompsonJ_map_conj_eq_of_mem_normalizer [Finite G] {p : ℕ} {P : Subgro
           have heq : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
           rw [heq]; exact hy
         exact (hg_iff (g⁻¹ * y * g)).mpr hmem
-      · show g * (g⁻¹ * y * g) * g⁻¹ = y
+      · change g * (g⁻¹ * y * g) * g⁻¹ = y
         group
   have hinj : Function.Injective (MulAut.conj g).toMonoidHom := (MulAut.conj g).injective
   rw [← thompsonJ_map_of_injective hinj P p, hP_conj]
