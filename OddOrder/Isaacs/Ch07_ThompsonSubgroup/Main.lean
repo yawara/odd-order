@@ -6827,6 +6827,123 @@ theorem normalizer_le_normalizer_map_of_characteristic
       rw [this]; exact hw'W
     · rw [hcg_symm_apply, hyeq]; group
 
+/-- **§7D Step 1 decomposition** — for a finite nilpotent group `N` whose order
+divides `p^a * q^b` (`p ≠ q`), `N = O_p(N) ⊔ O_q(N)`: the `p`- and `q`-cores
+generate everything.
+
+`N` nilpotent ⇒ `⊤ ≤ F(N)` (`nilpotent_normal_le_fitting`); `F(N) =
+⨆_{r ∈ pf(|N|)} O_r(N)` (`fitting_eq_iSup_primeFactors`); `pf(|N|) ⊆ {p, q}`
+since `|N| ∣ p^a q^b`. -/
+theorem opCore_sup_opCore_eq_top_of_nilpotent_paqb
+    {N : Type*} [Group N] [Finite N] [Group.IsNilpotent N] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hN_dvd : Nat.card N ∣ p ^ a * q ^ b) :
+    OddOrder.Isaacs.Ch01.opCore p N ⊔ OddOrder.Isaacs.Ch01.opCore q N = ⊤ := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- `⊤ ≤ F(N)`.
+  have hTop_le_F : (⊤ : Subgroup N) ≤ OddOrder.Isaacs.Ch01.fitting N := by
+    have := OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting (G := N) (N := ⊤)
+    simpa using this
+  -- `F(N) = ⨆_{r ∈ pf} O_r(N)`.
+  rw [OddOrder.Isaacs.Ch01.fitting_eq_iSup_primeFactors] at hTop_le_F
+  -- every prime factor of `|N|` is `p` or `q`.
+  have hpf_sub : ∀ r ∈ (Nat.card N).primeFactors, r = p ∨ r = q := by
+    intro r hr
+    obtain ⟨hr_prime, hr_dvd, _⟩ := Nat.mem_primeFactors.mp hr
+    have hr_dvd_paqb : r ∣ p ^ a * q ^ b := hr_dvd.trans hN_dvd
+    rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
+    · left; exact (Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp (hr_prime.dvd_of_dvd_pow h)
+    · right; exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow h)
+  -- so `⨆_{r ∈ pf} O_r(N) ≤ O_p(N) ⊔ O_q(N)`.
+  refine top_le_iff.mp (hTop_le_F.trans (iSup_le (fun r => ?_)))
+  rcases hpf_sub r r.2 with hrp | hrq
+  · rw [show (r : ℕ) = p from hrp]; exact le_sup_left
+  · rw [show (r : ℕ) = q from hrq]; exact le_sup_right
+
+/-- **§7D Step 1 core (Thm 4.33 application)** — in a finite solvable group `X'`
+whose order divides `p^a q^b` (`p ≠ q`), a `q`-subgroup `Y` normalized by the
+`p`-local subgroup `N_{X'}(W)` (`W` a nontrivial `p`-subgroup) lies in `O_q(X')`.
+
+This is Isaacs L3970-3973: `M ∩ X = N_X(K_p)` is `p`-local in the solvable `X`;
+`K_q ⊴ M ∩ X` is a `p'`-group, so `K_q ⊆ O_{p'}(M∩X) ⊆ O_{p'}(X) = O_q(X)` by
+Theorem 4.33.  Here `X'` plays the role of `↥X`, `W = K_p`, `Y = K_q`; the
+hypothesis `N_{X'}(W) ≤ N_{X'}(Y)` is `K_q ⊴ M ∩ X`. -/
+theorem qSubgroup_le_opCore_of_normal_in_pLocal
+    {X' : Type*} [Group X'] [Finite X'] [IsSolvable X'] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hX_dvd : Nat.card X' ∣ p ^ a * q ^ b)
+    {W : Subgroup X'} (hW_ne_bot : W ≠ ⊥) (hW_p : IsPGroup p W)
+    {Y : Subgroup X'} (hY_q : IsPGroup q Y)
+    (hY_le : Y ≤ Subgroup.normalizer (W : Set X'))
+    (hY_normalized : Subgroup.normalizer (W : Set X') ≤ Subgroup.normalizer (Y : Set X')) :
+    Y ≤ OddOrder.Isaacs.Ch01.opCore q X' := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) X' := inferInstance
+  set π' : Set ℕ := {r | r ∉ ({p} : Set ℕ)} with hπ'_def
+  -- `L = N_{X'}(W)` is `p`-local.
+  set L : Subgroup X' := Subgroup.normalizer (W : Set X') with hL_def
+  have hL_pLocal : OddOrder.Isaacs.Ch02.IsPLocal p L := ⟨W, hW_ne_bot, hW_p, rfl⟩
+  have hY_le_L : Y ≤ L := hY_le
+  set Ysub : Subgroup ↥L := Y.subgroupOf L with hYsub_def
+  -- `Ysub` is normal in `L` (every `l ∈ L` normalizes `Y` by `hY_normalized`).
+  haveI hYsub_normal : Ysub.Normal := by
+    rw [hYsub_def]
+    refine ⟨fun y hy l => ?_⟩
+    have hl_norm : (l : X') ∈ Subgroup.normalizer (Y : Set X') := hY_normalized l.2
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    rw [Subgroup.mem_normalizer_iff] at hl_norm
+    exact (hl_norm (y : X')).mp hy
+  -- `Ysub` is a `p'`-group: `Y` is a `q`-group, `q ∉ {p}`, transported to `subgroupOf`.
+  have hY_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Y := by
+    intro r hr
+    obtain ⟨hr_prime, hr_dvd_Y, _⟩ := Nat.mem_primeFactors.mp hr
+    have hr_eq_q : r = q := by
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card.mp hY_q)
+      rw [hk] at hr_dvd_Y
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow hr_dvd_Y)
+    rw [hπ'_def, Set.mem_setOf_eq, Set.mem_singleton_iff, hr_eq_q]; exact hpq.symm
+  have hYsub_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Ysub :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hY_le_L hY_pi'
+  -- `Ysub ≤ O_{p'}(L)`.
+  have hYsub_le : Ysub ≤ OddOrder.Isaacs.Ch03.oPiCore π' L :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hYsub_pi'
+  -- Theorem 4.33: `O_{p'}(L).map L.subtype ≤ O_{p'}(X')`.
+  have h433 := OddOrder.Isaacs.Ch04.oPiCore_compl_le_oPiCore_compl_of_isPLocal
+    (G := X') (p := p) L hL_pLocal
+  -- `Y = Ysub.map L.subtype ≤ O_{p'}(L).map L.subtype ≤ O_{p'}(X')`.
+  have hY_eq_map : Y = Ysub.map L.subtype := by
+    rw [hYsub_def, Subgroup.subgroupOf, Subgroup.map_comap_eq, L.range_subtype]
+    exact (inf_eq_right.mpr hY_le_L).symm
+  have hY_le_oPi' : Y ≤ OddOrder.Isaacs.Ch03.oPiCore π' X' := by
+    rw [hY_eq_map]
+    exact (Subgroup.map_mono hYsub_le).trans h433
+  -- `O_{p'}(X') = O_q(X')` for a `{p,q}`-group `X'`: `O_{p'}` is a `q`-group ≤ `O_q`.
+  have hOpi'_q : OddOrder.Isaacs.Ch03.oPiCore π' X' ≤ OddOrder.Isaacs.Ch01.opCore q X' := by
+    set Z := OddOrder.Isaacs.Ch03.oPiCore π' X' with hZ_def
+    have hZ_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Z :=
+      OddOrder.Isaacs.Ch03.oPiCore.isPiGroup π'
+    have hZ_q : IsPGroup q Z := by
+      apply OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton
+      intro r hr
+      obtain ⟨hr_prime, hr_dvd_Z, _⟩ := Nat.mem_primeFactors.mp hr
+      have hr_ne_p : r ≠ p := by
+        have := hZ_pi r hr
+        rwa [hπ'_def, Set.mem_setOf_eq, Set.mem_singleton_iff] at this
+      have hr_dvd_X : r ∣ Nat.card X' := hr_dvd_Z.trans Z.card_subgroup_dvd_card
+      have hr_dvd_paqb : r ∣ p ^ a * q ^ b := hr_dvd_X.trans hX_dvd
+      rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
+      · exact absurd ((Nat.prime_dvd_prime_iff_eq hr_prime hp_prime).mp
+          (hr_prime.dvd_of_dvd_pow h)) hr_ne_p
+      · simp only [Set.mem_singleton_iff]
+        exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow h)
+    haveI : Z.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal π' X'
+    exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hZ_q
+  exact hY_le_oPi'.trans hOpi'_q
+
 /-! ### §7D Steps 3-9 — per-step axioms + Step 7 theorem + final wiring
 
 The remaining heavier steps (3, 4, 6, 8, 9) are stated as fine-grained local
