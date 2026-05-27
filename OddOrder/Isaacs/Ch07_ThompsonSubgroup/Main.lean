@@ -21,6 +21,7 @@ import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # OddOrder.Isaacs.Ch07 — The Thompson Subgroup
@@ -4755,7 +4756,172 @@ private theorem relIndex_sup_of_inf_eq_bot
     rw [h1', ← h2', mul_comm]
   exact Nat.eq_of_mul_eq_mul_left hA_pos hfin
 
-/-- **Isaacs Thm 7.6 Step 5** (local axiom — mmd L3874): `|Ā| = p`, equivalently
+/-- **Modular law, normalizer form** (mmd L3877): if `W ≤ L`, `A ⊓ L = ⊥`, and `A`
+normalizes `W`, then `(W ⊔ A) ⊓ L = W`.  Used to show `W ⊔ Ā = ⊤ ⇒ W = L̄`.
+
+The mathlib `IsModularLattice (Subgroup ·)` instance only covers `[CommGroup]`; here
+the noncommutative case is handled by hand via the product representation `W·A` of
+`W ⊔ A` (valid since `A ≤ N(W)`, so `W` is normal in `W ⊔ A`). -/
+private theorem inf_sup_eq_of_le_normalizer_of_inf_eq_bot
+    {G : Type*} [Group G] {W A L : Subgroup G}
+    (hW_le : W ≤ L) (hA_inf : A ⊓ L = ⊥) (hAnorm : A ≤ Subgroup.normalizer (W : Set G)) :
+    (W ⊔ A) ⊓ L = W := by
+  apply le_antisymm
+  · intro x ⟨hxWA, hxL⟩
+    -- `W` is normal in `A ⊔ W`, so `x = w * a` with `w ∈ W`, `a ∈ A`.
+    haveI : (W.subgroupOf (A ⊔ W)).Normal := Subgroup.normal_subgroupOf_sup_of_le_normalizer hAnorm
+    have hx_AW : x ∈ A ⊔ W := by rw [sup_comm]; exact hxWA
+    have hmem : (⟨x, hx_AW⟩ : ↥(A ⊔ W)) ∈ (W.subgroupOf (A ⊔ W)) ⊔ (A.subgroupOf (A ⊔ W)) := by
+      rw [← Subgroup.subgroupOf_sup (le_sup_right) (le_sup_left), sup_comm W A,
+        Subgroup.subgroupOf_self]
+      exact Subgroup.mem_top _
+    rw [Subgroup.mem_sup_of_normal_left] at hmem
+    obtain ⟨⟨w, hw_AW⟩, hw, ⟨a, ha_AW⟩, ha, heq⟩ := hmem
+    have hw_W : w ∈ W := hw
+    have ha_A : a ∈ A := ha
+    have hxeq : x = w * a := congrArg (Subtype.val) heq |>.symm
+    -- `a = w⁻¹ * x ∈ L` (since `w ∈ W ≤ L`, `x ∈ L`), so `a ∈ A ⊓ L = ⊥`, `a = 1`.
+    have ha_L : a ∈ L := by
+      have : w⁻¹ * x ∈ L := L.mul_mem (L.inv_mem (hW_le hw_W)) hxL
+      rwa [hxeq, ← mul_assoc, inv_mul_cancel, one_mul] at this
+    have ha_one : a = 1 := by
+      have : a ∈ A ⊓ L := ⟨ha_A, ha_L⟩
+      rw [hA_inf, Subgroup.mem_bot] at this; exact this
+    rw [hxeq, ha_one, mul_one]; exact hw_W
+  · exact le_inf le_sup_left hW_le
+
+/-- **Isaacs Thm 7.6 Step 5, "trivial on proper invariant" clause** (mmd L3876-3878).
+
+Given the running Thm 7.6 hypotheses, the IH, the chosen `A ∈ E(P)` with `A ⊄ U`,
+and Step 4's output `P = UA`, every `Ā`-invariant proper subgroup `W < L̄` of
+`L̄ = O_{p'}(Ḡ)` is centralized by `Ā` (`⁅W, Ā⁆ = ⊥`).
+
+Book proof: set `M = preimage of W in G containing U` (`= W.comap mk`), so
+`U ≤ M ≤ L`.  `A ≤ N_G(M)` (since `Ā` normalizes `W` and `U = ker mk ≤ M`),
+hence `H = M ⊔ A` is proper (`H = ⊤` would force `W ⊔ Ā = ⊤`, and the modular
+law `(W ⊔ Ā) ⊓ L̄ = W ⊔ (Ā ⊓ L̄) = W` would give `L̄ = W`, contradicting `W < L̄`)
+with `P = UA ⊆ H` Sylow (`|H : P| = |W|`, a `p'`-number, via `relIndex`).  Step 3
+applied to `H` gives `⁅L ⊓ H, A⁆ ≤ U`; since `M ≤ L ⊓ H`, `⁅M, A⁆ ≤ U = ker mk`,
+so `⁅W, Ā⁆ = mk⁅M, A⁆ = ⊥`. -/
+private theorem step5_Abar_centralizes_invariant_proper.{u}
+    {G : Type u} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    (ih : ∀ (H : Type u) [Group H] [Finite H]
+      [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H],
+      Nat.card H < Nat.card G →
+      (∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H = ⊥ →
+      ∀ (Q : Sylow p H),
+        Subgroup.centralizer
+            (((Subgroup.center (Q : Subgroup H)).map
+              (Q : Subgroup H).subtype) : Set H)
+          = (Q : Subgroup H) →
+        (Subgroup.thompsonJ (Q : Subgroup H) p).Normal)
+    {A : Subgroup G}
+    (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    (h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G))
+    {W : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)}
+    (hW_le : W ≤ OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))
+    (hW_ne : W ≠ OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))
+    (hW_normalized : ∀ a : G, a ∈ A → ∀ w, w ∈ W →
+      (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) a * w *
+        ((QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) a)⁻¹ ∈ W) :
+    (⁅W, A.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G))⁆ :
+      Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥ := by
+  classical
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set L : Subgroup G := opPpPrimeCore G p with hL_def
+  set mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hmk_def
+  set Lbar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hLbar_def
+  set Abar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := A.map mk
+    with hAbar_def
+  have hU_eq_oPi : U = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
+  have hker_mk : mk.ker = U := by rw [hmk_def, QuotientGroup.ker_mk', hU_eq_oPi]
+  have hA_le_P : A ≤ (P : Subgroup G) := hA_mem.1
+  have hA_pg : IsPGroup p A := hA_mem.2.1.isPGroup
+  have hU_le_P : U ≤ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P
+  -- `L = comap mk L̄`, and `L.map mk = L̄`.
+  have hL_comap : L = Lbar.comap mk := by rw [hL_def, hLbar_def, hmk_def, opPpPrimeCore]
+  have hLmap : L.map mk = Lbar := by rw [hL_def, hLbar_def, hmk_def]; exact opPpPrimeCore_map_eq_LBar
+  have hU_le_L : U ≤ L := by rw [hU_eq_oPi, hL_def]; exact oPiCore_p_le_opPpPrimeCore
+  -- `M = preimage of W`, `U ≤ M ≤ L`.
+  set M : Subgroup G := W.comap mk with hM_def
+  have hU_le_M : U ≤ M := by
+    rw [hM_def, ← hker_mk]; intro x hx; rw [Subgroup.mem_comap, hx]; exact W.one_mem
+  have hM_le_L : M ≤ L := by rw [hM_def, hL_comap]; exact Subgroup.comap_mono hW_le
+  have hMmap : M.map mk = W := by
+    rw [hM_def]; exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) W
+  -- `H = M ⊔ A`.  `U ⊔ A ≤ H`, `P ≤ H`, `mk H = W ⊔ Abar`.
+  set H : Subgroup G := M ⊔ A with hH_def
+  have hUA_le_H : U ⊔ A ≤ H := sup_le_sup_right hU_le_M A
+  have hP_le_H : (P : Subgroup G) ≤ H := by rw [← h_P_eq_UA]; exact hUA_le_H
+  have hHmap : H.map mk = W ⊔ Abar := by
+    rw [hH_def, Subgroup.map_sup, hMmap, hAbar_def]
+  -- `Abar` normalizes `W` (from `hW_normalized`).
+  have hAbar_inf_Lbar : Abar ⊓ Lbar = ⊥ := by
+    rw [hAbar_def, hLbar_def]; exact AbarInf_LBar_eq_bot hA_pg
+  have hAbar_norm_W : Abar ≤ Subgroup.normalizer (W : Set _) := by
+    rintro _ ⟨a, ha, rfl⟩
+    rw [Subgroup.mem_normalizer_iff]
+    intro w
+    constructor
+    · intro hw; exact hW_normalized a ha w hw
+    · intro hw
+      have := hW_normalized a⁻¹ (A.inv_mem ha) _ hw
+      simpa [map_inv, mul_assoc] using this
+  -- `H ≠ ⊤`: else `W ⊔ Abar = ⊤`, modular law forces `W = L̄`.
+  have hH_ne_top : H ≠ ⊤ := by
+    intro hHtop
+    apply hW_ne
+    have hWAbar_top : W ⊔ Abar = ⊤ := by rw [← hHmap, hHtop, Subgroup.map_top_of_surjective _
+      (QuotientGroup.mk'_surjective _)]
+    -- `(W ⊔ Abar) ⊓ L̄ = W` (modular law), and LHS `= ⊤ ⊓ L̄ = L̄`.
+    have hmod := inf_sup_eq_of_le_normalizer_of_inf_eq_bot hW_le hAbar_inf_Lbar hAbar_norm_W
+    rw [hWAbar_top, top_inf_eq] at hmod
+    exact hmod.symm
+  -- `P = UA ⊆ H` is a Sylow `p`-subgroup of `G` contained in `H`, hence Sylow in `↥H`
+  -- (`Sylow.subtype`).  Since `P ⊆ H`, `H ⊓ P = P`, giving the form Step 3 wants.
+  let S : Sylow p ↥H := P.subtype hP_le_H
+  have hS_coe : (S : Subgroup ↥H) = (P : Subgroup G).subgroupOf H := P.coe_subtype hP_le_H
+  have hHP_eq_P : H ⊓ (P : Subgroup G) = (P : Subgroup G) := inf_eq_right.mpr hP_le_H
+  have hS_eq_HP : (S : Subgroup ↥H) = (H ⊓ (P : Subgroup G)).subgroupOf H := by
+    rw [hS_coe, hHP_eq_P]
+  -- Step 3 applied to `H`: `⁅L ⊓ H, A⁆ ≤ U`.
+  have hStep3 : (⁅L ⊓ H, A⁆ : Subgroup G) ≤ U :=
+    step3_Abar_centralizes_inter_LBar P hp2 h_pSolvable h2abelian h_oPiPrime_trivial
+      h_centralizer_center ih hA_mem hH_ne_top hUA_le_H S hS_eq_HP
+  -- `M ≤ L ⊓ H`, so `⁅M, A⁆ ≤ ⁅L ⊓ H, A⁆ ≤ U = ker mk`.
+  have hM_le_LinfH : M ≤ L ⊓ H := le_inf hM_le_L le_sup_left
+  have hMA_le_U : (⁅M, A⁆ : Subgroup G) ≤ U :=
+    (Subgroup.commutator_mono hM_le_LinfH le_rfl).trans hStep3
+  -- `⁅W, Abar⁆ = mk⁅M, A⁆ ≤ mk U = ⊥`.
+  have hcomm_map : (⁅M, A⁆ : Subgroup G).map mk = ⊥ := by
+    rw [Subgroup.map_eq_bot_iff, hker_mk]; exact hMA_le_U
+  rw [← hMmap, hAbar_def, ← Subgroup.map_commutator, hcomm_map]
+
+/-- The conjugation `MulDistribMulAction` of `↥Q` on the normal subgroup `↥N`
+of `K`, via `MulAut.conjNormal ∘ Q.subtype`.  Under this action,
+`a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩`.  Used in Step 5 with `Q = Ā`, `N = L̄`. -/
+private noncomputable def subgroupConjActionOnNormal
+    {K : Type*} [Group K] (Q N : Subgroup K) [N.Normal] :
+    MulDistribMulAction ↥Q ↥N :=
+  MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp Q.subtype)
+
+/-- **Isaacs Thm 7.6 Step 5** (mmd L3874): `|Ā| = p`, equivalently
 `(O_p(G)).relIndex A = p`.
 
 Given Step 4's output `P = UA` plus the running hypotheses and the induction
@@ -4763,15 +4929,10 @@ hypothesis, `Ā = A.map mk'` acts faithfully and coprimely on `L̄ = O_{p'}(Ḡ)
 (faithful by Step 1(c) + `Ā ⊓ L̄ = ⊥`; coprime by `p` vs `p'`).  By Lemma 6.20
 (`isCyclic_of_faithful_trivial_on_proper_invariant`), `Ā` is cyclic — the
 "trivial on every `Ā`-invariant proper subgroup `M̄ < L̄`" hypothesis is exactly
-Step 3 applied to `H = MA` (proper since `|L:M|` is a `p'`-number `> 1`).  A
-nontrivial cyclic elementary abelian `p`-group has order `p`.
-
-The residual content is the `MulDistribMulAction Ā L̄` instance plumbing and the
-per-invariant-subgroup Step 3 application; isolated here so Step 4 lands
-unconditionally.
-
-Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
-private axiom step5_Abar_card_eq_p.{u}
+`step5_Abar_centralizes_invariant_proper` (Step 3 applied to `H = MA`).  A
+nontrivial cyclic elementary abelian `p`-group has order `p`; the conversion of
+`Nat.card Ā = p` to `(O_p(G)).relIndex A = p` is `relIndex_sup_of_inf_eq_bot`. -/
+private theorem step5_Abar_card_eq_p.{u}
     {G : Type u} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     (hp2 : p ≠ 2)
@@ -4797,7 +4958,138 @@ private axiom step5_Abar_card_eq_p.{u}
     (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
     (hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G)
     (h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G)) :
-    (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p
+    (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p := by
+  classical
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G := h_pSolvable
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hmk_def
+  set Lbar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :=
+    OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hLbar_def
+  set Abar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := A.map mk
+    with hAbar_def
+  have hU_eq_oPi : U = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
+  have hA_pg : IsPGroup p A := hA_mem.2.1.isPGroup
+  haveI hLbar_normal : Lbar.Normal := by
+    rw [hLbar_def]; exact OddOrder.Isaacs.Ch03.oPiCore.normal _ _
+  -- `Ā ⊓ L̄ = ⊥`, `Ā ≠ ⊥`.
+  have hAbar_inf_Lbar : Abar ⊓ Lbar = ⊥ := by
+    rw [hAbar_def, hLbar_def]; exact AbarInf_LBar_eq_bot hA_pg
+  have hAbar_ne_bot : Abar ≠ ⊥ := by
+    rw [hAbar_def, hmk_def]
+    exact Abar_ne_bot_of_not_le (by rwa [hU_eq_oPi] at hA_not_le)
+  -- The conjugation action `↥Ā ↷ ↥L̄`.  `a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩`.
+  letI : MulDistribMulAction ↥Abar ↥Lbar := subgroupConjActionOnNormal Abar Lbar
+  have hsmul_coe : ∀ (a : ↥Abar) (n : ↥Lbar),
+      ((a • n : ↥Lbar) : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) =
+        (↑a : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) * ↑n * (↑a)⁻¹ := by
+    intro a n; rfl
+  -- `Ā` is elementary abelian (image of the elementary abelian `A`).
+  have hAbar_el : OddOrder.GroupTheory.IsElementaryAbelian p ↥Abar := by
+    rw [hAbar_def]
+    exact isElementaryAbelian_map_of_isElementaryAbelian mk
+      (A := A) ⟨hA_mem.2.1.1, hA_mem.2.1.2⟩
+  -- `↥Ā` is abelian.
+  haveI : IsMulCommutative ↥Abar := ⟨⟨hAbar_el.1⟩⟩
+  -- The action is faithful: `a` fixes all of `L̄` ⇒ `↑a ∈ C_Ḡ(L̄)`, and `Ā ⊓ C_Ḡ(L̄) = ⊥`.
+  have hAbar_inf_cent :
+      Abar ⊓ Subgroup.centralizer
+        (Lbar : Set (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥ := by
+    rw [hAbar_def, hLbar_def]; exact AbarInf_centralizer_LBar_eq_bot hA_pg
+  haveI : FaithfulSMul ↥Abar ↥Lbar := by
+    refine ⟨fun {a b} h => ?_⟩
+    -- `↑b⁻¹ * ↑a` centralizes `L̄`.
+    set ga : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := a.1 with hga
+    set gb : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := b.1 with hgb
+    have hcent : gb⁻¹ * ga ∈ Subgroup.centralizer
+        (Lbar : Set (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro m hm
+      have heq := h ⟨m, hm⟩
+      rw [Subtype.ext_iff, hsmul_coe, hsmul_coe, ← hga, ← hgb] at heq
+      -- `heq : ga * m * ga⁻¹ = gb * m * gb⁻¹`  ⇒  `m * (gb⁻¹ * ga) = (gb⁻¹ * ga) * m`.
+      calc m * (gb⁻¹ * ga)
+          = gb⁻¹ * (gb * m * gb⁻¹) * ga := by group
+        _ = gb⁻¹ * (ga * m * ga⁻¹) * ga := by rw [heq]
+        _ = (gb⁻¹ * ga) * m := by group
+    have hmem : gb⁻¹ * ga ∈ Abar ⊓ Subgroup.centralizer
+        (Lbar : Set (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) :=
+      ⟨Abar.mul_mem (Abar.inv_mem b.2) a.2, hcent⟩
+    rw [hAbar_inf_cent, Subgroup.mem_bot] at hmem
+    exact Subtype.ext (inv_mul_eq_one.mp hmem).symm
+  -- Coprimality: `|Ā|` is a `p`-power, `|L̄|` is a `p'`-number.
+  have hCop : Nat.Coprime (Nat.card ↥Abar) (Nat.card ↥Lbar) := by
+    have hAbar_pg : IsPGroup p ↥Abar := by rw [hAbar_def]; exact hA_pg.map mk
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hAbar_pg
+    rw [hk]
+    refine Nat.Coprime.pow_left k ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr ?_)
+    intro hdvd
+    have hLbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Lbar := by
+      rw [hLbar_def]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup
+        (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
+    exact (hLbar_pi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)) rfl
+  -- `hproper`: `Ā` acts trivially on every `Ā`-invariant proper `M̄ < L̄`.
+  have hproper : ∀ M : Subgroup ↥Lbar, (∀ a : ↥Abar, ∀ n ∈ M, a • n ∈ M) → M ≠ ⊤ →
+      ∀ a : ↥Abar, ∀ n ∈ M, a • n = n := by
+    intro M hM_inv hM_ne_top a n hn
+    -- Set `W = M.map L̄.subtype ≤ L̄`, proper, `Ā`-invariant; apply the focused lemma.
+    set W : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := M.map Lbar.subtype
+      with hW_def
+    have hW_le : W ≤ Lbar := by rw [hW_def]; exact Subgroup.map_subtype_le M
+    have hW_ne : W ≠ Lbar := by
+      intro hWtop
+      apply hM_ne_top
+      apply Subgroup.map_injective Lbar.subtype_injective
+      rw [← hW_def, hWtop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    have hW_normalized : ∀ a : G, a ∈ A → ∀ w, w ∈ W → mk a * w * (mk a)⁻¹ ∈ W := by
+      intro g hg w hw
+      obtain ⟨⟨w, hwL⟩, hwM, rfl⟩ := hw
+      have hg_Abar : mk g ∈ Abar := Subgroup.mem_map_of_mem mk hg
+      have hmoved := hM_inv ⟨mk g, hg_Abar⟩ ⟨w, hwL⟩ hwM
+      rw [hW_def]
+      have hsmul := hsmul_coe ⟨mk g, hg_Abar⟩ ⟨w, hwL⟩
+      exact ⟨_, hmoved, hsmul⟩
+    have hcomm := step5_Abar_centralizes_invariant_proper P hp2 h_pSolvable h2abelian
+      h_oPiPrime_trivial h_centralizer_center ih hA_mem h_P_eq_UA hW_le hW_ne hW_normalized
+    -- `⁅W, Ā⁆ = ⊥` ⇒ `Ā` centralizes `W` ⇒ `a • n = n`.
+    apply Subtype.ext
+    rw [hsmul_coe a n]
+    -- `ga` and `gn` commute since `⁅W, Ā⁆ = ⊥` and `gn ∈ W`, `ga ∈ Ā`.
+    set ga : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := a.1 with hga
+    set gn : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := n.1 with hgn
+    have hn_W : gn ∈ W := ⟨n, hn, rfl⟩
+    have hcomm_mem : ⁅gn, ga⁆ ∈ (⊥ :
+        Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) := by
+      rw [← hcomm]
+      exact Subgroup.commutator_mem_commutator hn_W a.2
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute] at hcomm_mem
+    -- `gn` and `ga` commute ⇒ `ga * gn * ga⁻¹ = gn`.
+    rw [mul_inv_eq_iff_eq_mul]
+    exact hcomm_mem.symm.eq
+  -- Apply Lemma 6.20: `Ā` is cyclic.
+  have hAbar_cyclic : IsCyclic ↥Abar :=
+    OddOrder.Isaacs.Ch06.isCyclic_of_faithful_trivial_on_proper_invariant hCop hproper
+  -- `Ā` is nontrivial, elementary abelian, cyclic `p`-group ⇒ `|Ā| = p`.
+  haveI : Nontrivial ↥Abar := (Subgroup.nontrivial_iff_ne_bot _).mpr hAbar_ne_bot
+  have hAbar_card : Nat.card ↥Abar = p :=
+    card_eq_prime_of_isElementaryAbelian_isCyclic_nontrivial hAbar_el hAbar_cyclic
+  -- Convert `Nat.card Ā = p` to `U.relIndex A = p` via `relIndex_map_map` + diamond.
+  -- `U.relIndex A = |A : A ⊓ U| = |Ā| = p` (`Ā = A.map mk ≅ A / (A ⊓ U)`, `ker mk = U`).
+  rw [← hAbar_card]
+  -- `U.relIndex A = (U.subgroupOf A).index`; `U.subgroupOf A = ker (mk ∘ A.subtype)`.
+  change (U.subgroupOf A).index = Nat.card ↥Abar
+  have hker : U.subgroupOf A = (mk.comp A.subtype).ker := by
+    ext x
+    rw [Subgroup.mem_subgroupOf, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      hmk_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, ← hU_eq_oPi]
+  rw [hker]
+  -- `|A : ker φ| = |range φ| = |A.map mk| = |Ā|` for `φ = mk ∘ A.subtype`.
+  have hrange : (mk.comp A.subtype).range = Abar := by
+    rw [hAbar_def, MonoidHom.range_comp, Subgroup.range_subtype]
+  rw [← hrange]
+  exact Subgroup.index_ker (mk.comp A.subtype)
 
 /-- **Isaacs Thm 7.6 Steps 4 + 5** (mmd L3870-3878).
 
