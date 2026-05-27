@@ -148,6 +148,12 @@ structure Hypothesis (G : Type*) [Group G] [Fintype G] (A : Set G) (L : Subgroup
       Subgroup.centralizer ({a.1} : Set G) = H a ⊔ centralizerIn L a.1
   centralizer_disjoint :
     ∀ a : {a : G // a ∈ A}, Disjoint (H a) (centralizerIn L a.1)
+  /-- `H(a)` is normal in `C_G(a)`: the normal-complement half of the
+  semidirect product `(2.2.b)` `C_G(a) = H(a) ⋊ C_L(a)`.  Without this the join
+  `H(a) ⊔ C_L(a)` need not have cardinality `|H(a)|·|C_L(a)|`. -/
+  H_normalized :
+    ∀ (a : {a : G // a ∈ A}) (c : G),
+      c ∈ Subgroup.centralizer ({a.1} : Set G) → ∀ x ∈ H a, c * x * c⁻¹ ∈ H a
   centralizer_coprime :
     ∀ a b : {a : G // a ∈ A},
       Nat.Coprime (Nat.card (H a)) (Nat.card (centralizerIn L b.1))
@@ -236,6 +242,8 @@ def of_isTISubset (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact hx.2
   centralizer_disjoint := fun _ => disjoint_bot_left
+  H_normalized := fun _ _ _ x hx => by
+    rw [Subgroup.mem_bot.mp hx, mul_one, mul_inv_cancel]; exact (⊥ : Subgroup G).one_mem
   centralizer_coprime := fun _ _ => by
     simp
 
@@ -276,6 +284,7 @@ def restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
     exact hyp.conj_in_L (hA₁A ha) (hA₁A hb) hconj
   centralizer_eq_sup := fun a => hyp.centralizer_eq_sup ⟨a.1, hA₁A a.2⟩
   centralizer_disjoint := fun a => hyp.centralizer_disjoint ⟨a.1, hA₁A a.2⟩
+  H_normalized := fun a => hyp.H_normalized ⟨a.1, hA₁A a.2⟩
   centralizer_coprime := fun a b =>
     hyp.centralizer_coprime ⟨a.1, hA₁A a.2⟩ ⟨b.1, hA₁A b.2⟩
 

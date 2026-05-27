@@ -50,11 +50,37 @@ orbit-stabilizer で `P = |Stab|·|orbit| = |C_G(a)|`.
 
 - [x] 基礎: commuting coprime 元の CRT 指数抽出 + 共役 rigidity
       → `OddOrder/GroupTheory/CoprimeConjugacy.lean`
-      (`exists_pow_eq_self_and_forall_pow_eq_one`, `conj_fixes_of_commute`)
-- [ ] fiber count `P(a,g)=|C_G(a)|` (orbit-stabilizer, ConjAct)
-- [ ] (2.4.b): `(aH(a))^G ∩ (bH(b))^G ≠ ∅ ⟹ a ~_L b` (大域 coprimality 2.2.c + CRT)
-- [ ] `|C_G(a)| = |H(a)|·|C_L(a)|` (centralizer_eq_sup + disjoint, 内部直積の位数)
+      (`exists_pow_eq_self_and_forall_pow_eq_one`, `conj_fixes_of_commute`) — commit a6a1514
+- [x] fiber count `P(a,g)=|C_G(a)|` → `card_conj_fiber`
+      (orbit-stabilizer は不要、fiber=C_G(a) コセットの全単射で直接) — commit 7cbc6b6
+      付随: `card_conjugatorBy_eq_card_centralizer`
+- [x] (2.4.b): cross-rigidity `isConj_of_isConj_mul` (commit b531ca5) +
+      S04 `Hypothesis.isConj_in_L_of_mul_H` (commit 18ee01c).
+      付随 helper: `commute_of_mem_H`, `orderOf_dvd_card_centralizerIn`
+- [ ] **⚠ Hypothesis 符号化の修正が必要 (BLOCKER)**: 下記参照
+- [ ] `|C_G(a)| = |H(a)|·|C_L(a)|` (正規性フィールド追加後)
+- [ ] `|a^L|·|C_L(a)| = |L|` (L 内 orbit-stabilizer)
 - [ ] S04 で三重和 double-count 組立 + 正規化 (star/inv, supportedness, ψ averaging)
+      + `adjoint_formula` に `HConjInvariant` 前提を追加
+
+## ⚠ 発見: Hypothesis 符号化が (2.2.b) の ⋊ より弱い
+
+現在の `Hypothesis` は (2.2.b) `C_G(a) = H(a) ⋊ C_L(a)` を
+`centralizer_eq_sup` (join `H a ⊔ C_L a`) + `centralizer_disjoint` (`H a ⊓ C_L a = ⊥`)
+で符号化しているが、**H(a) が C_G(a) で正規であること (⋊ の核心) が落ちている**.
+
+- join + disjoint だけでは `|C_G(a)| = |H(a)|·|C_L(a)|` は**導けない** (一般に
+  `|H ⊔ K| ≠ |H||K|`; 集合積 `HK` が部分群 = 一方が正規, が必要).
+- `card_conj_fiber` の適用にも `hnorm` (C_G(a) が H(a) を正規化) が必要.
+
+**修正案**: `Hypothesis` に field 追加:
+```
+H_normalized : ∀ (a : {a // a ∈ A}) (c : G),
+  c ∈ Subgroup.centralizer {a.1} → ∀ x ∈ H a, c * x * c⁻¹ ∈ H a
+```
+- `of_isTISubset` (H=⊥): `c*x*c⁻¹ ∈ ⊥` は x=1 から自明.
+- `restrict`: H 不変なので持ち越し.
+これで `|C_G(a)|=|H||C_L|` (H 正規 ⟹ join=集合積 ⟹ 位数積) と fiber count 適用が可能.
 
 ## 完了条件
 
