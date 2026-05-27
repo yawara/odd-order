@@ -682,6 +682,58 @@ theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
   rw [hsum]
   exact Finset.sum_congr rfl (fun a ha => (hfiber a ha).symm)
 
+open Classical in
+/-- **Fiber regrouping for the (2.7) adjoint formula.**  For a fixed `a ∈ A` and
+any `F : G → ℂ`, summing `F` over the conjugates `t(ax)t⁻¹` (`x ∈ H(a)`, `t ∈ G`)
+collapses to a sum over the target values `b`, each weighted by the fiber size
+`|C_G(a)|` (`card_conj_fiber`): a value `b` is hit iff `b ∈ (aH(a))^G`. -/
+theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
+    (F : G → ℂ) :
+    ∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)
+      = ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+          (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
+  classical
+  have hcomm : ∀ x ∈ hyp.H a, Commute a.1 x := fun x hx => hyp.commute_of_mem_H a hx
+  have hcop : Nat.Coprime (orderOf a.1) (Nat.card (hyp.H a)) :=
+    Nat.Coprime.coprime_dvd_left (hyp.orderOf_dvd_card_centralizerIn a.2)
+      (hyp.centralizer_coprime a a).symm
+  set ν : (hyp.H a) × G → G :=
+    fun p => (p.2 : G) * (a.1 * (p.1 : G)) * (p.2 : G)⁻¹ with hν
+  -- nested sum = sum over the product, then regroup by value
+  have step1 : (∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹))
+      = ∑ p : (hyp.H a) × G, F (ν p) := by rw [Fintype.sum_prod_type]
+  rw [step1, ← Finset.sum_fiberwise_of_maps_to (t := (Finset.univ : Finset G)) (g := ν)
+      (fun p _ => Finset.mem_univ _) (f := fun p => F (ν p)),
+    Finset.sum_filter]
+  apply Finset.sum_congr rfl
+  intro b _
+  by_cases hQ : ∃ x ∈ hyp.H a, IsConj (a.1 * x) b
+  · rw [if_pos hQ]
+    obtain ⟨x₀, hx₀, hx₀conj⟩ := hQ
+    have hcard : (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card
+        = Nat.card (Subgroup.centralizer ({a.1} : Set G)) := by
+      rw [← Fintype.card_subtype (fun p : (hyp.H a) × G => ν p = b),
+        ← Nat.card_eq_fintype_card]
+      rw [← OddOrder.GroupTheory.card_conj_fiber hcomm (hyp.H_normalized a) hcop hx₀ hx₀conj]
+      apply Nat.card_congr
+      exact
+        { toFun := fun q => ⟨((q.1.1 : G), q.1.2), q.1.1.2, q.2⟩
+          invFun := fun q => ⟨(⟨q.1.1, q.2.1⟩, q.1.2), q.2.2⟩
+          left_inv := fun q => rfl
+          right_inv := fun q => rfl }
+    calc ∑ p ∈ Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b), F (ν p)
+        = ∑ _p ∈ Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b), F b :=
+          Finset.sum_congr rfl (fun p hp => by rw [(Finset.mem_filter.mp hp).2])
+      _ = (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card • F b :=
+          Finset.sum_const _
+      _ = (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
+          rw [hcard, nsmul_eq_mul]
+  · rw [if_neg hQ]
+    apply Finset.sum_eq_zero
+    intro p hp
+    exact absurd ⟨p.1, p.1.2, by
+      rw [← (Finset.mem_filter.mp hp).2]; exact isConj_iff.mpr ⟨(p.2 : G), rfl⟩⟩ hQ
+
 end Hypothesis
 
 section DadeMap
