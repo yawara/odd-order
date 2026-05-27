@@ -85,6 +85,49 @@ It returns `IsCyclic Z_p ∧ (IsCyclic Z_q → p < q)`.  `step3_not_both_opCore_
 applies it with `(p,q)` and `(q,p)` (same `M`): `Z_p, Z_q` cyclic and `p < q`,
 `q < p` — contradiction. -/
 
+/-- **§7D Step 3 arithmetic** — a nontrivial `p`-group `A` acting faithfully on a
+cyclic `q`-group `C` (via an injective `A →* MulAut C`) forces `p < q`.
+
+`A` injects into `MulAut C ≅ (ZMod q^j)ˣ`, which has order `φ(q^j) = q^{j-1}(q-1)`
+(`IsCyclic.card_mulAut`).  Since `p ≠ q`, `p ∤ q^{j-1}`, so `p ∣ q-1`, giving
+`p ≤ q-1 < q`. -/
+private theorem prime_lt_of_pGroup_faithful_on_cyclic
+    {A C : Type*} [Group A] [Finite A] [Group C] [Finite C] [IsCyclic C]
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hA : IsPGroup p A) (hA_nt : Nontrivial A)
+    (hC : IsPGroup q C) (hpq : p ≠ q)
+    (φ : A →* MulAut C) (hφ : Function.Injective φ) :
+    p < q := by
+  classical
+  have hp : p.Prime := Fact.out
+  have hq : q.Prime := Fact.out
+  -- `p ∣ |A|`  (`|A| = p^m`, `m ≥ 1` since `A` nontrivial).
+  obtain ⟨m, hmA⟩ := (IsPGroup.iff_card (p := p) (G := A)).mp hA
+  have hA1 : 1 < Nat.card A := Finite.one_lt_card_iff_nontrivial.mpr hA_nt
+  have hm0 : m ≠ 0 := by rintro rfl; rw [pow_zero] at hmA; omega
+  have hpA : p ∣ Nat.card A := hmA ▸ dvd_pow_self p hm0
+  -- `|A| ∣ |MulAut C|`  (`φ` injective ⇒ `A ≃* range ≤ MulAut C`).
+  have hrange : Nat.card A ∣ Nat.card (MulAut C) := Subgroup.card_dvd_of_injective φ hφ
+  -- `|MulAut C| = φ(|C|)`, `|C| = q^j`.
+  obtain ⟨j, hjC⟩ := (IsPGroup.iff_card (p := q) (G := C)).mp hC
+  have hp_tot : p ∣ Nat.totient (q ^ j) := by
+    have := hpA.trans hrange
+    rwa [IsCyclic.card_mulAut, hjC] at this
+  -- `j ≥ 1` (else `φ(1) = 1`, `p ∤ 1`).
+  have hj0 : 0 < j := by
+    rcases Nat.eq_zero_or_pos j with h | h
+    · rw [h, pow_zero, Nat.totient_one] at hp_tot
+      exact absurd (Nat.le_of_dvd one_pos hp_tot) (by have := hp.two_le; omega)
+    · exact h
+  rw [Nat.totient_prime_pow hq hj0] at hp_tot
+  -- `p ∣ q^{j-1}(q-1)`, `p ∤ q^{j-1}` ⇒ `p ∣ q-1`.
+  have hp_not_qpow : ¬ p ∣ q ^ (j - 1) := fun hdvd =>
+    hpq ((Nat.prime_dvd_prime_iff_eq hp hq).mp (hp.dvd_of_dvd_pow hdvd))
+  have hp_q1 : p ∣ (q - 1) := ((Nat.Prime.dvd_mul hp).mp hp_tot).resolve_left hp_not_qpow
+  have := Nat.le_of_dvd (by have := hq.two_le; omega) hp_q1
+  have := hq.two_le
+  omega
+
 /-- `Z(O_p(M))` viewed in `H` (for a subgroup `M ≤ H`): the image of
 `zCenterOpCoreSubgroup ↥M p` under `M.subtype`. -/
 private def zCenterOpCoreH {H : Type*} [Group H] (M : Subgroup H) (p : ℕ) : Subgroup H :=
