@@ -475,13 +475,12 @@ theorem odd_two_dim_sylow_abelian
     IsMulCommutative P ∧ commutator G ≤ (P : Subgroup G)
 ```
 
-**Lean status** (2026-05-25): `PGroupFixedVector` shared module の
-`IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero` は sorry-free.
+**Lean status** (2026-05-27): 本節 §2F (Thm 2.6 (a)(b)) は **証明完了**、
+本ファイル全体 **sorry-free** (帰納 + GL(2,F) 計算 + 旧 MISSING_PAGE:29 を補完済)。
+`PGroupFixedVector` shared module の `IsPGroup.invariants_ne_bot` /
+`exists_fixed_vector_ne_zero` も sorry-free
 ([OddOrder/GroupTheory/RepresentationTheory/PGroupFixedVector.lean]
 (../../GroupTheory/RepresentationTheory/PGroupFixedVector.lean)).
-本節 Thm 2.6 (a)(b) は Lean signature 確定済み, sorry 付き stub.
-残: (i) 帰納 + GL(2,F) 計算 + MISSING_PAGE:29 補完, (ii) `hchar` 引数の
-mathlib との型整合 (`CharP F p` vs `(ringChar F).Prime`) 確認.
 -/
 
 /-! ### §2F helper lemmas -/
