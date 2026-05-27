@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.OddTwoDimRepr
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.SCN
