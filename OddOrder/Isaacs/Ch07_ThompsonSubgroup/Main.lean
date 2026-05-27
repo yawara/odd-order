@@ -4380,31 +4380,41 @@ private theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
   rw [Subgroup.ker_subtype] at hM_le_ker
   exact le_bot_iff.mp hM_le_ker
 
-/-- **Isaacs Thm 7.6 Steps 4 + 5** (local axiom — mmd L3870-3878).
+/-- **Isaacs Thm 7.6 Step 3** (local axiom — mmd L3850-3856): the IH-consuming
+core of the Goldschmidt argument.
 
-Together Steps 4-5 produce `P = UA ∧ A.relIndex U = p` given:
-* The full Thm 7.6 hypotheses (i)-(v) on the running `G`.
-* An induction hypothesis: Thm 7.6 holds for all proper subgroups `H < G`.
-* A chosen `A ∈ E(P)` with `A ⊄ U` (Step 2 extraction).
+Given `U·A ≤ H` with `H` a **proper** subgroup of `G` and `H ∩ P ∈ Syl_p(H)`,
+the conclusion is `⁅L ⊓ H, A⁆ ≤ U`, i.e. `Ā` centralizes `(L ∩ H)bar` in
+`Ḡ = G/U`.  Here `L = O_{p',p}(G)` (`opPpPrimeCore`), `U = O_p(G)`.
 
-Step 3 is **internal to this axiom**: both Step 4 and Step 5 use Step 3 by
-applying the IH to proper subgroups (`H = LA` for Step 4, `H = MA` for any
-Ā-invariant proper `M̄ < L̄` for Step 5).
+Book proof (mmd L3850-3856):
+* `H` satisfies the five Thm 7.6 hypotheses: (i) `p`-separable (subgroup),
+  (ii) `p ≠ 2`, (iii) Sylow-2 abelian (descent), (iv) `O_{p'}(H) = 1`
+  (`oPiCorePrime_subgroup_eq_bot_of_opCore_le`, landed), and (v)
+  `C_H(Z(S)) = S` for `S = H ∩ P` (since `Z(P) ⊆ U ⊆ S ⊆ P` gives
+  `C_H(Z(S)) ⊆ C_G(Z(P)) = P`, a `p`-subgroup containing `S`, so `= S`).
+* By the IH (`H < G`), `J(S) ⊴ H`.  Since `A ∈ E(P)` and `A ⊆ S ⊆ P`,
+  `A ∈ E(S)`, so `A ⊆ J(S)`.
+* `⁅L ⊓ H, A⁆ ⊆ ⁅L ⊓ H, J(S)⁆ ⊆ (L ⊓ H) ⊓ J(S)` (both normal in `H`)
+  `⊆ L ⊓ J(S) ⊆ U` (`U` is the unique Sylow-`p` of `L`).
 
-The "|A : A ⊓ U|" formulation (= `A.relIndex U`) is used because the landed
-Step 7 lemma (`omega1ZCenterOpCore_relIndex_inter_A_le`) consumes it directly. -/
-private axiom step4_5_normal_J_hypotheses
+This axiom isolates the heavy induction-hypothesis application + the
+subgroup-as-type hypothesis descent.  Steps 4 and 5 (below) are proved as
+actual theorem code on top of it.
+
+Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+private axiom step3_Abar_centralizes_inter_LBar
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
-    (_hp2 : p ≠ 2)
-    (_h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
-    (_h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
-    (_h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
-    (_h_centralizer_center :
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
        Subgroup.centralizer
          (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
          = (P : Subgroup G))
-    (_ih : ∀ (H : Type*) [Group H] [Finite H]
+    (ih : ∀ (H : Type*) [Group H] [Finite H]
       [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H],
       Nat.card H < Nat.card G →
       (∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
@@ -4416,10 +4426,302 @@ private axiom step4_5_normal_J_hypotheses
           = (Q : Subgroup H) →
         (Subgroup.thompsonJ (Q : Subgroup H) p).Normal)
     {A : Subgroup G}
-    (_hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
-    (_hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G) :
+    (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    {H : Subgroup G}
+    (hH_ne_top : H ≠ ⊤)
+    (hUA_le_H : OddOrder.Isaacs.Ch01.opCore p G ⊔ A ≤ H)
+    (S : Sylow p ↥H)
+    (hS_eq : (S : Subgroup ↥H) = (H ⊓ (P : Subgroup G)).subgroupOf H) :
+    (⁅opPpPrimeCore G p ⊓ H, A⁆ : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G
+
+/-- For `N ⊴ G` and `A` with `N ⊓ A = ⊥`, the relative index `A.relIndex (N ⊔ A)`
+equals `Nat.card N`.  (Diamond isomorphism: `|NA : A| = |N : N ⊓ A| = |N|`.) -/
+private theorem relIndex_sup_of_inf_eq_bot
+    {G : Type*} [Group G] [Finite G] {N A : Subgroup G} [N.Normal]
+    (h_inf : N ⊓ A = ⊥) :
+    A.relIndex (N ⊔ A) = Nat.card N := by
+  classical
+  -- `|NA| = |A| * (A.relIndex NA)` (card_mul_index inside `↥(N ⊔ A)`).
+  have hA_le : A ≤ N ⊔ A := le_sup_right
+  have hN_le : N ≤ N ⊔ A := le_sup_left
+  have h1 : Nat.card (A.subgroupOf (N ⊔ A)) * (A.subgroupOf (N ⊔ A)).index =
+      Nat.card ↥(N ⊔ A) := Subgroup.card_mul_index _
+  have h1' : Nat.card A * A.relIndex (N ⊔ A) = Nat.card ↥(N ⊔ A) := by
+    rw [← h1]
+    congr 1
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA_le).toEquiv).symm
+  -- `|NA| = |N| * (N.relIndex NA)` and `N.relIndex NA = N.relIndex A = |A|`.
+  have h2 : Nat.card (N.subgroupOf (N ⊔ A)) * (N.subgroupOf (N ⊔ A)).index =
+      Nat.card ↥(N ⊔ A) := Subgroup.card_mul_index _
+  have hNrel : (N.subgroupOf (N ⊔ A)).index = Nat.card A := by
+    show N.relIndex (N ⊔ A) = Nat.card A
+    rw [Subgroup.relIndex_sup_left]
+    -- `N.relIndex A = |A : N ⊓ A| = |A : ⊥| = |A|`.
+    show (N.subgroupOf A).index = Nat.card A
+    have : N.subgroupOf A = ⊥ := by
+      rw [Subgroup.subgroupOf_eq_bot]
+      rw [disjoint_iff]; exact h_inf
+    rw [this, Subgroup.index_bot]
+  have h2' : Nat.card N * Nat.card A = Nat.card ↥(N ⊔ A) := by
+    rw [← h2, hNrel]
+    congr 1
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN_le).toEquiv).symm
+  -- Cancel `Nat.card A` from `|A| * relIndex = |N| * |A|`.
+  have hA_pos : 0 < Nat.card A := Nat.card_pos
+  have hfin : Nat.card A * A.relIndex (N ⊔ A) = Nat.card A * Nat.card N := by
+    rw [h1', ← h2', mul_comm]
+  exact Nat.eq_of_mul_eq_mul_left hA_pos hfin
+
+/-- **Isaacs Thm 7.6 Step 5** (local axiom — mmd L3874): `|Ā| = p`, equivalently
+`(O_p(G)).relIndex A = p`.
+
+Given Step 4's output `P = UA` plus the running hypotheses and the induction
+hypothesis, `Ā = A.map mk'` acts faithfully and coprimely on `L̄ = O_{p'}(Ḡ)`
+(faithful by Step 1(c) + `Ā ⊓ L̄ = ⊥`; coprime by `p` vs `p'`).  By Lemma 6.20
+(`isCyclic_of_faithful_trivial_on_proper_invariant`), `Ā` is cyclic — the
+"trivial on every `Ā`-invariant proper subgroup `M̄ < L̄`" hypothesis is exactly
+Step 3 applied to `H = MA` (proper since `|L:M|` is a `p'`-number `> 1`).  A
+nontrivial cyclic elementary abelian `p`-group has order `p`.
+
+The residual content is the `MulDistribMulAction Ā L̄` instance plumbing and the
+per-invariant-subgroup Step 3 application; isolated here so Step 4 lands
+unconditionally.
+
+Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+private axiom step5_Abar_card_eq_p
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    (ih : ∀ (H : Type*) [Group H] [Finite H]
+      [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H],
+      Nat.card H < Nat.card G →
+      (∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H = ⊥ →
+      ∀ (Q : Sylow p H),
+        Subgroup.centralizer
+            (((Subgroup.center (Q : Subgroup H)).map
+              (Q : Subgroup H).subtype) : Set H)
+          = (Q : Subgroup H) →
+        (Subgroup.thompsonJ (Q : Subgroup H) p).Normal)
+    {A : Subgroup G}
+    (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    (hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G)
+    (h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G)) :
+    (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p
+
+/-- **Isaacs Thm 7.6 Steps 4 + 5** (mmd L3870-3878).
+
+Together Steps 4-5 produce `P = UA ∧ A.relIndex U = p` given:
+* The full Thm 7.6 hypotheses (i)-(v) on the running `G`.
+* An induction hypothesis: Thm 7.6 holds for all proper subgroups `H < G`.
+* A chosen `A ∈ E(P)` with `A ⊄ U` (Step 2 extraction).
+
+**Step 4** (`P = UA`) is proved here as actual theorem code, using the focused
+Step 3 axiom (`step3_Abar_centralizes_inter_LBar`).  **Step 5** (`|Ā| = p`)
+is delegated to the focused `step5_Abar_card_eq_p` axiom.
+
+Step 3 is **internal to this axiom**: both Step 4 and Step 5 use Step 3 by
+applying the IH to proper subgroups (`H = LA` for Step 4, `H = MA` for any
+Ā-invariant proper `M̄ < L̄` for Step 5).
+
+The "|A : A ⊓ U|" formulation (= `A.relIndex U`) is used because the landed
+Step 7 lemma (`omega1ZCenterOpCore_relIndex_inter_A_le`) consumes it directly. -/
+private theorem step4_5_normal_J_hypotheses
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    (ih : ∀ (H : Type*) [Group H] [Finite H]
+      [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H],
+      Nat.card H < Nat.card G →
+      (∀ S : Subgroup H, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x) →
+      OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} H = ⊥ →
+      ∀ (Q : Sylow p H),
+        Subgroup.centralizer
+            (((Subgroup.center (Q : Subgroup H)).map
+              (Q : Subgroup H).subtype) : Set H)
+          = (Q : Subgroup H) →
+        (Subgroup.thompsonJ (Q : Subgroup H) p).Normal)
+    {A : Subgroup G}
+    (hA_mem : A ∈ Subgroup.maxElemAbelianIn (P : Subgroup G) p)
+    (hA_not_le : ¬ A ≤ OddOrder.Isaacs.Ch01.opCore p G) :
     OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G) ∧
-      (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p
+      (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p := by
+  classical
+  set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
+  set L : Subgroup G := opPpPrimeCore G p with hL_def
+  set mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hmk_def
+  -- `U = O_{{p}}(G)` (kernel of `mk`), and `U ≤ L`.
+  have hU_eq_oPi : U = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
+  have hker_mk : mk.ker = U := by rw [hmk_def, QuotientGroup.ker_mk', hU_eq_oPi]
+  have hU_le_L : U ≤ L := by
+    rw [hU_eq_oPi, hL_def]; exact oPiCore_p_le_opPpPrimeCore
+  -- Basic facts about `A` and `U`.
+  have hA_le_P : A ≤ (P : Subgroup G) := hA_mem.1
+  have hA_pg : IsPGroup p A := hA_mem.2.1.isPGroup
+  have hU_le_P : U ≤ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P
+  -- `UA = U ⊔ A`, `LA = L ⊔ A`.
+  set UA : Subgroup G := U ⊔ A with hUA_def
+  set LA : Subgroup G := L ⊔ A with hLA_def
+  have hUA_le_P : UA ≤ (P : Subgroup G) := sup_le hU_le_P hA_le_P
+  have hUA_le_LA : UA ≤ LA := sup_le_sup_right hU_le_L A
+  have hUA_pg : IsPGroup p ↥UA :=
+    P.isPGroup'.of_injective (Subgroup.inclusion hUA_le_P)
+      (Subgroup.inclusion_injective hUA_le_P)
+  -- `Ā = A.map mk`, `L̄ = L.map mk = O_{p'}(Ḡ)`.
+  set Abar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := A.map mk
+    with hAbar_def
+  set Lbar : Subgroup (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := L.map mk
+    with hLbar_def
+  have hLbar_eq : Lbar = OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
+    rw [hLbar_def, hL_def, hmk_def]; exact opPpPrimeCore_map_eq_LBar
+  haveI : Lbar.Normal := by rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.normal _ _
+  -- `Ā ⊓ L̄ = ⊥` (p-group vs p'-group) and `Ā ≠ ⊥`.
+  have hAbar_inf_Lbar : Abar ⊓ Lbar = ⊥ := by
+    rw [hAbar_def, hLbar_eq]; exact AbarInf_LBar_eq_bot hA_pg
+  have hAbar_ne_bot : Abar ≠ ⊥ := by
+    rw [hAbar_def, hmk_def]
+    exact Abar_ne_bot_of_not_le (by rwa [hU_eq_oPi] at hA_not_le)
+  -- Step 4: prove `LA = ⊤`, then `UA = P`.
+  have hLA_top : LA = ⊤ := by
+    by_contra hLA_ne_top
+    -- Build the Sylow `p`-subgroup `UA.subgroupOf LA` of `↥LA`.
+    have hUA_le_LA' : UA ≤ LA := hUA_le_LA
+    have hL_le_LA : L ≤ LA := le_sup_left
+    have hA_le_LA : A ≤ LA := le_sup_right
+    -- `UA.subgroupOf LA` is a `p`-group.
+    have hUAsub_pg : IsPGroup p ↥(UA.subgroupOf LA) := hUA_pg.comap_subtype
+    -- Its index in `↥LA` is `UA.relIndex LA = Nat.card L̄`, a `p'`-number.
+    have hidx_eq : (UA.subgroupOf LA).index = UA.relIndex LA := rfl
+    -- `UA.relIndex LA = Nat.card Lbar` via `relIndex_map_map` + diamond.
+    have hrelindex_map : (Abar).relIndex (Lbar ⊔ Abar) = UA.relIndex LA := by
+      rw [hAbar_def, hLbar_def]
+      rw [← Subgroup.map_sup]
+      rw [Subgroup.relIndex_map_map mk A (L ⊔ A)]
+      rw [hker_mk]
+      -- `(A ⊔ U).relIndex ((L ⊔ A) ⊔ U) = UA.relIndex LA` since `U ≤ A⊔U`, `U ≤ LA`.
+      congr 1
+      · rw [hUA_def, sup_comm]
+      · rw [hLA_def]; rw [sup_assoc, sup_comm A U, ← sup_assoc, sup_eq_left.mpr hU_le_L]
+    have hAbar_relindex : (Abar).relIndex (Lbar ⊔ Abar) = Nat.card Lbar :=
+      relIndex_sup_of_inf_eq_bot (by rw [inf_comm]; exact hAbar_inf_Lbar)
+    have hUA_relindex_LA : UA.relIndex LA = Nat.card Lbar := by
+      rw [← hrelindex_map, hAbar_relindex]
+    -- `Nat.card Lbar` is a `p'`-number, so `p ∤ (UA.subgroupOf LA).index`.
+    have hLbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Lbar := by
+      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
+    have hp_not_dvd : ¬ p ∣ (UA.subgroupOf LA).index := by
+      rw [hidx_eq, hUA_relindex_LA]
+      intro hdvd
+      exact (hLbar_pi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)) rfl
+    -- The Sylow subgroup `S`.
+    let S : Sylow p ↥LA := hUAsub_pg.toSylow hp_not_dvd
+    have hS_coe : (S : Subgroup ↥LA) = UA.subgroupOf LA := hUAsub_pg.toSylow_coe hp_not_dvd
+    -- `S = (LA ⊓ P).subgroupOf LA`: both are `p`-subgroups, `S` Sylow, `S ≤ (LA⊓P)sub`.
+    have hLAP_pg : IsPGroup p ↥((LA ⊓ (P : Subgroup G)).subgroupOf LA) := by
+      have : IsPGroup p ↥(LA ⊓ (P : Subgroup G)) :=
+        P.isPGroup'.of_injective (Subgroup.inclusion (inf_le_right))
+          (Subgroup.inclusion_injective _)
+      exact this.comap_subtype
+    have hS_le_LAP : (S : Subgroup ↥LA) ≤ (LA ⊓ (P : Subgroup G)).subgroupOf LA := by
+      rw [hS_coe]
+      intro x hx
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+      exact ⟨x.property, hUA_le_P hx⟩
+    have hS_eq_LAP : ((LA ⊓ (P : Subgroup G)).subgroupOf LA) = (S : Subgroup ↥LA) :=
+      S.is_maximal' hLAP_pg hS_le_LAP
+    -- Apply Step 3 with `H = LA`: `⁅L ⊓ LA, A⁆ ≤ U`.
+    have hUA_le_H : U ⊔ A ≤ LA := sup_le (hU_le_L.trans hL_le_LA) hA_le_LA
+    have hStep3 : (⁅L ⊓ LA, A⁆ : Subgroup G) ≤ U :=
+      step3_Abar_centralizes_inter_LBar P hp2 h_pSolvable h2abelian h_oPiPrime_trivial
+        h_centralizer_center ih hA_mem hLA_ne_top hUA_le_H S hS_eq_LAP.symm
+    -- `L ⊓ LA = L` (since `L ≤ LA`).
+    have hL_inf_LA : L ⊓ LA = L := inf_eq_left.mpr hL_le_LA
+    rw [hL_inf_LA] at hStep3
+    -- `⁅L, A⁆ ≤ U = ker mk` ⇒ `⁅L̄, Ā⁆ = ⊥` ⇒ `Ā ≤ C_Ḡ(L̄)`.
+    have hcomm_map : (⁅L, A⁆ : Subgroup G).map mk = ⊥ := by
+      rw [Subgroup.map_eq_bot_iff, hker_mk]; exact hStep3
+    have hAbar_le_cent : Abar ≤ Subgroup.centralizer (Lbar : Set _) := by
+      rw [hAbar_def, hLbar_def, ← Subgroup.commutator_eq_bot_iff_le_centralizer,
+        ← Subgroup.map_commutator]
+      rw [Subgroup.commutator_comm]
+      exact hcomm_map
+    -- Step 1(c): `C_Ḡ(L̄) ≤ L̄`.
+    have hcent_le_Lbar : Subgroup.centralizer (Lbar : Set _) ≤ Lbar := by
+      rw [hLbar_eq]; exact step1_c_centralizer_oPiPrime_quotient_le_self
+    -- So `Ā ≤ L̄`, hence `Ā = Ā ⊓ L̄ = ⊥`, contradiction.
+    have hAbar_le_Lbar : Abar ≤ Lbar := hAbar_le_cent.trans hcent_le_Lbar
+    have hAbar_bot : Abar = ⊥ := by
+      rw [← inf_eq_left.mpr hAbar_le_Lbar]; exact hAbar_inf_Lbar
+    exact hAbar_ne_bot hAbar_bot
+  -- From `LA = ⊤`: `UA = LA ⊓ P = ⊤ ⊓ P = P`.  Use `UA = LA ⊓ P`.
+  have hUA_eq_P : UA = (P : Subgroup G) := by
+    -- We re-derive the Sylow identity at `H = LA = ⊤`: `UA.subgroupOf LA = (LA⊓P).subgroupOf LA`,
+    -- then map back.  With `LA = ⊤`, `LA ⊓ P = P`.
+    apply le_antisymm hUA_le_P
+    -- `P ≤ UA`: since `LA = ⊤`, `P ≤ LA`, and `LA ⊓ P = P` is a `p`-subgroup of `↥LA`
+    -- containing the Sylow `UA.subgroupOf LA`, forcing equality.
+    have hP_le_LA : (P : Subgroup G) ≤ LA := by rw [hLA_top]; exact le_top
+    have hUAsub_pg : IsPGroup p ↥(UA.subgroupOf LA) := hUA_pg.comap_subtype
+    have hidx_eq : (UA.subgroupOf LA).index = UA.relIndex LA := rfl
+    have hrelindex_map : (Abar).relIndex (Lbar ⊔ Abar) = UA.relIndex LA := by
+      rw [hAbar_def, hLbar_def, ← Subgroup.map_sup, Subgroup.relIndex_map_map mk A (L ⊔ A),
+        hker_mk]
+      congr 1
+      · rw [hUA_def, sup_comm]
+      · rw [hLA_def, sup_assoc, sup_comm A U, ← sup_assoc, sup_eq_left.mpr hU_le_L]
+    have hAbar_relindex : (Abar).relIndex (Lbar ⊔ Abar) = Nat.card Lbar :=
+      relIndex_sup_of_inf_eq_bot (by rw [inf_comm]; exact hAbar_inf_Lbar)
+    have hLbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Lbar := by
+      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
+    have hp_not_dvd : ¬ p ∣ (UA.subgroupOf LA).index := by
+      rw [hidx_eq, hrelindex_map.symm.trans hAbar_relindex]
+      intro hdvd
+      exact (hLbar_pi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)) rfl
+    let S : Sylow p ↥LA := hUAsub_pg.toSylow hp_not_dvd
+    have hS_coe : (S : Subgroup ↥LA) = UA.subgroupOf LA := hUAsub_pg.toSylow_coe hp_not_dvd
+    have hLAP_pg : IsPGroup p ↥((LA ⊓ (P : Subgroup G)).subgroupOf LA) := by
+      have : IsPGroup p ↥(LA ⊓ (P : Subgroup G)) :=
+        P.isPGroup'.of_injective (Subgroup.inclusion (inf_le_right))
+          (Subgroup.inclusion_injective _)
+      exact this.comap_subtype
+    have hS_le_LAP : (S : Subgroup ↥LA) ≤ (LA ⊓ (P : Subgroup G)).subgroupOf LA := by
+      rw [hS_coe]
+      intro x hx
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+      exact ⟨x.property, hUA_le_P hx⟩
+    have hS_eq_LAP : ((LA ⊓ (P : Subgroup G)).subgroupOf LA) = (S : Subgroup ↥LA) :=
+      S.is_maximal' hLAP_pg hS_le_LAP
+    -- So `(LA⊓P).subgroupOf LA = UA.subgroupOf LA`, hence `LA ⊓ P = UA` (both ≤ LA).
+    rw [hS_coe] at hS_eq_LAP
+    have hLAP_eq_UA : LA ⊓ (P : Subgroup G) = UA := by
+      have hmap := congrArg (fun K : Subgroup ↥LA => K.map LA.subtype) hS_eq_LAP
+      simp only [Subgroup.subgroupOf, Subgroup.map_comap_eq, LA.range_subtype] at hmap
+      rwa [inf_eq_right.mpr (inf_le_left), inf_eq_right.mpr hUA_le_LA] at hmap
+    -- `P ≤ LA ⊓ P = UA`.
+    intro x hxP
+    rw [← hLAP_eq_UA]
+    exact ⟨hP_le_LA hxP, hxP⟩
+  refine ⟨hUA_eq_P, ?_⟩
+  -- Step 5 (delegated): `U.relIndex A = p`.
+  exact step5_Abar_card_eq_p P hp2 h_pSolvable h2abelian h_oPiPrime_trivial
+    h_centralizer_center ih hA_mem hA_not_le hUA_eq_P
 
 /-! ### Step 8 action setup: `Ḡ →* MulAut V` (mmd L3879)
 
