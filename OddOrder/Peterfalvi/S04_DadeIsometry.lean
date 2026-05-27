@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.CoprimeConjugacy
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.Peterfalvi.S02_Notation
@@ -474,6 +475,48 @@ theorem hCoset_conj_eq_of_HConjInvariant (hyp : Hypothesis G A L)
           hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
       simpa [hg_eq] using hg
     exact (hyp.hCoset_conj_mem_iff_of_HConjInvariant hconj a l).mp hmem
+
+/-- Every element of `H(a)` commutes with `a`, since `H(a) ≤ C_G(a)` by the
+centralizer decomposition `(2.2.b)`. -/
+theorem commute_of_mem_H (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) {u : G}
+    (hu : u ∈ hyp.H a) : Commute a.1 u := by
+  have hle : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+  exact (Subgroup.mem_centralizer_singleton_iff.mp (hle hu)).symm
+
+/-- `orderOf a` divides `|C_L(a)|`, since `a ∈ C_L(a)`. -/
+theorem orderOf_dvd_card_centralizerIn (hyp : Hypothesis G A L)
+    {a : G} (ha : a ∈ A) : orderOf a ∣ Nat.card (centralizerIn L a) :=
+  (centralizerIn L a).orderOf_dvd_natCard
+    (mem_centralizerIn.mpr ⟨hyp.mem_L ha, rfl⟩)
+
+/-- **Peterfalvi (2.4.b).**  If `a * u` is conjugate in `G` to `b * v` for some
+`u ∈ H(a)`, `v ∈ H(b)`, then `a` and `b` are conjugate in `L`.
+
+This is the well-definedness input for the Dade map (2.5): conjugate cosets
+`(aH(a))^G` come from `L`-conjugate base points.  The proof is the
+`π`-part argument of Peterfalvi, packaged as `isConj_of_isConj_mul`. -/
+theorem isConj_in_L_of_mul_H (hyp : Hypothesis G A L) {a b : G} (ha : a ∈ A)
+    (hb : b ∈ A) {u v : G} (hu : u ∈ hyp.H ⟨a, ha⟩) (hv : v ∈ hyp.H ⟨b, hb⟩)
+    (hconj : IsConj (a * u) (b * v)) :
+    ∃ l : L, (l : G) * a * (l : G)⁻¹ = b := by
+  set m : ℕ := Nat.card (hyp.H ⟨a, ha⟩) * Nat.card (hyp.H ⟨b, hb⟩) with hm
+  -- coprimality of `orderOf a` (resp. `orderOf b`) with `m`
+  have hcop_CL : ∀ {c : G} (hc : c ∈ A), Nat.Coprime (orderOf c) m := by
+    intro c hc
+    refine Nat.Coprime.coprime_dvd_left (hyp.orderOf_dvd_card_centralizerIn hc) ?_
+    rw [hm]
+    exact Nat.coprime_mul_iff_right.mpr
+      ⟨(hyp.centralizer_coprime ⟨a, ha⟩ ⟨c, hc⟩).symm,
+       (hyp.centralizer_coprime ⟨b, hb⟩ ⟨c, hc⟩).symm⟩
+  have hum : orderOf u ∣ m :=
+    ((hyp.H ⟨a, ha⟩).orderOf_dvd_natCard hu).trans (dvd_mul_right _ _)
+  have hvm : orderOf v ∣ m :=
+    ((hyp.H ⟨b, hb⟩).orderOf_dvd_natCard hv).trans (dvd_mul_left _ _)
+  have hab : IsConj a b :=
+    OddOrder.GroupTheory.isConj_of_isConj_mul (hyp.commute_of_mem_H ⟨a, ha⟩ hu)
+      (hyp.commute_of_mem_H ⟨b, hb⟩ hv) (hcop_CL ha) (hcop_CL hb) hum hvm hconj
+  exact hyp.conj_in_L ha hb hab
 
 end Hypothesis
 
