@@ -35,10 +35,12 @@ created: 2026-05-25
    `IrreducibleCharacter.inner_self = 1` と `inner_eq_zero_of_ne` の bridge.
    → `characterTableRowOrthogonality` (`RowOrthogonality.lean`) で証明し、
    IsometryDifferencePair / S07 の inner-product helper を全て無条件化した。
-- [ ] **prerequisite lemma 2 (層 2)**:
-   `ZIrr G` Fourier 基底展開: 各 `φ ∈ ZIrr G` は `∑ c_χ · χ` 唯一展開で
-   `c_χ = ⟨φ, χ⟩` (`ZIrr.lean:46-47` の TODO に該当, ~100-200 LOC).
-   全張る性 (spanning) は不要、orthonormality + 一次独立で済む (handoff 参照)。
+- [x] **prerequisite lemma 2 (層 2 完了)**:
+   `ZIrr G` Fourier 係数 API. → 新ファイル `ZIrrFourier.lean` で実装:
+   `mem_ZIrr_inner_int` (係数整数性), `mem_ZIrr_repr` (有限 ℤ-結合展開),
+   `inner_eq_coeff_of_repr` (`⟨φ,χ⟩ = c_χ`), `inner_self_eq_sum_sq_of_repr` /
+   `mem_ZIrr_inner_self_eq_sum_sq` (Parseval norm `⟨φ,φ⟩ = ∑ c_a²`).
+   全張る性 (spanning) は不要だった (span membership + orthonormality のみ)。
 - [ ] `n = 2` の norm `2` case を証明する.
 - [ ] `n = 3` の common component 共有 case を証明する.
 - [ ] induction step で uniform sign が崩れる `e₂ + e₃` case を degree 条件で排除する.
@@ -226,6 +228,57 @@ SecondOrthogonality←RowOrthogonality の依存があるため逆 import は循
   (mathlib にも無い、handoff 参照)。
 - 配置案: `ZIrr.lean` に Fourier 係数補題を足す or 新ファイル。
   `ZIrr.lean:46-47` の TODO 参照。
+
+## 2026-05-28 progress (cont. 2): 層 2 完了 — 層 3 (combinatorial core) が次
+
+**層 2 (ZIrr Fourier 係数 API) を完了**した (3 commit、`peterfalvi-s09`、未 push):
+新ファイル `OddOrder/GroupTheory/RepresentationTheory/ZIrrFourier.lean`
+(RowOrthogonality を import)。
+
+- `irreducibleCharacter_inner_eq_ite`, `irr_cf_inner` — orthonormality `⟨χ,ψ⟩=δ`
+  (subtype 版と CF 版)。
+- `mem_ZIrr_inner_int` — `φ ∈ ZIrr G ⇒ ⟨φ,χ⟩ ∈ ℤ` (span_induction)。
+- `inner_sum_left` / `inner_sum_right` / `inner_smul_right` — inner の有限和・
+  scalar 線形性 (右は共役)。ローカルに置いた (ClassFunction.lean を触らず)。
+- `mem_ZIrr_repr` — `φ = ∑_{a∈c.support} (c a:ℂ) • a` (`mem_span_set` +
+  `Int.cast_smul_eq_zsmul`)。
+- `inner_eq_coeff_of_repr` — `⟨∑ c_a•a, χ⟩ = c_χ` (内積が整数係数を復元)。
+- `inner_self_eq_sum_sq_of_repr`, `mem_ZIrr_inner_self_eq_sum_sq` — **Parseval norm**
+  `⟨φ,φ⟩ = ∑_a (c_a:ℂ)²`。
+
+**層構造**: 1a ✅ / 1b ✅ / 層 2 ✅ / 層 3 (combinatorial core) ⬜。
+
+### 層 3 着手 recipe (combinatorial core) — 次の着手点
+
+**核心の橋渡し補題** (層 2→3 の境界):
+
+```
+「φ ∈ ZIrr G, ⟨φ,φ⟩ = 2, φ(1) = 0 ⇒ ∃ α β : Irr, α ≠ β ∧ φ = α - β」
+```
+
+これが出来れば、各 `v_i = τ(χ_i-χ_0)` が *名前付き既約指標の差* になり、以降の
+`⟨v_i,v_j⟩` 計算は **named irreducible の orthonormality**
+(`irreducibleCharacter_inner_eq_ite`) + 有限組合せだけで済む (一般 Parseval は不要)。
+
+この橋渡し補題に必要な未実装部品:
+1. **整数の組合せ論**: `∑_{a∈s} (c_a)² = 2`, 各 `c_a ≠ 0` (= `c.support`) ⇒
+   `s.card = 2` かつ両 `c_a = ±1`. (各 `c_a²≥1`, 和 2 ⇒ card≤2; card=1 だと
+   `c_a²=2` で整数解なし ⇒ card=2, 各 `c_a²=1`.) `mem_ZIrr_inner_self_eq_sum_sq`
+   の `∑(c_a:ℂ)²=2` を `Int.cast` 単射で ℤ に落としてから。
+2. **既約指標の次数正値性**: `(χ:CF)(1) = finrank ≥ 1` (= `Representation.char_one`
+   + 既約 ⇒ 非零 ⇒ finrank ≥ 1)。未実装、要 ~20-40 LOC。
+3. **符号解析**: 上の 2 つの ±1 係数 `c_α, c_β` に対し degree-zero
+   `c_α·degα + c_β·degβ = 0` と次数正値性で同符号を排除 ⇒ 反対符号 ⇒ `φ = α - β`.
+
+その後の **combinatorial core** 本体 (n=2 base / n=3 共有成分 / induction で
+`e₂+e₃` 排除) は、各 `v_i = α_i - β_i` 表示 + 名前付き orthonormality で進める。
+`IsometryDifferencePairNumerics` (無条件化済) が input numerics を供給する。
+
+### このセッション (継続) の commit (peterfalvi-s09、未 push)
+- `893a502` / `c9ab339` / `3599d95` — 層 1b (定理 + IsometryDifferencePair/S07 discharge)
+- `3b0613d` — 層 2: 係数整数性
+- `68d90a0` — 層 2: reconstruction + 係数公式
+- `290a5e6` — 層 2: Parseval norm
 
 ## 完了条件
 
