@@ -6781,6 +6781,52 @@ theorem mem_closure_conjCentralizers_of_not_isCyclic
   · intro x _ hx
     rw [Subgroup.coe_inv]; exact Subgroup.inv_mem _ hx
 
+/-- **§7D Step 1 helper** — a characteristic subgroup `W` of `K` (as a subgroup
+of `↥K`) has its `H`-image `W.map K.subtype` normalized by `N_H(K)`.
+
+For `g ∈ N_H(K)`, conjugation by `g` restricts to an automorphism of `↥K`; since
+`W` is characteristic, that automorphism preserves `W`, so `g` preserves
+`W.map K.subtype`.  Used to deduce `M = N_H(K_p)` from `M = N_H(K)` (`K_p`
+characteristic in `K`). -/
+theorem normalizer_le_normalizer_map_of_characteristic
+    {H : Type*} [Group H] {K : Subgroup H} {W : Subgroup ↥K} [W.Characteristic] :
+    Subgroup.normalizer (K : Set H) ≤
+      Subgroup.normalizer ((W.map K.subtype) : Set H) := by
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff]
+  -- The automorphism of ↥K induced by conjugation by `g ∈ N_H(K)`.
+  set cg : ↥K ≃* ↥K := K.normalizerMonoidHom (⟨g, hg⟩ : ↥(Subgroup.normalizer K))
+    with hcg_def
+  -- W characteristic ⇒ `cg` fixes `W`.
+  have hWfix : W.map (cg : ↥K →* ↥K) = W :=
+    (Subgroup.characteristic_iff_map_eq.mp ‹W.Characteristic›) cg
+  -- `↑(cg w) = g * ↑w * g⁻¹` for `w : ↥K`.
+  have hcg_apply : ∀ w : ↥K, ((cg w : ↥K) : H) = g * (w : H) * g⁻¹ := fun w => rfl
+  have hcg_symm_apply : ∀ w : ↥K, ((cg.symm w : ↥K) : H) = g⁻¹ * (w : H) * g := by
+    intro w
+    have h := hcg_apply (cg.symm w)
+    rw [cg.apply_symm_apply] at h
+    -- h : ↑w = g * ↑(cg.symm w) * g⁻¹  ⇒  ↑(cg.symm w) = g⁻¹ * ↑w * g.
+    rw [h]; group
+  intro y
+  simp only [Subgroup.mem_map, Subgroup.coe_subtype]
+  constructor
+  · rintro ⟨w, hwW, rfl⟩
+    -- y = ↑w, conjugate by g lands in W.map subtype via cg.
+    refine ⟨cg w, ?_, ?_⟩
+    · -- cg w ∈ W since cg fixes W.
+      rw [← hWfix]; exact ⟨w, hwW, rfl⟩
+    · rw [hcg_apply]
+  · rintro ⟨w, hwW, hyeq⟩
+    -- y conjugated back: g⁻¹ y g ∈ W.map subtype.
+    refine ⟨cg.symm w, ?_, ?_⟩
+    · rw [← hWfix] at hwW
+      obtain ⟨w', hw'W, hw'eq⟩ := hwW
+      -- cg.symm w = w' ∈ W.
+      have : cg.symm w = w' := by rw [← hw'eq]; exact cg.symm_apply_apply w'
+      rw [this]; exact hw'W
+    · rw [hcg_symm_apply, hyeq]; group
+
 /-! ### §7D Steps 3-9 — per-step axioms + Step 7 theorem + final wiring
 
 The remaining heavier steps (3, 4, 6, 8, 9) are stated as fine-grained local
