@@ -73,7 +73,7 @@ private lemma commutator_le_center_of_index_pow_two
     rw [← Subgroup.index_eq_card]; exact h_idx
   have h_quot_comm : ∀ a b : T ⧸ Subgroup.center T, a * b = b * a :=
     IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
-  exact hZnorm.quotient_commutative_iff_commutator_le.mp ⟨h_quot_comm⟩
+  exact hZnorm.quotient_commutative_iff_commutator_le.mp ⟨⟨h_quot_comm⟩⟩
 
 /-- **Step 0 of Lem 6.15**: under the hypothesis `Z(T) ≤ C` and `|T : Z(T)| = p²`, `C` is
 normal in `T`. (Because `T/Z(T)` of order `p²` is abelian, so every subgroup of `T/Z(T)`
@@ -129,7 +129,7 @@ theorem quotient_commutator_commutative
     {T : Type*} [Group T] :
     ∀ a b : T ⧸ _root_.commutator T, a * b = b * a := by
   exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
-    (le_rfl : _root_.commutator T ≤ _root_.commutator T)).comm
+    (le_rfl : _root_.commutator T ≤ _root_.commutator T)).is_comm.comm
 
 /-- **Lem 6.15 `p = 2` setup**: under the center-index hypothesis of Lemma 6.15,
 the quotient `T/T'` is not cyclic.

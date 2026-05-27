@@ -779,7 +779,8 @@ theorem quotient_isCyclic_of_involutions_invert_zpowers_square
     ext x
     have hcomm : g * (x : P) = (x : P) * g := by
       haveI : IsCyclic C := hC_cyclic
-      have hmul : (⟨g, hg⟩ : C) * x = x * ⟨g, hg⟩ := mul_comm _ _
+      have hmul : (⟨g, hg⟩ : C) * x = x * ⟨g, hg⟩ :=
+        (inferInstance : IsMulCommutative C).is_comm.comm _ _
       exact congrArg Subtype.val hmul
     calc
       ((φ g x : C) : P) = g * (x : P) * g⁻¹ := by rfl
@@ -1187,8 +1188,8 @@ theorem isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyc
     have htop_cyclic : IsCyclic (⊤ : Subgroup P) := by
       apply hcyc
       · infer_instance
-      · haveI : IsMulCommutative P := hP_comm
-        infer_instance
+      · -- rc2: no auto `IsMulCommutative P → IsMulCommutative ↥⊤`; build it directly.
+        exact ⟨⟨fun a b => Subtype.ext (hP_comm.is_comm.comm a b)⟩⟩
     rw [← Subgroup.topEquiv.isCyclic]
     exact htop_cyclic
   have h_nonab : ∃ x y : P, x * y ≠ y * x := by
