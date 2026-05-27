@@ -6977,15 +6977,14 @@ the ambient group `H`.
 
 Textbook proof: by the first part of Step 8, `J(S) ⊴ M`, and since `M` is
 maximal with `J(S) ≤ M` nontrivial and `M`-normalized, `N_H(J(S)) = M`.  If
-`S_H := S.map subtype` were not a full Sylow of `H`, then `S_H ◁ T` for a
-`p`-subgroup `T ⊋ S_H`; as `J(S_H)` is characteristic in `S_H`, `T` normalizes
-`J(S_H)`, so `T ⊆ N_H(J(S_H)) = M`, making `T` a `p`-subgroup of `M` properly
-containing the Sylow `S` — contradiction.
-
-This relies on the commutation of `thompsonJ` with the injective map `subtype`
-(`J(S_H) = J(S).map subtype`), a `Subgroup.thompsonJ`-map lemma not yet in the
-shared module; tracked as a residual axiom in issue 0032. -/
-axiom step8_sylow_full
+`S_H := S.map subtype` were not a full Sylow of `H`, then `S_H < T` for a
+`p`-subgroup `T` (take `T = N_{P_H}(S_H)` for `P_H ∈ Syl_p(H)` containing `S_H`,
+which strictly contains `S_H` by the normalizer condition for the nilpotent
+group `P_H`); as `J(S_H)` is characteristic in `S_H`, `T` normalizes `J(S_H)`,
+so `T ⊆ N_H(J(S_H)) = M`, making `T` a `p`-subgroup of `M` containing the Sylow
+`S = M ∩ P_H` — but `T > S_H`, contradiction.  Hence `S_H = P_H` is a full
+Sylow. -/
+theorem step8_sylow_full
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
@@ -6995,7 +6994,111 @@ axiom step8_sylow_full
     (S : Sylow p ↥M)
     (hJ_normal : (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
     ((S : Subgroup ↥M).map M.subtype) ∈
-      Set.range (fun P : Sylow p H => (P : Subgroup H))
+      Set.range (fun P : Sylow p H => (P : Subgroup H)) := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  -- `M ≠ ⊥`; `O_p(↥M) ≠ ⊥`.
+  have hOp_ne_bot : OddOrder.Isaacs.Ch01.opCore p ↥M ≠ ⊥ := hM_pType.2
+  -- `SH := S.map subtype`, a `p`-group; extend to `PH ∈ Syl_p(H)`.
+  set SH : Subgroup H := (S : Subgroup ↥M).map M.subtype with hSH_def
+  have hSH_p : IsPGroup p SH := S.isPGroup'.map M.subtype
+  obtain ⟨PH, hSH_le_PH⟩ := IsPGroup.exists_le_sylow hSH_p
+  -- `SH ≠ ⊥` (since `O_p(↥M) ≤ S`, `O_p(↥M).map subtype ≤ SH` nontrivial).
+  have hSH_ne_bot : SH ≠ ⊥ := by
+    rw [hSH_def]
+    intro hbot
+    apply hOp_ne_bot
+    have hOp_le_S : OddOrder.Isaacs.Ch01.opCore p ↥M ≤ (S : Subgroup ↥M) :=
+      OddOrder.Isaacs.Ch01.opCore_le S
+    have : (OddOrder.Isaacs.Ch01.opCore p ↥M).map M.subtype = ⊥ :=
+      le_bot_iff.mp ((Subgroup.map_mono hOp_le_S).trans (le_of_eq hbot))
+    exact (Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp this
+  -- `J(SH) = (J S).map subtype`.
+  have hJSH : Subgroup.thompsonJ SH p = (Subgroup.thompsonJ (S : Subgroup ↥M) p).map M.subtype :=
+    Subgroup.thompsonJ_map_of_injective M.subtype_injective (S : Subgroup ↥M) p
+  -- `J(SH) ≠ ⊥`, `J(SH) ≤ M`.
+  have hJSH_ne_bot : Subgroup.thompsonJ SH p ≠ ⊥ := Subgroup.thompsonJ_ne_bot hSH_p hSH_ne_bot
+  have hJSH_le_M : Subgroup.thompsonJ SH p ≤ M :=
+    (Subgroup.thompsonJ_le SH p).trans (hSH_def ▸ Subgroup.map_subtype_le _)
+  -- `M ≤ N_H(J(SH))` from `J(S) ⊴ M` (the image is M-conjugation-invariant).
+  have hM_norm_JSH : (M : Subgroup H) ≤ Subgroup.normalizer (Subgroup.thompsonJ SH p) := by
+    have h1 : (Subgroup.normalizer (Subgroup.thompsonJ (S : Subgroup ↥M) p)).map M.subtype
+        ≤ Subgroup.normalizer ((Subgroup.thompsonJ (S : Subgroup ↥M) p).map M.subtype) :=
+      Subgroup.le_normalizer_map M.subtype
+    rw [Subgroup.normalizer_eq_top_iff.mpr hJ_normal] at h1
+    have h3 : (⊤ : Subgroup ↥M).map M.subtype = M := by
+      rw [← MonoidHom.range_eq_map, M.range_subtype]
+    rw [h3] at h1
+    rw [hJSH]; exact h1
+  -- `N_H(J(SH)) = M` (maximality).
+  have hNJSH_eq_M : Subgroup.normalizer (Subgroup.thompsonJ SH p) = M :=
+    maximal_eq_normalizer_of_M_normalizes hM_pType.1 hJSH_ne_bot hJSH_le_M hM_norm_JSH
+  -- `S = PH.subgroupOf M`, i.e. `SH = M ⊓ PH`.
+  have hPH_subOf_p : IsPGroup p ((PH : Subgroup H).subgroupOf M) := PH.isPGroup'.comap_subtype
+  have hS_le_PH_subOf : (S : Subgroup ↥M) ≤ (PH : Subgroup H).subgroupOf M := by
+    intro s hs
+    have : M.subtype s ∈ SH := ⟨s, hs, rfl⟩
+    exact hSH_le_PH this
+  have hS_eq : (PH : Subgroup H).subgroupOf M = (S : Subgroup ↥M) :=
+    S.is_maximal' hPH_subOf_p hS_le_PH_subOf
+  -- Goal: `SH = PH`.  Suffices, then `SH = ↑PH ∈ range`.
+  suffices hSH_eq : SH = (PH : Subgroup H) by exact ⟨PH, hSH_eq.symm⟩
+  -- Show `SH = PH` by `le_antisymm`; `≤` is `hSH_le_PH`.
+  refine le_antisymm hSH_le_PH ?_
+  by_contra hPH_not_le
+  -- `SH < PH`; use the normalizer condition in the nilpotent `p`-group `↥PH`.
+  have hSH_lt_PH : SH < (PH : Subgroup H) := lt_of_le_of_ne hSH_le_PH (by
+    intro h; exact hPH_not_le (le_of_eq h.symm))
+  -- Work inside `↥PH`: `SH.subgroupOf PH < ⊤`.
+  haveI : Group.IsNilpotent ↥(PH : Subgroup H) := PH.isPGroup'.isNilpotent
+  have hNC : NormalizerCondition ↥(PH : Subgroup H) :=
+    normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup H))
+  have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup H) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact absurd (le_antisymm hSH_le_PH htop) (by
+      intro h; exact hPH_not_le (le_of_eq h.symm))
+  -- `SH.subgroupOf PH < N(SH.subgroupOf PH)`.
+  have hlt := hNC (SH.subgroupOf (PH : Subgroup H)) hSH_subOf_lt_top
+  -- Get `t : ↥PH` with `t ∈ N(SH.subgroupOf PH)`, `t ∉ SH.subgroupOf PH`.
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  -- `↑t ∈ N_H(SH)` (transport normalizer), `↑t ∉ SH`.
+  rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  set tH : H := (t : H) with htH_def
+  -- `tH` normalizes `J(SH)` (since `tH ∈ N_H(SH)`), so `tH ∈ N_H(J(SH)) = M`.
+  have htH_norm_JSH : tH ∈ Subgroup.normalizer (Subgroup.thompsonJ SH p) := by
+    rw [Subgroup.mem_normalizer_iff]
+    intro w
+    have hconj : (Subgroup.thompsonJ SH p).map (MulAut.conj tH).toMonoidHom
+        = Subgroup.thompsonJ SH p :=
+      Subgroup.thompsonJ_map_conj_eq_of_mem_normalizer ht_norm
+    constructor
+    · intro hw
+      have : tH * w * tH⁻¹ ∈ (Subgroup.thompsonJ SH p).map (MulAut.conj tH).toMonoidHom :=
+        ⟨w, hw, rfl⟩
+      rwa [hconj] at this
+    · intro hw
+      have : tH * w * tH⁻¹ ∈ (Subgroup.thompsonJ SH p).map (MulAut.conj tH).toMonoidHom := by
+        rw [hconj]; exact hw
+      obtain ⟨z, hz, hz_eq⟩ := this
+      have hzw : w = z := by
+        have heq : tH * z * tH⁻¹ = tH * w * tH⁻¹ := by
+          have := hz_eq
+          simp only [MulAut.conj_apply, MonoidHom.coe_coe] at this
+          exact this
+        -- cancel `tH⁻¹` on the right, then `tH` on the left.
+        exact (mul_left_cancel (mul_right_cancel heq)).symm
+      rw [hzw]; exact hz
+  have htH_in_M : tH ∈ M := hNJSH_eq_M ▸ htH_norm_JSH
+  -- `tH ∈ M ∩ PH`, so `(⟨tH, _⟩ : ↥M) ∈ PH.subgroupOf M = S`, i.e. `tH ∈ SH`.
+  have htH_in_PH : tH ∈ (PH : Subgroup H) := t.2
+  have htM_in_S : (⟨tH, htH_in_M⟩ : ↥M) ∈ (S : Subgroup ↥M) := by
+    rw [← hS_eq, Subgroup.mem_subgroupOf]; exact htH_in_PH
+  have htH_in_SH : tH ∈ SH := ⟨⟨tH, htH_in_M⟩, htM_in_S, rfl⟩
+  -- But `t ∉ SH.subgroupOf PH` means `↑t ∉ SH`, contradiction.
+  exact ht_not htH_in_SH
 
 /-- **§7D Step 8** (Isaacs L4045-4063) — *normal `J` and full Sylow for a
 `p`-type maximal*.
