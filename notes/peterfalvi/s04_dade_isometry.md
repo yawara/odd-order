@@ -5,6 +5,17 @@
 ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 役割: **Dade isometry 新規概念の正式定義**, §5-§8 (Coherence) の全前提.
 
+## 進捗 (2026-05-27)
+
+- **(2.1)-(2.7) 形式化完了** (`S04_DadeIsometry.lean` sorry-free).  特に
+  **(2.7) adjoint formula** (§4 最大の外部 export, 7 cite) を issue 0039 で完成.
+  三重和 double-count: `card_centralizer_eq` (|C_G(a)|=|H(a)||C_L(a)|),
+  `sum_card_centralizerIn_eq` (軌道 multiplicity |L|), `fiber_regroup` (per-a 半分),
+  補助 `card_centralizerIn_conj`, `card_conjugatorIn_L`.
+- **(2.6) は現状インターフェース** (`FullDadeIsometryData`); Dade 写像の明示構成
+  ((2.6.b)/(2.8)-(2.10) inclusion-exclusion) は **issue 0040** で別途追跡 (規模大,
+  誘導指標値公式が要る).  §5-§8 はインターフェース + (2.7) を使うので非ブロッキング.
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).

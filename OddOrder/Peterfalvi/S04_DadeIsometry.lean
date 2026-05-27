@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.CoprimeConjugacy
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.Peterfalvi.S02_Notation
@@ -76,6 +77,59 @@ def centralizerIn (L : Subgroup G) (a : G) : Subgroup G :=
 @[simp] theorem mem_centralizerIn {L : Subgroup G} {a x : G} :
     x ∈ centralizerIn L a ↔ x ∈ L ∧ x * a = a * x := by
   simp [centralizerIn, Subgroup.mem_centralizer_singleton_iff]
+
+/-- Conjugation by `l ∈ L` is an order-preserving bijection
+`C_L(l a l⁻¹) ≃ C_L(a)`, so `|C_L(l a l⁻¹)| = |C_L(a)|`.  Used to see that the
+centralizers `C_L(a)` are constant on each `L`-conjugacy class. -/
+theorem card_centralizerIn_conj {L : Subgroup G} {l : G} (hl : l ∈ L) (a : G) :
+    Nat.card (centralizerIn L (l * a * l⁻¹)) = Nat.card (centralizerIn L a) := by
+  apply Nat.card_congr
+  refine
+    { toFun := fun c => ⟨l⁻¹ * c.1 * l, ?_⟩
+      invFun := fun c => ⟨l * c.1 * l⁻¹, ?_⟩
+      left_inv := fun c => Subtype.ext (by group)
+      right_inv := fun c => Subtype.ext (by group) }
+  · obtain ⟨hcL, hcomm⟩ := mem_centralizerIn.mp c.2
+    refine mem_centralizerIn.mpr ⟨L.mul_mem (L.mul_mem (L.inv_mem hl) hcL) hl, ?_⟩
+    calc (l⁻¹ * c.1 * l) * a
+        = l⁻¹ * (c.1 * (l * a * l⁻¹)) * l := by group
+      _ = l⁻¹ * ((l * a * l⁻¹) * c.1) * l := by rw [hcomm]
+      _ = a * (l⁻¹ * c.1 * l) := by group
+  · obtain ⟨hcL, hcomm⟩ := mem_centralizerIn.mp c.2
+    refine mem_centralizerIn.mpr ⟨L.mul_mem (L.mul_mem hl hcL) (L.inv_mem hl), ?_⟩
+    calc (l * c.1 * l⁻¹) * (l * a * l⁻¹)
+        = l * (c.1 * a) * l⁻¹ := by group
+      _ = l * (a * c.1) * l⁻¹ := by rw [hcomm]
+      _ = (l * a * l⁻¹) * (l * c.1 * l⁻¹) := by group
+
+/-- **`L`-conjugator count.**  If `b` lies in the `L`-conjugacy class of `a`, the
+set of `l ∈ L` conjugating `a` to `b` is a left coset of `C_L(a)`, hence has
+cardinality `|C_L(a)|`. -/
+theorem card_conjugatorIn_L {L : Subgroup G} {a b : G}
+    (h : ∃ l : L, (l : G) * a * (l : G)⁻¹ = b) :
+    Nat.card {l : L // (l : G) * a * (l : G)⁻¹ = b}
+      = Nat.card (centralizerIn L a) := by
+  obtain ⟨l₀, hl₀⟩ := h
+  apply Nat.card_congr
+  refine
+    { toFun := fun l => ⟨(l₀ : G)⁻¹ * (l.1 : G), ?_⟩
+      invFun := fun c => ⟨⟨(l₀ : G) * c.1, L.mul_mem l₀.2 (mem_centralizerIn.mp c.2).1⟩, ?_⟩
+      left_inv := fun l => Subtype.ext (Subtype.ext (by group))
+      right_inv := fun c => Subtype.ext (by group) }
+  · refine mem_centralizerIn.mpr ⟨L.mul_mem (L.inv_mem l₀.2) l.1.2, ?_⟩
+    have e1 : (l.1 : G) * a * (l.1 : G)⁻¹ = (l₀ : G) * a * (l₀ : G)⁻¹ := by rw [l.2, hl₀]
+    have hsas : ((l₀ : G)⁻¹ * (l.1 : G)) * a * ((l₀ : G)⁻¹ * (l.1 : G))⁻¹ = a := by
+      calc ((l₀ : G)⁻¹ * (l.1 : G)) * a * ((l₀ : G)⁻¹ * (l.1 : G))⁻¹
+          = (l₀ : G)⁻¹ * ((l.1 : G) * a * (l.1 : G)⁻¹) * (l₀ : G) := by group
+        _ = (l₀ : G)⁻¹ * ((l₀ : G) * a * (l₀ : G)⁻¹) * (l₀ : G) := by rw [e1]
+        _ = a := by group
+    exact mul_inv_eq_iff_eq_mul.mp hsas
+  · have hc : c.1 * a = a * c.1 := (mem_centralizerIn.mp c.2).2
+    calc ((l₀ : G) * c.1) * a * ((l₀ : G) * c.1)⁻¹
+        = (l₀ : G) * (c.1 * a * c.1⁻¹) * (l₀ : G)⁻¹ := by group
+      _ = (l₀ : G) * a * (l₀ : G)⁻¹ := by
+          rw [show c.1 * a * c.1⁻¹ = a from by rw [hc]; group]
+      _ = b := hl₀
 
 /-- The subset of a subgroup `L` obtained by restricting an ambient subset
 `A ⊆ G` to elements of `L`. -/
@@ -147,6 +201,12 @@ structure Hypothesis (G : Type*) [Group G] [Fintype G] (A : Set G) (L : Subgroup
       Subgroup.centralizer ({a.1} : Set G) = H a ⊔ centralizerIn L a.1
   centralizer_disjoint :
     ∀ a : {a : G // a ∈ A}, Disjoint (H a) (centralizerIn L a.1)
+  /-- `H(a)` is normal in `C_G(a)`: the normal-complement half of the
+  semidirect product `(2.2.b)` `C_G(a) = H(a) ⋊ C_L(a)`.  Without this the join
+  `H(a) ⊔ C_L(a)` need not have cardinality `|H(a)|·|C_L(a)|`. -/
+  H_normalized :
+    ∀ (a : {a : G // a ∈ A}) (c : G),
+      c ∈ Subgroup.centralizer ({a.1} : Set G) → ∀ x ∈ H a, c * x * c⁻¹ ∈ H a
   centralizer_coprime :
     ∀ a b : {a : G // a ∈ A},
       Nat.Coprime (Nat.card (H a)) (Nat.card (centralizerIn L b.1))
@@ -235,6 +295,8 @@ def of_isTISubset (hA_sharp : A ⊆ sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact hx.2
   centralizer_disjoint := fun _ => disjoint_bot_left
+  H_normalized := fun _ _ _ x hx => by
+    rw [Subgroup.mem_bot.mp hx, mul_one, mul_inv_cancel]; exact (⊥ : Subgroup G).one_mem
   centralizer_coprime := fun _ _ => by
     simp
 
@@ -275,6 +337,7 @@ def restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
     exact hyp.conj_in_L (hA₁A ha) (hA₁A hb) hconj
   centralizer_eq_sup := fun a => hyp.centralizer_eq_sup ⟨a.1, hA₁A a.2⟩
   centralizer_disjoint := fun a => hyp.centralizer_disjoint ⟨a.1, hA₁A a.2⟩
+  H_normalized := fun a => hyp.H_normalized ⟨a.1, hA₁A a.2⟩
   centralizer_coprime := fun a b =>
     hyp.centralizer_coprime ⟨a.1, hA₁A a.2⟩ ⟨b.1, hA₁A b.2⟩
 
@@ -474,6 +537,202 @@ theorem hCoset_conj_eq_of_HConjInvariant (hyp : Hypothesis G A L)
           hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
       simpa [hg_eq] using hg
     exact (hyp.hCoset_conj_mem_iff_of_HConjInvariant hconj a l).mp hmem
+
+/-- Every element of `H(a)` commutes with `a`, since `H(a) ≤ C_G(a)` by the
+centralizer decomposition `(2.2.b)`. -/
+theorem commute_of_mem_H (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) {u : G}
+    (hu : u ∈ hyp.H a) : Commute a.1 u := by
+  have hle : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+  exact (Subgroup.mem_centralizer_singleton_iff.mp (hle hu)).symm
+
+/-- `orderOf a` divides `|C_L(a)|`, since `a ∈ C_L(a)`. -/
+theorem orderOf_dvd_card_centralizerIn (hyp : Hypothesis G A L)
+    {a : G} (ha : a ∈ A) : orderOf a ∣ Nat.card (centralizerIn L a) :=
+  (centralizerIn L a).orderOf_dvd_natCard
+    (mem_centralizerIn.mpr ⟨hyp.mem_L ha, rfl⟩)
+
+/-- **Peterfalvi (2.4.b).**  If `a * u` is conjugate in `G` to `b * v` for some
+`u ∈ H(a)`, `v ∈ H(b)`, then `a` and `b` are conjugate in `L`.
+
+This is the well-definedness input for the Dade map (2.5): conjugate cosets
+`(aH(a))^G` come from `L`-conjugate base points.  The proof is the
+`π`-part argument of Peterfalvi, packaged as `isConj_of_isConj_mul`. -/
+theorem isConj_in_L_of_mul_H (hyp : Hypothesis G A L) {a b : G} (ha : a ∈ A)
+    (hb : b ∈ A) {u v : G} (hu : u ∈ hyp.H ⟨a, ha⟩) (hv : v ∈ hyp.H ⟨b, hb⟩)
+    (hconj : IsConj (a * u) (b * v)) :
+    ∃ l : L, (l : G) * a * (l : G)⁻¹ = b := by
+  set m : ℕ := Nat.card (hyp.H ⟨a, ha⟩) * Nat.card (hyp.H ⟨b, hb⟩) with hm
+  -- coprimality of `orderOf a` (resp. `orderOf b`) with `m`
+  have hcop_CL : ∀ {c : G} (hc : c ∈ A), Nat.Coprime (orderOf c) m := by
+    intro c hc
+    refine Nat.Coprime.coprime_dvd_left (hyp.orderOf_dvd_card_centralizerIn hc) ?_
+    rw [hm]
+    exact Nat.coprime_mul_iff_right.mpr
+      ⟨(hyp.centralizer_coprime ⟨a, ha⟩ ⟨c, hc⟩).symm,
+       (hyp.centralizer_coprime ⟨b, hb⟩ ⟨c, hc⟩).symm⟩
+  have hum : orderOf u ∣ m :=
+    ((hyp.H ⟨a, ha⟩).orderOf_dvd_natCard hu).trans (dvd_mul_right _ _)
+  have hvm : orderOf v ∣ m :=
+    ((hyp.H ⟨b, hb⟩).orderOf_dvd_natCard hv).trans (dvd_mul_left _ _)
+  have hab : IsConj a b :=
+    OddOrder.GroupTheory.isConj_of_isConj_mul (hyp.commute_of_mem_H ⟨a, ha⟩ hu)
+      (hyp.commute_of_mem_H ⟨b, hb⟩ hv) (hcop_CL ha) (hcop_CL hb) hum hvm hconj
+  exact hyp.conj_in_L ha hb hab
+
+/-- **`|C_G(a)| = |H(a)| · |C_L(a)|`.**  The semidirect decomposition `(2.2.b)`
+`C_G(a) = H(a) ⋊ C_L(a)` is order-multiplicative: `H(a)` is normal in `C_G(a)`
+(`H_normalized`) and meets `C_L(a)` trivially (`centralizer_disjoint`), so the
+multiplication map `H(a) × C_L(a) → C_G(a)` is a bijection. -/
+theorem card_centralizer_eq (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
+    Nat.card (Subgroup.centralizer ({a.1} : Set G))
+      = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := by
+  classical
+  have hHC : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+  have hCLC : centralizerIn L a.1 ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_right
+  have hnorm : centralizerIn L a.1 ≤ Subgroup.normalizer (hyp.H a) := by
+    intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    have hcC : c ∈ Subgroup.centralizer ({a.1} : Set G) := hCLC hc
+    refine ⟨fun hh => hyp.H_normalized a c hcC h hh, fun hh => ?_⟩
+    have hmem := hyp.H_normalized a c⁻¹ (Subgroup.inv_mem _ hcC) _ hh
+    have heq : c⁻¹ * (c * h * c⁻¹) * (c⁻¹)⁻¹ = h := by group
+    rwa [heq] at hmem
+  have hcoe : (↑(Subgroup.centralizer ({a.1} : Set G)) : Set G)
+      = ↑(hyp.H a) * ↑(centralizerIn L a.1) := by
+    rw [hyp.centralizer_eq_sup a]
+    exact Subgroup.coe_mul_of_right_le_normalizer_left (hyp.H a) (centralizerIn L a.1) hnorm
+  let f : (hyp.H a) × (centralizerIn L a.1) → Subgroup.centralizer ({a.1} : Set G) :=
+    fun p => ⟨(p.1 : G) * (p.2 : G),
+      (Subgroup.centralizer ({a.1} : Set G)).mul_mem (hHC p.1.2) (hCLC p.2.2)⟩
+  have hf : Function.Bijective f := by
+    refine ⟨fun p q hpq => ?_, fun g => ?_⟩
+    · have hval : (p.1 : G) * (p.2 : G) = (q.1 : G) * (q.2 : G) :=
+        congrArg Subtype.val hpq
+      exact Subgroup.mul_injective_of_disjoint (hyp.centralizer_disjoint a) hval
+    · have hmem : (g : G) ∈ (↑(hyp.H a) * ↑(centralizerIn L a.1) : Set G) := by
+        rw [← hcoe]; exact g.2
+      obtain ⟨h, hh, c, hc, hgeq⟩ := hmem
+      exact ⟨(⟨h, hh⟩, ⟨c, hc⟩), Subtype.ext hgeq⟩
+  calc Nat.card (Subgroup.centralizer ({a.1} : Set G))
+      = Nat.card ((hyp.H a) × (centralizerIn L a.1)) :=
+        (Nat.card_congr (Equiv.ofBijective f hf)).symm
+    _ = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := Nat.card_prod _ _
+
+open Classical in
+/-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,
+the centralizers `|C_L(a)|`, summed over the `a ∈ A` whose coset `aH(a)` meets
+the `G`-conjugacy class of `g`, total `|L|`.
+
+The index set `{a : g ∈ (aH(a))^G}` is a single `L`-conjugacy class `a₀^L`
+(`[2.4.b]` for `⊆`, `HConjInvariant` for `⊇`).  Mapping `l ↦ l a₀ l⁻¹` from `L`
+onto it has fibers that are `C_L(a₀)`-cosets (`card_conjugatorIn_L`), and the
+summand `|C_L(a)|` is constant `= |C_L(a₀)|` on the class
+(`card_centralizerIn_conj`); fiberwise counting then gives `|L|`. -/
+theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
+    (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant) {g : G}
+    (hg : g ∈ hyp.dadeSupport) :
+    ∑ a ∈ Finset.univ.filter
+        (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g),
+      Nat.card (centralizerIn L a.1) = Nat.card L := by
+  classical
+  letI : Fintype L := Fintype.ofFinite L
+  obtain ⟨a₀, x₀, hx₀, hca₀⟩ := hyp.mem_dadeSupport_iff.mp hg
+  let φ : L → {a : G // a ∈ A} :=
+    fun l => ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
+  set S := Finset.univ.filter
+    (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g) with hS
+  have hmaps : ∀ l : L, φ l ∈ S := by
+    intro l
+    rw [hS, Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, (l : G) * x₀ * (l : G)⁻¹, ?_, ?_⟩
+    · change (l : G) * x₀ * (l : G)⁻¹ ∈
+        hyp.H ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
+      rw [hconj a₀ l]
+      exact Subgroup.smul_mem_pointwise_smul x₀ (MulAut.conj (l : G)) (hyp.H a₀) hx₀
+    · have heq : (φ l).1 * ((l : G) * x₀ * (l : G)⁻¹)
+          = (l : G) * (a₀.1 * x₀) * (l : G)⁻¹ := by
+        change ((l : G) * a₀.1 * (l : G)⁻¹) * ((l : G) * x₀ * (l : G)⁻¹)
+          = (l : G) * (a₀.1 * x₀) * (l : G)⁻¹
+        group
+      have h1 : IsConj (a₀.1 * x₀) ((φ l).1 * ((l : G) * x₀ * (l : G)⁻¹)) := by
+        rw [heq]; exact isConj_iff.mpr ⟨(l : G), rfl⟩
+      exact h1.symm.trans hca₀
+  have horbit : ∀ a ∈ S, ∃ l : L, (l : G) * a₀.1 * (l : G)⁻¹ = a.1 := by
+    intro a ha
+    rw [hS, Finset.mem_filter] at ha
+    obtain ⟨x, hx, hax⟩ := ha.2
+    exact hyp.isConj_in_L_of_mul_H a₀.2 a.2 hx₀ hx (hca₀.trans hax.symm)
+  have hfiber : ∀ a ∈ S, (Finset.univ.filter (fun l : L => φ l = a)).card
+      = Nat.card (centralizerIn L a.1) := by
+    intro a ha
+    obtain ⟨lₐ, hlₐ⟩ := horbit a ha
+    have hcard1 : (Finset.univ.filter (fun l : L => φ l = a)).card
+        = Nat.card {l : L // (l : G) * a₀.1 * (l : G)⁻¹ = a.1} := by
+      rw [Nat.card_eq_fintype_card, ← Fintype.card_subtype (fun l : L => φ l = a)]
+      apply Fintype.card_congr
+      exact Equiv.subtypeEquivRight (fun l => Subtype.ext_iff)
+    rw [hcard1, card_conjugatorIn_L ⟨lₐ, hlₐ⟩, ← hlₐ, card_centralizerIn_conj lₐ.2 a₀.1]
+  have hsum := Finset.card_eq_sum_card_fiberwise
+    (f := φ) (s := (Finset.univ : Finset L)) (t := S) (fun l _ => hmaps l)
+  rw [Finset.card_univ, ← Nat.card_eq_fintype_card] at hsum
+  rw [hsum]
+  exact Finset.sum_congr rfl (fun a ha => (hfiber a ha).symm)
+
+open Classical in
+/-- **Fiber regrouping for the (2.7) adjoint formula.**  For a fixed `a ∈ A` and
+any `F : G → ℂ`, summing `F` over the conjugates `t(ax)t⁻¹` (`x ∈ H(a)`, `t ∈ G`)
+collapses to a sum over the target values `b`, each weighted by the fiber size
+`|C_G(a)|` (`card_conj_fiber`): a value `b` is hit iff `b ∈ (aH(a))^G`. -/
+theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
+    (F : G → ℂ) :
+    ∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)
+      = ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+          (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
+  classical
+  have hcomm : ∀ x ∈ hyp.H a, Commute a.1 x := fun x hx => hyp.commute_of_mem_H a hx
+  have hcop : Nat.Coprime (orderOf a.1) (Nat.card (hyp.H a)) :=
+    Nat.Coprime.coprime_dvd_left (hyp.orderOf_dvd_card_centralizerIn a.2)
+      (hyp.centralizer_coprime a a).symm
+  set ν : (hyp.H a) × G → G :=
+    fun p => (p.2 : G) * (a.1 * (p.1 : G)) * (p.2 : G)⁻¹ with hν
+  -- nested sum = sum over the product, then regroup by value
+  have step1 : (∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹))
+      = ∑ p : (hyp.H a) × G, F (ν p) := by rw [Fintype.sum_prod_type]
+  rw [step1, ← Finset.sum_fiberwise_of_maps_to (t := (Finset.univ : Finset G)) (g := ν)
+      (fun p _ => Finset.mem_univ _) (f := fun p => F (ν p)),
+    Finset.sum_filter]
+  apply Finset.sum_congr rfl
+  intro b _
+  by_cases hQ : ∃ x ∈ hyp.H a, IsConj (a.1 * x) b
+  · rw [if_pos hQ]
+    obtain ⟨x₀, hx₀, hx₀conj⟩ := hQ
+    have hcard : (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card
+        = Nat.card (Subgroup.centralizer ({a.1} : Set G)) := by
+      rw [← Fintype.card_subtype (fun p : (hyp.H a) × G => ν p = b),
+        ← Nat.card_eq_fintype_card]
+      rw [← OddOrder.GroupTheory.card_conj_fiber hcomm (hyp.H_normalized a) hcop hx₀ hx₀conj]
+      apply Nat.card_congr
+      exact
+        { toFun := fun q => ⟨((q.1.1 : G), q.1.2), q.1.1.2, q.2⟩
+          invFun := fun q => ⟨(⟨q.1.1, q.2.1⟩, q.1.2), q.2.2⟩
+          left_inv := fun q => rfl
+          right_inv := fun q => rfl }
+    calc ∑ p ∈ Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b), F (ν p)
+        = ∑ _p ∈ Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b), F b :=
+          Finset.sum_congr rfl (fun p hp => by rw [(Finset.mem_filter.mp hp).2])
+      _ = (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card • F b :=
+          Finset.sum_const _
+      _ = (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
+          rw [hcard, nsmul_eq_mul]
+  · rw [if_neg hQ]
+    apply Finset.sum_eq_zero
+    intro p hp
+    exact absurd ⟨p.1, p.1.2, by
+      rw [← (Finset.mem_filter.mp hp).2]; exact isConj_iff.mpr ⟨(p.2 : G), rfl⟩⟩ hQ
 
 end Hypothesis
 
@@ -806,15 +1065,156 @@ This lemma is Peterfalvi §4's heaviest external export: §7 (5.4), §9 (7.2.b),
 §12 (9.5) ×2, §13 (10.3), §16 (14.1) ×2 all apply it directly (audit
 2026-05-23). -/
 theorem adjoint_formula
-    (τ : DadeMap (G := G) (k := ℂ) A L) (_hτ : IsDadeMap hyp τ)
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant)
     (α : SupportedClassFunctions (G := G) ℂ A L)
     (χ : ClassFunction G ℂ) (ψ : ClassFunction L ℂ)
-    (_hψ : ∀ a : {a : G // a ∈ A},
+    (hψ : ∀ a : {a : G // a ∈ A},
         ψ ⟨a.1, hyp.subset_L a.2⟩ =
           adjointAverageFun hyp χ ⟨a.1, hyp.subset_L a.2⟩) :
     ClassFunction.inner (τ α) χ =
       ClassFunction.inner (α : ClassFunction L ℂ) ψ := by
-  sorry
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  set aα : {a : G // a ∈ A} → ℂ :=
+    fun a => (α : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ with haα
+  set F : G → ℂ := fun g => (τ α) g * star (χ g) with hF
+  set M : ℂ := ∑ a : {a : G // a ∈ A}, ∑ x : hyp.H a, ∑ t : G,
+      (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+        star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)) with hM
+  -- |H(a)| ≠ 0 in ℂ
+  have hHne : ∀ a : {a : G // a ∈ A}, (Nat.card (hyp.H a) : ℂ) ≠ 0 := by
+    intro a
+    have : 0 < Nat.card (hyp.H a) := Nat.card_pos
+    exact_mod_cast this.ne'
+  -- the averaging value, unfolded
+  have hψa : ∀ a : {a : G // a ∈ A},
+      ψ ⟨a.1, hyp.subset_L a.2⟩
+        = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : hyp.H a, χ (a.1 * (x : G)) := by
+    intro a
+    rw [hψ a]
+    simp only [adjointAverageFun]
+    rw [dif_pos a.2]
+  -- support reindexing of the L-inner sum
+  have hISL : ClassFunction.innerSum (α : ClassFunction L ℂ) ψ
+      = ∑ a : {a : G // a ∈ A}, aα a * star (ψ ⟨a.1, hyp.subset_L a.2⟩) := by
+    rw [ClassFunction.innerSum]
+    rw [← Finset.sum_subset
+      (Finset.filter_subset (fun ℓ : L => (ℓ : G) ∈ A) Finset.univ)
+      (fun ℓ _ hℓ => by
+        have hα0 : (α : ClassFunction L ℂ) ℓ = 0 := by
+          by_contra hne
+          exact hℓ (Finset.mem_filter.mpr ⟨Finset.mem_univ _, α.2 hne⟩)
+        rw [hα0, zero_mul])]
+    refine (Finset.sum_bij (fun a _ => (⟨a.1, hyp.subset_L a.2⟩ : L)) ?_ ?_ ?_ ?_).symm
+    · intro a _; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, a.2⟩
+    · intro a _ b _ hab; exact Subtype.ext (by simpa using congrArg Subtype.val hab)
+    · intro ℓ hℓ
+      exact ⟨⟨ℓ.1, (Finset.mem_filter.mp hℓ).2⟩, Finset.mem_univ _, Subtype.ext rfl⟩
+    · intro a _; rfl
+  -- WAY 1: M = |G| · ⟨α, ψ⟩_L
+  have way1 : M = (Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ := by
+    rw [hISL, Finset.mul_sum, hM]
+    refine Finset.sum_congr rfl (fun a _ => ?_)
+    have hstar_psi : star (ψ ⟨a.1, hyp.subset_L a.2⟩)
+        = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : hyp.H a, star (χ (a.1 * (x : G))) := by
+      rw [hψa a, star_mul', star_sum, star_inv₀, star_natCast]
+    calc ∑ x : hyp.H a, ∑ t : G, (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+            star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹))
+        = ∑ x : hyp.H a, (Nat.card G : ℂ) *
+            ((Nat.card (hyp.H a) : ℂ)⁻¹ * aα a * star (χ (a.1 * (x : G)))) := by
+          refine Finset.sum_congr rfl (fun x _ => ?_)
+          simp only [ClassFunction.conj_eq]
+          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← Nat.card_eq_fintype_card]
+      _ = (Nat.card G : ℂ) * (aα a * star (ψ ⟨a.1, hyp.subset_L a.2⟩)) := by
+          rw [hstar_psi, ← Finset.mul_sum]
+          congr 1
+          rw [Finset.mul_sum, Finset.mul_sum]
+          refine Finset.sum_congr rfl (fun x _ => ?_)
+          ring
+  -- substitution aα a = (τ α)(t (a x) t⁻¹)
+  have hsub : ∀ (a : {a : G // a ∈ A}) (x : hyp.H a) (t : G),
+      aα a = (τ α) ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹) := by
+    intro a x t
+    rw [haα]
+    exact (hτ.map_eq_of_isConj_hCoset α _ a (x : G) x.2
+      (isConj_iff.mpr ⟨(t : G), rfl⟩)).symm
+  -- WAY 2: M = |L| · ⟨τ α, χ⟩_G
+  have way2 : M = (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ := by
+    have step : M = ∑ a : {a : G // a ∈ A},
+        ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+          (Nat.card (centralizerIn L a.1) : ℂ) * F b := by
+      rw [hM]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      have e1 : (∑ x : hyp.H a, ∑ t : G, (Nat.card (hyp.H a) : ℂ)⁻¹ * aα a *
+              star (χ ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹)))
+          = (Nat.card (hyp.H a) : ℂ)⁻¹ *
+              ∑ x : hyp.H a, ∑ t : G, F ((t : G) * (a.1 * (x : G)) * (t : G)⁻¹) := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun t _ => ?_)
+        rw [hsub a x t, hF]
+        ring
+      rw [e1, hyp.fiber_regroup a F, Finset.mul_sum]
+      refine Finset.sum_congr rfl (fun b _ => ?_)
+      rw [← mul_assoc]
+      congr 1
+      rw [hyp.card_centralizer_eq a, Nat.cast_mul, ← mul_assoc,
+        inv_mul_cancel₀ (hHne a), one_mul]
+    rw [step]
+    -- turn inner filtered sum into an if-sum, then swap
+    have step2 : (∑ a : {a : G // a ∈ A},
+          ∑ b ∈ Finset.univ.filter (fun b : G => ∃ x ∈ hyp.H a, IsConj (a.1 * x) b),
+            (Nat.card (centralizerIn L a.1) : ℂ) * F b)
+        = ∑ b : G, ∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) * F b else 0) := by
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      rw [Finset.sum_filter]
+    rw [step2, show (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ
+          = ∑ b : G, (Nat.card L : ℂ) * F b from by
+        rw [ClassFunction.innerSum, Finset.mul_sum]]
+    refine Finset.sum_congr rfl (fun b _ => ?_)
+    -- ∑_a (if Q then |C_L a| * F b else 0) = |L| * F b
+    have factor : (∑ a : {a : G // a ∈ A},
+          (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+            then (Nat.card (centralizerIn L a.1) : ℂ) * F b else 0))
+        = (∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) else 0)) * F b := by
+      rw [Finset.sum_mul]
+      refine Finset.sum_congr rfl (fun a _ => ?_)
+      split <;> simp
+    rw [factor]
+    by_cases hb : b ∈ hyp.dadeSupport
+    · have hN : (∑ a : {a : G // a ∈ A},
+            (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
+              then (Nat.card (centralizerIn L a.1) : ℂ) else 0)) = (Nat.card L : ℂ) := by
+        rw [← Finset.sum_filter, ← Nat.cast_sum, hyp.sum_card_centralizerIn_eq hconj hb]
+      rw [hN, mul_comm]
+    · have hF0 : F b = 0 := by
+        rw [hF]
+        simp only
+        rw [hτ.map_eq_zero_of_not_mem_dadeSupport α b hb, zero_mul]
+      rw [hF0, mul_zero, mul_zero]
+  -- combine and divide by |G|, |L|
+  have hcombine : (Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ
+      = (Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ :=
+    way2.symm.trans way1
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.inner_eq_inv_card_mul_innerSum]
+  calc ⅟(Nat.card G : ℂ) * ClassFunction.innerSum (τ α) χ
+      = ⅟(Nat.card G : ℂ) * ⅟(Nat.card L : ℂ) *
+          ((Nat.card L : ℂ) * ClassFunction.innerSum (τ α) χ) := by
+        rw [mul_assoc, ← mul_assoc (⅟(Nat.card L : ℂ)), invOf_mul_self, one_mul]
+    _ = ⅟(Nat.card G : ℂ) * ⅟(Nat.card L : ℂ) *
+          ((Nat.card G : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ) := by
+        rw [hcombine]
+    _ = ⅟(Nat.card L : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ := by
+        rw [mul_comm (⅟(Nat.card G : ℂ)) (⅟(Nat.card L : ℂ)), mul_assoc,
+          ← mul_assoc (⅟(Nat.card G : ℂ)), invOf_mul_self, one_mul]
 
 end AdjointFormula
 
