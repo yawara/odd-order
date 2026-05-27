@@ -390,7 +390,7 @@ theorem step3_main
   -- L6 prerequisites: `N_H(M) = M` (M maximal in simple H), and `M^g := M.map (conj g)`
   -- is again maximal.
   have hNM_eq_M : Subgroup.normalizer M = M := by
-    rcases eq_or_lt_of_le Subgroup.le_normalizer with h | h
+    rcases eq_or_lt_of_le (show M ≤ Subgroup.normalizer M from Subgroup.le_normalizer) with h | h
     · exact h.symm
     · exfalso
       have hNtop : Subgroup.normalizer M = ⊤ := hM_max.2 _ h
@@ -400,7 +400,33 @@ theorem step3_main
       · exact hM_max.1 ht
   set Mg : Subgroup H := M.map (MulAut.conj g) with hMg_def
   have hMg_coatom : IsCoatom Mg := by
-    rw [hMg_def]; exact (Subgroup.isCoatom_map (MulAut.conj g)).mpr hM_max
+    rw [hMg_def]
+    exact (OrderIso.isCoatom_iff (MulEquiv.mapSubgroup (MulAut.conj g)) M).mpr hM_max
+  -- Membership in `M^g`, and the bridge `M^g = M ⇒ g ∈ N_H(M) = M`.
+  have hmem_Mg : ∀ x : H, x ∈ Mg ↔ g⁻¹ * x * g ∈ M := fun x => by
+    rw [hMg_def, Subgroup.mem_map]
+    constructor
+    · rintro ⟨m, hm, rfl⟩
+      show g⁻¹ * (MulAut.conj g m) * g ∈ M
+      rw [MulAut.conj_apply, show g⁻¹ * (g * m * g⁻¹) * g = m from by group]
+      exact hm
+    · intro hx
+      refine ⟨g⁻¹ * x * g, hx, ?_⟩
+      show MulAut.conj g (g⁻¹ * x * g) = x
+      rw [MulAut.conj_apply]; group
+  have hg_in_M_of_Mg_eq : Mg = M → g ∈ M := fun hMgM => by
+    rw [← hNM_eq_M, Subgroup.mem_normalizer_iff'']
+    intro y; rw [← hmem_Mg y, hMgM]
+  -- The conjugation action of `A` on `Z_q`, and coprimality of `|A|`, `|Z_q|`.
+  letI : MulDistribMulAction ↥A ↥ZqH := conjActionOfNormalizes A ZqH hA_norm_Zq
+  set φ : ↥A →* MulAut ↥ZqH := MulDistribMulAction.toMulAut ↥A ↥ZqH with hφ_def
+  have hsmul_coe : ∀ (a : ↥A) (n : ↥ZqH), ((a • n : ↥ZqH) : H) = (↑a) * (↑n) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥ZqH) := by
+    obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := p) (G := ↥A)).mp hA_pgroup
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q) (G := ↥ZqH)).mp hZqH_qgroup
+    rw [hm, hn]
+    exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hp_prime hq_prime).mpr hpq)
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
