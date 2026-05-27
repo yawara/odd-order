@@ -221,4 +221,24 @@ theorem exists_pair_of_sum_sq_eq_two {ι : Type*} [DecidableEq ι] {s : Finset �
   · rw [pow_two] at hα1; exact mul_self_eq_one_iff.mp hα1
   · rw [pow_two] at hβ1; exact mul_self_eq_one_iff.mp hβ1
 
+set_option backward.isDefEq.respectTransparency false in
+omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- An irreducible representation has positive dimension. -/
+theorem finrank_pos_of_isIrreducible {V : Type} [AddCommGroup V] [Module ℂ V]
+    [FiniteDimensional ℂ V] (ρ : Representation ℂ G V) (hρ : Representation.IsIrreducible ρ) :
+    0 < Module.finrank ℂ V := by
+  haveI := hρ
+  haveI : Nontrivial V :=
+    IsSimpleModule.nontrivial (R := MonoidAlgebra ℂ G) (M := ρ.asModule)
+  exact Module.finrank_pos
+
+omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- The degree of an irreducible character is a positive integer: `χ(1) = (d : ℂ)` with
+`0 < d` (the dimension of the underlying representation). -/
+theorem irreducibleCharacter_apply_one_eq_pos_natCast (χ : IrreducibleCharacter G) :
+    ∃ d : ℕ, 0 < d ∧ ((χ : ClassFunction G ℂ) : G → ℂ) 1 = (d : ℂ) := by
+  obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
+  exact ⟨Module.finrank ℂ V, finrank_pos_of_isIrreducible ρ hρ, by
+    rw [congrFun hχ 1, ρ.char_one]⟩
+
 end OddOrder.RepresentationTheory
