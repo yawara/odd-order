@@ -72,6 +72,32 @@ private theorem comm_of_isPGroup_two_of_odd [Finite G]
     rw [Nat.odd_iff] at hodd
     omega
 
+/-- **(infra)** `O_p(G) ≤ O_{p',p}(G)`: 正規 `p`-core は第 2 Fitting 層に含まれる。
+
+BG Thm 6.1/6.2 が含意を `O_{p',p}(G)` で述べるための再利用可能な橋。`O_p(G)` の
+`G ⧸ O_{p'}(G)` への像は正規 `{p}`-群なので `O_p(G ⧸ O_{p'}(G)) = O_{q∉{p}}(...)` に含まれ、
+引き戻すと `O_{p',p}(G)`。 -/
+theorem opCore_le_oPiPrimePiCore [Finite G] (p : ℕ) [Fact p.Prime] :
+    Ch01.opCore p G ≤ Ch03.oPiPrimePiCore {p} G := by
+  have hmap_le : (Ch01.opCore p G).map
+      (QuotientGroup.mk' (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)) ≤
+      Ch03.oPiCore {p} (G ⧸ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) := by
+    haveI : ((Ch01.opCore p G).map
+        (QuotientGroup.mk' (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G))).Normal :=
+      (Ch01.opCore.normal p G).map _ (QuotientGroup.mk'_surjective _)
+    apply Ch03.Subgroup.IsPiGroup.le_oPiCore
+    have hpg : IsPGroup p ((Ch01.opCore p G).map
+        (QuotientGroup.mk' (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G))) :=
+      (Ch01.opCore_isPGroup p G).map _
+    intro q hq
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hpg
+    rw [hn, Nat.mem_primeFactors] at hq
+    have hqp : q = p :=
+      (Nat.prime_dvd_prime_iff_eq hq.1 Fact.out).mp (hq.1.dvd_of_dvd_pow hq.2.1)
+    rw [hqp]
+    exact Set.mem_singleton p
+  exact Subgroup.map_le_iff_le_comap.mp hmap_le
+
 /-- **BG Thm 6.1 (core / reduced case)** = Isaacs Thm 7.6 中間結果の奇数位数特殊化。
 
 奇数位数 solvable `G`、`p ≠ 2`、`P ∈ Syl_p(G)` で `O_{p'}(G) = ⊥` かつ `P = C_G(Z(P))`
@@ -109,5 +135,23 @@ theorem normalJ_normal_of_odd [Finite G]
     (Subgroup.thompsonJ (P : Subgroup G) p).Normal :=
   Ch07.normal_J P hp2 inferInstance
     (comm_of_isPGroup_two_of_odd hodd) h_oPiPrime_trivial h_centralizer_center
+
+/-- **BG Thm 6.1 (J(P)-instance, O_{p',p} 形)**: `thompsonJ_le_opCore_of_odd` を橋
+`opCore_le_oPiPrimePiCore` で `O_{p',p}(G)` 形に持ち上げたもの。
+
+奇数 solvable `G`、`p ≠ 2`、`P ∈ Syl_p`、`O_{p'}(G) = ⊥`、`P = C_G(Z(P))` で
+`J(P) ≤ O_{p',p}(G)`。BG Thm 6.1 (任意 abelian normal 部分群 ⊆ `O_{p',p}`) の `J(P)`
+特殊形 (reduced case)。一般形は別途 (notes/bg/s06_additional.md 残課題 3)。 -/
+theorem thompsonJ_le_oPiPrimePiCore_of_odd [Finite G]
+    (hodd : Odd (Nat.card G)) [IsSolvable G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
+    (h_oPiPrime_trivial : Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+      Subgroup.centralizer
+        (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+        = (P : Subgroup G)) :
+    Subgroup.thompsonJ (P : Subgroup G) p ≤ Ch03.oPiPrimePiCore {p} G :=
+  (thompsonJ_le_opCore_of_odd hodd P hp2 h_oPiPrime_trivial h_centralizer_center).trans
+    (opCore_le_oPiPrimePiCore p)
 
 end OddOrder.BG.Ch1.S06
