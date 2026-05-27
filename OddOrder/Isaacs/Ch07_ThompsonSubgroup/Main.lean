@@ -5478,18 +5478,62 @@ theorem step2_pSylow_not_normalizes_nontrivial_qSubgroup
   rw [hH_card_eq_qb] at hp_dvd
   exact hp_ne_dvd_q (hp_prime.dvd_of_dvd_pow hp_dvd)
 
-/-- **§7D helper axiom** — a nontrivial finite solvable group has nontrivial
-Fitting subgroup.
+/-- **§7D helper** — a nontrivial finite solvable group has nontrivial Fitting
+subgroup.
 
-This is a standard fact (Isaacs Cor 3.9 / the structure theory of solvable
-groups): a minimal normal subgroup of a solvable group is an elementary abelian
-`p`-group, hence nilpotent, hence contained in `F(G)`; therefore `F(G) ≠ 1`.
-The repo's minimal-normal-subgroup machinery (`SchurZassenhausConj.lean`,
-`minimal_normal_isPGroup_of_solvable`) is currently `private`; this small axiom
-captures the consequence pending a public re-export.  Tracked in issue 0032. -/
-axiom fitting_ne_bot_of_solvable_nontrivial
+**Proven.** Take the *last nontrivial term* `L = derivedSeries M (n-1)` of the
+derived series (where `n` is minimal with `derivedSeries M n = ⊥`).  Then
+`⁅L, L⁆ = derivedSeries M n = ⊥`, so `L` is abelian, hence nilpotent; `L` is
+characteristic (`derivedSeries_characteristic`) hence normal, and nontrivial by
+minimality of `n`.  By `nilpotent_normal_le_fitting`, `L ≤ F(M)`, so
+`F(M) ≠ ⊥`. -/
+theorem fitting_ne_bot_of_solvable_nontrivial
     (M : Type*) [Group M] [Finite M] [Nontrivial M] [IsSolvable M] :
-    OddOrder.Isaacs.Ch01.fitting M ≠ ⊥
+    OddOrder.Isaacs.Ch01.fitting M ≠ ⊥ := by
+  classical
+  -- ∃ n, derivedSeries M n = ⊥.
+  obtain ⟨N, hN⟩ := (isSolvable_def M).mp inferInstance
+  -- Minimal such n.
+  have hex : ∃ n, derivedSeries M n = ⊥ := ⟨N, hN⟩
+  set n := Nat.find hex with hn_def
+  have hn_bot : derivedSeries M n = ⊥ := Nat.find_spec hex
+  -- n ≠ 0: derivedSeries M 0 = ⊤ ≠ ⊥ since M nontrivial.
+  have hn_pos : 0 < n := by
+    rcases Nat.eq_zero_or_pos n with h0 | hpos
+    · exfalso
+      have : derivedSeries M 0 = ⊥ := h0 ▸ hn_bot
+      rw [derivedSeries_zero] at this
+      exact (bot_ne_top (α := Subgroup M)) this.symm
+    · exact hpos
+  -- L := derivedSeries M (n-1) is the last nontrivial term.
+  set m := n - 1 with hm_def
+  have hm_succ : m + 1 = n := by omega
+  set L := derivedSeries M m with hL_def
+  -- L ≠ ⊥ by minimality of n.
+  have hL_ne_bot : L ≠ ⊥ := by
+    rw [hL_def]
+    exact Nat.find_min hex (by omega)
+  -- ⁅L, L⁆ = derivedSeries M n = ⊥.
+  have hLL_bot : ⁅L, L⁆ = ⊥ := by
+    rw [hL_def, ← derivedSeries_succ, hm_succ, hn_bot]
+  -- L is abelian (commutative): ⁅L,L⁆ = ⊥ ⇒ each pair commutes.
+  haveI hL_comm : IsMulCommutative L := by
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at hLL_bot
+    refine ⟨⟨fun a b => ?_⟩⟩
+    have ha_cent : (a : M) ∈ Subgroup.centralizer (L : Set M) := hLL_bot a.property
+    rw [Subgroup.mem_centralizer_iff] at ha_cent
+    apply Subtype.ext
+    exact (ha_cent b.val b.property).symm
+  -- L is normal (characteristic).
+  haveI hL_normal : L.Normal := by rw [hL_def]; exact derivedSeries_normal M m
+  -- L is nilpotent (abelian ⇒ CommGroup via CommGroup.ofIsMulCommutative ⇒ nilpotent).
+  haveI hL_nilp : Group.IsNilpotent ↥L := inferInstance
+  -- L ≤ F(M), so F(M) ≠ ⊥.
+  have hL_le_fitting : L ≤ OddOrder.Isaacs.Ch01.fitting M :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  intro hF_bot
+  rw [hF_bot, le_bot_iff] at hL_le_fitting
+  exact hL_ne_bot hL_le_fitting
 
 /-- **§7D Steps 2-3 partition setup** — every maximal subgroup `M` of a simple
 group of order `p^a q^b` is `p`-type or `q`-type (Isaacs L3963-3967).
