@@ -258,6 +258,33 @@ prove via Ch06), (3) wire Step 3 from them.
 3. `#assert_only_allowed_axioms OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow` を
    AxiomsCheck.lean に追加して固定 (回帰ガード)。
 
+## 2026-05-27 update — ✅ COMPLETE: `step3_main` sorry 解消, Burnside unconditional
+
+`step3_main` の最後の `sorry` を **sub-axiom 無しで** wire 完了。`burnside_p_pow_q_pow`
+は標準 3 公理 (`propext` / `Classical.choice` / `Quot.sound`) **のみ**に依存 ⇒ 真に
+unconditional。`lake build OddOrder.AxiomsCheck` (EXIT 0) で確定。
+
+**前回 update の認識ミスを訂正**: 「faithful-action generation は Ch06 未形式化、追加作業 or
+sub-axiom 化が必要」としていたが, **誤り**だった。当の補題は既に Ch06 に sorry-free で存在:
+- `OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic` (**Isaacs
+  Thm 6.21**): 非巡回 abelian `A` の coprime 作用 ⇒ `⟨C_N(a):1≠a∈A⟩ = ⊤`。
+  (Thm 6.20 = `isCyclic_of_faithful_trivial_on_proper_invariant` は cyclicity のみだが,
+  generation を与える 6.21 はその直前に証明済みだった。)
+
+**配線内容** (`step3_main` 末尾 L7, Isaacs L3987-3993):
+- レバー `hcomm_mem_Mg` (`C_G(a)⊆M^g`), `hZpH_le_Mg`, `hZqH_le_Mg_imp_False` (既着地) に
+  接続。
+- `hclosure_imp : ⟨C_{Z_q}(a)⟩=⊤ → Z_q ⊆ M^g` を `nontrivialActionFixedByClosure_le_iff`
+  + `Mg.comap ZqH.subtype` + `hcomm_mem_Mg` で構成。
+- 非巡回分岐: Thm 6.21 → closure=⊤ → 矛盾。非忠実分岐: `∃1≠c, C_{Z_q}(c)=⊤` →
+  closure=⊤ → 矛盾。ゆえに `A` 巡回 ∧ 忠実。
+- 結論 1: `A≅Z_p` (eA) ⇒ `IsCyclic Z_p` (`isCyclic_of_surjective`)。
+- 結論 2: faithful nontrivial p-群 on 巡回 `Z_q` ⇒ `p<q`
+  (`prime_lt_of_pGroup_faithful_on_cyclic`, 既着地)。
+- AxiomsCheck.lean に `#assert_only_allowed_axioms burnside_p_pow_q_pow` 追加 (回帰ガード)。
+
+Commit: `§7D Step 3 complete: close step3_main sorry → Burnside Thm 7.8 unconditional`.
+
 ## 完了条件
 
 - Top-level theorem matching goal-grep `^theorem burnside_p_pow_q_pow…` ✅
@@ -266,7 +293,8 @@ prove via Ch06), (3) wire Step 3 from them.
   (`step3_not_both_opCore_ne_bot`) も axiom → theorem 化**され、残りは
   `step3_main` 内の `sorry` 1 個のみ (= `burnside` の唯一の `sorryAx` 源)。
 - 最終: `step3_main` の sorry を埋め、`burnside_p_pow_q_pow` が標準 3 公理のみ依存
-  (`#assert_only_allowed_axioms` 通過) になれば **unconditional 完成**。
+  (`#assert_only_allowed_axioms` 通過) になれば **unconditional 完成**。✅ **達成
+  (2026-05-27)** — 上記 COMPLETE update 参照。
 
 ## 参照
 

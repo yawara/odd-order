@@ -65,6 +65,14 @@ mmd で `### 7a` (L3715), `### 7b` (L3828), `**7C**` (L3898, インラインテ�
 
 ### § 7D — Burnside p^a q^b (lines 3951-4053)
 
+> ✅ **COMPLETE (2026-05-27)** — `OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow` は標準 3 公理
+> (`propext`/`Classical.choice`/`Quot.sound`) のみに依存する **unconditional な theorem**。
+> Steps 1-9 全て sorry/project-axiom 無し。`#assert_only_allowed_axioms` で回帰ガード済み。
+> 最後の関門だった `step3_main` の faithful-action 分岐は **sub-axiom 無し**で wire 完了
+> (generation は Ch06 Thm 6.21 `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`)。
+> 詳細は [issues/closed/0032](../../issues/closed/0032-isaacs-ch07-thm-7-8-burnside.md)。
+> ⚠ 本ノート下部の forward-axiom 表 (`hMinCounterexample` 記載) は discharge 前の旧情報で stale。
+
 `### 7D` (L3951) で section 開始. character-free 証明 (Goldschmidt + Bender + Matsuyama). Thompson 局所解析の応用例.
 
 | # | 種別 | 内容 | mmd |
