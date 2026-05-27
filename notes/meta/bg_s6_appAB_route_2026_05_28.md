@@ -8,9 +8,25 @@
 - **BG Thm 6.1 (Hall-Higman) = Gorenstein 6.5.2、Thm 6.2 (Glauberman Z(J)) = Gorenstein 6.5.1 + 8.2.11**。BG 本文は **statement + G 引用のみで証明を書かない**。
 - **Isaacs FGT は Glauberman Z(J)-定理を明示的に省く** (p.217 verbatim)。⇒ CLAUDE.md「BG の G 引用 → Isaacs 読み替え」方針が **Thm 6.2 で破綻**(Isaacs に対応物なし)。
 - **解決 = BG App.A + App.B(Puig の L(S))の自己完結ルート**。BG が Gorenstein 依存を断つために用意した代替で、**B.4 は Isaacs 本人の未公刊証明**。
-- **依存閉包の真のゲートは A.4(b)(= Thm 6.1)と A.4(c)(A.5/B.4 が要する)の 2 つだけ**。両者は Gorenstein §6.5 の special case で、**最深部 = SL(2,p) 表現論(Dickson 2.8.4 / G 3.8.1)は repo に既にある**(`gl2_pSubgroup_centralizes_of_normalizes` = Isaacs Lem 7.3)。A.2/A.3/A.4(a) は直接構築すれば**迂回可**。
+- **依存閉包の真のゲートは A.4(b)(= Thm 6.1)と A.4(c)(A.5/B.4 が要する)の 2 つだけ**。両者は Gorenstein §6.5 の special case。~~最深部 = SL(2,p) 表現論(Dickson 2.8.4 / G 3.8.1)は repo に既にある(`gl2_pSubgroup_centralizes_of_normalizes` = Isaacs Lem 7.3)。A.2/A.3/A.4(a) は直接構築すれば迂回可~~ **⚠️ 2026-05-28 PM spike で訂正(§0 参照)**: 7.3 は一般ゲートの臨界路に**乗っていない**(reduced J(P) 経路=7.5/7.6 の道具)。一般 A.4(b)/(c) は BG 構造どおり A.4⟸A.3⟸**A.2(=3.8.1, 二次既約⇒dim≤2 縮約)**⟸A.1 で、A.2/A.3 は迂回**不可**。base A.1 は部品済(BG Thm 2.6 ✅ + `PGroupFixedVector` ✅)、**唯一の実質的欠落は A.2(char-p rep theory)**。
 - **J → L(S) 大域置換は通る**(§8/§9 精査済)。M は J で定義されておらず「N_G(Z(J(P)))=M」は導出的。App.B(B.1(f)/B.2/B.4)が J の使用性質を**設計通り**ミラーする。
 - **2026-05-23 wave1 監査の「App.B + Thm A.5 を Phase 2a でスキップ推奨」は、no-Gorenstein 方針下では誤り**。App.B は 6.2 代替の本線で必須。本 doc で撤回。
+
+## 0. 2026-05-28 (PM) kernel-connection spike の結果 — リスクモデルの訂正
+
+「A.4(b)/(c) の最深部 SL(2,p) は repo 既証 (7.3)、残りは 7.5 と同程度の bounded reduction」という当初 TL;DR/§3 の見立てを、**(i)** 7.5 機構の精読(`actionCentralizer` + 次元縮約補題群)、**(ii)** BG Thm 2.6 の repo 実装確認、**(iii)** 二次作用の rank-nullity 計算、で検証した。結論: **ルートは破綻しない**(A.2/3.8.1 は標準・真の定理)。**だが難所の位置と規模が当初想定と違っていた**。3 点訂正:
+
+1. **7.3 は一般ゲートの臨界路に乗っていない**。7.3 (`gl2_pSubgroup_centralizes_of_normalizes`) は **reduced J(P) 経路**(7.5/7.6, `P=C_G(Z(P))`)で使う GL(2,p) 補題。そこで効くのは J(P)=maximal elementary abelian の組合せ論が **直接 `|V:C_V|≤p` を与える**ため(7.6 Step 5 の `|Ā|=p`)で、**次元縮約が要らない**。一般の A.4(b)/(c)(任意 abelian normal A / 任意二次作用)にはこの index 境界が無い。
+
+2. **二次作用は dim≤2 に落とすまで `actionCentralizer index ≤ p` を与えない**。7.5 の次元縮約補題(`actionCentralizer_sup_index_le_sq` / `actionCentralizer_inf_normal_of_index_le_prime` / `quotient_isElementaryAbelian_card_prime_sq_of_actionCentralizer_inf_not_isCyclic`, S7A2)は **`(actionCentralizer φ P).index ≤ p` を仮説に取る**(= 7.5 の仮定 (v))。一方 `[V,a,a]=1 ⇒ (a-1)²=0 ⇒ rank(a-1) ≤ dim/2 ⇒ |V:C_V(a)| ≤ √|V|`(rank-nullity)。dim>2 では index>p になり得る。⇒ **7.5 の縮約は二次ゲートに流用できない**。「二次・既約 ⇒ dim≤2」の縮約は **Gorenstein 3.8.1**(= BG A.2「follow to p.105」)で、7.5 とは別物。
+
+3. **BG App.A の構造どおり A.4 ⟸ A.3 ⟸ A.2 ⟸ A.1。「A.2/A.3 迂回可」は不成立**(BG 自身が A.4 を A.2/A.3 の上に積む。迂回する別証明は文献にも無い)。内訳:
+   - **A.1**(dim-2 base, char p): ✅ **部品は揃っている**。BG Thm 2.6 = `OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian`(sorry-free, **体一般** — `references/bg` L774「`F` is a field」)+ `OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector.exists_fixed_vector_ne_zero`(sorry-free)で組める。`OddTwoDimRepr.lean` の 34 行 skeleton/「complex」記述は S02 実装に置換済(誤記、要 cleanup)。
+   - **A.2**(= 3.8.1 の「二次・既約 ⇒ dim≤2」縮約, char p, closure of 𝔽_p): ❌ **唯一の実質的欠落**。char-p 加群の primitivity / module-Clifford / tensor 分解が要る。repo の rep-theory(`Clifford.lean` = ℂ 上の character Clifford〔Isaacs 6.5, 証明 deferred〕、`EigenspaceUnderCyclicAction.lean` = BG Prop 2.4 ℂ 上)は **char-0/指標論**で、これを**カバーしない**。
+
+**正味**: 難所は「7.5 流用の group-theory reduction」ではなく **A.2 = char-p 二次既約加群の dim≤2 縮約(新規 rep theory, 中規模)** 1 点に集約。**7.3 は J(P) 経路の道具であって一般ゲートの底ではない**。
+
+**訂正後の着手順**: **A.1 を組む**(部品済、interface/型確認の早い勝ち筋)→ **A.2 / 3.8.1 を scope して着手(本ルートの真のゲート)** → A.3 → A.4(a/b/c) → A.5 → App.B(B.1-B.4) → §8-§16 を L(S) 化。下記 §3「真のゲート」の旧記述(7.3 核 reduction)は本 §0 で上書き。
 
 ## 1. 問題: 6.1/6.2 は深く、Isaacs に無い
 
@@ -67,8 +83,8 @@ Puig の L(S):`X → Y :⟺ Y は X に正規化される abelian 部分群で�
   - 7.5 (normal-P): P∈Syl_p, faithful 作用 V, `|V:C_V(P)|≤p` ⇒ P⊴G。主役 P が外部加群に作用、結論は大域正規性。
   - A.4(c): A が P に二次作用 `[P,A,A]=1`、結論は O_p(N/C) 局所化。
   - 共通核 = **Lemma 7.3 (GL(2,p))**。両証明とも rank-2/GL(2,p) に落として 7.3 を適用。
-- **最深部 = Dickson 2.8.4 / Gorenstein 3.8.1(SL(2,p) 表現論、BG が "long, complicated" と呼び A.1/A.2 で迂回)は repo に既証**: `OddOrder.Isaacs.Ch07.gl2_pSubgroup_centralizes_of_normalizes`(S7A1:1269、Isaacs Lem 7.3)。
-- ⇒ A.4(b)/(c) は「**新規 reduction を組んで 7.3 を適用**」する bounded な作業(7.5 の repo 証明と同程度の reduction)。A.2/A.3/A.4(a) は直接構築するため**不要**(BG の §3.8→§6.5 経路を迂回)。
+- ~~最深部 = Dickson 2.8.4 / Gorenstein 3.8.1(SL(2,p) 表現論)は repo に既証: `gl2_pSubgroup_centralizes_of_normalizes`(Isaacs Lem 7.3)~~ **⚠️ §0 で訂正**: 7.3 = Isaacs の GL(2,p) 補題で **reduced J(P) 経路(7.5/7.6)の道具**。BG が Dickson 2.8.4 の代替に使うのは **A.1**(= BG Thm 2.6, repo `odd_two_dim_sylow_abelian` ✅)、3.8.1 の代替は **A.2**(未実装)。7.3 ≠ 3.8.1/2.8.4(別の GL(2,p) 事実)。
+- ~~⇒ A.4(b)/(c) は「新規 reduction を組んで 7.3 を適用」する bounded な作業(7.5 と同程度)。A.2/A.3/A.4(a) は不要(§3.8→§6.5 を迂回)~~ **⚠️ §0 で訂正**: 7.5 の縮約は `index ≤ p` を仮説に取り、二次作用はそれを dim≤2 でしか与えない(rank-nullity)。一般 A.4(b)/(c) は **A.2(3.8.1, char-p 二次既約⇒dim≤2 縮約)が必須**で、これが唯一の実質的欠落。A.2/A.3 は迂回不可。
 - **鉱脈**: repo §7B `normal_J` 証明(Step 1-7 で `J(P)≤O_p`)が、abelian A∈E(P) の `[H∩L,A]⊆U` 型と 7.5 を使うので、A.4(c) の stability-lift 部品が再利用できる可能性。
 
 ## 4. J → L(S) 大域置換の検証(§8/§9 精査)
@@ -104,7 +120,7 @@ Puig の L(S):`X → Y :⟺ Y は X に正規化される abelian 部分群で�
 6. **App.B**: B.1(+ G 5.3.12=Isaacs 1D.10)、B.2、B.3(A.5)、B.4(A.5 + oPiCore_quotient + Frattini)。
 7. **§8-§16 を L(S) で formalize**(J→L 大域置換、本 doc §4 で健全性確認済)。
 
-着手順: **7.3 は済 → (1)+(2) A.4(b)/(c) → (3)(4) 小補題 → A.5 → App.B(B.1-B.4) → §8-§16 を L(S) 化**。これで §6 の Gorenstein §3.8/§6.5/8.2.11 依存を完全に捨てられる。
+着手順(**§0 spike で改訂**): **A.1 を組む(部品済 = BG Thm 2.6 + PGroupFixedVector、interface/型確認)→ A.2 / Gorenstein 3.8.1(char-p 二次既約⇒dim≤2 縮約、本ルートの真のゲート・唯一の実質欠落)→ A.3 → A.4(a/b/c) → A.5 → App.B(B.1-B.4)→ §8-§16 を L(S) 化**。これで §6 の Gorenstein §3.8/§6.5/8.2.11 依存を完全に捨てられる。⚠️ 旧「7.3 は済→A.4(b)/(c)」は誤り(7.3 は J(P) 経路の道具、一般ゲートの底ではない)。
 
 ## 関連ノート
 
