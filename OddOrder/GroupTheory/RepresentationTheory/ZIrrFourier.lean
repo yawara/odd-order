@@ -72,4 +72,61 @@ theorem mem_ZIrr_inner_int (χ : IrreducibleCharacter G) {φ : ClassFunction G �
       rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, hm]
       push_cast; ring
 
+omit [Finite G] in
+/-- Left-linearity of `ClassFunction.inner` over a finite sum. -/
+theorem inner_sum_left {ι : Type*} (s : Finset ι) (f : ι → ClassFunction G ℂ)
+    (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner (∑ i ∈ s, f i) ψ =
+      ∑ i ∈ s, ClassFunction.inner (f i) ψ := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.inner_add_left, ih]
+
+open scoped Classical in
+/-- Orthonormality at the level of irreducible class functions (not the subtype index):
+for `a, b` in `irreducibleCharacters G`, `⟨a, b⟩ = δ_{a,b}`. -/
+theorem irr_cf_inner {a b : ClassFunction G ℂ}
+    (ha : a ∈ irreducibleCharacters G) (hb : b ∈ irreducibleCharacters G) :
+    ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 := by
+  have key := irreducibleCharacter_inner_eq_ite
+    (⟨a, ha⟩ : IrreducibleCharacter G) (⟨b, hb⟩ : IrreducibleCharacter G)
+  simp only [IrreducibleCharacter.coe_mk] at key
+  rw [key]
+  by_cases h : a = b
+  · rw [if_pos h, if_pos (Subtype.ext h)]
+  · rw [if_neg h, if_neg fun he => h (Subtype.ext_iff.mp he)]
+
+omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- A virtual character `φ ∈ ZIrr G` is a finite `ℂ`-linear combination of irreducible
+characters with integer coefficients (recorded as a `Finsupp` supported on `Irr(G)`). -/
+theorem mem_ZIrr_repr {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    ∃ c : ClassFunction G ℂ →₀ ℤ, (↑c.support ⊆ irreducibleCharacters G) ∧
+      φ = ∑ a ∈ c.support, (c a : ℂ) • a := by
+  rw [ZIrr_eq_span] at hφ
+  obtain ⟨c, hsupp, hsum⟩ := Submodule.mem_span_set.mp hφ
+  refine ⟨c, hsupp, ?_⟩
+  rw [← hsum, Finsupp.sum]
+  exact Finset.sum_congr rfl fun a _ => (Int.cast_smul_eq_zsmul ℂ (c a) a).symm
+
+open scoped Classical in
+/-- The Fourier coefficient of an integer span representation is recovered by the inner
+product: `⟨∑ c_a • a, χ⟩ = c_χ`. -/
+theorem inner_eq_coeff_of_repr (χ : IrreducibleCharacter G)
+    {c : ClassFunction G ℂ →₀ ℤ} (hsupp : ↑c.support ⊆ irreducibleCharacters G) :
+    ClassFunction.inner (∑ a ∈ c.support, (c a : ℂ) • a) (χ : ClassFunction G ℂ) =
+      (c (χ : ClassFunction G ℂ) : ℂ) := by
+  rw [inner_sum_left]
+  have hχ : (χ : ClassFunction G ℂ) ∈ irreducibleCharacters G := χ.mem_irreducibleCharacters
+  have step : (∑ a ∈ c.support, ClassFunction.inner ((c a : ℂ) • a) (χ : ClassFunction G ℂ))
+      = ∑ a ∈ c.support, (if a = (χ : ClassFunction G ℂ) then (c a : ℂ) else 0) := by
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [ClassFunction.inner_smul_left, irr_cf_inner (hsupp (Finset.mem_coe.mpr ha)) hχ,
+      mul_ite, mul_one, mul_zero]
+  rw [step, Finset.sum_ite_eq' c.support (χ : ClassFunction G ℂ) (fun a => (c a : ℂ))]
+  by_cases hmem : (χ : ClassFunction G ℂ) ∈ c.support
+  · rw [if_pos hmem]
+  · rw [if_neg hmem, Finsupp.notMem_support_iff.mp hmem, Int.cast_zero]
+
 end OddOrder.RepresentationTheory
