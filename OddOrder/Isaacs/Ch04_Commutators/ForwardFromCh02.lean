@@ -295,7 +295,9 @@ theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
         change (a * b) ^ p = 1
         change a ^ p = 1 at ha
         change b ^ p = 1 at hb
-        rw [mul_pow, ha, hb, one_mul]
+        -- rc2: `mul_pow` needs `CommMonoid ↥E`; derive `Commute a b` from `habel`.
+        have hcomm : Commute a b := Subtype.ext (habel a a.2 b b.2)
+        rw [hcomm.mul_pow, ha, hb, one_mul]
       inv_mem' := by
         intro a ha
         change a⁻¹ ^ p = 1

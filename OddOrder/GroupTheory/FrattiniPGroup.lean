@@ -46,6 +46,7 @@ BG §1 Lemma 1.7 は Frattini 部分群 `Φ(R)` の 4 つの基本性質を述�
 -/
 
 open scoped commutatorElement
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup is now scoped
 
 namespace OddOrder.GroupTheory
 
@@ -140,7 +141,7 @@ theorem commutator_mem_frattini
   suffices h : (QuotientGroup.mk' M) ⁅x, y⁆ = 1 by
     exact (QuotientGroup.eq_one_iff _).mp h
   rw [map_commutatorElement]
-  exact commutatorElement_eq_one_iff_mul_comm.mpr (IsCyclic.commutative.comm _ _)
+  exact commutatorElement_eq_one_iff_mul_comm.mpr (mul_comm _ _)
 
 /-- For a finite p-group `R`, every `p`-th power lies in `Φ(R)`. -/
 theorem pow_mem_frattini

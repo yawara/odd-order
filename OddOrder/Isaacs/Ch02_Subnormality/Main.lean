@@ -3331,6 +3331,9 @@ private lemma inf_le_center_of_join_eq_top {G : Type*} [Group G] {A B : Subgroup
   rw [Subgroup.mem_centralizer_iff] at hx_central
   exact (hx_central c (Set.mem_singleton _)).symm
 
+-- rc2: IsMulCommutative→CommGroup is scoped; open locally (file-wide blows up
+-- `CommGroup (MulAut ?m)` typeclass search elsewhere in this file).
+open scoped IsMulCommutative in
 /-- `Subgroup.center G ≤ fitting G`. Center は abelian → 冪零, 正規部分群. -/
 private lemma center_le_fitting (G : Type*) [Group G] [Finite G] :
     Subgroup.center G ≤ fitting G := by

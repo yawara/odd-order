@@ -3550,8 +3550,8 @@ private theorem opCore_ne_bot_of_sylow_normalizer
     {q : ℕ} [Fact q.Prime] {G : Type*} [Group G] [Finite G] [Finite (Sylow q G)]
     (Q : Sylow q G) (hq_dvd : q ∣ Nat.card G) :
     OddOrder.Isaacs.Ch01.opCore q
-      (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ := by
-  let N : Subgroup G := Subgroup.normalizer ((Q : Subgroup G) : Set G)
+      (Subgroup.normalizer (Q : Set G)) ≠ ⊥ := by
+  let N : Subgroup G := Subgroup.normalizer (Q : Set G)
   let QN : Sylow q N := Q.subtype Q.le_normalizer
   haveI : Finite (Sylow q N) := inferInstance
   haveI : (QN : Subgroup N).Normal := by
@@ -3711,7 +3711,7 @@ private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
     (hnot_pgroup : ¬ IsPGroup p G) :
     ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ q ∣ Nat.card G ∧ ∃ Q : Sylow q G,
       OddOrder.Isaacs.Ch01.opCore q
-        (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ := by
+        (Subgroup.normalizer (Q : Set G)) ≠ ⊥ := by
   rcases exists_prime_ne_dvd_card_of_not_isPGroup (p := p) (G := G) hnot_pgroup with
     ⟨q, hq_prime, hq_ne_p, hq_dvd⟩
   haveI : Fact q.Prime := ⟨hq_prime⟩
@@ -3729,9 +3729,9 @@ private theorem hasNormalPComplement_of_sylow_normalizer_commutative
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
     (Q : Sylow p G)
     (hN_comm : Std.Commutative
-      (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
-        Subgroup.normalizer ((Q : Subgroup G) : Set G) →
-        Subgroup.normalizer ((Q : Subgroup G) : Set G))) :
+      (· * · : Subgroup.normalizer (Q : Set G) →
+        Subgroup.normalizer (Q : Set G) →
+        Subgroup.normalizer (Q : Set G))) :
     OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
   refine OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer
     Q ?_
@@ -3796,11 +3796,11 @@ private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
     (hnot_pgroup : ¬ IsPGroup p G)
     (hnormalizer : ∀ {q : ℕ} [Fact q.Prime], q ≠ p → (Q : Sylow q G) →
       OddOrder.Isaacs.Ch01.opCore q
-        (Subgroup.normalizer ((Q : Subgroup G) : Set G)) ≠ ⊥ →
+        (Subgroup.normalizer (Q : Set G)) ≠ ⊥ →
       Std.Commutative
-        (· * · : Subgroup.normalizer ((Q : Subgroup G) : Set G) →
-          Subgroup.normalizer ((Q : Subgroup G) : Set G) →
-          Subgroup.normalizer ((Q : Subgroup G) : Set G)))
+        (· * · : Subgroup.normalizer (Q : Set G) →
+          Subgroup.normalizer (Q : Set G) →
+          Subgroup.normalizer (Q : Set G)))
     (hind : ∀ N : Subgroup G, N.Normal → N ≠ ⊥ → N ≠ ⊤ →
       ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by

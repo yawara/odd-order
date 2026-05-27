@@ -517,7 +517,9 @@ theorem solvable_minimal_normal_isElementaryAbelian [Finite G] [IsSolvable G]
         change (a * b) ^ p = 1
         change a ^ p = 1 at ha
         change b ^ p = 1 at hb
-        rw [mul_pow, ha, hb, one_mul]
+        -- rc2: `mul_pow` needs `CommMonoid ↥M`; derive `Commute a b` from `habel`.
+        have hcomm : Commute a b := Subtype.ext (habel a a.2 b b.2)
+        rw [hcomm.mul_pow, ha, hb, one_mul]
       inv_mem' := by
         intro a ha
         change a⁻¹ ^ p = 1
