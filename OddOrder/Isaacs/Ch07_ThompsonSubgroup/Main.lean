@@ -346,6 +346,27 @@ theorem step3_main
     · exact h
   have hNPS_gt : SH < Subgroup.normalizer SH ⊓ (P : Subgroup H) :=
     lt_normalizer_inf_sylow_of_lt P hSH_lt
+  set NPS : Subgroup H := Subgroup.normalizer SH ⊓ (P : Subgroup H) with hNPS_def
+  -- `N_P(S) ⊄ M` (else it is a `p`-subgroup of `M` strictly containing the Sylow-`p`
+  -- `S` of `M`, impossible by `Sylow.is_maximal'`); pick `g ∈ N_P(S) ∖ M`.
+  have hNPS_not_le_M : ¬ NPS ≤ M := by
+    intro hle
+    have hNPS_pgroup : IsPGroup p NPS := by rw [hNPS_def]; exact P.isPGroup'.to_inf_right
+    have hSM_le_K : (SM : Subgroup ↥M) ≤ NPS.comap M.subtype := by
+      rw [← Subgroup.map_le_iff_le_comap, ← hSH_def]; exact le_of_lt hNPS_gt
+    have hK_pgroup : IsPGroup p (NPS.comap M.subtype) :=
+      hNPS_pgroup.comap_of_ker_isPGroup M.subtype
+        (by rw [Subgroup.ker_subtype]; exact IsPGroup.of_bot)
+    have hK_eq := SM.is_maximal' hK_pgroup hSM_le_K
+    have hNPS_eq_SH : NPS = SH := by
+      have h1 : (NPS.comap M.subtype).map M.subtype = NPS :=
+        Subgroup.map_comap_eq_self (by rw [Subgroup.range_subtype]; exact hle)
+      rw [hK_eq] at h1
+      exact (hSH_def.trans h1).symm
+    exact (ne_of_lt hNPS_gt) hNPS_eq_SH.symm
+  obtain ⟨g, hg_NPS, hg_notM⟩ := SetLike.not_le_iff_exists.mp hNPS_not_le_M
+  rw [hNPS_def, Subgroup.mem_inf] at hg_NPS
+  have hg_normSH : g ∈ Subgroup.normalizer SH := hg_NPS.1
   sorry
 
 /-- **§7D Step 3** (Isaacs L3982-3993) — *not both cores nontrivial*.
