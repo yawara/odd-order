@@ -1,0 +1,1292 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+
+/-!
+# Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4 (pp. 184-193)
+-/
+
+namespace OddOrder.Isaacs.Ch06
+
+section /- 6B structural helper: finite abelian Z-groups -/
+
+/-! ### Finite abelian Z-group helpers
+
+Isaacs Lemma 6.20 uses Corollary 6.17 to show that the Sylow subgroups of an abelian
+Frobenius complement are cyclic, and then concludes that the complement itself is cyclic.
+Mathlib packages the Sylow-cyclic condition as `IsZGroup`; these helpers expose exactly the
+abelian specialization needed for the 6.20 route. -/
+
+/-- A finite abelian group whose Sylow subgroups are all cyclic is cyclic. -/
+theorem isCyclic_of_sylow_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hSylow : ∀ p : ℕ, p.Prime → ∀ P : Sylow p A, IsCyclic P) :
+    IsCyclic A := by
+  haveI : IsZGroup A := ⟨hSylow⟩
+  exact inferInstance
+
+/-- If a finite abelian group is not cyclic, then some Sylow subgroup is not cyclic. -/
+theorem exists_prime_sylow_not_isCyclic_of_not_isCyclic
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    (hA : ¬ IsCyclic A) :
+    ∃ p : ℕ, p.Prime ∧ ∃ P : Sylow p A, ¬ IsCyclic P := by
+  by_contra hnone
+  apply hA
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    by_contra hP
+    exact hnone ⟨p, hp, P, hP⟩
+
+end
+
+section /- 6B (number-theoretic prelude): Lemma 6.16 (pp. 191-193) -/
+
+/-! ### Isaacs Lemma 6.16
+
+Pure number-theoretic fact used in §6B for the Sylow structure of Frobenius complements
+(Cor 6.17). Independent of all preceding chapters and of §6A.
+
+* For `p` odd: relies on the Lifting-the-Exponent lemma (mathlib
+  `Int.emultiplicity_pow_sub_pow`); conclusion `i ≡ 1 (mod p^{e-1})` always holds.
+* For `p = 2`: direct factorization `i^2 - 1 = (i-1)(i+1)` plus coprimality of the two
+  factors with the odd residual. Three sub-cases according to which factor carries the
+  bulk of the `2`-power and whether the residual is even or odd. -/
+
+open Int
+
+/-- Helper for the `p = 2` branch of Lemma 6.16: if `2 ^ (e + 1) ∣ i ^ 2 - 1`, then
+`2 ^ e` divides one of `i - 1` or `i + 1`. -/
+private theorem two_pow_dvd_or_of_sq_sub_one {e : ℕ} {i : ℤ}
+    (h : (2 : ℤ) ^ (e + 1) ∣ i ^ 2 - 1) :
+    (2 : ℤ) ^ e ∣ i - 1 ∨ (2 : ℤ) ^ e ∣ i + 1 := by
+  -- `i` must be odd, otherwise `i^2 - 1` is odd, contradicting even divisibility.
+  have h_fact : (i ^ 2 - 1 : ℤ) = (i - 1) * (i + 1) := by ring
+  rw [h_fact] at h
+  have h_i_odd : Odd i := by
+    rcases Int.even_or_odd i with ⟨k, rfl⟩ | hodd
+    · -- `i = k + k`, so `(i - 1)(i + 1) = (k+k-1)(k+k+1)` is a product of two odd numbers; odd.
+      exfalso
+      have h2 : (2 : ℤ) ∣ (k + k - 1) * (k + k + 1) :=
+        (dvd_pow_self 2 (Nat.succ_ne_zero _)).trans h
+      rcases Int.prime_two.dvd_or_dvd h2 with h2' | h2'
+      · -- `2 ∣ k + k - 1` is impossible mod 2.
+        omega
+      · omega
+    · exact hodd
+  obtain ⟨j, rfl⟩ := h_i_odd
+  -- Now `i = 2 j + 1`. Factorization: `(i-1)(i+1) = (2j)(2j+2) = 4 · j · (j+1)`.
+  have h_dvd' : (2 : ℤ) ^ (e + 1) ∣ 4 * (j * (j + 1)) := by
+    have h_re : ((2 * j + 1) - 1) * ((2 * j + 1) + 1) = 4 * (j * (j + 1)) := by ring
+    rwa [h_re] at h
+  -- Case split on parity of `j` (then either `j` or `j + 1` contributes a 2-power).
+  rcases Int.even_or_odd j with hjeven | hjodd
+  · -- `j = 2k` (well, `j = k + k`). Then `i - 1 = 4k`.
+    obtain ⟨k, rfl⟩ := hjeven
+    -- Coprimality: `2k + 1` (i.e. `(k + k) + 1`) is odd.
+    have h_coprime : IsCoprime ((2 : ℤ) ^ (e + 1)) ((k + k) + 1) := by
+      apply IsCoprime.pow_left
+      exact ⟨-k, 1, by ring⟩
+    -- Rewrite `4 * ((k + k) * ((k + k) + 1))` as `(4 * (k + k)) * ((k + k) + 1)` to factor.
+    have h_dvd'' : (2 : ℤ) ^ (e + 1) ∣ (4 * (k + k)) * ((k + k) + 1) := by
+      convert h_dvd' using 1; ring
+    have h_dvd_bulk : (2 : ℤ) ^ (e + 1) ∣ 4 * (k + k) :=
+      h_coprime.dvd_of_dvd_mul_right h_dvd''
+    -- `4 * (k + k) = 8 k = 2 · (4 k)`. Divide by 2: `2^e ∣ 4k = i - 1`.
+    left
+    rcases h_dvd_bulk with ⟨m, hm⟩
+    refine ⟨m, ?_⟩
+    have h2pow : (2 : ℤ) ^ (e + 1) = 2 * 2 ^ e := by rw [pow_succ]; ring
+    have hm' : (4 : ℤ) * (k + k) = 2 * (2 ^ e * m) := by rw [hm, h2pow]; ring
+    -- `((k + k) + 1) - 1 = k + k`, so `i - 1 = (2 j + 1) - 1` with `j = k + k`.
+    linarith
+  · -- `j = 2k + 1` for some `k`. Then `i + 1 = 2(2k+1) + 2 = 4(k+1)`.
+    obtain ⟨k, rfl⟩ := hjodd
+    right
+    -- `2 k + 1` is odd.
+    have h_coprime : IsCoprime ((2 : ℤ) ^ (e + 1)) (2 * k + 1) := by
+      apply IsCoprime.pow_left
+      exact ⟨-k, 1, by ring⟩
+    -- `4 * ((2k+1) * ((2k+1) + 1)) = (4 * (2 * (k + 1))) * (2 k + 1)`.
+    have h_dvd'' : (2 : ℤ) ^ (e + 1) ∣ (4 * (2 * (k + 1))) * (2 * k + 1) := by
+      convert h_dvd' using 1; ring
+    have h_dvd_bulk : (2 : ℤ) ^ (e + 1) ∣ 4 * (2 * (k + 1)) :=
+      h_coprime.dvd_of_dvd_mul_right h_dvd''
+    rcases h_dvd_bulk with ⟨m, hm⟩
+    refine ⟨m, ?_⟩
+    have h2pow : (2 : ℤ) ^ (e + 1) = 2 * 2 ^ e := by rw [pow_succ]; ring
+    have hm' : (4 : ℤ) * (2 * (k + 1)) = 2 * (2 ^ e * m) := by rw [hm, h2pow]; ring
+    -- `(2 * (2 k + 1) + 1) + 1 = 4 k + 4 = 4 (k + 1)`, so this is `i + 1`.
+    linarith
+
+/-- **Isaacs Lemma 6.16**. Let `p` be a prime and `e` a positive integer. If `i : ℤ` satisfies
+`i ^ p ≡ 1 (mod p ^ e)`, then one of the following holds:
+* `i ≡ 1 (mod p ^ (e - 1))`,
+* `p = 2` and `i ≡ -1 (mod 2 ^ e)`,
+* `p = 2` and `i ≡ 2 ^ (e - 1) - 1 (mod 2 ^ e)`. -/
+theorem pow_prime_modEq_one_cases {p : ℕ} (hp : p.Prime) {e : ℕ} (he : 0 < e) {i : ℤ}
+    (h : i ^ p ≡ 1 [ZMOD ((p : ℤ) ^ e)]) :
+    i ≡ 1 [ZMOD ((p : ℤ) ^ (e - 1))] ∨
+    (p = 2 ∧ i ≡ -1 [ZMOD ((2 : ℤ) ^ e)]) ∨
+    (p = 2 ∧ i ≡ ((2 : ℤ) ^ (e - 1) - 1) [ZMOD ((2 : ℤ) ^ e)]) := by
+  -- Normalise `e = e' + 1` so `e - 1 = e'` is definitionally clean.
+  obtain ⟨e', rfl⟩ : ∃ e', e = e' + 1 := ⟨e - 1, (Nat.sub_add_cancel he).symm⟩
+  simp only [Nat.add_sub_cancel]
+  -- Convert hypothesis to divisibility (`a ≡ b [ZMOD n]` gives `n ∣ b - a`).
+  have h_dvd : ((p : ℤ) ^ (e' + 1)) ∣ i ^ p - 1 := h.symm.dvd
+  rcases hp.eq_two_or_odd' with rfl | hp_odd
+  · -- ##### Case p = 2 #####
+    rcases two_pow_dvd_or_of_sq_sub_one h_dvd with h_left | h_right
+    · -- (a) holds: `2 ^ e' ∣ i - 1` ⇒ `i ≡ 1 (mod 2^e')`.
+      left
+      refine Int.modEq_iff_dvd.mpr ?_
+      have : (1 - i : ℤ) = -(i - 1) := by ring
+      rw [this]
+      exact dvd_neg.mpr h_left
+    · -- `2 ^ e' ∣ i + 1`. Case-split on whether `2 ^ (e' + 1) ∣ i + 1`.
+      by_cases h_b : (2 : ℤ) ^ (e' + 1) ∣ i + 1
+      · -- (b): `2 ^ (e' + 1) ∣ i + 1`, i.e. `i ≡ -1 (mod 2 ^ (e' + 1))`.
+        right; left
+        refine ⟨rfl, Int.modEq_iff_dvd.mpr ?_⟩
+        have : (-1 - i : ℤ) = -(i + 1) := by ring
+        rw [this]
+        exact dvd_neg.mpr h_b
+      · -- (c): write `i + 1 = 2 ^ e' * a` with `a` odd (else (b) would hold).
+        right; right
+        refine ⟨rfl, Int.modEq_iff_dvd.mpr ?_⟩
+        obtain ⟨a, ha⟩ := h_right
+        have ha_odd : Odd a := by
+          rcases Int.even_or_odd a with hev | hodd
+          · -- `a = b + b`, so `i + 1 = 2 ^ e' * (b + b) = 2 * (2^e' * b)`, contradicting `h_b`.
+            exfalso
+            obtain ⟨b, rfl⟩ := hev
+            apply h_b
+            refine ⟨b, ?_⟩
+            rw [ha, pow_succ]; ring
+          · exact hodd
+        obtain ⟨b, rfl⟩ := ha_odd
+        -- `i + 1 = 2^e' * (2 b + 1)`, so `i = 2^e' * (2 b + 1) - 1 = (2^e' - 1) + 2^(e'+1) * b`.
+        -- Goal: `2 ^ (e' + 1) ∣ (2 ^ e' - 1) - i`.
+        refine ⟨-b, ?_⟩
+        have hi : i = (2 : ℤ) ^ e' * (2 * b + 1) - 1 := by linarith
+        rw [hi, pow_succ]; ring
+  · -- ##### Case p odd ##### (LTE).
+    left
+    -- Step 1: `p ∣ i - 1` from Fermat + hypothesis reduced modulo `p`.
+    have h_p_dvd_sub : (p : ℤ) ∣ i - 1 := by
+      have h_fermat : i ^ p ≡ i [ZMOD (p : ℤ)] := Int.ModEq.pow_prime_eq_self hp i
+      have h_mod_p : i ^ p ≡ 1 [ZMOD (p : ℤ)] :=
+        h.of_dvd (dvd_pow_self _ (Nat.succ_ne_zero _))
+      exact (h_fermat.symm.trans h_mod_p).symm.dvd
+    -- Step 2: `p ∤ i` (else `p ∣ 1`).
+    have h_p_not_dvd_i : ¬ (p : ℤ) ∣ i := by
+      intro hpi
+      have h1 : (p : ℤ) ∣ 1 := by
+        have := dvd_sub hpi h_p_dvd_sub
+        simpa using this
+      have hp_eq : (p : ℤ) = 1 := Int.eq_one_of_dvd_one (by positivity) h1
+      have hp_eq' : p = 1 := by exact_mod_cast hp_eq
+      exact hp.one_lt.ne' hp_eq'
+    -- Step 3: LTE: `emultiplicity p (i^p - 1) = emultiplicity p (i - 1) + emultiplicity p p`.
+    have h_LTE :=
+      Int.emultiplicity_pow_sub_pow hp hp_odd (x := i) (y := 1) (by simpa using h_p_dvd_sub)
+        h_p_not_dvd_i p
+    rw [one_pow, hp.emultiplicity_self] at h_LTE
+    -- Convert the hypothesis into an `emultiplicity` lower bound.
+    have h_e_le : ((e' + 1 : ℕ) : ℕ∞) ≤ emultiplicity (p : ℤ) (i ^ p - 1) :=
+      pow_dvd_iff_le_emultiplicity.mp h_dvd
+    rw [h_LTE] at h_e_le
+    -- `(e' + 1 : ℕ∞) ≤ m + 1 ⇒ (e' : ℕ∞) ≤ m`.
+    have h_em : (e' : ℕ∞) ≤ emultiplicity (p : ℤ) (i - 1) := by
+      have h_cast : ((e' + 1 : ℕ) : ℕ∞) = (e' : ℕ∞) + 1 := by push_cast; rfl
+      rw [h_cast] at h_e_le
+      exact (WithTop.add_le_add_iff_right WithTop.one_ne_top).mp h_e_le
+    have h_pe'_dvd : (p : ℤ) ^ e' ∣ i - 1 := pow_dvd_iff_le_emultiplicity.mpr h_em
+    refine Int.modEq_iff_dvd.mpr ?_
+    have : (1 - i : ℤ) = -(i - 1) := by ring
+    rw [this]
+    exact dvd_neg.mpr h_pe'_dvd
+
+end
+section /- 6A continued: Frobenius group (subgroup pair, Thm 6.4) -/
+
+/-! ### Definition of Frobenius group (subgroup-pair version)
+
+A **Frobenius group** is a group `G` together with a nontrivial proper normal subgroup `N`
+(the *kernel*) and a nontrivial complement `A` (the *Frobenius complement*) such that the
+conjugation action of `A` on `N` is Frobenius (Isaacs's condition (1) of Thm 6.4).
+
+Thm 6.4 in Isaacs asserts the equivalence of four conditions:
+1. (conjugation-Frobenius) `∀ 1 ≠ a ∈ A, 1 ≠ n ∈ N, a n a⁻¹ ≠ n`.
+2. (TI) `∀ g ∉ A, A ∩ A^g = 1`.
+3. (centralizer-in-A) `∀ 1 ≠ a ∈ A, C_G(a) ⊆ A`.
+4. (centralizer-in-N) `∀ 1 ≠ n ∈ N, C_G(n) ⊆ N`.
+
+We adopt (1) as the canonical condition (it is the most directly elementary). We then prove
+the cyclic equivalence of (1) ⇔ (2) ⇔ (3) directly, and supply constructors from (3) and (4).
+The direction (1) ⇒ (4) requires Cor 6.6 (Frobenius's theorem on Frobenius kernels) and is
+deferred. -/
+
+/-- A **Frobenius group**: `G` has a nontrivial normal subgroup `N` (the *Frobenius kernel*)
+complemented by a nontrivial subgroup `A` (the *Frobenius complement*), with the conjugation
+action of `A` on `N` being Frobenius.
+
+This is Isaacs's condition (1) of Thm 6.4; the other three equivalent conditions are proven
+separately as `trivialIntersection`, `centralizer_complement_le`, and the constructors
+`of_centralizer_complement_le` / `of_centralizer_kernel_le`. -/
+structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
+  /-- The kernel `N` is normal in `G`. -/
+  isNormal : N.Normal
+  /-- `N` and `A` are complements: `N ⊓ A = ⊥` and the product map `N × A → G` is a bijection. -/
+  isComplement : Subgroup.IsComplement' N A
+  /-- The kernel is nontrivial. -/
+  ne_bot_kernel : N ≠ ⊥
+  /-- The complement is nontrivial. -/
+  ne_bot_complement : A ≠ ⊥
+  /-- The conjugation action of `A` on `N` is Frobenius (Isaacs Thm 6.4 condition (1)). -/
+  conj_frobenius : ∀ a ∈ A, a ≠ 1 → ∀ n ∈ N, n ≠ 1 → a * n * a⁻¹ ≠ n
+
+namespace IsFrobeniusGroup
+
+variable {G : Type*} [Group G] {N A : Subgroup G}
+
+/-- A subgroup-pair Frobenius group gives a Frobenius action of the complement on the kernel by
+conjugation. This is the bridge between the pair form of Isaacs Thm 6.4 and the action-based
+definition used for Lemma 6.1. -/
+theorem toFrobeniusAction (h : IsFrobeniusGroup G N A) :
+    letI : N.Normal := h.isNormal
+    @IsFrobeniusAction A N _ _
+      (MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)) := by
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  intro a ha n hn hfix
+  have haG : (a : G) ≠ 1 := fun haG => ha (Subtype.ext haG)
+  have hnG : (n : G) ≠ 1 := fun hnG => hn (Subtype.ext hnG)
+  have hfixG : (a : G) * (n : G) * (a : G)⁻¹ = n := Subtype.ext_iff.mp hfix
+  exact h.conj_frobenius (a : G) a.2 haG (n : G) n.2 hnG hfixG
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group,
+`|N| ≡ 1 (mod |A|)`. -/
+theorem card_kernel_modEq_one [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.card N ≡ 1 [MOD Nat.card A] := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.card_modEq_one (A := A) (N := N) h.toFrobeniusAction
+
+/-- Subgroup-pair version of Isaacs Lemma 6.1: in a finite Frobenius group, the kernel and
+complement have coprime orders. -/
+theorem coprime_card_kernel_complement [Finite G] (h : IsFrobeniusGroup G N A) :
+    Nat.Coprime (Nat.card N) (Nat.card A) := by
+  classical
+  letI : N.Normal := h.isNormal
+  letI : MulDistribMulAction A N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Fintype N := Fintype.ofFinite N
+  haveI : Fintype A := Fintype.ofFinite A
+  simpa only [Fintype.card_eq_nat_card] using
+    IsFrobeniusAction.coprime_card (A := A) (N := N) h.toFrobeniusAction
+
+/-- **Isaacs Thm 6.4 (3) ⇒ (1)** (constructor). If `C_G(a) ⊆ A` for every nontrivial `a ∈ A`,
+then the conjugation action of `A` on `N` is Frobenius. -/
+theorem of_centralizer_complement_le
+    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
+    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
+    (h3 : ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A) :
+    IsFrobeniusGroup G N A where
+  isNormal := hN
+  isComplement := hC
+  ne_bot_kernel := hN_ne
+  ne_bot_complement := hA_ne
+  conj_frobenius := by
+    intro a haA ha n hnN hn h_conj
+    -- `a * n * a⁻¹ = n` ⇒ `n * a = a * n` ⇒ `n ∈ C_G(a) ⊆ A`.
+    have h_an : a * n = n * a := by
+      have := congrArg (· * a) h_conj
+      simpa using this
+    have h_comm : n * a = a * n := h_an.symm
+    have hnA : n ∈ A :=
+      h3 a haA ha (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
+    -- `n ∈ N ∩ A = ⊥` ⇒ `n = 1`, contradicting `hn`.
+    have hdisj : Disjoint N A := hC.disjoint
+    exact hn (Subgroup.disjoint_def.mp hdisj hnN hnA)
+
+/-- **Isaacs Thm 6.4 (4) ⇒ (1)** (constructor). If `C_G(n) ⊆ N` for every nontrivial `n ∈ N`,
+then the conjugation action of `A` on `N` is Frobenius. -/
+theorem of_centralizer_kernel_le
+    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
+    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
+    (h4 : ∀ n ∈ N, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ N) :
+    IsFrobeniusGroup G N A where
+  isNormal := hN
+  isComplement := hC
+  ne_bot_kernel := hN_ne
+  ne_bot_complement := hA_ne
+  conj_frobenius := by
+    intro a haA ha n hnN hn h_conj
+    -- `a * n * a⁻¹ = n` ⇒ `a * n = n * a` ⇒ `a ∈ C_G(n) ⊆ N`.
+    have h_an : a * n = n * a := by
+      have := congrArg (· * a) h_conj
+      simpa using this
+    -- We need `a ∈ C_G(n) = { x : x * n = n * x }`.
+    have h_comm : a * n = n * a := h_an
+    have haN : a ∈ N :=
+      h4 n hnN hn (Subgroup.mem_centralizer_singleton_iff.mpr h_comm)
+    -- `a ∈ N ∩ A = ⊥` ⇒ `a = 1`, contradicting `ha`.
+    have hdisj : Disjoint N A := hC.disjoint
+    exact ha (Subgroup.disjoint_def.mp hdisj haN haA)
+
+/-- Given `IsComplement' N A`, every `g : G` factors uniquely as `n * a` with `n ∈ N`, `a ∈ A`. -/
+private theorem _root_.Subgroup.IsComplement'.factor
+    (hC : Subgroup.IsComplement' N A) (g : G) :
+    ∃ (n : G) (a : G), n ∈ N ∧ a ∈ A ∧ n * a = g := by
+  obtain ⟨⟨n, a⟩, hna⟩ := (hC.existsUnique g).exists
+  exact ⟨n, a, n.2, a.2, hna⟩
+
+/-- **Isaacs Thm 6.4 (1) ⇒ (2)**: Frobenius group ⇒ trivial intersection.
+
+If `g ∉ A`, then `A ⊓ A^g = ⊥`. (Here `A^g = g A g⁻¹ = (MulAut.conj g) '' A`.) -/
+theorem trivialIntersection (h : IsFrobeniusGroup G N A) :
+    ∀ g : G, g ∉ A → A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A = ⊥ := by
+  intro g hg
+  -- Outline: assume `A ⊓ A^g ≠ ⊥`, derive `g ∈ A`, contradiction.
+  by_contra h_ne
+  apply hg
+  -- Factor `g = n * a` with `n ∈ N`, `a ∈ A` (from `IsComplement' N A`).
+  obtain ⟨n, a, hnN, haA, hna⟩ := h.isComplement.factor g
+  -- Get a nontrivial `x ∈ A ⊓ A^g`.
+  have h_ne_bot : A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A ≠ ⊥ := h_ne
+  obtain ⟨x, hxAg, hx_ne⟩ : ∃ x ∈ A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A, x ≠ 1 := by
+    by_contra h_all
+    apply h_ne_bot
+    rw [eq_bot_iff]
+    intro y hy
+    rw [Subgroup.mem_bot]
+    by_contra hy_ne
+    exact h_all ⟨y, hy, hy_ne⟩
+  rw [Subgroup.mem_inf] at hxAg
+  obtain ⟨hxA, hxAg⟩ := hxAg
+  -- `x = g * b * g⁻¹` for some `b ∈ A`.
+  rw [Subgroup.mem_map] at hxAg
+  obtain ⟨b, hbA, hxeq⟩ := hxAg
+  simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom] at hxeq
+  -- Substitute `g = n * a`. Then `x = (n * a) * b * (n * a)⁻¹ = n * (a b a⁻¹) * n⁻¹`.
+  have hxeq' : x = n * (a * b * a⁻¹) * n⁻¹ := by
+    rw [← hxeq, ← hna]
+    group
+  -- Let `b' := a * b * a⁻¹ ∈ A`. Then `x = n * b' * n⁻¹` and `b' ∈ A`.
+  set b' := a * b * a⁻¹ with hb'_def
+  have hb'_mem : b' ∈ A := by
+    rw [hb'_def]
+    exact Subgroup.mul_mem _ (Subgroup.mul_mem _ haA hbA) (Subgroup.inv_mem _ haA)
+  have hx_eq2 : x = n * b' * n⁻¹ := hxeq'
+  -- Consider `b'⁻¹ * x = b'⁻¹ * (n * b' * n⁻¹)`.
+  -- This is in `A` (both `b'⁻¹` and `x` are in `A`).
+  -- This is also in `N`: rewrite as `(b'⁻¹ * n * b') * n⁻¹`. The factor `b'⁻¹ * n * b' ∈ N`
+  -- by normality of `N`, and `n⁻¹ ∈ N`, so the product is in `N`.
+  have h_comm_elem : b'⁻¹ * (n * b' * n⁻¹) ∈ A := by
+    apply Subgroup.mul_mem
+    · exact Subgroup.inv_mem _ hb'_mem
+    · rw [← hx_eq2]; exact hxA
+  have h_comm_elem' : b'⁻¹ * (n * b' * n⁻¹) ∈ N := by
+    -- Rewrite as `(b'⁻¹ * n * b') * n⁻¹`.
+    have h_eq : b'⁻¹ * (n * b' * n⁻¹) = (b'⁻¹ * n * b') * n⁻¹ := by group
+    rw [h_eq]
+    apply Subgroup.mul_mem _ _ (Subgroup.inv_mem _ hnN)
+    -- `b'⁻¹ * n * b' ∈ N` by normality.
+    have := h.isNormal.conj_mem' n hnN b'
+    exact this
+  have hdisj : Disjoint N A := h.isComplement.disjoint
+  -- So `b'⁻¹ * (n * b' * n⁻¹) = 1`, i.e., `n * b' * n⁻¹ = b'`, i.e., `b'` commutes with `n`.
+  have h_one : b'⁻¹ * (n * b' * n⁻¹) = 1 := Subgroup.disjoint_def.mp hdisj h_comm_elem' h_comm_elem
+  have h_conj_b' : n * b' * n⁻¹ = b' := by
+    have := h_one
+    -- `b'⁻¹ * Y = 1` ⇒ `Y = b'`.
+    have h_mul := congrArg (b' * ·) this
+    simp only [← mul_assoc, mul_inv_cancel, one_mul, mul_one] at h_mul
+    exact h_mul
+  -- By Frobenius condition, if `b' ≠ 1` and `n ≠ 1`, then... wait, we have `b' * n * b'⁻¹ ≠ n`.
+  -- Reformulate `h_conj_b'`: `n * b' * n⁻¹ = b'` ⇔ `n * b' = b' * n` ⇔ `b' * n * b'⁻¹ = n`.
+  -- So if `b' ≠ 1` and `n ≠ 1`, Frobenius gives contradiction. Hence `b' = 1` or `n = 1`.
+  have h_conj_n : b' * n * b'⁻¹ = n := by
+    -- `n * b' * n⁻¹ = b'` ⇒ `n * b' = b' * n`.
+    have h_nb' : n * b' = b' * n := by
+      have := congrArg (· * n) h_conj_b'
+      simpa using this
+    -- `b' * n * b'⁻¹ = (b' * n) * b'⁻¹ = (n * b') * b'⁻¹ = n`.
+    rw [← h_nb', mul_inv_cancel_right]
+  -- Case analysis: either `b' = 1` or `n = 1`.
+  by_cases h_n_one : n = 1
+  · -- `n = 1` ⇒ `g = n * a = a ∈ A`.
+    rw [← hna, h_n_one, one_mul]
+    exact haA
+  · -- `n ≠ 1`. By Frobenius, `b' = 1`. Then `x = n * 1 * n⁻¹ = 1`, contradiction.
+    by_cases h_b'_one : b' = 1
+    · exfalso
+      have : x = 1 := by rw [hx_eq2, h_b'_one, mul_one, mul_inv_cancel]
+      exact hx_ne this
+    · exfalso
+      exact h.conj_frobenius b' hb'_mem h_b'_one n hnN h_n_one h_conj_n
+
+/-- **Isaacs Thm 6.4 (2) ⇒ (3)**: Frobenius group ⇒ centralizer of any nontrivial element of `A`
+is contained in `A`. -/
+theorem centralizer_complement_le (h : IsFrobeniusGroup G N A) :
+    ∀ a ∈ A, a ≠ 1 → Subgroup.centralizer ({a} : Set G) ≤ A := by
+  intro a haA ha x hx
+  -- `x * a = a * x`, so `x * a * x⁻¹ = a`, so `a = (MulAut.conj x) a⁻¹⁻¹ ∈ A.map (MulAut.conj x)`.
+  rw [Subgroup.mem_centralizer_singleton_iff] at hx
+  -- Want: `x ∈ A`. Assume for contradiction `x ∉ A`.
+  by_contra hxA
+  -- By (2), `A ⊓ A^x = ⊥`.
+  have h_ti := h.trivialIntersection x hxA
+  -- `a ∈ A ⊓ A^x`: indeed `a ∈ A`, and `a = (MulAut.conj x) a` (from commutativity).
+  have h_a_in_conj : a ∈ Subgroup.map (MulAut.conj x).toMonoidHom A := by
+    rw [Subgroup.mem_map]
+    refine ⟨a, haA, ?_⟩
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+    -- `x * a * x⁻¹ = a` follows from `x * a = a * x`.
+    have := hx
+    calc x * a * x⁻¹ = (x * a) * x⁻¹ := by rfl
+      _ = (a * x) * x⁻¹ := by rw [hx]
+      _ = a := by rw [mul_inv_cancel_right]
+  have h_a_in : a ∈ A ⊓ Subgroup.map (MulAut.conj x).toMonoidHom A :=
+    Subgroup.mem_inf.mpr ⟨haA, h_a_in_conj⟩
+  rw [h_ti, Subgroup.mem_bot] at h_a_in
+  exact ha h_a_in
+
+/-- **Isaacs Corollary 6.6**: In a Frobenius group `G` with kernel `N` and complement `A`, the
+kernel `N` is exactly the set of elements **not** conjugate to any nonidentity element of `A`.
+
+Proof: For `n ∈ N`, if `IsConj a n` with `a ∈ A`, write `g * a * g⁻¹ = n`. Then `a = g⁻¹ * n * g`
+lies in `N` (by normality of `N`), so `a ∈ N ⊓ A = ⊥`, i.e., `a = 1`. Hence `N ⊆ notConjugateSet A`.
+Equality follows by cardinality: `|N| = A.index = |notConjugateSet A|` (Lagrange + Lem 6.5). -/
+theorem kernel_eq_notConjugateSet [Finite G] (h : IsFrobeniusGroup G N A) :
+    (N : Set G) = notConjugateSet A := by
+  classical
+  -- Step 1: N ⊆ notConjugateSet A.
+  have h_subset : (N : Set G) ⊆ notConjugateSet A := by
+    intro n hnN a haA ha_ne h_conj
+    rw [SetLike.mem_coe] at hnN
+    rw [isConj_iff] at h_conj
+    obtain ⟨g, hg⟩ := h_conj
+    -- hg : g * a * g⁻¹ = n. Rearrange: a = g⁻¹ * n * g.
+    have hag : a = g⁻¹ * n * g := by rw [← hg]; group
+    -- g⁻¹ * n * g ∈ N (normality), so a ∈ N.
+    have h_gng_in_N : g⁻¹ * n * g ∈ N := by
+      have := h.isNormal.conj_mem n hnN g⁻¹
+      simpa using this
+    have ha_in_N : a ∈ N := hag ▸ h_gng_in_N
+    have hdisj : Disjoint N A := h.isComplement.disjoint
+    exact ha_ne (Subgroup.disjoint_def.mp hdisj ha_in_N haA)
+  -- Step 2: Equal cardinalities + subset ⇒ equal.
+  have h_ncard_N : (N : Set G).ncard = A.index := h.isComplement.ncard_left
+  have h_ncard_X : (notConjugateSet A).ncard = A.index :=
+    card_notConjugateSet_eq_index A fun g hg => h.trivialIntersection g hg
+  have h_finite : (notConjugateSet A).Finite := Set.toFinite _
+  exact Set.eq_of_subset_of_ncard_le h_subset (h_ncard_X.trans h_ncard_N.symm).le h_finite
+
+/-- **Isaacs Thm 6.4 (1) ⇒ (4)**: Frobenius group ⇒ centralizer of any nontrivial element of `N`
+is contained in `N`. Together with `of_centralizer_kernel_le` this completes the four-way
+equivalence of Thm 6.4.
+
+Proof uses Cor 6.6 (`kernel_eq_notConjugateSet`): suppose `c ∈ C_G(n) \ N`. Then `c` is conjugate
+to some `1 ≠ a ∈ A`, say `c = g a g⁻¹`. Set `m := g⁻¹ n g ∈ N` (by normality, `m ≠ 1`). From
+`c * n * c⁻¹ = n` we get `a * m * a⁻¹ = m`, contradicting the Frobenius condition. -/
+theorem centralizer_kernel_le [Finite G] (h : IsFrobeniusGroup G N A) :
+    ∀ n ∈ N, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ N := by
+  intro n hnN hn_ne c hc
+  rw [Subgroup.mem_centralizer_singleton_iff] at hc
+  -- hc : c * n = n * c
+  by_contra hcN
+  -- c ∉ N. Use Cor 6.6: N = notConjugateSet A, so c ∉ notConjugateSet A.
+  have hX_eq := h.kernel_eq_notConjugateSet
+  have hcX : c ∉ notConjugateSet A := by
+    intro h_mem
+    apply hcN
+    have h_in_N_set : c ∈ (N : Set G) := hX_eq ▸ h_mem
+    exact h_in_N_set
+  -- ¬ (∀ a ∈ A, a ≠ 1 → ¬ IsConj a c) ⇒ ∃ a ∈ A, a ≠ 1, IsConj a c.
+  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hcX
+  obtain ⟨a, haA, ha_ne, h_conj⟩ := hcX
+  rw [isConj_iff] at h_conj
+  obtain ⟨g, hgac⟩ := h_conj
+  -- hgac : g * a * g⁻¹ = c
+  -- Set m := g⁻¹ * n * g; by normality m ∈ N, and m ≠ 1 since n ≠ 1.
+  set m := g⁻¹ * n * g with hm_def
+  have hmN : m ∈ N := by
+    have := h.isNormal.conj_mem n hnN g⁻¹
+    simpa using this
+  have hm_ne : m ≠ 1 := by
+    intro hm_one
+    apply hn_ne
+    have h_n_eq : n = g * m * g⁻¹ := by rw [hm_def]; group
+    rw [h_n_eq, hm_one, mul_one, mul_inv_cancel]
+  -- From c * n = n * c and c = g a g⁻¹, conjugating both sides by g⁻¹/g gives a * m = m * a.
+  have h_am : a * m * a⁻¹ = m := by
+    have h_eq : a * m = m * a := by
+      have h_cn : c * n = n * c := hc
+      have h_cong : g⁻¹ * (c * n) * g = g⁻¹ * (n * c) * g :=
+        congrArg (fun x => g⁻¹ * x * g) h_cn
+      have hLHS : g⁻¹ * (c * n) * g = a * m := by
+        rw [← hgac, hm_def]; group
+      have hRHS : g⁻¹ * (n * c) * g = m * a := by
+        rw [← hgac, hm_def]; group
+      rw [hLHS, hRHS] at h_cong
+      exact h_cong
+    -- a * m = m * a ⇒ a * m * a⁻¹ = m.
+    calc a * m * a⁻¹ = (m * a) * a⁻¹ := by rw [h_eq]
+      _ = m := mul_inv_cancel_right m a
+  exact h.conj_frobenius a haA ha_ne m hmN hm_ne h_am
+
+open scoped Pointwise
+
+/-- In a Frobenius group, the kernel has trivial intersection with every conjugate of the
+complement. This is the `N ∩ A^g = 1` part used in the partition construction of §6B. -/
+theorem disjoint_kernel_conjugate_complement (h : IsFrobeniusGroup G N A) (g : G) :
+    Disjoint N (MulAut.conj g • A : Subgroup G) := by
+  rw [Subgroup.disjoint_def]
+  intro x hxN hxAconj
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hxAconj
+  have haN : (MulAut.conj g)⁻¹ x ∈ N := by
+    have hx_conj_N := h.isNormal.conj_mem x hxN g⁻¹
+    change (MulAut.conj g).symm x ∈ N
+    simpa [MulAut.conj_symm_apply] using hx_conj_N
+  have hdisj : Disjoint N A := h.isComplement.disjoint
+  have ha_one : (MulAut.conj g)⁻¹ x = 1 :=
+    Subgroup.disjoint_def.mp hdisj haN hxAconj
+  have hx_one : x = 1 := by
+    have hraw : g⁻¹ * x * g = 1 := by
+      simpa [MulAut.conj_symm_apply] using ha_one
+    calc
+      x = g * (g⁻¹ * x * g) * g⁻¹ := by group
+      _ = 1 := by
+        rw [hraw]
+        group
+  exact hx_one
+
+end IsFrobeniusGroup
+
+namespace SubgroupPartition
+
+open scoped Pointwise
+
+variable {G : Type*} [Group G]
+
+private theorem exists_ne_one_mem_of_ne_bot {H : Subgroup G} (hH : H ≠ ⊥) :
+    ∃ x : G, x ∈ H ∧ x ≠ 1 := by
+  by_contra hnone
+  push Not at hnone
+  apply hH
+  exact (Subgroup.eq_bot_iff_forall H).mpr fun x hx => hnone x hx
+
+private noncomputable def conjugatesFinset [Finite G] (A : Subgroup G) :
+    Finset (Subgroup G) := by
+  classical
+  exact (Set.finite_range (fun g : G => MulAut.conj g • A)).toFinset
+
+private theorem mem_conjugatesFinset [Finite G] {A B : Subgroup G} :
+    B ∈ conjugatesFinset A ↔ ∃ g : G, B = MulAut.conj g • A := by
+  classical
+  unfold conjugatesFinset
+  rw [Set.Finite.mem_toFinset, Set.mem_range]
+  constructor
+  · rintro ⟨g, rfl⟩
+    exact ⟨g, rfl⟩
+  · rintro ⟨g, rfl⟩
+    exact ⟨g, rfl⟩
+
+private theorem conjugatesFinset_card_eq_index [Finite G] {A : Subgroup G}
+    (hA_ne : A ≠ ⊥)
+    (hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
+    (conjugatesFinset A).card = A.index := by
+  classical
+  have hcard :=
+    Set.ncard_eq_toFinset_card
+      (Set.range (fun g : G => MulAut.conj g • A)) (Set.finite_range _)
+  rw [conjugatesFinset, ← hcard]
+  exact ncard_conjugates_eq_index_of_TI hA_ne hTI
+
+/-- Isaacs §6B partition attached to a Frobenius group: the kernel together with all conjugates
+of the complement. -/
+noncomputable def frobeniusGroup [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) :
+    SubgroupPartition G where
+  parts := by
+    classical
+    exact insert N (conjugatesFinset A)
+  nontrivial := by
+    classical
+    intro X hX hX_bot
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · apply h.ne_bot_kernel
+      rw [← hXN]
+      exact hX_bot
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      obtain ⟨a, haA, ha_ne⟩ := exists_ne_one_mem_of_ne_bot h.ne_bot_complement
+      apply ha_ne
+      have hmem_conj : MulAut.conj g a ∈ (MulAut.conj g • A : Subgroup G) := by
+        simpa using Subgroup.smul_mem_pointwise_smul a (MulAut.conj g) A haA
+      have hmem : MulAut.conj g a ∈ (⊥ : Subgroup G) := by
+        simpa [hX_bot] using hmem_conj
+      rw [Subgroup.mem_bot] at hmem
+      have ha_one : a = 1 := by
+        have hraw : g⁻¹ * (g * a * g⁻¹) * g = 1 := by
+          simpa [MulAut.conj_apply, MulAut.conj_symm_apply] using
+            congrArg (MulAut.conj g).symm hmem
+        calc
+          a = g⁻¹ * (g * a * g⁻¹) * g := by group
+          _ = 1 := hraw
+      exact ha_one
+  proper := by
+    classical
+    intro X hX hX_top
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · apply h.ne_bot_complement
+      exact (Subgroup.eq_bot_iff_forall A).mpr fun a haA => by
+        have haN : a ∈ N := by
+          rw [← hXN, hX_top]
+          exact Subgroup.mem_top a
+        exact Subgroup.disjoint_def.mp h.isComplement.disjoint haN haA
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      apply h.ne_bot_kernel
+      exact (Subgroup.eq_bot_iff_forall N).mpr fun n hnN => by
+        have hnAconj : n ∈ (MulAut.conj g • A : Subgroup G) := by
+          rw [hX_top]
+          exact Subgroup.mem_top n
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hnN hnAconj
+  cover := by
+    classical
+    intro x
+    by_cases hxN : x ∈ N
+    · exact ⟨N, Finset.mem_insert_self _ _, hxN⟩
+    · have hkernel := h.kernel_eq_notConjugateSet
+      have hx_not : x ∉ notConjugateSet A := by
+        intro hx
+        have hxN' : x ∈ (N : Set G) := by
+          rw [hkernel]
+          exact hx
+        exact hxN hxN'
+      simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hx_not
+      obtain ⟨a, haA, ha_ne, hconj⟩ := hx_not
+      rw [isConj_iff] at hconj
+      obtain ⟨g, hgax⟩ := hconj
+      refine ⟨MulAut.conj g • A, ?_, ?_⟩
+      · exact Finset.mem_insert.mpr (Or.inr (mem_conjugatesFinset.mpr ⟨g, rfl⟩))
+      · rw [← hgax]
+        simpa using Subgroup.smul_mem_pointwise_smul a (MulAut.conj g) A haA
+  inf_eq_bot_of_ne := by
+    classical
+    intro X Y hX hY hXY
+    rcases Finset.mem_insert.mp hX with hXN | hX
+    · rcases Finset.mem_insert.mp hY with hYN | hY
+      · exact False.elim (hXY (hXN.trans hYN.symm))
+      · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hY
+        rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_inf] at hx
+        have hxN : x ∈ N := by
+          rw [← hXN]
+          exact hx.1
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hxN hx.2
+    · obtain ⟨g, rfl⟩ := mem_conjugatesFinset.mp hX
+      rcases Finset.mem_insert.mp hY with hYN | hY
+      · rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_inf] at hx
+        have hxN : x ∈ N := by
+          rw [← hYN]
+          exact hx.2
+        exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hxN hx.1
+      · obtain ⟨k, rfl⟩ := mem_conjugatesFinset.mp hY
+        have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
+          intro g hg
+          simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+        exact TI_conjugate hTI g k hXY
+
+/-- The Frobenius-group partition has cardinality `1 + |N|`, where `N` is the kernel. -/
+theorem frobeniusGroup_parts_card [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) :
+    (frobeniusGroup h).parts.card = Nat.card N + 1 := by
+  classical
+  have hTI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
+    intro g hg
+    simpa [Subgroup.pointwise_smul_def] using h.trivialIntersection g hg
+  have hN_not_mem : N ∉ conjugatesFinset A := by
+    intro hNmem
+    obtain ⟨g, hNg⟩ := mem_conjugatesFinset.mp hNmem
+    apply h.ne_bot_kernel
+    exact (Subgroup.eq_bot_iff_forall N).mpr fun n hnN => by
+      have hnAconj : n ∈ (MulAut.conj g • A : Subgroup G) := by
+        rw [← hNg]
+        exact hnN
+      exact Subgroup.disjoint_def.mp (h.disjoint_kernel_conjugate_complement g) hnN hnAconj
+  have hindex : A.index = Nat.card N := by
+    have hn : Nat.card N = (N : Set G).ncard := by
+      simpa using (Nat.card_coe_set_eq (N : Set G))
+    rw [hn, h.isComplement.ncard_left]
+  rw [frobeniusGroup, Finset.card_insert_of_notMem hN_not_mem,
+    conjugatesFinset_card_eq_index h.ne_bot_complement hTI, hindex]
+
+end SubgroupPartition
+
+/-- **Isaacs Thm 6.9** (Frobenius-group branch, abelian target): a Frobenius actor cannot
+itself be a Frobenius group.  The proof uses the §6B partition by the kernel and conjugates of
+the complement, whose part count is `1 + |N|`. -/
+theorem false_of_frobeniusAction_isFrobeniusGroup_on_abelian
+    {A U : Type*} [Group A] [Finite A] [CommGroup U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    {N C : Subgroup A} (hGroup : IsFrobeniusGroup A N C) :
+    False := by
+  let partn := SubgroupPartition.frobeniusGroup hGroup
+  have hparts :
+      partn.parts.card = Nat.card N + 1 :=
+    SubgroupPartition.frobeniusGroup_parts_card hGroup
+  have hdvd : Nat.card N ∣ Nat.card A := by
+    have htop : Nat.card N ∣ Nat.card (⊤ : Subgroup A) :=
+      Subgroup.card_dvd_of_le (show N ≤ (⊤ : Subgroup A) from le_top)
+    simpa [Subgroup.card_top] using htop
+  exact false_of_frobeniusAction_partition_of_card_eq_succ_and_dvd_actor_card
+    hFrob partn hparts hdvd
+
+/-- **Isaacs Thm 6.9** reduction step: if a solvable subgroup `B` of the actor acts
+Frobeniusly on a finite nontrivial target, then the target contains a nontrivial abelian
+`B`-invariant subgroup.  This is the reusable form of the textbook move in L3495: choose an
+invariant Sylow subgroup `R` by Isaacs Thm 3.23, then pass to `Z(R)`. -/
+theorem exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B] :
+    ∃ M : Subgroup U, Nontrivial M ∧ IsMulCommutative M ∧
+      ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M := by
+  classical
+  let φ : B →* MulAut U := MulDistribMulAction.toMulAut B U
+  have hFrobB : IsFrobeniusAction B U := IsFrobeniusAction.actorSubgroup hFrob B
+  have hCop : Nat.Coprime (Nat.card B) (Nat.card U) := by
+    haveI : Fintype B := Fintype.ofFinite B
+    haveI : Fintype U := Fintype.ofFinite U
+    simpa only [Nat.card_eq_fintype_card] using
+      (IsFrobeniusAction.coprime_card (A := B) (N := U) hFrobB).symm
+  have hU_gt_one : 1 < Nat.card U :=
+    Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  obtain ⟨p, hp, hp_dvd⟩ := Nat.exists_prime_and_dvd hU_gt_one.ne'
+  letI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨R, hR_inv⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := U) (A := B) (φ := φ)
+      hCop (Or.inl (inferInstance : IsSolvable B)) p
+  let M : Subgroup U := (Subgroup.center R).map (R : Subgroup U).subtype
+  have hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M := by
+    simpa [M] using
+      (OddOrder.Isaacs.Ch03.IsAInvariant.map_subtype_of_characteristic
+        (φ := φ) hR_inv (K := Subgroup.center R))
+  have hR_ne_bot : (R : Subgroup U) ≠ ⊥ := R.ne_bot_of_dvd_card hp_dvd
+  haveI hR_nontrivial : Nontrivial R :=
+    (Subgroup.nontrivial_iff_ne_bot (R : Subgroup U)).mpr hR_ne_bot
+  haveI hCenter_nontrivial : Nontrivial (Subgroup.center R) :=
+    R.isPGroup'.center_nontrivial
+  have hM_ne_bot : M ≠ ⊥ := by
+    dsimp [M]
+    rw [Subgroup.map_eq_bot_iff_of_injective
+      (H := Subgroup.center R) (R : Subgroup U).subtype_injective]
+    exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center R)).mp hCenter_nontrivial
+  refine ⟨M, (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot, ?_, ?_⟩
+  · dsimp [M]
+    infer_instance
+  · intro b m hm
+    simpa [φ] using hM_inv.smul_mem b hm
+
+/-- **Isaacs Thm 6.9** reduction hook: if a subgroup `B` of the Frobenius actor is itself a
+Frobenius group and the target contains a nontrivial `B`-invariant abelian subgroup, then the
+Frobenius action is impossible.  The remaining textbook step is to obtain such a subgroup as
+`Z(R)` from an invariant Sylow subgroup `R` via Isaacs Thm 3.23. -/
+theorem false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C)
+    (M : Subgroup U) [Finite M] [Nontrivial M] [IsMulCommutative M]
+    (hM : ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M) :
+    False := by
+  letI : CommGroup M := inferInstance
+  letI : MulDistribMulAction B M := by
+    letI : SMul B M := ⟨fun b m => ⟨(b : A) • (m : U), hM b m m.2⟩⟩
+    exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+  have hFrobM : IsFrobeniusAction B M := by
+    intro b hb m hm hfix
+    have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+    have hmU : (m : U) ≠ 1 := fun hmU => hm (Subtype.ext hmU)
+    exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
+  exact false_of_frobeniusAction_isFrobeniusGroup_on_abelian hFrobM hGroup
+
+/-- **Isaacs Thm 6.9** (solvable Frobenius-group branch): a Frobenius actor cannot contain a
+solvable Frobenius group.  This is the full reduction in L3495: choose an invariant Sylow
+subgroup `R` of the target by Isaacs Thm 3.23, pass to the nontrivial invariant abelian subgroup
+`Z(R)`, and apply the abelian-target Frobenius-group contradiction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U] (hFrob : IsFrobeniusAction A U)
+    (B : Subgroup A) [Finite B] [IsSolvable B]
+    {N C : Subgroup B} (hGroup : IsFrobeniusGroup B N C) :
+    False := by
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
+  exact
+    false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup_on_invariant_abelian_subgroup
+      hFrob B hGroup M hM_inv
+
+/-- **Isaacs Thm 6.9** reduction hook for the elementary-abelian branch: if a subgroup `B` of
+the Frobenius actor is elementary abelian of order `p^2` and the target contains a nontrivial
+`B`-invariant abelian subgroup, then the action is impossible. -/
+theorem false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2)
+    (M : Subgroup U) [Finite M] [Nontrivial M] [IsMulCommutative M]
+    (hM : ∀ b : B, ∀ m ∈ M, (b : A) • m ∈ M) :
+    False := by
+  letI : CommGroup M := inferInstance
+  letI : MulDistribMulAction B M := by
+    letI : SMul B M := ⟨fun b m => ⟨(b : A) • (m : U), hM b m m.2⟩⟩
+    exact Subtype.coe_injective.mulDistribMulAction M.subtype (fun _ _ => rfl)
+  have hFrobM : IsFrobeniusAction B M := by
+    intro b hb m hm hfix
+    have hbA : (b : A) ≠ 1 := fun hbA => hb (Subtype.ext hbA)
+    have hmU : (m : U) ≠ 1 := fun hmU => hm (Subtype.ext hmU)
+    exact hFrob (b : A) hbA (m : U) hmU (Subtype.ext_iff.mp hfix)
+  exact false_of_frobeniusAction_isElementaryAbelian_card_prime_sq hFrobM hp hElem hCard
+
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, finite target): a Frobenius actor cannot
+contain an elementary abelian subgroup of order `p^2`.  The abelian-target partition argument is
+applied after the invariant-Sylow-center reduction. -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B) (hCard : Nat.card B = p ^ 2) :
+    False := by
+  haveI : IsMulCommutative B := ⟨⟨fun x y => hElem.comm x y⟩⟩
+  letI : CommGroup B := inferInstance
+  haveI : IsSolvable B := inferInstance
+  obtain ⟨M, hM_nontrivial, hM_comm, hM_inv⟩ :=
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hFrob B
+  haveI : Nontrivial M := hM_nontrivial
+  haveI : IsMulCommutative M := hM_comm
+  exact
+    false_of_invariant_abelian_target_actorSubgroup_isElementaryAbelian_card_prime_sq
+      hFrob B hp hElem hCard M hM_inv
+
+/-- **Isaacs Thm 6.9** (elementary-abelian branch, large order): a Frobenius actor cannot
+contain an elementary abelian `p`-subgroup whose order is at least `p^2`.  This packages the
+textbook reduction "replace by a subgroup so that `e = 2`". -/
+theorem false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_ge_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime)
+    (hElem : OddOrder.GroupTheory.IsElementaryAbelian p B)
+    (hCard : p ^ 2 ≤ Nat.card B) :
+    False := by
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    hElem.exists_subgroup_card_prime_sq hp hCard
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := B) (U := U) (IsFrobeniusAction.actorSubgroup hFrob B)
+      E hp hE_elem hE_card
+
+/-- **Isaacs Thm 6.9** (`p = q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p^2`; hence such a subgroup must be cyclic. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p : ℕ} (hp : p.Prime) (hCard : Nat.card B = p ^ 2)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      hFrob B hp
+      (OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic
+        hp hCard hNotCyclic)
+      hCard
+
+private lemma orderOf_eq_prime_of_mem_subgroup_card_prime
+    {G : Type*} [Group G] {H : Subgroup G} [Finite H] {p : ℕ}
+    (hp : p.Prime) (hH_card : Nat.card H = p)
+    {x : G} (hxH : x ∈ H) (hx : x ≠ 1) :
+    orderOf x = p := by
+  let xH : H := ⟨x, hxH⟩
+  have hxH_ne : xH ≠ 1 := fun hxH_one => hx (Subtype.ext_iff.mp hxH_one)
+  have h_dvd : orderOf xH ∣ p := by
+    simpa [hH_card] using orderOf_dvd_natCard xH
+  have h_order : orderOf xH = p := by
+    rcases (Nat.dvd_prime hp).mp h_dvd with h_one | h_prime
+    · exact False.elim (hxH_ne (orderOf_eq_one_iff.mp h_one))
+    · exact h_prime
+  exact (Subgroup.orderOf_coe xH).trans h_order
+
+/-- **Isaacs Thm 6.9** (`p > q` branch for subgroups of order `pq`): a Frobenius actor cannot
+contain a noncyclic subgroup of order `p*q` with `q < p`.  Such a subgroup would be a solvable
+Frobenius group: its Sylow `p`-subgroup is normal, a Sylow `q`-subgroup is a complement, and any
+fixed nonidentity pair would generate the whole group cyclically. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hqp : q < p) (hCard : Nat.card B = p * q)
+    (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  classical
+  have hpq_ne : p ≠ q := fun hpq => (Nat.lt_irrefl q (hpq ▸ hqp))
+  have hcop_qp : Nat.Coprime q p := (Nat.coprime_primes hq.out hp.out).mpr hpq_ne.symm
+  have hcop_pq : Nat.Coprime p q := hcop_qp.symm
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := B)
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := B)
+  have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+  have hfact_p : (Nat.card B).factorization p = 1 := by
+    rw [hCard, Nat.factorization_mul_apply_of_coprime hcop_pq,
+        hp.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne ((Nat.prime_dvd_prime_iff_eq hp.out hq.out).mp hd))]
+  have hfact_q : (Nat.card B).factorization q = 1 := by
+    rw [hCard', Nat.factorization_mul_apply_of_coprime hcop_qp,
+        hq.out.factorization_self,
+        Nat.factorization_eq_zero_of_not_dvd
+          (fun hd => hpq_ne.symm ((Nat.prime_dvd_prime_iff_eq hq.out hp.out).mp hd))]
+  have hP_card : Nat.card (P : Subgroup B) = p := by
+    rw [P.card_eq_multiplicity, hfact_p, pow_one]
+  have hQ_card : Nat.card (Q : Subgroup B) = q := by
+    rw [Q.card_eq_multiplicity, hfact_q, pow_one]
+  have hP_normal : (P : Subgroup B).Normal :=
+    OddOrder.Isaacs.Ch01.sylow_normal_of_card_eq_mul_prime_lt
+      (G := B) hqp hCard P
+  have h_disjoint : Disjoint (P : Subgroup B) (Q : Subgroup B) :=
+    IsPGroup.disjoint_of_ne p q hpq_ne _ _ P.isPGroup' Q.isPGroup'
+  have h_compl : Subgroup.IsComplement' (P : Subgroup B) (Q : Subgroup B) :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint
+      (by rw [hP_card, hQ_card, hCard]) h_disjoint
+  have hP_ne_bot : (P : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hp_eq_one : p = 1 := by
+      rw [← hP_card, hbot]
+      simp
+    exact hp.out.ne_one hp_eq_one
+  have hQ_ne_bot : (Q : Subgroup B) ≠ ⊥ := by
+    intro hbot
+    have hq_eq_one : q = 1 := by
+      rw [← hQ_card, hbot]
+      simp
+    exact hq.out.ne_one hq_eq_one
+  letI : (P : Subgroup B).Normal := hP_normal
+  have hFrobGroup : IsFrobeniusGroup B (P : Subgroup B) (Q : Subgroup B) := by
+    refine
+      { isNormal := hP_normal
+        isComplement := h_compl
+        ne_bot_kernel := hP_ne_bot
+        ne_bot_complement := hQ_ne_bot
+        conj_frobenius := ?_ }
+    intro a haQ ha_ne n hnP hn_ne h_conj
+    have h_an : a * n = n * a := by
+      have := congrArg (fun x => x * a) h_conj
+      simpa [mul_assoc] using this
+    have hcomm : Commute n a := h_an.symm
+    have hn_order : orderOf n = p :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hp.out hP_card hnP hn_ne
+    have ha_order : orderOf a = q :=
+      orderOf_eq_prime_of_mem_subgroup_card_prime hq.out hQ_card haQ ha_ne
+    have hcop_orders : Nat.Coprime (orderOf n) (orderOf a) := by
+      rw [hn_order, ha_order]
+      exact hcop_pq
+    have horder : orderOf (n * a) = p * q := by
+      rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders,
+        hn_order, ha_order]
+    exact hNotCyclic (isCyclic_of_orderOf_eq_card (n * a) (by rw [horder, hCard]))
+  haveI : IsSolvable B := by
+    haveI : IsCyclic (P : Subgroup B) := isCyclic_of_prime_card hP_card
+    have hP_index : (P : Subgroup B).index = q := by
+      have hmul := (P : Subgroup B).card_mul_index
+      rw [hP_card, hCard] at hmul
+      exact Nat.eq_of_mul_eq_mul_left hp.out.pos hmul
+    have hquot_card : Nat.card (B ⧸ (P : Subgroup B)) = q := by
+      rw [← Subgroup.index_eq_card, hP_index]
+    haveI : IsCyclic (B ⧸ (P : Subgroup B)) := isCyclic_of_prime_card hquot_card
+    letI : CommGroup (P : Subgroup B) := IsCyclic.commGroup
+    letI : CommGroup (B ⧸ (P : Subgroup B)) := IsCyclic.commGroup
+    exact solvable_of_ker_le_range (P : Subgroup B).subtype
+      (QuotientGroup.mk' (P : Subgroup B)) (by
+        rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+  exact
+    false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
+      hFrob B hFrobGroup
+
+/-- **Isaacs Thm 6.9** (order `pq` branch): a Frobenius actor cannot contain a noncyclic
+subgroup of order `p*q`, for primes `p` and `q` that may be equal. -/
+theorem false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime
+    {A U : Type*} [Group A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) (B : Subgroup A) [Finite B]
+    {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hCard : Nat.card B = p * q) (hNotCyclic : ¬ IsCyclic B) :
+    False := by
+  rcases lt_trichotomy p q with hpq | hpq | hqp
+  · have hCard' : Nat.card B = q * p := by rw [hCard, mul_comm]
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := q) (q := p) hFrob B hpq hCard' hNotCyclic
+  · subst q
+    exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_prime_sq
+        hFrob B hp.out (by simpa [pow_two] using hCard) hNotCyclic
+  · exact
+      false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime_lt
+        (p := p) (q := q) hFrob B hqp hCard hNotCyclic
+
+/-- **Isaacs Cor 6.10**: if `P` is a Sylow `p`-subgroup of a finite Frobenius
+complement, then `P` contains at most one subgroup of order `p`. -/
+theorem subgroups_card_prime_unique_of_frobeniusAction_sylow
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [hp : Fact p.Prime] (P : Sylow p A) :
+    ∀ K L : Subgroup P, Nat.card K = p → Nat.card L = p → K = L := by
+  intro K L hK_card hL_card
+  by_contra hKL_ne
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    P.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+      hK_card hL_card hKL_ne
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      (A := P) (U := U) (IsFrobeniusAction.actorSubgroup hFrob (P : Subgroup A))
+      E hp.out hE_elem hE_card
+
+/-- **Isaacs Thm 6.11 (abelian branch, in Frobenius-complement form)**: a commutative
+Sylow `p`-subgroup of a finite Frobenius complement is cyclic.  Corollary 6.10 supplies the
+unique order-`p` subgroup hypothesis, and the finite abelian p-group structure theorem turns it
+into cyclicity. -/
+theorem sylow_isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [Fact p.Prime]
+    (P : Sylow p A) [IsMulCommutative P] :
+    IsCyclic P :=
+  P.isPGroup'.isCyclic_of_subgroups_card_prime_unique
+    (subgroups_card_prime_unique_of_frobeniusAction_sylow hFrob P)
+
+/-- **Isaacs Cor 6.17 observation (abelian complement branch)**: a finite abelian Frobenius
+complement is cyclic.  This is the part needed later in Theorem 6.21 to rule out a noncyclic
+abelian group acting Frobeniusly. -/
+theorem isCyclic_of_frobeniusAction_of_isMulCommutative
+    {A U : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group U] [Finite U] [Nontrivial U] [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) :
+    IsCyclic A := by
+  exact isCyclic_of_sylow_isCyclic (A := A) fun p hp P => by
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : IsMulCommutative P := ⟨⟨fun x y => by
+      ext
+      exact mul_comm (x : A) (y : A)⟩⟩
+    exact sylow_isCyclic_of_frobeniusAction_of_isMulCommutative hFrob P
+
+/-- The contradiction step in Isaacs Thm 6.21 after the induction hypothesis has shown that
+every proper `A`-invariant subgroup of `N` lies in `K = ⟨C_N(a) | a ≠ 1⟩`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+    {A N : Type*} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A)
+    (hproper : ∀ P : Subgroup N,
+      (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ →
+        P ≤ nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N)) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let K : Subgroup N := nontrivialActionFixedByClosure φ
+  change K = ⊤
+  by_contra hK_ne_top
+  have hidx_gt : 1 < K.index := Subgroup.one_lt_index_of_ne_top hK_ne_top
+  obtain ⟨p, hp_prime, hp_dvd⟩ :=
+    Nat.exists_prime_and_dvd (Nat.ne_of_gt hidx_gt)
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hSolvA : IsSolvable A := isSolvable_of_comm fun a b : A => mul_comm a b
+  obtain ⟨P, _hP_inv, hP_top⟩ :=
+    exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
+      (A := A) (N := N) (K := K) (p := p) hCop (Or.inl hSolvA) hp_dvd
+      (by simpa [K, φ] using hproper)
+  have hN_pgroup : IsPGroup p N := by
+    have hP_pgroup : IsPGroup p (P : Subgroup N) := P.isPGroup'
+    rw [hP_top] at hP_pgroup
+    exact hP_pgroup.of_equiv Subgroup.topEquiv
+  have hN_solv : IsSolvable N := by
+    haveI : Group.IsNilpotent N := hN_pgroup.isNilpotent
+    exact IsNilpotent.to_isSolvable
+  letI : IsSolvable N := hN_solv
+  have hcomm : _root_.commutator N ≤ K :=
+    commutator_le_of_proper_invariant_le_of_isSolvable (A := A) (N := N) (K := K)
+      (by simpa [K, φ] using hproper)
+  letI : K.Normal := normal_of_commutator_le hcomm
+  have hK_inv : ∀ a : A, ∀ n ∈ K, a • n ∈ K := by
+    simpa [K, φ] using nontrivialActionFixedByClosure_invariant_of_commutative φ
+  have hCopAK : Nat.Coprime (Nat.card A) (Nat.card K) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card K)
+  have hfixed : ∀ a : A, a ≠ 1 → actionFixedBy φ a ≤ K := by
+    intro a ha
+    exact actionFixedBy_le_nontrivialActionFixedByClosure (φ := φ) ha
+  letI : MulDistribMulAction A (N ⧸ K) :=
+    IsFrobeniusAction.invariantQuotientMulDistribMulAction K hK_inv
+  haveI : Nontrivial (N ⧸ K) := Subgroup.nontrivial_quotient_of_ne_top hK_ne_top
+  have hFrobQuot : IsFrobeniusAction A (N ⧸ K) :=
+    quotient_isFrobeniusAction_of_fixedBy_le (A := A) (N := N) (M := K)
+      hK_inv hCopAK hfixed
+  exact hNotCyclic (isCyclic_of_frobeniusAction_of_isMulCommutative hFrobQuot)
+
+universe uA uN
+
+/-- **Isaacs Thm 6.21** (nontrivial case): if a finite abelian noncyclic group `A` acts
+coprimely on a finite nontrivial group `N`, then the subgroups `C_N(a)` for `a ≠ 1`
+generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  classical
+  let motive : ℕ → Prop := fun n =>
+    ∀ (N : Type uN) [Group N] [Finite N] [Nontrivial N] [MulDistribMulAction A N],
+      Nat.card N = n →
+      Nat.Coprime (Nat.card A) (Nat.card N) →
+      nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤
+  have hmain : motive (Nat.card N) := by
+    refine Nat.strong_induction_on (Nat.card N) ?_
+    intro n ih N _ _ _ _ hcard hCopN
+    refine nontrivialActionFixedByClosure_eq_top_of_proper_invariant_le
+      (A := A) (N := N) hCopN hNotCyclic ?_
+    intro M hM hM_ne_top
+    by_cases hM_nontriv : Nontrivial M
+    · letI : Nontrivial M := hM_nontriv
+      letI : MulDistribMulAction A M :=
+        IsFrobeniusAction.invariantSubgroupMulDistribMulAction M hM
+      have hM_card_lt_N : Nat.card M < Nat.card N := by
+        have h_dvd : Nat.card M ∣ Nat.card N := Subgroup.card_subgroup_dvd_card M
+        have h_le : Nat.card M ≤ Nat.card N := Nat.le_of_dvd Nat.card_pos h_dvd
+        have h_ne : Nat.card M ≠ Nat.card N := fun heq =>
+          hM_ne_top (Subgroup.eq_top_of_card_eq M heq)
+        exact Nat.lt_of_le_of_ne h_le h_ne
+      have hM_card_lt : Nat.card M < n := by
+        simpa [hcard] using hM_card_lt_N
+      have hCopM : Nat.Coprime (Nat.card A) (Nat.card M) :=
+        hCopN.coprime_dvd_right (Subgroup.card_subgroup_dvd_card M)
+      have hMtop :
+          nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A M) = ⊤ :=
+        (ih (Nat.card M) hM_card_lt) M rfl hCopM
+      exact
+        subgroup_le_nontrivialActionFixedByClosure_of_closure_eq_top
+          (M := M) (by intro a m; rfl) hMtop
+    · haveI : Subsingleton M := not_nontrivial_iff_subsingleton.mp hM_nontriv
+      intro n hn
+      have hn_one : n = 1 := by
+        have hsub : (⟨n, hn⟩ : M) = 1 := Subsingleton.elim _ _
+        exact congrArg Subtype.val hsub
+      rw [hn_one]
+      exact Subgroup.one_mem _
+  exact hmain N rfl hCop
+
+/-- **Isaacs Thm 6.21**: if a finite abelian noncyclic group `A` acts coprimely on a finite
+group `N`, then the subgroups `C_N(a)` for `a ≠ 1` generate `N`. -/
+theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [MulDistribMulAction A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (hNotCyclic : ¬ IsCyclic A) :
+    nontrivialActionFixedByClosure (MulDistribMulAction.toMulAut A N) = ⊤ := by
+  by_cases hN_nontriv : Nontrivial N
+  · letI : Nontrivial N := hN_nontriv
+    exact nontrivialActionFixedByClosure_eq_top_of_not_isCyclic_of_nontrivial
+      hCop hNotCyclic
+  · haveI : Subsingleton N := not_nontrivial_iff_subsingleton.mp hN_nontriv
+    rw [eq_top_iff]
+    intro n _hn
+    have hn_one : n = 1 := Subsingleton.elim n 1
+    rw [hn_one]
+    exact Subgroup.one_mem _
+
+/-- **Isaacs Lem 6.20**: if a finite abelian group acts faithfully and coprimely on `N`,
+and acts trivially on every proper invariant subgroup of `N`, then it is cyclic. -/
+theorem isCyclic_of_faithful_trivial_on_proper_invariant
+    {A : Type uA} {N : Type uN} [Group A] [Finite A] [IsMulCommutative A]
+    [Group N] [Finite N] [MulDistribMulAction A N] [FaithfulSMul A N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hproper :
+      ∀ M : Subgroup N,
+        (∀ a : A, ∀ n ∈ M, a • n ∈ M) →
+        M ≠ ⊤ →
+        ∀ a : A, ∀ n ∈ M, a • n = n) :
+    IsCyclic A := by
+  classical
+  by_contra hNotCyclic
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let fixedTop : Subgroup N := actionFixedPoints φ ⊤
+  have hKtop : nontrivialActionFixedByClosure φ = ⊤ :=
+    nontrivialActionFixedByClosure_eq_top_of_not_isCyclic hCop hNotCyclic
+  have hK_le_fixedTop : nontrivialActionFixedByClosure φ ≤ fixedTop := by
+    rw [nontrivialActionFixedByClosure_le_iff]
+    intro a ha
+    let M : Subgroup N := actionFixedBy φ a
+    have hM_inv : ∀ b : A, ∀ n ∈ M, b • n ∈ M := by
+      intro b n hn
+      have hmem :
+          (φ b) n ∈ actionFixedBy φ a :=
+        actionFixedBy_invariant_of_commute (φ := φ) (a := a) (b := b)
+          (mul_comm a b) n hn
+      simpa [φ, M] using hmem
+    have hM_ne_top : M ≠ ⊤ := by
+      intro hMtop
+      have ha_one : a = 1 := by
+        exact eq_of_smul_eq_smul fun n : N => by
+          have hn : n ∈ M := by
+            rw [hMtop]
+            exact Subgroup.mem_top n
+          change (φ a) n = n at hn
+          simpa [φ] using hn
+      exact ha ha_one
+    have hM_trivial := hproper M hM_inv hM_ne_top
+    intro n hn
+    change ∀ b : (⊤ : Subgroup A), (φ b) n = n
+    intro b
+    have hfix := hM_trivial (b : A) n hn
+    simpa [φ] using hfix
+  have hfixedTop_eq_top : fixedTop = ⊤ := by
+    rw [eq_top_iff]
+    intro n _hn
+    exact hK_le_fixedTop (by
+      rw [hKtop]
+      exact Subgroup.mem_top n)
+  have hA_subsingleton : Subsingleton A := by
+    refine ⟨fun a b => ?_⟩
+    have ha : a = 1 := by
+      exact eq_of_smul_eq_smul fun n : N => by
+        have hn : n ∈ fixedTop := by
+          rw [hfixedTop_eq_top]
+          exact Subgroup.mem_top n
+        have hfix := hn ⟨a, Subgroup.mem_top a⟩
+        change (φ a) n = n at hfix
+        simpa [φ] using hfix
+    have hb : b = 1 := by
+      exact eq_of_smul_eq_smul fun n : N => by
+        have hn : n ∈ fixedTop := by
+          rw [hfixedTop_eq_top]
+          exact Subgroup.mem_top n
+        have hfix := hn ⟨b, Subgroup.mem_top b⟩
+        change (φ b) n = n at hfix
+        simpa [φ] using hfix
+    exact ha.trans hb.symm
+  exact hNotCyclic (@isCyclic_of_subsingleton A _ hA_subsingleton)
+
+end
+
+
+end OddOrder.Isaacs.Ch06
