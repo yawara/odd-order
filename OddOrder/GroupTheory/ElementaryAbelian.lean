@@ -63,6 +63,20 @@ theorem to_subgroup (h : IsElementaryAbelian p G) (H : Subgroup G) :
     ext
     exact h.pow_eq_one (x : G)
 
+/-- **Transport across a group isomorphism**: if `A ≃* B` and `A` is
+`p`-elementary abelian, then so is `B`. -/
+theorem of_mulEquiv {A B : Type*} [Group A] [Group B] (e : A ≃* B)
+    (h : IsElementaryAbelian p A) : IsElementaryAbelian p B := by
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · -- commutativity transfers via `e⁻¹`.
+    have := h.comm (e.symm x) (e.symm y)
+    have h2 := congrArg e this
+    simpa using h2
+  · -- `x ^ p = 1` transfers via `e⁻¹`.
+    have := h.pow_eq_one (e.symm x)
+    have h2 := congrArg e this
+    simpa using h2
+
 /-- A noncyclic finite group of order `p^2` is elementary abelian. -/
 theorem of_card_prime_sq_of_not_isCyclic
     [Finite G] (hp : p.Prime) (hCard : Nat.card G = p ^ 2)
@@ -496,6 +510,22 @@ variable {G : Type*} [Group G]
 the subtype `↥H` is `p`-elementary abelian as a group. -/
 def IsElementaryAbelian (H : Subgroup G) (p : ℕ) : Prop :=
   OddOrder.GroupTheory.IsElementaryAbelian p ↥H
+
+/-- The image `H.map f` of an elementary abelian subgroup under an *injective*
+homomorphism is elementary abelian (via `↥H ≃* ↥(H.map f)`). -/
+theorem IsElementaryAbelian.map {p : ℕ} {N : Type*} [Group N] {H : Subgroup G}
+    {f : G →* N} (hf : Function.Injective f) (hH : H.IsElementaryAbelian p) :
+    (H.map f).IsElementaryAbelian p :=
+  OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+    (Subgroup.equivMapOfInjective H f hf) hH
+
+/-- Pulling back along an injective hom: if `H.map f` is elementary abelian, so
+is `H` (via the same iso `↥H ≃* ↥(H.map f)`). -/
+theorem IsElementaryAbelian.of_map {p : ℕ} {N : Type*} [Group N] {H : Subgroup G}
+    {f : G →* N} (hf : Function.Injective f) (hH : (H.map f).IsElementaryAbelian p) :
+    H.IsElementaryAbelian p :=
+  OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+    (Subgroup.equivMapOfInjective H f hf).symm hH
 
 /-- An elementary abelian subgroup of order `p^2` contains two distinct ambient subgroups of
 order `p`. -/

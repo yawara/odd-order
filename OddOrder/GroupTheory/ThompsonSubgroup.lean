@@ -149,4 +149,82 @@ theorem thompsonJ_eq_of_le_of_le [Finite G] {P Q : Subgroup G} {p : ℕ}
     intro F hF_Q hF_el
     exact hE_P.2.2 F (hF_Q.trans hQP) hF_el
 
+/-- **`J` commutes with injective images**: for an injective homomorphism
+`f : G →* N` and a subgroup `P ≤ G`, `J(f(P)) = f(J(P))`.
+
+The maximum-order elementary abelian subgroups of `f(P)` are exactly the
+`f`-images of those of `P` (injectivity preserves both the elementary-abelian
+property and cardinality, and every subgroup of `f(P)` is `f(its preimage)`).
+
+Used in §7D Step 8 (Isaacs Thm 7.8) to relate `J` of a Sylow of `M` computed
+inside `↥M` versus inside the ambient group. -/
+theorem thompsonJ_map_of_injective [Finite G] {N : Type*} [Group N]
+    {f : G →* N} (hf : Function.Injective f) (P : Subgroup G) (p : ℕ) :
+    thompsonJ (P.map f) p = (thompsonJ P p).map f := by
+  -- A subgroup `E ≤ P.map f` is the image of `E.comap f ≤ P`, with equal card and
+  -- elementary-abelian status preserved.
+  have key_comap : ∀ E : Subgroup N, E ∈ maxElemAbelianIn (P.map f) p →
+      E.comap f ∈ maxElemAbelianIn P p ∧ (E.comap f).map f = E := by
+    intro E hE
+    obtain ⟨hE_le, hE_el, hE_max⟩ := hE
+    -- `E ≤ P.map f ≤ range f`, so `(E.comap f).map f = E`.
+    have hE_le_range : E ≤ f.range := hE_le.trans (Subgroup.map_le_range f P)
+    have hmap_comap : (E.comap f).map f = E :=
+      Subgroup.map_comap_eq_self hE_le_range
+    refine ⟨⟨?_, ?_, ?_⟩, hmap_comap⟩
+    · -- `E.comap f ≤ P`.
+      rw [← Subgroup.comap_map_eq_self_of_injective hf P]
+      exact Subgroup.comap_mono hE_le
+    · -- `E.comap f` elementary abelian: its image `E` is, and `f` injective.
+      have hmap_el : ((E.comap f).map f).IsElementaryAbelian p := by
+        rw [hmap_comap]; exact hE_el
+      exact hmap_el.of_map hf
+    · -- Max-order: any elem-ab `F ≤ P` has `|F| = |F.map f| ≤ |E| = |E.comap f|`.
+      intro F hF_P hF_el
+      have hFmap_le : F.map f ≤ P.map f := Subgroup.map_mono hF_P
+      have hFmap_el : (F.map f).IsElementaryAbelian p :=
+        Subgroup.IsElementaryAbelian.map hf hF_el
+      have hcard_F : Nat.card (F.map f) = Nat.card F := Subgroup.card_map_of_injective hf
+      have hcard_E : Nat.card E = Nat.card (E.comap f) := by
+        conv_lhs => rw [← hmap_comap]
+        exact Subgroup.card_map_of_injective hf
+      have hstep : Nat.card (F.map f) ≤ Nat.card E := hE_max (F.map f) hFmap_le hFmap_el
+      rw [← hcard_E, ← hcard_F]; exact hstep
+  -- The image of a max elem-ab subgroup of `P` is a max elem-ab subgroup of `P.map f`.
+  have key_map : ∀ E : Subgroup G, E ∈ maxElemAbelianIn P p →
+      E.map f ∈ maxElemAbelianIn (P.map f) p := by
+    intro E hE
+    obtain ⟨hE_le, hE_el, hE_max⟩ := hE
+    refine ⟨Subgroup.map_mono hE_le, Subgroup.IsElementaryAbelian.map hf hE_el, ?_⟩
+    -- Max-order in `P.map f`: any elem-ab `F ≤ P.map f` is `(F.comap f).map f`,
+    -- and `F.comap f ≤ P` elem-ab, so `|F| = |F.comap f| ≤ |E| = |E.map f|`.
+    intro F hF_le hF_el
+    have hF_le_range : F ≤ f.range := hF_le.trans (Subgroup.map_le_range f P)
+    have hF_mapcomap : (F.comap f).map f = F := Subgroup.map_comap_eq_self hF_le_range
+    have hFcomap_le : F.comap f ≤ P := by
+      rw [← Subgroup.comap_map_eq_self_of_injective hf P]; exact Subgroup.comap_mono hF_le
+    have hFcomap_el : (F.comap f).IsElementaryAbelian p := by
+      have hmap_el : ((F.comap f).map f).IsElementaryAbelian p := by
+        rw [hF_mapcomap]; exact hF_el
+      exact hmap_el.of_map hf
+    have hcard_F : Nat.card F = Nat.card (F.comap f) := by
+      conv_lhs => rw [← hF_mapcomap]
+      exact Subgroup.card_map_of_injective hf
+    have hcard_E : Nat.card (E.map f) = Nat.card E := Subgroup.card_map_of_injective hf
+    calc Nat.card F = Nat.card (F.comap f) := hcard_F
+      _ ≤ Nat.card E := hE_max (F.comap f) hFcomap_le hFcomap_el
+      _ = Nat.card (E.map f) := hcard_E.symm
+  -- Combine the two correspondences.
+  apply le_antisymm
+  · -- `J(P.map f) ≤ (J P).map f`.
+    refine iSup_le fun E => iSup_le fun hE => ?_
+    obtain ⟨hEcomap_mem, hmapcomap⟩ := key_comap E hE
+    rw [← hmapcomap]
+    exact Subgroup.map_mono (le_thompsonJ_of_mem_maxElemAbelianIn hEcomap_mem)
+  · -- `(J P).map f ≤ J(P.map f)`: flip to `J P ≤ comap` and use `iSup_le`.
+    rw [Subgroup.map_le_iff_le_comap]
+    refine iSup_le fun E => iSup_le fun hE => ?_
+    rw [← Subgroup.map_le_iff_le_comap]
+    exact le_thompsonJ_of_mem_maxElemAbelianIn (key_map E hE)
+
 end Subgroup
