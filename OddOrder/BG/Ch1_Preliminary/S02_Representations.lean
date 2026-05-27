@@ -846,6 +846,7 @@ private theorem det_eq_scalar_of_finrank_eq_one
     _ = c := by
       simp [hdim]
 
+open scoped IsMulCommutative in
 /-- Irreducible representations of an abelian group over an algebraically closed
 field are one-dimensional.
 
@@ -864,7 +865,7 @@ private theorem finrank_eq_one_of_irreducible_representation_of_commutative_grou
   letI : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
   have hfinite : Module.Finite F σ.asModule := inferInstance
-  haveI : IsMulCommutative (MonoidAlgebra F K) := ⟨CommMagma.to_isCommutative⟩
+  haveI : IsMulCommutative (MonoidAlgebra F K) := inferInstance
   have hmodule :
       Module.finrank F σ.asModule = 1 :=
     @IsSimpleModule.finrank_eq_one_of_isMulCommutative
@@ -985,6 +986,7 @@ private theorem exists_simple_submodule_of_isPGroup_ne_char
     neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   exact exists_simple_submodule_of_neZero_card (K := K) σ
 
+open scoped IsMulCommutative in
 /-- Scalar-instance bridge for a simple group-algebra submodule of an abelian group.
 
 The simple object naturally lives as a `MonoidAlgebra F K`-submodule of
@@ -1026,7 +1028,7 @@ private theorem finrank_eq_one_of_simple_submodule_of_commutative_group
         NF ⊤ hfiniteTop le_top
     simpa [NF, Submodule.restrictScalars] using hfiniteNF
   haveI : IsMulCommutative K := ⟨hKcomm⟩
-  haveI : IsMulCommutative (MonoidAlgebra F K) := ⟨CommMagma.to_isCommutative⟩
+  haveI : IsMulCommutative (MonoidAlgebra F K) := inferInstance
   have hNdim : Module.finrank F N = 1 :=
     @IsSimpleModule.finrank_eq_one_of_isMulCommutative
       (MonoidAlgebra F K) N F
@@ -3556,16 +3558,16 @@ private theorem opCore_ne_bot_of_sylow_normalizer
   haveI : Finite (Sylow q N) := inferInstance
   haveI : (QN : Subgroup N).Normal := by
     change ((Q : Subgroup G).subgroupOf N).Normal
-    infer_instance
+    exact Subgroup.normal_subgroupOf_of_le_normalizer le_rfl
   have hQ_ne_bot : (Q : Subgroup G) ≠ ⊥ := Q.ne_bot_of_dvd_card hq_dvd
   have hQN_ne_bot : (QN : Subgroup N) ≠ ⊥ := by
     intro hbot
     apply hQ_ne_bot
-    have hmap :
-        ((QN : Subgroup N).map N.subtype) = (⊥ : Subgroup N).map N.subtype := by
-      rw [hbot]
-    simpa [QN, N, Sylow.coe_subtype,
-      Subgroup.map_subgroupOf_eq_of_le Q.le_normalizer] using hmap
+    have hmap : ((QN : Subgroup N).map N.subtype) = (Q : Subgroup G) := by
+      simp only [QN, Sylow.coe_subtype]
+      exact Subgroup.map_subgroupOf_eq_of_le Q.le_normalizer
+    rw [hbot, Subgroup.map_bot] at hmap
+    exact hmap.symm
   exact opCore_ne_bot_of_nontrivial_normal_pSubgroup
     (G := N) (K := (QN : Subgroup N)) QN.2 hQN_ne_bot
 
