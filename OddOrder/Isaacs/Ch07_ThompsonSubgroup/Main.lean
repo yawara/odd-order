@@ -6731,7 +6731,7 @@ theorem oPiCore_pPrime_eq_bot_of_isPType
 group with `p, q` both odd.  Hence Sylow-`2` subgroups of `M` are trivial. -/
 theorem two_not_dvd_card_subgroup_of_odd_primes
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     (hp2 : p ≠ 2) (hq2 : q ≠ 2) (M : Subgroup H) :
     ¬ (2 : ℕ) ∣ Nat.card ↥M := by
@@ -6986,10 +6986,10 @@ so `T ⊆ N_H(J(S_H)) = M`, making `T` a `p`-subgroup of `M` containing the Sylo
 Sylow. -/
 theorem step8_sylow_full
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
-    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
+    {a b : ℕ} (_hH_card : Nat.card H = p ^ a * q ^ b)
+    (_hH_nsol : ¬ IsSolvable H)
+    (_hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
     {M : Subgroup H} (hM_pType : IsPType p M)
     (S : Sylow p ↥M)
     (hJ_normal : (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
@@ -7084,10 +7084,7 @@ theorem step8_sylow_full
         rw [hconj]; exact hw
       obtain ⟨z, hz, hz_eq⟩ := this
       have hzw : w = z := by
-        have heq : tH * z * tH⁻¹ = tH * w * tH⁻¹ := by
-          have := hz_eq
-          simp only [MulAut.conj_apply, MonoidHom.coe_coe] at this
-          exact this
+        have heq : tH * z * tH⁻¹ = tH * w * tH⁻¹ := hz_eq
         -- cancel `tH⁻¹` on the right, then `tH` on the left.
         exact (mul_left_cancel (mul_right_cancel heq)).symm
       rw [hzw]; exact hz
