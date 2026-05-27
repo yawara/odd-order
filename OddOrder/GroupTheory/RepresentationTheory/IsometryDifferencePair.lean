@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
@@ -56,7 +57,6 @@ variable {G H : Type*} [Group G] [Group H]
 
 theorem irreducibleCharacter_inner_eq_if
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     {n : ℕ} (χ : Fin n → IrreducibleCharacter G) (hχ : Function.Injective χ)
     (i j : Fin n) :
     ClassFunction.inner (χ i : ClassFunction G ℂ) (χ j : ClassFunction G ℂ) =
@@ -64,15 +64,14 @@ theorem irreducibleCharacter_inner_eq_if
   by_cases hij : i = j
   · subst j
     simpa [characterTableRowPairing] using
-      CharacterTableRowOrthogonality.diagonal (G := G) hrow (χ i)
+      CharacterTableRowOrthogonality.diagonal (G := G) characterTableRowOrthogonality (χ i)
   · have hμ : χ i ≠ χ j := fun h => hij (hχ h)
     rw [if_neg hij]
     simpa [characterTableRowPairing] using
-      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+      CharacterTableRowOrthogonality.offDiagonal (G := G) characterTableRowOrthogonality hμ
 
 theorem irreducibleCharacter_difference_inner_self_of_ne_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
     (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
     ClassFunction.inner
@@ -80,16 +79,15 @@ theorem irreducibleCharacter_difference_inner_self_of_ne_zero
         ((χ i : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 2 := by
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_sub_right]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i i]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 i]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ i i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ 0 i]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ 0 0]
   simp [hi, eq_comm]
   norm_num
 
 theorem irreducibleCharacter_difference_inner_of_ne_zero_of_ne
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
     (hχ : Function.Injective χ) {i j : Fin n}
     (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
@@ -98,10 +96,10 @@ theorem irreducibleCharacter_difference_inner_of_ne_zero_of_ne
         ((χ j : ClassFunction G ℂ) - (χ 0 : ClassFunction G ℂ)) = 1 := by
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_sub_right]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i j]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ i 0]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 j]
-  rw [irreducibleCharacter_inner_eq_if (G := G) hrow χ hχ 0 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ i j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ i 0]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ 0 j]
+  rw [irreducibleCharacter_inner_eq_if (G := G) χ hχ 0 0]
   simp [hi, hj, hij, eq_comm]
 
 /-- The source-side difference `χ_i - χ_0` used in Peterfalvi §3 (1.4). -/
@@ -153,23 +151,21 @@ theorem irreducibleCharacterDifference_apply_one_of_same_degree
 
 theorem irreducibleCharacterDifference_inner_self_of_ne_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
     (hχ : Function.Injective χ) {i : Fin n} (hi : i ≠ 0) :
     ClassFunction.inner (irreducibleCharacterDifference χ i)
         (irreducibleCharacterDifference χ i) = 2 := by
-  exact irreducibleCharacter_difference_inner_self_of_ne_zero (G := G) hrow χ hχ hi
+  exact irreducibleCharacter_difference_inner_self_of_ne_zero (G := G) χ hχ hi
 
 theorem irreducibleCharacterDifference_inner_of_ne_zero_of_ne
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter G)
     (hχ : Function.Injective χ) {i j : Fin n}
     (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
     ClassFunction.inner (irreducibleCharacterDifference χ i)
         (irreducibleCharacterDifference χ j) = 1 := by
   exact irreducibleCharacter_difference_inner_of_ne_zero_of_ne
-    (G := G) hrow χ hχ hi hj hij
+    (G := G) χ hχ hi hj hij
 
 /-- The image under an integral isometry of a source-side difference `χ_i - χ_0`. -/
 abbrev isometryDifferenceImage {G H : Type*} [Group G] [Group H]
@@ -212,7 +208,6 @@ def IsometryDifferenceImagesAreVirtual {G H : Type*} [Group G] [Group H]
 theorem isometryDifferenceImage_inner_self_of_ne_zero
     [Fintype G] [Fintype H]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := H))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
     (hχ : Function.Injective χ)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
@@ -226,12 +221,11 @@ theorem isometryDifferenceImage_inner_self_of_ne_zero
         (isometryDifferenceImage τ χ i) = 2 := by
   rw [h_isom i i]
   exact irreducibleCharacterDifference_inner_self_of_ne_zero
-    (G := H) hrow χ hχ hi
+    (G := H) χ hχ hi
 
 theorem isometryDifferenceImage_inner_of_ne_zero_of_ne
     [Fintype G] [Fintype H]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := H))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
     (hχ : Function.Injective χ)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
@@ -245,7 +239,7 @@ theorem isometryDifferenceImage_inner_of_ne_zero_of_ne
         (isometryDifferenceImage τ χ j) = 1 := by
   rw [h_isom i j]
   exact irreducibleCharacterDifference_inner_of_ne_zero_of_ne
-    (G := H) hrow χ hχ hi hj hij
+    (G := H) χ hχ hi hj hij
 
 /-- The numeric data carried by the image differences in Peterfalvi §3 (1.4).
 
@@ -285,7 +279,6 @@ conditions needed by the later combinatorial proof core. -/
 theorem isometryDifferencePairNumerics_of_isometryDifferenceImage
     [Fintype G] [Fintype H]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := H))
     {n : ℕ} [NeZero n] (χ : Fin n → IrreducibleCharacter H)
     (hχ : Function.Injective χ)
     (τ : ClassFunction H ℂ →ₗ[ℤ] ClassFunction G ℂ)
@@ -303,11 +296,11 @@ theorem isometryDifferencePairNumerics_of_isometryDifferenceImage
   inner_self_of_ne_zero := by
     intro i hi
     exact isometryDifferenceImage_inner_self_of_ne_zero
-      (G := G) (H := H) hrow χ hχ τ h_isom hi
+      (G := G) (H := H) χ hχ τ h_isom hi
   inner_of_ne_zero_of_ne := by
     intro i j hi hj hij
     exact isometryDifferenceImage_inner_of_ne_zero_of_ne
-      (G := G) (H := H) hrow χ hχ τ h_isom hi hj hij
+      (G := G) (H := H) χ hχ τ h_isom hi hj hij
 
 /-- A signed `n`-tuple of irreducible characters of `G`, used as the target
 shape in Peterfalvi's difference-pair lemmas.
@@ -524,46 +517,43 @@ theorem sign_mul_self (data : SignedIrreducibleDifferenceFamily G n) :
 
 theorem classFunction_inner_eq_if
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) (i j : Fin n) :
     ClassFunction.inner (data.classFunction i) (data.classFunction j) =
       if i = j then 1 else 0 := by
   by_cases hij : i = j
   · subst j
     simpa [classFunction, characterTableRowPairing] using
-      CharacterTableRowOrthogonality.diagonal (G := G) hrow (data.mu i)
+      CharacterTableRowOrthogonality.diagonal (G := G) characterTableRowOrthogonality (data.mu i)
   · have hμ : data.mu i ≠ data.mu j := fun h => hij (data.injective h)
     rw [if_neg hij]
     simpa [classFunction, characterTableRowPairing] using
-      CharacterTableRowOrthogonality.offDiagonal (G := G) hrow hμ
+      CharacterTableRowOrthogonality.offDiagonal (G := G) characterTableRowOrthogonality hμ
 
 theorem difference_inner_self_of_ne_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
     {i : Fin n} (hi : i ≠ 0) :
     ClassFunction.inner (data.difference i) (data.difference i) = 2 := by
   rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_sub_right]
-  rw [classFunction_inner_eq_if (G := G) hrow data i i]
-  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
-  rw [classFunction_inner_eq_if (G := G) hrow data 0 i]
-  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  rw [classFunction_inner_eq_if (G := G) data i i]
+  rw [classFunction_inner_eq_if (G := G) data i 0]
+  rw [classFunction_inner_eq_if (G := G) data 0 i]
+  rw [classFunction_inner_eq_if (G := G) data 0 0]
   simp [hi, eq_comm]
   norm_num
 
 theorem difference_inner_of_ne_zero_of_ne
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
     {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
     ClassFunction.inner (data.difference i) (data.difference j) = 1 := by
   rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_sub_right]
-  rw [classFunction_inner_eq_if (G := G) hrow data i j]
-  rw [classFunction_inner_eq_if (G := G) hrow data i 0]
-  rw [classFunction_inner_eq_if (G := G) hrow data 0 j]
-  rw [classFunction_inner_eq_if (G := G) hrow data 0 0]
+  rw [classFunction_inner_eq_if (G := G) data i j]
+  rw [classFunction_inner_eq_if (G := G) data i 0]
+  rw [classFunction_inner_eq_if (G := G) data 0 j]
+  rw [classFunction_inner_eq_if (G := G) data 0 0]
   simp [hi, hj, hij, eq_comm]
 
 theorem signedDifference_inner_signedDifference
@@ -582,27 +572,24 @@ theorem signedDifference_inner_signedDifference
 
 theorem signedDifference_inner_self_of_ne_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
     {i : Fin n} (hi : i ≠ 0) :
     ClassFunction.inner (data.signedDifference i) (data.signedDifference i) = 2 := by
   rw [signedDifference_inner_signedDifference]
-  exact difference_inner_self_of_ne_zero (G := G) hrow data hi
+  exact difference_inner_self_of_ne_zero (G := G) data hi
 
 theorem signedDifference_inner_of_ne_zero_of_ne
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
     {i j : Fin n} (hi : i ≠ 0) (hj : j ≠ 0) (hij : i ≠ j) :
     ClassFunction.inner (data.signedDifference i) (data.signedDifference j) = 1 := by
   rw [signedDifference_inner_signedDifference]
-  exact difference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
+  exact difference_inner_of_ne_zero_of_ne (G := G) data hi hj hij
 
 /-- A signed irreducible-difference family satisfies the same finite numeric
 conditions once the degree-zero condition is supplied separately. -/
 theorem numerics_of_signedDifference_vanishAtOne
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : CharacterTableRowOrthogonality (G := G))
     (data : SignedIrreducibleDifferenceFamily G n) [NeZero n]
     (hvanish : ∀ i, data.signedDifference i (1 : G) = 0) :
     IsometryDifferencePairNumerics
@@ -612,10 +599,10 @@ theorem numerics_of_signedDifference_vanishAtOne
   degree_zero := hvanish
   inner_self_of_ne_zero := by
     intro i hi
-    exact signedDifference_inner_self_of_ne_zero (G := G) hrow data hi
+    exact signedDifference_inner_self_of_ne_zero (G := G) data hi
   inner_of_ne_zero_of_ne := by
     intro i j hi hj hij
-    exact signedDifference_inner_of_ne_zero_of_ne (G := G) hrow data hi hj hij
+    exact signedDifference_inner_of_ne_zero_of_ne (G := G) data hi hj hij
 
 end SignedIrreducibleDifferenceFamily
 
