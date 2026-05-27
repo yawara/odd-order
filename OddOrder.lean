@@ -38,6 +38,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
