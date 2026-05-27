@@ -1109,7 +1109,8 @@ theorem nontrivialActionFixedByClosure_invariant_of_commutative
     ?mem ?one ?mul ?inv hu
   · rintro u ⟨a, ha, hu⟩
     exact Subgroup.subset_closure
-      ⟨a, ha, actionFixedBy_invariant_of_commute (φ := φ) (mul_comm a b) u hu⟩
+      ⟨a, ha, actionFixedBy_invariant_of_commute (φ := φ)
+        (‹IsMulCommutative A›.is_comm.comm a b) u hu⟩
   · simp
   · intro u v _ _ hu hv
     simpa [map_mul] using Subgroup.mul_mem _ hu hv
