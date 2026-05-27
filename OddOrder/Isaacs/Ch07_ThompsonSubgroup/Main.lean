@@ -6944,6 +6944,189 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
     exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hZ_q
   exact hY_le_oPi'.trans hOpi'_q
 
+/-- **§7D Step 1** (Isaacs L3969-3981) — *unique maximal containing a nilpotent
+subgroup divisible by both primes*.
+
+Let `K ≤ H` be nilpotent with both `p` and `q` dividing `|K|`, and suppose
+`M = N_H(K)` is maximal.  Then `M` is the **unique** maximal subgroup of `H`
+containing `K`: any maximal `X ⊇ K` equals `M`.
+
+Proof (downward strong induction on `|H| - |K|`, i.e. `K` maximal among
+counterexamples): write `K = K_p × K_q` (`K_p = O_p(K)` characteristic in `K`).
+`K_p ⊴ M ⇒ M = N_H(K_p)`.  `M ∩ X = N_X(K_p)` is `p`-local in solvable `X`, and
+`K_q ⊴ M ∩ X` is a `p'`-group, so by Thm 4.33 `K_q ⊆ O_q(X) =: L_q`; similarly
+`K_p ⊆ L_p = O_p(X)`.  With `L = L_p L_q ⊇ K` nilpotent and `X = N_H(L)`, if
+`K < L` the IH gives `X` unique maximal `⊇ L`; but `L_q ⊆ C(L_p) ⊆ C(K_p) ⊆ M`
+and `L_p ⊆ M`, so `L ⊆ M`, forcing `M = X`.  If `K = L` then
+`M = N_H(K) = N_H(L) = X`. -/
+theorem step1_unique_maximal_containing_nilpotent
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    {K : Subgroup H} (hK_nilp : Group.IsNilpotent ↥K)
+    (hp_dvd : p ∣ Nat.card ↥K) (hq_dvd : q ∣ Nat.card ↥K)
+    (hM_max : IsCoatom (Subgroup.normalizer (K : Set H) : Subgroup H))
+    {X : Subgroup H} (hX_max : IsCoatom X) (hKX : K ≤ X) :
+    X = (Subgroup.normalizer (K : Set H) : Subgroup H) := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  -- Strong downward induction on `|K|` via the measure `m = |H| - |K|`: the IH
+  -- handles any nilpotent `K'` with `|K'| > |K|` (smaller measure).
+  suffices hmain : ∀ m : ℕ, ∀ K' : Subgroup H, Group.IsNilpotent ↥K' →
+      p ∣ Nat.card ↥K' → q ∣ Nat.card ↥K' →
+      IsCoatom (Subgroup.normalizer (K' : Set H) : Subgroup H) →
+      Nat.card H - Nat.card ↥K' = m →
+      ∀ X' : Subgroup H, IsCoatom X' → K' ≤ X' →
+      X' = (Subgroup.normalizer (K' : Set H) : Subgroup H) by
+    exact hmain _ K hK_nilp hp_dvd hq_dvd hM_max rfl X hX_max hKX
+  intro m
+  induction m using Nat.strong_induction_on with
+  | _ m ih =>
+    intro K hK_nilp hp_dvd hq_dvd hM_max hmeas X hX_max hKX
+    -- Notation.
+    set M : Subgroup H := Subgroup.normalizer (K : Set H) with hM_def
+    -- `K ≤ M` and `M ≠ ⊤`.
+    have hK_le_M : K ≤ M := Subgroup.le_normalizer
+    have hM_ne_top : M ≠ ⊤ := hM_max.1
+    -- `|K| ∣ p^a q^b`.
+    have hK_card_dvd : Nat.card ↥K ∣ p ^ a * q ^ b := by
+      rw [← hH_card]; exact K.card_subgroup_dvd_card
+    -- `K_p = O_p(K).map subtype`, `K_q = O_q(K).map subtype`.
+    set Kp : Subgroup H := (OddOrder.Isaacs.Ch01.opCore p ↥K).map K.subtype with hKp_def
+    set Kq : Subgroup H := (OddOrder.Isaacs.Ch01.opCore q ↥K).map K.subtype with hKq_def
+    -- `O_p(K) ⊔ O_q(K) = ⊤`, hence `Kp ⊔ Kq = K`.
+    have hsup_top : OddOrder.Isaacs.Ch01.opCore p ↥K ⊔ OddOrder.Isaacs.Ch01.opCore q ↥K = ⊤ :=
+      opCore_sup_opCore_eq_top_of_nilpotent_paqb hpq hK_card_dvd
+    have hKp_sup_Kq : Kp ⊔ Kq = K := by
+      rw [hKp_def, hKq_def, ← Subgroup.map_sup, hsup_top, ← MonoidHom.range_eq_map,
+        K.range_subtype]
+    -- `Kp ≤ K`, `Kq ≤ K`.
+    have hKp_le_K : Kp ≤ K := hKp_sup_Kq ▸ le_sup_left
+    have hKq_le_K : Kq ≤ K := hKp_sup_Kq ▸ le_sup_right
+    -- `Kp` is a `p`-group, `Kq` a `q`-group.
+    have hKp_pgroup : IsPGroup p Kp :=
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup p ↥K).map K.subtype
+    have hKq_qgroup : IsPGroup q Kq :=
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup q ↥K).map K.subtype
+    -- `O_p(K) ≠ ⊥` (`p ∣ |K|`, `K` nilpotent ⇒ normal Sylow-p `≤ O_p(K)` nontrivial).
+    have hOpK_ne_bot : OddOrder.Isaacs.Ch01.opCore p ↥K ≠ ⊥ := by
+      obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := ↥K)
+      have hP_ne_bot : (P : Subgroup ↥K) ≠ ⊥ :=
+        OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hp_dvd P
+      haveI : (P : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
+      have hP_le_Op : (P : Subgroup ↥K) ≤ OddOrder.Isaacs.Ch01.opCore p ↥K :=
+        OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore P.isPGroup'
+      intro hbot
+      rw [hbot, le_bot_iff] at hP_le_Op
+      exact hP_ne_bot hP_le_Op
+    have hOqK_ne_bot : OddOrder.Isaacs.Ch01.opCore q ↥K ≠ ⊥ := by
+      obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := ↥K)
+      have hQ_ne_bot : (Q : Subgroup ↥K) ≠ ⊥ :=
+        OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hq_dvd Q
+      haveI : (Q : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent Q
+      have hQ_le_Oq : (Q : Subgroup ↥K) ≤ OddOrder.Isaacs.Ch01.opCore q ↥K :=
+        OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore Q.isPGroup'
+      intro hbot
+      rw [hbot, le_bot_iff] at hQ_le_Oq
+      exact hQ_ne_bot hQ_le_Oq
+    -- `Kp ≠ ⊥`, `Kq ≠ ⊥` (subtype map is injective).
+    have hKp_ne_bot : Kp ≠ ⊥ := by
+      rw [hKp_def]; intro hbot
+      rw [Subgroup.map_eq_bot_iff_of_injective _ K.subtype_injective] at hbot
+      exact hOpK_ne_bot hbot
+    have hKq_ne_bot : Kq ≠ ⊥ := by
+      rw [hKq_def]; intro hbot
+      rw [Subgroup.map_eq_bot_iff_of_injective _ K.subtype_injective] at hbot
+      exact hOqK_ne_bot hbot
+    -- `Kp` characteristic in `↥K`; hence `M = N_H(K) ≤ N_H(Kp)` and `M = N_H(Kp)`.
+    haveI hOpK_char : (OddOrder.Isaacs.Ch01.opCore p ↥K).Characteristic :=
+      OddOrder.Isaacs.Ch01.opCore.characteristic p ↥K
+    have hM_le_NKp : M ≤ (Subgroup.normalizer (Kp : Set H) : Subgroup H) := by
+      rw [hKp_def]
+      exact normalizer_le_normalizer_map_of_characteristic
+    have hKp_le_M : Kp ≤ M := le_trans hKp_le_K hK_le_M
+    have hM_eq_NKp : (Subgroup.normalizer (Kp : Set H) : Subgroup H) = M :=
+      maximal_eq_normalizer_of_M_normalizes hM_max hKp_ne_bot hKp_le_M hM_le_NKp
+    -- Symmetric facts for `Kq`.
+    haveI hOqK_char : (OddOrder.Isaacs.Ch01.opCore q ↥K).Characteristic :=
+      OddOrder.Isaacs.Ch01.opCore.characteristic q ↥K
+    have hM_le_NKq : M ≤ (Subgroup.normalizer (Kq : Set H) : Subgroup H) := by
+      rw [hKq_def]; exact normalizer_le_normalizer_map_of_characteristic
+    have hKq_le_M : Kq ≤ M := le_trans hKq_le_K hK_le_M
+    have hM_eq_NKq : (Subgroup.normalizer (Kq : Set H) : Subgroup H) = M :=
+      maximal_eq_normalizer_of_M_normalizes hM_max hKq_ne_bot hKq_le_M hM_le_NKq
+    -- `Kp, Kq ≤ X`.
+    have hKp_le_X : Kp ≤ X := le_trans hKp_le_K hKX
+    have hKq_le_X : Kq ≤ X := le_trans hKq_le_K hKX
+    -- `X` solvable (proper subgroup of simple `H`).
+    haveI hX_solv : IsSolvable ↥X := hSubgroupsSolvable X hX_max.1
+    have hX_card_dvd : Nat.card ↥X ∣ p ^ a * q ^ b := by
+      rw [← hH_card]; exact X.card_subgroup_dvd_card
+    -- Reusable: lift "`Kr ≤ O_r(X)`-image" via the Thm-4.33 helper inside `↥X`.
+    -- For `Kq`: `Kq` is a `q`-subgroup normalized by `N_X(Kp)` (= the `p`-local).
+    have hLq_extract : Kq ≤ (OddOrder.Isaacs.Ch01.opCore q ↥X).map X.subtype := by
+      -- Work inside `↥X`: `W = Kp.subgroupOf X`, `Y = Kq.subgroupOf X`.
+      set W : Subgroup ↥X := Kp.subgroupOf X with hW_def
+      set Y : Subgroup ↥X := Kq.subgroupOf X with hY_def
+      have hW_ne_bot : W ≠ ⊥ := by
+        rw [hW_def, Ne, Subgroup.subgroupOf_eq_bot]
+        exact fun hd => hKp_ne_bot (le_bot_iff.mp (hd le_rfl hKp_le_X))
+      have hW_p : IsPGroup p W := hKp_pgroup.comap_subtype
+      have hY_q : IsPGroup q Y := hKq_qgroup.comap_subtype
+      -- `Y ≤ N_{↥X}(W)`: `Kq ≤ N_H(Kp) = M` (since `Kq ≤ K ≤ M = N(Kp)`).
+      have hKq_le_NKp : Kq ≤ (Subgroup.normalizer (Kp : Set H) : Subgroup H) := by
+        rw [hM_eq_NKp]; exact hKq_le_M
+      have hY_le : Y ≤ Subgroup.normalizer (W : Set ↥X) := by
+        rw [hW_def, ← Subgroup.subgroupOf_normalizer_eq hKp_le_X]
+        exact Subgroup.subgroupOf_mono X hKq_le_NKp
+      -- `N_{↥X}(W) ≤ N_{↥X}(Y)`: `N_H(Kp) = M ≤ N_H(Kq)`.
+      have hNKp_le_NKq : (Subgroup.normalizer (Kp : Set H) : Subgroup H) ≤
+          (Subgroup.normalizer (Kq : Set H) : Subgroup H) := by
+        rw [hM_eq_NKp, hM_eq_NKq]
+      have hY_norm : Subgroup.normalizer (W : Set ↥X) ≤ Subgroup.normalizer (Y : Set ↥X) := by
+        rw [hW_def, hY_def, ← Subgroup.subgroupOf_normalizer_eq hKp_le_X,
+          ← Subgroup.subgroupOf_normalizer_eq hKq_le_X]
+        exact Subgroup.subgroupOf_mono X hNKp_le_NKq
+      have hY_le_Oq : Y ≤ OddOrder.Isaacs.Ch01.opCore q ↥X :=
+        qSubgroup_le_opCore_of_normal_in_pLocal hpq hX_card_dvd hW_ne_bot hW_p hY_q hY_le hY_norm
+      -- Map back: `Kq = Y.map subtype ≤ (O_q ↥X).map subtype`.
+      have hKq_eq : Kq = Y.map X.subtype := by
+        rw [hY_def, Subgroup.subgroupOf, Subgroup.map_comap_eq, X.range_subtype]
+        exact (inf_eq_right.mpr hKq_le_X).symm
+      rw [hKq_eq]; exact Subgroup.map_mono hY_le_Oq
+    -- Symmetric extraction for `Kp` (roles `p ↔ q` swapped).
+    have hLp_extract : Kp ≤ (OddOrder.Isaacs.Ch01.opCore p ↥X).map X.subtype := by
+      set W : Subgroup ↥X := Kq.subgroupOf X with hW_def
+      set Y : Subgroup ↥X := Kp.subgroupOf X with hY_def
+      have hW_ne_bot : W ≠ ⊥ := by
+        rw [hW_def, Ne, Subgroup.subgroupOf_eq_bot]
+        exact fun hd => hKq_ne_bot (le_bot_iff.mp (hd le_rfl hKq_le_X))
+      have hW_q : IsPGroup q W := hKq_qgroup.comap_subtype
+      have hY_p : IsPGroup p Y := hKp_pgroup.comap_subtype
+      have hKp_le_NKq : Kp ≤ (Subgroup.normalizer (Kq : Set H) : Subgroup H) := by
+        rw [hM_eq_NKq]; exact hKp_le_M
+      have hY_le : Y ≤ Subgroup.normalizer (W : Set ↥X) := by
+        rw [hW_def, ← Subgroup.subgroupOf_normalizer_eq hKq_le_X]
+        exact Subgroup.subgroupOf_mono X hKp_le_NKq
+      have hNKq_le_NKp : (Subgroup.normalizer (Kq : Set H) : Subgroup H) ≤
+          (Subgroup.normalizer (Kp : Set H) : Subgroup H) := by
+        rw [hM_eq_NKp, hM_eq_NKq]
+      have hY_norm : Subgroup.normalizer (W : Set ↥X) ≤ Subgroup.normalizer (Y : Set ↥X) := by
+        rw [hW_def, hY_def, ← Subgroup.subgroupOf_normalizer_eq hKq_le_X,
+          ← Subgroup.subgroupOf_normalizer_eq hKp_le_X]
+        exact Subgroup.subgroupOf_mono X hNKq_le_NKp
+      have hX_card_dvd' : Nat.card ↥X ∣ q ^ b * p ^ a := by rw [mul_comm]; exact hX_card_dvd
+      have hY_le_Op : Y ≤ OddOrder.Isaacs.Ch01.opCore p ↥X :=
+        qSubgroup_le_opCore_of_normal_in_pLocal hpq.symm hX_card_dvd' hW_ne_bot hW_q hY_p hY_le
+          hY_norm
+      have hKp_eq : Kp = Y.map X.subtype := by
+        rw [hY_def, Subgroup.subgroupOf, Subgroup.map_comap_eq, X.range_subtype]
+        exact (inf_eq_right.mpr hKp_le_X).symm
+      rw [hKp_eq]; exact Subgroup.map_mono hY_le_Op
+    sorry
+
 /-! ### §7D Steps 3-9 — per-step axioms + Step 7 theorem + final wiring
 
 The remaining heavier steps (3, 4, 6, 8, 9) are stated as fine-grained local
