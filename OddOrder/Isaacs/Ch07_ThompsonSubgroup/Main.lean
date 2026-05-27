@@ -7454,31 +7454,422 @@ theorem step8_normalJ_and_fullSylow
   · -- (3) `S.map M.subtype` is a full Sylow `p`-subgroup of `H` (Step 8 second half).
     exact step8_sylow_full hpq hH_card hH_nsol hSubgroupsSolvable hM_pType S hJ_normal
 
-/-- **§7D Step 9 axiom** (Isaacs L4065-4093) — *the final contradiction*.
+/-! ### §7D Step 9 — terminal contradiction (Isaacs L4065-4093)
 
-With `|G|_p ≠ |G|_q` (WLOG `|G|_p > |G|_q`), the Sylow intersection counting
-`|G_p|² > |G_p||G_q| = |G| ≥ |ST| = |G_p|²/|S ∩ T|` forces `|S ∩ T| > 1` for all
-`S, T ∈ Syl_p(G)`.  Since `O_p(G) = 1` but `J(P) > 1`, the Thompson subgroups
-`J(S)` are not all equal; choosing `S, T` with `J(S) ≠ J(T)` and `D = S ∩ T`
-maximal gives `D > 1`, `N_G(D) ⊆ M` (a `p`-type maximal by Steps 5, 8), and then
-`J(S) = J(U) ⊴ M`, `J(T) = J(V)` conjugate to `J(U)` in `M`, so
-`J(S) = J(T)` — contradiction.
+Step 9 is now **proven** (no longer an axiom).  We first land six reusable
+helper lemmas, then `step9_core` (the WLOG-`|G|_p > |G|_q` argument), then the
+dispatcher `step9_contradiction` that case-splits on which Sylow is larger. -/
 
-This is the terminal step producing `False` from all the prior structure. -/
-axiom step9_contradiction
+/-- In a group of order `p^a q^b` (`p ≠ q` prime), a Sylow `p`-subgroup has
+order `p^a`. -/
+theorem sylow_p_card_eq_of_paqb
+    {H : Type*} [Group H] [Finite H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (P : Sylow p H) :
+    Nat.card (P : Subgroup H) = p ^ a := by
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  have hp_ne_dvd_q : ¬ p ∣ q := by
+    rw [Nat.prime_dvd_prime_iff_eq hp_prime hq_prime]; exact hpq
+  have hfact_p : (p ^ a * q ^ b).factorization p = a := by
+    rw [Nat.factorization_mul (pow_ne_zero a hp_prime.ne_zero)
+        (pow_ne_zero b hq_prime.ne_zero), Finsupp.add_apply,
+        Nat.factorization_pow_self hp_prime,
+        Nat.factorization_pow, Finsupp.smul_apply,
+        Nat.factorization_eq_zero_of_not_dvd hp_ne_dvd_q, smul_eq_mul, mul_zero, add_zero]
+  rw [P.card_eq_multiplicity, hH_card, hfact_p]
+
+theorem sylow_inter_ne_bot_of_card_sq_gt
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p H) (hcard : Nat.card H < Nat.card (P : Subgroup H) ^ 2)
+    (S T : Sylow p H) :
+    (S : Subgroup H) ⊓ (T : Subgroup H) ≠ ⊥ := by
+  intro hbot
+  have hS_card : Nat.card (S : Subgroup H) = Nat.card (P : Subgroup H) :=
+    Nat.card_congr (Sylow.equiv S P).toEquiv
+  have hT_card : Nat.card (T : Subgroup H) = Nat.card (P : Subgroup H) :=
+    Nat.card_congr (Sylow.equiv T P).toEquiv
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+    (S : Subgroup H) (T : Subgroup H)
+  rw [hbot] at hprod
+  simp only [Subgroup.card_bot, mul_one] at hprod
+  rw [hS_card, hT_card] at hprod
+  have hST_le : Nat.card ((↑(S : Subgroup H) : Set H) * (↑(T : Subgroup H) : Set H))
+      ≤ Nat.card H :=
+    Nat.card_le_card_of_injective (Subtype.val) Subtype.val_injective
+  rw [hprod] at hST_le
+  rw [sq] at hcard
+  omega
+
+/-- §7D Step 9: normalizer-grows. If `D < ↑S` for a finite `p`-group Sylow `S`,
+then `D` is strictly contained in `N_H(D) ⊓ ↑S`. -/
+theorem lt_normalizer_inf_sylow_of_lt
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (S : Sylow p H) {D : Subgroup H} (hD_lt : D < (S : Subgroup H)) :
+    D < Subgroup.normalizer D ⊓ (S : Subgroup H) := by
+  classical
+  haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
+  have hNC : NormalizerCondition ↥(S : Subgroup H) :=
+    normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
+  -- D.subgroupOf S < ⊤.
+  have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
+  have hsub_lt_top : D.subgroupOf (S : Subgroup H) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
+  have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  -- ↑t ∈ N_H(D) ⊓ ↑S, ↑t ∉ D.
+  refine lt_of_le_of_ne (le_inf ?_ hD_le) ?_
+  · -- D ≤ N_H(D).
+    exact Subgroup.le_normalizer
+  · intro heq
+    apply ht_not
+    have : (t : H) ∈ Subgroup.normalizer D ⊓ (S : Subgroup H) := ⟨ht_norm, t.2⟩
+    rw [← heq] at this
+    exact this
+
+theorem exists_thompsonJ_ne
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hH_nsol : ¬ IsSolvable H) :
+    ∃ S T : Sylow p H,
+      Subgroup.thompsonJ (S : Subgroup H) p ≠ Subgroup.thompsonJ (T : Subgroup H) p := by
+  classical
+  by_contra h_all_eq
+  push Not at h_all_eq
+  obtain ⟨hp_dvd, _⟩ :=
+    p_and_q_dvd_card_of_simple_nonsolvable hpq inferInstance hH_nsol (dvd_of_eq hH_card)
+  obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := H)
+  have hP_ne_bot : (P : Subgroup H) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
+  set J₀ : Subgroup H := Subgroup.thompsonJ (P : Subgroup H) p with hJ₀_def
+  have hJ₀_ne_bot : J₀ ≠ ⊥ := Subgroup.thompsonJ_ne_bot P.isPGroup' hP_ne_bot
+  have hJ₀_pgroup : IsPGroup p J₀ :=
+    P.isPGroup'.of_injective (Subgroup.inclusion (Subgroup.thompsonJ_le (P : Subgroup H) p))
+      (Subgroup.inclusion_injective _)
+  -- J₀ normal: conj g maps J₀ to J of the conjugate Sylow = J₀.
+  have hJ₀_normal : J₀.Normal := by
+    apply Subgroup.Normal.of_conjugate_fixed
+    intro g
+    change J₀.map (MulAut.conj g).toMonoidHom = J₀
+    -- J₀.map (conj g) = J((↑P).map (conj g)) = J(↑(g • P)) = J(↑(g•P)) = J₀.
+    have h1 : J₀.map (MulAut.conj g).toMonoidHom
+        = Subgroup.thompsonJ ((P : Subgroup H).map (MulAut.conj g).toMonoidHom) p :=
+      (Subgroup.thompsonJ_map_of_injective (MulAut.conj g).injective (P : Subgroup H) p).symm
+    have h2 : (P : Subgroup H).map (MulAut.conj g).toMonoidHom
+        = ((g • P : Sylow p H) : Subgroup H) :=
+      Sylow.coe_subgroup_smul.symm
+    rw [h1, h2, h_all_eq (g • P) P]
+  have hOp_bot : OddOrder.Isaacs.Ch01.opCore p H = ⊥ :=
+    opCore_eq_bot_of_simple_nonsolvable inferInstance hH_nsol
+  have hJ₀_le_Op : J₀ ≤ OddOrder.Isaacs.Ch01.opCore p H :=
+    OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hJ₀_pgroup
+  rw [hOp_bot, le_bot_iff] at hJ₀_le_Op
+  exact hJ₀_ne_bot hJ₀_le_Op
+
+theorem exists_sylowM_of_full_sylow_le
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime] {M : Subgroup H}
+    (U : Sylow p H) (hUM : (U : Subgroup H) ≤ M) :
+    ∃ UM : Sylow p ↥M, (UM : Subgroup ↥M).map M.subtype = (U : Subgroup H) := by
+  classical
+  have hUsub_p : IsPGroup p ((U : Subgroup H).subgroupOf M) := U.isPGroup'.comap_subtype
+  obtain ⟨UM, hUsub_le⟩ := hUsub_p.exists_le_sylow
+  refine ⟨UM, ?_⟩
+  have hUM_p : IsPGroup p ((UM : Subgroup ↥M).map M.subtype) := UM.isPGroup'.map M.subtype
+  have hmap_eq : ((U : Subgroup H).subgroupOf M).map M.subtype = (U : Subgroup H) := by
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, M.range_subtype]
+    exact inf_eq_right.mpr hUM
+  have hU_le : (U : Subgroup H) ≤ (UM : Subgroup ↥M).map M.subtype := by
+    rw [← hmap_eq]; exact Subgroup.map_mono hUsub_le
+  exact U.is_maximal' hUM_p hU_le
+
+/-- §7D Step 9 bridge: for a `p`-type maximal `M` whose Sylow Thompson subgroups
+are `M`-normal (Step 8), any two full Sylow `p`-subgroups of `H` lying in `M`
+have the same Thompson subgroup. -/
+theorem thompsonJ_eq_of_full_sylow_le_pType
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime] {M : Subgroup H}
+    (hStep8 : ∀ {N : Subgroup H} (_ : IsPType p N) (S : Sylow p ↥N),
+      (Subgroup.thompsonJ (S : Subgroup ↥N) p).Normal)
+    (hM_pType : IsPType p M)
+    (U V : Sylow p H) (hUM : (U : Subgroup H) ≤ M) (hVM : (V : Subgroup H) ≤ M) :
+    Subgroup.thompsonJ (U : Subgroup H) p = Subgroup.thompsonJ (V : Subgroup H) p := by
+  classical
+  obtain ⟨UM, hUM_eq⟩ := exists_sylowM_of_full_sylow_le U hUM
+  obtain ⟨VM, hVM_eq⟩ := exists_sylowM_of_full_sylow_le V hVM
+  -- J(↑U) = (J(↑UM)).map subtype.
+  have hJU : Subgroup.thompsonJ (U : Subgroup H) p
+      = (Subgroup.thompsonJ (UM : Subgroup ↥M) p).map M.subtype := by
+    rw [← hUM_eq, Subgroup.thompsonJ_map_of_injective M.subtype_injective]
+  have hJV : Subgroup.thompsonJ (V : Subgroup H) p
+      = (Subgroup.thompsonJ (VM : Subgroup ↥M) p).map M.subtype := by
+    rw [← hVM_eq, Subgroup.thompsonJ_map_of_injective M.subtype_injective]
+  rw [hJU, hJV]
+  -- Suffices: J(↑UM) = J(↑VM) in ↥M.
+  suffices hJeq : Subgroup.thompsonJ (UM : Subgroup ↥M) p
+      = Subgroup.thompsonJ (VM : Subgroup ↥M) p by rw [hJeq]
+  -- UM, VM are M-conjugate.
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (↥M) UM VM
+  -- J(↑UM) ⊴ M (Step 8).
+  have hJUM_normal : (Subgroup.thompsonJ (UM : Subgroup ↥M) p).Normal := hStep8 hM_pType UM
+  -- J(↑VM) = J(↑(g • UM)) = J((↑UM).map (conj g)) = (J(↑UM)).map (conj g) = J(↑UM).
+  have h1 : Subgroup.thompsonJ (VM : Subgroup ↥M) p
+      = Subgroup.thompsonJ ((UM : Subgroup ↥M).map (MulAut.conj g).toMonoidHom) p := by
+    rw [← hg]; rfl
+  haveI := hJUM_normal
+  rw [h1, Subgroup.thompsonJ_map_of_injective (MulAut.conj g).injective]
+  -- goal: J(↑UM) = (J(↑UM)).map (conj g); use normality (map = smul = self).
+  exact (Subgroup.Normal.conj_smul_eq_self g (Subgroup.thompsonJ (UM : Subgroup ↥M) p)).symm
+
+theorem step9_core
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     (hH_nsol : ¬ IsSolvable H)
     (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
-    (hp2 : p ≠ 2) (hq2 : q ≠ 2)
-    -- Step 8 packaged: every p-type maximal has normal J and full Sylow.
+    (hgt : q ^ b < p ^ a)
     (hStep8 : ∀ {M : Subgroup H} (_ : IsPType p M) (S : Sylow p ↥M),
-      (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal)
-    -- partition: every maximal is p-type or q-type.
-    (hPartition : ∀ {M : Subgroup H}, IsCoatom M → M ≠ ⊥ →
-      IsPType p M ∨ IsQType q M) :
-    False
+      (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
+    False := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  obtain ⟨hp_dvd, hq_dvd⟩ :=
+    p_and_q_dvd_card_of_simple_nonsolvable hpq inferInstance hH_nsol (dvd_of_eq hH_card)
+  -- For P : Sylow p H, |P| = p^a, and |P|² > |H|.
+  obtain ⟨P₀⟩ := Sylow.nonempty (p := p) (G := H)
+  have hP₀_card : Nat.card (P₀ : Subgroup H) = p ^ a := sylow_p_card_eq_of_paqb hpq hH_card P₀
+  have hcard_sq : Nat.card H < Nat.card (P₀ : Subgroup H) ^ 2 := by
+    rw [hP₀_card, hH_card, sq]
+    have hpa_pos : 0 < p ^ a := pow_pos hp_prime.pos a
+    calc p ^ a * q ^ b < p ^ a * p ^ a := by
+          exact (Nat.mul_lt_mul_left hpa_pos).mpr hgt
+      _ = p ^ a * p ^ a := rfl
+  -- (1) all p-Sylow pairs meet nontrivially.
+  have hinter : ∀ S T : Sylow p H, (S : Subgroup H) ⊓ (T : Subgroup H) ≠ ⊥ := fun S T =>
+    sylow_inter_ne_bot_of_card_sq_gt P₀ hcard_sq S T
+  -- (2) ∃ pair with distinct J.
+  obtain ⟨S₀, T₀, hJ_ne⟩ := exists_thompsonJ_ne hpq hH_card hH_nsol
+  -- (3) maximize |↑S ⊓ ↑T| over distinct-J pairs.
+  let distinctJ : Finset (Sylow p H × Sylow p H) :=
+    Finset.univ.filter (fun ST =>
+      Subgroup.thompsonJ (ST.1 : Subgroup H) p ≠ Subgroup.thompsonJ (ST.2 : Subgroup H) p)
+  have hne : distinctJ.Nonempty := ⟨(S₀, T₀), Finset.mem_filter.mpr ⟨Finset.mem_univ _, hJ_ne⟩⟩
+  obtain ⟨STm, hSTm_mem, hSTm_max⟩ :=
+    distinctJ.exists_max_image
+      (fun ST => Nat.card ((ST.1 : Subgroup H) ⊓ (ST.2 : Subgroup H) : Subgroup H)) hne
+  obtain ⟨S, T⟩ := STm
+  have hST_Jne : Subgroup.thompsonJ (S : Subgroup H) p ≠ Subgroup.thompsonJ (T : Subgroup H) p :=
+    (Finset.mem_filter.mp hSTm_mem).2
+  have hmaxJ : ∀ R₁ R₂ : Sylow p H,
+      Subgroup.thompsonJ (R₁ : Subgroup H) p ≠ Subgroup.thompsonJ (R₂ : Subgroup H) p →
+      Nat.card ((R₁ : Subgroup H) ⊓ (R₂ : Subgroup H) : Subgroup H) ≤
+      Nat.card ((S : Subgroup H) ⊓ (T : Subgroup H) : Subgroup H) := by
+    intro R₁ R₂ hR
+    exact hSTm_max (R₁, R₂) (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hR⟩)
+  set D : Subgroup H := (S : Subgroup H) ⊓ (T : Subgroup H) with hD_def
+  have hD_ne_bot : D ≠ ⊥ := hinter S T
+  -- S ≠ T, ↑S ≠ ↑T.
+  have hST_ne : S ≠ T := by intro h; exact hST_Jne (by rw [h])
+  have hcoeST_ne : (S : Subgroup H) ≠ (T : Subgroup H) := by
+    intro h; exact hST_ne (Sylow.ext h)
+  -- D < ↑S (else ↑S ≤ ↑T, equal card ⇒ equal, contra).
+  have hD_lt_S : D < (S : Subgroup H) := by
+    refine lt_of_le_of_ne inf_le_left ?_
+    intro hDS
+    -- D = ↑S ⇒ ↑S ≤ ↑T ⇒ (equal card) ↑S = ↑T.
+    have hS_le_T : (S : Subgroup H) ≤ (T : Subgroup H) := by
+      rw [hD_def] at hDS; rw [← hDS]; exact inf_le_right
+    have hcard_eq : Nat.card (S : Subgroup H) = Nat.card (T : Subgroup H) :=
+      Nat.card_congr (Sylow.equiv S T).toEquiv
+    exact hcoeST_ne (Subgroup.eq_of_le_of_card_ge hS_le_T (le_of_eq hcard_eq.symm))
+  -- (5) N_H(D) < ⊤, maximal M ⊇ N_H(D).
+  have hD_ne_top : D ≠ ⊤ := by
+    intro h
+    rw [h] at hD_lt_S
+    exact (lt_irrefl _ (lt_of_lt_of_le hD_lt_S le_top))
+  have hND_ne_top : Subgroup.normalizer (D : Set H) ≠ ⊤ := by
+    intro hNtop
+    have hD_normal : D.Normal := by rw [← Subgroup.normalizer_eq_top_iff]; exact hNtop
+    rcases hD_normal.eq_bot_or_eq_top with hb | ht
+    · exact hD_ne_bot hb
+    · exact hD_ne_top ht
+  obtain ⟨M, hM_max, hND_le⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom
+      (Subgroup.normalizer (D : Set H))).resolve_left hND_ne_top
+  -- D is a p-subgroup.
+  have hD_pgroup : IsPGroup p D :=
+    S.isPGroup'.of_injective (Subgroup.inclusion (le_of_lt hD_lt_S))
+      (Subgroup.inclusion_injective _)
+  -- (6) D < N_H(D) ⊓ ↑S.
+  have hD_lt_NS : D < Subgroup.normalizer (D : Set H) ⊓ (S : Subgroup H) := by
+    have := lt_normalizer_inf_sylow_of_lt S hD_lt_S
+    -- normalizer of D (as subgroup) coerces to normalizer (D : Set H)
+    exact this
+  -- (7) M is p-type.
+  -- M ≠ ⊥.
+  have hD_le_M : D ≤ M := le_trans Subgroup.le_normalizer hND_le
+  have hM_ne_bot : M ≠ ⊥ := by
+    intro hbot; rw [hbot, le_bot_iff] at hD_le_M; exact hD_ne_bot hD_le_M
+  -- p-central x centralizing D ⇒ x ∈ M.
+  obtain ⟨x, hx_pcentral, hx_comm⟩ := exists_isPCentral_centralizing hp_dvd D hD_pgroup
+  have hx_in_CD : x ∈ Subgroup.centralizer (D : Set H) := by
+    rw [Subgroup.mem_centralizer_iff]; intro v hv; exact (hx_comm v hv).symm
+  have hx_in_ND : x ∈ Subgroup.normalizer (D : Set H) := centralizer_le_normalizer D hx_in_CD
+  have hx_in_M : x ∈ M := hND_le hx_in_ND
+  have hM_pType : IsPType p M := by
+    rcases maximal_isPType_xor_isQType hpq hH_card hSubgroupsSolvable hM_max hM_ne_bot with h | h
+    · exact h.1
+    · exfalso
+      exact step5b_pType_no_qCentral (Ne.symm hpq) (a := b) (b := a)
+        (by rw [hH_card]; ring) hH_nsol hSubgroupsSolvable h.1 hx_pcentral hx_in_M
+  -- (8) Full Sylows U ⊇ M ⊓ ↑S and V ⊇ M ⊓ ↑T of H, contained in M.
+  -- Generic: from a p-subgroup K ≤ M, get full Sylow W of H with ↑W ≤ M, K ≤ ↑W.
+  have hfull : ∀ K : Subgroup H, K ≤ M → IsPGroup p K →
+      ∃ W : Sylow p H, (W : Subgroup H) ≤ M ∧ K ≤ (W : Subgroup H) := by
+    intro K hKM hK_p
+    -- K.subgroupOf M is a p-group of ↥M; extend to Sylow W_M.
+    have hKsub_p : IsPGroup p (K.subgroupOf M) := hK_p.comap_subtype
+    obtain ⟨WM, hKsub_le⟩ := hKsub_p.exists_le_sylow
+    -- (↑WM).map subtype is a full Sylow of H.
+    obtain ⟨_, _, hWM_range⟩ :=
+      step8_normalJ_and_fullSylow hpq hH_card hH_nsol hSubgroupsSolvable hM_pType WM
+    obtain ⟨W, hW_eq⟩ := hWM_range
+    simp only at hW_eq
+    -- hW_eq : ↑W = (↑WM).map subtype
+    refine ⟨W, ?_, ?_⟩
+    · -- ↑W = (↑WM).map subtype ≤ M.
+      rw [hW_eq]; exact Subgroup.map_subtype_le _
+    · -- K ≤ ↑W: K = (K.subgroupOf M).map subtype ≤ (↑WM).map subtype = ↑W.
+      rw [hW_eq]
+      have hKmap : (K.subgroupOf M).map M.subtype = K := by
+        rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, M.range_subtype]
+        exact inf_eq_right.mpr hKM
+      rw [← hKmap]; exact Subgroup.map_mono hKsub_le
+  -- M ⊓ ↑S and M ⊓ ↑T are p-subgroups ≤ M.
+  have hMS_p : IsPGroup p (M ⊓ (S : Subgroup H) : Subgroup H) :=
+    S.isPGroup'.of_injective (Subgroup.inclusion (inf_le_right))
+      (Subgroup.inclusion_injective _)
+  have hMT_p : IsPGroup p (M ⊓ (T : Subgroup H) : Subgroup H) :=
+    T.isPGroup'.of_injective (Subgroup.inclusion (inf_le_right))
+      (Subgroup.inclusion_injective _)
+  obtain ⟨U, hU_le_M, hMS_le_U⟩ := hfull (M ⊓ (S : Subgroup H)) inf_le_left hMS_p
+  obtain ⟨V, hV_le_M, hMT_le_V⟩ := hfull (M ⊓ (T : Subgroup H)) inf_le_left hMT_p
+  -- (9) ↑U ⊓ ↑S ⊇ N_H(D) ⊓ ↑S ⊋ D, similarly ↑V ⊓ ↑T ⊋ D.
+  -- D < N_H(D) ⊓ ↑S ≤ M ⊓ ↑S ≤ ↑U; and N_H(D) ⊓ ↑S ≤ ↑U ⊓ ↑S, so D < ↑U ⊓ ↑S.
+  have hNS_le_MS : Subgroup.normalizer (D : Set H) ⊓ (S : Subgroup H) ≤ M ⊓ (S : Subgroup H) :=
+    inf_le_inf_right _ hND_le
+  have hD_lt_US : D < (U : Subgroup H) ⊓ (S : Subgroup H) := by
+    refine lt_of_lt_of_le hD_lt_NS ?_
+    -- N_H(D) ⊓ ↑S ≤ ↑U ⊓ ↑S : left ≤ M⊓↑S ≤ ↑U; right ≤ ↑S.
+    exact le_inf (le_trans hNS_le_MS hMS_le_U) inf_le_right
+  have hD_lt_VT : D < (V : Subgroup H) ⊓ (T : Subgroup H) := by
+    -- By symmetry: D = ↑S ⊓ ↑T = ↑T ⊓ ↑S; N_H(D) ⊓ ↑T ⊋ D.
+    have hD_lt_T : D < (T : Subgroup H) := by
+      refine lt_of_le_of_ne inf_le_right ?_
+      intro hDT
+      have hT_le_S : (T : Subgroup H) ≤ (S : Subgroup H) := by
+        rw [hD_def] at hDT; rw [← hDT]; exact inf_le_left
+      have hcard_eq : Nat.card (T : Subgroup H) = Nat.card (S : Subgroup H) :=
+        Nat.card_congr (Sylow.equiv T S).toEquiv
+      exact hcoeST_ne (Subgroup.eq_of_le_of_card_ge hT_le_S (le_of_eq hcard_eq.symm)).symm
+    have hD_lt_NT : D < Subgroup.normalizer (D : Set H) ⊓ (T : Subgroup H) :=
+      lt_normalizer_inf_sylow_of_lt T hD_lt_T
+    have hNT_le_MT : Subgroup.normalizer (D : Set H) ⊓ (T : Subgroup H) ≤ M ⊓ (T : Subgroup H) :=
+      inf_le_inf_right _ hND_le
+    refine lt_of_lt_of_le hD_lt_NT ?_
+    exact le_inf (le_trans hNT_le_MT hMT_le_V) inf_le_right
+  -- (10) J(↑S) = J(↑U) and J(↑T) = J(↑V) by maximality of |D|.
+  have hJS_eq_JU :
+      Subgroup.thompsonJ (S : Subgroup H) p = Subgroup.thompsonJ (U : Subgroup H) p := by
+    by_contra hne
+    -- (S, U) distinct-J pair with |↑S ⊓ ↑U| > |D|, contradicting hmaxJ.
+    have hle := hmaxJ S U hne
+    have hcard_gt : Nat.card (D : Subgroup H)
+        < Nat.card ((S : Subgroup H) ⊓ (U : Subgroup H) : Subgroup H) := by
+      have : ((U : Subgroup H) ⊓ (S : Subgroup H))
+          = ((S : Subgroup H) ⊓ (U : Subgroup H)) := inf_comm _ _
+      rw [← this]
+      exact Set.Finite.card_lt_card (Set.toFinite _) (hD_lt_US : (D : Set H) ⊂ _)
+    omega
+  have hJT_eq_JV :
+      Subgroup.thompsonJ (T : Subgroup H) p = Subgroup.thompsonJ (V : Subgroup H) p := by
+    by_contra hne
+    have hle := hmaxJ T V hne
+    have hcard_gt : Nat.card (D : Subgroup H)
+        < Nat.card ((T : Subgroup H) ⊓ (V : Subgroup H) : Subgroup H) := by
+      have : ((V : Subgroup H) ⊓ (T : Subgroup H))
+          = ((T : Subgroup H) ⊓ (V : Subgroup H)) := inf_comm _ _
+      rw [← this]
+      exact Set.Finite.card_lt_card (Set.toFinite _) (hD_lt_VT : (D : Set H) ⊂ _)
+    omega
+  -- (11) J(↑U) = J(↑V) (both full Sylows ≤ M, M p-type).
+  have hJU_eq_JV : Subgroup.thompsonJ (U : Subgroup H) p = Subgroup.thompsonJ (V : Subgroup H) p :=
+    thompsonJ_eq_of_full_sylow_le_pType hStep8 hM_pType U V hU_le_M hV_le_M
+  -- (12) J(↑S) = J(↑U) = J(↑V) = J(↑T), contradiction.
+  exact hST_Jne (hJS_eq_JU.trans (hJU_eq_JV.trans hJT_eq_JV.symm))
+
+/-- **§7D Step 9** (Isaacs L4065-4093) — *the terminal contradiction*.
+
+Now a **theorem** (was an axiom).  Dispatches on whether `|G|_p > |G|_q` or
+`|G|_q > |G|_p` (the two are unequal since `p^a = q^b` is impossible for distinct
+primes with `a, b ≥ 1`), running `step9_core` with the prime whose Sylow is
+larger.  Step 8 (`step8_normalJ_and_fullSylow`) and the partition
+(`maximal_isPType_or_isQType`) are derived internally for that prime. -/
+theorem step9_contradiction
+    {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
+    (hH_nsol : ¬ IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (_hp2 : p ≠ 2) (_hq2 : q ≠ 2) :
+    False := by
+  classical
+  have hp_prime : p.Prime := Fact.out
+  have hq_prime : q.Prime := Fact.out
+  obtain ⟨hp_dvd, hq_dvd⟩ :=
+    p_and_q_dvd_card_of_simple_nonsolvable hpq inferInstance hH_nsol (dvd_of_eq hH_card)
+  -- a, b ≥ 1.
+  have ha_pos : 0 < a := by
+    by_contra h; push Not at h
+    interval_cases a
+    rw [pow_zero, one_mul] at hH_card
+    -- p ∣ |H| = q^b ⇒ p = q.
+    rw [hH_card] at hp_dvd
+    exact hpq ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp (hp_prime.dvd_of_dvd_pow hp_dvd))
+  have hb_pos : 0 < b := by
+    by_contra h; push Not at h
+    interval_cases b
+    rw [pow_zero, mul_one] at hH_card
+    rw [hH_card] at hq_dvd
+    exact hpq ((Nat.prime_dvd_prime_iff_eq hq_prime hp_prime).mp
+      (hq_prime.dvd_of_dvd_pow hq_dvd)).symm
+  -- p^a ≠ q^b.
+  have hpa_ne_qb : p ^ a ≠ q ^ b := by
+    intro heq
+    -- p ∣ p^a = q^b ⇒ p = q.
+    have : p ∣ q ^ b := heq ▸ dvd_pow_self p ha_pos.ne'
+    exact hpq ((Nat.prime_dvd_prime_iff_eq hp_prime hq_prime).mp (hp_prime.dvd_of_dvd_pow this))
+  have hH_card_swap : Nat.card H = q ^ b * p ^ a := by rw [hH_card]; ring
+  rcases lt_or_gt_of_ne hpa_ne_qb with hlt | hgt
+  · -- p^a < q^b: run core with (q, p) swapped.
+    -- need hStep8 for q-type and partition for q.
+    have hStep8' : ∀ {M : Subgroup H} (_ : IsPType q M) (S : Sylow q ↥M),
+        (Subgroup.thompsonJ (S : Subgroup ↥M) q).Normal := by
+      intro M hM S
+      exact (step8_normalJ_and_fullSylow (Ne.symm hpq) hH_card_swap hH_nsol
+        hSubgroupsSolvable hM S).1
+    exact step9_core (Ne.symm hpq) hH_card_swap hH_nsol hSubgroupsSolvable hlt hStep8'
+  · -- p^a > q^b: run core directly.
+    have hStep8' : ∀ {M : Subgroup H} (_ : IsPType p M) (S : Sylow p ↥M),
+        (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal := by
+      intro M hM S
+      exact (step8_normalJ_and_fullSylow hpq hH_card hH_nsol hSubgroupsSolvable hM S).1
+    exact step9_core hpq hH_card hH_nsol hSubgroupsSolvable hgt hStep8'
 
 /-- **§7D — no finite simple non-solvable group of order `p^a q^b`** (Isaacs
 §7D, Thm 7.8 contradiction).
@@ -7522,7 +7913,6 @@ theorem noNonsolvableSimplePaQb.{u}
     exact (step8_normalJ_and_fullSylow hpq hH_card hH_nsol hSubgroupsSolvable hM_pType S).1
   -- Step 9: terminal contradiction.
   exact step9_contradiction hpq hH_card hH_nsol hSubgroupsSolvable hp2 hq2
-    hStep8 hPartition
 
 /-- **Isaacs Thm 7.8** (Burnside `p^a q^b` solvability).
 
