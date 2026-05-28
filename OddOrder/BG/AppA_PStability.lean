@@ -683,24 +683,22 @@ mmd L2288): `p` odd, `G` に非自明な正規 `p`-部分群が無く (= `O_p(G)
 
 詳細・着手順は issue [#0043](../../issues/0043-bg-appa-a3-pstability.md). -/
 theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
-    (_h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
+    (h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
     (h_not_pstable : ¬ IsPStable p G) :
     ¬ Odd (Nat.card G) := by
-  intro _hodd
-  -- Step 1: ¬ IsPStable を unfold + push Not で証人を取り出す
+  intro hodd
+  -- ## Step 1: ¬ IsPStable を unfold + push Not で証人を取り出す
   unfold IsPStable at h_not_pstable
   push Not at h_not_pstable
-  obtain ⟨F, _, _, _, V, _, _, _, _, ρ, hfaithful, x, _hxp, _hxsq, hxne⟩ :=
+  obtain ⟨F, _, _, _, V, _, _, _, _, ρ, hfaithful, x, hxp, hxsq, hxne⟩ :=
     h_not_pstable
-  -- Step 2: Baer-Suzuki で ⟨x, gxg⁻¹⟩ が非 p-群となる g を取得
+  -- ## Step 2: Baer-Suzuki で ⟨x, gxg⁻¹⟩ が非 p-群となる g を取得
   -- x ≠ 1 (ρ x ≠ 1 + faithful)
   have hx_ne_one : x ≠ 1 := by
-    intro h
-    apply hxne
-    rw [h, map_one]
+    intro h; apply hxne; rw [h, map_one]
   -- x ∉ O_p(G) (= ⊥ なので x ≠ 1 から)
   have hx_not_in_Op : x ∉ OddOrder.Isaacs.Ch01.opCore p G := by
-    rw [_h_Op_trivial]
+    rw [h_Op_trivial]
     intro h
     exact hx_ne_one (Subgroup.mem_bot.mp h)
   -- baerSuzuki_pCore.mpr の対偶で ∃ g, ⟨x, gxg⁻¹⟩ 非 p-群
@@ -711,9 +709,54 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
     exact hx_not_in_Op
       ((OddOrder.Isaacs.Ch02.baerSuzuki_pCore x).mpr h_all)
   obtain ⟨g, h_pair_not_pgroup⟩ := h_exists_g
-  -- TODO: ここから (3) H = ⟨x, gxg⁻¹⟩ の H-invariant 合成列 →
-  -- (4) coprime action → (5) ∃ N_i ⊊ H → (6) A.2 適用 で False を出す.
-  sorry
+  -- ## Step 3: `y := g x g⁻¹` ∈ K (= conjugacy class of x) も同じ性質を持つ
+  set y : G := g * x * g⁻¹ with hy_def
+  -- y は p-element, ρ y は quadratic で ≠ 1
+  have hysq : ((ρ y : Module.End F V) - 1) ^ 2 = 0 :=
+    representation_conj_quadratic ρ x g hxsq
+  have hyne : ρ y ≠ 1 := representation_conj_ne_one ρ x g hxne
+  have hyp : IsPGroup p (Subgroup.zpowers y) := isPGroup_zpowers_conj x g hxp
+  -- H := ⟨x, y⟩ ≤ G は非 p-群
+  set H : Subgroup G := Subgroup.closure ({x, y} : Set G) with hH_def
+  have hH_not_pgroup : ¬ IsPGroup p H := h_pair_not_pgroup
+  -- x ∈ H, y ∈ H
+  have hxH : x ∈ H := Subgroup.subset_closure (by simp)
+  have hyH : y ∈ H := Subgroup.subset_closure (by simp)
+  -- ## Steps 4-8 (Gorenstein 8.3 mmd L2293-L2298): 合成列 + coprime action + A.2
+  -- 残りの目標 = `2 ∣ |G|`. これを出せば `hodd : Odd |G|` と矛盾.
+  --
+  -- 4. H-invariant 合成列 `V = V_1 ⊋ V_2 ⊋ ... ⊋ V_{m+1} = 0` を構成
+  --    (V finite-dim + 再帰的に H-irreducible quotient を取得).
+  --    mathlib: `RingTheory.SimpleModule` / `Order.JordanHolder.CompositionSeries`.
+  --
+  -- 5. N_i := ker(H → End_F (V_i/V_{i+1})). 全 i で N_i = H と仮定すると
+  --    H に nontrivial p'-subgroup Q が存在 (H not p-group, Cauchy + IsPGroup
+  --    否定). Q は全 V_i/V_{i+1} 上自明 ⇒ **coprime action (Gorenstein Thm 3.4
+  --    翻訳)** で Q は V 上自明 ⇒ ρ|_Q = 1
+  --    ⇒ ρ faithful + Q ≠ 1 と矛盾. ∴ ∃ i, N_i ⊊ H.
+  --
+  -- 6. その i で H̄ := H/N_i, ρ̄ : H̄ → End_F (V_i/V_{i+1}) faithful + irreducible.
+  --    H̄ = ⟨x̄, ȳ⟩ (closure 商).
+  --
+  -- 7. x̄, ȳ ≠ 1: もし x̄ = 1 なら H̄ = ⟨ȳ⟩ は p-group (ȳ p-element, `hyp` 使用).
+  --    H̄ p-group + alg-closed char p faithful irreducible は不可能
+  --    (= Gorenstein Thm 1.2 = repo `PGroupFixedVector.invariants_ne_bot` 系)
+  --    ⇒ H̄ = 1 ⇒ N_i = H, 矛盾. 同様に ȳ ≠ 1.
+  --
+  -- 8. A.2 (`thmA2`) を H̄ ↷ V_i/V_{i+1} に適用 (closure_eq via x̄, ȳ 生成元)
+  --    ⇒ ¬ Odd |H̄| ⇒ 2 ∣ |H̄|. 2 ∣ |H̄| ∣ |H| ∣ |G| (Lagrange) で 2 ∣ |G|. ∎
+  --
+  -- TODO 主要新規補題 (issue #0043 + notes/bg/appA_pstability.md):
+  --   * H-invariant `CompositionSeries` of `V` as `F[H]`-module
+  --   * `coprime_action_trivial_of_trivial_on_quotients` (= Gorenstein Thm 3.4)
+  --   * `IsPGroup.faithful_irreducible_in_charP_trivial` (= Gorenstein Thm 1.2)
+  --   * Quotient representation `H → H/N_i → End_F (V_i/V_{i+1})`
+  have h_two_dvd : 2 ∣ Nat.card G := by
+    -- Step 4-8 でここを埋める. 使う hypothesis:
+    --   ρ, hfaithful, x, hxp, hxsq, hxne, hyp, hysq, hyne, hH_not_pgroup,
+    --   hxH, hyH, h_Op_trivial, _hp_odd
+    sorry
+  exact hodd.not_two_dvd_nat h_two_dvd
 
 end PStability
 
