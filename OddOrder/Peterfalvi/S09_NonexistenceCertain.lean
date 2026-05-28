@@ -234,16 +234,145 @@ noncomputable def chiRhoSupp (H71 : Hypothesis71 G A L) (χ : ClassFunction G �
     ((H71.chiRhoSupp χ : OddOrder.Peterfalvi.S04.SupportedClassFunctions
         (G := G) ℂ A L) : ClassFunction L ℂ) = H71.chiRhoCF χ := rfl
 
-/-- **Peterfalvi (7.2.b)** (stated; proof deferred).  `‖χ^ρ‖² ≤ ‖χ‖²` for any
-`χ ∈ CF(G)`, with equality iff `χ ∈ im τ`.  Proof requires Peterfalvi (2.6)/(2.7)
-(orthogonal projection onto `im τ`); see `issues/0042-*` follow-on. -/
-theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
-    [Fintype L]
+/-- **Class-function form of (7.2.a).**  `chiRhoCF (τ α) = α` as class functions on `L`.
+The pointwise (7.2.a) gives the equality on `A`; off `A`, both sides vanish since `α`
+is supported on `A` and `chiRho` is supported on `A` by definition. -/
+theorem chiRhoCF_dadeImage_eq {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G}
+    (H71 : Hypothesis71 G A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L) :
+    H71.chiRhoCF (H71.τ α) = (α : ClassFunction L ℂ) := by
+  ext a
+  by_cases ha : (a : G) ∈ A
+  · simp only [chiRhoCF_apply]
+    exact H71.chiRho_dadeImage_eq α ha
+  · simp only [chiRhoCF_apply]
+    rw [H71.chiRho_of_not_mem _ ha]
+    -- (α : CF L) vanishes outside A
+    have hsupp_subset :
+        (α : ClassFunction L ℂ).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup A L := α.property
+    by_contra hne
+    exact ha (hsupp_subset (Ne.symm hne))
+
+/-- Helper: the normalized class-function inner product `⟨φ, φ⟩` is the cast of a real
+number (sum of `Complex.normSq` over `G`, divided by `|G|`). -/
+theorem ClassFunction.inner_self_eq_ofReal {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ =
+      (((Nat.card G : ℝ)⁻¹ * ∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]
+  have hsum : (∑ g : G, φ g * star (φ g)) =
+      ((∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+    push_cast
+    refine Finset.sum_congr rfl (fun g _ => ?_)
+    exact Complex.mul_conj (φ g)
+  rw [hsum, invOf_eq_inv]
+  push_cast
+  ring
+
+/-- Helper: `(⟨φ, φ⟩).re ≥ 0`. -/
+theorem ClassFunction.inner_self_re_nonneg {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    0 ≤ (ClassFunction.inner φ φ).re := by
+  rw [ClassFunction.inner_self_eq_ofReal, Complex.ofReal_re]
+  have hG_pos : 0 < (Nat.card G : ℝ) := by exact_mod_cast Nat.card_pos
+  have hsum_nonneg : 0 ≤ (∑ g : G, Complex.normSq (φ g) : ℝ) :=
+    Finset.sum_nonneg (fun g _ => Complex.normSq_nonneg _)
+  exact mul_nonneg (inv_nonneg.mpr hG_pos.le) hsum_nonneg
+
+/-- Helper: `⟨φ, φ⟩` is fixed by `star` (since it is the cast of a real number). -/
+theorem ClassFunction.star_inner_self {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (φ : ClassFunction G ℂ) :
+    star (ClassFunction.inner φ φ) = ClassFunction.inner φ φ := by
+  rw [ClassFunction.inner_self_eq_ofReal, Complex.star_def, Complex.conj_ofReal]
+
+/-- Hermitian symmetry of `ClassFunction.inner`: `⟨ψ, φ⟩ = star ⟨φ, ψ⟩`. -/
+theorem ClassFunction.inner_symm {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner ψ φ = star (ClassFunction.inner φ ψ) := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+      ClassFunction.inner_eq_inv_card_mul_innerSum]
+  rw [star_mul']
+  have h_card_real : star (⅟(Nat.card G : ℂ) : ℂ) = ⅟(Nat.card G : ℂ) := by
+    rw [invOf_eq_inv, star_inv₀, Complex.star_def, Complex.conj_natCast]
+  rw [h_card_real]
+  congr 1
+  rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
+  refine Finset.sum_congr rfl (fun g _ => ?_)
+  rw [star_mul', star_star, mul_comm]
+
+/-- Helper: `chiRho` matches the (2.7) `adjointAverageFun` on points of `L`. -/
+theorem chiRhoCF_eq_adjointAverageFun {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
+    (a : {a : G // a ∈ A}) :
+    (H71.chiRhoCF χ) ⟨a.1, H71.hyp.subset_L a.2⟩ =
+      OddOrder.Peterfalvi.S04.adjointAverageFun H71.hyp χ
+        ⟨a.1, H71.hyp.subset_L a.2⟩ := by
+  simp only [chiRhoCF_apply, OddOrder.Peterfalvi.S04.adjointAverageFun]
+  rw [H71.chiRho_of_mem _ a.2, dif_pos a.2]
+
+/-- **Adjoint formula for `chiRho`** (Peterfalvi (2.7) packaged for `chiRhoCF`).
+For `α ∈ CF(L, A)` and `χ ∈ CF(G)`, `⟨τ α, χ⟩_G = ⟨α, χ^ρ⟩_L`. -/
+theorem chiRho_adjoint {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    (H71 : Hypothesis71 G A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    (χ : ClassFunction G ℂ) :
+    ClassFunction.inner (H71.τ α) χ =
+      ClassFunction.inner (α : ClassFunction L ℂ) (H71.chiRhoCF χ) :=
+  OddOrder.Peterfalvi.S04.adjoint_formula H71.hyp H71.τ H71.isDadeMap
+    H71.hConjInvariant α χ (H71.chiRhoCF χ) (H71.chiRhoCF_eq_adjointAverageFun χ)
+
+/-- **Peterfalvi (7.2.b).** `‖χ^ρ‖² ≤ ‖χ‖²` for any `χ ∈ CF(G)`.
+
+Proof outline (Peterfalvi p.39): let `φ := τ (χ^ρ)` (the projection of `χ` onto `im τ`).
+By the adjoint formula (`chiRho_adjoint`) and isometry (`hiso`), `⟨φ, χ⟩_G = ⟨φ, φ⟩_G`,
+and by Hermitian symmetry `⟨χ, φ⟩_G = ⟨φ, φ⟩_G` as well.  Hence `χ - φ` is orthogonal
+to `φ`, giving `⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ - φ, χ - φ⟩ ≥ ⟨φ, φ⟩`.  The conclusion follows
+from `⟨φ, φ⟩ = ⟨χ^ρ, χ^ρ⟩_L` (isometry). -/
+theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (χ : ClassFunction G ℂ) :
     (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re ≤
       (ClassFunction.inner χ χ).re := by
-  sorry
+  set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+    H71.chiRhoSupp χ with hα_def
+  set φ : ClassFunction G ℂ := H71.τ α with hφ_def
+  -- `(α : CF L) = chiRhoCF χ` is `rfl`.
+  have hα_coe : (α : ClassFunction L ℂ) = H71.chiRhoCF χ := rfl
+  -- Step 1: `⟨φ, χ⟩ = ⟨φ, φ⟩` via adjoint + isometry.
+  have h_phi_chi : ClassFunction.inner φ χ = ClassFunction.inner φ φ := by
+    have h_adj : ClassFunction.inner φ χ =
+        ClassFunction.inner (α : ClassFunction L ℂ) (H71.chiRhoCF χ) :=
+      H71.chiRho_adjoint α χ
+    have h_isom : ClassFunction.inner φ φ =
+        ClassFunction.inner (α : ClassFunction L ℂ) (α : ClassFunction L ℂ) :=
+      hiso.inner_eq α α
+    rw [h_adj, h_isom, hα_coe]
+  -- Step 2: `⟨χ, φ⟩ = ⟨φ, φ⟩` via Hermitian symmetry + inner_self real.
+  have h_chi_phi : ClassFunction.inner χ φ = ClassFunction.inner φ φ := by
+    rw [ClassFunction.inner_symm, h_phi_chi, ClassFunction.star_inner_self]
+  -- Step 3: Orthogonal decomposition `⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ - φ, χ - φ⟩`.
+  have h_decomp : ClassFunction.inner χ χ =
+      ClassFunction.inner φ φ + ClassFunction.inner (χ - φ) (χ - φ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, h_chi_phi, h_phi_chi]
+    ring
+  -- Step 4: Real-part inequality.
+  have h_tail_nonneg : 0 ≤ (ClassFunction.inner (χ - φ) (χ - φ)).re :=
+    ClassFunction.inner_self_re_nonneg _
+  -- Step 5: `⟨φ, φ⟩ = ⟨χ^ρ, χ^ρ⟩_L`.
+  have h_phi_eq : ClassFunction.inner φ φ =
+      ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ) := by
+    rw [hφ_def]
+    exact (hiso.inner_eq α α).trans (by rw [hα_coe])
+  rw [h_decomp, Complex.add_re, h_phi_eq]
+  linarith
 
 open scoped Classical in
 /-- **Peterfalvi (7.3)** (stated; proof deferred).  The integral inequality:

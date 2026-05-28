@@ -37,10 +37,19 @@ created: 2026-05-28
   - `chiRhoCF : ClassFunction L ℂ` を上記不変性で定義。
   - `chiRhoCF_support_subset` で `chiRho` の supports が `A` に入ることを確認。
   - `chiRhoSupp : SupportedClassFunctions ℂ A L` を最終 promote。
-- [x] (follow-on) (7.2.b), (7.3) の **statement** 化 (proof は sorry, 別 issue で)。
+- [x] (follow-on) (7.2.b), (7.3) の **statement** 化。
   - `chiRho_norm_sq_le`: `(⟨χ^ρ, χ^ρ⟩).re ≤ (⟨χ, χ⟩).re`. 要 (2.6)/(2.7).
   - `chiRho_integral_inequality`: `(⟨χ^ρ, χ^ρ⟩).re ≤ Re(|G|⁻¹ Σ_{A^τ} |χ|²)`. (7.2.b) の系。
-- 残り (follow-on, 別 issue): (7.2.b), (7.3) の proof。
+- [x] **(7.2.b) `chiRho_norm_sq_le` proof** (2026-05-28, sorry-free)。helper として
+  `ClassFunction.inner_self_eq_ofReal`, `ClassFunction.inner_self_re_nonneg`,
+  `ClassFunction.star_inner_self`, `ClassFunction.inner_symm` (Hermitian) を S09 内に追加。
+  - `chiRhoCF_dadeImage_eq` (class function 版 (7.2.a)) を導入。
+  - `chiRho_adjoint` で (2.7) `adjoint_formula` を chiRhoCF に packaging。
+  - 主証明: `φ := τ (chiRhoSupp χ)` で `⟨φ, χ⟩ = ⟨φ, φ⟩` (adjoint + isometry),
+    `⟨χ, φ⟩ = ⟨φ, φ⟩` (Hermitian + inner_self real), orthogonal decomposition
+    `⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ-φ, χ-φ⟩`, tail ≥ 0 (`.re` で取り出し), final linarith。
+  - 要 `hiso : IsDadeIsometry τ` を分離引数 (Hypothesis71 に同居させず引数で受ける)。
+- 残り (follow-on, 別 issue): (7.3) の proof, A^τ 上の sum 形と内積の関係付け。
 
 ## 完了条件
 
