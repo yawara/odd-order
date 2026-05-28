@@ -22,7 +22,39 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 §0.2 参照. mini-roadmap は
 [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
 
+## 現状 (handoff 用)
+
+[`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean) 末尾 (~545-606)
+に以下を実装済:
+
+- **`IsPStable p G`** def (`b8ab8a9`): alg-closed char-p faithful rep で p-element の
+  quadratic min poly が無いという Gorenstein 1968 p.105 定義. `O_p(G) = 1` /
+  `p odd` は使う側で hypothesis として渡す.
+- **`thmA3` statement** + **Step 1 (witness extraction)** + **Step 2 (Baer-Suzuki 適用)**
+  (`33bb1df`):
+  ```lean
+  theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
+      (_h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
+      (h_not_pstable : ¬ IsPStable p G) :
+      ¬ Odd (Nat.card G) := by
+    intro _hodd
+    -- ✅ Step 1: ¬ IsPStable を unfold + push Not で証人 ⟨F, V, ρ, hfaithful, x,
+    --    _hxp, _hxsq, hxne⟩ を取り出す
+    -- ✅ Step 2: Baer-Suzuki で ∃ g : G, ⟨x, g x g⁻¹⟩ が非 p-群 (g, h_pair_not_pgroup)
+    -- 🚧 Step 3-6: sorry
+    sorry
+  ```
+
+残 sorry の中身は下記「やること」 Step 3-6. import 済: `Mathlib.LinearAlgebra.*`,
+`OddOrder.BG.Ch1_Preliminary.S02_Representations`, `OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector`,
+`OddOrder.Isaacs.Ch02_Subnormality.Main`. `lake build OddOrder.BG.AppA_PStability` green
+(thmA3 sorry のみ警告).
+
 ## やること
+
+### 0. ✅ 完了済 (`b8ab8a9` + `33bb1df`)
+
+下記 1, 2, 3 (Step 1+2) は実装済. 詳細は上記「現状」.
 
 ### 1. `IsPStable` 定義 (新規)
 
@@ -62,23 +94,23 @@ theorem thmA3 {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
 
 Gorenstein 8.3 proof (mmd L2290–) 翻訳:
 
-1. `¬ IsPStable p G` を unfold ⇒ ∃ ρ faithful + ∃ x p-element (≠ 1) with
+1. ✅ `¬ IsPStable p G` を unfold ⇒ ∃ ρ faithful + ∃ x p-element (≠ 1) with
    `(ρ x - 1)^2 = 0` (quadratic min poly).
 2. `K := x` の conjugacy class. 全ての K の元は同じ性質 (conjugation).
-3. **Baer-Suzuki (Gorenstein 8.2)** で `O_p(G) = 1` + K で「全 pair が p-群を生成」が
+3. ✅ **Baer-Suzuki (Gorenstein 8.2)** で `O_p(G) = 1` + K で「全 pair が p-群を生成」が
    不可能 ⇒ ∃ y ∈ K, `⟨x, y⟩` は p-群でない.
    - repo: `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` (= 単一元 form,
      `Main.lean:2134`). 適合する形に変換要.
-4. `H := ⟨x, y⟩` 非 p-群、`ρ_H : Representation F H V` (= ρ comp H.subtype).
-5. **H-invariant chain** `V = V_1 ⊋ V_2 ⊋ ... ⊋ V_{m+1} = 0` with H 作用が
+4. 🚧 `H := ⟨x, y⟩` 非 p-群、`ρ_H : Representation F H V` (= ρ comp H.subtype).
+5. 🚧 **H-invariant chain** `V = V_1 ⊋ V_2 ⊋ ... ⊋ V_{m+1} = 0` with H 作用が
    各 `V_i / V_{i+1}` 上既約. 構成 = `V` finite-dim + 再帰的 maximal proper sub.
-6. `N_i := ker(H → End(V_i/V_{i+1}))`. ∃ i, `N_i ⊊ H`.
+6. 🚧 `N_i := ker(H → End(V_i/V_{i+1}))`. ∃ i, `N_i ⊊ H`.
    - 反例: 全 N_i = H ⇒ H 全要素が全 V_i/V_{i+1} 上自明作用. H の任意の `p'`-部分群
      も自明作用 → ρ faithful より p'-部分群 = 1 ⇒ H は p-群、矛盾.
-7. `H/N_i` の faithful irreducible action on `V_i/V_{i+1}`. x, y のイメージ x̄, ȳ
+7. 🚧 `H/N_i` の faithful irreducible action on `V_i/V_{i+1}`. x, y のイメージ x̄, ȳ
    は quadratic minpoly (= `(ρ̄ x̄ - 1)^2 = 0`, ρ̄ x̄ ≠ 1).
-8. **A.2 適用**: `H/N_i = ⟨x̄, ȳ⟩` 忠実既約二次⇒ `|H/N_i|` 偶.
-9. `2 ∣ |H/N_i| ∣ |H| ∣ |G|` ⇒ `|G|` 偶. ∎
+8. 🚧 **A.2 適用**: `H/N_i = ⟨x̄, ȳ⟩` 忠実既約二次⇒ `|H/N_i|` 偶.
+9. 🚧 `2 ∣ |H/N_i| ∣ |H| ∣ |G|` ⇒ `|G|` 偶. ∎
 
 ### 必要な mathlib / repo API
 
