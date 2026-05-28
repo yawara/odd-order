@@ -446,6 +446,83 @@ end Hypothesis71
 
 end Section_7_1_to_7_3
 
+section Section_7_4_to_7_5
+
+/-- **Peterfalvi (7.4) Hypothesis.**  A family `(L_i, A_i, τ_i)_{i ∈ Fin k}`,
+each satisfying Hypothesis (7.1) (i.e., Hypothesis (2.2) together with a Dade
+isometry `τ_i`), with pairwise-disjoint `A_i^{τ_i}`.
+
+The `Fintype (L i)` and `Invertible (Nat.card (L i) : ℂ)` instances are carried
+as plain fields so that per-index `chiRhoCF.inner` is well-defined inside the
+structure namespace (accessed via `haveI`). -/
+structure FamilyHypothesis71 (G : Type*) [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (k : ℕ) where
+  /-- The host subgroups `L_i ≤ G`. -/
+  L : Fin k → Subgroup G
+  /-- The subsets `A_i ⊆ G`. -/
+  A : Fin k → Set G
+  /-- `Fintype` instance for each `L_i`. -/
+  fintypeL : ∀ i, Fintype (L i)
+  /-- `|L_i|`-invertibility in `ℂ`. -/
+  invertibleL : ∀ i, Invertible (Nat.card (L i) : ℂ)
+  /-- Each `(A_i, L_i)` carries a (7.1) hypothesis (with a chosen Dade map `τ_i`). -/
+  hyp71 : ∀ i, Hypothesis71 G (A i) (L i)
+  /-- Each `τ_i` is a Dade isometry. -/
+  isDadeIsometry : ∀ i,
+    haveI := fintypeL i
+    haveI := invertibleL i
+    OddOrder.Peterfalvi.S04.IsDadeIsometry
+      (G := G) (k := ℂ) (L := L i) (hyp71 i).τ
+  /-- (7.4): the sets `A_i^{τ_i}` are pairwise disjoint. -/
+  pairwise_disjoint : ∀ ⦃i j⦄, i ≠ j →
+    Disjoint ((hyp71 i).hyp.dadeSupport) ((hyp71 j).hyp.dadeSupport)
+
+namespace FamilyHypothesis71
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
+
+/-- **(7.4)(d).**  `G_0 = G - ⋃_i A_i^{τ_i}`: elements not lying in any
+`A_i^{τ_i} = (F.hyp71 i).hyp.dadeSupport`. -/
+def G0 (F : FamilyHypothesis71 G k) : Set G :=
+  {g | ∀ i, g ∉ (F.hyp71 i).hyp.dadeSupport}
+
+theorem mem_G0_iff (F : FamilyHypothesis71 G k) {g : G} :
+    g ∈ F.G0 ↔ ∀ i, g ∉ (F.hyp71 i).hyp.dadeSupport := Iff.rfl
+
+/-- `‖χ^{ρ_i}‖²_{L_i}` as a real number, using the per-index `Fintype` and
+`Invertible` instances carried by `F`. -/
+noncomputable def chiRhoNormSq (F : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (i : Fin k) : ℝ :=
+  letI := F.fintypeL i
+  letI := F.invertibleL i
+  (ClassFunction.inner ((F.hyp71 i).chiRhoCF χ) ((F.hyp71 i).chiRhoCF χ)).re
+
+end FamilyHypothesis71
+
+open scoped Classical in
+/-- **Peterfalvi (7.5).**  Under Hypothesis (7.4), for any `χ ∈ CF(G)` of norm one
+(in particular, any `χ ∈ Irr G`),
+`(1/|G|)(Σ_{g ∈ G_0} |χ(g)|² - |G_0|) + Σ_i (‖χ^{ρ_i}‖² - |A_i|/|L_i|) ≤ 0`.
+
+Proof outline (Peterfalvi p.39).  Apply (7.3) for `χ` at each `i` and partition
+`Σ_G |χ|² = Σ_{G_0} |χ|² + Σ_i Σ_{A_i^{τ_i}} |χ|²` (disjointness, `G = G_0 ⊔ ⋃ A_i^{τ_i}`)
+to bound the LHS by `‖χ‖² = 1`.  Apply (7.3) for `1_G` (equality case: `1_G` is
+trivially constant on each coset `aH(a)`) to identify
+`|A_i^{τ_i}|/|G| = ‖1_G^{ρ_i}‖²_{L_i} = |A_i|/|L_i|`, hence
+`|G_0|/|G| + Σ_i |A_i|/|L_i| = 1`. -/
+theorem family_inequality {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    (F : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1) :
+    ((Nat.card G : ℝ)⁻¹ *
+        ((∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+            ‖(χ : G → ℂ) g‖^2) - (Nat.card F.G0 : ℝ))) +
+      ∑ i : Fin k, (F.chiRhoNormSq χ i -
+        (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ)) ≤ 0 := by
+  sorry
+
+end Section_7_4_to_7_5
+
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
 /-- **Peterfalvi (7.10) hypothesis.** A family of `k` Frobenius subgroups of `G`
