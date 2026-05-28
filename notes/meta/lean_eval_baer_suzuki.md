@@ -68,22 +68,42 @@ eval 側の `LeanEval.GroupTheory.Defs.pCore p G` は問題説明文によれば
 
 つまり `opCore p G = LeanEval.Defs.pCore p G` (extensionality + 最大性).
 
-### 提出方法 (2 通り)
+### 提出方法 — self-contained 化 (採用)
 
-1. **直接 submit**: eval submission の preamble に本 repo の `OddOrder` import + 2 行の
-   `pCore = opCore` ext 補題を書く. 依存閉包は重い (Isaacs Ch01-2 + mathlib)
-   が, sorry/axiom-free が保証されているため eval-checker は通る想定.
+**機密性制約**: 本 repo は Feit-Thompson 形式化 (BG App.A, Peterfalvi §§1-14)
+の進行中作業を含む. `OddOrder` を直接 `import` する形で submit すると, 依存閉包
+解決時に未公開の補助補題群・命名・章割り構成等が lean-eval 比較器側に露出する.
+これを避けるため, **必要最小コードを別 repo にコピーして self-contained submission**
+とする.
 
-2. **self-contained 化** (将来必要なら):
-   - Isaacs 2.12 iff の Zipper Lemma 経由証明 (本 repo `le_fitting_of_baer_aux`
-     L1718) を eval 側に展開. mathlib `Sylow.normal_of_isNilpotent`,
-     `Subgroup.Normal.conj_smul_eq_self` などの mathlib API は使える前提.
-   - 行数概算: 補助 `le_fitting_aux` (L272), `le_fitting_of_baer_aux` (L1718),
-     `mem_opCore_of_le_fitting_of_isPGroup` (L1973) で本体 ~250 行. Wielandt Zipper
-     Lemma (Ch01 想定) も必要なので, **self-contained 化はコスト高** (Isaacs Ch01
-     の Zipper 周辺をまるごと移植する必要).
+別 repo 位置: [`../../../baer_suzuki/`](../../../baer_suzuki/) (lean-eval ローカル
+workspace, `Submission.lean` + `Submission/Helpers.lean` を編集).
 
-現状は **1. 直接 submit** が現実的. 2. が要求された時点で再評価.
+#### 移植スコープ (最小化)
+
+`baerSuzuki_pCore` のクロージャ閉包 — 抽出すべき定義/補題:
+
+| 項目 | 本 repo 所在 | 役割 |
+|---|---|---|
+| `opCore`, `opCore.normal`, `opCore_isPGroup`, `normal_pgroup_le_opCore` | Ch01 Main.lean (L533 周辺) | `O_p(G)` 定義と最大性 |
+| `fitting`, `fitting.normal`, `fitting.isNilpotent`, `nilpotent_normal_le_fitting` | Ch01 Main.lean | `F(G)` 定義と最大冪零正規性 |
+| Wielandt Zipper Lemma (`zipper_lemma`) と支援補題群 | Ch02 Main.lean:697 周辺 | Isaacs Thm 2.12 逆方向の核 |
+| `le_fitting_iff_baer_sup_conj_isNilpotent` | Ch02 Main.lean:1829 | Isaacs Thm 2.12 iff |
+| `mem_opCore_of_le_fitting_of_isPGroup` | Ch02 Main.lean:1976 | F(G) → O_p(G) 橋渡し |
+| `baerSuzuki_pCore` 本体 | Ch02 Main.lean:2134 | 単一元 Baer-Suzuki |
+
+提出時には `LeanEval.GroupTheory.Defs.pCore = opCore` の extensionality 補題を
+`Submission/Helpers.lean` に書き signature 整合.
+
+機密性のため移植コードは命名・コメントを **lean-eval 側 namespace**
+(`Submission.Helpers` 等) に rebrand し, 本 repo の `OddOrder.Isaacs.Ch0X` 命名・
+章割り情報は持ち出さない. 出典 (Isaacs FGT § 等) のみ記載可.
+
+#### 不採用: 直接 submit (`import OddOrder`)
+
+`import OddOrder` + ext 補題 2 行案は手軽だが, lean-eval 比較器側へ
+`OddOrder` 全モジュール (BG/Peterfalvi 含む) のシンボル名・補助補題構成が露出し,
+進行中の Feit-Thompson 形式化の進捗情報が漏れる. 機密性の観点で却下.
 
 ## 関連定理
 
@@ -100,3 +120,6 @@ eval 側の `LeanEval.GroupTheory.Defs.pCore p G` は問題説明文によれば
 
 - 2026-05-28: `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` 実装 (issue #0042 close).
   `mem_opCore_of_le_fitting_of_isPGroup` を `private` 解除 (Matsuyama+本定理で共有).
+- 2026-05-28: 提出方針を **self-contained 化** へ変更. `import OddOrder` 案は
+  機密性 (Feit-Thompson 進捗情報の流出) の観点で却下. `../baer_suzuki/` workspace
+  に必要最小コードをコピーして submit する方針へ.
