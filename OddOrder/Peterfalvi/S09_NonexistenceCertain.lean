@@ -446,6 +446,154 @@ end Hypothesis71
 
 end Section_7_1_to_7_3
 
+section Section_7_3_constants
+
+/-! ### The cardinality identity `|A^τ|·|L| = |A|·|G|`
+
+Specializing (7.3) to the constant `1_G` gives, in the equality case (the constant
+function is constant on every coset `aH(a)`), the cardinality identity used in
+(7.5).  This is *not* a generic consequence of (2.6.a) but of (2.5): the Dade map
+sends the indicator `1_A ∈ CF(L,A)` to `1_{A^τ} ∈ CF(G)` *exactly* (not just up to
+an `im τ` correction), and then isometry equates their norms.
+-/
+
+namespace Hypothesis71
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {A : Set G} {L : Subgroup G}
+
+/-- The constant class function with value `1`. -/
+def constOne (G : Type*) [Group G] : ClassFunction G ℂ :=
+  ⟨fun _ => 1, fun _ _ => rfl⟩
+
+@[simp] theorem constOne_apply {G : Type*} [Group G] (g : G) :
+    (constOne G : G → ℂ) g = 1 := rfl
+
+open scoped Classical in
+/-- `chiRho` applied to the constant `1_G` is the indicator of `A` on `L`. -/
+theorem chiRho_constOne (H71 : Hypothesis71 G A L) (a : L) :
+    H71.chiRho (constOne G) a = if (a : G) ∈ A then 1 else 0 := by
+  by_cases ha : (a : G) ∈ A
+  · rw [if_pos ha, H71.chiRho_of_mem _ ha]
+    simp only [constOne_apply, Finset.sum_const, Finset.card_univ,
+      ← Nat.card_eq_fintype_card, nsmul_eq_mul, mul_one]
+    rw [inv_mul_cancel₀]
+    exact_mod_cast (Nat.card_pos (α := H71.hyp.H ⟨(a : G), ha⟩)).ne'
+  · rw [if_neg ha, H71.chiRho_of_not_mem _ ha]
+
+open scoped Classical in
+/-- The Dade image of `chiRhoSupp 1_G` is the indicator of `dadeSupport` on `G`.
+
+Uses both `IsDadeMap.map_eq_of_isConj_hCoset` (positive case) and
+`map_eq_zero_of_not_mem_dadeSupport` (negative case). -/
+theorem tau_chiRhoSupp_constOne
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (g : G) :
+    H71.τ (H71.chiRhoSupp (constOne G)) g =
+      if g ∈ H71.hyp.dadeSupport then 1 else 0 := by
+  by_cases hg : g ∈ H71.hyp.dadeSupport
+  · rw [if_pos hg]
+    rcases H71.hyp.mem_dadeSupport_iff.mp hg with ⟨a, h, hh, hconj⟩
+    rw [H71.isDadeMap.map_eq_of_isConj_hCoset _ g a h hh hconj]
+    change H71.chiRhoCF (constOne G) ⟨a.1, H71.hyp.subset_L a.2⟩ = 1
+    rw [chiRhoCF_apply, chiRho_constOne, if_pos a.2]
+  · rw [if_neg hg]
+    exact H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg
+
+omit [Fintype G] in
+/-- `Nat.card` of the `L`-subtype `{l : L | (l : G) ∈ A}` equals `Nat.card A`
+when `A ⊆ L`. -/
+theorem card_supportInSubgroup_eq_card_A (hAL : A ⊆ L) :
+    Nat.card (OddOrder.Peterfalvi.S04.supportInSubgroup A L) = Nat.card A := by
+  apply Nat.card_congr
+  refine
+    { toFun := fun x => ⟨(x.1 : G), x.2⟩
+      invFun := fun x => ⟨⟨x.1, hAL x.2⟩, x.2⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+
+open scoped Classical in
+/-- The cardinality identity `|A^τ| · |L| = |A| · |G|`, in `ℝ`.
+
+Proof: by isometry, `⟨τ α, τ α⟩_G = ⟨α, α⟩_L` where `α = chiRhoSupp 1_G`.  Each
+inner product is, by the indicator computations, a normalized cardinality, and
+the equation becomes the stated identity. -/
+theorem card_dadeSupport_div_card_G_eq_card_A_div_card_L [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry
+      (G := G) (k := ℂ) (L := L) H71.τ) :
+    (Nat.card H71.hyp.dadeSupport : ℝ) / (Nat.card G : ℝ) =
+      (Nat.card A : ℝ) / (Nat.card L : ℝ) := by
+  set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+    H71.chiRhoSupp (constOne G) with hα_def
+  -- Isometry: ⟨τ α, τ α⟩_G = ⟨α, α⟩_L.
+  have hiso_eq : ClassFunction.inner (H71.τ α) (H71.τ α) =
+      ClassFunction.inner (α : ClassFunction L ℂ) (α : ClassFunction L ℂ) :=
+    hiso.inner_eq α α
+  -- Compute ⟨τ α, τ α⟩_G = (Nat.card G)⁻¹ · |dadeSupport|.
+  have hRHS : ClassFunction.inner (H71.τ α) (H71.τ α) =
+      (Nat.card G : ℂ)⁻¹ * (Nat.card H71.hyp.dadeSupport : ℂ) := by
+    rw [ClassFunction.inner_eq_inv_card_mul_innerSum, invOf_eq_inv,
+        ClassFunction.innerSum]
+    congr 1
+    -- Rewrite each summand as the indicator.
+    have hpt : ∀ g : G, H71.τ α g * star (H71.τ α g) =
+        if g ∈ H71.hyp.dadeSupport then (1 : ℂ) else 0 := by
+      intro g
+      rw [H71.tau_chiRhoSupp_constOne g]
+      by_cases hg : g ∈ H71.hyp.dadeSupport
+      · simp [hg]
+      · simp [hg]
+    calc ∑ g : G, H71.τ α g * star (H71.τ α g)
+        = ∑ g : G, if g ∈ H71.hyp.dadeSupport then (1 : ℂ) else 0 :=
+          Finset.sum_congr rfl (fun g _ => hpt g)
+      _ = (Nat.card H71.hyp.dadeSupport : ℂ) := by
+          rw [Finset.sum_boole]
+          rw [show {x ∈ (Finset.univ : Finset G) | x ∈ H71.hyp.dadeSupport} =
+              H71.hyp.dadeSupport.toFinset from by
+            ext g; simp]
+          rw [Set.toFinset_card, ← Nat.card_eq_fintype_card]
+  -- Compute ⟨α, α⟩_L = (Nat.card L)⁻¹ · |A|.
+  have hLHS : ClassFunction.inner (α : ClassFunction L ℂ) (α : ClassFunction L ℂ) =
+      (Nat.card L : ℂ)⁻¹ * (Nat.card A : ℂ) := by
+    rw [ClassFunction.inner_eq_inv_card_mul_innerSum, invOf_eq_inv,
+        ClassFunction.innerSum]
+    congr 1
+    have hpt : ∀ l : L, (α : ClassFunction L ℂ) l * star ((α : ClassFunction L ℂ) l) =
+        if (l : G) ∈ A then (1 : ℂ) else 0 := by
+      intro l
+      change H71.chiRhoCF (constOne G) l * star (H71.chiRhoCF (constOne G) l) = _
+      rw [chiRhoCF_apply, chiRho_constOne]
+      by_cases hl : (l : G) ∈ A
+      · simp [hl]
+      · simp [hl]
+    calc ∑ l : L, (α : ClassFunction L ℂ) l * star ((α : ClassFunction L ℂ) l)
+        = ∑ l : L, if (l : G) ∈ A then (1 : ℂ) else 0 :=
+          Finset.sum_congr rfl (fun l _ => hpt l)
+      _ = (Nat.card A : ℂ) := by
+          rw [Finset.sum_boole]
+          norm_cast
+          rw [← card_supportInSubgroup_eq_card_A H71.hyp.subset_L,
+              Nat.card_eq_fintype_card, Fintype.card_subtype]
+          rfl
+  -- Combine via isometry.
+  rw [hLHS, hRHS] at hiso_eq
+  -- Take real parts.
+  have hG_pos : (0 : ℝ) < Nat.card G := by exact_mod_cast Nat.card_pos (α := G)
+  have hL_pos : (0 : ℝ) < Nat.card L := by exact_mod_cast Nat.card_pos (α := L)
+  have hreal : (Nat.card G : ℝ)⁻¹ * (Nat.card H71.hyp.dadeSupport : ℝ) =
+      (Nat.card L : ℝ)⁻¹ * (Nat.card A : ℝ) := by
+    have := congrArg Complex.re hiso_eq
+    push_cast at this
+    simpa using this
+  field_simp at hreal ⊢
+  linarith [hreal]
+
+end Hypothesis71
+
+end Section_7_3_constants
+
 section Section_7_4_to_7_5
 
 /-- **Peterfalvi (7.4) Hypothesis.**  A family `(L_i, A_i, τ_i)_{i ∈ Fin k}`,
@@ -519,7 +667,197 @@ theorem family_inequality {G : Type*} [Group G] [Fintype G]
             ‖(χ : G → ℂ) g‖^2) - (Nat.card F.G0 : ℝ))) +
       ∑ i : Fin k, (F.chiRhoNormSq χ i -
         (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ)) ≤ 0 := by
-  sorry
+  classical
+  -- Shorthand notation.
+  let AT : Fin k → Set G := fun i => (F.hyp71 i).hyp.dadeSupport
+  -- Cast helper: `((|G|⁻¹ * (Σ ‖χ g‖² : ℝ) : ℂ)).re = |G|⁻¹ * Σ ‖χ g‖²` (real).
+  have h_cast_sum_re : ∀ (S : Finset G),
+      (((Nat.card G : ℂ)⁻¹ *
+          ∑ g ∈ S, ‖(χ : G → ℂ) g‖^2 : ℂ)).re =
+        (Nat.card G : ℝ)⁻¹ * ∑ g ∈ S, ‖(χ : G → ℂ) g‖^2 := by
+    intro S
+    -- Rewrite (Nat.card G : ℂ)⁻¹ as a real cast.
+    have h_inv_cast : ((Nat.card G : ℂ)⁻¹ : ℂ) = (((Nat.card G : ℝ)⁻¹ : ℝ) : ℂ) := by
+      rw [show (Nat.card G : ℂ) = ((Nat.card G : ℝ) : ℂ) by push_cast; rfl,
+          ← Complex.ofReal_inv]
+    rw [h_inv_cast, ← Complex.ofReal_mul, Complex.ofReal_re]
+  -- (I) Per-index (7.3) in real form.
+  have h_per_index : ∀ i : Fin k,
+      F.chiRhoNormSq χ i ≤ (Nat.card G : ℝ)⁻¹ *
+        ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ AT i),
+          ‖(χ : G → ℂ) g‖^2 := by
+    intro i
+    letI : Fintype (F.L i) := F.fintypeL i
+    letI : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
+    have h73 := (F.hyp71 i).chiRho_integral_inequality (F.isDadeIsometry i) χ
+    have h_re : (((Nat.card G : ℂ)⁻¹ *
+        ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ (F.hyp71 i).hyp.dadeSupport),
+            ‖(χ : G → ℂ) g‖^2 : ℂ)).re =
+      (Nat.card G : ℝ)⁻¹ *
+        ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ AT i),
+          ‖(χ : G → ℂ) g‖^2 :=
+      h_cast_sum_re _
+    exact h_re ▸ h73
+  -- (II) Sum the per-index bounds.
+  have h_sum_bound :
+      (∑ i : Fin k, F.chiRhoNormSq χ i) ≤
+        (Nat.card G : ℝ)⁻¹ *
+          ∑ i : Fin k,
+            ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ AT i),
+              ‖(χ : G → ℂ) g‖^2 := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_le_sum (fun i _ => h_per_index i)
+  -- (III) Pairwise disjointness on Fin k for the filter Finsets.
+  have h_disj :
+      ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint
+        (fun i => Finset.univ.filter (fun x : G => x ∈ AT i)) := by
+    intro i _ j _ hij
+    rw [Function.onFun, Finset.disjoint_filter]
+    intro x _ hxi
+    exact (Set.disjoint_left.mp (F.pairwise_disjoint hij)) hxi
+  -- (IV) biUnion sum equals the iterated sum.
+  have h_biUnion_sum :
+      ∑ i : Fin k,
+          ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ AT i),
+            ‖(χ : G → ℂ) g‖^2 =
+        ∑ g ∈ (Finset.univ : Finset (Fin k)).biUnion
+            (fun i => Finset.univ.filter (fun x : G => x ∈ AT i)),
+          ‖(χ : G → ℂ) g‖^2 :=
+    (Finset.sum_biUnion h_disj).symm
+  -- (V) biUnion of the per-index filters = `{g | g ∉ G0}` (as Finsets).
+  have h_biUnion_eq :
+      (Finset.univ : Finset (Fin k)).biUnion
+          (fun i => Finset.univ.filter (fun x : G => x ∈ AT i)) =
+        Finset.univ.filter (fun g : G => g ∉ F.G0) := by
+    ext g
+    simp only [Finset.mem_biUnion, Finset.mem_filter, Finset.mem_univ, true_and,
+      F.mem_G0_iff, not_forall, not_not]
+    refine ⟨fun ⟨i, hi⟩ => ⟨i, hi⟩, fun ⟨i, hi⟩ => ⟨i, hi⟩⟩
+  -- (VI) Σ_G ‖χ‖² = |G| (from `⟨χ, χ⟩ = 1`).
+  have h_chi_total : ∑ g : G, ‖(χ : G → ℂ) g‖^2 = (Nat.card G : ℝ) := by
+    have h_inner_ℂ : (Nat.card G : ℂ) * ClassFunction.inner χ χ =
+        ((∑ g : G, ‖(χ : G → ℂ) g‖^2 : ℝ) : ℂ) := by
+      rw [ClassFunction.card_mul_inner, ClassFunction.innerSum]
+      push_cast
+      refine Finset.sum_congr rfl fun g _ => ?_
+      rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq,
+          Complex.ofReal_pow]
+    rw [hχ, mul_one] at h_inner_ℂ
+    have := congrArg Complex.re h_inner_ℂ
+    rw [Complex.ofReal_re] at this
+    rw [← this, Complex.natCast_re]
+  -- (VII) Σ_{filter ∉ G0} ‖χ‖² = |G| - Σ_{filter ∈ G0} ‖χ‖².
+  have h_chi_split :
+      ∑ g ∈ Finset.univ.filter (fun g => g ∉ F.G0), ‖(χ : G → ℂ) g‖^2 =
+        (Nat.card G : ℝ) -
+          ∑ g ∈ Finset.univ.filter (fun g => g ∈ F.G0), ‖(χ : G → ℂ) g‖^2 := by
+    have h_split :
+        ∑ g ∈ Finset.univ.filter (fun g => g ∈ F.G0), ‖(χ : G → ℂ) g‖^2 +
+          ∑ g ∈ Finset.univ.filter (fun g => g ∉ F.G0), ‖(χ : G → ℂ) g‖^2 =
+          ∑ g : G, ‖(χ : G → ℂ) g‖^2 :=
+      Finset.sum_filter_add_sum_filter_not Finset.univ _ _
+    linarith [h_split, h_chi_total]
+  -- (VIII) Per-index cardinality identity: `|A_i|/|L_i| = |AT i|/|G|`.
+  have h_card_id : ∀ i : Fin k,
+      (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) =
+        (Nat.card (AT i) : ℝ) / (Nat.card G : ℝ) := by
+    intro i
+    letI : Fintype (F.L i) := F.fintypeL i
+    letI : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
+    exact ((F.hyp71 i).card_dadeSupport_div_card_G_eq_card_A_div_card_L
+      (F.isDadeIsometry i)).symm
+  -- (IX) `|G| = |G0| + Σ_i |AT i|` (G partition cardinality, in ℝ).
+  have h_G_partition : (Nat.card G : ℝ) =
+      (Nat.card F.G0 : ℝ) + ∑ i : Fin k, (Nat.card (AT i) : ℝ) := by
+    -- Convert to Finset cards.
+    have h_disjFin :
+        ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint
+          (fun i => (AT i).toFinset) := by
+      intro i _ j _ hij
+      rw [Function.onFun, Set.disjoint_toFinset]
+      exact F.pairwise_disjoint hij
+    have h_biUnion_card :
+        ((Finset.univ : Finset (Fin k)).biUnion (fun i => (AT i).toFinset)).card =
+          ∑ i : Fin k, (AT i).toFinset.card :=
+      Finset.card_biUnion h_disjFin
+    -- biUnion (toFinset of AT i) = G0.toFinsetᶜ.
+    have h_biUnion_set :
+        (Finset.univ : Finset (Fin k)).biUnion (fun i => (AT i).toFinset) =
+          F.G0.toFinsetᶜ := by
+      ext g
+      simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, Finset.mem_compl,
+        Set.mem_toFinset, F.mem_G0_iff, not_forall, not_not]
+      refine ⟨fun ⟨i, hi⟩ => ⟨i, hi⟩, fun ⟨i, hi⟩ => ⟨i, hi⟩⟩
+    have hG0_le : F.G0.toFinset.card ≤ Fintype.card G := by
+      rw [← Finset.card_univ (α := G)]
+      exact Finset.card_le_card (Finset.subset_univ _)
+    have hG0_card_eq : (F.G0.toFinset.card : ℝ) = Nat.card F.G0 := by
+      rw [Set.toFinset_card, ← Nat.card_eq_fintype_card]
+    have h_AT_card_eq : ∀ i : Fin k,
+        ((AT i).toFinset.card : ℝ) = Nat.card (AT i) := by
+      intro i; rw [Set.toFinset_card, ← Nat.card_eq_fintype_card]
+    -- Compute Σ Nat.card (AT i) = |G| - |G0| (cast to ℝ).
+    have h_compl_card :
+        (F.G0.toFinsetᶜ.card : ℝ) = (Nat.card G : ℝ) - (Nat.card F.G0 : ℝ) := by
+      rw [Finset.card_compl]
+      push_cast [Nat.cast_sub hG0_le]
+      rw [show (Fintype.card G : ℝ) = Nat.card G from by
+        rw [Nat.card_eq_fintype_card]]
+      linarith [hG0_card_eq]
+    have h_AT_sum_card :
+        ∑ i : Fin k, ((AT i).toFinset.card : ℝ) =
+          ∑ i : Fin k, (Nat.card (AT i) : ℝ) :=
+      Finset.sum_congr rfl (fun i _ => h_AT_card_eq i)
+    -- Putting it together.
+    have h_biUnion_card_real :
+        (((Finset.univ : Finset (Fin k)).biUnion
+              (fun i => (AT i).toFinset)).card : ℝ) =
+          ∑ i : Fin k, (Nat.card (AT i) : ℝ) := by
+      rw [h_biUnion_card]; push_cast; exact h_AT_sum_card
+    rw [h_biUnion_set] at h_biUnion_card_real
+    linarith [h_compl_card, h_biUnion_card_real]
+  -- (X) `|G0|/|G| + Σ_i |A_i|/|L_i| = 1`.
+  have hG_pos : (0 : ℝ) < Nat.card G := by exact_mod_cast Nat.card_pos (α := G)
+  have h_balance :
+      (Nat.card F.G0 : ℝ) / (Nat.card G : ℝ) +
+        ∑ i : Fin k, (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) = 1 := by
+    have h_eq : ∑ i : Fin k, (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) =
+        ∑ i : Fin k, (Nat.card (AT i) : ℝ) / (Nat.card G : ℝ) :=
+      Finset.sum_congr rfl (fun i _ => h_card_id i)
+    rw [h_eq, ← Finset.sum_div, ← add_div, ← h_G_partition, div_self hG_pos.ne']
+  -- (XI) Main bound: Σ_i chiRhoNormSq χ i ≤ 1 - (1/|G|) Σ_{G0} ‖χ‖².
+  have h_main :
+      (∑ i : Fin k, F.chiRhoNormSq χ i) +
+        (Nat.card G : ℝ)⁻¹ *
+          (∑ g ∈ Finset.univ.filter (fun g => g ∈ F.G0), ‖(χ : G → ℂ) g‖^2) ≤ 1 := by
+    have h1 := h_sum_bound
+    rw [h_biUnion_sum, h_biUnion_eq, h_chi_split] at h1
+    -- h1 : Σ chiRhoNormSq ≤ |G|⁻¹ * (|G| - Σ_{G0} ‖χ‖²) = 1 - |G|⁻¹ * Σ_{G0} ‖χ‖²
+    have h2 : (Nat.card G : ℝ)⁻¹ *
+        ((Nat.card G : ℝ) -
+          ∑ g ∈ Finset.univ.filter (fun g => g ∈ F.G0), ‖(χ : G → ℂ) g‖^2) =
+        1 - (Nat.card G : ℝ)⁻¹ *
+          ∑ g ∈ Finset.univ.filter (fun g => g ∈ F.G0), ‖(χ : G → ℂ) g‖^2 := by
+      field_simp
+    linarith [h1, h2]
+  -- (XII) Rearrange to the (7.5) form.
+  have h_sum_diff_expand :
+      ∑ i : Fin k, (F.chiRhoNormSq χ i -
+          (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ)) =
+        (∑ i : Fin k, F.chiRhoNormSq χ i) -
+          ∑ i : Fin k, (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) :=
+    Finset.sum_sub_distrib _ _
+  rw [h_sum_diff_expand]
+  -- Use `h_balance` to express `Σ |A_i|/|L_i| = 1 - |G0|/|G|`.
+  have h_sumA_eq : ∑ i : Fin k, (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) =
+      1 - (Nat.card F.G0 : ℝ) / (Nat.card G : ℝ) := by linarith [h_balance]
+  rw [h_sumA_eq]
+  -- Cancel `(1/|G|) * |G0|` against `|G0|/|G|`.
+  have hGne : (Nat.card G : ℝ) ≠ 0 := hG_pos.ne'
+  have h_cancel : (Nat.card G : ℝ)⁻¹ * (Nat.card F.G0 : ℝ) =
+      (Nat.card F.G0 : ℝ) / (Nat.card G : ℝ) := by
+    field_simp
+  linarith [h_main, h_cancel]
 
 end Section_7_4_to_7_5
 
