@@ -9,8 +9,11 @@ import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.Order.OrderIsoNat
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 
 /-!
@@ -752,10 +755,126 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
   --   * `IsPGroup.faithful_irreducible_in_charP_trivial` (= Gorenstein Thm 1.2)
   --   * Quotient representation `H → H/N_i → End_F (V_i/V_{i+1})`
   have h_two_dvd : 2 ∣ Nat.card G := by
-    -- Step 4-8 でここを埋める. 使う hypothesis:
-    --   ρ, hfaithful, x, hxp, hxsq, hxne, hyp, hysq, hyne, hH_not_pgroup,
-    --   hxH, hyH, h_Op_trivial, _hp_odd
-    sorry
+    -- ## Step 5: Set up ρ_H : Representation F ↥H V via subgroup restriction
+    let ρ_H : Representation F ↥H V := ρ.comp H.subtype
+    have hρH_faithful : Function.Injective ρ_H :=
+      fun a b hab => Subtype.ext (hfaithful hab)
+    -- Well-foundedness for `Subrepresentation ρ_H` via toSubmodule embedding.
+    -- `Submodule F V` has WF (both directions) for finite-dim V.
+    haveI hwf_LT : WellFoundedLT (Subrepresentation ρ_H) := by
+      apply StrictMono.wellFoundedLT (f := Subrepresentation.toSubmodule)
+      intros a b hab
+      exact lt_of_le_of_ne hab.le
+        (fun h => hab.ne (Subrepresentation.toSubmodule_injective h))
+    haveI hwf_GT : WellFoundedGT (Subrepresentation ρ_H) := by
+      apply StrictMono.wellFoundedGT (f := Subrepresentation.toSubmodule)
+      intros a b hab
+      exact lt_of_le_of_ne hab.le
+        (fun h => hab.ne (Subrepresentation.toSubmodule_injective h))
+    haveI : Nonempty (Subrepresentation ρ_H) := ⟨⊥⟩
+    -- Get covBy chain in `Subrepresentation ρ_H`
+    obtain ⟨a, h_min, n, h_max, h_cov⟩ :=
+      exists_covBy_seq_of_wellFoundedLT_wellFoundedGT (Subrepresentation ρ_H)
+    -- Translate to Submodule chain
+    have h_a0_bot : (a 0).toSubmodule = ⊥ := by
+      have h_eq : a 0 = ⊥ := h_min.eq_bot
+      rw [h_eq]; rfl
+    have h_an_top : (a n).toSubmodule = ⊤ := by
+      have h_eq : a n = ⊤ := h_max.eq_top
+      rw [h_eq]; rfl
+    -- ## Step 6: 分岐 — H が全 quotient で自明か否か
+    by_cases h_all_triv : ∀ i : ℕ, i < n → ∀ (h : ↥H) (v : V),
+        v ∈ (a (i + 1)).toSubmodule → ρ_H h v - v ∈ (a i).toSubmodule
+    · -- Case A: 全 quotient 自明 ⇒ coprime action chain で矛盾
+      exfalso
+      -- A.1: ∃ prime r ≠ p with r ∣ |↥H| (H not p-group + 素因数分解)
+      have hH_card_pos : 0 < Nat.card ↥H := Nat.card_pos
+      have hH_card_ne_zero : Nat.card ↥H ≠ 0 := hH_card_pos.ne'
+      have h_not_pow : ¬ ∃ k : ℕ, Nat.card ↥H = p ^ k := by
+        intro hc; exact hH_not_pgroup (IsPGroup.iff_card.mpr hc)
+      obtain ⟨r, hr_prime, hr_dvd, hr_ne_p⟩ :
+          ∃ r : ℕ, r.Prime ∧ r ∣ Nat.card ↥H ∧ r ≠ p := by
+        by_contra h_no
+        push_neg at h_no
+        apply h_not_pow
+        have hall : ∀ q ∈ (Nat.card ↥H).primeFactorsList, q = p := by
+          intro q hq
+          rw [Nat.mem_primeFactorsList hH_card_ne_zero] at hq
+          exact h_no q hq.1 hq.2
+        refine ⟨(Nat.card ↥H).primeFactorsList.length, ?_⟩
+        rw [← List.prod_replicate, ← List.eq_replicate_of_mem hall,
+          Nat.prod_primeFactorsList hH_card_ne_zero]
+      -- A.2: Cauchy で q ∈ ↥H, orderOf q = r
+      haveI : Fact r.Prime := ⟨hr_prime⟩
+      obtain ⟨q, hq_order⟩ : ∃ q : ↥H, orderOf q = r :=
+        exists_prime_orderOf_dvd_card' r hr_dvd
+      -- q ≠ 1
+      have hq_ne_one : q ≠ 1 := by
+        intro h
+        rw [h, orderOf_one] at hq_order
+        -- hq_order : 1 = r, and hr_prime.one_lt : 1 < r ⇒ 1 ≠ r
+        exact hr_prime.one_lt.ne hq_order
+      have hqG_ne_one : (q : G) ≠ 1 := by
+        intro h
+        exact hq_ne_one (Subtype.ext h)
+      -- A.3: Q := zpowers q (as Subgroup ↥H) — work entirely in ↥H
+      let Q : Subgroup ↥H := Subgroup.zpowers q
+      let ρ_Q : Representation F ↥Q V := ρ_H.comp Q.subtype
+      -- Cardinality of Q is r
+      have hQ_card : Nat.card ↥Q = r := by
+        rw [Nat.card_zpowers]; exact hq_order
+      -- (Nat.card ↥Q : F) ≠ 0 since r ≠ p = char F
+      haveI hQ_nezero : NeZero ((Nat.card ↥Q : F)) := by
+        constructor
+        intro h_zero
+        rw [hQ_card] at h_zero
+        have hp_dvd_r : p ∣ r := by
+          rwa [CharP.cast_eq_zero_iff F p r] at h_zero
+        have hp_prime : p.Prime := Fact.out
+        rcases hr_prime.eq_one_or_self_of_dvd p hp_dvd_r with h1 | h2
+        · exact hp_prime.one_lt.ne' h1
+        · exact hr_ne_p h2.symm
+      haveI : Finite ↥Q := inferInstance
+      -- A.4: Apply coprime_action_trivial_chain to ρ_Q
+      have h_Q_triv : ∀ (g : ↥Q) (v : V), ρ_Q g v = v := by
+        apply OddOrder.GroupTheory.RepresentationTheory.coprime_action_trivial_chain
+          ρ_Q (s := fun i : Fin (n + 1) => (a (i : ℕ)).toSubmodule)
+        · -- s 0 = ⊥ (= h_a0_bot via beta + Fin cast)
+          simpa using h_a0_bot
+        · -- s (Fin.last n) = ⊤
+          have hlast : ((Fin.last n : Fin (n + 1)) : ℕ) = n := by simp
+          show (a ((Fin.last n : Fin (n + 1)) : ℕ)).toSubmodule = ⊤
+          rw [hlast]; exact h_an_top
+        · -- h_triv_quot
+          intro g_q i v hv
+          have h_eq : ρ_Q g_q v = ρ_H (g_q : ↥H) v := rfl
+          show ρ_Q g_q v - v ∈ (a ((i.castSucc : Fin (n + 1)) : ℕ)).toSubmodule
+          rw [h_eq]
+          have hcastSucc : ((i.castSucc : Fin (n + 1)) : ℕ) = i.val := by simp
+          have hsucc : ((i.succ : Fin (n + 1)) : ℕ) = i.val + 1 := by simp
+          rw [hcastSucc]
+          have hv' : v ∈ (a (i.val + 1)).toSubmodule := by
+            have hv_in : v ∈ (a ((i.succ : Fin (n + 1)) : ℕ)).toSubmodule := hv
+            rwa [hsucc] at hv_in
+          exact h_all_triv i.val i.isLt (g_q : ↥H) v hv'
+      -- A.5: ρ q = 1 (via ρ_Q at ⟨q, mem_zpowers_self⟩)
+      have h_ρq_one : ρ (q : G) = 1 := by
+        ext v
+        rw [Module.End.one_apply]
+        have hself : q ∈ Subgroup.zpowers q := Subgroup.mem_zpowers q
+        have h_app := h_Q_triv ⟨q, hself⟩ v
+        -- ρ_Q ⟨q, hself⟩ v = ρ_H q v = ρ (q : G) v
+        change ρ (q : G) v = v at h_app
+        exact h_app
+      -- A.6: 矛盾 — q = 1 (by faithful) と q ≠ 1
+      have hq_eq_one : (q : G) = 1 := by
+        apply hfaithful
+        rw [h_ρq_one, map_one]
+      exact hqG_ne_one hq_eq_one
+    · -- Case B: ∃ i, action non-trivial. Apply A.2.
+      -- ## TODO Step 7-8: H/N_i ↷ V_{i+1}/V_i faithful + irreducible + A.2.
+      -- 詳細は issue #0043 「Case B 残作業」参照.
+      sorry
   exact hodd.not_two_dvd_nat h_two_dvd
 
 end PStability
