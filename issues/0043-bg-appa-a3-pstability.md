@@ -22,6 +22,89 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 §0.2 参照. mini-roadmap は
 [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
 
+## 🚧 2026-05-29 PM — Step 4 完了 + Step 5 hard block 判明
+
+### 進捗 (`0b8ff45`)
+
+`OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean` に
+**relative + chain 版 coprime action** を sorry-free 追加 (約 +138 行)。
+
+- `coprime_action_trivial_relative_step`: `W ≤ U ≤ V` で `G` が `W` 上自明 +
+  `U` 上で mod W 自明 ⇒ `G` は `U` 上自明. Pointwise binomial 利用
+  (`(1+T)^n u = u + n • T u` when `T (T u) = 0`).
+- `coprime_action_trivial_chain`: chain `s : Fin (n+1) → Submodule F V`,
+  `s 0 = ⊥`, `s last = ⊤`, 各 quotient 上自明 ⇒ `V` 全体自明.
+  上向き帰納で relative step を反復適用.
+
+これで A.3 Step 5 の **chain coprime action 補題は完備**。
+
+### Hard block: F[H]-module 合成列 (Step 5 残り)
+
+Step 5 残作業 = 「V を F[↥H]-module 視 + H-invariant composition series 取得」を
+mathlib の `exists_compositionSeries_of_isNoetherian_isArtinian` を使って実装しようと
+試みたところ、**typeclass diamond で詰まる**:
+
+`@JordanHolderModule.instJordanHolderLattice (Submodule R M)`
+(`Mathlib.RingTheory.SimpleModule.Basic:552`) は `[Ring R]` から
+`Ring.toSemiring` を経由した `Module R M` を要求。
+
+一方、`Module (MonoidAlgebra F G) ρ.asModule`
+(`Mathlib.RepresentationTheory.Basic:162`) は `MonoidAlgebra.semiring`
+(独立宣言、`MonoidAlgebra/Defs.lean:612`) を経由した Module 構造を持つ。
+
+`MonoidAlgebra.semiring ≠ (MonoidAlgebra.ring).toSemiring` (definitionally) なので
+両者が unify せず、`JordanHolderLattice (Submodule (MonoidAlgebra F G) ρ.asModule)`
+が `inferInstance` で取れない。`letI`, 明示 instance 指定でも diamond を解消できず。
+
+mathlib 全体検索でも `CompositionSeries (Submodule (MonoidAlgebra ...) _)` の
+使用例ゼロ、`Subrepresentation ρ` に `JordanHolderLattice` instance なし、
+`restrictScalars` 経由で合成列を移送するパターンもなし。
+
+### 次に試すべき選択肢 (実装コスト目安)
+
+1. **`Subrepresentation ρ_H` に直接 `JordanHolderLattice` 実装** ~80-150 行
+   - Order iso `subrepresentationSubmoduleOrderIso ρ ≃o Submodule F[G] ρ.asModule`
+     経由で transfer。Iso 経由なので diamond は迂回できる。
+   - 修正後の `CompositionSeries (Subrepresentation ρ_H)` から
+     `.toSubmodule` で `Submodule F V` を取り出して以後の argument に使う。
+
+2. **finrank-induction で composition series 手構築** ~150-200 行
+   - `H-invariant W ≠ ⊥` ⇒ ∃ 極大 proper H-invariant W' ⊊ W (有限次元性から)
+   - 再帰で chain を構築。`Subrepresentation ρ_H` 上の DCC を利用。
+   - mathlib の `WellFoundedLT (Subrepresentation ρ)` 等が必要なら別途実装。
+
+3. **合成列を経由しない直接論法** ~100-150 行
+   - 「H が 全 simple F[H]-subquotient 上自明 ⇒ H が V 上自明」を
+     finrank induction で直接示す (composition series 経由せず)。
+   - V が単純 ⇒ 自身が simple subquotient で hypothesis 適用
+   - V が非単純 ⇒ proper H-invariant W で IH 適用 + relative coprime step
+   - "simple F[H]-subquotient" の formalization が必要 (= `IsSimpleModule` の
+     H-invariant 版を新規定義 or `Subrepresentation` の `CovBy` で表現).
+
+### 推奨選択
+
+**1 (Subrepresentation に JordanHolderLattice)** が最も汎用的だが既存
+mathlib infrastructure の理解が必要。
+**3 (直接論法)** が最も self-contained で本 issue だけで済むが、新規
+infrastructure 量が中程度。
+
+どの選択でも `coprime_action_trivial_chain` (本 commit 完成) は Step 5
+最後の lift step に直接使える。
+
+### Step 6-8 残作業
+
+Step 5 完成後の Step 6-8 = 約 200-300 行:
+- Step 6: N_i = ker(H → End(V_i/V_{i+1})) 定義 + ∃ i, N_i ⊊ H (coprime action chain
+  を `q := p'-element of H` に適用、faithful + ρ q = 1 で矛盾)
+- Step 7: H/N_i 商表現を `Representation.ofQuotient`
+  (`Mathlib.RepresentationTheory.Basic:354`) で構築、faithful (N_i = kernel) +
+  irreducible (V_i/V_{i+1} が simple), x̄ ȳ quadratic minpoly 確認、x̄ ȳ ≠ 1
+  (p-group + alg-closed + faithful irreducible 不可能から)
+- Step 8: `thmA2` 適用 ⇒ 2 ∣ |H/N_i|, Lagrange (`Subgroup.card_dvd_card` 等) で
+  2 ∣ |H/N_i| ∣ |H| ∣ |G|, `hodd` と矛盾.
+
+合計工数見積もり: **Step 5 残 + 6-8 = 約 400-650 行** (現セッション継続困難)
+
 ## 現状 (handoff 用、2026-05-29 更新)
 
 [`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean) ~L545-770

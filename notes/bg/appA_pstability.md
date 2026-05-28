@@ -69,6 +69,49 @@ extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
    `(1 + T)^(orderOf g) = 1 + (orderOf g) • T`, `(ρ g)^(orderOf g) = 1` と
    `(orderOf g : F) ≠ 0` から `T = 0`。次は chain (合成列) 版 で下降帰納。
 
+6. **Step 5 chain 版 + relative step** (`0b8ff45`, 2026-05-29 PM, sorry-free):
+   同ファイルに +138 行追加 (合計 ~285 行):
+   - `coprime_action_trivial_relative_step`: `W ≤ U ≤ V` で `G` が `W` 上自明 +
+     `U` 上で `ρ g u - u ∈ W` (= `U/W` 上自明) ⇒ `G` は `U` 上自明.
+     Pointwise binomial `(1+T)^n u = u + n • T u` when `T (T u) = 0` 経由。
+   - `coprime_action_trivial_chain`: chain `s : Fin (n+1) → Submodule F V`,
+     `s 0 = ⊥`, `s last = ⊤`, 各 quotient 上自明 ⇒ `V` 全体自明。
+     上向き帰納で relative step を反復適用。
+   - これで A.3 Step 5 の **chain 適用部分は完備**。残課題は次節参照。
+
+### ⛔ 2026-05-29 PM hard block: F[H]-module 合成列構築 (Step 5 残)
+
+Step 5 の残り = 「`V` を `F[↥H]`-module 視 + H-invariant composition series」を
+mathlib の `exists_compositionSeries_of_isNoetherian_isArtinian` 経由で取得を
+試みたが、**Lean 4 typeclass diamond で詰まる**:
+
+- `@JordanHolderModule.instJordanHolderLattice (Submodule R M)`
+  (`Mathlib.RingTheory.SimpleModule.Basic:552`): `[Ring R]` から
+  `Ring.toSemiring` 経由の `Module R M` を要求。
+- `Module (MonoidAlgebra F G) ρ.asModule`
+  (`Mathlib.RepresentationTheory.Basic:162`): `MonoidAlgebra.semiring`
+  (独立宣言 `MonoidAlgebra/Defs.lean:612`) 経由の Module 構造。
+- 両者が `defeq` でないため `Module` instance が unify せず
+  `JordanHolderLattice (Submodule (MonoidAlgebra F G) ρ.asModule)` を
+  `inferInstance` 取得不可。`letI`, 明示 instance 指定でも diamond 解消できず。
+
+mathlib 全体検索でも `CompositionSeries (Submodule (MonoidAlgebra ...) _)` 使用例
+ゼロ、`Subrepresentation ρ` に `JordanHolderLattice` instance なし、`restrictScalars`
+経由で合成列移送パターンもなし。
+
+#### 次に試すべき選択肢 (issue #0043 に記録)
+
+1. **`Subrepresentation ρ_H` に直接 `JordanHolderLattice` 実装** ~80-150 行
+   - Order iso `subrepresentationSubmoduleOrderIso` 経由で transfer。
+2. **finrank-induction で composition series 手構築** ~150-200 行
+   - `H-invariant W ≠ ⊥` ⇒ ∃ 極大 proper H-invariant W' ⊊ W で再帰。
+3. **合成列経由しない直接論法** ~100-150 行
+   - 「H 全 simple F[H]-subquotient 自明 ⇒ V 上自明」finrank induction 直接。
+
+合計 Step 5 残 + Step 6-8 = **400-650 行**、本セッション継続不可。詳細
+[`issues/0043-bg-appa-a3-pstability.md`](../../issues/0043-bg-appa-a3-pstability.md)
+「🚧 2026-05-29 PM」節。
+
 ### 残 (Step 4-8 = Gorenstein 8.3 mmd L2293-L2298)
 
 | Step | 内容 | 鍵新規補題 |
