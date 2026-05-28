@@ -80,9 +80,10 @@ These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
 (`OddOrder.RepresentationTheory`, §4-§8).  The §9 headline results (7.10)-(7.11)
 below do not reference them — those are pure group-theoretic statements.
 
-This first scaffold installs the (7.1) hypothesis bundle (`Hypothesis71`), the
-`ρ` map (`chiRho`), and the (7.2.a) lemma; (7.2.b) and (7.3) are stated with
-`sorry` and reserved for follow-on issues (see `issues/0042-*`). -/
+This file installs (7.1)-(7.3): the hypothesis bundle (`Hypothesis71`), the `ρ`
+map (`chiRho` / `chiRhoCF` / `chiRhoSupp`), (7.2.a) `chiRho_dadeImage_eq`,
+(7.2.b) `chiRho_norm_sq_le`, and (7.3) `chiRho_integral_inequality` — all
+sorry-free.  (7.4)-(7.9) remain as follow-on. -/
 
 section Section_7_1_to_7_3
 
@@ -375,24 +376,71 @@ theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G]
   linarith
 
 open scoped Classical in
-/-- **Peterfalvi (7.3)** (stated; proof deferred).  The integral inequality:
+/-- **Peterfalvi (7.3).**  The integral inequality:
 `|G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|² ≥ ‖χ^ρ‖²`, with equality iff `χ` is constant on each
-`aH(a)`.  Consequence of (7.2.b); see `issues/0042-*` follow-on. -/
+`aH(a)`.  Consequence of (7.2.b): define `χ₁ ∈ CF(G)` to be `χ` restricted to
+`A^τ = dadeSupport` (zero elsewhere); then `χ₁^ρ = χ^ρ` (since `aH(a) ⊆ A^τ`),
+and `‖χ₁‖² = |G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|²`, so (7.2.b) applied to `χ₁` gives the result. -/
 theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
     {A : Set G} {L : Subgroup G} [Fintype L]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
     (χ : ClassFunction G ℂ) :
     (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re ≤
       (((Nat.card G : ℂ)⁻¹ *
         ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
           ‖(χ : G → ℂ) g‖^2 : ℂ)).re := by
-  sorry
-
-/- (7.2.b) `‖χ^ρ‖² ≤ ‖χ‖²` and (7.3) the integral inequality are deferred to
-the follow-on infrastructure issue (promotion of `chiRho` to a class function on
-`L` supported on `A`, plus the normalized inner product layer over `CF(L,A)` and
-`CF(G)`).  See `issues/0042-peterfalvi-s09-rho-and-7-1-7-3.md`. -/
+  -- Define `χ₁`: `χ` restricted to `A^τ = dadeSupport` (zero off `A^τ`).
+  set χ₁ : ClassFunction G ℂ :=
+    ⟨fun g => if g ∈ H71.hyp.dadeSupport then χ g else 0,
+      fun g h => by
+        change (if h * g * h⁻¹ ∈ H71.hyp.dadeSupport then χ (h * g * h⁻¹) else 0) =
+             (if g ∈ H71.hyp.dadeSupport then χ g else 0)
+        by_cases hg : g ∈ H71.hyp.dadeSupport
+        · have hconj : h * g * h⁻¹ ∈ H71.hyp.dadeSupport :=
+            H71.hyp.conj_mem_dadeSupport hg
+          rw [if_pos hg, if_pos hconj]
+          exact χ.conj_eq g h
+        · have hconj : h * g * h⁻¹ ∉ H71.hyp.dadeSupport := fun hin =>
+            hg (H71.hyp.mem_dadeSupport_conj_iff.mp hin)
+          rw [if_neg hg, if_neg hconj]⟩ with hχ₁_def
+  have hχ₁_apply : ∀ g, (χ₁ : G → ℂ) g =
+      if g ∈ H71.hyp.dadeSupport then (χ : G → ℂ) g else 0 := fun _ => rfl
+  -- Step 1: `chiRhoCF χ₁ = chiRhoCF χ` (the `ρ` sum sees only `aH(a) ⊆ A^τ`).
+  have h_chiRhoCF_eq : H71.chiRhoCF χ₁ = H71.chiRhoCF χ := by
+    ext a
+    by_cases ha : (a : G) ∈ A
+    · rw [chiRhoCF_apply, chiRhoCF_apply,
+          H71.chiRho_of_mem _ ha, H71.chiRho_of_mem _ ha]
+      congr 1
+      refine Finset.sum_congr rfl fun x _ => ?_
+      have hmem : (a : G) * (x : G) ∈ H71.hyp.dadeSupport :=
+        H71.hyp.mem_dadeSupport_of_mem_hCoset (a := ⟨(a : G), ha⟩) x.2
+      rw [hχ₁_apply, if_pos hmem]
+    · rw [chiRhoCF_apply, chiRhoCF_apply,
+          H71.chiRho_of_not_mem _ ha, H71.chiRho_of_not_mem _ ha]
+  -- Step 2: apply (7.2.b) to `χ₁`.
+  have h72b := H71.chiRho_norm_sq_le hiso χ₁
+  rw [h_chiRhoCF_eq] at h72b
+  -- Step 3: `⟨χ₁, χ₁⟩_G = (Nat.card G)⁻¹ * ↑(Σ_{g ∈ A^τ} ‖χ g‖²)` (cast outside sum).
+  have h_inner_χ₁ :
+      ClassFunction.inner χ₁ χ₁ =
+        (Nat.card G : ℂ)⁻¹ *
+          (((∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
+              ‖(χ : G → ℂ) g‖^2 : ℝ) : ℂ)) := by
+    rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+        invOf_eq_inv]
+    congr 1
+    rw [Complex.ofReal_sum, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [hχ₁_apply]
+    by_cases hg : g ∈ H71.hyp.dadeSupport
+    · rw [if_pos hg, if_pos hg]
+      rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
+    · rw [if_neg hg, if_neg hg, star_zero, mul_zero]
+  rw [h_inner_χ₁] at h72b
+  exact h72b
 
 end Hypothesis71
 
