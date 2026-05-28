@@ -29,8 +29,18 @@ created: 2026-05-28
       **本 issue では deferred**, follow-on issue で実施。
 - [-] (7.3) も同じ理由で **deferred**, follow-on issue で実施。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S09_NonexistenceCertain` 緑、`lake build OddOrder` 全体緑。
-- [ ] (follow-on) `chiRho` を `SupportedClassFunctions ℂ A L` に promote する (HConjInvariant 仮定追加 → 既存 `S04.HConjInvariant` 利用)。
-- [ ] (follow-on) (7.2.b), (7.3) の statement + proof。
+- [x] (follow-on, 2026-05-28) `chiRho` を `SupportedClassFunctions ℂ A L` に promote:
+  - `Hypothesis71` に `hConjInvariant : hyp.HConjInvariant` フィールドを追加。
+  - `chiRho_conj_invariant` を **sorry-free** で証明: `(g : G) ∈ A` の場合, `hConjInvariant` で
+    `H(lal⁻¹) = MulAut.conj l • H(g)` に書き換え, `Subgroup.equivSMul` で sum reindex,
+    pointwise は `χ.conj_eq` (class function 性) で詰める. `(g : G) ∉ A` の場合は両側 0.
+  - `chiRhoCF : ClassFunction L ℂ` を上記不変性で定義。
+  - `chiRhoCF_support_subset` で `chiRho` の supports が `A` に入ることを確認。
+  - `chiRhoSupp : SupportedClassFunctions ℂ A L` を最終 promote。
+- [x] (follow-on) (7.2.b), (7.3) の **statement** 化 (proof は sorry, 別 issue で)。
+  - `chiRho_norm_sq_le`: `(⟨χ^ρ, χ^ρ⟩).re ≤ (⟨χ, χ⟩).re`. 要 (2.6)/(2.7).
+  - `chiRho_integral_inequality`: `(⟨χ^ρ, χ^ρ⟩).re ≤ Re(|G|⁻¹ Σ_{A^τ} |χ|²)`. (7.2.b) の系。
+- 残り (follow-on, 別 issue): (7.2.b), (7.3) の proof。
 
 ## 完了条件
 

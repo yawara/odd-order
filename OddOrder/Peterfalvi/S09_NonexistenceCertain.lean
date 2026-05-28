@@ -68,6 +68,7 @@ namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)
 open OddOrder.RepresentationTheory
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -86,8 +87,8 @@ This first scaffold installs the (7.1) hypothesis bundle (`Hypothesis71`), the
 section Section_7_1_to_7_3
 
 /-- **Peterfalvi (7.1) data.** Hypothesis (2.2) together with a chosen Dade map
-`τ : CF(L,A) → CF(G)` (Peterfalvi (2.5)/(2.6)). The reverse map `ρ` is then
-defined as `chiRho`. -/
+`τ : CF(L,A) → CF(G)` (Peterfalvi (2.5)/(2.6)) and the `H(-)`-conjugation-invariance
+condition that promotes `chiRho` to a class function on `L`. -/
 structure Hypothesis71 (G : Type*) [Group G] [Fintype G]
     (A : Set G) (L : Subgroup G) where
   /-- The underlying Peterfalvi (2.2) hypothesis. -/
@@ -96,6 +97,9 @@ structure Hypothesis71 (G : Type*) [Group G] [Fintype G]
   τ : OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L
   /-- `τ` satisfies the Peterfalvi (2.5) Dade-map equations for `hyp`. -/
   isDadeMap : OddOrder.Peterfalvi.S04.IsDadeMap hyp τ
+  /-- `H(-)` is `L`-conjugation equivariant: `H(l·a·l⁻¹) = l·H(a)·l⁻¹`.  This makes
+  the `ρ`-image of a class function on `G` itself a class function on `L`. -/
+  hConjInvariant : hyp.HConjInvariant
 
 namespace Hypothesis71
 
@@ -149,6 +153,112 @@ theorem chiRho_dadeImage_eq (H71 : Hypothesis71 G A L)
     Nat.cast_ne_zero.mpr (Nat.card_pos (α := H71.hyp.H ⟨(a : G), ha⟩)).ne'
   rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
       nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+
+/-- **L-conjugation invariance of `chiRho`.** Under `HConjInvariant` (carried by
+`Hypothesis71`), the `ρ`-image of any `χ ∈ CF(G)` is `L`-class-function valued. -/
+theorem chiRho_conj_invariant (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
+    (g h : L) : H71.chiRho χ (h * g * h⁻¹) = H71.chiRho χ g := by
+  classical
+  have hcoe_conj : ((h * g * h⁻¹ : L) : G) = (h : G) * (g : G) * (h : G)⁻¹ := by
+    push_cast; group
+  by_cases hg : (g : G) ∈ A
+  · -- (g : G) ∈ A and hence the conjugate is too
+    have hhgh : ((h * g * h⁻¹ : L) : G) ∈ A := by
+      rw [hcoe_conj]; exact H71.hyp.L_normalizes_A h hg
+    rw [H71.chiRho_of_mem _ hhgh, H71.chiRho_of_mem _ hg]
+    -- Normalize the subtype index on the LHS so it matches `HConjInvariant`.
+    have hsubeq : (⟨((h * g * h⁻¹ : L) : G), hhgh⟩ : {x : G // x ∈ A}) =
+        ⟨(h : G) * (g : G) * (h : G)⁻¹, H71.hyp.L_normalizes_A h hg⟩ :=
+      Subtype.ext hcoe_conj
+    rw [hsubeq]
+    have hConj := H71.hConjInvariant ⟨(g : G), hg⟩ h
+    -- `hConj : H ⟨(h:G)*(g:G)*(h:G)⁻¹, _⟩ = MulAut.conj (h:G) • H ⟨(g:G), hg⟩`
+    rw [hConj]
+    -- Reduce the cardinality coefficient via conjugacy.
+    rw [show Nat.card (MulAut.conj (h : G) • H71.hyp.H ⟨(g : G), hg⟩ : Subgroup G) =
+        Nat.card (H71.hyp.H ⟨(g : G), hg⟩) from
+        (Nat.card_congr (Subgroup.equivSMul (MulAut.conj (h : G))
+          (H71.hyp.H ⟨(g : G), hg⟩)).toEquiv).symm]
+    -- Reindex the sum via the same `equivSMul`.
+    congr 1
+    refine (Fintype.sum_equiv
+        (Subgroup.equivSMul (MulAut.conj (h : G)) (H71.hyp.H ⟨(g : G), hg⟩)).toEquiv
+        (fun y => χ ((g : G) * (y : G)))
+        (fun x => χ ((h : G) * (g : G) * (h : G)⁻¹ * (x : G)))
+        ?_).symm
+    intro y
+    -- After beta + unfolding the equiv apply, both sides reduce to a `χ` equation.
+    change χ ((g : G) * (y : G)) =
+      χ ((h : G) * (g : G) * (h : G)⁻¹ * ((h : G) * (y : G) * (h : G)⁻¹))
+    have hcalc : (h : G) * (g : G) * (h : G)⁻¹ * ((h : G) * (y : G) * (h : G)⁻¹) =
+        (h : G) * ((g : G) * (y : G)) * (h : G)⁻¹ := by group
+    rw [hcalc, χ.conj_eq]
+  · -- (g : G) ∉ A: both sides are zero
+    have hhgh : ((h * g * h⁻¹ : L) : G) ∉ A := by
+      intro hin
+      apply hg
+      have hcoe_inv : ((h⁻¹ : L) : G) = (h : G)⁻¹ := by push_cast; rfl
+      have key := H71.hyp.L_normalizes_A h⁻¹ hin
+      rw [hcoe_conj] at key
+      have hsimp : ((h⁻¹ : L) : G) * ((h : G) * (g : G) * (h : G)⁻¹) *
+          ((h⁻¹ : L) : G)⁻¹ = (g : G) := by rw [hcoe_inv]; group
+      rwa [hsimp] at key
+    rw [H71.chiRho_of_not_mem _ hhgh, H71.chiRho_of_not_mem _ hg]
+
+/-- The `ρ` image of `χ : CF(G)` as a class function on `L`.  This is `chiRho`
+endowed with its `L`-conjugation invariance (proved in `chiRho_conj_invariant`). -/
+noncomputable def chiRhoCF (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    ClassFunction L ℂ :=
+  ⟨H71.chiRho χ, fun g h => H71.chiRho_conj_invariant χ g h⟩
+
+@[simp] theorem chiRhoCF_apply (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
+    (a : L) : H71.chiRhoCF χ a = H71.chiRho χ a := rfl
+
+/-- The support of `chiRhoCF χ` is contained in `A ∩ L` (viewed as a subset of `L`):
+`chiRho` vanishes off `A` by definition. -/
+theorem chiRhoCF_support_subset (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    (H71.chiRhoCF χ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+  intro a ha
+  rw [ClassFunction.mem_support, chiRhoCF_apply] at ha
+  by_contra hnotA
+  exact ha (H71.chiRho_of_not_mem χ hnotA)
+
+/-- The `ρ` map as a `SupportedClassFunctions ℂ A L`: the class-function form of
+`chiRho` together with its support in `A` (Peterfalvi `CF(L,A)`). -/
+noncomputable def chiRhoSupp (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+  ⟨H71.chiRhoCF χ, H71.chiRhoCF_support_subset χ⟩
+
+@[simp] theorem chiRhoSupp_coe (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    ((H71.chiRhoSupp χ : OddOrder.Peterfalvi.S04.SupportedClassFunctions
+        (G := G) ℂ A L) : ClassFunction L ℂ) = H71.chiRhoCF χ := rfl
+
+/-- **Peterfalvi (7.2.b)** (stated; proof deferred).  `‖χ^ρ‖² ≤ ‖χ‖²` for any
+`χ ∈ CF(G)`, with equality iff `χ ∈ im τ`.  Proof requires Peterfalvi (2.6)/(2.7)
+(orthogonal projection onto `im τ`); see `issues/0042-*` follow-on. -/
+theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re ≤
+      (ClassFunction.inner χ χ).re := by
+  sorry
+
+open scoped Classical in
+/-- **Peterfalvi (7.3)** (stated; proof deferred).  The integral inequality:
+`|G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|² ≥ ‖χ^ρ‖²`, with equality iff `χ` is constant on each
+`aH(a)`.  Consequence of (7.2.b); see `issues/0042-*` follow-on. -/
+theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re ≤
+      (((Nat.card G : ℂ)⁻¹ *
+        ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
+          ‖(χ : G → ℂ) g‖^2 : ℂ)).re := by
+  sorry
 
 /- (7.2.b) `‖χ^ρ‖² ≤ ‖χ‖²` and (7.3) the integral inequality are deferred to
 the follow-on infrastructure issue (promotion of `chiRho` to a class function on
