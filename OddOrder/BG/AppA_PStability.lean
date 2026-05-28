@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.Isaacs.Ch02_Subnormality.Main
 
 /-!
 # BG Appendix A: p-Stability — Theorems A.1 and A.2
@@ -595,9 +596,36 @@ mmd L2288): `p` odd, `G` に非自明な正規 `p`-部分群が無く (= `O_p(G)
 
 詳細・着手順は issue [#0043](../../issues/0043-bg-appa-a3-pstability.md). -/
 theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
-    (h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
+    (_h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
     (h_not_pstable : ¬ IsPStable p G) :
     ¬ Odd (Nat.card G) := by
+  intro _hodd
+  -- Step 1: ¬ IsPStable を unfold + push Not で証人を取り出す
+  unfold IsPStable at h_not_pstable
+  push Not at h_not_pstable
+  obtain ⟨F, _, _, _, V, _, _, _, _, ρ, hfaithful, x, _hxp, _hxsq, hxne⟩ :=
+    h_not_pstable
+  -- Step 2: Baer-Suzuki で ⟨x, gxg⁻¹⟩ が非 p-群となる g を取得
+  -- x ≠ 1 (ρ x ≠ 1 + faithful)
+  have hx_ne_one : x ≠ 1 := by
+    intro h
+    apply hxne
+    rw [h, map_one]
+  -- x ∉ O_p(G) (= ⊥ なので x ≠ 1 から)
+  have hx_not_in_Op : x ∉ OddOrder.Isaacs.Ch01.opCore p G := by
+    rw [_h_Op_trivial]
+    intro h
+    exact hx_ne_one (Subgroup.mem_bot.mp h)
+  -- baerSuzuki_pCore.mpr の対偶で ∃ g, ⟨x, gxg⁻¹⟩ 非 p-群
+  have h_exists_g : ∃ g : G,
+      ¬ IsPGroup p ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G)) := by
+    by_contra h_all
+    push Not at h_all
+    exact hx_not_in_Op
+      ((OddOrder.Isaacs.Ch02.baerSuzuki_pCore x).mpr h_all)
+  obtain ⟨g, h_pair_not_pgroup⟩ := h_exists_g
+  -- TODO: ここから (3) H = ⟨x, gxg⁻¹⟩ の H-invariant 合成列 →
+  -- (4) coprime action → (5) ∃ N_i ⊊ H → (6) A.2 適用 で False を出す.
   sorry
 
 end PStability
