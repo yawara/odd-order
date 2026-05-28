@@ -872,9 +872,469 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         rw [h_ρq_one, map_one]
       exact hqG_ne_one hq_eq_one
     · -- Case B: ∃ i, action non-trivial. Apply A.2.
-      -- ## TODO Step 7-8: H/N_i ↷ V_{i+1}/V_i faithful + irreducible + A.2.
-      -- 詳細は issue #0043 「Case B 残作業」参照.
-      sorry
+      push Not at h_all_triv
+      obtain ⟨i, hi_lt_n, q_witness, v_witness, hv_witness, h_not_triv_witness⟩ :=
+        h_all_triv
+      -- Step 7a: N_i := {h ∈ ↥H | h acts trivially on a(i+1)/a i}
+      let N_i : Subgroup ↥H :=
+        { carrier := { h | ∀ v ∈ (a (i + 1)).toSubmodule,
+                            ρ_H h v - v ∈ (a i).toSubmodule }
+          one_mem' := by
+            intro v _
+            show ρ_H 1 v - v ∈ (a i).toSubmodule
+            simp [map_one, Module.End.one_apply]
+          mul_mem' := by
+            intro h₁ h₂ hh₁ hh₂ v hv
+            show ρ_H (h₁ * h₂) v - v ∈ (a i).toSubmodule
+            have h_decomp : ρ_H (h₁ * h₂) v - v
+                = ρ_H h₁ (ρ_H h₂ v - v) + (ρ_H h₁ v - v) := by
+              rw [map_mul, Module.End.mul_apply, map_sub]
+              abel
+            rw [h_decomp]
+            exact (a i).toSubmodule.add_mem
+              ((a i).apply_mem_toSubmodule h₁ (hh₂ v hv)) (hh₁ v hv)
+          inv_mem' := by
+            intro h hh v hv
+            show ρ_H h⁻¹ v - v ∈ (a i).toSubmodule
+            -- key: ρ_H h⁻¹ v - v = ρ_H h⁻¹ (-(ρ_H h v - v))
+            have h_apply : ρ_H h⁻¹ (-(ρ_H h v - v)) = ρ_H h⁻¹ v - v := by
+              rw [map_neg, map_sub]
+              have hh_inv : ρ_H h⁻¹ (ρ_H h v) = v := by
+                rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
+                  Module.End.one_apply]
+              rw [hh_inv]; abel
+            rw [← h_apply]
+            exact (a i).apply_mem_toSubmodule h⁻¹
+              ((a i).toSubmodule.neg_mem (hh v hv)) }
+      -- Step 7b: witness ∉ N_i
+      have h_q_notin_Ni : q_witness ∉ N_i := by
+        intro h_in
+        exact h_not_triv_witness (h_in v_witness hv_witness)
+      -- Step 7c: N_i.Normal
+      have hN_i_normal : N_i.Normal := by
+        constructor
+        intro n hn g v hv
+        show ρ_H (g * n * g⁻¹) v - v ∈ (a i).toSubmodule
+        -- ρ_H (g n g⁻¹) v = ρ_H g (ρ_H n (ρ_H g⁻¹ v))
+        -- v = ρ_H g (ρ_H g⁻¹ v)
+        -- so diff = ρ_H g (ρ_H n (ρ_H g⁻¹ v) - ρ_H g⁻¹ v)
+        have h_inv_v : ρ_H g (ρ_H g⁻¹ v) = v := by
+          rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one,
+            Module.End.one_apply]
+        have h_compute : ρ_H (g * n * g⁻¹) v - v
+            = ρ_H g (ρ_H n (ρ_H g⁻¹ v) - ρ_H g⁻¹ v) := by
+          rw [map_sub]
+          congr 1
+          · rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply]
+          · exact h_inv_v.symm
+        rw [h_compute]
+        have hgv_in : ρ_H g⁻¹ v ∈ (a (i + 1)).toSubmodule :=
+          (a (i + 1)).apply_mem_toSubmodule g⁻¹ hv
+        have h_n_act : ρ_H n (ρ_H g⁻¹ v) - ρ_H g⁻¹ v ∈ (a i).toSubmodule :=
+          hn (ρ_H g⁻¹ v) hgv_in
+        exact (a i).apply_mem_toSubmodule g h_n_act
+      -- Step 7d: V_quot setup
+      let aip1_top : Submodule F V := (a (i + 1)).toSubmodule
+      let ai_in_aip1 : Submodule F ↥aip1_top :=
+        (a i).toSubmodule.comap aip1_top.subtype
+      -- a i ⋖ a (i+1) ⇒ a i < a (i+1) as Submodule
+      have h_ai_lt_aip1 : (a i).toSubmodule < aip1_top := by
+        have h_lt : a i < a (i + 1) := (h_cov i hi_lt_n).lt
+        show (a i).toSubmodule < (a (i + 1)).toSubmodule
+        exact lt_of_le_of_ne h_lt.le
+          (fun h_eq => h_lt.ne (Subrepresentation.toSubmodule_injective h_eq))
+      have h_ai_in_aip1_ne_top : ai_in_aip1 ≠ ⊤ := by
+        intro h_eq
+        apply h_ai_lt_aip1.ne
+        apply le_antisymm h_ai_lt_aip1.le
+        intro w hw
+        have hw_subt : (⟨w, hw⟩ : ↥aip1_top) ∈ ai_in_aip1 := by rw [h_eq]; trivial
+        exact hw_subt
+      haveI hV_quot_nontriv : Nontrivial (↥aip1_top ⧸ ai_in_aip1) := by
+        rw [Submodule.Quotient.nontrivial_iff]
+        exact h_ai_in_aip1_ne_top
+      haveI hV_quot_finite : Module.Finite F (↥aip1_top ⧸ ai_in_aip1) :=
+        Module.Finite.of_surjective ai_in_aip1.mkQ ai_in_aip1.mkQ_surjective
+      -- Step 7e: ρ_quot : Representation F ↥H (↥aip1_top ⧸ ai_in_aip1)
+      have h_inv_aip1 : ∀ g : ↥H,
+          ai_in_aip1 ≤ ai_in_aip1.comap ((a (i + 1)).toRepresentation g) := by
+        intro g w hw
+        change ((a (i + 1)).toRepresentation g w).val ∈ (a i).toSubmodule
+        change ρ_H g w.val ∈ (a i).toSubmodule
+        exact (a i).apply_mem_toSubmodule g hw
+      let ρ_quot : Representation F ↥H (↥aip1_top ⧸ ai_in_aip1) :=
+        Representation.quotient (a (i + 1)).toRepresentation ai_in_aip1 h_inv_aip1
+      -- Step 7f: N_i acts trivially on V_quot (= IsTrivial ρ_quot.comp N_i.subtype)
+      haveI hN_i_triv :
+          Representation.IsTrivial (ρ_quot.comp N_i.subtype) := by
+        constructor
+        intro n
+        apply LinearMap.ext
+        intro v_q
+        refine Quotient.inductionOn' v_q (fun w => ?_)
+        -- Goal: ρ_quot ↑n (Quotient.mk' w) = 1 (Quotient.mk' w)
+        change Submodule.Quotient.mk ((a (i + 1)).toRepresentation
+                (N_i.subtype n) w) = Submodule.Quotient.mk w
+        rw [Submodule.Quotient.eq]
+        change ρ_H (N_i.subtype n) w.val - w.val ∈ (a i).toSubmodule
+        exact n.property w.val w.property
+      -- Step 7g: ρ_bar : Representation F (↥H ⧸ N_i) (V_quot)
+      haveI := hN_i_normal
+      let ρ_bar : Representation F (↥H ⧸ N_i) (↥aip1_top ⧸ ai_in_aip1) :=
+        Representation.ofQuotient ρ_quot N_i
+      -- Step 7h: ρ_bar faithful
+      have hρ_bar_faithful : Function.Injective ρ_bar := by
+        rw [injective_iff_map_eq_one]
+        intro hbar
+        refine Quotient.inductionOn' hbar (fun h => ?_)
+        intro hh_eq
+        rw [QuotientGroup.eq_one_iff]
+        intro v hv
+        have h_quot_h_eq : ρ_quot h = 1 := by
+          apply LinearMap.ext
+          intro v_q
+          refine Quotient.inductionOn' v_q (fun w => ?_)
+          -- Goal: ρ_quot h (Quotient.mk'' w) = 1 (Quotient.mk'' w)
+          -- Rewrite ρ_quot via ρ_bar:
+          have h_app : ρ_quot h (Submodule.Quotient.mk w) =
+              ρ_bar (QuotientGroup.mk h) (Submodule.Quotient.mk w) :=
+            (Representation.ofQuotient_coe_apply ρ_quot N_i h _).symm
+          -- mk equals: Submodule.Quotient.mk w = Quotient.mk'' w
+          have h_mk_eq : (Submodule.Quotient.mk w : ↥aip1_top ⧸ ai_in_aip1) =
+              Quotient.mk'' w := rfl
+          rw [← h_mk_eq, h_app]
+          -- ρ_bar (QuotientGroup.mk h) = ρ_bar (Quotient.mk'' h) = 1
+          have h_eq_qbar : (QuotientGroup.mk h : ↥H ⧸ N_i) = Quotient.mk'' h := rfl
+          rw [h_eq_qbar, hh_eq]
+        have h_app_v : ρ_quot h (Submodule.Quotient.mk ⟨v, hv⟩)
+            = Submodule.Quotient.mk ⟨v, hv⟩ := by
+          rw [h_quot_h_eq, Module.End.one_apply]
+        change Submodule.Quotient.mk ((a (i + 1)).toRepresentation h ⟨v, hv⟩)
+            = Submodule.Quotient.mk ⟨v, hv⟩ at h_app_v
+        rw [Submodule.Quotient.eq] at h_app_v
+        change ρ_H h v - v ∈ (a i).toSubmodule
+        exact h_app_v
+      -- Step 7i: ρ_bar irreducible
+      have hρ_bar_irr : ∀ U : Submodule F (↥aip1_top ⧸ ai_in_aip1),
+          (∀ g : ↥H ⧸ N_i, ∀ v ∈ U, ρ_bar g v ∈ U) → U = ⊥ ∨ U = ⊤ := by
+        intro U hU_inv
+        -- W := comap mkQ U : Submodule of aip1_top, contains ai_in_aip1
+        let W : Submodule F ↥aip1_top := Submodule.comap ai_in_aip1.mkQ U
+        have hW_ge : ai_in_aip1 ≤ W := Submodule.le_comap_mkQ ai_in_aip1 U
+        -- W invariant under (a(i+1)).toRepresentation
+        have hW_inv : ∀ h : ↥H, ∀ w ∈ W, (a (i + 1)).toRepresentation h w ∈ W := by
+          intro h w hw_W
+          show ai_in_aip1.mkQ ((a (i + 1)).toRepresentation h w) ∈ U
+          have h_step : ai_in_aip1.mkQ ((a (i + 1)).toRepresentation h w) =
+              ρ_quot h (ai_in_aip1.mkQ w) := rfl
+          rw [h_step]
+          have hw_U : ai_in_aip1.mkQ w ∈ U := hw_W
+          -- ρ_bar (QuotientGroup.mk h) (ai_in_aip1.mkQ w) = ρ_quot h (...)
+          have h_eq : ρ_quot h (ai_in_aip1.mkQ w) =
+              ρ_bar (QuotientGroup.mk h) (ai_in_aip1.mkQ w) :=
+            (Representation.ofQuotient_coe_apply ρ_quot N_i h _).symm
+          rw [h_eq]
+          exact hU_inv (QuotientGroup.mk h) (ai_in_aip1.mkQ w) hw_U
+        -- Build σ : Subrepresentation ρ_H with σ.toSubmodule = Submodule.map subtype W
+        let σ : Subrepresentation ρ_H :=
+          { toSubmodule := Submodule.map aip1_top.subtype W
+            apply_mem_toSubmodule := by
+              intro g v hv
+              obtain ⟨⟨w, hw_aip1⟩, hw_W, hval_eq⟩ := hv
+              refine ⟨(a (i + 1)).toRepresentation g ⟨w, hw_aip1⟩,
+                hW_inv g ⟨w, hw_aip1⟩ hw_W, ?_⟩
+              rw [← hval_eq]; rfl }
+        -- a i ≤ σ
+        have hai_le_σ : a i ≤ σ := by
+          intro v hv
+          have h_in_aip1 : v ∈ aip1_top := (h_cov i hi_lt_n).le hv
+          refine ⟨⟨v, h_in_aip1⟩, ?_, rfl⟩
+          show (⟨v, h_in_aip1⟩ : ↥aip1_top) ∈ W
+          exact hW_ge hv
+        -- σ ≤ a (i+1)
+        have hσ_le_aip1 : σ ≤ a (i + 1) := by
+          intro v hv
+          obtain ⟨⟨w, hw_aip1⟩, _, hval_eq⟩ := hv
+          rw [← hval_eq]; exact hw_aip1
+        -- By covering: σ = a i or σ = a (i+1)
+        have h_covby : a i ⋖ a (i + 1) := h_cov i hi_lt_n
+        rcases h_covby.eq_or_eq hai_le_σ hσ_le_aip1 with hσ_eq_ai | hσ_eq_aip1
+        · -- σ = a i ⇒ U = ⊥
+          left
+          rw [eq_bot_iff]
+          intro u hu_U
+          obtain ⟨w, rfl⟩ := ai_in_aip1.mkQ_surjective u
+          have hw_W : w ∈ W := hu_U
+          have hwval_σ : w.val ∈ σ.toSubmodule := ⟨w, hw_W, rfl⟩
+          have hσ_eq : σ.toSubmodule = (a i).toSubmodule :=
+            congr_arg Subrepresentation.toSubmodule hσ_eq_ai
+          rw [hσ_eq] at hwval_σ
+          have hw_ai : w ∈ ai_in_aip1 := hwval_σ
+          show (ai_in_aip1.mkQ w : ↥aip1_top ⧸ ai_in_aip1) ∈
+            (⊥ : Submodule F (↥aip1_top ⧸ ai_in_aip1))
+          rw [Submodule.mem_bot, Submodule.mkQ_apply,
+            Submodule.Quotient.mk_eq_zero]
+          exact hw_ai
+        · -- σ = a (i+1) ⇒ U = ⊤
+          right
+          rw [eq_top_iff]
+          intro u _
+          obtain ⟨w, rfl⟩ := ai_in_aip1.mkQ_surjective u
+          show w ∈ W
+          have hwval_aip1 : w.val ∈ aip1_top := w.property
+          have hσ_eq : σ.toSubmodule = (a (i + 1)).toSubmodule :=
+            congr_arg Subrepresentation.toSubmodule hσ_eq_aip1
+          have hwval_σ : w.val ∈ σ.toSubmodule := by
+            rw [hσ_eq]; exact hwval_aip1
+          obtain ⟨⟨w', hw'_aip1⟩, hw'_W, hval_eq⟩ := hwval_σ
+          have h_eq_w : w = ⟨w', hw'_aip1⟩ := Subtype.ext hval_eq.symm
+          rw [h_eq_w]; exact hw'_W
+      -- Step 7j: closure {x_bar, y_bar} = ⊤ in ↥H ⧸ N_i
+      let x_subt : ↥H := ⟨x, hxH⟩
+      let y_subt : ↥H := ⟨y, hyH⟩
+      let x_bar : ↥H ⧸ N_i := QuotientGroup.mk x_subt
+      let y_bar : ↥H ⧸ N_i := QuotientGroup.mk y_subt
+      -- closure {x_subt, y_subt} = ⊤ in ↥H
+      have h_gen_subt : Subgroup.closure ({x_subt, y_subt} : Set ↥H) = ⊤ := by
+        apply Subgroup.map_injective H.subtype_injective
+        rw [MonoidHom.map_closure, ← MonoidHom.range_eq_map, H.range_subtype]
+        congr 1
+        ext g
+        constructor
+        · rintro ⟨a, ha_mem, rfl⟩
+          rcases ha_mem with rfl | rfl
+          · exact Set.mem_insert _ _
+          · exact Set.mem_insert_of_mem _ rfl
+        · rintro (rfl | rfl)
+          · exact ⟨x_subt, Set.mem_insert _ _, rfl⟩
+          · exact ⟨y_subt, Set.mem_insert_of_mem _ rfl, rfl⟩
+      -- closure {x_bar, y_bar} = ⊤ in ↥H ⧸ N_i
+      have h_gen_bar : Subgroup.closure ({x_bar, y_bar} : Set (↥H ⧸ N_i)) = ⊤ := by
+        have h_eq : ({x_bar, y_bar} : Set (↥H ⧸ N_i)) =
+            (QuotientGroup.mk' N_i) '' ({x_subt, y_subt} : Set ↥H) := by
+          ext z
+          constructor
+          · rintro (rfl | rfl)
+            · exact ⟨x_subt, Set.mem_insert _ _, rfl⟩
+            · exact ⟨y_subt, Set.mem_insert_of_mem _ rfl, rfl⟩
+          · rintro ⟨a, ha_mem, rfl⟩
+            rcases ha_mem with rfl | rfl
+            · exact Set.mem_insert _ _
+            · exact Set.mem_insert_of_mem _ rfl
+        rw [h_eq, ← MonoidHom.map_closure, h_gen_subt,
+          ← MonoidHom.range_eq_map]
+        exact MonoidHom.range_eq_top_of_surjective _
+          (QuotientGroup.mk'_surjective N_i)
+      -- Step 7k: (ρ_bar x_bar - 1)² = 0 and similarly for y_bar
+      have h_lift_sq : ∀ (z_subt : ↥H)
+          (hzsq : ((ρ_H z_subt : Module.End F V) - 1) ^ 2 = 0),
+          ((ρ_bar (QuotientGroup.mk z_subt) :
+              Module.End F (↥aip1_top ⧸ ai_in_aip1)) - 1) ^ 2 = 0 := by
+        intro z_subt hzsq
+        apply LinearMap.ext
+        intro v_q
+        refine Quotient.inductionOn' v_q (fun w => ?_)
+        -- Goal: ((ρ_bar (mk z_subt) - 1) ^ 2) (mk w) = 0 (mk w)
+        -- Key fact: applying ρ_bar via ofQuotient_coe_apply: lifts to (a(i+1)).toRep z_subt
+        -- (ρ_bar (mk z_subt) - 1) (mk u) = mk ((a(i+1)).toRep z_subt u - u) for any u
+        have h_step : ∀ (u : ↥aip1_top),
+            ((ρ_bar (QuotientGroup.mk z_subt) - 1)
+              (Submodule.Quotient.mk u : ↥aip1_top ⧸ ai_in_aip1)) =
+            Submodule.Quotient.mk ((a (i + 1)).toRepresentation z_subt u - u) := by
+          intro u
+          rw [LinearMap.sub_apply, Module.End.one_apply]
+          have h_app : ρ_bar (QuotientGroup.mk z_subt) (Submodule.Quotient.mk u) =
+              Submodule.Quotient.mk ((a (i + 1)).toRepresentation z_subt u) :=
+            Representation.ofQuotient_coe_apply ρ_quot N_i z_subt _
+          rw [h_app]; rfl
+        set M : Module.End F (↥aip1_top ⧸ ai_in_aip1) :=
+          (ρ_bar (QuotientGroup.mk z_subt) - 1) ^ 2 with hM_def
+        have h_sq_app : M (Quotient.mk'' w) =
+            Submodule.Quotient.mk ((a (i + 1)).toRepresentation z_subt
+              ((a (i + 1)).toRepresentation z_subt w - w) -
+              ((a (i + 1)).toRepresentation z_subt w - w)) := by
+          show M (Submodule.Quotient.mk w) = _
+          rw [hM_def, pow_two, Module.End.mul_apply, h_step, h_step]
+        rw [h_sq_app]
+        -- The inner argument equals 0 in ↥aip1_top.
+        have h_inner_zero : (a (i + 1)).toRepresentation z_subt
+            ((a (i + 1)).toRepresentation z_subt w - w) -
+            ((a (i + 1)).toRepresentation z_subt w - w) = (0 : ↥aip1_top) := by
+          apply Subtype.ext
+          -- Compute .val
+          have h_act : ∀ (u' : ↥aip1_top),
+              ((a (i + 1)).toRepresentation z_subt u' : ↥aip1_top).val =
+              ρ_H z_subt u'.val := fun _ => rfl
+          show ((((a (i + 1)).toRepresentation z_subt
+              ((a (i + 1)).toRepresentation z_subt w - w) -
+              ((a (i + 1)).toRepresentation z_subt w - w)) : ↥aip1_top).val) =
+              (0 : ↥aip1_top).val
+          -- Step-by-step value computation
+          rw [show ((((a (i + 1)).toRepresentation z_subt
+                  ((a (i + 1)).toRepresentation z_subt w - w) -
+                  ((a (i + 1)).toRepresentation z_subt w - w)) : ↥aip1_top).val) =
+              (((a (i + 1)).toRepresentation z_subt
+                  ((a (i + 1)).toRepresentation z_subt w - w)) : ↥aip1_top).val -
+              (((a (i + 1)).toRepresentation z_subt w - w) : ↥aip1_top).val from rfl]
+          rw [show ((((a (i + 1)).toRepresentation z_subt w - w) : ↥aip1_top).val) =
+              ((a (i + 1)).toRepresentation z_subt w : ↥aip1_top).val - w.val from rfl]
+          rw [h_act ((a (i + 1)).toRepresentation z_subt w - w), h_act w]
+          show ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
+              = (0 : V)
+          -- (ρ_H z_subt - 1)² w.val = ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
+          have h_at_val :
+              ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val) = 0 := by
+            have h := congr_arg (· w.val) hzsq
+            simp only [Pi.zero_apply] at h
+            rw [pow_two, Module.End.mul_apply,
+              LinearMap.sub_apply, LinearMap.sub_apply,
+              Module.End.one_apply, Module.End.one_apply] at h
+            -- h : ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val) = 0
+            exact h
+          exact h_at_val
+        rw [h_inner_zero, Submodule.Quotient.mk_zero]
+        rfl
+      have hx_bar_sq : ((ρ_bar x_bar : Module.End F _) - 1) ^ 2 = 0 := by
+        have h_eq : ρ_H x_subt = ρ x := rfl
+        exact h_lift_sq x_subt (by rw [h_eq]; exact hxsq)
+      have hy_bar_sq : ((ρ_bar y_bar : Module.End F _) - 1) ^ 2 = 0 := by
+        have h_eq : ρ_H y_subt = ρ y := rfl
+        exact h_lift_sq y_subt (by rw [h_eq]; exact hysq)
+      -- Step 7l: x_bar ≠ 1 and y_bar ≠ 1 (PGroupFixedVector argument)
+      -- Helper: if z_subt ∈ N_i, then ↥H/N_i = ⟨other_bar⟩ p-group ⇒ contradiction
+      -- We'll show: x_subt ∉ N_i and y_subt ∉ N_i.
+      -- Argument structure (for x_subt):
+      --   Suppose x_subt ∈ N_i. Then ↥H/N_i = closure {1, y_bar} = ⟨y_bar⟩.
+      --   y_bar = image of y_subt (p-element) ⇒ y_bar is p-element ⇒ ⟨y_bar⟩ p-group.
+      --   ⇒ ↥H/N_i p-group. ρ_bar faithful irreducible on V_quot in char p.
+      --   PGroupFixedVector ⇒ ρ_bar.invariants ≠ ⊥, irreducibility ⇒ = ⊤
+      --   ⇒ ρ_bar acts trivially ⇒ ↥H/N_i = 1 ⇒ q_witness ∈ N_i, 矛盾.
+      have h_HN_not_pgroup_via : ∀ (z : G) (z_subt : ↥H) (hz_eq : (z_subt : G) = z)
+          (hzp : IsPGroup p (Subgroup.zpowers z)),
+          (Subgroup.zpowers (QuotientGroup.mk z_subt : ↥H ⧸ N_i)
+            = (⊤ : Subgroup (↥H ⧸ N_i))) → False := by
+        intro z z_subt hz_eq hzp h_top_zpow
+        -- z_bar is p-element (via order divides z's order)
+        have h_HN_pgroup : IsPGroup p (↥H ⧸ N_i) := by
+          rw [IsPGroup.iff_card] at hzp
+          obtain ⟨n, hn⟩ := hzp
+          rw [Nat.card_zpowers] at hn
+          have h_ord_z_subt : orderOf z_subt = orderOf z := by
+            have h := orderOf_injective H.subtype Subtype.coe_injective z_subt
+            simp only [Subgroup.coe_subtype] at h
+            rw [hz_eq] at h
+            exact h.symm
+          have h_pow_mk : (QuotientGroup.mk z_subt : ↥H ⧸ N_i) ^ (p ^ n) = 1 := by
+            have h_pow : z_subt ^ (p ^ n) = 1 := by
+              rw [← h_ord_z_subt] at hn
+              rw [← hn, pow_orderOf_eq_one]
+            have h_eq : (QuotientGroup.mk z_subt : ↥H ⧸ N_i) ^ (p ^ n)
+                = (QuotientGroup.mk (z_subt ^ (p ^ n)) : ↥H ⧸ N_i) := by
+              show ((QuotientGroup.mk' N_i) z_subt) ^ (p ^ n) =
+                (QuotientGroup.mk' N_i) (z_subt ^ (p ^ n))
+              rw [map_pow]
+            rw [h_eq, h_pow]; rfl
+          have h_ord_mk_dvd : orderOf (QuotientGroup.mk z_subt : ↥H ⧸ N_i) ∣ p ^ n :=
+            orderOf_dvd_of_pow_eq_one h_pow_mk
+          obtain ⟨m, _, h_ord_mk⟩ := (Nat.dvd_prime_pow Fact.out).mp h_ord_mk_dvd
+          -- Now ↥H ⧸ N_i = zpowers (mk z_subt) (by h_top_zpow), so card = orderOf mk z_subt
+          intro g
+          have h_g_in : g ∈ Subgroup.zpowers (QuotientGroup.mk z_subt : ↥H ⧸ N_i) := by
+            rw [h_top_zpow]; trivial
+          obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp h_g_in
+          -- g = (mk z_subt)^k. Order of g divides order of mk z_subt = p^m.
+          refine ⟨m, ?_⟩
+          have h_pow_g : g ^ (p ^ m) = 1 := by
+            rw [← hk]
+            rw [show ((QuotientGroup.mk z_subt : ↥H ⧸ N_i)^k)^(p^m)
+                = ((QuotientGroup.mk z_subt : ↥H ⧸ N_i)^(p^m))^k by group]
+            have : (QuotientGroup.mk z_subt : ↥H ⧸ N_i) ^ (p ^ m) = 1 := by
+              rw [← h_ord_mk, pow_orderOf_eq_one]
+            rw [this, one_zpow]
+          exact h_pow_g
+        -- ρ_bar.invariants ≠ ⊥
+        haveI hHN_finite : Finite (↥H ⧸ N_i) := inferInstance
+        have h_VQ_top_ne_bot : (⊤ : Submodule F (↥aip1_top ⧸ ai_in_aip1)) ≠ ⊥ := by
+          intro h_bot
+          obtain ⟨v, hv⟩ := exists_ne (0 : ↥aip1_top ⧸ ai_in_aip1)
+          apply hv
+          have : v ∈ (⊥ : Submodule F (↥aip1_top ⧸ ai_in_aip1)) := h_bot ▸ Submodule.mem_top
+          exact (Submodule.mem_bot _).mp this
+        have h_inv_ne_bot : ρ_bar.invariants ≠ ⊥ :=
+          h_HN_pgroup.invariants_ne_bot ρ_bar h_VQ_top_ne_bot
+        -- Irreducibility: invariants is ↥H/N_i-invariant
+        have h_inv_subm_inv : ∀ g : ↥H ⧸ N_i, ∀ v ∈ ρ_bar.invariants,
+            ρ_bar g v ∈ ρ_bar.invariants := by
+          intro g v hv
+          rw [Representation.mem_invariants] at hv ⊢
+          intro h
+          calc ρ_bar h (ρ_bar g v) = (ρ_bar h * ρ_bar g) v := by
+                rw [Module.End.mul_apply]
+            _ = ρ_bar (h * g) v := by rw [← map_mul]
+            _ = ρ_bar g (ρ_bar (g⁻¹ * h * g) v) := by
+                rw [show h * g = g * (g⁻¹ * h * g) by group, map_mul, Module.End.mul_apply]
+            _ = ρ_bar g v := by rw [hv (g⁻¹ * h * g)]
+        rcases hρ_bar_irr ρ_bar.invariants h_inv_subm_inv with h_bot | h_top
+        · exact h_inv_ne_bot h_bot
+        · -- ρ_bar.invariants = ⊤ ⇒ ρ_bar acts trivially
+          have h_triv : ∀ g : ↥H ⧸ N_i, ρ_bar g = 1 := by
+            intro g
+            apply LinearMap.ext
+            intro v
+            have hv_inv : v ∈ ρ_bar.invariants := by rw [h_top]; exact Submodule.mem_top
+            have := (Representation.mem_invariants ρ_bar v).mp hv_inv g
+            rw [Module.End.one_apply]
+            exact this
+          -- ρ_bar = 1 ⇒ ↥H/N_i = 1 (faithful)
+          have h_HN_trivial : ∀ g : ↥H ⧸ N_i, g = 1 := by
+            intro g
+            apply hρ_bar_faithful
+            rw [h_triv g, map_one]
+          -- But q_witness has nontrivial image in ↥H/N_i (since q_witness ∉ N_i)
+          have h_q_bar_ne_one : (QuotientGroup.mk q_witness : ↥H ⧸ N_i) ≠ 1 := by
+            intro h_eq; apply h_q_notin_Ni
+            exact (QuotientGroup.eq_one_iff _).mp h_eq
+          exact h_q_bar_ne_one (h_HN_trivial _)
+      have hx_bar_ne : ρ_bar x_bar ≠ 1 := by
+        intro h_eq
+        have hx_bar_one : x_bar = 1 := hρ_bar_faithful (h_eq.trans (map_one ρ_bar).symm)
+        -- closure {x_bar, y_bar} = ⊤; x_bar = 1 ⇒ ⟨y_bar⟩ = ⊤
+        have h_zpow_y : Subgroup.zpowers y_bar = (⊤ : Subgroup (↥H ⧸ N_i)) := by
+          apply le_antisymm le_top
+          rw [← h_gen_bar]
+          rw [Subgroup.closure_le]
+          intro z hz
+          rcases hz with hz | hz
+          · subst hz; rw [hx_bar_one]; exact one_mem _
+          · subst hz; exact Subgroup.mem_zpowers _
+        exact h_HN_not_pgroup_via y y_subt rfl hyp h_zpow_y
+      have hy_bar_ne : ρ_bar y_bar ≠ 1 := by
+        intro h_eq
+        have hy_bar_one : y_bar = 1 := hρ_bar_faithful (h_eq.trans (map_one ρ_bar).symm)
+        have h_zpow_x : Subgroup.zpowers x_bar = (⊤ : Subgroup (↥H ⧸ N_i)) := by
+          apply le_antisymm le_top
+          rw [← h_gen_bar]
+          rw [Subgroup.closure_le]
+          intro z hz
+          rcases hz with hz | hz
+          · subst hz; exact Subgroup.mem_zpowers _
+          · subst hz; rw [hy_bar_one]; exact one_mem _
+        exact h_HN_not_pgroup_via x x_subt rfl hxp h_zpow_x
+      -- Step 8: Apply thmA2 + Lagrange
+      haveI : Finite (↥H ⧸ N_i) := inferInstance
+      have h_HN_even : ¬ Odd (Nat.card (↥H ⧸ N_i)) :=
+        thmA2 _hp_odd ρ_bar hρ_bar_faithful hρ_bar_irr x_bar y_bar h_gen_bar
+          hx_bar_sq hx_bar_ne hy_bar_sq hy_bar_ne
+      have h_2_dvd_HN : 2 ∣ Nat.card (↥H ⧸ N_i) := by
+        rcases Nat.even_or_odd (Nat.card (↥H ⧸ N_i)) with h_even | h_odd
+        · exact h_even.two_dvd
+        · exact absurd h_odd h_HN_even
+      -- Lagrange: |↥H ⧸ N_i| ∣ |↥H| ∣ |G|
+      have h_HN_dvd_H : Nat.card (↥H ⧸ N_i) ∣ Nat.card ↥H := by
+        rw [← Subgroup.index_eq_card]
+        exact ⟨Nat.card N_i, N_i.index_mul_card.symm⟩
+      have h_H_dvd_G : Nat.card ↥H ∣ Nat.card G := H.card_subgroup_dvd_card
+      exact h_2_dvd_HN.trans (h_HN_dvd_H.trans h_H_dvd_G)
   exact hodd.not_two_dvd_nat h_two_dvd
 
 end PStability
