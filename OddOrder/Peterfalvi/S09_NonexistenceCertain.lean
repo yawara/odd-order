@@ -67,6 +67,7 @@ namespace OddOrder.Peterfalvi.S09
 
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)
+open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G]
 
@@ -75,8 +76,88 @@ variable {G : Type*} [Group G]
 These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
 (7.5), and the coherence/norm estimates (7.6)-(7.9).  Their statements live over
 `ℂ`-valued class functions and depend on the Dade isometry / coherence layer
-(`OddOrder.RepresentationTheory`, §4-§8).  They are deferred here; see the module
-docstring.  The §9 headline results (7.10)-(7.11) below do not reference them. -/
+(`OddOrder.RepresentationTheory`, §4-§8).  The §9 headline results (7.10)-(7.11)
+below do not reference them — those are pure group-theoretic statements.
+
+This first scaffold installs the (7.1) hypothesis bundle (`Hypothesis71`), the
+`ρ` map (`chiRho`), and the (7.2.a) lemma; (7.2.b) and (7.3) are stated with
+`sorry` and reserved for follow-on issues (see `issues/0042-*`). -/
+
+section Section_7_1_to_7_3
+
+/-- **Peterfalvi (7.1) data.** Hypothesis (2.2) together with a chosen Dade map
+`τ : CF(L,A) → CF(G)` (Peterfalvi (2.5)/(2.6)). The reverse map `ρ` is then
+defined as `chiRho`. -/
+structure Hypothesis71 (G : Type*) [Group G] [Fintype G]
+    (A : Set G) (L : Subgroup G) where
+  /-- The underlying Peterfalvi (2.2) hypothesis. -/
+  hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L
+  /-- The Dade map `τ : CF(L,A) → CF(G)`. -/
+  τ : OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L
+  /-- `τ` satisfies the Peterfalvi (2.5) Dade-map equations for `hyp`. -/
+  isDadeMap : OddOrder.Peterfalvi.S04.IsDadeMap hyp τ
+
+namespace Hypothesis71
+
+variable {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+
+open scoped Classical in
+/-- The **ρ map** of Peterfalvi (7.1).  For `a ∈ A`,
+`χ^ρ(a) = |H(a)|⁻¹ Σ_{x ∈ H(a)} χ(a·x)`; for `a ∉ A`, `χ^ρ(a) = 0`.
+
+Returned as a raw function `L → ℂ`; promoting it to a class function (i.e. to
+`SupportedClassFunctions ℂ A L`) requires `Hypothesis.HConjInvariant`, which is
+not yet folded into the `Hypothesis71` structure. -/
+noncomputable def chiRho (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ) :
+    L → ℂ := fun a =>
+  if ha : (a : G) ∈ A then
+    (Nat.card (H71.hyp.H ⟨(a : G), ha⟩) : ℂ)⁻¹ *
+      ∑ x : H71.hyp.H ⟨(a : G), ha⟩, χ ((a : G) * (x : G))
+  else 0
+
+open scoped Classical in
+@[simp] theorem chiRho_of_not_mem
+    (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
+    {a : L} (ha : (a : G) ∉ A) : H71.chiRho χ a = 0 := by
+  simp [chiRho, ha]
+
+open scoped Classical in
+theorem chiRho_of_mem (H71 : Hypothesis71 G A L) (χ : ClassFunction G ℂ)
+    {a : L} (ha : (a : G) ∈ A) :
+    H71.chiRho χ a =
+      (Nat.card (H71.hyp.H ⟨(a : G), ha⟩) : ℂ)⁻¹ *
+        ∑ x : H71.hyp.H ⟨(a : G), ha⟩, χ ((a : G) * (x : G)) := by
+  simp [chiRho, ha]
+
+open scoped Classical in
+/-- **Peterfalvi (7.2.a).** The Dade map `τ` has the `ρ` map as a left inverse on
+`CF(L,A)`: for every `α ∈ CF(L,A)` and `a ∈ A`, `α^{τρ}(a) = α(a)`. -/
+theorem chiRho_dadeImage_eq (H71 : Hypothesis71 G A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L)
+    {a : L} (ha : (a : G) ∈ A) :
+    H71.chiRho (H71.τ α) a = (α : ClassFunction L ℂ) a := by
+  rw [H71.chiRho_of_mem _ ha]
+  -- Each summand equals `α a`, via `IsDadeMap.map_eq_of_mem_hCoset` on `a · x ∈ aH(a)`.
+  have hpt : ∀ x : H71.hyp.H ⟨(a : G), ha⟩,
+      H71.τ α ((a : G) * (x : G)) = (α : ClassFunction L ℂ) a := by
+    intro x
+    have hmem : (a : G) * (x : G) ∈ H71.hyp.hCoset ⟨(a : G), ha⟩ := ⟨x, x.2, rfl⟩
+    have hmap := H71.isDadeMap.map_eq_of_mem_hCoset α ⟨(a : G), ha⟩ hmem
+    rw [hmap]
+  simp_rw [hpt]
+  have hne : (Nat.card (H71.hyp.H ⟨(a : G), ha⟩) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (Nat.card_pos (α := H71.hyp.H ⟨(a : G), ha⟩)).ne'
+  rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+      nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+
+/- (7.2.b) `‖χ^ρ‖² ≤ ‖χ‖²` and (7.3) the integral inequality are deferred to
+the follow-on infrastructure issue (promotion of `chiRho` to a class function on
+`L` supported on `A`, plus the normalized inner product layer over `CF(L,A)` and
+`CF(G)`).  See `issues/0042-peterfalvi-s09-rho-and-7-1-7-3.md`. -/
+
+end Hypothesis71
+
+end Section_7_1_to_7_3
 
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
