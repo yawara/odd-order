@@ -25,6 +25,62 @@ issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) クローズ
 
 A.3 / A.4(a/b/c) / A.5 は別 issue で継続(下記表「未実装」を更新予定)。
 
+## 🚧 2026-05-29 — A.3 進捗 (Step 1-3 完了 + 助補題、Step 4-8 = 残 sorry)
+
+[`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean)
+末尾 (~ L546-768) に **`IsPStable` def + `thmA3` statement + Step 1-3 (witness
+extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
+[#0043](../../issues/0043-bg-appa-a3-pstability.md) 進行中。残 = **Step 4-8
+(合成列 + coprime action + p-group irreducible + A.2 適用)** = `h_two_dvd : 2 ∣ |G|` 1 sorry。
+
+### 実装済 (commits `b8ab8a9`, `33bb1df`, `7b6158f`, `1921dec`)
+
+1. **`IsPStable` 定義** (`b8ab8a9`):
+   ```lean
+   def IsPStable (p : ℕ) (G : Type*) [Group G] : Prop :=
+     ∀ ⦃F : Type*⦄ [Field F] [CharP F p] [IsAlgClosed F]
+       ⦃V : Type*⦄ [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+       (ρ : Representation F G V), Function.Injective ρ →
+       ∀ x : G, IsPGroup p (Subgroup.zpowers x) →
+         ((ρ x : Module.End F V) - 1) ^ 2 = 0 → ρ x = 1
+   ```
+   `O_p(G) = 1` / `p odd` は使う側 (A.3/A.4) で hypothesis として渡す方針。
+
+2. **`thmA3` statement + Step 1-2** (`33bb1df`): `¬ IsPStable` ⇒ 証人取り出し、
+   Baer-Suzuki (= repo `Isaacs.Ch02.baerSuzuki_pCore`) で `O_p(G) = ⊥` + `x ≠ 1`
+   から `∃ g, ⟨x, gxg⁻¹⟩` 非 p-群。
+
+3. **共役元 helpers** (`7b6158f`, AppA_PStability.lean L562-636):
+   - `representation_conj_sub_one`: `ρ(gxg⁻¹) - 1 = ρg (ρx - 1) ρg⁻¹`
+   - `representation_conj_quadratic`: `(ρx - 1)² = 0 ⇒ (ρ(gxg⁻¹) - 1)² = 0`
+   - `representation_conj_ne_one`: `ρx ≠ 1 ⇒ ρ(gxg⁻¹) ≠ 1`
+   - `isPGroup_zpowers_conj`: `IsPGroup p ⟨x⟩ ⇒ IsPGroup p ⟨gxg⁻¹⟩`
+     (`SemiconjBy.orderOf_eq` + `IsPGroup.iff_card`)
+
+4. **Step 3 (y ∈ K) + H setup** (`1921dec`): `y := g x g⁻¹` で
+   `hysq, hyne, hyp` を helpers から取得、`H := closure {x, y}` 非 p-群
+   (`hH_not_pgroup`) + `hxH`, `hyH` ∈ H 准備。残 = `h_two_dvd : 2 ∣ |G|` のみ。
+
+### 残 (Step 4-8 = Gorenstein 8.3 mmd L2293-L2298)
+
+| Step | 内容 | 鍵新規補題 |
+|---|---|---|
+| 4 | V を `F[H]`-module 視 + H-invariant 合成列 `V = V_1 ⊋ V_2 ⊋ … ⊋ V_{m+1} = 0` | `RingTheory.SimpleModule` / `Order.JordanHolder.CompositionSeries` の Submodule-restricted 版 |
+| 5 | 全 i で `N_i := ker(H → End(V_i/V_{i+1})) = H` 仮定 ⇒ H の p'-subgroup Q が全 quotient 上自明 ⇒ V 上自明 (Maschke + Jordan-Hölder) ⇒ ρ faithful と矛盾、∴ ∃ i, N_i ⊊ H | **coprime action** = Gorenstein Thm 3.4 翻訳: `coprime_action_trivial_of_trivial_on_quotients` |
+| 6 | その i で H̄ := H/N_i, ρ̄ faithful irreducible on V_i/V_{i+1}, H̄ = ⟨x̄, ȳ⟩ | quotient representation `H/N_i → End_F (V_i/V_{i+1})` (新規定義 or `Representation.quotient`) |
+| 7 | x̄, ȳ ≠ 1: x̄ = 1 ⇒ H̄ = ⟨ȳ⟩ p-group, alg-closed char p faithful irreducible 不可能 (= Gorenstein Thm 1.2) ⇒ H̄ = 1 矛盾 | **p-group irreducible faithful → trivial** = Gorenstein Thm 1.2 帰結: `IsPGroup.faithful_irreducible_in_charP_trivial` (repo `PGroupFixedVector.invariants_ne_bot` 系) |
+| 8 | A.2 (`thmA2`) を H̄ ↷ V_i/V_{i+1} に適用 ⇒ ¬ Odd \|H̄\| ⇒ 2 ∣ \|H̄\| ∣ \|H\| ∣ \|G\| | 既存 `thmA2` を呼ぶだけ |
+
+### 工数見積
+
+- Step 4 (composition series): mathlib `CompositionSeries` を Submodule lattice 上で具体化、~50-80 行 (mathlib 既存 API 探索 + 適用)
+- Step 5 (coprime action): Maschke ベースの induction、`Mathlib.RepresentationTheory.Maschke` 利用、~80-120 行
+- Step 6 (quotient rep): ~30-50 行
+- Step 7 (p-group irreducible): `PGroupFixedVector.invariants_ne_bot` 系 + irreducible 仮定で短い、~30 行
+- Step 8 (A.2 適用 + Lagrange): ~30-50 行
+
+**合計目安**: ~300-400 行 (中規模 1 sub-issue ~~2-3 セッション分)。
+
 ## ⚠️ 2026-05-28 訂正: A.4(b)/(c) は Isaacs import では出ない(7.3 reduction が要る)
 
 下記 TL;DR / 形式化戦略 (L78-90「選択肢1 推奨: Isaacs 7.6 import for A.4(b)」) は**過度に楽観的**。
