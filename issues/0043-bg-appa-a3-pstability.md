@@ -22,7 +22,68 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 §0.2 参照. mini-roadmap は
 [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
 
-## 🚧 2026-05-29 PM — Step 4 完了 + Step 5 hard block 判明
+## 🚧 2026-05-29 evening — Step 4-6 Case A 完了 + Case B 残
+
+### `22e281d`: Step 5 chain + Step 6 Case A (coprime contradiction) sorry-free
+
+mathlib JordanHolderLattice diamond を回避し、`Subrepresentation ρ_H` 上で
+`exists_covBy_seq_of_wellFoundedLT_wellFoundedGT` を直接適用するルートが成功:
+
+- **Step 5 (chain setup, ~25 行)**: `ρ_H := ρ.comp H.subtype`,
+  `WellFoundedLT/GT (Subrepresentation ρ_H)` を `StrictMono.wellFoundedLT/GT`
+  + `toSubmodule_injective` で取得。`exists_covBy_seq_of_wellFoundedLT_wellFoundedGT`
+  で `a : ℕ → Subrepresentation ρ_H`, `a 0 = ⊥`, `a n = ⊤`, 各 step covering.
+- **Step 6 Case A (~60 行)**: `∀ i < n, H が a (i+1)/a i 上自明` 仮定 ⇒ 矛盾.
+  - 素因数分解 ⇒ ∃ prime r ≠ p with r ∣ |↥H|
+  - Cauchy (`exists_prime_orderOf_dvd_card'`) で `∃ q : ↥H, orderOf q = r`
+  - `Q := Subgroup.zpowers q : Subgroup ↥H`, `(|Q| : F) = r ≠ 0`
+  - `coprime_action_trivial_chain` を `ρ_Q := ρ_H.comp Q.subtype` に適用
+  - ρ q = 1 ⇒ q = 1 (faithful) ⇒ orderOf q = 1 と矛盾.
+
+### 残 Case B (Step 7-8) ≈ 150-200 行
+
+`h_two_dvd` 内、`h_all_triv` 否定 case (Case B): ∃ i < n, ∃ h ∈ H, ∃ v ∈ a(i+1),
+ρ_H h v - v ∉ a i。この i で:
+
+| 工程 | 工数 | 鍵 API |
+|---|---|---|
+| `N_i : Subgroup ↥H` 定義 (kernel of action on quotient) | ~20 行 | 手構築 (one_mem, mul_mem, inv_mem) |
+| `N_i.Normal` instance | ~10 行 | 共役不変性の直接証明 |
+| `V_quot := (a(i+1)).toSubmodule ⧸ (a i comap subtype)` | ~10 行 | `Submodule.Quotient` |
+| Nontrivial V_quot (since a i ⋖ a(i+1)) | ~15 行 | 等式 = covering の strict 性 |
+| Module.Finite F V_quot | ~5 行 | infer / `Module.Finite.quotient` |
+| `ρ_quot : Representation F ↥H V_quot` | ~15 行 | `Representation.quotient` + invariance |
+| `ρ_bar : Representation F (↥H ⧸ N_i) V_quot` | ~10 行 | `Representation.ofQuotient` + IsTrivial |
+| ρ_bar faithful | ~25 行 | `N_i = kernel` から; quotient injection |
+| ρ_bar irreducible | ~30 行 | covering ⇒ 中間 H-invariant 無し ⇒ V_quot simple |
+| x̄ ȳ generators (closure_eq) | ~20 行 | image of `Subgroup.closure {x,y}` |
+| x̄ ≠ 1, ȳ ≠ 1 | ~30 行 | 反例: cyclic p-group faithful irreducible char p 不可能 (`IsPGroup.invariants_ne_bot` + 既約) |
+| x̄, ȳ quadratic minpoly | ~15 行 | image via quotient map preserves `(_-1)² = 0` |
+| `thmA2` 適用 + Lagrange | ~20 行 | `Subgroup.card_dvd_card` 等 |
+
+合計 ~225 行 (現実 +α). **本セッションでは未完, sorry 残置**。
+
+### Implementation strategy notes (継続用)
+
+- N_i 構築の `mul_mem'`: `h_a i ≤ h_a (i+1)` を使用 (covering の前段). `ρ_H (h₁*h₂) v - v = ρ_H h₁ (ρ_H h₂ v) - v` を `ρ_H h₁ (ρ_H h₂ v - v) + (ρ_H h₁ v - v)` に展開、両項とも `a i` に入る (前者: `a i` H-invariant + 後者: `ρ_H h₁ v - v ∈ a i` since `v ∈ a(i+1)` and `h₁ ∈ N_i`).
+- ρ_bar faithful: `∀ h : ↥H, ρ_quot h = 1 ↔ h ∈ N_i`. 商表現 faithful = ker(ρ_quot) ⊆ N_i (auto from definition).
+- Irreducible argument: `V_quot` の H-invariant 部分は `Subrepresentation ρ_H` の `a i ≤ W ≤ a(i+1)` 範囲に対応 (correspondence via mapQ); covering ⇒ W = a i または W = a(i+1).
+- `x̄ ≠ 1` argument (詳細):
+  - 仮 x̄ = 1 ⇒ x ∈ N_i.
+  - H̄ = ↥H/N_i = ⟨x̄, ȳ⟩ = ⟨ȳ⟩ (image of closure {x,y} = closure {x̄, ȳ} = closure {1, ȳ} = ⟨ȳ⟩).
+  - ȳ は image of y, y は p-element ⇒ ȳ も p-element.
+  - H̄ = ⟨ȳ⟩ cyclic p-group.
+  - ρ_bar : H̄ → End_F V_quot faithful irreducible nontrivial (since N_i ⊊ H by case B condition).
+  - V_quot は alg-closed F char p 上 nontrivial finite-dim.
+  - `IsPGroup.invariants_ne_bot` (PGroupFixedVector) ⇒ H̄-invariants ≠ ⊥.
+  - H̄-invariants は H̄-invariant submodule, 既約より = ⊤.
+  - ∴ H̄ 全要素 が V_quot 全要素 fix ⇒ ρ_bar = 1.
+  - faithful ⇒ H̄ = 1.
+  - H̄ = 1 ⇒ N_i = ↥H, **矛盾** with N_i ⊊ ↥H (case B 仮定).
+
+このノートを次セッションで Case B を埋める際の roadmap として使用.
+
+## 🚧 2026-05-29 PM — Step 4 完了 + Step 5 hard block 判明 (初期試行記録)
 
 ### 進捗 (`0b8ff45`)
 

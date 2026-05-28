@@ -79,7 +79,23 @@ extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
      上向き帰納で relative step を反復適用。
    - これで A.3 Step 5 の **chain 適用部分は完備**。残課題は次節参照。
 
-### ⛔ 2026-05-29 PM hard block: F[H]-module 合成列構築 (Step 5 残)
+### ✅ 2026-05-29 evening: Step 5 chain + Step 6 Case A 完了 (`22e281d`)
+
+mathlib JordanHolderLattice diamond を `Subrepresentation ρ_H` lattice 上で直接
+`exists_covBy_seq_of_wellFoundedLT_wellFoundedGT` を呼ぶことで回避:
+
+- `WellFoundedLT/GT (Subrepresentation ρ_H)` を `StrictMono.wellFoundedLT/GT`
+  + `Subrepresentation.toSubmodule_injective` で取得.
+- 得られた `a : ℕ → Subrepresentation ρ_H` を `(a i).toSubmodule : Submodule F V`
+  で取り出す.
+- Step 6 Case A (`∀ i 自明 ⇒ 矛盾`) を `coprime_action_trivial_chain` で実装
+  (素因数分解 + Cauchy + Q := zpowers q + 自明性持ち上げで faithful 矛盾).
+
+Case B (`∃ i, N_i ⊊ ↥H ⇒ A.2 適用 ⇒ 2 ∣ |H| ∣ |G|`) は次セッション (≈ 150-200 行)
+で issue [`#0043`](../../issues/0043-bg-appa-a3-pstability.md) 「残 Case B」節
+roadmap に沿って実装.
+
+### ⛔ 2026-05-29 PM hard block: F[H]-module 合成列構築 (初期試行記録、回避済)
 
 Step 5 の残り = 「`V` を `F[↥H]`-module 視 + H-invariant composition series」を
 mathlib の `exists_compositionSeries_of_isNoetherian_isArtinian` 経由で取得を
