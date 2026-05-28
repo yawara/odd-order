@@ -37,7 +37,33 @@
 - §0-#3 で挙げた「`Clifford.lean`=ℂ character / `EigenspaceUnderCyclicAction`=Prop 2.4 ℂ なのでカバーせず」は誤り(これらは元から不要だった)。
 - **正味**: A.2 = ❌ 未実装である事実は変わらず、しかし**証明本体は Gorenstein 翻訳**(再構成ではない)で、見積もりは大幅軽量化(中規模 rep theory → 中規模線形代数翻訳)。
 - ポリシー(CLAUDE.md 2026-05-28 訂正): 本プロジェクトは Gorenstein を**全形式化しない**が、**BG の行間を埋めるための原文参照**として `references/gorenstein/` を使う。A.2/A.3/A.4 がまさにその典型用途。
-- 引き継ぎ issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md) も同 refinement に同期(「Gorenstein 原典 references/ に無い」警告を撤去、proof strategy を linear-algebra 翻訳へ書き換え)。
+- 引き継ぎ issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) も同 refinement に同期(「Gorenstein 原典 references/ に無い」警告を撤去、proof strategy を linear-algebra 翻訳へ書き換え)。
+
+### 0.2 補追: 2026-05-28 (late PM, 実装完了) — A.2 までクローズ
+
+[`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean) を新規作成
+(~545 行)。**A.1** (`thmA1`), **dim reduction lemma**
+(`quadratic_two_generated_irreducible_finrank_eq_two`), **A.2** (`thmA2`) を全て
+sorry-free / axiom-clean、`lake build` green。issue
+[`#0041`](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) クローズ。
+
+**§0/§0.1 で予測した最大リスクは回避**: Step 4 = Jordan canonical form 自前実装
+~200 行 → spike で発見の **「eigenvector 1 個で十分」**精密化により
+`Module.End.exists_eigenvalue` だけで完結(~30-50 行)。 Gorenstein 8.1 mmd L2210–L2240
+の Step 4-5 で proof が実際使うのは「`S` 最初列が `(λ, 0, …)ᵀ` (e₁ が eigenvector)」
+だけで、Jordan canonical form 全体の構造は不要だった、という観察に基づく。詳細は
+[`notes/bg/appA_pstability.md`](../bg/appA_pstability.md) 冒頭の「★ 2026-05-28 (late PM) 追補」+
+issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) 「★ Step 4 の精密化」節。
+
+ゲート構造の進捗:
+
+```
+Thm 6.2 ⟸ App.B Thm B.4 ⟸ Thm A.5 ⟸ Thm A.4(c) ⟸ Thm A.3 ⟸ Thm A.2 ✅ ⟸ Thm A.1 ✅
+                                                                      ↑ ここまで完了
+```
+
+残: A.3 → A.4(a/b/c) → A.5 → App.B(B.1-B.4) → §6 Thm 6.2 を L(S) 化 → §7-§16 を
+L(S) 化. 別 issue として継続予定.
 
 ## 1. 問題: 6.1/6.2 は深く、Isaacs に無い
 

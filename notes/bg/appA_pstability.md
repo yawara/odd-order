@@ -5,6 +5,26 @@
 ROADMAP 上の位置: **Phase 2a 第 2 波** (Phase 1 Isaacs Ch.7 完成必須, §6 と並行 or 直後).
 役割: **Isaacs Ch.7 と BG §6-§16 の橋渡し**; **p-stability 概念の正式定義**; **Thm A.4(b) ≡ Isaacs Thm 7.6 の odd-order 再述**.
 
+## ✅ 2026-05-28 (late PM, 実装完了) — A.1 / dim reduction / A.2 sorry-free
+
+[`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean) (~545 行)
+に **A.1**, **A.2 dim reduction lemma** (`quadratic_two_generated_irreducible_finrank_eq_two`),
+**A.2** (`thmA2`) を実装、すべて sorry-free / axiom-clean、`lake build` green。
+issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) クローズ。
+
+実装ハイライト:
+- **A.1**: `odd_two_dim_sylow_abelian` (BG Thm 2.6 = repo S02) + `Subgroup.Normal.of_commutator_le`
+  + `IsPGroup.invariants_ne_bot` (= `PGroupFixedVector`) で C_V(P) ≠ ⊥, G-不変、既約 ⇒ P 自明、
+  忠実より P = ⊥, `Sylow.ne_bot_of_dvd_card` と矛盾。
+- **dim reduction**: Gorenstein 8.1 mmd L2210-L2240 の 5 step 翻訳。
+  Step 4 を ★ **「eigenvector 1 個」** (= `Module.End.exists_eigenvalue` on
+  `T := (Ty * Tx).restrict : V₂ →ₗ V₂`) に精密化し、Jordan canonical form の
+  自前実装 (~200 行) を回避。
+- **A.2**: dim reduction + `sub_pow_char_of_commute` で `(ρ x)^p = 1` から
+  `orderOf x = p` を得て `p ∣ |G|`、A.1 と矛盾。Dickson 不要。
+
+A.3 / A.4(a/b/c) / A.5 は別 issue で継続(下記表「未実装」を更新予定)。
+
 ## ⚠️ 2026-05-28 訂正: A.4(b)/(c) は Isaacs import では出ない(7.3 reduction が要る)
 
 下記 TL;DR / 形式化戦略 (L78-90「選択肢1 推奨: Isaacs 7.6 import for A.4(b)」) は**過度に楽観的**。
