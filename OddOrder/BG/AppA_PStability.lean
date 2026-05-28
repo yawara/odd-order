@@ -502,7 +502,43 @@ theorem thmA2
     (hx : ((ρ x : Module.End F V) - 1) ^ 2 = 0) (hxne : ρ x ≠ 1)
     (hy : ((ρ y : Module.End F V) - 1) ^ 2 = 0) (hyne : ρ y ≠ 1) :
     ¬ Odd (Nat.card G) := by
-  sorry
+  intro hodd
+  -- Step 1: dim V = 2 (from dim reduction lemma)
+  have hdim : Module.finrank F V = 2 :=
+    quadratic_two_generated_irreducible_finrank_eq_two ρ hfaithful hirr
+      x y hgen hx hxne hy hyne
+  -- Step 2: (ρ x)^p = 1 via Frobenius
+  haveI : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
+  have hp_prime : p.Prime := Fact.out
+  -- (ρ x - 1)^p = (ρ x - 1)^(p-2) * (ρ x - 1)^2 = (ρ x - 1)^(p-2) * 0 = 0
+  have hN_p_zero : ((ρ x : Module.End F V) - 1) ^ p = 0 := by
+    have hp_two : 2 ≤ p := hp_prime.two_le
+    calc ((ρ x : Module.End F V) - 1) ^ p
+        = ((ρ x : Module.End F V) - 1) ^ (p - 2) * ((ρ x : Module.End F V) - 1) ^ 2 := by
+          rw [← pow_add]; congr 1; omega
+      _ = ((ρ x : Module.End F V) - 1) ^ (p - 2) * 0 := by rw [hx]
+      _ = 0 := mul_zero _
+  -- (ρ x - 1)^p = (ρ x)^p - 1^p (Frobenius); = 0 ⇒ (ρ x)^p = 1
+  have hρx_p : (ρ x : Module.End F V) ^ p = 1 := by
+    have h1 : ((ρ x : Module.End F V) - 1) ^ p =
+        (ρ x : Module.End F V) ^ p - (1 : Module.End F V) ^ p :=
+      sub_pow_char_of_commute p (Commute.one_right _)
+    rw [hN_p_zero, one_pow, eq_comm, sub_eq_zero] at h1
+    exact h1
+  -- Step 3: x has order dividing p; ≠ 1 ⇒ order = p (p prime); so p ∣ |G|
+  have hxp_one : x ^ p = 1 := by
+    apply hfaithful
+    rw [map_pow, map_one]; exact hρx_p
+  have hox_dvd_p : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one hxp_one
+  have hx_ne_one : x ≠ 1 := fun h => hxne (by rw [h, map_one])
+  have hox_ne_one : orderOf x ≠ 1 := fun h => hx_ne_one (orderOf_eq_one_iff.mp h)
+  have hox_eq_p : orderOf x = p := by
+    rcases hp_prime.eq_one_or_self_of_dvd (orderOf x) hox_dvd_p with h | h
+    · exact absurd h hox_ne_one
+    · exact h
+  have hp_dvd : p ∣ Nat.card G := hox_eq_p ▸ orderOf_dvd_natCard x
+  -- Step 4: A.1 (|G| odd ⇒ p ∤ |G|) で矛盾
+  exact thmA1 hodd hdim ρ hfaithful hirr hp_dvd
 
 end ThmA2
 
