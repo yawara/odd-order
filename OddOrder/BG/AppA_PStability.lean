@@ -542,4 +542,64 @@ theorem thmA2
 
 end ThmA2
 
+/-! ## p-stability: 定義 + A.3 (no normal p-subgroup + not p-stable ⇒ |G| even) -/
+
+section PStability
+
+/-- **p-stability** (Gorenstein 1968 p.105 definition, BG App.A 用途).
+
+`G` が `p`-stable とは: `F` の alg-closed char `p` 上の有限次元 nontrivial vector space
+`V` への **忠実な representation** `ρ : G →* End F V` で、任意の `p`-element `x : G` が
+**quadratic minimal polynomial** `(X - 1)²` を持つ(= `(ρ x - 1)² = 0` ∧ `ρ x ≠ 1`)
+ことは無い、というもの.
+
+Gorenstein は `GF(p^n)` 上の faithful rep で定義するが、`GF(p^n) → F` 拡張 (= base change)
+で alg closure に持ち上がり同値. Lean では alg closure 版で statement.
+
+**注意**: Gorenstein の p-stability は通常「`G` has no nontrivial normal `p`-subgroups」
+かつ `p` odd の context で定義する. 本 def はそれらを前提に組み込まず、`IsPStable` を
+使う側の定理 (A.3, A.4) で hypothesis として渡す方針 (def シンプル + 整合性).
+
+下流: A.3, A.4(a) で使用. -/
+def IsPStable (p : ℕ) (G : Type*) [Group G] : Prop :=
+  ∀ ⦃F : Type*⦄ [Field F] [CharP F p] [IsAlgClosed F]
+    ⦃V : Type*⦄ [AddCommGroup V] [Module F V] [Module.Finite F V] [Nontrivial V]
+    (ρ : Representation F G V), Function.Injective ρ →
+    ∀ x : G, IsPGroup p (Subgroup.zpowers x) →
+      ((ρ x : Module.End F V) - 1) ^ 2 = 0 → ρ x = 1
+
+/-- **BG Theorem A.3** (mmd L4476, = Gorenstein Ch.3 §8 Thm 8.3 weakening,
+mmd L2288): `p` odd, `G` に非自明な正規 `p`-部分群が無く (= `O_p(G) = 1`),
+`G` が `p`-stable でないなら `|G|` は偶.
+
+**証明 (= Gorenstein 8.3 翻訳, A.2 を 8.1 の代わりに使う, mmd L2290-L2310)**:
+1. `¬ IsPStable p G` ⇒ ∃ ρ faithful, ∃ x p-element with quadratic minpoly.
+2. `K := x` の conjugacy class. 全 K の元は同じ性質.
+3. **Baer-Suzuki (Gorenstein 8.2)** で `O_p(G) = 1` + K で全 pair p-群を生成」が
+   不可能 ⇒ ∃ y ∈ K, `H := ⟨x, y⟩` は p-群でない.
+4. H-invariant chain `V ⊃ V_2 ⊃ ... ⊃ 0` で H が各 quotient 上既約.
+5. `N_i := ker(H → End(V_i/V_{i+1}))`. ∃ i, `N_i ⊊ H` (反例: 全 N_i = H ⇒ H の
+   p'-部分群は全 quotient 上自明 → V 上自明 (coprime action) → faithful より = 1 ⇒
+   H p-群、矛盾).
+6. `H/N_i` faithful irreducible action on `V_i/V_{i+1}`, x̄, ȳ quadratic minpoly.
+7. **A.2 (`quadratic_two_generated_irreducible_finrank_eq_two` + closure_eq via x̄, ȳ
+   generators)** で `|H/N_i|` 偶.
+8. `2 ∣ |H/N_i| ∣ |H| ∣ |G|` ⇒ `|G|` 偶. ∎
+
+依存:
+- ✅ `OddOrder.Isaacs.Ch01.opCore` (= `O_p(G)`)
+- ✅ `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` (Baer-Suzuki 単一元 form)
+- ✅ `quadratic_two_generated_irreducible_finrank_eq_two` (= A.2)
+- ❌ H-invariant chain + quotient representation (新規)
+- ❌ p'-element trivial on quotients ⇒ trivial on V (coprime action 結果)
+
+詳細・着手順は issue [#0043](../../issues/0043-bg-appa-a3-pstability.md). -/
+theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
+    (h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥)
+    (h_not_pstable : ¬ IsPStable p G) :
+    ¬ Odd (Nat.card G) := by
+  sorry
+
+end PStability
+
 end OddOrder.BG.AppA
