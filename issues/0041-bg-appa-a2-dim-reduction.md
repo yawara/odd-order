@@ -8,6 +8,10 @@ created: 2026-05-28
 # BG App.A A.2 / Gorenstein 3.8.1 次元縮約 (char-p 二次既約 ⇒ dim V = 2)
 
 > **この issue は単独で読めるように書いてある**(別セッション引き継ぎ用)。前提知識ゼロから着手できる。
+> **2026-05-28 (late PM) 更新**: `references/gorenstein/` 追加で Gorenstein 3.8.1 の証明本体
+> (mmd L2204+) が読めるようになった。本 issue は**証明の再構成ではなく、Gorenstein 原文の
+> Lean への翻訳**になった。内容は初等線形代数(rank-nullity / Jordan / ブロック行列 / 置換共役)
+> で、当初想定の「char-p 加群表現論(primitivity / module-Clifford / tensor 分解)」は不要だった。
 
 ## 背景 — なぜこれが要るか
 
@@ -16,14 +20,12 @@ _Local Analysis for the Odd Order Theorem_) の局所解析パートを形式化
 **BG Thm 6.2 (Glauberman の normal-J / Z(J) 定理)** = `Z(J(S))·O_{p'}(G) ⊴ G` があり、
 §7–§9 (Uniqueness) で 7+ 箇所引用される。
 
-問題: **本プロジェクトは Gorenstein 1968 "Finite Groups" を一次参照に使わない方針**
-(CLAUDE.md。BG の "**G**, Thm X.Y.Z" 引用は Isaacs FGT の対応定理に読み替える)。ところが
-**Isaacs FGT は Glauberman Z(J)-定理を明示的に省く**(Isaacs p.217)。⇒ Thm 6.2 は読み替え
-不能。解決ルートとして **BG App.A (p-Stability) + App.B (Puig L(S))** を採る(設計決定:
-[`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md))。
+問題: **Isaacs FGT は Glauberman Z(J)-定理を明示的に省く**(Isaacs p.217)。⇒ Thm 6.2 は
+Isaacs へ「読み替え」不能。解決ルートとして **BG App.A (p-Stability) + App.B (Puig L(S))** を採る
+(設計決定: [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md))。
 
 2026-05-28 の kernel-connection spike で、そのルートの **唯一の実質的な数学的欠落** が
-本 issue の対象だと判明した(同ノート **§0** 参照)。依存連鎖:
+本 issue の対象だと判明した(同ノート **§0**)。依存連鎖:
 
 ```
 Thm 6.2 ⟸ App.B Thm B.4 ⟸ Thm A.5 ⟸ Thm A.4(c) ⟸ Thm A.3 ⟸ Thm A.2 ⟸ Thm A.1
@@ -33,22 +35,22 @@ Thm 6.2 ⟸ App.B Thm B.4 ⟸ Thm A.5 ⟸ Thm A.4(c) ⟸ Thm A.3 ⟸ Thm A.2 ⟸
 
 - A.5, A.4, A.3 は A.2 の上に積む(reduction glue、別途)。
 - **A.1**(dim-2 base)は部品が揃っている(下記「使える部品」)。
-- **A.2 の証明本体 = Gorenstein 3.8.1 の「次元 2 への縮約」** が、Isaacs にも mathlib にも
-  repo にも無い。BG App.A はこれを *"follow the proof of Theorem 3.8.1 of **G** up to page
-  105, where V is shown to have dimension 2"* と書くだけで証明を書かない。**ここを Lean で
-  自前形式化するのが本 issue**。
+- **A.2 の証明本体 = Gorenstein 3.8.1 の「次元 2 への縮約」**。BG App.A は *"follow the proof
+  of Theorem 3.8.1 of **G** up to page 105, where V is shown to have dimension 2"* と書くだけ。
+  **Gorenstein 原文は repo に追加済**(`references/gorenstein/finite-groups.{pdf,mmd}`、
+  Ch.3 §8 Thm 8.1 = G's 3.8.1, mmd **L2204 statement / L2210–L2240 proof**)。
 
-⚠️ よくある誤解(spike で訂正済): repo の `gl2_pSubgroup_centralizes_of_normalizes`
+⚠️ よくある誤解(spike で訂正済 — §0): repo の `gl2_pSubgroup_centralizes_of_normalizes`
 (Isaacs Lem 7.3)や `sylow_normal_of_elementary_normal_P_theorem`(Thm 7.5)は **この
 次元縮約ではない**。7.3 は GL(2,p) の補題で reduced J(P) 経路 (7.5/7.6) 専用。7.5 の次元縮約は
 `|V:C_V(P)| ≤ p` を**仮説に取る**(二次作用はそれを dim≤2 でしか満たさない、rank-nullity)。
-詳細は上記ノート §0。**本 issue は別物の新規証明**。
+**本 issue は別物の新規証明 = Gorenstein 8.1 の翻訳**。
 
 ## ターゲット(正確な statement)
 
 ### 主目標 = 次元縮約補題
 
-BG Thm A.2 の証明本体。informal:
+BG Thm A.2 の証明本体(= Gorenstein Ch.3 §8 Thm 8.1 の弱化形)。informal:
 
 > `p` を奇素数、`F` を `F_p` の代数閉包、`V` を有限次元 `F`-ベクトル空間とする。
 > `G ≤ GL(V)` が `V` 上 **忠実かつ既約** に作用し、`G` が **2 つの**「二次最小多項式を持つ
@@ -90,24 +92,66 @@ theorem quadratic_two_generated_irreducible_finrank_eq_two
 A.2 まで仕上げてくれてよいが、**最小の deliverable は次元縮約補題**(`= 2`)。A.1/A.2 の
 assemble は短い follow-on。
 
-## なぜ「二次」「二生成」「`p` 奇」が効くか(prover 向け orientation)
+> Gorenstein 8.1 の full conclusion は `G ⊇ SL(2,p)`(dim=2 + Dickson Ch.2 §8 Thm 8.4)で
+> BG A.2 より強い。**BG A.2 weakening(`|G|` 偶のみ)なら Dickson は不要**で、上記 dim=2 +
+> repo A.1 で閉じる。Dickson 形式化を回避できる利点があるので、BG の weakening を採るのが推奨。
 
-- **二生成が本質**。「二次 `p`-元で生成」だけでは dim は大きくできる: SL(`n`,`p`) は
-  transvection(二次 `p`-元)で生成され、`n` 次元既約だが transvection は多数要る。
-  **2 つだけ**だと既約に作用できるのは `dim ≤ 2` の場合に限られる、というのが縮約の心臓部。
-- **`p` 奇が本質**。`p=2` では偽(p-stability の反例 `S₄`, `p=2`)。証明のどこかで `p≠2` が
-  効く(典型的には SL(2,p) の構造 / `-1 ≠ 1` / `2` が可逆)。`p=2` を最後まで通さないこと。
-- 二次 `(x−1)²=0` ⇒ Jordan ブロックは全てサイズ `≤ 2`、`[V,x]=im(x−1) ⊆ ker(x−1)=C_V(x)`、
-  `|V:C_V(x)| = p^{rank(x−1)}`、`rank ≤ dim/2`。
+## 証明戦略 = Gorenstein 8.1 (mmd L2210–L2240) の Lean 翻訳
+
+Gorenstein Ch.3 §8 Theorem 8.1 の証明は **完全に初等線形代数**で、次の 5 ステップ:
+
+1. **rank-nullity**: `xᵢ` は char `p` 上の `p`-element で min poly `(X-1)²` ⇒ `(xᵢ-1)² = 0`。
+   `Wᵢ := im(xᵢ-1) ⊆ ker(xᵢ-1) = C_V(xᵢ) =: Vᵢ`。rank-nullity ⇒ `d ≤ 2dᵢ`(`d = dim V`,
+   `dᵢ = dim Vᵢ`)。
+
+2. **既約性で `V₁ ∩ V₂ = 0` 強制**: `dᵢ > d/2`(つまり等号 `d = 2dᵢ` でない)を仮定 ⇒
+   `W := V₁ ∩ V₂ ≠ 0`(次元数え)。両 `x₁, x₂` は `W` 上自明、`G = ⟨x₁, x₂⟩` も `W` 上自明 ⇒
+   既約より `V = W` ⇒ `G` 自明 ⇒ `G` 忠実だが `G = 1` で contradiction(`xᵢ ≠ 1` 仮定と矛盾)。
+   よって `d₁ = d₂ = d/2 =: m`、`V = V₁ ⊕ V₂`。
+
+3. **ブロック行列形**: `V₁` の基底 `{v_i}_{1≤i≤m}` を取り、`v_{m+i} := vᵢ(x₁-1)` で `V₂` の基底
+   を生成(`x₁-1: V₂ → V₁` 同型)。この `(v_i)_{1≤i≤2m}` 基底で:
+
+   ```
+   x₁ = (I 0)    x₂ = (I R)         (R は x₂-1: V₁→V₂ の同型行列、非特異)
+        (I I)         (0 I)
+   ```
+
+4. **Jordan canonical form + 置換共役**: `R` を `F` 代数閉なので Jordan canonical form
+   `S = Q⁻¹RQ` に。基底変換で `x₂ = (I S / 0 I)`。`S` は対角値非零の lower triangular。
+   さらに **「行 2 と行 `m+1` を入れ替える置換行列 `P`」で共役**を取ると、新基底 `(u_i)` で:
+
+   ```
+   x₁ = (1 0      *)    x₂ = (1 λ      *)     (λ = S の (0,0) 成分)
+        (1 1      *)         (0 1      *)
+        (*  *     *)         (*  *     *)
+   ```
+
+   ⇒ **`u₁, u₂` が張る 2 次元部分空間 `U` は `x₁` と `x₂` の両方で不変**。
+
+5. **既約性で `U = V`**: `G = ⟨x₁, x₂⟩` も `U` 不変。`U ≠ 0`(`u₁ ≠ 0`)、既約 ⇒ `U = V` ⇒
+   **`dim V = 2`**。∎
+
+(Gorenstein はこの後 Dickson でさらに `SL(2,p) ⊆ G` を出すが、**BG A.2 の `|G|` 偶のためには
+ここまで(dim=2)で十分**。後は repo A.1 で閉じる。)
+
+**Lean 翻訳の中身**:
+- ステップ 1, 2: `LinearMap.range_le_ker_iff` (or 同等), `LinearMap.finrank_range`,
+  `Module.finrank_add_finrank_quotient`, `IsSimpleModule.eq_top_of_isInvariant` 等の
+  既約性論証。
+- ステップ 3: 自前で基底構成 + `Module.Basis`。
+- ステップ 4: Jordan canonical form — mathlib `Module.End.HasEigenvalue` / `…GeneralizedEigenspace`
+  + alg-closed の `Polynomial.splits` 経由。**ここが一番技術的**(mathlib に Jordan form の
+  packaged form があるかは要確認、無ければ block-by-block で構成)。
+- ステップ 5: ステップ 4 の不変 2 次元部分空間 + `IsSimpleModule` から `top` 結論。
 
 ## repo で使える部品(確認済・sorry-free)
 
 | 部品 | 名前 / 場所 | 用途 |
 |---|---|---|
 | **BG Thm 2.6** (体一般, 2-dim faithful) | `OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian` / `odd_two_dim_abelian`([S02_Representations.lean](../OddOrder/BG/Ch1_Preliminary/S02_Representations.lean) L4627/L4680) | **A.1 の主部品**。`Odd |G|`, `finrank F V = 2`, faithful `ρ`, `p ∣ |G|`, `CharP F p` ⇒ Sylow-`p` abelian ∧ `G' ≤ P` |
-| p-group fixed vector | `OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector.{exists_fixed_vector_ne_zero, invariants_ne_bot}` (L289/L197) | **A.1 と Case `q=p`**: char-`p` で `p`-群の固定ベクトル `≠ 0` |
-| 巡回作用の固有空間 | `OddOrder.RepresentationTheory.EigenspaceUnderCyclicAction.*`([…/EigenspaceUnderCyclicAction.lean](../OddOrder/GroupTheory/RepresentationTheory/EigenspaceUnderCyclicAction.lean), 918 行) | BG Prop 2.4。固有空間分解の道具。**部分的に流用可かも**(char-0 寄りだが eigenspace tooling) |
-| mathlib | `Representation` / `FDRep` / `Module.End` / `Module.End.eigenspace` / `Matrix.GeneralLinearGroup` / `Module.IsSimpleModule` / Maschke (char ∤ \|G\| で半単純) | 基盤 |
+| p-group fixed vector | `OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector.{exists_fixed_vector_ne_zero, invariants_ne_bot}` (L289/L197) | **A.1**: char-`p` で `p`-群の固定ベクトル `≠ 0` |
+| mathlib | `Representation` / `Module.End` / `Module.End.eigenspace` / `LinearMap.range` / `LinearMap.ker` / `Module.finrank` / `Module.Basis` / `IsSimpleModule` / `Polynomial.splits` / Jordan/eigenspace API | 線形代数の基盤 |
 
 ### A.1 の組み立てレシピ(prover への確認用、follow-on)
 
@@ -121,74 +165,54 @@ A.1: `V` 2-dim over `F` (odd char `p`), `G ≤ GL(V)` 有限既約, `|G|` 奇 �
 
 ## 直接は使えないもの(誤解しやすい点)
 
-- `gl2_pSubgroup_centralizes_of_normalizes` (Lem 7.3, [S7A1](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7A1_JpGL2p.lean) L1269) と
-  `sylow_normal_of_elementary_normal_P_theorem` (Thm 7.5, [S7A2](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7A2_NormalPThm75.lean) L1216):
+- `gl2_pSubgroup_centralizes_of_normalizes` (Lem 7.3) と `sylow_normal_of_elementary_normal_P_theorem` (Thm 7.5):
   **本 issue には使わない**(reduced J(P) 経路の道具。理由はノート §0)。
-- `Clifford.lean`(`OddOrder.RepresentationTheory`)は **ℂ 上の指標 Clifford**(Isaacs 6.5、
-  しかも証明 deferred)。本 issue が要るのは **`F̄_p` 上の加群 Clifford**(homogeneous component
-  分解)で別物。流用不可。
+- `OddOrder.RepresentationTheory.Clifford.lean` は **ℂ 上の指標 Clifford**(Isaacs 6.5、しかも
+  proof deferred)。本 issue が必要としていると当初(spike 段階で)思っていた「`F̄_p` 上の加群
+  Clifford」**は実際には不要**(Gorenstein 8.1 の proof を読むと出てこない)。流用不要・不可。
+- `OddOrder.RepresentationTheory.EigenspaceUnderCyclicAction.lean` は BG Prop 2.4 用(ℂ 寄り)。
+  本 issue には**ほぼ不要**(Jordan/eigenspace は mathlib の `Module.End.eigenspace` で直接組める)。
 
-## 作る必要があるインフラ(char-`p` 加群表現論)
+## 作るかもしれないインフラ(限定的)
 
-縮約証明の中で要りそうなもの(過不足は実装で判明):
-- **加群の primitivity / imprimitivity**(induced module、系 of imprimitivity blocks)。
-  mathlib に直接は無い見込み → 必要分を `OddOrder/GroupTheory/RepresentationTheory/` に新規。
-- **加群 Clifford**: 正規部分群への制限の homogeneous 分解、alg-closed 上で normal abelian は
-  scalar に作用(primitive のとき)。
-- **二次元 (transvection / Jordan サイズ ≤2) の固有値・Jordan 解析**。
+Gorenstein 8.1 の翻訳に直接要るのは:
+- **Jordan canonical form**(mathlib にある形が使えるか確認、無ければ実装)。alg-closed `F` 上の
+  非特異 endomorphism の標準形。**唯一非自明な可能性のあるピース**。
 
-`OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean` は現状 40 行 skeleton。
-ここを膨らませる手もある。
-
-## 証明戦略の出発点(⚠️ 要検証 — 下記「原典が無い」注意)
-
-Gorenstein 3.8.1 の標準的な縮約は概ね次の形(**FF-module / quadratic pair 理論の特殊例**):
-1. **WLOG `G` は `V` 上 primitive**。imprimitive なら `V = V₁ ⊕ … ⊕ V_k` (`k>1`) を `G` が
-   推移置換。二次元 `x` のブロック置換への作用 + 二次条件 + 既約性で primitive に帰着。
-2. **primitive + alg-closed** ⇒ normal abelian subgroup は scalar 作用(Clifford + primitivity)。
-   ⇒ `F(G)`/socle の構造が強く制約される。
-3. **二次元の固有値/Jordan 構造 + 制約された正規構造 + 2 生成** ⇒ `dim V = 2`。
-
-これはあくまで orientation。**正確な step は実装者が確定すること**(記憶ベースで未検証)。
-
-## ⚠️ 重要: Gorenstein 原典は references/ に無い
-
-本プロジェクトの `references/` には Isaacs FGT / BG / Peterfalvi しか無く、**Gorenstein 1968
-"Finite Groups" §3.8 (p.105) は読めない**。よって本 issue は「既知の証明を翻訳する」のではなく
-**証明を再構成 or アクセス可能な別ソースから持ってくる**作業を含む。
-
-- 最初の sub-task は「2 生成・二次・既約 ⇒ dim 2」の **証明の確定**(=調査)にしてよい。
-- この内容(quadratic action / FF-module / quadratic pairs)が書かれている標準文献:
-  Kurzweil–Stellmacher _The Theory of Finite Groups_ (quadratic action の章), Aschbacher
-  _Finite Group Theory_, Gorenstein–Lyons–Solomon。**プロジェクトに無いので、必要なら
-  ユーザーに該当ページの供与を依頼**(BG 同様 references/ に追加してもらう)のが確実。
-- BG Thm A.1/A.2 の原文は [`references/bg/local-analysis.mmd`](../references/bg/local-analysis.mmd) L4460–4472。
+不要(spike 段階で「要る」と書いていたが Gorenstein 原文を読んで誤りと判明):
+- ~~加群の primitivity / imprimitivity~~ — proof に出てこない。
+- ~~加群 Clifford(homogeneous component 分解)~~ — proof に出てこない。
+- ~~tensor 分解~~ — proof に出てこない。
 
 ## やること(着手順)
 
-- [ ] **(調査)** 「2 生成・二次・既約 (`p` 奇, `F̄_p`) ⇒ dim V = 2」の証明を確定。原典不在のため
-      再構成 or ソース供与依頼。`p=2` 反例で `p≠2` の使いどころを特定。
 - [ ] **(A.1)** 上記レシピで A.1 を組む(部品済、interface/型の早い確認)。新規ファイル
       `OddOrder/BG/AppA_PStability.lean`(または相当)を作る。配置は ROADMAP / 既存 BG 構成に合わせる。
-- [ ] **(インフラ)** 縮約に要る char-`p` 加群表現論(primitivity / 加群 Clifford / 二次解析)を
-      `OddOrder/GroupTheory/RepresentationTheory/` に必要分だけ新規実装。
-- [ ] **(縮約)** `quadratic_two_generated_irreducible_finrank_eq_two` を証明。
-- [ ] **(A.2)** 縮約 + A.1 で A.2(`|G|` 偶)を閉じる。
+- [ ] **(Jordan form 確認)** mathlib に alg-closed 上 endomorphism の Jordan canonical form
+      packaged 形がどこまであるか調査。無ければ最小限を自前実装(`Module.End` + eigenspace
+      decomp + nilpotent part 分離 で足りる)。
+- [ ] **(縮約)** `quadratic_two_generated_irreducible_finrank_eq_two` を Gorenstein 8.1 proof
+      (mmd L2210–L2240)5 ステップに沿って証明。
+- [ ] **(A.2)** 縮約 + A.1 で A.2(`|G|` 偶)を閉じる。Dickson 不要。
 
 ## 完了条件
 
 - 次元縮約補題(`finrank F V = 2`)が `sorry`/`axiom` 無しで証明され `lake build` が通る。
 - できれば A.1・A.2 も sorry-free で配線(A.2 = 本ルートの真のゲート)。
-- docstring に `**BG Thm A.2** (Gorenstein 3.8.1 次元縮約パート)` のトレーサビリティ。
-- 新規インフラは `OddOrder/GroupTheory/RepresentationTheory/` 配下、mathlib 互換命名。
+- docstring に `**BG Thm A.2** (= Gorenstein 3.8.1 weakening, mmd L2204+)` のトレーサビリティ。
 - 完了後 `notes/meta/bg_s6_appAB_route_2026_05_28.md` §0 と per-section
   [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) の状態を更新。
 
 ## 参照
 
-- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md) **§0**(spike 訂正)
+- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md) **§0 + §0.1**(spike 訂正 + Gorenstein 追加後の再評価)
 - per-section: [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) / [`notes/bg/s06_additional.md`](../notes/bg/s06_additional.md)
-- BG 原文: `references/bg/local-analysis.mmd` — A.1 L4460–4464, **A.2 L4468–4472**, A.3 L4476, A.4 L4480–4485, A.5 L4488–4513, App.A 序文 L4452–4458
-- repo 部品: S02 `odd_two_dim_sylow_abelian` (L4680) / `PGroupFixedVector` / `EigenspaceUnderCyclicAction`
-- 隣接 issue: #28 (Prop 2.4 eigenspace), #33 (AbsolutelyIrreducible), #35 (OddTwoDimRepr — Thm 2.6 は実際は S02 に実装済なので #35 は陳腐化。要整理)
-- 下流(A.2 が出来た後): A.3 → A.4(a/b/c) → A.5 → App.B(B.1–B.4)→ BG §8–§16 を L(S) 化
+- **Gorenstein 1968 原文**(本 issue の primary source、`references/gorenstein/finite-groups.mmd`):
+  Ch.3 §8 Thm 8.1 **statement L2204 / proof L2210–L2240**(本 issue の翻訳対象)。
+  関連: Ch.3 §8 Thm 8.2/8.3/8.4(BG A.3 の materials)、Ch.2 §8 Thm 8.4(Dickson、BG A.2 では不要)。
+- BG 原文: `references/bg/local-analysis.mmd` — A.1 L4460–4464, **A.2 L4468–4472**, A.3 L4476, A.4 L4480–4485, A.5 L4488–4513, App.A 序文 L4452–4458。
+- repo 部品: S02 `odd_two_dim_sylow_abelian` (L4680) / `PGroupFixedVector`。
+- ポリシー: CLAUDE.md「Gorenstein 1968 は形式化対象ではない…BG の行間を埋めるためにのみ原文参照」
+  — 本 issue がまさにその典型用途。Gorenstein 全形式化はしない。
+- 隣接 issue: closed #0035 (Thm 2.6 は S02 で実装済)、#28 (Prop 2.4)、#33 (AbsolutelyIrreducible)。
+- 下流(A.2 が出来た後): A.3 → A.4(a/b/c) → A.5 → App.B(B.1–B.4)→ BG §8–§16 を L(S) 化。

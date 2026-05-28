@@ -28,6 +28,17 @@
 
 **訂正後の着手順**: **A.1 を組む**(部品済、interface/型確認の早い勝ち筋)→ **A.2 / 3.8.1 を scope して着手(本ルートの真のゲート)** → A.3 → A.4(a/b/c) → A.5 → App.B(B.1-B.4) → §8-§16 を L(S) 化。下記 §3「真のゲート」の旧記述(7.3 核 reduction)は本 §0 で上書き。
 
+### 0.1 補追: 2026-05-28 (late PM, Gorenstein 追加後の再評価)
+
+同日に `references/gorenstein/finite-groups.{pdf,mmd}` を追加。**Gorenstein 3.8.1 の実際の証明本体を読めるようになった**(Ch.3 §8 内 chapter-local 番号 = Theorem 8.1, mmd L2204 statement / L2210–L2240 proof)ことで、上記 §0-#3-A.2 の「char-p 加群表現論 (primitivity / module-Clifford / tensor 分解) が要る」は**過大評価**だったと判明。**訂正**:
+
+- **Gorenstein 3.8.1 の証明は基本的に初等線形代数**: (i) `(xᵢ−1)² = 0` の rank-nullity ⇒ `d ≤ 2dᵢ`、(ii) 2 生成 + 既約で `V₁ ∩ V₂ = 0` 強制 ⇒ `V = V₁ ⊕ V₂` (`dᵢ = d/2 = m`)、(iii) ブロック行列形 `(I 0/I I), (I R/0 I)` を取り `R` を Jordan canonical form、(iv) 行 2 と行 `m+1` の置換共役で 2 次元の `x₁, x₂`-不変部分空間 `U` を露出、既約より `U = V`、∴ **`dim V = 2`**、(v) `G ≤ GL(2,p)` 後は Dickson(Gorenstein 8.4 = Ch.2 §8)で `SL(2,p) ⊆ G`(ただし BG A.2「`|G|` 偶」だけなら repo の A.1 で閉じ、**Dickson 不要**)。
+- ⇒ 必要な道具は `Module.End` の rank-nullity、Jordan canonical form、ブロック行列・置換共役、不変部分空間の既約性論証。**char-p module 表現論ではなく、mathlib `LinearMap` / `Module.End` の射程内**。
+- §0-#3 で挙げた「`Clifford.lean`=ℂ character / `EigenspaceUnderCyclicAction`=Prop 2.4 ℂ なのでカバーせず」は誤り(これらは元から不要だった)。
+- **正味**: A.2 = ❌ 未実装である事実は変わらず、しかし**証明本体は Gorenstein 翻訳**(再構成ではない)で、見積もりは大幅軽量化(中規模 rep theory → 中規模線形代数翻訳)。
+- ポリシー(CLAUDE.md 2026-05-28 訂正): 本プロジェクトは Gorenstein を**全形式化しない**が、**BG の行間を埋めるための原文参照**として `references/gorenstein/` を使う。A.2/A.3/A.4 がまさにその典型用途。
+- 引き継ぎ issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md) も同 refinement に同期(「Gorenstein 原典 references/ に無い」警告を撤去、proof strategy を linear-algebra 翻訳へ書き換え)。
+
 ## 1. 問題: 6.1/6.2 は深く、Isaacs に無い
 
 | BG | = | 完全証明の所在 | BG での扱い |
