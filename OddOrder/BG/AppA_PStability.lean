@@ -547,6 +547,93 @@ end ThmA2
 
 section PStability
 
+/-! ### 共役元 helpers (A.3 用)
+
+`y := g * x * g⁻¹` (= conjugate of `x` by `g`) は `x` と同じ性質を持つ:
+- `(ρ y - 1) ^ 2 = 0` (quadratic minpoly 保存)
+- `ρ y ≠ 1` (≠ 1 保存; ρ faithful の前提下)
+- `IsPGroup p (zpowers y)` (p-element 保存)
+
+A.3 Step 3 で `H := closure {x, gxg⁻¹}` を Baer-Suzuki で構築するとき, `y = gxg⁻¹`
+が `x` と同じ性質 (= K = conjugacy class) を持つ事実が必要. -/
+
+omit [Module.Finite F V] in
+/-- `ρ (g * x * g⁻¹) - 1 = ρg * (ρx - 1) * ρg⁻¹` (conjugation factorization). -/
+lemma representation_conj_sub_one
+    (ρ : Representation F G V) (x g : G) :
+    (ρ (g * x * g⁻¹) : Module.End F V) - 1
+      = ρ g * ((ρ x : Module.End F V) - 1) * ρ g⁻¹ := by
+  have hgg : (ρ g : Module.End F V) * ρ g⁻¹ = 1 := by
+    rw [← map_mul, mul_inv_cancel, map_one]
+  rw [map_mul, map_mul, mul_sub, sub_mul, mul_one, hgg]
+
+omit [Module.Finite F V] in
+/-- 共役元は同じ quadratic minimal polynomial を持つ: `(ρ x - 1)² = 0 ⇒ (ρ(gxg⁻¹) - 1)² = 0`.
+A.3 で `y = gxg⁻¹` ∈ K (conjugacy class of x) も quadratic を持つことに使用. -/
+lemma representation_conj_quadratic
+    (ρ : Representation F G V) (x g : G)
+    (hxsq : ((ρ x : Module.End F V) - 1) ^ 2 = 0) :
+    ((ρ (g * x * g⁻¹) : Module.End F V) - 1) ^ 2 = 0 := by
+  have hgg' : (ρ g⁻¹ : Module.End F V) * ρ g = 1 := by
+    rw [← map_mul, inv_mul_cancel, map_one]
+  rw [representation_conj_sub_one ρ x g]
+  -- (ρg * A * ρg⁻¹)^2 = ρg * A * (ρg⁻¹ * ρg) * A * ρg⁻¹ = ρg * A² * ρg⁻¹ = 0
+  calc (ρ g * ((ρ x : Module.End F V) - 1) * ρ g⁻¹) ^ 2
+      = ρ g * ((ρ x : Module.End F V) - 1) * ρ g⁻¹
+          * (ρ g * ((ρ x : Module.End F V) - 1) * ρ g⁻¹) := by rw [sq]
+    _ = ρ g * ((ρ x : Module.End F V) - 1) * (ρ g⁻¹ * ρ g)
+          * ((ρ x : Module.End F V) - 1) * ρ g⁻¹ := by
+            simp only [mul_assoc]
+    _ = ρ g * ((ρ x : Module.End F V) - 1) * 1
+          * ((ρ x : Module.End F V) - 1) * ρ g⁻¹ := by rw [hgg']
+    _ = ρ g * (((ρ x : Module.End F V) - 1)
+          * ((ρ x : Module.End F V) - 1)) * ρ g⁻¹ := by
+            simp only [mul_one, mul_assoc]
+    _ = ρ g * ((ρ x : Module.End F V) - 1) ^ 2 * ρ g⁻¹ := by rw [← sq]
+    _ = ρ g * 0 * ρ g⁻¹ := by rw [hxsq]
+    _ = 0 := by rw [mul_zero, zero_mul]
+
+omit [Module.Finite F V] in
+/-- 共役元は `ρ` 上 `≠ 1` を保つ: `ρ x ≠ 1 ⇒ ρ(gxg⁻¹) ≠ 1`. -/
+lemma representation_conj_ne_one
+    (ρ : Representation F G V) (x g : G) (hxne : ρ x ≠ 1) :
+    ρ (g * x * g⁻¹) ≠ 1 := by
+  intro h
+  apply hxne
+  -- ρ(gxg⁻¹) = ρg ρx ρg⁻¹ = 1 ⇒ ρx = ρg⁻¹ * 1 * ρg = 1
+  have hgg : (ρ g : Module.End F V) * ρ g⁻¹ = 1 := by
+    rw [← map_mul, mul_inv_cancel, map_one]
+  have hg'g : (ρ g⁻¹ : Module.End F V) * ρ g = 1 := by
+    rw [← map_mul, inv_mul_cancel, map_one]
+  have h1 : (ρ g : Module.End F V) * ρ x * ρ g⁻¹ = 1 := by
+    rw [← map_mul, ← map_mul]; exact h
+  -- ρx = ρg⁻¹ * (ρg * ρx * ρg⁻¹) * ρg = ρg⁻¹ * 1 * ρg = 1
+  have : (ρ x : Module.End F V)
+       = ρ g⁻¹ * (ρ g * ρ x * ρ g⁻¹) * ρ g := by
+    calc (ρ x : Module.End F V)
+        = 1 * ρ x * 1 := by rw [one_mul, mul_one]
+      _ = (ρ g⁻¹ * ρ g) * ρ x * (ρ g⁻¹ * ρ g) := by rw [hg'g]
+      _ = ρ g⁻¹ * (ρ g * ρ x * ρ g⁻¹) * ρ g := by
+            simp only [mul_assoc]
+  rw [this, h1, mul_one, hg'g]
+
+/-- 共役元は p-element を保つ: `IsPGroup p (zpowers x) ⇒ IsPGroup p (zpowers (gxg⁻¹))`.
+証明: `SemiconjBy g x (gxg⁻¹)` ⇒ `orderOf x = orderOf (gxg⁻¹)`, IsPGroup は orderOf
+で特徴付け. -/
+lemma isPGroup_zpowers_conj [Finite G]
+    (x g : G) (hxp : IsPGroup p (Subgroup.zpowers x)) :
+    IsPGroup p (Subgroup.zpowers (g * x * g⁻¹)) := by
+  have hp_prime : p.Prime := Fact.out
+  -- SemiconjBy g x (gxg⁻¹): g * x = (g * x * g⁻¹) * g
+  have hsemi : SemiconjBy g x (g * x * g⁻¹) := by
+    unfold SemiconjBy
+    group
+  have horder : orderOf x = orderOf (g * x * g⁻¹) := hsemi.orderOf_eq g
+  -- IsPGroup p (zpowers a) ↔ ∃ n, |zpowers a| = p^n; |zpowers a| = orderOf a (mathlib)
+  rw [IsPGroup.iff_card] at hxp ⊢
+  rw [Nat.card_zpowers, ← horder, ← Nat.card_zpowers]
+  exact hxp
+
 /-- **p-stability** (Gorenstein 1968 p.105 definition, BG App.A 用途).
 
 `G` が `p`-stable とは: `F` の alg-closed char `p` 上の有限次元 nontrivial vector space
