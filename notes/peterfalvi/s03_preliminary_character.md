@@ -187,6 +187,9 @@ orthogonality layer separate from the remaining finite induction.
 
 **重要性**: **(1.4) は §4 Dade isometry の主定理 (2.6) への "isometry 構造 lemma"**. これにより、「TI-subset 上の virtual character 等距 → 既約成分への分解保存」が言える.
 
+**2026-05-28 進捗**: (1.4) の証明は bottom-up の 4 層に分解 (詳細は [`issues/0025`](../../issues/0025-peterfalvi-isometry-difference-core.md) の HANDOFF):
+**層 1a** `χ(g⁻¹)=conj χ(g)` ✅ 完了 (`RepresentationTheory/CharacterConjugate.lean`, `character_inv`, sorry-free, mathlib ギャップを行列 S-ユニタリ・トリックで充足) → **層 1b** orthonormality discharge (`CharacterTableRowOrthogonality` を定理化、次の着手点) → 層 2 ZIrr Fourier API → 層 3 combinatorial core。
+
 ## Isaacs [Is] 1976 → mathlib 対応 (Phase 1 完成想定)
 
 Peterfalvi §3 が明示引用する [Is] results:

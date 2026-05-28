@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
@@ -17,8 +18,10 @@ import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.TISubset
@@ -46,4 +49,5 @@ import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.AxiomsCheck

@@ -172,4 +172,89 @@ theorem coherence_inner_eq_on_supported
 
 end SibleySetup
 
+/-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the Sibley
+setup, the input set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is coherent — there
+is an integral isometric extension of `τ` from `Z[S, A]` to `Z[S]`.
+
+The full proof is the central technical content of §8, requiring the
+(6.1)/(6.4)/(6.5)/(6.6)/(5.2) machinery and the case split on `H` being a
+non-abelian `p`-group (cases (A), (B) in the mmd L150-).  This is the main
+sorry blocking the §9 (7.10) `card_G0_lower_bound` proof; see
+`issues/0046-peterfalvi-s08-6-8-coherence.md`.
+
+This is a `noncomputable def` rather than a `theorem` because `CoherenceTarget`
+(an instance of `IsCoherent`) carries the extension map `ν` as a data field, so
+it lives in `Type`, not `Prop`. -/
+noncomputable def sibleySetup_is_coherent
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : SibleySetup (L := L) (G := G) S A) : hyp.CoherenceTarget := by
+  sorry
+
+/-- **Peterfalvi (6.8) → (7.10) consumer interface.**
+A degree-scaled `Z`-chain decomposition: given a coherence input `τ` on `(S, A)`
+and an orthonormal family `ζ : Fin n → ClassFunction L ℂ` in `S` with explicit
+integer degree ratios `d : Fin n → ℤ` (`d 0 = 1`), the family of images
+`χ t = ν (ζ t)` under the coherence extension `ν` is orthonormal, and
+`τ (ζ t - d t • ζ 0) = χ t - d t • χ 0`.
+
+This packages the orthonormal-subsets-with-Ind-equation language used in the
+(7.10) proof (see `references/peterfalvi/04.9_*.mmd` L133-135). -/
+structure IndChainDecomposition
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G)
+    {n : ℕ} [NeZero n]
+    (ζ : Fin n → ClassFunction L ℂ) (d : Fin n → ℤ)
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- The orthonormal output family `χ_t = ν(ζ_t)` in `ClassFunction G ℂ`. -/
+  χ : Fin n → ClassFunction G ℂ
+  /-- Each `χ_t` has norm `1`. -/
+  norm_one : ∀ t, ClassFunction.inner (χ t) (χ t) = 1
+  /-- Distinct indices give orthogonal `χ`. -/
+  pairwise_inner_zero :
+    ∀ ⦃t u : Fin n⦄, t ≠ u → ClassFunction.inner (χ t) (χ u) = 0
+  /-- The reference index has trivial scaling: `d 0 = 1`. -/
+  d_zero : d 0 = 1
+  /-- The Ind equation: `τ(ζ_t - d_t · ζ_0) = χ_t - d_t · χ_0`. -/
+  image_eq :
+    ∀ t, τ (ζ t - (d t) • ζ 0) = χ t - (d t) • χ 0
+
+namespace IndChainDecomposition
+
+variable {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+variable {n : ℕ} [NeZero n]
+
+/-- The Ind-chain decomposition vanishes at the reference index: for `t = 0`,
+`τ(ζ 0 - d 0 · ζ 0) = 0`. -/
+@[simp] theorem image_eq_zero
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    τ (ζ 0 - (d 0) • ζ 0) = 0 := by
+  rw [data.d_zero, one_smul, sub_self, map_zero]
+
+/-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
+together with the orthonormality of the input family `ζ` (in `S`) and the support of
+each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`. -/
+noncomputable def ofIsCoherent
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hτ : OddOrder.Peterfalvi.S07.IsCoherent (L := L) (G := G) τ S A)
+    {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u → ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A) :
+    IndChainDecomposition (L := L) (G := G) τ ζ d where
+  χ t := hτ.extension (ζ t)
+  norm_one t := by rw [hτ.extension_inner_eq, hζ_norm]
+  pairwise_inner_zero t u htu := by rw [hτ.extension_inner_eq, hζ_pairwise htu]
+  d_zero := hd_zero
+  image_eq t := by
+    rw [← hτ.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul]
+
+end IndChainDecomposition
+
 end OddOrder.Peterfalvi.S08

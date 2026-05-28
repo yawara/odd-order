@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Module.Submodule.LinearMap
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 
 /-!
@@ -235,7 +236,6 @@ theorem signed_image_ne_zero
 
 theorem difference_inner_self
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     ClassFunction.inner hχ.difference hχ.difference = 2 := by
   rw [difference, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
@@ -244,41 +244,40 @@ theorem difference_inner_self
       ClassFunction.inner hχ.muClassFunction hχ.muClassFunction = 1 := by
     simpa [muClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
       OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
-        (G := G) hrow hχ.mu
+        (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.mu
   have hμν :
       ClassFunction.inner hχ.muClassFunction hχ.nuClassFunction = 0 := by
     simpa [muClassFunction, nuClassFunction,
       OddOrder.RepresentationTheory.characterTableRowPairing] using
       OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
-        (G := G) hrow hχ.distinct
+        (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.distinct
   have hνμ :
       ClassFunction.inner hχ.nuClassFunction hχ.muClassFunction = 0 := by
     simpa [muClassFunction, nuClassFunction,
       OddOrder.RepresentationTheory.characterTableRowPairing] using
       OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
-        (G := G) hrow (Ne.symm hχ.distinct)
+        (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality (Ne.symm hχ.distinct)
   have hνν :
       ClassFunction.inner hχ.nuClassFunction hχ.nuClassFunction = 1 := by
     simpa [nuClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
       OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
-        (G := G) hrow hχ.nu
+        (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.nu
   rw [hμμ, hμν, hνμ, hνν]
   norm_num
 
 theorem signedDifference_inner_self
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     ClassFunction.inner hχ.signedDifference hχ.signedDifference = 2 := by
   rcases hχ.sign_eq with hsign | hsign
-  · simpa [signedDifference, hsign] using hχ.difference_inner_self hrow
+  · simpa [signedDifference, hsign] using hχ.difference_inner_self
   · calc
       ClassFunction.inner hχ.signedDifference hχ.signedDifference =
           ClassFunction.inner (-hχ.difference) (-hχ.difference) := by
             simp [signedDifference, hsign]
       _ = ClassFunction.inner hχ.difference hχ.difference := by
             rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg]
-      _ = 2 := hχ.difference_inner_self hrow
+      _ = 2 := hχ.difference_inner_self
 
 /-- Orthogonality of the two image sets `R(χ)` and `R(ψ)` from Peterfalvi
 (5.2.e). -/
@@ -302,13 +301,12 @@ theorem image_conjugateDifference_ne_zero
 
 theorem image_conjugateDifference_inner_self
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     ClassFunction.inner
         (τ (OddOrder.Peterfalvi.S03.conjugateDifference χ))
         (τ (OddOrder.Peterfalvi.S03.conjugateDifference χ)) = 2 := by
   rw [hχ.image_conjugateDifference]
-  exact hχ.signedDifference_inner_self hrow
+  exact hχ.signedDifference_inner_self
 
 theorem Orthogonal.difference_inner_eq_zero
     [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -496,12 +494,11 @@ theorem difference_images_orthogonal_of_inner_pair
 
 theorem difference_image_inner_self
     {hyp : Hypothesis (L := L) (G := G) S A}
-    (hrow : OddOrder.RepresentationTheory.CharacterTableRowOrthogonality (G := G))
     {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
     ClassFunction.inner
         (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ))
         (hyp.tau (OddOrder.Peterfalvi.S03.conjugateDifference χ)) = 2 :=
-  (hyp.difference_image hχ).image_conjugateDifference_inner_self hrow
+  (hyp.difference_image hχ).image_conjugateDifference_inner_self
 
 theorem difference_images_inner_eq_zero_of_inner_pair
     {hyp : Hypothesis (L := L) (G := G) S A}
