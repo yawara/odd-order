@@ -96,3 +96,21 @@ Isaacs 2.12: `H ≤ F(G) ⇔ ∀ x ∈ G, ⟨H, H^x⟩` が冪零
   F(G) → O_p(G) の真の翻訳を含むので no-wrapper policy には抵触しない
 - 同 ch.2 内の Baer 応用例: Zenkov (`OddOrder/Isaacs/Ch02_Subnormality/Main.lean:3501`),
   Matsuyama Thm 2.13 (同 file:2000)
+
+## 結果 (2026-05-28 close)
+
+- [x] **F(G) → O_p(G) 橋渡し補題**: 既存 `mem_opCore_of_le_fitting_of_isPGroup`
+  ([Ch02 Main.lean:1973](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean#L1973))
+  を `private` から解除 (Matsuyama と本定理で共用).
+- [x] **`baerSuzuki_pCore` 実装**: [Ch02 Main.lean](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
+  2B 末尾 (Matsuyama の後). `mem_opCore_of_le_fitting_of_isPGroup`
+  + Isaacs 2.12 iff (`le_fitting_iff_baer_sup_conj_isNilpotent`) の合成で 80 行弱.
+- [x] **CI 公理保証**: [`AxiomsCheck.lean`](../../OddOrder/AxiomsCheck.lean) に
+  `#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.baerSuzuki_pCore` 追加.
+  `{propext, Classical.choice, Quot.sound}` のみ依存.
+- [x] **lean-eval submit 対応メモ**:
+  [`notes/meta/lean_eval_baer_suzuki.md`](../../notes/meta/lean_eval_baer_suzuki.md)
+  に `LeanEval.Defs.pCore = opCore` の対応と submit 戦略を記録.
+- [ ] (option) subset 版 — 未実装 (lean-eval が subset 版を追加した時点で対応).
+
+`lake build OddOrder` green, full AxiomsCheck pass.

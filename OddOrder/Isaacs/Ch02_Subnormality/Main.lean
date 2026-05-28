@@ -1969,8 +1969,11 @@ private theorem exists_odd_prime_dvd_of_not_pow_two :
 
 証明: `F(G)` は冪零 ⇒ 各素数 `p` について Sylow `p` が一意 (`Sylow.normal_of_isNilpotent`
 + `Sylow.characteristic_of_normal`). `H` をその unique Sylow に含め, characteristic
-in normal で `G` の正規 `p`-部分群 ⇒ `normal_pgroup_le_opCore` で `O_p(G)` 配下. -/
-private theorem mem_opCore_of_le_fitting_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+in normal で `G` の正規 `p`-部分群 ⇒ `normal_pgroup_le_opCore` で `O_p(G)` 配下.
+
+Matsuyama (Thm 2.13) と Baer-Suzuki p-core 単一元版 (`baerSuzuki_pCore`, lean-eval
+problem) の両方で `F(G) → O_p(G)` 橋渡しに使う. -/
+theorem mem_opCore_of_le_fitting_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
     {H : Subgroup G} (hH_pgroup : IsPGroup p H) (hH_fit : H ≤ fitting G) :
     H ≤ opCore p G := by
   -- Lift H to a subgroup of fitting G.
@@ -2102,6 +2105,90 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
     · rw [h2] at hq_odd
       rcases hq_odd with ⟨k, hk⟩
       omega
+
+/-! ### Baer-Suzuki theorem (single-element p-core form) -/
+
+open scoped Pointwise in
+/-- **Baer-Suzuki Theorem (single-element p-core form)**: 有限群 `G` の元 `x`,
+素数 `p` について,
+`x ∈ O_p(G) ↔ ∀ g : G, ⟨x, g·x·g⁻¹⟩` is a `p`-group.
+
+これは Isaacs Thm 2.12 (Baer, `H ≤ F(G) ↔ ∀ x ∈ G, ⟨H, H^x⟩` 冪零) の
+`H := ⟨x⟩` への特殊化と, `p`-元 ∈ `F(G)` ⇒ `p`-元 ∈ `O_p(G)`
+([`mem_opCore_of_le_fitting_of_isPGroup`](#mem_opCore_of_le_fitting_of_isPGroup))
+の合成で得られる.
+
+- 順方向 (`⇒`): `O_p(G) ⊴ G` で共役不変 ⇒ `closure {x, gxg⁻¹} ≤ O_p(G)`,
+  `O_p(G)` は `p`-群 ⇒ 部分群も `p`-群.
+- 逆方向 (`⇐`): `g = 1` で `⟨x⟩` が `p`-群; 各 `g` で `⟨x⟩ ⊔ ⟨x⟩^g
+  = ⟨x, gxg⁻¹⟩` が `p`-群 ⇒ 冪零. Baer 2.12 で `⟨x⟩ ≤ F(G)`, 橋渡し
+  で `⟨x⟩ ≤ O_p(G)`.
+
+lean-eval problem suite signature:
+<https://lean-lang.org/eval/problems/baer_suzuki/>
+(eval 側の `LeanEval.GroupTheory.Defs.pCore` は本 repo の
+[`OddOrder.Isaacs.Ch01.opCore`](Ch01_Sylow/Main.lean#L533) と同じく最大正規 `p`-部分群).
+
+古典 Baer-Suzuki theorem は通常 subset 版 (`X ⊆ O_p(G) ↔ ∀ a b ∈ X,
+⟨a, b⟩` p-群) で語られるが, 本定理はその単一元への特殊化. -/
+theorem baerSuzuki_pCore [Finite G] {p : ℕ} [Fact p.Prime] (x : G) :
+    x ∈ opCore p G ↔
+      ∀ g : G, IsPGroup p ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G)) := by
+  refine ⟨?_, ?_⟩
+  · -- (⇒) x ∈ O_p(G) ⇒ closure {x, gxg⁻¹} ≤ O_p(G), 部分群は p-群.
+    intro hx g
+    have hOp_pgroup : IsPGroup p ↥(opCore p G) := opCore_isPGroup p G
+    have hgx : g * x * g⁻¹ ∈ opCore p G :=
+      (opCore.normal p G).conj_mem x hx g
+    have hclos_le : Subgroup.closure ({x, g * x * g⁻¹} : Set G) ≤ opCore p G := by
+      rw [Subgroup.closure_le]
+      intro y hy
+      rcases hy with rfl | hy
+      · exact hx
+      · rw [Set.mem_singleton_iff] at hy
+        exact hy ▸ hgx
+    exact hOp_pgroup.of_injective (Subgroup.inclusion hclos_le)
+      (Subgroup.inclusion_injective hclos_le)
+  · -- (⇐) ∀ g, closure {x, gxg⁻¹} p-群 ⇒ Isaacs 2.12 iff で ⟨x⟩ ≤ F(G), 橋渡しで x ∈ O_p(G).
+    intro hPg
+    -- ⟨x⟩ は p-群 (g = 1 で closure {x, x} = ⟨x⟩).
+    have hx_pgroup : IsPGroup p ↥(Subgroup.zpowers x) := by
+      have h1 := hPg 1
+      have h_set : ({x, 1 * x * 1⁻¹} : Set G) = {x} := by simp
+      rw [h_set, ← Subgroup.zpowers_eq_closure] at h1
+      exact h1
+    -- ⟨x⟩ ⊔ (MulAut.conj g) • ⟨x⟩ = closure {x, gxg⁻¹}.
+    have hsup_eq : ∀ g : G,
+        (Subgroup.zpowers x ⊔ ((MulAut.conj g) • Subgroup.zpowers x : Subgroup G))
+          = Subgroup.closure ({x, g * x * g⁻¹} : Set G) := by
+      intro g
+      -- まず (MulAut.conj g) • ⟨x⟩ = ⟨gxg⁻¹⟩.
+      have h_conj : (MulAut.conj g : MulAut G) • Subgroup.zpowers x
+          = Subgroup.zpowers (g * x * g⁻¹) := by
+        rw [Subgroup.zpowers_eq_closure x,
+            Subgroup.zpowers_eq_closure (g * x * g⁻¹),
+            Subgroup.smul_closure]
+        congr 1
+        ext y
+        simp [MulAut.smul_def, MulAut.conj_apply]
+      -- closure {x} ⊔ closure {gxg⁻¹} = closure ({x} ∪ {gxg⁻¹}) = closure {x, gxg⁻¹}.
+      rw [h_conj, Subgroup.zpowers_eq_closure x,
+          Subgroup.zpowers_eq_closure (g * x * g⁻¹),
+          ← Subgroup.closure_union]
+      congr 1
+    -- Baer 仮定: ∀ g, ⟨x⟩ ⊔ ⟨x⟩^g 冪零.
+    have hbaer : ∀ g : G,
+        Group.IsNilpotent ↥(Subgroup.zpowers x ⊔
+          ((MulAut.conj g) • Subgroup.zpowers x : Subgroup G)) := by
+      intro g
+      rw [hsup_eq g]
+      exact (hPg g).isNilpotent
+    -- Isaacs 2.12 iff ⇒ ⟨x⟩ ≤ F(G).
+    have hxle_fit : Subgroup.zpowers x ≤ fitting G :=
+      (le_fitting_iff_baer_sup_conj_isNilpotent _).mpr hbaer
+    -- 橋渡し: ⟨x⟩ p-群 + ⟨x⟩ ≤ F(G) ⇒ ⟨x⟩ ≤ O_p(G).
+    exact mem_opCore_of_le_fitting_of_isPGroup hx_pgroup hxle_fit
+      (Subgroup.mem_zpowers x)
 
 end -- 2B
 

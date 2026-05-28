@@ -26,6 +26,7 @@ elaboration 時に検査する CI ガード. moore57 プロジェクトの `Moor
 |---|---|---|
 | Ch.1 (Sylow Theory) | `Subgroup.chermakDelgado` | Thm 1.41 (Chermak-Delgado) |
 | Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.matsuyama` | Thm 2.13 (Matsuyama involution) |
+| Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` | Thm 2.12 系 (lean-eval Baer-Suzuki) |
 | Ch.2 (Subnormality) | `lucchini_index_normalCore_lt_index` | Thm 2.20 (Lucchini) |
 | Ch.3 (Split Extensions) | `horosevskii_aut_order_lt` | Thm 3.3 (Horosevskii) |
 | Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.hall_E_exists` | Thm 3.13 (Hall E for solvable) |
@@ -86,6 +87,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.2 (Subnormality): Thm 2.13 Matsuyama
 -- 奇素数位数 inversion `x^t = x⁻¹` の存在 (`t ∉ O_2(G)` 下)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch02.matsuyama
+
+-- Ch.2 (Subnormality): Baer-Suzuki single-element p-core form (lean-eval problem)
+-- x ∈ O_p(G) ↔ ∀ g, ⟨x, gxg⁻¹⟩ p-group. Isaacs 2.12 iff から導出.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.baerSuzuki_pCore
 
 -- Ch.2 (Subnormality) / Ch.4 forward dependency: Thm 2.20 Lucchini
 -- A cyclic proper subgroup A, K = core_G(A) ⇒ |A:K| < |G:A|.
