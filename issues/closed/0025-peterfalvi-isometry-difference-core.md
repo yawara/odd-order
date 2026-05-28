@@ -46,10 +46,11 @@ created: 2026-05-25
    `irreducibleCharacter_apply_one_eq_pos_natCast` (既約指標の次数 > 0),
    `exists_irr_sub_irr_of_inner_self_two` (**橋渡し**: `φ∈ZIrr`, `⟨φ,φ⟩=2`, `φ(1)=0`
    ⇒ `φ = α - β`, α,β 相異なる既約指標)。各 `τ(χ_i-χ_0)` が *名前付き* 既約の差になる。
-- [ ] **combinatorial core 本体 (残り、最大の塊)**: 名前付き差分
-   `v_i = α_i - β_i` を共通成分解析で uniform sign family に組み立てる
-   (n=2 / n=3 / induction)。下記 recipe 参照。
-- [ ] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消す.
+- [x] **combinatorial core 本体 (完了)**: 名前付き差分 `v_i = α_i - β_i` を共通成分解析で
+   uniform sign family に組み立てた。実装は §3 (1.4) を induction でなく
+   `irreducibleCharacter_cross_pair_classify` (Type A / Type B 二分) + 共通成分
+   `αFun one` (or `βFun one`) の global 一意性で書いた。下記 progress 参照。
+- [x] core lemma を `isometry_difference_pair_structure` に戻して `sorry` を消した。
 
 合計推定: ~400-750 LOC of new bridges + combinatorial induction.
 **`column_orthogonality_cases` (#27) は不要** (row orthogonality だけで済む).
@@ -328,6 +329,69 @@ sorry (現 IsometryDifferencePair.lean:679) を埋める。推定 ~200-400 LOC�
 - `beab244` 層3: 整数組合せ (`exists_pair_of_sum_sq_eq_two`)
 - `ab77c1e` 層3: 既約指標の次数正値性
 - `e0b8c70` 層3: 橋渡し (`exists_irr_sub_irr_of_inner_self_two`)
+
+## 2026-05-28 progress (cont. 4): 層 3 combinatorial core 完了 — issue クローズ可
+
+**層 3 combinatorial core 本体を完了**し, `isometry_difference_pair_structure` の `sorry`
+を消した (`IsometryDifferencePair.lean`, `peterfalvi-s09`, 未 push)。
+
+### 追加した補題
+
+`IsometryDifferencePair.lean` 内 (variable `[Fintype G]` 後, 主定理直前) に 2 つ:
+
+- `irreducibleCharacter_inner_sub_sub_eq_ite` — `⟨α-β, γ-δ⟩` を 4 つの Kronecker delta
+  `[α=γ], [α=δ], [β=γ], [β=δ]` の差和に展開する。`ClassFunction.inner_sub_left/right` と
+  `irreducibleCharacter_inner_eq_ite` を順に rw。
+- `irreducibleCharacter_cross_pair_classify` — `⟨α-β, γ-δ⟩ = 1` (α≠β, γ≠δ) ⇒
+  **Type A** `(α = γ ∧ α ≠ δ ∧ β ≠ γ ∧ β ≠ δ)` または **Type B**
+  `(α ≠ γ ∧ α ≠ δ ∧ β ≠ γ ∧ β = δ)` の二者択一。4 つの indicator を case bash で全パターン
+  尽くす (`(1,0,0,1)` も `(0,1,1,0)` も内積 ≠ 1 で除外)。
+
+### 主定理の証明戦略
+
+1. `exists_irr_sub_irr_of_inner_self_two` (`ZIrrFourier`) で各 `v_i = τ(χ_i-χ_0)`
+   (i ≠ 0) を `α_i - β_i` (`α_i ≠ β_i`) に展開し, `αFun, βFun : Fin n → IrreducibleCharacter G`
+   を Classical.choose で固定 (i = 0 は trivial 既約に default)。
+2. 参照 index `one : Fin n := ⟨1, _⟩` を固定 (`_hn : 2 ≤ n` から `1 < n`)。
+3. **Type A globally** (`∃ k ≠ 0, k ≠ one, αFun one = αFun k`) か **Type B globally**
+   (∀ k ≠ 0, k ≠ one, αFun one ≠ αFun k) で case split。
+4. Type A の場合: cross_pair_classify で `(one, k₀)` Type A を確定, 任意の k についても
+   Type A を取れることを **三角形 (k₀, k) cross pair の矛盾**で示す (Type B at (one, k) と
+   Type A at (one, k₀) を仮定すると, (k₀, k) cross pair が Type A でも Type B でもなくなる)。
+   結果: `∀ k ≠ 0, αFun k = αFun one`。
+   - `μFun := Function.update βFun 0 (αFun one)`, sign = -1。
+   - `v_i = (αFun one) - (βFun i) = -1 • (μFun i - μFun 0)`。
+5. Type B の場合は対称: `∀ k ≠ 0, βFun k = βFun one`, μFun := update αFun 0 (βFun one),
+   sign = +1。
+6. 各 case で `μFun` の injectivity も cross_pair_classify から: `i, j ≠ 0, i ≠ j` で
+   `αFun i = αFun j` (Type A globally) かつ `βFun i = βFun j` (仮定) は両立しない
+   (cross_pair_classify は Type A/B 排他)。
+
+### 注意
+
+- `by_cases hkOne : k = one` の negative 枝は `hkOne : ¬(k = one)` で `Ne` namespace
+  の dot notation `.symm` が効かない (`Function.symm` を探す)。`Ne.symm hkOne` と
+  明示するか, 受け取り側の型を `Ne` に明示する必要がある。
+- `push_neg` は v4.30 で deprecated; 代わりに `push Not` を使用。
+- 構造体 update の `data.signedDifference` 展開には `change` (not `show`) +
+  `neg_one_zsmul`, `neg_sub`, `one_zsmul` を組み合わせる。
+- 当初 recipe の n=2/n=3/induction は不要だった (cross 内積 = 1 から Type A vs Type B
+  が排他で取れるので, induction なしで一気に global 化できる)。
+
+### このセッション (継続) の追加 commit (peterfalvi-s09、未 push)
+
+これからコミット予定:
+- combinatorial core 本体: `irreducibleCharacter_inner_sub_sub_eq_ite`,
+  `irreducibleCharacter_cross_pair_classify`, および
+  `isometry_difference_pair_structure` の sorry-free 化。
+
+### Build 確認
+
+- `lake build OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair` ✅
+- `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` ✅
+- `lake build OddOrder` ✅ (S09 の sorry は別 issue)
+
+**本 issue (0025) の完了条件は全て満たされた**。クローズ可。
 
 ## 完了条件
 
