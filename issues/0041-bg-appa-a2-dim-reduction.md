@@ -12,6 +12,13 @@ created: 2026-05-28
 > (mmd L2204+) が読めるようになった。本 issue は**証明の再構成ではなく、Gorenstein 原文の
 > Lean への翻訳**になった。内容は初等線形代数(rank-nullity / Jordan / ブロック行列 / 置換共役)
 > で、当初想定の「char-p 加群表現論(primitivity / module-Clifford / tensor 分解)」は不要だった。
+>
+> **★ 2026-05-28 (late PM) 再更新**: Gorenstein 8.1 Step 4-5 を精読、**Jordan canonical form は不要**と判明。
+> 実際に proof が使うのは `R: V₁ ≅ V₂` 同型(より正確には `T := (x₂-1)∘(x₁-1): V₂ → V₂` 同型)の
+> **eigenvector 1 個**だけで、Jordan form 全体は不要。mathlib `Module.End.exists_eigenvalue`
+> (alg-closed + finite-dim + nontrivial)で直接。Step 4 自前実装見積もり ~200 行 → **~30-50 行**。
+> 詳細: 下記「★ Step 4 の精密化」節 + [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md)
+> 「★ 2026-05-28 (late PM) 追補」節。
 
 ## 背景 — なぜこれが要るか
 
@@ -117,7 +124,7 @@ Gorenstein Ch.3 §8 Theorem 8.1 の証明は **完全に初等線形代数**で�
         (I I)         (0 I)
    ```
 
-4. **Jordan canonical form + 置換共役**: `R` を `F` 代数閉なので Jordan canonical form
+4. **Jordan canonical form + 置換共役**(Gorenstein 原文): `R` を `F` 代数閉なので Jordan canonical form
    `S = Q⁻¹RQ` に。基底変換で `x₂ = (I S / 0 I)`。`S` は対角値非零の lower triangular。
    さらに **「行 2 と行 `m+1` を入れ替える置換行列 `P`」で共役**を取ると、新基底 `(u_i)` で:
 
@@ -135,15 +142,52 @@ Gorenstein Ch.3 §8 Theorem 8.1 の証明は **完全に初等線形代数**で�
 (Gorenstein はこの後 Dickson でさらに `SL(2,p) ⊆ G` を出すが、**BG A.2 の `|G|` 偶のためには
 ここまで(dim=2)で十分**。後は repo A.1 で閉じる。)
 
-**Lean 翻訳の中身**:
+### ★ Step 4 の精密化: Jordan form 不要(eigenvector 1 個で足りる)
+
+Gorenstein 8.1 Step 4-5 を精読すると、**「`S` が Jordan canonical form である」という構造全体は
+不要**で、**`S` の最初の列が `(λ, 0, …, 0)ᵀ`(= `e₁` が `S` の eigenvector)**だけで議論が回る。
+
+理由: 置換共役後、`x₂ u₂` の `U = span(u₁, u₂)` 外への成分は `S` の最初の列の (2 行目以降) で
+支配される。これがゼロ ⇔ `S e₁ = λ e₁` ⇔ `R` の対応する元が eigenvector。
+
+⇒ **Jordan form 全体を構成せず、`R` の eigenvector 1 個で足りる**。
+
+**Clean argument (Jordan form を使わない、Lean 実装で採るべき版)**:
+
+```
+T := (x₂ - 1) ∘ (x₁ - 1) : V₂ → V₂        -- composition of two isomorphisms
+  (x₁ - 1)|_{V₂} : V₂ → V₁ iso, (x₂ - 1)|_{V₁} : V₁ → V₂ iso
+T 非特異, V₂ 有限次元 nontrivial, F alg-closed
+⇒ ∃ v ∈ V₂ \ {0}, ∃ λ ∈ F \ {0}, T(v) = λ v        -- Module.End.exists_eigenvalue
+
+u₁ := v ∈ V₂                              -- nonzero eigenvector
+u₂ := (x₁ - 1)(v) ∈ V₁                    -- in V₁ via the iso (x₁-1)|_{V₂}
+
+U := span(u₁, u₂)
+  - u₁, u₂ 線形独立 (V₁ ∩ V₂ = 0, u₁ ∈ V₂\0, u₂ ∈ V₁\0 since (x₁-1)|_{V₂} 単射)
+  - x₁ u₁ = u₁ + (x₁-1)(u₁) = u₁ + u₂        ∈ U  ✓
+  - x₁ u₂ = u₂                  (u₂ ∈ V₁)    ∈ U  ✓
+  - x₂ u₁ = u₁                  (u₁ ∈ V₂)    ∈ U  ✓
+  - x₂ u₂ = u₂ + (x₂-1)(u₂) = u₂ + T(v) = u₂ + λ u₁  ∈ U  ✓
+
+⇒ U は x₁, x₂ 不変 ⇒ G = ⟨x₁,x₂⟩ 不変 ⇒ G-submodule.
+既約 + u₁ ≠ 0 ⇒ U = V ⇒ dim V = 2. ∎
+```
+
+つまり Step 4-5 はまとめて 「`T` の eigenvector + `U` 不変性 + 既約 ⇒ `dim V = 2`」 の
+**~30-50 行**。
+
+**Lean 翻訳の中身**(更新版):
 - ステップ 1, 2: `LinearMap.range_le_ker_iff` (or 同等), `LinearMap.finrank_range`,
-  `Module.finrank_add_finrank_quotient`, `IsSimpleModule.eq_top_of_isInvariant` 等の
+  rank-nullity (`LinearMap.finrank_range_add_finrank_ker` 等), `IsSimpleModule.eq_top` 系の
   既約性論証。
-- ステップ 3: 自前で基底構成 + `Module.Basis`。
-- ステップ 4: Jordan canonical form — mathlib `Module.End.HasEigenvalue` / `…GeneralizedEigenspace`
-  + alg-closed の `Polynomial.splits` 経由。**ここが一番技術的**(mathlib に Jordan form の
-  packaged form があるかは要確認、無ければ block-by-block で構成)。
-- ステップ 5: ステップ 4 の不変 2 次元部分空間 + `IsSimpleModule` から `top` 結論。
+- ステップ 3: `V = V₁ ⊕ V₂` を `Submodule.IsCompl` で取り、`v_{m+i} = (x₁-1)(v_i)` の基底構成は
+  不要(`u₂ := (x₁-1)(v)` を直接定義すれば足りる)。
+- ステップ 4-5: **`T := (x₂-1)∘(x₁-1): V₂ →ₗ V₂`** を作り、`Module.End.exists_eigenvalue`
+  (`[IsAlgClosed F] [FiniteDimensional F V₂] [Nontrivial V₂]`) で eigenvector を得る。
+  `u₁ := v`, `u₂ := (x₁-1)(v)`, `U := Submodule.span F {u₁, u₂}` の不変性 4 本を proof.
+  `IsSimpleModule + Nontrivial U ⇒ U = ⊤` で `Module.finrank F V = 2`(= `finrank_span` 等)。
+- **Jordan form / generalized eigenspace 系は使わない**。
 
 ## repo で使える部品(確認済・sorry-free)
 
@@ -173,26 +217,32 @@ A.1: `V` 2-dim over `F` (odd char `p`), `G ≤ GL(V)` 有限既約, `|G|` 奇 �
 - `OddOrder.RepresentationTheory.EigenspaceUnderCyclicAction.lean` は BG Prop 2.4 用(ℂ 寄り)。
   本 issue には**ほぼ不要**(Jordan/eigenspace は mathlib の `Module.End.eigenspace` で直接組める)。
 
-## 作るかもしれないインフラ(限定的)
+## 作るかもしれないインフラ
 
-Gorenstein 8.1 の翻訳に直接要るのは:
-- **Jordan canonical form**(mathlib にある形が使えるか確認、無ければ実装)。alg-closed `F` 上の
-  非特異 endomorphism の標準形。**唯一非自明な可能性のあるピース**。
+**新規インフラ: 不要**(2026-05-28 late PM 確認済)。
 
-不要(spike 段階で「要る」と書いていたが Gorenstein 原文を読んで誤りと判明):
+不要だと当初想定していた中で確定したもの:
+- ~~**Jordan canonical form**~~ — Step 4 の精密化で eigenvector 1 個で十分と判明。
+  mathlib `Module.End.exists_eigenvalue` (`LinearAlgebra/Eigenspace/Triangularizable.lean:63-66`)
+  で直接。**自前実装不要**。
 - ~~加群の primitivity / imprimitivity~~ — proof に出てこない。
 - ~~加群 Clifford(homogeneous component 分解)~~ — proof に出てこない。
 - ~~tensor 分解~~ — proof に出てこない。
+
+参考 — mathlib にあるが本 issue では使わないもの:
+- `Module.End.iSup_maxGenEigenspace_eq_top [IsAlgClosed]` (Triangularizable.lean L75-137)
+- Jordan-Chevalley 分解 (`Module.End.exists_isNilpotent_isSemisimple`, JordanChevalley.lean L76-101)
+- packaged Jordan canonical form は mathlib に**無い**(が、本 issue では不要なので問題なし)。
 
 ## やること(着手順)
 
 - [ ] **(A.1)** 上記レシピで A.1 を組む(部品済、interface/型の早い確認)。新規ファイル
       `OddOrder/BG/AppA_PStability.lean`(または相当)を作る。配置は ROADMAP / 既存 BG 構成に合わせる。
-- [ ] **(Jordan form 確認)** mathlib に alg-closed 上 endomorphism の Jordan canonical form
-      packaged 形がどこまであるか調査。無ければ最小限を自前実装(`Module.End` + eigenspace
-      decomp + nilpotent part 分離 で足りる)。
-- [ ] **(縮約)** `quadratic_two_generated_irreducible_finrank_eq_two` を Gorenstein 8.1 proof
-      (mmd L2210–L2240)5 ステップに沿って証明。
+- [ ] **(縮約 Step 1-3)** `V₁ ∩ V₂ = 0`, `V = V₁ ⊕ V₂` を `Submodule.IsCompl` で。
+      rank-nullity + 既約性論証。
+- [ ] **(縮約 Step 4-5)** `T := (x₂-1)∘(x₁-1): V₂ →ₗ V₂` 構成 → `Module.End.exists_eigenvalue`
+      で `(v, λ)` 取得 → `u₁ := v`, `u₂ := (x₁-1)(v)`, `U := span {u₁, u₂}` 不変性 4 本 →
+      既約より `U = V` → `Module.finrank F V = 2`。
 - [ ] **(A.2)** 縮約 + A.1 で A.2(`|G|` 偶)を閉じる。Dickson 不要。
 
 ## 完了条件

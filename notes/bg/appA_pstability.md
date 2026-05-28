@@ -15,6 +15,98 @@ ROADMAP 上の位置: **Phase 2a 第 2 波** (Phase 1 Isaacs Ch.7 完成必須, 
 - 詳細・依存閉包(App.B 完備、ゲート = A.4(b)+A.4(c))・J→L 大域置換の検証は
   [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
 
+## ★ 2026-05-28 (late PM) 追補: A.2 = Gorenstein 8.1 翻訳, **Jordan form 不要**
+
+### 背景の変化
+
+References repo に Gorenstein 1968 _Finite Groups_ が追加された(`references/gorenstein/finite-groups.{pdf,mmd}`)。これで BG App.A が "follow the proof of Theorem 3.8.1 of **G**" と書くだけで省略していた A.2 の証明本体(= Gorenstein Ch.3 §8 Thm 8.1 = mmd L2204+ statement / **L2210–L2240 proof**)が直接読めるようになり、issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md) が「証明の再構成」から「Gorenstein 原文の Lean 翻訳」に簡素化された。
+
+### Gorenstein 8.1 (V dim=2) の 5 ステップ(精読、mmd L2210–L2240)
+
+1. **rank-nullity**: `xᵢ` が char `p` 上 `p`-element + 二次最小多項式 ⇒ `Wᵢ := V(xᵢ−1) ⊆ Vᵢ = C_V(xᵢ)`, `d ≤ 2dᵢ`。
+2. **`V₁ ∩ V₂ = 0`**: `dᵢ > d/2` 仮定 ⇒ `W := V₁ ∩ V₂ ≠ 0`、両 `xᵢ` は `W` 上自明 ⇒ `G = ⟨x₁, x₂⟩` も自明 ⇒ 既約より `V = W` ⇒ 忠実かつ `xᵢ ≠ 1` と矛盾。∴ `d₁ = d₂ = m`, `V = V₁ ⊕ V₂`。
+3. **ブロック行列**: `vᵢ` を `V₂` 基底、`v_{m+i} := vᵢ(x₁−1) ∈ V₁` で `V₁` 基底。この基底で `x₁ = (I 0 / I I)`, `x₂ = (I R / 0 I)`, `R` 非特異(`x₂−1: V₁ → V₂` 同型)。
+4. **Jordan + 置換共役**: `R` を Jordan form `S = Q⁻¹RQ` (`F` alg-closed)、`D = diag(Q,Q)` で共役 → `B₁ = A₁`, `B₂ = (I S / 0 I)`。`P` = 行 2, m+1 swap で再共役 → top-left 2×2 が `C₁ = (1 0 / 1 1)`, `C₂ = (1 λ / 0 1)` (`λ = S` の (1,1) 成分)。
+5. **U=V**: `U = span(u₁, u₂)` が `x₁, x₂` 不変 ⇒ `G`-不変 ⇒ 既約 + `u₁ ≠ 0` ⇒ `U = V` ⇒ **`dim V = 2`**。∎
+
+(Gorenstein は更に Dickson で `G ⊇ SL(2,p)` を出すが、**BG A.2 weakening (`|G|` 偶) には dim=2 で十分**、Dickson 不要。)
+
+### Step 4 の数学的精読 = ★ Jordan form 不要の発見
+
+mmd L2230–L2236 で実際に proof が使う情報を抽出すると、**「`S` が Jordan canonical form である」 という構造全体は不要**で、**`S` の最初の列が `(λ, 0, …, 0)ᵀ`**(つまり `e₁` が `S` の eigenvector)だけで議論が回る。
+
+理由: Step 4 の置換共役後、`x₂ u₂` の `U = span(u₁, u₂)` 外への成分は `S` の最初の列の (2 行目以降) で支配される。これがゼロ ⇔ `S e₁ = λ e₁` ⇔ `R` の対応する元が eigenvector。
+
+⇒ **Jordan form 全体を構成せず、`R` の eigenvector 1 個で足りる**。
+
+### Clean argument(Jordan form を使わない版)
+
+```
+T := (x₂ - 1) ∘ (x₁ - 1) : V₂ → V₂        -- composition of two isomorphisms
+  (x₁ - 1)|_{V₂} : V₂ → V₁ iso, (x₂ - 1)|_{V₁} : V₁ → V₂ iso
+T 非特異, V₂ 有限次元 nontrivial, F alg-closed
+⇒ ∃ v ∈ V₂ \ {0}, ∃ λ ∈ F \ {0}, T(v) = λ v
+
+u₁ := v ∈ V₂                              -- nonzero eigenvector
+u₂ := (x₁ - 1)(v) ∈ V₁                    -- in V₁ via the iso (x₁-1)|_{V₂}
+
+U := span(u₁, u₂)
+  - u₁, u₂ は線形独立 (V₁ ∩ V₂ = 0, u₁ ∈ V₂\0, u₂ ∈ V₁\0)
+  - x₁ u₁ = u₁ + (x₁-1)(u₁) = u₁ + u₂        ∈ U  ✓
+  - x₁ u₂ = u₂                  (u₂ ∈ V₁)    ∈ U  ✓
+  - x₂ u₁ = u₁                  (u₁ ∈ V₂)    ∈ U  ✓
+  - x₂ u₂ = u₂ + (x₂-1)(u₂) = u₂ + T(v) = u₂ + λ u₁  ∈ U  ✓
+
+⇒ U は x₁, x₂ 不変 ⇒ G = ⟨x₁,x₂⟩ 不変 ⇒ G-submodule.
+既約 + u₁ ≠ 0 ⇒ U = V ⇒ dim V = 2. ∎
+```
+
+### mathlib 調査結果(packaged Jordan form の有無)
+
+調査済。mathlib 4.30-rc2 にあるのは:
+- ✅ `Module.End.exists_eigenvalue [IsAlgClosed F] [FiniteDimensional F V] [Nontrivial V]` (`LinearAlgebra/Eigenspace/Triangularizable.lean:63-66`)
+- ✅ `Module.End.iSup_maxGenEigenspace_eq_top [IsAlgClosed]` (同 L75-137) — generalized eigenspace で全体 span
+- ✅ Jordan-Chevalley 分解 (`Module.End.exists_isNilpotent_isSemisimple`, `LinearAlgebra/JordanChevalley.lean:76-101`) — 半単純 + 冪零、unique
+- ✅ permutation matrix / block matrix / swap (`LinearAlgebra/Matrix/{Permutation,Block,Swap}.lean`)
+- ❌ **Jordan block 行列の明示構成 / Jordan canonical form 定理は無い**
+
+⇒ 上記 clean argument を採用すれば必要なのは `exists_eigenvalue` だけ。**Jordan form 自前実装 (~150-250 行) は完全に不要**。
+
+### 実装 impact(issue #0041 への反映)
+
+| 元の見積もり | 修正版 |
+|---|---|
+| Step 4 = Jordan form 自前実装 ~200 行 | Step 4 = `exists_eigenvalue` + `T := (x₂-1)∘(x₁-1)` の eigenvector で基底変換 ~30-50 行 |
+| 全体 ~530 行 (App.A 全体) | A.2 縮約補題部分が大幅短縮 |
+| 最大リスク = Jordan form の packaged 形が無い | リスクなし(`exists_eigenvalue` で直接) |
+
+### 必要な mathlib API(縮約補題、最小限)
+
+```lean
+-- Step 1: rank-nullity
+LinearMap.range_le_ker_iff
+LinearMap.finrank_range
+Module.finrank_add_finrank_quotient  -- or rank-nullity in some form
+LinearMap.finrank_range_add_finrank_ker
+
+-- Step 2: irreducibility-driven contradiction
+IsSimpleModule.eq_top_of_isInvariant  -- or its equivalent
+Submodule.eq_bot_or_eq_top  -- in IsSimpleModule context
+
+-- Step 3: basis construction
+Module.Basis.ofVectorSpace / Basis.extend / Basis.append
+Submodule.isCompl_of_direct_sum  -- or DirectSum.Decomposition
+
+-- Step 4: eigenvalue + eigenvector
+Module.End.exists_eigenvalue   -- alg-closed + finite-dim + nontrivial
+Module.End.HasEigenvector  -- eigenvector definition
+
+-- Step 5: invariant subspace + simple module → top
+Submodule.eq_top_of_isSimpleModule_of_ne_bot  -- or similar
+```
+
+詳細は issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md)。
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
