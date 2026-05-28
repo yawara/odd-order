@@ -61,12 +61,20 @@ extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
    `hysq, hyne, hyp` を helpers から取得、`H := closure {x, y}` 非 p-群
    (`hH_not_pgroup`) + `hxH`, `hyH` ∈ H 准備。残 = `h_two_dvd : 2 ∣ |G|` のみ。
 
+5. **Step 5 用 single-step coprime action** (`96b447e`, 2026-05-29):
+   新ファイル [`OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean`](../../OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean)
+   (147 行, sorry-free) に `coprime_action_trivial_step` を実装。`G` 有限,
+   `[NeZero (Nat.card G : F)]`, `W ≤ V` 上 + `V/W` 上自明 ⇒ `V` 全体に自明。
+   証明は Maschke 不要の直接展開: `T := ρ g - 1` で `T² = 0`, 二項展開で
+   `(1 + T)^(orderOf g) = 1 + (orderOf g) • T`, `(ρ g)^(orderOf g) = 1` と
+   `(orderOf g : F) ≠ 0` から `T = 0`。次は chain (合成列) 版 で下降帰納。
+
 ### 残 (Step 4-8 = Gorenstein 8.3 mmd L2293-L2298)
 
 | Step | 内容 | 鍵新規補題 |
 |---|---|---|
 | 4 | V を `F[H]`-module 視 + H-invariant 合成列 `V = V_1 ⊋ V_2 ⊋ … ⊋ V_{m+1} = 0` | `RingTheory.SimpleModule` / `Order.JordanHolder.CompositionSeries` の Submodule-restricted 版 |
-| 5 | 全 i で `N_i := ker(H → End(V_i/V_{i+1})) = H` 仮定 ⇒ H の p'-subgroup Q が全 quotient 上自明 ⇒ V 上自明 (Maschke + Jordan-Hölder) ⇒ ρ faithful と矛盾、∴ ∃ i, N_i ⊊ H | **coprime action** = Gorenstein Thm 3.4 翻訳: `coprime_action_trivial_of_trivial_on_quotients` |
+| 5 | 全 i で `N_i := ker(H → End(V_i/V_{i+1})) = H` 仮定 ⇒ H の p'-subgroup Q が全 quotient 上自明 ⇒ V 上自明 (Maschke + Jordan-Hölder) ⇒ ρ faithful と矛盾、∴ ∃ i, N_i ⊊ H | **coprime action** = Gorenstein Thm 3.4 翻訳: 単段 `coprime_action_trivial_step` ✅ (`96b447e`, 147 行, sorry-free); chain 版 (下降帰納で composition series 上で適用) TODO |
 | 6 | その i で H̄ := H/N_i, ρ̄ faithful irreducible on V_i/V_{i+1}, H̄ = ⟨x̄, ȳ⟩ | quotient representation `H/N_i → End_F (V_i/V_{i+1})` (新規定義 or `Representation.quotient`) |
 | 7 | x̄, ȳ ≠ 1: x̄ = 1 ⇒ H̄ = ⟨ȳ⟩ p-group, alg-closed char p faithful irreducible 不可能 (= Gorenstein Thm 1.2) ⇒ H̄ = 1 矛盾 | **p-group irreducible faithful → trivial** = Gorenstein Thm 1.2 帰結: `IsPGroup.faithful_irreducible_in_charP_trivial` (repo `PGroupFixedVector.invariants_ne_bot` 系) |
 | 8 | A.2 (`thmA2`) を H̄ ↷ V_i/V_{i+1} に適用 ⇒ ¬ Odd \|H̄\| ⇒ 2 ∣ \|H̄\| ∣ \|H\| ∣ \|G\| | 既存 `thmA2` を呼ぶだけ |
@@ -74,7 +82,7 @@ extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
 ### 工数見積
 
 - Step 4 (composition series): mathlib `CompositionSeries` を Submodule lattice 上で具体化、~50-80 行 (mathlib 既存 API 探索 + 適用)
-- Step 5 (coprime action): Maschke ベースの induction、`Mathlib.RepresentationTheory.Maschke` 利用、~80-120 行
+- Step 5 (coprime action): **単段は完了** (`96b447e`, 147 行, Maschke 不要の直接展開). 残 chain 版 (composition series 上の下降帰納) ~50-80 行。
 - Step 6 (quotient rep): ~30-50 行
 - Step 7 (p-group irreducible): `PGroupFixedVector.invariants_ne_bot` 系 + irreducible 仮定で短い、~30 行
 - Step 8 (A.2 適用 + Lagrange): ~30-50 行

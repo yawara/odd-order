@@ -35,6 +35,12 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
   - `representation_conj_quadratic`: `(ρx - 1)² = 0 ⇒ (ρ(gxg⁻¹) - 1)² = 0`
   - `representation_conj_ne_one`: `ρx ≠ 1 ⇒ ρ(gxg⁻¹) ≠ 1`
   - `isPGroup_zpowers_conj`: `IsPGroup p ⟨x⟩ ⇒ IsPGroup p ⟨gxg⁻¹⟩`
+- **Step 5 用 single-step coprime action** (`96b447e`, 2026-05-29):
+  新 module [`OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean`](../OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean) (147 行)
+  に `coprime_action_trivial_step` sorry-free 実装。`G` 有限,
+  `(|G| : F) ≠ 0`, `W ≤ V` 上 + `V/W` 上自明 ⇒ `V` 全体に自明。
+  Maschke 不要の直接展開 (`T := ρ g - 1`, `(1+T)^(orderOf g) = 1 + (orderOf g) • T`,
+  `(orderOf g : F) ≠ 0` から `T = 0`).
 - **`thmA3` statement** + **Step 1-3** (`33bb1df`, `1921dec`):
   ```lean
   theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
