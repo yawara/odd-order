@@ -149,8 +149,10 @@ theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
 
 ### 次の一手 (next session)
 
-1. 上記 statement を `AppA_PStability.lean` に書き、Normal instance を発火させて **型が通る scaffold**
-   (`:= sorry`) を build green に。(centralizer/normalizer の set/subgroup 形を合わせるのが鍵)
+1. ✅ (2026-05-29) statement scaffold を `AppA_PStability.lean` に追加 (`thmA4c`, `:= sorry`, build green)。
+   **`Subgroup.normalizer` は Set 引数**(Defs.lean:667)なので `Subgroup.normalizer (P : Set G)` で統一 →
+   `normal_subgroupOf_centralizer_normalizer` instance (s=↑P) が発火し商 N/C が well-formed になった。
+   残: proof 本体 (下記 2,3)。
 2. Gorenstein Ch.6 §5 (6.5.3 proof 末尾) を mmd で特定し「sections p-stable ⇒ (B)」を読む。
 3. proof を step 分解 (A.3 corollary = A.4(a) を section に適用する形)。multi-session 想定。
 

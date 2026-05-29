@@ -1348,6 +1348,29 @@ theorem thmA4a [Finite G] (hp_odd : p ≠ 2) (hodd : Odd (Nat.card G))
   by_contra h_not
   exact thmA3 hp_odd h_Op_trivial h_not hodd
 
+/-- **BG Theorem A.4(c)** (mmd L4480(c), = Gorenstein "condition (B)" / Thm 6.5.3 翻訳):
+`p` odd, `G` solvable odd order, `P` を `p`-部分群とする。`O_{p'}(G)·P ◁ G` かつ `A` が
+`N_G(P)` の `p`-部分群で `[P,A,A]=1` なら, `A` の `N_G(P)/C_G(P)` での像は
+`O_p(N_G(P)/C_G(P))` に含まれる (= **stability lift**, A.5/B.4 → Thm 6.2 の本線)。
+
+**証明ルート (未完, issue #0047)**: condition (B) は「`G` が non-p-stable な section を
+involve しない」とき成立 (Gorenstein 6.5.3 proof 末尾)。奇数位数可解 `G` では全 section が
+`O_p=1` で p-stable (= `thmA4a` = `thmA3` 対偶) ⇒ condition (B)。詳細・step 分解は
+issue [#0047](../../issues/0047-bg-appa-a4.md) 「A.4(c) 作業計画」。 -/
+theorem thmA4c [Finite G] (_hp_odd : p ≠ 2) (_hsolv : IsSolvable G)
+    (_hodd : Odd (Nat.card G))
+    {P : Subgroup G} (_hP : IsPGroup p P)
+    (_hPnorm : (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G ⊔ P).Normal)
+    {A : Subgroup G} (_hA_le : A ≤ Subgroup.normalizer (P : Set G)) (_hA_p : IsPGroup p A)
+    (_hPAA : ⁅⁅P, A⁆, A⁆ = (⊥ : Subgroup G)) :
+    (A.subgroupOf (Subgroup.normalizer (P : Set G))).map
+        (QuotientGroup.mk' ((Subgroup.centralizer (P : Set G)).subgroupOf
+          (Subgroup.normalizer (P : Set G))))
+      ≤ OddOrder.Isaacs.Ch01.opCore p
+          (↥(Subgroup.normalizer (P : Set G)) ⧸
+            (Subgroup.centralizer (P : Set G)).subgroupOf (Subgroup.normalizer (P : Set G))) := by
+  sorry
+
 end PStability
 
 end OddOrder.BG.AppA
