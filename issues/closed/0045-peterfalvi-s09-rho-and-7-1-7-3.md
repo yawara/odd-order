@@ -49,7 +49,15 @@ created: 2026-05-28
     `⟨χ, φ⟩ = ⟨φ, φ⟩` (Hermitian + inner_self real), orthogonal decomposition
     `⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ-φ, χ-φ⟩`, tail ≥ 0 (`.re` で取り出し), final linarith。
   - 要 `hiso : IsDadeIsometry τ` を分離引数 (Hypothesis71 に同居させず引数で受ける)。
-- 残り (follow-on, 別 issue): (7.3) の proof, A^τ 上の sum 形と内積の関係付け。
+- [x] **(7.3) `chiRho_integral_inequality` proof** (2026-05-29, sorry-free)。
+  - Peterfalvi p.39 の議論: `χ₁ := χ * 1_{A^τ}` を `ClassFunction G ℂ` として構成
+    (conj-invariance は `Hypothesis.conj_mem_dadeSupport` / `mem_dadeSupport_conj_iff` で詰める)。
+  - `chiRhoCF χ₁ = chiRhoCF χ`: `ρ` の和は `aH(a) ⊆ A^τ = dadeSupport` 上で動くので
+    `χ₁` も `χ` も同じ値を取る (`mem_dadeSupport_of_mem_hCoset` 一発)。
+  - `(7.2.b)` を `χ₁` に適用し, `‖χ^ρ‖² ≤ ‖χ₁‖²`。
+  - `‖χ₁‖² = (Nat.card G)⁻¹ * ↑(Σ_{g ∈ A^τ} ‖χ g‖²)` を `Complex.mul_conj` +
+    `Complex.normSq_eq_norm_sq` + `Finset.sum_filter` / `Complex.ofReal_sum` で計算。
+  - 要 `hiso : IsDadeIsometry τ` を分離引数 ((7.2.b) と同様)。
 
 ## 完了条件
 
