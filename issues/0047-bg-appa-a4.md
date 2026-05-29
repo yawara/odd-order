@@ -153,8 +153,77 @@ theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
    **`Subgroup.normalizer` は Set 引数**(Defs.lean:667)なので `Subgroup.normalizer (P : Set G)` で統一 →
    `normal_subgroupOf_centralizer_normalizer` instance (s=↑P) が発火し商 N/C が well-formed になった。
    残: proof 本体 (下記 2,3)。
-2. Gorenstein Ch.6 §5 (6.5.3 proof 末尾) を mmd で特定し「sections p-stable ⇒ (B)」を読む。
-3. proof を step 分解 (A.3 corollary = A.4(a) を section に適用する形)。multi-session 想定。
+## A.4(c) proof — Gorenstein 6.5.3 完全引き継ぎ (2026-05-29)
+
+### Gorenstein §6.5 の所在 (特定済)
+
+- **Gorenstein Ch.6 §5「p-stability in p-solvable groups」= `references/gorenstein/finite-groups.mmd` L4758-4823**
+  (Ch.7 が L4824 なので §6.5 はこの範囲)。⚠️ Nougat が章を再番号しているので `grep 6.5.x` では出ない。
+- **Thm 5.1** (L4762) = 6.5.1: `G` p-solvable, `O_p(G)=1`, (p≥5 or (p=3 ∧ SL(2,3)∉G)) ⇒ `G` p-stable。= A.4(a) の母体 (奇数位数では `thmA4a` で代替済)。
+- **Thm 5.2** (L4779) = 6.5.2 = **A.4(b)**: P∈Syl_p of strongly p-solvable G ⇒ 全 normal abelian ≤ O_{p',p}(G)。
+- **Thm 5.3** (L4795) = 6.5.3 = **A.4(c)** ← 本命。
+
+### 🎯 重要: A.4(b) は A.4(c) の系 (Gorenstein 5.3 直後 Remark)
+
+> "Taking P to be a Sylow p-subgroup of O_{p',p}(G) ... If Q is an S_p-subgroup of G containing P
+> and A is an abelian normal subgroup of Q, then [P,A,A]=1. By the theorem, A⊆P ⊆ O_{p',p}(G).
+> **Thus Theorem 5.2 is a special case of Theorem 5.3.**"
+
+⇒ **(c) `thmA4c` を埋めれば (b) `thmA4b` は短い系**。実装順は **(c) → (b)** で確定。
+
+### A.4(c) = Gorenstein 5.3 の証明 (mmd L4801-4815, 翻訳)
+
+`N := N_G(P)`, `C := C_G(P)`。
+1. **`P` の N-不変正規列** `P = P_1 ⊃ P_2 ⊃ … ⊃ P_{n+1} = 1`、各 `P̄_i = P_i/P_{i+1}` は
+   **elementary abelian** かつ **N が既約に作用**（= P を N-群として見た chief series）。
+2. `H_i := ker(N → Aut(P̄_i))` の表現。`N̄_i = N/H_i` は `P̄_i` (Z_p 上ベクトル空間) に
+   **faithful + irreducible** に作用 ⇒ **`O_p(N̄_i) = 1`**（Gorenstein 3.1.3）。
+3. `[P,A,A]=1` ⇒ 各 `[P̄_i, Ā_i, Ā_i]=1` (`Ā_i` = A の N̄_i での像)。
+   **Gorenstein 2.6.6** で各 `x̄ ∈ Ā_i` は `(X-1)²` を満たす（quadratic minpoly）。
+   ★ **`N̄_i` は `O_p=1` の奇数位数可解 section ⇒ `thmA4a` (= A.4(a)) で p-stable**
+   ⇒ p-stable + quadratic ⇒ `x̄` は `(X-1)` を満たす（自明）⇒ **`Ā_i = 1`** ⇒ `A ⊆ H_i`。
+4. ∴ `A ⊆ H := ⋂_i H_i`。`H` は正規列 `P_i` を **stabilize** する。
+5. **`H/C ≤ Aut(P)` の chain-stabilizer ⇒ H/C は p-群**（Gorenstein **Cor 5.3.3** = Hall の
+   stability theorem: p-群の正規列の stability group は p-群）。
+6. `H/C ◁ N/C` かつ p-群 ⇒ `H/C ⊆ O_p(N/C)`。`A ⊆ H` ⇒ **`AC/C ⊆ O_p(N/C)`** ∎。
+
+末尾注: 「Thm 5.3 は p-stable subgroup しか involve しない任意の群で成立」。⇒ 奇数位数仮定は
+N̄_i の p-stability (step 3) を `thmA4a` で得るためだけに効く。
+
+### 必要 sub-lemma と repo/mathlib API 候補
+
+| sub-step | 内容 | 候補 |
+|---|---|---|
+| (1) | p-群 P の N-不変 elementary-abelian chief series | repo `GroupTheory/ChiefFactor.lean`? / `CompositionSeries` を N-群上で。新規の可能性 |
+| (2) | faithful irred rep over F_p ⇒ O_p=1 (G 3.1.3) | repo `PGroupFixedVector` (`IsPGroup.invariants_ne_bot`) の対偶系 |
+| (3a) | `[V,Ā,Ā]=1` ⇒ 各元 quadratic `(ρx-1)²=0` (G 2.6.6) | 直接計算 (交換子 → minpoly)。repo `S02_Representations` 周辺 |
+| (3b) ★ | `N̄_i` p-stable: `thmA4a` 適用 | **`thmA4a` 完成済**。ただし IsPStable は **alg-closed F** 上定義、P̄_i は **F_p** 上 ⇒ **base change (F_p → F_p^alg) で faithful + quadratic 保存** の橋が要る (技術的 sub-lemma、要新規) |
+| (4) | H が chain を stabilize ⇒ A ⊆ H | step 3 の帰結 (各 H_i に A) |
+| (5) ★ | chain stabilizer ⊆ p-群 (Hall stability, G Cor 5.3.3) | **要調査**: mathlib に stability group 補題があるか / repo Ch.4 coprime + 交換子。無ければ新規 (中規模) |
+| (6) | H/C ◁ N/C p-群 ⇒ ⊆ O_p(N/C) | `opCore` の最大正規 p-部分群性質 (Ch01) |
+
+### ⚠️ statement の仮説 discrepancy (要確認)
+
+- Gorenstein 5.3 statement (L4795) は **`O_p(G)P ◁ G`** と書くが、直後 Remark と BG A.4(c)/condition(B)
+  は **`O_{p'}(G)P ◁ G`**。Nougat OCR で `p'` → `p` の可能性大。**scaffold は `O_{p'}` (`oPiCore {q|q≠p}`) を採用済**(正)。
+- proof 本体 (上記 1-6) は **この仮説をほぼ使っていない**ように見える (N=N_G(P) と section p-stability のみ)。
+  → `_hPnorm` が proof で本当に要るか、A.5 application 側の都合かを実装時に判定 (不要なら統合 or 残置)。
+
+### 次セッションの着手順 (推奨)
+
+1. **(5) chain-stabilizer ⊆ p-群** を先に調査・実装 (mathlib 有無 → 無ければ Ch.4 ベース新規)。最大の未知数。
+2. **(1) N-不変 chief series** + **(2) O_p=1** を組む (repo ChiefFactor / PGroupFixedVector 活用)。
+3. **(3b) base-change bridge** (F_p rep → alg-closed で thmA4a 適用) を実装。
+4. 1-6 を assemble して `thmA4c` の sorry を消す。
+5. その後 **(b) `thmA4b`** を 5.3 系として短く (Sylow + abelian normal + (c))。
+6. notes/bg/appA_pstability.md 更新。
+
+### 再開メモ
+
+- scaffold: `OddOrder/BG/AppA_PStability.lean` の `thmA4c` (statement ~L1360, `sorry` L1372)。
+  build: `lake build OddOrder.BG.AppA_PStability` (~20s)。`thmA4a` (= A.4(a)) は同ファイル L1340 付近、完成済。
+- 依存定理: `thmA3`/`thmA4a` (同ファイル), `opCore` (Ch01), `oPiCore` (Ch03), `opPpPrimeCore` (Ch07 S7B1),
+  `PGroupFixedVector`, `normal_subgroupOf_centralizer_normalizer` (mathlib Centralizer.lean:164)。
 
 ## 完了条件
 
