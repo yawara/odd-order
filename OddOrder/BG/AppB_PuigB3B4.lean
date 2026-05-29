@@ -214,4 +214,36 @@ theorem normalizer_le_normalizer_lOddIn (H : Subgroup G) :
   exact map_conj_eq_iff_mem_normalizer.mp
     (lOddIn_map_equiv (MulAut.conj g) (map_conj_eq_iff_mem_normalizer.mpr hg))
 
+/-- `K` の characteristic 部分群 `W` の `G`-像 `W.map K.subtype` は `N_G(K)` で正規化される.
+(`OddOrder.Isaacs.Ch07` S7D1 の同名定理の port; Ch07 は AppB の import 閉包外ゆえ規約上 new generic
+helper として複製する.) -/
+theorem normalizer_le_normalizer_map_of_characteristic
+    {H : Type*} [Group H] {K : Subgroup H} {W : Subgroup ↥K} [W.Characteristic] :
+    Subgroup.normalizer (K : Set H) ≤ Subgroup.normalizer ((W.map K.subtype) : Set H) := by
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff]
+  set cg : ↥K ≃* ↥K := K.normalizerMonoidHom (⟨g, hg⟩ : ↥(Subgroup.normalizer K)) with hcg_def
+  have hWfix : W.map (cg : ↥K →* ↥K) = W :=
+    (Subgroup.characteristic_iff_map_eq.mp ‹W.Characteristic›) cg
+  have hcg_apply : ∀ w : ↥K, ((cg w : ↥K) : H) = g * (w : H) * g⁻¹ := fun w => rfl
+  have hcg_symm_apply : ∀ w : ↥K, ((cg.symm w : ↥K) : H) = g⁻¹ * (w : H) * g := by
+    intro w
+    have h := hcg_apply (cg.symm w)
+    rw [cg.apply_symm_apply] at h
+    rw [h]; group
+  intro y
+  simp only [Subgroup.mem_map, Subgroup.coe_subtype]
+  constructor
+  · rintro ⟨w, hwW, rfl⟩
+    refine ⟨cg w, ?_, ?_⟩
+    · rw [← hWfix]; exact ⟨w, hwW, rfl⟩
+    · rw [hcg_apply]
+  · rintro ⟨w, hwW, hyeq⟩
+    refine ⟨cg.symm w, ?_, ?_⟩
+    · rw [← hWfix] at hwW
+      obtain ⟨w', hw'W, hw'eq⟩ := hwW
+      have : cg.symm w = w' := by rw [← hw'eq]; exact cg.symm_apply_apply w'
+      rw [this]; exact hw'W
+    · rw [hcg_symm_apply, hyeq]; group
+
 end OddOrder.BG.AppB
