@@ -89,7 +89,9 @@ group-algebra center の class-sums 基底 / 指標↔単純加群の数え上�
       (`[Finite G]` のみ) を sorry-free で追加。`instCharacterTableIndexingOfFinite` +
       `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality characterTableRowOrthogonality_holds`
       で `idx`/`hrow` を discharge。AxiomsCheck で allowlist-only 確認。
-- [ ] 0022: 加えて複素共役置換 σ → close。
+- [x] 0022: **無条件化 landed + closed (2026-05-30)**。複素共役置換 σ を新 downstream ファイル
+      `BrauerPermutationUnconditional.lean` で構成 (`Representation.IsIrreducible.dual` 経由)、
+      `brauer_permutation_lemma'` (`[Finite G]` のみ) を sorry-free で追加。AxiomsCheck allowlist-only。
 
 ### 2026-05-30 技術メモ (継続者向け)
 
