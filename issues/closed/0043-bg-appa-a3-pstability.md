@@ -22,6 +22,20 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 §0.2 参照. mini-roadmap は
 [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
 
+## ✅ 完了 (2026-05-29, HEAD `c06e188` で Case B 完成)
+
+`thmA3` + `IsPStable` def を **sorry-free / axiom-clean** で実装完了
+([`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean))。
+当該ファイルの `sorry` proof-hole は 0、`lake build OddOrder` green (root 3334 jobs)。
+
+- **Case A** (`22e281d`): chain coprime action + 素因数 contradiction。
+- **Case B** (`c06e188`): `H/N_i` 商表現 (faithful irreducible) を構築 → A.2 (`thmA2`) 適用 →
+  `2 ∣ |H/N_i| ∣ |H| ∣ |G|` で `hodd : Odd |G|` と矛盾。
+- ゲート進捗: `Thm 6.2 ⟸ B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 ✅ ⟸ A.2 ✅ ⟸ A.1 ✅`。
+  **次フロンティア = A.4(a/b/c)**(別 issue で継続)。
+
+以下は作業ログ (handoff 用の進行中メモ。Case B は上記コミットで消化済み、内容は履歴として残置)。
+
 ## 🚧 2026-05-29 evening — Step 4-6 Case A 完了 + Case B 残
 
 ### `22e281d`: Step 5 chain + Step 6 Case A (coprime contradiction) sorry-free
