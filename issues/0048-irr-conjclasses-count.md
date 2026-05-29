@@ -33,21 +33,57 @@ group-algebra center の class-sums 基底 / 指標↔単純加群の数え上�
 
 - [x] (foundation) `≤` 方向 + 類関数空間の次元 + 線形独立 + 有限性
 - [x] `classFunctionOperator` + intertwiner lemma
-- [ ] **Schur**: ρ 既約 ⇒ `T_ρ f = c • id` (mathlib `Representation.IsIrreducible.finrank_intertwiningMap_self = 1`
-      を使い, intertwiner が 1 次元空間 = span{id} の元であることから). `IntertwiningMap` API 要調査。
-- [ ] **scalar = 0**: `c` を trace で取り出し `trace (T_ρ f) = ∑_g f(g) χ_ρ(g)`,
-      `f ⊥ Irr G` (= `inner f χ = 0` 全 χ) から `c = 0`。conjugate convention (character_inv) に注意。
-- [ ] **completeness**: `f ⊥ Irr G ⇒ f = 0`。
-      `T_ρ f` は中心元 `Φf = ∑ f(g)•single g ∈ Z(ℂ[G])` の作用。各単純加群で 0 ⇒
-      semisimple (Maschke) より regular module `ℂ[G]` の simple submodule の sup = ⊤ で 0 ⇒
-      `Φf • 1 = Φf = 0` ⇒ f = 0。mathlib `IsSemisimpleModule` の
-      "⊤ = sSup simple submodules" 系 lemma の有無を要調査 (DFinsupp 直和分解を避けたい)。
-- [ ] **span = ⊤**: completeness より, 任意 f = ∑_χ (f,χ)χ + r で r ⊥ Irr ⇒ r = 0 ⇒ f ∈ span。
-      `finite_irreducibleCharacter` で有限和が使える。
-- [ ] **count**: span = ⊤ + 線形独立 ⇒ 既約指標は基底 ⇒ `Nat.card Irr = finrank CF = #ConjClasses`。
-- [ ] `CharacterTableIndexing.ofFinite` で `idx : CharacterTableIndexing G` を `[Finite G]` から構成。
-- [ ] 0027: `column_orthogonality_cases` + 3 corollary から `idx`/`hrow` 仮定を落として無条件化 → close。
-- [ ] 0022: 加えて複素共役置換 σ (χ ↦ χ̄, dual rep) の構成 + h_real_irr/h_compat → close。
+- [x] **Schur**: `classFunctionOperator_eq_smul_id` (T_ρ f = c•id) — mathlib
+      `Representation.IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed` で
+      自己 intertwiner = `algebraMap ℂ _ c` = `c•1`。`classFunctionIntertwiner` で
+      `classFunctionOperator` を `IntertwiningMap ρ ρ` に梱包。(commit a7197cb)
+- [x] **scalar = 0**: `trace_classFunctionOperator` (trace = ∑ f(g)χ_ρ(g)) +
+      `classFunctionOperator_eq_zero_of_sum_eq_zero` (∑ f(g)χ_ρ(g)=0 ⇒ T_ρ f=0;
+      c·finrank=trace=0, finrank>0)。(commit a7197cb)
+- [x] **universe transfer**: `exists_isIrreducibleCharacter_eq` — 任意 universe の有限次元既約
+      σ に対し ∃ χ∈Irr, χ=σ.character。`IsIrreducibleCharacter` が Type 0 carrier しか
+      量化しないので Fin n→ℂ へ transport (`transportRep`/`transportRep_character`/
+      `transportRep_isIrreducible`)。(commit 729175d)
+- [x] **orthogonality ⇒ sum=0**: `classFunctionInv` (g↦f g⁻¹) +
+      `sum_classFunctionInv_character_eq_zero` (f⊥Irr ⇒ ∀ f.d.既約σ, ∑ f(g⁻¹)χ_σ(g)=0)。
+      (commit, 2026-05-30)
+- [ ] **completeness core** (`f ⊥ Irr G ⇒ f = 0`) — **残ブロッカー**。設計確定:
+      reg := `Representation.ofMulAction ℂ G G`、`Ti := classFunctionIntertwiner (classFunctionInv f) reg`、
+      `Ti_mod := equivLinearMapAsModule reg reg Ti : reg.asModule →ₗ[ℂ[G]] reg.asModule`。
+      `IsSemisimpleModule ℂ[G] reg.asModule` (Maschke instance, 要 `[Finite G]`+`NeZero (Nat.card G:ℂ)`) と
+      `IsSemisimpleModule.sSup_simples_eq_top` + `sSup_le` で「全 simple 部分加群 ≤ ker Ti_mod ⇒ ker=⊤ ⇒ Ti_mod=0」
+      (`LinearMap.ker_eq_top`)。最後に `Ti_mod (single 1 1)=∑ f(g⁻¹)•single g 1=0` から Finsupp 係数抽出で finv=0 ⇒ f=0。
+      **未解決ギャップ**: simple ℂ[G]-部分加群 W に対し「W 上の表現が既約 ∧ その指標が Irr に入り ∧
+      T が W 上で消える (`classFunctionOperator_eq_zero_of_sum_eq_zero` + `sum_classFunctionInv...`)」
+      を結ぶブリッジ。2 経路:
+      (a) `Representation.ofModule ↥W` (既約は `isSimpleModule_iff_irreducible_ofModule` で無料) だが
+          carrier が `RestrictScalars ℂ ℂ[G] ↥W` で `FiniteDimensional` instance + 作用関係が addEquiv 経由で煩雑;
+      (b) `(subrepresentationSubmoduleOrderIso.symm W).toRepresentation` (carrier は素直な ℂ-部分空間) だが
+          atom→`IsIrreducible toRepresentation` の橋 (asModule 構造一致) を自前で要証明。
+      どちらも ~40-60 行の sub-object ブリッジ補題が必要 (mathlib に直接対応なし)。
+- [ ] **span = ⊤** / **count** (`Nat.card Irr = #ConjClasses`) / `CharacterTableIndexing.ofFinite`
+      (count を `hcard` に供給するだけ。既存 def)。
+- [ ] 0027: `column_orthogonality_cases_ofRowOrthogonality (ofFinite count) characterTableRowOrthogonality_holds`
+      で無条件化 (downstream の新定理; upstream の sorry は無し) → close。
+- [ ] 0022: 加えて複素共役置換 σ → close。
+
+### 2026-05-30 技術メモ (継続者向け)
+
+**`asModule` 型シノニムの instance 解決の罠** (重要): `reg.asModule` 等の `Representation.asModule`
+に対する `Module ℂ[G] _` / `IsSimpleModule ℂ[G] _` の instance は、**型注釈 (`haveI : IsSimpleModule ℂ[G] σ.asModule := …`)
+で書くと再探索が走り失敗する**。mathlib 同様 `set_option backward.isDefEq.respectTransparency false in` を
+宣言に付ける、かつ baked instance (lemma の戻り値型に埋まったもの) を使う / `IsSimpleModule.congr` 等で
+型注釈を避けると通る。`transportRep_isIrreducible` 参照。`equivLinearMapAsModule` の戻り値は instance が
+ベイク済みなので注釈なしで使える。
+
+**確認済み mathlib API**: `Representation.IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed`,
+`Representation.IntertwiningMap.equivLinearMapAsModule`, `LinearEquiv.conjRingEquiv`, `LinearMap.trace_conj'`,
+`Module.finBasis`, `IsSimpleModule.congr`/`LinearEquiv.isSimpleModule_iff`/`isSimpleModule_iff_isAtom`,
+`Maschke: instance IsSemisimpleModule k[G] V` (`[Group G][Field k][Finite G][NeZero (Nat.card G:k)]`),
+`IsSemisimpleModule.sSup_simples_eq_top`, `Representation.ofMulAction`/`ofMulAction_single`/
+`ofMulActionSelfAsModuleEquiv`, `Representation.single_smul`, `Representation.ofModule`/
+`isSimpleModule_iff_irreducible_ofModule`, `Subrepresentation.{toRepresentation,asSubmodule,ofSubmodule',
+subrepresentationSubmoduleOrderIso}`, `LinearMap.ker_eq_top`, `Module.finrank_pos`, `Finsupp.single_eq_same`.
 
 ### Route A (代替, Wedderburn) — mathlib support は多いが absent piece も多い
 `ℂ[G] ≃ₐ ∏ Mₙᵢ(ℂ)` (mathlib `exists_algEquiv_pi_matrix_of_isAlgClosed`) ⇒ #factors。
