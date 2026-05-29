@@ -436,4 +436,69 @@ theorem lRelIn_le_iSup_pgroup_normalized {p : ℕ} [Fact p.Prime] {H : Subgroup 
   refine lRelIn_le fun A hcomm hAH hnorm => ?_
   exact le_iSup₂ (f := fun A _ => A) A ⟨hcomm, hH.to_le hAH, le_trans hPX hnorm⟩
 
+/-! ### 相対 Lemma B.1(f): `H` が p-群の場合 (`[Finite G]`)
+
+`↥H` 上の極大 normal abelian `M'` (Ch06) を `M'.map H.subtype` で `G` に落として self-centralizing
+を transport する. B.3 で `T = O_p(G)`, `S ∈ Syl_p(G)` に適用する. -/
+
+/-- `↥H` で正規な `M'` を `G` に落とした `M'.map H.subtype` は `H` で正規化される (相対B.1(f) 補助). -/
+theorem le_normalizer_map_subtype_of_normal {H : Subgroup G} {M' : Subgroup ↥H}
+    (hM'_normal : M'.Normal) :
+    H ≤ Subgroup.normalizer ((M'.map H.subtype : Subgroup G) : Set G) := by
+  have heq : (M'.map H.subtype).subgroupOf H = M' :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective M'
+  rw [← Subgroup.normal_subgroupOf_iff_le_normalizer (Subgroup.map_subtype_le M'), heq]
+  exact hM'_normal
+
+/-- `↥H` 側の self-centralizing `C_{↥H}(M') = M'` を `G` 側へ:
+`C_G(M'.map H.subtype) ⊓ H ⊆ M'.map H.subtype`.
+`H` injective subtype を橋に, `g ∈ C_G(M) ⊓ H` から `⟨g, _⟩ ∈ C_{↥H}(M') = M'` を導く. -/
+theorem centralizer_inf_le_of_self_centralizing {H : Subgroup G} {M' : Subgroup ↥H}
+    (hM'_cent : Subgroup.centralizer (M' : Set ↥H) = M') :
+    Subgroup.centralizer ((M'.map H.subtype : Subgroup G) : Set G) ⊓ H
+      ≤ (M'.map H.subtype : Subgroup G) := by
+  rintro g ⟨hg_cent, hg_H⟩
+  have hg_tilde : (⟨g, hg_H⟩ : ↥H) ∈ Subgroup.centralizer (M' : Set ↥H) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    have hcM : ((c : ↥H) : G) ∈ (M'.map H.subtype : Subgroup G) := by
+      have h := Subgroup.apply_coe_mem_map H.subtype M' ⟨c, hc⟩
+      simpa [Subgroup.coe_subtype] using h
+    have hcomm := Subgroup.mem_centralizer_iff.mp hg_cent ((c : ↥H) : G) hcM
+    apply Subtype.ext
+    push_cast
+    exact hcomm
+  rw [hM'_cent] at hg_tilde
+  have h := Subgroup.apply_coe_mem_map H.subtype M' ⟨⟨g, hg_H⟩, hg_tilde⟩
+  simpa [Subgroup.coe_subtype] using h
+
+/-- **相対 BG Lemma B.1(f)** (L4551): `H` が `p`-群なら `i > 0` で `C_G(L_i(H)) ⊓ H ⊆ L_i(H)`.
+B.3 で `T = O_p(G)`, `S ∈ Syl_p(G)` に適用. -/
+theorem centralizer_lNIn_inf_le [Finite G] {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : IsPGroup p ↥H) {i : ℕ} (hi : 0 < i) :
+    Subgroup.centralizer (lNIn H i : Set G) ⊓ H ≤ lNIn H i := by
+  obtain ⟨M', hM'_normal, hM'_comm, hM'_max⟩ :=
+    OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := ↥H)
+  haveI : M'.Normal := hM'_normal
+  haveI : IsMulCommutative ↥M' := hM'_comm
+  have hM_comm : IsMulCommutative ↥(M'.map H.subtype) := inferInstance
+  have hM_le_Li : M'.map H.subtype ≤ lNIn H i :=
+    abelian_le_lNIn hM_comm (Subgroup.map_subtype_le M')
+      (le_normalizer_map_subtype_of_normal hM'_normal) hi
+  have hM'_self : Subgroup.centralizer (M' : Set ↥H) = M' :=
+    OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative hH hM'_comm hM'_max
+  have hanti : Subgroup.centralizer (lNIn H i : Set G)
+      ≤ Subgroup.centralizer ((M'.map H.subtype : Subgroup G) : Set G) :=
+    Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hM_le_Li)
+  exact (inf_le_inf_right H hanti).trans
+    ((centralizer_inf_le_of_self_centralizing hM'_self).trans hM_le_Li)
+
+/-- **相対 BG Lemma B.1(f)** (`L_*` 版): `H` が `p`-群なら `C_G(L_*(H)) ⊓ H ⊆ L_*(H)`.
+B.4(b) Step2 が `C_S(L_*(S)) ⊆ L_*(S)` を要する. -/
+theorem centralizer_lStarIn_inf_le [Finite G] {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : IsPGroup p ↥H) : Subgroup.centralizer (lStarIn H : Set G) ⊓ H ≤ lStarIn H := by
+  obtain ⟨k, hk⟩ := exists_lStarIn_eq H
+  rw [hk (k + 1) (Nat.le_succ k)]
+  exact centralizer_lNIn_inf_le hH (by omega)
+
 end OddOrder.BG.AppB
