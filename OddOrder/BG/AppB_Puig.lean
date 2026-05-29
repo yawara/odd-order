@@ -239,4 +239,25 @@ theorem lRelIn_lOddIn [Finite G] (H : Subgroup G) : lRelIn H (lOddIn H) = lStarI
     show 2 * (K + 1) = 2 * K + 1 + 1 from by ring]
   exact (lNIn_succ H (2 * K + 1)).symm
 
+/-! ### `L_1(H) = H` と Lemma B.1(e) (L4556, L4550) -/
+
+/-- `L_1(H) = H` (BG App.B, L4556: 各元が cyclic 群に属するため). -/
+theorem lNIn_one (H : Subgroup G) : lNIn H 1 = H := by
+  refine le_antisymm (lNIn_le_self H 1) ?_
+  intro x hx
+  have hle : Subgroup.zpowers x ≤ lNIn H 1 := by
+    rw [lNIn_succ]
+    exact le_lRelIn (Subgroup.zpowers_isMulCommutative x) (Subgroup.zpowers_le.mpr hx) bot_le
+  exact hle (Subgroup.mem_zpowers x)
+
+/-- **BG Lemma B.1(e)** (L4550): `G` の abelian normal 部分群 `A` (with `A ≤ H`) は,
+すべての `i > 0` について `L_i(H)` に含まれる. (`H = ⊤` で教科書の `A ⊆ L_i(G)`.) -/
+theorem abelian_normal_le_lNIn {A H : Subgroup G} (hcomm : IsMulCommutative ↥A)
+    (hnormal : A.Normal) (hAH : A ≤ H) {i : ℕ} (hi : 0 < i) : A ≤ lNIn H i := by
+  obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hi.ne'
+  rw [lNIn_succ]
+  refine le_lRelIn hcomm hAH ?_
+  rw [Subgroup.normalizer_eq_top_iff.mpr hnormal]
+  exact le_top
+
 end OddOrder.BG.AppB

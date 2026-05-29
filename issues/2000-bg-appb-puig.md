@@ -27,7 +27,7 @@ BG Thm 6.2 (Glauberman Z(J)) は Isaacs FGT が省く (p.217) ため、no-Gorens
 - [x] Lemma B.1(b) chain (偶増加 / 奇減少 / 偶 ≤ 奇)
 - [x] Lemma B.1(d) `L_*(H) ⊆ L(H)` (`lStarIn_le_lOddIn`)
 - [x] Lemma B.1(c) 停留 (有限 subgroup lattice の WellFounded)
-- [ ] Lemma B.1(e) abelian normal ⊆ L_i (i>0)
+- [x] Lemma B.1(e) abelian normal ⊆ L_i (i>0)
 - [ ] Lemma B.1(f) p-群で L_i ⊇ C_G(L_i) ⊇ Z(G) (極大 abelian normal の self-centralizing 経由)
 - [x] Lemma B.1(g) L_G(L_*)=L, L_G(L)=L_*
 - [ ] Lemma B.2 `H ⊇ L(G) ⇒ L(G)=L(H)`
