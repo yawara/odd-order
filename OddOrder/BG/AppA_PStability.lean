@@ -1421,6 +1421,70 @@ private theorem coprime_stabilizes_chain_trivial
   show (ψ a) x = x
   exact key n 0 (by omega) a x (by rw [hs0]; exact Subgroup.mem_top x)
 
+open scoped commutatorElement in
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 in
+/-- **Chain-stabilizer ⊆ centralizer (coprime)**: `M` 有限, `K ◁ M` を `p`-群, `D ≤ M` が
+`K` と coprime (`(|D|,|K|)=1`) で `K` の chief series を stabilize
+(`⁅Pᵢ, D⁆ ≤ Pᵢ₊₁`) するなら, `D ≤ C_M(K)`.
+
+`MulAut.conjNormal : M →* MulAut ↥K` で `D` の作用を作り,
+`coprime_stabilizes_chain_trivial` を `K` の chief series (`subgroupOf K` 化) に適用. -/
+private theorem coprime_chainStabilizer_le_centralizer
+    {M : Type*} [Group M] [Finite M]
+    {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
+    {D : Subgroup M} (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
+    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hstab : ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1)) :
+    D ≤ Subgroup.centralizer (K : Set M) := by
+  classical
+  obtain ⟨N, hN⟩ := chiefSeriesInside_exists_eq_bot K
+  set ψ : ↥D →* MulAut ↥K := (MulAut.conjNormal (H := K)).comp D.subtype with hψ
+  set s : ℕ → Subgroup ↥K := fun i => (chiefSeriesInside K i).subgroupOf K with hs
+  -- helper: `↑(ψ a g) = ↑a * ↑g * (↑a)⁻¹`
+  have hψcoe : ∀ (a : ↥D) (g : ↥K), ((ψ a) g : M) = (a : M) * (g : M) * (a : M)⁻¹ := by
+    intro a g; rw [hψ]; simp [MulAut.conjNormal_apply]
+  have htrivψ : ∀ a : ↥D, ψ a = 1 := by
+    refine coprime_stabilizes_chain_trivial ψ hcop hsolv s ?_ ?_ (n := N) ?_ ?_ ?_ ?_
+    · -- Antitone s
+      intro i j hij
+      exact Subgroup.comap_mono (chiefSeriesInside_antitone K hij)
+    · -- s 0 = ⊤
+      simp [hs, chiefSeriesInside_zero, Subgroup.subgroupOf_self]
+    · -- s N = ⊥
+      simp [hs, hN, Subgroup.bot_subgroupOf]
+    · -- normal
+      intro i
+      exact (inferInstance : (chiefSeriesInside K i).Normal).subgroupOf K
+    · -- IsAInvariant
+      intro i
+      rw [isAInvariant_iff_smul_mem]
+      intro a g hg
+      rw [hs, Subgroup.mem_subgroupOf] at hg ⊢
+      rw [hψcoe]
+      exact (chiefSeriesInside_instNormal K i).conj_mem _ hg _
+    · -- stabilize each factor
+      intro i a x hx
+      rw [hs, Subgroup.mem_subgroupOf] at hx
+      refine ⟨x⁻¹ * ψ a x, ?_, by group⟩
+      rw [hs, Subgroup.mem_subgroupOf]
+      have hcoe : ((x⁻¹ * ψ a x : ↥K) : M) = ⁅(x : M)⁻¹, (a : M)⁆ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv, hψcoe, commutatorElement_def]; group
+      rw [hcoe]
+      exact hstab i (Subgroup.commutator_mem_commutator
+        (Subgroup.inv_mem _ hx) (SetLike.coe_mem a))
+  -- conclude `D ≤ C_M(K)`
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro k hk
+  have h1 := DFunLike.congr_fun (htrivψ ⟨x, hx⟩) ⟨k, hk⟩
+  have h2 : (x : M) * k * x⁻¹ = k := by
+    have := congrArg (Subtype.val) h1
+    rwa [hψcoe] at this
+  have h3 : x * k = k * x := by
+    have := congrArg (· * x) h2
+    simpa [mul_assoc] using this
+  exact h3.symm
+
 /-- `C_G(P)` を `N_G(P)` に制限したものは, `P` を `↥N_G(P)` の部分群 `P.subgroupOf N` と
 見たときの `↥N_G(P)` 内 centralizer に一致する. `thmA4c` を `stabilityLiftAux`
 (商 `M / C_M(K)` 形) に instantiate するときの橋渡し. -/
