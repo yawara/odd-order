@@ -341,75 +341,86 @@ theorem lOddIn_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] [Nontrivial G] (hG : I
 theorem lNIn_even_le_lOddIn (H : Subgroup G) (m : ℕ) : lNIn H (2 * m) ≤ lOddIn H :=
   le_iInf fun n => lNIn_even_le_odd H m n
 
-/-- B.2 証明核 (mmd L4604-4616, L4626-4638 共通): `L_G(W) ⊆ H` かつ `W' ⊆ W` なら
-`L_G(W) ⊆ L_H(W')`. `L_G(W)` を張る abelian `A` は `A ⊆ L_G(W) ⊆ H` で `W' ⊆ W ⊆ N(A)`. -/
-theorem lRelIn_top_le_lRelIn {W W' H : Subgroup G} (hW' : W' ≤ W)
-    (hH : lRelIn ⊤ W ≤ H) : lRelIn ⊤ W ≤ lRelIn H W' := by
-  refine lRelIn_le fun A hcomm _ hnorm => le_lRelIn hcomm ?_ (le_trans hW' hnorm)
-  exact le_trans (le_lRelIn hcomm le_top hnorm) hH
+/-- B.2 証明核 (mmd L4604-4616, L4626-4638 共通; ambient `H₁` 相対版):
+`L_{H₁}(W) ⊆ H₂` かつ `W' ⊆ W` なら `L_{H₁}(W) ⊆ L_{H₂}(W')`.
+`L_{H₁}(W)` を張る abelian `A` は `A ⊆ L_{H₁}(W) ⊆ H₂` で `W' ⊆ W ⊆ N(A)`. -/
+theorem lRelIn_le_lRelIn {H₁ W W' H₂ : Subgroup G} (hW' : W' ≤ W)
+    (hsub : lRelIn H₁ W ≤ H₂) : lRelIn H₁ W ≤ lRelIn H₂ W' := by
+  refine lRelIn_le fun A hcomm hAH hnorm => le_lRelIn hcomm ?_ (le_trans hW' hnorm)
+  exact le_trans (le_lRelIn hcomm hAH hnorm) hsub
 
-/-- B.2 Step 1 偶段 (mmd L4604-4608): `L_{2n+1}(H) ⊆ L_{2n+1}(G)` から `L_{2n+2}(G) ⊆ L_{2n+2}(H)`. -/
-private theorem b2_even_le {H : Subgroup G} (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) {n : ℕ}
-    (hodd : lNIn H (2 * n + 1) ≤ lNIn (⊤ : Subgroup G) (2 * n + 1)) :
-    lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lNIn H (2 * n + 2) := by
-  have hev_le : lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lOddIn ⊤ := by
-    have h := lNIn_even_le_lOddIn (⊤ : Subgroup G) (n + 1)
+/-- B.2 Step 1 偶段 (mmd L4604-4608, ambient `H₀`): `L_{2n+1}(H) ⊆ L_{2n+1}(H₀)` から
+`L_{2n+2}(H₀) ⊆ L_{2n+2}(H)`. -/
+private theorem b2_even_le {H₀ H : Subgroup G} (hH₀H : lOddIn H₀ ≤ H) {n : ℕ}
+    (hodd : lNIn H (2 * n + 1) ≤ lNIn H₀ (2 * n + 1)) :
+    lNIn H₀ (2 * n + 2) ≤ lNIn H (2 * n + 2) := by
+  have hev_le : lNIn H₀ (2 * n + 2) ≤ lOddIn H₀ := by
+    have h := lNIn_even_le_lOddIn H₀ (n + 1)
     rwa [show 2 * (n + 1) = 2 * n + 2 from by ring] at h
-  exact lRelIn_top_le_lRelIn hodd (hev_le.trans hLGH)
+  exact lRelIn_le_lRelIn hodd (hev_le.trans hH₀H)
 
-/-- B.2 Step 1 奇段 (mmd L4612-4616): `L_{2n+2}(G) ⊆ L_{2n+2}(H)` から `L_{2n+3}(H) ⊆ L_{2n+3}(G)`. -/
-private theorem b2_odd_le {H : Subgroup G} {n : ℕ}
-    (hev : lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lNIn H (2 * n + 2)) :
-    lNIn H (2 * n + 3) ≤ lNIn (⊤ : Subgroup G) (2 * n + 3) :=
-  (lRelIn_mono_left le_top (lNIn H (2 * n + 2))).trans (lRelIn_anti_right hev)
+/-- B.2 Step 1 奇段 (mmd L4612-4616, ambient `H₀`): `L_{2n+2}(H₀) ⊆ L_{2n+2}(H)` から
+`L_{2n+3}(H) ⊆ L_{2n+3}(H₀)`. -/
+private theorem b2_odd_le {H₀ H : Subgroup G} (hHH₀ : H ≤ H₀) {n : ℕ}
+    (hev : lNIn H₀ (2 * n + 2) ≤ lNIn H (2 * n + 2)) :
+    lNIn H (2 * n + 3) ≤ lNIn H₀ (2 * n + 3) :=
+  (lRelIn_mono_left hHH₀ (lNIn H (2 * n + 2))).trans (lRelIn_anti_right hev)
 
-/-- **BG Lemma B.2 Step 1(a)** (mmd L4594): `L_{2n+1}(H) ⊆ L_{2n+1}(G)`. -/
-theorem b2_step1 {H : Subgroup G} (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) :
-    ∀ n, lNIn H (2 * n + 1) ≤ lNIn (⊤ : Subgroup G) (2 * n + 1)
+/-- **BG Lemma B.2 Step 1(a)** (mmd L4594, ambient `H₀`): `L_{2n+1}(H) ⊆ L_{2n+1}(H₀)`. -/
+theorem b2_step1 {H₀ H : Subgroup G} (hHH₀ : H ≤ H₀) (hH₀H : lOddIn H₀ ≤ H) :
+    ∀ n, lNIn H (2 * n + 1) ≤ lNIn H₀ (2 * n + 1)
   | 0 => by
       have e1 : lNIn H (2 * 0 + 1) = H := lNIn_one H
-      have e2 : lNIn (⊤ : Subgroup G) (2 * 0 + 1) = ⊤ := lNIn_one ⊤
-      rw [e1, e2]; exact le_top
+      have e2 : lNIn H₀ (2 * 0 + 1) = H₀ := lNIn_one H₀
+      rw [e1, e2]; exact hHH₀
   | (n + 1) => by
-      have hodd := b2_odd_le (b2_even_le hLGH (b2_step1 hLGH n))
+      have hodd := b2_odd_le hHH₀ (b2_even_le hH₀H (b2_step1 hHH₀ hH₀H n))
       rwa [show 2 * (n + 1) + 1 = 2 * n + 3 from by ring]
 
-/-- B.2 Step 2 偶段 (mmd L4626-4630): `L(G) ⊆ L_{2n+1}(H)` から `L_{2n+2}(H) ⊆ L_*(G)`. -/
-private theorem b2_star_le {H : Subgroup G} [Finite G] {n : ℕ}
-    (hIH : lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 1)) :
-    lNIn H (2 * n + 2) ≤ lStarIn (⊤ : Subgroup G) := by
-  rw [← lRelIn_lOddIn (⊤ : Subgroup G)]
-  exact (lRelIn_mono_left le_top (lNIn H (2 * n + 1))).trans (lRelIn_anti_right hIH)
+/-- B.2 Step 2 偶段 (mmd L4626-4630, ambient `H₀`): `L(H₀) ⊆ L_{2n+1}(H)` から
+`L_{2n+2}(H) ⊆ L_*(H₀)`. -/
+private theorem b2_star_le {H₀ H : Subgroup G} [Finite G] (hHH₀ : H ≤ H₀) {n : ℕ}
+    (hIH : lOddIn H₀ ≤ lNIn H (2 * n + 1)) :
+    lNIn H (2 * n + 2) ≤ lStarIn H₀ := by
+  rw [← lRelIn_lOddIn H₀]
+  exact (lRelIn_mono_left hHH₀ (lNIn H (2 * n + 1))).trans (lRelIn_anti_right hIH)
 
-/-- B.2 Step 2 奇段 (mmd L4632-4638): `L_{2n+2}(H) ⊆ L_*(G)` から `L(G) ⊆ L_{2n+3}(H)`. -/
-private theorem b2_odd_ge {H : Subgroup G} [Finite G] (hLGH : lOddIn (⊤ : Subgroup G) ≤ H)
-    {n : ℕ} (hstar : lNIn H (2 * n + 2) ≤ lStarIn (⊤ : Subgroup G)) :
-    lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 3) := by
-  rw [← lRelIn_lStarIn (⊤ : Subgroup G)]
-  exact lRelIn_top_le_lRelIn hstar ((lRelIn_lStarIn ⊤).le.trans hLGH)
+/-- B.2 Step 2 奇段 (mmd L4632-4638, ambient `H₀`): `L_{2n+2}(H) ⊆ L_*(H₀)` から
+`L(H₀) ⊆ L_{2n+3}(H)`. -/
+private theorem b2_odd_ge {H₀ H : Subgroup G} [Finite G] (hH₀H : lOddIn H₀ ≤ H)
+    {n : ℕ} (hstar : lNIn H (2 * n + 2) ≤ lStarIn H₀) :
+    lOddIn H₀ ≤ lNIn H (2 * n + 3) := by
+  rw [← lRelIn_lStarIn H₀]
+  exact lRelIn_le_lRelIn hstar ((lRelIn_lStarIn H₀).le.trans hH₀H)
 
-/-- **BG Lemma B.2 Step 2(a)** (mmd L4620): `L(G) ⊆ L_{2n+1}(H)`. -/
-theorem b2_step2 {H : Subgroup G} [Finite G] (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) :
-    ∀ n, lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 1)
+/-- **BG Lemma B.2 Step 2(a)** (mmd L4620, ambient `H₀`): `L(H₀) ⊆ L_{2n+1}(H)`. -/
+theorem b2_step2 {H₀ H : Subgroup G} [Finite G] (hHH₀ : H ≤ H₀) (hH₀H : lOddIn H₀ ≤ H) :
+    ∀ n, lOddIn H₀ ≤ lNIn H (2 * n + 1)
   | 0 => by
       have e : lNIn H (2 * 0 + 1) = H := lNIn_one H
-      rw [e]; exact hLGH
+      rw [e]; exact hH₀H
   | (n + 1) => by
-      have hodd := b2_odd_ge hLGH (b2_star_le (b2_step2 hLGH n))
+      have hodd := b2_odd_ge hH₀H (b2_star_le hHH₀ (b2_step2 hHH₀ hH₀H n))
       rwa [show 2 * (n + 1) + 1 = 2 * n + 3 from by ring]
 
-/-- **BG Lemma B.2** (L4590): `L(G) ⊆ H` なら `L(H) = L(G)`
-(`lOddIn ⊤ = L(G)`, `lOddIn H = L(H)`). -/
-theorem lOddIn_eq_of_lOddIn_le {H : Subgroup G} [Finite G]
-    (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) : lOddIn H = lOddIn (⊤ : Subgroup G) := by
+/-- **BG Lemma B.2 一般版** (mmd L4590): `H ⊆ H₀` かつ `L(H₀) ⊆ H` なら `L(H) = L(H₀)`.
+B.4 Step3 末尾 `L(C∩S) = L(S)` (H = C∩S, H₀ = S) に使う. -/
+theorem lOddIn_eq_of_lOddIn_le_relative {H₀ H : Subgroup G} [Finite G]
+    (hHH₀ : H ≤ H₀) (hH₀H : lOddIn H₀ ≤ H) : lOddIn H = lOddIn H₀ := by
   refine le_antisymm ?_ ?_
   · obtain ⟨k, hk⟩ := exists_lOddIn_eq H
-    obtain ⟨k', hk'⟩ := exists_lOddIn_eq (⊤ : Subgroup G)
+    obtain ⟨k', hk'⟩ := exists_lOddIn_eq H₀
     rw [hk (max k k') (le_max_left _ _), hk' (max k k') (le_max_right _ _)]
-    exact b2_step1 hLGH (max k k')
+    exact b2_step1 hHH₀ hH₀H (max k k')
   · obtain ⟨k, hk⟩ := exists_lOddIn_eq H
     rw [hk k (le_refl k)]
-    exact b2_step2 hLGH k
+    exact b2_step2 hHH₀ hH₀H k
+
+/-- **BG Lemma B.2** (L4590): `L(G) ⊆ H` なら `L(H) = L(G)`
+(`lOddIn ⊤ = L(G)`, `lOddIn H = L(H)`; `H₀ = ⊤` 特殊化). -/
+theorem lOddIn_eq_of_lOddIn_le {H : Subgroup G} [Finite G]
+    (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) : lOddIn H = lOddIn (⊤ : Subgroup G) :=
+  lOddIn_eq_of_lOddIn_le_relative le_top hLGH
 
 /-! ### Lemma B.3 / Theorem B.4 準備 (A.5 非依存の L-API 拡張)
 
