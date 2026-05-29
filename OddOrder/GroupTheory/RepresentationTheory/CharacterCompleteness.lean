@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.RepresentationTheory.Maschke
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -191,6 +192,8 @@ end Transfer
 
 section Completeness
 
+open scoped MonoidAlgebra
+
 variable {G : Type*} [Group G]
 
 /-- `f` precomposed with inversion, `g ↦ f g⁻¹`. A class function, since inversion permutes each
@@ -225,6 +228,152 @@ theorem sum_classFunctionInv_character_eq_zero {W : Type*} [AddCommGroup W] [Mod
   have : ∑ g : G, f g * star ((χ : ClassFunction G ℂ) g)
       = ClassFunction.innerSum f (χ : ClassFunction G ℂ) := rfl
   rw [this, ← ClassFunction.card_mul_inner, hf ⟨χ, hχirr⟩, mul_zero]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+set_option backward.isDefEq.respectTransparency false in
+/-- On the subrepresentation `ofSubmodule' N`, the `ℂ[G]`-action on `asModule` is the ambient action
+restricted: `(c • v).val = c • v.val` (the right-hand smul taken in `ρ.asModule`). Reduces to
+`Representation.single_smul` and `(ofSubmodule' N).toRepresentation g = (ρ g).restrict`. -/
+theorem ofSubmodulePrime_coe_smul {W : Type*} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G W) (N : Submodule ℂ[G] ρ.asModule) (c : ℂ[G])
+    (v : (Subrepresentation.ofSubmodule' N).toRepresentation.asModule) :
+    ((c • v).1 : ρ.asModule) = c • (show ρ.asModule from v.1) := by
+  induction c using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => rw [add_smul, add_smul, AddSubmonoid.coe_add, hx, hy]
+  | single g a => rw [Representation.single_smul, Representation.single_smul]; rfl
+
+set_option backward.isDefEq.respectTransparency false in
+/-- A `ℂ[G]`-submodule `N` of `ρ.asModule`, viewed as the subrepresentation `ofSubmodule' N`, has
+its `asModule` `ℂ[G]`-linearly isomorphic to `N`. The underlying map is the identity on the shared
+carrier (`↥N` and `↥(ofSubmodule' N).toSubmodule` are the same type definitionally); the only
+content is `ℂ[G]`-linearity, supplied by `ofSubmodulePrime_coe_smul`. -/
+noncomputable def ofSubmodulePrimeAsModuleEquiv {W : Type*} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G W) (N : Submodule ℂ[G] ρ.asModule) :
+    (↥N) ≃ₗ[ℂ[G]] (Subrepresentation.ofSubmodule' N).toRepresentation.asModule where
+  toFun v := v
+  invFun w := w
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_add' _ _ := rfl
+  map_smul' c v := by
+    apply Subtype.ext
+    rw [RingHom.id_apply, Submodule.coe_smul]
+    exact (ofSubmodulePrime_coe_smul ρ N c v).symm
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+set_option backward.isDefEq.respectTransparency false in
+/-- For a simple `ℂ[G]`-submodule `N` of `ρ.asModule`, the subrepresentation `ofSubmodule' N` is
+irreducible. -/
+theorem ofSubmodulePrime_isIrreducible {W : Type*} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G W) (N : Submodule ℂ[G] ρ.asModule) [IsSimpleModule ℂ[G] (↥N)] :
+    Representation.IsIrreducible (Subrepresentation.ofSubmodule' N).toRepresentation := by
+  rw [Representation.irreducible_iff_isSimpleModule_asModule]
+  exact (ofSubmodulePrimeAsModuleEquiv ρ N).isSimpleModule_iff.mp inferInstance
+
+omit [Invertible (Nat.card G : ℂ)] in
+/-- The class-function operator on the subrepresentation `ofSubmodule' N` is the ambient operator
+restricted: `(classFunctionOperator cf (ofSubmodule' N).toRepresentation w).val
+= classFunctionOperator cf ρ w.val`. Each summand's value matches because
+`(ofSubmodule' N).toRepresentation g = (ρ g).restrict`. -/
+theorem classFunctionOperator_ofSubmodulePrime_coe (f : ClassFunction G ℂ) {W : Type*}
+    [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G W) (N : Submodule ℂ[G] ρ.asModule)
+    (w : (Subrepresentation.ofSubmodule' N).toRepresentation.asModule) :
+    ((classFunctionOperator f (Subrepresentation.ofSubmodule' N).toRepresentation w).1 : W)
+    = classFunctionOperator f ρ (show W from w.1) := by
+  rw [classFunctionOperator, classFunctionOperator, LinearMap.sum_apply, LinearMap.sum_apply,
+    AddSubmonoid.coe_finset_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  rw [LinearMap.smul_apply, LinearMap.smul_apply]
+  rfl
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Completeness of irreducible characters.** If `f : ClassFunction G ℂ` is orthogonal to every
+irreducible character, then `f = 0`. Equivalently, the irreducible characters span the space of
+class functions.
+
+The proof uses the regular representation `reg = ofMulAction ℂ G G`. The class-function operator
+`T = ∑_g f(g⁻¹) • reg g` is `ℂ[G]`-linear (an intertwiner). By Maschke's theorem `reg.asModule` is
+a semisimple `ℂ[G]`-module, hence the supremum of its simple submodules is `⊤`. On each simple
+submodule `N` the corresponding subrepresentation is irreducible (`ofSubmodulePrime_isIrreducible`),
+so Schur's lemma forces `T` to vanish there (`classFunctionOperator_eq_zero_of_sum_eq_zero`, fed by
+`sum_classFunctionInv_character_eq_zero`). Therefore `ker T = ⊤`, i.e. `T = 0`. Evaluating `T` at
+`Finsupp.single 1 1` reads off `f(g⁻¹) = 0` for every `g`, so `f = 0`. -/
+theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
+    (hf : ∀ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ) = 0) :
+    f = 0 := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : NeZero (Nat.card G : ℂ) := ⟨Invertible.ne_zero _⟩
+  let reg : Representation ℂ G (G →₀ ℂ) := Representation.ofMulAction ℂ G G
+  have hreg : reg = Representation.ofMulAction ℂ G G := rfl
+  -- The intertwiner `T = ∑_g f(g⁻¹) • reg g`, packaged as a `ℂ[G]`-linear `End` of `asModule`.
+  set Ti : reg.asModule →ₗ[ℂ[G]] reg.asModule :=
+    Representation.IntertwiningMap.equivLinearMapAsModule reg reg
+      (classFunctionIntertwiner (classFunctionInv f) reg) with hTi
+  -- Each simple `ℂ[G]`-submodule lies in `ker Ti`.
+  have hsimple_le : ∀ N : Submodule ℂ[G] reg.asModule, IsSimpleModule ℂ[G] (↥N) →
+      N ≤ LinearMap.ker Ti := by
+    intro N hN
+    haveI := hN
+    haveI : Nontrivial (↥N) := IsSimpleModule.nontrivial ℂ[G] (↥N)
+    set σN : Representation ℂ G _ := (Subrepresentation.ofSubmodule' N).toRepresentation with hσN
+    haveI : Representation.IsIrreducible σN := ofSubmodulePrime_isIrreducible reg N
+    haveI : Nontrivial ((Subrepresentation.ofSubmodule' N).toSubmodule) := ‹Nontrivial (↥N)›
+    haveI : FiniteDimensional ℂ ((Subrepresentation.ofSubmodule' N).toSubmodule) :=
+      inferInstance
+    -- `T` restricted to the subrepresentation `σN` vanishes by Schur + orthogonality.
+    have hzero : classFunctionOperator (classFunctionInv f) σN = 0 :=
+      classFunctionOperator_eq_zero_of_sum_eq_zero (classFunctionInv f) σN
+        (sum_classFunctionInv_character_eq_zero f hf σN)
+    intro v hv
+    -- `Ti v` equals the unbundled operator applied to `v`.
+    have hTiv : Ti v = classFunctionOperator (classFunctionInv f) reg v := by
+      rw [hTi]
+      rfl
+    -- The value of the restricted operator at `⟨v, _⟩` equals `Ti v`.
+    have hmem : v ∈ (Subrepresentation.ofSubmodule' N).toSubmodule :=
+      (Subrepresentation.mem_ofSubmodule'_iff).mpr hv
+    rw [LinearMap.mem_ker, hTiv]
+    have hval := classFunctionOperator_ofSubmodulePrime_coe (classFunctionInv f) reg N ⟨v, hmem⟩
+    rw [hσN] at hzero
+    rw [← hval, hzero]
+    rfl
+  -- `ker Ti = ⊤` since the supremum of simple submodules is `⊤` (Maschke).
+  haveI : IsSemisimpleModule ℂ[G] reg.asModule :=
+    (Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule reg).mp inferInstance
+  have hker : LinearMap.ker Ti = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← IsSemisimpleModule.sSup_simples_eq_top ℂ[G] reg.asModule]
+    exact sSup_le fun N hN => hsimple_le N hN
+  -- Hence `Ti = 0`, so the unbundled operator `T = ∑_g f(g⁻¹) • reg g` is `0`.
+  have hTi0 : Ti = 0 := LinearMap.ker_eq_top.mp hker
+  have hop0 : classFunctionOperator (classFunctionInv f) reg = 0 := by
+    have : (Representation.IntertwiningMap.equivLinearMapAsModule reg reg).symm Ti
+        = classFunctionIntertwiner (classFunctionInv f) reg := by
+      rw [hTi, LinearEquiv.symm_apply_apply]
+    rw [hTi0, map_zero] at this
+    have h2 := congrArg Representation.IntertwiningMap.toLinearMap this.symm
+    rwa [classFunctionIntertwiner_toLinearMap] at h2
+  -- Evaluate `T` at `single 1 1` to read off `f (g⁻¹) = 0` for every `g`.
+  apply ClassFunction.ext
+  intro k
+  classical
+  have hcoeff : ∀ x : G, (classFunctionOperator (classFunctionInv f) reg
+      (Finsupp.single (1 : G) 1)) x = f x⁻¹ := by
+    intro x
+    rw [classFunctionOperator]
+    have hterm : ∀ g : G, (classFunctionInv f g • reg g) (Finsupp.single (1 : G) (1 : ℂ)) x
+        = if g = x then f g⁻¹ else 0 := by
+      intro g
+      rw [LinearMap.smul_apply, hreg, Representation.ofMulAction_single, Finsupp.smul_single,
+        smul_eq_mul, mul_one, Finsupp.single_apply, smul_eq_mul, mul_one, classFunctionInv_apply,
+        eq_comm]
+    rw [LinearMap.sum_apply, Finset.sum_apply',
+      Finset.sum_congr rfl (fun g _ => hterm g), Finset.sum_ite_eq' Finset.univ x]
+    simp
+  have := hcoeff k⁻¹
+  rw [hop0] at this
+  simpa using this.symm
 
 end Completeness
 

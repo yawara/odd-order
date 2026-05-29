@@ -14,8 +14,10 @@ created: 2026-05-29
 **無条件化**するために必須。`card_eq` がまさに `|Irr G| = |ConjClasses G|`。
 
 `≤` 方向は **2026-05-29 に sorry-free + axiom-checked で landed**
-(`card_irreducibleCharacter_le`, `CharacterCount.lean`)。残るは **`≥` 方向 (completeness)**:
-既約指標が類関数空間を張ること。mathlib v4.30 に無し (Wedderburn-Artin はあるが
+(`card_irreducibleCharacter_le`, `CharacterCount.lean`)。`≥` 方向 (completeness) の
+**解析的コア `classFunction_eq_zero_of_orthogonal` (`f ⊥ Irr ⇒ f=0`) は 2026-05-30 に landed**
+(sorry-free, axiom = {propext, Classical.choice, Quot.sound})。残りは span=⊤ / count の機械的接続。
+mathlib v4.30 に直接の数え上げは無し (Wedderburn-Artin はあるが
 group-algebra center の class-sums 基底 / 指標↔単純加群の数え上げは無い)。
 
 ## 現状 (2026-05-29, branch chartable-bridge)
@@ -47,20 +49,26 @@ group-algebra center の class-sums 基底 / 指標↔単純加群の数え上�
 - [x] **orthogonality ⇒ sum=0**: `classFunctionInv` (g↦f g⁻¹) +
       `sum_classFunctionInv_character_eq_zero` (f⊥Irr ⇒ ∀ f.d.既約σ, ∑ f(g⁻¹)χ_σ(g)=0)。
       (commit, 2026-05-30)
-- [ ] **completeness core** (`f ⊥ Irr G ⇒ f = 0`) — **残ブロッカー**。設計確定:
-      reg := `Representation.ofMulAction ℂ G G`、`Ti := classFunctionIntertwiner (classFunctionInv f) reg`、
-      `Ti_mod := equivLinearMapAsModule reg reg Ti : reg.asModule →ₗ[ℂ[G]] reg.asModule`。
-      `IsSemisimpleModule ℂ[G] reg.asModule` (Maschke instance, 要 `[Finite G]`+`NeZero (Nat.card G:ℂ)`) と
-      `IsSemisimpleModule.sSup_simples_eq_top` + `sSup_le` で「全 simple 部分加群 ≤ ker Ti_mod ⇒ ker=⊤ ⇒ Ti_mod=0」
-      (`LinearMap.ker_eq_top`)。最後に `Ti_mod (single 1 1)=∑ f(g⁻¹)•single g 1=0` から Finsupp 係数抽出で finv=0 ⇒ f=0。
-      **未解決ギャップ**: simple ℂ[G]-部分加群 W に対し「W 上の表現が既約 ∧ その指標が Irr に入り ∧
-      T が W 上で消える (`classFunctionOperator_eq_zero_of_sum_eq_zero` + `sum_classFunctionInv...`)」
-      を結ぶブリッジ。2 経路:
-      (a) `Representation.ofModule ↥W` (既約は `isSimpleModule_iff_irreducible_ofModule` で無料) だが
-          carrier が `RestrictScalars ℂ ℂ[G] ↥W` で `FiniteDimensional` instance + 作用関係が addEquiv 経由で煩雑;
-      (b) `(subrepresentationSubmoduleOrderIso.symm W).toRepresentation` (carrier は素直な ℂ-部分空間) だが
-          atom→`IsIrreducible toRepresentation` の橋 (asModule 構造一致) を自前で要証明。
-      どちらも ~40-60 行の sub-object ブリッジ補題が必要 (mathlib に直接対応なし)。
+- [x] **completeness core** (`f ⊥ Irr G ⇒ f = 0`) — **landed (sorry-free, axiom-checked)**
+      2026-05-30, `classFunction_eq_zero_of_orthogonal` (CharacterCompleteness.lean)。
+      reg := `Representation.ofMulAction ℂ G G`、`Ti := equivLinearMapAsModule reg reg
+      (classFunctionIntertwiner (classFunctionInv f) reg)`。`IsSemisimpleModule.sSup_simples_eq_top`
+      + `sSup_le` で「全 simple ℂ[G]-部分加群 N ≤ ker Ti ⇒ ker=⊤ ⇒ Ti=0」(`LinearMap.ker_eq_top`)。
+      最後に `Ti (single 1 1)` の係数抽出 (`LinearMap.sum_apply`/`Finset.sum_apply'`/`Finset.sum_ite_eq'`)
+      で `f(g⁻¹)=0` ⇒ `f=0`。採用ブリッジ = **route (b)**: `(ofSubmodule' N).toRepresentation`。
+      補題 `ofSubmodulePrime_coe_smul` (asModule の `single g a` 作用 = `ρ` 制限, `single_smul` 2 回 + `rfl`),
+      `ofSubmodulePrimeAsModuleEquiv` (`↥N ≃ₗ[ℂ[G]] σN.asModule`, 恒等写像; `↥N` と `↥σN.toSubmodule` は
+      **同一型 (rfl)**, `map_smul'` は `Subtype.ext`+`Submodule.coe_smul`+上記補題),
+      `ofSubmodulePrime_isIrreducible` (`irreducible_iff_isSimpleModule_asModule` →
+      `(equiv).isSimpleModule_iff.mp inferInstance`), `classFunctionOperator_ofSubmodulePrime_coe`
+      (operator 値ブリッジ, 各項 `(σN g w).val = reg g w.val` は `rfl`)。
+      **diamond 回避の要点** (継続者向け): (1) `IsSimpleModule.congr` は asModule の
+      `AddCommMonoid` diamond (`deriving` 由来 vs `AddCommGroup.toAddCommMonoid`) で application
+      type mismatch → 代わりに `LinearEquiv.isSimpleModule_iff.mp` を使う (exact が defeq で吸収);
+      (2) `IsSemisimpleModule ℂ[G] reg.asModule` / `sSup_simples_eq_top` の `Module ℂ[G] reg.asModule`
+      合成は **直接 `inferInstance` で失敗**(同 diamond)→ `isSemisimpleRepresentation_iff_isSemisimpleModule_asModule reg |>.mp inferInstance` で得る
+      (Maschke `IsSemisimpleRepresentation` instance, 要 `[Finite G]`+`NeZero`)+ 宣言全体に
+      `set_option backward.isDefEq.respectTransparency false`; (3) `reg` は `let`(not `set`)。
 - [ ] **span = ⊤** / **count** (`Nat.card Irr = #ConjClasses`) / `CharacterTableIndexing.ofFinite`
       (count を `hcard` に供給するだけ。既存 def)。
 - [ ] 0027: `column_orthogonality_cases_ofRowOrthogonality (ofFinite count) characterTableRowOrthogonality_holds`
