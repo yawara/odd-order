@@ -1,9 +1,23 @@
 # BG App.B: The Puig Subgroup L(S) — mini-roadmap
 
 **スコープ**: BG Appendix B (pp. 139-144), mmd L4517-4758, **4 主要結果 (Lem B.1-B.3, Thm B.4)**.
-形式化先 (予定): `OddOrder/BG/AppB_Puig.lean` (~350-500 行想定).
+形式化先: `OddOrder/BG/AppB_Puig.lean`.
 ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 完了後 optional).
 役割: **J(S) の一般化代替** Puig L(S); **Thm B.4 = Thm 6.2 substitute**; **Lem B.1-B.4 系**: L(G), L_*(G) の再帰演算とその基本性質.
+
+## 実装状況 (2026-05-29)
+
+- ✅ **定義 + Lemma B.1(a)-(g) + Lemma B.2 完成** (`OddOrder/BG/AppB_Puig.lean`, 409 行 / 48 宣言,
+  sorry-free, `#assert_only_allowed_axioms` で axiom-clean, issue 2000 クローズ済).
+  - 設計: 相対版 `lRelIn H X` / `lNIn H n` / `lOddIn H` / `lStarIn H` を primitive (= `G` の部分群で `≤ H`)
+    とし, 教科書の `L_G/L_n/L/L_*` を `H = ⊤` 特殊化 `lRel/lN/lOdd/lStar` で与える。B.3 の
+    `L_*(S) ⊆ L_*(T)` 型比較が `G` の部分群として直接型付くのが利点。
+  - B.1(f) は**絶対版** (`G` 自体が p-群) のみ実装 (`centralizer_lNIn_le` 等, Ch06 の
+    `centralizer_eq_of_maximal_normal_isMulCommutative` 再利用)。**B.3 で必要な相対版** (`H` が p-群,
+    `H`-内 centralizer) は subtype `↥H` 経由 transport が要るため B.3 着手時に別途用意。
+  - B.2 の証明核 `lRelIn_top_le_lRelIn` (`L_G(W) ⊆ H ∧ W' ⊆ W ⇒ L_G(W) ⊆ L_H(W')`) は B.3 でも再利用見込み。
+- ⏳ **Lemma B.3 + Theorem B.4** (= Thm 6.2 代替, `thmA5` 消費): **issue 2001**。A.5 (`thmA5`, issue 0049)
+  完成済 + B.1/B.2 完成済で **ready-now**。クリティカルパス: → BG Thm 6.2 一般形 → §7-§16。
 
 ## ⚠️ 2026-05-28 訂正: App.B は「スキップ」ではなく Thm 6.2 の本線
 
