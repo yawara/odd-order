@@ -1509,6 +1509,43 @@ private theorem centralizer_subgroupOf_normalizer_eq {G : Type*} [Group G] (P : 
     exact congrArg Subtype.val (h ⟨x, hxN⟩ hmem)
 
 open OddOrder.GroupTheory in
+/-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c) の残核):
+`M` 有限可解奇数位数, `p` odd, `K ◁ M` を `p`-群, `A ≤ M` を `p`-部分群で `[K,A,A]=1`.
+このとき `K` の各 `M`-chief factor 上で `A` は trivial, すなわち `⁅Pᵢ, A⁆ ≤ Pᵢ₊₁`
+(`Pᵢ := chiefSeriesInside K i`).
+
+**証明計画 (未完, issue #0047 PSTAB)**: `U := chiefSeriesInside K i`,
+`V := chiefSeriesInside K (i+1)`. `U = ⊥` なら `⁅⊥,A⁆ = ⊥ ≤ V`. 以下 `U/V` が `M`-chief
+factor (`isChiefFactor_chiefSeriesInside`) の場合:
+1. `U/V` は elementary abelian `p`-群 (`IsChiefFactor.commutator_le_of_isSolvable` で abelian,
+   `K` が `p`-群なので exponent `p`) ⇒ `AddCommGroup.zmodModule` で `ZMod p`-ベクトル空間.
+2. `M` の conjugation 作用は `ZMod p`-線形 ⇒ `H_i := chiefFactorCentralizer U V` を kernel と
+   する `Representation (ZMod p) (M ⧸ H_i) (U/V)`. **faithful** (kernel = `H_i`) + **irreducible**
+   (`U/V` chief = `M/V` の minimal normal, `IsChiefFactor.isMinimalNormal_map_quotient`).
+3. faithful + irreducible char-`p` ⇒ `O_p(M/H_i) = 1` (`PGroupFixedVector` =
+   `IsPGroup.invariants_ne_bot`: 正規 `p`-部分群の固定空間は `M`-不変・非零 ⇒ irreducible で全空間
+   ⇒ 自明作用 ⇒ faithful で `= 1`).
+4. `M/H_i` は奇数位数可解 section で `O_p = 1` ⇒ **`thmA4a` で `IsPStable p (M/H_i)`**.
+5. `[K,A,A]=1` ∧ `U ≤ K` ⇒ `[U,A,A] ≤ V` ⇒ 各 `ā ∈ Ā` (= `A` の `M/H_i` 像) は `U/V` 上
+   quadratic (`(ρ ā - 1)² = 0`); `ā` は `p`-element (`A` `p`-群).
+6. `IsPStable` は alg-closed 上定義 ⇒ `baseChangeRepresentation` (S02_Representations, 要 expose)
+   で `ρ` を `AlgebraicClosure (ZMod p)` に持ち上げ (faithful + quadratic 保存) ⇒ `IsPStable` で
+   `ρ' ā = 1` ⇒ faithful で `ā = 1` ⇒ `Ā = 1` ⇒ `A ⊆ H_i` ⇒ `⁅U, A⁆ ≤ V`. ∎
+
+必要 API: `isChiefFactor_chiefSeriesInside`, `IsChiefFactor.commutator_le_of_isSolvable`,
+`IsChiefFactor.isMinimalNormal_map_quotient`, `AddCommGroup.zmodModule`,
+`IsPGroup.invariants_ne_bot`, `thmA4a`, `baseChangeRepresentation`
+(+ `_faithful`, `private` 解除要), `Module.FaithfullyFlat (ZMod p) (AlgebraicClosure (ZMod p))`. -/
+private theorem stability_perFactor
+    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    (hp_odd : p ≠ 2) (hodd : Odd (Nat.card M))
+    {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
+    {A : Subgroup M} (hA_p : IsPGroup p A)
+    (hKAA : ⁅⁅K, A⁆, A⁆ = (⊥ : Subgroup M)) (i : ℕ) :
+    ⁅chiefSeriesInside K i, A⁆ ≤ chiefSeriesInside K (i + 1) := by
+  sorry
+
+open OddOrder.GroupTheory in
 /-- **Stability lift, abstract form** (= Gorenstein 6.5.3 本体, normalizer 化を剥がした版):
 `M` 有限可解奇数位数, `p` odd, `K ◁ M` を正規 `p`-部分群, `A ≤ M` を `p`-部分群で
 `[K, A, A] = 1`. このとき `A` の `M / C_M(K)` での像は `O_p(M / C_M(K))` に含まれる.
@@ -1552,14 +1589,69 @@ private theorem stabilityLiftAux
     exact commutatorElement_eq_one_iff_mul_comm.mpr hcomm
   -- (2) `A ≤ H`: the per-chief-factor p-stability argument (Gorenstein 6.5.3 steps 1-3).
   have hA_le_H : A ≤ H := by
-    sorry
+    rw [hH, le_iInf_iff]
+    intro i
+    rw [chiefFactorCentralizer.le_iff_commutator_le]
+    exact stability_perFactor hp_odd hodd hK hA_p hKAA i
   -- (3) `H ◁ M`.
   haveI hHnorm : H.Normal := by
     rw [hH]; exact Subgroup.normal_iInf_normal (fun _ => inferInstance)
   -- (4) `H / C_M(K)` is a p-group (Gorenstein 6.5.3 steps 4-5, coprime stability).
   have hHmap_pgroup :
       IsPGroup p (H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))) := by
-    sorry
+    -- `H` stabilizes every chief factor of `K`.
+    have hH_stab : ∀ i, ⁅chiefSeriesInside K i, H⁆ ≤ chiefSeriesInside K (i + 1) := by
+      intro i
+      rw [← chiefFactorCentralizer.le_iff_commutator_le, hH]
+      exact iInf_le _ i
+    -- A Hall `{p}'`-subgroup `D` of `↥H` (exists: `↥H` finite solvable).
+    obtain ⟨D, hD⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥H) {q : ℕ | q ≠ p}
+    have hpD : ¬ p ∣ Nat.card ↥D := by
+      intro hpdvd
+      exact absurd rfl (hD.primeFactors_card_subset p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvd, Nat.card_pos.ne'⟩))
+    -- `|D.map subtype| = |D|` is coprime to `|K| = p^j`.
+    have hcardD' : Nat.card ↥(D.map H.subtype) = Nat.card ↥D :=
+      (Nat.card_congr (D.equivMapOfInjective H.subtype (Subgroup.subtype_injective H)).toEquiv).symm
+    have hcop : (Nat.card ↥(D.map H.subtype)).Coprime (Nat.card ↥K) := by
+      obtain ⟨j, hjK⟩ := hK.exists_card_eq
+      rw [hcardD', hjK]
+      exact ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpD).symm.pow_right j
+    -- `D.map subtype ≤ H` stabilizes the chief series, hence `≤ C_M(K)` (the helper).
+    have hstabD' : ∀ i,
+        ⁅chiefSeriesInside K i, D.map H.subtype⁆ ≤ chiefSeriesInside K (i + 1) :=
+      fun i => le_trans (Subgroup.commutator_mono le_rfl (Subgroup.map_subtype_le D)) (hH_stab i)
+    have hsolvD' : IsSolvable ↥(D.map H.subtype) ∨ IsSolvable ↥K := by
+      haveI := hK.isNilpotent; exact Or.inr inferInstance
+    have hD'C : D.map H.subtype ≤ Subgroup.centralizer (K : Set M) :=
+      coprime_chainStabilizer_le_centralizer hK hcop hsolvD' hstabD'
+    have hDC : D ≤ (Subgroup.centralizer (K : Set M)).subgroupOf H :=
+      Subgroup.map_le_iff_le_comap.mp hD'C
+    -- `D.index` is a power of `p` (Hall `{p}'` ⇒ index a `{p}`-number).
+    obtain ⟨k, hk⟩ : ∃ k, D.index = p ^ k := by
+      refine ⟨_, Nat.eq_prime_pow_of_unique_prime_dvd Subgroup.index_ne_zero_of_finite
+        (fun {d} hd hdvd => ?_)⟩
+      simpa using hD.index_no_pi d
+        (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Subgroup.index_ne_zero_of_finite⟩)
+    -- `|H.map(mk' C)| = (C ∩ H).index ∣ D.index = p^k`, so it is a power of `p`.
+    set ψH : ↥H →* M ⧸ Subgroup.centralizer (K : Set M) :=
+      (QuotientGroup.mk' (Subgroup.centralizer (K : Set M))).comp H.subtype with hψH
+    have hrange : ψH.range = H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M))) := by
+      rw [hψH, MonoidHom.range_comp, Subgroup.range_subtype]
+    have hker : ψH.ker = (Subgroup.centralizer (K : Set M)).subgroupOf H := by
+      rw [hψH, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+      rfl
+    have hcard_eq :
+        Nat.card ↥(H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M))))
+          = ((Subgroup.centralizer (K : Set M)).subgroupOf H).index := by
+      rw [← hrange, ← hker]
+      exact (Nat.card_congr (QuotientGroup.quotientKerEquivRange ψH).toEquiv).symm
+    rw [IsPGroup.iff_card]
+    have hdvd :
+        Nat.card ↥(H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))) ∣ p ^ k := by
+      rw [hcard_eq, ← hk]; exact Subgroup.index_dvd_of_le hDC
+    obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
+    exact ⟨j, hj⟩
   haveI hHmap_norm :
       (H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))).Normal :=
     hHnorm.map _ (QuotientGroup.mk'_surjective _)
