@@ -117,6 +117,23 @@ subrepresentationSubmoduleOrderIso}`, `LinearMap.ker_eq_top`, `Module.finrank_po
 (class-sums 基底, MonoidAlgebra center criterion = fiddly), #simple modules = #factors,
 #Irr = #simple (char↔simple bijection)。Route B より長いチェーン。
 
+## CLOSED — 2026-05-30 (全完了条件達成, adversarial review 検証済)
+
+4 件の完了条件すべて達成・検証済 (`notes/meta/peterfalvi_overnight_undefined.md`):
+
+- [x] `card_irreducibleCharacter_eq [Finite G] : Nat.card (IrreducibleCharacter G) =
+  Nat.card (ConjClasses G)` sorry-free (`CharacterCompleteness.lean`)。
+- [x] `CharacterTableIndexing.ofFinite'` / `instCharacterTableIndexingOfFinite` で
+  `[Finite G]` から構成可能。
+- [x] AxiomsCheck: `card_irreducibleCharacter_eq` / `classFunction_eq_zero_of_orthogonal`
+  / `span_irreducibleCharacter_eq_top` が 3-axiom allowlist のみ依存
+  (`lake build OddOrder.AxiomsCheck` green で確認)。
+- [x] downstream 0027 (column orthogonality) / 0022 (Brauer permutation) 無条件化 + close。
+
+statement faithfulness 確認済: `IrreducibleCharacter` / `IsIrreducibleCharacter` は
+非 vacuous な実定義、`card_irreducibleCharacter_eq` は仮定を隠さない真の Isaacs Thm 2.8。
+**conditional scaffold ではない**。
+
 ## 完了条件
 
 - `Nat.card (IrreducibleCharacter G) = Nat.card (ConjClasses G)` (`[Finite G]`) が sorry-free。
