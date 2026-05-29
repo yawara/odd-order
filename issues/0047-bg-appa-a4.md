@@ -67,8 +67,9 @@ A.5 → B.4 → Thm 6.2 の本線。証明本体 = Gorenstein 6.5.3 を A.3 で�
 - [x] **(a) `thmA4a`** — thmA3 の対偶 (sorry-free). 2026-05-29 完了 (`AppA_PStability.lean`)。
 - [ ] **(b)/(c) 投資調査**: Gorenstein Ch.6 §5 (`references/gorenstein/finite-groups.mmd`,
   Thm 6.5.1-6.5.3) を読み、A.3 (= thmA3) で 3.8.4(e) を置換する具体ルートを per-part で記述。
-- [ ] **(c) `thmA4c`** (critical path: A.5/B.4 が要する) を先に。必要 API: `O_{p',p}` =
-  `oPiPCore` (repo), `O_{p'}` = `oPiCore`, `N_G(P)/C_G(P)` 商, `[P,A,A]` lower central。
+- [x] **(c) `thmA4c`** — ✅ **2026-05-29 完成 (sorry-free, axiom-clean)**。`stabilityLiftAux` +
+  `stability_perFactor` (PSTAB rep-theory core) を含む全証明が標準 3 公理のみに依存
+  (`AxiomsCheck.lean` で `thmA4a`/`thmA4c` を CI ガード)。詳細は末尾「PSTAB 完成」節。
 - [ ] **(b) `thmA4b`** (= Thm 6.1): normal abelian ≤ `O_{p',p}`. §6 reduced-case
   (`S06_Additional`) との関係を確認 (一般形は未実装)。
 - [ ] notes/bg/appA_pstability.md の A.4 節を更新。
@@ -240,10 +241,34 @@ N̄_i の p-stability (step 3) を `thmA4a` で得るためだけに効く。
 | `coprime_stabilizes_chain_trivial` | **BG Lem 1.9 一般形**: coprime ψ:A→MulAut K が正規降鎖を stabilize ⇒ 自明 (下降帰納 + S01 2-step) | ✅ sorry-free / 再利用可 |
 | `coprime_chainStabilizer_le_centralizer` | coprime D≤M が K の chief series stabilize ⇒ D≤C_M(K) (conjNormal 作用) | ✅ sorry-free |
 | `hHmap_pgroup` (HALL, stabilityLiftAux 内 step 4-5) | H/C は p-群: ↥H の Hall {p}'-subgroup ⊆ C ⇒ |H/C| ∣ p-冪 | ✅ sorry-free |
-| **`stability_perFactor` (PSTAB)** | 各 chief factor で `⁅Pᵢ,A⁆ ≤ Pᵢ₊₁` (rep theory core) | ⬜ **残 1 sorry** |
+| **`stability_perFactor` (PSTAB)** | 各 chief factor で `⁅Pᵢ,A⁆ ≤ Pᵢ₊₁` (rep theory core) | ✅ **sorry-free (2026-05-29)** |
 
 ⇒ **issue 当初の「最大の未知数」だった HALL (step 5 chain-stabilizer)** は coprime route で
-**完全に解決** (Hall stability theorem の逐語形式化を回避)。残るは rep-theory core のみ。
+**完全に解決** (Hall stability theorem の逐語形式化を回避)。**rep-theory core (PSTAB) も完成し
+A.4(c) は sorry-free**。
+
+## PSTAB 完成 (2026-05-29) — `stability_perFactor` を sorry-free 化
+
+`stability_perFactor` の rep-theory core (docstring の 6-step roadmap) を全て埋めた。
+補助 def `mulAutToEnd : MulAut W →* Module.End (ZMod p) (Additive W)` (共役表現コア) を追加。
+ビルド: `lake build OddOrder` green, `lake build OddOrder.AxiomsCheck` で `thmA4a`/`thmA4c`
+ともに「3 axiom(s), all in allowlist」(= **unconditional / axiom-clean**)。
+
+証明の要点 (chief factor `U/V` が `⊥` でない場合):
+1. `q = p` — `W := U.map (mk' V)` は p-群 `K` の section ∧ elementary abelian q ⇒ q ∣ p^k ⇒ q=p。
+2. `Additive ↥W` を `AddCommGroup.zmodModule` で `ZMod p`-空間化、共役表現
+   `ρ : M → End` (`mulAutToEnd ∘ conjNormal ∘ mk' V`)、faithful (`ker ρ = C_M(U/V)`)。
+3. **`O_p(M̄) = ⊥`** (`M̄ := M/C_M(U/V)`): `Q := O_p(M̄)` の固定部分群 `Wfix ≤ W` を
+   `invariants_ne_bot` で非自明・`Q ◁ M̄` で `M⧸V`-正規と示し、`W` minimal normal
+   (`isMinimalNormal_map_quotient`) で `Wfix.map = W` ⇒ `Q` が `W` を自明作用 ⇒ faithful で `Q=⊥`。
+4. `thmA4a` で `IsPStable p M̄` (M̄ は奇数位数 section + `O_p=⊥`)。
+5. `[K,A,A]=1` ⇒ 各 `ā` が `W` 上 quadratic: `(ρ̄ ā - 1)² x = ofMul ⁅ā,⁅ā,↑w⁆⁆`、
+   `↑w = mk' V u` (u∈U≤K) ⇒ `mk' V ⁅a,⁅a,u⁆⁆ = 1` (`⁅⁅K,A⁆,A⁆=⊥`)。
+6. `baseChangeRepresentation` で alg-closed `AlgebraicClosure (ZMod p)` に持ち上げ、
+   `IsPStable` で `ā = 1` ⇒ `A ⊆ C_M(U/V)` ⇒ `⁅U,A⁆ ≤ V`。∎
+
+残: **A.4(b) `thmA4b`** (A.4(c) の系: Sylow + abelian normal ⇒ `[P,A,A]=1`) は未着手だが
+`thmA4c` 完成で短く組める見込み。下流の **A.5 → App.B B.4 → Thm 6.2 一般形** が unblock。
 
 ### `stability_perFactor` (PSTAB) の残作業 = 純 rep theory
 

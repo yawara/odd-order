@@ -1508,13 +1508,26 @@ private theorem centralizer_subgroupOf_normalizer_eq {G : Type*} [Group G] (P : 
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hx
     exact congrArg Subtype.val (h ⟨x, hxN⟩ hmem)
 
-open OddOrder.GroupTheory in
-/-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c) の残核):
+open scoped IsMulCommutative in
+/-- 自己同型 `φ : MulAut W` を `Additive W` 上の `ZMod p`-線形自己準同型と見るための
+`MulAut W →* Module.End (ZMod p) (Additive W)`. `stability_perFactor` の共役表現コア. -/
+private noncomputable def mulAutToEnd
+    (W : Type*) [Group W] [IsMulCommutative W] (p : ℕ)
+    [Module (ZMod p) (Additive W)] :
+    MulAut W →* Module.End (ZMod p) (Additive W) where
+  toFun φ := ((MulEquiv.toAdditive φ).toLinearEquiv
+      (fun c x => ZMod.map_smul (MulEquiv.toAdditive φ).toAddMonoidHom c x)).toLinearMap
+  map_one' := by ext x; rfl
+  map_mul' φ ψ := by ext x; rfl
+
+open OddOrder.GroupTheory OddOrder.BG.Ch1.S02 in
+open scoped commutatorElement IsMulCommutative in
+/-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c)):
 `M` 有限可解奇数位数, `p` odd, `K ◁ M` を `p`-群, `A ≤ M` を `p`-部分群で `[K,A,A]=1`.
 このとき `K` の各 `M`-chief factor 上で `A` は trivial, すなわち `⁅Pᵢ, A⁆ ≤ Pᵢ₊₁`
 (`Pᵢ := chiefSeriesInside K i`).
 
-**証明計画 (未完, issue #0047 PSTAB)**: `U := chiefSeriesInside K i`,
+**証明 (issue #0047 PSTAB, sorry-free)**: `U := chiefSeriesInside K i`,
 `V := chiefSeriesInside K (i+1)`. `U = ⊥` なら `⁅⊥,A⁆ = ⊥ ≤ V`. 以下 `U/V` が `M`-chief
 factor (`isChiefFactor_chiefSeriesInside`) の場合:
 1. `U/V` は elementary abelian `p`-群 (`IsChiefFactor.commutator_le_of_isSolvable` で abelian,
@@ -1532,10 +1545,10 @@ factor (`isChiefFactor_chiefSeriesInside`) の場合:
    で `ρ` を `AlgebraicClosure (ZMod p)` に持ち上げ (faithful + quadratic 保存) ⇒ `IsPStable` で
    `ρ' ā = 1` ⇒ faithful で `ā = 1` ⇒ `Ā = 1` ⇒ `A ⊆ H_i` ⇒ `⁅U, A⁆ ≤ V`. ∎
 
-必要 API: `isChiefFactor_chiefSeriesInside`, `IsChiefFactor.commutator_le_of_isSolvable`,
-`IsChiefFactor.isMinimalNormal_map_quotient`, `AddCommGroup.zmodModule`,
-`IsPGroup.invariants_ne_bot`, `thmA4a`, `baseChangeRepresentation`
-(+ `_faithful`, `private` 解除要), `Module.FaithfullyFlat (ZMod p) (AlgebraicClosure (ZMod p))`. -/
+主要 API: `isChiefFactor_chiefSeriesInside`, `IsChiefFactor.isMinimalNormal_map_quotient`,
+`solvable_minimal_normal_isElementaryAbelian`, `AddCommGroup.zmodModule`, `mulAutToEnd`,
+`IsPGroup.invariants_ne_bot` (step 3 の O_p=1), `thmA4a`, `baseChangeRepresentation`
+(+ `_faithful`). -/
 private theorem stability_perFactor
     {M : Type*} [Group M] [Finite M] [IsSolvable M]
     (hp_odd : p ≠ 2) (hodd : Odd (Nat.card M))
@@ -1543,7 +1556,256 @@ private theorem stability_perFactor
     {A : Subgroup M} (hA_p : IsPGroup p A)
     (hKAA : ⁅⁅K, A⁆, A⁆ = (⊥ : Subgroup M)) (i : ℕ) :
     ⁅chiefSeriesInside K i, A⁆ ≤ chiefSeriesInside K (i + 1) := by
-  sorry
+  classical
+  rcases eq_or_ne (chiefSeriesInside K i) ⊥ with hU0 | hU0
+  · rw [hU0, Subgroup.commutator_bot_left]; exact bot_le
+  -- chief factor case
+  have hchief : IsChiefFactor (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
+    isChiefFactor_chiefSeriesInside hU0
+  set U : Subgroup M := chiefSeriesInside K i with hUdef
+  set V : Subgroup M := chiefSeriesInside K (i + 1) with hVdef
+  haveI hVn : V.Normal := hchief.normal_bot
+  haveI hUn : U.Normal := hchief.normal_top
+  -- reduce to A ≤ C_M(U/V)
+  suffices hAC : A ≤ chiefFactorCentralizer U V from
+    chiefFactorCentralizer.commutator_le_of_le hAC
+  -- W := U/V as a (normal, minimal-normal) subgroup of M/V
+  set W : Subgroup (M ⧸ V) := U.map (QuotientGroup.mk' V) with hWdef
+  haveI hWn : W.Normal := hUn.map _ (QuotientGroup.mk'_surjective V)
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal W := hchief.isMinimalNormal_map_quotient
+  have hW_ne_bot : W ≠ ⊥ := hMin.2.1
+  obtain ⟨q, hq_prime, hElem⟩ :=
+    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+  -- the elementary-abelian prime is p (W is a section of the p-group K)
+  have hq_eq_p : q = p := by
+    have hUp : IsPGroup p ↥U := by
+      rw [hUdef]; exact hK.to_le (chiefSeriesInside_le K i)
+    have hWp : IsPGroup p ↥W := by
+      rw [hWdef]; exact hUp.map (QuotientGroup.mk' V)
+    have hElemG : OddOrder.GroupTheory.IsElementaryAbelian q ↥W := hElem
+    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have hp_prime : p.Prime := Fact.out
+    haveI : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
+    obtain ⟨x, hx⟩ := exists_ne (1 : ↥W)
+    obtain ⟨ka, hka⟩ := IsPGroup.iff_orderOf.mp hElemG.isPGroup x
+    obtain ⟨kb, hkb⟩ := IsPGroup.iff_orderOf.mp hWp x
+    have hox : orderOf x ≠ 1 := fun h => hx (orderOf_eq_one_iff.mp h)
+    have hka0 : ka ≠ 0 := fun h => hox (by rw [hka, h, pow_zero])
+    have hqd : q ∣ orderOf x := hka ▸ dvd_pow_self q hka0
+    rw [hkb] at hqd
+    exact (Nat.prime_dvd_prime_iff_eq hq_prime hp_prime).mp (hq_prime.dvd_of_dvd_pow hqd)
+  rw [hq_eq_p] at hElem
+  have hElemT : OddOrder.GroupTheory.IsElementaryAbelian p ↥W := hElem
+  -- module structure on Additive ↥W
+  haveI hWcomm : IsMulCommutative ↥W :=
+    ⟨⟨fun a b => hElemT.comm a b⟩⟩
+  have hpsmul : ∀ x : Additive ↥W, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hElemT.pow_eq_one x.toMul
+  haveI hWmod : Module (ZMod p) (Additive ↥W) := AddCommGroup.zmodModule hpsmul
+  haveI hWnt : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
+  haveI : Finite ↥W := inferInstance
+  -- the conjugation representation ρ : M → End (Additive ↥W)
+  set ρ : Representation (ZMod p) M (Additive ↥W) :=
+    (mulAutToEnd ↥W p).comp ((MulAut.conjNormal (H := W)).comp (QuotientGroup.mk' V)) with hρdef
+  have hρ_apply : ∀ (g : M) (x : Additive ↥W),
+      ρ g x = Additive.ofMul (MulAut.conjNormal (H := W) (QuotientGroup.mk' V g)
+        (Additive.toMul x)) := by
+    intro g x; rfl
+  -- faithfulness: ker ρ = C_M(U/V)
+  have hker : ∀ g : M, ρ g = 1 ↔ g ∈ chiefFactorCentralizer U V := by
+    intro g
+    rw [chiefFactorCentralizer.mem_iff, Subgroup.mem_centralizer_iff]
+    constructor
+    · intro hg w hw
+      have hx := DFunLike.congr_fun hg (Additive.ofMul (⟨w, hw⟩ : ↥W))
+      rw [hρ_apply, Module.End.one_apply] at hx
+      have hcoe := congrArg (Subtype.val) (Additive.ofMul.injective hx)
+      rw [MulAut.conjNormal_apply] at hcoe
+      exact (mul_inv_eq_iff_eq_mul.mp hcoe).symm
+    · intro hg
+      ext x
+      have h : MulAut.conjNormal (H := W) (QuotientGroup.mk' V g) (Additive.toMul x)
+          = Additive.toMul x := by
+        apply Subtype.ext
+        rw [MulAut.conjNormal_apply]
+        have hcomm := hg ((Additive.toMul x : ↥W) : M ⧸ V) (Additive.toMul x).2
+        exact mul_inv_eq_iff_eq_mul.mpr hcomm.symm
+      simp only [hρ_apply, Module.End.one_apply, h, ofMul_toMul]
+  -- quotient M̄ := M / C and the lifted (faithful) representation
+  set C : Subgroup M := chiefFactorCentralizer U V with hCdef
+  haveI hCn : C.Normal := chiefFactorCentralizer.normal
+  have hC_le_ker : C ≤ (ρ : M →* _).ker := fun g hg => (hker g).mpr hg
+  set ρbar : Representation (ZMod p) (M ⧸ C) (Additive ↥W) :=
+    QuotientGroup.lift C ρ hC_le_ker with hρbardef
+  have hρbar_mk : ∀ g : M, ρbar (QuotientGroup.mk' C g) = ρ g := fun g => rfl
+  have hρbar_faithful : Function.Injective ρbar := by
+    rw [injective_iff_map_eq_one]
+    intro x hx
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective C x
+    rw [hρbar_mk] at hx
+    exact (QuotientGroup.eq_one_iff g).mpr ((hker g).mp hx)
+  -- O_p(M̄) = ⊥: faithful + irreducible (chief factor) ⇒ no nontrivial normal p-subgroup.
+  have hOp : OddOrder.Isaacs.Ch01.opCore p (M ⧸ C) = ⊥ := by
+    set Q : Subgroup (M ⧸ C) := OddOrder.Isaacs.Ch01.opCore p (M ⧸ C) with hQdef
+    have hQp : IsPGroup p ↥Q := OddOrder.Isaacs.Ch01.opCore_isPGroup p (M ⧸ C)
+    haveI hQn : Q.Normal := OddOrder.Isaacs.Ch01.opCore.normal p (M ⧸ C)
+    -- the restriction of `ρbar` to `Q`, and its (nonzero) invariant submodule
+    set σ : Representation (ZMod p) ↥Q (Additive ↥W) := ρbar.comp Q.subtype with hσdef
+    have hσ_apply : ∀ (q : ↥Q) (z : Additive ↥W), σ q z = ρbar (Q.subtype q) z :=
+      fun _ _ => rfl
+    have hWtop_ne : (⊤ : Submodule (ZMod p) (Additive ↥W)) ≠ ⊥ := by
+      obtain ⟨w, hw⟩ := exists_ne (1 : ↥W)
+      rw [Submodule.ne_bot_iff]
+      refine ⟨Additive.ofMul w, Submodule.mem_top, fun h => hw ?_⟩
+      rwa [← ofMul_one, Equiv.apply_eq_iff_eq] at h
+    have hinv_ne : σ.invariants ≠ ⊥ := hQp.invariants_ne_bot σ hWtop_ne
+    -- the subgroup of `W` fixed (pointwise) by `Q`
+    let Wfix : Subgroup ↥W :=
+      { carrier := {w : ↥W | ∀ q : ↥Q, σ q (Additive.ofMul w) = Additive.ofMul w}
+        one_mem' := fun q => by rw [ofMul_one, map_zero]
+        mul_mem' := fun {w w'} hw hw' q => by rw [ofMul_mul, map_add, hw q, hw' q]
+        inv_mem' := fun {w} hw q => by rw [ofMul_inv, map_neg, hw q] }
+    have hmem_Wfix : ∀ w : ↥W,
+        w ∈ Wfix ↔ ∀ q : ↥Q, σ q (Additive.ofMul w) = Additive.ofMul w := fun _ => Iff.rfl
+    set N : Subgroup (M ⧸ V) := Wfix.map W.subtype with hNdef
+    -- (A) `N ≤ W`
+    have hNle : N ≤ W := by rw [hNdef]; rintro _ ⟨w, _, rfl⟩; exact w.2
+    -- (B) `N ≠ ⊥`: a nonzero invariant vector gives a nontrivial fixed element
+    have hN_ne : N ≠ ⊥ := by
+      obtain ⟨v, hv_mem, hv_ne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hinv_ne
+      have hfix : Additive.toMul v ∈ Wfix :=
+        (hmem_Wfix _).mpr fun q => by
+          rw [ofMul_toMul]; exact (Representation.mem_invariants σ v).mp hv_mem q
+      have hmemN : ((Additive.toMul v : ↥W) : M ⧸ V) ∈ N := by
+        rw [hNdef]; exact ⟨Additive.toMul v, hfix, rfl⟩
+      intro hbot
+      rw [hbot, Subgroup.mem_bot] at hmemN
+      have hone : Additive.toMul v = 1 := by
+        have hcoe : ((Additive.toMul v : ↥W) : M ⧸ V) = ((1 : ↥W) : M ⧸ V) := by
+          rw [Subgroup.coe_one]; exact hmemN
+        exact Subtype.coe_inj.mp hcoe
+      exact hv_ne (by rw [← ofMul_toMul v, hone, ofMul_one])
+    -- (C) `N` is normal in `M ⧸ V`: `Q ◁ M̄` makes the fixed set `M̄`-stable
+    have hNnorm : N.Normal := by
+      rw [hNdef]
+      refine ⟨?_⟩
+      rintro _ ⟨w, hw, rfl⟩ gbar
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective V gbar
+      have hconjW :
+          (QuotientGroup.mk' V g) * (W.subtype w) * (QuotientGroup.mk' V g)⁻¹ ∈ W :=
+        hWn.conj_mem _ w.2 _
+      refine ⟨⟨_, hconjW⟩, (hmem_Wfix _).mpr fun q => ?_, rfl⟩
+      have heq : (⟨_, hconjW⟩ : ↥W) = MulAut.conjNormal (QuotientGroup.mk' V g) w := by
+        apply Subtype.ext
+        simp only [MulAut.conjNormal_apply, Subgroup.coe_subtype]
+      rw [heq]
+      have hρg : ρ g (Additive.ofMul w)
+          = Additive.ofMul (MulAut.conjNormal (QuotientGroup.mk' V g) w) := by
+        rw [hρ_apply, toMul_ofMul]
+      rw [hσ_apply, ← hρg, ← hρbar_mk g, ← Module.End.mul_apply, ← map_mul]
+      have hq' : (QuotientGroup.mk' C g)⁻¹ * Q.subtype q * QuotientGroup.mk' C g ∈ Q := by
+        simpa using hQn.conj_mem (Q.subtype q) q.2 ((QuotientGroup.mk' C g)⁻¹)
+      have hfixq' :
+          ρbar ((QuotientGroup.mk' C g)⁻¹ * Q.subtype q * QuotientGroup.mk' C g)
+              (Additive.ofMul w) = Additive.ofMul w := by
+        have h2 := (hmem_Wfix w).mp hw ⟨_, hq'⟩
+        rwa [hσ_apply] at h2
+      have hconj_eq : Q.subtype q * QuotientGroup.mk' C g
+          = QuotientGroup.mk' C g * ((QuotientGroup.mk' C g)⁻¹ * Q.subtype q
+              * QuotientGroup.mk' C g) := by group
+      rw [hconj_eq, map_mul, Module.End.mul_apply, hfixq']
+    -- (D) minimality ⇒ `N = W` ⇒ `Q` acts trivially ⇒ `Q = ⊥`
+    have hNW : N = W := (hMin.2.2 N hNnorm hNle).resolve_left hN_ne
+    have hWfix_top : ∀ w : ↥W, w ∈ Wfix := by
+      intro w
+      have hwN : ((w : ↥W) : M ⧸ V) ∈ N := by rw [hNW]; exact w.2
+      rw [hNdef] at hwN
+      obtain ⟨w', hw', hw'eq⟩ := hwN
+      rwa [← Subtype.coe_inj.mp hw'eq]
+    rw [Subgroup.eq_bot_iff_forall]
+    intro x hx
+    have hρx : ρbar x = 1 := by
+      have hone : ρbar (Q.subtype ⟨x, hx⟩) = 1 := by
+        refine LinearMap.ext fun z => ?_
+        rw [Module.End.one_apply, ← hσ_apply, ← ofMul_toMul z]
+        exact (hmem_Wfix _).mp (hWfix_top (Additive.toMul z)) ⟨x, hx⟩
+      exact hone
+    exact hρbar_faithful (by rw [hρx, map_one])
+  -- M̄ odd order ⇒ p-stable
+  have hodd_bar : Odd (Nat.card (M ⧸ C)) :=
+    hodd.of_dvd_nat (Subgroup.card_quotient_dvd_card C)
+  have hpstable : IsPStable p (M ⧸ C) := thmA4a hp_odd hodd_bar hOp
+  -- now A ≤ C
+  intro a ha
+  set abar : M ⧸ C := QuotientGroup.mk' C a with habardef
+  have habar_p : IsPGroup p (Subgroup.zpowers abar) := by
+    have hmem : abar ∈ A.map (QuotientGroup.mk' C) := by
+      rw [habardef]; exact Subgroup.mem_map_of_mem _ ha
+    exact (hA_p.map (QuotientGroup.mk' C)).to_le (Subgroup.zpowers_le.mpr hmem)
+  -- quadratic over the algebraic closure
+  have hquadZ : ((ρbar abar : Module.End (ZMod p) (Additive ↥W)) - 1) ^ 2 = 0 := by
+    have hρbar_eq : ρbar abar = ρ a := by rw [habardef]; exact hρbar_mk a
+    -- `(ρ a - 1) y = ofMul (⁅ā, toMul y⁆)`  with `ā = mk' V a`
+    have hsub : ∀ y : Additive ↥W,
+        (ρ a - (1 : Module.End (ZMod p) (Additive ↥W))) y
+          = Additive.ofMul (MulAut.conjNormal (QuotientGroup.mk' V a) (Additive.toMul y)
+              * (Additive.toMul y)⁻¹) := by
+      intro y
+      rw [LinearMap.sub_apply, Module.End.one_apply, hρ_apply, ofMul_mul, ofMul_inv,
+        ofMul_toMul, sub_eq_add_neg]
+    -- coercion of `⁅ā, s⁆`-as-element-of-`↥W` into `M ⧸ V`
+    have hcomm_coe : ∀ s : ↥W,
+        ((MulAut.conjNormal (QuotientGroup.mk' V a) s * s⁻¹ : ↥W) : M ⧸ V)
+          = ⁅(QuotientGroup.mk' V a), (s : M ⧸ V)⁆ := by
+      intro s
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, MulAut.conjNormal_apply,
+        commutatorElement_def]
+    rw [hρbar_eq]
+    refine LinearMap.ext fun x => ?_
+    rw [LinearMap.zero_apply, pow_two, Module.End.mul_apply, hsub x, hsub, toMul_ofMul,
+      ← ofMul_one]
+    refine congrArg Additive.ofMul ?_
+    -- `↑w ∈ W = U.map (mk' V)`: pick `u ∈ U ≤ K` with `mk' V u = ↑w`
+    obtain ⟨u, hu, hux⟩ := Subgroup.mem_map.mp
+      (show ((Additive.toMul x : ↥W) : M ⧸ V) ∈ U.map (QuotientGroup.mk' V) by
+        rw [← hWdef]; exact (Additive.toMul x).2)
+    apply Subtype.ext
+    rw [Subgroup.coe_one,
+      hcomm_coe (MulAut.conjNormal (QuotientGroup.mk' V a) (Additive.toMul x)
+        * (Additive.toMul x)⁻¹),
+      hcomm_coe (Additive.toMul x), ← hux, ← map_commutatorElement (QuotientGroup.mk' V),
+      ← map_commutatorElement (QuotientGroup.mk' V)]
+    -- `⁅a, ⁅a, u⁆⁆ ∈ ⁅⁅K, A⁆, A⁆ = ⊥`
+    have huK : u ∈ K := chiefSeriesInside_le K i (hUdef ▸ hu)
+    have hc1 : ⁅a, u⁆ ∈ ⁅K, A⁆ := by
+      rw [Subgroup.commutator_comm]; exact Subgroup.commutator_mem_commutator ha huK
+    have hc2 : ⁅a, ⁅a, u⁆⁆ ∈ ⁅⁅K, A⁆, A⁆ := by
+      rw [Subgroup.commutator_comm ⁅K, A⁆ A]
+      exact Subgroup.commutator_mem_commutator ha hc1
+    rw [hKAA] at hc2
+    rw [Subgroup.mem_bot.mp hc2, map_one]
+  set Kalg := AlgebraicClosure (ZMod p)
+  haveI : CharP Kalg p := inferInstance
+  have hρ'_faithful : Function.Injective (baseChangeRepresentation Kalg ρbar) :=
+    baseChangeRepresentation_faithful Kalg ρbar hρbar_faithful
+  have hquad' :
+      ((baseChangeRepresentation Kalg ρbar abar :
+          Module.End Kalg (TensorProduct (ZMod p) Kalg (Additive ↥W))) - 1) ^ 2 = 0 := by
+    have happ : (baseChangeRepresentation Kalg ρbar abar :
+        Module.End Kalg (TensorProduct (ZMod p) Kalg (Additive ↥W)))
+        = Module.End.baseChangeHom (ZMod p) Kalg (Additive ↥W) (ρbar abar) := rfl
+    rw [happ, show (1 : Module.End Kalg (TensorProduct (ZMod p) Kalg (Additive ↥W)))
+          = Module.End.baseChangeHom (ZMod p) Kalg (Additive ↥W) 1 from (map_one _).symm,
+        ← map_sub (Module.End.baseChangeHom (ZMod p) Kalg (Additive ↥W)), ← map_pow, hquadZ,
+        map_zero]
+  -- IsPStable kills ā
+  have h1 : baseChangeRepresentation Kalg ρbar abar = 1 :=
+    hpstable (baseChangeRepresentation Kalg ρbar) hρ'_faithful abar habar_p hquad'
+  have habar1 : abar = 1 := hρ'_faithful (by rw [h1, map_one])
+  exact (QuotientGroup.eq_one_iff a).mp habar1
 
 open OddOrder.GroupTheory in
 /-- **Stability lift, abstract form** (= Gorenstein 6.5.3 本体, normalizer 化を剥がした版):

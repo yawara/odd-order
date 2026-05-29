@@ -13,6 +13,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+import OddOrder.BG.AppA_PStability
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -556,3 +557,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+
+-- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
+#assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
+-- BG App.A Thm A.4(c) (= Gorenstein 6.5.3 翻訳, stability lift) ⭐ **= issue 0047 PSTAB**.
+-- O_{p'}(G)P ◁ G, A ≤ N_G(P) p-subgroup, [P,A,A]=1 ⇒ AC_G(P)/C_G(P) ⊆ O_p(N_G(P)/C_G(P)).
+-- per-chief-factor p-stability (`stability_perFactor`) を含む全証明が unconditional であることの保証.
+#assert_only_allowed_axioms OddOrder.BG.AppA.thmA4c

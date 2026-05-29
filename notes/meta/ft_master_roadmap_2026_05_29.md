@@ -7,10 +7,10 @@
 
 ## 0. TL;DR
 
-- **実 `sorry` proof-term はちょうど 3 個**。`axiom` 宣言 **0**、`admit` **0**(全件 grep + `AxiomsCheck.lean` の `#assert_only_allowed_axioms` で検証済み)。
-  1. `OddOrder/BG/AppA_PStability.lean:1546` — `stability_perFactor` (issue 0047)
-  2. `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:193` — `sibleySetup_is_coherent` (issue 0046)
-  3. `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean:1596` — `card_G0_lower_bound` (issue 0044)
+- **実 `sorry` proof-term は 2 個** (2026-05-29 更新: PSTAB 解消で 3→2)。`axiom` 宣言 **0**、`admit` **0**(全件 grep + `AxiomsCheck.lean` の `#assert_only_allowed_axioms` で検証済み)。
+  1. `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:188` — `sibleySetup_is_coherent` (issue 0046)
+  2. `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean:1589` — `card_G0_lower_bound` (issue 0044)
+  - ✅ **解消済**: `stability_perFactor` (BG App.A A.4(c) PSTAB, 旧 AppA:1546, issue 0047) — 2026-05-29 sorry-free 化。`thmA4a`/`thmA4c` を `AxiomsCheck.lean` で axiom-clean を CI ガード。下流 A.4(b)/A.5/App.B/Thm 6.2 一般形が unblock。
 - **完成度: 結果数では ~33%(168/~510)、数学的深さでは ~18-22%**。Isaacs Ch.1-7 の FT ルートは本物の sorry-free・axiom-clean で**最大の堅い土台**。だが残りの大半 = **BG ローカル解析本線 §7-§16(~76 結果・Lean ファイルゼロ)+ Peterfalvi §10-§16(~80 結果・ファイルゼロ)** が**直列ボトルネック**で、ここが FT の実際の深さ。現フロンティアペースでは複数年規模。
 - **クリティカルパス長 43 ゲート**。最深の拘束: **Peterfalvi §10-§16 は BG §16 完成まで一切着手できない**(BG Theorems A-E が Peterfalvi §10 の入力)。
 - **今日クリーンな tree から着手可能なのは ~15 ゲート**。最高レバレッジは **issue 0047 の単一 sorry**(これを潰すと A.4(b)→A.5→App.B→BG Thm 6.2 一般形が連鎖開放、§7-§16 全体が 7+ 回参照する normal-J ハブ)。
