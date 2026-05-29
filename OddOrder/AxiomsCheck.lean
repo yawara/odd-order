@@ -567,3 +567,10 @@ set_option linter.style.longLine false in
 -- BG App.A Thm A.4(b) (= Gorenstein 6.5.2 翻訳 = BG Thm 6.1): P∈Syl_p, A abelian normal of P
 -- ⇒ A ⊆ O_{p',p}(G). A.4(c) の stabilityLiftAux を K=O_p(G/O_{p'}) で再利用。
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4b
+-- BG App.A Thm A.5(1): P ◁ G p-group, X gen by P-normalized abelian p-groups
+-- ⇒ XC_G(P)/C_G(P) ⊆ O_p(G/C_G(P)). stabilityLiftAux を K=P で直接適用 + iSup 分解。
+#assert_only_allowed_axioms OddOrder.BG.AppA.thmA5_part1
+-- BG App.A Thm A.5(2): 上記 + O_{p'}(G)=1 ∧ C_{O_p(G)}(P) ⊆ P ⇒ X ⊆ O_p(G).
+-- Prop 1.10 (⟨u⟩ の O_p(G) 上共役作用) で C_G(P) の p'-元を消去 ⇒ C_G(P) p-群
+-- ⇒ part(1) を comap 還元。
+#assert_only_allowed_axioms OddOrder.BG.AppA.thmA5_part2

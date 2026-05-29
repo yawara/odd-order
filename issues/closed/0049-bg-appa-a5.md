@@ -68,13 +68,17 @@ self-contained な sup 仮説に留める。)
   ⭐ **簡略化**: N_G(P)=⊤ transport は**不要だった** — P 正規なので `thmA4c` (N_G(P) 経由) でなく
   **`stabilityLiftAux` を M:=G, K:=P で直接適用**できる (1 行)。各生成子 A に `⁅⁅P,A⁆,A⁆=⊥`
   (P≤N(A) で ⁅P,A⁆≤A, A abelian で ⁅A,A⁆=⊥) → stabilityLiftAux → iSup で X に持ち上げ。
-- [ ] **part(2) `thmA5_part2`**: `O_{p'}=1` ∧ `C_{O_p(G)}(P)⊆P` ⇒ `X ⊆ O_p(G)`。
-  Q:=O_p(G), C:=C_G(P)。各 p'-元 u∈C に Prop 1.10 (✅, ⟨u⟩ の Q 上共役作用
+- [x] **part(2) `thmA5_part2`** — ✅ **2026-05-29 完成 (sorry-free, axiom-clean)**。
+  Q:=O_p(G), C:=C_G(P)。各 p'-元 u∈C に Prop 1.10 (⟨u⟩ の Q 上共役作用
   `(MulAut.conjNormal (H:=Q)).comp (zpowers u).subtype`) で u が Q 中心化 ⇒ C_G(Q)⊆Q (Hall-Higman)
-  で u=1 ⇒ C は p-群 ⇒ C◁G で C⊆Q。`O_p(G/C)=O_p(G)/C` (C⊆Q 商対応) + part(1) で X⊆Q。
-  **残: conjNormal→fixedPoints=C_Q(u) 翻訳 + Q-内部 centralizer chain + opCore 商対応 (~100 行)。**
-- [ ] `thmA5` (part1+part2) を統合 (or part2 が X⊆O_p を直接与えるので part2 = 本体)。
-- [ ] `AxiomsCheck.lean` に登録。
+  で u=1 ⇒ C は p-群 (Cauchy `exists_prime_orderOf_dvd_card'`) ⇒ C◁G で C⊆Q。
+  ⭐ **簡略化**: `O_p(G/C)=O_p(G)/C` の equality は**不要だった** — part(1) の `XC/C ⊆ O_p(G/C)` を
+  `comap (mk' C)` で引き戻し, `comap (mk' C) (O_p(G/C))` が正規 p-群 (ker=C が p-群,
+  `comap_of_ker_isPGroup`) ⇒ `≤ Q` (`normal_pgroup_le_opCore`) で `X ⊆ Q`。thmA4b Step6-7 と同型。
+  ⭐ **核心の翻訳**: `fixedPointsOfMulAut φ = C_Q(u)`, chain は `centralizer(C_Q(u)) ≤ centralizer(P_Q)
+  ≤ P_Q ≤ C_Q(u)` (centralizer 反変 + hCP)。`P_Q := P.subgroupOf Q`。
+- [x] `thmA5` 統合 — **不要**: part2 が `X ⊆ O_p(G)` を直接与え本体。part1/part2 の 2 定理で完結。
+- [x] `AxiomsCheck.lean` に登録 — ✅ `thmA5_part1` + `thmA5_part2` (thmA4b の隣)。
 
 ## 必要 API (確認済)
 
