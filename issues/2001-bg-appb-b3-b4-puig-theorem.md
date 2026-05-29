@@ -79,6 +79,8 @@ L4644-4757 (Lem B.3 = L4644-4684, Thm B.4 = L4686-4757)。
 
 ## 参照
 
+- ⭐ **別セッション引き継ぎ (B.4(b) 残作業の自己完結手順書)**: [`notes/bg/appB_b4b_handoff.md`](../notes/bg/appB_b4b_handoff.md)
+  — normalInf_isSylow / Step3 / Step4 / FINAL の署名・sketch・FIX・落とし穴・先例を全転記。**B.4(b) 再開時はまずこれを読む。**
 - 前提 (完成済): issue 2000 (B.1/B.2), issue 0049 (`thmA5_part1/part2`)。
 - `notes/bg/appB_puig.md` (Lem B.3 詳解 L174-208, Thm B.4 4-Step 詳解 L212-322)。
 - `OddOrder/BG/AppB_Puig.lean`: `lRelIn_top_le_lRelIn` (B.4 Step3 の `L(C∩S)=L(S)` に再利用),
