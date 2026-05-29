@@ -280,6 +280,112 @@ theorem support_induce_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
 
 end Normalized
 
+section FrobeniusReciprocity
+
+variable [StarRing k]
+
+/-- The `x`-slice of the induction sum, paired with `star (χ g)`, does not depend on
+`x` when `χ` is a class function: conjugating `g ↦ x * g * x⁻¹` sends the `x`-slice to
+the `1`-slice and fixes `χ`. -/
+theorem sum_induceTerm_mul_star_eq (H : Subgroup G) (θ : ClassFunction ↥H k)
+    (χ : ClassFunction G k) (x : G) :
+    (∑ g : G, induceTerm H θ x g * star (χ g)) =
+      ∑ g : G, induceTerm H θ 1 g * star (χ g) := by
+  refine (Fintype.sum_equiv (MulAut.conj x).toEquiv _ _ ?_).symm
+  intro g
+  have hconj : (MulAut.conj x).toEquiv g = x * g * x⁻¹ := by simp [MulAut.conj_apply]
+  rw [hconj]
+  have hterm : induceTerm H θ x (x * g * x⁻¹) = induceTerm H θ 1 g := by
+    have := induceTerm_conj H θ x g x
+    rwa [inv_mul_cancel] at this
+  rw [hterm, χ.conj_eq g x]
+
+/-- The `1`-slice of the induction sum, paired with `star (χ g)`, collected over the
+subgroup: only `g ∈ H` contributes, where `induceTerm H θ 1 g = θ g`. -/
+theorem sum_induceTerm_one_mul_star_eq (H : Subgroup G) [Fintype H]
+    (θ : ClassFunction ↥H k) (χ : ClassFunction G k) :
+    (∑ g : G, induceTerm H θ 1 g * star (χ g)) =
+      ∑ h : H, θ h * star ((restrict H χ) h) := by
+  classical
+  set s : Finset G := Finset.univ.filter (fun g : G => g ∈ H) with hs
+  have hmem_iff : ∀ x : G, x ∈ s ↔ x ∈ H := fun x => by simp [hs]
+  -- Step 1: collapse the universe sum to the filtered sum (off-`H` terms vanish).
+  have hstep1 :
+      (∑ g : G, induceTerm H θ 1 g * star (χ g)) =
+        ∑ g ∈ s, induceTerm H θ 1 g * star (χ g) := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+    intro g _ hg
+    have hgH : g ∉ H := by rw [hmem_iff] at hg; exact hg
+    have hnmem : (1 : G)⁻¹ * g * 1 ∉ H := by simpa using hgH
+    rw [induceTerm_of_not_mem θ hnmem, zero_mul]
+  -- Step 2: identify the filtered sum with the subtype sum over `H`.
+  have hstep2 :
+      (∑ g ∈ s, induceTerm H θ 1 g * star (χ g)) =
+        ∑ h : H, θ h * star ((restrict H χ) h) := by
+    rw [Finset.sum_subtype s hmem_iff (fun g => induceTerm H θ 1 g * star (χ g))]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    have hmem : (1 : G)⁻¹ * (h : G) * 1 ∈ H := by
+      rw [inv_one, one_mul, mul_one]; exact h.2
+    rw [induceTerm_of_mem θ hmem]
+    have hθeq : (θ : ↥H → k) ⟨(1 : G)⁻¹ * (h : G) * 1, hmem⟩ = (θ : ↥H → k) h :=
+      congrArg (θ : ↥H → k) (by apply Subtype.ext; simp)
+    rw [hθeq]; rfl
+  rw [hstep1, hstep2]
+
+/-- **Frobenius reciprocity** for the classical induced class function, in
+unnormalized inner-sum form:
+
+`∑_{g∈G} (Ind θ)^{unscaled}(g) · star (χ g) = |G| · ∑_{h∈H} θ h · star (χ h)`.
+
+The factor `|G|` arises because each of the `|G|` slices indexed by `x ∈ G` contributes
+the same subgroup sum. -/
+theorem sum_induceSum_mul_star_eq (H : Subgroup G) [Fintype H] (θ : ClassFunction ↥H k)
+    (χ : ClassFunction G k) :
+    (∑ g : G, induceSum H θ g * star (χ g)) =
+      (Nat.card G : k) * ∑ h : H, θ h * star ((restrict H χ) h) := by
+  classical
+  have hswap :
+      (∑ g : G, induceSum H θ g * star (χ g)) =
+        ∑ x : G, ∑ g : G, induceTerm H θ x g * star (χ g) := by
+    simp only [induceSum_apply, Finset.sum_mul]
+    rw [Finset.sum_comm]
+  rw [hswap]
+  have hconst : ∀ x : G,
+      (∑ g : G, induceTerm H θ x g * star (χ g)) =
+        ∑ h : H, θ h * star ((restrict H χ) h) := by
+    intro x
+    rw [sum_induceTerm_mul_star_eq H θ χ x,
+      sum_induceTerm_one_mul_star_eq H θ χ]
+  rw [Finset.sum_congr rfl fun x _ => hconst x]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Nat.card_eq_fintype_card]
+
+/-- **Frobenius reciprocity** (numerical / class-function form):
+`(Ind_H^G θ, χ)_G = (θ, Res_H^G χ)_H`.
+
+This is [Is] Lemma 5.2, the adjunction between induction and restriction at the level of
+class-function inner products. -/
+theorem inner_induce_eq_inner_restrict (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card G : k)] [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) (χ : ClassFunction G k) :
+    ClassFunction.inner (induce H θ) χ =
+      ClassFunction.inner θ (restrict H χ) := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+    ClassFunction.innerSum]
+  have hL : ∀ g : G, (induce H θ) g * star (χ g) =
+      ⅟(Nat.card H : k) * (induceSum H θ g * star (χ g)) := by
+    intro g
+    rw [induce, ClassFunction.smul_apply, mul_assoc]
+  rw [Finset.sum_congr rfl fun g _ => hL g, ← Finset.mul_sum,
+    sum_induceSum_mul_star_eq H θ χ]
+  set S : k := ∑ h : H, θ h * star ((restrict H χ) h) with hS
+  -- LHS: ⅟|G| * (⅟|H| * (|G| * S))  =  ⅟|H| * S  :RHS
+  calc ⅟(Nat.card G : k) * (⅟(Nat.card H : k) * ((Nat.card G : k) * S))
+      = (⅟(Nat.card G : k) * (Nat.card G : k)) * (⅟(Nat.card H : k) * S) := by ring
+    _ = ⅟(Nat.card H : k) * S := by rw [invOf_mul_self, one_mul]
+
+end FrobeniusReciprocity
+
 end ClassFunction
 
 end OddOrder.RepresentationTheory
