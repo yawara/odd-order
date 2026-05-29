@@ -28,6 +28,10 @@ inequality already proved) equality. The downstream steps are not yet formalized
 
 namespace OddOrder.RepresentationTheory
 
+open Module (finrank)
+
+section CFOp
+
 variable {G V : Type*} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
 
 /-- The operator `∑_{g ∈ G} f(g) • ρ(g)` attached to a class function `f` and a
@@ -55,8 +59,6 @@ theorem classFunctionOperator_comm (f : ClassFunction G ℂ) (ρ : Representatio
   refine Finset.sum_congr rfl (fun g _ => ?_)
   have hconj : (MulAut.conj h).toEquiv g = h * g * h⁻¹ := by simp [MulAut.conj_apply]
   rw [hconj, f.conj_eq g h, show h * g * h⁻¹ * h = h * g from by group]
-
-open Module (finrank)
 
 /-- The class-function operator `T_ρ f`, packaged as an `IntertwiningMap ρ ρ`
 (`classFunctionOperator_comm` is exactly the intertwining condition). -/
@@ -116,5 +118,75 @@ theorem classFunctionOperator_eq_zero_of_sum_eq_zero [FiniteDimensional ℂ V] [
     · exact hc0
     · exact absurd (Nat.cast_eq_zero.mp hfr0) hfr.ne'
   rw [hc, hc0, zero_smul]
+
+end CFOp
+
+section Transfer
+
+variable {G : Type*} [Group G]
+
+/-- Transport a representation `σ` on `W` along a linear equivalence `e : W ≃ₗ[ℂ] X`, giving a
+representation on `X` (conjugation by `e`). Used to move a finite-dimensional representation to a
+representative on `Fin n → ℂ`, a `Type 0` space. -/
+noncomputable def transportRep {W X : Type*} [AddCommGroup W] [Module ℂ W]
+    [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X) :
+    Representation ℂ G X :=
+  ((e.conjRingEquiv : Module.End ℂ W ≃+* Module.End ℂ X).toRingHom.toMonoidHom).comp σ
+
+@[simp] theorem transportRep_apply {W X : Type*} [AddCommGroup W] [Module ℂ W]
+    [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X) (g : G) :
+    transportRep σ e g = e.conj (σ g) := rfl
+
+/-- Transporting a representation preserves its character. -/
+theorem transportRep_character {W X : Type*} [AddCommGroup W] [Module ℂ W]
+    [AddCommGroup X] [Module ℂ X] [FiniteDimensional ℂ W]
+    (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X) :
+    (transportRep σ e).character = σ.character := by
+  funext g
+  show LinearMap.trace ℂ X (e.conj (σ g)) = LinearMap.trace ℂ W (σ g)
+  exact LinearMap.trace_conj' (σ g) e
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Transporting an irreducible representation along a linear equivalence keeps it irreducible. -/
+theorem transportRep_isIrreducible {W X : Type*} [AddCommGroup W] [Module ℂ W]
+    [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X)
+    [Representation.IsIrreducible σ] : Representation.IsIrreducible (transportRep σ e) := by
+  -- rep equivalence `σ ≃ transportRep σ e` via `e`
+  have he : ∀ g : G, (e : W →ₗ[ℂ] X) ∘ₗ σ g = (transportRep σ e) g ∘ₗ (e : W →ₗ[ℂ] X) := by
+    intro g; ext w
+    simp only [LinearMap.comp_apply, transportRep_apply, LinearEquiv.conj_apply_apply,
+      LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply]
+  let φ : σ.Equiv (transportRep σ e) := Representation.Equiv.mk e he
+  -- transport to `asModule` linear equivalence over `ℂ[G]`
+  have hbij : Function.Bijective
+      (Representation.IntertwiningMap.equivLinearMapAsModule σ (transportRep σ e)
+        φ.toIntertwiningMap) :=
+    e.bijective
+  -- No type annotation on `L`: the `asModule` `MonoidAlgebra`-module instance is baked into the
+  -- result of `equivLinearMapAsModule`, whereas re-stating the type would re-trigger (and fail)
+  -- instance search on the `asModule` type synonym.
+  let L := LinearEquiv.ofBijective
+      (Representation.IntertwiningMap.equivLinearMapAsModule σ (transportRep σ e)
+        φ.toIntertwiningMap) hbij
+  haveI hσs := (Representation.irreducible_iff_isSimpleModule_asModule σ).mp
+    ‹Representation.IsIrreducible σ›
+  rw [Representation.irreducible_iff_isSimpleModule_asModule]
+  exact IsSimpleModule.congr L.symm
+
+/-- **Every finite-dimensional irreducible complex representation has its character among the
+`IsIrreducibleCharacter`s.** (`IsIrreducibleCharacter` only quantifies over `Type 0` carriers;
+this discharges the universe restriction by transporting to `Fin n → ℂ`.) -/
+theorem exists_isIrreducibleCharacter_eq {W : Type*} [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ W] (σ : Representation ℂ G W) [Representation.IsIrreducible σ] :
+    ∃ φ : ClassFunction G ℂ, IsIrreducibleCharacter φ ∧ (φ : G → ℂ) = σ.character := by
+  let e : W ≃ₗ[ℂ] (Fin (finrank ℂ W) → ℂ) := (Module.finBasis ℂ W).equivFun
+  haveI : Representation.IsIrreducible (transportRep σ e) := transportRep_isIrreducible σ e
+  refine ⟨repCharacterClassFunction (transportRep σ e),
+    ⟨Fin (finrank ℂ W) → ℂ, inferInstance, inferInstance, inferInstance, transportRep σ e,
+      inferInstance, rfl⟩, ?_⟩
+  funext g
+  exact congrFun (transportRep_character σ e) g
+
+end Transfer
 
 end OddOrder.RepresentationTheory
