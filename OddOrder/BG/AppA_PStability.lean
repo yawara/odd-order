@@ -1971,6 +1971,87 @@ theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
   exact stabilityLiftAux (K := P.subgroupOf (Subgroup.normalizer (P : Set G)))
     hp_odd hoddN hKp hAp' hKAA' (centralizer_subgroupOf_normalizer_eq P)
 
+/-- **BG Theorem A.4(b)** (mmd L4480(b), = Gorenstein 6.5.2 翻訳 = BG Thm 6.1, Hall-Higman 特殊形):
+`p` odd, `G` solvable odd order, `P ∈ Syl_p(G)`, `A` を `P` の正規 abelian 部分群とする
+(`A ≤ P` かつ `P ≤ N_G(A)`)。このとき `A ≤ O_{p',p}(G)`。
+
+**証明 (Gorenstein 5.2 直接ルート)**: `N := O_{p'}(G)`, `Ḡ := G/N`, `R̄ := O_p(Ḡ)`,
+`Ā := A の像`。`Ḡ` では `O_{p'}=⊥`。`Ā` は abelian `p`-群で `R̄ ≤ P̄ ≤ N_Ḡ(Ā)` ⇒
+`⁅R̄,Ā,Ā⁆ ≤ ⁅Ā,Ā⁆ = ⊥`。`stabilityLiftAux` を `K := R̄` に適用し
+`Ā·C_Ḡ(R̄)/C_Ḡ(R̄) ⊆ O_p(Ḡ/C_Ḡ(R̄))`。Hall-Higman (`O_{p'}(Ḡ)=⊥ ⇒ C_Ḡ(R̄) ⊆ R̄`,
+`centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot`) で `C_Ḡ(R̄)` は `p`-群 ⇒ 商を
+引き戻して `Ā ⊆ R̄ = O_p(Ḡ)` ⇒ `A ⊆ O_{p',p}(G)`。Gorenstein の Remark (A.4(c) の系) が
+隠す "`A ⊆ P`" 推論を回避するため, A.4(c) でなく 5.2 自身 (= `stabilityLiftAux@K=O_p(Ḡ)`) を翻訳。 -/
+theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (P : Sylow p G) {A : Subgroup G} (hA_le : A ≤ (P : Subgroup G))
+    (hA_norm : (P : Subgroup G) ≤ Subgroup.normalizer (A : Set G)) [IsMulCommutative A] :
+    A ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G := by
+  haveI : IsSolvable G := hsolv
+  set N : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G with hN
+  set mk := QuotientGroup.mk' N with hmk
+  set Abar : Subgroup (G ⧸ N) := A.map mk with hAbar
+  set Rbar : Subgroup (G ⧸ N) := OddOrder.Isaacs.Ch01.opCore p (G ⧸ N) with hRbar
+  -- Step 0: instances / odd order on `Ḡ`; the `{q ∉ {p}} = {q ≠ p}` set identity
+  have hset : {p_1 | p_1 ∉ ({p} : Set ℕ)} = {q | q ≠ p} := by ext q; simp
+  have hoddBar : Odd (Nat.card (G ⧸ N)) :=
+    hodd.of_dvd_nat (Subgroup.card_quotient_dvd_card N)
+  -- Step 1: `O_{p'}(Ḡ) = ⊥`
+  have hOp'Bar : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} (G ⧸ N) = ⊥ :=
+    OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot {q | q ≠ p}
+  -- Step 2: `Ā` is an abelian `p`-group, `R̄ ≤ P̄ ≤ N_Ḡ(Ā)`
+  have hA_pg : IsPGroup p A := P.2.to_le hA_le
+  have hAbar_pg : IsPGroup p Abar := hA_pg.map mk
+  set Pbar : Sylow p (G ⧸ N) := P.mapSurjective (QuotientGroup.mk'_surjective N) with hPbar
+  have hPbar_coe : (Pbar : Subgroup (G ⧸ N)) = (P : Subgroup G).map mk :=
+    P.coe_mapSurjective (QuotientGroup.mk'_surjective N)
+  have hR_le_NAbar : Rbar ≤ Subgroup.normalizer (Abar : Set (G ⧸ N)) := by
+    refine le_trans (OddOrder.Isaacs.Ch01.opCore_le Pbar) ?_
+    rw [hPbar_coe, hAbar]
+    exact le_trans (Subgroup.map_mono hA_norm) (Subgroup.le_normalizer_map mk)
+  -- Step 3: `⁅R̄, Ā, Ā⁆ = ⊥`
+  have hAA : ⁅A, A⁆ = (⊥ : Subgroup G) := by
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro b hb
+    exact congrArg Subtype.val (‹IsMulCommutative A›.is_comm.comm ⟨b, hb⟩ ⟨a, ha⟩)
+  have hAbarAbar : ⁅Abar, Abar⁆ = (⊥ : Subgroup (G ⧸ N)) := by
+    rw [hAbar, ← Subgroup.map_commutator, hAA, Subgroup.map_bot]
+  have hRAbar_le : ⁅Rbar, Abar⁆ ≤ Abar := by
+    rw [Subgroup.commutator_comm]
+    exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hR_le_NAbar
+  have hKAA : ⁅⁅Rbar, Abar⁆, Abar⁆ = (⊥ : Subgroup (G ⧸ N)) :=
+    le_bot_iff.mp (le_trans (Subgroup.commutator_mono hRAbar_le le_rfl) hAbarAbar.le)
+  -- Step 4: stabilityLiftAux with `K := R̄`
+  have hStab := stabilityLiftAux (M := G ⧸ N) (K := Rbar) (A := Abar)
+    hp_odd hoddBar (OddOrder.Isaacs.Ch01.opCore_isPGroup p (G ⧸ N)) hAbar_pg hKAA
+    (C₀ := Subgroup.centralizer (Rbar : Set (G ⧸ N))) rfl
+  -- Step 5: `C₀ := C_Ḡ(R̄) ≤ R̄` (Hall-Higman) ⇒ `C₀` is a `p`-group
+  have hC₀_le_R : Subgroup.centralizer (Rbar : Set (G ⧸ N)) ≤ Rbar := by
+    have hHH := OddOrder.BG.Ch1.S01.hall_higman_solvable_specialization (p := p) (G := G ⧸ N)
+      (by rw [hset]; exact hOp'Bar)
+    rwa [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore, ← hRbar] at hHH
+  have hC₀_pg : IsPGroup p (Subgroup.centralizer (Rbar : Set (G ⧸ N))) :=
+    (OddOrder.Isaacs.Ch01.opCore_isPGroup p (G ⧸ N)).to_le hC₀_le_R
+  -- Step 6: pull back `Ā.map(mk' C₀) ≤ O_p(Ḡ/C₀)` to `Ā ≤ R̄`
+  set C₀ := Subgroup.centralizer (Rbar : Set (G ⧸ N)) with hC₀
+  have hcomap_pg : IsPGroup p
+      ((OddOrder.Isaacs.Ch01.opCore p ((G ⧸ N) ⧸ C₀)).comap (QuotientGroup.mk' C₀)) := by
+    refine (OddOrder.Isaacs.Ch01.opCore_isPGroup p _).comap_of_ker_isPGroup
+      (QuotientGroup.mk' C₀) ?_
+    rw [QuotientGroup.ker_mk']
+    exact hC₀_pg
+  have hcomap_le_R : (OddOrder.Isaacs.Ch01.opCore p ((G ⧸ N) ⧸ C₀)).comap
+      (QuotientGroup.mk' C₀) ≤ Rbar :=
+    OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hcomap_pg
+  have hAbar_le_R : Abar ≤ Rbar :=
+    le_trans (Subgroup.map_le_iff_le_comap.mp hStab) hcomap_le_R
+  -- Step 7: `A ≤ O_{p',p}(G)`, which is defeq `comap (mk' N) (O_p(Ḡ))`
+  -- (`{p_1 | p_1 ∉ {p}}` is defeq `{q | q ≠ p}` since `x ∈ {p} ≡ x = p`).
+  show A ≤ Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N))
+  rw [← Subgroup.map_le_iff_le_comap, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+  exact hAbar_le_R
+
 end PStability
 
 end OddOrder.BG.AppA

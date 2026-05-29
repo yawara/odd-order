@@ -10,7 +10,7 @@
 - **実 `sorry` proof-term は 2 個** (2026-05-29 更新: PSTAB 解消で 3→2)。`axiom` 宣言 **0**、`admit` **0**(全件 grep + `AxiomsCheck.lean` の `#assert_only_allowed_axioms` で検証済み)。
   1. `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:188` — `sibleySetup_is_coherent` (issue 0046)
   2. `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean:1589` — `card_G0_lower_bound` (issue 0044)
-  - ✅ **解消済**: `stability_perFactor` (BG App.A A.4(c) PSTAB, 旧 AppA:1546, issue 0047) — 2026-05-29 sorry-free 化。`thmA4a`/`thmA4c` を `AxiomsCheck.lean` で axiom-clean を CI ガード。下流 A.4(b)/A.5/App.B/Thm 6.2 一般形が unblock。
+  - ✅ **解消済**: `stability_perFactor` (BG App.A A.4(c) PSTAB, 旧 AppA:1546, issue 0047) — 2026-05-29 sorry-free 化。さらに **A.4(b) `thmA4b`** (= Thm 6.1, normal abelian ≤ O_{p',p}) も同日完成 (Gorenstein 5.2 直接ルート, `stabilityLiftAux`@K=O_p(Ḡ) 再利用)。`thmA4a`/`thmA4b`/`thmA4c` を `AxiomsCheck.lean` で axiom-clean を CI ガード。**issue 0047 (A.4 a/b/c) クローズ済**。次の本線 = **A.5 `thmA5`** (新規ブロッカー = Prop 1.10 coprime-nilpotent のみ) → App.B Puig L(S) → Thm 6.2 一般形 (Z(L(S)) 代替)。
 - **完成度: 結果数では ~33%(168/~510)、数学的深さでは ~18-22%**。Isaacs Ch.1-7 の FT ルートは本物の sorry-free・axiom-clean で**最大の堅い土台**。だが残りの大半 = **BG ローカル解析本線 §7-§16(~76 結果・Lean ファイルゼロ)+ Peterfalvi §10-§16(~80 結果・ファイルゼロ)** が**直列ボトルネック**で、ここが FT の実際の深さ。現フロンティアペースでは複数年規模。
 - **クリティカルパス長 43 ゲート**。最深の拘束: **Peterfalvi §10-§16 は BG §16 完成まで一切着手できない**(BG Theorems A-E が Peterfalvi §10 の入力)。
 - **今日クリーンな tree から着手可能なのは ~15 ゲート**。最高レバレッジは **issue 0047 の単一 sorry**(これを潰すと A.4(b)→A.5→App.B→BG Thm 6.2 一般形が連鎖開放、§7-§16 全体が 7+ 回参照する normal-J ハブ)。
@@ -183,7 +183,7 @@ synthesis 由来 15 + 批判で追加 3:
 |🟡|bg-s03-frobenius-actions|§3 Lem 3.1-3.10|B|L|ch06, 2-5|
 |✅|bg-appa-a1-a2-a3-a4a|App.A A.1-A.4(a)|R|XL|s02-thm-2-6, chieffactor, ch01|
 |🔴|**bg-appa-a4c-pstab**|App.A A.4(c) PSTAB|R|L|a1-a4a, basechange, chieffactor|
-|⬜|bg-appa-a4b-thm61|App.A A.4(b)=Thm 6.1|B|S|a4c-pstab|
+|✅|bg-appa-a4b-thm61|App.A A.4(b)=Thm 6.1|R|S|a4c-pstab|
 |⬜|bg-appa-a5|App.A A.5|B|M|a4c-pstab, solvable-core|
 |⬜|bg-appb-puig|App.B Puig L(S) B.1-B.4|B|L|a5, chieffactor|
 |🟡|bg-thm-6-2-general|Thm 6.2 一般形|B|S|appb-puig|

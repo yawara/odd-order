@@ -564,3 +564,6 @@ set_option linter.style.longLine false in
 -- O_{p'}(G)P ◁ G, A ≤ N_G(P) p-subgroup, [P,A,A]=1 ⇒ AC_G(P)/C_G(P) ⊆ O_p(N_G(P)/C_G(P)).
 -- per-chief-factor p-stability (`stability_perFactor`) を含む全証明が unconditional であることの保証.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4c
+-- BG App.A Thm A.4(b) (= Gorenstein 6.5.2 翻訳 = BG Thm 6.1): P∈Syl_p, A abelian normal of P
+-- ⇒ A ⊆ O_{p',p}(G). A.4(c) の stabilityLiftAux を K=O_p(G/O_{p'}) で再利用。
+#assert_only_allowed_axioms OddOrder.BG.AppA.thmA4b
