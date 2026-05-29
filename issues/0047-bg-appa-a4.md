@@ -73,6 +73,35 @@ A.5 → B.4 → Thm 6.2 の本線。証明本体 = Gorenstein 6.5.3 を A.3 で�
   (`S06_Additional`) との関係を確認 (一般形は未実装)。
 - [ ] notes/bg/appA_pstability.md の A.4 節を更新。
 
+## 投資調査メモ (2026-05-29)
+
+### repo API は (b) 向けに揃っている
+
+- **`O_{p',p}(G)` = `opPpPrimeCore` が repo に既存**
+  ([`Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean:257`](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean) で
+  `L = O_{p',p}(G) (opPpPrimeCore)` として使用)。`O_p` = `opCore`, `O_{p'}` も Ch04 で使用例多数。
+  → (b) 「normal abelian ≤ `O_{p',p}`」の主役 API は新規実装不要。
+
+### Gorenstein 6.5.1-6.5.3 の所在 (⚠️ Nougat 再番号に注意)
+
+- **Nougat 抽出 mmd は章番号を振り直している**: BG が引く Gorenstein「Section 6.5 /
+  Thm 6.5.1-6.5.3」は、mmd では **「Chapter 8 §1 *p-constraint and p-stability*」
+  (L5373 章見出し / L5383 節見出し / L5385+ 本体)** に対応。
+- ⇒ **`grep "6.5.1"` 等では statement 本体が出ない** (Nougat が "Theorem 1.x" 等に
+  再番号した可能性)。次回は **mmd L5383-5420 を直接 Read** して 6.5.1/6.5.2/6.5.3 を
+  同定する (または `references/gorenstein/finite-groups.pdf` の原番号で確認)。
+- L5385「Theorems 6.3.3 and 6.5.3 show that a strongly p-solvable group ... p-constrained」、
+  L5410「In view of Theorem 3.8.4 and the remark following Theorem 6.5.3」、
+  L5415「extension of Theorem 6.5.2」が proof 後の引用。6.5.3 = p-constraint 定理らしい。
+- BG mmd L4478 が明示する翻訳ルール: **A.3 (= `thmA3`) で Gorenstein 3.8.4(e) を置換**して
+  6.5.1-6.5.3 の特殊形 (= A.4) を得る。3.8.4(e) の使用箇所を 6.5.x proof 中で特定するのが鍵。
+
+### スコープ感
+
+- **(a)** ✅ 完了 (thmA3 対偶)。
+- **(b)/(c)** は Gorenstein Ch.8§1 (= 6.5) の p-constraint 定理翻訳で **deep / 多段**。
+  専用セッション or sub-agent 向き。(c) (critical path: A.5/B.4) を (b) より優先推奨。
+
 ## 完了条件
 
 - `thmA4a` / `thmA4b` / `thmA4c` を `OddOrder/BG/AppA_PStability.lean` に sorry-free 追加。
