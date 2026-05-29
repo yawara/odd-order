@@ -102,6 +102,58 @@ A.5 → B.4 → Thm 6.2 の本線。証明本体 = Gorenstein 6.5.3 を A.3 で�
 - **(b)/(c)** は Gorenstein Ch.8§1 (= 6.5) の p-constraint 定理翻訳で **deep / 多段**。
   専用セッション or sub-agent 向き。(c) (critical path: A.5/B.4) を (b) より優先推奨。
 
+## A.4(c) 作業計画 (2026-05-29 着手、Gorenstein 精読済)
+
+### 同定: A.4(c) = Gorenstein「condition (B)」(逐語一致)
+
+Gorenstein mmd L5391 (Ch.8 §1 = BG の §6.5 を参照する章) に **condition (B)** が逐語:
+> Let `P` be a `p`-subgroup of `G` such that `O_{p'}(G)P ◁ G`. Then if `A` is a
+> `p`-subgroup of `N_G(P)` with `[P,A,A]=1`, we have `AC_G(P)/C_G(P) ⊆ O_p(N_G(P)/C_G(P))`.
+
+= **A.4(c) そのもの**。さらに mmd「Theorem 1.3」(= **A.4(b)**: P∈Syl_p, A abelian normal of P
+⇒ A ⊆ O_{p',p}) の証明が condition (B) を呼ぶ ⇒ **(c) が (b) の土台。(c) 優先で正しい**。
+
+### 証明ルート (BG L4478 の翻訳規則)
+
+condition (B) は「**G が non-p-stable な section を involve しない**ら成立」(Gorenstein,
+proof of 6.5.3 末尾)。奇数位数可解 G では **全 section が O_p=1 で p-stable**
+(= A.4(a) = `thmA3` の対偶) ⇒ condition (B) 成立。BG は Gorenstein 3.8.4(e) を **A.3 で置換**。
+- ⚠️ Gorenstein 6.5.1-6.5.3 の **statement+proof 本体は mmd L5383 より前** (Gorenstein Ch.6 §5)。
+  L5383+ は Ch.8 で結果を**使う**側。次回 mmd で Gorenstein Ch.6 §5 を特定して 6.5.3 proof
+  末尾の「sections p-stable ⇒ (B)」argument を読む (Nougat 再番号で `grep 6.5.x` 不可)。
+- 別ルート候補: repo Ch.04 の coprime action / p-solvable 機構 + `thmA3` で直接組めるか要検討
+  (Gorenstein 逐語翻訳より短い可能性)。repo §7B `normal_J` 証明の stability-lift 部品も再利用候補。
+
+### Lean statement draft + 必要 API (確認済)
+
+```lean
+theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    {P : Subgroup G} (hP : IsPGroup p P)
+    (hPnorm : (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G ⊔ P).Normal)   -- O_{p'}(G)·P ◁ G
+    {A : Subgroup G} (hA_le : A ≤ P.normalizer) (hA_p : IsPGroup p A)
+    (hPAA : ⁅⁅P, A⁆, A⁆ = (⊥ : Subgroup G)) :                            -- [P,A,A]=1
+    (A.subgroupOf P.normalizer).map
+        (QuotientGroup.mk' ((Subgroup.centralizer (P : Set G)).subgroupOf P.normalizer))
+      ≤ opCore p (↥P.normalizer ⧸ (Subgroup.centralizer (P : Set G)).subgroupOf P.normalizer)
+```
+
+確認済の mathlib/repo API:
+- `O_p` = `opCore p G` (Ch01), `O_{p'}` = `oPiCore {q|q≠p} G` (Ch03), `O_{p',p}` = `opPpPrimeCore G p` (Ch07 S7B1)
+- 三重交換子 `⁅⁅P, A⁆, A⁆` 記法 OK (Ch04 で `⁅⁅H₁,H₂⁆,H₃⁆` 使用)
+- **商 `N_G(P)/C_G(P)` は well-formed**: `Subgroup.normal_subgroupOf_centralizer_normalizer`
+  (`Mathlib/GroupTheory/Subgroup/Centralizer.lean:164`) が `(centralizer s).subgroupOf (normalizer s)` の
+  Normal を **instance** で供給。`normalizerMonoidHom` (ker = `C.subgroupOf N`, L194) で N/C ≅ N(H)→Aut(H) 像。
+- ⚠️ **churn 注意点**: instance は `s : Set G` 形 (`centralizer s` / `normalizer s`)。statement の
+  `P.normalizer` (Subgroup 形) と `Subgroup.centralizer (P:Set G)` の組合せで Normal instance が
+  発火するか要確認 (`normalizer (P:Set G)` 形に揃える必要があるかも)。scaffold build の最初の関門。
+
+### 次の一手 (next session)
+
+1. 上記 statement を `AppA_PStability.lean` に書き、Normal instance を発火させて **型が通る scaffold**
+   (`:= sorry`) を build green に。(centralizer/normalizer の set/subgroup 形を合わせるのが鍵)
+2. Gorenstein Ch.6 §5 (6.5.3 proof 末尾) を mmd で特定し「sections p-stable ⇒ (B)」を読む。
+3. proof を step 分解 (A.3 corollary = A.4(a) を section に適用する形)。multi-session 想定。
+
 ## 完了条件
 
 - `thmA4a` / `thmA4b` / `thmA4c` を `OddOrder/BG/AppA_PStability.lean` に sorry-free 追加。
