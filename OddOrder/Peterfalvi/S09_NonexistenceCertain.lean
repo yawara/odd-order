@@ -80,10 +80,22 @@ These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
 (`OddOrder.RepresentationTheory`, §4-§8).  The §9 headline results (7.10)-(7.11)
 below do not reference them — those are pure group-theoretic statements.
 
-This file installs (7.1)-(7.3): the hypothesis bundle (`Hypothesis71`), the `ρ`
-map (`chiRho` / `chiRhoCF` / `chiRhoSupp`), (7.2.a) `chiRho_dadeImage_eq`,
-(7.2.b) `chiRho_norm_sq_le`, and (7.3) `chiRho_integral_inequality` — all
-sorry-free.  (7.4)-(7.9) remain as follow-on. -/
+This file installs (7.1)-(7.8), all sorry-free:
+* (7.1)-(7.3): the hypothesis bundle (`Hypothesis71`), the `ρ` map
+  (`chiRho` / `chiRhoCF` / `chiRhoSupp`), (7.2.a) `chiRho_dadeImage_eq`,
+  (7.2.b) `chiRho_norm_sq_le`, (7.3) `chiRho_integral_inequality`;
+* (7.4)-(7.5): `FamilyHypothesis71` and `family_inequality`;
+* (7.6)-(7.7): the normal-subgroup case `A = H^#` (`Hypothesis76`), with
+  (7.7.a) `chiRho_explicit_formula` and (7.7.b) `chiRho_norm_sq_double_sum`;
+* (7.8): the coherence-based formula (`Hypothesis78`), with (7.8.c.i)
+  `chiRho_eq_inner_beta_on_A` and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`.
+
+The (7.7.a) and (7.8.c.i) pointwise identities are carried as structural
+certificates (`Hypothesis76.chiRho_decomp`, `Hypothesis78.chiRho_eq_inner_beta`):
+they encode Peterfalvi's `CF(L,A)`-basis / coherence reductions, whose proofs
+need the induced/restricted-character decomposition theory not yet in this file.
+The norm-square corollaries (7.7.b)/(7.8.c.ii) are then proved here outright.
+(7.9) remains as follow-on. -/
 
 section Section_7_1_to_7_3
 
@@ -860,6 +872,590 @@ theorem family_inequality {G : Type*} [Group G] [Fintype G]
   linarith [h_main, h_cancel]
 
 end Section_7_4_to_7_5
+
+section Section_7_6_to_7_7
+
+/-! ### (7.6)-(7.7): normal-subgroup case `A = H^#`
+
+Specializes Hypothesis (7.1) to the situation where `A = H \ {1}` for a normal
+subgroup `H ⊴ L`, with the family `T = {ζ_0, ..., ζ_n}` of induced characters
+`Ind_H^L θ`.  The headline outputs are:
+
+* `Hypothesis76` — the (7.6) data bundle, carrying `H ⊴ L`, `A = H^#`, the
+  family `(ζ_i, d_i)` of induced characters and degree ratios, the support
+  proofs that `ψ_i = ζ_i - d_i ζ_0 ∈ CF(L,A)`, and the **(7.7.a) certificate**
+  expressing `χ^ρ` linearly through `(ζ_i)_{i≥1}` with coefficients
+  `c̄_i / ‖ζ_i‖²` (where `c_i = (ψ_i^τ, χ)`).
+
+* `Hypothesis76.chiRho_explicit_formula` — Peterfalvi (7.7.a): for `x ∈ A`,
+  `χ^ρ(x) = Σ_{i≥1} c̄_i / ‖ζ_i‖² · ζ_i(x)`.
+
+* `Hypothesis76.chiRho_norm_sq_double_sum` — Peterfalvi (7.7.b): the
+  double-sum form
+  `‖χ^ρ‖² = Σ_{i,j≥1} c̄_i c_j / ‖ζ_i‖² ‖ζ_j‖² · ((ζ_i, ζ_j) - ζ_i(1)·conj(ζ_j(1))/|L|)`,
+  obtained by inner-product expansion of (7.7.a) using `ζ_i` supported on `H`.
+
+The (7.7.a) statement is carried as a structural certificate (`chiRho_decomp`)
+rather than proved here: it encodes Peterfalvi's basis argument
+("ψ_i span CF(L,A)") which depends on the induced/restricted character
+decomposition theory not yet formalized in this file.  Once that decomposition
+is available the field can be discharged by a constructor.  (7.7.b) is then
+proved here as a direct corollary by inner-product expansion. -/
+
+/-- **Peterfalvi (7.6) Hypothesis.**
+
+Carries (in addition to Hypothesis (7.1) + the Dade-isometry property):
+* a normal subgroup `H ⊴ L` (with `H ≤ L` and `L`-conjugation closure);
+* the assumption `A = H \ {1}`;
+* the family `(ζ_i)_{i ≤ n}` of distinct induced characters `Ind_H^L θ` and
+  the degree ratios `d_i` (so `ζ_i(1) = d_i · ζ_0(1)`);
+* the support fact that `ζ_i` vanishes outside `H` (induced characters from a
+  normal subgroup are supported on `H`);
+* the (7.7.a) decomposition certificate
+  (`chiRho_decomp` — Peterfalvi's basis argument applied to `CF(L,A)`).
+
+Note: `ζ_i` are stored as raw class functions on `L` (without identifying them
+with specific induced characters); the support and degree-ratio fields are the
+properties needed to derive (7.7.a)-(7.7.b). -/
+structure Hypothesis76 (G : Type*) [Group G] [Fintype G]
+    (A : Set G) (L : Subgroup G) [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- The underlying Hypothesis (7.1) with chosen Dade map `τ`. -/
+  hyp71 : Hypothesis71 G A L
+  /-- `τ` is a Dade isometry. -/
+  isDadeIsometry : OddOrder.Peterfalvi.S04.IsDadeIsometry
+    (G := G) (k := ℂ) (L := L) hyp71.τ
+  /-- The normal subgroup `H` of `L`. -/
+  H : Subgroup G
+  /-- `H ≤ L`. -/
+  H_le_L : H ≤ L
+  /-- `H ⊴ L`: `L` normalizes `H` (so `H.subgroupOf L` is normal in `L`). -/
+  H_normal_in_L : ∀ (l : L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H
+  /-- `A = H \ {1}` (the "sharp"). -/
+  A_eq_H_sharp : A = (H : Set G) \ {1}
+  /-- Cardinality of the family `T = {ζ_0, ..., ζ_n}` minus one. -/
+  n : ℕ
+  /-- The family `T = {ζ_0, ..., ζ_n}` of induced characters (distinct). -/
+  zeta : Fin (n + 1) → ClassFunction L ℂ
+  /-- Degree ratios `d_i = ζ_i(1) / ζ_0(1)`. -/
+  d : Fin (n + 1) → ℂ
+  /-- `ζ_i` vanishes outside `H` (a normal subgroup): `Ind_H^L θ` is supported
+  on `H` since `H = ⋃_g g H g⁻¹`. -/
+  zeta_eq_zero_of_not_mem_H : ∀ (i : Fin (n + 1)) (x : L),
+    (x : G) ∉ H → zeta i x = 0
+  /-- The degree-ratio relation `ζ_i(1) = d_i · ζ_0(1)`. -/
+  zeta_one_eq_d_mul : ∀ i : Fin (n + 1), zeta i (1 : L) = d i * zeta 0 (1 : L)
+  /-- `ψ_i = ζ_i - d_i ζ_0` is supported on `A` (= `H \ {1}`).  Follows from
+  `zeta_eq_zero_of_not_mem_H` + `zeta_one_eq_d_mul` + `A_eq_H_sharp`; carried
+  as a field so the (7.7.a) certificate can name the `SupportedClassFunctions`
+  value inline. -/
+  psi_support : ∀ i : Fin (n + 1),
+    (zeta i - d i • zeta 0).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  /-- **Peterfalvi (7.7.a) certificate.**  For every `χ ∈ CF(G)` and `x ∈ A`,
+  `χ^ρ(x) = Σ_{i≥1} c̄_i / ‖ζ_i‖² · ζ_i(x)`, where
+  `c_i = (ψ_i^τ, χ)_G` and `ψ_i = ζ_i - d_i ζ_0`.
+
+  Encodes Peterfalvi's CF(L,A)-basis argument (see proof of (7.7.a), p.39):
+  the ψ_i (for i ≥ 1) span CF(L,A) modulo `ψ_0 = 0`, allowing the
+  inner-product equations
+  `c_j = (ψ_j, χ^ρ)` to determine `χ^ρ` on `A` linearly through the `ζ_i`. -/
+  chiRho_decomp : ∀ (χ : ClassFunction G ℂ) (x : L), (x : G) ∈ A →
+    hyp71.chiRho χ x =
+      ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+        (star (ClassFunction.inner
+          (hyp71.τ ⟨zeta i - d i • zeta 0, psi_support i⟩) χ) /
+          ClassFunction.inner (zeta i) (zeta i)) * zeta i x
+
+namespace Hypothesis76
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {A : Set G} {L : Subgroup G} [Fintype L]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- `ψ_i = ζ_i - d_i · ζ_0` as a member of `CF(L,A)`. -/
+noncomputable def psiSupp (H76 : Hypothesis76 G A L) (i : Fin (H76.n + 1)) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+  ⟨H76.zeta i - H76.d i • H76.zeta 0, H76.psi_support i⟩
+
+@[simp] theorem psiSupp_coe (H76 : Hypothesis76 G A L) (i : Fin (H76.n + 1)) :
+    ((H76.psiSupp i : OddOrder.Peterfalvi.S04.SupportedClassFunctions
+        (G := G) ℂ A L) : ClassFunction L ℂ) =
+      H76.zeta i - H76.d i • H76.zeta 0 := rfl
+
+/-- Peterfalvi's coefficient `c_i = (ψ_i^τ, χ)_G` for `1 ≤ i ≤ n`.  Also defined
+for `i = 0`, where it equals zero (since `ψ_0 = ζ_0 - d_0 ζ_0 = 0` after the
+degree-ratio identity, but we do not enforce `d_0 = 1` here). -/
+noncomputable def cCoeff (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) (i : Fin (H76.n + 1)) : ℂ :=
+  ClassFunction.inner (H76.hyp71.τ (H76.psiSupp i)) χ
+
+/-- The squared norm `‖ζ_i‖² = (ζ_i, ζ_i)_L` as a complex number. -/
+noncomputable def zetaNormSq (H76 : Hypothesis76 G A L) (i : Fin (H76.n + 1)) : ℂ :=
+  ClassFunction.inner (H76.zeta i) (H76.zeta i)
+
+/-- **Peterfalvi (7.7.a).**  For `χ ∈ CF(G)` and `x ∈ A`,
+`χ^ρ(x) = Σ_{i ≥ 1} c̄_i / ‖ζ_i‖² · ζ_i(x)`. -/
+theorem chiRho_explicit_formula (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) {x : L} (hx : (x : G) ∈ A) :
+    H76.hyp71.chiRho χ x =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i x :=
+  H76.chiRho_decomp χ x hx
+
+/-- The class function `S_χ = Σ_{i ≥ 1} c̄_i / ‖ζ_i‖² · ζ_i ∈ CF(L)`.  By
+(7.7.a), `S_χ` agrees with `χ^ρ` on `A`.  Off `H`, `S_χ` vanishes (each `ζ_i`
+does), and on `H \ A = {1}`, `S_χ(1) = Σ_{i≥1} c̄_i d_i ζ_0(1) / ‖ζ_i‖²` is in
+general nonzero.  Used to package (7.7.b) via inner-product expansion. -/
+noncomputable def chiRhoLinearCombo (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) : ClassFunction L ℂ :=
+  ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+    (star (H76.cCoeff χ i) / H76.zetaNormSq i) • H76.zeta i
+
+omit [Fintype G] [Fintype L] [Invertible (Nat.card L : ℂ)]
+  [Invertible (Nat.card G : ℂ)] in
+/-- Pointwise evaluation of a finite sum of class functions.  Provable by
+straightforward induction; collected here as a local helper. -/
+private theorem classFunction_finsum_apply
+    {ι : Type*} (s : Finset ι) (f : ι → ClassFunction L ℂ) (x : L) :
+    (∑ i ∈ s, f i) x = ∑ i ∈ s, f i x := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha,
+          ClassFunction.add_apply, ih]
+
+@[simp] theorem chiRhoLinearCombo_apply (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) (x : L) :
+    H76.chiRhoLinearCombo χ x =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        (star (H76.cCoeff χ i) / H76.zetaNormSq i) * H76.zeta i x := by
+  classical
+  unfold chiRhoLinearCombo
+  rw [classFunction_finsum_apply]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [ClassFunction.smul_apply]
+
+/-- `S_χ` vanishes outside `H` (as a subset of `L`). -/
+theorem chiRhoLinearCombo_eq_zero_of_not_mem_H (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) {x : L} (hx : (x : G) ∉ H76.H) :
+    H76.chiRhoLinearCombo χ x = 0 := by
+  classical
+  rw [chiRhoLinearCombo_apply]
+  refine Finset.sum_eq_zero fun i _ => ?_
+  rw [H76.zeta_eq_zero_of_not_mem_H i x hx, mul_zero]
+
+/-- `1 ∉ A` (since `A = H \ {1}`). -/
+theorem one_not_mem_A (H76 : Hypothesis76 G A L) : (1 : G) ∉ A := by
+  rw [H76.A_eq_H_sharp]
+  rintro ⟨_, h⟩
+  exact h rfl
+
+/-- For `x ∈ L` with `(x : G) ∈ H` and `(x : G) ≠ 1`, we have `(x : G) ∈ A`. -/
+theorem mem_A_of_mem_H_and_ne_one (H76 : Hypothesis76 G A L) {x : L}
+    (hxH : (x : G) ∈ H76.H) (hx1 : (x : G) ≠ 1) : (x : G) ∈ A := by
+  rw [H76.A_eq_H_sharp]
+  exact ⟨hxH, hx1⟩
+
+/-- The (7.7.a) substitution: `χ^ρ(x) = S_χ(x)` for `x ∈ A`. -/
+theorem chiRho_eq_chiRhoLinearCombo_of_mem_A (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) {x : L} (hx : (x : G) ∈ A) :
+    H76.hyp71.chiRho χ x = H76.chiRhoLinearCombo χ x := by
+  rw [chiRhoLinearCombo_apply]
+  exact H76.chiRho_explicit_formula χ hx
+
+/-- `χ^ρ` vanishes outside `H` (since `A ⊆ H`). -/
+theorem chiRho_eq_zero_of_not_mem_H (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) {x : L} (hx : (x : G) ∉ H76.H) :
+    H76.hyp71.chiRho χ x = 0 := by
+  have hxA : (x : G) ∉ A := by
+    intro h
+    rw [H76.A_eq_H_sharp] at h
+    exact hx h.1
+  exact H76.hyp71.chiRho_of_not_mem χ hxA
+
+open scoped Classical in
+/-- **Pointwise key lemma** for (7.7.b): the difference `χ^ρ - S_χ` is
+supported at `(1 : L)`, where its value is `-S_χ(1)`. -/
+theorem chiRho_sub_chiRhoLinearCombo_apply (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) (x : L) :
+    H76.hyp71.chiRho χ x - H76.chiRhoLinearCombo χ x =
+      if x = 1 then -H76.chiRhoLinearCombo χ 1 else 0 := by
+  by_cases hx1 : x = 1
+  · subst hx1
+    have h_chiRho_one : H76.hyp71.chiRho χ 1 = 0 :=
+      H76.hyp71.chiRho_of_not_mem χ (by
+        rw [show ((1 : L) : G) = (1 : G) from rfl]
+        exact H76.one_not_mem_A)
+    rw [h_chiRho_one, if_pos rfl, zero_sub]
+  · rw [if_neg hx1]
+    by_cases hxH : (x : G) ∈ H76.H
+    · -- (x : G) ∈ H and x ≠ 1, so we need (x : G) ≠ 1
+      have hx_coe_ne_one : (x : G) ≠ 1 := by
+        intro h
+        apply hx1
+        ext
+        rw [h]
+        rfl
+      have hxA : (x : G) ∈ A := H76.mem_A_of_mem_H_and_ne_one hxH hx_coe_ne_one
+      rw [H76.chiRho_eq_chiRhoLinearCombo_of_mem_A χ hxA, sub_self]
+    · -- (x : G) ∉ H: both terms zero
+      rw [H76.chiRho_eq_zero_of_not_mem_H χ hxH,
+          H76.chiRhoLinearCombo_eq_zero_of_not_mem_H χ hxH, sub_self]
+
+/-- The inner sum `Σ_{x ∈ L} χ^ρ(x) · conj(χ^ρ(x))` equals
+`Σ_{x} S_χ(x) · conj(S_χ(x)) - S_χ(1) · conj(S_χ(1))`, since they differ only
+at `x = 1`. -/
+theorem innerSum_chiRho_eq (H76 : Hypothesis76 G A L) (χ : ClassFunction G ℂ) :
+    ClassFunction.innerSum (H76.hyp71.chiRhoCF χ) (H76.hyp71.chiRhoCF χ) =
+      ClassFunction.innerSum (H76.chiRhoLinearCombo χ) (H76.chiRhoLinearCombo χ) -
+        H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1) := by
+  classical
+  -- Both sides are Σ_{x ∈ L} f(x); compare pointwise.
+  have hpt : ∀ x : L,
+      (H76.hyp71.chiRhoCF χ) x * star ((H76.hyp71.chiRhoCF χ) x) =
+        H76.chiRhoLinearCombo χ x * star (H76.chiRhoLinearCombo χ x) -
+          (if x = 1 then
+            H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1)
+           else 0) := by
+    intro x
+    -- chiRhoCF x = chiRho x; chiRhoCF_apply lets us rewrite the LHS.
+    rw [Hypothesis71.chiRhoCF_apply]
+    by_cases hx1 : x = 1
+    · subst hx1
+      have h_chi : H76.hyp71.chiRho χ 1 = 0 :=
+        H76.hyp71.chiRho_of_not_mem χ (by
+          rw [show ((1 : L) : G) = (1 : G) from rfl]
+          exact H76.one_not_mem_A)
+      rw [h_chi, star_zero, mul_zero, if_pos rfl, sub_self]
+    · rw [if_neg hx1]
+      by_cases hxH : (x : G) ∈ H76.H
+      · have hx_coe_ne_one : (x : G) ≠ 1 := by
+          intro h
+          apply hx1
+          ext
+          rw [h]
+          rfl
+        have hxA : (x : G) ∈ A := H76.mem_A_of_mem_H_and_ne_one hxH hx_coe_ne_one
+        rw [H76.chiRho_eq_chiRhoLinearCombo_of_mem_A χ hxA, sub_zero]
+      · rw [H76.chiRho_eq_zero_of_not_mem_H χ hxH,
+            H76.chiRhoLinearCombo_eq_zero_of_not_mem_H χ hxH,
+            star_zero, mul_zero, sub_zero]
+  -- Apply hpt and sum
+  unfold ClassFunction.innerSum
+  rw [show (∑ g : L, (H76.hyp71.chiRhoCF χ) g * star ((H76.hyp71.chiRhoCF χ) g)) =
+      ∑ g : L, (H76.chiRhoLinearCombo χ g * star (H76.chiRhoLinearCombo χ g) -
+        (if g = 1 then
+          H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1)
+         else 0)) from
+    Finset.sum_congr rfl (fun g _ => hpt g)]
+  rw [Finset.sum_sub_distrib]
+  congr 1
+  rw [Finset.sum_ite_eq' Finset.univ (1 : L) (fun _ =>
+    H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1))]
+  rw [if_pos (Finset.mem_univ _)]
+
+/-- **Inner-product of `S_χ` with itself** as a double sum over `i, j ≥ 1`:
+`(S_χ, S_χ) = Σ_{i, j ≥ 1} (c̄_i c_j / (‖ζ_i‖² ‖ζ_j‖²)) · (ζ_i, ζ_j)`.
+
+(`star_div` cancels the conjugate in the smul-right, using that `‖ζ_i‖²` is
+fixed by `star` — true here because `inner_self_eq_ofReal`.) -/
+theorem inner_chiRhoLinearCombo_self
+    (H76 : Hypothesis76 G A L) (χ : ClassFunction G ℂ) :
+    ClassFunction.inner (H76.chiRhoLinearCombo χ) (H76.chiRhoLinearCombo χ) =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+            ClassFunction.inner (H76.zeta i) (H76.zeta j) := by
+  classical
+  unfold chiRhoLinearCombo
+  -- Expand inner of two sums as a double sum, via `inner_sum_left` then
+  -- `inner_sum_right` on each summand.
+  rw [OddOrder.RepresentationTheory.inner_sum_left]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+  -- Goal: (star c_i / ‖ζ_i‖²) * (star (star c_j / ‖ζ_j‖²) * (ζ_i, ζ_j))
+  --       = (star c_i * c_j / (‖ζ_i‖² * ‖ζ_j‖²)) * (ζ_i, ζ_j)
+  rw [show star ((star (H76.cCoeff χ j) / H76.zetaNormSq j) : ℂ) =
+        H76.cCoeff χ j / star (H76.zetaNormSq j) from by
+    rw [star_div₀, star_star]]
+  -- Now reduce: ‖ζ_j‖² is fixed by star (since inner_self is real).
+  have h_star_norm : star (H76.zetaNormSq j) = H76.zetaNormSq j :=
+    Hypothesis71.ClassFunction.star_inner_self _
+  rw [h_star_norm]
+  ring
+
+/-- The value `S_χ(1) · conj(S_χ(1))` as a double sum.  Uses
+`ζ_i(1) = d_i ζ_0(1)` and `star (‖ζ_i‖²) = ‖ζ_i‖²`. -/
+theorem chiRhoLinearCombo_one_mul_star (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) :
+    H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1) =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+            (H76.zeta i 1 * star (H76.zeta j 1)) := by
+  classical
+  rw [chiRhoLinearCombo_apply]
+  rw [star_sum]
+  rw [Finset.sum_mul_sum]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  refine Finset.sum_congr rfl fun j _ => ?_
+  -- LHS term: (star c_i / ‖ζ_i‖²) * ζ_i(1) * star ((star c_j / ‖ζ_j‖²) * ζ_j(1))
+  rw [show star (((star (H76.cCoeff χ j) / H76.zetaNormSq j) * H76.zeta j 1) : ℂ) =
+        (H76.cCoeff χ j / star (H76.zetaNormSq j)) * star (H76.zeta j 1) from by
+    rw [star_mul', star_div₀, star_star]]
+  have h_star_norm : star (H76.zetaNormSq j) = H76.zetaNormSq j :=
+    Hypothesis71.ClassFunction.star_inner_self _
+  rw [h_star_norm]
+  ring
+
+/-- **Peterfalvi (7.7.b).**  `‖χ^ρ‖²` has the double-sum form:
+`‖χ^ρ‖² = Σ_{i,j ≥ 1} c̄_i c_j / ‖ζ_i‖² ‖ζ_j‖² · ((ζ_i, ζ_j) - ζ_i(1) · conj(ζ_j(1)) / |L|)`.
+
+Proof: by (7.7.a), `χ^ρ` agrees with the linear combination `S_χ` on `A` and
+vanishes off `A`; `S_χ` also vanishes off `H` (since each `ζ_i` does).  Thus
+`χ^ρ - S_χ` is supported at `x = 1` only, where its value is `-S_χ(1)`.
+Subtracting `S_χ(1) · conj(S_χ(1))` from `Σ_L S_χ(x) · conj(S_χ(x))` yields
+`Σ_L χ^ρ(x) · conj(χ^ρ(x))`, and dividing by `|L|` and rearranging gives
+the displayed double-sum. -/
+theorem chiRho_norm_sq_double_sum (H76 : Hypothesis76 G A L)
+    (χ : ClassFunction G ℂ) :
+    ClassFunction.inner (H76.hyp71.chiRhoCF χ) (H76.hyp71.chiRhoCF χ) =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+          (ClassFunction.inner (H76.zeta i) (H76.zeta j) -
+            H76.zeta i 1 * star (H76.zeta j 1) / (Nat.card L : ℂ)) := by
+  classical
+  -- Step 1: inner χ^ρ χ^ρ = (1/|L|) innerSum χ^ρ χ^ρ.
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, invOf_eq_inv]
+  -- Step 2: apply innerSum_chiRho_eq.
+  rw [H76.innerSum_chiRho_eq χ]
+  -- Step 3: rewrite innerSum S S = |L| · inner S S, then expand inner S S.
+  rw [show ClassFunction.innerSum (H76.chiRhoLinearCombo χ) (H76.chiRhoLinearCombo χ) =
+      (Nat.card L : ℂ) *
+        ClassFunction.inner (H76.chiRhoLinearCombo χ) (H76.chiRhoLinearCombo χ) from
+    (ClassFunction.card_mul_inner _ _).symm]
+  rw [H76.inner_chiRhoLinearCombo_self χ, H76.chiRhoLinearCombo_one_mul_star χ]
+  -- Step 4: distribute (1/|L|) over the difference and unify the two double sums.
+  rw [mul_sub]
+  have hL_ne : (Nat.card L : ℂ) ≠ 0 := Invertible.ne_zero _
+  rw [show (Nat.card L : ℂ)⁻¹ *
+      ((Nat.card L : ℂ) *
+        ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+            (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+              (H76.zetaNormSq i * H76.zetaNormSq j)) *
+            ClassFunction.inner (H76.zeta i) (H76.zeta j)) =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+          ClassFunction.inner (H76.zeta i) (H76.zeta j) from by
+    rw [← mul_assoc, inv_mul_cancel₀ hL_ne, one_mul]]
+  rw [show (Nat.card L : ℂ)⁻¹ *
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+            (H76.zeta i 1 * star (H76.zeta j 1)) =
+      ∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        ∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          (star (H76.cCoeff χ i) * H76.cCoeff χ j /
+            (H76.zetaNormSq i * H76.zetaNormSq j)) *
+            (H76.zeta i 1 * star (H76.zeta j 1) / (Nat.card L : ℂ)) from by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    ring]
+  -- Combine into one sum with the inner difference.
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  ring
+
+end Hypothesis76
+
+end Section_7_6_to_7_7
+
+section Section_7_8
+
+/-! ### (7.8): the coherence-based formula for `χ^ρ`
+
+Bundles Hypothesis (7.6) with the §7 coherence input:
+
+* The family `T = {ζ_0, ..., ζ_n}` contains the **induced principal character**
+  `Ind 1_H = Ind_H^L 1_H` at some index `ind1H`.
+* The remaining set `S = T \ {Ind 1_H}` is **coherent**, with isometric extension
+  `ν : ℤ[S] → ℤ[Irr G]` (represented as an integral linear map on the ambient
+  `ClassFunction L ℂ` space).
+* There is a **distinguished** `ζ ∈ S` with `ζ(1) = (Ind 1_H)(1)` (= `e = [L:H]`);
+  equivalently `(Ind 1_H − ζ)(1) = 0`, so `Ind 1_H − ζ ∈ CF(L,A)`.
+* `β := τ (Ind 1_H − ζ) ∈ CF(G)` (Dade image of the supported difference).
+
+The headline output (Peterfalvi (7.8.c), p. 40) is:
+
+* (i)  For χ ∈ Irr(G) with `χ ⊥ S^ν`, `χ^ρ(x) = star (β, χ)_G` for every `x ∈ A`.
+* (ii) `‖χ^ρ‖² = (|A|/|L|) · (β, χ)_G · star (β, χ)_G`.
+
+(i) — `chiRho_eq_inner_beta_on_A` — is carried as the structural certificate
+`chiRho_eq_inner_beta` inside `Hypothesis78` (the coherence-based derivation
+from (7.7.a) is the subject of Peterfalvi (7.8.c) and is not yet formalized).
+(ii) — `chiRho_norm_sq_eq_card_ratio_mul` — is then a direct corollary of (i):
+the inner product is `(1/|L|) Σ_{l : L} χ^ρ(l) · star (χ^ρ(l))`; off `A` the
+summands vanish, on `A` each equals `star (β,χ) · (β,χ)`, and the number of
+`l ∈ L` with `(l : G) ∈ A` equals `|A|` (since `A ⊆ L`). -/
+
+/-- **Peterfalvi (7.8) Hypothesis.**  Hypothesis (7.6) together with the
+coherence input for `S = T \ {Ind 1_H}` and a distinguished `ζ ∈ S` of degree
+`e = [L:H] = (Ind 1_H)(1)`.
+
+The (7.8.c) conclusion (the pointwise identity on `A`) is carried as the
+structural certificate `chiRho_eq_inner_beta`. -/
+structure Hypothesis78 (G : Type*) [Group G] [Fintype G]
+    (A : Set G) (L : Subgroup G) [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- The underlying Hypothesis (7.6). -/
+  hyp76 : Hypothesis76 G A L
+  /-- Index of the induced principal character `Ind 1_H` in `T = {ζ_0, ..., ζ_n}`. -/
+  ind1H : Fin (hyp76.n + 1)
+  /-- Index of the distinguished `ζ ∈ S = T \ {Ind 1_H}`. -/
+  zetaDistinct : Fin (hyp76.n + 1)
+  /-- `ζ ≠ Ind 1_H`, so the distinguished `ζ` lies in `S`. -/
+  zetaDistinct_ne_ind1H : zetaDistinct ≠ ind1H
+  /-- `ζ(1) = (Ind 1_H)(1)` (= `e = [L:H]`).  Makes the difference
+  `Ind 1_H − ζ` vanish at `1`, hence supported on `A = H \ {1}`. -/
+  zeta_one_eq_ind1H_one :
+    hyp76.zeta zetaDistinct (1 : L) = hyp76.zeta ind1H (1 : L)
+  /-- `Ind 1_H − ζ` is supported on `A`.  Carried so the supported-class-function
+  `β` can be formed cleanly. -/
+  diff_support : (hyp76.zeta ind1H - hyp76.zeta zetaDistinct).support ⊆
+    OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  /-- The coherent isometric extension `ν : ℤ[S] → ℤ[Irr G]`, presented as an
+  `ℤ`-linear map on the ambient class-function space. -/
+  nu : ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ
+  /-- `ν` is an isometry: `(ν φ, ν ψ)_G = (φ, ψ)_L`. -/
+  nu_isometry : ∀ φ ψ : ClassFunction L ℂ,
+    ClassFunction.inner (nu φ) (nu ψ) = ClassFunction.inner φ ψ
+  /-- **Peterfalvi (7.8.c.i) certificate.**  For χ ∈ Irr G orthogonal to `S^ν`
+  (i.e. `(χ, ν ζ_i)_G = 0` for every `i ≠ ind1H`), and `x ∈ A`,
+  `χ^ρ(x) = star (β, χ)_G`, where `β = τ (Ind 1_H − ζ) ∈ CF(G)`.
+
+  Encodes the coherence-based reduction of the (7.7.a) decomposition: under
+  `χ ⊥ S^ν`, the inner products `(ψ_i^τ, χ) = (ν(ψ_i), χ)` collapse to a
+  single contribution proportional to `β`. -/
+  chiRho_eq_inner_beta : ∀ (χ : ClassFunction G ℂ),
+    IsIrreducibleCharacter χ →
+    (∀ i : Fin (hyp76.n + 1), i ≠ ind1H →
+      ClassFunction.inner χ (nu (hyp76.zeta i)) = 0) →
+    ∀ {x : L}, (x : G) ∈ A →
+    hyp76.hyp71.chiRho χ x =
+      star (ClassFunction.inner
+        (hyp76.hyp71.τ
+          ⟨hyp76.zeta ind1H - hyp76.zeta zetaDistinct, diff_support⟩) χ)
+
+namespace Hypothesis78
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {A : Set G} {L : Subgroup G} [Fintype L]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- `Ind 1_H − ζ ∈ CF(L,A)`, the supported difference defining `β`. -/
+noncomputable def indMinusZetaSupp (H78 : Hypothesis78 G A L) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+  ⟨H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct, H78.diff_support⟩
+
+/-- **`β = (Ind 1_H − ζ)^τ ∈ CF(G)`.** -/
+noncomputable def beta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
+  H78.hyp76.hyp71.τ H78.indMinusZetaSupp
+
+theorem beta_def (H78 : Hypothesis78 G A L) :
+    H78.beta =
+      H78.hyp76.hyp71.τ
+        ⟨H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct,
+          H78.diff_support⟩ :=
+  rfl
+
+/-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
+`χ^ρ(x) = star (β, χ)_G`. -/
+theorem chiRho_eq_inner_beta_on_A (H78 : Hypothesis78 G A L)
+    (χ : ClassFunction G ℂ) (hχ_irr : IsIrreducibleCharacter χ)
+    (hχ_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner χ (H78.nu (H78.hyp76.zeta i)) = 0)
+    {x : L} (hx : (x : G) ∈ A) :
+    H78.hyp76.hyp71.chiRho χ x = star (ClassFunction.inner H78.beta χ) := by
+  rw [beta_def]
+  exact H78.chiRho_eq_inner_beta χ hχ_irr hχ_orth hx
+
+/-- **Peterfalvi (7.8.c.ii).**  For χ ∈ Irr G orthogonal to `S^ν`,
+`‖χ^ρ‖² = (|A|/|L|) · (β, χ)_G · star (β, χ)_G`.
+
+Proof: the inner-product `(χ^ρ, χ^ρ)_L = (1/|L|) Σ_{l : L} χ^ρ(l) · star (χ^ρ(l))`.
+By (7.8.c.i), on `{l ∈ L | (l:G) ∈ A}` each summand equals
+`star (β,χ) · (β,χ)`; off it the summand vanishes since `chiRho` is supported
+on `A`.  The count of `l : L` with `(l : G) ∈ A` equals `|A|` since `A ⊆ L`
+(by `Hypothesis71.card_supportInSubgroup_eq_card_A`). -/
+theorem chiRho_norm_sq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
+    (χ : ClassFunction G ℂ) (hχ_irr : IsIrreducibleCharacter χ)
+    (hχ_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner χ (H78.nu (H78.hyp76.zeta i)) = 0) :
+    ClassFunction.inner (H78.hyp76.hyp71.chiRhoCF χ) (H78.hyp76.hyp71.chiRhoCF χ) =
+      ((Nat.card A : ℂ) / (Nat.card L : ℂ)) *
+        (ClassFunction.inner H78.beta χ *
+          star (ClassFunction.inner H78.beta χ)) := by
+  classical
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, invOf_eq_inv,
+      ClassFunction.innerSum]
+  -- Pointwise: each summand is a constant on `{l | (l:G) ∈ A}` and zero off it.
+  have hpt : ∀ l : L,
+      H78.hyp76.hyp71.chiRhoCF χ l * star (H78.hyp76.hyp71.chiRhoCF χ l) =
+        if (l : G) ∈ A then
+          star (ClassFunction.inner H78.beta χ) *
+            ClassFunction.inner H78.beta χ
+        else 0 := by
+    intro l
+    rw [Hypothesis71.chiRhoCF_apply]
+    by_cases hl : (l : G) ∈ A
+    · rw [if_pos hl,
+          H78.chiRho_eq_inner_beta_on_A χ hχ_irr hχ_orth hl, star_star]
+    · rw [if_neg hl, H78.hyp76.hyp71.chiRho_of_not_mem χ hl, star_zero,
+          mul_zero]
+  -- Aggregate the pointwise rewrite, then convert the indicator sum to a count.
+  rw [show ∑ l : L,
+        H78.hyp76.hyp71.chiRhoCF χ l * star (H78.hyp76.hyp71.chiRhoCF χ l) =
+      ∑ l : L,
+        if (l : G) ∈ A then
+          star (ClassFunction.inner H78.beta χ) *
+            ClassFunction.inner H78.beta χ
+        else 0 from
+    Finset.sum_congr rfl (fun l _ => hpt l)]
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+  -- The filter count equals `Nat.card A` via `card_supportInSubgroup_eq_card_A`.
+  have hcard :
+      ((Finset.univ.filter (fun l : L => (l : G) ∈ A)).card : ℂ) =
+        (Nat.card A : ℂ) := by
+    have hset_eq :
+        Finset.univ.filter (fun l : L => (l : G) ∈ A) =
+          (OddOrder.Peterfalvi.S04.supportInSubgroup A L).toFinset := by
+      ext l
+      simp
+    rw [hset_eq, Set.toFinset_card, ← Nat.card_eq_fintype_card,
+        Hypothesis71.card_supportInSubgroup_eq_card_A
+          H78.hyp76.hyp71.hyp.subset_L]
+  rw [hcard]
+  ring
+
+end Hypothesis78
+
+end Section_7_8
 
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
