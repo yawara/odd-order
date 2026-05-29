@@ -43,7 +43,8 @@ ROADMAP.md は長期計画 (フェーズ・章節チェックリスト) を持�
 
 ```
 issues/
-├── SEQUENCE             # 整数 1 行. 次回採番用カウンタ.
+├── SEQUENCE             # 整数 1 行. main レンジ (base 0) の採番カウンタ.
+├── SEQUENCE.1000        # 並行レンジの採番カウンタ (base 1000, 2000, ... 使用時のみ)
 ├── 0001-<slug>.md       # open: top-level に置く
 ├── 0002-<slug>.md
 ├── pending/
@@ -57,13 +58,41 @@ issues/
 ## 採番
 
 - **SEQUENCE ファイル**に整数を持ち, 新規発行ごとに +1.
-- `bin/new-issue <slug> "<title>"` がロックを取って SEQUENCE 読み出し → +1 →
+- `bin/new-issue [--base N] <slug> "<title>"` がロックを取って SEQUENCE 読み出し → +1 →
   書き戻し → scaffold 作成 → `git add` までを 1 ステップで行う.
 - ロックは **`mkdir` 原子操作**で実装. macOS は `flock(1)` を持たないので
   POSIX 標準で済む方式を選んだ. 5 秒 (50 × 100ms) 取れなければエラー終了.
-- **ブランチ越しの衝突**は許容. 別ブランチで同じ番号を取った場合は
-  マージ時に手動でリナンバ + SEQUENCE 解決. 発行頻度が低ければ実用上問題ない
-  という割り切り (Django migrations と同じトレードオフ).
+
+### 並行セッションの採番レンジ (確定 2026-05-29)
+
+並行する複数セッション (worktree / 別ブランチ) が 1 個のグローバルカウンタを
+共有すると同じ番号を取って衝突する (2026-05-29 に main の BG 系と `peterfalvi-s09`
+ブランチが 0041-0043 で衝突, 手動リナンバで解決した). これを **採番レンジの分割**で
+予防する:
+
+| base | レンジ | 用途 (確定割当) | SEQUENCE ファイル |
+|---|---|---|---|
+| 0 | 0000-0999 | main / trunk セッション | `issues/SEQUENCE` |
+| **1000** | **1000-1999** | **Peterfalvi 系並行セッション (確定)** | `issues/SEQUENCE.1000` |
+| 2000 | 2000-2999 | その他の ad-hoc 並行セッション #1 | `issues/SEQUENCE.2000` |
+| 3000+ | (1000 ごと) | その他の ad-hoc 並行セッション #2… | `issues/SEQUENCE.N` |
+
+**Peterfalvi の並行作業は base 1000 に固定**(`ODD_ISSUE_BASE=1000`)。これは予約済みなので
+他の並行セッションには使わない。Peterfalvi 以外の ad-hoc な並行作業は 2000 以降を割り当てる。
+
+- base は **`--base N` 引数** または **環境変数 `ODD_ISSUE_BASE`** で渡す (既定 0).
+  base は **1000 の倍数のみ** (レンジ重複防止のため `new-issue` が検証).
+- **レンジごとに別 SEQUENCE ファイル** (`SEQUENCE.N`) を使うので, 採番もマージも
+  衝突しない (異なるファイル = git は両方そのまま残す). `SEQUENCE.N` は初回
+  `new-issue --base N` 時に遅延作成 (初期値 N-1, 最初の issue = N).
+- **Peterfalvi の並行作業は base 1000 に固定** (`export ODD_ISSUE_BASE=1000` または
+  `--base 1000`)。それ以外の **並行 worktree を切るとき**は 2000 以降の未使用 base を
+  1 つ割り当てる (手順は [`worktree_setup.md`](worktree_setup.md)).
+- 既存の 0001-0046 は全て main レンジ (base 0). **移行不要**.
+- レンジ幅 1000 を使い切ると `new-issue` がエラーで知らせる = **採番レンジを
+  再分割 / 幅を見直すタイミング** (issue が増えてきたら再考).
+- 万一 **同一レンジ内**で衝突した場合 (同 base の 2 セッション等) のみ, 従来どおり
+  マージ時に手動リナンバ + 該当 SEQUENCE 解決 (Django migrations と同じ割り切り).
 
 ## ファイル名
 

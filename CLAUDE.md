@@ -83,7 +83,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 単発の作業項目 (1 つの sorry を埋める, 1 つの設計を決める, etc.) は `issues/` 配下のファイルベース issue で追跡する。GitHub Issues は使わない (local-first)。詳細は [`notes/meta/issue_management.md`](notes/meta/issue_management.md)。
 
-- 採番 + scaffold: `bin/new-issue <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`
+- 採番 + scaffold: `bin/new-issue [--base N] <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`。並行セッションは `--base`/`ODD_ISSUE_BASE` で採番レンジを分けて衝突回避 (main=0, **Peterfalvi=1000 固定**, その他=2000…; 既定 0)
 - 状態 = 配置ディレクトリが source of truth: `issues/` (open) / `issues/pending/` / `issues/closed/`
 - 遷移は `git mv`. frontmatter に `status:` は持たない
 
@@ -96,6 +96,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 - `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)
 - **`lake update` は worktree で走らせない** (共有 mathlib rev を壊す)
 - forward axiom 経由で章をまたぐ並行作業は合流時の名前衝突に注意 ([`notes/meta/forward_dep_policy.md`](notes/meta/forward_dep_policy.md))
+- 並行 worktree には **issue 採番レンジ**を割り当てる (`export ODD_ISSUE_BASE=N`、base は 1000 の倍数; main=0, **Peterfalvi=1000 固定**, その他の並行=2000…)。採番衝突を予防 ([`notes/meta/issue_management.md`](notes/meta/issue_management.md) 「並行セッションの採番レンジ」)
 
 ## 主要パス
 

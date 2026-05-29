@@ -12,7 +12,7 @@
 - `lake exe cache get` 再実行 = **~5 min + ~3 GB DL**
 - `references/` (gitignored 別 private リポ) も再取得
 
-mathlib は `lakefile.toml` で `v4.29.1` に pin されており worktree 間で drift しないので, **mathlib パッケージと references を main worktree から symlink で共有**するのが最適.
+mathlib は `lakefile.toml` で `v4.30.0-rc2` に pin されており worktree 間で drift しないので, **mathlib パッケージと references を main worktree から symlink で共有**するのが最適.
 
 ## セットアップ手順
 
@@ -47,6 +47,21 @@ echo "references" >> /Users/ywr/odd-order/.git/info/exclude
 ### 4. 初回ビルド
 
 新 worktree 内で `lake build OddOrder.Isaacs.ChXX_...` を直接実行. mathlib olean は symlink 経由で既存キャッシュを利用するので `lake exe cache get` は **不要**. Ch.01-Ch.04 等の本プロジェクト olean だけビルドが走る (数分).
+
+### 5. issue 採番レンジの割り当て (並行発行の衝突予防)
+
+並行セッションが `bin/new-issue` で同じ番号を取らないよう, この worktree に
+**採番 base** を割り当てる (1000 の倍数; main = 0)。**Peterfalvi 系は base 1000 で固定**、
+その他の並行 worktree は 2000 以降の未使用値:
+
+```bash
+# 例: Peterfalvi worktree (base 1000 固定) — セッション冒頭で
+export ODD_ISSUE_BASE=1000
+# あるいは発行ごとに明示: bin/new-issue --base 1000 <slug> "<title>"
+```
+
+レンジごとに別 `SEQUENCE.N` を使うので採番もマージも衝突しない. 詳細・レンジ表は
+[`issue_management.md`](issue_management.md) 「並行セッションの採番レンジ」.
 
 ## 共有 / 独立 の境界
 
