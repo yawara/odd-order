@@ -16,8 +16,16 @@ ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 �
     `centralizer_eq_of_maximal_normal_isMulCommutative` 再利用)。**B.3 で必要な相対版** (`H` が p-群,
     `H`-内 centralizer) は subtype `↥H` 経由 transport が要るため B.3 着手時に別途用意。
   - B.2 の証明核 `lRelIn_top_le_lRelIn` (`L_G(W) ⊆ H ∧ W' ⊆ W ⇒ L_G(W) ⊆ L_H(W')`) は B.3 でも再利用見込み。
-- ⏳ **Lemma B.3 + Theorem B.4** (= Thm 6.2 代替, `thmA5` 消費): **issue 2001**。A.5 (`thmA5`, issue 0049)
-  完成済 + B.1/B.2 完成済で **ready-now**。クリティカルパス: → BG Thm 6.2 一般形 → §7-§16。
+- ✅ **B.3/B.4 準備層 + Lemma B.3 完成** (2026-05-30, issue 2001)。`AppB_Puig.lean` に A.5 非依存の
+  L-API 拡張 (相対 B.1(f) `centralizer_lNIn_inf_le` ほか / 相対 B.2 `lOddIn_eq_of_lOddIn_le_relative` /
+  thmA5 橋渡し `lRelIn_le_iSup_pgroup_normalized` / φ-同変 `lRelIn_map_equiv` + characteristic)。
+  新ファイル `AppB_PuigB3B4.lean` に **`b3_chain`** (`L_*(S)⊆L_*(T)⊆L(T)⊆L(S)`, `thmA5_part2` + 相対 B.1(f)
+  消費, AxiomsCheck 登録, 標準3公理)。設計は `bg-appb-b3b4-design` workflow (run wf_06198d42-7bc) 由来。
+- ⏳ **Theorem B.4(b)** (= Thm 6.2 代替, `O_{p'}(G)=1 ⇒ Z(L(S))⊴G`): **issue 2001 の主目標, 残作業**。
+  4 step (Step2 = b3_chain+相対B.1(f) / Step3 = thmA5_part1+相対B.2 / Step4 = Frattini, C∩S を Sylow p C
+  として realize する箇所が最重)。ConjAct import 要。
+- ⏳ **B.4(a)** `G=O_{p'}·N_G(Z(L(S)))` → **issue 2002** (異群 iso `φ:G≃*H` 共変性が前提でBLOCKED)。
+  クリティカルパス: B.4(a)+(b) → BG Thm 6.2 一般形 → §7-§16。
 
 ## ⚠️ 2026-05-28 訂正: App.B は「スキップ」ではなく Thm 6.2 の本線
 
