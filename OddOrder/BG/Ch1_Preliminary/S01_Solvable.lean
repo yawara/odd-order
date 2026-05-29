@@ -684,6 +684,138 @@ theorem coprime_actsTrivially_of_normal_and_quotient
   have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
   rw [hg_eq, map_mul, hc_fix a, map_inv, h_triv_N a n hn_in]
 
+open OddOrder.Isaacs.Ch03 (IsAInvariant) in
+/-- 演算子作用 `φ : A →* MulAut G` を `A`-不変部分群 `H` へ制限し `A →* MulAut ↥H` を得る.
+Prop 1.10 等で `A` の作用を `N_G(C)` などの不変部分群上で扱うための橋. -/
+def restrictAction {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : IsAInvariant φ H) : A →* MulAut ↥H where
+  toFun a :=
+    { toFun := fun g => ⟨φ a g, hH.smul_mem a g.2⟩
+      invFun := fun g => ⟨(φ a)⁻¹ g, hH.inv_smul_mem a g.2⟩
+      left_inv := fun g => Subtype.ext (MulAut.inv_apply_self G (φ a) g.1)
+      right_inv := fun g => Subtype.ext (MulAut.apply_inv_self G (φ a) g.1)
+      map_mul' := fun x y => Subtype.ext (map_mul (φ a) x.1 y.1) }
+  map_one' := MulEquiv.ext fun g => Subtype.ext <| by
+    change (φ 1) g.1 = g.1; rw [map_one, MulAut.one_apply]
+  map_mul' a b := MulEquiv.ext fun g => Subtype.ext <| by
+    change (φ (a * b)) g.1 = (φ a) ((φ b) g.1); rw [map_mul, MulAut.mul_apply]
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant) in
+@[simp]
+theorem restrictAction_apply {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : IsAInvariant φ H) (a : A) (g : ↥H) :
+    (restrictAction hH a g : G) = φ a g := rfl
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant) in
+/-- **BG Proposition 1.10** (mmd L445): `A` が冪零群 `G` 上の演算子群で `(|A|,|G|)=1`.
+`C := C_G(A)` (`fixedPointsOfMulAut φ`) とおく. `C_G(C) ⊆ C` なら `A` は `G` 上自明に作用.
+
+**証明** (BG): `x ∈ N_G(C)`, `a ∈ A`, `y ∈ C` に対し `xᵃx⁻¹ ∈ C_G(C) ⊆ C` を示すと `A` が
+`N_G(C)/C` を中心化. `C` は `A`-fixed なので Lemma 1.9
+(`coprime_actsTrivially_of_normal_and_quotient`) で `A` は `N_G(C)` 上自明 ⇒ `N_G(C) ⊆ C`
+⇒ `C` self-normalizing ⇒ (冪零の normalizer condition) `C = ⊤` ⇒ `A` は `G` 上自明. -/
+theorem coprime_nilpotent_acts_trivially_of_centralizer_self
+    {A G : Type*} [Group A] [Finite A] [Group G] [Finite G] [Group.IsNilpotent G]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hCC : Subgroup.centralizer (Subgroup.fixedPointsOfMulAut φ : Set G)
+        ≤ Subgroup.fixedPointsOfMulAut φ) :
+    ∀ a : A, ∀ g : G, (φ a) g = g := by
+  set C := Subgroup.fixedPointsOfMulAut φ with hC
+  -- `C` is `A`-invariant (fixed pointwise).
+  have hC_inv : IsAInvariant φ C := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a g hg
+    rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hg ⊢
+    intro a'
+    rw [hg a, hg a']
+  -- `N := N_G(C)` is `A`-invariant, contains `C`.
+  have hNC_inv : IsAInvariant φ (Subgroup.normalizer (C : Set G)) := hC_inv.normalizer
+  have hC_le_NC : C ≤ Subgroup.normalizer (C : Set G) := Subgroup.le_normalizer
+  haveI : (C.subgroupOf (Subgroup.normalizer (C : Set G))).Normal := Subgroup.normal_in_normalizer
+  -- coprimality / solvability descend to `↥N`.
+  have hcardNC : Nat.card ↥(Subgroup.normalizer (C : Set G)) ∣ Nat.card G :=
+    (Subgroup.normalizer (C : Set G)).card_subgroup_dvd_card
+  have hCopNC : Nat.Coprime (Nat.card A) (Nat.card ↥(Subgroup.normalizer (C : Set G))) :=
+    hCop.coprime_dvd_right hcardNC
+  haveI : IsSolvable G := inferInstance
+  -- engine hypotheses (acting via `restrictAction hNC_inv` on `↥N`).
+  have hNinv_eng : IsAInvariant (restrictAction hNC_inv)
+      (C.subgroupOf (Subgroup.normalizer (C : Set G))) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    have hx' : (x : G) ∈ C := Subgroup.mem_subgroupOf.mp hx
+    rw [Subgroup.mem_subgroupOf, restrictAction_apply]
+    exact hC_inv.smul_mem a hx'
+  have hTrivN_eng : ∀ a : A, ∀ x ∈ C.subgroupOf (Subgroup.normalizer (C : Set G)),
+      (restrictAction hNC_inv a) x = x := by
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx
+    apply Subtype.ext
+    rw [restrictAction_apply]
+    exact (Subgroup.mem_fixedPointsOfMulAut.mp hx) a
+  have hQuot_eng : ∀ a : A, ∀ x : ↥(Subgroup.normalizer (C : Set G)),
+      ∃ y ∈ C.subgroupOf (Subgroup.normalizer (C : Set G)),
+        (restrictAction hNC_inv a) x = x * y := by
+    intro a x
+    set g : G := x.1 with hg
+    have hgNC : g ∈ Subgroup.normalizer (C : Set G) := x.2
+    -- (i) `t := φ a g * g⁻¹` centralizes `C`, hence `t ∈ C`.
+    have htC : (φ a) g * g⁻¹ ∈ C := by
+      apply hCC
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [SetLike.mem_coe] at hy
+      have hyc : g⁻¹ * y * g ∈ C := by
+        have h := Subgroup.mem_normalizer_iff.mp (inv_mem hgNC) y
+        rw [inv_inv] at h
+        exact h.mp hy
+      have hfix : (φ a) (g⁻¹ * y * g) = g⁻¹ * y * g := by
+        rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hyc; exact hyc a
+      rw [map_mul, map_mul, map_inv] at hfix
+      have hyfix : (φ a) y = y := by
+        rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hy; exact hy a
+      rw [hyfix] at hfix
+      -- `hfix : (φ a g)⁻¹ * y * (φ a g) = g⁻¹ * y * g` ⇒ `Commute (φ a g * g⁻¹) y`.
+      have key : ((φ a) g * g⁻¹) * y * ((φ a) g * g⁻¹)⁻¹ = y :=
+        calc ((φ a) g * g⁻¹) * y * ((φ a) g * g⁻¹)⁻¹
+            = (φ a) g * (g⁻¹ * y * g) * ((φ a) g)⁻¹ := by group
+          _ = (φ a) g * (((φ a) g)⁻¹ * y * ((φ a) g)) * ((φ a) g)⁻¹ := by rw [← hfix]
+          _ = y := by group
+      exact (mul_inv_eq_iff_eq_mul.mp key).symm
+    -- (ii) `g⁻¹ * φ a g ∈ C` (conjugate of `t` by `g⁻¹`, `C` normal in `N_G(C)`).
+    have hyC : g⁻¹ * (φ a) g ∈ C := by
+      have h := Subgroup.mem_normalizer_iff.mp (inv_mem hgNC) ((φ a) g * g⁻¹)
+      rw [inv_inv] at h
+      have h2 : g⁻¹ * ((φ a) g * g⁻¹) * g ∈ C := h.mp htC
+      rwa [show g⁻¹ * ((φ a) g * g⁻¹) * g = g⁻¹ * (φ a) g by group] at h2
+    refine ⟨⟨g⁻¹ * (φ a) g, hC_le_NC hyC⟩, ?_, ?_⟩
+    · rw [Subgroup.mem_subgroupOf]; exact hyC
+    · apply Subtype.ext
+      rw [restrictAction_apply]
+      simp only [Subgroup.coe_mul]
+      rw [← hg]; group
+  -- engine ⇒ `A` trivial on `N_G(C)`.
+  have hTrivNC : ∀ a : A, ∀ x : ↥(Subgroup.normalizer (C : Set G)),
+      (restrictAction hNC_inv a) x = x :=
+    coprime_actsTrivially_of_normal_and_quotient hCopNC (Or.inr inferInstance)
+      hNinv_eng hTrivN_eng hQuot_eng
+  -- `N_G(C) ⊆ C`, so `C` is self-normalizing.
+  have hNC_le_C : Subgroup.normalizer (C : Set G) ≤ C := by
+    intro g hg
+    rw [hC, Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    exact congrArg Subtype.val (hTrivNC a ⟨g, hg⟩)
+  -- nilpotent ⇒ self-normalizing subgroup is `⊤`.
+  have hNCeqC : Subgroup.normalizer (C : Set G) = C := le_antisymm hNC_le_C hC_le_NC
+  have hC_top : C = ⊤ :=
+    (normalizerCondition_iff_only_full_group_self_normalizing.mp
+      normalizerCondition_of_isNilpotent) C hNCeqC
+  intro a g
+  have hmem : g ∈ C := hC_top ▸ Subgroup.mem_top g
+  rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hmem
+  exact hmem a
+
 /-! ## §1D: 未実装 (Phase 1 Ch.4 §4D 待ち) -/
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
