@@ -330,4 +330,80 @@ theorem lOddIn_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] [Nontrivial G] (hG : I
     lOddIn (⊤ : Subgroup G) ≠ ⊥ := fun h =>
   lStarIn_ne_bot hG (le_bot_iff.mp ((lStarIn_le_lOddIn ⊤).trans h.le))
 
+/-! ### Lemma B.2: `L(G) ⊆ H ⇒ L(H) = L(G)` (L4590-4642; `[Finite G]`) -/
+
+/-- 偶 index は `L(H)` 以下: `L_{2m}(H) ⊆ L(H)`. -/
+theorem lNIn_even_le_lOddIn (H : Subgroup G) (m : ℕ) : lNIn H (2 * m) ≤ lOddIn H :=
+  le_iInf fun n => lNIn_even_le_odd H m n
+
+/-- B.2 証明核 (mmd L4604-4616, L4626-4638 共通): `L_G(W) ⊆ H` かつ `W' ⊆ W` なら
+`L_G(W) ⊆ L_H(W')`. `L_G(W)` を張る abelian `A` は `A ⊆ L_G(W) ⊆ H` で `W' ⊆ W ⊆ N(A)`. -/
+theorem lRelIn_top_le_lRelIn {W W' H : Subgroup G} (hW' : W' ≤ W)
+    (hH : lRelIn ⊤ W ≤ H) : lRelIn ⊤ W ≤ lRelIn H W' := by
+  refine lRelIn_le fun A hcomm _ hnorm => le_lRelIn hcomm ?_ (le_trans hW' hnorm)
+  exact le_trans (le_lRelIn hcomm le_top hnorm) hH
+
+/-- B.2 Step 1 偶段 (mmd L4604-4608): `L_{2n+1}(H) ⊆ L_{2n+1}(G)` から `L_{2n+2}(G) ⊆ L_{2n+2}(H)`. -/
+private theorem b2_even_le {H : Subgroup G} (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) {n : ℕ}
+    (hodd : lNIn H (2 * n + 1) ≤ lNIn (⊤ : Subgroup G) (2 * n + 1)) :
+    lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lNIn H (2 * n + 2) := by
+  have hev_le : lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lOddIn ⊤ := by
+    have h := lNIn_even_le_lOddIn (⊤ : Subgroup G) (n + 1)
+    rwa [show 2 * (n + 1) = 2 * n + 2 from by ring] at h
+  exact lRelIn_top_le_lRelIn hodd (hev_le.trans hLGH)
+
+/-- B.2 Step 1 奇段 (mmd L4612-4616): `L_{2n+2}(G) ⊆ L_{2n+2}(H)` から `L_{2n+3}(H) ⊆ L_{2n+3}(G)`. -/
+private theorem b2_odd_le {H : Subgroup G} {n : ℕ}
+    (hev : lNIn (⊤ : Subgroup G) (2 * n + 2) ≤ lNIn H (2 * n + 2)) :
+    lNIn H (2 * n + 3) ≤ lNIn (⊤ : Subgroup G) (2 * n + 3) :=
+  (lRelIn_mono_left le_top (lNIn H (2 * n + 2))).trans (lRelIn_anti_right hev)
+
+/-- **BG Lemma B.2 Step 1(a)** (mmd L4594): `L_{2n+1}(H) ⊆ L_{2n+1}(G)`. -/
+theorem b2_step1 {H : Subgroup G} (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) :
+    ∀ n, lNIn H (2 * n + 1) ≤ lNIn (⊤ : Subgroup G) (2 * n + 1)
+  | 0 => by
+      have e1 : lNIn H (2 * 0 + 1) = H := lNIn_one H
+      have e2 : lNIn (⊤ : Subgroup G) (2 * 0 + 1) = ⊤ := lNIn_one ⊤
+      rw [e1, e2]; exact le_top
+  | (n + 1) => by
+      have hodd := b2_odd_le (b2_even_le hLGH (b2_step1 hLGH n))
+      rwa [show 2 * (n + 1) + 1 = 2 * n + 3 from by ring]
+
+/-- B.2 Step 2 偶段 (mmd L4626-4630): `L(G) ⊆ L_{2n+1}(H)` から `L_{2n+2}(H) ⊆ L_*(G)`. -/
+private theorem b2_star_le {H : Subgroup G} [Finite G] {n : ℕ}
+    (hIH : lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 1)) :
+    lNIn H (2 * n + 2) ≤ lStarIn (⊤ : Subgroup G) := by
+  rw [← lRelIn_lOddIn (⊤ : Subgroup G)]
+  exact (lRelIn_mono_left le_top (lNIn H (2 * n + 1))).trans (lRelIn_anti_right hIH)
+
+/-- B.2 Step 2 奇段 (mmd L4632-4638): `L_{2n+2}(H) ⊆ L_*(G)` から `L(G) ⊆ L_{2n+3}(H)`. -/
+private theorem b2_odd_ge {H : Subgroup G} [Finite G] (hLGH : lOddIn (⊤ : Subgroup G) ≤ H)
+    {n : ℕ} (hstar : lNIn H (2 * n + 2) ≤ lStarIn (⊤ : Subgroup G)) :
+    lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 3) := by
+  rw [← lRelIn_lStarIn (⊤ : Subgroup G)]
+  exact lRelIn_top_le_lRelIn hstar ((lRelIn_lStarIn ⊤).le.trans hLGH)
+
+/-- **BG Lemma B.2 Step 2(a)** (mmd L4620): `L(G) ⊆ L_{2n+1}(H)`. -/
+theorem b2_step2 {H : Subgroup G} [Finite G] (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) :
+    ∀ n, lOddIn (⊤ : Subgroup G) ≤ lNIn H (2 * n + 1)
+  | 0 => by
+      have e : lNIn H (2 * 0 + 1) = H := lNIn_one H
+      rw [e]; exact hLGH
+  | (n + 1) => by
+      have hodd := b2_odd_ge hLGH (b2_star_le (b2_step2 hLGH n))
+      rwa [show 2 * (n + 1) + 1 = 2 * n + 3 from by ring]
+
+/-- **BG Lemma B.2** (L4590): `L(G) ⊆ H` なら `L(H) = L(G)`
+(`lOddIn ⊤ = L(G)`, `lOddIn H = L(H)`). -/
+theorem lOddIn_eq_of_lOddIn_le {H : Subgroup G} [Finite G]
+    (hLGH : lOddIn (⊤ : Subgroup G) ≤ H) : lOddIn H = lOddIn (⊤ : Subgroup G) := by
+  refine le_antisymm ?_ ?_
+  · obtain ⟨k, hk⟩ := exists_lOddIn_eq H
+    obtain ⟨k', hk'⟩ := exists_lOddIn_eq (⊤ : Subgroup G)
+    rw [hk (max k k') (le_max_left _ _), hk' (max k k') (le_max_right _ _)]
+    exact b2_step1 hLGH (max k k')
+  · obtain ⟨k, hk⟩ := exists_lOddIn_eq H
+    rw [hk k (le_refl k)]
+    exact b2_step2 hLGH k
+
 end OddOrder.BG.AppB

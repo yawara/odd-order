@@ -14,6 +14,7 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.AppA_PStability
+import OddOrder.BG.AppB_Puig
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -574,3 +575,21 @@ set_option linter.style.longLine false in
 -- Prop 1.10 (⟨u⟩ の O_p(G) 上共役作用) で C_G(P) の p'-元を消去 ⇒ C_G(P) p-群
 -- ⇒ part(1) を comap 還元。
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA5_part2
+
+-- BG App.B (Puig L(S)) Lemma B.1 + B.2 (issue 2000). 定義 lRelIn/lNIn/lOddIn/lStarIn の
+-- 主要性質が unconditional であることの保証. B.3/Thm B.4 (= Thm 6.2 代替) は A.5 消費の別 issue.
+-- B.1(a) 反変単調 / (b) 偶 ≤ 奇 / (c) 停留 / (d) L_* ⊆ L.
+#assert_only_allowed_axioms OddOrder.BG.AppB.lRelIn_anti_right
+#assert_only_allowed_axioms OddOrder.BG.AppB.lNIn_even_le_odd
+#assert_only_allowed_axioms OddOrder.BG.AppB.exists_lNIn_stable
+#assert_only_allowed_axioms OddOrder.BG.AppB.lStarIn_le_lOddIn
+-- B.1(e) abelian normal ⊆ L_i / (g) L_G(L_*)=L, L_G(L)=L_*.
+#assert_only_allowed_axioms OddOrder.BG.AppB.abelian_normal_le_lNIn
+#assert_only_allowed_axioms OddOrder.BG.AppB.lRelIn_lStarIn
+#assert_only_allowed_axioms OddOrder.BG.AppB.lRelIn_lOddIn
+-- B.1(f) p-群自己中心性 C_G(L_i) ⊆ L_i ⊇ Z(G) + L_*≠1, L≠1.
+#assert_only_allowed_axioms OddOrder.BG.AppB.centralizer_lNIn_le
+#assert_only_allowed_axioms OddOrder.BG.AppB.center_le_lNIn
+#assert_only_allowed_axioms OddOrder.BG.AppB.lOddIn_ne_bot
+-- B.2 L(G) ⊆ H ⇒ L(H) = L(G).
+#assert_only_allowed_axioms OddOrder.BG.AppB.lOddIn_eq_of_lOddIn_le

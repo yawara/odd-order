@@ -21,7 +21,7 @@ BG Thm 6.2 (Glauberman Z(J)) は Isaacs FGT が省く (p.217) ため、no-Gorens
 
 ## やること
 
-- [ ] `OddOrder/BG/AppB_Puig.lean` 新規作成 (namespace `OddOrder.BG.AppB`)、`OddOrder.lean` に import 追加 (作成済; import は完成時に追加)
+- [x] `OddOrder/BG/AppB_Puig.lean` 新規作成 (namespace `OddOrder.BG.AppB`)、import 追加 (AppA 前例に倣い `OddOrder/AxiomsCheck.lean` 経由 = `OddOrder.lean` から推移的に到達 + `#assert_only_allowed_axioms` で axiom-clean を CI ガード)
 - [x] 定義: `lRelIn`/`lRel` (= `L_G(X)`), `lNIn`/`lN` (= `L_n(G)`), `lOddIn`/`lOdd` (= `L(G)`), `lStarIn`/`lStar` (= `L_*(G)`)
 - [x] Lemma B.1(a) 反変単調 (`lRel` antitone)
 - [x] Lemma B.1(b) chain (偶増加 / 奇減少 / 偶 ≤ 奇)
@@ -30,7 +30,7 @@ BG Thm 6.2 (Glauberman Z(J)) は Isaacs FGT が省く (p.217) ため、no-Gorens
 - [x] Lemma B.1(e) abelian normal ⊆ L_i (i>0)
 - [x] Lemma B.1(f) p-群で L_i ⊇ C_G(L_i) ⊇ Z(G) (極大 abelian normal の self-centralizing 経由)
 - [x] Lemma B.1(g) L_G(L_*)=L, L_G(L)=L_*
-- [ ] Lemma B.2 `H ⊇ L(G) ⇒ L(G)=L(H)`
+- [x] Lemma B.2 `H ⊇ L(G) ⇒ L(G)=L(H)` (`lOddIn_eq_of_lOddIn_le`)
 
 ## 完了条件
 
