@@ -168,4 +168,75 @@ theorem lStarIn_le_lOddIn (H : Subgroup G) : lStarIn H ≤ lOddIn H := by
   change ⨆ m, lNIn H (2 * m) ≤ ⨅ n, lNIn H (2 * n + 1)
   exact iSup_le fun m => le_iInf fun n => lNIn_even_le_odd H m n
 
+/-! ### Lemma B.1(c)(g): 停留と双対性 (L4548, L4552; `[Finite G]`) -/
+
+/-- 単調列 `f : ℕ → Subgroup G` が `k` 以降一定なら `⨆ f = f k`. -/
+private theorem iSup_eq_of_monotone_stable {f : ℕ → Subgroup G} (hf : Monotone f) {k : ℕ}
+    (hk : ∀ m, k ≤ m → f k = f m) : ⨆ n, f n = f k := by
+  refine le_antisymm (iSup_le fun n => ?_) (le_iSup f k)
+  rcases le_total n k with h | h
+  · exact hf h
+  · exact (hk n h).ge
+
+/-- 反単調列 `f : ℕ → Subgroup G` が `k` 以降一定なら `⨅ f = f k`. -/
+private theorem iInf_eq_of_antitone_stable {f : ℕ → Subgroup G} (hf : Antitone f) {k : ℕ}
+    (hk : ∀ m, k ≤ m → f k = f m) : ⨅ n, f n = f k := by
+  refine le_antisymm (iInf_le f k) (le_iInf fun n => ?_)
+  rcases le_total n k with h | h
+  · exact hf h
+  · exact (hk n h).le
+
+/-- 偶部分列の停留 (有限性). -/
+theorem exists_even_stable [Finite G] (H : Subgroup G) :
+    ∃ k, ∀ m, k ≤ m → lNIn H (2 * k) = lNIn H (2 * m) := by
+  obtain ⟨k, hk⟩ :=
+    WellFoundedGT.monotone_chain_condition ⟨fun n => lNIn H (2 * n), lNIn_even_mono H⟩
+  exact ⟨k, hk⟩
+
+/-- 奇部分列の停留 (有限性). -/
+theorem exists_odd_stable [Finite G] (H : Subgroup G) :
+    ∃ k, ∀ m, k ≤ m → lNIn H (2 * k + 1) = lNIn H (2 * m + 1) := by
+  obtain ⟨k, hk⟩ := WellFoundedLT.antitone_chain_condition (lNIn_odd_anti H)
+  exact ⟨k, hk⟩
+
+/-- `L_*(H) = L_{2j}(H)` for `j ≥` 停留点. -/
+theorem exists_lStarIn_eq [Finite G] (H : Subgroup G) :
+    ∃ k, ∀ j, k ≤ j → lStarIn H = lNIn H (2 * j) := by
+  obtain ⟨k, hk⟩ := exists_even_stable H
+  have h0 : lStarIn H = lNIn H (2 * k) := iSup_eq_of_monotone_stable (lNIn_even_mono H) hk
+  exact ⟨k, fun j hj => h0.trans (hk j hj)⟩
+
+/-- `L(H) = L_{2j+1}(H)` for `j ≥` 停留点. -/
+theorem exists_lOddIn_eq [Finite G] (H : Subgroup G) :
+    ∃ k, ∀ j, k ≤ j → lOddIn H = lNIn H (2 * j + 1) := by
+  obtain ⟨k, hk⟩ := exists_odd_stable H
+  have h0 : lOddIn H = lNIn H (2 * k + 1) := iInf_eq_of_antitone_stable (lNIn_odd_anti H) hk
+  exact ⟨k, fun j hj => h0.trans (hk j hj)⟩
+
+/-- **BG Lemma B.1(c)** (L4548): ある `k` 以降 `L_{2n}(H) = L_*(H)` かつ `L_{2n+1}(H) = L(H)`. -/
+theorem exists_lNIn_stable [Finite G] (H : Subgroup G) :
+    ∃ k, (∀ n, k ≤ n → lNIn H (2 * n) = lStarIn H) ∧
+      (∀ n, k ≤ n → lNIn H (2 * n + 1) = lOddIn H) := by
+  obtain ⟨k1, h1⟩ := exists_lStarIn_eq H
+  obtain ⟨k2, h2⟩ := exists_lOddIn_eq H
+  refine ⟨max k1 k2, fun n hn => ?_, fun n hn => ?_⟩
+  · exact (h1 n (le_trans (le_max_left _ _) hn)).symm
+  · exact (h2 n (le_trans (le_max_right _ _) hn)).symm
+
+/-- **BG Lemma B.1(g)** (L4552): `L_H(L_*(H)) = L(H)`. -/
+theorem lRelIn_lStarIn [Finite G] (H : Subgroup G) : lRelIn H (lStarIn H) = lOddIn H := by
+  obtain ⟨k1, h1⟩ := exists_lStarIn_eq H
+  obtain ⟨k2, h2⟩ := exists_lOddIn_eq H
+  rw [h1 (max k1 k2) (le_max_left _ _), h2 (max k1 k2) (le_max_right _ _)]
+  exact (lNIn_succ H (2 * max k1 k2)).symm
+
+/-- **BG Lemma B.1(g)** (L4552): `L_H(L(H)) = L_*(H)`. -/
+theorem lRelIn_lOddIn [Finite G] (H : Subgroup G) : lRelIn H (lOddIn H) = lStarIn H := by
+  obtain ⟨k1, h1⟩ := exists_lStarIn_eq H
+  obtain ⟨k2, h2⟩ := exists_lOddIn_eq H
+  set K := max k1 k2 with hK
+  rw [h2 K (le_max_right _ _), h1 (K + 1) (le_trans (le_max_left _ _) (Nat.le_succ _)),
+    show 2 * (K + 1) = 2 * K + 1 + 1 from by ring]
+  exact (lNIn_succ H (2 * K + 1)).symm
+
 end OddOrder.BG.AppB
