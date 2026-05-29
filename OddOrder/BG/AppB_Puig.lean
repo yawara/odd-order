@@ -251,15 +251,20 @@ theorem lNIn_one (H : Subgroup G) : lNIn H 1 = H := by
     exact le_lRelIn (Subgroup.zpowers_isMulCommutative x) (Subgroup.zpowers_le.mpr hx) bot_le
   exact hle (Subgroup.mem_zpowers x)
 
+/-- **BG Lemma B.1(e) 一般化**: `A` abelian で `A ≤ H` かつ `H ≤ N_G(A)` (= `A` が `H` で正規化される)
+なら, すべての `i > 0` で `A ⊆ L_i(H)`. 相対 B.1(f) / B.3 で `A` が `H`-正規 (G-正規でない) の場合に使う. -/
+theorem abelian_le_lNIn {A H : Subgroup G} (hcomm : IsMulCommutative ↥A) (hAH : A ≤ H)
+    (hnorm : H ≤ Subgroup.normalizer (A : Set G)) {i : ℕ} (hi : 0 < i) : A ≤ lNIn H i := by
+  obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hi.ne'
+  rw [lNIn_succ]
+  exact le_lRelIn hcomm hAH ((lNIn_le_self H j).trans hnorm)
+
 /-- **BG Lemma B.1(e)** (L4550): `G` の abelian normal 部分群 `A` (with `A ≤ H`) は,
 すべての `i > 0` について `L_i(H)` に含まれる. (`H = ⊤` で教科書の `A ⊆ L_i(G)`.) -/
 theorem abelian_normal_le_lNIn {A H : Subgroup G} (hcomm : IsMulCommutative ↥A)
-    (hnormal : A.Normal) (hAH : A ≤ H) {i : ℕ} (hi : 0 < i) : A ≤ lNIn H i := by
-  obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hi.ne'
-  rw [lNIn_succ]
-  refine le_lRelIn hcomm hAH ?_
-  rw [Subgroup.normalizer_eq_top_iff.mpr hnormal]
-  exact le_top
+    (hnormal : A.Normal) (hAH : A ≤ H) {i : ℕ} (hi : 0 < i) : A ≤ lNIn H i :=
+  abelian_le_lNIn hcomm hAH
+    (le_top.trans_eq (Subgroup.normalizer_eq_top_iff.mpr hnormal).symm) hi
 
 /-! ### Lemma B.1(f): p-群での自己中心性 (L4551; `[Finite G]`)
 
@@ -405,5 +410,19 @@ theorem lOddIn_eq_of_lOddIn_le {H : Subgroup G} [Finite G]
   · obtain ⟨k, hk⟩ := exists_lOddIn_eq H
     rw [hk k (le_refl k)]
     exact b2_step2 hLGH k
+
+/-! ### Lemma B.3 / Theorem B.4 準備 (A.5 非依存の L-API 拡張)
+
+B.3/B.4 (issue 2001) は A.5 (`thmA5`) を消費するため本体は別ファイル `AppB_PuigB3B4.lean`。
+ここには A.5 に依存しない L-API の拡張 (thmA5 橋渡し / 相対 B.1(f) / φ-同変 + characteristic) のみを置く. -/
+
+/-- **thmA5 橋渡し**: `H` が `p`-群なら `L_H(X)` は「`P` (≤ X) に正規化される abelian **p-群** で生成
+される部分群」の上限以下. これにより B.3/B.4 が `lRelIn`/`lNIn` を `thmA5` の `hX` 仮説へ渡せる. -/
+theorem lRelIn_le_iSup_pgroup_normalized {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : IsPGroup p ↥H) {P X : Subgroup G} (hPX : P ≤ X) :
+    lRelIn H X ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧ IsPGroup p ↥A ∧
+        P ≤ Subgroup.normalizer (A : Set G)}, A := by
+  refine lRelIn_le fun A hcomm hAH hnorm => ?_
+  exact le_iSup₂ (f := fun A _ => A) A ⟨hcomm, hH.to_le hAH, le_trans hPX hnorm⟩
 
 end OddOrder.BG.AppB
