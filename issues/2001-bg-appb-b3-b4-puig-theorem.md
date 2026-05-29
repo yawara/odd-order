@@ -43,21 +43,28 @@ L4644-4757 (Lem B.3 = L4644-4684, Thm B.4 = L4686-4757)。
 
 ### Theorem B.4(b) (mmd L4689-4762) — ⏳ 残作業 (本 issue の主目標)
 
-- [ ] **`zCenter_lOdd_normal_of_oPiCore_eq_bot`**: `O_{p'}(G)=1 ⇒ (Z(L(S))).Normal`
-      (`Z(L(S))` = `(Subgroup.center ↥(lOddIn ↑S)).map (lOddIn ↑S).subtype`)。4 step:
-      - **Step2** `Z(L(S)) ⊆ Z(L(T))`: `b3_chain` (済) + `centralizer_lStarIn_inf_le` (済) + `mem_center_iff`。
-      - **Step3** `L(S) ◁ N_G(C∩S)`: `Y=Z(L(T))` の Normal を `ConjAct.normal_of_characteristic_of_normal`
-        (`lOddIn_characteristic` 済 → `haveI Normal := inferInstance`, **`.normal` アクセサ不可**) で。
-        `C := comap (mk' C_G(Y)) (O_p(G/C_G(Y)))`。`thmA5_part1` (P=Y, X=L(S), `lRelIn_le_iSup_pgroup_normalized`
-        で hX) → `L·C_G(Y)/C_G(Y) ⊆ O_p` → `L≤C`; `L≤C∩S`; **`lOddIn_eq_of_lOddIn_le_relative`** (済,
-        H=C∩S, H₀=S) で `L(C∩S)=L(S)` → `L char (C∩S)` → `N_G(C∩S)≤N_G(L)`。
-      - **Step4 (検証で最重・元設計で elided)** Frattini 二段: `C∩S` を `Sylow p ↥C` として realize
-        (`C/C_G(Y)=O_p` が p-群 + `(C∩S)↠C/C_G(Y)` 全射) → `Sylow.normalizer_sup_eq_top` で
-        `N_G(C∩S)⊔C=⊤`; `C=C_G(Y)·(C∩S)` 吸収 (mmd B.6) → `C_G(Y)⊔N_G(C∩S)=⊤`; `Z(L)⊆Y` ⇒
-        `C_G(Y)≤C_G(Z(L))≤N_G(Z(L))`, `N_G(C∩S)≤N_G(L)≤N_G(Z(L))` ⇒ `Z(L).Normal` (`normalizer_eq_top_iff`)。
-      - 新規依存補題 (ConjAct import 要): `ConjAct.normal_of_characteristic_of_normal`,
-        `Subgroup.centerCharacteristic`, `Subgroup.normal_centralizer`, `Sylow.normalizer_sup_eq_top`。
-- [ ] AxiomsCheck 登録 (`zCenter_lOdd_normal_of_oPiCore_eq_bot`)。
+> **2026-05-30 進捗 (overnight 自走)**: Step2 + normalizer 基盤 完成・コミット済。**設計の高リスク
+> transport 群 (`lRelIn_subgroupOf`/`lNIn_subgroupOf`/`lOddIn_subgroupOf`/`lOddIn_subgroupOf_characteristic`,
+> ~60行) は不要化** — 代わりに **共役同変ルート** `normalizer_le_normalizer_lOddIn`
+> (`N_G(H) ⊆ N_G(L(H))` 任意 H, `lNIn_map_equiv` + `map_conj_eq_iff_mem_normalizer`) で
+> Step3 の `N_G(C∩S) ⊆ N_G(L(C∩S))` を直接供給する。
+
+- [x] `Z(L(S))` 定義 (`zCenterLOdd`) + keystone bridge `zCenterLOdd_eq_centralizer_inf` (`Z(L(H))=C_G(L(H))⊓L(H)`)
+- [x] **Step2** `zCenterLOdd_sylow_le_zCenterLOdd_opCore` (`Z(L(S)) ⊆ Z(L(T))`)
+- [x] **normalizer 基盤**: `lOddIn_map_equiv` / `map_conj_eq_iff_mem_normalizer` / `normalizer_le_normalizer_lOddIn` (共役同変)
+      + `normalizer_le_normalizer_map_of_characteristic` (S7D1 port, center 段用)
+- [ ] **`normalInf_isSylow`**: `Sylow p G` と normal `N` で `(↑Q⊓N).subgroupOf N` が `Sylow p ↥N`
+      (`IsPGroup.toSylow`; index 義務 `¬p∣relIndex` = S7B2:955 先例)。Step4 Frattini 用。
+- [ ] **Step3** (FINAL 内 inline): `Y=Z(L(T))` (Normal via `lOddIn_characteristic`→`ConjAct.normal_of_characteristic_of_normal`,
+      **`.normal` 不可→`haveI Normal := inferInstance`**), `C := comap (mk' C_G(Y)) (opCore p (G/C_G(Y)))`,
+      `thmA5_part1` (P=Y, X=L(S), hX = `lRelIn_lStarIn` + `lRelIn_le_iSup_pgroup_normalized`) → `L(S)≤C`;
+      `lOddIn_eq_of_lOddIn_le_relative` で `L(C∩S)=L(S)`; **`hN := normalizer_le_normalizer_lOddIn (C∩S)` ∘ hLeq**
+      で `N_G(C∩S) ⊆ N_G(L(S))`。⚠ `hY_le_T := (zCenterLOdd_le_lOddIn (opCore p G)).trans (lOddIn_le_self _)`。
+- [ ] **Step4** (FINAL 内 inline, 最重): Frattini `Sylow.normalizer_sup_eq_top` (normalInf_isSylow) →
+      `N_G(C∩S)⊔C=⊤`; 吸収 `C=C_G(Y)·(C∩S)` (mk' の ker=C_G(Y) ルート, 符号罠回避) → `C_G(Y)⊔N_G(C∩S)=⊤`。
+- [ ] **FINAL** `zCenter_lOdd_normal_of_oPiCore_eq_bot`: `⊤=C_G(Y)⊔N_G(C∩S)≤N_G(Z)` で `Z.Normal`。
+      左枝 `C_G(Y)≤C_G(Z)≤N_G(Z)` (Z⊆Y); 右枝 `N_G(C∩S) ⊆ N_G(L(S)) ⊆ N_G(Z)`
+      (後者 = `normalizer_le_normalizer_map_of_characteristic` K=L(S), W=center)。+ AxiomsCheck 登録。
 
 ### B.4(a) + Thm 6.2 一般形 — → **issue 2002 に分離**
 

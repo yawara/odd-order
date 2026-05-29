@@ -21,9 +21,11 @@ ROADMAP 上の位置: **Phase 2a 第 6 波** (App.A 完成必須, BG §6-§16 �
   thmA5 橋渡し `lRelIn_le_iSup_pgroup_normalized` / φ-同変 `lRelIn_map_equiv` + characteristic)。
   新ファイル `AppB_PuigB3B4.lean` に **`b3_chain`** (`L_*(S)⊆L_*(T)⊆L(T)⊆L(S)`, `thmA5_part2` + 相対 B.1(f)
   消費, AxiomsCheck 登録, 標準3公理)。設計は `bg-appb-b3b4-design` workflow (run wf_06198d42-7bc) 由来。
-- ⏳ **Theorem B.4(b)** (= Thm 6.2 代替, `O_{p'}(G)=1 ⇒ Z(L(S))⊴G`): **issue 2001 の主目標, 残作業**。
-  4 step (Step2 = b3_chain+相対B.1(f) / Step3 = thmA5_part1+相対B.2 / Step4 = Frattini, C∩S を Sylow p C
-  として realize する箇所が最重)。ConjAct import 要。
+- ⏳ **Theorem B.4(b)** (= Thm 6.2 代替, `O_{p'}(G)=1 ⇒ Z(L(S))⊴G`): **issue 2001 の主目標**。
+  2026-05-30 overnight 自走で **Step2 (`Z(L(S))⊆Z(L(T))`, `zCenterLOdd` + bridge) + normalizer 基盤
+  完成・コミット済**。**設計の高リスク transport 群 (`lRelIn_subgroupOf` 〜60行) は共役同変ルート
+  `normalizer_le_normalizer_lOddIn` (`N_G(H)⊆N_G(L(H))`) で不要化**。残: `normalInf_isSylow` (Sylow∩normal)
+  + Step3 (thmA5_part1+C構成) + Step4 (Frattini 吸収, 最重) + FINAL 組立。`AppB_PuigB3B4.lean`。ConjAct import 残。
 - ⏳ **B.4(a)** `G=O_{p'}·N_G(Z(L(S)))` → **issue 2002** (異群 iso `φ:G≃*H` 共変性が前提でBLOCKED)。
   クリティカルパス: B.4(a)+(b) → BG Thm 6.2 一般形 → §7-§16。
 
