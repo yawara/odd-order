@@ -62,12 +62,19 @@ self-contained な sup 仮説に留める。)
 
 ## やること
 
-- [ ] **X-signature の sup を Lean で定義/確認** (上記)。
-- [ ] **part(1) `thmA5_part1`**: A.4(c) を各 A に + N_G(P)=⊤ transport。最大の型操作。
-- [ ] **part(2) `thmA5_part2`**: Prop 1.10 (✅) の内部共役作用での instantiate (conjNormal bridge,
-  AppA:1441 パターン) + Hall-Higman + `O_p(G/C)=O_p(G)/C` 商対応 (新規小補題か mathlib 探索)。
-- [ ] `thmA5` (part1+part2) を sorry-free, axiom-clean。`AppA_PStability.lean` に配置。
-- [ ] `AxiomsCheck.lean` に `thmA5` 登録。
+- [x] **X-signature の sup を Lean で定義/確認** — ✅ `X ≤ ⨆ A ∈ {IsMulCommutative ↥A ∧
+  IsPGroup p ↥A ∧ P ≤ normalizer ↑A}, A` で確定。
+- [x] **part(1) `thmA5_part1`** — ✅ **2026-05-29 完成 (sorry-free, axiom-clean)**。
+  ⭐ **簡略化**: N_G(P)=⊤ transport は**不要だった** — P 正規なので `thmA4c` (N_G(P) 経由) でなく
+  **`stabilityLiftAux` を M:=G, K:=P で直接適用**できる (1 行)。各生成子 A に `⁅⁅P,A⁆,A⁆=⊥`
+  (P≤N(A) で ⁅P,A⁆≤A, A abelian で ⁅A,A⁆=⊥) → stabilityLiftAux → iSup で X に持ち上げ。
+- [ ] **part(2) `thmA5_part2`**: `O_{p'}=1` ∧ `C_{O_p(G)}(P)⊆P` ⇒ `X ⊆ O_p(G)`。
+  Q:=O_p(G), C:=C_G(P)。各 p'-元 u∈C に Prop 1.10 (✅, ⟨u⟩ の Q 上共役作用
+  `(MulAut.conjNormal (H:=Q)).comp (zpowers u).subtype`) で u が Q 中心化 ⇒ C_G(Q)⊆Q (Hall-Higman)
+  で u=1 ⇒ C は p-群 ⇒ C◁G で C⊆Q。`O_p(G/C)=O_p(G)/C` (C⊆Q 商対応) + part(1) で X⊆Q。
+  **残: conjNormal→fixedPoints=C_Q(u) 翻訳 + Q-内部 centralizer chain + opCore 商対応 (~100 行)。**
+- [ ] `thmA5` (part1+part2) を統合 (or part2 が X⊆O_p を直接与えるので part2 = 本体)。
+- [ ] `AxiomsCheck.lean` に登録。
 
 ## 必要 API (確認済)
 

@@ -2052,6 +2052,40 @@ theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
   rw [← Subgroup.map_le_iff_le_comap, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
   exact hAbar_le_R
 
+open scoped commutatorElement in
+/-- **BG Theorem A.5(1)** (mmd L4488): `p` odd, `G` solvable odd order, `P ◁ G` を `p`-部分群,
+`X` を「`P` で正規化される abelian `p`-群」で生成される部分群とする。このとき
+`X·C_G(P)/C_G(P) ⊆ O_p(G/C_G(P))`。
+
+各生成子 `A` (abelian `p`-群, `P`-正規化) は `⁅P,A⁆ ≤ A` ∧ `⁅A,A⁆ = ⊥` ⇒ `⁅⁅P,A⁆,A⁆ = ⊥`
+なので `stabilityLiftAux` (`K := P`, `P ◁ G`) で `A·C/C ⊆ O_p(G/C)`。`X ≤ ⨆ A` を iSup で分解。 -/
+theorem thmA5_part1 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    {P : Subgroup G} [P.Normal] (hP : IsPGroup p P)
+    {X : Subgroup G}
+    (hX : X ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧ IsPGroup p ↥A ∧
+        P ≤ Subgroup.normalizer (A : Set G)}, A) :
+    X.map (QuotientGroup.mk' (Subgroup.centralizer (P : Set G)))
+      ≤ OddOrder.Isaacs.Ch01.opCore p (G ⧸ Subgroup.centralizer (P : Set G)) := by
+  haveI : IsSolvable G := hsolv
+  refine le_trans (Subgroup.map_mono hX) ?_
+  rw [Subgroup.map_iSup]
+  refine iSup_le fun A => ?_
+  rw [Subgroup.map_iSup]
+  refine iSup_le fun hA => ?_
+  obtain ⟨hAcomm, hA_pg, hA_norm⟩ := hA
+  have hPAA : ⁅⁅P, A⁆, A⁆ = (⊥ : Subgroup G) := by
+    have hPA_le : ⁅P, A⁆ ≤ A := by
+      rw [Subgroup.commutator_comm]
+      exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hA_norm
+    have hAA : ⁅A, A⁆ = (⊥ : Subgroup G) := by
+      rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+      intro a ha
+      rw [Subgroup.mem_centralizer_iff]
+      intro b hb
+      exact congrArg Subtype.val (hAcomm.is_comm.comm ⟨b, hb⟩ ⟨a, ha⟩)
+    exact le_bot_iff.mp (le_trans (Subgroup.commutator_mono hPA_le le_rfl) hAA.le)
+  exact stabilityLiftAux hp_odd hodd hP hA_pg hPAA rfl
+
 end PStability
 
 end OddOrder.BG.AppA
