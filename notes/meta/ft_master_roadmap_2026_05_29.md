@@ -164,7 +164,7 @@ synthesis 由来 15 + 批判で追加 3:
 |🟡|infra-basechange-rep|baseChangeRep F_p→AlgClosure|R|S|s02-thm-2-6|
 |🟡|infra-irr-conjclasses-count|`|Irr|=|ConjClasses|` ≥|R|M|—|
 |🟡|infra-frobenius-reciprocity|数値 Frobenius 相互律|R|M|—|
-|⬜|infra-classsum-algebra|class-sum 代数 ω:ZC[G]→ℂ|R|M|—|
+|🟡|infra-classsum-algebra|class-sum 代数 ω:ZC[G]→ℂ (代数射 + classSum 中心性 ✅ `ClassSumAlgebra.lean`; ω(C) 整数性のみ残)|R|M|—|
 
 ### Phase 2a — BG local analysis(30)
 
