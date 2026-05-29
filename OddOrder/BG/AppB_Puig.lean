@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Sylow
 import Mathlib.Order.OrderIsoNat
 import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
 import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
@@ -259,5 +260,74 @@ theorem abelian_normal_le_lNIn {A H : Subgroup G} (hcomm : IsMulCommutative ↥A
   refine le_lRelIn hcomm hAH ?_
   rw [Subgroup.normalizer_eq_top_iff.mpr hnormal]
   exact le_top
+
+/-! ### Lemma B.1(f): p-群での自己中心性 (L4551; `[Finite G]`)
+
+教科書の `G` が `p`-群の場合 (= `H = ⊤`). 部分群 `H` が `p`-群の相対版 (B.3 で `T = O_p(G)`,
+`S ∈ Syl_p` に適用) は subtype `↥H` 経由の transport を要するため B.3 着手時に別途用意する. -/
+
+/-- **BG Lemma B.1(f)** 核 (L4551): `G` が `p`-群なら `i > 0` で `C_G(L_i(G)) ⊆ L_i(G)`.
+極大 normal abelian `M ⊆ L_i` (B.1(e)) と self-centralizing `C_G(M) = M`
+(Isaacs Thm 5.3.12 = `Ch06.centralizer_eq_of_maximal_normal_isMulCommutative`) から従う. -/
+theorem centralizer_lNIn_le [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G)
+    {i : ℕ} (hi : 0 < i) :
+    Subgroup.centralizer (lNIn (⊤ : Subgroup G) i : Set G) ≤ lNIn (⊤ : Subgroup G) i := by
+  obtain ⟨M, hM_normal, hM_comm, hM_max⟩ :=
+    OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := G)
+  haveI : M.Normal := hM_normal
+  have hM_le : M ≤ lNIn (⊤ : Subgroup G) i := abelian_normal_le_lNIn hM_comm hM_normal le_top hi
+  have hCent : Subgroup.centralizer (M : Set G) = M :=
+    OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative hG hM_comm hM_max
+  have hanti : Subgroup.centralizer (lNIn (⊤ : Subgroup G) i : Set G)
+      ≤ Subgroup.centralizer (M : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_centralizer_iff] at hg ⊢
+    exact fun h hh => hg h (hM_le hh)
+  exact hanti.trans (hCent.le.trans hM_le)
+
+/-- `Z(G) ⊆ C_G(L_i(G))` (中心は何でも中心化する; B.1(f) の `⊇ Z(G)` 部分). -/
+theorem center_le_centralizer_lNIn (i : ℕ) :
+    Subgroup.center G ≤ Subgroup.centralizer (lNIn (⊤ : Subgroup G) i : Set G) := by
+  intro g hg
+  rw [Subgroup.mem_centralizer_iff]
+  exact fun h _ => Subgroup.mem_center_iff.mp hg h
+
+/-- **BG Lemma B.1(f)** (L4551): `G` が `p`-群なら `i > 0` で `Z(G) ⊆ L_i(G)`. -/
+theorem center_le_lNIn [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G)
+    {i : ℕ} (hi : 0 < i) : Subgroup.center G ≤ lNIn (⊤ : Subgroup G) i :=
+  (center_le_centralizer_lNIn i).trans (centralizer_lNIn_le hG hi)
+
+/-- **BG Lemma B.1(f)** (`L_*` 版, L4551): `G` p-群で `C_G(L_*(G)) ⊆ L_*(G)`. -/
+theorem centralizer_lStarIn_le [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) :
+    Subgroup.centralizer (lStarIn (⊤ : Subgroup G) : Set G) ≤ lStarIn ⊤ := by
+  obtain ⟨k, hk⟩ := exists_lStarIn_eq (⊤ : Subgroup G)
+  rw [hk (k + 1) (Nat.le_succ k)]
+  exact centralizer_lNIn_le hG (by omega)
+
+/-- **BG Lemma B.1(f)** (`L` 版, L4551): `G` p-群で `C_G(L(G)) ⊆ L(G)`. -/
+theorem centralizer_lOddIn_le [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) :
+    Subgroup.centralizer (lOddIn (⊤ : Subgroup G) : Set G) ≤ lOddIn ⊤ := by
+  obtain ⟨k, hk⟩ := exists_lOddIn_eq (⊤ : Subgroup G)
+  rw [hk k (le_refl k)]
+  exact centralizer_lNIn_le hG (by omega)
+
+/-- `Z(G) ⊆ L_*(G)` (`G` p-群). -/
+theorem center_le_lStarIn [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) :
+    Subgroup.center G ≤ lStarIn (⊤ : Subgroup G) := by
+  obtain ⟨k, hk⟩ := exists_lStarIn_eq (⊤ : Subgroup G)
+  rw [hk (k + 1) (Nat.le_succ k)]
+  exact center_le_lNIn hG (by omega)
+
+/-- **BG Lemma B.1(f)** 帰結 (L4551): `G ≠ 1` p-群なら `L_*(G) ≠ 1`. -/
+theorem lStarIn_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] [Nontrivial G] (hG : IsPGroup p G) :
+    lStarIn (⊤ : Subgroup G) ≠ ⊥ := by
+  intro h
+  have hc : Subgroup.center G ≤ ⊥ := h ▸ center_le_lStarIn hG
+  exact hG.bot_lt_center.ne' (le_bot_iff.mp hc)
+
+/-- **BG Lemma B.1(f)** 帰結 (L4551): `G ≠ 1` p-群なら `L(G) ≠ 1`. -/
+theorem lOddIn_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] [Nontrivial G] (hG : IsPGroup p G) :
+    lOddIn (⊤ : Subgroup G) ≠ ⊥ := fun h =>
+  lStarIn_ne_bot hG (le_bot_iff.mp ((lStarIn_le_lOddIn ⊤).trans h.le))
 
 end OddOrder.BG.AppB
