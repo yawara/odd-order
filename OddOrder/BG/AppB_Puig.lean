@@ -501,4 +501,52 @@ theorem centralizer_lStarIn_inf_le [Finite G] {p : ℕ} [Fact p.Prime] {H : Subg
   rw [hk (k + 1) (Nat.le_succ k)]
   exact centralizer_lNIn_inf_le hH (by omega)
 
+/-! ### φ-同変性と characteristic (B.3 で `L_{2n+1}(T)` の正規性, B.4 で `L(T)` の characteristic) -/
+
+/-- `L_H(X)` の `G`-自己同型 `φ` 同変性: `(L_H(X)).map φ = L_{φ(H)}(φ(X))`. -/
+theorem lRelIn_map_equiv (φ : G ≃* G) (H X : Subgroup G) :
+    (lRelIn H X).map φ.toMonoidHom = lRelIn (H.map φ.toMonoidHom) (X.map φ.toMonoidHom) := by
+  have hle : ∀ (ψ : G ≃* G) (H₁ X₁ : Subgroup G),
+      (lRelIn H₁ X₁).map ψ.toMonoidHom ≤ lRelIn (H₁.map ψ.toMonoidHom) (X₁.map ψ.toMonoidHom) := by
+    intro ψ H₁ X₁
+    rw [Subgroup.map_le_iff_le_comap]
+    refine lRelIn_le fun A hcomm hAH hnorm => ?_
+    rw [← Subgroup.map_le_iff_le_comap]
+    haveI := hcomm
+    refine le_lRelIn inferInstance (Subgroup.map_mono hAH) ?_
+    rw [← Subgroup.map_equiv_normalizer_eq A ψ]
+    exact Subgroup.map_mono hnorm
+  have hAB : ∀ K : Subgroup G, (K.map φ.toMonoidHom).map φ.symm.toMonoidHom = K := by
+    intro K; rw [Subgroup.map_map]; simp
+  have hBA : ∀ K : Subgroup G, (K.map φ.symm.toMonoidHom).map φ.toMonoidHom = K := by
+    intro K; rw [Subgroup.map_map]; simp
+  refine le_antisymm (hle φ H X) ?_
+  have h := hle φ.symm (H.map φ.toMonoidHom) (X.map φ.toMonoidHom)
+  rw [hAB, hAB] at h
+  have h2 := Subgroup.map_mono (f := φ.toMonoidHom) h
+  rwa [hBA] at h2
+
+/-- `φ` が `H` を固定するなら `L_n(H)` も固定する. -/
+theorem lNIn_map_equiv (φ : G ≃* G) {H : Subgroup G} (hH : H.map φ.toMonoidHom = H) :
+    ∀ k, (lNIn H k).map φ.toMonoidHom = lNIn H k
+  | 0 => by rw [lNIn_zero, Subgroup.map_bot]
+  | (k + 1) => by
+      rw [lNIn_succ, lRelIn_map_equiv φ H (lNIn H k), hH, lNIn_map_equiv φ hH k]
+
+/-- `H` が `G`-characteristic なら `L_n(H)` も `G`-characteristic (`B.3` で `L_{2n+1}(O_p)` の正規性). -/
+theorem lNIn_characteristic_of_characteristic {H : Subgroup G} (hH : H.Characteristic)
+    (k : ℕ) : (lNIn H k).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_eq]
+  exact fun φ => lNIn_map_equiv φ (Subgroup.characteristic_iff_map_eq.mp hH φ) k
+
+/-- `H` が `G`-characteristic なら `L(H)` も `G`-characteristic (`B.4` で `L(O_p)` の正規性). -/
+theorem lOddIn_characteristic_of_characteristic [Finite G] {H : Subgroup G}
+    (hH : H.Characteristic) : (lOddIn H).Characteristic := by
+  obtain ⟨k, hk⟩ := exists_lOddIn_eq H
+  rw [Subgroup.characteristic_iff_map_eq]
+  intro φ
+  rw [hk k le_rfl]
+  have hchar := lNIn_characteristic_of_characteristic hH (2 * k + 1)
+  exact Subgroup.characteristic_iff_map_eq.mp hchar φ
+
 end OddOrder.BG.AppB
