@@ -61,8 +61,9 @@ created: 2026-05-27
 - [ ] 誘導指標値公式 (必要なら InducedCharacter.lean に追加)
 - [ ] (2.10.1)-(2.10.3) sub-lemmas
 - [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺)
-- [ ] (2.6.b) を (2.10) から、(2.6.a) を (2.7) から; Dade 写像 τ の明示構成と
-      `FullDadeIsometryData` への接続
+- [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
+      を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).  残るは
+      (2.6.b)/(2.10) 経由の Dade 写像 τ の明示構成と `FullDadeIsometryData` への接続.
 - [ ] (2.11) restriction 互換性
 
 ## 完了条件
@@ -77,3 +78,63 @@ Dade 写像 τ が `IsDadeMap` + isometry + virtual-char 保存を満たすも�
 - (2.7) 完成: issue 0040 の前提 = issues/closed/0039-*, commits 40211fe..0d8307e
 - ミニロードマップ: `notes/peterfalvi/s04_dade_isometry.md`
 - インフラ: `OddOrder/GroupTheory/RepresentationTheory/InducedCharacter.lean`
+
+## 進捗 2026-05-30 — (2.6.a) isometry を Dade-map equations から導出 (sorry-free)
+
+**landed** (`OddOrder/Peterfalvi/S04_DadeIsometry.lean`, `section AdjointFormula`, green):
+
+- `adjointAverageFun_dadeMap_eq` — Dade map `τ` と `β ∈ CF(L,A)` に対し
+  (2.7) の平均化写像 `adjointAverageFun hyp (τ β)` が `A` 上で `β` に一致する.
+  証明: `τ β` は coset `aH(a)` 上で定数 `β(a)` (`IsDadeMap.map_eq_of_mem_hCoset`)
+  なので `H(a)` 上の平均は `β(a)`.  教科書 (2.6.a) 冒頭「`β^τ` は `aH(a)` 上定数」の計算.
+- `isDadeIsometry_of_isDadeMap` — **(2.6.a) 本体**.  `IsDadeMap hyp τ` ((2.5) の
+  pointwise equations) と `hyp.HConjInvariant` ((2.4.a)) だけから `IsDadeIsometry τ`
+  (= `(α^τ,β^τ)_G = (α,β)_L`) を導出.  教科書の証明そのまま: (2.7) `adjoint_formula`
+  に `χ := τ β`, `ψ := β` を入れる (`hψ` は `adjointAverageFun_dadeMap_eq`).
+- `DadeIsometryData.ofIsDadeMap` (+ `_toDadeMap` simp) — Dade map と (2.5)/(2.4.a)
+  仮定だけから `DadeIsometryData` を束ねる constructor.  従来 isometry を独立 field
+  として仮定していたのを、defining equations から導けるようにした (インターフェース改善).
+
+**意義**: (2.6.a) はもはやインターフェース仮定でなく `IsDadeMap` から導出される定理.
+残る未構成は (2.6.b) (virtual char 保存) と、その前提となる Dade 写像 τ の明示構成
+((2.8)-(2.10) inclusion-exclusion) のみ.
+
+### 残作業の精密プラン ((2.6.b)/(2.8)-(2.10) — 大規模, 別 sub-issue 推奨)
+
+検証済みのブロッカーと工数見積り (本セッションで mmd / 既存 API を確認):
+
+1. **BLOCKER (critical, (2.6.b))**: `induce_mem_ZIrr` が repo にも mathlib にも無い.
+   必要な statement:
+   ```lean
+   theorem induce_mem_ZIrr {H : Subgroup G} [Invertible (Nat.card H : ℂ)]
+       {θ : ClassFunction H ℂ} (hθ : θ ∈ ZIrr H) :
+       ClassFunction.induce H θ ∈ ZIrr G
+   ```
+   `InducedCharacter.lean` には `induce`/`induceSum` と線形性 (`induce_add`,
+   `induce_smul`) はあるが、誘導が virtual char を virtual char に送る事実 (Frobenius
+   相互律 + 整係数性) が無い.  証明には `⟨Ind χ_i, ψ⟩_G = ⟨χ_i, Res ψ⟩_H` 型の
+   Frobenius reciprocity を整係数で先に立てる必要 (~80-100 LOC).  これが (2.6.b) の
+   唯一かつ最大の前提 — **独立 sub-issue 化推奨**.
+
+2. **(2.8) `M(B) = H(B) ⋊ N_L(B)`**: `hIntersection B = ⨅ a ∈ B, hyp.H a` と
+   `N_L(B)` (B の L-set-stabilizer) を定義し disjointness を示す.
+   - disjointness の数学は容易: `x ∈ H(B) ∩ N_L(B) ⊆ H(a) ∩ L`; `commute_of_mem_H`
+     で `x ∈ C_L(a)`; `centralizer_disjoint` で `x = 1` (~20 LOC).
+   - 注意: `Subgroup.setNormalizer` は mathlib では `Subgroup.normalizer` の **alias で
+     subgroup 用** — Finset `B` の set-stabilizer には使えない.  `N_L(B)` は
+     conjugation による `L` の set-stabilizer を手書き subgroup (carrier + closure 証明)
+     として定義する必要があり、faithful な `N_L(B)` 構成自体が ~40-50 LOC.
+3. **(2.9) `α_B = α ∘ f_B`**: 商準同型 `f_B : M(B) →* L` (核 `H(B)`) を (2.8) の
+   semidirect 分解から構成し `α_B := α.comp f_B`.  `α ∈ ZIrr L ⟹ α_B ∈ ZIrr (M B)`
+   は (1) の `induce_mem_ZIrr` とは別に「ZIrr の準同型 pullback (Res along f_B)」が要る.
+4. **(2.10.1)-(2.10.3) + Möbius 相殺**: (2.10.3) の Ind 値公式 → `B` と `B∪{a}` の
+   項が `(2.10.2) C_{H(B)}(a)=H(B∪{a})` 経由でペア相殺、`B={a}` のみ残す.
+   `card_conj_fiber` (= 𝒜(g,H(a)a)=xC_G(a)) を再利用.  組合せ engine は
+   `Finset.sum_powerset_insert` + `Finset.sum_powerset_neg_one_pow_card_of_nonempty`.
+   最難、~150-200 LOC.
+5. **接続**: `dadeSumMap` を (2.10) 公式で定義 → `IsDadeMap` を (2.10.3) から証明 →
+   (2.6.a) は本セッションの `isDadeIsometry_of_isDadeMap` で自動 → (2.6.b) は (1)+(3)+
+   (4) → `FullDadeIsometryData` 完成.  `[Fintype {a // a ∈ A}]` は `[Fintype G]` から
+   `Fintype.ofFinite` で供給 (A は `Set G`).
+
+依存順: (1) induce_mem_ZIrr [独立] → (2)(3) → (4) → (5).  全体 ~400-500 LOC.

@@ -1216,6 +1216,71 @@ theorem adjoint_formula
         rw [mul_comm (⅟(Nat.card G : ℂ)) (⅟(Nat.card L : ℂ)), mul_assoc,
           ← mul_assoc (⅟(Nat.card G : ℂ)), invOf_mul_self, one_mul]
 
+omit [Fintype L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)] in
+/-- For a Dade map `τ` and `β : CF(L, A)`, the (2.7) averaging map applied to the
+class function `τ β` recovers `β` on `A`.
+
+Indeed `τ β` is constant equal to `β(a)` on the coset `aH(a)` (this is the (2.5)
+defining equation `IsDadeMap.map_eq_of_mem_hCoset`), so averaging it over `H(a)`
+gives back `β(a)`.  This is the computation behind Peterfalvi's remark, at the
+start of the proof of (2.6.a), that "`β^τ` is constant on `aH(a)`". -/
+theorem adjointAverageFun_dadeMap_eq
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (β : SupportedClassFunctions (G := G) ℂ A L) (a : {a : G // a ∈ A}) :
+    adjointAverageFun hyp (τ β) ⟨a.1, hyp.subset_L a.2⟩ =
+      (β : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ := by
+  classical
+  -- unfold the averaging map at `a`
+  simp only [adjointAverageFun]
+  rw [dif_pos a.2]
+  -- `τ β` is constant `= β(a)` on the coset `a · H(a)`
+  have hconst : ∀ x : ↥(hyp.H ⟨a.1, a.2⟩),
+      (τ β) (a.1 * (x : G)) = (β : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ := by
+    intro x
+    have hx : a.1 * (x : G) ∈ hyp.hCoset a := ⟨(x : G), x.2, rfl⟩
+    simpa using hτ.map_eq_of_mem_hCoset β a hx
+  have hHne : (Nat.card (hyp.H ⟨a.1, a.2⟩) : ℂ) ≠ 0 := by
+    have : 0 < Nat.card (hyp.H ⟨a.1, a.2⟩) := Nat.card_pos
+    exact_mod_cast this.ne'
+  rw [Finset.sum_congr rfl (fun x _ => hconst x), Finset.sum_const, Finset.card_univ,
+    ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc,
+    inv_mul_cancel₀ hHne, one_mul]
+
+/-- **Peterfalvi (2.6.a).**  Any map `τ` satisfying the (2.5) Dade-map equations
+(`IsDadeMap`) and the (2.4.a) `L`-equivariance of the subgroups `H(a)`
+(`HConjInvariant`) automatically preserves Peterfalvi's normalized inner product:
+
+    `(α^τ, β^τ)_G = (α, β)_L`    for all `α, β ∈ CF(L, A)`.
+
+This is the textbook proof of (2.6.a): since `β^τ` is constant on each coset
+`aH(a)`, the (2.7) adjoint formula with `χ = β^τ` and `ψ = β` reduces the
+`G`-inner product to the `L`-inner product `(α, β)_L`.  Together with
+`IsDadeMap` this upgrades a Dade map to a full `DadeIsometryData` without
+assuming the isometry property separately. -/
+theorem isDadeIsometry_of_isDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    IsDadeIsometry (k := ℂ) τ where
+  inner_eq α β :=
+    adjoint_formula hyp τ hτ hconj α (τ β) (β : ClassFunction L ℂ)
+      (fun a => (adjointAverageFun_dadeMap_eq hyp τ hτ β a).symm)
+
+/-- Bundle a Dade map satisfying the (2.5) equations into a `DadeIsometryData`,
+using `isDadeIsometry_of_isDadeMap` to supply the (2.6.a) isometry property. -/
+noncomputable def DadeIsometryData.ofIsDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    DadeIsometryData (G := G) (k := ℂ) hyp where
+  toDadeMap := τ
+  isDadeMap := hτ
+  isDadeIsometry := isDadeIsometry_of_isDadeMap hyp τ hτ hconj
+
+@[simp] theorem DadeIsometryData.ofIsDadeMap_toDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    (DadeIsometryData.ofIsDadeMap hyp τ hτ hconj).toDadeMap = τ :=
+  rfl
+
 end AdjointFormula
 
 end DadeMap
