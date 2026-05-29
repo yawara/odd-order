@@ -1,5 +1,5 @@
 ---
-id: 47
+id: 48
 slug: irr-conjclasses-count
 title: "RepTheory: |Irr G| = |ConjClasses G| (square character-table count)"
 created: 2026-05-29
