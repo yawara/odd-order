@@ -47,8 +47,8 @@ created: 2026-05-28
 - [x] sub-issue 0046: (6.8) `sibleySetup_is_coherent` statement + `IndChainDecomposition` consumer interface (proof 本体は別 issue)
 - [x] sub-issue: (7.4) family hypothesis + (7.5) main inequality (sorry-free, 2026-05-29)
 - [x] sub-issue: (7.6) `Hypothesis76` + (7.7.a/b) `χ^ρ` explicit formula + norm-square double sum (2026-05-29; (7.7.a) は `chiRho_decomp` 証明書フィールド, (7.7.b) は proved)
-- [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; **(7.8.a)/(7.8.b) 未** (`β = 1_G - ζ^ν + aΣ + Γ` 分解と `‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`)
-- [ ] sub-issue: (7.9) 2-family non-orthogonality
+- [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; **(7.8.a)/(7.8.b) 未** (`β = 1_G - ζ^ν + aΣ + Γ` 分解と `‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`) — 精密 spec + blocker は `notes/peterfalvi/s09_nonexistence_certain.md` 2026-05-30 節 (B: 整数射影 / `‖β‖²=e+1` / Burnside (1.5.d) / `nu↔coherence` 未組立; outright proof 不能のため証明書追加も見送り)
+- [ ] sub-issue: (7.9) 2-family non-orthogonality — 精密 spec + blocker は同ノート 2026-05-30 節 (最重 blocker = `Odd card ⇒ ¬IsReal χ` が repo 未実装, (5.9) nu 接続, disjoint-support inner=0 補題欠如)
 - [ ] sub-issue: (6.8) 本体 proof ((6.1)-(6.7), (5.2), (4.6) の積み上げ)
 - [ ] (7.10) 最終 assembly: (7.5)(7.8)(7.9)(6.8)+Thompson の連立 + 算術
 

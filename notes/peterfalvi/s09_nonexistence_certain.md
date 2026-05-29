@@ -110,4 +110,158 @@ theorem not_trivial_G0 (F) (hodd) (hG0 : F.G0 = {1}) : False  -- (7.11), 証明 
 
 ---
 
+## 2026-05-30 — (7.8.a)/(7.8.b)/(7.9) statement spec + blocker analysis (issue 0044)
+
+調査タスク: 「(7.8.a)/(7.8.b)/(7.9) を **sorry-free + faithful** に Lean 化する、不可能なら spec + plan を記録」。
+結論: **3 件とも現状 sorry-free では実装不能** (下記 blocker)。Lean には一切手を入れていない (revert 不要)。
+本節に精密ステートメント (repo の実型に合わせて検証済) と各々の証明計画・blocker を記録する。
+
+### 重要な前提: §9 の証明書 (certificate) パターン
+
+`S09_NonexistenceCertain.lean` の §9 は **「難所の pointwise 恒等式を構造体フィールドに hoist し、系のみ証明する」** 方式で書かれている (memory `scaffold-sorry-free-not-done` 参照):
+
+- (7.7.a) = `Hypothesis76.chiRho_decomp` フィールド
+- (7.8.c.i) = `Hypothesis78.chiRho_eq_inner_beta` フィールド
+- (7.7.b) `chiRho_norm_sq_double_sum` / (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul` のみ **outright proof**
+
+タスクの絶対ルールは「real mathematical content を hypothesis に hoist するな」。したがって
+(7.8.a/b)/(7.9) を **新たな証明書フィールドとして追加するのは不可** (= 偽の進捗、かつ既存の green proof が依存する
+`Hypothesis78` を肥大化させ回帰リスク)。**outright に証明できる場合のみ Lean に書く** べきだが、下記の通りどれも不能。
+
+### (7.8.a) — β 分解 (整数係数 a + 残余 Γ)
+
+教科書 (mmd L63-71): `S^ν ⊥ 1_G`、かつ整数 `a` と `Γ ⊥ S^ν ∪ {1_G}` が存在し
+`β = 1_G − ζ^ν + a·Σ_{φ∈S} (φ(1)/(e‖φ‖²))·φ^ν + Γ`。係数決定式 `a_φ‖φ‖² − (φ(1)/e)(a_ζ−1) = φ(1)/e`
+から全 `a_φ = a·φ(1)/(e‖φ‖²)`、`(β,ζ^ν) = a−1 ∈ ℤ`。
+
+精密ステートメント (repo 型検証済; `S = T \ {Ind 1_H}` を `i ≠ ind1H` で表現):
+
+```lean
+namespace Hypothesis78
+variable {G : Type*} [Group G] [Fintype G]
+variable {A : Set G} {L : Subgroup G} [Fintype L]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- **Peterfalvi (7.8.a)** 証明書 (構造体). `S^ν ⊥ 1_G`、整数 `a`・残余 `Γ` の存在 +
+分解恒等式。`e = ζ_{ind1H}(1)`. -/
+structure BetaDecomp (H78 : Hypothesis78 G A L) where
+  a : ℤ
+  Gamma : ClassFunction G ℂ
+  /-- `S^ν ⊥ 1_G`: 各 `ν(ζ_i)` (i ≠ ind1H) は `1_G` に直交. -/
+  nu_orth_one : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+      (OddOrder.RepresentationTheory.trivialClassFunction G) = 0
+  Gamma_orth_nu : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner Gamma (H78.nu (H78.hyp76.zeta i)) = 0
+  Gamma_orth_one : ClassFunction.inner Gamma
+    (OddOrder.RepresentationTheory.trivialClassFunction G) = 0
+  beta_eq : H78.beta =
+    OddOrder.RepresentationTheory.trivialClassFunction G
+    - H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+    + ((a : ℂ) • ∑ i ∈ Finset.univ.filter (· ≠ H78.ind1H),
+        (H78.hyp76.zeta i (1 : L) /
+          (H78.hyp76.zeta H78.ind1H (1 : L) *
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)))
+          • H78.nu (H78.hyp76.zeta i))
+    + Gamma
+
+theorem exists_betaDecomp (H78 : Hypothesis78 G A L) : Nonempty H78.BetaDecomp
+```
+
+**Blocker (7.8.a)**: 証明には (i) `β ∈ ZIrr G` (Dade 等距 `IsDadeIsometry` を `Ind 1_H − ζ ∈ ℤ[CF(L,A)]`
+に適用)、(ii) 正規直交集合 `{1_G} ∪ {φ^ν/‖φ‖}` への **整数係数直交射影**で `a ∈ ℤ`・`Γ` を抽出、が必要。
+(ii) は `ZIrr` 上の射影理論であり repo 未組立。さらに **`H78.nu` が `ZIrr(L) → ZIrr(G)` を保つ**事実
+(整数性に必須) が `Hypothesis78` のフィールドに無い (`nu_isometry` のみ)。`S^ν ⊥ 1_G` 自体は
+`nu_isometry` + `(2.7)` adjoint + `trivialClassFunction_isIrreducible` から導ける見込みだが、分解本体が射影理論待ち。
+
+### (7.8.b) — ノルム評価 `‖ζ^{νρ}‖² ≥ 1−e/h`, `‖Γ‖² ≤ e−1`
+
+教科書 (mmd L73-101): `e ≤ (h−1)/2` (= `2e+1 ≤ h`) の下で `‖ζ^{νρ}‖² = ua²−2va+w`
+(`u=(1/e)(1−1/h)`, `v=1/h`, `w=1−e/h`、(7.7.b) を `ζ_0∈S∖{ζ}, ζ_1=Ind1_H, ζ_2=ζ, χ=ζ^ν` で適用)。
+`2hv=2 ≤ (h−1)/e=hu ⇒ 0≤2v/u≤1 ⇒ ua²−2va≥0` (a∈ℤ) で下界 `w`。
+`‖Γ‖² = e−1−h(ua²−2va) ≤ e−1` は `‖β‖²=e+1` と (1.5.d) `Σ_{θ≠1}θ(1)²=h−1` から。
+
+精密ステートメント (実数化は `Complex.re`; `e,h` は `ℝ` cast):
+
+```lean
+/-- **Peterfalvi (7.8.b)** 下界. -/
+theorem zetaNu_chiRho_norm_sq_ge (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (h_e_le : 2 * Nat.card H78.hyp76.H ≤ ... ) :  -- 2e+1 ≤ h を H/L の card で
+    1 - (Nat.card H78.hyp76.H : ℝ)⁻¹ * ... ≤
+      (ClassFunction.inner
+        (H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+        (H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))).re
+
+/-- **Peterfalvi (7.8.b)** 上界 `‖Γ‖² ≤ e−1`. -/
+theorem Gamma_norm_sq_le (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (h_e_le : ...) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤ (Nat.card ... : ℝ) - 1
+```
+
+注: prior pass の `(β,χ)²` は誤り。repo の (7.8.c.ii) は `inner β χ * star (inner β χ)` 形。
+また `e = ζ_{ind1H}(1:L)` は `ℂ` 値なので `e ≤ (h−1)/2` は `Nat.card` ベース (`[L:H]=e`) で書くのが安全
+(`.re.toNat` は避ける)。`(ν ζ)^ρ` のノルムは `chiRhoCF` over `L` 上の `ClassFunction.inner`。
+
+**Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` を `Ind1_H−ζ` に適用 + `L` 上での
+`‖Ind1_H−ζ‖²=e+1` 計算 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
+`Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
+`|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
+の計算が必要で、これは (7.8.a) の `BetaDecomp` (係数 `a`) に依存する。よって (7.8.a) が先。算術 `ua²−2va≥0`
+自体は `ℚ`/`ℝ` で容易だが、`u,v,w`・`‖β‖²` を構造から導く層が未組立。
+
+### (7.9) — 2 族の非直交性
+
+教科書 (mmd L107-113): `β_i=1_G−ζ_i^{ν_i}+Δ_i`。(5.9) で `Δ_i` 実、(7.8.a) で `(Δ_i,1_G)=0`、
+(1.1)+`G` 奇位数で `(Δ_1,Δ_2)=Σ_χ(Δ_1,χ)(Δ_2,χ)` 偶、`A_1^{τ_1}∩A_2^{τ_2}=∅` で `(β_1,β_2)=0`、
+(4.1) で `(ζ_1^{ν_1},ζ_2^{ν_2})=0`。展開
+`0=(β_1,β_2)=1−(ζ_1^{ν_1},Δ_2)−(ζ_2^{ν_2},Δ_1)+(Δ_1,Δ_2)` ⇒ 和 ≡1 (mod 2) ⇒ 少なくとも一方≠0。
+
+精密ステートメント (2 つの `Hypothesis78` + dadeSupport 互いに素):
+
+```lean
+theorem non_orthogonality_two_families
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hodd : Odd (Nat.card G))
+    {A₁ A₂ : Set G} {L₁ L₂ : Subgroup G} [Fintype L₁] [Fintype L₂]
+    [Invertible (Nat.card L₁ : ℂ)] [Invertible (Nat.card L₂ : ℂ)]
+    (H78₁ : Hypothesis78 G A₁ L₁) (H78₂ : Hypothesis78 G A₂ L₂)
+    (hBD₁ : H78₁.BetaDecomp) (hBD₂ : H78₂.BetaDecomp)
+    (hDisjoint : Disjoint H78₁.hyp76.hyp71.hyp.dadeSupport
+                          H78₂.hyp76.hyp71.hyp.dadeSupport) :
+    ClassFunction.inner H78₁.beta (H78₂.nu (H78₂.hyp76.zeta H78₂.zetaDistinct)) ≠ 0 ∨
+    ClassFunction.inner H78₂.beta (H78₁.nu (H78₁.hyp76.zeta H78₁.zetaDistinct)) ≠ 0
+```
+
+**Blocker (7.9)** (最重・多数):
+1. **奇位数 ⇒ 非自明既約は実でない** — (1.1) parity の核。`IsReal.lean` は `IsReal`/`conj` 基盤と
+   `trivialClassFunction_isReal` のみで、**`Odd (Nat.card G) → χ≠1 → ¬IsReal χ` の定理は repo に存在しない**
+   (grep 確認済)。これ無しに `(Δ_1,Δ_2)` 偶が言えない。
+2. **(5.9) realness 接続** — `S07_Coherence.lean` の `CharacterDifferenceImage`
+   (`τ(χ−χ.conj)=signedDifference`) を `H78.nu` 経由で適用する橋が無い (`H78.nu` ↔ `IsCoherent.extension`
+   未接続 = Blocker B1)。これで `Δ_i` 実 (`Δ_i=Δ̄_i`) を得る。
+3. **互いに素 support ⇒ inner=0** — 汎用補題が無い (`difference_images_inner_eq_zero_of_inner_pair` は別形・
+   仮定付き)。`f.support⊆S₁, g.support⊆S₂, S₁∩S₂=∅ ⇒ ⟨f,g⟩=0` を `inner_eq_inv_card_mul_innerSum` から要証明。
+4. **(4.1) `nu` 像の support** — `(ν ζ_i).support ⊆ dadeSupport_i` が `Hypothesis78` のフィールドに無い。
+5. **(7.8.a) 依存** — `BetaDecomp` (`Δ_i` の存在、`(Δ_i,1_G)=0`) が前提。
+
+### 優先順位と次の一手 (plan)
+
+1. **基盤 B3 (奇位数⇒非実)**: `IsReal.lean` に `theorem not_isReal_of_odd_card_of_ne_one` を証明する
+   (写像 `g↦g²` が奇位数群で全単射 ⇒ Frobenius-Schur 指標 `ν₂(χ)=|G|⁻¹Σχ(g²)=0` for χ≠1)。
+   これは (7.9) のみならず §3 (1.1) や 0022/0027 系の共通 unblocker。**最高価値の独立基盤**。
+2. **B-disjoint-support**: `ClassFunction.inner_eq_zero_of_disjoint_support` を `inner_eq_inv_card_mul_innerSum`
+   から証明 (elementary、1 定理)。
+3. **Burnside (1.5.d)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を named lemma 化 (第二直交関係 / `g=1` 評価)。
+4. **B1 (nu ↔ coherence)**: `Hypothesis78` に 3 フィールド追加を検討 — `nu_maps_ZIrr`, `nu_conj`
+   (共役保存), `nu_supp` (像の support ⊆ dadeSupport)。**ただしこれは証明書追加であり、追加するなら
+   それらが `IsCoherent.extension` から構成可能であることを別途示す責務が伴う** (memory
+   `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
+5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
+
+**現時点の判定**: 1-4 が未組立のため、(7.8.a/b)/(7.9) のいずれも outright sorry-free 化は不能。
+証明書フィールド方式での「sorry-free」化はルール上の偽進捗 + 回帰リスクのため見送り。本 spec を実装の青写真とする。
+
+---
+
 *訂正版 作成: 2026-05-27 (原典 `04.9` 162 行 精読 + scaffold 実装に基づく). 旧版 2026-05-22 は App.C 混同のため破棄.*
+*(7.8.a/b)/(7.9) spec + blocker 追記: 2026-05-30 (issue 0044, mmd L63-113 精読 + repo 型検証).*
