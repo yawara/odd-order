@@ -15,6 +15,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
+import OddOrder.BG.AppB_PuigB3B4
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -593,3 +594,6 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppB.lOddIn_ne_bot
 -- B.2 L(G) ⊆ H ⇒ L(H) = L(G).
 #assert_only_allowed_axioms OddOrder.BG.AppB.lOddIn_eq_of_lOddIn_le
+-- B.3 (issue 2001): p odd solvable, O_{p'}(G)=1, S∈Syl_p, T=O_p ⇒ L_*(S)⊆L_*(T)⊆L(T)⊆L(S).
+-- 相対 B.1(f) + thmA5_part2 を消費する最初の結果.
+#assert_only_allowed_axioms OddOrder.BG.AppB.b3_chain
