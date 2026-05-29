@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial

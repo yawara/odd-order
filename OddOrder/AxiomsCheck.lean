@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Lean
 import OddOrder.GroupTheory.ChermakDelgado
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -547,3 +548,11 @@ set_option linter.style.longLine false in
 -- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Cor 3.25): A-invariant p-subgroup ⊆ A-invariant Sylow ⭐
 -- Tier 1 最後の残課題. 極大化 + 3.23(a) + Normalizer-grow-in-p-groups で完成 (2026-05-24).
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow
+
+-- RepresentationTheory (Peterfalvi §3 root-bridge): the first orthogonality relation is
+-- unconditional (discharges the row-orthogonality hypothesis of SecondOrthogonality.lean).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.characterTableRowOrthogonality_holds
+-- RepresentationTheory: `|Irr G| ≤ |ConjClasses G|` (orthonormality ⇒ linear independence).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
+-- RepresentationTheory: there are finitely many irreducible characters of a finite group.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
