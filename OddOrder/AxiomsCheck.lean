@@ -597,3 +597,7 @@ set_option linter.style.longLine false in
 -- B.3 (issue 2001): p odd solvable, O_{p'}(G)=1, S∈Syl_p, T=O_p ⇒ L_*(S)⊆L_*(T)⊆L(T)⊆L(S).
 -- 相対 B.1(f) + thmA5_part2 を消費する最初の結果.
 #assert_only_allowed_axioms OddOrder.BG.AppB.b3_chain
+-- B.4(b) Step2 (issue 2001): Z(L(S)) ⊆ Z(L(T)) (keystone bridge + B.3 + 相対 B.1(f)).
+#assert_only_allowed_axioms OddOrder.BG.AppB.zCenterLOdd_sylow_le_zCenterLOdd_opCore
+-- B.4(b) 基盤: L-operator の normalizer 同変性 N_G(H) ⊆ N_G(L(H)) (共役同変, transport 回避).
+#assert_only_allowed_axioms OddOrder.BG.AppB.normalizer_le_normalizer_lOddIn
