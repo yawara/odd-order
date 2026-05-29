@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Lean
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -557,6 +558,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
+-- (regular representation + Maschke + Schur).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
+-- RepresentationTheory: `|Irr G| = |ConjClasses G|` (completeness ⇒ the reverse inequality).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_eq
+-- RepresentationTheory: the irreducible characters span the class functions.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.span_irreducibleCharacter_eq_top
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

@@ -377,4 +377,89 @@ theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
 
 end Completeness
 
+section Count
+
+variable {G : Type*} [Group G]
+
+open Module (finrank)
+
+/-- The linear functional "inner product against the irreducible characters", as a single
+`ℂ`-linear map `ClassFunction G ℂ →ₗ[ℂ] (IrreducibleCharacter G → ℂ)`, `f ↦ (χ ↦ (f, χ))`.
+`ClassFunction.inner` is `ℂ`-linear in its first argument, so this is well-defined; completeness
+(`classFunction_eq_zero_of_orthogonal`) says it is injective. -/
+noncomputable def innerAgainstIrreducibleCharacters [Fintype G] [Invertible (Nat.card G : ℂ)] :
+    ClassFunction G ℂ →ₗ[ℂ] (IrreducibleCharacter G → ℂ) where
+  toFun f χ := ClassFunction.inner f (χ : ClassFunction G ℂ)
+  map_add' f₁ f₂ := by funext χ; exact ClassFunction.inner_add_left f₁ f₂ _
+  map_smul' c f := by
+    funext χ
+    simpa using ClassFunction.inner_smul_left c f (χ : ClassFunction G ℂ)
+
+/-- **`|Irr G| = |ConjClasses G|`** (Isaacs Thm 2.8 / Thm 6.10 count): the number of irreducible
+complex characters of a finite group equals the number of conjugacy classes.
+
+The `≤` direction is `card_irreducibleCharacter_le` (linear independence). For `≥`, completeness
+(`classFunction_eq_zero_of_orthogonal`) makes the inner-product map
+`innerAgainstIrreducibleCharacters : ClassFunction G ℂ →ₗ (IrreducibleCharacter G → ℂ)` injective,
+whence `|ConjClasses G| = finrank ℂ (ClassFunction G ℂ) ≤ finrank ℂ (Irr G → ℂ) = |Irr G|`. -/
+theorem card_irreducibleCharacter_eq [Finite G] :
+    Nat.card (IrreducibleCharacter G) = Nat.card (ConjClasses G) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI := finite_irreducibleCharacter (G := G)
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  refine le_antisymm (card_irreducibleCharacter_le (G := G)) ?_
+  -- The inner-product map against the irreducible characters is injective by completeness.
+  have hinj : Function.Injective (innerAgainstIrreducibleCharacters (G := G)) := by
+    rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+    intro f hf
+    refine classFunction_eq_zero_of_orthogonal f fun χ => ?_
+    exact congrFun hf χ
+  -- Injectivity bounds the dimension of the class functions by `|Irr G|`.
+  have hfr : finrank ℂ (ClassFunction G ℂ) ≤ finrank ℂ (IrreducibleCharacter G → ℂ) :=
+    LinearMap.finrank_le_finrank_of_injective hinj
+  rw [finrank_classFunction (G := G), Module.finrank_fintype_fun_eq_card,
+    ← Nat.card_eq_fintype_card (α := IrreducibleCharacter G)] at hfr
+  exact hfr
+
+/-- **The irreducible characters span the space of class functions.** Equivalently, every class
+function is a `ℂ`-linear combination of irreducible characters (Isaacs Thm 2.8). Combines linear
+independence (`linearIndependent_irreducibleCharacter`) with the count
+`card_irreducibleCharacter_eq` and `finrank_classFunction`. -/
+theorem span_irreducibleCharacter_eq_top [Finite G] :
+    Submodule.span ℂ (Set.range (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)))
+      = ⊤ := by
+  haveI := finite_irreducibleCharacter (G := G)
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  haveI : Nonempty (IrreducibleCharacter G) := ⟨trivialIrreducibleCharacter G⟩
+  refine LinearIndependent.span_eq_top_of_card_eq_finrank
+    (linearIndependent_irreducibleCharacter (G := G)) ?_
+  rw [finrank_classFunction (G := G), ← Nat.card_eq_fintype_card, card_irreducibleCharacter_eq]
+
+end Count
+
+section TableIndexing
+
+open scoped Classical in
+/-- **Hypothesis-free character-table indexing data** for a finite group, built from the count
+`card_irreducibleCharacter_eq`. This discharges the cardinality input of
+`CharacterTableIndexing.ofFinite`, so downstream column-orthogonality results (which take a
+`CharacterTableIndexing G`) apply to any `[Finite G]`. -/
+noncomputable def CharacterTableIndexing.ofFinite' (G : Type*) [Group G] [Finite G] :
+    CharacterTableIndexing G := by
+  haveI := finite_irreducibleCharacter (G := G)
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  refine CharacterTableIndexing.ofFinite (G := G) ?_
+  letI : Fintype (ConjClasses G) := conjClassesFintypeOfFinite G
+  rw [← Nat.card_eq_fintype_card (α := IrreducibleCharacter G),
+    ← Nat.card_eq_fintype_card (α := ConjClasses G), card_irreducibleCharacter_eq]
+
+/-- A finite group canonically carries character-table indexing data. -/
+noncomputable instance instCharacterTableIndexingOfFinite {G : Type*} [Group G] [Finite G] :
+    CharacterTableIndexing G :=
+  CharacterTableIndexing.ofFinite' G
+
+end TableIndexing
+
 end OddOrder.RepresentationTheory

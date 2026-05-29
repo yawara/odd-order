@@ -69,8 +69,21 @@ group-algebra center の class-sums 基底 / 指標↔単純加群の数え上�
       合成は **直接 `inferInstance` で失敗**(同 diamond)→ `isSemisimpleRepresentation_iff_isSemisimpleModule_asModule reg |>.mp inferInstance` で得る
       (Maschke `IsSemisimpleRepresentation` instance, 要 `[Finite G]`+`NeZero`)+ 宣言全体に
       `set_option backward.isDefEq.respectTransparency false`; (3) `reg` は `let`(not `set`)。
-- [ ] **span = ⊤** / **count** (`Nat.card Irr = #ConjClasses`) / `CharacterTableIndexing.ofFinite`
-      (count を `hcard` に供給するだけ。既存 def)。
+- [x] **span = ⊤** / **count** (`Nat.card Irr = #ConjClasses`) / `CharacterTableIndexing.ofFinite`
+      — **landed (sorry-free, axiom-checked) 2026-05-30** (CharacterCompleteness.lean, section
+      `Count` + `TableIndexing`)。count は completeness の解析的コアから直接導出: 内積写像
+      `innerAgainstIrreducibleCharacters : ClassFunction G ℂ →ₗ[ℂ] (Irr G → ℂ)`, `f ↦ (χ ↦ (f,χ))`
+      は `inner` が第 1 引数線形 (`inner_add_left`/`inner_smul_left`) なので well-defined。
+      `classFunction_eq_zero_of_orthogonal` で **単射** ⇒
+      `#ConjClasses = finrank (ClassFunction) ≤ finrank (Irr→ℂ) = #Irr`
+      (`LinearMap.finrank_le_finrank_of_injective` + `finrank_classFunction` +
+      `Module.finrank_fintype_fun_eq_card`)。`≤` は `card_irreducibleCharacter_le` で
+      `le_antisymm`。span=⊤ は count=finrank + 線形独立 + `[Nonempty]` (= `trivialIrreducibleCharacter`)
+      ⇒ `LinearIndependent.span_eq_top_of_card_eq_finrank`。`CharacterTableIndexing.ofFinite'`
+      (G) `[Finite G]` は `ofFinite` の `hcard` を count で供給。`instCharacterTableIndexingOfFinite`
+      も追加 (無条件 instance)。AxiomsCheck に
+      `classFunction_eq_zero_of_orthogonal` / `card_irreducibleCharacter_eq` /
+      `span_irreducibleCharacter_eq_top` を追加 (all 3-axiom allowlist)。
 - [ ] 0027: `column_orthogonality_cases_ofRowOrthogonality (ofFinite count) characterTableRowOrthogonality_holds`
       で無条件化 (downstream の新定理; upstream の sorry は無し) → close。
 - [ ] 0022: 加えて複素共役置換 σ → close。
