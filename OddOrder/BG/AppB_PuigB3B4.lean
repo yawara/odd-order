@@ -110,4 +110,62 @@ theorem b3_chain [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
       hk4 K (le_trans (le_max_right _ _) (le_max_right _ _))]
     exact hTS
 
+/-! ### Theorem B.4(b): `O_{p'}(G)=1 ⇒ Z(L(S)) ⊴ G` (= Thm 6.2 代替, mmd L4686-4762) -/
+
+/-- `Z(L(H))` を `G` の部分群として実現: `L(H)` の中心を subtype で `G` に落とす. -/
+def zCenterLOdd (H : Subgroup G) : Subgroup G :=
+  (Subgroup.center (lOddIn H : Subgroup G)).map (lOddIn H).subtype
+
+/-- `Z(L(H)) ⊆ L(H)`. -/
+theorem zCenterLOdd_le_lOddIn (H : Subgroup G) : zCenterLOdd H ≤ (lOddIn H : Subgroup G) :=
+  Subgroup.map_subtype_le _
+
+/-- **keystone bridge**: `Z(L(H)) = C_G(L(H)) ⊓ L(H)` (中心を `G`-中心化群の交わりで表す). -/
+theorem zCenterLOdd_eq_centralizer_inf (H : Subgroup G) :
+    zCenterLOdd H = Subgroup.centralizer (lOddIn H : Set G) ⊓ (lOddIn H : Subgroup G) := by
+  refine le_antisymm (le_inf ?_ (zCenterLOdd_le_lOddIn H)) ?_
+  · rintro g hg
+    obtain ⟨z, hz_center, rfl⟩ := Subgroup.mem_map.mp hg
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hw := Subgroup.mem_center_iff.mp hz_center ⟨h, hh⟩
+    have hco := congrArg (Subtype.val) hw
+    push_cast at hco
+    exact hco
+  · intro g hg
+    rw [Subgroup.mem_inf, Subgroup.mem_centralizer_iff] at hg
+    obtain ⟨hg_cent, hg_mem⟩ := hg
+    refine ⟨⟨g, hg_mem⟩, ?_, rfl⟩
+    rw [SetLike.mem_coe, Subgroup.mem_center_iff]
+    intro w
+    apply Subtype.ext
+    push_cast
+    exact hg_cent (w : G) w.2
+
+/-- **BG Theorem B.4(b) Step 2** (mmd L4707-4719): `Z(L(S)) ⊆ Z(L(T))` (`T = O_p(G)`).
+`Z(L(S))` は `S` 内で `L(S) ⊇ L_*(S)` を中心化 ⇒ 相対 B.1(f) で `L_*(S)` に入り,
+B.3 で `L_*(S) ⊆ L_*(T) ⊆ L(T)`; かつ `L(T) ⊆ L(S)` ゆえ `L(T)` も中心化. -/
+theorem zCenterLOdd_sylow_le_zCenterLOdd_opCore [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
+    zCenterLOdd (S : Subgroup G) ≤ zCenterLOdd (opCore p G) := by
+  obtain ⟨hSS, hST, hTS⟩ := b3_chain hp_odd hsolv hodd hOp' S
+  have hZ_cent_LS : zCenterLOdd (S : Subgroup G)
+      ≤ Subgroup.centralizer (lOddIn (S : Subgroup G) : Set G) := by
+    rw [zCenterLOdd_eq_centralizer_inf]; exact inf_le_left
+  have hZ_le_S : zCenterLOdd (S : Subgroup G) ≤ (S : Subgroup G) :=
+    (zCenterLOdd_le_lOddIn (S : Subgroup G)).trans (lOddIn_le_self (S : Subgroup G))
+  have hZ_cent_LstarS : zCenterLOdd (S : Subgroup G)
+      ≤ Subgroup.centralizer (lStarIn (S : Subgroup G) : Set G) :=
+    hZ_cent_LS.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr (lStarIn_le_lOddIn _)))
+  have hZ_le_LstarS : zCenterLOdd (S : Subgroup G) ≤ lStarIn (S : Subgroup G) :=
+    (le_inf hZ_cent_LstarS hZ_le_S).trans (centralizer_lStarIn_inf_le S.isPGroup')
+  have hZ_le_LT : zCenterLOdd (S : Subgroup G) ≤ lOddIn (opCore p G) :=
+    (hZ_le_LstarS.trans hSS).trans hST
+  have hZ_cent_LT : zCenterLOdd (S : Subgroup G)
+      ≤ Subgroup.centralizer (lOddIn (opCore p G) : Set G) :=
+    hZ_cent_LS.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hTS))
+  rw [zCenterLOdd_eq_centralizer_inf (opCore p G)]
+  exact le_inf hZ_cent_LT hZ_le_LT
+
 end OddOrder.BG.AppB

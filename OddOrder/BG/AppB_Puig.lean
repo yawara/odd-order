@@ -251,6 +251,12 @@ theorem lNIn_one (H : Subgroup G) : lNIn H 1 = H := by
     exact le_lRelIn (Subgroup.zpowers_isMulCommutative x) (Subgroup.zpowers_le.mpr hx) bot_le
   exact hle (Subgroup.mem_zpowers x)
 
+/-- `L(H) ⊆ H` (odd-indexed limit は `L_1(H) = H` 以下). B.4 で `Z(L(S)) ≤ S` 等に使う. -/
+theorem lOddIn_le_self (H : Subgroup G) : lOddIn H ≤ H := by
+  have h : lOddIn H ≤ lNIn H (2 * 0 + 1) := iInf_le _ 0
+  have e : lNIn H (2 * 0 + 1) = H := lNIn_one H
+  exact h.trans_eq e
+
 /-- **BG Lemma B.1(e) 一般化**: `A` abelian で `A ≤ H` かつ `H ≤ N_G(A)` (= `A` が `H` で正規化される)
 なら, すべての `i > 0` で `A ⊆ L_i(H)`. 相対 B.1(f) / B.3 で `A` が `H`-正規 (G-正規でない) の場合に使う. -/
 theorem abelian_le_lNIn {A H : Subgroup G} (hcomm : IsMulCommutative ↥A) (hAH : A ≤ H)
