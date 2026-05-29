@@ -70,8 +70,9 @@ A.5 → B.4 → Thm 6.2 の本線。証明本体 = Gorenstein 6.5.3 を A.3 で�
 - [x] **(c) `thmA4c`** — ✅ **2026-05-29 完成 (sorry-free, axiom-clean)**。`stabilityLiftAux` +
   `stability_perFactor` (PSTAB rep-theory core) を含む全証明が標準 3 公理のみに依存
   (`AxiomsCheck.lean` で `thmA4a`/`thmA4c` を CI ガード)。詳細は末尾「PSTAB 完成」節。
-- [ ] **(b) `thmA4b`** (= Thm 6.1): normal abelian ≤ `O_{p',p}`. §6 reduced-case
-  (`S06_Additional`) との関係を確認 (一般形は未実装)。
+- [x] **(b) `thmA4b`** (= Thm 6.1) — ✅ **2026-05-29 完成 (sorry-free, axiom-clean)**。
+  normal abelian ≤ `O_{p',p}` (= `Ch03.oPiPrimePiCore {p} G`)。Gorenstein 5.2 直接ルート
+  (商 `Ḡ=G/O_{p'}` + `stabilityLiftAux`@`K=O_p(Ḡ)`)。末尾「A.4(b) 完成」節参照。
 - [ ] notes/bg/appA_pstability.md の A.4 節を更新。
 
 ## 投資調査メモ (2026-05-29)
@@ -284,10 +285,30 @@ A.4(c) は sorry-free**。
 **スコープ感**: chief-factor-as-representation 構築 + base change の専用セッション向き
 (~250-400 行新規)。HALL 部品は全て再利用可能な形で完成済。
 
-### A.4(b) (`thmA4b`) は未着手
+## A.4(b) 完成 (2026-05-29) — `thmA4b` を sorry-free 化
 
-Gorenstein 5.3 直後 Remark より A.4(b) は A.4(c) の系 (Sylow + abelian normal ⇒ [P,A,A]=1)。
-`stability_perFactor` 完成 → `thmA4c` sorry-free 後に短く組める見込み。
+`thmA4b` を `AppA_PStability.lean` に追加。**Gorenstein の Remark (A.4(c) の系) は採らず**
+(その "By the theorem A⊆P" が `AC_G(P)/C_G(P) ⊆ O_p(N/C)` から `A⊆P` への重い推論
+(Frattini + `P=Q∩O_{p',p}◁Q` + self-centralizing) を隠すため)、**Gorenstein 5.2 自身の
+直接証明**を翻訳:
+
+`N := O_{p'}(G)`, `Ḡ := G/N`。`Ḡ` で `O_{p'}=⊥` (`oPiCore_quotient_self_eq_bot`)。
+`R̄ := O_p(Ḡ)`, `Ā := A` の像。`Ā` abelian p-群 ∧ `R̄ ≤ P̄ ≤ N_Ḡ(Ā)` ⇒
+`⁅R̄,Ā,Ā⁆ ≤ ⁅Ā,Ā⁆ = ⊥`。**`stabilityLiftAux` を `K:=R̄=O_p(Ḡ)` で再利用** (= 5.2 ≈
+per-chief-factor p-stability) ⇒ `Ā·C_Ḡ(R̄)/C_Ḡ(R̄) ⊆ O_p(Ḡ/C_Ḡ(R̄))`。Hall-Higman
+(`hall_higman_solvable_specialization`, S01) で `C_Ḡ(R̄) ⊆ R̄` ⇒ p-群 ⇒ comap pull-back
+で `Ā ⊆ R̄` ⇒ `A ⊆ O_{p',p}(G)` (`oPiPrimePiCore {p} G` が defeq `comap(mk' N)(O_p(Ḡ))`)。
+
+- ターゲットは標準 `Ch03.oPiPrimePiCore {p} G` (O_{p'}下層/O_p上層)。`Ch07.opPpPrimeCore` は別物。
+- `AxiomsCheck.lean` で `thmA4a`/`thmA4b`/`thmA4c` 全て axiom-clean を CI ガード。
+- 投資調査は `appA-to-thm62-investigation` workflow (5 agent) のプランに基づく。
+
+## 残: BG Thm 6.1 一般形の §6 hookup
+
+`S06_Additional.lean` の Thm 6.1 表記 (「一般形 TODO」) は `AppA.thmA4b` で供給可能になった
+(任意 abelian normal ≤ `O_{p',p}`)。§6 entrypoint への hookup は後続。次の本線は **A.5
+`thmA5`** (workflow プラン: Prop 1.10 coprime-nilpotent が唯一の新規ブロッカー) → App.B Puig L(S)
+→ Thm 6.2 一般形 (= `Z(L(S))·O_{p'}◁G`、literal `Z(J(S))` は Glauberman Z(J) 不在で到達不能)。
 
 ## 完了条件
 
