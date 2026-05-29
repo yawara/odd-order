@@ -1337,6 +1337,17 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       exact h_2_dvd_HN.trans (h_HN_dvd_H.trans h_H_dvd_G)
   exact hodd.not_two_dvd_nat h_two_dvd
 
+/-- **BG Theorem A.4(a)** (mmd L4480, = Gorenstein Ch.6 §5 の特殊形): `p` odd, `G` 有限・
+奇数位数で `O_p(G) = 1` (非自明な正規 `p`-部分群が無い) なら `G` は `p`-stable.
+
+A.3 (`thmA3`) の対偶。`thmA3` が `¬IsPStable ∧ O_p(G)=1 ⇒ ¬Odd|G|` を与えるので,
+`Odd|G|` のもとで `O_p(G)=1` なら `IsPStable`。BG の標準仮定「`G` solvable」は (a) には不要. -/
+theorem thmA4a [Finite G] (hp_odd : p ≠ 2) (hodd : Odd (Nat.card G))
+    (h_Op_trivial : OddOrder.Isaacs.Ch01.opCore p G = ⊥) :
+    IsPStable p G := by
+  by_contra h_not
+  exact thmA3 hp_odd h_Op_trivial h_not hodd
+
 end PStability
 
 end OddOrder.BG.AppA
