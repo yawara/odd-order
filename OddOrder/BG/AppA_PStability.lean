@@ -11,9 +11,11 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.RepresentationTheory.Subrepresentation
 import Mathlib.Order.OrderIsoNat
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
+import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 
 /-!
@@ -1348,6 +1350,90 @@ theorem thmA4a [Finite G] (hp_odd : p ≠ 2) (hodd : Odd (Nat.card G))
   by_contra h_not
   exact thmA3 hp_odd h_Op_trivial h_not hodd
 
+/-- `C_G(P)` を `N_G(P)` に制限したものは, `P` を `↥N_G(P)` の部分群 `P.subgroupOf N` と
+見たときの `↥N_G(P)` 内 centralizer に一致する. `thmA4c` を `stabilityLiftAux`
+(商 `M / C_M(K)` 形) に instantiate するときの橋渡し. -/
+private theorem centralizer_subgroupOf_normalizer_eq {G : Type*} [Group G] (P : Subgroup G) :
+    (Subgroup.centralizer (P : Set G)).subgroupOf (Subgroup.normalizer (P : Set G)) =
+      Subgroup.centralizer
+        ((P.subgroupOf (Subgroup.normalizer (P : Set G)) :
+          Subgroup ↥(Subgroup.normalizer (P : Set G))) : Set _) := by
+  have hP_le_N : P ≤ Subgroup.normalizer (P : Set G) := Subgroup.le_normalizer
+  ext n
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h m hm
+    have hmP : (m : G) ∈ P := by
+      have := hm; rwa [SetLike.mem_coe, Subgroup.mem_subgroupOf] at this
+    exact Subtype.ext (h (m : G) hmP)
+  · intro h x hx
+    have hxN : x ∈ Subgroup.normalizer (P : Set G) := hP_le_N hx
+    have hmem : (⟨x, hxN⟩ : ↥(Subgroup.normalizer (P : Set G))) ∈
+        (P.subgroupOf (Subgroup.normalizer (P : Set G)) : Set _) := by
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hx
+    exact congrArg Subtype.val (h ⟨x, hxN⟩ hmem)
+
+open OddOrder.GroupTheory in
+/-- **Stability lift, abstract form** (= Gorenstein 6.5.3 本体, normalizer 化を剥がした版):
+`M` 有限可解奇数位数, `p` odd, `K ◁ M` を正規 `p`-部分群, `A ≤ M` を `p`-部分群で
+`[K, A, A] = 1`. このとき `A` の `M / C_M(K)` での像は `O_p(M / C_M(K))` に含まれる.
+
+`thmA4c` は本補題を `M := ↥N_G(P)`, `K := P.subgroupOf N` に instantiate して得る
+(`C_M(K) = C_G(P).subgroupOf N`).
+
+**証明骨格 (Gorenstein 6.5.3, mmd L4796)**: `Pᵢ := chiefSeriesInside K`,
+`H := ⨅ᵢ C_M(Pᵢ/Pᵢ₊₁)`. (1) `C_M(K) ≤ H` (K を centralize ⇒ 各 factor も).
+(2) `A ≤ H` — 各 chief factor で p-stability (`thmA4a`) + quadratic (`[K,A,A]=1`) ⇒
+`A` は factor を centralize [= `stability_le_chiefFactorCentralizer`]. (3) `H/C_M(K)` は
+`p`-群 — `H/C` は `Aut K` の chain-stabilizer, coprime stability で p'-元は自明
+[= `chiefSeries_stabilizer_isPGroup`]. (4) `H ◁ M` かつ `H/C` p-群 ⇒
+`H/C ⊆ O_p(M/C)` (`normal_pgroup_le_opCore`), `A ≤ H` で結論. -/
+private theorem stabilityLiftAux
+    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    (hp_odd : p ≠ 2) (hodd : Odd (Nat.card M))
+    {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
+    {A : Subgroup M} (hA_p : IsPGroup p A)
+    (hKAA : ⁅⁅K, A⁆, A⁆ = (⊥ : Subgroup M))
+    {C₀ : Subgroup M} [C₀.Normal] (hC₀ : C₀ = Subgroup.centralizer (K : Set M)) :
+    A.map (QuotientGroup.mk' C₀) ≤ OddOrder.Isaacs.Ch01.opCore p (M ⧸ C₀) := by
+  subst hC₀
+  classical
+  haveI hCnorm : (Subgroup.centralizer (K : Set M)).Normal := inferInstance
+  -- `H := ⨅ᵢ C_M(Pᵢ/Pᵢ₊₁)`, intersection of chief-factor centralizers of the N-chief series of K.
+  set H : Subgroup M :=
+    ⨅ i : ℕ, chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))
+    with hH
+  -- (1) `C_M(K) ≤ H`: the centralizer of all of `K` centralizes every chief factor.
+  have hC_le_H : Subgroup.centralizer (K : Set M) ≤ H := by
+    rw [hH]
+    refine le_iInf (fun i => ?_)
+    rw [chiefFactorCentralizer.le_iff_commutator_le]
+    refine le_trans ?_ (bot_le : (⊥ : Subgroup M) ≤ _)
+    rw [Subgroup.commutator_le]
+    intro u hu c hc
+    have huK : u ∈ K := chiefSeriesInside_le K i hu
+    have hcomm : u * c = c * u := Subgroup.mem_centralizer_iff.mp hc u huK
+    rw [Subgroup.mem_bot]
+    exact commutatorElement_eq_one_iff_mul_comm.mpr hcomm
+  -- (2) `A ≤ H`: the per-chief-factor p-stability argument (Gorenstein 6.5.3 steps 1-3).
+  have hA_le_H : A ≤ H := by
+    sorry
+  -- (3) `H ◁ M`.
+  haveI hHnorm : H.Normal := by
+    rw [hH]; exact Subgroup.normal_iInf_normal (fun _ => inferInstance)
+  -- (4) `H / C_M(K)` is a p-group (Gorenstein 6.5.3 steps 4-5, coprime stability).
+  have hHmap_pgroup :
+      IsPGroup p (H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))) := by
+    sorry
+  haveI hHmap_norm :
+      (H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))).Normal :=
+    hHnorm.map _ (QuotientGroup.mk'_surjective _)
+  calc A.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))
+      ≤ H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M))) :=
+        Subgroup.map_mono hA_le_H
+    _ ≤ OddOrder.Isaacs.Ch01.opCore p (M ⧸ Subgroup.centralizer (K : Set M)) :=
+        OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hHmap_pgroup
+
 /-- **BG Theorem A.4(c)** (mmd L4480(c), = Gorenstein "condition (B)" / Thm 6.5.3 翻訳):
 `p` odd, `G` solvable odd order, `P` を `p`-部分群とする。`O_{p'}(G)·P ◁ G` かつ `A` が
 `N_G(P)` の `p`-部分群で `[P,A,A]=1` なら, `A` の `N_G(P)/C_G(P)` での像は
@@ -1357,19 +1443,44 @@ theorem thmA4a [Finite G] (hp_odd : p ≠ 2) (hodd : Odd (Nat.card G))
 involve しない」とき成立 (Gorenstein 6.5.3 proof 末尾)。奇数位数可解 `G` では全 section が
 `O_p=1` で p-stable (= `thmA4a` = `thmA3` 対偶) ⇒ condition (B)。詳細・step 分解は
 issue [#0047](../../issues/0047-bg-appa-a4.md) 「A.4(c) 作業計画」。 -/
-theorem thmA4c [Finite G] (_hp_odd : p ≠ 2) (_hsolv : IsSolvable G)
-    (_hodd : Odd (Nat.card G))
-    {P : Subgroup G} (_hP : IsPGroup p P)
+theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
+    (hodd : Odd (Nat.card G))
+    {P : Subgroup G} (hP : IsPGroup p P)
     (_hPnorm : (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G ⊔ P).Normal)
-    {A : Subgroup G} (_hA_le : A ≤ Subgroup.normalizer (P : Set G)) (_hA_p : IsPGroup p A)
-    (_hPAA : ⁅⁅P, A⁆, A⁆ = (⊥ : Subgroup G)) :
+    {A : Subgroup G} (hA_le : A ≤ Subgroup.normalizer (P : Set G)) (hA_p : IsPGroup p A)
+    (hPAA : ⁅⁅P, A⁆, A⁆ = (⊥ : Subgroup G)) :
     (A.subgroupOf (Subgroup.normalizer (P : Set G))).map
         (QuotientGroup.mk' ((Subgroup.centralizer (P : Set G)).subgroupOf
           (Subgroup.normalizer (P : Set G))))
       ≤ OddOrder.Isaacs.Ch01.opCore p
           (↥(Subgroup.normalizer (P : Set G)) ⧸
             (Subgroup.centralizer (P : Set G)).subgroupOf (Subgroup.normalizer (P : Set G))) := by
-  sorry
+  haveI : IsSolvable G := hsolv
+  have hP_le_N : P ≤ Subgroup.normalizer (P : Set G) := Subgroup.le_normalizer
+  -- `P.subgroupOf N`, `A.subgroupOf N` inherit the `p`-group property (`≃* P`, `≃* A`).
+  have hKp : IsPGroup p ↥(P.subgroupOf (Subgroup.normalizer (P : Set G))) :=
+    hP.of_injective (Subgroup.subgroupOfEquivOfLe hP_le_N).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hP_le_N).injective
+  have hAp' : IsPGroup p ↥(A.subgroupOf (Subgroup.normalizer (P : Set G))) :=
+    hA_p.of_injective (Subgroup.subgroupOfEquivOfLe hA_le).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hA_le).injective
+  -- Odd order descends along `N ≤ G` (a divisor of an odd number is odd).
+  have hcardN_dvd : Nat.card ↥(Subgroup.normalizer (P : Set G)) ∣ Nat.card G :=
+    (Subgroup.normalizer (P : Set G)).card_subgroup_dvd_card
+  have hoddN : Odd (Nat.card ↥(Subgroup.normalizer (P : Set G))) := by
+    rcases Nat.even_or_odd (Nat.card ↥(Subgroup.normalizer (P : Set G))) with hev | hod
+    · exact absurd (hev.two_dvd.trans hcardN_dvd) hodd.not_two_dvd_nat
+    · exact hod
+  -- `[K, A', A'] = 1` inside `↥N` (pull back along the injective `subtype`).
+  have hKAA' : ⁅⁅P.subgroupOf (Subgroup.normalizer (P : Set G)),
+        A.subgroupOf (Subgroup.normalizer (P : Set G))⁆,
+        A.subgroupOf (Subgroup.normalizer (P : Set G))⁆ = (⊥ : Subgroup _) := by
+    apply Subgroup.map_injective (Subgroup.subtype_injective (Subgroup.normalizer (P : Set G)))
+    simp only [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype, Subgroup.map_bot,
+      inf_eq_left.mpr hP_le_N, inf_eq_left.mpr hA_le]
+    exact hPAA
+  exact stabilityLiftAux (K := P.subgroupOf (Subgroup.normalizer (P : Set G)))
+    hp_odd hoddN hKp hAp' hKAA' (centralizer_subgroupOf_normalizer_eq P)
 
 end PStability
 
