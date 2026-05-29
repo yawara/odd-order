@@ -168,4 +168,50 @@ theorem zCenterLOdd_sylow_le_zCenterLOdd_opCore [Finite G] {p : ℕ} [Fact p.Pri
   rw [zCenterLOdd_eq_centralizer_inf (opCore p G)]
   exact le_inf hZ_cent_LT hZ_le_LT
 
+/-- `L(H)` は `H` を固定する `G`-自己同型 `φ` で不変 (`lNIn_map_equiv` を `⨅` に分配). -/
+theorem lOddIn_map_equiv (φ : G ≃* G) {H : Subgroup G} (hH : H.map φ.toMonoidHom = H) :
+    (lOddIn H).map φ.toMonoidHom = lOddIn H := by
+  change (⨅ n, lNIn H (2 * n + 1)).map φ.toMonoidHom = ⨅ n, lNIn H (2 * n + 1)
+  rw [Subgroup.map_iInf φ.toMonoidHom φ.injective]
+  exact iInf_congr fun n => lNIn_map_equiv φ hH (2 * n + 1)
+
+/-- `K.map (conj g) = K ↔ g ∈ N_G(K)` (共役写像が `K` を固定 ⇔ `g` が `K` を正規化). -/
+theorem map_conj_eq_iff_mem_normalizer {K : Subgroup G} {g : G} :
+    K.map (MulAut.conj g).toMonoidHom = K ↔ g ∈ Subgroup.normalizer (K : Set G) := by
+  rw [Subgroup.mem_set_normalizer_iff]
+  constructor
+  · intro hmap h
+    constructor
+    · intro hh
+      have hm : (MulAut.conj g).toMonoidHom h ∈ K.map (MulAut.conj g).toMonoidHom :=
+        Subgroup.mem_map_of_mem _ hh
+      rw [hmap] at hm
+      simpa [MulAut.conj_apply] using hm
+    · intro hh
+      have hm : g * h * g⁻¹ ∈ K.map (MulAut.conj g).toMonoidHom := by rw [hmap]; exact hh
+      obtain ⟨y, hy, hxy⟩ := hm
+      simp only [MulAut.conj_apply, MonoidHom.coe_coe] at hxy
+      have hyh : y = h := mul_left_cancel (mul_right_cancel hxy)
+      rwa [← hyh]
+  · intro hnorm
+    ext x
+    simp only [Subgroup.mem_map, MulAut.conj_apply, MonoidHom.coe_coe]
+    constructor
+    · rintro ⟨y, hy, rfl⟩
+      exact (hnorm y).mp hy
+    · intro hx
+      have he : g * (g⁻¹ * x * g) * g⁻¹ = x := by group
+      refine ⟨g⁻¹ * x * g, ?_, he⟩
+      rw [← SetLike.mem_coe, hnorm (g⁻¹ * x * g), he]
+      exact hx
+
+/-- **`L`-operator の normalizer 同変性**: `N_G(H) ≤ N_G(L(H))` (任意の `H`).
+`g ∈ N_G(H)` ⇒ 共役 `conj g` が `H` を固定 ⇒ `L(H)` も固定 ⇒ `g ∈ N_G(L(H))`.
+これが B.4(b) Step3 の `N_G(C∩S) ≤ N_G(L(C∩S))` を subgroupOf transport 無しで与える. -/
+theorem normalizer_le_normalizer_lOddIn (H : Subgroup G) :
+    Subgroup.normalizer (H : Set G) ≤ Subgroup.normalizer (lOddIn H : Set G) := by
+  intro g hg
+  exact map_conj_eq_iff_mem_normalizer.mp
+    (lOddIn_map_equiv (MulAut.conj g) (map_conj_eq_iff_mem_normalizer.mpr hg))
+
 end OddOrder.BG.AppB
