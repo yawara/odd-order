@@ -220,10 +220,49 @@ N̄_i の p-stability (step 3) を `thmA4a` で得るためだけに効く。
 
 ### 再開メモ
 
-- scaffold: `OddOrder/BG/AppA_PStability.lean` の `thmA4c` (statement ~L1360, `sorry` L1372)。
-  build: `lake build OddOrder.BG.AppA_PStability` (~20s)。`thmA4a` (= A.4(a)) は同ファイル L1340 付近、完成済。
-- 依存定理: `thmA3`/`thmA4a` (同ファイル), `opCore` (Ch01), `oPiCore` (Ch03), `opPpPrimeCore` (Ch07 S7B1),
-  `PGroupFixedVector`, `normal_subgroupOf_centralizer_normalizer` (mathlib Centralizer.lean:164)。
+- **(2026-05-29 更新)** 残 `sorry` は `stability_perFactor` (PSTAB) のみ。下記「実装進捗」表参照。
+  build: `lake build OddOrder.BG.AppA_PStability` (~20s, green w/ 1 sorry)。
+- 依存定理: `thmA3`/`thmA4a` (同ファイル), `opCore`/`normal_pgroup_le_opCore` (Ch01), `oPiCore` (Ch03),
+  `PGroupFixedVector` (`IsPGroup.invariants_ne_bot`), `chiefSeriesInside`/`chiefFactorCentralizer`
+  (GroupTheory/ChiefFactor), `coprime_actsTrivially_of_normal_and_quotient` (BG S01),
+  `MulAut.conjNormal` / `hall_E_exists` (Ch03) / `baseChangeRepresentation` (BG S02, private)。
+
+## 実装進捗 (2026-05-29 続き) — A.4(c) は残 PSTAB のみ
+
+**`thmA4c` の証明骨格を実装し、Gorenstein 6.5.3 を 2 段 + per-factor core に分解。残 `sorry` は
+`stability_perFactor` (PSTAB) 1 個のみ**。`OddOrder/BG/AppA_PStability.lean`:
+
+| 部品 | 内容 | 状態 |
+|---|---|---|
+| `thmA4c` | A.4(c) 本体 = `stabilityLiftAux` を `M:=↥N_G(P)`, `K:=P.subgroupOf N` に instantiate | ✅ sorry-free |
+| `stabilityLiftAux` | 抽象形 (M 可解奇数, K◁M p-群, A p-群, [K,A,A]=1 ⇒ AC/C ⊆ O_p(M/C))。H:=⨅ C_M(chief factor) を構成、(1)(3)(4) 段 + 結論 | ✅ (PSTAB 依存) |
+| `centralizer_subgroupOf_normalizer_eq` | C_G(P)|_N = C_{↥N}(P.subgroupOf N) 橋 | ✅ sorry-free |
+| `coprime_stabilizes_chain_trivial` | **BG Lem 1.9 一般形**: coprime ψ:A→MulAut K が正規降鎖を stabilize ⇒ 自明 (下降帰納 + S01 2-step) | ✅ sorry-free / 再利用可 |
+| `coprime_chainStabilizer_le_centralizer` | coprime D≤M が K の chief series stabilize ⇒ D≤C_M(K) (conjNormal 作用) | ✅ sorry-free |
+| `hHmap_pgroup` (HALL, stabilityLiftAux 内 step 4-5) | H/C は p-群: ↥H の Hall {p}'-subgroup ⊆ C ⇒ |H/C| ∣ p-冪 | ✅ sorry-free |
+| **`stability_perFactor` (PSTAB)** | 各 chief factor で `⁅Pᵢ,A⁆ ≤ Pᵢ₊₁` (rep theory core) | ⬜ **残 1 sorry** |
+
+⇒ **issue 当初の「最大の未知数」だった HALL (step 5 chain-stabilizer)** は coprime route で
+**完全に解決** (Hall stability theorem の逐語形式化を回避)。残るは rep-theory core のみ。
+
+### `stability_perFactor` (PSTAB) の残作業 = 純 rep theory
+
+`stability_perFactor` の docstring に 6-step roadmap + 必要 API を記載済。要点:
+1. chief factor `U/V` (elem abelian p) を `AddCommGroup.zmodModule` で `ZMod p`-空間化。
+2. conjugation 作用を `Representation (ZMod p) (M/H_i) (U/V)`, faithful (kernel=H_i) + irreducible (chief)。
+3. faithful+irred ⇒ `O_p(M/H_i)=1` (`PGroupFixedVector`)。
+4. `thmA4a` で `IsPStable p (M/H_i)`。
+5. `[K,A,A]=1` ⇒ `Ā` quadratic on `U/V`。
+6. **base change** `baseChangeRepresentation` (S02, `private` 解除要) で alg-closed に上げ `IsPStable`
+   適用 ⇒ `Ā=1` ⇒ `A⊆H_i`。`Module.FaithfullyFlat (ZMod p) (AlgebraicClosure (ZMod p))` instance 要。
+
+**スコープ感**: chief-factor-as-representation 構築 + base change の専用セッション向き
+(~250-400 行新規)。HALL 部品は全て再利用可能な形で完成済。
+
+### A.4(b) (`thmA4b`) は未着手
+
+Gorenstein 5.3 直後 Remark より A.4(b) は A.4(c) の系 (Sylow + abelian normal ⇒ [P,A,A]=1)。
+`stability_perFactor` 完成 → `thmA4c` sorry-free 後に短く組める見込み。
 
 ## 完了条件
 
