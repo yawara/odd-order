@@ -26,8 +26,12 @@ API がまだ不足している。
 ## やること
 
 - [x] restriction inner product で constituent/multiplicity predicate を定義する。
-- [ ] `χ` irreducible なら restriction constituents are one `G`-orbit を statement 化する。
-- [ ] common multiplicity `e` と orbit-sum decomposition を証明する。
+- [x] `χ` irreducible なら restriction constituents are one `G`-orbit を statement 化する
+      (`RestrictionConstituentsSingleOrbit` predicate)。
+- [x] common multiplicity `e` を (single-orbit hypothesis から) 証明する
+      (`hasCommonRestrictionMultiplicity_of_singleOrbit`, 2026-05-30)。
+- [ ] orbit-sum decomposition (`Res χ = e · ∑ orbit`) を証明する — module 層待ち。
+- [ ] `RestrictionConstituentsSingleOrbit` の hypothesis を外す (orbit transitivity 本体) — module 層待ち。
 
 ## 2026-05-26 update — sub-agent 調査結果 (6 件の API ギャップ)
 
@@ -99,6 +103,66 @@ API がまだ不足している。
   次はこの同値から finite transversal / orbit sum の API を切る。
 - 次の小単位は、restriction constituents が単一 orbit になる Clifford core
   theorem の statement/proof 入力、または inertia induction bijection の API 化。
+
+## 2026-05-30 update — Frobenius 相互律 + common-multiplicity step を sorry-free 着地
+
+### 着地した theorem (3 件, sorry/axiom 無し)
+
+1. **`ClassFunction.inner_induce_eq_inner_restrict`** (`InducedCharacter.lean`):
+   `⟨Ind_H^G θ, χ⟩_G = ⟨θ, Res_H^G χ⟩_H` ([Is] Lemma 5.2)。任意の部分群 `H` で成立
+   (正規性不要)。補助: `sum_induceTerm_mul_star_eq` (x-slice の x 非依存性, χ class
+   function による共役不変), `sum_induceTerm_one_mul_star_eq` (1-slice を `H` 上和へ収集),
+   `sum_induceSum_mul_star_eq` (非正規化版 `∑ = |G| · ∑_{h∈H}`)。
+2. **`ClassFunction.induce_conjBy_eq`** (+ `induceSum_conjBy_eq`) (`Clifford.lean`):
+   Peterfalvi (1.5)(a) — `Ind_H^G (θ^g) = Ind_H^G θ` (`H ⊴ G`)。再添字 `x ↦ x·g` +
+   normality の conj_mem。
+3. **`IrreducibleCharacter.hasCommonRestrictionMultiplicity_of_singleOrbit`**
+   (`Clifford.lean`): single-orbit ⇒ common multiplicity (Clifford 第 2 clause)。
+   `restrictionMultiplicity_conjBy_right` で conjugate が multiplicity を保つことから。
+   **注**: これは conditional scaffold ではなく Clifford の独立した clause の証明である
+   (hypothesis `RestrictionConstituentsSingleOrbit` は結論 `HasCommonRestrictionMultiplicity`
+   とは別の命題で, 含意自体に内容がある)。
+
+### prior plan の誤りの訂正 (重要)
+
+prior read-only plan は「character completeness (`span Irr H = CF(H)`) は未証明」を
+blocker 4/5 として挙げていたが, **これは既に証明済み**である:
+`CharacterCompleteness.lean` に
+- `classFunction_eq_zero_of_orthogonal` (orthogonal ⇒ 0),
+- `span_irreducibleCharacter_eq_top` (Irr が CF を張る),
+- `card_irreducibleCharacter_eq` (`|Irr G| = |ConjClasses G|`),
+さらに `ZIrrFourier.lean` に Fourier 係数 API (`mem_ZIrr_repr`, `inner_eq_coeff_of_repr`,
+Parseval) が完備。したがって完成度の障壁は completeness ではなく **module 層** のみ。
+
+### 残る唯一の hard blocker = module-theoretic Clifford core
+
+orbit-sum decomposition と orbit transitivity (single-orbit hypothesis の除去) の双方が,
+次の 1 つの module 層に帰着する:
+
+> `IsIrreducibleCharacter χ` の証人 `ρ : Representation ℂ G V` (irreducible, f.d.) を取り,
+> `Res^G_H ρ = ρ.comp H.subtype` を `H`-module として見たとき,
+> (a) その指標が `restrict H χ` に一致し,
+> (b) `Res ρ` は既約 `H`-部分加群の直和に分解し各 isotype が `G` で transitive に
+>     permute される (Clifford の module 本体)。
+
+(a) からは `restrictionMultiplicity H χ θ` が genuine character の係数 = **非負整数**で
+あることが出る (現状 `ℂ` 値のまま; 整数性 lemma は未着地)。(b) からは single-orbit が出る。
+mathlib は `Maschke`/`IsSemisimpleModule`/`sSup_simples_eq_top` を持つので (a) の指標一致と
+isotype 抽出は手が届くが, **`G`-action による isotype の transitive permutation** は新規
+module 開発が必要 (mathlib 未収録)。これは複数セッション規模で, 本セッションでは着手しない
+(sorry や fake-scaffold を避け clean を優先)。
+
+### 次の具体 step (順序案)
+
+1. `Res^G_H ρ` の指標 = `restrict H (repCharacterClassFunction ρ)` の bridge lemma
+   (`ρ.comp H.subtype` の character = `g ↦ ρ.character (g:G)`)。`Type 0` 制約は
+   `CharacterCompleteness.transportRep` パターンで回避。
+2. `restrict H χ ∈ ZIrr H` (genuine character) ⇒ `restrictionMultiplicity ∈ ℤ≥0`
+   (Maschke 分解の係数; `Fourier` API で係数抽出後 module 側で非負整数性)。
+3. `G`-action on simple `ℂ[H]`-submodules of `Res ρ.asModule` + orbit-stabilizer ⇒
+   `RestrictionConstituentsSingleOrbit`。ここが新規 module 開発の本体。
+4. 2+3 + completeness の Fourier 展開 ⇒ orbit-sum decomposition ⇒
+   `clifford_decomposition` の tautological scaffold を実証明へ置換。
 
 ## 完了条件
 
