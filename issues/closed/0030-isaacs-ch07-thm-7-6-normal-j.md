@@ -67,3 +67,23 @@ App.A で 7 ヶ所超で直接引用 (L2456, L2480, L2482, L2511, L2515, L5014, 
 - BG §App.A Thm A.4(b) — equivalent statement
 - Issue #29 (Thm 7.5 — prerequisite)
 - `OddOrder.GroupTheory.ThompsonSubgroup` — `J(P)` def
+
+## 完了確認 (2026-05-29) — CLOSED
+
+top-level theorem **`OddOrder.Isaacs.Ch07.normal_J`** (`S7B2_NormalJ_PComplement.lean:1416`) が
+完成済を確認:
+
+- 署名 = reduced Thm 7.6 (P Sylow p, p≠2, p-separable, 2-subgroups abelian, **O_{p'}(G)=⊥**,
+  **P=C_G(Z(P))** ⇒ `J(P).Normal`)。これは issue statement の (i)-(v) と完全一致。
+- 委譲先 **`thompsonJ_le_opCore_of_normal_J_hypotheses`** (`S7B2:1299`) = `Nat.card G` 強帰納の
+  **本物の証明** (forward 仮説スキャフォールドではない; 仮説は全て正当な reduced-case 条件で
+  hoisted hard content ではない。`scaffold-sorry-free-not-done` 検証クリア)。
+- S7B2 は **sorry 0**、`lake build OddOrder` green、**AxiomsCheck 登録済** (`AxiomsCheck.lean:499`)。
+
+⚠ **2026-05-26 update の「8-step bridge ゼロ・~800-1500 LOC multi-session」は stale** —
+その後 `thompsonJ_le_opCore_of_normal_J_hypotheses` (強帰納) として完成した。
+
+★ これは **reduced case** (O_{p'}=⊥, P=C_G(Z(P)))。**BG Thm 6.2 一般形** (`Z(J(S))·O_{p'}◁G`,
+任意 S) は別系統 = App.A→App.B 連鎖 (issue 0047✅ A.4, 0049 A.5, App.B Puig L(S))。
+
+完了条件すべて充足。クローズ。

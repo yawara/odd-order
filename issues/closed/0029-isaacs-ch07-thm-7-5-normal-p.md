@@ -55,3 +55,17 @@ The book argument (Isaacs pp.207-208) uses:
 - `references/isaacs/finite-group-theory.mmd` L3783-L3826
 - `OddOrder.Isaacs.Ch03.IsPiSeparable` — p-separability bridge
 - Issue #30 (Thm 7.6 normal-J — depends on this)
+
+## 完了確認 (2026-05-29) — CLOSED
+
+full Thm 7.5 の top-level theorem **`OddOrder.Isaacs.Ch07.sylow_normal_of_elementary_normal_P_theorem`**
+(`S7A2_NormalPThm75.lean:1216`) が完成済を確認:
+
+- 署名 = full Thm 7.5 (G p-separable, p≠2, 2-subgroups abelian, φ faithful on p-group V,
+  `∀ Sylow P, (actionCentralizer φ P).index ≤ p` (= `|V:C_V(P)|≤p`) ⇒ ∀ Sylow P, P.Normal)。
+- 証明 = `Nat.card G` 強帰納 + 2 分岐 (elementary-abelian p² / cyclic) で chief-factor reduction を
+  内包。**forward 仮説スキャフォールドではない本物の証明** (`scaffold-sorry-free-not-done` 検証クリア)。
+- S7A2 は **sorry 0**、`lake build OddOrder` green。
+
+完了条件 (top-level theorem / no sorry / build green) すべて充足。クローズ。
+(分岐 `sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful` は AxiomsCheck:452 に登録済。)
