@@ -84,8 +84,11 @@ group-algebra center の class-sums 基底 / 指標↔単純加群の数え上�
       も追加 (無条件 instance)。AxiomsCheck に
       `classFunction_eq_zero_of_orthogonal` / `card_irreducibleCharacter_eq` /
       `span_irreducibleCharacter_eq_top` を追加 (all 3-axiom allowlist)。
-- [ ] 0027: `column_orthogonality_cases_ofRowOrthogonality (ofFinite count) characterTableRowOrthogonality_holds`
-      で無条件化 (downstream の新定理; upstream の sorry は無し) → close。
+- [x] 0027: **無条件化 landed + closed (2026-05-30)**。新 downstream ファイル
+      `ColumnOrthogonality.lean` に `column_orthogonality_{diagonal,conjugate,not_conjugate}`
+      (`[Finite G]` のみ) を sorry-free で追加。`instCharacterTableIndexingOfFinite` +
+      `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality characterTableRowOrthogonality_holds`
+      で `idx`/`hrow` を discharge。AxiomsCheck で allowlist-only 確認。
 - [ ] 0022: 加えて複素共役置換 σ → close。
 
 ### 2026-05-30 技術メモ (継続者向け)

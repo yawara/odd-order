@@ -7,6 +7,7 @@ import Lean
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -565,6 +566,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_eq
 -- RepresentationTheory: the irreducible characters span the class functions.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.span_irreducibleCharacter_eq_top
+-- RepresentationTheory (Peterfalvi §3, [Is] Thm 2.18/6.10): second (column) orthogonality is
+-- unconditional — the `CharacterTableIndexing` and weighted-row-orthogonality inputs of the
+-- matrix proof core are discharged for any `[Finite G]` (issue 0027 closed unconditionally).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
