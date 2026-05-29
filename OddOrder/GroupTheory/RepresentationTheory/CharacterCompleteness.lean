@@ -189,4 +189,43 @@ theorem exists_isIrreducibleCharacter_eq {W : Type*} [AddCommGroup W] [Module �
 
 end Transfer
 
+section Completeness
+
+variable {G : Type*} [Group G]
+
+/-- `f` precomposed with inversion, `g ↦ f g⁻¹`. A class function, since inversion permutes each
+conjugacy class. -/
+def classFunctionInv (f : ClassFunction G ℂ) : ClassFunction G ℂ :=
+  ⟨fun g => f g⁻¹, fun g h => by
+    show f (h * g * h⁻¹)⁻¹ = f g⁻¹
+    rw [show (h * g * h⁻¹)⁻¹ = h * g⁻¹ * h⁻¹ from by group, f.conj_eq]⟩
+
+@[simp] theorem classFunctionInv_apply (f : ClassFunction G ℂ) (g : G) :
+    classFunctionInv f g = f g⁻¹ := rfl
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- If `f` is orthogonal to every irreducible character, then for every finite-dimensional
+irreducible representation `σ`, `∑_g f(g⁻¹) · χ_σ(g) = 0`. (Reindexing by `g ↦ g⁻¹` and the
+identity `χ_σ(g⁻¹) = conj χ_σ(g)` turn this sum into `|G| · (f, χ_σ)`, which vanishes since
+`χ_σ ∈ Irr G`.) -/
+theorem sum_classFunctionInv_character_eq_zero {W : Type*} [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ W] (f : ClassFunction G ℂ)
+    (hf : ∀ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ) = 0)
+    (σ : Representation ℂ G W) [Representation.IsIrreducible σ] :
+    ∑ g : G, classFunctionInv f g * σ.character g = 0 := by
+  obtain ⟨χ, hχirr, hχeq⟩ := exists_isIrreducibleCharacter_eq σ
+  have hstep : ∑ g : G, classFunctionInv f g * σ.character g
+      = ∑ g : G, f g * star ((χ : ClassFunction G ℂ) g) := by
+    apply Fintype.sum_equiv (Equiv.inv G)
+    intro g
+    simp only [Equiv.inv_apply, classFunctionInv_apply]
+    rw [congrFun hχeq g⁻¹, character_inv σ g, star_star]
+  rw [hstep]
+  have : ∑ g : G, f g * star ((χ : ClassFunction G ℂ) g)
+      = ClassFunction.innerSum f (χ : ClassFunction G ℂ) := rfl
+  rw [this, ← ClassFunction.card_mul_inner, hf ⟨χ, hχirr⟩, mul_zero]
+
+end Completeness
+
 end OddOrder.RepresentationTheory
