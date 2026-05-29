@@ -4153,7 +4153,7 @@ private theorem
 This is the concrete base-change object needed to run the algebraically closed
 q≠p reduction on `K ⊗[F] V` and then descend the group-theoretic conclusion
 back to the original representation. -/
-private noncomputable def baseChangeRepresentation
+noncomputable def baseChangeRepresentation
     {F : Type*} [Field F] {G : Type*} [Group G]
     {V : Type*} [AddCommGroup V] [Module F V]
     (K : Type*) [Field K] [Algebra F K]
@@ -4171,8 +4171,9 @@ private noncomputable def baseChangeRepresentation
     intro a v
     simp [map_mul]
 
+/-- `baseChangeRepresentation` の単純テンソル上の作用: `a ⊗ₜ v ↦ a ⊗ₜ ρ g v`. -/
 @[simp]
-private theorem baseChangeRepresentation_apply_tmul
+theorem baseChangeRepresentation_apply_tmul
     {F : Type*} [Field F] {G : Type*} [Group G]
     {V : Type*} [AddCommGroup V] [Module F V]
     (K : Type*) [Field K] [Algebra F K]
@@ -4186,7 +4187,7 @@ extension.
 For the eventual algebraic-closure route, `K` will be `AlgebraicClosure F`.
 The proof uses the canonical injection `V → K ⊗[F] V`; no representation
 theorem is merely being renamed here. -/
-private theorem baseChangeRepresentation_faithful
+theorem baseChangeRepresentation_faithful
     {F : Type*} [Field F] {G : Type*} [Group G]
     {V : Type*} [AddCommGroup V] [Module F V]
     (K : Type*) [Field K] [Algebra F K] [Module.FaithfullyFlat F K]
