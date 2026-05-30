@@ -207,6 +207,22 @@ theorem restrictionMultiplicity_conjBy_right [H.Normal]
     _ = inner (restrict H χ) θ :=
         inner_conjBy_conjBy (G := G) (H := H) g (restrict H χ) θ
 
+/-- **Integrality of the restriction multiplicity.** When the inducing class function
+`χ` and the constituent `θ` are both virtual characters, the normalized inner-product
+multiplicity `⟨Res^G_H χ, θ⟩` is an integer.
+
+This resolves the integer part of Clifford's multiplicity statement ([Is] Thm 6.5): the
+multiplicity `e_χ = ⟨Res χ, θ⟩` is `ℤ`-valued.  The proof combines `restrict_mem_ZIrr`
+(restriction maps `ℤ[Irr G]` into `ℤ[Irr H]`, Peterfalvi (2.6.b)) with the integrality of
+inner products of virtual characters (`inner_mem_ZIrr_int`).  Non-negativity of the
+multiplicity for a *genuine* character is a separate fact that needs the module-theoretic
+decomposition of `Res^G_H ρ` (see `issues/0026-peterfalvi-clifford-core.md`). -/
+theorem restrictionMultiplicity_int [Finite G]
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G)
+    {θ : ClassFunction H ℂ} (hθ : θ ∈ ZIrr H) :
+    ∃ m : ℤ, restrictionMultiplicity H χ θ = (m : ℂ) :=
+  inner_mem_ZIrr_int (restrict_mem_ZIrr H hχ) hθ
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
@@ -329,6 +345,17 @@ theorem liesOver_iff_restrictionConstituent
   · exact liesOver_restrictionConstituent (H := H)
   · intro hθ
     exact hθ.multiplicity_ne_zero
+
+/-- **The constituent multiplicity of an irreducible character is an integer.** For
+irreducible characters `χ` of `G` and `θ` of `H`, the normalized inner product
+`⟨Res^G_H χ, θ⟩` is `ℤ`-valued.  This is the irreducible-character specialization of
+`ClassFunction.restrictionMultiplicity_int`, giving the integer part of Clifford's
+multiplicity statement ([Is] Thm 6.5). -/
+theorem restrictionMultiplicity_int [Finite G]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    ∃ m : ℤ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) = (m : ℂ) :=
+  ClassFunction.restrictionMultiplicity_int H χ.mem_ZIrr θ.mem_ZIrr
 
 end IrreducibleCharacter
 

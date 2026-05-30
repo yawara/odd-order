@@ -30,6 +30,10 @@ API がまだ不足している。
       (`RestrictionConstituentsSingleOrbit` predicate)。
 - [x] common multiplicity `e` を (single-orbit hypothesis から) 証明する
       (`hasCommonRestrictionMultiplicity_of_singleOrbit`, 2026-05-30)。
+- [x] multiplicity `e = ⟨Res χ, θ⟩` の **整数性** (gap #5 の整数半分) を証明する
+      (`restrictionMultiplicity_int`, 2026-05-30)。
+- [ ] multiplicity `e ≥ 0` (gap #5 の非負半分) を証明する — module 層待ち
+      (genuine character の Fourier 係数 = isotype の重複度 ≥ 0)。
 - [ ] orbit-sum decomposition (`Res χ = e · ∑ orbit`) を証明する — module 層待ち。
 - [ ] `RestrictionConstituentsSingleOrbit` の hypothesis を外す (orbit transitivity 本体) — module 層待ち。
 
@@ -163,6 +167,59 @@ module 開発が必要 (mathlib 未収録)。これは複数セッション規�
    `RestrictionConstituentsSingleOrbit`。ここが新規 module 開発の本体。
 4. 2+3 + completeness の Fourier 展開 ⇒ orbit-sum decomposition ⇒
    `clifford_decomposition` の tautological scaffold を実証明へ置換。
+
+## 2026-05-30 update (2) — multiplicity 整数性を sorry-free 着地 + prior plan の重複指摘
+
+### 着地した theorem (2 件, sorry/axiom 無し, `Clifford.lean`)
+
+1. **`ClassFunction.restrictionMultiplicity_int`**:
+   `χ ∈ ZIrr G → θ ∈ ZIrr H → ∃ m : ℤ, restrictionMultiplicity H χ θ = (m:ℂ)`。
+   gap #5 (「multiplicity ∈ ℤ⁺」) の **整数半分**を解決。証明は既存 2 theorem の合成のみ:
+   `restrict_mem_ZIrr` (`Res^G_H : ℤ[Irr G] → ℤ[Irr H]`, Peterfalvi (2.6.b)) で
+   `restrict H χ ∈ ZIrr H` を得て, `inner_mem_ZIrr_int` (virtual character 同士の inner
+   product は整数) を適用。仮説 (ZIrr 所属) と結論 (整数性) は別命題で含意自体に内容がある
+   (tautology ではない)。
+2. **`IrreducibleCharacter.restrictionMultiplicity_int`**: 上の既約指標版
+   (`χ : IrreducibleCharacter G`, `θ : IrreducibleCharacter H`)。`.mem_ZIrr` 経由の特殊化。
+
+両者とも `[Finite G]` を要する (`restrict_mem_ZIrr` の要件)。
+
+### prior read-only plan の重複指摘 (重要)
+
+prior plan は「Step 1 = `repCharacterClassFunction_comp_subtype`
+(`repCharacterClassFunction (ρ.comp H.subtype) = restrict H (repCharacterClassFunction ρ)`)
+を最初に着地せよ」と提案したが, **これは `InducedCharacter.lean` に既に
+`restrict_repCharacterClassFunction` として存在する** (左右逆向きの等式だが内容同一)。
+新規に書くと wrapper 規約違反。同様に prior plan の Step 2-4 (Maschke semisimple +
+`restrict H χ ∈ ZIrr H` + 整数性) も `restrict_mem_ZIrr` / `inner_mem_ZIrr_int` で
+**既に達成済み or 上記 1-2 で着地**。よって Phase 1 の残りは「**非負性のみ**」。
+
+### 残る hard blocker = module-theoretic Clifford core (変わらず未着手)
+
+`clifford_decomposition` の tautological scaffold (lines ~612-625) は **意図的に未置換**
+(sorry-free だが偽の進捗; 結論 = 仮説の連言)。実証明への置換には次の 2 つが必須で,
+いずれも mathlib 未収録の新規 module 開発 (見積り 3-5 セッション):
+
+- **BLOCKER A (G-action on `ℂ[H]`-simples)**: `H ⊴ G` のとき
+  `N ↦ N.map (ρ g)` が `Res^G_H ρ.asModule` の simple `ℂ[H]`-submodule を simple
+  `ℂ[H]`-submodule に送る。`N.map (ρ g)` 上の `ℂ[H]`-module 構造を normality
+  (`h • (ρ g v) = ρ g (ρ (g⁻¹hg) v)`, `g⁻¹hg ∈ H`) で明示的に与える必要。
+  `asModule` 型シノニムの instance 管理 (`set_option backward.isDefEq.respectTransparency
+  false` 必須; issues/closed/0048 の gotcha 参照) が delicate。~50-80 行。
+- **BLOCKER B (orbit transitivity)**: `ρ` が `G`-既約なら, simple `ℂ[H]`-submodule の
+  `G`-orbit-sum は `ℂ[G]`-submodule ⇒ 既約性で `= ⊤`。`Submodule.linearEquiv_of_le_sSup`
+  (Isotypic.lean) で任意の simple constituent が orbit 内の 1 つと `ℂ[H]`-linear 同型
+  ⇒ single-orbit。submodule lattice 推論の glue が重い。~80 行。
+
+**非負性 (gap #5 残り)** も BLOCKER B と同じ module 分解 (genuine character の Fourier
+係数 = isotype 重複度 ≥ 0) に帰着するため, A/B 解決まで保留。
+
+mathlib 確認済み相当 API: `IsSemisimpleModule.exists_sSupIndep_sSup_simples_eq_top`,
+`IsIsotypicOfType` / `isotypicComponent` (`RingTheory/SimpleModule/Isotypic.lean`),
+`IsSimpleModule.congr`, `Submodule.equivMapOfInjective`,
+`ofSubmodulePrime_isIrreducible` (本 repo `CharacterCompleteness.lean`)。
+**欠落**: 「`H ⊴ G` で `ρ g` が simple `ℂ[H]`-submodule を simple `ℂ[H]`-submodule に
+送る」(= BLOCKER A) — これだけは自前で書くしかない。
 
 ## 完了条件
 
