@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Complex.Basic
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Algebra.MonoidAlgebra.MapDomain
+import Mathlib.RingTheory.SimpleModule.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
@@ -122,6 +125,137 @@ theorem IsIrreducible.comp_mulEquiv
     · right
       apply Subrepresentation.toSubmodule_injective
       simpa [Wρ] using congrArg (fun X : Subrepresentation ρ => X.toSubmodule) htop
+
+end Representation
+
+namespace Representation
+
+open scoped MonoidAlgebra
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V]
+
+section ConjBySimple
+
+variable (ρ : Representation ℂ G V) (H : Subgroup G) [hH : H.Normal]
+
+/-- The restriction `Res^G_H ρ` of `ρ` to a subgroup `H`, packaged as a
+`Representation ℂ ↥H V` (rather than the bare `MonoidHom` `ρ.comp H.subtype`) so that
+its `ℂ[H]`-module `asModule` and `asModuleEquiv` are available by dot notation.
+
+This is a reducible abbreviation so that the `ℂ[H]`-module instance on
+`(restrictRep ρ H).asModule` is found by unfolding to `(ρ.comp H.subtype).asModule`. -/
+abbrev restrictRep : Representation ℂ ↥H V := ρ.comp H.subtype
+
+omit hH in
+@[simp] theorem restrictRep_apply (h : ↥H) : restrictRep ρ H h = ρ (h : G) := rfl
+
+variable {H}
+
+/-- The ring automorphism of `ℂ[H]` induced by conjugation `h ↦ g h g⁻¹` on the normal
+subgroup `H`.  On generators it sends `single h c` to `single (g h g⁻¹) c`. -/
+noncomputable def conjBySimpleRingHom (g : G) : ℂ[↥H] →+* ℂ[↥H] :=
+  MonoidAlgebra.mapDomainRingHom ℂ
+    (ClassFunction.conjByMulEquiv (G := G) (H := H) g).toMonoidHom
+
+theorem conjBySimpleRingHom_single (g : G) (h : ↥H) (c : ℂ) :
+    conjBySimpleRingHom (H := H) g (MonoidAlgebra.single h c) =
+      MonoidAlgebra.single
+        (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) c := by
+  simp [conjBySimpleRingHom]
+
+theorem conjBySimpleRingHom_surjective (g : G) :
+    Function.Surjective (conjBySimpleRingHom (H := H) g) :=
+  (MonoidAlgebra.mapDomainRingEquiv ℂ
+    (ClassFunction.conjByMulEquiv (G := G) (H := H) g)).surjective
+
+instance conjBySimpleRingHom_isSurjective (g : G) :
+    RingHomSurjective (conjBySimpleRingHom (H := H) g) :=
+  ⟨conjBySimpleRingHom_surjective (H := H) g⟩
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The `ℂ`-linear bijection `ρ g`, packaged as a `conjBySimpleRingHom g`-semilinear
+endomorphism of the restricted module `(restrictRep ρ H).asModule`.
+
+This is the module-theoretic incarnation of normality: for `h ∈ H`, the standard
+`ℂ[H]`-action on the image satisfies `h • (ρ g v) = ρ g (ρ (g⁻¹ h g) v)`, i.e. `ρ g`
+intertwines the `H`-action up to the conjugation twist `conjBySimpleRingHom g`. -/
+noncomputable def conjBySimpleSemilinear (g : G) :
+    (restrictRep ρ H).asModule →ₛₗ[conjBySimpleRingHom (H := H) g]
+      (restrictRep ρ H).asModule where
+  toFun v := (show (restrictRep ρ H).asModule from ρ g v)
+  map_add' v w := by simp
+  map_smul' s v := by
+    induction s using MonoidAlgebra.induction_linear with
+    | zero => simp
+    | add x y hx hy =>
+        change ρ g ((x + y) • v) = _
+        rw [add_smul, map_add, map_add, add_smul]
+        exact congrArg₂ (· + ·) hx hy
+    | single h c =>
+        have hHh : (ClassFunction.conjByMulEquiv (G := G) (H := H) g h : G) =
+            g * (h : G) * g⁻¹ := rfl
+        rw [conjBySimpleRingHom_single]
+        change ρ g (MonoidAlgebra.single h c • v) =
+          MonoidAlgebra.single (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) c •
+            (show (restrictRep ρ H).asModule from ρ g v)
+        rw [Representation.single_smul, Representation.single_smul, restrictRep_apply,
+          restrictRep_apply, map_smul]
+        congr 1
+        change ρ g (ρ (h : G) v) = ρ ((ClassFunction.conjByMulEquiv
+          (G := G) (H := H) g h : G)) (ρ g v)
+        rw [hHh, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
+        congr 2
+        group
+
+@[simp] theorem conjBySimpleSemilinear_apply (g : G) (v : (restrictRep ρ H).asModule) :
+    conjBySimpleSemilinear (H := H) ρ g v = (show (restrictRep ρ H).asModule from ρ g v) :=
+  rfl
+
+theorem conjBySimpleSemilinear_bijective (g : G) :
+    Function.Bijective (conjBySimpleSemilinear (H := H) ρ g) :=
+  ρ.apply_bijective g
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Membership in the image submodule `N.map (conjBySimpleSemilinear ρ g)` is exactly being
+of the form `ρ g v` for some `v ∈ N`.  This confirms that the simple `ℂ[H]`-submodule produced
+by `isSimpleModule_map_conjBySimpleSemilinear` is, as a set, the `ρ g`-translate of `N`, carrying
+the standard `ℂ[H]`-action `h • w = ρ (h : G) w`. -/
+theorem mem_map_conjBySimpleSemilinear (g : G)
+    (N : Submodule ℂ[↥H] (restrictRep ρ H).asModule) (w : (restrictRep ρ H).asModule) :
+    w ∈ N.map (conjBySimpleSemilinear (H := H) ρ g) ↔
+      ∃ v ∈ N, (show (restrictRep ρ H).asModule from ρ g v) = w := by
+  simp only [Submodule.mem_map, conjBySimpleSemilinear_apply]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Clifford BLOCKER A** (module-theoretic core of [Is] Thm 6.5 / Peterfalvi §3 (1.5)).
+For `ρ : Representation ℂ G V`, `H ⊴ G`, a simple `ℂ[H]`-submodule `N` of the restricted
+module `(restrictRep ρ H).asModule`, and any `g : G`, the image of `N` under `ρ g` is again
+a simple `ℂ[H]`-submodule of the restricted module.
+
+The image is `N.map (conjBySimpleSemilinear ρ g)`, where the standard `ℂ[H]`-action on the
+image satisfies `h • (ρ g v) = ρ g (ρ (g⁻¹ h g) v)` (normality of `H`).  Simplicity is
+transported across the semilinear bijection `ρ g` via the order isomorphism of submodule
+lattices it induces (`Submodule.orderIsoMapComapOfBijective`), since `IsSimpleModule`
+is equivalent to the submodule being an atom (`isSimpleModule_iff_isAtom`).
+
+Note that no irreducibility of `ρ` is needed: `ρ g` is always a bijection, so it sends
+any simple `ℂ[H]`-submodule to a simple `ℂ[H]`-submodule.  Irreducibility of `ρ` enters
+later (orbit transitivity), not here. -/
+theorem isSimpleModule_map_conjBySimpleSemilinear
+    (g : G) (N : Submodule ℂ[↥H] (restrictRep ρ H).asModule)
+    [IsSimpleModule ℂ[↥H] N] :
+    IsSimpleModule ℂ[↥H]
+      (N.map (conjBySimpleSemilinear (H := H) ρ g) :
+        Submodule ℂ[↥H] (restrictRep ρ H).asModule) := by
+  have hatomN : IsAtom N := IsSimpleModule.isAtom
+  have hmap : (Submodule.orderIsoMapComapOfBijective
+      (conjBySimpleSemilinear (H := H) ρ g)
+      (conjBySimpleSemilinear_bijective (H := H) ρ g)) N =
+      N.map (conjBySimpleSemilinear (H := H) ρ g) := rfl
+  rw [isSimpleModule_iff_isAtom, ← hmap]
+  exact (OrderIso.isAtom_iff _ N).mpr hatomN
+
+end ConjBySimple
 
 end Representation
 

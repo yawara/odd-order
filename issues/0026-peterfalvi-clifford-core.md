@@ -200,9 +200,9 @@ prior plan は「Step 1 = `repCharacterClassFunction_comp_subtype`
 (sorry-free だが偽の進捗; 結論 = 仮説の連言)。実証明への置換には次の 2 つが必須で,
 いずれも mathlib 未収録の新規 module 開発 (見積り 3-5 セッション):
 
-- **BLOCKER A (G-action on `ℂ[H]`-simples)**: `H ⊴ G` のとき
-  `N ↦ N.map (ρ g)` が `Res^G_H ρ.asModule` の simple `ℂ[H]`-submodule を simple
-  `ℂ[H]`-submodule に送る。`N.map (ρ g)` 上の `ℂ[H]`-module 構造を normality
+- **BLOCKER A (G-action on `ℂ[H]`-simples)** — ✅ **2026-05-30 着地** (下記 update 参照)。
+  `H ⊴ G` のとき `N ↦ N.map (ρ g)` が `Res^G_H ρ.asModule` の simple `ℂ[H]`-submodule を
+  simple `ℂ[H]`-submodule に送る。`N.map (ρ g)` 上の `ℂ[H]`-module 構造を normality
   (`h • (ρ g v) = ρ g (ρ (g⁻¹hg) v)`, `g⁻¹hg ∈ H`) で明示的に与える必要。
   `asModule` 型シノニムの instance 管理 (`set_option backward.isDefEq.respectTransparency
   false` 必須; issues/closed/0048 の gotcha 参照) が delicate。~50-80 行。
@@ -220,6 +220,35 @@ mathlib 確認済み相当 API: `IsSemisimpleModule.exists_sSupIndep_sSup_simple
 `ofSubmodulePrime_isIrreducible` (本 repo `CharacterCompleteness.lean`)。
 **欠落**: 「`H ⊴ G` で `ρ g` が simple `ℂ[H]`-submodule を simple `ℂ[H]`-submodule に
 送る」(= BLOCKER A) — これだけは自前で書くしかない。
+
+## 2026-05-30 update (3) — BLOCKER A (G-action on `ℂ[H]`-simples) を sorry-free 着地
+
+`Clifford.lean` (namespace `OddOrder.RepresentationTheory.Representation`) に
+module 層の片割れ **BLOCKER A** を実証明で着地 (sorry/axiom 無し, allowlist 3 axioms):
+
+- **`isSimpleModule_map_conjBySimpleSemilinear`** (主定理): `ρ : Representation ℂ G V`,
+  `H ⊴ G`, simple `ℂ[H]`-submodule `N` of `(restrictRep ρ H).asModule`, `g : G` のとき
+  `N.map (conjBySimpleSemilinear ρ g)` は再び simple `ℂ[H]`-submodule。**ρ の既約性は不要**
+  (より一般; 既約性は BLOCKER B の orbit transitivity でのみ必要)。
+- 補助 (同ファイル):
+  - `restrictRep ρ H : Representation ℂ ↥H V` = `ρ.comp H.subtype` の reducible abbrev
+    (`.asModule`/`.asModuleEquiv` の dot 記法 + `Module ℂ[H]` instance 解決のため)。
+  - `conjBySimpleRingHom g : ℂ[H] →+* ℂ[H]` = 共役 `h ↦ ghg⁻¹` 由来の環自己同型
+    (`MonoidAlgebra.mapDomainRingHom` + `conjByMulEquiv`)。`RingHomSurjective` instance 付き。
+  - `conjBySimpleSemilinear g : asModule →ₛₗ[conjBySimpleRingHom g] asModule` = `ρ g` を
+    共役 twist に関する **semilinear** 写像として packaging。normality
+    `ρ(h)(ρ g v)=ρ g(ρ(g⁻¹hg)v)` が semilinearity (`map_smul'`) の中身。
+  - `conjBySimpleSemilinear_bijective` (= `ρ.apply_bijective g`),
+    `mem_map_conjBySimpleSemilinear` (像は集合として `ρ g '' N`, 標準作用)。
+
+証明の鍵: 「`IsSimpleModule R m ↔ IsAtom m` (`isSimpleModule_iff_isAtom`)」+ semilinear
+全単射が誘導する **submodule lattice の order-iso** (`Submodule.orderIsoMapComapOfBijective`)
++ `OrderIso.isAtom_iff` で atom 性を transport。`IsSimpleModule.congr` は同環の linear equiv
+専用で共役 twist (semilinear) には使えないため, atom 経由が正攻法。`asModule` 型シノニムの
+instance/defeq 摩擦は `set_option backward.isDefEq.respectTransparency false` で解消。
+
+**残るのは BLOCKER B (orbit transitivity, 既約性使用) のみ。** A は B の前提として再利用可能。
+`AxiomsCheck.lean` に主定理を登録済 (all in allowlist)。
 
 ## 完了条件
 
