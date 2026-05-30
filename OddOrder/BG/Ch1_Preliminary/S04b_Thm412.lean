@@ -56,6 +56,7 @@ namespace OddOrder.BG.Ch1.S04b
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.Isaacs.Ch04
 open OddOrder.BG.Ch1.OperatorQuotientAction
 open OddOrder.BG.Ch1_Preliminary
 open OddOrder.BG.Ch1.S04
@@ -249,5 +250,80 @@ theorem isMulCommutative_of_metacyclic_actionCommutator_eq_top
     isCyclic_of_surjective _ hmap_surj
   exact ⟨⟨commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center R))
     (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center R)))⟩⟩
+
+set_option maxHeartbeats 1000000 in
+-- `actionCommutator_restrict_self_eq_top` (the internal `[T, A] = T`) unifies a deeply nested
+-- operator-action term, which is heartbeat-heavy; raise the limit for this single proof.
+/-- **BG Theorem 4.12(b)** (Huppert). `references/bg/local-analysis.mmd` L1616.
+With `T := [R, A] = actionCommutator φ` and `C := C_R(A) = fixedPointsOfMulAut φ`, one has
+`T ∩ C = 1`.
+
+mmd L1616: "Let `T = [R, A]`. By (a) and Proposition 1.6, `[T, A] = T`, … and
+`T = [T, A] × C_T(A) = T × (T ∩ C_R(A))`. Hence `T ∩ C_R(A) = 1`."
+
+This holds for **every** metacyclic `p`-group `R` (whether or not `R` is abelian): the argument
+applies part (a) to the *subgroup* `T = [R, A]`, never to `R` itself.
+
+* `[T, A] = T` (`actionCommutator ψT = ⊤`) is the always-true internal form of Prop 1.6(b)
+  (`actionCommutator_restrict_self_eq_top`);
+* `T` is metacyclic (`IsMetacyclic.subgroup`), a coprime `p`-group, so part (a)
+  (`isMulCommutative_of_metacyclic_actionCommutator_eq_top`) makes `T` abelian;
+* Prop 1.6(d) for the abelian `T` (`fixedPoints_inf_actionCommutator_eq_bot_of_abelian`) gives
+  `C_T(A) ∩ [T, A] = ⊥`; with `[T, A] = T` this is `C_T(A) = ⊥`, and
+  `C_T(A) = (C_R(A)).subgroupOf T` transports it to `T ∩ C_R(A) = ⊥` in `R`.
+
+**BG §4** Thm 4.12(b). Huppert, _Endliche Gruppen I_ (1967), Satz III.13.5.
+
+**註.** Part (c) of Theorem 4.12 (`[R, A]` and `C_R(A)` cyclic, `R' ⊆ [R, A]`) is *false*
+without the textbook's standing assumption `1 ⊂ [R, A] ⊂ R` (mmd L1618 "By (a), `1 ⊂ T ⊂ R`"):
+e.g. for `p = 3`, `R = (ℤ/3)²`, and `A = ℤ/2` acting by inversion, `[R, A] = R = E₉` is not
+cyclic, so `IsCyclic [R, A]` fails even though `hp_odd, hR, hmeta, hcop, hAsolv` all hold. The
+faithful (c) additionally requires `actionCommutator φ ≠ ⊥` and `actionCommutator φ ≠ ⊤`. -/
+theorem actionCommutator_inf_fixedPoints_eq_bot
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) (hAsolv : IsSolvable A) :
+    OddOrder.Isaacs.Ch04.actionCommutator φ ⊓ Subgroup.fixedPointsOfMulAut φ = ⊥ := by
+  classical
+  -- `T := [R, A]`, with its restricted operator action `ψT`.
+  set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
+  set ψT : A →* MulAut ↥T := (IsAInvariant.actionCommutator φ).toMulAutHom with hψT_def
+  -- `[T, A] = T` (Prop 1.6(b), internal form — always holds).
+  have hψT_top : OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊤ :=
+    actionCommutator_restrict_self_eq_top hcop (Or.inl hAsolv)
+  -- `T` is metacyclic (subgroup of metacyclic `R`), a coprime `p`-group.
+  have hT_meta : IsMetacyclic ↥T := hmeta.subgroup
+  have hT_pg : IsPGroup p ↥T := hR.to_subgroup T
+  have hcopT : Nat.Coprime (Nat.card A) (Nat.card ↥T) :=
+    Nat.Coprime.coprime_dvd_right (Subgroup.card_subgroup_dvd_card T) hcop
+  -- Part (a) applied to `T` ⇒ `T` abelian.
+  have hTab : IsMulCommutative ↥T :=
+    isMulCommutative_of_metacyclic_actionCommutator_eq_top hp_odd hT_pg hT_meta hcopT hψT_top
+  letI : CommGroup ↥T := { (inferInstance : Group ↥T) with mul_comm := hTab.is_comm.comm }
+  -- Prop 1.6(d) for the abelian `T`: `C_T(A) ∩ [T, A] = ⊥`; with `[T, A] = T`, `C_T(A) = ⊥`.
+  have hCT_bot :
+      Subgroup.fixedPointsOfMulAut ψT ⊓ OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊥ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian ψT hcopT
+  rw [hψT_top, inf_top_eq] at hCT_bot
+  -- `C_T(A) = (C_R(A)).subgroupOf T` (membrane transport; `set` is unfolded via `hψT_def`
+  -- so the `@[simp]` lemma `toMulAutHom_apply_val` fires).
+  have hCident : Subgroup.fixedPointsOfMulAut ψT
+      = (Subgroup.fixedPointsOfMulAut φ).subgroupOf T := by
+    ext x
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_fixedPointsOfMulAut,
+      Subgroup.mem_fixedPointsOfMulAut]
+    constructor
+    · intro h a
+      have hv := congrArg (Subtype.val) (h a)
+      simpa [hψT_def] using hv
+    · intro h a
+      exact Subtype.ext (by simpa [hψT_def] using h a)
+  rw [hCident] at hCT_bot
+  -- `(C_R(A)).subgroupOf T = ⊥` ⇒ `Disjoint C_R(A) T` ⇒ `T ∩ C_R(A) = ⊥`.
+  have hdisj : Disjoint (Subgroup.fixedPointsOfMulAut φ) T :=
+    Subgroup.subgroupOf_eq_bot.mp hCT_bot
+  rw [disjoint_iff] at hdisj
+  rw [inf_comm]; exact hdisj
 
 end OddOrder.BG.Ch1.S04b
