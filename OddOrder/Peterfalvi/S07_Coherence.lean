@@ -1470,6 +1470,112 @@ theorem inner_X_conjImage_eq_zero
     inner_sum_orthonormal_eq_zero_of_disjoint hE (Finset.sdiff_subset)
       (Finset.disjoint_sdiff) D.imageFamily.orthonormal, neg_zero]
 
+/-! #### Peterfalvi (5.6.3) target pair `{X, X̄}` from the `ψ = 0` decomposition
+
+The §7 keystone `retarget_isCoherent` consumes an **orthonormal target pair** `{X, X̄} ⊂ ℤ[Irr G]`
+with `X̄ = X − (χ − χ̄)^τ` and the lattice orthogonality `X, X̄ ⊥ τ₁ S₁`.  For an *irreducible*
+`χ` (the (6.6) case: every `χᵢ` is irreducible, so `‖χ‖² = 1`) this whole pair is **forced** by
+the (5.5) decomposition `D : CharacterPsiDecomposition τ χ 0` together with the orthonormality of
+the source pair `{χ, χ̄}` — *no* free-module basis extension / Gram–Schmidt is needed.  The
+arithmetic is the one Peterfalvi performs verbatim in (5.6.3):
+
+* `(5.5)` gives `X^{τ₂} = X = ∑_{α ∈ E} α` with `|E| = ‖χ‖² = 1`, so `X` is a **single**
+  element of `R(χ)`, hence orthonormal (`‖X‖² = |E| = 1`) and a virtual character;
+* `|R(χ)| = ‖(χ − χ̄)^τ‖² = ‖χ − χ̄‖² = 2` (isometry of `τ₁`, `tau1_agrees`, orthonormal `{χ, χ̄}`),
+  so `‖X̄‖² = |R(χ)| − |E| = 2 − 1 = 1` (`inner_self_conjImage_eq_card_sdiff`);
+* `⟨X, X̄⟩ = 0` (`inner_X_conjImage_eq_zero`), and `X̄ = X − (χ − χ̄)^τ ∈ ℤ[Irr G]`.
+
+This is the constructible foundational brick of the G2.7 hstep gate: it discharges the `{X, X̄}`
+block of `retarget_isCoherent` (`hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`/`hXbar_def`) plus virtual-character
+membership, *from* a decomposition `D`.  Producing `D` itself (the auxiliary isometry `τ₁` agreeing
+with the running coherence extension on `χ − χ̄`) is the separate, genuinely hard step. -/
+
+/-- The orthonormal target pair `{X, X̄}` of Peterfalvi (5.6.3), bundled with the facts the
+re-targeting keystone needs.  Here `X̄ = X − (χ − χ̄)^τ`. -/
+structure RetargetTargetPair (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0) where
+  /-- `X ∈ ℤ[Irr G]` (a virtual character of `G`). -/
+  X_mem_ZIrr : D.X ∈ ZIrr G
+  /-- The conjugate image `X̄ = X − (χ − χ̄)^τ ∈ ℤ[Irr G]`. -/
+  conjImage_mem_ZIrr : D.X - τ (χ - χ.conj) ∈ ZIrr G
+  /-- `‖X‖² = 1`. -/
+  inner_self_X : ClassFunction.inner D.X D.X = 1
+  /-- `‖X̄‖² = 1`. -/
+  inner_self_conjImage :
+    ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) = 1
+  /-- `⟨X, X̄⟩ = 0`. -/
+  inner_X_conjImage : ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0
+  /-- `⟨X̄, X⟩ = 0`. -/
+  inner_conjImage_X : ClassFunction.inner (D.X - τ (χ - χ.conj)) D.X = 0
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3): the orthonormal target pair `{X, X̄}` for an irreducible `χ`.**
+
+From the (5.5) decomposition `D` of an irreducible `χ` (`‖χ‖² = 1`) together with the
+orthonormality of the source pair `{χ, χ̄}`, the pair `{X, X̄ := X − (χ − χ̄)^τ}` is orthonormal
+in `ℤ[Irr G]`.  This *constructs* — does not posit — the `{X, X̄}` block of `retarget_isCoherent`.
+
+`(5.5)` yields `X = ∑_{α ∈ E} α` with `|E| = ‖χ‖² = 1`; the source-pair norm computation
+`|R(χ)| = ‖χ − χ̄‖² = 2` (via `tau1_agrees` and the isometry of `τ₁`) then gives
+`‖X̄‖² = |R(χ)| − |E| = 1`, while `‖X‖² = |E| = 1` and `⟨X, X̄⟩ = 0` are read off the orthonormal
+family directly. -/
+noncomputable def retargetTargetPair
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (hχχ : ClassFunction.inner χ χ = 1)
+    (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0)
+    (hχbarχ : ClassFunction.inner χ.conj χ = 0) :
+    D.RetargetTargetPair := by
+  classical
+  -- (5.5): `X = ∑_{α ∈ E} α` with `|E| = ‖χ‖² = 1`.
+  obtain ⟨_hY0, _hτ1χ, E, hEsub, hXsum, hEcard⟩ := D.eq_sum_of_psi_eq_zero
+  have hEcard1 : E.card = 1 := by
+    have : (E.card : ℂ) = 1 := by rw [hEcard, hχχ]
+    exact_mod_cast this
+  -- `|R(χ)| = ‖(χ − χ̄)^τ‖²`, and `(χ − χ̄)^τ = (χ − χ̄)^{τ₁}` is a `τ₁`-isometry image, so
+  -- `|R(χ)| = ‖χ − χ̄‖² = 2`.
+  have hcardR : D.imageFamily.imageSet.card = 2 := by
+    have h1 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) =
+        (D.imageFamily.imageSet.card : ℂ) := by
+      rw [D.imageFamily.image_eq, inner_self_sum_orthonormal_eq_card D.imageFamily.orthonormal]
+    have h2 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) =
+        ClassFunction.inner (χ - χ.conj) (χ - χ.conj) := by
+      rw [← D.tau1_agrees, D.tau1_isometry.inner_eq]
+    have h3 : ClassFunction.inner (χ - χ.conj) (χ - χ.conj) = 2 := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, hχχ, hχbarχbar, hχχbar, hχbarχ]
+      ring
+    have : (D.imageFamily.imageSet.card : ℂ) = 2 := by rw [← h1, h2, h3]
+    exact_mod_cast this
+  -- `‖X‖² = |E| = 1`.
+  have hXnorm : ClassFunction.inner D.X D.X = 1 := by
+    rw [hXsum, inner_self_sum_orthonormal_eq_card
+      (fun a ha b hb => D.imageFamily.orthonormal a (hEsub ha) b (hEsub hb)), hEcard1]
+    norm_num
+  -- `‖X̄‖² = |R(χ)| − |E| = 2 − 1 = 1`.
+  have hXbarnorm : ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) = 1 := by
+    rw [D.inner_self_conjImage_eq_card_sdiff hEsub hXsum, hcardR, hEcard1]
+    push_cast
+    norm_num
+  -- `⟨X, X̄⟩ = 0`, and `⟨X̄, X⟩ = 0` by conjugate symmetry.
+  have hXXbar : ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0 :=
+    D.inner_X_conjImage_eq_zero hEsub hXsum
+  have hXbarX : ClassFunction.inner (D.X - τ (χ - χ.conj)) D.X = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hXXbar, star_zero]
+  -- `X ∈ ℤ[Irr G]` (sum of `R(χ)` members) and `X̄ = X − (χ − χ̄)^τ ∈ ℤ[Irr G]`.
+  have hXmem : D.X ∈ ZIrr G := by
+    rw [hXsum]
+    exact Submodule.sum_mem _ fun α hα => D.imageFamily.mem_ZIrr α (hEsub hα)
+  have hτmem : τ (χ - χ.conj) ∈ ZIrr G := by
+    rw [D.imageFamily.image_eq]
+    exact Submodule.sum_mem _ fun α hα => D.imageFamily.mem_ZIrr α hα
+  exact
+    { X_mem_ZIrr := hXmem
+      conjImage_mem_ZIrr := Submodule.sub_mem _ hXmem hτmem
+      inner_self_X := hXnorm
+      inner_self_conjImage := hXbarnorm
+      inner_X_conjImage := hXXbar
+      inner_conjImage_X := hXbarX }
+
 end CharacterPsiDecomposition
 
 /-! ### The orthonormal-block isometry re-targeting keystone
@@ -2023,6 +2129,51 @@ noncomputable def retarget_isCoherent
   · -- extends_on_supported via span generation + generator agreement.
     intro φ hφ
     exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
+
+open scoped Classical in
+open IntegralCharacterMap in
+/-- **Peterfalvi (5.6.3) per-step coherence, with the target pair constructed from (5.5).**
+
+The (5.6.3) adjoining of `{χ, χ̄}` to a coherent `S₁`, where the orthonormal target pair
+`{X, X̄}` is *not* taken as data but **constructed** from a (5.5) decomposition
+`D : CharacterPsiDecomposition τ χ 0` of the irreducible `χ` (`X := D.X`,
+`X̄ := D.X − (χ − χ̄)^τ`, orthonormal by `retargetTargetPair`).  This isolates exactly the part
+of `retarget_isCoherent` that genuinely couples to the running `τ₁ = hS₁.extension`:
+
+* `hX_ortho`/`hXbar_ortho` — the (5.2.e) cross-orthogonality `D.X, X̄ ⊥ τ₁ ξ` (`ξ ∈ ℤ[S₁]`);
+* `himg` — the (5.6.2) image equation `(χ − a·χ₁)^τ = D.X − a·τ₁ χ₁`.
+
+These two — and these alone — depend on how `D.tau1` relates to the *prior-step* coherence
+extension `hS₁.extension`; everything else (the orthonormality of `{D.X, X̄}` and their virtual-
+character membership) is supplied by `D` through `retargetTargetPair`.  The Round-20 "missing
+Gram–Schmidt / basis-extension primitive" is thereby shown to be unnecessary: for irreducible `χ`
+the target pair is forced, and the real residual is the running-`τ₁` coupling above. -/
+noncomputable def retarget_isCoherent_of_decomposition
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) D.X = 0)
+    (hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) (D.X - τ (χ - chibar)) = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (himg : τ (χ - a • chi1) = D.X - a • hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  subst hχbar_eq
+  -- The orthonormal `{X, X̄}` block, constructed from `D` (no Gram–Schmidt).
+  set P := D.retargetTargetPair hχχ hχbarχbar hχχbar hχbarχ with hP
+  exact retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ
+    P.inner_self_X P.inner_self_conjImage P.inner_X_conjImage P.inner_conjImage_X
+    hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
 
 /-! ### Peterfalvi (6.8.1)/(6.8.2): the orthogonal coherent union `X ∪ Y`
 

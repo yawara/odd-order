@@ -1166,6 +1166,21 @@ set_option linter.style.longLine false in
 -- *lattice* (5.5)+(5.2.e) orthogonality `X,X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`, the (5.6.2) image equation)
 -- plus the (5.1)-type generation `hgen`.  No special-position restriction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent
+-- (5.6.3) target-pair PRODUCER (G2.7 foundational brick): CONSTRUCTS the orthonormal `{X,X̄}` block
+-- of `retarget_isCoherent` *from* a (5.5) decomposition `D : CharacterPsiDecomposition τ χ 0` of an
+-- irreducible `χ` (`‖χ‖²=1`) plus the source-pair orthonormality.  `X := D.X`, `X̄ := D.X−(χ−χ̄)^τ`;
+-- `(5.5)` gives `X = ∑_{E}α` with `|E|=‖χ‖²=1` (single element, ‖X‖²=1), `|R(χ)|=‖χ−χ̄‖²=2` (via
+-- `tau1_agrees`+τ₁-isometry), so `‖X̄‖²=|R(χ)|−|E|=1`; `⟨X,X̄⟩=0` off the orthonormal family; both
+-- ∈ℤ[Irr G].  This refutes the Round-20 "missing Gram–Schmidt/basis-extension" claim: for irreducible
+-- `χ` the target pair is FORCED, no rescaling/orthonormalization primitive is needed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.retargetTargetPair
+-- (5.6.3) per-step assembly with target pair constructed from (5.5): `IsCoherent (S₁∪{χ,χ̄}) A` where
+-- `{X,X̄}` is NOT data but built from `D` via `retargetTargetPair`.  Isolates exactly the residual that
+-- genuinely couples to the running `τ₁ = hS₁.extension`: the (5.2.e) cross-orthogonality `X,X̄ ⊥ τ₁ ξ`
+-- (`hX_ortho`/`hXbar_ortho`) and the (5.6.2) image equation `(χ−aχ₁)^τ = D.X − a·τ₁χ₁` (`himg`).  All
+-- else (orthonormality + virtual-character membership of `{D.X, X̄}`) comes from `D`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decomposition
 -- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
 -- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
 -- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).
