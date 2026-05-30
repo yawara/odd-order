@@ -7,6 +7,7 @@ import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.IsMetacyclic
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # BG §4: p-Groups of Small Rank
@@ -255,5 +256,87 @@ theorem mul_pow_eq_mul_commutator_pow_of_central {x y : K}
     simp only [mul_assoc, pow_zero, one_mul]
 
 end CommutatorPowerIdentities
+
+/-! ## §4A: `Ω₁` of a class-`≤ 2` `p`-group has exponent `1` or `p` (Proposition 4.3(a))
+
+BG Proposition 4.3 (mmd L1387-1472): for `p` odd and a `p`-group `R` with either
+(a) `cl(R) ≤ 2`, or (b) `p > 3` and `cl(R) ≤ 3`, the subgroup `Ω₁(R)` has exponent
+`1` or `p`, and (when `R' ⊆ Ω₁(R)`) the `p`-th power map is a homomorphism.
+
+**The `cl(R) ≤ 2` half of part (a) is already formalised in the repo** and we reuse
+it directly (no wrapper, per project policy):
+
+* `OddOrder.GroupTheory.Omega.pow_eq_one_of_class_le_two`
+  (`OddOrder/GroupTheory/CriticalSubgroup.lean`, Gorenstein Lemma 5.3.9(i)):
+  for `p` odd and `⁅R, R⁆ ≤ Z(R)`, every `g ∈ Ω₁(R) = Omega R p 1` has `g ^ p = 1`,
+  i.e. `Ω₁(R)` has exponent `1` or `p`.
+* `OddOrder.GroupTheory.Omega.exponent_eq_of_class_le_two` (same file): the exponent
+  form `Monoid.exponent (Omega R p 1) = p` (under `Nontrivial (Omega R p 1)`).
+
+These are exactly BG Proposition 4.3(a) in the `cl ≤ 2` case; the BG-facing uses
+(e.g. Lemma 4.5(c), applying 4.3(a) to `Z₂(R)`) call them directly. The
+`cl ≤ 3, p > 3` branch of 4.3 (regular-`p`-group collection, mmd L1410-1472, which
+needs the `(uv)^n` triple-commutator expansion (4.4)) is deferred. -/
+
+/-! ## §4B: existence of elementary abelian `E_{p²}` subgroups (Lemma 4.5(a))
+
+BG Lemma 4.5(a) (mmd L1474, BG defers to **G** Theorem 5.4.10): an odd noncyclic
+`p`-group `R` possesses a **normal** elementary abelian subgroup of order `p²`.
+
+We supply the pieces that the repo infrastructure proves cleanly and rigorously:
+
+* `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`: an odd noncyclic
+  `p`-group has *some* elementary abelian `E_{p²}` (not yet normal). This is the
+  contrapositive of Isaacs Thm 6.11 (`isCyclic_of_subgroups_card_prime_unique_of_odd`)
+  followed by the order-`p²` construction in `ElementaryAbelian.lean`.
+* `exists_normal_isElementaryAbelian_card_prime_sq_of_omega1_center_not_isCyclic`:
+  if moreover `Ω₁(Z(R))` is noncyclic, the `E_{p²}` can be taken central, hence
+  **normal**. This is the (clean) abelian-center case of 4.5(a).
+
+The remaining (nonabelian, cyclic-center) case of the *normal* refinement is exactly
+Gorenstein 5.4.10's substance and is deferred. Parts (b), (c) of Lemma 4.5 are also
+deferred (4.5(b) needs the cyclic-maximal-subgroup classification **G** 5.4.3/5.4.4;
+4.5(c) needs 4.5(a) + Prop 4.3(a) applied to `Z₂(R)` together with the *normal*
+refinement). -/
+
+section ElementaryAbelianExistence
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- A noncyclic finite `p`-group (`p` odd) has two distinct subgroups of order `p`.
+
+This is the contrapositive of Isaacs Thm 6.11
+(`OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd`): a finite
+odd `p`-group with a *unique* subgroup of order `p` is cyclic. -/
+theorem exists_distinct_subgroups_card_prime_of_not_isCyclic (hR : IsPGroup p R)
+    (hp_odd : Odd p) (hnc : ¬ IsCyclic R) :
+    ∃ K L : Subgroup R, Nat.card K = p ∧ Nat.card L = p ∧ K ≠ L := by
+  -- If no two order-`p` subgroups were distinct, `R` would be cyclic (Thm 6.11).
+  have huniq : (∀ K L : Subgroup R, Nat.card K = p → Nat.card L = p → K = L) →
+      IsCyclic R :=
+    fun h => OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hR hp_odd h
+  by_contra h
+  push_neg at h
+  exact hnc (huniq fun K L hK hL => h K L hK hL)
+
+/-- **BG Lemma 4.5(a)** (existence half, normality deferred). An odd noncyclic
+`p`-group `R` contains an elementary abelian subgroup of order `p²`.
+
+Proof: by `exists_distinct_subgroups_card_prime_of_not_isCyclic` there are two
+distinct order-`p` subgroups; `ElementaryAbelian.lean`'s
+`exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne` builds an
+`E_{p²}` from them. -/
+theorem exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic (hR : IsPGroup p R)
+    (hp_odd : Odd p) (hnc : ¬ IsCyclic R) :
+    ∃ E : Subgroup R, E.IsElementaryAbelian p ∧ Nat.card E = p ^ 2 := by
+  obtain ⟨K, L, hK, hL, hKL⟩ :=
+    exists_distinct_subgroups_card_prime_of_not_isCyclic hR hp_odd hnc
+  obtain ⟨E, hE_elem, hE_card⟩ :=
+    hR.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne hK hL hKL
+  exact ⟨E, hE_elem, hE_card⟩
+
+end ElementaryAbelianExistence
 
 end OddOrder.BG.Ch1.S04
