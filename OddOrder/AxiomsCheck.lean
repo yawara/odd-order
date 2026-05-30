@@ -1090,6 +1090,15 @@ set_option linter.style.longLine false in
 -- *計算* 供給。残 input = structural data (imageFamily R(χ), tau1 + isom + agrees, 3 直交スカラー)。
 -- 各 step の D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive に縮約する seam。
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+-- (5.6.3) PASS 2 (ii): per-step shared-isometry decomposition PAIR.  `decompositionPair` produces
+-- BOTH `D₀` (ψ=0) and `Da` (ψ=a·χ₁) from ONE shared `(R(χ), τ₁, isom, agrees)` + the two
+-- `ZIrr`-membership facts `(χ−0)^{τ₁}, (χ−a·χ₁)^{τ₁} ∈ ℤ[Irr G]` via two `ofProjection` calls, so
+-- the τ₁-agreement `Da.tau1 χ = D₀.tau1 χ` is STRUCTURAL (`decompositionPair_tau1_agree`, `rfl`) —
+-- never posited.  This is the honest packaging of the per-step D₀/Da production from the running τ₁.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.decompositionPair
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.decompositionPair_tau1_agree
 -- (5.4.a) ‖X‖² ≥ ‖χ‖².
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X
@@ -1264,6 +1273,14 @@ set_option linter.style.longLine false in
 -- from the actual Dade isometry's per-member (5.5)+(5.2.e) data.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions_and_memberFamily
+-- (5.6.3) PASS 2 (ii) ENTRY POINT: per-step coherence from a SHARED-isometry decomposition pair.
+-- `retarget_isCoherent_of_sharedDecomposition` takes the shared `(R(χ), τ₁, isom, agrees)` + the two
+-- `ZIrr`-membership facts, builds `(D₀, Da)` via `decompositionPair`, and discharges the τ₁-agreement
+-- `htau1_chi : Da.tau1 χ = D₀.tau1 χ` STRUCTURALLY (`decompositionPair_tau1_agree`).  The (5.6.3)
+-- projection identity `Da.X = D₀.X` then follows from the structural agreement.  This is the clean
+-- (6.6) `hstep` shape: a caller supplies the per-step Dade `R(χ)` + global τ₁ + per-member family.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_sharedDecomposition
 -- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
 -- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
 -- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).

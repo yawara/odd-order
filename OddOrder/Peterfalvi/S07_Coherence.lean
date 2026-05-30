@@ -795,6 +795,65 @@ noncomputable def ofProjection
     chiConj_psi_orthogonal := hχbarψ
     chi_chiConj_orthogonal := hχχbar }
 
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) per-step decomposition pair: shared auxiliary isometry.**
+`(D₀, Da)` for the *same* `χ` built against the *same* auxiliary isometry `τ₁`, so that the
+projection identity `Da.tau1 χ = D₀.tau1 χ` (the honest τ₁-agreement input of
+`retarget_isCoherent_of_decompositions`) holds by `rfl`.
+
+This packages the PASS 2 (ii) per-step production: from a single shared `(imageFamily, τ₁,
+isometry, agreement)` plus the two number-theoretic `ZIrr`-membership facts
+`(χ − 0)^{τ₁} ∈ ℤ[Irr G]` and `(χ − a·χ₁)^{τ₁} ∈ ℤ[Irr G]`, both `ofProjection` calls produce
+`CharacterPsiDecomposition`s with the *same* `tau1` field, so the two `R(χ)`-projections are
+evaluated against one running isometry — exactly Peterfalvi's "`τ₂` extends `τ₁`".  The
+distinguishing data are only the two `ψ`-values (`0` and `a·χ₁`); everything geometric (`R(χ)`, the
+isometry, the agreement) is shared, and the `Da.tau1 χ = D₀.tau1 χ` agreement is *structural*.
+
+The orthogonalities for `ψ = a·χ₁` are derived from the bare `⟨χ, χ₁⟩ = ⟨χ̄, χ₁⟩ = 0` (the
+`χ ⊥ S₁` hypothesis); for `ψ = 0` they are automatic (`inner_zero_right`). -/
+noncomputable def decompositionPair {a : ℕ} {chi1 : ClassFunction L ℂ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (tau1 : IntegralCharacterMap L G)
+    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
+    (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
+    (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
+    (hχχ1 : ClassFunction.inner χ chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    CharacterPsiDecomposition (L := L) (G := G) τ χ 0 ×
+      CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1) :=
+  -- `⟨χ, a·χ₁⟩ = a·⟨χ, χ₁⟩ = 0` (nsmul pulls out of the second slot, conjugate of a real `a`).
+  have hχaχ1 : ClassFunction.inner χ (a • chi1 : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, OddOrder.RepresentationTheory.inner_smul_right,
+      hχχ1, mul_zero]
+  have hχbaraχ1 : ClassFunction.inner χ.conj (a • chi1 : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, OddOrder.RepresentationTheory.inner_smul_right,
+      hχbarχ1, mul_zero]
+  (ofProjection imageFamily tau1 htau1_isom htau1_agrees htau1_mem0
+      (by rw [ClassFunction.inner_zero_right]) (by rw [ClassFunction.inner_zero_right]) hχχbar,
+    ofProjection imageFamily tau1 htau1_isom htau1_agrees htau1_mema hχaχ1 hχbaraχ1 hχχbar)
+
+/-- The two decompositions produced by `decompositionPair` share their auxiliary isometry: their
+`tau1` fields are literally the same `tau1`, so `Da.tau1 χ = D₀.tau1 χ` is `rfl`.  This is the
+honest τ₁-agreement `htau1_chi` input of `retarget_isCoherent_of_decompositions`, discharged
+structurally rather than posited. -/
+theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (tau1 : IntegralCharacterMap L G)
+    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
+    (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
+    (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
+    (hχχ1 : ClassFunction.inner χ chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    ((decompositionPair imageFamily tau1 htau1_isom htau1_agrees htau1_mem0 htau1_mema
+        hχχ1 hχbarχ1 hχχbar).2).tau1 χ =
+      ((decompositionPair imageFamily tau1 htau1_isom htau1_agrees htau1_mem0 htau1_mema
+        hχχ1 hχbarχ1 hχχbar).1).tau1 χ :=
+  rfl
+
 /-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
 theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
     {α : ClassFunction G ℂ} (hα : α ∈ D.imageFamily.imageSet) :
@@ -2664,6 +2723,81 @@ noncomputable def retarget_isCoherent_of_decompositions_and_memberFamily
       (hmemOrtho x hx) (hmemTau1 x hx) hα
   exact retarget_isCoherent_of_decompositions hS₁ D₀ Da htau1_chi hχbar_eq hχχ hχbarχbar hχχbar
     hχbarχ hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY htau1_chi1 hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.3) per-step coherence from a shared-isometry decomposition pair.**
+
+The full (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` with the two
+distinguished decompositions `D₀`, `Da` *produced together* by `CharacterPsiDecomposition.decompositionPair`
+from a single shared auxiliary isometry `τ₁` — so the τ₁-agreement input `htau1_chi : Da.tau1 χ =
+D₀.tau1 χ` of `retarget_isCoherent_of_decompositions_and_memberFamily` is discharged **structurally**
+(`decompositionPair_tau1_agree`, by `rfl`), never posited.
+
+This is the precise PASS 2 (ii) entry point for a (6.6) `hstep`: instead of supplying two ad-hoc
+decompositions and *asserting* they evaluate the same running `τ₁` at `χ`, the caller supplies the
+shared `(R(χ), τ₁, isometry, agreement)` and the two number-theoretic membership facts
+`(χ − 0)^{τ₁}, (χ − a·χ₁)^{τ₁} ∈ ℤ[Irr G]`; both decompositions are then built against one isometry
+by `decompositionPair`, and the projection identity `Da.X = D₀.X` ((5.6.3)) follows from the
+*structural* agreement via the already-landed `X_eq_of_tau1_eq_on_chi`.
+
+The remaining inputs are exactly those of `retarget_isCoherent_of_decompositions_and_memberFamily`,
+restated for the produced `Da = (decompositionPair …).2`:
+* the per-member `ψ = 0` family `Dmem`/`hmemOrtho`/`hmemTau1` (the (5.5)+(5.2.e) image-side data);
+* the orthonormality of `{χ, χ̄}` and the `χ, χ̄ ⊥ S₁` relations;
+* the (5.6.2) collapse `hY : Da.Y = a·χ₁^{τ₁}` (produced by `Y_eq_nsmul_tau1_of_lambdaForm`), the
+  (5.4) agreement `htau1_diff`, and the coherence compatibility `htau1_chi1`. -/
+noncomputable def retarget_isCoherent_of_sharedDecomposition
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (tau1 : IntegralCharacterMap L G)
+    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
+    (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
+    (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hχχ1 : ClassFunction.inner χ chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
+    (hχχbar' : ClassFunction.inner χ χ.conj = 0)
+    (Dmem : (x : ClassFunction L ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := L) (G := G) τ x 0)
+    (hmemOrtho : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal imageFamily)
+    (hmemTau1 : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 x = hS₁.extension x)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff :
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+        htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY :
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+        htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).Y =
+        a • ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+          htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1)
+    (htau1_chi1 :
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+        htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A :=
+  -- The two decompositions are produced together against the *same* `τ₁`, so the τ₁-agreement
+  -- `Da.tau1 χ = D₀.tau1 χ` is structural (`rfl`).
+  retarget_isCoherent_of_decompositions_and_memberFamily hS₁
+    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+      htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').1
+    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+      htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2
+    (CharacterPsiDecomposition.decompositionPair_tau1_agree imageFamily tau1 htau1_isom
+      htau1_agrees htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar')
+    hχbar_eq hχχ hχbarχbar hχχbar hχbarχ Dmem hmemOrtho hmemTau1 hχ_S1 hχbar_S1 hchi1
+    htau1_diff hY htau1_chi1 hgen
 
 /-! ### Peterfalvi (6.8.1)/(6.8.2): the orthogonal coherent union `X ∪ Y`
 
