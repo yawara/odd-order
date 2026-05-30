@@ -64,6 +64,18 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 → **Thm 4.12(a) (Huppert, metacyclic+[R,A]=R⇒abelian) の最深 gate が開いた**。次候補 = Thm 4.12(a) 本体 (N-4 + Lem 4.10✅/4.5(b)✅ で書ける) / Prop 4.11 (Huppert) / Prop 4.3(a) full。⚠ Ch04 `quotientMulAutHom` の `_root_` 欠落 (二重 nest 実名) は未修正 — 本ファイルは explicit 実名で回避 (S7A2 と同様)。
 
+**Thm 4.12(a) building blocks 一部 + §5 infra 着地** (2026-05-31, workflow `bg-thm412-s5-fronthalf` wf_13fd7d0a-618, 11 agent, design→逐次 build-green→report, **全 landed を axiom-clean 独立検証済**):
+
+- ✅ **`IsMetacyclic.isCyclic_commutator`** (c3c7a99, `IsMetacyclic.lean`) — metacyclic ⇒ R′ cyclic (a-2 部品)。
+- ✅ **`isCyclic_of_card_omega1_le_prime`** (9891140, S04) — |Ω₁(R)|≤p ⇒ R cyclic (Lem 4.5 逆, a-3/a-4 engine, Isaacs Thm 6.11 経由)。
+- ✅ **§5 S5-0 infra** = 新規 `OddOrder/GroupTheory/NarrowPGroup.lean` (bcfb437/b9484b0/8bc0601/2b1d685/539aeae): `IsNarrow` (r≤2 ∨ C_R(R₀)=R₀×R₁ cyclic) / `IsMaximalElementaryAbelian`(E*(R))+`exists_maximalElementaryAbelian_ge` / `omega1UpperCentralTwo`(W=Ω₁(Z₂(R)))+`commutator_upperCentralSeries_two_le_center`(Z₂ class≤2, genuine) + **Lem 4.5(c) exp-p 半** `pow_eq_one_of_mem_omega1UpperCentralTwo` + T=C_R(W) char/Z(R)⊆T。全 sorry-free/axiom-clean。
+- ❌ wrapper `mulAut_comm_of_isCyclic` は意図的に不着地 (mathlib ZGroup.lean:169 の 1 行 idiom, caller 0, ラッパー方針で禁止 — agent の正しい判断)。
+
+**両 leg の次 gate (workflow 設計が特定)**:
+- **Thm 4.12(a) = D-a2 が最深难所** (mmd L1592-1600): A-不変 cyclic 極大 S の存在は軽いが **S◁R + S⊆Z(R)** が deep ((RA)′⊆C_{RA}(S) を半直積 R⋊[φ]A に lift)。hoist 厳禁。D-a2 後に D-a3 (Maschke 統合, N-4✅) → D-main → D-bc。設計 `notes/bg/s04_thm412_design_2026_05_30.md`。
+- **§5 = Lem 4.7⇒ (=Lem 5.1(a), Gorenstein 5.4.15) と Lem 4.5(c) noncyclic 半 (=Lem 4.5(a) general, Gorenstein 5.4.10) が gate** (ともに §4 側で要)。§5 本体 (Lem 5.1/5.2/Thm 5.3/Cor 5.4) はこれら待ち。設計 `notes/bg/s05_design_2026_05_30.md`。
+- ⚠ **§5 survey の「Lem 1.22 repo 不在」は誤り** — `normal_subgroup_card_pow_le_of_pGroup`@S01:1247 既存 sorry-free (workflow 訂正)。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
