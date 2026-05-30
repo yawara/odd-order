@@ -688,6 +688,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_eq_of_mk_eq
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_inv_one_eq_card
+-- Peterfalvi (6.7.3) coprimality atom `(|C₁|, p) = 1`: `card_class_eq_index_centralizer` is the
+-- orbit-stabilizer identity `|⟦z⟧| = [G : C_G(z)]` (conjugation action of `ConjAct G`), and
+-- `coprime_card_class_card_sylow` derives `IsCoprime |⟦z⟧| |P|` from `P ≤ C_G(z)` (so
+-- `[G:C_G(z)] ∣ [G:P]`, `p ∤ [G:P]`) and `|P| = p^k`.  Discharges the last (6.7.3) atom.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_class_eq_index_centralizer
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.coprime_card_class_card_sylow
 -- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
 -- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
 -- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence
