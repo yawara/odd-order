@@ -621,6 +621,37 @@ landing (sorry/axiom 無). 둘 다 landed (5.4)/(5.5) API 위에 직접 구축, 
   primitive **없음** (검색 확인: `grep LinearIsometry/extend` 무수확; `IsCoherent` 유일한 Type-level
   생성자는 `S08.sibleySetup_is_coherent`의 sorry). 이 확장 생성자가 §5.6 main의 단일 미착수 장애물.
 
+### (2026-05-31, pass 2) (5.6.2) capstone end-to-end + (5.6.3) conjugate-image computations
+
+pass 1의 sub-lemma 위에 (5.6.2)를 **완전히 닫고** (5.6.3)의 isometry 검증 계산을 landing
+(전부 sorry/axiom 無, AxiomsCheck 등록, full `lake build OddOrder` 緑 3351 jobs).
+
+**ZIrrFourier 일반 helper (Hilbert-space, 재사용)**:
+- `inner_self_orthogonalSum_add_re` — **직교족 + 직교 잔차의 Pythagoras**:
+  `‖(∑ᵢ cᵢ•vᵢ) + Z‖²(.re) = ∑ᵢ cᵢ²·mᵢ + ‖Z‖²(.re)` (gram `⟨vᵢ,vⱼ⟩ = δᵢⱼ·mᵢ` 실수, `Z ⊥ vᵢ`).
+- `inner_self_sum_orthonormal_eq_card` — orthonormal 부분합 `‖∑_{a∈s} a‖² = |s|`.
+- `inner_sum_orthonormal_eq_zero_of_disjoint` — disjoint 부분합 cross term `⟨∑_E, ∑_F⟩ = 0`.
+
+**S07 (5.6.2)**:
+- `CharacterPsiDecomposition.sum_sq_mul_add_normSq_Z_le` — (5.6.2) 기하 절반:
+  `Y = (∑ᵢ cᵢ•vᵢ) + Z` (직교족) ⟹ `∑ᵢ cᵢ²·mᵢ + ‖Z‖² ≤ ‖ψ‖²`. Pythagoras + pass-1 opening bound.
+- **`CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero`** — **(5.6.2) capstone** `λ=0 ∧ Z=0`.
+  기하 절반 ∘ 대수전개 `∑(a·[i=i₁]-λrᵢ)²mᵢ = a²m₁ - 2aλ + λ²D` (`Finset.sum_ite_eq'` split + `ring`)
+  ∘ pass-1 정수 forcing `int_eq_zero_of_sq_mul_le_of_two_mul_lt` (ℝ로 transcribe) ∘ 정정치성
+  `eq_zero_of_inner_self_re_eq_zero`. 입력 = (5.6.1) 분해 데이터 + `‖ψ‖²=a²m₁` (`ψ=a·χ₁`) +
+  `r₁·m₁=1` (`a₁=1`) + `2a<D` (가설 (c)) — 모두 §7 Hypothesis + (5.5)에서 **구성가능** (hoisting 아님).
+
+**S07 (5.6.3) conjugate-image** (전부 (5.4.b)/(5.5)의 `E` 데이터에서, `τ₂` 구성 없이):
+- `CharacterPsiDecomposition.conjImage_eq_neg_sum_sdiff` — `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`
+  (`Finset.sum_sdiff` telescoping).
+- `inner_self_conjImage_eq_card_sdiff` — `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` (= `‖χ-χ̄‖²-‖χ‖² = ‖χ̄‖²`).
+- `inner_X_conjImage_eq_zero` — `⟨χ^{τ₂}, χ̄^{τ₂}⟩ = 0` (disjoint `E`, `R(χ)-E` cross term).
+
+이 세 계산이 (5.6.3) `τ₂`의 `extension_isometry` 필드를 직접 공급 (`χ^{τ₂}`/`χ̄^{τ₂}` norm 보존
++ 상호 직교). **남은 단일 장애물은 변함없음**: (5.6.1) ambient bundle 구성 (~150-250 LOC) +
+`τ₂`의 **전역** `IsIntegralIsometry` 확장 생성자 (orthonormal-basis → 전역 등거리 primitive,
+repo/mathlib 부재). main `IsCoherent(S₁∪{χ,χ̄})`는 이 둘이 갖춰지면 위 landed 계산으로 즉시 조립 가능.
+
 ---
 
 ## 未解決 / TODO

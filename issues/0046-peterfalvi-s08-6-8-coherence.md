@@ -212,6 +212,19 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - 残 (5.6): (5.6.1) Y-decomposition (family `{χᵢ}`+degree ratio bundle 要), (5.6.3)/main の
     `τ₂` **전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis →
     전역 등거리)。상세 `notes/peterfalvi/s07_coherence.md` "(2026-05-31)" 절。
+- [x] (2026-05-31, pass 2) **(5.6.2) capstone end-to-end + (5.6.3) conjugate-image** を
+      `S07_Coherence.lean`/`ZIrrFourier.lean` に landing (sorry/axiom 無, AxiomsCheck 登録,
+      full `lake build OddOrder` 緑 3351 jobs)。
+  - ZIrrFourier 일반 helper: `inner_self_orthogonalSum_add_re` (직교족+잔차 Pythagoras
+    `‖∑cᵢ•vᵢ+Z‖²=∑cᵢ²mᵢ+‖Z‖²`), `inner_self_sum_orthonormal_eq_card`,
+    `inner_sum_orthonormal_eq_zero_of_disjoint`。
+  - (5.6.2): `sum_sq_mul_add_normSq_Z_le` (기하 절반 `∑cᵢ²mᵢ+‖Z‖²≤‖ψ‖²`) +
+    **`lambda_eq_zero_and_Z_eq_zero`** ((5.6.2) **capstone** `λ=0 ∧ Z=0`: 기하∘대수전개∘pass-1
+    정수forcing∘정정치성; (5.6.1) 분해 데이터 + `‖ψ‖²=a²m₁` + `r₁m₁=1` + `2a<D` 소비, 전부 구성가능).
+  - (5.6.3): `conjImage_eq_neg_sum_sdiff` (`χ̄^{τ₂}=-∑_{R(χ)-E}α`),
+    `inner_self_conjImage_eq_card_sdiff` (`‖χ̄^{τ₂}‖²=|R(χ)|-|E|=‖χ̄‖²`),
+    `inner_X_conjImage_eq_zero` (`⟨χ^{τ₂},χ̄^{τ₂}⟩=0`) — `τ₂` 구성 없이 (5.4.b) `E` 데이터에서.
+  - 남은 단일 장애물 불변: (5.6.1) ambient bundle 구성 + `τ₂` 전역 `IsIntegralIsometry` 확장 생성자.
 
 ## 完了条件
 
