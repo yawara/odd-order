@@ -1088,3 +1088,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_eq_on_zSpan_of_orthogonal
+-- (5.5)+(5.2.e) orthogonality in sum form: from `X = ∑_{α∈R} c(α)·α` (the (5.5) `X ∈ ℤ[R(χ)]` in
+-- explicit `X_eq` form) and per-element `⟨η, α⟩ = 0`, conclude `⟨η, X⟩ = 0`.  Packages the
+-- `hX_ortho`/`hXbar_ortho` inputs of `retarget_isCoherent` from the per-`R(χ)`-element (5.2.e) fact.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_eq_intCast_sum

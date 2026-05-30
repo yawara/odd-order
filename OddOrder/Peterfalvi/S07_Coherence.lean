@@ -1440,6 +1440,22 @@ theorem inner_eq_zero_of_mem_zSpan {η : ClassFunction L ℂ}
       rw [← Int.cast_smul_eq_zsmul ℂ a x,
         OddOrder.RepresentationTheory.inner_smul_right, ih, mul_zero]
 
+/-- **(5.5)+(5.2.e) orthogonality, sum form.**  If `X = ∑_{α ∈ R} c(α)·α` is an integer
+combination of an indexed family and `η` is orthogonal to every `α ∈ R`, then `⟨η, X⟩ = 0`.
+
+This packages the `hX_ortho`/`hXbar_ortho` hypotheses of `retarget_isCoherent` from the (5.5)
+output `X ∈ ℤ[R(χ)]` (in the explicit `CharacterPsiDecomposition.X_eq` form `X = ∑ coeff α • α`)
+and the per-element (5.2.e) orthogonality `⟨τ₁ ξ, α⟩ = 0` for `α ∈ R(χ)`. -/
+theorem inner_eq_zero_of_eq_intCast_sum {W : Type*} [Group W] [Fintype W]
+    [Invertible (Nat.card W : ℂ)] {η X : ClassFunction W ℂ}
+    {R : Finset (ClassFunction W ℂ)} {c : ClassFunction W ℂ → ℤ}
+    (hX : X = ∑ α ∈ R, (c α : ℂ) • α)
+    (hη : ∀ α ∈ R, ClassFunction.inner η α = 0) :
+    ClassFunction.inner η X = 0 := by
+  rw [hX, OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right, hη α hα, mul_zero]
+
 /-- On the integral span of a set orthogonal to `{χ, χ̄}`, the re-targeting agrees with `τ₁`. -/
 theorem retarget_eq_on_zSpan_of_orthogonal {τ₁ : IntegralCharacterMap L G}
     {χ chibar : ClassFunction L ℂ} {X Xbar : ClassFunction G ℂ}
