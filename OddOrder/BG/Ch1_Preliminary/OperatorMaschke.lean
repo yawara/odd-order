@@ -1,0 +1,279 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Submodule
+import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.Algebra.Module.ZMod
+
+/-!
+# BG §4 — N-4: Maschke A-invariant complement bridge
+
+**Bender–Glauberman**, _Local Analysis for the Odd Order Theorem_, §4 (pp. 38-41),
+supporting **Theorem 4.12(a)** (Huppert) step a-3 and **Theorem 4.16** (Blackburn) Case B-2.
+
+Both proofs need the following analytic step: an operator group `A` (with `φ : A →* MulAut R`)
+acts on a quotient `R ⧸ S` (`S` an `A`-invariant normal subgroup), the section `Ω₁(R ⧸ S)`
+is an elementary abelian `p`-group hence an `F_p`-vector space, and — because `(|A|, |R|)` is
+coprime — **Maschke's theorem** splits off an `A`-invariant complement of any `A`-invariant
+subspace. The complement must be returned as a genuine subgroup `X` of `R` with `S ≤ X`.
+
+The induced quotient action `φ̄ : A →* MulAut (R ⧸ S)` is already available as
+`OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom` (Ch04). This file supplies the **module
+bridge**: it views `Ω₁(R ⧸ S)` additively as a `ZMod p`-module, lifts the `A`-action to a
+`Representation`, calls `MonoidAlgebra.Submodule.exists_isCompl`, and transports the resulting
+`(ZMod p)[A]`-submodule complement back through the order-isomorphisms
+`Representation.mapSubmodule` and `AddSubgroup.toZModSubmodule` to a subgroup of `R`.
+
+## Main results
+
+* `isElementaryAbelian_omega_one_of_comm` — `Ω₁` of an abelian group is elementary abelian.
+* `exists_aInvariant_complement_in_omega1_quotient` — the Maschke bridge (N-4).
+-/
+
+open scoped IsMulCommutative
+
+namespace OddOrder.BG.Ch1_Preliminary
+
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 OddOrder.Isaacs.Ch04
+
+variable {p : ℕ}
+
+/-- In an abelian group, every element of `Ω₁` has `p`-th power `1`.
+
+For abelian `Q` the set `{g | gᵖ = 1}` is already a subgroup, so the closure `Ω₁(Q)` adds
+nothing; we prove it directly by closure induction using commutativity for the product case. -/
+theorem pow_eq_one_of_mem_omega_one_of_comm {Q : Type*} [Group Q]
+    (hQ : ∀ x y : Q, x * y = y * x) {g : Q} (hg : g ∈ Omega Q p 1) : g ^ p = 1 := by
+  induction hg using Subgroup.closure_induction with
+  | mem x hx => simpa only [pow_one] using hx
+  | one => exact one_pow p
+  | mul a b _ _ ha hb =>
+      have hab : Commute a b := hQ a b
+      rw [hab.mul_pow, ha, hb, mul_one]
+  | inv a _ ha => rw [inv_pow, ha, inv_one]
+
+/-- **M-a-1**: `Ω₁` of an abelian `p`-group is elementary abelian.
+
+`Ω₁(Q) = ⟨ g : gᵖ = 1 ⟩`; commutativity comes from `Q` abelian and every element has order
+dividing `p` by `pow_eq_one_of_mem_omega_one_of_comm`. -/
+theorem isElementaryAbelian_omega_one_of_comm {Q : Type*} [Group Q]
+    (hQ : ∀ x y : Q, x * y = y * x) :
+    IsElementaryAbelian p ↥(Omega Q p 1) := by
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · exact Subtype.ext (hQ x.val y.val)
+  · refine Subtype.ext ?_
+    rw [Subgroup.coe_pow, OneMemClass.coe_one]
+    exact pow_eq_one_of_mem_omega_one_of_comm hQ x.property
+
+/-- **M-e-1**: from `(nA, nR)` coprime and `p ∣ nR` we get `(nA : ZMod p) ≠ 0`, the
+`NeZero` instance Maschke needs (`p ∤ |A|` because `p ∣ |R|` and `gcd = 1`). -/
+theorem neZero_natCast_zmod_of_coprime {p nA nR : ℕ} [Fact p.Prime]
+    (hcop : Nat.Coprime nA nR) (hpR : p ∣ nR) : NeZero ((nA : ZMod p)) := by
+  refine ⟨?_⟩
+  rw [Ne, CharP.cast_eq_zero_iff (ZMod p) p]
+  intro hpA
+  have hp1 : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpA hpR
+  exact (Fact.out : p.Prime).ne_one (Nat.dvd_one.mp hp1)
+
+variable {R : Type*} [Group R] {A : Type*} [Group A] {φ : A →* MulAut R}
+
+-- The quotient action `φ̄ : A →* MulAut (R ⧸ S)` lives in Ch04 but, owing to a missing `_root_`
+-- in its declaration, has the (doubly-nested) real name below. We reference it explicitly,
+-- matching existing call sites (`S7A2_NormalPThm75.lean`); the rename is a separate cleanup task.
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- An `A`-invariant subgroup maps to an `A`-invariant subgroup under the quotient action
+`φ̄ = quotientMulAutHom hS`. -/
+theorem isAInvariant_map_mk' {S : Subgroup R} [S.Normal] (hS : IsAInvariant φ S)
+    {H : Subgroup R} (hH : IsAInvariant φ H) :
+    IsAInvariant (quotientMulAutHom hS) (H.map (QuotientGroup.mk' S)) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a q hq
+  rw [Subgroup.mem_map] at hq ⊢
+  obtain ⟨g, hg, rfl⟩ := hq
+  exact ⟨(φ a) g, hH.smul_mem a hg, by rw [quotientMulAutHom_apply_mk']⟩
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- The preimage under `mk' S` of a `φ̄`-invariant subgroup is `φ`-invariant. -/
+theorem isAInvariant_comap_mk' {S : Subgroup R} [S.Normal] (hS : IsAInvariant φ S)
+    {Y : Subgroup (R ⧸ S)} (hY : IsAInvariant (quotientMulAutHom hS) Y) :
+    IsAInvariant φ (Y.comap (QuotientGroup.mk' S)) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a r hr
+  rw [Subgroup.mem_comap] at hr ⊢
+  rw [← quotientMulAutHom_apply_mk']
+  exact hY.smul_mem a hr
+
+/-- The restriction to an `A`-invariant `K` of a `φ`-invariant `H` (as `H.subgroupOf K`) is
+invariant under the restricted action `hK.restrict`. -/
+theorem isAInvariant_subgroupOf_restrict {K : Subgroup R} (hK : IsAInvariant φ K)
+    {H : Subgroup R} (hH : IsAInvariant φ H) :
+    IsAInvariant hK.restrict (H.subgroupOf K) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a h hh
+  rw [Subgroup.mem_subgroupOf] at hh ⊢
+  rw [IsAInvariant.restrict_apply_val]
+  exact hH.smul_mem a hh
+
+/-- A subgroup of `↥K` invariant under `hK.restrict` maps (via `K.subtype`) to a `φ`-invariant
+subgroup of `R`. -/
+theorem isAInvariant_map_subtype_of_restrict {K : Subgroup R} (hK : IsAInvariant φ K)
+    {H : Subgroup ↥K} (hH : IsAInvariant hK.restrict H) :
+    IsAInvariant φ (H.map K.subtype) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a q hq
+  rw [Subgroup.mem_map] at hq ⊢
+  obtain ⟨h, hh, rfl⟩ := hq
+  exact ⟨(hK.restrict a) h, hH.smul_mem a hh, IsAInvariant.restrict_apply_val hK a h⟩
+
+/-- A `MulAut`-action on a commutative `p`-group `W`, packaged as a monoid hom into the
+`F_p`-linear endomorphisms of `Additive W`. Composing with `φ : A →* MulAut W` yields a
+`Representation (ZMod p) A (Additive W)`. (Mirrors the private helper in `AppA_PStability`.) -/
+noncomputable def mulAutToEnd (W : Type*) [Group W] [IsMulCommutative W] (p : ℕ)
+    [Module (ZMod p) (Additive W)] :
+    MulAut W →* Module.End (ZMod p) (Additive W) where
+  toFun φ := ((MulEquiv.toAdditive φ).toLinearEquiv
+      (fun c x => ZMod.map_smul (MulEquiv.toAdditive φ).toAddMonoidHom c x)).toLinearMap
+  map_one' := by ext x; rfl
+  map_mul' φ ψ := by ext x; rfl
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **N-4 Maschke bridge** (BG §4; supports Thm 4.12(a) step a-3 and Thm 4.16 Case B-2).
+
+Let `φ : A →* MulAut R` with `(|A|, |R|)` coprime, `p` prime with `p ∣ |R|`, `S` an
+`A`-invariant normal subgroup with **abelian** quotient `R ⧸ S`. For any `A`-invariant
+`W₀ ≤ R` whose image in `R ⧸ S` lies in `Ω₁(R ⧸ S)`, there is an `A`-invariant `X` with
+`S ≤ X` whose image `X ⧸ S` is an `A`-invariant **complement** of `W₀ ⧸ S` inside
+`Ω₁(R ⧸ S)` (`⊓ = ⊥`, `⊔ = Ω₁`).
+
+`Ω₁(R ⧸ S)` is an `F_p`-vector space and `A` acts on it coprimely, so Maschke's theorem
+(`MonoidAlgebra.Submodule.exists_isCompl`) splits it. -/
+theorem exists_aInvariant_complement_in_omega1_quotient
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hpR : p ∣ Nat.card R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
+    {S : Subgroup R} [S.Normal] (hS : IsAInvariant φ S)
+    (hQab : ∀ x y : R ⧸ S, x * y = y * x)
+    {W₀ : Subgroup R} (hWinv : IsAInvariant φ W₀)
+    (hWΩ : W₀.map (QuotientGroup.mk' S) ≤ Omega (R ⧸ S) p 1) :
+    ∃ X : Subgroup R, S ≤ X ∧ IsAInvariant φ X ∧
+      X.map (QuotientGroup.mk' S) ≤ Omega (R ⧸ S) p 1 ∧
+      X.map (QuotientGroup.mk' S) ⊓ W₀.map (QuotientGroup.mk' S) = ⊥ ∧
+      X.map (QuotientGroup.mk' S) ⊔ W₀.map (QuotientGroup.mk' S) = Omega (R ⧸ S) p 1 := by
+  classical
+  -- `E := Ω₁(R ⧸ S)` is elementary abelian, hence an `F_p`-module on `Additive ↥E`.
+  have hEea : IsElementaryAbelian p ↥(Omega (R ⧸ S) p 1) :=
+    isElementaryAbelian_omega_one_of_comm hQab
+  haveI hEcomm : IsMulCommutative ↥(Omega (R ⧸ S) p 1) := ⟨⟨fun a b => hEea.comm a b⟩⟩
+  have hpsmul : ∀ x : Additive ↥(Omega (R ⧸ S) p 1), (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hEea.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) := AddCommGroup.zmodModule hpsmul
+  haveI : NeZero ((Nat.card A : ZMod p)) := neZero_natCast_zmod_of_coprime hcop hpR
+  have hEinv : IsAInvariant (quotientMulAutHom hS) (Omega (R ⧸ S) p 1) :=
+    IsAInvariant.of_characteristic _
+  -- the `F_p[A]`-representation `ρ` carried by the restricted quotient action.
+  set ρ : Representation (ZMod p) A (Additive ↥(Omega (R ⧸ S) p 1)) :=
+    (mulAutToEnd ↥(Omega (R ⧸ S) p 1) p).comp hEinv.restrict with hρ_def
+  have key_rho : ∀ (a : A) (v : Additive ↥(Omega (R ⧸ S) p 1)),
+      Additive.toMul (ρ a v) = (hEinv.restrict a) (Additive.toMul v) := fun _ _ => rfl
+  -- `W' = W₀ ⧸ S` as a subgroup of `↥E`, and its invariance.
+  set W' := W₀.map (QuotientGroup.mk' S) with hW'_def
+  have hW'inv : IsAInvariant (quotientMulAutHom hS) W' := isAInvariant_map_mk' hS hWinv
+  set pWg : Subgroup ↥(Omega (R ⧸ S) p 1) := W'.subgroupOf (Omega (R ⧸ S) p 1) with hpWg_def
+  have hpWg : IsAInvariant hEinv.restrict pWg := isAInvariant_subgroupOf_restrict hEinv hW'inv
+  -- `W'` as a `ZMod p`-submodule `pW`.
+  set pW := AddSubgroup.toZModSubmodule (n := p) (Subgroup.toAddSubgroup pWg) with hpW_def
+  have hmem_pW : ∀ v : Additive ↥(Omega (R ⧸ S) p 1), v ∈ pW ↔ Additive.toMul v ∈ pWg := by
+    intro v
+    simp only [hpW_def, AddSubgroup.mem_toZModSubmodule, Additive.mem_toAddSubgroup]
+  have hpW_invt : pW ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    intro v hv
+    rw [hmem_pW] at hv ⊢
+    rw [key_rho]
+    exact hpWg.smul_mem a hv
+  -- Maschke: `pW` is a subrepresentation, and the subrepresentation lattice is complemented
+  -- (`IsSemisimpleRepresentation`), so `pW` has an invariant complement `qc`.
+  have hpW_sub : ∀ (a : A) ⦃v : Additive ↥(Omega (R ⧸ S) p 1)⦄, v ∈ pW → ρ a v ∈ pW := by
+    intro a v hv
+    have hmem := ρ.mem_invtSubmodule.mp hpW_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem v hv
+  obtain ⟨qcSub, hcompl⟩ :=
+    ComplementedLattice.exists_isCompl (⟨pW, hpW_sub⟩ : Subrepresentation ρ)
+  set qc : Submodule (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) := qcSub.toSubmodule with hqc_def
+  have hqc_invt : qc ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    exact fun v hv => qcSub.apply_mem_toSubmodule a hv
+  have hinf : pW ⊓ qc = ⊥ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+    simpa [Subrepresentation.toSubmodule_inf] using h
+  have hsup : pW ⊔ qc = ⊤ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
+    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- transport `qc` to a subgroup `Hc` of `↥E` via the order-iso `Φ`.
+  let Φ : Submodule (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) ≃o Subgroup ↥(Omega (R ⧸ S) p 1) :=
+    (AddSubgroup.toZModSubmodule (n := p)).symm.trans AddSubgroup.toSubgroup'
+  set Hc : Subgroup ↥(Omega (R ⧸ S) p 1) := Φ qc with hHc_def
+  have hΦpW : Φ pW = pWg := by
+    have h1 : (AddSubgroup.toZModSubmodule (n := p)).symm pW = Subgroup.toAddSubgroup pWg := by
+      rw [hpW_def, OrderIso.symm_apply_apply]
+    simp only [Φ, OrderIso.trans_apply, h1]
+    exact Subgroup.toAddSubgroup.symm_apply_apply pWg
+  have hmem_Hc : ∀ h : ↥(Omega (R ⧸ S) p 1), h ∈ Hc ↔ (Additive.ofMul h) ∈ qc := by
+    intro h
+    rw [hHc_def]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
+  -- `Hc` is `A`-invariant (under `hEinv.restrict`).  `(ρ a) (ofMul h) = ofMul ((restrict a) h)`
+  -- definitionally, so the invariant-submodule membership transfers by `exact`.
+  have hHc_inv : IsAInvariant hEinv.restrict Hc := by
+    rw [isAInvariant_iff_smul_mem]
+    intro a h hh
+    rw [hmem_Hc] at hh ⊢
+    have hmem := ρ.mem_invtSubmodule.mp hqc_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem _ hh
+  -- subgroup-level complement inside `↥E`.
+  have hinf_g : pWg ⊓ Hc = ⊥ := by
+    have h := congrArg Φ hinf; rwa [Φ.map_inf, Φ.map_bot, hΦpW, ← hHc_def] at h
+  have hsup_g : pWg ⊔ Hc = ⊤ := by
+    have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpW, ← hHc_def] at h
+  -- lift `Hc` to `Y := Hc ⧸ S`-as-subgroup-of-`R ⧸ S`, and `X := Y.comap (mk' S)`.
+  set Y : Subgroup (R ⧸ S) := Hc.map (Omega (R ⧸ S) p 1).subtype with hY_def
+  have hY_le : Y ≤ Omega (R ⧸ S) p 1 := by rw [hY_def]; exact Subgroup.map_subtype_le _
+  have hYinv : IsAInvariant (quotientMulAutHom hS) Y :=
+    isAInvariant_map_subtype_of_restrict hEinv hHc_inv
+  have hpWg_map : pWg.map (Omega (R ⧸ S) p 1).subtype = W' := by
+    rw [hpWg_def, Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
+      inf_eq_right.mpr hWΩ]
+  have hYW_inf : Y ⊓ W' = ⊥ := by
+    rw [hY_def, ← hpWg_map,
+      ← Subgroup.map_inf _ _ _ (Omega (R ⧸ S) p 1).subtype_injective,
+      inf_comm, hinf_g, Subgroup.map_bot]
+  have hYW_sup : Y ⊔ W' = Omega (R ⧸ S) p 1 := by
+    rw [hY_def, ← hpWg_map, ← Subgroup.map_sup, sup_comm, hsup_g, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+  -- assemble `X`.
+  refine ⟨Y.comap (QuotientGroup.mk' S), ?_, isAInvariant_comap_mk' hS hYinv, ?_, ?_, ?_⟩
+  · intro s hs
+    rw [Subgroup.mem_comap, QuotientGroup.coe_mk', (QuotientGroup.eq_one_iff s).mpr hs]
+    exact Y.one_mem
+  · rw [Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S)]; exact hY_le
+  · rw [Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S)]; exact hYW_inf
+  · rw [Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S)]; exact hYW_sup
+
+end OddOrder.BG.Ch1_Preliminary
