@@ -221,6 +221,97 @@ theorem exists_pair_of_sum_sq_eq_two {ι : Type*} [DecidableEq ι] {s : Finset �
   · rw [pow_two] at hα1; exact mul_self_eq_one_iff.mp hα1
   · rw [pow_two] at hβ1; exact mul_self_eq_one_iff.mp hβ1
 
+/-! ### Integer Cauchy–Schwarz on a coefficient vector
+
+The numeric core of Peterfalvi §7 (5.4): for an integer `c`, `c ≤ c²`, with
+equality exactly when `c ∈ {0, 1}`.  Summed over a finite index set this gives
+`∑ c ≤ ∑ c²` and the tight equality `∀ a, c a ∈ {0, 1}`.  These are pure `ℤ`
+facts used to turn the orthonormal Parseval identities into the (5.4.a)
+inequality `‖χ‖² ≤ ‖X‖²` and the (5.4.b) reconstruction `X = ∑_{α ∈ E} α`. -/
+
+/-- For an integer `c`, `c ≤ c²` (since `c (c - 1) ≥ 0`). -/
+theorem int_le_sq (c : ℤ) : c ≤ c ^ 2 := by nlinarith [sq_nonneg (c - 1), sq_nonneg c]
+
+/-- Equality `c = c²` holds for an integer iff `c ∈ {0, 1}`. -/
+theorem int_eq_sq_iff (c : ℤ) : c = c ^ 2 ↔ c = 0 ∨ c = 1 := by
+  constructor
+  · intro h
+    have : c * (c - 1) = 0 := by ring_nf; linarith [h]
+    rcases mul_eq_zero.mp this with h0 | h1
+    · exact Or.inl h0
+    · exact Or.inr (by omega)
+  · rintro (rfl | rfl) <;> norm_num
+
+/-- **Finite integer Cauchy–Schwarz.** `∑_{a ∈ s} c a ≤ ∑_{a ∈ s} (c a)²`. -/
+theorem finset_sum_le_sum_sq {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
+    ∑ a ∈ s, c a ≤ ∑ a ∈ s, (c a) ^ 2 :=
+  Finset.sum_le_sum fun a _ => int_le_sq (c a)
+
+/-- **Tightness of integer Cauchy–Schwarz.** The sum and the sum of squares are
+equal iff every coefficient is `0` or `1`. -/
+theorem finset_sum_eq_sum_sq_iff {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
+    (∑ a ∈ s, c a = ∑ a ∈ s, (c a) ^ 2) ↔ ∀ a ∈ s, c a = 0 ∨ c a = 1 := by
+  constructor
+  · intro h a ha
+    exact (int_eq_sq_iff (c a)).mp
+      ((Finset.sum_eq_sum_iff_of_le fun a _ => int_le_sq (c a)).mp h a ha)
+  · intro h
+    exact Finset.sum_congr rfl fun a ha => (int_eq_sq_iff (c a)).mpr (h a ha)
+
+/-! ### Parseval on an arbitrary orthonormal finite family
+
+Peterfalvi's `R(χ)` in (5.2.d) is an **orthonormal subset of `ℤ[Irr G]`** (norm-`1`,
+pairwise-orthogonal virtual characters — not necessarily single irreducibles).  The (5.4)
+argument only needs the Parseval identities for such a family: the Fourier coefficient of
+an integer combination `X = ∑ c_a • α_a` at a basis vector `α_b` is `c_b`, and the squared
+norm is `∑ c_a²`.  These lemmas are stated for a `Finset` carrying an explicit
+orthonormality hypothesis `⟨α_a, α_b⟩ = δ_{a,b}`, so they apply verbatim once the family is
+extracted from the gateway struct. -/
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Coefficient recovery in an orthonormal family.** If `⟨a, b⟩ = δ_{a,b}` for all
+`a, b ∈ s`, then the Fourier coefficient of `X = ∑_{a ∈ s} (c a) • a` at `b ∈ s` is `c b`. -/
+theorem inner_orthonormalSum_eq_coeff {s : Finset (ClassFunction G ℂ)} {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    {b : ClassFunction G ℂ} (hb : b ∈ s) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) b = (c b : ℂ) := by
+  classical
+  rw [inner_sum_left]
+  have step : (∑ a ∈ s, ClassFunction.inner ((c a : ℂ) • a) b)
+      = ∑ a ∈ s, (if a = b then (c a : ℂ) else 0) := by
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [ClassFunction.inner_smul_left, horth a ha b hb, mul_ite, mul_one, mul_zero]
+  rw [step, Finset.sum_ite_eq' s b (fun a => (c a : ℂ)), if_pos hb]
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Parseval (norm form) for an orthonormal family.** With `⟨a, b⟩ = δ_{a,b}` on `s`, the
+squared norm of `X = ∑_{a ∈ s} (c a) • a` is `∑_{a ∈ s} (c a)²`. -/
+theorem inner_self_orthonormalSum_eq_sum_sq {s : Finset (ClassFunction G ℂ)}
+    {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) (∑ a ∈ s, (c a : ℂ) • a) =
+      ∑ a ∈ s, (c a : ℂ) ^ 2 := by
+  rw [inner_sum_right]
+  refine Finset.sum_congr rfl fun b hb => ?_
+  rw [inner_smul_right, inner_orthonormalSum_eq_coeff horth hb, star_intCast]
+  ring
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Inner product against the all-ones sum.** With `⟨a, b⟩ = δ_{a,b}` on `s`, the inner
+product of `X = ∑_{a ∈ s} (c a) • a` against the unsigned sum `∑_{a ∈ s} a` is `∑_{a ∈ s} c a`.
+This is the middle identity of Peterfalvi (5.4.a): `‖χ‖² = ⟨X, ∑_{α} α⟩ = ∑_{α} ⟨X, α⟩`. -/
+theorem inner_orthonormalSum_sum_eq_sum_coeff {s : Finset (ClassFunction G ℂ)}
+    {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) (∑ a ∈ s, a) =
+      ∑ a ∈ s, (c a : ℂ) := by
+  rw [inner_sum_right]
+  refine Finset.sum_congr rfl fun b hb => ?_
+  exact inner_orthonormalSum_eq_coeff horth hb
+
 set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- An irreducible representation has positive dimension. -/
