@@ -824,3 +824,9 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_natCast
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
+
+-- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
+-- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
+-- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.
+#assert_only_allowed_axioms OddOrder.GroupTheory.coset_eq_cosetConjImage
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_mem_centralizer_conj

@@ -32,6 +32,11 @@ exponent `k`, produced by the Chinese remainder theorem, simultaneously fixes
   `a * x` is conjugate to `a * x'` (with `x, x'` of order dividing such an `n`,
   both commuting with `a`), then the conjugator already centralizes `a`, and
   conjugates `x` to `x'`.
+* `OddOrder.GroupTheory.exists_mem_centralizer_conj` /
+  `OddOrder.GroupTheory.coset_eq_cosetConjImage` — **Peterfalvi (2.1)**: for `g`
+  normalizing `H` with `(|H|, orderOf g) = 1`, the coset `Hg` is the disjoint
+  union of `|H : C_H(g)|` `H`-conjugates of `C_H(g) g`; equivalently every
+  element of `Hg` is `H`-conjugate to an element of `C_H(g) g`.
 
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
@@ -275,6 +280,196 @@ theorem mem_centralizer_of_coset_conj_eq
   exact Subgroup.mem_inf.mpr
     ⟨H.mul_mem hy (H.inv_mem hx),
       Subgroup.mem_centralizer_singleton_iff.mpr (mul_inv_eq_iff_eq_mul.mp hfix)⟩
+
+/-- The `H`-conjugates of the coset `C_H(g) g`, packaged as the image of
+`(c, x) ↦ x⁻¹ (c g) x` (`c ∈ C_H(g)`, `x ∈ H`).  This is the set `K = Hg` of
+the textbook proof of (2.1). -/
+private def cosetConjImage (g : G) (H : Subgroup G) : Set G :=
+  Set.range fun p : ↥(H ⊓ Subgroup.centralizer ({g} : Set G)) × ↥H =>
+    (p.2 : G)⁻¹ * ((p.1 : G) * g) * (p.2 : G)
+
+variable (hnorm : ∀ x ∈ H, g * x * g⁻¹ ∈ H)
+
+include hnorm in
+/-- Each conjugate `x⁻¹ (c g) x` (`c ∈ C_H(g)`, `x ∈ H`) lies in the coset `Hg`. -/
+private theorem cosetConjImage_subset_coset :
+    cosetConjImage g H ⊆ {w | w * g⁻¹ ∈ H} := by
+  rintro _ ⟨⟨c, x⟩, rfl⟩
+  obtain ⟨hcH, _⟩ := Subgroup.mem_inf.mp c.2
+  -- `x⁻¹ (c g) x g⁻¹ = (x⁻¹ c) (g x g⁻¹) ∈ H`.
+  have hgxg : g * (x : G) * g⁻¹ ∈ H := hnorm _ x.2
+  have key : (x : G)⁻¹ * ((c : G) * g) * (x : G) * g⁻¹
+      = ((x : G)⁻¹ * (c : G)) * (g * (x : G) * g⁻¹) := by group
+  rw [Set.mem_setOf_eq, key]
+  exact H.mul_mem (H.mul_mem (H.inv_mem x.2) hcH) hgxg
+
+/-- **Cardinality of the conjugate image** (Peterfalvi (2.1)).  The set
+`K = ⋃_{x∈H} (C_H(g) g)^x` has exactly `|H|` elements: it is the disjoint union
+of `|H : C_H(g)|` translated copies of `C_H(g) g`, each of size `|C_H(g)|`.
+
+The proof is the textbook count `|K| = |H : C_H(g)| · |C_H(g) g| = |H|` realized
+as a fiberwise count of the surjection `(c, x) ↦ x⁻¹ (c g) x` onto `K`: every
+fiber is the orbit `{(e c₀ e⁻¹, e x₀) : e ∈ C_H(g)}` of a witness, hence has size
+`|C_H(g)|`, and the domain has size `|C_H(g)| · |H|`.  (Normalization of `H` by
+`g` is not needed for the count itself, only for `K ⊆ Hg`.) -/
+private theorem card_cosetConjImage
+    [Finite G] (hcop : Nat.Coprime (orderOf g) (Nat.card H)) :
+    Nat.card (cosetConjImage g H) = Nat.card H := by
+  classical
+  letI : Fintype G := Fintype.ofFinite G
+  set C : Subgroup G := H ⊓ Subgroup.centralizer ({g} : Set G) with hC
+  -- The conjugation map and the target finset `T = K`.
+  set Φ : ↥C × ↥H → G := fun p => (p.2 : G)⁻¹ * ((p.1 : G) * g) * (p.2 : G) with hΦ
+  set T : Finset G := (Finset.univ : Finset (↥C × ↥H)).image Φ with hT
+  have hrange : (T : Set G) = cosetConjImage g H := by
+    rw [hT, Finset.coe_image, Finset.coe_univ, Set.image_univ]; rfl
+  -- Fiber count: each fiber over `w ∈ T` has card `|C|`.
+  have hfiber : ∀ w ∈ T, (Finset.univ.filter (fun p => Φ p = w)).card = Nat.card C := by
+    intro w hw
+    rw [hT, Finset.mem_image] at hw
+    obtain ⟨⟨c₀, x₀⟩, -, hcx₀⟩ := hw
+    have hcx₀' : (x₀ : G)⁻¹ * ((c₀ : G) * g) * (x₀ : G) = w := hcx₀
+    rw [Nat.card_eq_fintype_card, ← Finset.card_univ (α := ↥C)]
+    -- `e ↦ (e c₀ e⁻¹, e x₀)` bijects `C` with the fiber; inverse `(c,x) ↦ x x₀⁻¹`.
+    -- membership of `x x₀⁻¹` in `C` (via rigidity), packaged for `i`.
+    have hiMem : ∀ p : ↥C × ↥H, p ∈ Finset.univ.filter (fun p => Φ p = w) →
+        (p.2 : G) * (x₀ : G)⁻¹ ∈ C := by
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      have heq : (p.2 : G)⁻¹ * ((p.1 : G) * g) * (p.2 : G)
+          = (x₀ : G)⁻¹ * ((c₀ : G) * g) * (x₀ : G) := by
+        have : Φ p = w := hp.2; rw [hcx₀']; exact this
+      have hmemC := mem_centralizer_of_coset_conj_eq (g := g) (H := H) hcop
+        p.2.2 x₀.2 p.1.2 c₀.2 heq
+      have := C.inv_mem hmemC
+      rwa [mul_inv_rev, inv_inv] at this
+    have hjMem : ∀ e : ↥C, (e : G) * (x₀ : G) ∈ H := fun e =>
+      H.mul_mem ((Subgroup.mem_inf.mp e.2).1) x₀.2
+    refine Finset.card_bij'
+      (i := fun (p : ↥C × ↥H) hp => (⟨(p.2 : G) * (x₀ : G)⁻¹, hiMem p hp⟩ : ↥C))
+      (j := fun (e : ↥C) _ =>
+        ((e * c₀ * e⁻¹ : ↥C), (⟨(e : G) * (x₀ : G), hjMem e⟩ : ↥H)))
+      (fun p _ => Finset.mem_univ _) ?_ ?_ ?_
+    · -- `j e ∈ fiber`
+      intro e _
+      rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      obtain ⟨-, hecomm⟩ := Subgroup.mem_inf.mp e.2
+      have hge : Commute (e : G) g := Subgroup.mem_centralizer_singleton_iff.mp hecomm
+      have hge' : (e : G)⁻¹ * g = g * (e : G)⁻¹ := hge.inv_left
+      change ((e : G) * (x₀ : G))⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * g)
+        * ((e : G) * (x₀ : G)) = w
+      rw [← hcx₀']
+      calc ((e : G) * (x₀ : G))⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * g) * ((e : G) * (x₀ : G))
+          = (x₀ : G)⁻¹ * ((c₀ : G) * ((e : G)⁻¹ * g * (e : G))) * (x₀ : G) := by group
+        _ = (x₀ : G)⁻¹ * ((c₀ : G) * g) * (x₀ : G) := by rw [hge']; group
+    · -- left inverse: `j (i p) = p`.  With `e := x x₀⁻¹`, recover `c` and `x`.
+      rintro ⟨c, x⟩ hmem
+      rw [Finset.mem_filter] at hmem
+      have hΦeq : (x : G)⁻¹ * ((c : G) * g) * (x : G) = w := hmem.2
+      have heq : (x : G)⁻¹ * ((c : G) * g) * (x : G)
+          = (x₀ : G)⁻¹ * ((c₀ : G) * g) * (x₀ : G) := by rw [hΦeq, hcx₀']
+      obtain ⟨-, hecomm⟩ :=
+        Subgroup.mem_inf.mp
+          (mem_centralizer_of_coset_conj_eq (g := g) (H := H) hcop x.2 x₀.2 c.2 c₀.2 heq)
+      -- `x₀ x⁻¹` centralizes `g`.
+      have hcomm : (x₀ : G) * (x : G)⁻¹ * g = g * ((x₀ : G) * (x : G)⁻¹) :=
+        Subgroup.mem_centralizer_singleton_iff.mp hecomm
+      apply Prod.ext
+      · -- first coordinate `(x x₀⁻¹) c₀ (x x₀⁻¹)⁻¹ = c`
+        apply Subtype.ext
+        change (x : G) * (x₀ : G)⁻¹ * (c₀ : G) * ((x : G) * (x₀ : G)⁻¹)⁻¹ = (c : G)
+        -- from `x⁻¹ c g x = x₀⁻¹ c₀ g x₀`, conjugate by `x` and `x₀`.
+        have e1 : (x : G)⁻¹ * (c : G) * g * (x : G) = (x₀ : G)⁻¹ * (c₀ : G) * g * (x₀ : G) := by
+          rw [show (x : G)⁻¹ * (c : G) * g * (x : G) = (x : G)⁻¹ * ((c : G) * g) * (x : G) by group,
+            show (x₀ : G)⁻¹ * (c₀ : G) * g * (x₀ : G)
+              = (x₀ : G)⁻¹ * ((c₀ : G) * g) * (x₀ : G) by group]
+          exact heq
+        -- `c g = (x x₀⁻¹) c₀ g (x₀ x⁻¹)`
+        have e2 : (c : G) * g = (x : G) * (x₀ : G)⁻¹ * ((c₀ : G) * g) * ((x₀ : G) * (x : G)⁻¹) := by
+          calc (c : G) * g
+              = (x : G) * ((x : G)⁻¹ * (c : G) * g * (x : G)) * (x : G)⁻¹ := by group
+            _ = (x : G) * ((x₀ : G)⁻¹ * (c₀ : G) * g * (x₀ : G)) * (x : G)⁻¹ := by rw [e1]
+            _ = (x : G) * (x₀ : G)⁻¹ * ((c₀ : G) * g) * ((x₀ : G) * (x : G)⁻¹) := by group
+        -- swap `g` past `x₀ x⁻¹` on the RHS via `hcomm`, then cancel `g`.
+        have e3 : (c : G) * g
+            = (x : G) * (x₀ : G)⁻¹ * (c₀ : G) * ((x : G) * (x₀ : G)⁻¹)⁻¹ * g := by
+          rw [e2, mul_inv_rev, inv_inv]
+          calc (x : G) * (x₀ : G)⁻¹ * ((c₀ : G) * g) * ((x₀ : G) * (x : G)⁻¹)
+              = (x : G) * (x₀ : G)⁻¹ * (c₀ : G) * (g * ((x₀ : G) * (x : G)⁻¹)) := by group
+            _ = (x : G) * (x₀ : G)⁻¹ * (c₀ : G) * (((x₀ : G) * (x : G)⁻¹) * g) := by rw [hcomm]
+            _ = (x : G) * (x₀ : G)⁻¹ * (c₀ : G) * ((x₀ : G) * (x : G)⁻¹) * g := by group
+        rw [mul_right_cancel e3]
+      · -- second coordinate `x x₀⁻¹ · x₀ = x`
+        apply Subtype.ext
+        change (x : G) * (x₀ : G)⁻¹ * (x₀ : G) = (x : G)
+        group
+    · -- right inverse: `i (j e) = e`
+      intro e _
+      apply Subtype.ext
+      change (e : G) * (x₀ : G) * (x₀ : G)⁻¹ = (e : G)
+      group
+  -- Domain card `= |C| · |H|`, fiberwise sum `= T.card · |C|`.
+  have hsum := Finset.card_eq_sum_card_fiberwise (f := Φ)
+    (s := (Finset.univ : Finset (↥C × ↥H))) (t := T)
+    (fun p _ => Finset.mem_image_of_mem Φ (Finset.mem_univ p))
+  rw [Finset.sum_congr rfl hfiber, Finset.sum_const, smul_eq_mul] at hsum
+  rw [Finset.card_univ, Fintype.card_prod, ← Nat.card_eq_fintype_card,
+    ← Nat.card_eq_fintype_card] at hsum
+  -- `Nat.card K = T.card` (coe), and conclude.
+  have hcardC : 0 < Nat.card C := Nat.card_pos
+  have hTcard : T.card = Nat.card H := by
+    have : Nat.card C * Nat.card H = T.card * Nat.card C := hsum
+    have := this.symm
+    rw [mul_comm (Nat.card C) (Nat.card H)] at this
+    exact Nat.eq_of_mul_eq_mul_right hcardC this
+  rw [← hrange, Nat.card_coe_set_eq, Set.ncard_coe_finset, hTcard]
+
+/-- **Peterfalvi (2.1), set form.**  If `g` normalizes `H` and `⟨g⟩`, `H` have
+coprime orders, then the coset `Hg` *equals* the union `⋃_{x∈H} (C_H(g) g)^x` of
+the `H`-conjugates of `C_H(g) g`.
+
+The textbook counting closure: the union is contained in `Hg` and has cardinality
+`|H : C_H(g)| · |C_H(g)| = |H| = |Hg|`, so the two finite sets coincide. -/
+theorem coset_eq_cosetConjImage [Finite G]
+    (hcop : Nat.Coprime (orderOf g) (Nat.card H)) (hnorm : ∀ x ∈ H, g * x * g⁻¹ ∈ H) :
+    {w | w * g⁻¹ ∈ H} = cosetConjImage g H := by
+  classical
+  have hsub := cosetConjImage_subset_coset (g := g) (H := H) hnorm
+  -- `Hg` is a translate of `H`, hence has `|H|` elements.
+  have hcoset_card : Nat.card {w : G | w * g⁻¹ ∈ H} = Nat.card H := by
+    refine Nat.card_congr (Equiv.symm ?_)
+    refine
+      { toFun := fun h => ⟨(h : G) * g, by
+          rw [Set.mem_setOf_eq, mul_assoc, mul_inv_cancel, mul_one]; exact h.2⟩
+        invFun := fun w => ⟨(w : G) * g⁻¹, w.2⟩
+        left_inv := fun h => by apply Subtype.ext; group
+        right_inv := fun w => by apply Subtype.ext; group }
+  -- Equal cardinalities + inclusion ⟹ equal sets.
+  refine (Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)).symm
+  rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq, hcoset_card,
+    card_cosetConjImage (g := g) (H := H) hcop]
+
+/-- **Peterfalvi (2.1), existence form.**  If `g` normalizes `H` and `⟨g⟩`, `H`
+have coprime orders, then every element `h g` of the coset `Hg` is `H`-conjugate
+to an element `c g` with `c ∈ C_H(g) = H ⊓ C_G(g)`.
+
+This is the principal consequence used throughout the text: the coset `Hg`
+collapses, under `H`-conjugation, onto `C_H(g) g`. -/
+theorem exists_mem_centralizer_conj [Finite G]
+    (hcop : Nat.Coprime (orderOf g) (Nat.card H)) (hnorm : ∀ x ∈ H, g * x * g⁻¹ ∈ H)
+    {h : G} (hh : h ∈ H) :
+    ∃ c ∈ H ⊓ Subgroup.centralizer ({g} : Set G), ∃ x ∈ H, x * (h * g) * x⁻¹ = c * g := by
+  have hmem : h * g ∈ cosetConjImage g H := by
+    rw [← coset_eq_cosetConjImage (g := g) (H := H) hcop hnorm]
+    simpa using hh
+  obtain ⟨⟨c, x⟩, hcx⟩ := hmem
+  -- `hcx : x⁻¹ (c g) x = h g`, so `x (h g) x⁻¹ = c g`.
+  refine ⟨c, c.2, (x : G), x.2, ?_⟩
+  have hcx' : (x : G)⁻¹ * ((c : G) * g) * (x : G) = h * g := hcx
+  calc (x : G) * (h * g) * (x : G)⁻¹
+      = (x : G) * ((x : G)⁻¹ * ((c : G) * g) * (x : G)) * (x : G)⁻¹ := by rw [hcx']
+    _ = (c : G) * g := by group
 
 end CosetConjugacy
 
