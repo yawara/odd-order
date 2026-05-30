@@ -1411,6 +1411,61 @@ theorem lambda_eq_zero_and_Z_eq_zero
     rw [hlam0] at hquad; push_cast at hquad; nlinarith [hquad]
   exact eq_zero_of_inner_self_re_eq_zero (le_antisymm hZ0 hZre_nonneg)
 
+/-! #### Peterfalvi (5.6.3) projection identity `Da.X = D₀.X`
+
+The (5.6.3) extension `τ₂` is defined with `χ^{τ₂} = X` where `X` is *the same* `X` for the
+`ψ = 0` decomposition `D₀` (giving `χ^{τ₁} = X` by (5.5)) and the `ψ = a·χ₁` decomposition `Da`
+(giving `(χ − a·χ₁)^{τ₁} = X − Y`).  This is only well-defined because **the `R(χ)`-projection `X`
+is independent of `ψ`**.  The two lemmas below *derive* this, rather than positing it:
+
+* For the `ψ = a·χ₁` decomposition `Da`, the (5.6.2) collapse `Y = a·χ₁^{τ₁}`
+  (`lambda_eq_zero_and_Z_eq_zero` fed back) gives `Da.X = Da.tau1 χ` directly, by linearity of
+  `Da.tau1` on `χ − a·χ₁` (`X_eq_tau1_chi_of_Y_eq`);
+* the (5.5) decomposition `D₀` gives `D₀.tau1 χ = D₀.X` (`eq_sum_of_psi_eq_zero`).
+
+When the two decompositions are built against the *same* auxiliary isometry `τ₁` (the running
+coherence extension), `Da.tau1 χ = D₀.tau1 χ`, so `Da.X = Da.tau1 χ = D₀.tau1 χ = D₀.X`
+(`X_eq_of_tau1_eq_on_chi`).  The agreement `Da.tau1 χ = D₀.tau1 χ` is the honest input — it is what
+"both decompositions use the running `τ₁`" means — *not* the conclusion `Da.X = D₀.X` itself. -/
+
+/-- **Peterfalvi (5.6.2)/(5.6.3) `X = χ^{τ₁}` for the `ψ = a·χ₁` decomposition.**
+
+For a decomposition `D : CharacterPsiDecomposition τ χ (a·χ₁)` whose orthogonal part has collapsed
+to `Y = a·χ₁^{τ₁}` (the (5.6.2) conclusion, `hY`), the image part `X` equals `χ^{τ₁}`:
+`D.X = D.tau1 χ`.
+
+`D.tau1 (χ − a·χ₁) = D.X − D.Y = D.X − a·χ₁^{τ₁}` (`tau1_image`, `hY`), while linearity gives
+`D.tau1 (χ − a·χ₁) = χ^{τ₁} − a·χ₁^{τ₁}` (`map_sub`, `map_nsmul`).  Cancelling `a·χ₁^{τ₁}` yields
+`D.X = χ^{τ₁}`.  This is the `ψ`-independence of the `R(χ)`-projection used in (5.6.3). -/
+theorem X_eq_tau1_chi_of_Y_eq {a : ℕ} {chi1 : ClassFunction L ℂ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hY : D.Y = a • D.tau1 chi1) :
+    D.X = D.tau1 χ := by
+  have himg := D.tau1_image
+  rw [hY, map_sub, map_nsmul] at himg
+  -- `χ^{τ₁} − a·χ₁^{τ₁} = X − a·χ₁^{τ₁}` ⟹ `χ^{τ₁} = X` ⟹ `X = χ^{τ₁}`.
+  exact (sub_left_inj.mp himg).symm
+
+/-- **Peterfalvi (5.6.3) projection identity `Da.X = D₀.X`.**
+
+The `R(χ)`-projection `X` is the same for the `ψ = 0` decomposition `D₀` and the `ψ = a·χ₁`
+decomposition `Da`, *provided both use the same auxiliary isometry `τ₁` on `χ`* (the honest input
+`htau1_chi : Da.tau1 χ = D₀.tau1 χ`, expressing that both decompositions are built against the
+running coherence extension).
+
+`Da.X = Da.tau1 χ` (by `X_eq_tau1_chi_of_Y_eq`, using the (5.6.2) collapse `hY`), `Da.tau1 χ =
+D₀.tau1 χ` (`htau1_chi`), `D₀.tau1 χ = D₀.X` (`eq_sum_of_psi_eq_zero` for `ψ = 0`).  Chaining gives
+`Da.X = D₀.X`.  This *constructs* the `hX_eq` hypothesis of
+`retarget_isCoherent_of_decompositions` from the two decompositions and the τ₁-agreement, rather
+than positing it. -/
+theorem X_eq_of_tau1_eq_on_chi {a : ℕ} {chi1 : ClassFunction L ℂ}
+    (D₀ : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi : Da.tau1 χ = D₀.tau1 χ) :
+    Da.X = D₀.X := by
+  rw [Da.X_eq_tau1_chi_of_Y_eq hY, htau1_chi, (D₀.eq_sum_of_psi_eq_zero).2.1]
+
 open scoped Classical in
 /-- **Peterfalvi (5.6.3) conjugate image as a complementary signed sum.**
 Given the (5.4.b)/(5.5) output `X = ∑_{α ∈ E} α` for a subset `E ⊆ R(χ)`, the candidate
@@ -2245,8 +2300,10 @@ The two decompositions and their common projection are exactly Peterfalvi's (5.6
   the orthonormal pair `{X, X̄ := X − (χ−χ̄)^τ}` (`retargetTargetPair`);
 * `Da : CharacterPsiDecomposition τ χ (a·χ₁)` — the (5.6.1) decomposition `(χ−a·χ₁)^τ = X − Y` whose
   `R(χ)`-projection feeds the (5.6.2) integer-forcing;
-* `hX_eq : Da.X = D₀.X` — the (5.6.2) identification that the two projections onto `R(χ)` coincide
-  (in the text, both equal `∑_{α∈E}α` with the same `E`, since `a·χ₁^{τ₁} ⊥ R(χ)`).
+* `htau1_chi : Da.tau1 χ = D₀.tau1 χ` — both decompositions evaluate the *same* running `τ₁` at `χ`.
+  This is the honest τ₁-agreement input; the (5.6.2) identification `Da.X = D₀.X` (the two `R(χ)`
+  projections coincide, both `∑_{α∈E}α`) is then **derived** here via `X_eq_of_tau1_eq_on_chi`
+  (`Da.X = Da.tau1 χ` from the (5.6.2) collapse `hY`, `= D₀.tau1 χ = D₀.X` from (5.5)), *not* posited.
 
 The `himg` facts (`htau1_diff`, `hY`, `htau1_chi1`) are the (5.4)/(5.6.2)/(coherence-compat) inputs
 of `image_eq_of_decomposition`. -/
@@ -2257,7 +2314,7 @@ noncomputable def retarget_isCoherent_of_decompositions
     {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
     (D₀ : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
     (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
-    (hX_eq : Da.X = D₀.X)
+    (htau1_chi : Da.tau1 χ = D₀.tau1 χ)
     (hχbar_eq : chibar = χ.conj)
     (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
     (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
@@ -2274,6 +2331,10 @@ noncomputable def retarget_isCoherent_of_decompositions
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
     IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
   classical
+  -- (5.6.3) projection identity `Da.X = D₀.X`, *constructed* from the (5.6.2) collapse `hY` and the
+  -- τ₁-agreement `htau1_chi` (no longer posited).
+  have hX_eq : Da.X = D₀.X :=
+    CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi (a := a) D₀ Da hY htau1_chi
   -- `himg` for `D₀.X`, constructed from the (5.6.1) decomposition `Da` via the supplier, then
   -- rewritten through `hX_eq : Da.X = D₀.X`.
   have himg : τ (χ - a • chi1) = D₀.X - a • hS₁.extension chi1 := by

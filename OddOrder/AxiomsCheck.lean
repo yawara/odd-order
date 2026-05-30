@@ -1104,6 +1104,16 @@ set_option linter.style.longLine false in
 -- (5.6.1) 分解データ (構成可能) を消費し (5.6.2) 結論 `Y = a·χ₁^{τ₁}` を出す。
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero
+-- (5.6.3) projection identity `Da.X = D₀.X` (issue 0046): the `R(χ)`-projection `X` is independent
+-- of `ψ`.  `X_eq_tau1_chi_of_Y_eq` : from the (5.6.2) collapse `Y = a·χ₁^{τ₁}` (`hY`), the
+-- `ψ = a·χ₁` decomposition has `X = χ^{τ₁}` (linearity of `tau1` on `χ - a·χ₁`).
+-- `X_eq_of_tau1_eq_on_chi` : chaining with `D₀.tau1 χ = D₀.X` (5.5) and the τ₁-agreement
+-- `Da.tau1 χ = D₀.tau1 χ` gives `Da.X = D₀.X` — CONSTRUCTS the `hX_eq` hypothesis of
+-- `retarget_isCoherent_of_decompositions`, not posited.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_tau1_chi_of_Y_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi
 -- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
 -- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
 -- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で
