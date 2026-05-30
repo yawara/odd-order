@@ -1655,6 +1655,28 @@ noncomputable def induceAlphaBTerm (hyp : Hypothesis G A L) (hconj : hyp.HConjIn
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   ClassFunction.induce (mBSubgroup hyp p.1 p.2) (alphaB hyp hconj p.2 α)
 
+/-- **Peterfalvi (2.10.1), packaged form.**  The inclusion–exclusion summand `induceAlphaBTerm`
+is `L`-conjugacy invariant: replacing the subset `B` by a conjugate `B^l` leaves
+`Ind_{M(B)}^G α_B` unchanged.
+
+This lifts the bare-`induce` invariance `induce_alphaB_conjFinset` ((2.10.1) Dade-specific) to the
+packaged `ClassFunction G ℂ` summand `induceAlphaBTerm` (which carries its own `Invertible (|M(B)|
+: ℂ)` instance).  It is the well-definedness fact making the (2.10) right-hand side
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` independent of the chosen transversal representatives:
+together with `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) it lets the sum over the
+transversal `ℬ` (`conjClassQuotient`/`transversalRep`) be re-indexed over all nonempty subsets. -/
+theorem induceAlphaBTerm_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (α : ClassFunction L ℂ) (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.induceAlphaBTerm hconj α ⟨hyp.conjFinset l B, hyp.conjFinset_nonempty hB⟩
+      = hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ := by
+  letI : Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
+      (hyp.conjFinset_nonempty hB)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  simp only [induceAlphaBTerm]
+  exact hyp.induce_alphaB_conjFinset hconj l hB α
+
 /-- **Peterfalvi (2.6.b), each packaged summand is a virtual character.**  For `α ∈ ℤ[Irr L]`,
 the term `induceAlphaBTerm` lies in `ℤ[Irr G]` — the `induce_alphaB_mem_ZIrr` content with the
 invertibility instance pinned to the one carried by `induceAlphaBTerm`. -/

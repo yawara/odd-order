@@ -75,6 +75,12 @@ created: 2026-05-27
 - [x] **(2.10.1) Dade-specific** `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` — 2026-05-30 完了
       (`induce_alphaB_conjFinset`; M(B^x)=M(B)^x の subgroup 共役 + α_{B^x}=transportConj x α_B の
       class function transport + generic `induce_map_conj`; 下記「進捗 (6)」).
+- [x] **(2.10.1) packaged form** `induceAlphaBTerm_conjFinset` — 2026-05-30 完了.  bare-`induce`
+      不変性 `induce_alphaB_conjFinset` を packaged summand `induceAlphaBTerm`
+      (自前 `Invertible (|M(B)|:ℂ)` instance 持ち) に持ち上げ.  transversal `ℬ` 和
+      `-∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B` が代表元選択に依らない well-definedness 事実
+      (`conjFinset_card` で sign も `L`-不変).  `simp only [induceAlphaBTerm]` +
+      `induce_alphaB_conjFinset`; Invertible は `Invertible.subsingleton` で整合.
 - [~] (2.10.3) Dade-specific 点別値: **transversal half 完了** (2026-05-30, 下記「進捗 (7)」):
       `induce_alphaB_apply_eq_sum_conjFiber` (第 1 式 `(Ind α_B)(g)=⅟|M(B)|∑_{x∈𝒜(g,M(B))}induceTerm`)
       + `exists_nLStabilizerIn_alphaB_induceTerm` (per-term `α_B(x⁻¹gx)=α(b)` collapse, (2.9) keystone).

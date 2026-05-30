@@ -746,6 +746,9 @@ set_option linter.style.longLine false in
 -- (2.10) identity `α^τ = -∑_{B∈ℬ} (-1)^|B| Ind_{M(B)} α_B`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induceAlphaBTerm_mem_ZIrr
+-- (2.10.1) packaged form: the summand `induceAlphaBTerm` is `L`-conjugacy invariant
+-- (`Ind_{M(B^l)} α_{B^l} = Ind_{M(B)} α_B`), the well-definedness fact for the transversal `ℬ` sum.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induceAlphaBTerm_conjFinset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.zsmul_induceAlphaBTerm_sum_mem_ZIrr
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
