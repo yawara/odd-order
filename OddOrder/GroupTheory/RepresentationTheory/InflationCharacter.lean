@@ -7,6 +7,7 @@ import Mathlib.RepresentationTheory.Subrepresentation
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 
 /-!
@@ -44,14 +45,20 @@ This is the first brick of the Inflation infrastructure gating Peterfalvi (6.6) 
 * `OddOrder.RepresentationTheory.inflate_apply_one` — degree preservation.
 * `OddOrder.RepresentationTheory.inflate_injective` — injectivity of the inflation map.
 * `OddOrder.RepresentationTheory.subset_characterKernel_inflate` — `N ⊆ ker (inflate N χbar)`.
+* `OddOrder.RepresentationTheory.exists_inflate_eq_of_subset_characterKernel` — surjectivity of
+  `inflate` onto `{χ ∈ Irr G | N ⊆ ker χ}` (the reverse inclusion, via the diagonalization
+  keystone descending `ρ` through `Representation.ofQuotient`).
+* `OddOrder.RepresentationTheory.sumInflatedDegreeSq` — the Peterfalvi (6.6) degree-sum identity
+  `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`, obtained by transporting Burnside on `G ⧸ N` across the
+  inflation bijection.
 
-Together these realize `inflate` as a **degree-preserving injection**
-`Irr(G ⧸ N) ↪ {χ ∈ Irr G | N ⊆ ker χ}`.  The reverse inclusion (surjectivity onto the
-kernel-subset set, hence the full bijection of [Isaacs] (2.22) and the degree-sum corollary
-`Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`) additionally requires descending the witnessing representation
-through `Representation.ofQuotient`, which needs `ρ` to act trivially on `N`; that step rests on
-the diagonalization fact `χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id` (finite-order operators over `ℂ` are
-semisimple) and is left for a follow-up.
+Together these realize `inflate` as a **degree-preserving bijection**
+`Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆ ker χ}`.  The surjectivity onto the kernel-subset set rests on
+descending the witnessing representation through `Representation.ofQuotient`, which needs `ρ` to act
+trivially on `N`; that step uses the diagonalization fact `χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id`
+(finite-order operators over `ℂ` are semisimple, `rep_eq_id_of_character_eq_one`).  The bijection
+delivers the degree-sum corollary `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|` (`sumInflatedDegreeSq`) from
+Burnside's `Σ_{Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`.
 
 ## References
 
@@ -281,6 +288,46 @@ theorem exists_inflate_eq_of_subset_characterKernel (χ : IrreducibleCharacter G
   rw [show σ.character (QuotientGroup.mk' N g)
       = Representation.character (σ.comp (QuotientGroup.mk' N)) g from rfl,
     hcomp, ← congrFun hχ g]
+
+open scoped Classical in
+/-- **Peterfalvi (6.6) degree-sum identity** ([Isaacs] (2.22) corollary).  The sum of the squared
+degrees over exactly the irreducible characters of `G` whose kernel contains the normal subgroup
+`N` equals the order of the quotient `G ⧸ N`:
+`∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|` in `ℂ`.
+
+This is the payoff of the **diagonalization keystone**: the keystone makes
+`exists_inflate_eq_of_subset_characterKernel` (the surjectivity of inflation onto the
+kernel-containing characters) available, so together with `inflate_injective`,
+`subset_characterKernel_inflate` (image lands in the kernel-subset set) and `inflate_apply_one`
+(degree preservation) the inflation map is a degree-preserving **bijection**
+`Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆ ker χ}`.  Transporting the Burnside identity
+`sumIrreducibleDegreeSq` for `G ⧸ N` (`∑_{χbar ∈ Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`) across this
+bijection — via `Finset.sum_bij'` with `inflate N` as the forward map and the inflation-surjectivity
+witness as its inverse — yields the displayed identity.
+
+This is the form Peterfalvi (6.6) reads off the inflation correspondence: the irreducible
+characters of `G` killing `N` are precisely the inflations of those of `G ⧸ N`, and their squared
+degrees sum to `|G ⧸ N|` by Burnside on the quotient. -/
+theorem sumInflatedDegreeSq :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card (G ⧸ N) : ℂ) := by
+  rw [← sumIrreducibleDegreeSq (G := G ⧸ N)]
+  refine (Finset.sum_bij' (fun χbar _ => inflate N χbar)
+    (fun χ hχ => (exists_inflate_eq_of_subset_characterKernel N χ
+      ((Finset.mem_filter.mp hχ).2)).choose)
+    (fun χbar _ => by
+      rw [Finset.mem_filter]
+      exact ⟨Finset.mem_univ _, subset_characterKernel_inflate N χbar⟩)
+    (fun _ _ => Finset.mem_univ _)
+    (fun χbar _ => by
+      -- `choose (inflate N χbar) = χbar` by injectivity of `inflate N`.
+      apply inflate_injective N
+      exact (exists_inflate_eq_of_subset_characterKernel N (inflate N χbar)
+        (subset_characterKernel_inflate N χbar)).choose_spec)
+    (fun χ hχ => (exists_inflate_eq_of_subset_characterKernel N χ
+      ((Finset.mem_filter.mp hχ).2)).choose_spec)
+    (fun χbar _ => by rw [inflate_apply_one])).symm
 
 end Inflation
 

@@ -1238,3 +1238,6 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.Representation.isIrreducible_of_isIrreducible_comp_of_surjective
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_inflate_eq_of_subset_characterKernel
+-- Peterfalvi (6.6) degree-sum (the G2.5 payoff): the inflation bijection transports Burnside on
+-- `G ⧸ N` to `∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumInflatedDegreeSq
