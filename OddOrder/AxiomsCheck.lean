@@ -1220,3 +1220,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.ClassFunction.compHom_injective_of_surjective
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_injective
+-- Surjective half (the keystone consumer): every irreducible `χ` with `N ⊆ ker χ` is an inflation
+-- `inflate N χbar`.  `ρ n = id` on `N` (keystone) ⇒ `ρ` descends through `Representation.ofQuotient`
+-- to an irreducible `σ` on `G ⧸ N` with `χ_σ ∘ mk' = χ`.  Completes the inflation bijection (2.22).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Representation.isIrreducible_of_isIrreducible_comp_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_inflate_eq_of_subset_characterKernel
