@@ -1028,6 +1028,10 @@ set_option linter.style.longLine false in
 -- (5.4.a) ‖X‖² ≥ ‖χ‖².
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X
--- (5.4.b) norm 等号 + X = ∑_{α∈E} α (E ⊆ R(χ)).
+-- (5.4.b) norm 等号 + X = ∑_{α∈E} α (E ⊆ R(χ), |E| = ‖χ‖²).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.norm_eq_and_X_eq_sum_of_norm_Y_ge
+-- (5.5) ψ=0 の特殊化: Y=0 かつ χ^{τ₁} = ∑_{α∈E} α. ⟨φ,φ⟩ の正定値性
+-- (eq_zero_of_inner_self_re_eq_zero) で ‖Y‖²=0 → Y=0.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
