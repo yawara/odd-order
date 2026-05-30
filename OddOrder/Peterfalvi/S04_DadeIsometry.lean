@@ -2501,6 +2501,134 @@ theorem card_conjFiber_hIntersection_mul_eq (hyp : Hypothesis G A L)
   rw [hCeq] at hfact
   exact hfact
 
+/-! #### STEP 3b: the toggle-`a` Möbius cancellation
+
+The proof of (2.10) collapses the alternating sum over `𝒫(a)` (nonempty `B ⊆ A` with
+`a ∈ N_L(B)`) to its `B = {a}` survivor.  We index `𝒫(a)` as a `Finset`, define the summand
+`mobiusSummand` `= (-1)^{|B|}/|H(B)| · |𝒜(g, H(B)a)|`, and cancel pairs `B ↔ B △ {a}` by the
+multiplicative identity `card_conjFiber_hIntersection_mul_eq`. -/
+
+variable (hyp : Hypothesis G A L)
+
+/-- `𝒫(a)` as a `Finset`: the nonempty subsets `B ⊆ A` with `a ∈ N_L(B)`. -/
+noncomputable def mobiusIndex (a : {a : G // a ∈ A}) :
+    Finset (Finset {a : G // a ∈ A}) := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  exact (Finset.univ.powerset).filter
+    (fun B => B.Nonempty ∧ (a : G) ∈ nLStabilizerIn hyp B)
+
+theorem mem_mobiusIndex {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    B ∈ hyp.mobiusIndex a ↔ B.Nonempty ∧ (a : G) ∈ nLStabilizerIn hyp B := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  simp only [mobiusIndex, Finset.mem_filter, Finset.mem_powerset, Finset.subset_univ, true_and]
+
+/-- The Möbius summand `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` (as a complex number). -/
+noncomputable def mobiusSummand (a : {a : G // a ∈ A}) (g : G)
+    (B : Finset {a : G // a ∈ A}) : ℂ := by
+  classical
+  exact if hB : B.Nonempty then
+      ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+        ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
+    else 0
+
+theorem mobiusSummand_of_nonempty (a : {a : G // a ∈ A}) (g : G)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.mobiusSummand a g B
+      = ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+        ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ) := by
+  rw [mobiusSummand, dif_pos hB]
+
+/-- Membership of `a` in `N_L(B)` is insensitive to inserting `a` into `B` (for `a ∉ B`): since
+conjugation by `a` fixes `a` (`a·a·a⁻¹ = a`), `a` permutes `B` iff it permutes `insert a B`. -/
+theorem mem_nLStabilizerIn_insert_iff (a : {a : G // a ∈ A})
+    {B : Finset {a : G // a ∈ A}} (haB : a ∉ B) :
+    (a : G) ∈ nLStabilizerIn hyp (insert a B) ↔ (a : G) ∈ nLStabilizerIn hyp B := by
+  classical
+  have ha : (a : G) ∈ L := hyp.mem_L a.2
+  have hfix : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩ a = a := by
+    intro hx
+    apply Subtype.ext
+    show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+    group
+  have hfixinv : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩⁻¹ a = a := by
+    intro hx
+    apply Subtype.ext
+    show (a : G)⁻¹ * (a : G) * ((a : G)⁻¹)⁻¹ = (a : G)
+    group
+  rw [mem_nLStabilizerIn, mem_nLStabilizerIn]
+  constructor
+  · rintro ⟨hx, hstab⟩
+    refine ⟨ha, ?_⟩
+    intro c hc
+    have hmem := hstab c (Finset.mem_insert_of_mem hc)
+    rw [Finset.mem_insert] at hmem
+    rcases hmem with hca | hca
+    · -- `conjA a c = a` forces `c = a`, contradicting `a ∉ B` (as `c ∈ B`)
+      exfalso
+      have hceq : c = a := by
+        have := congrArg (hyp.conjA ⟨(a : G), hx⟩⁻¹) hca
+        rwa [conjA_inv_conjA, hfixinv hx] at this
+      exact haB (hceq ▸ hc)
+    · exact hca
+  · rintro ⟨hx, hstab⟩
+    refine ⟨ha, ?_⟩
+    intro c hc
+    rw [Finset.mem_insert] at hc
+    rcases hc with rfl | hc
+    · rw [hfix hx]; exact Finset.mem_insert_self _ _
+    · exact Finset.mem_insert_of_mem (hstab c hc)
+
+/-- **Peterfalvi (2.10), the toggle-`a` pairwise cancellation.**  For `a ∉ B`, nonempty `B ⊆ A`
+with `a ∈ N_L(B)`, the Möbius summands for `B` and `insert a B` are negatives:
+
+    `mobiusSummand a g B + mobiusSummand a g (insert a B) = 0`.
+
+This is the multiplicative identity `card_conjFiber_hIntersection_mul_eq`
+(`|𝒜(g,H(B)a)|·|H(B∪{a})| = |𝒜(g,H(B∪{a})a)|·|H(B)|`) cleared of denominators, together with the
+sign flip `(-1)^{|B|+1} = -(-1)^{|B|}` from `|insert a B| = |B| + 1`.  It is the cancellation law
+fed to `Finset.sum_involution`. -/
+theorem mobiusSummand_add_insert_eq_zero (hconj : hyp.HConjInvariant) (g : G)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} (haB : a ∉ B) (hB : B.Nonempty)
+    (haN : (a : G) ∈ nLStabilizerIn hyp B) :
+    hyp.mobiusSummand a g B + hyp.mobiusSummand a g (insert a B) = 0 := by
+  classical
+  have hiB : (insert a B).Nonempty := Finset.insert_nonempty a B
+  -- the multiplicative cancellation identity
+  have hmul := hyp.card_conjFiber_hIntersection_mul_eq hconj hB haN g
+  -- nonzero cardinalities
+  have hHBne : (Nat.card (hIntersection hyp B hB) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hHiBne : (Nat.card (hIntersection hyp (insert a B) hiB) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  rw [hyp.mobiusSummand_of_nonempty a g hB, hyp.mobiusSummand_of_nonempty a g hiB]
+  -- card of `insert a B` and sign flip
+  rw [Finset.card_insert_of_notMem haB, pow_succ]
+  -- abbreviations
+  set p : ℂ := (-1 : ℂ) ^ B.card
+  set hb : ℂ := (Nat.card (hIntersection hyp B hB) : ℂ)
+  set hib : ℂ := (Nat.card (hIntersection hyp (insert a B) hiB) : ℂ)
+  set fb : ℂ := ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+    * ({(a : G)} : Set G))).card : ℂ)
+  set fib : ℂ := ((conjFiber g ((↑(hIntersection hyp (insert a B) hiB) : Set G)
+    * ({(a : G)} : Set G))).card : ℂ)
+  -- cast the multiplicative identity to ℂ: `fb * hib = fib * hb` (`hiB` and `insert_nonempty`
+  -- give defeq `H(insert a B)`)
+  have hmulC : fb * hib = fib * hb := by
+    show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
+        * (Nat.card (hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : ℂ)
+      = ((conjFiber g ((↑(hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : Set G)
+            * ({(a : G)} : Set G))).card : ℂ)
+        * (Nat.card (hIntersection hyp B hB) : ℂ)
+    exact_mod_cast hmul
+  -- assemble: `p/hb · fb + (p·(-1))/hib · fib = (p/(hb·hib)) · (fb·hib - fib·hb) = 0`
+  rw [div_mul_eq_mul_div, div_mul_eq_mul_div]
+  rw [div_add_div (p * fb) (p * -1 * fib) hHBne hHiBne, div_eq_zero_iff]
+  left
+  -- numerator: `(p·fb)·hib + hb·(p·(-1)·fib) = p·(fb·hib - fib·hb) = 0`
+  linear_combination p * hmulC
+
 end MobiusAssembly
 
 end SemidirectStructure
