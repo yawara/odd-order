@@ -53,4 +53,31 @@ theorem isNarrow_of_pRank_le_two {p : ℕ} {R : Type*} [Group R] (h : pRank R p 
     IsNarrow p R :=
   Or.inl h
 
+/-- **`E*(R)`: maximal elementary abelian subgroup** (BG §5 p.45). A subgroup `E ≤ R` is
+`p`-elementary abelian and is contained in no strictly larger `p`-elementary abelian
+subgroup of `R`.
+
+The "no larger" condition is phrased as: any `p`-elementary abelian `F` with `E ≤ F`
+satisfies `F = E`. BG's `E²(R) ∩ E*(R)` (elementary abelian of order `p²` not contained
+in any `E_{p³}`) is expressed at use sites as
+`Nat.card E = p ^ 2 ∧ IsMaximalElementaryAbelian p E` (no separate abbreviation). -/
+def IsMaximalElementaryAbelian (p : ℕ) {R : Type*} [Group R] (E : Subgroup R) : Prop :=
+  E.IsElementaryAbelian p ∧
+    ∀ F : Subgroup R, F.IsElementaryAbelian p → E ≤ F → F = E
+
+namespace IsMaximalElementaryAbelian
+
+variable {p : ℕ} {R : Type*} [Group R] {E F : Subgroup R}
+
+/-- A maximal elementary abelian subgroup is, in particular, elementary abelian. -/
+theorem isElementaryAbelian (h : IsMaximalElementaryAbelian p E) : E.IsElementaryAbelian p :=
+  h.1
+
+/-- Maximality: any `p`-elementary abelian `F ⊇ E` collapses back to `E`. -/
+theorem eq_of_le (h : IsMaximalElementaryAbelian p E) (hF : F.IsElementaryAbelian p)
+    (hEF : E ≤ F) : F = E :=
+  h.2 F hF hEF
+
+end IsMaximalElementaryAbelian
+
 end OddOrder.GroupTheory
