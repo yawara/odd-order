@@ -1620,6 +1620,85 @@ theorem exists_nLStabilizerIn_alphaB_induceTerm (hyp : Hypothesis G A L)
     _ = alphaB hyp hconj hB α ⟨h * b, hhbM⟩ := congrArg (alphaB hyp hconj hB α) harg
     _ = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := hyp.alphaB_apply_mul hconj hB α hh hb hhbM
 
+/-- **Coprimality of `orderOf b` with `|H(B)|`** (Peterfalvi (2.2.c), the input to (2.1) in the
+proof of (2.10.3)).  For `b ∈ A`, the order of `b` is coprime to `|H(B)|`: `|H(B)| ∣ |H(b₀)|`
+for any `b₀ ∈ B` (`H(B) ⊆ H(b₀)`), which is coprime to `|C_L(b)|` by `centralizer_coprime`, and
+`orderOf b ∣ |C_L(b)|` since `b ∈ C_L(b)`. -/
+theorem coprime_orderOf_card_hIntersection (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {b : G} (hbA : b ∈ A) :
+    Nat.Coprime (orderOf b) (Nat.card (hIntersection hyp B hB)) := by
+  obtain ⟨b₀, hb₀⟩ := hB.exists_mem
+  have hdvdH : Nat.card (hIntersection hyp B hB) ∣ Nat.card (hyp.H b₀) :=
+    Subgroup.card_dvd_of_le (hIntersection_le hyp hB hb₀)
+  have hcop : Nat.Coprime (Nat.card (hyp.H b₀)) (Nat.card (centralizerIn L b)) :=
+    hyp.centralizer_coprime b₀ ⟨b, hbA⟩
+  have hcop' : Nat.Coprime (Nat.card (hIntersection hyp B hB))
+      (Nat.card (centralizerIn L b)) :=
+    Nat.Coprime.coprime_dvd_left hdvdH hcop
+  exact (Nat.Coprime.coprime_dvd_right (hyp.orderOf_dvd_card_centralizerIn hbA) hcop').symm
+
+/-- **Peterfalvi (2.10.3), the vanishing case.**  If `g` lies outside `⋃_{a∈A} (aH(a))^G` (the
+Dade support), then `(Ind_{M(B)}^G α_B)(g) = 0`.
+
+Each summand `induceTerm M(B) α_B x g` over `x ∈ 𝒜(g, M(B))`, if nonzero, has
+`x⁻¹ g x = h·b` with `h ∈ H(B)`, `b ∈ N_L(B)` and `α(b) ≠ 0`, so `b ∈ A`
+(`exists_nLStabilizerIn_alphaB_induceTerm` + support of `α`).  By (2.1)
+(`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `h·b` is
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G ⊆ dadeSupport` —
+contradicting `g ∉ dadeSupport`.  Hence every summand vanishes. -/
+theorem induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] {g : G} (hg : g ∉ hyp.dadeSupport) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = 0 := by
+  classical
+  rw [induce_alphaB_apply_eq_sum_conjFiber hyp hconj hB (α : ClassFunction L ℂ) g]
+  rw [mul_eq_zero]; right
+  apply Finset.sum_eq_zero
+  intro x hx
+  rw [mem_conjFiber] at hx
+  -- factor the conjugate and read off the summand value `α(b)`
+  obtain ⟨h, hh, b, hb, hxgx, hterm⟩ :=
+    hyp.exists_nLStabilizerIn_alphaB_induceTerm hconj hB (α : ClassFunction L ℂ) hx
+  rw [hterm]
+  by_contra hαb
+  -- `α(b) ≠ 0 ⇒ b ∈ A`
+  have hbA : b ∈ A := α.property hαb
+  -- `b` normalizes `H(B)` and is coprime to `|H(B)|`; apply (2.1)
+  have hnorm : ∀ y ∈ hIntersection hyp B hB, b * y * b⁻¹ ∈ hIntersection hyp B hB := by
+    intro y hy
+    have := hyp.nLStabilizerIn_le_normalizer hconj hB hb
+    rw [Subgroup.mem_normalizer_iff] at this
+    exact (this y).mp hy
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB hbA
+  obtain ⟨c, hcmem, x', hx'H, hx'eq⟩ :=
+    OddOrder.GroupTheory.exists_mem_centralizer_conj (g := b) (H := hIntersection hyp B hB)
+      hcop hnorm hh
+  -- `c ∈ C_{H(B)}(b) = H(B ∪ {b}) ⊆ H(b)`, and `c` commutes with `b`
+  obtain ⟨hcH, hccomm⟩ := Subgroup.mem_inf.mp hcmem
+  have hccb : Commute c b :=
+    Subgroup.mem_centralizer_singleton_iff.mp hccomm
+  have hcHb : c ∈ hyp.H ⟨b, hbA⟩ := by
+    have hcInsert : c ∈ hIntersection hyp (insert ⟨b, hbA⟩ B)
+        (Finset.insert_nonempty _ B) := by
+      rw [← hyp.centralizer_inf_hIntersection hB ⟨b, hbA⟩]
+      exact Subgroup.mem_inf.mpr ⟨hccomm, hcH⟩
+    exact hIntersection_le hyp (Finset.insert_nonempty _ B) (Finset.mem_insert_self _ B) hcInsert
+  -- `c·b = b·c ∈ hCoset b`
+  have hcb_mem : c * b ∈ hyp.hCoset ⟨b, hbA⟩ := by
+    rw [mem_hCoset]
+    exact ⟨c, hcHb, hccb.eq⟩
+  -- `g` is conjugate to `c·b` (via `x' x⁻¹`), hence in `dadeSupport`
+  have hgconj : (x' * x⁻¹) * g * (x' * x⁻¹)⁻¹ = c * b := by
+    rw [← hx'eq, ← hxgx]; group
+  apply hg
+  rw [hyp.mem_dadeSupport_iff]
+  refine ⟨⟨b, hbA⟩, c, hcHb, ?_⟩
+  rw [show (⟨b, hbA⟩ : {a : G // a ∈ A}).1 * c = c * b from (hccb.eq).symm]
+  exact (isConj_iff.mpr ⟨x' * x⁻¹, hgconj⟩).symm
+
 end PointwiseValue
 
 /- 2.10/2.6.b: The right-hand side of the inclusion–exclusion is a virtual character. -/

@@ -743,6 +743,13 @@ set_option linter.style.longLine false in
 -- via the (2.9) defining equation (`exists_nLStabilizerIn_alphaB_induceTerm`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_conjFiber
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.exists_nLStabilizerIn_alphaB_induceTerm
+-- Peterfalvi §4 (2.10.3) vanishing case: if `g ∉ ⋃_a (aH(a))^G` then `(Ind_{M(B)} α_B)(g) = 0`.
+-- Each nonzero summand forces (via the (2.1) keystone `exists_mem_centralizer_conj` and (2.10.2))
+-- `g ∈ (bH(b))^G ⊆ dadeSupport`, contradicting `g ∉ dadeSupport` (`coprime_orderOf_card_hIntersection`
+-- supplies the (2.2.c) coprimality input).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.coprime_orderOf_card_hIntersection
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport
 -- Peterfalvi §4 (2.10) `L`-conjugacy transversal `ℬ`: the `conjFinset` action is a `MulAction`
 -- whose stabilizer is `N_L(B)` (`stabilizer_conjFinsetAction`), with `Quotient.out` representatives
 -- `L`-conjugate to their class (`transversalRep_conj`); the orbit-stabilizer weight
