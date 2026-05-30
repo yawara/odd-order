@@ -147,6 +147,43 @@ theorem natMul_left (k : ℕ) (h : a ≡ b [ALGMOD n]) :
   have := h.intMul_left (k : ℤ)
   simpa using this
 
+/-- **Cancel a coprime integer factor from a congruence.** If `(c : ℂ)·a ≡ (c : ℂ)·b (mod n)` with
+`c` coprime to the modulus `n` (as integers), and the endpoints `a`, `b` are themselves algebraic
+integers, then `a ≡ b (mod n)`.
+
+This is the "divide by `|C₁|`" step of Peterfalvi (6.7.3): `|C₁|` is prime to `p` (hence coprime to
+`n = |P| = p^k`), so it may be cancelled from a congruence modulo `|P|`.  The endpoint-integrality
+hypotheses are essential and are supplied by `character_isIntegral` (`a = ψ(z)`, `b = ψ(1)`).
+Bézout `u·c + v·n = 1` writes `(a-b)/n = u·(c·(a-b)/n) + v·(a-b)`, integral since both
+`c·(a-b)/n = (c·a - c·b)/n` and `a - b` are integral. -/
+theorem intMul_cancel_left {c : ℤ} (hcop : IsCoprime c n) (ha : IsIntegral ℤ a)
+    (hb : IsIntegral ℤ b) (h : (c : ℂ) * a ≡ (c : ℂ) * b [ALGMOD n]) :
+    a ≡ b [ALGMOD n] := by
+  unfold Cong at h ⊢
+  obtain ⟨u, v, huv⟩ := hcop
+  -- `t := (a - b)/n`; the hypothesis gives `c·t` integral, and `a - b` is integral.
+  set t : ℂ := (a - b) / (n : ℂ) with ht
+  have hct : IsIntegral ℤ ((c : ℂ) * t) := by
+    have : ((c : ℂ) * a - (c : ℂ) * b) / (n : ℂ) = (c : ℂ) * t := by rw [ht]; ring
+    rwa [this] at h
+  have hab : IsIntegral ℤ (a - b) := ha.sub hb
+  -- `t = u·(c·t) + v·(a - b)` by Bézout `u·c + v·n = 1` (note `n·t = a - b` after clearing).
+  by_cases hn0 : (n : ℂ) = 0
+  · -- `n = 0`: then `t = (a-b)/0 = 0`, integral.
+    rw [ht, hn0, div_zero]; exact isIntegral_zero
+  · have hnt : (n : ℂ) * t = a - b := by
+      rw [ht]; field_simp
+    have hbez : (u : ℂ) * (c : ℂ) + (v : ℂ) * (n : ℂ) = 1 := by
+      have hc : ((u * c + v * n : ℤ) : ℂ) = ((1 : ℤ) : ℂ) := by rw [huv]
+      push_cast at hc; linear_combination hc
+    have hrw : t = (u : ℂ) * ((c : ℂ) * t) + (v : ℂ) * (a - b) := by
+      have hcollect : (u : ℂ) * ((c : ℂ) * t) + (v : ℂ) * (a - b)
+          = ((u : ℂ) * (c : ℂ) + (v : ℂ) * (n : ℂ)) * t := by rw [← hnt]; ring
+      rw [hcollect, hbez, one_mul]
+    rw [hrw]
+    exact ((isIntegral_algebraMap (x := u)).mul hct).add
+      ((isIntegral_algebraMap (x := v)).mul hab)
+
 end Cong
 
 /-- **Introduction form.** If `α - β = n · c` with `c` an algebraic integer, then `α ≡ β (mod n)`,
