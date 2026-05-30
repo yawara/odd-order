@@ -419,6 +419,23 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     = smallest-p-power-divides-sum, `Finset.dvd_sum`+`pow_dvd_pow`; `θᵢ(1)²≤|K:Z|` = [Is] Cor 2.30;
     `(|L:K|,p)=1` = (6.4.c)) + degree sort + base prefix coherence ((1.1)/(1.4)). 이 character-theory
     덩어리들이 leaf 1+2 의 가설을 채우면 (6.6) 의 `coherentPairChain` `hstep` data 가 완성.
+- [x] (2026-05-31, G2.0) **(6.6) opening "By (1.1), `n ≥ 2`" (mmd L76)** 를 `S07_Coherence.lean`
+      ((6.6) section 의 `pairSet` 직전) 에 landing (sorry/axiom 無 — AxiomsCheck 등록 1건 3 axiom 全
+      allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs).
+  - **`two_le_ncard_of_conjugate_closed_of_noReal`**: `X : Set (ClassFunction L ℂ)` 가 finite +
+    nonempty + `ClosedUnderConjugate` + `HasNoRealCharacters` ⟹ `2 ≤ X.ncard`.  mmd L76 "Let
+    `n=|X|`. By (1.1), `n ≥ 2`" 의 정직한 일반형: (1.1) 이 공급하는 두 사실 — conjugation 폐쇄
+    (`χ∈X ⟹ χ̄∈X`, `Z` normal 로 `Ker χ̄ = Ker χ`) + non-self-conjugate (`χ̄ ≠ χ`, `|L|` odd &
+    nontrivial) — 가 nonempty 와 결합해 `χ`, `χ̄` 두 distinct member 를 주어 `1 < X.ncard`
+    (`Set.one_lt_ncard`) → `2 ≤ X.ncard` (`omega`).
+  - **honest 판정**: thin wrapper 아님 — `Set.one_lt_ncard ↔ ∃ a∈s ∃ b∈s, a≠b` 는 bridge 일 뿐,
+    내용은 conjugation involution 으로부터 distinct witness `χ̄ ≠ χ` 를 *구성* 하는 부분.
+    두 가설 (`ClosedUnderConjugate`/`HasNoRealCharacters`) 은 §7 `Hypothesis` 필드 (각각
+    `conjugate_closed`/`no_real_characters`) 이고 `X ⊆ S` 로 상속 (`HasNoRealCharacters.mono`,
+    `ClosedUnderConjugate` 는 caller 가 `S(Z)` conj-폐쇄성과 함께 공급) — posited 아님.
+  - **caller 측 잔여 (G2.0 이후)**: (6.6) 본문이 이 leaf 를 instantiate 하려면 `X = S − S(Z)` 의
+    nonemptiness (`Z ≠ 1` ⟹ `Z ⊄ Ker χ` 인 irreducible 존재) + `S(Z)` conj-폐쇄성 (그래야 `X`
+    가 conj-폐쇄) 을 공급해야 함. 이는 §6 setup-specific character theory 로 별도 leaf.
 
 ## 完了条件
 

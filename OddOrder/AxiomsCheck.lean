@@ -1136,6 +1136,12 @@ set_option linter.style.longLine false in
 -- accumulated-set monotonicity helper is `pairUnion_mono`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono
+-- (6.6) opening "By (1.1), n ≥ 2" (mmd L76): the count `n = |X|` of the irreducible characters of
+-- `L` not killing `Z` satisfies `n ≥ 2`.  The two consequences of (1.1) used — closure under
+-- conjugation (`ClosedUnderConjugate`) and no real character (`HasNoRealCharacters`), both §7
+-- `Hypothesis` fields inherited by `X ⊆ S` — plus nonemptiness yield, via the conjugation
+-- involution `χ ↦ χ̄`, a second distinct member, hence `2 ≤ X.ncard` (`Set.one_lt_ncard`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_le_ncard_of_conjugate_closed_of_noReal
 -- (6.6) prime-power degree gap (mmd L82): the strict bound `2·χᵢ(1)·χ₁(1) < ∑_{j<i}χⱼ(1)²` that
 -- each `coherentPairChain` step's (5.6.2) integer-forcing (`int_eq_zero_of_sq_mul_le_of_two_mul_lt`)
 -- consumes.  `two_mul_lt_sq_of_primePow_gap`: `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹

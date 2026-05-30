@@ -225,6 +225,26 @@ allowlist):
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
   sort + base prefix coherence ((1.1)/(1.4)). 상세는 issue 0046 pass-2 leaf 2.
 
+### (2026-05-31, G2.0) (6.6) opening "By (1.1), n ≥ 2" (mmd L76)
+
+(6.6) 증명의 *첫* 단계 "Let `n=|X|`. By (1.1), `n ≥ 2`"를 `S07_Coherence.lean` ((6.6) section의
+`pairSet` def 직전)에 landing (sorry/axiom 無 — AxiomsCheck 등록 1건 3 axiom 全 allowlist; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs):
+
+- **`two_le_ncard_of_conjugate_closed_of_noReal`**: `X : Set (ClassFunction L ℂ)`가 finite +
+  nonempty + `ClosedUnderConjugate` + `HasNoRealCharacters` ⟹ `2 ≤ X.ncard`. mmd L76의 정직한
+  일반형 — (1.1)이 공급하는 두 사실 [conjugation 폐쇄 (`χ∈X ⟹ χ̄∈X`; `Z` normal로 `Ker χ̄=Ker χ`),
+  non-self-conjugate (`χ̄ ≠ χ`; `|L|` odd & nontrivial)]가 nonempty와 결합해 `χ`, `χ̄` 두 distinct
+  member를 주어 `1 < X.ncard` (`Set.one_lt_ncard`) → `2 ≤ X.ncard` (`omega`). 사실 `|X|`은 even이나
+  (6.6)은 `≥ 2`만 사용 (= `Z[X,L^#] ≠ 0` 보증 + (1.4) prefix 시작).
+- **honest 판정**: thin wrapper 아님 — `Set.one_lt_ncard`는 bridge일 뿐, 내용은 conjugation
+  involution으로부터 distinct witness `χ̄ ≠ χ`를 *구성*하는 부분. 두 가설은 §7 `Hypothesis` 필드
+  (`conjugate_closed`/`no_real_characters`)이고 `X ⊆ S`로 상속 (`HasNoRealCharacters.mono`;
+  `ClosedUnderConjugate`는 caller가 `S(Z)` conj-폐쇄성과 함께 공급) — posited 아님.
+- **caller 측 잔여 (G2.0 이후)**: (6.6) 본문이 instantiate하려면 `X = S − S(Z)`의 nonemptiness
+  (`Z ≠ 1` ⟹ `Z ⊄ Ker χ`인 irreducible 존재) + `S(Z)` conj-폐쇄성 (→ `X` conj-폐쇄)을 공급해야
+  함 — §6 setup-specific character theory의 별도 leaf. 상세는 issue 0046 G2.0.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

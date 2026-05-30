@@ -2055,6 +2055,35 @@ This subsection provides the **iteration engine** for that argument, decoupled f
 The accumulated set `pairUnion S₀ pair i` and the fold `coherentPairChain` make "repeated use of
 (5.6)" precise: the final coherence is **derived** by induction on the pair count, never posited. -/
 
+/-- **Peterfalvi (6.6): "By (1.1), `n ≥ 2`".**
+
+The opening step of the (6.6) proof: with `X = S − S(Z)` the set of irreducible characters of
+`L` not killing `Z`, one has `n := |X| ≥ 2`.  The textbook justification "By (1.1)" unpacks as
+follows.  Every `χ ∈ X` is nontrivial (it does not contain `Z` in its kernel), so by Peterfalvi
+(1.1) — "for `|L|` odd a nontrivial irreducible character is non-self-conjugate" — its complex
+conjugate `χ̄` differs from `χ`; and `X` is closed under conjugation because `Z` is normal, so
+`Ker χ̄ = Ker χ` and `χ̄ ∈ X` whenever `χ ∈ X`.  Thus from one element of the nonempty set `X`
+the conjugation involution produces a *second*, distinct one, forcing `|X| ≥ 2` (in fact `|X|`
+is even, but only `≥ 2` is used to certify `Z[X, L^#] ≠ 0` and to start the (1.4) prefix).
+
+Stated for an arbitrary finite set of class functions, the two consequences of (1.1) used here —
+no real character (`HasNoRealCharacters`) and closure under conjugation (`ClosedUnderConjugate`),
+both fields of the §7 `Hypothesis` and inherited by `X ⊆ S` — together with nonemptiness give the
+cardinality bound directly. -/
+theorem two_le_ncard_of_conjugate_closed_of_noReal
+    {X : Set (ClassFunction L ℂ)} (hXfin : X.Finite) (hXne : X.Nonempty)
+    (hXconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate X)
+    (hXreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters X) :
+    2 ≤ X.ncard := by
+  obtain ⟨χ, hχ⟩ := hXne
+  -- `χ̄ ∈ X` by closure under conjugation; `χ̄ ≠ χ` since `χ` is not a real character.
+  have hconj_mem : χ.conj ∈ X := hXconj hχ
+  have hne : χ.conj ≠ χ := fun h => hXreal hχ h
+  -- two distinct members of `X` give `1 < |X|`, i.e. `2 ≤ |X|`.
+  have h1 : 1 < X.ncard :=
+    (Set.one_lt_ncard hXfin).mpr ⟨χ.conj, hconj_mem, χ, hχ, hne⟩
+  omega
+
 /-- The two characters of the `i`-th adjoined pair, as a set `{χᵢ, χ̄ᵢ}`. -/
 def pairSet (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (i : ℕ) :
     Set (ClassFunction L ℂ) :=
