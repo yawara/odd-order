@@ -921,6 +921,36 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     `extension_inner_eq` = lattice-relative inner-eq しか証明せず global 等距は証明し得ない)、
     `tau1_inner_eq_on_support` を直接供給して `CharacterPsiDecomposition` を *手構成* 可能になった
     (`IsCoherent` 自身の構成と完全並行)。これが Round-24 (ii) per-step D production の構造的 unblock。
+  - **Round 25 PASS 2 (2026-05-31) — constructor 弱化 + supply-ability 橋 + per-step D 生産者 完了**:
+    PASS 1 (commit 8577211) は *field* のみ弱化し constructor `ofProjection`/`decompositionPair`/
+    `retarget_isCoherent_of_sharedDecomposition` の入力は global `htau1_isom : IsIntegralIsometry tau1`
+    のままだった。だが「Dade 等距から per-step D を組む」には constructor が **lattice-relative 入力を
+    受理**せねばならない (Dade 等距は global isometry を *供給し得ない*)。PASS 2 でこれを完了:
+    - **constructor cascade**: `ofProjection` / `decompositionPair` / `decompositionPair_tau1_agree` /
+      `retarget_isCoherent_of_sharedDecomposition` の `htau1_isom : IsIntegralIsometry tau1` を
+      lattice-relative `htau1_inner_eq : ∀ φ ζ ∈ zSpan {χ, χ̄, ψ}, ⟨τ₁ φ, τ₁ ζ⟩ = ⟨φ, ζ⟩` に置換
+      (`decompositionPair` は 2 個の `ofProjection` 呼出 `ψ=0`/`ψ=a·χ₁` を共有格子
+      `{χ, χ̄, 0, a·χ₁}` 上の 1 つの inner-eq から `Submodule.span_mono` で特殊化)。`rfl` 証明
+      (`decompositionPair_tau1_agree`) 不変。外部 caller 0 (`AxiomsCheck` の登録のみ、名前参照で不変)。
+    - **supply-ability 橋 (実 Lean、prose でなく)**: `support_subset_of_mem_zSpan_of_supported`
+      (supported 生成系の `ℤ[S]` は全 supported — `Submodule.span_le` で
+      `supportedSubmodule.restrictScalars ℤ` へ) + `dadeIntegralCharacterMap_inner_eq_on_supported_span`
+      (Dade 基底写像 `τ` は supported span 上で inner 保存 — `IsDadeIsometry.inner_eq` (2.6.a) を
+      `hyp.dadeIsometryData hconj` 経由で `hyp.dadeMap` に移送、`dadeIsometryData_toDadeMap` rfl)。
+      これが **weakened form が Dade 等距から実際に供給される**ことの Lean 証明。
+    - **per-step D 生産者 (Round-24 (ii) を閉じる)**: `decompositionPairFromDade` —
+      orthonormal `R(χ)` + supported `χ,χ̄,a·χ₁` + 2 つの `ZIrr`-membership から
+      `(D₀, Da)` を **(5.1) 基底写像 `τ = dadeIntegralCharacterMap` から直接構成**、欠けていた
+      `htau1_inner_eq` を上記橋で *内部放電* (global 等距仮説なし)。これが Round-24 (ii) per-step
+      `(D₀, Da)` production の実体。`retarget_isCoherent_of_sharedDecomposition` に直接供給可。
+    - sorry/axiom 無; `#assert_only_allowed_axioms` 3 新規 (`support_subset_of_mem_zSpan_of_supported`/
+      `dadeIntegralCharacterMap_inner_eq_on_supported_span`/`decompositionPairFromDade`) 全 3 axiom
+      allowlist 内; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑。
+    - **残**: `decompositionPairFromDade` は (5.4) **基底ケース `τ₁ = τ`** を構成。一般 (5.4) `τ₁ ⊋ τ`
+      (running coherence extension への拡張) と `OrthonormalCharacterImageFamily` の Dade `R(χ)` 抽出
+      (① 依然 missing) は別パス。だが lattice-relative 化が前提で、その前提は本パスで除去済 —
+      per-step `hstep` を `decompositionPairFromDade` + `retarget_isCoherent_of_sharedDecomposition` で
+      組む経路が型レベルで開通した。
 
 ## 完了条件
 

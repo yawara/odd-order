@@ -1306,3 +1306,39 @@ Round-13 (pass 5, commit b14a987) で `IsCoherent.extension_isometry` を lattic
   直接供給して `CharacterPsiDecomposition` を *手構成* 可能に。`IsCoherent` 自身の構成と完全に並行する形で、
   ②「τ₁ 2D Gram–Schmidt 拡張」を *global ではなく lattice-relative* な達成可能形へ確定した。残 = ①Dade
   R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) のみ。
+
+### G2.10 Round 25 PASS 2 (2026-05-31): constructor 弱化 + supply-ability 橋 + per-step D 生産者
+
+PASS 1 (commit 8577211) は *field* `tau1_inner_eq_on_support` のみ弱化し、constructor の入力は global
+`htau1_isom : IsIntegralIsometry tau1` のままだった (上 PASS-1 note の「constructor 供給」参照、`fun φ ζ _ _
+=> htau1_isom.inner_eq φ ζ` で global を捨てて field を供給)。**だが「Dade 等距から per-step D を組む」には
+constructor 自身が lattice-relative 入力を受理せねばならない** — Dade 等距は global isometry を *供給し得ない*
+(supported `CF(L,A)` 上のみ isometric, FT で `dim CF(L) > dim CF(G)`)。PASS 2 でこの最後のギャップを解消し、
+Round-24 (ii) per-step `(D₀, Da)` production を **実 Lean で**閉じた。sorry/axiom 無; full
+`lake build OddOrder` / `OddOrder.AxiomsCheck` 緑; 新規 3 定義全 3 axiom allowlist 内。
+
+- **constructor cascade** (S07): `ofProjection` / `decompositionPair` / `decompositionPair_tau1_agree` /
+  `retarget_isCoherent_of_sharedDecomposition` の `htau1_isom : IsIntegralIsometry tau1` 入力を
+  lattice-relative `htau1_inner_eq : ∀ φ ζ ∈ zSpan {χ, χ̄, ψ}, ⟨τ₁ φ, τ₁ ζ⟩ = ⟨φ, ζ⟩` に置換。
+  `decompositionPair` は 2 つの `ofProjection` 呼出 (`ψ=0`/`ψ=a·χ₁`) を **共有格子 `{χ, χ̄, 0, a·χ₁}`**
+  上の 1 つの inner-eq から `Submodule.span_mono` で各 `{χ, χ̄, ψ}` へ特殊化 (これが Dade 等距の供給形:
+  supported span 上の 1 つの保存則が全差分生成子を覆う)。`decompositionPair_tau1_agree` の `rfl` 不変。
+  外部 caller 0 (`AxiomsCheck` の登録は名前参照ゆえ不変)。
+- **supply-ability 橋 (prose でなく実 Lean 証明)** — Dade 基底写像が weakened form を *実際に供給* する証拠:
+  - `support_subset_of_mem_zSpan_of_supported` — supported 生成系 `S` の `ℤ[S]` 全体が supported。
+    `supportedSubmodule (supportInSubgroup A L)` の `restrictScalars ℤ` が全生成子を含む ⟹
+    `Submodule.span_le` で `zSpan S = span ℤ S` を含む。純 `ℤ`-submodule closure。
+  - `dadeIntegralCharacterMap_inner_eq_on_supported_span` — (5.1) 基底写像
+    `τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)` が **任意の supported span 上で
+    inner 保存**。証明: 元が supported ⟹ `dadeIntegralCharacterMap_apply_of_support` で
+    `τ φ = hyp.dadeMap ⟨φ,_⟩`、`IsDadeIsometry.inner_eq` (2.6.a) を `hyp.dadeIsometryData hconj` 経由で
+    適用 (`dadeIsometryData_toDadeMap : (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap`, rfl)。
+- **per-step D 生産者** `decompositionPairFromDade` (Round-24 (ii) を閉じる): orthonormal `R(χ)` +
+  supported `χ, χ̄, a·χ₁` (`0` は `support_zero` で自動) + 2 つの `ZIrr`-membership
+  `(χ−0)^τ, (χ−a·χ₁)^τ ∈ ℤ[Irr G]` から `(D₀, Da)` を **基底写像 `τ` から直接構成**。欠けていた
+  `htau1_inner_eq` を上記橋で *内部放電* (global 等距仮説なし)。(5.4) 基底ケース `τ₁ = τ` の実体化で、
+  `retarget_isCoherent_of_sharedDecomposition` に直接供給可。
+- **残 (本パス後)**: 一般 (5.4) `τ₁ ⊋ τ` (running coherence extension への τ₁ 拡張) と ①Dade `R(χ)` 抽出
+  (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) は別パス。ただし両者とも
+  lattice-relative 化が前提で、その前提は本パスで完全除去 — per-step `hstep` を `decompositionPairFromDade`
+  + `retarget_isCoherent_of_sharedDecomposition` で組む経路が **型レベルで開通**した。
