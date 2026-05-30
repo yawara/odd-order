@@ -1067,6 +1067,90 @@ theorem sum_sq_mul_add_normSq_Z_le
   exact hbound
 
 open scoped Classical in
+/-- **Peterfalvi (5.6.2) capstone: `λ = 0` and `Z = 0`.**
+
+Composes the geometric half (`sum_sq_mul_add_normSq_Z_le`) and the arithmetic half
+(`int_eq_zero_of_sq_mul_le_of_two_mul_lt`).  The (5.6.1) decomposition writes the orthogonal
+part as
+
+`Y = (∑ i ∈ s, (a·[i = i₁] - λ·r i) • v i) + Z`,
+
+against the orthogonal family `v i` (real gram `m i = ‖χ_i‖²`, `v i = χ_i^{τ₁}`) with `Z`
+orthogonal to the family, where `r i = a_i / ‖χ_i‖²`, `i₁` indexes `χ₁`, and `ψ = a·χ₁` (so
+`‖ψ‖² = a²·m i₁`, hypothesis `hψ`) with `a₁ = 1` (so `r i₁ · m i₁ = 1`, hypothesis `hr₁`).
+
+The Pythagoras expansion gives `∑ (a·[i=i₁] - λ·r i)²·m i + ‖Z‖² ≤ ‖ψ‖² = a²·m i₁`; the
+algebraic identity collapses the left sum to `a²·m i₁ - 2·a·λ + λ²·D` with
+`D = ∑ (r i)²·m i`, so `λ²·D - 2·λ·a + ‖Z‖² ≤ 0`.  Hypothesis (c) `2·a < D` then forces
+`λ = 0` (`int_eq_zero_of_sq_mul_le_of_two_mul_lt`), and feeding `λ = 0` back gives `‖Z‖² ≤ 0`,
+hence `Z = 0` by positive definiteness. -/
+theorem lambda_eq_zero_and_Z_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {ι : Type*} (s : Finset ι) (i₁ : ι) (hi₁ : i₁ ∈ s)
+    (a : ℝ) (lam : ℤ) (Z : ClassFunction G ℂ)
+    (vc : ι → ClassFunction G ℂ) (mc : ι → ℝ) (rc : ι → ℝ)
+    (hY : D.Y = (∑ i ∈ s, ((a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i : ℝ) : ℂ) • vc i)
+      + Z)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (vc i) (vc j) =
+      if i = j then (mc i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (vc i) = 0)
+    (hψ : (ClassFunction.inner ψ ψ).re = a ^ 2 * mc i₁)
+    (hr₁ : rc i₁ * mc i₁ = 1)
+    (ha : 0 ≤ a)
+    (hD : 2 * a < ∑ i ∈ s, (rc i) ^ 2 * mc i) :
+    lam = 0 ∧ Z = 0 := by
+  classical
+  -- Geometric half: `∑ (c i)²·m i + ‖Z‖² ≤ ‖ψ‖²`.
+  have hgeo := D.sum_sq_mul_add_normSq_Z_le s vc
+    (fun i => a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) mc Z hY horth hZ
+  -- Algebraic collapse of the left sum.
+  have halg : (∑ i ∈ s, (a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) ^ 2 * mc i)
+      = a ^ 2 * mc i₁ - 2 * a * (lam : ℝ) * (rc i₁ * mc i₁)
+        + (lam : ℝ) ^ 2 * ∑ i ∈ s, (rc i) ^ 2 * mc i := by
+    have key : ∀ i ∈ s,
+        (a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) ^ 2 * mc i
+        = (if i = i₁ then (a ^ 2 * mc i₁ - 2 * a * (lam : ℝ) * (rc i₁ * mc i₁)) else 0)
+          + (lam : ℝ) ^ 2 * ((rc i) ^ 2 * mc i) := by
+      intro i hi
+      by_cases h : i = i₁
+      · subst h; rw [if_pos rfl, if_pos rfl]; ring
+      · rw [if_neg h, if_neg h]; ring
+    rw [Finset.sum_congr rfl key, Finset.sum_add_distrib, Finset.sum_ite_eq' s i₁,
+      if_pos hi₁, ← Finset.mul_sum]
+  -- Substitute `r i₁ · m i₁ = 1` and `‖ψ‖² = a²·m i₁`; obtain the quadratic `≤ 0`.
+  set Dsum := ∑ i ∈ s, (rc i) ^ 2 * mc i with hDsum
+  have hquad : (lam : ℝ) ^ 2 * Dsum - 2 * (lam : ℝ) * a + (ClassFunction.inner Z Z).re ≤ 0 := by
+    rw [halg, hr₁, hψ, mul_one] at hgeo
+    nlinarith [hgeo]
+  -- Integer forcing (cast to ℚ) gives `λ = 0`.
+  have hZre_nonneg : (0 : ℝ) ≤ (ClassFunction.inner Z Z).re := inner_self_re_nonneg Z
+  have hlam0 : lam = 0 := by
+    -- Work over ℝ directly: the integer-forcing argument transcribed.
+    by_contra hne
+    rcases lt_trichotomy lam 0 with hneg | hzero | hpos
+    · have hlamR : (lam : ℝ) < 0 := by exact_mod_cast hneg
+      have hsq_pos : 0 < (lam : ℝ) ^ 2 := by positivity
+      have hDpos : 0 < Dsum := by
+        have : (0 : ℝ) ≤ 2 * a := by linarith
+        linarith [hD]
+      nlinarith [mul_pos hsq_pos hDpos, hZre_nonneg, mul_nonneg ha (le_of_lt (neg_pos.mpr hlamR))]
+    · exact hne hzero
+    · have hlam1 : (1 : ℝ) ≤ (lam : ℝ) := by
+        have : (1 : ℤ) ≤ lam := hpos; exact_mod_cast this
+      have hlampos : (0 : ℝ) < (lam : ℝ) := by linarith
+      -- `λ²·D - 2λa + ‖Z‖² ≤ 0`, `‖Z‖² ≥ 0` ⟹ `λ²·D ≤ 2λa`, cancel `λ` ⟹ `λ·D ≤ 2a < D`.
+      have hcore : (lam : ℝ) ^ 2 * Dsum ≤ 2 * (lam : ℝ) * a := by linarith
+      have hcancel : (lam : ℝ) * Dsum ≤ 2 * a := by
+        have h2 : (lam : ℝ) * ((lam : ℝ) * Dsum) ≤ (lam : ℝ) * (2 * a) := by nlinarith [hcore]
+        exact le_of_mul_le_mul_left h2 hlampos
+      nlinarith [hcancel, hlam1, hD]
+  refine ⟨hlam0, ?_⟩
+  -- Feed `λ = 0` back: `‖Z‖² ≤ 0`, hence `Z = 0`.
+  have hZ0 : (ClassFunction.inner Z Z).re ≤ 0 := by
+    rw [hlam0] at hquad; push_cast at hquad; nlinarith [hquad]
+  exact eq_zero_of_inner_self_re_eq_zero (le_antisymm hZ0 hZre_nonneg)
+
+open scoped Classical in
 /-- **Peterfalvi (5.6.3) conjugate image as a complementary signed sum.**
 Given the (5.4.b)/(5.5) output `X = ∑_{α ∈ E} α` for a subset `E ⊆ R(χ)`, the candidate
 image of `χ̄` under `τ₂`, namely `X - (χ - χ̄)^τ`, equals the **negated** sum over the
