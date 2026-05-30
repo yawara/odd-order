@@ -141,6 +141,21 @@ theorem inner_smul_right (c : ℂ) (φ ψ : ClassFunction G ℂ) :
   rw [ClassFunction.inner, ClassFunction.inner, h]; ring
 
 omit [Finite G] in
+/-- **Conjugate symmetry of `ClassFunction.inner`:** `⟨ψ, φ⟩ = conj ⟨φ, ψ⟩`.
+The unscaled sum `∑ φ(g) conj(ψ(g))` is conjugate-symmetric, and the normalizing factor
+`⅟|G|` is real. -/
+theorem inner_conj_symm (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner ψ φ = star (ClassFunction.inner φ ψ) := by
+  have hsum : ClassFunction.innerSum ψ φ = star (ClassFunction.innerSum φ ψ) := by
+    rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [star_mul', star_star, mul_comm]
+  have hcard : star (⅟(Nat.card G : ℂ)) = ⅟(Nat.card G : ℂ) := by
+    rw [show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _,
+      star_inv₀, Complex.star_def, Complex.conj_natCast]
+  rw [ClassFunction.inner, ClassFunction.inner, hsum, star_mul', hcard]
+
+omit [Finite G] in
 /-- Right-linearity of `ClassFunction.inner` over a finite sum. -/
 theorem inner_sum_right {ι : Type*} (φ : ClassFunction G ℂ) (s : Finset ι)
     (f : ι → ClassFunction G ℂ) :
