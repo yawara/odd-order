@@ -1645,4 +1645,173 @@ theorem mul_centralizer_eq_top_of_isExtraspecial
 
 end ExtraspecialCommutator
 
+/-! ## 4D: Proposition 4.8(a) (pp. 35-36)
+
+BG mmd L1511-1518. We formalize **part (a)** only: a `p`-group `R` of rank `r(R) ≤ 2`
+and exponent `p` satisfies `|R| ≤ p³`. Part (b) (about `Ω₁(R)` for `p > 3`) depends on
+Proposition 4.3 and is handled separately.
+-/
+
+section Prop48ExponentPrime
+
+open OddOrder.GroupTheory
+
+/-- **BG Proposition 4.8(a)** (BG mmd L1511-1518): if `p` is a prime, `R` is a `p`-group of
+rank `r(R) ≤ 2` (here `pRank R p ≤ 2`) with exponent `p` (here `∀ x, x ^ p = 1`), then
+`|R| ≤ p³`.
+
+Following BG's proof: take a self-centralizing normal abelian subgroup `A ∈ SCN(R)` (obtained
+from `Ch06.exists_maximal_normal_isMulCommutative` + `centralizer_eq_…`). Since `exp R = p`,
+`A` is elementary abelian, so `|A| = p^{m(A)}` with `m(A) ≤ pRank R p ≤ 2`, giving `|A| ≤ p²`.
+Conjugation embeds `R/A = R/C_R(A) ↪ Aut(A)`, so `|R/A| ∣ |Aut A|`; as `R/A` is a `p`-group
+and `|Aut A|_p ≤ |GL(2,p)|_p = p` (for `|A| ≤ p²`), we get `|R/A| ≤ p`. Hence
+`|R| = |R/A|·|A| ≤ p·p² = p³`. -/
+theorem card_le_prime_cube_of_pRank_le_two_of_exponent_prime
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R) (hrank : pRank R p ≤ 2) (hexp : ∀ x : R, x ^ p = 1) :
+    Nat.card R ≤ p ^ 3 := by
+  classical
+  have hp : p.Prime := Fact.out
+  -- ── Step (i): take `A ∈ SCN(R)`, get self-centralizing `C_R(A) = A` (BG "Take A ∈ SCN(R)").
+  obtain ⟨A, hA_normal, hA_comm, hA_max⟩ :=
+    OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := R)
+  haveI : A.Normal := hA_normal
+  have hCent : Subgroup.centralizer (A : Set R) = A :=
+    OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative hR hA_comm hA_max
+  -- ── Step (ii): `exp p` ⇒ `A` elementary abelian; `|A| = p^kA`, `kA ≤ 2`, so `|A| ≤ p²`.
+  have hA_ea : (A : Subgroup R).IsElementaryAbelian p := by
+    refine ⟨isMulCommutative_iff.mp hA_comm, fun a => ?_⟩
+    apply Subtype.ext
+    push_cast
+    exact hexp (a : R)
+  letI : IsMulCommutative (↥A) := IsMulCommutative.of_comm hA_ea.comm
+  letI := hA_ea.zmodModule
+  have hlog_le : Nat.log p (Nat.card (↥A)) ≤ 2 := le_trans (le_pRank A hA_ea) hrank
+  have hA_pow : Nat.card (↥A) = p ^ (Nat.log p (Nat.card (↥A))) := by
+    rw [hA_ea.log_card_eq_finrank]
+    exact hA_ea.card_eq_pow_finrank
+  set kA := Nat.log p (Nat.card (↥A)) with hkA
+  have hA_card : Nat.card (↥A) = p ^ kA := hA_pow
+  have hA_le : Nat.card (↥A) ≤ p ^ 2 := by
+    rw [hA_card]; exact Nat.pow_le_pow_right hp.pos hlog_le
+  -- ── Step (iii): conjugation hom `R →* MulAut ↥A` with kernel `C_R(A) = A` ⇒ `R/A ↪ MulAut A`.
+  let φ : R →* MulAut (↥A) := MulAut.conjNormal (H := A)
+  -- `ker φ = C_R(A)` (the standard conjugation-kernel identity; cf. the local template
+  -- `conjNormal_ker_eq_centralizer_local`), then `= A` by `hCent`.
+  have hker_cent : φ.ker = Subgroup.centralizer (A : Set R) := by
+    ext g
+    rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+    constructor
+    · intro hg s hs
+      have hfix0 : MulAut.conjNormal (H := A) g ⟨s, hs⟩ = (⟨s, hs⟩ : ↥A) := by
+        rw [hg]; rfl
+      have hfix : (g * s * g⁻¹ : R) = s := by
+        have hh := congrArg (fun x : ↥A => (x : R)) hfix0
+        simp only [MulAut.conjNormal_apply] at hh
+        exact hh
+      have : g * s * g⁻¹ * g = s * g := by rw [hfix]
+      simpa [mul_assoc] using this.symm
+    · intro hcent
+      ext s
+      have hcomm : (s : R) * g = g * (s : R) := hcent (s : R) s.2
+      have hfix : MulAut.conjNormal (H := A) g s = s := by
+        apply A.subtype_injective
+        rw [Subgroup.coe_subtype, MulAut.conjNormal_apply, ← hcomm]; group
+      rw [hfix]; rfl
+  have hker : φ.ker = A := hker_cent.trans hCent
+  let ψ : R ⧸ A →* MulAut (↥A) := QuotientGroup.lift A φ (by rw [hker])
+  have hψ_inj : Function.Injective ψ := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    dsimp only [ψ]
+    rw [QuotientGroup.ker_lift, hker]
+    simp
+  have hdvd : Nat.card (R ⧸ A) ∣ Nat.card (MulAut (↥A)) :=
+    Subgroup.card_dvd_of_injective ψ hψ_inj
+  -- `R/A` is a `p`-group.
+  obtain ⟨kQ, hkQ⟩ := IsPGroup.iff_card.mp (hR.to_quotient A)
+  -- ── Step (iv): `|R/A| ≤ p` by case analysis on `kA ∈ {0, 1, 2}` (BG's `|Aut A|_p ≤ p`).
+  have hquot_le : Nat.card (R ⧸ A) ≤ p := by
+    -- It suffices to show `kQ ≤ 1`; then `|R/A| = p^kQ ≤ p`.
+    suffices hkQ_le : kQ ≤ 1 by
+      rw [hkQ]
+      calc p ^ kQ ≤ p ^ 1 := Nat.pow_le_pow_right hp.pos hkQ_le
+        _ = p := pow_one p
+    -- Reduce to `¬ (p² ∣ |MulAut A|)`: if `kQ ≥ 2` then `p² ∣ p^kQ = |R/A| ∣ |MulAut A|`.
+    by_contra hkQ_gt
+    rw [not_le] at hkQ_gt
+    have hp2_dvd : p ^ 2 ∣ Nat.card (MulAut (↥A)) := by
+      refine dvd_trans ?_ hdvd
+      rw [hkQ]
+      exact pow_dvd_pow p hkQ_gt
+    -- `|MulAut A| = ∏_{i<kA}(p^kA - pⁱ)` (the `|GL(kA, p)|` formula), with `kA ≤ 2`.
+    have hfr := hA_ea.log_card_eq_finrank
+    rw [← hkA] at hfr
+    have hcard_aut_gen :
+        Nat.card (MulAut (↥A)) = ∏ i : Fin kA, (p ^ kA - p ^ (i : ℕ)) := by
+      rw [hA_ea.card_mulAut, ← hfr]
+    -- Now derive a contradiction by computing `|MulAut A|` in each rank case.
+    have hp2_not_dvd : ¬ p ^ 2 ∣ Nat.card (MulAut (↥A)) := by
+      rw [hcard_aut_gen]
+      clear hp2_dvd hcard_aut_gen hdvd
+      interval_cases kA
+      · -- `kA = 0`: empty product `= 1`, `p² ∤ 1`.
+        simp only [Finset.univ_eq_empty, Finset.prod_empty]
+        intro hdvd1
+        have := Nat.le_of_dvd one_pos hdvd1
+        have hlt : 1 < p ^ 2 := by have := hp.two_le; nlinarith
+        omega
+      · -- `kA = 1`: product `= p^1 - p^0 = p - 1`, and `p ∤ p - 1` ⇒ `p² ∤ p - 1`.
+        simp only [Fin.prod_univ_one, Fin.isValue, Fin.val_zero, pow_zero, pow_one]
+        intro hdvd_pred
+        have hp_dvd : p ∣ p - 1 :=
+          (dvd_pow_self p (by norm_num : (2:ℕ) ≠ 0)).trans hdvd_pred
+        have hpred_pos : 0 < p - 1 := by have := hp.two_le; omega
+        have := Nat.le_of_dvd hpred_pos hp_dvd
+        omega
+      · -- `kA = 2`: product `= (p²-1)(p²-p) = p(p-1)(p-1)(p+1)`, whose `p`-part is `p¹`.
+        have hcard_aut :
+            (∏ i : Fin 2, (p ^ 2 - p ^ (i : ℕ))) = p * (p - 1) * (p - 1) * (p + 1) := by
+          simp only [Fin.prod_univ_two, Fin.isValue, Fin.val_zero, Fin.val_one, pow_zero, pow_one]
+          have h_sq_sub_one : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+            simpa using Nat.sq_sub_sq p 1
+          have h_sq_sub_self : p ^ 2 - p = p * (p - 1) := by
+            calc p ^ 2 - p = p * p - p * 1 := by rw [pow_two, mul_one]
+              _ = p * (p - 1) := (Nat.mul_sub_left_distrib p p 1).symm
+          rw [h_sq_sub_one, h_sq_sub_self]; ring
+        rw [hcard_aut]
+        -- `p² ∤ p(p-1)(p-1)(p+1)` because `p ∤ (p-1)(p-1)(p+1)`.
+        intro hp2_dvd_aut
+        have hp_not_dvd_pred : ¬ p ∣ p - 1 := by
+          intro h
+          have hpred_pos : 0 < p - 1 := by have := hp.two_le; omega
+          have := Nat.le_of_dvd hpred_pos h
+          omega
+        have hp_not_dvd_succ : ¬ p ∣ p + 1 := by
+          intro h
+          have hsub : p ∣ (p + 1) - p := Nat.dvd_sub h (dvd_refl p)
+          have hsub_eq : (p + 1) - p = 1 := by omega
+          rw [hsub_eq] at hsub
+          exact hp.not_dvd_one hsub
+        have hp_not_dvd_rest : ¬ p ∣ (p - 1) * (p - 1) * (p + 1) := by
+          intro h
+          rcases hp.dvd_mul.mp h with hleft | hsucc
+          · rcases hp.dvd_mul.mp hleft with h1 | h2
+            · exact hp_not_dvd_pred h1
+            · exact hp_not_dvd_pred h2
+          · exact hp_not_dvd_succ hsucc
+        have hp_dvd_rest : p ∣ (p - 1) * (p - 1) * (p + 1) := by
+          have hmul : p * p ∣ p * ((p - 1) * (p - 1) * (p + 1)) := by
+            simpa [pow_two, mul_assoc] using hp2_dvd_aut
+          exact Nat.dvd_of_mul_dvd_mul_left hp.pos hmul
+        exact hp_not_dvd_rest hp_dvd_rest
+    exact hp2_not_dvd hp2_dvd
+  -- ── Step (v): `|R| = |R/A|·|A| ≤ p·p² = p³`.
+  have hmul : A.index * Nat.card (↥A) = Nat.card R := Subgroup.index_mul_card A
+  have hindex : A.index = Nat.card (R ⧸ A) := (Subgroup.index_eq_card A).symm
+  calc Nat.card R = A.index * Nat.card (↥A) := hmul.symm
+    _ ≤ p * p ^ 2 := by rw [hindex]; exact Nat.mul_le_mul hquot_le hA_le
+    _ = p ^ 3 := by ring
+
+end Prop48ExponentPrime
+
 end OddOrder.BG.Ch1.S04
