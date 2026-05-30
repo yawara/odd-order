@@ -8,6 +8,9 @@ import Mathlib.GroupTheory.PGroup
 import Mathlib.Algebra.Order.GroupWithZero.Canonical
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
+import Mathlib.LinearAlgebra.Dimension.Free
 
 -- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
 open scoped IsMulCommutative
@@ -126,6 +129,95 @@ theorem IsElementaryAbelian.log_card_eq_finrank [Fact p.Prime] [Finite G]
   rw [h.card_eq_pow_finrank, Nat.log_pow (Fact.out : p.Prime).one_lt]
 
 end Bridge
+
+section AutGL
+
+/-! ## 1B: `Aut(E) ≅ GL(n, F_p)` for elementary abelian `E` (BG §4, standard bridge)
+
+BG Lem 4.13 (mmd L1624) と Thm 4.16 (mmd L1658, `|GL(2,p)| = p(p²-1)(p-1)`) は,
+elementary abelian `p`-群 `E` の自己同型群が `F_p`-ベクトル空間 `Additive E` の一般線型群と
+同型である事実 `Aut(E) ≅ GL(n, p)` (`n = m(E) = finrank (ZMod p) (Additive E)`) を暗黙に使う.
+この橋自体は教科書外の標準事実 (BG 本文に proof なし) なので, 標準的に形式化する.
+
+橋の核心: 群準同型 `E → E` は `Additive E` 上の加法準同型, したがって `ZMod p`-スカラー作用を
+自動的に保存する (`ZMod.map_smul`) ので `ZMod p`-線型. これにより `Aut(E)` (mult.) は
+`AddAut (Additive E)` (add.) を経て `(Additive E ≃ₗ[ZMod p] Additive E)`, 基底を取って
+`GL(Fin n, ZMod p)` へ移る. -/
+
+/-- The automorphism group of a `ZMod p`-module `M` (as an additive group) is multiplicatively
+equivalent to the group of `ZMod p`-linear automorphisms of `M`.
+
+Every additive automorphism of `M` is automatically `ZMod p`-linear, because an additive map
+preserves the `ZMod p`-scalar action (`ZMod.map_smul`): the action `c • x` is determined by the
+group structure (`c • x = (c.val) • x` as an iterated sum), which any `AddMonoidHom` respects. -/
+noncomputable def AddAut.toZModLinearEquiv {p : ℕ} {M : Type*}
+    [AddCommGroup M] [Module (ZMod p) M] :
+    AddAut M ≃* (M ≃ₗ[ZMod p] M) where
+  toFun e := { e with map_smul' := ZMod.map_smul e.toAddMonoidHom }
+  invFun e := { e.toAddEquiv with }
+  left_inv _ := by ext; rfl
+  right_inv _ := by ext; rfl
+  map_mul' _ _ := by ext; rfl
+
+/-- **`Aut(M) ≅ GL(n, F_p)` for a finite `ZMod p`-module** (`p` prime,
+`n = finrank (ZMod p) M`): the additive automorphism group of a finite `F_p`-vector space `M` is
+multiplicatively equivalent to the general linear group `GL(Fin n, ZMod p)`.
+
+This is the abstract `[Module (ZMod p) M]` form. Keeping the module abstract (rather than the
+`letI`-bound `zmodModule` structure on `Additive E`) is essential: with a `letI`-bound local
+module instance, the `Module.Finite` / `Module.Free` / basis instance synthesis gets stuck on the
+shared module argument. The `Additive E`-specific form is obtained in
+`IsElementaryAbelian.mulAutEquivGeneralLinearGroup` by composing with `AddAutAdditive`. -/
+noncomputable def IsElementaryAbelian.addAutEquivGL {p : ℕ} [Fact p.Prime] {M : Type*}
+    [AddCommGroup M] [Module (ZMod p) M] [Finite M] :
+    AddAut M ≃* GL (Fin (Module.finrank (ZMod p) M)) (ZMod p) := by
+  haveI : Module.Finite (ZMod p) M := Module.Finite.of_finite
+  let b : Module.Basis (Fin (Module.finrank (ZMod p) M)) (ZMod p) M :=
+    Module.finBasisOfFinrankEq (ZMod p) M rfl
+  exact (AddAut.toZModLinearEquiv).trans
+    ((LinearMap.GeneralLinearGroup.generalLinearEquiv (ZMod p) M).symm.trans
+      (Matrix.GeneralLinearGroup.toLin' b).symm)
+
+/-- **`Aut(E) ≅ GL(m(E), F_p)`** for an elementary abelian `p`-group `E` (`p` prime), where
+`m(E) = finrank (ZMod p) (Additive E)` is BG's `m(E)`.
+
+This is the standard bridge underlying BG Lem 4.13 and Thm 4.16: viewing `E` additively as an
+`F_p`-vector space, `MulAut E` is multiplicatively equivalent to the general linear group of
+dimension `m(E)` over `F_p`. The multiplicativity is honest (no anti-homomorphism flip): the
+`AddAutAdditive` leg is a genuine `≃*` in the direction `AddAut (Additive E) → MulAut E`. -/
+noncomputable def IsElementaryAbelian.mulAutEquivGeneralLinearGroup
+    {p : ℕ} {E : Type*} [Group E] [Finite E] [Fact p.Prime]
+    (hE : IsElementaryAbelian p E) :
+    letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+    letI := hE.zmodModule
+    MulAut E ≃* GL (Fin (Module.finrank (ZMod p) (Additive E))) (ZMod p) := by
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  letI := hE.zmodModule
+  haveI : Finite (Additive E) := inferInstanceAs (Finite E)
+  exact (AddAutAdditive (G := E)).symm.trans IsElementaryAbelian.addAutEquivGL
+
+/-- **`|Aut(E)| = ∏ (pⁿ - pⁱ)`** for an elementary abelian `p`-group `E` (`p` prime), where
+`n = m(E) = finrank (ZMod p) (Additive E)`.
+
+This is the standard order formula underlying BG Thm 4.16: `|Aut(E)| = |GL(n, p)|`. For `n = 2`
+(BG's case `|E| = p²`) the product is `(p² - 1)(p² - p) = p(p² - 1)(p - 1)`, matching BG's
+`|GL(2, p)| = p(p² - 1)(p - 1)` (via `Fin.prod_univ_two`). -/
+theorem IsElementaryAbelian.card_mulAut
+    {p : ℕ} {E : Type*} [Group E] [Finite E] [Fact p.Prime]
+    (hE : IsElementaryAbelian p E) :
+    letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+    letI := hE.zmodModule
+    Nat.card (MulAut E) =
+      ∏ i : Fin (Module.finrank (ZMod p) (Additive E)),
+        (p ^ Module.finrank (ZMod p) (Additive E) - p ^ (i : ℕ)) := by
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  letI := hE.zmodModule
+  rw [Nat.card_congr (hE.mulAutEquivGeneralLinearGroup).toEquiv,
+      Matrix.card_GL_field, ZMod.card]
+
+end AutGL
 
 variable (G : Type*) [Group G]
 
