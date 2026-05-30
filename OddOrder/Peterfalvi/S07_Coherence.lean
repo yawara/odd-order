@@ -722,6 +722,22 @@ theorem inner_self_chi_add_psi_eq
   rw [← D.inner_self_chi_sub_psi, ← D.inner_self_X_sub_Y, ← D.tau1_image,
     D.tau1_isometry.inner_eq]
 
+/-- **Peterfalvi (5.6.2) opening bound:** `‖Y‖² ≤ ‖ψ‖²`.
+
+This is the first step of (5.6.2) ("We note first that `‖χ‖² + a²‖χ₁‖² = ‖X‖² + ‖Y‖²`;
+by (5.4.a) `‖X‖² ≥ ‖χ‖²`, so `‖Y‖² ≤ a²‖χ₁‖²`").  It follows directly from the total-norm
+identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` and (5.4.a) `‖χ‖² ≤ ‖X‖²`, with `ψ = a·χ₁` in the
+application.  Stated for the general `ψ` of the (5.4) decomposition. -/
+theorem inner_self_Y_re_le_inner_self_psi
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    (ClassFunction.inner D.Y D.Y).re ≤ (ClassFunction.inner ψ ψ).re := by
+  have htotal : (ClassFunction.inner χ χ).re + (ClassFunction.inner ψ ψ).re =
+      (ClassFunction.inner D.X D.X).re + (ClassFunction.inner D.Y D.Y).re := by
+    have := congrArg Complex.re D.inner_self_chi_add_psi_eq
+    simpa [Complex.add_re] using this
+  have hXge := D.inner_self_chi_re_le_inner_self_X
+  linarith
+
 /-- **Peterfalvi (5.4.b).**  If `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²`
 and `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²`.
 
