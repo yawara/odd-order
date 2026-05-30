@@ -569,6 +569,27 @@ theorem liesOver_iff_restrictionConstituent
   · intro hθ
     exact hθ.multiplicity_ne_zero
 
+/-- **Constituent-of-induction ⟺ lies-over bridge** (Frobenius reciprocity at the
+constituent level).  For `θ ∈ Irr H` and `χ ∈ Irr G`, the irreducible `χ` is a constituent
+of the induced character `Ind_H^G θ` — i.e. `⟨Ind_H^G θ, χ⟩ ≠ 0` — exactly when `χ` lies over
+`θ`.
+
+This packages numerical Frobenius reciprocity
+(`ClassFunction.inner_induce_eq_inner_restrict`: `⟨Ind θ, χ⟩ = ⟨θ, Res χ⟩`) into the
+constituent/`LiesOver` language: the constituent multiplicity `⟨θ, Res χ⟩` is the conjugate of
+the restriction multiplicity `⟨Res χ, θ⟩ = restrictionMultiplicity H χ θ`, so the two
+non-vanishing conditions agree.  This is the bridge that Peterfalvi (6.6) needs to pass between
+"`χ` is a constituent of `Ind_K^L θ`" and "`χ` lies over `θ`". -/
+theorem inner_induce_ne_zero_iff_liesOver [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
+        (χ : ClassFunction G ℂ) ≠ 0 ↔ LiesOver H χ θ := by
+  rw [ClassFunction.inner_induce_eq_inner_restrict, liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def,
+    inner_conj_symm (ClassFunction.restrict H (χ : ClassFunction G ℂ))
+      (θ : ClassFunction H ℂ)]
+  exact star_ne_zero
+
 /-- **The constituent multiplicity of an irreducible character is an integer.** For
 irreducible characters `χ` of `G` and `θ` of `H`, the normalized inner product
 `⟨Res^G_H χ, θ⟩` is `ℤ`-valued.  This is the irreducible-character specialization of
@@ -591,6 +612,37 @@ theorem restrictionMultiplicity_natCast [Finite G]
     ∃ k : ℕ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
         (θ : ClassFunction H ℂ) = (k : ℂ) :=
   ClassFunction.restrictionMultiplicity_natCast H χ.isIrreducible θ.isIrreducible
+
+/-- **Lies-over existence.**  For any subgroup `H` and any irreducible character `χ` of `G`,
+there is an irreducible character `θ` of `H` over which `χ` lies — i.e. `θ` occurs in the
+restriction `Res^G_H χ` with nonzero multiplicity.
+
+This is elementary completeness: the restriction `Res^G_H χ` is nonzero (its value at `1` is
+`χ(1)`, the positive character degree), so it cannot be orthogonal to *every* irreducible
+character of `H` (`classFunction_eq_zero_of_orthogonal`), and any irreducible `θ` with nonzero
+inner product is one `χ` lies over.  (Normality of `H` is not needed for existence.)  Together
+with `inner_induce_ne_zero_iff_liesOver`, this is the input the case-B `X`-characterization
+needs: each constituent has an irreducible to lie over. -/
+theorem exists_liesOver [Finite G]
+    (χ : IrreducibleCharacter G) :
+    ∃ θ : IrreducibleCharacter H, LiesOver H χ θ := by
+  classical
+  haveI : Finite H := Subtype.finite
+  -- The restricted character is nonzero: its value at `1` is the positive degree `χ(1)`.
+  have hne : ClassFunction.restrict H (χ : ClassFunction G ℂ) ≠ 0 := by
+    obtain ⟨n, hpos, hval, _⟩ :=
+      χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+    intro hzero
+    have h1 : ClassFunction.restrict H (χ : ClassFunction G ℂ) (1 : ↥H) = 0 := by
+      rw [hzero]; rfl
+    rw [ClassFunction.restrict_apply, Subgroup.coe_one, hval] at h1
+    exact (Nat.cast_ne_zero.mpr hpos.ne') h1
+  -- Completeness: a nonzero class function is not orthogonal to all irreducibles.
+  by_contra hcon
+  refine hne (classFunction_eq_zero_of_orthogonal
+    (ClassFunction.restrict H (χ : ClassFunction G ℂ)) fun θ => ?_)
+  by_contra hθ
+  exact hcon ⟨θ, by rw [liesOver_iff, ClassFunction.restrictionMultiplicity_def]; exact hθ⟩
 
 end IrreducibleCharacter
 

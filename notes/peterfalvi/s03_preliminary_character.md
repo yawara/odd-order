@@ -130,6 +130,21 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterKernel_trivialClassFunction`, `characterKernel_conj`,
   `subsetCharacterKernel_trivialClassFunction`,
   `subsetCharacterKernel_conj_iff`, and `SubsetCharacterKernel.mono`.
+- (2026-05-31) **(1.6.a) forward direction landed** (the (6.6) G2.2 use case):
+  `subsetCharacterKernel_induce_of_subgroupOf` — for `A ⊴ G` with `A ≤ H`, if
+  `(A.subgroupOf H : Set ↥H) ⊆ characterKernel θ` then
+  `(A : Set G) ⊆ characterKernel (induce H θ)`.  Built on the RT value formula
+  `ClassFunction.induce_apply_of_mem_normal_of_const` (`InducedCharacter.lean`):
+  normality makes every conjugate `x⁻¹ a x` of `a ∈ A` land back in `A ≤ H`, so when
+  `θ` is constant `= c` on `A` the whole induction sum at `a` collapses to `|G|·c·|H|⁻¹`.
+  The (6.6) consumer uses the contrapositive `Z ⊄ Ker (Ind θ) ⟹ Z ⊄ Ker θ`.  The
+  **converse** ((1.6.a) `⟸`) is [Is] *Character Theory* Lemma 2.21 (an eigenvalue
+  argument on the genuine character `θ`) and is **not yet formalised** — the repo's
+  value-based `characterKernel` lacks the representation-kernel eigenvalue machinery.
+  Companion constituent infra in `Clifford.lean`:
+  `IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver` (`⟨Ind θ, χ⟩ ≠ 0 ↔ LiesOver`,
+  Frobenius reciprocity packaging) and `IrreducibleCharacter.exists_liesOver`
+  (every `χ ∈ Irr G` lies over some `θ ∈ Irr H`, via completeness on the nonzero `Res χ`).
 - `SecondOrthogonality` now exposes the next matrix proof-core bridge:
   `conjugacyClassSize_pos`,
   `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,

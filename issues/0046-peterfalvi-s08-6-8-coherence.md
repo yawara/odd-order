@@ -475,6 +475,38 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - **caller 측 残 (G2.3 以後)**: (6.6) 本文の "`θᵢ(1)² ∣ ∑_{j≥i} χⱼ(1)²`" は本 leaf の p-power 事実
     + `sq_dvd_of_factored_coprime`/`two_mul_lt_sq_of_primePow_gap` (Round 15 landed) を `K=p群` setup で
     instantiate して得る (degree-sort `exists_monotoneDegreeEnum` [G2.1] と接続)。
+- [x] (2026-05-31, G2.2) **(6.6) `Z ⊄ Ker χ` 判定が要する induced-character kernel + constituent
+      infrastructure** を 3 file に landing (sorry/axiom 無 — 各 `#assert_only_allowed_axioms` = 3 axiom
+      全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑). Round-16 G2.2 honest-revert
+      で欠落と判明した「`Ind_K^L θ` の核」「constituent ⟺ LiesOver」「lies-over 存在」を foundational
+      primitive として実装 (case-B L3.1 も同部品を再利用):
+  - **(A) Peterfalvi (1.6.a) forward** — `Ind_H^G θ` の核 (mmd 04.3 L73-77):
+    - **`ClassFunction.induce_apply_of_mem_normal_of_const`** (`InducedCharacter.lean`, RT 一般形, 任意
+      `CommRing k`): `A ⊴ G`, `A ≤ H`, `θ` が `A` 上一定 `= c` ⟹ `a ∈ A` で `Ind_H^G θ(a) = |G|·c·|H|⁻¹`。
+      正規性で全共役 `x⁻¹ a x ∈ A ≤ H` ⟹ 誘導和の filter が `G` 全体, 各項 `= c` (補助
+      `induceTerm_of_mem_normal`)。これが (1.6.a) の計算的心臓。
+    - **`Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf`** (`S03_PreliminaryCharacter.lean`):
+      `(A.subgroupOf H : Set ↥H) ⊆ characterKernel θ` ⟹ `(A:Set G) ⊆ characterKernel (Ind_H^G θ)`。
+      forward 半分 (`A ⊆ Ker θ ⟹ A ⊆ Ker Ind θ`)。(6.6) は **対偶** `Z ⊄ Ker (Ind θ) ⟹ Z ⊄ Ker θ` を消費。
+      **逆方向** ((1.6.a) converse) は [Is] *Character Theory* Lemma 2.21 (genuine character の固有値論法)
+      で本 round では未形式化 (repo の value-based `characterKernel` には表現核の固有値機構が無い)。
+  - **(B) constituent ⟺ LiesOver bridge** — `inner_induce_ne_zero_iff_liesOver`
+    (`Clifford.lean`, `IrreducibleCharacter` namespace, `[Fintype G] [Invertible (Nat.card G:ℂ)]`):
+    `⟨Ind_H^G θ, χ⟩ ≠ 0 ↔ LiesOver H χ θ`。numerical Frobenius reciprocity
+    (`inner_induce_eq_inner_restrict`) を `LiesOver` 言語に packaging — constituent multiplicity
+    `⟨θ, Res χ⟩` = restriction multiplicity `⟨Res χ, θ⟩` の共役 (`inner_conj_symm` + `star_ne_zero`)。
+    (6.6) が「χ は `Ind_K^L θ` の constituent」と「χ lies over θ」を往復する橋。
+  - **(C) lies-over existence** — `IrreducibleCharacter.exists_liesOver` (`Clifford.lean`, `[Finite G]`):
+    任意 `χ ∈ Irr G` は **ある** `θ ∈ Irr H` の上にある。`Res^G_H χ ≠ 0` (値 `χ(1)>0` at `1`,
+    `exists_natDegree_charValue_one_dvd_card`) ⟹ 全 irreducible と直交不可
+    (`classFunction_eq_zero_of_orthogonal`)。正規性不要。case-B `X`-characterization が消費。
+  - **honest 判定**: (A)-forward/(B)/(C) は完全 unconditional・fully-general。posited 仮説無し。
+    唯一 (1.6.a) converse のみ [Is] 2.21 (deep) で未着 ⟹ (6.6) は forward 対偶のみ使うため G2.2 の
+    `Z ⊄ Ker θ` step には十分。
+  - **caller 측 残 (G2.2 以後)**: (6.6) で `X = S − S(Z)` が conj-閉 (= G2.0 caller 残) を出すには
+    `S(Z) := {χ ∈ S | Z ⊆ Ker χ}` の conj-閉性が要り, それは本 leaf の `subsetCharacterKernel_induce_of_subgroupOf`
+    対偶 + constituent bridge で「χ ∈ S(Z) ⟺ χ が `Ind θ` (θ∈Irr(K) with Z⊆Ker θ) の constituent」を
+    回す setup-specific character theory (別 leaf)。
 
 ## 完了条件
 

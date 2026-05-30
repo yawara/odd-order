@@ -619,6 +619,11 @@ set_option linter.style.longLine false in
 -- Peterfalvi §3 (1.1), conjugate-difference (nondegeneracy) form for §7: in a finite group of
 -- odd order, the conjugate difference `χ - χ̄` of a nontrivial irreducible character is nonzero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_of_ne_trivial_of_odd_card
+-- Peterfalvi §3 (1.6.a), forward direction: for `A ⊴ G` with `A ≤ H`, if `A ⊆ Ker θ` (as a
+-- subgroup of `H`) then `A ⊆ Ker (Ind_H^G θ)`.  Elementary from the value formula
+-- `induce_apply_of_mem_normal_of_const`; the converse is [Is] Lemma 2.21 (not formalised).
+-- (6.6) uses the contrapositive: `Z ⊄ Ker (Ind_H^G θ)` ⟹ `Z ⊄ Ker θ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
 -- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
 -- characters contains no real class function. Discharges the `no_real_characters` field of the §7
 -- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
@@ -641,6 +646,19 @@ set_option linter.style.longLine false in
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (Peterfalvi (1.6.a) value core): for a normal subgroup `A ⊴ G` with
+-- `A ≤ H` on which `θ` is constant `= c`, every term of the induction sum at `a ∈ A` is `c`
+-- (conjugates `x⁻¹ a x` stay in `A ≤ H` by normality), so `Ind_H^G θ(a) = |G|·c·|H|⁻¹`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_of_mem_normal_of_const
+-- RepresentationTheory (Peterfalvi §3 (1.6.b)-bridge): `χ` is a constituent of `Ind_H^G θ`
+-- (`⟨Ind θ, χ⟩ ≠ 0`) iff `χ` lies over `θ`.  Numerical Frobenius reciprocity
+-- (`inner_induce_eq_inner_restrict`) packaged into `LiesOver`; the constituent multiplicity
+-- `⟨θ, Res χ⟩` is the conjugate of the restriction multiplicity `⟨Res χ, θ⟩`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver
+-- RepresentationTheory (lies-over existence): every `χ ∈ Irr G` lies over some `θ ∈ Irr H`.
+-- Completeness: `Res^G_H χ ≠ 0` (value `χ(1) > 0` at `1`), so it is not orthogonal to all
+-- irreducibles of `H` (`classFunction_eq_zero_of_orthogonal`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
 -- RepresentationTheory (Peterfalvi (2.10.1) L-conjugacy invariance): inducing from a conjugate
 -- subgroup `H^ℓ = H.map (MulAut.conj ℓ)` with the transported class function `transportConj ℓ θ`
 -- equals inducing from `H`.  Re-index the induction sum by `x ↦ x * ℓ` (`induceTerm_transportConj`);

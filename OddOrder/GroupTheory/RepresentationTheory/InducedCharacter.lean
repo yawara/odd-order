@@ -501,6 +501,53 @@ theorem inner_induce_eq_inner_restrict (H : Subgroup G) [Fintype H]
 
 end FrobeniusReciprocity
 
+section NormalSubgroupValue
+
+/-! ### Value of the induced character on a normal subgroup contained in `H`
+
+For `A ⊴ G` with `A ≤ H`, every conjugate `x⁻¹ a x` of `a ∈ A` stays in `A ≤ H`, so the
+induction sum at `a` has **no** vanishing terms: it runs over all of `G`, each summand being
+`θ` evaluated at the conjugate.  This is the computational core behind Peterfalvi (1.6.a):
+if `θ` is constant (equal to its degree) on `A`, then so is `Ind_H^G θ`. -/
+
+omit [Fintype G] in
+/-- For a normal subgroup `A ⊴ G` with `A ≤ H` and `a ∈ A`, the `x`-summand of the
+induction sum at `a` is `θ` evaluated at the conjugate `x⁻¹ a x ∈ A ≤ H` (no term vanishes,
+since `A` is closed under `G`-conjugation). -/
+theorem induceTerm_of_mem_normal {A H : Subgroup G} (hAH : A ≤ H) [hA : A.Normal]
+    (θ : ClassFunction ↥H k) {a : G} (ha : a ∈ A) (x : G) :
+    induceTerm H θ x a =
+      θ ⟨x⁻¹ * a * x, hAH (hA.conj_mem' a ha x)⟩ := by
+  have hxa : x⁻¹ * a * x ∈ H := hAH (hA.conj_mem' a ha x)
+  rw [induceTerm_of_mem θ hxa]
+
+variable [Fintype G]
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Value of `Ind_H^G θ` on a normal subgroup, constant case.**  Let `A ⊴ G` with `A ≤ H`,
+and suppose `θ` takes a single value `c` on all of `A` (as a subset of `H`).  Then `Ind_H^G θ`
+takes the value `|G|·c·|H|⁻¹` at every `a ∈ A`.
+
+This is the heart of the forward direction of Peterfalvi (1.6.a): since every conjugate of
+`a ∈ A` lands back in `A` (normality) and `θ` is constant on `A`, all `|G|` summands of the
+induction sum coincide. -/
+theorem induce_apply_of_mem_normal_of_const {A H : Subgroup G} (hAH : A ≤ H) [A.Normal]
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) {c : k}
+    (hc : ∀ a' : G, ∀ ha' : a' ∈ A, θ ⟨a', hAH ha'⟩ = c) {a : G} (ha : a ∈ A) :
+    induce H θ a = ⅟(Nat.card H : k) * ((Nat.card G : k) * c) := by
+  rw [induce_apply]
+  congr 1
+  have hterm : ∀ x : G, induceTerm H θ x a = c := by
+    intro x
+    have hconj : x⁻¹ * a * x ∈ A := (‹A.Normal›.conj_mem' a ha x)
+    rw [induceTerm_of_mem_normal hAH θ ha x]
+    exact hc _ hconj
+  rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul, Nat.card_eq_fintype_card]
+
+end NormalSubgroupValue
+
 section VirtualCharacters
 
 /-! ### Restriction and induction preserve virtual characters (Peterfalvi (2.6.b))

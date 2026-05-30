@@ -516,4 +516,65 @@ theorem conjugateDifference_ne_zero_of_ne_trivial_of_odd_card [Finite G]
   (conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ)).mpr
     (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ)
 
+/-! ### Peterfalvi (1.6.a): kernel of an induced character
+
+For `A ⊴ G` with `A ≤ H` (and `θ` a class function on `H`), the normal subgroup `A` lies in
+the kernel of `θ` if and only if it lies in the kernel of the induced character `Ind_H^G θ`.
+The forward direction is elementary from the value formula
+`ClassFunction.induce_apply_of_mem_normal_of_const`: when `θ` is constant on `A`, every term
+of the induction sum at `a ∈ A` is that constant, so `Ind_H^G θ` is constant on `A` as well.
+The backward direction (the converse) is [Is] *Character Theory* Lemma 2.21, an eigenvalue
+argument on the genuine character `θ`, and is **not** formalised here. -/
+
+section InducedKernel
+
+variable {A H : Subgroup G} [Fintype G] [Fintype H] [Invertible (Nat.card H : ℂ)]
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- For `a ∈ A`, the constant value taken by the induced character `Ind_H^G θ` on a normal
+subgroup `A ≤ H` on which `θ` is constant `= θ(1)`.  This is the explicit value formula
+`Ind_H^G θ(a) = |G|·θ(1)·|H|⁻¹`, derived from
+`ClassFunction.induce_apply_of_mem_normal_of_const` with the kernel hypothesis. -/
+theorem induce_apply_eq_of_subgroupOf_subset_characterKernel (hAH : A ≤ H) [A.Normal]
+    (θ : ClassFunction ↥H ℂ)
+    (hker : (A.subgroupOf H : Set ↥H) ⊆ characterKernel θ) {a : G} (ha : a ∈ A) :
+    ClassFunction.induce H θ a =
+      ⅟(Nat.card H : ℂ) * ((Nat.card G : ℂ) * characterDegree θ) := by
+  refine ClassFunction.induce_apply_of_mem_normal_of_const hAH θ
+    (c := characterDegree θ) (fun a' ha' => ?_) ha
+  -- `θ` is constant `= characterDegree θ` on `A`, by the kernel hypothesis.
+  have hmem : (⟨a', hAH ha'⟩ : ↥H) ∈ A.subgroupOf H := by
+    rw [Subgroup.mem_subgroupOf]; exact ha'
+  exact hker hmem
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (1.6.a)**, forward direction.  Let `A ⊴ G` with `A ≤ H` and let `θ` be a class
+function on `H`.  If `A` is contained in the kernel of `θ` (as a subgroup of `H`), then `A` is
+contained in the kernel of the induced character `Ind_H^G θ` (as a subgroup of `G`).
+
+This is the elementary half of (1.6.a): when `θ` is constant on `A`, so is `Ind_H^G θ` (every
+term of the induction sum at `a ∈ A` is `θ` evaluated at a conjugate `x⁻¹ a x ∈ A`, hence the
+common constant).  The converse is [Is] Lemma 2.21 and is not formalised here.
+
+The (6.6) use case is the contrapositive: if `Z ⊄ Ker (Ind_H^G θ)` then `Z ⊄ Ker θ`. -/
+theorem subsetCharacterKernel_induce_of_subgroupOf (hAH : A ≤ H) [A.Normal]
+    (θ : ClassFunction ↥H ℂ)
+    (hker : (A.subgroupOf H : Set ↥H) ⊆ characterKernel θ) :
+    SubsetCharacterKernel (A : Set G) (ClassFunction.induce H θ) := by
+  intro a ha
+  rw [mem_characterKernel]
+  -- both `Ind θ(a)` and `Ind θ(1) = characterDegree (Ind θ)` equal the common constant.
+  have hval : ClassFunction.induce H θ a =
+      ⅟(Nat.card H : ℂ) * ((Nat.card G : ℂ) * characterDegree θ) :=
+    induce_apply_eq_of_subgroupOf_subset_characterKernel hAH θ hker ha
+  have hval1 : characterDegree (ClassFunction.induce H θ) =
+      ⅟(Nat.card H : ℂ) * ((Nat.card G : ℂ) * characterDegree θ) := by
+    rw [characterDegree_def]
+    exact induce_apply_eq_of_subgroupOf_subset_characterKernel hAH θ hker A.one_mem
+  rw [hval, hval1]
+
+end InducedKernel
+
 end OddOrder.Peterfalvi.S03
