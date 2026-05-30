@@ -2175,6 +2175,113 @@ noncomputable def retarget_isCoherent_of_decomposition
     P.inner_self_X P.inner_self_conjImage P.inner_X_conjImage P.inner_conjImage_X
     hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
 
+/-! ### Peterfalvi (5.6.2): the image-equation supplier `himg`
+
+`retarget_isCoherent` / `retarget_isCoherent_of_decomposition` consume, as their single genuinely
+running-`τ₁`-coupled hypothesis, the (5.6.2) **image equation**
+
+`himg : (χ − a·χ₁)^τ = X − a·χ₁^{τ₁}`   (`τ₁ := hS₁.extension`).
+
+This is *not* a free wiring fact — it is exactly Peterfalvi (5.6.1)+(5.6.2): writing the (5.4)
+decomposition `(χ − a·χ₁)^{τ₁'} = X − Y` against `R(χ)` (where `τ₁'` is the (5.4) auxiliary isometry
+agreeing with `τ` on the supported difference), the integer-forcing capstone `lambda_eq_zero_and_Z_eq_zero`
+collapses `Y` to `a·χ₁^{τ₁}`.  The producer below assembles `himg` from the three honest textbook
+facts, *constructing* it rather than positing it:
+
+* `htau1_diff` — the (5.4) agreement `(χ − a·χ₁)^{τ₁'} = (χ − a·χ₁)^τ` (`τ₁'` coincides with `τ` on
+  `ℤ[χ − a·χ₁, χ − χ̄]`, the (5.4) hypothesis); written via the decomposition's `tau1`;
+* `hY` — the (5.6.2) output `Y = a·χ₁^{τ₁'}` (the `lambda_eq_zero_and_Z_eq_zero` conclusion fed back
+  into `(5.6.1)`'s `Y = a·χ₁^{τ₁} − λ·(…) + Z` at `λ = 0`, `Z = 0`);
+* `htau1_chi1` — the coherence compatibility `χ₁^{τ₁'} = χ₁^{τ₁}` of the (5.4) auxiliary isometry
+  with the running coherence extension `τ₁ = hS₁.extension` at the family member `χ₁ ∈ S₁`.
+
+The chain `(χ − a·χ₁)^τ = (χ − a·χ₁)^{τ₁'} = X − Y = X − a·χ₁^{τ₁'} = X − a·χ₁^{τ₁}` then delivers
+`himg`.  This is the precise §4↔§7 connection point: the Dade-isometry side enters as `τ` in
+`htau1_diff` (the LHS `(χ − a·χ₁)^τ`), and the running coherence side as `hS₁.extension` in the
+conclusion. -/
+
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.2) image equation.**
+
+Assembles the `himg : τ(χ − a·χ₁) = X − a·(hS₁.extension χ₁)` hypothesis of `retarget_isCoherent`
+from the (5.4)/(5.6.2) decomposition `D : CharacterPsiDecomposition τ χ (a·χ₁)` and the three
+honest facts:
+
+* `htau1_diff : D.tau1 (χ − a·χ₁) = τ (χ − a·χ₁)` — the (5.4) auxiliary isometry `D.tau1` coincides
+  with `τ` on the supported difference `χ − a·χ₁` (the (5.4) hypothesis "τ₁ coincides with τ on
+  `ℤ[χ − ψ, χ − χ̄]`");
+* `hY : D.Y = a • D.tau1 χ₁` — the (5.6.2) conclusion `Y = a·χ₁^{τ₁}` (after `λ = 0`, `Z = 0`);
+* `htau1_chi1 : D.tau1 χ₁ = hS₁.extension χ₁` — `D.tau1` agrees with the running coherence extension
+  at `χ₁ ∈ S₁`.
+
+The output `himg` is *constructed* by chaining
+`τ(χ − a·χ₁) = D.tau1(χ − a·χ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁`,
+using `D.tau1_image` for the middle step. -/
+theorem image_eq_of_decomposition
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chi1 : ClassFunction L ℂ} {a : ℕ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (htau1_diff : D.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : D.Y = a • D.tau1 chi1)
+    (htau1_chi1 : D.tau1 chi1 = hS₁.extension chi1) :
+    τ (χ - a • chi1) = D.X - a • hS₁.extension chi1 := by
+  rw [← htau1_diff, D.tau1_image, hY, htau1_chi1]
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.3) per-step coherence, `himg` discharged internally.**
+
+The complete (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A`, with **both**
+the orthonormal target pair `{X, X̄}` (from the (5.5) decomposition `D₀ : CharacterPsiDecomposition
+τ χ 0`) **and** the (5.6.2) image equation `himg` *constructed*, not posited.  This is the single
+clean entry point a (6.6)/(6.8) instantiation calls per `coherentPairChain` step: it consumes the
+two honest decompositions and the (5.6.2)/(5.2.e) facts, and discharges `retarget_isCoherent`'s
+`himg` via `image_eq_of_decomposition`.
+
+The two decompositions and their common projection are exactly Peterfalvi's (5.6.3) data:
+* `D₀ : CharacterPsiDecomposition τ χ 0` — the (5.5) decomposition giving `X = D₀.X = ∑_{α∈E}α` and
+  the orthonormal pair `{X, X̄ := X − (χ−χ̄)^τ}` (`retargetTargetPair`);
+* `Da : CharacterPsiDecomposition τ χ (a·χ₁)` — the (5.6.1) decomposition `(χ−a·χ₁)^τ = X − Y` whose
+  `R(χ)`-projection feeds the (5.6.2) integer-forcing;
+* `hX_eq : Da.X = D₀.X` — the (5.6.2) identification that the two projections onto `R(χ)` coincide
+  (in the text, both equal `∑_{α∈E}α` with the same `E`, since `a·χ₁^{τ₁} ⊥ R(χ)`).
+
+The `himg` facts (`htau1_diff`, `hY`, `htau1_chi1`) are the (5.4)/(5.6.2)/(coherence-compat) inputs
+of `image_eq_of_decomposition`. -/
+noncomputable def retarget_isCoherent_of_decompositions
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (D₀ : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hX_eq : Da.X = D₀.X)
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) D₀.X = 0)
+    (hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) (D₀.X - τ (χ - chibar)) = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  -- `himg` for `D₀.X`, constructed from the (5.6.1) decomposition `Da` via the supplier, then
+  -- rewritten through `hX_eq : Da.X = D₀.X`.
+  have himg : τ (χ - a • chi1) = D₀.X - a • hS₁.extension chi1 := by
+    rw [← hX_eq]
+    exact image_eq_of_decomposition hS₁ Da htau1_diff hY htau1_chi1
+  exact retarget_isCoherent_of_decomposition hS₁ D₀ hχbar_eq hχχ hχbarχbar hχχbar hχbarχ
+    hX_ortho hXbar_ortho hχ_S1 hχbar_S1 hchi1 himg hgen
+
 /-! ### Peterfalvi (6.8.1)/(6.8.2): the orthogonal coherent union `X ∪ Y`
 
 The §8 case-analysis proofs (6.8.1) for case (A) and (6.8.2) for case (B) both *conclude* with the

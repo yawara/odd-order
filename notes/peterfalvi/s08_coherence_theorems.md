@@ -1077,3 +1077,41 @@ PASS 1/2 で「§4 Dade map (`SupportedClassFunctions ℂ A L → ClassFunction 
 (= `Y = ∑ᵢ(a[i=i₁]−λ·rᵢ)•χᵢ^{τ₁} + Z`) を実際の Dade τ・running `τ₁ = hS₁.extension` から導き,
 `λ=0,Z=0` を代入して `Y = a•χ₁^{τ₁}` → `himg`** の assembly (wiring でなく (5.6.1) 本体, PASS 4+)。
 これは `D.tau1`↔`hS₁.extension` 結合と (5.6.1) の cross-difference 計算を要し本質的に hard。
+
+### G2.7 PASS 4 (2026-05-31): (5.6.2) image-equation supplier `himg` を *構成* + end-to-end 組立器
+
+PASS 3 後の残 (`himg` を **posit せず構成**) を解消。`peterfalvi_66_coherence_of_X` の `hstep` が
+Dade-isometry targets から放電可能になった (posit 無, sorry/axiom 無, AxiomsCheck 登録 2 件 全
+allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。
+
+**verdict 再確認 (mmd 04.7 (5.6.2)/(5.6.3) 精読)**: `retarget_isCoherent` の `himg : τ(χ−aχ₁) =
+X − a·τ₁χ₁` は **(5.6.1)+(5.6.2) そのもの** — `(χ−aχ₁)^τ = X−Y` の `R(χ)`-射影 + 整数強制 `λ=0` で
+`Y = a·χ₁^{τ₁}`。これは free wiring でなく (5.6) の核。`τ₁ = hS₁.extension` は (5.6.3) の "τ₂ が `τ` と
+`Z[S₁,L^#]`, `χ−aχ₁`, `χ−χ̄` 上で一致" の running isometry。`τ` (LHS) は Dade isometry (supported span 上)。
+
+- **`image_eq_of_decomposition`** (= (5.6.2) image-eq supplier): `himg` を (5.4)/(5.6.1) decomposition
+  `D : CharacterPsiDecomposition τ χ (a·χ₁)` と 3 honest 入力から *構成*:
+  - `htau1_diff : D.tau1 (χ−a·χ₁) = τ (χ−a·χ₁)` — (5.4) auxiliary isometry `D.tau1` が supported
+    difference 上で `τ` (Dade map) と一致 (mmd (5.4) "τ₁ coincides with τ on `Z[χ−ψ, χ−χ̄]`");
+  - `hY : D.Y = a • D.tau1 χ₁` — (5.6.2) 結論 `Y = a·χ₁^{τ₁}` (λ=0/Z=0 後);
+  - `htau1_chi1 : D.tau1 χ₁ = hS₁.extension χ₁` — `D.tau1` が running coherence 拡張と `χ₁∈S₁` で一致。
+  proof は 1 行: `rw [← htau1_diff, D.tau1_image, hY, htau1_chi1]` (連鎖
+  `τ(χ−aχ₁) = D.tau1(χ−aχ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁`)。
+  **これが §4↔§7 結合点の正準形**: Dade-isometry 側は `htau1_diff` の RHS `τ(χ−aχ₁)` で入る
+  (= supported difference の §4 Dade 像, `dadeIntegralCharacterMap_apply_of_support` で具体化可能)。
+- **`retarget_isCoherent_of_decompositions`** (= 完全 per-step adjoining, `himg` 内部放電):
+  (6.6)/(6.8) `coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` の
+  **単一入口**。(5.5) decomposition `D₀ : CharacterPsiDecomposition τ χ 0` (orthonormal pair
+  `{D₀.X, X̄}` 用) と (5.6.1) decomposition `Da : CharacterPsiDecomposition τ χ (a·χ₁)` (himg 用),
+  共通射影 `hX_eq : Da.X = D₀.X` ((5.6.2) 同定) を取り, `retargetTargetPair` で pair 構成 +
+  `image_eq_of_decomposition` で `himg` 内部放電 → `retarget_isCoherent_of_decomposition` に委譲。
+  `pairSet pair i = {(pair i).1, (pair i).2}`, `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪
+  pairSet pair i` ゆえ `hstep` target に直結。
+
+**PASS 4 後の残 (この round 範囲外, (5.4)/(5.6.1) 本体 content; wiring 部分は完了)**:
+1. 各 step の **decomposition `D₀`/`Da` の生産** — (5.4) auxiliary isometry `D.tau1` (Dade `τ` と
+   supported diff 上一致, running `τ₁` と `S₁` 上一致) の構成。
+2. **(5.6.2) `hY` の導出** — (5.6.1) λ-係数分解を `lambda_eq_zero_and_Z_eq_zero` に流す cross-difference
+   計算 (`crossDifference_inner` 系で source 側は landed, image 側 `χᵢ^{τ₁} ⊥ R(χ)` の (5.5)+(5.2.e)
+   結合が残)。capstone 自体は landed。
+3. **`Da.X = D₀.X` の (5.6.2) 同定** — 2 射影が同一 `∑_{α∈E}α` になること (`a·χ₁^{τ₁} ⊥ R(χ)` ゆえ)。

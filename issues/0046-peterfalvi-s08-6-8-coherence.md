@@ -804,6 +804,28 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     running `τ₁` から導き λ=0,Z=0 代入で `himg`** の assembly (PASS 4+, `D.tau1`↔`hS₁.extension` 結合
     + (5.6.1) cross-difference 計算を要し本質的に hard)。詳細 `notes/peterfalvi/s08_coherence_theorems.md`
     G2.7 PASS 3 節。
+- [x] (2026-05-31, G2.7 PASS 4) **(5.6.2) image-equation supplier `himg` を *構成* + end-to-end
+      per-step adjoining 組立器** を `S07_Coherence.lean` に landing (sorry/axiom 無, AxiomsCheck 登録
+      2 件 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。PASS 3 後の残 (`himg` の
+      *posit せず構成*) を解消 — `peterfalvi_66_coherence_of_X` の `hstep` が Dade-isometry targets から
+      放電可能になった。
+  - **`image_eq_of_decomposition`** (= (5.6.2) image eq supplier): `retarget_isCoherent` の唯一の
+    running-`τ₁`-結合仮説 `himg : τ(χ−aχ₁) = X − a·τ₁χ₁` を, (5.4)/(5.6.1) decomposition
+    `D : CharacterPsiDecomposition τ χ (a·χ₁)` と 3 つの honest 入力から構成: `htau1_diff`
+    ((5.4) `D.tau1 = τ` on supported difference `χ−aχ₁`), `hY` ((5.6.2) `D.Y = a·D.tau1 χ₁`,
+    λ=0/Z=0 後), `htau1_chi1` (`D.tau1 χ₁ = hS₁.extension χ₁`)。連鎖
+    `τ(χ−aχ₁) = D.tau1(χ−aχ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁`
+    (`D.tau1_image` 経由)。**これが §4↔§7 結合点**: Dade-isometry 側は LHS `τ(χ−aχ₁)` で入る
+    (= supported difference の §4 Dade 像; `dadeIntegralCharacterMap_apply_of_support`)。
+  - **`retarget_isCoherent_of_decompositions`** (= 完全 per-step adjoining, `himg` 内部放電):
+    (6.6)/(6.8) `coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` の
+    単一入口。(5.5)/(5.6.1) の 2 decomposition `D₀`/`Da` + 共通 `R(χ)`-射影 `hX_eq : Da.X = D₀.X`
+    ((5.6.2) 同定) を取り, orthonormal pair `{D₀.X, X̄}` を `retargetTargetPair` で構成しつつ
+    `retarget_isCoherent` の `himg` を `image_eq_of_decomposition` で内部放電。
+  - **PASS 4 後の残** (この round 範囲外): (a) 各 step の **decomposition `D₀`/`Da` の生産** (`D.tau1`
+    が Dade `τ` と supported diff 上で一致する (5.4) auxiliary isometry の構成); (b) **(5.6.2) `hY` の
+    導出** ((5.6.1) λ-係数分解を `lambda_eq_zero_and_Z_eq_zero` に流す cross-difference 計算 — capstone
+    自体は landed); (c) `Da.X = D₀.X` の (5.6.2) 同定。これらは wiring でなく (5.4)/(5.6.1) 本体 content。
 
 ## 完了条件
 

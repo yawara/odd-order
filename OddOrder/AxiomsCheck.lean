@@ -1181,6 +1181,23 @@ set_option linter.style.longLine false in
 -- else (orthonormality + virtual-character membership of `{D.X, X̄}`) comes from `D`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decomposition
+-- (5.6.2) IMAGE-EQUATION SUPPLIER (G2.7 wiring): CONSTRUCTS the `himg : τ(χ−aχ₁) = X − a·τ₁χ₁`
+-- hypothesis of `retarget_isCoherent` — the single genuinely running-τ₁-coupled fact — from the
+-- (5.4)/(5.6.1) decomposition `D : CharacterPsiDecomposition τ χ (a·χ₁)` and three honest textbook
+-- inputs: `htau1_diff` ((5.4) τ₁'=τ on the supported difference `χ−aχ₁`), `hY` ((5.6.2) `Y=a·χ₁^{τ₁'}`
+-- after λ=0/Z=0), `htau1_chi1` (τ₁' agrees with the running coherence extension at `χ₁∈S₁`).  Chains
+-- `τ(χ−aχ₁) = D.tau1(χ−aχ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁` via `tau1_image`.
+-- This is the precise §4↔§7 coupling: the Dade-isometry side enters as `τ(χ−aχ₁)` (LHS, the §4 Dade
+-- image of the supported difference via `dadeIntegralCharacterMap_apply_of_support`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.image_eq_of_decomposition
+-- (5.6.3) COMPLETE per-step adjoining with `himg` discharged internally: the single entry point a
+-- (6.6)/(6.8) `coherentPairChain` step calls — `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A`.
+-- Consumes BOTH (5.5)/(5.6.1) decompositions `D₀`/`Da` and their common `R(χ)`-projection
+-- (`hX_eq : Da.X = D₀.X`, the (5.6.2) identification), builds the orthonormal pair `{D₀.X, X̄}` via
+-- `retargetTargetPair` AND discharges `retarget_isCoherent`'s `himg` via `image_eq_of_decomposition`.
+-- Makes (6.6) `peterfalvi_66_coherence_of_X`'s `hstep` dischargeable from the Dade-isometry targets.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions
 -- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
 -- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
 -- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).
