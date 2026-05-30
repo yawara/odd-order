@@ -30,7 +30,8 @@
 | 5c | **Prop 4.3 (a)(b)** Ω₁ exp p / φ=x^p hom | `omega1_pow_eq_one` + `pow_mul_eq_mul_pow_of_commutator_le_omega1` | collection 5b✅ | ✅**PASS** (commit 03a40d7, S04 §Prop43ClassThree, 独立監査済, main直)。(a)=\|R\|-induction product-closure, (b)=collection\|n=p。hR追加は忠実 |
 | 6b | **Prop 4.8(b)** p>3⇒Ω₁(R) exp 1/p | `omega1_pow_eq_one_of_pRank_le_two_of_three_lt` | Prop4.3(a)✅+Prop4.8(a)✅ | ✅**PASS** (commit 07024dc, S04 §Prop48ExponentP, 独立監査済, main直)。helper F1(\|G\|≤p^(j+1)⇒class≤j) + F2(cl≤3⇒γ₃central)。**Prop4.8 完全** |
 | 7 | **Lem 4.9** \|Ω₁(R)\|≤p²⇒\|Ω₁(R/T)\|≤p² ∀T◁R | — | **Prop4.8✅(a+b) + Prop4.3(b)✅ (pow_mul_eq_mul_pow_…) + Lem4.5b✅**。二重 minimal-counterexample (R,T): \|T\|=p に帰着→r(R/T) 場合分け→\|R\|=p⁴,R/T exp p→φ=x^p hom (Prop4.3b)→ker φ=Ω₁(R)→p≥p² 矛盾 | **IN PROGRESS** (Prop4.11 の必須gate, hard) |
-| 8 | **Prop 4.11 (Huppert)** p>3,\|Ω₁\|≤p²⇒metacyclic | `isMetacyclic_of_omega1_card_le_prime_sq` | gate: #7 + agemo✅ + Lem4.5b✅ + abelian case | queued (gate: #7) |
+| 7 | **Lem 4.9** \|Ω₁(R)\|≤p²⇒\|Ω₁(R/T)\|≤p² ∀T◁R | `card_omega1_quotient_le_prime_sq` | Prop4.8✅+Prop4.3(b)✅+Lem4.5✅ | ✅**PASS** (commit c721aad, S04, +458行, 独立監査済, main直)。二重 minimal-CE + Fact F |
+| 8 | **Prop 4.11 (Huppert)** p>3,\|Ω₁\|≤p²⇒metacyclic | `isMetacyclic_of_omega1_card_le_prime_sq` | **Lem4.9✅ + agemo✅ + Lem4.5(b)✅ + Lem4.2✅ + Lem4.1✅**。design §3 に full skeleton (8 step)。abelian case は FiniteAbelian 分解で≤2生成 (軽 needs-impl) | **IN PROGRESS** (§4 第2の山, Thm4.16 CaseA を閉じる) |
 | 9 | **Lem 4.13/4.14** q∣\|Aut R\|⇒q∣p²-1, q<p | — | gate: #3 + SCN₃=∅✅ | queued (gate: #3) |
 | 10 | **Lem 4.5(c) noncyclic 半** Ω₁(Z₂(R)) noncyclic | — | Gorenstein 5.4.10, Lem4.5(a)general | queued (§5 でも要) |
 | 11 | **Thm 4.16 (Blackburn) apex** rank≤2 分類 | `blackburn_rank_two_classification` | gate: #2,#6,#8,#9,#4 + central product API✅ + GL engine✅ | queued (gate多, 最後) |
