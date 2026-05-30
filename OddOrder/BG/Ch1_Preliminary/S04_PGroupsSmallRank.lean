@@ -7,6 +7,7 @@ import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.IsMetacyclic
+import OddOrder.GroupTheory.SCN
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
@@ -399,5 +400,69 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_ome
     rw [hE_def, Subgroup.card_map_of_injective (omega1Center R p).subtype_injective, hB_card]
 
 end ElementaryAbelianExistence
+
+/-! ## §4C: `SCN₃(R)` empty ⟺ `r(R) ≤ 2` (Lemma 4.7)
+
+BG Lemma 4.7 (mmd L1500-1502): for an odd prime `p` and a `p`-group `R`, `SCN₃(R)` is
+empty if and only if `r(R) ≤ 2`.
+
+In the repo encoding (`OddOrder.GroupTheory.SCN`, `OddOrder.GroupTheory.PRank`):
+
+* `SCN₃(R) = ∅` is `∀ A : Subgroup R, ¬ IsSCN₃ p A`, where
+  `IsSCN₃ p A := IsSCN A ∧ 3 ≤ pRank A p` (the BG generator number `m(A)` of an abelian
+  `p`-group `A` is its `p`-rank `pRank A p`, since `|Ω₁(A)| = p^{m(A)}`).
+* `r(R) ≤ 2` is `pRank R p ≤ 2`: for a `p`-group `R` every abelian `q`-subgroup with
+  `q ≠ p` is trivial, so BG's all-primes rank `r(R) = max_q r_q(R)` collapses to the
+  single `p`-rank `r_p(R) = pRank R p`.
+
+**This file proves the easy (`⇐`) direction** of BG's iff — *"Obviously, `SCN₃(R)` is
+empty if `r(R) ≤ 2`"* — as `scn3_empty_of_pRank_le_two`. The substance is pure
+monotonicity of `pRank` under subgroup inclusion (`pRank_mono_of_le`): an SCN subgroup
+`A` of rank `≥ 3` would force `3 ≤ pRank A p ≤ pRank R p ≤ 2`, impossible.
+
+The hard converse (`SCN₃(R) = ∅ ⇒ r(R) ≤ 2`, BG = **G** Theorem 5.4.15(i), Gorenstein
+mmd L4214-4231) is **deferred, with no `sorry`**: it rests on Gorenstein Lemma 5.4.14
+(for a maximal abelian normal `A` with `m(A) = d_n(P)`, `Ω₁(C_P(Ω₁(A))) = Ω₁(A)` — a
+`p`-odd induction on a chief-like chain `B₁ ◁ ⋯ ◁ Bₙ` plus an exponent-`p` argument via
+BG Lemma 4.2 / Prop 4.3) together with the `GL(2,p)` linear bound (Gorenstein 2.8.1) to
+exclude an elementary abelian `E_{p³}`. That converse is what makes `SCN₃ = ∅` a genuine
+*rank* statement; the easy direction here is the one BG itself calls "obvious" and is the
+piece §5/§7 (Thompson transitivity)/§10 (`α(M) = {p : r_p(M) ≥ 3}`) actually consume to
+*recognise* `SCN₃`. -/
+
+section SCN3Empty
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ}
+
+/-- **BG Lemma 4.7**, the easy (`⇐`) direction — *"Obviously, `SCN₃(R)` is empty if
+`r(R) ≤ 2`"* (mmd L1502).
+
+If the `p`-rank of `R` is at most `2` then `R` has no `SCN₃` subgroup: any subgroup `A`
+with `3 ≤ pRank A p` (in particular any `IsSCN₃ p A`) would violate monotonicity of the
+`p`-rank, since `pRank A p ≤ pRank R p ≤ 2` for `A ≤ R` (`pRank_mono_of_le`).
+
+This is the half of BG's iff that §5 / §7 (Thompson transitivity) / §10 use to *detect*
+`SCN₃`. The hard converse `SCN₃(R) = ∅ ⇒ pRank R p ≤ 2` is **G** Theorem 5.4.15(i)
+(Gorenstein), deferred (see the section docstring); note it needs neither the SCN nor the
+self-centralizing structure of `A` — only `3 ≤ pRank A p` and `A ≤ R` — so we state the
+hypothesis-minimal form. -/
+theorem not_le_pRank_of_pRank_le_two (hr : pRank R p ≤ 2) (A : Subgroup R) :
+    ¬ 3 ≤ pRank A p := by
+  intro hA
+  -- `3 ≤ pRank A p ≤ pRank R p ≤ 2`, contradiction.
+  have : (3 : ℕ) ≤ 2 := hA.trans ((pRank_mono_of_le A).trans hr)
+  omega
+
+/-- **BG Lemma 4.7**, the easy (`⇐`) direction, SCN form: if `r(R) ≤ 2` (i.e.
+`pRank R p ≤ 2`) then `SCN₃(R)` is empty, `∀ A, ¬ IsSCN₃ p A`.
+
+Immediate from `not_le_pRank_of_pRank_le_two` applied to the rank component of `IsSCN₃`.
+This is the v1 goal opening the §4 dependency of §5 / §7 (Thompson transitivity) / §10. -/
+theorem scn3_empty_of_pRank_le_two (hr : pRank R p ≤ 2) (A : Subgroup R) :
+    ¬ IsSCN₃ p A := fun h => not_le_pRank_of_pRank_le_two hr A h.le_pRank
+
+end SCN3Empty
 
 end OddOrder.BG.Ch1.S04
