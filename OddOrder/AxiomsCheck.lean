@@ -624,6 +624,14 @@ set_option linter.style.longLine false in
 -- `induce_apply_of_mem_normal_of_const`; the converse is [Is] Lemma 2.21 (not formalised).
 -- (6.6) uses the contrapositive: `Z ⊄ Ker (Ind_H^G θ)` ⟹ `Z ⊄ Ker θ`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+-- Peterfalvi §3 (1.6.a), contrapositive form (the (6.6) `X`-characterization consumes this):
+-- `Z ⊄ Ker (Ind_H^G θ)` ⟹ `Z ⊄ Ker θ`.  Literal contrapositive of the forward (1.6.a) lemma.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.not_subsetCharacterKernel_of_not_induce
+-- Peterfalvi §3 (6.6) `X`-characterization, constituent-existence half (mmd 04.8 L76): every
+-- `χ ∈ Irr G` is a constituent of `Ind_H^G θ` for some `θ ∈ Irr H` (`⟨Ind_H^G θ, χ⟩ ≠ 0`).
+-- Frobenius reciprocity via the Clifford `LiesOver` bridge (`exists_liesOver` +
+-- `inner_induce_ne_zero_iff_liesOver`); unconditional, no reference to a center `Z`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero
 -- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
 -- characters contains no real class function. Discharges the `no_real_characters` field of the §7
 -- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.

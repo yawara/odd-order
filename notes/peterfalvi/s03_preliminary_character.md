@@ -145,6 +145,22 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver` (`⟨Ind θ, χ⟩ ≠ 0 ↔ LiesOver`,
   Frobenius reciprocity packaging) and `IrreducibleCharacter.exists_liesOver`
   (every `χ ∈ Irr G` lies over some `θ ∈ Irr H`, via completeness on the nonzero `Res χ`).
+- (2026-05-31, G2.2 assembly) **(6.6) `X`-characterization, the two honest bricks** assembled
+  from the R17 infra above (commit b45164f) and landed in `S03_PreliminaryCharacter.lean`
+  (sorry/axiom-free; `#print axioms` = `{propext, Classical.choice, Quot.sound}`; AxiomsCheck
+  registered):
+  - `not_subsetCharacterKernel_of_not_induce` — the literal **contrapositive** of (1.6.a)-forward,
+    `Z ⊄ Ker (Ind_H^G θ) ⟹ Z ⊄ Ker θ`, in the consumer-facing shape (6.6) reads `Z ⊄ Ker θ` from.
+  - `exists_inner_induce_ne_zero` — the **constituent-existence half**: every `χ ∈ Irr G` is a
+    constituent of `Ind_H^G θ` for some `θ ∈ Irr H` (`⟨Ind_H^G θ, χ⟩ ≠ 0`), by composing
+    `exists_liesOver` with `inner_induce_ne_zero_iff_liesOver`.  Unconditional, no center `Z` — the
+    existence backbone of the (1.7)-type characterization.
+  - **Residual beyond R17** (the one piece (6.6) needs that this round does *not* close): the link
+    `Z ⊄ Ker χ ⟹ Z ⊄ Ker (Ind_H^G θ)` for a constituent `χ` — equivalently "an irreducible
+    constituent inherits a kernel containment of the ambient character" (`Z ⊆ Ker (Ind θ) ⟹
+    Z ⊆ Ker χ`).  This is the general character-value bound `|χ(a)| ≤ χ(1)` with its equality case;
+    the repo currently has only the **central**-element Schur equality `‖χ(z)‖² = χ(1)²`
+    (`SchurCenterBound.lean:108`), so the general-`a` bound is `needs-infra`.
 - `SecondOrthogonality` now exposes the next matrix proof-core bridge:
   `conjugacyClassSize_pos`,
   `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,

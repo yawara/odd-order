@@ -575,6 +575,74 @@ theorem subsetCharacterKernel_induce_of_subgroupOf (hAH : A ≤ H) [A.Normal]
     exact induce_apply_eq_of_subgroupOf_subset_characterKernel hAH θ hker A.one_mem
   rw [hval, hval1]
 
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (1.6.a), contrapositive form.**  Let `A ⊴ G` with `A ≤ H` and let `θ` be a
+class function on `H`.  If `A` is *not* contained in the kernel of the induced character
+`Ind_H^G θ`, then `A` is *not* contained in the kernel of `θ` (as a subgroup of `H`).
+
+This is the exact direction the (6.6) `X`-characterization consumes (mmd 04.8 L76, "by (1.6),
+`Z ⊄ Ker θ`"): once `χ = Ind_K^L θ` (or, more generally, `Z ⊄ Ker (Ind_K^L θ)`), the normal
+subgroup `Z` escapes the kernel of `θ` as well.  It is the literal contrapositive of the
+forward (1.6.a) lemma `subsetCharacterKernel_induce_of_subgroupOf`. -/
+theorem not_subsetCharacterKernel_of_not_induce (hAH : A ≤ H) [A.Normal]
+    (θ : ClassFunction ↥H ℂ)
+    (hind : ¬ SubsetCharacterKernel (A : Set G) (ClassFunction.induce H θ)) :
+    ¬ ((A.subgroupOf H : Set ↥H) ⊆ characterKernel θ) :=
+  fun hker => hind (subsetCharacterKernel_induce_of_subgroupOf hAH θ hker)
+
 end InducedKernel
+
+/-! ### Peterfalvi (6.6): the `X`-characterization — constituent of an induced character
+
+The (6.6) `X`-characterization (mmd 04.8 L76) opens: "Let `χ ∈ Irr L` be such that
+`Z ⊄ Ker χ`.  There is a character `θ ∈ Irr K` for which `χ` is an irreducible component of
+`Ind_K^L θ`."  The *existence* of such a constituent `θ` is unconditional — it holds for
+**every** `χ ∈ Irr L`, with no reference to `Z` at all — and is the backbone of the
+characterization.  It is Frobenius reciprocity packaged through the Clifford `LiesOver` bridge:
+`χ` lies over *some* `θ ∈ Irr K` (`IrreducibleCharacter.exists_liesOver`), and lying over `θ`
+is exactly being a constituent of `Ind_K^L θ`
+(`IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver`).
+
+Combined with `not_subsetCharacterKernel_of_not_induce` (the (1.6.a) contrapositive above), this
+delivers the two honest halves of the (6.6) `X`-characterization: every `χ ∈ Irr L` is a
+constituent of some `Ind_K^L θ`, and from `Z ⊄ Ker (Ind_K^L θ)` one reads off `Z ⊄ Ker θ`.  The
+remaining link — that a constituent `χ` of `Ind_K^L θ` with `Z ⊄ Ker χ` forces
+`Z ⊄ Ker (Ind_K^L θ)` (equivalently `Z ⊆ Ker (Ind_K^L θ) ⟹ Z ⊆ Ker χ`, "an irreducible
+constituent inherits a kernel containment of the ambient character") — is the standard
+character-value inequality `|χ(a)| ≤ χ(1)` with its equality case, which is not yet available in
+this development and is recorded as the residual of (6.6) G2.2. -/
+
+section InducedConstituent
+
+variable {H : Subgroup G} [Fintype G] [Fintype H]
+  [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (6.6) `X`-characterization, constituent-existence half** (mmd 04.8 L76).  For
+any subgroup `H` of `G` and any irreducible character `χ` of `G`, there is an irreducible
+character `θ` of `H` of which `χ` is a constituent of the induced character `Ind_H^G θ`, i.e.
+`⟨Ind_H^G θ, χ⟩ ≠ 0`.
+
+This is the "`χ = Ind_K^L θ` constituent" step of (6.6), in its honest unconditional generality:
+it requires nothing about a center `Z`, only Frobenius reciprocity.  The proof composes
+`IrreducibleCharacter.exists_liesOver` (every `χ` lies over some `θ ∈ Irr H`) with
+`IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver` (lying over `θ` ⟺ being a constituent
+of `Ind_H^G θ`).
+
+(The `Fintype H` instance feeds the Frobenius-reciprocity bridge in the proof; it does not appear
+in the statement.) -/
+theorem exists_inner_induce_ne_zero
+    (χ : OddOrder.RepresentationTheory.IrreducibleCharacter G) :
+    ∃ θ : OddOrder.RepresentationTheory.IrreducibleCharacter H,
+      ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (χ : ClassFunction G ℂ) ≠ 0 := by
+  obtain ⟨θ, hθ⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver (G := G) H χ
+  exact ⟨θ,
+    (OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver
+      (G := G) H χ θ).mpr hθ⟩
+
+end InducedConstituent
 
 end OddOrder.Peterfalvi.S03

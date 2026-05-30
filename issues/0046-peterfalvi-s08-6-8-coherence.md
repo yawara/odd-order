@@ -507,6 +507,33 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `S(Z) := {χ ∈ S | Z ⊆ Ker χ}` の conj-閉性が要り, それは本 leaf の `subsetCharacterKernel_induce_of_subgroupOf`
     対偶 + constituent bridge で「χ ∈ S(Z) ⟺ χ が `Ind θ` (θ∈Irr(K) with Z⊆Ker θ) の constituent」を
     回す setup-specific character theory (別 leaf)。
+- [x] (2026-05-31, G2.2 assembly) **(6.6) `X`-characterization の honest 2 brick** を上記 R17 infra
+      (commit b45164f) から組み上げて `S03_PreliminaryCharacter.lean` に landing (sorry/axiom 無 —
+      `#print axioms` 両者 = `{propext, Classical.choice, Quot.sound}`; AxiomsCheck 登録 2 件 各 3 axiom
+      全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3352/3335 jobs). (6.6) mmd 04.8
+      L76「Let `χ∈Irr L` be such that `Z⊄Ker χ`. There is a character `θ∈Irr K` for which `χ` is an
+      irreducible component of `Ind_K^L θ`; by (1.6), `Z⊄Ker θ`」の **R17 で消化可能な正直部分**:
+  - **`not_subsetCharacterKernel_of_not_induce`** (= (1.6.a) **対偶**, `InducedKernel` section):
+    `A ⊴ G`, `A ≤ H` で `Z ⊄ Ker (Ind_H^G θ) ⟹ Z ⊄ Ker θ` (`(A.subgroupOf H:Set ↥H) ⊄ characterKernel θ`)。
+    R17 の forward `subsetCharacterKernel_induce_of_subgroupOf` の literal 対偶 (`fun hker => hind (… hker)`)。
+    (6.6) が `Z⊄Ker θ` を読み取る step そのもの (= consumer-facing 形)。
+  - **`exists_inner_induce_ne_zero`** (= constituent-existence half, 新 `InducedConstituent` section,
+    `[Fintype G] [Fintype H] [Invertible (Nat.card G:ℂ)] [Invertible (Nat.card H:ℂ)]`): 任意 `χ∈Irr G` に
+    対し **ある** `θ∈Irr H` で `⟨Ind_H^G θ, χ⟩ ≠ 0` (χ は `Ind θ` の constituent)。R17 の
+    `exists_liesOver` (χ lies over 何らかの θ) ∘ `inner_induce_ne_zero_iff_liesOver` (lies-over ⟺
+    constituent) の合成。**`Z` 不参照の完全 unconditional/fully-general** = "every χ∈Irr L is a
+    constituent of some `Ind_K^L θ`" という (6.6)/(1.7)-type の存在 backbone。
+  - **honest 判定**: 両者 posited 仮説無し・thin wrapper でない (前者は対偶を consumer 形で固定し
+    AxiomsCheck gate, 後者は 2 つの R17 lemma を non-trivial に compose し `IrreducibleCharacter`
+    bundled 形へ橋渡し)。
+  - **精密残 (G2.2 で R17 を超える唯一の piece)**: (6.6) が `Z⊄Ker χ` から `Z⊄Ker(Ind θ)` を得る
+    リンク = **「irreducible constituent χ が ambient character `Ind θ` の核包含を継承する」**
+    (`Z ⊆ Ker(Ind θ) ⟹ Z ⊆ Ker χ`)。これは character-value 不等式 `|χ(a)| ≤ χ(1)` + 等号成立条件
+    (ρ(a) scalar) の標準論法で, repo には**中心元限定**の Schur 等号 `‖χ(z)‖²=χ(1)²`
+    (`SchurCenterBound.lean:108`) しか無く一般 `a` 版が未形式化 ⟹ `needs-infra` (別 leaf/issue 候補:
+    "general character-value bound `|χ(a)| ≤ χ(1)` + equality case")。この piece が入れば
+    `not_subsetCharacterKernel_of_not_induce` ∘ constituent-inherits-kernel ∘ `exists_inner_induce_ne_zero`
+    で (6.6) `X = {χ∈Irr L | Z⊄Ker χ}` の `Z⊄Ker θ` 帰結が完全に閉じる。
 
 ## 完了条件
 
