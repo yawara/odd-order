@@ -663,6 +663,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSum_mul
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_isIntegral
+-- Peterfalvi (6.7.2) (product rule mod |P|): `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{C_s∩Z≠∅} ψ(1)·a_{ijs}·ω(C_s)`,
+-- i.e. classes `C_s` disjoint from `Z` drop out modulo `m` once `m ∣ a_{ijs}|C_s|` for those classes
+-- (the (6.7.1) input, `card_dvd_classSumCoeff_of_fixedPointFree`).  Each dropped term equals
+-- `(a_{ijs}|C_s|)·χ_ρ(C_s.out)` (`character_one_mul_coeff_mul_centralChar`, via the pair-count
+-- identity `coeff_mul_card_eq_classSumCoeff`), an algebraic-integer multiple of `m`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.coeff_mul_card_eq_classSumCoeff
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_one_mul_coeff_mul_centralChar
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong
 -- The explicit character-value form `|C| · χ_ρ(g) / χ_ρ(1) ∈ ℤ̄` (algebraic integer), obtained
 -- from the keystone via `centralCharacterOfRep_classSum` + `sum_character_eq_card_mul` + `char_one`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_card_mul_character_div
