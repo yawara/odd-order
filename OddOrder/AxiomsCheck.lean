@@ -578,6 +578,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
+-- RepresentationTheory (Peterfalvi (1.5.d), Burnside degree-sum): the diagonal column relation
+-- at `g = 1` gives `∑_{χ ∈ Irr G} χ(1)² = |G|` and, restricted to nontrivial characters,
+-- `∑_{χ ≠ 1} χ(1)² = |G| - 1` (issue 0044 building block for §9 (7.8)).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumIrreducibleDegreeSq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNontrivialIrreducibleDegreeSq
 -- RepresentationTheory (Peterfalvi §3 (1.1), [Is] Thm 6.32): Brauer's permutation lemma is
 -- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
 -- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).

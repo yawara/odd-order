@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Second (column) orthogonality of irreducible characters, unconditional form
@@ -40,7 +41,16 @@ typeclass assumption.
 * `OddOrder.RepresentationTheory.column_orthogonality_not_conjugate` —
   for `g ≁ h`, `∑_{χ ∈ Irr G} χ(g) · star (χ(h)) = 0`.
 
-Reference issue: `issues/0027-peterfalvi-column-orthogonality-core.md`.
+The diagonal case at `g = 1` is the **Burnside degree-sum identity**
+(Peterfalvi (1.5.d)), recorded here as:
+
+* `OddOrder.RepresentationTheory.sumIrreducibleDegreeSq` —
+  `∑_{χ ∈ Irr G} χ(1)² = |G|`;
+* `OddOrder.RepresentationTheory.sumNontrivialIrreducibleDegreeSq` —
+  `∑_{χ ∈ Irr G, χ ≠ 1} χ(1)² = |G| - 1`.
+
+Reference issues: `issues/0027-peterfalvi-column-orthogonality-core.md`,
+`issues/0044-peterfalvi-s09-card-g0-lower-bound.md`.
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -108,5 +118,48 @@ theorem column_orthogonality_not_conjugate {g h : G} (hgh : ¬ IsConj g h) :
   rw [← sum_irreducibleCharacter_idx_eq]
   exact column_orthogonality_not_conj (instCharacterTableIndexingOfFinite (G := G))
     weightedRowOrthogonality_ofFinite hgh
+
+omit [Finite G] in
+/-- The summand `χ(g) · star (χ(g))` of the diagonal column relation equals `χ(g)²`
+whenever `χ(g)` is a real natural number cast, in particular at `g = 1` where
+`χ(1)` is the (positive integer) degree of `χ`. -/
+private theorem char_one_mul_star_eq_sq (χ : IrreducibleCharacter G) :
+    ((χ : ClassFunction G ℂ) 1) * star ((χ : ClassFunction G ℂ) 1) =
+      ((χ : ClassFunction G ℂ) 1) ^ 2 := by
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  rw [hd, star_natCast, sq]
+
+/-- **Burnside degree-sum identity** (Peterfalvi (1.5.d); the diagonal column relation
+[Isaacs] Thm 2.18 at `g = 1`).
+
+The sum of the squares of the degrees of all irreducible characters of a finite group `G`
+equals the group order: `∑_{χ ∈ Irr G} χ(1)² = |G|` in `ℂ`. -/
+theorem sumIrreducibleDegreeSq :
+    ∑ χ : IrreducibleCharacter G, ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card G : ℂ) := by
+  have hcentralizer : (Subgroup.centralizer ({(1 : G)} : Set G)) = ⊤ :=
+    Subgroup.centralizer_eq_top_iff_subset.mpr
+      (Set.singleton_subset_iff.mpr (Subgroup.one_mem _))
+  have h := column_orthogonality_diagonal (1 : G)
+  rw [Finset.sum_congr rfl (fun χ _ => char_one_mul_star_eq_sq χ)] at h
+  rw [h, hcentralizer, Subgroup.card_top]
+
+open scoped Classical in
+/-- **Burnside degree-sum identity, nontrivial part** (Peterfalvi (1.5.d)).
+
+Summing the squared degrees over the *nontrivial* irreducible characters (i.e. all `χ`
+except the trivial character, whose degree is `1`) gives `|G| - 1`:
+`∑_{χ ∈ Irr G, χ ≠ 1} χ(1)² = |G| - 1` in `ℂ`. -/
+theorem sumNontrivialIrreducibleDegreeSq :
+    ∑ χ ∈ Finset.univ.erase (trivialIrreducibleCharacter G),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card G : ℂ) - 1 := by
+  have htriv : ((trivialIrreducibleCharacter G : ClassFunction G ℂ) 1) ^ 2 = 1 := by
+    simp
+  have hsplit :=
+    Finset.add_sum_erase (Finset.univ : Finset (IrreducibleCharacter G))
+      (fun χ => ((χ : ClassFunction G ℂ) 1) ^ 2)
+      (a := trivialIrreducibleCharacter G) (Finset.mem_univ _)
+  dsimp only at hsplit
+  rw [htriv] at hsplit
+  rw [eq_sub_iff_add_eq, add_comm, hsplit, sumIrreducibleDegreeSq]
 
 end OddOrder.RepresentationTheory

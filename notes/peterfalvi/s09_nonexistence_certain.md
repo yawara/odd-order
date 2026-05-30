@@ -267,15 +267,20 @@ theorem non_orthogonality_two_families
 2. ✅ **B-disjoint-support — 完了 (2026-05-30, issue 0044)**: `ClassFunction.inner_eq_zero_of_disjoint_support`
    を `inner_eq_inv_card_mul_innerSum` + `innerSum_eq_zero_of_disjoint_support` (各 summand を
    `Set.disjoint_left` で消す) から sorry-free 実装。
-3. **Burnside (1.5.d)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を named lemma 化 (第二直交関係 / `g=1` 評価)。
+3. ✅ **Burnside (1.5.d) — 完了 (2026-05-30, issue 0044)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を
+   `ColumnOrthogonality.lean` に named lemma 化。`column_orthogonality_diagonal (1:G)` を `g=1` で評価し
+   (`Subgroup.centralizer {1} = ⊤` ⇒ `card = |G|`), 各 `χ(1)·star(χ(1))` を
+   `irreducibleCharacter_apply_one_eq_pos_natCast` + `star_natCast` で `χ(1)²` に置換。
+   `sumIrreducibleDegreeSq` (`Σ χ(1)²=|G|`) + `sumNontrivialIrreducibleDegreeSq`
+   (`Σ_{χ≠1} χ(1)²=|G|−1`, `Finset.add_sum_erase` で trivial 寄与 `1²` を分離) の 2 本。AxiomsCheck clean。
 4. **B1 (nu ↔ coherence)**: `Hypothesis78` に 3 フィールド追加を検討 — `nu_maps_ZIrr`, `nu_conj`
    (共役保存), `nu_supp` (像の support ⊆ dadeSupport)。**ただしこれは証明書追加であり、追加するなら
    それらが `IsCoherent.extension` から構成可能であることを別途示す責務が伴う** (memory
    `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
 5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
 
-**現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside — ただし 3 は要確認) のうち
-1 と 2 は完了。残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
+**現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside (1.5.d)) はすべて完了。
+残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
 (7.8.a/b)/(7.9) のいずれも outright sorry-free 化は依然不能。
 証明書フィールド方式での「sorry-free」化はルール上の偽進捗 + 回帰リスクのため見送り。本 spec を実装の青写真とする。
 
@@ -283,3 +288,4 @@ theorem non_orthogonality_two_families
 
 *訂正版 作成: 2026-05-27 (原典 `04.9` 162 行 精読 + scaffold 実装に基づく). 旧版 2026-05-22 は App.C 混同のため破棄.*
 *(7.8.a/b)/(7.9) spec + blocker 追記: 2026-05-30 (issue 0044, mmd L63-113 精読 + repo 型検証).*
+*Burnside (1.5.d) `sumIrreducibleDegreeSq` / `sumNontrivialIrreducibleDegreeSq` 実装完了: 2026-05-30 (issue 0044, `ColumnOrthogonality.lean`).*
