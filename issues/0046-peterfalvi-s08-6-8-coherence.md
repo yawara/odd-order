@@ -1008,6 +1008,29 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
       なお必要で、これは Dade 等距の責務外 (roadmap の "Residual (post-instantiation)" と一致)。
       よって本 round では `retarget_isCoherent_fromDade` までを landing し、完全 instantiate は
       (6.6) per-step degree データの threading (別 round) に残す。
+  - **Round C assembly (2026-05-31) — instantiated `peterfalvi_66_coherence_of_X_from_dade` 完了**
+    (= 上記「完全 instantiate は別 round に残す」を消化): Round C の per-step engine
+    `retarget_isCoherent_fromDade` を `coherentPairChain` accumulator 形に組み上げ、(6.6) coherence-of-X
+    を **実 Dade 等距 `τ = dadeIntegralCharacterMap` で instantiate**。`hstep` はもはや posit されず
+    Dade 等距 + 前段 coherence から **構成**される。3 piece:
+    - `pairUnion_succ_eq_union_pair` (汎用 set 橋): `(pair i)=(c₁,c₂)` のとき
+      `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪ {c₁,c₂}`。per-step adjoining engine の
+      `S₁∪{χ,χ̄}` 結論を `coherentPairChain` accumulator 形に接続。
+    - `DadeChainStep hyp hconj S₁ A χ` (構造体): Dade 等距が供給しきった**後に残る真正 (6.6) per-step
+      文字次数内容**を field として束ねる残余 interface — `χ₁`/`a`/非実性/supports/orthonormality/
+      per-member (5.5)+(5.2.e) family (`Dmem`/`hmemTau1Base`/`hmemSupp`/`hmemOrtho`)/source
+      orthogonalities/(5.6.2) collapse `hY`/generation `hgen`。どれも Dade 等距の *image-side* 構造に
+      触れない (source-side degree/orthogonality data = (6.6) enumeration の責務)。
+      `DadeChainStep.advance` が 1 step を `retarget_isCoherent_fromDade` で放電し
+      (R(χ)・ZIrr・inner-preservation・`τ₁=τ` agreement は内部供給)、
+      `DadeChainStep.chainStepAdvance` が橋で accumulator 形に書き換え。
+    - `peterfalvi_66_coherence_of_X_from_dade` (主定理): 上記を chain 上で fold。残 input は
+      enumeration `e`/cover `hcoverIdx`/base coherence `h0`/per-step `hstepData`+`hpairχ` のみ
+      (= 真正 (6.6) 文字内容、Dade 等距の責務外)。これで **§5/§6 coherence engine が実 Dade τ に対し
+      完全 constructive**: 各 step は 1 つの完全 Dade 由来 (5.6) adjoining。
+    - sorry/axiom 無; `#assert_only_allowed_axioms` 4 新規 (`pairUnion_succ_eq_union_pair`/
+      `DadeChainStep.advance`/`DadeChainStep.chainStepAdvance`/`peterfalvi_66_coherence_of_X_from_dade`)
+      全 3 axiom allowlist 内; full `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
 
 ## 完了条件
 

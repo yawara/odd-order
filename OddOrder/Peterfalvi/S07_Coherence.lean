@@ -3129,6 +3129,19 @@ theorem pairUnion_mono (S₀ : Set (ClassFunction L ℂ))
   | refl => exact Set.Subset.rfl
   | step _ ih => exact ih.trans (subset_pairUnion_succ (L := L) S₀ pair _)
 
+/-- The `(i+1)`-st accumulator `pairUnion S₀ pair (i+1)` is the `i`-th accumulator with the explicit
+two-element set `{c₁, c₂}` adjoined, *provided* the `i`-th pair is `(pair i) = (c₁, c₂)`.
+
+This is the set-level bridge from a per-step adjoining engine — whose conclusion is naturally phrased
+as coherence of `S₁ ∪ {c₁, c₂}` for the adjoined pair — to the `coherentPairChain` accumulator shape
+`pairUnion S₀ pair (i+1)`.  With `c₁ = χ`, `c₂ = χ̄` and `(pair i) = (χ, χ̄)`, the two match
+definitionally up to the `(pair i).1`/`(pair i).2` rewrites supplied by `hpair0`/`hpair1`. -/
+theorem pairUnion_succ_eq_union_pair {S₀ : Set (ClassFunction L ℂ)}
+    {pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ} {i : ℕ}
+    {c₁ c₂ : ClassFunction L ℂ} (hpair0 : (pair i).1 = c₁) (hpair1 : (pair i).2 = c₂) :
+    pairUnion (L := L) S₀ pair (i + 1) = pairUnion (L := L) S₀ pair i ∪ {c₁, c₂} := by
+  rw [pairUnion_succ, pairSet, hpair0, hpair1]
+
 /-- Membership in `pairUnion S₀ pair N`: an element is either in the base `S₀` or in one of the
 adjoined pairs `{χⱼ, χ̄ⱼ}` with `j < N`. -/
 theorem mem_pairUnion {S₀ : Set (ClassFunction L ℂ)}
@@ -3867,6 +3880,240 @@ noncomputable def retarget_isCoherent_fromDade
     -- `htau1_chi1`: `τ χ₁ = hS₁.extension χ₁` (χ₁ supported ⇒ `extends_on_supported`).
     (hS₁.extends_on_supported chi1 hchi1supp).symm
     hgen
+
+/-- **The genuine per-step (6.6) content, after the Dade isometry has supplied everything it can.**
+
+`DadeChainStep hyp hconj S₁ A χ` bundles the inputs of one (5.6) adjoining step
+`IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {↑χ, (↑χ).conj}) A` against the Dade base map
+`τ = dadeIntegralCharacterMap` that are **NOT** the Dade isometry's responsibility — the genuine
+character-degree content of (6.6) — leaving the Round-B/Dade-supplied parts
+(`R(χ)`, the `ZIrr`-membership facts, the inner-preservation) to be filled in by `advance`.
+
+The fields are exactly the residual hypotheses of `retarget_isCoherent_fromDade`:
+
+* `chi1`, `a` — the distinguished member `χ₁ ∈ S₁` and the degree ratio `a` with `χ(1) = a·χ₁(1)`
+  (from the (6.6) degree enumeration);
+* `hreal`, `hχsupp`, `hχbarsupp`, `haχ1supp`, `hchi1Z` — `χ` non-real, the supports of `χ`, `χ̄`,
+  `a·χ₁` in `CF(L,A)`, and `χ₁ ∈ ℤ[Irr L]` (so `advance` can build the `ZIrr` facts);
+* `hχχ`, `hχbarχbar`, `hχbarχ`, `hχχbar'`, `hχχ1`, `hχbarχ1` — the orthonormality of `{χ, χ̄}` and
+  the orthogonality of `χ`, `χ̄` to `χ₁` (the (5.2)-level relations);
+* `Dmem`, `hmemTau1Base`, `hmemSupp`, `hmemOrtho`, `hχ_S1`, `hχbar_S1` — the (5.5)+(5.2.e)
+  per-member image-side family of `S₁` (each `x ∈ S₁` has a decomposition with `τ₁ = τ` whose
+  `R(x)` is orthogonal to `R(χ)`, every `x` supported, and `χ`, `χ̄ ⊥ S₁`);
+* `hchi1`, `hchi1supp` — `χ₁ ∈ S₁` and supported;
+* `hY`, `hgen` — the (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` and the (5.1) generation hypothesis.
+
+None of these mention the Dade isometry's *image-side* structure: they are the source-side degree
+and orthogonality data the (6.6) enumeration is responsible for.  `advance` adjoins the Round-B
+`R(χ)` (`dadeOrthonormalCharacterImageFamily`) and the (2.6.b) `ZIrr`-membership and discharges the
+step. -/
+structure DadeChainStep
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (S₁ : Set (ClassFunction (↥L) ℂ)) (A' : Set ↥L)
+    (χ : IrreducibleCharacter (↥L)) where
+  /-- The distinguished member `χ₁`. -/
+  chi1 : ClassFunction (↥L) ℂ
+  /-- The degree ratio `a` with `χ(1) = a·χ₁(1)`. -/
+  a : ℕ
+  /-- `χ` is non-real (Peterfalvi (1.1)). -/
+  hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ)
+  /-- `χ` is supported in `CF(L,A)`. -/
+  hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
+  /-- `χ̄` is supported in `CF(L,A)`. -/
+  hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L
+  /-- `χ₁ ∈ ℤ[Irr L]`. -/
+  hchi1Z : chi1 ∈ ZIrr (↥L)
+  /-- `a·χ₁` is supported in `CF(L,A)`. -/
+  haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
+  /-- `‖χ‖² = 1`. -/
+  hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1
+  /-- `‖χ̄‖² = 1`. -/
+  hχbarχbar :
+    ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ).conj = 1
+  /-- `⟨χ̄, χ⟩ = 0`. -/
+  hχbarχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0
+  /-- `⟨χ, χ̄⟩ = 0`. -/
+  hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0
+  /-- The per-member `ψ = 0` decomposition family of `S₁` ((5.5)). -/
+  Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
+    CharacterPsiDecomposition (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0
+  /-- Each member's auxiliary isometry is the base map `τ` (running `τ₁ = τ`). -/
+  hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+    (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+  /-- Every member of `S₁` is supported. -/
+  hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A'
+  /-- Per-member `R(x) ⊥ R(χ)` ((5.2.e)). -/
+  hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+    (Dmem x hx).imageFamily.Orthogonal
+      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+  /-- `χ ⊥ S₁`. -/
+  hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0
+  /-- `χ̄ ⊥ S₁`. -/
+  hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj x = 0
+  /-- `χ₁ ∈ S₁`. -/
+  hchi1 : chi1 ∈ S₁
+  /-- `χ₁` supported. -/
+  hchi1supp : chi1 ∈ zSupportedSpan (L := ↥L) S₁ A'
+  /-- `⟨χ, χ₁⟩ = 0`. -/
+  hχχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) chi1 = 0
+  /-- `⟨χ̄, χ₁⟩ = 0`. -/
+  hχbarχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj chi1 = 0
+  /-- The (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` for the Dade-built `Da` (the `.2` of the per-step
+  decomposition pair). -/
+  hY :
+    ((CharacterPsiDecomposition.decompositionPair
+      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+        (by
+          intro s hs
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+          rcases hs with rfl | rfl | rfl | rfl
+          · exact hχsupp
+          · exact hχbarsupp
+          · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+          · exact haχ1supp) hφ hζ)
+      rfl
+      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+        (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
+      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+        ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
+        (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a)))
+      hχχ1 hχbarχ1 hχχbar').2).Y =
+      a • ((CharacterPsiDecomposition.decompositionPair
+      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+        (by
+          intro s hs
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+          rcases hs with rfl | rfl | rfl | rfl
+          · exact hχsupp
+          · exact hχbarsupp
+          · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+          · exact haχ1supp) hφ hζ)
+      rfl
+      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+        (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
+      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+        ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
+        (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a)))
+      hχχ1 hχbarχ1 hχχbar').2).tau1 chi1
+  /-- The (5.1) generation hypothesis. -/
+  hgen : zSupportedSpan (L := ↥L) (S₁ ∪ {(χ : ClassFunction (↥L) ℂ),
+      (χ : ClassFunction (↥L) ℂ).conj}) A' ⊆
+    Submodule.span ℤ (zSupportedSpan (L := ↥L) S₁ A' ∪
+      {(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
+       (χ : ClassFunction (↥L) ℂ) - a • chi1})
+
+namespace DadeChainStep
+
+variable {hyp : S04.Hypothesis G A L} {hconj : hyp.HConjInvariant}
+variable {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L} {χ : IrreducibleCharacter (↥L)}
+
+/-- **The genuine per-step content advances coherence by one Dade step.**
+
+Given the prior coherence `IsCoherent τ S₁ A'` and the genuine (6.6) per-step content `step`, the
+adjoined set `S₁ ∪ {↑χ, (↑χ).conj}` is coherent.  This is the clean realization of one (5.6)
+adjoining step against the real Dade base map: the Round-B `R(χ)` and (2.6.b) `ZIrr`-membership are
+built internally, the running `τ₁ = τ` agreements are `rfl`/`extends_on_supported`, and the
+genuine character data is read off `step`'s fields.  It is a single call to
+`retarget_isCoherent_fromDade`. -/
+noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A') :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
+  retarget_isCoherent_fromDade hyp hconj hS₁ χ step.hreal step.hχsupp step.hχbarsupp
+    step.haχ1supp
+    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      (by simpa only [sub_zero] using step.hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
+    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
+      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
+    step.hχχ step.hχbarχbar step.hχbarχ step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
+    step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp step.hχχ1 step.hχbarχ1 step.hχχbar'
+    step.hY step.hgen
+
+/-- **One `coherentPairChain` step, in the engine's accumulator shape, from the Dade isometry.**
+
+Given the genuine per-step (6.6) content `step : DadeChainStep hyp hconj (pairUnion S₀ pair i) A χ`
+together with the requirement that the `i`-th adjoined pair is `{↑χ, (↑χ).conj}`
+(`hpair0 : (pair i).1 = ↑χ`, `hpair1 : (pair i).2 = (↑χ).conj`), this produces the per-step map
+`IsCoherent τ (pairUnion S₀ pair i) A → IsCoherent τ (pairUnion S₀ pair (i+1)) A` that the
+`coherentPairChain` engine consumes: `advance` yields coherence of the union
+`pairUnion S₀ pair i ∪ {↑χ, (↑χ).conj}`, and `pairUnion_succ_eq_union_pair` identifies that union
+with the accumulator `pairUnion S₀ pair (i+1)`.
+
+This is the `hstep` building block for `peterfalvi_66_coherence_of_X_from_dade`: each step is one
+fully Dade-derived (5.6) adjoining, with the only remaining content being the source-side (6.6)
+degree data packaged in `step`. -/
+noncomputable def chainStepAdvance
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₀ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
+    (pair : ℕ → ClassFunction (↥L) ℂ × ClassFunction (↥L) ℂ) (i : ℕ)
+    {χ : IrreducibleCharacter (↥L)}
+    (hpair0 : (pair i).1 = (χ : ClassFunction (↥L) ℂ))
+    (hpair1 : (pair i).2 = (χ : ClassFunction (↥L) ℂ).conj)
+    (step : DadeChainStep hyp hconj (pairUnion (L := ↥L) S₀ pair i) A' χ)
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (pairUnion (L := ↥L) S₀ pair i) A') :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (pairUnion (L := ↥L) S₀ pair (i + 1)) A' :=
+  (pairUnion_succ_eq_union_pair (L := ↥L) hpair0 hpair1).symm ▸ step.advance hS₁
+
+end DadeChainStep
+
+/-- **Peterfalvi (6.6): `X = S − S(Z)` is coherent — instantiated at the real Dade isometry.**
+
+The (6.6) conclusion with the coherence base map **fixed** to the genuine Dade base map
+`τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)`, and the per-step `hstep` of the
+`coherentPairChain` engine **constructed** — no longer posited — from the Dade isometry plus the
+prior step's coherence.
+
+Compared to the abstract `peterfalvi_66_coherence_of_X`, the opaque `hstep` hypothesis is replaced
+by, for each adjoined pair `i < N`:
+* `hpairχ i hi` — an irreducible character `χᵢ` of `L` realizing the `i`-th pair as `{χᵢ, χ̄ᵢ}`
+  (`(pair i) = (↑χᵢ, (↑χᵢ).conj)`); and
+* `hstepData i hi` — the genuine per-step (6.6) degree/orthogonality content
+  `DadeChainStep hyp hconj (pairUnion S₀ pair i) A χᵢ` over the running accumulator.
+
+Each step is then discharged by `DadeChainStep.chainStepAdvance` — one fully Dade-derived (5.6)
+adjoining (`retarget_isCoherent_fromDade`): the orthonormal image `R(χᵢ)`
+(`dadeOrthonormalCharacterImageFamily`, Round B), the `ZIrr`-membership of the images
+(`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, (2.6.b)), the inner-product preservation
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`), and the running-`τ₁ = τ` agreements
+(`IsCoherent.extends_on_supported`) are all supplied internally from the Dade isometry.  The folded
+chain (`coherentPairChain`) and the enumeration cover (`pairUnion_eq_of_enumCover`) then derive
+`IsCoherent τ X A`.
+
+This makes the §5/§6 coherence engine **fully constructive against the real Dade `τ`**: the only
+inputs that remain are the genuine (6.6) character-degree content (the enumeration `e`, the cover
+`hcoverIdx`, the base coherence `h0`, and the per-step `hstepData`/`hpairχ`), none of which is the
+Dade isometry's responsibility.  It is the (6.6) coherence-of-X with its (5.6) per-step machinery
+dischargeable from the Dade isometry. -/
+noncomputable def peterfalvi_66_coherence_of_X_from_dade
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant) {A' : Set ↥L}
+    {X S₀ : Set (ClassFunction (↥L) ℂ)}
+    (hXfin : X.Finite)
+    {e : Fin X.ncard → ClassFunction (↥L) ℂ} (hsurj : ∀ χ ∈ X, ∃ i, e i = χ)
+    (pair : ℕ → ClassFunction (↥L) ℂ × ClassFunction (↥L) ℂ) (N : ℕ)
+    (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := ↥L) pair j ⊆ X)
+    (hcoverIdx : ∀ i : Fin X.ncard,
+      e i ∈ S₀ ∨ ∃ j, j < N ∧ e i ∈ pairSet (L := ↥L) pair j)
+    (h0 : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₀ A')
+    (hpairχ : ∀ i, i < N → IrreducibleCharacter (↥L))
+    (hpair0 : ∀ (i : ℕ) (hi : i < N), (pair i).1 = ((hpairχ i hi : IrreducibleCharacter (↥L)) :
+      ClassFunction (↥L) ℂ))
+    (hpair1 : ∀ (i : ℕ) (hi : i < N), (pair i).2 =
+      ((hpairχ i hi : IrreducibleCharacter (↥L)) : ClassFunction (↥L) ℂ).conj)
+    (hstepData : ∀ (i : ℕ) (hi : i < N),
+      DadeChainStep hyp hconj (pairUnion (L := ↥L) S₀ pair i) A' (hpairχ i hi)) :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X A' :=
+  peterfalvi_66_coherence_of_X hXfin hsurj pair N hS₀ hpairs hcoverIdx h0
+    (fun i hi hS₁ =>
+      DadeChainStep.chainStepAdvance hyp hconj pair i (hpair0 i hi) (hpair1 i hi)
+        (hstepData i hi) hS₁)
 
 end DadeBaseMap
 

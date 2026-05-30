@@ -1426,6 +1426,23 @@ set_option linter.style.longLine false in
 -- content (the (6.6) enumeration's responsibility, not the Dade isometry's).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent_fromDade
 
+-- Round C assembly: the (6.6) coherence-of-X INSTANTIATED at the real Dade isometry.
+-- `pairUnion_succ_eq_union_pair`: the set-level bridge `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i
+-- ∪ {c₁, c₂}` when `(pair i) = (c₁, c₂)` — connects the per-step adjoining engine's `S₁ ∪ {χ, χ̄}`
+-- conclusion to the `coherentPairChain` accumulator shape.  `DadeChainStep` bundles the genuine
+-- per-step (6.6) character-degree content (the residual after the Dade isometry supplies `R(χ)`, the
+-- `ZIrr` facts, the inner-preservation, the `τ₁ = τ` agreements); `DadeChainStep.advance` discharges
+-- one (5.6) step via `retarget_isCoherent_fromDade`, and `DadeChainStep.chainStepAdvance` rewrites it
+-- into the accumulator shape.  `peterfalvi_66_coherence_of_X_from_dade` then folds these over the
+-- chain: the (6.6) `hstep` is no longer posited but CONSTRUCTED from the Dade isometry + prior
+-- coherence, so the §5/§6 coherence engine is fully constructive against the real Dade `τ`.  The only
+-- remaining inputs (enumeration `e`, cover `hcoverIdx`, base coherence `h0`, per-step `hstepData`/
+-- `hpairχ`) are the genuine (6.6) character content, not the Dade isometry's responsibility.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.advance
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.chainStepAdvance
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X_from_dade
+
 -- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
 -- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
 -- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue

@@ -1396,3 +1396,38 @@ image-orthogonality `hmemOrtho`、source orthogonalities、generation `hgen`。�
 **`peterfalvi_66_coherence_of_X` 完全 instantiate の到達性**: `hstep` から opaque 補助等距 agreement は
 除去済 (B+C)。だが各 step の `hY`/`hmemOrtho`/次数比/`hgen` がなお必要で、これは (6.6) per-step degree
 データの threading (別 round)。本 round は `retarget_isCoherent_fromDade` までを landing。
+
+## Round C assembly (2026-05-31): instantiated `peterfalvi_66_coherence_of_X_from_dade`
+
+上記「(6.6) per-step degree データの threading (別 round)」を消化。Round C の per-step engine
+`retarget_isCoherent_fromDade` を `coherentPairChain` accumulator 形に組み上げ、(6.6) coherence-of-X を
+**実 Dade 等距 `τ = dadeIntegralCharacterMap` で instantiate** する。`hstep` はもはや posit されず、
+各 step が Dade 等距 + 前段 coherence からの 1 つの (5.6) adjoining として **構成** される。
+
+3 piece (すべて `S07_Coherence.lean` `DadeBaseMap` section 末尾):
+
+- **`pairUnion_succ_eq_union_pair`** (汎用 set 橋, `pairUnion` 一般 section): `(pair i)=(c₁,c₂)` のとき
+  `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪ {c₁,c₂}`。`pairUnion_succ` + `pairSet` の rewrite。
+  per-step adjoining engine の `S₁∪{χ,χ̄}` 結論を engine accumulator 形へ接続する connective tissue。
+
+- **`DadeChainStep hyp hconj S₁ A χ`** (構造体): Dade 等距が供給しきった後に残る**真正 (6.6) per-step
+  文字次数内容**を field として束ねる *残余 interface*。field = `χ₁`/`a`/`χ` 非実性/`χ,χ̄,a·χ₁` の
+  supports/`χ₁∈ℤ[Irr L]`/orthonormality (`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar'`)/per-member (5.5)+(5.2.e)
+  family (`Dmem`/`hmemTau1Base`/`hmemSupp`/`hmemOrtho`)/source orthogonalities (`hχ_S1`/`hχbar_S1`)/
+  `χ₁∈S₁` & supported/(5.6.2) collapse `hY`/(5.1) generation `hgen`。どれも Dade 等距の *image-side*
+  構造に触れない (= source-side degree/orthogonality = (6.6) enumeration の責務)。
+  - `DadeChainStep.advance`: prior coherence + step から `IsCoherent τ (S₁∪{χ,χ̄}) A` を
+    `retarget_isCoherent_fromDade` 1 回で放電 (R(χ) [Round B] / ZIrr [2.6.b] / inner-preservation /
+    `τ₁=τ` agreement は内部供給)。
+  - `DadeChainStep.chainStepAdvance`: 橋で accumulator 形 `pairUnion S₀ pair (i+1)` へ書き換え。
+
+- **`peterfalvi_66_coherence_of_X_from_dade`** (主定理 = milestone): 上記を `peterfalvi_66_coherence_of_X`
+  の `hstep` 引数として chain 上で fold。`τ` を実 Dade map に固定し、各 `i<N` に対し
+  `IrreducibleCharacter χᵢ` (`pair i = (↑χᵢ,(↑χᵢ).conj)`) + `DadeChainStep` over `pairUnion S₀ pair i`
+  を取る。残 input = enumeration `e`/cover `hcoverIdx`/base coherence `h0`/per-step `hstepData`+`hpairχ`
+  のみ。これで **§5/§6 coherence engine が実 Dade τ に対し完全 constructive**。
+
+sorry/axiom 無; `#assert_only_allowed_axioms` 4 新規全 3 axiom allowlist 内; full `lake build OddOrder`
+緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。**残 (post-instantiation)**: per-step `DadeChainStep` の構成
+(degree 比 `a` の整数性、`hY`/`hgen` の (6.6) 列挙からの供給) は依然 (6.6) degree 算術であり、Dade 等距の
+責務外 — これは設計上の正しい境界 (Dade 等距 ↔ (6.6) enumeration の責務分離)。
