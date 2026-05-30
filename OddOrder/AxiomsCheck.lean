@@ -689,6 +689,10 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_finrank_charValue_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card
+-- Peterfalvi-side consumer: the same divisibility on the `IrreducibleCharacter G` subtype, phrased
+-- through `characterDegree` (= `χ 1`), the degree datum used throughout Peterfalvi §6.7.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card
 -- Corollary (Isaacs Cor. 3.12): the degree of an irreducible representation of a finite p-group is
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms

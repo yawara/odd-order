@@ -184,6 +184,23 @@ def characterDegree (χ : ClassFunction G ℂ) : ℂ :=
     characterDegree (trivialClassFunction G) = 1 :=
   rfl
 
+/-- **The degree of an irreducible character divides the group order**, phrased through Peterfalvi's
+`characterDegree` (Isaacs, *Character Theory of Finite Groups*, Thm 3.11; the degree datum behind
+Peterfalvi (6.7)).  For an irreducible character `χ` of a finite group `G` there is a positive
+natural number `n` with `characterDegree χ = n` and `n ∣ |G|`.
+
+This is the consumer-facing form of the integrality theory: `characterDegree χ` is definitionally
+`χ 1` (`characterDegree_def`), and the `IsIrreducibleCharacter`/`ClassFunction` bridge
+`exists_natDegree_charValue_one_dvd_card` carries `finrank_dvd_card` (the dimension of any
+witnessing representation divides `|G|`) onto that value.  Because `characterDegree` ranges over
+`ℂ`, the divisibility is recorded on the natural witness `n`, with `characterDegree χ = (n : ℂ)`
+tying the two together. -/
+theorem exists_natDegree_characterDegree_dvd_card [Finite G]
+    (χ : IrreducibleCharacter G) :
+    ∃ n : ℕ, 0 < n ∧ characterDegree (χ : ClassFunction G ℂ) = (n : ℂ) ∧ n ∣ Nat.card G := by
+  obtain ⟨n, hpos, hval, hdvd⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  exact ⟨n, hpos, by rw [characterDegree_def]; exact hval, hdvd⟩
+
 /-- A family of class functions has constant degree. -/
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=
   ∀ i j, characterDegree (χ i) = characterDegree (χ j)

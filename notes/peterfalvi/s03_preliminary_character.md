@@ -82,6 +82,15 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `sameDegreeFamily_of_characterDegree_eq`, `HasUniformDegree.eq_of_mem`,
   `HasUniformDegree.mono`, `hasUniformDegree_empty`, and
   `hasUniformDegree_singleton`.
+- (2026-05-30) `exists_natDegree_characterDegree_dvd_card` — **Isaacs Thm 3.11
+  / Peterfalvi §6.7 degree datum** through the Peterfalvi `characterDegree` API:
+  for `χ : IrreducibleCharacter G` (`[Finite G]`) there is `n : ℕ` with `0 < n`,
+  `characterDegree χ = (n : ℂ)`, and `n ∣ |G|`.  This is the consumer-facing form
+  of the integrality theory — it carries the `IsIrreducibleCharacter`/`ClassFunction`
+  bridge `exists_natDegree_charValue_one_dvd_card` (= `finrank_dvd_card` through
+  `φ 1`) onto Peterfalvi's `characterDegree`, since `characterDegree χ = χ 1`
+  definitionally.  Lets `χ(1) ∣ |G|` flow into §6.7/§7 degree statements phrased
+  through `characterDegree`.
 - `centralizerInSubgroup` and `VanishesOnTrivialSubgroupCentralizers` encode the
   target shape of (1.2) without adding a new proof stub.
 - The shared `ClassFunction` infrastructure now exposes support/restriction
