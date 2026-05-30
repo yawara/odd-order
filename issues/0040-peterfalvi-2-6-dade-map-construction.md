@@ -72,7 +72,9 @@ created: 2026-05-27
       `x⁻¹gx∈H` の x のみ寄与) — 2026-05-30 完了 (下記「進捗 (5)」).
 - [x] **(2.10.1) Ind L-共役不変 (generic 形)**: `induceSum_map_conj` / `induce_map_conj`
       (= `Ind_{H^ℓ}^G (transportConj ℓ θ) = Ind_H^G θ`) — 2026-05-30 完了 (下記「進捗 (5)」).
-      Dade-specific 形 `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` は H↦M(B), θ↦α_B 適用 + α_B transport で残.
+- [x] **(2.10.1) Dade-specific** `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` — 2026-05-30 完了
+      (`induce_alphaB_conjFinset`; M(B^x)=M(B)^x の subgroup 共役 + α_{B^x}=transportConj x α_B の
+      class function transport + generic `induce_map_conj`; 下記「進捗 (6)」).
 - [ ] (2.10.3) Dade-specific 点別値: 上の transversal collapse + `card_conj_fiber` で
       `𝒜(g,H(B)b)` 集計 (issue 0039 再利用) — generic infra は整備済、Dade 適用が残.
 - [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **(2.6.b) 専用、現フロンティア**
@@ -350,11 +352,19 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
   (L 内 set-stabilizer 共役を G の pointwise smul に移送; `push_cast`+`group` で coercion 整合).
 - **`mBSubgroup_conjFinset`** = **(2.10.1) `M(B^x)=M(B)^x`**: `M(B^l) = conj l • M(B)`
   (`mBSubgroup = H(B)⊔N_L(B)` + `Subgroup.smul_sup` で 2 因子から合成).
+- `mBSubgroup_conjFinset_eq_map` — `M(B^l) = M(B).map(conj l)` (= generic `induce_map_conj` が
+  生成する subgroup 形; `pointwise_smul_def`+`rfl`).
+- `induce_congr_of_subgroup_eq` — subgroup 等式越しの `induce` 合同 (`subst`+`Subsingleton.elim`
+  で Invertible instance も一致).
+- **`alphaB_conjFinset_eq_transportConj`** = **(2.9)/(2.10.1) class function transport**:
+  `M(B^l)` 上の `α_{B^l}` が `transportConj l α_B` (M(B)^l 上へ移送した α_B) に一致.  両辺を
+  `alphaB_apply_mul` で計算: `m=l⁻¹yl=h·b` 分解 ⇒ LHS `α(lbl⁻¹)` (y=(lhl⁻¹)(lbl⁻¹)), RHS `α(b)`,
+  α の L-class 不変性 `α(lbl⁻¹)=α(b)` (`of_isConj`, 共役子 l⁻¹) で bridge.
+- **`induce_alphaB_conjFinset`** = **(2.10.1) Dade-specific 本体**:
+  `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B`.  `induce_congr_of_subgroup_eq` +
+  `alphaB_conjFinset_eq_transportConj` + generic `induce_map_conj` で合成.  Invertible instance は
+  `invertibleOfNonzero (card_pos.ne')` で局所供給.
 
-**残 (2.10.1 完了まで)**: generic `induce_map_conj` (= `Ind_{H.map(conj l)}(transportConj l θ)=Ind_H θ`)
-へ `H↦M(B)`, `θ↦α_B` を適用するには, class function 側 `alphaB (B^l) α = transportConj l (alphaB B α)`
-(subgroup 等式 `M(B^l)=M(B).map(conj l)` 越しの transport) が要る.  値計算は
-`alphaB(B^l) α (lml⁻¹) = α(lbl⁻¹) = α(b) = transportConj l (alphaB B α)(lml⁻¹)` (m=hb 分解 +
-α の L-class 不変性 `α(lbl⁻¹)=α(b)`) で成立するが, **dependent type transport** (型 index の
-subgroup 書換え + Invertible instance) の packaging が残作業.  その後 (2.10.3) Dade 適用 →
-ℬ 代表系 (項目 1) → Möbius 相殺 (項目 4) → `PreservesVirtualCharacters`.
+**残 ((2.6.b) まで)**: (2.10.1) Dade-specific は**完了**.  残るは
+(2.10.3) Dade 点別値 (`card_conj_fiber` で `𝒜(g,H(B)b)` 集計) → ℬ 代表系 (項目 1, 構造的) →
+Möbius 相殺 (項目 4, `Finset.sum_involution`) → `PreservesVirtualCharacters` → `FullDadeIsometryData`.

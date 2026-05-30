@@ -1303,6 +1303,118 @@ theorem mBSubgroup_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvaria
   rw [mBSubgroup, mBSubgroup, hyp.hIntersection_conjFinset hconj l hB,
     hyp.nLStabilizerIn_conjFinset l, Subgroup.smul_sup]
 
+/-- `M(B) = H(B)^x ⊔ N_L(B)^x`-conjugation packaged as `Subgroup.map`: `M(B^l) = M(B).map (conj l)`.
+This is the form consumed by the generic `induce_map_conj` (which produces a `.map (conj ℓ)`
+subgroup). -/
+theorem mBSubgroup_conjFinset_eq_map (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G) := by
+  rw [hyp.mBSubgroup_conjFinset hconj l hB, Subgroup.pointwise_smul_def]; rfl
+
+/-- A congruence principle for `induce` along a subgroup equality: if `H₁ = H₂` and the two class
+functions take equal values on the common carrier, the induced class functions agree. -/
+theorem induce_congr_of_subgroup_eq {H₁ H₂ : Subgroup G} (h : H₁ = H₂)
+    [Invertible (Nat.card H₁ : ℂ)] [Invertible (Nat.card H₂ : ℂ)]
+    {θ₁ : ClassFunction ↥H₁ ℂ} {θ₂ : ClassFunction ↥H₂ ℂ}
+    (hval : ∀ x (hx₁ : x ∈ H₁) (hx₂ : x ∈ H₂), θ₁ ⟨x, hx₁⟩ = θ₂ ⟨x, hx₂⟩) :
+    ClassFunction.induce H₁ θ₁ = ClassFunction.induce H₂ θ₂ := by
+  subst h
+  have hθ : θ₁ = θ₂ := by ext x; exact hval x.1 x.2 x.2
+  rw [hθ]; congr 1; exact Subsingleton.elim _ _
+
+/-- **Peterfalvi (2.10.1), transported `α_B`.**  On the conjugate subgroup `M(B^l)`, the class
+function `α_{B^l}` agrees with the transport `transportConj l α_B` of `α_B` to `M(B)^l`.
+
+Both values are computed via the (2.9) defining equation `alphaB_apply_mul`: writing `y = l m l⁻¹`
+with `m = h·b ∈ M(B)` (`h ∈ H(B)`, `b ∈ N_L(B)`), the left side is `α((lbl⁻¹))` (since
+`y = (lhl⁻¹)(lbl⁻¹)` with `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`) and the right side is `α(b)`;
+they agree because `α` is an `L`-class function and `l, b ∈ L`. -/
+theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    (y : G) (hy₁ : y ∈ mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+    (hy₂ : y ∈ (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G)) :
+    alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+      = ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩ := by
+  classical
+  -- `m := l⁻¹ y l ∈ M(B)`, so `y = l m l⁻¹`; decompose `m = h * b`, `h ∈ H(B)`, `b ∈ N_L(B)`.
+  have hmM : (l : G)⁻¹ * y * (l : G) ∈ mBSubgroup hyp B hB := by
+    have := (Subgroup.mem_map_equiv).mp hy₂
+    rwa [MulAut.conj_symm_apply] at this
+  have hmem_prod : (l : G)⁻¹ * y * (l : G)
+      ∈ (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
+    rw [← hyp.coe_mBSubgroup hconj hB]; exact hmM
+  obtain ⟨h, hh, b, hb, hhb⟩ := hmem_prod
+  -- `hhb : h * b = l⁻¹ * y * l`; hence `y = (l h l⁻¹)(l b l⁻¹)`.
+  have hyhb : y = ((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹) := by
+    have hconj_y : (l : G) * ((l : G)⁻¹ * y * (l : G)) * (l : G)⁻¹ = y := by group
+    rw [← hconj_y, ← hhb]; group
+  have hbL : b ∈ L := nLStabilizerIn_le_L hyp B hb
+  have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+  have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
+  have hhbM : h * b ∈ mBSubgroup hyp B hB := (mBSubgroup hyp B hB).mul_mem hhM hbM
+  -- Right side: `transportConj l α_B ⟨y,_⟩ = α_B ⟨l⁻¹ y l,_⟩ = α(b)`.
+  have hRHS : ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩
+      = α ⟨b, hbL⟩ := by
+    rw [ClassFunction.transportConj_apply]
+    have harg : ((MulEquiv.subgroupMap (MulAut.conj (l : G)) (mBSubgroup hyp B hB)).symm
+        ⟨y, hy₂⟩ : mBSubgroup hyp B hB) = ⟨h * b, hhbM⟩ := by
+      apply Subtype.ext
+      simp only [MulEquiv.subgroupMap_symm_apply, MulAut.conj_symm_apply]
+      exact hhb.symm
+    rw [harg]
+    exact hyp.alphaB_apply_mul hconj hB α hh hb hhbM
+  -- Left side: `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`, so `α_{B^l} ⟨y,_⟩ = α(lbl⁻¹)`.
+  have hh'mem : (l : G) * h * (l : G)⁻¹
+      ∈ hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB) := by
+    rw [hyp.hIntersection_conjFinset hconj l hB,
+      show (l : G) * h * (l : G)⁻¹ = (MulAut.conj (l : G)) h from (MulAut.conj_apply _ _).symm]
+    exact Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hIntersection hyp B hB) hh
+  have hb'mem : (l : G) * b * (l : G)⁻¹ ∈ nLStabilizerIn hyp (hyp.conjFinset l B) := by
+    rw [hyp.nLStabilizerIn_conjFinset l,
+      show (l : G) * b * (l : G)⁻¹ = (MulAut.conj (l : G)) b from (MulAut.conj_apply _ _).symm]
+    exact Subgroup.smul_mem_pointwise_smul b (MulAut.conj (l : G)) (nLStabilizerIn hyp B) hb
+  have hb'L : (l : G) * b * (l : G)⁻¹ ∈ L := nLStabilizerIn_le_L hyp (hyp.conjFinset l B) hb'mem
+  have hLHS : alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+      = α ⟨(l : G) * b * (l : G)⁻¹, hb'L⟩ := by
+    have hyeq : (⟨y, hy₁⟩ : mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+        = ⟨((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹), by rw [← hyhb]; exact hy₁⟩ :=
+      Subtype.ext hyhb
+    rw [hyeq]
+    exact hyp.alphaB_apply_mul hconj (hyp.conjFinset_nonempty hB) α hh'mem hb'mem
+      (by rw [← hyhb]; exact hy₁)
+  -- Bridge: `α(lbl⁻¹) = α(b)` by `L`-class invariance (conjugator `l⁻¹`).
+  rw [hLHS, hRHS]
+  refine ClassFunction.of_isConj α (isConj_iff.mpr ⟨l⁻¹, ?_⟩)
+  apply Subtype.ext
+  push_cast; group
+
+/-- **Peterfalvi (2.10.1) (Dade-specific).**  The induced class function
+`Ind_{M(B^x)}^G α_{B^x}` is `L`-conjugacy invariant: it equals `Ind_{M(B)}^G α_B`.
+
+This is the textbook (2.10.1) used to re-index the inclusion–exclusion sum over `ℬ`
+(`L`-conjugacy class representatives of nonempty subsets) into one over all nonempty subsets `𝒫`.
+The proof combines the subgroup conjugation `M(B^l) = M(B)^l` (`mBSubgroup_conjFinset_eq_map`),
+the class function transport `α_{B^l} = transportConj l α_B` (`alphaB_conjFinset_eq_transportConj`),
+and the generic `induce_map_conj`. -/
+theorem induce_alphaB_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    [Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
+      (hyp.conjFinset_nonempty hB)) : ℂ)]
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] :
+    ClassFunction.induce (mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+        (alphaB hyp hconj (hyp.conjFinset_nonempty hB) α)
+      = ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) := by
+  haveI : Invertible (Nat.card ((mBSubgroup hyp B hB).map
+      (MulAut.conj (l : G) : G →* G)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- Step 1: rewrite the source subgroup to `M(B)^l` and identify the class functions.
+  rw [induce_congr_of_subgroup_eq (hyp.mBSubgroup_conjFinset_eq_map hconj l hB)
+    (θ₂ := ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α))
+    (fun x hx₁ hx₂ => hyp.alphaB_conjFinset_eq_transportConj hconj l hB α x hx₁ hx₂)]
+  -- Step 2: generic (2.10.1) `Ind_{H^ℓ}(transportConj ℓ θ) = Ind_H θ`.
+  exact ClassFunction.induce_map_conj (l : G) (alphaB hyp hconj hB α)
+
 end ConjugacyInvariance
 
 end SemidirectStructure
