@@ -156,6 +156,52 @@ theorem inner_conj_symm (φ ψ : ClassFunction G ℂ) :
   rw [ClassFunction.inner, ClassFunction.inner, hsum, star_mul', hcard]
 
 omit [Finite G] in
+/-- `⟨φ, φ⟩ = (|G| : ℂ)⁻¹ · ∑_g ‖φ(g)‖²` as the real cast of a nonnegative real.
+The unscaled sum `∑_g φ(g) · conj(φ(g)) = ∑_g ‖φ(g)‖²` and the factor `⅟|G|` is the
+positive real `(|G| : ℝ)⁻¹`. -/
+theorem inner_self_eq_realCast (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ =
+      ((((Nat.card G : ℝ)⁻¹) * ∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+  have hsum : ClassFunction.innerSum φ φ =
+      ((∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+    rw [ClassFunction.innerSum, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [Complex.star_def, Complex.mul_conj]
+  rw [ClassFunction.inner, hsum,
+    show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _]
+  push_cast
+  ring
+
+omit [Finite G] in
+/-- **Positive semidefiniteness:** `0 ≤ (⟨φ, φ⟩).re`. -/
+theorem inner_self_re_nonneg (φ : ClassFunction G ℂ) :
+    0 ≤ (ClassFunction.inner φ φ).re := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re]
+  have hcard : (0 : ℝ) ≤ (Nat.card G : ℝ)⁻¹ := by positivity
+  have hsum : (0 : ℝ) ≤ ∑ g : G, Complex.normSq (φ g) :=
+    Finset.sum_nonneg fun g _ => Complex.normSq_nonneg (φ g)
+  positivity
+
+omit [Finite G] in
+/-- **Positive definiteness:** if `(⟨φ, φ⟩).re = 0` then `φ = 0`.  Over `ℂ`,
+`(⟨φ, φ⟩).re = (|G| : ℝ)⁻¹ · ∑_g ‖φ(g)‖²`; the positive factor forces every
+`‖φ(g)‖² = 0`, hence `φ(g) = 0` for all `g`. -/
+theorem eq_zero_of_inner_self_re_eq_zero {φ : ClassFunction G ℂ}
+    (h : (ClassFunction.inner φ φ).re = 0) : φ = 0 := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re] at h
+  have hcard : (Nat.card G : ℝ)⁻¹ ≠ 0 := by
+    have : (0 : ℝ) < Nat.card G := by
+      exact_mod_cast Nat.card_pos
+    positivity
+  have hsum : ∑ g : G, Complex.normSq (φ g) = 0 :=
+    (mul_eq_zero.mp h).resolve_left hcard
+  have hterm : ∀ g ∈ (Finset.univ : Finset G), Complex.normSq (φ g) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg fun g _ => Complex.normSq_nonneg (φ g)).mp hsum
+  ext g
+  rw [ClassFunction.zero_apply]
+  exact Complex.normSq_eq_zero.mp (hterm g (Finset.mem_univ g))
+
+omit [Finite G] in
 /-- Right-linearity of `ClassFunction.inner` over a finite sum. -/
 theorem inner_sum_right {ι : Type*} (φ : ClassFunction G ℂ) (s : Finset ι)
     (f : ι → ClassFunction G ℂ) :
