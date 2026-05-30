@@ -276,6 +276,29 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     dim CF(L)≤dim CF(G) 필요 — FT 비보장 ⟹ 현 정의 일반 충족불가 가능성. 약화 후 본 라운드 infra 가
     즉시 main (5.6) 완성. **단 shared `IsCoherent`/S08 영향 ⟹ main 합류 시 결정 (worktree 단독
     변경 회피).** 대안 (Witt 전역확장) 은 dim 조건 + bespoke mathlib 부재로 열세.
+- [x] (2026-05-31, pass 5) **USER-APPROVED def 약화 + general (5.6) UNCONDITIONAL 완성**
+      (`S07_Coherence.lean`/`S08_CoherenceTheorems.lean`/`AxiomsCheck.lean`; sorry/axiom 無 —
+      `#print axioms retarget_isCoherent` = {propext, Classical.choice, Quot.sound}, full
+      `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs; commit b14a987). Pass-4 의
+      "권장 경로" (격자-相對 약화) 를 실행하여 **main (5.6) 의 유일 gap 해소**:
+  - **`IsCoherent` 약화**: 전역 `extension_isometry : IsIntegralIsometry extension` 필드를
+    격자-相對 `extension_inner_eq : ∀ φ ψ ∈ zSpan S, ⟨ν φ, ν ψ⟩ = ⟨φ, ψ⟩` 로 교체. FT 에서
+    `dim CF(L) > dim CF(G)` 이라 전역 등거리는 일반 부재; Peterfalvi 의 실제 대상 = 격자 등거리.
+  - **신규 keystone 2 건**: `IntegralCharacterMap.orthoResidualMap_mem_zSpan` ({χ,χ̄} Gram–Schmidt
+    잔차가 `ℤ[S₁∪{χ,χ̄}]→ℤ[S₁]`, `span_induction`; 생성원 x∈S₁↦x, χ↦0, χ̄↦0) +
+    **`retarget_inner_eq_on_zSpan_union`** (정직 충족형 integral-span keystone: 재타게팅이
+    `ℤ[S₁∪{χ,χ̄}]` 전체에서 `⟨·,·⟩` 보존, **τ₁ 의 `ℤ[S₁]`-등거리** + 격자 직교 `X,X̄⊥τ₁ξ` (ξ∈ℤ[S₁])
+    만 사용 — 전역 등거리 불요). 잔차∈ℤ[S₁] ⟹ `inner_block_expand` 로 폐합.
+  - **`retarget_isCoherent` 이제 UNCONDITIONAL general (5.6)**: `hX_ortho`/`hXbar_ortho` 를 정직한
+    격자형 (∀ξ∈ℤ[S₁]) 으로 약화, τ₂:=retarget 구성, `retarget_inner_eq_on_zSpan_union` 로 약화된
+    `IsCoherent` 산출. special-position 제한 제거; X,X̄⊥S₁^{τ₁} 는 진짜 (5.5)+(5.2.e) 격자 사실
+    (전역 over-strong 판 아님, posit 無).
+  - **S08 consumer 적응**: `IndChainDecomposition.ofIsCoherent` 에 `hζ_mem : ∀ t, ζ t ∈ S` 추가,
+    `Submodule.subset_span` (ζt∈S⊆zSpan S) 로 격자 `extension_inner_eq` 공급. 약화는 consumer 의
+    증명을 **쉽게** 만들 뿐 (전역성 미사용이었음). `sibleySetup_is_coherent` (여전히 sorry) 는 약화된
+    `CoherenceTarget` 에 그대로 typecheck — 향후 증명도 약화로 더 쉬워짐.
+  - **§5 coherence hub (5.6) 일반형 완료** = 쌍 인접으로 coherence 를 짓는 귀납 엔진, §6 (case-A/B
+    coherence) 및 궁극적으로 S08:188 `sibleySetup_is_coherent` 로의 관문.
 
 ## 完了条件
 

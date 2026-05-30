@@ -67,6 +67,38 @@ family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axio
 "(2026-05-31)" 절. (5.6) main `IsCoherent(S₁∪{χ,χ̄})`의 단일 blocker = `τ₂`의
 **전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis → 전역 등거리).
 
+### (2026-05-31, pass 5) USER-APPROVED def 약화 → general (5.6) UNCONDITIONAL 완성 (commit b14a987)
+
+위 blocker를 **정의 약화**로 해소하여 §5 coherence hub (5.6)을 일반형으로 닫음
+(`S07_Coherence.lean`/`S08_CoherenceTheorems.lean`/`AxiomsCheck.lean`; sorry/axiom 無 —
+`#print axioms retarget_isCoherent` = {propext, Classical.choice, Quot.sound}; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑).
+
+- **`IsCoherent` 약화** (USER-APPROVED, 이 branch 한정): 전역 필드
+  `extension_isometry : IsIntegralIsometry extension` → 격자-相對
+  `extension_inner_eq : ∀ φ ψ ∈ zSpan S, ⟨ν φ, ν ψ⟩ = ⟨φ, ψ⟩`. 이유: FT에서
+  `dim CF(L) > dim CF(G)`이라 character-difference 격자를 `CF(G)`로 보내는 **전역** 등거리는
+  일반적으로 부재; Peterfalvi (5.6.3)이 실제로 주장하는 대상은 **격자** 등거리이고, 모든 하류
+  consumer가 격자원 `ζ∈S`에만 inner-preservation을 쓴다.
+- **신규 keystone** (`namespace IntegralCharacterMap`, AxiomsCheck 등록 2건):
+  - `orthoResidualMap_mem_zSpan`: {χ,χ̄} Gram–Schmidt 잔차가 `ℤ[S₁∪{χ,χ̄}] → ℤ[S₁]`
+    (`span_induction`; 생성원 x∈S₁↦x [x⊥{χ,χ̄}], χ↦0, χ̄↦0). 이것이 전역 등거리 없이 격자
+    등거리를 가능케 하는 핵심 격자 사실.
+  - `retarget_inner_eq_on_zSpan_union`: `retarget_inner_eq_on`의 정직 충족형 integral-span 판.
+    재타게팅이 `ℤ[S₁∪{χ,χ̄}]` 전체에서 `⟨·,·⟩` 보존, **τ₁의 `ℤ[S₁]`-등거리** (= S₁ coherence)
+    + 격자 직교 `X,X̄ ⊥ τ₁ξ` (ξ∈ℤ[S₁]) 만 사용 (전역 등거리/over-strong 입력 불요). 잔차∈ℤ[S₁]
+    ⟹ `inner_block_expand`로 폐합.
+- **`retarget_isCoherent` 이제 UNCONDITIONAL general (5.6)**: `hX_ortho`/`hXbar_ortho`를 정직한
+  격자형 (`∀ξ∈ℤ[S₁]`)으로 약화 (전역 `∀ξ⊥{χ,χ̄}`보다 약한 가설 = 더 강한 정리), τ₂:=retarget
+  구성, `retarget_inner_eq_on_zSpan_union`로 약화된 `IsCoherent` 산출. **special-position 제한
+  제거**; X,X̄⊥S₁^{τ₁}는 진짜 (5.5)+(5.2.e) 격자 사실 (posit 無).
+- **S08 consumer 적응**: `IndChainDecomposition.ofIsCoherent`에 `hζ_mem : ∀ t, ζ t ∈ S` 추가,
+  `Submodule.subset_span` (ζt∈S⊆zSpan S)로 격자 `extension_inner_eq` 공급. 약화는 consumer
+  증명을 **쉽게** 만들 뿐 (전역성 미사용이었음). `sibleySetup_is_coherent` (S08:188, 여전히
+  sorry)는 약화된 `CoherenceTarget`에 그대로 typecheck — 향후 증명도 약화로 더 쉬워짐.
+- **의의**: (5.6)은 쌍 인접으로 coherence를 짓는 **귀납 엔진**, §6 (case-A/B coherence) 및
+  궁극적으로 S08:188 `sibleySetup_is_coherent`로의 관문. 상세는 issue 0046 pass-5.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
