@@ -1207,3 +1207,8 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_apply_one
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.subset_characterKernel_inflate
+-- Injective half of the inflation bijection: distinct quotient characters inflate to distinct
+-- characters (surjective precomposition is injective on class functions).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.compHom_injective_of_surjective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_injective

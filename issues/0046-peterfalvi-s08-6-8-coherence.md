@@ -569,6 +569,24 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     (`compHom (mk' N)` 単射, `mk'` 全射性から) + (a) で得た全単射 + `Fintype.sum_bijective` +
     landed `sumIrreducibleDegreeSq` (`Σ_{χ∈Irr L}χ(1)²=|L|`) ⟹ `Σ_{χ∈S(Z)}χ(1)²=|L/Z|=|L:Z|` ⟹
     `Σ_X χ(1)²=|L|−|L:Z|` (X=Irr L∖S(Z))。infra (a) が入れば (b) は機械的。
+- [x] (2026-05-31, G2.5 infra PASS 2) **Inflation の injective 半分を確定** (同 `InflationCharacter.lean`,
+      sorry/axiom 無; AxiomsCheck +2 件 各 3 axiom 全 allowlist; full `lake build OddOrder` 緑 3353 jobs):
+  - **`ClassFunction.compHom_injective_of_surjective`** : `f : H →* G` 全射 ⟹ `compHom f` 単射
+    (`compHom f φ = compHom f ψ` から `∀h, φ(f h)=ψ(f h)`, `f` 全射で `g=f h` を取り `φ g=ψ g`)。
+    任意全射 hom 一般 (quotient に限らず repo 再利用可)。
+  - **`inflate_injective`** : `Function.Injective (inflate N)` (上記を `mk'_surjective N` に特殊化し
+    `Subtype.ext` で包む)。⇒ `inflate` は **degree 保存 injection** `Irr(G⧸N) ↪ {χ∈Irr G | N⊆Ker χ}`
+    として確定 (injection 半分 + `inflate_apply_one` + `subset_characterKernel_inflate`)。
+  - **精密残 (G2.5 完了に残る唯一の keystone = surjectivity)**: 全単射の **surjectivity** =
+    「`N⊆Ker χ` なる `χ∈Irr G` は `inflate N χ̄` の形」。唯一の欠片は **`χ_ρ(n)=χ_ρ(1) ⟹ ρ n = id`**
+    (`n∈N`)。これがあれば `IsTrivial (ρ.comp N.subtype)` ⇒ mathlib `Representation.ofQuotient ρ N`
+    (既存, `ofQuotient_coe_apply : ofQuotient ρ N (g) x = ρ g x`) で `ρ̄:Representation ℂ (G⧸N) V`,
+    `ρ̄.comp (mk' N)=ρ` ⇒ `compHomEquiv` で `ρ̄` irreducible, `χ̄=ρ̄.character` が `inflate N χ̄=χ` を与える。
+    `χ_ρ(n)=dim V ⟹ ρ n = id` の mathlib 経路: `ρ n` は有限位数 ⇒ `(ρ n)^m=1` ⇒ `X^m−1` が零化
+    かつ ℂ 上 squarefree ⇒ `Module.End.isSemisimple_of_squarefree_aeval_eq_zero` で diagonalizable,
+    固有値は 1 の冪根 (norm 1), `trace=Σλ_i=dim` ⇒ `|Σλ_i|≤Σ|λ_i|=dim` 等号で全 `λ_i=1`,
+    semisimple+唯一固有値 1 ⇒ `ρ n=id` (`IsSemisimple.eq_zero_iff_forall_eigenvalue` 系)。
+    この diagonalization keystone は数時間規模の独立 leaf = 次 PASS。入れば (b) sum-bijection は機械的。
 
 ## 完了条件
 

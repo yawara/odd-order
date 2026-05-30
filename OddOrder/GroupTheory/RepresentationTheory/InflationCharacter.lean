@@ -41,7 +41,16 @@ This is the first brick of the Inflation infrastructure gating Peterfalvi (6.6) 
 * `OddOrder.RepresentationTheory.inflate` — the inflation map
   `IrreducibleCharacter (G ⧸ N) → IrreducibleCharacter G`, `χbar ↦ χbar ∘ (mk' N)`.
 * `OddOrder.RepresentationTheory.inflate_apply_one` — degree preservation.
+* `OddOrder.RepresentationTheory.inflate_injective` — injectivity of the inflation map.
 * `OddOrder.RepresentationTheory.subset_characterKernel_inflate` — `N ⊆ ker (inflate N χbar)`.
+
+Together these realize `inflate` as a **degree-preserving injection**
+`Irr(G ⧸ N) ↪ {χ ∈ Irr G | N ⊆ ker χ}`.  The reverse inclusion (surjectivity onto the
+kernel-subset set, hence the full bijection of [Isaacs] (2.22) and the degree-sum corollary
+`Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`) additionally requires descending the witnessing representation
+through `Representation.ofQuotient`, which needs `ρ` to act trivially on `N`; that step rests on
+the diagonalization fact `χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id` (finite-order operators over `ℂ` are
+semisimple) and is left for a follow-up.
 
 ## References
 
@@ -107,6 +116,21 @@ end Representation
 
 variable {G H : Type*} [Group G] [Group H]
 
+/-- **Precomposition by a surjective homomorphism is injective on class functions.**
+If `f : H →* G` is surjective then `ClassFunction.compHom f` is injective: two class functions
+on `G` that agree after pulling back along `f` agree everywhere, because every `g : G` is `f h`
+for some `h`.
+
+This is the injectivity half of the inflation correspondence ([Isaacs] (2.22)): distinct
+characters of the quotient inflate to distinct characters of `G`. -/
+theorem ClassFunction.compHom_injective_of_surjective {f : H →* G}
+    (hf : Function.Surjective f) :
+    Function.Injective (ClassFunction.compHom f : ClassFunction G ℂ → ClassFunction H ℂ) := by
+  intro φ ψ hφψ
+  ext g
+  obtain ⟨h, rfl⟩ := hf g
+  exact congrFun (congrArg (fun (χ : ClassFunction H ℂ) => (χ : H → ℂ)) hφψ) h
+
 /-- **Inflation along a surjective homomorphism preserves irreducible characters.**
 If `f : H →* G` is surjective and `φ` is an irreducible character of `G`, then its pullback
 `ClassFunction.compHom f φ` is an irreducible character of `H`.
@@ -157,6 +181,23 @@ character of `G ⧸ N` evaluated at `1`: the quotient map sends `1` to `1`. -/
     ((inflate N χbar : IrreducibleCharacter G) : ClassFunction G ℂ) 1 =
       (χbar : ClassFunction (G ⧸ N) ℂ) 1 := by
   rw [inflate_apply, map_one]
+
+/-- **Inflation is injective** ([Isaacs] (2.22)).  Distinct irreducible characters of `G ⧸ N`
+inflate to distinct irreducible characters of `G`.  The quotient map `QuotientGroup.mk' N` is
+surjective, so precomposition by it is injective on class functions
+(`ClassFunction.compHom_injective_of_surjective`), and `inflate` is that precomposition packaged
+on irreducible characters.
+
+Together with `inflate_apply_one` (degree preservation) and `subset_characterKernel_inflate`
+(image lands in `{χ ∈ Irr G | N ⊆ ker χ}`), this realizes the inflation map as a
+degree-preserving injection `Irr(G ⧸ N) ↪ {χ ∈ Irr G | N ⊆ ker χ}`.  Surjectivity of this
+injection (every irreducible character of `G` with `N ⊆ ker` arises by inflation) is the
+remaining half of the bijection. -/
+theorem inflate_injective : Function.Injective (inflate N) := by
+  intro χbar ψbar h
+  apply Subtype.ext
+  exact ClassFunction.compHom_injective_of_surjective (QuotientGroup.mk'_surjective N)
+    (congrArg (Subtype.val) h)
 
 /-- **The kernel of an inflated character contains `N`** ([Isaacs] (2.22)).  Every `n ∈ N` maps
 to `1` in `G ⧸ N`, so `(inflate N χbar) n = χbar 1 = (inflate N χbar) 1`, i.e. `n` lies in the
