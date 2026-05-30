@@ -1203,3 +1203,37 @@ Round 23 PASS 2 末尾の source-side 残 ① (`hY : Da.Y = a·Da.tau1 χ₁` �
 `hYform` 自体の供給も含む)。これは projection infra ((5.6.1) の Y 分解存在 = 有限正規直交族への直交射影) を
 要し, PASS 2 の対象。② が揃えば (6.6) `peterfalvi_66_coherence_of_X` の `hstep` が Dade isometry から
 完全放電し, coherence-of-X が実 Dade isometry で instantiable。
+
+### G2.9 Round 24 PASS 2 (2026-05-31): integral 直交射影 primitive + ofProjection 構成子
+
+PASS 1 末尾の source-side ② のうち **projection infra (有限 ZIrr-正規直交族への整数係数直交射影)** を解消し,
+D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive に縮約する seam を landed。sorry/axiom 無
+(`#print axioms` = propext/Classical.choice/Quot.sound のみ), AxiomsCheck 2 件 新規 全 allowlist;
+`lake build OddOrder` 緑 3360 jobs / `OddOrder.AxiomsCheck` 緑 3343 jobs。
+
+- `ClassFunction.exists_intProjection_of_orthonormal_ZIrr` (InducedCharacter.lean) : **整数係数直交射影**
+  本体。`φ ∈ ZIrr G` + 有限 ZIrr-正規直交族 `R` (`∀α∈R, α∈ZIrr G` + orthonormal) から *整数* 係数
+  `c α = ⟨φ,α⟩` (整数性は `inner_mem_ZIrr_int` ← R⊆ZIrr) + 直交残差 `Y = φ − ∑c•α ⊥ R` を生産。
+  `φ = (∑c•α) + Y`, `⟨Y,α⟩ = ⟨φ,α⟩ − ⟨X,α⟩ = c α − c α = 0` (orthonormal coeff recovery)。
+  これが (5.4)/(5.5)/(5.6.1) の **X-side (整数 ℤ[R(χ)]) / Y-side / coeff** を供給する genuine primitive。
+  係数整数性 (signed-irreducible family R(χ) ⊆ ZIrr 上) が load-bearing, Y 直交性は純線型代数。
+- `CharacterPsiDecomposition.ofProjection` (S07) : **smart constructor**。`CharacterPsiDecomposition`
+  の hard 6 fields (`X`/`Y`/`tau1_image`/`coeff`/`X_eq`/`Y_orthogonal`) を 単一 number-theoretic input
+  `htau1_mem : (χ−ψ)^{τ₁} ∈ ZIrr G` から上 projection で *計算* 供給。`X := ∑c•α`,
+  `Y := −((χ−ψ)^{τ₁} − X)` で `tau1_image : (χ−ψ)^{τ₁} = X − Y` は純 algebra (`sub_neg_eq_add; abel`)。
+  残 input = structural data のみ: `imageFamily` (R(χ); Dade data / §3 keystone),
+  `tau1`+`htau1_isom`+`htau1_agrees` ((5.4) auxiliary isometry), 3 直交スカラー
+  `⟨χ,ψ⟩=⟨χ̄,ψ⟩=⟨χ,χ̄⟩=0`。`htau1_mem` は IntegralCharacterMap の ℤ-線型性からは導けない genuine input
+  (nominal "integral"; 実 Dade map / 拡張のみが ZIrr→ZIrr; carried property)。
+
+**Round 24 PASS 2 後の残 (projection infra 完了)**: D₀/Da/Dmem 完全生産に残る 2 primitive は純構成 (本 round
+範囲外, projection は seam として landed):
+1. **Dade R(χ) 抽出**: `dadeIntegralCharacterMap` から各 χ∈S₁∪{χ} の `OrthonormalCharacterImageFamily`
+   を読み出す (irreducible は `characterDifferenceImageOfIsometry` + `toOrthonormalImage`;
+   reducible は Thm 4.9 経由)。
+2. **τ₁ isometry 拡張**: 非実 χ で `χ−χ̄` の像を 2 次元格子 `ℤ[χ,χ̄]` 上の full isometry に拡張し
+   τ (Dade) と差で, running τ₁ = hS₁.extension と S₁ で一致させる構成 (2D Gram–Schmidt; ZIrr→ZIrr 保存
+   = `ofProjection` の `htau1_mem` 供給)。これは from-scratch isometry-extension primitive で未実装。
+
+1+2 が揃えば `ofProjection` で D₀/Da/Dmem 完成 → `Y_eq_nsmul_tau1_of_lambdaForm` (PASS 1) で `hY`,
+`retarget_isCoherent_of_decompositions_and_memberFamily` で (6.6) `hstep` 完全放電。

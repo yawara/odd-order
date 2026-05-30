@@ -865,10 +865,16 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     `lambda_eq_zero_and_Z_eq_zero` で λ=0∧Z=0 → 戻して `D.Y = a • D.tau1 χ₁` (= `hY`) を *構成*。
     4 consumer (`X_eq_tau1_chi_of_Y_eq` 他) が消費するのみだった唯一の source-side posited-conclusion を
     除去。sorry/axiom 無, AxiomsCheck 1 件 新規 全 allowlist; build 緑 3360 jobs。
-  - **残 (次パス)**: source-side ② のみ — 各 step の `D₀`/`Da`/`Dmem` **instance 生産** ((5.4)
-    auxiliary isometry `D.tau1` を Dade `τ` + running `τ₁` から構成し τ₁-image を R(χ) に直交射影して X−Y
-    split + (5.6.1) λ-form 供給)。projection infra (有限正規直交族への直交射影存在) を要する本体 content。
-    image-side (b)+(c) は完了。
+  - **Round 24 PASS 2 (2026-05-31)**: source-side ② のうち projection infra 完了。
+    `ClassFunction.exists_intProjection_of_orthonormal_ZIrr` (整数係数直交射影: φ∈ZIrr + ZIrr-正規直交族
+    R → 整数 c α=⟨φ,α⟩ + 残差 Y⊥R) + `CharacterPsiDecomposition.ofProjection` (smart constructor:
+    hard 6 fields を `(χ−ψ)^{τ₁}∈ZIrr G` から projection で *計算* 供給; 残 input = structural data
+    のみ)。D₀/Da 生産を 2 primitive に縮約。sorry/axiom 無, AxiomsCheck 2 件 新規 全 allowlist; 緑 3360 jobs。
+  - **残 (次パス)**: D₀/Da/Dmem 完全生産に残る 2 純構成 primitive —
+    ① Dade R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`),
+    ② τ₁ isometry 拡張 (非実 χ で `ℤ[χ,χ̄]` 上 2D Gram–Schmidt, τ・running τ₁ と一致, ZIrr→ZIrr 保存)。
+    ②は from-scratch isometry-extension primitive で未実装。①②揃えば `ofProjection` で D₀/Da 完成
+    → `Y_eq_nsmul_tau1_of_lambdaForm` で hY → (6.6) hstep 完全放電。image-side (b)+(c) は完了。
 
 ## 完了条件
 

@@ -657,6 +657,14 @@ set_option linter.style.longLine false in
 -- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
+-- RepresentationTheory (Peterfalvi §7 (5.4) projection primitive): integral orthogonal projection
+-- of a virtual character `φ ∈ ZIrr G` onto a finite ZIrr-orthonormal family `R`.  Integer
+-- coefficients `c α = ⟨φ, α⟩` (integral because `R ⊆ ZIrr G`, `inner_mem_ZIrr_int`); residual
+-- `Y = φ − ∑ c•α ⊥ R` by orthonormal coefficient recovery.  Supplies the `X`/`Y`/`coeff` fields of
+-- `CharacterPsiDecomposition` (the (5.4)/(5.5)/(5.6.1) projection content), consumed by
+-- `CharacterPsiDecomposition.ofProjection`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.exists_intProjection_of_orthonormal_ZIrr
 -- RepresentationTheory (Peterfalvi (2.10.3) transversal value): the induction sum at `g`
 -- collapses to a sum over only those `x` with `x⁻¹ g x ∈ H` (off-support terms vanish via
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
@@ -1076,6 +1084,12 @@ set_option linter.style.longLine false in
 -- orthonormal Parseval (ZIrrFourier) で sorry-free.
 -- (5.2.d) gateway の非空性証拠 (2 元 CharacterDifferenceImage → 一般 family).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage
+-- (5.4) projection smart-constructor (issue 0046): `CharacterPsiDecomposition` の hard
+-- `X`/`Y`/`coeff`/`X_eq`/`Y_orthogonal` 6 fields を, 単一 number-theoretic input
+-- `(χ−ψ)^{τ₁} ∈ ZIrr G` から integral projection (`exists_intProjection_of_orthonormal_ZIrr`) で
+-- *計算* 供給。残 input = structural data (imageFamily R(χ), tau1 + isom + agrees, 3 直交スカラー)。
+-- 各 step の D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive に縮約する seam。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
 -- (5.4.a) ‖X‖² ≥ ‖χ‖².
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X

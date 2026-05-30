@@ -682,6 +682,48 @@ theorem inner_mem_ZIrr_int {φ ψ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (
       rw [← Int.cast_smul_eq_zsmul ℂ a x, inner_smul_right, hm]
       simp only [star_intCast]; push_cast; ring
 
+open scoped Classical in
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Integral orthogonal projection onto a finite ZIrr-orthonormal family.**
+For a virtual character `φ ∈ ZIrr G` and a finite family `R : Finset (CF G)` of virtual
+characters (`hZ : ∀ α ∈ R, α ∈ ZIrr G`) that is orthonormal (`horth : ⟨α, β⟩ = δ_{α,β}`),
+there are *integer* coefficients `c α = ⟨φ, α⟩ ∈ ℤ` (an integer because both `φ` and `α` are
+virtual characters, `inner_mem_ZIrr_int`) and an orthogonal residual `Y` with
+
+`φ = (∑_{α ∈ R} c α • α) + Y`     and     `⟨Y, α⟩ = 0` for all `α ∈ R`.
+
+The integral span part `X := ∑_{α ∈ R} c α • α` is the orthogonal projection of `φ` onto
+`ℤ[R]`; `Y := φ − X` is automatically orthogonal to `R` because, by orthonormality,
+`⟨X, α⟩ = c α = ⟨φ, α⟩` so `⟨Y, α⟩ = ⟨φ, α⟩ − ⟨X, α⟩ = 0`.
+
+This is the genuine *projection primitive* of Peterfalvi §7 (5.4)/(5.5)/(5.6.1): it supplies the
+integral `X`-side, the orthogonal `Y`-side, and the integer coefficient function of a
+`CharacterPsiDecomposition` from the single number-theoretic input `(χ − ψ)^{τ₁} ∈ ZIrr G`.  The
+coefficient integrality (over the signed-irreducible family `R(χ) ⊆ ZIrr G`) is the load-bearing
+content; the orthogonality of `Y` is then pure linear algebra. -/
+theorem exists_intProjection_of_orthonormal_ZIrr
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    {R : Finset (ClassFunction G ℂ)} (hZ : ∀ α ∈ R, α ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) :
+    ∃ (c : ClassFunction G ℂ → ℤ) (Y : ClassFunction G ℂ),
+      (∀ α ∈ R, (ClassFunction.inner φ α : ℂ) = (c α : ℂ)) ∧
+      φ = (∑ α ∈ R, (c α : ℂ) • α) + Y ∧
+      ∀ α ∈ R, ClassFunction.inner Y α = 0 := by
+  classical
+  -- Integer coefficients `c α := the integer value of ⟨φ, α⟩`.
+  set c : ClassFunction G ℂ → ℤ :=
+    fun α => if hα : α ∈ R then (inner_mem_ZIrr_int hφ (hZ α hα)).choose else 0 with hc
+  -- Key: on `R`, `⟨φ, α⟩ = c α`.
+  have hcoeff : ∀ α ∈ R, ClassFunction.inner φ α = (c α : ℂ) := by
+    intro α hα
+    rw [hc]; simp only [dif_pos hα]
+    exact (inner_mem_ZIrr_int hφ (hZ α hα)).choose_spec
+  refine ⟨c, φ - ∑ α ∈ R, (c α : ℂ) • α, hcoeff, by abel, ?_⟩
+  -- `⟨Y, α⟩ = ⟨φ, α⟩ − ⟨X, α⟩ = c α − c α = 0`.
+  intro α hα
+  rw [ClassFunction.inner_sub_left, inner_orthonormalSum_eq_coeff horth hα, hcoeff α hα, sub_self]
+
 set_option linter.unusedSectionVars false in
 set_option linter.unusedFintypeInType false in
 /-- **Induction preserves virtual characters.** For a subgroup `H ≤ G` and a virtual

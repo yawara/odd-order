@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.Data.Fin.Tuple.Sort
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 
 /-!
@@ -736,6 +737,63 @@ open OddOrder.RepresentationTheory
 variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
 variable [Fintype L] [Fintype G]
 variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- **Smart constructor for `CharacterPsiDecomposition` via integral projection.**
+
+The hard `X`/`Y`/`coeff` content of the (5.4) decomposition `(χ − ψ)^{τ₁} = X − Y` — the
+integral `R(χ)`-projection `X = ∑_{α ∈ R(χ)} (coeff α)•α ∈ ℤ[R(χ)]` and the orthogonal residual
+`Y ⊥ R(χ)` — is *computed*, not posited, from the single number-theoretic input
+`htau1_mem : (χ − ψ)^{τ₁} ∈ ZIrr G` (the τ₁-image is a virtual character of `G`).  This is the
+orthogonal projection of `(χ − ψ)^{τ₁}` onto the ZIrr-orthonormal family `R(χ)`
+(`exists_intProjection_of_orthonormal_ZIrr`, integer coefficients because `R(χ) ⊆ ZIrr G`); the
+residual `Y` is its orthogonal complement.
+
+The remaining inputs are exactly the *structural* data a per-step (5.4)/(5.5)/(5.6.1) construction
+must still supply:
+* `imageFamily` — the signed-irreducible family `R(χ)` with `(χ − χ̄)^τ = ∑_{α} α` (from the Dade
+  data / §3 keystone, `OrthonormalCharacterImageFamily`);
+* `tau1`, `htau1_isom`, `htau1_agrees` — the (5.4) auxiliary isometry `τ₁` on `ℤ[χ − ψ, χ − χ̄]`
+  agreeing with `τ` on `χ − χ̄`;
+* the three (5.2.c)/(5.4) orthogonality scalars `⟨χ, ψ⟩ = ⟨χ̄, ψ⟩ = ⟨χ, χ̄⟩ = 0`.
+
+This isolates the genuinely missing primitives (the Dade `R(χ)` extractor and the `τ₁`
+isometry-extension) as the only residual: once those are built, this constructor delivers the full
+`CharacterPsiDecomposition` with its `X`/`Y`/`coeff`/`X_eq`/`Y_orthogonal` fields populated by the
+projection. -/
+noncomputable def ofProjection
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (tau1 : IntegralCharacterMap L G)
+    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
+    (htau1_mem : tau1 (χ - ψ) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner χ ψ = 0)
+    (hχbarψ : ClassFunction.inner χ.conj ψ = 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    CharacterPsiDecomposition (L := L) (G := G) τ χ ψ :=
+  let proj := ClassFunction.exists_intProjection_of_orthonormal_ZIrr htau1_mem
+    imageFamily.mem_ZIrr imageFamily.orthonormal
+  { imageFamily := imageFamily
+    tau1 := tau1
+    tau1_isometry := htau1_isom
+    tau1_agrees := htau1_agrees
+    X := ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α
+    Y := -(tau1 (χ - ψ) - ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α)
+    tau1_image := by
+      -- `X − Y = X − (−(τ₁(χ−ψ) − X)) = τ₁(χ−ψ)`, pure algebra.
+      rw [sub_neg_eq_add]; abel
+    coeff := proj.choose
+    X_eq := rfl
+    Y_orthogonal := by
+      -- `⟨Y, α⟩ = −⟨τ₁(χ−ψ) − X, α⟩ = −(⟨τ₁(χ−ψ), α⟩ − coeff α) = −(coeff α − coeff α) = 0`.
+      intro α hα
+      have hcoeff : ClassFunction.inner (tau1 (χ - ψ)) α = (proj.choose α : ℂ) :=
+        proj.choose_spec.choose_spec.1 α hα
+      rw [ClassFunction.inner_neg_left, ClassFunction.inner_sub_left,
+        inner_orthonormalSum_eq_coeff imageFamily.orthonormal hα, hcoeff, sub_self, neg_zero]
+    chi_psi_orthogonal := hχψ
+    chiConj_psi_orthogonal := hχbarψ
+    chi_chiConj_orthogonal := hχχbar }
 
 /-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
 theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
