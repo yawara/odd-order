@@ -1190,6 +1190,121 @@ theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
   show α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
   rw [hsplit, map_mul, hfh, one_mul, hval]
 
+/- 2.10.1: `L`-conjugacy invariance of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
+
+section ConjugacyInvariance
+
+open scoped Classical in
+/-- The conjugate finset `B^l = { l·a·l⁻¹ | a ∈ B }`, as the `conjA l`-image of `B`. -/
+noncomputable def conjFinset (hyp : Hypothesis G A L) (l : L)
+    (B : Finset {a : G // a ∈ A}) : Finset {a : G // a ∈ A} :=
+  B.image (hyp.conjA l)
+
+@[simp] theorem mem_conjFinset (hyp : Hypothesis G A L) {l : L}
+    {B : Finset {a : G // a ∈ A}} {a : {a : G // a ∈ A}} :
+    a ∈ hyp.conjFinset l B ↔ ∃ b ∈ B, hyp.conjA l b = a := by
+  classical
+  simp [conjFinset]
+
+theorem conjFinset_nonempty (hyp : Hypothesis G A L) {l : L}
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    (hyp.conjFinset l B).Nonempty := by
+  classical
+  rw [conjFinset]
+  exact hB.image _
+
+/-- **Peterfalvi (2.10.1), `H(B^x) = H(B)^x`.**  Conjugation by `l ∈ L` carries `H(B)` to
+`H(B^l)`: `H(B^l) = l · H(B) · l⁻¹`.  Uses `(2.4.a)` (`mem_H_conjA_iff`): an element lies in
+`H(l·a·l⁻¹)` iff its `l`-untwist lies in `H(a)`. -/
+theorem hIntersection_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = MulAut.conj (l : G) • hIntersection hyp B hB := by
+  classical
+  ext x
+  rw [mem_hIntersection, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, mem_hIntersection]
+  constructor
+  · intro hx a ha
+    have hmem : x ∈ hyp.H (hyp.conjA l a) := hx _ ((hyp.mem_conjFinset).mpr ⟨a, ha, rfl⟩)
+    rw [mem_H_conjA_iff hyp hconj] at hmem
+    rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
+      rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+        MulAut.conj_inv_apply]]
+  · intro hx a ha
+    obtain ⟨b, hb, rfl⟩ := (hyp.mem_conjFinset).mp ha
+    rw [mem_H_conjA_iff hyp hconj]
+    have := hx b hb
+    rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
+      rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+        MulAut.conj_inv_apply]] at this
+
+/-- `conjA` conjugation relation: `(conjA l)⁻¹ ∘ conjA ℓ ∘ conjA l = conjA (l⁻¹ ℓ l)`. -/
+theorem conjA_conj (hyp : Hypothesis G A L) (l ℓ : L) (a : {a : G // a ∈ A}) :
+    hyp.conjA l⁻¹ (hyp.conjA ℓ (hyp.conjA l a)) = hyp.conjA (l⁻¹ * ℓ * l) a := by
+  rw [← conjA_mul, ← conjA_mul]
+
+/-- **Peterfalvi (2.10.1), `N_L(B^x)` membership.**  An element `ℓ ∈ L` stabilizes the
+conjugate finset `B^l` iff its `l`-untwist `l⁻¹ ℓ l` stabilizes `B`. -/
+theorem mem_setLStabilizer_conjFinset (hyp : Hypothesis G A L) (l ℓ : L)
+    {B : Finset {a : G // a ∈ A}} :
+    ℓ ∈ setLStabilizer hyp (hyp.conjFinset l B)
+      ↔ l⁻¹ * ℓ * l ∈ setLStabilizer hyp B := by
+  classical
+  simp only [mem_setLStabilizer, mem_conjFinset]
+  constructor
+  · intro h b hb
+    obtain ⟨c, hc, hceq⟩ := h (hyp.conjA l b) ⟨b, hb, rfl⟩
+    have : hyp.conjA (l⁻¹ * ℓ * l) b = c := by
+      rw [← conjA_conj, ← hceq, conjA_inv_conjA]
+    rw [this]; exact hc
+  · rintro h a ⟨b, hb, rfl⟩
+    refine ⟨hyp.conjA (l⁻¹ * ℓ * l) b, h b hb, ?_⟩
+    rw [← conjA_conj, conjA_conjA_inv]
+
+/-- **Peterfalvi (2.10.1), `N_L(B^x) = N_L(B)^x`.**  Conjugation by `l ∈ L` carries `N_L(B)`
+to `N_L(B^l)`: `N_L(B^l) = l · N_L(B) · l⁻¹`. -/
+theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
+    {B : Finset {a : G // a ∈ A}} :
+    nLStabilizerIn hyp (hyp.conjFinset l B)
+      = MulAut.conj (l : G) • nLStabilizerIn hyp B := by
+  classical
+  ext x
+  rw [mem_nLStabilizerIn, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, mem_nLStabilizerIn]
+  have hsmul : ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) := by
+    rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+      MulAut.conj_inv_apply]
+  rw [hsmul]
+  constructor
+  · rintro ⟨hxL, hxN⟩
+    have hconjL : (l : G)⁻¹ * x * (l : G) ∈ L :=
+      L.mul_mem (L.mul_mem (L.inv_mem l.2) hxL) l.2
+    refine ⟨hconjL, ?_⟩
+    have : (⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ : L) = l⁻¹ * ⟨x, hxL⟩ * l := by
+      apply Subtype.ext; push_cast; ring
+    rw [this]
+    exact (hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩).mp hxN
+  · rintro ⟨hconjL, hxN⟩
+    have hxL : x ∈ L := by
+      have : x = (l : G) * ((l : G)⁻¹ * x * (l : G)) * (l : G)⁻¹ := by group
+      rw [this]; exact L.mul_mem (L.mul_mem l.2 hconjL) (L.inv_mem l.2)
+    refine ⟨hxL, ?_⟩
+    rw [hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩]
+    have : (l⁻¹ * ⟨x, hxL⟩ * l : L) = ⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ := by
+      apply Subtype.ext; push_cast; ring
+    rw [this]; exact hxN
+
+/-- **Peterfalvi (2.10.1), `M(B^x) = M(B)^x`.**  Conjugation by `l ∈ L` carries `M(B)` to
+`M(B^l)`: `M(B^l) = l · M(B) · l⁻¹`.  Since `M(B) = H(B) ⊔ N_L(B)` and conjugation is a
+lattice homomorphism (`smul_sup`), this follows from the conjugation of the two factors. -/
+theorem mBSubgroup_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = MulAut.conj (l : G) • mBSubgroup hyp B hB := by
+  rw [mBSubgroup, mBSubgroup, hyp.hIntersection_conjFinset hconj l hB,
+    hyp.nLStabilizerIn_conjFinset l, Subgroup.smul_sup]
+
+end ConjugacyInvariance
+
 end SemidirectStructure
 
 end Hypothesis

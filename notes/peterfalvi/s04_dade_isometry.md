@@ -31,6 +31,12 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
   `induce_apply_eq_sum_filter` (= (2.10.3) transversal value, `x⁻¹gx∈H` の x のみ寄与),
   `induceSum_map_conj` / `induce_map_conj` (= (2.10.1) `Ind_{H^ℓ}(transportConj ℓ θ)=Ind_H θ`),
   補助 `transportConj` / `induceTerm_transportConj`.  Dade 適用 (H↦M(B), θ↦α_B) + Möbius 相殺は残.
+- **(2.10.1) Dade-specific 共役 (subgroup 側) 完成** (`S04_DadeIsometry.lean`, 2026-05-30,
+  sorry-free + axiom-clean; issue 0040「進捗 (6)」): `conjFinset l B = B^l`,
+  `hIntersection_conjFinset` (H(B^x)=H(B)^x), `nLStabilizerIn_conjFinset` (N_L(B^x)=N_L(B)^x),
+  `mBSubgroup_conjFinset` (M(B^x)=M(B)^x = `conj l • M(B)`), 補助 `conjA_conj` /
+  `mem_setLStabilizer_conjFinset`.  残: class function 側 `alphaB(B^l)=transportConj l (alphaB B)`
+  の dependent-type transport → `induce_map_conj` 適用で (2.10.1) Dade 完了.
 
 ## Audit log (2026-05-23 audit 訂正)
 

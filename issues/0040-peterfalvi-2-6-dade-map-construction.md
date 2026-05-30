@@ -334,3 +334,27 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
 **残 (Dade 適用)**: 上記は generic.  (2.6.b) 用には `H↦M(B)`, `θ↦α_B` を適用し,
 (2.10.1) は `M(B^x)=x M(B) x⁻¹` membership + `alphaB_apply_mul` で α_{B^x} transport を,
 (2.10.3) は `card_conj_fiber` (issue 0039) で `𝒜(g,H(B)b)` を集計する段が残る (項目 4 Möbius も).
+
+## 進捗 2026-05-30 (6) — (2.10.1) Dade-specific 共役インフラ `M(B^x)=M(B)^x` (sorry-free, axiom-clean)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section SemidirectStructure` 内
+`section ConjugacyInvariance` に, 上記「残作業」項目 2 (2.10.1) の **subgroup 共役側**を landed
+(`lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/axiom 無し; 3 定理とも 3 axioms 全 allowlist 内).
+
+- `conjFinset l B = B.image (conjA l)` (= `B^l`), `mem_conjFinset`, `conjFinset_nonempty`.
+- `conjA_conj` — `(conjA l)⁻¹∘conjA ℓ∘conjA l = conjA (l⁻¹ℓl)` (`conjA_mul` 2 回).
+- **`hIntersection_conjFinset`** = **(2.10.1) `H(B^x)=H(B)^x`**: `H(B^l) = conj l • H(B)`.
+  membership: `mem_hIntersection` + `mem_pointwise_smul_iff_inv_smul_mem` + (2.4.a) `mem_H_conjA_iff`.
+- `mem_setLStabilizer_conjFinset` — `ℓ∈N_L(B^l) ↔ l⁻¹ℓl∈N_L(B)` (`conjA_conj` で stabilizer 条件を untwist).
+- **`nLStabilizerIn_conjFinset`** = **(2.10.1) `N_L(B^x)=N_L(B)^x`**: `N_L(B^l) = conj l • N_L(B)`
+  (L 内 set-stabilizer 共役を G の pointwise smul に移送; `push_cast`+`group` で coercion 整合).
+- **`mBSubgroup_conjFinset`** = **(2.10.1) `M(B^x)=M(B)^x`**: `M(B^l) = conj l • M(B)`
+  (`mBSubgroup = H(B)⊔N_L(B)` + `Subgroup.smul_sup` で 2 因子から合成).
+
+**残 (2.10.1 完了まで)**: generic `induce_map_conj` (= `Ind_{H.map(conj l)}(transportConj l θ)=Ind_H θ`)
+へ `H↦M(B)`, `θ↦α_B` を適用するには, class function 側 `alphaB (B^l) α = transportConj l (alphaB B α)`
+(subgroup 等式 `M(B^l)=M(B).map(conj l)` 越しの transport) が要る.  値計算は
+`alphaB(B^l) α (lml⁻¹) = α(lbl⁻¹) = α(b) = transportConj l (alphaB B α)(lml⁻¹)` (m=hb 分解 +
+α の L-class 不変性 `α(lbl⁻¹)=α(b)`) で成立するが, **dependent type transport** (型 index の
+subgroup 書換え + Invertible instance) の packaging が残作業.  その後 (2.10.3) Dade 適用 →
+ℬ 代表系 (項目 1) → Möbius 相殺 (項目 4) → `PreservesVirtualCharacters`.
