@@ -1187,6 +1187,16 @@ set_option linter.style.longLine false in
 -- accumulated-set monotonicity helper is `pairUnion_mono`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono
+-- (6.6) conclusion "X is coherent" (mmd L84): `coherentOfPairChainCover` assembles it from the
+-- degree-ordered pair-chain decomposition of `X` (base prefix `S₀` + remaining conjugate pairs,
+-- certified to recover `X` by `pairUnion_eq_of_cover` via the membership lemma `mem_pairUnion`)
+-- and the `coherentPairChain` engine.  The base coherence `h0` (= (1.1)+(1.4) prefix) and the
+-- per-step (5.6) adjoining `hstep` are *supplied* (the residual to fill is `hstep`'s per-step
+-- `{Xᵢ, X̄ᵢ}` target data, needing the Dade-isometry ν basis extension, G2.7); the conclusion
+-- `IsCoherent τ X A` is derived from them through the chain.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mem_pairUnion
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_eq_of_cover
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentOfPairChainCover
 -- (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76): the degree-sorted indexing
 -- of the finite set `X = S − S(Z)`.  `exists_monotoneDegreeEnum` produces an injective surjection
 -- `e : Fin (X.ncard) → X` monotone in the real degree key `χ ↦ (characterDegree χ).re` — the purely

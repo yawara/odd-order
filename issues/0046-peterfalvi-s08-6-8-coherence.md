@@ -635,6 +635,40 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       (constituent-inherits-kernel 等号 case: `(∑ mᵢ χᵢ)(g) = (∑ mᵢ χᵢ)(1) ⟹ mᵢ≠0 の χᵢ で g∈Ker χᵢ`)。
       上記「精密残 (G2.2 で R17 を超える唯一の piece)」を閉じる。**残**: ψ=Ind_K^L θ の `∑ mᵢ χᵢ` 分解
       (genuine character = `Irr` 上 ℕ-結合) は別 leaf (G2.2 caller assembly)。
+- [x] (2026-05-31, G2.6 WIRING) **(6.6) coherence-of-X 結論 `IsCoherent τ X A` の組立** を
+      `S07_Coherence.lean` ((6.6) section の `coherentPairChain` 直後) に landing (sorry/axiom 無 —
+      `#print axioms coherentOfPairChainCover` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+      登録 3件 各 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs).
+      (6.6) 証明の結論 "Repeated use of Theorem (5.6) then shows that X is coherent" (mmd L84) を,
+      landed leaves (G2.1 degree-sort, pass-8 `coherentPairChain`, pass-2 gap leaf, G2.5
+      `sumInflatedDegreeSq`) の上に honest に組み上げる **wiring 定理**:
+  - **`mem_pairUnion`** (membership 특성화): `χ ∈ pairUnion S₀ pair N ↔ χ ∈ S₀ ∨ ∃ j<N, χ ∈ pairSet pair j`.
+    `N` induction (`Nat.lt_succ_iff_lt_or_eq` 분기). engine accumulator 의 멤버십 결정.
+  - **`pairUnion_eq_of_cover`** (set-decomposition bridge, 본 round 의 핵심 신규 content): `S₀ ⊆ X`,
+    각 pair `pairSet pair j ⊆ X` (`j<N`), `X` 가 `S₀`+pairs 로 covered ⟹ `pairUnion S₀ pair N = X`.
+    `Set.Subset.antisymm` + `mem_pairUnion`. = degree-monotone enum (`exists_monotoneDegreeEnum`)
+    이 `X = S − S(Z)` 를 equal-min-degree prefix `S₀` 와 나머지 conjugate pair 들로 쪼갠 것을
+    engine accumulator `pairUnion S₀ pair N` 와 동일시하는 다리.
+  - **`coherentOfPairChainCover`** (`noncomputable def`, = G2.6 GOAL `IsCoherent τ X A`): pair-chain
+    decomposition data (`pair`, `N`, `hS₀`/`hpairs`/`hcover`) + base coherence `h0 : IsCoherent τ S₀ A`
+    ((1.1)+(1.4) prefix) + per-step (5.6) adjoining `hstep` ⟹ `IsCoherent τ X A`. 증명 =
+    `pairUnion_eq_of_cover … ▸ coherentPairChain S₀ pair h0 N hstep`. (6.6) 결론 shape 산출.
+  - **honest 판정**: thin wrapper 아님 — `coherentPairChain` 은 `IsCoherent (pairUnion S₀ pair N) A`
+    만 주고, `coherentOfPairChainCover` 는 set-decomposition bridge (`pairUnion_eq_of_cover`,
+    `mem_pairUnion` 위) 를 추가해 **(6.6) 의 실제 결론 `IsCoherent τ X A`** 를 산출. `h0`/`hstep`
+    은 (6.6) 증명구조를 정직히 반영하는 *공급* 입력 (base prefix coherence / per-step retarget) 이며
+    결과를 posit 하지 않음 — 결론은 chain 으로 **derived**. memory `scaffold-sorry-free-not-done` 에
+    비추어, instruction 이 명시적으로 허용한 wiring boundary (ν basis extension G2.7 미완) 까지만 landing.
+  - **정밀 잔존 (G2.6 이후, G2.7 = `hstep` 입력 생산)**: `hstep` 의 각 step 은 `retarget_isCoherent`
+    1회이며, 그 입력 중 **target characters `{Xᵢ, X̄ᵢ}` (orthonormal in `ℤ[Irr G]`) + image equation
+    `(χ − a·χ₁)^τ = X − a·χ₁^{τ₁}` + lattice 직교 `X,X̄ ⊥ τ₁ξ`** 의 *구성* 이 미완 = **G2.7 Dade
+    isometry ν basis extension** (Dade context 의 character theory; `coherentPairChain` 의 docstring
+    이 "references the current extension `hcoh.extension`, hence given as a function of the running
+    witness" 로 명시한 부분). degree 부등식 부분 (`2χᵢ(1)χ₁(1) < ∑_{j<i}χⱼ(1)²`) 은 이미 landed
+    (`two_mul_lt_sq_of_primePow_gap` ← G2.5 `sumInflatedDegreeSq` degree-sum). 또한 caller 가
+    decomposition data (`pair`/`N`/cover) 를 `exists_monotoneDegreeEnum` enum 과 conjugate-pairing
+    에서 *구성* 하는 작업 (conjugate pair `{χᵢ, χ̄ᵢ}` 를 degree-block 안에서 짝짓기) 도 별도 — 본
+    wiring 정리는 그 decomposition 을 추상 data 로 받아 engine 에 정직히 흘림.
 
 ## 完了条件
 

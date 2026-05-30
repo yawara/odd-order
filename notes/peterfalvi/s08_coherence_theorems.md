@@ -334,6 +334,34 @@ landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allow
   per-step (5.6) data: θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)²∣∑_{j<i}`) + base prefix coherence
   ((1.1)/(1.4)) — character-theory/구조정수 작업으로 별도.
 
+### (2026-05-31, G2.6 WIRING) (6.6) coherence-of-X 결론 `IsCoherent τ X A` 의 조립
+
+(6.6) 증명의 결론 "Repeated use of Theorem (5.6) then shows that X is coherent" (mmd L84) 을, landed
+leaves (G2.1 degree-sort `exists_monotoneDegreeEnum`, pass-8 `coherentPairChain` 엔진, pass-2 gap leaf
+`two_mul_lt_sq_of_primePow_gap`, G2.5 degree-sum `sumInflatedDegreeSq`) 위에 honest 하게 조립하는
+**wiring 정리** 를 `S07_Coherence.lean` ((6.6) section 의 `coherentPairChain` 직후) 에 landing
+(sorry/axiom 無 — `#print axioms coherentOfPairChainCover` = {propext, Classical.choice, Quot.sound};
+AxiomsCheck 등록 3건 각 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑
+3360/3343 jobs):
+
+- **`mem_pairUnion`** (membership 특성화): `χ ∈ pairUnion S₀ pair N ↔ χ ∈ S₀ ∨ ∃ j<N, χ ∈ pairSet pair j`.
+  `N` induction. engine accumulator 의 멤버십 결정.
+- **`pairUnion_eq_of_cover`** (set-decomposition bridge): `S₀ ⊆ X` + 각 pair ⊆ X + `X` cover ⟹
+  `pairUnion S₀ pair N = X`. = degree-monotone enum (`exists_monotoneDegreeEnum`) 이 `X = S − S(Z)`
+  를 equal-min-degree prefix `S₀` 와 나머지 conjugate pair 들로 쪼갠 것을 engine accumulator
+  `pairUnion S₀ pair N` 와 동일시하는 다리. **본 round 의 핵심 신규 content** (`coherentPairChain` 미제공).
+- **`coherentOfPairChainCover`** (`noncomputable def`, = G2.6 GOAL): pair-chain decomposition data +
+  base coherence `h0 : IsCoherent τ S₀ A` ((1.1)+(1.4) prefix) + per-step (5.6) adjoining `hstep` ⟹
+  `IsCoherent τ X A`. 증명 = `pairUnion_eq_of_cover … ▸ coherentPairChain S₀ pair h0 N hstep`.
+- **honest 판정**: thin wrapper 아님 — `coherentPairChain` 은 `IsCoherent (pairUnion S₀ pair N) A` 만
+  주고, 본 정리는 set-decomposition bridge 를 추가해 **(6.6) 의 실제 결론 `IsCoherent τ X A`** 산출;
+  `h0`/`hstep` 은 (6.6) 증명구조의 *공급* 입력, 결론은 chain 으로 derived (posit 無). instruction 이
+  명시 허용한 wiring boundary 까지만 landing.
+- **정밀 잔존 (G2.7)**: `hstep` 각 step 의 `retarget_isCoherent` 입력 중 **target characters
+  `{Xᵢ, X̄ᵢ}` + image equation + lattice 직교** 의 *구성* = **Dade isometry ν basis extension** 미완
+  (degree 부등식 부분은 이미 landed). + caller 의 decomposition data (`pair`/`N`/cover) 를 enum +
+  conjugate-pairing 에서 구성하는 작업 (별도). 상세는 issue 0046 G2.6.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

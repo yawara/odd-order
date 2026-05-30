@@ -2166,6 +2166,49 @@ theorem pairUnion_mono (S₀ : Set (ClassFunction L ℂ))
   | refl => exact Set.Subset.rfl
   | step _ ih => exact ih.trans (subset_pairUnion_succ (L := L) S₀ pair _)
 
+/-- Membership in `pairUnion S₀ pair N`: an element is either in the base `S₀` or in one of the
+adjoined pairs `{χⱼ, χ̄ⱼ}` with `j < N`. -/
+theorem mem_pairUnion {S₀ : Set (ClassFunction L ℂ)}
+    {pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ} {χ : ClassFunction L ℂ} {N : ℕ} :
+    χ ∈ pairUnion (L := L) S₀ pair N ↔
+      χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ pairSet (L := L) pair j := by
+  induction N with
+  | zero => simp [pairUnion]
+  | succ N ih =>
+    rw [pairUnion_succ, Set.mem_union, ih]
+    constructor
+    · rintro ((hS₀ | ⟨j, hjN, hj⟩) | hpair)
+      · exact Or.inl hS₀
+      · exact Or.inr ⟨j, hjN.trans (Nat.lt_succ_self N), hj⟩
+      · exact Or.inr ⟨N, Nat.lt_succ_self N, hpair⟩
+    · rintro (hS₀ | ⟨j, hjN, hj⟩)
+      · exact Or.inl (Or.inl hS₀)
+      · rcases Nat.lt_succ_iff_lt_or_eq.mp hjN with hlt | heq
+        · exact Or.inl (Or.inr ⟨j, hlt, hj⟩)
+        · exact Or.inr (heq ▸ hj)
+
+/-- The pair-chain reaches exactly `X`: if the base `S₀ ⊆ X`, every adjoined pair `pairSet pair j`
+(`j < N`) lies in `X`, and conversely every element of `X` is in `S₀` or in some adjoined pair,
+then `pairUnion S₀ pair N = X`.
+
+This is the set-theoretic bridge between the `coherentPairChain` engine (which concludes coherence
+of the accumulated set `pairUnion S₀ pair N`) and the target set `X = S − S(Z)` of (6.6): the
+degree-monotone enumeration of `X` (`exists_monotoneDegreeEnum`) splits `X` into the equal-minimal
+-degree prefix `S₀` and the remaining conjugate pairs `{χᵢ, χ̄ᵢ}`, and this lemma certifies that
+adjoining those pairs to `S₀` recovers `X`. -/
+theorem pairUnion_eq_of_cover {S₀ X : Set (ClassFunction L ℂ)}
+    {pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ} {N : ℕ}
+    (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := L) pair j ⊆ X)
+    (hcover : ∀ χ ∈ X, χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ pairSet (L := L) pair j) :
+    pairUnion (L := L) S₀ pair N = X := by
+  apply Set.Subset.antisymm
+  · intro χ hχ
+    rcases mem_pairUnion.mp hχ with hbase | ⟨j, hjN, hj⟩
+    · exact hS₀ hbase
+    · exact hpairs j hjN hj
+  · intro χ hχ
+    exact mem_pairUnion.mpr (hcover χ hχ)
+
 /-- **Peterfalvi (6.6): the "repeated use of (5.6)" iteration engine.**
 
 Given a coherent base set `S₀` (the equal-minimal-degree prefix coherence supplied by (1.1)+(1.4))
@@ -2194,6 +2237,40 @@ noncomputable def coherentPairChain
     hstep N (Nat.lt_succ_self N)
       (coherentPairChain S₀ pair h0 N
         (fun i hi => hstep i (hi.trans (Nat.lt_succ_self N))))
+
+/-- **Peterfalvi (6.6): coherence of `X = S − S(Z)`.**
+
+The conclusion of (6.6): the center-conditioned character set `X = {χ ∈ Irr L | Z ⊄ Ker χ}` is
+coherent.  This assembles the (6.6) argument's final step "Repeated use of Theorem (5.6) then shows
+that `X` is coherent" (mmd L84) by combining the **pair-chain decomposition** of `X` with the
+`coherentPairChain` iteration engine.
+
+The hypotheses encode the (6.6) proof structure exactly:
+* a degree-ordered **decomposition** of `X` into a base set `S₀` (the equal-minimal-degree prefix
+  `{χ₁,…,χₖ}`) and the remaining conjugate pairs `pair j = (χ_{k+j}, χ̄_{k+j})`, certified to
+  recover `X` by `pairUnion_eq_of_cover` (`hS₀`, `hpairs`, `hcover`) — the genuinely new content
+  here, threading the `exists_monotoneDegreeEnum` sort into the engine's accumulator;
+* the **base coherence** `h0 : IsCoherent τ S₀ A`, which (6.6) supplies by (1.1)+(1.4)
+  ("By (1.1) and (1.4), `{χ₁,…,χₖ}` is coherent");
+* the per-step **(5.6) adjoining** `hstep`, each step one application of (5.6)
+  (`retarget_isCoherent`) whose degree inequality `2χᵢ(1)χ₁(1) < ∑_{j<i}χⱼ(1)²` is discharged by
+  the gap leaf `two_mul_lt_sq_of_primePow_gap` fed by the degree-sum `sumInflatedDegreeSq`.
+
+`h0` and `hstep` are *supplied* (the base-prefix coherence and the per-step retarget data), not
+posited as the result: the conclusion `IsCoherent τ X A` is **derived** from them through the
+chain.  See the issue note for the precise residual (the construction of `hstep`'s per-step `{Xᵢ,
+X̄ᵢ}` target data needs the Dade-isometry ν basis extension, G2.7). -/
+noncomputable def coherentOfPairChainCover
+    {τ : IntegralCharacterMap L G} {A : Set L} {X S₀ : Set (ClassFunction L ℂ)}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (N : ℕ)
+    (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := L) pair j ⊆ X)
+    (hcover : ∀ χ ∈ X, χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ pairSet (L := L) pair j)
+    (h0 : IsCoherent τ S₀ A)
+    (hstep : ∀ i, i < N → IsCoherent τ (pairUnion (L := L) S₀ pair i) A →
+      IsCoherent τ (pairUnion (L := L) S₀ pair (i + 1)) A) :
+    IsCoherent τ X A :=
+  pairUnion_eq_of_cover hS₀ hpairs hcover ▸ coherentPairChain S₀ pair h0 N hstep
 
 /-! ### Peterfalvi (5.6.1): the family bundle
 
