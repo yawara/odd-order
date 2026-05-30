@@ -436,6 +436,25 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - **caller 측 잔여 (G2.0 이후)**: (6.6) 본문이 이 leaf 를 instantiate 하려면 `X = S − S(Z)` 의
     nonemptiness (`Z ≠ 1` ⟹ `Z ⊄ Ker χ` 인 irreducible 존재) + `S(Z)` conj-폐쇄성 (그래야 `X`
     가 conj-폐쇄) 을 공급해야 함. 이는 §6 setup-specific character theory 로 별도 leaf.
+- [x] (2026-05-31, G2.1) **(6.6) opening "Set `X = {χ₁,…,χₙ}`, where `χ₁(1) ≤ ⋯ ≤ χₙ(1)`" (mmd L76)**
+      = degree-sort 단계 를 `S07_Coherence.lean` ((6.6) section, `two_le_ncard_…` 직전) 에 landing
+      (sorry/axiom 無 — `#print axioms` = `[propext, Classical.choice, Quot.sound]`; AxiomsCheck 등록
+      1건 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑).
+  - **`exists_monotoneDegreeEnum`**: `X : Set (ClassFunction L ℂ)` finite ⟹ `∃ e : Fin X.ncard →
+    ClassFunction L ℂ`, injective + `∀ i, e i ∈ X` + range = X (`∀ χ∈X, ∃ i, e i = χ`) + real degree
+    key `χ ↦ (characterDegree χ).re` 따라 monotone (`i ≤ j ⟹ (deg (e i)).re ≤ (deg (e j)).re`).
+    mmd L76 의 정직한 일반형. 구성: 유한성 → `Fintype.equivFinOfCardEq` 로 `g : X ≃ Fin n`
+    (`n=X.ncard`; bridge `Fintype.card = Nat.card = ncard`), key `k i := (deg (g.symm i)).re`,
+    `σ := Tuple.sort k`, `e i := g.symm (σ i)`. injective = `Subtype.val ∘ g.symm ∘ σ` 세 합성;
+    surjective = `i = σ⁻¹(g⟨χ,_⟩)`; monotone = `Tuple.monotone_sort k` (`(deg (e i)).re = (k∘σ) i`).
+  - **honest 판정**: thin wrapper 아님 — `Tuple.sort`/`Tuple.monotone_sort` 만으로는 *set* 의 monotone
+    enumeration 이 안 나옴 (임의 `Fin n ≃ X` 선택 + key pull-back + injective/surjective/range 재조립).
+    순수 order-이론적 "finite family 를 real key 로 sort" 단계 — irreducibility/induced-from-K/p-power
+    degree 전혀 미사용, 임의 finite class-function set 에 일반형. import `Mathlib.Data.Fin.Tuple.Sort`.
+  - **caller 측 잔여 (G2.1 이후)**: enumeration → `coherentPairChain` 의 `pair : ℕ → χ×χ̄` + base
+    prefix `{χ₁,…,χₖ}` (equal-minimal-degree, (1.1)+(1.4) coherent) 연결 + per-step (5.6) data 생산
+    (θᵢ(1) p-power, [Is] Cor 2.30, `χᵢ(1)² ∣ ∑_{j<i}` → `two_mul_lt_sq_of_primePow_gap`). enumeration
+    자체는 `Fin n` monotone; pair-인덱스(`ℕ`) 캐스팅·base 분리는 별도 leaf.
 
 ## 完了条件
 

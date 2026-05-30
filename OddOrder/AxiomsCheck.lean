@@ -1136,6 +1136,12 @@ set_option linter.style.longLine false in
 -- accumulated-set monotonicity helper is `pairUnion_mono`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono
+-- (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76): the degree-sorted indexing
+-- of the finite set `X = S − S(Z)`.  `exists_monotoneDegreeEnum` produces an injective surjection
+-- `e : Fin (X.ncard) → X` monotone in the real degree key `χ ↦ (characterDegree χ).re` — the purely
+-- order-theoretic "sort a finite family by a real key" step (`Tuple.sort`/`Tuple.monotone_sort`),
+-- stated for an arbitrary finite class-function set (no irreducibility / induced-structure used).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_monotoneDegreeEnum
 -- (6.6) opening "By (1.1), n ≥ 2" (mmd L76): the count `n = |X|` of the irreducible characters of
 -- `L` not killing `Z` satisfies `n ≥ 2`.  The two consequences of (1.1) used — closure under
 -- conjugation (`ClosedUnderConjugate`) and no real character (`HasNoRealCharacters`), both §7

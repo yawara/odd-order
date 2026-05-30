@@ -245,6 +245,29 @@ allowlist):
   (`Z ≠ 1` ⟹ `Z ⊄ Ker χ`인 irreducible 존재) + `S(Z)` conj-폐쇄성 (→ `X` conj-폐쇄)을 공급해야
   함 — §6 setup-specific character theory의 별도 leaf. 상세는 issue 0046 G2.0.
 
+### (2026-05-31, G2.1) (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76)
+
+(6.6) 증명이 `n=|X|` 다음 곧바로 하는 **degree-sort** "Set `X = {χ₁,…,χₙ}`, where `χ₁(1) ≤ ⋯ ≤
+χₙ(1)`"를 `S07_Coherence.lean` ((6.6) section, `two_le_ncard_…` 직전)에 landing (sorry/axiom 無 —
+`#print axioms exists_monotoneDegreeEnum` = `[propext, Classical.choice, Quot.sound]`; AxiomsCheck
+등록 1건 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑):
+
+- **`exists_monotoneDegreeEnum`**: `X : Set (ClassFunction L ℂ)` finite ⟹ `∃ e : Fin X.ncard →
+  ClassFunction L ℂ`, `e` injective + `∀ i, e i ∈ X` + `∀ χ∈X, ∃ i, e i = χ` (range = X) + real
+  degree key `χ ↦ (characterDegree χ).re` 따라 monotone (`i ≤ j ⟹ (deg (e i)).re ≤ (deg (e j)).re`).
+  구성: 유한성 → `Fintype.equivFinOfCardEq` 로 `g : X ≃ Fin n` (`n = X.ncard`, bridge `Fintype.card
+  = Nat.card = ncard`), key `k i := (deg (g.symm i)).re`, `σ := Tuple.sort k`, `e i := g.symm (σ i)`.
+  injective = `Subtype.val ∘ g.symm ∘ σ` 세 합성; surjective = `i = σ⁻¹(g⟨χ,_⟩)`; monotone =
+  `Tuple.monotone_sort k` (`k ∘ σ` monotone, 그리고 `(deg (e i)).re = (k∘σ) i` 정의적).
+- **honest 판정**: thin wrapper 아님 — `Tuple.sort`/`Tuple.monotone_sort`만으로는 *set*의 monotone
+  enumeration이 안 나옴 (set → 임의 `Fin n ≃ X` 선택 + key pull-back + injective/surjective/range 재조립
+  필요). 순수 order-이론적 "finite family를 real key로 sort" 단계로, irreducibility/induced-from-K/p-power
+  degree 사실 전혀 사용 안 함 — 임의 finite class-function set에 대해 일반형으로 statement.
+- **caller 측 잔여 (G2.1 이후)**: 이 enumeration을 `coherentPairChain`의 `pair : ℕ → χ×χ̄`와 base
+  prefix `{χ₁,…,χₖ}` (equal-minimal-degree, (1.1)+(1.4) coherent)로 연결 + per-step (5.6) data 생산
+  (θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` → `two_mul_lt_sq_of_primePow_gap`).
+  enumeration 자체는 `Fin n` 인덱스 monotone; pair-인덱스(`ℕ`)로의 캐스팅·base 분리는 별도 leaf.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

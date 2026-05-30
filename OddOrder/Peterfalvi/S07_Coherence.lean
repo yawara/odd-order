@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Module.Submodule.LinearMap
+import Mathlib.Data.Fin.Tuple.Sort
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 
@@ -2054,6 +2055,52 @@ This subsection provides the **iteration engine** for that argument, decoupled f
 (6.6)-specific degree/divisibility arithmetic (which is what *produces* each step's (5.6) inputs).
 The accumulated set `pairUnion S₀ pair i` and the fold `coherentPairChain` make "repeated use of
 (5.6)" precise: the final coherence is **derived** by induction on the pair count, never posited. -/
+
+/-- **Peterfalvi (6.6): "Set `X = {χ₁,…,χₙ}` where `χ₁(1) ≤ ⋯ ≤ χₙ(1)`".**
+
+The (6.6) proof opens by *sorting* the finite set `X = S − S(Z)` by character degree: it writes
+`X = {χ₁,…,χₙ}` with `χ₁(1) ≤ ⋯ ≤ χₙ(1)`.  Formally this is a monotone enumeration of the finite
+set: an injective surjection `e : Fin n → X` (here `n = |X| = X.ncard`) along which the real degree
+key `χ ↦ (characterDegree χ).re` is non-decreasing.
+
+The construction is the standard one: pick any bijection `Fin n ≃ X` (from finiteness), then permute
+the index set by `Tuple.sort` applied to the degree key, which makes the composite degree-monotone
+(`Tuple.monotone_sort`).  Nothing here uses irreducibility, the induced-from-`K` structure, or the
+`p`-power degree facts — it is the purely order-theoretic "sort a finite family by a real key" step,
+stated for an arbitrary finite set of class functions.  The enumeration is the indexing `χ₁,…,χₙ`
+the rest of the (6.6) argument refers to; the degree of `χᵢ` (a positive integer for genuine
+characters) is recorded through its real part, which the monotonicity orders. -/
+theorem exists_monotoneDegreeEnum {X : Set (ClassFunction L ℂ)} (hXfin : X.Finite) :
+    ∃ e : Fin X.ncard → ClassFunction L ℂ,
+      Function.Injective e ∧ (∀ i, e i ∈ X) ∧ (∀ χ ∈ X, ∃ i, e i = χ) ∧
+      ∀ ⦃i j : Fin X.ncard⦄, i ≤ j →
+        (OddOrder.Peterfalvi.S03.characterDegree (e i)).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (e j)).re := by
+  classical
+  letI : Fintype X := hXfin.fintype
+  -- `Fin n ≃ X`, where `n = X.ncard`.
+  have hcard : Fintype.card X = X.ncard := by
+    rw [← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+  let g : X ≃ Fin X.ncard := Fintype.equivFinOfCardEq hcard
+  -- The real degree key, pulled back along the chosen indexing.
+  let k : Fin X.ncard → ℝ :=
+    fun i => (OddOrder.Peterfalvi.S03.characterDegree (g.symm i : ClassFunction L ℂ)).re
+  -- Sort the index set by the key; the composite key is monotone.
+  let σ : Equiv.Perm (Fin X.ncard) := Tuple.sort k
+  refine ⟨fun i => (g.symm (σ i) : ClassFunction L ℂ), ?_, ?_, ?_, ?_⟩
+  · -- Injective: `Subtype.val ∘ g.symm ∘ σ`, all three injective.
+    intro i j hij
+    exact σ.injective (g.symm.injective (Subtype.coe_injective hij))
+  · -- Each value lies in `X`.
+    intro i
+    exact (g.symm (σ i)).2
+  · -- Surjective onto `X`: hit `χ` at `i = σ⁻¹ (g ⟨χ, _⟩)`.
+    intro χ hχ
+    refine ⟨σ.symm (g ⟨χ, hχ⟩), ?_⟩
+    simp only [σ.apply_symm_apply, g.symm_apply_apply]
+  · -- Monotone in the key: `(characterDegree (e ·)).re = (k ∘ σ) ·`, and `k ∘ σ` is monotone.
+    intro i j hij
+    exact Tuple.monotone_sort k hij
 
 /-- **Peterfalvi (6.6): "By (1.1), `n ≥ 2`".**
 
