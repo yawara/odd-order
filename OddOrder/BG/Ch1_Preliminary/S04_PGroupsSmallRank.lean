@@ -2312,7 +2312,7 @@ Proof by strong induction on `|G|`, both `G` and `j` generalised:
 * `Nontrivial G`, `j ≥ 2`: `|Z(G)| = pᵏ` with `k ≥ 1` (`card_center_eq_prime_pow`), so
   `|G/Z| ≤ p^((j-1)+1)`; the inductive hypothesis (on `j - 1 ≥ 1`) gives
   `cl(G/Z) ≤ j - 1`, and `cl(G) = cl(G/Z) + 1 ≤ j`. -/
-private theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
+theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
     {G : Type*} [Group G] [Finite G] (hG : IsPGroup p G) {j : ℕ} (hj : 1 ≤ j)
     (hcard : Nat.card G ≤ p ^ (j + 1)) : Group.nilpotencyClass G ≤ j := by
   have hp : p.Prime := Fact.out
@@ -2405,7 +2405,7 @@ the packaged-commutator hypothesis required by `omega1_pow_eq_one`.
 `cl(G) ≤ 3 ⇒ γ₄ = lowerCentralSeries G 3 = ⊥`. The element `⁅⁅a, b⁆, c⁆` lies in
 `γ₃ = lowerCentralSeries G 2`, so for every `d`, `⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ γ₄ = ⊥`, i.e.
 `⁅⁅a, b⁆, c⁆` commutes with every `d`, i.e. it is central. -/
-private theorem pointwise_central_of_nilpotencyClass_le_three {G : Type*} [Group G]
+theorem pointwise_central_of_nilpotencyClass_le_three {G : Type*} [Group G]
     [Group.IsNilpotent G] (h : Group.nilpotencyClass G ≤ 3) :
     ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G := by
   -- `γ₄ = lowerCentralSeries G 3 = ⊥`.
@@ -2609,6 +2609,462 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
     have hcoe : ((⟨x, hxK⟩ * ⟨y, hyK⟩ : ↥K) : R') ^ p = 1 := by
       rw [← Subgroup.coe_pow, hxyKp, Subgroup.coe_one]
     simpa using hcoe
+
+/-- A maximal (coatom) normal subgroup `M` of a finite `p`-group `Q` has index `p`:
+`Q/M` is a nontrivial `p`-group whose only subgroups are `⊥` and `⊤` (correspondence with
+the coatom `M`), so a Cauchy order-`p` subgroup must be all of `Q/M`. -/
+private theorem index_eq_prime_of_coatom {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
+    [Fact p.Prime] (hQpg : IsPGroup p Q) (M : Subgroup Q) [M.Normal] (hM_coatom : IsCoatom M) :
+    M.index = p := by
+  have hp : p.Prime := Fact.out
+  haveI hQMpg : IsPGroup p (Q ⧸ M) := hQpg.to_quotient M
+  haveI hQMnt : Nontrivial (Q ⧸ M) := QuotientGroup.nontrivial_iff.mpr hM_coatom.1
+  have hpdvd : p ∣ Nat.card (Q ⧸ M) := by
+    rcases hQMpg.card_eq_or_dvd with h1 | hd
+    · exact absurd (Finite.card_le_one_iff_subsingleton.mp h1.le)
+        (not_subsingleton_iff_nontrivial.mpr hQMnt)
+    · exact hd
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := Q ⧸ M) p hpdvd
+  set H : Subgroup (Q ⧸ M) := Subgroup.zpowers g with hH_def
+  have hHcard : Nat.card H = p := by rw [hH_def, Nat.card_zpowers, hg]
+  have hHne : H ≠ ⊥ := by
+    intro h; rw [h, Subgroup.card_bot] at hHcard; exact hp.one_lt.ne' hHcard.symm
+  set Hc : Subgroup Q := H.comap (QuotientGroup.mk' M) with hHc_def
+  have hM_le : M ≤ Hc := by
+    rw [hHc_def]; intro m hm
+    rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff m).mpr hm]
+    exact one_mem H
+  have hHc_eq : H = Hc.map (QuotientGroup.mk' M) := by
+    rw [hHc_def, Subgroup.map_comap_eq, QuotientGroup.range_mk', top_inf_eq]
+  have hHc_ne_M : Hc ≠ M := by
+    intro heq; apply hHne; rw [hHc_eq, heq, QuotientGroup.map_mk'_self]
+  have hHc_top : Hc = ⊤ := by
+    rcases (hM_coatom.le_iff.mp hM_le) with h | h
+    · exact h
+    · exact absurd h.symm hHc_ne_M.symm
+  have hH_top : H = ⊤ := by
+    rw [hHc_eq, hHc_top, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective M)]
+  rw [Subgroup.index_eq_card]
+  have hcard : Nat.card (Q ⧸ M) = Nat.card H := by
+    rw [hH_top]; exact (Nat.card_congr (Subgroup.topEquiv).toEquiv).symm
+  rw [hcard, hHcard]
+
+/-- **BG Lemma 4.9** (mmd L1522-1544). For `p > 3`, a `p`-group `R` with `|Ω₁(R)| ≤ p²`
+satisfies `|Ω₁(R/T)| ≤ p²` for *every* normal subgroup `T ⊴ R`.
+
+The proof is the double minimal-counterexample argument of BG: take `R` minimal among
+counterexamples (strong induction on `|R|`) and, within `R`, take `T₀ ⊴ R` minimal subject
+to `|Ω₁(R/T₀)| > p²`.
+
+* `|T₀| = p`: otherwise pick a central `Z ≤ T₀ ∩ Z(R)` of order `p`; minimality of `T₀`
+  gives `|Ω₁(R/Z)| ≤ p²`, induction (`|R/Z| < |R|`) applied to `R/Z` with `T₀/Z` plus the
+  third isomorphism `(R/Z)/(T₀/Z) ≅ R/T₀` give `|Ω₁(R/T₀)| ≤ p²`, contradiction.
+* `(4.6)`: `|R| = p⁴` and `R/T₀` has exponent `p`. The key sub-fact is that *every proper
+  subgroup* `K < R/T₀` has `|Ω₁(K)| ≤ p²` (lift `K` to `K̃ < R`, apply induction to `K̃`).
+  Hence `Ω₁(R/T₀)` is not contained in any maximal subgroup, so `Ω₁(R/T₀) = ⊤`; with
+  Prop 4.8(b) (rank `≤ 2`) resp. the elementary-abelian extraction (rank `> 2`) this forces
+  `R/T₀` of exponent `p` and order `p³`, whence `|R| = p⁴` (`|T₀| = p`).
+* Final contradiction: `|Ω₁(R)| = p²` (Lemma 4.5 lower bound + hypothesis), so
+  `|R/Ω₁(R)| = p²`. Since `cl(R) ≤ 3` (from `|R| ≤ p⁴`), `φ(x) = xᵖ` is a homomorphism
+  (Prop 4.3(b)) with `ker φ = Ω₁(R)` and image in `T₀`, giving
+  `p² = |R/Ω₁(R)| = |R/ker φ| = |im φ| ≤ |T₀| = p`, a contradiction. -/
+theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : ℕ}
+    [Fact p.Prime] (hR : IsPGroup p R) (hp3 : 3 < p)
+    (hΩ : Nat.card (Omega R p 1) ≤ p ^ 2) (T : Subgroup R) [T.Normal] :
+    Nat.card (Omega (R ⧸ T) p 1) ≤ p ^ 2 := by
+  classical
+  have hp : p.Prime := Fact.out
+  have hodd : Odd p := hp.odd_of_ne_two (by omega)
+  -- Strong induction on `|R|`, with `R` and the hypotheses packaged in the motive.
+  let motive : ℕ → Prop := fun n =>
+    ∀ {R' : Type _} [Group R'] [Finite R'], IsPGroup p R' → Nat.card (Omega R' p 1) ≤ p ^ 2 →
+      Nat.card R' = n → ∀ (T' : Subgroup R') [T'.Normal],
+        Nat.card (Omega (R' ⧸ T') p 1) ≤ p ^ 2
+  refine (Nat.strongRecOn (motive := motive) (Nat.card R) ?_) hR hΩ rfl T
+  clear hR hΩ
+  intro n ih R' _ _ hR' hΩ' hcard T' hT'N
+  -- `ih : ∀ m < n, motive m`.
+  -- Goal: `∀ T' [Normal], |Ω₁(R'/T')| ≤ p²`. By contradiction, pick a minimal bad `T₀`.
+  by_contra hcon
+  -- minimal `T₀` among normal subgroups with `|Ω₁(R'/T₀)| > p²`.
+  have hex : ∃ (S : Subgroup R') (_ : S.Normal), p ^ 2 < Nat.card (Omega (R' ⧸ S) p 1) := by
+    refine ⟨T', hT'N, ?_⟩; exact lt_of_not_ge hcon
+  let Qpred : {S : Subgroup R' // S.Normal} → Prop := fun S =>
+    haveI := S.2; p ^ 2 < Nat.card (Omega (R' ⧸ S.1) p 1)
+  have hQne : {S : {S : Subgroup R' // S.Normal} | Qpred S}.Nonempty := by
+    obtain ⟨S, hN, h⟩ := hex; exact ⟨⟨S, hN⟩, h⟩
+  obtain ⟨T₀sub, hT₀mem, hT₀minraw⟩ :=
+    Set.exists_min_image {S | Qpred S} (fun S => Nat.card S.1) (Set.toFinite _) hQne
+  set T₀ : Subgroup R' := T₀sub.1 with hT₀def
+  haveI hT₀N : T₀.Normal := T₀sub.2
+  have hT₀bad : p ^ 2 < Nat.card (Omega (R' ⧸ T₀) p 1) := hT₀mem
+  have hT₀min : ∀ (S : Subgroup R') [S.Normal],
+      p ^ 2 < Nat.card (Omega (R' ⧸ S) p 1) → Nat.card T₀ ≤ Nat.card S := by
+    intro S hSN hSbad; exact hT₀minraw ⟨S, hSN⟩ hSbad
+  have hQpg : IsPGroup p (R' ⧸ T₀) := hR'.to_quotient T₀
+  -- `R'/T₀` is nontrivial since `|Ω₁(R'/T₀)| > p² > 1`.
+  haveI hQnt : Nontrivial (R' ⧸ T₀) := by
+    rcases subsingleton_or_nontrivial (R' ⧸ T₀) with hs | hn
+    · exfalso
+      haveI := hs
+      have h1 : Nat.card (Omega (R' ⧸ T₀) p 1) ≤ Nat.card (R' ⧸ T₀) :=
+        Subgroup.card_le_card_group _
+      have h2 : Nat.card (R' ⧸ T₀) = 1 :=
+        Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, inferInstance⟩
+      rw [h2] at h1
+      have : 1 < p ^ 2 := by nlinarith [hp.two_le]
+      omega
+    · exact hn
+  -- ============================================================
+  -- Fact F: every proper subgroup `K < R'/T₀` has `|Ω₁(K)| ≤ p²`.
+  -- ============================================================
+  have factF : ∀ (K : Subgroup (R' ⧸ T₀)), K ≠ ⊤ →
+      Nat.card (Omega ↥K p 1) ≤ p ^ 2 := by
+    intro K hKtop
+    -- Lift `K` to `M ≤ R'` via `comap (mk' T₀)`; then `K = M.map (mk' T₀)`, `M ≠ ⊤`.
+    set M : Subgroup R' := K.comap (QuotientGroup.mk' T₀) with hM_def
+    have hMmap : M.map (QuotientGroup.mk' T₀) = K := by
+      rw [hM_def, Subgroup.map_comap_eq, QuotientGroup.range_mk', top_inf_eq]
+    have hMtop : M ≠ ⊤ := by
+      intro hMtop'
+      exact hKtop (by rw [← hMmap, hMtop',
+        Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective T₀)])
+    haveI hMpg : IsPGroup p ↥M := hR'.to_subgroup M
+    have hMcard_lt : Nat.card ↥M < n := by
+      rw [← hcard]
+      have hdvd : Nat.card ↥M ∣ Nat.card R' := ⟨M.index, by rw [mul_comm, M.index_mul_card]⟩
+      have hle : Nat.card ↥M ≤ Nat.card R' := Nat.le_of_dvd Nat.card_pos hdvd
+      have hne : Nat.card ↥M ≠ Nat.card R' := fun heq => hMtop (Subgroup.eq_top_of_card_eq _ heq)
+      exact Nat.lt_of_le_of_ne hle hne
+    -- `|Ω₁(↥M)| ≤ |Ω₁(R')| ≤ p²` (`Ω₁(↥M)` maps into `Ω₁(R')`).
+    have hΩM : Nat.card (Omega ↥M p 1) ≤ p ^ 2 := by
+      have hmap_le : (Omega ↥M p 1).map M.subtype ≤ Omega R' p 1 := by
+        rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+        rintro ⟨g, hgM⟩ (hg : (⟨g, hgM⟩ : ↥M) ^ (p ^ 1) = 1)
+        change (⟨g, hgM⟩ : ↥M) ∈ Subgroup.comap M.subtype (Omega R' p 1)
+        rw [Subgroup.mem_comap]
+        have hgp : g ^ (p ^ 1) = 1 := by
+          have := congrArg (Subgroup.subtype M) hg; rwa [map_pow, map_one] at this
+        exact Omega.mem_of_pow_eq_one hgp
+      calc Nat.card (Omega ↥M p 1)
+          = Nat.card ((Omega ↥M p 1).map M.subtype) :=
+            (Subgroup.card_map_of_injective M.subtype_injective).symm
+        _ ≤ Nat.card (Omega R' p 1) := Subgroup.card_le_of_le hmap_le
+        _ ≤ p ^ 2 := hΩ'
+    -- Induction on `↥M`: `4.9` holds for `↥M`.
+    have h49M : ∀ (U : Subgroup ↥M) [U.Normal], Nat.card (Omega (↥M ⧸ U) p 1) ≤ p ^ 2 :=
+      fun U _ => ih (Nat.card ↥M) hMcard_lt hMpg hΩM rfl U
+    -- Transport: `↥K ≃ ↥M ⧸ (T₀.subgroupOf M)` via the first isomorphism theorem.
+    let φ : M →* (R' ⧸ T₀) := (QuotientGroup.mk' T₀).comp M.subtype
+    have hrange : φ.range = K := by
+      rw [← hMmap]; ext x; simp [φ, MonoidHom.mem_range, Subgroup.mem_map]
+    let e : (↥M ⧸ φ.ker) ≃* ↥φ.range := QuotientGroup.quotientKerEquivRange φ
+    have hmap : (Omega (↥M ⧸ φ.ker) p 1).map e.toMonoidHom = Omega (↥φ.range) p 1 := by
+      rw [Omega, Omega, MonoidHom.map_closure]
+      congr 1
+      ext b
+      simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+      constructor
+      · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
+      · intro hb
+        refine ⟨e.symm b, ?_, e.apply_symm_apply b⟩
+        have hbb : e (e.symm b ^ p ^ 1) = b ^ p ^ 1 := by rw [map_pow, e.apply_symm_apply]
+        rw [hb] at hbb
+        have h1 : e.symm b ^ p ^ 1 = e.symm 1 := by rw [← hbb, e.symm_apply_apply]
+        rw [h1, map_one]
+    have hcardeq : Nat.card (Omega (↥φ.range) p 1) = Nat.card (Omega (↥M ⧸ φ.ker) p 1) := by
+      rw [← hmap]; exact Subgroup.card_map_of_injective (f := e.toMonoidHom) e.injective
+    rw [show Nat.card (Omega ↥K p 1) = Nat.card (Omega (↥φ.range) p 1) by rw [hrange], hcardeq]
+    exact h49M φ.ker
+  -- ============================================================
+  -- Step 1: `|T₀| = p`.
+  -- ============================================================
+  have hT₀card : Nat.card T₀ = p := by
+    haveI hT₀pg : IsPGroup p T₀ := hR'.to_subgroup T₀
+    -- `T₀` is nontrivial: if `T₀ = ⊥`, then `R'/⊥ ≃* R'` and `|Ω₁(R'/T₀)| = |Ω₁(R')| ≤ p²`,
+    -- contradicting `|Ω₁(R'/T₀)| > p²`.
+    have hT₀nt : Nontrivial T₀ := by
+      rcases subsingleton_or_nontrivial T₀ with hs | hn
+      · exfalso
+        have hbot : T₀ = ⊥ := by
+          rw [Subgroup.eq_bot_iff_card]
+          exact Nat.card_eq_one_iff_unique.mpr ⟨hs, ⟨1⟩⟩
+        -- `R'/T₀ ≃* R'/⊥ ≃* R'` (avoids rewriting `T₀` inside a quotient type).
+        let e : (R' ⧸ T₀) ≃* R' :=
+          (QuotientGroup.quotientMulEquivOfEq hbot).trans (QuotientGroup.quotientBot (G := R'))
+        have hmap : (Omega (R' ⧸ T₀) p 1).map e.toMonoidHom = Omega R' p 1 := by
+          rw [Omega, Omega, MonoidHom.map_closure]; congr 1; ext b
+          simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+          constructor
+          · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
+          · intro hb; refine ⟨e.symm b, ?_, e.apply_symm_apply b⟩
+            have hbb : e (e.symm b ^ p ^ 1) = b ^ p ^ 1 := by rw [map_pow, e.apply_symm_apply]
+            rw [hb] at hbb
+            have h1 : e.symm b ^ p ^ 1 = e.symm 1 := by rw [← hbb, e.symm_apply_apply]
+            rw [h1, map_one]
+        have hceq : Nat.card (Omega (R' ⧸ T₀) p 1) = Nat.card (Omega R' p 1) := by
+          rw [← hmap]
+          exact (Subgroup.card_map_of_injective (f := e.toMonoidHom) e.injective).symm
+        rw [hceq] at hT₀bad; omega
+      · exact hn
+    by_contra hne
+    -- Take a central `Z ≤ T₀` of order `p`.
+    have hinf_nt : Nontrivial ((T₀ ⊓ Subgroup.center R' : Subgroup R')) :=
+      OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial hR' hT₀nt
+    have hpg_inf : IsPGroup p (T₀ ⊓ Subgroup.center R' : Subgroup R') := hR'.to_subgroup _
+    have hpdvd : p ∣ Nat.card (T₀ ⊓ Subgroup.center R' : Subgroup R') := by
+      rcases hpg_inf.card_eq_or_dvd with h1 | hd
+      · exact absurd (Finite.card_le_one_iff_subsingleton.mp h1.le)
+          (not_subsingleton_iff_nontrivial.mpr hinf_nt)
+      · exact hd
+    obtain ⟨g, hg⟩ :=
+      exists_prime_orderOf_dvd_card' (G := (T₀ ⊓ Subgroup.center R' : Subgroup R')) p hpdvd
+    set z : R' := (g : R') with hz_def
+    set Z : Subgroup R' := Subgroup.zpowers z with hZ_def
+    have hZ_le_center : Z ≤ Subgroup.center R' := by
+      rw [hZ_def, Subgroup.zpowers_le]; exact g.2.2
+    haveI hZ_normal : Z.Normal := by
+      constructor; intro nn hnn g'
+      have := Subgroup.mem_center_iff.mp (hZ_le_center hnn) g'
+      rw [this, mul_assoc, mul_inv_cancel, mul_one]; exact hnn
+    have hZT : Z ≤ T₀ := by rw [hZ_def, Subgroup.zpowers_le]; exact g.2.1
+    have hZcard : Nat.card Z = p := by
+      rw [hZ_def, Nat.card_zpowers, hz_def, Subgroup.orderOf_coe, hg]
+    -- `|T₀| > p` (since `|T₀| ≥ |Z| = p` and `|T₀| ≠ p`).
+    have hT₀_gt : p < Nat.card T₀ := by
+      have hge : p ≤ Nat.card T₀ := hZcard ▸ Subgroup.card_le_of_le hZT
+      omega
+    -- Minimality of `T₀`: `|Z| = p < |T₀|` ⇒ `|Ω₁(R'/Z)| ≤ p²`.
+    have hΩRZ : Nat.card (Omega (R' ⧸ Z) p 1) ≤ p ^ 2 := by
+      by_contra hbad
+      have hbad' : p ^ 2 < Nat.card (Omega (R' ⧸ Z) p 1) := lt_of_not_ge hbad
+      have := hT₀min Z hbad'; rw [hZcard] at this; omega
+    -- `|R'/Z| < |R'| = n`.
+    have hRZ_lt : Nat.card (R' ⧸ Z) < n := by
+      rw [← hcard, ← Z.index_eq_card]
+      have hmul := Z.card_mul_index
+      have hZpos : 1 < Nat.card Z := by rw [hZcard]; exact hp.one_lt
+      calc Z.index = Nat.card R' / Nat.card Z := by
+              rw [← hmul, Nat.mul_div_cancel_left _ Nat.card_pos]
+        _ < Nat.card R' := Nat.div_lt_self Nat.card_pos hZpos
+    haveI hRZpg : IsPGroup p (R' ⧸ Z) := hR'.to_quotient Z
+    haveI hT₀map_normal : (T₀.map (QuotientGroup.mk' Z)).Normal :=
+      Subgroup.Normal.map (inferInstance : T₀.Normal) (QuotientGroup.mk' Z)
+        (QuotientGroup.mk'_surjective Z)
+    -- Induction on `R'/Z` with `T₀/Z = T₀.map (mk' Z)`.
+    have h49RZ := ih (Nat.card (R' ⧸ Z)) hRZ_lt hRZpg hΩRZ rfl (T₀.map (QuotientGroup.mk' Z))
+    -- Third isomorphism `(R'/Z)/(T₀/Z) ≃* R'/T₀`, transport `Ω₁`.
+    let e := QuotientGroup.quotientQuotientEquivQuotient Z T₀ hZT
+    have hmap : (Omega ((R' ⧸ Z) ⧸ (T₀.map (QuotientGroup.mk' Z))) p 1).map e.toMonoidHom
+        = Omega (R' ⧸ T₀) p 1 := by
+      rw [Omega, Omega, MonoidHom.map_closure]; congr 1; ext b
+      simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+      constructor
+      · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
+      · intro hb; refine ⟨e.symm b, ?_, e.apply_symm_apply b⟩
+        have hbb : e (e.symm b ^ p ^ 1) = b ^ p ^ 1 := by rw [map_pow, e.apply_symm_apply]
+        rw [hb] at hbb
+        have h1 : e.symm b ^ p ^ 1 = e.symm 1 := by rw [← hbb, e.symm_apply_apply]
+        rw [h1, map_one]
+    have hcard_eq : Nat.card (Omega (R' ⧸ T₀) p 1)
+        = Nat.card (Omega ((R' ⧸ Z) ⧸ (T₀.map (QuotientGroup.mk' Z))) p 1) := by
+      rw [← hmap]; exact Subgroup.card_map_of_injective (f := e.toMonoidHom) e.injective
+    rw [hcard_eq] at hT₀bad
+    exact absurd h49RZ (not_le.mpr hT₀bad)
+  -- ============================================================
+  -- Step 2 (4.6): `R'/T₀` has exponent `p`, `|R'/T₀| = p³`, `|R'| = p⁴`.
+  -- ============================================================
+  -- Helper: a subgroup `K ≤ M ≤ R'/T₀` of exponent `p` injects into `Ω₁(M)`.
+  have hexp_card_le : ∀ (K M : Subgroup (R' ⧸ T₀)), K ≤ M → (∀ k ∈ K, k ^ p = 1) →
+      Nat.card K ≤ Nat.card (Omega ↥M p 1) := by
+    intro K M hKM hKexp
+    have hsub_le : K.subgroupOf M ≤ Omega ↥M p 1 := by
+      intro k hk
+      rw [Subgroup.mem_subgroupOf] at hk
+      refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]; apply Subtype.ext
+      rw [Subgroup.coe_pow, Subgroup.coe_one]; exact hKexp _ hk
+    calc Nat.card K = Nat.card (K.subgroupOf M) :=
+          (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv).symm
+      _ ≤ Nat.card (Omega ↥M p 1) := Subgroup.card_le_of_le hsub_le
+  -- `R'/T₀` has exponent `p` and order `p³`. Case split on `pRank (R'/T₀) p`.
+  have hQ : (∀ x : R' ⧸ T₀, x ^ p = 1) ∧ Nat.card (R' ⧸ T₀) = p ^ 3 := by
+    rcases Nat.lt_or_ge (OddOrder.GroupTheory.pRank (R' ⧸ T₀) p) 3 with hr | hr
+    · -- Case `r(R'/T₀) ≤ 2`.
+      have hr2 : OddOrder.GroupTheory.pRank (R' ⧸ T₀) p ≤ 2 := by omega
+      -- Prop 4.8(b): every element of `Ω₁(R'/T₀)` has `p`-th power `1`.
+      have hΩexp : ∀ g ∈ Omega (R' ⧸ T₀) p 1, g ^ p = 1 := fun g hg =>
+        omega1_pow_eq_one_of_pRank_le_two_of_three_lt hQpg hp3 hr2 hg
+      -- `Ω₁(R'/T₀) = ⊤`: else it sits in a maximal subgroup `M̄`, but then
+      -- `|Ω₁(R'/T₀)| ≤ |Ω₁(M̄)| ≤ p²` (Fact F), contradicting `|Ω₁(R'/T₀)| > p²`.
+      have hΩtop : Omega (R' ⧸ T₀) p 1 = ⊤ := by
+        by_contra hne
+        obtain ⟨M, hM_coatom, hΩM_le⟩ :=
+          (IsCoatomic.eq_top_or_exists_le_coatom (Omega (R' ⧸ T₀) p 1)).resolve_left hne
+        have hMtop : M ≠ ⊤ := hM_coatom.1
+        have hcard_le := hexp_card_le (Omega (R' ⧸ T₀) p 1) M hΩM_le hΩexp
+        have := hcard_le.trans (factF M hMtop)
+        omega
+      have hexp : ∀ x : R' ⧸ T₀, x ^ p = 1 := fun x =>
+        hΩexp x (hΩtop ▸ Subgroup.mem_top x)
+      refine ⟨hexp, ?_⟩
+      -- `|R'/T₀| ≤ p³` (Prop 4.8(a)) and `> p²` (since `Ω₁ = ⊤`), so `= p³`.
+      have hub : Nat.card (R' ⧸ T₀) ≤ p ^ 3 :=
+        card_le_prime_cube_of_pRank_le_two_of_exponent_prime hQpg hr2 hexp
+      have hgt : p ^ 2 < Nat.card (R' ⧸ T₀) := by
+        have : Nat.card (Omega (R' ⧸ T₀) p 1) = Nat.card (R' ⧸ T₀) := by
+          rw [hΩtop]; exact Nat.card_congr (Subgroup.topEquiv).toEquiv
+        rw [← this]; exact hT₀bad
+      -- `p² < |Q| ≤ p³`, `|Q|` a power of `p` ⇒ `|Q| = p³`.
+      obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hQpg
+      rw [hm] at hub hgt ⊢
+      have h2 : 2 < m := (Nat.pow_lt_pow_iff_right hp.one_lt).mp hgt
+      have h3 : m ≤ 3 := (Nat.pow_le_pow_iff_right hp.one_lt).mp hub
+      have : m = 3 := by omega
+      rw [this]
+    · -- Case `r(R'/T₀) ≥ 3`: there is an elementary abelian `A` with `p³ ≤ |A|`.
+      have hnotle : ¬ OddOrder.GroupTheory.pRank (R' ⧸ T₀) p ≤ 2 := by omega
+      rw [OddOrder.GroupTheory.pRank_le_iff] at hnotle
+      simp only [not_forall, not_le, exists_prop] at hnotle
+      obtain ⟨A, hA_elem, hA_log⟩ := hnotle
+      have hA_card_ge : p ^ 3 ≤ Nat.card A := by
+        calc p ^ 3 ≤ p ^ (Nat.log p (Nat.card A)) :=
+              Nat.pow_le_pow_right hp.pos (by omega)
+          _ ≤ Nat.card A := Nat.pow_log_le_self p Nat.card_pos.ne'
+      have hA_exp : ∀ a ∈ A, a ^ p = 1 := by
+        intro a ha
+        have := hA_elem.pow_eq_one ⟨a, ha⟩
+        simpa using congrArg (Subtype.val) this
+      -- `A = ⊤`: else `A ≤ coatom M̄`, but then `p³ ≤ |A| ≤ |Ω₁(M̄)| ≤ p²`, contradiction.
+      have hAtop : A = ⊤ := by
+        by_contra hne
+        obtain ⟨M, hM_coatom, hAM_le⟩ :=
+          (IsCoatomic.eq_top_or_exists_le_coatom A).resolve_left hne
+        have hcard_le := hexp_card_le A M hAM_le hA_exp
+        have hcontra := hA_card_ge.trans (hcard_le.trans (factF M hM_coatom.1))
+        have : p ^ 2 < p ^ 3 := Nat.pow_lt_pow_right hp.one_lt (by norm_num)
+        omega
+      -- `R'/T₀` is elementary abelian (`= A`), hence exponent `p`.
+      have hQ_elem : (⊤ : Subgroup (R' ⧸ T₀)).IsElementaryAbelian p := hAtop ▸ hA_elem
+      have hexp : ∀ x : R' ⧸ T₀, x ^ p = 1 := by
+        intro x
+        have := hQ_elem.pow_eq_one ⟨x, Subgroup.mem_top x⟩
+        simpa using congrArg (Subtype.val) this
+      refine ⟨hexp, ?_⟩
+      -- `|R'/T₀| ≥ p³` (from `A`) and `≤ p³` (each maximal subgroup has order `≤ p²`).
+      have hge : p ^ 3 ≤ Nat.card (R' ⧸ T₀) := by
+        calc p ^ 3 ≤ Nat.card A := hA_card_ge
+          _ ≤ Nat.card (R' ⧸ T₀) := Subgroup.card_le_card_group A
+      have hle : Nat.card (R' ⧸ T₀) ≤ p ^ 3 := by
+        -- maximal `M̄`: `|M̄| ≤ p²` (Fact F, `M̄` exp `p`), index `p`, so `|Q| ≤ p³`.
+        obtain ⟨M, hM_coatom, _⟩ :=
+          (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup (R' ⧸ T₀))).resolve_left
+            (fun hbot => (bot_lt_top (α := Subgroup (R' ⧸ T₀))).ne hbot)
+        have hMtop : M ≠ ⊤ := hM_coatom.1
+        haveI : M.Normal := hM_coatom.normal_of_isPGroup hQpg
+        have hMexp_card : Nat.card M ≤ p ^ 2 :=
+          (hexp_card_le M M (le_refl M) (fun k _ => hexp k)).trans (factF M hMtop)
+        have hindex : M.index = p := index_eq_prime_of_coatom hQpg M hM_coatom
+        calc Nat.card (R' ⧸ T₀) = M.index * Nat.card M := (M.index_mul_card).symm
+          _ = p * Nat.card M := by rw [hindex]
+          _ ≤ p * p ^ 2 := Nat.mul_le_mul_left p hMexp_card
+          _ = p ^ 3 := by ring
+      exact le_antisymm hle hge
+  have hQexp : ∀ x : R' ⧸ T₀, x ^ p = 1 := hQ.1
+  have hQcard : Nat.card (R' ⧸ T₀) = p ^ 3 := hQ.2
+  have hR'card : Nat.card R' = p ^ 4 := by
+    have hmul := T₀.card_mul_index
+    rw [hT₀card, Subgroup.index_eq_card, hQcard] at hmul
+    rw [← hmul]; ring
+  -- ============================================================
+  -- Step 3: `|Ω₁(R')| = p²`, `|R'/Ω₁(R')| = p²`.
+  -- ============================================================
+  have hΩeq : Nat.card (Omega R' p 1) = p ^ 2 := by
+    -- `R'/T₀` is noncyclic (`|Ω₁(R'/T₀)| > p² > p`), hence `R'` is noncyclic.
+    have hQnc : ¬ IsCyclic (R' ⧸ T₀) := by
+      intro hcyc
+      haveI := hcyc
+      have := card_omega1_eq_prime_of_isCyclic hQpg
+      rw [this] at hT₀bad
+      nlinarith [hp.two_le]
+    have hRnc : ¬ IsCyclic R' := by
+      intro hcyc
+      haveI := hcyc
+      haveI : IsCyclic (R' ⧸ T₀) :=
+        isCyclic_of_surjective (QuotientGroup.mk' T₀) (QuotientGroup.mk'_surjective T₀)
+      exact hQnc inferInstance
+    -- Lemma 4.5(a): `R'` has an elementary abelian subgroup `E` of order `p²`; `E ≤ Ω₁(R')`.
+    obtain ⟨E, hE_elem, hE_card⟩ :=
+      exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hR' hodd hRnc
+    have hE_le : E ≤ Omega R' p 1 := by
+      intro a ha
+      refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]
+      have := hE_elem.pow_eq_one ⟨a, ha⟩
+      simpa using congrArg (Subtype.val) this
+    have hlb : p ^ 2 ≤ Nat.card (Omega R' p 1) := by
+      rw [← hE_card]; exact Subgroup.card_le_of_le hE_le
+    exact le_antisymm hΩ' hlb
+  have hRΩcard : Nat.card (R' ⧸ Omega R' p 1) = p ^ 2 := by
+    have hmul := (Omega R' p 1).card_mul_index
+    rw [Subgroup.index_eq_card, hΩeq, hR'card] at hmul
+    have : p ^ 2 * Nat.card (R' ⧸ Omega R' p 1) = p ^ 2 * p ^ 2 := by rw [hmul]; ring
+    exact Nat.eq_of_mul_eq_mul_left (by positivity) this
+  -- ============================================================
+  -- Step 4: `φ(x) = xᵖ` is a homomorphism `R' →* R'`, image `≤ T₀`.
+  -- ============================================================
+  -- cl(R') ≤ 3
+  haveI : Group.IsNilpotent R' := hR'.isNilpotent
+  have hclass : Group.nilpotencyClass R' ≤ 3 :=
+    nilpotencyClass_le_of_card_le_pow hR' (j := 3) (by norm_num) (by simpa using hR'card.le)
+  have hc3 : ∀ a b c : R', ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center R' :=
+    pointwise_central_of_nilpotencyClass_le_three hclass
+  -- `commutator R' ≤ Ω₁(R')` from `R'/Ω₁(R')` abelian (order p²).
+  have hcomm_le : _root_.commutator R' ≤ Omega R' p 1 := by
+    haveI : IsMulCommutative (R' ⧸ Omega R' p 1) :=
+      IsMulCommutative.of_comm (IsPGroup.commutative_of_card_eq_prime_sq hRΩcard)
+    exact (Subgroup.Normal.quotient_commutative_iff_commutator_le).mp ‹_›
+  have hpow_hom : ∀ x y : R', (x * y) ^ p = x ^ p * y ^ p := fun x y =>
+    pow_mul_eq_mul_pow_of_commutator_le_omega1 hR' hodd (Or.inr ⟨hp3, hc3⟩) hcomm_le x y
+  let φ : R' →* R' := MonoidHom.mk' (fun x => x ^ p) (fun x y => hpow_hom x y)
+  -- image ≤ T₀
+  have hφ_range : φ.range ≤ T₀ := by
+    rintro _ ⟨x, rfl⟩
+    change (x ^ p) ∈ T₀
+    have hq : (QuotientGroup.mk' T₀ x) ^ p = 1 := hQexp _
+    rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hq
+    exact hq
+  -- ============================================================
+  -- Step 5: `ker φ = Ω₁(R')` and the final contradiction.
+  -- ============================================================
+  have hker : φ.ker = Omega R' p 1 := by
+    let om : Subgroup R' :=
+      { carrier := {g : R' | g ^ p = 1}
+        mul_mem' := fun {x y} hx hy => by
+          rw [Set.mem_setOf_eq] at hx hy ⊢; rw [hpow_hom, hx, hy, mul_one]
+        one_mem' := one_pow p
+        inv_mem' := fun {x} hx => by
+          rw [Set.mem_setOf_eq, inv_pow, (by exact hx : x ^ p = 1), inv_one] }
+    have hker_eq : φ.ker = om := by
+      ext x; simp only [MonoidHom.mem_ker, MonoidHom.mk'_apply, φ]; rfl
+    rw [hker_eq]
+    apply le_antisymm
+    · intro x hx
+      exact Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx)
+    · rw [Omega, Subgroup.closure_le]
+      intro x hx
+      simpa [om] using (pow_one p ▸ hx : x ^ p = 1)
+  -- `|R'/ker φ| = |im φ| ≤ |T₀| = p`, but `= |R'/Ω₁(R')| = p²`.
+  have hquot_card : Nat.card (R' ⧸ φ.ker) = p ^ 2 := by
+    rw [hker]; exact hRΩcard
+  have hrange_card : Nat.card φ.range = p ^ 2 := by
+    have e := QuotientGroup.quotientKerEquivRange φ
+    rw [← hquot_card]; exact (Nat.card_congr e.toEquiv).symm
+  have hle_T₀ : Nat.card φ.range ≤ Nat.card T₀ := Subgroup.card_le_of_le hφ_range
+  rw [hrange_card, hT₀card] at hle_T₀
+  -- `p² ≤ p` with `p > 3`: contradiction.
+  have : p ^ 2 ≤ p := hle_T₀
+  nlinarith [hp.two_le, sq_nonneg p]
 
 end Prop48ExponentP
 
