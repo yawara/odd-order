@@ -723,19 +723,21 @@ theorem inner_self_chi_add_psi_eq
     D.tau1_isometry.inner_eq]
 
 /-- **Peterfalvi (5.4.b).**  If `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²`
-and `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)`.
+and `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²`.
 
 The total-norm identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` together with `‖X‖² ≥ ‖χ‖²`
 (5.4.a) and the hypothesis `‖Y‖² ≥ ‖ψ‖²` forces both inequalities to be equalities.
 The norm equality `‖χ‖² = ‖X‖²` reads `∑ coeff α = ∑ (coeff α)²`, so by the tightness
 of integer Cauchy–Schwarz each `coeff α ∈ {0, 1}`; then `E = {α | coeff α = 1}` and
-`X = ∑_{α ∈ E} α`. -/
+`X = ∑_{α ∈ E} α`.  The cardinality `|E| = ∑ coeff α = ‖χ‖²` is the form used in
+(5.6.3) to compute `‖χ̄^{τ₂}‖² = |R(χ)| - |E| = ‖χ - χ̄‖² - ‖χ‖² = ‖χ̄‖²`. -/
 theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
     (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
     (hY : (ClassFunction.inner ψ ψ).re ≤ (ClassFunction.inner D.Y D.Y).re) :
     (ClassFunction.inner χ χ).re = (ClassFunction.inner D.X D.X).re ∧
       (ClassFunction.inner ψ ψ).re = (ClassFunction.inner D.Y D.Y).re ∧
-      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α := by
+      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α ∧
+        (E.card : ℂ) = ClassFunction.inner χ χ := by
   classical
   -- The `.re` total-norm identity.
   have htotal : (ClassFunction.inner χ χ).re + (ClassFunction.inner ψ ψ).re =
@@ -756,13 +758,24 @@ theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
     exact_mod_cast h1
   have hcoeff01 : ∀ α ∈ D.imageFamily.imageSet, D.coeff α = 0 ∨ D.coeff α = 1 :=
     (finset_sum_eq_sum_sq_iff D.imageFamily.imageSet D.coeff).mp hsum_eq
-  -- `E = {α | coeff α = 1}`; `X = ∑_{α ∈ E} α`.
-  refine ⟨D.imageFamily.imageSet.filter (fun α => D.coeff α = 1), Finset.filter_subset _ _, ?_⟩
-  rw [D.X_eq, Finset.sum_filter]
-  refine Finset.sum_congr rfl fun α hα => ?_
-  rcases hcoeff01 α hα with h0 | h1
-  · rw [h0, if_neg (by norm_num), Int.cast_zero, zero_smul]
-  · rw [h1, if_pos rfl, Int.cast_one, one_smul]
+  -- `E = {α | coeff α = 1}`.
+  set E := D.imageFamily.imageSet.filter (fun α => D.coeff α = 1) with hE
+  refine ⟨E, Finset.filter_subset _ _, ?_, ?_⟩
+  · -- `X = ∑_{α ∈ E} α`.
+    rw [D.X_eq, hE, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun α hα => ?_
+    rcases hcoeff01 α hα with h0 | h1
+    · rw [h0, if_neg (by norm_num), Int.cast_zero, zero_smul]
+    · rw [h1, if_pos rfl, Int.cast_one, one_smul]
+  · -- `|E| = ∑ coeff α = ‖χ‖²`: on `R(χ)`, `coeff α = (if coeff α = 1 then 1 else 0)`.
+    have hcard : (E.card : ℤ) = ∑ α ∈ D.imageFamily.imageSet, D.coeff α := by
+      rw [hE, Finset.card_filter, Nat.cast_sum]
+      refine Finset.sum_congr rfl fun α hα => ?_
+      rcases hcoeff01 α hα with h0 | h1
+      · rw [h0, if_neg (by norm_num), Nat.cast_zero]
+      · rw [h1, if_pos rfl, Nat.cast_one]
+    rw [D.inner_self_chi_eq_intCast]
+    exact_mod_cast hcard
 
 end CharacterPsiDecomposition
 
