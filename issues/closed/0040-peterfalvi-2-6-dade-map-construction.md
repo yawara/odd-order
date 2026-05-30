@@ -100,7 +100,9 @@ created: 2026-05-27
 - [x] **(2.6.b) 前提 — `restrict_mem_ZIrr` + `induce_mem_ZIrr`** (Res/Ind が virtual char を
       保存; InducedCharacter.lean, 2026-05-30 完了, sorry-free + axiom-clean; 下記「進捗 (2)」).
       これは (2.6.b) の単一最大前提だった.
-- [ ] (2.6.b) `PreservesVirtualCharacters (hyp.dadeMap)` → `FullDadeIsometryData` (残り)
+- [x] **(2.6.b) `PreservesVirtualCharacters (hyp.dadeMap)` → `FullDadeIsometryData`**
+      — 2026-05-30 完了 (`preservesVirtualCharacters_dadeMap` + `fullDadeIsometryData`;
+      (2.10) Möbius 完全 assembly; 下記「進捗 (15)」).  **issue close**.
 - [x] **(2.11) restriction 互換性** — 2026-05-30 完了 (`dadeMap_restrict` + `IsDadeMap.unique`;
       下記「進捗 (13)」).  構成済み τ で `(restrict hyp).dadeMap = restrictDomain hyp.dadeMap` を
       **定理として**証明 (インターフェース仮定でない).
@@ -741,3 +743,48 @@ landing したのに続き, 本 round は **STEP 3 (Möbius 相殺) 全体 + STE
 
 合計 ~130-190 LOC, **純粋に組合せ的** (代数 primitive は全 present).  最大の技術的山は項目 1 の
 B-依存 index recast.  別 focused session 推奨.
+
+## 進捗 2026-05-30 (15) — (2.10) Möbius 完全 assembly + FullDadeIsometryData 構成 (issue close)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` の (2.10) Möbius 最終 assembly (STEP 3 残 + STEP 4) を
+**完成**.  `lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し
+(全 landed 定理が 3 axioms 全 allowlist 内).  これで **(2.6) Dade isometry が
+`FullDadeIsometryData` として honest に構成され, issue 0040 close**.
+
+### landed (依存順, 5 commits)
+
+1. **`mobiusTermCF`** / `mobiusTermCF_conjFinset` (orbit 不変) / **`aOrbitFinset a = a^L⊆A`** (固定 index) /
+   **`mobiusTermCF_div_orbit_eq`** = STEP 3 keystone: `mobiusSummand_orbit_weighted` の内側 `b`-和を
+   B-依存 `N_L(B)`-subtype から固定 `aOrbitFinset a` (with `if (b':G)∈N_L(B)` guard) へ reindex
+   (`Finset.sum_bij'`, b↦⟨b.val,_⟩, b∈a^L⊆A).  `Finset.sum_comm` swap 可能形.
+2. helper `exists_mem_H_isConj_of_mem_aOrbitFinset` (b'=a^l∈a^L ⇒ g∈(b'H(b'))^G; witness (a,h) を l で
+   transport) + `mobiusSummand_empty` / `mobiusTermCF_empty` / `mobiusTermCF_of_not_nonempty`.
+3. **`sum_mobiusTermCF_transversalRep_eq_neg`** = **support-side total** `∑_{C∈ℬ} mobiusTermCF(rep C) =
+   -α(a)` (g∈(aH(a))^G): (1) orbit-average ℬ→𝒫 (`sum_transversalRep_eq_sum_div_orbit`); (2) per-B
+   recast (`mobiusTermCF_div_orbit_eq`, empty B 両辺 0); (3) **`Finset.sum_comm` double-sum swap**
+   (∑_B∑_{b'}→∑_{b'}∑_B); (4) 内側 𝒫(b')-和 survivor 崩壊 `mobiusSummand b' g {b'}=-|C_L(b')|`
+   (`sum_mobiusSummand_eq_singleton`+`mobiusSummand_singleton_eq`; powerset→mobiusIndex は ∅ 項 0 で
+   `Finset.sum_subset`); (5) **(2.7) の `sum_card_centralizerIn_eq` 再利用** `∑_{b'∈a^L}|C_L(b')|=|L|`
+   (a^L = support filter Sg), ⇒ `(α(a)/|L|)·(-|L|)=-α(a)`.
+4. **`dadeMap_eq_neg_sum_mobiusTermCF`** = **(2.10) 点別恒等式** `dadeMap α = ⟨g↦-∑_{C∈ℬ}
+   mobiusTermCF(rep C)(g),_⟩` (ClassFunction 等式, `ClassFunction.ext`): support side =
+   `sum_mobiusTermCF_transversalRep_eq_neg`, non-support side = `induce_alphaB_apply_eq_zero_of_…` (各
+   Ind 項 0).  RHS の共役不変性は induced summand の不変性から inline.
+5. **`sum_mobiusTermCF_transversalRep_eq_sum_subtype`** = ℬ-和を fixed-point 代表 subtype
+   `{p:{B//B.Nonempty}//transversalRep(mk'' p.1)=p.1}` 上の `Finset` 和 `∑_p (-1)^|p.1|·Ind p(g)` へ
+   reindex (`Finset.sum_bij'`, C↦⟨rep C,_⟩ / p↦mk'' p.1, `Quotient.out_eq'`; 空 rep は両側脱落).
+   = bridge が要求する `∑ c_p • induceAlphaBTerm p` 形.
+6. **`preservesVirtualCharacters_dadeMap`** = **(2.6.b)**: 上を bridge
+   `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` (s = fixed-point 代表 filter,
+   c p = -(-1)^|p.1|) に投入.  ℤ-smul→ℂ-smul は `Int.cast_smul_eq_zsmul`, Finset-sum 評価は private
+   helper `classFunction_finset_sum_apply`.
+7. **`fullDadeIsometryData`** = **(2.6)**: honest `FullDadeIsometryData` constructor —
+   `toDadeIsometryData := dadeIsometryData hconj` ((2.5)/(2.6.a) bundle) +
+   `preserves_virtualCharacters := preservesVirtualCharacters_dadeMap hconj`.  **もはやインターフェース
+   仮定でなく Hypothesis (2.2) + (2.4.a) HConjInvariant から完全に構成**.
+
+### 完了条件 (達成)
+
+Dade 写像 τ が `IsDadeMap` + isometry ((2.6.a)) + virtual-char 保存 ((2.6.b)) を満たすものとして
+**構成** され (インターフェース仮定でない), (2.8)-(2.11) が形式化された.  §5-§8 (Coherence) は
+`FullDadeIsometryData` を直接 honest に得られる.

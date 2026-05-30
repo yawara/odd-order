@@ -428,3 +428,25 @@ spine を landing したのに続き:
 **残**: 最終 assembly (項目 1: B-依存 `nLStabilizerIn`-index の inner-sum を固定 `aOrbit`-index に
 recast → `Finset.sum_comm` で double-sum swap; 項目 2: combine; 項目 3: STEP 4 配線 →
 `FullDadeIsometryData`).  ~130-190 LOC, 純粋組合せ的.  詳細 = `issues/0040-*` 進捗 (14) 末尾.
+
+## 進捗 (2026-05-30, 続3) — (2.10) Möbius 完全 assembly + FullDadeIsometryData 構成 (issue 0040 CLOSE)
+
+issue 0040「進捗 (15)」参照.  (2.10) Möbius の **STEP 3 残 (double-sum swap + survivor combine) +
+STEP 4 (bridge 配線)** を完成し, **(2.6) Dade isometry を `FullDadeIsometryData` として honest に構成**
+(`S04_DadeIsometry.lean`, 6 commits, sorry-free + axiom-clean).  **issue 0040 close** (`issues/closed/`).
+
+- **`mobiusTermCF_div_orbit_eq`** (STEP 3 keystone): 内側 `b`-和を固定 `aOrbitFinset a = a^L` へ
+  reindex (`Finset.sum_comm` swap 可能形).
+- **`sum_mobiusTermCF_transversalRep_eq_neg`**: support-side total `∑_{C∈ℬ} mobiusTermCF(rep C) =
+  -α(a)` (orbit-average → swap → survivor `mobiusSummand b' g {b'}=-|C_L(b')|` → (2.7) の
+  `sum_card_centralizerIn_eq` で `∑_{b'∈a^L}|C_L(b')|=|L|`).
+- **`dadeMap_eq_neg_sum_mobiusTermCF`**: (2.10) 点別恒等式 `dadeMap α = -∑_ℬ mobiusTermCF(rep)`
+  (support = 上 total, non-support = `induce_alphaB_apply_eq_zero_of_…`).
+- **`sum_mobiusTermCF_transversalRep_eq_sum_subtype`**: ℬ-和を fixed-point rep subtype の `Finset` 和
+  `∑_p (-1)^|p.1|·Ind p` へ reindex (bridge 形).
+- **`preservesVirtualCharacters_dadeMap`** = **(2.6.b)**: bridge
+  `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` に投入 (c p = -(-1)^|p.1|).
+- **`fullDadeIsometryData`** = **(2.6)**: honest constructor (`dadeIsometryData` + 上 preservation).
+
+**§4 The Dade Isometry は (2.1)-(2.11) 全形式化完了**, `FullDadeIsometryData` 実構成済み (§5-§8
+Coherence は honest bundle を直接利用可能).  §4 mini-roadmap の主目的達成.
