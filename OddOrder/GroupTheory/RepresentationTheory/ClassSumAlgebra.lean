@@ -886,6 +886,26 @@ theorem sum_character_eq_card_mul (ρ : Representation ℂ G V) (C : ConjClasses
   congr 2
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
+/-- **The central character is `1` on the identity class** (`ω_ρ(C₀) = 1`), the value Peterfalvi
+uses for the `⟦1⟧` term when collapsing the (6.7.2) right-hand sum to `ψ(1)(a_{ij0} + a_{ij}α)`.
+The identity class is the singleton `{1}`, so `ω_ρ(⟦1⟧) = (1 · χ_ρ(1)) / χ_ρ(1) = 1`. -/
+theorem centralCharacterOfRep_one (ρ : Representation ℂ G V) [IsIrreducible ρ] :
+    centralCharacterOfRep ρ ⟨classSum 1, classSum_mem_center 1⟩ = 1 := by
+  classical
+  haveI := nontrivial_of_isIrreducible ρ
+  have hfr : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+  have hmk : ConjClasses.mk (1 : G) = (1 : ConjClasses G) := (ConjClasses.one_eq_mk_one).symm
+  rw [centralCharacterOfRep_classSum, sum_character_eq_card_mul ρ (1 : ConjClasses G) hmk]
+  -- The identity class is the singleton `{1}` (`mk x = 1 ↔ x = 1`), so its size is `1`.
+  have hcard : Nat.card { x : G // ConjClasses.mk x = (1 : ConjClasses G) } = 1 := by
+    rw [Nat.card_eq_one_iff_unique]
+    refine ⟨⟨fun a b => Subtype.ext ?_⟩, ⟨⟨1, hmk⟩⟩⟩
+    have ha : (a : G) = 1 := mk_eq_one_iff_eq_one.mp a.2
+    have hb : (b : G) = 1 := mk_eq_one_iff_eq_one.mp b.2
+    rw [ha, hb]
+  -- `ω(⟦1⟧) = (1 · χ(1)) / χ(1) = 1`.
+  rw [hcard, ρ.char_one, Nat.cast_one, one_mul, div_self hfr]
+
 end Evaluation
 
 section Integrality

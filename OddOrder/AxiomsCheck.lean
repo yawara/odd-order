@@ -694,6 +694,10 @@ set_option linter.style.longLine false in
 -- `[G:C_G(z)] ∣ [G:P]`, `p ∤ [G:P]`) and `|P| = p^k`.  Discharges the last (6.7.3) atom.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_class_eq_index_centralizer
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.coprime_card_class_card_sylow
+-- Peterfalvi (6.7.3) central-character value on the identity class: `ω_ρ(⟦1⟧) = 1` (the identity
+-- class is the singleton `{1}`, so `ω = 1·χ(1)/χ(1) = 1`).  This is the `ω(C₀) = 1` ingredient of
+-- the right-hand-sum collapse `∑ → ψ(1)(a_{ij0} + a_{ij}α)` in (6.7.2)/(6.7.3).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_one
 -- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
 -- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
 -- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence
