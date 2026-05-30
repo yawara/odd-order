@@ -213,4 +213,27 @@ theorem card_realIrreducibleCharacters_eq_one_of_odd_card' (hodd : Odd (Nat.card
     Nat.card (RealIrreducibleCharacter G) = 1 := by
   rw [brauer_permutation_lemma', ConjClasses.card_realClasses_eq_one_of_odd_card hodd]
 
+/-- In a finite group of odd order, every real irreducible character is the trivial
+irreducible character.  Unconditional form (no character-table hypotheses). -/
+theorem realIrreducibleCharacter_eq_trivial_of_odd_card' (hodd : Odd (Nat.card G))
+    (χ : RealIrreducibleCharacter G) :
+    (χ : IrreducibleCharacter G) = trivialIrreducibleCharacter G := by
+  obtain ⟨η, hη⟩ :=
+    Nat.card_eq_one_iff_exists.mp (card_realIrreducibleCharacters_eq_one_of_odd_card' hodd)
+  have hχ : χ = η := hη χ
+  have htriv : trivialRealIrreducibleCharacter G = η := hη (trivialRealIrreducibleCharacter G)
+  exact congrArg (fun ξ : RealIrreducibleCharacter G => (ξ : IrreducibleCharacter G))
+    (hχ.trans htriv.symm)
+
+/-- **Peterfalvi (1.1)**, pointwise unconditional form.
+
+In a finite group of odd order, a nontrivial irreducible complex character is not real
+(its complex conjugate `χ̄` differs from `χ`).  This is the parity core of the odd-order
+character theory: the only self-conjugate irreducible character is the trivial one. -/
+theorem not_isReal_of_ne_trivial_of_odd_card' (hodd : Odd (Nat.card G))
+    {χ : IrreducibleCharacter G} (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    ¬ ClassFunction.IsReal (χ : ClassFunction G ℂ) := by
+  intro hreal
+  exact hχ (realIrreducibleCharacter_eq_trivial_of_odd_card' hodd ⟨χ, hreal⟩)
+
 end OddOrder.RepresentationTheory

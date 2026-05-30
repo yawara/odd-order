@@ -233,7 +233,16 @@ theorem non_orthogonality_two_families
 ```
 
 **Blocker (7.9)** (最重・多数):
-1. **奇位数 ⇒ 非自明既約は実でない** — (1.1) parity の核。`IsReal.lean` は `IsReal`/`conj` 基盤と
+1. ✅ **解消 (2026-05-30, issue 0044)**: **奇位数 ⇒ 非自明既約は実でない** — (1.1) parity の核を
+   `BrauerPermutationUnconditional.lean` に `not_isReal_of_ne_trivial_of_odd_card'`
+   (`Odd (Nat.card G) → χ ≠ 1 → ¬ IsReal (χ:CF G ℂ)`, unconditional) として sorry-free 実装。
+   旧記述では「`IsReal.lean` は基盤のみで定理が存在しない」としていたが, 実際には Brauer permutation の
+   **unconditional 系** `card_realIrreducibleCharacters_eq_one_of_odd_card'`
+   (`# real Irr = 1`) が既に完成しており, そこから subsingleton 一意性
+   (`Nat.card_eq_one_iff_exists`) で導出した (note の `g↦g²` Frobenius-Schur 構成より軽い経路で完了)。
+   IsReal.lean は BrauerPermutation の上流のため, 定理は下流の Unconditional 側に置いた
+   (循環 import 回避)。`(Δ_1,Δ_2)` parity の核はこれで unblock。 [旧記述↓は参考保持]
+   `IsReal.lean` は `IsReal`/`conj` 基盤と
    `trivialClassFunction_isReal` のみで、**`Odd (Nat.card G) → χ≠1 → ¬IsReal χ` の定理は repo に存在しない**
    (grep 確認済)。これ無しに `(Δ_1,Δ_2)` 偶が言えない。
 2. **(5.9) realness 接続** — `S07_Coherence.lean` の `CharacterDifferenceImage`
@@ -246,9 +255,13 @@ theorem non_orthogonality_two_families
 
 ### 優先順位と次の一手 (plan)
 
-1. **基盤 B3 (奇位数⇒非実)**: `IsReal.lean` に `theorem not_isReal_of_odd_card_of_ne_one` を証明する
-   (写像 `g↦g²` が奇位数群で全単射 ⇒ Frobenius-Schur 指標 `ν₂(χ)=|G|⁻¹Σχ(g²)=0` for χ≠1)。
-   これは (7.9) のみならず §3 (1.1) や 0022/0027 系の共通 unblocker。**最高価値の独立基盤**。
+1. ✅ **基盤 B3 (奇位数⇒非実) — 完了 (2026-05-30, issue 0044)**:
+   `BrauerPermutationUnconditional.lean` に `not_isReal_of_ne_trivial_of_odd_card'`
+   (`Odd (Nat.card G) → χ ≠ 1 → ¬ IsReal (χ:CF G ℂ)`) + 補助
+   `realIrreducibleCharacter_eq_trivial_of_odd_card'` を sorry-free 実装。当初想定の
+   `g↦g²` Frobenius-Schur 経路は不要だった: Brauer permutation lemma の unconditional 系
+   `card_realIrreducibleCharacters_eq_one_of_odd_card'` から subsingleton 一意性で導出。
+   (7.9) のみならず §3 (1.1) / 0022/0027 系の共通 unblocker が解消。AxiomsCheck clean。
 2. **B-disjoint-support**: `ClassFunction.inner_eq_zero_of_disjoint_support` を `inner_eq_inv_card_mul_innerSum`
    から証明 (elementary、1 定理)。
 3. **Burnside (1.5.d)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を named lemma 化 (第二直交関係 / `g=1` 評価)。
