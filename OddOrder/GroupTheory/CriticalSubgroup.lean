@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.PGroup
@@ -35,7 +36,11 @@ CLAUDE.md が定める「`G, Thm` 引用で Isaacs が欠く場合のみ Gorenst
 * (S6) `mul_pow_eq_commutator_pow_mul_of_class_le_two` (Gorenstein 5.3.9 eq.(3.1)),
   `mul_pow_prime_eq_one_of_class_le_two`, `Omega.pow_eq_one_of_class_le_two` /
   `Omega.exponent_eq_of_class_le_two`: 5.3.9(i) = `Ω₁` exponent `p` (`p` odd, cl ≤ 2, 完成).
-* (予定 S3-S7) faithful `p'`-action, `C_{Aut G}(Ω₁ C)` が `p`-群.
+* (S3) `actionCommutator_le_centralizer_of_acts_trivially_of_characteristic` /
+  `IsCritical.actionCommutator_eq_bot_of_acts_trivially`: Gorenstein 5.3.11 (iii)⇒(iv),
+  critical `C` に自明作用する `p'`-自己同型は `P` 全体で自明 (完成).
+* (S7) `autFixerOfOrderP`, `isPGroup_autFixerOfOrderP`: Gorenstein 5.3.10,
+  全位数 `p` 元を固定する `MulAut P` の部分群は `p`-群 (`p` odd, 完成).
 
 ## Implementation notes
 
@@ -756,5 +761,259 @@ theorem Omega.exponent_eq_of_class_le_two [Fact p.Prime] (hp_odd : Odd p)
   · exact hp
 
 end Omega1ClassTwo
+
+/-! ## (iii) ⇒ (iv): faithfulness of a critical subgroup (`S3`)
+
+Gorenstein 5.3.11, (iii) ⇒ (iv): a `p'`-automorphism of `P` acting trivially on a
+critical (more generally, self-centralizing characteristic) subgroup `C` is
+trivial. The argument (Gorenstein, mmd L3917): with `A = ⟨ψ⟩` acting trivially on
+`C`, the three-subgroup lemma gives `[A, P] ⊆ C_P(C)`; by self-centrality
+`C_P(C) ⊆ C`, so `A` stabilises `P ⊇ C ⊇ 1`, whence `A = 1`.
+
+The "stabiliser is trivial" step is realised through the **coprime collapse**
+`actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime` (Isaacs Lem 4.28
+corollary): since `[P, A] ⊆ C` and `A` fixes `C` pointwise, `A` acts trivially on
+`[P, A] = actionCommutator φ`; coprimality (`A` is `p'`, `P` is a `p`-group) plus
+solvability of `P` then force `actionCommutator φ = ⊥`. -/
+
+section Faithful
+
+open OddOrder.Isaacs.Ch04
+open scoped commutatorElement
+
+variable {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
+variable {A : Type*} [Group A] [Finite A]
+
+/-- If `A` acts trivially on a characteristic self-centralizing subgroup `C`
+(`C ≤ C_P(C)`-image suffices via `IsCritical`), then `[P, A] = actionCommutator φ`
+centralizes `C`, i.e. `actionCommutator φ ≤ C_P(C)`.
+
+This is the three-subgroup-lemma core of Gorenstein 5.3.11 (iii)⇒(iv), carried out
+in `Γ = P ⋊[φ] A` exactly as in `actionCommutator_commutator_eq_bot_of_acts_trivially`. -/
+theorem actionCommutator_le_centralizer_of_acts_trivially_of_characteristic
+    {φ : A →* MulAut P} {C : Subgroup P} (hC_char : C.Characteristic)
+    (h_triv : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ) :
+    actionCommutator φ ≤ Subgroup.centralizer (C : Set P) := by
+  haveI : C.Characteristic := hC_char
+  haveI : C.Normal := inferInstance
+  -- Work in `Γ = P ⋊[φ] A`.
+  set XG : Subgroup (P ⋊[φ] A) := (SemidirectProduct.inl : P →* P ⋊[φ] A).range with hXG
+  set YA : Subgroup (P ⋊[φ] A) := (SemidirectProduct.inr : A →* P ⋊[φ] A).range with hYA
+  set XC : Subgroup (P ⋊[φ] A) := C.map (SemidirectProduct.inl : P →* P ⋊[φ] A) with hXC
+  set H_Γ : Subgroup (P ⋊[φ] A) := ⁅XG, YA⁆ with hHΓ_def
+  have h_HΓ_eq : (actionCommutator φ).map SemidirectProduct.inl = H_Γ :=
+    actionCommutator_map_inl φ
+  -- Step 1: `⁅XC, YA⁆ = ⊥` (A acts trivially on C).
+  have h_step1 : ⁅XC, YA⁆ = ⊥ := by
+    rw [hXC, eq_bot_iff, Subgroup.commutator_le]
+    rintro _ ⟨c, hc, rfl⟩ _ ⟨a, rfl⟩
+    rw [SemidirectProduct.commutator_inl_inr, Subgroup.mem_bot]
+    have h_fix : (φ a) c = c := h_triv hc a
+    rw [show (φ a) c⁻¹ = ((φ a) c)⁻¹ from map_inv (φ a) c, h_fix, mul_inv_cancel]
+    exact map_one _
+  -- `⁅XG, XC⁆ ≤ XC`: `[P, C] ⊆ C` (C normal), pushed by `inl`.
+  have h_GC_le : ⁅XG, XC⁆ ≤ XC := by
+    rw [hXG, hXC, show (SemidirectProduct.inl : P →* P ⋊[φ] A).range
+        = (⊤ : Subgroup P).map SemidirectProduct.inl from
+        (MonoidHom.range_eq_map _), ← Subgroup.map_commutator]
+    exact Subgroup.map_mono (Subgroup.commutator_le_right _ _)
+  -- Step 2: `⁅⁅XG, XC⁆, YA⁆ = ⊥`.
+  have h_step2 : ⁅⁅XG, XC⁆, YA⁆ = ⊥ :=
+    le_bot_iff.mp <| le_trans (Subgroup.commutator_mono h_GC_le le_rfl) h_step1.le
+  -- Three-subgroups (H₁ = YA, H₂ = XG, H₃ = XC): conclude `⁅⁅YA, XG⁆, XC⁆ = ⊥`.
+  have h_three : ⁅⁅YA, XG⁆, XC⁆ = ⊥ := by
+    have h_a : ⁅⁅XG, XC⁆, YA⁆ = ⊥ := h_step2
+    have h_b : ⁅⁅XC, YA⁆, XG⁆ = ⊥ := by rw [h_step1, Subgroup.commutator_bot_left]
+    exact Subgroup.commutator_commutator_eq_bot_of_rotate h_a h_b
+  -- `⁅YA, XG⁆ = ⁅XG, YA⁆ = H_Γ`, so `⁅H_Γ, XC⁆ = ⊥`.
+  have h_HΓ_XC : ⁅H_Γ, XC⁆ = ⊥ := by
+    rwa [Subgroup.commutator_comm YA XG, ← hHΓ_def] at h_three
+  -- Pull back via `inl`: `⁅actionCommutator φ, C⁆ = ⊥` in `P`.
+  have h_pull : ⁅actionCommutator φ, C⁆ = ⊥ := by
+    apply Subgroup.map_injective (f := (SemidirectProduct.inl : P →* P ⋊[φ] A))
+      SemidirectProduct.inl_injective
+    rw [Subgroup.map_commutator, h_HΓ_eq, Subgroup.map_bot]
+    exact h_HΓ_XC
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+  exact h_pull
+
+/-- **Gorenstein "Finite Groups" Theorem 5.3.11, (iii) ⇒ (iv)** (`S3`). A
+`p'`-automorphism group `A` of a `p`-group `P` (`p` odd) acting trivially on a
+critical subgroup `C` acts trivially on all of `P`: `actionCommutator φ = ⊥`.
+
+More precisely only the characteristic and self-centralizing properties of `C` are
+used (`IsCritical.characteristic` and `IsCritical.centralizer_eq`).
+
+Proof: by `actionCommutator_le_centralizer_of_acts_trivially_of_characteristic`,
+`actionCommutator φ ≤ C_P(C)`; by self-centrality `C_P(C) = Z(C)`-image `⊆ C`, so
+`A` fixes `actionCommutator φ` pointwise (as it fixes `C`). Coprimality (`A` is
+`p'`, `P` is a `p`-group) and solvability of `P` (`p`-group ⇒ nilpotent ⇒ solvable)
+give `actionCommutator φ = ⊥` by the coprime collapse Lem 4.28 corollary. -/
+theorem IsCritical.actionCommutator_eq_bot_of_acts_trivially
+    {φ : A →* MulAut P} (hp_odd : p ≠ 2) (hP : IsPGroup p P)
+    (hA_p' : ¬ p ∣ Nat.card A) {C : Subgroup P} (hC : IsCritical C)
+    (h_triv : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ) :
+    actionCommutator φ = ⊥ := by
+  haveI : C.Characteristic := hC.characteristic
+  -- `actionCommutator φ ≤ C_P(C) = Z(C)-image ⊆ C`.
+  have h_le_cent : actionCommutator φ ≤ Subgroup.centralizer (C : Set P) :=
+    actionCommutator_le_centralizer_of_acts_trivially_of_characteristic hC.characteristic h_triv
+  have h_cent_le_C : Subgroup.centralizer (C : Set P) ≤ C := by
+    rw [hC.centralizer_eq]
+    rintro _ ⟨z, _, rfl⟩
+    exact z.2
+  have h_ac_le_C : actionCommutator φ ≤ C := le_trans h_le_cent h_cent_le_C
+  -- `A` fixes `actionCommutator φ` pointwise (it fixes `C ⊇ actionCommutator φ`).
+  have h_triv_ac : ∀ a : A, ∀ h ∈ actionCommutator φ, (φ a) h = h := by
+    intro a h hh
+    exact h_triv (h_ac_le_C hh) a
+  -- Coprimality of `|A|` and `|P|` (`P` is a `p`-group, `p ∤ |A|`).
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := P)).mp hP
+  have hCop : Nat.Coprime (Nat.card A) (Nat.card P) := by
+    rw [hk]
+    exact (Nat.Coprime.pow_right k
+      ((Fact.out (p := p.Prime)).coprime_iff_not_dvd.mpr hA_p').symm)
+  -- `P` is solvable (`p`-group ⇒ nilpotent ⇒ solvable).
+  haveI : Group.IsNilpotent P := hP.isNilpotent
+  haveI : IsSolvable P := inferInstance
+  exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime hCop (Or.inr inferInstance)
+    h_triv_ac
+
+end Faithful
+
+/-! ## `C_{Aut P}(Ω₁)` is a `p`-group (Gorenstein Thm 5.3.10, `S7`)
+
+Gorenstein 5.3.10: a `p'`-group of automorphisms of a `p`-group `P` (`p` odd)
+acting trivially on `Ω₁(P)` is trivial. The Lean engine is
+`OddOrder.Isaacs.Ch04.isaacs_thm_4_36` (= Isaacs Thm 4.36 = BG Thm 1.11): for
+`p` odd, a `p'`-group `A` acting on a `p`-group `P` and fixing every element of
+order dividing `p` acts trivially.
+
+We package the contrapositive as: the subgroup of `MulAut P` fixing every
+order-`p` element of `P` is itself a `p`-group. The proof: any subgroup `A` of
+this fixer with `p ∤ |A|` acts trivially (`isaacs_thm_4_36`), hence is trivial; by
+Cauchy no prime `q ≠ p` can divide the order of the fixer, so it is a `p`-group. -/
+
+section AutFixer
+
+open OddOrder.Isaacs.Ch04
+
+variable {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
+
+/-- The subgroup of `MulAut P` consisting of automorphisms that fix every element
+of order dividing `p` (equivalently every element of `Ω₁(P)` in the abelian case).
+For a critical subgroup `C`, the relevant fixers of `Ω₁(C)` embed here via the
+faithfulness property. -/
+def autFixerOfOrderP (P : Type*) [Group P] (p : ℕ) : Subgroup (MulAut P) where
+  carrier := {ψ : MulAut P | ∀ g : P, g ^ p = 1 → ψ g = g}
+  one_mem' := fun _ _ => rfl
+  mul_mem' := fun {ψ χ} hψ hχ g hg => by
+    change ψ (χ g) = g
+    rw [hχ g hg, hψ g hg]
+  inv_mem' := fun {ψ} hψ g hg => by
+    -- `ψ⁻¹ g = g` since `ψ g = g`: apply `ψ⁻¹` to `ψ g = g`.
+    have h := hψ g hg
+    have h2 := congrArg (ψ⁻¹ : MulAut P) h
+    rw [MulAut.inv_apply_self P ψ g] at h2
+    exact h2.symm
+
+omit [Finite P] [Fact p.Prime] in
+@[simp]
+theorem mem_autFixerOfOrderP {ψ : MulAut P} :
+    ψ ∈ autFixerOfOrderP P p ↔ ∀ g : P, g ^ p = 1 → ψ g = g := Iff.rfl
+
+/-- A finite subgroup `A` of `autFixerOfOrderP P p` whose order is prime to `p`
+acts trivially, hence is the trivial subgroup. This is the contrapositive of
+Gorenstein 5.3.10 restricted to a single subgroup, powered by
+`isaacs_thm_4_36`. -/
+theorem autFixerOfOrderP.eq_bot_of_not_dvd_card (hp_odd : p ≠ 2) (hP : IsPGroup p P)
+    {A : Subgroup (MulAut P)} [Finite A] (hA_le : A ≤ autFixerOfOrderP P p)
+    (hA_p' : ¬ p ∣ Nat.card A) : A = ⊥ := by
+  -- `φ : A →* MulAut P` is the inclusion. Each `a : A` fixes every order-`p` element.
+  set φ : A →* MulAut P := A.subtype with hφ_def
+  have h_fix : ∀ g : P, g ^ p = 1 → ∀ a : A, (φ a) g = g := by
+    intro g hg a
+    exact hA_le a.2 g hg
+  -- Engine: `isaacs_thm_4_36` gives `actionCommutator φ = ⊥`, i.e. `A` acts trivially.
+  have h_triv := actionCommutator_eq_bot_iff_acts_trivially φ
+    |>.mp (isaacs_thm_4_36 hp_odd φ hP hA_p' h_fix)
+  -- Each `a ∈ A` acts as the identity automorphism, hence `a = 1`.
+  rw [eq_bot_iff]
+  intro a ha
+  rw [Subgroup.mem_bot]
+  refine MulEquiv.ext fun g => ?_
+  -- `(φ ⟨a, ha⟩) g = a g` and `h_triv` gives `a g = g = (1 : MulAut P) g`.
+  rw [MulAut.one_apply]
+  exact h_triv ⟨a, ha⟩ g
+
+/-- **Gorenstein "Finite Groups" Theorem 5.3.10** (packaged, `S7`). For `p` odd,
+the group of automorphisms of a `p`-group `P` fixing every order-`p` element is a
+`p`-group: `autFixerOfOrderP P p` is a `p`-group.
+
+Equivalently, every `p'`-automorphism of `P` acting trivially on the elements of
+order dividing `p` is trivial. This is the source of property (d) of a critical
+subgroup once combined with the faithfulness property `S3`.
+
+Proof: were a prime `q ≠ p` to divide the order, Cauchy would give an order-`q`
+element `ψ`; then `A = ⟨ψ⟩` has order `q` prime to `p`, so `A = ⊥` by
+`eq_bot_of_not_dvd_card`, contradicting `ψ ≠ 1`. Hence the order is a `p`-power. -/
+theorem isPGroup_autFixerOfOrderP (hp_odd : p ≠ 2) (hP : IsPGroup p P) :
+    IsPGroup p (autFixerOfOrderP P p) := by
+  -- Suffices: every element has `p`-power order (`IsPGroup.iff_orderOf`).
+  rw [IsPGroup.iff_orderOf]
+  intro ψ
+  -- Let `n = orderOf ψ`; show `n` is a `p`-power by ruling out other prime divisors.
+  by_contra hψ
+  simp only [not_exists] at hψ
+  -- `n ≠ 0` and `n` is not a `p`-power; so some prime `q ≠ p` divides `n`.
+  have hn0 : orderOf ψ ≠ 0 := by
+    intro h0
+    -- `orderOf = 0` impossible in a finite group.
+    haveI : Finite (autFixerOfOrderP P p) := Subtype.finite
+    exact (orderOf_pos ψ).ne' h0
+  -- The `p'`-part `b := ordCompl[p] (orderOf ψ)` is `> 1` (else `n` is a `p`-power).
+  set n := orderOf ψ with hn_def
+  set b := ordCompl[p] n with hb_def
+  have hb_pos : 0 < b := Nat.ordCompl_pos p hn0
+  have hb_cop : ¬ p ∣ b := Nat.not_dvd_ordCompl (Fact.out (p := p.Prime)) hn0
+  have hb_ne_one : b ≠ 1 := by
+    intro hb1
+    -- `n = p ^ (n.factorization p) * b = p ^ _ * 1`, a `p`-power.
+    have hnpow : n = p ^ (n.factorization p) := by
+      conv_lhs => rw [← Nat.ordProj_mul_ordCompl_eq_self n p, ← hb_def, hb1, mul_one]
+    exact hψ (n.factorization p) hnpow
+  -- `σ := ψ ^ (ordProj[p] n)` has order `b` (the `p'`-part).
+  set σ : autFixerOfOrderP P p := ψ ^ (ordProj[p] n) with hσ_def
+  have hσ_ord : orderOf σ = b := by
+    rw [hσ_def, hb_def, orderOf_pow_of_dvd (Nat.ordProj_pos n p).ne' (Nat.ordProj_dvd n p)]
+  -- `A := zpowers σ` has card `b`, coprime to `p`, and lies in the fixer.
+  set A : Subgroup (autFixerOfOrderP P p) := Subgroup.zpowers σ with hA_def
+  haveI : Finite A := Subtype.finite
+  have hAcard : Nat.card A = b := by rw [hA_def, Nat.card_zpowers, hσ_ord]
+  -- Map `A` into `MulAut P` via the fixer's `subtype`; the image lies in the fixer.
+  set Aimg : Subgroup (MulAut P) := A.map (autFixerOfOrderP P p).subtype with hAimg_def
+  have hAimg_le : Aimg ≤ autFixerOfOrderP P p := by
+    rw [hAimg_def]
+    rintro _ ⟨x, _, rfl⟩
+    exact x.property
+  haveI : Finite Aimg := Subtype.finite
+  have hAimg_card : Nat.card Aimg = b := by
+    rw [hAimg_def, Nat.card_congr (Subgroup.equivMapOfInjective A _
+      (autFixerOfOrderP P p).subtype_injective).symm.toEquiv, hAcard]
+  -- `Aimg = ⊥` by the helper (order `b` prime to `p`).
+  have hAimg_bot : Aimg = ⊥ :=
+    autFixerOfOrderP.eq_bot_of_not_dvd_card hp_odd hP hAimg_le (hAimg_card ▸ hb_cop)
+  -- But `σ ≠ 1` (order `b > 1`), and `(subtype σ) ∈ Aimg`, contradiction.
+  have hσ_ne : σ ≠ 1 := by
+    intro h1
+    rw [h1, orderOf_one] at hσ_ord
+    exact hb_ne_one hσ_ord.symm
+  have hmem : ((autFixerOfOrderP P p).subtype σ) ∈ Aimg :=
+    Subgroup.mem_map_of_mem _ (Subgroup.mem_zpowers σ)
+  rw [hAimg_bot, Subgroup.mem_bot] at hmem
+  exact hσ_ne ((autFixerOfOrderP P p).subtype_injective (by
+    rw [hmem]; rfl))
+
+end AutFixer
 
 end OddOrder.GroupTheory
