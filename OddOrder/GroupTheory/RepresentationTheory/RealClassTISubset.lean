@@ -108,4 +108,26 @@ theorem mk_inv_ne_self_of_isTISubset {p : ℕ} [Fact p.Prime] (P : Sylow p G)
   fun h => not_isConj_inv_of_isTISubset P hodd hti hzP hz1
     (ConjClasses.mk_eq_mk_iff_isConj.mp h)
 
+/-- **Peterfalvi (6.7.3), structure constant `a_{110} = 0` under the (6.7) setup.** With
+`C₁ = ⟦z⟧` for a nontrivial `z ∈ P`, the coefficient of the identity class in the class-sum product
+`C₁ · C₁` vanishes — *unconditionally* in the (6.7) setup (`P ∈ Syl_p(G)`, `L = N_G(P)` of odd
+order, `P^# = P ∖ {1}` a TI-subset).
+
+This wires the real-class atom `mk_inv_ne_self_of_isTISubset` (Peterfalvi's "since `|L|` is odd,
+`z⁻¹` is not conjugate to `z`") into the structure-constant computation
+`classSumCoeff_self_one_eq_zero`, discharging the latter's sole hypothesis from the group-theoretic
+TI/Sylow/odd-order data.  It is the `a_{110} = 0` input to (6.7.3) made hypothesis-free.
+
+Placed in this leaf module (downstream of `BrauerPermutation`) for the same reason as the atom: the
+TI-reduction calls `eq_one_of_isConj_inv_of_odd_card`, whose home `BrauerPermutation` cannot be
+imported into `ClassSumAlgebra` without closing the cycle `ClassSumAlgebra ← ZIrr ← IrrIndexing ←
+BrauerPermutation`. -/
+theorem classSumCoeff_self_one_eq_zero_of_isTISubset [Fintype G] [DecidableEq (ConjClasses G)]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hodd : Odd (Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G))))
+    (hti : IsTISubset ((P : Set G) \ {1}) (Subgroup.normalizer (P : Subgroup G)))
+    {z : G} (hzP : z ∈ (P : Subgroup G)) (hz1 : z ≠ 1) :
+    classSumCoeff (ConjClasses.mk z) (ConjClasses.mk z) 1 = 0 :=
+  classSumCoeff_self_one_eq_zero z (mk_inv_ne_self_of_isTISubset P hodd hti hzP hz1)
+
 end OddOrder.RepresentationTheory

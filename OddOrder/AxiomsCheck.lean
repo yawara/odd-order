@@ -698,6 +698,12 @@ set_option linter.style.longLine false in
 -- Peterfalvi's "since `|L|` is odd, `z⁻¹` is not conjugate to `z` in `G`" ((6.7.3), proof opening).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.not_isConj_inv_of_isTISubset
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_ne_self_of_isTISubset
+-- The `a_{110} = 0` structure constant with its real-class hypothesis discharged from the (6.7)
+-- setup: `classSumCoeff_self_one_eq_zero_of_isTISubset` feeds `mk_inv_ne_self_of_isTISubset` into
+-- `classSumCoeff_self_one_eq_zero`, so the `a_{110} = 0` input to (6.7.3) is hypothesis-free under
+-- `P ∈ Syl_p(G)`, `Odd |N_G(P)|`, `P^#` TI-subset, `z ∈ P ∖ {1}`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero_of_isTISubset
 -- Peterfalvi (6.7.3) coprimality atom `(|C₁|, p) = 1`: `card_class_eq_index_centralizer` is the
 -- orbit-stabilizer identity `|⟦z⟧| = [G : C_G(z)]` (conjugation action of `ConjAct G`), and
 -- `coprime_card_class_card_sylow` derives `IsCoprime |⟦z⟧| |P|` from `P ≤ C_G(z)` (so
