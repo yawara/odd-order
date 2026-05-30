@@ -884,6 +884,20 @@ set_option linter.style.longLine false in
 -- summands `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|` for `B` and `B∪{a}` are equal, hence cancel.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_hIntersection_mul_eq
+-- (2.10) STEP 3b, the toggle-`a` Möbius cancellation collapsing `𝒫(a)` to its `B = {a}` survivor:
+-- the Finset `mobiusIndex` `𝒫(a)` (nonempty `B ⊆ A` with `a ∈ N_L(B)`), the summand
+-- `mobiusSummand` `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|`, the pairwise cancellation
+-- `mobiusSummand_add_insert_eq_zero` (`= 0` via `card_conjFiber_hIntersection_mul_eq` + sign flip),
+-- and the involution `sum_mobiusSummand_eq_singleton` (`∑_{𝒫(a)} = mobiusSummand {a}` by
+-- `Finset.sum_involution` on `𝒫(a) \ {{a}}` with `toggleA` `B ↦ B △ {a}`); the survivor
+-- `mobiusSummand_singleton_eq` (`= -|C_L(a)|` via `card_conjFiber_coset_eq_card_centralizer` +
+-- `card_centralizer_eq`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_add_insert_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_eq_singleton
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_singleton_eq
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
