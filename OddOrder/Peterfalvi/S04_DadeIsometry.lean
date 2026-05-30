@@ -952,6 +952,110 @@ theorem card_mBSubgroup (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
     _ = Nat.card (hIntersection hyp B hB) * Nat.card (nLStabilizerIn hyp B) :=
         Nat.card_prod _ _
 
+theorem hIntersection_le_mBSubgroup (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hIntersection hyp B hB ≤ mBSubgroup hyp B hB := le_sup_left
+
+theorem nLStabilizerIn_le_mBSubgroup (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    nLStabilizerIn hyp B ≤ mBSubgroup hyp B hB := le_sup_right
+
+/-- `H(B)` is normal in `M(B)`: `M(B) = H(B) ⊔ N_L(B)` and both factors normalize `H(B)`
+(self-normalization and `(2.4.a)` for `N_L(B)`). -/
+theorem hIntersection_subgroupOf_normal (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal := by
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer (hyp.hIntersection_le_mBSubgroup hB)]
+  rw [mBSubgroup]
+  exact sup_le (hIntersection hyp B hB).le_normalizer
+    (hyp.nLStabilizerIn_le_normalizer hconj hB)
+
+/-- `H(B)` and `N_L(B)` are complementary subgroups inside `M(B)`: this is the internal
+semidirect decomposition `M(B) = H(B) ⋊ N_L(B)` as a `Subgroup.IsComplement'`. -/
+theorem isComplement'_subgroupOf (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Subgroup.IsComplement'
+      ((nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB))
+      ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)) := by
+  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  refine Subgroup.isComplement'_of_card_mul_and_disjoint ?_ ?_
+  · -- `|N_sub| · |H_sub| = |M(B)|`
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.hIntersection_le_mBSubgroup hB)).toEquiv,
+      mul_comm, ← hyp.card_mBSubgroup hconj hB]
+  · -- disjointness of the lifted subgroups
+    rw [disjoint_iff_inf_le]
+    intro x hx
+    obtain ⟨hxN, hxH⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_subgroupOf] at hxN hxH
+    have hxbot := (disjoint_iff_inf_le.mp
+      (hyp.hIntersection_disjoint_nLStabilizerIn hB)) (Subgroup.mem_inf.mpr ⟨hxH, hxN⟩)
+    rw [Subgroup.mem_bot] at hxbot
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext hxbot
+
+/-- **Peterfalvi (2.9), `f_B`.**  The natural homomorphism `f_B : M(B) →* L` with kernel
+`H(B)`, coming from the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`.
+
+Concretely `f_B` is the composite `M(B) → M(B)/H(B) ≅ N_L(B) ↪ L`, where the middle
+isomorphism is `IsComplement'.QuotientMulEquiv` (`H(B)` normal, `N_L(B)` a complement) and
+the last map is the inclusion `N_L(B) ≤ L`. -/
+noncomputable def dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp B hB →* L :=
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
+    (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
+      ((hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom.comp
+        (QuotientGroup.mk' _)))
+
+/-- **`f_B` has kernel `H(B)`.**  Confirms the Peterfalvi (2.9) description of `f_B` as "the
+natural homomorphism `M(B) → L` with kernel `H(B)`": everything after the quotient map
+`mk' : M(B) → M(B)/H(B)` is injective (an isomorphism followed by the inclusion
+`N_L(B) ≤ L`), so `ker f_B = ker mk' = H(B)` (as a subgroup of `M(B)`). -/
+theorem ker_dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    (hyp.dadeQuotientHom hconj hB).ker
+      = (hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB) := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  -- the post-`mk'` part of `f_B`
+  set post :=
+      (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
+        (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
+          (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom) with hpost
+  have hinj : Function.Injective post := by
+    rw [hpost]
+    refine (Set.inclusion_injective (hyp.nLStabilizerIn_le_L B)).comp ?_
+    exact (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).injective.comp
+      (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.injective
+  have hfB : hyp.dadeQuotientHom hconj hB = post.comp (QuotientGroup.mk' _) := rfl
+  rw [hfB]
+  ext x
+  simp only [MonoidHom.mem_ker, MonoidHom.comp_apply]
+  rw [← map_one post, hinj.eq_iff, ← MonoidHom.mem_ker, QuotientGroup.ker_mk']
+
+/-- **Peterfalvi (2.9), `α_B`.**  For `α ∈ CF(L)` and a nonempty `B ⊆ A`, the class function
+`α_B = α ∘ f_B` on `M(B)`. -/
+noncomputable def alphaB (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ) :
+    ClassFunction (mBSubgroup hyp B hB) ℂ :=
+  ClassFunction.compHom (hyp.dadeQuotientHom hconj hB) α
+
+/-- **Peterfalvi (2.9), virtual-character preservation.**  If `α` is a virtual character of
+`L`, then `α_B` is a virtual character of `M(B)`.
+
+Since `α_B = α ∘ f_B` is the pullback of `α` along the group hom `f_B : M(B) →* L`, this is
+the general `ClassFunction.compHom_mem_ZIrr` (pullback preserves `ℤ[Irr]`), which holds
+because the character of *any* finite-dimensional representation lies in `ℤ[Irr]`. -/
+theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
+    (hα : α ∈ ZIrr L) :
+    alphaB hyp hconj hB α ∈ ZIrr (mBSubgroup hyp B hB) := by
+  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hconj hB) hα
+
 end SemidirectStructure
 
 end Hypothesis
