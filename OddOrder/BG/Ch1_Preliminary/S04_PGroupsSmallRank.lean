@@ -1135,4 +1135,51 @@ theorem isElementaryAbelian_omega1_of_isMetacyclic
 
 end MetacyclicOmega
 
+/-! ## §4D: converse of Lemma 4.5 — `|Ω₁(R)| ≤ p ⇒ R` cyclic (Thm 4.12 a-3 engine)
+
+In the proof of BG Theorem 4.12(a) (mmd L1608, "Hence `|Ω₁(X)| ≤ |Ω₁(S)| = p`. By Lem 4.5,
+`X` cyclic") and again at the `R/S` step (L1612), BG runs Lemma 4.5 *in the converse
+direction*: a `p`-group whose `Ω₁` is small (`|Ω₁| ≤ p`) is cyclic. The repo's Lemma 4.5(b)
+(`isElementaryAbelian_omega1_of_isCyclic_index_prime`) is the forward statement
+(noncyclic ⇒ `Ω₁ ≅ E_{p²}`, so `|Ω₁| = p²`); this lemma is its contrapositive packaging.
+
+The genuine content is just Isaacs Thm 6.11: an odd `p`-group with a *unique* subgroup of
+order `p` is cyclic. Every order-`p` subgroup `M` consists of `p`-torsion (`g^p = 1` via
+`pow_card_eq_one'`), hence sits inside `Ω₁(R) = Omega R p 1` (`Omega.mem_of_pow_eq_one`); if
+`|Ω₁(R)| ≤ p` then any such `M` (which has `|M| = p ≥ |Ω₁|`) equals `Ω₁(R)` by
+`Subgroup.eq_of_le_of_card_ge`, so the order-`p` subgroup is unique. This is reused by Thm
+4.12 a-3 and by Prop 4.11. -/
+
+section ConverseLemma45
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- **Converse of BG Lemma 4.5**: a finite `p`-group (`p` odd) with `|Ω₁(R)| ≤ p` is cyclic.
+
+Every order-`p` subgroup lies in `Ω₁(R)`; if `|Ω₁(R)| ≤ p` it is the unique such subgroup,
+so `R` is cyclic by Isaacs Thm 6.11
+(`OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd`).
+
+Used in BG Thm 4.12(a) (mmd L1608, L1612) — the `|Ω₁(X)| ≤ p ⇒ X` cyclic and
+`|Ω₁(R/S)| ≤ p ⇒ R/S` cyclic steps — and reusable for Prop 4.11. -/
+theorem isCyclic_of_card_omega1_le_prime (hR : IsPGroup p R) (hp_odd : Odd p)
+    (hΩ : Nat.card (Omega R p 1) ≤ p) : IsCyclic R := by
+  apply OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hR hp_odd
+  intro K L hK hL
+  -- Every order-`p` subgroup consists of `p`-torsion, hence lies in `Ω₁(R)`.
+  have memle : ∀ M : Subgroup R, Nat.card M = p → M ≤ Omega R p 1 := by
+    intro M hM g hg
+    have hgp : g ^ p = 1 := by
+      have h1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
+      have := congrArg Subtype.val h1
+      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hM] at this
+    exact Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hgp)
+  -- `|M| = p ≥ |Ω₁|` forces `M = Ω₁(R)`, so the order-`p` subgroup is unique.
+  rw [Subgroup.eq_of_le_of_card_ge (memle K hK) (by rw [hK]; exact hΩ),
+      Subgroup.eq_of_le_of_card_ge (memle L hL) (by rw [hL]; exact hΩ)]
+
+end ConverseLemma45
+
 end OddOrder.BG.Ch1.S04
