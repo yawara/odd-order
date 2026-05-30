@@ -898,6 +898,18 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_eq_singleton
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_singleton_eq
+-- (2.10) STEP 3a, the orbit-averaging of the transversal sum to the powerset
+-- (`sum_transversalRep_eq_sum_div_orbit`: for orbit-constant `h`, `∑_{C∈ℬ} h(rep C) =
+-- ∑_{B⊆A} h B / |orbit B|`, via `Finset.sum_fiberwise_of_maps_to` along `Quotient.mk''`), and the
+-- `b = a^x` reindex via `L`-conjugation invariance of the `𝒫(b)`-sum
+-- (`sum_mobiusSummand_conjFinset`: `∑_{𝒫(a^l)} mobiusSummand (a^l) = ∑_{𝒫(a)} mobiusSummand a`,
+-- a `Finset.sum_bij'` with `B₀ ↦ B₀^l`, summand preserved by `mobiusSummand_conjFinset` =
+-- `card_conjFiber_conj_eq`).  These make the (2.10) RHS sum independent of transversal
+-- representatives and of `b ∈ a^L`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_transversalRep_eq_sum_div_orbit
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_conjFinset
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
