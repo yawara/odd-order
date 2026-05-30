@@ -26,6 +26,13 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 - **残: (2.6.b) のみ** = `PreservesVirtualCharacters (dadeMap)`.  道は (2.10) 恒等式
   `dadeMap α = -∑_ℬ (-1)^|B| Ind_{M(B)} α_B` の点別証明 (ℬ 代表系 + (2.10.1) + Möbius 相殺).
   詳細プランは issue 0040「進捗 (4)」.
+- **(2.1) coprime-action coset conjugacy 完成** (`OddOrder/GroupTheory/CoprimeConjugacy.lean`,
+  `coset_eq_cosetConjImage` 集合形 / `exists_mem_centralizer_conj` 存在形, sorry-free).
+  `g` normalizing `H`, `(|H|,orderOf g)=1` ⟹ `Hg = ⋃_{x∈H}(C_H(g)g)^x` (disjoint,
+  `|H:C_H(g)|` 個).  剛性 (`conj_fixes_of_commute` 再利用) + 繊維数え上げ closure;
+  Schur-Zassenhaus 不要.  (2.10.3) Ind 値の `𝒜(g,H(B)b)` 集計 (残作業 #3) で消費する
+  一般 normalizing 版 primitive (従来の `card_conj_fiber` は `a` central 特殊形のみ).
+  外部 6 cite §§6,10,12,15,16 の shared primitive でもある.  issue 0040「進捗 (5)」.
 
 ## Audit log (2026-05-23 audit 訂正)
 

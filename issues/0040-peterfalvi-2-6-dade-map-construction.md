@@ -301,3 +301,35 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
 5. **接続**: 上の恒等式 → `PreservesVirtualCharacters` → `FullDadeIsometryData` 完成.
 
 着手順: 1 (transversal infra) → 2 → 3 → 4 → 5.  全体 ~250-400 LOC、別 focused session 推奨.
+
+## 進捗 2026-05-30 (5) — (2.1) coprime-action coset conjugacy 完成 (sorry-free, axiom-clean)
+
+**landed** (`OddOrder/GroupTheory/CoprimeConjugacy.lean`, `section CosetConjugacy`,
+2 コミット 6c4ff90 (剛性) + 32b81df (存在/濃度), `lake build OddOrder` +
+`OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し):
+
+**Peterfalvi (2.1)** — `g` が `H` を正規化し `(|H|, orderOf g)=1` のとき、coset `Hg`
+は `C_H(g)g` の `|H:C_H(g)|` 個の `H`-共役の disjoint union.  これは Round-4 報告で
+「(2.6.b) Dade-isometry spine の単一 keystone」とされた項目 (上記残作業 #3 (2.10.3) の
+`𝒜(g,H(B)b)` 集計、および外部 6 cite §§6,10,12,15,16 の shared primitive).
+
+- `conj_centralizes_of_coset_conj_eq` / `mem_centralizer_of_coset_conj_eq` —
+  **剛性 (disjointness core)**: `u,v ∈ C_H(g)`, `x,y ∈ H`, `x⁻¹(ug)x = y⁻¹(vg)y`
+  ⟹ `yx⁻¹ ∈ C_H(g)` (= 右剰余類 `C_H(g)x = C_H(g)y`).  教科書の
+  `g^x = (ug)^x_π = (vg)^y_π = g^y` ステップ.  既存 `conj_fixes_of_commute` を `g` と
+  共役子 `yx⁻¹` に適用するだけ (π-part の再実装不要).
+- `card_cosetConjImage` — `|K| = |H|` where `K = ⋃_{x∈H}(C_H(g)g)^x` = image of
+  `(c,x) ↦ x⁻¹(cg)x`.  繊維数え上げ (`Finset.card_bij'`): 各繊維は witness の
+  `C_H(g)`-軌道 `{(e c₀ e⁻¹, e x₀) : e ∈ C_H(g)}` (剛性 ⟹ `x₀x⁻¹ ∈ C_H(g)`),
+  サイズ `|C_H(g)|`, 定義域 `|C_H(g)|·|H|`.
+- **`coset_eq_cosetConjImage`** — **(2.1) 集合形** `Hg = K` (counting closure:
+  `K ⊆ Hg`, `|K| = |H| = |Hg|`, 有限 ⟹ 一致).
+- **`exists_mem_centralizer_conj`** — **(2.1) 存在形** 全 `hg ∈ Hg` は `cg`
+  (`c ∈ C_H(g) = H ⊓ C_G(g)`) に `H`-共役.
+
+**重要**: 存在方向に Schur-Zassenhaus 共役 (`SchurZassenhausConj.lean` に既存だが
+重い) は**不要**だった.  counting closure が存在を自動的に与え、必要なのは初等的な
+CRT 剛性のみ.  両 public 定理を AxiomsCheck に登録 (各 3 axioms, allowlist 内).
+
+これで残作業 #3 (2.10.3) の `card_conj_fiber` 集計に必要な (2.1) primitive が揃った
+(従来は `card_conj_fiber` = `a` central 特殊形のみ; 一般 `g` normalizing 版が本項目).
