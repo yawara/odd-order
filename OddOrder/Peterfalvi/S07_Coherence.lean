@@ -1564,6 +1564,24 @@ theorem inner_conjImage_eq_zero_of_orthogonal_imageSet
     D.imageFamily.image_eq, OddOrder.RepresentationTheory.inner_sum_right,
     Finset.sum_eq_zero fun α hα => hη α hα, sub_zero]
 
+/-- **Peterfalvi (5.2.e) feed: `X ⊥ R(χ')` from `R(χ) ⊥ R(χ')`.**  The image part `X = D.X ∈
+ℤ[R(χ)]` of the (5.4) decomposition for `χ` is orthogonal to every member of a *second* image
+family `R'` whenever the two families are orthogonal (`D.imageFamily.Orthogonal R'`, the (5.2.e)
+hypothesis).  `⟨X, α⟩ = ⟨∑_{β∈R(χ)} coeff β • β, α⟩ = ∑ coeff β · ⟨β, α⟩ = 0` since each `⟨β, α⟩ =
+0`.  This is the per-character half of the (5.6.1) remark "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by
+(5.5) and (5.2.e)" (mmd L77): for the family member `χ' := χᵢ` (with `D` its `ψ = 0` decomposition,
+so `χᵢ^{τ₁} = D.X` by (5.5)) and the distinguished `R' := R(χ)`. -/
+theorem inner_X_orthogonal_imageSet_of_orthogonal
+    {χ' : ClassFunction L ℂ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    (R' : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ')
+    (hortho : D.imageFamily.Orthogonal R')
+    {α : ClassFunction G ℂ} (hα : α ∈ R'.imageSet) :
+    ClassFunction.inner D.X α = 0 := by
+  rw [D.X_eq, OddOrder.RepresentationTheory.inner_sum_left]
+  refine Finset.sum_eq_zero fun β hβ => ?_
+  rw [ClassFunction.inner_smul_left, hortho.inner_eq_zero hβ hα, mul_zero]
+
 /-! #### Peterfalvi (5.6.3) target pair `{X, X̄}` from the `ψ = 0` decomposition
 
 The §7 keystone `retarget_isCoherent` consumes an **orthonormal target pair** `{X, X̄} ⊂ ℤ[Irr G]`
@@ -2323,6 +2341,69 @@ theorem image_eq_of_decomposition
     τ (χ - a • chi1) = D.X - a • hS₁.extension chi1 := by
   rw [← htau1_diff, D.tau1_image, hY, htau1_chi1]
 
+/-! ### Peterfalvi (5.5)+(5.2.e): the running images `S₁^{τ₁}` are orthogonal to `R(χ)`
+
+`retarget_isCoherent_of_decompositions` consumes, as its single still-opaque hypothesis,
+`hperElem : ∀ ξ ∈ ℤ[S₁], ∀ α ∈ R(χ), ⟨τ₁ ξ, α⟩ = 0` (`τ₁ := hS₁.extension`).  In Peterfalvi this is
+the one-line remark "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)" (mmd L77), lifted from
+the family members `χᵢ ∈ S₁` to the whole lattice `ℤ[S₁]`.  The two lemmas below *construct* it:
+
+* per family member `χ' ∈ S₁`, the `ψ = 0` decomposition `D'` gives `χ'^{τ₁} = D'.X ∈ ℤ[R(χ')]` (by
+  (5.5), `eq_sum_of_psi_eq_zero`), which is orthogonal to `R(χ)` by (5.2.e) (`R(χ') ⊥ R(χ)`,
+  `inner_X_orthogonal_imageSet_of_orthogonal`).  The running agreement `D'.tau1 χ' = τ₁ χ'`
+  identifies `χ'^{τ₁}` with `D'.tau1 χ' = D'.X`;
+* the lattice lift to `ℤ[S₁]` is span induction on `ξ`, using `ℤ`-linearity of `τ₁` and of
+  `⟨·, α⟩` (`inner_extension_orthogonal_imageSet_of_members`).
+
+These supply `hperElem` from the honest per-member (5.5)/(5.2.e) data, removing it as a posited
+hypothesis. -/
+
+open OddOrder.RepresentationTheory in
+/-- **Per-member (5.5)+(5.2.e) orthogonality `χ'^{τ₁} ⊥ R(χ)`.**  For a family member `χ' ∈ S₁`
+with its `ψ = 0` decomposition `D'` (so `χ'^{τ₁'} = D'.X ∈ ℤ[R(χ')]` by (5.5),
+`eq_sum_of_psi_eq_zero`), whose image family `R(χ')` is orthogonal to the distinguished `R(χ) :=
+R₀` (the (5.2.e) input `D'.imageFamily.Orthogonal R₀`), and whose auxiliary isometry agrees with the
+running extension at `χ'` (`htau1 : D'.tau1 χ' = hS₁.extension χ'`), the running image
+`χ'^{τ₁} = hS₁.extension χ'` is orthogonal to every `α ∈ R(χ)`:
+`⟨hS₁.extension χ', α⟩ = ⟨D'.tau1 χ', α⟩ = ⟨D'.X, α⟩ = 0`.  This is the per-character content of
+mmd L77, the building block of `hperElem`. -/
+theorem inner_extension_member_orthogonal_imageSet
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ χ' : ClassFunction L ℂ}
+    (R₀ : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (D' : CharacterPsiDecomposition (L := L) (G := G) τ χ' 0)
+    (hortho : D'.imageFamily.Orthogonal R₀)
+    (htau1 : D'.tau1 χ' = hS₁.extension χ')
+    {α : ClassFunction G ℂ} (hα : α ∈ R₀.imageSet) :
+    ClassFunction.inner (hS₁.extension χ') α = 0 := by
+  rw [← htau1, (D'.eq_sum_of_psi_eq_zero).2.1,
+    D'.inner_X_orthogonal_imageSet_of_orthogonal R₀ hortho hα]
+
+open OddOrder.RepresentationTheory in
+/-- **Lattice lift of the (5.5)+(5.2.e) orthogonality to `ℤ[S₁]`.**  If the running image of every
+*member* `x ∈ S₁` is orthogonal to `α` (`hmem : ∀ x ∈ S₁, ⟨e x, α⟩ = 0`, supplied per-member by
+`inner_extension_member_orthogonal_imageSet`), then the running image of every *lattice element*
+`ξ ∈ ℤ[S₁]` is orthogonal to `α`.
+
+Span induction on `ξ`: the base case is `hmem`; the `0`, `+` and `ℤ•` cases follow from the
+`ℤ`-linearity of the extension `e` (`map_zero`/`map_add`/`map_zsmul`) and of `⟨·, α⟩`
+(`inner_zero_left`/`inner_add_left`/`inner_smul_left`).  This is exactly the lift of the per-member
+remark "`χᵢ^{τ₁}` is orthogonal to `R(χ)`" (mmd L77) to `ℤ[S₁]`. -/
+theorem inner_extension_orthogonal_imageSet_of_members
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (e : IntegralCharacterMap L G) {S₁ : Set (ClassFunction L ℂ)} {α : ClassFunction G ℂ}
+    (hmem : ∀ x ∈ S₁, ClassFunction.inner (e x) α = 0)
+    {ξ : ClassFunction L ℂ} (hξ : ξ ∈ Submodule.span ℤ S₁) :
+    ClassFunction.inner (e ξ) α = 0 := by
+  induction hξ using Submodule.span_induction with
+  | mem x hx => exact hmem x hx
+  | zero => rw [map_zero, ClassFunction.inner_zero_left]
+  | add x y _ _ ihx ihy => rw [map_add, ClassFunction.inner_add_left, ihx, ihy, add_zero]
+  | smul c x _ ih =>
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (e x), ClassFunction.inner_smul_left, ih, mul_zero]
+
 open scoped Classical in
 open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence, `himg` discharged internally.**
@@ -2396,6 +2477,68 @@ noncomputable def retarget_isCoherent_of_decompositions
     exact image_eq_of_decomposition hS₁ Da htau1_diff hY htau1_chi1
   exact retarget_isCoherent_of_decomposition hS₁ D₀ hχbar_eq hχχ hχbarχbar hχχbar hχbarχ
     hX_ortho hXbar_ortho hχ_S1 hχbar_S1 hchi1 himg hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.3) per-step coherence, `hperElem` *also* discharged internally.**
+
+The completed (5.6) adjoining step where the last opaque hypothesis of
+`retarget_isCoherent_of_decompositions` — the lattice orthogonality `hperElem : ∀ ξ ∈ ℤ[S₁], ∀ α ∈
+R(χ), ⟨τ₁ ξ, α⟩ = 0` — is *constructed*, not posited, from the honest per-member (5.5)+(5.2.e) data.
+Every (5.6.3) input now reduces to genuine textbook facts about the Dade map `τ` and the running
+extension `τ₁ = hS₁.extension`; nothing about the *image-side* coupling remains assumed.
+
+The extra data over `retarget_isCoherent_of_decompositions`, replacing `hperElem`, is the family of
+per-member `ψ = 0` decompositions of `S₁` (mmd L77 "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and
+(5.2.e)"):
+* `Dmem x hx : CharacterPsiDecomposition τ x 0` — the (5.5) decomposition of each member `x ∈ S₁`,
+  giving `x^{τ₁'} = (Dmem x hx).X ∈ ℤ[R(x)]`;
+* `hmemOrtho` — the (5.2.e) orthogonality `R(x) ⊥ R(χ)` (`(Dmem x hx).imageFamily.Orthogonal
+  D₀.imageFamily`);
+* `hmemTau1` — the running agreement `(Dmem x hx).tau1 x = hS₁.extension x` (each member's auxiliary
+  isometry coincides with the running extension at `x`).
+
+`hperElem` is then `inner_extension_orthogonal_imageSet_of_members` applied to the per-member
+`inner_extension_member_orthogonal_imageSet` (which chains `⟨τ₁ x, α⟩ = ⟨(Dmem x hx).X, α⟩ = 0`).
+The remaining hypotheses are identical to `retarget_isCoherent_of_decompositions`. -/
+noncomputable def retarget_isCoherent_of_decompositions_and_memberFamily
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (D₀ : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (htau1_chi : Da.tau1 χ = D₀.tau1 χ)
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (Dmem : (x : ClassFunction L ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := L) (G := G) τ x 0)
+    (hmemOrtho : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal D₀.imageFamily)
+    (hmemTau1 : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 x = hS₁.extension x)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  -- The per-element `R(χ)`-orthogonality `hperElem`, *constructed* from the per-member (5.5)/(5.2.e)
+  -- data: each member's running image `x^{τ₁} = (Dmem x hx).X ⊥ R(χ)`, lifted to `ℤ[S₁]`.
+  have hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ D₀.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0 := by
+    intro ξ hξ α hα
+    refine inner_extension_orthogonal_imageSet_of_members hS₁.extension ?_ hξ
+    intro x hx
+    exact inner_extension_member_orthogonal_imageSet hS₁ D₀.imageFamily (Dmem x hx)
+      (hmemOrtho x hx) (hmemTau1 x hx) hα
+  exact retarget_isCoherent_of_decompositions hS₁ D₀ Da htau1_chi hχbar_eq hχχ hχbarχbar hχχbar
+    hχbarχ hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY htau1_chi1 hgen
 
 /-! ### Peterfalvi (6.8.1)/(6.8.2): the orthogonal coherent union `X ∪ Y`
 

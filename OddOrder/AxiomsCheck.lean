@@ -1124,6 +1124,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_eq_zero_of_orthogonal_imageSet
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_conjImage_eq_zero_of_orthogonal_imageSet
+-- (5.2.e) FEED `inner_X_orthogonal_imageSet_of_orthogonal` (issue 0046, PASS 2): the dual of the
+-- above — `X = D.X ∈ ℤ[R(χ')]` is orthogonal to every member `α` of a *second* family `R(χ)` when
+-- `R(χ') ⊥ R(χ)` (`D.imageFamily.Orthogonal R₀`).  `⟨X, α⟩ = ∑ coeff·⟨β, α⟩ = 0`.  This is the
+-- per-character half of mmd L77 "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)".
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_orthogonal_imageSet_of_orthogonal
 -- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
 -- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
 -- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で
@@ -1218,6 +1224,25 @@ set_option linter.style.longLine false in
 -- Makes (6.6) `peterfalvi_66_coherence_of_X`'s `hstep` dischargeable from the Dade-isometry targets.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions
+-- (5.5)+(5.2.e) IMAGE-SIDE coupling `hperElem`, *constructed* not posited (issue 0046, PASS 2).
+-- `inner_extension_member_orthogonal_imageSet` : for a member `χ'∈S₁` with its `ψ=0` decomposition
+-- `D'` (so `χ'^{τ₁'}=D'.X` by (5.5)) and `R(χ')⊥R(χ)` (5.2.e) + the running agreement
+-- `D'.tau1 χ'=hS₁.extension χ'`, the running image `χ'^{τ₁}` is ⊥ `R(χ)` — the per-member mmd L77.
+-- `inner_extension_orthogonal_imageSet_of_members` : span induction lifts that to all `ξ∈ℤ[S₁]`
+-- (`ℤ`-linearity of the extension and of `⟨·,α⟩`).  These two SUPPLY the `hperElem` of
+-- `retarget_isCoherent_of_decompositions` from honest per-member data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.inner_extension_orthogonal_imageSet_of_members
+-- (5.6.3) COMPLETE per-step adjoining with ALSO `hperElem` discharged internally (issue 0046,
+-- PASS 2): the final form where every (5.6.3) input reduces to genuine Dade-map / running-extension
+-- facts — no image-side coupling remains posited.  Replaces `hperElem` by the per-member family of
+-- `ψ=0` decompositions `Dmem`/orthogonality `hmemOrtho`/agreement `hmemTau1`, deriving `hperElem`
+-- via the two lemmas above.  This makes (6.6) `peterfalvi_66_coherence_of_X`'s `hstep` dischargeable
+-- from the actual Dade isometry's per-member (5.5)+(5.2.e) data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions_and_memberFamily
 -- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
 -- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
 -- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).
