@@ -143,9 +143,22 @@ def IsExpPExtraspecial (p : ℕ) (G : Type*) [Group G] : Prop :=
 -- order p³ は (extraspecial + exp p + r≤2) から従う; Thm 4.16(2) では別途 |R₁|=p³ を持つ
 ```
 
-### N-4. operator `A` の **商 `R/S` への作用** — **needs-impl** ⭐⭐ (最深ゲート)
+### N-4. operator `A` の **商 `R/S` への作用** — **半分 DONE / Maschke のみ残** ⭐ (2026-05-30 更新)
+
+> ⚠ **訂正 (2026-05-30)**: 本節は当初「商作用持ち上げ全体が needs-impl」と書いたが **誤り**。
+> **φ̄ lift は既に Ch04 に存在**: `IsAInvariant.quotientMulAutHom` (`Ch04_Commutators/Main.lean:2248`,
+> commit d53f690) + apply 補題 (`quotientMulAutHom_apply`) + descent `actionCommutator_quotient_eq_map`
+> (`[R/S,A] = [R,A].map (mk' S)`) + `≤N ⇒ [R/S,A]=⊥`。**再実装してはならない** (重複。`bg-s04-n4-quotient-action`
+> workflow が誤って再実装し破棄した経緯あり)。残るのは **Maschke complement bridge のみ** = 設計書
+> [`s04_n4_maschke_bridge_design.md`](s04_n4_maschke_bridge_design.md) (難度 ⭐⭐ → ⭐ にダウングレード;
+> Maschke 自体 mathlib 完成、type-plumbing ~5-8 補題)。⚠ **既存 `quotientMulAutHom` は `_root_` 欠落で
+> 実名が `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom` と二重 nest** —
+> Ch04 外から呼ぶには名前解決に難あり (Ch04 修正 issue で対応予定)。
+> なお **`[R,A]=⊤ ⇒ [R/S,A]=⊤`** は `actionCommutator_quotient_eq_map` + `map_top_of_surjective` の
+> 2 行で出る (Maschke 段で inline 可、専用補題不要)。
+
 Thm 4.12 / 4.16 の Maschke 段は **`A` が `R/S` (S は A-invariant normal) に作用する** ことを要する。
-repo の `φ : A →* MulAut R` から `φ̄ : A →* MulAut (R⧸S)` を作る必要がある。
+repo の `φ : A →* MulAut R` から `φ̄ : A →* MulAut (R⧸S)` を作る (= **既存 `quotientMulAutHom`**)。
 ```lean
 -- needs-impl: A-invariant normal S に対する商作用の持ち上げ
 --   φ̄ a := MulAut induced by (φ a) on R⧸S  (well-defined ∵ S が (φ a)-invariant)
@@ -486,12 +499,12 @@ proof は純算術で閉じる。
   `Matrix.card_GL_field` で `|GL(2,p)|` 数値も補題化。
 
 ### Wave 1 — operator 商作用 (最深ゲート, 設計先行)
-- **I-1 商 `R/S` への A 作用 + A-invariant complement (N-4)** ⭐⭐ — Ch03/Ch04 拡張。
-  `φ : A →* MulAut R`, `S` A-invariant normal ⇒ `φ̄ : A →* MulAut (R⧸S)` の持ち上げ +
-  `Ω₁(R/S)` の Fₚ-加群化 + Maschke complement の subgroup 形。
-  **gate**: なし (独立) だが **Thm 4.12 / 4.16 B-2 の両方がこれに依存** ⇒ 最優先。
-  設計先行 (multi-sub: 持ち上げ / Maschke bridge を別 stage)。
-- **I-1b Prop 1.6(b) の Γ↔R-内部 変換** — `actionCommutator φ` 形へ。gate: なし。
+- **I-1 商 `R/S` への A 作用 + A-invariant complement (N-4)** ⭐ — **持ち上げ `φ̄` は Ch04 既存**
+  (`quotientMulAutHom`, §2 N-4 訂正参照、再実装不可)。残 = **Maschke complement の subgroup 形のみ**
+  = [`s04_n4_maschke_bridge_design.md`](s04_n4_maschke_bridge_design.md) (`Ω₁(R/S)` Fₚ-加群化 + mathlib
+  Maschke + module↔subgroup 還元, ~5-8 補題)。**Thm 4.12 / 4.16 B-2 の両方が依存** ⇒ 最優先。
+- **I-1b Prop 1.6(b) の Γ↔R-内部 変換** ✅ **DONE** (2026-05-30, commit 3641c6a,
+  `OperatorQuotientAction.lean` `actionCommutator_restrict_self_eq_top`, sorry-free/axiom-clean)。gate: なし。
 
 ### Wave 2 — §4 前提補題 (Prop 4.11/4.12/4.16 が共有)
 - **I-2a Prop 4.3(a) cl≤3/p>3** — regular p-group collection (mmd L1410-1472, `(uv)ⁿ`)。

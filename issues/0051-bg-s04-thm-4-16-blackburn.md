@@ -36,7 +36,15 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - `OmegaSubgroup.lean` — `Agemo p n G` (BG 𝒰ⁿ, Omega 双対) + `anti`/`characteristic`。
 - 全て sorry-free / axiom-clean (`[propext, Classical.choice, Quot.sound]`)、`lake build OddOrder` green (3352 jobs)。
 
-**設計書** `notes/bg/s04_prop411_thm416_design.md` (Prop 4.11/Thm 4.12/Thm 4.16, scaffold-trap audit + sub-issue I-0a..I-5)。次の着手 = handoff §6 issue 2 (Prop 4.3(a) cl≤3 + Lem 4.5 general)。**最深 gate = N-4 (A の R/S 商作用 + Maschke)** を設計書が指摘。
+**設計書** `notes/bg/s04_prop411_thm416_design.md` (Prop 4.11/Thm 4.12/Thm 4.16, scaffold-trap audit + sub-issue I-0a..I-5)。**最深 gate = N-4 (A の R/S 商作用 + Maschke)** を設計書が指摘。
+
+**I-1b (Prop 1.6(b) R-内部形) 完了 + N-4 半分既存判明** — workflow `bg-s04-n4-quotient-action`:
+
+- `OperatorQuotientAction.lean` 新規 — `actionCommutator_restrict_self_eq_top` (`[[R,A],A]=[R,A]` ⇒ `[N,A]=N` = Thm 4.12(a) step a-1「R=[R,A] WLOG」) ほか 3 補題、sorry-free/axiom-clean (commit 3641c6a)。
+- **N-4 φ̄ lift は Ch04 既存判明** (`quotientMulAutHom`@Ch04:2248)。workflow が誤って再実装したが破棄。設計書 §2 N-4 を訂正。残 N-4 = **Maschke bridge のみ** = `notes/bg/s04_n4_maschke_bridge_design.md` (難度 ⭐⭐→⭐)。
+- ⚠ 既存 `quotientMulAutHom` は `_root_` 欠落で実名二重 nest → Ch04 修正 issue を spawn。
+
+次 = (A) issue 2 (Prop 4.3(a) cl≤3 + Lem 4.5 general) か (B) N-4 Maschke bridge。
 
 ## 完了条件
 

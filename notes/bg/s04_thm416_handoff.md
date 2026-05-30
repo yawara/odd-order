@@ -36,6 +36,8 @@ Thm 4.16 は §4 最難。memory `scaffold-sorry-free-not-done` が最も効く�
 | 0016 critical | `IsCritical` / `isCritical_exists` / `autCentralizer` / `Omega.exponent_eq_of_class_le_two` / `mul_pow_eq_commutator_pow_mul_of_class_le_two` / `centralizer_eq_self_of_maximal_abelian_normal` | `OddOrder/GroupTheory/CriticalSubgroup.lean` |
 | Thm 2.6 | `odd_two_dim_sylow_abelian` (GL(2,p) 分岐の出典) | `S02_Representations.lean` |
 | **issue 1 API (2026-05-30 完了)** | `IsCentralProduct` / `of_le_centralizer` (Case B-1 producer) / `inf_le_centralizer` (R₁⊓R₂≤Z(R) 導出) ・ `IsExpPExtraspecial` / `pow_eq_one` ・ `Agemo` (𝒰ⁿ) / `anti` / `characteristic` | `CentralProduct.lean` (新規) / `IsExtraspecial.lean` / `OmegaSubgroup.lean` |
+| **I-1b Prop 1.6(b) R-内部形 (2026-05-30 完了)** | `actionCommutator_restrict_self_eq_top` (`[[R,A],A]=[R,A]` ⇒ `[N,A]=N`, Thm 4.12(a) a-1「R=[R,A] WLOG」) + `..._map_subtype_eq` (G 内等式) + `..._toMulAutHom_map_subtype_map_inl` (一般橋) | `OperatorQuotientAction.lean` (新規) |
+| **N-4 φ̄ lift = Ch04 既存** | `IsAInvariant.quotientMulAutHom` (商作用持ち上げ) + `actionCommutator_quotient_eq_map` (descent) ⚠ 実名二重 nest (`_root_` 欠落, Ch04 修正待ち) | `Isaacs/Ch04_Commutators/Main.lean:2248` |
 
 ## 3. Thm 4.16 に至る未実装の前提 (Wave 2 — D の実質的大半)
 
@@ -85,9 +87,13 @@ Thm 4.16 本体の前に要る (sorry なしで deferred 中):
 
 ## 8. 次セッションの最初の一歩
 
-> **更新 (2026-05-30)**: ~~issue 1 (新規 API 束)~~ ✅ **完了** (workflow `bg-s04-thm416-api-bundle`, commits 4656738/560312b/4d0269a)。`IsCentralProduct` / `IsExpPExtraspecial` / `Agemo` が §2 表に載った状態で使える。Prop 4.11 含む 3 大難所の設計も **`notes/bg/s04_prop411_thm416_design.md`** に出力済 (signature/skeleton/scaffold-trap audit/sub-issue I-0a..I-5)。
+> **更新 (2026-05-30)**: ~~issue 1 (新規 API 束)~~ ✅ + ~~I-1b (Prop 1.6(b) R-内部形)~~ ✅ **完了**。
+> - issue 1: `IsCentralProduct` / `IsExpPExtraspecial` / `Agemo` (commits 4656738/560312b/4d0269a)。
+> - I-1b: `actionCommutator_restrict_self_eq_top` @ `OperatorQuotientAction.lean` (commit 3641c6a)。
+> - **N-4 の φ̄ lift 半分は Ch04 既存** (`quotientMulAutHom`@Ch04:2248) と判明 (設計書 §2 N-4 訂正済、再実装不可)。残 N-4 = **Maschke complement bridge のみ** = `notes/bg/s04_n4_maschke_bridge_design.md`。
+> - 3 大難所設計 = **`notes/bg/s04_prop411_thm416_design.md`** (scaffold-trap audit + sub-issue I-0a..I-5)。
 
-**次 = issue 2 (Prop 4.3(a) cl≤3 分岐 + Lem 4.5 general/4.5(b)(c))** から (handoff §6 の 2 番)。設計書の依存表・risk を必ず先に読む。
+**次の選択肢** (どちらも gate 解消済): (A) **issue 2 = Prop 4.3(a) cl≤3 + Lem 4.5 general** (Wave 2、Prop 4.11/4.8 の前提)、または (B) **N-4 Maschke bridge** (`s04_n4_maschke_bridge_design.md`、Thm 4.12(a)/4.16 B-2 を開く)。設計書の依存表・risk を必ず先に読む。⚠ **既存 `quotientMulAutHom` の二重 nest 名 (Ch04 `_root_` 欠落) に注意** — Maschke 着手前に Ch04 修正が要る (spawn task 済)。
 
 **最重要 risk (設計書より)**: 最深 scaffold-trap gate = **N-4 (A の R/S 商作用 + Maschke A-invariant complement)** — Thm 4.12(a) と Thm 4.16 Case B-2 が両方依存するが repo 不在。`MulAction A (R/S) := sorry` で誤魔化す誘惑が最大なので**最初に genuine 実装**。Thm 4.16 B-2 の `j²≡1` 矛盾は**純 ZMod p 算術で閉じる** (GL engine 経由でない — mis-routing 注意)。
 
