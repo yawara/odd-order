@@ -587,6 +587,17 @@ set_option linter.style.longLine false in
 -- `∑_{χ ≠ 1} χ(1)² = |G| - 1` (issue 0044 building block for §9 (7.8)).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumIrreducibleDegreeSq
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNontrivialIrreducibleDegreeSq
+-- RepresentationTheory (Peterfalvi (6.7.1), orbit-counting primitive): a finite group acting freely
+-- (all stabilizers trivial / no non-identity element fixes a point) on a finite set divides its
+-- cardinality. Free-action decomposition `β ≃ (β/Γ) × Γ`. This is the missing counting primitive
+-- behind the fixed-point-free `P`-action of (6.7.1).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_of_stabilizer_eq_bot
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_of_no_nontrivial_fixed
+-- RepresentationTheory (Peterfalvi (6.7.1), orbit-counting half): a subgroup `P ≤ G` acting
+-- fixed-point-freely by conjugation on the pair set `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}` has
+-- `|P| ∣ a_{ijs}|C_s|` (= `classSumCoeff Ci Cj Cs`). The residual content of (6.7.1) is the
+-- group-theoretic verification of fixed-point-freeness (TI-subset + Sylow-in-`L`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_classSumCoeff_of_fixedPointFree
 -- RepresentationTheory (Peterfalvi §3 (1.1), [Is] Thm 6.32): Brauer's permutation lemma is
 -- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
 -- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).

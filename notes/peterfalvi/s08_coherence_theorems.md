@@ -251,6 +251,22 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   `ψ=1_G` で a_{11}≡1+a_{12} ⟹ (1+a_{12})ψ(z)≡ψ(1)+a_{12}ψ(z) ⟹ ψ(z)≡ψ(1). ⟸ ここで本 module の
 >   `Cong.smul_left`/`add`/`trans` が直接効く. (1)(2)(3) は §6 group-theory 組み立てなので別 issue.
 
+> **進捗 2026-05-30 ((6.7.1) orbit-counting half 完了)**: (6.7.1) の**数え上げ部分**を
+> `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> planner が CRITICAL と指摘した「集合上の作用の `|G| ∣ |Ω|`」欠落 primitive を埋めた:
+> - `card_dvd_of_stabilizer_eq_bot` : 有限群 `Γ` の有限集合 `β` への**自由**作用 (全 stabilizer ⊥) ⟹ `|Γ| ∣ |β|`.
+>   proof は free-action 分解 `β ≃ (β/Γ) × Γ` (mathlib `MulAction.selfEquivOrbitsQuotientProd`).
+>   ⚠️ "fixed-point-free" は教科書文脈では **自由作用** (x≠1 が点を固定しない=全 stabilizer 自明) の意で,
+>   mathlib の `IsPGroup.card_modEq_card_fixedPoints` (= `p ∣ |Ω|` しか出ない) では**不足**; 自由作用の
+>   orbit-stabilizer 分解で初めて全 `|P| ∣ |Ω|` が出る (教科書の主張は `|P|` 整除であって `p` 整除ではない).
+> - `card_dvd_of_no_nontrivial_fixed` : 等価な仮説形 (no `x≠1` fixes a point).
+> - `classPairMulAction` : 部分群 `P` の `ClassPair = {q:G×G // IsClassPair Ci Cj Cs q}` (= Ω) 上共役作用.
+> - `card_classPair` : `|Ω| = classSumCoeff Ci Cj Cs` (= a_{ijs}|C_s|).
+> - **`card_dvd_classSumCoeff_of_fixedPointFree`** : fixed-point-free ⟹ `|P| ∣ a_{ijs}|C_s|` = (6.7.1) 結論.
+> - **残**: fixed-point-free *仮説の検証* (TI ⟹ C_G(x)⊆L ⟹ y∈P ⟹ y∈Z ⟹ uv∈Z 矛盾) は Sylow/TI/Z setup
+>   (`IsTISubset`+Sylow-in-L) を要し repo 未実装 = `needs-infra`. 揃えば (6.7.2)/(6.7.3) は本 module の
+>   `centralCharacterOfRep_classSum_mul` + `card_dvd_classSumCoeff_of_fixedPointFree` + `AlgInt.Cong` で assembly.
+
 **Lean 表現**: 
 ```lean
 theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]

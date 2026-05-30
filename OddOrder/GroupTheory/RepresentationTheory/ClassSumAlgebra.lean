@@ -11,6 +11,7 @@ import Mathlib.LinearAlgebra.Trace
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
@@ -288,6 +289,121 @@ theorem classSum_mul (Ci Cj : ConjClasses G) :
   exact classSum_mul_apply_out Ci Cj w
 
 end StructureCoeff
+
+section FreeActionDivisibility
+
+/-- **A free action of a finite group divides the cardinality of the set acted on.** If a finite
+group `Γ` acts on a finite type `β` *freely* — every point has trivial stabilizer — then
+`|Γ| ∣ |β|`.  Equivalently (the contrapositive direction used below): if every orbit has the full
+size `|Γ|`, the set decomposes as a disjoint union of `|Γ|`-element orbits.
+
+This is the orbit-counting primitive behind Peterfalvi (6.7.1): a `p`-group `P` acting
+fixed-point-freely (here `freely`) on a finite set `Ω` forces `|P| ∣ |Ω|`.  The proof is the
+free-action decomposition `β ≃ (β / Γ) × Γ` (`MulAction.selfEquivOrbitsQuotientProd`), which makes
+`|β| = |β / Γ| · |Γ|`. -/
+theorem card_dvd_of_stabilizer_eq_bot {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
+    [MulAction Γ β] (h : ∀ b : β, MulAction.stabilizer Γ b = ⊥) :
+    Nat.card Γ ∣ Nat.card β := by
+  have e := MulAction.selfEquivOrbitsQuotientProd (α := Γ) (β := β) h
+  rw [Nat.card_congr e, Nat.card_prod]
+  exact Dvd.intro_left _ rfl
+
+/-- **A finite group acting with no non-trivial fixed pairs divides the cardinality.** Variant of
+`card_dvd_of_stabilizer_eq_bot` whose hypothesis is the form actually checked in Peterfalvi (6.7.1):
+no element `x ≠ 1` fixes any point.  (Trivial stabilizers and "no non-identity element fixes a
+point" are equivalent for a group action.) -/
+theorem card_dvd_of_no_nontrivial_fixed {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
+    [MulAction Γ β] (h : ∀ (x : Γ), x ≠ 1 → ∀ b : β, x • b ≠ b) :
+    Nat.card Γ ∣ Nat.card β := by
+  refine card_dvd_of_stabilizer_eq_bot fun b => ?_
+  rw [eq_bot_iff]
+  intro x hx
+  rw [MulAction.mem_stabilizer_iff] at hx
+  by_contra hx1
+  exact h x (by simpa using hx1) b hx
+
+end FreeActionDivisibility
+
+section PairAction
+
+variable [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)]
+
+/-- The defining predicate of the pair set `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}` of Peterfalvi
+(6.7.1): an ordered pair `q = (u, v)` with `u ∈ C_i`, `v ∈ C_j` and `u·v ∈ C_s`. -/
+def IsClassPair (Ci Cj Cs : ConjClasses G) (q : G × G) : Prop :=
+  ConjClasses.mk q.1 = Ci ∧ ConjClasses.mk q.2 = Cj ∧ ConjClasses.mk (q.1 * q.2) = Cs
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] in
+/-- Conjugation preserves the pair predicate: if `q` lies in `Ω` then so does `(x q.1 x⁻¹, x q.2
+x⁻¹)`, because conjugation fixes every conjugacy class and is multiplicative. -/
+theorem isClassPair_conj {Ci Cj Cs : ConjClasses G} {q : G × G}
+    (hq : IsClassPair Ci Cj Cs q) (x : G) :
+    IsClassPair Ci Cj Cs (x * q.1 * x⁻¹, x * q.2 * x⁻¹) := by
+  obtain ⟨h1, h2, h3⟩ := hq
+  refine ⟨by rw [mk_conj_eq, h1], by rw [mk_conj_eq, h2], ?_⟩
+  rw [show x * q.1 * x⁻¹ * (x * q.2 * x⁻¹) = x * (q.1 * q.2) * x⁻¹ by group, mk_conj_eq, h3]
+
+/-- The pair set `Ω` of Peterfalvi (6.7.1), as a subtype of `G × G`. -/
+abbrev ClassPair (Ci Cj Cs : ConjClasses G) : Type _ := { q : G × G // IsClassPair Ci Cj Cs q }
+
+/-- The **conjugation action of a subgroup `P ≤ G` on the pair set `Ω`** of Peterfalvi (6.7.1):
+`x • (u, v) = (x u x⁻¹, x v x⁻¹)`.  This is the action whose fixed-point-freeness (no `x ∈ P^#`
+fixes a pair) yields `|P| ∣ a_{ijs}|C_s| = |Ω|`. -/
+instance classPairSMul (P : Subgroup G) (Ci Cj Cs : ConjClasses G) :
+    SMul P (ClassPair Ci Cj Cs) where
+  smul x q := ⟨((x : G) * q.1.1 * (x : G)⁻¹, (x : G) * q.1.2 * (x : G)⁻¹),
+    isClassPair_conj q.2 (x : G)⟩
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] in
+@[simp] theorem classPairSMul_coe (P : Subgroup G) {Ci Cj Cs : ConjClasses G} (x : P)
+    (q : ClassPair Ci Cj Cs) :
+    ((x • q : ClassPair Ci Cj Cs) : G × G) = ((x : G) * q.1.1 * (x : G)⁻¹,
+      (x : G) * q.1.2 * (x : G)⁻¹) := rfl
+
+instance classPairMulAction (P : Subgroup G) (Ci Cj Cs : ConjClasses G) :
+    MulAction P (ClassPair Ci Cj Cs) where
+  one_smul q := by
+    apply Subtype.ext
+    rw [classPairSMul_coe]
+    simp
+  mul_smul x y q := by
+    apply Subtype.ext
+    rw [classPairSMul_coe, classPairSMul_coe, classPairSMul_coe]
+    simp only [Subgroup.coe_mul, Prod.mk.injEq]
+    constructor <;> group
+
+omit [DecidableEq G] in
+/-- The cardinality of the pair set `Ω` equals the structure coefficient `a_{ijs}|C_s| =
+`classSumCoeff Ci Cj Cs` (Peterfalvi's `a_{ijs}|{\cal C}_s|`). -/
+theorem card_classPair (Ci Cj Cs : ConjClasses G) :
+    Nat.card (ClassPair Ci Cj Cs) = classSumCoeff Ci Cj Cs := by
+  classical
+  rw [classSumCoeff, Nat.card_eq_fintype_card,
+    Fintype.card_subtype (p := fun q => IsClassPair Ci Cj Cs q)]
+  congr 1
+  ext q
+  simp only [Finset.mem_filter, IsClassPair]
+
+omit [DecidableEq G] in
+/-- **Peterfalvi (6.7.1)** (orbit-counting half).  Let `P ≤ G` be a finite subgroup acting on the
+pair set `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}` by conjugation.  If `P` acts *fixed-point-freely* —
+no `x ∈ P` with `x ≠ 1` fixes a pair of `Ω` — then `|P| ∣ a_{ijs}|C_s|`, i.e. `|P|` divides the
+structure-coefficient count `classSumCoeff Ci Cj Cs`.
+
+This packages the counting step of (6.7.1): the remaining content of (6.7.1) is precisely the
+group-theoretic verification of the fixed-point-free hypothesis (`P^#` TI-subset ⟹ `C_G(x) ⊆ L`,
+a `p`-element of `L` lies in `P`, conjugacy into `Z^#` with `Z ⊴ L` forces it into `Z`,
+contradicting `C_s ∩ Z = ∅`). -/
+theorem card_dvd_classSumCoeff_of_fixedPointFree (P : Subgroup G) [Finite P]
+    (Ci Cj Cs : ConjClasses G)
+    (hfree : ∀ x : P, (x : G) ≠ 1 → ∀ q : ClassPair Ci Cj Cs, x • q ≠ q) :
+    Nat.card P ∣ classSumCoeff Ci Cj Cs := by
+  rw [← card_classPair]
+  refine card_dvd_of_no_nontrivial_fixed (Γ := P) (β := ClassPair Ci Cj Cs) ?_
+  intro x hx q
+  exact hfree x (by simpa using hx) q
+
+end PairAction
 
 section CentralCharacter
 
