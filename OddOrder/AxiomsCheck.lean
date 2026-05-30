@@ -725,6 +725,12 @@ set_option linter.style.longLine false in
 -- (`alphaB_conjFinset_eq_transportConj`) and the generic `induce_map_conj`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.alphaB_conjFinset_eq_transportConj
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_conjFinset
+-- Peterfalvi §4 (2.10.3) pointwise value of `Ind_{M(B)}^G α_B`, transversal half:
+-- `(Ind_{M(B)} α_B)(g) = ⅟|M(B)| · ∑_{x ∈ 𝒜(g,M(B))} induceTerm M(B) α_B x g`
+-- (`induce_alphaB_apply_eq_sum_conjFiber`), and the per-term `α_B(x⁻¹gx) = α(b)` collapse
+-- via the (2.9) defining equation (`exists_nLStabilizerIn_alphaB_induceTerm`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_conjFiber
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.exists_nLStabilizerIn_alphaB_induceTerm
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

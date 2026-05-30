@@ -75,8 +75,11 @@ created: 2026-05-27
 - [x] **(2.10.1) Dade-specific** `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` — 2026-05-30 完了
       (`induce_alphaB_conjFinset`; M(B^x)=M(B)^x の subgroup 共役 + α_{B^x}=transportConj x α_B の
       class function transport + generic `induce_map_conj`; 下記「進捗 (6)」).
-- [ ] (2.10.3) Dade-specific 点別値: 上の transversal collapse + `card_conj_fiber` で
-      `𝒜(g,H(B)b)` 集計 (issue 0039 再利用) — generic infra は整備済、Dade 適用が残.
+- [~] (2.10.3) Dade-specific 点別値: **transversal half 完了** (2026-05-30, 下記「進捗 (7)」):
+      `induce_alphaB_apply_eq_sum_conjFiber` (第 1 式 `(Ind α_B)(g)=⅟|M(B)|∑_{x∈𝒜(g,M(B))}induceTerm`)
+      + `exists_nLStabilizerIn_alphaB_induceTerm` (per-term `α_B(x⁻¹gx)=α(b)` collapse, (2.9) keystone).
+      **残**: vanishing case (g∉⋃(aH(a))^G ⇒ 0) と `card_conj_fiber` 集計 (𝒜(g,H(B)b)) は
+      **coprime-action 共役 primitive `hb ~ c·b (c∈C_{H(B)}(b))` が repo/mathlib に欠落**でブロック.
 - [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **(2.6.b) 専用、現フロンティア**
 - [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
       を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).
@@ -373,3 +376,38 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
 **残 ((2.6.b) まで)**: (2.10.1) Dade-specific は**完了**.  残るは
 (2.10.3) Dade 点別値 (`card_conj_fiber` で `𝒜(g,H(B)b)` 集計) → ℬ 代表系 (項目 1, 構造的) →
 Möbius 相殺 (項目 4, `Finset.sum_involution`) → `PreservesVirtualCharacters` → `FullDadeIsometryData`.
+
+## 進捗 2026-05-30 (7) — (2.10.3) transversal half 完成 (sorry-free, axiom-clean)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section SemidirectStructure` 内
+`section PointwiseValue` に, (2.10.3) の **transversal value 半分** を landed
+(`lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/axiom 無し; 2 定理とも 3 axioms 全 allowlist 内).
+
+- `conjFiber g X` = **`𝒜(g,X) = {x∈G | x⁻¹gx∈X}`** (Finset, `[Fintype G]`), `mem_conjFiber`.
+- **`induce_alphaB_apply_eq_sum_conjFiber`** = (2.10.3) **第 1 式**:
+  `(Ind_{M(B)} α_B)(g) = ⅟|M(B)| · ∑_{x∈𝒜(g,M(B))} induceTerm M(B) α_B x g`.
+  証明 = generic `induce_apply_eq_sum_filter` + `rfl` (filter = conjFiber, subgroup↔Set coercion defeq).
+- `alphaB_induceTerm_of_mem` — filter 上で `induceTerm M(B) α_B x g = α_B⟨x⁻¹gx,_⟩` (`induceTerm_of_mem`).
+- **`exists_nLStabilizerIn_alphaB_induceTerm`** = (2.10.3) **per-term collapse** `α_B(x⁻¹gx)=α(b)`:
+  `x⁻¹gx∈M(B)` を `coe_mBSubgroup` で `h·b` (h∈H(B), b∈N_L(B)) に分解し, (2.9) keystone
+  `alphaB_apply_mul` で `induceTerm = α(b)` を取り出す. これが Möbius 計算で各項を `α(b)` 化する核.
+
+### 残ブロッカー (precise): coprime-action 共役 primitive
+
+(2.10.3) の **残り 2 つ** — (i) vanishing `g∉⋃_a(aH(a))^G ⇒ (Ind α_B)(g)=0`,
+(ii) `card_conj_fiber` 集計 `∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|` — は共に, 教科書の
+
+> "_hb_ is conjugate to an element of `C_{H(B)}(b)·b`" (proof of (2.10.3))
+
+すなわち **coprime-action 共役**:
+`K=H(B)` 有限部分群, `b` が `K` を正規化 (b∈N_L(B)) し `gcd(|K|,ord b)=1` (= (2.2.c)) のとき,
+`h·b` (h∈K) は `K`-共役で `c·b` (c∈C_K(b)) に移る (Glauberman/coprime action の特殊形),
+を必要とする.  これは **mathlib の `Mathlib/GroupTheory/` にも本 repo にも無い** (確認済:
+coprime + IsConj/centralizer-coset の補題は皆無; mathlib にあるのは `orderOf_mul_..._coprime` 系のみ).
+
+`c∈C_{H(B)}(b)=H(B∪{b})⊆H(b)` ((2.10.2)+`b∈A`) かつ `c·b=b·c` なので
+`h·b ~ c·b = b·c ∈ b·H(b)`, すなわち `g∈(bH(b))^G⊆dadeSupport`.  これさえ立てば vanishing は
+`exists_nLStabilizerIn_alphaB_induceTerm` + 対偶で即, 集計は `card_conj_fiber` (issue 0039) で完了.
+
+→ **次の sub-issue 候補**: `Mathlib`-style の coprime-action conjugacy-to-centralizer-coset 補題
+(`OddOrder/GroupTheory/CoprimeConjugacy.lean` に追加)  これは (2.10.3) 完成と Möbius (2.10) の前提.

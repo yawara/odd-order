@@ -1439,6 +1439,87 @@ theorem induce_alphaB_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInva
 
 end ConjugacyInvariance
 
+/- 2.10.3: Pointwise value of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
+
+section PointwiseValue
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.3), the conjugating set `𝒜(g, X)`.**  For `g : G` and a subset
+`X ⊆ G`, `𝒜(g, X) = { x ∈ G | x⁻¹ g x ∈ X }`, as a `Finset G` (using `[Fintype G]`).
+This is the index set of the transversal sum in the induced-character value formula. -/
+noncomputable def conjFiber (g : G) (X : Set G) : Finset G :=
+  Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ X)
+
+@[simp] theorem mem_conjFiber {g x : G} {X : Set G} :
+    x ∈ conjFiber g X ↔ x⁻¹ * g * x ∈ X := by
+  classical
+  simp [conjFiber]
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.3), first displayed equation (transversal form).**  The pointwise
+value of the induced class function `Ind_{M(B)}^G α_B` at `g`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{x ∈ 𝒜(g, M(B))} induceTerm M(B) α_B x g`.
+
+This is the literal first line of Peterfalvi's proof of (2.10.3): the induction formula
+`induce_apply_eq_sum_filter`, restated with the conjugating set `𝒜(g, M(B)) = conjFiber`.
+On the filter the summand `induceTerm M(B) α_B x g` *is* `α_B(x⁻¹ g x)`
+(`alphaB_induceTerm_of_mem` below). -/
+theorem induce_alphaB_apply_eq_sum_conjFiber (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ x ∈ conjFiber g (↑(mBSubgroup hyp B hB) : Set G),
+            ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g := by
+  rw [ClassFunction.induce_apply_eq_sum_filter]
+  rfl
+
+/-- On the conjugating set `𝒜(g, M(B))`, the induction summand `induceTerm M(B) α_B x g`
+is the explicit value `α_B(x⁻¹ g x)`.  Combined with
+`induce_alphaB_apply_eq_sum_conjFiber` this is the `α_B`-explicit first line of (2.10.3). -/
+theorem alphaB_induceTerm_of_mem (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    {x g : G} (hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB) :
+    ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+      = alphaB hyp hconj hB α ⟨x⁻¹ * g * x, hx⟩ :=
+  ClassFunction.induceTerm_of_mem _ hx
+
+/-- **Peterfalvi (2.10.3), the `α_B(x⁻¹gx) = α(b)` collapse.**  For `x ∈ 𝒜(g, M(B))`,
+write the conjugate `x⁻¹ g x = h · b` with `h ∈ H(B)` and `b ∈ N_L(B)` (the semidirect
+factorization of `M(B)`, `coe_mBSubgroup`).  Then the induction summand collapses, via the
+(2.9) defining equation `alphaB_apply_mul`, to `α(b)`.
+
+This isolates the value half of Peterfalvi's "`α_B(x⁻¹ g x) = α(b)`" step (the membership
+half — `α(b) ≠ 0 ⟹ b ∈ A` and then `g ∈ (bH(b))^G` — is the coprime-conjugacy argument
+driving the `card_conj_fiber` aggregation, tracked separately). -/
+theorem exists_nLStabilizerIn_alphaB_induceTerm (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) {x g : G} (hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB) :
+    ∃ (h : G) (_ : h ∈ hIntersection hyp B hB) (b : G) (hb : b ∈ nLStabilizerIn hyp B),
+      x⁻¹ * g * x = h * b ∧
+        ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+          = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+  classical
+  -- factor `x⁻¹ g x = h * b` with `h ∈ H(B)`, `b ∈ N_L(B)`
+  have hmem_prod : x⁻¹ * g * x
+      ∈ (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
+    rw [← hyp.coe_mBSubgroup hconj hB]; exact hx
+  obtain ⟨h, hh, b, hb, hhb⟩ := hmem_prod
+  -- `hhb : h * b = x⁻¹ * g * x`
+  refine ⟨h, hh, b, hb, hhb.symm, ?_⟩
+  have hhbeq : h * b = x⁻¹ * g * x := hhb
+  have hhbM : h * b ∈ mBSubgroup hyp B hB := by rw [hhbeq]; exact hx
+  have harg : (⟨x⁻¹ * g * x, hx⟩ : mBSubgroup hyp B hB) = ⟨h * b, hhbM⟩ :=
+    Subtype.ext hhb.symm
+  calc ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+      = alphaB hyp hconj hB α ⟨x⁻¹ * g * x, hx⟩ :=
+        alphaB_induceTerm_of_mem hyp hconj hB α hx
+    _ = alphaB hyp hconj hB α ⟨h * b, hhbM⟩ := congrArg (alphaB hyp hconj hB α) harg
+    _ = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := hyp.alphaB_apply_mul hconj hB α hh hb hhbM
+
+end PointwiseValue
+
 end SemidirectStructure
 
 end Hypothesis

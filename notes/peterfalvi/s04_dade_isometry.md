@@ -331,3 +331,19 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
 **作成**: 2026-05-22. **出典**: Peterfalvi `references/peterfalvi/04.4_pp_10_14_*.mmd` (127 行), Phase 1 Isaacs Ch.6 ノート (Frobenius), `notes/peterfalvi/_overview.md`, `notes/meta/phase2_cross_refs.md`.
 
 **次ステップ**: §3 着手と並行して `Dade.Isometry` の Lean 型設計 review (候補 1-3 比較). §5 (TI cyclic normalizer) 設計の preview.
+
+---
+
+## 2026-05-30 追記 — (2.10.3) transversal half landed / 残ブロッカー確定
+
+(2.5)–(2.6.a)/(2.8)/(2.9)/(2.10.1)/(2.10.2) は landed (詳細 = `issues/0040-*` 進捗 (1)-(7)).
+本日 **(2.10.3) の transversal value 半分**を `S04_DadeIsometry.lean` `section PointwiseValue` に追加:
+`induce_alphaB_apply_eq_sum_conjFiber` (第 1 式) + `exists_nLStabilizerIn_alphaB_induceTerm`
+(per-term `α_B(x⁻¹gx)=α(b)` collapse).  sorry-free, axiom-clean.
+
+**(2.6.b) までの単一ブロッカー (precise)**: (2.10.3) 残 (vanishing + `card_conj_fiber` 集計) と
+(2.10) Möbius は共に **coprime-action 共役 primitive** —
+`K` 有限部分群, `b` が `K` を正規化し `gcd(|K|,ord b)=1` ⇒ `h·b (h∈K)` が `K`-共役で `c·b (c∈C_K(b))` —
+を要する.  mathlib `GroupTheory/`・本 repo とも欠落 (確認済).  次 sub-issue =
+`OddOrder/GroupTheory/CoprimeConjugacy.lean` に Glauberman coprime-action conjugacy 補題追加.
+詳細は `issues/0040-*` 進捗 (7).
