@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.CriticalSubgroup
 import Mathlib.GroupTheory.Complement
 
 /-!
@@ -96,5 +97,88 @@ theorem exists_maximalElementaryAbelian_ge
   obtain ⟨F, hEF, hFmax⟩ :=
     Finite.exists_le_maximal (p := fun F : Subgroup R => F.IsElementaryAbelian p) hE
   exact ⟨F, hEF, hFmax.1, fun G hG hFG => le_antisymm (hFmax.2 hG hFG) hFG⟩
+
+/-! ## `W = Ω₁(Z₂(R))` (BG Lemma 4.5, exp-`p` half)
+
+For an odd `p`-group `R`, BG Lemma 4.5 studies `W = Ω₁(Z₂(R))`, the order-`p`
+elements of the second centre `Z₂(R) = upperCentralSeries R 2`. Since `Z₂(R)` has
+class `≤ 2` (`⁅Z₂, Z₂⁆ ≤ Z₁ = Z(R)`), the exponent-`p` half of Lemma 4.5(c) follows
+from `Omega.pow_eq_one_of_class_le_two`: every element of `W` has `p`-th power `1`.
+
+`Z₂(R)` is in general **non-abelian** (it has class `≤ 2`, not `≤ 1`), so `W` is
+built with the `omega1Map` template (`OmegaSubgroup` / `CriticalSubgroup`): take
+`Ω₁` of the subtype `↥Z₂(R)`, then map back along `Z₂(R).subtype`. The noncyclic
+half of Lemma 4.5(c) is **not** proved here (it needs the general Lemma 4.5(a)). -/
+
+section Omega1UpperCentralTwo
+
+open scoped commutatorElement
+
+/-- **BG Lemma 4.5** `W = Ω₁(Z₂(R))`. For a prime `p`, the subgroup of `R` generated
+by the order-`p` elements of the second centre `Z₂(R) = upperCentralSeries R 2`,
+realised as the image of `Ω₁(↥Z₂(R))` under `Z₂(R).subtype` (the `omega1Map`
+template, since `Z₂(R)` is generally non-abelian). -/
+def omega1UpperCentralTwo (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
+  (Omega ↥(upperCentralSeries R 2) p 1).map (upperCentralSeries R 2).subtype
+
+/-- `W = Ω₁(Z₂(R)) ≤ Z₂(R)`. -/
+theorem omega1UpperCentralTwo_le (R : Type*) [Group R] (p : ℕ) :
+    omega1UpperCentralTwo R p ≤ upperCentralSeries R 2 :=
+  Subgroup.map_subtype_le _
+
+/-- `W = Ω₁(Z₂(R))` is characteristic in `R` (char-in-char: `Ω₁` is characteristic
+in `Z₂(R)`, `Z₂(R)` is characteristic in `R`). -/
+instance omega1UpperCentralTwo_characteristic {R : Type*} [Group R] {p : ℕ} :
+    (omega1UpperCentralTwo R p).Characteristic :=
+  characteristic_map_subtype_of_characteristic inferInstance Omega.characteristic
+
+/-- `Z₂(R) = upperCentralSeries R 2` has class `≤ 2`: `⁅Z₂, Z₂⁆ ≤ Z(↥Z₂)`.
+
+For `x, y ∈ Z₂(R) = upperCentralSeries R 2`, `mem_upperCentralSeries_succ_iff` (with
+`n = 1`) gives `⁅x, y⁆ = x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1 = Z(R)`, so
+`⁅x, y⁆` commutes with all of `R`, in particular centralises `Z₂(R)`. Translating
+along `Z₂(R).subtype` yields the claim. -/
+theorem commutator_upperCentralSeries_two_le_center {R : Type*} [Group R] :
+    _root_.commutator ↥(upperCentralSeries R 2) ≤
+      Subgroup.center ↥(upperCentralSeries R 2) := by
+  set Z := upperCentralSeries R 2 with hZ
+  -- `⁅Z, Z⁆ ≤ Z(R)`: for `x, y ∈ Z = upperCentralSeries R 2`, `⁅x, y⁆ ∈ Z(R)`.
+  have hZZ_le_center : ⁅Z, Z⁆ ≤ Subgroup.center R := by
+    rw [Subgroup.commutator_le]
+    intro x hx y _
+    -- `x ∈ upperCentralSeries R (1 + 1)` ⇒ `x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1`.
+    have hmem : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1 :=
+      mem_upperCentralSeries_succ_iff.mp hx y
+    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+  -- `Z(R)` centralises everything, so `⁅Z, Z⁆ ≤ centralizer (Z : Set R)`.
+  have hZZ_cent : ⁅Z, Z⁆ ≤ Subgroup.centralizer (Z : Set R) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro w _
+    exact Subgroup.mem_center_iff.mp (hZZ_le_center hx) w
+  -- Translate `⁅Z, Z⁆ ≤ centralizer Z` to `commutator ↥Z ≤ center ↥Z`.
+  rw [← Z.map_subtype_le_map_subtype, Z.map_subtype_commutator]
+  intro x hx
+  have hxZ : x ∈ Z := Z.commutator_le_self hx
+  rw [Subgroup.mem_map]
+  refine ⟨⟨x, hxZ⟩, ?_, rfl⟩
+  rw [Subgroup.mem_center_iff]
+  intro k
+  apply Subtype.ext
+  rw [Subgroup.coe_mul, Subgroup.coe_mul]
+  exact Subgroup.mem_centralizer_iff.mp (hZZ_cent hx) (k : R) k.2
+
+/-- **BG Lemma 4.5(c)** (exponent-`p` half). For odd `p`, every element of
+`W = Ω₁(Z₂(R))` has `p`-th power `1`. -/
+theorem pow_eq_one_of_mem_omega1UpperCentralTwo
+    {R : Type*} [Group R] {p : ℕ} (hp_odd : Odd p) {g : R}
+    (hg : g ∈ omega1UpperCentralTwo R p) : g ^ p = 1 := by
+  rw [omega1UpperCentralTwo, Subgroup.mem_map] at hg
+  obtain ⟨z, hz, rfl⟩ := hg
+  have hzp : z ^ p = 1 :=
+    Omega.pow_eq_one_of_class_le_two hp_odd commutator_upperCentralSeries_two_le_center hz
+  rw [Subgroup.coe_subtype, ← Subgroup.coe_pow, hzp, Subgroup.coe_one]
+
+end Omega1UpperCentralTwo
 
 end OddOrder.GroupTheory
