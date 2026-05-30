@@ -203,6 +203,37 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
         Fourier (`mem_ZIrr_repr`/`inner_eq_coeff_of_repr`) + `character_inv` 가 모두 import closure 내
         유일 모듈). `IsCharacter` 述語만 `ZIrr.lean` (其 `.mem_ZIrr` 는 downstream `character_mem_ZIrr`
         필요해 Clifford 에).
+- [x] (2026-05-31, G2.6 PASS 2) **(6.6) named conclusion `peterfalvi_66_coherence_of_X` + enum-cover
+      bridge** 를 `S07_Coherence.lean` (`coherentOfPairChainCover` 직후) 에 landing (sorry/axiom 無 —
+      `#print axioms peterfalvi_66_coherence_of_X` = {propext, Classical.choice, Quot.sound};
+      AxiomsCheck 등록 2건 각 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck`
+      緑 3360/3343 jobs). PASS 1 의 `coherentOfPairChainCover` (set-level cover `hcover` 를 opaque
+      가설로 받음) 를 (6.6) 의 실제 증명구조 — degree-monotone enumeration `exists_monotoneDegreeEnum`
+      (mmd L76 "Set X = {χ₁,…,χₙ}, χ₁(1) ≤ ⋯ ≤ χₙ(1)") 를 engine accumulator 에 threading — 으로
+      끌어올림:
+  - **`pairUnion_eq_of_enumCover`** (genuinely new bridge, NOT thin wrapper): enum `e : Fin n →
+    ClassFunction L ℂ` 의 *surjectivity* `hsurj : ∀ χ∈X, ∃ i, e i=χ` + **index-level** cover
+    `hcoverIdx : ∀ i, e i ∈ S₀ ∨ ∃ j<N, e i ∈ pairSet pair j` ⟹ `pairUnion S₀ pair N = X`.
+    set-level cover (`pairUnion_eq_of_cover` 가 요구) 를 χ=e i 치환으로 index-level 에서 도출 —
+    `exists_monotoneDegreeEnum` 가 `Fin n` 으로 주는 사실들과 engine 의 set-level cover 사이의
+    connective tissue (PASS 1 note 의 residual "threading the enum sort into the accumulator").
+  - **`peterfalvi_66_coherence_of_X`** (`noncomputable def`, = G2.6 GOAL, textbook altitude): enum
+    `e`/`hsurj` (mmd L76 opening) + pair-chain decomposition (`S₀`/`pair`/`N`/`hS₀`/`hpairs` +
+    index-cover `hcoverIdx`) + base prefix coherence `h0` ((1.1)+(1.4)) + per-step (5.6) adjoining
+    `hstep` (`retarget_isCoherent`) ⟹ `IsCoherent τ X A` (mmd L84 "Repeated use of (5.6) shows X is
+    coherent"). proof = `pairUnion_eq_of_enumCover hsurj … ▸ coherentPairChain S₀ pair h0 N hstep`.
+    `hXfin` 는 (6.6) X 유한성 (enum 존재 정당화), `e`/`hcoverIdx`/`h0`/`hstep` 가 *공급* 데이터,
+    결론은 chain 으로 derived (posit 無).
+  - **honest 판정**: thin wrapper 아님 — `coherentOfPairChainCover` 보다 (a) (6.6) 의 named 결론
+    statement 를 textbook altitude 로 제시하고 (b) `exists_monotoneDegreeEnum` enumeration 을
+    surjectivity 경유로 engine 에 연결 (set-level cover 를 index-level `hcoverIdx` 로 약화 = caller 가
+    χ₁,…,χₙ 따라 index 별 확인). degree-inequality 측은 이미 landed (`two_mul_lt_sq_of_primePow_gap`/
+    `sumInflatedDegreeSq`).
+  - **정밀 잔존 (G2.7, 불변)**: `hstep` 각 step 의 `retarget_isCoherent` 입력 중 **target characters
+    `{Xᵢ, X̄ᵢ}` + image equation + lattice 직교** 의 *구성* = **Dade isometry ν basis extension** 미완
+    (orthonormal `X∪Y`/`X` 의 ℤ-linear independence ⟹ free-module basis extension, repo/mathlib 부재).
+    + caller 의 decomposition data (`pair`/`N`/index-cover) 를 enum + conjugate-pairing 에서 구성하는
+    작업 (conjugation-closed set 의 canonical pairing, 별도 leaf). 상세는 issue 0046 G2.6 PASS 2.
 
 ## 進捗 (2026-05-30, issue 1001, Round-9 Track B)
 

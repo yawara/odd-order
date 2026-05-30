@@ -1197,6 +1197,18 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mem_pairUnion
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_eq_of_cover
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentOfPairChainCover
+-- (6.6) named conclusion `peterfalvi_66_coherence_of_X : … → IsCoherent τ X A` (mmd L74/L84):
+-- "X = {χ ∈ Irr L | Z ⊄ Ker χ} is coherent".  Assembles the (6.6) proof at the textbook altitude
+-- by threading the degree-monotone enumeration `e` of `exists_monotoneDegreeEnum` (mmd L76 opening
+-- "Set X = {χ₁,…,χₙ}, χ₁(1) ≤ ⋯ ≤ χₙ(1)") into the `coherentPairChain` accumulator via
+-- `pairUnion_eq_of_enumCover`: the enum's *surjectivity* onto `X` reduces the engine's set-level
+-- cover to the index-level cover `hcoverIdx` (checked along χ₁,…,χₙ), so the accumulator
+-- `pairUnion S₀ pair N` is identified with `X` and folded coherence (`coherentPairChain`) lands as
+-- `IsCoherent τ X A`.  Base prefix coherence `h0` ((1.1)+(1.4)) and per-step (5.6) adjoining `hstep`
+-- (degree side already discharged by `two_mul_lt_sq_of_primePow_gap`/`sumInflatedDegreeSq`) are
+-- supplied; the residual is `hstep`'s per-step `{Xᵢ,X̄ᵢ}` target data (Dade-isometry ν extension, G2.7).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_eq_of_enumCover
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X
 -- (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76): the degree-sorted indexing
 -- of the finite set `X = S − S(Z)`.  `exists_monotoneDegreeEnum` produces an injective surjection
 -- `e : Fin (X.ncard) → X` monotone in the real degree key `χ ↦ (characterDegree χ).re` — the purely

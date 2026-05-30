@@ -2272,6 +2272,80 @@ noncomputable def coherentOfPairChainCover
     IsCoherent τ X A :=
   pairUnion_eq_of_cover hS₀ hpairs hcover ▸ coherentPairChain S₀ pair h0 N hstep
 
+/-- The pair-chain reaches `X` from a degree-monotone **enumeration** of `X`.
+
+This is the bridge specialized to the way (6.6) actually produces the decomposition: from the
+degree-monotone enumeration `e : Fin n → X` of `exists_monotoneDegreeEnum`, which is *surjective*
+onto `X` (`hsurj : ∀ χ ∈ X, ∃ i, e i = χ`).  Then the set-level cover hypothesis of
+`pairUnion_eq_of_cover` is reduced to the **index-level** cover `hcoverIdx`: each enumerated
+character `e i` lies in the base `S₀` or in some adjoined pair.  Surjectivity transports this to
+arbitrary `χ ∈ X`, so `pairUnion S₀ pair N = X`.
+
+This is the connective tissue between the `exists_monotoneDegreeEnum` sort and the
+`coherentPairChain` accumulator: the enumeration provides facts indexed by `Fin n`, while the
+engine's cover is phrased over members of `X`; surjectivity is exactly what closes the gap. -/
+theorem pairUnion_eq_of_enumCover {S₀ X : Set (ClassFunction L ℂ)}
+    {pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ} {N : ℕ} {n : ℕ}
+    {e : Fin n → ClassFunction L ℂ}
+    (hsurj : ∀ χ ∈ X, ∃ i, e i = χ)
+    (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := L) pair j ⊆ X)
+    (hcoverIdx : ∀ i : Fin n,
+      e i ∈ S₀ ∨ ∃ j, j < N ∧ e i ∈ pairSet (L := L) pair j) :
+    pairUnion (L := L) S₀ pair N = X :=
+  pairUnion_eq_of_cover hS₀ hpairs (by
+    intro χ hχ
+    obtain ⟨i, rfl⟩ := hsurj χ hχ
+    exact hcoverIdx i)
+
+/-- **Peterfalvi (6.6): `X = S − S(Z)` is coherent.**
+
+The named conclusion of (6.6): the center-conditioned irreducible-character set
+`X = {χ ∈ Irr L | Z ⊄ Ker χ}` is coherent.  This is the assembly of the (6.6) proof's final step
+"**Repeated use of Theorem (5.6)** then shows that `X` is coherent" (mmd L84), wired against the
+opening "**Set `X = {χ₁,…,χₙ}`, where `χ₁(1) ≤ ⋯ ≤ χₙ(1)`**" (mmd L76).
+
+The hypotheses mirror the textbook proof structure exactly:
+
+* `hXfin` — `X` is finite, so the degree-sort enumeration exists (the (6.6) `X = S − S(Z)` is a
+  finite set of irreducible characters);
+* `e`/`hsurj` — the **degree-monotone enumeration** `χ₁,…,χₙ` of (6.6)'s opening, supplied by
+  `exists_monotoneDegreeEnum` (only its surjectivity onto `X` is needed to recover `X` from the
+  accumulator);
+* the pair-chain **decomposition** `S₀` (the equal-minimal-degree prefix `{χ₁,…,χₖ}`),
+  `pair`/`N` (the remaining conjugate pairs `{χᵢ, χ̄ᵢ}`), with the inclusions `hS₀`/`hpairs` and
+  the **index-level** cover `hcoverIdx` — `pairUnion_eq_of_enumCover` turns these into
+  `pairUnion S₀ pair N = X`;
+* the **base coherence** `h0` — "By (1.1) and (1.4), `{χ₁,…,χₖ}` is coherent";
+* the per-step **(5.6) adjoining** `hstep` — each step one application of (5.6)
+  (`retarget_isCoherent`), whose strict degree inequality `2χᵢ(1)χ₁(1) < ∑_{j<i}χⱼ(1)²` is
+  discharged by the gap leaf `two_mul_lt_sq_of_primePow_gap` fed by the degree-sum
+  `sumInflatedDegreeSq`.
+
+The conclusion `IsCoherent τ X A` is **derived** by folding `hstep` over the chain
+(`coherentPairChain`) and identifying the accumulator with `X` (`pairUnion_eq_of_enumCover`); it is
+never posited.  Beyond `coherentOfPairChainCover`, this names the (6.6) result at the textbook
+altitude and threads the `exists_monotoneDegreeEnum` enumeration into the engine via surjectivity,
+so the cover is checked index-by-index along `χ₁,…,χₙ` rather than re-proved over abstract `χ ∈ X`.
+
+The residual is the construction of each `hstep`'s per-step retarget target data `{Xᵢ, X̄ᵢ}` (the
+Dade-isometry `ν` basis extension, G2.7); the degree-inequality side of each step is already landed
+(`two_mul_lt_sq_of_primePow_gap`, `sumInflatedDegreeSq`). -/
+noncomputable def peterfalvi_66_coherence_of_X
+    {τ : IntegralCharacterMap L G} {A : Set L} {X S₀ : Set (ClassFunction L ℂ)}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hXfin : X.Finite)
+    {e : Fin X.ncard → ClassFunction L ℂ} (hsurj : ∀ χ ∈ X, ∃ i, e i = χ)
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (N : ℕ)
+    (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := L) pair j ⊆ X)
+    (hcoverIdx : ∀ i : Fin X.ncard,
+      e i ∈ S₀ ∨ ∃ j, j < N ∧ e i ∈ pairSet (L := L) pair j)
+    (h0 : IsCoherent τ S₀ A)
+    (hstep : ∀ i, i < N → IsCoherent τ (pairUnion (L := L) S₀ pair i) A →
+      IsCoherent τ (pairUnion (L := L) S₀ pair (i + 1)) A) :
+    IsCoherent τ X A :=
+  pairUnion_eq_of_enumCover hsurj hS₀ hpairs hcoverIdx ▸
+    coherentPairChain S₀ pair h0 N hstep
+
 /-! ### Peterfalvi (5.6.1): the family bundle
 
 The (5.6) coherence-union argument carries a whole **family** `{χᵢ}_{i ∈ s} ⊆ S₁` with `χ₁` a
