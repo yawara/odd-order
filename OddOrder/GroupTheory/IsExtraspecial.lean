@@ -22,6 +22,9 @@ mathlib v4.29.1 に `IsExtraspecial` 不在を確認済 (0 hits in `Mathlib/`,
 ## Main definitions
 
 * `OddOrder.GroupTheory.IsExtraspecial p G`: `G` is an extraspecial `p`-group.
+* `OddOrder.GroupTheory.IsExpPExtraspecial p G`: `G` is an extraspecial `p`-group
+  of exponent `p` (`Monoid.exponent G = p`). BG §4 Thm 4.16 case (2) /
+  Cor 10.7(b) の中心積の非可換因子 `R₁` (Heisenberg 群 `M(p,1)`) を述語化したもの.
 
 教科書 (Isaacs FGT Defn 6.6, Aschbacher §23) 標準定義:
 **`Z(G) = [G, G] = Φ(G)`** かつ **`|Z(G)| = p`**.
@@ -86,5 +89,39 @@ theorem frattini_card (h : IsExtraspecial p G) : Nat.card (frattini G) = p := by
   rw [h.frattini_eq_center]; exact h.center_card
 
 end IsExtraspecial
+
+/-- **Extraspecial p-group of exponent p**: an extraspecial `p`-group all of whose
+elements satisfy `g ^ p = 1` (equivalently `Monoid.exponent G = p`).
+
+これは **BG §4 Thm 4.16** condition (2) / **BG Cor 10.7(b)** で現れる中心積の
+非可換因子 `R₁` (= Heisenberg 群 `M(p,1)`, 位数 `p³`) の構造を記述する再利用可能な
+述語. Thm 4.16 の Case B-1 では `S = Ω₁(R)` が `r(R) = 2` から非可換 ⇒ extraspecial,
+かつ Prop 4.8 から exponent `p` であることが示され, この述語の witness となる.
+
+**重要**: 位数 `p³` はこの述語に **含めない**. Thm 4.16 の証明内部で `|Ω₁(R)| = p³`
+として別途確立される (Prop 4.8) ため, ここでは exponent-`p` 部分のみを述語化する.
+
+`p` prime 仮定は def 段階では不要 (`IsExtraspecial` と同様 mathlib 慣用). -/
+def IsExpPExtraspecial (p : ℕ) (G : Type*) [Group G] : Prop :=
+  IsExtraspecial p G ∧ Monoid.exponent G = p
+
+namespace IsExpPExtraspecial
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+/-- An exponent-`p` extraspecial group is extraspecial. -/
+theorem isExtraspecial (h : IsExpPExtraspecial p G) : IsExtraspecial p G := h.1
+
+/-- An exponent-`p` extraspecial group has `Monoid.exponent` equal to `p`. -/
+theorem exponent_eq (h : IsExpPExtraspecial p G) : Monoid.exponent G = p := h.2
+
+/-- Every element of an exponent-`p` extraspecial group satisfies `g ^ p = 1`.
+
+This is the form consumed in BG §4 Thm 4.16 Case B-1, where `S = Ω₁(R)` has exponent
+`p` and hence every element of `S` is killed by `p`-th power. -/
+theorem pow_eq_one (h : IsExpPExtraspecial p G) (g : G) : g ^ p = 1 := by
+  rw [← h.exponent_eq]; exact Monoid.pow_exponent_eq_one g
+
+end IsExpPExtraspecial
 
 end OddOrder.GroupTheory
