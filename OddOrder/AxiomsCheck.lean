@@ -1198,6 +1198,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
 
+-- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
+-- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
+-- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue
+-- to be `1` (triangle-inequality equality case `all_eq_one_of_norm_eq_one_of_sum_eq_card`).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.all_eq_one_of_norm_eq_one_of_sum_eq_card
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one
+
 -- Inflation infrastructure ([Isaacs] (2.22), gating Peterfalvi (6.6) G2.5 degree-sum):
 -- irreducibility is preserved under surjective precomposition, hence the inflation map
 -- `Irr(G ⧸ N) → Irr G`, `χ̄ ↦ χ̄ ∘ (mk' N)`, is degree-preserving with `N ⊆ ker`.
