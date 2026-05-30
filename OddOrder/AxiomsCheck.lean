@@ -595,6 +595,10 @@ set_option linter.style.longLine false in
 -- Peterfalvi §3 (1.1), conjugate-difference (nondegeneracy) form for §7: in a finite group of
 -- odd order, the conjugate difference `χ - χ̄` of a nontrivial irreducible character is nonzero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_of_ne_trivial_of_odd_card
+-- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
+-- characters contains no real class function. Discharges the `no_real_characters` field of the §7
+-- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.hasNoRealCharacters_nontrivialIrreducibleClassFunctions
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters

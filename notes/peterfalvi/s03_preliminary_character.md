@@ -280,6 +280,7 @@ theorem frobenius_reciprocity : (Induced_char θ, χ) = (θ, Res χ) := ...
 ## 進捗
 
 - **2026-05-30**: (1.1) 共役差の非退化形 `conjugateDifference_ne_zero_of_ne_trivial_of_odd_card` を追加 (`S03_PreliminaryCharacter.lean`). `|G|` 奇数 + χ 非自明 ⇒ `χ - χ̄ ≠ 0`. 無条件版 `RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'` と既存 `conjugateDifference_ne_zero_iff_not_isReal` の合成. §7 の `χ - χ̄` 構成が非ゼロであることの土台 (§9 (7.9) 経路で消費). AxiomsCheck 登録済 (allowlist clean).
+- **2026-05-30**: (1.1) 集合形 `hasNoRealCharacters_nontrivialIrreducibleClassFunctions` を追加 (`S03_PreliminaryCharacter.lean`). 補助定義 `nontrivialIrreducibleClassFunctions G` (= `Irr(G) ∖ {1}` の CF への像) + `mem_…` simp + 単項注入補題 `irreducibleCharacter_mem_…` と併せ, `|G|` 奇数 ⇒ この集合が `HasNoRealCharacters` を満たすことを `not_isReal_of_ne_trivial_of_odd_card'` から導出. §7 coherence の `Hypothesis.no_real_characters` フィールド (= Hypothesis (5.2)(a)) を実際の odd-order 設定で奇数性のみから供給する discharge 補題. AxiomsCheck 登録済 (allowlist clean, sorryAx なし).
 
 ## 未解決 / TODO
 

@@ -84,6 +84,44 @@ theorem HasNoRealCharacters.not_mem_of_isReal {S : Set (ClassFunction G ℂ)}
   intro hmem
   exact hS hmem hχ
 
+/-- The set of class functions arising from the *nontrivial* irreducible complex
+characters of `G`.
+
+This is Peterfalvi's `Irr(G) ∖ {1_G}`, viewed inside `CF(G)`.  It is the concrete
+source set whose `HasNoRealCharacters` property (under odd order) discharges the
+`no_real_characters` field of the §7 coherence hypothesis. -/
+def nontrivialIrreducibleClassFunctions (G : Type*) [Group G] :
+    Set (ClassFunction G ℂ) :=
+  {φ | ∃ χ : IrreducibleCharacter G,
+    χ ≠ trivialIrreducibleCharacter G ∧ (χ : ClassFunction G ℂ) = φ}
+
+@[simp] theorem mem_nontrivialIrreducibleClassFunctions {φ : ClassFunction G ℂ} :
+    φ ∈ nontrivialIrreducibleClassFunctions G ↔
+      ∃ χ : IrreducibleCharacter G,
+        χ ≠ trivialIrreducibleCharacter G ∧ (χ : ClassFunction G ℂ) = φ :=
+  Iff.rfl
+
+theorem irreducibleCharacter_mem_nontrivialIrreducibleClassFunctions
+    {χ : IrreducibleCharacter G} (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    (χ : ClassFunction G ℂ) ∈ nontrivialIrreducibleClassFunctions G :=
+  ⟨χ, hχ, rfl⟩
+
+/-- **Peterfalvi (1.1)**, set form (discharge of the §7 coherence hypothesis).
+
+If `G` has odd order, then the set of nontrivial irreducible complex characters
+contains no real class function.  This is the set-level statement of (1.1) — every
+nontrivial irreducible character is non-self-conjugate — packaged as the
+`HasNoRealCharacters` predicate so that the `no_real_characters` field of a §7
+coherence hypothesis is supplied directly from oddness, with no extra input.
+
+It is the unconditional consequence of `not_isReal_of_ne_trivial_of_odd_card'`
+quantified over the whole nontrivial-irreducible source set. -/
+theorem hasNoRealCharacters_nontrivialIrreducibleClassFunctions [Finite G]
+    (hodd : Odd (Nat.card G)) :
+    HasNoRealCharacters (nontrivialIrreducibleClassFunctions G) := by
+  rintro φ ⟨χ, hχ, rfl⟩
+  exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ
+
 /-- **Peterfalvi (1.1)**, cardinal form.
 
 If `G` has odd order, then there is exactly one real irreducible complex
