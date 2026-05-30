@@ -1122,3 +1122,10 @@ set_option linter.style.longLine false in
 -- `ℤ[X]` and `νY` on `ℤ[Y]` (`Submodule.span_union` decomposition) — the weakened
 -- `IsCoherent.extension_inner_eq` field for the union `X ∪ Y` once the two coherent pieces exist.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_eq_on_zSpan_union_of_orthogonal
+-- (6.8.1)/(6.8.2) the `τ₃` assembly into an actual `IsCoherent (X∪Y) A` witness: from two coherence
+-- witnesses `hX`, `hY`, a glued map `ν` agreeing with `hX.extension`/`hY.extension` on `ℤ[X]`/`ℤ[Y]`,
+-- and source+image orthogonality, build `IsCoherent τ (X∪Y) A` — `extension_inner_eq` via
+-- `inner_eq_on_zSpan_union_of_orthogonal`, `extends_on_supported` via `eq_on_zSpan_of_eq_on` on the
+-- generator `Z[X,A] ∪ Z[Y,A]` and a (5.1)-type generation hypothesis.  The two-family analogue of
+-- `retarget_isCoherent`; carries no character theory (its inputs are supplied by (6.6)/(6.7)/Dade).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued

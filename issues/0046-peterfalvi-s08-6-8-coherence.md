@@ -317,6 +317,33 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `himg_ortho` 를 case-A/B character theory ((6.7) 포함) 에서 생성, (iii) glued `ν=τ₃` 의 well-defined
     구성 = orthonormal `X∪Y` 의 ℤ-linear independence ⟹ free-module basis extension (repo/mathlib 부재
     infra) + `extends_on_supported` (case별 difference-generator). (iii) 이 핵심 missing infra.
+- [x] (2026-05-31, pass 7) **(6.8.1)/(6.8.2) `τ₃` 두-family `IsCoherent` 조립기
+      `coherentUnion_of_glued`** 를 `S07_Coherence.lean` 에 landing (PARTIAL; sorry/axiom 無 —
+      `#print axioms coherentUnion_of_glued` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+      등록 1건 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs).
+      pass-6 의 잔존 (iii) 중 **`extends_on_supported` + 실제 `IsCoherent` witness 산출**을 정직하게 해소
+      (= pass-6 의 두 항등식 `inner_orthogonal_glued_eq`/`inner_eq_on_zSpan_union_of_orthogonal` 의
+      자연스러운 소비자, single-pair `retarget_isCoherent` 의 **두-family 유사물**):
+  - **`coherentUnion_of_glued`** (`noncomputable def`) : `hX : IsCoherent τ X A`,
+    `hY : IsCoherent τ Y A` (= **공급** 데이터, posit 無 — (6.6) / (1.1)·(1.4) 의 결론), 글루된 map
+    `ν : IntegralCharacterMap L G` (`hX.extension` 에 `ℤ[X]` 에서, `hY.extension` 에 `ℤ[Y]` 에서 일치 =
+    Peterfalvi 의 `τ₃` "coincides with τ₂ on X and τ₁ on Y"), source 직교 `hsrc_ortho` + image 직교
+    `himg_ortho`, 그리고 (5.1)-type 생성 가설 `hgen : Z[X∪Y,A] ⊆ span ℤ(Z[X,A] ∪ Z[Y,A])` ⟹
+    `IsCoherent τ (X∪Y) A`. 두 field 방전: `extension_inner_eq` = `inner_eq_on_zSpan_union_of_orthogonal`
+    (격자 등거리 `hX`/`hY.extension_inner_eq` + 두 직교성 투입), `extends_on_supported` =
+    `eq_on_zSpan_of_eq_on` over generator `Z[X,A]∪Z[Y,A]` (`Z[X,A]` 위 `ν=νX=τ`,
+    `Z[Y,A]` 위 `ν=νY=τ`), `nonzero` 는 `X⊆X∪Y` 에서 상속. **character theory 미포함** ((6.7)
+    congruence / 명시 `X=χ₁^{τ₁}` / Dade isometry 는 입력 `hX`/`hY`/`hagreeX`/`hagreeY`/직교성을
+    *생산* 하는 별도 작업).
+  - **정밀 잔존 (full L2.2, pass-7 이후)** : (i) **(6.6)** coherence-of-X witness `hX`
+    (별 issue; ~8-step character theorem), (ii) **case-A/B character theory** 가 `hY`(=Y coherence,
+    (1.1)·(1.4)) / `hagreeX`·`hagreeY` (glued map `ν=τ₃` 의 lattice 일치) / `hsrc_ortho` (X⊥Y on source)
+    / `himg_ortho` (`X^{τ₂}⊥Y^{τ₁}`, (4.1)+(6.7) congruence) / `hgen` 을 생산 (가장 무거운 미형식화 덩어리),
+    (iii) glued map `ν=τ₃` 자체의 **canonical 구성** — orthonormal `X∪Y` 의 ℤ-기저 확장 (ℂ-valued
+    class-function 공간이라 ℤ-projection 이 비정수 계수 ⟹ free-module 기저 확장 infra 必, repo/mathlib
+    부재). 현 `coherentUnion_of_glued` 는 `ν` 를 **공급 데이터**로 받음 (Peterfalvi 의 `τ₃` 가 실제로
+    orthonormal 기저에서 구성되는 정직한 supplied data) ⟹ assembler 자체는 honest·general·완결.
+    조립기는 끝났고, 남은 건 그 입력을 채우는 (i)/(ii)/(iii)-canonical 의 character/free-module 작업.
 
 ## 完了条件
 

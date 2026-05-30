@@ -136,6 +136,28 @@ allowlist; full `lake build OddOrder` 緑 3351 jobs). **roadmap의 recommended f
   (`eq_on_zSpan_of_eq_on` generator 패턴, case별 difference-generator 구조 필요). (iii)이 본 leaf의
   핵심 missing infra. 상세는 issue 0046 pass-6.
 
+### (2026-05-31, pass 7) (6.8.1)/(6.8.2) `τ₃` 두-family `IsCoherent` 조립기 landing (PARTIAL)
+
+`S07_Coherence.lean`에 **`coherentUnion_of_glued`** landing (sorry/axiom 無 —
+`#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 1건 3 axiom 全 allowlist;
+full `lake build OddOrder` 緑 3351 jobs). pass-6의 두 gluing 항등식의 **자연스러운 소비자** = 실제
+`IsCoherent (X∪Y) A` witness 산출, single-pair `retarget_isCoherent`의 **두-family 유사물**:
+
+- **`coherentUnion_of_glued`** (`noncomputable def`): 입력 = `hX : IsCoherent τ X A`,
+  `hY : IsCoherent τ Y A` (**공급** 데이터, posit 無; (6.6) 와 (1.1)·(1.4)의 결론), 글루 map
+  `ν : IntegralCharacterMap L G` (`hX.extension`에 `ℤ[X]`, `hY.extension`에 `ℤ[Y]`에서 일치 =
+  Peterfalvi의 `τ₃`), source 직교 `hsrc_ortho`, image 직교 `himg_ortho`, (5.1)-type 생성 가설 `hgen`.
+  출력 = `IsCoherent τ (X∪Y) A`. 두 field 방전: `extension_inner_eq` =
+  `inner_eq_on_zSpan_union_of_orthogonal` (격자 등거리 `hX`/`hY.extension_inner_eq` + 직교성 투입),
+  `extends_on_supported` = `eq_on_zSpan_of_eq_on` over generator `Z[X,A]∪Z[Y,A]` (각 lattice 위
+  `ν=νX=τ` / `ν=νY=τ`, `hagreeX`+`hX.extends_on_supported` 등), `nonzero`는 `X⊆X∪Y`에서 상속.
+- **honest 판정**: 조립기는 character theory 미포함 — 입력 `hX`/`hY`/`hagreeX`/`hagreeY`/직교성/`hgen`을
+  *생산*하는 ((6.7) congruence, 명시 `X=χ₁^{τ₁}` 동정, Dade isometry) 가 별도 작업으로 남음. glued map
+  `ν=τ₃` 자체의 canonical 구성은 ℂ-valued 공간이라 ℤ-projection이 비정수 계수 ⟹ free-module 기저 확장
+  infra 필요 (부재) ⟹ `ν`를 supplied data로 받음 (Peterfalvi의 `τ₃`가 orthonormal 기저에서 실제로
+  구성되는 정직한 입력). **조립기는 완결**; 남은 건 (i) (6.6) coherence-of-X `hX`, (ii) case-A/B
+  character theory (가장 무거운 덩어리), (iii)-canonical glued-map 구성. 상세는 issue 0046 pass-7.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

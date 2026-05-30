@@ -1860,6 +1860,59 @@ theorem inner_eq_on_zSpan_union_of_orthogonal
   rw [hνφ, hνψ, ← hφeq, ← hψeq]
   exact inner_orthogonal_glued_eq hνX hνY hsrc_ortho himg_ortho ha ha' hb hb'
 
+/-- **Peterfalvi (6.8.1)/(6.8.2): coherence of the orthogonal union `X ∪ Y`.**
+
+The final gluing step shared by case (A) (6.8.1) and case (B) (6.8.2): given two coherent sets
+`X`, `Y` (witnesses `hX`, `hY` — *supplied*, the conclusions of (6.6) and of (1.1)/(1.4)
+respectively, **not** posited here) whose extensions `νX := hX.extension`, `νY := hY.extension`
+land in mutually orthogonal target subspaces (`himg_ortho`) over mutually orthogonal source lattices
+(`hsrc_ortho`), and a `ℤ`-linear map `ν` agreeing with `νX` on `ℤ[X]` and with `νY` on `ℤ[Y]`
+(Peterfalvi's `τ₃` "which coincides with `τ₂` on `X` and with `τ₁` on `Y`", mmd L176/L224), the
+union `X ∪ Y` is coherent with extension `ν`.
+
+The two `IsCoherent` obligations are discharged exactly as in `retarget_isCoherent`:
+* `extension_inner_eq` on `ℤ[X ∪ Y]` is `inner_eq_on_zSpan_union_of_orthogonal`, fed the
+  lattice isometries `hX.extension_inner_eq` / `hY.extension_inner_eq` and the two orthogonalities;
+* `extends_on_supported` is `eq_on_zSpan_of_eq_on` over the generating set
+  `Z[X,A] ∪ Z[Y,A]` — on `Z[X,A]` the map `ν = νX = τ` (by `hagreeX` + `hX.extends_on_supported`),
+  on `Z[Y,A]` likewise — using the (5.1)-type generation hypothesis `hgen`.
+
+This carries no character-theoretic content of its own (the (6.7) congruence forcing, the explicit
+`X = χ₁^{τ₁}` identification, the Dade isometry, etc. are what *produce* the inputs `hX`, `hY`,
+`hagreeX`, `hagreeY`, `hsrc_ortho`, `himg_ortho`); it is purely the algebraic assembly of `τ₃`. -/
+noncomputable def coherentUnion_of_glued
+    {τ : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hX : IsCoherent τ X A) (hY : IsCoherent τ Y A)
+    (ν : IntegralCharacterMap L G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ X, ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ Y, ν v = hY.extension v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (hX.extension u) (hY.extension v) = 0)
+    (hgen : zSupportedSpan (L := L) (X ∪ Y) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A)) :
+    IsCoherent τ (X ∪ Y) A := by
+  classical
+  refine ⟨?_, ν, ?_, ?_⟩
+  · -- nonzero: inherited from `X ⊆ X ∪ Y`.
+    obtain ⟨φ, hφmem, hφne⟩ := hX.nonzero
+    exact ⟨φ, zSupportedSpan_mono_left Set.subset_union_left hφmem, hφne⟩
+  · -- `extension_inner_eq` on `ℤ[X ∪ Y]` via the two-lattice gluing identity.
+    intro φ ψ hφ hψ
+    exact inner_eq_on_zSpan_union_of_orthogonal hagreeX hagreeY
+      hX.extension_inner_eq hY.extension_inner_eq hsrc_ortho himg_ortho hφ hψ
+  · -- `extends_on_supported`: `ν = τ` on the generator `Z[X,A] ∪ Z[Y,A]`, then `span_induction`.
+    intro φ hφ
+    have hagree_T : ∀ y ∈ zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A,
+        ν y = τ y := by
+      intro y hy
+      rcases hy with hyX | hyY
+      · rw [hagreeX y hyX.1, hX.extends_on_supported y hyX]
+      · rw [hagreeY y hyY.1, hY.extends_on_supported y hyY]
+    exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
+
 /-! ### Peterfalvi (5.6.1): the family bundle
 
 The (5.6) coherence-union argument carries a whole **family** `{χᵢ}_{i ∈ s} ⊆ S₁` with `χ₁` a
