@@ -32,8 +32,10 @@ API がまだ不足している。
       (`hasCommonRestrictionMultiplicity_of_singleOrbit`, 2026-05-30)。
 - [x] multiplicity `e = ⟨Res χ, θ⟩` の **整数性** (gap #5 の整数半分) を証明する
       (`restrictionMultiplicity_int`, 2026-05-30)。
-- [ ] multiplicity `e ≥ 0` (gap #5 の非負半分) を証明する — module 層待ち
-      (genuine character の Fourier 係数 = isotype の重複度 ≥ 0)。
+- [x] multiplicity `e ≥ 0` (gap #5 の非負半分) を証明する
+      (`restrictionMultiplicity_nonneg`, 2026-05-30)。BLOCKER B を経由せず, mathlib の
+      Hom-次元公式 `card_inv_mul_sum_char_mul_char_eq_finrank` で
+      `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H) ≥ 0` を直接得た (isotype 分解不要)。
 - [ ] orbit-sum decomposition (`Res χ = e · ∑ orbit`) を証明する — module 層待ち。
 - [ ] `RestrictionConstituentsSingleOrbit` の hypothesis を外す (orbit transitivity 本体) — module 層待ち。
 
@@ -249,6 +251,36 @@ instance/defeq 摩擦は `set_option backward.isDefEq.respectTransparency false`
 
 **残るのは BLOCKER B (orbit transitivity, 既約性使用) のみ。** A は B の前提として再利用可能。
 `AxiomsCheck.lean` に主定理を登録済 (all in allowlist)。
+
+## 2026-05-30 update (4) — gap #5 非負半分を sorry-free 着地 (BLOCKER B 回避)
+
+`Clifford.lean` (namespace `OddOrder.RepresentationTheory.ClassFunction`) に gap #5 の
+**非負半分**を実証明で着地 (sorry/axiom 無し, allowlist 3 axioms)。**planner の sketch は
+BLOCKER B (orbit transitivity) + Maschke isotype 分解経由を想定していたが, それは不要**だった:
+
+- **`restrictionMultiplicity_eq_finrank_intertwiningMap`** (値の公式, 主補題):
+  `χ = χ_ρ` (`ρ : Representation ℂ G V`, f.d.), `θ = χ_σ` (`σ : Representation ℂ ↥H W`, f.d.)
+  のとき `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)` (= `finrank ℂ (IntertwiningMap σ (ρ.comp H.subtype))`)。
+  これは multiplicity の module 論的同定そのもの (簡約 `σ` が genuine `H`-module `ρ|_H` に
+  `Hom`-次元で何個入るか) であり, **gap #1 (multiplicity-as-inner-product) の核**でもある。
+- **`restrictionMultiplicity_nonneg`** (非負性): 既約指標 `χ`, `θ` で `0 ≤ ⟨Res^G_H χ, θ⟩`。
+  上の公式 + `Nat.cast_nonneg` (次元は cast された自然数) で即座。既約性は不要 (genuine
+  character の証人だけ使う); irreducible 版を statement にしている。
+
+**鍵**: mathlib `Representation.card_inv_mul_sum_char_mul_char_eq_finrank`
+(`Mathlib/RepresentationTheory/Character.lean`) が
+`(Nat.card G)⁻¹ * ∑_g σ.char g * ρ.char g⁻¹ = finrank (IntertwiningMap ρ σ)` を与える。
+これは `Representation` レベル (FDRep 不要 ⇒ universe 制約なし) かつ **既約性不要**で,
+Schur ではなく `invariants` ↔ `IntertwiningMap` 同型 + 平均射影の trace で従う。
+repo `inner` の `star(θ(h))` は `character_inv` (`CharacterConjugate.lean`,
+`χ(g⁻¹) = star χ(g)`) で `σ.char h⁻¹` に直し, 上の公式に帰着。証明の骨格は G-side の
+`RowOrthogonality.characterTableRowOrthogonality` と同型 (ただし `char_orthonormal` の
+代わりに `card_inv_mul_sum_char_mul_char_eq_finrank` を使い, 0/1 でなく finrank ≥ 0)。
+
+**残る module 層 = BLOCKER B (orbit transitivity, single-orbit hypothesis 除去) のみ。**
+orbit-sum decomposition と `RestrictionConstituentsSingleOrbit` の hypothesis 除去は
+依然 BLOCKER B 待ち (既約性使用, isotype の `G`-transitive permutation, mathlib 未収録)。
+非負性は BLOCKER B に依存しないことが判明したので, これで gap #5 は完全に解決 (整数 + 非負)。
 
 ## 完了条件
 

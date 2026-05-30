@@ -752,3 +752,8 @@ set_option linter.style.longLine false in
 -- Clifford BLOCKER A (issue 0026): ρ g は simple ℂ[H]-部分加群を simple に送る.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Representation.isSimpleModule_map_conjBySimpleSemilinear
+-- Clifford gap #5 非負半分 (issue 0026): ⟨Res^G_H χ, θ⟩ = dim Hom(σ, ρ|_H) ≥ 0.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_nonneg

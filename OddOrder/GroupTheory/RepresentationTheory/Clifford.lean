@@ -357,6 +357,71 @@ theorem restrictionMultiplicity_int [Finite G]
     ∃ m : ℤ, restrictionMultiplicity H χ θ = (m : ℂ) :=
   inner_mem_ZIrr_int (restrict_mem_ZIrr H hχ) hθ
 
+/-- **Hom-dimension formula for the restriction multiplicity.** When `χ = χ_ρ` is the
+character of a finite-dimensional `ℂ`-representation `ρ` of `G` and `θ = χ_σ` is the
+character of a finite-dimensional `ℂ`-representation `σ` of `H`, the normalized
+inner-product multiplicity `⟨Res^G_H χ, θ⟩` equals the `ℂ`-dimension of the space of
+`H`-equivariant maps `σ ⟶ Res^G_H ρ`:
+
+  `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)`.
+
+This is the module-theoretic identification of the multiplicity: it is the number of
+copies (counted with `Hom`-dimension) of the simple `σ` inside the genuine `H`-module
+`ρ|_H`.  The proof rewrites the inner sum into the `σ.character g⁻¹` form using
+`character_inv` and then applies mathlib's
+`Representation.card_inv_mul_sum_char_mul_char_eq_finrank`. -/
+theorem restrictionMultiplicity_eq_finrank_intertwiningMap
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V)
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (σ : Representation ℂ ↥H W)
+    {χ : ClassFunction G ℂ} (hχ : (χ : G → ℂ) = ρ.character)
+    {θ : ClassFunction H ℂ} (hθ : (θ : ↥H → ℂ) = σ.character) :
+    restrictionMultiplicity H χ θ =
+      (Module.finrank ℂ
+        (Representation.IntertwiningMap σ (ρ.comp H.subtype :
+          Representation ℂ ↥H V)) : ℂ) := by
+  classical
+  haveI : Finite ↥H := Finite.of_fintype _
+  set ρ' : Representation ℂ ↥H V := ρ.comp H.subtype with hρ'
+  rw [restrictionMultiplicity, inner_eq_inv_card_mul_innerSum, innerSum]
+  have hcharρ' : ∀ h : ↥H, χ (h : G) = ρ'.character h := fun h => by
+    rw [congrFun hχ (h : G)]
+    rfl
+  have hsum :
+      ∑ h : ↥H, (restrict H χ) h * star (θ h)
+        = ∑ h : ↥H, ρ'.character h * σ.character h⁻¹ := by
+    refine Finset.sum_congr rfl fun h _ => ?_
+    rw [restrict_apply, hcharρ' h, congrFun hθ h, ← character_inv σ h]
+  rw [hsum, invOf_eq_inv,
+    ← Representation.card_inv_mul_sum_char_mul_char_eq_finrank σ ρ']
+
+open scoped ComplexOrder in
+/-- **Non-negativity of the restriction multiplicity** (nonneg half of Clifford's
+multiplicity statement, [Is] Thm 6.5).  For irreducible characters `χ` of `G` and `θ` of
+`H`, the normalized inner-product multiplicity `⟨Res^G_H χ, θ⟩` is `≥ 0`.
+
+Together with `restrictionMultiplicity_int` (its integrality), this shows the multiplicity
+is a non-negative integer, as required by Clifford's theorem.  The non-negativity is the
+genuine-character fact: the constituent multiplicity is a count, never negative.  The proof
+realizes `χ` and `θ` by representations `ρ`, `σ` and identifies the multiplicity with the
+`ℂ`-dimension `dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)` via
+`restrictionMultiplicity_eq_finrank_intertwiningMap`; a dimension is a cast natural number,
+hence `0 ≤`.
+
+Only the genuine-character provenance of `χ`, `θ` is used (not irreducibility): the same
+proof gives `0 ≤ ⟨Res^G_H χ, θ⟩` whenever `χ` and `θ` are characters of finite-dimensional
+representations.  Note this routes through mathlib's Hom-dimension characterization of the
+character scalar product, *not* through an explicit Maschke isotype decomposition. -/
+theorem restrictionMultiplicity_nonneg
+    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) :
+    0 ≤ restrictionMultiplicity H χ θ := by
+  obtain ⟨V, _, _, _, ρ, _, hχρ⟩ := hχ
+  obtain ⟨W, _, _, _, σ, _, hθσ⟩ := hθ
+  rw [restrictionMultiplicity_eq_finrank_intertwiningMap H ρ σ hχρ hθσ]
+  exact Nat.cast_nonneg _
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
