@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Complex.Basic
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Algebra.MonoidAlgebra.MapDomain
+import Mathlib.RingTheory.SimpleModule.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
@@ -125,6 +128,137 @@ theorem IsIrreducible.comp_mulEquiv
 
 end Representation
 
+namespace Representation
+
+open scoped MonoidAlgebra
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V]
+
+section ConjBySimple
+
+variable (ρ : Representation ℂ G V) (H : Subgroup G) [hH : H.Normal]
+
+/-- The restriction `Res^G_H ρ` of `ρ` to a subgroup `H`, packaged as a
+`Representation ℂ ↥H V` (rather than the bare `MonoidHom` `ρ.comp H.subtype`) so that
+its `ℂ[H]`-module `asModule` and `asModuleEquiv` are available by dot notation.
+
+This is a reducible abbreviation so that the `ℂ[H]`-module instance on
+`(restrictRep ρ H).asModule` is found by unfolding to `(ρ.comp H.subtype).asModule`. -/
+abbrev restrictRep : Representation ℂ ↥H V := ρ.comp H.subtype
+
+omit hH in
+@[simp] theorem restrictRep_apply (h : ↥H) : restrictRep ρ H h = ρ (h : G) := rfl
+
+variable {H}
+
+/-- The ring automorphism of `ℂ[H]` induced by conjugation `h ↦ g h g⁻¹` on the normal
+subgroup `H`.  On generators it sends `single h c` to `single (g h g⁻¹) c`. -/
+noncomputable def conjBySimpleRingHom (g : G) : ℂ[↥H] →+* ℂ[↥H] :=
+  MonoidAlgebra.mapDomainRingHom ℂ
+    (ClassFunction.conjByMulEquiv (G := G) (H := H) g).toMonoidHom
+
+theorem conjBySimpleRingHom_single (g : G) (h : ↥H) (c : ℂ) :
+    conjBySimpleRingHom (H := H) g (MonoidAlgebra.single h c) =
+      MonoidAlgebra.single
+        (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) c := by
+  simp [conjBySimpleRingHom]
+
+theorem conjBySimpleRingHom_surjective (g : G) :
+    Function.Surjective (conjBySimpleRingHom (H := H) g) :=
+  (MonoidAlgebra.mapDomainRingEquiv ℂ
+    (ClassFunction.conjByMulEquiv (G := G) (H := H) g)).surjective
+
+instance conjBySimpleRingHom_isSurjective (g : G) :
+    RingHomSurjective (conjBySimpleRingHom (H := H) g) :=
+  ⟨conjBySimpleRingHom_surjective (H := H) g⟩
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The `ℂ`-linear bijection `ρ g`, packaged as a `conjBySimpleRingHom g`-semilinear
+endomorphism of the restricted module `(restrictRep ρ H).asModule`.
+
+This is the module-theoretic incarnation of normality: for `h ∈ H`, the standard
+`ℂ[H]`-action on the image satisfies `h • (ρ g v) = ρ g (ρ (g⁻¹ h g) v)`, i.e. `ρ g`
+intertwines the `H`-action up to the conjugation twist `conjBySimpleRingHom g`. -/
+noncomputable def conjBySimpleSemilinear (g : G) :
+    (restrictRep ρ H).asModule →ₛₗ[conjBySimpleRingHom (H := H) g]
+      (restrictRep ρ H).asModule where
+  toFun v := (show (restrictRep ρ H).asModule from ρ g v)
+  map_add' v w := by simp
+  map_smul' s v := by
+    induction s using MonoidAlgebra.induction_linear with
+    | zero => simp
+    | add x y hx hy =>
+        change ρ g ((x + y) • v) = _
+        rw [add_smul, map_add, map_add, add_smul]
+        exact congrArg₂ (· + ·) hx hy
+    | single h c =>
+        have hHh : (ClassFunction.conjByMulEquiv (G := G) (H := H) g h : G) =
+            g * (h : G) * g⁻¹ := rfl
+        rw [conjBySimpleRingHom_single]
+        change ρ g (MonoidAlgebra.single h c • v) =
+          MonoidAlgebra.single (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) c •
+            (show (restrictRep ρ H).asModule from ρ g v)
+        rw [Representation.single_smul, Representation.single_smul, restrictRep_apply,
+          restrictRep_apply, map_smul]
+        congr 1
+        change ρ g (ρ (h : G) v) = ρ ((ClassFunction.conjByMulEquiv
+          (G := G) (H := H) g h : G)) (ρ g v)
+        rw [hHh, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
+        congr 2
+        group
+
+@[simp] theorem conjBySimpleSemilinear_apply (g : G) (v : (restrictRep ρ H).asModule) :
+    conjBySimpleSemilinear (H := H) ρ g v = (show (restrictRep ρ H).asModule from ρ g v) :=
+  rfl
+
+theorem conjBySimpleSemilinear_bijective (g : G) :
+    Function.Bijective (conjBySimpleSemilinear (H := H) ρ g) :=
+  ρ.apply_bijective g
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Membership in the image submodule `N.map (conjBySimpleSemilinear ρ g)` is exactly being
+of the form `ρ g v` for some `v ∈ N`.  This confirms that the simple `ℂ[H]`-submodule produced
+by `isSimpleModule_map_conjBySimpleSemilinear` is, as a set, the `ρ g`-translate of `N`, carrying
+the standard `ℂ[H]`-action `h • w = ρ (h : G) w`. -/
+theorem mem_map_conjBySimpleSemilinear (g : G)
+    (N : Submodule ℂ[↥H] (restrictRep ρ H).asModule) (w : (restrictRep ρ H).asModule) :
+    w ∈ N.map (conjBySimpleSemilinear (H := H) ρ g) ↔
+      ∃ v ∈ N, (show (restrictRep ρ H).asModule from ρ g v) = w := by
+  simp only [Submodule.mem_map, conjBySimpleSemilinear_apply]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Clifford BLOCKER A** (module-theoretic core of [Is] Thm 6.5 / Peterfalvi §3 (1.5)).
+For `ρ : Representation ℂ G V`, `H ⊴ G`, a simple `ℂ[H]`-submodule `N` of the restricted
+module `(restrictRep ρ H).asModule`, and any `g : G`, the image of `N` under `ρ g` is again
+a simple `ℂ[H]`-submodule of the restricted module.
+
+The image is `N.map (conjBySimpleSemilinear ρ g)`, where the standard `ℂ[H]`-action on the
+image satisfies `h • (ρ g v) = ρ g (ρ (g⁻¹ h g) v)` (normality of `H`).  Simplicity is
+transported across the semilinear bijection `ρ g` via the order isomorphism of submodule
+lattices it induces (`Submodule.orderIsoMapComapOfBijective`), since `IsSimpleModule`
+is equivalent to the submodule being an atom (`isSimpleModule_iff_isAtom`).
+
+Note that no irreducibility of `ρ` is needed: `ρ g` is always a bijection, so it sends
+any simple `ℂ[H]`-submodule to a simple `ℂ[H]`-submodule.  Irreducibility of `ρ` enters
+later (orbit transitivity), not here. -/
+theorem isSimpleModule_map_conjBySimpleSemilinear
+    (g : G) (N : Submodule ℂ[↥H] (restrictRep ρ H).asModule)
+    [IsSimpleModule ℂ[↥H] N] :
+    IsSimpleModule ℂ[↥H]
+      (N.map (conjBySimpleSemilinear (H := H) ρ g) :
+        Submodule ℂ[↥H] (restrictRep ρ H).asModule) := by
+  have hatomN : IsAtom N := IsSimpleModule.isAtom
+  have hmap : (Submodule.orderIsoMapComapOfBijective
+      (conjBySimpleSemilinear (H := H) ρ g)
+      (conjBySimpleSemilinear_bijective (H := H) ρ g)) N =
+      N.map (conjBySimpleSemilinear (H := H) ρ g) := rfl
+  rw [isSimpleModule_iff_isAtom, ← hmap]
+  exact (OrderIso.isAtom_iff _ N).mpr hatomN
+
+end ConjBySimple
+
+end Representation
+
 namespace ClassFunction
 
 variable (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
@@ -222,6 +356,95 @@ theorem restrictionMultiplicity_int [Finite G]
     {θ : ClassFunction H ℂ} (hθ : θ ∈ ZIrr H) :
     ∃ m : ℤ, restrictionMultiplicity H χ θ = (m : ℂ) :=
   inner_mem_ZIrr_int (restrict_mem_ZIrr H hχ) hθ
+
+/-- **Hom-dimension formula for the restriction multiplicity.** When `χ = χ_ρ` is the
+character of a finite-dimensional `ℂ`-representation `ρ` of `G` and `θ = χ_σ` is the
+character of a finite-dimensional `ℂ`-representation `σ` of `H`, the normalized
+inner-product multiplicity `⟨Res^G_H χ, θ⟩` equals the `ℂ`-dimension of the space of
+`H`-equivariant maps `σ ⟶ Res^G_H ρ`:
+
+  `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)`.
+
+This is the module-theoretic identification of the multiplicity: it is the number of
+copies (counted with `Hom`-dimension) of the simple `σ` inside the genuine `H`-module
+`ρ|_H`.  The proof rewrites the inner sum into the `σ.character g⁻¹` form using
+`character_inv` and then applies mathlib's
+`Representation.card_inv_mul_sum_char_mul_char_eq_finrank`. -/
+theorem restrictionMultiplicity_eq_finrank_intertwiningMap
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V)
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (σ : Representation ℂ ↥H W)
+    {χ : ClassFunction G ℂ} (hχ : (χ : G → ℂ) = ρ.character)
+    {θ : ClassFunction H ℂ} (hθ : (θ : ↥H → ℂ) = σ.character) :
+    restrictionMultiplicity H χ θ =
+      (Module.finrank ℂ
+        (Representation.IntertwiningMap σ (ρ.comp H.subtype :
+          Representation ℂ ↥H V)) : ℂ) := by
+  classical
+  haveI : Finite ↥H := Finite.of_fintype _
+  set ρ' : Representation ℂ ↥H V := ρ.comp H.subtype with hρ'
+  rw [restrictionMultiplicity, inner_eq_inv_card_mul_innerSum, innerSum]
+  have hcharρ' : ∀ h : ↥H, χ (h : G) = ρ'.character h := fun h => by
+    rw [congrFun hχ (h : G)]
+    rfl
+  have hsum :
+      ∑ h : ↥H, (restrict H χ) h * star (θ h)
+        = ∑ h : ↥H, ρ'.character h * σ.character h⁻¹ := by
+    refine Finset.sum_congr rfl fun h _ => ?_
+    rw [restrict_apply, hcharρ' h, congrFun hθ h, ← character_inv σ h]
+  rw [hsum, invOf_eq_inv,
+    ← Representation.card_inv_mul_sum_char_mul_char_eq_finrank σ ρ']
+
+open scoped ComplexOrder in
+/-- **Non-negativity of the restriction multiplicity** (nonneg half of Clifford's
+multiplicity statement, [Is] Thm 6.5).  For irreducible characters `χ` of `G` and `θ` of
+`H`, the normalized inner-product multiplicity `⟨Res^G_H χ, θ⟩` is `≥ 0`.
+
+Together with `restrictionMultiplicity_int` (its integrality), this shows the multiplicity
+is a non-negative integer, as required by Clifford's theorem.  The non-negativity is the
+genuine-character fact: the constituent multiplicity is a count, never negative.  The proof
+realizes `χ` and `θ` by representations `ρ`, `σ` and identifies the multiplicity with the
+`ℂ`-dimension `dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)` via
+`restrictionMultiplicity_eq_finrank_intertwiningMap`; a dimension is a cast natural number,
+hence `0 ≤`.
+
+Only the genuine-character provenance of `χ`, `θ` is used (not irreducibility): the same
+proof gives `0 ≤ ⟨Res^G_H χ, θ⟩` whenever `χ` and `θ` are characters of finite-dimensional
+representations.  Note this routes through mathlib's Hom-dimension characterization of the
+character scalar product, *not* through an explicit Maschke isotype decomposition. -/
+theorem restrictionMultiplicity_nonneg
+    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) :
+    0 ≤ restrictionMultiplicity H χ θ := by
+  obtain ⟨V, _, _, _, ρ, _, hχρ⟩ := hχ
+  obtain ⟨W, _, _, _, σ, _, hθσ⟩ := hθ
+  rw [restrictionMultiplicity_eq_finrank_intertwiningMap H ρ σ hχρ hθσ]
+  exact Nat.cast_nonneg _
+
+open scoped ComplexOrder in
+/-- **The restriction multiplicity is a non-negative integer** (the full multiplicity
+statement of Clifford's theorem, [Is] Thm 6.5).  For irreducible characters `χ` of `G`
+and `θ` of `H`, the normalized inner-product multiplicity `⟨Res^G_H χ, θ⟩ = (k : ℂ)` for
+some `k : ℕ`.
+
+This combines the two halves established separately: the integrality
+`restrictionMultiplicity_int` (`⟨Res χ, θ⟩ = m` for some `m : ℤ`, via the virtual-character
+inner product) and the non-negativity `restrictionMultiplicity_nonneg`
+(`0 ≤ ⟨Res χ, θ⟩`, via the `Hom`-dimension formula).  A non-negative integer is a natural
+number (`m ≥ 0` from `0 ≤ (m : ℂ)`, then `k = m.toNat`).  This is the form Clifford's
+theorem consumes: the constituent multiplicity `e_χ` is the *count* of copies of `θ` in
+`Res^G_H χ`, a non-negative integer. -/
+theorem restrictionMultiplicity_natCast [Finite G]
+    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) :
+    ∃ k : ℕ, restrictionMultiplicity H χ θ = (k : ℂ) := by
+  obtain ⟨m, hm⟩ := restrictionMultiplicity_int H hχ.mem_ZIrr hθ.mem_ZIrr
+  have hnn : (0 : ℂ) ≤ (m : ℂ) := hm ▸ restrictionMultiplicity_nonneg H hχ hθ
+  have hm0 : 0 ≤ m := by exact_mod_cast hnn
+  refine ⟨m.toNat, ?_⟩
+  rw [hm]
+  exact_mod_cast (Int.toNat_of_nonneg hm0).symm
 
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
@@ -356,6 +579,18 @@ theorem restrictionMultiplicity_int [Finite G]
     ∃ m : ℤ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
         (θ : ClassFunction H ℂ) = (m : ℂ) :=
   ClassFunction.restrictionMultiplicity_int H χ.mem_ZIrr θ.mem_ZIrr
+
+/-- **The constituent multiplicity of an irreducible character is a non-negative integer**
+(the full multiplicity statement of Clifford's theorem, [Is] Thm 6.5).  For irreducible
+characters `χ` of `G` and `θ` of `H`, the normalized inner product
+`⟨Res^G_H χ, θ⟩ = (k : ℂ)` for some `k : ℕ`.  This is the irreducible-character
+specialization of `ClassFunction.restrictionMultiplicity_natCast`: the constituent
+multiplicity `e_χ` is the count of copies of `θ` in `Res^G_H χ`. -/
+theorem restrictionMultiplicity_natCast [Finite G]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    ∃ k : ℕ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) = (k : ℂ) :=
+  ClassFunction.restrictionMultiplicity_natCast H χ.isIrreducible θ.isIrreducible
 
 end IrreducibleCharacter
 

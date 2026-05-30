@@ -233,35 +233,59 @@ theorem non_orthogonality_two_families
 ```
 
 **Blocker (7.9)** (最重・多数):
-1. **奇位数 ⇒ 非自明既約は実でない** — (1.1) parity の核。`IsReal.lean` は `IsReal`/`conj` 基盤と
+1. ✅ **解消 (2026-05-30, issue 0044)**: **奇位数 ⇒ 非自明既約は実でない** — (1.1) parity の核を
+   `BrauerPermutationUnconditional.lean` に `not_isReal_of_ne_trivial_of_odd_card'`
+   (`Odd (Nat.card G) → χ ≠ 1 → ¬ IsReal (χ:CF G ℂ)`, unconditional) として sorry-free 実装。
+   旧記述では「`IsReal.lean` は基盤のみで定理が存在しない」としていたが, 実際には Brauer permutation の
+   **unconditional 系** `card_realIrreducibleCharacters_eq_one_of_odd_card'`
+   (`# real Irr = 1`) が既に完成しており, そこから subsingleton 一意性
+   (`Nat.card_eq_one_iff_exists`) で導出した (note の `g↦g²` Frobenius-Schur 構成より軽い経路で完了)。
+   IsReal.lean は BrauerPermutation の上流のため, 定理は下流の Unconditional 側に置いた
+   (循環 import 回避)。`(Δ_1,Δ_2)` parity の核はこれで unblock。 [旧記述↓は参考保持]
+   `IsReal.lean` は `IsReal`/`conj` 基盤と
    `trivialClassFunction_isReal` のみで、**`Odd (Nat.card G) → χ≠1 → ¬IsReal χ` の定理は repo に存在しない**
    (grep 確認済)。これ無しに `(Δ_1,Δ_2)` 偶が言えない。
 2. **(5.9) realness 接続** — `S07_Coherence.lean` の `CharacterDifferenceImage`
    (`τ(χ−χ.conj)=signedDifference`) を `H78.nu` 経由で適用する橋が無い (`H78.nu` ↔ `IsCoherent.extension`
    未接続 = Blocker B1)。これで `Δ_i` 実 (`Δ_i=Δ̄_i`) を得る。
-3. **互いに素 support ⇒ inner=0** — 汎用補題が無い (`difference_images_inner_eq_zero_of_inner_pair` は別形・
-   仮定付き)。`f.support⊆S₁, g.support⊆S₂, S₁∩S₂=∅ ⇒ ⟨f,g⟩=0` を `inner_eq_inv_card_mul_innerSum` から要証明。
+3. ✅ **互いに素 support ⇒ inner=0 — 完了 (2026-05-30, issue 0044)**: `ClassFunction.lean` に
+   `inner_eq_zero_of_disjoint_support` (`Disjoint φ.support ψ.support → inner φ ψ = 0`) + 補助
+   `innerSum_eq_zero_of_disjoint_support` を sorry-free 実装。各 summand `φ g · star (ψ g)` が
+   `Set.disjoint_left` で消える elementary proof。AxiomsCheck clean, full build green。
 4. **(4.1) `nu` 像の support** — `(ν ζ_i).support ⊆ dadeSupport_i` が `Hypothesis78` のフィールドに無い。
 5. **(7.8.a) 依存** — `BetaDecomp` (`Δ_i` の存在、`(Δ_i,1_G)=0`) が前提。
 
 ### 優先順位と次の一手 (plan)
 
-1. **基盤 B3 (奇位数⇒非実)**: `IsReal.lean` に `theorem not_isReal_of_odd_card_of_ne_one` を証明する
-   (写像 `g↦g²` が奇位数群で全単射 ⇒ Frobenius-Schur 指標 `ν₂(χ)=|G|⁻¹Σχ(g²)=0` for χ≠1)。
-   これは (7.9) のみならず §3 (1.1) や 0022/0027 系の共通 unblocker。**最高価値の独立基盤**。
-2. **B-disjoint-support**: `ClassFunction.inner_eq_zero_of_disjoint_support` を `inner_eq_inv_card_mul_innerSum`
-   から証明 (elementary、1 定理)。
-3. **Burnside (1.5.d)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を named lemma 化 (第二直交関係 / `g=1` 評価)。
+1. ✅ **基盤 B3 (奇位数⇒非実) — 完了 (2026-05-30, issue 0044)**:
+   `BrauerPermutationUnconditional.lean` に `not_isReal_of_ne_trivial_of_odd_card'`
+   (`Odd (Nat.card G) → χ ≠ 1 → ¬ IsReal (χ:CF G ℂ)`) + 補助
+   `realIrreducibleCharacter_eq_trivial_of_odd_card'` を sorry-free 実装。当初想定の
+   `g↦g²` Frobenius-Schur 経路は不要だった: Brauer permutation lemma の unconditional 系
+   `card_realIrreducibleCharacters_eq_one_of_odd_card'` から subsingleton 一意性で導出。
+   (7.9) のみならず §3 (1.1) / 0022/0027 系の共通 unblocker が解消。AxiomsCheck clean。
+2. ✅ **B-disjoint-support — 完了 (2026-05-30, issue 0044)**: `ClassFunction.inner_eq_zero_of_disjoint_support`
+   を `inner_eq_inv_card_mul_innerSum` + `innerSum_eq_zero_of_disjoint_support` (各 summand を
+   `Set.disjoint_left` で消す) から sorry-free 実装。
+3. ✅ **Burnside (1.5.d) — 完了 (2026-05-30, issue 0044)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を
+   `ColumnOrthogonality.lean` に named lemma 化。`column_orthogonality_diagonal (1:G)` を `g=1` で評価し
+   (`Subgroup.centralizer {1} = ⊤` ⇒ `card = |G|`), 各 `χ(1)·star(χ(1))` を
+   `irreducibleCharacter_apply_one_eq_pos_natCast` + `star_natCast` で `χ(1)²` に置換。
+   `sumIrreducibleDegreeSq` (`Σ χ(1)²=|G|`) + `sumNontrivialIrreducibleDegreeSq`
+   (`Σ_{χ≠1} χ(1)²=|G|−1`, `Finset.add_sum_erase` で trivial 寄与 `1²` を分離) の 2 本。AxiomsCheck clean。
 4. **B1 (nu ↔ coherence)**: `Hypothesis78` に 3 フィールド追加を検討 — `nu_maps_ZIrr`, `nu_conj`
    (共役保存), `nu_supp` (像の support ⊆ dadeSupport)。**ただしこれは証明書追加であり、追加するなら
    それらが `IsCoherent.extension` から構成可能であることを別途示す責務が伴う** (memory
    `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
 5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
 
-**現時点の判定**: 1-4 が未組立のため、(7.8.a/b)/(7.9) のいずれも outright sorry-free 化は不能。
+**現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside (1.5.d)) はすべて完了。
+残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
+(7.8.a/b)/(7.9) のいずれも outright sorry-free 化は依然不能。
 証明書フィールド方式での「sorry-free」化はルール上の偽進捗 + 回帰リスクのため見送り。本 spec を実装の青写真とする。
 
 ---
 
 *訂正版 作成: 2026-05-27 (原典 `04.9` 162 行 精読 + scaffold 実装に基づく). 旧版 2026-05-22 は App.C 混同のため破棄.*
 *(7.8.a/b)/(7.9) spec + blocker 追記: 2026-05-30 (issue 0044, mmd L63-113 精読 + repo 型検証).*
+*Burnside (1.5.d) `sumIrreducibleDegreeSq` / `sumNontrivialIrreducibleDegreeSq` 実装完了: 2026-05-30 (issue 0044, `ColumnOrthogonality.lean`).*

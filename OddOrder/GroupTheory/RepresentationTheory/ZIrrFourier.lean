@@ -141,6 +141,67 @@ theorem inner_smul_right (c : ℂ) (φ ψ : ClassFunction G ℂ) :
   rw [ClassFunction.inner, ClassFunction.inner, h]; ring
 
 omit [Finite G] in
+/-- **Conjugate symmetry of `ClassFunction.inner`:** `⟨ψ, φ⟩ = conj ⟨φ, ψ⟩`.
+The unscaled sum `∑ φ(g) conj(ψ(g))` is conjugate-symmetric, and the normalizing factor
+`⅟|G|` is real. -/
+theorem inner_conj_symm (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner ψ φ = star (ClassFunction.inner φ ψ) := by
+  have hsum : ClassFunction.innerSum ψ φ = star (ClassFunction.innerSum φ ψ) := by
+    rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [star_mul', star_star, mul_comm]
+  have hcard : star (⅟(Nat.card G : ℂ)) = ⅟(Nat.card G : ℂ) := by
+    rw [show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _,
+      star_inv₀, Complex.star_def, Complex.conj_natCast]
+  rw [ClassFunction.inner, ClassFunction.inner, hsum, star_mul', hcard]
+
+omit [Finite G] in
+/-- `⟨φ, φ⟩ = (|G| : ℂ)⁻¹ · ∑_g ‖φ(g)‖²` as the real cast of a nonnegative real.
+The unscaled sum `∑_g φ(g) · conj(φ(g)) = ∑_g ‖φ(g)‖²` and the factor `⅟|G|` is the
+positive real `(|G| : ℝ)⁻¹`. -/
+theorem inner_self_eq_realCast (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ =
+      ((((Nat.card G : ℝ)⁻¹) * ∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+  have hsum : ClassFunction.innerSum φ φ =
+      ((∑ g : G, Complex.normSq (φ g) : ℝ) : ℂ) := by
+    rw [ClassFunction.innerSum, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [Complex.star_def, Complex.mul_conj]
+  rw [ClassFunction.inner, hsum,
+    show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _]
+  push_cast
+  ring
+
+omit [Finite G] in
+/-- **Positive semidefiniteness:** `0 ≤ (⟨φ, φ⟩).re`. -/
+theorem inner_self_re_nonneg (φ : ClassFunction G ℂ) :
+    0 ≤ (ClassFunction.inner φ φ).re := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re]
+  have hcard : (0 : ℝ) ≤ (Nat.card G : ℝ)⁻¹ := by positivity
+  have hsum : (0 : ℝ) ≤ ∑ g : G, Complex.normSq (φ g) :=
+    Finset.sum_nonneg fun g _ => Complex.normSq_nonneg (φ g)
+  positivity
+
+omit [Finite G] in
+/-- **Positive definiteness:** if `(⟨φ, φ⟩).re = 0` then `φ = 0`.  Over `ℂ`,
+`(⟨φ, φ⟩).re = (|G| : ℝ)⁻¹ · ∑_g ‖φ(g)‖²`; the positive factor forces every
+`‖φ(g)‖² = 0`, hence `φ(g) = 0` for all `g`. -/
+theorem eq_zero_of_inner_self_re_eq_zero {φ : ClassFunction G ℂ}
+    (h : (ClassFunction.inner φ φ).re = 0) : φ = 0 := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re] at h
+  have hcard : (Nat.card G : ℝ)⁻¹ ≠ 0 := by
+    have : (0 : ℝ) < Nat.card G := by
+      exact_mod_cast Nat.card_pos
+    positivity
+  have hsum : ∑ g : G, Complex.normSq (φ g) = 0 :=
+    (mul_eq_zero.mp h).resolve_left hcard
+  have hterm : ∀ g ∈ (Finset.univ : Finset G), Complex.normSq (φ g) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg fun g _ => Complex.normSq_nonneg (φ g)).mp hsum
+  ext g
+  rw [ClassFunction.zero_apply]
+  exact Complex.normSq_eq_zero.mp (hterm g (Finset.mem_univ g))
+
+omit [Finite G] in
 /-- Right-linearity of `ClassFunction.inner` over a finite sum. -/
 theorem inner_sum_right {ι : Type*} (φ : ClassFunction G ℂ) (s : Finset ι)
     (f : ι → ClassFunction G ℂ) :
@@ -220,6 +281,179 @@ theorem exists_pair_of_sum_sq_eq_two {ι : Type*} [DecidableEq ι] {s : Finset �
   refine ⟨α, β, hαβ, rfl, ?_, ?_⟩
   · rw [pow_two] at hα1; exact mul_self_eq_one_iff.mp hα1
   · rw [pow_two] at hβ1; exact mul_self_eq_one_iff.mp hβ1
+
+/-! ### Integer Cauchy–Schwarz on a coefficient vector
+
+The numeric core of Peterfalvi §7 (5.4): for an integer `c`, `c ≤ c²`, with
+equality exactly when `c ∈ {0, 1}`.  Summed over a finite index set this gives
+`∑ c ≤ ∑ c²` and the tight equality `∀ a, c a ∈ {0, 1}`.  These are pure `ℤ`
+facts used to turn the orthonormal Parseval identities into the (5.4.a)
+inequality `‖χ‖² ≤ ‖X‖²` and the (5.4.b) reconstruction `X = ∑_{α ∈ E} α`. -/
+
+/-- For an integer `c`, `c ≤ c²` (since `c (c - 1) ≥ 0`). -/
+theorem int_le_sq (c : ℤ) : c ≤ c ^ 2 := by nlinarith [sq_nonneg (c - 1), sq_nonneg c]
+
+/-- Equality `c = c²` holds for an integer iff `c ∈ {0, 1}`. -/
+theorem int_eq_sq_iff (c : ℤ) : c = c ^ 2 ↔ c = 0 ∨ c = 1 := by
+  constructor
+  · intro h
+    have : c * (c - 1) = 0 := by ring_nf; linarith [h]
+    rcases mul_eq_zero.mp this with h0 | h1
+    · exact Or.inl h0
+    · exact Or.inr (by omega)
+  · rintro (rfl | rfl) <;> norm_num
+
+/-- **Finite integer Cauchy–Schwarz.** `∑_{a ∈ s} c a ≤ ∑_{a ∈ s} (c a)²`. -/
+theorem finset_sum_le_sum_sq {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
+    ∑ a ∈ s, c a ≤ ∑ a ∈ s, (c a) ^ 2 :=
+  Finset.sum_le_sum fun a _ => int_le_sq (c a)
+
+/-- **Tightness of integer Cauchy–Schwarz.** The sum and the sum of squares are
+equal iff every coefficient is `0` or `1`. -/
+theorem finset_sum_eq_sum_sq_iff {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
+    (∑ a ∈ s, c a = ∑ a ∈ s, (c a) ^ 2) ↔ ∀ a ∈ s, c a = 0 ∨ c a = 1 := by
+  constructor
+  · intro h a ha
+    exact (int_eq_sq_iff (c a)).mp
+      ((Finset.sum_eq_sum_iff_of_le fun a _ => int_le_sq (c a)).mp h a ha)
+  · intro h
+    exact Finset.sum_congr rfl fun a ha => (int_eq_sq_iff (c a)).mpr (h a ha)
+
+/-! ### Parseval on an arbitrary orthonormal finite family
+
+Peterfalvi's `R(χ)` in (5.2.d) is an **orthonormal subset of `ℤ[Irr G]`** (norm-`1`,
+pairwise-orthogonal virtual characters — not necessarily single irreducibles).  The (5.4)
+argument only needs the Parseval identities for such a family: the Fourier coefficient of
+an integer combination `X = ∑ c_a • α_a` at a basis vector `α_b` is `c_b`, and the squared
+norm is `∑ c_a²`.  These lemmas are stated for a `Finset` carrying an explicit
+orthonormality hypothesis `⟨α_a, α_b⟩ = δ_{a,b}`, so they apply verbatim once the family is
+extracted from the gateway struct. -/
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Coefficient recovery in an orthonormal family.** If `⟨a, b⟩ = δ_{a,b}` for all
+`a, b ∈ s`, then the Fourier coefficient of `X = ∑_{a ∈ s} (c a) • a` at `b ∈ s` is `c b`. -/
+theorem inner_orthonormalSum_eq_coeff {s : Finset (ClassFunction G ℂ)} {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    {b : ClassFunction G ℂ} (hb : b ∈ s) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) b = (c b : ℂ) := by
+  classical
+  rw [inner_sum_left]
+  have step : (∑ a ∈ s, ClassFunction.inner ((c a : ℂ) • a) b)
+      = ∑ a ∈ s, (if a = b then (c a : ℂ) else 0) := by
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [ClassFunction.inner_smul_left, horth a ha b hb, mul_ite, mul_one, mul_zero]
+  rw [step, Finset.sum_ite_eq' s b (fun a => (c a : ℂ)), if_pos hb]
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Parseval (norm form) for an orthonormal family.** With `⟨a, b⟩ = δ_{a,b}` on `s`, the
+squared norm of `X = ∑_{a ∈ s} (c a) • a` is `∑_{a ∈ s} (c a)²`. -/
+theorem inner_self_orthonormalSum_eq_sum_sq {s : Finset (ClassFunction G ℂ)}
+    {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) (∑ a ∈ s, (c a : ℂ) • a) =
+      ∑ a ∈ s, (c a : ℂ) ^ 2 := by
+  rw [inner_sum_right]
+  refine Finset.sum_congr rfl fun b hb => ?_
+  rw [inner_smul_right, inner_orthonormalSum_eq_coeff horth hb, star_intCast]
+  ring
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Inner product against the all-ones sum.** With `⟨a, b⟩ = δ_{a,b}` on `s`, the inner
+product of `X = ∑_{a ∈ s} (c a) • a` against the unsigned sum `∑_{a ∈ s} a` is `∑_{a ∈ s} c a`.
+This is the middle identity of Peterfalvi (5.4.a): `‖χ‖² = ⟨X, ∑_{α} α⟩ = ∑_{α} ⟨X, α⟩`. -/
+theorem inner_orthonormalSum_sum_eq_sum_coeff {s : Finset (ClassFunction G ℂ)}
+    {c : ClassFunction G ℂ → ℤ}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, (c a : ℂ) • a) (∑ a ∈ s, a) =
+      ∑ a ∈ s, (c a : ℂ) := by
+  rw [inner_sum_right]
+  refine Finset.sum_congr rfl fun b hb => ?_
+  exact inner_orthonormalSum_eq_coeff horth hb
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Squared norm of an unsigned sum over an orthonormal family.** With `⟨a, b⟩ = δ_{a,b}`
+on `s`, the squared norm of `∑_{a ∈ s} a` is the cardinality `|s|`.  This is the
+`coeff ≡ 1` case of Parseval, used in Peterfalvi (5.6.3) to read
+`‖χ̄^{τ₂}‖² = |R(χ) - E|` off the signed sum. -/
+theorem inner_self_sum_orthonormal_eq_card {s : Finset (ClassFunction G ℂ)}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, a) (∑ a ∈ s, a) = (s.card : ℂ) := by
+  classical
+  rw [inner_sum_left, Finset.sum_congr rfl (fun a ha => ?_)]
+  · rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+  · rw [inner_sum_right, Finset.sum_eq_single a]
+    · rw [horth a ha a ha, if_pos rfl]
+    · intro b hb hba; rw [horth a ha b hb, if_neg (Ne.symm hba)]
+    · intro hna; exact absurd ha hna
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Cross inner products of disjoint sub-sums of an orthonormal family vanish.**
+If `E, F ⊆ s` are disjoint and `s` is orthonormal, then `⟨∑_{α ∈ E} α, ∑_{β ∈ F} β⟩ = 0`.
+Used in Peterfalvi (5.6.3): `⟨X, χ̄^{τ₂}⟩` reduces to a cross term over `E` and `R(χ) - E`. -/
+theorem inner_sum_orthonormal_eq_zero_of_disjoint {s E F : Finset (ClassFunction G ℂ)}
+    (hE : E ⊆ s) (hF : F ⊆ s) (hdisj : Disjoint E F)
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ E, a) (∑ b ∈ F, b) = 0 := by
+  classical
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero fun a ha => ?_
+  rw [inner_sum_right]
+  refine Finset.sum_eq_zero fun b hb => ?_
+  have hab : a ≠ b := fun h => (Finset.disjoint_left.mp hdisj ha) (h ▸ hb)
+  rw [horth a (hE ha) b (hF hb), if_neg hab]
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Pythagoras for an orthogonal family plus an orthogonal residual.**
+Let `v : ι → ClassFunction G ℂ` (indexed over `s : Finset ι`) be **orthogonal** with real
+gram `⟨v i, v j⟩ = if i = j then (m i : ℂ) else 0`, and let `Z` be orthogonal to every
+`v i` (`i ∈ s`).  Then the squared norm of `w = (∑ i ∈ s, (c i : ℂ) • v i) + Z` is the
+real number `∑ i ∈ s, (c i)² · m i + (⟨Z, Z⟩).re`.
+
+This is the Hilbert-space identity behind Peterfalvi (5.6.2): writing the orthogonal part
+`Y = ∑ i, c i · χ_i^{τ₁} + Z` against the orthogonal family `χ_i^{τ₁}` (norms `‖χ_i‖²`),
+`‖Y‖²` splits as a sum of squares plus `‖Z‖²`. -/
+theorem inner_self_orthogonalSum_add_re {ι : Type*} (s : Finset ι)
+    (v : ι → ClassFunction G ℂ) (c : ι → ℝ) (m : ι → ℝ) (Z : ClassFunction G ℂ)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (v i) (v j) =
+      if i = j then (m i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (v i) = 0) :
+    (ClassFunction.inner ((∑ i ∈ s, (c i : ℂ) • v i) + Z)
+        ((∑ i ∈ s, (c i : ℂ) • v i) + Z)).re =
+      (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re := by
+  classical
+  -- `Z` is also orthogonal to each `v i` on the *left*: `⟨v i, Z⟩ = star ⟨Z, v i⟩ = 0`.
+  have hZ' : ∀ i ∈ s, ClassFunction.inner (v i) Z = 0 := fun i hi => by
+    rw [inner_conj_symm, hZ i hi, star_zero]
+  set X : ClassFunction G ℂ := ∑ i ∈ s, (c i : ℂ) • v i with hX
+  -- Expand `⟨X + Z, X + Z⟩ = ⟨X, X⟩ + ⟨X, Z⟩ + ⟨Z, X⟩ + ⟨Z, Z⟩`.
+  have hXZ : ClassFunction.inner X Z = 0 := by
+    rw [hX, inner_sum_left]
+    refine Finset.sum_eq_zero fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, hZ' i hi, mul_zero]
+  have hZX : ClassFunction.inner Z X = 0 := by
+    rw [inner_conj_symm, hXZ, star_zero]
+  -- `⟨X, X⟩ = ∑ i, (c i)² • m i` (the diagonal survives by orthogonality).
+  have hXX : ClassFunction.inner X X = ((∑ i ∈ s, (c i) ^ 2 * m i : ℝ) : ℂ) := by
+    rw [hX, inner_sum_left, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [inner_sum_right]
+    rw [Finset.sum_eq_single i]
+    · rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi i hi, if_pos rfl,
+        Complex.star_def, Complex.conj_ofReal]
+      push_cast; ring
+    · intro j hj hji
+      rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi j hj,
+        if_neg (Ne.symm hji), mul_zero, mul_zero]
+    · intro hni; exact absurd hi hni
+  rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_add_right, hXZ, hZX, add_zero, zero_add, hXX,
+    Complex.add_re, Complex.ofReal_re]
 
 set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in

@@ -57,6 +57,16 @@ structures for §8:
 - `coherence_inner_eq_on_supported`: proved coherence target があるとき、
   `Z[S,A]` 上で `τ` 自身が inner product を保存することを §8 setup から直接使う。
 
+### (2026-05-31) §7 (5.6) coherence-union 依存の sub-lemma 진척
+
+§8 (6.2)/(6.6)이 반복 invoke하는 **§7 Theorem (5.6)** (coherence-union hub)의
+family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axiom 無):
+`int_eq_zero_of_sq_mul_le_of_two_mul_lt` ((5.6.2) integer-forcing core, division-free
+`2a < D, λ²D-2λa+z ≤ 0 ⇒ λ=0`) + `CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi`
+((5.6.2) 첫 norm bound `‖Y‖² ≤ ‖ψ‖²`). 상세·잔여는 `notes/peterfalvi/s07_coherence.md`
+"(2026-05-31)" 절. (5.6) main `IsCoherent(S₁∪{χ,χ̄})`의 단일 blocker = `τ₂`의
+**전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis → 전역 등거리).
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
@@ -218,6 +228,214 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 - character class congruence: TI-subset + cyclic centralizer ⟹ character が "rigid" (mod |P|)
 - (6.8) Sibley main thm の前準備
 - proof 内で [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` + algebraic integer congruence を使用 (両方 mathlib 不在; 新規 `OddOrder/RepresentationTheory/ClassSumAlgebraHom.lean` + `AlgInt.cong.lean` 要)
+
+> **進捗 2026-05-30 (issue 1000 完了)**: class-sum algebra + central character `ω_ρ` の整数性を
+> `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> - `classSum_mul` : `C_i · C_j = ∑_s m_s · C_s` の **正しい** explicit 形 (係数 `m_s = (classSum Ci * classSum Cj) C_s.out`
+>   = per-element 因子分解個数, 同一類上で定数; class-function 性は `classSum_mul_apply_conj`/`_out`).
+>   read-only plan の `classSumCoeff/|C_s|` 形は誤りで採用せず (issue 注意書き通り).
+> - `centralCharacterOfRep_classSum_mul` : `ω_ρ(C_i)·ω_ρ(C_j) = ∑_s m_s · ω_ρ(C_s)` (ℕ 係数; ω が ℂ-alg hom).
+> - `centralCharacterOfRep_classSum_isIntegral` : **`IsIntegral ℤ (ω_ρ(C))`**. 行列固有値論法を回避し,
+>   `{ω_ρ(C_s)}∪{1}` 生成の ℤ-部分加群 `N⊆ℂ` が乗法閉 (上記 product rule) かつ f.g. ⟹ `Submodule.toSubalgebra`
+>   で部分代数化 ⟹ `IsIntegral.of_mem_of_fg`. これが (6.7.3) の `ψ(z)≡ψ(1) (mod |P|)` で使う integrality 部品.
+> - 残: `AlgInt.cong` (合同 arithmetic in ℤ[ζ_n]) + a_{11}/a_{12} mod |P| の計算 = (6.7.3) 本体.
+
+> **進捗 2026-05-30 (AlgInt.cong infra 完了)**: 合同関係 `α ≡ β (mod n)` を
+> `OddOrder/Algebra/AlgInt.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> `Cong n α β := IsIntegral ℤ ((α - β)/n)` (Peterfalvi の三条件のうち load-bearing な商整数性;
+> 端点整数性は別途 `character_isIntegral` 等で供給). API:
+> - refl / symm / comm / trans / add / sub / neg = 加法的合同.
+> - **`Cong.smul_left`/`smul_right`** : 片側を**任意の代数的整数で**スケール = (6.7.2)/(6.7.3) の
+>   乗法ステップ (合同を ψ(1), 構造定数 a_{ij}, 別の整数 ω-値で掛ける). ⚠️ 2 つの合同の積
+>   (`a≡b ∧ c≡d ⟹ ac≡bd`) は端点整数性を要し**無条件には成立しない**; 教科書も整数定数倍しかしないので一致.
+> - `intMul_left`/`intMul_right`/`natMul_left` : 整数/ℕ スカラー特殊形.
+> - `cong_of_exists_isIntegral`/`cong_of_sub_eq_intMul`/`Cong.of_int` : 導入形 (差を n×整数として提示).
+> - notation `α ≡ β [ALGMOD n]` (scoped). commit dde7758.
+> - **(6.7.3) 本体の残依存** (精密化): (1) **(6.7.1)** P が
+>   `Ω = {(u,v) ∈ C_i × C_j | uv ∈ C_s}` (`C_s ∩ Z = ∅`) に fixed-point-free 作用 ⟹ `|P| ∣ a_{ijs}|C_s|`.
+>   proof は **TI-subset ⟹ `C_G(x) ⊆ L` (x∈P^#)** + y∈{u,v} が L の p-元 ⟹ y∈P ⟹ (Z normal in L で) y∈Z ⟹ uv∈Z 矛盾.
+>   これは `IsTISubset` + Sylow-in-L の group-theoretic 組み立て (~40-60 LOC, 未着手).
+>   (2) **(6.7.2)** `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α) (mod |P|)`: `ω(C_i)ω(C_j)=∑ a_{ijs}ω(C_s)` (既存
+>   `centralCharacterOfRep_classSum_mul`) に (6.7.1) を適用し `C_s∩Z=∅` 項を mod |P| で落とす.
+>   (3) **(6.7.3)** assembly: |L| odd ⟹ z, z⁻¹ が異なる G-共役類 ⟹ a_{110}=0, a_{120}=|C_1|;
+>   `ψ=1_G` で a_{11}≡1+a_{12} ⟹ (1+a_{12})ψ(z)≡ψ(1)+a_{12}ψ(z) ⟹ ψ(z)≡ψ(1). ⟸ ここで本 module の
+>   `Cong.smul_left`/`add`/`trans` が直接効く. (1)(2)(3) は §6 group-theory 組み立てなので別 issue.
+
+> **進捗 2026-05-30 ((6.7.1) orbit-counting half 完了)**: (6.7.1) の**数え上げ部分**を
+> `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> planner が CRITICAL と指摘した「集合上の作用の `|G| ∣ |Ω|`」欠落 primitive を埋めた:
+> - `card_dvd_of_stabilizer_eq_bot` : 有限群 `Γ` の有限集合 `β` への**自由**作用 (全 stabilizer ⊥) ⟹ `|Γ| ∣ |β|`.
+>   proof は free-action 分解 `β ≃ (β/Γ) × Γ` (mathlib `MulAction.selfEquivOrbitsQuotientProd`).
+>   ⚠️ "fixed-point-free" は教科書文脈では **自由作用** (x≠1 が点を固定しない=全 stabilizer 自明) の意で,
+>   mathlib の `IsPGroup.card_modEq_card_fixedPoints` (= `p ∣ |Ω|` しか出ない) では**不足**; 自由作用の
+>   orbit-stabilizer 分解で初めて全 `|P| ∣ |Ω|` が出る (教科書の主張は `|P|` 整除であって `p` 整除ではない).
+> - `card_dvd_of_no_nontrivial_fixed` : 等価な仮説形 (no `x≠1` fixes a point).
+> - `classPairMulAction` : 部分群 `P` の `ClassPair = {q:G×G // IsClassPair Ci Cj Cs q}` (= Ω) 上共役作用.
+> - `card_classPair` : `|Ω| = classSumCoeff Ci Cj Cs` (= a_{ijs}|C_s|).
+> - **`card_dvd_classSumCoeff_of_fixedPointFree`** : fixed-point-free ⟹ `|P| ∣ a_{ijs}|C_s|` = (6.7.1) 結論.
+> - **残**: fixed-point-free *仮説の検証* (TI ⟹ C_G(x)⊆L ⟹ y∈P ⟹ y∈Z ⟹ uv∈Z 矛盾) は Sylow/TI/Z setup
+>   (`IsTISubset`+Sylow-in-L) を要し repo 未実装 = `needs-infra`. 揃えば (6.7.2)/(6.7.3) は本 module の
+>   `centralCharacterOfRep_classSum_mul` + `card_dvd_classSumCoeff_of_fixedPointFree` + `AlgInt.Cong` で assembly.
+
+> **進捗 2026-05-30 ((6.7.1) fixed-point-free 仮説検証 完了, commit 384e5b5)**: 上記「残」だった
+> fixed-point-free *仮説の検証* を `ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> これで (6.7.1) の group-theory 部分が完全に閉じた:
+> - **`mem_sylow_of_mem_normalizer_of_isPGroup`** : `N_G(P)` の p-元は Sylow p-部分群 `P` に属する
+>   (P は N_G(P) で normal ⟹ unique Sylow p). proof は `P ⊔ ⟨u⟩` が p-群
+>   (`IsPGroup.to_sup_of_normal_left'`; `⟨u⟩ ≤ N_G(P)`) + `Sylow.is_maximal'` で join が `P` に collapse.
+>   ⚠️ `Z ≤ Z(P)` ではなく `Z ≤ P` のみ使用 (教科書の `Z ⊆ Z(P)` は強いが load-bearing なのは `Z ≤ P`).
+> - **`fixedPointFree_classPair_of_isTISubset`** : (6.7) setup (P Sylow p in L=N_G(P), P^# TI-subset,
+>   Z ≤ P normal in L; C_i,C_j が Z^# と交わり C_s∩Z=∅) で `P` が
+>   `Ω = {(u,v)∈C_i×C_j | uv∈C_s}` に **fixed-point-free** 作用 (no `x∈P^#` が pair を固定).
+>   - x∈P^# が (u,v) を固定 ⟹ x が u,v を中心化 ⟹ TI (`IsTISubset`, `y` が x を共役で動かさない
+>     ⟹ y conjugates `x∈P^#` to `x∈P^#` ⟹ y∈L) で `C_G(x) ⊆ L`.
+>   - u,v は p-元 (Z^#∩C_i 経由で `z∈Z≤P` (p-群) に G-共役; `SemiconjBy.orderOf_eq` で order 保存)
+>     ⟹ 上記 `mem_sylow_…` で u,v∈P.
+>   - 同じ共役が u (resp. v) を `c⁻¹` で `Z^#⊆P^#` に送る ⟹ TI で conjugator∈L ⟹ `Z⊴L` で u,v∈Z
+>     ⟹ uv∈Z, `C_s∩Z=∅` に矛盾.
+> - **assembly 可能**: `card_dvd_classSumCoeff_of_fixedPointFree` と合成して (6.7.1) 結論
+>   `|P| ∣ a_{ijs}|C_s|` (C_s∩Z=∅) が完全形で出る. 残は (6.7.2) `ψ(1)α²≡ψ(1)(a_{ij0}+a_{ij}α)`
+>   (本 module `centralCharacterOfRep_classSum_mul` + (6.7.1) で C_s∩Z=∅ 項を mod|P| 落とす) と
+>   (6.7.3) assembly (|L| odd ⟹ z,z⁻¹ 異 G-共役類; `Cong.smul_left`/`add`/`trans`). これらは §6
+>   class-algebra/合同算術の組み立てで group-theory 依存は解消済.
+
+> **進捗 2026-05-30 ((6.7.2) product rule mod |P| 完了, commit 3735af4)**: (6.7.1) keystone
+> (`card_dvd_classSumCoeff_of_fixedPointFree`) を product rule に流して (6.7.2) を `ClassSumAlgebra.lean`
+> に実装済 (AxiomsCheck 登録). `import OddOrder.Algebra.AlgInt` 追加, `CharacterValuesIntegral` section を
+> `ClassCongruence` section の前へ移動 (`character_isIntegral` を scope に入れるため).
+> - `coeff_mul_card_eq_classSumCoeff` : per-element 因子数 `a_{ijs}=(classSum Ci*classSum Cj) Cs.out` ×
+>   `|C_s|` = pair-count `classSumCoeff Ci Cj Cs` (Peterfalvi `a_{ijs}|C_s|`). `classSum_mul` の class-sum
+>   係数 (per-element count) と (6.7.1) の pair-count を ℂ-cast で橋渡し. proof は pair 集合を `uv` の class
+>   で fiber 分割 (`Finset.card_biUnion`) + per-element count の class-不変性 (`classSum_mul_apply_out`).
+> - `character_one_mul_coeff_mul_centralChar` : 各項 `ψ(1)·a_{ijs}·ω(C_s) = (a_{ijs}|C_s|)·χ(C_s.out)`
+>   (`ω(C_s)=(|C_s|χ(C_s.out))/χ(1)` + 上記 pair-count identity).
+> - `character_one_mul_coeff_mul_centralChar_cong_zero` : `m ∣ a_{ijs}|C_s|` ((6.7.1) 入力) ⟹ 当該項
+>   `≡ 0 [ALGMOD m]` (`cong_of_exists_isIntegral`; 代数的整数 `χ(C_s.out)` の `m` 倍).
+> - **`centralCharacterOfRep_classSum_mul_cong`** = **(6.7.2)** :
+>   `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{inZ C_s} ψ(1)·a_{ijs}·ω(C_s) [ALGMOD m]` (`inZ` = `C_s∩Z≠∅` の decidable 述語;
+>   `¬inZ` 項は `m∣a_{ijs}|C_s|` で脱落). proof は `centralCharacterOfRep_classSum_mul` ×ψ(1) で全 sum 展開 →
+>   `Finset.sum_filter_add_sum_filter_not` で split → `¬inZ` 部分が `Finset.sum_induction` (`≡0` の加法閉) で `≡0`.
+>   Peterfalvi `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α)` の `ω(C_s)=α` collapse 前形 (collapse は α 不変性の group-theory 要).
+
+> **進捗 2026-05-30 ((6.7.3) 合同算術 assembly 完了, commits 27ed939/2be1cc3)**: (6.7.3) を
+> group-theory atoms を仮説とする **conditional** assembly に還元して `ClassSumAlgebra.lean` に, cancellation
+> infra を `AlgInt.lean` に実装済 (AxiomsCheck 登録). ⚠️ memory `scaffold-sorry-free-not-done` に照らし:
+> これは sorry-free だが atoms (`a_{110}=0`,`a_{120}=|C₁|`,`z⁻¹∤z`,`ω(C_s)=α` const) を仮説に外出しした
+> conditional 形 — 真の完了には atoms の group-theory 証明が要る (下記「残依存」). assembly 自体の算術は本物.
+> - `AlgInt.Cong.intMul_cancel_left` : `(c:ℂ)·a≡(c:ℂ)·b (mod n)` + `IsCoprime c n` (ℤ) + a,b 代数的整数 ⟹
+>   `a≡b (mod n)`. Bézout `uc+vn=1` で `(a-b)/n = u·(c(a-b)/n) + v·(a-b)` (両項整数係数×代数的整数で整). =
+>   (6.7.3) の「`|C₁|` で割る」step. **端点整数性が本質** (2 合同の積が無条件でないのと同根; `character_isIntegral` 供給).
+> - `peterfalvi_673_combine` : 2 つの (6.7.2) instance (1,1) `ψ(1)α²≡ψ(1)a_{11}α` (a_{110}=0) /
+>   (1,2) `ψ(1)α²≡ψ(1)(|C₁|+a_{12}α)` (a_{120}=|C₁|) の `symm.trans`.
+> - `peterfalvi_673_cancel` : `ψ(1)α=|C₁|ψ(z)` 代入で両辺を `|C₁|·(…)` 形にして `intMul_cancel_left` で
+>   `|C₁|` cancel ⟹ `a_{11}ψ(z)≡ψ(1)+a_{12}ψ(z)`.
+> - `peterfalvi_673_final` : `1_G` instance `a_{11}≡1+a_{12}` を `ψ(z)` (整) 倍 (`Cong.smul_left`) →
+>   `a_{11}ψ(z)≡ψ(z)+a_{12}ψ(z)`, `hψ` と trans して `ψ(z)+a_{12}ψ(z)≡ψ(1)+a_{12}ψ(z)`, `a_{12}ψ(z)` を sub.
+> - **`peterfalvi_673`** = **(6.7.3)** : combine→cancel→final の chain を atoms 仮説から組む 1 本.
+> - **残依存** (= (6.7.3) 真完了に要る group-theory atoms; いずれも (6.7) full setup
+>   `IsTISubset`+Sylow `P`+`Z⊴L`+`|C_L(z)|` const を要する `needs-infra`):
+>   (i) 構造定数計算 `a_{110}=0` (`(u,u⁻¹)`, u∈C_1, u⁻¹∈C_2≠C_1 ⟹ 不可) / `a_{120}=|C_1|`;
+>   (ii) `|L| odd ⟹ z⁻¹` が `z` に G-非共役 (z∈C_1, z⁻¹∈C_2 を distinct に取れる);
+>   (iii) `ω(C_s)=α` が `C_s∩Z^#≠∅` 上不変 (`ψ(z),|C_L(z)|` の z∈Z^# 不変性から) + `ω(C_0)=1` で右辺 collapse;
+>   (iv) `(|C_1|,p)=1` (= `IsCoprime |C_1| |P|`).
+
+> **進捗 2026-05-30 ((6.7.2) geometric form — abstract `hdvd` を (6.7) setup から放電)**:
+> `ClassSumAlgebra.lean` (`section ClassCongruence`) に
+> **`centralCharacterOfRep_classSum_mul_cong_of_isTISubset`** を landing (AxiomsCheck 登録, 3 axioms 全
+> allowlist 内). これは抽象版 `centralCharacterOfRep_classSum_mul_cong` (仮説 `hdvd : ∀ Cs, ¬inZ Cs →
+> m ∣ classSumCoeff` を要求) を **実 (6.7) setup** へ特殊化したもの:
+> - 仮説: Sylow `p`-subgroup `P`, `Z ≤ P` で `Z ⊴ L=N_G(P)` (`hZnormal`), `P^#=P∖{1}` TI-subset
+>   (`hti : IsTISubset (P∖{1}) (N_G(P))`), source class `C_i,C_j` が `Z^#` と交わる (`hCi`/`hCj`).
+> - 設定: `m := |P| = Nat.card P` (≠0: `Nat.card_pos`, P は群 nonempty + finite), 
+>   `inZ Cs := ∃ w, ⟦w⟧=Cs ∧ w∈Z` (= Peterfalvi の `C_s∩Z≠∅`; `open Classical in` で statement の
+>   `Finset.filter` の `DecidablePred` を供給, `omit [DecidableEq G]`).
+> - `hdvd` の放電が新規部分: `¬inZ C_s` は `∀ w, ⟦w⟧=Cs → w∉Z` と同値 = (6.7.1)
+>   `fixedPointFree_classPair_of_isTISubset` の `hCs` 仮説そのもの. それで fixed-point-free を得て (6.7.1)
+>   counting `card_dvd_classSumCoeff_of_fixedPointFree` に流すと `|P| ∣ a_{ijs}|C_s|` (ℕ);
+>   `exact_mod_cast` で ℤ. これで **(6.7.1) fixed-point-free + counting + (6.7.2) product rule を 1 定理に
+>   合成**, (6.7.3) の geometric source `h11`/`h12` (`ψ(1)α²≡ψ(1)(a_{ij0}+a_{ij}α)`) が立つ.
+>   残 atoms = 上記 (i)`a_{110}=0`/`a_{120}=|C₁|` 構造定数 + (iii)`ω(C_s)=α` const + (iv)`(|C₁|,p)=1` のみ
+>   (= 純粋に構造定数・指標値の計算; fixed-point-free の group-theory は本定理で解消済).
+
+> **進捗 2026-05-30 ((6.7.3) atom discharge — (i)/(iv)/`ω(C₀)=1` 完了, (ii)/(iii) 残)**:
+> `ClassSumAlgebra.lean` に (6.7.3) の group-theory atoms を放電する standalone 補題群を landing
+> (commits 5105064 / 4588590 / 399945c / ed4fae7, 全 AxiomsCheck 登録, unconditional). これで
+> `peterfalvi_673` の conditional 仮説のうち **構造定数 (i) と coprimality (iv) と (iii) の `ω(C₀)=1`
+> 部分が真の補題として独立に証明済**になった:
+> - **構造定数 (i)** (`section StructureCoeffAtIdentity`): `classSumCoeff_one_eq_zero` (`a_{110}=0`,
+>   抽象仮説 `∀u, mk u=Ci→mk u⁻¹≠Cj` で filter 空) / `classSumCoeff_one_eq_card` (`a_{120}=|C₁|`,
+>   `Cj` = inverse class で bijection `u↦(u,u⁻¹)`). z-keyed instance:
+>   `classSumCoeff_self_one_eq_zero` (`C₁=⟦z⟧`, **唯一の仮説 = `⟦z⁻¹⟧≠⟦z⟧`**) /
+>   `classSumCoeff_self_inv_one_eq_card` (`C₂=⟦z⁻¹⟧`, **完全 unconditional** — `mk_inv_eq_of_mk_eq`).
+> - **coprimality (iv)** (`section ClassSizeCoprime`, `[Finite G]`): `card_class_eq_index_centralizer`
+>   (orbit-stabilizer `|⟦z⟧|=[G:C_G(z)]`; `ConjAct G` 作用, `orbit=carrier`, `stabilizer=centralizer`,
+>   `toConjAct` 同型で card 移送 + `index_mul_card` cancel) / `coprime_card_class_card_sylow`
+>   (`(|C₁|,p)=1`; `P≤C_G(z)` (z∈Z(P)) ⟹ `[G:C_G(z)]∣[G:P]` (`index_dvd_of_le`), `p∤[G:P]`
+>   (`Sylow.not_dvd_index`), `|P|=p^k`).
+> - **(iii) の `ω(C₀)=1`** (`section Evaluation`): `centralCharacterOfRep_one` (identity class =
+>   singleton `{1}`, `ω=1·χ(1)/χ(1)=1`).
+> - **残 atom (fully unconditional `peterfalvi_673` 化の前提)**:
+>   (ii-wrap) real-class atom `⟦z⁻¹⟧≠⟦z⟧` の **TI-reduction** (`|L| odd`+`P^#` TI+`z∈P` ⟹
+>     `¬IsConj_G z⁻¹ z`, Peterfalvi L122). core `ConjClasses.eq_one_of_isConj_inv_of_odd_card` は repo
+>     既存 (`BrauerPermutation.lean`) だが TI-reduction wrapper は **import cycle
+>     `ClassSumAlgebra←ZIrr←IrrIndexing←BrauerPermutation` で `ClassSumAlgebra` に置けない** ⟹
+>     downstream module (例: `ZIrr` か新規 file) 行き.
+>   (iii-collapse) `centralCharacterOfRep_classSum_mul_cong_of_isTISubset` の RHS sum を Peterfalvi
+>     `ψ(1)(a_{ij0}+a_{ij}α)` 形へ collapse する補題. `{C_s∩Z≠∅}` を `{⟦1⟧}` (ω=1) と `{C_s∩Z^#≠∅}`
+>     (ω=α, **atom iii = `ω` 不変性, `ψ`+`|C_L(z)|` の Z^# 不変性依存**) に分割し per-element count を
+>     regroup. `|C_L(z)|` const の (6.7) setup 仕込みを要する最深 `needs-infra`.
+
+> **進捗 2026-05-30 ((6.7.3) 残 atom (ii-wrap) real-class TI-reduction 完了, 新規 `RealClassTISubset.lean`)**:
+> 上記 (ii-wrap) を解消. `BrauerPermutation` (= `eq_one_of_isConj_inv_of_odd_card` の在処) と
+> `ClassSumAlgebra` の **両方の downstream** に新 leaf module
+> `OddOrder/GroupTheory/RepresentationTheory/RealClassTISubset.lean` を作成 (unconditional, AxiomsCheck 登録).
+> import cycle 回避: `ZIrr` は `BrauerPermutation` の *upstream* ゆえ不可 (`ZIrr←IrrIndexing←BrauerPermutation`);
+> `BrauerPermutation` を import すれば `ClassSumAlgebra` も transitive に入る. 2 定理:
+> - `not_isConj_inv_of_isTISubset` : `P∈Syl_p`, `Odd |N_G(P)|`, `P^#=P∖{1}` が `N_G(P)` 相対 TI-subset,
+>   `z∈P`, `z≠1` ⟹ `¬IsConj z⁻¹ z`. 証明: `z,z⁻¹∈P^#`; `G`-conjugator `c` (`c z⁻¹ c⁻¹=z`) が `z⁻¹∈P^#`
+>   を `z∈P^#` へ送るので TI で `c∈L=N_G(P)`; `z∈L` (`P≤L`) と合わせ `↥L` 内で `IsConj (⟨z,_⟩⁻¹) ⟨z,_⟩`;
+>   `|L|` odd で `eq_one_of_isConj_inv_of_odd_card` が `z=1` を強制し矛盾. = Peterfalvi L122「`|L|` odd ⟹
+>   `z⁻¹` は `G` 内で `z` に共役でない」.
+> - `mk_inv_ne_self_of_isTISubset` : 上の class 形 `⟦z⁻¹⟧≠⟦z⟧` (`mk_eq_mk_iff_isConj`). これが
+>   `classSumCoeff_self_one_eq_zero` の唯一仮説に直接プラグインし **(ii) 残を解消**.
+> - mathlib quirk (rc2): `Subgroup.normalizer : Set G → Subgroup G` (Set 引数) のため, `Nat.card`/`Finite`/
+>   subtype-ascription 等の型位置では `Subgroup→Set` 引数 coercion が自動挿入されずエラー. `∈`/`IsTISubset`
+>   引数位置 (期待型 `Subgroup G`) は OK. `set L := Subgroup.normalizer ((P:Subgroup G):Set G)` で `hodd`/`hti`
+>   を畳んで全箇所一貫化し回避.
+> - **残**: fully unconditional `peterfalvi_673` の最後の依存は (iii-collapse) のみ
+>   (`centralCharacterOfRep_classSum_mul_cong_of_isTISubset` の RHS sum collapse, `|C_L(z)|` const 依存).
+
+> **進捗 2026-05-30 ((6.7.3) atom (i) `a_{110}=0` を (6.7) setup から hypothesis-free 化, `RealClassTISubset.lean`)**:
+> 上記 (ii-wrap) real-class atom を構造定数計算に**配線**し, `a_{110}=0` を (6.7) setup から無条件化.
+> `RealClassTISubset.lean` に `classSumCoeff_self_one_eq_zero_of_isTISubset` を追加 (unconditional,
+> AxiomsCheck 登録, `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑, 3 axioms 全 allowlist 内):
+> - `classSumCoeff_self_one_eq_zero_of_isTISubset` (`[Fintype G]`, `[DecidableEq (ConjClasses G)]`,
+>   `P∈Syl_p`, `Odd |N_G(P)|`, `P^#=P∖{1}` が `N_G(P)` 相対 TI-subset, `z∈P`, `z≠1` ⟹
+>   `classSumCoeff ⟦z⟧ ⟦z⟧ 1 = 0`): `mk_inv_ne_self_of_isTISubset` を `classSumCoeff_self_one_eq_zero`
+>   (唯一仮説 = `⟦z⁻¹⟧≠⟦z⟧`) にプラグイン. これで **(6.7.3) の `a_{110}=0` 入力が group-theory 仮説ゼロ**で
+>   (6.7) data から出る (`z∈P^#` のみ要求). placement は atom と同理由で本 leaf (`BrauerPermutation` downstream;
+>   `ClassSumAlgebra` への `BrauerPermutation` import は cycle `ClassSumAlgebra←ZIrr←IrrIndexing←BrauerPermutation`).
+> - **残 (fully unconditional `peterfalvi_673` の唯一の前提)**: (iii-collapse) のみ.
+>   `centralCharacterOfRep_classSum_mul_cong_of_isTISubset` は (6.7.2) を **SUM 形**
+>   (`ψ(1)ω(C_i)ω(C_j) ≡ ∑_{C_s∩Z≠∅} ψ(1)a_{ijs}ω(C_s)`) で無条件に出すが, `peterfalvi_673` の `h11`/`h12`
+>   入力は **collapse 形** (`ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α)`). 橋には `ω(C_s)=α` (`C_s∩Z^#≠∅` 上不変) が要り,
+>   それは `|C_L(z)|` const = `[G:C_G(z)]·ψ(z)` が `z∈Z^#` で不変 = (6.7) hypothesis の deep character-theory
+>   仕込み (`needs-infra`). これは memory `scaffold-sorry-free-not-done` の趣旨に照らし**仮説外出ししない**
+>   (外出しは vacuous/too-strong になる). 真の完了には `|C_L(z)|`-constancy 部品の実装が要る (別 issue).
+
+> **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
+> (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
+> `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
+> `OddOrder/GroupTheory/RepresentationTheory/ZIrr.lean` に実装 (unconditional, AxiomsCheck 登録):
+> - `IsIrreducibleCharacter.exists_finrank_charValue_one` : 既約指標 `φ` の値 `φ 1` は任意の witness 表現
+>   `ρ` on `V` の次元 `finrank ℂ V` に等しい (`IsIrreducibleCharacter` の存在 witness を unpack →
+>   仮説 `Representation.IsIrreducible ρ` を `haveI` で instance 化 → `ρ.char_one`)。`[Finite G]` 不要。
+> - `IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card` `[Finite G]` : ∃ `n:ℕ`, `0<n ∧ φ 1 = n ∧ n ∣ |G|`
+>   (= Isaacs Thm 3.11 の `ClassFunction` 層への載せ替え; `finrank_dvd_card ρ` を直接適用)。
+> - **消費経路**: Peterfalvi の `characterDegree φ` は定義上 `φ 1` (`characterDegree_def`, `rfl`/`@[simp]`)
+>   なので S03 側で `rw [characterDegree_def]` 後に上記を当てれば `characterDegree φ ∣ |G|` (ℕ 鋳直し) が出る。
+>   `ZIrr` は `ClassSumAlgebra` を新規 import (両者 sibling, `ClassFunction` 経由で acyclic; `characterDegree`
+>   自体は S03 = downstream なので `ZIrr` からは参照せず `φ 1` 形で橋渡しした)。
 
 **Lean 表現**: 
 ```lean

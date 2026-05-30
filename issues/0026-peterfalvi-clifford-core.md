@@ -32,8 +32,10 @@ API がまだ不足している。
       (`hasCommonRestrictionMultiplicity_of_singleOrbit`, 2026-05-30)。
 - [x] multiplicity `e = ⟨Res χ, θ⟩` の **整数性** (gap #5 の整数半分) を証明する
       (`restrictionMultiplicity_int`, 2026-05-30)。
-- [ ] multiplicity `e ≥ 0` (gap #5 の非負半分) を証明する — module 層待ち
-      (genuine character の Fourier 係数 = isotype の重複度 ≥ 0)。
+- [x] multiplicity `e ≥ 0` (gap #5 の非負半分) を証明する
+      (`restrictionMultiplicity_nonneg`, 2026-05-30)。BLOCKER B を経由せず, mathlib の
+      Hom-次元公式 `card_inv_mul_sum_char_mul_char_eq_finrank` で
+      `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H) ≥ 0` を直接得た (isotype 分解不要)。
 - [ ] orbit-sum decomposition (`Res χ = e · ∑ orbit`) を証明する — module 層待ち。
 - [ ] `RestrictionConstituentsSingleOrbit` の hypothesis を外す (orbit transitivity 本体) — module 層待ち。
 
@@ -200,9 +202,9 @@ prior plan は「Step 1 = `repCharacterClassFunction_comp_subtype`
 (sorry-free だが偽の進捗; 結論 = 仮説の連言)。実証明への置換には次の 2 つが必須で,
 いずれも mathlib 未収録の新規 module 開発 (見積り 3-5 セッション):
 
-- **BLOCKER A (G-action on `ℂ[H]`-simples)**: `H ⊴ G` のとき
-  `N ↦ N.map (ρ g)` が `Res^G_H ρ.asModule` の simple `ℂ[H]`-submodule を simple
-  `ℂ[H]`-submodule に送る。`N.map (ρ g)` 上の `ℂ[H]`-module 構造を normality
+- **BLOCKER A (G-action on `ℂ[H]`-simples)** — ✅ **2026-05-30 着地** (下記 update 参照)。
+  `H ⊴ G` のとき `N ↦ N.map (ρ g)` が `Res^G_H ρ.asModule` の simple `ℂ[H]`-submodule を
+  simple `ℂ[H]`-submodule に送る。`N.map (ρ g)` 上の `ℂ[H]`-module 構造を normality
   (`h • (ρ g v) = ρ g (ρ (g⁻¹hg) v)`, `g⁻¹hg ∈ H`) で明示的に与える必要。
   `asModule` 型シノニムの instance 管理 (`set_option backward.isDefEq.respectTransparency
   false` 必須; issues/closed/0048 の gotcha 参照) が delicate。~50-80 行。
@@ -220,6 +222,83 @@ mathlib 確認済み相当 API: `IsSemisimpleModule.exists_sSupIndep_sSup_simple
 `ofSubmodulePrime_isIrreducible` (本 repo `CharacterCompleteness.lean`)。
 **欠落**: 「`H ⊴ G` で `ρ g` が simple `ℂ[H]`-submodule を simple `ℂ[H]`-submodule に
 送る」(= BLOCKER A) — これだけは自前で書くしかない。
+
+## 2026-05-30 update (3) — BLOCKER A (G-action on `ℂ[H]`-simples) を sorry-free 着地
+
+`Clifford.lean` (namespace `OddOrder.RepresentationTheory.Representation`) に
+module 層の片割れ **BLOCKER A** を実証明で着地 (sorry/axiom 無し, allowlist 3 axioms):
+
+- **`isSimpleModule_map_conjBySimpleSemilinear`** (主定理): `ρ : Representation ℂ G V`,
+  `H ⊴ G`, simple `ℂ[H]`-submodule `N` of `(restrictRep ρ H).asModule`, `g : G` のとき
+  `N.map (conjBySimpleSemilinear ρ g)` は再び simple `ℂ[H]`-submodule。**ρ の既約性は不要**
+  (より一般; 既約性は BLOCKER B の orbit transitivity でのみ必要)。
+- 補助 (同ファイル):
+  - `restrictRep ρ H : Representation ℂ ↥H V` = `ρ.comp H.subtype` の reducible abbrev
+    (`.asModule`/`.asModuleEquiv` の dot 記法 + `Module ℂ[H]` instance 解決のため)。
+  - `conjBySimpleRingHom g : ℂ[H] →+* ℂ[H]` = 共役 `h ↦ ghg⁻¹` 由来の環自己同型
+    (`MonoidAlgebra.mapDomainRingHom` + `conjByMulEquiv`)。`RingHomSurjective` instance 付き。
+  - `conjBySimpleSemilinear g : asModule →ₛₗ[conjBySimpleRingHom g] asModule` = `ρ g` を
+    共役 twist に関する **semilinear** 写像として packaging。normality
+    `ρ(h)(ρ g v)=ρ g(ρ(g⁻¹hg)v)` が semilinearity (`map_smul'`) の中身。
+  - `conjBySimpleSemilinear_bijective` (= `ρ.apply_bijective g`),
+    `mem_map_conjBySimpleSemilinear` (像は集合として `ρ g '' N`, 標準作用)。
+
+証明の鍵: 「`IsSimpleModule R m ↔ IsAtom m` (`isSimpleModule_iff_isAtom`)」+ semilinear
+全単射が誘導する **submodule lattice の order-iso** (`Submodule.orderIsoMapComapOfBijective`)
++ `OrderIso.isAtom_iff` で atom 性を transport。`IsSimpleModule.congr` は同環の linear equiv
+専用で共役 twist (semilinear) には使えないため, atom 経由が正攻法。`asModule` 型シノニムの
+instance/defeq 摩擦は `set_option backward.isDefEq.respectTransparency false` で解消。
+
+**残るのは BLOCKER B (orbit transitivity, 既約性使用) のみ。** A は B の前提として再利用可能。
+`AxiomsCheck.lean` に主定理を登録済 (all in allowlist)。
+
+## 2026-05-30 update (4) — gap #5 非負半分を sorry-free 着地 (BLOCKER B 回避)
+
+`Clifford.lean` (namespace `OddOrder.RepresentationTheory.ClassFunction`) に gap #5 の
+**非負半分**を実証明で着地 (sorry/axiom 無し, allowlist 3 axioms)。**planner の sketch は
+BLOCKER B (orbit transitivity) + Maschke isotype 分解経由を想定していたが, それは不要**だった:
+
+- **`restrictionMultiplicity_eq_finrank_intertwiningMap`** (値の公式, 主補題):
+  `χ = χ_ρ` (`ρ : Representation ℂ G V`, f.d.), `θ = χ_σ` (`σ : Representation ℂ ↥H W`, f.d.)
+  のとき `⟨Res^G_H χ, θ⟩ = dim_ℂ Hom_{ℂ[H]}(σ, ρ|_H)` (= `finrank ℂ (IntertwiningMap σ (ρ.comp H.subtype))`)。
+  これは multiplicity の module 論的同定そのもの (簡約 `σ` が genuine `H`-module `ρ|_H` に
+  `Hom`-次元で何個入るか) であり, **gap #1 (multiplicity-as-inner-product) の核**でもある。
+- **`restrictionMultiplicity_nonneg`** (非負性): 既約指標 `χ`, `θ` で `0 ≤ ⟨Res^G_H χ, θ⟩`。
+  上の公式 + `Nat.cast_nonneg` (次元は cast された自然数) で即座。既約性は不要 (genuine
+  character の証人だけ使う); irreducible 版を statement にしている。
+
+**鍵**: mathlib `Representation.card_inv_mul_sum_char_mul_char_eq_finrank`
+(`Mathlib/RepresentationTheory/Character.lean`) が
+`(Nat.card G)⁻¹ * ∑_g σ.char g * ρ.char g⁻¹ = finrank (IntertwiningMap ρ σ)` を与える。
+これは `Representation` レベル (FDRep 不要 ⇒ universe 制約なし) かつ **既約性不要**で,
+Schur ではなく `invariants` ↔ `IntertwiningMap` 同型 + 平均射影の trace で従う。
+repo `inner` の `star(θ(h))` は `character_inv` (`CharacterConjugate.lean`,
+`χ(g⁻¹) = star χ(g)`) で `σ.char h⁻¹` に直し, 上の公式に帰着。証明の骨格は G-side の
+`RowOrthogonality.characterTableRowOrthogonality` と同型 (ただし `char_orthonormal` の
+代わりに `card_inv_mul_sum_char_mul_char_eq_finrank` を使い, 0/1 でなく finrank ≥ 0)。
+
+**残る module 層 = BLOCKER B (orbit transitivity, single-orbit hypothesis 除去) のみ。**
+orbit-sum decomposition と `RestrictionConstituentsSingleOrbit` の hypothesis 除去は
+依然 BLOCKER B 待ち (既約性使用, isotype の `G`-transitive permutation, mathlib 未収録)。
+非負性は BLOCKER B に依存しないことが判明したので, これで gap #5 は完全に解決 (整数 + 非負)。
+
+## 2026-05-30 update (5) — multiplicity ∈ ℕ (gap #5 を単一 theorem に統合)
+
+整数半分 (`restrictionMultiplicity_int`) と非負半分 (`restrictionMultiplicity_nonneg`) を
+**1 つの命題**に合成し, Clifford ([Is] Thm 6.5) が実際に消費する形
+`⟨Res^G_H χ, θ⟩ = (k : ℂ)` (`k : ℕ`) を着地 (sorry/axiom 無し, allowlist 3 axioms)。これまで
+gap #5 は「整数」と「非負」が**別仮説の 2 定理**(整数性は ZIrr 所属, 非負性は既約性)に
+分かれており, 単一の自然数値ステートメントが欠けていた。既約指標は両方を供給する
+(`.mem_ZIrr` で整数, 既約性で非負)ので合成可能。
+
+- **`ClassFunction.restrictionMultiplicity_natCast`** (`Clifford.lean`):
+  `[Finite G]`, `IsIrreducibleCharacter χ`, `IsIrreducibleCharacter θ` →
+  `∃ k : ℕ, restrictionMultiplicity H χ θ = (k : ℂ)`。証明は `restrictionMultiplicity_int`
+  + `restrictionMultiplicity_nonneg` の合成 (`0 ≤ (m:ℂ)` ⇒ `0 ≤ m` ⇒ `k = m.toNat`)。
+- **`IrreducibleCharacter.restrictionMultiplicity_natCast`**: bundled 既約指標版。
+
+これで gap #5 は文字通り完結 (ℕ 値として確定)。残る hard blocker は依然 BLOCKER B
+(orbit transitivity) のみ。
 
 ## 完了条件
 

@@ -17,6 +17,16 @@ created: 2026-05-28
 `isometry_difference_pair_structure` (issue 0025) が sorry-free になったので,
 §3 (1.4) 経由の §5 (3.2) / §6 (4.5) / §7 (5.6) の使用前提は整っている。
 
+## 進捗 (2026-05-30)
+
+(7.9) の最重 blocker だった **Peterfalvi (1.1) pointwise (奇位数 ⇒ 非自明既約は非実)** を
+sorry-free 実装。`OddOrder/GroupTheory/RepresentationTheory/BrauerPermutationUnconditional.lean` に
+`not_isReal_of_ne_trivial_of_odd_card'` (`Odd (Nat.card G) → χ ≠ 1 → ¬ IsReal (χ:CF G ℂ)`,
+unconditional) + 補助 `realIrreducibleCharacter_eq_trivial_of_odd_card'` を追加。既存の
+unconditional 系 `card_realIrreducibleCharacters_eq_one_of_odd_card'` (`# real Irr = 1`) から
+subsingleton 一意性 (`Nat.card_eq_one_iff_exists`) で導出。AxiomsCheck clean, full build green。
+note `notes/peterfalvi/s09_nonexistence_certain.md` の blocker 1 / plan 1 を更新済。
+
 ## 全体構造 (Peterfalvi §9 mmd `04.9_pp_38_43_*.mmd` より)
 
 (7.10) は次の構成ブロックの **合成定理**:
@@ -47,8 +57,8 @@ created: 2026-05-28
 - [x] sub-issue 0046: (6.8) `sibleySetup_is_coherent` statement + `IndChainDecomposition` consumer interface (proof 本体は別 issue)
 - [x] sub-issue: (7.4) family hypothesis + (7.5) main inequality (sorry-free, 2026-05-29)
 - [x] sub-issue: (7.6) `Hypothesis76` + (7.7.a/b) `χ^ρ` explicit formula + norm-square double sum (2026-05-29; (7.7.a) は `chiRho_decomp` 証明書フィールド, (7.7.b) は proved)
-- [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; **(7.8.a)/(7.8.b) 未** (`β = 1_G - ζ^ν + aΣ + Γ` 分解と `‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`) — 精密 spec + blocker は `notes/peterfalvi/s09_nonexistence_certain.md` 2026-05-30 節 (B: 整数射影 / `‖β‖²=e+1` / Burnside (1.5.d) / `nu↔coherence` 未組立; outright proof 不能のため証明書追加も見送り)
-- [ ] sub-issue: (7.9) 2-family non-orthogonality — 精密 spec + blocker は同ノート 2026-05-30 節 (最重 blocker = `Odd card ⇒ ¬IsReal χ` が repo 未実装, (5.9) nu 接続, disjoint-support inner=0 補題欠如)
+- [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; **(7.8.a)/(7.8.b) 未** (`β = 1_G - ζ^ν + aΣ + Γ` 分解と `‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`) — 精密 spec + blocker は `notes/peterfalvi/s09_nonexistence_certain.md` 2026-05-30 節 (B: 整数射影 / `‖β‖²=e+1` / ~~Burnside (1.5.d)~~ / `nu↔coherence` 未組立; outright proof 不能のため証明書追加も見送り)。**Burnside (1.5.d) building block は 2026-05-30 解消** → `ColumnOrthogonality.lean` の `sumIrreducibleDegreeSq` (`Σ χ(1)²=|G|`) + `sumNontrivialIrreducibleDegreeSq` (`Σ_{χ≠1} χ(1)²=|G|−1`), AxiomsCheck clean
+- [ ] sub-issue: (7.9) 2-family non-orthogonality — 精密 spec + blocker は同ノート 2026-05-30 節 ((5.9) nu 接続; **disjoint-support inner=0 補題は 2026-05-30 解消** → `ClassFunction.inner_eq_zero_of_disjoint_support` (+ `innerSum_eq_zero_of_disjoint_support`); **`Odd card ⇒ ¬IsReal χ` も 2026-05-30 解消**)
 - [ ] sub-issue: (6.8) 本体 proof ((6.1)-(6.7), (5.2), (4.6) の積み上げ)
 - [ ] (7.10) 最終 assembly: (7.5)(7.8)(7.9)(6.8)+Thompson の連立 + 算術
 

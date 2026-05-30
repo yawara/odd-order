@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
@@ -83,6 +84,44 @@ theorem HasNoRealCharacters.not_mem_of_isReal {S : Set (ClassFunction G ℂ)}
   intro hmem
   exact hS hmem hχ
 
+/-- The set of class functions arising from the *nontrivial* irreducible complex
+characters of `G`.
+
+This is Peterfalvi's `Irr(G) ∖ {1_G}`, viewed inside `CF(G)`.  It is the concrete
+source set whose `HasNoRealCharacters` property (under odd order) discharges the
+`no_real_characters` field of the §7 coherence hypothesis. -/
+def nontrivialIrreducibleClassFunctions (G : Type*) [Group G] :
+    Set (ClassFunction G ℂ) :=
+  {φ | ∃ χ : IrreducibleCharacter G,
+    χ ≠ trivialIrreducibleCharacter G ∧ (χ : ClassFunction G ℂ) = φ}
+
+@[simp] theorem mem_nontrivialIrreducibleClassFunctions {φ : ClassFunction G ℂ} :
+    φ ∈ nontrivialIrreducibleClassFunctions G ↔
+      ∃ χ : IrreducibleCharacter G,
+        χ ≠ trivialIrreducibleCharacter G ∧ (χ : ClassFunction G ℂ) = φ :=
+  Iff.rfl
+
+theorem irreducibleCharacter_mem_nontrivialIrreducibleClassFunctions
+    {χ : IrreducibleCharacter G} (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    (χ : ClassFunction G ℂ) ∈ nontrivialIrreducibleClassFunctions G :=
+  ⟨χ, hχ, rfl⟩
+
+/-- **Peterfalvi (1.1)**, set form (discharge of the §7 coherence hypothesis).
+
+If `G` has odd order, then the set of nontrivial irreducible complex characters
+contains no real class function.  This is the set-level statement of (1.1) — every
+nontrivial irreducible character is non-self-conjugate — packaged as the
+`HasNoRealCharacters` predicate so that the `no_real_characters` field of a §7
+coherence hypothesis is supplied directly from oddness, with no extra input.
+
+It is the unconditional consequence of `not_isReal_of_ne_trivial_of_odd_card'`
+quantified over the whole nontrivial-irreducible source set. -/
+theorem hasNoRealCharacters_nontrivialIrreducibleClassFunctions [Finite G]
+    (hodd : Odd (Nat.card G)) :
+    HasNoRealCharacters (nontrivialIrreducibleClassFunctions G) := by
+  rintro φ ⟨χ, hχ, rfl⟩
+  exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ
+
 /-- **Peterfalvi (1.1)**, cardinal form.
 
 If `G` has odd order, then there is exactly one real irreducible complex
@@ -144,6 +183,53 @@ def characterDegree (χ : ClassFunction G ℂ) : ℂ :=
 @[simp] theorem characterDegree_trivialClassFunction :
     characterDegree (trivialClassFunction G) = 1 :=
   rfl
+
+/-- **The degree of an irreducible character divides the group order**, phrased through Peterfalvi's
+`characterDegree` (Isaacs, *Character Theory of Finite Groups*, Thm 3.11; the degree datum behind
+Peterfalvi (6.7)).  For an irreducible character `χ` of a finite group `G` there is a positive
+natural number `n` with `characterDegree χ = n` and `n ∣ |G|`.
+
+This is the consumer-facing form of the integrality theory: `characterDegree χ` is definitionally
+`χ 1` (`characterDegree_def`), and the `IsIrreducibleCharacter`/`ClassFunction` bridge
+`exists_natDegree_charValue_one_dvd_card` carries `finrank_dvd_card` (the dimension of any
+witnessing representation divides `|G|`) onto that value.  Because `characterDegree` ranges over
+`ℂ`, the divisibility is recorded on the natural witness `n`, with `characterDegree χ = (n : ℂ)`
+tying the two together. -/
+theorem exists_natDegree_characterDegree_dvd_card [Finite G]
+    (χ : IrreducibleCharacter G) :
+    ∃ n : ℕ, 0 < n ∧ characterDegree (χ : ClassFunction G ℂ) = (n : ℂ) ∧ n ∣ Nat.card G := by
+  obtain ⟨n, hpos, hval, hdvd⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  exact ⟨n, hpos, by rw [characterDegree_def]; exact hval, hdvd⟩
+
+/-- **Degree-ratio integrality** (Peterfalvi (5.6), opening step "Set `χ(1) = a·χ₁(1)`").
+
+If `χ₁` is an irreducible character whose natural degree divides that of an irreducible
+character `χ` — the divisibility hypothesis (5.6)(b) — then the ratio is a *positive
+natural number* `a`, and the complex degrees scale by it:
+`characterDegree χ = a • characterDegree χ₁`.
+
+The divisibility hypothesis is phrased intrinsically: for the (unique, by `Nat.cast`
+injectivity) natural witnesses `d, d₁` of the two degrees, `d₁ ∣ d`.  This is the honest
+form of the §5.6 step — the literal "ratio of two positive integers is an integer" is false
+without divisibility (e.g. degrees `2, 3`), so the divisibility datum is essential, not
+scaffolding: it is exactly Peterfalvi's hypothesis (b).  The quotient `a` is what the §5.6
+proof denotes `a` (and the `a_i` for the family), feeding the Cauchy–Schwarz degree bound (c). -/
+theorem exists_pos_natDegreeRatio_of_dvd [Finite G]
+    (χ χ₁ : IrreducibleCharacter G)
+    (hdvd : ∀ d d₁ : ℕ, (χ : ClassFunction G ℂ) 1 = (d : ℂ) →
+      (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) → d₁ ∣ d) :
+    ∃ a : ℕ, 0 < a ∧ characterDegree (χ : ClassFunction G ℂ) =
+      (a : ℂ) * characterDegree (χ₁ : ClassFunction G ℂ) := by
+  obtain ⟨d, hd_pos, hd_val, _⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨d₁, hd₁_pos, hd₁_val, _⟩ := χ₁.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨a, rfl⟩ := hdvd d d₁ hd_val hd₁_val
+  refine ⟨a, ?_, ?_⟩
+  · -- `a > 0`: from `d₁ * a = d > 0` with `d₁ > 0`.
+    rcases Nat.eq_zero_or_pos a with ha | ha
+    · simp [ha] at hd_pos
+    · exact ha
+  · rw [characterDegree_def, characterDegree_def, hd_val, hd₁_val, Nat.cast_mul]
+    ring
 
 /-- A family of class functions has constant degree. -/
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=
@@ -396,5 +482,22 @@ theorem conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ) :
     exact hne ((conjugateDifference_eq_zero_iff_isReal χ).mpr hreal)
   · intro hnot hzero
     exact hnot ((conjugateDifference_eq_zero_iff_isReal χ).mp hzero)
+
+/-- **Peterfalvi (1.1)**, conjugate-difference (nondegeneracy) form, used in §7.
+
+If `G` has odd order and `χ` is a *nontrivial* irreducible complex character, then the
+conjugate difference `χ - χ̄` is nonzero.  Together with `conjugateDifference_conj`
+(which gives `(χ̄ - χ) = -(χ - χ̄)`) this is the nondegeneracy fact that makes the
+`χ - χ̄` constructions of Peterfalvi §7 nonzero: a nontrivial odd-order irreducible
+character is genuinely non-self-conjugate, so its conjugate difference does not collapse.
+
+This is the unconditional consequence of Peterfalvi (1.1) (`G` of odd order has no
+nontrivial real irreducible character) specialised to the `χ - χ̄` expression. -/
+theorem conjugateDifference_ne_zero_of_ne_trivial_of_odd_card [Finite G]
+    (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
+    (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    conjugateDifference (χ : ClassFunction G ℂ) ≠ 0 :=
+  (conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ)).mpr
+    (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ)
 
 end OddOrder.Peterfalvi.S03

@@ -51,10 +51,17 @@ variable {G : Type*} [Group G] {k : Type*} [CommRing k]
 def conjugatesInto (H : Subgroup G) : Set G :=
   { g | ∃ x : G, x⁻¹ * g * x ∈ H }
 
+@[simp] theorem mem_conjugatesInto {H : Subgroup G} {g : G} :
+    g ∈ conjugatesInto H ↔ ∃ x : G, x⁻¹ * g * x ∈ H := Iff.rfl
+
 /-- Elements of `G` that are conjugate into `A`, where `A` is a set of elements
 of the subgroup `H`. -/
 def conjugatesIntoSet (H : Subgroup G) (A : Set ↥H) : Set G :=
   { g | ∃ (x : G) (hx : x⁻¹ * g * x ∈ H), (⟨x⁻¹ * g * x, hx⟩ : ↥H) ∈ A }
+
+theorem mem_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H} {g : G} :
+    g ∈ conjugatesIntoSet H A ↔
+      ∃ (x : G) (hx : x⁻¹ * g * x ∈ H), (⟨x⁻¹ * g * x, hx⟩ : ↥H) ∈ A := Iff.rfl
 
 theorem conjugatesIntoSet_mono {H : Subgroup G} {A B : Set ↥H} (hAB : A ⊆ B) :
     conjugatesIntoSet H A ⊆ conjugatesIntoSet H B := by
@@ -178,6 +185,19 @@ def induceSum (H : Subgroup G) (θ : ClassFunction ↥H k) : ClassFunction G k w
 @[simp] theorem induceSum_apply (H : Subgroup G) (θ : ClassFunction ↥H k) (g : G) :
     induceSum H θ g = ∑ x : G, induceTerm H θ x g := rfl
 
+open scoped Classical in
+/-- **Peterfalvi (2.10.3)** (transversal value, unscaled form).  Only those `x ∈ G`
+with `x⁻¹ g x ∈ H` contribute to the induction sum, so the universe sum collapses to a
+sum over the `Finset` of such `x`. -/
+theorem induceSum_apply_eq_sum_filter (H : Subgroup G) (θ : ClassFunction ↥H k) (g : G) :
+    induceSum H θ g =
+      ∑ x ∈ Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ H), induceTerm H θ x g := by
+  rw [induceSum_apply]
+  refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+  intro x _ hx
+  have hx' : x⁻¹ * g * x ∉ H := by simpa using hx
+  exact induceTerm_of_not_mem θ hx'
+
 @[simp] theorem induceSum_zero (H : Subgroup G) :
     induceSum H (0 : ClassFunction ↥H k) = 0 := by
   ext g
@@ -235,6 +255,17 @@ def induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     induce H θ g = ⅟(Nat.card H : k) * ∑ x : G, induceTerm H θ x g :=
   rfl
 
+open scoped Classical in
+/-- **Peterfalvi (2.10.3)** (transversal value, normalized form).  The normalized
+induced class function `Ind_H^G θ` at `g` is `|H|⁻¹` times the sum of `induceTerm` over
+just those `x ∈ G` with `x⁻¹ g x ∈ H`. -/
+theorem induce_apply_eq_sum_filter (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) (g : G) :
+    induce H θ g =
+      ⅟(Nat.card H : k) *
+        ∑ x ∈ Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ H), induceTerm H θ x g := by
+  rw [induce_apply, ← induceSum_apply, induceSum_apply_eq_sum_filter]
+
 @[simp] theorem card_smul_induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     (θ : ClassFunction ↥H k) :
     (Nat.card H : k) • induce H θ = induceSum H θ := by
@@ -281,6 +312,88 @@ theorem support_induce_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
   exact hg (induce_eq_zero_of_not_conjugatesIntoSet hθ hnot)
 
 end Normalized
+
+section ConjugacyInvariance
+
+/-! ### Peterfalvi (2.10.1): `L`-conjugacy invariance of the induced class function
+
+If `H` is replaced by its conjugate `H^ℓ = H.map (MulAut.conj ℓ)` and `θ` is transported
+accordingly (`transportConj ℓ θ`), the induced class function is unchanged.  This is the
+invariance used in Peterfalvi (2.10.1) when re-indexing the inclusion-exclusion sum over a
+set of conjugacy-class representatives `ℬ`: each `Ind_{M(B^x)}^G α_{B^x}` equals
+`Ind_{M(B)}^G α_B`.
+-/
+
+omit [Fintype G] in
+/-- The **transport** of a class function `θ` on `H` to a class function on the conjugate
+subgroup `H^ℓ = H.map (MulAut.conj ℓ)`: it sends `y ∈ H^ℓ` to `θ (ℓ⁻¹ y ℓ)`.
+
+This is `θ` precomposed with the inverse of the conjugation isomorphism
+`MulEquiv.subgroupMap (MulAut.conj ℓ) H : H ≃* H^ℓ`. -/
+def transportConj (ℓ : G) {H : Subgroup G} (θ : ClassFunction ↥H k) :
+    ClassFunction ↥(H.map (MulAut.conj ℓ : G →* G)) k :=
+  compHom (MulEquiv.subgroupMap (MulAut.conj ℓ) H).symm.toMonoidHom θ
+
+omit [Fintype G] in
+@[simp] theorem transportConj_apply (ℓ : G) {H : Subgroup G} (θ : ClassFunction ↥H k)
+    (y : ↥(H.map (MulAut.conj ℓ : G →* G))) :
+    transportConj ℓ θ y = θ ((MulEquiv.subgroupMap (MulAut.conj ℓ) H).symm y) := rfl
+
+omit [Fintype G] in
+/-- The summand identity behind Peterfalvi (2.10.1): re-indexing `x ↦ x * ℓ⁻¹` matches the
+`x`-summand for `H^ℓ` with the `x`-summand for `H`. -/
+theorem induceTerm_transportConj (ℓ : G) {H : Subgroup G} (θ : ClassFunction ↥H k) (x g : G) :
+    induceTerm (H.map (MulAut.conj ℓ : G →* G)) (transportConj ℓ θ) (x * ℓ⁻¹) g =
+      induceTerm H θ x g := by
+  classical
+  set e : G ≃* G := MulAut.conj ℓ with he
+  -- The reindexed conjugate `e.symm ((x ℓ⁻¹)⁻¹ g (x ℓ⁻¹))` collapses to `x⁻¹ g x`.
+  have key : e.symm ((x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹)) = x⁻¹ * g * x := by
+    rw [he]; simp only [MulAut.conj_symm_apply]; group
+  -- The conjugation condition for `H^ℓ` at `x * ℓ⁻¹` matches the condition for `H` at `x`.
+  have hcond : (x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹) ∈ H.map (e : G →* G) ↔ x⁻¹ * g * x ∈ H := by
+    rw [← key]; exact Subgroup.mem_map_equiv
+  unfold induceTerm
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · have hy : (x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹) ∈ H.map (e : G →* G) := hcond.mpr hx
+    rw [dif_pos hy, dif_pos hx]
+    apply congrArg θ
+    apply Subtype.ext
+    change (e.symm ((x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹)) : G) = x⁻¹ * g * x
+    exact key
+  · have hy : (x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹) ∉ H.map (e : G →* G) := fun h => hx (hcond.mp h)
+    rw [dif_neg hy, dif_neg hx]
+
+/-- **Peterfalvi (2.10.1)** for the unscaled induction sum: the induced class function of a
+conjugate subgroup (with the transported class function) agrees with the original. -/
+theorem induceSum_map_conj (ℓ : G) {H : Subgroup G} (θ : ClassFunction ↥H k) :
+    induceSum (H.map (MulAut.conj ℓ : G →* G)) (transportConj ℓ θ) = induceSum H θ := by
+  ext g
+  rw [induceSum_apply, induceSum_apply]
+  refine Fintype.sum_equiv (Equiv.mulRight ℓ)
+    (fun x => induceTerm (H.map (MulAut.conj ℓ : G →* G)) (transportConj ℓ θ) x g)
+    (fun x => induceTerm H θ x g) (fun x => ?_)
+  have := induceTerm_transportConj ℓ θ (x * ℓ) g
+  rwa [mul_inv_cancel_right] at this
+
+/-- **Peterfalvi (2.10.1)** (normalized form): the normalized induced class function
+`Ind_{H^ℓ}^G (transportConj ℓ θ) = Ind_H^G θ`.  The `|H^ℓ| = |H|` factors agree because
+conjugation is an isomorphism (`Subgroup.card_map_of_injective`). -/
+theorem induce_map_conj (ℓ : G) {H : Subgroup G}
+    [Invertible (Nat.card H : k)]
+    [Invertible (Nat.card (H.map (MulAut.conj ℓ : G →* G)) : k)]
+    (θ : ClassFunction ↥H k) :
+    induce (H.map (MulAut.conj ℓ : G →* G)) (transportConj ℓ θ) = induce H θ := by
+  have hcard : Nat.card (H.map (MulAut.conj ℓ : G →* G)) = Nat.card H :=
+    Subgroup.card_map_of_injective (EquivLike.injective (MulAut.conj ℓ))
+  have hcast : ((Nat.card (H.map (MulAut.conj ℓ : G →* G)) : k)) = (Nat.card H : k) := by
+    rw [hcard]
+  rw [induce, induce, induceSum_map_conj]
+  congr 1
+  -- The two chosen inverses of `(|H| : k)` agree since the cardinalities (hence casts) agree.
+  exact invertible_unique _ _ hcast
+
+end ConjugacyInvariance
 
 section FrobeniusReciprocity
 

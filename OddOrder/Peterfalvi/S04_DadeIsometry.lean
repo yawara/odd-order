@@ -1190,6 +1190,2165 @@ theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
   show α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
   rw [hsplit, map_mul, hfh, one_mul, hval]
 
+/- 2.10.1: `L`-conjugacy invariance of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
+
+section ConjugacyInvariance
+
+open scoped Classical in
+/-- The conjugate finset `B^l = { l·a·l⁻¹ | a ∈ B }`, as the `conjA l`-image of `B`. -/
+noncomputable def conjFinset (hyp : Hypothesis G A L) (l : L)
+    (B : Finset {a : G // a ∈ A}) : Finset {a : G // a ∈ A} :=
+  B.image (hyp.conjA l)
+
+@[simp] theorem mem_conjFinset (hyp : Hypothesis G A L) {l : L}
+    {B : Finset {a : G // a ∈ A}} {a : {a : G // a ∈ A}} :
+    a ∈ hyp.conjFinset l B ↔ ∃ b ∈ B, hyp.conjA l b = a := by
+  classical
+  simp [conjFinset]
+
+theorem conjFinset_nonempty (hyp : Hypothesis G A L) {l : L}
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    (hyp.conjFinset l B).Nonempty := by
+  classical
+  rw [conjFinset]
+  exact hB.image _
+
+@[simp] theorem conjFinset_one (hyp : Hypothesis G A L) (B : Finset {a : G // a ∈ A}) :
+    hyp.conjFinset 1 B = B := by
+  classical
+  rw [conjFinset]
+  rw [show (hyp.conjA 1) = id from funext fun a => hyp.conjA_one a]
+  exact Finset.image_id
+
+theorem conjFinset_mul (hyp : Hypothesis G A L) (l₁ l₂ : L)
+    (B : Finset {a : G // a ∈ A}) :
+    hyp.conjFinset (l₁ * l₂) B = hyp.conjFinset l₁ (hyp.conjFinset l₂ B) := by
+  classical
+  rw [conjFinset, conjFinset, conjFinset, Finset.image_image]
+  exact Finset.image_congr (fun a _ => hyp.conjA_mul l₁ l₂ a)
+
+theorem conjFinset_card (hyp : Hypothesis G A L) (l : L) (B : Finset {a : G // a ∈ A}) :
+    (hyp.conjFinset l B).card = B.card := by
+  classical
+  rw [conjFinset, Finset.card_image_of_injective]
+  intro a b hab
+  have := congrArg (hyp.conjA l⁻¹) hab
+  rwa [conjA_inv_conjA, conjA_inv_conjA] at this
+
+/-- **Peterfalvi (2.10.1), `H(B^x) = H(B)^x`.**  Conjugation by `l ∈ L` carries `H(B)` to
+`H(B^l)`: `H(B^l) = l · H(B) · l⁻¹`.  Uses `(2.4.a)` (`mem_H_conjA_iff`): an element lies in
+`H(l·a·l⁻¹)` iff its `l`-untwist lies in `H(a)`. -/
+theorem hIntersection_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = MulAut.conj (l : G) • hIntersection hyp B hB := by
+  classical
+  ext x
+  rw [mem_hIntersection, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, mem_hIntersection]
+  constructor
+  · intro hx a ha
+    have hmem : x ∈ hyp.H (hyp.conjA l a) := hx _ ((hyp.mem_conjFinset).mpr ⟨a, ha, rfl⟩)
+    rw [mem_H_conjA_iff hyp hconj] at hmem
+    rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
+      rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+        MulAut.conj_inv_apply]]
+  · intro hx a ha
+    obtain ⟨b, hb, rfl⟩ := (hyp.mem_conjFinset).mp ha
+    rw [mem_H_conjA_iff hyp hconj]
+    have := hx b hb
+    rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
+      rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+        MulAut.conj_inv_apply]] at this
+
+/-- `conjA` conjugation relation: `(conjA l)⁻¹ ∘ conjA ℓ ∘ conjA l = conjA (l⁻¹ ℓ l)`. -/
+theorem conjA_conj (hyp : Hypothesis G A L) (l ℓ : L) (a : {a : G // a ∈ A}) :
+    hyp.conjA l⁻¹ (hyp.conjA ℓ (hyp.conjA l a)) = hyp.conjA (l⁻¹ * ℓ * l) a := by
+  rw [← conjA_mul, ← conjA_mul]
+
+/-- **Peterfalvi (2.10.1), `N_L(B^x)` membership.**  An element `ℓ ∈ L` stabilizes the
+conjugate finset `B^l` iff its `l`-untwist `l⁻¹ ℓ l` stabilizes `B`. -/
+theorem mem_setLStabilizer_conjFinset (hyp : Hypothesis G A L) (l ℓ : L)
+    {B : Finset {a : G // a ∈ A}} :
+    ℓ ∈ setLStabilizer hyp (hyp.conjFinset l B)
+      ↔ l⁻¹ * ℓ * l ∈ setLStabilizer hyp B := by
+  classical
+  simp only [mem_setLStabilizer, mem_conjFinset]
+  constructor
+  · intro h b hb
+    obtain ⟨c, hc, hceq⟩ := h (hyp.conjA l b) ⟨b, hb, rfl⟩
+    have : hyp.conjA (l⁻¹ * ℓ * l) b = c := by
+      rw [← conjA_conj, ← hceq, conjA_inv_conjA]
+    rw [this]; exact hc
+  · rintro h a ⟨b, hb, rfl⟩
+    refine ⟨hyp.conjA (l⁻¹ * ℓ * l) b, h b hb, ?_⟩
+    rw [← conjA_conj, conjA_conjA_inv]
+
+/-- **Peterfalvi (2.10.1), `N_L(B^x) = N_L(B)^x`.**  Conjugation by `l ∈ L` carries `N_L(B)`
+to `N_L(B^l)`: `N_L(B^l) = l · N_L(B) · l⁻¹`. -/
+theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
+    {B : Finset {a : G // a ∈ A}} :
+    nLStabilizerIn hyp (hyp.conjFinset l B)
+      = MulAut.conj (l : G) • nLStabilizerIn hyp B := by
+  classical
+  ext x
+  rw [mem_nLStabilizerIn, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, mem_nLStabilizerIn]
+  have hsmul : ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) := by
+    rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
+      MulAut.conj_inv_apply]
+  rw [hsmul]
+  constructor
+  · rintro ⟨hxL, hxN⟩
+    have hconjL : (l : G)⁻¹ * x * (l : G) ∈ L :=
+      L.mul_mem (L.mul_mem (L.inv_mem l.2) hxL) l.2
+    refine ⟨hconjL, ?_⟩
+    have : (⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ : L) = l⁻¹ * ⟨x, hxL⟩ * l := by
+      apply Subtype.ext; push_cast; ring
+    rw [this]
+    exact (hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩).mp hxN
+  · rintro ⟨hconjL, hxN⟩
+    have hxL : x ∈ L := by
+      have : x = (l : G) * ((l : G)⁻¹ * x * (l : G)) * (l : G)⁻¹ := by group
+      rw [this]; exact L.mul_mem (L.mul_mem l.2 hconjL) (L.inv_mem l.2)
+    refine ⟨hxL, ?_⟩
+    rw [hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩]
+    have : (l⁻¹ * ⟨x, hxL⟩ * l : L) = ⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ := by
+      apply Subtype.ext; push_cast; ring
+    rw [this]; exact hxN
+
+/-- **Peterfalvi (2.10.1), `M(B^x) = M(B)^x`.**  Conjugation by `l ∈ L` carries `M(B)` to
+`M(B^l)`: `M(B^l) = l · M(B) · l⁻¹`.  Since `M(B) = H(B) ⊔ N_L(B)` and conjugation is a
+lattice homomorphism (`smul_sup`), this follows from the conjugation of the two factors. -/
+theorem mBSubgroup_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = MulAut.conj (l : G) • mBSubgroup hyp B hB := by
+  rw [mBSubgroup, mBSubgroup, hyp.hIntersection_conjFinset hconj l hB,
+    hyp.nLStabilizerIn_conjFinset l, Subgroup.smul_sup]
+
+/-- `M(B) = H(B)^x ⊔ N_L(B)^x`-conjugation packaged as `Subgroup.map`: `M(B^l) = M(B).map (conj l)`.
+This is the form consumed by the generic `induce_map_conj` (which produces a `.map (conj ℓ)`
+subgroup). -/
+theorem mBSubgroup_conjFinset_eq_map (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
+      = (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G) := by
+  rw [hyp.mBSubgroup_conjFinset hconj l hB, Subgroup.pointwise_smul_def]; rfl
+
+/-- A congruence principle for `induce` along a subgroup equality: if `H₁ = H₂` and the two class
+functions take equal values on the common carrier, the induced class functions agree. -/
+theorem induce_congr_of_subgroup_eq {H₁ H₂ : Subgroup G} (h : H₁ = H₂)
+    [Invertible (Nat.card H₁ : ℂ)] [Invertible (Nat.card H₂ : ℂ)]
+    {θ₁ : ClassFunction ↥H₁ ℂ} {θ₂ : ClassFunction ↥H₂ ℂ}
+    (hval : ∀ x (hx₁ : x ∈ H₁) (hx₂ : x ∈ H₂), θ₁ ⟨x, hx₁⟩ = θ₂ ⟨x, hx₂⟩) :
+    ClassFunction.induce H₁ θ₁ = ClassFunction.induce H₂ θ₂ := by
+  subst h
+  have hθ : θ₁ = θ₂ := by ext x; exact hval x.1 x.2 x.2
+  rw [hθ]; congr 1; exact Subsingleton.elim _ _
+
+/-- **Peterfalvi (2.10.1), transported `α_B`.**  On the conjugate subgroup `M(B^l)`, the class
+function `α_{B^l}` agrees with the transport `transportConj l α_B` of `α_B` to `M(B)^l`.
+
+Both values are computed via the (2.9) defining equation `alphaB_apply_mul`: writing `y = l m l⁻¹`
+with `m = h·b ∈ M(B)` (`h ∈ H(B)`, `b ∈ N_L(B)`), the left side is `α((lbl⁻¹))` (since
+`y = (lhl⁻¹)(lbl⁻¹)` with `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`) and the right side is `α(b)`;
+they agree because `α` is an `L`-class function and `l, b ∈ L`. -/
+theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    (y : G) (hy₁ : y ∈ mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+    (hy₂ : y ∈ (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G)) :
+    alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+      = ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩ := by
+  classical
+  -- `m := l⁻¹ y l ∈ M(B)`, so `y = l m l⁻¹`; decompose `m = h * b`, `h ∈ H(B)`, `b ∈ N_L(B)`.
+  have hmM : (l : G)⁻¹ * y * (l : G) ∈ mBSubgroup hyp B hB := by
+    have := (Subgroup.mem_map_equiv).mp hy₂
+    rwa [MulAut.conj_symm_apply] at this
+  have hmem_prod : (l : G)⁻¹ * y * (l : G)
+      ∈ (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
+    rw [← hyp.coe_mBSubgroup hconj hB]; exact hmM
+  obtain ⟨h, hh, b, hb, hhb⟩ := hmem_prod
+  -- `hhb : h * b = l⁻¹ * y * l`; hence `y = (l h l⁻¹)(l b l⁻¹)`.
+  have hyhb : y = ((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹) := by
+    have hconj_y : (l : G) * ((l : G)⁻¹ * y * (l : G)) * (l : G)⁻¹ = y := by group
+    rw [← hconj_y, ← hhb]; group
+  have hbL : b ∈ L := nLStabilizerIn_le_L hyp B hb
+  have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+  have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
+  have hhbM : h * b ∈ mBSubgroup hyp B hB := (mBSubgroup hyp B hB).mul_mem hhM hbM
+  -- Right side: `transportConj l α_B ⟨y,_⟩ = α_B ⟨l⁻¹ y l,_⟩ = α(b)`.
+  have hRHS : ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩
+      = α ⟨b, hbL⟩ := by
+    rw [ClassFunction.transportConj_apply]
+    have harg : ((MulEquiv.subgroupMap (MulAut.conj (l : G)) (mBSubgroup hyp B hB)).symm
+        ⟨y, hy₂⟩ : mBSubgroup hyp B hB) = ⟨h * b, hhbM⟩ := by
+      apply Subtype.ext
+      simp only [MulEquiv.subgroupMap_symm_apply, MulAut.conj_symm_apply]
+      exact hhb.symm
+    rw [harg]
+    exact hyp.alphaB_apply_mul hconj hB α hh hb hhbM
+  -- Left side: `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`, so `α_{B^l} ⟨y,_⟩ = α(lbl⁻¹)`.
+  have hh'mem : (l : G) * h * (l : G)⁻¹
+      ∈ hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB) := by
+    rw [hyp.hIntersection_conjFinset hconj l hB,
+      show (l : G) * h * (l : G)⁻¹ = (MulAut.conj (l : G)) h from (MulAut.conj_apply _ _).symm]
+    exact Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hIntersection hyp B hB) hh
+  have hb'mem : (l : G) * b * (l : G)⁻¹ ∈ nLStabilizerIn hyp (hyp.conjFinset l B) := by
+    rw [hyp.nLStabilizerIn_conjFinset l,
+      show (l : G) * b * (l : G)⁻¹ = (MulAut.conj (l : G)) b from (MulAut.conj_apply _ _).symm]
+    exact Subgroup.smul_mem_pointwise_smul b (MulAut.conj (l : G)) (nLStabilizerIn hyp B) hb
+  have hb'L : (l : G) * b * (l : G)⁻¹ ∈ L := nLStabilizerIn_le_L hyp (hyp.conjFinset l B) hb'mem
+  have hLHS : alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+      = α ⟨(l : G) * b * (l : G)⁻¹, hb'L⟩ := by
+    have hyeq : (⟨y, hy₁⟩ : mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+        = ⟨((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹), by rw [← hyhb]; exact hy₁⟩ :=
+      Subtype.ext hyhb
+    rw [hyeq]
+    exact hyp.alphaB_apply_mul hconj (hyp.conjFinset_nonempty hB) α hh'mem hb'mem
+      (by rw [← hyhb]; exact hy₁)
+  -- Bridge: `α(lbl⁻¹) = α(b)` by `L`-class invariance (conjugator `l⁻¹`).
+  rw [hLHS, hRHS]
+  refine ClassFunction.of_isConj α (isConj_iff.mpr ⟨l⁻¹, ?_⟩)
+  apply Subtype.ext
+  push_cast; group
+
+/-- **Peterfalvi (2.10.1) (Dade-specific).**  The induced class function
+`Ind_{M(B^x)}^G α_{B^x}` is `L`-conjugacy invariant: it equals `Ind_{M(B)}^G α_B`.
+
+This is the textbook (2.10.1) used to re-index the inclusion–exclusion sum over `ℬ`
+(`L`-conjugacy class representatives of nonempty subsets) into one over all nonempty subsets `𝒫`.
+The proof combines the subgroup conjugation `M(B^l) = M(B)^l` (`mBSubgroup_conjFinset_eq_map`),
+the class function transport `α_{B^l} = transportConj l α_B` (`alphaB_conjFinset_eq_transportConj`),
+and the generic `induce_map_conj`. -/
+theorem induce_alphaB_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    [Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
+      (hyp.conjFinset_nonempty hB)) : ℂ)]
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] :
+    ClassFunction.induce (mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
+        (alphaB hyp hconj (hyp.conjFinset_nonempty hB) α)
+      = ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) := by
+  haveI : Invertible (Nat.card ((mBSubgroup hyp B hB).map
+      (MulAut.conj (l : G) : G →* G)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- Step 1: rewrite the source subgroup to `M(B)^l` and identify the class functions.
+  rw [induce_congr_of_subgroup_eq (hyp.mBSubgroup_conjFinset_eq_map hconj l hB)
+    (θ₂ := ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α))
+    (fun x hx₁ hx₂ => hyp.alphaB_conjFinset_eq_transportConj hconj l hB α x hx₁ hx₂)]
+  -- Step 2: generic (2.10.1) `Ind_{H^ℓ}(transportConj ℓ θ) = Ind_H θ`.
+  exact ClassFunction.induce_map_conj (l : G) (alphaB hyp hconj hB α)
+
+end ConjugacyInvariance
+
+/- 2.10: The `L`-conjugacy transversal `ℬ` of nonempty subsets of `A`. -/
+
+section Transversal
+
+/-- **Peterfalvi (2.10), the `L`-action on subsets of `A`.**  The `L`-conjugation action
+`conjFinset` (`B ↦ B^l = {l·a·l⁻¹ | a ∈ B}`) on `Finset {a : G // a ∈ A}` is a `MulAction`:
+the action laws are exactly `conjFinset_one` and `conjFinset_mul`.
+
+This is the action whose orbits index the inclusion–exclusion sum (2.10): the alternating sum
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` runs over `L`-conjugacy class representatives `ℬ` of the
+nonempty subsets, made well defined by `induce_alphaB_conjFinset` ((2.10.1)) and `conjFinset_card`
+(the sign `(-1)^{|B|}` is `L`-invariant since `|B^l| = |B|`).  It is provided as a `def` (not a
+global instance) because it depends on the hypothesis `hyp`; downstream lemmas activate it with
+`letI := hyp.conjFinsetAction`. -/
+@[reducible] noncomputable def conjFinsetAction (hyp : Hypothesis G A L) :
+    MulAction L (Finset {a : G // a ∈ A}) where
+  smul := hyp.conjFinset
+  one_smul := hyp.conjFinset_one
+  mul_smul := hyp.conjFinset_mul
+
+@[simp] theorem conjFinsetAction_smul (hyp : Hypothesis G A L) (l : L)
+    (B : Finset {a : G // a ∈ A}) :
+    (letI := hyp.conjFinsetAction; l • B) = hyp.conjFinset l B := rfl
+
+/-- **Peterfalvi (2.10), the stabilizer is `N_L(B)`.**  Under the `conjFinset` action, the
+`MulAction` stabilizer of `B` is exactly the set-stabilizer `setLStabilizer hyp B = N_L(B)`.
+
+`l • B = B` unfolds to `B.image (conjA l) = B`; since `conjA l` is injective this is equivalent to
+`conjA l` mapping `B` into `B`, i.e. `∀ a ∈ B, conjA l a ∈ B` — the defining condition of
+`setLStabilizer`.  This identifies the orbit-stabilizer weight `|orbit B| = [L : N_L(B)]` used in
+(2.10). -/
+theorem stabilizer_conjFinsetAction (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) :
+    (letI := hyp.conjFinsetAction; MulAction.stabilizer L B) = setLStabilizer hyp B := by
+  classical
+  letI := hyp.conjFinsetAction
+  ext l
+  rw [MulAction.mem_stabilizer_iff, mem_setLStabilizer]
+  change hyp.conjFinset l B = B ↔ ∀ a ∈ B, hyp.conjA l a ∈ B
+  constructor
+  · intro hl a ha
+    rw [← hl]
+    exact (hyp.mem_conjFinset).mpr ⟨a, ha, rfl⟩
+  · intro hl
+    apply Finset.eq_of_subset_of_card_le
+    · intro a ha
+      obtain ⟨b, hb, rfl⟩ := (hyp.mem_conjFinset).mp ha
+      exact hl b hb
+    · rw [hyp.conjFinset_card]
+
+/-- **Peterfalvi (2.10), the transversal `ℬ`.**  The quotient of `Finset {a : G // a ∈ A}` by the
+`L`-conjugacy relation (`conjFinset` orbits); its elements index the inclusion–exclusion sum once
+restricted to nonempty subsets.  Representatives are obtained via `Quotient.out` (`transversalRep`),
+realizing Peterfalvi's "`ℬ` = set of representatives of the `L`-conjugacy classes of subsets". -/
+noncomputable def conjClassQuotient (hyp : Hypothesis G A L) : Type _ :=
+  letI := hyp.conjFinsetAction
+  MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})
+
+instance (hyp : Hypothesis G A L) : Finite hyp.conjClassQuotient := by
+  unfold Hypothesis.conjClassQuotient
+  letI := hyp.conjFinsetAction
+  letI : Finite (Finset {a : G // a ∈ A}) := Finite.of_fintype _
+  infer_instance
+
+/-- A chosen representative subset of an `L`-conjugacy class (`Quotient.out`).  This is one element
+of Peterfalvi's transversal `ℬ`. -/
+noncomputable def transversalRep (hyp : Hypothesis G A L)
+    (C : hyp.conjClassQuotient) : Finset {a : G // a ∈ A} :=
+  letI := hyp.conjFinsetAction
+  Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C
+
+/-- The chosen representative of the class of `B` is `L`-conjugate to `B`: there is some `l ∈ L`
+with `transversalRep ⟦B⟧ = B^l`.  This is the well-definedness bridge from `ℬ` back to arbitrary
+subsets, dual to `induce_alphaB_conjFinset` (2.10.1). -/
+theorem transversalRep_conj (hyp : Hypothesis G A L) (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    ∃ l : L, hyp.transversalRep (Quotient.mk'' B) = hyp.conjFinset l B := by
+  letI := hyp.conjFinsetAction
+  have hout : (Quotient.mk'' (hyp.transversalRep (Quotient.mk'' B)) :
+      MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})) = Quotient.mk'' B := by
+    rw [transversalRep]
+    exact Quotient.out_eq' _
+  obtain ⟨l, hl⟩ := Quotient.exact' hout
+  exact ⟨l, hl.symm⟩
+
+/-- **Peterfalvi (2.10), orbit-stabilizer weight.**  For a subset `B`, the size of its
+`L`-conjugacy orbit times `|N_L(B)|` equals `|L|`.  Equivalently `|orbit B| = [L : N_L(B)]`, the
+fibrewise weight attached to each representative `B ∈ ℬ` in the (2.10) sum normalization.
+
+This is the orbit-stabilizer theorem `card_orbit_mul_card_stabilizer_eq_card_group` specialized to
+the `conjFinset` action, with the stabilizer rewritten to `setLStabilizer hyp B`
+(`stabilizer_conjFinsetAction`).  Stated with `Nat.card` so no ambient `Fintype L` is needed. -/
+theorem card_orbit_mul_card_setLStabilizer (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    Nat.card (MulAction.orbit L B) * Nat.card (setLStabilizer hyp B)
+      = Nat.card L := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype L := Fintype.ofFinite L
+  letI : Fintype (MulAction.orbit L B) := Fintype.ofFinite _
+  letI : Fintype (MulAction.stabilizer L B) := Fintype.ofFinite _
+  rw [Nat.card_eq_fintype_card, ← hyp.stabilizer_conjFinsetAction B, Nat.card_eq_fintype_card,
+    Nat.card_eq_fintype_card]
+  exact MulAction.card_orbit_mul_card_stabilizer_eq_card_group L B
+
+end Transversal
+
+/- 2.10.3: Pointwise value of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
+
+section PointwiseValue
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.3), the conjugating set `𝒜(g, X)`.**  For `g : G` and a subset
+`X ⊆ G`, `𝒜(g, X) = { x ∈ G | x⁻¹ g x ∈ X }`, as a `Finset G` (using `[Fintype G]`).
+This is the index set of the transversal sum in the induced-character value formula. -/
+noncomputable def conjFiber (g : G) (X : Set G) : Finset G :=
+  Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ X)
+
+@[simp] theorem mem_conjFiber {g x : G} {X : Set G} :
+    x ∈ conjFiber g X ↔ x⁻¹ * g * x ∈ X := by
+  classical
+  simp [conjFiber]
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.3), first displayed equation (transversal form).**  The pointwise
+value of the induced class function `Ind_{M(B)}^G α_B` at `g`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{x ∈ 𝒜(g, M(B))} induceTerm M(B) α_B x g`.
+
+This is the literal first line of Peterfalvi's proof of (2.10.3): the induction formula
+`induce_apply_eq_sum_filter`, restated with the conjugating set `𝒜(g, M(B)) = conjFiber`.
+On the filter the summand `induceTerm M(B) α_B x g` *is* `α_B(x⁻¹ g x)`
+(`alphaB_induceTerm_of_mem` below). -/
+theorem induce_alphaB_apply_eq_sum_conjFiber (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ x ∈ conjFiber g (↑(mBSubgroup hyp B hB) : Set G),
+            ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g := by
+  rw [ClassFunction.induce_apply_eq_sum_filter]
+  rfl
+
+/-- On the conjugating set `𝒜(g, M(B))`, the induction summand `induceTerm M(B) α_B x g`
+is the explicit value `α_B(x⁻¹ g x)`.  Combined with
+`induce_alphaB_apply_eq_sum_conjFiber` this is the `α_B`-explicit first line of (2.10.3). -/
+theorem alphaB_induceTerm_of_mem (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    {x g : G} (hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB) :
+    ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+      = alphaB hyp hconj hB α ⟨x⁻¹ * g * x, hx⟩ :=
+  ClassFunction.induceTerm_of_mem _ hx
+
+/-- **Peterfalvi (2.10.3), the `α_B(x⁻¹gx) = α(b)` collapse.**  For `x ∈ 𝒜(g, M(B))`,
+write the conjugate `x⁻¹ g x = h · b` with `h ∈ H(B)` and `b ∈ N_L(B)` (the semidirect
+factorization of `M(B)`, `coe_mBSubgroup`).  Then the induction summand collapses, via the
+(2.9) defining equation `alphaB_apply_mul`, to `α(b)`.
+
+This isolates the value half of Peterfalvi's "`α_B(x⁻¹ g x) = α(b)`" step (the membership
+half — `α(b) ≠ 0 ⟹ b ∈ A` and then `g ∈ (bH(b))^G` — is the coprime-conjugacy argument
+driving the `card_conj_fiber` aggregation, tracked separately). -/
+theorem exists_nLStabilizerIn_alphaB_induceTerm (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) {x g : G} (hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB) :
+    ∃ (h : G) (_ : h ∈ hIntersection hyp B hB) (b : G) (hb : b ∈ nLStabilizerIn hyp B),
+      x⁻¹ * g * x = h * b ∧
+        ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+          = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+  classical
+  -- factor `x⁻¹ g x = h * b` with `h ∈ H(B)`, `b ∈ N_L(B)`
+  have hmem_prod : x⁻¹ * g * x
+      ∈ (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
+    rw [← hyp.coe_mBSubgroup hconj hB]; exact hx
+  obtain ⟨h, hh, b, hb, hhb⟩ := hmem_prod
+  -- `hhb : h * b = x⁻¹ * g * x`
+  refine ⟨h, hh, b, hb, hhb.symm, ?_⟩
+  have hhbeq : h * b = x⁻¹ * g * x := hhb
+  have hhbM : h * b ∈ mBSubgroup hyp B hB := by rw [hhbeq]; exact hx
+  have harg : (⟨x⁻¹ * g * x, hx⟩ : mBSubgroup hyp B hB) = ⟨h * b, hhbM⟩ :=
+    Subtype.ext hhb.symm
+  calc ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+      = alphaB hyp hconj hB α ⟨x⁻¹ * g * x, hx⟩ :=
+        alphaB_induceTerm_of_mem hyp hconj hB α hx
+    _ = alphaB hyp hconj hB α ⟨h * b, hhbM⟩ := congrArg (alphaB hyp hconj hB α) harg
+    _ = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := hyp.alphaB_apply_mul hconj hB α hh hb hhbM
+
+/-- **Coprimality of `orderOf b` with `|H(B)|`** (Peterfalvi (2.2.c), the input to (2.1) in the
+proof of (2.10.3)).  For `b ∈ A`, the order of `b` is coprime to `|H(B)|`: `|H(B)| ∣ |H(b₀)|`
+for any `b₀ ∈ B` (`H(B) ⊆ H(b₀)`), which is coprime to `|C_L(b)|` by `centralizer_coprime`, and
+`orderOf b ∣ |C_L(b)|` since `b ∈ C_L(b)`. -/
+theorem coprime_orderOf_card_hIntersection (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {b : G} (hbA : b ∈ A) :
+    Nat.Coprime (orderOf b) (Nat.card (hIntersection hyp B hB)) := by
+  obtain ⟨b₀, hb₀⟩ := hB.exists_mem
+  have hdvdH : Nat.card (hIntersection hyp B hB) ∣ Nat.card (hyp.H b₀) :=
+    Subgroup.card_dvd_of_le (hIntersection_le hyp hB hb₀)
+  have hcop : Nat.Coprime (Nat.card (hyp.H b₀)) (Nat.card (centralizerIn L b)) :=
+    hyp.centralizer_coprime b₀ ⟨b, hbA⟩
+  have hcop' : Nat.Coprime (Nat.card (hIntersection hyp B hB))
+      (Nat.card (centralizerIn L b)) :=
+    Nat.Coprime.coprime_dvd_left hdvdH hcop
+  exact (Nat.Coprime.coprime_dvd_right (hyp.orderOf_dvd_card_centralizerIn hbA) hcop').symm
+
+/-- **Peterfalvi (2.10.3), the vanishing case.**  If `g` lies outside `⋃_{a∈A} (aH(a))^G` (the
+Dade support), then `(Ind_{M(B)}^G α_B)(g) = 0`.
+
+Each summand `induceTerm M(B) α_B x g` over `x ∈ 𝒜(g, M(B))`, if nonzero, has
+`x⁻¹ g x = h·b` with `h ∈ H(B)`, `b ∈ N_L(B)` and `α(b) ≠ 0`, so `b ∈ A`
+(`exists_nLStabilizerIn_alphaB_induceTerm` + support of `α`).  By (2.1)
+(`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `h·b` is
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G ⊆ dadeSupport` —
+contradicting `g ∉ dadeSupport`.  Hence every summand vanishes. -/
+theorem induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] {g : G} (hg : g ∉ hyp.dadeSupport) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = 0 := by
+  classical
+  rw [induce_alphaB_apply_eq_sum_conjFiber hyp hconj hB (α : ClassFunction L ℂ) g]
+  rw [mul_eq_zero]; right
+  apply Finset.sum_eq_zero
+  intro x hx
+  rw [mem_conjFiber] at hx
+  -- factor the conjugate and read off the summand value `α(b)`
+  obtain ⟨h, hh, b, hb, hxgx, hterm⟩ :=
+    hyp.exists_nLStabilizerIn_alphaB_induceTerm hconj hB (α : ClassFunction L ℂ) hx
+  rw [hterm]
+  by_contra hαb
+  -- `α(b) ≠ 0 ⇒ b ∈ A`
+  have hbA : b ∈ A := α.property hαb
+  -- `b` normalizes `H(B)` and is coprime to `|H(B)|`; apply (2.1)
+  have hnorm : ∀ y ∈ hIntersection hyp B hB, b * y * b⁻¹ ∈ hIntersection hyp B hB := by
+    intro y hy
+    have := hyp.nLStabilizerIn_le_normalizer hconj hB hb
+    rw [Subgroup.mem_normalizer_iff] at this
+    exact (this y).mp hy
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB hbA
+  obtain ⟨c, hcmem, x', hx'H, hx'eq⟩ :=
+    OddOrder.GroupTheory.exists_mem_centralizer_conj (g := b) (H := hIntersection hyp B hB)
+      hcop hnorm hh
+  -- `c ∈ C_{H(B)}(b) = H(B ∪ {b}) ⊆ H(b)`, and `c` commutes with `b`
+  obtain ⟨hcH, hccomm⟩ := Subgroup.mem_inf.mp hcmem
+  have hccb : Commute c b :=
+    Subgroup.mem_centralizer_singleton_iff.mp hccomm
+  have hcHb : c ∈ hyp.H ⟨b, hbA⟩ := by
+    have hcInsert : c ∈ hIntersection hyp (insert ⟨b, hbA⟩ B)
+        (Finset.insert_nonempty _ B) := by
+      rw [← hyp.centralizer_inf_hIntersection hB ⟨b, hbA⟩]
+      exact Subgroup.mem_inf.mpr ⟨hccomm, hcH⟩
+    exact hIntersection_le hyp (Finset.insert_nonempty _ B) (Finset.mem_insert_self _ B) hcInsert
+  -- `c·b = b·c ∈ hCoset b`
+  have hcb_mem : c * b ∈ hyp.hCoset ⟨b, hbA⟩ := by
+    rw [mem_hCoset]
+    exact ⟨c, hcHb, hccb.eq⟩
+  -- `g` is conjugate to `c·b` (via `x' x⁻¹`), hence in `dadeSupport`
+  have hgconj : (x' * x⁻¹) * g * (x' * x⁻¹)⁻¹ = c * b := by
+    rw [← hx'eq, ← hxgx]; group
+  apply hg
+  rw [hyp.mem_dadeSupport_iff]
+  refine ⟨⟨b, hbA⟩, c, hcHb, ?_⟩
+  rw [show (⟨b, hbA⟩ : {a : G // a ∈ A}).1 * c = c * b from (hccb.eq).symm]
+  exact (isConj_iff.mpr ⟨x' * x⁻¹, hgconj⟩).symm
+
+/-- **The `N_L(B)`-component of an element of `M(B)`.**  For `m ∈ M(B)` and `b ∈ N_L(B)`, the
+quotient homomorphism `f_B = dadeQuotientHom` sends `m` to `b` (in `L`) exactly when `m` lies in
+the coset `H(B)·b`.  This realizes the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`: `f_B`
+projects onto the `N_L(B)`-factor, with fibers the `H(B)`-cosets.
+
+`(⇐)` `m = h·b` with `h ∈ H(B) = ker f_B`, `b ∈ N_L(B)` (retracted by `f_B`); `(⇒)` `m·b⁻¹` maps
+to `1` under `f_B`, hence lies in `ker f_B = H(B)`. -/
+theorem dadeQuotientHom_eq_iff_mem_hIntersection_mul (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) {b : G} (hb : b ∈ nLStabilizerIn hyp B) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) = b ↔
+      (m : G) ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G) := by
+  classical
+  set bM : mBSubgroup hyp B hB := ⟨b, hyp.nLStabilizerIn_le_mBSubgroup hB hb⟩ with hbM
+  have hfbM : ((hyp.dadeQuotientHom hconj hB bM : L) : G) = b :=
+    hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB bM hb
+  constructor
+  · intro hfm
+    -- `m * bM⁻¹ ∈ ker = H(B)`
+    have hker : (m * bM⁻¹ : mBSubgroup hyp B hB) ∈ (hyp.dadeQuotientHom hconj hB).ker := by
+      rw [MonoidHom.mem_ker, map_mul, map_inv]
+      apply Subtype.ext
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, hfm, hfbM, mul_inv_cancel]
+      rfl
+    rw [hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf] at hker
+    -- `(m * bM⁻¹ : G) = (m:G) * b⁻¹ ∈ H(B)`, so `(m:G) = (that) * b ∈ H(B)·b`
+    refine ⟨(m : G) * b⁻¹, ?_, b, rfl, ?_⟩
+    · have : ((m * bM⁻¹ : mBSubgroup hyp B hB) : G) = (m : G) * b⁻¹ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv]
+      rwa [this] at hker
+    · group
+  · rintro ⟨h, hh, _, rfl, hmeq⟩
+    -- `m = h·b` with `h ∈ H(B)`, so `f_B(m) = f_B(h)·f_B(b) = 1·b = b`
+    have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+    have hmsplit : m = (⟨h, hhM⟩ : mBSubgroup hyp B hB) * bM := by
+      apply Subtype.ext; rw [Subgroup.coe_mul]; exact hmeq.symm
+    have hfh : hyp.dadeQuotientHom hconj hB ⟨h, hhM⟩ = 1 := by
+      rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf]
+      exact hh
+    rw [hmsplit, map_mul, hfh, one_mul, hfbM]
+
+/-- The `f_B`-image of any `m ∈ M(B)` lands in the `N_L(B)`-factor: `f_B(m) ∈ N_L(B)`.
+This is structural — `f_B = dadeQuotientHom` factors through the inclusion `N_L(B) ≤ L`. -/
+theorem dadeQuotientHom_mem_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) ∈ nLStabilizerIn hyp B := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  -- `dadeQuotientHom m = inclusion(N_L(B) ≤ L) z` for `z = …`
+  set z : nLStabilizerIn hyp B :=
+    (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB))
+      ((hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv (QuotientGroup.mk' _ m)) with hz
+  have hval : hyp.dadeQuotientHom hconj hB m = Subgroup.inclusion (hyp.nLStabilizerIn_le_L B) z :=
+    rfl
+  rw [hval]
+  exact z.2
+
+open Classical in
+/-- **Peterfalvi (2.10.3), the `N_L(B)`-aggregated value (value case, before specialization).**
+The pointwise value of `Ind_{M(B)}^G α_B` regrouped over the `N_L(B)`-component `b` of the
+conjugate `x⁻¹ g x`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{b ∈ N_L(B)} α(b) · |𝒜(g, H(B)·b)|`.
+
+This is the heart of (2.10.3): the conjugating set `𝒜(g, M(B))` partitions over the
+`N_L(B)`-factor of `M(B) = H(B) ⋊ N_L(B)`; on the fiber `{x : comp(x⁻¹gx) = b}` the induction
+summand is the constant `α(b)` (the (2.9) defining equation, `alphaB_apply_mul`), and that fiber is
+exactly `𝒜(g, H(B)·b)` (`dadeQuotientHom_eq_iff_mem_hIntersection_mul`).  The textbook value
+formula `(α(a)/|M(B)|)·∑_{b ∈ N_L(B)∩a^L} |𝒜(g, H(B)b)|` follows by discarding the `b ∉ a^L` terms
+(where `α(b) = 0` by support of `α`) once `g ∈ (aH(a))^G` is fixed. -/
+theorem induce_alphaB_apply_eq_sum_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ b : (nLStabilizerIn hyp B),
+            α ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ *
+              (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card := by
+  rw [induce_alphaB_apply_eq_sum_conjFiber hyp hconj hB α g]
+  congr 1
+  -- The component map sends `𝒜(g, M(B))` into `N_L(B)` (the `f_B`-image, with a junk default).
+  set φ : G → nLStabilizerIn hyp B := fun x =>
+    if hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB then
+      ⟨((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hx⟩ : L) : G),
+        hyp.dadeQuotientHom_mem_nLStabilizerIn hconj hB ⟨x⁻¹ * g * x, hx⟩⟩
+    else 1 with hφ
+  have hmaps : ∀ x ∈ conjFiber g (↑(mBSubgroup hyp B hB) : Set G),
+      φ x ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)) := fun x _ => Finset.mem_univ _
+  rw [← Finset.sum_fiberwise_of_maps_to hmaps
+    (f := fun x => ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g)]
+  apply Finset.sum_congr rfl
+  intro b _
+  -- the fiber over `b` is `𝒜(g, H(B)·b)`, and the summand is constant `α(b)` there
+  have hfiber_eq : (conjFiber g (↑(mBSubgroup hyp B hB) : Set G)).filter (fun x => φ x = b)
+      = conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G)) := by
+    ext x
+    simp only [Finset.mem_filter, mem_conjFiber]
+    -- value of `φ x` when `x⁻¹gx ∈ M(B)`
+    have hφval : ∀ hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB,
+        ((φ x : nLStabilizerIn hyp B) : G)
+          = ((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) := by
+      intro hxM
+      simp only [hφ, dif_pos hxM]
+    constructor
+    · rintro ⟨hxM, hφx⟩
+      have hφx' : ((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) = (b : G) := by
+        rw [← hφval hxM, hφx]
+      exact (hyp.dadeQuotientHom_eq_iff_mem_hIntersection_mul hconj hB
+        ⟨x⁻¹ * g * x, hxM⟩ b.2).mp hφx'
+    · intro hxHb
+      rw [Set.mem_mul] at hxHb
+      obtain ⟨h, hh, b', hb', hmeq⟩ := hxHb
+      rw [Set.mem_singleton_iff] at hb'
+      subst hb'
+      have hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB := by
+        rw [← hmeq]
+        exact (mBSubgroup hyp B hB).mul_mem (hyp.hIntersection_le_mBSubgroup hB hh)
+          (hyp.nLStabilizerIn_le_mBSubgroup hB b.2)
+      refine ⟨hxM, ?_⟩
+      apply Subtype.ext
+      rw [hφval hxM]
+      exact (hyp.dadeQuotientHom_eq_iff_mem_hIntersection_mul hconj hB
+        ⟨x⁻¹ * g * x, hxM⟩ b.2).mpr ⟨h, hh, _, rfl, hmeq⟩
+  rw [hfiber_eq]
+  -- on `𝒜(g, H(B)·b)` every summand is `α(b)`
+  have hconst : ∀ x ∈ conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G)),
+      ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+        = α ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ := by
+    intro x hx
+    rw [mem_conjFiber] at hx
+    rw [Set.mem_mul] at hx
+    obtain ⟨h, hh, b', hb', hmeq⟩ := hx
+    rw [Set.mem_singleton_iff] at hb'
+    subst hb'
+    have hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB := by
+      rw [← hmeq]
+      exact (mBSubgroup hyp B hB).mul_mem (hyp.hIntersection_le_mBSubgroup hB hh)
+        (hyp.nLStabilizerIn_le_mBSubgroup hB b.2)
+    rw [alphaB_induceTerm_of_mem hyp hconj hB α hxM]
+    have harg : (⟨x⁻¹ * g * x, hxM⟩ : mBSubgroup hyp B hB)
+        = ⟨h * (b : G), by rw [hmeq]; exact hxM⟩ := Subtype.ext hmeq.symm
+    rw [harg]
+    exact hyp.alphaB_apply_mul hconj hB α hh b.2 _
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul, mul_comm]
+
+open Classical in
+/-- **Peterfalvi (2.10.3), the support-restricted value.**  When `α ∈ CF(L, A)` is supported on
+`A`, the `N_L(B)`-aggregated value of `Ind_{M(B)}^G α_B` may be summed over only those
+`b ∈ N_L(B)` lying in `A`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{b ∈ N_L(B), b ∈ A} α(b) · |𝒜(g, H(B)·b)|`.
+
+This is the first reduction of (2.10.3)'s value case: the terms with `b ∉ A` carry a vanishing
+factor `α(b) = 0` (support of `α`) and so drop out of the `N_L(B)`-sum of
+`induce_alphaB_apply_eq_sum_nLStabilizerIn`.  After fixing a Dade-support representative `a` with
+`g ∈ (aH(a))^G`, the surviving `b` are moreover `L`-conjugate to `a` (Peterfalvi (2.4.b)), which
+collapses `α(b)` to the constant `α(a)` in the textbook value formula. -/
+theorem induce_alphaB_apply_eq_sum_nLStabilizerIn_inA (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+              (fun b : (nLStabilizerIn hyp B) => ((b : G) ∈ A)),
+            (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ *
+              (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card := by
+  rw [induce_alphaB_apply_eq_sum_nLStabilizerIn hyp hconj hB (α : ClassFunction L ℂ) g]
+  congr 1
+  -- terms with `b ∉ A` vanish since `α(b) = 0` there (support of `α`)
+  refine (Finset.sum_subset (Finset.filter_subset _ _) fun b _ hb => ?_).symm
+  rw [Finset.mem_filter] at hb
+  have hbA : (b : G) ∉ A := fun h => hb ⟨Finset.mem_univ _, h⟩
+  have hα0 : (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ = 0 := by
+    by_contra hαne
+    exact hbA (α.property hαne)
+  rw [hα0, zero_mul]
+
+end PointwiseValue
+
+/- 2.10/2.6.b: The right-hand side of the inclusion–exclusion is a virtual character. -/
+
+section VirtualCharacterRHS
+
+/-- **Peterfalvi (2.6.b), each summand is a virtual character.**  For `α ∈ ℤ[Irr L]` and a
+nonempty `B ⊆ A`, the induced class function `Ind_{M(B)}^G α_B` lies in `ℤ[Irr G]`.
+
+This is the building block of the (2.10) inclusion–exclusion's right-hand side
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)}^G α_B`: each term is a virtual character, so any
+`ℤ`-linear (in particular alternating) combination is one too.  It chains the (2.9)
+pullback `alphaB_mem_ZIrr` (`α_B = α ∘ f_B ∈ ℤ[Irr M(B)]`) with the induction lemma
+`ClassFunction.induce_mem_ZIrr` (induction preserves `ℤ[Irr]`). -/
+theorem induce_alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    [Invertible (Nat.card G : ℂ)]
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
+    (hα : α ∈ ZIrr L) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) ∈ ZIrr G := by
+  haveI : Fintype (mBSubgroup hyp B hB) := Fintype.ofFinite _
+  exact ClassFunction.induce_mem_ZIrr (mBSubgroup hyp B hB)
+    (hyp.alphaB_mem_ZIrr hconj hB hα)
+
+/-- **Peterfalvi (2.10), an inclusion–exclusion summand `Ind_{M(B)}^G α_B`.**  Packaged as a
+`ClassFunction G ℂ` carrying its own `Invertible (|M(B)| : ℂ)` instance (supplied from
+`Nat.card_pos`), so the (2.10) right-hand side `-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` can be
+formed as an ordinary `Finset` sum without threading invertibility through each binder.  The
+subset `B` is carried together with its nonemptiness proof as the subtype `{B // B.Nonempty}`. -/
+noncomputable def induceAlphaBTerm (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (α : ClassFunction L ℂ) (p : {B : Finset {a : G // a ∈ A} // B.Nonempty}) :
+    ClassFunction G ℂ :=
+  letI : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  ClassFunction.induce (mBSubgroup hyp p.1 p.2) (alphaB hyp hconj p.2 α)
+
+/-- **Peterfalvi (2.10.1), packaged form.**  The inclusion–exclusion summand `induceAlphaBTerm`
+is `L`-conjugacy invariant: replacing the subset `B` by a conjugate `B^l` leaves
+`Ind_{M(B)}^G α_B` unchanged.
+
+This lifts the bare-`induce` invariance `induce_alphaB_conjFinset` ((2.10.1) Dade-specific) to the
+packaged `ClassFunction G ℂ` summand `induceAlphaBTerm` (which carries its own `Invertible (|M(B)|
+: ℂ)` instance).  It is the well-definedness fact making the (2.10) right-hand side
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` independent of the chosen transversal representatives:
+together with `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) it lets the sum over the
+transversal `ℬ` (`conjClassQuotient`/`transversalRep`) be re-indexed over all nonempty subsets. -/
+theorem induceAlphaBTerm_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (α : ClassFunction L ℂ) (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.induceAlphaBTerm hconj α ⟨hyp.conjFinset l B, hyp.conjFinset_nonempty hB⟩
+      = hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ := by
+  letI : Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
+      (hyp.conjFinset_nonempty hB)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  simp only [induceAlphaBTerm]
+  exact hyp.induce_alphaB_conjFinset hconj l hB α
+
+/-- **Peterfalvi (2.6.b), each packaged summand is a virtual character.**  For `α ∈ ℤ[Irr L]`,
+the term `induceAlphaBTerm` lies in `ℤ[Irr G]` — the `induce_alphaB_mem_ZIrr` content with the
+invertibility instance pinned to the one carried by `induceAlphaBTerm`. -/
+theorem induceAlphaBTerm_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    [Invertible (Nat.card G : ℂ)] {α : ClassFunction L ℂ} (hα : α ∈ ZIrr L)
+    (p : {B : Finset {a : G // a ∈ A} // B.Nonempty}) :
+    hyp.induceAlphaBTerm hconj α p ∈ ZIrr G := by
+  letI : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact hyp.induce_alphaB_mem_ZIrr hconj p.2 hα
+
+/-- **Peterfalvi (2.10)/(2.6.b), the right-hand side is a virtual character.**  Any finite
+`ℤ`-linear combination `∑_{p ∈ s} c p • Ind_{M(B)}^G α_B` of the inclusion–exclusion summands
+(`induceAlphaBTerm`) is a virtual character of `G`.
+
+This is part (d) of the (2.6.b) program: granting the (2.10) identity
+`α^τ = -∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` (the special case `c B = -(-1)^{|B|}` and
+`s = ℬ`), the right-hand side, hence `α^τ`, lies in `ℤ[Irr G]`.  Immediate from
+`Submodule.sum_mem` / `Submodule.smul_mem` over `induceAlphaBTerm_mem_ZIrr`. -/
+theorem zsmul_induceAlphaBTerm_sum_mem_ZIrr (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) [Invertible (Nat.card G : ℂ)]
+    {α : ClassFunction L ℂ} (hα : α ∈ ZIrr L)
+    (s : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty})
+    (c : {B : Finset {a : G // a ∈ A} // B.Nonempty} → ℤ) :
+    (∑ p ∈ s, c p • hyp.induceAlphaBTerm hconj α p) ∈ ZIrr G :=
+  Submodule.sum_mem _ (fun p _ =>
+    Submodule.smul_mem _ _ (hyp.induceAlphaBTerm_mem_ZIrr hconj hα p))
+
+end VirtualCharacterRHS
+
+/- 2.10: The Möbius (inclusion–exclusion) assembly of the Dade map. -/
+
+section MobiusAssembly
+
+open scoped Classical
+
+/-- **Peterfalvi (2.1)/(2.10.3), the conjugating-set cardinality `|𝒜(g, K·a)| = |C_G(a)|`** when
+`a` *centralizes* the subgroup `K` (so `K ⊆ C_G(a)`), `C_G(a)` normalizes `K`, `⟨a⟩` and `K` have
+coprime orders, and `g` is `G`-conjugate to an element `a·x₀` (`x₀ ∈ K`).
+
+This is the textbook's "`𝒜(g, H(a)a) = x C_G(a)`" remark.  The conjugating set
+`𝒜(g, K·a) = {y | y⁻¹gy ∈ K·a}` is in bijection with the `card_conj_fiber` pair set
+`{(p₁, p₂) | p₁ ∈ K ∧ p₂(a·p₁)p₂⁻¹ = g}`: each conjugator `y = p₂` determines a unique `p₁` via
+`y⁻¹gy = a·p₁ ∈ a·K = K·a` (the cosets agree as `a` centralizes `K`).  By `card_conj_fiber` the pair
+set has cardinality `|C_G(a)|`.  Applied at the Möbius survivor `B = {a}` (where `H({a}) = H(a) ⊆
+C_G(a)`, normalized by `C_G(a)` via `H_normalized`) it evaluates the surviving term of (2.10). -/
+theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
+    (hcomm : ∀ x ∈ K, Commute a x)
+    (hnorm : ∀ c ∈ Subgroup.centralizer ({a} : Set G), ∀ x ∈ K, c * x * c⁻¹ ∈ K)
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K))
+    {g x₀ : G} (hx₀K : x₀ ∈ K) (hx₀ : IsConj (a * x₀) g) :
+    (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+      = Nat.card (Subgroup.centralizer ({a} : Set G)) := by
+  classical
+  rw [← OddOrder.GroupTheory.card_conj_fiber hcomm hnorm hcop hx₀K hx₀]
+  -- `(conjFiber g (K·a)).card = Nat.card {y // y⁻¹gy ∈ K·a}`.
+  have hcard1 : (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+      = Nat.card {y : G // y⁻¹ * g * y ∈ (↑K : Set G) * ({a} : Set G)} := by
+    rw [← Nat.card_eq_finsetCard]
+    exact Nat.card_congr (Equiv.subtypeEquivRight fun y => mem_conjFiber)
+  rw [hcard1]
+  -- Bijection `{y // y⁻¹gy ∈ K·a} ≃ {p : G×G // p.1 ∈ K ∧ p.2(a·p.1)p.2⁻¹ = g}`.
+  refine Nat.card_congr ?_
+  refine
+    { toFun := fun y => ⟨(a⁻¹ * (y.1⁻¹ * g * y.1), y.1), ?_, ?_⟩
+      invFun := fun p => ⟨p.1.2, ?_⟩
+      left_inv := ?_
+      right_inv := ?_ }
+  · -- `a⁻¹·(y⁻¹gy) ∈ K`: from `y⁻¹gy ∈ K·a = a·K`.
+    show a⁻¹ * (y.1⁻¹ * g * y.1) ∈ K
+    obtain ⟨h, hh, a', ha', hyeq⟩ := y.2
+    rw [Set.mem_singleton_iff] at ha'
+    simp only at hyeq
+    -- `hyeq : h * a' = y.1⁻¹ * g * y.1`, `ha' : a' = a`
+    rw [← hyeq, ha']
+    have hreduce : a⁻¹ * (h * a) = h := by
+      have hcomm_ha : a * h = h * a := (hcomm h hh).eq
+      rw [← hcomm_ha]; group
+    rw [hreduce]
+    exact hh
+  · -- `y·(a·(a⁻¹·(y⁻¹gy)))·y⁻¹ = g`
+    show y.1 * (a * (a⁻¹ * (y.1⁻¹ * g * y.1))) * y.1⁻¹ = g
+    group
+  · -- `p.1.2⁻¹·g·p.1.2 ∈ K·a`: from `p.2(a·p.1)p.2⁻¹ = g`, `p.1∈K`.
+    obtain ⟨⟨q1, q2⟩, hq1, hq2⟩ := p
+    show q2⁻¹ * g * q2 ∈ (↑K : Set G) * ({a} : Set G)
+    rw [Set.mem_mul]
+    refine ⟨a * q1 * a⁻¹, ?_, a, Set.mem_singleton _, ?_⟩
+    · -- `a·q1·a⁻¹ ∈ K` (`K` is normalized by `a`, which lies in `C_G(a)`)
+      have hacomm : a * q1 * a⁻¹ = q1 := by rw [(hcomm q1 hq1).eq]; group
+      rw [hacomm]; exact hq1
+    · -- `q2⁻¹·g·q2 = (a·q1·a⁻¹)·a`
+      have hconj : q2⁻¹ * g * q2 = a * q1 := by rw [← hq2]; group
+      rw [hconj]; group
+  · -- left inverse
+    rintro ⟨y, hy⟩
+    rfl
+  · -- right inverse
+    rintro ⟨⟨x, t⟩, hx, ht⟩
+    apply Subtype.ext
+    apply Prod.ext
+    · -- `a⁻¹·(t⁻¹·g·t) = x` from `t(a·x)t⁻¹ = g`
+      show a⁻¹ * (t⁻¹ * g * t) = x
+      conv_lhs => rw [← ht]
+      group
+    · rfl
+
+/-- **Peterfalvi (2.10.3), the support test for a single component `b`.**  For `b ∈ N_L(B)` with
+`b ∈ A`, if some conjugate `y⁻¹gy` lies in the coset `H(B)·b` (i.e. `𝒜(g, H(B)b) ≠ ∅`), then
+`g ∈ (bH(b))^G` lies in the Dade support.
+
+This is the contrapositive content of the vanishing case
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` isolated to one fiber: by (2.1)
+(`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `y⁻¹gy = h·b` is
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G`. -/
+theorem exists_mem_H_isConj_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {b : G} (hbN : b ∈ nLStabilizerIn hyp B) (hbA : b ∈ A) {g y : G}
+    (hy : y⁻¹ * g * y ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G)) :
+    ∃ c ∈ hyp.H ⟨b, hbA⟩, IsConj (b * c) g := by
+  classical
+  -- factor `y⁻¹gy = h·b` with `h ∈ H(B)`
+  rw [Set.mem_mul] at hy
+  obtain ⟨h, hh, b', hb', hyeq⟩ := hy
+  rw [Set.mem_singleton_iff] at hb'
+  rw [hb'] at hyeq
+  -- `hyeq : h * b = y⁻¹ * g * y`
+  -- `b` normalizes `H(B)` and is coprime to `|H(B)|`; apply (2.1)
+  have hnorm : ∀ z ∈ hIntersection hyp B hB, b * z * b⁻¹ ∈ hIntersection hyp B hB := by
+    intro z hz
+    have := hyp.nLStabilizerIn_le_normalizer hconj hB hbN
+    rw [Subgroup.mem_normalizer_iff] at this
+    exact (this z).mp hz
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB hbA
+  obtain ⟨c, hcmem, x', hx'H, hx'eq⟩ :=
+    OddOrder.GroupTheory.exists_mem_centralizer_conj (g := b) (H := hIntersection hyp B hB)
+      hcop hnorm hh
+  obtain ⟨hcH, hccomm⟩ := Subgroup.mem_inf.mp hcmem
+  have hccb : Commute c b := Subgroup.mem_centralizer_singleton_iff.mp hccomm
+  have hcHb : c ∈ hyp.H ⟨b, hbA⟩ := by
+    have hcInsert : c ∈ hIntersection hyp (insert ⟨b, hbA⟩ B) (Finset.insert_nonempty _ B) := by
+      rw [← hyp.centralizer_inf_hIntersection hB ⟨b, hbA⟩]
+      exact Subgroup.mem_inf.mpr ⟨hccomm, hcH⟩
+    exact hIntersection_le hyp (Finset.insert_nonempty _ B) (Finset.mem_insert_self _ B) hcInsert
+  -- `g` is conjugate to `c·b = b·c`
+  have hgconj : (x' * y⁻¹) * g * (x' * y⁻¹)⁻¹ = c * b := by
+    rw [← hx'eq, hyeq]; group
+  refine ⟨c, hcHb, ?_⟩
+  rw [show b * c = c * b from (hccb.eq).symm]
+  exact (isConj_iff.mpr ⟨x' * y⁻¹, hgconj⟩).symm
+
+/-- **Peterfalvi (2.10.3), the support test for a single component `b`.**  If `𝒜(g, H(B)b) ≠ ∅`
+(some `y⁻¹gy ∈ H(B)·b`) with `b ∈ N_L(B) ∩ A`, then `g ∈ (bH(b))^G ⊆ dadeSupport`.  Immediate from
+the explicit conjugacy witness `exists_mem_H_isConj_of_mem_conjFiber_coset`. -/
+theorem mem_dadeSupport_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {b : G} (hbN : b ∈ nLStabilizerIn hyp B) (hbA : b ∈ A) {g y : G}
+    (hy : y⁻¹ * g * y ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G)) :
+    g ∈ hyp.dadeSupport := by
+  obtain ⟨c, hcHb, hgc⟩ := hyp.exists_mem_H_isConj_of_mem_conjFiber_coset hconj hB hbN hbA hy
+  exact hyp.mem_dadeSupport_iff.mpr ⟨⟨b, hbA⟩, c, hcHb, hgc⟩
+
+open Classical in
+/-- **Peterfalvi (2.10.3), the value case `a^L`-specialized.**  Fix a Dade-support representative
+`a` with `g ∈ (aH(a))^G` (witnessed by `h ∈ H(a)`, `IsConj (a·h) g`).  Then the `N_L(B)`-aggregated
+value of `Ind_{M(B)}^G α_B` collapses to the textbook value formula
+
+    `(Ind_{M(B)}^G α_B)(g) = (α(a)/|M(B)|) · ∑_{b ∈ N_L(B) ∩ a^L} |𝒜(g, H(B)·b)|`,
+
+the sum running only over `b` that are `L`-conjugate to `a`.  Starting from
+`induce_alphaB_apply_eq_sum_nLStabilizerIn_inA` (sum over `b ∈ N_L(B), b ∈ A`), the terms with
+`b ∉ a^L` vanish: if `|𝒜(g, H(B)b)| ≠ 0` then `g ∈ (bH(b))^G` by
+`mem_dadeSupport_of_mem_conjFiber_coset`, whence `a·h` and `b·h'` are `G`-conjugate, so by (2.4.b)
+(`isConj_in_L_of_mul_H`) `b ∈ a^L` — a contradiction.  On the surviving `b ∈ a^L` the value
+`α(b) = α(a)` (an `L`-class function), and `α(a)` factors out. -/
+theorem induce_alphaB_apply_eq_alpha_mul_sum_conjL (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)]
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ *
+            ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+                (fun b : (nLStabilizerIn hyp B) =>
+                  ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+              ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+                * ({(b : G)} : Set G))).card : ℂ)) := by
+  classical
+  rw [induce_alphaB_apply_eq_sum_nLStabilizerIn_inA hyp hconj hB α g]
+  congr 1
+  -- restrict `{b ∈ N_L(B), b ∈ A}` to `{b ∈ N_L(B), b ∈ a^L}`, factoring `α(a)`.
+  rw [Finset.mul_sum]
+  -- abbreviations for the two filtering predicates and the `N`-summand
+  set N : (nLStabilizerIn hyp B) → ℂ := fun b =>
+    ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card : ℂ) with hN
+  set sP : Finset (nLStabilizerIn hyp B) :=
+    (Finset.univ : Finset (nLStabilizerIn hyp B)).filter (fun b => ((b : G) ∈ A)) with hsP
+  set sQ : Finset (nLStabilizerIn hyp B) :=
+    (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+      (fun b => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)) with hsQ
+  -- `sQ ⊆ sP` (a^L ⊆ A) and on `sP \ sQ` the summand `N b` vanishes.
+  have hsub : sQ ⊆ sP := by
+    intro b hb
+    rw [hsQ, Finset.mem_filter] at hb
+    obtain ⟨l, hl⟩ := hb.2
+    rw [hsP, Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, hl ▸ hyp.L_normalizes_A l a.2⟩
+  -- `∑_{sP} α(b)·N b = ∑_{sQ} α(b)·N b`: terms outside `sQ` have `N b = 0`.
+  have hPQ : ∑ b ∈ sP, (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ * N b
+      = ∑ b ∈ sQ, (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ * N b := by
+    refine (Finset.sum_subset hsub fun b hbP hbQ => ?_).symm
+    rw [hsP, Finset.mem_filter] at hbP
+    obtain ⟨_, hbA⟩ := hbP
+    -- `b ∉ sQ` ⟹ `b ∉ a^L`; show `N b = 0`, i.e. `𝒜(g, H(B)b) = ∅`.
+    have hbnotQ : ¬ ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G) := by
+      intro hQ; exact hbQ (by rw [hsQ, Finset.mem_filter]; exact ⟨Finset.mem_univ _, hQ⟩)
+    have hfiber0 : N b = 0 := by
+      show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+        * ({(b : G)} : Set G))).card : ℂ) = 0
+      norm_cast
+      rw [Finset.card_eq_zero]
+      by_contra hne
+      rw [← Ne, ← Finset.nonempty_iff_ne_empty] at hne
+      obtain ⟨y, hy⟩ := hne
+      rw [mem_conjFiber] at hy
+      obtain ⟨c, hcHb, hgc⟩ :=
+        hyp.exists_mem_H_isConj_of_mem_conjFiber_coset hconj hB b.2 hbA hy
+      have hconjab : IsConj (a.1 * h) ((b : G) * c) := hga.trans hgc.symm
+      obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a.2 hbA hh hcHb hconjab
+      exact hbnotQ ⟨l, hl⟩
+    rw [hfiber0, mul_zero]
+  rw [hPQ]
+  -- on `sQ`, `α(b) = α(a)`.
+  apply Finset.sum_congr rfl
+  intro b hb
+  rw [hsQ, Finset.mem_filter] at hb
+  obtain ⟨l, hl⟩ := hb.2
+  have hαeq : (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩
+      = (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ := by
+    refine ClassFunction.of_isConj (α : ClassFunction L ℂ) (isConj_iff.mpr ⟨l⁻¹, ?_⟩)
+    apply Subtype.ext
+    show (l⁻¹ : L) * (b : G) * ((l⁻¹ : L) : G)⁻¹ = a.1
+    rw [← hl]; push_cast; group
+  simp only [hN]
+  rw [hαeq]
+
+/-- **Peterfalvi (2.10), conjugation invariance of the conjugating set.**  For any `c : G` and
+subset `X ⊆ G`, right translation by `c` is a bijection `𝒜(g, X) ≃ 𝒜(g, c·X·c⁻¹)`; in particular
+the cardinalities agree:
+
+    `|𝒜(g, c·X·c⁻¹)| = |𝒜(g, X)|`.
+
+Indeed `y⁻¹gy ∈ c·X·c⁻¹ ⟺ (yc⁻¹)⁻¹ g (yc⁻¹) ∈ X`, so `𝒜(g, c·X·c⁻¹) = 𝒜(g, X)·c`.  This is the
+reindexing fact `|𝒜(g, H(B^x)b)| = |𝒜(g, H(B)a)|` (with `b = a^x`, `H(B^x) = x·H(B)·x⁻¹` by
+(2.10.1)) used to collapse the `a^L`-sum in the proof of (2.10). -/
+theorem card_conjFiber_conj_eq (g c : G) (X : Set G) :
+    (conjFiber g ((fun z => c * z * c⁻¹) '' X)).card = (conjFiber g X).card := by
+  classical
+  apply Finset.card_bij' (fun y _ => y * c) (fun y _ => y * c⁻¹)
+  · intro y hy
+    rw [mem_conjFiber] at hy ⊢
+    obtain ⟨z, hz, hzeq⟩ := hy
+    simp only at hzeq
+    -- `hzeq : c·z·c⁻¹ = y⁻¹gy` ⟹ `(yc)⁻¹ g (yc) = z ∈ X`
+    have hval : (y * c)⁻¹ * g * (y * c) = z := by
+      have : y⁻¹ * g * y = c * z * c⁻¹ := hzeq.symm
+      rw [show (y * c)⁻¹ * g * (y * c) = c⁻¹ * (y⁻¹ * g * y) * c by group, this]; group
+    rw [hval]; exact hz
+  · intro y hy
+    rw [mem_conjFiber] at hy ⊢
+    -- `(yc⁻¹)⁻¹ g (yc⁻¹) = c·(y⁻¹gy)·c⁻¹ ∈ c·X·c⁻¹`
+    refine ⟨y⁻¹ * g * y, hy, ?_⟩
+    group
+  · intro y _; group
+  · intro y _; group
+
+/-- **Peterfalvi (2.1), the conjugacy-image fiber count.**  Let `a` normalize a finite subgroup `K`
+coprimely and `C = K ⊓ C_G(a)`.  For `w` in the coset `K·a` (`w·a⁻¹ ∈ K`), the fiber of the
+parametrization `(c, x) ↦ x⁻¹(c·a)x` of `K·a` over `w` has exactly `|C|` elements:
+
+    `|{(c, x) ∈ C × K | x⁻¹(c·a)x = w}| = |C|`.
+
+This is the disjoint-union count `H(B)a = ⨆ (C·a)^x` (`coset_eq_cosetConjImage`) read fiberwise.
+Given a witness `(c₀, x₀)` for `w`, the map `e ↦ (e c₀ e⁻¹, e x₀)` (`e ∈ C`) bijects `C` with the
+fiber, with inverse `(c, x) ↦ x x₀⁻¹` landing in `C` by the rigidity
+`mem_centralizer_of_coset_conj_eq`. -/
+theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K)) {w : G}
+    (hwImage : ∃ c ∈ K ⊓ Subgroup.centralizer ({a} : Set G), ∃ x ∈ K,
+      x⁻¹ * (c * a) * x = w) :
+    ((Finset.univ : Finset (↥(K ⊓ Subgroup.centralizer ({a} : Set G)) × ↥K)).filter
+        (fun p => (p.2 : G)⁻¹ * ((p.1 : G) * a) * (p.2 : G) = w)).card
+      = Nat.card ↥(K ⊓ Subgroup.centralizer ({a} : Set G)) := by
+  classical
+  set C : Subgroup G := K ⊓ Subgroup.centralizer ({a} : Set G) with hC
+  obtain ⟨c₀, hc₀C, x₀, hx₀K, hcx₀⟩ := hwImage
+  rw [Nat.card_eq_fintype_card, ← Finset.card_univ (α := C)]
+  -- membership of `e c₀ e⁻¹` in `C`, packaged for the forward map.
+  have hfwd1 : ∀ e : C, (e : G) * (c₀ : G) * (e : G)⁻¹ ∈ C := by
+    intro e
+    obtain ⟨heK, hecomm⟩ := Subgroup.mem_inf.mp e.2
+    obtain ⟨hc₀K, hc₀comm⟩ := Subgroup.mem_inf.mp hc₀C
+    refine Subgroup.mem_inf.mpr ⟨K.mul_mem (K.mul_mem heK hc₀K) (K.inv_mem heK),
+      Subgroup.mem_centralizer_singleton_iff.mpr ?_⟩
+    have hge : Commute (e : G) a := Subgroup.mem_centralizer_singleton_iff.mp hecomm
+    have hgc₀ : Commute (c₀ : G) a := Subgroup.mem_centralizer_singleton_iff.mp hc₀comm
+    have hgeinv : (e : G)⁻¹ * a = a * (e : G)⁻¹ := hge.inv_left.eq
+    calc (e : G) * (c₀ : G) * (e : G)⁻¹ * a
+        = (e : G) * (c₀ : G) * (a * (e : G)⁻¹) := by rw [mul_assoc, hgeinv]
+      _ = (e : G) * ((c₀ : G) * a) * (e : G)⁻¹ := by group
+      _ = (e : G) * (a * (c₀ : G)) * (e : G)⁻¹ := by rw [hgc₀.eq]
+      _ = (e : G) * a * (c₀ : G) * (e : G)⁻¹ := by group
+      _ = a * ((e : G) * (c₀ : G) * (e : G)⁻¹) := by rw [hge.eq]; group
+  -- `(c, x) ↦ x x₀⁻¹ ∈ C` for fiber elements, packaged for the inverse map.
+  have hinv1 : ∀ p : ↥C × ↥K, p ∈ (Finset.univ : Finset (↥C × ↥K)).filter
+        (fun p => (p.2 : G)⁻¹ * ((p.1 : G) * a) * (p.2 : G) = w) →
+      (p.2 : G) * (x₀ : G)⁻¹ ∈ C := by
+    intro p hp
+    rw [Finset.mem_filter] at hp
+    have hxx₀ := OddOrder.GroupTheory.mem_centralizer_of_coset_conj_eq (g := a) (H := K)
+      hcop p.2.2 hx₀K p.1.2 hc₀C (by rw [hp.2, ← hcx₀])
+    have := C.inv_mem hxx₀
+    rwa [mul_inv_rev, inv_inv] at this
+  refine Eq.symm ?_
+  refine Finset.card_bij'
+    (i := fun e _ => ((⟨(e : G) * (c₀ : G) * (e : G)⁻¹, hfwd1 e⟩ : ↥C),
+      (⟨(e : G) * x₀, K.mul_mem ((Subgroup.mem_inf.mp e.2).1) hx₀K⟩ : ↥K)))
+    (j := fun p hp => (⟨(p.2 : G) * (x₀ : G)⁻¹, hinv1 p hp⟩ : ↥C))
+    ?_ ?_ ?_ ?_
+  · -- `i e ∈ fiber`
+    intro e _
+    rw [Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    obtain ⟨-, hecomm⟩ := Subgroup.mem_inf.mp e.2
+    have hge : Commute (e : G) a := Subgroup.mem_centralizer_singleton_iff.mp hecomm
+    have hge' : (e : G)⁻¹ * a = a * (e : G)⁻¹ := hge.inv_left.eq
+    show ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀) = w
+    rw [← hcx₀]
+    calc ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀)
+        = x₀⁻¹ * ((c₀ : G) * ((e : G)⁻¹ * a * (e : G))) * x₀ := by group
+      _ = x₀⁻¹ * ((c₀ : G) * a) * x₀ := by rw [hge']; group
+  · -- `j p ∈ univ`
+    intro p _; exact Finset.mem_univ _
+  · -- left inverse: `j (i e) = e`
+    intro e _
+    apply Subtype.ext
+    show (e : G) * x₀ * (x₀ : G)⁻¹ = (e : G)
+    group
+  · -- right inverse: `i (j p) = p`
+    rintro ⟨⟨c, hcC⟩, ⟨x, hxK⟩⟩ hp
+    rw [Finset.mem_filter] at hp
+    have hpeq : x⁻¹ * (c * a) * x = w := hp.2
+    apply Prod.ext
+    · -- first coordinate: `(x x₀⁻¹) c₀ (x x₀⁻¹)⁻¹ = c`
+      apply Subtype.ext
+      show (x * (x₀ : G)⁻¹) * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ = c
+      have hxx₀ := OddOrder.GroupTheory.mem_centralizer_of_coset_conj_eq (g := a) (H := K)
+        hcop hxK hx₀K hcC hc₀C (by rw [hpeq, ← hcx₀])
+      obtain ⟨-, hcomm⟩ := Subgroup.mem_inf.mp hxx₀
+      have hxx₀comm : (x₀ : G) * x⁻¹ * a = a * ((x₀ : G) * x⁻¹) :=
+        Subgroup.mem_centralizer_singleton_iff.mp hcomm
+      have heq : x⁻¹ * (c * a) * x = x₀⁻¹ * ((c₀ : G) * a) * x₀ := by rw [hpeq, hcx₀]
+      have e2 : c * a = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := by
+        calc c * a
+            = x * (x⁻¹ * (c * a) * x) * x⁻¹ := by group
+          _ = x * (x₀⁻¹ * ((c₀ : G) * a) * x₀) * x⁻¹ := by rw [heq]
+          _ = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := by group
+      have e3 : c * a = x * (x₀ : G)⁻¹ * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ * a := by
+        calc c * a
+            = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := e2
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (a * ((x₀ : G) * x⁻¹)) := by group
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (((x₀ : G) * x⁻¹) * a) := by rw [hxx₀comm]
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ * a := by group
+      exact mul_right_cancel e3.symm
+    · -- second coordinate: `(x x₀⁻¹) x₀ = x`
+      apply Subtype.ext
+      show x * (x₀ : G)⁻¹ * (x₀ : G) = x
+      group
+
+/-- **Peterfalvi (2.1), the fiber factorization** (the long pole of (2.10) STEP 2).  Let `a`
+normalize a finite subgroup `K` coprimely and `C = K ⊓ C_G(a)`.  Then for any `g`,
+
+    `|𝒜(g, K·a)| · |C| = |𝒜(g, C·a)| · |K|`,
+
+equivalently `|𝒜(g, K·a)| = |𝒜(g, C·a)| · [K : C]`.  This is Peterfalvi's "`H(B)a` is the disjoint
+union of `[H(B):C_{H(B)}(a)]` conjugates of `C_{H(B)}(a)a`, so `|𝒜(g, H(B)a)| =
+|𝒜(g, C_{H(B)}(a)a)|·[H(B):C_{H(B)}(a)]`".
+
+Both sides are computed as `|S|`, where `S = {(y, c, x) ∈ G × C × K | y⁻¹gy = x⁻¹(c·a)x}`:
+* projecting to `y` and using the conjugacy-image fiber count
+  `card_cosetConjFiber_eq_card_centralizerInf` (each nonempty fiber has size `|C|`,
+  via `coset_eq_cosetConjImage` for the image membership) gives `|S| = |𝒜(g, K·a)|·|C|`;
+* the involution-free bijection `(y, c, x) ↦ (yx⁻¹, c, x)` onto
+  `{(w, c, x) | w⁻¹gw = c·a}`, in which `x ∈ K` is now free, gives `|S| = |𝒜(g, C·a)|·|K|`. -/
+theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
+    (hnorm : ∀ x ∈ K, a * x * a⁻¹ ∈ K)
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K)) (g : G) :
+    (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+        * Nat.card ↥(K ⊓ Subgroup.centralizer ({a} : Set G))
+      = (conjFiber g ((↑(K ⊓ Subgroup.centralizer ({a} : Set G)) : Set G) * ({a} : Set G))).card
+        * Nat.card ↥K := by
+  classical
+  set C : Subgroup G := K ⊓ Subgroup.centralizer ({a} : Set G) with hC
+  letI : Fintype ↥C := Fintype.ofFinite _
+  letI : Fintype ↥K := Fintype.ofFinite _
+  -- The bridge set `S`.
+  set S : Finset (G × ↥C × ↥K) := (Finset.univ : Finset (G × ↥C × ↥K)).filter
+    (fun p => p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G)) with hS
+  -- helper: `x⁻¹(c·a)x ∈ K·a` for `c ∈ C`, `x ∈ K`.
+  have hmemKa : ∀ (c : G) (_ : c ∈ K) (x : G) (_ : x ∈ K),
+      x⁻¹ * (c * a) * x ∈ (↑K : Set G) * ({a} : Set G) := by
+    intro c hc x hx
+    rw [Set.mem_mul]
+    refine ⟨x⁻¹ * c * (a * x * a⁻¹), K.mul_mem (K.mul_mem (K.inv_mem hx) hc) (hnorm x hx),
+      a, Set.mem_singleton _, by group⟩
+  -- ### `|S| = |𝒜(g, K·a)| · |C|`
+  have hSleft : S.card = (conjFiber g ((↑K : Set G) * ({a} : Set G))).card * Nat.card ↥C := by
+    rw [hS, Nat.card_eq_fintype_card, ← Finset.card_univ (α := ↥C), ← smul_eq_mul,
+      ← Finset.sum_const]
+    rw [Finset.card_eq_sum_card_fiberwise (f := fun p : G × ↥C × ↥K => p.1)
+      (t := conjFiber g ((↑K : Set G) * ({a} : Set G))) ?_]
+    · -- each fiber over `y ∈ 𝒜(g, K·a)` has card `|univ C|`
+      refine Finset.sum_congr rfl fun y hy => ?_
+      rw [mem_conjFiber] at hy
+      -- `y⁻¹gy = x⁻¹(c·a)x` (image membership) via (2.1)
+      have himg : ∃ c ∈ C, ∃ x ∈ K, x⁻¹ * (c * a) * x = y⁻¹ * g * y := by
+        obtain ⟨k, hk, a', ha', hkeq⟩ := hy
+        rw [Set.mem_singleton_iff] at ha'
+        rw [ha'] at hkeq
+        -- `hkeq : k * a = y⁻¹ g y`
+        obtain ⟨c, hcC, x, hxK, hxeq⟩ :=
+          OddOrder.GroupTheory.exists_mem_centralizer_conj (g := a) (H := K) hcop hnorm hk
+        -- `hxeq : x (k a) x⁻¹ = c a`, so `y⁻¹gy = k a = x⁻¹ (c a) x`
+        refine ⟨c, hcC, x, hxK, ?_⟩
+        rw [← hkeq]
+        have hxeq' : x * (k * a) * x⁻¹ = c * a := hxeq
+        rw [← hxeq']; group
+      rw [Finset.card_univ, ← Nat.card_eq_fintype_card,
+        ← card_cosetConjFiber_eq_card_centralizerInf hcop himg]
+      -- the `S`-fiber over `y` (drop the fixed first coordinate) bijects with the conjugacy fiber.
+      refine Finset.card_bij' (i := fun p _ => p.2) (j := fun q _ => (y, q))
+        ?_ ?_ ?_ ?_
+      · intro p hp
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp ⊢
+        obtain ⟨hpeq, hpy⟩ := hp
+        rw [← hpy]; exact hpeq.symm
+      · intro q hq
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hq
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact ⟨hq.symm, trivial⟩
+      · intro p hp
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp
+        obtain ⟨_, hpy⟩ := hp
+        exact Prod.ext hpy.symm rfl
+      · intro q _; rfl
+    · intro p hpS
+      simp only [Finset.mem_coe, mem_conjFiber]
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      rw [hp]
+      exact hmemKa (p.2.1 : G) (Subgroup.mem_inf.mp p.2.1.2).1 (p.2.2 : G) p.2.2.2
+  -- helper: membership `w⁻¹gw ∈ C·a ⟹ (w⁻¹gw)·a⁻¹ ∈ C`.
+  have hcwC : ∀ w : G, w⁻¹ * g * w ∈ (↑C : Set G) * ({a} : Set G) →
+      w⁻¹ * g * w * a⁻¹ ∈ C := by
+    intro w hw
+    obtain ⟨c, hc, a', ha', hceq⟩ := hw
+    rw [Set.mem_singleton_iff] at ha'
+    rw [ha'] at hceq
+    rw [← hceq, mul_assoc, mul_inv_cancel, mul_one]; exact hc
+  -- ### `|S| = |𝒜(g, C·a)| · |K|` via `(y,c,x) ↦ (yx⁻¹, c, x)` and freeing `x`.
+  have hSright : S.card
+      = (conjFiber g ((↑C : Set G) * ({a} : Set G))).card * Nat.card ↥K := by
+    rw [Nat.card_eq_fintype_card, ← Finset.card_univ (α := ↥K), ← Finset.card_product]
+    refine Finset.card_bij'
+      (i := fun p _ => (p.1 * (p.2.2 : G)⁻¹, p.2.2))
+      (j := fun q hq => (q.1 * (q.2 : G),
+        ⟨q.1⁻¹ * g * q.1 * a⁻¹,
+          hcwC q.1 (mem_conjFiber.mp (Finset.mem_product.mp hq).1)⟩, q.2))
+      ?_ ?_ ?_ ?_
+    · -- `i p ∈ conjFiber(C·a) ×ˢ univ`
+      intro p hpS
+      rw [Finset.mem_product]
+      refine ⟨?_, Finset.mem_univ _⟩
+      simp only [mem_conjFiber]
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      -- `(p.1 p.2.2⁻¹)⁻¹ g (p.1 p.2.2⁻¹) = p.2.2 (p.1⁻¹ g p.1) p.2.2⁻¹ = p.2.1 · a`
+      have hval : (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+          = (p.2.1 : G) * a := by
+        rw [show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+            = (p.2.2 : G) * (p.1⁻¹ * g * p.1) * (p.2.2 : G)⁻¹ by group, hp]; group
+      rw [hval]
+      exact ⟨(p.2.1 : G), p.2.1.2, a, Set.mem_singleton _, rfl⟩
+    · -- `j q ∈ S`
+      intro q hq
+      rw [Finset.mem_product] at hq
+      have hwCa : q.1⁻¹ * g * q.1 ∈ (↑C : Set G) * ({a} : Set G) := by
+        have := (mem_conjFiber (g := g)).mp (Finset.mem_coe.mpr hq.1); simpa using this
+      simp only [hS, Finset.mem_filter, Finset.mem_univ, true_and]
+      -- S-condition: `(q.1 q.2)⁻¹ g (q.1 q.2) = q.2⁻¹ ((q.1⁻¹gq.1·a⁻¹)·a) q.2`
+      show (q.1 * (q.2 : G))⁻¹ * g * (q.1 * (q.2 : G))
+        = (q.2 : G)⁻¹ * ((q.1⁻¹ * g * q.1 * a⁻¹) * a) * (q.2 : G)
+      rw [show (q.1⁻¹ * g * q.1 * a⁻¹) * a = q.1⁻¹ * g * q.1 by group]
+      group
+    · -- left inverse `j (i p) = p`
+      intro p hpS
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      -- `(p.1 p.2.2⁻¹)·p.2.2 = p.1`, and the recovered `c = p.2.1`.
+      apply Prod.ext
+      · show p.1 * (p.2.2 : G)⁻¹ * (p.2.2 : G) = p.1; group
+      apply Prod.ext
+      · -- recovered centralizer component equals `p.2.1`
+        apply Subtype.ext
+        show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹) * a⁻¹ = (p.2.1 : G)
+        rw [show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+            = (p.2.2 : G) * (p.1⁻¹ * g * p.1) * (p.2.2 : G)⁻¹ by group, hp]
+        group
+      · rfl
+    · -- right inverse `i (j q) = q`
+      intro q hq
+      apply Prod.ext
+      · show q.1 * (q.2 : G) * (q.2 : G)⁻¹ = q.1; group
+      · rfl
+  rw [hSleft] at hSright
+  exact hSright
+
+/-- **Peterfalvi (2.10), the Möbius cancellation identity** (the toggle-`a` pairing of (2.10)).
+For `a ∈ A` normalizing `H(B)` (i.e. `a ∈ N_L(B)`) and nonempty `B ⊆ A`,
+
+    `|𝒜(g, H(B)·a)| · |H(B ∪ {a})| = |𝒜(g, H(B ∪ {a})·a)| · |H(B)|`.
+
+This is the (2.10) STEP 2 factorization `card_conjFiber_coset_mul_card_centralizerInf` specialized to
+`K = H(B)`, with `C = H(B) ⊓ C_G(a) = C_{H(B)}(a) = H(B ∪ {a})` by (2.10.2)
+(`centralizer_inf_hIntersection`).  In the (2.10) alternating sum it shows the summands
+`(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` for `B` and `B ∪ {a}` are equal (so cancel by the opposite
+signs `(-1)^{|B|}` vs `(-1)^{|B|+1}`), leaving only the survivor `B = {a}`. -/
+theorem card_conjFiber_hIntersection_mul_eq (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {a : {a : G // a ∈ A}}
+    (haN : (a : G) ∈ nLStabilizerIn hyp B) (g : G) :
+    (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card
+        * Nat.card (hIntersection hyp (insert a B) (Finset.insert_nonempty a B))
+      = (conjFiber g ((↑(hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : Set G)
+            * ({(a : G)} : Set G))).card
+        * Nat.card (hIntersection hyp B hB) := by
+  classical
+  -- `a` normalizes `H(B)` coprimely; `H(B) ⊓ C_G(a) = H(insert a B)` by (2.10.2).
+  have hnorm : ∀ x ∈ hIntersection hyp B hB, (a : G) * x * (a : G)⁻¹ ∈ hIntersection hyp B hB := by
+    intro x hx
+    have hmem := hyp.nLStabilizerIn_le_normalizer hconj hB haN
+    rw [Subgroup.mem_normalizer_iff] at hmem
+    exact (hmem x).mp hx
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB a.2
+  -- `H(B) ⊓ C_G(a) = H(insert a B)`
+  have hCeq : hIntersection hyp B hB ⊓ Subgroup.centralizer ({(a : G)} : Set G)
+      = hIntersection hyp (insert a B) (Finset.insert_nonempty a B) := by
+    rw [inf_comm]; exact hyp.centralizer_inf_hIntersection hB a
+  -- apply STEP 2 and rewrite `C` via (2.10.2)
+  have hfact := card_conjFiber_coset_mul_card_centralizerInf
+    (K := hIntersection hyp B hB) (a := (a : G)) hnorm hcop g
+  rw [hCeq] at hfact
+  exact hfact
+
+/-! #### STEP 3b: the toggle-`a` Möbius cancellation
+
+The proof of (2.10) collapses the alternating sum over `𝒫(a)` (nonempty `B ⊆ A` with
+`a ∈ N_L(B)`) to its `B = {a}` survivor.  We index `𝒫(a)` as a `Finset`, define the summand
+`mobiusSummand` `= (-1)^{|B|}/|H(B)| · |𝒜(g, H(B)a)|`, and cancel pairs `B ↔ B △ {a}` by the
+multiplicative identity `card_conjFiber_hIntersection_mul_eq`. -/
+
+variable (hyp : Hypothesis G A L)
+
+/-- `𝒫(a)` as a `Finset`: the nonempty subsets `B ⊆ A` with `a ∈ N_L(B)`. -/
+noncomputable def mobiusIndex (a : {a : G // a ∈ A}) :
+    Finset (Finset {a : G // a ∈ A}) := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  exact (Finset.univ.powerset).filter
+    (fun B => B.Nonempty ∧ (a : G) ∈ nLStabilizerIn hyp B)
+
+theorem mem_mobiusIndex {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    B ∈ hyp.mobiusIndex a ↔ B.Nonempty ∧ (a : G) ∈ nLStabilizerIn hyp B := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  simp only [mobiusIndex, Finset.mem_filter, Finset.mem_powerset, Finset.subset_univ, true_and]
+
+/-- The Möbius summand `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` (as a complex number). -/
+noncomputable def mobiusSummand (a : {a : G // a ∈ A}) (g : G)
+    (B : Finset {a : G // a ∈ A}) : ℂ := by
+  classical
+  exact if hB : B.Nonempty then
+      ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+        ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
+    else 0
+
+theorem mobiusSummand_of_nonempty (a : {a : G // a ∈ A}) (g : G)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.mobiusSummand a g B
+      = ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+        ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ) := by
+  rw [mobiusSummand, dif_pos hB]
+
+/-- Membership of `a` in `N_L(B)` is insensitive to inserting `a` into `B` (for `a ∉ B`): since
+conjugation by `a` fixes `a` (`a·a·a⁻¹ = a`), `a` permutes `B` iff it permutes `insert a B`. -/
+theorem mem_nLStabilizerIn_insert_iff (a : {a : G // a ∈ A})
+    {B : Finset {a : G // a ∈ A}} (haB : a ∉ B) :
+    (a : G) ∈ nLStabilizerIn hyp (insert a B) ↔ (a : G) ∈ nLStabilizerIn hyp B := by
+  classical
+  have ha : (a : G) ∈ L := hyp.mem_L a.2
+  have hfix : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩ a = a := by
+    intro hx
+    apply Subtype.ext
+    show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+    group
+  have hfixinv : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩⁻¹ a = a := by
+    intro hx
+    apply Subtype.ext
+    show (a : G)⁻¹ * (a : G) * ((a : G)⁻¹)⁻¹ = (a : G)
+    group
+  rw [mem_nLStabilizerIn, mem_nLStabilizerIn]
+  constructor
+  · rintro ⟨hx, hstab⟩
+    refine ⟨ha, ?_⟩
+    intro c hc
+    have hmem := hstab c (Finset.mem_insert_of_mem hc)
+    rw [Finset.mem_insert] at hmem
+    rcases hmem with hca | hca
+    · -- `conjA a c = a` forces `c = a`, contradicting `a ∉ B` (as `c ∈ B`)
+      exfalso
+      have hceq : c = a := by
+        have := congrArg (hyp.conjA ⟨(a : G), hx⟩⁻¹) hca
+        rwa [conjA_inv_conjA, hfixinv hx] at this
+      exact haB (hceq ▸ hc)
+    · exact hca
+  · rintro ⟨hx, hstab⟩
+    refine ⟨ha, ?_⟩
+    intro c hc
+    rw [Finset.mem_insert] at hc
+    rcases hc with rfl | hc
+    · rw [hfix hx]; exact Finset.mem_insert_self _ _
+    · exact Finset.mem_insert_of_mem (hstab c hc)
+
+/-- **Peterfalvi (2.10), the toggle-`a` pairwise cancellation.**  For `a ∉ B`, nonempty `B ⊆ A`
+with `a ∈ N_L(B)`, the Möbius summands for `B` and `insert a B` are negatives:
+
+    `mobiusSummand a g B + mobiusSummand a g (insert a B) = 0`.
+
+This is the multiplicative identity `card_conjFiber_hIntersection_mul_eq`
+(`|𝒜(g,H(B)a)|·|H(B∪{a})| = |𝒜(g,H(B∪{a})a)|·|H(B)|`) cleared of denominators, together with the
+sign flip `(-1)^{|B|+1} = -(-1)^{|B|}` from `|insert a B| = |B| + 1`.  It is the cancellation law
+fed to `Finset.sum_involution`. -/
+theorem mobiusSummand_add_insert_eq_zero (hconj : hyp.HConjInvariant) (g : G)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} (haB : a ∉ B) (hB : B.Nonempty)
+    (haN : (a : G) ∈ nLStabilizerIn hyp B) :
+    hyp.mobiusSummand a g B + hyp.mobiusSummand a g (insert a B) = 0 := by
+  classical
+  have hiB : (insert a B).Nonempty := Finset.insert_nonempty a B
+  -- the multiplicative cancellation identity
+  have hmul := hyp.card_conjFiber_hIntersection_mul_eq hconj hB haN g
+  -- nonzero cardinalities
+  have hHBne : (Nat.card (hIntersection hyp B hB) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hHiBne : (Nat.card (hIntersection hyp (insert a B) hiB) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  rw [hyp.mobiusSummand_of_nonempty a g hB, hyp.mobiusSummand_of_nonempty a g hiB]
+  -- card of `insert a B` and sign flip
+  rw [Finset.card_insert_of_notMem haB, pow_succ]
+  -- abbreviations
+  set p : ℂ := (-1 : ℂ) ^ B.card
+  set hb : ℂ := (Nat.card (hIntersection hyp B hB) : ℂ)
+  set hib : ℂ := (Nat.card (hIntersection hyp (insert a B) hiB) : ℂ)
+  set fb : ℂ := ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+    * ({(a : G)} : Set G))).card : ℂ)
+  set fib : ℂ := ((conjFiber g ((↑(hIntersection hyp (insert a B) hiB) : Set G)
+    * ({(a : G)} : Set G))).card : ℂ)
+  -- cast the multiplicative identity to ℂ: `fb * hib = fib * hb` (`hiB` and `insert_nonempty`
+  -- give defeq `H(insert a B)`)
+  have hmulC : fb * hib = fib * hb := by
+    show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
+        * (Nat.card (hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : ℂ)
+      = ((conjFiber g ((↑(hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : Set G)
+            * ({(a : G)} : Set G))).card : ℂ)
+        * (Nat.card (hIntersection hyp B hB) : ℂ)
+    exact_mod_cast hmul
+  -- assemble: `p/hb · fb + (p·(-1))/hib · fib = (p/(hb·hib)) · (fb·hib - fib·hb) = 0`
+  rw [div_mul_eq_mul_div, div_mul_eq_mul_div]
+  rw [div_add_div (p * fb) (p * -1 * fib) hHBne hHiBne, div_eq_zero_iff]
+  left
+  -- numerator: `(p·fb)·hib + hb·(p·(-1)·fib) = p·(fb·hib - fib·hb) = 0`
+  linear_combination p * hmulC
+
+/-- The singleton `{a}` lies in `𝒫(a)`. -/
+theorem singleton_mem_mobiusIndex (a : {a : G // a ∈ A}) :
+    ({a} : Finset {a : G // a ∈ A}) ∈ hyp.mobiusIndex a := by
+  classical
+  rw [hyp.mem_mobiusIndex]
+  refine ⟨Finset.singleton_nonempty a, ?_⟩
+  rw [mem_nLStabilizerIn]
+  refine ⟨hyp.mem_L a.2, ?_⟩
+  intro c hc
+  rw [Finset.mem_singleton] at hc
+  rw [hc, Finset.mem_singleton]
+  apply Subtype.ext
+  show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+  group
+
+/-- The toggle-`a` map `B ↦ B △ {a}`: removes `a` from `B` if present, else inserts it. -/
+noncomputable def toggleA (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A}) :
+    Finset {a : G // a ∈ A} := by
+  classical
+  exact if a ∈ B then B.erase a else insert a B
+
+theorem toggleA_of_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
+    (haB : a ∈ B) : toggleA a B = B.erase a := by
+  classical rw [toggleA]; simp only [if_pos haB]
+
+theorem toggleA_of_not_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
+    (haB : a ∉ B) : toggleA a B = insert a B := by
+  classical rw [toggleA]; simp only [if_neg haB]
+
+/-- **Peterfalvi (2.10), the toggle-`a` involution collapses `𝒫(a)` to its `B = {a}` survivor.**
+
+    `∑_{B ∈ 𝒫(a)} mobiusSummand a g B = mobiusSummand a g {a}`.
+
+The toggle `B ↦ B △ {a}` (`toggleA`) is a fixed-point-free involution on `𝒫(a) \ {{a}}` under which
+the summands cancel pairwise (`mobiusSummand_add_insert_eq_zero`), so `∑_{𝒫(a) \ {{a}}} = 0` by
+`Finset.sum_involution`; adding back the isolated survivor `{a}` gives the claim. -/
+theorem sum_mobiusSummand_eq_singleton (hconj : hyp.HConjInvariant) (g : G)
+    (a : {a : G // a ∈ A}) :
+    ∑ B ∈ hyp.mobiusIndex a, hyp.mobiusSummand a g B = hyp.mobiusSummand a g {a} := by
+  classical
+  -- a helper: `toggleA a B ∈ 𝒫(a) \ {{a}}` and the pairwise data, packaged once.
+  have key : ∀ B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A}),
+      hyp.mobiusSummand a g B + hyp.mobiusSummand a g (toggleA a B) = 0
+        ∧ toggleA a B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A})
+        ∧ toggleA a (toggleA a B) = B := by
+    intro B hB
+    rw [Finset.mem_erase, hyp.mem_mobiusIndex] at hB
+    obtain ⟨hBne, hBnonempty, hBnorm⟩ := hB
+    by_cases haB : a ∈ B
+    · -- `toggleA a B = B.erase a`, write `B = insert a (B.erase a)`
+      set B' := B.erase a with hB'
+      have haB' : a ∉ B' := Finset.notMem_erase a B
+      have hBins : B = insert a B' := by rw [hB', Finset.insert_erase haB]
+      have hB'ne : B'.Nonempty := by
+        rw [Finset.nonempty_iff_ne_empty, hB']
+        intro hempty
+        rcases (Finset.erase_eq_empty_iff B a).mp hempty with h | h
+        · rw [h] at haB; exact absurd haB (Finset.notMem_empty a)
+        · exact hBne h
+      have hB'norm : (a : G) ∈ nLStabilizerIn hyp B' := by
+        rw [← hyp.mem_nLStabilizerIn_insert_iff a haB', ← hBins]; exact hBnorm
+      refine ⟨?_, ?_, ?_⟩
+      · rw [toggleA_of_mem haB]
+        have := hyp.mobiusSummand_add_insert_eq_zero hconj g haB' hB'ne hB'norm
+        rw [← hBins] at this
+        rw [add_comm]; exact this
+      · rw [toggleA_of_mem haB, Finset.mem_erase, hyp.mem_mobiusIndex]
+        refine ⟨fun hcontra => haB' ?_, hB'ne, hB'norm⟩
+        show a ∈ B.erase a
+        rw [hcontra]; exact Finset.mem_singleton_self a
+      · rw [toggleA_of_mem haB]
+        rw [toggleA_of_not_mem haB', Finset.insert_erase haB]
+    · -- `toggleA a B = insert a B`
+      have hains : (a : G) ∈ nLStabilizerIn hyp (insert a B) :=
+        (hyp.mem_nLStabilizerIn_insert_iff a haB).mpr hBnorm
+      refine ⟨?_, ?_, ?_⟩
+      · rw [toggleA_of_not_mem haB]
+        exact hyp.mobiusSummand_add_insert_eq_zero hconj g haB hBnonempty hBnorm
+      · rw [toggleA_of_not_mem haB, Finset.mem_erase, hyp.mem_mobiusIndex]
+        refine ⟨?_, Finset.insert_nonempty a B, hains⟩
+        intro hcontra
+        obtain ⟨c, hc⟩ := hBnonempty
+        have hcins : c ∈ insert a B := Finset.mem_insert_of_mem hc
+        rw [hcontra, Finset.mem_singleton] at hcins
+        exact haB (hcins ▸ hc)
+      · rw [toggleA_of_not_mem haB, toggleA_of_mem (Finset.mem_insert_self a B),
+          Finset.erase_insert haB]
+  -- isolate the survivor `{a}`: `∑_{𝒫(a)} = mobiusSummand {a} + ∑_{𝒫(a) \ {{a}}}`
+  rw [← Finset.sum_erase_add _ _ (hyp.singleton_mem_mobiusIndex a)]
+  have hzero : ∑ B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A}),
+      hyp.mobiusSummand a g B = 0 := by
+    refine Finset.sum_involution (fun B _ => toggleA a B)
+      (fun B hB => (key B hB).1)
+      (fun B hB _ => ?_)
+      (fun B hB => (key B hB).2.1)
+      (fun B hB => (key B hB).2.2)
+    -- `hg₃`: `toggleA a B ≠ B` (toggle changes membership of `a`)
+    show toggleA a B ≠ B
+    by_cases haB : a ∈ B
+    · rw [toggleA_of_mem haB]
+      intro hcontra
+      rw [← hcontra] at haB
+      exact (Finset.notMem_erase a B) haB
+    · rw [toggleA_of_not_mem haB]
+      intro hcontra
+      have : a ∈ B := by rw [← hcontra]; exact Finset.mem_insert_self a B
+      exact haB this
+  rw [hzero, zero_add]
+
+/-- `H({a}) = H(a)`: the intersection over the singleton `{a}` is `H(a)`. -/
+theorem hIntersection_singleton (a : {a : G // a ∈ A}) :
+    hIntersection hyp {a} (Finset.singleton_nonempty a) = hyp.H a := by
+  apply le_antisymm
+  · exact hyp.hIntersection_le _ (Finset.mem_singleton_self a)
+  · intro x hx
+    rw [mem_hIntersection]
+    intro b hb
+    rw [Finset.mem_singleton] at hb
+    exact hb ▸ hx
+
+/-- **Peterfalvi (2.10), evaluation of the surviving `B = {a}` term.**  For `g ∈ (aH(a))^G`
+(witnessed by `h ∈ H(a)`, `IsConj (a·h) g`),
+
+    `mobiusSummand a g {a} = -(|C_L(a)| : ℂ)`.
+
+Indeed `|{a}| = 1`, `H({a}) = H(a)`, and the surviving conjugating set has
+`|𝒜(g, H(a)·a)| = |C_G(a)|` (`card_conjFiber_coset_eq_card_centralizer`), while
+`|C_G(a)| = |H(a)|·|C_L(a)|` (`card_centralizer_eq`); the `|H(a)|` cancels the denominator,
+leaving `(-1)·|C_L(a)|`. -/
+theorem mobiusSummand_singleton_eq (g : G) {a : {a : G // a ∈ A}} {h : G}
+    (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    hyp.mobiusSummand a g {a} = -(Nat.card (centralizerIn L a.1) : ℂ) := by
+  classical
+  rw [hyp.mobiusSummand_of_nonempty a g (Finset.singleton_nonempty a)]
+  -- `H({a}) = H(a)`
+  have hHeq : hIntersection hyp {a} (Finset.singleton_nonempty a) = hyp.H a :=
+    hyp.hIntersection_singleton a
+  rw [hHeq, Finset.card_singleton, pow_one]
+  -- `|𝒜(g, H(a)·a)| = |C_G(a)|`
+  have hcomm : ∀ x ∈ hyp.H a, Commute a.1 x := fun x hx => hyp.commute_of_mem_H a hx
+  have hnorm : ∀ c ∈ Subgroup.centralizer ({a.1} : Set G), ∀ x ∈ hyp.H a, c * x * c⁻¹ ∈ hyp.H a :=
+    fun c hc x hx => hyp.H_normalized a c hc x hx
+  have hcop : Nat.Coprime (orderOf a.1) (Nat.card (hyp.H a)) := by
+    have := hyp.coprime_orderOf_card_hIntersection (Finset.singleton_nonempty a) a.2
+    rwa [hHeq] at this
+  have hAcard : (conjFiber g ((↑(hyp.H a) : Set G) * ({a.1} : Set G))).card
+      = Nat.card (Subgroup.centralizer ({a.1} : Set G)) :=
+    card_conjFiber_coset_eq_card_centralizer hcomm hnorm hcop hh hga
+  rw [hAcard]
+  -- `|C_G(a)| = |H(a)|·|C_L(a)|`
+  rw [hyp.card_centralizer_eq a]
+  -- `(-1)/|H(a)| · (|H(a)|·|C_L(a)|) = -|C_L(a)|`
+  have hHne : (Nat.card (hyp.H a) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  push_cast
+  field_simp
+
+/-! #### STEP 3a: orbit-averaging the transversal sum to the powerset
+
+The (2.10) right-hand side is a sum over the `L`-conjugacy transversal `ℬ` of an orbit-constant
+summand.  We convert it to a sum over the full powerset weighted by `1/|orbit B|`. -/
+
+/-- The conjugation orbit of `B` is contained in `A`-subsets of the same cardinality, so it is
+finite; `Nat.card (orbit B) > 0`. -/
+theorem card_orbit_pos (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    0 < Nat.card (MulAction.orbit L B) := by
+  letI := hyp.conjFinsetAction
+  letI : Finite (MulAction.orbit L B) := Set.finite_coe_iff.mpr (Set.toFinite _)
+  letI : Nonempty (MulAction.orbit L B) := ⟨⟨B, MulAction.mem_orbit_self B⟩⟩
+  exact Nat.card_pos
+
+/-- **Peterfalvi (2.10), orbit-averaging.**  For any `ℂ`-valued `h` constant on `L`-conjugacy orbits
+of subsets (`h (B^l) = h B`), the transversal sum equals the powerset sum weighted by inverse orbit
+size:
+
+    `∑_{C ∈ ℬ} h(rep C) = ∑_{B ⊆ A} h(B) / |orbit B|`.
+
+Each orbit `O` contributes `∑_{B ∈ O} h(B)/|orbit B| = |O| · h(rep)/|O| = h(rep)` (the numerator is
+orbit-constant and `|orbit B| = |O|` throughout `O`); partitioning the powerset sum into orbit fibers
+(`Finset.sum_fiberwise_of_maps_to` along `Quotient.mk''`) collapses it to the transversal sum.  This
+realizes the `1/|L:N_L(B)|` weight of (2.10) (`card_orbit_mul_card_setLStabilizer`). -/
+theorem sum_transversalRep_eq_sum_div_orbit
+    (h : Finset {a : G // a ∈ A} → ℂ)
+    (hinv : ∀ (l : L) (B : Finset {a : G // a ∈ A}), h (hyp.conjFinset l B) = h B) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+    ∑ C : hyp.conjClassQuotient, h (hyp.transversalRep C)
+      = ∑ B : Finset {a : G // a ∈ A},
+          h B / (Nat.card (MulAction.orbit L B) : ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  -- `h` and `Nat.card (orbit ·)` are constant along orbits.
+  have horbit_const : ∀ B : Finset {a : G // a ∈ A}, ∀ B' ∈ MulAction.orbit L B,
+      h B' = h B := by
+    rintro B B' ⟨l, rfl⟩
+    exact hinv l B
+  have hcard_const : ∀ B : Finset {a : G // a ∈ A}, ∀ B' ∈ MulAction.orbit L B,
+      MulAction.orbit L B' = MulAction.orbit L B := by
+    rintro B B' hB'
+    exact (MulAction.orbit_eq_iff.mpr hB')
+  -- partition the powerset sum into orbit fibers along `Quotient.mk''`.
+  rw [← Finset.sum_fiberwise_of_maps_to
+      (g := fun B => (Quotient.mk'' B : hyp.conjClassQuotient))
+      (s := Finset.univ) (t := Finset.univ)
+      (fun B _ => Finset.mem_univ _)
+      (f := fun B => h B / (Nat.card (MulAction.orbit L B) : ℂ))]
+  refine Finset.sum_congr (by congr 1; exact Subsingleton.elim _ _) fun C _ => ?_
+  -- evaluate the fiber over `C`: it is the orbit of `out C = transversalRep C`.
+  set B₀ := hyp.transversalRep C with hB₀
+  -- the fiber `{B | ⟦B⟧ = C}` as a Finset; on it the summand is the constant `h B₀ / |orbit B₀|`.
+  have hfiber_eq : ((Finset.univ : Finset (Finset {a : G // a ∈ A})).filter
+        (fun B => (Quotient.mk'' B : hyp.conjClassQuotient) = C))
+      = (MulAction.orbit L B₀).toFinset := by
+    ext B
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_toFinset]
+    rw [hB₀, transversalRep]
+    constructor
+    · intro hB
+      rw [MulAction.mem_orbit_iff]
+      have : (Quotient.mk'' B : hyp.conjClassQuotient)
+          = Quotient.mk'' (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) := by
+        rw [hB, Quotient.out_eq']
+      exact Quotient.exact' this
+    · intro hB
+      have : (Quotient.mk'' B : hyp.conjClassQuotient)
+          = Quotient.mk'' (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) :=
+        Quotient.sound' (by rwa [MulAction.mem_orbit_iff] at hB)
+      rw [this, Quotient.out_eq']
+  rw [hfiber_eq]
+  -- on the orbit, the summand is constant `= h B₀ / |orbit B₀|`; there are `|orbit B₀|` terms.
+  have hconst : ∀ B ∈ (MulAction.orbit L B₀).toFinset,
+      h B / (Nat.card (MulAction.orbit L B) : ℂ) = h B₀ / (Nat.card (MulAction.orbit L B₀) : ℂ) := by
+    intro B hB
+    rw [Set.mem_toFinset] at hB
+    rw [horbit_const B₀ B hB, hcard_const B₀ B hB]
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul]
+  -- `|orbit B₀| · (h B₀ / |orbit B₀|) = h B₀`.
+  have hcardpos : 0 < Nat.card (MulAction.orbit L B₀) := hyp.card_orbit_pos B₀
+  have hcard_eq : ((MulAction.orbit L B₀).toFinset.card : ℂ)
+      = (Nat.card (MulAction.orbit L B₀) : ℂ) := by
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card]
+  rw [hcard_eq]
+  rw [mul_div_assoc']
+  rw [mul_div_cancel_left₀]
+  exact Nat.cast_ne_zero.mpr hcardpos.ne'
+
+/-- `|H(B^l)| = |H(B)|`: conjugation by `l` is a cardinality-preserving bijection of subgroups. -/
+theorem card_hIntersection_conjFinset (hconj : hyp.HConjInvariant) (l : L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Nat.card (hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty (l := l) hB))
+      = Nat.card (hIntersection hyp B hB) := by
+  rw [hyp.hIntersection_conjFinset hconj l hB]
+  refine Nat.card_congr ?_
+  have hsmul : ∀ z : G, ((MulAut.conj (l : G))⁻¹ • z) = (l : G)⁻¹ * z * (l : G) := by
+    intro z
+    rw [show ((MulAut.conj (l : G))⁻¹ • z) = (MulAut.conj (l : G))⁻¹ z from rfl,
+      MulAut.conj_inv_apply]
+  refine
+    { toFun := fun x => ⟨(l : G)⁻¹ * (x : G) * (l : G), ?_⟩
+      invFun := fun y => ⟨(l : G) * (y : G) * (l : G)⁻¹, ?_⟩
+      left_inv := fun x => ?_
+      right_inv := fun y => ?_ }
+  · -- `x ∈ conj•H(B) ⟹ l⁻¹·x·l ∈ H(B)`
+    have hx := x.2
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul] at hx
+    exact hx
+  · -- `y ∈ H(B) ⟹ l·y·l⁻¹ ∈ conj•H(B)`
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul]
+    rw [show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G) from by group]
+    exact y.2
+  · apply Subtype.ext; show (l : G) * ((l : G)⁻¹ * (x : G) * (l : G)) * (l : G)⁻¹ = (x : G); group
+  · apply Subtype.ext; show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G); group
+
+/-- The conjugation orbit element `a^l` lies in `N_L(B^l)` iff `a` lies in `N_L(B)`. -/
+theorem mem_nLStabilizerIn_conjA_conjFinset (l : L)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    (hyp.conjA l a : G) ∈ nLStabilizerIn hyp (hyp.conjFinset l B)
+      ↔ (a : G) ∈ nLStabilizerIn hyp B := by
+  rw [hyp.nLStabilizerIn_conjFinset l, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  rw [show ((MulAut.conj (l : G))⁻¹ • (hyp.conjA l a : G)) = (l : G)⁻¹ * (hyp.conjA l a : G)
+      * (l : G) from by
+    rw [show ((MulAut.conj (l : G))⁻¹ • (hyp.conjA l a : G))
+        = (MulAut.conj (l : G))⁻¹ (hyp.conjA l a : G) from rfl, MulAut.conj_inv_apply]]
+  rw [show (l : G)⁻¹ * (hyp.conjA l a : G) * (l : G) = (a : G) from by
+    simp only [conjA_coe]; group]
+
+/-- Conjugation `B ↦ B^l` sends `𝒫(a)` bijectively to `𝒫(a^l)`. -/
+theorem mem_mobiusIndex_conjFinset (l : L)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    hyp.conjFinset l B ∈ hyp.mobiusIndex (hyp.conjA l a) ↔ B ∈ hyp.mobiusIndex a := by
+  classical
+  rw [hyp.mem_mobiusIndex, hyp.mem_mobiusIndex, conjFinset,
+    Finset.image_nonempty, ← conjFinset, hyp.mem_nLStabilizerIn_conjA_conjFinset l]
+
+/-- **Peterfalvi (2.10), conjugation-invariance of the `mobiusSummand`.**  For `l ∈ L`,
+
+    `mobiusSummand (a^l) g (B^l) = mobiusSummand a g B`.
+
+`|B^l| = |B|`, `H(B^l) = l·H(B)·l⁻¹` has the same cardinality, and the conjugating set
+`|𝒜(g, H(B^l)·a^l)| = |𝒜(g, l·(H(B)·a)·l⁻¹)| = |𝒜(g, H(B)·a)|` by `card_conjFiber_conj_eq`. -/
+theorem mobiusSummand_conjFinset (hconj : hyp.HConjInvariant) (l : L) (g : G)
+    (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A}) :
+    hyp.mobiusSummand (hyp.conjA l a) g (hyp.conjFinset l B)
+      = hyp.mobiusSummand a g B := by
+  classical
+  by_cases hB : B.Nonempty
+  · have hBl : (hyp.conjFinset l B).Nonempty := hyp.conjFinset_nonempty (l := l) hB
+    rw [hyp.mobiusSummand_of_nonempty _ g hBl, hyp.mobiusSummand_of_nonempty a g hB]
+    rw [hyp.conjFinset_card, hyp.card_hIntersection_conjFinset hconj l hB]
+    -- only the conjugating-set cardinality remains
+    congr 2
+    -- `|𝒜(g, H(B^l)·a^l)| = |𝒜(g, H(B)·a)|`
+    have hset : (↑(hIntersection hyp (hyp.conjFinset l B) hBl) : Set G)
+          * ({(hyp.conjA l a : G)} : Set G)
+        = (fun z => (l : G) * z * (l : G)⁻¹) ''
+            ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G)) := by
+      rw [hyp.hIntersection_conjFinset hconj l hB]
+      have hsmul : ∀ z : G, ((MulAut.conj (l : G))⁻¹ • z) = (l : G)⁻¹ * z * (l : G) := by
+        intro z
+        rw [show ((MulAut.conj (l : G))⁻¹ • z) = (MulAut.conj (l : G))⁻¹ z from rfl,
+          MulAut.conj_inv_apply]
+      ext y
+      simp only [Set.mem_mul, Set.mem_image, Set.mem_singleton_iff, conjA_coe,
+        SetLike.mem_coe]
+      constructor
+      · rintro ⟨p, hp, q, rfl, rfl⟩
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul] at hp
+        refine ⟨(l : G)⁻¹ * p * (l : G) * (a : G),
+          ⟨(l : G)⁻¹ * p * (l : G), hp, a, rfl, rfl⟩, by group⟩
+      · rintro ⟨z, ⟨p, hp, q, rfl, rfl⟩, rfl⟩
+        refine ⟨(l : G) * p * (l : G)⁻¹, ?_, (l : G) * (a : G) * (l : G)⁻¹, rfl, by group⟩
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul,
+          show (l : G)⁻¹ * ((l : G) * p * (l : G)⁻¹) * (l : G) = p from by group]
+        exact hp
+    rw [hset, card_conjFiber_conj_eq]
+  · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
+      rw [conjFinset, Finset.image_nonempty]; exact hB
+    simp only [mobiusSummand, dif_neg hBe, dif_neg hB]
+
+/-- **Peterfalvi (2.10), the `𝒫(b)`-sum is `L`-conjugation invariant.**  For `l ∈ L`,
+
+    `∑_{B ∈ 𝒫(a^l)} mobiusSummand (a^l) g B = ∑_{B₀ ∈ 𝒫(a)} mobiusSummand a g B₀`.
+
+The bijection `B₀ ↦ B₀^l` carries `𝒫(a)` to `𝒫(a^l)` (`mem_mobiusIndex_conjFinset`) and preserves
+the summand (`mobiusSummand_conjFinset`).  This is the `b = a^x` reindex of (2.10) (lines making the
+inner `𝒫(b)`-sum independent of `b ∈ a^L`). -/
+theorem sum_mobiusSummand_conjFinset (hconj : hyp.HConjInvariant) (l : L) (g : G)
+    (a : {a : G // a ∈ A}) :
+    ∑ B ∈ hyp.mobiusIndex (hyp.conjA l a), hyp.mobiusSummand (hyp.conjA l a) g B
+      = ∑ B₀ ∈ hyp.mobiusIndex a, hyp.mobiusSummand a g B₀ := by
+  classical
+  refine Finset.sum_bij' (fun B _ => hyp.conjFinset l⁻¹ B) (fun B₀ _ => hyp.conjFinset l B₀)
+    ?_ ?_ ?_ ?_ ?_
+  · -- `i : 𝒫(a^l) → 𝒫(a)`
+    intro B hB
+    have hmem := (hyp.mem_mobiusIndex_conjFinset l⁻¹ (a := hyp.conjA l a) (B := B)).mpr
+    rw [conjA_inv_conjA] at hmem
+    exact hmem hB
+  · -- `j : 𝒫(a) → 𝒫(a^l)`
+    intro B₀ hB₀
+    exact (hyp.mem_mobiusIndex_conjFinset l (a := a) (B := B₀)).mpr hB₀
+  · intro B _
+    show hyp.conjFinset l (hyp.conjFinset l⁻¹ B) = B
+    rw [← hyp.conjFinset_mul, mul_inv_cancel, hyp.conjFinset_one]
+  · intro B₀ _
+    show hyp.conjFinset l⁻¹ (hyp.conjFinset l B₀) = B₀
+    rw [← hyp.conjFinset_mul, inv_mul_cancel, hyp.conjFinset_one]
+  · -- summand agrees: `mobiusSummand (a^l) g B = mobiusSummand a g (B^{l⁻¹})`
+    intro B hB
+    show hyp.mobiusSummand (hyp.conjA l a) g B
+      = hyp.mobiusSummand a g (hyp.conjFinset l⁻¹ B)
+    have := hyp.mobiusSummand_conjFinset hconj l⁻¹ g (hyp.conjA l a) B
+    rw [conjA_inv_conjA] at this
+    exact this.symm
+
+/-- `|N_L(B)| = |setLStabilizer B|`: `N_L(B) = setLStabilizer.map L.subtype` along the injection
+`L ↪ G`, so the two cardinalities agree. -/
+theorem card_nLStabilizerIn_eq (B : Finset {a : G // a ∈ A}) :
+    Nat.card (nLStabilizerIn hyp B) = Nat.card (setLStabilizer hyp B) := by
+  rw [nLStabilizerIn]
+  exact Nat.card_congr (Subgroup.equivMapOfInjective _ L.subtype L.subtype_injective).symm.toEquiv
+
+/-- The packaged summand `induceAlphaBTerm` evaluated at `g` equals the bare induced value,
+independent of the carried invertibility instance (`Invertible.subsingleton`). -/
+theorem induceAlphaBTerm_apply (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    [inst : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g
+      = ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g := by
+  have h : inst = invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne') :=
+    Subsingleton.elim _ _
+  rw [induceAlphaBTerm, h]
+
+/-- **Peterfalvi (2.10), per-`B` weight simplification.**  For nonempty `B` and `g ∈ (aH(a))^G`, the
+orbit-averaged inclusion–exclusion summand collapses, using `|orbit B|·|N_L(B)| = |L|`
+(`card_orbit_mul_card_setLStabilizer`) and `|M(B)| = |H(B)|·|N_L(B)|` (`card_mBSubgroup`):
+
+    `(-1)^{|B|}/|orbit B| · (Ind_{M(B)} α_B)(g)
+      = (α(a)/|L|) · ∑_{b ∈ N_L(B) ∩ a^L} (-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·b)|`.
+
+The factor `1/(|orbit B|·|M(B)|) = 1/(|orbit B|·|H(B)|·|N_L(B)|) = 1/(|L|·|H(B)|)`. -/
+theorem mobiusSummand_orbit_weighted (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)]
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    ((-1 : ℂ) ^ B.card / (Nat.card (MulAction.orbit L B) : ℂ))
+        * hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) ⟨B, hB⟩ g
+      = ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ / (Nat.card L : ℂ))
+          * ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+              (fun b : (nLStabilizerIn hyp B) =>
+                ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+            ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+              ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+                * ({(b : G)} : Set G))).card : ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  rw [hyp.induceAlphaBTerm_apply hconj _ hB g,
+    hyp.induce_alphaB_apply_eq_alpha_mul_sum_conjL hconj hB α hh hga]
+  -- abbreviations
+  set p : ℂ := (-1 : ℂ) ^ B.card with hp
+  set αa : ℂ := (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ with hαa
+  set Hc : ℂ := (Nat.card (hIntersection hyp B hB) : ℂ) with hHc
+  set Nc : ℂ := (Nat.card (nLStabilizerIn hyp B) : ℂ) with hNc
+  set Oc : ℂ := (Nat.card (MulAction.orbit L B) : ℂ) with hOc
+  -- `|M(B)| = |H(B)|·|N_L(B)|` and `|orbit B|·|N_L(B)| = |L|`.
+  have hM : (Nat.card (mBSubgroup hyp B hB) : ℂ) = Hc * Nc := by
+    rw [hHc, hNc]; exact_mod_cast hyp.card_mBSubgroup hconj hB
+  have hON : Oc * Nc = (Nat.card L : ℂ) := by
+    rw [hOc, hNc, hyp.card_nLStabilizerIn_eq B]
+    exact_mod_cast hyp.card_orbit_mul_card_setLStabilizer B
+  have hHne : Hc ≠ 0 := by rw [hHc]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hNne : Nc ≠ 0 := by rw [hNc]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hOne : Oc ≠ 0 := by rw [hOc]; exact Nat.cast_ne_zero.mpr (hyp.card_orbit_pos B).ne'
+  -- name the inner sum `S = ∑_b |𝒜(g, H(B)b)|`.
+  set S : ℂ := ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+      (fun b : (nLStabilizerIn hyp B) => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+      ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card : ℂ)
+      with hS
+  -- expand `⅟|M(B)|` and pull the per-term scalar `p/Hc` out of the RHS sum.
+  rw [show (⅟(Nat.card (mBSubgroup hyp B hB) : ℂ)) = (Hc * Nc)⁻¹ from by
+    rw [invOf_eq_inv, hM]]
+  rw [show (∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+        (fun b : (nLStabilizerIn hyp B) => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+        (p / Hc) * ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+          * ({(b : G)} : Set G))).card : ℂ)) = (p / Hc) * S from by
+    rw [hS, Finset.mul_sum]]
+  -- now both sides are scalar multiples of `S`; equate scalars using `Oc·Nc = |L|`.
+  rw [← hON]
+  field_simp
+
+/-! #### Final assembly: the (2.10) pointwise identity and `FullDadeIsometryData`
+
+The remaining work assembles the per-`B` weight identity `mobiusSummand_orbit_weighted` into the
+(2.10) pointwise identity `α^τ(g) = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}(g)`, by
+(a) orbit-averaging the transversal sum to the powerset, (b) recognizing the inner RHS term as
+`mobiusSummand b g B`, (c) swapping the resulting double sum to sum over `b ∈ a^L` first, (d)
+collapsing each inner `𝒫(b)`-sum to its survivor `mobiusSummand b g {b} = -|C_L(b)|`, and (e)
+totalling `∑_{b ∈ a^L} |C_L(b)| = |L|` (`sum_card_centralizerIn_eq`). -/
+
+/-- The orbit-averaging summand `(-1)^{|B|} · Ind_{M(B)} α_B(g)` (and `0` if `B` is empty),
+packaged so `sum_transversalRep_eq_sum_div_orbit` applies. -/
+noncomputable def mobiusTermCF (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) (B : Finset {a : G // a ∈ A}) : ℂ := by
+  classical
+  exact if hB : B.Nonempty then
+      (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g
+    else 0
+
+theorem mobiusTermCF_of_nonempty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.mobiusTermCF hconj α g B
+      = (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g := by
+  rw [mobiusTermCF, dif_pos hB]
+
+theorem mobiusTermCF_of_not_nonempty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) {B : Finset {a : G // a ∈ A}} (hB : ¬ B.Nonempty) :
+    hyp.mobiusTermCF hconj α g B = 0 := by
+  rw [mobiusTermCF, dif_neg hB]
+
+/-- The orbit-averaging summand is `L`-conjugacy invariant: `mobiusTermCF (B^l) = mobiusTermCF B`.
+Uses `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) and `induceAlphaBTerm_conjFinset`
+(the packaged induced summand is invariant). -/
+theorem mobiusTermCF_conjFinset (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) (l : L) (B : Finset {a : G // a ∈ A}) :
+    hyp.mobiusTermCF hconj α g (hyp.conjFinset l B) = hyp.mobiusTermCF hconj α g B := by
+  classical
+  by_cases hB : B.Nonempty
+  · have hBl : (hyp.conjFinset l B).Nonempty := hyp.conjFinset_nonempty (l := l) hB
+    rw [hyp.mobiusTermCF_of_nonempty hconj α g hBl, hyp.mobiusTermCF_of_nonempty hconj α g hB,
+      hyp.conjFinset_card l B, hyp.induceAlphaBTerm_conjFinset hconj α l hB]
+  · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
+      rw [conjFinset, Finset.image_nonempty]; exact hB
+    rw [mobiusTermCF, mobiusTermCF, dif_neg hBe, dif_neg hB]
+
+/-- The `L`-orbit of the support representative `a`, as a `Finset {a : G // a ∈ A}`: the elements
+`b' ∈ A` with `b' = l·a·l⁻¹` for some `l ∈ L`.  This is the fixed (`B`-independent) index over which
+the inner `b`-sum of (2.10) ranges; it coincides with the support filter `Sg` of
+`sum_card_centralizerIn_eq` when `g ∈ (aH(a))^G` (`mem_aOrbitFinset_iff_mem_supportFilter`). -/
+noncomputable def aOrbitFinset (a : {a : G // a ∈ A}) : Finset {a : G // a ∈ A} := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  exact Finset.univ.filter (fun b => ∃ l : L, hyp.conjA l a = b)
+
+theorem mem_aOrbitFinset {a b : {a : G // a ∈ A}} :
+    b ∈ hyp.aOrbitFinset a ↔ ∃ l : L, hyp.conjA l a = b := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  simp only [aOrbitFinset, Finset.mem_filter, Finset.mem_univ, true_and]
+
+/-- **Peterfalvi (2.10), per-`B` weight identity, inner sum over the fixed index `a^L`.**  For
+`g ∈ (aH(a))^G`,
+
+    `mobiusTermCF B / |orbit B| =
+       (α(a)/|L|) · ∑_{b' ∈ a^L} (if b' ∈ N_L(B) then mobiusSummand b' g B else 0)`.
+
+Recasting `mobiusSummand_orbit_weighted` so the inner sum ranges over the **`B`-independent** Finset
+`aOrbitFinset a` (with an `if (b':G) ∈ N_L(B)` guard) instead of the `B`-dependent subtype
+`N_L(B)`; this fixed index is what makes the subsequent `Finset.sum_comm` double-sum swap go
+through.  The reindexing bijection sends `b : N_L(B)` with `b ∈ a^L` to `⟨b.val, _⟩ : {a // a ∈ A}`
+(in `a^L ⊆ A`), and the term `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·b)|` is `mobiusSummand b' g B`. -/
+theorem mobiusTermCF_div_orbit_eq (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B / (Nat.card (MulAction.orbit L B) : ℂ)
+      = ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ / (Nat.card L : ℂ))
+          * ∑ b' ∈ hyp.aOrbitFinset a,
+            (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- start from the orbit-weight identity, which sums over `b : N_L(B)` with `b ∈ a^L`.
+  rw [hyp.mobiusTermCF_of_nonempty hconj _ g hB, mul_div_right_comm,
+    hyp.mobiusSummand_orbit_weighted hconj α hB hh hga]
+  congr 1
+  -- reindex the `N_L(B)`-subtype sum to the fixed `aOrbitFinset` sum.
+  rw [← Finset.sum_filter]
+  refine Finset.sum_bij'
+      (i := fun b hb => (⟨(b : G), by
+        rw [Finset.mem_filter] at hb
+        obtain ⟨l, hl⟩ := hb.2
+        exact hl ▸ hyp.L_normalizes_A l a.2⟩ : {a : G // a ∈ A}))
+      (j := fun b' hb' => (⟨(b' : G), by
+        rw [Finset.mem_filter] at hb'
+        exact hb'.2⟩ : nLStabilizerIn hyp B))
+      ?_ ?_ ?_ ?_ ?_
+  · -- `i b ∈ aOrbitFinset a` with `(i b : G) ∈ N_L(B)`
+    intro b hb
+    rw [Finset.mem_filter] at hb ⊢
+    obtain ⟨l, hl⟩ := hb.2
+    refine ⟨hyp.mem_aOrbitFinset.mpr ⟨l, ?_⟩, b.2⟩
+    apply Subtype.ext; rw [conjA_coe]; exact hl
+  · -- `j b' ∈ (univ.filter (a^L))`
+    intro b' hb'
+    rw [Finset.mem_filter] at hb' ⊢
+    obtain ⟨l, hl⟩ := (hyp.mem_aOrbitFinset).mp hb'.1
+    exact ⟨Finset.mem_univ _, l, by rw [← hyp.conjA_coe l a, hl]⟩
+  · intro b _; rfl
+  · intro b' _; rfl
+  · -- summands agree
+    intro b _
+    rw [hyp.mobiusSummand_of_nonempty _ g hB]
+
+/-- For `g ∈ (aH(a))^G` and `b' = a^l ∈ a^L`, also `g ∈ (b'H(b'))^G`: there is `x ∈ H(b')` with
+`IsConj (b'·x) g`.  Transporting the witness `(a, h)` by `l`: `x = l·h·l⁻¹ ∈ H(a^l) = H(b')` by
+(2.4.a), and `b'·x = l·(a·h)·l⁻¹` is `G`-conjugate to `a·h`, hence to `g`. -/
+theorem exists_mem_H_isConj_of_mem_aOrbitFinset (hconj : hyp.HConjInvariant)
+    {a b' : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g)
+    (hb' : b' ∈ hyp.aOrbitFinset a) :
+    ∃ x ∈ hyp.H b', IsConj (b'.1 * x) g := by
+  obtain ⟨l, hl⟩ := hyp.mem_aOrbitFinset.mp hb'
+  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, ?_⟩
+  · have hmem : (l : G) * h * (l : G)⁻¹ ∈ hyp.H (hyp.conjA l a) := by
+      rw [hyp.mem_H_conjA_iff hconj a l]
+      rw [show (l : G)⁻¹ * ((l : G) * h * (l : G)⁻¹) * (l : G) = h from by group]
+      exact hh
+    rwa [hl] at hmem
+  · have hconjeq : b'.1 * ((l : G) * h * (l : G)⁻¹) = (l : G) * (a.1 * h) * (l : G)⁻¹ := by
+      rw [← hl, conjA_coe]; group
+    rw [hconjeq]
+    exact (isConj_iff.mpr ⟨(l : G), rfl⟩).symm.trans hga
+
+/-- `mobiusSummand` vanishes on the empty subset (no `a`). -/
+theorem mobiusSummand_empty (a : {a : G // a ∈ A}) (g : G) :
+    hyp.mobiusSummand a g (∅ : Finset {a : G // a ∈ A}) = 0 := by
+  rw [mobiusSummand, dif_neg (by simp)]
+
+/-- `mobiusTermCF` vanishes on the empty subset. -/
+theorem mobiusTermCF_empty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ) (g : G) :
+    hyp.mobiusTermCF hconj α g (∅ : Finset {a : G // a ∈ A}) = 0 := by
+  rw [mobiusTermCF, dif_neg (by simp)]
+
+/-- **Peterfalvi (2.10), the support-side total.**  For `g ∈ (aH(a))^G` (witnessed by `h ∈ H(a)`,
+`IsConj (a·h) g`), the transversal sum of orbit-averaging summands evaluates to `-α(a)`:
+
+    `∑_{C ∈ ℬ} mobiusTermCF (rep C) = -α(a)`.
+
+The proof: (1) orbit-average to the powerset (`sum_transversalRep_eq_sum_div_orbit`); (2) recast
+each term via `mobiusTermCF_div_orbit_eq` to `(α(a)/|L|) · ∑_{b' ∈ a^L} [b' ∈ N_L(B)] mobiusSummand
+b' g B` (handling the empty `B` separately, both sides zero); (3) swap the double sum by
+`Finset.sum_comm`; (4) the inner `B`-sum over `𝒫(b')` collapses to its survivor `mobiusSummand b' g
+{b'} = -|C_L(b')|` (`sum_mobiusSummand_eq_singleton` + `mobiusSummand_singleton_eq`, using
+`g ∈ (b'H(b'))^G` for `b' ∈ a^L`); (5) `∑_{b' ∈ a^L} |C_L(b')| = |L|`
+(`sum_card_centralizerIn_eq`), giving `(α(a)/|L|) · (-|L|) = -α(a)`. -/
+theorem sum_mobiusTermCF_transversalRep_eq_neg (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    ∑ C : hyp.conjClassQuotient, hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g
+        (hyp.transversalRep C)
+      = -((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  set αa : ℂ := (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ with hαa
+  -- (1) orbit-average the transversal sum to the powerset.
+  rw [hyp.sum_transversalRep_eq_sum_div_orbit
+    (h := fun B => hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B)
+    (fun l B => hyp.mobiusTermCF_conjFinset hconj _ g l B)]
+  -- (2) recast each term; factor out `αa/|L|` over the `B`-sum.
+  have hterm : ∀ B : Finset {a : G // a ∈ A},
+      hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B / (Nat.card (MulAction.orbit L B) : ℂ)
+        = (αa / (Nat.card L : ℂ))
+          * ∑ b' ∈ hyp.aOrbitFinset a,
+            (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0) := by
+    intro B
+    by_cases hB : B.Nonempty
+    · exact hyp.mobiusTermCF_div_orbit_eq hconj α hB hh hga
+    · -- empty `B`: both sides vanish.
+      rw [Finset.not_nonempty_iff_eq_empty] at hB
+      subst hB
+      rw [hyp.mobiusTermCF_empty hconj, zero_div]
+      rw [show (∑ b' ∈ hyp.aOrbitFinset a,
+          (if (b' : G) ∈ nLStabilizerIn hyp (∅ : Finset {a : G // a ∈ A})
+            then hyp.mobiusSummand b' g ∅ else 0)) = 0 from ?_, mul_zero]
+      refine Finset.sum_eq_zero fun b' _ => ?_
+      rw [hyp.mobiusSummand_empty, ite_self]
+  rw [Finset.sum_congr rfl (fun B _ => hterm B), ← Finset.mul_sum]
+  -- (3) swap the double sum: `∑_B ∑_{b'} = ∑_{b'} ∑_B`.
+  rw [Finset.sum_comm]
+  -- (4) collapse the inner `B`-sum over `𝒫(b')` to its survivor `-|C_L(b')|`.
+  have hinner : ∀ b' ∈ hyp.aOrbitFinset a,
+      (∑ B : Finset {a : G // a ∈ A},
+        (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0))
+        = -((Nat.card (centralizerIn L b'.1)) : ℂ) := by
+    intro b' hb'
+    -- the `b'`-survivor needs `g ∈ (b'H(b'))^G`, i.e. `∃ x ∈ H(b'), IsConj (b'·x) g`.
+    obtain ⟨x', hx', hgx'⟩ :=
+      hyp.exists_mem_H_isConj_of_mem_aOrbitFinset hconj hh hga hb'
+    -- restrict the full powerset `B`-sum to `𝒫(b')` (the `if` is `0` off it); the only difference
+    -- is the empty set (in the filter via `b' ∈ N_L(∅)` but not in `mobiusIndex`), where the
+    -- summand vanishes.  Then apply the survivor collapse.
+    rw [← Finset.sum_filter]
+    rw [show (∑ B ∈ Finset.univ.filter
+          (fun B : Finset {a : G // a ∈ A} => (b' : G) ∈ nLStabilizerIn hyp B),
+          hyp.mobiusSummand b' g B)
+        = ∑ B ∈ hyp.mobiusIndex b', hyp.mobiusSummand b' g B from ?_]
+    · rw [hyp.sum_mobiusSummand_eq_singleton hconj g b',
+        hyp.mobiusSummand_singleton_eq g hx' hgx']
+    · -- `∑_{mobiusIndex} = ∑_{filter}` since they differ only by `∅` (where the summand is `0`).
+      refine (Finset.sum_subset ?_ ?_).symm
+      · -- `mobiusIndex b' ⊆ filter`
+        intro B hB
+        rw [hyp.mem_mobiusIndex] at hB
+        rw [Finset.mem_filter]
+        exact ⟨Finset.mem_univ _, hB.2⟩
+      · -- off `mobiusIndex` (i.e. `B = ∅`), the summand vanishes.
+        intro B hBfilter hBnot
+        rw [Finset.mem_filter] at hBfilter
+        rw [hyp.mem_mobiusIndex] at hBnot
+        have hBempty : ¬ B.Nonempty := fun hne => hBnot ⟨hne, hBfilter.2⟩
+        rw [Finset.not_nonempty_iff_eq_empty] at hBempty
+        rw [hBempty, hyp.mobiusSummand_empty]
+  -- (5) combine: `∑_{b' ∈ a^L} (-|C_L(b')|) = -|L|`, giving `(αa/|L|)·(-|L|) = -αa`.
+  -- evaluate the inner-collapsed sum `∑_{b' ∈ a^L} (-|C_L(b')|) = -|L|`.
+  have hsum_eval :
+      (∑ b' ∈ hyp.aOrbitFinset a,
+        (∑ B : Finset {a : G // a ∈ A},
+          (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0)))
+        = -((Nat.card L : ℂ)) := by
+    rw [Finset.sum_congr rfl hinner]
+    -- rewrite the `aOrbitFinset` index to the support filter `Sg` of `sum_card_centralizerIn_eq`.
+    have hSg : hyp.aOrbitFinset a
+        = Finset.univ.filter
+          (fun b : {a : G // a ∈ A} => ∃ x ∈ hyp.H b, IsConj (b.1 * x) g) := by
+      ext b'
+      rw [Finset.mem_filter]
+      constructor
+      · intro hb'
+        exact ⟨Finset.mem_univ _,
+          hyp.exists_mem_H_isConj_of_mem_aOrbitFinset hconj hh hga hb'⟩
+      · rintro ⟨-, x, hx, hbx⟩
+        rw [hyp.mem_aOrbitFinset]
+        obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a.2 b'.2 hh hx (hga.trans hbx.symm)
+        exact ⟨l, Subtype.ext (by rw [conjA_coe]; exact hl)⟩
+    rw [hSg, Finset.sum_neg_distrib, ← Nat.cast_sum,
+      hyp.sum_card_centralizerIn_eq hconj (hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, hga⟩)]
+  -- `(αa/|L|)·(-|L|) = -αa`.
+  have hLne : (Nat.card L : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  rw [hsum_eval]
+  field_simp
+
+end MobiusAssembly
+
 end SemidirectStructure
 
 end Hypothesis
@@ -1247,6 +3406,21 @@ theorem map_eq_of_mem_hCoset {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A
     τ α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ := by
   rcases hg with ⟨h, hh, rfl⟩
   exact hτ.map_eq_of_isConj_hCoset α (a.1 * h) a h hh (IsConj.refl _)
+
+/-- **Peterfalvi (2.5), uniqueness.**  The defining equations of the Dade map pin it
+down completely: any two candidate maps satisfying `IsDadeMap hyp` agree.  On
+`dadeSupport` both values are `α(a)` for a common witness `a` (`map_eq_of_isConj_hCoset`),
+and off `dadeSupport` both vanish. -/
+theorem unique {hyp : Hypothesis G A L} {τ₁ τ₂ : DadeMap (G := G) k A L}
+    (h₁ : IsDadeMap hyp τ₁) (h₂ : IsDadeMap hyp τ₂) : τ₁ = τ₂ := by
+  funext α
+  refine ClassFunction.ext fun g => ?_
+  by_cases hg : g ∈ hyp.dadeSupport
+  · obtain ⟨a, h, hh, hconj⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [h₁.map_eq_of_isConj_hCoset α g a h hh hconj,
+      h₂.map_eq_of_isConj_hCoset α g a h hh hconj]
+  · rw [h₁.map_eq_zero_of_not_mem_dadeSupport α g hg,
+      h₂.map_eq_zero_of_not_mem_dadeSupport α g hg]
 
 theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
     (hτ : IsDadeMap hyp τ) (hA₁A : A₁ ⊆ A)
@@ -1389,6 +3563,34 @@ theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :
   map_eq_zero_of_not_mem_dadeSupport α g hg :=
     hyp.dadeValue_of_not_mem_dadeSupport α hg
 
+/-- **Peterfalvi (2.11), restriction compatibility of the constructed Dade map.**  The
+explicit Dade map of the restricted hypothesis `hyp.restrict` is the domain-restriction
+of the explicit Dade map of `hyp`: `(α₁)^{τ₁} = (ι α₁)^τ` for `α₁ ∈ CF(L, A₁)`.
+
+This fulfils the promise recorded at `Hypothesis.restrict` — that "the equality of the
+corresponding Dade maps is stated later, once `dadeMap` is defined".  It now holds *as a
+theorem about the genuine construction* (not an interface assumption): both sides satisfy
+the (2.5) defining equations for `hyp.restrict` — the left by `isDadeMap_dadeMap`, the
+right by `IsDadeMap.restrictDomain` applied to `hyp`'s — so they coincide by the (2.5)
+uniqueness `IsDadeMap.unique`. -/
+theorem Hypothesis.dadeMap_restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).dadeMap (k := k) =
+      DadeMap.restrictDomain (G := G) (k := k) (L := L) (hyp.dadeMap (k := k)) hA₁A :=
+  IsDadeMap.unique
+    ((hyp.restrict hA₁A hA₁_norm).isDadeMap_dadeMap (k := k))
+    (IsDadeMap.restrictDomain (hyp.isDadeMap_dadeMap (k := k)) hA₁A hA₁_norm)
+
+/-- **Peterfalvi (2.11)**, pointwise form of `Hypothesis.dadeMap_restrict`: the restricted
+Dade map evaluated at `α₁ ∈ CF(L, A₁)` is `hyp`'s Dade map at the included `α₁`. -/
+theorem Hypothesis.dadeMap_restrict_apply (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    (hyp.restrict hA₁A hA₁_norm).dadeMap (k := k) α =
+      hyp.dadeMap (k := k)
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) := by
+  rw [hyp.dadeMap_restrict hA₁A hA₁_norm, DadeMap.restrictDomain_apply]
+
 end IsDadeMap
 
 /-- Peterfalvi (2.6.b): a complex Dade map sends supported virtual characters
@@ -1418,6 +3620,31 @@ theorem restrictDomain {τ : DadeMap (G := G) ℂ A L}
     (by simpa using hα)
 
 end PreservesVirtualCharacters
+
+/-- **Peterfalvi (2.6.b), reduced to the (2.10) identity.**  If the explicit Dade map
+`hyp.dadeMap` agrees, on every supported virtual character `α ∈ ℤ[Irr L, A]`, with *some* finite
+`ℤ`-linear combination of inclusion–exclusion summands `Ind_{M(B)}^G α_B` (`induceAlphaBTerm`),
+then `hyp.dadeMap` preserves virtual characters, i.e. satisfies `PreservesVirtualCharacters`.
+
+This isolates the remaining content of (2.6.b) to the (2.10) identity
+`α^τ = -∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` itself: once that pointwise identity is available
+(with `s = ℬ` the `L`-conjugacy transversal and `c B = -(-1)^{|B|}`), this lemma upgrades the
+`DadeIsometryData` to a `FullDadeIsometryData`.  Membership of the right-hand side in `ℤ[Irr G]`
+is `zsmul_induceAlphaBTerm_sum_mem_ZIrr`. -/
+theorem preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
+    (hτ : ∀ α : SupportedClassFunctions (G := G) ℂ A L,
+        ((α : ClassFunction L ℂ) ∈ ZIrr L) →
+        ∃ (s : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty})
+          (c : {B : Finset {a : G // a ∈ A} // B.Nonempty} → ℤ),
+          hyp.dadeMap (k := ℂ) α
+            = ∑ p ∈ s, c p • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) :
+    PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
+  intro α hα
+  obtain ⟨s, c, hsum⟩ := hτ α hα
+  rw [hsum]
+  exact hyp.zsmul_induceAlphaBTerm_sum_mem_ZIrr hconj hα s c
 
 variable [StarRing k]
 variable [Fintype G] [Fintype L]
@@ -1832,6 +4059,200 @@ noncomputable def Hypothesis.dadeIsometryData (hconj : hyp.HConjInvariant) :
 @[simp] theorem Hypothesis.dadeIsometryData_toDadeMap (hconj : hyp.HConjInvariant) :
     (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) :=
   rfl
+
+/-! ### Peterfalvi (2.10), the pointwise inclusion–exclusion identity and `FullDadeIsometryData`
+
+The (2.10) identity `α^τ = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}` is now assembled from
+the support-side total `sum_mobiusTermCF_transversalRep_eq_neg` and the non-support vanishing
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`, then fed through the bridge
+`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` to construct the
+`FullDadeIsometryData`. -/
+
+open scoped Classical in
+/-- **Peterfalvi (2.10), the pointwise identity.**  For a supported class function `α ∈ CF(L, A)`,
+the Dade map equals the negated transversal sum of orbit-averaging summands:
+
+    `α^τ(g) = -∑_{C ∈ ℬ} mobiusTermCF (rep C) (g)`,
+
+where `mobiusTermCF (rep C) = (-1)^{|rep C|} Ind_{M(rep C)}^G α_{rep C}`.  On the Dade support
+(`g ∈ (aH(a))^G`) the transversal sum is `-α(a) = -α^τ(g)`
+(`sum_mobiusTermCF_transversalRep_eq_neg`); off the support both sides vanish — `α^τ(g) = 0` by the
+(2.5) definition, and each `Ind_{M(rep C)} α_{rep C}(g) = 0` by
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`. -/
+theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    hyp.dadeMap (k := ℂ) α
+      = (⟨fun g => -∑ C : hyp.conjClassQuotient,
+            hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C),
+          by
+            intro g x
+            classical
+            simp only [neg_inj]
+            refine Finset.sum_congr rfl fun C _ => ?_
+            by_cases hC : (hyp.transversalRep C).Nonempty
+            · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+                invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+              rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC,
+                hyp.mobiusTermCF_of_nonempty hconj _ (x * g * x⁻¹) hC]
+              congr 1
+              rw [hyp.induceAlphaBTerm_apply hconj _ hC, hyp.induceAlphaBTerm_apply hconj _ hC]
+              exact (ClassFunction.induce (mBSubgroup hyp (hyp.transversalRep C) hC)
+                (alphaB hyp hconj hC (α : ClassFunction L ℂ))).2 g x
+            · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC,
+                hyp.mobiusTermCF_of_not_nonempty hconj _ (x * g * x⁻¹) hC]⟩
+          : ClassFunction G ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  refine ClassFunction.ext fun g => ?_
+  show hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
+    = -∑ C : hyp.conjClassQuotient,
+        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+  by_cases hg : g ∈ hyp.dadeSupport
+  · -- support side: the transversal sum is `-α(a)`.
+    obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [hyp.dadeValue_eq α hh hga,
+      hyp.sum_mobiusTermCF_transversalRep_eq_neg hconj α hh hga, neg_neg]
+  · -- non-support side: both sides are `0`.
+    rw [hyp.dadeValue_of_not_mem_dadeSupport α hg]
+    rw [show (∑ C : hyp.conjClassQuotient,
+          hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)) = 0 from ?_,
+      neg_zero]
+    refine Finset.sum_eq_zero fun C _ => ?_
+    by_cases hC : (hyp.transversalRep C).Nonempty
+    · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC, hyp.induceAlphaBTerm_apply hconj _ hC,
+        hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hconj hC α hg, mul_zero]
+    · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC]
+
+open scoped Classical in
+/-- The transversal sum of `mobiusTermCF` reindexes over the `Finset` of nonempty subsets that are
+their own conjugacy-class representative (`transversalRep (mk'' B) = B`), with the summand the
+packaged induced character:
+
+    `∑_{C ∈ ℬ} mobiusTermCF (rep C) (g) = ∑_{p ∈ s} (-1)^{|p.1|} · Ind_{M(p)}^G α_p (g)`,
+
+`s` ranging over `{p : {B // B.Nonempty} // transversalRep (mk'' p.1) = p.1}` (as a `Finset`).
+This converts the (2.10) identity into the `∑ c_p • induceAlphaBTerm p` shape demanded by the bridge
+`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`.  The bijection sends a class `C` with
+nonempty representative to `⟨rep C, _⟩` and back via `p ↦ mk'' p.1` (`Quotient.out_eq'`); the empty
+classes contribute `0` on the left and are excluded on the right. -/
+theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L) (g : G) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+    (∑ C : hyp.conjClassQuotient,
+        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C))
+      = ∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+          (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+          ((-1 : ℂ) ^ p.1.card) * hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p g := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  -- restrict the left sum to nonempty-rep classes (empty reps contribute `0`).
+  rw [← Finset.sum_filter_of_ne (p := fun C : hyp.conjClassQuotient =>
+        (hyp.transversalRep C).Nonempty) ?_]
+  · -- now bijection between `{C : rep C nonempty}` and the fixed-point subtype Finset.
+    refine Finset.sum_bij'
+      (i := fun C hC => (⟨hyp.transversalRep C, by
+          rw [Finset.mem_filter] at hC; exact hC.2⟩
+        : {B : Finset {a : G // a ∈ A} // B.Nonempty}))
+      (j := fun p _ => (Quotient.mk'' p.1 : hyp.conjClassQuotient))
+      ?_ ?_ ?_ ?_ ?_
+    · -- `i C ∈ s`
+      intro C hC
+      rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      show hyp.transversalRep (Quotient.mk'' (hyp.transversalRep C)) = hyp.transversalRep C
+      simp only [transversalRep, Quotient.out_eq']
+    · -- `j p ∈ filter (rep nonempty)`
+      intro p hp
+      rw [Finset.mem_filter] at hp ⊢
+      refine ⟨Finset.mem_univ _, ?_⟩
+      rw [hp.2]; exact p.2
+    · -- left inverse: `mk'' (rep C) = C`
+      intro C hC
+      show Quotient.mk'' (hyp.transversalRep C) = C
+      simp only [transversalRep, Quotient.out_eq']
+    · -- right inverse: `⟨rep (mk'' p.1), _⟩ = p`
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      apply Subtype.ext
+      exact hp.2
+    · -- summand agreement
+      intro C hC
+      rw [Finset.mem_filter] at hC
+      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC.2]
+  · -- the dropped terms (empty reps) are zero: if the summand is nonzero, the rep is nonempty.
+    intro C _ hC
+    by_contra hne
+    exact hC (hyp.mobiusTermCF_of_not_nonempty hconj _ g hne)
+
+/-- Evaluation of a `Finset` sum of class functions is the sum of the evaluations. -/
+private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
+    (f : ι → ClassFunction G ℂ) (g : G) :
+    (∑ p ∈ s, f p) g = ∑ p ∈ s, f p g := by
+  classical
+  refine s.induction_on (by simp) ?_
+  intro p s' hps' ih
+  rw [Finset.sum_insert hps', Finset.sum_insert hps', ClassFunction.add_apply, ih]
+
+open scoped Classical in
+/-- **Peterfalvi (2.6.b).**  The complex Dade map preserves virtual characters:
+`τ : ℤ[Irr L, A] → ℤ[Irr G]`.
+
+This is the culmination of the (2.10) inclusion–exclusion.  Feeding the pointwise identity
+`α^τ = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}` (`dadeMap_eq_neg_sum_mobiusTermCF`,
+reindexed over the representative subtype by `sum_mobiusTermCF_transversalRep_eq_sum_subtype`) into
+the bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`: the right-hand side is a
+`ℤ`-linear combination (`c p = -(-1)^{|p.1|}`) of inclusion–exclusion summands `induceAlphaBTerm`,
+each a virtual character (`induceAlphaBTerm_mem_ZIrr`), so `α^τ ∈ ℤ[Irr G]`. -/
+theorem Hypothesis.preservesVirtualCharacters_dadeMap (hconj : hyp.HConjInvariant) :
+    PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
+  refine preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum hconj ?_
+  intro α _
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  refine ⟨(Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+      (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+    fun p => -((-1 : ℤ) ^ p.1.card), ?_⟩
+  refine ClassFunction.ext fun g => ?_
+  rw [hyp.dadeMap_eq_neg_sum_mobiusTermCF hconj α]
+  show -∑ C : hyp.conjClassQuotient,
+      hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+    = (∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+        (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+        (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) g
+  rw [hyp.sum_mobiusTermCF_transversalRep_eq_sum_subtype hconj α g,
+    classFunction_finset_sum_apply, ← Finset.sum_neg_distrib]
+  refine Finset.sum_congr rfl fun p _ => ?_
+  -- `(-(-1)^|p.1| • Ind p) g = -((-1)^|p.1| · Ind p g)`.
+  rw [show (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
+      = (((-((-1 : ℤ) ^ p.1.card) : ℤ) : ℂ)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
+      from by rw [Int.cast_smul_eq_zsmul], ClassFunction.smul_apply]
+  push_cast
+  ring
+
+/-- **Peterfalvi (2.6).**  The full complex Dade-isometry package: the (2.5) Dade-map equations, the
+(2.6.a) normalized isometry, and the (2.6.b) virtual-character preservation, all constructed from
+Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+
+This is the honest construction of `FullDadeIsometryData` (no longer an interface assumption):
+`toDadeIsometryData` is the `dadeIsometryData` built from the explicit (2.5) Dade map, and
+`preserves_virtualCharacters` is the (2.10) inclusion–exclusion result
+`preservesVirtualCharacters_dadeMap`. -/
+noncomputable def Hypothesis.fullDadeIsometryData (hconj : hyp.HConjInvariant) :
+    FullDadeIsometryData (G := G) hyp where
+  toDadeIsometryData := hyp.dadeIsometryData hconj
+  preserves_virtualCharacters := by
+    rw [hyp.dadeIsometryData_toDadeMap hconj]
+    exact hyp.preservesVirtualCharacters_dadeMap hconj
 
 end AdjointFormula
 

@@ -364,6 +364,466 @@ theorem Orthogonal.image_conjugateDifference_inner_eq_zero
 
 end CharacterDifferenceImage
 
+/-! ### Peterfalvi (5.2.d): the general orthonormal difference-image family `R(χ)`
+
+The two-element `CharacterDifferenceImage` records the special case where `R(χ) = {ε·μ, -ε·ν}`
+has exactly two elements.  Peterfalvi (5.2.d) is more general: `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` for
+an **orthonormal subset `R(χ)` of `ℤ[Irr G]`** (norm-`1`, pairwise-orthogonal virtual
+characters, not necessarily single irreducibles).  This is the gateway that the §7 (5.4)
+norm inequalities are stated against. -/
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.2.d): orthonormal character-difference image.**
+
+For `χ ∈ S`, the image of `χ - χ̄` under the integral isometry `τ` is a sum
+`(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` over a finite **orthonormal** family `R(χ) = imageSet`
+of virtual characters (each `α ∈ ℤ[Irr G]`, `‖α‖² = 1`, mutually orthogonal).  This is
+the general form of `CharacterDifferenceImage`, which is recovered as the two-element case
+via `CharacterDifferenceImage.toOrthonormalImage`. -/
+structure OrthonormalCharacterImageFamily (τ : IntegralCharacterMap L G)
+    (χ : ClassFunction L ℂ)
+    [Fintype G] [Invertible (Nat.card G : ℂ)] where
+  /-- The orthonormal subset `R(χ)` of `ℤ[Irr G]`. -/
+  imageSet : Finset (ClassFunction G ℂ)
+  /-- Every member of `R(χ)` is a virtual character of `G`. -/
+  mem_ZIrr : ∀ α ∈ imageSet, α ∈ ZIrr G
+  /-- `R(χ)` is orthonormal: `⟨α, β⟩ = δ_{α,β}` for `α, β ∈ R(χ)`. -/
+  orthonormal :
+    ∀ α ∈ imageSet, ∀ β ∈ imageSet,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0
+  /-- The image equation `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α`. -/
+  image_eq : τ (χ - χ.conj) = ∑ α ∈ imageSet, α
+
+namespace OrthonormalCharacterImageFamily
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- The squared norm of an element of `R(χ)` is `1`. -/
+theorem inner_self_of_mem (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    {α : ClassFunction G ℂ} (hα : α ∈ R.imageSet) :
+    ClassFunction.inner α α = 1 := by
+  rw [R.orthonormal α hα α hα, if_pos rfl]
+
+/-- Distinct members of `R(χ)` are orthogonal. -/
+theorem inner_eq_zero_of_ne (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    {α β : ClassFunction G ℂ} (hα : α ∈ R.imageSet) (hβ : β ∈ R.imageSet) (hαβ : α ≠ β) :
+    ClassFunction.inner α β = 0 := by
+  rw [R.orthonormal α hα β hβ, if_neg hαβ]
+
+/-- The image equation in `conjugateDifference` form: `τ (χ - χ̄) = ∑_{α ∈ R(χ)} α`. -/
+theorem image_conjugateDifference
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ) :
+    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) = ∑ α ∈ R.imageSet, α := by
+  simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using R.image_eq
+
+/-- **Peterfalvi (5.2.e): disjoint-pair orthogonality.**  Two image families `R(χ)`,
+`R(ψ)` are orthogonal if every `α ∈ R(χ)` is orthogonal to every `β ∈ R(ψ)`. -/
+def Orthogonal (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (R' : OrthonormalCharacterImageFamily (L := L) (G := G) τ ψ) : Prop :=
+  ∀ α ∈ R.imageSet, ∀ β ∈ R'.imageSet, ClassFunction.inner α β = 0
+
+theorem Orthogonal.inner_eq_zero
+    {R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ}
+    {R' : OrthonormalCharacterImageFamily (L := L) (G := G) τ ψ}
+    (h : R.Orthogonal R') {α β : ClassFunction G ℂ}
+    (hα : α ∈ R.imageSet) (hβ : β ∈ R'.imageSet) :
+    ClassFunction.inner α β = 0 :=
+  h α hα β hβ
+
+end OrthonormalCharacterImageFamily
+
+namespace CharacterDifferenceImage
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- `⟨ε·μ, ε·μ⟩ = 1`, `⟨-ε·ν, -ε·ν⟩ = 1`, `⟨ε·μ, -ε·ν⟩ = 0`: the orthonormality
+of the two-element family `{ε·μ, -ε·ν}` underlying the two-element case.
+
+Stated as the `δ_{·,·}` identity for the (ℤ-scaled) pair, by reducing the
+`ℤ`-scalar `ε` to the `ℂ`-scalar `(ε : ℂ)` and using row orthogonality with
+`ε² = 1`.  (The sign hypotheses `hs`/`ht` are unused in the proof but pin down
+which scaled pair is meant.) -/
+theorem inner_signSmul_pair_eq_ite
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) {s t : ℤ}
+    {a b : ClassFunction G ℂ}
+    (ha : a = hχ.muClassFunction ∨ a = hχ.nuClassFunction)
+    (hb : b = hχ.muClassFunction ∨ b = hχ.nuClassFunction) :
+    ClassFunction.inner (s • a) (t • b) =
+      (s : ℂ) * (t : ℂ) * (if a = b then (1 : ℂ) else 0) := by
+  classical
+  have hpair : ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 := by
+    have hμμ : ClassFunction.inner hχ.muClassFunction hχ.muClassFunction = 1 := by
+      simpa [muClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.mu
+    have hνν : ClassFunction.inner hχ.nuClassFunction hχ.nuClassFunction = 1 := by
+      simpa [nuClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.nu
+    have hμν : ClassFunction.inner hχ.muClassFunction hχ.nuClassFunction = 0 := by
+      simpa [muClassFunction, nuClassFunction,
+        OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.distinct
+    have hνμ : ClassFunction.inner hχ.nuClassFunction hχ.muClassFunction = 0 := by
+      simpa [muClassFunction, nuClassFunction,
+        OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality
+          (Ne.symm hχ.distinct)
+    have hμν_ne : hχ.muClassFunction ≠ hχ.nuClassFunction :=
+      hχ.muClassFunction_ne_nuClassFunction
+    rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
+    · rw [hμμ, if_pos rfl]
+    · rw [hμν, if_neg hμν_ne]
+    · rw [hνμ, if_neg (Ne.symm hμν_ne)]
+    · rw [hνν, if_pos rfl]
+  rw [← Int.cast_smul_eq_zsmul ℂ s a, ← Int.cast_smul_eq_zsmul ℂ t b,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    hpair, star_intCast]
+  ring
+
+/-- The two members `ε·μ` and `-ε·ν` of the two-element family are distinct. -/
+theorem signMu_ne_negSignNu (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.sign • (hχ.muClassFunction) ≠ (-hχ.sign) • (hχ.nuClassFunction) := by
+  intro h
+  -- `⟨ε·μ, ε·μ⟩ = ε² = 1`, but if `ε·μ = -ε·ν` it equals `⟨ε·μ, -ε·ν⟩ = -ε²⟨μ,ν⟩ = 0`.
+  have hself := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := hχ.sign)
+    (a := hχ.muClassFunction) (b := hχ.muClassFunction) (Or.inl rfl) (Or.inl rfl)
+  have hcross := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := -hχ.sign)
+    (a := hχ.muClassFunction) (b := hχ.nuClassFunction) (Or.inl rfl) (Or.inr rfl)
+  rw [if_pos rfl, mul_one] at hself
+  rw [if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero] at hcross
+  have hsign : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
+    have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  rw [hsign] at hself
+  -- `⟨ε·μ, ε·μ⟩ = 1`; replace the *second* `ε·μ` by `-ε·ν` via `h`, then `hcross` gives `1 = 0`.
+  nth_rewrite 2 [h] at hself
+  rw [hcross] at hself
+  exact one_ne_zero hself.symm
+
+open scoped Classical in
+/-- **Two-element case of (5.2.d).**  The special two-element `CharacterDifferenceImage`
+data yields a genuine `OrthonormalCharacterImageFamily` with `R(χ) = {ε·μ, -ε·ν}`.  This
+shows the general gateway subsumes the existing two-element interface. -/
+noncomputable def toOrthonormalImage
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    OrthonormalCharacterImageFamily (L := L) (G := G) τ χ where
+  imageSet := {hχ.sign • hχ.muClassFunction, (-hχ.sign) • hχ.nuClassFunction}
+  mem_ZIrr := by
+    intro α hα
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hα
+    rcases hα with rfl | rfl
+    · exact Submodule.smul_mem _ _ hχ.mu.mem_ZIrr
+    · exact Submodule.smul_mem _ _ hχ.nu.mem_ZIrr
+  orthonormal := by
+    classical
+    have hsign : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
+      have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+    have hne := hχ.signMu_ne_negSignNu
+    intro α hα β hβ
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hα hβ
+    rcases hα with rfl | rfl <;> rcases hβ with rfl | rfl
+    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inl rfl),
+        if_pos rfl, mul_one, hsign]
+    · rw [if_neg hne, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inr rfl),
+        if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero]
+    · rw [if_neg (Ne.symm hne), hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inl rfl),
+        if_neg (Ne.symm hχ.muClassFunction_ne_nuClassFunction), mul_zero]
+    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inr rfl),
+        if_pos rfl, mul_one]
+      push_cast
+      rw [neg_mul_neg, hsign]
+  image_eq := by
+    rw [hχ.image_eq, Finset.sum_pair hχ.signMu_ne_negSignNu, neg_smul, ← sub_eq_add_neg,
+      ← smul_sub]
+
+end CharacterDifferenceImage
+
+/-! ### Peterfalvi (5.4): the norm inequalities for `X` and `Y`
+
+Setup: `χ ∈ S`, `ψ ∈ ℤ[S]` with `(χ,ψ) = (χ̄,ψ) = 0`; an isometry `τ₁` on
+`ℤ[χ-ψ, χ-χ̄]` coinciding with `τ` on `ℤ[χ-χ̄]`; `(χ-ψ)^{τ₁} = X - Y` with
+`X ∈ ℤ[R(χ)]` and `Y ⊥ R(χ)`.  The conclusions are:
+
+* (5.4.a) `‖X‖² ≥ ‖χ‖²`;
+* (5.4.b) if also `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²` and
+  `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)`.
+
+The whole argument is the integer Cauchy–Schwarz `∑ c_α ≤ ∑ c_α²` against the
+orthonormal `R(χ)`, run through the Parseval identities of `ZIrrFourier`. -/
+
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.4) setup.**  Bundles the hypotheses of (5.4): the orthonormal
+image family `R(χ)`, the auxiliary isometry `τ₁` agreeing with `τ` on `χ - χ̄`, the
+decomposition `(χ - ψ)^{τ₁} = X - Y` with `X ∈ ℤ[R(χ)]` (recorded via integer
+coefficients `coeff`) and `Y ⊥ R(χ)`, and the orthogonality relations
+`(χ,ψ) = (χ̄,ψ) = (χ,χ̄) = 0`. -/
+structure CharacterPsiDecomposition (τ : IntegralCharacterMap L G)
+    (χ ψ : ClassFunction L ℂ)
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- The orthonormal image family `R(χ)` with `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α`. -/
+  imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ
+  /-- The auxiliary isometry `τ₁` on `ℤ[χ - ψ, χ - χ̄]`. -/
+  tau1 : IntegralCharacterMap L G
+  /-- `τ₁` is an integral isometry. -/
+  tau1_isometry : IsIntegralIsometry (L := L) (G := G) tau1
+  /-- `τ₁` coincides with `τ` on `χ - χ̄`. -/
+  tau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj)
+  /-- The image side `X` of `(χ - ψ)^{τ₁} = X - Y`. -/
+  X : ClassFunction G ℂ
+  /-- The orthogonal side `Y` of `(χ - ψ)^{τ₁} = X - Y`. -/
+  Y : ClassFunction G ℂ
+  /-- The decomposition `(χ - ψ)^{τ₁} = X - Y`. -/
+  tau1_image : tau1 (χ - ψ) = X - Y
+  /-- The integer coefficients of `X ∈ ℤ[R(χ)]`. -/
+  coeff : ClassFunction G ℂ → ℤ
+  /-- `X = ∑_{α ∈ R(χ)} (coeff α) • α`, i.e. `X ∈ ℤ[R(χ)]`. -/
+  X_eq : X = ∑ α ∈ imageFamily.imageSet, (coeff α : ℂ) • α
+  /-- `Y` is orthogonal to `R(χ)`. -/
+  Y_orthogonal : ∀ α ∈ imageFamily.imageSet, ClassFunction.inner Y α = 0
+  /-- `(χ, ψ) = 0`. -/
+  chi_psi_orthogonal : ClassFunction.inner χ ψ = 0
+  /-- `(χ̄, ψ) = 0`. -/
+  chiConj_psi_orthogonal : ClassFunction.inner χ.conj ψ = 0
+  /-- `(χ, χ̄) = 0` (the distinct elements `χ`, `χ̄ ∈ S` are orthogonal by (5.2.c)). -/
+  chi_chiConj_orthogonal : ClassFunction.inner χ χ.conj = 0
+
+namespace CharacterPsiDecomposition
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
+theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {α : ClassFunction G ℂ} (hα : α ∈ D.imageFamily.imageSet) :
+    ClassFunction.inner D.X α = (D.coeff α : ℂ) := by
+  rw [D.X_eq]
+  exact inner_orthonormalSum_eq_coeff D.imageFamily.orthonormal hα
+
+/-- `‖X‖² = ∑_{α ∈ R(χ)} (coeff α)²` (Parseval). -/
+theorem inner_self_X (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.X = ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) ^ 2 := by
+  rw [D.X_eq]
+  exact inner_self_orthonormalSum_eq_sum_sq D.imageFamily.orthonormal
+
+/-- `⟨X, ∑_{α ∈ R(χ)} α⟩ = ∑_{α ∈ R(χ)} coeff α`. -/
+theorem inner_X_sum (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X (∑ α ∈ D.imageFamily.imageSet, α) =
+      ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) := by
+  rw [D.X_eq]
+  exact inner_orthonormalSum_sum_eq_sum_coeff D.imageFamily.orthonormal
+
+/-- `Y ⊥ R(χ)` extends to the sum: `⟨Y, ∑_{α ∈ R(χ)} α⟩ = 0`. -/
+theorem inner_Y_sum (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.Y (∑ α ∈ D.imageFamily.imageSet, α) = 0 := by
+  rw [inner_sum_right]
+  exact Finset.sum_eq_zero fun α hα => D.Y_orthogonal α hα
+
+/-- **The keystone identity of (5.4.a).**  `‖χ‖² = ∑_{α ∈ R(χ)} coeff α`.
+
+`‖χ‖² = ⟨χ - ψ, χ - χ̄⟩` (using the three orthogonality relations), `= ⟨X - Y, ∑ α⟩`
+(by the isometry of `τ₁` and `τ₁ = τ` on `χ - χ̄`), `= ⟨X, ∑ α⟩` (since `Y ⊥ R(χ)`),
+`= ∑ coeff α`. -/
+theorem inner_self_chi_eq_sum_coeff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ = ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) := by
+  -- Step 1: `⟨χ, χ⟩ = ⟨χ - ψ, χ - χ̄⟩`.
+  have hpsi_chi : ClassFunction.inner ψ χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chi_psi_orthogonal, star_zero]
+  have hpsi_chiConj : ClassFunction.inner ψ χ.conj = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chiConj_psi_orthogonal, star_zero]
+  have hsrc : ClassFunction.inner χ χ =
+      ClassFunction.inner (χ - ψ) (χ - χ.conj) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, D.chi_chiConj_orthogonal, hpsi_chi, hpsi_chiConj]
+    ring
+  -- Step 2: transport across `τ₁` (isometry, agreeing with `τ` on `χ - χ̄`).
+  have himg : ClassFunction.inner (χ - ψ) (χ - χ.conj) =
+      ClassFunction.inner (D.X - D.Y) (∑ α ∈ D.imageFamily.imageSet, α) := by
+    rw [← D.tau1_isometry.inner_eq, D.tau1_image, D.tau1_agrees, D.imageFamily.image_eq]
+  -- Step 3: `Y ⊥ R(χ)` drops `Y`; coefficient recovery finishes.
+  rw [hsrc, himg, ClassFunction.inner_sub_left, D.inner_Y_sum, sub_zero, D.inner_X_sum]
+
+/-- **Peterfalvi (5.4.a):** `‖X‖² ≥ ‖χ‖²`.
+
+By the keystone identity `‖χ‖² = ∑ coeff α` and Parseval `‖X‖² = ∑ (coeff α)²`, the
+integer Cauchy–Schwarz `∑ coeff α ≤ ∑ (coeff α)²` gives the inequality. -/
+theorem inner_self_chi_re_le_inner_self_X
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    (ClassFunction.inner χ χ).re ≤ (ClassFunction.inner D.X D.X).re := by
+  classical
+  have hχ : ClassFunction.inner χ χ =
+      ((∑ α ∈ D.imageFamily.imageSet, D.coeff α : ℤ) : ℂ) := by
+    rw [D.inner_self_chi_eq_sum_coeff]; push_cast; ring
+  have hX : ClassFunction.inner D.X D.X =
+      ((∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 : ℤ) : ℂ) := by
+    rw [D.inner_self_X]; push_cast; ring
+  rw [hχ, hX, Complex.intCast_re, Complex.intCast_re]
+  exact_mod_cast finset_sum_le_sum_sq D.imageFamily.imageSet D.coeff
+
+/-- `⟨χ, χ⟩` is the integer cast `(∑ coeff α : ℤ)`. -/
+theorem inner_self_chi_eq_intCast
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ = ((∑ α ∈ D.imageFamily.imageSet, D.coeff α : ℤ) : ℂ) := by
+  rw [D.inner_self_chi_eq_sum_coeff]; push_cast; ring
+
+/-- `⟨X, X⟩` is the integer cast `(∑ (coeff α)² : ℤ)`. -/
+theorem inner_self_X_eq_intCast
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.X = ((∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 : ℤ) : ℂ) := by
+  rw [D.inner_self_X]; push_cast; ring
+
+/-- `X ⊥ Y`: `⟨X, Y⟩ = 0` (since `X ∈ ℤ[R(χ)]` and `Y ⊥ R(χ)`). -/
+theorem inner_X_Y (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.Y = 0 := by
+  rw [D.X_eq, inner_sum_left]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [ClassFunction.inner_smul_left,
+    OddOrder.RepresentationTheory.inner_conj_symm, D.Y_orthogonal α hα, star_zero, mul_zero]
+
+/-- `‖X - Y‖² = ‖X‖² + ‖Y‖²` (Pythagoras, since `X ⊥ Y`). -/
+theorem inner_self_X_sub_Y (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner (D.X - D.Y) (D.X - D.Y) =
+      ClassFunction.inner D.X D.X + ClassFunction.inner D.Y D.Y := by
+  have hYX : ClassFunction.inner D.Y D.X = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.inner_X_Y, star_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, D.inner_X_Y, hYX]
+  ring
+
+/-- `‖χ - ψ‖² = ‖χ‖² + ‖ψ‖²` (Pythagoras, since `(χ, ψ) = (ψ, χ) = 0`). -/
+theorem inner_self_chi_sub_psi (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner (χ - ψ) (χ - ψ) =
+      ClassFunction.inner χ χ + ClassFunction.inner ψ ψ := by
+  have hpsi_chi : ClassFunction.inner ψ χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chi_psi_orthogonal, star_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, D.chi_psi_orthogonal, hpsi_chi]
+  ring
+
+/-- The total-norm identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` from the isometry of `τ₁`. -/
+theorem inner_self_chi_add_psi_eq
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ + ClassFunction.inner ψ ψ =
+      ClassFunction.inner D.X D.X + ClassFunction.inner D.Y D.Y := by
+  rw [← D.inner_self_chi_sub_psi, ← D.inner_self_X_sub_Y, ← D.tau1_image,
+    D.tau1_isometry.inner_eq]
+
+/-- **Peterfalvi (5.6.2) opening bound:** `‖Y‖² ≤ ‖ψ‖²`.
+
+This is the first step of (5.6.2) ("We note first that `‖χ‖² + a²‖χ₁‖² = ‖X‖² + ‖Y‖²`;
+by (5.4.a) `‖X‖² ≥ ‖χ‖²`, so `‖Y‖² ≤ a²‖χ₁‖²`").  It follows directly from the total-norm
+identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` and (5.4.a) `‖χ‖² ≤ ‖X‖²`, with `ψ = a·χ₁` in the
+application.  Stated for the general `ψ` of the (5.4) decomposition. -/
+theorem inner_self_Y_re_le_inner_self_psi
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    (ClassFunction.inner D.Y D.Y).re ≤ (ClassFunction.inner ψ ψ).re := by
+  have htotal : (ClassFunction.inner χ χ).re + (ClassFunction.inner ψ ψ).re =
+      (ClassFunction.inner D.X D.X).re + (ClassFunction.inner D.Y D.Y).re := by
+    have := congrArg Complex.re D.inner_self_chi_add_psi_eq
+    simpa [Complex.add_re] using this
+  have hXge := D.inner_self_chi_re_le_inner_self_X
+  linarith
+
+/-- **Peterfalvi (5.4.b).**  If `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²`
+and `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²`.
+
+The total-norm identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` together with `‖X‖² ≥ ‖χ‖²`
+(5.4.a) and the hypothesis `‖Y‖² ≥ ‖ψ‖²` forces both inequalities to be equalities.
+The norm equality `‖χ‖² = ‖X‖²` reads `∑ coeff α = ∑ (coeff α)²`, so by the tightness
+of integer Cauchy–Schwarz each `coeff α ∈ {0, 1}`; then `E = {α | coeff α = 1}` and
+`X = ∑_{α ∈ E} α`.  The cardinality `|E| = ∑ coeff α = ‖χ‖²` is the form used in
+(5.6.3) to compute `‖χ̄^{τ₂}‖² = |R(χ)| - |E| = ‖χ - χ̄‖² - ‖χ‖² = ‖χ̄‖²`. -/
+theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    (hY : (ClassFunction.inner ψ ψ).re ≤ (ClassFunction.inner D.Y D.Y).re) :
+    (ClassFunction.inner χ χ).re = (ClassFunction.inner D.X D.X).re ∧
+      (ClassFunction.inner ψ ψ).re = (ClassFunction.inner D.Y D.Y).re ∧
+      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α ∧
+        (E.card : ℂ) = ClassFunction.inner χ χ := by
+  classical
+  -- The `.re` total-norm identity.
+  have htotal : (ClassFunction.inner χ χ).re + (ClassFunction.inner ψ ψ).re =
+      (ClassFunction.inner D.X D.X).re + (ClassFunction.inner D.Y D.Y).re := by
+    have := congrArg Complex.re D.inner_self_chi_add_psi_eq
+    simpa [Complex.add_re] using this
+  have hXge := D.inner_self_chi_re_le_inner_self_X
+  -- Both inequalities are forced to equalities.
+  have hχX : (ClassFunction.inner χ χ).re = (ClassFunction.inner D.X D.X).re := by linarith
+  have hψY : (ClassFunction.inner ψ ψ).re = (ClassFunction.inner D.Y D.Y).re := by linarith
+  refine ⟨hχX, hψY, ?_⟩
+  -- Tightness: `∑ coeff = ∑ coeff²` as integers.
+  have hsum_eq : (∑ α ∈ D.imageFamily.imageSet, D.coeff α) =
+      ∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 := by
+    have h1 := hχX
+    rw [D.inner_self_chi_eq_intCast, D.inner_self_X_eq_intCast,
+      Complex.intCast_re, Complex.intCast_re] at h1
+    exact_mod_cast h1
+  have hcoeff01 : ∀ α ∈ D.imageFamily.imageSet, D.coeff α = 0 ∨ D.coeff α = 1 :=
+    (finset_sum_eq_sum_sq_iff D.imageFamily.imageSet D.coeff).mp hsum_eq
+  -- `E = {α | coeff α = 1}`.
+  set E := D.imageFamily.imageSet.filter (fun α => D.coeff α = 1) with hE
+  refine ⟨E, Finset.filter_subset _ _, ?_, ?_⟩
+  · -- `X = ∑_{α ∈ E} α`.
+    rw [D.X_eq, hE, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun α hα => ?_
+    rcases hcoeff01 α hα with h0 | h1
+    · rw [h0, if_neg (by norm_num), Int.cast_zero, zero_smul]
+    · rw [h1, if_pos rfl, Int.cast_one, one_smul]
+  · -- `|E| = ∑ coeff α = ‖χ‖²`: on `R(χ)`, `coeff α = (if coeff α = 1 then 1 else 0)`.
+    have hcard : (E.card : ℤ) = ∑ α ∈ D.imageFamily.imageSet, D.coeff α := by
+      rw [hE, Finset.card_filter, Nat.cast_sum]
+      refine Finset.sum_congr rfl fun α hα => ?_
+      rcases hcoeff01 α hα with h0 | h1
+      · rw [h0, if_neg (by norm_num), Nat.cast_zero]
+      · rw [h1, if_pos rfl, Nat.cast_one]
+    rw [D.inner_self_chi_eq_intCast]
+    exact_mod_cast hcard
+
+/-- **Peterfalvi (5.5).**  Applying (5.4) with `ψ = 0`: the hypothesis `‖Y‖² ≥ ‖ψ‖² = 0`
+of (5.4.b) holds automatically (the inner product is positive semidefinite), so `Y = 0`
+and `χ^{τ₁} = X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²`.
+
+`‖ψ‖² = ⟨0, 0⟩ = 0 ≤ ‖Y‖²` feeds (5.4.b), whose norm equality `‖Y‖² = ‖ψ‖² = 0` forces
+`Y = 0` by positive definiteness of `ClassFunction.inner`.  Then
+`χ^{τ₁} = (χ - 0)^{τ₁} = X - Y = X`. -/
+theorem eq_sum_of_psi_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0) :
+    D.Y = 0 ∧ D.tau1 χ = D.X ∧
+      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α ∧
+        (E.card : ℂ) = ClassFunction.inner χ χ := by
+  -- `‖ψ‖² = ‖0‖² = 0 ≤ ‖Y‖²` by positive semidefiniteness.
+  have hψY : (ClassFunction.inner (0 : ClassFunction L ℂ) 0).re ≤
+      (ClassFunction.inner D.Y D.Y).re := by
+    rw [ClassFunction.inner_zero_left, Complex.zero_re]
+    exact inner_self_re_nonneg D.Y
+  obtain ⟨_, hYnorm, E, hEsub, hXsum, hEcard⟩ := D.norm_eq_and_X_eq_sum_of_norm_Y_ge hψY
+  -- `‖Y‖² = ‖0‖² = 0`, so `Y = 0` by positive definiteness.
+  have hY0 : D.Y = 0 := by
+    apply eq_zero_of_inner_self_re_eq_zero
+    rw [← hYnorm, ClassFunction.inner_zero_left, Complex.zero_re]
+  -- `χ^{τ₁} = (χ - 0)^{τ₁} = X - Y = X`.
+  have hτ1χ : D.tau1 χ = D.X := by
+    have := D.tau1_image
+    rw [sub_zero] at this
+    rw [this, hY0, sub_zero]
+  exact ⟨hY0, hτ1χ, E, hEsub, hXsum, hEcard⟩
+
+end CharacterPsiDecomposition
+
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
 isometric extension on `Z[S]` that agrees with `τ` on `Z[S,A]`. -/
 structure IsCoherent (τ : IntegralCharacterMap L G)
@@ -512,5 +972,243 @@ theorem difference_images_inner_eq_zero_of_inner_pair
     (hyp.difference_images_orthogonal_of_inner_pair hφ hχ hφχ hφχ_conj)
 
 end Hypothesis
+
+/-! ### Peterfalvi (5.6): the coherence-union theorem
+
+`S₁ = {χ₁,…,χₙ}` is a conjugation-closed coherent subset of `S` and `{χ, χ̄}` is disjoint
+from `S₁` with `χ₁(1) ∣ χ(1)` (write `χ(1) = a·χ₁(1)`).  Under the degree-ratio inequality
+`2·χ(1)·χ₁(1) < ∑ᵢ χᵢ(1)²/‖χᵢ‖²`, the union `S₁ ∪ {χ, χ̄}` is coherent.
+
+The proof runs through the (5.4)/(5.5) decomposition machinery: writing
+`(χ - a·χ₁)^τ = X - Y` against the orthonormal `R(χ)`, the inequality forces the integer
+coefficient `λ` of the orthogonal part `Y` to vanish (5.6.2), so `Y = a·χ₁^{τ₁}` (5.6.1) and
+`X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²` (5.5/5.4.b); the extension `τ₂` with
+`χ^{τ₂} = X`, `χ̄^{τ₂} = X - (χ - χ̄)^τ` is then the coherence witness. -/
+
+/-- **Peterfalvi (5.6.2): the integer-forcing core.**
+
+The quadratic inequality produced by the (5.6.2) norm computation forces `λ = 0`.  Concretely:
+if `D` is a positive rational, `z ≥ 0`, `0 ≤ a`, the strict degree-ratio bound `2·a < D` holds,
+and the integer `λ` satisfies `λ²·D - 2·λ·a + z ≤ 0`, then `λ = 0`.
+
+This is exactly the step `λ² - bλ ≤ 0`, `0 < b < 1` (with `b = 2a/D`) `⟹ λ = 0` of the text,
+kept division-free: the strict bound `2a < D` is the `b < 1` hypothesis and `0 ≤ a`, `0 < D`
+give `0 < b`.  The slack term `z = ‖Z‖² ≥ 0` is carried so the caller need not drop it first. -/
+theorem int_eq_zero_of_sq_mul_le_of_two_mul_lt
+    {lam : ℤ} {D a z : ℚ}
+    (hD : 0 < D) (hz : 0 ≤ z) (ha : 0 ≤ a) (hbnd : 2 * a < D)
+    (hquad : (lam : ℚ) ^ 2 * D - 2 * (lam : ℚ) * a + z ≤ 0) :
+    lam = 0 := by
+  -- From `λ²·D - 2λa + z ≤ 0` and `z ≥ 0`: `λ²·D ≤ 2λa`.
+  have hcore : (lam : ℚ) ^ 2 * D ≤ 2 * (lam : ℚ) * a := by linarith
+  -- `λ ≠ 0` is impossible.
+  by_contra hne
+  have hne' : lam ≠ 0 := hne
+  -- WLOG via cases on the sign of `λ`.
+  rcases lt_trichotomy lam 0 with hneg | hzero | hpos
+  · -- `λ < 0`: then `2λa ≤ 0 ≤ λ²·D` with `λ²·D > 0`, contradiction.
+    have hlamR : (lam : ℚ) < 0 := by exact_mod_cast hneg
+    have hsq_pos : 0 < (lam : ℚ) ^ 2 := by positivity
+    have hlhs_pos : 0 < (lam : ℚ) ^ 2 * D := mul_pos hsq_pos hD
+    have hrhs_nonpos : 2 * (lam : ℚ) * a ≤ 0 := by nlinarith [hlamR, ha]
+    linarith
+  · exact hne' hzero
+  · -- `λ > 0`: divide `λ²·D ≤ 2λa` by `λ > 0` to get `λ·D ≤ 2a < D`, so `λ < 1`, contradiction.
+    have hlamR : (0 : ℚ) < (lam : ℚ) := by exact_mod_cast hpos
+    have hlam1 : (1 : ℚ) ≤ (lam : ℚ) := by
+      have : (1 : ℤ) ≤ lam := hpos
+      exact_mod_cast this
+    -- `λ²·D = λ·(λ·D)` and `2λa = λ·(2a)`, cancel one `λ`.
+    have hcancel : (lam : ℚ) * D ≤ 2 * a := by
+      have h2 : (lam : ℚ) * ((lam : ℚ) * D) ≤ (lam : ℚ) * (2 * a) := by nlinarith [hcore]
+      exact le_of_mul_le_mul_left h2 hlamR
+    -- But `λ ≥ 1` gives `D ≤ λ·D ≤ 2a < D`, contradiction.
+    have hDle : D ≤ (lam : ℚ) * D := by nlinarith [hlam1, hD]
+    linarith
+
+namespace CharacterPsiDecomposition
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.2) quadratic bound.**  Suppose the orthogonal part `Y` of the (5.4)
+decomposition is written against an **orthogonal family** `v : ι → CF(G)` (indexed over
+`s`, with real gram `⟨v i, v j⟩ = if i = j then m i else 0`) plus a residual `Z` orthogonal
+to the family, with real coefficients `c`:
+
+`Y = (∑ i ∈ s, (c i) • v i) + Z`.
+
+Then `∑ i ∈ s, (c i)² · m i + ‖Z‖² ≤ ‖ψ‖²`.
+
+This is the geometric half of (5.6.2): the Pythagoras expansion of `‖Y‖²` against the
+orthogonal family, combined with the opening bound `‖Y‖² ≤ ‖ψ‖²` (`inner_self_Y_re_le_inner_self_psi`).
+The arithmetic half — substituting the (5.6.1) coefficients and forcing the integer `λ = 0` —
+is `int_eq_zero_of_sq_mul_le_of_two_mul_lt`. -/
+theorem sum_sq_mul_add_normSq_Z_le
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {ι : Type*} (s : Finset ι) (v : ι → ClassFunction G ℂ) (c m : ι → ℝ)
+    (Z : ClassFunction G ℂ)
+    (hY : D.Y = (∑ i ∈ s, (c i : ℂ) • v i) + Z)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (v i) (v j) =
+      if i = j then (m i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (v i) = 0) :
+    (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re ≤
+      (ClassFunction.inner ψ ψ).re := by
+  have hpyth := inner_self_orthogonalSum_add_re (G := G) s v c m Z horth hZ
+  have hYnorm : (ClassFunction.inner D.Y D.Y).re =
+      (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re := by
+    rw [hY]; exact hpyth
+  have hbound := D.inner_self_Y_re_le_inner_self_psi
+  rw [hYnorm] at hbound
+  exact hbound
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.2) capstone: `λ = 0` and `Z = 0`.**
+
+Composes the geometric half (`sum_sq_mul_add_normSq_Z_le`) and the arithmetic half
+(`int_eq_zero_of_sq_mul_le_of_two_mul_lt`).  The (5.6.1) decomposition writes the orthogonal
+part as
+
+`Y = (∑ i ∈ s, (a·[i = i₁] - λ·r i) • v i) + Z`,
+
+against the orthogonal family `v i` (real gram `m i = ‖χ_i‖²`, `v i = χ_i^{τ₁}`) with `Z`
+orthogonal to the family, where `r i = a_i / ‖χ_i‖²`, `i₁` indexes `χ₁`, and `ψ = a·χ₁` (so
+`‖ψ‖² = a²·m i₁`, hypothesis `hψ`) with `a₁ = 1` (so `r i₁ · m i₁ = 1`, hypothesis `hr₁`).
+
+The Pythagoras expansion gives `∑ (a·[i=i₁] - λ·r i)²·m i + ‖Z‖² ≤ ‖ψ‖² = a²·m i₁`; the
+algebraic identity collapses the left sum to `a²·m i₁ - 2·a·λ + λ²·D` with
+`D = ∑ (r i)²·m i`, so `λ²·D - 2·λ·a + ‖Z‖² ≤ 0`.  Hypothesis (c) `2·a < D` then forces
+`λ = 0` (`int_eq_zero_of_sq_mul_le_of_two_mul_lt`), and feeding `λ = 0` back gives `‖Z‖² ≤ 0`,
+hence `Z = 0` by positive definiteness. -/
+theorem lambda_eq_zero_and_Z_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {ι : Type*} (s : Finset ι) (i₁ : ι) (hi₁ : i₁ ∈ s)
+    (a : ℝ) (lam : ℤ) (Z : ClassFunction G ℂ)
+    (vc : ι → ClassFunction G ℂ) (mc : ι → ℝ) (rc : ι → ℝ)
+    (hY : D.Y = (∑ i ∈ s, ((a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i : ℝ) : ℂ) • vc i)
+      + Z)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (vc i) (vc j) =
+      if i = j then (mc i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (vc i) = 0)
+    (hψ : (ClassFunction.inner ψ ψ).re = a ^ 2 * mc i₁)
+    (hr₁ : rc i₁ * mc i₁ = 1)
+    (ha : 0 ≤ a)
+    (hD : 2 * a < ∑ i ∈ s, (rc i) ^ 2 * mc i) :
+    lam = 0 ∧ Z = 0 := by
+  classical
+  -- Geometric half: `∑ (c i)²·m i + ‖Z‖² ≤ ‖ψ‖²`.
+  have hgeo := D.sum_sq_mul_add_normSq_Z_le s vc
+    (fun i => a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) mc Z hY horth hZ
+  -- Algebraic collapse of the left sum.
+  have halg : (∑ i ∈ s, (a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) ^ 2 * mc i)
+      = a ^ 2 * mc i₁ - 2 * a * (lam : ℝ) * (rc i₁ * mc i₁)
+        + (lam : ℝ) ^ 2 * ∑ i ∈ s, (rc i) ^ 2 * mc i := by
+    have key : ∀ i ∈ s,
+        (a * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i) ^ 2 * mc i
+        = (if i = i₁ then (a ^ 2 * mc i₁ - 2 * a * (lam : ℝ) * (rc i₁ * mc i₁)) else 0)
+          + (lam : ℝ) ^ 2 * ((rc i) ^ 2 * mc i) := by
+      intro i hi
+      by_cases h : i = i₁
+      · subst h; rw [if_pos rfl, if_pos rfl]; ring
+      · rw [if_neg h, if_neg h]; ring
+    rw [Finset.sum_congr rfl key, Finset.sum_add_distrib, Finset.sum_ite_eq' s i₁,
+      if_pos hi₁, ← Finset.mul_sum]
+  -- Substitute `r i₁ · m i₁ = 1` and `‖ψ‖² = a²·m i₁`; obtain the quadratic `≤ 0`.
+  set Dsum := ∑ i ∈ s, (rc i) ^ 2 * mc i with hDsum
+  have hquad : (lam : ℝ) ^ 2 * Dsum - 2 * (lam : ℝ) * a + (ClassFunction.inner Z Z).re ≤ 0 := by
+    rw [halg, hr₁, hψ, mul_one] at hgeo
+    nlinarith [hgeo]
+  -- Integer forcing (cast to ℚ) gives `λ = 0`.
+  have hZre_nonneg : (0 : ℝ) ≤ (ClassFunction.inner Z Z).re := inner_self_re_nonneg Z
+  have hlam0 : lam = 0 := by
+    -- Work over ℝ directly: the integer-forcing argument transcribed.
+    by_contra hne
+    rcases lt_trichotomy lam 0 with hneg | hzero | hpos
+    · have hlamR : (lam : ℝ) < 0 := by exact_mod_cast hneg
+      have hsq_pos : 0 < (lam : ℝ) ^ 2 := by positivity
+      have hDpos : 0 < Dsum := by
+        have : (0 : ℝ) ≤ 2 * a := by linarith
+        linarith [hD]
+      nlinarith [mul_pos hsq_pos hDpos, hZre_nonneg, mul_nonneg ha (le_of_lt (neg_pos.mpr hlamR))]
+    · exact hne hzero
+    · have hlam1 : (1 : ℝ) ≤ (lam : ℝ) := by
+        have : (1 : ℤ) ≤ lam := hpos; exact_mod_cast this
+      have hlampos : (0 : ℝ) < (lam : ℝ) := by linarith
+      -- `λ²·D - 2λa + ‖Z‖² ≤ 0`, `‖Z‖² ≥ 0` ⟹ `λ²·D ≤ 2λa`, cancel `λ` ⟹ `λ·D ≤ 2a < D`.
+      have hcore : (lam : ℝ) ^ 2 * Dsum ≤ 2 * (lam : ℝ) * a := by linarith
+      have hcancel : (lam : ℝ) * Dsum ≤ 2 * a := by
+        have h2 : (lam : ℝ) * ((lam : ℝ) * Dsum) ≤ (lam : ℝ) * (2 * a) := by nlinarith [hcore]
+        exact le_of_mul_le_mul_left h2 hlampos
+      nlinarith [hcancel, hlam1, hD]
+  refine ⟨hlam0, ?_⟩
+  -- Feed `λ = 0` back: `‖Z‖² ≤ 0`, hence `Z = 0`.
+  have hZ0 : (ClassFunction.inner Z Z).re ≤ 0 := by
+    rw [hlam0] at hquad; push_cast at hquad; nlinarith [hquad]
+  exact eq_zero_of_inner_self_re_eq_zero (le_antisymm hZ0 hZre_nonneg)
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) conjugate image as a complementary signed sum.**
+Given the (5.4.b)/(5.5) output `X = ∑_{α ∈ E} α` for a subset `E ⊆ R(χ)`, the candidate
+image of `χ̄` under `τ₂`, namely `X - (χ - χ̄)^τ`, equals the **negated** sum over the
+complement `R(χ) - E`:
+
+`X - τ(χ - χ̄) = -∑_{α ∈ R(χ) - E} α`.
+
+Since `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` (the image-family equation) and `E ⊆ R(χ)`, the
+difference telescopes to the complement. -/
+theorem conjImage_eq_neg_sum_sdiff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    D.X - τ (χ - χ.conj) = -(∑ α ∈ D.imageFamily.imageSet \ E, α) := by
+  classical
+  rw [hX, D.imageFamily.image_eq]
+  have h := Finset.sum_sdiff (s₁ := E) (s₂ := D.imageFamily.imageSet) hE (f := fun a => a)
+  rw [← h]; abel
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) norm of the conjugate image:** `‖X - (χ - χ̄)^τ‖² = |R(χ)| - |E|`.
+With `X = ∑_{α ∈ E} α` (`E ⊆ R(χ)`), the candidate `χ̄^{τ₂} = X - (χ - χ̄)^τ` is the negated
+sum over `R(χ) - E`, whose squared norm is the cardinality `|R(χ) - E| = |R(χ)| - |E|` by
+orthonormality of `R(χ)`.  This is the computation
+`‖χ̄^{τ₂}‖² = |R(χ) - E| = ‖χ - χ̄‖² - ‖χ‖² = ‖χ̄‖²` of the text. -/
+theorem inner_self_conjImage_eq_card_sdiff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) =
+      ((D.imageFamily.imageSet.card : ℤ) - (E.card : ℤ) : ℂ) := by
+  classical
+  have horth' : ∀ a ∈ D.imageFamily.imageSet \ E, ∀ b ∈ D.imageFamily.imageSet \ E,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 :=
+    fun a ha b hb => D.imageFamily.orthonormal a (Finset.mem_sdiff.mp ha).1 b
+      (Finset.mem_sdiff.mp hb).1
+  rw [D.conjImage_eq_neg_sum_sdiff hE hX, ClassFunction.inner_neg_left,
+    ClassFunction.inner_neg_right, neg_neg,
+    inner_self_sum_orthonormal_eq_card horth', Finset.card_sdiff_of_subset hE]
+  have hle : E.card ≤ D.imageFamily.imageSet.card := Finset.card_le_card hE
+  push_cast [Nat.cast_sub hle]
+  ring
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) orthogonality `⟨X, χ̄^{τ₂}⟩ = 0`.**  The candidate images
+`χ^{τ₂} = X = ∑_{α ∈ E} α` and `χ̄^{τ₂} = X - (χ - χ̄)^τ = -∑_{α ∈ R(χ) - E} α` are
+orthogonal: their inner product is a cross term over the disjoint subsets `E` and
+`R(χ) - E` of the orthonormal family `R(χ)`, hence `0`. -/
+theorem inner_X_conjImage_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0 := by
+  classical
+  rw [D.conjImage_eq_neg_sum_sdiff hE hX, ClassFunction.inner_neg_right, hX,
+    inner_sum_orthonormal_eq_zero_of_disjoint hE (Finset.sdiff_subset)
+      (Finset.disjoint_sdiff) D.imageFamily.orthonormal, neg_zero]
+
+end CharacterPsiDecomposition
 
 end OddOrder.Peterfalvi.S07

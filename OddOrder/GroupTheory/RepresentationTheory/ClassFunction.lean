@@ -308,6 +308,16 @@ def inner [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) : k :=
     (Nat.card G : k) * inner φ ψ = innerSum φ ψ := by
   rw [inner, ← mul_assoc, mul_invOf_self, one_mul]
 
+/-- If two class functions have disjoint supports, their unscaled inner sum vanishes:
+every summand `φ g * star (ψ g)` is zero because `g` lies outside at least one support. -/
+theorem innerSum_eq_zero_of_disjoint_support {φ ψ : ClassFunction G k}
+    (h : Disjoint φ.support ψ.support) : innerSum φ ψ = 0 := by
+  refine Finset.sum_eq_zero fun g _ => ?_
+  by_cases hφ : g ∈ φ.support
+  · have hψ : g ∉ ψ.support := Set.disjoint_left.mp h hφ
+    rw [show ψ g = 0 from not_not.mp hψ, star_zero, mul_zero]
+  · rw [show φ g = 0 from not_not.mp hφ, zero_mul]
+
 @[simp] theorem innerSum_zero_left (ψ : ClassFunction G k) :
     innerSum (0 : ClassFunction G k) ψ = 0 := by
   simp [innerSum]
@@ -353,6 +363,15 @@ theorem innerSum_sub_right (φ ψ₁ ψ₂ : ClassFunction G k) :
 @[simp] theorem inner_zero_right [Invertible (Nat.card G : k)] (φ : ClassFunction G k) :
     inner φ (0 : ClassFunction G k) = 0 := by
   simp [inner]
+
+/-- **Peterfalvi §2 (orthogonality of disjointly-supported class functions).**
+If `φ` and `ψ` have disjoint supports then `⟨φ, ψ⟩_G = 0`. This is the basic
+vanishing used throughout the Dade isometry / coherence arguments: characters
+supported on disjoint sets of group elements are orthogonal. -/
+theorem inner_eq_zero_of_disjoint_support [Invertible (Nat.card G : k)]
+    {φ ψ : ClassFunction G k} (h : Disjoint φ.support ψ.support) :
+    inner φ ψ = 0 := by
+  rw [inner_eq_inv_card_mul_innerSum, innerSum_eq_zero_of_disjoint_support h, mul_zero]
 
 theorem inner_add_left [Invertible (Nat.card G : k)]
     (φ₁ φ₂ ψ : ClassFunction G k) :

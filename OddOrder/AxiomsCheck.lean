@@ -4,12 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Lean
+import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -22,7 +26,9 @@ import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -579,10 +585,45 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
+-- RepresentationTheory (Peterfalvi (1.5.d), Burnside degree-sum): the diagonal column relation
+-- at `g = 1` gives `∑_{χ ∈ Irr G} χ(1)² = |G|` and, restricted to nontrivial characters,
+-- `∑_{χ ≠ 1} χ(1)² = |G| - 1` (issue 0044 building block for §9 (7.8)).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumIrreducibleDegreeSq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNontrivialIrreducibleDegreeSq
+-- RepresentationTheory (Peterfalvi (6.7.1), orbit-counting primitive): a finite group acting freely
+-- (all stabilizers trivial / no non-identity element fixes a point) on a finite set divides its
+-- cardinality. Free-action decomposition `β ≃ (β/Γ) × Γ`. This is the missing counting primitive
+-- behind the fixed-point-free `P`-action of (6.7.1).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_of_stabilizer_eq_bot
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_of_no_nontrivial_fixed
+-- RepresentationTheory (Peterfalvi (6.7.1), orbit-counting half): a subgroup `P ≤ G` acting
+-- fixed-point-freely by conjugation on the pair set `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}` has
+-- `|P| ∣ a_{ijs}|C_s|` (= `classSumCoeff Ci Cj Cs`). The residual content of (6.7.1) is the
+-- group-theoretic verification of fixed-point-freeness (TI-subset + Sylow-in-`L`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_classSumCoeff_of_fixedPointFree
+-- RepresentationTheory (Peterfalvi (6.7.1), p-element step): a p-element of `N_G(P)` lies in the
+-- Sylow p-subgroup `P` (P is normal, hence the unique Sylow p in its normalizer).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mem_sylow_of_mem_normalizer_of_isPGroup
+-- RepresentationTheory (Peterfalvi (6.7.1), fixed-point-free hypothesis): under (6.7)'s setup
+-- (P Sylow p in L = N_G(P), P^# TI-subset, Z ≤ P normal in L; C_i, C_j meet Z^#, C_s ∩ Z = ∅),
+-- `P` acts fixed-point-freely by conjugation on `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}`. Combined
+-- with `card_dvd_classSumCoeff_of_fixedPointFree` this gives the full (6.7.1) `|P| ∣ a_{ijs}|C_s|`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.fixedPointFree_classPair_of_isTISubset
 -- RepresentationTheory (Peterfalvi §3 (1.1), [Is] Thm 6.32): Brauer's permutation lemma is
 -- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
 -- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.brauer_permutation_lemma'
+-- RepresentationTheory (Peterfalvi §3 (1.1), pointwise): in a finite group of odd order a
+-- nontrivial irreducible character is not real (`χ̄ ≠ χ`). Unconditional parity core, the
+-- common unblocker for §3 (1.1) and §9 (7.9).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+-- Peterfalvi §3 (1.1), conjugate-difference (nondegeneracy) form for §7: in a finite group of
+-- odd order, the conjugate difference `χ - χ̄` of a nontrivial irreducible character is nonzero.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_of_ne_trivial_of_odd_card
+-- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
+-- characters contains no real class function. Discharges the `no_real_characters` field of the §7
+-- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.hasNoRealCharacters_nontrivialIrreducibleClassFunctions
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
@@ -596,11 +637,144 @@ set_option linter.style.longLine false in
 -- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (2.10.3) transversal value): the induction sum at `g`
+-- collapses to a sum over only those `x` with `x⁻¹ g x ∈ H` (off-support terms vanish via
+-- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (Peterfalvi (2.10.1) L-conjugacy invariance): inducing from a conjugate
+-- subgroup `H^ℓ = H.map (MulAut.conj ℓ)` with the transported class function `transportConj ℓ θ`
+-- equals inducing from `H`.  Re-index the induction sum by `x ↦ x * ℓ` (`induceTerm_transportConj`);
+-- the `|H^ℓ| = |H|` normalization factors agree by `Subgroup.card_map_of_injective`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_map_conj
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_map_conj
 -- RepresentationTheory (Peterfalvi (2.9)): pullback `φ ∘ f` along a group hom `f : H →* G`
 -- preserves virtual characters (the "Res along a homomorphism" generalization of
 -- `restrict_mem_ZIrr`).  Same span-induction proof via `character_mem_ZIrr (ρ.comp f)`; this
 -- is the `α_B = α ∘ f_B ∈ ℤ[Irr M(B)]` step of the Dade-map construction.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.compHom_mem_ZIrr
+-- RepresentationTheory (Peterfalvi §2 orthogonality): class functions with disjoint supports
+-- are orthogonal (`⟨φ, ψ⟩_G = 0`). Each summand `φ g · star (ψ g)` vanishes since `g` lies
+-- outside at least one support. Basic vanishing for the Dade isometry / §9 coherence arguments.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.inner_eq_zero_of_disjoint_support
+-- RepresentationTheory (Isaacs §3 (3.6)/(3.7); Peterfalvi (6.7.2)/(6.7.3)): the class-sum algebra.
+-- `classSum_mul` expresses `C_i · C_j = ∑_s m_s · C_s` with the per-element factorization counts
+-- `m_s` (constant on each class), and `centralCharacterOfRep_classSum_mul` transports this through
+-- the central character `ω_ρ`.  The keystone `centralCharacterOfRep_classSum_isIntegral`: `ω_ρ(C)`
+-- is an algebraic integer (module-finite ℤ-subalgebra of ℂ generated by the `ω_ρ(C_s)`), the
+-- structure-constant integrality used in the `mod |P|` congruence (6.7.3).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSum_mul
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_isIntegral
+-- Peterfalvi (6.7.2) (product rule mod |P|): `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{C_s∩Z≠∅} ψ(1)·a_{ijs}·ω(C_s)`,
+-- i.e. classes `C_s` disjoint from `Z` drop out modulo `m` once `m ∣ a_{ijs}|C_s|` for those classes
+-- (the (6.7.1) input, `card_dvd_classSumCoeff_of_fixedPointFree`).  Each dropped term equals
+-- `(a_{ijs}|C_s|)·χ_ρ(C_s.out)` (`character_one_mul_coeff_mul_centralChar`, via the pair-count
+-- identity `coeff_mul_card_eq_classSumCoeff`), an algebraic-integer multiple of `m`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.coeff_mul_card_eq_classSumCoeff
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_one_mul_coeff_mul_centralChar
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong
+-- Peterfalvi (6.7.2) geometric form: the same congruence with the abstract divisibility hypothesis
+-- discharged from the (6.7) setup (Sylow `P`, `Z ⊴ N_G(P)`, `P^#` TI) via (6.7.1)
+-- (`fixedPointFree_classPair_of_isTISubset` + `card_dvd_classSumCoeff_of_fixedPointFree`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong_of_isTISubset
+-- Peterfalvi (6.7.3) structure-constant atoms (the identity-class coefficients `a_{ij0}`):
+-- `classSumCoeff_one_eq_zero` is `a_{110} = 0` (no pair `(u,u⁻¹)` with both `u, u⁻¹ ∈ C₁` when
+-- `⟦z⁻¹⟧ ≠ ⟦z⟧`), and `classSumCoeff_one_eq_card` is `a_{120} = |C₁|` (the pairs with product `1`
+-- in `C₁ × C₁⁻¹` are exactly `(u, u⁻¹)`, `u ∈ C₁`).  These discharge two of the (6.7.3) atoms.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_card
+-- The `z`-keyed instances consumed by (6.7.3): `classSumCoeff_self_one_eq_zero` (`a_{110} = 0`
+-- with `C₁ = ⟦z⟧`, sole hypothesis the real-class atom `⟦z⁻¹⟧ ≠ ⟦z⟧`) and
+-- `classSumCoeff_self_inv_one_eq_card` (`a_{120} = |C₁|` with `C₂ = ⟦z⁻¹⟧`, *unconditional* — the
+-- inverse-class membership `mk u = ⟦z⟧ → mk u⁻¹ = ⟦z⁻¹⟧` is `mk_inv_eq_of_mk_eq`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_eq_of_mk_eq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_inv_one_eq_card
+-- Peterfalvi (6.7.3) real-class atom (TI-reduction, `RealClassTISubset.lean`): the sole remaining
+-- hypothesis of `classSumCoeff_self_one_eq_zero` — `⟦z⁻¹⟧ ≠ ⟦z⟧` — discharged from the (6.7) setup
+-- (`P ∈ Syl_p`, `L = N_G(P)` of *odd* order, `P^#` TI-subset).  `not_isConj_inv_of_isTISubset`
+-- proves `¬ IsConj z⁻¹ z` (a `G`-conjugator of `z⁻¹` to `z` lands in `L` by TI, so `z` is
+-- `L`-conjugate to `z⁻¹`, forcing `z = 1` by `eq_one_of_isConj_inv_of_odd_card`); the class form
+-- `mk_inv_ne_self_of_isTISubset` is what plugs into `classSumCoeff_self_one_eq_zero`.  This is
+-- Peterfalvi's "since `|L|` is odd, `z⁻¹` is not conjugate to `z` in `G`" ((6.7.3), proof opening).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.not_isConj_inv_of_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_ne_self_of_isTISubset
+-- The `a_{110} = 0` structure constant with its real-class hypothesis discharged from the (6.7)
+-- setup: `classSumCoeff_self_one_eq_zero_of_isTISubset` feeds `mk_inv_ne_self_of_isTISubset` into
+-- `classSumCoeff_self_one_eq_zero`, so the `a_{110} = 0` input to (6.7.3) is hypothesis-free under
+-- `P ∈ Syl_p(G)`, `Odd |N_G(P)|`, `P^#` TI-subset, `z ∈ P ∖ {1}`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero_of_isTISubset
+-- Peterfalvi (6.7.3) coprimality atom `(|C₁|, p) = 1`: `card_class_eq_index_centralizer` is the
+-- orbit-stabilizer identity `|⟦z⟧| = [G : C_G(z)]` (conjugation action of `ConjAct G`), and
+-- `coprime_card_class_card_sylow` derives `IsCoprime |⟦z⟧| |P|` from `P ≤ C_G(z)` (so
+-- `[G:C_G(z)] ∣ [G:P]`, `p ∤ [G:P]`) and `|P| = p^k`.  Discharges the last (6.7.3) atom.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_class_eq_index_centralizer
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.coprime_card_class_card_sylow
+-- Peterfalvi (6.7.3) central-character value on the identity class: `ω_ρ(⟦1⟧) = 1` (the identity
+-- class is the singleton `{1}`, so `ω = 1·χ(1)/χ(1) = 1`).  This is the `ω(C₀) = 1` ingredient of
+-- the right-hand-sum collapse `∑ → ψ(1)(a_{ij0} + a_{ij}α)` in (6.7.2)/(6.7.3).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_one
+-- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
+-- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
+-- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence
+-- `a₁₁ ≡ 1 + a₁₂` by `ψ(z)` and subtract.  The group-theoretic atoms (`a_{110}=0`, `a_{120}=|C₁|`,
+-- `z⁻¹` not `G`-conjugate to `z`, `ω(C_s)=α` constant) feed in as hypotheses (the (6.7.1) setup).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_combine
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_cancel
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_final
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673
+-- The explicit character-value form `|C| · χ_ρ(g) / χ_ρ(1) ∈ ℤ̄` (algebraic integer), obtained
+-- from the keystone via `centralCharacterOfRep_classSum` + `sum_character_eq_card_mul` + `char_one`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_card_mul_character_div
+-- RepresentationTheory (Isaacs §3 (3.7) preamble): character values χ_ρ(g) = trace(ρ g) are
+-- algebraic integers — `ρ g` has finite order (`g^|G| = 1`), the charpoly splits over ℂ, the trace
+-- is the sum of its roots, and each root μ is a root of unity (μ^|G| = 1, root of `X^|G| - 1`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_isIntegral
+-- RepresentationTheory: a rational algebraic integer is an integer — `ℤ` is integrally closed (UFD),
+-- so transferring `IsIntegral ℤ (q : ℂ)` down the injection `ℚ ↪ ℂ` yields `∃ n : ℤ, (q : ℂ) = n`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_rat_imp_int
+
+-- Algebra (Peterfalvi, proof of (6.7), pp. 31–32): the algebraic-integer congruence `α ≡ β (mod n)`
+-- on ℂ — `(α - β)/n ∈ ℤ̄`.  An additive congruence: reflexive/symmetric/transitive, closed under
+-- addition (`Cong.add`) and under scaling one side by an algebraic integer (`Cong.smul_left`, the
+-- multiplicative step of (6.7.2)/(6.7.3)).  Introduction forms `cong_of_exists_isIntegral`/`.of_int`.
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.trans
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.add
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.smul_left
+#assert_only_allowed_axioms OddOrder.AlgInt.cong_of_exists_isIntegral
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.of_int
+-- The "divide by |C₁|" cancellation of (6.7.3): a congruence `c·a ≡ c·b (mod n)` with `c` coprime
+-- to `n` and `a`, `b` algebraic integers gives `a ≡ b (mod n)` (Bézout `u·c + v·n = 1`).
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.intMul_cancel_left
+-- RepresentationTheory (Isaacs Thm 3.11): for an irreducible complex representation ρ of a finite
+-- group G, the degree χ_ρ(1) = dim V divides |G|.  The first orthogonality relation regrouped over
+-- conjugacy classes expresses |G|/χ(1) = ∑_C ω_ρ(C)·χ((g_C)⁻¹) as a sum of products of algebraic
+-- integers, hence a rational algebraic integer ⇒ integer (the three linked pieces above).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_centralCharacter_mul_character_inv_mul_character_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card
+-- ClassFunction-level bridge: an irreducible character's value at 1 is the witnessing
+-- representation's dimension, and (Isaacs Thm 3.11) that natural number divides |G|.  This recasts
+-- `finrank_dvd_card` through `φ 1`, which is definitionally Peterfalvi's `characterDegree φ`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_finrank_charValue_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card
+-- Peterfalvi-side consumer: the same divisibility on the `IrreducibleCharacter G` subtype, phrased
+-- through `characterDegree` (= `χ 1`), the degree datum used throughout Peterfalvi §6.7.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card
+-- Peterfalvi (5.6) degree-ratio integrality ("Set χ(1) = a·χ₁(1)"): when χ₁'s natural degree
+-- divides χ's, the quotient `a` is a *positive* natural with `characterDegree χ = a·characterDegree χ₁`.
+-- This is the honest §5.6 opening step — divisibility (hyp (5.6)(b)) is essential, not scaffolding.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatio_of_dvd
+-- Corollary (Isaacs Cor. 3.12): the degree of an irreducible representation of a finite p-group is
+-- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_finrank_eq_prime_pow_of_isPGroup
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
@@ -623,6 +797,162 @@ set_option linter.style.longLine false in
 -- (2.6.a) isometry into an actual `DadeIsometryData` (no longer an interface assumption).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.isDadeMap_dadeMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeIsometryData
+-- Peterfalvi §4 (2.5) uniqueness + (2.11) restriction compatibility of the explicit Dade map:
+-- the (2.5) equations pin the map down (`IsDadeMap.unique`), so the constructed Dade map of the
+-- restricted hypothesis is the domain-restriction of the constructed Dade map (`dadeMap_restrict`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.IsDadeMap.unique
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_restrict
+-- Peterfalvi §4 (2.10.1) Dade-specific conjugation: `M(B^x) = M(B)^x`, with the factor
+-- conjugations `H(B^x) = H(B)^x` and `N_L(B^x) = N_L(B)^x` (via (2.4.a) `HConjInvariant`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.hIntersection_conjFinset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.nLStabilizerIn_conjFinset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.mBSubgroup_conjFinset
+-- Peterfalvi §4 (2.10.1) Dade-specific induced-character invariance:
+-- `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B`, via the transport `α_{B^x} = transportConj x α_B`
+-- (`alphaB_conjFinset_eq_transportConj`) and the generic `induce_map_conj`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.alphaB_conjFinset_eq_transportConj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_conjFinset
+-- Peterfalvi §4 (2.10.3) pointwise value of `Ind_{M(B)}^G α_B`, transversal half:
+-- `(Ind_{M(B)} α_B)(g) = ⅟|M(B)| · ∑_{x ∈ 𝒜(g,M(B))} induceTerm M(B) α_B x g`
+-- (`induce_alphaB_apply_eq_sum_conjFiber`), and the per-term `α_B(x⁻¹gx) = α(b)` collapse
+-- via the (2.9) defining equation (`exists_nLStabilizerIn_alphaB_induceTerm`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_conjFiber
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.exists_nLStabilizerIn_alphaB_induceTerm
+-- Peterfalvi §4 (2.10.3) vanishing case: if `g ∉ ⋃_a (aH(a))^G` then `(Ind_{M(B)} α_B)(g) = 0`.
+-- Each nonzero summand forces (via the (2.1) keystone `exists_mem_centralizer_conj` and (2.10.2))
+-- `g ∈ (bH(b))^G ⊆ dadeSupport`, contradicting `g ∉ dadeSupport` (`coprime_orderOf_card_hIntersection`
+-- supplies the (2.2.c) coprimality input).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.coprime_orderOf_card_hIntersection
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport
+-- Peterfalvi §4 (2.10.3) value case (N_L(B)-aggregated): `f_B` projects M(B) onto its N_L(B)-factor
+-- with H(B)-coset fibers (`dadeQuotientHom_eq_iff_mem_hIntersection_mul`,
+-- `dadeQuotientHom_mem_nLStabilizerIn`), so `(Ind_{M(B)} α_B)(g) = ⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`
+-- (`induce_alphaB_apply_eq_sum_nLStabilizerIn`): the conjFiber sum regrouped over the component `b`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.dadeQuotientHom_eq_iff_mem_hIntersection_mul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeQuotientHom_mem_nLStabilizerIn
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_nLStabilizerIn
+-- Peterfalvi §4 (2.10.3) value case, support-restricted: when `α ∈ CF(L,A)`, the `N_L(B)`-sum
+-- may be taken over `{b ∈ N_L(B) | b ∈ A}` since terms with `b ∉ A` carry `α(b) = 0`
+-- (`induce_alphaB_apply_eq_sum_nLStabilizerIn_inA`) — first reduction of (2.10.3)'s value formula.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_nLStabilizerIn_inA
+-- Peterfalvi §4 (2.10) `L`-conjugacy transversal `ℬ`: the `conjFinset` action is a `MulAction`
+-- whose stabilizer is `N_L(B)` (`stabilizer_conjFinsetAction`), with `Quotient.out` representatives
+-- `L`-conjugate to their class (`transversalRep_conj`); the orbit-stabilizer weight
+-- `|orbit B|·|N_L(B)| = |L|` (`card_orbit_mul_card_setLStabilizer`) is the (2.10.3) sum normalization.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.stabilizer_conjFinsetAction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.transversalRep_conj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.card_orbit_mul_card_setLStabilizer
+-- Peterfalvi §4 (2.10)/(2.6.b) right-hand-side virtual-character infrastructure: each
+-- inclusion–exclusion summand `Ind_{M(B)}^G α_B` is a virtual character (`induce_alphaB_mem_ZIrr`,
+-- packaged with its own invertibility as `induceAlphaBTerm` / `induceAlphaBTerm_mem_ZIrr`), hence
+-- any ℤ-combination `∑ c_B • Ind_{M(B)} α_B` is one (`zsmul_induceAlphaBTerm_sum_mem_ZIrr`).  The
+-- bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` reduces (2.6.b) to the
+-- (2.10) identity `α^τ = -∑_{B∈ℬ} (-1)^|B| Ind_{M(B)} α_B`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induceAlphaBTerm_mem_ZIrr
+-- (2.10.1) packaged form: the summand `induceAlphaBTerm` is `L`-conjugacy invariant
+-- (`Ind_{M(B^l)} α_{B^l} = Ind_{M(B)} α_B`), the well-definedness fact for the transversal `ℬ` sum.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induceAlphaBTerm_conjFinset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.zsmul_induceAlphaBTerm_sum_mem_ZIrr
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
+-- (2.10) Möbius-assembly primitives: the survivor cardinality `|𝒜(g, K·a)| = |C_G(a)|` for a
+-- subgroup centralized by `a` (`card_conjFiber_coset_eq_card_centralizer`, the (2.1) coset
+-- conjugacy `card_conj_fiber` translated to the conjugating set `𝒜`); the per-component conjugacy
+-- witness `𝒜(g, H(B)b) ≠ ∅ ⇒ ∃c∈H(b), (b·c)~g` (`exists_mem_H_isConj_of_mem_conjFiber_coset`) and
+-- its support corollary (`mem_dadeSupport_of_mem_conjFiber_coset`); and the (2.10.3) value case
+-- `a^L`-specialized: `(Ind α_B)(g) = (α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|`
+-- (`induce_alphaB_apply_eq_alpha_mul_sum_conjL`), dropping the `b ∉ a^L` terms by the conjugacy
+-- witness + (2.4.b) and collapsing `α(b)` to `α(a)`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_eq_card_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.exists_mem_H_isConj_of_mem_conjFiber_coset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_of_mem_conjFiber_coset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_alpha_mul_sum_conjL
+-- conjugation invariance of the conjugating set `|𝒜(g, c·X·c⁻¹)| = |𝒜(g, X)|`
+-- (`card_conjFiber_conj_eq`), the reindexing fact `|𝒜(g, H(B^x)b)| = |𝒜(g, H(B)a)|` used to
+-- collapse the `a^L`-sum (right translation by `c` bijects the conjugating sets).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_conj_eq
+-- (2.1)/(2.10) STEP 2 fiber factorization: the conjugacy-image fiber count
+-- (`card_cosetConjFiber_eq_card_centralizerInf`, each `(c,x) ↦ x⁻¹(c·a)x` fiber over a point of
+-- `K·a` has size `|C|`, via `mem_centralizer_of_coset_conj_eq` rigidity) and the resulting
+-- factorization `|𝒜(g,K·a)|·|C| = |𝒜(g,C·a)|·|K|` (`card_conjFiber_coset_mul_card_centralizerInf`,
+-- `C = K ⊓ C_G(a)`), computed via the bridge set `S = {(y,c,x) | y⁻¹gy = x⁻¹(c·a)x}` both ways
+-- (fiber count over `y`, and the `(y,c,x) ↦ (yx⁻¹,c,x)` bijection freeing `x ∈ K`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_cosetConjFiber_eq_card_centralizerInf
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_mul_card_centralizerInf
+-- (2.10) Möbius cancellation identity (`card_conjFiber_hIntersection_mul_eq`):
+-- `|𝒜(g,H(B)a)|·|H(B∪{a})| = |𝒜(g,H(B∪{a})a)|·|H(B)|` for `a ∈ N_L(B)` — STEP 2 factorization
+-- specialized to `K = H(B)`, `C = C_{H(B)}(a) = H(B∪{a})` by (2.10.2).  Shows the toggle-`a`
+-- summands `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|` for `B` and `B∪{a}` are equal, hence cancel.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_hIntersection_mul_eq
+-- (2.10) STEP 3b, the toggle-`a` Möbius cancellation collapsing `𝒫(a)` to its `B = {a}` survivor:
+-- the Finset `mobiusIndex` `𝒫(a)` (nonempty `B ⊆ A` with `a ∈ N_L(B)`), the summand
+-- `mobiusSummand` `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|`, the pairwise cancellation
+-- `mobiusSummand_add_insert_eq_zero` (`= 0` via `card_conjFiber_hIntersection_mul_eq` + sign flip),
+-- and the involution `sum_mobiusSummand_eq_singleton` (`∑_{𝒫(a)} = mobiusSummand {a}` by
+-- `Finset.sum_involution` on `𝒫(a) \ {{a}}` with `toggleA` `B ↦ B △ {a}`); the survivor
+-- `mobiusSummand_singleton_eq` (`= -|C_L(a)|` via `card_conjFiber_coset_eq_card_centralizer` +
+-- `card_centralizer_eq`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_add_insert_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_eq_singleton
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_singleton_eq
+-- (2.10) STEP 3a, the orbit-averaging of the transversal sum to the powerset
+-- (`sum_transversalRep_eq_sum_div_orbit`: for orbit-constant `h`, `∑_{C∈ℬ} h(rep C) =
+-- ∑_{B⊆A} h B / |orbit B|`, via `Finset.sum_fiberwise_of_maps_to` along `Quotient.mk''`), and the
+-- `b = a^x` reindex via `L`-conjugation invariance of the `𝒫(b)`-sum
+-- (`sum_mobiusSummand_conjFinset`: `∑_{𝒫(a^l)} mobiusSummand (a^l) = ∑_{𝒫(a)} mobiusSummand a`,
+-- a `Finset.sum_bij'` with `B₀ ↦ B₀^l`, summand preserved by `mobiusSummand_conjFinset` =
+-- `card_conjFiber_conj_eq`).  These make the (2.10) RHS sum independent of transversal
+-- representatives and of `b ∈ a^L`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_transversalRep_eq_sum_div_orbit
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_conjFinset
+-- (2.10) STEP 3a per-`B` orbit-weight algebra (`mobiusSummand_orbit_weighted`):
+-- `(-1)^|B|/|orbit B|·(Ind α_B)(g) = (α(a)/|L|)·∑_{b∈N_L(B)∩a^L} (-1)^|B|/|H(B)|·|𝒜(g,H(B)b)|`,
+-- collapsing `1/(|orbit B||M(B)|) = 1/(|L||H(B)|)` via `card_orbit_mul_card_setLStabilizer` +
+-- `card_mBSubgroup` + `card_nLStabilizerIn_eq` (|N_L(B)|=|setLStabilizer B|).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_orbit_weighted
+-- (2.10) STEP 3 final assembly: the per-`B` orbit-weight identity over the fixed `a^L` index
+-- (`mobiusTermCF_div_orbit_eq`, reindexing the inner `b`-sum from the `B`-dependent `N_L(B)`-subtype
+-- to `aOrbitFinset a = a^L` for the `Finset.sum_comm` swap), and the support-side total
+-- (`sum_mobiusTermCF_transversalRep_eq_neg`: `∑_{C∈ℬ} mobiusTermCF(rep C) = -α(a)` via orbit-average
+-- + double-sum swap + survivor collapse `mobiusSummand b' g {b'} = -|C_L(b')|` + the (2.7) count
+-- `sum_card_centralizerIn_eq` giving `∑_{b'∈a^L}|C_L(b')| = |L|`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusTermCF_div_orbit_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusTermCF_transversalRep_eq_neg
+-- (2.10) STEP 4: the pointwise inclusion–exclusion identity `α^τ = -∑_{C∈ℬ} mobiusTermCF(rep C)`
+-- (`dadeMap_eq_neg_sum_mobiusTermCF`, support side = `sum_mobiusTermCF_transversalRep_eq_neg`,
+-- non-support side = `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`), its reindex over the
+-- representative subtype (`sum_mobiusTermCF_transversalRep_eq_sum_subtype`), the (2.6.b) preservation
+-- `PreservesVirtualCharacters (hyp.dadeMap)` (`preservesVirtualCharacters_dadeMap`, via the bridge),
+-- and the honest `FullDadeIsometryData` construction (`fullDadeIsometryData`, = (2.6)).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.preservesVirtualCharacters_dadeMap
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.fullDadeIsometryData
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
@@ -674,9 +1004,68 @@ set_option linter.style.longLine false in
 -- characteristic H = Ω₁(C) (C critical) で [H,G]⊆Z(H), cl≤2, exp=p, C_{Aut G}(H) p-群.
 -- 証明本体は OddOrder.GroupTheory.CriticalSubgroup (Gorenstein Finite Groups Thm 5.3.11+5.3.13).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.thompson_critical_omega
+-- Clifford BLOCKER A (issue 0026): ρ g は simple ℂ[H]-部分加群を simple に送る.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Representation.isSimpleModule_map_conjBySimpleSemilinear
+-- Clifford gap #5 非負半分 (issue 0026): ⟨Res^G_H χ, θ⟩ = dim Hom(σ, ρ|_H) ≥ 0.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_nonneg
+-- Clifford gap #5 完結 (issue 0026): multiplicity ⟨Res^G_H χ, θ⟩ = (k : ℂ), k : ℕ
+-- (整数性 restrictionMultiplicity_int + 非負性 restrictionMultiplicity_nonneg の合成).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_natCast
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
 
 -- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
 -- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
 -- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.
 #assert_only_allowed_axioms OddOrder.GroupTheory.coset_eq_cosetConjImage
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_mem_centralizer_conj
+
+-- Peterfalvi §7 (5.4) gateway (issue 1001, Round-9 Track B): R(χ) を ℤ[Irr G] の
+-- 一般 orthonormal subset へ一般化した OrthonormalCharacterImageFamily と, その上の
+-- (5.4.a) ‖X‖²≥‖χ‖² / (5.4.b) norm 等号 + X=∑_{α∈E}α. 整数 Cauchy-Schwarz +
+-- orthonormal Parseval (ZIrrFourier) で sorry-free.
+-- (5.2.d) gateway の非空性証拠 (2 元 CharacterDifferenceImage → 一般 family).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage
+-- (5.4.a) ‖X‖² ≥ ‖χ‖².
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X
+-- (5.4.b) norm 等号 + X = ∑_{α∈E} α (E ⊆ R(χ), |E| = ‖χ‖²).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.norm_eq_and_X_eq_sum_of_norm_Y_ge
+-- (5.5) ψ=0 の特殊化: Y=0 かつ χ^{τ₁} = ∑_{α∈E} α. ⟨φ,φ⟩ の正定値性
+-- (eq_zero_of_inner_self_re_eq_zero) で ‖Y‖²=0 → Y=0.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
+-- Peterfalvi §7 (5.6.2) integer-forcing + Pythagoras layer (issue 0046):
+-- orthogonal-family Pythagoras `‖∑cᵢ•vᵢ + Z‖² = ∑cᵢ²mᵢ + ‖Z‖²` (ZIrrFourier),
+-- the (5.6.2) opening bound `‖Y‖² ≤ ‖ψ‖²`, the (5.6.2) quadratic bound
+-- `∑cᵢ²mᵢ + ‖Z‖² ≤ ‖ψ‖²`, and the division-free integer-forcing core
+-- `2a < D, λ²D-2λa+z ≤ 0 ⇒ λ = 0`. すべて (5.4)/(5.5) API 直載 sorry-free.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.inner_self_orthogonalSum_add_re
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.sum_sq_mul_add_normSq_Z_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.int_eq_zero_of_sq_mul_le_of_two_mul_lt
+-- (5.6.2) capstone `λ = 0 ∧ Z = 0`: Pythagoras (geometric half) + 整数 forcing (arithmetic
+-- half) + 代数展開 `∑(a·[i=i₁]-λrᵢ)²mᵢ = a²m₁ - 2aλ + λ²D` + 正定値性 を end-to-end 合成。
+-- (5.6.1) 分解データ (構成可能) を消費し (5.6.2) 結論 `Y = a·χ₁^{τ₁}` を出す。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero
+-- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
+-- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
+-- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で
+-- sorry-free; (5.6.3) extension `τ₂` の isometry 検証に直接供給 (大域 isometry 拡張は別途).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.conjImage_eq_neg_sum_sdiff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_conjImage_eq_card_sdiff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_conjImage_eq_zero

@@ -26,13 +26,51 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 - **残: (2.6.b) のみ** = `PreservesVirtualCharacters (dadeMap)`.  道は (2.10) 恒等式
   `dadeMap α = -∑_ℬ (-1)^|B| Ind_{M(B)} α_B` の点別証明 (ℬ 代表系 + (2.10.1) + Möbius 相殺).
   詳細プランは issue 0040「進捗 (4)」.
-- **(2.1) coprime-action coset conjugacy 完成** (`OddOrder/GroupTheory/CoprimeConjugacy.lean`,
-  `coset_eq_cosetConjImage` 集合形 / `exists_mem_centralizer_conj` 存在形, sorry-free).
-  `g` normalizing `H`, `(|H|,orderOf g)=1` ⟹ `Hg = ⋃_{x∈H}(C_H(g)g)^x` (disjoint,
-  `|H:C_H(g)|` 個).  剛性 (`conj_fixes_of_commute` 再利用) + 繊維数え上げ closure;
-  Schur-Zassenhaus 不要.  (2.10.3) Ind 値の `𝒜(g,H(B)b)` 集計 (残作業 #3) で消費する
-  一般 normalizing 版 primitive (従来の `card_conj_fiber` は `a` central 特殊形のみ).
-  外部 6 cite §§6,10,12,15,16 の shared primitive でもある.  issue 0040「進捗 (5)」.
+- **(2.10.1)/(2.10.3) generic 誘導指標インフラ完成** (`InducedCharacter.lean`, 2026-05-30,
+  sorry-free + axiom-clean; issue 0040「進捗 (5)」): `induceSum_apply_eq_sum_filter` /
+  `induce_apply_eq_sum_filter` (= (2.10.3) transversal value, `x⁻¹gx∈H` の x のみ寄与),
+  `induceSum_map_conj` / `induce_map_conj` (= (2.10.1) `Ind_{H^ℓ}(transportConj ℓ θ)=Ind_H θ`),
+  補助 `transportConj` / `induceTerm_transportConj`.  Dade 適用 (H↦M(B), θ↦α_B) + Möbius 相殺は残.
+- **(2.10.1) Dade-specific 完成** (`S04_DadeIsometry.lean`, 2026-05-30, sorry-free + axiom-clean;
+  issue 0040「進捗 (6)」): `conjFinset l B = B^l`, `hIntersection_conjFinset` (H(B^x)=H(B)^x),
+  `nLStabilizerIn_conjFinset` (N_L(B^x)=N_L(B)^x), `mBSubgroup_conjFinset` (M(B^x)=M(B)^x);
+  `alphaB_conjFinset_eq_transportConj` (α_{B^x}=transportConj x α_B, `alphaB_apply_mul`+α の
+  L-class 不変性); **`induce_alphaB_conjFinset`** = `Ind_{M(B^x)} α_{B^x}=Ind_{M(B)} α_B` (本体,
+  `induce_congr_of_subgroup_eq`+generic `induce_map_conj`).  残: (2.10.3) Dade 点別値 →
+  ℬ 代表系 → Möbius 相殺 → `PreservesVirtualCharacters`.
+
+## 進捗 (2026-05-30, 続) — (2.1) keystone 取り込み + (2.10.3) vanishing/value 完成
+
+issue 0040「進捗 (10)」参照.  (2.6.b) bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`
+の点別恒等式に向け, **(2.10.3) を集計形まで完成**:
+- **(2.1) keystone を本ブランチへ cherry-pick** (`6c4ff90`/`32b81df`, `CoprimeConjugacy.lean`;
+  main 上には landed 済だったが本ブランチは merge-base `f911d3a` で分岐し未取り込みだった).
+  `exists_mem_centralizer_conj` (Hg の C_H(g)g への coprime 共役) ほか.
+- **(2.10.3) vanishing case** `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`
+  (g∉dadeSupport ⇒ 0; (2.1)+（2.10.2) 消費).  = **最終恒等式の non-support side そのもの**.
+- **(2.10.3) value case (N_L(B)-集計形)** `induce_alphaB_apply_eq_sum_nLStabilizerIn`
+  (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`; f_B coset partition
+  `dadeQuotientHom_eq_iff_mem_hIntersection_mul`).
+- **残 = Möbius engine のみ** (support side): a^L 特殊化 (容易) → fiber 因子分解 (2.1) →
+  `Finset.sum_involution` toggle-a 相殺 (2.10.2) → survivor B={a} を `card_conj_fiber` で評価.
+  ~150-230 LOC, 純粋に組合せ的; infra 全 present.
+
+## 進捗 (2026-05-30, 続2) — STEP 1 + STEP 2 (fiber 因子分解) + cancellation identity 完成
+
+issue 0040「進捗 (12)」参照.  Möbius の **代数的 spine を全て landing** (6 commits,
+`S04_DadeIsometry.lean` `section MobiusAssembly`, sorry-free + axiom-clean):
+- survivor `card_conjFiber_coset_eq_card_centralizer` (|𝒜(g,K·a)|=|C_G(a)|, K⊆C_G(a)),
+- conjugacy witness `exists_mem_H_isConj_of_mem_conjFiber_coset`,
+- **STEP 1** `induce_alphaB_apply_eq_alpha_mul_sum_conjL`
+  ((Ind α_B)(g)=(α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|),
+- conjugation invariance `card_conjFiber_conj_eq` (|𝒜(g,c·X·c⁻¹)|=|𝒜(g,X)|),
+- **STEP 2** `card_conjFiber_coset_mul_card_centralizerInf`
+  (|𝒜(g,K·a)|·|C|=|𝒜(g,C·a)|·|K|, C=K⊓C_G(a); planner の「long pole」; bridge set 二重計数 +
+  fiber count `card_cosetConjFiber_eq_card_centralizerInf` via `coset_eq_cosetConjImage`),
+- cancellation identity `card_conjFiber_hIntersection_mul_eq`
+  (|𝒜(g,H(B)·a)|·|H(B∪{a})|=|𝒜(g,H(B∪{a})·a)|·|H(B)|; toggle-a 相殺核).
+- **残 = STEP 3 (ℬ→𝒫 orbit-weight reindex + `Finset.sum_involution` toggle-a) + STEP 4
+  (`FullDadeIsometryData` 配線)** のみ.  純粋に組合せ的, ~180-270 LOC; 代数 primitive 全 present.
 
 ## Audit log (2026-05-23 audit 訂正)
 
@@ -326,3 +364,89 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
 **作成**: 2026-05-22. **出典**: Peterfalvi `references/peterfalvi/04.4_pp_10_14_*.mmd` (127 行), Phase 1 Isaacs Ch.6 ノート (Frobenius), `notes/peterfalvi/_overview.md`, `notes/meta/phase2_cross_refs.md`.
 
 **次ステップ**: §3 着手と並行して `Dade.Isometry` の Lean 型設計 review (候補 1-3 比較). §5 (TI cyclic normalizer) 設計の preview.
+
+---
+
+## 2026-05-30 追記 — (2.10.3) transversal half landed / 残ブロッカー確定
+
+(2.5)–(2.6.a)/(2.8)/(2.9)/(2.10.1)/(2.10.2) は landed (詳細 = `issues/0040-*` 進捗 (1)-(7)).
+本日 **(2.10.3) の transversal value 半分**を `S04_DadeIsometry.lean` `section PointwiseValue` に追加:
+`induce_alphaB_apply_eq_sum_conjFiber` (第 1 式) + `exists_nLStabilizerIn_alphaB_induceTerm`
+(per-term `α_B(x⁻¹gx)=α(b)` collapse).  sorry-free, axiom-clean.
+
+**(2.6.b) までの単一ブロッカー (precise)**: (2.10.3) 残 (vanishing + `card_conj_fiber` 集計) と
+(2.10) Möbius は共に **coprime-action 共役 primitive** —
+`K` 有限部分群, `b` が `K` を正規化し `gcd(|K|,ord b)=1` ⇒ `h·b (h∈K)` が `K`-共役で `c·b (c∈C_K(b))` —
+を要する.  mathlib `GroupTheory/`・本 repo とも欠落 (確認済).  次 sub-issue =
+`OddOrder/GroupTheory/CoprimeConjugacy.lean` に Glauberman coprime-action conjugacy 補題追加.
+詳細は `issues/0040-*` 進捗 (7).
+
+## 2026-05-30 追記 (2) — (2.10) 代表系 ℬ infra landed
+
+`S04_DadeIsometry.lean` `section Transversal` に **L-共役類代表系 ℬ の構造基盤**を追加
+(sorry-free, axiom-clean; `issues/0040-*` 進捗 (8)):
+- `conjFinsetAction` = `MulAction L (Finset {a//a∈A})` (`smul := conjFinset`, 法則 = `conjFinset_{one,mul}`).
+- `stabilizer_conjFinsetAction` = **stabilizer = N_L(B)** (`MulAction.stabilizer L B = setLStabilizer hyp B`).
+- `conjClassQuotient` / `transversalRep` (=`Quotient.out` 代表) / `transversalRep_conj` (代表は B^l).
+- `card_orbit_mul_card_setLStabilizer` = **軌道公式** `|orbit B|·|N_L(B)|=|L|` (和の正規化重み).
+
+これで進捗 (4) 残作業 **項目 1 (代表系 ℬ, 構造的ブロッカー) 完了**.  残: 項目 3 (2.10.3) 残
+(coprime-action 共役 primitive, 上記) → 項目 4 Möbius 相殺 → 項目 5 接続.
+
+## 2026-05-30 追記 (3) — (2.10) part (d) RHS∈ℤ[Irr G] + (2.10)→(2.6.b) bridge landed
+
+教科書 (2.10) 証明を **part (c)** (Möbius 相殺で点別恒等式 `α^τ=γ`) と **part (d)** (RHS
+`γ=-∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B ∈ ℤ[Irr G]`) に分解.  **part (d) を完成**
+(commit 6196d09, sorry-free, axiom-clean; `issues/0040-*` 進捗 (9)):
+- `induce_alphaB_mem_ZIrr` (summand `Ind_{M(B)} α_B∈ℤ[Irr G]`) /
+  `induceAlphaBTerm` (invertibility 内包 package) / `induceAlphaBTerm_mem_ZIrr` /
+  `zsmul_induceAlphaBTerm_sum_mem_ZIrr` (任意 ℤ-結合∈ℤ[Irr G]).
+- **`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`** (bridge):
+  `dadeMap α` が induceAlphaBTerm の ℤ-結合に等しい ⟹ (2.6.b).  **(2.6.b) は (2.10) 点別恒等式
+  (part (c)) だけに縮小**.
+
+**残ブロッカー (part (c) 専用)**: 教科書 **(2.1)** = `Kb` が `C_K(b)b` の K-共役 `[K:C_K(b)]` 個の
+disjoint union (coprime-action) が mathlib・repo とも欠落.  これが (2.10.3) の vanishing +
+fiber 集計の両方を駆動.  **本 issue の TARGET FILE 制約 (S04 のみ) 外** —
+`OddOrder/GroupTheory/CoprimeConjugacy.lean` 行きの独立 primitive (~100-150 LOC) で別 sub-issue.
+landed 後の part (c) 残工程 = (2.10.3) 集計 → `Finset.sum_involution` (B↔B∪{a}, (2.10.2)
+`centralizer_inf_hIntersection` で相殺) → bridge で (2.6.b).
+
+## 2026-05-30 追記 (4) — (2.10) Möbius 機構を完成 (STEP 3 engine + 3a keystone)
+
+`S04_DadeIsometry.lean` `section MobiusAssembly` に (2.10) 点別恒等式の**組合せ機構をほぼ全て**
+landing (10 commits, sorry-free + axiom-clean; 詳細 = `issues/0040-*` 進捗 (14)).  Round 6 が代数
+spine を landing したのに続き:
+- **STEP 3b (toggle-a Möbius 相殺)**: `mobiusIndex`/`mobiusSummand` + `mobiusSummand_add_insert_eq_zero`
+  (pairwise cancel) + `sum_mobiusSummand_eq_singleton` (`Finset.sum_involution`, survivor B={a}) +
+  `mobiusSummand_singleton_eq` (= -|C_L(a)|).
+- **STEP 3a keystone**: `sum_transversalRep_eq_sum_div_orbit` (orbit-averaging ℬ→𝒫,
+  `∑_ℬ h(rep) = ∑_𝒫 h/|orbit|`) + `sum_mobiusSummand_conjFinset` (b=a^x reindex,
+  `∑_{𝒫(a^l)} = ∑_{𝒫(a)}`) + `mobiusSummand_orbit_weighted` (per-B 重み
+  `1/(|orbit B||M(B)|)=1/(|L||H(B)|)`).
+
+**残**: 最終 assembly (項目 1: B-依存 `nLStabilizerIn`-index の inner-sum を固定 `aOrbit`-index に
+recast → `Finset.sum_comm` で double-sum swap; 項目 2: combine; 項目 3: STEP 4 配線 →
+`FullDadeIsometryData`).  ~130-190 LOC, 純粋組合せ的.  詳細 = `issues/0040-*` 進捗 (14) 末尾.
+
+## 進捗 (2026-05-30, 続3) — (2.10) Möbius 完全 assembly + FullDadeIsometryData 構成 (issue 0040 CLOSE)
+
+issue 0040「進捗 (15)」参照.  (2.10) Möbius の **STEP 3 残 (double-sum swap + survivor combine) +
+STEP 4 (bridge 配線)** を完成し, **(2.6) Dade isometry を `FullDadeIsometryData` として honest に構成**
+(`S04_DadeIsometry.lean`, 6 commits, sorry-free + axiom-clean).  **issue 0040 close** (`issues/closed/`).
+
+- **`mobiusTermCF_div_orbit_eq`** (STEP 3 keystone): 内側 `b`-和を固定 `aOrbitFinset a = a^L` へ
+  reindex (`Finset.sum_comm` swap 可能形).
+- **`sum_mobiusTermCF_transversalRep_eq_neg`**: support-side total `∑_{C∈ℬ} mobiusTermCF(rep C) =
+  -α(a)` (orbit-average → swap → survivor `mobiusSummand b' g {b'}=-|C_L(b')|` → (2.7) の
+  `sum_card_centralizerIn_eq` で `∑_{b'∈a^L}|C_L(b')|=|L|`).
+- **`dadeMap_eq_neg_sum_mobiusTermCF`**: (2.10) 点別恒等式 `dadeMap α = -∑_ℬ mobiusTermCF(rep)`
+  (support = 上 total, non-support = `induce_alphaB_apply_eq_zero_of_…`).
+- **`sum_mobiusTermCF_transversalRep_eq_sum_subtype`**: ℬ-和を fixed-point rep subtype の `Finset` 和
+  `∑_p (-1)^|p.1|·Ind p` へ reindex (bridge 形).
+- **`preservesVirtualCharacters_dadeMap`** = **(2.6.b)**: bridge
+  `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` に投入 (c p = -(-1)^|p.1|).
+- **`fullDadeIsometryData`** = **(2.6)**: honest constructor (`dadeIsometryData` + 上 preservation).
+
+**§4 The Dade Isometry は (2.1)-(2.11) 全形式化完了**, `FullDadeIsometryData` 実構成済み (§5-§8
+Coherence は honest bundle を直接利用可能).  §4 mini-roadmap の主目的達成.

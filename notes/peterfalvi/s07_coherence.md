@@ -34,6 +34,43 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ---
 
+## Lean status: (5.2.d) gateway + (5.4)/(5.5) norm 不等式 (2026-05-30, issue 1001, Round-9 Track B)
+
+`OddOrder/Peterfalvi/S07_Coherence.lean` に (5.2.d) の一般 gateway + (5.4)/(5.5) を sorry-free 実装.
+
+- **`OrthonormalCharacterImageFamily τ χ`** = (5.2.d) の R(χ): `imageSet : Finset (ClassFunction G ℂ)`
+  (orthonormal subset of ℤ[Irr G]), `mem_ZIrr`, `orthonormal` (⟨α,β⟩=δ_{α,β}),
+  `image_eq` ((χ-χ̄)^τ=∑_{α∈R(χ)}α). 既存 2 元 `CharacterDifferenceImage` は特殊例
+  (R(χ)={ε·μ,-ε·ν}); 一般 gateway が真に subsume することを
+  `CharacterDifferenceImage.toOrthonormalImage` で証明 (非空性 = scaffolding でない証拠).
+  `Orthogonal` predicate = (5.2.e) disjoint-pair.
+- **`CharacterPsiDecomposition τ χ ψ`** = (5.4) setup を bundle: imageFamily R(χ), 補助
+  isometry τ₁ (χ-χ̄ で τ と一致), 分解 (χ-ψ)^{τ₁}=X-Y, X∈ℤ[R(χ)] (整数係数 coeff),
+  Y⊥R(χ), 直交 (χ,ψ)=(χ̄,ψ)=(χ,χ̄)=0.
+- **(5.4.a)** `inner_self_chi_re_le_inner_self_X`: (⟨χ,χ⟩).re ≤ (⟨X,X⟩).re. keystone は
+  `inner_self_chi_eq_sum_coeff` (‖χ‖²=⟨χ-ψ,χ-χ̄⟩=⟨X-Y,∑α⟩=⟨X,∑α⟩=∑coeff).
+- **(5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge`: ‖Y‖²≥‖ψ‖² ⟹ ‖X‖²=‖χ‖², ‖Y‖²=‖ψ‖²,
+  X=∑_{α∈E}α (E=filter(coeff=1)⊆R(χ)) **かつ `|E|=‖χ‖²`** (`(E.card:ℂ)=⟨χ,χ⟩`).
+  total-norm Pythagoras + 整数 CS tightness. `|E|=‖χ‖²` は coeff∈{0,1} から
+  ∑coeff=|E| で keystone identity に接続; (5.6.3) が `‖χ̄^{τ₂}‖²=|R(χ)|-|E|` で消費する形.
+- **(5.5)** `eq_sum_of_psi_eq_zero`: ψ=0 特殊化. `‖ψ‖²=⟨0,0⟩=0≤‖Y‖²` が正半定値性で自動成立し
+  (5.4.b) を起動; norm 等号 `‖Y‖²=0` から正定値性で **Y=0**, よって χ^{τ₁}=(χ-0)^{τ₁}=X=∑_{α∈E}α.
+- norm 比較は repo 慣用の `(⟨·,·⟩).re` (S09 と整合).
+- **infra (ZIrrFourier)**: 整数 CS (int_le_sq / int_eq_sq_iff / finset_sum_le_sum_sq /
+  finset_sum_eq_sum_sq_iff), 任意 orthonormal Finset 族の Parseval
+  (inner_orthonormalSum_eq_coeff / inner_self_orthonormalSum_eq_sum_sq /
+  inner_orthonormalSum_sum_eq_sum_coeff), inner_conj_symm (⟨ψ,φ⟩=conj⟨φ,ψ⟩),
+  **正(半)定値性** (inner_self_eq_realCast: ⟨φ,φ⟩=(|G|:ℝ)⁻¹·∑‖φ(g)‖² /
+  inner_self_re_nonneg: 0≤(⟨φ,φ⟩).re / eq_zero_of_inner_self_re_eq_zero:
+  (⟨φ,φ⟩).re=0→φ=0; ℂ 全体で一般, ZIrr 不要).
+- AxiomsCheck 4 件登録 (all in allowlist): toOrthonormalImage / (5.4.a) / (5.4.b) / (5.5).
+- **残 (別 issue)**: (5.6)/(5.7) は本 (5.4)/(5.5) gateway を消費する coherence 統合.
+  (5.6.1) Y 分解, (5.6.2) `0<b<1⇒λ=0` quadratic forcing が未着手の主難所.
+  `CharacterPsiDecomposition` の data 入力 (imageFamily/tau1/coeff) は実適用時に Dade
+  文脈から構成要 (gateway は statement-level の道具).
+
+---
+
 ## §7 全 9 結果 (抽出表) ⚠️ audit 訂正 (旧 6 結果は (5.7)-(5.9) 完全欠落)
 
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | §8-§16 被引用 |
@@ -523,6 +560,97 @@ lemma norm_bound_determines_zero (hyp : Hypothesis L G S A) {χ χ₁ : S}
 - predicate-based 設計により、「isometry τ̃ の properties」を記述 — mathlib `LinearIsometry` ラッパー不要
 
 **結論**: Coherence は `feedback_no_mathlib_wrapper` 原則に完全準拠. 純粋新規実装として設計自由度最大.
+
+---
+
+## 형식화 진행 (Track A — 整數性/次数비 API)
+
+### (2026-05-30) (5.6)(b) degree-ratio integrality landing — `exists_pos_natDegreeRatio_of_dvd`
+
+(5.6) 증명 첫 줄 "Set `χ(1) = aχ₁(1)`"의 `a ∈ ℕ` 도출을 honest leaf로 형식화.
+**위치**: `OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean` (`characterDegree` namespace,
+`exists_natDegree_characterDegree_dvd_card` 직후). AxiomsCheck 등록 (3 axioms, all allowlist; sorry-free).
+
+```
+theorem exists_pos_natDegreeRatio_of_dvd [Finite G]
+    (χ χ₁ : IrreducibleCharacter G)
+    (hdvd : ∀ d d₁ : ℕ, (χ : ClassFunction G ℂ) 1 = (d : ℂ) →
+      (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) → d₁ ∣ d) :
+    ∃ a : ℕ, 0 < a ∧ characterDegree (χ : ClassFunction G ℂ) =
+      (a : ℂ) * characterDegree (χ₁ : ClassFunction G ℂ)
+```
+
+**중요 (honest-statement 訂正)**: 본 라운드 decomposition roadmap의 첫 leaf 후보 A3은
+"χ(1) = a·χ₁(1) for some `a ∈ ℚ` ⟹ `a ∈ ℤ`"였으나 **이는 수학적으로 거짓** — 두 양의 정수 비가
+정수일 필요는 없음 (degree 2, 3 → 2/3). Peterfalvi (5.6) 가설 **(b) `χ₁(1) ∣ χ(1)`** 가 바로 이
+divisibility datum이며 (mmd 04.7, L60-67: "Set χ(1) = aχ₁(1) … this is compatible … if aᵢ ∈ **N**"),
+`a`는 그 가설로 보장되는 **양의 자연수 몫**. 따라서 divisibility를 명시적 가설로 받는 형태가 honest이고,
+roadmap의 무조건 ℚ→ℤ 형태는 채택하지 않음 (scaffolding/거짓 statement 회피).
+
+증명: `χ.isIrreducible.exists_natDegree_charValue_one_dvd_card`로 두 양의 nat 차수 `d, d₁` 추출 →
+`hdvd d d₁` 로 `d = d₁ * a` → `d > 0`에서 `a > 0` → `Nat.cast_mul` + `ring`.
+
+**이후 leaf (미착수)**: (5.6.1) Y 분해, (5.6.2) `0 < b < 1 ⇒ λ = 0` quadratic forcing
+(`a` 와 `a_i` 가 본 lemma 出力), (5.4.a/b) Cauchy–Schwarz. 모두 R(χ) 一般 orthonormal lattice (B1) 선행 필요.
+
+### (2026-05-31) (5.6.2) integer-forcing + opening norm bound landing (S07)
+
+(5.6) coherence-union 정리를 향한 **family-free honest sub-lemma 2개**를 `S07_Coherence.lean`에
+landing (sorry/axiom 無). 둘 다 landed (5.4)/(5.5) API 위에 직접 구축, scaffolding 無.
+
+1. **`int_eq_zero_of_sq_mul_le_of_two_mul_lt`** (`S07_Coherence.lean`, namespace `S07`) — (5.6.2)의
+   integer-forcing core. division-free 형태: `0 < D` (rational), `0 ≤ z`, `0 ≤ a`,
+   **strict** `2a < D` (텍스트의 `b < 1`, `b = 2a/D`), `λ : ℤ`에 대해
+   `λ²·D - 2λa + z ≤ 0` ⟹ `λ = 0`. 부호별 trichotomy: `λ < 0`이면 `2λa ≤ 0 < λ²D` 모순;
+   `λ > 0`이면 `λ` 약분해 `λ·D ≤ 2a < D` + `λ ≥ 1` 모순. slack `z = ‖Z‖²`를 들고 있어 caller가
+   먼저 떨어뜨릴 필요 없음. **`λ` glyph는 식별자 불가** (lambda 예약) → 변수 `lam`, 가설 `hlamR`/`hlam1`.
+2. **`CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi`** — (5.6.2) 첫 줄 norm bound
+   `‖Y‖² ≤ ‖ψ‖²` (적용 시 `ψ = a·χ₁` → `‖Y‖² ≤ a²‖χ₁‖²`). landed `inner_self_chi_add_psi_eq`
+   (`‖χ‖²+‖ψ‖² = ‖X‖²+‖Y‖²`) + (5.4.a) `inner_self_chi_re_le_inner_self_X` (`‖χ‖² ≤ ‖X‖²`)에서 `linarith`로 즉시.
+
+**미착수 잔여 (정밀)**:
+- **(5.6.1) Y 분해** (`Y = a·χ₁^{τ₁} - λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, `λ ∈ ℤ`): family
+  `{χᵢ}` + degree ratio `aᵢ` + norm `‖χᵢ‖²` + cross-difference 직교
+  `⟨(χ-aχ₁)^τ, (χᵢ-aᵢχ₁)^τ⟩ = a·aᵢ‖χ₁‖²`를 담는 **새 ambient bundle**가 필요.
+  `CharacterPsiDecomposition`에는 family 데이터가 없음. (5.6.1) 결론을 가설로 패키징하면 scaffolding이라 금지 →
+  bundle을 실제 구성하고 inner-product 관계를 §5.2 직교성에서 유도해야 함 (~150-250 LOC).
+- **(5.6.3)/main `IsCoherent (S₁∪{χ,χ̄})`의 진짜 blocker**: `τ₂` extension은
+  `IntegralCharacterMap L G` (전체 `ClassFunction L ℂ` 위 ℤ-linear) + **global** `IsIntegralIsometry`
+  (`∀ φ ψ, ⟨τφ,τψ⟩=⟨φ,ψ⟩`)를 요구. 기저 `{χᵢ,χ,χ̄}` 위에서 정의해 ℤ-linear 확장해도 **전역 등거리**는
+  보장 안 됨 (lattice 등거리 ≪ 전역 등거리). repo/mathlib에 orthonormal-basis → 전역 등거리 확장
+  primitive **없음** (검색 확인: `grep LinearIsometry/extend` 무수확; `IsCoherent` 유일한 Type-level
+  생성자는 `S08.sibleySetup_is_coherent`의 sorry). 이 확장 생성자가 §5.6 main의 단일 미착수 장애물.
+
+### (2026-05-31, pass 2) (5.6.2) capstone end-to-end + (5.6.3) conjugate-image computations
+
+pass 1의 sub-lemma 위에 (5.6.2)를 **완전히 닫고** (5.6.3)의 isometry 검증 계산을 landing
+(전부 sorry/axiom 無, AxiomsCheck 등록, full `lake build OddOrder` 緑 3351 jobs).
+
+**ZIrrFourier 일반 helper (Hilbert-space, 재사용)**:
+- `inner_self_orthogonalSum_add_re` — **직교족 + 직교 잔차의 Pythagoras**:
+  `‖(∑ᵢ cᵢ•vᵢ) + Z‖²(.re) = ∑ᵢ cᵢ²·mᵢ + ‖Z‖²(.re)` (gram `⟨vᵢ,vⱼ⟩ = δᵢⱼ·mᵢ` 실수, `Z ⊥ vᵢ`).
+- `inner_self_sum_orthonormal_eq_card` — orthonormal 부분합 `‖∑_{a∈s} a‖² = |s|`.
+- `inner_sum_orthonormal_eq_zero_of_disjoint` — disjoint 부분합 cross term `⟨∑_E, ∑_F⟩ = 0`.
+
+**S07 (5.6.2)**:
+- `CharacterPsiDecomposition.sum_sq_mul_add_normSq_Z_le` — (5.6.2) 기하 절반:
+  `Y = (∑ᵢ cᵢ•vᵢ) + Z` (직교족) ⟹ `∑ᵢ cᵢ²·mᵢ + ‖Z‖² ≤ ‖ψ‖²`. Pythagoras + pass-1 opening bound.
+- **`CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero`** — **(5.6.2) capstone** `λ=0 ∧ Z=0`.
+  기하 절반 ∘ 대수전개 `∑(a·[i=i₁]-λrᵢ)²mᵢ = a²m₁ - 2aλ + λ²D` (`Finset.sum_ite_eq'` split + `ring`)
+  ∘ pass-1 정수 forcing `int_eq_zero_of_sq_mul_le_of_two_mul_lt` (ℝ로 transcribe) ∘ 정정치성
+  `eq_zero_of_inner_self_re_eq_zero`. 입력 = (5.6.1) 분해 데이터 + `‖ψ‖²=a²m₁` (`ψ=a·χ₁`) +
+  `r₁·m₁=1` (`a₁=1`) + `2a<D` (가설 (c)) — 모두 §7 Hypothesis + (5.5)에서 **구성가능** (hoisting 아님).
+
+**S07 (5.6.3) conjugate-image** (전부 (5.4.b)/(5.5)의 `E` 데이터에서, `τ₂` 구성 없이):
+- `CharacterPsiDecomposition.conjImage_eq_neg_sum_sdiff` — `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`
+  (`Finset.sum_sdiff` telescoping).
+- `inner_self_conjImage_eq_card_sdiff` — `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` (= `‖χ-χ̄‖²-‖χ‖² = ‖χ̄‖²`).
+- `inner_X_conjImage_eq_zero` — `⟨χ^{τ₂}, χ̄^{τ₂}⟩ = 0` (disjoint `E`, `R(χ)-E` cross term).
+
+이 세 계산이 (5.6.3) `τ₂`의 `extension_isometry` 필드를 직접 공급 (`χ^{τ₂}`/`χ̄^{τ₂}` norm 보존
++ 상호 직교). **남은 단일 장애물은 변함없음**: (5.6.1) ambient bundle 구성 (~150-250 LOC) +
+`τ₂`의 **전역** `IsIntegralIsometry` 확장 생성자 (orthonormal-basis → 전역 등거리 primitive,
+repo/mathlib 부재). main `IsCoherent(S₁∪{χ,χ̄})`는 이 둘이 갖춰지면 위 landed 계산으로 즉시 조립 가능.
 
 ---
 
