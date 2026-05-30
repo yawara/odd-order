@@ -2561,6 +2561,21 @@ theorem map_eq_of_mem_hCoset {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A
   rcases hg with ⟨h, hh, rfl⟩
   exact hτ.map_eq_of_isConj_hCoset α (a.1 * h) a h hh (IsConj.refl _)
 
+/-- **Peterfalvi (2.5), uniqueness.**  The defining equations of the Dade map pin it
+down completely: any two candidate maps satisfying `IsDadeMap hyp` agree.  On
+`dadeSupport` both values are `α(a)` for a common witness `a` (`map_eq_of_isConj_hCoset`),
+and off `dadeSupport` both vanish. -/
+theorem unique {hyp : Hypothesis G A L} {τ₁ τ₂ : DadeMap (G := G) k A L}
+    (h₁ : IsDadeMap hyp τ₁) (h₂ : IsDadeMap hyp τ₂) : τ₁ = τ₂ := by
+  funext α
+  refine ClassFunction.ext fun g => ?_
+  by_cases hg : g ∈ hyp.dadeSupport
+  · obtain ⟨a, h, hh, hconj⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [h₁.map_eq_of_isConj_hCoset α g a h hh hconj,
+      h₂.map_eq_of_isConj_hCoset α g a h hh hconj]
+  · rw [h₁.map_eq_zero_of_not_mem_dadeSupport α g hg,
+      h₂.map_eq_zero_of_not_mem_dadeSupport α g hg]
+
 theorem restrictDomain {hyp : Hypothesis G A L} {τ : DadeMap (G := G) k A L}
     (hτ : IsDadeMap hyp τ) (hA₁A : A₁ ⊆ A)
     (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
@@ -2701,6 +2716,34 @@ theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :
   map_eq_of_isConj_hCoset α g a h hh hconj := hyp.dadeValue_eq α hh hconj
   map_eq_zero_of_not_mem_dadeSupport α g hg :=
     hyp.dadeValue_of_not_mem_dadeSupport α hg
+
+/-- **Peterfalvi (2.11), restriction compatibility of the constructed Dade map.**  The
+explicit Dade map of the restricted hypothesis `hyp.restrict` is the domain-restriction
+of the explicit Dade map of `hyp`: `(α₁)^{τ₁} = (ι α₁)^τ` for `α₁ ∈ CF(L, A₁)`.
+
+This fulfils the promise recorded at `Hypothesis.restrict` — that "the equality of the
+corresponding Dade maps is stated later, once `dadeMap` is defined".  It now holds *as a
+theorem about the genuine construction* (not an interface assumption): both sides satisfy
+the (2.5) defining equations for `hyp.restrict` — the left by `isDadeMap_dadeMap`, the
+right by `IsDadeMap.restrictDomain` applied to `hyp`'s — so they coincide by the (2.5)
+uniqueness `IsDadeMap.unique`. -/
+theorem Hypothesis.dadeMap_restrict (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).dadeMap (k := k) =
+      DadeMap.restrictDomain (G := G) (k := k) (L := L) (hyp.dadeMap (k := k)) hA₁A :=
+  IsDadeMap.unique
+    ((hyp.restrict hA₁A hA₁_norm).isDadeMap_dadeMap (k := k))
+    (IsDadeMap.restrictDomain (hyp.isDadeMap_dadeMap (k := k)) hA₁A hA₁_norm)
+
+/-- **Peterfalvi (2.11)**, pointwise form of `Hypothesis.dadeMap_restrict`: the restricted
+Dade map evaluated at `α₁ ∈ CF(L, A₁)` is `hyp`'s Dade map at the included `α₁`. -/
+theorem Hypothesis.dadeMap_restrict_apply (hyp : Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (α : SupportedClassFunctions (G := G) k A₁ L) :
+    (hyp.restrict hA₁A hA₁_norm).dadeMap (k := k) α =
+      hyp.dadeMap (k := k)
+        (SupportedClassFunctions.inclusion (G := G) (k := k) (L := L) hA₁A α) := by
+  rw [hyp.dadeMap_restrict hA₁A hA₁_norm, DadeMap.restrictDomain_apply]
 
 end IsDadeMap
 

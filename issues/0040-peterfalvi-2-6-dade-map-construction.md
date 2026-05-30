@@ -101,7 +101,9 @@ created: 2026-05-27
       保存; InducedCharacter.lean, 2026-05-30 完了, sorry-free + axiom-clean; 下記「進捗 (2)」).
       これは (2.6.b) の単一最大前提だった.
 - [ ] (2.6.b) `PreservesVirtualCharacters (hyp.dadeMap)` → `FullDadeIsometryData` (残り)
-- [ ] (2.11) restriction 互換性 (現 `restrict` インターフェースを実 τ で正当化)
+- [x] **(2.11) restriction 互換性** — 2026-05-30 完了 (`dadeMap_restrict` + `IsDadeMap.unique`;
+      下記「進捗 (13)」).  構成済み τ で `(restrict hyp).dadeMap = restrictDomain hyp.dadeMap` を
+      **定理として**証明 (インターフェース仮定でない).
 
 ## 完了条件
 
@@ -642,3 +644,35 @@ green, 新規 sorry/admit/axiom 無し).  残るは純粋に組合せ的な **ST
 合計 ~180-270 LOC, **純粋に組合せ的** (代数 primitive は全 present).  別 focused session 推奨.
 non-support side (g∉dadeSupport) は `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` +
 `dadeValue_of_not_mem_dadeSupport` で即 (恒等式の半分は landed 済).
+
+## 進捗 2026-05-30 (13) — (2.11) restriction 互換性 + (2.5) uniqueness 完成 (sorry-free, axiom-clean)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section IsDadeMap` に, **(2.11) の Dade 写像
+互換性**を構成済み τ に対する**定理として** landing.  `lake build OddOrder` +
+`OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し (2 定理とも 3 axioms 全 allowlist 内).
+
+直接の動機: 進捗(4) で τ=`dadeMap` を (2.5) 点別構成にした結果, `Hypothesis.restrict` の
+docstring が約束していた「the equality of the corresponding Dade maps is stated later, once
+`dadeMap` is defined」(L327-328) が **インターフェース仮定でなく構成についての定理として**
+証明可能になった.  これが今回の landed infra (実 `dadeMap` 構成) の直接の consumer.
+
+- **`IsDadeMap.unique`** = **(2.5) uniqueness** `IsDadeMap hyp τ₁ → IsDadeMap hyp τ₂ → τ₁ = τ₂`.
+  (2.5) defining equations が τ を完全に決める: `funext α` + `ClassFunction.ext g`,
+  `dadeSupport` で場合分け — support 上は共通 witness `a` で両辺 `map_eq_of_isConj_hCoset` により
+  `α(a)`, support 外は両辺 `map_eq_zero_of_not_mem_dadeSupport` で 0.  汎用に有用な characterization.
+- **`Hypothesis.dadeMap_restrict`** = **(2.11) 本体**:
+  `(hyp.restrict hA₁A hA₁_norm).dadeMap = DadeMap.restrictDomain hyp.dadeMap hA₁A`.
+  両辺とも `IsDadeMap (hyp.restrict …)` — LHS は `isDadeMap_dadeMap` (進捗(4)), RHS は既存
+  `IsDadeMap.restrictDomain` を `hyp` の `isDadeMap_dadeMap` に適用 (L2564) — ゆえ `IsDadeMap.unique`
+  で一致.  証明は 1 行 (term-mode).
+- **`Hypothesis.dadeMap_restrict_apply`** — 点別形 `(restrict hyp).dadeMap α =
+  hyp.dadeMap (inclusion hA₁A α)` (`dadeMap_restrict` + `restrictDomain_apply`).
+
+**意義**: §4 の `restrict` インターフェース群 (`DadeIsometryData.restrict` /
+`FullDadeIsometryData.restrict` / `IsDadeMap.restrictDomain` / `IsDadeIsometry.restrictDomain` /
+`PreservesVirtualCharacters.restrictDomain`) は既に landed 済だったが, これらが扱う
+`DadeMap.restrictDomain hyp.dadeMap` が **構成された** `(restrict hyp).dadeMap` と*同一の写像*で
+あることが (2.11) として確定.  これで §5-§8 が「A₁ ⊆ A 上で τ を取り直す」操作 (TI 部分集合への
+特殊化 = (2.3)/(2.5) との整合) を, 構成の一意性込みで正当化できる.  `IsDadeMap.unique` は
+(2.6.b) Möbius 恒等式 (STEP 3/4) で `dadeMap = -∑(-1)^|B| Ind α_B` を立てる際にも,
+RHS が `IsDadeMap` を満たすことを示せば `dadeMap` 一致を即得る道具として再利用可能.

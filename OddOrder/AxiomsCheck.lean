@@ -774,6 +774,11 @@ set_option linter.style.longLine false in
 -- (2.6.a) isometry into an actual `DadeIsometryData` (no longer an interface assumption).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.isDadeMap_dadeMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeIsometryData
+-- Peterfalvi §4 (2.5) uniqueness + (2.11) restriction compatibility of the explicit Dade map:
+-- the (2.5) equations pin the map down (`IsDadeMap.unique`), so the constructed Dade map of the
+-- restricted hypothesis is the domain-restriction of the constructed Dade map (`dadeMap_restrict`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.IsDadeMap.unique
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_restrict
 -- Peterfalvi §4 (2.10.1) Dade-specific conjugation: `M(B^x) = M(B)^x`, with the factor
 -- conjugations `H(B^x) = H(B)^x` and `N_L(B^x) = N_L(B)^x` (via (2.4.a) `HConjInvariant`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.hIntersection_conjFinset
