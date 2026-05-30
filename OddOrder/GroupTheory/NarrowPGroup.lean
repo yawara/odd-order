@@ -179,6 +179,29 @@ theorem pow_eq_one_of_mem_omega1UpperCentralTwo
     Omega.pow_eq_one_of_class_le_two hp_odd commutator_upperCentralSeries_two_le_center hz
   rw [Subgroup.coe_subtype, ← Subgroup.coe_pow, hzp, Subgroup.coe_one]
 
+/-! ### `T = C_R(W)`: basic properties (BG §5, used in Theorem 5.3 (c)(d))
+
+`T = C_R(W) = Subgroup.centralizer (Ω₁(Z₂(R)))`. Two basic facts hold for any
+`p`-group: `T` is characteristic (centralizer of the characteristic `W`) and
+`Z(R) ⊆ T` (the centre centralises everything). The third BG property `R' ⊆ T`
+(mmd L1862) is genuinely true but its nested-commutator proof is deferred to the
+Theorem 5.3(d) work. -/
+
+/-- **`T = C_R(W)` is characteristic** (BG §5). The centralizer of the
+characteristic subgroup `W = Ω₁(Z₂(R))` is characteristic
+(`Subgroup.characteristic_centralizer` + `omega1UpperCentralTwo_characteristic`). -/
+instance centralizer_omega1UpperCentralTwo_characteristic
+    {R : Type*} [Group R] {p : ℕ} :
+    (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).Characteristic :=
+  Subgroup.characteristic_centralizer
+
+/-- `Z(R) ⊆ T = C_R(W)` (BG §5): the centre centralises every subset, in
+particular `W = Ω₁(Z₂(R))` (`Subgroup.center_le_centralizer`). -/
+theorem center_le_centralizer_omega1UpperCentralTwo
+    {R : Type*} [Group R] {p : ℕ} :
+    Subgroup.center R ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) :=
+  Subgroup.center_le_centralizer _
+
 end Omega1UpperCentralTwo
 
 end OddOrder.GroupTheory
