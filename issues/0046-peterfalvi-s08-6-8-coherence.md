@@ -70,6 +70,27 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
         ⟹ uv∈Z, C_s∩Z=∅ に矛盾。
       - `card_dvd_classSumCoeff_of_fixedPointFree` と合成で (6.7.1) 結論 `|P| ∣ a_{ijs}|C_s|` (C_s∩Z=∅) 完全形。
       - 残: (6.7.2)/(6.7.3) の class-algebra/合同算術 assembly (group-theory 依存は解消済; 別 issue)。
+- [x] (2026-05-30) **(6.7.2) product rule mod |P|** を `ClassSumAlgebra.lean` に landing
+      (commit 3735af4, AxiomsCheck 登録)。(6.7.1) keystone を product rule に流す:
+      - `coeff_mul_card_eq_classSumCoeff` : per-element 因子数 `a_{ijs}=(classSum Ci*classSum Cj) Cs.out`
+        × `|C_s|` = pair-count `classSumCoeff` (= Peterfalvi `a_{ijs}|C_s|`)。class-sum 係数と pair-count の橋。
+      - `character_one_mul_coeff_mul_centralChar` : 各項 `ψ(1)·a_{ijs}·ω(C_s) = (a_{ijs}|C_s|)·χ(C_s.out)`。
+      - `character_one_mul_coeff_mul_centralChar_cong_zero` : `m ∣ a_{ijs}|C_s|` ((6.7.1) 入力) ⟹ 当該項 `≡ 0 [ALGMOD m]`
+        (代数的整数 `χ(C_s.out)` の `m` 倍)。
+      - **`centralCharacterOfRep_classSum_mul_cong`** = (6.7.2) :
+        `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{C_s∩Z≠∅} ψ(1)·a_{ijs}·ω(C_s) [ALGMOD m]` (`C_s∩Z=∅` 項が mod m で脱落)。
+        Peterfalvi の `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α)` の `ω(C_s)=α` collapse 前形。
+- [x] (2026-05-30) **(6.7.3) 合同算術 assembly** を `ClassSumAlgebra.lean` + cancellation infra を
+      `AlgInt.lean` に landing (commits 27ed939, 2be1cc3, AxiomsCheck 登録)。(6.7.3) を group-theory atoms
+      (`a_{110}=0`, `a_{120}=|C₁|`, `z⁻¹∤z`, `ω(C_s)=α` const) を仮説とする **conditional** assembly に還元:
+      - `AlgInt.Cong.intMul_cancel_left` : `c·a≡c·b (mod n)` + `IsCoprime c n` + a,b 代数的整数 ⟹ `a≡b`
+        (Bézout `uc+vn=1` で `(a-b)/n=u(c(a-b)/n)+v(a-b)`)。= (6.7.3) の「`|C₁|` で割る」step。
+      - `peterfalvi_673_combine` : 2 つの (6.7.2) instance (1,1)/(1,2) の trans。
+      - `peterfalvi_673_cancel` : `ψ(1)α=|C₁|ψ(z)` 代入 + `|C₁|` cancel ⟹ `a_{11}ψ(z)≡ψ(1)+a_{12}ψ(z)`。
+      - `peterfalvi_673_final` : `1_G` instance `a_{11}≡1+a_{12}` を `ψ(z)` 倍して subtract ⟹ `ψ(z)≡ψ(1)`。
+      - **`peterfalvi_673`** = (6.7.3) : 上記 chain を atoms 仮説から組む。**残依存** = atoms の group-theory
+        証明 (`a_{110}=0`/`a_{120}=|C₁|` の構造定数計算, `|L| odd ⟹ z⁻¹∤z`, `ω(C_s)=α` 不変性, `(|C₁|,p)=1`)。
+        これらは (6.7) full setup (`IsTISubset`+Sylow+`|C_L(z)|` const) を要する `needs-infra` (別 issue)。
 
 ## 完了条件
 

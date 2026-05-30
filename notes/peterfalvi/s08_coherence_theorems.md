@@ -289,6 +289,46 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   (6.7.3) assembly (|L| odd ⟹ z,z⁻¹ 異 G-共役類; `Cong.smul_left`/`add`/`trans`). これらは §6
 >   class-algebra/合同算術の組み立てで group-theory 依存は解消済.
 
+> **進捗 2026-05-30 ((6.7.2) product rule mod |P| 完了, commit 3735af4)**: (6.7.1) keystone
+> (`card_dvd_classSumCoeff_of_fixedPointFree`) を product rule に流して (6.7.2) を `ClassSumAlgebra.lean`
+> に実装済 (AxiomsCheck 登録). `import OddOrder.Algebra.AlgInt` 追加, `CharacterValuesIntegral` section を
+> `ClassCongruence` section の前へ移動 (`character_isIntegral` を scope に入れるため).
+> - `coeff_mul_card_eq_classSumCoeff` : per-element 因子数 `a_{ijs}=(classSum Ci*classSum Cj) Cs.out` ×
+>   `|C_s|` = pair-count `classSumCoeff Ci Cj Cs` (Peterfalvi `a_{ijs}|C_s|`). `classSum_mul` の class-sum
+>   係数 (per-element count) と (6.7.1) の pair-count を ℂ-cast で橋渡し. proof は pair 集合を `uv` の class
+>   で fiber 分割 (`Finset.card_biUnion`) + per-element count の class-不変性 (`classSum_mul_apply_out`).
+> - `character_one_mul_coeff_mul_centralChar` : 各項 `ψ(1)·a_{ijs}·ω(C_s) = (a_{ijs}|C_s|)·χ(C_s.out)`
+>   (`ω(C_s)=(|C_s|χ(C_s.out))/χ(1)` + 上記 pair-count identity).
+> - `character_one_mul_coeff_mul_centralChar_cong_zero` : `m ∣ a_{ijs}|C_s|` ((6.7.1) 入力) ⟹ 当該項
+>   `≡ 0 [ALGMOD m]` (`cong_of_exists_isIntegral`; 代数的整数 `χ(C_s.out)` の `m` 倍).
+> - **`centralCharacterOfRep_classSum_mul_cong`** = **(6.7.2)** :
+>   `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{inZ C_s} ψ(1)·a_{ijs}·ω(C_s) [ALGMOD m]` (`inZ` = `C_s∩Z≠∅` の decidable 述語;
+>   `¬inZ` 項は `m∣a_{ijs}|C_s|` で脱落). proof は `centralCharacterOfRep_classSum_mul` ×ψ(1) で全 sum 展開 →
+>   `Finset.sum_filter_add_sum_filter_not` で split → `¬inZ` 部分が `Finset.sum_induction` (`≡0` の加法閉) で `≡0`.
+>   Peterfalvi `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α)` の `ω(C_s)=α` collapse 前形 (collapse は α 不変性の group-theory 要).
+
+> **進捗 2026-05-30 ((6.7.3) 合同算術 assembly 完了, commits 27ed939/2be1cc3)**: (6.7.3) を
+> group-theory atoms を仮説とする **conditional** assembly に還元して `ClassSumAlgebra.lean` に, cancellation
+> infra を `AlgInt.lean` に実装済 (AxiomsCheck 登録). ⚠️ memory `scaffold-sorry-free-not-done` に照らし:
+> これは sorry-free だが atoms (`a_{110}=0`,`a_{120}=|C₁|`,`z⁻¹∤z`,`ω(C_s)=α` const) を仮説に外出しした
+> conditional 形 — 真の完了には atoms の group-theory 証明が要る (下記「残依存」). assembly 自体の算術は本物.
+> - `AlgInt.Cong.intMul_cancel_left` : `(c:ℂ)·a≡(c:ℂ)·b (mod n)` + `IsCoprime c n` (ℤ) + a,b 代数的整数 ⟹
+>   `a≡b (mod n)`. Bézout `uc+vn=1` で `(a-b)/n = u·(c(a-b)/n) + v·(a-b)` (両項整数係数×代数的整数で整). =
+>   (6.7.3) の「`|C₁|` で割る」step. **端点整数性が本質** (2 合同の積が無条件でないのと同根; `character_isIntegral` 供給).
+> - `peterfalvi_673_combine` : 2 つの (6.7.2) instance (1,1) `ψ(1)α²≡ψ(1)a_{11}α` (a_{110}=0) /
+>   (1,2) `ψ(1)α²≡ψ(1)(|C₁|+a_{12}α)` (a_{120}=|C₁|) の `symm.trans`.
+> - `peterfalvi_673_cancel` : `ψ(1)α=|C₁|ψ(z)` 代入で両辺を `|C₁|·(…)` 形にして `intMul_cancel_left` で
+>   `|C₁|` cancel ⟹ `a_{11}ψ(z)≡ψ(1)+a_{12}ψ(z)`.
+> - `peterfalvi_673_final` : `1_G` instance `a_{11}≡1+a_{12}` を `ψ(z)` (整) 倍 (`Cong.smul_left`) →
+>   `a_{11}ψ(z)≡ψ(z)+a_{12}ψ(z)`, `hψ` と trans して `ψ(z)+a_{12}ψ(z)≡ψ(1)+a_{12}ψ(z)`, `a_{12}ψ(z)` を sub.
+> - **`peterfalvi_673`** = **(6.7.3)** : combine→cancel→final の chain を atoms 仮説から組む 1 本.
+> - **残依存** (= (6.7.3) 真完了に要る group-theory atoms; いずれも (6.7) full setup
+>   `IsTISubset`+Sylow `P`+`Z⊴L`+`|C_L(z)|` const を要する `needs-infra`):
+>   (i) 構造定数計算 `a_{110}=0` (`(u,u⁻¹)`, u∈C_1, u⁻¹∈C_2≠C_1 ⟹ 不可) / `a_{120}=|C_1|`;
+>   (ii) `|L| odd ⟹ z⁻¹` が `z` に G-非共役 (z∈C_1, z⁻¹∈C_2 を distinct に取れる);
+>   (iii) `ω(C_s)=α` が `C_s∩Z^#≠∅` 上不変 (`ψ(z),|C_L(z)|` の z∈Z^# 不変性から) + `ω(C_0)=1` で右辺 collapse;
+>   (iv) `(|C_1|,p)=1` (= `IsCoprime |C_1| |P|`).
+
 > **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
 > (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
 > `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
