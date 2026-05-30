@@ -745,6 +745,42 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
 `τ₁` を `coherentPairChain` の各 step witness から取り出す配線, (b) `R(χ)` を使った
 `CharacterPsiDecomposition` constructor。
 
+- [x] (2026-05-31, G2.7 PASS 2) **(5.6.3) target pair `{X, X̄}` を (5.5) decomposition から構成** を
+      `S07_Coherence.lean` に landing (sorry/axiom 無 — `#print axioms` 両者 =
+      `{propext, Classical.choice, Quot.sound}`; AxiomsCheck 登録 2 件 各 3 axiom 全 allowlist; full
+      `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs; commit c6df07e). PASS 1 で genuine
+      新 infra と判定した G2.7 の **source-independent な部分** = `retarget_isCoherent` の `{X, X̄}` block
+      を `CharacterPsiDecomposition τ χ 0` から **構成** (posit 無) し, **Round-20 roadmap の「Gram–Schmidt
+      / free-module basis-extension 欠落」判定を反証**:
+  - **`CharacterPsiDecomposition.RetargetTargetPair`** (structure) + **`.retargetTargetPair`** (producer):
+    irreducible `χ` (`‖χ‖²=1`) の (5.5) 分解 `D` と source-pair orthonormality (`⟨χ,χ⟩=1`,
+    `⟨χ̄,χ̄⟩=1`, `⟨χ,χ̄⟩=0`, `⟨χ̄,χ⟩=0`) から `X := D.X`, `X̄ := D.X − (χ−χ̄)^τ` の orthonormal pair を
+    構成。**rescaling/Gram–Schmidt 不要**: (5.5) `eq_sum_of_psi_eq_zero` が `X = ∑_{E}α`, `|E|=‖χ‖²=1`
+    を与え (X = 単一 R(χ) 元 ⟹ `‖X‖²=|E|=1`); `|R(χ)| = ‖(χ−χ̄)^τ‖² = ‖χ−χ̄‖² = 2` (image_eq +
+    `inner_self_sum_orthonormal_eq_card`; `(χ−χ̄)^τ = (χ−χ̄)^{τ₁}` は `tau1_agrees`, `tau1_isometry` で
+    `‖·‖²` 保存; orthonormal `{χ,χ̄}` で `‖χ−χ̄‖²=2`) ⟹ `‖X̄‖²=|R(χ)|−|E|=2−1=1`
+    (`inner_self_conjImage_eq_card_sdiff`); `⟨X,X̄⟩=0` (`inner_X_conjImage_eq_zero`); 両者 ∈ `ℤ[Irr G]`
+    (`Submodule.sum_mem` over R(χ) ⊆ ZIrr)。**irreducible χ では target pair は FORCED** = roadmap の
+    "missing orthonormalization primitive" は不要 (`|E|=1` ゆえ単一元, scaling 自明)。
+  - **`retarget_isCoherent_of_decomposition`** (`noncomputable def`): per-step (5.6.3) assembly で
+    `{X, X̄}` を data として取らず `D` から `retargetTargetPair` 経由で構成し `retarget_isCoherent` に投入
+    ⟹ `IsCoherent (S₁ ∪ {χ, χ̄}) A`。これにより `retarget_isCoherent` の残仮説のうち **running
+    `τ₁ = hS₁.extension` に genuine に結合する 2 つ** だけを explicit residual として分離: (i) (5.2.e)
+    cross-orthogonality `D.X, X̄ ⊥ τ₁ ξ` (`hX_ortho`/`hXbar_ortho`), (ii) (5.6.2) image equation
+    `(χ−aχ₁)^τ = D.X − a·τ₁χ₁` (`himg`)。orthonormality + virtual-character membership は全て `D` 由来。
+  - **honest 判定**: thin wrapper でない — `RetargetTargetPair` producer は (5.5)/(5.6.3) の既存 norm 計算
+    (`inner_self_conjImage_eq_card_sdiff`/`inner_X_conjImage_eq_zero`/`eq_sum_of_psi_eq_zero`) を
+    **irreducible 仮定で閉じた orthonormal pair に組み上げる** non-trivial 合成 (`|R(χ)|=2` の導出が核);
+    assembly def は `{X,X̄}` を posit せず `D` から構成。scaffolding 無し (D は consume, 結論は derived)。
+  - **精密残 (G2.7 本体, PASS 2 以後)**: 真に残るのは **running `τ₁` 結合の 2 piece** のみ —
+    (a) `CharacterPsiDecomposition τ χ 0` instance の **構成** (auxiliary isometry `tau1` が `χ−χ̄` 上で
+    running τ と一致, かつ (5.5) を満たす `X`/`Y` を持つ); これは §3 (1.4) keystone
+    `isometry_difference_pair_structure` + running coherence extension からの組立を要する。
+    (b) `hX_ortho`/`himg` の per-step 放電 (= R(χ) ⊥ τ₁(S₁) cross-family orthogonality と image eq の
+    running-τ₁ 一致)。これらは `coherentPairChain` の各 step witness `hS₁.extension` に本質的に依存し,
+    Dade τ (固定写像) からは出ない (PASS 1 型ミスマッチ判定通り)。本 PASS は `{X,X̄}` 構成という
+    source-independent layer を消化し, 残 gap を「running-τ₁ + (5.5) instance 構成」に精密化した。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。

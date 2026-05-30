@@ -1018,3 +1018,23 @@ L156/L166 通りこの lattice isometry の存在こそ (5.6)/(6.6) の結論 (F
 
 詳細・残作業 (running `τ₁` 配線 + `CharacterPsiDecomposition` constructor) は issue 0046 の進捗節
 (2026-05-31) 参照。
+
+### G2.7 PASS 2 (2026-05-31): (5.6.3) target pair `{X, X̄}` を (5.5) から構成
+
+PASS 1 で genuine 新 infra と判定した G2.7 のうち **source-independent な layer** =
+`retarget_isCoherent` の `{X, X̄}` block を `CharacterPsiDecomposition τ χ 0` から **構成** (posit 無)。
+sorry/axiom 無, AxiomsCheck 登録 2 件 (3 axioms 全 allowlist), commit c6df07e。
+
+- **`CharacterPsiDecomposition.RetargetTargetPair` + `.retargetTargetPair`**: irreducible `χ`
+  (`‖χ‖²=1`) の (5.5) 分解 + source-pair orthonormality から `X := D.X`, `X̄ := D.X − (χ−χ̄)^τ` の
+  orthonormal pair (`‖X‖²=‖X̄‖²=1`, `⟨X,X̄⟩=0`, 両者 ∈ `ℤ[Irr G]`)。**`|R(χ)|=‖χ−χ̄‖²=2` を
+  `tau1_agrees`+τ₁-isometry で導き, `|E|=‖χ‖²=1` (5.5) と合わせ `‖X̄‖²=|R(χ)|−|E|=1`**。
+- **`retarget_isCoherent_of_decomposition`**: `{X,X̄}` を data でなく `D` から構成して
+  `retarget_isCoherent` に投入 ⟹ `IsCoherent (S₁∪{χ,χ̄}) A`。残仮説は **running `τ₁` 結合の 2 つ**
+  (`hX_ortho`/`hXbar_ortho` = (5.2.e) cross-orthogonality, `himg` = (5.6.2) image eq) のみに精密化。
+
+**Round-20 roadmap の反証**: 「Gram–Schmidt / free-module basis-extension 欠落 primitive が必要」は
+**誤り**。irreducible `χ` では `|E|=1` ゆえ `X` は単一 R(χ) 元, target pair は FORCED で rescaling
+不要。真の残 gap は orthonormalization でなく **(a) `CharacterPsiDecomposition` instance の構成
+(auxiliary `tau1` が running τ と `χ−χ̄` 上一致), (b) `hX_ortho`/`himg` の running-`τ₁` 放電**。
+両者は `hS₁.extension` に本質依存し固定 Dade τ から出ない (PASS 1 型ミスマッチ判定通り)。
