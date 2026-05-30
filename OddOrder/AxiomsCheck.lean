@@ -1072,3 +1072,19 @@ set_option linter.style.longLine false in
 -- `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²`, derived (not posited) from `χ ⊥ S₁` + pairwise orthogonality.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterFamilyBundle.crossDifference_inner
+-- (5.6.3) MAIN coherence-union assembly: `IsCoherent (S₁ ∪ {χ,χ̄}) A`.  CONSTRUCTS the extension
+-- `τ₂ := retarget τ₁ χ χ̄ X X̄`, proves it a global integral isometry (keystone
+-- `retarget_isIntegralIsometry`), and discharges `extends_on_supported` by agreement on the three
+-- difference generators `{χ−χ̄, χ−a·χ₁} ∪ Z[S₁,L^#]` (`eq_on_zSpan_of_eq_on`).  The data threaded
+-- in are the honest (5.4)/(5.5)/(5.6.2) outputs (orthonormal `{X,X̄}`, `X̄ = X−(χ−χ̄)^τ`, the
+-- (5.5)+(5.2.e) orthogonality, the (5.6.2) image equation) plus the (5.1)-type generation `hgen`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent
+-- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
+-- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
+-- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.eq_on_zSpan_of_eq_on
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_eq_on_zSpan_of_orthogonal

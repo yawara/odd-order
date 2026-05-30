@@ -1404,7 +1404,160 @@ theorem retarget_isIntegralIsometry [Fintype G] [Invertible (Nat.card G : ℂ)]
       hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
   rw [himg, hsrc, hτ₁.inner_eq φperp ψperp]
 
+/-! #### Agreement on the supported span
+
+The `extends_on_supported` field of `IsCoherent` for the re-targeted map `τ₂` is discharged by
+a `span_induction`: two integral character maps that agree on a generating set `T` agree on all of
+`ℤ[T] = Submodule.span ℤ T` (`eq_on_zSpan_of_eq_on`).  For (5.6) the generating set is the three
+*differences* `{χ - χ̄, χ - a·χ₁} ∪ Z[S₁, L^#]` — Peterfalvi's "which generate `Z[S₁∪S₂, L^#]`"
+— and the `zSupportedSpan` is contained in their `ℤ`-span (the (5.1)-type generation input).  -/
+
+omit [Fintype L] [Invertible (Nat.card L : ℂ)] in
+/-- **Two integral character maps agreeing on a set agree on its integral span.**
+If `f, g : IntegralCharacterMap L G` agree on every element of `T ⊆ ClassFunction L ℂ`, they
+agree on all of `Submodule.span ℤ T`.  Pure `span_induction`; reused to discharge
+`extends_on_supported`. -/
+theorem eq_on_zSpan_of_eq_on {f g : IntegralCharacterMap L G}
+    {T : Set (ClassFunction L ℂ)} (h : ∀ x ∈ T, f x = g x)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ T) :
+    f φ = g φ := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx => exact h x hx
+  | zero => simp
+  | add x y _ _ ihx ihy => rw [map_add, map_add, ihx, ihy]
+  | smul a x _ ih => rw [map_zsmul, map_zsmul, ih]
+
+/-- A class function orthogonal to every element of `T` is orthogonal to all of `ℤ[T]`. -/
+theorem inner_eq_zero_of_mem_zSpan {η : ClassFunction L ℂ}
+    {T : Set (ClassFunction L ℂ)} (h : ∀ x ∈ T, ClassFunction.inner η x = 0)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ T) :
+    ClassFunction.inner η φ = 0 := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx => exact h x hx
+  | zero => exact ClassFunction.inner_zero_right η
+  | add x y _ _ ihx ihy => rw [ClassFunction.inner_add_right, ihx, ihy, add_zero]
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x,
+        OddOrder.RepresentationTheory.inner_smul_right, ih, mul_zero]
+
+/-- On the integral span of a set orthogonal to `{χ, χ̄}`, the re-targeting agrees with `τ₁`. -/
+theorem retarget_eq_on_zSpan_of_orthogonal {τ₁ : IntegralCharacterMap L G}
+    {χ chibar : ClassFunction L ℂ} {X Xbar : ClassFunction G ℂ}
+    {T : Set (ClassFunction L ℂ)}
+    (hTχ : ∀ x ∈ T, ClassFunction.inner χ x = 0)
+    (hTχbar : ∀ x ∈ T, ClassFunction.inner chibar x = 0)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ T) :
+    retarget τ₁ χ chibar X Xbar φ = τ₁ φ := by
+  refine retarget_eq_of_orthogonal ?_ ?_
+  · rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      inner_eq_zero_of_mem_zSpan hTχ hφ, star_zero]
+  · rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      inner_eq_zero_of_mem_zSpan hTχbar hφ, star_zero]
+
 end IntegralCharacterMap
+
+/-! ### Peterfalvi (5.6.3): the coherence-union extension `τ₂`
+
+The keystone `IntegralCharacterMap.retarget_isIntegralIsometry` builds the global isometry `τ₂`;
+this section assembles it into the actual `IsCoherent (S₁ ∪ {χ, χ̄}) A` witness.  The data threaded
+in are the honest outputs of (5.4)/(5.5)/(5.6.2): the coherent `τ₁` (= `hS₁.extension`), the
+orthonormal pairs `{χ, χ̄}`, `{X, X̄}` (with `‖χ‖² = ‖χ̄‖² = 1` for irreducibles, hence
+`‖X‖² = ‖X̄‖² = 1`), the conjugate-image definition `X̄ = X − (χ − χ̄)^τ`, the (5.5)+(5.2.e)
+orthogonality `X, X̄ ⊥ τ₁ ξ` for `ξ ⊥ {χ, χ̄}`, the (5.6.2) image equation `(χ − aχ₁)^τ = X − aχ₁^{τ₁}`,
+and the (5.1)-type generation `Z[S₁∪S₂, L^#] ⊆ ℤ[Z[S₁,L^#] ∪ {χ−χ̄, χ−aχ₁}]`.  No hypothesis
+assumes the extension itself: `τ₂` is *constructed* as `retarget τ₁ χ χ̄ X X̄`. -/
+
+open IntegralCharacterMap in
+/-- **Peterfalvi (5.6.3): coherence of `S₁ ∪ {χ, χ̄}`.**
+
+Given a coherent `τ` on `S₁` (witness `hS₁`, with `τ₁ := hS₁.extension`), an orthonormal pair
+`{χ, χ̄}` disjoint from and orthogonal to `S₁`, and the (5.4)/(5.5)/(5.6.2) target data `{X, X̄}`
+— orthonormal in `ℤ[Irr G]`, with `X̄ = X − (χ − χ̄)^τ`, both orthogonal to `τ₁ ξ` for every `ξ`
+orthogonal to `{χ, χ̄}` (the (5.5)+(5.2.e) input), and with the (5.6.2) image equation
+`(χ − a·χ₁)^τ = X − a·χ₁^{τ₁}` — the union `S₁ ∪ {χ, χ̄}` is coherent.
+
+The constructed extension is `τ₂ := retarget τ₁ χ χ̄ X X̄`: it is a global integral isometry by the
+keystone `retarget_isIntegralIsometry`, sends `χ ↦ X`, `χ̄ ↦ X̄`, keeps `τ₁` off `{χ, χ̄}`, and
+agrees with `τ` on the supported span — checked on the three difference generators
+`{χ − χ̄, χ − a·χ₁} ∪ Z[S₁, L^#]` via `eq_on_zSpan_of_eq_on`, using the generation hypothesis
+`hgen`.  The degree ratio `a : ℕ` (`χ(1) = a·χ₁(1)` from hypothesis (b) divisibility,
+`exists_pos_natDegreeRatio_of_dvd`) enters as a *natural* scalar, so the difference `χ − a·χ₁`
+is preserved by the `ℤ`-linear `τ₂`. -/
+noncomputable def retarget_isCoherent
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ} {X Xbar : ClassFunction G ℂ}
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hXX : ClassFunction.inner X X = 1) (hXbarXbar : ClassFunction.inner Xbar Xbar = 1)
+    (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
+    (hX_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (hS₁.extension ξ) X = 0)
+    (hXbar_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (hS₁.extension ξ) Xbar = 0)
+    (hXbar_def : Xbar = X - τ (χ - chibar))
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (himg : τ (χ - a • chi1) = X - a • hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  set τ₁ := hS₁.extension with hτ₁def
+  set τ₂ := retarget τ₁ χ chibar X Xbar with hτ₂def
+  -- χ, χ̄ are orthogonal to all of ℤ[S₁].
+  have hχ_zspan : ∀ φ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ S₁ →
+      ClassFunction.inner χ φ = 0 := fun φ hφ =>
+    IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hχ_S1 hφ
+  have hχbar_zspan : ∀ φ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ S₁ →
+      ClassFunction.inner chibar φ = 0 := fun φ hφ =>
+    IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hχbar_S1 hφ
+  -- (1) τ₂ is a global integral isometry (the keystone).
+  have hτ₂_isom : IsIntegralIsometry (L := L) (G := G) τ₂ :=
+    retarget_isIntegralIsometry hS₁.extension_isometry hχχ hχbarχbar hχχbar hχbarχ
+      hXX hXbarXbar hXXbar hXbarX hX_ortho hXbar_ortho
+  -- (2) Agreement of τ₂ with τ on the three difference generators.
+  -- (2a) On χ - χ̄: τ₂(χ-χ̄) = X - X̄ = X - (X - τ(χ-χ̄)) = τ(χ-χ̄).
+  have hagree_diff : τ₂ (χ - chibar) = τ (χ - chibar) := by
+    rw [hτ₂def, map_sub, retarget_apply_left hχχ hχχbar, retarget_apply_right hχbarχ hχbarχbar,
+      hXbar_def]; abel
+  -- (2b) On χ - a·χ₁: τ₂(χ - a•χ₁) = X - a•τ₁χ₁ = τ(χ - a•χ₁).
+  have hagree_ratio : τ₂ (χ - a • chi1) = τ (χ - a • chi1) := by
+    have hχ₁ : τ₂ chi1 = τ₁ chi1 :=
+      retarget_eq_of_orthogonal
+        (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_S1 chi1 hchi1, star_zero])
+        (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_S1 chi1 hchi1, star_zero])
+    rw [hτ₂def, map_sub, map_nsmul, retarget_apply_left hχχ hχχbar, ← hτ₂def, hχ₁,
+      himg, hτ₁def]
+  -- (2c) On Z[S₁, L^#]: τ₂ φ = τ₁ φ = τ φ.
+  have hagree_S1 : ∀ x ∈ zSupportedSpan (L := L) S₁ A, τ₂ x = τ x := by
+    intro x hx
+    have hxspan : x ∈ Submodule.span ℤ S₁ := hx.1
+    have hτ₂x : τ₂ x = τ₁ x := by
+      rw [hτ₂def]
+      exact retarget_eq_of_orthogonal
+        (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_zspan x hxspan, star_zero])
+        (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_zspan x hxspan, star_zero])
+    rw [hτ₂x, hτ₁def, hS₁.extends_on_supported x hx]
+  -- (3) τ₂ = τ on the generating set T, hence on its span (eq_on_zSpan_of_eq_on).
+  have hagree_T : ∀ y ∈ zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1},
+      τ₂ y = τ y := by
+    intro y hy
+    rcases hy with hyS1 | hypair
+    · exact hagree_S1 y hyS1
+    · rcases hypair with hy1 | hy2
+      · rw [hy1]; exact hagree_diff
+      · rw [hy2]; exact hagree_ratio
+  -- (4) Assemble the IsCoherent witness.
+  refine ⟨?_, τ₂, hτ₂_isom, ?_⟩
+  · -- nonzero: inherited from S₁ ⊆ S₁ ∪ {χ, χ̄}.
+    obtain ⟨φ, hφmem, hφne⟩ := hS₁.nonzero
+    exact ⟨φ, zSupportedSpan_mono_left (Set.subset_union_left) hφmem, hφne⟩
+  · -- extends_on_supported via span generation + generator agreement.
+    intro φ hφ
+    exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
 
 /-! ### Peterfalvi (5.6.1): the family bundle
 
