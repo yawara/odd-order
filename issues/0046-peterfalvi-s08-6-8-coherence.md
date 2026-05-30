@@ -127,9 +127,26 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
           `centralCharacterOfRep_one`) と `{C_s∩Z^#≠∅}` (ω=α, **atom iii = `ω` 不変性, `ψ`+`|C_L(z)|`
           の Z^# 不変性に依存**) に分割し per-element count を regroup。これが最深部で `|C_L(z)|` const の
           (6.7) setup 仕込みを要する `needs-infra`。
-      - **総括**: (i)/(iv)/`ω(C₀)=1` は完全放電。残るは (ii) の TI-reduction (cycle で配置先が `ClassSumAlgebra`
-        外) と (iii)+sum-collapse (`|C_L(z)|` const 依存)。**fully unconditional `peterfalvi_673` 化は
-        この 2 件が前提**で本 issue scope 内では未了 (PARTIAL)。
+      - **総括**: (i)/(iv)/`ω(C₀)=1` は完全放電。(ii) の TI-reduction も別 leaf module で放電完了
+        (下記 2026-05-30 追記)。残るは (iii)+sum-collapse (`|C_L(z)|` const 依存) **のみ**。
+        **fully unconditional `peterfalvi_673` 化はこの 1 件が前提**で本 issue scope 内では未了 (PARTIAL)。
+- [x] (2026-05-30) **(6.7.3) 残 atom (ii-wrap) real-class TI-reduction 完了** を新規 leaf module
+      `OddOrder/GroupTheory/RepresentationTheory/RealClassTISubset.lean` に landing (unconditional,
+      AxiomsCheck 登録, sorry-free, `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。
+      - 配置判断: `BrauerPermutation` (= `eq_one_of_isConj_inv_of_odd_card` の在処) と `ClassSumAlgebra`
+        の**両方の downstream**。`ZIrr` は `BrauerPermutation` の *upstream*
+        (`ZIrr←IrrIndexing←BrauerPermutation`) ゆえ不可と判明 ⟹ `BrauerPermutation` を import する新規
+        file (これで `ClassSumAlgebra`/`TISubset`/`Sylow` も transitive に入る)。
+      - `not_isConj_inv_of_isTISubset` (`P∈Syl_p`, `Odd |N_G(P)|`, `P^#=P∖{1}` が `N_G(P)` 相対 TI-subset,
+        `z∈P`, `z≠1` ⟹ `¬IsConj z⁻¹ z`): conjugator `c` (`c z⁻¹ c⁻¹=z`) が `z⁻¹∈P^#`→`z∈P^#` ⟹ TI で
+        `c∈L=N_G(P)` ⟹ `↥L` 内で `IsConj (⟨z,_⟩⁻¹) ⟨z,_⟩` ⟹ `|L|` odd で
+        `eq_one_of_isConj_inv_of_odd_card` が `z=1` 強制し矛盾。= Peterfalvi L122。
+      - `mk_inv_ne_self_of_isTISubset` (`⟦z⁻¹⟧≠⟦z⟧`, `mk_eq_mk_iff_isConj`): `classSumCoeff_self_one_eq_zero`
+        の唯一仮説に直接プラグイン ⟹ **(ii) 残を解消**。
+      - mathlib rc2 quirk: `Subgroup.normalizer : Set G→Subgroup G` (Set 引数) のため型位置
+        (`Nat.card`/`Finite`/subtype 注釈) で `Subgroup→Set` 引数 coercion が非挿入 ⟹
+        `set L := Subgroup.normalizer ((P:Subgroup G):Set G)` で `hodd`/`hti` を畳み一貫化し回避。
+      - **残**: fully unconditional `peterfalvi_673` は (iii-collapse) `|C_L(z)|` const 依存のみ。
 
 ## 完了条件
 

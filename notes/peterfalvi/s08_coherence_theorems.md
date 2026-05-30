@@ -375,6 +375,26 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >     (ω=α, **atom iii = `ω` 不変性, `ψ`+`|C_L(z)|` の Z^# 不変性依存**) に分割し per-element count を
 >     regroup. `|C_L(z)|` const の (6.7) setup 仕込みを要する最深 `needs-infra`.
 
+> **進捗 2026-05-30 ((6.7.3) 残 atom (ii-wrap) real-class TI-reduction 完了, 新規 `RealClassTISubset.lean`)**:
+> 上記 (ii-wrap) を解消. `BrauerPermutation` (= `eq_one_of_isConj_inv_of_odd_card` の在処) と
+> `ClassSumAlgebra` の **両方の downstream** に新 leaf module
+> `OddOrder/GroupTheory/RepresentationTheory/RealClassTISubset.lean` を作成 (unconditional, AxiomsCheck 登録).
+> import cycle 回避: `ZIrr` は `BrauerPermutation` の *upstream* ゆえ不可 (`ZIrr←IrrIndexing←BrauerPermutation`);
+> `BrauerPermutation` を import すれば `ClassSumAlgebra` も transitive に入る. 2 定理:
+> - `not_isConj_inv_of_isTISubset` : `P∈Syl_p`, `Odd |N_G(P)|`, `P^#=P∖{1}` が `N_G(P)` 相対 TI-subset,
+>   `z∈P`, `z≠1` ⟹ `¬IsConj z⁻¹ z`. 証明: `z,z⁻¹∈P^#`; `G`-conjugator `c` (`c z⁻¹ c⁻¹=z`) が `z⁻¹∈P^#`
+>   を `z∈P^#` へ送るので TI で `c∈L=N_G(P)`; `z∈L` (`P≤L`) と合わせ `↥L` 内で `IsConj (⟨z,_⟩⁻¹) ⟨z,_⟩`;
+>   `|L|` odd で `eq_one_of_isConj_inv_of_odd_card` が `z=1` を強制し矛盾. = Peterfalvi L122「`|L|` odd ⟹
+>   `z⁻¹` は `G` 内で `z` に共役でない」.
+> - `mk_inv_ne_self_of_isTISubset` : 上の class 形 `⟦z⁻¹⟧≠⟦z⟧` (`mk_eq_mk_iff_isConj`). これが
+>   `classSumCoeff_self_one_eq_zero` の唯一仮説に直接プラグインし **(ii) 残を解消**.
+> - mathlib quirk (rc2): `Subgroup.normalizer : Set G → Subgroup G` (Set 引数) のため, `Nat.card`/`Finite`/
+>   subtype-ascription 等の型位置では `Subgroup→Set` 引数 coercion が自動挿入されずエラー. `∈`/`IsTISubset`
+>   引数位置 (期待型 `Subgroup G`) は OK. `set L := Subgroup.normalizer ((P:Subgroup G):Set G)` で `hodd`/`hti`
+>   を畳んで全箇所一貫化し回避.
+> - **残**: fully unconditional `peterfalvi_673` の最後の依存は (iii-collapse) のみ
+>   (`centralCharacterOfRep_classSum_mul_cong_of_isTISubset` の RHS sum collapse, `|C_L(z)|` const 依存).
+
 > **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
 > (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
 > `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
