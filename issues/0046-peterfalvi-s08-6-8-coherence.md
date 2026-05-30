@@ -398,6 +398,27 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     가설 (`χᵢ(1) = q·χ₁(1)`, `q = p^m`; θ degree p-power) + square-divisibility (`χᵢ(1)² ∣ ∑_{j<i}`;
     [Is] Cor 2.30 `θᵢ(1)²≤|K:Z|` + sum identity + (6.4.c) coprimality) 를 본 leaf 에 plug; + base prefix
     coherence ((1.1)/(1.4)). degree-bound 부분은 본 leaf 가 공급, 나머지가 `hstep`/`h0` 의 잔여 입력.
+- [x] (2026-05-31, pass 2 leaf 2) **(6.6) square-divisibility producers (mmd L78-80)** 를
+      `S07_Coherence.lean` (`two_mul_degree_lt_sum_ratCast` 직후) 에 landing (sorry/axiom 無 —
+      `#print axioms` = {propext, Quot.sound} (Classical.choice 불요); AxiomsCheck 등록 2건 각 2 axiom 全
+      allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs). leaf 1 의 `hdvd`
+      입력 (`χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) 을 *생산* 하는 mmd L80 chain 의 두 load-bearing 산술 step 을 분리:
+  - **`dvd_of_add_eq_of_dvd_dvd`** (ℕ): `head + tail = total`, `a∣tail`, `a∣total` ⟹ `a∣head`.
+    mmd L78+L80 의 combination step — `head = ∑_{j<i}χⱼ(1)²`, `tail = ∑_{j≥i}χⱼ(1)²`,
+    `total = |L|-|L:Z|` 로 `θᵢ(1)² ∣ tail` (smallest p-power) + `θᵢ(1)² ∣ total` ([Is] Cor 2.30
+    `θᵢ(1)²≤|K:Z|`) ⟹ `θᵢ(1)² ∣ head`. **additive equation** 로 진술해 ℕ truncated subtraction 회피
+    (`Nat.dvd_sub` + `omega` rewrite).
+  - **`sq_dvd_of_factored_coprime`** (ℕ): `χᵢ(1) = idx·θ` (idx=|L:K|, θ=θᵢ(1)), `θ²∣D`, `idx²∣D`,
+    `Coprime idx θ` ⟹ `χᵢ(1)²∣D`. mmd L80 의 coprimality forcing — `(|L:K|,p)=1` & θ p-power ⟹
+    `Coprime idx² θ²` (`Nat.Coprime.pow`), coprime divisors 곱 (`mul_dvd_of_dvd_of_dvd`),
+    `χᵢ(1)²=idx²·θ²` (`ring`).
+  - **honest 판정**: 둘 다 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
+    (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
+  - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 두 producer 의 *입력* divisibility 생산 (sum identity
+    `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` = column-orthogonality 의 character theory; `θᵢ(1)² ∣ ∑_{j≥i}`
+    = smallest-p-power-divides-sum, `Finset.dvd_sum`+`pow_dvd_pow`; `θᵢ(1)²≤|K:Z|` = [Is] Cor 2.30;
+    `(|L:K|,p)=1` = (6.4.c)) + degree sort + base prefix coherence ((1.1)/(1.4)). 이 character-theory
+    덩어리들이 leaf 1+2 의 가설을 채우면 (6.6) 의 `coherentPairChain` `hstep` data 가 완성.
 
 ## 完了条件
 

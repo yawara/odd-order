@@ -210,6 +210,21 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
   square-divisibility (`χᵢ(1)² ∣ ∑_{j<i}`; [Is] Cor 2.30 + sum identity + (6.4.c)) 를 본 leaf에 plug +
   base prefix coherence ((1.1)/(1.4)). degree-bound 부분은 본 leaf가 공급. 상세는 issue 0046 pass-2.
 
+**leaf 2 (square-divisibility producers, mmd L78-80)**: leaf 1의 `hdvd` (`χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`)을
+*생산*하는 mmd L80 chain의 두 산술 step을 `S07_Coherence.lean` (`two_mul_degree_lt_sum_ratCast` 직후)에
+landing (sorry/axiom 無 — `#print axioms` = {propext, Quot.sound}; AxiomsCheck 등록 2건 각 2 axiom 全
+allowlist):
+
+- **`dvd_of_add_eq_of_dvd_dvd`** (ℕ): `head + tail = total`, `a∣tail`, `a∣total` ⟹ `a∣head`. mmd
+  L78+L80 combination (`head=∑_{j<i}`, `tail=∑_{j≥i}`, `total=|L|-|L:Z|`; `θᵢ(1)²∣tail` + `θᵢ(1)²∣total`
+  ⟹ `θᵢ(1)²∣head`). **additive equation**로 진술해 ℕ subtraction 회피.
+- **`sq_dvd_of_factored_coprime`** (ℕ): `χᵢ(1)=idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`.
+  mmd L80 coprimality forcing (`(|L:K|,p)=1` & θ p-power ⟹ `Coprime idx² θ²`; coprime divisors 곱).
+- **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
+  `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
+  (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
+  sort + base prefix coherence ((1.1)/(1.4)). 상세는 issue 0046 pass-2 leaf 2.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

@@ -1109,6 +1109,53 @@ theorem two_mul_degree_lt_sum_ratCast
       (two_mul_lt_sq_of_primePow_gap hp hpos₁ hq hdiv hlt) hdvd hDpos
   exact_mod_cast hℕ
 
+/-! ### Peterfalvi (6.6): producing the square-divisibility `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`
+
+The `hdvd` hypothesis of `two_mul_degree_lt_sum_ratCast` (`dᵢ² ∣ D`, i.e.
+`χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) is itself produced by the number-theoretic chain of mmd L78-80:
+
+* (L78, sum identity)  `∑_{j<i}χⱼ(1)² + ∑_{j≥i}χⱼ(1)² = |L| - |L:Z|`;
+* (L80, p-power)       `θᵢ(1)²` (smallest among `j ≥ i`) divides `∑_{j≥i}χⱼ(1)²`, and by
+                        [Is] Cor 2.30 `θᵢ(1)² ≤ |K:Z|` so `θᵢ(1)² ∣ |L| - |L:Z|`;
+* (L80, combine)       hence `θᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` (the additive complement);
+* (L80, coprime)       `(|L:K|, p) = 1` and `χᵢ(1) = |L:K|·θᵢ(1)` give `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`.
+
+The two purely arithmetic load-bearing steps — the additive complement and the coprimality
+forcing — are isolated below.  They take honest divisibility data (consequences of the
+character-degree structure; the sum identity is an *additive* equation, sidestepping `ℕ`
+truncated subtraction) and are not posited. -/
+
+/-- **Peterfalvi (6.6): additive complement of a divisor (ℕ).**
+
+If `a` divides both the `tail` and the `total`, and `head + tail = total`, then `a ∣ head`.
+This is the combination step of mmd L78+L80: with `head = ∑_{j<i}χⱼ(1)²`,
+`tail = ∑_{j≥i}χⱼ(1)²`, `total = |L| - |L:Z|`, the divisibilities `θᵢ(1)² ∣ tail` and
+`θᵢ(1)² ∣ total` give `θᵢ(1)² ∣ head`.  Stated additively to avoid `ℕ` subtraction. -/
+theorem dvd_of_add_eq_of_dvd_dvd
+    {a head tail total : ℕ} (hsum : head + tail = total)
+    (htail : a ∣ tail) (htot : a ∣ total) :
+    a ∣ head := by
+  have h : a ∣ total - tail := Nat.dvd_sub htot htail
+  rwa [show total - tail = head from by omega] at h
+
+/-- **Peterfalvi (6.6): coprimality forcing of the full degree square (ℕ).**
+
+The induced degree factors as `χᵢ(1) = idx·θ` (`idx = |L:K|`, `θ = θᵢ(1)`).  Given that both
+`θ²` and `idx²` divide `D` and that `idx` is coprime to `θ` (mmd L80: `(|L:K|, p) = 1` with
+`θ` a power of `p`), the full square `χᵢ(1)² = idx²·θ²` divides `D`.
+
+`Coprime idx θ ⟹ Coprime idx² θ²`, and coprime divisors multiply: `idx²·θ² ∣ D`. -/
+theorem sq_dvd_of_factored_coprime
+    {idx θ chi D : ℕ} (hchi : chi = idx * θ)
+    (hθ : θ * θ ∣ D) (hidx : idx * idx ∣ D) (hcop : Nat.Coprime idx θ) :
+    chi * chi ∣ D := by
+  subst hchi
+  have hsq : Nat.Coprime (idx * idx) (θ * θ) := by
+    simpa [sq] using Nat.Coprime.pow 2 2 hcop
+  have h : (idx * idx) * (θ * θ) ∣ D := hsq.mul_dvd_of_dvd_of_dvd hidx hθ
+  calc idx * θ * (idx * θ) = (idx * idx) * (θ * θ) := by ring
+    _ ∣ D := h
+
 namespace CharacterPsiDecomposition
 
 open OddOrder.RepresentationTheory

@@ -1143,3 +1143,10 @@ set_option linter.style.longLine false in
 -- through the square-divisibility `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) to the `ℚ` bound `2·a < D`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_primePow_gap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_degree_lt_sum_ratCast
+-- (6.6) square-divisibility producers (mmd L78-80): the `hdvd : χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` input.
+-- `dvd_of_add_eq_of_dvd_dvd`: additive complement `head + tail = total`, `a∣tail`, `a∣total` ⟹
+-- `a∣head` (combine `θᵢ(1)² ∣ ∑_{j≥i}` and `θᵢ(1)² ∣ |L|-|L:Z|` through the sum identity).
+-- `sq_dvd_of_factored_coprime`: `χᵢ(1) = idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`
+-- (mmd L80 coprimality forcing, `idx = |L:K|` prime to `p`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
