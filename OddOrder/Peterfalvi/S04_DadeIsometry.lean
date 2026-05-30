@@ -3555,6 +3555,43 @@ noncomputable def Hypothesis.dadeMap (hyp : Hypothesis G A L) :
     (α : SupportedClassFunctions (G := G) k A L) (g : G) :
     hyp.dadeMap α g = hyp.dadeValue α g := rfl
 
+/-- The Peterfalvi (2.5) Dade map is `k`-linear in its argument.
+
+`dadeValue α g` is, at each `g ∈ dadeSupport`, the *evaluation* `α(a)` at a fixed base point `a`
+(and `0` off the support), so it is `k`-linear in `α`: `dadeValue (c•α+β) g = c·dadeValue α g +
+dadeValue β g` pointwise.  This packages the bare `DadeMap` function `hyp.dadeMap` as an honest
+`k`-linear map `CF(L,A) →ₗ[k] CF(G)` — the form needed to extend it to a total integral character
+map (the coherence base map `τ` of Peterfalvi (5.1)). -/
+noncomputable def Hypothesis.dadeLinearMap (hyp : Hypothesis G A L) :
+    SupportedClassFunctions (G := G) k A L →ₗ[k] ClassFunction G k where
+  toFun := hyp.dadeMap (k := k)
+  map_add' α β := by
+    ext g
+    classical
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [ClassFunction.add_apply, hyp.dadeMap_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_eq α hh hga, hyp.dadeValue_eq β hh hga, hyp.dadeValue_eq (α + β) hh hga]
+      rfl
+    · rw [ClassFunction.add_apply, hyp.dadeMap_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg, hyp.dadeValue_of_not_mem_dadeSupport β hg,
+        hyp.dadeValue_of_not_mem_dadeSupport (α + β) hg, add_zero]
+  map_smul' c α := by
+    ext g
+    classical
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [RingHom.id_apply, ClassFunction.smul_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_eq α hh hga, hyp.dadeValue_eq (c • α) hh hga]
+      rfl
+    · rw [RingHom.id_apply, ClassFunction.smul_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg,
+        hyp.dadeValue_of_not_mem_dadeSupport (c • α) hg, mul_zero]
+
+@[simp] theorem Hypothesis.dadeLinearMap_apply (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) :
+    hyp.dadeLinearMap (k := k) α = hyp.dadeMap (k := k) α := rfl
+
 /-- **Peterfalvi (2.5).**  The explicit Dade map satisfies the defining equations,
 i.e. it `IsDadeMap`.  This discharges the `IsDadeMap` interface by construction. -/
 theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :

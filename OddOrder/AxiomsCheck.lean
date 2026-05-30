@@ -1266,6 +1266,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
 
+-- Peterfalvi (5.1) Dade-isometry base map (G2.7 type-bridge): the §4 Dade map is `ℂ`-linear on the
+-- supported subspace `CF(L,A)` (`Hypothesis.dadeLinearMap`, the bare `DadeMap` repackaged via the
+-- pointwise `dadeValue α g = α(a)` evaluation), and `dadeIntegralCharacterMap` extends it to a total
+-- `IntegralCharacterMap ↥L G` (`LinearMap.exists_extend` over the field `ℂ`, then `restrictScalars
+-- ℤ`).  `dadeIntegralCharacterMap_apply_of_support` is its defining property: on `CF(L,A)` the lift
+-- *is* the Dade map, supplying the (5.6.3) base map `τ` from the actual §4 isometry.  The extension
+-- off `CF(L,A)` is unconstrained — `IsCoherent τ S A` only inspects `τ` on `zSupportedSpan S A`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeLinearMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+
 -- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
 -- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
 -- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue

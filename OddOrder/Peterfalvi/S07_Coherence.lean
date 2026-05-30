@@ -2717,4 +2717,61 @@ theorem crossDifference_inner (B : CharacterFamilyBundle (L := L) chi chi1 a s i
 
 end CharacterFamilyBundle
 
+/-! ### Peterfalvi (5.1): the Dade isometry as the coherence base map `τ`
+
+Peterfalvi (5.1) takes the coherence **base map** `τ` to be "a `ℤ`-linear isometry from `E` to
+`ℤ[Irr G]`, where `Z[S,A] ⊂ E ⊂ ℤ[Irr L]`", and (5.6.3) uses `τ` *directly* on the supported
+sublattice `Z[S₁, L^#]` and on the difference generators `χ − a·χ₁`, `χ − χ̄`.  In §4–§16 this `τ`
+**is the Dade isometry** of §4 (`FullDadeIsometryData`).  But the §4 Dade map is a *partial, bare*
+function `CF(L,A) → CF(G)` on the supported subspace, whereas `IsCoherent` consumes a *total*
+`IntegralCharacterMap L G = CF(L) →ₗ[ℤ] CF(G)`.
+
+`dadeIntegralCharacterMap` bridges the two: it lifts the §4 Dade map to a total integral character
+map.  The §4 map is `ℂ`-linear on `CF(L,A)` (`Hypothesis.dadeLinearMap`); `LinearMap.exists_extend`
+(splitting of subspaces over the field `ℂ`) extends it to all of `CF(L)`, and
+`LinearMap.restrictScalars ℤ` reads the result as an `IntegralCharacterMap`.  The extension off the
+supported subspace is irrelevant: `IsCoherent τ S A` constrains `τ` **only** on `zSupportedSpan S A
+⊆ CF(L,A)` (via `extends_on_supported`), and `dadeIntegralCharacterMap_apply_of_support` shows the
+lift agrees with the Dade map there.  This realizes the (5.1) base map `τ` from the actual §4 Dade
+isometry — the G2.7 type-bridge. -/
+section DadeBaseMap
+
+open OddOrder.Peterfalvi.S04
+
+variable {G : Type*} [Group G] {A : Set G} {L : Subgroup G} [Fintype G] [Fintype ↥L]
+variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)]
+
+/-- The §4 Dade isometry `dade`, lifted to a *total* `ℤ`-linear `IntegralCharacterMap ↥L G`.
+
+Built by extending the `ℂ`-linear Dade map `hyp.dadeLinearMap` (the bare §4 map repackaged as a
+`ℂ`-linear map on the supported subspace `CF(L,A)`) to all of `CF(L)` via `LinearMap.exists_extend`,
+then restricting scalars to `ℤ`.  Its values on the supported subspace are the Dade map's
+(`dadeIntegralCharacterMap_apply_of_support`); off it they are an arbitrary linear extension, which
+the coherence machinery never inspects. -/
+noncomputable def dadeIntegralCharacterMap (hyp : S04.Hypothesis G A L)
+    (_dade : S04.FullDadeIsometryData (G := G) hyp) :
+    IntegralCharacterMap (↥L) G :=
+  (Classical.choose (LinearMap.exists_extend (hyp.dadeLinearMap (k := ℂ)))).restrictScalars ℤ
+
+/-- The defining property of `dadeIntegralCharacterMap`: on the supported subspace `CF(L,A)` it
+agrees with the §4 Dade map.
+
+For a supported class function `φ` (`φ.support ⊆ supportInSubgroup A L`, i.e. `φ ∈ CF(L,A)`), the
+lift evaluates to the Dade-map image `hyp.dadeMap ⟨φ, hφ⟩` — the (5.6.3) `τ` on `Z[S,L^#]`. -/
+theorem dadeIntegralCharacterMap_apply_of_support (hyp : S04.Hypothesis G A L)
+    (dade : S04.FullDadeIsometryData (G := G) hyp)
+    {φ : ClassFunction (↥L) ℂ} (hφ : φ.support ⊆ supportInSubgroup A L) :
+    dadeIntegralCharacterMap hyp dade φ =
+      hyp.dadeMap (k := ℂ)
+        (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ :
+          SupportedClassFunctions (G := G) ℂ A L) := by
+  have hext := Classical.choose_spec (LinearMap.exists_extend (hyp.dadeLinearMap (k := ℂ)))
+  have key := LinearMap.congr_fun hext
+    (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ :
+      SupportedClassFunctions (G := G) ℂ A L)
+  simpa [dadeIntegralCharacterMap, LinearMap.restrictScalars_apply,
+    Hypothesis.dadeLinearMap_apply] using key
+
+end DadeBaseMap
+
 end OddOrder.Peterfalvi.S07

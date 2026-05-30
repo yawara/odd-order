@@ -781,6 +781,30 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     Dade τ (固定写像) からは出ない (PASS 1 型ミスマッチ判定通り)。本 PASS は `{X,X̄}` 構成という
     source-independent layer を消化し, 残 gap を「running-τ₁ + (5.5) instance 構成」に精密化した。
 
+- [x] (2026-05-31, G2.7 PASS 3) **§4 Dade isometry を (5.1) base map `τ` として実体化** (type-bridge)
+      を `S04_DadeIsometry.lean` + `S07_Coherence.lean` に landing (sorry/axiom 無, AxiomsCheck 登録
+      3 件 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs)。PASS 1/2 で
+      「§4 Dade map と §7 `IntegralCharacterMap` は別型」と判定した残 gap のうち **base map `τ` 側の
+      bridge を構成**。
+  - **mmd 04.7 L3 (5.1) の決定的読解で roadmap Q1 を訂正**: coherence base map `τ` は「Dade isometry
+    (supported sublattice 上)」で, Lean `IsCoherent τ S A` は `τ` を `extends_on_supported`
+    (`zSupportedSpan S A` 上のみ) で制約し span 外は inspect しない。roadmap の「τ は別 running
+    isometry」は `τ`/`extension` の混同 → 正しくは **Q2 (= τ は Dade isometry, supported span 上で
+    一致する bridge が必要)**。
+  - `Hypothesis.dadeLinearMap` (S04): bare `DadeMap` を `ℂ`-linear `CF(L,A) →ₗ[ℂ] CF(G)` に package
+    (`dadeValue α g = α(a)` 評価ゆえ linear)。
+  - `dadeIntegralCharacterMap` (S07): `LinearMap.exists_extend` (体 ℂ 上の分裂) で `CF(L) →ₗ[ℂ] CF(G)`
+    に延長 → `restrictScalars ℤ` で `IntegralCharacterMap ↥L G`。延長は非標準だが supported span 外は
+    無害。
+  - `dadeIntegralCharacterMap_apply_of_support`: 定義性質 = supported subspace 上で lift = Dade map。
+    (5.6.3) の `τ` on `Z[S,L^#]` を実 §4 isometry から供給。
+  - **PASS 3 後の残** (hstep の (5.6.2) image eq): `τ = dadeIntegralCharacterMap` に対し
+    `himg : τ(χ−aχ₁) = D.X − a•hS₁.extension χ₁` を組む = (5.6.2) `Y = aχ₁^{τ₁}`。capstone
+    `lambda_eq_zero_and_Z_eq_zero` (λ=0∧Z=0) は landed, 残は **(5.6.1) λ-係数分解 `hY` を Dade τ・
+    running `τ₁` から導き λ=0,Z=0 代入で `himg`** の assembly (PASS 4+, `D.tau1`↔`hS₁.extension` 結合
+    + (5.6.1) cross-difference 計算を要し本質的に hard)。詳細 `notes/peterfalvi/s08_coherence_theorems.md`
+    G2.7 PASS 3 節。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。

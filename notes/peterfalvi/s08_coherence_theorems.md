@@ -1038,3 +1038,42 @@ sorry/axiom 無, AxiomsCheck 登録 2 件 (3 axioms 全 allowlist), commit c6df0
 不要。真の残 gap は orthonormalization でなく **(a) `CharacterPsiDecomposition` instance の構成
 (auxiliary `tau1` が running τ と `χ−χ̄` 上一致), (b) `hX_ortho`/`himg` の running-`τ₁` 放電**。
 両者は `hS₁.extension` に本質依存し固定 Dade τ から出ない (PASS 1 型ミスマッチ判定通り)。
+
+### G2.7 PASS 3 (2026-05-31): Dade isometry を (5.1) base map `τ` として実体化 (type-bridge)
+
+PASS 1/2 で「§4 Dade map (`SupportedClassFunctions ℂ A L → ClassFunction G ℂ`, bare partial,
+`L : Subgroup G`) と §7 `IntegralCharacterMap L G := ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ`
+(total ℤ-linear, `L G : Type*`) は別型」と判定した残 gap のうち, **base map `τ` 側の type-bridge を
+構成** (posit 無, sorry/axiom 無, AxiomsCheck 登録 3 件 全 allowlist)。
+
+**mmd 04.7 L3 (5.1) Definition の決定的読解**: coherence の base map `τ` は「`Z[S,A] ⊂ E ⊂ Z[Irr L]`
+上の `ℤ`-linear isometry」で, (5.6.3) (mmd L101) は `τ` を **supported sublattice `Z[S₁,L^#]` および
+差 `χ−aχ₁`, `χ−χ̄` 上で直接**使う。すなわち §4–§16 では **`τ` = §4 Dade isometry** (が supported span
+上で). Lean `IsCoherent τ S A` はこれを忠実に符号化: `τ` を制約するのは `extends_on_supported`
+(`zSupportedSpan S A` 上で `extension = τ`) **のみ**で, supported span 外の `τ` 値は一切 inspect
+されない。**roadmap の Q1「τ は別 running isometry」判定は `τ` と `extension` を混同したもので,
+正しくは Q2 (= τ は Dade isometry, supported span 上で一致する bridge が必要)**。
+
+- **`Hypothesis.dadeLinearMap` (S04)**: bare `DadeMap` (`hyp.dadeMap`) を `ℂ`-linear map
+  `CF(L,A) →ₗ[ℂ] CF(G)` として package。`dadeValue α g = α(a)` (固定基点 `a` での **評価**, support 外 0)
+  ゆえ `α` について `ℂ`-linear。`map_add'`/`map_smul'` は `dadeValue_eq`/`dadeValue_of_not_mem` の
+  case 分け + 係数加群 coe の `rfl`。
+- **`dadeIntegralCharacterMap` (S07)**: `LinearMap.exists_extend` (体 `ℂ` 上の部分空間の分裂) で
+  `dadeLinearMap` を `CF(L) →ₗ[ℂ] CF(G)` に延長 → `restrictScalars ℤ` で `IntegralCharacterMap ↥L G`。
+  **延長は非標準 (complement 任意) だが無害**: supported span 外は coherence が見ない。
+- **`dadeIntegralCharacterMap_apply_of_support`**: 定義性質 = supported subspace (`φ.support ⊆
+  supportInSubgroup A L`) 上で lift = Dade map (`hyp.dadeMap ⟨φ,_⟩`)。`LinearMap.exists_extend` の
+  `g ∘ subtype = dadeLinearMap` を `congr_fun` で評価。**これが (5.6.3) の `τ` on `Z[S,L^#]` を
+  実 §4 isometry から供給する**。
+
+**型整合**: S07 の `L G : Type*`, `A : Set L` を `↥L_subgroup`, `supportInSubgroup A_G L` で具体化。
+`zSupportedSpan S (supportInSubgroup A_G L)` の元は `support ⊆ supportInSubgroup A_G L` を満たし
+`dadeIntegralCharacterMap_apply_of_support` の仮説に直結。
+
+**PASS 3 後の残 (hstep の (5.6.2) image eq 本体)**: `peterfalvi_66_coherence_of_X` の `hstep` を
+`retarget_isCoherent_of_decomposition` で放電するには, `τ = dadeIntegralCharacterMap` に対し
+`himg : τ(χ−aχ₁) = D.X − a•hS₁.extension χ₁` ((5.6.2) `Y = aχ₁^{τ₁}`) を組む必要。(5.6.2) capstone
+`lambda_eq_zero_and_Z_eq_zero` (`λ=0 ∧ Z=0`) は landed なので, 残は **(5.6.1) の λ-係数分解 `hY`
+(= `Y = ∑ᵢ(a[i=i₁]−λ·rᵢ)•χᵢ^{τ₁} + Z`) を実際の Dade τ・running `τ₁ = hS₁.extension` から導き,
+`λ=0,Z=0` を代入して `Y = a•χ₁^{τ₁}` → `himg`** の assembly (wiring でなく (5.6.1) 本体, PASS 4+)。
+これは `D.tau1`↔`hS₁.extension` 結合と (5.6.1) の cross-difference 計算を要し本質的に hard。
