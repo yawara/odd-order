@@ -681,6 +681,13 @@ set_option linter.style.longLine false in
 -- in `C₁ × C₁⁻¹` are exactly `(u, u⁻¹)`, `u ∈ C₁`).  These discharge two of the (6.7.3) atoms.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_zero
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_card
+-- The `z`-keyed instances consumed by (6.7.3): `classSumCoeff_self_one_eq_zero` (`a_{110} = 0`
+-- with `C₁ = ⟦z⟧`, sole hypothesis the real-class atom `⟦z⁻¹⟧ ≠ ⟦z⟧`) and
+-- `classSumCoeff_self_inv_one_eq_card` (`a_{120} = |C₁|` with `C₂ = ⟦z⁻¹⟧`, *unconditional* — the
+-- inverse-class membership `mk u = ⟦z⟧ → mk u⁻¹ = ⟦z⁻¹⟧` is `mk_inv_eq_of_mk_eq`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_eq_of_mk_eq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_inv_one_eq_card
 -- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
 -- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
 -- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence

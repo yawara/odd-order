@@ -300,6 +300,16 @@ section StructureCoeffAtIdentity
 private theorem mk_eq_one_iff_eq_one {w : G} : ConjClasses.mk w = 1 ↔ w = 1 := by
   rw [ConjClasses.one_eq_mk_one, ConjClasses.mk_eq_mk_iff_isConj, isConj_one_left]
 
+/-- Conjugacy of inverses is determined at the level of classes: `mk a = mk b ⟹ mk a⁻¹ = mk b⁻¹`.
+(A two-line consequence of `IsConj a b ⟹ IsConj a⁻¹ b⁻¹`, kept local to avoid the import cycle
+`ClassSumAlgebra ← ZIrr ← IrrIndexing ← BrauerPermutation`, where `ConjClasses.isConj_inv`
+lives.) -/
+theorem mk_inv_eq_of_mk_eq {a b : G} (h : ConjClasses.mk a = ConjClasses.mk b) :
+    ConjClasses.mk a⁻¹ = ConjClasses.mk b⁻¹ := by
+  rw [ConjClasses.mk_eq_mk_iff_isConj] at h ⊢
+  obtain ⟨c, rfl⟩ := isConj_iff.mp h
+  exact isConj_iff.mpr ⟨c, by group⟩
+
 variable [Fintype G] [DecidableEq (ConjClasses G)]
 
 /-- **Peterfalvi (6.7.3), structure constant `a_{ij0} = 0`.** The coefficient of the *identity*
@@ -351,6 +361,27 @@ theorem classSumCoeff_one_eq_card (Ci Cj : ConjClasses G)
     rw [mk_eq_one_iff_eq_one] at hs
     simp [inv_eq_of_mul_eq_one_right hs]
   · intro u _; rfl
+
+/-- **Peterfalvi (6.7.3), `a_{110} = 0` keyed to `z`.** With `C_1 = ⟦z⟧`, the coefficient of the
+identity class in `C_1 · C_1` is `0` provided `z⁻¹` is not `G`-conjugate to `z`
+(`⟦z⁻¹⟧ ≠ ⟦z⟧`).  This is the direct instance of `classSumCoeff_one_eq_zero` consumed by (6.7.3):
+the only hypothesis is the real-class atom `⟦z⁻¹⟧ ≠ ⟦z⟧` (from `|L|` odd). -/
+theorem classSumCoeff_self_one_eq_zero (z : G)
+    (hz : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z) :
+    classSumCoeff (ConjClasses.mk z) (ConjClasses.mk z) 1 = 0 := by
+  refine classSumCoeff_one_eq_zero _ _ fun u hu => ?_
+  -- `mk u = ⟦z⟧ ⟹ mk u⁻¹ = ⟦z⁻¹⟧ ≠ ⟦z⟧`.
+  rw [mk_inv_eq_of_mk_eq hu]
+  exact hz
+
+/-- **Peterfalvi (6.7.3), `a_{120} = |C_1|` keyed to `z`.** With `C_1 = ⟦z⟧` and `C_2 = ⟦z⁻¹⟧`
+(the inverse class), the coefficient of the identity class in `C_1 · C_2` is `|C_1|`.  This is the
+direct instance of `classSumCoeff_one_eq_card` consumed by (6.7.3); the inverse-class hypothesis
+`∀ u, mk u = ⟦z⟧ → mk u⁻¹ = ⟦z⁻¹⟧` is *unconditional* (`mk_inv_eq_of_mk_eq`). -/
+theorem classSumCoeff_self_inv_one_eq_card (z : G) :
+    classSumCoeff (ConjClasses.mk z) (ConjClasses.mk z⁻¹) 1
+      = Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } :=
+  classSumCoeff_one_eq_card _ _ fun _ hu => mk_inv_eq_of_mk_eq hu
 
 end StructureCoeffAtIdentity
 
