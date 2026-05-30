@@ -38,6 +38,23 @@ created: 2026-05-30
   `{ω_ρ(C_s)}∪{1}` 生成の `Submodule.span ℤ` が乗法閉 (product rule) かつ f.g. ⟹ `Submodule.toSubalgebra`
   ⟹ `IsIntegral.of_mem_of_fg`。行列固有値論法 (Route B) は不要だった。
 
+## 後続 (2026-05-30): 指標値形の系
+
+keystone `centralCharacterOfRep_classSum_isIntegral` の上に **指標値の明示形**
+`isIntegral_card_mul_character_div` を追加 (同ファイル `CharacterIntegrality` section):
+
+```lean
+theorem isIntegral_card_mul_character_div (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    (C : ConjClasses G) {g : G} (hg : ConjClasses.mk g = C) :
+    IsIntegral ℤ
+      ((Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character g / ρ.character 1)
+```
+
+すなわち **`|C| · χ_ρ(g) / χ_ρ(1)` が代数的整数** (Isaacs (3.7))。証明は
+`centralCharacterOfRep_classSum` + `sum_character_eq_card_mul` + `ρ.char_one` で `ω_ρ(C)` に書き換え、
+keystone を適用するだけ。`[Finite G]` で取り `Fintype.ofFinite` を内部で使い型に余分な instance を残さない。
+AxiomsCheck 登録済 (unconditional)。(6.7.3) や古典的 `χ(1) ∣ |G|` がこの形を直接消費する。
+
 ## 完了条件
 
 上記 `IsIntegral ℤ (ω_ρ(C_s))` が sorry/admit/axiom 無しで証明され `lake build OddOrder` が通る。
