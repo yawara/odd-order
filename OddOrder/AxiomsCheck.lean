@@ -27,6 +27,7 @@ import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1017,3 +1018,16 @@ set_option linter.style.longLine false in
 -- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.
 #assert_only_allowed_axioms OddOrder.GroupTheory.coset_eq_cosetConjImage
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_mem_centralizer_conj
+
+-- Peterfalvi §7 (5.4) gateway (issue 1001, Round-9 Track B): R(χ) を ℤ[Irr G] の
+-- 一般 orthonormal subset へ一般化した OrthonormalCharacterImageFamily と, その上の
+-- (5.4.a) ‖X‖²≥‖χ‖² / (5.4.b) norm 等号 + X=∑_{α∈E}α. 整数 Cauchy-Schwarz +
+-- orthonormal Parseval (ZIrrFourier) で sorry-free.
+-- (5.2.d) gateway の非空性証拠 (2 元 CharacterDifferenceImage → 一般 family).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage
+-- (5.4.a) ‖X‖² ≥ ‖χ‖².
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X
+-- (5.4.b) norm 等号 + X = ∑_{α∈E} α (E ⊆ R(χ)).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.norm_eq_and_X_eq_sum_of_norm_Y_ge
