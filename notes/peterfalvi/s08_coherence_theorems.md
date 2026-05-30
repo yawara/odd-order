@@ -230,6 +230,27 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   で部分代数化 ⟹ `IsIntegral.of_mem_of_fg`. これが (6.7.3) の `ψ(z)≡ψ(1) (mod |P|)` で使う integrality 部品.
 > - 残: `AlgInt.cong` (合同 arithmetic in ℤ[ζ_n]) + a_{11}/a_{12} mod |P| の計算 = (6.7.3) 本体.
 
+> **進捗 2026-05-30 (AlgInt.cong infra 完了)**: 合同関係 `α ≡ β (mod n)` を
+> `OddOrder/Algebra/AlgInt.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> `Cong n α β := IsIntegral ℤ ((α - β)/n)` (Peterfalvi の三条件のうち load-bearing な商整数性;
+> 端点整数性は別途 `character_isIntegral` 等で供給). API:
+> - refl / symm / comm / trans / add / sub / neg = 加法的合同.
+> - **`Cong.smul_left`/`smul_right`** : 片側を**任意の代数的整数で**スケール = (6.7.2)/(6.7.3) の
+>   乗法ステップ (合同を ψ(1), 構造定数 a_{ij}, 別の整数 ω-値で掛ける). ⚠️ 2 つの合同の積
+>   (`a≡b ∧ c≡d ⟹ ac≡bd`) は端点整数性を要し**無条件には成立しない**; 教科書も整数定数倍しかしないので一致.
+> - `intMul_left`/`intMul_right`/`natMul_left` : 整数/ℕ スカラー特殊形.
+> - `cong_of_exists_isIntegral`/`cong_of_sub_eq_intMul`/`Cong.of_int` : 導入形 (差を n×整数として提示).
+> - notation `α ≡ β [ALGMOD n]` (scoped). commit dde7758.
+> - **(6.7.3) 本体の残依存** (精密化): (1) **(6.7.1)** P が
+>   `Ω = {(u,v) ∈ C_i × C_j | uv ∈ C_s}` (`C_s ∩ Z = ∅`) に fixed-point-free 作用 ⟹ `|P| ∣ a_{ijs}|C_s|`.
+>   proof は **TI-subset ⟹ `C_G(x) ⊆ L` (x∈P^#)** + y∈{u,v} が L の p-元 ⟹ y∈P ⟹ (Z normal in L で) y∈Z ⟹ uv∈Z 矛盾.
+>   これは `IsTISubset` + Sylow-in-L の group-theoretic 組み立て (~40-60 LOC, 未着手).
+>   (2) **(6.7.2)** `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α) (mod |P|)`: `ω(C_i)ω(C_j)=∑ a_{ijs}ω(C_s)` (既存
+>   `centralCharacterOfRep_classSum_mul`) に (6.7.1) を適用し `C_s∩Z=∅` 項を mod |P| で落とす.
+>   (3) **(6.7.3)** assembly: |L| odd ⟹ z, z⁻¹ が異なる G-共役類 ⟹ a_{110}=0, a_{120}=|C_1|;
+>   `ψ=1_G` で a_{11}≡1+a_{12} ⟹ (1+a_{12})ψ(z)≡ψ(1)+a_{12}ψ(z) ⟹ ψ(z)≡ψ(1). ⟸ ここで本 module の
+>   `Cong.smul_left`/`add`/`trans` が直接効く. (1)(2)(3) は §6 group-theory 組み立てなので別 issue.
+
 **Lean 表現**: 
 ```lean
 theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]
