@@ -3013,6 +3013,83 @@ theorem sum_mobiusSummand_conjFinset (hconj : hyp.HConjInvariant) (l : L) (g : G
     rw [conjA_inv_conjA] at this
     exact this.symm
 
+/-- `|N_L(B)| = |setLStabilizer B|`: `N_L(B) = setLStabilizer.map L.subtype` along the injection
+`L ↪ G`, so the two cardinalities agree. -/
+theorem card_nLStabilizerIn_eq (B : Finset {a : G // a ∈ A}) :
+    Nat.card (nLStabilizerIn hyp B) = Nat.card (setLStabilizer hyp B) := by
+  rw [nLStabilizerIn]
+  exact Nat.card_congr (Subgroup.equivMapOfInjective _ L.subtype L.subtype_injective).symm.toEquiv
+
+/-- The packaged summand `induceAlphaBTerm` evaluated at `g` equals the bare induced value,
+independent of the carried invertibility instance (`Invertible.subsingleton`). -/
+theorem induceAlphaBTerm_apply (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    [inst : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g
+      = ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g := by
+  have h : inst = invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne') :=
+    Subsingleton.elim _ _
+  rw [induceAlphaBTerm, h]
+
+/-- **Peterfalvi (2.10), per-`B` weight simplification.**  For nonempty `B` and `g ∈ (aH(a))^G`, the
+orbit-averaged inclusion–exclusion summand collapses, using `|orbit B|·|N_L(B)| = |L|`
+(`card_orbit_mul_card_setLStabilizer`) and `|M(B)| = |H(B)|·|N_L(B)|` (`card_mBSubgroup`):
+
+    `(-1)^{|B|}/|orbit B| · (Ind_{M(B)} α_B)(g)
+      = (α(a)/|L|) · ∑_{b ∈ N_L(B) ∩ a^L} (-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·b)|`.
+
+The factor `1/(|orbit B|·|M(B)|) = 1/(|orbit B|·|H(B)|·|N_L(B)|) = 1/(|L|·|H(B)|)`. -/
+theorem mobiusSummand_orbit_weighted (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)]
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    ((-1 : ℂ) ^ B.card / (Nat.card (MulAction.orbit L B) : ℂ))
+        * hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) ⟨B, hB⟩ g
+      = ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ / (Nat.card L : ℂ))
+          * ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+              (fun b : (nLStabilizerIn hyp B) =>
+                ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+            ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
+              ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+                * ({(b : G)} : Set G))).card : ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  rw [hyp.induceAlphaBTerm_apply hconj _ hB g,
+    hyp.induce_alphaB_apply_eq_alpha_mul_sum_conjL hconj hB α hh hga]
+  -- abbreviations
+  set p : ℂ := (-1 : ℂ) ^ B.card with hp
+  set αa : ℂ := (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ with hαa
+  set Hc : ℂ := (Nat.card (hIntersection hyp B hB) : ℂ) with hHc
+  set Nc : ℂ := (Nat.card (nLStabilizerIn hyp B) : ℂ) with hNc
+  set Oc : ℂ := (Nat.card (MulAction.orbit L B) : ℂ) with hOc
+  -- `|M(B)| = |H(B)|·|N_L(B)|` and `|orbit B|·|N_L(B)| = |L|`.
+  have hM : (Nat.card (mBSubgroup hyp B hB) : ℂ) = Hc * Nc := by
+    rw [hHc, hNc]; exact_mod_cast hyp.card_mBSubgroup hconj hB
+  have hON : Oc * Nc = (Nat.card L : ℂ) := by
+    rw [hOc, hNc, hyp.card_nLStabilizerIn_eq B]
+    exact_mod_cast hyp.card_orbit_mul_card_setLStabilizer B
+  have hHne : Hc ≠ 0 := by rw [hHc]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hNne : Nc ≠ 0 := by rw [hNc]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hOne : Oc ≠ 0 := by rw [hOc]; exact Nat.cast_ne_zero.mpr (hyp.card_orbit_pos B).ne'
+  -- name the inner sum `S = ∑_b |𝒜(g, H(B)b)|`.
+  set S : ℂ := ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+      (fun b : (nLStabilizerIn hyp B) => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+      ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card : ℂ)
+      with hS
+  -- expand `⅟|M(B)|` and pull the per-term scalar `p/Hc` out of the RHS sum.
+  rw [show (⅟(Nat.card (mBSubgroup hyp B hB) : ℂ)) = (Hc * Nc)⁻¹ from by
+    rw [invOf_eq_inv, hM]]
+  rw [show (∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+        (fun b : (nLStabilizerIn hyp B) => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+        (p / Hc) * ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+          * ({(b : G)} : Set G))).card : ℂ)) = (p / Hc) * S from by
+    rw [hS, Finset.mul_sum]]
+  -- now both sides are scalar multiples of `S`; equate scalars using `Oc·Nc = |L|`.
+  rw [← hON]
+  field_simp
+
 end MobiusAssembly
 
 end SemidirectStructure
