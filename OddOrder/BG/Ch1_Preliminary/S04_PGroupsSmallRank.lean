@@ -2282,4 +2282,334 @@ theorem card_le_prime_cube_of_pRank_le_two_of_exponent_prime
 
 end Prop48ExponentPrime
 
+/-! ## 4E: Proposition 4.8(b) (pp. 35-36)
+
+BG mmd L1511-1520. We formalize **part (b)**: for `p > 3`, a `p`-group `R` of rank
+`r(R) ≤ 2` has `Ω₁(R)` of exponent one or `p`. Following BG's minimal-counterexample
+proof, the key reduction is "it suffices to show `cl(R) ≤ 3`", obtained by bounding
+`|R| ≤ p⁴` (via part (a) on `Ω₁(S)` for a maximal `S`) and the standard fact that a
+`p`-group of order `≤ p⁴` has nilpotency class `≤ 3`.
+-/
+
+section Prop48ExponentP
+
+open OddOrder.GroupTheory
+open scoped commutatorElement
+
+/-- **`p`-group order bounds nilpotency class.** For a finite `p`-group `G` with
+`|G| ≤ p^(j+1)` and `1 ≤ j`, the nilpotency class satisfies `cl(G) ≤ j`.
+
+This is the standard fact "a group of order `pⁿ` has class `< n`" specialised to the
+`j ≥ 1` regime where it holds without the abelian-endpoint exception (`Cₚ` has class
+`1 = 0 + 1` but order `p = p^(0+1)`, so the naive `n = 1`, `j = 0` instance is false;
+hence the `1 ≤ j` hypothesis).
+
+Proof by strong induction on `|G|`, both `G` and `j` generalised:
+* `Subsingleton G`: class `= 0 ≤ j`.
+* `Nontrivial G`, `j = 1`: `|G| ≤ p²`, so `G` is abelian (order `1`, `p`, or `p²`;
+  the `p²` case is `IsPGroup.commutative_of_card_eq_prime_sq`), giving `Z(G) = ⊤` and
+  `cl(G) ≤ 1`.
+* `Nontrivial G`, `j ≥ 2`: `|Z(G)| = pᵏ` with `k ≥ 1` (`card_center_eq_prime_pow`), so
+  `|G/Z| ≤ p^((j-1)+1)`; the inductive hypothesis (on `j - 1 ≥ 1`) gives
+  `cl(G/Z) ≤ j - 1`, and `cl(G) = cl(G/Z) + 1 ≤ j`. -/
+private theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
+    {G : Type*} [Group G] [Finite G] (hG : IsPGroup p G) {j : ℕ} (hj : 1 ≤ j)
+    (hcard : Nat.card G ≤ p ^ (j + 1)) : Group.nilpotencyClass G ≤ j := by
+  have hp : p.Prime := Fact.out
+  -- Strong induction on `|G|`, with `j` and the group (as `R'`) quantified inside the motive.
+  let motive : ℕ → Prop := fun N =>
+    ∀ (j : ℕ), 1 ≤ j → ∀ {R' : Type _} [Group R'] [Finite R'], IsPGroup p R' →
+      Nat.card R' = N → Nat.card R' ≤ p ^ (j + 1) → Group.nilpotencyClass R' ≤ j
+  refine (Nat.strongRecOn (motive := motive) (Nat.card G) ?_) j hj hG rfl hcard
+  intro N ih j hj R' _ _ hR' hcardN hcardR'
+  haveI : Group.IsNilpotent R' := hR'.isNilpotent
+  rcases subsingleton_or_nontrivial R' with hsub | hnt
+  · -- `Subsingleton R'`: class `= 0 ≤ j`.
+    exact le_trans (le_of_eq (nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
+  · -- `Nontrivial R'`.
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR'
+    -- `m ≥ 1` since `R'` is nontrivial.
+    have hm_pos : 0 < m := by
+      rcases Nat.eq_zero_or_pos m with hm0 | hpos
+      · exfalso; rw [hm0, pow_zero] at hm
+        exact (not_subsingleton_iff_nontrivial.mpr hnt)
+          (Finite.card_le_one_iff_subsingleton.mp (le_of_eq hm))
+      · exact hpos
+    rcases Nat.lt_or_ge j 2 with hj1 | hj2
+    · -- `j = 1`: `|R'| ≤ p²` ⇒ `R'` abelian ⇒ `cl(R') ≤ 1`.
+      have hj_eq : j = 1 := by omega
+      subst hj_eq
+      -- `R'` is commutative: `m ∈ {1, 2}` and `commutative_of_card_eq_prime_sq` / cyclic.
+      have hcomm : ∀ a b : R', a * b = b * a := by
+        have hm_le : m ≤ 2 := by
+          have hpm : p ^ m ≤ p ^ 2 := by rw [← hm]; exact hcardR'
+          exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hpm
+        interval_cases m
+        · -- `|R'| = p`: cyclic, hence commutative.
+          haveI : IsCyclic R' := isCyclic_of_prime_card (p := p) (by rw [hm, pow_one])
+          obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := R')
+          intro a b
+          obtain ⟨i, rfl⟩ := hg a
+          obtain ⟨l, rfl⟩ := hg b
+          exact zpow_mul_comm g i l
+        · -- `|R'| = p²`: commutative.
+          exact IsPGroup.commutative_of_card_eq_prime_sq hm
+      -- `Z(R') = ⊤`, so `upperCentralSeries R' 1 = ⊤`, giving `cl(R') ≤ 1`.
+      rw [← upperCentralSeries_eq_top_iff_nilpotencyClass_le, upperCentralSeries_one, eq_top_iff]
+      intro z _
+      rw [Subgroup.mem_center_iff]
+      intro g
+      exact hcomm g z
+    · -- `j ≥ 2`: recurse on `R'/Z`.
+      -- `|Z(R')| = pᵏ`, `k ≥ 1`.
+      obtain ⟨k, hk_pos, hk⟩ := IsPGroup.card_center_eq_prime_pow hm hm_pos
+      -- `|Z| · |R'/Z| = |R'|`.
+      have hZmul : Nat.card (Subgroup.center R') * Nat.card (R' ⧸ Subgroup.center R') =
+          Nat.card R' := by
+        rw [← Subgroup.index_eq_card]; exact (Subgroup.center R').card_mul_index
+      -- `|R'/Z| ≤ p^((j-1)+1) = p^j`.
+      have hquot_le : Nat.card (R' ⧸ Subgroup.center R') ≤ p ^ ((j - 1) + 1) := by
+        have hj_sub : (j - 1) + 1 = j := by omega
+        rw [hj_sub]
+        -- `p * |R'/Z| ≤ pᵏ * |R'/Z| = |R'| ≤ p^(j+1) = p * pʲ`.
+        have hpk : p ≤ Nat.card (Subgroup.center R') := by
+          rw [hk]; calc p = p ^ 1 := (pow_one p).symm
+            _ ≤ p ^ k := Nat.pow_le_pow_right hp.pos hk_pos
+        have hstep : p * Nat.card (R' ⧸ Subgroup.center R') ≤ p * p ^ j := by
+          calc p * Nat.card (R' ⧸ Subgroup.center R')
+              ≤ Nat.card (Subgroup.center R') * Nat.card (R' ⧸ Subgroup.center R') :=
+                Nat.mul_le_mul_right _ hpk
+            _ = Nat.card R' := hZmul
+            _ ≤ p ^ (j + 1) := hcardR'
+            _ = p * p ^ j := by rw [pow_succ]; ring
+        exact Nat.le_of_mul_le_mul_left hstep hp.pos
+      -- `|R'/Z| < |R'| = N` since `|Z| ≥ p > 1`.
+      have hquot_lt : Nat.card (R' ⧸ Subgroup.center R') < N := by
+        rw [← hcardN, ← hZmul]
+        have hZ_gt : 1 < Nat.card (Subgroup.center R') := by
+          rw [hk]; exact one_lt_pow₀ hp.one_lt hk_pos.ne'
+        have hQ_pos : 0 < Nat.card (R' ⧸ Subgroup.center R') := Nat.card_pos
+        exact (Nat.lt_mul_iff_one_lt_left hQ_pos).mpr hZ_gt
+      -- Inductive hypothesis on `R'/Z` with parameter `j - 1`.
+      have hQpg : IsPGroup p (R' ⧸ Subgroup.center R') := hR'.to_quotient _
+      have hQclass : Group.nilpotencyClass (R' ⧸ Subgroup.center R') ≤ j - 1 :=
+        ih (Nat.card (R' ⧸ Subgroup.center R')) hquot_lt (j - 1) (by omega) hQpg rfl hquot_le
+      -- `cl(R') = cl(R'/Z) + 1 ≤ (j-1) + 1 = j`.
+      rw [nilpotencyClass_eq_quotient_center_plus_one]
+      omega
+
+/-- From `cl(G) ≤ 3` one gets that every weight-`3` commutator `⁅⁅a, b⁆, c⁆` is central.
+Bridge from the `nilpotencyClass` form (output of `nilpotencyClass_le_of_card_le_pow`) to
+the packaged-commutator hypothesis required by `omega1_pow_eq_one`.
+
+`cl(G) ≤ 3 ⇒ γ₄ = lowerCentralSeries G 3 = ⊥`. The element `⁅⁅a, b⁆, c⁆` lies in
+`γ₃ = lowerCentralSeries G 2`, so for every `d`, `⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ γ₄ = ⊥`, i.e.
+`⁅⁅a, b⁆, c⁆` commutes with every `d`, i.e. it is central. -/
+private theorem pointwise_central_of_nilpotencyClass_le_three {G : Type*} [Group G]
+    [Group.IsNilpotent G] (h : Group.nilpotencyClass G ≤ 3) :
+    ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G := by
+  -- `γ₄ = lowerCentralSeries G 3 = ⊥`.
+  have hbot : lowerCentralSeries G 3 = ⊥ := lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h
+  intro a b c
+  -- `⁅a, b⁆ ∈ lowerCentralSeries G 1 = commutator G = ⁅⊤, ⊤⁆`.
+  have h1 : ⁅a, b⁆ ∈ lowerCentralSeries G 1 := by
+    rw [lowerCentralSeries_one]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b)
+  -- `⁅⁅a, b⁆, c⁆ ∈ lowerCentralSeries G 2 = ⁅lcs 1, ⊤⁆`.
+  have h2 : ⁅⁅a, b⁆, c⁆ ∈ lowerCentralSeries G 2 := by
+    rw [lowerCentralSeries_succ]
+    exact Subgroup.commutator_mem_commutator h1 (Subgroup.mem_top c)
+  -- For every `d`, `⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ lcs 3 = ⊥`, so the commutator is `1`.
+  rw [Subgroup.mem_center_iff]
+  intro d
+  have h3 : ⁅⁅⁅a, b⁆, c⁆, d⁆ ∈ lowerCentralSeries G 3 := by
+    rw [lowerCentralSeries_succ]
+    exact Subgroup.commutator_mem_commutator h2 (Subgroup.mem_top d)
+  rw [hbot, Subgroup.mem_bot] at h3
+  exact (commutatorElement_eq_one_iff_commute.mp h3).symm
+
+/-- **BG Proposition 4.8(b)** (BG mmd L1511-1520): for a prime `p > 3` and a finite
+`p`-group `R` of rank `r(R) ≤ 2` (here `pRank R p ≤ 2`), `Ω₁(R) = Omega R p 1` has
+exponent one or `p`; i.e. every `g ∈ Ω₁(R)` satisfies `g ^ p = 1`.
+
+Following BG's minimal-counterexample argument, recast (as in `omega1_pow_eq_one`) as a
+strong induction on `|R|` proving the product-closure `x ^ p = y ^ p = 1 ⇒ (x*y)^p = 1`.
+For each `R'`:
+* If `⟨x, y⟩ ≠ R'`: apply the inductive hypothesis to the proper subgroup `⟨x, y⟩`.
+* If `⟨x⟩ = R'`: `R'` is abelian, so `(x*y)^p = x^p y^p = 1`.
+* Otherwise take a maximal (normal) `S ⊇ ⟨x⟩`. By induction `Ω₁(S)` has exponent `p`, so
+  by part (a) `|Ω₁(S)| ≤ p³`; with `R' = ⟨Ω₁(S), y⟩` and `|⟨y⟩| ≤ p`, `|R'| ≤ p⁴`. Then
+  `cl(R') ≤ 3` (`nilpotencyClass_le_of_card_le_pow`), so the weight-`3` commutators are
+  central (`pointwise_central_of_nilpotencyClass_le_three`), and `omega1_pow_eq_one` (the
+  `cl ≤ 3` branch of Prop 4.3) gives `(x*y)^p = 1`. -/
+theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R) (hp3 : 3 < p)
+    (hrank : OddOrder.GroupTheory.pRank R p ≤ 2)
+    {g : R} (hg : g ∈ Omega R p 1) : g ^ p = 1 := by
+  have hp : p.Prime := Fact.out
+  have hodd : Odd p := hp.odd_of_ne_two (by omega)
+  -- Reduce to product-closure of `{g | g^p = 1}`.
+  suffices hclosed : ∀ x y : R, x ^ p = 1 → y ^ p = 1 → (x * y) ^ p = 1 by
+    let omega1 : Subgroup R :=
+      { carrier := {g : R | g ^ p = 1}
+        mul_mem' := fun {x y} hx hy => hclosed x y hx hy
+        one_mem' := one_pow p
+        inv_mem' := fun {x} hx => by rw [Set.mem_setOf_eq, inv_pow, hx, inv_one] }
+    have hle : Omega R p 1 ≤ omega1 := by
+      rw [Omega, Subgroup.closure_le]
+      intro x hx
+      simpa using (pow_one p ▸ hx : x ^ p = 1)
+    simpa [omega1] using hle hg
+  clear hg g
+  -- Strong induction on `Nat.card R`, with `R` and `pRank ≤ 2` in the motive.
+  let motive : ℕ → Prop := fun n =>
+    ∀ {R' : Type _} [Group R'] [Finite R'], IsPGroup p R' →
+      OddOrder.GroupTheory.pRank R' p ≤ 2 → Nat.card R' = n →
+        ∀ x y : R', x ^ p = 1 → y ^ p = 1 → (x * y) ^ p = 1
+  refine (Nat.strongRecOn (motive := motive) (Nat.card R) ?_) hR hrank rfl
+  clear hR hrank
+  intro n ih R' _ _ hR' hrank' hcard x y hxp hyp
+  -- WLOG `⟨x, y⟩ = ⊤`: otherwise the inductive hypothesis on `K := ⟨x, y⟩` closes the goal.
+  by_cases hxytop : Subgroup.closure ({x, y} : Set R') = ⊤
+  · -- Main argument under `⟨x, y⟩ = ⊤`.
+    by_cases hxtop : Subgroup.zpowers x = ⊤
+    · -- `⟨x⟩ = ⊤`: `R'` is cyclic, hence abelian; `x, y` commute.
+      have hxy : Commute x y := by
+        have hy_mem : y ∈ Subgroup.zpowers x := hxtop ▸ Subgroup.mem_top y
+        obtain ⟨ky, hk⟩ := hy_mem
+        rw [← hk]; exact (Commute.refl x).zpow_right ky
+      rw [hxy.mul_pow, hxp, hyp, mul_one]
+    · -- `⟨x⟩ ≠ ⊤`: take a maximal (normal) subgroup `S ⊇ ⟨x⟩`.
+      obtain ⟨S, hS_coatom, hxS_le⟩ :=
+        (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.zpowers x)).resolve_left hxtop
+      haveI hS_normal : S.Normal := hS_coatom.normal_of_isPGroup hR'
+      have hxS : x ∈ S := hxS_le (Subgroup.mem_zpowers x)
+      -- `|↥S| < |R'| = n`.
+      have hScard : Nat.card ↥S < n := by
+        rw [← hcard]
+        have h_dvd : Nat.card ↥S ∣ Nat.card R' := ⟨S.index, by rw [mul_comm, S.index_mul_card]⟩
+        have h_le : Nat.card ↥S ≤ Nat.card R' := Nat.le_of_dvd Nat.card_pos h_dvd
+        have h_ne : Nat.card ↥S ≠ Nat.card R' := fun heq =>
+          hS_coatom.1 (Subgroup.eq_top_of_card_eq _ heq)
+        exact Nat.lt_of_le_of_ne h_le h_ne
+      haveI hSpg : IsPGroup p ↥S := hR'.to_subgroup S
+      have hrankS : OddOrder.GroupTheory.pRank ↥S p ≤ 2 :=
+        (OddOrder.GroupTheory.pRank_mono_of_le S).trans hrank'
+      -- Inductive hypothesis: product-closure on `↥S`.
+      have IHS : ∀ a b : ↥S, a ^ p = 1 → b ^ p = 1 → (a * b) ^ p = 1 :=
+        ih (Nat.card ↥S) hScard hSpg hrankS rfl
+      -- `{a : ↥S | a^p = 1}` is a subgroup of `↥S`; every element of `Ω₁(↥S)` has `p`-th power `1`.
+      have hΩSpow : ∀ a ∈ Omega ↥S p 1, a ^ p = 1 := by
+        let omega1S : Subgroup ↥S :=
+          { carrier := {a : ↥S | a ^ p = 1}
+            mul_mem' := fun {a b} ha hb => IHS a b ha hb
+            one_mem' := one_pow p
+            inv_mem' := fun {a} ha => by rw [Set.mem_setOf_eq, inv_pow, ha, inv_one] }
+        have hΩle : Omega ↥S p 1 ≤ omega1S := by
+          rw [Omega, Subgroup.closure_le]
+          intro a ha
+          simpa using (pow_one p ▸ ha : a ^ p = 1)
+        intro a ha
+        simpa [omega1S] using hΩle ha
+      -- `Ω₁(↥S)` (as an `R'`-subgroup) is normal in `R'` and has exponent `p`.
+      haveI : (Omega ↥S p 1).Characteristic := Omega.characteristic
+      set H : Subgroup R' := (Omega ↥S p 1).map S.subtype with hH_def
+      haveI hH_normal : H.Normal := by rw [hH_def]; infer_instance
+      have hHpow : ∀ z ∈ H, z ^ p = 1 := by
+        intro z hz
+        rw [hH_def, Subgroup.mem_map] at hz
+        obtain ⟨a, ha, rfl⟩ := hz
+        have hap : a ^ p = 1 := hΩSpow a ha
+        rw [Subgroup.coe_subtype, ← Subgroup.coe_pow, hap, Subgroup.coe_one]
+      -- `x ∈ H`.
+      have hxH : x ∈ H := by
+        rw [hH_def, Subgroup.mem_map]
+        refine ⟨⟨x, hxS⟩, ?_, by rw [Subgroup.coe_subtype]⟩
+        exact Omega.mem_of_pow_eq_one (by rw [pow_one]; exact Subtype.ext (by simpa using hxp))
+      -- **Step 5**: `|Ω₁(↥S)| ≤ p³` by part (a).
+      haveI hSomega_pg : IsPGroup p ↥(Omega ↥S p 1) := hSpg.to_subgroup _
+      have hSomega_rank : OddOrder.GroupTheory.pRank ↥(Omega ↥S p 1) p ≤ 2 :=
+        (OddOrder.GroupTheory.pRank_mono_of_le (Omega ↥S p 1)).trans hrankS
+      have hSomega_exp : ∀ w : ↥(Omega ↥S p 1), w ^ p = 1 := by
+        intro w
+        apply Subtype.ext
+        rw [Subgroup.coe_pow, Subgroup.coe_one]
+        exact hΩSpow (w : ↥S) w.2
+      have hcube : Nat.card ↥(Omega ↥S p 1) ≤ p ^ 3 :=
+        card_le_prime_cube_of_pRank_le_two_of_exponent_prime hSomega_pg hSomega_rank hSomega_exp
+      -- **Step 6**: `|R'| ≤ p⁴`. `R' = H ⊔ ⟨y⟩`, `|H| = |Ω₁(↥S)| ≤ p³`, `|⟨y⟩| ≤ p`.
+      have hHcard : Nat.card ↥H ≤ p ^ 3 := by
+        rw [hH_def, Subgroup.card_map_of_injective S.subtype_injective]
+        exact hcube
+      have hYcard : Nat.card ↥(Subgroup.zpowers y) ≤ p := by
+        rw [Nat.card_zpowers]
+        exact Nat.le_of_dvd hp.pos (orderOf_dvd_of_pow_eq_one hyp)
+      have hHY_top : H ⊔ Subgroup.zpowers y = ⊤ := by
+        rw [eq_top_iff, ← hxytop, Subgroup.closure_le]
+        intro w hw
+        rcases hw with hw | hw
+        · rw [hw]; exact Subgroup.mem_sup_left hxH
+        · rw [Set.mem_singleton_iff] at hw; rw [hw]
+          exact Subgroup.mem_sup_right (Subgroup.mem_zpowers y)
+      have hR'card : Nat.card R' ≤ p ^ 4 := by
+        -- `↥(H ⊔ ⟨y⟩) = ↑H * ↑⟨y⟩`, so the multiplication map is surjective.
+        have hsurj : Function.Surjective
+            (fun q : ↥H × ↥(Subgroup.zpowers y) => ((q.1 : R') * (q.2 : R') : R')) := by
+          intro z
+          have hzmem : z ∈ H ⊔ Subgroup.zpowers y := hHY_top ▸ Subgroup.mem_top z
+          rw [← SetLike.mem_coe, Subgroup.normal_mul] at hzmem
+          obtain ⟨a, ha, b, hb, rfl⟩ := hzmem
+          exact ⟨(⟨a, ha⟩, ⟨b, hb⟩), rfl⟩
+        have hcard_le : Nat.card R' ≤ Nat.card (↥H × ↥(Subgroup.zpowers y)) := by
+          have hRtop : Nat.card R' = Nat.card ↥(H ⊔ Subgroup.zpowers y) := by
+            rw [hHY_top]; exact (Nat.card_congr (Subgroup.topEquiv).symm.toEquiv)
+          rw [hRtop, hHY_top]
+          have : Nat.card (↥(⊤ : Subgroup R')) = Nat.card R' :=
+            Nat.card_congr (Subgroup.topEquiv).toEquiv
+          rw [this]
+          exact Nat.card_le_card_of_surjective _ hsurj
+        calc Nat.card R' ≤ Nat.card (↥H × ↥(Subgroup.zpowers y)) := hcard_le
+          _ = Nat.card ↥H * Nat.card ↥(Subgroup.zpowers y) := Nat.card_prod _ _
+          _ ≤ p ^ 3 * p := Nat.mul_le_mul hHcard hYcard
+          _ = p ^ 4 := by ring
+      -- **Step 7**: `cl(R') ≤ 3`.
+      haveI : Group.IsNilpotent R' := hR'.isNilpotent
+      have hclass : Group.nilpotencyClass R' ≤ 3 :=
+        nilpotencyClass_le_of_card_le_pow hR' (j := 3) (by norm_num) (by simpa using hR'card)
+      -- **Step 8**: weight-`3` commutators central; apply `omega1_pow_eq_one`.
+      have hc3' : ∀ a b c : R', ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center R' :=
+        pointwise_central_of_nilpotencyClass_le_three hclass
+      have hxy_mem : x * y ∈ Omega R' p 1 :=
+        mul_mem
+          (Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hxp))
+          (Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hyp))
+      exact omega1_pow_eq_one hR' hodd (Or.inr ⟨hp3, hc3'⟩) hxy_mem
+  · -- `⟨x, y⟩ ≠ ⊤`: apply the inductive hypothesis to `K := ⟨x, y⟩`.
+    set K : Subgroup R' := Subgroup.closure ({x, y} : Set R') with hK_def
+    have hxK : x ∈ K := Subgroup.subset_closure (by left; rfl)
+    have hyK : y ∈ K := Subgroup.subset_closure (by right; rfl)
+    have hKcard : Nat.card ↥K < n := by
+      rw [← hcard]
+      have h_dvd : Nat.card ↥K ∣ Nat.card R' := ⟨K.index, by rw [mul_comm, K.index_mul_card]⟩
+      have h_le : Nat.card ↥K ≤ Nat.card R' := Nat.le_of_dvd Nat.card_pos h_dvd
+      have h_ne : Nat.card ↥K ≠ Nat.card R' := fun heq =>
+        hxytop (Subgroup.eq_top_of_card_eq _ heq)
+      exact Nat.lt_of_le_of_ne h_le h_ne
+    haveI hKpg : IsPGroup p ↥K := hR'.to_subgroup K
+    have hrankK : OddOrder.GroupTheory.pRank ↥K p ≤ 2 :=
+      (OddOrder.GroupTheory.pRank_mono_of_le K).trans hrank'
+    have IHK : ∀ a b : ↥K, a ^ p = 1 → b ^ p = 1 → (a * b) ^ p = 1 :=
+      ih (Nat.card ↥K) hKcard hKpg hrankK rfl
+    have hxKp : (⟨x, hxK⟩ : ↥K) ^ p = 1 := by
+      apply Subtype.ext; rw [Subgroup.coe_pow, Subgroup.coe_one]; exact hxp
+    have hyKp : (⟨y, hyK⟩ : ↥K) ^ p = 1 := by
+      apply Subtype.ext; rw [Subgroup.coe_pow, Subgroup.coe_one]; exact hyp
+    have hxyKp := IHK ⟨x, hxK⟩ ⟨y, hyK⟩ hxKp hyKp
+    have hcoe : ((⟨x, hxK⟩ * ⟨y, hyK⟩ : ↥K) : R') ^ p = 1 := by
+      rw [← Subgroup.coe_pow, hxyKp, Subgroup.coe_one]
+    simpa using hcoe
+
+end Prop48ExponentP
+
 end OddOrder.BG.Ch1.S04
