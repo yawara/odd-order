@@ -916,6 +916,30 @@ set_option linter.style.longLine false in
 -- `card_mBSubgroup` + `card_nLStabilizerIn_eq` (|N_L(B)|=|setLStabilizer B|).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_orbit_weighted
+-- (2.10) STEP 3 final assembly: the per-`B` orbit-weight identity over the fixed `a^L` index
+-- (`mobiusTermCF_div_orbit_eq`, reindexing the inner `b`-sum from the `B`-dependent `N_L(B)`-subtype
+-- to `aOrbitFinset a = a^L` for the `Finset.sum_comm` swap), and the support-side total
+-- (`sum_mobiusTermCF_transversalRep_eq_neg`: `∑_{C∈ℬ} mobiusTermCF(rep C) = -α(a)` via orbit-average
+-- + double-sum swap + survivor collapse `mobiusSummand b' g {b'} = -|C_L(b')|` + the (2.7) count
+-- `sum_card_centralizerIn_eq` giving `∑_{b'∈a^L}|C_L(b')| = |L|`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusTermCF_div_orbit_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusTermCF_transversalRep_eq_neg
+-- (2.10) STEP 4: the pointwise inclusion–exclusion identity `α^τ = -∑_{C∈ℬ} mobiusTermCF(rep C)`
+-- (`dadeMap_eq_neg_sum_mobiusTermCF`, support side = `sum_mobiusTermCF_transversalRep_eq_neg`,
+-- non-support side = `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`), its reindex over the
+-- representative subtype (`sum_mobiusTermCF_transversalRep_eq_sum_subtype`), the (2.6.b) preservation
+-- `PreservesVirtualCharacters (hyp.dadeMap)` (`preservesVirtualCharacters_dadeMap`, via the bridge),
+-- and the honest `FullDadeIsometryData` construction (`fullDadeIsometryData`, = (2.6)).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.preservesVirtualCharacters_dadeMap
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.fullDadeIsometryData
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
