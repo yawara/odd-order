@@ -99,6 +99,43 @@ family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axio
 - **의의**: (5.6)은 쌍 인접으로 coherence를 짓는 **귀납 엔진**, §6 (case-A/B coherence) 및
   궁극적으로 S08:188 `sibleySetup_is_coherent`로의 관문. 상세는 issue 0046 pass-5.
 
+### (2026-05-31, pass 6) (6.8.1)/(6.8.2) `τ₃`-gluing의 algebraic heart landing (PARTIAL)
+
+`S07_Coherence.lean`에 **orthogonal coherent union** 항등식 2건 landing (sorry/axiom 無 —
+`#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각 3 axiom 전
+allowlist; full `lake build OddOrder` 緑 3351 jobs). **roadmap의 recommended first leaf
+`case_A_X_union_Y_coherent` (L2.2)는 NOT tractable로 판정** (아래), 대신 그 leaf와 case (B)가
+*공통으로* 소비하는 가장 foundational한 honest primitive를 landing:
+
+- **`inner_orthogonal_glued_eq`** (two-lattice block identity): `a,a'∈ℤ[X]`, `b,b'∈ℤ[Y]`에 대해
+  `νX`가 `ℤ[X]`에서, `νY`가 `ℤ[Y]`에서 `⟨·,·⟩` 보존 + source 직교 (`⟨a,b'⟩=⟨b,a'⟩=0`) + image
+  직교 (`⟨νX a, νY b'⟩=⟨νY b, νX a'⟩=0`) ⟹
+  `⟨νX a + νY b, νX a' + νY b'⟩ = ⟨a + b, a' + b'⟩`. `inner_block_expand`의 two-lattice 판; 양변이
+  대각 블록 `⟨a,a'⟩+⟨b,b'⟩`로 collapse. Peterfalvi의 "`τ₃`는 `τ₁`을 `Y`에, `τ₂`를 `X`에 일치"
+  (mmd L176/L224) gluing의 **대수적 심장**.
+- **`inner_eq_on_zSpan_union_of_orthogonal`**: 위 항등식을 `ℤ[X∪Y]=ℤ[X]⊔ℤ[Y]`
+  (`Submodule.span_union`) 전체로 lift — `νX`를 `ℤ[X]`에, `νY`를 `ℤ[Y]`에 일치시키는 **임의**의 map
+  `ν`에 대해 `ν`가 `ℤ[X∪Y]`에서 `⟨·,·⟩` 보존. `φ∈ℤ[X∪Y]`를 `a+b` (`mem_sup`)로 분해 ⟹
+  `ν φ=νX a+νY b` ⟹ `inner_orthogonal_glued_eq`로 폐합. = 합집합 `X∪Y`의 glued map `τ₃`에 대한
+  약화된 `IsCoherent.extension_inner_eq` field 그 자체.
+- **honest 판정 — L2.2가 NOT tractable인 이유** (roadmap의 "(5.6) direct consumer ~100-140 LOC"는
+  과대평가): (6.8.1) 증명 (mmd L158-176)은 `retarget_isCoherent` 1회 호출이 **아니다** —
+  (1) **(6.6)** coherence-of-`X` (별도의 ~8-step character theorem, 미형식화),
+  (2) **(6.7)** congruence forcing `b≡c≡0 (mod a)` + 명시적 `X=χ₁^{τ₁}` 동정 (미형식화),
+  (3) `τ₃` = **두 family** `X`, `Y` (임의 크기)의 orthonormal union — repo에는 single-pair
+  `retarget` closed-form만 있고 two-family union 구성 (free-module/orthonormal-basis extension)이
+  부재. 게다가 thin `SibleySetup`은 `S=Ind`/Dade isometry/`X`/`Y`/`τ₁`/`τ₂`/(6.6)를 전혀 안 들고
+  있어 statement화하면 case content를 가설로 외출 = memory `scaffold-sorry-free-not-done`가 금하는
+  scaffolding. 따라서 정직하게 **두 항등식 (gluing의 hard algebraic step)만 landing**.
+- **정밀 잔존 (full `case_A_X_union_Y_coherent` = L2.2)**:
+  (i) **(6.6)** coherence-of-`X` witness (별 issue/leaf),
+  (ii) `νX`(=τ₂)/`νY`(=τ₁) coherence extension 및 image 직교 `himg_ortho`를 case-A/B character
+  theory ((6.7) 포함)에서 *생성* (위 두 항등식의 honest 가설들을 채우는 작업),
+  (iii) glued map `ν=τ₃`의 **well-defined 구성** = orthonormal `X∪Y`의 ℤ-linear independence ⟹
+  free-module basis extension (repo/mathlib 부재 infra) + `extends_on_supported`
+  (`eq_on_zSpan_of_eq_on` generator 패턴, case별 difference-generator 구조 필요). (iii)이 본 leaf의
+  핵심 missing infra. 상세는 issue 0046 pass-6.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

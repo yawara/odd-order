@@ -1768,6 +1768,98 @@ noncomputable def retarget_isCoherent
     intro φ hφ
     exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
 
+/-! ### Peterfalvi (6.8.1)/(6.8.2): the orthogonal coherent union `X ∪ Y`
+
+The §8 case-analysis proofs (6.8.1) for case (A) and (6.8.2) for case (B) both *conclude* with the
+**same** gluing step: two coherent sets `X` and `Y`, mutually orthogonal at the source *and* whose
+coherence extensions land in mutually orthogonal target subspaces, are glued into a single isometry
+`τ₃` of `Z[X ∪ Y]` — Peterfalvi's "`τ₃` is the `ℤ`-linear mapping which coincides with `τ₁` on `Y`
+and with `τ₂` on `X`" (mmd L176, L224).
+
+The genuinely hard, reusable algebraic content of that step is the **inner-product preservation** on
+`Z[X ∪ Y]`: for any map `ν` agreeing with `νX` on `Z[X]` and with `νY` on `Z[Y]`, the gram matrix is
+preserved.  This is the two-lattice analogue of `inner_block_expand`, and it is what realizes the
+weakened `IsCoherent.extension_inner_eq` field once the case-specific machinery has supplied the two
+coherent pieces and the image orthogonality.  It is *not* posited: the case-(A)/(B) content (the
+(6.6) coherence of `X`, the (6.7) congruence forcing `b ≡ 0 (mod a)`, the explicit identification
+`X = χ₁^{τ₁}`) is exactly what *produces* the hypotheses `hX`, `hY`, `himg_ortho` below, and remains
+separate, unfinished work.  Here we discharge only the gluing identity they all feed into. -/
+
+/-- **Two-lattice orthogonal block identity.**
+
+For `a, a' ∈ ℤ[X]` and `b, b' ∈ ℤ[Y]`, if `νX` preserves `⟨·,·⟩` on `ℤ[X]`, `νY` preserves it on
+`ℤ[Y]`, the source lattices are orthogonal (`⟨a, b'⟩ = ⟨b, a'⟩ = 0`), and the images are orthogonal
+(`⟨νX a, νY b'⟩ = ⟨νY b, νX a'⟩ = 0`), then
+`⟨νX a + νY b, νX a' + νY b'⟩ = ⟨a + b, a' + b'⟩`.
+
+Both sides expand to `⟨a, a'⟩ + ⟨b, b'⟩` by the respective orthogonalities; the diagonal blocks
+match via the lattice isometries `hνX`, `hνY`.  This is the algebraic heart of the (6.8.1)/(6.8.2)
+`τ₃` gluing. -/
+theorem inner_orthogonal_glued_eq
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {νX νY : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)}
+    (hνX : ∀ u v : ClassFunction L ℂ, u ∈ Submodule.span ℤ X → v ∈ Submodule.span ℤ X →
+      ClassFunction.inner (νX u) (νX v) = ClassFunction.inner u v)
+    (hνY : ∀ u v : ClassFunction L ℂ, u ∈ Submodule.span ℤ Y → v ∈ Submodule.span ℤ Y →
+      ClassFunction.inner (νY u) (νY v) = ClassFunction.inner u v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (νX u) (νY v) = 0)
+    {a a' b b' : ClassFunction L ℂ}
+    (ha : a ∈ Submodule.span ℤ X) (ha' : a' ∈ Submodule.span ℤ X)
+    (hb : b ∈ Submodule.span ℤ Y) (hb' : b' ∈ Submodule.span ℤ Y) :
+    ClassFunction.inner (νX a + νY b) (νX a' + νY b') =
+      ClassFunction.inner (a + b) (a' + b') := by
+  -- Source-side orthogonalities (both directions, via conjugate symmetry).
+  have hab' : ClassFunction.inner a b' = 0 := hsrc_ortho a ha b' hb'
+  have hba' : ClassFunction.inner b a' = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hsrc_ortho a' ha' b hb, star_zero]
+  -- Image-side orthogonalities (both directions, via conjugate symmetry).
+  have hXaYb' : ClassFunction.inner (νX a) (νY b') = 0 := himg_ortho a ha b' hb'
+  have hYbXa' : ClassFunction.inner (νY b) (νX a') = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, himg_ortho a' ha' b hb, star_zero]
+  rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_add_right, ClassFunction.inner_add_left,
+    ClassFunction.inner_add_right, ClassFunction.inner_add_right,
+    hXaYb', hYbXa', hab', hba', hνX a a' ha ha', hνY b b' hb hb']
+
+/-- **Inner-product preservation on `Z[X ∪ Y]` for an orthogonal coherent union.**
+
+If a map `ν` agrees with `νX` on `ℤ[X]` and with `νY` on `ℤ[Y]`, and the four orthogonal-block
+hypotheses of `inner_orthogonal_glued_eq` hold, then `ν` preserves `⟨·,·⟩` on the whole lattice
+`ℤ[X ∪ Y]`.  Every `φ ∈ ℤ[X ∪ Y] = ℤ[X] ⊔ ℤ[Y]` (`Submodule.span_union`) splits as `a + b` with
+`a ∈ ℤ[X]`, `b ∈ ℤ[Y]`, so `ν φ = νX a + νY b`; the identity then closes by
+`inner_orthogonal_glued_eq`.  This is precisely the weakened `IsCoherent.extension_inner_eq`
+obligation for the glued map `τ₃` of (6.8.1)/(6.8.2). -/
+theorem inner_eq_on_zSpan_union_of_orthogonal
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {ν νX νY : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)}
+    (hagreeX : ∀ u ∈ Submodule.span ℤ X, ν u = νX u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ Y, ν v = νY v)
+    (hνX : ∀ u v : ClassFunction L ℂ, u ∈ Submodule.span ℤ X → v ∈ Submodule.span ℤ X →
+      ClassFunction.inner (νX u) (νX v) = ClassFunction.inner u v)
+    (hνY : ∀ u v : ClassFunction L ℂ, u ∈ Submodule.span ℤ Y → v ∈ Submodule.span ℤ Y →
+      ClassFunction.inner (νY u) (νY v) = ClassFunction.inner u v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (νX u) (νY v) = 0)
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ Submodule.span ℤ (X ∪ Y)) (hψ : ψ ∈ Submodule.span ℤ (X ∪ Y)) :
+    ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ := by
+  -- Decompose `φ, ψ ∈ ℤ[X ∪ Y] = ℤ[X] ⊔ ℤ[Y]`.
+  rw [Submodule.span_union, Submodule.mem_sup] at hφ hψ
+  obtain ⟨a, ha, b, hb, hφeq⟩ := hφ
+  obtain ⟨a', ha', b', hb', hψeq⟩ := hψ
+  -- `ν φ = νX a + νY b`, `ν ψ = νX a' + νY b'`.
+  have hνφ : ν φ = νX a + νY b := by
+    rw [← hφeq, map_add, hagreeX a ha, hagreeY b hb]
+  have hνψ : ν ψ = νX a' + νY b' := by
+    rw [← hψeq, map_add, hagreeX a' ha', hagreeY b' hb']
+  rw [hνφ, hνψ, ← hφeq, ← hψeq]
+  exact inner_orthogonal_glued_eq hνX hνY hsrc_ortho himg_ortho ha ha' hb hb'
+
 /-! ### Peterfalvi (5.6.1): the family bundle
 
 The (5.6) coherence-union argument carries a whole **family** `{χᵢ}_{i ∈ s} ⊆ S₁` with `χ₁` a

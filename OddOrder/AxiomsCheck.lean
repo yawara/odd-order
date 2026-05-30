@@ -1114,3 +1114,11 @@ set_option linter.style.longLine false in
 -- `hX_ortho`/`hXbar_ortho` inputs of `retarget_isCoherent` from the per-`R(χ)`-element (5.2.e) fact.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_eq_intCast_sum
+-- (6.8.1)/(6.8.2) orthogonal coherent union: the two-lattice block identity
+-- `⟨νX a + νY b, νX a' + νY b'⟩ = ⟨a + b, a' + b'⟩` for `a,a'∈ℤ[X]`, `b,b'∈ℤ[Y]` under source +
+-- image orthogonality (the algebraic heart of Peterfalvi's `τ₃` gluing of two coherent pieces).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_orthogonal_glued_eq
+-- (6.8.1)/(6.8.2) the same identity lifted to all of `ℤ[X∪Y]` for any map `ν` agreeing with `νX` on
+-- `ℤ[X]` and `νY` on `ℤ[Y]` (`Submodule.span_union` decomposition) — the weakened
+-- `IsCoherent.extension_inner_eq` field for the union `X ∪ Y` once the two coherent pieces exist.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_eq_on_zSpan_union_of_orthogonal

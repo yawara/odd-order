@@ -299,6 +299,24 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `CoherenceTarget` 에 그대로 typecheck — 향후 증명도 약화로 더 쉬워짐.
   - **§5 coherence hub (5.6) 일반형 완료** = 쌍 인접으로 coherence 를 짓는 귀납 엔진, §6 (case-A/B
     coherence) 및 궁극적으로 S08:188 `sibleySetup_is_coherent` 로의 관문.
+- [x] (2026-05-31, pass 6) **(6.8.1)/(6.8.2) `τ₃`-gluing 의 algebraic heart 2건** 을
+      `S07_Coherence.lean` 에 landing (PARTIAL; sorry/axiom 無, AxiomsCheck 등록 2건 각 3 axiom 全
+      allowlist, full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351 jobs). **이번 round 의
+      recommended first leaf `case_A_X_union_Y_coherent` (L2.2) 는 NOT tractable 로 판정** — roadmap 의
+      "(5.6) `retarget_isCoherent` direct consumer ~100-140 LOC" 는 과대평가 (실제 (6.8.1) mmd L158-176
+      은 (6.6) coherence-of-X + (6.7) congruence forcing + **두 family** orthonormal union 구성을
+      요하며 single-pair `retarget` 로는 불가; thin `SibleySetup` 은 S=Ind/Dade/X/Y/τ₁/τ₂/(6.6) 미보유
+      ⟹ statement화하면 scaffolding). 대신 L2.2 와 case (B) 가 공통 소비하는 foundational primitive landing:
+  - **`inner_orthogonal_glued_eq`** : `a,a'∈ℤ[X]`,`b,b'∈ℤ[Y]`, `νX`/`νY` 각 lattice 등거리 + source
+    직교 `⟨a,b'⟩=⟨b,a'⟩=0` + image 직교 `⟨νX a,νY b'⟩=⟨νY b,νX a'⟩=0` ⟹
+    `⟨νX a+νY b, νX a'+νY b'⟩=⟨a+b,a'+b'⟩`. `inner_block_expand` 의 two-lattice 판, gluing 의 대수적 심장.
+  - **`inner_eq_on_zSpan_union_of_orthogonal`** : 위를 `ℤ[X∪Y]=ℤ[X]⊔ℤ[Y]` (`Submodule.span_union`)
+    전체로 lift — `νX`/`νY` 에 일치하는 임의 `ν` 가 `ℤ[X∪Y]` 에서 `⟨·,·⟩` 보존. = 합집합 glued map
+    `τ₃` 의 약화된 `IsCoherent.extension_inner_eq` field.
+  - **정밀 잔존 (full L2.2)** : (i) (6.6) coherence-of-X witness, (ii) `νX`(τ₂)/`νY`(τ₁) extension 및
+    `himg_ortho` 를 case-A/B character theory ((6.7) 포함) 에서 생성, (iii) glued `ν=τ₃` 의 well-defined
+    구성 = orthonormal `X∪Y` 의 ℤ-linear independence ⟹ free-module basis extension (repo/mathlib 부재
+    infra) + `extends_on_supported` (case별 difference-generator). (iii) 이 핵심 missing infra.
 
 ## 完了条件
 
