@@ -98,7 +98,18 @@ Thm 4.16 本体の前に要る (sorry なしで deferred 中):
 
 > **更新 (2026-05-30, commit 46e9e5c)**: issue 2 のうち ✅ **Lem 4.5(b) + Lem 4.10 完全達成** (Prop 4.11 step 8 / Thm 4.12 の前提が開いた)。⚠ Prop 4.3(a) cl≤3 は **precursor のみ** (full collection は γ₄=1 を要し BG の f/g exponent が mathlib convention で誤り、§2 N-5 参照)。
 
-**次の選択肢**: (A) **Prop 4.11 (Huppert)** — gate の Lem 4.5(b) ✅/agemo ✅ が揃った; 残依存 = Lem 4.9 (`|Ω₁(R/T)|≤p²`) + abelian case (設計書 §3)。(B) **N-4 Maschke bridge** (`s04_n4_maschke_bridge_design.md`、Thm 4.12(a)/4.16 B-2 を開く、⚠ Ch04 `_root_` 修正 spawn task 後)。(C) **Prop 4.3(a) cl≤3 full + Prop 4.3(b)** (precursor の上に full collection+|R|帰納; mirror で f/g 再計算)。(D) **Lem 4.9 + Prop 4.8** (Wave 2 残)。設計書の依存表・risk を必ず先に読む。
+> **更新 (2026-05-30, commit 91fc115)**: ✅ **N-4 Maschke bridge 完了** = `OperatorMaschke.lean`
+> `exists_aInvariant_complement_in_omega1_quotient` (最深 scaffold-trap gate, sorry-free/axiom-clean)。
+> 設計書の `mapSubmodule`/`asModule` 経路は **asModule の AddCommMonoid 二重 instance trap** で詰み,
+> **`Subrepresentation` + `IsSemisimpleRepresentation` 経由に変更** (`s04_n4_maschke_bridge_design.md`
+> 冒頭バナー参照)。これで **Thm 4.12(a) a-3 / Thm 4.16 B-2 の Maschke 段が genuine に書ける**。
+
+**次の選択肢**: (A) **Thm 4.12(a) (Huppert)** — N-4 ✅ + Lem 4.10 ✅/4.5(b) ✅ で Maschke 段が揃った;
+残 needs-impl = metacyclic⇒R' cyclic / A-inv cyclic 極大 subgroup / Aut(cyclic) abelian / Prop 1.6(b)
+Γ↔R-内部 変換 (設計書 §4.3 依存表)。(B) **Prop 4.11 (Huppert)** — 残依存 = Lem 4.9 (`|Ω₁(R/T)|≤p²`)
++ abelian case (設計書 §3)。(C) **Prop 4.3(a) cl≤3 full + Prop 4.3(b)**。(D) **Lem 4.9 + Prop 4.8**。
+設計書の依存表・risk を必ず先に読む。⚠ Ch04 `quotientMulAutHom` の `_root_` 欠落 (二重 nest 実名) は未修正,
+新ファイルは explicit 実名で回避 (S7A2 と同様); 修正 spawn task は別途。
 
 **最重要 risk (設計書より)**: 最深 scaffold-trap gate = **N-4 (A の R/S 商作用 + Maschke A-invariant complement)** — Thm 4.12(a) と Thm 4.16 Case B-2 が両方依存するが repo 不在。`MulAction A (R/S) := sorry` で誤魔化す誘惑が最大なので**最初に genuine 実装**。Thm 4.16 B-2 の `j²≡1` 矛盾は**純 ZMod p 算術で閉じる** (GL engine 経由でない — mis-routing 注意)。
 
