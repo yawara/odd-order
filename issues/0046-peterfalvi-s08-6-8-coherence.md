@@ -893,6 +893,34 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     retarget chain 全体) に cascade する大規模・高リスク refactor で、本ラウンド scope 外。
     ① Dade R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) は依然 missing だが
     ②の lattice-relative 化が前提。image-side (b)+(c) は完了済。
+  - **Round 25 (2026-05-31) — ②の lattice-relative 化 (前パスの「真の修正」) 完了**: Round-13 で
+    `IsCoherent.extension_isometry` に施した lattice-relative 弱化 (pass 5, commit b14a987) と **同一原理**を
+    `CharacterPsiDecomposition.tau1_isometry` に適用 (USER 永続承認済)。sorry/axiom 無 —
+    `#print axioms` 不変 ({propext, Classical.choice, Quot.sound}); AxiomsCheck 件数不変 (S07 既存 5 件
+    `ofProjection`/`decompositionPair`/`decompositionPair_tau1_agree`/`retargetTargetPair`/
+    `retarget_isCoherent_of_sharedDecomposition` 全 3 axiom allowlist 内); full `lake build OddOrder`/
+    `OddOrder.AxiomsCheck` 緑 3360/3343 jobs。
+  - **field 弱化**: 構造体 `CharacterPsiDecomposition` の global `tau1_isometry : IsIntegralIsometry tau1`
+    を lattice-relative `tau1_inner_eq_on_support : ∀ φ ζ ∈ zSpan {χ, χ.conj, ψ}, ⟨τ₁ φ, τ₁ ζ⟩ = ⟨φ, ζ⟩`
+    に置換。FT では `dim CF(L) > dim CF(G)` ゆえ global 等距は一般不在; Dade 等距/running extension は
+    supported sublattice `ℤ[χ, χ̄, ψ]` 上でのみ inner 保存 — それが (5.4.b)/(5.5)/(5.6.2) の全使用 (L904/
+    L971/L1838、いずれも `χ−ψ` か `χ−χ̄`、両者 ∈ ℤ[χ, χ̄, ψ]) に充分。
+  - **blast radius (実測, 前パス見積りを精密化)**: field アクセスは `.inner_eq` 経由の **3 箇所のみ**
+    (`inner_self_chi_eq_sum_coeff` L904 / `inner_self_chi_add_psi_eq` L971 / `retargetTargetPair` 内
+    `hχχbar_equiv_card_R` L1838)、構造分解・pattern-match 無。membership cert は新規 helper 2 件
+    `chi_sub_conj_mem_zSpan_support` / `chi_sub_psi_mem_zSpan_support` (各 `Submodule.sub_mem` +
+    `Submodule.subset_span`、4 行) で供給。**前パスが「大規模 cascade」と見た `retarget_isIntegralIsometry`
+    (L2023) は struct field を経由せず standalone global `τ₁` 仮説で動く別系統 ⟹ blast radius 外**
+    (global `τ₁` を要求し global retarget を産む chain は本 refactor と独立、不変)。
+  - **constructor 供給**: `ofProjection` は入力 `htau1_isom : IsIntegralIsometry tau1` (global) のまま
+    保持し、field を `fun φ ζ _ _ => htau1_isom.inner_eq φ ζ` で供給 (global→lattice は健全な特殊化)。
+    `decompositionPair`/`retarget_isCoherent_of_sharedDecomposition` の入力も global のまま (変更不要)。
+  - **supply-ability (Round-24 (ii) unblock の実体)**: 弱化は **field レベル**のみ ⟹ 構造体に *もはや
+    global isometry を要求する field が無い* (唯一だった `tau1_isometry` を除去)。よって将来の per-step
+    D₀/Da 生産者が `tau1` を **Dade 等距 + running `IsCoherent.extension`** から組む際 (extension は
+    `extension_inner_eq` = lattice-relative inner-eq しか証明せず global 等距は証明し得ない)、
+    `tau1_inner_eq_on_support` を直接供給して `CharacterPsiDecomposition` を *手構成* 可能になった
+    (`IsCoherent` 自身の構成と完全並行)。これが Round-24 (ii) per-step D production の構造的 unblock。
 
 ## 完了条件
 

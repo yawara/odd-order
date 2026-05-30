@@ -707,8 +707,19 @@ structure CharacterPsiDecomposition (τ : IntegralCharacterMap L G)
   imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ
   /-- The auxiliary isometry `τ₁` on `ℤ[χ - ψ, χ - χ̄]`. -/
   tau1 : IntegralCharacterMap L G
-  /-- `τ₁` is an integral isometry. -/
-  tau1_isometry : IsIntegralIsometry (L := L) (G := G) tau1
+  /-- `τ₁` preserves the inner product on the sponsoring lattice `ℤ[χ, χ̄, ψ]`.
+
+  This is **lattice-relative**, not a global `IsIntegralIsometry` on all of `CF(L)`:
+  it is the same Round-13 weakening already applied to `IsCoherent.extension_inner_eq`.
+  In Feit–Thompson `dim CF(L) > dim CF(G)`, so a global isometry of the
+  character-difference lattice into `CF(G)` generically does not exist, but the Dade
+  isometry / running extension *does* preserve the inner product on the supported
+  sublattice `ℤ[χ, χ̄, ψ]` — which is all the (5.4.b)/(5.5)/(5.6.2) proofs use (every
+  access is on `χ - ψ` or `χ - χ̄`, both in `ℤ[χ, χ̄, ψ]`). -/
+  tau1_inner_eq_on_support :
+    ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ
   /-- `τ₁` coincides with `τ` on `χ - χ̄`. -/
   tau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj)
   /-- The image side `X` of `(χ - ψ)^{τ₁} = X - Y`. -/
@@ -775,7 +786,7 @@ noncomputable def ofProjection
     imageFamily.mem_ZIrr imageFamily.orthonormal
   { imageFamily := imageFamily
     tau1 := tau1
-    tau1_isometry := htau1_isom
+    tau1_inner_eq_on_support := fun φ ζ _ _ => htau1_isom.inner_eq φ ζ
     tau1_agrees := htau1_agrees
     X := ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α
     Y := -(tau1 (χ - ψ) - ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α)
@@ -854,6 +865,20 @@ theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
         hχχ1 hχbarχ1 hχχbar).1).tau1 χ :=
   rfl
 
+/-- `χ - χ̄ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the conjugate difference. -/
+theorem chi_sub_conj_mem_zSpan_support :
+    χ - χ.conj ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
+  Submodule.sub_mem _
+    (Submodule.subset_span (by simp))
+    (Submodule.subset_span (by simp))
+
+/-- `χ - ψ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the `ψ`-difference. -/
+theorem chi_sub_psi_mem_zSpan_support :
+    χ - ψ ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
+  Submodule.sub_mem _
+    (Submodule.subset_span (by simp))
+    (Submodule.subset_span (by simp))
+
 /-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
 theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
     {α : ClassFunction G ℂ} (hα : α ∈ D.imageFamily.imageSet) :
@@ -901,7 +926,9 @@ theorem inner_self_chi_eq_sum_coeff
   -- Step 2: transport across `τ₁` (isometry, agreeing with `τ` on `χ - χ̄`).
   have himg : ClassFunction.inner (χ - ψ) (χ - χ.conj) =
       ClassFunction.inner (D.X - D.Y) (∑ α ∈ D.imageFamily.imageSet, α) := by
-    rw [← D.tau1_isometry.inner_eq, D.tau1_image, D.tau1_agrees, D.imageFamily.image_eq]
+    rw [← D.tau1_inner_eq_on_support (χ - ψ) (χ - χ.conj)
+        chi_sub_psi_mem_zSpan_support chi_sub_conj_mem_zSpan_support,
+      D.tau1_image, D.tau1_agrees, D.imageFamily.image_eq]
   -- Step 3: `Y ⊥ R(χ)` drops `Y`; coefficient recovery finishes.
   rw [hsrc, himg, ClassFunction.inner_sub_left, D.inner_Y_sum, sub_zero, D.inner_X_sum]
 
@@ -968,7 +995,8 @@ theorem inner_self_chi_add_psi_eq
     ClassFunction.inner χ χ + ClassFunction.inner ψ ψ =
       ClassFunction.inner D.X D.X + ClassFunction.inner D.Y D.Y := by
   rw [← D.inner_self_chi_sub_psi, ← D.inner_self_X_sub_Y, ← D.tau1_image,
-    D.tau1_isometry.inner_eq]
+    D.tau1_inner_eq_on_support (χ - ψ) (χ - ψ)
+      chi_sub_psi_mem_zSpan_support chi_sub_psi_mem_zSpan_support]
 
 /-- **Peterfalvi (5.6.2) opening bound:** `‖Y‖² ≤ ‖ψ‖²`.
 
@@ -1835,7 +1863,8 @@ noncomputable def retargetTargetPair
       rw [D.imageFamily.image_eq, inner_self_sum_orthonormal_eq_card D.imageFamily.orthonormal]
     have h2 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) =
         ClassFunction.inner (χ - χ.conj) (χ - χ.conj) := by
-      rw [← D.tau1_agrees, D.tau1_isometry.inner_eq]
+      rw [← D.tau1_agrees, D.tau1_inner_eq_on_support (χ - χ.conj) (χ - χ.conj)
+        chi_sub_conj_mem_zSpan_support chi_sub_conj_mem_zSpan_support]
     have h3 : ClassFunction.inner (χ - χ.conj) (χ - χ.conj) = 2 := by
       rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
         ClassFunction.inner_sub_right, hχχ, hχbarχbar, hχχbar, hχbarχ]
