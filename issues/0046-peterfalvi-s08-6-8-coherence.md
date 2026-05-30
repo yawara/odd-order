@@ -840,6 +840,29 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     `⟨η,X⟩=0`/`⟨η,X̄⟩=0`。posited sum-level `hX_ortho`/`hXbar_ortho` → 単一 `hperElem` に置換し内部導出。
   - **残 (次パス)**: posited-conclusion 仮説は `hY : Da.Y=a·Da.tau1 χ₁` ((5.6.2) collapse, (5.6.1)
     form 存在を要する) ただ 1 つ + 各 step `D₀`/`Da` 生産 + `hperElem` の family `{R(χᵢ)}` 結合。
+- [x] (2026-05-31, Round 23 PASS 2) **residual (b) image-side coupling `hperElem` を完全構成** (commit
+      8c48fe7, AxiomsCheck 4 件 新規 全 allowlist, `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑
+      3343 jobs)。PASS 1 残 (b) の「family `{R(χᵢ)}` 結合」を解消 — `hperElem` が
+      `retarget_isCoherent_of_decompositions` の最後の image-side opaque 仮説だったが, honest per-member
+      (5.5)+(5.2.e) data から **構成** (posit せず) できるようになった。これは mmd L77
+      「χᵢ^{τ₁} is orthogonal to R(χ) by (5.5) and (5.2.e)」を members → ℤ[S₁] へ lift したもの:
+  - `CharacterPsiDecomposition.inner_X_orthogonal_imageSet_of_orthogonal` : (5.2.e) feed.
+    `X = D.X ∈ ℤ[R(χ')]` が, `R(χ')⊥R(χ)` (`D.imageFamily.Orthogonal R₀`) なら 各 `α∈R(χ)` と直交。
+    `⟨X,α⟩ = ∑ coeff·⟨β,α⟩ = 0`。`inner_X_eq_zero_of_orthogonal_imageSet` の双対 (左因子が X)。
+  - `inner_extension_member_orthogonal_imageSet` : per family member `χ'∈S₁`。その ψ=0 decomposition
+    `D'` (⟹ `χ'^{τ₁'}=D'.X` by (5.5)) + `R(χ')⊥R(χ)` (5.2.e) + running agreement
+    `D'.tau1 χ'=hS₁.extension χ'` から, running image `χ'^{τ₁}=hS₁.extension χ'` が `R(χ)` と直交。
+  - `inner_extension_orthogonal_imageSet_of_members` : span induction で per-member 直交性を
+    全 `ξ∈ℤ[S₁]` へ lift (extension の ℤ-線形性 + `⟨·,α⟩` の ℤ-線形性; `mem`/`zero`/`add`/`smul`)。
+  - `retarget_isCoherent_of_decompositions_and_memberFamily` : **完全** (5.6.3) per-step adjoining で
+    `hperElem` も内部放電。`hperElem` を per-member family `{Dmem, hmemOrtho, hmemTau1}` で置換し
+    上 2 lemma で導出。**(5.6.3) の全入力が genuine Dade-map / running-extension fact に帰着** —
+    image-side coupling は一切 posit されない。(6.6) `peterfalvi_66_coherence_of_X` の `hstep` が
+    Dade isometry の per-member (5.5)+(5.2.e) data から放電可能に。
+  - **残 (次パス, この round 範囲外)**: source-side の `hY : Da.Y=a·Da.tau1 χ₁` ((5.6.2) collapse,
+    (5.6.1) λ-form の cross-difference 計算を `lambda_eq_zero_and_Z_eq_zero` に流す本体) + 各 step の
+    `D₀`/`Da`/`Dmem` 生産 ((5.4) auxiliary isometry の Dade `τ` との supported-diff 一致)。
+    これらは wiring でなく (5.4)/(5.6.1) 本体 content。image-side (b)+(c) は完了。
 
 ## 完了条件
 
