@@ -2213,6 +2213,257 @@ theorem card_conjFiber_conj_eq (g c : G) (X : Set G) :
   · intro y _; group
   · intro y _; group
 
+/-- **Peterfalvi (2.1), the conjugacy-image fiber count.**  Let `a` normalize a finite subgroup `K`
+coprimely and `C = K ⊓ C_G(a)`.  For `w` in the coset `K·a` (`w·a⁻¹ ∈ K`), the fiber of the
+parametrization `(c, x) ↦ x⁻¹(c·a)x` of `K·a` over `w` has exactly `|C|` elements:
+
+    `|{(c, x) ∈ C × K | x⁻¹(c·a)x = w}| = |C|`.
+
+This is the disjoint-union count `H(B)a = ⨆ (C·a)^x` (`coset_eq_cosetConjImage`) read fiberwise.
+Given a witness `(c₀, x₀)` for `w`, the map `e ↦ (e c₀ e⁻¹, e x₀)` (`e ∈ C`) bijects `C` with the
+fiber, with inverse `(c, x) ↦ x x₀⁻¹` landing in `C` by the rigidity
+`mem_centralizer_of_coset_conj_eq`. -/
+theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K)) {w : G}
+    (hwImage : ∃ c ∈ K ⊓ Subgroup.centralizer ({a} : Set G), ∃ x ∈ K,
+      x⁻¹ * (c * a) * x = w) :
+    ((Finset.univ : Finset (↥(K ⊓ Subgroup.centralizer ({a} : Set G)) × ↥K)).filter
+        (fun p => (p.2 : G)⁻¹ * ((p.1 : G) * a) * (p.2 : G) = w)).card
+      = Nat.card ↥(K ⊓ Subgroup.centralizer ({a} : Set G)) := by
+  classical
+  set C : Subgroup G := K ⊓ Subgroup.centralizer ({a} : Set G) with hC
+  obtain ⟨c₀, hc₀C, x₀, hx₀K, hcx₀⟩ := hwImage
+  rw [Nat.card_eq_fintype_card, ← Finset.card_univ (α := C)]
+  -- membership of `e c₀ e⁻¹` in `C`, packaged for the forward map.
+  have hfwd1 : ∀ e : C, (e : G) * (c₀ : G) * (e : G)⁻¹ ∈ C := by
+    intro e
+    obtain ⟨heK, hecomm⟩ := Subgroup.mem_inf.mp e.2
+    obtain ⟨hc₀K, hc₀comm⟩ := Subgroup.mem_inf.mp hc₀C
+    refine Subgroup.mem_inf.mpr ⟨K.mul_mem (K.mul_mem heK hc₀K) (K.inv_mem heK),
+      Subgroup.mem_centralizer_singleton_iff.mpr ?_⟩
+    have hge : Commute (e : G) a := Subgroup.mem_centralizer_singleton_iff.mp hecomm
+    have hgc₀ : Commute (c₀ : G) a := Subgroup.mem_centralizer_singleton_iff.mp hc₀comm
+    have hgeinv : (e : G)⁻¹ * a = a * (e : G)⁻¹ := hge.inv_left.eq
+    calc (e : G) * (c₀ : G) * (e : G)⁻¹ * a
+        = (e : G) * (c₀ : G) * (a * (e : G)⁻¹) := by rw [mul_assoc, hgeinv]
+      _ = (e : G) * ((c₀ : G) * a) * (e : G)⁻¹ := by group
+      _ = (e : G) * (a * (c₀ : G)) * (e : G)⁻¹ := by rw [hgc₀.eq]
+      _ = (e : G) * a * (c₀ : G) * (e : G)⁻¹ := by group
+      _ = a * ((e : G) * (c₀ : G) * (e : G)⁻¹) := by rw [hge.eq]; group
+  -- `(c, x) ↦ x x₀⁻¹ ∈ C` for fiber elements, packaged for the inverse map.
+  have hinv1 : ∀ p : ↥C × ↥K, p ∈ (Finset.univ : Finset (↥C × ↥K)).filter
+        (fun p => (p.2 : G)⁻¹ * ((p.1 : G) * a) * (p.2 : G) = w) →
+      (p.2 : G) * (x₀ : G)⁻¹ ∈ C := by
+    intro p hp
+    rw [Finset.mem_filter] at hp
+    have hxx₀ := OddOrder.GroupTheory.mem_centralizer_of_coset_conj_eq (g := a) (H := K)
+      hcop p.2.2 hx₀K p.1.2 hc₀C (by rw [hp.2, ← hcx₀])
+    have := C.inv_mem hxx₀
+    rwa [mul_inv_rev, inv_inv] at this
+  refine Eq.symm ?_
+  refine Finset.card_bij'
+    (i := fun e _ => ((⟨(e : G) * (c₀ : G) * (e : G)⁻¹, hfwd1 e⟩ : ↥C),
+      (⟨(e : G) * x₀, K.mul_mem ((Subgroup.mem_inf.mp e.2).1) hx₀K⟩ : ↥K)))
+    (j := fun p hp => (⟨(p.2 : G) * (x₀ : G)⁻¹, hinv1 p hp⟩ : ↥C))
+    ?_ ?_ ?_ ?_
+  · -- `i e ∈ fiber`
+    intro e _
+    rw [Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    obtain ⟨-, hecomm⟩ := Subgroup.mem_inf.mp e.2
+    have hge : Commute (e : G) a := Subgroup.mem_centralizer_singleton_iff.mp hecomm
+    have hge' : (e : G)⁻¹ * a = a * (e : G)⁻¹ := hge.inv_left.eq
+    show ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀) = w
+    rw [← hcx₀]
+    calc ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀)
+        = x₀⁻¹ * ((c₀ : G) * ((e : G)⁻¹ * a * (e : G))) * x₀ := by group
+      _ = x₀⁻¹ * ((c₀ : G) * a) * x₀ := by rw [hge']; group
+  · -- `j p ∈ univ`
+    intro p _; exact Finset.mem_univ _
+  · -- left inverse: `j (i e) = e`
+    intro e _
+    apply Subtype.ext
+    show (e : G) * x₀ * (x₀ : G)⁻¹ = (e : G)
+    group
+  · -- right inverse: `i (j p) = p`
+    rintro ⟨⟨c, hcC⟩, ⟨x, hxK⟩⟩ hp
+    rw [Finset.mem_filter] at hp
+    have hpeq : x⁻¹ * (c * a) * x = w := hp.2
+    apply Prod.ext
+    · -- first coordinate: `(x x₀⁻¹) c₀ (x x₀⁻¹)⁻¹ = c`
+      apply Subtype.ext
+      show (x * (x₀ : G)⁻¹) * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ = c
+      have hxx₀ := OddOrder.GroupTheory.mem_centralizer_of_coset_conj_eq (g := a) (H := K)
+        hcop hxK hx₀K hcC hc₀C (by rw [hpeq, ← hcx₀])
+      obtain ⟨-, hcomm⟩ := Subgroup.mem_inf.mp hxx₀
+      have hxx₀comm : (x₀ : G) * x⁻¹ * a = a * ((x₀ : G) * x⁻¹) :=
+        Subgroup.mem_centralizer_singleton_iff.mp hcomm
+      have heq : x⁻¹ * (c * a) * x = x₀⁻¹ * ((c₀ : G) * a) * x₀ := by rw [hpeq, hcx₀]
+      have e2 : c * a = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := by
+        calc c * a
+            = x * (x⁻¹ * (c * a) * x) * x⁻¹ := by group
+          _ = x * (x₀⁻¹ * ((c₀ : G) * a) * x₀) * x⁻¹ := by rw [heq]
+          _ = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := by group
+      have e3 : c * a = x * (x₀ : G)⁻¹ * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ * a := by
+        calc c * a
+            = x * (x₀ : G)⁻¹ * ((c₀ : G) * a) * ((x₀ : G) * x⁻¹) := e2
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (a * ((x₀ : G) * x⁻¹)) := by group
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (((x₀ : G) * x⁻¹) * a) := by rw [hxx₀comm]
+          _ = x * (x₀ : G)⁻¹ * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ * a := by group
+      exact mul_right_cancel e3.symm
+    · -- second coordinate: `(x x₀⁻¹) x₀ = x`
+      apply Subtype.ext
+      show x * (x₀ : G)⁻¹ * (x₀ : G) = x
+      group
+
+/-- **Peterfalvi (2.1), the fiber factorization** (the long pole of (2.10) STEP 2).  Let `a`
+normalize a finite subgroup `K` coprimely and `C = K ⊓ C_G(a)`.  Then for any `g`,
+
+    `|𝒜(g, K·a)| · |C| = |𝒜(g, C·a)| · |K|`,
+
+equivalently `|𝒜(g, K·a)| = |𝒜(g, C·a)| · [K : C]`.  This is Peterfalvi's "`H(B)a` is the disjoint
+union of `[H(B):C_{H(B)}(a)]` conjugates of `C_{H(B)}(a)a`, so `|𝒜(g, H(B)a)| =
+|𝒜(g, C_{H(B)}(a)a)|·[H(B):C_{H(B)}(a)]`".
+
+Both sides are computed as `|S|`, where `S = {(y, c, x) ∈ G × C × K | y⁻¹gy = x⁻¹(c·a)x}`:
+* projecting to `y` and using the conjugacy-image fiber count
+  `card_cosetConjFiber_eq_card_centralizerInf` (each nonempty fiber has size `|C|`,
+  via `coset_eq_cosetConjImage` for the image membership) gives `|S| = |𝒜(g, K·a)|·|C|`;
+* the involution-free bijection `(y, c, x) ↦ (yx⁻¹, c, x)` onto
+  `{(w, c, x) | w⁻¹gw = c·a}`, in which `x ∈ K` is now free, gives `|S| = |𝒜(g, C·a)|·|K|`. -/
+theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
+    (hnorm : ∀ x ∈ K, a * x * a⁻¹ ∈ K)
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K)) (g : G) :
+    (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+        * Nat.card ↥(K ⊓ Subgroup.centralizer ({a} : Set G))
+      = (conjFiber g ((↑(K ⊓ Subgroup.centralizer ({a} : Set G)) : Set G) * ({a} : Set G))).card
+        * Nat.card ↥K := by
+  classical
+  set C : Subgroup G := K ⊓ Subgroup.centralizer ({a} : Set G) with hC
+  letI : Fintype ↥C := Fintype.ofFinite _
+  letI : Fintype ↥K := Fintype.ofFinite _
+  -- The bridge set `S`.
+  set S : Finset (G × ↥C × ↥K) := (Finset.univ : Finset (G × ↥C × ↥K)).filter
+    (fun p => p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G)) with hS
+  -- helper: `x⁻¹(c·a)x ∈ K·a` for `c ∈ C`, `x ∈ K`.
+  have hmemKa : ∀ (c : G) (_ : c ∈ K) (x : G) (_ : x ∈ K),
+      x⁻¹ * (c * a) * x ∈ (↑K : Set G) * ({a} : Set G) := by
+    intro c hc x hx
+    rw [Set.mem_mul]
+    refine ⟨x⁻¹ * c * (a * x * a⁻¹), K.mul_mem (K.mul_mem (K.inv_mem hx) hc) (hnorm x hx),
+      a, Set.mem_singleton _, by group⟩
+  -- ### `|S| = |𝒜(g, K·a)| · |C|`
+  have hSleft : S.card = (conjFiber g ((↑K : Set G) * ({a} : Set G))).card * Nat.card ↥C := by
+    rw [hS, Nat.card_eq_fintype_card, ← Finset.card_univ (α := ↥C), ← smul_eq_mul,
+      ← Finset.sum_const]
+    rw [Finset.card_eq_sum_card_fiberwise (f := fun p : G × ↥C × ↥K => p.1)
+      (t := conjFiber g ((↑K : Set G) * ({a} : Set G))) ?_]
+    · -- each fiber over `y ∈ 𝒜(g, K·a)` has card `|univ C|`
+      refine Finset.sum_congr rfl fun y hy => ?_
+      rw [mem_conjFiber] at hy
+      -- `y⁻¹gy = x⁻¹(c·a)x` (image membership) via (2.1)
+      have himg : ∃ c ∈ C, ∃ x ∈ K, x⁻¹ * (c * a) * x = y⁻¹ * g * y := by
+        obtain ⟨k, hk, a', ha', hkeq⟩ := hy
+        rw [Set.mem_singleton_iff] at ha'
+        rw [ha'] at hkeq
+        -- `hkeq : k * a = y⁻¹ g y`
+        obtain ⟨c, hcC, x, hxK, hxeq⟩ :=
+          OddOrder.GroupTheory.exists_mem_centralizer_conj (g := a) (H := K) hcop hnorm hk
+        -- `hxeq : x (k a) x⁻¹ = c a`, so `y⁻¹gy = k a = x⁻¹ (c a) x`
+        refine ⟨c, hcC, x, hxK, ?_⟩
+        rw [← hkeq]
+        have hxeq' : x * (k * a) * x⁻¹ = c * a := hxeq
+        rw [← hxeq']; group
+      rw [Finset.card_univ, ← Nat.card_eq_fintype_card,
+        ← card_cosetConjFiber_eq_card_centralizerInf hcop himg]
+      -- the `S`-fiber over `y` (drop the fixed first coordinate) bijects with the conjugacy fiber.
+      refine Finset.card_bij' (i := fun p _ => p.2) (j := fun q _ => (y, q))
+        ?_ ?_ ?_ ?_
+      · intro p hp
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp ⊢
+        obtain ⟨hpeq, hpy⟩ := hp
+        rw [← hpy]; exact hpeq.symm
+      · intro q hq
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hq
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact ⟨hq.symm, trivial⟩
+      · intro p hp
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp
+        obtain ⟨_, hpy⟩ := hp
+        exact Prod.ext hpy.symm rfl
+      · intro q _; rfl
+    · intro p hpS
+      simp only [Finset.mem_coe, mem_conjFiber]
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      rw [hp]
+      exact hmemKa (p.2.1 : G) (Subgroup.mem_inf.mp p.2.1.2).1 (p.2.2 : G) p.2.2.2
+  -- helper: membership `w⁻¹gw ∈ C·a ⟹ (w⁻¹gw)·a⁻¹ ∈ C`.
+  have hcwC : ∀ w : G, w⁻¹ * g * w ∈ (↑C : Set G) * ({a} : Set G) →
+      w⁻¹ * g * w * a⁻¹ ∈ C := by
+    intro w hw
+    obtain ⟨c, hc, a', ha', hceq⟩ := hw
+    rw [Set.mem_singleton_iff] at ha'
+    rw [ha'] at hceq
+    rw [← hceq, mul_assoc, mul_inv_cancel, mul_one]; exact hc
+  -- ### `|S| = |𝒜(g, C·a)| · |K|` via `(y,c,x) ↦ (yx⁻¹, c, x)` and freeing `x`.
+  have hSright : S.card
+      = (conjFiber g ((↑C : Set G) * ({a} : Set G))).card * Nat.card ↥K := by
+    rw [Nat.card_eq_fintype_card, ← Finset.card_univ (α := ↥K), ← Finset.card_product]
+    refine Finset.card_bij'
+      (i := fun p _ => (p.1 * (p.2.2 : G)⁻¹, p.2.2))
+      (j := fun q hq => (q.1 * (q.2 : G),
+        ⟨q.1⁻¹ * g * q.1 * a⁻¹,
+          hcwC q.1 (mem_conjFiber.mp (Finset.mem_product.mp hq).1)⟩, q.2))
+      ?_ ?_ ?_ ?_
+    · -- `i p ∈ conjFiber(C·a) ×ˢ univ`
+      intro p hpS
+      rw [Finset.mem_product]
+      refine ⟨?_, Finset.mem_univ _⟩
+      simp only [mem_conjFiber]
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      -- `(p.1 p.2.2⁻¹)⁻¹ g (p.1 p.2.2⁻¹) = p.2.2 (p.1⁻¹ g p.1) p.2.2⁻¹ = p.2.1 · a`
+      have hval : (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+          = (p.2.1 : G) * a := by
+        rw [show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+            = (p.2.2 : G) * (p.1⁻¹ * g * p.1) * (p.2.2 : G)⁻¹ by group, hp]; group
+      rw [hval]
+      exact ⟨(p.2.1 : G), p.2.1.2, a, Set.mem_singleton _, rfl⟩
+    · -- `j q ∈ S`
+      intro q hq
+      rw [Finset.mem_product] at hq
+      have hwCa : q.1⁻¹ * g * q.1 ∈ (↑C : Set G) * ({a} : Set G) := by
+        have := (mem_conjFiber (g := g)).mp (Finset.mem_coe.mpr hq.1); simpa using this
+      simp only [hS, Finset.mem_filter, Finset.mem_univ, true_and]
+      -- S-condition: `(q.1 q.2)⁻¹ g (q.1 q.2) = q.2⁻¹ ((q.1⁻¹gq.1·a⁻¹)·a) q.2`
+      show (q.1 * (q.2 : G))⁻¹ * g * (q.1 * (q.2 : G))
+        = (q.2 : G)⁻¹ * ((q.1⁻¹ * g * q.1 * a⁻¹) * a) * (q.2 : G)
+      rw [show (q.1⁻¹ * g * q.1 * a⁻¹) * a = q.1⁻¹ * g * q.1 by group]
+      group
+    · -- left inverse `j (i p) = p`
+      intro p hpS
+      have hp : p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G) :=
+        (Finset.mem_filter.mp hpS).2
+      -- `(p.1 p.2.2⁻¹)·p.2.2 = p.1`, and the recovered `c = p.2.1`.
+      apply Prod.ext
+      · show p.1 * (p.2.2 : G)⁻¹ * (p.2.2 : G) = p.1; group
+      apply Prod.ext
+      · -- recovered centralizer component equals `p.2.1`
+        apply Subtype.ext
+        show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹) * a⁻¹ = (p.2.1 : G)
+        rw [show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
+            = (p.2.2 : G) * (p.1⁻¹ * g * p.1) * (p.2.2 : G)⁻¹ by group, hp]
+        group
+      · rfl
+    · -- right inverse `i (j q) = q`
+      intro q hq
+      apply Prod.ext
+      · show q.1 * (q.2 : G) * (q.2 : G)⁻¹ = q.1; group
+      · rfl
+  rw [hSleft] at hSright
+  exact hSright
+
 end MobiusAssembly
 
 end SemidirectStructure

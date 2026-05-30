@@ -830,6 +830,16 @@ set_option linter.style.longLine false in
 -- collapse the `a^L`-sum (right translation by `c` bijects the conjugating sets).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_conj_eq
+-- (2.1)/(2.10) STEP 2 fiber factorization: the conjugacy-image fiber count
+-- (`card_cosetConjFiber_eq_card_centralizerInf`, each `(c,x) ↦ x⁻¹(c·a)x` fiber over a point of
+-- `K·a` has size `|C|`, via `mem_centralizer_of_coset_conj_eq` rigidity) and the resulting
+-- factorization `|𝒜(g,K·a)|·|C| = |𝒜(g,C·a)|·|K|` (`card_conjFiber_coset_mul_card_centralizerInf`,
+-- `C = K ⊓ C_G(a)`), computed via the bridge set `S = {(y,c,x) | y⁻¹gy = x⁻¹(c·a)x}` both ways
+-- (fiber count over `y`, and the `(y,c,x) ↦ (yx⁻¹,c,x)` bijection freeing `x ∈ K`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_cosetConjFiber_eq_card_centralizerInf
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_mul_card_centralizerInf
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
