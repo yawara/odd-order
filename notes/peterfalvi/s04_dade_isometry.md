@@ -16,6 +16,17 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
   ((2.6.b)/(2.8)-(2.10) inclusion-exclusion) は **issue 0040** で別途追跡 (規模大,
   誘導指標値公式が要る).  §5-§8 はインターフェース + (2.7) を使うので非ブロッキング.
 
+## 進捗 (2026-05-30) — issue 0040: Dade 写像を pointwise 構成
+
+- **(2.5)+(2.6.a) Dade 写像 τ を点別構成** (`Hypothesis.dadeMap`, `isDadeMap_dadeMap`,
+  `dadeIsometryData`).  `DadeIsometryData` は**もはやインターフェース仮定でなく実構成**
+  (well-def は (2.4.b)).  isometry は既存 `isDadeIsometry_of_isDadeMap` で自動.
+- **(2.8) M(B)=H(B)⋊N_L(B)** + **(2.9) f_B/α_B** 完了済 (`alphaB_apply_mul` で定義方程式
+  `α_B(h·b)=α(b)` も確立), **(2.10.2)** `C_G(a)⊓H(B)=H(insert a B)` 完了.
+- **残: (2.6.b) のみ** = `PreservesVirtualCharacters (dadeMap)`.  道は (2.10) 恒等式
+  `dadeMap α = -∑_ℬ (-1)^|B| Ind_{M(B)} α_B` の点別証明 (ℬ 代表系 + (2.10.1) + Möbius 相殺).
+  詳細プランは issue 0040「進捗 (4)」.
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).

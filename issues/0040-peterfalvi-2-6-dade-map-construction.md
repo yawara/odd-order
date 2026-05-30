@@ -60,16 +60,23 @@ created: 2026-05-27
       — 2026-05-30 完了 (sorry-free, axiom-clean; 下記「進捗 (3)」).
 - [x] (2.9) `α_B` を商準同型 `f_B` 経由で定義、virtual char 保存
       — 2026-05-30 完了 (sorry-free, axiom-clean; 下記「進捗 (3)」).
-- [ ] 誘導指標値公式 (必要なら InducedCharacter.lean に追加)
-- [ ] (2.10.1)-(2.10.3) sub-lemmas
-- [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺)
+- [x] **(2.10.2)** `C_{H(B)}(a) = H(B∪{a})` — 2026-05-30 完了 (`centralizer_inf_hIntersection`
+      + `mem_H_of_mem_centralizer_coprime`; 下記「進捗 (4)」).
+- [x] **(2.9) 定義方程式** `α_B(h·b)=α(b)` — 2026-05-30 完了 (`alphaB_apply_mul` +
+      `dadeQuotientHom_coe_of_mem_nLStabilizerIn`; Möbius keystone; 下記「進捗 (4)」).
+- [x] **(2.5)+(2.6.a) Dade 写像 τ を pointwise 構成** — 2026-05-30 完了
+      (`Hypothesis.dadeMap` / `isDadeMap_dadeMap` / `dadeIsometryData`; **実 DadeIsometryData**,
+      もはやインターフェース仮定でない; 下記「進捗 (4)」).  **これで (2.10) は (2.6.b) 専用に縮小**.
+- [ ] 誘導指標値公式: `induce_apply` (既存) で足りる見込み; 集計は (2.10.3) 内
+- [ ] (2.10.1) Ind L-共役不変 / (2.10.3) Ind 点別値
+- [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **(2.6.b) 専用、現フロンティア**
 - [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
-      を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).  残るは
-      (2.6.b)/(2.10) 経由の Dade 写像 τ の明示構成と `FullDadeIsometryData` への接続.
+      を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).
 - [x] **(2.6.b) 前提 — `restrict_mem_ZIrr` + `induce_mem_ZIrr`** (Res/Ind が virtual char を
       保存; InducedCharacter.lean, 2026-05-30 完了, sorry-free + axiom-clean; 下記「進捗 (2)」).
       これは (2.6.b) の単一最大前提だった.
-- [ ] (2.11) restriction 互換性
+- [ ] (2.6.b) `PreservesVirtualCharacters (hyp.dadeMap)` → `FullDadeIsometryData` (残り)
+- [ ] (2.11) restriction 互換性 (現 `restrict` インターフェースを実 τ で正当化)
 
 ## 完了条件
 
@@ -248,3 +255,49 @@ AxiomsCheck.lean に登録 (各 3 axioms allowlist 内; AxiomsCheck が S04 を 
   `alphaB_mem_ZIrr` → `FullDadeIsometryData` 完成.
 - 誘導指標**値**公式 (Ind の点別値, (2.10.1)/(2.10.3) 用) は未実装で要追加
   (InducedCharacter.lean の `induce` 定義から点別値を出す補題).
+
+## 進捗 2026-05-30 (4) — pointwise 構成で DadeIsometryData 実体化 + (2.10.2)/(2.9) keystone
+
+3 コミット (9a81831 (2.10.2), 2a7133c 構成, 64a546c (2.9)定義方程式), `lake build OddOrder`
++ `OddOrder.AxiomsCheck` green, 新規 sorry/axiom 無し.
+
+**アーキテクチャ転換 (重要)**: 旧プランは「(2.10) 公式で `dadeSumMap` を定義 → そこから
+IsDadeMap を導出」だった.  本セッションで **τ を (2.5) 点別定義で直接構成** する方が
+IsDadeMap+isometry に対して遥かに簡明と判明し、そちらに切替えた:
+
+- `Hypothesis.dadeValue α g` / `dadeMapCF` / `dadeMap` — (2.5) 点別: g∈(aH(a))^G なら α(a),
+  else 0.  well-defined は (2.4.b) `isConj_in_L_of_mul_H` 経由 (`dadeValue_eq`).
+- `Hypothesis.isDadeMap_dadeMap` — 構成から IsDadeMap を**証明** (もはや仮定でない).
+- `Hypothesis.dadeIsometryData hconj` — (2.5)+(2.6.a) を束ねた**実 `DadeIsometryData`**
+  (`ofIsDadeMap` 経由, isometry は既存 `isDadeIsometry_of_isDadeMap` で自動).
+
+**この結果 (2.10) inclusion-exclusion が必要なのは (2.6.b) virtual-char 保存だけ** に縮小.
+IsDadeMap/isometry はもう (2.10) 非依存で構成済.
+
+(2.10.2) と (2.9) keystone も完了:
+- `mem_H_of_mem_centralizer_coprime` + `centralizer_inf_hIntersection` = **(2.10.2)**
+  `C_G(a)⊓H(B)=H(insert a B)` (O_{π'}-containment: pow_index_mem + CRT).
+- `dadeQuotientHom_coe_of_mem_nLStabilizerIn` + `alphaB_apply_mul` = **(2.9) 定義方程式**
+  `α_B(h·b)=α(b)` (f_B が N_L(B) を retract; QuotientMulEquiv の補元 retraction 経由).
+  Möbius (2.10.3) で α_B 点別値を扱う必須 keystone.
+
+### 残作業 (2.6.b 専用、現フロンティア)
+
+目標: `PreservesVirtualCharacters (hyp.dadeMap)` を示し `FullDadeIsometryData` 化.
+唯一の道は (2.10) 恒等式 `hyp.dadeMap α = -∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B` を点別証明
+(RHS は `induce_mem_ZIrr`+`alphaB_mem_ZIrr` で manifest に ZIrr G).  依存:
+
+1. **代表系 ℬ の Lean 表現** (構造的ブロッカー): 非空部分集合の L-共役類代表系.
+   推奨 = `conjA` を `Finset {a//a∈A}` 上の `MulAction L` に持ち上げ、orbit 商
+   `MulAction.orbitRel.Quotient` 上で `Quotient.out` 代表をとる (or 非空部分集合の subtype).
+   ℬ-和は整数交代和なので (2.6.b) は manifest.
+2. **(2.10.1)** `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` (ℬ→𝒫 切替 / 商 well-def に必須).
+   要: `M(B^x)=x·M(B)·x⁻¹` membership (H(B^x)=x H(B)x⁻¹, N_L(B^x)=x N_L(B)x⁻¹) +
+   induceSum の reindex (t↦tx).  `alphaB_apply_mul` で transport α_{B^x}(xmx⁻¹)=α_B(m).
+3. **(2.10.3)** Ind 点別値: `induce_apply` (既存) + α_B 値 (`alphaB_apply_mul`) +
+   `card_conj_fiber` (issue 0039) で `𝒜(g,H(B)b)` 集計.
+4. **(2.10) Möbius 相殺** (最難 ~150-200 LOC): `Finset.sum_involution` で toggle-a 対合
+   B↔B△{a}, (2.10.2) で C_{H(B)}(a)=C_{H(B∪a)}(a) 経由 sign 相殺、survivor B={a}.
+5. **接続**: 上の恒等式 → `PreservesVirtualCharacters` → `FullDadeIsometryData` 完成.
+
+着手順: 1 (transversal infra) → 2 → 3 → 4 → 5.  全体 ~250-400 LOC、別 focused session 推奨.
