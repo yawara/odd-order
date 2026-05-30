@@ -3090,6 +3090,116 @@ theorem mobiusSummand_orbit_weighted (hconj : hyp.HConjInvariant)
   rw [← hON]
   field_simp
 
+/-! #### Final assembly: the (2.10) pointwise identity and `FullDadeIsometryData`
+
+The remaining work assembles the per-`B` weight identity `mobiusSummand_orbit_weighted` into the
+(2.10) pointwise identity `α^τ(g) = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}(g)`, by
+(a) orbit-averaging the transversal sum to the powerset, (b) recognizing the inner RHS term as
+`mobiusSummand b g B`, (c) swapping the resulting double sum to sum over `b ∈ a^L` first, (d)
+collapsing each inner `𝒫(b)`-sum to its survivor `mobiusSummand b g {b} = -|C_L(b)|`, and (e)
+totalling `∑_{b ∈ a^L} |C_L(b)| = |L|` (`sum_card_centralizerIn_eq`). -/
+
+/-- The orbit-averaging summand `(-1)^{|B|} · Ind_{M(B)} α_B(g)` (and `0` if `B` is empty),
+packaged so `sum_transversalRep_eq_sum_div_orbit` applies. -/
+noncomputable def mobiusTermCF (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) (B : Finset {a : G // a ∈ A}) : ℂ := by
+  classical
+  exact if hB : B.Nonempty then
+      (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g
+    else 0
+
+theorem mobiusTermCF_of_nonempty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hyp.mobiusTermCF hconj α g B
+      = (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g := by
+  rw [mobiusTermCF, dif_pos hB]
+
+/-- The orbit-averaging summand is `L`-conjugacy invariant: `mobiusTermCF (B^l) = mobiusTermCF B`.
+Uses `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) and `induceAlphaBTerm_conjFinset`
+(the packaged induced summand is invariant). -/
+theorem mobiusTermCF_conjFinset (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) (l : L) (B : Finset {a : G // a ∈ A}) :
+    hyp.mobiusTermCF hconj α g (hyp.conjFinset l B) = hyp.mobiusTermCF hconj α g B := by
+  classical
+  by_cases hB : B.Nonempty
+  · have hBl : (hyp.conjFinset l B).Nonempty := hyp.conjFinset_nonempty (l := l) hB
+    rw [hyp.mobiusTermCF_of_nonempty hconj α g hBl, hyp.mobiusTermCF_of_nonempty hconj α g hB,
+      hyp.conjFinset_card l B, hyp.induceAlphaBTerm_conjFinset hconj α l hB]
+  · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
+      rw [conjFinset, Finset.image_nonempty]; exact hB
+    rw [mobiusTermCF, mobiusTermCF, dif_neg hBe, dif_neg hB]
+
+/-- The `L`-orbit of the support representative `a`, as a `Finset {a : G // a ∈ A}`: the elements
+`b' ∈ A` with `b' = l·a·l⁻¹` for some `l ∈ L`.  This is the fixed (`B`-independent) index over which
+the inner `b`-sum of (2.10) ranges; it coincides with the support filter `Sg` of
+`sum_card_centralizerIn_eq` when `g ∈ (aH(a))^G` (`mem_aOrbitFinset_iff_mem_supportFilter`). -/
+noncomputable def aOrbitFinset (a : {a : G // a ∈ A}) : Finset {a : G // a ∈ A} := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  exact Finset.univ.filter (fun b => ∃ l : L, hyp.conjA l a = b)
+
+theorem mem_aOrbitFinset {a b : {a : G // a ∈ A}} :
+    b ∈ hyp.aOrbitFinset a ↔ ∃ l : L, hyp.conjA l a = b := by
+  classical
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  simp only [aOrbitFinset, Finset.mem_filter, Finset.mem_univ, true_and]
+
+/-- **Peterfalvi (2.10), per-`B` weight identity, inner sum over the fixed index `a^L`.**  For
+`g ∈ (aH(a))^G`,
+
+    `mobiusTermCF B / |orbit B| =
+       (α(a)/|L|) · ∑_{b' ∈ a^L} (if b' ∈ N_L(B) then mobiusSummand b' g B else 0)`.
+
+Recasting `mobiusSummand_orbit_weighted` so the inner sum ranges over the **`B`-independent** Finset
+`aOrbitFinset a` (with an `if (b':G) ∈ N_L(B)` guard) instead of the `B`-dependent subtype
+`N_L(B)`; this fixed index is what makes the subsequent `Finset.sum_comm` double-sum swap go
+through.  The reindexing bijection sends `b : N_L(B)` with `b ∈ a^L` to `⟨b.val, _⟩ : {a // a ∈ A}`
+(in `a^L ⊆ A`), and the term `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·b)|` is `mobiusSummand b' g B`. -/
+theorem mobiusTermCF_div_orbit_eq (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B / (Nat.card (MulAction.orbit L B) : ℂ)
+      = ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ / (Nat.card L : ℂ))
+          * ∑ b' ∈ hyp.aOrbitFinset a,
+            (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- start from the orbit-weight identity, which sums over `b : N_L(B)` with `b ∈ a^L`.
+  rw [hyp.mobiusTermCF_of_nonempty hconj _ g hB, mul_div_right_comm,
+    hyp.mobiusSummand_orbit_weighted hconj α hB hh hga]
+  congr 1
+  -- reindex the `N_L(B)`-subtype sum to the fixed `aOrbitFinset` sum.
+  rw [← Finset.sum_filter]
+  refine Finset.sum_bij'
+      (i := fun b hb => (⟨(b : G), by
+        rw [Finset.mem_filter] at hb
+        obtain ⟨l, hl⟩ := hb.2
+        exact hl ▸ hyp.L_normalizes_A l a.2⟩ : {a : G // a ∈ A}))
+      (j := fun b' hb' => (⟨(b' : G), by
+        rw [Finset.mem_filter] at hb'
+        exact hb'.2⟩ : nLStabilizerIn hyp B))
+      ?_ ?_ ?_ ?_ ?_
+  · -- `i b ∈ aOrbitFinset a` with `(i b : G) ∈ N_L(B)`
+    intro b hb
+    rw [Finset.mem_filter] at hb ⊢
+    obtain ⟨l, hl⟩ := hb.2
+    refine ⟨hyp.mem_aOrbitFinset.mpr ⟨l, ?_⟩, b.2⟩
+    apply Subtype.ext; rw [conjA_coe]; exact hl
+  · -- `j b' ∈ (univ.filter (a^L))`
+    intro b' hb'
+    rw [Finset.mem_filter] at hb' ⊢
+    obtain ⟨l, hl⟩ := (hyp.mem_aOrbitFinset).mp hb'.1
+    exact ⟨Finset.mem_univ _, l, by rw [← hyp.conjA_coe l a, hl]⟩
+  · intro b _; rfl
+  · intro b' _; rfl
+  · -- summands agree
+    intro b _
+    rw [hyp.mobiusSummand_of_nonempty _ g hB]
+
 end MobiusAssembly
 
 end SemidirectStructure
