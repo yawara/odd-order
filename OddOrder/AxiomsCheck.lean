@@ -1063,3 +1063,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_conjImage_eq_card_sdiff
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_conjImage_eq_zero
+-- (5.6.3) keystone: the orthonormal-block isometry re-targeting constructor `τ₂`.  Given a global
+-- integral isometry `τ₁` and orthonormal pairs `{χ,χ̄}`, `{X,X̄}` with the same gram, with `X,X̄ ⊥
+-- τ₁ ξ` for every `ξ ⊥ {χ,χ̄}`, the rank-2 re-targeting is again a global integral isometry.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_isIntegralIsometry
+-- (5.6.1) family bundle: the source-side cross-difference orthogonality
+-- `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²`, derived (not posited) from `χ ⊥ S₁` + pairwise orthogonality.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterFamilyBundle.crossDifference_inner

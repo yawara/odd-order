@@ -1406,4 +1406,94 @@ theorem retarget_isIntegralIsometry [Fintype G] [Invertible (Nat.card G : ℂ)]
 
 end IntegralCharacterMap
 
+/-! ### Peterfalvi (5.6.1): the family bundle
+
+The (5.6) coherence-union argument carries a whole **family** `{χᵢ}_{i ∈ s} ⊆ S₁` with `χ₁` a
+distinguished member, integer degree ratios `aᵢ` (`χᵢ(1) = aᵢ·χ₁(1)`, `a₁ = 1`), squared norms
+`mᵢ = ‖χᵢ‖²`, and the auxiliary isometry `τ₁` on `ℤ[S₁]` extending `τ`.  The single non-trivial
+fact threaded through (5.6.1)→(5.6.2) is the **cross-difference orthogonality**
+
+`⟨(χ − a·χ₁), (χᵢ − aᵢ·χ₁)⟩ = a·aᵢ·‖χ₁‖²`  (for `i ≠ 1`),
+
+derived from `χ ⊥ S₁` and pairwise orthogonality of `S₁`.  The bundle records the family data and
+*derives* this identity (it is not posited): `crossDifference_inner` below. -/
+
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.1) family bundle.**
+
+Bundles the family `{χᵢ}_{i ∈ s} ⊆ S₁` (with distinguished `χ₁ = chiFam i₁`), the integer degree
+ratios `ratio i = aᵢ` (`χᵢ(1) = aᵢ·χ₁(1)`, `ratio i₁ = 1`), the squared norms `normSq i = ‖χᵢ‖²`,
+and the orthogonality data threaded through (5.6.1): `χ` is orthogonal to every `χᵢ` and to every
+`χ̄ᵢ`, and `{χᵢ}` is pairwise orthogonal.  These are exactly the `(5.2)`-level inputs; the bundle
+*derives* the cross-difference orthogonality `crossDifference_inner` rather than assuming it.
+
+This carries no extension witness for the union `S₁ ∪ {χ, χ̄}`; it is pure source-side family data
+(the `degree`, `norm` and `orthogonality` hypotheses of (5.6)), constructed from `(5.2)`. -/
+structure CharacterFamilyBundle
+    (chi chi1 : ClassFunction L ℂ) (a : ℝ)
+    {ι : Type*} (s : Finset ι) (i₁ : ι)
+    [Fintype L] [Invertible (Nat.card L : ℂ)] where
+  /-- The distinguished index `i₁` lies in the family. -/
+  i₁_mem : i₁ ∈ s
+  /-- The characters of the family `S₁`. -/
+  chiFam : ι → ClassFunction L ℂ
+  /-- `χ₁ = chiFam i₁`. -/
+  chi1_eq : chiFam i₁ = chi1
+  /-- The integer degree ratios `aᵢ`. -/
+  ratio : ι → ℕ
+  /-- `a₁ = 1`. -/
+  ratio_one : ratio i₁ = 1
+  /-- The degree scaling `χᵢ(1) = aᵢ·χ₁(1)`, recorded via `characterDegree`. -/
+  degree_eq : ∀ i ∈ s, OddOrder.Peterfalvi.S03.characterDegree (chiFam i) =
+    (ratio i : ℂ) * OddOrder.Peterfalvi.S03.characterDegree chi1
+  /-- The complex degree ratio `a = χ(1)/χ₁(1)`. -/
+  degree_chi : OddOrder.Peterfalvi.S03.characterDegree chi =
+    (a : ℂ) * OddOrder.Peterfalvi.S03.characterDegree chi1
+  /-- `χ` is orthogonal to every family member. -/
+  chi_orthogonal : ∀ i ∈ s, ClassFunction.inner chi (chiFam i) = 0
+  /-- `{χᵢ}` is pairwise orthogonal. -/
+  chiFam_pairwise : ∀ i ∈ s, ∀ j ∈ s, i ≠ j →
+    ClassFunction.inner (chiFam i) (chiFam j) = 0
+
+namespace CharacterFamilyBundle
+
+open OddOrder.RepresentationTheory
+
+variable {chi chi1 : ClassFunction L ℂ} {a : ℝ}
+variable {ι : Type*} {s : Finset ι} {i₁ : ι}
+variable [Fintype L] [Invertible (Nat.card L : ℂ)]
+
+/-- `‖χ₁‖²` written through the bundle. -/
+abbrev normSq1 (_B : CharacterFamilyBundle (L := L) chi chi1 a s i₁) : ℂ :=
+  ClassFunction.inner chi1 chi1
+
+/-- **Peterfalvi (5.6.1) cross-difference orthogonality (source side).**
+
+For `i ∈ s` with `i ≠ i₁`, the inner product of the differences `χ − a·χ₁` and
+`χᵢ − aᵢ·χ₁` equals `a·aᵢ·‖χ₁‖²`.
+
+`⟨χ − aχ₁, χᵢ − aᵢχ₁⟩ = ⟨χ,χᵢ⟩ − aᵢ⟨χ,χ₁⟩ − a⟨χ₁,χᵢ⟩ + a·aᵢ⟨χ₁,χ₁⟩`.  The first three
+inner products vanish: `⟨χ,χᵢ⟩ = ⟨χ,χ₁⟩ = 0` since `χ ⊥ S₁`, and `⟨χ₁,χᵢ⟩ = 0` since `i ≠ i₁`
+and `{χᵢ}` is pairwise orthogonal.  Only `a·aᵢ·‖χ₁‖²` survives. -/
+theorem crossDifference_inner (B : CharacterFamilyBundle (L := L) chi chi1 a s i₁)
+    {i : ι} (hi : i ∈ s) (hii₁ : i ≠ i₁) :
+    ClassFunction.inner (chi - (a : ℂ) • chi1)
+        (B.chiFam i - (B.ratio i : ℂ) • chi1) =
+      (a : ℂ) * (B.ratio i : ℂ) * ClassFunction.inner chi1 chi1 := by
+  have hchi_i : ClassFunction.inner chi (B.chiFam i) = 0 := B.chi_orthogonal i hi
+  have hchi_1 : ClassFunction.inner chi chi1 = 0 := by
+    have := B.chi_orthogonal i₁ B.i₁_mem; rwa [B.chi1_eq] at this
+  have h1_i : ClassFunction.inner chi1 (B.chiFam i) = 0 := by
+    have := B.chiFam_pairwise i₁ B.i₁_mem i hi (fun h => hii₁ h.symm)
+    rwa [B.chi1_eq] at this
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, ClassFunction.inner_smul_left,
+    OddOrder.RepresentationTheory.inner_smul_right,
+    OddOrder.RepresentationTheory.inner_smul_right, ClassFunction.inner_smul_left,
+    hchi_i, hchi_1, h1_i]
+  rw [star_natCast]
+  ring
+
+end CharacterFamilyBundle
+
 end OddOrder.Peterfalvi.S07
