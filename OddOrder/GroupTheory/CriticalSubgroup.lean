@@ -32,7 +32,9 @@ CLAUDE.md が定める「`G, Thm` 引用で Isaacs が欠く場合のみ Gorenst
 * `IsCritical.*`: 射影 (本ファイル).
 * (S1) `centralizer_eq_self_of_maximal_abelian_normal`: Gorenstein 5.3.12.
 * (S2) `isCritical_exists`: Gorenstein 5.3.11 存在定理 (two-case 構成, 完成).
-* (予定 S6) `IsCritical.omega1_exponent`: 5.3.13 = `Ω₁(C)` exponent `p` (odd).
+* (S6) `mul_pow_eq_commutator_pow_mul_of_class_le_two` (Gorenstein 5.3.9 eq.(3.1)),
+  `mul_pow_prime_eq_one_of_class_le_two`, `Omega.pow_eq_one_of_class_le_two` /
+  `Omega.exponent_eq_of_class_le_two`: 5.3.9(i) = `Ω₁` exponent `p` (`p` odd, cl ≤ 2, 完成).
 * (予定 S3-S7) faithful `p'`-action, `C_{Aut G}(Ω₁ C)` が `p`-群.
 
 ## Implementation notes
@@ -573,5 +575,186 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
         exact (hDcentralC d hd c hc).symm
 
 end Existence
+
+/-! ## Gorenstein Lemma 5.3.9(i): `Ω₁` of a class-`≤ 2` `p`-group has exponent `p`
+
+For a `p`-group of class at most `2` with `p` odd, `Ω₁` has exponent `p`. The core
+is the class-`2` power identity (Gorenstein eq. (3.1), a special case of the
+Hall–Petrescu / Lemma 2.2.2 collection formula):
+`(x y) ^ n = ⁅y, x⁆ ^ (n (n-1) / 2) · x ^ n · y ^ n`,
+valid whenever `z := ⁅y, x⁆` is central. With `x ^ p = y ^ p = 1` one gets
+`z ^ p = ⁅y ^ p, x⁆ = 1`, and for odd `p` the exponent `p (p-1) / 2` is a multiple
+of `p`, so `(x y) ^ p = 1`. Hence the set of order-`≤ p` elements is closed under
+multiplication and `Ω₁` has exponent `p`. This is `S6` of `notes/bg/thm113_design.md`.
+
+These are general lemmas requiring only `cl ≤ 2`; they do not depend on the
+critical-subgroup construction (`S2`). -/
+
+section ClassTwoExponent
+
+variable {K : Type*} [Group K]
+
+open scoped commutatorElement
+
+/-- Triangular-number Pascal step: `(k+1) * (k+1-1) / 2 = k * (k-1) / 2 + k`.
+Phrased via `Nat.choose 2` (`= n*(n-1)/2`) and `Nat.choose_succ_succ'`. -/
+private theorem succ_choose_two (k : ℕ) :
+    (k + 1) * (k + 1 - 1) / 2 = k * (k - 1) / 2 + k := by
+  have h := Nat.choose_succ_succ' k 1
+  rw [Nat.choose_two_right, Nat.choose_two_right, Nat.choose_one_right] at h
+  -- `(k+1).choose 2 = k.choose 1 + k.choose 2 = k + k.choose 2`.
+  omega
+
+/-- For `z := ⁅y, x⁆` central, `y ^ n * x = z ^ n * x * y ^ n`. Iterating the basic
+relation `y * x = ⁅y, x⁆ * x * y` (which holds by definition of `⁅y, x⁆`). -/
+private theorem pow_mul_eq_of_commutator_central (x y : K)
+    (hz : ⁅y, x⁆ ∈ Subgroup.center K) (n : ℕ) :
+    y ^ n * x = ⁅y, x⁆ ^ n * x * y ^ n := by
+  -- `z` commutes with everything (`mem_center_iff` gives `g * z = z * g`).
+  have hzc : ∀ g : K, ⁅y, x⁆ * g = g * ⁅y, x⁆ :=
+    fun g => (Subgroup.mem_center_iff.mp hz g).symm
+  -- Base relation: `y * x = z * x * y`.
+  have hbase : y * x = ⁅y, x⁆ * x * y := by
+    rw [commutatorElement_def]; group
+  -- `y` commutes with `z^k`.
+  have hycomm : ∀ j : ℕ, y * ⁅y, x⁆ ^ j = ⁅y, x⁆ ^ j * y :=
+    fun j => (Commute.pow_right (show Commute y ⁅y, x⁆ from (hzc y).symm) j).eq
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    calc y ^ (k + 1) * x
+        = y * (y ^ k * x) := by rw [pow_succ']; group
+      _ = y * (⁅y, x⁆ ^ k * x * y ^ k) := by rw [ih]
+      _ = (y * ⁅y, x⁆ ^ k) * x * y ^ k := by group
+      _ = (⁅y, x⁆ ^ k * y) * x * y ^ k := by rw [hycomm]
+      _ = ⁅y, x⁆ ^ k * (y * x) * y ^ k := by group
+      _ = ⁅y, x⁆ ^ k * (⁅y, x⁆ * x * y) * y ^ k := by rw [hbase]
+      _ = ⁅y, x⁆ ^ (k + 1) * x * (y ^ (k + 1)) := by
+          rw [pow_succ ⁅y, x⁆ k, pow_succ' y k]; simp only [mul_assoc]
+
+/-- **Gorenstein "Finite Groups" Lemma 5.3.9, eq. (3.1).** In a group of class
+`≤ 2` (`⁅K, K⁆ ≤ Z(K)`), for all `x y : K` and `n : ℕ`,
+`(x * y) ^ n = ⁅y, x⁆ ^ (n * (n - 1) / 2) * x ^ n * y ^ n`.
+
+Special case of the Hall–Petrescu collection formula. Proof by induction on `n`,
+moving the central commutator `z = ⁅y, x⁆` past powers using
+`pow_mul_eq_of_commutator_central`; the exponent accumulates as
+`n(n-1)/2 + n = (n+1)n/2`. -/
+theorem mul_pow_eq_commutator_pow_mul_of_class_le_two
+    (hcl : _root_.commutator K ≤ Subgroup.center K) (x y : K) (n : ℕ) :
+    (x * y) ^ n = ⁅y, x⁆ ^ (n * (n - 1) / 2) * x ^ n * y ^ n := by
+  -- `z := ⁅y, x⁆` is central.
+  have hz : ⁅y, x⁆ ∈ Subgroup.center K :=
+    hcl (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
+  have hzc : ∀ g : K, ⁅y, x⁆ * g = g * ⁅y, x⁆ :=
+    fun g => (Subgroup.mem_center_iff.mp hz g).symm
+  -- `z^j` commutes with every element.
+  have hzpow : ∀ (j : ℕ) (g : K), Commute (⁅y, x⁆ ^ j) g :=
+    fun j g => Commute.pow_left (hzc g) j
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    -- Target exponent: `(k+1) * (k+1-1) / 2 = k*(k-1)/2 + k`.
+    have hexp : (k + 1) * (k + 1 - 1) / 2 = k * (k - 1) / 2 + k := succ_choose_two k
+    calc (x * y) ^ (k + 1)
+        = ⁅y, x⁆ ^ (k * (k - 1) / 2) * x ^ k * y ^ k * (x * y) := by rw [pow_succ, ih]
+      _ = ⁅y, x⁆ ^ (k * (k - 1) / 2) * x ^ k * (y ^ k * x) * y := by group
+      _ = ⁅y, x⁆ ^ (k * (k - 1) / 2) * x ^ k * (⁅y, x⁆ ^ k * x * y ^ k) * y := by
+          rw [pow_mul_eq_of_commutator_central x y hz k]
+      _ = ⁅y, x⁆ ^ (k * (k - 1) / 2) * (x ^ k * ⁅y, x⁆ ^ k) * x * (y ^ k * y) := by group
+      _ = ⁅y, x⁆ ^ (k * (k - 1) / 2) * (⁅y, x⁆ ^ k * x ^ k) * x * (y ^ k * y) := by
+          rw [(hzpow k (x ^ k)).eq]
+      _ = ⁅y, x⁆ ^ (k * (k - 1) / 2 + k) * (x ^ k * x) * (y ^ k * y) := by
+          rw [pow_add]; group
+      _ = ⁅y, x⁆ ^ ((k + 1) * (k + 1 - 1) / 2) * x ^ (k + 1) * y ^ (k + 1) := by
+          rw [hexp, pow_succ x, pow_succ y]
+
+/-- **Gorenstein "Finite Groups" Lemma 5.3.9(i)** (key step). In a group of class
+`≤ 2` with `p` odd, the product of two elements of order dividing `p` again has
+order dividing `p`: if `x ^ p = 1` and `y ^ p = 1` then `(x * y) ^ p = 1`.
+
+Proof: in `(x * y) ^ p = ⁅y, x⁆ ^ (p (p-1) / 2) · x ^ p · y ^ p`, the last two
+factors are `1`. Also `⁅y, x⁆ ^ p = ⁅y ^ p, x⁆ = ⁅1, x⁆ = 1`, and for odd `p`,
+`p ∣ p (p-1) / 2`, so `⁅y, x⁆ ^ (p (p-1) / 2) = 1`. -/
+theorem mul_pow_prime_eq_one_of_class_le_two {p : ℕ} (hp_odd : Odd p)
+    (hcl : _root_.commutator K ≤ Subgroup.center K) {x y : K}
+    (hx : x ^ p = 1) (hy : y ^ p = 1) : (x * y) ^ p = 1 := by
+  have hz : ⁅y, x⁆ ∈ Subgroup.center K :=
+    hcl (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
+  -- `z ^ p = 1`: move `p` inside the left slot of the commutator using `pow_mul_eq_…`.
+  have hzp : ⁅y, x⁆ ^ p = 1 := by
+    have h := pow_mul_eq_of_commutator_central x y hz p
+    rw [hy, one_mul, mul_one] at h
+    -- `x = z^p * x`, so `z^p = 1`.
+    nth_rewrite 1 [← one_mul x] at h
+    exact (mul_right_cancel h).symm
+  -- `p ∣ p (p-1) / 2`.
+  have hdvd : p ∣ p * (p - 1) / 2 := by
+    obtain ⟨k, rfl⟩ := hp_odd
+    -- `(2k+1) * (2k) / 2 = (2k+1) * ((2k)/2) = (2k+1) * k`.
+    rw [show 2 * k + 1 - 1 = 2 * k by omega,
+      Nat.mul_div_assoc _ (Dvd.intro k rfl : 2 ∣ 2 * k), Nat.mul_div_cancel_left k two_pos]
+    exact Dvd.intro k rfl
+  obtain ⟨m, hm⟩ := hdvd
+  rw [mul_pow_eq_commutator_pow_mul_of_class_le_two hcl, hx, hy, mul_one, mul_one, hm,
+    pow_mul, hzp, one_pow]
+
+end ClassTwoExponent
+
+/-! ## `Ω₁` of a class-`≤ 2` group is exponent `p` (`S6`, packaged form)
+
+For odd `p` and a group `K` of class `≤ 2`, the closure `Omega K p 1` coincides
+with the set `{g | g ^ p = 1}` (closed under product by
+`mul_pow_prime_eq_one_of_class_le_two`), so every element has order dividing `p`. -/
+
+section Omega1ClassTwo
+
+variable {K : Type*} [Group K] {p : ℕ}
+
+/-- For odd `p` and class `≤ 2`, the set `{g : K | g ^ p = 1}` is a subgroup. -/
+private def omega1OfClassLeTwo (K : Type*) [Group K] (p : ℕ) (hp_odd : Odd p)
+    (hcl : _root_.commutator K ≤ Subgroup.center K) : Subgroup K where
+  carrier := {g : K | g ^ p = 1}
+  mul_mem' := fun {x y} hx hy => mul_pow_prime_eq_one_of_class_le_two hp_odd hcl hx hy
+  one_mem' := one_pow p
+  inv_mem' := fun {x} hx => by rw [Set.mem_setOf_eq, inv_pow, hx, inv_one]
+
+/-- **Gorenstein "Finite Groups" Lemma 5.3.9(i).** In a group `K` of class `≤ 2`
+with `p` odd, every element of `Ω₁(K) = Omega K p 1` has `p`-th power `1`.
+
+This is the load-bearing form: `Ω₁` has exponent dividing `p`. The set
+`{g | g ^ p = 1}` is already a subgroup (`mul_pow_prime_eq_one_of_class_le_two`),
+so it contains the closure `Omega K p 1`. -/
+theorem Omega.pow_eq_one_of_class_le_two (hp_odd : Odd p)
+    (hcl : _root_.commutator K ≤ Subgroup.center K) {g : K}
+    (hg : g ∈ Omega K p 1) : g ^ p = 1 := by
+  -- `Omega K p 1 = closure {g | g^(p^1) = 1} ≤ {g | g^p = 1}` (the latter is a subgroup).
+  have hle : Omega K p 1 ≤ omega1OfClassLeTwo K p hp_odd hcl := by
+    rw [Omega, Subgroup.closure_le]
+    intro x hx
+    simpa using (pow_one p ▸ hx : x ^ p = 1)
+  simpa [omega1OfClassLeTwo] using hle hg
+
+/-- **Gorenstein "Finite Groups" Lemma 5.3.9(i)** (exponent form). For odd `p` and
+a class-`≤ 2` group `K`, `Ω₁(K)` has exponent `p`, provided `Ω₁(K)` is nontrivial.
+
+`Monoid.exponent (Omega K p 1) = p`: every nonidentity element has order exactly
+`p` (`p` prime ⇒ order dividing `p` is `1` or `p`; nonidentity ⇒ not `1`). -/
+theorem Omega.exponent_eq_of_class_le_two [Fact p.Prime] (hp_odd : Odd p)
+    (hcl : _root_.commutator K ≤ Subgroup.center K)
+    [Nontrivial (Omega K p 1)] :
+    Monoid.exponent (Omega K p 1) = p := by
+  rw [Monoid.exponent_eq_prime_iff (Fact.out (p := p.Prime))]
+  intro g hg
+  -- `g ^ p = 1`, so `orderOf g ∣ p`; `g ≠ 1` rules out `orderOf g = 1`.
+  have hgp : (g : K) ^ p = 1 := Omega.pow_eq_one_of_class_le_two hp_odd hcl g.2
+  have hgp' : g ^ p = 1 := by
+    apply Subtype.ext; rw [SubmonoidClass.coe_pow]; simpa using hgp
+  have hdvd : orderOf g ∣ p := orderOf_dvd_of_pow_eq_one hgp'
+  rcases ((Fact.out (p := p.Prime)).eq_one_or_self_of_dvd _ hdvd) with h1 | hp
+  · exact absurd (orderOf_eq_one_iff.mp h1) hg
+  · exact hp
+
+end Omega1ClassTwo
 
 end OddOrder.GroupTheory
