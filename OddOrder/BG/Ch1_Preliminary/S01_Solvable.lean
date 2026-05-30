@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.CriticalSubgroup
 import Mathlib.Order.Minimal
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
@@ -48,7 +49,7 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
 | **Lem 1.7(c⇐)** | Isaacs Lem 4.5 | `frattini_le_iff_isElementaryAbelian_quotient_of_pgroup` ✅ | ✅ **sorry-free** |
 | **Lem 1.7(d⇐)** | Isaacs Lem 4.5 | `R/K` elementary abelian | ✅ **sorry-free** |
 | Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
-| Thm 1.13 | (Thompson critical) | (Phase 1 未) | Phase 1 待ち |
+| **Thm 1.13** | (Thompson critical) | `GroupTheory.CriticalSubgroup` ✅ | ✅ **sorry-free** `thompson_critical_omega` |
 | **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
 | **Lem 1.14** 易方向 | — | `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer` | ✅ **sorry-free 5 行** |
 | **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | ✅ **sorry-free thin wrap** (π = {p} 特殊化) |
@@ -816,7 +817,46 @@ theorem coprime_nilpotent_acts_trivially_of_centralizer_self
   rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hmem
   exact hmem a
 
-/-! ## §1D: 未実装 (Phase 1 Ch.4 §4D 待ち) -/
+/-! ## §1D: p-odd action (Thm 1.11, Cor 1.12, Thm 1.13 Thompson critical)
+
+BG Theorem 1.13 (J. G. Thompson). 証明本体は Gorenstein "Finite Groups" Thm 5.3.11
+(critical subgroup の存在) + 5.3.13 (`Ω₁(C)` の四性質) で,
+`OddOrder.GroupTheory.CriticalSubgroup` に段階実装済 (`isCritical_exists` +
+`IsCritical.omega1*`). 本節では `H = Ω₁(C)` を取り出して四性質を束ねる. -/
+
+open OddOrder.GroupTheory in
+/-- **BG Theorem 1.13** (J. G. Thompson) — `references/bg/local-analysis.mmd:461`.
+**Gorenstein "Finite Groups" Theorem 5.3.13** (p. 186) の Lean 化.
+
+`p` が奇素数で `G` が非自明な `p`-群ならば, `G` は次の四性質を持つ characteristic
+subgroup `H` (= ある critical subgroup `C` の `Ω₁(C)`) を含む:
+
+* (a) `[H, G] ⊆ Z(H)`;
+* (b) `H` の nilpotence class は `≤ 2` (`commutator ↥H ≤ Z(↥H)`);
+* (c) `H` の exponent は `p`;
+* (d) `C_{Aut G}(H)` (= `H` を pointwise に固定する `Aut G` の部分群) は `p`-群.
+
+証明: `isCritical_exists` で critical subgroup `C` を取り `H = Ω₁(C)`
+(`omega1Map C p`) とする. (a)=`commutator_top_le_center_omega1Map` (BG L468 の
+三段包含), (b)=`omega1Map_class_le_two` (`H ≤ C` から継承), (c)=`exponent_omega1Map`
+(Gorenstein 5.3.9(i)), (d)=`isPGroup_autCentralizer_omega1Map` (Gorenstein 5.3.10
+で `Ω₁(C)` 固定 ⇒ `C` 上自明, 5.3.11(iv) で `G` 上自明). characteristic は
+`omega1Map_characteristic` (char-in-char). -/
+theorem thompson_critical_omega {G : Type*} [Group G] [Finite G] [Nontrivial G]
+    {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2) (hG : IsPGroup p G) :
+    ∃ H : Subgroup G,
+      H.Characteristic
+      ∧ ⁅H, (⊤ : Subgroup G)⁆ ≤ (Subgroup.center ↥H).map H.subtype
+      ∧ _root_.commutator ↥H ≤ Subgroup.center ↥H
+      ∧ Monoid.exponent ↥H = p
+      ∧ IsPGroup p (autCentralizer H) := by
+  obtain ⟨C, hC⟩ := isCritical_exists hG
+  refine ⟨omega1Map C p, hC.omega1Map_characteristic, ?_,
+    hC.omega1Map_class_le_two, hC.exponent_omega1Map hp_odd hG,
+    hC.isPGroup_autCentralizer_omega1Map hp_odd hG⟩
+  -- (a) `[H, G] ⊆ Z(H)` from the symmetric `[G, H]` via `commutator_comm`.
+  rw [Subgroup.commutator_comm]
+  exact hC.commutator_top_le_center_omega1Map
 
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
 

@@ -41,6 +41,13 @@ CLAUDE.md が定める「`G, Thm` 引用で Isaacs が欠く場合のみ Gorenst
   critical `C` に自明作用する `p'`-自己同型は `P` 全体で自明 (完成).
 * (S7) `autFixerOfOrderP`, `isPGroup_autFixerOfOrderP`: Gorenstein 5.3.10,
   全位数 `p` 元を固定する `MulAut P` の部分群は `p`-群 (`p` odd, 完成).
+* (BG Thm 1.13 / Gorenstein 5.3.13) `omega1Map C p = Ω₁(C)` の四性質
+  (`H : Subgroup P` として): `IsCritical.omega1Map_characteristic` (S4, char-in-char),
+  `IsCritical.omega1Map_class_le_two` (S5, `commutator_le_center_of_le_of_class_le_two`),
+  `IsCritical.commutator_top_le_center_omega1Map` (S8, BG L468 の `[P,Ω₁]⊆[P,C]∩H⊆Z(C)∩H⊆Z(H)`),
+  `IsCritical.exponent_omega1Map` (S6 transfer), `IsCritical.isPGroup_autCentralizer_omega1Map`
+  (S3+S7, `C_{Aut P}(H)` p-群). BG-facing 本体 `thompson_critical_omega` は
+  `OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean` §1D.
 
 ## Implementation notes
 
@@ -1015,5 +1022,305 @@ theorem isPGroup_autFixerOfOrderP (hp_odd : p ≠ 2) (hP : IsPGroup p P) :
     rw [hmem]; rfl))
 
 end AutFixer
+
+/-! ## `H = Ω₁(C)` and BG Theorem 1.13 (Gorenstein Thm 5.3.13, `S4`/`S5`/`S8`)
+
+Given a critical subgroup `C` of an odd `p`-group `P`, the subgroup `H = Ω₁(C)`
+(as an ambient subgroup of `P`) is the characteristic subgroup of BG Theorem 1.13.
+We collect its four properties: characteristic (`S4`), class `≤ 2` (`S5`), exponent
+`p` (`S6`, via `Omega.exponent_eq_of_class_le_two`), `[P, H] ⊆ Z(H)` (`S8`, BG's
+own three-step inclusion `[P, Ω₁(C)] ⊆ [P, C] ∩ H ⊆ Z(C) ∩ H ⊆ Z(H)`), and the
+faithfulness/`p`-group property of `C_{Aut P}(H)` (`S3` + `S7`). -/
+
+section Omega1Critical
+
+open scoped commutatorElement
+
+variable {P : Type*} [Group P]
+
+/-- **Class `≤ 2` is inherited by subgroups.** If `K ≤ L` are subgroups of `P` and
+`L` has class `≤ 2` (`⁅L, L⁆ ≤ Z(L)`, i.e. `commutator ↥L ≤ center ↥L`), then so
+does `K`. Used for `S5` with `K = Ω₁(C) ≤ C = L`.
+
+Proof: in `P`, `Z(L)`-image centralizes `L`, so `⁅L, L⁆` centralizes `L ⊇ K`;
+hence `⁅K, K⁆ ≤ ⁅L, L⁆` centralizes `K`, i.e. `commutator ↥K ≤ center ↥K`. -/
+theorem commutator_le_center_of_le_of_class_le_two {K L : Subgroup P} (hKL : K ≤ L)
+    (hL : _root_.commutator ↥L ≤ Subgroup.center ↥L) :
+    _root_.commutator ↥K ≤ Subgroup.center ↥K := by
+  -- `⁅L, L⁆ ≤ centralizer L` (central elements of `L` commute with `L`).
+  have hLL_cent : ⁅L, L⁆ ≤ Subgroup.centralizer (L : Set P) := by
+    rw [← L.map_subtype_commutator]
+    rintro _ ⟨c, hc, rfl⟩
+    rw [Subgroup.mem_centralizer_iff]
+    rintro x hx
+    -- `c ∈ center ↥L` commutes with `⟨x, hx⟩ : ↥L`.
+    have := Subgroup.mem_center_iff.mp (hL hc) ⟨x, hx⟩
+    exact congrArg Subtype.val this
+  -- `⁅K, K⁆ ≤ centralizer K`.
+  have hKK_cent : ⁅K, K⁆ ≤ Subgroup.centralizer (K : Set P) := by
+    refine le_trans (Subgroup.commutator_mono hKL hKL) ?_
+    refine le_trans hLL_cent ?_
+    exact Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hKL)
+  -- Translate back to `center ↥K`: every element of `⁅K, K⁆` is in `K` and central in `K`.
+  rw [← K.map_subtype_le_map_subtype, K.map_subtype_commutator]
+  intro x hx
+  have hxK : x ∈ K := K.commutator_le_self hx
+  rw [Subgroup.mem_map]
+  refine ⟨⟨x, hxK⟩, ?_, rfl⟩
+  rw [Subgroup.mem_center_iff]
+  intro k
+  apply Subtype.ext
+  -- `x` centralizes `K ∋ k`: goal reduces to `↑k * x = x * ↑k`.
+  rw [Subgroup.coe_mul, Subgroup.coe_mul]
+  exact Subgroup.mem_centralizer_iff.mp (hKK_cent hx) (k : P) k.2
+
+variable {p : ℕ}
+
+/-- `H = Ω₁(C)` as an ambient subgroup of `P`: the image of `Omega ↥C p 1` under
+`C.subtype`. -/
+def omega1Map (C : Subgroup P) (p : ℕ) : Subgroup P :=
+  (Omega ↥C p 1).map C.subtype
+
+theorem omega1Map_le {C : Subgroup P} : omega1Map C p ≤ C := by
+  rw [omega1Map]; exact Subgroup.map_subtype_le _
+
+/-- **`S4`**: `H = Ω₁(C)` is characteristic in `P` (char-in-char: `Ω₁(C)` char `C`,
+`C` char `P`). -/
+theorem IsCritical.omega1Map_characteristic {C : Subgroup P} (hC : IsCritical C) :
+    (omega1Map C p).Characteristic :=
+  characteristic_map_subtype_of_characteristic hC.characteristic Omega.characteristic
+
+/-- **`S5`**: `H = Ω₁(C)` has class `≤ 2` (inherited from `C`). -/
+theorem IsCritical.omega1Map_class_le_two {C : Subgroup P} (hC : IsCritical C) :
+    _root_.commutator ↥(omega1Map C p) ≤ Subgroup.center ↥(omega1Map C p) :=
+  commutator_le_center_of_le_of_class_le_two omega1Map_le hC.commutator_le_center
+
+/-- **`S8`** (BG Theorem 1.13, property (a)). `[P, H] ⊆ Z(H)` for `H = Ω₁(C)`.
+
+Proof (BG, mmd L468): `⁅⊤, H⁆ ⊆ ⁅⊤, C⁆ ∩ H ⊆ Z(C) ∩ H ⊆ Z(H)`. Concretely, any
+`⁅g, h⁆` with `h ∈ H ⊆ C` lies in `H` (normality of `H`) and is central in `C`
+(`hC.commutator_top_le_center`); an element of `H` central in `C ⊇ H` is central
+in `H`. -/
+theorem IsCritical.commutator_top_le_center_omega1Map {C : Subgroup P} (hC : IsCritical C) :
+    ⁅(⊤ : Subgroup P), omega1Map C p⁆ ≤
+      (Subgroup.center ↥(omega1Map C p)).map (omega1Map C p).subtype := by
+  haveI : (omega1Map C p).Characteristic := hC.omega1Map_characteristic
+  set H := omega1Map C p with hH_def
+  -- `⁅⊤, H⁆ ≤ H` (H normal) and `⁅⊤, H⁆ ≤ ⁅⊤, C⁆`.
+  have hCH_H : ⁅(⊤ : Subgroup P), H⁆ ≤ H := Subgroup.commutator_le_right _ _
+  have hCH_C : ⁅(⊤ : Subgroup P), H⁆ ≤ ⁅(⊤ : Subgroup P), C⁆ :=
+    Subgroup.commutator_mono le_rfl omega1Map_le
+  -- Each element of `⁅⊤, H⁆` is in `H` and central in `C` (hence in `H`).
+  intro x hx
+  have hxH : x ∈ H := hCH_H hx
+  -- `x ∈ ⁅⊤, C⁆ ≤ (center ↥C).map C.subtype`, so `x` is central in `C`.
+  have hxZC : x ∈ (Subgroup.center ↥C).map C.subtype := hC.commutator_top_le_center (hCH_C hx)
+  rw [Subgroup.mem_map] at hxZC
+  obtain ⟨z, hz_center, hz_eq⟩ := hxZC
+  simp only [Subgroup.coe_subtype] at hz_eq
+  -- `x` commutes with all of `C ⊇ H`.
+  have hx_comm : ∀ c ∈ C, x * c = c * x := by
+    intro c hc
+    have := Subgroup.mem_center_iff.mp hz_center ⟨c, hc⟩
+    have := congrArg (Subtype.val) this
+    rw [Subgroup.coe_mul, Subgroup.coe_mul, hz_eq] at this
+    exact this.symm
+  -- Hence `x` is central in `H`.
+  rw [Subgroup.mem_map]
+  refine ⟨⟨x, hxH⟩, ?_, rfl⟩
+  rw [Subgroup.mem_center_iff]
+  intro k
+  apply Subtype.ext
+  rw [Subgroup.coe_mul, Subgroup.coe_mul]
+  exact (hx_comm (k : P) (omega1Map_le k.2)).symm
+
+variable [Finite P] [Fact p.Prime]
+
+omit [Finite P] in
+/-- A critical subgroup of a nontrivial `p`-group is itself nontrivial: if `C = ⊥`
+then `C_P(C) = ⊤` but self-centrality forces `C_P(C) = Z(⊥)`-image `= ⊥`, so
+`⊤ = ⊥`, contradicting `Nontrivial P`. -/
+theorem IsCritical.ne_bot [Nontrivial P] {C : Subgroup P} (hC : IsCritical C) : C ≠ ⊥ := by
+  intro hbot
+  -- `centralizer ⊥ = ⊤`, but `hC.centralizer_eq` makes it `(center ↥⊥).map subtype = ⊥`.
+  have h1 : Subgroup.centralizer (C : Set P) = ⊤ := by
+    rw [hbot]; simp [Subgroup.centralizer_eq_top_iff_subset]
+  have h2 : Subgroup.centralizer (C : Set P) = ⊥ := by
+    rw [hC.centralizer_eq, hbot]
+    rw [eq_bot_iff]
+    rintro _ ⟨z, _, rfl⟩
+    have : (z : (⊥ : Subgroup P)) = 1 := Subsingleton.elim _ _
+    simp [this]
+  rw [h1] at h2
+  exact (bot_ne_top h2.symm)
+
+/-- `Ω₁(C)` is nontrivial for a critical subgroup `C` of a nontrivial finite
+`p`-group: `C` is a nontrivial `p`-group, so by Cauchy it has an order-`p` element,
+which lies in `Omega ↥C p 1`. -/
+theorem IsCritical.omega1_nontrivial [Nontrivial P] {C : Subgroup P}
+    (hG : IsPGroup p P) (hC : IsCritical C) : Nontrivial ↥(Omega ↥C p 1) := by
+  haveI : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hC.ne_bot
+  have hCp : IsPGroup p ↥C := hG.to_subgroup C
+  -- `p ∣ |↥C|`.
+  obtain ⟨n, hn0, hn⟩ := hCp.nontrivial_iff_card.mp inferInstance
+  have hdvd : p ∣ Nat.card ↥C := hn ▸ dvd_pow_self p hn0.ne'
+  -- Cauchy: an order-`p` element of `↥C`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥C) p hdvd
+  have hg1 : g ^ p = 1 := by rw [← hg]; exact pow_orderOf_eq_one g
+  have hg_ne : g ≠ 1 := by
+    intro h; rw [h, orderOf_one] at hg; exact (Fact.out (p := p.Prime)).one_lt.ne hg
+  -- `g ∈ Omega ↥C p 1`.
+  have hg_mem : g ∈ Omega ↥C p 1 := Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hg1)
+  exact ⟨⟨⟨g, hg_mem⟩, 1, fun h => hg_ne (by simpa using congrArg Subtype.val h)⟩⟩
+
+/-- **`S6`** (BG Theorem 1.13, property (c)). `H = Ω₁(C)` has exponent `p` (for `p`
+odd). Transfers `Omega.exponent_eq_of_class_le_two` along the iso
+`↥(omega1Map C p) ≃* Omega ↥C p 1`. -/
+theorem IsCritical.exponent_omega1Map [Nontrivial P] (hp_odd : p ≠ 2)
+    (hG : IsPGroup p P) {C : Subgroup P} (hC : IsCritical C) :
+    Monoid.exponent ↥(omega1Map C p) = p := by
+  haveI : Nontrivial ↥(Omega ↥C p 1) := hC.omega1_nontrivial hG
+  -- exponent of `Omega ↥C p 1` is `p`.
+  have hexp : Monoid.exponent ↥(Omega ↥C p 1) = p :=
+    Omega.exponent_eq_of_class_le_two (Nat.Prime.odd_of_ne_two (Fact.out (p := p.Prime)) hp_odd)
+      hC.commutator_le_center
+  -- transfer along the iso `↥(omega1Map C p) ≃* Omega ↥C p 1`.
+  rw [omega1Map, Monoid.exponent_eq_of_mulEquiv
+    (Subgroup.equivMapOfInjective (Omega ↥C p 1) C.subtype C.subtype_injective).symm]
+  exact hexp
+
+/-! ### Property (d): `C_{Aut P}(H)` is a `p`-group (`S3` + `S7`)
+
+The automorphisms of `P` fixing `H = Ω₁(C)` pointwise form a `p`-group. The
+mechanism (Gorenstein 5.3.13): a `p'`-automorphism fixing `Ω₁(C)` fixes every
+order-`p` element of `C`, hence acts trivially on `C` by `isaacs_thm_4_36`
+(= Gorenstein 5.3.10), hence acts trivially on `P` by the faithfulness property
+`IsCritical.actionCommutator_eq_bot_of_acts_trivially` (Gorenstein 5.3.11 (iv)). -/
+
+open OddOrder.Isaacs.Ch04
+
+/-- `C_{Aut P}(H)`: the automorphisms of `P` fixing every element of `H` pointwise. -/
+def autCentralizer (H : Subgroup P) : Subgroup (MulAut P) where
+  carrier := {ψ : MulAut P | ∀ h ∈ H, ψ h = h}
+  one_mem' := fun _ _ => rfl
+  mul_mem' := fun {ψ χ} hψ hχ h hh => by
+    change ψ (χ h) = h
+    rw [hχ h hh, hψ h hh]
+  inv_mem' := fun {ψ} hψ h hh => by
+    have hh' := hψ h hh
+    have h2 := congrArg (ψ⁻¹ : MulAut P) hh'
+    rw [MulAut.inv_apply_self P ψ h] at h2
+    exact h2.symm
+
+omit [Finite P] in
+@[simp]
+theorem mem_autCentralizer {H : Subgroup P} {ψ : MulAut P} :
+    ψ ∈ autCentralizer H ↔ ∀ h ∈ H, ψ h = h := Iff.rfl
+
+/-- A finite subgroup `A` of `C_{Aut P}(Ω₁(C))` with order prime to `p` acts
+trivially on `P`, hence is the trivial subgroup. Chain: `A` fixes `Ω₁(C)` ⇒ `A`
+fixes every order-`p` element of `C` ⇒ (`isaacs_thm_4_36`) `A` acts trivially on
+`C` ⇒ (faithfulness `S3`) `A` acts trivially on `P` ⇒ `A = ⊥`. -/
+theorem autCentralizer.eq_bot_of_not_dvd_card (hp_odd : p ≠ 2) (hG : IsPGroup p P)
+    {C : Subgroup P} (hC : IsCritical C)
+    {A : Subgroup (MulAut P)} [Finite A] (hA_le : A ≤ autCentralizer (omega1Map C p))
+    (hA_p' : ¬ p ∣ Nat.card A) : A = ⊥ := by
+  haveI : C.Characteristic := hC.characteristic
+  set φ : A →* MulAut P := A.subtype with hφ_def
+  -- `C` is `A`-invariant (characteristic), so restrict the action to `↥C`.
+  have hC_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ C :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+  set φC : A →* MulAut ↥C := hC_inv.restrict with hφC_def
+  haveI hCp : IsPGroup p ↥C := hG.to_subgroup C
+  -- `A` fixes every order-`p` element of `↥C` (such elements map into `Ω₁(C) = H`).
+  have h_fix_C : ∀ g : ↥C, g ^ p = 1 → ∀ a : A, (φC a) g = g := by
+    intro g hgp a
+    -- `(g : P) ∈ omega1Map C p` since `g ^ p = 1` (so `g ∈ Omega ↥C p 1`).
+    have hg_omega : g ∈ Omega ↥C p 1 := Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hgp)
+    have hgP_mem : (g : P) ∈ omega1Map C p :=
+      Subgroup.mem_map_of_mem C.subtype hg_omega
+    -- `a` fixes `(g : P)`.
+    have h_fix : (φ a) (g : P) = (g : P) := hA_le a.2 (g : P) hgP_mem
+    -- transfer to `↥C`.
+    apply Subtype.ext
+    rw [hC_inv.restrict_apply_val a g]
+    exact h_fix
+  -- `isaacs_thm_4_36`: `A` acts trivially on `↥C`.
+  have h_triv_C_act : actionCommutator φC = ⊥ := isaacs_thm_4_36 hp_odd φC hCp hA_p' h_fix_C
+  have h_triv_C : ∀ a : A, ∀ g : ↥C, (φC a) g = g :=
+    (actionCommutator_eq_bot_iff_acts_trivially φC).mp h_triv_C_act
+  -- `A` fixes `C` pointwise (as a subset of `P`).
+  have h_triv_C_set : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ := by
+    intro x hx a
+    have := h_triv_C a ⟨x, hx⟩
+    have := congrArg (Subtype.val) this
+    rwa [hC_inv.restrict_apply_val a ⟨x, hx⟩] at this
+  -- Faithfulness (`S3`): `A` acts trivially on `P`.
+  have h_triv_P : actionCommutator φ = ⊥ :=
+    hC.actionCommutator_eq_bot_of_acts_trivially hp_odd hG hA_p' h_triv_C_set
+  have h_triv_P' : ∀ a : A, ∀ g : P, (φ a) g = g :=
+    (actionCommutator_eq_bot_iff_acts_trivially φ).mp h_triv_P
+  -- Each `a ∈ A` is the identity automorphism, so `A = ⊥`.
+  rw [eq_bot_iff]
+  intro a ha
+  rw [Subgroup.mem_bot]
+  refine MulEquiv.ext fun g => ?_
+  rw [MulAut.one_apply]
+  exact h_triv_P' ⟨a, ha⟩ g
+
+/-- **BG Theorem 1.13, property (d)** (Gorenstein 5.3.13). For `p` odd and `C` a
+critical subgroup of a finite `p`-group `P`, `C_{Aut P}(Ω₁(C))` is a `p`-group.
+
+Proof (mirrors `isPGroup_autFixerOfOrderP`): if a prime `q ≠ p` divided the order,
+Cauchy would give an order-`q` element `ψ`; its cyclic `p'`-part `A` would satisfy
+`A = ⊥` by `eq_bot_of_not_dvd_card`, contradicting `ψ ≠ 1`. -/
+theorem IsCritical.isPGroup_autCentralizer_omega1Map (hp_odd : p ≠ 2) (hG : IsPGroup p P)
+    {C : Subgroup P} (hC : IsCritical C) :
+    IsPGroup p (autCentralizer (omega1Map C p)) := by
+  rw [IsPGroup.iff_orderOf]
+  intro ψ
+  by_contra hψ
+  simp only [not_exists] at hψ
+  have hn0 : orderOf ψ ≠ 0 := by
+    intro h0
+    haveI : Finite (autCentralizer (omega1Map C p)) := Subtype.finite
+    exact (orderOf_pos ψ).ne' h0
+  set n := orderOf ψ with hn_def
+  set b := ordCompl[p] n with hb_def
+  have hb_pos : 0 < b := Nat.ordCompl_pos p hn0
+  have hb_cop : ¬ p ∣ b := Nat.not_dvd_ordCompl (Fact.out (p := p.Prime)) hn0
+  have hb_ne_one : b ≠ 1 := by
+    intro hb1
+    have hnpow : n = p ^ (n.factorization p) := by
+      conv_lhs => rw [← Nat.ordProj_mul_ordCompl_eq_self n p, ← hb_def, hb1, mul_one]
+    exact hψ (n.factorization p) hnpow
+  set σ : autCentralizer (omega1Map C p) := ψ ^ (ordProj[p] n) with hσ_def
+  have hσ_ord : orderOf σ = b := by
+    rw [hσ_def, hb_def, orderOf_pow_of_dvd (Nat.ordProj_pos n p).ne' (Nat.ordProj_dvd n p)]
+  set A : Subgroup (autCentralizer (omega1Map C p)) := Subgroup.zpowers σ with hA_def
+  haveI : Finite A := Subtype.finite
+  have hAcard : Nat.card A = b := by rw [hA_def, Nat.card_zpowers, hσ_ord]
+  set Aimg : Subgroup (MulAut P) := A.map (autCentralizer (omega1Map C p)).subtype with hAimg_def
+  have hAimg_le : Aimg ≤ autCentralizer (omega1Map C p) := by
+    rw [hAimg_def]
+    rintro _ ⟨x, _, rfl⟩
+    exact x.property
+  haveI : Finite Aimg := Subtype.finite
+  have hAimg_card : Nat.card Aimg = b := by
+    rw [hAimg_def, Nat.card_congr (Subgroup.equivMapOfInjective A _
+      (autCentralizer (omega1Map C p)).subtype_injective).symm.toEquiv, hAcard]
+  have hAimg_bot : Aimg = ⊥ :=
+    autCentralizer.eq_bot_of_not_dvd_card hp_odd hG hC hAimg_le (hAimg_card ▸ hb_cop)
+  have hσ_ne : σ ≠ 1 := by
+    intro h1
+    rw [h1, orderOf_one] at hσ_ord
+    exact hb_ne_one hσ_ord.symm
+  have hmem : ((autCentralizer (omega1Map C p)).subtype σ) ∈ Aimg :=
+    Subgroup.mem_map_of_mem _ (Subgroup.mem_zpowers σ)
+  rw [hAimg_bot, Subgroup.mem_bot] at hmem
+  exact hσ_ne ((autCentralizer (omega1Map C p)).subtype_injective (by
+    rw [hmem]; rfl))
+
+end Omega1Critical
 
 end OddOrder.GroupTheory
