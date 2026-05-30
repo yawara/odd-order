@@ -26,6 +26,9 @@ genuine に供給する (= BG §4 I-1b)。
 * `actionCommutator_restrict_self_map_subtype_eq` : `([N,A] の像) = N` (G 内の等式形)
 * `actionCommutator_restrict_self_eq_top` : `actionCommutator ψN = ⊤` (⊤ 形, headline,
   Thm 4.12(a) step a-1 が消費)
+* `actionCommutator_le_centralizer_of_isCyclic_isAInvariant` : `S ⊴ G` cyclic A-不変 ⇒
+  `[G,A] ⊆ C_G(S)` (= BG Thm 4.12(a) step a-2 核心、**半直積 `GA` を経由しない**共役同変性版)
+* `isCyclic_le_center_of_actionCommutator_eq_top` : 上の系で `[G,A]=⊤` ⇒ `S ⊆ Z(G)` (a-2 結論)
 
 **注意 (重複回避)**: A-invariant normal `S ⊴ R` の商 `R ⧸ S` への作用持ち上げ自体
 (`IsAInvariant.quotientMulAutHom`, apply 補題, descent `actionCommutator_quotient_eq_map`,
@@ -156,5 +159,81 @@ theorem actionCommutator_restrict_self_eq_top
     ← MonoidHom.range_eq_map, N.range_subtype]
 
 end RestrictSelf
+
+section CentralizerOfCyclicAInvariant
+
+/-- **BG Thm 4.12(a) step a-2 核心** (`R = [R,A] ⊆ (RA)′ ⊆ C_{RA}(S) ⇒ S ⊆ Z(R)` の前半),
+半直積を経由しない版。
+
+`S ⊴ G` が cyclic かつ `A`-不変 (`IsAInvariant φ S`) なら, 作用交換子
+`[G,A] = actionCommutator φ` は `S` を中心化する (`⊆ C_G(S)`).
+
+BG の証明は `G = [G,A] ⊆ (GA)′ ⊆ C_{GA}(S)` を半直積 `GA = G ⋊ A` 経由で辿るが, ここでは
+`GA` を一切作らない。共役作用 `α : G →* MulAut ↥S` (`S ⊴ G`) と制限作用 `ρ := φ|_S : A →* MulAut ↥S`
+(`S` `A`-不変) を取ると, `α` を `ρ a` で共役する同変性 `ρ a * α g = α ((φ a) g) * ρ a` が成り立つ。
+`S` cyclic ゆえ `MulAut ↥S` は abelian なので, これは `α ((φ a) g) = α g` を強制する。よって `[G,A]` の
+各生成元 `g · (φ a) g⁻¹` は `α (g · (φ a) g⁻¹) = α g · (α g)⁻¹ = 1`, すなわち `S` を中心化する。 -/
+theorem actionCommutator_le_centralizer_of_isCyclic_isAInvariant
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {S : Subgroup G} [IsCyclic ↥S] (hS_norm : S.Normal) (hS_inv : IsAInvariant φ S) :
+    actionCommutator φ ≤ Subgroup.centralizer (S : Set G) := by
+  -- 共役作用 α : G →* MulAut ↥S を「`MulAut.conj` 下での S の A-不変性」として得る (S ⊴ G ⇔ これ)
+  have hconj : IsAInvariant (MulAut.conj : G →* MulAut G) S := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro r s hs
+    simpa using hS_norm.conj_mem s hs r
+  -- S cyclic ⇒ MulAut ↥S abelian (`MulAut ↥S ≃* (ZMod _)ˣ`)。**インスタンス登録はしない**
+  -- (canonical `MulAut.instGroup` と競合する 2 つ目の inv が出来てダイヤモンドになる)。
+  -- 必要な `mul_comm` だけを局所事実として取り出す。
+  have hcomm : ∀ x y : MulAut ↥S, x * y = y * x := by
+    intro x y
+    apply (IsCyclic.mulAutMulEquiv (G := ↥S)).injective
+    rw [map_mul, map_mul]
+    exact mul_comm _ _
+  -- 共役作用 α と制限作用 ρ。`((toMulAutHom · ·) ·).val = (φ ·) (·).val` は定義的等号なので
+  -- 以下 `show`/`congrArg Subtype.val` で defeq 展開する (Ch04 の `_root_` 欠落で apply_val 補題名が
+  -- 二重 nest し名前参照できないため、名前を介さない)。
+  set α : G →* MulAut ↥S := hconj.toMulAutHom
+  set ρ : A →* MulAut ↥S := hS_inv.toMulAutHom
+  -- 同変性: ρ a * α g = α ((φ a) g) * ρ a  (両辺 s への作用が (φa)g · (φa)s · ((φa)g)⁻¹ に一致)
+  have hint : ∀ (a : A) (g : G), ρ a * α g = α ((φ a) g) * ρ a := by
+    intro a g
+    ext s
+    change (φ a) (g * (s : G) * g⁻¹) = (φ a) g * (φ a) (s : G) * ((φ a) g)⁻¹
+    rw [map_mul, map_mul, map_inv]
+  -- abelian で同変性から α ((φ a) g) = α g
+  have heq : ∀ (a : A) (g : G), α ((φ a) g) = α g := by
+    intro a g
+    have hi := hint a g
+    rw [hcomm (α ((φ a) g)) (ρ a)] at hi
+    exact (mul_left_cancel hi).symm
+  -- 生成元 g · (φ a) g⁻¹ は α で 1 に飛ぶ ⇒ C_G(S) に属する
+  rw [actionCommutator, Subgroup.closure_le]
+  rintro x ⟨g, a, rfl⟩
+  have hx1 : α (g * (φ a) g⁻¹) = 1 := by
+    rw [map_mul, heq a g⁻¹, map_inv]
+    exact mul_inv_cancel (α g)
+  rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+  intro s hs
+  have h : (α (g * (φ a) g⁻¹)) ⟨s, hs⟩ = ⟨s, hs⟩ := by rw [hx1]; simp
+  have hval : (g * (φ a) g⁻¹) * s * (g * (φ a) g⁻¹)⁻¹ = s := congrArg Subtype.val h
+  exact (mul_inv_eq_iff_eq_mul.mp hval).symm
+
+/-- **BG Thm 4.12(a) step a-2** (`S ⊆ Z(R)`): cyclic A-不変 normal `S ⊴ G` で `[G,A] = ⊤`
+(`actionCommutator φ = ⊤`) なら `S` は中心に含まれる (`S ⊆ Z(G)`).
+
+`actionCommutator_le_centralizer_of_isCyclic_isAInvariant` と
+`Subgroup.centralizer_eq_top_iff_subset` から直ちに従う。 -/
+theorem isCyclic_le_center_of_actionCommutator_eq_top
+    {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G}
+    {S : Subgroup G} [IsCyclic ↥S] (hS_norm : S.Normal) (hS_inv : IsAInvariant φ S)
+    (hGA : actionCommutator φ = ⊤) :
+    S ≤ Subgroup.center G := by
+  have hle := actionCommutator_le_centralizer_of_isCyclic_isAInvariant hS_norm hS_inv
+  rw [hGA, top_le_iff] at hle
+  intro x hx
+  exact (Subgroup.centralizer_eq_top_iff_subset.mp hle) hx
+
+end CentralizerOfCyclicAInvariant
 
 end OddOrder.BG.Ch1.OperatorQuotientAction
