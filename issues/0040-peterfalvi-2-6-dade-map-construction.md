@@ -56,8 +56,10 @@ created: 2026-05-27
 
 ## やること
 
-- [ ] (2.8) `M(B) = H(B) ⋊ N_L(B)` の構造補題 (H(B), N_L(B), M(B) を定義)
-- [ ] (2.9) `α_B` を商準同型 `f_B` 経由で定義、virtual char 保存
+- [x] (2.8) `M(B) = H(B) ⋊ N_L(B)` の構造補題 (H(B), N_L(B), M(B) を定義)
+      — 2026-05-30 完了 (sorry-free, axiom-clean; 下記「進捗 (3)」).
+- [x] (2.9) `α_B` を商準同型 `f_B` 経由で定義、virtual char 保存
+      — 2026-05-30 完了 (sorry-free, axiom-clean; 下記「進捗 (3)」).
 - [ ] 誘導指標値公式 (必要なら InducedCharacter.lean に追加)
 - [ ] (2.10.1)-(2.10.3) sub-lemmas
 - [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺)
@@ -178,3 +180,71 @@ Dade 写像 τ が `IsDadeMap` + isometry + virtual-char 保存を満たすも�
   (`OddOrder.RepresentationTheory.ClassFunction.{restrict,induce}_mem_ZIrr`).
 - InducedCharacter.lean が ZIrrFourier + CharacterCompleteness を import するよう変更
   (循環なし; 下流 S02/S03/Clifford ビルド確認済み).
+
+## 進捗 2026-05-30 (3) — (2.8) M(B)=H(B)⋊N_L(B) + (2.9) f_B/α_B 完成 (sorry-free, axiom-clean)
+
+上記「残作業プラン」の **項目 (2) M(B)=H(B)⋊N_L(B) と (3) α_B pullback が解決**.
+3 コミット (commits 527053b, 527d486, a6dd522), `lake build OddOrder` + `OddOrder.AxiomsCheck`
+ともに green, 新規 sorry/admit/axiom 無し.
+
+### ZIrr pullback (項目 (3) の核, 先行調査の「ブロッカー」評価は誤り)
+
+`OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean` + `InducedCharacter.lean`:
+- `ClassFunction.compHom (f : H →* G) (φ : ClassFunction G k) : ClassFunction H k` := `φ ∘ f`
+  (= `restrict` の `f = H.subtype` 一般化), + `compHom_{zero,add,neg,sub,smul}`.
+- **`ClassFunction.compHom_mem_ZIrr`** `[Finite H] (f : H →* G) (hφ : φ ∈ ZIrr G) : compHom f φ ∈ ZIrr H`.
+  証明は `restrict_mem_ZIrr` と同型の span induction; base case で
+  `compHom f (χ_ρ) = χ_{ρ.comp f}` と書換え `character_mem_ZIrr (ρ.comp f)` を適用.
+
+**先行調査の誤り訂正**: 「(2.9) の `α_B ∈ ZIrr M(B)` は `Representation.IsIrreducible` の
+inflation/precompose-surjective 保存 (~30-50 LOC, mathlib/repo に無い) を要しブロック」と
+されていたが**誤り**.  `character_mem_ZIrr` (同 session landed, **任意の**有限次元複素表現の
+指標 ∈ ℤ[Irr], 既約性不要) のおかげで, `ρ.comp f` の既約性は不要で span induction の
+base case が直接片付く.  `f` の全射性も不要 (N_L(B) は L の真部分群でよい).
+
+### (2.8) `OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section SemidirectStructure`
+
+`Hypothesis` namespace 内, `end Hypothesis` の直前:
+- `conjA l a` = `⟨l·a·l⁻¹, _⟩ : {a//a∈A}` (L の A 上共役作用), `conjA_{one,mul,inv_conjA,…}`.
+- `hIntersection B hB = H(B) = ⨅_{a∈B} H(a)` (`Finset.inf'`), `hIntersection_le`, `mem_hIntersection`.
+- `setLStabilizer B : Subgroup L = N_L(B)` (B の L-set-stabilizer, 手書き).  `inv_mem'` は
+  「ℓ 共役が finite set B の単射自己写像 ⇒ 全射」(`Finset.surjOn_of_injOn_of_card_le`).
+  `Subgroup.setNormalizer` は `Subgroup.normalizer` の alias で **subgroup 用 (Finset 不可)** を実機で確認.
+- `nLStabilizerIn B = N_L(B)` を G の subgroup として (`.map L.subtype`), `nLStabilizerIn_le_L`.
+- `mem_H_conjA_iff` — (2.4.a) HConjInvariant 経由: `y ∈ H(conjA l a) ↔ l⁻¹yl ∈ H(a)`.
+- `nLStabilizerIn_le_normalizer` — N_L(B) ◁ 正規化 (ℓ が B を置換 ⇒ H(B) 保つ).
+- `hIntersection_disjoint_nLStabilizerIn` — H(B) ∩ N_L(B) = 1
+  (`commute_of_mem_H` + `centralizer_disjoint`).
+- `mBSubgroup B = M(B) = H(B) ⊔ N_L(B)`, `coe_mBSubgroup` (台 = H(B)·N_L(B)),
+  **`card_mBSubgroup`** = |M(B)| = |H(B)|·|N_L(B)| (`card_centralizer_eq` と同じ bijection 論法).
+
+### (2.9) 同ファイル, (2.8) の後
+
+- `hIntersection_subgroupOf_normal` — H(B) ◁ M(B) (`normal_subgroupOf_iff_le_normalizer` + `sup_le`).
+- `isComplement'_subgroupOf` — ↥M(B) 内で N_L(B) と H(B) が complementary
+  (`isComplement'_of_card_mul_and_disjoint`; card は `subgroupOfEquivOfLe` + `card_mBSubgroup`).
+- **`dadeQuotientHom = f_B : M(B) →* L`** = 合成 `M(B) → M(B)/H(B) ≅ N_L(B) ↪ L`
+  (`IsComplement'.QuotientMulEquiv [H(B).Normal]` + `Subgroup.inclusion`).
+- **`ker_dadeQuotientHom`** = `ker f_B = H(B).subgroupOf M(B)` (mk' 以降単射 ⇒ ker = ker mk';
+  教科書「核 H(B) の自然準同型」を faithful に裏付け).
+- `alphaB B α = α ∘ f_B` (`ClassFunction.compHom`), **`alphaB_mem_ZIrr`** = α∈ℤ[Irr L] ⇒
+  α_B∈ℤ[Irr M(B)] (`compHom_mem_ZIrr`).
+
+`card_mBSubgroup` / `ker_dadeQuotientHom` / `alphaB_mem_ZIrr` / `compHom_mem_ZIrr` を
+AxiomsCheck.lean に登録 (各 3 axioms allowlist 内; AxiomsCheck が S04 を import).
+
+### 残作業 (Dade 写像 τ 明示構成の最終段, 別 sub-issue 推奨)
+
+依存プランの残りは **(4) (2.10) inclusion-exclusion (Möbius 相殺) と (5) 接続** のみ:
+- (2.10.1) `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` (L-共役不変).
+- (2.10.2) `C_{H(B)}(a) = H(B∪{a})` (a∈A).  H(B∪{a}) ⊆ H(a) ⊆ C_G(a) ⇒ ⊆ C_{H(B)}(a);
+  逆は C_{H(B)}(a) が |C_L(a)| と互いに素な C_G(a) の部分群 ⇒ ⊆ H(a).
+- (2.10.3) Ind 値公式 (g∉⋃(aH(a))^G なら 0; g∈(aH(a))^G なら明示式).
+- (2.10) 本体: `γ := -∑_{B∈ℬ} (-1)^|B| Ind α_B`, g で場合分け, B と B∪{a} が
+  (2.10.2) 経由でペア相殺, B={a} のみ残し `𝒜(g,H(a)a)=xC_G(a)` (issue 0039 `card_conj_fiber`)
+  で `γ(g)=α(a)=α^τ(g)`.  組合せ engine = `Finset.sum_powerset_*` 系. 最難 ~150-200 LOC.
+- (5) `dadeSumMap` を (2.10) 公式で定義 → `IsDadeMap` を (2.10.3) から → (2.6.a) は既存
+  `isDadeIsometry_of_isDadeMap` で自動 → (2.6.b) は (2.10) の Ind 交代和 + `induce_mem_ZIrr`/
+  `alphaB_mem_ZIrr` → `FullDadeIsometryData` 完成.
+- 誘導指標**値**公式 (Ind の点別値, (2.10.1)/(2.10.3) 用) は未実装で要追加
+  (InducedCharacter.lean の `induce` 定義から点別値を出す補題).
