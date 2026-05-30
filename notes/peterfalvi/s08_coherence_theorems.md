@@ -1115,3 +1115,37 @@ X − a·τ₁χ₁` は **(5.6.1)+(5.6.2) そのもの** — `(χ−aχ₁)^τ 
    計算 (`crossDifference_inner` 系で source 側は landed, image 側 `χᵢ^{τ₁} ⊥ R(χ)` の (5.5)+(5.2.e)
    結合が残)。capstone 自体は landed。
 3. **`Da.X = D₀.X` の (5.6.2) 同定** — 2 射影が同一 `∑_{α∈E}α` になること (`a·χ₁^{τ₁} ⊥ R(χ)` ゆえ)。
+
+### G2.7 Round 23 PASS 1 (2026-05-31): (5.6.3) 射影同定 `Da.X=D₀.X` + (5.5)+(5.2.e) image-side orthogonality を *構成*
+
+PASS 4 末尾の残 3 (`Da.X=D₀.X` 同定) と残 2 の image 側 (`χᵢ^{τ₁} ⊥ R(χ)` 結合の reduction) を解消。
+`retarget_isCoherent_of_decompositions` から **3 つの opaque 仮説** (`hX_eq`, `hX_ortho`, `hXbar_ortho`)
+が消え, genuine な (5.5)/(5.6.2)/(5.2.e) data から *構成*されるようになった (posit 無, sorry/axiom 無,
+AxiomsCheck 4 件 新規 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360 jobs;
+commits 32a8c37 / e340467)。
+
+- **(a)+(c) 射影同定 `Da.X = D₀.X`** (`CharacterPsiDecomposition` namespace):
+  - `X_eq_tau1_chi_of_Y_eq` : (5.6.2) collapse `hY : Da.Y = a·χ₁^{τ₁}` から `Da.X = Da.tau1 χ`
+    (= χ^{τ₁})。proof は `Da.tau1 (χ−a·χ₁) = Da.X − Da.Y = Da.X − a·χ₁^{τ₁}` (tau1_image, hY) と
+    線形性 `= χ^{τ₁} − a·χ₁^{τ₁}` (map_sub, map_nsmul) を `sub_left_inj` で相殺。`a : ℕ` 必須
+    (map_nsmul)。これが (5.6.3) の「X が ψ に依らない」核。
+  - `X_eq_of_tau1_eq_on_chi` : `Da.X = Da.tau1 χ` (上) + `Da.tau1 χ = D₀.tau1 χ` (τ₁-agreement,
+    honest 入力) + `D₀.tau1 χ = D₀.X` (eq_sum_of_psi_eq_zero, (5.5)) を連鎖し `Da.X = D₀.X`。
+  - **`retarget_isCoherent_of_decompositions`**: posit していた `hX_eq : Da.X = D₀.X` を, より原始的な
+    honest 入力 `htau1_chi : Da.tau1 χ = D₀.tau1 χ` (両 decomposition が running τ₁ を χ で同一評価) に
+    置換し, `hX_eq` を `X_eq_of_tau1_eq_on_chi` で内部導出。
+- **(b) image-side orthogonality `X, X̄ ⊥ τ₁ξ`** (`CharacterPsiDecomposition` namespace):
+  - `inner_X_eq_zero_of_orthogonal_imageSet` : per-element `∀α∈R(χ), ⟨η,α⟩=0` ⟹ `⟨η, X⟩=0`,
+    via `X_eq : X = ∑ coeff•α` + `inner_sum_right`/`inner_smul_right`。
+  - `inner_conjImage_eq_zero_of_orthogonal_imageSet` : 同様に `⟨η, X̄⟩=0` (X̄ = X−(χ−χ̄)^τ;
+    `(χ−χ̄)^τ = ∑_{α∈R(χ)}α` ゆえ X̄ も ℤ[R(χ)])。
+  - **`retarget_isCoherent_of_decompositions`**: posit していた sum-level `hX_ortho`/`hXbar_ortho` を
+    単一 per-element 入力 `hperElem : ∀ξ∈ℤ[S₁], ∀α∈R(χ), ⟨τ₁ξ, α⟩=0` (genuine (5.5)+(5.2.e) fact;
+    残るは family `{R(χᵢ)}` への結合のみ) に置換し, 両者を内部導出。
+
+**Round 23 PASS 1 後の残 (この round 範囲外)**: `retarget_isCoherent_of_decompositions` に残る
+posited-conclusion 系仮説は **`hY : Da.Y = a·Da.tau1 χ₁` ((5.6.2) collapse 出力) ただ 1 つ**。これは
+(5.6.1) の `Y` を基底 `{χᵢ^{τ₁}} ∪ {直交補}` に展開した form (= (5.6.1) 存在主張, projection 存在を要する)
+を `lambda_eq_zero_and_Z_eq_zero` (landed) に流して得る。残は: ① 各 step の `D₀`/`Da` 生産 ((5.4)
+auxiliary isometry `D.tau1` を Dade τ + running τ₁ から構成), ② (5.6.1) form の存在 (Y の R(χ)/{χᵢ^τ₁}
+分解), ③ `hperElem` の family `{R(χᵢ)}` 結合 ((5.2.e) を extension 像へ)。①②③ が揃えば hstep 完全放電。

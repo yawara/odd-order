@@ -826,6 +826,20 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     が Dade `τ` と supported diff 上で一致する (5.4) auxiliary isometry の構成); (b) **(5.6.2) `hY` の
     導出** ((5.6.1) λ-係数分解を `lambda_eq_zero_and_Z_eq_zero` に流す cross-difference 計算 — capstone
     自体は landed); (c) `Da.X = D₀.X` の (5.6.2) 同定。これらは wiring でなく (5.4)/(5.6.1) 本体 content。
+- [x] (2026-05-31, Round 23 PASS 1) **(5.6.3) 射影同定 `Da.X=D₀.X` (residual c) + (5.5)+(5.2.e)
+      image-side orthogonality (residual b) を構成** (commits 32a8c37 / e340467, AxiomsCheck 4 件 新規
+      全 allowlist, `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360 jobs)。PASS 4 残 (c) と残 (b) の
+      reduction を解消。`retarget_isCoherent_of_decompositions` から **3 つの opaque 仮説**
+      (`hX_eq`/`hX_ortho`/`hXbar_ortho`) が消えた:
+  - `CharacterPsiDecomposition.X_eq_tau1_chi_of_Y_eq` : (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` ⟹
+    `Da.X = χ^{τ₁}` (tau1 の χ−a·χ₁ 上線形性 map_nsmul + `sub_left_inj`; `a:ℕ`)。
+  - `CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi` : 上 + τ₁-agreement `Da.tau1 χ=D₀.tau1 χ`
+    (honest 入力) + `D₀.tau1 χ=D₀.X` ((5.5)) ⟹ `Da.X=D₀.X`。posited `hX_eq` → `htau1_chi` に置換。
+  - `CharacterPsiDecomposition.inner_X_eq_zero_of_orthogonal_imageSet` /
+    `inner_conjImage_eq_zero_of_orthogonal_imageSet` : per-element `∀α∈R(χ),⟨η,α⟩=0` ⟹
+    `⟨η,X⟩=0`/`⟨η,X̄⟩=0`。posited sum-level `hX_ortho`/`hXbar_ortho` → 単一 `hperElem` に置換し内部導出。
+  - **残 (次パス)**: posited-conclusion 仮説は `hY : Da.Y=a·Da.tau1 χ₁` ((5.6.2) collapse, (5.6.1)
+    form 存在を要する) ただ 1 つ + 各 step `D₀`/`Da` 生産 + `hperElem` の family `{R(χᵢ)}` 結合。
 
 ## 完了条件
 

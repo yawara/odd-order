@@ -721,6 +721,25 @@ base 등) 에서 직접 적용 가능하며 (5.6) 의 **대수적 심장**.
   2. Witt/유니터리 부분공간-등거리 확장 (격자 등거리 → 전역): dim 조건 성립시에만 존재,
      bespoke `ClassFunction.inner` 용 mathlib 부재 ⟹ multi-day brick. 경로 1 이 우월.
 
+### (2026-05-31, Round 23 PASS 1) (5.6.3) 射영동정 `Da.X=D₀.X` + (5.5)+(5.2.e) image-side orthogonality 構成
+
+`retarget_isCoherent_of_decompositions` の 3 opaque 仮설 (`hX_eq`, `hX_ortho`, `hXbar_ortho`) 을 genuine
+한 (5.5)/(5.6.2)/(5.2.e) data 로부터 *構成* (posit 無, sorry/axiom 無, AxiomsCheck 4 신규 全 allowlist;
+`lake build OddOrder` 緑 3360; commits 32a8c37 / e340467). 상세는 `notes/peterfalvi/s08_coherence_theorems.md`
+Round 23 PASS 1 항목.
+
+- **`X_eq_tau1_chi_of_Y_eq`** : (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` 로부터 `Da.X = χ^{τ₁}` (tau1 의
+  `χ−a·χ₁` 상 선형성, `a:ℕ` map_nsmul, `sub_left_inj` 상쇄). (5.6.3) "X 가 ψ 에 무관" 의 핵.
+- **`X_eq_of_tau1_eq_on_chi`** : `Da.X=Da.tau1 χ` + τ₁-agreement `Da.tau1 χ=D₀.tau1 χ` (honest) +
+  `D₀.tau1 χ=D₀.X` ((5.5)) ⟹ `Da.X=D₀.X`. posited `hX_eq` 를 더 원시적 `htau1_chi` 로 치환 후 내부 도출.
+- **`inner_X_eq_zero_of_orthogonal_imageSet`** / **`inner_conjImage_eq_zero_of_orthogonal_imageSet`** :
+  per-element `∀α∈R(χ), ⟨η,α⟩=0` ⟹ `⟨η,X⟩=0` / `⟨η,X̄⟩=0` (X, X̄=X−(χ−χ̄)^τ 둘 다 ℤ[R(χ)]).
+  posited sum-level `hX_ortho`/`hXbar_ortho` 를 단일 per-element `hperElem` 로 치환 후 내부 도출.
+
+**잔존**: `retarget_isCoherent_of_decompositions` 의 posited-conclusion 仮설은 `hY : Da.Y=a·Da.tau1 χ₁`
+((5.6.2) collapse, (5.6.1) form 존재 필요) 뿐. + 각 step `D₀`/`Da` 생산 ((5.4) τ₁ 구성) 과 `hperElem`
+의 family `{R(χᵢ)}` 결합. 이들이 hstep 완전 방전의 다음 패스.
+
 ---
 
 ## 未解決 / TODO
