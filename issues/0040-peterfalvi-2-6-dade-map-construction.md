@@ -676,3 +676,68 @@ docstring が約束していた「the equality of the corresponding Dade maps is
 特殊化 = (2.3)/(2.5) との整合) を, 構成の一意性込みで正当化できる.  `IsDadeMap.unique` は
 (2.6.b) Möbius 恒等式 (STEP 3/4) で `dadeMap = -∑(-1)^|B| Ind α_B` を立てる際にも,
 RHS が `IsDadeMap` を満たすことを示せば `dadeMap` 一致を即得る道具として再利用可能.
+
+## 進捗 2026-05-30 (14) — (2.10) Möbius 機構を完成 (STEP 3 engine + 3a keystone), 残: 最終 assembly + STEP 4
+
+`S04_DadeIsometry.lean` `section MobiusAssembly` に, (2.10) 点別恒等式に必要な**組合せ機構を
+ほぼ全て** landing (10 commits; `lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規
+sorry/admit/axiom 無し; 全 landed 定理が 3 axioms 全 allowlist 内).  Round 6 が代数 spine を
+landing したのに続き, 本 round は **STEP 3 (Möbius 相殺) 全体 + STEP 3a の keystone
+(orbit-averaging + b=a^x reindex + 重み代数)** を landing.
+
+### landed (依存順)
+
+- **STEP 3b 中核 (toggle-a Möbius 相殺)** (commits 9d0e68d, 28ea253, 3a2954c):
+  - `mobiusIndex a` = 𝒫(a) (非空 B⊆A で a∈N_L(B)) を Finset 化, `mobiusSummand a g B`
+    = `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|` (ℂ).
+  - `mem_nLStabilizerIn_insert_iff` (a∉B で a∈N_L(B)↔a∈N_L(insert a B)).
+  - `mobiusSummand_add_insert_eq_zero` (pairwise cancellation `mobiusSummand B + mobiusSummand
+    (insert a B) = 0`, `card_conjFiber_hIntersection_mul_eq` + sign flip).
+  - `toggleA` (B↦B△{a}) + `singleton_mem_mobiusIndex` + **`sum_mobiusSummand_eq_singleton`**
+    (`∑_{B∈𝒫(a)} mobiusSummand a g B = mobiusSummand a g {a}` via `Finset.sum_involution` on
+    `𝒫(a)\{{a}}`, fixed-point-free toggle).
+  - **`mobiusSummand_singleton_eq`** (survivor B={a} 評価 `= -(|C_L(a)|:ℂ)` via
+    `card_conjFiber_coset_eq_card_centralizer` + `card_centralizer_eq`; `hIntersection_singleton`).
+- **STEP 3a keystone** (commits 3ca98dd, 73a3f80, 11ed9bc):
+  - `Finite conjClassQuotient` instance + `card_orbit_pos`.
+  - **`sum_transversalRep_eq_sum_div_orbit`** = **orbit-averaging**: orbit-constant `h` で
+    `∑_{C∈ℬ} h(rep C) = ∑_{B⊆A} h B / |orbit B|` (`Finset.sum_fiberwise_of_maps_to` で 𝒫 を
+    orbit fiber 分割, 各 fiber = orbit(out C) で `h`/|orbit| 一定 ⇒ fiber-sum = h(rep)).
+    (2.10) の `1/[L:N_L(B)]` 重み.
+  - **`mobiusSummand_conjFinset`** (`mobiusSummand (a^l) g (B^l) = mobiusSummand a g B`,
+    `card_conjFiber_conj_eq` + `card_hIntersection_conjFinset` |H(B^l)|=|H(B)|) +
+    `mem_mobiusIndex_conjFinset` (𝒫(a)≅𝒫(a^l)) + **`sum_mobiusSummand_conjFinset`**
+    (`∑_{𝒫(a^l)} mobiusSummand (a^l) = ∑_{𝒫(a)} mobiusSummand a`, `Finset.sum_bij'`,
+    B₀↦B₀^l).  = (2.10) の **b=a^x reindex** (内側 𝒫(b)-和が b∈a^L に依らないこと).
+  - **`mobiusSummand_orbit_weighted`** = **per-B 重み代数**:
+    `(-1)^|B|/|orbit B|·(Ind α_B)(g) = (α(a)/|L|)·∑_{b∈N_L(B)∩a^L} (-1)^|B|/|H(B)|·|𝒜(g,H(B)b)|`
+    (`1/(|orbit B||M(B)|) = 1/(|L||H(B)|)` via `card_orbit_mul_card_setLStabilizer` +
+    `card_mBSubgroup` + `card_nLStabilizerIn_eq`).  `induceAlphaBTerm_apply` (packaged=bare).
+
+### 残ブロッカー (precise): 最終 assembly (double-sum swap + combine) + STEP 4 配線
+
+代数機構は **すべて present**.  残るは純粋に組合せ的な組み上げのみ:
+
+1. **inner-sum recast + double-sum swap** (~60-80 LOC): `mobiusSummand_orbit_weighted` の内側和
+   `∑_{b∈N_L(B)∩a^L}` (index = `nLStabilizerIn hyp B`-subtype, **B 依存**) を, 固定 Finset
+   `aOrbit := {b':{x//x∈A} | ∃l, conjA l a = b'}` 上の `if (b':G)∈N_L(B) then mobiusSummand b' g B
+   else 0` に recast (`Finset.sum_bij`, b↦⟨b.val,_⟩; b∈a^L⊆A).  これで両和が固定 index ⇒
+   `∑_{B∈𝒫}∑_{b'∈aOrbit}[ind] = ∑_{b'∈aOrbit}∑_{B∈𝒫}[ind]` を **`Finset.sum_comm`** (product 上,
+   `sum_comm'` 不要) で swap, `= ∑_{b'∈aOrbit}∑_{B∈𝒫(b')} mobiusSummand b' g B`.  ⚠ key:
+   B-依存 index を固定 index に出すのが唯一の技術的山 (それさえ済めば swap は trivial).
+2. **combine** (~40-60 LOC): 上を `sum_mobiusSummand_conjFinset` (各 b'=a^l で内側 = ∑_{𝒫(a)}
+   mobiusSummand a, b'-非依存) で `|aOrbit|·∑_{𝒫(a)} mobiusSummand a` 化, `|aOrbit|=|a^L|=[L:C_L(a)]
+   =|L|/|C_L(a)|` で重み確定.  `sum_transversalRep_eq_sum_div_orbit` (orbit-averaging) で ℬ-和を
+   接続, `sum_mobiusSummand_eq_singleton`+`mobiusSummand_singleton_eq` (survivor = -|C_L(a)|) で
+   `dadeValue α g = -∑_{C∈ℬ}(-1)^|rep C|(Ind α_rep C)(g) = -(α(a)/|C_L(a)|)·(-|C_L(a)|) = α(a)`.
+   非-support side は `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` +
+   `dadeValue_of_not_mem_dadeSupport` で即 (恒等式の半分は landed 済).
+3. **STEP 4 配線** (~30-50 LOC): 点別恒等式を ClassFunction 等式 `dadeMap α = ∑_{p∈s} c p •
+   induceAlphaBTerm p` (s = ℬ の非空-rep image を `Finset {B//B.Nonempty}` 化, c B = -(-1)^|B|)
+   にまとめ, **`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`** に投入 ⇒
+   `PreservesVirtualCharacters (hyp.dadeMap)` ⇒ `FullDadeIsometryData.mk (hyp.dadeIsometryData
+   hconj) <preservation>` で構成, issue 0040 close.  ⚠ s の構成 (ℬ quotient → 非空 rep の
+   Finset {B//B.Nonempty}) に Quotient/Finset 注意 (`Finite conjClassQuotient` instance は landed).
+
+合計 ~130-190 LOC, **純粋に組合せ的** (代数 primitive は全 present).  最大の技術的山は項目 1 の
+B-依存 index recast.  別 focused session 推奨.

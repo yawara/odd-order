@@ -411,3 +411,20 @@ fiber 集計の両方を駆動.  **本 issue の TARGET FILE 制約 (S04 のみ)
 `OddOrder/GroupTheory/CoprimeConjugacy.lean` 行きの独立 primitive (~100-150 LOC) で別 sub-issue.
 landed 後の part (c) 残工程 = (2.10.3) 集計 → `Finset.sum_involution` (B↔B∪{a}, (2.10.2)
 `centralizer_inf_hIntersection` で相殺) → bridge で (2.6.b).
+
+## 2026-05-30 追記 (4) — (2.10) Möbius 機構を完成 (STEP 3 engine + 3a keystone)
+
+`S04_DadeIsometry.lean` `section MobiusAssembly` に (2.10) 点別恒等式の**組合せ機構をほぼ全て**
+landing (10 commits, sorry-free + axiom-clean; 詳細 = `issues/0040-*` 進捗 (14)).  Round 6 が代数
+spine を landing したのに続き:
+- **STEP 3b (toggle-a Möbius 相殺)**: `mobiusIndex`/`mobiusSummand` + `mobiusSummand_add_insert_eq_zero`
+  (pairwise cancel) + `sum_mobiusSummand_eq_singleton` (`Finset.sum_involution`, survivor B={a}) +
+  `mobiusSummand_singleton_eq` (= -|C_L(a)|).
+- **STEP 3a keystone**: `sum_transversalRep_eq_sum_div_orbit` (orbit-averaging ℬ→𝒫,
+  `∑_ℬ h(rep) = ∑_𝒫 h/|orbit|`) + `sum_mobiusSummand_conjFinset` (b=a^x reindex,
+  `∑_{𝒫(a^l)} = ∑_{𝒫(a)}`) + `mobiusSummand_orbit_weighted` (per-B 重み
+  `1/(|orbit B||M(B)|)=1/(|L||H(B)|)`).
+
+**残**: 最終 assembly (項目 1: B-依存 `nLStabilizerIn`-index の inner-sum を固定 `aOrbit`-index に
+recast → `Finset.sum_comm` で double-sum swap; 項目 2: combine; 項目 3: STEP 4 配線 →
+`FullDadeIsometryData`).  ~130-190 LOC, 純粋組合せ的.  詳細 = `issues/0040-*` 進捗 (14) 末尾.
