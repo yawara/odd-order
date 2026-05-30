@@ -90,7 +90,8 @@ created: 2026-05-27
       (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`, f_B coset partition; 2026-05-30「進捗 (10)」);
       **support-restricted 形** `induce_alphaB_apply_eq_sum_nLStabilizerIn_inA`
       (`∑_{b∈N_L(B)}` → `∑_{b∈N_L(B), b∈A}`; α 台外項脱落, 2026-05-30「進捗 (11)」).
-      **残**: 教科書 value case の `b∈a^L` 特殊化 (g∈(aH(a))^G 固定で生残 b を a^L に + α(b)=α(a) 定数化; 容易).
+      **a^L 特殊化完了** `induce_alphaB_apply_eq_alpha_mul_sum_conjL` (2026-05-30「進捗 (12)」, STEP 1):
+      g∈(aH(a))^G で `(Ind α_B)(g)=(α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|`.
 - [~] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **part (d) (RHS∈ℤ[Irr G]) 完了**
       (2026-05-30, 下記「進捗 (9)」); part (c) (Möbius 相殺で点別恒等式) は (2.1) coprime-action
       primitive 欠落でブロック (residual 精密化済).
@@ -584,3 +585,60 @@ landed) — 残るは純粋に組合せ的集計 (involution + reindex + cardina
 **残 (項目 1 の後半)**: support 代表 `a` (g∈(aH(a))^G) を固定し, 生き残った `b∈N_L(B)∩A` が
 (2.4.b) `isConj_in_L_of_mul_H` で `b∈a^L` ((2.10.3) value case の `a^L` 制約) かつ α(b)=α(a) 定数化
 する段 (`∑_{b∈N_L(B)∩A}` → `α(a)·∑_{b∈N_L(B)∩a^L}`).  以降は項目 2-4 (fiber 因子分解 + Möbius 相殺).
+
+## 進捗 2026-05-30 (12) — STEP 1 (a^L 特殊化) + STEP 2 (fiber 因子分解) + cancellation identity 完成 (sorry-free, axiom-clean)
+
+issue 0040 part (c) (Möbius) の **代数的 spine を全て landing** (6 commits;
+`S04_DadeIsometry.lean` `section MobiusAssembly`; `lake build OddOrder` + `OddOrder.AxiomsCheck`
+green, 新規 sorry/admit/axiom 無し).  残るは純粋に組合せ的な **STEP 3 (involution + ℬ→𝒫 reindex)
++ STEP 4 (FullDadeIsometryData 配線)** のみ.
+
+### landed (依存順)
+
+1. **survivor cardinality** `card_conjFiber_coset_eq_card_centralizer` (commit d7b10ef) —
+   a が K を*中心化* (K⊆C_G(a)), C_G(a) が K を正規化, ⟨a⟩⊥K coprime, g~a·x₀ で
+   `|𝒜(g,K·a)|=|C_G(a)|`.  (2.1) `card_conj_fiber` の pair set と全単射.
+   survivor B={a} (H({a})=H(a)⊆C_G(a)) 評価用.
+2. **conjugacy witness / support test** `exists_mem_H_isConj_of_mem_conjFiber_coset`
+   (+ 系 `mem_dadeSupport_of_mem_conjFiber_coset`, commit d7b10ef/7893599) —
+   `y⁻¹gy∈H(B)·b` (b∈N_L(B)∩A) ⇒ ∃c∈H(b), (b·c)~g.  vanishing/value case の核.
+3. **STEP 1** `induce_alphaB_apply_eq_alpha_mul_sum_conjL` (commit 7893599) —
+   g∈(aH(a))^G で `(Ind α_B)(g)=(α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|`.
+   `_inA` 版から b∉a^L 項脱落 (項目 2 の conjugacy witness + (2.4.b)) + α(b)=α(a) 定数化.
+4. **conjugation invariance** `card_conjFiber_conj_eq` (commit 2146af5) —
+   `|𝒜(g,c·X·c⁻¹)|=|𝒜(g,X)|` (右 c-平行移動).  教科書 reindex
+   `|𝒜(g,H(B^x)b)|=|𝒜(g,H(B)a)|` (b=a^x) 用.
+5. **STEP 2 fiber 因子分解** `card_cosetConjFiber_eq_card_centralizerInf` (fiber count) +
+   **`card_conjFiber_coset_mul_card_centralizerInf`** (commit fcb5d34) —
+   `|𝒜(g,K·a)|·|C| = |𝒜(g,C·a)|·|K|` (C=K⊓C_G(a)).  bridge set
+   `S={(y,c,x)|y⁻¹gy=x⁻¹(c·a)x}` を 2 通り (y へ射影 + fiber count |C| via
+   `coset_eq_cosetConjImage`/`mem_centralizer_of_coset_conj_eq`; `(y,c,x)↦(yx⁻¹,c,x)` で x 自由化).
+   **これが planner の「long pole」STEP 2 本体**.
+6. **cancellation identity** `card_conjFiber_hIntersection_mul_eq` (commit c843e9d) —
+   a∈N_L(B) で `|𝒜(g,H(B)·a)|·|H(B∪{a})| = |𝒜(g,H(B∪{a})·a)|·|H(B)|`.
+   STEP 2 を K=H(B), C=C_{H(B)}(a)=H(B∪{a}) ((2.10.2)) に特殊化.  toggle-a 相殺の代数核.
+
+### 残ブロッカー (precise): STEP 3 (組合せ assembly) + STEP 4 (配線) のみ
+
+代数的事実 (全 cardinality 恒等式, value 公式, cancellation) は **すべて landed**.  残るは:
+
+- **STEP 3a (ℬ→𝒫 orbit-weight reindex)**: bridge は整数係数 `c_B=-(-1)^|B|`, `s=ℬ` (transversal)
+  を要求するので, 点別恒等式 `dadeMap α g = -∑_{B∈ℬ}(-1)^|B| Ind_{M(B)}α_B(g)` を直接評価する.
+  教科書は ℬ-和を 𝒫-和 `-∑_{B∈𝒫}((-1)^|B|/[L:N_L(B)])Ind(g)` に変換 ((2.10.1) orbit 不変 +
+  軌道重み `card_orbit_mul_card_setLStabilizer`).  Lean では `conjClassQuotient` 上の
+  `Finset.univ` + `transversalRep` で ℬ-和を作り, orbit averaging
+  (`∑_ℬ f = ∑_O f(rep) = ∑_𝒫 f/|O_B|`, f=induceAlphaBTerm は (2.10.1) `induceAlphaBTerm_conjFinset`
+  で orbit 不変) で 𝒫-和へ.  **最大の構造的リスク** (quotient/Finset 操作 ~80-120 LOC).
+- **STEP 3b (𝒫(b)/a^L 二重和 + involution)**: STEP 1 で各 Ind 値を `α(a)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|`
+  に, `card_conjFiber_conj_eq` で b↔a の reindex (|𝒜(g,H(B^x)b)|=|𝒜(g,H(B)a)|) し
+  𝒫(a) 上の単和へ.  `Finset.sum_involution` toggle-a (B↔B∪{a}) で
+  `card_conjFiber_hIntersection_mul_eq` (cancellation identity) により符号相殺, survivor B={a}.
+  survivor は `card_conjFiber_coset_eq_card_centralizer` (=|C_G(a)|) + `card_centralizer_eq`
+  (|C_G(a)|=|H(a)||C_L(a)|) で `γ(g)=α(a)`.  (~80-120 LOC)
+- **STEP 4 (配線)**: 点別恒等式 → `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`
+  → `PreservesVirtualCharacters (hyp.dadeMap)` → `FullDadeIsometryData` (`dadeIsometryData` +
+  この preservation).  (~20-30 LOC)
+
+合計 ~180-270 LOC, **純粋に組合せ的** (代数 primitive は全 present).  別 focused session 推奨.
+non-support side (g∉dadeSupport) は `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` +
+`dadeValue_of_not_mem_dadeSupport` で即 (恒等式の半分は landed 済).

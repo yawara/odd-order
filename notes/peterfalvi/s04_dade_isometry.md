@@ -55,6 +55,23 @@ issue 0040「進捗 (10)」参照.  (2.6.b) bridge `preservesVirtualCharacters_d
   `Finset.sum_involution` toggle-a 相殺 (2.10.2) → survivor B={a} を `card_conj_fiber` で評価.
   ~150-230 LOC, 純粋に組合せ的; infra 全 present.
 
+## 進捗 (2026-05-30, 続2) — STEP 1 + STEP 2 (fiber 因子分解) + cancellation identity 完成
+
+issue 0040「進捗 (12)」参照.  Möbius の **代数的 spine を全て landing** (6 commits,
+`S04_DadeIsometry.lean` `section MobiusAssembly`, sorry-free + axiom-clean):
+- survivor `card_conjFiber_coset_eq_card_centralizer` (|𝒜(g,K·a)|=|C_G(a)|, K⊆C_G(a)),
+- conjugacy witness `exists_mem_H_isConj_of_mem_conjFiber_coset`,
+- **STEP 1** `induce_alphaB_apply_eq_alpha_mul_sum_conjL`
+  ((Ind α_B)(g)=(α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|),
+- conjugation invariance `card_conjFiber_conj_eq` (|𝒜(g,c·X·c⁻¹)|=|𝒜(g,X)|),
+- **STEP 2** `card_conjFiber_coset_mul_card_centralizerInf`
+  (|𝒜(g,K·a)|·|C|=|𝒜(g,C·a)|·|K|, C=K⊓C_G(a); planner の「long pole」; bridge set 二重計数 +
+  fiber count `card_cosetConjFiber_eq_card_centralizerInf` via `coset_eq_cosetConjImage`),
+- cancellation identity `card_conjFiber_hIntersection_mul_eq`
+  (|𝒜(g,H(B)·a)|·|H(B∪{a})|=|𝒜(g,H(B∪{a})·a)|·|H(B)|; toggle-a 相殺核).
+- **残 = STEP 3 (ℬ→𝒫 orbit-weight reindex + `Finset.sum_involution` toggle-a) + STEP 4
+  (`FullDadeIsometryData` 配線)** のみ.  純粋に組合せ的, ~180-270 LOC; 代数 primitive 全 present.
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
