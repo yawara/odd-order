@@ -248,8 +248,10 @@ theorem non_orthogonality_two_families
 2. **(5.9) realness 接続** — `S07_Coherence.lean` の `CharacterDifferenceImage`
    (`τ(χ−χ.conj)=signedDifference`) を `H78.nu` 経由で適用する橋が無い (`H78.nu` ↔ `IsCoherent.extension`
    未接続 = Blocker B1)。これで `Δ_i` 実 (`Δ_i=Δ̄_i`) を得る。
-3. **互いに素 support ⇒ inner=0** — 汎用補題が無い (`difference_images_inner_eq_zero_of_inner_pair` は別形・
-   仮定付き)。`f.support⊆S₁, g.support⊆S₂, S₁∩S₂=∅ ⇒ ⟨f,g⟩=0` を `inner_eq_inv_card_mul_innerSum` から要証明。
+3. ✅ **互いに素 support ⇒ inner=0 — 完了 (2026-05-30, issue 0044)**: `ClassFunction.lean` に
+   `inner_eq_zero_of_disjoint_support` (`Disjoint φ.support ψ.support → inner φ ψ = 0`) + 補助
+   `innerSum_eq_zero_of_disjoint_support` を sorry-free 実装。各 summand `φ g · star (ψ g)` が
+   `Set.disjoint_left` で消える elementary proof。AxiomsCheck clean, full build green。
 4. **(4.1) `nu` 像の support** — `(ν ζ_i).support ⊆ dadeSupport_i` が `Hypothesis78` のフィールドに無い。
 5. **(7.8.a) 依存** — `BetaDecomp` (`Δ_i` の存在、`(Δ_i,1_G)=0`) が前提。
 
@@ -262,8 +264,9 @@ theorem non_orthogonality_two_families
    `g↦g²` Frobenius-Schur 経路は不要だった: Brauer permutation lemma の unconditional 系
    `card_realIrreducibleCharacters_eq_one_of_odd_card'` から subsingleton 一意性で導出。
    (7.9) のみならず §3 (1.1) / 0022/0027 系の共通 unblocker が解消。AxiomsCheck clean。
-2. **B-disjoint-support**: `ClassFunction.inner_eq_zero_of_disjoint_support` を `inner_eq_inv_card_mul_innerSum`
-   から証明 (elementary、1 定理)。
+2. ✅ **B-disjoint-support — 完了 (2026-05-30, issue 0044)**: `ClassFunction.inner_eq_zero_of_disjoint_support`
+   を `inner_eq_inv_card_mul_innerSum` + `innerSum_eq_zero_of_disjoint_support` (各 summand を
+   `Set.disjoint_left` で消す) から sorry-free 実装。
 3. **Burnside (1.5.d)**: `Σ_{θ∈Irr H, θ≠1}θ(1)²=|H|−1` を named lemma 化 (第二直交関係 / `g=1` 評価)。
 4. **B1 (nu ↔ coherence)**: `Hypothesis78` に 3 フィールド追加を検討 — `nu_maps_ZIrr`, `nu_conj`
    (共役保存), `nu_supp` (像の support ⊆ dadeSupport)。**ただしこれは証明書追加であり、追加するなら
@@ -271,7 +274,9 @@ theorem non_orthogonality_two_families
    `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
 5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
 
-**現時点の判定**: 1-4 が未組立のため、(7.8.a/b)/(7.9) のいずれも outright sorry-free 化は不能。
+**現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside — ただし 3 は要確認) のうち
+1 と 2 は完了。残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
+(7.8.a/b)/(7.9) のいずれも outright sorry-free 化は依然不能。
 証明書フィールド方式での「sorry-free」化はルール上の偽進捗 + 回帰リスクのため見送り。本 spec を実装の青写真とする。
 
 ---
