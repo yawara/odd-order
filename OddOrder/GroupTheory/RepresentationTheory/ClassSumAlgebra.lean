@@ -1237,6 +1237,54 @@ theorem rep_eq_id_of_character_eq_one (ρ : Representation ℂ G V) [Finite G] {
   rw [Module.End.eigenspace_def, one_smul, LinearMap.ker_eq_top, sub_eq_zero] at htop
   exact htop
 
+/-- **Character value equals degree iff the operator is the identity** (the equality case of the
+`|χ(g)| ≤ χ(1)` bound, both directions).  The forward direction is the diagonalization keystone
+`rep_eq_id_of_character_eq_one`; the reverse is immediate, as `trace (LinearMap.id) = finrank ℂ V =
+ρ.character 1`. -/
+theorem character_eq_one_iff_rep_eq_id (ρ : Representation ℂ G V) [Finite G] {g : G} :
+    ρ.character g = ρ.character 1 ↔ ρ g = LinearMap.id := by
+  refine ⟨rep_eq_id_of_character_eq_one ρ, fun h => ?_⟩
+  rw [ρ.char_one, Representation.character, h, LinearMap.trace_id]
+
+/-- **Character values are bounded by the degree** (the general `|χ(g)| ≤ χ(1)` bound; Isaacs
+*Character Theory*, the inequality underlying Lemma 2.27 and the equality case of (2.21)/(2.27)).
+For a finite-dimensional complex representation `ρ` of a finite group `G` and `g : G`,
+`‖ρ.character g‖ ≤ ρ.character 1 = finrank ℂ V`.
+
+Proof.  `g` has finite order, so `(ρ g) ^ |G| = 1` and the (splitting) charpoly roots — the
+eigenvalues with multiplicity — are roots of unity (`‖μ‖ = 1`).  The trace is their sum, and the
+triangle inequality gives `‖∑ μ‖ ≤ ∑ ‖μ‖ = roots.card = finrank ℂ V`.
+
+This is the general-`g` companion of the central Schur equality `‖χ(z)‖² = χ(1)²`; the equality case
+`‖χ(g)‖ = χ(1)` together with positivity of the trace at the kernel is what
+`rep_eq_id_of_character_eq_one` (the keystone) sharpens to `ρ g = id`. -/
+theorem norm_character_le_finrank (ρ : Representation ℂ G V) [Finite G] (g : G) :
+    ‖ρ.character g‖ ≤ (Module.finrank ℂ V : ℝ) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set n : ℕ := Nat.card G with hn_def
+  have hn : n ≠ 0 := Nat.card_pos.ne'
+  have hfn : (ρ g) ^ n = 1 := by rw [← map_pow, pow_card_eq_one', map_one]
+  -- `character g = roots.sum`, with `roots.card = finrank`.
+  have hsplits : (ρ g).charpoly.Splits := IsAlgClosed.splits _
+  have htrace : ρ.character g = (ρ g).charpoly.roots.sum :=
+    Module.End.trace_eq_sum_roots_charpoly_of_splits hsplits
+  have hcard : Multiset.card (ρ g).charpoly.roots = Module.finrank ℂ V := by
+    rw [hsplits.natDegree_eq_card_roots.symm, (ρ g).charpoly_natDegree]
+  -- Each root is a root of unity: `‖μ‖ = 1`.
+  have hroot_norm : ∀ μ ∈ (ρ g).charpoly.roots, ‖μ‖ = 1 := by
+    intro μ hμ
+    have hroot : (ρ g).charpoly.IsRoot μ :=
+      (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
+    exact Complex.norm_eq_one_of_pow_eq_one
+      (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot) hn
+  -- Triangle inequality: `‖∑ μ‖ ≤ ∑ ‖μ‖ = ∑ 1 = card = finrank`.
+  rw [htrace]
+  refine (norm_multiset_sum_le _).trans ?_
+  have hmap : ((ρ g).charpoly.roots.map fun μ => ‖μ‖) = (ρ g).charpoly.roots.map fun _ => (1 : ℝ) :=
+    Multiset.map_congr rfl hroot_norm
+  rw [hmap, Multiset.map_const', Multiset.sum_replicate, hcard, nsmul_eq_mul, mul_one]
+
 /-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
 inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.
 

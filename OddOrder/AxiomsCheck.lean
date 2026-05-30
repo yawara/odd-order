@@ -1205,6 +1205,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.all_eq_one_of_norm_eq_one_of_sum_eq_card
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_eq_one_iff_rep_eq_id
+-- General character-value bound `|χ(g)| ≤ χ(1)` (the inequality the (6.6) G2.2 residual flags as
+-- needs-infra), via the same root-of-unity / triangle machinery; equality case is the keystone.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.norm_character_le_finrank
 
 -- Inflation infrastructure ([Isaacs] (2.22), gating Peterfalvi (6.6) G2.5 degree-sum):
 -- irreducibility is preserved under surjective precomposition, hence the inflation map
