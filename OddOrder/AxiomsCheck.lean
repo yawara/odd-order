@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
@@ -688,6 +689,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_eq_of_mk_eq
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_one_eq_zero
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_self_inv_one_eq_card
+-- Peterfalvi (6.7.3) real-class atom (TI-reduction, `RealClassTISubset.lean`): the sole remaining
+-- hypothesis of `classSumCoeff_self_one_eq_zero` — `⟦z⁻¹⟧ ≠ ⟦z⟧` — discharged from the (6.7) setup
+-- (`P ∈ Syl_p`, `L = N_G(P)` of *odd* order, `P^#` TI-subset).  `not_isConj_inv_of_isTISubset`
+-- proves `¬ IsConj z⁻¹ z` (a `G`-conjugator of `z⁻¹` to `z` lands in `L` by TI, so `z` is
+-- `L`-conjugate to `z⁻¹`, forcing `z = 1` by `eq_one_of_isConj_inv_of_odd_card`); the class form
+-- `mk_inv_ne_self_of_isTISubset` is what plugs into `classSumCoeff_self_one_eq_zero`.  This is
+-- Peterfalvi's "since `|L|` is odd, `z⁻¹` is not conjugate to `z` in `G`" ((6.7.3), proof opening).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.not_isConj_inv_of_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mk_inv_ne_self_of_isTISubset
 -- Peterfalvi (6.7.3) coprimality atom `(|C₁|, p) = 1`: `card_class_eq_index_centralizer` is the
 -- orbit-stabilizer identity `|⟦z⟧| = [G : C_G(z)]` (conjugation action of `ConjAct G`), and
 -- `coprime_card_class_card_sylow` derives `IsCoprime |⟦z⟧| |P|` from `P ≤ C_G(z)` (so
