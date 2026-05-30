@@ -192,6 +192,17 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - これで (5.6)/(5.7) coherence 統合 (上記 Track A の残 (5.6.1)/(5.6.2)) が
     (5.4) gateway を直接消費して書ける土台が揃った (実適用時 `CharacterPsiDecomposition`
     の data 入力を Dade 文脈から構成する作業は残)。
+- **(5.4.b) 強化 + (5.5) 追加** (PASS 2, sorry-free, `S07_Coherence.lean`/`ZIrrFourier.lean`):
+  - **(5.4.b) に `|E|=‖χ‖²` を追加** (`norm_eq_and_X_eq_sum_of_norm_Y_ge` の結論に
+    `(E.card:ℂ)=⟨χ,χ⟩`)。coeff∈{0,1} から `∑coeff=|E|`, keystone で `=‖χ‖²`。
+    これは (5.6.3) (mmd 04.7 L101: "X=∑_{α∈E}α for some E⊂R(χ) such that **|E|=‖χ‖²**")
+    が `‖χ̄^{τ₂}‖²=|R(χ)|-|E|=‖χ-χ̄‖²-‖χ‖²=‖χ̄‖²` を計算するのに必須の形 (bare ∃E では不足)。
+  - **(5.5)** `eq_sum_of_psi_eq_zero` (mmd L55-57): ψ=0 で (5.4) を適用。`‖ψ‖²=⟨0,0⟩=0≤‖Y‖²`
+    が正半定値性で自動成立し (5.4.b) を起動, norm 等号 `‖Y‖²=0` が正定値性で **Y=0** を強制,
+    `χ^{τ₁}=(χ-0)^{τ₁}=X=∑_{α∈E}α`。(5.5) は §8-§16 で forward 最多 hub (×11 cite)。
+  - **正(半)定値性 infra** (ZIrrFourier, ℂ 全体一般・ZIrr 不要): `inner_self_eq_realCast`
+    (⟨φ,φ⟩=(|G|:ℝ)⁻¹·∑‖φ(g)‖²) / `inner_self_re_nonneg` / `eq_zero_of_inner_self_re_eq_zero`。
+  - AxiomsCheck: (5.5) を追加登録 (計 4 件, 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。
 
 ## 完了条件
 

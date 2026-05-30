@@ -34,9 +34,9 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ---
 
-## Lean status: (5.2.d) gateway + (5.4) norm 不等式 (2026-05-30, issue 1001, Round-9 Track B)
+## Lean status: (5.2.d) gateway + (5.4)/(5.5) norm 不等式 (2026-05-30, issue 1001, Round-9 Track B)
 
-`OddOrder/Peterfalvi/S07_Coherence.lean` に (5.2.d) の一般 gateway + (5.4) を sorry-free 実装.
+`OddOrder/Peterfalvi/S07_Coherence.lean` に (5.2.d) の一般 gateway + (5.4)/(5.5) を sorry-free 実装.
 
 - **`OrthonormalCharacterImageFamily τ χ`** = (5.2.d) の R(χ): `imageSet : Finset (ClassFunction G ℂ)`
   (orthonormal subset of ℤ[Irr G]), `mem_ZIrr`, `orthonormal` (⟨α,β⟩=δ_{α,β}),
@@ -50,14 +50,22 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 - **(5.4.a)** `inner_self_chi_re_le_inner_self_X`: (⟨χ,χ⟩).re ≤ (⟨X,X⟩).re. keystone は
   `inner_self_chi_eq_sum_coeff` (‖χ‖²=⟨χ-ψ,χ-χ̄⟩=⟨X-Y,∑α⟩=⟨X,∑α⟩=∑coeff).
 - **(5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge`: ‖Y‖²≥‖ψ‖² ⟹ ‖X‖²=‖χ‖², ‖Y‖²=‖ψ‖²,
-  X=∑_{α∈E}α (E=filter(coeff=1)⊆R(χ)). total-norm Pythagoras + 整数 CS tightness.
+  X=∑_{α∈E}α (E=filter(coeff=1)⊆R(χ)) **かつ `|E|=‖χ‖²`** (`(E.card:ℂ)=⟨χ,χ⟩`).
+  total-norm Pythagoras + 整数 CS tightness. `|E|=‖χ‖²` は coeff∈{0,1} から
+  ∑coeff=|E| で keystone identity に接続; (5.6.3) が `‖χ̄^{τ₂}‖²=|R(χ)|-|E|` で消費する形.
+- **(5.5)** `eq_sum_of_psi_eq_zero`: ψ=0 特殊化. `‖ψ‖²=⟨0,0⟩=0≤‖Y‖²` が正半定値性で自動成立し
+  (5.4.b) を起動; norm 等号 `‖Y‖²=0` から正定値性で **Y=0**, よって χ^{τ₁}=(χ-0)^{τ₁}=X=∑_{α∈E}α.
 - norm 比較は repo 慣用の `(⟨·,·⟩).re` (S09 と整合).
 - **infra (ZIrrFourier)**: 整数 CS (int_le_sq / int_eq_sq_iff / finset_sum_le_sum_sq /
   finset_sum_eq_sum_sq_iff), 任意 orthonormal Finset 族の Parseval
   (inner_orthonormalSum_eq_coeff / inner_self_orthonormalSum_eq_sum_sq /
-  inner_orthonormalSum_sum_eq_sum_coeff), inner_conj_symm (⟨ψ,φ⟩=conj⟨φ,ψ⟩).
-- AxiomsCheck 3 件登録 (all in allowlist).
-- **残 (別 issue)**: (5.5)/(5.6)/(5.7) は本 (5.4) gateway を消費する coherence 統合.
+  inner_orthonormalSum_sum_eq_sum_coeff), inner_conj_symm (⟨ψ,φ⟩=conj⟨φ,ψ⟩),
+  **正(半)定値性** (inner_self_eq_realCast: ⟨φ,φ⟩=(|G|:ℝ)⁻¹·∑‖φ(g)‖² /
+  inner_self_re_nonneg: 0≤(⟨φ,φ⟩).re / eq_zero_of_inner_self_re_eq_zero:
+  (⟨φ,φ⟩).re=0→φ=0; ℂ 全体で一般, ZIrr 不要).
+- AxiomsCheck 4 件登録 (all in allowlist): toOrthonormalImage / (5.4.a) / (5.4.b) / (5.5).
+- **残 (別 issue)**: (5.6)/(5.7) は本 (5.4)/(5.5) gateway を消費する coherence 統合.
+  (5.6.1) Y 分解, (5.6.2) `0<b<1⇒λ=0` quadratic forcing が未着手の主難所.
   `CharacterPsiDecomposition` の data 入力 (imageFamily/tau1/coeff) は実適用時に Dade
   文脈から構成要 (gateway は statement-level の道具).
 
