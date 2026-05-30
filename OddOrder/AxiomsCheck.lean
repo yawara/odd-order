@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Lean
+import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -653,6 +654,16 @@ set_option linter.style.longLine false in
 -- RepresentationTheory: a rational algebraic integer is an integer — `ℤ` is integrally closed (UFD),
 -- so transferring `IsIntegral ℤ (q : ℂ)` down the injection `ℚ ↪ ℂ` yields `∃ n : ℤ, (q : ℂ) = n`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_rat_imp_int
+
+-- Algebra (Peterfalvi, proof of (6.7), pp. 31–32): the algebraic-integer congruence `α ≡ β (mod n)`
+-- on ℂ — `(α - β)/n ∈ ℤ̄`.  An additive congruence: reflexive/symmetric/transitive, closed under
+-- addition (`Cong.add`) and under scaling one side by an algebraic integer (`Cong.smul_left`, the
+-- multiplicative step of (6.7.2)/(6.7.3)).  Introduction forms `cong_of_exists_isIntegral`/`.of_int`.
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.trans
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.add
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.smul_left
+#assert_only_allowed_axioms OddOrder.AlgInt.cong_of_exists_isIntegral
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.of_int
 -- RepresentationTheory (Isaacs Thm 3.11): for an irreducible complex representation ρ of a finite
 -- group G, the degree χ_ρ(1) = dim V divides |G|.  The first orthogonality relation regrouped over
 -- conjugacy classes expresses |G|/χ(1) = ∑_C ω_ρ(C)·χ((g_C)⁻¹) as a sum of products of algebraic
