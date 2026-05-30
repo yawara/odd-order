@@ -2629,6 +2629,115 @@ theorem mobiusSummand_add_insert_eq_zero (hconj : hyp.HConjInvariant) (g : G)
   -- numerator: `(p·fb)·hib + hb·(p·(-1)·fib) = p·(fb·hib - fib·hb) = 0`
   linear_combination p * hmulC
 
+/-- The singleton `{a}` lies in `𝒫(a)`. -/
+theorem singleton_mem_mobiusIndex (a : {a : G // a ∈ A}) :
+    ({a} : Finset {a : G // a ∈ A}) ∈ hyp.mobiusIndex a := by
+  classical
+  rw [hyp.mem_mobiusIndex]
+  refine ⟨Finset.singleton_nonempty a, ?_⟩
+  rw [mem_nLStabilizerIn]
+  refine ⟨hyp.mem_L a.2, ?_⟩
+  intro c hc
+  rw [Finset.mem_singleton] at hc
+  rw [hc, Finset.mem_singleton]
+  apply Subtype.ext
+  show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+  group
+
+/-- The toggle-`a` map `B ↦ B △ {a}`: removes `a` from `B` if present, else inserts it. -/
+noncomputable def toggleA (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A}) :
+    Finset {a : G // a ∈ A} := by
+  classical
+  exact if a ∈ B then B.erase a else insert a B
+
+theorem toggleA_of_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
+    (haB : a ∈ B) : toggleA a B = B.erase a := by
+  classical rw [toggleA]; simp only [if_pos haB]
+
+theorem toggleA_of_not_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
+    (haB : a ∉ B) : toggleA a B = insert a B := by
+  classical rw [toggleA]; simp only [if_neg haB]
+
+/-- **Peterfalvi (2.10), the toggle-`a` involution collapses `𝒫(a)` to its `B = {a}` survivor.**
+
+    `∑_{B ∈ 𝒫(a)} mobiusSummand a g B = mobiusSummand a g {a}`.
+
+The toggle `B ↦ B △ {a}` (`toggleA`) is a fixed-point-free involution on `𝒫(a) \ {{a}}` under which
+the summands cancel pairwise (`mobiusSummand_add_insert_eq_zero`), so `∑_{𝒫(a) \ {{a}}} = 0` by
+`Finset.sum_involution`; adding back the isolated survivor `{a}` gives the claim. -/
+theorem sum_mobiusSummand_eq_singleton (hconj : hyp.HConjInvariant) (g : G)
+    (a : {a : G // a ∈ A}) :
+    ∑ B ∈ hyp.mobiusIndex a, hyp.mobiusSummand a g B = hyp.mobiusSummand a g {a} := by
+  classical
+  -- a helper: `toggleA a B ∈ 𝒫(a) \ {{a}}` and the pairwise data, packaged once.
+  have key : ∀ B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A}),
+      hyp.mobiusSummand a g B + hyp.mobiusSummand a g (toggleA a B) = 0
+        ∧ toggleA a B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A})
+        ∧ toggleA a (toggleA a B) = B := by
+    intro B hB
+    rw [Finset.mem_erase, hyp.mem_mobiusIndex] at hB
+    obtain ⟨hBne, hBnonempty, hBnorm⟩ := hB
+    by_cases haB : a ∈ B
+    · -- `toggleA a B = B.erase a`, write `B = insert a (B.erase a)`
+      set B' := B.erase a with hB'
+      have haB' : a ∉ B' := Finset.notMem_erase a B
+      have hBins : B = insert a B' := by rw [hB', Finset.insert_erase haB]
+      have hB'ne : B'.Nonempty := by
+        rw [Finset.nonempty_iff_ne_empty, hB']
+        intro hempty
+        rcases (Finset.erase_eq_empty_iff B a).mp hempty with h | h
+        · rw [h] at haB; exact absurd haB (Finset.notMem_empty a)
+        · exact hBne h
+      have hB'norm : (a : G) ∈ nLStabilizerIn hyp B' := by
+        rw [← hyp.mem_nLStabilizerIn_insert_iff a haB', ← hBins]; exact hBnorm
+      refine ⟨?_, ?_, ?_⟩
+      · rw [toggleA_of_mem haB]
+        have := hyp.mobiusSummand_add_insert_eq_zero hconj g haB' hB'ne hB'norm
+        rw [← hBins] at this
+        rw [add_comm]; exact this
+      · rw [toggleA_of_mem haB, Finset.mem_erase, hyp.mem_mobiusIndex]
+        refine ⟨fun hcontra => haB' ?_, hB'ne, hB'norm⟩
+        show a ∈ B.erase a
+        rw [hcontra]; exact Finset.mem_singleton_self a
+      · rw [toggleA_of_mem haB]
+        rw [toggleA_of_not_mem haB', Finset.insert_erase haB]
+    · -- `toggleA a B = insert a B`
+      have hains : (a : G) ∈ nLStabilizerIn hyp (insert a B) :=
+        (hyp.mem_nLStabilizerIn_insert_iff a haB).mpr hBnorm
+      refine ⟨?_, ?_, ?_⟩
+      · rw [toggleA_of_not_mem haB]
+        exact hyp.mobiusSummand_add_insert_eq_zero hconj g haB hBnonempty hBnorm
+      · rw [toggleA_of_not_mem haB, Finset.mem_erase, hyp.mem_mobiusIndex]
+        refine ⟨?_, Finset.insert_nonempty a B, hains⟩
+        intro hcontra
+        obtain ⟨c, hc⟩ := hBnonempty
+        have hcins : c ∈ insert a B := Finset.mem_insert_of_mem hc
+        rw [hcontra, Finset.mem_singleton] at hcins
+        exact haB (hcins ▸ hc)
+      · rw [toggleA_of_not_mem haB, toggleA_of_mem (Finset.mem_insert_self a B),
+          Finset.erase_insert haB]
+  -- isolate the survivor `{a}`: `∑_{𝒫(a)} = mobiusSummand {a} + ∑_{𝒫(a) \ {{a}}}`
+  rw [← Finset.sum_erase_add _ _ (hyp.singleton_mem_mobiusIndex a)]
+  have hzero : ∑ B ∈ (hyp.mobiusIndex a).erase ({a} : Finset {a : G // a ∈ A}),
+      hyp.mobiusSummand a g B = 0 := by
+    refine Finset.sum_involution (fun B _ => toggleA a B)
+      (fun B hB => (key B hB).1)
+      (fun B hB _ => ?_)
+      (fun B hB => (key B hB).2.1)
+      (fun B hB => (key B hB).2.2)
+    -- `hg₃`: `toggleA a B ≠ B` (toggle changes membership of `a`)
+    show toggleA a B ≠ B
+    by_cases haB : a ∈ B
+    · rw [toggleA_of_mem haB]
+      intro hcontra
+      rw [← hcontra] at haB
+      exact (Finset.notMem_erase a B) haB
+    · rw [toggleA_of_not_mem haB]
+      intro hcontra
+      have : a ∈ B := by rw [← hcontra]; exact Finset.mem_insert_self a B
+      exact haB this
+  rw [hzero, zero_add]
+
 end MobiusAssembly
 
 end SemidirectStructure
