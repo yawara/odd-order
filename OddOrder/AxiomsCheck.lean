@@ -653,6 +653,13 @@ set_option linter.style.longLine false in
 -- RepresentationTheory: a rational algebraic integer is an integer — `ℤ` is integrally closed (UFD),
 -- so transferring `IsIntegral ℤ (q : ℂ)` down the injection `ℚ ↪ ℂ` yields `∃ n : ℤ, (q : ℂ) = n`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_rat_imp_int
+-- RepresentationTheory (Isaacs Thm 3.11): for an irreducible complex representation ρ of a finite
+-- group G, the degree χ_ρ(1) = dim V divides |G|.  The first orthogonality relation regrouped over
+-- conjugacy classes expresses |G|/χ(1) = ∑_C ω_ρ(C)·χ((g_C)⁻¹) as a sum of products of algebraic
+-- integers, hence a rational algebraic integer ⇒ integer (the three linked pieces above).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_centralCharacter_mul_character_inv_mul_character_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product

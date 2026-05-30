@@ -55,6 +55,26 @@ theorem isIntegral_card_mul_character_div (ρ : Representation ℂ G V) [IsIrred
 keystone を適用するだけ。`[Finite G]` で取り `Fintype.ofFinite` を内部で使い型に余分な instance を残さない。
 AxiomsCheck 登録済 (unconditional)。(6.7.3) や古典的 `χ(1) ∣ |G|` がこの形を直接消費する。
 
+## 後続 (2026-05-30 第 2 波): 指標整数性チェーン + χ(1) ∣ |G|
+
+同ファイルに古典的指標整数性の 3 連結ピースを追加 (新 section `CharacterValuesIntegral` /
+`CharacterDegreeDvd` / `CharacterDegreeDvdMain`)。すべて AxiomsCheck 登録済 (unconditional):
+
+- `character_isIntegral (ρ) [Finite G] (g) : IsIntegral ℤ (ρ.character g)` — 指標値は代数的整数。
+  `ρ g` は有限位数 (`g^|G|=1 ⟹ (ρ g)^|G|=1`)、ℂ 上 charpoly は分解、trace = 根の和、各根 μ は
+  固有値で `μ^|G|=1` ⟹ `X^|G|-1` の根 ⟹ 整。補助 `isIntegral_of_pow_eq_one`,
+  `pow_eq_one_of_isRoot_charpoly_of_pow_eq_one` (mathlib
+  `Module.End.trace_eq_sum_roots_charpoly_of_splits` + `hasEigenvalue_iff_isRoot_charpoly`
+  + `HasEigenvector.pow_apply`)。
+- `isIntegral_rat_imp_int {q : ℚ} (IsIntegral ℤ (q:ℂ)) : ∃ n : ℤ, (q:ℂ) = n` — 有理代数的整数は整数。
+  ℤ integrally closed (UFD ⟹ `IsIntegrallyClosed ℤ`、import `RingTheory.Polynomial.RationalRoot`)、
+  `isIntegral_algebraMap_iff` で `ℚ ↪ ℂ` を降りて `IsIntegrallyClosed.isIntegral_iff` (分数体 ℚ)。
+- `finrank_dvd_card (ρ) [Finite G] [IsIrreducible ρ] : finrank ℂ V ∣ Nat.card G` — **Isaacs Thm 3.11**。
+  第一直交関係 (`Representation.char_orthonormal`, `ρ≅ρ` で `∑_g χ(g)χ(g⁻¹)=|G|`) を共役類で再編成し
+  `|G|/χ(1) = ∑_C ω_ρ(C)·χ((g_C)⁻¹)` (補助 `sum_centralCharacter_mul_character_inv_mul_character_one`,
+  `sum_eq_sum_conjClasses_of_isClassFun`) — 代数的整数の積和 ⟹ 有理代数的整数 ⟹ 整数 (上記)。
+  古典 `χ(1) ∣ |G|` を mathlib に無い形で供給 (round-2 #1 unlock)。
+
 ## 完了条件
 
 上記 `IsIntegral ℤ (ω_ρ(C_s))` が sorry/admit/axiom 無しで証明され `lake build OddOrder` が通る。

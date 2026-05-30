@@ -57,8 +57,19 @@ To each finite-dimensional irreducible complex representation `ρ` of `G` Schur'
   integral.  See `notes/peterfalvi/s08_coherence_theorems.md`.
 * `OddOrder.RepresentationTheory.isIntegral_card_mul_character_div` — the explicit character-value
   form: **`|C| · χ_ρ(g) / χ_ρ(1)` is an algebraic integer**.
+* `OddOrder.RepresentationTheory.character_isIntegral` — **character values `χ_ρ(g)` are algebraic
+  integers** (sum of roots of unity; the eigenvalues of the finite-order `ρ g`).
+* `OddOrder.RepresentationTheory.isIntegral_rat_imp_int` — **a rational algebraic integer is an
+  integer** (`ℤ` integrally closed, transferred along `ℚ ↪ ℂ`).
+* `OddOrder.RepresentationTheory.finrank_dvd_card` — **`χ_ρ(1) ∣ |G|`** (Isaacs Thm 3.11): for `ρ`
+  irreducible, `dim V` divides `|G|`.  The first orthogonality relation regrouped over conjugacy
+  classes writes `|G| / χ_ρ(1) = ∑_C ω_ρ(C) · χ_ρ((g_C)⁻¹)` as a sum of products of algebraic
+  integers, hence a rational algebraic integer ⇒ integer.
 
 ## References
+
+* I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, Thm 3.11
+  (`finrank_dvd_card`).
 
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, §3 (p. 35), (3.6).
 * Peterfalvi, *Character Theory for the Odd Order Theorem*, (6.7.2).
@@ -659,5 +670,153 @@ theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
   ring
 
 end CharacterValuesIntegral
+
+section CharacterDegreeDvd
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+variable [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+
+omit [DecidableEq (ConjClasses G)] in
+/-- **Regrouping a class function by conjugacy class.** For `F : G → ℂ` constant on conjugacy
+classes, the sum over `G` regroups as a sum over classes, each contributing `|C| · F(C.out)`. -/
+theorem sum_eq_sum_conjClasses_of_isClassFun {F : G → ℂ}
+    (hF : ∀ g h : G, F (h * g * h⁻¹) = F g) :
+    ∑ g : G, F g
+      = ∑ C : ConjClasses G, (Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * F C.out := by
+  classical
+  -- Fiberwise over the conjugacy-class map `mk : G → ConjClasses G`.
+  rw [← Finset.sum_fiberwise Finset.univ (fun g : G => ConjClasses.mk g) F]
+  refine Finset.sum_congr rfl fun C _ => ?_
+  -- On the fiber `{g | mk g = C}`, `F` is constant equal to `F C.out`.
+  have hbody : ∀ g ∈ Finset.univ.filter (fun g : G => ConjClasses.mk g = C),
+      F g = F C.out := by
+    intro g hg
+    rw [Finset.mem_filter] at hg
+    -- `g` and `C.out` are conjugate (both have class `C`), so `F g = F C.out`.
+    have hmkout : ConjClasses.mk C.out = C := by
+      rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+    have hconj : IsConj C.out g := ConjClasses.mk_eq_mk_iff_isConj.mp (hmkout.trans hg.2.symm)
+    obtain ⟨u, rfl⟩ := isConj_iff.mp hconj
+    exact hF C.out u
+  rw [Finset.sum_congr rfl hbody, Finset.sum_const, nsmul_eq_mul]
+  congr 2
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+
+/-- **First orthogonality in class-sum form.** For an irreducible representation `ρ`, summing the
+class-sum central-character values weighted by `χ_ρ((C.out)⁻¹)` and rescaling by `χ_ρ(1)` recovers
+`|G|`:
+`(∑_C ω_ρ(C) · χ_ρ((C.out)⁻¹)) · χ_ρ(1) = |G|`.
+This is the first orthogonality relation `∑_g χ_ρ(g) χ_ρ(g⁻¹) = |G|` (`char_orthonormal` with
+`ρ ≅ ρ`) regrouped over conjugacy classes. -/
+theorem sum_centralCharacter_mul_character_inv_mul_character_one (ρ : Representation ℂ G V)
+    [IsIrreducible ρ] :
+    (∑ C : ConjClasses G,
+        centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ * ρ.character (C.out)⁻¹)
+        * ρ.character 1 = (Nat.card G : ℂ) := by
+  classical
+  haveI := nontrivial_of_isIrreducible ρ
+  have hd : ρ.character 1 ≠ 0 := by
+    rw [ρ.char_one]; exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+  -- First orthogonality `∑_g χ(g) χ(g⁻¹) = |G|` from `char_orthonormal` with `ρ ≅ ρ`.
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hNℂ : (Nat.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have horth := Representation.char_orthonormal ρ ρ
+  rw [if_pos ⟨Representation.Equiv.refl ρ⟩] at horth
+  -- Clear the `(Nat.card G)⁻¹` factor: `∑_g χ(g) χ(g⁻¹) = |G|`.
+  have hsumG : ∑ g : G, ρ.character g * ρ.character g⁻¹ = (Nat.card G : ℂ) := by
+    field_simp at horth
+    simpa [mul_comm] using horth
+  -- Distribute `· χ(1)` over the sum and identify each term with `|C| χ(g_C) χ(g_C⁻¹)`.
+  rw [Finset.sum_mul]
+  have hterm : ∀ C : ConjClasses G,
+      (centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ * ρ.character (C.out)⁻¹)
+          * ρ.character 1
+        = (Nat.card { x : G // ConjClasses.mk x = C } : ℂ)
+            * (ρ.character C.out * ρ.character (C.out)⁻¹) := by
+    intro C
+    -- `ω_ρ(C) = (|C| χ(g_C)) / χ(1)` via `centralCharacterOfRep_classSum` + class-constancy.
+    have hmkout : ConjClasses.mk C.out = C := by
+      rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+    have homega : centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩
+        = ((Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character C.out)
+            / ρ.character 1 := by
+      rw [centralCharacterOfRep_classSum, sum_character_eq_card_mul ρ C hmkout, ρ.char_one]
+    rw [homega, div_mul_eq_mul_div, div_mul_eq_mul_div, mul_div_assoc, div_self hd, mul_one]
+    ring
+  rw [Finset.sum_congr rfl (fun C _ => hterm C),
+    ← sum_eq_sum_conjClasses_of_isClassFun
+      (F := fun g => ρ.character g * ρ.character g⁻¹) ?_]
+  · exact hsumG
+  · intro g h
+    simp only
+    rw [ρ.char_conj, show (h * g * h⁻¹)⁻¹ = h * g⁻¹ * h⁻¹ by group, ρ.char_conj]
+
+end CharacterDegreeDvd
+
+section CharacterDegreeDvdMain
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Finite G]
+
+/-- **`χ_ρ(1) ∣ |G|`** (Isaacs, *Character Theory of Finite Groups*, Thm 3.11; the classical
+divisibility of the degree).  For an irreducible complex representation `ρ` of a finite group `G`,
+the degree `χ_ρ(1) = dim V` divides the order of the group.
+
+Proof (the standard algebraic-integer argument): the rational number `|G| / χ_ρ(1)` equals
+`∑_C ω_ρ(C) · χ_ρ((g_C)⁻¹)` (first orthogonality regrouped over classes,
+`sum_centralCharacter_mul_character_inv_mul_character_one`), a sum of products of algebraic integers
+(`isIntegral_card_mul_character_div` for `ω_ρ(C)`, `character_isIntegral` for the conjugate factor),
+hence itself an algebraic integer.  Being a rational algebraic integer it is an integer
+(`isIntegral_rat_imp_int`), so `χ_ρ(1) ∣ |G|`. -/
+theorem finrank_dvd_card (ρ : Representation ℂ G V) [IsIrreducible ρ] :
+    finrank ℂ V ∣ Nat.card G := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  haveI := nontrivial_of_isIrreducible ρ
+  set d : ℕ := finrank ℂ V with hd_def
+  have hdpos : 0 < d := Module.finrank_pos
+  have hdℂ : (d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hdpos.ne'
+  -- The summed quantity `S := ∑_C ω_ρ(C) · χ((g_C)⁻¹)`.
+  set S : ℂ := ∑ C : ConjClasses G,
+      centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ * ρ.character (C.out)⁻¹ with hS
+  -- `S · χ(1) = |G|`, and `χ(1) = d`, so `S · d = |G|`.
+  have hSd : S * (d : ℂ) = (Nat.card G : ℂ) := by
+    have := sum_centralCharacter_mul_character_inv_mul_character_one ρ
+    rwa [ρ.char_one] at this
+  -- `S` is an algebraic integer: a sum of products of algebraic integers.
+  have hSint : IsIntegral ℤ S := by
+    refine IsIntegral.sum _ fun C _ => ?_
+    refine IsIntegral.mul ?_ ?_
+    · -- `ω_ρ(C) = |C| χ(g_C)/χ(1)` is an algebraic integer.
+      have hmkout : ConjClasses.mk C.out = C := by
+        rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+      have hval := isIntegral_card_mul_character_div ρ C hmkout
+      have heq : centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩
+          = (Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character C.out
+              / ρ.character 1 := by
+        rw [centralCharacterOfRep_classSum, sum_character_eq_card_mul ρ C hmkout, ρ.char_one]
+      rw [heq]; exact hval
+    · exact character_isIntegral ρ (C.out)⁻¹
+  -- `S = (|G| / d : ℚ)` cast to `ℂ`, so `S` is a rational algebraic integer, hence an integer.
+  have hSrat : S = (((Nat.card G : ℚ) / (d : ℚ) : ℚ) : ℂ) := by
+    rw [eq_div_of_mul_eq hdℂ hSd]
+    push_cast
+    ring
+  obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (q := (Nat.card G : ℚ) / (d : ℚ)) (hSrat ▸ hSint)
+  -- From `S = n` and `S · d = |G|`: `(n : ℂ) · d = |G|`, descend to `ℤ` then to `ℕ`.
+  rw [hSrat, hn] at hSd
+  -- `(n : ℂ) * d = |G|` over `ℂ` ⇒ `n * d = |G|` over `ℤ`.
+  have hZ : n * (d : ℤ) = (Nat.card G : ℤ) := by
+    have hcast : ((n * (d : ℤ) : ℤ) : ℂ) = ((Nat.card G : ℤ) : ℂ) := by
+      push_cast
+      linear_combination hSd
+    exact_mod_cast hcast
+  -- `d ∣ |G|` in `ℤ`, hence in `ℕ`.
+  have hdvdZ : (d : ℤ) ∣ (Nat.card G : ℤ) := ⟨n, by rw [← hZ]; ring⟩
+  exact_mod_cast hdvdZ
+
+end CharacterDegreeDvdMain
 
 end OddOrder.RepresentationTheory
