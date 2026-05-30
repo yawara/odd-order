@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -583,6 +584,13 @@ set_option linter.style.longLine false in
 -- add (`character_add_of_isCompl` = `trace_conj' + trace_prodMap'`); the irreducible base case is
 -- `exists_isIrreducibleCharacter_eq`. Unblocks `induce`/`restrict ∈ ℤ[Irr]` ⇒ Dade (2.6.b)/§9.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.character_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (2.6.b) prerequisites): restriction and induction preserve
+-- virtual characters. `restrict ∈ ℤ[Irr]` reduces (via span induction) to the keystone
+-- `character_mem_ZIrr` applied to `ρ.comp H.subtype`; `induce ∈ ℤ[Irr]` then follows from
+-- numerical Frobenius reciprocity (`inner_induce_eq_inner_restrict`) + integer Fourier
+-- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

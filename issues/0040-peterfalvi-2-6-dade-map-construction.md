@@ -64,6 +64,9 @@ created: 2026-05-27
 - [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
       を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).  残るは
       (2.6.b)/(2.10) 経由の Dade 写像 τ の明示構成と `FullDadeIsometryData` への接続.
+- [x] **(2.6.b) 前提 — `restrict_mem_ZIrr` + `induce_mem_ZIrr`** (Res/Ind が virtual char を
+      保存; InducedCharacter.lean, 2026-05-30 完了, sorry-free + axiom-clean; 下記「進捗 (2)」).
+      これは (2.6.b) の単一最大前提だった.
 - [ ] (2.11) restriction 互換性
 
 ## 完了条件
@@ -138,3 +141,40 @@ Dade 写像 τ が `IsDadeMap` + isometry + virtual-char 保存を満たすも�
    `Fintype.ofFinite` で供給 (A は `Set G`).
 
 依存順: (1) induce_mem_ZIrr [独立] → (2)(3) → (4) → (5).  全体 ~400-500 LOC.
+
+## 進捗 2026-05-30 (2) — (1) induce_mem_ZIrr + restrict_mem_ZIrr 完成 (sorry-free, axiom-clean)
+
+**landed** (`OddOrder/GroupTheory/RepresentationTheory/InducedCharacter.lean`,
+`section VirtualCharacters` / `section InduceVirtualCharacters`, `lake build OddOrder` green,
+`#assert_only_allowed_axioms` 両定理とも 3 axioms 全て allowlist 内):
+
+- `restrict_repCharacterClassFunction` — `Res^G_H (χ_ρ) = χ_{ρ.comp H.subtype}` (ext で即).
+- **`restrict_mem_ZIrr`** `(H : Subgroup G) [Finite G] {φ} (hφ : φ ∈ ZIrr G) : restrict H φ ∈ ZIrr H`.
+  (2.6.b) の片側.  上の進捗ノートの「critical BLOCKER」評価は**誤りだった**: 当初は
+  「ρ|H は既約でないので `repCharacterClassFunction_mem_ZIrr` が使えず、char-of-restriction
+  分解 (issue 0026 module-theoretic blocker) が要る」と見ていたが、**同日 landed の keystone
+  `character_mem_ZIrr` (CharacterCompleteness.lean、任意の有限次元複素表現の指標 ∈ ℤ[Irr]) が
+  既約性を要求しない**ため、span induction の base case (φ = χ_ρ, ρ 既約) で
+  `restrict H φ = repCharacterClassFunction (ρ.comp H.subtype)` と書き換え
+  `character_mem_ZIrr (ρ.comp H.subtype)` を直接適用するだけで済む (ρ|H の可約性は無問題).
+  線形ケースは `restrict_add`/`restrict_smul` (ℤ-smul は `Int.cast_smul_eq_zsmul` 経由).
+- `inner_mem_ZIrr_int` — `φ, ψ ∈ ZIrr G ⇒ ⟨φ, ψ⟩_G ∈ ℤ`.  ψ で span induction、base は
+  `mem_ZIrr_inner_int` (ZIrrFourier)、右引数の共役線形性 (`inner_smul_right` + `star_intCast`).
+- **`induce_mem_ZIrr`** `(H : Subgroup G) [Fintype G] [Invertible (Nat.card G:ℂ)] [Fintype H]
+  [Invertible (Nat.card H:ℂ)] {θ} (hθ : θ ∈ ZIrr H) : induce H θ ∈ ZIrr G`.  (2.6.b) の本体.
+  θ で span induction.  base case (θ ∈ Irr H): 各 χ ∈ Irr G に対し numerical Frobenius
+  reciprocity `inner_induce_eq_inner_restrict` で `⟨Ind θ, χ⟩_G = ⟨θ, Res H χ⟩_H`、
+  `restrict_mem_ZIrr` で `Res H χ ∈ ZIrr H` ⇒ `inner_mem_ZIrr_int` で整数係数 `f χ`.
+  `Φ := ∑_{χ∈Irr G} (f χ) • χ ∈ ZIrr G` を作り、`Ind θ - Φ` が全 irreducible と直交
+  (対角 Fourier 係数一致 by `irreducibleCharacter_inner_eq_ite`) ⇒ completeness
+  `classFunction_eq_zero_of_orthogonal` で `Ind θ = Φ`.  線形ケースは `induce_add`/`induce_smul`.
+
+これで上記「残作業プラン」の**項目 (1) (critical, 唯一最大の前提) が解決**.  AxiomsCheck.lean に
+両定理を登録済み.  残る (2.6.b) 構成タスクは (2) M(B)=H(B)⋊N_L(B) / (3) α_B pullback /
+(4) Möbius 相殺 / (5) 接続 のみ (これらは依然 ~350-450 LOC、別 sub-issue 推奨).
+
+実装:
+- `restrict_mem_ZIrr`, `induce_mem_ZIrr` ともに `ClassFunction` namespace
+  (`OddOrder.RepresentationTheory.ClassFunction.{restrict,induce}_mem_ZIrr`).
+- InducedCharacter.lean が ZIrrFourier + CharacterCompleteness を import するよう変更
+  (循環なし; 下流 S02/S03/Clifford ビルド確認済み).
