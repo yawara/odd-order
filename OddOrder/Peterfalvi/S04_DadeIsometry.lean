@@ -3200,6 +3200,148 @@ theorem mobiusTermCF_div_orbit_eq (hconj : hyp.HConjInvariant)
     intro b _
     rw [hyp.mobiusSummand_of_nonempty _ g hB]
 
+/-- For `g ∈ (aH(a))^G` and `b' = a^l ∈ a^L`, also `g ∈ (b'H(b'))^G`: there is `x ∈ H(b')` with
+`IsConj (b'·x) g`.  Transporting the witness `(a, h)` by `l`: `x = l·h·l⁻¹ ∈ H(a^l) = H(b')` by
+(2.4.a), and `b'·x = l·(a·h)·l⁻¹` is `G`-conjugate to `a·h`, hence to `g`. -/
+theorem exists_mem_H_isConj_of_mem_aOrbitFinset (hconj : hyp.HConjInvariant)
+    {a b' : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g)
+    (hb' : b' ∈ hyp.aOrbitFinset a) :
+    ∃ x ∈ hyp.H b', IsConj (b'.1 * x) g := by
+  obtain ⟨l, hl⟩ := hyp.mem_aOrbitFinset.mp hb'
+  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, ?_⟩
+  · have hmem : (l : G) * h * (l : G)⁻¹ ∈ hyp.H (hyp.conjA l a) := by
+      rw [hyp.mem_H_conjA_iff hconj a l]
+      rw [show (l : G)⁻¹ * ((l : G) * h * (l : G)⁻¹) * (l : G) = h from by group]
+      exact hh
+    rwa [hl] at hmem
+  · have hconjeq : b'.1 * ((l : G) * h * (l : G)⁻¹) = (l : G) * (a.1 * h) * (l : G)⁻¹ := by
+      rw [← hl, conjA_coe]; group
+    rw [hconjeq]
+    exact (isConj_iff.mpr ⟨(l : G), rfl⟩).symm.trans hga
+
+/-- `mobiusSummand` vanishes on the empty subset (no `a`). -/
+theorem mobiusSummand_empty (a : {a : G // a ∈ A}) (g : G) :
+    hyp.mobiusSummand a g (∅ : Finset {a : G // a ∈ A}) = 0 := by
+  rw [mobiusSummand, dif_neg (by simp)]
+
+/-- `mobiusTermCF` vanishes on the empty subset. -/
+theorem mobiusTermCF_empty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ) (g : G) :
+    hyp.mobiusTermCF hconj α g (∅ : Finset {a : G // a ∈ A}) = 0 := by
+  rw [mobiusTermCF, dif_neg (by simp)]
+
+/-- **Peterfalvi (2.10), the support-side total.**  For `g ∈ (aH(a))^G` (witnessed by `h ∈ H(a)`,
+`IsConj (a·h) g`), the transversal sum of orbit-averaging summands evaluates to `-α(a)`:
+
+    `∑_{C ∈ ℬ} mobiusTermCF (rep C) = -α(a)`.
+
+The proof: (1) orbit-average to the powerset (`sum_transversalRep_eq_sum_div_orbit`); (2) recast
+each term via `mobiusTermCF_div_orbit_eq` to `(α(a)/|L|) · ∑_{b' ∈ a^L} [b' ∈ N_L(B)] mobiusSummand
+b' g B` (handling the empty `B` separately, both sides zero); (3) swap the double sum by
+`Finset.sum_comm`; (4) the inner `B`-sum over `𝒫(b')` collapses to its survivor `mobiusSummand b' g
+{b'} = -|C_L(b')|` (`sum_mobiusSummand_eq_singleton` + `mobiusSummand_singleton_eq`, using
+`g ∈ (b'H(b'))^G` for `b' ∈ a^L`); (5) `∑_{b' ∈ a^L} |C_L(b')| = |L|`
+(`sum_card_centralizerIn_eq`), giving `(α(a)/|L|) · (-|L|) = -α(a)`. -/
+theorem sum_mobiusTermCF_transversalRep_eq_neg (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    ∑ C : hyp.conjClassQuotient, hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g
+        (hyp.transversalRep C)
+      = -((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  set αa : ℂ := (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ with hαa
+  -- (1) orbit-average the transversal sum to the powerset.
+  rw [hyp.sum_transversalRep_eq_sum_div_orbit
+    (h := fun B => hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B)
+    (fun l B => hyp.mobiusTermCF_conjFinset hconj _ g l B)]
+  -- (2) recast each term; factor out `αa/|L|` over the `B`-sum.
+  have hterm : ∀ B : Finset {a : G // a ∈ A},
+      hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g B / (Nat.card (MulAction.orbit L B) : ℂ)
+        = (αa / (Nat.card L : ℂ))
+          * ∑ b' ∈ hyp.aOrbitFinset a,
+            (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0) := by
+    intro B
+    by_cases hB : B.Nonempty
+    · exact hyp.mobiusTermCF_div_orbit_eq hconj α hB hh hga
+    · -- empty `B`: both sides vanish.
+      rw [Finset.not_nonempty_iff_eq_empty] at hB
+      subst hB
+      rw [hyp.mobiusTermCF_empty hconj, zero_div]
+      rw [show (∑ b' ∈ hyp.aOrbitFinset a,
+          (if (b' : G) ∈ nLStabilizerIn hyp (∅ : Finset {a : G // a ∈ A})
+            then hyp.mobiusSummand b' g ∅ else 0)) = 0 from ?_, mul_zero]
+      refine Finset.sum_eq_zero fun b' _ => ?_
+      rw [hyp.mobiusSummand_empty, ite_self]
+  rw [Finset.sum_congr rfl (fun B _ => hterm B), ← Finset.mul_sum]
+  -- (3) swap the double sum: `∑_B ∑_{b'} = ∑_{b'} ∑_B`.
+  rw [Finset.sum_comm]
+  -- (4) collapse the inner `B`-sum over `𝒫(b')` to its survivor `-|C_L(b')|`.
+  have hinner : ∀ b' ∈ hyp.aOrbitFinset a,
+      (∑ B : Finset {a : G // a ∈ A},
+        (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0))
+        = -((Nat.card (centralizerIn L b'.1)) : ℂ) := by
+    intro b' hb'
+    -- the `b'`-survivor needs `g ∈ (b'H(b'))^G`, i.e. `∃ x ∈ H(b'), IsConj (b'·x) g`.
+    obtain ⟨x', hx', hgx'⟩ :=
+      hyp.exists_mem_H_isConj_of_mem_aOrbitFinset hconj hh hga hb'
+    -- restrict the full powerset `B`-sum to `𝒫(b')` (the `if` is `0` off it); the only difference
+    -- is the empty set (in the filter via `b' ∈ N_L(∅)` but not in `mobiusIndex`), where the
+    -- summand vanishes.  Then apply the survivor collapse.
+    rw [← Finset.sum_filter]
+    rw [show (∑ B ∈ Finset.univ.filter
+          (fun B : Finset {a : G // a ∈ A} => (b' : G) ∈ nLStabilizerIn hyp B),
+          hyp.mobiusSummand b' g B)
+        = ∑ B ∈ hyp.mobiusIndex b', hyp.mobiusSummand b' g B from ?_]
+    · rw [hyp.sum_mobiusSummand_eq_singleton hconj g b',
+        hyp.mobiusSummand_singleton_eq g hx' hgx']
+    · -- `∑_{mobiusIndex} = ∑_{filter}` since they differ only by `∅` (where the summand is `0`).
+      refine (Finset.sum_subset ?_ ?_).symm
+      · -- `mobiusIndex b' ⊆ filter`
+        intro B hB
+        rw [hyp.mem_mobiusIndex] at hB
+        rw [Finset.mem_filter]
+        exact ⟨Finset.mem_univ _, hB.2⟩
+      · -- off `mobiusIndex` (i.e. `B = ∅`), the summand vanishes.
+        intro B hBfilter hBnot
+        rw [Finset.mem_filter] at hBfilter
+        rw [hyp.mem_mobiusIndex] at hBnot
+        have hBempty : ¬ B.Nonempty := fun hne => hBnot ⟨hne, hBfilter.2⟩
+        rw [Finset.not_nonempty_iff_eq_empty] at hBempty
+        rw [hBempty, hyp.mobiusSummand_empty]
+  -- (5) combine: `∑_{b' ∈ a^L} (-|C_L(b')|) = -|L|`, giving `(αa/|L|)·(-|L|) = -αa`.
+  -- evaluate the inner-collapsed sum `∑_{b' ∈ a^L} (-|C_L(b')|) = -|L|`.
+  have hsum_eval :
+      (∑ b' ∈ hyp.aOrbitFinset a,
+        (∑ B : Finset {a : G // a ∈ A},
+          (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0)))
+        = -((Nat.card L : ℂ)) := by
+    rw [Finset.sum_congr rfl hinner]
+    -- rewrite the `aOrbitFinset` index to the support filter `Sg` of `sum_card_centralizerIn_eq`.
+    have hSg : hyp.aOrbitFinset a
+        = Finset.univ.filter
+          (fun b : {a : G // a ∈ A} => ∃ x ∈ hyp.H b, IsConj (b.1 * x) g) := by
+      ext b'
+      rw [Finset.mem_filter]
+      constructor
+      · intro hb'
+        exact ⟨Finset.mem_univ _,
+          hyp.exists_mem_H_isConj_of_mem_aOrbitFinset hconj hh hga hb'⟩
+      · rintro ⟨-, x, hx, hbx⟩
+        rw [hyp.mem_aOrbitFinset]
+        obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a.2 b'.2 hh hx (hga.trans hbx.symm)
+        exact ⟨l, Subtype.ext (by rw [conjA_coe]; exact hl)⟩
+    rw [hSg, Finset.sum_neg_distrib, ← Nat.cast_sum,
+      hyp.sum_card_centralizerIn_eq hconj (hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, hga⟩)]
+  -- `(αa/|L|)·(-|L|) = -αa`.
+  have hLne : (Nat.card L : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  rw [hsum_eval]
+  field_simp
+
 end MobiusAssembly
 
 end SemidirectStructure
