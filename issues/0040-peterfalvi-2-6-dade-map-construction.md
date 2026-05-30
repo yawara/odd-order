@@ -67,8 +67,14 @@ created: 2026-05-27
 - [x] **(2.5)+(2.6.a) Dade 写像 τ を pointwise 構成** — 2026-05-30 完了
       (`Hypothesis.dadeMap` / `isDadeMap_dadeMap` / `dadeIsometryData`; **実 DadeIsometryData**,
       もはやインターフェース仮定でない; 下記「進捗 (4)」).  **これで (2.10) は (2.6.b) 専用に縮小**.
-- [ ] 誘導指標値公式: `induce_apply` (既存) で足りる見込み; 集計は (2.10.3) 内
-- [ ] (2.10.1) Ind L-共役不変 / (2.10.3) Ind 点別値
+- [x] 誘導指標値公式 (transversal collapse): `induceSum_apply_eq_sum_filter` /
+      `induce_apply_eq_sum_filter` (= **(2.10.3)** unscaled/normalized 点別値の generic 形;
+      `x⁻¹gx∈H` の x のみ寄与) — 2026-05-30 完了 (下記「進捗 (5)」).
+- [x] **(2.10.1) Ind L-共役不変 (generic 形)**: `induceSum_map_conj` / `induce_map_conj`
+      (= `Ind_{H^ℓ}^G (transportConj ℓ θ) = Ind_H^G θ`) — 2026-05-30 完了 (下記「進捗 (5)」).
+      Dade-specific 形 `Ind_{M(B^x)} α_{B^x} = Ind_{M(B)} α_B` は H↦M(B), θ↦α_B 適用 + α_B transport で残.
+- [ ] (2.10.3) Dade-specific 点別値: 上の transversal collapse + `card_conj_fiber` で
+      `𝒜(g,H(B)b)` 集計 (issue 0039 再利用) — generic infra は整備済、Dade 適用が残.
 - [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **(2.6.b) 専用、現フロンティア**
 - [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
       を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).
@@ -301,3 +307,30 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
 5. **接続**: 上の恒等式 → `PreservesVirtualCharacters` → `FullDadeIsometryData` 完成.
 
 着手順: 1 (transversal infra) → 2 → 3 → 4 → 5.  全体 ~250-400 LOC、別 focused session 推奨.
+
+## 進捗 2026-05-30 (5) — (2.10.1)/(2.10.3) generic 誘導指標インフラ完成 (sorry-free, axiom-clean)
+
+`OddOrder/GroupTheory/RepresentationTheory/InducedCharacter.lean` に, 上記「依存」
+項目 2 (2.10.1) / 項目 3 (2.10.3) の **generic (任意 subgroup `H` / class function `θ`) 形**
+を landed.  `lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/axiom 無し
+(4 定理とも 3 axioms 全 allowlist 内).
+
+- **(2.10.3) transversal value**:
+  - `induceSum_apply_eq_sum_filter` `(H θ g) : induceSum H θ g = ∑ x∈univ.filter (x⁻¹gx∈H), induceTerm H θ x g`.
+  - `induce_apply_eq_sum_filter` (normalized, `⅟|H| * ∑_filter`).
+  証明は `induceTerm_of_not_mem` で off-filter 項消去 → `Finset.sum_subset (filter_subset)`.
+  decidability は `open scoped Classical in` で供給 (両定理同一 `Classical.propDecidable` ⇒ `rw` 整合).
+- **(2.10.1) L-conjugacy invariance**:
+  - `transportConj ℓ θ : ClassFunction ↥(H.map (MulAut.conj ℓ)) k` — `θ` を共役同型
+    `MulEquiv.subgroupMap (MulAut.conj ℓ) H : H ≃* H^ℓ` の逆で precompose (`compHom`).
+    値: `transportConj ℓ θ ⟨y,_⟩ = θ ⟨ℓ⁻¹yℓ,_⟩`.
+  - `induceTerm_transportConj` (keystone summand 恒等式): `induceTerm (H^ℓ) (transportConj ℓ θ) (x*ℓ⁻¹) g = induceTerm H θ x g`.
+    `Subgroup.mem_map_equiv` + `MulAut.conj_symm_apply` で条件・値とも `e.symm(...)=x⁻¹gx` に collapse.
+  - **`induceSum_map_conj`** `: induceSum (H^ℓ) (transportConj ℓ θ) = induceSum H θ`.
+    `Fintype.sum_equiv (Equiv.mulRight ℓ)` で reindex (t↦t·ℓ), 各項 `induceTerm_transportConj` で一致.
+  - **`induce_map_conj`** (normalized): `induce (H^ℓ) (transportConj ℓ θ) = induce H θ`.
+    `|H^ℓ|=|H|` (`Subgroup.card_map_of_injective`) ⇒ 2 つの `⅟(|·|:k)` が `invertible_unique` で一致.
+
+**残 (Dade 適用)**: 上記は generic.  (2.6.b) 用には `H↦M(B)`, `θ↦α_B` を適用し,
+(2.10.1) は `M(B^x)=x M(B) x⁻¹` membership + `alphaB_apply_mul` で α_{B^x} transport を,
+(2.10.3) は `card_conj_fiber` (issue 0039) で `𝒜(g,H(B)b)` を集計する段が残る (項目 4 Möbius も).

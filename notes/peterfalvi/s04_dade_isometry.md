@@ -26,6 +26,11 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
 - **残: (2.6.b) のみ** = `PreservesVirtualCharacters (dadeMap)`.  道は (2.10) 恒等式
   `dadeMap α = -∑_ℬ (-1)^|B| Ind_{M(B)} α_B` の点別証明 (ℬ 代表系 + (2.10.1) + Möbius 相殺).
   詳細プランは issue 0040「進捗 (4)」.
+- **(2.10.1)/(2.10.3) generic 誘導指標インフラ完成** (`InducedCharacter.lean`, 2026-05-30,
+  sorry-free + axiom-clean; issue 0040「進捗 (5)」): `induceSum_apply_eq_sum_filter` /
+  `induce_apply_eq_sum_filter` (= (2.10.3) transversal value, `x⁻¹gx∈H` の x のみ寄与),
+  `induceSum_map_conj` / `induce_map_conj` (= (2.10.1) `Ind_{H^ℓ}(transportConj ℓ θ)=Ind_H θ`),
+  補助 `transportConj` / `induceTerm_transportConj`.  Dade 適用 (H↦M(B), θ↦α_B) + Möbius 相殺は残.
 
 ## Audit log (2026-05-23 audit 訂正)
 

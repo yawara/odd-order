@@ -613,6 +613,17 @@ set_option linter.style.longLine false in
 -- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (2.10.3) transversal value): the induction sum at `g`
+-- collapses to a sum over only those `x` with `x⁻¹ g x ∈ H` (off-support terms vanish via
+-- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (Peterfalvi (2.10.1) L-conjugacy invariance): inducing from a conjugate
+-- subgroup `H^ℓ = H.map (MulAut.conj ℓ)` with the transported class function `transportConj ℓ θ`
+-- equals inducing from `H`.  Re-index the induction sum by `x ↦ x * ℓ` (`induceTerm_transportConj`);
+-- the `|H^ℓ| = |H|` normalization factors agree by `Subgroup.card_map_of_injective`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_map_conj
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_map_conj
 -- RepresentationTheory (Peterfalvi (2.9)): pullback `φ ∘ f` along a group hom `f : H →* G`
 -- preserves virtual characters (the "Res along a homomorphism" generalization of
 -- `restrict_mem_ZIrr`).  Same span-induction proof via `character_mem_ZIrr (ρ.comp f)`; this
