@@ -39,6 +39,22 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§3 完了後).
   `induce_congr_of_subgroup_eq`+generic `induce_map_conj`).  残: (2.10.3) Dade 点別値 →
   ℬ 代表系 → Möbius 相殺 → `PreservesVirtualCharacters`.
 
+## 進捗 (2026-05-30, 続) — (2.1) keystone 取り込み + (2.10.3) vanishing/value 完成
+
+issue 0040「進捗 (10)」参照.  (2.6.b) bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`
+の点別恒等式に向け, **(2.10.3) を集計形まで完成**:
+- **(2.1) keystone を本ブランチへ cherry-pick** (`6c4ff90`/`32b81df`, `CoprimeConjugacy.lean`;
+  main 上には landed 済だったが本ブランチは merge-base `f911d3a` で分岐し未取り込みだった).
+  `exists_mem_centralizer_conj` (Hg の C_H(g)g への coprime 共役) ほか.
+- **(2.10.3) vanishing case** `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`
+  (g∉dadeSupport ⇒ 0; (2.1)+（2.10.2) 消費).  = **最終恒等式の non-support side そのもの**.
+- **(2.10.3) value case (N_L(B)-集計形)** `induce_alphaB_apply_eq_sum_nLStabilizerIn`
+  (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`; f_B coset partition
+  `dadeQuotientHom_eq_iff_mem_hIntersection_mul`).
+- **残 = Möbius engine のみ** (support side): a^L 特殊化 (容易) → fiber 因子分解 (2.1) →
+  `Finset.sum_involution` toggle-a 相殺 (2.10.2) → survivor B={a} を `card_conj_fiber` で評価.
+  ~150-230 LOC, 純粋に組合せ的; infra 全 present.
+
 ## Audit log (2026-05-23 audit 訂正)
 
 統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).

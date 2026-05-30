@@ -81,11 +81,14 @@ created: 2026-05-27
       `-∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B` が代表元選択に依らない well-definedness 事実
       (`conjFinset_card` で sign も `L`-不変).  `simp only [induceAlphaBTerm]` +
       `induce_alphaB_conjFinset`; Invertible は `Invertible.subsingleton` で整合.
-- [~] (2.10.3) Dade-specific 点別値: **transversal half 完了** (2026-05-30, 下記「進捗 (7)」):
+- [~] (2.10.3) Dade-specific 点別値: **transversal half + vanishing + value (N_L(B)-集計形) 完了**:
       `induce_alphaB_apply_eq_sum_conjFiber` (第 1 式 `(Ind α_B)(g)=⅟|M(B)|∑_{x∈𝒜(g,M(B))}induceTerm`)
-      + `exists_nLStabilizerIn_alphaB_induceTerm` (per-term `α_B(x⁻¹gx)=α(b)` collapse, (2.9) keystone).
-      **残**: vanishing case (g∉⋃(aH(a))^G ⇒ 0) と `card_conj_fiber` 集計 (𝒜(g,H(B)b)) は
-      **coprime-action 共役 primitive `hb ~ c·b (c∈C_{H(B)}(b))` が repo/mathlib に欠落**でブロック.
+      + `exists_nLStabilizerIn_alphaB_induceTerm` (per-term `α_B(x⁻¹gx)=α(b)` collapse, (2.9) keystone)
+      (2026-05-30「進捗 (7)」); **vanishing case** `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`
+      (g∉⋃(aH(a))^G ⇒ 0) 完了 (2026-05-30「進捗 (10)」, (2.1) keystone `exists_mem_centralizer_conj`);
+      **value case (N_L(B)-集計形)** `induce_alphaB_apply_eq_sum_nLStabilizerIn`
+      (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`, f_B coset partition; 2026-05-30「進捗 (10)」).
+      **残**: 教科書 value case の `b∈a^L` 特殊化 (g∈(aH(a))^G 固定で α(b)=0 の b を捨てる; 容易).
 - [~] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **part (d) (RHS∈ℤ[Irr G]) 完了**
       (2026-05-30, 下記「進捗 (9)」); part (c) (Möbius 相殺で点別恒等式) は (2.1) coprime-action
       primitive 欠落でブロック (residual 精密化済).
@@ -498,3 +501,68 @@ Möbius 相殺 `Finset.sum_involution` で `B↔B∪{a}` pair (sign 反転, summ
 `centralizer_inf_hIntersection` = (2.10.2) `C_{H(B)}(a)=C_{H(B∪a)}(a)` で同一 ⟹ 相殺,
 survivor `B={a}`) → `card_conj_fiber` (issue 0039) で `𝒜(g,H(a)a)=xC_G(a)` →
 点別恒等式 → bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` で (2.6.b).
+
+## 進捗 2026-05-30 (10) — (2.1) keystone をブランチへ取り込み + (2.10.3) vanishing case 完成 (sorry-free, axiom-clean)
+
+2 段階で landed.  `lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し.
+
+### (a) (2.1) coset-conjugacy keystone を本ブランチへ cherry-pick
+
+進捗 (9) 末尾で「part (c) 専用ブロッカー」とした **Peterfalvi (2.1)** は `main` 上 (commits
+`6c4ff90`/`32b81df`, `OddOrder/GroupTheory/CoprimeConjugacy.lean`) に landed 済だったが,
+**本ブランチ (claude/naughty-nash-…) は merge-base `f911d3a` で分岐しており未取り込み**だった
+(branch sync gap; planner の「keystone landed this round」前提を満たすため取り込みが必要).
+2 commit を cherry-pick (AxiomsCheck の conflict は `thompson_critical_omega` 行 — 本ブランチ未存在 —
+を落として解決).  使える (2.1) 公開定理:
+- `exists_mem_centralizer_conj` — g normalizing H, (|H|,orderOf g)=1 ⇒ 任意 hg∈Hg は H-共役で cg
+  (c∈H⊓C_G(g)) に移る (**existence form**; (2.10.3) で消費する主系).
+- `coset_eq_cosetConjImage` — Hg = ⋃_{x∈H}(C_H(g)g)^x (**set form**).
+- rigidity core `conj_centralizes_of_coset_conj_eq`/`mem_centralizer_of_coset_conj_eq`.
+
+### (b) (2.10.3) vanishing case (`section PointwiseValue`)
+
+- **`coprime_orderOf_card_hIntersection`** — b∈A ⇒ `gcd(orderOf b, |H(B)|)=1` ((2.2.c) の (2.1) 入力).
+  |H(B)| ∣ |H(b₀)| (b₀∈B) ⊥ |C_L(b)| (`centralizer_coprime`), orderOf b ∣ |C_L(b)| (b∈C_L(b)).
+- **`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`** = **(2.10.3) vanishing case**:
+  g∉dadeSupport=⋃_a(aH(a))^G ⇒ `(Ind_{M(B)} α_B)(g)=0`.  各 summand `induceTerm M(B) α_B x g`
+  (x∈𝒜(g,M(B))) が ≠0 なら x⁻¹gx=h·b (h∈H(B), b∈N_L(B)), α(b)≠0 ⇒ b∈A (α の support).
+  (2.1) `exists_mem_centralizer_conj` (b が coprime H(B) を正規化, `nLStabilizerIn_le_normalizer` 経由)
+  で hb は H(B)-共役 cb (c∈C_{H(B)}(b)=H(B∪{b})⊆H(b), (2.10.2) `centralizer_inf_hIntersection`);
+  c·b=b·c∈hCoset b ⇒ g∈(bH(b))^G⊆dadeSupport — 矛盾.
+
+**意義**: vanishing case は **(2.10) 最終恒等式の `g∉dadeSupport` 半分そのもの** (s=ℬ 選択時, RHS 各項が
+この lemma で 0, LHS は `dadeValue_of_not_mem_dadeSupport` で 0).  これで bridge の点別証明のうち
+non-support side が片付いた.
+
+### (c) (2.10.3) value case (N_L(B)-集計形) (`section PointwiseValue`, 進捗 (10) 追加分)
+
+- **`dadeQuotientHom_eq_iff_mem_hIntersection_mul`** — m∈M(B), b∈N_L(B) で `f_B(m)=b ↔ (m:G)∈H(B)·b`.
+  f_B=dadeQuotientHom が M(B)=H(B)⋊N_L(B) を N_L(B)-因子へ射影 (fiber=H(B)-coset).
+  (⇐) m=h·b (h∈ker f_B=H(B), b は f_B が retract); (⇒) m·b⁻¹↦1 ⇒ m·b⁻¹∈ker=H(B).
+- **`dadeQuotientHom_mem_nLStabilizerIn`** — `f_B(m)∈N_L(B)` (構造的; f_B は inclusion N_L(B)≤L を経由).
+- **`induce_alphaB_apply_eq_sum_nLStabilizerIn`** = **(2.10.3) value case (specialization 前)**:
+  `(Ind_{M(B)} α_B)(g) = ⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)·b)|`.  conjFiber 和を
+  `Finset.sum_fiberwise_of_maps_to` で成分 b=f_B(x⁻¹gx) で再編成: fiber `{x: comp=b}` が
+  `𝒜(g,H(B)·b)` (上 helper), summand は定数 α(b) ((2.9) `alphaB_apply_mul`).
+
+### 残ブロッカー (precise): Möbius 相殺本体 (support side) — 純粋に組合せ的集計
+
+bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` の点別恒等式
+`dadeMap α = -∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B` のうち, **残るのは `g∈(aH(a))^G` の support side のみ**.
+**(2.10.3) は (集計形まで) 完了**したので, 残りは (2.10) 教科書証明の組合せ engine だけ
+(mmd `04.4_*` の "Proof of (2.10)"):
+1. **value case の a^L 特殊化** (容易, ~20-30 LOC): `induce_alphaB_apply_eq_sum_nLStabilizerIn` の
+   `∑_{b∈N_L(B)}` から `α(b)≠0 ⟹ b∈A` かつ (2.4.b) `b∈a^L` で `∑_{b∈N_L(B)∩a^L}` へ, α(b)=α(a) 定数化.
+2. **fiber 因子分解** (~50-80 LOC): `|𝒜(g,H(B)a)| = |𝒜(g,C_{H(B)}(a)a)|·[H(B):C_{H(B)}(a)]`.  (2.1)
+   `coset_eq_cosetConjImage` (H(B)a = ⋃(C_{H(B)}(a)a)^x disjoint union, [H(B):C_{H(B)}(a)] 枚) を
+   conjFiber cardinality に翻訳 (各 x-conjugate coset の preimage が等濃度).
+3. **Möbius 相殺** (~80-120 LOC): 𝒫(a) (a∋ の非空部分集合) 上 `Finset.sum_involution` toggle-a (B↔B∪{a}),
+   (2.10.2) `C_{H(B)}(a)=C_{H(B∪a)}(a)=H(B∪{a})` で summand 同一 ⟹ sign 相殺, survivor B={a}.
+   ℬ↔𝒫 reindex (orbit weight [L:N_L(B)], `card_orbit_mul_card_setLStabilizer`),
+   b↔a^L reindex (`induce_alphaB_conjFinset` (2.10.1)).
+4. survivor `B={a}` 評価: `card_conj_fiber` (= |𝒜(g,H(a)a)|=|C_G(a)|) → γ(g)=α(a)=dadeValue α g.
+   非-support side は `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` (= 進捗 (10)(b)) で即.
+
+合計 ~150-230 LOC; 別 focused session 推奨.  infra は全て present (keystone (2.1) 取り込み済,
+(2.10.1)/(2.10.2)/(2.9)/(2.10.3) [transversal+vanishing+value 集計形]/ℬ-transversal/bridge すべて
+landed) — 残るは純粋に組合せ的集計 (involution + reindex + cardinality 翻訳) の組み上げのみ.
