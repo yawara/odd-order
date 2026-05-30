@@ -1066,6 +1066,65 @@ theorem sum_sq_mul_add_normSq_Z_le
   rw [hYnorm] at hbound
   exact hbound
 
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) conjugate image as a complementary signed sum.**
+Given the (5.4.b)/(5.5) output `X = ∑_{α ∈ E} α` for a subset `E ⊆ R(χ)`, the candidate
+image of `χ̄` under `τ₂`, namely `X - (χ - χ̄)^τ`, equals the **negated** sum over the
+complement `R(χ) - E`:
+
+`X - τ(χ - χ̄) = -∑_{α ∈ R(χ) - E} α`.
+
+Since `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` (the image-family equation) and `E ⊆ R(χ)`, the
+difference telescopes to the complement. -/
+theorem conjImage_eq_neg_sum_sdiff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    D.X - τ (χ - χ.conj) = -(∑ α ∈ D.imageFamily.imageSet \ E, α) := by
+  classical
+  rw [hX, D.imageFamily.image_eq]
+  have h := Finset.sum_sdiff (s₁ := E) (s₂ := D.imageFamily.imageSet) hE (f := fun a => a)
+  rw [← h]; abel
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) norm of the conjugate image:** `‖X - (χ - χ̄)^τ‖² = |R(χ)| - |E|`.
+With `X = ∑_{α ∈ E} α` (`E ⊆ R(χ)`), the candidate `χ̄^{τ₂} = X - (χ - χ̄)^τ` is the negated
+sum over `R(χ) - E`, whose squared norm is the cardinality `|R(χ) - E| = |R(χ)| - |E|` by
+orthonormality of `R(χ)`.  This is the computation
+`‖χ̄^{τ₂}‖² = |R(χ) - E| = ‖χ - χ̄‖² - ‖χ‖² = ‖χ̄‖²` of the text. -/
+theorem inner_self_conjImage_eq_card_sdiff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) =
+      ((D.imageFamily.imageSet.card : ℤ) - (E.card : ℤ) : ℂ) := by
+  classical
+  have horth' : ∀ a ∈ D.imageFamily.imageSet \ E, ∀ b ∈ D.imageFamily.imageSet \ E,
+      ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 :=
+    fun a ha b hb => D.imageFamily.orthonormal a (Finset.mem_sdiff.mp ha).1 b
+      (Finset.mem_sdiff.mp hb).1
+  rw [D.conjImage_eq_neg_sum_sdiff hE hX, ClassFunction.inner_neg_left,
+    ClassFunction.inner_neg_right, neg_neg,
+    inner_self_sum_orthonormal_eq_card horth', Finset.card_sdiff_of_subset hE]
+  have hle : E.card ≤ D.imageFamily.imageSet.card := Finset.card_le_card hE
+  push_cast [Nat.cast_sub hle]
+  ring
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3) orthogonality `⟨X, χ̄^{τ₂}⟩ = 0`.**  The candidate images
+`χ^{τ₂} = X = ∑_{α ∈ E} α` and `χ̄^{τ₂} = X - (χ - χ̄)^τ = -∑_{α ∈ R(χ) - E} α` are
+orthogonal: their inner product is a cross term over the disjoint subsets `E` and
+`R(χ) - E` of the orthonormal family `R(χ)`, hence `0`. -/
+theorem inner_X_conjImage_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {E : Finset (ClassFunction G ℂ)} (hE : E ⊆ D.imageFamily.imageSet)
+    (hX : D.X = ∑ α ∈ E, α) :
+    ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0 := by
+  classical
+  rw [D.conjImage_eq_neg_sum_sdiff hE hX, ClassFunction.inner_neg_right, hX,
+    inner_sum_orthonormal_eq_zero_of_disjoint hE (Finset.sdiff_subset)
+      (Finset.disjoint_sdiff) D.imageFamily.orthonormal, neg_zero]
+
 end CharacterPsiDecomposition
 
 end OddOrder.Peterfalvi.S07

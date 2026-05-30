@@ -375,6 +375,40 @@ theorem inner_orthonormalSum_sum_eq_sum_coeff {s : Finset (ClassFunction G ℂ)}
 
 open scoped Classical in
 omit [Finite G] in
+/-- **Squared norm of an unsigned sum over an orthonormal family.** With `⟨a, b⟩ = δ_{a,b}`
+on `s`, the squared norm of `∑_{a ∈ s} a` is the cardinality `|s|`.  This is the
+`coeff ≡ 1` case of Parseval, used in Peterfalvi (5.6.3) to read
+`‖χ̄^{τ₂}‖² = |R(χ) - E|` off the signed sum. -/
+theorem inner_self_sum_orthonormal_eq_card {s : Finset (ClassFunction G ℂ)}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ s, a) (∑ a ∈ s, a) = (s.card : ℂ) := by
+  classical
+  rw [inner_sum_left, Finset.sum_congr rfl (fun a ha => ?_)]
+  · rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+  · rw [inner_sum_right, Finset.sum_eq_single a]
+    · rw [horth a ha a ha, if_pos rfl]
+    · intro b hb hba; rw [horth a ha b hb, if_neg (Ne.symm hba)]
+    · intro hna; exact absurd ha hna
+
+open scoped Classical in
+omit [Finite G] in
+/-- **Cross inner products of disjoint sub-sums of an orthonormal family vanish.**
+If `E, F ⊆ s` are disjoint and `s` is orthonormal, then `⟨∑_{α ∈ E} α, ∑_{β ∈ F} β⟩ = 0`.
+Used in Peterfalvi (5.6.3): `⟨X, χ̄^{τ₂}⟩` reduces to a cross term over `E` and `R(χ) - E`. -/
+theorem inner_sum_orthonormal_eq_zero_of_disjoint {s E F : Finset (ClassFunction G ℂ)}
+    (hE : E ⊆ s) (hF : F ⊆ s) (hdisj : Disjoint E F)
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0) :
+    ClassFunction.inner (∑ a ∈ E, a) (∑ b ∈ F, b) = 0 := by
+  classical
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero fun a ha => ?_
+  rw [inner_sum_right]
+  refine Finset.sum_eq_zero fun b hb => ?_
+  have hab : a ≠ b := fun h => (Finset.disjoint_left.mp hdisj ha) (h ▸ hb)
+  rw [horth a (hE ha) b (hF hb), if_neg hab]
+
+open scoped Classical in
+omit [Finite G] in
 /-- **Pythagoras for an orthogonal family plus an orthogonal residual.**
 Let `v : ι → ClassFunction G ℂ` (indexed over `s : Finset ι`) be **orthogonal** with real
 gram `⟨v i, v j⟩ = if i = j then (m i : ℂ) else 0`, and let `Z` be orthogonal to every

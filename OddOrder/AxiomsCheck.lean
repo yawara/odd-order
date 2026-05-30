@@ -1048,3 +1048,13 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.sum_sq_mul_add_normSq_Z_le
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.int_eq_zero_of_sq_mul_le_of_two_mul_lt
+-- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
+-- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
+-- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で
+-- sorry-free; (5.6.3) extension `τ₂` の isometry 検証に直接供給 (大域 isometry 拡張は別途).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.conjImage_eq_neg_sum_sdiff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_conjImage_eq_card_sdiff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_conjImage_eq_zero
