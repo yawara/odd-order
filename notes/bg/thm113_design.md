@@ -3,6 +3,7 @@
 > **生成**: `bg-thm113-design` workflow (run wf_000d0ff2-91b, 6 agent / 469k tok / 8.8 min)。BG mmd / Gorenstein / Isaacs / repo API / mathlib API を並列調査 + ソース直接検証 → 統合設計。
 > **ルート**: Gorenstein 原文 (Isaacs に critical subgroup 定理は無い)。`references/gorenstein/finite-groups.mmd` L3878-3945 に証明全文 (Lemma 5.3.9 / Thm 5.3.10 / 5.3.11+5.3.12 / 5.3.13)。
 > 着手判断: 本セッション (parallel_execution_plan の W-3)。実装は full port 前提、5 stage。
+> **✅ 完成** (2026-05-30, `bg-thm113-impl` workflow wf_a0911e68-98c, commits 4aefbf5..37a6277): S1→S2→S6→S3/S7→BG-facing 全 sorry-free/axiom-clean、Verify genuinelyDone (scaffold trap clean、fixRounds=0)。`thompson_critical_omega`@S01_Solvable.lean:845。**design が GAP 候補とした S3 stability (Gorenstein 5.3.2) は既存 Ch04 で代替でき不要だった**。下流参照は §3/§4 Lem4.17/§5 Thm5.5/§12 (旧「§13×5」は誤り)。
 
 # 0016 実装設計: BG Thm 1.13 (Thompson critical subgroup)
 
