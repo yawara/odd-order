@@ -1965,6 +1965,131 @@ theorem zsmul_induceAlphaBTerm_sum_mem_ZIrr (hyp : Hypothesis G A L)
 
 end VirtualCharacterRHS
 
+/- 2.10: The Möbius (inclusion–exclusion) assembly of the Dade map. -/
+
+section MobiusAssembly
+
+open scoped Classical
+
+/-- **Peterfalvi (2.1)/(2.10.3), the conjugating-set cardinality `|𝒜(g, K·a)| = |C_G(a)|`** when
+`a` *centralizes* the subgroup `K` (so `K ⊆ C_G(a)`), `C_G(a)` normalizes `K`, `⟨a⟩` and `K` have
+coprime orders, and `g` is `G`-conjugate to an element `a·x₀` (`x₀ ∈ K`).
+
+This is the textbook's "`𝒜(g, H(a)a) = x C_G(a)`" remark.  The conjugating set
+`𝒜(g, K·a) = {y | y⁻¹gy ∈ K·a}` is in bijection with the `card_conj_fiber` pair set
+`{(p₁, p₂) | p₁ ∈ K ∧ p₂(a·p₁)p₂⁻¹ = g}`: each conjugator `y = p₂` determines a unique `p₁` via
+`y⁻¹gy = a·p₁ ∈ a·K = K·a` (the cosets agree as `a` centralizes `K`).  By `card_conj_fiber` the pair
+set has cardinality `|C_G(a)|`.  Applied at the Möbius survivor `B = {a}` (where `H({a}) = H(a) ⊆
+C_G(a)`, normalized by `C_G(a)` via `H_normalized`) it evaluates the surviving term of (2.10). -/
+theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
+    (hcomm : ∀ x ∈ K, Commute a x)
+    (hnorm : ∀ c ∈ Subgroup.centralizer ({a} : Set G), ∀ x ∈ K, c * x * c⁻¹ ∈ K)
+    (hcop : Nat.Coprime (orderOf a) (Nat.card K))
+    {g x₀ : G} (hx₀K : x₀ ∈ K) (hx₀ : IsConj (a * x₀) g) :
+    (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+      = Nat.card (Subgroup.centralizer ({a} : Set G)) := by
+  classical
+  rw [← OddOrder.GroupTheory.card_conj_fiber hcomm hnorm hcop hx₀K hx₀]
+  -- `(conjFiber g (K·a)).card = Nat.card {y // y⁻¹gy ∈ K·a}`.
+  have hcard1 : (conjFiber g ((↑K : Set G) * ({a} : Set G))).card
+      = Nat.card {y : G // y⁻¹ * g * y ∈ (↑K : Set G) * ({a} : Set G)} := by
+    rw [← Nat.card_eq_finsetCard]
+    exact Nat.card_congr (Equiv.subtypeEquivRight fun y => mem_conjFiber)
+  rw [hcard1]
+  -- Bijection `{y // y⁻¹gy ∈ K·a} ≃ {p : G×G // p.1 ∈ K ∧ p.2(a·p.1)p.2⁻¹ = g}`.
+  refine Nat.card_congr ?_
+  refine
+    { toFun := fun y => ⟨(a⁻¹ * (y.1⁻¹ * g * y.1), y.1), ?_, ?_⟩
+      invFun := fun p => ⟨p.1.2, ?_⟩
+      left_inv := ?_
+      right_inv := ?_ }
+  · -- `a⁻¹·(y⁻¹gy) ∈ K`: from `y⁻¹gy ∈ K·a = a·K`.
+    show a⁻¹ * (y.1⁻¹ * g * y.1) ∈ K
+    obtain ⟨h, hh, a', ha', hyeq⟩ := y.2
+    rw [Set.mem_singleton_iff] at ha'
+    simp only at hyeq
+    -- `hyeq : h * a' = y.1⁻¹ * g * y.1`, `ha' : a' = a`
+    rw [← hyeq, ha']
+    have hreduce : a⁻¹ * (h * a) = h := by
+      have hcomm_ha : a * h = h * a := (hcomm h hh).eq
+      rw [← hcomm_ha]; group
+    rw [hreduce]
+    exact hh
+  · -- `y·(a·(a⁻¹·(y⁻¹gy)))·y⁻¹ = g`
+    show y.1 * (a * (a⁻¹ * (y.1⁻¹ * g * y.1))) * y.1⁻¹ = g
+    group
+  · -- `p.1.2⁻¹·g·p.1.2 ∈ K·a`: from `p.2(a·p.1)p.2⁻¹ = g`, `p.1∈K`.
+    obtain ⟨⟨q1, q2⟩, hq1, hq2⟩ := p
+    show q2⁻¹ * g * q2 ∈ (↑K : Set G) * ({a} : Set G)
+    rw [Set.mem_mul]
+    refine ⟨a * q1 * a⁻¹, ?_, a, Set.mem_singleton _, ?_⟩
+    · -- `a·q1·a⁻¹ ∈ K` (`K` is normalized by `a`, which lies in `C_G(a)`)
+      have hacomm : a * q1 * a⁻¹ = q1 := by rw [(hcomm q1 hq1).eq]; group
+      rw [hacomm]; exact hq1
+    · -- `q2⁻¹·g·q2 = (a·q1·a⁻¹)·a`
+      have hconj : q2⁻¹ * g * q2 = a * q1 := by rw [← hq2]; group
+      rw [hconj]; group
+  · -- left inverse
+    rintro ⟨y, hy⟩
+    rfl
+  · -- right inverse
+    rintro ⟨⟨x, t⟩, hx, ht⟩
+    apply Subtype.ext
+    apply Prod.ext
+    · -- `a⁻¹·(t⁻¹·g·t) = x` from `t(a·x)t⁻¹ = g`
+      show a⁻¹ * (t⁻¹ * g * t) = x
+      conv_lhs => rw [← ht]
+      group
+    · rfl
+
+/-- **Peterfalvi (2.10.3), the support test for a single component `b`.**  For `b ∈ N_L(B)` with
+`b ∈ A`, if some conjugate `y⁻¹gy` lies in the coset `H(B)·b` (i.e. `𝒜(g, H(B)b) ≠ ∅`), then
+`g ∈ (bH(b))^G` lies in the Dade support.
+
+This is the contrapositive content of the vanishing case
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` isolated to one fiber: by (2.1)
+(`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `y⁻¹gy = h·b` is
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G`. -/
+theorem mem_dadeSupport_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {b : G} (hbN : b ∈ nLStabilizerIn hyp B) (hbA : b ∈ A) {g y : G}
+    (hy : y⁻¹ * g * y ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G)) :
+    g ∈ hyp.dadeSupport := by
+  classical
+  -- factor `y⁻¹gy = h·b` with `h ∈ H(B)`
+  rw [Set.mem_mul] at hy
+  obtain ⟨h, hh, b', hb', hyeq⟩ := hy
+  rw [Set.mem_singleton_iff] at hb'
+  rw [hb'] at hyeq
+  -- `hyeq : h * b = y⁻¹ * g * y`
+  -- `b` normalizes `H(B)` and is coprime to `|H(B)|`; apply (2.1)
+  have hnorm : ∀ z ∈ hIntersection hyp B hB, b * z * b⁻¹ ∈ hIntersection hyp B hB := by
+    intro z hz
+    have := hyp.nLStabilizerIn_le_normalizer hconj hB hbN
+    rw [Subgroup.mem_normalizer_iff] at this
+    exact (this z).mp hz
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB hbA
+  obtain ⟨c, hcmem, x', hx'H, hx'eq⟩ :=
+    OddOrder.GroupTheory.exists_mem_centralizer_conj (g := b) (H := hIntersection hyp B hB)
+      hcop hnorm hh
+  obtain ⟨hcH, hccomm⟩ := Subgroup.mem_inf.mp hcmem
+  have hccb : Commute c b := Subgroup.mem_centralizer_singleton_iff.mp hccomm
+  have hcHb : c ∈ hyp.H ⟨b, hbA⟩ := by
+    have hcInsert : c ∈ hIntersection hyp (insert ⟨b, hbA⟩ B) (Finset.insert_nonempty _ B) := by
+      rw [← hyp.centralizer_inf_hIntersection hB ⟨b, hbA⟩]
+      exact Subgroup.mem_inf.mpr ⟨hccomm, hcH⟩
+    exact hIntersection_le hyp (Finset.insert_nonempty _ B) (Finset.mem_insert_self _ B) hcInsert
+  -- `g` is conjugate to `c·b = b·c ∈ hCoset b`, hence in `dadeSupport`
+  have hgconj : (x' * y⁻¹) * g * (x' * y⁻¹)⁻¹ = c * b := by
+    rw [← hx'eq, hyeq]; group
+  rw [hyp.mem_dadeSupport_iff]
+  refine ⟨⟨b, hbA⟩, c, hcHb, ?_⟩
+  rw [show (⟨b, hbA⟩ : {a : G // a ∈ A}).1 * c = c * b from (hccb.eq).symm]
+  exact (isConj_iff.mpr ⟨x' * y⁻¹, hgconj⟩).symm
+
+end MobiusAssembly
+
 end SemidirectStructure
 
 end Hypothesis

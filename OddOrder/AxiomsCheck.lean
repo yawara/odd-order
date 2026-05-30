@@ -809,6 +809,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.zsmul_induceAlphaBTerm_sum_mem_ZIrr
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
+-- (2.10) Möbius-assembly primitives: the survivor cardinality `|𝒜(g, K·a)| = |C_G(a)|` for a
+-- subgroup centralized by `a` (`card_conjFiber_coset_eq_card_centralizer`, the (2.1) coset
+-- conjugacy `card_conj_fiber` translated to the conjugating set `𝒜`), and the per-component support
+-- test `𝒜(g, H(B)b) ≠ ∅ ⇒ g ∈ (bH(b))^G` (`mem_dadeSupport_of_mem_conjFiber_coset`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_eq_card_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_of_mem_conjFiber_coset
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
