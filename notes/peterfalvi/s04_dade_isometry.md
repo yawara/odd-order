@@ -359,3 +359,22 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
 
 これで進捗 (4) 残作業 **項目 1 (代表系 ℬ, 構造的ブロッカー) 完了**.  残: 項目 3 (2.10.3) 残
 (coprime-action 共役 primitive, 上記) → 項目 4 Möbius 相殺 → 項目 5 接続.
+
+## 2026-05-30 追記 (3) — (2.10) part (d) RHS∈ℤ[Irr G] + (2.10)→(2.6.b) bridge landed
+
+教科書 (2.10) 証明を **part (c)** (Möbius 相殺で点別恒等式 `α^τ=γ`) と **part (d)** (RHS
+`γ=-∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B ∈ ℤ[Irr G]`) に分解.  **part (d) を完成**
+(commit 6196d09, sorry-free, axiom-clean; `issues/0040-*` 進捗 (9)):
+- `induce_alphaB_mem_ZIrr` (summand `Ind_{M(B)} α_B∈ℤ[Irr G]`) /
+  `induceAlphaBTerm` (invertibility 内包 package) / `induceAlphaBTerm_mem_ZIrr` /
+  `zsmul_induceAlphaBTerm_sum_mem_ZIrr` (任意 ℤ-結合∈ℤ[Irr G]).
+- **`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`** (bridge):
+  `dadeMap α` が induceAlphaBTerm の ℤ-結合に等しい ⟹ (2.6.b).  **(2.6.b) は (2.10) 点別恒等式
+  (part (c)) だけに縮小**.
+
+**残ブロッカー (part (c) 専用)**: 教科書 **(2.1)** = `Kb` が `C_K(b)b` の K-共役 `[K:C_K(b)]` 個の
+disjoint union (coprime-action) が mathlib・repo とも欠落.  これが (2.10.3) の vanishing +
+fiber 集計の両方を駆動.  **本 issue の TARGET FILE 制約 (S04 のみ) 外** —
+`OddOrder/GroupTheory/CoprimeConjugacy.lean` 行きの独立 primitive (~100-150 LOC) で別 sub-issue.
+landed 後の part (c) 残工程 = (2.10.3) 集計 → `Finset.sum_involution` (B↔B∪{a}, (2.10.2)
+`centralizer_inf_hIntersection` で相殺) → bridge で (2.6.b).

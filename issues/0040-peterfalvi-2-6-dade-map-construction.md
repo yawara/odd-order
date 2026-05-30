@@ -80,7 +80,9 @@ created: 2026-05-27
       + `exists_nLStabilizerIn_alphaB_induceTerm` (per-term `α_B(x⁻¹gx)=α(b)` collapse, (2.9) keystone).
       **残**: vanishing case (g∉⋃(aH(a))^G ⇒ 0) と `card_conj_fiber` 集計 (𝒜(g,H(B)b)) は
       **coprime-action 共役 primitive `hb ~ c·b (c∈C_{H(B)}(b))` が repo/mathlib に欠落**でブロック.
-- [ ] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **(2.6.b) 専用、現フロンティア**
+- [~] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **part (d) (RHS∈ℤ[Irr G]) 完了**
+      (2026-05-30, 下記「進捗 (9)」); part (c) (Möbius 相殺で点別恒等式) は (2.1) coprime-action
+      primitive 欠落でブロック (residual 精密化済).
 - [x] **(2.6.a) を (2.7) から** — `IsDadeMap` + `HConjInvariant` ⟹ `IsDadeIsometry`
       を導出 (`isDadeIsometry_of_isDadeMap`, 2026-05-30 完了; 下記参照).
 - [x] **(2.6.b) 前提 — `restrict_mem_ZIrr` + `induce_mem_ZIrr`** (Res/Ind が virtual char を
@@ -442,3 +444,51 @@ coprime + IsConj/centralizer-coset の補題は皆無; mathlib にあるのは `
 ℬ-和の sign 相殺) → 項目 5 接続 (`PreservesVirtualCharacters` → `FullDadeIsometryData`).
 ℬ-和は整数交代和なので (2.6.b) は項目 4-5 が立てば manifest (RHS は `induce_mem_ZIrr` +
 `alphaB_mem_ZIrr` で ZIrr G).
+
+## 進捗 2026-05-30 (9) — (2.10) part (d) RHS∈ℤ[Irr G] + (2.10)→(2.6.b) bridge 完成 (sorry-free, axiom-clean)
+
+commit 6196d09, `lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し
+(4 定理とも 3 axioms 全 allowlist 内).  教科書 (2.10) 証明を 2 つに分解した:
+**part (c)** = Möbius 相殺で点別恒等式 `α^τ = γ` を立てる段, **part (d)** = RHS
+`γ = -∑_{B∈ℬ}(-1)^|B| Ind_{M(B)} α_B` が virtual character である段.  **part (d) を完成**:
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section VirtualCharacterRHS` (Hypothesis 内,
+`end SemidirectStructure` 直前):
+- **`induce_alphaB_mem_ZIrr`** — `α∈ℤ[Irr L]`, 非空 B ⟹ `Ind_{M(B)}^G α_B ∈ ℤ[Irr G]`.
+  (2.9) pullback `alphaB_mem_ZIrr` + `ClassFunction.induce_mem_ZIrr` の合成.  `[Invertible(|G|:ℂ)]`
+  + `[Invertible(|M(B)|:ℂ)]` 要 (induce_mem_ZIrr の section 変数).
+- **`induceAlphaBTerm`** — 上の summand を **`Invertible(|M(B)|:ℂ)` instance を内包した**
+  `ClassFunction G ℂ` として package (B は `{B//B.Nonempty}` subtype で nonempty 証明同伴).
+  これで (2.10) RHS を通常の `Finset` 和として書ける (各 binder に invertibility を通さず済む;
+  生 `letI` を binder 内に置くと `isDefEq` timeout する問題を回避).
+- **`induceAlphaBTerm_mem_ZIrr`** / **`zsmul_induceAlphaBTerm_sum_mem_ZIrr`** — package 版の
+  ℤ[Irr G] 帰属 + 任意 ℤ-結合 `∑_{p∈s} c p • induceAlphaBTerm ∈ ℤ[Irr G]`
+  (`Submodule.sum_mem`/`smul_mem`).  (2.10) RHS は `c B = -(-1)^|B|`, `s = ℬ` の特殊形.
+
+`PreservesVirtualCharacters` namespace 直後 (DadeMap section):
+- **`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`** = **bridge**.
+  「全 supported `α∈ℤ[Irr L]` で `hyp.dadeMap α` が *ある* induceAlphaBTerm の ℤ-結合に等しい」
+  ⟹ `PreservesVirtualCharacters (hyp.dadeMap)` (= (2.6.b)).  これで **(2.6.b) は (2.10) 点別恒等式
+  (part (c)) だけに縮小**.  恒等式さえ立てば bridge で即 `FullDadeIsometryData` 化.
+
+### 残ブロッカー (precise, part (c) 専用): Peterfalvi (2.1) coprime-action primitive
+
+part (c) Möbius 本体は **(2.10.3)** を要し, (2.10.3) は教科書 **(2.1)** を要する:
+
+> **(2.1)** `K` 有限, `b` が `K` を正規化し `gcd(|K|, ord b)=1` ⟹ コセット `Kb` は
+> `C_K(b)b` の `K`-共役 `[K:C_K(b)]` 個の disjoint union.
+
+これは **mathlib にも本 repo にも無い** (進捗(7)末尾で確認済; mathlib の coprime 系は
+`orderOf_mul_..._coprime` のみで centralizer-coset 構造の共役は皆無).  (2.1) は (2.10.3) の
+- vanishing case `α_B(x⁻¹gx)≠0 ⟹ g∈(bH(b))^G` (hb~cb, c∈C_K(b))
+- fiber 集計 `|𝒜(g,H(B)a)| = |𝒜(g,C_{H(B)}(a)a)|·[H(B):C_{H(B)}(a)]`
+の両方を駆動する.  証明は `π=primes(ord b)` の π-part 引数 (既存 `conj_fixes_of_commute` の
+役割交換版; ~100-150 LOC).  **本 issue の TARGET FILE 制約 (S04 のみ touch) 外** —
+`OddOrder/GroupTheory/CoprimeConjugacy.lean` に置くべき独立 primitive ゆえ別 sub-issue.
+
+(2.1) landed 後の part (c) 残工程: (2.10.3) Dade 点別値 (`induce_alphaB_apply_eq_sum_conjFiber`
++ per-term collapse `exists_nLStabilizerIn_alphaB_induceTerm` は landed 済; 集計のみ) →
+Möbius 相殺 `Finset.sum_involution` で `B↔B∪{a}` pair (sign 反転, summand は
+`centralizer_inf_hIntersection` = (2.10.2) `C_{H(B)}(a)=C_{H(B∪a)}(a)` で同一 ⟹ 相殺,
+survivor `B={a}`) → `card_conj_fiber` (issue 0039) で `𝒜(g,H(a)a)=xC_G(a)` →
+点別恒等式 → bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` で (2.6.b).
