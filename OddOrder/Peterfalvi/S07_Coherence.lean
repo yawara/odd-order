@@ -548,6 +548,134 @@ noncomputable def toOrthonormalImage
 
 end CharacterDifferenceImage
 
+/-! ### Peterfalvi (5.4): the norm inequalities for `X` and `Y`
+
+Setup: `χ ∈ S`, `ψ ∈ ℤ[S]` with `(χ,ψ) = (χ̄,ψ) = 0`; an isometry `τ₁` on
+`ℤ[χ-ψ, χ-χ̄]` coinciding with `τ` on `ℤ[χ-χ̄]`; `(χ-ψ)^{τ₁} = X - Y` with
+`X ∈ ℤ[R(χ)]` and `Y ⊥ R(χ)`.  The conclusions are:
+
+* (5.4.a) `‖X‖² ≥ ‖χ‖²`;
+* (5.4.b) if also `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²` and
+  `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)`.
+
+The whole argument is the integer Cauchy–Schwarz `∑ c_α ≤ ∑ c_α²` against the
+orthonormal `R(χ)`, run through the Parseval identities of `ZIrrFourier`. -/
+
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.4) setup.**  Bundles the hypotheses of (5.4): the orthonormal
+image family `R(χ)`, the auxiliary isometry `τ₁` agreeing with `τ` on `χ - χ̄`, the
+decomposition `(χ - ψ)^{τ₁} = X - Y` with `X ∈ ℤ[R(χ)]` (recorded via integer
+coefficients `coeff`) and `Y ⊥ R(χ)`, and the orthogonality relations
+`(χ,ψ) = (χ̄,ψ) = (χ,χ̄) = 0`. -/
+structure CharacterPsiDecomposition (τ : IntegralCharacterMap L G)
+    (χ ψ : ClassFunction L ℂ)
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- The orthonormal image family `R(χ)` with `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α`. -/
+  imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ
+  /-- The auxiliary isometry `τ₁` on `ℤ[χ - ψ, χ - χ̄]`. -/
+  tau1 : IntegralCharacterMap L G
+  /-- `τ₁` is an integral isometry. -/
+  tau1_isometry : IsIntegralIsometry (L := L) (G := G) tau1
+  /-- `τ₁` coincides with `τ` on `χ - χ̄`. -/
+  tau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj)
+  /-- The image side `X` of `(χ - ψ)^{τ₁} = X - Y`. -/
+  X : ClassFunction G ℂ
+  /-- The orthogonal side `Y` of `(χ - ψ)^{τ₁} = X - Y`. -/
+  Y : ClassFunction G ℂ
+  /-- The decomposition `(χ - ψ)^{τ₁} = X - Y`. -/
+  tau1_image : tau1 (χ - ψ) = X - Y
+  /-- The integer coefficients of `X ∈ ℤ[R(χ)]`. -/
+  coeff : ClassFunction G ℂ → ℤ
+  /-- `X = ∑_{α ∈ R(χ)} (coeff α) • α`, i.e. `X ∈ ℤ[R(χ)]`. -/
+  X_eq : X = ∑ α ∈ imageFamily.imageSet, (coeff α : ℂ) • α
+  /-- `Y` is orthogonal to `R(χ)`. -/
+  Y_orthogonal : ∀ α ∈ imageFamily.imageSet, ClassFunction.inner Y α = 0
+  /-- `(χ, ψ) = 0`. -/
+  chi_psi_orthogonal : ClassFunction.inner χ ψ = 0
+  /-- `(χ̄, ψ) = 0`. -/
+  chiConj_psi_orthogonal : ClassFunction.inner χ.conj ψ = 0
+  /-- `(χ, χ̄) = 0` (the distinct elements `χ`, `χ̄ ∈ S` are orthogonal by (5.2.c)). -/
+  chi_chiConj_orthogonal : ClassFunction.inner χ χ.conj = 0
+
+namespace CharacterPsiDecomposition
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
+theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {α : ClassFunction G ℂ} (hα : α ∈ D.imageFamily.imageSet) :
+    ClassFunction.inner D.X α = (D.coeff α : ℂ) := by
+  rw [D.X_eq]
+  exact inner_orthonormalSum_eq_coeff D.imageFamily.orthonormal hα
+
+/-- `‖X‖² = ∑_{α ∈ R(χ)} (coeff α)²` (Parseval). -/
+theorem inner_self_X (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.X = ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) ^ 2 := by
+  rw [D.X_eq]
+  exact inner_self_orthonormalSum_eq_sum_sq D.imageFamily.orthonormal
+
+/-- `⟨X, ∑_{α ∈ R(χ)} α⟩ = ∑_{α ∈ R(χ)} coeff α`. -/
+theorem inner_X_sum (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X (∑ α ∈ D.imageFamily.imageSet, α) =
+      ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) := by
+  rw [D.X_eq]
+  exact inner_orthonormalSum_sum_eq_sum_coeff D.imageFamily.orthonormal
+
+/-- `Y ⊥ R(χ)` extends to the sum: `⟨Y, ∑_{α ∈ R(χ)} α⟩ = 0`. -/
+theorem inner_Y_sum (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.Y (∑ α ∈ D.imageFamily.imageSet, α) = 0 := by
+  rw [inner_sum_right]
+  exact Finset.sum_eq_zero fun α hα => D.Y_orthogonal α hα
+
+/-- **The keystone identity of (5.4.a).**  `‖χ‖² = ∑_{α ∈ R(χ)} coeff α`.
+
+`‖χ‖² = ⟨χ - ψ, χ - χ̄⟩` (using the three orthogonality relations), `= ⟨X - Y, ∑ α⟩`
+(by the isometry of `τ₁` and `τ₁ = τ` on `χ - χ̄`), `= ⟨X, ∑ α⟩` (since `Y ⊥ R(χ)`),
+`= ∑ coeff α`. -/
+theorem inner_self_chi_eq_sum_coeff
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ = ∑ α ∈ D.imageFamily.imageSet, (D.coeff α : ℂ) := by
+  -- Step 1: `⟨χ, χ⟩ = ⟨χ - ψ, χ - χ̄⟩`.
+  have hpsi_chi : ClassFunction.inner ψ χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chi_psi_orthogonal, star_zero]
+  have hpsi_chiConj : ClassFunction.inner ψ χ.conj = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chiConj_psi_orthogonal, star_zero]
+  have hsrc : ClassFunction.inner χ χ =
+      ClassFunction.inner (χ - ψ) (χ - χ.conj) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, D.chi_chiConj_orthogonal, hpsi_chi, hpsi_chiConj]
+    ring
+  -- Step 2: transport across `τ₁` (isometry, agreeing with `τ` on `χ - χ̄`).
+  have himg : ClassFunction.inner (χ - ψ) (χ - χ.conj) =
+      ClassFunction.inner (D.X - D.Y) (∑ α ∈ D.imageFamily.imageSet, α) := by
+    rw [← D.tau1_isometry.inner_eq, D.tau1_image, D.tau1_agrees, D.imageFamily.image_eq]
+  -- Step 3: `Y ⊥ R(χ)` drops `Y`; coefficient recovery finishes.
+  rw [hsrc, himg, ClassFunction.inner_sub_left, D.inner_Y_sum, sub_zero, D.inner_X_sum]
+
+/-- **Peterfalvi (5.4.a):** `‖X‖² ≥ ‖χ‖²`.
+
+By the keystone identity `‖χ‖² = ∑ coeff α` and Parseval `‖X‖² = ∑ (coeff α)²`, the
+integer Cauchy–Schwarz `∑ coeff α ≤ ∑ (coeff α)²` gives the inequality. -/
+theorem inner_self_chi_re_le_inner_self_X
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    (ClassFunction.inner χ χ).re ≤ (ClassFunction.inner D.X D.X).re := by
+  classical
+  have hχ : ClassFunction.inner χ χ =
+      ((∑ α ∈ D.imageFamily.imageSet, D.coeff α : ℤ) : ℂ) := by
+    rw [D.inner_self_chi_eq_sum_coeff]; push_cast; ring
+  have hX : ClassFunction.inner D.X D.X =
+      ((∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 : ℤ) : ℂ) := by
+    rw [D.inner_self_X]; push_cast; ring
+  rw [hχ, hX, Complex.intCast_re, Complex.intCast_re]
+  exact_mod_cast finset_sum_le_sum_sq D.imageFamily.imageSet D.coeff
+
+end CharacterPsiDecomposition
+
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
 isometric extension on `Z[S]` that agrees with `τ` on `Z[S,A]`. -/
 structure IsCoherent (τ : IntegralCharacterMap L G)
