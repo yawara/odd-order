@@ -2884,6 +2884,135 @@ theorem sum_transversalRep_eq_sum_div_orbit
   rw [mul_div_cancel_left₀]
   exact Nat.cast_ne_zero.mpr hcardpos.ne'
 
+/-- `|H(B^l)| = |H(B)|`: conjugation by `l` is a cardinality-preserving bijection of subgroups. -/
+theorem card_hIntersection_conjFinset (hconj : hyp.HConjInvariant) (l : L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Nat.card (hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty (l := l) hB))
+      = Nat.card (hIntersection hyp B hB) := by
+  rw [hyp.hIntersection_conjFinset hconj l hB]
+  refine Nat.card_congr ?_
+  have hsmul : ∀ z : G, ((MulAut.conj (l : G))⁻¹ • z) = (l : G)⁻¹ * z * (l : G) := by
+    intro z
+    rw [show ((MulAut.conj (l : G))⁻¹ • z) = (MulAut.conj (l : G))⁻¹ z from rfl,
+      MulAut.conj_inv_apply]
+  refine
+    { toFun := fun x => ⟨(l : G)⁻¹ * (x : G) * (l : G), ?_⟩
+      invFun := fun y => ⟨(l : G) * (y : G) * (l : G)⁻¹, ?_⟩
+      left_inv := fun x => ?_
+      right_inv := fun y => ?_ }
+  · -- `x ∈ conj•H(B) ⟹ l⁻¹·x·l ∈ H(B)`
+    have hx := x.2
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul] at hx
+    exact hx
+  · -- `y ∈ H(B) ⟹ l·y·l⁻¹ ∈ conj•H(B)`
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul]
+    rw [show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G) from by group]
+    exact y.2
+  · apply Subtype.ext; show (l : G) * ((l : G)⁻¹ * (x : G) * (l : G)) * (l : G)⁻¹ = (x : G); group
+  · apply Subtype.ext; show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G); group
+
+/-- The conjugation orbit element `a^l` lies in `N_L(B^l)` iff `a` lies in `N_L(B)`. -/
+theorem mem_nLStabilizerIn_conjA_conjFinset (l : L)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    (hyp.conjA l a : G) ∈ nLStabilizerIn hyp (hyp.conjFinset l B)
+      ↔ (a : G) ∈ nLStabilizerIn hyp B := by
+  rw [hyp.nLStabilizerIn_conjFinset l, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  rw [show ((MulAut.conj (l : G))⁻¹ • (hyp.conjA l a : G)) = (l : G)⁻¹ * (hyp.conjA l a : G)
+      * (l : G) from by
+    rw [show ((MulAut.conj (l : G))⁻¹ • (hyp.conjA l a : G))
+        = (MulAut.conj (l : G))⁻¹ (hyp.conjA l a : G) from rfl, MulAut.conj_inv_apply]]
+  rw [show (l : G)⁻¹ * (hyp.conjA l a : G) * (l : G) = (a : G) from by
+    simp only [conjA_coe]; group]
+
+/-- Conjugation `B ↦ B^l` sends `𝒫(a)` bijectively to `𝒫(a^l)`. -/
+theorem mem_mobiusIndex_conjFinset (l : L)
+    {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
+    hyp.conjFinset l B ∈ hyp.mobiusIndex (hyp.conjA l a) ↔ B ∈ hyp.mobiusIndex a := by
+  classical
+  rw [hyp.mem_mobiusIndex, hyp.mem_mobiusIndex, conjFinset,
+    Finset.image_nonempty, ← conjFinset, hyp.mem_nLStabilizerIn_conjA_conjFinset l]
+
+/-- **Peterfalvi (2.10), conjugation-invariance of the `mobiusSummand`.**  For `l ∈ L`,
+
+    `mobiusSummand (a^l) g (B^l) = mobiusSummand a g B`.
+
+`|B^l| = |B|`, `H(B^l) = l·H(B)·l⁻¹` has the same cardinality, and the conjugating set
+`|𝒜(g, H(B^l)·a^l)| = |𝒜(g, l·(H(B)·a)·l⁻¹)| = |𝒜(g, H(B)·a)|` by `card_conjFiber_conj_eq`. -/
+theorem mobiusSummand_conjFinset (hconj : hyp.HConjInvariant) (l : L) (g : G)
+    (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A}) :
+    hyp.mobiusSummand (hyp.conjA l a) g (hyp.conjFinset l B)
+      = hyp.mobiusSummand a g B := by
+  classical
+  by_cases hB : B.Nonempty
+  · have hBl : (hyp.conjFinset l B).Nonempty := hyp.conjFinset_nonempty (l := l) hB
+    rw [hyp.mobiusSummand_of_nonempty _ g hBl, hyp.mobiusSummand_of_nonempty a g hB]
+    rw [hyp.conjFinset_card, hyp.card_hIntersection_conjFinset hconj l hB]
+    -- only the conjugating-set cardinality remains
+    congr 2
+    -- `|𝒜(g, H(B^l)·a^l)| = |𝒜(g, H(B)·a)|`
+    have hset : (↑(hIntersection hyp (hyp.conjFinset l B) hBl) : Set G)
+          * ({(hyp.conjA l a : G)} : Set G)
+        = (fun z => (l : G) * z * (l : G)⁻¹) ''
+            ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G)) := by
+      rw [hyp.hIntersection_conjFinset hconj l hB]
+      have hsmul : ∀ z : G, ((MulAut.conj (l : G))⁻¹ • z) = (l : G)⁻¹ * z * (l : G) := by
+        intro z
+        rw [show ((MulAut.conj (l : G))⁻¹ • z) = (MulAut.conj (l : G))⁻¹ z from rfl,
+          MulAut.conj_inv_apply]
+      ext y
+      simp only [Set.mem_mul, Set.mem_image, Set.mem_singleton_iff, conjA_coe,
+        SetLike.mem_coe]
+      constructor
+      · rintro ⟨p, hp, q, rfl, rfl⟩
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul] at hp
+        refine ⟨(l : G)⁻¹ * p * (l : G) * (a : G),
+          ⟨(l : G)⁻¹ * p * (l : G), hp, a, rfl, rfl⟩, by group⟩
+      · rintro ⟨z, ⟨p, hp, q, rfl, rfl⟩, rfl⟩
+        refine ⟨(l : G) * p * (l : G)⁻¹, ?_, (l : G) * (a : G) * (l : G)⁻¹, rfl, by group⟩
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul,
+          show (l : G)⁻¹ * ((l : G) * p * (l : G)⁻¹) * (l : G) = p from by group]
+        exact hp
+    rw [hset, card_conjFiber_conj_eq]
+  · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
+      rw [conjFinset, Finset.image_nonempty]; exact hB
+    simp only [mobiusSummand, dif_neg hBe, dif_neg hB]
+
+/-- **Peterfalvi (2.10), the `𝒫(b)`-sum is `L`-conjugation invariant.**  For `l ∈ L`,
+
+    `∑_{B ∈ 𝒫(a^l)} mobiusSummand (a^l) g B = ∑_{B₀ ∈ 𝒫(a)} mobiusSummand a g B₀`.
+
+The bijection `B₀ ↦ B₀^l` carries `𝒫(a)` to `𝒫(a^l)` (`mem_mobiusIndex_conjFinset`) and preserves
+the summand (`mobiusSummand_conjFinset`).  This is the `b = a^x` reindex of (2.10) (lines making the
+inner `𝒫(b)`-sum independent of `b ∈ a^L`). -/
+theorem sum_mobiusSummand_conjFinset (hconj : hyp.HConjInvariant) (l : L) (g : G)
+    (a : {a : G // a ∈ A}) :
+    ∑ B ∈ hyp.mobiusIndex (hyp.conjA l a), hyp.mobiusSummand (hyp.conjA l a) g B
+      = ∑ B₀ ∈ hyp.mobiusIndex a, hyp.mobiusSummand a g B₀ := by
+  classical
+  refine Finset.sum_bij' (fun B _ => hyp.conjFinset l⁻¹ B) (fun B₀ _ => hyp.conjFinset l B₀)
+    ?_ ?_ ?_ ?_ ?_
+  · -- `i : 𝒫(a^l) → 𝒫(a)`
+    intro B hB
+    have hmem := (hyp.mem_mobiusIndex_conjFinset l⁻¹ (a := hyp.conjA l a) (B := B)).mpr
+    rw [conjA_inv_conjA] at hmem
+    exact hmem hB
+  · -- `j : 𝒫(a) → 𝒫(a^l)`
+    intro B₀ hB₀
+    exact (hyp.mem_mobiusIndex_conjFinset l (a := a) (B := B₀)).mpr hB₀
+  · intro B _
+    show hyp.conjFinset l (hyp.conjFinset l⁻¹ B) = B
+    rw [← hyp.conjFinset_mul, mul_inv_cancel, hyp.conjFinset_one]
+  · intro B₀ _
+    show hyp.conjFinset l⁻¹ (hyp.conjFinset l B₀) = B₀
+    rw [← hyp.conjFinset_mul, inv_mul_cancel, hyp.conjFinset_one]
+  · -- summand agrees: `mobiusSummand (a^l) g B = mobiusSummand a g (B^{l⁻¹})`
+    intro B hB
+    show hyp.mobiusSummand (hyp.conjA l a) g B
+      = hyp.mobiusSummand a g (hyp.conjFinset l⁻¹ B)
+    have := hyp.mobiusSummand_conjFinset hconj l⁻¹ g (hyp.conjA l a) B
+    rw [conjA_inv_conjA] at this
+    exact this.symm
+
 end MobiusAssembly
 
 end SemidirectStructure
