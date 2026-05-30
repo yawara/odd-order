@@ -3749,6 +3749,125 @@ noncomputable def decompositionPairFromDadeOfIrreducible
     (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
     hχsupp hχbarsupp haχ1supp hmem0 hmema hχχ1 hχbarχ1 hχχbar
 
+/-- **Round C: the per-step (6.6) `hstep`, discharged from the Dade isometry + prior coherence.**
+
+One adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` of the (6.6)
+`coherentPairChain`, run against the (5.1) base map `τ = dadeIntegralCharacterMap` **as the running
+auxiliary isometry `τ₁ = τ`** itself.  This is the running-`τ₁` instantiation: rather than positing
+an opaque auxiliary isometry agreeing with `τ`, it takes `τ₁ := τ` and discharges the four
+agreement obligations of `retarget_isCoherent_of_sharedDecomposition` **internally**:
+
+* `htau1_agrees : τ(χ−χ̄) = τ(χ−χ̄)` and `htau1_diff : τ(χ−a·χ₁) = τ(χ−a·χ₁)` — both `rfl`
+  (the decomposition pair's `tau1` field *is* `τ`);
+* `htau1_chi1 : τ χ₁ = hS₁.extension χ₁` and the per-member `hmemTau1 : (Dmem x).tau1 x =
+  hS₁.extension x` — from `IsCoherent.extends_on_supported`: the running extension **agrees with the
+  base map `τ` on the supported sublattice** `Z[S₁, A]`, and `χ₁`, every member `x ∈ S₁` are
+  supported (`hchi1supp`, `hmemSupp`), so `(Dmem x).tau1 x = τ x = hS₁.extension x`.
+
+The `R(χ)` family and the two `ZIrr`-membership facts are supplied by Round B
+(`dadeOrthonormalCharacterImageFamily`, `dadeIntegralCharacterMap_mem_ZIrr_of_supported`); the
+lattice-relative inner-preservation `htau1_inner_eq` by
+`dadeIntegralCharacterMap_inner_eq_on_supported_span`.
+The remaining inputs — the (5.6.2) collapse `hY`, the per-member (5.2.e) image-orthogonality
+`hmemOrtho`, the source-orthogonalities `hχ_S1`/`hχbar_S1`/`hχχbar`, and the generation hypothesis
+`hgen` — are the genuine per-step (6.6) character-degree content (NOT the Dade isometry's
+responsibility; supplied by the (6.6) enumeration).  Each per-member decomposition `Dmem x` is
+likewise produced from the Dade isometry (e.g. `decompositionPairFromDadeOfIrreducible … .1`), with
+its `tau1` field equal to `τ` (`hmemTau1Base`).
+
+This closes the running-`τ₁` instantiation: a `coherentPairChain` step is now DISCHARGED from the
+real Dade τ + the prior coherence, with no opaque auxiliary-isometry agreement hypothesis. -/
+noncomputable def retarget_isCoherent_fromDade
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A')
+    (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L)
+    (haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (htau1_mem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - 0) ∈ ZIrr G)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
+    (hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1)
+    (hχbarχbar :
+      ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ).conj = 1)
+    (hχbarχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
+    (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
+    (hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A')
+    (hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal
+        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp))
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (hchi1supp : chi1 ∈ zSupportedSpan (L := ↥L) S₁ A')
+    (hχχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj chi1 = 0)
+    (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0)
+    (hY :
+      ((CharacterPsiDecomposition.decompositionPair
+        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+          (by
+            intro s hs
+            simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+            rcases hs with rfl | rfl | rfl | rfl
+            · exact hχsupp
+            · exact hχbarsupp
+            · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+            · exact haχ1supp) hφ hζ)
+        rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).Y =
+        a • ((CharacterPsiDecomposition.decompositionPair
+        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+          (by
+            intro s hs
+            simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+            rcases hs with rfl | rfl | rfl | rfl
+            · exact hχsupp
+            · exact hχbarsupp
+            · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+            · exact haχ1supp) hφ hζ)
+        rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1)
+    (hgen : zSupportedSpan (L := ↥L) (S₁ ∪ {(χ : ClassFunction (↥L) ℂ),
+        (χ : ClassFunction (↥L) ℂ).conj}) A' ⊆
+      Submodule.span ℤ (zSupportedSpan (L := ↥L) S₁ A' ∪
+        {(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
+         (χ : ClassFunction (↥L) ℂ) - a • chi1})) :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
+  retarget_isCoherent_of_sharedDecomposition hS₁
+    (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+      (by
+        intro s hs
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+        rcases hs with rfl | rfl | rfl | rfl
+        · exact hχsupp
+        · exact hχbarsupp
+        · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+        · exact haχ1supp) hφ hζ)
+    rfl htau1_mem0 htau1_mema rfl hχχ hχbarχbar hχχbar' hχbarχ hχχ1 hχbarχ1 hχχbar'
+    Dmem hmemOrtho
+    -- `hmemTau1`: `(Dmem x).tau1 x = τ x = hS₁.extension x` (member supported ⇒ `extends`).
+    (fun x hx => by
+      rw [hmemTau1Base x hx, (hS₁.extends_on_supported x (hmemSupp x hx)).symm])
+    hχ_S1 hχbar_S1 hchi1
+    -- `htau1_diff`: the `Da.tau1` field is literally `τ`, so this is `rfl`.
+    rfl hY
+    -- `htau1_chi1`: `τ χ₁ = hS₁.extension χ₁` (χ₁ supported ⇒ `extends_on_supported`).
+    (hS₁.extends_on_supported chi1 hchi1supp).symm
+    hgen
+
 end DadeBaseMap
 
 end OddOrder.Peterfalvi.S07

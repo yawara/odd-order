@@ -1372,3 +1372,27 @@ Round-24 (ii) per-step `(D₀, Da)` production を **実 Lean で**閉じた。s
   示す (`htau1_agrees`/`himg` を running extension に対し成立させる) のが Round C。それが済めば
   `coherentPairChain` の各 `hstep` が Dade 等距 + 前段 coherence から DISCHARGE され、
   `peterfalvi_66_coherence_of_X` が実 Dade τ で INSTANTIABLE になる。
+
+## Round C (2026-05-31): running-`τ₁` instantiation `retarget_isCoherent_fromDade`
+
+`coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` を **基底写像
+`τ = dadeIntegralCharacterMap` を running 補助等距 `τ₁ = τ` *そのもの* として** DISCHARGE する producer。
+Round B 残「running τ₁ = hS₁.extension への一般化」を閉じる。要点 = `τ₁ := τ` で
+`retarget_isCoherent_of_sharedDecomposition` の 4 agreement を **内部放電**:
+
+- `htau1_agrees`/`htau1_diff` — 共に `rfl` (decomposition の `tau1` field が `τ` そのもの)。
+- `htau1_chi1 : τ χ₁ = hS₁.extension χ₁` / per-member `hmemTau1 : (Dmem x).tau1 x = hS₁.extension x` —
+  **`IsCoherent.extends_on_supported`** から。running extension は supported sublattice `Z[S₁,A]` 上で
+  基底 `τ` と一致し、χ₁ も全 member `x∈S₁` も supported (`hchi1supp`/`hmemSupp`) ゆえ
+  `(Dmem x).tau1 x = τ x = hS₁.extension x`。これが「base case `τ₁=τ` を running extension へ一般化」の核心:
+  *running extension が新規 τ₁ を必要とせず、`τ` 自身が supported lattice 上の agreement を提供する*。
+- `R(χ)` + 2 `ZIrr` facts = Round B; `htau1_inner_eq` = `dadeIntegralCharacterMap_inner_eq_on_supported_span`。
+- per-member `Dmem x` も Dade 等距から生産 (`.tau1=τ` を `hmemTau1Base` で保証)。
+
+**残 input** = 真正 (6.6) 文字次数内容 (Dade 等距の責務外): (5.6.2) collapse `hY`、per-member (5.2.e)
+image-orthogonality `hmemOrtho`、source orthogonalities、generation `hgen`。これらは (6.6) enumeration が
+供給する degree 算術で、本 round の対象外 (roadmap "Residual (post-instantiation)" と一致)。
+
+**`peterfalvi_66_coherence_of_X` 完全 instantiate の到達性**: `hstep` から opaque 補助等距 agreement は
+除去済 (B+C)。だが各 step の `hY`/`hmemOrtho`/次数比/`hgen` がなお必要で、これは (6.6) per-step degree
+データの threading (別 round)。本 round は `retarget_isCoherent_fromDade` までを landing。

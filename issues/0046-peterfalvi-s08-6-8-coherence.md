@@ -979,6 +979,35 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
       `dadeIntegralCharacterMap_apply_one_eq_zero`/`dadeIntegralCharacterMap_mem_ZIrr_of_supported`/
       `dadeOrthonormalCharacterImageFamily`/`decompositionPairFromDadeOfIrreducible`) 全 3 axiom
       allowlist 内; full `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
+  - **Round C (2026-05-31) — running-`τ₁` instantiation `retarget_isCoherent_fromDade` 完了**:
+    `coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` を **(5.1) 基底写像
+    `τ = dadeIntegralCharacterMap` を running 補助等距 `τ₁ = τ` *そのもの* として** DISCHARGE する
+    producer。`retarget_isCoherent_of_sharedDecomposition` の 4 つの agreement 義務を **内部放電**:
+    - `htau1_agrees : τ(χ−χ̄)=τ(χ−χ̄)` / `htau1_diff : τ(χ−a·χ₁)=τ(χ−a·χ₁)` — 共に `rfl`
+      (decomposition の `tau1` field が `τ` そのもの)。
+    - `htau1_chi1 : τ χ₁ = hS₁.extension χ₁` / per-member `hmemTau1 : (Dmem x).tau1 x = hS₁.extension x`
+      — `IsCoherent.extends_on_supported` から: running extension は **supported sublattice
+      `Z[S₁,A]` 上で 基底 `τ` と一致**、χ₁ も全 member `x∈S₁` も supported (`hchi1supp`/`hmemSupp`)
+      ゆえ `(Dmem x).tau1 x = τ x = hS₁.extension x`。これが「running extension への一般化」の核心。
+    - `R(χ)` + 2 `ZIrr` facts = Round B (`dadeOrthonormalCharacterImageFamily`/
+      `dadeIntegralCharacterMap_mem_ZIrr_of_supported`); `htau1_inner_eq` =
+      `dadeIntegralCharacterMap_inner_eq_on_supported_span`。
+    - **残 input** = 真正 (6.6) 文字次数内容 (Dade 等距の責務外、(6.6) enumeration が供給):
+      (5.6.2) collapse `hY`、per-member (5.2.e) image-orthogonality `hmemOrtho`、source
+      orthogonalities `hχ_S1`/`hχbar_S1`/`hχχbar`、generation `hgen`。各 per-member decomposition
+      `Dmem x` も Dade 等距から生産 (`decompositionPairFromDadeOfIrreducible … .1`、`.tau1=τ` を
+      `hmemTau1Base` で保証)。
+    - これで **opaque な補助等距 agreement 仮説なしに** `coherentPairChain` step が 実 Dade τ +
+      前段 coherence から DISCHARGE される。B+C 合わせて per-step `hstep` の Dade-isometry 由来部分
+      (`τ₁` 構成・R(χ)・ZIrr・agreement) が全構成、(6.6) 由来の文字次数部分のみが supplied として残る。
+    - sorry/axiom 無; `#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent_fromDade`
+      3 axiom allowlist 内; full `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
+    - **`peterfalvi_66_coherence_of_X` 完全 instantiate の到達性 (正直評価)**: `hstep` から opaque
+      補助等距 agreement は除去済 (Round C)。ただし `peterfalvi_66_coherence_of_X` の `hstep` を
+      *完全に* 埋めるには各 step の `hY`/`hmemOrtho`/次数比/`hgen` (= (6.6) 列挙・degree 算術) が
+      なお必要で、これは Dade 等距の責務外 (roadmap の "Residual (post-instantiation)" と一致)。
+      よって本 round では `retarget_isCoherent_fromDade` までを landing し、完全 instantiate は
+      (6.6) per-step degree データの threading (別 round) に残す。
 
 ## 完了条件
 

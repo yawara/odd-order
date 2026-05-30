@@ -1413,6 +1413,19 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDadeOfIrreducible
 
+-- Round C: the running-`τ₁` instantiation.  `retarget_isCoherent_fromDade` discharges one (6.6)
+-- `coherentPairChain` step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` against the (5.1)
+-- base map `τ = dadeIntegralCharacterMap` AS the running auxiliary isometry `τ₁ = τ` itself.  The
+-- four agreement obligations of `retarget_isCoherent_of_sharedDecomposition` are discharged
+-- internally: `htau1_agrees`/`htau1_diff` are `rfl` (the decomposition's `tau1` field IS `τ`), and
+-- `htau1_chi1`/`hmemTau1` (agreement with the running `hS₁.extension` on `χ₁` and on every member
+-- `x ∈ S₁`) come from `IsCoherent.extends_on_supported` — the running extension agrees with `τ` on
+-- the supported sublattice `Z[S₁, A]`, where `χ₁` and the members are supported.  The `R(χ)` family +
+-- `ZIrr` facts are Round B; the residual inputs (`hY` (5.6.2) collapse, `hmemOrtho` (5.2.e) image
+-- orthogonality, source orthogonalities, `hgen`) are the genuine per-step (6.6) character-degree
+-- content (the (6.6) enumeration's responsibility, not the Dade isometry's).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent_fromDade
+
 -- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
 -- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
 -- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue
