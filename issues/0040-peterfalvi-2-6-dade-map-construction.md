@@ -365,6 +365,11 @@ IsDadeMap/isometry はもう (2.10) 非依存で構成済.
   `alphaB_conjFinset_eq_transportConj` + generic `induce_map_conj` で合成.  Invertible instance は
   `invertibleOfNonzero (card_pos.ne')` で局所供給.
 
+なお ℬ 代表系 / Möbius 用に `conjA` の Finset 作用律も landed:
+`conjFinset_one` (B^1=B), `conjFinset_mul` (B^{l₁l₂}=(B^{l₂})^{l₁}), `conjFinset_card`
+(|B^l|=|B|, Möbius sign `(-1)^|B|` 用).  これで `MulAction L (Finset {a//a∈A})` (orbit 商で
+ℬ を取る) は equational には準備済 (instance 化は未, 将来 transversal step で).
+
 **残 ((2.6.b) まで)**: (2.10.1) Dade-specific は**完了**.  残るは
 (2.10.3) Dade 点別値 (`card_conj_fiber` で `𝒜(g,H(B)b)` 集計) → ℬ 代表系 (項目 1, 構造的) →
 Möbius 相殺 (項目 4, `Finset.sum_involution`) → `PreservesVirtualCharacters` → `FullDadeIsometryData`.

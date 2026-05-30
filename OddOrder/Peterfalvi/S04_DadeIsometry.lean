@@ -1213,6 +1213,28 @@ theorem conjFinset_nonempty (hyp : Hypothesis G A L) {l : L}
   rw [conjFinset]
   exact hB.image _
 
+@[simp] theorem conjFinset_one (hyp : Hypothesis G A L) (B : Finset {a : G // a ∈ A}) :
+    hyp.conjFinset 1 B = B := by
+  classical
+  rw [conjFinset]
+  rw [show (hyp.conjA 1) = id from funext fun a => hyp.conjA_one a]
+  exact Finset.image_id
+
+theorem conjFinset_mul (hyp : Hypothesis G A L) (l₁ l₂ : L)
+    (B : Finset {a : G // a ∈ A}) :
+    hyp.conjFinset (l₁ * l₂) B = hyp.conjFinset l₁ (hyp.conjFinset l₂ B) := by
+  classical
+  rw [conjFinset, conjFinset, conjFinset, Finset.image_image]
+  exact Finset.image_congr (fun a _ => hyp.conjA_mul l₁ l₂ a)
+
+theorem conjFinset_card (hyp : Hypothesis G A L) (l : L) (B : Finset {a : G // a ∈ A}) :
+    (hyp.conjFinset l B).card = B.card := by
+  classical
+  rw [conjFinset, Finset.card_image_of_injective]
+  intro a b hab
+  have := congrArg (hyp.conjA l⁻¹) hab
+  rwa [conjA_inv_conjA, conjA_inv_conjA] at this
+
 /-- **Peterfalvi (2.10.1), `H(B^x) = H(B)^x`.**  Conjugation by `l ∈ L` carries `H(B)` to
 `H(B^l)`: `H(B^l) = l · H(B) · l⁻¹`.  Uses `(2.4.a)` (`mem_H_conjA_iff`): an element lies in
 `H(l·a·l⁻¹)` iff its `l`-untwist lies in `H(a)`. -/
