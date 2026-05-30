@@ -80,4 +80,21 @@ theorem eq_of_le (h : IsMaximalElementaryAbelian p E) (hF : F.IsElementaryAbelia
 
 end IsMaximalElementaryAbelian
 
+/-- **Existence of a maximal elementary abelian subgroup above a given one** (used by
+BG Theorem 5.3 ⇐). In a finite group, every `p`-elementary abelian subgroup `E` is
+contained in some `E* ∈ E*(R)`, i.e. a `p`-elementary abelian subgroup maximal under
+inclusion.
+
+This is a pure finite-poset maximality statement: take a `≤`-maximal element of the
+finite subgroup lattice among the `p`-elementary abelian subgroups containing `E`
+(`Finite.exists_le_maximal`); the maximality witness upgrades to
+`IsMaximalElementaryAbelian` via antisymmetry. -/
+theorem exists_maximalElementaryAbelian_ge
+    {p : ℕ} {R : Type*} [Group R] [Finite R] {E : Subgroup R}
+    (hE : E.IsElementaryAbelian p) :
+    ∃ F : Subgroup R, E ≤ F ∧ IsMaximalElementaryAbelian p F := by
+  obtain ⟨F, hEF, hFmax⟩ :=
+    Finite.exists_le_maximal (p := fun F : Subgroup R => F.IsElementaryAbelian p) hE
+  exact ⟨F, hEF, hFmax.1, fun G hG hFG => le_antisymm (hFmax.2 hG hFG) hFG⟩
+
 end OddOrder.GroupTheory
