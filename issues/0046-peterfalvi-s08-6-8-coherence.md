@@ -102,6 +102,34 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       - **`peterfalvi_673`** = (6.7.3) : 上記 chain を atoms 仮説から組む。**残依存** = atoms の group-theory
         証明 (`a_{110}=0`/`a_{120}=|C₁|` の構造定数計算, `|L| odd ⟹ z⁻¹∤z`, `ω(C_s)=α` 不変性, `(|C₁|,p)=1`)。
         これらは (6.7) full setup (`IsTISubset`+Sylow+`|C_L(z)|` const) を要する `needs-infra` (別 issue)。
+- [x] (2026-05-30) **(6.7.3) atom discharge (4 件中 3.5 件)** を `ClassSumAlgebra.lean` に landing
+      (commits 5105064 / 4588590 / 399945c / ed4fae7, 全 AxiomsCheck 登録, unconditional)。
+      `peterfalvi_673` の 8 仮説のうち group-theory atoms を放電する standalone 補題群を実装:
+      - **構造定数 (i)**: `classSumCoeff_one_eq_zero` (= `a_{110}=0`; 抽象仮説 `∀u, mk u=Ci → mk u⁻¹≠Cj`
+        で identity class 係数 = 0; filter 空) / `classSumCoeff_one_eq_card` (= `a_{120}=|C₁|`; `Cj` が
+        inverse class なら係数 = `|Ci|`; bijection `u ↦ (u,u⁻¹)`)。`classSumCoeff` の filter 定義から直接。
+      - **z-keyed bridge**: `mk_inv_eq_of_mk_eq` (`mk a=mk b ⟹ mk a⁻¹=mk b⁻¹`, unconditional, 2 行;
+        `ConjClasses.isConj_inv` は import cycle `ClassSumAlgebra←ZIrr←IrrIndexing←BrauerPermutation`
+        で import 不可ゆえ local 再証明) / `classSumCoeff_self_one_eq_zero` (= `a_{110}=0` for `C₁=⟦z⟧`,
+        **唯一の仮説 = real-class atom `⟦z⁻¹⟧≠⟦z⟧`**) / `classSumCoeff_self_inv_one_eq_card`
+        (= `a_{120}=|C₁|` for `C₂=⟦z⁻¹⟧`, **完全 unconditional**)。
+      - **coprimality (iv)**: `card_class_eq_index_centralizer` (orbit-stabilizer: `|⟦z⟧|=[G:C_G(z)]`;
+        `ConjAct G` 作用, orbit=carrier, stabilizer=centralizer) / `coprime_card_class_card_sylow`
+        (= `(|C₁|,p)=1`; `P ≤ C_G(z)` (z∈Z(P)) ⟹ `[G:C_G(z)]∣[G:P]`, `p∤[G:P]`, `|P|=p^k`)。
+      - **(iii) の一部**: `centralCharacterOfRep_one` (= `ω(C₀)=1`; identity class singleton)。
+      - **残 atom (真の unconditional 化に残るもの)**:
+        (ii-wrap) **real-class atom `⟦z⁻¹⟧≠⟦z⟧`** の **TI-reduction** (`|L| odd` + `P^#` TI + `z∈P` ⟹
+          `¬IsConj_G z⁻¹ z`; Peterfalvi L122)。core `ConjClasses.eq_one_of_isConj_inv_of_odd_card` は
+          repo 既存 (`BrauerPermutation.lean`) だが, それを呼ぶ TI-reduction wrapper は **`ClassSumAlgebra`
+          に置けない** (上記 import cycle)。**downstream module (例: `ZIrr` か新規 file) に置く必要**。
+        (iii-collapse) **`centralCharacterOfRep_classSum_mul_cong_of_isTISubset` の RHS sum →
+          Peterfalvi `ψ(1)(a_{ij0}+a_{ij}α)` 形への collapse**。`{C_s∩Z≠∅}` を `{⟦1⟧}` (ω=1, 上記
+          `centralCharacterOfRep_one`) と `{C_s∩Z^#≠∅}` (ω=α, **atom iii = `ω` 不変性, `ψ`+`|C_L(z)|`
+          の Z^# 不変性に依存**) に分割し per-element count を regroup。これが最深部で `|C_L(z)|` const の
+          (6.7) setup 仕込みを要する `needs-infra`。
+      - **総括**: (i)/(iv)/`ω(C₀)=1` は完全放電。残るは (ii) の TI-reduction (cycle で配置先が `ClassSumAlgebra`
+        外) と (iii)+sum-collapse (`|C_L(z)|` const 依存)。**fully unconditional `peterfalvi_673` 化は
+        この 2 件が前提**で本 issue scope 内では未了 (PARTIAL)。
 
 ## 完了条件
 

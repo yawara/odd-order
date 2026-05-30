@@ -347,6 +347,34 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   残 atoms = 上記 (i)`a_{110}=0`/`a_{120}=|C₁|` 構造定数 + (iii)`ω(C_s)=α` const + (iv)`(|C₁|,p)=1` のみ
 >   (= 純粋に構造定数・指標値の計算; fixed-point-free の group-theory は本定理で解消済).
 
+> **進捗 2026-05-30 ((6.7.3) atom discharge — (i)/(iv)/`ω(C₀)=1` 完了, (ii)/(iii) 残)**:
+> `ClassSumAlgebra.lean` に (6.7.3) の group-theory atoms を放電する standalone 補題群を landing
+> (commits 5105064 / 4588590 / 399945c / ed4fae7, 全 AxiomsCheck 登録, unconditional). これで
+> `peterfalvi_673` の conditional 仮説のうち **構造定数 (i) と coprimality (iv) と (iii) の `ω(C₀)=1`
+> 部分が真の補題として独立に証明済**になった:
+> - **構造定数 (i)** (`section StructureCoeffAtIdentity`): `classSumCoeff_one_eq_zero` (`a_{110}=0`,
+>   抽象仮説 `∀u, mk u=Ci→mk u⁻¹≠Cj` で filter 空) / `classSumCoeff_one_eq_card` (`a_{120}=|C₁|`,
+>   `Cj` = inverse class で bijection `u↦(u,u⁻¹)`). z-keyed instance:
+>   `classSumCoeff_self_one_eq_zero` (`C₁=⟦z⟧`, **唯一の仮説 = `⟦z⁻¹⟧≠⟦z⟧`**) /
+>   `classSumCoeff_self_inv_one_eq_card` (`C₂=⟦z⁻¹⟧`, **完全 unconditional** — `mk_inv_eq_of_mk_eq`).
+> - **coprimality (iv)** (`section ClassSizeCoprime`, `[Finite G]`): `card_class_eq_index_centralizer`
+>   (orbit-stabilizer `|⟦z⟧|=[G:C_G(z)]`; `ConjAct G` 作用, `orbit=carrier`, `stabilizer=centralizer`,
+>   `toConjAct` 同型で card 移送 + `index_mul_card` cancel) / `coprime_card_class_card_sylow`
+>   (`(|C₁|,p)=1`; `P≤C_G(z)` (z∈Z(P)) ⟹ `[G:C_G(z)]∣[G:P]` (`index_dvd_of_le`), `p∤[G:P]`
+>   (`Sylow.not_dvd_index`), `|P|=p^k`).
+> - **(iii) の `ω(C₀)=1`** (`section Evaluation`): `centralCharacterOfRep_one` (identity class =
+>   singleton `{1}`, `ω=1·χ(1)/χ(1)=1`).
+> - **残 atom (fully unconditional `peterfalvi_673` 化の前提)**:
+>   (ii-wrap) real-class atom `⟦z⁻¹⟧≠⟦z⟧` の **TI-reduction** (`|L| odd`+`P^#` TI+`z∈P` ⟹
+>     `¬IsConj_G z⁻¹ z`, Peterfalvi L122). core `ConjClasses.eq_one_of_isConj_inv_of_odd_card` は repo
+>     既存 (`BrauerPermutation.lean`) だが TI-reduction wrapper は **import cycle
+>     `ClassSumAlgebra←ZIrr←IrrIndexing←BrauerPermutation` で `ClassSumAlgebra` に置けない** ⟹
+>     downstream module (例: `ZIrr` か新規 file) 行き.
+>   (iii-collapse) `centralCharacterOfRep_classSum_mul_cong_of_isTISubset` の RHS sum を Peterfalvi
+>     `ψ(1)(a_{ij0}+a_{ij}α)` 形へ collapse する補題. `{C_s∩Z≠∅}` を `{⟦1⟧}` (ω=1) と `{C_s∩Z^#≠∅}`
+>     (ω=α, **atom iii = `ω` 不変性, `ψ`+`|C_L(z)|` の Z^# 不変性依存**) に分割し per-element count を
+>     regroup. `|C_L(z)|` const の (6.7) setup 仕込みを要する最深 `needs-infra`.
+
 > **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
 > (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
 > `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
