@@ -219,6 +219,17 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 - (6.8) Sibley main thm の前準備
 - proof 内で [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` + algebraic integer congruence を使用 (両方 mathlib 不在; 新規 `OddOrder/RepresentationTheory/ClassSumAlgebraHom.lean` + `AlgInt.cong.lean` 要)
 
+> **進捗 2026-05-30 (issue 1000 完了)**: class-sum algebra + central character `ω_ρ` の整数性を
+> `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> - `classSum_mul` : `C_i · C_j = ∑_s m_s · C_s` の **正しい** explicit 形 (係数 `m_s = (classSum Ci * classSum Cj) C_s.out`
+>   = per-element 因子分解個数, 同一類上で定数; class-function 性は `classSum_mul_apply_conj`/`_out`).
+>   read-only plan の `classSumCoeff/|C_s|` 形は誤りで採用せず (issue 注意書き通り).
+> - `centralCharacterOfRep_classSum_mul` : `ω_ρ(C_i)·ω_ρ(C_j) = ∑_s m_s · ω_ρ(C_s)` (ℕ 係数; ω が ℂ-alg hom).
+> - `centralCharacterOfRep_classSum_isIntegral` : **`IsIntegral ℤ (ω_ρ(C))`**. 行列固有値論法を回避し,
+>   `{ω_ρ(C_s)}∪{1}` 生成の ℤ-部分加群 `N⊆ℂ` が乗法閉 (上記 product rule) かつ f.g. ⟹ `Submodule.toSubalgebra`
+>   で部分代数化 ⟹ `IsIntegral.of_mem_of_fg`. これが (6.7.3) の `ψ(z)≡ψ(1) (mod |P|)` で使う integrality 部品.
+> - 残: `AlgInt.cong` (合同 arithmetic in ℤ[ζ_n]) + a_{11}/a_{12} mod |P| の計算 = (6.7.3) 本体.
+
 **Lean 表現**: 
 ```lean
 theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]

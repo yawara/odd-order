@@ -16,14 +16,27 @@ created: 2026-05-30
 
 ## やること
 
-- [ ] 次の定理を sorry-free で証明:
+- [x] 次の定理を sorry-free で証明 (**完了 2026-05-30**, commit は worktree 履歴参照):
   ```lean
   theorem centralCharacterOfRep_classSum_isIntegral
-      {G V : Type*} [Group G] [Finite G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+      {G V : Type*} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
       [DecidableEq (ConjClasses G)]
       (ρ : Representation ℂ G V) [Representation.IsIrreducible ρ] (C : ConjClasses G) :
       IsIntegral ℤ (centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩)
   ```
+  実際の署名は `classSum` が `∑ g : G` を使う都合で `[Finite G]` ではなく `[Fintype G]` を採る
+  (本ファイルの既存 convention と一致).
+
+## 完了メモ (2026-05-30)
+
+`OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装。3 定理を AxiomsCheck 登録済
+(unconditional = propext/Classical.choice/Quot.sound のみ):
+- `classSum_mul` (PREREQ 1, 正しい per-element 係数形; read-only plan の `/|C_s|` 形は誤りで不採用),
+  補助 `classSum_mul_apply_conj` (係数の class-function 性) / `classSum_mul_apply_out`。
+- `centralCharacterOfRep_classSum_mul` (`ω_ρ(C_i)·ω_ρ(C_j) = ∑_s m_s·ω_ρ(C_s)`, ℕ 係数)。
+- `centralCharacterOfRep_classSum_isIntegral` (本体)。Route A (module-finite ℤ-subalgebra of ℂ):
+  `{ω_ρ(C_s)}∪{1}` 生成の `Submodule.span ℤ` が乗法閉 (product rule) かつ f.g. ⟹ `Submodule.toSubalgebra`
+  ⟹ `IsIntegral.of_mem_of_fg`。行列固有値論法 (Route B) は不要だった。
 
 ## 完了条件
 
