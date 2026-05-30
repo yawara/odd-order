@@ -623,6 +623,59 @@ theorem card_centralizer_eq (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
         (Nat.card_congr (Equiv.ofBijective f hf)).symm
     _ = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := Nat.card_prod _ _
 
+/-- **The `O_{π'}`-containment behind `(2.4)`/`(2.10.2)`.**  Any `x ∈ C_G(a)` whose
+order is prime to `|C_L(a)|` already lies in `H(a)`.
+
+Since `H(a) ⊴ C_G(a)` (`H_normalized`) with relative index `[C_G(a) : H(a)] =
+|C_L(a)|` (`card_centralizer_eq`), the element `x ^ |C_L(a)|` lies in `H(a)`
+(`pow_index_mem`); and `x` is itself a power of `x ^ |C_L(a)|` because `|C_L(a)|`
+is prime to `orderOf x` (Chinese remainder).  Equivalently, the image of `x` in
+`C_G(a)/H(a) ≅ C_L(a)` has order prime to `|C_L(a)|`, hence is trivial. -/
+theorem mem_H_of_mem_centralizer_coprime (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) {x : G}
+    (hx : x ∈ Subgroup.centralizer ({a.1} : Set G))
+    (hcop : Nat.Coprime (orderOf x) (Nat.card (centralizerIn L a.1))) :
+    x ∈ hyp.H a := by
+  classical
+  set C := Subgroup.centralizer ({a.1} : Set G) with hCdef
+  set m := Nat.card (centralizerIn L a.1) with hmdef
+  have hHaC : hyp.H a ≤ C := by rw [hCdef, hyp.centralizer_eq_sup a]; exact le_sup_left
+  -- `C_G(a)` normalizes `H(a)` (both directions of `H_normalized`).
+  have hCnorm : C ≤ Subgroup.normalizer (hyp.H a) := by
+    intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    refine ⟨fun hh => hyp.H_normalized a c hc h hh, fun hh => ?_⟩
+    have hmem := hyp.H_normalized a c⁻¹ (Subgroup.inv_mem _ hc) _ hh
+    have heq : c⁻¹ * (c * h * c⁻¹) * (c⁻¹)⁻¹ = h := by group
+    rwa [heq] at hmem
+  haveI hnormal : ((hyp.H a).subgroupOf C).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHaC).mpr hCnorm
+  -- `[C_G(a) : H(a)] = |C_L(a)|`.
+  have hindex : ((hyp.H a).subgroupOf C).index = m := by
+    have hcard_sub : Nat.card ((hyp.H a).subgroupOf C) = Nat.card (hyp.H a) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHaC).toEquiv
+    have hmul := Subgroup.index_mul_card ((hyp.H a).subgroupOf C)
+    rw [hcard_sub] at hmul
+    have hCcard : Nat.card C = Nat.card (hyp.H a) * m := by
+      rw [hCdef, hmdef]; exact hyp.card_centralizer_eq a
+    rw [hCcard] at hmul
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos (by rw [hmul]; ring)
+  -- `x ^ |C_L(a)| ∈ H(a)`.
+  have hxm : x ^ m ∈ hyp.H a := by
+    have hpow := Subgroup.pow_index_mem ((hyp.H a).subgroupOf C) (⟨x, hx⟩ : C)
+    rw [hindex, Subgroup.mem_subgroupOf] at hpow
+    simpa using hpow
+  -- `x` is a power of `x ^ |C_L(a)|`.
+  obtain ⟨k, hk1, hk0⟩ := Nat.chineseRemainder hcop 1 0
+  have hxk : x ^ k = x := by
+    have : x ^ k = x ^ 1 := pow_eq_pow_iff_modEq.mpr hk1
+    simpa using this
+  obtain ⟨j, rfl⟩ := (Nat.modEq_zero_iff_dvd).mp hk0
+  have hxeq : x = (x ^ m) ^ j := by rw [← pow_mul, hxk]
+  rw [hxeq]
+  exact (hyp.H a).pow_mem hxm j
+
 open Classical in
 /-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,
 the centralizers `|C_L(a)|`, summed over the `a ∈ A` whose coset `aH(a)` meets
@@ -790,6 +843,36 @@ theorem mem_hIntersection (hyp : Hypothesis G A L)
       rw [Finset.inf'_cons hs]
       exact Subgroup.mem_inf.mpr
         ⟨hx a (by simp), ih (fun b hb => hx b (by simp [hb]))⟩
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.2).**  For a nonempty `B ⊆ A` and `a ∈ A`, the centralizer of
+`a` inside `H(B)` is `H(B ∪ {a})`:  `C_G(a) ⊓ H(B) = H(insert a B)`.
+
+`⊇`: `H(insert a B) ⊆ H(a) ⊆ C_G(a)` and `⊆ H(B)`.  `⊆`: any
+`x ∈ C_G(a) ⊓ H(B)` has order dividing some `|H(b₀)|` (`b₀ ∈ B`), which is prime to
+`|C_L(a)|` by `(2.2.c)`, so `x ∈ H(a)` by `mem_H_of_mem_centralizer_coprime`. -/
+theorem centralizer_inf_hIntersection (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (a : {a : G // a ∈ A}) :
+    Subgroup.centralizer ({a.1} : Set G) ⊓ hIntersection hyp B hB
+      = hIntersection hyp (insert a B) (Finset.insert_nonempty a B) := by
+  classical
+  ext x
+  simp only [Subgroup.mem_inf, mem_hIntersection]
+  constructor
+  · rintro ⟨hxC, hxB⟩ b hb
+    rw [Finset.mem_insert] at hb
+    rcases hb with hb | hb
+    · rw [hb]
+      obtain ⟨b₀, hb₀⟩ := hB
+      have hcop : Nat.Coprime (orderOf x) (Nat.card (centralizerIn L a.1)) :=
+        Nat.Coprime.coprime_dvd_left ((hyp.H b₀).orderOf_dvd_natCard (hxB b₀ hb₀))
+          (hyp.centralizer_coprime b₀ a)
+      exact hyp.mem_H_of_mem_centralizer_coprime a hxC hcop
+    · exact hxB b hb
+  · intro hx
+    refine ⟨?_, fun b hb => hx b (Finset.mem_insert_of_mem hb)⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    exact (hyp.commute_of_mem_H a (hx a (Finset.mem_insert_self a B))).symm
 
 /-- **Peterfalvi (2.8), `N_L(B)`.**  The `L`-set-stabilizer of `B` under conjugation:
 `{ℓ ∈ L | ℓ permutes B}`.  Mathlib's `Subgroup.setNormalizer` is `Subgroup.normalizer`
