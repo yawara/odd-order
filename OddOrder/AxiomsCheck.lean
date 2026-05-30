@@ -750,6 +750,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.coprime_orderOf_card_hIntersection
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport
+-- Peterfalvi §4 (2.10.3) value case (N_L(B)-aggregated): `f_B` projects M(B) onto its N_L(B)-factor
+-- with H(B)-coset fibers (`dadeQuotientHom_eq_iff_mem_hIntersection_mul`,
+-- `dadeQuotientHom_mem_nLStabilizerIn`), so `(Ind_{M(B)} α_B)(g) = ⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`
+-- (`induce_alphaB_apply_eq_sum_nLStabilizerIn`): the conjFiber sum regrouped over the component `b`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.dadeQuotientHom_eq_iff_mem_hIntersection_mul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeQuotientHom_mem_nLStabilizerIn
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_sum_nLStabilizerIn
 -- Peterfalvi §4 (2.10) `L`-conjugacy transversal `ℬ`: the `conjFinset` action is a `MulAction`
 -- whose stabilizer is `N_L(B)` (`stabilizer_conjFinsetAction`), with `Quotient.out` representatives
 -- `L`-conjugate to their class (`transversalRep_conj`); the orbit-stabilizer weight

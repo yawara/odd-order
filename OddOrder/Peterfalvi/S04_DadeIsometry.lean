@@ -1699,6 +1699,152 @@ theorem induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport (hyp : Hypothesis G A
   rw [show (⟨b, hbA⟩ : {a : G // a ∈ A}).1 * c = c * b from (hccb.eq).symm]
   exact (isConj_iff.mpr ⟨x' * x⁻¹, hgconj⟩).symm
 
+/-- **The `N_L(B)`-component of an element of `M(B)`.**  For `m ∈ M(B)` and `b ∈ N_L(B)`, the
+quotient homomorphism `f_B = dadeQuotientHom` sends `m` to `b` (in `L`) exactly when `m` lies in
+the coset `H(B)·b`.  This realizes the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`: `f_B`
+projects onto the `N_L(B)`-factor, with fibers the `H(B)`-cosets.
+
+`(⇐)` `m = h·b` with `h ∈ H(B) = ker f_B`, `b ∈ N_L(B)` (retracted by `f_B`); `(⇒)` `m·b⁻¹` maps
+to `1` under `f_B`, hence lies in `ker f_B = H(B)`. -/
+theorem dadeQuotientHom_eq_iff_mem_hIntersection_mul (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) {b : G} (hb : b ∈ nLStabilizerIn hyp B) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) = b ↔
+      (m : G) ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G) := by
+  classical
+  set bM : mBSubgroup hyp B hB := ⟨b, hyp.nLStabilizerIn_le_mBSubgroup hB hb⟩ with hbM
+  have hfbM : ((hyp.dadeQuotientHom hconj hB bM : L) : G) = b :=
+    hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB bM hb
+  constructor
+  · intro hfm
+    -- `m * bM⁻¹ ∈ ker = H(B)`
+    have hker : (m * bM⁻¹ : mBSubgroup hyp B hB) ∈ (hyp.dadeQuotientHom hconj hB).ker := by
+      rw [MonoidHom.mem_ker, map_mul, map_inv]
+      apply Subtype.ext
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, hfm, hfbM, mul_inv_cancel]
+      rfl
+    rw [hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf] at hker
+    -- `(m * bM⁻¹ : G) = (m:G) * b⁻¹ ∈ H(B)`, so `(m:G) = (that) * b ∈ H(B)·b`
+    refine ⟨(m : G) * b⁻¹, ?_, b, rfl, ?_⟩
+    · have : ((m * bM⁻¹ : mBSubgroup hyp B hB) : G) = (m : G) * b⁻¹ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv]
+      rwa [this] at hker
+    · group
+  · rintro ⟨h, hh, _, rfl, hmeq⟩
+    -- `m = h·b` with `h ∈ H(B)`, so `f_B(m) = f_B(h)·f_B(b) = 1·b = b`
+    have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+    have hmsplit : m = (⟨h, hhM⟩ : mBSubgroup hyp B hB) * bM := by
+      apply Subtype.ext; rw [Subgroup.coe_mul]; exact hmeq.symm
+    have hfh : hyp.dadeQuotientHom hconj hB ⟨h, hhM⟩ = 1 := by
+      rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf]
+      exact hh
+    rw [hmsplit, map_mul, hfh, one_mul, hfbM]
+
+/-- The `f_B`-image of any `m ∈ M(B)` lands in the `N_L(B)`-factor: `f_B(m) ∈ N_L(B)`.
+This is structural — `f_B = dadeQuotientHom` factors through the inclusion `N_L(B) ≤ L`. -/
+theorem dadeQuotientHom_mem_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) ∈ nLStabilizerIn hyp B := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  -- `dadeQuotientHom m = inclusion(N_L(B) ≤ L) z` for `z = …`
+  set z : nLStabilizerIn hyp B :=
+    (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB))
+      ((hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv (QuotientGroup.mk' _ m)) with hz
+  have hval : hyp.dadeQuotientHom hconj hB m = Subgroup.inclusion (hyp.nLStabilizerIn_le_L B) z :=
+    rfl
+  rw [hval]
+  exact z.2
+
+open Classical in
+/-- **Peterfalvi (2.10.3), the `N_L(B)`-aggregated value (value case, before specialization).**
+The pointwise value of `Ind_{M(B)}^G α_B` regrouped over the `N_L(B)`-component `b` of the
+conjugate `x⁻¹ g x`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{b ∈ N_L(B)} α(b) · |𝒜(g, H(B)·b)|`.
+
+This is the heart of (2.10.3): the conjugating set `𝒜(g, M(B))` partitions over the
+`N_L(B)`-factor of `M(B) = H(B) ⋊ N_L(B)`; on the fiber `{x : comp(x⁻¹gx) = b}` the induction
+summand is the constant `α(b)` (the (2.9) defining equation, `alphaB_apply_mul`), and that fiber is
+exactly `𝒜(g, H(B)·b)` (`dadeQuotientHom_eq_iff_mem_hIntersection_mul`).  The textbook value
+formula `(α(a)/|M(B)|)·∑_{b ∈ N_L(B)∩a^L} |𝒜(g, H(B)b)|` follows by discarding the `b ∉ a^L` terms
+(where `α(b) = 0` by support of `α`) once `g ∈ (aH(a))^G` is fixed. -/
+theorem induce_alphaB_apply_eq_sum_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : ClassFunction L ℂ) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ b : (nLStabilizerIn hyp B),
+            α ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ *
+              (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card := by
+  rw [induce_alphaB_apply_eq_sum_conjFiber hyp hconj hB α g]
+  congr 1
+  -- The component map sends `𝒜(g, M(B))` into `N_L(B)` (the `f_B`-image, with a junk default).
+  set φ : G → nLStabilizerIn hyp B := fun x =>
+    if hx : x⁻¹ * g * x ∈ mBSubgroup hyp B hB then
+      ⟨((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hx⟩ : L) : G),
+        hyp.dadeQuotientHom_mem_nLStabilizerIn hconj hB ⟨x⁻¹ * g * x, hx⟩⟩
+    else 1 with hφ
+  have hmaps : ∀ x ∈ conjFiber g (↑(mBSubgroup hyp B hB) : Set G),
+      φ x ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)) := fun x _ => Finset.mem_univ _
+  rw [← Finset.sum_fiberwise_of_maps_to hmaps
+    (f := fun x => ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g)]
+  apply Finset.sum_congr rfl
+  intro b _
+  -- the fiber over `b` is `𝒜(g, H(B)·b)`, and the summand is constant `α(b)` there
+  have hfiber_eq : (conjFiber g (↑(mBSubgroup hyp B hB) : Set G)).filter (fun x => φ x = b)
+      = conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G)) := by
+    ext x
+    simp only [Finset.mem_filter, mem_conjFiber]
+    -- value of `φ x` when `x⁻¹gx ∈ M(B)`
+    have hφval : ∀ hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB,
+        ((φ x : nLStabilizerIn hyp B) : G)
+          = ((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) := by
+      intro hxM
+      simp only [hφ, dif_pos hxM]
+    constructor
+    · rintro ⟨hxM, hφx⟩
+      have hφx' : ((hyp.dadeQuotientHom hconj hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) = (b : G) := by
+        rw [← hφval hxM, hφx]
+      exact (hyp.dadeQuotientHom_eq_iff_mem_hIntersection_mul hconj hB
+        ⟨x⁻¹ * g * x, hxM⟩ b.2).mp hφx'
+    · intro hxHb
+      rw [Set.mem_mul] at hxHb
+      obtain ⟨h, hh, b', hb', hmeq⟩ := hxHb
+      rw [Set.mem_singleton_iff] at hb'
+      subst hb'
+      have hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB := by
+        rw [← hmeq]
+        exact (mBSubgroup hyp B hB).mul_mem (hyp.hIntersection_le_mBSubgroup hB hh)
+          (hyp.nLStabilizerIn_le_mBSubgroup hB b.2)
+      refine ⟨hxM, ?_⟩
+      apply Subtype.ext
+      rw [hφval hxM]
+      exact (hyp.dadeQuotientHom_eq_iff_mem_hIntersection_mul hconj hB
+        ⟨x⁻¹ * g * x, hxM⟩ b.2).mpr ⟨h, hh, _, rfl, hmeq⟩
+  rw [hfiber_eq]
+  -- on `𝒜(g, H(B)·b)` every summand is `α(b)`
+  have hconst : ∀ x ∈ conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G)),
+      ClassFunction.induceTerm (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) x g
+        = α ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ := by
+    intro x hx
+    rw [mem_conjFiber] at hx
+    rw [Set.mem_mul] at hx
+    obtain ⟨h, hh, b', hb', hmeq⟩ := hx
+    rw [Set.mem_singleton_iff] at hb'
+    subst hb'
+    have hxM : x⁻¹ * g * x ∈ mBSubgroup hyp B hB := by
+      rw [← hmeq]
+      exact (mBSubgroup hyp B hB).mul_mem (hyp.hIntersection_le_mBSubgroup hB hh)
+        (hyp.nLStabilizerIn_le_mBSubgroup hB b.2)
+    rw [alphaB_induceTerm_of_mem hyp hconj hB α hxM]
+    have harg : (⟨x⁻¹ * g * x, hxM⟩ : mBSubgroup hyp B hB)
+        = ⟨h * (b : G), by rw [hmeq]; exact hxM⟩ := Subtype.ext hmeq.symm
+    rw [harg]
+    exact hyp.alphaB_apply_mul hconj hB α hh b.2 _
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul, mul_comm]
+
 end PointwiseValue
 
 /- 2.10/2.6.b: The right-hand side of the inclusion–exclusion is a virtual character. -/
