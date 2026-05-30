@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.IndexNormal
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
@@ -277,7 +278,142 @@ it directly (no wrapper, per project policy):
 These are exactly BG Proposition 4.3(a) in the `cl ≤ 2` case; the BG-facing uses
 (e.g. Lemma 4.5(c), applying 4.3(a) to `Z₂(R)`) call them directly. The
 `cl ≤ 3, p > 3` branch of 4.3 (regular-`p`-group collection, mmd L1410-1472, which
-needs the `(uv)^n` triple-commutator expansion (4.4)) is deferred. -/
+needs the `(uv)^n` triple-commutator expansion (4.4)) is developed below: its
+**mathematical core**, the iterated commutator power law (4.4)-precursor under
+`cl ≤ 3`, is supplied here sorry-free (`commutatorElement_pow_left_of_triple_central`).
+The full `(u*v)^n` collection bookkeeping and the `|R|`-induction packaging the
+exponent-`≤ p` conclusion as `Omega.pow_eq_one_of_class_le_three` remain to be
+assembled on top of this core (they additionally need `γ₄(R) = 1` collection and a
+maximal-subgroup induction; see the section below). -/
+
+/-! ## §4A: iterated commutator power law under `cl ≤ 3` (Proposition 4.3(a), `(4.4)`)
+
+BG Proposition 4.3(a), `p > 3` branch (mmd L1410-1472), runs the regular-`p`-group
+collection formula `(4.4)`. Its load-bearing ingredient is the **iterated commutator
+power law**: when `γ₃(G) = ⁅⁅G,G⁆,G⁆ ⊆ Z(G)` (class `≤ 3`), the left slot of a
+commutator collects as
+`⁅u ^ n, w⁆ = ⁅u, w⁆ ^ n * ⁅u, ⁅u, w⁆⁆ ^ (n.choose 2)`,
+the class-`3` analogue of Lemma 4.2(a)'s `⁅u ^ n, w⁆ = ⁅u, w⁆ ^ n` (which holds when
+`⁅u, w⁆` is itself central). The correction term `⁅u, ⁅u, w⁆⁆` is central here (it is
+`⁅⁅u, w⁆, u⁆⁻¹`, a `γ₃`-element), so it accumulates with the triangular exponent
+`n.choose 2`.
+
+This is the genuine mathematical content of `(4.4)` (no hidden hypotheses: `hc3` is
+exactly `cl ≤ 3`, constructible from any class-`≤ 3` group). It is the class-`3`
+sibling of the repo's class-`≤ 2` collection
+`OddOrder.GroupTheory.mul_pow_eq_commutator_pow_mul_of_class_le_two`, and is reused by
+the full `(u*v)^n` collection and by Lemma 4.5(c) / Prop 4.8.
+
+The hypothesis is taken in the pointwise form `∀ a b c, ⁅⁅a, b⁆, c⁆ ∈ Z(G)`; a
+`commutator (commutator ⊤) ≤ center` packaging converts to it via
+`Subgroup.commutator_mem_commutator` exactly as the class-`≤ 2` lemma does with
+`commutator K ≤ center K`. -/
+
+section Prop43ClassThreeCollection
+
+open scoped commutatorElement
+
+variable {G : Type*} [Group G]
+
+/-- Drop a central right factor inside a commutator's right slot: `⁅u, A * z⁆ = ⁅u, A⁆`
+when `z` is central.
+
+Used to discard the central correction term produced by the inductive expansion of
+`⁅u ^ n, w⁆` before iterating the right slot. -/
+private theorem commutatorElement_right_mul_central {u A z : G}
+    (hz : z ∈ Subgroup.center G) : ⁅u, A * z⁆ = ⁅u, A⁆ := by
+  simp only [commutatorElement_def]
+  have hc : ∀ g : G, z * g = g * z := fun g => (Subgroup.mem_center_iff.mp hz g).symm
+  rw [mul_inv_rev]
+  calc u * (A * z) * u⁻¹ * (z⁻¹ * A⁻¹)
+      = u * A * (z * u⁻¹) * (z⁻¹ * A⁻¹) := by group
+    _ = u * A * (u⁻¹ * z) * (z⁻¹ * A⁻¹) := by rw [hc u⁻¹]
+    _ = u * A * u⁻¹ * A⁻¹ := by group
+
+/-- Collect a central element to the right: `z ^ m * (a * z ^ j) * b = a * b * z ^ (j + m)`
+when `z` is central.
+
+The accumulation step for the `n.choose 2` exponent in the iterated commutator power
+law: after the inductive step exposes `z ^ k` (with `k = (k.choose 2)`-th batch) and a
+fresh `z ^ (k.choose 2)`, this merges them on the right past the non-central `a`, `b`. -/
+private theorem mul_central_pow_collect (z a b : G) (hz : ∀ g : G, Commute z g)
+    (m j : ℕ) : z ^ m * (a * z ^ j) * b = a * b * z ^ (j + m) := by
+  have hzk : ∀ (i : ℕ) (g : G), Commute (z ^ i) g := fun i g => (hz g).pow_left i
+  have hblock : Commute (z ^ j * z ^ m) b := (hzk j b).mul_left (hzk m b)
+  have h1 : z ^ m * (a * z ^ j) = a * (z ^ j * z ^ m) := by
+    rw [(hzk m (a * z ^ j)).eq, mul_assoc]
+  rw [h1, mul_assoc a, hblock.eq, ← mul_assoc, pow_add]
+
+/-- **BG Proposition 4.3(a), `(4.4)`-precursor: iterated commutator power law under
+`cl ≤ 3`.** If `γ₃(G) = ⁅⁅G,G⁆,G⁆ ⊆ Z(G)` (here `hc3 : ∀ a b c, ⁅⁅a, b⁆, c⁆ ∈ Z(G)`),
+then for all `u w : G` and `n : ℕ`,
+`⁅u ^ n, w⁆ = ⁅u, w⁆ ^ n * ⁅u, ⁅u, w⁆⁆ ^ (n.choose 2)`.
+
+This is BG's `[u^n, w] = [u, w]^n · [u, w, u]^{C(n,2)}` in mathlib's commutator
+convention `⁅a, b⁆ = a b a⁻¹ b⁻¹`; the correction commutator is
+`⁅u, ⁅u, w⁆⁆ = ⁅⁅u, w⁆, u⁆⁻¹`, a `γ₃`-element, hence central, so the positive exponent
+`n.choose 2` is recorded directly.
+
+Proof: induction on `n`. The product rule
+`⁅u ^ (k+1), w⁆ = ⁅u, ⁅u ^ k, w⁆⁆ · ⁅u ^ k, w⁆ · ⁅u, w⁆` (`group` after `commutatorElement_def`)
+exposes a `⁅u, ⁅u ^ k, w⁆⁆`; substitute the inductive hypothesis, drop the central
+correction factor inside its right slot (`commutatorElement_right_mul_central`),
+iterate the right slot via the central-commutator law
+`commutatorElement_pow_right_of_central` (Lemma 4.2(a), REUSED), and merge the central
+powers (`mul_central_pow_collect`); the exponent satisfies
+`(k+1).choose 2 = k.choose 2 + k` (`Nat.choose_succ_succ'`).
+
+This is the genuine class-`3` analogue of Lemma 4.2(a)
+(`commutatorElement_pow_left_of_central`, which needs `⁅u, w⁆` central) and the
+class-`3` sibling of the repo's class-`≤ 2` collection
+`OddOrder.GroupTheory.mul_pow_eq_commutator_pow_mul_of_class_le_two`. -/
+theorem commutatorElement_pow_left_of_triple_central
+    (hc3 : ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G) (u w : G) (n : ℕ) :
+    ⁅u ^ n, w⁆ = ⁅u, w⁆ ^ n * ⁅u, ⁅u, w⁆⁆ ^ (n.choose 2) := by
+  set d := ⁅u, ⁅u, w⁆⁆ with hd_def
+  -- `d = ⁅u, ⁅u, w⁆⁆ = ⁅⁅u, w⁆, u⁆⁻¹` is a `γ₃`-element, hence central.
+  have hd_cen : d ∈ Subgroup.center G := by
+    rw [hd_def, ← commutatorElement_inv]; exact (Subgroup.center G).inv_mem (hc3 u w u)
+  have hd_comm : ∀ g : G, Commute d g := fun g => (Subgroup.mem_center_iff.mp hd_cen g).symm
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    -- Product rule for the left slot, pure group identity.
+    have hbase : ⁅u ^ (k + 1), w⁆ = ⁅u, ⁅u ^ k, w⁆⁆ * ⁅u ^ k, w⁆ * ⁅u, w⁆ := by
+      rw [pow_succ' u k]; simp only [commutatorElement_def]; group
+    have hchoose : (k + 1).choose 2 = k.choose 2 + k := by
+      rw [Nat.choose_succ_succ' k 1, Nat.choose_one_right, Nat.add_comm]
+    rw [hbase, ih,
+        commutatorElement_right_mul_central
+          (u := u) (A := ⁅u, w⁆ ^ k) (z := d ^ (k.choose 2))
+          ((Subgroup.center G).pow_mem hd_cen _),
+        commutatorElement_pow_right_of_central hd_cen k,
+        hchoose, pow_succ ⁅u, w⁆ k]
+    exact mul_central_pow_collect d (⁅u, w⁆ ^ k) ⁅u, w⁆ hd_comm k (k.choose 2)
+
+/-- Base case `n = 2` of the `(u*v)^n` collection (`(4.4)`), pure group identity locking
+the formula shape: `(u * v) ^ 2 = u * ⁅v, u⁆ * u * v ^ 2`.
+
+For `cl ≤ 3` the inner commutator `⁅v, u⁆` is **not** central, so `(u*v)^n` does not
+have the class-`≤ 2` shape `(central) * u ^ n * v ^ n`; the collection must carry
+`⁅v, u⁆` through, generating `γ₃` corrections. This identity records the obstruction
+that the full `(4.4)` (still to be assembled on top of
+`commutatorElement_pow_left_of_triple_central`) has to resolve. -/
+theorem mul_pow_two_eq_mul_commutator (u v : G) :
+    (u * v) ^ 2 = u * ⁅v, u⁆ * u * v ^ 2 := by
+  simp only [commutatorElement_def, pow_two]; group
+
+/-- Bridge identity feeding the `(u*v)^n` collection induction: `v ^ k * u` exposes a
+single left-slot commutator power, `v ^ k * u = ⁅v ^ k, u⁆ * u * v ^ k`.
+
+Combined with `commutatorElement_pow_left_of_triple_central` (roles `v, u`) this yields
+`v ^ k * u = ⁅v, u⁆ ^ k * ⁅v, ⁅v, u⁆⁆ ^ (k.choose 2) * u * v ^ k`, the step that moves a
+block of `v`'s past a `u` during collection. -/
+theorem pow_mul_eq_commutator_mul (u v : G) (k : ℕ) :
+    v ^ k * u = ⁅v ^ k, u⁆ * u * v ^ k := by
+  rw [commutatorElement_def]; group
+
+end Prop43ClassThreeCollection
 
 /-! ## §4B: existence of elementary abelian `E_{p²}` subgroups (Lemma 4.5(a))
 
@@ -465,5 +601,538 @@ theorem scn3_empty_of_pRank_le_two (hr : pRank R p ≤ 2) (A : Subgroup R) :
     ¬ IsSCN₃ p A := fun h => not_le_pRank_of_pRank_le_two hr A h.le_pRank
 
 end SCN3Empty
+
+/-! ## §4C: BG Lemma 4.5(b) — cyclic subgroup of index `p` ⇒ `Ω₁(R) ≅ E_{p²}`
+
+BG Lemma 4.5(b) (mmd L1484, BG defers to **G** Theorems 5.4.3/5.4.4): for `p` odd, a
+**noncyclic** `p`-group `R` possessing a **cyclic** subgroup of index `p` has `Ω₁(R)`
+elementary abelian of order `p²`.
+
+BG's deferral is to the `M_m(p)` classification (Gorenstein 5.4.4: an odd nonabelian
+`p`-group with a cyclic maximal subgroup is the modular group `M_m(p)`). **We do not
+reconstruct the `M_m(p)` isomorphism.** The genuine content is `|Ω₁(R)| ≤ p²`, obtained
+through a uniform class-`≤ 2` route that is valid precisely because `p` is odd:
+
+* **`commutator R ≤ Z(R)`** (`commutator_le_center_of_cyclic_index_prime`): the Gorenstein
+  5.4.4 Frattini computation. With `H = ⟨x⟩` cyclic of index `p`, `H ⊴ R` and `x^p ∈ Z(R)`;
+  the latter is the irreducible number-theoretic heart, and we discharge it by **reusing the
+  Isaacs Thm 6.12 conjugation engine** (`OddOrder.Isaacs.Ch06`): for any `a ∈ R`,
+  `a x a⁻¹ = x^i` with `i^p ≡ 1 [ZMOD p^e]` (`conj_exponent_pow_modEq_one_of_pow_mem_zpowers`,
+  using `a^p ∈ H`), and Isaacs Lemma 6.16 (`pow_prime_modEq_one_cases`) forces — for `p`
+  *odd*, all `p = 2` branches vanish — `i ≡ 1 [ZMOD p^(e-1)]`, whence `a x^p a⁻¹ = x^p`
+  (`conj_exponent_not_modEq_one_of_pow_conj_ne`, contrapositive). With `x^p` central,
+  `R⧸⟨x^p⟩` has order `p²` (`= |R:H|·|H:⟨x^p⟩|`), hence is abelian, so `R' ≤ ⟨x^p⟩ ≤ Z(R)`.
+* `cl(R) ≤ 2` + `p` odd ⇒ `Ω₁(R)` has exponent `p` (`Omega.pow_eq_one_of_class_le_two`),
+  hence is elementary abelian.
+* rank bound **`|Ω₁(R)| ≤ p²`** (`card_omega1_le_prime_sq_of_cyclic_index_prime`): with
+  `K := Ω₁(R) ⊓ H`, `|K| ≤ p` (`K ≤ H` cyclic and exp `p`) and `Ω₁/K ↪ R/H` of order `p`
+  (`(Ω₁⊓H).relIndex Ω₁ ∣ H.index = p`), so `|Ω₁| = |K|·(Ω₁⊓H).relIndex Ω₁ ≤ p·p`.
+* noncyclic + `|Ω₁| ≤ p²` ⇒ `E_{p²}` via the prime-square classification
+  (`isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic`); `Ω₁` is
+  noncyclic because the two distinct order-`p` subgroups of `R` both lie in `Ω₁`.
+
+The `|Ω₁(R)| ≤ p²` bound is **proven from the cyclic-index-`p` hypothesis**, never assumed. -/
+
+section CyclicIndexP
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- ⚠ GENUINE SUB-LEMMA (the heart of 4.5(b)): for `p` odd and `H = ⟨x⟩ ⊴ R` cyclic of
+index `p` in a `p`-group `R`, the `p`-th power `x^p` is central.
+
+This is the Gorenstein 5.4.4 Frattini step, and where odd `p` is essential. For any
+`a ∈ R`, conjugation acts on the normal cyclic `H = ⟨x⟩` as `a x a⁻¹ = x^i`; since
+`a^p ∈ H` (as `|R:H| = p`), Isaacs Lemma 6.5-style bookkeeping gives `i^p ≡ 1 [ZMOD p^e]`
+(`orderOf x = p^e`), and Isaacs Lemma 6.16 (`pow_prime_modEq_one_cases`) — whose `p = 2`
+alternatives are excluded by `p` odd — forces `i ≡ 1 [ZMOD p^(e-1)]`, which is exactly
+`a x^p a⁻¹ = x^p` (`conj_exponent_not_modEq_one_of_pow_conj_ne`, contrapositive). -/
+theorem pow_mem_center_of_cyclic_index_prime
+    (hR : IsPGroup p R) (hp_odd : Odd p) {x : R} (hHidx : (Subgroup.zpowers x).index = p) :
+    x ^ p ∈ Subgroup.center R := by
+  set H : Subgroup R := Subgroup.zpowers x with hH_def
+  -- `H ⊴ R` (index `p` = `minFac` in a `p`-group).
+  haveI hH_normal : H.Normal := by
+    have hp_prime : p.Prime := Fact.out
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR
+    have hm_ne : m ≠ 0 := by
+      rintro rfl
+      have : Nat.card R = 1 := by simpa using hm
+      have hdvd : p ∣ 1 := this ▸ hHidx ▸ H.index_dvd_card
+      exact hp_prime.not_dvd_one hdvd
+    have hmin : (Nat.card R).minFac = p := by rw [hm, hp_prime.pow_minFac hm_ne]
+    exact Subgroup.normal_of_index_eq_minFac_card (by rw [hHidx, hmin])
+  -- `orderOf x = p^e`.
+  obtain ⟨e, he_order⟩ := (IsPGroup.iff_orderOf.mp hR) x
+  rw [Subgroup.mem_center_iff]
+  intro a
+  -- It suffices to show `a * x^p * a⁻¹ = x^p` (i.e. `a` and `x^p` commute).
+  suffices hfix : a * x ^ p * a⁻¹ = x ^ p by
+    calc a * x ^ p = (a * x ^ p * a⁻¹) * a := by group
+      _ = x ^ p * a := by rw [hfix]
+  -- Degenerate case `e = 0` (`x = 1`): the goal is about `x^p = 1`, trivially fixed.
+  rcases Nat.eq_zero_or_pos e with he0 | he_pos
+  · have hx1 : x = 1 := orderOf_eq_one_iff.mp (by rw [he_order, he0, pow_zero])
+    rw [hx1]; group
+  -- Main case `e ≥ 1`. Conjugation by `a` sends `x` into `H = ⟨x⟩`: `a x a⁻¹ = x^i`.
+  have hconj_mem : a * x * a⁻¹ ∈ Subgroup.zpowers x :=
+    hH_normal.conj_mem x (Subgroup.mem_zpowers x) a
+  obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp hconj_mem
+  have h_conj : a * x * a⁻¹ = x ^ i := hi.symm
+  -- `a^p ∈ H = ⟨x⟩` (since `|R : H| = p`).
+  have ha_pow_mem : a ^ p ∈ Subgroup.zpowers x := by
+    have := H.pow_index_mem a
+    rwa [hHidx] at this
+  -- `i^p ≡ 1 [ZMOD p^e]`.
+  have hpow_mod : i ^ p ≡ 1 [ZMOD ((p : ℤ) ^ e)] :=
+    OddOrder.Isaacs.Ch06.conj_exponent_pow_modEq_one_of_pow_mem_zpowers
+      he_order h_conj ha_pow_mem
+  -- For `p` odd, Lemma 6.16 leaves only `i ≡ 1 [ZMOD p^(e-1)]`.
+  have hp_ne_two : p ≠ 2 := by
+    rintro rfl; exact (Nat.not_odd_iff_even.mpr (by norm_num)) hp_odd
+  have hmod_one : i ≡ 1 [ZMOD ((p : ℤ) ^ (e - 1))] := by
+    rcases OddOrder.Isaacs.Ch06.pow_prime_modEq_one_cases (Fact.out : p.Prime) he_pos hpow_mod
+      with h | h2 | h2
+    · exact h
+    · exact absurd h2.1 hp_ne_two
+    · exact absurd h2.1 hp_ne_two
+  -- `i ≡ 1 [ZMOD p^(e-1)]` ⇒ `a x^p a⁻¹ = x^p` (contrapositive of the noncentrality lemma).
+  by_contra hne
+  exact OddOrder.Isaacs.Ch06.conj_exponent_not_modEq_one_of_pow_conj_ne
+    he_pos he_order h_conj hne hmod_one
+
+/-- ⚠ GENUINE SUB-LEMMA (the heart of 4.5(b)): for `p` odd and `R` a `p`-group with a
+cyclic subgroup `H = ⟨x⟩` of index `p`, the nilpotence class is `≤ 2`,
+`commutator R ≤ Z(R)`.
+
+`H ⊴ R` and `x^p ∈ Z(R)` (`pow_mem_center_of_cyclic_index_prime`). Then `⟨x^p⟩ ⊴ R` is
+central, and `R⧸⟨x^p⟩` has order `p²` (`= |R:H|·|H:⟨x^p⟩| = p·p`), hence is abelian, so
+`commutator R ≤ ⟨x^p⟩ ≤ Z(R)`. The order computation uses `|H| = orderOf x = p^e`
+(`e ≥ 1`) and `|⟨x^p⟩| = orderOf (x^p) = p^(e-1)`. -/
+theorem commutator_le_center_of_cyclic_index_prime
+    (hR : IsPGroup p R) (hp_odd : Odd p) {x : R} (hHidx : (Subgroup.zpowers x).index = p) :
+    _root_.commutator R ≤ Subgroup.center R := by
+  have hp_prime : p.Prime := Fact.out
+  set H : Subgroup R := Subgroup.zpowers x with hH_def
+  -- `x^p` is central.
+  have hxp_center : x ^ p ∈ Subgroup.center R :=
+    pow_mem_center_of_cyclic_index_prime hR hp_odd hHidx
+  -- `N := ⟨x^p⟩` is central, hence normal.
+  set N : Subgroup R := Subgroup.zpowers (x ^ p) with hN_def
+  have hN_le_center : N ≤ Subgroup.center R := by
+    rw [hN_def, Subgroup.zpowers_le]; exact hxp_center
+  haveI hN_normal : N.Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hgn : g * n = n * g := Subgroup.mem_center_iff.mp (hN_le_center hn) g
+    simpa [mul_assoc, hgn] using hn
+  -- `orderOf x = p^e`.
+  obtain ⟨e, he_order⟩ := (IsPGroup.iff_orderOf.mp hR) x
+  -- Degenerate case `e = 0` (`x = 1`): `H = ⊥`, `|R| = p`, so `R` is cyclic (hence
+  -- commutative) and `commutator R = ⊥ ≤ Z(R)`.
+  rcases Nat.eq_zero_or_pos e with he0 | he_pos
+  · have hx1 : x = 1 := orderOf_eq_one_iff.mp (by rw [he_order, he0, pow_zero])
+    have hHbot : H = ⊥ := by rw [hH_def, hx1, Subgroup.zpowers_one_eq_bot]
+    have hcardR : Nat.card R = p := by
+      have hidx : (⊥ : Subgroup R).index = Nat.card R := Subgroup.index_bot
+      rw [← hHbot, hHidx] at hidx; exact hidx.symm
+    haveI : IsCyclic R := isCyclic_of_prime_card hcardR
+    exact (commutator_eq_bot R).le.trans bot_le
+  -- Main case `e ≥ 1`. `|R| = p · orderOf x = p^(e+1)`.
+  have hcardR : Nat.card R = p ^ (e + 1) := by
+    have h1 : Nat.card H * H.index = Nat.card R := Subgroup.card_mul_index H
+    have hcardH : Nat.card H = p ^ e := by rw [hH_def, Nat.card_zpowers, he_order]
+    rw [hcardH, hHidx, ← pow_succ] at h1
+    exact h1.symm
+  -- `|N| = orderOf (x^p) = p^(e-1)`.
+  have hcardN : Nat.card N = p ^ (e - 1) := by
+    rw [hN_def, Nat.card_zpowers, orderOf_pow x, he_order]
+    -- `gcd (p^e) p = p`, so `p^e / p = p^(e-1)`.
+    have hgcd : Nat.gcd (p ^ e) p = p := by
+      have hdvd : p ∣ p ^ e := dvd_pow_self p he_pos.ne'
+      exact Nat.gcd_eq_right hdvd
+    rw [hgcd]
+    -- `p^e / p = p^e / p^1 = p^(e-1)`.
+    have : p ^ e / p = p ^ e / p ^ 1 := by rw [pow_one]
+    rw [this, Nat.pow_div he_pos hp_prime.pos]
+  -- `R ⧸ N` has order `p²`, hence abelian.
+  have hcard_quot : Nat.card (R ⧸ N) = p ^ 2 := by
+    have hmul : Nat.card N * N.index = Nat.card R := Subgroup.card_mul_index N
+    rw [hcardN, hcardR] at hmul
+    have hNidx : N.index = p ^ 2 := by
+      have he1 : (e - 1) + 2 = e + 1 := by omega
+      have : p ^ (e - 1) * N.index = p ^ (e - 1) * p ^ 2 := by
+        rw [hmul, ← pow_add, he1]
+      exact Nat.eq_of_mul_eq_mul_left (pow_pos hp_prime.pos _) this
+    rw [← Subgroup.index_eq_card]; exact hNidx
+  have hquot_comm : ∀ a b : R ⧸ N, a * b = b * a :=
+    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hcard_quot
+  -- `commutator R ≤ N ≤ Z(R)`.
+  have hcomm_le_N : _root_.commutator R ≤ N :=
+    hN_normal.quotient_commutative_iff_commutator_le.mp ⟨⟨hquot_comm⟩⟩
+  exact hcomm_le_N.trans hN_le_center
+
+/-- ⚠ GENUINE SUB-LEMMA (the rank bound of 4.5(b)): for `p` odd and `R` a `p`-group with a
+cyclic subgroup `H = ⟨x⟩` of index `p`, `|Ω₁(R)| ≤ p²`.
+
+Set `Ω := Ω₁(R)` and `K := Ω ⊓ H`. By `commutator_le_center_of_cyclic_index_prime`,
+`cl(R) ≤ 2`, so every element of `Ω` has `p`-th power `1` (`Omega.pow_eq_one_of_class_le_two`).
+Hence `K ≤ H` is a finite subgroup of the cyclic `H` with exponent dividing `p`, so
+`|K| ∣ p`. The second isomorphism `Ω⧸K ↪ R⧸H` (order `p`) gives
+`(Ω⊓H).relIndex Ω ∣ H.index = p`. Then
+`|Ω| = |K| · (Ω⊓H).relIndex Ω ≤ p · p`. -/
+theorem card_omega1_le_prime_sq_of_cyclic_index_prime
+    (hR : IsPGroup p R) (hp_odd : Odd p) {x : R} (hHidx : (Subgroup.zpowers x).index = p) :
+    Nat.card (Omega R p 1) ≤ p ^ 2 := by
+  set H : Subgroup R := Subgroup.zpowers x with hH_def
+  set Ω : Subgroup R := Omega R p 1 with hΩ_def
+  have hp_prime : p.Prime := Fact.out
+  -- `H ⊴ R`.
+  haveI hH_normal : H.Normal := by
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR
+    have hm_ne : m ≠ 0 := by
+      rintro rfl
+      have : Nat.card R = 1 := by simpa using hm
+      have hdvd : p ∣ 1 := this ▸ hHidx ▸ H.index_dvd_card
+      exact hp_prime.not_dvd_one hdvd
+    have hmin : (Nat.card R).minFac = p := by rw [hm, hp_prime.pow_minFac hm_ne]
+    exact Subgroup.normal_of_index_eq_minFac_card (by rw [hHidx, hmin])
+  -- `cl(R) ≤ 2`.
+  have hcl : _root_.commutator R ≤ Subgroup.center R :=
+    commutator_le_center_of_cyclic_index_prime hR hp_odd hHidx
+  -- Every element of `Ω` has `p`-th power `1`.
+  have hΩ_exp : ∀ g ∈ Ω, g ^ p = 1 := fun g hg =>
+    Omega.pow_eq_one_of_class_le_two hp_odd hcl hg
+  -- (1) `|K| ∣ p` where `K := Ω ⊓ H`.
+  set K : Subgroup R := Ω ⊓ H with hK_def
+  have hK_card_dvd : Nat.card K ∣ p := by
+    -- `K` is a subgroup of cyclic `H`, hence cyclic; its exponent divides `p`.
+    haveI hHcyc : IsCyclic H := by rw [hH_def]; exact Subgroup.isCyclic_zpowers x
+    haveI hK_cyc : IsCyclic K := by
+      -- `K.subgroupOf H` is a subgroup of the cyclic `H`, hence cyclic; transport to `K`.
+      have hKH : K ≤ H := inf_le_right
+      haveI : IsCyclic (K.subgroupOf H) := Subgroup.isCyclic _
+      exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hKH).surjective
+    -- exponent of `K` divides `p`.
+    have hexp_dvd : Monoid.exponent K ∣ p := by
+      rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+      intro g
+      apply Subtype.ext
+      have hgΩ : (g : R) ∈ Ω := (inf_le_left : K ≤ Ω) g.2
+      rw [SubmonoidClass.coe_pow]; simpa using hΩ_exp (g : R) hgΩ
+    -- cyclic ⇒ `card = exponent`.
+    have : Nat.card K = Monoid.exponent K := IsCyclic.exponent_eq_card.symm
+    rw [this]; exact hexp_dvd
+  have hK_le : Nat.card K ≤ p := Nat.le_of_dvd hp_prime.pos hK_card_dvd
+  -- (2) `(Ω ⊓ H).relIndex Ω ∣ p`.
+  have hrel_dvd : (Ω ⊓ H).relIndex Ω ∣ p := by
+    have h1 : (Ω ⊓ H).relIndex Ω = H.relIndex Ω := by
+      rw [inf_comm]; exact Subgroup.inf_relIndex_right H Ω
+    rw [h1]
+    have h2 : H.relIndex Ω ∣ H.index := Subgroup.relIndex_dvd_index_of_normal H Ω
+    rw [hHidx] at h2; exact h2
+  have hrel_le : (Ω ⊓ H).relIndex Ω ≤ p := Nat.le_of_dvd hp_prime.pos hrel_dvd
+  -- `|Ω| = |K| · (Ω ⊓ H).relIndex Ω`.
+  have hΩ_factor : Nat.card K * (Ω ⊓ H).relIndex Ω = Nat.card Ω := by
+    have hbot1 : (⊥ : Subgroup R).relIndex K = Nat.card K := Subgroup.relIndex_bot_left K
+    have hbot2 : (⊥ : Subgroup R).relIndex Ω = Nat.card Ω := Subgroup.relIndex_bot_left Ω
+    have hmrr := Subgroup.relIndex_mul_relIndex (⊥ : Subgroup R) K Ω
+      (bot_le) (inf_le_left)
+    rw [hbot1, hbot2] at hmrr
+    -- `(⊥).relIndex K = Nat.card K` and `K.relIndex Ω = (Ω⊓H).relIndex Ω`.
+    simpa [hK_def] using hmrr
+  -- Combine: `|Ω| ≤ p · p = p²`.
+  rw [← hΩ_factor]
+  calc Nat.card K * (Ω ⊓ H).relIndex Ω ≤ p * p := Nat.mul_le_mul hK_le hrel_le
+    _ = p ^ 2 := by rw [sq]
+
+/-- **BG Lemma 4.5(b)**, generator form (**G** Thms 5.4.3/5.4.4). For `p` odd, a noncyclic
+`p`-group `R` such that `⟨x⟩ = Subgroup.zpowers x` has index `p` has `Ω₁(R)` elementary
+abelian of order `p²`.
+
+The hard content `|Ω₁(R)| ≤ p²` is `card_omega1_le_prime_sq_of_cyclic_index_prime`
+(proven from the cyclic-index-`p` hypothesis via `cl(R) ≤ 2`, NOT hoisted). The finisher
+is the prime-square classification. `Ω₁(R)` is noncyclic because the two distinct order-`p`
+subgroups of `R` (Isaacs Thm 6.11) both lie in `Ω₁(R)`. The BG-facing statement
+(`isElementaryAbelian_omega1_of_isCyclic_index_prime`) takes an abstract cyclic subgroup
+`H` of index `p` and is reduced to this by extracting a generator. -/
+theorem isElementaryAbelian_omega1_of_cyclic_index_prime
+    (hR : IsPGroup p R) (hp_odd : Odd p) (hnc : ¬ IsCyclic R)
+    {x : R} (hHidx : (Subgroup.zpowers x).index = p) :
+    (Omega R p 1).IsElementaryAbelian p ∧ Nat.card (Omega R p 1) = p ^ 2 := by
+  have hp_prime : p.Prime := Fact.out
+  set Ω : Subgroup R := Omega R p 1 with hΩ_def
+  -- `Ω` is a `p`-group.
+  have hΩ_pgroup : IsPGroup p Ω := hR.to_subgroup _
+  -- `|Ω| ≤ p²` (the genuine crux).
+  have hle : Nat.card Ω ≤ p ^ 2 :=
+    card_omega1_le_prime_sq_of_cyclic_index_prime hR hp_odd hHidx
+  -- `Ω` is noncyclic: pull `R`'s two distinct order-`p` subgroups into `Ω`.
+  have hΩ_nc : ¬ IsCyclic Ω := by
+    obtain ⟨Ksub, Lsub, hK, hL, hKL⟩ :=
+      exists_distinct_subgroups_card_prime_of_not_isCyclic hR hp_odd hnc
+    -- order-`p` subgroups consist of `p`-torsion, hence sit inside `Ω`.
+    have mem_omega_of_card_p : ∀ (M : Subgroup R), Nat.card M = p → M ≤ Ω := by
+      intro M hM g hg
+      have hgp : g ^ p = 1 := by
+        have hM1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
+        have hcoe : g ^ Nat.card M = 1 := by
+          have := congrArg (Subtype.val) hM1
+          rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at this
+        rwa [hM] at hcoe
+      exact Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hgp)
+    have hKΩ : Ksub ≤ Ω := mem_omega_of_card_p Ksub hK
+    have hLΩ : Lsub ≤ Ω := mem_omega_of_card_p Lsub hL
+    intro hcyc
+    haveI : IsCyclic Ω := hcyc
+    -- `Ω` has exponent dividing `p` (class ≤ 2 + odd), and cyclic ⇒ `|Ω| = exponent ∣ p`.
+    have hcl : _root_.commutator R ≤ Subgroup.center R :=
+      commutator_le_center_of_cyclic_index_prime hR hp_odd hHidx
+    have hexp_dvd : Monoid.exponent Ω ∣ p := by
+      rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+      intro g; apply Subtype.ext
+      rw [SubmonoidClass.coe_pow]
+      simpa using Omega.pow_eq_one_of_class_le_two hp_odd hcl g.2
+    have hΩcard_dvd : Nat.card Ω ∣ p := by
+      rw [IsCyclic.exponent_eq_card (α := Ω)] at hexp_dvd; exact hexp_dvd
+    -- `|Ksub| = p ≤ |Ω| ∣ p` ⇒ `|Ω| = p`, then `Ksub = Ω` and `Lsub = Ω` by card.
+    have hp_le_Ω : p ≤ Nat.card Ω := hK ▸ Subgroup.card_le_of_le hKΩ
+    have hΩ_le_p : Nat.card Ω ≤ p := Nat.le_of_dvd hp_prime.pos hΩcard_dvd
+    have hΩcard : Nat.card Ω = p := le_antisymm hΩ_le_p hp_le_Ω
+    have hKeq : Ksub = Ω := Subgroup.eq_of_le_of_card_ge hKΩ (by rw [hΩcard, hK])
+    have hLeq : Lsub = Ω := Subgroup.eq_of_le_of_card_ge hLΩ (by rw [hΩcard, hL])
+    exact hKL (hKeq.trans hLeq.symm)
+  -- Finisher: noncyclic + `≤ p²` ⇒ `E_{p²}`.
+  obtain ⟨hElem, hCard⟩ :=
+    hΩ_pgroup.isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic hle hΩ_nc
+  exact ⟨hElem, hCard⟩
+
+/-- **BG Lemma 4.5(b)** (**G** Thms 5.4.3/5.4.4). For `p` odd, a noncyclic `p`-group `R`
+possessing a cyclic subgroup `H` of index `p` has `Ω₁(R)` elementary abelian of order `p²`.
+
+This is the faithful BG statement: `H` is an abstract cyclic subgroup of index `p`. The
+proof extracts a generator (`H = Subgroup.zpowers x`) and applies the generator-form
+`isElementaryAbelian_omega1_of_cyclic_index_prime`. Callers (BG Prop 4.11 / Thm 4.12)
+instantiate `R` at a noncyclic subgroup `S₁` having a cyclic subgroup `S` of relative
+index `p`. -/
+theorem isElementaryAbelian_omega1_of_isCyclic_index_prime
+    (hR : IsPGroup p R) (hp_odd : Odd p) (hnc : ¬ IsCyclic R)
+    {H : Subgroup R} (hHcyc : IsCyclic H) (hidx : H.index = p) :
+    (Omega R p 1).IsElementaryAbelian p ∧ Nat.card (Omega R p 1) = p ^ 2 := by
+  -- Extract an ambient generator `x` with `H = ⟨x⟩`.
+  obtain ⟨x, hx⟩ := (Subgroup.isCyclic_iff_exists_zpowers_eq_top H).mp hHcyc
+  have hHidx : (Subgroup.zpowers x).index = p := by rw [hx]; exact hidx
+  exact isElementaryAbelian_omega1_of_cyclic_index_prime hR hp_odd hnc hHidx
+
+end CyclicIndexP
+
+/-! ## §4C: `Ω₁` of a noncyclic metacyclic `p`-group (Lemma 4.10)
+
+BG Lemma 4.10 (mmd L1546-1552): for `p` odd and `R` a **metacyclic** `p`-group that is
+**not cyclic**, `Ω₁(R)` is elementary abelian of order `p²`.
+
+This is a corollary of BG Lemma 4.5(b)
+(`isElementaryAbelian_omega1_of_isCyclic_index_prime`, already in §4C above), via a
+reduction to the subgroup `T ≤ R` whose quotient `T/S = Ω₁(R/S)`.
+
+Concretely: take `S ⊴ R` with `S`, `R/S` cyclic (from `IsMetacyclic`). Set
+`T := comap (mk' S) (Ω₁(R/S))`, so `S ≤ T`. Two genuine facts are proved (not hoisted):
+
+* `Ω₁(R) = (Ω₁ ↥T).map T.subtype` — every `g` with `g^p = 1` has `mk' g ∈ Ω₁(R/S)`, hence
+  `g ∈ T`; conversely the `Ω₁`-generators of `↥T` map to `p`-torsion of `R`.
+* `S.relindex T = p` — via `relIndex_ker (mk' S) T = |T.map (mk' S)| = |Ω₁(R/S)| = p`,
+  where the last equality is `card_omega1_eq_prime_of_isCyclic` (the unique order-`p`
+  subgroup of the nontrivial cyclic `p`-group `R/S`).
+
+Then `S.subgroupOf T` is cyclic (`≅ S`, as `S ≤ T`) of index `S.relindex T = p` in the
+noncyclic `↥T`, so Lemma 4.5(b) applied to `↥T` gives `Ω₁(↥T) ≅ E_{p²}`; transfer the
+conclusion across the injective `T.subtype`. `↥T` is noncyclic because `Ω₁(↥T)` maps onto
+the noncyclic `Ω₁(R)` (noncyclic since `R` has two distinct order-`p` subgroups, both
+inside `Ω₁(R)`). -/
+
+section MetacyclicOmega
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- A nontrivial finite cyclic `p`-group `Q` has `|Ω₁(Q)| = p`.
+
+`Q` cyclic ⇒ commutative, so the generating set `{g | g^p = 1}` of `Ω₁(Q) = Omega Q p 1`
+is already the kernel of the `p`-th power map (`powMonoidHom p`), hence
+`Ω₁(Q) = (powMonoidHom p).ker`. Its cardinality is `(|Q|).gcd p`
+(`IsCyclic.card_powMonoidHom_ker`); for a nontrivial `p`-group `|Q| = p^k` with `k ≥ 1`, so
+`gcd(p^k, p) = p`. -/
+theorem card_omega1_eq_prime_of_isCyclic
+    {Q : Type*} [Group Q] [Finite Q] [IsCyclic Q] [Nontrivial Q] (hQ : IsPGroup p Q) :
+    Nat.card (Omega Q p 1) = p := by
+  have hp_prime : p.Prime := Fact.out
+  -- `Q` is commutative; use it for the `powMonoidHom` kernel cardinality lemma.
+  letI : CommGroup Q := IsCyclic.commGroup
+  -- `Ω₁(Q) = (powMonoidHom p).ker`: the generating set `{g | g^(p^1)=1}` *is* the kernel.
+  have hset : {g : Q | g ^ (p ^ 1) = 1} = ((powMonoidHom p : Q →* Q).ker : Set Q) := by
+    ext g
+    simp only [Set.mem_setOf_eq, pow_one, SetLike.mem_coe, MonoidHom.mem_ker, powMonoidHom_apply]
+  have hΩ_ker : Omega Q p 1 = (powMonoidHom p : Q →* Q).ker := by
+    rw [Omega, hset, Subgroup.closure_eq]
+  -- `|Q| = p^k` with `k ≥ 1` (nontrivial `p`-group).
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hQ
+  have hk_pos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with hk0 | hk0
+    · exact absurd (by rw [hk, hk0, pow_zero] : Nat.card Q = 1)
+        (by simpa using (Finite.one_lt_card (α := Q)).ne')
+    · exact hk0
+  -- `gcd(p^k, p) = p`.
+  have hgcd : (Nat.card Q).gcd p = p := by
+    rw [hk]; exact Nat.gcd_eq_right (dvd_pow_self p hk_pos.ne')
+  rw [hΩ_ker, IsCyclic.card_powMonoidHom_ker (G := Q) p, hgcd]
+
+/-- In a finite cyclic group `C`, two subgroups of order `p` (`p` prime) are equal.
+
+This is the uniqueness half behind "noncyclic ⇒ two distinct order-`p` subgroups". Proof: any
+order-`p` subgroup `K` has every element `p`-torsion (Lagrange), so `K ≤ (powMonoidHom p).ker`;
+and `|ker| = gcd(|C|, p) = p` since `p = |K|` divides `|C|`. Equal cardinalities force
+`K = ker`, so both `K` and `L` equal that unique kernel. -/
+private theorem subgroup_card_prime_unique_of_isCyclic
+    {C : Type*} [Group C] [Finite C] [IsCyclic C] {K L : Subgroup C}
+    (hK : Nat.card K = p) (hL : Nat.card L = p) : K = L := by
+  have hp_prime : p.Prime := Fact.out
+  letI : CommGroup C := IsCyclic.commGroup
+  -- Each order-`p` subgroup equals the unique order-`p` kernel `(powMonoidHom p).ker`.
+  have key : ∀ {M : Subgroup C}, Nat.card M = p → M = (powMonoidHom p : C →* C).ker := by
+    intro M hM
+    -- `M ≤ ker`: every element of `M` is `p`-torsion (Lagrange in `M`).
+    have hM_le : M ≤ (powMonoidHom p : C →* C).ker := by
+      intro g hg
+      rw [MonoidHom.mem_ker, powMonoidHom_apply]
+      have hg1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
+      have := congrArg (Subtype.val) hg1
+      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hM] at this
+    -- `|ker| = gcd(|C|, p) = p` (as `p = |M| ∣ |C|`).
+    have hp_dvd : p ∣ Nat.card C := hM ▸ M.card_subgroup_dvd_card
+    have hker_card : Nat.card (powMonoidHom p : C →* C).ker = p := by
+      rw [IsCyclic.card_powMonoidHom_ker (G := C) p, Nat.gcd_eq_right hp_dvd]
+    exact Subgroup.eq_of_le_of_card_ge hM_le (by rw [hker_card, hM])
+  exact (key hK).trans (key hL).symm
+
+/-- **BG Lemma 4.10** (mmd L1546-1552). For `p` odd, a noncyclic metacyclic `p`-group `R`
+has `Ω₁(R)` elementary abelian of order `p²`.
+
+Reduction to BG Lemma 4.5(b) (`isElementaryAbelian_omega1_of_isCyclic_index_prime`): with
+`S ⊴ R` cyclic and `R/S` cyclic, the subgroup `T = comap (mk' S) (Ω₁(R/S))` satisfies
+`Ω₁(R) = (Ω₁ ↥T).map T.subtype` and contains `S` with `S.relIndex T = p`; apply 4.5(b) to the
+noncyclic `↥T` (cyclic subgroup `S.subgroupOf T` of index `p`) and transfer. -/
+theorem isElementaryAbelian_omega1_of_isMetacyclic
+    (hR : IsPGroup p R) (hp_odd : Odd p) (hmeta : IsMetacyclic R) (hnc : ¬ IsCyclic R) :
+    (Omega R p 1).IsElementaryAbelian p ∧ Nat.card (Omega R p 1) = p ^ 2 := by
+  classical
+  -- Unpack the metacyclic structure.
+  obtain ⟨S, hS_norm, hS_cyc, hQ_cyc⟩ := hmeta
+  haveI := hS_norm
+  haveI : IsCyclic (R ⧸ S) := hQ_cyc
+  -- `R/S` is nontrivial: else `S = ⊤` and `R ≅ ↥S` is cyclic, contradicting `hnc`.
+  haveI hQ_nontriv : Nontrivial (R ⧸ S) := by
+    rcases subsingleton_or_nontrivial (R ⧸ S) with hsub | hnt
+    · exfalso
+      -- `R⧸S` subsingleton ⇒ `S.index = 1` ⇒ `S = ⊤`; then `↥(⊤) ≅ R` is cyclic.
+      have hidx1 : S.index = 1 := by
+        rw [Subgroup.index, Nat.card_eq_one_iff_unique]
+        exact ⟨hsub, ⟨1⟩⟩
+      have hStop : S = ⊤ := Subgroup.index_eq_one.mp hidx1
+      have : IsCyclic ↥(⊤ : Subgroup R) := hStop ▸ hS_cyc
+      exact hnc (isCyclic_of_surjective (Subgroup.topEquiv (G := R)).toMonoidHom
+        (Subgroup.topEquiv (G := R)).surjective)
+    · exact hnt
+  have hQ_pgroup : IsPGroup p (R ⧸ S) := hR.to_quotient S
+  -- `T := comap (mk' S) (Ω₁(R/S))`; `S ≤ T`.
+  set T : Subgroup R := Subgroup.comap (QuotientGroup.mk' S) (Omega (R ⧸ S) p 1) with hT_def
+  have hS_le_T : S ≤ T := by
+    rw [hT_def]; exact QuotientGroup.le_comap_mk' S _
+  have hT_pgroup : IsPGroup p T := hR.to_subgroup T
+  -- (a) `Ω₁(R) = (Ω₁ ↥T).map T.subtype`.
+  have hΩ_eq : Omega R p 1 = (Omega (↥T) p 1).map T.subtype := by
+    apply le_antisymm
+    · -- ⊆ : push each generator `g` (with `g^p = 1`) of `Ω₁(R)` into `T`, then into `Ω₁ ↥T`.
+      rw [Omega, Subgroup.closure_le]
+      intro g (hg : g ^ (p ^ 1) = 1)
+      rw [pow_one] at hg
+      have hgT : g ∈ T := by
+        rw [hT_def, Subgroup.mem_comap]
+        refine Omega.mem_of_pow_eq_one ?_
+        rw [pow_one, ← map_pow, hg, map_one]
+      change g ∈ Subgroup.map T.subtype (Omega (↥T) p 1)
+      rw [Subgroup.mem_map]
+      refine ⟨⟨g, hgT⟩, ?_, rfl⟩
+      refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]
+      ext
+      rw [SubmonoidClass.coe_pow, Subgroup.coe_mk, OneMemClass.coe_one, hg]
+    · -- ⊇ : the image of an `Ω₁ ↥T` generator lies in `Ω₁(R)`.
+      rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+      rintro ⟨g, hgT⟩ (hg : (⟨g, hgT⟩ : ↥T) ^ (p ^ 1) = 1)
+      change (⟨g, hgT⟩ : ↥T) ∈ Subgroup.comap T.subtype (Omega R p 1)
+      rw [Subgroup.mem_comap]
+      refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]
+      have hval := congrArg (Subgroup.subtype T) hg
+      rw [map_pow, pow_one, map_one] at hval
+      simpa using hval
+  -- `Ω₁(R) ≤ T` (image under `T.subtype` lands in `T`).
+  have hΩ_le_T : Omega R p 1 ≤ T := by
+    rw [hΩ_eq]; exact Subgroup.map_subtype_le _
+  -- (b) `S.relIndex T = p`.
+  have hSrel : S.relIndex T = p := by
+    have hker : S = (QuotientGroup.mk' S).ker := (QuotientGroup.ker_mk' S).symm
+    rw [hker, Subgroup.relIndex_ker, hT_def,
+      Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S)]
+    exact card_omega1_eq_prime_of_isCyclic hQ_pgroup
+  -- `↥T` noncyclic: pull `R`'s two distinct order-`p` subgroups into `↥T`.
+  have hT_nc : ¬ IsCyclic ↥T := by
+    intro hTcyc
+    obtain ⟨Ksub, Lsub, hK, hL, hKL⟩ :=
+      exists_distinct_subgroups_card_prime_of_not_isCyclic hR hp_odd hnc
+    -- order-`p` subgroups of `R` sit inside `Ω₁(R) ≤ T`.
+    have mem_omega_of_card_p : ∀ (M : Subgroup R), Nat.card M = p → M ≤ T := by
+      intro M hM g hg
+      have hgp : g ^ p = 1 := by
+        have hM1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
+        have hcoe : g ^ Nat.card M = 1 := by
+          have := congrArg (Subtype.val) hM1
+          rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at this
+        rwa [hM] at hcoe
+      exact hΩ_le_T (Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hgp))
+    have hKT : Ksub ≤ T := mem_omega_of_card_p Ksub hK
+    have hLT : Lsub ≤ T := mem_omega_of_card_p Lsub hL
+    -- their `subgroupOf T` versions have order `p`; uniqueness in cyclic `↥T` forces equality.
+    have hcardK : Nat.card (Ksub.subgroupOf T) = p := by
+      rw [← Subgroup.card_map_of_injective (K := Ksub.subgroupOf T) (f := T.subtype)
+            T.subtype_injective,
+        Subgroup.subgroupOf_map_subtype, inf_of_le_left hKT, hK]
+    have hcardL : Nat.card (Lsub.subgroupOf T) = p := by
+      rw [← Subgroup.card_map_of_injective (K := Lsub.subgroupOf T) (f := T.subtype)
+            T.subtype_injective,
+        Subgroup.subgroupOf_map_subtype, inf_of_le_left hLT, hL]
+    have hsub_eq : Ksub.subgroupOf T = Lsub.subgroupOf T :=
+      subgroup_card_prime_unique_of_isCyclic hcardK hcardL
+    -- map back along `T.subtype` to recover `Ksub = Lsub`, contradiction.
+    apply hKL
+    have := congrArg (Subgroup.map T.subtype) hsub_eq
+    rwa [Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left hKT, inf_of_le_left hLT] at this
+  -- `S.subgroupOf T` is cyclic (`≅ ↥S`) of index `p`.
+  have hSsub_cyc : IsCyclic ↥(S.subgroupOf T) :=
+    isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hS_le_T).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hS_le_T).symm.surjective
+  have hSsub_idx : (S.subgroupOf T).index = p := hSrel
+  -- Apply Lemma 4.5(b) to `↥T`.
+  obtain ⟨hΩT_elem, hΩT_card⟩ :=
+    isElementaryAbelian_omega1_of_isCyclic_index_prime hT_pgroup hp_odd hT_nc
+      hSsub_cyc hSsub_idx
+  -- Transfer `E_{p²}` across `T.subtype`.
+  refine ⟨?_, ?_⟩
+  · rw [hΩ_eq]; exact hΩT_elem.map T.subtype_injective
+  · rw [hΩ_eq, Subgroup.card_map_of_injective T.subtype_injective]; exact hΩT_card
+
+end MetacyclicOmega
 
 end OddOrder.BG.Ch1.S04
