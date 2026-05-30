@@ -3114,6 +3114,11 @@ theorem mobiusTermCF_of_nonempty (hconj : hyp.HConjInvariant) (α : ClassFunctio
       = (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm hconj α ⟨B, hB⟩ g := by
   rw [mobiusTermCF, dif_pos hB]
 
+theorem mobiusTermCF_of_not_nonempty (hconj : hyp.HConjInvariant) (α : ClassFunction L ℂ)
+    (g : G) {B : Finset {a : G // a ∈ A}} (hB : ¬ B.Nonempty) :
+    hyp.mobiusTermCF hconj α g B = 0 := by
+  rw [mobiusTermCF, dif_neg hB]
+
 /-- The orbit-averaging summand is `L`-conjugacy invariant: `mobiusTermCF (B^l) = mobiusTermCF B`.
 Uses `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) and `induceAlphaBTerm_conjFinset`
 (the packaged induced summand is invariant). -/
@@ -4054,6 +4059,74 @@ noncomputable def Hypothesis.dadeIsometryData (hconj : hyp.HConjInvariant) :
 @[simp] theorem Hypothesis.dadeIsometryData_toDadeMap (hconj : hyp.HConjInvariant) :
     (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) :=
   rfl
+
+/-! ### Peterfalvi (2.10), the pointwise inclusion–exclusion identity and `FullDadeIsometryData`
+
+The (2.10) identity `α^τ = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}` is now assembled from
+the support-side total `sum_mobiusTermCF_transversalRep_eq_neg` and the non-support vanishing
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`, then fed through the bridge
+`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` to construct the
+`FullDadeIsometryData`. -/
+
+open scoped Classical in
+/-- **Peterfalvi (2.10), the pointwise identity.**  For a supported class function `α ∈ CF(L, A)`,
+the Dade map equals the negated transversal sum of orbit-averaging summands:
+
+    `α^τ(g) = -∑_{C ∈ ℬ} mobiusTermCF (rep C) (g)`,
+
+where `mobiusTermCF (rep C) = (-1)^{|rep C|} Ind_{M(rep C)}^G α_{rep C}`.  On the Dade support
+(`g ∈ (aH(a))^G`) the transversal sum is `-α(a) = -α^τ(g)`
+(`sum_mobiusTermCF_transversalRep_eq_neg`); off the support both sides vanish — `α^τ(g) = 0` by the
+(2.5) definition, and each `Ind_{M(rep C)} α_{rep C}(g) = 0` by
+`induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`. -/
+theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    hyp.dadeMap (k := ℂ) α
+      = (⟨fun g => -∑ C : hyp.conjClassQuotient,
+            hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C),
+          by
+            intro g x
+            classical
+            simp only [neg_inj]
+            refine Finset.sum_congr rfl fun C _ => ?_
+            by_cases hC : (hyp.transversalRep C).Nonempty
+            · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+                invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+              rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC,
+                hyp.mobiusTermCF_of_nonempty hconj _ (x * g * x⁻¹) hC]
+              congr 1
+              rw [hyp.induceAlphaBTerm_apply hconj _ hC, hyp.induceAlphaBTerm_apply hconj _ hC]
+              exact (ClassFunction.induce (mBSubgroup hyp (hyp.transversalRep C) hC)
+                (alphaB hyp hconj hC (α : ClassFunction L ℂ))).2 g x
+            · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC,
+                hyp.mobiusTermCF_of_not_nonempty hconj _ (x * g * x⁻¹) hC]⟩
+          : ClassFunction G ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  refine ClassFunction.ext fun g => ?_
+  show hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
+    = -∑ C : hyp.conjClassQuotient,
+        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+  by_cases hg : g ∈ hyp.dadeSupport
+  · -- support side: the transversal sum is `-α(a)`.
+    obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+    rw [hyp.dadeValue_eq α hh hga,
+      hyp.sum_mobiusTermCF_transversalRep_eq_neg hconj α hh hga, neg_neg]
+  · -- non-support side: both sides are `0`.
+    rw [hyp.dadeValue_of_not_mem_dadeSupport α hg]
+    rw [show (∑ C : hyp.conjClassQuotient,
+          hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)) = 0 from ?_,
+      neg_zero]
+    refine Finset.sum_eq_zero fun C _ => ?_
+    by_cases hC : (hyp.transversalRep C).Nonempty
+    · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+        invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC, hyp.induceAlphaBTerm_apply hconj _ hC,
+        hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hconj hC α hg, mul_zero]
+    · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC]
 
 end AdjointFormula
 
