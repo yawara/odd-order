@@ -23,8 +23,9 @@
 | 2 | **Thm 4.12(b)(c)** T∩C=1, T/C cyclic, R'⊆T | `actionCommutator_inf_fixedPoints_eq_bot` (b) + `actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le` (c) + `IsMetacyclic.subgroup` | (a)✅ Prop1.6(a)(d)✅ Lem4.10✅ LEAF-4✅ | ✅**PASS (忠実版)** (commits 8e8240e/09192d2/2a18823, 独立監査済 build green/axiom-clean)。⚠ 目標署名(c)は偽 (Nougat が "1⊂T⊂R" を欠落) → workflow が検出し `hT_ne_bot/hT_ne_top` 付き忠実版を着地 (status=BLOCKED_IMPL だったが genuine 成功)。**BG Thm 4.12 (a)(b)(c) 完全形式化完了** |
 | 3 | **I-0d GL橋** Aut(Eₚⁿ)≅GL(n,p) | `IsElementaryAbelian.mulAutEquivGeneralLinearGroup` + `card_mulAut` | gate無 | ✅**PASS** (commit bba6410, PRank.lean に4 decl, 独立監査済) |
 | 4 | **Lem 4.15** extraspecial S, [S,R]⊆S'⇒R=S·C_R(S) | `mul_centralizer_eq_top_of_isExtraspecial` | Gorenstein 5.4.6 | ✅**PASS** (commit 3f7f99d, S04 §4E, 独立監査済)。構造定理回避: 変位準同型 δ_g:S→Z(S) の 𝔽_p 線形化 + 基底埋込 squeeze (genuine counting) |
-| 5 | **Prop 4.3(a)(b)** cl≤3/p>3 collection | — | ⚠ γ₄=1 + BG f/g exponent が mathlib convention で誤 → **mirror で f/g 再計算要**。precursor `commutatorElement_pow_left_of_triple_central`@S04 あり | **IN PROGRESS** (root gate: #6,#7,#8 を開く, risk大)。block時 pivot→§1 0015 banking |
-| 6 | **Prop 4.8** r≤2+exp p⇒\|R\|≤p³, p>3⇒Ω₁ exp p | — | gate: #3, #5, Lem4.5b✅ | queued (gate: #3,#5) |
+| 5 | **Prop 4.3(a)(b)** cl≤3/p>3 collection | — | ⚠ γ₄=1 + f/g mathlib convention 再計算要 | ⏸ **BLOCKED_DESIGN** (full は1ショット intractable; 詳細 skeleton を `notes/bg/s04_prop43_design_2026_05_31.md` に保存)。**将来 GATE-1 (4.4)collection を単独 workflow 化**。cl≤2 部分は wrapper 気味で見送り |
+| 6a | **Prop 4.8(a)** r≤2+exp p ⇒ \|R\|≤p³ | — | I-0d✅ (Aut(E_p²)≅GL,\|GL\|_p=p) + SCN✅ + Prop4.4(a)✅ (`isSCN_iff_isMaximalAbelianNormal`) + `IsSCN_n.le_pRank`✅。**Prop 4.3 不要** | **IN PROGRESS** (genuine §4, Thm4.16 CaseB 部分) |
+| 6b | **Prop 4.8(b)** p>3⇒Ω₁(R) exp 1/p | — | = Prop 4.3(a) 応用 (cl≤3) | blocked (gate: #5 Prop4.3) |
 | 7 | **Lem 4.9** \|Ω₁(R/T)\|≤p² | — | gate: #6 | queued (gate: #6) |
 | 8 | **Prop 4.11 (Huppert)** p>3,\|Ω₁\|≤p²⇒metacyclic | `isMetacyclic_of_omega1_card_le_prime_sq` | gate: #7 + agemo✅ + Lem4.5b✅ + abelian case | queued (gate: #7) |
 | 9 | **Lem 4.13/4.14** q∣\|Aut R\|⇒q∣p²-1, q<p | — | gate: #3 + SCN₃=∅✅ | queued (gate: #3) |
