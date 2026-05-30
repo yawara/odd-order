@@ -811,12 +811,20 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S04.preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
 -- (2.10) Möbius-assembly primitives: the survivor cardinality `|𝒜(g, K·a)| = |C_G(a)|` for a
 -- subgroup centralized by `a` (`card_conjFiber_coset_eq_card_centralizer`, the (2.1) coset
--- conjugacy `card_conj_fiber` translated to the conjugating set `𝒜`), and the per-component support
--- test `𝒜(g, H(B)b) ≠ ∅ ⇒ g ∈ (bH(b))^G` (`mem_dadeSupport_of_mem_conjFiber_coset`).
+-- conjugacy `card_conj_fiber` translated to the conjugating set `𝒜`); the per-component conjugacy
+-- witness `𝒜(g, H(B)b) ≠ ∅ ⇒ ∃c∈H(b), (b·c)~g` (`exists_mem_H_isConj_of_mem_conjFiber_coset`) and
+-- its support corollary (`mem_dadeSupport_of_mem_conjFiber_coset`); and the (2.10.3) value case
+-- `a^L`-specialized: `(Ind α_B)(g) = (α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|`
+-- (`induce_alphaB_apply_eq_alpha_mul_sum_conjL`), dropping the `b ∉ a^L` terms by the conjugacy
+-- witness + (2.4.b) and collapsing `α(b)` to `α(a)`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_eq_card_centralizer
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.exists_mem_H_isConj_of_mem_conjFiber_coset
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_of_mem_conjFiber_coset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_apply_eq_alpha_mul_sum_conjL
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

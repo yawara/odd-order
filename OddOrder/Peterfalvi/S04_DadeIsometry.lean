@@ -2051,11 +2051,11 @@ This is the contrapositive content of the vanishing case
 (`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `y⁻¹gy = h·b` is
 `H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
 since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G`. -/
-theorem mem_dadeSupport_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
+theorem exists_mem_H_isConj_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
     (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
     {b : G} (hbN : b ∈ nLStabilizerIn hyp B) (hbA : b ∈ A) {g y : G}
     (hy : y⁻¹ * g * y ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G)) :
-    g ∈ hyp.dadeSupport := by
+    ∃ c ∈ hyp.H ⟨b, hbA⟩, IsConj (b * c) g := by
   classical
   -- factor `y⁻¹gy = h·b` with `h ∈ H(B)`
   rw [Set.mem_mul] at hy
@@ -2080,13 +2080,108 @@ theorem mem_dadeSupport_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
       rw [← hyp.centralizer_inf_hIntersection hB ⟨b, hbA⟩]
       exact Subgroup.mem_inf.mpr ⟨hccomm, hcH⟩
     exact hIntersection_le hyp (Finset.insert_nonempty _ B) (Finset.mem_insert_self _ B) hcInsert
-  -- `g` is conjugate to `c·b = b·c ∈ hCoset b`, hence in `dadeSupport`
+  -- `g` is conjugate to `c·b = b·c`
   have hgconj : (x' * y⁻¹) * g * (x' * y⁻¹)⁻¹ = c * b := by
     rw [← hx'eq, hyeq]; group
-  rw [hyp.mem_dadeSupport_iff]
-  refine ⟨⟨b, hbA⟩, c, hcHb, ?_⟩
-  rw [show (⟨b, hbA⟩ : {a : G // a ∈ A}).1 * c = c * b from (hccb.eq).symm]
+  refine ⟨c, hcHb, ?_⟩
+  rw [show b * c = c * b from (hccb.eq).symm]
   exact (isConj_iff.mpr ⟨x' * y⁻¹, hgconj⟩).symm
+
+/-- **Peterfalvi (2.10.3), the support test for a single component `b`.**  If `𝒜(g, H(B)b) ≠ ∅`
+(some `y⁻¹gy ∈ H(B)·b`) with `b ∈ N_L(B) ∩ A`, then `g ∈ (bH(b))^G ⊆ dadeSupport`.  Immediate from
+the explicit conjugacy witness `exists_mem_H_isConj_of_mem_conjFiber_coset`. -/
+theorem mem_dadeSupport_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {b : G} (hbN : b ∈ nLStabilizerIn hyp B) (hbA : b ∈ A) {g y : G}
+    (hy : y⁻¹ * g * y ∈ (↑(hIntersection hyp B hB) : Set G) * ({b} : Set G)) :
+    g ∈ hyp.dadeSupport := by
+  obtain ⟨c, hcHb, hgc⟩ := hyp.exists_mem_H_isConj_of_mem_conjFiber_coset hconj hB hbN hbA hy
+  exact hyp.mem_dadeSupport_iff.mpr ⟨⟨b, hbA⟩, c, hcHb, hgc⟩
+
+open Classical in
+/-- **Peterfalvi (2.10.3), the value case `a^L`-specialized.**  Fix a Dade-support representative
+`a` with `g ∈ (aH(a))^G` (witnessed by `h ∈ H(a)`, `IsConj (a·h) g`).  Then the `N_L(B)`-aggregated
+value of `Ind_{M(B)}^G α_B` collapses to the textbook value formula
+
+    `(Ind_{M(B)}^G α_B)(g) = (α(a)/|M(B)|) · ∑_{b ∈ N_L(B) ∩ a^L} |𝒜(g, H(B)·b)|`,
+
+the sum running only over `b` that are `L`-conjugate to `a`.  Starting from
+`induce_alphaB_apply_eq_sum_nLStabilizerIn_inA` (sum over `b ∈ N_L(B), b ∈ A`), the terms with
+`b ∉ a^L` vanish: if `|𝒜(g, H(B)b)| ≠ 0` then `g ∈ (bH(b))^G` by
+`mem_dadeSupport_of_mem_conjFiber_coset`, whence `a·h` and `b·h'` are `G`-conjugate, so by (2.4.b)
+(`isConj_in_L_of_mul_H`) `b ∈ a^L` — a contradiction.  On the surviving `b ∈ a^L` the value
+`α(b) = α(a)` (an `L`-class function), and `α(a)` factors out. -/
+theorem induce_alphaB_apply_eq_alpha_mul_sum_conjL (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)]
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ *
+            ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+                (fun b : (nLStabilizerIn hyp B) =>
+                  ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)),
+              ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+                * ({(b : G)} : Set G))).card : ℂ)) := by
+  classical
+  rw [induce_alphaB_apply_eq_sum_nLStabilizerIn_inA hyp hconj hB α g]
+  congr 1
+  -- restrict `{b ∈ N_L(B), b ∈ A}` to `{b ∈ N_L(B), b ∈ a^L}`, factoring `α(a)`.
+  rw [Finset.mul_sum]
+  -- abbreviations for the two filtering predicates and the `N`-summand
+  set N : (nLStabilizerIn hyp B) → ℂ := fun b =>
+    ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card : ℂ) with hN
+  set sP : Finset (nLStabilizerIn hyp B) :=
+    (Finset.univ : Finset (nLStabilizerIn hyp B)).filter (fun b => ((b : G) ∈ A)) with hsP
+  set sQ : Finset (nLStabilizerIn hyp B) :=
+    (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+      (fun b => ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G)) with hsQ
+  -- `sQ ⊆ sP` (a^L ⊆ A) and on `sP \ sQ` the summand `N b` vanishes.
+  have hsub : sQ ⊆ sP := by
+    intro b hb
+    rw [hsQ, Finset.mem_filter] at hb
+    obtain ⟨l, hl⟩ := hb.2
+    rw [hsP, Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, hl ▸ hyp.L_normalizes_A l a.2⟩
+  -- `∑_{sP} α(b)·N b = ∑_{sQ} α(b)·N b`: terms outside `sQ` have `N b = 0`.
+  have hPQ : ∑ b ∈ sP, (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ * N b
+      = ∑ b ∈ sQ, (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ * N b := by
+    refine (Finset.sum_subset hsub fun b hbP hbQ => ?_).symm
+    rw [hsP, Finset.mem_filter] at hbP
+    obtain ⟨_, hbA⟩ := hbP
+    -- `b ∉ sQ` ⟹ `b ∉ a^L`; show `N b = 0`, i.e. `𝒜(g, H(B)b) = ∅`.
+    have hbnotQ : ¬ ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G) := by
+      intro hQ; exact hbQ (by rw [hsQ, Finset.mem_filter]; exact ⟨Finset.mem_univ _, hQ⟩)
+    have hfiber0 : N b = 0 := by
+      show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+        * ({(b : G)} : Set G))).card : ℂ) = 0
+      norm_cast
+      rw [Finset.card_eq_zero]
+      by_contra hne
+      rw [← Ne, ← Finset.nonempty_iff_ne_empty] at hne
+      obtain ⟨y, hy⟩ := hne
+      rw [mem_conjFiber] at hy
+      obtain ⟨c, hcHb, hgc⟩ :=
+        hyp.exists_mem_H_isConj_of_mem_conjFiber_coset hconj hB b.2 hbA hy
+      have hconjab : IsConj (a.1 * h) ((b : G) * c) := hga.trans hgc.symm
+      obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a.2 hbA hh hcHb hconjab
+      exact hbnotQ ⟨l, hl⟩
+    rw [hfiber0, mul_zero]
+  rw [hPQ]
+  -- on `sQ`, `α(b) = α(a)`.
+  apply Finset.sum_congr rfl
+  intro b hb
+  rw [hsQ, Finset.mem_filter] at hb
+  obtain ⟨l, hl⟩ := hb.2
+  have hαeq : (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩
+      = (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ := by
+    refine ClassFunction.of_isConj (α : ClassFunction L ℂ) (isConj_iff.mpr ⟨l⁻¹, ?_⟩)
+    apply Subtype.ext
+    show (l⁻¹ : L) * (b : G) * ((l⁻¹ : L) : G)⁻¹ = a.1
+    rw [← hl]; push_cast; group
+  simp only [hN]
+  rw [hαeq]
 
 end MobiusAssembly
 
