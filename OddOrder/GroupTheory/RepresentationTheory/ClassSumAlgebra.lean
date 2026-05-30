@@ -11,7 +11,11 @@ import Mathlib.LinearAlgebra.Trace
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
+import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Charpoly
+import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.Localization.FractionRing
 
 /-!
 # The class-sum algebra and central characters
@@ -569,5 +573,68 @@ theorem isIntegral_card_mul_character_div (ρ : Representation ℂ G V) [IsIrred
   exact centralCharacterOfRep_classSum_isIntegral ρ C
 
 end CharacterIntegrality
+
+section CharacterValuesIntegral
+
+/-- **A root of unity is an algebraic integer.** If `x : ℂ` satisfies `x ^ n = 1` with `n ≠ 0`,
+then `x` is integral over `ℤ` — it is a root of the monic polynomial `X ^ n - 1`. -/
+theorem isIntegral_of_pow_eq_one {x : ℂ} {n : ℕ} (hn : n ≠ 0) (hx : x ^ n = 1) :
+    IsIntegral ℤ x := by
+  refine ⟨Polynomial.X ^ n - Polynomial.C 1, ?_, ?_⟩
+  · exact Polynomial.monic_X_pow_sub_C 1 hn
+  · simp [hx]
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+
+/-- **Eigenvalues of a finite-order endomorphism are roots of unity.** If `f : End ℂ V` satisfies
+`f ^ n = 1` and `μ` is a root of the characteristic polynomial of `f` (equivalently an eigenvalue),
+then `μ ^ n = 1`. -/
+theorem pow_eq_one_of_isRoot_charpoly_of_pow_eq_one {f : Module.End ℂ V} {n : ℕ}
+    (hf : f ^ n = 1) {μ : ℂ} (hμ : f.charpoly.IsRoot μ) : μ ^ n = 1 := by
+  -- `μ` is a root of the charpoly, hence an eigenvalue, so it has a nonzero eigenvector.
+  have hev : f.HasEigenvalue μ := (Module.End.hasEigenvalue_iff_isRoot_charpoly f μ).mpr hμ
+  obtain ⟨v, hv⟩ := hev.exists_hasEigenvector
+  -- Acting by `f ^ n` scales `v` by `μ ^ n`; but `f ^ n = 1`, so `μ ^ n • v = v`.
+  have hpow : (f ^ n) v = μ ^ n • v := hv.pow_apply n
+  rw [hf, Module.End.one_apply] at hpow
+  -- `hpow : v = μ ^ n • v`; hence `(μ ^ n - 1) • v = 0` with `v ≠ 0` over `ℂ` forces `μ ^ n = 1`.
+  have hsub : (μ ^ n - 1) • v = 0 := by rw [sub_smul, one_smul, ← hpow, sub_self]
+  rcases smul_eq_zero.mp hsub with h | h
+  · exact sub_eq_zero.mp h
+  · exact absurd h hv.2
+
+/-- **Character values are algebraic integers** (Isaacs (3.7) preamble / standard).  For any
+finite-dimensional complex representation `ρ` of a finite group `G` and any `g : G`, the character
+value `χ_ρ(g) = trace(ρ g)` is an algebraic integer over `ℤ`.
+
+Standard proof: `ρ g` has finite order `n = |G|` (since `g ^ |G| = 1` and `ρ` is a homomorphism),
+so `(ρ g) ^ n = 1`.  Over `ℂ` the characteristic polynomial of `ρ g` splits, so the trace is the
+sum of its roots (eigenvalues); each eigenvalue `μ` satisfies `μ ^ n = 1`, hence is a root of unity
+and so integral over `ℤ` (`isIntegral_of_pow_eq_one`).  A sum of algebraic integers is an algebraic
+integer. -/
+theorem character_isIntegral (ρ : Representation ℂ G V) [Finite G] (g : G) :
+    IsIntegral ℤ (ρ.character g) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set n : ℕ := Nat.card G with hn_def
+  have hn : n ≠ 0 := Nat.card_pos.ne'
+  -- `(ρ g) ^ n = ρ (g ^ n) = ρ 1 = 1`, using `g ^ |G| = 1`.
+  have hgn : g ^ n = 1 := pow_card_eq_one'
+  have hfn : (ρ g) ^ n = 1 := by
+    rw [← map_pow, hgn, map_one]
+  -- The trace is the sum of the roots of the (splitting) characteristic polynomial.
+  have hsplits : (ρ g).charpoly.Splits := IsAlgClosed.splits _
+  have htrace : ρ.character g = (ρ g).charpoly.roots.sum := by
+    rw [Representation.character]
+    exact Module.End.trace_eq_sum_roots_charpoly_of_splits hsplits
+  rw [htrace]
+  -- A finite sum (over a multiset) of algebraic integers is an algebraic integer; each root is one.
+  refine IsIntegral.multiset_sum ?_
+  intro μ hμ
+  have hroot : (ρ g).charpoly.IsRoot μ :=
+    (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
+  exact isIntegral_of_pow_eq_one hn (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot)
+
+end CharacterValuesIntegral
 
 end OddOrder.RepresentationTheory
