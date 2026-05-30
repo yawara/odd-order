@@ -20,9 +20,9 @@
 | # | ターゲット | decl 候補 | 依存 (✅=ready) | 状態 |
 |---|---|---|---|---|
 | 1 | **Thm 4.12(a)** metacyclic+[R,A]=R⇒abelian | `OddOrder.BG.Ch1.S04b.isMulCommutative_of_metacyclic_actionCommutator_eq_top` | a-2✅ N-4✅ Lem4.10✅ LEAF-4✅ LEAF-1✅ Lem4.1✅ | ✅**PASS** (commit 034d4c4, S04b_Thm412.lean, 独立監査済: build green 3360 / axiom-clean / 署名一致) |
-| 2 | **Thm 4.12(b)(c)** T∩C=1, T/C cyclic, R'⊆T | `thm412bc_structure` 等 | (a)✅後 + Prop1.6(d) `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` + Lem4.10✅ LEAF-4✅。⚠(a)を T=[R,A] に適用 (subgroup-metacyclic + 制限作用 + coprime transfer) | **IN PROGRESS** (Thm4.12 完成, momentum) |
+| 2 | **Thm 4.12(b)(c)** T∩C=1, T/C cyclic, R'⊆T | `actionCommutator_inf_fixedPoints_eq_bot` (b) + `actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le` (c) + `IsMetacyclic.subgroup` | (a)✅ Prop1.6(a)(d)✅ Lem4.10✅ LEAF-4✅ | ✅**PASS (忠実版)** (commits 8e8240e/09192d2/2a18823, 独立監査済 build green/axiom-clean)。⚠ 目標署名(c)は偽 (Nougat が "1⊂T⊂R" を欠落) → workflow が検出し `hT_ne_bot/hT_ne_top` 付き忠実版を着地 (status=BLOCKED_IMPL だったが genuine 成功)。**BG Thm 4.12 (a)(b)(c) 完全形式化完了** |
 | 3 | **I-0d GL橋** Aut(Eₚⁿ)≅GL(n,p) | `IsElementaryAbelian.mulAutEquivGeneralLinearGroup` + `card_mulAut` | gate無 | ✅**PASS** (commit bba6410, PRank.lean に4 decl, 独立監査済) |
-| 4 | **Lem 4.15** extraspecial S, [S,R]⊆S'⇒R=S·C_R(S) | — | Gorenstein 5.4.6 行間, `IsExtraspecial`✅ | queued (独立) |
+| 4 | **Lem 4.15** extraspecial S, [S,R]⊆S'⇒R=S·C_R(S) | — | Gorenstein 5.4.6 行間, `IsExtraspecial`✅ | **IN PROGRESS** (独立, Thm4.16 B-1)。block時 pivot→#10 Lem4.5c→§1 0015/0012 で banking |
 | 5 | **Prop 4.3(a) full** cl≤3/p>3 collection | — | ⚠ γ₄=1 + BG f/g exponent が mathlib convention で誤 → **mirror で f/g 再計算要** (design が blocked 判定し得る) | queued (risk大) |
 | 6 | **Prop 4.8** r≤2+exp p⇒\|R\|≤p³, p>3⇒Ω₁ exp p | — | gate: #3, #5, Lem4.5b✅ | queued (gate: #3,#5) |
 | 7 | **Lem 4.9** \|Ω₁(R/T)\|≤p² | — | gate: #6 | queued (gate: #6) |
