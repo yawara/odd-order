@@ -987,3 +987,34 @@ structure CoherenceHypothesis ... where
 ---
 
 *作成: 2026-05-22. 出典: `references/peterfalvi/04.8_pp_30_37_Some_Coherence_Theorems.mmd` (243 行) + `04.7_pp_25_29_Coherence.mmd` (136 行). クロス参照確認済: §7 (5.1)-(5.9), (6.1)-(6.8) self-contained, §9 (7.1)-(7.6) 依存. Phase 2b 第 3 波着手予定は §7 完成後.*
+
+---
+
+## 追記 (2026-05-31): G2.7 gate 調査結論 + (5.2.d) `R(χ)` producer landing
+
+(6.6) `peterfalvi_66_coherence_of_X` / `coherentPairChain` の `hstep` (= G2.7 gate) について調査:
+
+**型レベルの honest verdict (Round-20 roadmap の「Dade wiring」判定を訂正)**: `hstep` 構成は Dade
+isometry の wiring **ではなく** genuine 新 infra。理由 — `IsCoherent`/`retarget_isCoherent`/
+`CharacterPsiDecomposition` は `IntegralCharacterMap L G = ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ`
+(全 class function 上の ℤ-線形, `L G` 独立群) で動くのに対し, `FullDadeIsometryData`/`DadeMap`
+(`OddOrder/Peterfalvi/S04_DadeIsometry.lean`) は `SupportedClassFunctions ℂ A L → ClassFunction G ℂ`
+(supported 部分加群上のみの bare 関数, `L : Subgroup G`) で**別型**。各 step が要求する running
+`τ₁ = hS₁.extension` (χᵢ 含む `Z[S₁]` 全体への isometry) は固定 Dade τ から得られず, mmd 04.8
+L156/L166 通りこの lattice isometry の存在こそ (5.6)/(6.6) の結論 (FT では `dim CF(L) > dim CF(G)`
+で大域 isometry 不在)。`CharacterPsiDecomposition` は repo 内 constructor 皆無,
+`isometry_difference_pair_structure` も適用例皆無で §7↔§3 が断絶していた。
+
+**landed (G2.7 最基礎 brick, sorry-free, axioms 3 個 allowlist; `S07_Coherence.lean`)**: (5.2.d)
+`R(χ)` の producer。§3 (1.4) keystone `isometry_difference_pair_structure` の初の実 consumer。
+
+- `characterDifferenceImageOfIsometry` — `τ`, non-real irreducible `χ`, family `{χ,χ̄}` 上の (1.4)
+  三仮定から `CharacterDifferenceImage τ χ` を**構成** (`Exists.choose` で signed irreducible
+  difference を抽出, `image_eq : τ(χ−χ̄)=ε•(μ−ν)`)。従来 constructor 無しで全 §7 補題が仮定取りして
+  いた欠落を埋める。`toOrthonormalImage` 経由で orthonormal `R(χ)` (`OrthonormalCharacterImageFamily`)
+  へ持ち上がる。
+- 補助: `conjIrreducibleCharacter`/`conjPairFamily`/`coe_conjIrreducibleCharacter`,
+  `irreducibleCharacter_conj_apply_one` (`χ̄(1)=χ(1)`, 指標値 at 1 = 自然数 ⟹ 共役不変)。
+
+詳細・残作業 (running `τ₁` 配線 + `CharacterPsiDecomposition` constructor) は issue 0046 の進捗節
+(2026-05-31) 参照。

@@ -701,6 +701,50 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     에서 *구성* 하는 작업 (conjugate pair `{χᵢ, χ̄ᵢ}` 를 degree-block 안에서 짝짓기) 도 별도 — 본
     wiring 정리는 그 decomposition 을 추상 data 로 받아 engine 에 정직히 흘림.
 
+## 進捗 (2026-05-31, G2.7 調査 + (5.2.d) producer landing)
+
+**調査結論 (honest verdict, Round-20 の roadmap を訂正)**: G2.7 の `hstep` 構成は **Dade
+isometry の wiring ではなく genuine 新 infra**。Round-20 roadmap は「FullDadeIsometryData の τ を
+`χᵢ−χ̄ᵢ` に適用 → (5.4.b)/(5.5) 分解で Xᵢ を取れる (wiring)」と判定したが, **型レベルで誤り**:
+
+- `IsCoherent`/`retarget_isCoherent`/`CharacterPsiDecomposition`/`OrthonormalCharacterImageFamily`
+  は `IntegralCharacterMap L G := ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ` (**全** class function
+  上の ℤ-線形写像, `L G` 独立群) で動く。
+- `FullDadeIsometryData`/`DadeMap` は `SupportedClassFunctions ℂ A L → ClassFunction G ℂ`
+  (**supported 部分加群上のみ**の bare 関数, 線形ですらない, `L : Subgroup G`)。
+
+両者は別型。Dade τ は `Z[S, L^#]` 上の **固定** 写像であり, `hstep` が各 step で要求する **running
+`τ₁ = hS₁.extension`** (直前 set `S₁` の coherence 拡張, χᵢ 自身を含む `Z[S₁]` 全体への isometry) は
+Dade τ から得られない。mmd 04.8 L156/L166 が "Let τ₁ be **an isometry from Z[Y] to Z[Irr G]** which
+coincides with τ on Z[Y, L^#]" と書く通り, この lattice isometry の**存在こそ (5.6)/(6.6) が示す
+結論**であって, Dade τ を virtual character に適用して作るものではない (FT では
+`dim CF(L) > dim CF(G)` ゆえ大域 isometry は一般に無い)。`CharacterPsiDecomposition` は repo 内に
+**constructor が皆無** (consume only), `isometry_difference_pair_structure` (§3 (1.4) keystone) も
+**適用例が皆無** — §7 coherence 界面は §3 存在定理から完全に断絶していた。⟹ G2.7 は確かに
+「running-τ₁ + lattice basis extension」の新 infra。
+
+**landed brick (`OddOrder/Peterfalvi/S07_Coherence.lean`, sorry-free, axioms 3 個 allowlist)**:
+G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) keystone の最初の実 consumer:
+
+- `characterDifferenceImageOfIsometry` (`noncomputable def`): integral isometry `τ`, non-real
+  irreducible `χ` (⟹ `χ ≠ χ̄`), family `{χ, χ̄}` 上の (1.4) 三仮定 (images virtual / vanish at 1 /
+  norm-preserving) から **`CharacterDifferenceImage τ χ` を構成** (posit ではない —
+  `SignedIrreducibleDifferenceFamily` を `isometry_difference_pair_structure` の `Exists.choose` で
+  抽出, `image_eq : τ(χ−χ̄)=ε•(μ−ν)` を index-1 family 方程式 `τ(χ̄−χ)=ε•(μ₁−μ₀)` から導出)。これまで
+  `CharacterDifferenceImage` は constructor 無しで全 §7 補題が仮定取りしていた欠落を埋める。
+  `toOrthonormalImage` がこれを `OrthonormalCharacterImageFamily` (orthonormal `R(χ)`) に持ち上げる。
+- `conjIrreducibleCharacter`/`conjPairFamily`/`coe_conjIrreducibleCharacter`: `χ̄` と family `{χ,χ̄}`
+  の packaging helper。
+- `irreducibleCharacter_conj_apply_one`: `χ̄(1)=χ(1)` (指標の 1 での値は自然数=実 ⟹ 共役不変,
+  `exists_natDegree_charValue_one_dvd_card`)。(1.4) の equal-degree 仮定 discharge。
+
+**残存 (G2.7 本体, 不変)**: running `τ₁` の構成と, それを使った per-step
+`CharacterPsiDecomposition` の **構成** ((5.5) で `Xᵢ=∑_{E}α`), さらに `{Xᵢ,X̄ᵢ}` orthonormal pair
++ image equation `(χᵢ−aᵢχ₁)^τ=Xᵢ−aᵢχ₁^{τ₁}` + lattice 직교 `Xᵢ,X̄ᵢ⊥τ₁ξ`。本 brick はこの連鎖の
+入口 (`τ`-image → signed irreducible difference → orthonormal `R(χ)`) を供給する。次段は (a) running
+`τ₁` を `coherentPairChain` の各 step witness から取り出す配線, (b) `R(χ)` を使った
+`CharacterPsiDecomposition` constructor。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。

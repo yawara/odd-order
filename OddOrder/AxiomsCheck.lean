@@ -1114,6 +1114,21 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_conjImage_eq_card_sdiff
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_conjImage_eq_zero
+-- (5.2.d) PRODUCER `characterDifferenceImageOfIsometry` (issue 0046): the first actual consumer of
+-- the §3 (1.4) keystone `isometry_difference_pair_structure`.  CONSTRUCTS (not posits) the §7
+-- `CharacterDifferenceImage τ χ` record — the two-element `R(χ) = {μ,ν}` gateway used throughout §7
+-- — from an integral isometry `τ`, a non-real irreducible `χ` (so `χ ≠ χ̄`), and the three (1.4)
+-- hypotheses on the family `{χ,χ̄}` (images virtual, vanish at 1, norm-preserving).  Reads `μ,ν,ε`
+-- off the `SignedIrreducibleDifferenceFamily` delivered by the keystone (`Exists.choose`, hence
+-- `noncomputable`); `image_eq : τ(χ-χ̄) = ε•(μ-ν)` from the index-1 family equation
+-- `τ(χ̄-χ) = ε•(μ₁-μ₀)`.  Until now the §7 `CharacterDifferenceImage` had NO constructor — every §7
+-- lemma took it hypothetically; this supplies the missing existence (`toOrthonormalImage` then lifts
+-- it to `OrthonormalCharacterImageFamily`, the orthonormal `R(χ)`).  Equal-degree of `χ,χ̄` is
+-- `irreducibleCharacter_conj_apply_one` (char value at 1 is a natural number, fixed by conjugation).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.irreducibleCharacter_conj_apply_one
 -- (5.6.3) keystone: the orthonormal-block isometry re-targeting constructor `τ₂`.  Given a global
 -- integral isometry `τ₁` and orthonormal pairs `{χ,χ̄}`, `{X,X̄}` with the same gram, with `X,X̄ ⊥
 -- τ₁ ξ` for every `ξ ⊥ {χ,χ̄}`, the rank-2 re-targeting is again a global integral isometry.

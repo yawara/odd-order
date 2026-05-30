@@ -549,6 +549,136 @@ noncomputable def toOrthonormalImage
 
 end CharacterDifferenceImage
 
+/-! ### Peterfalvi (5.2.d) producer: the difference image from the §3 (1.4) keystone
+
+The two-element `CharacterDifferenceImage` (the `R(χ) = {μ, ν}` record consumed throughout §7)
+was, until now, only *posited* as a structure with no constructor in the repository — every
+§7 lemma took it as a hypothesis.  The genuine existence content for it is
+`OddOrder.RepresentationTheory.isometry_difference_pair_structure` (Peterfalvi §3 (1.4)):
+for an integral isometry `τ` whose images on the differences `χᵢ - χ₀` are virtual characters of
+`G` vanishing at `1` and norm-preserving, the image is a *signed* difference of named irreducibles.
+
+`characterDifferenceImageOfIsometry` is the first actual consumer of that keystone: it specializes
+to the two-element family `{χ, χ̄}` (`χ` irreducible, non-real, so `χ ≠ χ̄`) and reads off the
+`{μ, ν, ε}` data, discharging `CharacterDifferenceImage`'s `image_eq : τ(χ - χ̄) = ε•(μ - ν)`.
+This is the missing *producer* connecting the §3 existence theorem to the §7 decomposition
+interface (`CharacterDifferenceImage.toOrthonormalImage` then lifts it to the orthonormal `R(χ)`
+family `OrthonormalCharacterImageFamily`).  Nothing here is posited: `μ, ν, ε` are extracted from
+the `SignedIrreducibleDifferenceFamily` produced by the keystone. -/
+section DifferenceImageProducer
+
+open OddOrder.RepresentationTheory
+
+variable [Finite L]
+
+/-- The conjugate irreducible character `χ̄` of `χ`, packaged as an `IrreducibleCharacter`. -/
+noncomputable abbrev conjIrreducibleCharacter (χ : IrreducibleCharacter L) :
+    IrreducibleCharacter L :=
+  ⟨(χ : ClassFunction L ℂ).conj, χ.isIrreducible.conj⟩
+
+@[simp] theorem coe_conjIrreducibleCharacter (χ : IrreducibleCharacter L) :
+    (conjIrreducibleCharacter (L := L) χ : ClassFunction L ℂ) = (χ : ClassFunction L ℂ).conj :=
+  rfl
+
+/-- The two-element family `{χ, χ̄}` used as the (1.4) keystone input for the difference image. -/
+noncomputable abbrev conjPairFamily (χ : IrreducibleCharacter L) :
+    Fin 2 → IrreducibleCharacter L :=
+  ![χ, conjIrreducibleCharacter (L := L) χ]
+
+/-- The conjugate of an irreducible character fixes the value at `1` (the degree is a natural
+number, hence real).  Used to discharge the equal-degree hypothesis of (1.4) for `{χ, χ̄}`. -/
+theorem irreducibleCharacter_conj_apply_one
+    (χ : IrreducibleCharacter L) :
+    ((χ : ClassFunction L ℂ).conj : L → ℂ) 1 = ((χ : ClassFunction L ℂ) : L → ℂ) 1 := by
+  obtain ⟨n, _, hn, _⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  rw [ClassFunction.conj_apply, show ((χ : ClassFunction L ℂ) : L → ℂ) 1 = (χ : ClassFunction L ℂ) 1
+      from rfl, hn, star_natCast]
+
+variable [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- **Peterfalvi (5.2.d), the existence of the difference image.**
+
+Given an integral isometry `τ`, an irreducible character `χ` of `L` that is **not real**
+(so `χ ≠ χ̄`), and the three (1.4) hypotheses on the two-element family `{χ, χ̄}` — the images of
+`χ - χ̄` are virtual characters of `G`, vanish at `1`, and the inner product is preserved — the
+image of `χ - χ̄` under `τ` is a signed difference `ε•(μ - ν)` of two distinct irreducible
+characters of `G`.  This **constructs** the `CharacterDifferenceImage τ χ` record (the §7 `R(χ)`
+gateway), reading `μ, ν, ε` off the `SignedIrreducibleDifferenceFamily` delivered by the §3
+keystone `isometry_difference_pair_structure`.
+
+Indexing: the family is `χ ↦ ![χ, χ̄]`, so `χ̄ - χ` is index `1`; the keystone gives
+`τ(χ̄ - χ) = ε•(μ₁ - μ₀)`, whence `τ(χ - χ̄) = ε•(μ₀ - μ₁)`, recorded with `μ := μ₀`, `ν := μ₁`. -/
+noncomputable def characterDifferenceImageOfIsometry
+    (τ : IntegralCharacterMap L G) (χ : IrreducibleCharacter L)
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction L ℂ))
+    (hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := L) τ (conjPairFamily (L := L) χ))
+    (hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := L) τ (conjPairFamily (L := L) χ))
+    (hisom : ∀ i j,
+        ClassFunction.inner
+            (isometryDifferenceImage τ (conjPairFamily (L := L) χ) i)
+            (isometryDifferenceImage τ (conjPairFamily (L := L) χ) j) =
+          ClassFunction.inner
+            (irreducibleCharacterDifference (conjPairFamily (L := L) χ) i)
+            (irreducibleCharacterDifference (conjPairFamily (L := L) χ) j)) :
+    CharacterDifferenceImage (L := L) (G := G) τ (χ : ClassFunction L ℂ) := by
+  classical
+  set fam : Fin 2 → IrreducibleCharacter L := conjPairFamily (L := L) χ with hfam
+  have hfam0 : (fam 0 : ClassFunction L ℂ) = (χ : ClassFunction L ℂ) := by
+    simp [hfam, conjPairFamily]
+  have hfam1 : (fam 1 : ClassFunction L ℂ) = (χ : ClassFunction L ℂ).conj := by
+    simp [hfam, conjPairFamily]
+  -- The two family members are distinct: `χ ≠ χ̄` because `χ` is not real.
+  have hne_coe : (fam 0 : ClassFunction L ℂ) ≠ (fam 1 : ClassFunction L ℂ) := by
+    rw [hfam0, hfam1]
+    intro h
+    exact hreal h.symm
+  have hinj : Function.Injective fam := by
+    have : fam 0 ≠ fam 1 := fun h => hne_coe (congrArg IrreducibleCharacter.toClassFunction h)
+    intro i j hij
+    fin_cases i <;> fin_cases j <;> first
+      | rfl
+      | (exact absurd hij this)
+      | (exact absurd hij.symm this)
+  -- Equal degree: `χ̄(1) = χ(1)` since the degree is a natural number.
+  have hdeg : ∀ i, ((fam i : ClassFunction L ℂ) : L → ℂ) 1 =
+      ((fam 0 : ClassFunction L ℂ) : L → ℂ) 1 := by
+    refine Fin.forall_fin_two.mpr ⟨rfl, ?_⟩
+    rw [hfam1, hfam0]
+    exact irreducibleCharacter_conj_apply_one χ
+  -- Apply the §3 keystone to the family `{χ, χ̄}`.  The existence is `Prop`-valued, so we extract
+  -- the `SignedIrreducibleDifferenceFamily` constructively via `Exists.choose` (this `def` is
+  -- `noncomputable`).
+  set data := (isometry_difference_pair_structure (le_refl 2) fam hinj hdeg τ hvirtual hzero
+    hisom).choose with hdata_def
+  have hdata := (isometry_difference_pair_structure (le_refl 2) fam hinj hdeg τ hvirtual hzero
+    hisom).choose_spec
+  -- `μ := data.mu 0`, `ν := data.mu 1`, `ε := data.sign`.
+  have hone : (1 : Fin 2) ≠ 0 := by decide
+  have hmu_ne : data.mu 0 ≠ data.mu 1 := fun h => hone (data.injective h.symm)
+  refine
+    { mu := data.mu 0
+      nu := data.mu 1
+      distinct := hmu_ne
+      sign := data.sign
+      sign_eq := data.sign_eq
+      image_eq := ?_ }
+  -- `τ(χ - χ̄) = -τ(χ̄ - χ) = -ε•(μ₁ - μ₀) = ε•(μ₀ - μ₁)`.
+  -- `χ̄ - χ` is `irreducibleCharacterDifference fam 1`; its image is `data.signedDifference 1`.
+  have h1 := hdata 1
+  rw [isometryDifferenceImage, irreducibleCharacterDifference, hfam0, hfam1,
+    SignedIrreducibleDifferenceFamily.signedDifference,
+    SignedIrreducibleDifferenceFamily.difference,
+    SignedIrreducibleDifferenceFamily.classFunction,
+    SignedIrreducibleDifferenceFamily.classFunction] at h1
+  -- From `τ(χ̄ - χ) = ε•(μ₁ - μ₀)` conclude `τ(χ - χ̄) = ε•(μ₀ - μ₁)`.
+  -- `τ(χ - χ̄) = τ(-(χ̄ - χ)) = -τ(χ̄ - χ) = -(ε•(μ₁ - μ₀)) = ε•(μ₀ - μ₁)`.
+  have hlhs : (χ : ClassFunction L ℂ) - (χ : ClassFunction L ℂ).conj =
+      -((χ : ClassFunction L ℂ).conj - (χ : ClassFunction L ℂ)) := by
+    rw [neg_sub]
+  rw [hlhs, map_neg, h1, ← smul_neg, neg_sub]
+
+end DifferenceImageProducer
+
 /-! ### Peterfalvi (5.4): the norm inequalities for `X` and `Y`
 
 Setup: `χ ∈ S`, `ψ ∈ ℤ[S]` with `(χ,ψ) = (χ̄,ψ) = 0`; an isometry `τ₁` on
