@@ -16,6 +16,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.AppB_Thm62
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -603,3 +604,5 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppB.normalizer_le_normalizer_lOddIn
 -- B.4(b) 本体 (issue 2001): O_{p'}(G)=1 ⇒ Z(L(S)) ⊴ G (= BG Thm 6.2 Glauberman Z(J) 代替).
 #assert_only_allowed_axioms OddOrder.BG.AppB.zCenter_lOdd_normal_of_oPiCore_eq_bot
+-- BG Thm 6.2 一般形 (issue 2002 合流): Z(L(S))·O_{p'}(G) ⊴ G (B.4(b) を G/O_{p'} に適用し引き戻し).
+#assert_only_allowed_axioms OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal
