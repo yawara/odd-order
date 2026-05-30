@@ -16,6 +16,7 @@ import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.LinearAlgebra.Eigenspace.Charpoly
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
 # The class-sum algebra and central characters
@@ -634,6 +635,28 @@ theorem character_isIntegral (ρ : Representation ℂ G V) [Finite G] (g : G) :
   have hroot : (ρ g).charpoly.IsRoot μ :=
     (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
   exact isIntegral_of_pow_eq_one hn (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot)
+
+/-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
+inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.
+
+`ℤ` is integrally closed (it is a `UniqueFactorizationMonoid`, hence integrally closed in its
+fraction field `ℚ`).  Transferring `IsIntegral ℤ (q : ℂ)` down the injective `ℚ`-algebra map
+`ℚ ↪ ℂ` gives `IsIntegral ℤ q`, and integral closure then yields the integer. -/
+theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
+    ∃ n : ℤ, (q : ℂ) = n := by
+  -- `(q : ℂ) = algebraMap ℚ ℂ q`; transfer integrality down the injection `ℚ ↪ ℂ`.
+  have hqℂ : (q : ℂ) = algebraMap ℚ ℂ q := (eq_ratCast (algebraMap ℚ ℂ) q).symm
+  rw [hqℂ] at h
+  have hQ : IsIntegral ℤ q :=
+    (isIntegral_algebraMap_iff (FaithfulSMul.algebraMap_injective ℚ ℂ)).mp h
+  -- `ℤ` is integrally closed in `ℚ` (it is a UFD), so `q = (n : ℚ)` for some `n : ℤ`.
+  obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hQ
+  refine ⟨n, ?_⟩
+  -- `hn : algebraMap ℤ ℚ n = q`, i.e. `(n : ℚ) = q`; cast up to `ℂ`.
+  rw [algebraMap_int_eq, Int.coe_castRingHom] at hn
+  rw [← hn]
+  push_cast
+  ring
 
 end CharacterValuesIntegral
 

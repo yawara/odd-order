@@ -650,6 +650,9 @@ set_option linter.style.longLine false in
 -- algebraic integers — `ρ g` has finite order (`g^|G| = 1`), the charpoly splits over ℂ, the trace
 -- is the sum of its roots, and each root μ is a root of unity (μ^|G| = 1, root of `X^|G| - 1`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.character_isIntegral
+-- RepresentationTheory: a rational algebraic integer is an integer — `ℤ` is integrally closed (UFD),
+-- so transferring `IsIntegral ℤ (q : ℂ)` down the injection `ℚ ↪ ℂ` yields `∃ n : ℤ, (q : ℂ) = n`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_rat_imp_int
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
