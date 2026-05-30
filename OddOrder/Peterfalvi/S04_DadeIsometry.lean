@@ -2464,6 +2464,43 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
   rw [hSleft] at hSright
   exact hSright
 
+/-- **Peterfalvi (2.10), the Möbius cancellation identity** (the toggle-`a` pairing of (2.10)).
+For `a ∈ A` normalizing `H(B)` (i.e. `a ∈ N_L(B)`) and nonempty `B ⊆ A`,
+
+    `|𝒜(g, H(B)·a)| · |H(B ∪ {a})| = |𝒜(g, H(B ∪ {a})·a)| · |H(B)|`.
+
+This is the (2.10) STEP 2 factorization `card_conjFiber_coset_mul_card_centralizerInf` specialized to
+`K = H(B)`, with `C = H(B) ⊓ C_G(a) = C_{H(B)}(a) = H(B ∪ {a})` by (2.10.2)
+(`centralizer_inf_hIntersection`).  In the (2.10) alternating sum it shows the summands
+`(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` for `B` and `B ∪ {a}` are equal (so cancel by the opposite
+signs `(-1)^{|B|}` vs `(-1)^{|B|+1}`), leaving only the survivor `B = {a}`. -/
+theorem card_conjFiber_hIntersection_mul_eq (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {a : {a : G // a ∈ A}}
+    (haN : (a : G) ∈ nLStabilizerIn hyp B) (g : G) :
+    (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card
+        * Nat.card (hIntersection hyp (insert a B) (Finset.insert_nonempty a B))
+      = (conjFiber g ((↑(hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : Set G)
+            * ({(a : G)} : Set G))).card
+        * Nat.card (hIntersection hyp B hB) := by
+  classical
+  -- `a` normalizes `H(B)` coprimely; `H(B) ⊓ C_G(a) = H(insert a B)` by (2.10.2).
+  have hnorm : ∀ x ∈ hIntersection hyp B hB, (a : G) * x * (a : G)⁻¹ ∈ hIntersection hyp B hB := by
+    intro x hx
+    have hmem := hyp.nLStabilizerIn_le_normalizer hconj hB haN
+    rw [Subgroup.mem_normalizer_iff] at hmem
+    exact (hmem x).mp hx
+  have hcop := hyp.coprime_orderOf_card_hIntersection hB a.2
+  -- `H(B) ⊓ C_G(a) = H(insert a B)`
+  have hCeq : hIntersection hyp B hB ⊓ Subgroup.centralizer ({(a : G)} : Set G)
+      = hIntersection hyp (insert a B) (Finset.insert_nonempty a B) := by
+    rw [inf_comm]; exact hyp.centralizer_inf_hIntersection hB a
+  -- apply STEP 2 and rewrite `C` via (2.10.2)
+  have hfact := card_conjFiber_coset_mul_card_centralizerInf
+    (K := hIntersection hyp B hB) (a := (a : G)) hnorm hcop g
+  rw [hCeq] at hfact
+  exact hfact
+
 end MobiusAssembly
 
 end SemidirectStructure

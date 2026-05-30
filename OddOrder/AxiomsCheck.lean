@@ -840,6 +840,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S04.Hypothesis.card_cosetConjFiber_eq_card_centralizerInf
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_coset_mul_card_centralizerInf
+-- (2.10) Möbius cancellation identity (`card_conjFiber_hIntersection_mul_eq`):
+-- `|𝒜(g,H(B)a)|·|H(B∪{a})| = |𝒜(g,H(B∪{a})a)|·|H(B)|` for `a ∈ N_L(B)` — STEP 2 factorization
+-- specialized to `K = H(B)`, `C = C_{H(B)}(a) = H(B∪{a})` by (2.10.2).  Shows the toggle-`a`
+-- summands `(-1)^|B|/|H(B)|·|𝒜(g,H(B)a)|` for `B` and `B∪{a}` are equal, hence cancel.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.card_conjFiber_hIntersection_mul_eq
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
