@@ -87,8 +87,10 @@ created: 2026-05-27
       (2026-05-30「進捗 (7)」); **vanishing case** `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`
       (g∉⋃(aH(a))^G ⇒ 0) 完了 (2026-05-30「進捗 (10)」, (2.1) keystone `exists_mem_centralizer_conj`);
       **value case (N_L(B)-集計形)** `induce_alphaB_apply_eq_sum_nLStabilizerIn`
-      (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`, f_B coset partition; 2026-05-30「進捗 (10)」).
-      **残**: 教科書 value case の `b∈a^L` 特殊化 (g∈(aH(a))^G 固定で α(b)=0 の b を捨てる; 容易).
+      (`(Ind α_B)(g)=⅟|M(B)|·∑_{b∈N_L(B)} α(b)·|𝒜(g,H(B)b)|`, f_B coset partition; 2026-05-30「進捗 (10)」);
+      **support-restricted 形** `induce_alphaB_apply_eq_sum_nLStabilizerIn_inA`
+      (`∑_{b∈N_L(B)}` → `∑_{b∈N_L(B), b∈A}`; α 台外項脱落, 2026-05-30「進捗 (11)」).
+      **残**: 教科書 value case の `b∈a^L` 特殊化 (g∈(aH(a))^G 固定で生残 b を a^L に + α(b)=α(a) 定数化; 容易).
 - [~] (2.10) inclusion-exclusion 本体 (Möbius 相殺) — **part (d) (RHS∈ℤ[Irr G]) 完了**
       (2026-05-30, 下記「進捗 (9)」); part (c) (Möbius 相殺で点別恒等式) は (2.1) coprime-action
       primitive 欠落でブロック (residual 精密化済).
@@ -566,3 +568,19 @@ bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` の点別
 合計 ~150-230 LOC; 別 focused session 推奨.  infra は全て present (keystone (2.1) 取り込み済,
 (2.10.1)/(2.10.2)/(2.9)/(2.10.3) [transversal+vanishing+value 集計形]/ℬ-transversal/bridge すべて
 landed) — 残るは純粋に組合せ的集計 (involution + reindex + cardinality 翻訳) の組み上げのみ.
+
+## 進捗 2026-05-30 (11) — (2.10.3) value case の support-restricted 形 (sorry-free, axiom-clean)
+
+上記「残ブロッカー」**項目 1 (value case の a^L 特殊化) の前半 (support による台外項の脱落)** を landing.
+`lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/admit/axiom 無し (3 axioms 全 allowlist 内).
+
+- **`induce_alphaB_apply_eq_sum_nLStabilizerIn_inA`** (`section PointwiseValue`) — α∈CF(L,A) (台 A) のとき
+  `(Ind_{M(B)} α_B)(g) = ⅟|M(B)|·∑_{b∈N_L(B), b∈A} α(b)·|𝒜(g,H(B)·b)|`.  進捗 (10)(c) の
+  `induce_alphaB_apply_eq_sum_nLStabilizerIn` (∑ over all N_L(B)) から, `(b:G)∉A ⟹ α(b)=0`
+  (α の `SupportedClassFunctions.property`) で `Finset.sum_subset` により台外項を捨てるだけ.
+  教科書 value 式 `(α(a)/|M(B)|)·∑_{b∈N_L(B)∩a^L}|𝒜(g,H(B)b)|` への第 1 還元
+  (∑ 範囲を N_L(B) から N_L(B)∩A へ縮小; これが「`α(b)≠0 ⟹ b∈A`」段).
+
+**残 (項目 1 の後半)**: support 代表 `a` (g∈(aH(a))^G) を固定し, 生き残った `b∈N_L(B)∩A` が
+(2.4.b) `isConj_in_L_of_mul_H` で `b∈a^L` ((2.10.3) value case の `a^L` 制約) かつ α(b)=α(a) 定数化
+する段 (`∑_{b∈N_L(B)∩A}` → `α(a)·∑_{b∈N_L(B)∩a^L}`).  以降は項目 2-4 (fiber 因子分解 + Möbius 相殺).

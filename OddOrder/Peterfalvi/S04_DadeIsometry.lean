@@ -1845,6 +1845,39 @@ theorem induce_alphaB_apply_eq_sum_nLStabilizerIn (hyp : Hypothesis G A L)
     exact hyp.alphaB_apply_mul hconj hB α hh b.2 _
   rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul, mul_comm]
 
+open Classical in
+/-- **Peterfalvi (2.10.3), the support-restricted value.**  When `α ∈ CF(L, A)` is supported on
+`A`, the `N_L(B)`-aggregated value of `Ind_{M(B)}^G α_B` may be summed over only those
+`b ∈ N_L(B)` lying in `A`:
+
+    `(Ind_{M(B)}^G α_B)(g) = ⅟|M(B)| · ∑_{b ∈ N_L(B), b ∈ A} α(b) · |𝒜(g, H(B)·b)|`.
+
+This is the first reduction of (2.10.3)'s value case: the terms with `b ∉ A` carry a vanishing
+factor `α(b) = 0` (support of `α`) and so drop out of the `N_L(B)`-sum of
+`induce_alphaB_apply_eq_sum_nLStabilizerIn`.  After fixing a Dade-support representative `a` with
+`g ∈ (aH(a))^G`, the surviving `b` are moreover `L`-conjugate to `a` (Peterfalvi (2.4.b)), which
+collapses `α(b)` to the constant `α(a)` in the textbook value formula. -/
+theorem induce_alphaB_apply_eq_sum_nLStabilizerIn_inA (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (α : SupportedClassFunctions (G := G) ℂ A L)
+    [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] (g : G) :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB (α : ClassFunction L ℂ)) g
+      = ⅟(Nat.card (mBSubgroup hyp B hB) : ℂ) *
+          ∑ b ∈ (Finset.univ : Finset (nLStabilizerIn hyp B)).filter
+              (fun b : (nLStabilizerIn hyp B) => ((b : G) ∈ A)),
+            (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ *
+              (conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(b : G)} : Set G))).card := by
+  rw [induce_alphaB_apply_eq_sum_nLStabilizerIn hyp hconj hB (α : ClassFunction L ℂ) g]
+  congr 1
+  -- terms with `b ∉ A` vanish since `α(b) = 0` there (support of `α`)
+  refine (Finset.sum_subset (Finset.filter_subset _ _) fun b _ hb => ?_).symm
+  rw [Finset.mem_filter] at hb
+  have hbA : (b : G) ∉ A := fun h => hb ⟨Finset.mem_univ _, h⟩
+  have hα0 : (α : ClassFunction L ℂ) ⟨(b : G), nLStabilizerIn_le_L hyp B b.2⟩ = 0 := by
+    by_contra hαne
+    exact hbA (α.property hαne)
+  rw [hα0, zero_mul]
+
 end PointwiseValue
 
 /- 2.10/2.6.b: The right-hand side of the inclusion–exclusion is a virtual character. -/
