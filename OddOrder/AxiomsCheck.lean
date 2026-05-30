@@ -1114,6 +1114,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_tau1_chi_of_Y_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi
+-- (5.5)+(5.2.e) image-side orthogonality (issue 0046): the (5.6.3) lattice orthogonalities
+-- `hX_ortho`/`hXbar_ortho` (`⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`) derived from the per-element
+-- `R(χ)`-orthogonality `∀ α ∈ R(χ), ⟨η, α⟩ = 0`.  `inner_X_eq_zero_of_orthogonal_imageSet` :
+-- `X = ∑ coeff•α` (`X_eq`) ⟹ `⟨η, X⟩ = 0`.  `inner_conjImage_eq_zero_of_orthogonal_imageSet` :
+-- `X̄ = X − (χ−χ̄)^τ` with `(χ−χ̄)^τ = ∑_{α∈R(χ)}α` both in `ℤ[R(χ)]` ⟹ `⟨η, X̄⟩ = 0`.  These
+-- CONSTRUCT the `hperElem`-fed `hX_ortho`/`hXbar_ortho` of `retarget_isCoherent_of_decompositions`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_eq_zero_of_orthogonal_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_conjImage_eq_zero_of_orthogonal_imageSet
 -- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
 -- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
 -- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で

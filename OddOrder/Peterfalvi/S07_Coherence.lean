@@ -1525,6 +1525,45 @@ theorem inner_X_conjImage_eq_zero
     inner_sum_orthonormal_eq_zero_of_disjoint hE (Finset.sdiff_subset)
       (Finset.disjoint_sdiff) D.imageFamily.orthonormal, neg_zero]
 
+/-! ##### Peterfalvi (5.5)+(5.2.e): the image-side orthogonality `X, X̄ ⊥ η`
+
+`retarget_isCoherent_of_decomposition` consumes the lattice orthogonalities `hX_ortho`/`hXbar_ortho`
+— `⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0` for `ξ ∈ ℤ[S₁]` (`τ₁ := hS₁.extension`).  In the text these are the
+(5.5)+(5.2.e) facts: `X ∈ ℤ[R(χ)]` (the (5.5) output `X = ∑ coeff•α`, `X_eq`), `X̄ = X − (χ − χ̄)^τ ∈
+ℤ[R(χ)]` too (`(χ − χ̄)^τ = ∑_{α∈R(χ)}α`, `imageFamily.image_eq`), and for every `χᵢ ∈ S₁` the image
+`χᵢ^{τ₁}` is orthogonal to `R(χ)` (by (5.5) for `χᵢ` and (5.2.e) `R(χᵢ) ⊥ R(χ)`), so `τ₁ ξ ⊥ R(χ)`
+for every `ξ ∈ ℤ[S₁]`.
+
+The two reductions *derive* `hX_ortho`/`hXbar_ortho` from the **per-element** `R(χ)`-orthogonality
+`∀ α ∈ R(χ), ⟨η, α⟩ = 0` (the genuine (5.5)+(5.2.e) input, leaving only that as the residual coupling
+to the family `{R(χᵢ)}`).  Stated for an arbitrary `η : CF(G)`, so the caller plugs
+`η := hS₁.extension ξ`. -/
+
+/-- **(5.5) reduction `η ⊥ X`.**  If `η` is orthogonal to every member of `R(χ)`, then `η` is
+orthogonal to `X = D.X ∈ ℤ[R(χ)]` (the (5.5) output `X = ∑ coeff•α`).  This is the `hX_ortho` half
+of (5.6.3): `⟨η, X⟩ = ∑ coeff·⟨η, α⟩ = 0`. -/
+theorem inner_X_eq_zero_of_orthogonal_imageSet
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {η : ClassFunction G ℂ}
+    (hη : ∀ α ∈ D.imageFamily.imageSet, ClassFunction.inner η α = 0) :
+    ClassFunction.inner η D.X = 0 := by
+  rw [D.X_eq, OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right, hη α hα, mul_zero]
+
+/-- **(5.5) reduction `η ⊥ X̄`.**  If `η` is orthogonal to every member of `R(χ)`, then `η` is
+orthogonal to `X̄ = X − (χ − χ̄)^τ`.  Both `X = ∑ coeff•α` (`X_eq`) and `(χ − χ̄)^τ = ∑_{α∈R(χ)}α`
+(`imageFamily.image_eq`) lie in `ℤ[R(χ)]`, so `⟨η, X̄⟩ = ⟨η, X⟩ − ⟨η, (χ−χ̄)^τ⟩ = 0 − 0 = 0`.  This
+is the `hXbar_ortho` half of (5.6.3). -/
+theorem inner_conjImage_eq_zero_of_orthogonal_imageSet
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {η : ClassFunction G ℂ}
+    (hη : ∀ α ∈ D.imageFamily.imageSet, ClassFunction.inner η α = 0) :
+    ClassFunction.inner η (D.X - τ (χ - χ.conj)) = 0 := by
+  rw [ClassFunction.inner_sub_right, D.inner_X_eq_zero_of_orthogonal_imageSet hη,
+    D.imageFamily.image_eq, OddOrder.RepresentationTheory.inner_sum_right,
+    Finset.sum_eq_zero fun α hα => hη α hα, sub_zero]
+
 /-! #### Peterfalvi (5.6.3) target pair `{X, X̄}` from the `ψ = 0` decomposition
 
 The §7 keystone `retarget_isCoherent` consumes an **orthonormal target pair** `{X, X̄} ⊂ ℤ[Irr G]`
@@ -2303,7 +2342,13 @@ The two decompositions and their common projection are exactly Peterfalvi's (5.6
 * `htau1_chi : Da.tau1 χ = D₀.tau1 χ` — both decompositions evaluate the *same* running `τ₁` at `χ`.
   This is the honest τ₁-agreement input; the (5.6.2) identification `Da.X = D₀.X` (the two `R(χ)`
   projections coincide, both `∑_{α∈E}α`) is then **derived** here via `X_eq_of_tau1_eq_on_chi`
-  (`Da.X = Da.tau1 χ` from the (5.6.2) collapse `hY`, `= D₀.tau1 χ = D₀.X` from (5.5)), *not* posited.
+  (`Da.X = Da.tau1 χ` from the (5.6.2) collapse `hY`, `= D₀.tau1 χ = D₀.X` from (5.5)), *not* posited;
+* `hperElem : ∀ ξ ∈ ℤ[S₁], ∀ α ∈ R(χ), ⟨τ₁ ξ, α⟩ = 0` — the (5.5)+(5.2.e) **per-element**
+  `R(χ)`-orthogonality of the running images.  The sum-level lattice orthogonalities
+  `hX_ortho`/`hXbar_ortho` (`⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`) consumed by `retarget_isCoherent_of_decomposition`
+  are **derived** here via `inner_X_eq_zero_of_orthogonal_imageSet` /
+  `inner_conjImage_eq_zero_of_orthogonal_imageSet` (using `X = ∑ coeff•α` and `(χ−χ̄)^τ = ∑_{α∈R(χ)}α`
+  both in `ℤ[R(χ)]`), *not* posited.
 
 The `himg` facts (`htau1_diff`, `hY`, `htau1_chi1`) are the (5.4)/(5.6.2)/(coherence-compat) inputs
 of `image_eq_of_decomposition`. -/
@@ -2318,9 +2363,8 @@ noncomputable def retarget_isCoherent_of_decompositions
     (hχbar_eq : chibar = χ.conj)
     (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
     (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
-    (hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) D₀.X = 0)
-    (hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
-      ClassFunction.inner (hS₁.extension ξ) (D₀.X - τ (χ - chibar)) = 0)
+    (hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ D₀.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0)
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
     (hchi1 : chi1 ∈ S₁)
@@ -2335,6 +2379,16 @@ noncomputable def retarget_isCoherent_of_decompositions
   -- τ₁-agreement `htau1_chi` (no longer posited).
   have hX_eq : Da.X = D₀.X :=
     CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi (a := a) D₀ Da hY htau1_chi
+  -- (5.5)+(5.2.e) image-side orthogonalities `⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`, *constructed* from the
+  -- per-element `R(χ)`-orthogonality `hperElem` (no longer posited).
+  have hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) D₀.X = 0 := fun ξ hξ =>
+    D₀.inner_X_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
+  have hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) (D₀.X - τ (χ - chibar)) = 0 := by
+    intro ξ hξ
+    rw [hχbar_eq]
+    exact D₀.inner_conjImage_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
   -- `himg` for `D₀.X`, constructed from the (5.6.1) decomposition `Da` via the supplier, then
   -- rewritten through `hX_eq : Da.X = D₀.X`.
   have himg : τ (χ - a • chi1) = D₀.X - a • hS₁.extension chi1 := by
