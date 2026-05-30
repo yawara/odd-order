@@ -76,6 +76,16 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - **§5 = Lem 4.7⇒ (=Lem 5.1(a), Gorenstein 5.4.15) と Lem 4.5(c) noncyclic 半 (=Lem 4.5(a) general, Gorenstein 5.4.10) が gate** (ともに §4 側で要)。§5 本体 (Lem 5.1/5.2/Thm 5.3/Cor 5.4) はこれら待ち。設計 `notes/bg/s05_design_2026_05_30.md`。
 - ⚠ **§5 survey の「Lem 1.22 repo 不在」は誤り** — `normal_subgroup_card_pow_le_of_pGroup`@S01:1247 既存 sorry-free (workflow 訂正)。
 
+**Thm 4.12(a) step a-2 完全着地** (2026-05-31, commits 017a888 / ce7645f, sorry-free / axiom-clean, build green 3359 jobs) — 設計 (`s04_thm412_design` §4) が「最深 山場」と名指した D-a2:
+
+- ✅ `actionCommutator_le_centralizer_of_isCyclic_isAInvariant` (`OperatorQuotientAction.lean`): cyclic A-不変 normal `S ⊴ G` ⇒ `[G,A] ⊆ C_G(S)`。
+- ✅ `isCyclic_le_center_of_actionCommutator_eq_top`: 上 + `[G,A]=⊤` ⇒ `S ⊆ Z(G)` (a-2 結論)。
+- ✅ `exists_maximal_isCyclic_isAInvariant_commutator_le`: 極大 A-不変 cyclic `S ⊇ R'` 存在 (S 構成)。
+- 🔑 **設計の半直積 RA ルート (`R=[R,A]⊆(RA)′⊆C_{RA}(S)`, ZGroup.lean:168 技法を RA に lift) は不要だった** — 共役作用 `α:G→*MulAut↥S` と制限作用 `ρ:=φ|_S` の同変性 `ρa·αg=α((φa)g)·ρa` + `MulAut↥S` abelian (S cyclic) で `α((φa)g)=αg`, 生成元 `g·(φa)g⁻¹` が `ker α=C_G(S)` に落ちる。**半直積を一切作らない**。
+- 実装メモ: (1) `CommGroup (MulAut↥S)` を instance 登録すると canonical `MulAut.instGroup` と inv 競合のダイヤモンド → `have hcomm` で mul_comm のみ局所抽出。(2) `IsAInvariant.toMulAutHom_apply_val` は Ch04 `_root_` 欠落で二重 nest 名 → defeq (`change`/`congrArg Subtype.val`) で名前回避。
+
+→ **Thm 4.12(a) の a-2 ビルディングブロック全完**。次 frontier = **D-a3 (Maschke 統合 `Ω₁(R/S)=Ω₁(R)S/S`)** (gate: D-a2✅ / N-4 Maschke✅ / Lem4.10✅ / LEAF-4✅ 全揃い) → D-main (|R|帰納) → D-bc。S⊴R は R'⊆S から即。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
