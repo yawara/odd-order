@@ -1091,6 +1091,88 @@ theorem centralCharacterOfRep_classSum_mul_cong [Finite G] (ρ : Representation 
       rw [Finset.mem_filter] at hCs
       exact character_one_mul_coeff_mul_centralChar_cong_zero ρ Ci Cj Cs (hdvd Cs hCs.2) hm
 
+/-! ### Peterfalvi (6.7.3): the congruence-arithmetic assembly
+
+The remaining content of (6.7.3) is pure algebraic-integer congruence arithmetic, combining the two
+(6.7.2) instances at `(i,j) = (1,1)` and `(1,2)`.  We isolate it from the group-theoretic atoms
+(`a_{110} = 0`, `a_{120} = |C₁|`, `z⁻¹` not `G`-conjugate to `z`, and `ω(C_s) = α` constant on the
+classes meeting `Z^#`), which feed in as hypotheses; those atoms are the `needs-infra`
+TI-subset/Sylow bookkeeping of (6.7.1)'s setup.  The arithmetic below is faithful to Peterfalvi's
+displayed steps. -/
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Peterfalvi (6.7.3)**, combination of the two (6.7.2) instances.  After (6.7.2) at `(1,1)`
+(where `a_{110} = 0`) and `(1,2)` (where `a_{120} = |C₁|`), transitivity of the congruence yields
+`ψ(1)·a_{11}·α ≡ ψ(1)·(|C₁| + a_{12}·α) (mod n)` from the two statements
+`ψ(1)·α² ≡ ψ(1)·a_{11}·α` and `ψ(1)·α² ≡ ψ(1)·(|C₁| + a_{12}·α)`. -/
+theorem peterfalvi_673_combine {n : ℤ} {ψ1 α q a₁₁ a₁₂ : ℂ}
+    (h11 : ψ1 * α ^ 2 ≡ ψ1 * (a₁₁ * α) [ALGMOD n])
+    (h12 : ψ1 * α ^ 2 ≡ ψ1 * (q + a₁₂ * α) [ALGMOD n]) :
+    ψ1 * (a₁₁ * α) ≡ ψ1 * (q + a₁₂ * α) [ALGMOD n] :=
+  h11.symm.trans h12
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Peterfalvi (6.7.3)**, the "divide by `|C₁|`" step.  Substituting `ψ(1)·α = |C₁|·ψ(z)` into the
+combined congruence `ψ(1)·a_{11}·α ≡ ψ(1)·(|C₁| + a_{12}·α)` gives a congruence with a common factor
+`|C₁| = q`; since `q` is coprime to the modulus `n` (Peterfalvi: `|C₁|` prime to `p`, `n = |P|`) and
+the endpoints `ψ(z)`, `ψ(1)` are algebraic integers, that factor cancels, yielding
+`a_{11}·ψ(z) ≡ ψ(1) + a_{12}·ψ(z) (mod n)`. -/
+theorem peterfalvi_673_cancel {n : ℤ} {ψ1 ψz α a₁₁ a₁₂ : ℂ} {q : ℤ}
+    (hcop : IsCoprime q n) (hψz : IsIntegral ℤ ψz) (hψ1 : IsIntegral ℤ ψ1)
+    (ha₁₁ : IsIntegral ℤ a₁₁) (ha₁₂ : IsIntegral ℤ a₁₂)
+    (hsubst : ψ1 * α = (q : ℂ) * ψz)
+    (hcomb : ψ1 * (a₁₁ * α) ≡ ψ1 * ((q : ℂ) + a₁₂ * α) [ALGMOD n]) :
+    a₁₁ * ψz ≡ ψ1 + a₁₂ * ψz [ALGMOD n] := by
+  -- Rewrite both sides of `hcomb` as `q · (…)` using `ψ1·α = q·ψz`.
+  have hL : ψ1 * (a₁₁ * α) = (q : ℂ) * (a₁₁ * ψz) := by
+    rw [show ψ1 * (a₁₁ * α) = a₁₁ * (ψ1 * α) by ring, hsubst]; ring
+  have hR : ψ1 * ((q : ℂ) + a₁₂ * α) = (q : ℂ) * (ψ1 + a₁₂ * ψz) := by
+    rw [show ψ1 * ((q : ℂ) + a₁₂ * α) = (q : ℂ) * ψ1 + a₁₂ * (ψ1 * α) by ring, hsubst]; ring
+  rw [hL, hR] at hcomb
+  -- Cancel the coprime factor `q`; endpoints are integral (counts and character values are).
+  exact Cong.intMul_cancel_left hcop (ha₁₁.mul hψz) (hψ1.add (ha₁₂.mul hψz)) hcomb
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Peterfalvi (6.7.3)**, the final step.  Given the per-`ψ` congruence
+`a_{11}·ψ(z) ≡ ψ(1) + a_{12}·ψ(z) (mod n)` and the `ψ = 1_G` specialization
+`a_{11} ≡ 1 + a_{12} (mod n)`, multiplying the latter by the algebraic integer `ψ(z)` and combining
+yields `ψ(z) ≡ ψ(1) (mod n)`. -/
+theorem peterfalvi_673_final {n : ℤ} {ψ1 ψz a₁₁ a₁₂ : ℂ} (hψz : IsIntegral ℤ ψz)
+    (hψ : a₁₁ * ψz ≡ ψ1 + a₁₂ * ψz [ALGMOD n])
+    (hone : a₁₁ ≡ 1 + a₁₂ [ALGMOD n]) :
+    ψz ≡ ψ1 [ALGMOD n] := by
+  -- Multiply `a₁₁ ≡ 1 + a₁₂` by `ψ(z)`: `a₁₁·ψz ≡ (1 + a₁₂)·ψz = ψz + a₁₂·ψz`.
+  have honeψ : a₁₁ * ψz ≡ ψz + a₁₂ * ψz [ALGMOD n] := by
+    have := hone.smul_left hψz
+    rwa [show ψz * (1 + a₁₂) = ψz + a₁₂ * ψz by ring, mul_comm ψz a₁₁] at this
+  -- Combine with `hψ`: `ψz + a₁₂·ψz ≡ ψ1 + a₁₂·ψz`, then cancel the common `a₁₂·ψz`.
+  have hcomb : ψz + a₁₂ * ψz ≡ ψ1 + a₁₂ * ψz [ALGMOD n] := honeψ.symm.trans hψ
+  have := hcomb.sub (Cong.refl n (a₁₂ * ψz))
+  simpa using this
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Peterfalvi (6.7.3)** (`ψ(z) ≡ ψ(1) (mod |P|)`), assembled from its (6.7.2) inputs.  Given:
+
+* the two (6.7.2) congruences `ψ(1)·α² ≡ ψ(1)·a_{11}·α` (instance `(1,1)`, where `a_{110} = 0`)
+  and `ψ(1)·α² ≡ ψ(1)·(|C₁| + a_{12}·α)` (instance `(1,2)`, where `a_{120} = |C₁|`);
+* the identity `ψ(1)·α = |C₁|·ψ(z)` (`α = ω(C₁)`, `z ∈ C₁ ∩ Z^#`);
+* the `ψ = 1_G` specialization `a_{11} ≡ 1 + a_{12}` of the cancelled congruence;
+* coprimality `IsCoprime |C₁| |P|` (Peterfalvi: `|C₁|` prime to `p`, `|P| = p^k`) and integrality of
+  the character values `ψ(z)`, `ψ(1)` and the integer structure constants `a_{11}`, `a_{12}`,
+
+one concludes `ψ(z) ≡ ψ(1) (mod |P|)`.  This is Peterfalvi's chain
+combine ⟶ substitute-and-cancel-`|C₁|` ⟶ multiply the `1_G` congruence by `ψ(z)` and subtract. -/
+theorem peterfalvi_673 {n : ℤ} {ψ1 ψz α a₁₁ a₁₂ : ℂ} {q : ℤ}
+    (hcop : IsCoprime q n) (hψz : IsIntegral ℤ ψz) (hψ1 : IsIntegral ℤ ψ1)
+    (ha₁₁ : IsIntegral ℤ a₁₁) (ha₁₂ : IsIntegral ℤ a₁₂)
+    (h11 : ψ1 * α ^ 2 ≡ ψ1 * (a₁₁ * α) [ALGMOD n])
+    (h12 : ψ1 * α ^ 2 ≡ ψ1 * ((q : ℂ) + a₁₂ * α) [ALGMOD n])
+    (hsubst : ψ1 * α = (q : ℂ) * ψz)
+    (hone : a₁₁ ≡ 1 + a₁₂ [ALGMOD n]) :
+    ψz ≡ ψ1 [ALGMOD n] :=
+  peterfalvi_673_final hψz
+    (peterfalvi_673_cancel hcop hψz hψ1 ha₁₁ ha₁₂ hsubst (peterfalvi_673_combine h11 h12)) hone
+
 end ClassCongruence
 
 section CharacterDegreeDvd

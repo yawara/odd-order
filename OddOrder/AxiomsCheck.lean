@@ -671,6 +671,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.coeff_mul_card_eq_classSumCoeff
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.character_one_mul_coeff_mul_centralChar
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong
+-- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
+-- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
+-- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence
+-- `a₁₁ ≡ 1 + a₁₂` by `ψ(z)` and subtract.  The group-theoretic atoms (`a_{110}=0`, `a_{120}=|C₁|`,
+-- `z⁻¹` not `G`-conjugate to `z`, `ω(C_s)=α` constant) feed in as hypotheses (the (6.7.1) setup).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_combine
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_cancel
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673_final
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_673
 -- The explicit character-value form `|C| · χ_ρ(g) / χ_ρ(1) ∈ ℤ̄` (algebraic integer), obtained
 -- from the keystone via `centralCharacterOfRep_classSum` + `sum_character_eq_card_mul` + `char_one`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_card_mul_character_div
@@ -691,6 +700,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.AlgInt.Cong.smul_left
 #assert_only_allowed_axioms OddOrder.AlgInt.cong_of_exists_isIntegral
 #assert_only_allowed_axioms OddOrder.AlgInt.Cong.of_int
+-- The "divide by |C₁|" cancellation of (6.7.3): a congruence `c·a ≡ c·b (mod n)` with `c` coprime
+-- to `n` and `a`, `b` algebraic integers gives `a ≡ b (mod n)` (Bézout `u·c + v·n = 1`).
+#assert_only_allowed_axioms OddOrder.AlgInt.Cong.intMul_cancel_left
 -- RepresentationTheory (Isaacs Thm 3.11): for an irreducible complex representation ρ of a finite
 -- group G, the degree χ_ρ(1) = dim V divides |G|.  The first orthogonality relation regrouped over
 -- conjugacy classes expresses |G|/χ(1) = ∑_C ω_ρ(C)·χ((g_C)⁻¹) as a sum of products of algebraic
