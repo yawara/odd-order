@@ -1211,4 +1211,199 @@ theorem inner_X_conjImage_eq_zero
 
 end CharacterPsiDecomposition
 
+/-! ### The orthonormal-block isometry re-targeting keystone
+
+The (5.6.3) construction of `τ₂` from `τ₁` is an instance of a reusable operation: given a
+**global** integral isometry `τ₁ : ℤ[Irr L] → ℤ[Irr G]` (here at the class-function level over
+`ℂ`), an **orthonormal pair** `{χ, χ̄}` in the source and an **orthonormal pair** `{X, X̄}` in the
+target with the *same* gram matrix, re-target the rank-`2` block: send `χ ↦ X`, `χ̄ ↦ X̄`, keeping
+`τ₁` on the orthogonal complement of `{χ, χ̄}`.  The single hypothesis making this a global isometry
+is that `X` and `X̄` are orthogonal to `τ₁ ψ` for *every* `ψ` orthogonal to both `χ` and `χ̄`
+(in the (5.6) application this is `(5.5) + (5.2.e)`: `S₁^{τ₁} ⊥ R(χ)` and `X, X̄ ∈ ℤ[R(χ)]`).
+
+The construction is the explicit correction map
+`τ₂ φ = τ₁ φ + ⟨φ,χ⟩·(X − τ₁χ) + ⟨φ,χ̄⟩·(X̄ − τ₁χ̄)`,
+which automatically equals `τ₁` off `{χ, χ̄}` (the Gram–Schmidt residual
+`φ⊥ = φ − ⟨φ,χ⟩χ − ⟨φ,χ̄⟩χ̄` lands in `{χ, χ̄}^⊥`, so the hypothesis applies to it). -/
+
+namespace IntegralCharacterMap
+
+open OddOrder.RepresentationTheory
+
+variable [Fintype L] [Invertible (Nat.card L : ℂ)]
+
+/-- The integral-linear functional `φ ↦ ⟨φ, η⟩` (linear in the **first** argument). -/
+noncomputable def innerLeftℤ (η : ClassFunction L ℂ) : ClassFunction L ℂ →ₗ[ℤ] ℂ where
+  toFun φ := ClassFunction.inner φ η
+  map_add' a b := ClassFunction.inner_add_left a b η
+  map_smul' n a := by
+    simp only [RingHom.id_apply, zsmul_eq_mul]
+    rw [← Int.cast_smul_eq_zsmul ℂ n a, ClassFunction.inner_smul_left]
+
+@[simp] theorem innerLeftℤ_apply (η φ : ClassFunction L ℂ) :
+    innerLeftℤ (L := L) η φ = ClassFunction.inner φ η := rfl
+
+/-- The Gram–Schmidt residual `φ⊥ = φ − ⟨φ,χ⟩χ − ⟨φ,χ̄⟩χ̄` against `{χ, χ̄}`, as a `ℤ`-linear
+endomorphism of `ClassFunction L ℂ`.  This is `ℂ`-linear (the inner product is `ℂ`-linear in
+its first argument), and in particular `ℤ`-linear, so it composes with the `ℤ`-linear `τ₁`. -/
+noncomputable def orthoResidualMap (χ chibar : ClassFunction L ℂ) :
+    ClassFunction L ℂ →ₗ[ℤ] ClassFunction L ℂ :=
+  LinearMap.id - (innerLeftℤ (L := L) χ).smulRight χ
+    - (innerLeftℤ (L := L) chibar).smulRight chibar
+
+@[simp] theorem orthoResidualMap_apply (χ chibar φ : ClassFunction L ℂ) :
+    orthoResidualMap (L := L) χ chibar φ =
+      φ - ClassFunction.inner φ χ • χ - ClassFunction.inner φ chibar • chibar := by
+  simp [orthoResidualMap, LinearMap.smulRight_apply]
+
+/-- The residual `φ⊥` is orthogonal to `χ` (using orthonormality of `{χ, χ̄}`). -/
+theorem inner_orthoResidualMap_left {χ chibar : ClassFunction L ℂ}
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (φ : ClassFunction L ℂ) :
+    ClassFunction.inner (orthoResidualMap (L := L) χ chibar φ) χ = 0 := by
+  rw [orthoResidualMap_apply, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, hχχ, hχbarχ,
+    mul_one, mul_zero, sub_zero, sub_self]
+
+/-- The residual `φ⊥` is orthogonal to `χ̄` (using orthonormality of `{χ, χ̄}`). -/
+theorem inner_orthoResidualMap_right {χ chibar : ClassFunction L ℂ}
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (φ : ClassFunction L ℂ) :
+    ClassFunction.inner (orthoResidualMap (L := L) χ chibar φ) chibar = 0 := by
+  rw [orthoResidualMap_apply, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, hχχbar, hχbarχbar,
+    mul_one, mul_zero, sub_zero, sub_self]
+
+/-- The rank-`2` **re-targeting** of an integral isometry `τ₁`:
+`φ ↦ τ₁ φ⊥ + ⟨φ,χ⟩·X + ⟨φ,χ̄⟩·X̄`, where `φ⊥ = φ − ⟨φ,χ⟩χ − ⟨φ,χ̄⟩χ̄` is the Gram–Schmidt
+residual.  For an orthonormal pair `{χ, χ̄}` this sends `χ ↦ X`, `χ̄ ↦ X̄`, and keeps `τ₁`
+on the orthogonal complement `{χ, χ̄}^⊥` (where `φ⊥ = φ`).
+
+Concretely, `τ₂ = τ₁ ∘ φ⊥ + ⟨·,χ⟩·X + ⟨·,χ̄⟩·X̄`, a genuine `ℤ`-linear map (the projection is
+`ℂ`-linear, hence `ℤ`-linear; the inner-product functionals are `ℤ`-linear).  Note `τ₁` is *not*
+applied to the complex Fourier coefficients, so the construction is correct even though `τ₁` is
+only `ℤ`-linear. -/
+noncomputable def retarget (τ₁ : IntegralCharacterMap L G)
+    (χ chibar : ClassFunction L ℂ) (X Xbar : ClassFunction G ℂ) :
+    IntegralCharacterMap L G :=
+  τ₁ ∘ₗ orthoResidualMap (L := L) χ chibar
+    + (innerLeftℤ (L := L) χ).smulRight X
+    + (innerLeftℤ (L := L) chibar).smulRight Xbar
+
+@[simp] theorem retarget_apply (τ₁ : IntegralCharacterMap L G)
+    (χ chibar : ClassFunction L ℂ) (X Xbar : ClassFunction G ℂ) (φ : ClassFunction L ℂ) :
+    retarget τ₁ χ chibar X Xbar φ =
+      τ₁ (orthoResidualMap (L := L) χ chibar φ)
+        + ClassFunction.inner φ χ • X + ClassFunction.inner φ chibar • Xbar := by
+  simp [retarget, LinearMap.smulRight_apply]
+
+variable {τ₁ : IntegralCharacterMap L G} {χ chibar : ClassFunction L ℂ}
+  {X Xbar : ClassFunction G ℂ}
+
+/-- On the orthogonal complement of `{χ, χ̄}` the re-targeting agrees with `τ₁`. -/
+theorem retarget_eq_of_orthogonal {φ : ClassFunction L ℂ}
+    (hφχ : ClassFunction.inner φ χ = 0) (hφχbar : ClassFunction.inner φ chibar = 0) :
+    retarget τ₁ χ chibar X Xbar φ = τ₁ φ := by
+  rw [retarget_apply, hφχ, hφχbar, zero_smul, zero_smul, add_zero, add_zero,
+    orthoResidualMap_apply, hφχ, hφχbar, zero_smul, zero_smul, sub_zero, sub_zero]
+
+/-- `χ ↦ X` for an orthonormal pair `{χ, χ̄}`. -/
+theorem retarget_apply_left
+    (hχχ : ClassFunction.inner χ χ = 1) (hχχbar : ClassFunction.inner χ chibar = 0) :
+    retarget τ₁ χ chibar X Xbar χ = X := by
+  have hres : orthoResidualMap (L := L) χ chibar χ = 0 := by
+    rw [orthoResidualMap_apply, hχχ, hχχbar, one_smul, zero_smul, sub_zero, sub_self]
+  rw [retarget_apply, hres, map_zero, hχχ, hχχbar, one_smul, zero_smul, add_zero, zero_add]
+
+/-- `χ̄ ↦ X̄` for an orthonormal pair `{χ, χ̄}`. -/
+theorem retarget_apply_right
+    (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hχbarχbar : ClassFunction.inner chibar chibar = 1) :
+    retarget τ₁ χ chibar X Xbar chibar = Xbar := by
+  have hres : orthoResidualMap (L := L) χ chibar chibar = 0 := by
+    rw [orthoResidualMap_apply, hχbarχ, hχbarχbar, one_smul, zero_smul, sub_zero, sub_self]
+  rw [retarget_apply, hres, map_zero, hχbarχ, hχbarχbar, one_smul, zero_smul, add_zero, zero_add]
+
+/-- **Block expansion of a sesquilinear inner product against an orthonormal pair.**
+For `u, u' ∈ W` with `⟨e,e⟩ = ⟨f,f⟩ = 1`, `⟨e,f⟩ = ⟨f,e⟩ = 0`, and `u, u'` each orthogonal
+to `e` and `f`, the inner product of `u + s·e + t·f` and `u' + s'·e + t'·f` collapses to
+`⟨u,u'⟩ + s·conj s' + t·conj t'`.  This is the common normal form both sides of the
+re-targeting isometry reduce to. -/
+theorem inner_block_expand {W : Type*} [Group W] [Fintype W] [Invertible (Nat.card W : ℂ)]
+    {e f u u' : ClassFunction W ℂ} {s t s' t' : ℂ}
+    (hee : ClassFunction.inner e e = 1) (hff : ClassFunction.inner f f = 1)
+    (hef : ClassFunction.inner e f = 0) (hfe : ClassFunction.inner f e = 0)
+    (hue : ClassFunction.inner u e = 0) (huf : ClassFunction.inner u f = 0)
+    (hu'e : ClassFunction.inner u' e = 0) (hu'f : ClassFunction.inner u' f = 0) :
+    ClassFunction.inner (u + s • e + t • f) (u' + s' • e + t' • f) =
+      ClassFunction.inner u u' + s * star s' + t * star t' := by
+  have heu' : ClassFunction.inner e u' = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hu'e, star_zero]
+  have hfu' : ClassFunction.inner f u' = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hu'f, star_zero]
+  simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    hue, huf, heu', hfu', hee, hff, hef, hfe]
+  ring
+
+/-- **The orthonormal-block isometry re-targeting keystone.**
+
+Let `τ₁` be a *global* integral isometry, `{χ, χ̄}` an orthonormal pair in the source and
+`{X, X̄}` an orthonormal pair in the target with the same gram matrix.  Suppose `X` and `X̄`
+are each orthogonal to `τ₁ ξ` for **every** `ξ` orthogonal to both `χ` and `χ̄`.  Then the
+re-targeted map `τ₂ = retarget τ₁ χ χ̄ X X̄` is again a global integral isometry.
+
+This is the reusable form of Peterfalvi (5.6.3)'s `τ₂`: the orthogonality hypothesis is
+exactly `(5.5) + (5.2.e)` (`X, X̄ ∈ ℤ[R(χ)]` and `S₁^{τ₁} ⊥ R(χ)`), and the conclusion is the
+global isometry that, together with `retarget_apply_left`/`retarget_apply_right`/
+`retarget_eq_of_orthogonal`, witnesses coherence of `S₁ ∪ {χ, χ̄}`. -/
+theorem retarget_isIntegralIsometry [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hτ₁ : IsIntegralIsometry (L := L) (G := G) τ₁)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hXX : ClassFunction.inner X X = 1) (hXbarXbar : ClassFunction.inner Xbar Xbar = 1)
+    (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
+    (hX_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (τ₁ ξ) X = 0)
+    (hXbar_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (τ₁ ξ) Xbar = 0) :
+    IsIntegralIsometry (L := L) (G := G) (retarget τ₁ χ chibar X Xbar) := by
+  refine ⟨fun φ ψ => ?_⟩
+  set s := ClassFunction.inner φ χ with hs
+  set t := ClassFunction.inner φ chibar with ht
+  set s' := ClassFunction.inner ψ χ with hs'
+  set t' := ClassFunction.inner ψ chibar with ht'
+  set φperp := orthoResidualMap (L := L) χ chibar φ with hφperp
+  set ψperp := orthoResidualMap (L := L) χ chibar ψ with hψperp
+  -- Orthogonality of the residuals to `{χ, χ̄}`.
+  have hφperp_χ : ClassFunction.inner φperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ φ
+  have hφperp_χbar : ClassFunction.inner φperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar φ
+  have hψperp_χ : ClassFunction.inner ψperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ ψ
+  have hψperp_χbar : ClassFunction.inner ψperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar ψ
+  -- Image side: `⟨τ₂φ, τ₂ψ⟩ = ⟨τ₁φ⊥, τ₁ψ⊥⟩ + s·conj s' + t·conj t'`.
+  have himg : ClassFunction.inner (retarget τ₁ χ chibar X Xbar φ)
+      (retarget τ₁ χ chibar X Xbar ψ) =
+      ClassFunction.inner (τ₁ φperp) (τ₁ ψperp) + s * star s' + t * star t' := by
+    rw [retarget_apply, retarget_apply, ← hφperp, ← hψperp, ← hs, ← ht, ← hs', ← ht']
+    exact inner_block_expand hXX hXbarXbar hXXbar hXbarX
+      (hX_ortho φperp hφperp_χ hφperp_χbar) (hXbar_ortho φperp hφperp_χ hφperp_χbar)
+      (hX_ortho ψperp hψperp_χ hψperp_χbar) (hXbar_ortho ψperp hψperp_χ hψperp_χbar)
+  -- Source side: `⟨φ, ψ⟩ = ⟨φ⊥, ψ⊥⟩ + s·conj s' + t·conj t'`.
+  have hsrc : ClassFunction.inner φ ψ =
+      ClassFunction.inner φperp ψperp + s * star s' + t * star t' := by
+    have hφ : φ = φperp + s • χ + t • chibar := by
+      rw [hφperp, orthoResidualMap_apply, ← hs, ← ht]; abel
+    have hψ : ψ = ψperp + s' • χ + t' • chibar := by
+      rw [hψperp, orthoResidualMap_apply, ← hs', ← ht']; abel
+    rw [hφ, hψ]
+    exact inner_block_expand hχχ hχbarχbar hχχbar hχbarχ
+      hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
+  rw [himg, hsrc, hτ₁.inner_eq φperp ψperp]
+
+end IntegralCharacterMap
+
 end OddOrder.Peterfalvi.S07
