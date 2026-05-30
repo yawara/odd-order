@@ -1285,6 +1285,35 @@ theorem norm_character_le_finrank (ρ : Representation ℂ G V) [Finite G] (g : 
     Multiset.map_congr rfl hroot_norm
   rw [hmap, Multiset.map_const', Multiset.sum_replicate, hcard, nsmul_eq_mul, mul_one]
 
+/-- **Peterfalvi (6.6) G2.2: a subrepresentation inherits a kernel containment** (the
+representation-level constituent-inherits-kernel fact, via the diagonalization keystone).  If the
+character of `ρ` at `g` equals its degree (`ρ.character g = ρ.character 1`, i.e. `g` lies in the
+character kernel of `ρ`), then for **every** subrepresentation `ρ'` of `ρ` the same holds of its
+character: `ρ'.toRepresentation.character g = ρ'.toRepresentation.character 1`.
+
+This is the honest, fully-general form of "an irreducible constituent inherits a kernel containment
+of the ambient character": a constituent is a subrepresentation, and the keystone
+`rep_eq_id_of_character_eq_one` makes `ρ g = id`, which *restricts* to the identity on the invariant
+submodule `ρ'.toSubmodule`; the trace of the identity is the dimension, i.e. the degree of `ρ'`.  No
+character-decomposition (`ψ = ∑ mᵢ χᵢ`) is needed — the statement is purely at the
+representation/subrepresentation level, which is exactly the structural content (6.6) reads off
+(`Z ⊆ ker (Ind θ) ⟹ Z ⊆ ker χ` for a constituent `χ`). -/
+theorem subrepresentation_character_eq_one_of_character_eq_one
+    (ρ : Representation ℂ G V) [Finite G] (ρ' : Subrepresentation ρ) {g : G}
+    (h : ρ.character g = ρ.character 1) :
+    ρ'.toRepresentation.character g = ρ'.toRepresentation.character 1 := by
+  -- Keystone: `ρ g = id`.
+  have hid : ρ g = LinearMap.id := rep_eq_id_of_character_eq_one ρ h
+  -- Restricting the identity to the invariant submodule is the identity.
+  have hrestr : ρ'.toRepresentation g = LinearMap.id := by
+    show (ρ g).restrict (ρ'.apply_mem_toSubmodule g) = LinearMap.id
+    ext v
+    simp [LinearMap.restrict_apply, hid]
+  -- Both sides are the dimension of the submodule (`trace id = finrank`).
+  rw [show ρ'.toRepresentation.character g
+        = LinearMap.trace ℂ ρ'.toSubmodule (ρ'.toRepresentation g) from rfl, hrestr,
+      Representation.char_one, LinearMap.trace_id]
+
 /-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
 inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.
 

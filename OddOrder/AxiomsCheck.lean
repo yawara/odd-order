@@ -1216,6 +1216,11 @@ set_option linter.style.longLine false in
 -- General character-value bound `|χ(g)| ≤ χ(1)` (the inequality the (6.6) G2.2 residual flags as
 -- needs-infra), via the same root-of-unity / triangle machinery; equality case is the keystone.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.norm_character_le_finrank
+-- Peterfalvi (6.6) G2.2 representation-level constituent-inherits-kernel: `g ∈ ker χ_ρ` (whole-rep
+-- character = degree) ⟹ `g ∈ ker χ_{ρ'}` for every subrepresentation `ρ'` (keystone: `ρ g = id`
+-- restricts to `id` on the invariant submodule, so its character = dimension = degree).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.subrepresentation_character_eq_one_of_character_eq_one
 
 -- Inflation infrastructure ([Isaacs] (2.22), gating Peterfalvi (6.6) G2.5 degree-sum):
 -- irreducibility is preserved under surjective precomposition, hence the inflation map
