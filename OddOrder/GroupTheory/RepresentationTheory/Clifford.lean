@@ -422,6 +422,30 @@ theorem restrictionMultiplicity_nonneg
   rw [restrictionMultiplicity_eq_finrank_intertwiningMap H ρ σ hχρ hθσ]
   exact Nat.cast_nonneg _
 
+open scoped ComplexOrder in
+/-- **The restriction multiplicity is a non-negative integer** (the full multiplicity
+statement of Clifford's theorem, [Is] Thm 6.5).  For irreducible characters `χ` of `G`
+and `θ` of `H`, the normalized inner-product multiplicity `⟨Res^G_H χ, θ⟩ = (k : ℂ)` for
+some `k : ℕ`.
+
+This combines the two halves established separately: the integrality
+`restrictionMultiplicity_int` (`⟨Res χ, θ⟩ = m` for some `m : ℤ`, via the virtual-character
+inner product) and the non-negativity `restrictionMultiplicity_nonneg`
+(`0 ≤ ⟨Res χ, θ⟩`, via the `Hom`-dimension formula).  A non-negative integer is a natural
+number (`m ≥ 0` from `0 ≤ (m : ℂ)`, then `k = m.toNat`).  This is the form Clifford's
+theorem consumes: the constituent multiplicity `e_χ` is the *count* of copies of `θ` in
+`Res^G_H χ`, a non-negative integer. -/
+theorem restrictionMultiplicity_natCast [Finite G]
+    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) :
+    ∃ k : ℕ, restrictionMultiplicity H χ θ = (k : ℂ) := by
+  obtain ⟨m, hm⟩ := restrictionMultiplicity_int H hχ.mem_ZIrr hθ.mem_ZIrr
+  have hnn : (0 : ℂ) ≤ (m : ℂ) := hm ▸ restrictionMultiplicity_nonneg H hχ hθ
+  have hm0 : 0 ≤ m := by exact_mod_cast hnn
+  refine ⟨m.toNat, ?_⟩
+  rw [hm]
+  exact_mod_cast (Int.toNat_of_nonneg hm0).symm
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
@@ -555,6 +579,18 @@ theorem restrictionMultiplicity_int [Finite G]
     ∃ m : ℤ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
         (θ : ClassFunction H ℂ) = (m : ℂ) :=
   ClassFunction.restrictionMultiplicity_int H χ.mem_ZIrr θ.mem_ZIrr
+
+/-- **The constituent multiplicity of an irreducible character is a non-negative integer**
+(the full multiplicity statement of Clifford's theorem, [Is] Thm 6.5).  For irreducible
+characters `χ` of `G` and `θ` of `H`, the normalized inner product
+`⟨Res^G_H χ, θ⟩ = (k : ℂ)` for some `k : ℕ`.  This is the irreducible-character
+specialization of `ClassFunction.restrictionMultiplicity_natCast`: the constituent
+multiplicity `e_χ` is the count of copies of `θ` in `Res^G_H χ`. -/
+theorem restrictionMultiplicity_natCast [Finite G]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    ∃ k : ℕ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) = (k : ℂ) :=
+  ClassFunction.restrictionMultiplicity_natCast H χ.isIrreducible θ.isIrreducible
 
 end IrreducibleCharacter
 

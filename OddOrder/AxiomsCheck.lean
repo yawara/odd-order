@@ -761,3 +761,9 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_nonneg
+-- Clifford gap #5 完結 (issue 0026): multiplicity ⟨Res^G_H χ, θ⟩ = (k : ℂ), k : ℕ
+-- (整数性 restrictionMultiplicity_int + 非負性 restrictionMultiplicity_nonneg の合成).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_natCast
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast

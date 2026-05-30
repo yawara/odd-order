@@ -282,6 +282,24 @@ orbit-sum decomposition と `RestrictionConstituentsSingleOrbit` の hypothesis 
 依然 BLOCKER B 待ち (既約性使用, isotype の `G`-transitive permutation, mathlib 未収録)。
 非負性は BLOCKER B に依存しないことが判明したので, これで gap #5 は完全に解決 (整数 + 非負)。
 
+## 2026-05-30 update (5) — multiplicity ∈ ℕ (gap #5 を単一 theorem に統合)
+
+整数半分 (`restrictionMultiplicity_int`) と非負半分 (`restrictionMultiplicity_nonneg`) を
+**1 つの命題**に合成し, Clifford ([Is] Thm 6.5) が実際に消費する形
+`⟨Res^G_H χ, θ⟩ = (k : ℂ)` (`k : ℕ`) を着地 (sorry/axiom 無し, allowlist 3 axioms)。これまで
+gap #5 は「整数」と「非負」が**別仮説の 2 定理**(整数性は ZIrr 所属, 非負性は既約性)に
+分かれており, 単一の自然数値ステートメントが欠けていた。既約指標は両方を供給する
+(`.mem_ZIrr` で整数, 既約性で非負)ので合成可能。
+
+- **`ClassFunction.restrictionMultiplicity_natCast`** (`Clifford.lean`):
+  `[Finite G]`, `IsIrreducibleCharacter χ`, `IsIrreducibleCharacter θ` →
+  `∃ k : ℕ, restrictionMultiplicity H χ θ = (k : ℂ)`。証明は `restrictionMultiplicity_int`
+  + `restrictionMultiplicity_nonneg` の合成 (`0 ≤ (m:ℂ)` ⇒ `0 ≤ m` ⇒ `k = m.toNat`)。
+- **`IrreducibleCharacter.restrictionMultiplicity_natCast`**: bundled 既約指標版。
+
+これで gap #5 は文字通り完結 (ℕ 値として確定)。残る hard blocker は依然 BLOCKER B
+(orbit transitivity) のみ。
+
 ## 完了条件
 
 - `OddOrder.RepresentationTheory.clifford_decomposition` から `sorry` が消える、または
