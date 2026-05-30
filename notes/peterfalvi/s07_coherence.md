@@ -34,6 +34,35 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ---
 
+## Lean status: (5.2.d) gateway + (5.4) norm 不等式 (2026-05-30, issue 1001, Round-9 Track B)
+
+`OddOrder/Peterfalvi/S07_Coherence.lean` に (5.2.d) の一般 gateway + (5.4) を sorry-free 実装.
+
+- **`OrthonormalCharacterImageFamily τ χ`** = (5.2.d) の R(χ): `imageSet : Finset (ClassFunction G ℂ)`
+  (orthonormal subset of ℤ[Irr G]), `mem_ZIrr`, `orthonormal` (⟨α,β⟩=δ_{α,β}),
+  `image_eq` ((χ-χ̄)^τ=∑_{α∈R(χ)}α). 既存 2 元 `CharacterDifferenceImage` は特殊例
+  (R(χ)={ε·μ,-ε·ν}); 一般 gateway が真に subsume することを
+  `CharacterDifferenceImage.toOrthonormalImage` で証明 (非空性 = scaffolding でない証拠).
+  `Orthogonal` predicate = (5.2.e) disjoint-pair.
+- **`CharacterPsiDecomposition τ χ ψ`** = (5.4) setup を bundle: imageFamily R(χ), 補助
+  isometry τ₁ (χ-χ̄ で τ と一致), 分解 (χ-ψ)^{τ₁}=X-Y, X∈ℤ[R(χ)] (整数係数 coeff),
+  Y⊥R(χ), 直交 (χ,ψ)=(χ̄,ψ)=(χ,χ̄)=0.
+- **(5.4.a)** `inner_self_chi_re_le_inner_self_X`: (⟨χ,χ⟩).re ≤ (⟨X,X⟩).re. keystone は
+  `inner_self_chi_eq_sum_coeff` (‖χ‖²=⟨χ-ψ,χ-χ̄⟩=⟨X-Y,∑α⟩=⟨X,∑α⟩=∑coeff).
+- **(5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge`: ‖Y‖²≥‖ψ‖² ⟹ ‖X‖²=‖χ‖², ‖Y‖²=‖ψ‖²,
+  X=∑_{α∈E}α (E=filter(coeff=1)⊆R(χ)). total-norm Pythagoras + 整数 CS tightness.
+- norm 比較は repo 慣用の `(⟨·,·⟩).re` (S09 と整合).
+- **infra (ZIrrFourier)**: 整数 CS (int_le_sq / int_eq_sq_iff / finset_sum_le_sum_sq /
+  finset_sum_eq_sum_sq_iff), 任意 orthonormal Finset 族の Parseval
+  (inner_orthonormalSum_eq_coeff / inner_self_orthonormalSum_eq_sum_sq /
+  inner_orthonormalSum_sum_eq_sum_coeff), inner_conj_symm (⟨ψ,φ⟩=conj⟨φ,ψ⟩).
+- AxiomsCheck 3 件登録 (all in allowlist).
+- **残 (別 issue)**: (5.5)/(5.6)/(5.7) は本 (5.4) gateway を消費する coherence 統合.
+  `CharacterPsiDecomposition` の data 入力 (imageFamily/tau1/coeff) は実適用時に Dade
+  文脈から構成要 (gateway は statement-level の道具).
+
+---
+
 ## §7 全 9 結果 (抽出表) ⚠️ audit 訂正 (旧 6 結果は (5.7)-(5.9) 完全欠落)
 
 | # | mmd 行 | 種別 | statement 概要 | 役割 | mathlib | §8-§16 被引用 |

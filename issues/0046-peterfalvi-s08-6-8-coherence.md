@@ -178,6 +178,21 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
         「형식화 진행 (Track A)」。残: (5.6.1) Y 분해 / (5.6.2) `0<b<1⇒λ=0` quadratic forcing /
         (5.4.a/b) Cauchy–Schwarz — いずれも R(χ) 一般 orthonormal lattice (B1) 선행 필요。
 
+## 進捗 (2026-05-30, issue 1001, Round-9 Track B)
+
+- **(5.4) gateway B1+B2+B3 完了** (`S07_Coherence.lean`, sorry-free):
+  - **B1** `OrthonormalCharacterImageFamily τ χ` = (5.2.d) の一般 R(χ) (ℤ[Irr G] の
+    orthonormal subset, (χ-χ̄)^τ=∑α). 2 元 `CharacterDifferenceImage` は特殊例で,
+    `toOrthonormalImage` で一般 gateway が subsume することを証明 (上の「(5.4.a/b) は
+    R(χ) 一般 orthonormal lattice (B1) 선행 필요」を解消)。
+  - **B2 (5.4.a)** `CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X` (‖X‖²≥‖χ‖²)。
+  - **B3 (5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge` (norm 等号 + X=∑_{α∈E}α)。
+  - infra: 整数 Cauchy-Schwarz + orthonormal Parseval + inner_conj_symm (ZIrrFourier)。
+  - 詳細 `notes/peterfalvi/s07_coherence.md` 「Lean status: (5.2.d) gateway + (5.4)」。
+  - これで (5.6)/(5.7) coherence 統合 (上記 Track A の残 (5.6.1)/(5.6.2)) が
+    (5.4) gateway を直接消費して書ける土台が揃った (実適用時 `CharacterPsiDecomposition`
+    の data 入力を Dade 文脈から構成する作業は残)。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。
