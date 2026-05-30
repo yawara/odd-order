@@ -610,6 +610,11 @@ set_option linter.style.longLine false in
 -- (a coprime-order element of `C_G(a)` lies in the normal complement `H(a)`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.mem_H_of_mem_centralizer_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.centralizer_inf_hIntersection
+-- Peterfalvi §4 (2.5)/(2.6.a): the explicit pointwise Dade map `dadeMap` satisfies the (2.5)
+-- defining equations (`isDadeMap_dadeMap`, well-defined by (2.4.b)), and bundles with the
+-- (2.6.a) isometry into an actual `DadeIsometryData` (no longer an interface assumption).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.isDadeMap_dadeMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeIsometryData
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

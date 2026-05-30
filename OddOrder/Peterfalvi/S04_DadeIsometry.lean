@@ -1261,6 +1261,83 @@ theorem map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
   apply hτ.map_eq_zero_of_not_mem_dadeSupport
   rwa [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]
 
+/-! ### The explicit Dade map of Peterfalvi (2.5)
+
+We construct the Dade map `α ↦ α^τ` *pointwise* from its defining equations (2.5):
+`α^τ(g) = α(a)` if `g` is `G`-conjugate to an element of some coset `aH(a)`, and `0`
+otherwise.  Well-definedness (independence of the chosen `a`) is exactly (2.4.b).
+This realizes the previously interface-only `IsDadeMap` as an honest construction;
+together with `isDadeIsometry_of_isDadeMap` it gives a genuine `DadeIsometryData`.
+The remaining (2.6.b) virtual-character preservation, which needs the (2.10)
+inclusion–exclusion, upgrades it to a `FullDadeIsometryData`. -/
+
+/-- The value `α^τ(g)` of the Peterfalvi (2.5) Dade map: `α(a)` when `g` is
+`G`-conjugate to an element of some coset `aH(a)`, else `0`.  The chosen `a` is
+irrelevant by (2.4.b) (`dadeValue_eq`). -/
+noncomputable def Hypothesis.dadeValue (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) (g : G) : k := by
+  classical
+  exact if hg : g ∈ hyp.dadeSupport then
+      (α : ClassFunction L k)
+        ⟨(hyp.mem_dadeSupport_iff.mp hg).choose.1,
+          hyp.mem_L (hyp.mem_dadeSupport_iff.mp hg).choose.2⟩
+    else 0
+
+theorem Hypothesis.dadeValue_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) {g : G} (hg : g ∉ hyp.dadeSupport) :
+    hyp.dadeValue α g = 0 := by
+  rw [Hypothesis.dadeValue, dif_neg hg]
+
+/-- **Peterfalvi (2.5), well-definedness.**  `α^τ(g) = α(a)` whenever `g` is
+`G`-conjugate to an element of `aH(a)`.  Two such base points `a, a'` are
+`L`-conjugate by (2.4.b) (`isConj_in_L_of_mul_H`), and `α` is an `L`-class function. -/
+theorem Hypothesis.dadeValue_eq (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    hyp.dadeValue α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ := by
+  classical
+  have hg : g ∈ hyp.dadeSupport := hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, hga⟩
+  rw [Hypothesis.dadeValue, dif_pos hg]
+  set a₀ := (hyp.mem_dadeSupport_iff.mp hg).choose with ha₀
+  obtain ⟨h₀, hh₀, hga₀⟩ := (hyp.mem_dadeSupport_iff.mp hg).choose_spec
+  obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a₀.2 a.2 hh₀ hh (hga₀.trans hga.symm)
+  refine ClassFunction.of_isConj (α : ClassFunction L k) (isConj_iff.mpr ⟨l, ?_⟩)
+  exact Subtype.ext (by simp only [Subgroup.coe_mul, Subgroup.coe_inv]; exact hl)
+
+/-- The Peterfalvi (2.5) Dade map as a `ClassFunction G k`.  Conjugation invariance:
+if `g` lies in `dadeSupport` it is `G`-conjugate to some `aH(a)`, hence so is
+`x g x⁻¹` with the *same* `a`, so both values are `α(a)`; off `dadeSupport` both are `0`
+(`dadeSupport` is conjugation-stable). -/
+noncomputable def Hypothesis.dadeMapCF (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) : ClassFunction G k :=
+  ⟨hyp.dadeValue α, by
+    intro g x
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [hyp.dadeValue_eq α hh (hga.trans (isConj_iff.mpr ⟨x, rfl⟩)),
+        hyp.dadeValue_eq α hh hga]
+    · have hxg : x * g * x⁻¹ ∉ hyp.dadeSupport := by
+        rw [hyp.mem_dadeSupport_conj_iff]; exact hg
+      rw [hyp.dadeValue_of_not_mem_dadeSupport α hxg,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg]⟩
+
+/-- **Peterfalvi (2.5).**  The explicit Dade map `τ : CF(L, A) → CF(G)`. -/
+noncomputable def Hypothesis.dadeMap (hyp : Hypothesis G A L) :
+    DadeMap (G := G) k A L :=
+  fun α => hyp.dadeMapCF α
+
+@[simp] theorem Hypothesis.dadeMap_apply (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) (g : G) :
+    hyp.dadeMap α g = hyp.dadeValue α g := rfl
+
+/-- **Peterfalvi (2.5).**  The explicit Dade map satisfies the defining equations,
+i.e. it `IsDadeMap`.  This discharges the `IsDadeMap` interface by construction. -/
+theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :
+    IsDadeMap hyp (hyp.dadeMap (k := k)) where
+  map_eq_of_isConj_hCoset α g a h hh hconj := hyp.dadeValue_eq α hh hconj
+  map_eq_zero_of_not_mem_dadeSupport α g hg :=
+    hyp.dadeValue_of_not_mem_dadeSupport α hg
+
 end IsDadeMap
 
 /-- Peterfalvi (2.6.b): a complex Dade map sends supported virtual characters
@@ -1686,6 +1763,23 @@ noncomputable def DadeIsometryData.ofIsDadeMap
     (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
     (hconj : hyp.HConjInvariant) :
     (DadeIsometryData.ofIsDadeMap hyp τ hτ hconj).toDadeMap = τ :=
+  rfl
+
+/-- **The explicit Dade isometry of Peterfalvi (2.5)–(2.6.a).**  Bundles the pointwise
+Dade map `dadeMap` (satisfying the (2.5) equations, `isDadeMap_dadeMap`) with the (2.6.a)
+isometry property, supplied automatically by `isDadeIsometry_of_isDadeMap`.
+
+This realizes the previously interface-only `DadeIsometryData` as an actual construction,
+relative to Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+Virtual-character preservation (2.6.b) — which upgrades this to a `FullDadeIsometryData` —
+needs the (2.10) inclusion–exclusion and is tracked separately (issue 0040). -/
+noncomputable def Hypothesis.dadeIsometryData (hconj : hyp.HConjInvariant) :
+    DadeIsometryData (G := G) (k := ℂ) hyp :=
+  DadeIsometryData.ofIsDadeMap hyp (hyp.dadeMap (k := ℂ))
+    (hyp.isDadeMap_dadeMap (k := ℂ)) hconj
+
+@[simp] theorem Hypothesis.dadeIsometryData_toDadeMap (hconj : hyp.HConjInvariant) :
+    (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) :=
   rfl
 
 end AdjointFormula
