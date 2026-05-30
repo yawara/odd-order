@@ -250,6 +250,32 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     은 추가 brick = **"부분공간 등거리 → 전역 등거리 확장" (유한차원 ℂ class-function 공간의
     Witt/Gram–Schmidt 확장)** 또는 격자-상대 `IsCoherent` 재정식화가 필요. keystone 자체는
     R(χ)⊆span{τ₁χ,τ₁χ̄} (예: 2-원소 (5.2.d) base) 에서 직접 사용 가능하며 (5.6) 의 대수적 심장.
+- [x] (2026-05-31, pass 4) **(5.6.3) 격자-相対 keystone + 大域 assembly bridge + span infra**
+      (sorry/axiom 無, AxiomsCheck 신규 7 건 各 3 axiom 全 allowlist, full `lake build OddOrder`
+      緑 3351 jobs; commits 63f7437 / e5ac588 / fede79c). Pass 3 의 "전역 vs 격자" 잔존의 **격자
+      측 해결**:
+  - **`retarget_inner_eq_on`** (격자-相対 keystone, 진짜 충족가능형): 전역 keystone 가설
+    `∀ξ⊥{χ,χ̄},⟨τ₁ξ,X⟩=0` 은 (5.6) 일반위치 비충족 (X=μ∉span{τ₁χ,τ₁χ̄}; τ₁=hS₁.extension 은
+    χ−χ̄ 위 τ 와 무관, χ∉S₁). 대신 ℂ-부분가군 `M` ({χ,χ̄}-잔차 닫힘, χ,χ̄∈M) 위 `⟨·,·⟩` 보존,
+    `X,X̄⊥τ₁ξ` 도 `ξ∈M⊥{χ,χ̄}` 한정. `M=span_ℂ(S₁∪{χ,χ̄})` ⟹ 잔차∈span_ℂ S₁ ⟹ 가설은 정확히
+    honest 한 (5.5)+(5.2.e) `X,X̄⊥S₁^{τ₁}`. **(5.6.3) 격자 등거리 `Z[S₁∪{χ,χ̄}]→Z[Irr G]`, §7 가
+    실제 공급.** 증명 전역판과 동일 `inner_block_expand` (잔차 ∈M submodule 닫힘).
+  - **`retarget_isCoherent`** (`noncomputable def`): hS₁ + orthonormal {χ,χ̄}/{X,X̄} +
+    `X̄=X−(χ−χ̄)^τ` + (5.5)+(5.2.e) 전역 orthogonality + (5.6.2) image eq (a:ℕ) + (5.1)-generation
+    ⟹ `IsCoherent τ (S₁∪{χ,χ̄}) A`. τ₂:=retarget **구성** (posit 無). extends_on_supported 는
+    차이생성원 `{χ−χ̄,χ−a·χ₁}∪Z[S₁,L^#]` 일치 + span-induction. ⚠️ 전역 keystone 의존 ⟹
+    X,X̄∈span{τ₁χ,τ₁χ̄} 특수상황 (예: (5.2.d) 2-원소 base) 에서만 적용 (정직하나 main 일반형 아님).
+  - **재사용 infra**: `eq_on_zSpan_of_eq_on` (생성집합 일치 ⟹ ℤ-span 일치),
+    `inner_eq_zero_of_mem_zSpan` (η⊥T ⟹ η⊥ℤ[T]), `retarget_eq_on_zSpan_of_orthogonal`,
+    `inner_eq_zero_of_eq_intCast_sum` (X=∑c(α)•α + η⊥각 α ⟹ η⊥X; `X_eq`→hX_ortho 다리).
+  - **정밀 잔존 (단 하나, 정의적 결정)**: main (5.6) 유일 gap = `IsCoherent.extension_isometry` 가
+    **전역** `IsIntegralIsometry` 요구. 격자 등거리 `retarget_inner_eq_on` 은 이미 구성. **권장
+    경로**: `extension_isometry` 를 격자-相対 (`Z[S]` 위) 로 약화 — (a) Peterfalvi (5.6.3) 자체가
+    격자만 주장, (b) 하류 `S08 IndChainDecomposition.ofIsCoherent` 는 `extension_inner_eq` 를
+    ζt∈S (격자원) 에만 적용 (S08_CoherenceTheorems.lean:251-253, 전역성 미사용), (c) 전역은
+    dim CF(L)≤dim CF(G) 필요 — FT 비보장 ⟹ 현 정의 일반 충족불가 가능성. 약화 후 본 라운드 infra 가
+    즉시 main (5.6) 완성. **단 shared `IsCoherent`/S08 영향 ⟹ main 합류 시 결정 (worktree 단독
+    변경 회피).** 대안 (Witt 전역확장) 은 dim 조건 + bespoke mathlib 부재로 열세.
 
 ## 完了条件
 

@@ -681,6 +681,46 @@ S₁-coherence 확장 τ₁ (span 밖 값 비제어) 에 대해 **충족 불가*
 또는 격자-상대 `IsCoherent` 재정식화 필요. keystone 자체는 R(χ)⊆span{τ₁χ,τ₁χ̄} (2-원소 (5.2.d)
 base 등) 에서 직접 적용 가능하며 (5.6) 의 **대수적 심장**.
 
+### (2026-05-31, pass 4) 격자-상대 keystone `retarget_inner_eq_on` + 大域 assembly bridge + span infra
+
+`S07_Coherence.lean` (sorry/axiom 無, AxiomsCheck 7 건 신규 각 3 axiom 全 allowlist, full
+`lake build OddOrder` 緑 3351 jobs; commits 63f7437 / e5ac588 / fede79c). Pass 3 의 정밀 잔존
+("전역 vs 격자" + "格子-相対 재정식화 필요")의 **격자 측을 해결**.
+
+- **`retarget_inner_eq_on`** (격자-相対 keystone, 진짜 충족가능형): 전역 keystone
+  `retarget_isIntegralIsometry` 의 가설 `∀ξ⊥{χ,χ̄}, ⟨τ₁ξ,X⟩=0` 은 (5.6) 일반위치에서 충족불가
+  (X=μ∉span{τ₁χ,τ₁χ̄}; τ₁=hS₁.extension 은 χ−χ̄ 위에서 τ 와 무관 — χ∉S₁). 대신 **ℂ-부분가군 `M`**
+  ({χ,χ̄}-Gram–Schmidt 잔차 닫힘, χ,χ̄∈M) 위에서만 `⟨·,·⟩` 보존, `X,X̄⊥τ₁ξ` 도 `ξ∈M⊥{χ,χ̄}`
+  에 한해 요구. `M=span_ℂ(S₁∪{χ,χ̄})` 면 `φ∈M` 잔차는 `span_ℂ S₁` 에 들어가므로 가설은 정확히 honest
+  한 (5.5)+(5.2.e) `X,X̄⊥S₁^{τ₁}`. **이것이 (5.6.3) 격자 등거리 `Z[S₁∪{χ,χ̄}]→Z[Irr G]` 로,
+  §7 data 가 실제 공급하는 형태.** 증명은 전역판과 동일 `inner_block_expand`, 단 잔차의 ∈M 을
+  submodule 닫힘으로.
+- **`retarget_isCoherent`** (大域 assembly, `noncomputable def`): `hS₁:IsCoherent τ S₁ A` (τ₁:=
+  hS₁.extension) + orthonormal {χ,χ̄}/{X,X̄} + `X̄=X−(χ−χ̄)^τ` + (5.5)+(5.2.e) 전역 orthogonality
+  + (5.6.2) image eq `(χ−a·χ₁)^τ=X−a·χ₁^{τ₁}` (a:ℕ) + (5.1)-generation `hgen` ⟹
+  `IsCoherent τ (S₁∪{χ,χ̄}) A`. `τ₂:=retarget …` **구성** (posit 無). 등거리는 전역 keystone,
+  `extends_on_supported` 는 세 차이생성원 `{χ−χ̄,χ−a·χ₁}∪Z[S₁,L^#]` 위 일치 + span-induction.
+  ⚠️ **여전히 전역 keystone 가설 의존** ⟹ (5.6) 일반위치 비충족 (X,X̄∈span{τ₁χ,τ₁χ̄} 특수상황,
+  예: (5.2.d) 2-원소 base, 에서만 적용가능). 정직한 정리지만 main (5.6) 일반형은 아님.
+- **재사용 infra** (전부 sorry/axiom 無): `eq_on_zSpan_of_eq_on` (두 ℤ-character map 이 생성집합
+  위 일치 ⟹ ℤ-span 위 일치, span_induction), `inner_eq_zero_of_mem_zSpan` (η⊥T ⟹ η⊥ℤ[T]),
+  `retarget_eq_on_zSpan_of_orthogonal` (T⊥{χ,χ̄} 의 ℤ-span 위 retarget=τ₁),
+  `inner_eq_zero_of_eq_intCast_sum` (X=∑c(α)•α + η⊥각 α ⟹ η⊥X; `X_eq` → hX_ortho 다리).
+
+**정밀 잔존 (단 하나, 정의적 결정)**: main (5.6) 의 유일 gap 은 `IsCoherent.extension_isometry`
+필드가 **전역** `IsIntegralIsometry` (∀φ,ψ over all CF(L)) 를 요구한다는 점. 격자 등거리
+`retarget_inner_eq_on` 은 이미 구성됨. 두 경로:
+  1. **`IsCoherent` 약화 (권장, 수학적으로 정확)**: `extension_isometry` 를 격자-相対
+     (`Z[S]` 위 등거리) 로 재정의. 근거: (a) Peterfalvi (5.6.3) 자체가 격자 등거리만 주장,
+     (b) **하류 소비자 `S08 IndChainDecomposition.ofIsCoherent` 는 `extension_inner_eq` 를 ζt∈S
+     (격자원) 에만 적용** — 전역성 전혀 미사용 (S08_CoherenceTheorems.lean:251-253 확인),
+     (c) 전역 등거리는 dim CF(L)≤dim CF(G) 필요 — FT 에서 일반적으로 보장 안 됨 ⟹ 현 정의는
+     일반적으로 **충족불가능**일 수도. 이 약화 후 `retarget_inner_eq_on` + 본 bridge infra 가
+     즉시 main (5.6) 완성. **단 shared `IsCoherent`/S08 영향 ⟹ main 합류시 정의 결정 필요
+     (worktree 단독 변경 회피).**
+  2. Witt/유니터리 부분공간-등거리 확장 (격자 등거리 → 전역): dim 조건 성립시에만 존재,
+     bespoke `ClassFunction.inner` 용 mathlib 부재 ⟹ multi-day brick. 경로 1 이 우월.
+
 ---
 
 ## 未解決 / TODO
