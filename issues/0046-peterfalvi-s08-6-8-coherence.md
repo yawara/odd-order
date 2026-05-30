@@ -535,6 +535,41 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `not_subsetCharacterKernel_of_not_induce` ∘ constituent-inherits-kernel ∘ `exists_inner_induce_ne_zero`
     で (6.6) `X = {χ∈Irr L | Z⊄Ker χ}` の `Z⊄Ker θ` 帰結が完全に閉じる。
 
+- [x] (2026-05-31, G2.5 infra) **Inflation infrastructure ([Isaacs] (2.22)) PASS 1** を新規 leaf module
+      `OddOrder/GroupTheory/RepresentationTheory/InflationCharacter.lean` に landing (sorry/axiom 無 —
+      4 主定理 `#print axioms` 全 `{propext, Classical.choice, Quot.sound}`; AxiomsCheck 登録 4 件 各
+      3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3353/3336 jobs). (6.6)
+      G2.5 degree-sum identity `Σ_{j≥i}χⱼ(1)² = |L|−|L:Z|−Σ_{j<i}χⱼ(1)²` の **核 = inflation 対応**
+      (`Irr(L/Z) ≃ {χ∈Irr L | Z⊆Ker χ}`, degree 保存) の **injective degree-preserving 半分**を消化:
+  - **`Subrepresentation.compHomEquiv`** : surjective `f : H →* G` で
+    `Subrepresentation (σ.comp f) ≃o Subrepresentation σ` (台 submodule 上 identity; `σ(f h)`-不変 ⟺
+    `σ g`-不変 が `f` 全射で一致)。`ofCompSurjective`/`comapComp` を両 inverse に持つ order iso。
+  - **`Representation.isIrreducible_comp_of_surjective`** : `IsIrreducible σ ⟹ IsIrreducible (σ.comp f)`
+    (`f` 全射)。`IsIrreducible = IsSimpleOrder (Subrepresentation ·)` を上 order iso で `e.isSimpleOrder`
+    transport。**任意全射 hom 一般** (quotient に限らない)。
+  - **`IsIrreducibleCharacter.compHom_of_surjective`** (= **最 foundational brick**, hom-general (2.22)):
+    `f` 全射, `φ∈Irr G` ⟹ `ClassFunction.compHom f φ ∈ Irr H`。witness `σ` (φ=χ_σ) を `σ.comp f` へ
+    precompose (上の irreducibility transfer) し character `χ_σ∘f = compHom f φ` を確認。landed `compHom`
+    API 再利用。
+  - **`inflate`** : `IrreducibleCharacter (G⧸N) → IrreducibleCharacter G`, `χ̄ ↦ χ̄∘(mk' N)`
+    (`mk'_surjective` で irreducibility 供給)。**`inflate_apply_one`** (= **degree 保存**
+    `(inflate N χ̄) 1 = χ̄ 1`, `map_one`)。**`subset_characterKernel_inflate`** (`N ⊆ Ker(inflate N χ̄)`;
+    `n∈N ⟹ mk' n = 1 ⟹ (inflate N χ̄) n = χ̄ 1 = (inflate N χ̄) 1`)。後二者で image ⊆
+    `{χ∈Irr G | N⊆Ker χ}` を確立 = G2.5 が ranging する集合。
+  - **honest 判定**: posited 仮説無し・thin wrapper でない (irreducibility transfer は
+    `Subrepresentation` order-iso の non-trivial 構成; mathlib の `Representation.ofQuotient` を**使わず**
+    任意全射 hom へ一般化したため repo 再利用性が高い)。`characterKernel`/`characterDegree` は
+    `OddOrder.Peterfalvi.S03` の既存定義を直接参照 (import `S03_PreliminaryCharacter`)。
+  - **精密残 (G2.5 完了に向けた surjectivity/degree-sum 半分)**: (a) inflation **BIJECTION**
+    `Irr(G⧸N) ≃ {χ∈Irr G | N⊆Ker χ}` の **surjectivity** = 「`N⊆Ker χ` なる `χ∈Irr G` は `G⧸N` の
+    irreducible character から inflate される」。これは `χ` の witness rep `ρ` が `N` 上 trivial ⟹
+    `ρ` が `G⧸N` を factor (`Representation.ofQuotient`, mathlib 既存) ⟹ その character が `χ̄` で
+    `inflate N χ̄ = χ`。kernel⊆ ⟹ rep-trivial-on-N の橋 (`characterKernel` の値等式 ⟹ `ρ n = id`) が
+    要 (Schur/中心限定でなく `n∈N` 一般; `SchurCenterBound` 不足) = `needs-infra`。(b) injectivity
+    (`compHom (mk' N)` 単射, `mk'` 全射性から) + (a) で得た全単射 + `Fintype.sum_bijective` +
+    landed `sumIrreducibleDegreeSq` (`Σ_{χ∈Irr L}χ(1)²=|L|`) ⟹ `Σ_{χ∈S(Z)}χ(1)²=|L/Z|=|L:Z|` ⟹
+    `Σ_X χ(1)²=|L|−|L:Z|` (X=Irr L∖S(Z))。infra (a) が入れば (b) は機械的。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。

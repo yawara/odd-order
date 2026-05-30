@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -1196,3 +1197,13 @@ set_option linter.style.longLine false in
 -- (mmd L80 coprimality forcing, `idx = |L:K|` prime to `p`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
+
+-- Inflation infrastructure ([Isaacs] (2.22), gating Peterfalvi (6.6) G2.5 degree-sum):
+-- irreducibility is preserved under surjective precomposition, hence the inflation map
+-- `Irr(G ⧸ N) → Irr G`, `χ̄ ↦ χ̄ ∘ (mk' N)`, is degree-preserving with `N ⊆ ker`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Representation.isIrreducible_comp_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_apply_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.subset_characterKernel_inflate
