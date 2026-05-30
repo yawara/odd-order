@@ -1411,6 +1411,73 @@ theorem lambda_eq_zero_and_Z_eq_zero
     rw [hlam0] at hquad; push_cast at hquad; nlinarith [hquad]
   exact eq_zero_of_inner_self_re_eq_zero (le_antisymm hZ0 hZre_nonneg)
 
+open scoped Classical in
+/-- **Peterfalvi (5.6.1)→(5.6.2): the `Y`-collapse `Y = a·χ₁^{τ₁}`.**
+
+For the `ψ = a·χ₁` decomposition `D : CharacterPsiDecomposition τ χ (a·χ₁)`, the **(5.6.1)
+λ-form** of the orthogonal part is
+
+`Y = a·χ₁^{τ₁} − λ·∑ᵢ (aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`     (mmd L73)
+
+where `λ ∈ ℤ`, the family `vc i = χᵢ^{τ₁}` (indexed over `s`, with `i₁ ∈ s` indexing `χ₁`, so
+`vc i₁ = D.tau1 χ₁`) is orthogonal with real gram `⟨vcᵢ, vcⱼ⟩ = if i = j then mc i else 0`
+(`mc i = ‖χᵢ‖²`), `rc i = aᵢ/‖χᵢ‖²`, and `Z` is orthogonal to the family.  Under the (5.4.a) opening
+bound (`inner_self_Y_re_le_inner_self_psi`, internal to the family) together with the textbook
+hypotheses `‖ψ‖² = a²·‖χ₁‖²` (`hψ`), `a₁ = 1 ⇒ rc i₁·mc i₁ = 1` (`hr₁`), and the degree inequality
+(c) `2·a < ∑ᵢ(aᵢ/‖χᵢ‖²)²·‖χᵢ‖²` (`hD`), the integer-forcing capstone
+`lambda_eq_zero_and_Z_eq_zero` collapses `λ = 0` and `Z = 0`.  Feeding these back into the λ-form
+yields the (5.6.2) conclusion `Y = a·χ₁^{τ₁}` (`D.Y = a • D.tau1 χ₁`).
+
+This is the producer of the `hY` hypothesis that `X_eq_tau1_chi_of_Y_eq` /
+`X_eq_of_tau1_eq_on_chi` / `image_eq_of_decomposition` /
+`retarget_isCoherent_of_decompositions[_and_memberFamily]` all consume: it *constructs* the
+(5.6.2) collapse from the (5.6.1) decomposition and the orthogonal-projection data, rather than
+positing `Y = a·χ₁^{τ₁}`. -/
+theorem Y_eq_nsmul_tau1_of_lambdaForm {a : ℕ} {chi1 : ClassFunction L ℂ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    {ι : Type*} (s : Finset ι) (i₁ : ι) (hi₁ : i₁ ∈ s)
+    (lam : ℤ) (Z : ClassFunction G ℂ)
+    (vc : ι → ClassFunction G ℂ) (mc rc : ι → ℝ)
+    (hvc1 : vc i₁ = D.tau1 chi1)
+    (hYform : D.Y =
+      (a : ℂ) • D.tau1 chi1 - (lam : ℂ) • (∑ i ∈ s, (rc i : ℂ) • vc i) + Z)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (vc i) (vc j) =
+      if i = j then (mc i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (vc i) = 0)
+    (hψ : (ClassFunction.inner (a • chi1 : ClassFunction L ℂ) (a • chi1)).re
+      = (a : ℝ) ^ 2 * mc i₁)
+    (hr₁ : rc i₁ * mc i₁ = 1)
+    (hD : 2 * (a : ℝ) < ∑ i ∈ s, (rc i) ^ 2 * mc i) :
+    D.Y = a • D.tau1 chi1 := by
+  classical
+  -- Bridge the (5.6.1) λ-form to the capstone's pointwise-coefficient form.
+  have hbridge : D.Y =
+      (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i : ℝ) : ℂ) • vc i) + Z := by
+    rw [hYform]
+    congr 1
+    -- `(a:ℂ)•vc(i₁) − λ•∑ rcᵢ•vcᵢ = ∑ᵢ (a[i=i₁] − λ·rcᵢ)•vcᵢ`.
+    rw [← hvc1]
+    -- Split each summand on the RHS into its `a`-part and its `λ`-part.
+    have hsplit : ∀ i ∈ s,
+        (((a : ℝ) * (if i = i₁ then 1 else 0) - (lam : ℝ) * rc i : ℝ) : ℂ) • vc i =
+          (if i = i₁ then ((a : ℂ) • vc i₁) else 0)
+            - (lam : ℂ) • ((rc i : ℂ) • vc i) := by
+      intro i _
+      by_cases h : i = i₁
+      · subst h; simp only [if_pos rfl]; push_cast; rw [sub_smul]; module
+      · simp only [if_neg h]; push_cast; rw [sub_smul]; module
+    rw [Finset.sum_congr rfl hsplit, Finset.sum_sub_distrib,
+      Finset.sum_ite_eq' s i₁, if_pos hi₁, ← Finset.smul_sum]
+  -- Capstone forcing: `λ = 0` and `Z = 0`.
+  obtain ⟨hlam0, hZ0⟩ :=
+    D.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) lam Z vc mc rc hbridge horth hZ
+      hψ hr₁ (by positivity) hD
+  -- Feed `λ = 0`, `Z = 0` back into the λ-form.
+  rw [hYform, hlam0, hZ0]
+  simp only [Int.cast_zero, zero_smul, sub_zero, add_zero]
+  -- `(a:ℂ)•D.tau1 χ₁ = a • D.tau1 χ₁` (nsmul).
+  rw [Nat.cast_smul_eq_nsmul]
+
 /-! #### Peterfalvi (5.6.3) projection identity `Da.X = D₀.X`
 
 The (5.6.3) extension `τ₂` is defined with `χ^{τ₂} = X` where `X` is *the same* `X` for the

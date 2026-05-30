@@ -1104,6 +1104,13 @@ set_option linter.style.longLine false in
 -- (5.6.1) 分解データ (構成可能) を消費し (5.6.2) 結論 `Y = a·χ₁^{τ₁}` を出す。
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero
+-- (5.6.1)→(5.6.2) `Y`-collapse producer `Y = a·χ₁^{τ₁}` (issue 0046): consumes the (5.6.1) λ-form
+-- `Y = a·χ₁^{τ₁} − λ·∑(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, bridges it to the capstone's pointwise-coefficient
+-- form, applies `lambda_eq_zero_and_Z_eq_zero` (λ=0, Z=0), and feeds back → `D.Y = a • D.tau1 χ₁`.
+-- CONSTRUCTS the `hY` hypothesis that `X_eq_tau1_chi_of_Y_eq` / `image_eq_of_decomposition` /
+-- `retarget_isCoherent_of_decompositions[_and_memberFamily]` consume, not posited.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_eq_nsmul_tau1_of_lambdaForm
 -- (5.6.3) projection identity `Da.X = D₀.X` (issue 0046): the `R(χ)`-projection `X` is independent
 -- of `ψ`.  `X_eq_tau1_chi_of_Y_eq` : from the (5.6.2) collapse `Y = a·χ₁^{τ₁}` (`hY`), the
 -- `ψ = a·χ₁` decomposition has `X = χ^{τ₁}` (linearity of `tau1` on `χ - a·χ₁`).

@@ -859,10 +859,16 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     上 2 lemma で導出。**(5.6.3) の全入力が genuine Dade-map / running-extension fact に帰着** —
     image-side coupling は一切 posit されない。(6.6) `peterfalvi_66_coherence_of_X` の `hstep` が
     Dade isometry の per-member (5.5)+(5.2.e) data から放電可能に。
-  - **残 (次パス, この round 範囲外)**: source-side の `hY : Da.Y=a·Da.tau1 χ₁` ((5.6.2) collapse,
-    (5.6.1) λ-form の cross-difference 計算を `lambda_eq_zero_and_Z_eq_zero` に流す本体) + 各 step の
-    `D₀`/`Da`/`Dmem` 生産 ((5.4) auxiliary isometry の Dade `τ` との supported-diff 一致)。
-    これらは wiring でなく (5.4)/(5.6.1) 本体 content。image-side (b)+(c) は完了。
+  - **Round 24 PASS 1 (2026-05-31)**: source-side ① `hY` producer 完了。
+    `CharacterPsiDecomposition.Y_eq_nsmul_tau1_of_lambdaForm` が (5.6.1) λ-form
+    `D.Y = (a:ℂ)•χ₁^{τ₁} − λ•∑ᵢ(aᵢ/‖χᵢ‖²)•χᵢ^{τ₁} + Z` を capstone pointwise-coeff form に bridge し
+    `lambda_eq_zero_and_Z_eq_zero` で λ=0∧Z=0 → 戻して `D.Y = a • D.tau1 χ₁` (= `hY`) を *構成*。
+    4 consumer (`X_eq_tau1_chi_of_Y_eq` 他) が消費するのみだった唯一の source-side posited-conclusion を
+    除去。sorry/axiom 無, AxiomsCheck 1 件 新規 全 allowlist; build 緑 3360 jobs。
+  - **残 (次パス)**: source-side ② のみ — 各 step の `D₀`/`Da`/`Dmem` **instance 生産** ((5.4)
+    auxiliary isometry `D.tau1` を Dade `τ` + running `τ₁` から構成し τ₁-image を R(χ) に直交射影して X−Y
+    split + (5.6.1) λ-form 供給)。projection infra (有限正規直交族への直交射影存在) を要する本体 content。
+    image-side (b)+(c) は完了。
 
 ## 完了条件
 

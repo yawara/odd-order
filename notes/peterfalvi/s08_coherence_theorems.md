@@ -1178,3 +1178,28 @@ a·Da.tau1 χ₁` ((5.6.2) collapse 出力; (5.6.1) λ-form の cross-difference
 `lambda_eq_zero_and_Z_eq_zero` に流す本体), ② 各 step の `D₀`/`Da`/`Dmem` 生産 ((5.4) auxiliary isometry
 `D.tau1` を Dade `τ` と supported-diff 上で一致させる構成)。①② は wiring でなく (5.4)/(5.6.1) 本体 content。
 これらが揃えば (6.6) `peterfalvi_66_coherence_of_X` の `hstep` が Dade isometry から完全放電。
+
+### G2.8 Round 24 PASS 1 (2026-05-31): source-side ① `hY` producer を (5.6.1) λ-form から完全構成
+
+Round 23 PASS 2 末尾の source-side 残 ① (`hY : Da.Y = a·Da.tau1 χ₁` の生産) を解消。これまで `hY` は
+`X_eq_tau1_chi_of_Y_eq` / `image_eq_of_decomposition` / `retarget_isCoherent_of_decompositions[_and_memberFamily]`
+の 4 箇所で **消費** されるが, どこからも **生産** されていなかった (= source-side の唯一の posited-conclusion)。
+これを (5.6.1) λ-form + landed `lambda_eq_zero_and_Z_eq_zero` から *構成* (posit せず)。sorry/axiom 無
+(`#print axioms` = propext/Classical.choice/Quot.sound のみ), AxiomsCheck 1 件 新規 全 allowlist;
+`lake build OddOrder` 緑 3360 jobs / `OddOrder.AxiomsCheck` 緑 3343 jobs。
+
+- `CharacterPsiDecomposition.Y_eq_nsmul_tau1_of_lambdaForm` : (5.6.1)→(5.6.2) の `Y`-collapse 本体。
+  入力 = (5.6.1) λ-form `hYform : D.Y = (a:ℂ)•χ₁^{τ₁} − (lam:ℂ)•∑ᵢ(rcᵢ:ℂ)•vcᵢ + Z`
+  (`vc i = χᵢ^{τ₁}`, `vc i₁ = D.tau1 χ₁`, `rc i = aᵢ/‖χᵢ‖²`, `mc i = ‖χᵢ‖²`), 直交 gram `horth`,
+  `Z` の family 直交性 `hZ`, 教科書仮説 `hψ` (‖ψ‖²=a²‖χ₁‖²) / `hr₁` (a₁=1 ⟹ rc·mc=1) / `hD`
+  (degree (c) `2a < ∑(aᵢ/‖χᵢ‖²)²‖χᵢ‖²`)。本体: ① λ-form を capstone の pointwise-coeff form
+  `∑ᵢ(a[i=i₁]−λrcᵢ)•vcᵢ + Z` に bridge (`sub_smul`/`Finset.sum_sub_distrib`/`Finset.sum_ite_eq'`/
+  `Finset.smul_sum` + `module`), ② `lambda_eq_zero_and_Z_eq_zero` で λ=0 ∧ Z=0, ③ λ-form に戻し
+  `(a:ℂ)•χ₁^{τ₁} = a•χ₁^{τ₁}` (`Nat.cast_smul_eq_nsmul`) → `D.Y = a • D.tau1 χ₁` (= `hY`)。
+
+**Round 24 PASS 1 後の残 (source-side ① 完了)**: 残るは source-side ② のみ — 各 step の `D₀`/`Da`/`Dmem`
+**instance 生産** ((5.4) auxiliary isometry `D.tau1` を Dade `τ` + running `τ₁ = hS₁.extension` から構成し,
+τ₁-image を `OrthonormalCharacterImageFamily R(χ)` に projection して X−Y split を作る; (5.6.1) λ-form
+`hYform` 自体の供給も含む)。これは projection infra ((5.6.1) の Y 分解存在 = 有限正規直交族への直交射影) を
+要し, PASS 2 の対象。② が揃えば (6.6) `peterfalvi_66_coherence_of_X` の `hstep` が Dade isometry から
+完全放電し, coherence-of-X が実 Dade isometry で instantiable。
