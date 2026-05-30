@@ -364,6 +364,190 @@ theorem Orthogonal.image_conjugateDifference_inner_eq_zero
 
 end CharacterDifferenceImage
 
+/-! ### Peterfalvi (5.2.d): the general orthonormal difference-image family `R(χ)`
+
+The two-element `CharacterDifferenceImage` records the special case where `R(χ) = {ε·μ, -ε·ν}`
+has exactly two elements.  Peterfalvi (5.2.d) is more general: `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` for
+an **orthonormal subset `R(χ)` of `ℤ[Irr G]`** (norm-`1`, pairwise-orthogonal virtual
+characters, not necessarily single irreducibles).  This is the gateway that the §7 (5.4)
+norm inequalities are stated against. -/
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.2.d): orthonormal character-difference image.**
+
+For `χ ∈ S`, the image of `χ - χ̄` under the integral isometry `τ` is a sum
+`(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α` over a finite **orthonormal** family `R(χ) = imageSet`
+of virtual characters (each `α ∈ ℤ[Irr G]`, `‖α‖² = 1`, mutually orthogonal).  This is
+the general form of `CharacterDifferenceImage`, which is recovered as the two-element case
+via `CharacterDifferenceImage.toOrthonormalImage`. -/
+structure OrthonormalCharacterImageFamily (τ : IntegralCharacterMap L G)
+    (χ : ClassFunction L ℂ)
+    [Fintype G] [Invertible (Nat.card G : ℂ)] where
+  /-- The orthonormal subset `R(χ)` of `ℤ[Irr G]`. -/
+  imageSet : Finset (ClassFunction G ℂ)
+  /-- Every member of `R(χ)` is a virtual character of `G`. -/
+  mem_ZIrr : ∀ α ∈ imageSet, α ∈ ZIrr G
+  /-- `R(χ)` is orthonormal: `⟨α, β⟩ = δ_{α,β}` for `α, β ∈ R(χ)`. -/
+  orthonormal :
+    ∀ α ∈ imageSet, ∀ β ∈ imageSet,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0
+  /-- The image equation `(χ - χ̄)^τ = ∑_{α ∈ R(χ)} α`. -/
+  image_eq : τ (χ - χ.conj) = ∑ α ∈ imageSet, α
+
+namespace OrthonormalCharacterImageFamily
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- The squared norm of an element of `R(χ)` is `1`. -/
+theorem inner_self_of_mem (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    {α : ClassFunction G ℂ} (hα : α ∈ R.imageSet) :
+    ClassFunction.inner α α = 1 := by
+  rw [R.orthonormal α hα α hα, if_pos rfl]
+
+/-- Distinct members of `R(χ)` are orthogonal. -/
+theorem inner_eq_zero_of_ne (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    {α β : ClassFunction G ℂ} (hα : α ∈ R.imageSet) (hβ : β ∈ R.imageSet) (hαβ : α ≠ β) :
+    ClassFunction.inner α β = 0 := by
+  rw [R.orthonormal α hα β hβ, if_neg hαβ]
+
+/-- The image equation in `conjugateDifference` form: `τ (χ - χ̄) = ∑_{α ∈ R(χ)} α`. -/
+theorem image_conjugateDifference
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ) :
+    τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) = ∑ α ∈ R.imageSet, α := by
+  simpa [OddOrder.Peterfalvi.S03.conjugateDifference] using R.image_eq
+
+/-- **Peterfalvi (5.2.e): disjoint-pair orthogonality.**  Two image families `R(χ)`,
+`R(ψ)` are orthogonal if every `α ∈ R(χ)` is orthogonal to every `β ∈ R(ψ)`. -/
+def Orthogonal (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (R' : OrthonormalCharacterImageFamily (L := L) (G := G) τ ψ) : Prop :=
+  ∀ α ∈ R.imageSet, ∀ β ∈ R'.imageSet, ClassFunction.inner α β = 0
+
+theorem Orthogonal.inner_eq_zero
+    {R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ}
+    {R' : OrthonormalCharacterImageFamily (L := L) (G := G) τ ψ}
+    (h : R.Orthogonal R') {α β : ClassFunction G ℂ}
+    (hα : α ∈ R.imageSet) (hβ : β ∈ R'.imageSet) :
+    ClassFunction.inner α β = 0 :=
+  h α hα β hβ
+
+end OrthonormalCharacterImageFamily
+
+namespace CharacterDifferenceImage
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- `⟨ε·μ, ε·μ⟩ = 1`, `⟨-ε·ν, -ε·ν⟩ = 1`, `⟨ε·μ, -ε·ν⟩ = 0`: the orthonormality
+of the two-element family `{ε·μ, -ε·ν}` underlying the two-element case.
+
+Stated as the `δ_{·,·}` identity for the (ℤ-scaled) pair, by reducing the
+`ℤ`-scalar `ε` to the `ℂ`-scalar `(ε : ℂ)` and using row orthogonality with
+`ε² = 1`.  (The sign hypotheses `hs`/`ht` are unused in the proof but pin down
+which scaled pair is meant.) -/
+theorem inner_signSmul_pair_eq_ite
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) {s t : ℤ}
+    {a b : ClassFunction G ℂ}
+    (ha : a = hχ.muClassFunction ∨ a = hχ.nuClassFunction)
+    (hb : b = hχ.muClassFunction ∨ b = hχ.nuClassFunction) :
+    ClassFunction.inner (s • a) (t • b) =
+      (s : ℂ) * (t : ℂ) * (if a = b then (1 : ℂ) else 0) := by
+  classical
+  have hpair : ClassFunction.inner a b = if a = b then (1 : ℂ) else 0 := by
+    have hμμ : ClassFunction.inner hχ.muClassFunction hχ.muClassFunction = 1 := by
+      simpa [muClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.mu
+    have hνν : ClassFunction.inner hχ.nuClassFunction hχ.nuClassFunction = 1 := by
+      simpa [nuClassFunction, OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.diagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.nu
+    have hμν : ClassFunction.inner hχ.muClassFunction hχ.nuClassFunction = 0 := by
+      simpa [muClassFunction, nuClassFunction,
+        OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality hχ.distinct
+    have hνμ : ClassFunction.inner hχ.nuClassFunction hχ.muClassFunction = 0 := by
+      simpa [muClassFunction, nuClassFunction,
+        OddOrder.RepresentationTheory.characterTableRowPairing] using
+        OddOrder.RepresentationTheory.CharacterTableRowOrthogonality.offDiagonal
+          (G := G) OddOrder.RepresentationTheory.characterTableRowOrthogonality
+          (Ne.symm hχ.distinct)
+    have hμν_ne : hχ.muClassFunction ≠ hχ.nuClassFunction :=
+      hχ.muClassFunction_ne_nuClassFunction
+    rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
+    · rw [hμμ, if_pos rfl]
+    · rw [hμν, if_neg hμν_ne]
+    · rw [hνμ, if_neg (Ne.symm hμν_ne)]
+    · rw [hνν, if_pos rfl]
+  rw [← Int.cast_smul_eq_zsmul ℂ s a, ← Int.cast_smul_eq_zsmul ℂ t b,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    hpair, star_intCast]
+  ring
+
+/-- The two members `ε·μ` and `-ε·ν` of the two-element family are distinct. -/
+theorem signMu_ne_negSignNu (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    hχ.sign • (hχ.muClassFunction) ≠ (-hχ.sign) • (hχ.nuClassFunction) := by
+  intro h
+  -- `⟨ε·μ, ε·μ⟩ = ε² = 1`, but if `ε·μ = -ε·ν` it equals `⟨ε·μ, -ε·ν⟩ = -ε²⟨μ,ν⟩ = 0`.
+  have hself := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := hχ.sign)
+    (a := hχ.muClassFunction) (b := hχ.muClassFunction) (Or.inl rfl) (Or.inl rfl)
+  have hcross := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := -hχ.sign)
+    (a := hχ.muClassFunction) (b := hχ.nuClassFunction) (Or.inl rfl) (Or.inr rfl)
+  rw [if_pos rfl, mul_one] at hself
+  rw [if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero] at hcross
+  have hsign : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
+    have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  rw [hsign] at hself
+  -- `⟨ε·μ, ε·μ⟩ = 1`; replace the *second* `ε·μ` by `-ε·ν` via `h`, then `hcross` gives `1 = 0`.
+  nth_rewrite 2 [h] at hself
+  rw [hcross] at hself
+  exact one_ne_zero hself.symm
+
+open scoped Classical in
+/-- **Two-element case of (5.2.d).**  The special two-element `CharacterDifferenceImage`
+data yields a genuine `OrthonormalCharacterImageFamily` with `R(χ) = {ε·μ, -ε·ν}`.  This
+shows the general gateway subsumes the existing two-element interface. -/
+noncomputable def toOrthonormalImage
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+    OrthonormalCharacterImageFamily (L := L) (G := G) τ χ where
+  imageSet := {hχ.sign • hχ.muClassFunction, (-hχ.sign) • hχ.nuClassFunction}
+  mem_ZIrr := by
+    intro α hα
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hα
+    rcases hα with rfl | rfl
+    · exact Submodule.smul_mem _ _ hχ.mu.mem_ZIrr
+    · exact Submodule.smul_mem _ _ hχ.nu.mem_ZIrr
+  orthonormal := by
+    classical
+    have hsign : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
+      have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+    have hne := hχ.signMu_ne_negSignNu
+    intro α hα β hβ
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hα hβ
+    rcases hα with rfl | rfl <;> rcases hβ with rfl | rfl
+    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inl rfl),
+        if_pos rfl, mul_one, hsign]
+    · rw [if_neg hne, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inr rfl),
+        if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero]
+    · rw [if_neg (Ne.symm hne), hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inl rfl),
+        if_neg (Ne.symm hχ.muClassFunction_ne_nuClassFunction), mul_zero]
+    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inr rfl),
+        if_pos rfl, mul_one]
+      push_cast
+      rw [neg_mul_neg, hsign]
+  image_eq := by
+    rw [hχ.image_eq, Finset.sum_pair hχ.signMu_ne_negSignNu, neg_smul, ← sub_eq_add_neg,
+      ← smul_sub]
+
+end CharacterDifferenceImage
+
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
 isometric extension on `Z[S]` that agrees with `τ` on `Z[S,A]`. -/
 structure IsCoherent (τ : IntegralCharacterMap L G)
