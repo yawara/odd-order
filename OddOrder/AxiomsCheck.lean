@@ -21,6 +21,7 @@ import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 
 /-!
@@ -591,6 +592,9 @@ set_option linter.style.longLine false in
 -- nontrivial irreducible character is not real (`χ̄ ≠ χ`). Unconditional parity core, the
 -- common unblocker for §3 (1.1) and §9 (7.9).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+-- Peterfalvi §3 (1.1), conjugate-difference (nondegeneracy) form for §7: in a finite group of
+-- odd order, the conjugate difference `χ - χ̄` of a nontrivial irreducible character is nonzero.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_of_ne_trivial_of_odd_card
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters

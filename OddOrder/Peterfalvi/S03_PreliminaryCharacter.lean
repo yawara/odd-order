@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
@@ -396,5 +397,22 @@ theorem conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ) :
     exact hne ((conjugateDifference_eq_zero_iff_isReal χ).mpr hreal)
   · intro hnot hzero
     exact hnot ((conjugateDifference_eq_zero_iff_isReal χ).mp hzero)
+
+/-- **Peterfalvi (1.1)**, conjugate-difference (nondegeneracy) form, used in §7.
+
+If `G` has odd order and `χ` is a *nontrivial* irreducible complex character, then the
+conjugate difference `χ - χ̄` is nonzero.  Together with `conjugateDifference_conj`
+(which gives `(χ̄ - χ) = -(χ - χ̄)`) this is the nondegeneracy fact that makes the
+`χ - χ̄` constructions of Peterfalvi §7 nonzero: a nontrivial odd-order irreducible
+character is genuinely non-self-conjugate, so its conjugate difference does not collapse.
+
+This is the unconditional consequence of Peterfalvi (1.1) (`G` of odd order has no
+nontrivial real irreducible character) specialised to the `χ - χ̄` expression. -/
+theorem conjugateDifference_ne_zero_of_ne_trivial_of_odd_card [Finite G]
+    (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
+    (hχ : χ ≠ trivialIrreducibleCharacter G) :
+    conjugateDifference (χ : ClassFunction G ℂ) ≠ 0 :=
+  (conjugateDifference_ne_zero_iff_not_isReal (χ : ClassFunction G ℂ)).mpr
+    (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ)
 
 end OddOrder.Peterfalvi.S03

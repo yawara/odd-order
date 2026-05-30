@@ -277,6 +277,10 @@ theorem frobenius_reciprocity : (Induced_char θ, χ) = (θ, Res χ) := ...
 - **Character space**: 新型 `CharacterSubspace` は Peterfalvi 専用モジュールに置く (mathlib に PR する候補ではない、特化型)
 - **Phase 1 / Phase 2 境界**: Isaacs [Is] Thm 6.2, 6.5, 6.11 等は Phase 1 で独立形式化, §3 で再導出しない. §3 は import + 適用のみ.
 
+## 進捗
+
+- **2026-05-30**: (1.1) 共役差の非退化形 `conjugateDifference_ne_zero_of_ne_trivial_of_odd_card` を追加 (`S03_PreliminaryCharacter.lean`). `|G|` 奇数 + χ 非自明 ⇒ `χ - χ̄ ≠ 0`. 無条件版 `RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'` と既存 `conjugateDifference_ne_zero_iff_not_isReal` の合成. §7 の `χ - χ̄` 構成が非ゼロであることの土台 (§9 (7.9) 経路で消費). AxiomsCheck 登録済 (allowlist clean).
+
 ## 未解決 / TODO
 
 1. **Frobenius reciprocity character-level**: 現状 Representation level のみ. character 統一 API 設計要.
