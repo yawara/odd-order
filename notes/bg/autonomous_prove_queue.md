@@ -24,7 +24,8 @@
 | 3 | **I-0d GL橋** Aut(Eₚⁿ)≅GL(n,p) | `IsElementaryAbelian.mulAutEquivGeneralLinearGroup` + `card_mulAut` | gate無 | ✅**PASS** (commit bba6410, PRank.lean に4 decl, 独立監査済) |
 | 4 | **Lem 4.15** extraspecial S, [S,R]⊆S'⇒R=S·C_R(S) | `mul_centralizer_eq_top_of_isExtraspecial` | Gorenstein 5.4.6 | ✅**PASS** (commit 3f7f99d, S04 §4E, 独立監査済)。構造定理回避: 変位準同型 δ_g:S→Z(S) の 𝔽_p 線形化 + 基底埋込 squeeze (genuine counting) |
 | 5 | **Prop 4.3(a)(b)** cl≤3/p>3 collection | — | ⚠ γ₄=1 + f/g mathlib convention 再計算要 | ⏸ **BLOCKED_DESIGN** (full は1ショット intractable; 詳細 skeleton を `notes/bg/s04_prop43_design_2026_05_31.md` に保存)。**将来 GATE-1 (4.4)collection を単独 workflow 化**。cl≤2 部分は wrapper 気味で見送り |
-| 6a | **Prop 4.8(a)** r≤2+exp p ⇒ \|R\|≤p³ | — | I-0d✅ (Aut(E_p²)≅GL,\|GL\|_p=p) + SCN✅ + Prop4.4(a)✅ (`isSCN_iff_isMaximalAbelianNormal`) + `IsSCN_n.le_pRank`✅。**Prop 4.3 不要** | **IN PROGRESS** (genuine §4, Thm4.16 CaseB 部分) |
+| 6a | **Prop 4.8(a)** r≤2+exp p ⇒ \|R\|≤p³ | `card_le_prime_cube_of_pRank_le_two_of_exponent_prime` | I-0d✅ + SCN✅ + Prop4.4(a)✅ | ✅**PASS** (commit 73df7e1, S04 §4D, 独立監査済)。SCN+GL counting, Ch07 import 回避 |
+| 5b | **Prop 4.3 GATE-1 (4.4) collection** (decomposed) | `mul_pow_eq_collect_of_triple_central` | skeleton = `notes/bg/s04_prop43_design_2026_05_31.md` GATE-1。precursor S04:378 + Lem4.2 + γ₄=1。**f/g mathlib convention 再計算が crux** | **IN PROGRESS** (最高レバレッジ §4 gate; block時 pivot→§1 0018 banking) |
 | 6b | **Prop 4.8(b)** p>3⇒Ω₁(R) exp 1/p | — | = Prop 4.3(a) 応用 (cl≤3) | blocked (gate: #5 Prop4.3) |
 | 7 | **Lem 4.9** \|Ω₁(R/T)\|≤p² | — | gate: #6 | queued (gate: #6) |
 | 8 | **Prop 4.11 (Huppert)** p>3,\|Ω₁\|≤p²⇒metacyclic | `isMetacyclic_of_omega1_card_le_prime_sq` | gate: #7 + agemo✅ + Lem4.5b✅ + abelian case | queued (gate: #7) |
