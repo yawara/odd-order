@@ -1342,3 +1342,33 @@ Round-24 (ii) per-step `(D₀, Da)` production を **実 Lean で**閉じた。s
   (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) は別パス。ただし両者とも
   lattice-relative 化が前提で、その前提は本パスで完全除去 — per-step `hstep` を `decompositionPairFromDade`
   + `retarget_isCoherent_of_sharedDecomposition` で組む経路が **型レベルで開通**した。
+
+## Round B (2026-05-31): Dade `R(χ)` extractor + ZIrr-membership (上記残① を閉じる)
+
+`decompositionPairFromDade` が **入力**として要求していた `imageFamily : OrthonormalCharacterImageFamily τ χ`
+と 2 つの `ZIrr`-membership を **Dade 等距から構成**。これで per-step `(5.6)` 入力が opaque 仮説ゼロで
+実 Dade τ から得られる (基底ケース `τ₁=τ`)。
+
+- **`Hypothesis.one_notMem_dadeSupport`** (S04, support-side keystone): `1 ∉ dadeSupport`。
+  `1 ∈ dadeSupport ⟹ IsConj (a·h) 1 ⟹ a·h=1` (`isConj_one_left`) `⟹ a=h⁻¹∈H(a)`; 一方 `a∈C_L(a)`
+  (a∈L, 自己可換)、`centralizer_disjoint` ((2.2)) で `a∈H(a)⊓C_L(a)=⊥ ⟹ a=1`、`ne_one` (A⊆G^#) と矛盾。
+  vanish-at-1 の土台。
+- **`dadeIntegralCharacterMap_apply_one_eq_zero`** (S07): supported φ の Dade 像は `dadeSupport` 外で 0
+  (`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` via `isDadeMap_dadeMap`)、`1 ∉ dadeSupport` ゆえ
+  `(φ^τ)(1)=0`。(1.4) `IsometryDifferenceImagesVanishAtOne` を放電。
+- **`dadeIntegralCharacterMap_mem_ZIrr_of_supported`** (S07): supported かつ `φ∈ℤ[Irr L]` なら
+  `φ^τ∈ℤ[Irr G]` ((2.6.b) `PreservesVirtualCharacters`/`maps_virtualCharacter`、`apply_of_support` で
+  `hyp.dadeMap` に移送)。(1.4) `IsometryDifferenceImagesAreVirtual` + `htau1_mem0`/`htau1_mema` 双方を放電。
+- **`dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp`** (S07, R(χ) extractor):
+  χ irreducible 非実 + χ,χ̄ supported から、`conjPairFamily χ=![χ,χ̄]` 上で (1.4) keystone
+  `characterDifferenceImageOfIsometry` の 3 仮説を上記で放電 (inner-eq は差が `ℤ[χ,χ̄]` 内ゆえ
+  `dadeIntegralCharacterMap_inner_eq_on_supported_span` で供給)、`toOrthonormalImage` で
+  `OrthonormalCharacterImageFamily τ χ` を構成。**①Dade `R(χ)` 抽出を実装**。
+- **`decompositionPairFromDadeOfIrreducible`** (S07, full assembly): χ irreducible 非実 supported +
+  `χ₁∈ℤ[Irr L]` から `R(χ)`・`htau1_mem0`・`htau1_mema` を **すべて内部構成**し `(D₀,Da)` を生産。
+  per-step `(5.6)` 入力が opaque 仮説ゼロで実 Dade τ から得られる。
+- **残 (Round C)**: `decompositionPairFromDadeOfIrreducible` は基底ケース `τ₁=τ` を構成。running chain では
+  τ₁ = `hS₁.extension` (前段 coherence の extension) で、Dade-derived τ と新差分 χ−χ̄ 上で agree することを
+  示す (`htau1_agrees`/`himg` を running extension に対し成立させる) のが Round C。それが済めば
+  `coherentPairChain` の各 `hstep` が Dade 等距 + 前段 coherence から DISCHARGE され、
+  `peterfalvi_66_coherence_of_X` が実 Dade τ で INSTANTIABLE になる。

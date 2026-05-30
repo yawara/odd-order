@@ -1393,6 +1393,26 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDade
 
+-- Round B: the Dade `R(χ)` extractor + ZIrr-membership, constructing the per-step (5.6) inputs
+-- ENTIRELY from the Dade isometry (no opaque `OrthonormalCharacterImageFamily`/`ZIrr` hypotheses).
+-- `one_notMem_dadeSupport` (S04): `1 ∉ dadeSupport` (from `a ≠ 1` + `centralizer_disjoint`).
+-- `dadeIntegralCharacterMap_apply_one_eq_zero`: the Dade image vanishes at `1` (vanishes off
+-- `dadeSupport` via `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`; `1 ∉ dadeSupport`) — discharges
+-- the (1.4) `IsometryDifferenceImagesVanishAtOne`.  `dadeIntegralCharacterMap_mem_ZIrr_of_supported`:
+-- supported virtual characters map into `ℤ[Irr G]` ((2.6.b) `PreservesVirtualCharacters`/
+-- `maps_virtualCharacter`) — discharges the (1.4) `IsometryDifferenceImagesAreVirtual` and the two
+-- `htau1_mem0`/`htau1_mema` facts.  `dadeOrthonormalCharacterImageFamily` is the R(χ) extractor: it
+-- discharges the three (1.4) hypotheses of `characterDifferenceImageOfIsometry` for the Dade map on
+-- `{χ, χ̄}` and lifts via `toOrthonormalImage` to `OrthonormalCharacterImageFamily`.
+-- `decompositionPairFromDadeOfIrreducible` is the full assembly: from `χ` irreducible non-real +
+-- supported + `χ₁ ∈ ℤ[Irr L]` it builds BOTH `R(χ)` AND the `ZIrr` facts internally, producing the
+-- per-step `(D₀, Da)` pair for `retarget_isCoherent_of_sharedDecomposition` from the real Dade τ.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.one_notMem_dadeSupport
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDadeOfIrreducible
+
 -- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
 -- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
 -- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue

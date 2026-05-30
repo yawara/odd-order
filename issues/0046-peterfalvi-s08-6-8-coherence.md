@@ -951,6 +951,34 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
       (① 依然 missing) は別パス。だが lattice-relative 化が前提で、その前提は本パスで除去済 —
       per-step `hstep` を `decompositionPairFromDade` + `retarget_isCoherent_of_sharedDecomposition` で
       組む経路が型レベルで開通した。
+  - **Round B (2026-05-31) — Dade `R(χ)` extractor + ZIrr-membership 完了 (上記残① を閉じる)**:
+    前パス残「`OrthonormalCharacterImageFamily` の Dade `R(χ)` 抽出 (① 依然 missing)」を実装。
+    `decompositionPairFromDade` は `imageFamily : OrthonormalCharacterImageFamily τ χ` と 2 つの
+    `ZIrr`-membership を **入力** として要求していた; Round B はこれら 3 つを **Dade 等距から構成**:
+    - **support-side keystone (S04)**: `Hypothesis.one_notMem_dadeSupport` — `1 ∉ dadeSupport`。
+      `1 ∈ dadeSupport ⟹ IsConj (a·h) 1 (a∈A, h∈H(a)) ⟹ a·h=1` (`isConj_one_left`) `⟹ a=h⁻¹∈H(a)`;
+      同時に `a∈C_L(a)` (a∈L, 自己可換)、`centralizer_disjoint (H a) (C_L a)` ((2.2)) で
+      `a∈H(a)⊓C_L(a)=⊥ ⟹ a=1`、`ne_one` (A⊆G^#) と矛盾。
+    - **vanish-at-1 (S07)**: `dadeIntegralCharacterMap_apply_one_eq_zero` — supported φ の Dade 像は
+      `dadeSupport` 外で 0 (`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` via `isDadeMap_dadeMap`)、
+      `1 ∉ dadeSupport` ゆえ `(φ^τ)(1)=0`。(1.4) `IsometryDifferenceImagesVanishAtOne` を放電。
+    - **virtual-char (S07)**: `dadeIntegralCharacterMap_mem_ZIrr_of_supported` — supported かつ
+      `φ∈ℤ[Irr L]` なら `φ^τ∈ℤ[Irr G]` ((2.6.b) `PreservesVirtualCharacters`/`maps_virtualCharacter`、
+      `apply_of_support` で `hyp.dadeMap` に移送)。(1.4) `IsometryDifferenceImagesAreVirtual` +
+      `htau1_mem0`/`htau1_mema` の双方を放電。
+    - **R(χ) extractor**: `dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp` —
+      χ irreducible 非実 + χ,χ̄ supported から、`conjPairFamily χ=![χ,χ̄]` 上で (1.4) keystone
+      `characterDifferenceImageOfIsometry` の 3 仮説を上記で放電し、`toOrthonormalImage` で
+      `OrthonormalCharacterImageFamily τ χ` を構成。inner-eq 仮説は差 χ̄−χ, χ−χ が `ℤ[χ,χ̄]` 内ゆえ
+      `dadeIntegralCharacterMap_inner_eq_on_supported_span` で供給。
+    - **full assembly**: `decompositionPairFromDadeOfIrreducible` — χ irreducible 非実 supported +
+      `χ₁∈ℤ[Irr L]` から `R(χ)` も `htau1_mem0`/`htau1_mema` も **内部構成**し `(D₀,Da)` を生産。
+      これで per-step `(5.6)` 入力が **opaque 仮説ゼロ**で実 Dade τ から得られる (Round C の
+      running τ₁ 一般化を残すのみ; 基底ケース `τ₁=τ` は完全構成)。
+    - sorry/axiom 無; `#assert_only_allowed_axioms` 5 新規 (`one_notMem_dadeSupport`/
+      `dadeIntegralCharacterMap_apply_one_eq_zero`/`dadeIntegralCharacterMap_mem_ZIrr_of_supported`/
+      `dadeOrthonormalCharacterImageFamily`/`decompositionPairFromDadeOfIrreducible`) 全 3 axiom
+      allowlist 内; full `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
 
 ## 完了条件
 

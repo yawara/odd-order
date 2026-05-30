@@ -3524,6 +3524,136 @@ theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
       S04.SupportedClassFunctions (G := G) ℂ A L)
   rwa [hyp.dadeIsometryData_toDadeMap hconj] at hiso
 
+/-- **The Dade base map sends supported virtual characters to virtual characters of `G`.**
+
+For a supported class function `φ` (`φ.support ⊆ supportInSubgroup A L`, i.e. `φ ∈ CF(L,A)`) that is
+also a virtual character of `L` (`φ ∈ ℤ[Irr L]`), the lift `dadeIntegralCharacterMap hyp dade φ`
+lies in `ℤ[Irr G]`.  On the supported subspace the lift agrees with the explicit Dade map
+(`dadeIntegralCharacterMap_apply_of_support`), and the §4 `FullDadeIsometryData` records the
+(2.6.b) virtual-character preservation `PreservesVirtualCharacters` (`maps_virtualCharacter`).
+This is the Round-B supply of the `ZIrr`-membership facts feeding `decompositionPairFromDade`. -/
+theorem dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {φ : ClassFunction (↥L) ℂ} (hφsupp : φ.support ⊆ supportInSubgroup A L)
+    (hφZ : φ ∈ ZIrr (↥L)) :
+    dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ ∈ ZIrr G := by
+  rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp]
+  -- `hyp.dadeMap` is the underlying `toDadeMap` of `fullDadeIsometryData`; apply (2.6.b).
+  have hpv := (hyp.fullDadeIsometryData hconj).maps_virtualCharacter
+    (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
+      S04.SupportedClassFunctions (G := G) ℂ A L) hφZ
+  rwa [show (hyp.fullDadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) from
+    hyp.dadeIsometryData_toDadeMap hconj] at hpv
+
+/-- **The Dade base map sends supported class functions to functions vanishing at `1`.**
+
+For a supported class function `φ` (`φ ∈ CF(L,A)`), the lift `dadeIntegralCharacterMap hyp dade φ`
+vanishes at the identity of `G`.  On the supported subspace the lift agrees with the explicit Dade
+map `hyp.dadeMap ⟨φ,_⟩` (`dadeIntegralCharacterMap_apply_of_support`), which vanishes off
+`dadeSupport` (`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`); since `1 ∉ dadeSupport`
+(`one_notMem_dadeSupport`), the value at `1` is `0`.  This discharges the (1.4)
+`IsometryDifferenceImagesVanishAtOne` hypothesis for the Dade map. -/
+theorem dadeIntegralCharacterMap_apply_one_eq_zero
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {φ : ClassFunction (↥L) ℂ} (hφsupp : φ.support ⊆ supportInSubgroup A L) :
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ) (1 : G) = 0 := by
+  rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp]
+  exact (hyp.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport
+    (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
+      S04.SupportedClassFunctions (G := G) ℂ A L)
+    (1 : G) hyp.one_notMem_dadeSupport
+
+/-- **Round B: the Dade `R(χ)` extractor.**  For an irreducible **non-real** character `χ` of `L`
+whose support (and that of `χ̄`) lies in `CF(L,A)`, the orthonormal image family `R(χ)` of `χ - χ̄`
+under the Dade base map `τ = dadeIntegralCharacterMap` is **constructed** from the Dade isometry
+itself — no opaque `OrthonormalCharacterImageFamily` hypothesis.
+
+The construction feeds the §3 (1.4) keystone `characterDifferenceImageOfIsometry` (which reads off
+the signed-difference data `{μ, ν, ε}` from `isometry_difference_pair_structure`), then lifts the
+resulting two-element `CharacterDifferenceImage` to the orthonormal family via
+`CharacterDifferenceImage.toOrthonormalImage`.  Its three (1.4) hypotheses are discharged directly
+from the Dade isometry on the two-element family `{χ, χ̄}`:
+
+* **virtual-character images** — `dadeIntegralCharacterMap_mem_ZIrr_of_supported` ((2.6.b)
+  `PreservesVirtualCharacters`): `(χ̄ - χ)^τ ∈ ℤ[Irr G]` since `χ̄ - χ` is supported and in `ℤ[Irr L]`;
+* **vanish at `1`** — `dadeIntegralCharacterMap_apply_one_eq_zero` (`1 ∉ dadeSupport`): the Dade
+  image vanishes off the support, hence at `1`;
+* **inner-product preservation** — `dadeIntegralCharacterMap_inner_eq_on_supported_span`
+  ((2.6.a) `IsDadeIsometry`): the difference generators all lie in the supported lattice
+  `ℤ[χ, χ̄]`.
+
+This is the Round-B gateway: it supplies the `imageFamily` argument of `decompositionPairFromDade`
+from the real Dade τ. -/
+noncomputable def dadeOrthonormalCharacterImageFamily
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L) :
+    OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ_def
+  set fam : Fin 2 → IrreducibleCharacter (↥L) := conjPairFamily (L := ↥L) χ with hfam
+  -- The two difference generators `χ - χ` (= 0) and `χ̄ - χ` are supported, in `ℤ[χ, χ̄]`.
+  have hfam0 : (fam 0 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ) := by
+    simp [hfam, conjPairFamily]
+  have hfam1 : (fam 1 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ).conj := by
+    simp [hfam, conjPairFamily]
+  -- Each generator `fam i` (i.e. `χ` or `χ̄`) is supported in `CF(L,A)`.
+  have hfam_supp : ∀ i, (fam i : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hfam0]; exact hχsupp
+    · rw [hfam1]; exact hχbarsupp
+  -- Each `fam i` lies in `ℤ[χ, χ̄]`.
+  have hfam_zspan : ∀ i, (fam i : ClassFunction (↥L) ℂ) ∈
+      zSpan (L := ↥L) ({(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj} :
+        Set (ClassFunction (↥L) ℂ)) := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hfam0]; exact Submodule.subset_span (by simp)
+    · rw [hfam1]; exact Submodule.subset_span (by simp)
+  -- Each `irreducibleCharacterDifference fam i = (fam i) - (fam 0)` is supported in `CF(L,A)`.
+  have hdiff_supp : ∀ i,
+      (irreducibleCharacterDifference fam i).support ⊆ supportInSubgroup A L := fun i =>
+    (ClassFunction.support_sub_subset _ _).trans
+      (Set.union_subset (hfam_supp i) (hfam_supp 0))
+  -- Each difference lies in `ℤ[χ, χ̄]`.
+  have hdiff_zspan : ∀ i,
+      irreducibleCharacterDifference fam i ∈
+        zSpan (L := ↥L) ({(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj} :
+          Set (ClassFunction (↥L) ℂ)) := fun i =>
+    Submodule.sub_mem _ (hfam_zspan i) (hfam_zspan 0)
+  -- Supportedness of the two generators of `ℤ[χ, χ̄]`.
+  have hSsupp : ∀ s ∈ ({(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj} :
+      Set (ClassFunction (↥L) ℂ)), s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact hχsupp
+    · exact hχbarsupp
+  -- (1.4) hypothesis (virtual): `(fam i - χ)^τ ∈ ℤ[Irr G]`.
+  have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ fam := by
+    intro i
+    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i) ?_
+    -- `(fam i) - χ ∈ ℤ[Irr L]`: difference of two irreducibles.
+    refine Submodule.sub_mem _ ?_ (fam 0).mem_ZIrr
+    exact (fam i).mem_ZIrr
+  -- (1.4) hypothesis (vanish at 1).
+  have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ fam := by
+    intro i
+    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+  -- (1.4) hypothesis (inner product preserved): both differences live in the supported `ℤ[χ, χ̄]`.
+  have hisom : ∀ i j,
+      ClassFunction.inner (isometryDifferenceImage τ fam i) (isometryDifferenceImage τ fam j) =
+        ClassFunction.inner (irreducibleCharacterDifference fam i)
+          (irreducibleCharacterDifference fam j) := by
+    intro i j
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSsupp
+      (hdiff_zspan i) (hdiff_zspan j)
+  -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
+  exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
+
 /-- **Peterfalvi (5.6.3) / Round-24 (ii): the per-step decomposition pair `(D₀, Da)`, produced
 directly from the Dade isometry.**
 
@@ -3575,6 +3705,49 @@ noncomputable def decompositionPairFromDade
     (fun φ ζ hφ hζ =>
       dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hφ hζ)
     rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar
+
+/-- **Round B assembly: the fully Dade-derived per-step decomposition pair.**
+
+The per-step `(D₀, Da)` decomposition pair produced *entirely* from the Dade isometry, taking only
+the natural character-theoretic data of (6.6): `χ` an irreducible **non-real** character of `L`,
+`χ₁ ∈ ℤ[Irr L]`, both `χ`, `χ̄`, `a·χ₁` supported in `CF(L,A)`, and the three orthogonality
+relations.  Both the orthonormal image family `R(χ)` (via `dadeOrthonormalCharacterImageFamily`,
+Round B) **and** the two `ZIrr`-membership facts `(χ−0)^τ, (χ−a·χ₁)^τ ∈ ℤ[Irr G]` (via
+`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, (2.6.b)) are constructed internally — no opaque
+`OrthonormalCharacterImageFamily` or `ZIrr` hypotheses.  This makes the per-step `(5.6)` retarget
+input fully constructive from the real Dade τ: feed the result to
+`retarget_isCoherent_of_sharedDecomposition`. -/
+noncomputable def decompositionPairFromDadeOfIrreducible
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L)
+    (hchi1Z : chi1 ∈ ZIrr (↥L))
+    (haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hχχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj chi1 = 0)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0) :
+    CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (χ : ClassFunction (↥L) ℂ) 0 ×
+      CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (χ : ClassFunction (↥L) ℂ) (a • chi1) :=
+  -- `(χ − 0)^τ ∈ ℤ[Irr G]`: `χ` itself is supported and in `ℤ[Irr L]`.
+  have hmem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - 0) ∈ ZIrr G :=
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr)
+  -- `(χ − a·χ₁)^τ ∈ ℤ[Irr G]`: difference of supported virtual characters.
+  have hmema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G :=
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
+      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a))
+  decompositionPairFromDade hyp hconj
+    (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+    hχsupp hχbarsupp haχ1supp hmem0 hmema hχχ1 hχbarχ1 hχχbar
 
 end DadeBaseMap
 
