@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.Algebra.Group.Subgroup.Map
 
 /-!
 # Omega Subgroups
@@ -78,6 +79,25 @@ theorem mono {m n : ℕ} (h : m ≤ n) : Omega G p m ≤ Omega G p n := by
   change g ^ (p ^ n) = 1
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
   rw [Nat.pow_add, pow_mul, hg, one_pow]
+
+/-- **`Ω_n(G)` は characteristic**: 任意の自己同型 `φ : G ≃* G` は生成集合
+`{g | g ^ (p ^ n) = 1}` を保つ (`(φ g) ^ (p ^ n) = φ (g ^ (p ^ n)) = φ 1 = 1`),
+ゆえに `Ω_n(G)` を固定する.
+
+BG Thm 1.13 (issue 0016) で `H = Ω₁(C)` を `C` で characteristic にし,
+`C char G` と合わせて ambient `G` での characteristic を導く土台. -/
+instance characteristic : (Omega G p n).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_eq]
+  intro φ
+  rw [Omega, MonoidHom.map_closure]
+  congr 1
+  ext h
+  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  constructor
+  · rintro ⟨g, hg, rfl⟩
+    rw [← map_pow, hg, map_one]
+  · intro hh
+    exact ⟨φ.symm h, by rw [← map_pow, hh, map_one], φ.apply_symm_apply h⟩
 
 end Omega
 
