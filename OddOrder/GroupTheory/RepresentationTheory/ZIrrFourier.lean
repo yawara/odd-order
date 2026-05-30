@@ -373,6 +373,54 @@ theorem inner_orthonormalSum_sum_eq_sum_coeff {s : Finset (ClassFunction G ℂ)}
   refine Finset.sum_congr rfl fun b hb => ?_
   exact inner_orthonormalSum_eq_coeff horth hb
 
+open scoped Classical in
+omit [Finite G] in
+/-- **Pythagoras for an orthogonal family plus an orthogonal residual.**
+Let `v : ι → ClassFunction G ℂ` (indexed over `s : Finset ι`) be **orthogonal** with real
+gram `⟨v i, v j⟩ = if i = j then (m i : ℂ) else 0`, and let `Z` be orthogonal to every
+`v i` (`i ∈ s`).  Then the squared norm of `w = (∑ i ∈ s, (c i : ℂ) • v i) + Z` is the
+real number `∑ i ∈ s, (c i)² · m i + (⟨Z, Z⟩).re`.
+
+This is the Hilbert-space identity behind Peterfalvi (5.6.2): writing the orthogonal part
+`Y = ∑ i, c i · χ_i^{τ₁} + Z` against the orthogonal family `χ_i^{τ₁}` (norms `‖χ_i‖²`),
+`‖Y‖²` splits as a sum of squares plus `‖Z‖²`. -/
+theorem inner_self_orthogonalSum_add_re {ι : Type*} (s : Finset ι)
+    (v : ι → ClassFunction G ℂ) (c : ι → ℝ) (m : ι → ℝ) (Z : ClassFunction G ℂ)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (v i) (v j) =
+      if i = j then (m i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (v i) = 0) :
+    (ClassFunction.inner ((∑ i ∈ s, (c i : ℂ) • v i) + Z)
+        ((∑ i ∈ s, (c i : ℂ) • v i) + Z)).re =
+      (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re := by
+  classical
+  -- `Z` is also orthogonal to each `v i` on the *left*: `⟨v i, Z⟩ = star ⟨Z, v i⟩ = 0`.
+  have hZ' : ∀ i ∈ s, ClassFunction.inner (v i) Z = 0 := fun i hi => by
+    rw [inner_conj_symm, hZ i hi, star_zero]
+  set X : ClassFunction G ℂ := ∑ i ∈ s, (c i : ℂ) • v i with hX
+  -- Expand `⟨X + Z, X + Z⟩ = ⟨X, X⟩ + ⟨X, Z⟩ + ⟨Z, X⟩ + ⟨Z, Z⟩`.
+  have hXZ : ClassFunction.inner X Z = 0 := by
+    rw [hX, inner_sum_left]
+    refine Finset.sum_eq_zero fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, hZ' i hi, mul_zero]
+  have hZX : ClassFunction.inner Z X = 0 := by
+    rw [inner_conj_symm, hXZ, star_zero]
+  -- `⟨X, X⟩ = ∑ i, (c i)² • m i` (the diagonal survives by orthogonality).
+  have hXX : ClassFunction.inner X X = ((∑ i ∈ s, (c i) ^ 2 * m i : ℝ) : ℂ) := by
+    rw [hX, inner_sum_left, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [inner_sum_right]
+    rw [Finset.sum_eq_single i]
+    · rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi i hi, if_pos rfl,
+        Complex.star_def, Complex.conj_ofReal]
+      push_cast; ring
+    · intro j hj hji
+      rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi j hj,
+        if_neg (Ne.symm hji), mul_zero, mul_zero]
+    · intro hni; exact absurd hi hni
+  rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_add_right, hXZ, hZX, add_zero, zero_add, hXX,
+    Complex.add_re, Complex.ofReal_re]
+
 set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- An irreducible representation has positive dimension. -/
