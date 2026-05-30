@@ -11,7 +11,10 @@ import Mathlib.LinearAlgebra.Trace
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.GroupAction.Quotient
+import OddOrder.GroupTheory.TISubset
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
@@ -404,6 +407,149 @@ theorem card_dvd_classSumCoeff_of_fixedPointFree (P : Subgroup G) [Finite P]
   exact hfree x (by simpa using hx) q
 
 end PairAction
+
+section FixedPointFree
+
+open OddOrder.GroupTheory
+
+/-- **A `p`-element normalizing a Sylow `p`-subgroup lies in it.** If `P` is a Sylow `p`-subgroup
+of `G` and `u ∈ N_G(P)` generates a `p`-group `⟨u⟩` (i.e. `u` is a `p`-element), then `u ∈ P`.
+
+This is the "`y` is a `p`-element of `L`, and so `y ∈ P`" step of Peterfalvi (6.7.1): in
+`L = N_G(P)` the Sylow `p`-subgroup `P` is normal, hence the unique one, so every `p`-element of `L`
+lies in `P`.  Proof: `P ⊔ ⟨u⟩` is a `p`-group (both factors are `p`-groups and `⟨u⟩ ≤ N_G(P)`,
+`IsPGroup.to_sup_of_normal_left'`); since `P` is a *maximal* `p`-subgroup (`Sylow.is_maximal'`) and
+`P ≤ P ⊔ ⟨u⟩`, this forces `P ⊔ ⟨u⟩ = P`, whence `u ∈ P`. -/
+theorem mem_sylow_of_mem_normalizer_of_isPGroup {p : ℕ} [Fact p.Prime] (P : Sylow p G) {u : G}
+    (hu : u ∈ Subgroup.normalizer (P : Subgroup G)) (hup : IsPGroup p (Subgroup.zpowers u)) :
+    u ∈ (P : Subgroup G) := by
+  -- `⟨u⟩ ≤ N_G(P)`, so `P ⊔ ⟨u⟩` is a `p`-group.
+  have hzle : Subgroup.zpowers u ≤ Subgroup.normalizer (P : Subgroup G) :=
+    Subgroup.zpowers_le.mpr hu
+  have hsup : IsPGroup p ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) :=
+    IsPGroup.to_sup_of_normal_left' P.2 hup hzle
+  -- `P` is maximal among `p`-subgroups, and `P ≤ P ⊔ ⟨u⟩`, so the join collapses to `P`.
+  have heq : ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) = (P : Subgroup G) :=
+    P.3 hsup le_sup_left
+  -- `u ∈ ⟨u⟩ ≤ P ⊔ ⟨u⟩ = P`.
+  have humem : u ∈ ((P : Subgroup G) ⊔ Subgroup.zpowers u : Subgroup G) :=
+    (le_sup_right : Subgroup.zpowers u ≤ _) (Subgroup.mem_zpowers u)
+  rwa [heq] at humem
+
+/-- **Peterfalvi (6.7.1)** (fixed-point-free hypothesis).  Setup of (6.7): `P` a Sylow `p`-subgroup
+of the finite group `G`, `L = N_G(P)`, `P^# = P ∖ {1}` a TI-subset of `G` (with normalizer-bound
+`L`), and `Z ≤ P` a subgroup that is *normal in* `L`.  Suppose the conjugacy classes satisfy
+`C_i ∩ Z^# ≠ ∅`, `C_j ∩ Z^# ≠ ∅`, and `C_s ∩ Z = ∅`.
+
+Then `P` acts *fixed-point-freely* by conjugation on `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}`:
+no `x ∈ P` with `x ≠ 1` fixes a pair of `Ω`.
+
+The argument is Peterfalvi's: if `x ∈ P^#` fixes `(u, v)`, then `x` centralizes both `u` and `v`,
+so `u, v ∈ C_G(x) ⊆ L` (because `P^#` is TI and `x ∈ P^#` is centralized, so any centralizing
+element conjugates `x ∈ P^#` to itself, landing in `L`).  Each of `u, v` is a `p`-element (it is
+`G`-conjugate to a nontrivial element of `Z ≤ P`, a `p`-group), hence lies in `P`
+(`mem_sylow_of_mem_normalizer_of_isPGroup`).  The same conjugacy carries `u` (resp. `v`) into `Z^#`
+by an element of `L` (TI again), and `Z ⊴ L` forces `u, v ∈ Z`; then `u·v ∈ Z`, contradicting
+`C_s ∩ Z = ∅`. -/
+theorem fixedPointFree_classPair_of_isTISubset {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    {Z : Subgroup G} (hZP : Z ≤ (P : Subgroup G))
+    (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
+    (hti : IsTISubset ((P : Set G) \ {1}) (Subgroup.normalizer (P : Subgroup G)))
+    {Ci Cj Cs : ConjClasses G}
+    (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
+    (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj)
+    (hCs : ∀ w : G, ConjClasses.mk w = Cs → w ∉ Z) :
+    ∀ x : (P : Subgroup G), (x : G) ≠ 1 → ∀ q : ClassPair Ci Cj Cs, x • q ≠ q := by
+  classical
+  -- `Z ≤ P ≤ L`, so `Z` sits inside `L = N_G(P)`.
+  have hZL : ∀ a : G, a ∈ Z → a ∈ Subgroup.normalizer (P : Subgroup G) := by
+    intro a ha
+    exact (P : Subgroup G).le_normalizer (hZP ha)
+  -- `Z ⊴ L`, read at the level of `G`: `L` conjugates `Z` to itself.
+  have hZconj : ∀ c : G, c ∈ Subgroup.normalizer (P : Subgroup G) →
+      ∀ a : G, a ∈ Z → c * a * c⁻¹ ∈ Z := by
+    intro c hc a ha
+    have haL : a ∈ Subgroup.normalizer (P : Subgroup G) := hZL a ha
+    have := hZnormal.conj_mem ⟨a, haL⟩ ha ⟨c, hc⟩
+    simpa [Subgroup.mem_subgroupOf] using this
+  -- `z ∈ P` has `p`-power order, so does anything `G`-conjugate to it: `⟨w⟩` is a `p`-group.
+  have hp_of_conj : ∀ {w z : G}, z ∈ (P : Subgroup G) → IsConj z w →
+      IsPGroup p (Subgroup.zpowers w) := by
+    intro w z hzP hconj
+    -- `orderOf z = p ^ k` (it lies in the `p`-group `P`), and conjugation preserves order.
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp P.2) ⟨z, hzP⟩
+    rw [Subgroup.orderOf_mk] at hk
+    obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+    have hsc : SemiconjBy c z w := mul_inv_eq_iff_eq_mul.mp hc
+    have hordw : orderOf w = p ^ k := (SemiconjBy.orderOf_eq c hsc).symm.trans hk
+    -- A cyclic group of `p`-power order is a `p`-group.
+    exact IsPGroup.of_card (n := k) (by rw [Nat.card_zpowers, hordw])
+  -- `x ∈ P^#` fixing `(u,v)` centralizes `u`, `v`; TI puts that centralizer inside `L`.
+  intro x hx q hfix
+  obtain ⟨⟨u, v⟩, hq⟩ := q
+  obtain ⟨hqi, hqj, hqs⟩ := hq
+  -- Work with the underlying group element `xg = ↑x` to keep inverses on the `G` side.
+  set xg : G := (x : G) with hxg
+  -- Unfold `x • (u,v) = (u,v)` into `xg u xg⁻¹ = u` and `xg v xg⁻¹ = v`.
+  have hcoe := congrArg (Subtype.val) hfix
+  rw [classPairSMul_coe] at hcoe
+  simp only [Prod.mk.injEq] at hcoe
+  obtain ⟨hxu, hxv⟩ := hcoe
+  -- `xg ∈ P^# = P ∖ {1}`.
+  have hxP : xg ∈ ((P : Set G) \ {1}) := ⟨x.2, by simpa [hxg] using hx⟩
+  -- Any `y` commuting with `xg` lands in `L`: it conjugates `xg ∈ P^#` to `xg ∈ P^#`.
+  have hcent_le : ∀ y : G, xg * y * xg⁻¹ = y →
+      y ∈ Subgroup.normalizer (P : Subgroup G) := by
+    intro y hy
+    -- `xg y xg⁻¹ = y` says `xg, y` commute; hence `y xg y⁻¹ = xg`, overlapping `P^#`.
+    have hcomm : xg * y = y * xg := mul_inv_eq_iff_eq_mul.mp hy
+    have hyx : y * xg * y⁻¹ = xg := by
+      rw [← hcomm]; group
+    exact hti y ⟨xg, hxP, by rw [hyx]; exact hxP⟩
+  -- The core sub-step applied to a member `y ∈ {u, v}`: `y ∈ Z`.
+  have hmem_Z : ∀ {y z : G}, xg * y * xg⁻¹ = y → z ∈ Z → z ≠ 1 → IsConj z y →
+      y ∈ Z := by
+    intro y z hxy hzZ _ hconj
+    -- `y ∈ L` (it commutes with `xg ∈ P^#`).
+    have hyL : y ∈ Subgroup.normalizer (P : Subgroup G) := hcent_le y hxy
+    -- `y` is a `p`-element (conjugate to `z ∈ Z ≤ P`), hence `y ∈ P`.
+    have hyP : y ∈ (P : Subgroup G) :=
+      mem_sylow_of_mem_normalizer_of_isPGroup P hyL (hp_of_conj (hZP hzZ) hconj)
+    -- `c z c⁻¹ = y` for some `c`; so `c⁻¹` conjugates `y ∈ P^#` into `Z^# ⊆ P^#`.
+    obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+    have hyne : y ≠ 1 := by
+      rintro rfl
+      -- `c z c⁻¹ = 1` forces `z = 1`, contradicting `z ≠ 1`.
+      apply ‹z ≠ 1›
+      have : c * z * c⁻¹ = 1 := hc
+      simpa [mul_eq_one_iff_eq_inv] using this
+    have hyP' : y ∈ ((P : Set G) \ {1}) :=
+      ⟨SetLike.mem_coe.mpr hyP, by simpa using hyne⟩
+    have hzP' : z ∈ ((P : Set G) \ {1}) :=
+      ⟨SetLike.mem_coe.mpr (hZP hzZ), by simpa using ‹z ≠ 1›⟩
+    -- TI applied to `c⁻¹` (sending `y ∈ P^#` to `c⁻¹ y c = z ∈ P^#`) gives `c⁻¹ ∈ L`.
+    have hcinv_conj : c⁻¹ * y * (c⁻¹)⁻¹ = z := by rw [← hc]; group
+    have hcinvL : c⁻¹ ∈ Subgroup.normalizer (P : Subgroup G) :=
+      hti c⁻¹ ⟨y, hyP', by rw [hcinv_conj]; exact hzP'⟩
+    -- So `c ∈ L`, and `y = c z c⁻¹` with `Z ⊴ L`, `z ∈ Z` give `y ∈ Z`.
+    have hcL : c ∈ Subgroup.normalizer (P : Subgroup G) := by
+      simpa using inv_mem hcinvL
+    have := hZconj c hcL z hzZ
+    rwa [hc] at this
+  -- Apply the sub-step to `u` and `v` via their class memberships, then derive `u·v ∈ Z`.
+  obtain ⟨zi, hziZ, hzine, hzic⟩ := hCi
+  obtain ⟨zj, hzjZ, hzjne, hzjc⟩ := hCj
+  -- `u ∈ C_i` and `zi ∈ C_i ∩ Z^#` are conjugate, similarly `v`, `zj`.
+  have huconj : IsConj zi u :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp (hzic.trans hqi.symm)
+  have hvconj : IsConj zj v :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp (hzjc.trans hqj.symm)
+  have huZ : u ∈ Z := hmem_Z hxu hziZ hzine huconj
+  have hvZ : v ∈ Z := hmem_Z hxv hzjZ hzjne hvconj
+  -- `u·v ∈ Z` contradicts `C_s ∩ Z = ∅` (here `u·v ∈ C_s`).
+  exact hCs (u * v) hqs (Z.mul_mem huZ hvZ)
+
+end FixedPointFree
 
 section CentralCharacter
 

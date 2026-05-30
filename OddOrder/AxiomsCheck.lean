@@ -598,6 +598,14 @@ set_option linter.style.longLine false in
 -- `|P| ∣ a_{ijs}|C_s|` (= `classSumCoeff Ci Cj Cs`). The residual content of (6.7.1) is the
 -- group-theoretic verification of fixed-point-freeness (TI-subset + Sylow-in-`L`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_dvd_classSumCoeff_of_fixedPointFree
+-- RepresentationTheory (Peterfalvi (6.7.1), p-element step): a p-element of `N_G(P)` lies in the
+-- Sylow p-subgroup `P` (P is normal, hence the unique Sylow p in its normalizer).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mem_sylow_of_mem_normalizer_of_isPGroup
+-- RepresentationTheory (Peterfalvi (6.7.1), fixed-point-free hypothesis): under (6.7)'s setup
+-- (P Sylow p in L = N_G(P), P^# TI-subset, Z ≤ P normal in L; C_i, C_j meet Z^#, C_s ∩ Z = ∅),
+-- `P` acts fixed-point-freely by conjugation on `Ω = {(u,v) ∈ C_i × C_j ∣ u·v ∈ C_s}`. Combined
+-- with `card_dvd_classSumCoeff_of_fixedPointFree` this gives the full (6.7.1) `|P| ∣ a_{ijs}|C_s|`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.fixedPointFree_classPair_of_isTISubset
 -- RepresentationTheory (Peterfalvi §3 (1.1), [Is] Thm 6.32): Brauer's permutation lemma is
 -- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
 -- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).
