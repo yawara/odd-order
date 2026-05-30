@@ -214,4 +214,68 @@ theorem card_conj_fiber {a : G} {H : Subgroup G}
     apply Subtype.ext
     change t₀⁻¹ * (t₀ * k) = k; group
 
+/-! ### Peterfalvi (2.1): coprime coset conjugacy onto `C_H(g) g`
+
+The setting now is the *normalizing* analogue of the central one above: `g`
+normalizes `H` (rather than centralizing it) and `⟨g⟩`, `H` have coprime orders.
+The coset `Hg` then collapses, under `H`-conjugation, onto the smaller coset
+`C_H(g) g`: every element of `Hg` is `H`-conjugate to an element of `C_H(g) g`,
+and `Hg` is the disjoint union of `|H : C_H(g)|` such conjugates.
+
+This is **Peterfalvi, Character Theory for the Odd Order Theorem, (2.1)** and is a
+shared primitive cited throughout the text (notably §§6, 10, 12, 15, 16).
+-/
+
+section CosetConjugacy
+
+variable {g : G} {H : Subgroup G}
+
+/-- **Conjugacy rigidity for the normalizing coset** (Peterfalvi (2.1), the
+"`g^x = (ug)^x_π = (vg)^y_π = g^y`" step).
+
+If `u, v` commute with `g` and have order coprime-killed by the CRT exponent for
+`g` (here: order dividing `n` with `n` coprime to `orderOf g`), then any equality
+of conjugates `x⁻¹ (u g) x = y⁻¹ (v g) y` forces `y x⁻¹` to centralize `g`.
+
+This is a direct consequence of `conj_fixes_of_commute` applied to `g` and the
+conjugator `y x⁻¹`. -/
+theorem conj_centralizes_of_coset_conj_eq {x y u v : G} (hu : Commute g u)
+    (hv : Commute g v) {n : ℕ} (hn : Nat.Coprime (orderOf g) n)
+    (hun : orderOf u ∣ n) (hvn : orderOf v ∣ n)
+    (h : x⁻¹ * (u * g) * x = y⁻¹ * (v * g) * y) :
+    (y * x⁻¹) * g * (y * x⁻¹)⁻¹ = g := by
+  -- Rewrite the hypothesis as a single conjugation `t (g u) t⁻¹ = g v` with `t = y x⁻¹`.
+  have hconj : (y * x⁻¹) * (g * u) * (y * x⁻¹)⁻¹ = g * v := by
+    rw [hu.eq, hv.eq]
+    have e : (y * x⁻¹) * (u * g) * (y * x⁻¹)⁻¹
+        = y * (x⁻¹ * (u * g) * x) * y⁻¹ := by group
+    rw [e, h]; group
+  exact (conj_fixes_of_commute hu hv hn hun hvn hconj).1
+
+/-- **Membership form of `(2.1)` rigidity.**  With `C_H(g) = H ⊓ C_G(g)`: if
+`u, v ∈ C_H(g)` (so `|C_H(g)|`, hence `orderOf u, orderOf v`, is coprime to
+`orderOf g`) and `x, y ∈ H` satisfy `x⁻¹ (u g) x = y⁻¹ (v g) y`, then
+`y x⁻¹ ∈ C_H(g)`.  Equivalently the right cosets `C_H(g) x` and `C_H(g) y`
+coincide — the disjointness in the statement of (2.1). -/
+theorem mem_centralizer_of_coset_conj_eq
+    (hcop : Nat.Coprime (orderOf g) (Nat.card H)) [Finite H]
+    {x y u v : G} (hx : x ∈ H) (hy : y ∈ H)
+    (hu : u ∈ H ⊓ Subgroup.centralizer ({g} : Set G))
+    (hv : v ∈ H ⊓ Subgroup.centralizer ({g} : Set G))
+    (h : x⁻¹ * (u * g) * x = y⁻¹ * (v * g) * y) :
+    y * x⁻¹ ∈ H ⊓ Subgroup.centralizer ({g} : Set G) := by
+  obtain ⟨huH, hucomm⟩ := Subgroup.mem_inf.mp hu
+  obtain ⟨hvH, hvcomm⟩ := Subgroup.mem_inf.mp hv
+  have hu' : Commute g u :=
+    (Subgroup.mem_centralizer_singleton_iff.mp hucomm).symm
+  have hv' : Commute g v :=
+    (Subgroup.mem_centralizer_singleton_iff.mp hvcomm).symm
+  have hfix := conj_centralizes_of_coset_conj_eq hu' hv' hcop
+    (H.orderOf_dvd_natCard huH) (H.orderOf_dvd_natCard hvH) h
+  exact Subgroup.mem_inf.mpr
+    ⟨H.mul_mem hy (H.inv_mem hx),
+      Subgroup.mem_centralizer_singleton_iff.mpr (mul_inv_eq_iff_eq_mul.mp hfix)⟩
+
+end CosetConjugacy
+
 end OddOrder.GroupTheory
