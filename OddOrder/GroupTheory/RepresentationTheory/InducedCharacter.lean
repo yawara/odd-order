@@ -450,6 +450,47 @@ theorem restrict_mem_ZIrr (H : Subgroup G) {φ : ClassFunction G ℂ} (hφ : φ 
       rw [← Int.cast_smul_eq_zsmul ℂ a x, restrict_smul, Int.cast_smul_eq_zsmul]
       exact Submodule.smul_mem _ a ih
 
+omit [Fintype G] [Finite G] in
+/-- The pullback of the character of `ρ` along a group hom `f : H →* G` is the character of
+the pulled-back representation: `(χ_ρ) ∘ f = χ_{ρ ∘ f}`.  Here the right-hand side is the
+character of `ρ.comp f : Representation ℂ H V`. -/
+theorem compHom_repCharacterClassFunction {H : Type*} [Group H]
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (f : H →* G) (ρ : Representation ℂ G V) :
+    compHom f (repCharacterClassFunction ρ)
+      = repCharacterClassFunction (ρ.comp f) := by
+  ext h
+  rfl
+
+omit [Fintype G] [Finite G] in
+/-- **Pullback along a group hom preserves virtual characters.** For a group hom
+`f : H →* G` with `H` finite and a virtual character `φ ∈ ℤ[Irr G]`, the pullback
+`φ ∘ f` is a virtual character of `H`.
+
+This is the general "Res along a homomorphism" form needed for Peterfalvi (2.9): the class
+function `α_B = α ∘ f_B` is a virtual character of `M(B)` whenever `α ∈ ℤ[Irr L]`, where
+`f_B : M(B) →* L`.  As with `restrict_mem_ZIrr`, the proof is `Submodule.span_induction`;
+the base case uses that `(χ_ρ) ∘ f` is the character of the finite-dimensional
+representation `ρ.comp f`, which lies in `ℤ[Irr H]` by `character_mem_ZIrr` (irreducibility
+of `ρ.comp f` is *not* needed). -/
+theorem compHom_mem_ZIrr {H : Type*} [Group H] [Finite H] (f : H →* G)
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    compHom f φ ∈ ZIrr H := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, _, hρeq⟩ := hx
+      have hx_eq : x = repCharacterClassFunction ρ := by
+        apply ClassFunction.ext
+        intro g
+        rw [repCharacterClassFunction_apply, congrFun hρeq g]
+      rw [hx_eq, compHom_repCharacterClassFunction f ρ]
+      exact character_mem_ZIrr (ρ.comp f)
+  | zero => rw [compHom_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [compHom_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, compHom_smul, Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ a ih
+
 end VirtualCharacters
 
 section InduceVirtualCharacters
