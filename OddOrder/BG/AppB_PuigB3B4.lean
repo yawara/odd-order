@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppA_PStability
+import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
 # BG Appendix B: Lemma B.3 + Theorem B.4 (Puig, = Thm 6.2 代替)
@@ -142,6 +143,17 @@ theorem zCenterLOdd_eq_centralizer_inf (H : Subgroup G) :
     push_cast
     exact hg_cent (w : G) w.2
 
+/-- `Z(L(H))` は可換 (中心ゆえ): `Z(L(H)) = C_G(L(H)) ⊓ L(H)` の任意 2 元は互いに中心化する. -/
+theorem zCenterLOdd_isMulCommutative (H : Subgroup G) :
+    IsMulCommutative ↥(zCenterLOdd H) := by
+  refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
+  have hle : zCenterLOdd H ≤ Subgroup.centralizer (lOddIn H : Set G) := by
+    rw [zCenterLOdd_eq_centralizer_inf]; exact inf_le_left
+  have ha_cent : (a : G) ∈ Subgroup.centralizer (lOddIn H : Set G) := hle a.2
+  have hb_mem : (b : G) ∈ (lOddIn H : Subgroup G) := zCenterLOdd_le_lOddIn H b.2
+  rw [Subgroup.mem_centralizer_iff] at ha_cent
+  exact (ha_cent (b : G) hb_mem).symm
+
 /-- **BG Theorem B.4(b) Step 2** (mmd L4707-4719): `Z(L(S)) ⊆ Z(L(T))` (`T = O_p(G)`).
 `Z(L(S))` は `S` 内で `L(S) ⊇ L_*(S)` を中心化 ⇒ 相対 B.1(f) で `L_*(S)` に入り,
 B.3 で `L_*(S) ⊆ L_*(T) ⊆ L(T)`; かつ `L(T) ⊆ L(S)` ゆえ `L(T)` も中心化. -/
@@ -245,5 +257,150 @@ theorem normalizer_le_normalizer_map_of_characteristic
       have : cg.symm w = w' := by rw [← hw'eq]; exact cg.symm_apply_apply w'
       rw [this]; exact hw'W
     · rw [hcg_symm_apply, hyeq]; group
+
+/-! ### Step4 Frattini 用: `Sylow ∩ normal = Sylow of normal` -/
+
+/-- **第2同型の指数版** (積公式): `N ⊴ G` で `[N : Q⊓N] = [Q⊔N : Q]`.
+`Sylow ∩ normal` が `normal` 内で Sylow であることの index 義務に使う. -/
+private theorem relIndex_inf_eq_relIndex_sup [Finite G] {Q N : Subgroup G} [N.Normal] :
+    (Q ⊓ N).relIndex N = Q.relIndex (Q ⊔ N) := by
+  have hpos : 0 < N.relIndex Q :=
+    Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite (H := N.subgroupOf Q))
+  apply Nat.eq_of_mul_eq_mul_right hpos
+  have e1 : (Q ⊓ N).relIndex N * N.relIndex (Q ⊔ N) = (Q ⊓ N).relIndex (Q ⊔ N) :=
+    Subgroup.relIndex_mul_relIndex (Q ⊓ N) N (Q ⊔ N) inf_le_right le_sup_right
+  have e2 : (Q ⊓ N).relIndex Q * Q.relIndex (Q ⊔ N) = (Q ⊓ N).relIndex (Q ⊔ N) :=
+    Subgroup.relIndex_mul_relIndex (Q ⊓ N) Q (Q ⊔ N) inf_le_left le_sup_left
+  rw [Subgroup.relIndex_sup_right] at e1
+  rw [Subgroup.inf_relIndex_left] at e2
+  rw [e1, ← e2]; ring
+
+/-- `Q ∈ Syl_p(G)`, `N ⊴ G` ⇒ `Q ⊓ N` は `N` の Sylow `p`-部分群 (`(↑Q ⊓ N).subgroupOf N` で実現).
+Step4 の Frattini argument 用. 先例 `Isaacs/Ch07/S7B2:955`. -/
+noncomputable def normalInf_isSylow {p : ℕ} [Fact p.Prime] [Finite G]
+    {N : Subgroup G} [N.Normal] (Q : Sylow p G) : Sylow p ↥N :=
+  (show IsPGroup p (((Q : Subgroup G) ⊓ N).subgroupOf N) from Q.2.to_inf_left.comap_subtype).toSylow
+    (by
+      change ¬ p ∣ ((Q : Subgroup G) ⊓ N).relIndex N
+      rw [relIndex_inf_eq_relIndex_sup]
+      exact fun h => Q.not_dvd_index (h.trans (Subgroup.relIndex_dvd_index_of_le le_sup_left)))
+
+/-- `normalInf_isSylow Q` の台部分群は `(↑Q ⊓ N).subgroupOf N`. -/
+theorem normalInf_isSylow_coe {p : ℕ} [Fact p.Prime] [Finite G]
+    {N : Subgroup G} [N.Normal] (Q : Sylow p G) :
+    ((normalInf_isSylow (N := N) Q : Sylow p ↥N) : Subgroup ↥N)
+      = ((Q : Subgroup G) ⊓ N).subgroupOf N :=
+  rfl
+
+/-! ### Theorem B.4(b) 本体 -/
+
+/-- **BG Theorem B.4(b)** (mmd L4689-4762, Puig 1976): `p` odd, `G` solvable of odd order,
+`O_{p'}(G) = 1`, `S ∈ Syl_p(G)` ⇒ `Z(L(S)) ⊴ G`.
+
+これは **BG Thm 6.2 (Glauberman `Z(J)`) の自己完結代替** (BG L4691). Isaacs FGT が `Z(J)`
+定理を省くため, no-Gorenstein 方針下では Thm 6.2 一般形への唯一の自己完結ルート.
+
+証明 (mmd 4-Step): `T = O_p(G)`, `Y = Z(L(T))`.
+* **Step 2** = `zCenterLOdd_sylow_le_zCenterLOdd_opCore`: `Z(L(S)) ⊆ Y`.
+* **Step 3** (inline): `C` を `C/C_G(Y) = O_p(G/C_G(Y))` で取ると, `Y ⊆ L_*(S)` (B.1(e)),
+  `L(S) → L` (A.5) で `L(S) ⊆ C`, よって `L(C∩S) = L(S)` (相対 B.2), 共役同変で
+  `N_G(C∩S) ⊆ N_G(L(S))`.
+* **Step 4** (inline): Frattini (`C∩S ∈ Syl_p(C)`) + 吸収 `C = C_G(Y)(C∩S)` で
+  `C_G(Y) ⊔ N_G(C∩S) = ⊤`.
+* **FINAL**: `⊤ = C_G(Y) ⊔ N_G(C∩S) ≤ N_G(Z(L(S)))` (左枝 `Z ⊆ Y`, 右枝 Step3 + center 同変). -/
+theorem zCenter_lOdd_normal_of_oPiCore_eq_bot [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
+    (zCenterLOdd (S : Subgroup G)).Normal := by
+  -- Step 2: Z(L(S)) ⊆ Y = Z(L(T))
+  have hZ_le_Y : zCenterLOdd (S : Subgroup G) ≤ zCenterLOdd (opCore p G) :=
+    zCenterLOdd_sylow_le_zCenterLOdd_opCore hp_odd hsolv hodd hOp' S
+  -- Y = Z(L(T)) は characteristic-of-characteristic ルートで正規
+  haveI hLT_char : (lOddIn (opCore p G)).Characteristic :=
+    lOddIn_characteristic_of_characteristic (opCore.characteristic p G)
+  haveI hLT_normal : (lOddIn (opCore p G)).Normal := inferInstance
+  haveI hY_normal : (zCenterLOdd (opCore p G)).Normal := by
+    unfold zCenterLOdd; infer_instance
+  set Y := zCenterLOdd (opCore p G) with hY_def
+  -- C₀ = C_G(Y) は正規 (`centralizer` 頭で保持, set しない — A.5 出力の quotient instance 用)
+  haveI hC₀_normal : (Subgroup.centralizer (Y : Set G)).Normal := inferInstance
+  haveI hC_normal :
+      ((opCore p (G ⧸ Subgroup.centralizer (Y : Set G))).comap
+        (QuotientGroup.mk' (Subgroup.centralizer (Y : Set G)))).Normal := inferInstance
+  set C := (opCore p (G ⧸ Subgroup.centralizer (Y : Set G))).comap
+    (QuotientGroup.mk' (Subgroup.centralizer (Y : Set G))) with hC_def
+  set CapS := C ⊓ (S : Subgroup G) with hCapS_def
+  -- === Step 3 の素材 ===
+  have hY_le_T : Y ≤ opCore p G :=
+    (zCenterLOdd_le_lOddIn (opCore p G)).trans (lOddIn_le_self (opCore p G))
+  have hY_le_S : Y ≤ (S : Subgroup G) := hY_le_T.trans (opCore_le S)
+  have hY_pg : IsPGroup p ↥Y := (opCore_isPGroup p G).to_le hY_le_T
+  have hY_comm : IsMulCommutative ↥Y := zCenterLOdd_isMulCommutative (opCore p G)
+  -- Y ⊆ L_*(S): Y abelian, Y ⊴ S ⟹ B.1(e)
+  have hS_norm_Y : (S : Subgroup G) ≤ Subgroup.normalizer (Y : Set G) :=
+    le_top.trans_eq (Subgroup.normalizer_eq_top_iff.mpr hY_normal).symm
+  have hY_le_LstarS : Y ≤ lStarIn (S : Subgroup G) := by
+    obtain ⟨k, hk⟩ := exists_lStarIn_eq (S : Subgroup G)
+    have hpos : 0 < 2 * max k 1 := by have := le_max_right k 1; omega
+    rw [hk (max k 1) (le_max_left _ _)]
+    exact abelian_le_lNIn hY_comm hY_le_S hS_norm_Y hpos
+  -- hX: L(S) ≤ ⨆ (Y-正規化 abelian p-群)
+  have hX : lOddIn (S : Subgroup G) ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧
+      IsPGroup p ↥A ∧ Y ≤ Subgroup.normalizer (A : Set G)}, A := by
+    rw [← lRelIn_lStarIn (S : Subgroup G)]
+    exact lRelIn_le_iSup_pgroup_normalized S.isPGroup' hY_le_LstarS
+  -- A.5(1): L(S)·C₀/C₀ ⊆ O_p(G/C₀) = C/C₀, ゆえ L(S) ⊆ C
+  have hmap := thmA5_part1 hp_odd hsolv hodd (P := Y) hY_pg hX
+  have hL_le_C : lOddIn (S : Subgroup G) ≤ C := Subgroup.map_le_iff_le_comap.mp hmap
+  -- 相対 B.2: L(C∩S) = L(S)
+  have hLeq : lOddIn CapS = lOddIn (S : Subgroup G) :=
+    lOddIn_eq_of_lOddIn_le_relative (H := CapS) (H₀ := (S : Subgroup G))
+      (by rw [hCapS_def]; exact inf_le_right)
+      (by rw [hCapS_def]; exact le_inf hL_le_C (lOddIn_le_self _))
+  -- Step 3 結論: N_G(C∩S) ⊆ N_G(L(S))
+  have hN : Subgroup.normalizer (CapS : Set G)
+      ≤ Subgroup.normalizer (lOddIn (S : Subgroup G) : Set G) := by
+    have h := normalizer_le_normalizer_lOddIn CapS
+    rwa [hLeq] at h
+  -- === Step 4: Frattini + 吸収 ⟹ C₀ ⊔ N_G(C∩S) = ⊤ ===
+  haveI : Finite (Sylow p ↥C) := inferInstance
+  have hQcs_map : ((normalInf_isSylow (N := C) S : Sylow p ↥C) : Subgroup ↥C).map C.subtype
+      = CapS := by
+    rw [normalInf_isSylow_coe, Subgroup.subgroupOf_map_subtype, hCapS_def, inf_assoc, inf_idem,
+      inf_comm]
+  have hFr : Subgroup.normalizer (CapS : Set G) ⊔ C = ⊤ := by
+    have h := Sylow.normalizer_sup_eq_top (normalInf_isSylow (N := C) S)
+    rwa [hQcs_map] at h
+  -- 吸収: C ⊆ C₀(C∩S)
+  have hC_absorb : C ≤ Subgroup.centralizer (Y : Set G) ⊔ CapS := by
+    intro c hc
+    rw [hC_def, Subgroup.mem_comap] at hc
+    have hle : opCore p (G ⧸ Subgroup.centralizer (Y : Set G))
+        ≤ (S : Subgroup G).map (QuotientGroup.mk' (Subgroup.centralizer (Y : Set G))) := by
+      have h := opCore_le (S.mapSurjective (QuotientGroup.mk'_surjective
+        (Subgroup.centralizer (Y : Set G))))
+      rwa [Sylow.coe_mapSurjective] at h
+    obtain ⟨s, hsS, hs_eq⟩ := Subgroup.mem_map.mp (hle hc)
+    have hsC : s ∈ C := by rw [hC_def, Subgroup.mem_comap, hs_eq]; exact hc
+    have hcs : c * s⁻¹ ∈ Subgroup.centralizer (Y : Set G) := by
+      have hker : (QuotientGroup.mk' (Subgroup.centralizer (Y : Set G))) (c * s⁻¹) = 1 := by
+        rw [map_mul, map_inv, hs_eq, mul_inv_cancel]
+      rwa [← QuotientGroup.ker_mk' (Subgroup.centralizer (Y : Set G)), MonoidHom.mem_ker]
+    have hsCapS : s ∈ CapS := by rw [hCapS_def, Subgroup.mem_inf]; exact ⟨hsC, hsS⟩
+    have hceq : c = (c * s⁻¹) * s := by group
+    rw [hceq]; exact Subgroup.mul_mem_sup hcs hsCapS
+  have hCabs : C ≤ Subgroup.centralizer (Y : Set G) ⊔ Subgroup.normalizer (CapS : Set G) :=
+    hC_absorb.trans (sup_le_sup_left Subgroup.le_normalizer _)
+  have hTop : Subgroup.centralizer (Y : Set G) ⊔ Subgroup.normalizer (CapS : Set G) = ⊤ := by
+    rw [eq_top_iff, ← hFr]; exact sup_le le_sup_right hCabs
+  -- === FINAL: ⊤ = C₀ ⊔ N_G(C∩S) ≤ N_G(Z) ⟹ Z ⊴ G ===
+  rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hTop]
+  refine sup_le ?_ ?_
+  · -- 左枝: C_G(Y) ≤ C_G(Z) ≤ N_G(Z)  (Z ⊆ Y)
+    exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hZ_le_Y)).trans
+      (Subgroup.centralizer_le_normalizer _)
+  · -- 右枝: N_G(C∩S) ⊆ N_G(L(S)) ⊆ N_G(Z)
+    exact hN.trans (normalizer_le_normalizer_map_of_characteristic
+      (K := lOddIn (S : Subgroup G)) (W := Subgroup.center _))
 
 end OddOrder.BG.AppB
