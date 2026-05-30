@@ -4128,6 +4128,132 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
         hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hconj hC α hg, mul_zero]
     · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC]
 
+open scoped Classical in
+/-- The transversal sum of `mobiusTermCF` reindexes over the `Finset` of nonempty subsets that are
+their own conjugacy-class representative (`transversalRep (mk'' B) = B`), with the summand the
+packaged induced character:
+
+    `∑_{C ∈ ℬ} mobiusTermCF (rep C) (g) = ∑_{p ∈ s} (-1)^{|p.1|} · Ind_{M(p)}^G α_p (g)`,
+
+`s` ranging over `{p : {B // B.Nonempty} // transversalRep (mk'' p.1) = p.1}` (as a `Finset`).
+This converts the (2.10) identity into the `∑ c_p • induceAlphaBTerm p` shape demanded by the bridge
+`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`.  The bijection sends a class `C` with
+nonempty representative to `⟨rep C, _⟩` and back via `p ↦ mk'' p.1` (`Quotient.out_eq'`); the empty
+classes contribute `0` on the left and are excluded on the right. -/
+theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.HConjInvariant)
+    (α : SupportedClassFunctions (G := G) ℂ A L) (g : G) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+    (∑ C : hyp.conjClassQuotient,
+        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C))
+      = ∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+          (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+          ((-1 : ℂ) ^ p.1.card) * hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p g := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  -- restrict the left sum to nonempty-rep classes (empty reps contribute `0`).
+  rw [← Finset.sum_filter_of_ne (p := fun C : hyp.conjClassQuotient =>
+        (hyp.transversalRep C).Nonempty) ?_]
+  · -- now bijection between `{C : rep C nonempty}` and the fixed-point subtype Finset.
+    refine Finset.sum_bij'
+      (i := fun C hC => (⟨hyp.transversalRep C, by
+          rw [Finset.mem_filter] at hC; exact hC.2⟩
+        : {B : Finset {a : G // a ∈ A} // B.Nonempty}))
+      (j := fun p _ => (Quotient.mk'' p.1 : hyp.conjClassQuotient))
+      ?_ ?_ ?_ ?_ ?_
+    · -- `i C ∈ s`
+      intro C hC
+      rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      show hyp.transversalRep (Quotient.mk'' (hyp.transversalRep C)) = hyp.transversalRep C
+      simp only [transversalRep, Quotient.out_eq']
+    · -- `j p ∈ filter (rep nonempty)`
+      intro p hp
+      rw [Finset.mem_filter] at hp ⊢
+      refine ⟨Finset.mem_univ _, ?_⟩
+      rw [hp.2]; exact p.2
+    · -- left inverse: `mk'' (rep C) = C`
+      intro C hC
+      show Quotient.mk'' (hyp.transversalRep C) = C
+      simp only [transversalRep, Quotient.out_eq']
+    · -- right inverse: `⟨rep (mk'' p.1), _⟩ = p`
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      apply Subtype.ext
+      exact hp.2
+    · -- summand agreement
+      intro C hC
+      rw [Finset.mem_filter] at hC
+      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC.2]
+  · -- the dropped terms (empty reps) are zero: if the summand is nonzero, the rep is nonempty.
+    intro C _ hC
+    by_contra hne
+    exact hC (hyp.mobiusTermCF_of_not_nonempty hconj _ g hne)
+
+/-- Evaluation of a `Finset` sum of class functions is the sum of the evaluations. -/
+private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
+    (f : ι → ClassFunction G ℂ) (g : G) :
+    (∑ p ∈ s, f p) g = ∑ p ∈ s, f p g := by
+  classical
+  refine s.induction_on (by simp) ?_
+  intro p s' hps' ih
+  rw [Finset.sum_insert hps', Finset.sum_insert hps', ClassFunction.add_apply, ih]
+
+open scoped Classical in
+/-- **Peterfalvi (2.6.b).**  The complex Dade map preserves virtual characters:
+`τ : ℤ[Irr L, A] → ℤ[Irr G]`.
+
+This is the culmination of the (2.10) inclusion–exclusion.  Feeding the pointwise identity
+`α^τ = -∑_{C ∈ ℬ} (-1)^{|rep C|} Ind_{M(rep C)} α_{rep C}` (`dadeMap_eq_neg_sum_mobiusTermCF`,
+reindexed over the representative subtype by `sum_mobiusTermCF_transversalRep_eq_sum_subtype`) into
+the bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`: the right-hand side is a
+`ℤ`-linear combination (`c p = -(-1)^{|p.1|}`) of inclusion–exclusion summands `induceAlphaBTerm`,
+each a virtual character (`induceAlphaBTerm_mem_ZIrr`), so `α^τ ∈ ℤ[Irr G]`. -/
+theorem Hypothesis.preservesVirtualCharacters_dadeMap (hconj : hyp.HConjInvariant) :
+    PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
+  refine preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum hconj ?_
+  intro α _
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  refine ⟨(Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+      (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+    fun p => -((-1 : ℤ) ^ p.1.card), ?_⟩
+  refine ClassFunction.ext fun g => ?_
+  rw [hyp.dadeMap_eq_neg_sum_mobiusTermCF hconj α]
+  show -∑ C : hyp.conjClassQuotient,
+      hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+    = (∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
+        (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
+        (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) g
+  rw [hyp.sum_mobiusTermCF_transversalRep_eq_sum_subtype hconj α g,
+    classFunction_finset_sum_apply, ← Finset.sum_neg_distrib]
+  refine Finset.sum_congr rfl fun p _ => ?_
+  -- `(-(-1)^|p.1| • Ind p) g = -((-1)^|p.1| · Ind p g)`.
+  rw [show (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
+      = (((-((-1 : ℤ) ^ p.1.card) : ℤ) : ℂ)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
+      from by rw [Int.cast_smul_eq_zsmul], ClassFunction.smul_apply]
+  push_cast
+  ring
+
+/-- **Peterfalvi (2.6).**  The full complex Dade-isometry package: the (2.5) Dade-map equations, the
+(2.6.a) normalized isometry, and the (2.6.b) virtual-character preservation, all constructed from
+Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+
+This is the honest construction of `FullDadeIsometryData` (no longer an interface assumption):
+`toDadeIsometryData` is the `dadeIsometryData` built from the explicit (2.5) Dade map, and
+`preserves_virtualCharacters` is the (2.10) inclusion–exclusion result
+`preservesVirtualCharacters_dadeMap`. -/
+noncomputable def Hypothesis.fullDadeIsometryData (hconj : hyp.HConjInvariant) :
+    FullDadeIsometryData (G := G) hyp where
+  toDadeIsometryData := hyp.dadeIsometryData hconj
+  preserves_virtualCharacters := by
+    rw [hyp.dadeIsometryData_toDadeMap hconj]
+    exact hyp.preservesVirtualCharacters_dadeMap hconj
+
 end AdjointFormula
 
 end DadeMap
