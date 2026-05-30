@@ -344,6 +344,36 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     부재). 현 `coherentUnion_of_glued` 는 `ν` 를 **공급 데이터**로 받음 (Peterfalvi 의 `τ₃` 가 실제로
     orthonormal 기저에서 구성되는 정직한 supplied data) ⟹ assembler 자체는 honest·general·완결.
     조립기는 끝났고, 남은 건 그 입력을 채우는 (i)/(ii)/(iii)-canonical 의 character/free-module 작업.
+- [x] (2026-05-31, pass 8) **(6.6) "repeated use of (5.6)" iteration engine** `coherentPairChain` 를
+      `S07_Coherence.lean` 에 landing (sorry/axiom 無 — `#print axioms coherentPairChain` =
+      {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각 3 axiom 全 allowlist; full
+      `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs). (6.6) 증명의 결론
+      "**Repeated use of Theorem (5.6)** then shows that X is coherent" (mmd L84) 을 정직하게 형식화 —
+      single-pair `retarget_isCoherent` 를 pair 수에 대한 induction 으로 fold 하는 **반복 엔진**.
+      이번 round 의 G1 plumbing (L1.1 Dade 추출 / L1.2 case-A/B split) 은 **honest 하지 않다고 판정**해
+      skip (아래 G1 판정).
+  - **`pairSet pair i := {(pair i).1, (pair i).2}`** (i-번째 adjoined pair `{χᵢ, χ̄ᵢ}`),
+    **`pairUnion S₀ pair`** (`0 ↦ S₀`, `i+1 ↦ pairUnion … i ∪ pairSet … i`; i 번 adjoin 후 누적집합),
+    `pairUnion_zero`/`pairUnion_succ` (simp), `subset_pairUnion_succ`, **`pairUnion_mono`**
+    (`i ≤ j ⟹ pairUnion … i ⊆ pairUnion … j`; `Nat.le` induction).
+  - **`coherentPairChain`** (`noncomputable def`): coherent base `h0 : IsCoherent τ S₀ A` +
+    per-index adjoining step `hstep : ∀ i < N, IsCoherent τ (pairUnion S₀ pair i) A →
+    IsCoherent τ (pairUnion S₀ pair (i+1)) A` ⟹ `IsCoherent τ (pairUnion S₀ pair N) A`. proof 는
+    `N` 에 대한 well-founded recursion (`0 ↦ h0`, `N+1 ↦ hstep N _ (코herentPairChain … N (step 약화))`).
+    각 `hstep i _` 는 (5.6) 1회 적용 = `retarget_isCoherent` 에 caller 의 per-step (5.6) data
+    (orthonormal `{χᵢ,χ̄ᵢ}`/`{Xᵢ,X̄ᵢ}`, image 방정식, lattice 직교, (5.1)-generation; *현재* 확장
+    `hcoh.extension` 을 참조하므로 running witness 의 함수로 주어짐) 를 투입하면 산출. 엔진은
+    **induction 자체** 만 기여 — 최종 coherence 는 **derived** (posit 無). general·reusable
+    (임의 chain; (6.6) 의 degree/divisibility 산술과 decouple). = roadmap 의 G2.7 "repeated (5.6)"
+    의 honest core. 남은 (6.6) 작업 = 각 step 의 (5.6) data 생산 (degree sort/θᵢ(1) p-power/
+    [Is]Cor 2.30/(6.4.c) coprimality forcing) + base prefix coherence ((1.1)/(1.4)).
+  - **G1 판정 (skip 사유, honest 하지 않음)**: `SibleySetup` 는 **Dade isometry 필드도, X/Y 집합도,
+    case-A/B flag (`Z(H)∩[H,H]` vs `W₂`) 도, (6.6) data 도 보유하지 않음** (필드 = `coherence`,
+    `K`, `H`, `W1`, `H_sharp_ti`, normality). (L1.1) "Dade τ 추출" = `hyp.coherence.tau` 단순 필드
+    접근이며 이미 `coherence_tau_inner_eq` 로 노출됨 ⟹ 순수 thin wrapper (repo 규약 금지). (L1.2)
+    case-A/B split = 분기에 필요한 `Z`·`W₂`·case 술어를 새 가설로 *외출* 해야 함 ⟹ scaffolding
+    (memory `scaffold-sorry-free-not-done` + task 금지). 따라서 G1 은 honest 하게 착지할 수 없어
+    skip; 대신 task (b) 의 §5-engine-consuming first leaf 를 landing.
 
 ## 完了条件
 

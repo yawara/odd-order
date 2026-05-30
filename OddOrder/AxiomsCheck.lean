@@ -1129,3 +1129,10 @@ set_option linter.style.longLine false in
 -- generator `Z[X,A] ∪ Z[Y,A]` and a (5.1)-type generation hypothesis.  The two-family analogue of
 -- `retarget_isCoherent`; carries no character theory (its inputs are supplied by (6.6)/(6.7)/Dade).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued
+-- (6.6) "repeated use of (5.6)" iteration engine: from a coherent base `S₀` and a per-index
+-- adjoining step `IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` (each step
+-- one application of (5.6) = `retarget_isCoherent` with the caller's per-step data), the union after
+-- `N` adjoinings `pairUnion S₀ pair N` is coherent — the induction is derived, never posited.  The
+-- accumulated-set monotonicity helper is `pairUnion_mono`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono

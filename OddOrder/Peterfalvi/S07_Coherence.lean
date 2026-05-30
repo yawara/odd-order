@@ -1913,6 +1913,87 @@ noncomputable def coherentUnion_of_glued
       · rw [hagreeY y hyY.1, hY.extends_on_supported y hyY]
     exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
 
+/-! ### Peterfalvi (6.6): coherence of `X` by repeated adjoining of pairs
+
+The (6.6) proof concludes "**Repeated use of Theorem (5.6)** then shows that `X` is coherent":
+one starts from the coherent base `{χ₁,…,χₖ}` (the equal-minimal-degree prefix, coherent by
+(1.1)+(1.4)) and adjoins each remaining `χᵢ` together with its conjugate `χ̄ᵢ`, *one pair at a
+time*, each adjoining being a single application of (5.6) (= `retarget_isCoherent`) to the union
+accumulated so far.  The growing set after `i` adjoinings is
+
+`chainSet i = S₀ ∪ (χ-and-χ̄ of the first i pairs)`,
+
+and each step is an instance of `IsCoherent (chainSet i) A → IsCoherent (chainSet (i+1)) A`.
+
+This subsection provides the **iteration engine** for that argument, decoupled from the
+(6.6)-specific degree/divisibility arithmetic (which is what *produces* each step's (5.6) inputs).
+The accumulated set `pairUnion S₀ pair i` and the fold `coherentPairChain` make "repeated use of
+(5.6)" precise: the final coherence is **derived** by induction on the pair count, never posited. -/
+
+/-- The two characters of the `i`-th adjoined pair, as a set `{χᵢ, χ̄ᵢ}`. -/
+def pairSet (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (i : ℕ) :
+    Set (ClassFunction L ℂ) :=
+  {(pair i).1, (pair i).2}
+
+/-- The base set `S₀` together with the pairs `{χⱼ, χ̄ⱼ}` for `j < i`: the set accumulated after
+the first `i` adjoinings in the (6.6) "repeated use of (5.6)" induction.
+
+`pairUnion S₀ pair 0 = S₀` and `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪ {χᵢ, χ̄ᵢ}`. -/
+def pairUnion (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) : ℕ → Set (ClassFunction L ℂ)
+  | 0 => S₀
+  | i + 1 => pairUnion S₀ pair i ∪ pairSet (L := L) pair i
+
+@[simp] theorem pairUnion_zero (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) :
+    pairUnion (L := L) S₀ pair 0 = S₀ := rfl
+
+@[simp] theorem pairUnion_succ (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (i : ℕ) :
+    pairUnion (L := L) S₀ pair (i + 1) =
+      pairUnion (L := L) S₀ pair i ∪ pairSet (L := L) pair i := rfl
+
+theorem subset_pairUnion_succ (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (i : ℕ) :
+    pairUnion (L := L) S₀ pair i ⊆ pairUnion (L := L) S₀ pair (i + 1) :=
+  Set.subset_union_left
+
+theorem pairUnion_mono (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) {i j : ℕ} (hij : i ≤ j) :
+    pairUnion (L := L) S₀ pair i ⊆ pairUnion (L := L) S₀ pair j := by
+  induction hij with
+  | refl => exact Set.Subset.rfl
+  | step _ ih => exact ih.trans (subset_pairUnion_succ (L := L) S₀ pair _)
+
+/-- **Peterfalvi (6.6): the "repeated use of (5.6)" iteration engine.**
+
+Given a coherent base set `S₀` (the equal-minimal-degree prefix coherence supplied by (1.1)+(1.4))
+and, for each `i < N`, an adjoining step turning coherence of the set accumulated so far
+(`pairUnion S₀ pair i`) into coherence of the set with the `i`-th pair `{χᵢ, χ̄ᵢ}` adjoined
+(`pairUnion S₀ pair (i+1)`), the full union after `N` adjoinings, `pairUnion S₀ pair N`, is coherent.
+
+Each step `hstep i _` is one application of (5.6) (`retarget_isCoherent`); the caller supplies the
+per-step (5.6) data (orthonormal `{χᵢ, χ̄ᵢ}`/`{Xᵢ, X̄ᵢ}`, the image equation, the lattice
+orthogonalities, the (5.1)-generation) — which references the *current* extension `hcoh.extension`,
+hence is given as a function of the running witness, exactly as the induction requires.  This engine
+contributes the induction itself: the conclusion `IsCoherent (pairUnion S₀ pair N) A` is **derived**
+by recursion on `N`, never assumed. -/
+noncomputable def coherentPairChain
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (S₀ : Set (ClassFunction L ℂ))
+    (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ)
+    (h0 : IsCoherent τ S₀ A) :
+    ∀ N : ℕ,
+      (∀ i, i < N → IsCoherent τ (pairUnion (L := L) S₀ pair i) A →
+        IsCoherent τ (pairUnion (L := L) S₀ pair (i + 1)) A) →
+      IsCoherent τ (pairUnion (L := L) S₀ pair N) A
+  | 0, _ => h0
+  | N + 1, hstep =>
+    hstep N (Nat.lt_succ_self N)
+      (coherentPairChain S₀ pair h0 N
+        (fun i hi => hstep i (hi.trans (Nat.lt_succ_self N))))
+
 /-! ### Peterfalvi (5.6.1): the family bundle
 
 The (5.6) coherence-union argument carries a whole **family** `{χᵢ}_{i ∈ s} ⊆ S₁` with `χ₁` a

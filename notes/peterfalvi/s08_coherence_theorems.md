@@ -158,6 +158,35 @@ full `lake build OddOrder` 緑 3351 jobs). pass-6의 두 gluing 항등식의 **�
   구성되는 정직한 입력). **조립기는 완결**; 남은 건 (i) (6.6) coherence-of-X `hX`, (ii) case-A/B
   character theory (가장 무거운 덩어리), (iii)-canonical glued-map 구성. 상세는 issue 0046 pass-7.
 
+### (2026-05-31, pass 8) (6.6) "repeated use of (5.6)" iteration engine `coherentPairChain` landing
+
+`S07_Coherence.lean`에 **(6.6) 증명의 결론 단계** "Repeated use of Theorem (5.6) then shows that X is
+coherent" (mmd L84)를 형식화한 **반복 엔진** landing (sorry/axiom 無 — `#print axioms coherentPairChain`
+= {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각 3 axiom 전 allowlist; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs). single-pair `retarget_isCoherent`를
+pair 수에 대한 induction으로 fold하는 정직한 핵심:
+
+- **`pairSet pair i`** (= `{(pair i).1, (pair i).2}` = i-번째 pair `{χᵢ, χ̄ᵢ}`), **`pairUnion S₀ pair`**
+  (`0 ↦ S₀`, `i+1 ↦ pairUnion … i ∪ pairSet … i` = i번 adjoin 후 누적집합), `pairUnion_zero`/
+  `pairUnion_succ` (simp), `subset_pairUnion_succ`, **`pairUnion_mono`** (`i≤j ⟹ ⊆`).
+- **`coherentPairChain`** (`noncomputable def`): `h0 : IsCoherent τ S₀ A` (base = (1.1)/(1.4) prefix
+  coherence) + `hstep : ∀ i<N, IsCoherent τ (pairUnion S₀ pair i) A → IsCoherent τ (pairUnion S₀
+  pair (i+1)) A` (각 step = (5.6) 1회 = `retarget_isCoherent`) ⟹ `IsCoherent τ (pairUnion S₀ pair N) A`.
+  proof는 `N`에 대한 recursion (`0↦h0`, `N+1↦hstep N _ (recurse N, step 약화)`). 엔진은 induction
+  자체만 기여 — 최종 coherence는 **derived** (posit 無). general·reusable (임의 chain). 각 `hstep i`의
+  (5.6) data (`hX_ortho`/`himg` 등)는 *현재* 확장 `hcoh.extension`을 참조하므로 running witness의
+  함수로 주어짐 = "repeated use"의 본질 구조.
+- **honest 판정 (G1 skip)**: 이번 round의 G1 plumbing (L1.1 Dade 추출 / L1.2 case-A/B split)은 honest
+  하지 않아 skip. `SibleySetup`는 Dade isometry 필드/X·Y 집합/case-A/B flag (`Z(H)∩[H,H]` vs `W₂`)/
+  (6.6) data를 **보유하지 않음** (필드 = `coherence`/`K`/`H`/`W1`/`H_sharp_ti`/normality). L1.1은
+  `hyp.coherence.tau` 필드 접근 (이미 `coherence_tau_inner_eq`로 노출) = thin wrapper (규약 금지);
+  L1.2는 `Z`·`W₂`·case 술어를 새 가설로 외출해야 함 = scaffolding (memory `scaffold-sorry-free-not-done`
+  금지). 상세는 issue 0046 pass-8.
+- **(6.6) 남은 작업**: 각 step의 (5.6) data 생산 (degree sort / θᵢ(1) = p-power / [Is] Cor 2.30
+  `θᵢ(1)²≤|K:Z|` / (6.4.c) `(|L:K|,p)=1` ⟹ `χᵢ(1)²∣∑_{j<i}χⱼ(1)²` ⟹ degree 부등식
+  `2χᵢ(1)χ₁(1)<∑_{j<i}χⱼ(1)²`) + base prefix coherence ((1.1)/(1.4)). 이들이 `coherentPairChain`의
+  `hstep`/`h0`를 채움.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
