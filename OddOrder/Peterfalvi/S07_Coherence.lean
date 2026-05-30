@@ -1404,6 +1404,79 @@ theorem retarget_isIntegralIsometry [Fintype G] [Invertible (Nat.card G : ℂ)]
       hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
   rw [himg, hsrc, hτ₁.inner_eq φperp ψperp]
 
+/-- **The lattice-relative orthonormal-block re-targeting isometry.**
+
+The genuinely satisfiable form of `retarget_isIntegralIsometry`: rather than demanding the
+orthogonality `X, X̄ ⊥ τ₁ ξ` for *every* `ξ ⊥ {χ, χ̄}` (which forces `X, X̄ ∈ span{τ₁χ, τ₁χ̄}`,
+not met in (5.6) general position), it only demands it for `ξ` in a submodule `M` closed under the
+Gram–Schmidt residual against `{χ, χ̄}` (with `χ, χ̄ ∈ M`).  The conclusion is then inner-product
+preservation **on `M`** — exactly the lattice `Z[S₁ ∪ {χ, χ̄}]` isometry of Peterfalvi (5.6.3).
+
+In the (5.6) application `M = span_ℂ(S₁ ∪ {χ, χ̄})`; the residual of any `φ ∈ M` lies in
+`span_ℂ S₁`, so the hypotheses `hX_ortho`/`hXbar_ortho` are the genuine `(5.5)+(5.2.e)` fact
+`X, X̄ ⊥ τ₁(span_ℂ S₁) = S₁^{τ₁}` (and *not* the over-strong global version).  `τ₁` need only be an
+isometry on `M`. -/
+theorem retarget_inner_eq_on {τ₁ : IntegralCharacterMap L G}
+    {χ chibar : ClassFunction L ℂ} {X Xbar : ClassFunction G ℂ}
+    {M : Submodule ℂ (ClassFunction L ℂ)} [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hχM : χ ∈ M) (hchibarM : chibar ∈ M)
+    (hτ₁ : ∀ u v : ClassFunction L ℂ, u ∈ M → v ∈ M →
+      ClassFunction.inner (τ₁ u) (τ₁ v) = ClassFunction.inner u v)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hXX : ClassFunction.inner X X = 1) (hXbarXbar : ClassFunction.inner Xbar Xbar = 1)
+    (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
+    (hX_ortho : ∀ ξ ∈ M, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (τ₁ ξ) X = 0)
+    (hXbar_ortho : ∀ ξ ∈ M, ClassFunction.inner ξ χ = 0 →
+      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (τ₁ ξ) Xbar = 0)
+    {φ ψ : ClassFunction L ℂ} (hφ : φ ∈ M) (hψ : ψ ∈ M) :
+    ClassFunction.inner (retarget τ₁ χ chibar X Xbar φ) (retarget τ₁ χ chibar X Xbar ψ) =
+      ClassFunction.inner φ ψ := by
+  set s := ClassFunction.inner φ χ with hs
+  set t := ClassFunction.inner φ chibar with ht
+  set s' := ClassFunction.inner ψ χ with hs'
+  set t' := ClassFunction.inner ψ chibar with ht'
+  set φperp := orthoResidualMap (L := L) χ chibar φ with hφperp
+  set ψperp := orthoResidualMap (L := L) χ chibar ψ with hψperp
+  -- The residuals lie in `M` (since `χ, χ̄ ∈ M`).
+  have hφperpM : φperp ∈ M := by
+    rw [hφperp, orthoResidualMap_apply]
+    exact M.sub_mem (M.sub_mem hφ (M.smul_mem _ hχM)) (M.smul_mem _ hchibarM)
+  have hψperpM : ψperp ∈ M := by
+    rw [hψperp, orthoResidualMap_apply]
+    exact M.sub_mem (M.sub_mem hψ (M.smul_mem _ hχM)) (M.smul_mem _ hchibarM)
+  -- Orthogonality of the residuals to `{χ, χ̄}`.
+  have hφperp_χ : ClassFunction.inner φperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ φ
+  have hφperp_χbar : ClassFunction.inner φperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar φ
+  have hψperp_χ : ClassFunction.inner ψperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ ψ
+  have hψperp_χbar : ClassFunction.inner ψperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar ψ
+  -- Image side.
+  have himg : ClassFunction.inner (retarget τ₁ χ chibar X Xbar φ)
+      (retarget τ₁ χ chibar X Xbar ψ) =
+      ClassFunction.inner (τ₁ φperp) (τ₁ ψperp) + s * star s' + t * star t' := by
+    rw [retarget_apply, retarget_apply, ← hφperp, ← hψperp, ← hs, ← ht, ← hs', ← ht']
+    exact inner_block_expand hXX hXbarXbar hXXbar hXbarX
+      (hX_ortho φperp hφperpM hφperp_χ hφperp_χbar)
+      (hXbar_ortho φperp hφperpM hφperp_χ hφperp_χbar)
+      (hX_ortho ψperp hψperpM hψperp_χ hψperp_χbar)
+      (hXbar_ortho ψperp hψperpM hψperp_χ hψperp_χbar)
+  -- Source side.
+  have hsrc : ClassFunction.inner φ ψ =
+      ClassFunction.inner φperp ψperp + s * star s' + t * star t' := by
+    have hφ' : φ = φperp + s • χ + t • chibar := by
+      rw [hφperp, orthoResidualMap_apply, ← hs, ← ht]; abel
+    have hψ' : ψ = ψperp + s' • χ + t' • chibar := by
+      rw [hψperp, orthoResidualMap_apply, ← hs', ← ht']; abel
+    rw [hφ', hψ']
+    exact inner_block_expand hχχ hχbarχbar hχχbar hχbarχ
+      hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
+  rw [himg, hsrc, hτ₁ φperp ψperp hφperpM hψperpM]
+
 /-! #### Agreement on the supported span
 
 The `extends_on_supported` field of `IsCoherent` for the re-targeted map `τ₂` is discharged by

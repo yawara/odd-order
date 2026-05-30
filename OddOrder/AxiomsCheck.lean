@@ -1068,6 +1068,15 @@ set_option linter.style.longLine false in
 -- τ₁ ξ` for every `ξ ⊥ {χ,χ̄}`, the rank-2 re-targeting is again a global integral isometry.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_isIntegralIsometry
+-- (5.6.3) lattice-relative keystone (the genuinely satisfiable form): the re-targeting preserves
+-- `⟨·,·⟩` *on a submodule `M`* (closed under the Gram–Schmidt residual against `{χ,χ̄}`, `χ,χ̄∈M`)
+-- requiring `X,X̄ ⊥ τ₁ ξ` only for `ξ ∈ M ⊥ {χ,χ̄}`.  For `M = span_ℂ(S₁∪{χ,χ̄})` the residual of
+-- `φ∈M` lies in `span_ℂ S₁`, so this is the honest (5.5)+(5.2.e) `X,X̄ ⊥ S₁^{τ₁}` (not the
+-- over-strong global version that forces `X,X̄ ∈ span{τ₁χ,τ₁χ̄}`).  This is the (5.6.3) *lattice*
+-- isometry `Z[S₁∪{χ,χ̄}] → Z[Irr G]`; the lift to the *global* `IsCoherent.extension_isometry` is a
+-- separate (Witt/unitary subspace-isometry extension) brick.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_inner_eq_on
 -- (5.6.1) family bundle: the source-side cross-difference orthogonality
 -- `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²`, derived (not posited) from `χ ⊥ S₁` + pairwise orthogonality.
 #assert_only_allowed_axioms
