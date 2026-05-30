@@ -1031,6 +1031,84 @@ theorem int_eq_zero_of_sq_mul_le_of_two_mul_lt
     have hDle : D ≤ (lam : ℚ) * D := by nlinarith [hlam1, hD]
     linarith
 
+/-! ### Peterfalvi (6.6): the prime-power degree gap
+
+(6.6) builds coherence of `X = {χ₁,…,χₙ}` (sorted, `χ₁(1) ≤ ⋯ ≤ χₙ(1)`) by *repeated use* of
+(5.6) (the `coherentPairChain` engine).  Each step adjoins one degree class and needs the strict
+degree-ratio bound `2·χᵢ(1)·χ₁(1) < ∑_{j<i} χⱼ(1)²` — exactly the `2·a < D` precondition of
+`int_eq_zero_of_sq_mul_le_of_two_mul_lt`.
+
+The mmd derives it (L80-82) from the prime-power structure: every `χⱼ(1) = |L:K|·θⱼ(1)` with
+`θⱼ(1)` a power of `p`, so for `i` past the maximal same-degree index, `χᵢ(1) = q·χ₁(1)` with
+`q = p^m` a non-trivial power of `p`; coprimality `(|L:K|, p) = 1` plus the sum identity force
+`χᵢ(1)² ∣ ∑_{j<i} χⱼ(1)²`.  Since `|L|` is odd, `p ≥ 3`, whence
+
+`2·χᵢ(1)·χ₁(1) < p·χᵢ(1)·χ₁(1) ≤ χᵢ(1)² ≤ ∑_{j<i} χⱼ(1)²`.
+
+The three lemmas below isolate this number-theoretic content (over `ℕ`, then cast to `ℚ` for the
+(5.6) core).  They are honest consequences of (6.6)'s data, not posited hypotheses: the prime-power
+gap and the square-divisibility both come from the character-degree structure of `K` a `p`-group. -/
+
+/-- **Peterfalvi (6.6): the prime-power degree gap (ℕ).**
+
+If two character degrees `d₁ ≤ dᵢ` differ by a non-trivial power of an odd prime — `dᵢ = q·d₁`
+with `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` — then the doubled cross term `2·dᵢ·d₁` is strictly below the
+square `dᵢ²`.
+
+The text's chain (mmd L82) is `2·dᵢ·d₁ < p·dᵢ·d₁ ≤ dᵢ²`.  We extract the load-bearing fact that
+`q > 1` is a power of `p`, hence `q ≥ p ≥ 3`, so `dᵢ = q·d₁ ≥ 3·d₁`; the strict inequality then
+follows from `2·dᵢ·d₁ < 3·dᵢ·d₁ ≤ dᵢ²` (using `d₁ ≥ 1`). -/
+theorem two_mul_lt_sq_of_primePow_gap
+    {p d₁ dᵢ q m : ℕ} (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dᵢ = q * d₁) (hlt : d₁ < dᵢ) :
+    2 * (dᵢ * d₁) < dᵢ * dᵢ := by
+  -- `q > 1`: otherwise `dᵢ = q·d₁ ≤ d₁`, contradicting `d₁ < dᵢ`.
+  have hq1 : 1 < q := by
+    rcases Nat.lt_or_ge q 2 with h | h
+    · interval_cases q <;> simp_all
+    · omega
+  -- `q = p^m` with `q > 1` forces `m ≥ 1`, hence `p ≤ q`.
+  have hpq : p ≤ q := by
+    rcases Nat.eq_zero_or_pos m with hm | hm
+    · subst hm; simp at hq; omega
+    · calc p = p ^ 1 := (pow_one p).symm
+        _ ≤ p ^ m := Nat.pow_le_pow_right (by omega) hm
+        _ = q := hq.symm
+  -- `dᵢ = q·d₁ ≥ p·d₁ ≥ 3·d₁`.
+  have hgap : 3 * d₁ ≤ dᵢ := by
+    have h1 : 3 * d₁ ≤ p * d₁ := Nat.mul_le_mul_right _ hp
+    have h2 : p * d₁ ≤ q * d₁ := Nat.mul_le_mul_right _ hpq
+    omega
+  nlinarith [hgap, hpos₁]
+
+/-- **Peterfalvi (6.6): chaining the gap to the partial degree sum (ℕ).**
+
+The gap `2·dᵢ·d₁ < dᵢ²` together with `dᵢ² ∣ D` (the square-divisibility `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`)
+and `0 < D` gives `2·dᵢ·d₁ < D`: positivity upgrades the divisibility to `dᵢ² ≤ D`. -/
+theorem two_mul_lt_of_sq_dvd_of_gap
+    {d₁ dᵢ D : ℕ} (hgap : 2 * (dᵢ * d₁) < dᵢ * dᵢ)
+    (hdvd : dᵢ * dᵢ ∣ D) (hDpos : 0 < D) :
+    2 * (dᵢ * d₁) < D := by
+  have : dᵢ * dᵢ ≤ D := Nat.le_of_dvd hDpos hdvd
+  omega
+
+/-- **Peterfalvi (6.6): the degree-ratio bound feeding (5.6) (ℚ).**
+
+The consumer-facing form: from the prime-power gap data (`dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`,
+`d₁ < dᵢ`) and the square-divisibility `dᵢ² ∣ D` with `0 < D`, the strict bound
+`2·(dᵢ·d₁) < D` holds in `ℚ`.  This is exactly the `2·a < D` precondition (`a = dᵢ·d₁`,
+`D = ∑_{j<i}χⱼ(1)²`) of `int_eq_zero_of_sq_mul_le_of_two_mul_lt`, so each `coherentPairChain`
+step's (5.6.2) integer-forcing has its degree hypothesis discharged from `ℕ` degree data. -/
+theorem two_mul_degree_lt_sum_ratCast
+    {p d₁ dᵢ q m D : ℕ} (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dᵢ = q * d₁) (hlt : d₁ < dᵢ)
+    (hdvd : dᵢ * dᵢ ∣ D) (hDpos : 0 < D) :
+    2 * ((dᵢ : ℚ) * (d₁ : ℚ)) < (D : ℚ) := by
+  have hℕ : 2 * (dᵢ * d₁) < D :=
+    two_mul_lt_of_sq_dvd_of_gap
+      (two_mul_lt_sq_of_primePow_gap hp hpos₁ hq hdiv hlt) hdvd hDpos
+  exact_mod_cast hℕ
+
 namespace CharacterPsiDecomposition
 
 open OddOrder.RepresentationTheory

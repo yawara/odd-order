@@ -374,6 +374,30 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     case-A/B split = 분기에 필요한 `Z`·`W₂`·case 술어를 새 가설로 *외출* 해야 함 ⟹ scaffolding
     (memory `scaffold-sorry-free-not-done` + task 금지). 따라서 G1 은 honest 하게 착지할 수 없어
     skip; 대신 task (b) 의 §5-engine-consuming first leaf 를 landing.
+- [x] (2026-05-31, pass 2-cont) **(6.6) prime-power degree gap (mmd L82) leaf** 를 `S07_Coherence.lean`
+      에 landing (sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+      등록 2건 각 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs).
+      pass-1 `coherentPairChain` 의 각 `hstep` 이 소비하는 **strict degree-ratio bound**
+      `2·χᵢ(1)·χ₁(1) < ∑_{j<i}χⱼ(1)²` (= (5.6.2) core `int_eq_zero_of_sq_mul_le_of_two_mul_lt` 의 `2·a < D`
+      전제) 를 (6.6) 의 prime-power 구조에서 정직하게 도출하는 number-theoretic leaf.
+      `int_eq_zero_of_sq_mul_le_of_two_mul_lt` (line 1032) 직후 (5.6) section 안에 배치:
+  - **`two_mul_lt_sq_of_primePow_gap`** (ℕ): `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹
+    `2·dᵢ·d₁ < dᵢ²`. proof: `q > 1` (else `dᵢ ≤ d₁`) + `q = p^m > 1` ⟹ `m ≥ 1` ⟹ `p ≤ q` ⟹
+    `dᵢ = q·d₁ ≥ p·d₁ ≥ 3·d₁`, `nlinarith`. = mmd L82 의 `2χᵢ(1)χ₁(1) < pχᵢ(1)χ₁(1) ≤ χᵢ(1)²` 의
+    load-bearing 산술 (χⱼ(1)=|L:K|·θⱼ(1), θⱼ(1) p-power ⟹ χᵢ(1)/χ₁(1)=p^m, `|L| odd ⟹ p ≥ 3`).
+  - **`two_mul_lt_of_sq_dvd_of_gap`** (ℕ): gap `2·dᵢ·d₁ < dᵢ²` + `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`)
+    + `0 < D` ⟹ `2·dᵢ·d₁ < D` (positivity 로 `dᵢ² ≤ D`).
+  - **`two_mul_degree_lt_sum_ratCast`** (ℚ, consumer-facing): 위 둘을 합쳐 prime-power gap data +
+    square-divisibility 에서 `2·((dᵢ:ℚ)·(d₁:ℚ)) < (D:ℚ)` 산출 = (5.6) core 의 `2·a < D` 전제 직접 공급.
+    각 `coherentPairChain` step 의 (5.6.2) integer-forcing 의 degree 가설이 ℕ degree data 에서 방전됨.
+  - **honest 판정**: prime-power gap (`dᵢ = q·d₁`, `q = p^m`) 와 square-divisibility (`dᵢ² ∣ D`) 는 둘 다
+    (6.6) data 의 정직한 귀결 (K = p-group ⟹ θ degree p-power; (6.4.c) coprimality + sum identity ⟹
+    `χᵢ(1)² ∣ ∑_{j<i}`). posited hypothesis 아님 — 실수 부등식을 실 number-theoretic 가설에서 도출.
+  - **(6.6) 남은 작업 (pass-2 이후)**: 각 step 의 (5.6) data *나머지* 생산 — degree sort (X 를
+    `χ₁(1) ≤ ⋯ ≤ χₙ(1)` 로 정렬해 `coherentPairChain` 의 `pair` index 화) + per-index prime-power gap
+    가설 (`χᵢ(1) = q·χ₁(1)`, `q = p^m`; θ degree p-power) + square-divisibility (`χᵢ(1)² ∣ ∑_{j<i}`;
+    [Is] Cor 2.30 `θᵢ(1)²≤|K:Z|` + sum identity + (6.4.c) coprimality) 를 본 leaf 에 plug; + base prefix
+    coherence ((1.1)/(1.4)). degree-bound 부분은 본 leaf 가 공급, 나머지가 `hstep`/`h0` 의 잔여 입력.
 
 ## 完了条件
 

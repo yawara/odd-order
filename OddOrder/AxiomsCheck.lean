@@ -1136,3 +1136,10 @@ set_option linter.style.longLine false in
 -- accumulated-set monotonicity helper is `pairUnion_mono`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono
+-- (6.6) prime-power degree gap (mmd L82): the strict bound `2·χᵢ(1)·χ₁(1) < ∑_{j<i}χⱼ(1)²` that
+-- each `coherentPairChain` step's (5.6.2) integer-forcing (`int_eq_zero_of_sq_mul_le_of_two_mul_lt`)
+-- consumes.  `two_mul_lt_sq_of_primePow_gap`: `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹
+-- `2·dᵢ·d₁ < dᵢ²` (`q ≥ p ≥ 3` gives `dᵢ ≥ 3·d₁`).  `two_mul_degree_lt_sum_ratCast`: chains the gap
+-- through the square-divisibility `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) to the `ℚ` bound `2·a < D`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_primePow_gap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_degree_lt_sum_ratCast

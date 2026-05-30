@@ -187,6 +187,29 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
   `2χᵢ(1)χ₁(1)<∑_{j<i}χⱼ(1)²`) + base prefix coherence ((1.1)/(1.4)). 이들이 `coherentPairChain`의
   `hstep`/`h0`를 채움.
 
+### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
+
+`coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <
+∑_{j<i}χⱼ(1)²`을 (6.6)의 prime-power 구조에서 정직하게 도출하는 number-theoretic leaf 3건을
+`S07_Coherence.lean` (`int_eq_zero_of_sq_mul_le_of_two_mul_lt` 직후 (5.6) section 안)에 landing
+(sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각
+3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs):
+
+- **`two_mul_lt_sq_of_primePow_gap`** (ℕ): `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹
+  `2·dᵢ·d₁ < dᵢ²`. proof: `q > 1` (else `dᵢ ≤ d₁`) + `q = p^m > 1` ⟹ `m ≥ 1` ⟹ `p ≤ q` ⟹
+  `dᵢ = q·d₁ ≥ p·d₁ ≥ 3·d₁`, `nlinarith`. = mmd L82의 `2χᵢ(1)χ₁(1) < pχᵢ(1)χ₁(1) ≤ χᵢ(1)²`의
+  load-bearing 산술 (χⱼ(1)=|L:K|·θⱼ(1), θⱼ(1) p-power ⟹ χᵢ(1)/χ₁(1)=p^m; `|L| odd ⟹ p ≥ 3`).
+- **`two_mul_lt_of_sq_dvd_of_gap`** (ℕ): gap + `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) + `0 < D` ⟹
+  `2·dᵢ·d₁ < D` (positivity로 `dᵢ² ≤ D`).
+- **`two_mul_degree_lt_sum_ratCast`** (ℚ, consumer-facing): 위 둘 합성 ⟹
+  `2·((dᵢ:ℚ)·(d₁:ℚ)) < (D:ℚ)` = (5.6) core의 `2·a < D` 전제 직접 공급. 각 `coherentPairChain` step의
+  (5.6.2) integer-forcing의 degree 가설이 ℕ degree data에서 방전됨.
+- **honest 판정**: prime-power gap (`dᵢ = q·d₁`)와 square-divisibility (`dᵢ² ∣ D`)는 둘 다 (6.6) data의
+  정직한 귀결 (K = p-group ⟹ θ degree p-power; (6.4.c) coprimality + sum identity). posited 아님.
+- **(6.6) 잔여 (pass-2 이후)**: degree sort + per-index prime-power gap 가설 (`χᵢ(1)=q·χ₁(1)`, `q=p^m`) +
+  square-divisibility (`χᵢ(1)² ∣ ∑_{j<i}`; [Is] Cor 2.30 + sum identity + (6.4.c)) 를 본 leaf에 plug +
+  base prefix coherence ((1.1)/(1.4)). degree-bound 부분은 본 leaf가 공급. 상세는 issue 0046 pass-2.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
