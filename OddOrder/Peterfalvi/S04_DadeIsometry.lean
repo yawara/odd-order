@@ -1497,6 +1497,12 @@ noncomputable def conjClassQuotient (hyp : Hypothesis G A L) : Type _ :=
   letI := hyp.conjFinsetAction
   MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})
 
+instance (hyp : Hypothesis G A L) : Finite hyp.conjClassQuotient := by
+  unfold Hypothesis.conjClassQuotient
+  letI := hyp.conjFinsetAction
+  letI : Finite (Finset {a : G // a ∈ A}) := Finite.of_fintype _
+  infer_instance
+
 /-- A chosen representative subset of an `L`-conjugacy class (`Quotient.out`).  This is one element
 of Peterfalvi's transversal `ℬ`. -/
 noncomputable def transversalRep (hyp : Hypothesis G A L)
@@ -2784,6 +2790,99 @@ theorem mobiusSummand_singleton_eq (g : G) {a : {a : G // a ∈ A}} {h : G}
   have hHne : (Nat.card (hyp.H a) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   push_cast
   field_simp
+
+/-! #### STEP 3a: orbit-averaging the transversal sum to the powerset
+
+The (2.10) right-hand side is a sum over the `L`-conjugacy transversal `ℬ` of an orbit-constant
+summand.  We convert it to a sum over the full powerset weighted by `1/|orbit B|`. -/
+
+/-- The conjugation orbit of `B` is contained in `A`-subsets of the same cardinality, so it is
+finite; `Nat.card (orbit B) > 0`. -/
+theorem card_orbit_pos (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    0 < Nat.card (MulAction.orbit L B) := by
+  letI := hyp.conjFinsetAction
+  letI : Finite (MulAction.orbit L B) := Set.finite_coe_iff.mpr (Set.toFinite _)
+  letI : Nonempty (MulAction.orbit L B) := ⟨⟨B, MulAction.mem_orbit_self B⟩⟩
+  exact Nat.card_pos
+
+/-- **Peterfalvi (2.10), orbit-averaging.**  For any `ℂ`-valued `h` constant on `L`-conjugacy orbits
+of subsets (`h (B^l) = h B`), the transversal sum equals the powerset sum weighted by inverse orbit
+size:
+
+    `∑_{C ∈ ℬ} h(rep C) = ∑_{B ⊆ A} h(B) / |orbit B|`.
+
+Each orbit `O` contributes `∑_{B ∈ O} h(B)/|orbit B| = |O| · h(rep)/|O| = h(rep)` (the numerator is
+orbit-constant and `|orbit B| = |O|` throughout `O`); partitioning the powerset sum into orbit fibers
+(`Finset.sum_fiberwise_of_maps_to` along `Quotient.mk''`) collapses it to the transversal sum.  This
+realizes the `1/|L:N_L(B)|` weight of (2.10) (`card_orbit_mul_card_setLStabilizer`). -/
+theorem sum_transversalRep_eq_sum_div_orbit
+    (h : Finset {a : G // a ∈ A} → ℂ)
+    (hinv : ∀ (l : L) (B : Finset {a : G // a ∈ A}), h (hyp.conjFinset l B) = h B) :
+    letI := hyp.conjFinsetAction
+    letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+    letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+    ∑ C : hyp.conjClassQuotient, h (hyp.transversalRep C)
+      = ∑ B : Finset {a : G // a ∈ A},
+          h B / (Nat.card (MulAction.orbit L B) : ℂ) := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  -- `h` and `Nat.card (orbit ·)` are constant along orbits.
+  have horbit_const : ∀ B : Finset {a : G // a ∈ A}, ∀ B' ∈ MulAction.orbit L B,
+      h B' = h B := by
+    rintro B B' ⟨l, rfl⟩
+    exact hinv l B
+  have hcard_const : ∀ B : Finset {a : G // a ∈ A}, ∀ B' ∈ MulAction.orbit L B,
+      MulAction.orbit L B' = MulAction.orbit L B := by
+    rintro B B' hB'
+    exact (MulAction.orbit_eq_iff.mpr hB')
+  -- partition the powerset sum into orbit fibers along `Quotient.mk''`.
+  rw [← Finset.sum_fiberwise_of_maps_to
+      (g := fun B => (Quotient.mk'' B : hyp.conjClassQuotient))
+      (s := Finset.univ) (t := Finset.univ)
+      (fun B _ => Finset.mem_univ _)
+      (f := fun B => h B / (Nat.card (MulAction.orbit L B) : ℂ))]
+  refine Finset.sum_congr (by congr 1; exact Subsingleton.elim _ _) fun C _ => ?_
+  -- evaluate the fiber over `C`: it is the orbit of `out C = transversalRep C`.
+  set B₀ := hyp.transversalRep C with hB₀
+  -- the fiber `{B | ⟦B⟧ = C}` as a Finset; on it the summand is the constant `h B₀ / |orbit B₀|`.
+  have hfiber_eq : ((Finset.univ : Finset (Finset {a : G // a ∈ A})).filter
+        (fun B => (Quotient.mk'' B : hyp.conjClassQuotient) = C))
+      = (MulAction.orbit L B₀).toFinset := by
+    ext B
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_toFinset]
+    rw [hB₀, transversalRep]
+    constructor
+    · intro hB
+      rw [MulAction.mem_orbit_iff]
+      have : (Quotient.mk'' B : hyp.conjClassQuotient)
+          = Quotient.mk'' (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) := by
+        rw [hB, Quotient.out_eq']
+      exact Quotient.exact' this
+    · intro hB
+      have : (Quotient.mk'' B : hyp.conjClassQuotient)
+          = Quotient.mk'' (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) :=
+        Quotient.sound' (by rwa [MulAction.mem_orbit_iff] at hB)
+      rw [this, Quotient.out_eq']
+  rw [hfiber_eq]
+  -- on the orbit, the summand is constant `= h B₀ / |orbit B₀|`; there are `|orbit B₀|` terms.
+  have hconst : ∀ B ∈ (MulAction.orbit L B₀).toFinset,
+      h B / (Nat.card (MulAction.orbit L B) : ℂ) = h B₀ / (Nat.card (MulAction.orbit L B₀) : ℂ) := by
+    intro B hB
+    rw [Set.mem_toFinset] at hB
+    rw [horbit_const B₀ B hB, hcard_const B₀ B hB]
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul]
+  -- `|orbit B₀| · (h B₀ / |orbit B₀|) = h B₀`.
+  have hcardpos : 0 < Nat.card (MulAction.orbit L B₀) := hyp.card_orbit_pos B₀
+  have hcard_eq : ((MulAction.orbit L B₀).toFinset.card : ℂ)
+      = (Nat.card (MulAction.orbit L B₀) : ℂ) := by
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card]
+  rw [hcard_eq]
+  rw [mul_div_assoc']
+  rw [mul_div_cancel_left₀]
+  exact Nat.cast_ne_zero.mpr hcardpos.ne'
 
 end MobiusAssembly
 
