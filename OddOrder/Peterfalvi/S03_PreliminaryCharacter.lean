@@ -201,6 +201,36 @@ theorem exists_natDegree_characterDegree_dvd_card [Finite G]
   obtain ⟨n, hpos, hval, hdvd⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
   exact ⟨n, hpos, by rw [characterDegree_def]; exact hval, hdvd⟩
 
+/-- **Degree-ratio integrality** (Peterfalvi (5.6), opening step "Set `χ(1) = a·χ₁(1)`").
+
+If `χ₁` is an irreducible character whose natural degree divides that of an irreducible
+character `χ` — the divisibility hypothesis (5.6)(b) — then the ratio is a *positive
+natural number* `a`, and the complex degrees scale by it:
+`characterDegree χ = a • characterDegree χ₁`.
+
+The divisibility hypothesis is phrased intrinsically: for the (unique, by `Nat.cast`
+injectivity) natural witnesses `d, d₁` of the two degrees, `d₁ ∣ d`.  This is the honest
+form of the §5.6 step — the literal "ratio of two positive integers is an integer" is false
+without divisibility (e.g. degrees `2, 3`), so the divisibility datum is essential, not
+scaffolding: it is exactly Peterfalvi's hypothesis (b).  The quotient `a` is what the §5.6
+proof denotes `a` (and the `a_i` for the family), feeding the Cauchy–Schwarz degree bound (c). -/
+theorem exists_pos_natDegreeRatio_of_dvd [Finite G]
+    (χ χ₁ : IrreducibleCharacter G)
+    (hdvd : ∀ d d₁ : ℕ, (χ : ClassFunction G ℂ) 1 = (d : ℂ) →
+      (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) → d₁ ∣ d) :
+    ∃ a : ℕ, 0 < a ∧ characterDegree (χ : ClassFunction G ℂ) =
+      (a : ℂ) * characterDegree (χ₁ : ClassFunction G ℂ) := by
+  obtain ⟨d, hd_pos, hd_val, _⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨d₁, hd₁_pos, hd₁_val, _⟩ := χ₁.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨a, rfl⟩ := hdvd d d₁ hd_val hd₁_val
+  refine ⟨a, ?_, ?_⟩
+  · -- `a > 0`: from `d₁ * a = d > 0` with `d₁ > 0`.
+    rcases Nat.eq_zero_or_pos a with ha | ha
+    · simp [ha] at hd_pos
+    · exact ha
+  · rw [characterDegree_def, characterDegree_def, hd_val, hd₁_val, Nat.cast_mul]
+    ring
+
 /-- A family of class functions has constant degree. -/
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=
   ∀ i j, characterDegree (χ i) = characterDegree (χ j)

@@ -526,6 +526,38 @@ lemma norm_bound_determines_zero (hyp : Hypothesis L G S A) {χ χ₁ : S}
 
 ---
 
+## 형식화 진행 (Track A — 整數性/次数비 API)
+
+### (2026-05-30) (5.6)(b) degree-ratio integrality landing — `exists_pos_natDegreeRatio_of_dvd`
+
+(5.6) 증명 첫 줄 "Set `χ(1) = aχ₁(1)`"의 `a ∈ ℕ` 도출을 honest leaf로 형식화.
+**위치**: `OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean` (`characterDegree` namespace,
+`exists_natDegree_characterDegree_dvd_card` 직후). AxiomsCheck 등록 (3 axioms, all allowlist; sorry-free).
+
+```
+theorem exists_pos_natDegreeRatio_of_dvd [Finite G]
+    (χ χ₁ : IrreducibleCharacter G)
+    (hdvd : ∀ d d₁ : ℕ, (χ : ClassFunction G ℂ) 1 = (d : ℂ) →
+      (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) → d₁ ∣ d) :
+    ∃ a : ℕ, 0 < a ∧ characterDegree (χ : ClassFunction G ℂ) =
+      (a : ℂ) * characterDegree (χ₁ : ClassFunction G ℂ)
+```
+
+**중요 (honest-statement 訂正)**: 본 라운드 decomposition roadmap의 첫 leaf 후보 A3은
+"χ(1) = a·χ₁(1) for some `a ∈ ℚ` ⟹ `a ∈ ℤ`"였으나 **이는 수학적으로 거짓** — 두 양의 정수 비가
+정수일 필요는 없음 (degree 2, 3 → 2/3). Peterfalvi (5.6) 가설 **(b) `χ₁(1) ∣ χ(1)`** 가 바로 이
+divisibility datum이며 (mmd 04.7, L60-67: "Set χ(1) = aχ₁(1) … this is compatible … if aᵢ ∈ **N**"),
+`a`는 그 가설로 보장되는 **양의 자연수 몫**. 따라서 divisibility를 명시적 가설로 받는 형태가 honest이고,
+roadmap의 무조건 ℚ→ℤ 형태는 채택하지 않음 (scaffolding/거짓 statement 회피).
+
+증명: `χ.isIrreducible.exists_natDegree_charValue_one_dvd_card`로 두 양의 nat 차수 `d, d₁` 추출 →
+`hdvd d d₁` 로 `d = d₁ * a` → `d > 0`에서 `a > 0` → `Nat.cast_mul` + `ring`.
+
+**이후 leaf (미착수)**: (5.6.1) Y 분해, (5.6.2) `0 < b < 1 ⇒ λ = 0` quadratic forcing
+(`a` 와 `a_i` 가 본 lemma 出力), (5.4.a/b) Cauchy–Schwarz. 모두 R(χ) 一般 orthonormal lattice (B1) 선행 필요.
+
+---
+
 ## 未解決 / TODO
 
 1. **R(χ) の Lean 表現**: Set か Finset か? Orthonormal set として index すべき? (5.4)-(5.6) で多出現するため, design choice は formalization の読みやすさを大きく左右.

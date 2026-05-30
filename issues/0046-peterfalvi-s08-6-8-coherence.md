@@ -165,6 +165,18 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
         hypothesis の deep character-theory 仕込み (`needs-infra`)。memory `scaffold-sorry-free-not-done`
         に照らし**仮説外出ししない** (外出しは vacuous/too-strong になる)。真完了には `|C_L(z)|`-constancy
         部品の実装が要る (別 issue 化候補)。
+- [x] (2026-05-30) **§7 (5.6)(b) degree-ratio integrality** = (5.6) 証明開始 "Set χ(1)=aχ₁(1)" の
+      `a∈ℕ` 導出を `OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean` に landing (commit 別; sorry-free,
+      AxiomsCheck 登録, `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑, 3 axioms 全 allowlist)。
+      - `exists_pos_natDegreeRatio_of_dvd` : `[Finite G]`, `χ χ₁ : IrreducibleCharacter G`,
+        仮説 `∀ d d₁:ℕ, χ 1=(d:ℂ) → χ₁ 1=(d₁:ℂ) → d₁ ∣ d` (= (5.6)(b) on nat degrees) ⟹
+        `∃ a:ℕ, 0<a ∧ characterDegree χ = a · characterDegree χ₁`。`a` は (5.6) の `a` (および族の `a_i`)。
+      - **honest-statement 訂正**: 本ラウンド roadmap の first leaf 候補 A3 ("χ(1)=a·χ₁(1) for `a∈ℚ` ⟹ `a∈ℤ`")
+        は **数学的に偽** (degree 2,3 → 2/3)。divisibility (5.6)(b) が本質 datum (mmd 04.7 L60-67 が
+        "this is compatible … if aᵢ∈**N**" と明記) なので divisibility を明示仮説に取る形が honest。
+        roadmap の無条件 ℚ→ℤ は採用せず (scaffolding/偽 statement 回避)。詳細 `notes/peterfalvi/s07_coherence.md`
+        「형식화 진행 (Track A)」。残: (5.6.1) Y 분해 / (5.6.2) `0<b<1⇒λ=0` quadratic forcing /
+        (5.4.a/b) Cauchy–Schwarz — いずれも R(χ) 一般 orthonormal lattice (B1) 선행 필요。
 
 ## 完了条件
 

@@ -764,6 +764,11 @@ set_option linter.style.longLine false in
 -- through `characterDegree` (= `χ 1`), the degree datum used throughout Peterfalvi §6.7.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card
+-- Peterfalvi (5.6) degree-ratio integrality ("Set χ(1) = a·χ₁(1)"): when χ₁'s natural degree
+-- divides χ's, the quotient `a` is a *positive* natural with `characterDegree χ = a·characterDegree χ₁`.
+-- This is the honest §5.6 opening step — divisibility (hyp (5.6)(b)) is essential, not scaffolding.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatio_of_dvd
 -- Corollary (Isaacs Cor. 3.12): the degree of an irreducible representation of a finite p-group is
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms
