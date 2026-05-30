@@ -2183,6 +2183,36 @@ theorem induce_alphaB_apply_eq_alpha_mul_sum_conjL (hyp : Hypothesis G A L)
   simp only [hN]
   rw [hαeq]
 
+/-- **Peterfalvi (2.10), conjugation invariance of the conjugating set.**  For any `c : G` and
+subset `X ⊆ G`, right translation by `c` is a bijection `𝒜(g, X) ≃ 𝒜(g, c·X·c⁻¹)`; in particular
+the cardinalities agree:
+
+    `|𝒜(g, c·X·c⁻¹)| = |𝒜(g, X)|`.
+
+Indeed `y⁻¹gy ∈ c·X·c⁻¹ ⟺ (yc⁻¹)⁻¹ g (yc⁻¹) ∈ X`, so `𝒜(g, c·X·c⁻¹) = 𝒜(g, X)·c`.  This is the
+reindexing fact `|𝒜(g, H(B^x)b)| = |𝒜(g, H(B)a)|` (with `b = a^x`, `H(B^x) = x·H(B)·x⁻¹` by
+(2.10.1)) used to collapse the `a^L`-sum in the proof of (2.10). -/
+theorem card_conjFiber_conj_eq (g c : G) (X : Set G) :
+    (conjFiber g ((fun z => c * z * c⁻¹) '' X)).card = (conjFiber g X).card := by
+  classical
+  apply Finset.card_bij' (fun y _ => y * c) (fun y _ => y * c⁻¹)
+  · intro y hy
+    rw [mem_conjFiber] at hy ⊢
+    obtain ⟨z, hz, hzeq⟩ := hy
+    simp only at hzeq
+    -- `hzeq : c·z·c⁻¹ = y⁻¹gy` ⟹ `(yc)⁻¹ g (yc) = z ∈ X`
+    have hval : (y * c)⁻¹ * g * (y * c) = z := by
+      have : y⁻¹ * g * y = c * z * c⁻¹ := hzeq.symm
+      rw [show (y * c)⁻¹ * g * (y * c) = c⁻¹ * (y⁻¹ * g * y) * c by group, this]; group
+    rw [hval]; exact hz
+  · intro y hy
+    rw [mem_conjFiber] at hy ⊢
+    -- `(yc⁻¹)⁻¹ g (yc⁻¹) = c·(y⁻¹gy)·c⁻¹ ∈ c·X·c⁻¹`
+    refine ⟨y⁻¹ * g * y, hy, ?_⟩
+    group
+  · intro y _; group
+  · intro y _; group
+
 end MobiusAssembly
 
 end SemidirectStructure
