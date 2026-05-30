@@ -6,15 +6,20 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.ElementaryAbelian
 import Mathlib.GroupTheory.PGroup
 import Mathlib.Algebra.Order.GroupWithZero.Canonical
+import Mathlib.Algebra.Module.ZMod
+import Mathlib.FieldTheory.Finite.GaloisField
+
+-- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
+open scoped IsMulCommutative
 
 /-!
 # p-Rank of a Group
 
 `OddOrder.GroupTheory` shared module: BG / Isaacs FGT の `r_p(G)` (`p`-rank) の概念.
 
-mathlib v4.29.1 の `Group.rank G` は **minimum generators 数** (`Mathlib/GroupTheory/Rank.lean`)
+mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** (`Mathlib/GroupTheory/Rank.lean`)
 で BG の `r_p(G)` (= max log_p of elementary abelian p-subgroup) とは別概念. 命名衝突を
-避けるため `pRank G p` (or `IsPGroup.pRank`) を採用.
+避けるため `pRank G p` を採用.
 
 **BG §4 全節 (Blackburn rank theory)**, **BG §5 (Narrow p-Groups)** で必要.
 
@@ -22,34 +27,105 @@ mathlib v4.29.1 の `Group.rank G` は **minimum generators 数** (`Mathlib/Grou
 
 * `OddOrder.GroupTheory.pRank G p`: `G` の `p`-rank, i.e. 最大の `n` で `G` が
   位数 `p^n` の elementary abelian p-subgroup を含む.
+* `OddOrder.GroupTheory.rank G`: `G` の rank `r(G) = ⨆_p pRank G p` (全素数の sup, BG `r(G)`).
 
-## Main results (本 module で提供, 最小)
+## Main results (本 module で提供)
 
-* `pRank` の def のみ. 性質は future work (BddAbove 条件下の `le_pRank`,
-  `pRank_eq_zero_of_one`, etc.) に分離.
+* `pRank_bddAbove`: `[Finite G]` 下で `pRank` を定義する族の値域が有界 (BddAbove).
+* `pRank_le_iff`: 評価補題 `pRank G p ≤ n ↔ ∀ elem-ab A, log_p |A| ≤ n` (`[Finite G]`).
+* `IsElementaryAbelian.card_eq_pow_finrank` / `IsElementaryAbelian.log_card_eq_finrank`:
+  **2 形の橋** — elem-ab `A` で `|A| = p ^ m(A)` かつ `log_p |A| = m(A)`,
+  ここで `m(A) = Module.finrank (ZMod p) (Additive A)` (BG の `m(A)`).
+* `pRank_mono_of_le` / `pRank_le_of_injective`: subgroup / 単射像での monotonicity.
+* `rank` の `pRank` 単調連動と全素数 sup の性質.
 
 ## Design notes
 
 * `noncomputable def` (iSup based). 一般 `G` で型は通るが, `[Finite G]` 下でのみ
-  意味のある値 (無限群では unbounded → mathlib `iSup` convention で 0 等になる可能性).
+  意味のある値 (無限群では unbounded → mathlib `iSup` convention で 0 になりうる).
 * mathlib `Group.rank` (min generators) と区別するため必ず `pRank` 命名を使用.
-* BG 教科書の `m(A) = log_p |Ω₁(A)|` for abelian は **abelian A** での specialization;
-  `pRank` は全 elementary abelian sub 上の max なので, abelian G では `pRank G p = m(G)`.
+* BG 教科書の `m(A)` (abelian `A` の最小生成元数) は **elem-ab `A` では F_p ベクトル空間次元
+  `Module.finrank (ZMod p) (Additive A)` と一致**. この橋を `IsElementaryAbelian` 側に置く.
+* `Additive A` の `Module (ZMod p)` 構造は `IsMulCommutative` (= elem-ab の commutativity) から
+  `CommGroup A` → `AddCommGroup (Additive A)`, そこに `AddCommGroup.zmodModule` を被せて得る.
+* `FiniteField.pow_finrank_eq_natCard` で `p ^ finrank = |Additive A| = |A|`.
 * 将来 mathlib upstream 視野で `OddOrder/Mathlib/PRank.lean` 候補.
 
 ## References
 
-* BG §4 (p-Groups of Small Rank), Lem 4.7 (rank ↔ SCN_3).
+* BG §4 (p-Groups of Small Rank), `m(A)`, `r_q(G)`, `r(G)` の定義 (printed p.33).
+* BG §4 Lem 4.7 (rank ↔ SCN_3).
 * BG §5 (Narrow p-Groups), 全節.
-* Gorenstein, _Finite Groups_ (1968), Definition 5.4.10.
+* Gorenstein, _Finite Groups_ (1968), Definition 5.4.10 (depth).
 
 ## Audit context
 
 Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確定.
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
+性質補強 2026-05-30 (BG §4 最初の山, `notes/bg/s04_implementation_plan_2026_05_30.md` §4.1).
 -/
 
 namespace OddOrder.GroupTheory
+
+section Bridge
+
+/-! ## 1A: 2 形の橋 (elem-ab `log_p |A|` ↔ abelian `m(A)`) (BG §4, p.33)
+
+BG は `m(A) =` abelian `A` の最小生成元数 と置き, p-群 `A` で `|Ω₁(A)| = p^{m(A)}` と述べる.
+elementary abelian `A` では `Ω₁(A) = A` なので `|A| = p^{m(A)}`. ここで `m(A)` は `A` を
+`F_p`-ベクトル空間 (`Additive A` 上の `ZMod p`-module) と見たときの次元
+`Module.finrank (ZMod p) (Additive A)` に他ならない. この橋を与える. -/
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+/-- An elementary abelian `p`-group, viewed additively, is a `ZMod p`-module:
+its commutativity gives `AddCommGroup (Additive G)`, and `x ^ p = 1` becomes `p • x = 0`. -/
+@[reducible] noncomputable def IsElementaryAbelian.zmodModule [NeZero p]
+    (h : IsElementaryAbelian p G) :
+    letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+    Module (ZMod p) (Additive G) :=
+  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  letI : CommGroup G := inferInstance
+  AddCommGroup.zmodModule (G := Additive G) (n := p) (by
+    intro x
+    -- `p • x = 0` in `Additive G` ⟺ `x.toMul ^ p = 1` in `G`.
+    have hx : (Additive.toMul x) ^ p = 1 := h.pow_eq_one _
+    have h2 : Additive.ofMul ((Additive.toMul x) ^ p) = Additive.ofMul (1 : G) := by
+      rw [hx]
+    rw [ofMul_pow, ofMul_one, ofMul_toMul] at h2
+    exact h2)
+
+/-- **BG `m(A)` for elementary abelian `A`** (`p` prime): the order of an elementary
+abelian `p`-group equals `p ^ m(A)`, where `m(A) = finrank (ZMod p) (Additive A)`.
+
+Since `Ω₁(A) = A` for elementary abelian `A`, this is BG's identity `|Ω₁(A)| = p^{m(A)}`. -/
+theorem IsElementaryAbelian.card_eq_pow_finrank [Fact p.Prime] [Finite G]
+    (h : IsElementaryAbelian p G) :
+    letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+    letI := h.zmodModule
+    Nat.card G = p ^ Module.finrank (ZMod p) (Additive G) := by
+  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  letI := h.zmodModule
+  have hcard : Nat.card (Additive G) = Nat.card G := Nat.card_congr Additive.toMul
+  have := FiniteField.pow_finrank_eq_natCard p (Additive G)
+  rw [hcard] at this
+  exact this.symm
+
+/-- **`log_p |A| = m(A)`** for elementary abelian `A` (`p` prime): the `p`-logarithm of the
+order recovers the `F_p`-dimension `m(A) = finrank (ZMod p) (Additive A)`.
+
+This is the half of the BG two-form bridge feeding `pRank`: the summand `Nat.log p |A|` in the
+`pRank` `iSup` equals BG's `m(A)`. -/
+theorem IsElementaryAbelian.log_card_eq_finrank [Fact p.Prime] [Finite G]
+    (h : IsElementaryAbelian p G) :
+    letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+    letI := h.zmodModule
+    Nat.log p (Nat.card G) = Module.finrank (ZMod p) (Additive G) := by
+  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  letI := h.zmodModule
+  rw [h.card_eq_pow_finrank, Nat.log_pow (Fact.out : p.Prime).one_lt]
+
+end Bridge
 
 variable (G : Type*) [Group G]
 
@@ -58,9 +134,167 @@ variable (G : Type*) [Group G]
 
 For `G = ⊥` or no elementary abelian `p`-subgroup besides `⊥`, this is `0`.
 
-**注**: mathlib v4.29.1 の `Group.rank G` は **minimum generators 数** で別概念.
+**注**: mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** で別概念.
 本 def の命名 `pRank` で衝突回避. -/
 noncomputable def pRank (p : ℕ) : ℕ :=
   ⨆ A : {A : Subgroup G // A.IsElementaryAbelian p}, Nat.log p (Nat.card (A.val : Subgroup G))
+
+/-- **Rank of a group** `r(G) = ⨆_p pRank G p` (BG §4, p.33): the supremum of the `p`-ranks
+over all primes `p`.
+
+The supremum ranges over **all** natural numbers `p` (only primes contribute a nonzero
+elementary abelian summand, so non-primes are harmless). -/
+noncomputable def rank : ℕ :=
+  ⨆ p : ℕ, pRank G p
+
+variable {G}
+
+section Properties
+
+variable {p : ℕ}
+
+/-- The trivial subgroup `⊥` is elementary abelian (every element is `1`). -/
+theorem bot_isElementaryAbelian : (⊥ : Subgroup G).IsElementaryAbelian p :=
+  ⟨fun x y => by
+      have hx : (x : G) = 1 := Subgroup.mem_bot.mp x.2
+      have hy : (y : G) = 1 := Subgroup.mem_bot.mp y.2
+      apply Subtype.ext
+      push_cast
+      rw [hx, hy],
+    fun x => by
+      have hx : (x : G) = 1 := Subgroup.mem_bot.mp x.2
+      apply Subtype.ext
+      push_cast
+      rw [hx, one_pow]⟩
+
+/-- The index type of the `pRank` supremum is nonempty: the trivial subgroup `⊥` is
+elementary abelian. -/
+theorem pRank_index_nonempty :
+    Nonempty {A : Subgroup G // A.IsElementaryAbelian p} :=
+  ⟨⟨⊥, bot_isElementaryAbelian⟩⟩
+
+/-- **BddAbove for `pRank`** (`[Finite G]`): every elementary abelian subgroup `A` satisfies
+`log_p |A| ≤ log_p |G|`, so the family defining `pRank G p` is bounded above by `log_p |G|`.
+
+Without finiteness the family can be unbounded and the `iSup` collapses to `0` (the `ℕ`
+`sSup` convention), so this hypothesis is essential for `pRank` to be meaningful. -/
+theorem pRank_bddAbove [Finite G] :
+    BddAbove (Set.range fun A : {A : Subgroup G // A.IsElementaryAbelian p} =>
+      Nat.log p (Nat.card (A.val : Subgroup G))) := by
+  refine ⟨Nat.log p (Nat.card G), ?_⟩
+  rintro _ ⟨A, rfl⟩
+  exact Nat.log_mono_right (Subgroup.card_le_card_group A.val)
+
+/-- The `pRank` summand of any elementary abelian subgroup is `≤ pRank G p` (`[Finite G]`). -/
+theorem le_pRank [Finite G] (A : Subgroup G) (hA : A.IsElementaryAbelian p) :
+    Nat.log p (Nat.card A) ≤ pRank G p :=
+  le_ciSup pRank_bddAbove (⟨A, hA⟩ : {A : Subgroup G // A.IsElementaryAbelian p})
+
+/-- **Evaluation lemma for `pRank`** (`[Finite G]`):
+`pRank G p ≤ n ⟺ ∀ elementary abelian `A ≤ G`, `log_p |A| ≤ n`.
+
+This is the workhorse characterisation used throughout BG §4: bounding the `p`-rank is
+equivalent to bounding `log_p` of the order of every elementary abelian `p`-subgroup. -/
+theorem pRank_le_iff [Finite G] {n : ℕ} :
+    pRank G p ≤ n ↔ ∀ A : Subgroup G, A.IsElementaryAbelian p → Nat.log p (Nat.card A) ≤ n := by
+  haveI := pRank_index_nonempty (G := G) (p := p)
+  rw [pRank, ciSup_le_iff pRank_bddAbove]
+  constructor
+  · intro h A hA
+    exact h ⟨A, hA⟩
+  · intro h A
+    exact h A.val A.2
+
+/-- **`pRank` lower bound** (`[Finite G]`, `p` prime): an elementary abelian subgroup of
+order `p ^ n` witnesses `n ≤ pRank G p`. This is the existence-side companion to the
+evaluation lemma `pRank_le_iff`. -/
+theorem pow_le_card_of_le_pRank [Finite G] [Fact p.Prime] {n : ℕ} (A : Subgroup G)
+    (hA : A.IsElementaryAbelian p) (hcard : Nat.card A = p ^ n) :
+    n ≤ pRank G p := by
+  have := le_pRank A hA
+  rwa [hcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at this
+
+/-- **Monotonicity under subgroup inclusion** (`[Finite G]`): an injective homomorphism
+`f : H →* G` (e.g. a subgroup inclusion) cannot increase the `p`-rank: `pRank H p ≤ pRank G p`.
+
+Elementary abelian subgroups of `H` map injectively to elementary abelian subgroups of `G`
+of the same order, so every `pRank H p` summand is realised in `G`. -/
+theorem pRank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
+    {f : H →* G} (hf : Function.Injective f) :
+    pRank H p ≤ pRank G p := by
+  rw [pRank_le_iff]
+  intro A hA
+  -- `A.map f ≤ G` is elementary abelian of the same order as `A`.
+  have hmap : (A.map f).IsElementaryAbelian p := Subgroup.IsElementaryAbelian.map hf hA
+  have hcard : Nat.card (A.map f) = Nat.card A :=
+    Subgroup.card_map_of_injective hf
+  calc
+    Nat.log p (Nat.card A) = Nat.log p (Nat.card (A.map f)) := by rw [hcard]
+    _ ≤ pRank G p := le_pRank (A.map f) hmap
+
+/-- **Monotonicity under subgroup inclusion** (`[Finite G]`), subgroup form:
+`pRank H p ≤ pRank G p` for `H ≤ G`, via the inclusion `H.subtype`. -/
+theorem pRank_mono_of_le [Finite G] (H : Subgroup G) :
+    pRank H p ≤ pRank G p :=
+  pRank_le_of_injective H.subtype_injective
+
+end Properties
+
+section Rank
+
+variable {p : ℕ}
+
+/-- **Uniform `pRank` bound** (`[Finite G]`, `2 ≤ p`): `pRank G p ≤ Nat.log 2 |G|`.
+
+Since any elementary abelian `p`-subgroup `A` has `|A| ≤ |G|` and `Nat.log p ≤ Nat.log 2`
+for `p ≥ 2`, every `p`-rank is bounded by `Nat.log 2 |G|` *independently of `p`*; this is the
+key bound making the all-primes supremum `rank G` well-defined (`rank_bddAbove`). -/
+theorem pRank_le_log_two [Finite G] (hp : 2 ≤ p) :
+    pRank G p ≤ Nat.log 2 (Nat.card G) := by
+  rw [pRank_le_iff]
+  intro A _
+  calc
+    Nat.log p (Nat.card A) ≤ Nat.log 2 (Nat.card A) :=
+      Nat.log_anti_left (by norm_num) hp
+    _ ≤ Nat.log 2 (Nat.card G) := Nat.log_mono_right (Subgroup.card_le_card_group A)
+
+/-- `pRank G p = 0` for `p < 2` (i.e. `p = 0` or `p = 1`): no nontrivial elementary abelian
+`p`-subgroup contributes. We bound the whole family `p ↦ pRank G p` by `Nat.log 2 |G|`. -/
+theorem rank_bddAbove [Finite G] :
+    BddAbove (Set.range fun p : ℕ => pRank G p) := by
+  refine ⟨Nat.log 2 (Nat.card G), ?_⟩
+  rintro _ ⟨p, rfl⟩
+  rcases Nat.lt_or_ge p 2 with hp | hp
+  · -- `p = 0` or `p = 1`: `Nat.log p _ = 0`, so each summand is `0`.
+    interval_cases p
+    · rw [pRank_le_iff]; intro A _; simp
+    · rw [pRank_le_iff]; intro A _; simp
+  · exact pRank_le_log_two hp
+
+/-- The `p`-rank is `≤ rank G` for every prime `p` (`[Finite G]`). -/
+theorem pRank_le_rank [Finite G] (p : ℕ) : pRank G p ≤ rank G :=
+  le_ciSup rank_bddAbove p
+
+/-- **Evaluation lemma for `rank`** (`[Finite G]`):
+`rank G ≤ n ⟺ ∀ p, pRank G p ≤ n`. -/
+theorem rank_le_iff [Finite G] {n : ℕ} :
+    rank G ≤ n ↔ ∀ p : ℕ, pRank G p ≤ n := by
+  rw [rank, ciSup_le_iff rank_bddAbove]
+
+/-- **Monotonicity of `rank` under an injective homomorphism** (`[Finite G]`):
+`rank H ≤ rank G` whenever `f : H →* G` is injective. -/
+theorem rank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
+    {f : H →* G} (hf : Function.Injective f) :
+    rank H ≤ rank G := by
+  rw [rank_le_iff]
+  intro p
+  exact (pRank_le_of_injective hf).trans (pRank_le_rank p)
+
+/-- **Monotonicity of `rank` under subgroup inclusion** (`[Finite G]`). -/
+theorem rank_mono_of_le [Finite G] (H : Subgroup G) :
+    rank H ≤ rank G :=
+  rank_le_of_injective H.subtype_injective
+
+end Rank
 
 end OddOrder.GroupTheory
