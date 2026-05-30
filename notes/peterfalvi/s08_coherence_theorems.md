@@ -267,6 +267,28 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   (`IsTISubset`+Sylow-in-L) を要し repo 未実装 = `needs-infra`. 揃えば (6.7.2)/(6.7.3) は本 module の
 >   `centralCharacterOfRep_classSum_mul` + `card_dvd_classSumCoeff_of_fixedPointFree` + `AlgInt.Cong` で assembly.
 
+> **進捗 2026-05-30 ((6.7.1) fixed-point-free 仮説検証 完了, commit 384e5b5)**: 上記「残」だった
+> fixed-point-free *仮説の検証* を `ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).
+> これで (6.7.1) の group-theory 部分が完全に閉じた:
+> - **`mem_sylow_of_mem_normalizer_of_isPGroup`** : `N_G(P)` の p-元は Sylow p-部分群 `P` に属する
+>   (P は N_G(P) で normal ⟹ unique Sylow p). proof は `P ⊔ ⟨u⟩` が p-群
+>   (`IsPGroup.to_sup_of_normal_left'`; `⟨u⟩ ≤ N_G(P)`) + `Sylow.is_maximal'` で join が `P` に collapse.
+>   ⚠️ `Z ≤ Z(P)` ではなく `Z ≤ P` のみ使用 (教科書の `Z ⊆ Z(P)` は強いが load-bearing なのは `Z ≤ P`).
+> - **`fixedPointFree_classPair_of_isTISubset`** : (6.7) setup (P Sylow p in L=N_G(P), P^# TI-subset,
+>   Z ≤ P normal in L; C_i,C_j が Z^# と交わり C_s∩Z=∅) で `P` が
+>   `Ω = {(u,v)∈C_i×C_j | uv∈C_s}` に **fixed-point-free** 作用 (no `x∈P^#` が pair を固定).
+>   - x∈P^# が (u,v) を固定 ⟹ x が u,v を中心化 ⟹ TI (`IsTISubset`, `y` が x を共役で動かさない
+>     ⟹ y conjugates `x∈P^#` to `x∈P^#` ⟹ y∈L) で `C_G(x) ⊆ L`.
+>   - u,v は p-元 (Z^#∩C_i 経由で `z∈Z≤P` (p-群) に G-共役; `SemiconjBy.orderOf_eq` で order 保存)
+>     ⟹ 上記 `mem_sylow_…` で u,v∈P.
+>   - 同じ共役が u (resp. v) を `c⁻¹` で `Z^#⊆P^#` に送る ⟹ TI で conjugator∈L ⟹ `Z⊴L` で u,v∈Z
+>     ⟹ uv∈Z, `C_s∩Z=∅` に矛盾.
+> - **assembly 可能**: `card_dvd_classSumCoeff_of_fixedPointFree` と合成して (6.7.1) 結論
+>   `|P| ∣ a_{ijs}|C_s|` (C_s∩Z=∅) が完全形で出る. 残は (6.7.2) `ψ(1)α²≡ψ(1)(a_{ij0}+a_{ij}α)`
+>   (本 module `centralCharacterOfRep_classSum_mul` + (6.7.1) で C_s∩Z=∅ 項を mod|P| 落とす) と
+>   (6.7.3) assembly (|L| odd ⟹ z,z⁻¹ 異 G-共役類; `Cong.smul_left`/`add`/`trans`). これらは §6
+>   class-algebra/合同算術の組み立てで group-theory 依存は解消済.
+
 > **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
 > (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
 > `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
