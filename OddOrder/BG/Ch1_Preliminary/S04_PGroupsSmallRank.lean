@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.IsMetacyclic
 
 /-!
 # BG §4: p-Groups of Small Rank
@@ -103,5 +106,154 @@ theorem isPGroup_commutator_of_faithful_two_dim_charP
     odd_two_dim_sylow_abelian hodd hdim ρ hfaithful hp_dvd hchar P
   -- `P` は `p`-群, ゆえに `G' ≤ P` も `p`-群。
   exact P.isPGroup'.to_le hcomm_le
+
+/-! ## §4A: commutator / power identities with a central commutator (Lemma 4.2)
+
+BG Lemma 4.2 (mmd L1374-1383, BG defers to **G** Lemma 2.2.2): if `⁅x, y⁆ ∈ Z(G)`
+then for all `n ≥ 1`,
+
+* (a) `⁅x ^ n, y⁆ = ⁅x, y⁆ ^ n = ⁅x, y ^ n⁆`, and
+* (b) `(x * y) ^ n = x ^ n * y ^ n * ⁅y, x⁆ ^ (n.choose 2)`.
+
+These are the basic collection identities for a single central commutator. Part (b)
+is a rearrangement of the repo's class-`≤ 2` identity
+`OddOrder.GroupTheory.mul_pow_eq_commutator_pow_mul_of_class_le_two`, but BG only
+assumes `⁅x, y⁆ ∈ Z(G)` for the *given* pair, so we prove the single-pair forms
+directly. -/
+
+section CommutatorPowerIdentities
+
+open scoped commutatorElement
+
+variable {K : Type*} [Group K]
+
+/-- Conjugation collection with a central commutator: if `z := ⁅x, y⁆` is central,
+then `x ^ n * y * x⁻¹ ^ n = ⁅x, y⁆ ^ n * y`.
+
+This is the engine for Lemma 4.2(a). Proof by induction using the base relation
+`x * y * x⁻¹ = ⁅x, y⁆ * y` (immediate from `commutatorElement_def`) and centrality
+of `z`. -/
+private theorem conj_pow_eq_commutator_pow_mul_of_central {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (n : ℕ) :
+    x ^ n * y * (x⁻¹) ^ n = ⁅x, y⁆ ^ n * y := by
+  -- Base relation `x * y * x⁻¹ = z * y`, then treat `z = ⁅x, y⁆` as an opaque atom.
+  have hbase : x * y * x⁻¹ = ⁅x, y⁆ * y := by rw [commutatorElement_def]; group
+  have hcomm_x : Commute x ⁅x, y⁆ := Subgroup.mem_center_iff.mp hz x
+  set z := ⁅x, y⁆ with hz_def
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    -- `x` commutes with `z ^ k`.
+    have hxk : x * z ^ k = z ^ k * x := (hcomm_x.pow_right k).eq
+    calc x ^ (k + 1) * y * (x⁻¹) ^ (k + 1)
+        = x * (x ^ k * y * (x⁻¹) ^ k) * x⁻¹ := by
+          rw [pow_succ', pow_succ]; simp only [mul_assoc]
+      _ = x * (z ^ k * y) * x⁻¹ := by rw [ih]
+      _ = (x * z ^ k) * (y * x⁻¹) := by rw [mul_assoc, mul_assoc, mul_assoc]
+      _ = (z ^ k * x) * (y * x⁻¹) := by rw [hxk]
+      _ = z ^ k * (x * y * x⁻¹) := by rw [mul_assoc, mul_assoc]
+      _ = z ^ k * (z * y) := by rw [hbase]
+      _ = z ^ (k + 1) * y := by rw [pow_succ]; rw [mul_assoc]
+
+/-- **BG Lemma 4.2(a)**, left slot. If `⁅x, y⁆` is central then
+`⁅x ^ n, y⁆ = ⁅x, y⁆ ^ n` for all `n`.
+
+Proof: `⁅x ^ n, y⁆ = x ^ n * y * x⁻¹ ^ n * y⁻¹ = ⁅x, y⁆ ^ n * y * y⁻¹ = ⁅x, y⁆ ^ n`
+using `conj_pow_eq_commutator_pow_mul_of_central`. -/
+theorem commutatorElement_pow_left_of_central {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (n : ℕ) :
+    ⁅x ^ n, y⁆ = ⁅x, y⁆ ^ n := by
+  rw [commutatorElement_def, ← inv_pow, mul_assoc (x ^ n) y,
+    show x ^ n * (y * (x⁻¹) ^ n) = x ^ n * y * (x⁻¹) ^ n by group,
+    conj_pow_eq_commutator_pow_mul_of_central hz n]
+  group
+
+/-- **BG Lemma 4.2(a)**, right slot. If `⁅x, y⁆` is central then
+`⁅x, y ^ n⁆ = ⁅x, y⁆ ^ n` for all `n`.
+
+Proof: pass to inverse commutators. `⁅x, y⁆⁻¹ = ⁅y, x⁆` (`commutatorElement_inv`),
+which is also central, so `⁅y ^ n, x⁆ = ⁅y, x⁆ ^ n` by the left-slot version; invert
+both sides and use `⁅y, x⁆⁻¹ = ⁅x, y⁆`. -/
+theorem commutatorElement_pow_right_of_central {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (n : ℕ) :
+    ⁅x, y ^ n⁆ = ⁅x, y⁆ ^ n := by
+  -- `⁅y, x⁆ = ⁅x, y⁆⁻¹` is central.
+  have hz' : ⁅y, x⁆ ∈ Subgroup.center K := by
+    rw [← commutatorElement_inv]; exact (Subgroup.center K).inv_mem hz
+  have h := commutatorElement_pow_left_of_central hz' n
+  -- `⁅x, y^n⁆ = ⁅y^n, x⁆⁻¹ = (⁅y, x⁆ ^ n)⁻¹ = (⁅x, y⁆⁻¹ ^ n)⁻¹ = ⁅x, y⁆ ^ n`.
+  rw [← commutatorElement_inv, h, ← commutatorElement_inv, inv_pow, inv_inv]
+
+/-- Power collection with a central commutator (mathlib's commutator convention
+`⁅a, b⁆ = a * b * a⁻¹ * b⁻¹`): if `z := ⁅y, x⁆` is central then
+`y ^ n * x = ⁅y, x⁆ ^ n * x * y ^ n`.
+
+The companion to `conj_pow_eq_commutator_pow_mul_of_central`, used for Lemma 4.2(b).
+Proof by induction from the base relation `y * x = ⁅y, x⁆ * x * y`. -/
+private theorem pow_mul_eq_commutator_pow_mul_mul_of_central {x y : K}
+    (hz' : ⁅y, x⁆ ∈ Subgroup.center K) (n : ℕ) :
+    y ^ n * x = ⁅y, x⁆ ^ n * x * y ^ n := by
+  -- Base relation `y * x = z * x * y`, then treat `z = ⁅y, x⁆` as an opaque central atom.
+  have hbase : y * x = ⁅y, x⁆ * x * y := by rw [commutatorElement_def]; group
+  have hcomm_z : Commute ⁅y, x⁆ y := (Subgroup.mem_center_iff.mp hz' y).symm
+  set z := ⁅y, x⁆ with hz_def
+  -- `y` commutes with `z ^ m`.
+  have hyz : ∀ m : ℕ, y * z ^ m = z ^ m * y := fun m => (hcomm_z.symm.pow_right m).eq
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    calc y ^ (k + 1) * x
+        = y * (y ^ k * x) := by rw [pow_succ']; rw [mul_assoc]
+      _ = y * (z ^ k * x * y ^ k) := by rw [ih]
+      _ = (y * z ^ k) * (x * y ^ k) := by rw [mul_assoc, mul_assoc]
+      _ = (z ^ k * y) * (x * y ^ k) := by rw [hyz k]
+      _ = z ^ k * (y * x) * y ^ k := by rw [mul_assoc, mul_assoc, mul_assoc]
+      _ = z ^ k * (z * x * y) * y ^ k := by rw [hbase]
+      _ = z ^ (k + 1) * x * y ^ (k + 1) := by
+          rw [pow_succ z, pow_succ' y]; simp only [mul_assoc]
+
+/-- **BG Lemma 4.2(b)**. If `⁅x, y⁆` is central then
+`(x * y) ^ n = x ^ n * y ^ n * ⁅y, x⁆ ^ (n.choose 2)` for all `n`.
+
+This is BG's form (commutator on the right). Proof by induction, moving the central
+commutator `⁅y, x⁆` to the right; the exponent accumulates as the triangular numbers
+`n.choose 2`. -/
+theorem mul_pow_eq_mul_commutator_pow_of_central {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (n : ℕ) :
+    (x * y) ^ n = x ^ n * y ^ n * ⁅y, x⁆ ^ (n.choose 2) := by
+  -- `⁅y, x⁆ = ⁅x, y⁆⁻¹` is central. Make `z = ⁅y, x⁆` opaque.
+  have hz' : ⁅y, x⁆ ∈ Subgroup.center K := by
+    rw [← commutatorElement_inv]; exact (Subgroup.center K).inv_mem hz
+  have hpow := fun (k : ℕ) => pow_mul_eq_commutator_pow_mul_mul_of_central hz' k
+  have hcentral : ∀ g : K, ⁅y, x⁆ * g = g * ⁅y, x⁆ :=
+    fun g => (Subgroup.mem_center_iff.mp hz' g).symm
+  set z := ⁅y, x⁆ with hz_def
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    have hchoose : (k + 1).choose 2 = k.choose 2 + k := by
+      rw [Nat.choose_succ_succ' k 1, Nat.choose_one_right, Nat.add_comm]
+    -- `z ^ j` is central: it commutes with every element `w` (so with `x`, `y`, and `z`).
+    have hzw : ∀ (j : ℕ) (w : K), z ^ j * w = w * z ^ j :=
+      fun j w => (Commute.pow_left (show Commute z w from hcentral w) j).eq
+    -- First collection: `(x * y) ^ (k+1) = x ^ k * (y ^ k * x) * y * z ^ (k.choose 2)`.
+    have hstep : (x * y) ^ (k + 1) = x ^ k * (y ^ k * x) * y * z ^ (k.choose 2) := by
+      rw [pow_succ, ih, mul_assoc (x ^ k * y ^ k), hzw (k.choose 2) (x * y)]
+      simp only [mul_assoc]
+    rw [hstep, hpow k]
+    -- Goal: `x^k*(z^k*x*y^k)*y*z^c = x^(k+1)*y^(k+1)*z^((k+1).choose 2)`.
+    rw [hchoose, pow_add]
+    -- Normalise to right-associated form.
+    simp only [mul_assoc]
+    -- LHS = `x^k * (z^k * (x * (y^k * (y * z^c))))`; move `z^k` rightward past `x, y^k, y`.
+    rw [hzw k (x * (y ^ k * (y * z ^ (k.choose 2))))]
+    -- Now `z^k` is to the right of `z^c`: bring them together via centrality of `z^c`.
+    rw [show x * (y ^ k * (y * z ^ (k.choose 2))) * z ^ k
+          = x * (y ^ k * (y * (z ^ (k.choose 2) * z ^ k))) by simp only [mul_assoc]]
+    -- Combine: `x^k * (x * (y^k * (y * (z^c * z^k))))`, matching RHS `x^(k+1)*y^(k+1)*z^(c+k)`.
+    rw [← pow_add, pow_succ x, pow_succ y]
+    simp only [mul_assoc, pow_zero, one_mul]
+
+end CommutatorPowerIdentities
 
 end OddOrder.BG.Ch1.S04
