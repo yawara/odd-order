@@ -294,6 +294,46 @@ landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allow
   새로 끌어옴. 二層 (RT predicate 형 + Peterfalvi `characterDegree`/subtype consumer 형)은 repo의
   기존 `dvd_card` 쌍과 동일한 확립된 패턴.
 
+### (2026-05-31, G2.2) (6.6) coherence-of-X equality residual: 真正 character の ℕ-分解
+
+(6.6) の coherence-of-X equality case (Round-19 residual) が end-to-end で消費する
+**「真正 character は非負整数係数で irreducible に分解する」**を honest 一般形で
+`OddOrder/GroupTheory/RepresentationTheory/Clifford.lean` (+ `IsCharacter` 述語を `ZIrr.lean`)
+に landing (sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+登録 4 件 各 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs):
+
+- **`IsCharacter`** (`ZIrr.lean`, `IsIrreducibleCharacter` の隣に新設): `φ : ClassFunction G ℂ` が
+  **有限次元 ℂ-表現 `ρ` の character** (= `(φ : G→ℂ) = ρ.character`, irreducibility を落とした版)。
+  `IsIrreducibleCharacter.isCharacter` (irreducible ⟹ genuine) /
+  `repCharacterClassFunction_isCharacter` で導入。virtual character (`ZIrr` の任意 ℤ-結合) と区別される
+  「実モジュールの character」の述語。
+- **`IsCharacter.mem_ZIrr`**: 真正 character ∈ ZIrr (`character_mem_ZIrr` を canonical class-function
+  同定後に適用; `[Finite G]` のみ要)。
+- **`IsCharacter.exists_natCast_inner_irreducible`** (非負性の核): 真正 `χ=χ_ρ`・irreducible `ψ=χ_σ` で
+  `⟨χ,ψ⟩ = dim_ℂ Hom_{ℂ[G]}(σ,ρ)` (cast ℕ)。これは Clifford `restrictionMultiplicity_nonneg`
+  (H-level の `⟨Res^G_H χ,θ⟩ ≥ 0`) の **G-level 版**: `inner χ ψ = ⅟|G| · ∑_g χ(g)·star(ψ g)` を
+  `star(χ_σ g)=χ_σ(g⁻¹)` (`character_inv`) で書き換え, mathlib の
+  `Representation.card_inv_mul_sum_char_mul_char_eq_finrank` (character scalar product = Hom-dim) に
+  `σ ρ` swap で流す。`inner_irreducible_nonneg` は `0 ≤ ⟨χ,ψ⟩` の即系。
+- **`IsCharacter.exists_natFinsupp_eq_sum`** (= GOAL, G2.2 が食う形): `∃ m : ClassFunction G ℂ →₀ ℕ`,
+  `supp m ⊆ Irr(G)`, `χ = ∑_{ψ∈supp m} (m ψ:ℂ)•ψ`, かつ `∀ψ∈Irr, (m ψ:ℂ)=⟨χ,ψ⟩`。証明:
+  `mem_ZIrr_repr` で `χ` の ℤ-Finsupp 分解 `c` を取り, `inner_eq_coeff_of_repr` で各係数 `c ψ = ⟨χ,ψ⟩`,
+  これが genuine character で `≥ 0` (`inner_irreducible_nonneg`), `Finsupp.mapRange Int.toNat` で ℕ 化
+  (support 不変: support 上の係数は正なので `Int.toNat` で値も support も保存)。Peterfalvi の
+  "χ = ∑ mᵢψᵢ with mᵢ = ⟨χ,ψᵢ⟩ ∈ ℕ".
+- **honest 판정**: thin wrapper 아님 — `IsCharacter` 는 genuine vs virtual character 의 진짜 새 述語;
+  비음성은 `restrictionMultiplicity_nonneg` (H-level) 가 안 주는 G-level Hom-dim 을 새로 끌어옴;
+  ℕ-Finsupp 分解은 ℤ-repr + 비음성 + `Int.toNat` support-preservation 의 비자명한 합성.
+- **배치 (import closure 判断)**: `Clifford.lean` 가 `character_mem_ZIrr` (CharacterCompleteness) +
+  Fourier (`mem_ZIrr_repr`/`inner_eq_coeff_of_repr`, ZIrrFourier) + `character_inv` (CharacterConjugate)
+  를 모두 import closure 에 가지는 유일 모듈이며, 概念的으로도 `restrictionMultiplicity_natCast`
+  (Clifford 多重度 비음성) 와 同族. `IsCharacter` 述語만 `ZIrr.lean` (其 `.mem_ZIrr` 는 downstream
+  `character_mem_ZIrr` 필요 ⟹ Clifford 에 둠).
+- **(6.6) 残作業 (G2.2 後)**: この ℕ-分解 leaf 자체는 G2.2 의 character-side primitive 로 완결.
+  (6.6) main 의 残 = pass-8/pass-2 의 `coherentPairChain` `hstep`/`h0` 입력 (degree sort →
+  per-step (5.6) data: θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)²∣∑_{j<i}`) + base prefix coherence
+  ((1.1)/(1.4)) — character-theory/구조정수 작업으로 별도.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

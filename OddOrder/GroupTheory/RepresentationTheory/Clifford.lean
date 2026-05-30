@@ -932,4 +932,127 @@ theorem clifford_orbit_subset_inertia (θ : ClassFunction ↥H ℂ) :
     H ≤ ClassFunction.inertia θ :=
   ClassFunction.subgroup_le_inertia θ
 
+/-! ## Genuine characters decompose with non-negative integer multiplicities
+
+A genuine character `χ = χ_ρ` (the character of an actual finite-dimensional
+representation, `IsCharacter χ`) lies in `ZIrr G` (`character_mem_ZIrr`), so it is *some*
+`ℤ`-combination of irreducibles.  The extra content here is that every Fourier coefficient
+`⟨χ, ψ⟩` is a **non-negative** integer — it is the `ℂ`-dimension of the intertwining space
+`Hom_{ℂ[G]}(σ, ρ)` for `ψ = χ_σ` irreducible (via
+`Representation.card_inv_mul_sum_char_mul_char_eq_finrank`),
+hence a cast `ℕ`.  Combining the two gives the genuine `ℕ`-decomposition
+`χ = ∑_{ψ ∈ Irr G} ⟨χ, ψ⟩ • ψ`, the form the Peterfalvi (6.6) coherence-of-`X` equality-case
+consumers feed end-to-end. -/
+section GenuineDecomposition
+
+variable [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- A genuine character is a virtual character: `IsCharacter χ ⟹ χ ∈ ZIrr G`.  Immediate
+from `character_mem_ZIrr` once `χ` is identified with the canonical class function of its
+witnessing representation. -/
+theorem IsCharacter.mem_ZIrr {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) : χ ∈ ZIrr G := by
+  obtain ⟨V, _, _, _, ρ, hρ⟩ := hχ
+  have hχeq : χ = (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) :=
+    ClassFunction.ext fun g => congrFun hρ g
+  rw [hχeq]
+  exact character_mem_ZIrr ρ
+
+open scoped ComplexOrder in
+/-- **The Fourier coefficient of a genuine character at an irreducible character is a
+non-negative integer.**  For `χ = χ_ρ` a genuine character and `ψ = χ_σ` irreducible, the
+multiplicity `⟨χ, ψ⟩` equals `dim_ℂ Hom_{ℂ[G]}(σ, ρ)`, a cast natural number.
+
+This is the `G`-level analogue of `restrictionMultiplicity_natCast` (which proves the same
+non-negativity for the *restriction* multiplicity `⟨Res^G_H χ, θ⟩`): the constituent
+multiplicity of `ψ` in the genuine module `ρ` is a count, never negative.  The proof realizes
+`ψ` by an irreducible `σ`, rewrites the inner sum through `χ_σ(g⁻¹) = star (χ_σ(g))`
+(`character_inv`), and applies mathlib's Hom-dimension characterization of the character
+scalar product. -/
+theorem IsCharacter.exists_natCast_inner_irreducible {χ : ClassFunction G ℂ}
+    (hχ : IsCharacter χ) {ψ : ClassFunction G ℂ} (hψ : IsIrreducibleCharacter ψ) :
+    ∃ k : ℕ, ClassFunction.inner χ ψ = (k : ℂ) := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hρ⟩ := hχ
+  obtain ⟨W, _, _, _, σ, _, hσcoe⟩ := hψ
+  refine ⟨Module.finrank ℂ (Representation.IntertwiningMap σ ρ), ?_⟩
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum, invOf_eq_inv]
+  have hsum : ∀ g : G, χ g * star (ψ g) = ρ.character g * σ.character g⁻¹ := fun g => by
+    rw [congrFun hρ g, congrFun hσcoe g, ← character_inv σ g]
+  rw [Finset.sum_congr rfl (fun g _ => hsum g),
+    ← Representation.card_inv_mul_sum_char_mul_char_eq_finrank σ ρ]
+
+open scoped ComplexOrder in
+/-- The Fourier coefficient of a genuine character at an irreducible character is `≥ 0`.
+Non-negativity half of `IsCharacter.exists_natCast_inner_irreducible`. -/
+theorem IsCharacter.inner_irreducible_nonneg {χ : ClassFunction G ℂ}
+    (hχ : IsCharacter χ) {ψ : ClassFunction G ℂ} (hψ : IsIrreducibleCharacter ψ) :
+    0 ≤ ClassFunction.inner χ ψ := by
+  obtain ⟨k, hk⟩ := hχ.exists_natCast_inner_irreducible hψ
+  rw [hk]; exact Nat.cast_nonneg _
+
+open scoped ComplexOrder in
+/-- **A genuine character decomposes as a non-negative-integer combination of irreducibles.**
+
+For `IsCharacter χ` there is a `Finsupp` `m : ClassFunction G ℂ →₀ ℕ` supported on
+`Irr(G)` with
+* `χ = ∑_{ψ ∈ supp m} (m ψ : ℂ) • ψ` (the decomposition), and
+* `(m ψ : ℂ) = ⟨χ, ψ⟩` for every irreducible `ψ` (the coefficients are the Fourier
+  multiplicities).
+
+This is Peterfalvi's "`χ = ∑ mᵢ ψᵢ` with `mᵢ = ⟨χ, ψᵢ⟩ ∈ ℕ`" — the genuine-character
+`ℕ`-decomposition consumed by the (6.6) coherence-of-`X` equality case (Round-19 residual).
+The proof takes the `ℤ`-decomposition of `χ ∈ ZIrr G` (`mem_ZIrr_repr`), identifies each
+integer coefficient with the Fourier coefficient `⟨χ, ψ⟩` (`inner_eq_coeff_of_repr`), which
+is `≥ 0` for a genuine character (`inner_irreducible_nonneg`), and pushes the coefficients
+through `Int.toNat` (no support is lost: every coefficient on the support is positive). -/
+theorem IsCharacter.exists_natFinsupp_eq_sum {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) :
+    ∃ m : ClassFunction G ℂ →₀ ℕ, (↑m.support ⊆ irreducibleCharacters G) ∧
+      χ = ∑ a ∈ m.support, (m a : ℂ) • a ∧
+      ∀ ψ : ClassFunction G ℂ, IsIrreducibleCharacter ψ →
+        (m ψ : ℂ) = ClassFunction.inner χ ψ := by
+  classical
+  obtain ⟨c, hsupp, hsum⟩ := mem_ZIrr_repr hχ.mem_ZIrr
+  -- Every integer coefficient is the Fourier coefficient `⟨χ, ψ⟩`, hence `≥ 0`.
+  have hcoeff : ∀ ψ : ClassFunction G ℂ, (hψ : ψ ∈ irreducibleCharacters G) →
+      (c ψ : ℂ) = ClassFunction.inner χ ψ := by
+    intro ψ hψ
+    have := inner_eq_coeff_of_repr (⟨ψ, hψ⟩ : IrreducibleCharacter G) hsupp
+    rw [show ((⟨ψ, hψ⟩ : IrreducibleCharacter G) : ClassFunction G ℂ) = ψ from rfl] at this
+    rw [← this, hsum]
+  have hcnn : ∀ ψ : ClassFunction G ℂ, ψ ∈ c.support → 0 ≤ c ψ := by
+    intro ψ hψsupp
+    have hψ : ψ ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr hψsupp)
+    have : (0 : ℂ) ≤ (c ψ : ℂ) := by
+      rw [hcoeff ψ hψ]; exact hχ.inner_irreducible_nonneg hψ
+    exact_mod_cast this
+  -- Push coefficients through `Int.toNat`; the support is unchanged.
+  refine ⟨Finsupp.mapRange Int.toNat Int.toNat_zero c, ?_, ?_, ?_⟩
+  · -- support of the `ℕ`-Finsupp is contained in that of `c`, hence in `Irr G`.
+    refine subset_trans ?_ hsupp
+    intro ψ hψ
+    exact Finset.mem_coe.mpr (Finsupp.support_mapRange (Finset.mem_coe.mp hψ))
+  · -- The decomposition: cast `Int.toNat (c a) = c a` on the support.
+    have hsupp_eq : (Finsupp.mapRange Int.toNat Int.toNat_zero c).support = c.support := by
+      apply Finset.Subset.antisymm Finsupp.support_mapRange
+      intro a ha
+      rw [Finsupp.mem_support_iff, Finsupp.mapRange_apply]
+      have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+      omega
+    rw [hsum, hsupp_eq]
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [Finsupp.mapRange_apply]
+    have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c a)), Int.toNat_of_nonneg (le_of_lt this)]
+  · -- The coefficient equals the Fourier multiplicity.
+    intro ψ hψ
+    rw [Finsupp.mapRange_apply, ← hcoeff ψ hψ]
+    have hnn : 0 ≤ c ψ := by
+      by_cases hsupp_mem : ψ ∈ c.support
+      · exact hcnn ψ hsupp_mem
+      · rw [Finsupp.notMem_support_iff.mp hsupp_mem]
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
+
+end GenuineDecomposition
+
 end OddOrder.RepresentationTheory

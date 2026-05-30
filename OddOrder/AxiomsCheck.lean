@@ -1055,6 +1055,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
 
+-- 真正 character の ℕ-分解 (issue 0046, Peterfalvi (6.6) G2.2 residual): 真正 character `χ_ρ`
+-- の Fourier 係数 ⟨χ,ψ⟩ は非負整数 (= dim Hom(σ,ρ)) で, χ = ∑_{ψ∈Irr} ⟨χ,ψ⟩•ψ と ℕ-係数で分解.
+-- G-level 非負性 (restrictionMultiplicity_nonneg の G 版) + mem_ZIrr_repr/inner_eq_coeff_of_repr 合成.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.mem_ZIrr
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsCharacter.exists_natCast_inner_irreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.inner_irreducible_nonneg
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.exists_natFinsupp_eq_sum
+
 -- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
 -- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
 -- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.

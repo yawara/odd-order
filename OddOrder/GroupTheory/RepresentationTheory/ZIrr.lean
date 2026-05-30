@@ -175,6 +175,30 @@ theorem irreducibleCharacters_subset_ZIrr :
     irreducibleCharacters G ⊆ (ZIrr G : Set (ClassFunction G ℂ)) :=
   fun _ hφ => IsIrreducibleCharacter.mem_ZIrr hφ
 
+/-- A class function `φ : ClassFunction G ℂ` is a **(genuine) character** if there is a
+finite-dimensional `ℂ`-representation `ρ` of `G` (on a vector space in `Type 0`) whose
+character is `φ`.  This is the non-irreducible analogue of `IsIrreducibleCharacter`: the
+character of an actual module, as opposed to a virtual (`ℤ`-combination) character in
+`ZIrr G`.  Genuine characters are exactly those virtual characters whose Fourier
+coefficients `⟨φ, ψ⟩` are all non-negative integers (`IsCharacter.exists_natFinsupp_eq_sum`). -/
+def IsCharacter (φ : ClassFunction G ℂ) : Prop :=
+  ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (_ : FiniteDimensional ℂ V)
+      (ρ : Representation ℂ G V), (φ : G → ℂ) = ρ.character
+
+/-- An irreducible character is in particular a genuine character (forget irreducibility). -/
+theorem IsIrreducibleCharacter.isCharacter {φ : ClassFunction G ℂ}
+    (hφ : IsIrreducibleCharacter φ) : IsCharacter φ := by
+  obtain ⟨V, _, _, _, ρ, _, hρ⟩ := hφ
+  exact ⟨V, inferInstance, inferInstance, inferInstance, ρ, hρ⟩
+
+/-- The character of a finite-dimensional `ℂ`-representation (on `Type 0`) is a genuine
+character. -/
+theorem repCharacterClassFunction_isCharacter
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V) :
+    IsCharacter (repCharacterClassFunction ρ) :=
+  ⟨V, inferInstance, inferInstance, inferInstance, ρ, rfl⟩
+
 section Degree
 
 open Module (finrank)

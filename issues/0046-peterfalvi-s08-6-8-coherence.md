@@ -177,6 +177,32 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
         roadmap の無条件 ℚ→ℤ は採用せず (scaffolding/偽 statement 回避)。詳細 `notes/peterfalvi/s07_coherence.md`
         「형식화 진행 (Track A)」。残: (5.6.1) Y 분해 / (5.6.2) `0<b<1⇒λ=0` quadratic forcing /
         (5.4.a/b) Cauchy–Schwarz — いずれも R(χ) 一般 orthonormal lattice (B1) 선행 필요。
+- [x] (2026-05-31) **(6.6) G2.2 residual: 真正 character の ℕ-分解** を
+      `OddOrder/GroupTheory/RepresentationTheory/Clifford.lean` (+ `IsCharacter` 述語を `ZIrr.lean`) に
+      landing (sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+      登録 4 件 各 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs)。
+      G2.2 equality-case consumer が end-to-end で食う「真正 character は ⟨χ,ψ⟩∈ℕ で分解」を honest 一般形で:
+      - **`IsCharacter`** (`ZIrr.lean`, `IsIrreducibleCharacter` の隣): `φ` が**有限次元 ℂ-表現 `ρ` の
+        character** (irreducibility 落とした版)。`IsIrreducibleCharacter.isCharacter` /
+        `repCharacterClassFunction_isCharacter` で導入。
+      - **`IsCharacter.mem_ZIrr`**: 真正 character ∈ ZIrr (`character_mem_ZIrr` を canonical class-function
+        同定後に適用)。
+      - **`IsCharacter.exists_natCast_inner_irreducible`** (非負性の核): 真正 `χ=χ_ρ`, irreducible `ψ=χ_σ`
+        で `⟨χ,ψ⟩ = dim_ℂ Hom_{ℂ[G]}(σ,ρ)` = cast ℕ。`restrictionMultiplicity_nonneg` の **G-level 版** —
+        `inner` を `χ_σ(g⁻¹)=star(χ_σ g)` (`character_inv`) で書き換え mathlib の
+        `Representation.card_inv_mul_sum_char_mul_char_eq_finrank` (Hom-dim 特성화) に流す。
+        `inner_irreducible_nonneg` は `0 ≤ ⟨χ,ψ⟩` の系。
+      - **`IsCharacter.exists_natFinsupp_eq_sum`** (= GOAL, G2.2): `∃ m : ClassFunction G ℂ →₀ ℕ`,
+        `supp m ⊆ Irr(G)`, `χ = ∑_{ψ∈supp m} (m ψ:ℂ)•ψ`, `∀ψ∈Irr, (m ψ:ℂ)=⟨χ,ψ⟩`。`mem_ZIrr_repr`
+        (ℤ-Finsupp 분해) + `inner_eq_coeff_of_repr` (係수=Fourier coeff) + 비음성 ⟹ 각 係수 ≥0 を
+        `Int.toNat` 로 ℕ 化 (support 불변: support 위 係수는 양수). Peterfalvi 의 "χ=∑mᵢψᵢ, mᵢ=⟨χ,ψᵢ⟩∈ℕ".
+      - **honest 판정**: thin wrapper 아님 — `IsCharacter` 는 진짜 새 述語 (genuine vs virtual character),
+        비음성은 `restrictionMultiplicity_nonneg` 가 H-level 만 주는 것을 G-level Hom-dim 으로 새로 끌어옴.
+        ℕ-Finsupp 分解은 ℤ-repr + 비음성의 비자명한 합성 (`Int.toNat` support-preservation 포함).
+      - **배치**: `Clifford.lean` (= `restrictionMultiplicity_natCast` 의 家; `character_mem_ZIrr` +
+        Fourier (`mem_ZIrr_repr`/`inner_eq_coeff_of_repr`) + `character_inv` 가 모두 import closure 내
+        유일 모듈). `IsCharacter` 述語만 `ZIrr.lean` (其 `.mem_ZIrr` 는 downstream `character_mem_ZIrr`
+        필요해 Clifford 에).
 
 ## 進捗 (2026-05-30, issue 1001, Round-9 Track B)
 
