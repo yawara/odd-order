@@ -411,3 +411,34 @@ coprime + IsConj/centralizer-coset の補題は皆無; mathlib にあるのは `
 
 → **次の sub-issue 候補**: `Mathlib`-style の coprime-action conjugacy-to-centralizer-coset 補題
 (`OddOrder/GroupTheory/CoprimeConjugacy.lean` に追加)  これは (2.10.3) 完成と Möbius (2.10) の前提.
+
+## 進捗 2026-05-30 (8) — (2.10) 代表系 ℬ infra (MulAction + orbit transversal + 軌道公式) 完成 (sorry-free, axiom-clean)
+
+`OddOrder/Peterfalvi/S04_DadeIsometry.lean` `section SemidirectStructure` 内
+`section Transversal` に, 上記「残作業 (2.6.b)」**項目 1 (代表系 ℬ の Lean 表現, 構造的ブロッカー)**
+を landed (`lake build OddOrder` + `OddOrder.AxiomsCheck` green, 新規 sorry/axiom 無し;
+3 定理とも 3 axioms 全 allowlist 内).  Round 3 commit 7477966 の `conjFinset_{one,mul,card}` は
+**既に現コードに統合済み** (planner の「未統合」評価は誤り; L1216-1236) だったので, その上に構築:
+
+- **`conjFinsetAction`** = `MulAction L (Finset {a//a∈A})`: `smul := conjFinset`, 法則は
+  `conjFinset_one`/`conjFinset_mul` そのまま.  `hyp` 依存のため global instance でなく
+  `@[reducible] noncomputable def` (downstream は `letI := hyp.conjFinsetAction` で起動).
+  `@[simp] conjFinsetAction_smul` で `l • B = conjFinset l B`.
+- **`stabilizer_conjFinsetAction`** = **(2.10) stabilizer = N_L(B)**:
+  `MulAction.stabilizer L B = setLStabilizer hyp B`.  `l • B = B ↔ B.image (conjA l) = B`
+  を `conjA l` 単射 + `Finset.eq_of_subset_of_card_le` (`conjFinset_card`) で `∀ a∈B, conjA l a∈B`
+  に collapse.  これで軌道重み `|orbit B| = [L:N_L(B)]` が既存 N_L(B) infra に接続.
+- `conjClassQuotient` = `MulAction.orbitRel.Quotient L (Finset {a//a∈A})` (L-共役類商),
+  **`transversalRep`** = `Quotient.out` 代表 (= ℬ の 1 元).
+- **`transversalRep_conj`**: 代表は自分のクラスと L-共役 `transversalRep ⟦B⟧ = B^l` (∃l∈L).
+  `Quotient.out_eq'` + `Quotient.exact'` (orbitRel) で.  ℬ→𝒫 well-def の橋
+  (項目 2 `induce_alphaB_conjFinset` (2.10.1) の双対側).
+- **`card_orbit_mul_card_setLStabilizer`** = **(2.10) 軌道公式** `|orbit B|·|N_L(B)| = |L|`
+  (= (2.10.3) 和の正規化重み).  `MulAction.card_orbit_mul_card_stabilizer_eq_card_group` +
+  `stabilizer_conjFinsetAction`.  `Nat.card` で述べ (`Fintype.ofFinite` で局所供給, 環境 Fintype 不要).
+
+これで上記「残作業 (2.6.b)」**項目 1 完了**.  残るは項目 3 (2.10.3) 残ブロッカー
+(coprime-action 共役 primitive, 進捗(7)末尾) → 項目 4 Möbius 相殺 (`Finset.sum_involution`,
+ℬ-和の sign 相殺) → 項目 5 接続 (`PreservesVirtualCharacters` → `FullDadeIsometryData`).
+ℬ-和は整数交代和なので (2.6.b) は項目 4-5 が立てば manifest (RHS は `induce_mem_ZIrr` +
+`alphaB_mem_ZIrr` で ZIrr G).

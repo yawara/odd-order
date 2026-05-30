@@ -1439,6 +1439,108 @@ theorem induce_alphaB_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInva
 
 end ConjugacyInvariance
 
+/- 2.10: The `L`-conjugacy transversal `ℬ` of nonempty subsets of `A`. -/
+
+section Transversal
+
+/-- **Peterfalvi (2.10), the `L`-action on subsets of `A`.**  The `L`-conjugation action
+`conjFinset` (`B ↦ B^l = {l·a·l⁻¹ | a ∈ B}`) on `Finset {a : G // a ∈ A}` is a `MulAction`:
+the action laws are exactly `conjFinset_one` and `conjFinset_mul`.
+
+This is the action whose orbits index the inclusion–exclusion sum (2.10): the alternating sum
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` runs over `L`-conjugacy class representatives `ℬ` of the
+nonempty subsets, made well defined by `induce_alphaB_conjFinset` ((2.10.1)) and `conjFinset_card`
+(the sign `(-1)^{|B|}` is `L`-invariant since `|B^l| = |B|`).  It is provided as a `def` (not a
+global instance) because it depends on the hypothesis `hyp`; downstream lemmas activate it with
+`letI := hyp.conjFinsetAction`. -/
+@[reducible] noncomputable def conjFinsetAction (hyp : Hypothesis G A L) :
+    MulAction L (Finset {a : G // a ∈ A}) where
+  smul := hyp.conjFinset
+  one_smul := hyp.conjFinset_one
+  mul_smul := hyp.conjFinset_mul
+
+@[simp] theorem conjFinsetAction_smul (hyp : Hypothesis G A L) (l : L)
+    (B : Finset {a : G // a ∈ A}) :
+    (letI := hyp.conjFinsetAction; l • B) = hyp.conjFinset l B := rfl
+
+/-- **Peterfalvi (2.10), the stabilizer is `N_L(B)`.**  Under the `conjFinset` action, the
+`MulAction` stabilizer of `B` is exactly the set-stabilizer `setLStabilizer hyp B = N_L(B)`.
+
+`l • B = B` unfolds to `B.image (conjA l) = B`; since `conjA l` is injective this is equivalent to
+`conjA l` mapping `B` into `B`, i.e. `∀ a ∈ B, conjA l a ∈ B` — the defining condition of
+`setLStabilizer`.  This identifies the orbit-stabilizer weight `|orbit B| = [L : N_L(B)]` used in
+(2.10). -/
+theorem stabilizer_conjFinsetAction (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) :
+    (letI := hyp.conjFinsetAction; MulAction.stabilizer L B) = setLStabilizer hyp B := by
+  classical
+  letI := hyp.conjFinsetAction
+  ext l
+  rw [MulAction.mem_stabilizer_iff, mem_setLStabilizer]
+  change hyp.conjFinset l B = B ↔ ∀ a ∈ B, hyp.conjA l a ∈ B
+  constructor
+  · intro hl a ha
+    rw [← hl]
+    exact (hyp.mem_conjFinset).mpr ⟨a, ha, rfl⟩
+  · intro hl
+    apply Finset.eq_of_subset_of_card_le
+    · intro a ha
+      obtain ⟨b, hb, rfl⟩ := (hyp.mem_conjFinset).mp ha
+      exact hl b hb
+    · rw [hyp.conjFinset_card]
+
+/-- **Peterfalvi (2.10), the transversal `ℬ`.**  The quotient of `Finset {a : G // a ∈ A}` by the
+`L`-conjugacy relation (`conjFinset` orbits); its elements index the inclusion–exclusion sum once
+restricted to nonempty subsets.  Representatives are obtained via `Quotient.out` (`transversalRep`),
+realizing Peterfalvi's "`ℬ` = set of representatives of the `L`-conjugacy classes of subsets". -/
+noncomputable def conjClassQuotient (hyp : Hypothesis G A L) : Type _ :=
+  letI := hyp.conjFinsetAction
+  MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})
+
+/-- A chosen representative subset of an `L`-conjugacy class (`Quotient.out`).  This is one element
+of Peterfalvi's transversal `ℬ`. -/
+noncomputable def transversalRep (hyp : Hypothesis G A L)
+    (C : hyp.conjClassQuotient) : Finset {a : G // a ∈ A} :=
+  letI := hyp.conjFinsetAction
+  Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C
+
+/-- The chosen representative of the class of `B` is `L`-conjugate to `B`: there is some `l ∈ L`
+with `transversalRep ⟦B⟧ = B^l`.  This is the well-definedness bridge from `ℬ` back to arbitrary
+subsets, dual to `induce_alphaB_conjFinset` (2.10.1). -/
+theorem transversalRep_conj (hyp : Hypothesis G A L) (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    ∃ l : L, hyp.transversalRep (Quotient.mk'' B) = hyp.conjFinset l B := by
+  letI := hyp.conjFinsetAction
+  have hout : (Quotient.mk'' (hyp.transversalRep (Quotient.mk'' B)) :
+      MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})) = Quotient.mk'' B := by
+    rw [transversalRep]
+    exact Quotient.out_eq' _
+  obtain ⟨l, hl⟩ := Quotient.exact' hout
+  exact ⟨l, hl.symm⟩
+
+/-- **Peterfalvi (2.10), orbit-stabilizer weight.**  For a subset `B`, the size of its
+`L`-conjugacy orbit times `|N_L(B)|` equals `|L|`.  Equivalently `|orbit B| = [L : N_L(B)]`, the
+fibrewise weight attached to each representative `B ∈ ℬ` in the (2.10) sum normalization.
+
+This is the orbit-stabilizer theorem `card_orbit_mul_card_stabilizer_eq_card_group` specialized to
+the `conjFinset` action, with the stabilizer rewritten to `setLStabilizer hyp B`
+(`stabilizer_conjFinsetAction`).  Stated with `Nat.card` so no ambient `Fintype L` is needed. -/
+theorem card_orbit_mul_card_setLStabilizer (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) :
+    letI := hyp.conjFinsetAction
+    Nat.card (MulAction.orbit L B) * Nat.card (setLStabilizer hyp B)
+      = Nat.card L := by
+  classical
+  letI := hyp.conjFinsetAction
+  letI : Fintype L := Fintype.ofFinite L
+  letI : Fintype (MulAction.orbit L B) := Fintype.ofFinite _
+  letI : Fintype (MulAction.stabilizer L B) := Fintype.ofFinite _
+  rw [Nat.card_eq_fintype_card, ← hyp.stabilizer_conjFinsetAction B, Nat.card_eq_fintype_card,
+    Nat.card_eq_fintype_card]
+  exact MulAction.card_orbit_mul_card_stabilizer_eq_card_group L B
+
+end Transversal
+
 /- 2.10.3: Pointwise value of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
 
 section PointwiseValue

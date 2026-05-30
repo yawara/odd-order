@@ -347,3 +347,15 @@ def CharacterSupport (H : Type*) [Group H] (A : Set H) : Type* :=
 を要する.  mathlib `GroupTheory/`・本 repo とも欠落 (確認済).  次 sub-issue =
 `OddOrder/GroupTheory/CoprimeConjugacy.lean` に Glauberman coprime-action conjugacy 補題追加.
 詳細は `issues/0040-*` 進捗 (7).
+
+## 2026-05-30 追記 (2) — (2.10) 代表系 ℬ infra landed
+
+`S04_DadeIsometry.lean` `section Transversal` に **L-共役類代表系 ℬ の構造基盤**を追加
+(sorry-free, axiom-clean; `issues/0040-*` 進捗 (8)):
+- `conjFinsetAction` = `MulAction L (Finset {a//a∈A})` (`smul := conjFinset`, 法則 = `conjFinset_{one,mul}`).
+- `stabilizer_conjFinsetAction` = **stabilizer = N_L(B)** (`MulAction.stabilizer L B = setLStabilizer hyp B`).
+- `conjClassQuotient` / `transversalRep` (=`Quotient.out` 代表) / `transversalRep_conj` (代表は B^l).
+- `card_orbit_mul_card_setLStabilizer` = **軌道公式** `|orbit B|·|N_L(B)|=|L|` (和の正規化重み).
+
+これで進捗 (4) 残作業 **項目 1 (代表系 ℬ, 構造的ブロッカー) 完了**.  残: 項目 3 (2.10.3) 残
+(coprime-action 共役 primitive, 上記) → 項目 4 Möbius 相殺 → 項目 5 接続.
