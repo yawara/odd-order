@@ -1,5 +1,13 @@
 # BG App.B Theorem B.4(b) — 別セッション引き継ぎ (2026-05-30)
 
+> **✅ 完成 (2026-05-30, commit c7acf6a)**: `zCenter_lOdd_normal_of_oPiCore_eq_bot` を
+> sorry-free / 標準3公理で証明済 (`OddOrder/BG/AppB_PuigB3B4.lean`, `lake build OddOrder` green)。
+> 下記手順書は完成済の設計記録として保存。**実装との差分**: ① Step3 の `Y⊆L_*(S)` は新補題
+> `zCenterLOdd_isMulCommutative` で `Y` の可換性を出してから `abelian_le_lNIn`; ② `normalInf_isSylow`
+> の index 義務は新補題 `relIndex_inf_eq_relIndex_sup` (第2同型の指数版) で `Q.not_dvd_index` に還元;
+> ③ `set` は Y/C/CapS のみ — **C₀=C_G(Y) は `set` せず `centralizer` 頭で保持** (`thmA5_part1` 出力の
+> `G⧸C_G(Y)` quotient instance が fvar 頭だと解決できないため)。残: **B.4(a) = issue 2002**。
+
 **目標**: `OddOrder.BG.AppB.zCenter_lOdd_normal_of_oPiCore_eq_bot` を完成させる
 = **BG Thm 6.2 (Glauberman Z(J)) の自己完結代替** = `O_{p'}(G)=1 ⇒ Z(L(S)) ⊴ G`。
 issue 2001 の主目標。完成後 → BG Thm 6.2 一般形 → §7-§16(支配的ボトルネック)が開く。
