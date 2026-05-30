@@ -21,11 +21,22 @@ BG §4 の頂点定理 = **Theorem 4.16 (Blackburn)**。p 奇, R 非自明 p-群
 
 handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨):
 
-- [ ] 新規 API: `OddOrder/GroupTheory/CentralProduct.lean` + exp-p extraspecial + agemo `℧`
+- [x] 新規 API: `OddOrder/GroupTheory/CentralProduct.lean` + exp-p extraspecial + agemo `℧` ✅ **2026-05-30 完了** (workflow `bg-s04-thm416-api-bundle`, commits 4656738/560312b/4d0269a, sorry-free/axiom-clean/build green 3352 jobs)
 - [ ] Prop 4.3(a) cl≤3 分岐 + Lem 4.5 general/4.5(b)(c) (Gorenstein 5.4.10/5.4.3 行間)
 - [ ] Prop 4.8 + Prop 4.11 Huppert + Thm 4.12 (§4 第2の山, 設計先行)
 - [ ] Lem 4.13/4.14/4.15 (aut order + extraspecial commutator)
 - [ ] Thm 4.16 本体 (Case A metacyclic / Case B-1 central product / Case B-2 GL(2,p) 矛盾)
+
+## 進捗 (2026-05-30)
+
+**issue 1 (新規 API 束) 完了** — workflow `bg-s04-thm416-api-bundle` (10 agent, design→implement→verify, anti-scaffold gated):
+
+- `OddOrder/GroupTheory/CentralProduct.lean` 新規 — `IsCentralProduct R R₁ R₂ := R = R₁⊔R₂ ∧ ⁅R₁,R₂⁆=⊥`。overlap `R₁⊓R₂ ≤ Z(R)` は導出補題 (anti-hoist)。+ `of_le_centralizer` (Case B-1 producer)。
+- `IsExtraspecial.lean` — `IsExpPExtraspecial p G := IsExtraspecial p G ∧ Monoid.exponent G = p` + `pow_eq_one`。
+- `OmegaSubgroup.lean` — `Agemo p n G` (BG 𝒰ⁿ, Omega 双対) + `anti`/`characteristic`。
+- 全て sorry-free / axiom-clean (`[propext, Classical.choice, Quot.sound]`)、`lake build OddOrder` green (3352 jobs)。
+
+**設計書** `notes/bg/s04_prop411_thm416_design.md` (Prop 4.11/Thm 4.12/Thm 4.16, scaffold-trap audit + sub-issue I-0a..I-5)。次の着手 = handoff §6 issue 2 (Prop 4.3(a) cl≤3 + Lem 4.5 general)。**最深 gate = N-4 (A の R/S 商作用 + Maschke)** を設計書が指摘。
 
 ## 完了条件
 

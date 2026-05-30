@@ -35,6 +35,7 @@ Thm 4.16 は §4 最難。memory `scaffold-sorry-free-not-done` が最も効く�
 | **GL(2,p) 分岐エンジン** | `isPGroup_commutator_of_faithful_two_dim_charP` (= Thm 2.6(b) 導来形。Thm 4.16 の Case B-2 と Cor 4.19 で使う) | `S04_PGroupsSmallRank.lean` |
 | 0016 critical | `IsCritical` / `isCritical_exists` / `autCentralizer` / `Omega.exponent_eq_of_class_le_two` / `mul_pow_eq_commutator_pow_mul_of_class_le_two` / `centralizer_eq_self_of_maximal_abelian_normal` | `OddOrder/GroupTheory/CriticalSubgroup.lean` |
 | Thm 2.6 | `odd_two_dim_sylow_abelian` (GL(2,p) 分岐の出典) | `S02_Representations.lean` |
+| **issue 1 API (2026-05-30 完了)** | `IsCentralProduct` / `of_le_centralizer` (Case B-1 producer) / `inf_le_centralizer` (R₁⊓R₂≤Z(R) 導出) ・ `IsExpPExtraspecial` / `pow_eq_one` ・ `Agemo` (𝒰ⁿ) / `anti` / `characteristic` | `CentralProduct.lean` (新規) / `IsExtraspecial.lean` / `OmegaSubgroup.lean` |
 
 ## 3. Thm 4.16 に至る未実装の前提 (Wave 2 — D の実質的大半)
 
@@ -84,10 +85,14 @@ Thm 4.16 本体の前に要る (sorry なしで deferred 中):
 
 ## 8. 次セッションの最初の一歩
 
-**issue 1 (新規 API 束 = CentralProduct + exp-p extraspecial + agemo) から**。build-green 向きで、Thm 4.16(2) の central product 表現を確定できる。並行して **Prop 4.11 Huppert の設計を mmd L1556-1586 精読**で詰める (§4 第2の山、ここが Case A の鍵)。
+> **更新 (2026-05-30)**: ~~issue 1 (新規 API 束)~~ ✅ **完了** (workflow `bg-s04-thm416-api-bundle`, commits 4656738/560312b/4d0269a)。`IsCentralProduct` / `IsExpPExtraspecial` / `Agemo` が §2 表に載った状態で使える。Prop 4.11 含む 3 大難所の設計も **`notes/bg/s04_prop411_thm416_design.md`** に出力済 (signature/skeleton/scaffold-trap audit/sub-issue I-0a..I-5)。
+
+**次 = issue 2 (Prop 4.3(a) cl≤3 分岐 + Lem 4.5 general/4.5(b)(c))** から (handoff §6 の 2 番)。設計書の依存表・risk を必ず先に読む。
+
+**最重要 risk (設計書より)**: 最深 scaffold-trap gate = **N-4 (A の R/S 商作用 + Maschke A-invariant complement)** — Thm 4.12(a) と Thm 4.16 Case B-2 が両方依存するが repo 不在。`MulAction A (R/S) := sorry` で誤魔化す誘惑が最大なので**最初に genuine 実装**。Thm 4.16 B-2 の `j²≡1` 矛盾は**純 ZMod p 算術で閉じる** (GL engine 経由でない — mis-routing 注意)。
 
 cold start チェック:
-1. `git log --oneline -5` で HEAD 確認 (引き継ぎ時 HEAD = §4 v1 完了後)。
-2. `lake build OddOrder` が green か (Peterfalvi S08/S09 の既知 sorry 2件以外 RC 0)。
-3. 本書 §2 の v1 前提が実在するか `grep` で確認 (drift 注意)。
-4. `notes/bg/s04_implementation_plan_2026_05_30.md` を通読してから着手。
+1. `git log --oneline -8` で HEAD 確認。issue 1 完了後の HEAD は commit 9f9db42 (設計書) 付近 (並行 Peterfalvi セッションの commit が混在し得る)。
+2. `lake build OddOrder` が green か (Peterfalvi S09 の既知 sorry 以外 RC 0)。
+3. 本書 §2 の前提 (issue 1 API 行 含む) が実在するか `grep` で確認 (drift 注意)。
+4. **`notes/bg/s04_prop411_thm416_design.md`** + `notes/bg/s04_implementation_plan_2026_05_30.md` を通読してから着手。
