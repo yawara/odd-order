@@ -27,7 +27,8 @@
 | 6a | **Prop 4.8(a)** r≤2+exp p ⇒ \|R\|≤p³ | `card_le_prime_cube_of_pRank_le_two_of_exponent_prime` | I-0d✅ + SCN✅ + Prop4.4(a)✅ | ✅**PASS** (commit 73df7e1, S04 §4D, 独立監査済)。SCN+GL counting, Ch07 import 回避 |
 | 5b | **Prop 4.3 GATE-1 (4.4) collection** | `mul_pow_eq_collect_of_triple_central` | precursor S04:378 + Lem4.2 + γ₄=1 | ✅**PASS** (commit 3190008, S04 §Prop43ClassThreeCollection, 独立監査済)。FF n=C(n+1,3), GG n=2·C(n+1,3) を BCH モデルで確定 (design note 訂正済)。⚠ agent が branch 切ったので main に ff-merge 済 |
 | 5c | **Prop 4.3 (a)(b)** Ω₁ exp p / φ=x^p hom | `omega1_pow_eq_one` (a) + `pow_mul_eq_mul_pow_of_commutator_le_omega1` (b) | **collection 5b✅** で assemble 可。GATE-2(b)=collection\|n=p+divisibility (tractable), GATE-3(a)=\|R\|-induction+Ω₁closure (やや重)。skeleton = s04_prop43_design GATE-2/3 | **IN PROGRESS** (collection 後の本命; #6b Prop4.8(b)→#7 Lem4.9→#8 Prop4.11 を開く) |
-| 6b | **Prop 4.8(b)** p>3⇒Ω₁(R) exp 1/p | — | = Prop 4.3(a) 応用 (cl≤3) | blocked (gate: #5 Prop4.3) |
+| 5c | **Prop 4.3 (a)(b)** Ω₁ exp p / φ=x^p hom | `omega1_pow_eq_one` + `pow_mul_eq_mul_pow_of_commutator_le_omega1` | collection 5b✅ | ✅**PASS** (commit 03a40d7, S04 §Prop43ClassThree, 独立監査済, main直)。(a)=\|R\|-induction product-closure, (b)=collection\|n=p。hR追加は忠実 |
+| 6b | **Prop 4.8(b)** p>3⇒Ω₁(R) exp 1/p | — | **Prop4.3(a)✅ (omega1_pow_eq_one) + Prop4.8(a)✅** で組める。minimal counterexample→\|R\|≤p⁴⇒cl≤3→Prop4.3(a)。要 \|R\|≤p⁴⇒cl≤3 (p-群 order p^n ⇒ class<n) | **IN PROGRESS** (Lem4.9→Prop4.11 を開く) |
 | 7 | **Lem 4.9** \|Ω₁(R/T)\|≤p² | — | gate: #6 | queued (gate: #6) |
 | 8 | **Prop 4.11 (Huppert)** p>3,\|Ω₁\|≤p²⇒metacyclic | `isMetacyclic_of_omega1_card_le_prime_sq` | gate: #7 + agemo✅ + Lem4.5b✅ + abelian case | queued (gate: #7) |
 | 9 | **Lem 4.13/4.14** q∣\|Aut R\|⇒q∣p²-1, q<p | — | gate: #3 + SCN₃=∅✅ | queued (gate: #3) |
