@@ -674,6 +674,96 @@ theorem inner_self_chi_re_le_inner_self_X
   rw [hχ, hX, Complex.intCast_re, Complex.intCast_re]
   exact_mod_cast finset_sum_le_sum_sq D.imageFamily.imageSet D.coeff
 
+/-- `⟨χ, χ⟩` is the integer cast `(∑ coeff α : ℤ)`. -/
+theorem inner_self_chi_eq_intCast
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ = ((∑ α ∈ D.imageFamily.imageSet, D.coeff α : ℤ) : ℂ) := by
+  rw [D.inner_self_chi_eq_sum_coeff]; push_cast; ring
+
+/-- `⟨X, X⟩` is the integer cast `(∑ (coeff α)² : ℤ)`. -/
+theorem inner_self_X_eq_intCast
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.X = ((∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 : ℤ) : ℂ) := by
+  rw [D.inner_self_X]; push_cast; ring
+
+/-- `X ⊥ Y`: `⟨X, Y⟩ = 0` (since `X ∈ ℤ[R(χ)]` and `Y ⊥ R(χ)`). -/
+theorem inner_X_Y (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner D.X D.Y = 0 := by
+  rw [D.X_eq, inner_sum_left]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [ClassFunction.inner_smul_left,
+    OddOrder.RepresentationTheory.inner_conj_symm, D.Y_orthogonal α hα, star_zero, mul_zero]
+
+/-- `‖X - Y‖² = ‖X‖² + ‖Y‖²` (Pythagoras, since `X ⊥ Y`). -/
+theorem inner_self_X_sub_Y (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner (D.X - D.Y) (D.X - D.Y) =
+      ClassFunction.inner D.X D.X + ClassFunction.inner D.Y D.Y := by
+  have hYX : ClassFunction.inner D.Y D.X = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.inner_X_Y, star_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, D.inner_X_Y, hYX]
+  ring
+
+/-- `‖χ - ψ‖² = ‖χ‖² + ‖ψ‖²` (Pythagoras, since `(χ, ψ) = (ψ, χ) = 0`). -/
+theorem inner_self_chi_sub_psi (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner (χ - ψ) (χ - ψ) =
+      ClassFunction.inner χ χ + ClassFunction.inner ψ ψ := by
+  have hpsi_chi : ClassFunction.inner ψ χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D.chi_psi_orthogonal, star_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, D.chi_psi_orthogonal, hpsi_chi]
+  ring
+
+/-- The total-norm identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` from the isometry of `τ₁`. -/
+theorem inner_self_chi_add_psi_eq
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    ClassFunction.inner χ χ + ClassFunction.inner ψ ψ =
+      ClassFunction.inner D.X D.X + ClassFunction.inner D.Y D.Y := by
+  rw [← D.inner_self_chi_sub_psi, ← D.inner_self_X_sub_Y, ← D.tau1_image,
+    D.tau1_isometry.inner_eq]
+
+/-- **Peterfalvi (5.4.b).**  If `‖Y‖² ≥ ‖ψ‖²`, then `‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²`
+and `X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)`.
+
+The total-norm identity `‖χ‖² + ‖ψ‖² = ‖X‖² + ‖Y‖²` together with `‖X‖² ≥ ‖χ‖²`
+(5.4.a) and the hypothesis `‖Y‖² ≥ ‖ψ‖²` forces both inequalities to be equalities.
+The norm equality `‖χ‖² = ‖X‖²` reads `∑ coeff α = ∑ (coeff α)²`, so by the tightness
+of integer Cauchy–Schwarz each `coeff α ∈ {0, 1}`; then `E = {α | coeff α = 1}` and
+`X = ∑_{α ∈ E} α`. -/
+theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    (hY : (ClassFunction.inner ψ ψ).re ≤ (ClassFunction.inner D.Y D.Y).re) :
+    (ClassFunction.inner χ χ).re = (ClassFunction.inner D.X D.X).re ∧
+      (ClassFunction.inner ψ ψ).re = (ClassFunction.inner D.Y D.Y).re ∧
+      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α := by
+  classical
+  -- The `.re` total-norm identity.
+  have htotal : (ClassFunction.inner χ χ).re + (ClassFunction.inner ψ ψ).re =
+      (ClassFunction.inner D.X D.X).re + (ClassFunction.inner D.Y D.Y).re := by
+    have := congrArg Complex.re D.inner_self_chi_add_psi_eq
+    simpa [Complex.add_re] using this
+  have hXge := D.inner_self_chi_re_le_inner_self_X
+  -- Both inequalities are forced to equalities.
+  have hχX : (ClassFunction.inner χ χ).re = (ClassFunction.inner D.X D.X).re := by linarith
+  have hψY : (ClassFunction.inner ψ ψ).re = (ClassFunction.inner D.Y D.Y).re := by linarith
+  refine ⟨hχX, hψY, ?_⟩
+  -- Tightness: `∑ coeff = ∑ coeff²` as integers.
+  have hsum_eq : (∑ α ∈ D.imageFamily.imageSet, D.coeff α) =
+      ∑ α ∈ D.imageFamily.imageSet, (D.coeff α) ^ 2 := by
+    have h1 := hχX
+    rw [D.inner_self_chi_eq_intCast, D.inner_self_X_eq_intCast,
+      Complex.intCast_re, Complex.intCast_re] at h1
+    exact_mod_cast h1
+  have hcoeff01 : ∀ α ∈ D.imageFamily.imageSet, D.coeff α = 0 ∨ D.coeff α = 1 :=
+    (finset_sum_eq_sum_sq_iff D.imageFamily.imageSet D.coeff).mp hsum_eq
+  -- `E = {α | coeff α = 1}`; `X = ∑_{α ∈ E} α`.
+  refine ⟨D.imageFamily.imageSet.filter (fun α => D.coeff α = 1), Finset.filter_subset _ _, ?_⟩
+  rw [D.X_eq, Finset.sum_filter]
+  refine Finset.sum_congr rfl fun α hα => ?_
+  rcases hcoeff01 α hα with h0 | h1
+  · rw [h0, if_neg (by norm_num), Int.cast_zero, zero_smul]
+  · rw [h1, if_pos rfl, Int.cast_one, one_smul]
+
 end CharacterPsiDecomposition
 
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
