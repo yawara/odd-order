@@ -957,4 +957,57 @@ theorem difference_images_inner_eq_zero_of_inner_pair
 
 end Hypothesis
 
+/-! ### Peterfalvi (5.6): the coherence-union theorem
+
+`S₁ = {χ₁,…,χₙ}` is a conjugation-closed coherent subset of `S` and `{χ, χ̄}` is disjoint
+from `S₁` with `χ₁(1) ∣ χ(1)` (write `χ(1) = a·χ₁(1)`).  Under the degree-ratio inequality
+`2·χ(1)·χ₁(1) < ∑ᵢ χᵢ(1)²/‖χᵢ‖²`, the union `S₁ ∪ {χ, χ̄}` is coherent.
+
+The proof runs through the (5.4)/(5.5) decomposition machinery: writing
+`(χ - a·χ₁)^τ = X - Y` against the orthonormal `R(χ)`, the inequality forces the integer
+coefficient `λ` of the orthogonal part `Y` to vanish (5.6.2), so `Y = a·χ₁^{τ₁}` (5.6.1) and
+`X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²` (5.5/5.4.b); the extension `τ₂` with
+`χ^{τ₂} = X`, `χ̄^{τ₂} = X - (χ - χ̄)^τ` is then the coherence witness. -/
+
+/-- **Peterfalvi (5.6.2): the integer-forcing core.**
+
+The quadratic inequality produced by the (5.6.2) norm computation forces `λ = 0`.  Concretely:
+if `D` is a positive rational, `z ≥ 0`, `0 ≤ a`, the strict degree-ratio bound `2·a < D` holds,
+and the integer `λ` satisfies `λ²·D - 2·λ·a + z ≤ 0`, then `λ = 0`.
+
+This is exactly the step `λ² - bλ ≤ 0`, `0 < b < 1` (with `b = 2a/D`) `⟹ λ = 0` of the text,
+kept division-free: the strict bound `2a < D` is the `b < 1` hypothesis and `0 ≤ a`, `0 < D`
+give `0 < b`.  The slack term `z = ‖Z‖² ≥ 0` is carried so the caller need not drop it first. -/
+theorem int_eq_zero_of_sq_mul_le_of_two_mul_lt
+    {lam : ℤ} {D a z : ℚ}
+    (hD : 0 < D) (hz : 0 ≤ z) (ha : 0 ≤ a) (hbnd : 2 * a < D)
+    (hquad : (lam : ℚ) ^ 2 * D - 2 * (lam : ℚ) * a + z ≤ 0) :
+    lam = 0 := by
+  -- From `λ²·D - 2λa + z ≤ 0` and `z ≥ 0`: `λ²·D ≤ 2λa`.
+  have hcore : (lam : ℚ) ^ 2 * D ≤ 2 * (lam : ℚ) * a := by linarith
+  -- `λ ≠ 0` is impossible.
+  by_contra hne
+  have hne' : lam ≠ 0 := hne
+  -- WLOG via cases on the sign of `λ`.
+  rcases lt_trichotomy lam 0 with hneg | hzero | hpos
+  · -- `λ < 0`: then `2λa ≤ 0 ≤ λ²·D` with `λ²·D > 0`, contradiction.
+    have hlamR : (lam : ℚ) < 0 := by exact_mod_cast hneg
+    have hsq_pos : 0 < (lam : ℚ) ^ 2 := by positivity
+    have hlhs_pos : 0 < (lam : ℚ) ^ 2 * D := mul_pos hsq_pos hD
+    have hrhs_nonpos : 2 * (lam : ℚ) * a ≤ 0 := by nlinarith [hlamR, ha]
+    linarith
+  · exact hne' hzero
+  · -- `λ > 0`: divide `λ²·D ≤ 2λa` by `λ > 0` to get `λ·D ≤ 2a < D`, so `λ < 1`, contradiction.
+    have hlamR : (0 : ℚ) < (lam : ℚ) := by exact_mod_cast hpos
+    have hlam1 : (1 : ℚ) ≤ (lam : ℚ) := by
+      have : (1 : ℤ) ≤ lam := hpos
+      exact_mod_cast this
+    -- `λ²·D = λ·(λ·D)` and `2λa = λ·(2a)`, cancel one `λ`.
+    have hcancel : (lam : ℚ) * D ≤ 2 * a := by
+      have h2 : (lam : ℚ) * ((lam : ℚ) * D) ≤ (lam : ℚ) * (2 * a) := by nlinarith [hcore]
+      exact le_of_mul_le_mul_left h2 hlamR
+    -- But `λ ≥ 1` gives `D ≤ λ·D ≤ 2a < D`, contradiction.
+    have hDle : D ≤ (lam : ℚ) * D := by nlinarith [hlam1, hD]
+    linarith
+
 end OddOrder.Peterfalvi.S07
