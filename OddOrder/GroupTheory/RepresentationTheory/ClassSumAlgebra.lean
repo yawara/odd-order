@@ -1091,6 +1091,50 @@ theorem centralCharacterOfRep_classSum_mul_cong [Finite G] (ρ : Representation 
       rw [Finset.mem_filter] at hCs
       exact character_one_mul_coeff_mul_centralChar_cong_zero ρ Ci Cj Cs (hdvd Cs hCs.2) hm
 
+omit [DecidableEq G] in
+open OddOrder.GroupTheory Classical in
+/-- **Peterfalvi (6.7.2)** (geometric form, modulus `|P|`).  This specializes
+`centralCharacterOfRep_classSum_mul_cong` to the actual setup of (6.7): a Sylow `p`-subgroup
+`P ≤ G`, a subgroup `Z ≤ P` that is *normal in* `L = N_G(P)`, and `P^# = P ∖ {1}` a TI-subset of `G`
+with normalizer-bound `L`.  With the class-membership predicate `inZ Cs := ∃ w, ⟦w⟧ = Cs ∧ w ∈ Z`
+(the classes meeting `Z`) and the two source classes `C_i`, `C_j` each meeting `Z^#`, one gets
+`ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{C_s meets Z} ψ(1)·a_{ijs}·ω(C_s) (mod |P|)`.
+
+The abstract divisibility hypothesis `hdvd` of `centralCharacterOfRep_classSum_mul_cong` is here
+*discharged*: for a class `C_s` disjoint from `Z` (`¬ inZ C_s`), Peterfalvi (6.7.1) says `P` acts
+fixed-point-freely by conjugation on `Ω = {(u,v) ∈ C_i × C_j ∣ uv ∈ C_s}`
+(`fixedPointFree_classPair_of_isTISubset`), whence `|P| ∣ a_{ijs}|C_s|`
+(`card_dvd_classSumCoeff_of_fixedPointFree`).  Thus the classes disjoint from `Z` drop out of
+`ψ(1)·ω(C_i)·ω(C_j)` modulo `|P|`, the content Peterfalvi uses to pass to `(6.7.3)`. -/
+theorem centralCharacterOfRep_classSum_mul_cong_of_isTISubset [Finite G]
+    (ρ : Representation ℂ G V) [IsIrreducible ρ] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    {Z : Subgroup G} (hZP : Z ≤ (P : Subgroup G))
+    (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
+    (hti : IsTISubset ((P : Set G) \ {1}) (Subgroup.normalizer (P : Subgroup G)))
+    {Ci Cj : ConjClasses G}
+    (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
+    (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj) :
+    ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
+      ≡ ∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
+          ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+        [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+  classical
+  -- The modulus `|P|` is a nonzero complex number (`P` is a finite group, hence nonempty).
+  have hm : ((Nat.card (P : Subgroup G) : ℤ) : ℂ) ≠ 0 := by
+    have hpos : (0 : ℕ) < Nat.card (P : Subgroup G) := Nat.card_pos
+    exact_mod_cast (Nat.cast_ne_zero (R := ℂ)).mpr hpos.ne'
+  -- For every class `C_s` disjoint from `Z`, `(6.7.1)` gives `|P| ∣ a_{ijs}|C_s|`.
+  refine centralCharacterOfRep_classSum_mul_cong ρ Ci Cj _ ?_ hm
+  intro Cs hCs
+  -- `¬ ∃ w, ⟦w⟧ = Cs ∧ w ∈ Z` is exactly the `(6.7.1)` hypothesis `∀ w, ⟦w⟧ = Cs → w ∉ Z`.
+  have hCsZ : ∀ w : G, ConjClasses.mk w = Cs → w ∉ Z := by
+    intro w hw hwZ; exact hCs ⟨w, hw, hwZ⟩
+  -- The fixed-point-free hypothesis from `(6.7.1)`, then the counting divisibility.
+  have hfree := fixedPointFree_classPair_of_isTISubset P hZP hZnormal hti hCi hCj hCsZ
+  have hdvd : Nat.card (P : Subgroup G) ∣ classSumCoeff Ci Cj Cs :=
+    card_dvd_classSumCoeff_of_fixedPointFree (P : Subgroup G) Ci Cj Cs hfree
+  exact_mod_cast hdvd
+
 /-! ### Peterfalvi (6.7.3): the congruence-arithmetic assembly
 
 The remaining content of (6.7.3) is pure algebraic-integer congruence arithmetic, combining the two

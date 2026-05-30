@@ -80,6 +80,17 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       - **`centralCharacterOfRep_classSum_mul_cong`** = (6.7.2) :
         `ψ(1)·ω(C_i)·ω(C_j) ≡ ∑_{C_s∩Z≠∅} ψ(1)·a_{ijs}·ω(C_s) [ALGMOD m]` (`C_s∩Z=∅` 項が mod m で脱落)。
         Peterfalvi の `ψ(1)α² ≡ ψ(1)(a_{ij0}+a_{ij}α)` の `ω(C_s)=α` collapse 前形。
+- [x] (2026-05-30) **(6.7.2) geometric form** (abstract `hdvd` を (6.7) setup から放電) を
+      `ClassSumAlgebra.lean` に landing (AxiomsCheck 登録, 3 axioms 全 allowlist 内)。
+      - **`centralCharacterOfRep_classSum_mul_cong_of_isTISubset`** : `centralCharacterOfRep_classSum_mul_cong`
+        (abstract `hdvd : ∀ Cs, ¬inZ Cs → m ∣ classSumCoeff`) を **実 (6.7) setup** へ特殊化 —
+        Sylow `P`, `Z ≤ P` で `Z ⊴ L=N_G(P)`, `P^#=P∖{1}` TI-subset, source class `C_i,C_j` が `Z^#` と交わる。
+        `m = |P| = Nat.card P`, `inZ Cs := ∃ w, ⟦w⟧=Cs ∧ w∈Z` (= `C_s∩Z≠∅`)。
+      - `hdvd` 放電: `¬inZ C_s` (= `∀ w, ⟦w⟧=Cs → w∉Z`) で (6.7.1) `fixedPointFree_classPair_of_isTISubset`
+        → fixed-point-free 仮説, それを (6.7.1) counting `card_dvd_classSumCoeff_of_fixedPointFree` に流し
+        `|P| ∣ a_{ijs}|C_s|` (ℕ) → `exact_mod_cast` で ℤ 版。これで **(6.7.1)+(6.7.2) を 1 定理に合成**し,
+        (6.7.3) `peterfalvi_673` の `h11`/`h12` 入力 (`ψ(1)α²≡ψ(1)(a_{ij0}+a_{ij}α)`) を生む geometric source
+        が揃った (残 atoms = `a_{110}=0`/`a_{120}=|C₁|`/`ω(C_s)=α` const/`(|C₁|,p)=1` の構造定数計算のみ)。
 - [x] (2026-05-30) **(6.7.3) 合同算術 assembly** を `ClassSumAlgebra.lean` + cancellation infra を
       `AlgInt.lean` に landing (commits 27ed939, 2be1cc3, AxiomsCheck 登録)。(6.7.3) を group-theory atoms
       (`a_{110}=0`, `a_{120}=|C₁|`, `z⁻¹∤z`, `ω(C_s)=α` const) を仮説とする **conditional** assembly に還元:

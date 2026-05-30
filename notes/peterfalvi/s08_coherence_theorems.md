@@ -329,6 +329,24 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   (iii) `ω(C_s)=α` が `C_s∩Z^#≠∅` 上不変 (`ψ(z),|C_L(z)|` の z∈Z^# 不変性から) + `ω(C_0)=1` で右辺 collapse;
 >   (iv) `(|C_1|,p)=1` (= `IsCoprime |C_1| |P|`).
 
+> **進捗 2026-05-30 ((6.7.2) geometric form — abstract `hdvd` を (6.7) setup から放電)**:
+> `ClassSumAlgebra.lean` (`section ClassCongruence`) に
+> **`centralCharacterOfRep_classSum_mul_cong_of_isTISubset`** を landing (AxiomsCheck 登録, 3 axioms 全
+> allowlist 内). これは抽象版 `centralCharacterOfRep_classSum_mul_cong` (仮説 `hdvd : ∀ Cs, ¬inZ Cs →
+> m ∣ classSumCoeff` を要求) を **実 (6.7) setup** へ特殊化したもの:
+> - 仮説: Sylow `p`-subgroup `P`, `Z ≤ P` で `Z ⊴ L=N_G(P)` (`hZnormal`), `P^#=P∖{1}` TI-subset
+>   (`hti : IsTISubset (P∖{1}) (N_G(P))`), source class `C_i,C_j` が `Z^#` と交わる (`hCi`/`hCj`).
+> - 設定: `m := |P| = Nat.card P` (≠0: `Nat.card_pos`, P は群 nonempty + finite), 
+>   `inZ Cs := ∃ w, ⟦w⟧=Cs ∧ w∈Z` (= Peterfalvi の `C_s∩Z≠∅`; `open Classical in` で statement の
+>   `Finset.filter` の `DecidablePred` を供給, `omit [DecidableEq G]`).
+> - `hdvd` の放電が新規部分: `¬inZ C_s` は `∀ w, ⟦w⟧=Cs → w∉Z` と同値 = (6.7.1)
+>   `fixedPointFree_classPair_of_isTISubset` の `hCs` 仮説そのもの. それで fixed-point-free を得て (6.7.1)
+>   counting `card_dvd_classSumCoeff_of_fixedPointFree` に流すと `|P| ∣ a_{ijs}|C_s|` (ℕ);
+>   `exact_mod_cast` で ℤ. これで **(6.7.1) fixed-point-free + counting + (6.7.2) product rule を 1 定理に
+>   合成**, (6.7.3) の geometric source `h11`/`h12` (`ψ(1)α²≡ψ(1)(a_{ij0}+a_{ij}α)`) が立つ.
+>   残 atoms = 上記 (i)`a_{110}=0`/`a_{120}=|C₁|` 構造定数 + (iii)`ω(C_s)=α` const + (iv)`(|C₁|,p)=1` のみ
+>   (= 純粋に構造定数・指標値の計算; fixed-point-free の group-theory は本定理で解消済).
+
 > **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
 > (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
 > `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
