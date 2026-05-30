@@ -1139,6 +1139,57 @@ theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
   haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
   exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hconj hB) hα
 
+/-- `IsComplement'.QuotientMulEquiv` is a retraction onto the complement: on the class of a
+complement element `x : H`, it returns `x` (`QuotientMulEquiv.symm x = mk' ↑x`). -/
+theorem _root_.Subgroup.IsComplement'.QuotientMulEquiv_mk'_coe {G' : Type*} [Group G']
+    {H K : Subgroup G'} [K.Normal] (h : H.IsComplement' K) (x : H) :
+    h.QuotientMulEquiv (QuotientGroup.mk' K (x : G')) = x := by
+  rw [show (QuotientGroup.mk' K (x : G')) = h.QuotientMulEquiv.symm x from rfl,
+    MulEquiv.apply_symm_apply]
+
+/-- **`f_B` retracts `N_L(B)`.**  For `m ∈ M(B)` whose underlying element lies in `N_L(B)`,
+`f_B(m) = m` (in `L`).  Together with `ker f_B = H(B)` this pins down `f_B` on the
+semidirect factors. -/
+theorem dadeQuotientHom_coe_of_mem_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) (hm : (m : G) ∈ nLStabilizerIn hyp B) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) = (m : G) := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  set κ : (nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB) :=
+    ⟨m, (Subgroup.mem_subgroupOf).mpr hm⟩ with hκ
+  have hmk : (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv
+      (QuotientGroup.mk' _ m) = κ := by
+    rw [show (m : mBSubgroup hyp B hB) = ((κ : (nLStabilizerIn hyp B).subgroupOf _) :
+        mBSubgroup hyp B hB) from rfl]
+    exact (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv_mk'_coe κ
+  simp only [dadeQuotientHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hmk,
+    Subgroup.coe_inclusion]
+  rfl
+
+/-- **Peterfalvi (2.9), defining equation.**  For `h ∈ H(B)`, `b ∈ N_L(B)`, the class
+function `α_B = α ∘ f_B` satisfies `α_B(h·b) = α(b)`.  Indeed `f_B(h·b) = f_B(h)·f_B(b) =
+1·b = b`, since `H(B) = ker f_B` and `f_B` retracts `N_L(B)`. -/
+theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    {h b : G} (hh : h ∈ hIntersection hyp B hB) (hb : b ∈ nLStabilizerIn hyp B)
+    (hmem : h * b ∈ mBSubgroup hyp B hB) :
+    alphaB hyp hconj hB α ⟨h * b, hmem⟩
+      = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+  have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+  have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
+  have hsplit : (⟨h * b, hmem⟩ : mBSubgroup hyp B hB)
+      = (⟨h, hhM⟩ : mBSubgroup hyp B hB) * ⟨b, hbM⟩ := rfl
+  have hfh : hyp.dadeQuotientHom hconj hB ⟨h, hhM⟩ = 1 := by
+    rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf]
+    exact hh
+  have hval : hyp.dadeQuotientHom hconj hB ⟨b, hbM⟩
+      = ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+    apply Subtype.ext
+    exact hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB ⟨b, hbM⟩ hb
+  show α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
+  rw [hsplit, map_mul, hfh, one_mul, hval]
+
 end SemidirectStructure
 
 end Hypothesis
