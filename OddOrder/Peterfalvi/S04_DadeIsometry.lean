@@ -1622,6 +1622,69 @@ theorem exists_nLStabilizerIn_alphaB_induceTerm (hyp : Hypothesis G A L)
 
 end PointwiseValue
 
+/- 2.10/2.6.b: The right-hand side of the inclusion–exclusion is a virtual character. -/
+
+section VirtualCharacterRHS
+
+/-- **Peterfalvi (2.6.b), each summand is a virtual character.**  For `α ∈ ℤ[Irr L]` and a
+nonempty `B ⊆ A`, the induced class function `Ind_{M(B)}^G α_B` lies in `ℤ[Irr G]`.
+
+This is the building block of the (2.10) inclusion–exclusion's right-hand side
+`-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)}^G α_B`: each term is a virtual character, so any
+`ℤ`-linear (in particular alternating) combination is one too.  It chains the (2.9)
+pullback `alphaB_mem_ZIrr` (`α_B = α ∘ f_B ∈ ℤ[Irr M(B)]`) with the induction lemma
+`ClassFunction.induce_mem_ZIrr` (induction preserves `ℤ[Irr]`). -/
+theorem induce_alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    [Invertible (Nat.card G : ℂ)]
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
+    (hα : α ∈ ZIrr L) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] :
+    ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hconj hB α) ∈ ZIrr G := by
+  haveI : Fintype (mBSubgroup hyp B hB) := Fintype.ofFinite _
+  exact ClassFunction.induce_mem_ZIrr (mBSubgroup hyp B hB)
+    (hyp.alphaB_mem_ZIrr hconj hB hα)
+
+/-- **Peterfalvi (2.10), an inclusion–exclusion summand `Ind_{M(B)}^G α_B`.**  Packaged as a
+`ClassFunction G ℂ` carrying its own `Invertible (|M(B)| : ℂ)` instance (supplied from
+`Nat.card_pos`), so the (2.10) right-hand side `-∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` can be
+formed as an ordinary `Finset` sum without threading invertibility through each binder.  The
+subset `B` is carried together with its nonemptiness proof as the subtype `{B // B.Nonempty}`. -/
+noncomputable def induceAlphaBTerm (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (α : ClassFunction L ℂ) (p : {B : Finset {a : G // a ∈ A} // B.Nonempty}) :
+    ClassFunction G ℂ :=
+  letI : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  ClassFunction.induce (mBSubgroup hyp p.1 p.2) (alphaB hyp hconj p.2 α)
+
+/-- **Peterfalvi (2.6.b), each packaged summand is a virtual character.**  For `α ∈ ℤ[Irr L]`,
+the term `induceAlphaBTerm` lies in `ℤ[Irr G]` — the `induce_alphaB_mem_ZIrr` content with the
+invertibility instance pinned to the one carried by `induceAlphaBTerm`. -/
+theorem induceAlphaBTerm_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    [Invertible (Nat.card G : ℂ)] {α : ClassFunction L ℂ} (hα : α ∈ ZIrr L)
+    (p : {B : Finset {a : G // a ∈ A} // B.Nonempty}) :
+    hyp.induceAlphaBTerm hconj α p ∈ ZIrr G := by
+  letI : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact hyp.induce_alphaB_mem_ZIrr hconj p.2 hα
+
+/-- **Peterfalvi (2.10)/(2.6.b), the right-hand side is a virtual character.**  Any finite
+`ℤ`-linear combination `∑_{p ∈ s} c p • Ind_{M(B)}^G α_B` of the inclusion–exclusion summands
+(`induceAlphaBTerm`) is a virtual character of `G`.
+
+This is part (d) of the (2.6.b) program: granting the (2.10) identity
+`α^τ = -∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` (the special case `c B = -(-1)^{|B|}` and
+`s = ℬ`), the right-hand side, hence `α^τ`, lies in `ℤ[Irr G]`.  Immediate from
+`Submodule.sum_mem` / `Submodule.smul_mem` over `induceAlphaBTerm_mem_ZIrr`. -/
+theorem zsmul_induceAlphaBTerm_sum_mem_ZIrr (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) [Invertible (Nat.card G : ℂ)]
+    {α : ClassFunction L ℂ} (hα : α ∈ ZIrr L)
+    (s : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty})
+    (c : {B : Finset {a : G // a ∈ A} // B.Nonempty} → ℤ) :
+    (∑ p ∈ s, c p • hyp.induceAlphaBTerm hconj α p) ∈ ZIrr G :=
+  Submodule.sum_mem _ (fun p _ =>
+    Submodule.smul_mem _ _ (hyp.induceAlphaBTerm_mem_ZIrr hconj hα p))
+
+end VirtualCharacterRHS
+
 end SemidirectStructure
 
 end Hypothesis
@@ -1850,6 +1913,31 @@ theorem restrictDomain {τ : DadeMap (G := G) ℂ A L}
     (by simpa using hα)
 
 end PreservesVirtualCharacters
+
+/-- **Peterfalvi (2.6.b), reduced to the (2.10) identity.**  If the explicit Dade map
+`hyp.dadeMap` agrees, on every supported virtual character `α ∈ ℤ[Irr L, A]`, with *some* finite
+`ℤ`-linear combination of inclusion–exclusion summands `Ind_{M(B)}^G α_B` (`induceAlphaBTerm`),
+then `hyp.dadeMap` preserves virtual characters, i.e. satisfies `PreservesVirtualCharacters`.
+
+This isolates the remaining content of (2.6.b) to the (2.10) identity
+`α^τ = -∑_{B ∈ ℬ} (-1)^{|B|} Ind_{M(B)} α_B` itself: once that pointwise identity is available
+(with `s = ℬ` the `L`-conjugacy transversal and `c B = -(-1)^{|B|}`), this lemma upgrades the
+`DadeIsometryData` to a `FullDadeIsometryData`.  Membership of the right-hand side in `ℤ[Irr G]`
+is `zsmul_induceAlphaBTerm_sum_mem_ZIrr`. -/
+theorem preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
+    (hτ : ∀ α : SupportedClassFunctions (G := G) ℂ A L,
+        ((α : ClassFunction L ℂ) ∈ ZIrr L) →
+        ∃ (s : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty})
+          (c : {B : Finset {a : G // a ∈ A} // B.Nonempty} → ℤ),
+          hyp.dadeMap (k := ℂ) α
+            = ∑ p ∈ s, c p • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) :
+    PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
+  intro α hα
+  obtain ⟨s, c, hsum⟩ := hτ α hα
+  rw [hsum]
+  exact hyp.zsmul_induceAlphaBTerm_sum_mem_ZIrr hconj hα s c
 
 variable [StarRing k]
 variable [Fintype G] [Fintype L]

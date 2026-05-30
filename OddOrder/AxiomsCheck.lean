@@ -738,6 +738,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.stabilizer_conjFinsetAction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.transversalRep_conj
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.card_orbit_mul_card_setLStabilizer
+-- Peterfalvi §4 (2.10)/(2.6.b) right-hand-side virtual-character infrastructure: each
+-- inclusion–exclusion summand `Ind_{M(B)}^G α_B` is a virtual character (`induce_alphaB_mem_ZIrr`,
+-- packaged with its own invertibility as `induceAlphaBTerm` / `induceAlphaBTerm_mem_ZIrr`), hence
+-- any ℤ-combination `∑ c_B • Ind_{M(B)} α_B` is one (`zsmul_induceAlphaBTerm_sum_mem_ZIrr`).  The
+-- bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum` reduces (2.6.b) to the
+-- (2.10) identity `α^τ = -∑_{B∈ℬ} (-1)^|B| Ind_{M(B)} α_B`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induce_alphaB_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.induceAlphaBTerm_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.zsmul_induceAlphaBTerm_sum_mem_ZIrr
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
