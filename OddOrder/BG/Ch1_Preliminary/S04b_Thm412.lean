@@ -326,4 +326,192 @@ theorem actionCommutator_inf_fixedPoints_eq_bot
   rw [disjoint_iff] at hdisj
   rw [inf_comm]; exact hdisj
 
+/-- The image of `Ω₁(H)` under `H.subtype` lands in `Ω₁(R)`: a `p`-torsion element of a
+subgroup `H ≤ R` is a `p`-torsion element of `R`. -/
+private theorem omega1_map_subtype_le {R : Type*} [Group R] {p : ℕ} (H : Subgroup R) :
+    (Omega ↥H p 1).map H.subtype ≤ Omega R p 1 := by
+  rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+  rintro ⟨g, hgH⟩ (hg : (⟨g, hgH⟩ : ↥H) ^ (p ^ 1) = 1)
+  rw [SetLike.mem_coe, Subgroup.mem_comap]
+  refine Omega.mem_of_pow_eq_one ?_
+  have := congrArg (Subgroup.subtype H) hg
+  rwa [map_pow, map_one] at this
+
+/-- In a finite `p`-group `R`, if `T ⊓ C = ⊥` and both `Ω₁(T)`, `Ω₁(C)` embed into `Ω₁(R)`
+(true for any subgroups `T, C ≤ R`), then `|Ω₁(T)| · |Ω₁(C)| ≤ |Ω₁(R)|`. The products
+`t · c` (`t ∈ Ω₁(T)`, `c ∈ Ω₁(C)`) are distinct (`Subgroup.mul_injective_of_disjoint`,
+using `T ⊓ C = ⊥`) and lie in the subgroup `Ω₁(R)`. -/
+private theorem card_omega1_mul_le_of_disjoint {R : Type*} [Group R] [Finite R] {p : ℕ}
+    {T C : Subgroup R} (hTC : T ⊓ C = ⊥) :
+    Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) ≤ Nat.card (Omega R p 1) := by
+  classical
+  set WT := (Omega ↥T p 1).map T.subtype with hWT
+  set WC := (Omega ↥C p 1).map C.subtype with hWC
+  have hcWT : Nat.card WT = Nat.card (Omega ↥T p 1) :=
+    Subgroup.card_map_of_injective T.subtype_injective
+  have hcWC : Nat.card WC = Nat.card (Omega ↥C p 1) :=
+    Subgroup.card_map_of_injective C.subtype_injective
+  have hWT_le : WT ≤ Omega R p 1 := omega1_map_subtype_le T
+  have hWC_le : WC ≤ Omega R p 1 := omega1_map_subtype_le C
+  -- `WT ≤ T`, `WC ≤ C`, so `WT ⊓ WC ≤ T ⊓ C = ⊥`.
+  have hWTT : WT ≤ T := by
+    rw [hWT, Subgroup.map_le_iff_le_comap]; intro x _; rw [Subgroup.mem_comap]; exact x.2
+  have hWCC : WC ≤ C := by
+    rw [hWC, Subgroup.map_le_iff_le_comap]; intro x _; rw [Subgroup.mem_comap]; exact x.2
+  have hdisj : Disjoint WT WC := by
+    rw [disjoint_iff]
+    exact le_antisymm (le_trans (inf_le_inf hWTT hWCC) (le_of_eq hTC)) bot_le
+  -- the multiplication `WT × WC → Ω₁(R)` is injective.
+  have hinj : Function.Injective
+      (fun g : WT × WC => (⟨(g.1 : R) * (g.2 : R),
+        (Omega R p 1).mul_mem (hWT_le g.1.2) (hWC_le g.2.2)⟩ : Omega R p 1)) := by
+    intro a b hab
+    have hab' : (a.1 : R) * (a.2 : R) = (b.1 : R) * (b.2 : R) := by
+      have := congrArg (Subtype.val) hab; simpa using this
+    exact Subgroup.mul_injective_of_disjoint hdisj hab'
+  calc Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1)
+      = Nat.card WT * Nat.card WC := by rw [hcWT, hcWC]
+    _ = Nat.card (WT × WC) := (Nat.card_prod _ _).symm
+    _ ≤ Nat.card (Omega R p 1) := Nat.card_le_card_of_injective _ hinj
+
+/-- A nontrivial finite `p`-group `H` has `p ≤ |Ω₁(H)|`: Cauchy gives an order-`p` element,
+which generates an order-`p` subgroup of `Ω₁(H)`. -/
+private theorem prime_le_card_omega1 {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (hH : IsPGroup p H) (hne : Nontrivial H) : p ≤ Nat.card (Omega H p 1) := by
+  classical
+  haveI : Fintype H := Fintype.ofFinite H
+  have hpH : p ∣ Nat.card H := by
+    rcases hH.card_eq_or_dvd with h1 | hd
+    · exact absurd h1 (by simpa using (Finite.one_lt_card (α := H)).ne')
+    · exact hd
+  have hpH' : p ∣ Fintype.card H := by rwa [Nat.card_eq_fintype_card] at hpH
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := H) p hpH'
+  have hxp : x ^ p = 1 := by rw [← hx]; exact pow_orderOf_eq_one x
+  have hxmem : x ∈ Omega H p 1 := Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hxp)
+  have hsub : Subgroup.zpowers x ≤ Omega H p 1 := by
+    rw [Subgroup.zpowers_le]; exact hxmem
+  have hcard : Nat.card (Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hx]
+  calc p = Nat.card (Subgroup.zpowers x) := hcard.symm
+    _ ≤ Nat.card (Omega H p 1) := Subgroup.card_le_of_le hsub
+
+set_option maxHeartbeats 1000000 in
+/-- **BG Theorem 4.12(c)** (Huppert), faithful form. `references/bg/local-analysis.mmd` L1616-1622.
+
+With `T := [R, A] = actionCommutator φ` and `C := C_R(A) = fixedPointsOfMulAut φ`, under the
+**textbook standing assumption** `1 ⊊ [R, A] ⊊ R` (mmd L1618: "By (a), `1 ⊂ T ⊂ R`"), the
+subgroups `T` and `C` are cyclic and `R′ ⊆ T`.
+
+The strict inclusions `hT_ne_bot : T ≠ ⊥` and `hT_ne_top : T ≠ ⊤` are *genuinely required*:
+without them part (c) is false (e.g. `p = 3`, `R = (ℤ/3)²`, `A = ℤ/2` by inversion gives
+`[R, A] = R` non-cyclic; the trivial action gives `[R, A] = ⊥`, `C = R` non-cyclic). They are
+the Nougat-dropped hypotheses of the BG statement line (L1589), not hoisted proof obligations.
+
+mmd L1616-1622: "By (a), `1 ⊂ T ⊂ R`, so `C_R(A) ≠ 1`. By (b), `T ∩ C_R(A) = 1`, therefore
+`|Ω₁(R)| ≥ |Ω₁(T)||Ω₁(C_R(A))| ≥ p²`. By Lemma 4.10, `|Ω₁(R)| ≤ p²`. Thus
+`|Ω₁(T)| = |Ω₁(C_R(A))| = p`. By Lemma 4.5, `T` and `C_R(A)` are cyclic. Since `T ⊴ R` and
+`R = T C_R(A)`, we obtain `R′ ⊆ T`."
+
+Proof structure:
+* If `R` is cyclic, `T` and `C` are cyclic (subgroups of a cyclic group) and `R′ = ⊥ ≤ T`.
+* Otherwise (`R` non-cyclic): Lemma 4.10 gives `Ω₁(R)` elementary abelian of order `p²`.
+  Part (b) gives `T ∩ C = ⊥`; Prop 1.6(a) gives `R = C ⊔ T`, whence `C ≠ ⊥` (else `T = ⊤`).
+  Both `T, C` nontrivial `p`-groups give `p ≤ |Ω₁(T)|, |Ω₁(C)|`; the disjoint product embeds
+  into `Ω₁(R)` (`card_omega1_mul_le_of_disjoint`), so `|Ω₁(T)| = |Ω₁(C)| = p` by squeezing.
+  Lemma 4.5 (`isCyclic_of_card_omega1_le_prime`) makes `T, C` cyclic. Finally `T ⊴ R`
+  (`actionCommutator.normal`) and `R = C ⊔ T` with `C` cyclic give `R′ ⊆ T`.
+
+**BG §4** Thm 4.12(c). Huppert, _Endliche Gruppen I_ (1967), Satz III.13.5. -/
+theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) (hAsolv : IsSolvable A)
+    (hT_ne_bot : OddOrder.Isaacs.Ch04.actionCommutator φ ≠ ⊥)
+    (hT_ne_top : OddOrder.Isaacs.Ch04.actionCommutator φ ≠ ⊤) :
+    IsCyclic (OddOrder.Isaacs.Ch04.actionCommutator φ) ∧
+    IsCyclic (Subgroup.fixedPointsOfMulAut φ) ∧
+    commutator R ≤ OddOrder.Isaacs.Ch04.actionCommutator φ := by
+  classical
+  set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
+  set C : Subgroup R := Subgroup.fixedPointsOfMulAut φ with hC_def
+  haveI : T.Normal := OddOrder.Isaacs.Ch04.actionCommutator.normal φ
+  -- `T ⊓ C = ⊥` (part (b)).
+  have hb : T ⊓ C = ⊥ :=
+    actionCommutator_inf_fixedPoints_eq_bot hp_odd hR hmeta hcop hAsolv
+  -- `R = C ⊔ T` (Prop 1.6(a)).
+  have hsup : C ⊔ T = ⊤ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top hcop (Or.inl hAsolv)
+  -- `T` and `C` are `p`-groups.
+  have hT_pg : IsPGroup p ↥T := hR.to_subgroup T
+  have hC_pg : IsPGroup p ↥C := hR.to_subgroup C
+  -- `R′ ⊆ T`: `R = C ⊔ T`, `T ⊴ R`, and once `C` is cyclic (hence abelian) `R/T` is abelian.
+  -- We first dispose of the cyclic case, then prove `C` cyclic in the generic case.
+  by_cases hRcyc : IsCyclic R
+  · -- `R` cyclic ⇒ every subgroup is cyclic, `R′ = ⊥`.
+    haveI : IsCyclic R := hRcyc
+    haveI : IsCyclic ↥T := Subgroup.isCyclic T
+    haveI : IsCyclic ↥C := Subgroup.isCyclic C
+    letI : CommGroup R := IsCyclic.commGroup
+    refine ⟨inferInstance, inferInstance, ?_⟩
+    rw [commutator_eq_bot R]; exact bot_le
+  · -- `R` non-cyclic: the squeeze argument.
+    -- `C ≠ ⊥` (else `R = C ⊔ T = T`, i.e. `T = ⊤`).
+    have hC_ne_bot : C ≠ ⊥ := by
+      intro hC0
+      rw [hC0, bot_sup_eq] at hsup
+      exact hT_ne_top hsup
+    haveI hT_nt : Nontrivial ↥T := T.nontrivial_iff_ne_bot.mpr hT_ne_bot
+    haveI hC_nt : Nontrivial ↥C := C.nontrivial_iff_ne_bot.mpr hC_ne_bot
+    -- `|Ω₁(R)| = p²` (Lemma 4.10).
+    obtain ⟨_hΩR_ea, hΩR_card⟩ :=
+      isElementaryAbelian_omega1_of_isMetacyclic hR hp_odd hmeta hRcyc
+    -- lower bounds `p ≤ |Ω₁(T)|`, `p ≤ |Ω₁(C)|`.
+    have hlb_T : p ≤ Nat.card (Omega ↥T p 1) := prime_le_card_omega1 hT_pg hT_nt
+    have hlb_C : p ≤ Nat.card (Omega ↥C p 1) := prime_le_card_omega1 hC_pg hC_nt
+    -- product bound `|Ω₁(T)| · |Ω₁(C)| ≤ |Ω₁(R)| = p²`.
+    have hprod_le : Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) ≤ p ^ 2 := by
+      rw [← hΩR_card]; exact card_omega1_mul_le_of_disjoint hb
+    -- squeeze: `p · p ≤ |Ω₁(T)| · |Ω₁(C)| ≤ p²`, forcing `|Ω₁(T)| = |Ω₁(C)| = p`.
+    have hprod_ge : p * p ≤ Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) :=
+      Nat.mul_le_mul hlb_T hlb_C
+    have hΩT_p : Nat.card (Omega ↥T p 1) = p := by
+      by_contra hne
+      have hgt : p < Nat.card (Omega ↥T p 1) := lt_of_le_of_ne hlb_T (Ne.symm hne)
+      have : p ^ 2 < Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) := by
+        calc p ^ 2 = p * p := sq p
+          _ < Nat.card (Omega ↥T p 1) * p :=
+              (Nat.mul_lt_mul_right (Fact.out : p.Prime).pos).mpr hgt
+          _ ≤ Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) :=
+              Nat.mul_le_mul_left _ hlb_C
+      exact absurd hprod_le (not_le.mpr this)
+    have hΩC_p : Nat.card (Omega ↥C p 1) = p := by
+      by_contra hne
+      have hgt : p < Nat.card (Omega ↥C p 1) := lt_of_le_of_ne hlb_C (Ne.symm hne)
+      have : p ^ 2 < Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) := by
+        calc p ^ 2 = p * p := sq p
+          _ < p * Nat.card (Omega ↥C p 1) :=
+              (Nat.mul_lt_mul_left (Fact.out : p.Prime).pos).mpr hgt
+          _ ≤ Nat.card (Omega ↥T p 1) * Nat.card (Omega ↥C p 1) :=
+              Nat.mul_le_mul_right _ hlb_T
+      exact absurd hprod_le (not_le.mpr this)
+    -- `T`, `C` cyclic (Lemma 4.5).
+    have hTcyc : IsCyclic ↥T := isCyclic_of_card_omega1_le_prime hT_pg hp_odd (le_of_eq hΩT_p)
+    have hCcyc : IsCyclic ↥C := isCyclic_of_card_omega1_le_prime hC_pg hp_odd (le_of_eq hΩC_p)
+    -- `R′ ⊆ T`: `C` cyclic (abelian) and `R = C ⊔ T`, `T ⊴ R` ⇒ `R/T` abelian.
+    refine ⟨hTcyc, hCcyc, ?_⟩
+    letI : CommGroup ↥C := hCcyc.commGroup
+    rw [← Subgroup.Normal.quotient_commutative_iff_commutator_le]
+    have hsurj : Function.Surjective ((QuotientGroup.mk' T).comp C.subtype) := by
+      rw [← MonoidHom.range_eq_top, MonoidHom.range_comp, Subgroup.range_subtype]
+      have hmap : (C ⊔ T).map (QuotientGroup.mk' T) = C.map (QuotientGroup.mk' T) := by
+        rw [Subgroup.map_sup, QuotientGroup.map_mk'_self, sup_bot_eq]
+      rw [← hmap, hsup, Subgroup.eq_top_iff']
+      intro y
+      obtain ⟨r, rfl⟩ := QuotientGroup.mk'_surjective T y
+      exact Subgroup.mem_map_of_mem _ (Subgroup.mem_top r)
+    refine ⟨⟨fun x y => ?_⟩⟩
+    obtain ⟨a, rfl⟩ := hsurj x
+    obtain ⟨b, rfl⟩ := hsurj y
+    rw [← map_mul, ← map_mul, mul_comm a b]
+
 end OddOrder.BG.Ch1.S04b
