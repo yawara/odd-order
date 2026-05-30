@@ -236,12 +236,18 @@ variable {n : ℕ} [NeZero n]
   rw [data.d_zero, one_smul, sub_self, map_zero]
 
 /-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
-together with the orthonormality of the input family `ζ` (in `S`) and the support of
-each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`. -/
+together with the membership `ζ_t ∈ S`, the orthonormality of the input family `ζ`,
+and the support of each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`.
+
+The orthonormality of the images `χ_t = ν(ζ_t)` uses the **lattice-relative**
+isometry `hτ.extension_inner_eq` on the generators `ζ_t ∈ S ⊆ Z[S] = zSpan S`
+(`Submodule.subset_span`); this is all the weakened `IsCoherent` interface
+supplies, and all it needs to. -/
 noncomputable def ofIsCoherent
     {S : Set (ClassFunction L ℂ)} {A : Set L}
     (hτ : OddOrder.Peterfalvi.S07.IsCoherent (L := L) (G := G) τ S A)
     {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ S)
     (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
     (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u → ClassFunction.inner (ζ t) (ζ u) = 0)
     {d : Fin n → ℤ} (hd_zero : d 0 = 1)
@@ -249,8 +255,12 @@ noncomputable def ofIsCoherent
       OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A) :
     IndChainDecomposition (L := L) (G := G) τ ζ d where
   χ t := hτ.extension (ζ t)
-  norm_one t := by rw [hτ.extension_inner_eq, hζ_norm]
-  pairwise_inner_zero t u htu := by rw [hτ.extension_inner_eq, hζ_pairwise htu]
+  norm_one t := by
+    rw [hτ.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem t)), hζ_norm]
+  pairwise_inner_zero t u htu := by
+    rw [hτ.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem u)), hζ_pairwise htu]
   d_zero := hd_zero
   image_eq t := by
     rw [← hτ.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul]

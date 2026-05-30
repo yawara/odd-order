@@ -1073,20 +1073,32 @@ set_option linter.style.longLine false in
 -- requiring `X,X̄ ⊥ τ₁ ξ` only for `ξ ∈ M ⊥ {χ,χ̄}`.  For `M = span_ℂ(S₁∪{χ,χ̄})` the residual of
 -- `φ∈M` lies in `span_ℂ S₁`, so this is the honest (5.5)+(5.2.e) `X,X̄ ⊥ S₁^{τ₁}` (not the
 -- over-strong global version that forces `X,X̄ ∈ span{τ₁χ,τ₁χ̄}`).  This is the (5.6.3) *lattice*
--- isometry `Z[S₁∪{χ,χ̄}] → Z[Irr G]`; the lift to the *global* `IsCoherent.extension_isometry` is a
--- separate (Witt/unitary subspace-isometry extension) brick.
+-- isometry `Z[S₁∪{χ,χ̄}] → Z[Irr G]`.  The weakened `IsCoherent.extension_inner_eq` is the
+-- *integral-span* form below (`retarget_inner_eq_on_zSpan_union`), needing only the `ℤ[S₁]`-isometry
+-- of `τ₁` — no global lift is required (and none exists in FT, where `dim CF(L) > dim CF(G)`).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_inner_eq_on
+-- (5.6.3) integral-span keystone (the honest realization of `IsCoherent.extension_inner_eq`): the
+-- re-targeting preserves `⟨·,·⟩` on all of `ℤ[S₁∪{χ,χ̄}]`, using only the `ℤ[S₁]`-isometry of
+-- `τ₁ = hS₁.extension` and the lattice orthogonality `X,X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`.  Every
+-- Gram–Schmidt residual of `φ∈ℤ[S₁∪{χ,χ̄}]` lands in `ℤ[S₁]` (`orthoResidualMap_mem_zSpan`), so the
+-- block expansion closes with no global-isometry input — directly feeding the weakened `IsCoherent`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.orthoResidualMap_mem_zSpan
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_inner_eq_on_zSpan_union
 -- (5.6.1) family bundle: the source-side cross-difference orthogonality
 -- `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²`, derived (not posited) from `χ ⊥ S₁` + pairwise orthogonality.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterFamilyBundle.crossDifference_inner
--- (5.6.3) MAIN coherence-union assembly: `IsCoherent (S₁ ∪ {χ,χ̄}) A`.  CONSTRUCTS the extension
--- `τ₂ := retarget τ₁ χ χ̄ X X̄`, proves it a global integral isometry (keystone
--- `retarget_isIntegralIsometry`), and discharges `extends_on_supported` by agreement on the three
--- difference generators `{χ−χ̄, χ−a·χ₁} ∪ Z[S₁,L^#]` (`eq_on_zSpan_of_eq_on`).  The data threaded
--- in are the honest (5.4)/(5.5)/(5.6.2) outputs (orthonormal `{X,X̄}`, `X̄ = X−(χ−χ̄)^τ`, the
--- (5.5)+(5.2.e) orthogonality, the (5.6.2) image equation) plus the (5.1)-type generation `hgen`.
+-- (5.6.3) MAIN coherence-union assembly (general (5.6), UNCONDITIONAL): `IsCoherent (S₁ ∪ {χ,χ̄}) A`.
+-- CONSTRUCTS the extension `τ₂ := retarget τ₁ χ χ̄ X X̄`, proves it a *lattice* isometry on
+-- `ℤ[S₁∪{χ,χ̄}]` (`retarget_inner_eq_on_zSpan_union`, the weakened `extension_inner_eq` field — no
+-- global isometry, none exists in FT), and discharges `extends_on_supported` by agreement on the
+-- three difference generators `{χ−χ̄, χ−a·χ₁} ∪ Z[S₁,L^#]` (`eq_on_zSpan_of_eq_on`).  The data
+-- threaded in are the honest (5.4)/(5.5)/(5.6.2) outputs (orthonormal `{X,X̄}`, `X̄ = X−(χ−χ̄)^τ`, the
+-- *lattice* (5.5)+(5.2.e) orthogonality `X,X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`, the (5.6.2) image equation)
+-- plus the (5.1)-type generation `hgen`.  No special-position restriction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent
 -- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
 -- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any

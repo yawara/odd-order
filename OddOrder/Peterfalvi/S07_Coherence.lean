@@ -825,14 +825,25 @@ theorem eq_sum_of_psi_eq_zero
 end CharacterPsiDecomposition
 
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
-isometric extension on `Z[S]` that agrees with `τ` on `Z[S,A]`. -/
+extension on `Z[S]` that is **isometric on the lattice `Z[S]`** and agrees with
+`τ` on `Z[S,A]`.
+
+The isometry hypothesis is **lattice-relative** (`extension_inner_eq`, restricted
+to `φ, ψ ∈ Z[S] = zSpan S`), not a global `IsIntegralIsometry` on all of `CF(L)`.
+This is the object Peterfalvi actually constructs in (5.6): in Feit–Thompson
+`dim CF(L) > dim CF(G)`, so a global isometry of the character-difference lattice
+into `CF(G)` generically does not exist, but the lattice-relative one
+(`retarget_inner_eq_on`) does.  Every downstream consumer uses only the
+inner-product preservation on lattice elements `ζ ∈ S ⊆ Z[S]`. -/
 structure IsCoherent (τ : IntegralCharacterMap L G)
     (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
   nonzero : ∃ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A ∧ φ ≠ 0
   extension : IntegralCharacterMap L G
-  extension_isometry : IsIntegralIsometry (L := L) (G := G) extension
+  extension_inner_eq :
+    ∀ φ ψ : ClassFunction L ℂ, φ ∈ zSpan (L := L) S → ψ ∈ zSpan (L := L) S →
+      ClassFunction.inner (extension φ) (extension ψ) = ClassFunction.inner φ ψ
   extends_on_supported :
     ∀ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A → extension φ = τ φ
 
@@ -851,19 +862,13 @@ theorem extension_agrees (hτ : IsCoherent τ S A)
     hτ.extension φ = τ φ :=
   hτ.extends_on_supported φ hφ
 
-theorem extension_inner_eq (hτ : IsCoherent τ S A)
-    (φ ψ : ClassFunction L ℂ) :
-    ClassFunction.inner (hτ.extension φ) (hτ.extension ψ) =
-      ClassFunction.inner φ ψ :=
-  hτ.extension_isometry.inner_eq φ ψ
-
 theorem inner_eq_on_supported (hτ : IsCoherent τ S A)
     {φ ψ : ClassFunction L ℂ}
     (hφ : φ ∈ zSupportedSpan (L := L) S A)
     (hψ : ψ ∈ zSupportedSpan (L := L) S A) :
     ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ := by
   rw [← hτ.extension_agrees hφ, ← hτ.extension_agrees hψ]
-  exact hτ.extension_inner_eq φ ψ
+  exact hτ.extension_inner_eq φ ψ hφ.1 hψ.1
 
 end IsCoherent
 
@@ -1477,6 +1482,117 @@ theorem retarget_inner_eq_on {τ₁ : IntegralCharacterMap L G}
       hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
   rw [himg, hsrc, hτ₁ φperp ψperp hφperpM hψperpM]
 
+/-- The Gram–Schmidt residual against an orthonormal pair `{χ, χ̄}` carries
+`ℤ[S₁ ∪ {χ, χ̄}]` into `ℤ[S₁]`, provided `χ, χ̄ ⊥ S₁`.
+
+For a generator `x ∈ S₁` the residual is `x` itself (`x ⊥ {χ, χ̄}`); for `x = χ`
+(resp. `χ̄`) it is `0`; and `orthoResidualMap` is `ℤ`-linear, so the property
+propagates over the `ℤ`-span by `span_induction`.  This is the lattice fact making
+the re-targeting an isometry on the *integral* span `ℤ[S₁ ∪ {χ, χ̄}]` using only
+the coherence isometry of `τ₁` on `ℤ[S₁]`. -/
+theorem orthoResidualMap_mem_zSpan {χ chibar : ClassFunction L ℂ}
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ (S₁ ∪ {χ, chibar})) :
+    orthoResidualMap (L := L) χ chibar φ ∈ Submodule.span ℤ S₁ := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      rcases hx with hxS1 | hxpair
+      · -- `x ∈ S₁`: residual is `x ∈ ℤ[S₁]` since `x ⊥ {χ, χ̄}`.
+        have hxχ : ClassFunction.inner x χ = 0 := by
+          rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_S1 x hxS1, star_zero]
+        have hxχbar : ClassFunction.inner x chibar = 0 := by
+          rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_S1 x hxS1, star_zero]
+        rw [orthoResidualMap_apply, hxχ, hxχbar, zero_smul, zero_smul, sub_zero, sub_zero]
+        exact Submodule.subset_span hxS1
+      · rcases hxpair with rfl | rfl
+        · -- `x = χ`: residual is `0`.
+          rw [orthoResidualMap_apply, hχχ, hχχbar, one_smul, zero_smul, sub_zero, sub_self]
+          exact Submodule.zero_mem _
+        · -- `x = χ̄`: residual is `0`.
+          rw [orthoResidualMap_apply, hχbarχ, hχbarχbar, one_smul, zero_smul, sub_zero,
+            sub_self]
+          exact Submodule.zero_mem _
+  | zero => rw [map_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ a ih
+
+/-- **The integral-span re-targeting isometry (the genuine (5.6.3) lattice isometry).**
+
+The honestly-satisfiable companion of `retarget_inner_eq_on`, stated over the *integral*
+span `ℤ[S₁ ∪ {χ, χ̄}]` instead of a complex submodule.  Re-targeting an isometry `τ₁` (here only
+required isometric on `ℤ[S₁]` — exactly the coherence isometry of `S₁`) preserves `⟨·,·⟩` on all of
+`ℤ[S₁ ∪ {χ, χ̄}]`, given:
+
+* `{χ, χ̄}` orthonormal with `χ, χ̄ ⊥ S₁`, and the target pair `{X, X̄}` orthonormal in `ℤ[Irr G]`;
+* the honest `(5.5)+(5.2.e)` orthogonality `X, X̄ ⊥ τ₁ ξ` for **`ξ ∈ ℤ[S₁]`** (not the over-strong
+  global version, and not posited beyond the lattice `S₁^{τ₁}`).
+
+Every Gram–Schmidt residual of `φ ∈ ℤ[S₁ ∪ {χ, χ̄}]` lands in `ℤ[S₁]`
+(`orthoResidualMap_mem_zSpan`), so the block expansion `inner_block_expand` closes the proof using
+only the `ℤ[S₁]`-isometry of `τ₁` and the lattice orthogonality.  This is what realizes the weakened
+`IsCoherent.extension_inner_eq` for the union `S₁ ∪ {χ, χ̄}`. -/
+theorem retarget_inner_eq_on_zSpan_union [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {τ₁ : IntegralCharacterMap L G} {χ chibar : ClassFunction L ℂ}
+    {X Xbar : ClassFunction G ℂ} {S₁ : Set (ClassFunction L ℂ)}
+    (hτ₁ : ∀ u v : ClassFunction L ℂ, u ∈ Submodule.span ℤ S₁ → v ∈ Submodule.span ℤ S₁ →
+      ClassFunction.inner (τ₁ u) (τ₁ v) = ClassFunction.inner u v)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hXX : ClassFunction.inner X X = 1) (hXbarXbar : ClassFunction.inner Xbar Xbar = 1)
+    (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (τ₁ ξ) X = 0)
+    (hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (τ₁ ξ) Xbar = 0)
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ Submodule.span ℤ (S₁ ∪ {χ, chibar}))
+    (hψ : ψ ∈ Submodule.span ℤ (S₁ ∪ {χ, chibar})) :
+    ClassFunction.inner (retarget τ₁ χ chibar X Xbar φ) (retarget τ₁ χ chibar X Xbar ψ) =
+      ClassFunction.inner φ ψ := by
+  set s := ClassFunction.inner φ χ with hs
+  set t := ClassFunction.inner φ chibar with ht
+  set s' := ClassFunction.inner ψ χ with hs'
+  set t' := ClassFunction.inner ψ chibar with ht'
+  set φperp := orthoResidualMap (L := L) χ chibar φ with hφperp
+  set ψperp := orthoResidualMap (L := L) χ chibar ψ with hψperp
+  -- The residuals lie in `ℤ[S₁]`.
+  have hφperpS1 : φperp ∈ Submodule.span ℤ S₁ :=
+    orthoResidualMap_mem_zSpan hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1 hφ
+  have hψperpS1 : ψperp ∈ Submodule.span ℤ S₁ :=
+    orthoResidualMap_mem_zSpan hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1 hψ
+  -- Orthogonality of the residuals to `{χ, χ̄}`.
+  have hφperp_χ : ClassFunction.inner φperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ φ
+  have hφperp_χbar : ClassFunction.inner φperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar φ
+  have hψperp_χ : ClassFunction.inner ψperp χ = 0 :=
+    inner_orthoResidualMap_left hχχ hχbarχ ψ
+  have hψperp_χbar : ClassFunction.inner ψperp chibar = 0 :=
+    inner_orthoResidualMap_right hχχbar hχbarχbar ψ
+  -- Image side.
+  have himg : ClassFunction.inner (retarget τ₁ χ chibar X Xbar φ)
+      (retarget τ₁ χ chibar X Xbar ψ) =
+      ClassFunction.inner (τ₁ φperp) (τ₁ ψperp) + s * star s' + t * star t' := by
+    rw [retarget_apply, retarget_apply, ← hφperp, ← hψperp, ← hs, ← ht, ← hs', ← ht']
+    exact inner_block_expand hXX hXbarXbar hXXbar hXbarX
+      (hX_ortho φperp hφperpS1) (hXbar_ortho φperp hφperpS1)
+      (hX_ortho ψperp hψperpS1) (hXbar_ortho ψperp hψperpS1)
+  -- Source side.
+  have hsrc : ClassFunction.inner φ ψ =
+      ClassFunction.inner φperp ψperp + s * star s' + t * star t' := by
+    have hφ' : φ = φperp + s • χ + t • chibar := by
+      rw [hφperp, orthoResidualMap_apply, ← hs, ← ht]; abel
+    have hψ' : ψ = ψperp + s' • χ + t' • chibar := by
+      rw [hψperp, orthoResidualMap_apply, ← hs', ← ht']; abel
+    rw [hφ', hψ']
+    exact inner_block_expand hχχ hχbarχbar hχχbar hχbarχ
+      hφperp_χ hφperp_χbar hψperp_χ hψperp_χbar
+  rw [himg, hsrc, hτ₁ φperp ψperp hφperpS1 hψperpS1]
+
 /-! #### Agreement on the supported span
 
 The `extends_on_supported` field of `IsCoherent` for the re-targeted map `τ₂` is discharged by
@@ -1581,10 +1697,8 @@ noncomputable def retarget_isCoherent
     (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
     (hXX : ClassFunction.inner X X = 1) (hXbarXbar : ClassFunction.inner Xbar Xbar = 1)
     (hXXbar : ClassFunction.inner X Xbar = 0) (hXbarX : ClassFunction.inner Xbar X = 0)
-    (hX_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
-      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (hS₁.extension ξ) X = 0)
-    (hXbar_ortho : ∀ ξ : ClassFunction L ℂ, ClassFunction.inner ξ χ = 0 →
-      ClassFunction.inner ξ chibar = 0 → ClassFunction.inner (hS₁.extension ξ) Xbar = 0)
+    (hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) X = 0)
+    (hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) Xbar = 0)
     (hXbar_def : Xbar = X - τ (χ - chibar))
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
@@ -1603,10 +1717,16 @@ noncomputable def retarget_isCoherent
   have hχbar_zspan : ∀ φ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ S₁ →
       ClassFunction.inner chibar φ = 0 := fun φ hφ =>
     IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hχbar_S1 hφ
-  -- (1) τ₂ is a global integral isometry (the keystone).
-  have hτ₂_isom : IsIntegralIsometry (L := L) (G := G) τ₂ :=
-    retarget_isIntegralIsometry hS₁.extension_isometry hχχ hχbarχbar hχχbar hχbarχ
-      hXX hXbarXbar hXXbar hXbarX hX_ortho hXbar_ortho
+  -- (1) τ₂ preserves `⟨·,·⟩` on the *lattice* `ℤ[S₁ ∪ {χ, χ̄}]` (the genuine (5.6.3) isometry).
+  -- This uses only the `ℤ[S₁]`-isometry of `τ₁ = hS₁.extension` (the coherence of `S₁`) and the
+  -- honest lattice orthogonality `X, X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`; *not* a global isometry.
+  have hτ₂_inner : ∀ φ ψ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) (S₁ ∪ {χ, chibar}) → ψ ∈ zSpan (L := L) (S₁ ∪ {χ, chibar}) →
+      ClassFunction.inner (τ₂ φ) (τ₂ ψ) = ClassFunction.inner φ ψ := by
+    intro φ ψ hφ hψ
+    rw [hτ₂def]
+    exact retarget_inner_eq_on_zSpan_union hS₁.extension_inner_eq hχχ hχbarχbar hχχbar hχbarχ
+      hXX hXbarXbar hXXbar hXbarX hχ_S1 hχbar_S1 hX_ortho hXbar_ortho hφ hψ
   -- (2) Agreement of τ₂ with τ on the three difference generators.
   -- (2a) On χ - χ̄: τ₂(χ-χ̄) = X - X̄ = X - (X - τ(χ-χ̄)) = τ(χ-χ̄).
   have hagree_diff : τ₂ (χ - chibar) = τ (χ - chibar) := by
@@ -1640,7 +1760,7 @@ noncomputable def retarget_isCoherent
       · rw [hy1]; exact hagree_diff
       · rw [hy2]; exact hagree_ratio
   -- (4) Assemble the IsCoherent witness.
-  refine ⟨?_, τ₂, hτ₂_isom, ?_⟩
+  refine ⟨?_, τ₂, hτ₂_inner, ?_⟩
   · -- nonzero: inherited from S₁ ⊆ S₁ ∪ {χ, χ̄}.
     obtain ⟨φ, hφmem, hφne⟩ := hS₁.nonzero
     exact ⟨φ, zSupportedSpan_mono_left (Set.subset_union_left) hφmem, hφne⟩
