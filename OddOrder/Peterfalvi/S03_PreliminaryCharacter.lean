@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
@@ -644,5 +645,100 @@ theorem exists_inner_induce_ne_zero
       (G := G) H χ θ).mpr hθ⟩
 
 end InducedConstituent
+
+/-! ### Peterfalvi (6.6) G2.2: a constituent inherits a kernel containment
+
+The (6.6) G2.2 residual is "an irreducible constituent `χ` of a genuine character `ψ` inherits
+`g ∈ Ker ψ`": from `ψ(g) = ψ(1)` one reads `χ(g) = χ(1)`.  Writing `ψ = ∑ mᵢ χᵢ` as a
+non-negative integer combination of irreducible characters, this is the **equality case of the
+character-value bound** `|χᵢ(g)| ≤ χᵢ(1)` applied to each summand: the real part of
+`ψ(g) = ∑ mᵢ χᵢ(g)` is `∑ mᵢ Re χᵢ(g) ≤ ∑ mᵢ |χᵢ(g)| ≤ ∑ mᵢ χᵢ(1) = ψ(1) = ψ(g)`, and the
+equality forces every summand with `mᵢ ≠ 0` to have `Re χᵢ(g) = χᵢ(1)`, hence (with
+`|χᵢ(g)| ≤ χᵢ(1)`) `χᵢ(g) = χᵢ(1)`.
+
+The bound and its equality case are supplied by the **diagonalization keystone**
+(`OddOrder.RepresentationTheory.norm_character_le_finrank` and
+`character_eq_one_iff_rep_eq_id`), the machinery `notes/peterfalvi/s03` previously flagged as the
+`needs-infra` piece of G2.2.  The statement below is the honest, fully-general equality case; a
+future G2.2 assembly supplies the `ψ = ∑ mᵢ χᵢ` decomposition of `Ind_K^L θ`. -/
+
+section ConstituentKernel
+
+variable [Finite G]
+
+/-- **Character-value bound `‖χ(g)‖ ≤ χ(1)`** for an irreducible character, in the
+`characterDegree` form ([Isaacs] *Character Theory*, the inequality of (2.27)).  Here `d` is the
+natural degree (`(χ : G → ℂ) 1 = d`), and `‖χ(g)‖ ≤ d`.  This is the consumer-facing form, through
+`IrreducibleCharacter`, of the keystone bound
+`OddOrder.RepresentationTheory.norm_character_le_finrank`. -/
+theorem norm_irreducibleCharacter_le_natDegree
+    (χ : OddOrder.RepresentationTheory.IrreducibleCharacter G) {d : ℕ}
+    (hd : (χ : ClassFunction G ℂ) 1 = (d : ℂ)) (g : G) :
+    ‖(χ : ClassFunction G ℂ) g‖ ≤ (d : ℝ) := by
+  obtain ⟨V, _, _, _, ρ, _, hχ⟩ := χ.isIrreducible
+  -- `χ g = ρ.character g` and the natural degree `d` is the `finrank`.
+  have hcharg : (χ : ClassFunction G ℂ) g = ρ.character g := congrFun hχ g
+  have hfin : (Module.finrank ℂ V : ℂ) = (d : ℂ) := by
+    rw [← ρ.char_one, ← congrFun hχ 1, hd]
+  have hfin' : (Module.finrank ℂ V : ℝ) = (d : ℝ) := by exact_mod_cast hfin
+  rw [hcharg, ← hfin']
+  exact OddOrder.RepresentationTheory.norm_character_le_finrank ρ g
+
+/-- **Peterfalvi (6.6) G2.2: a constituent inherits a kernel containment** (the equality case of
+`‖χ(g)‖ ≤ χ(1)`).  Let `χ : ι → Irr G` be a finite family of irreducible characters with
+non-negative integer multiplicities `m : ι → ℕ`.  If the value of `ψ = ∑ mᵢ χᵢ` at `g` equals its
+value at `1`, then every constituent `χ i` with `m i ≠ 0` satisfies `χ i (g) = χ i (1)`, i.e.
+`g ∈ characterKernel (χ i)`.
+
+This is the keystone-driven closure of the G2.2 residual: it sharpens the central Schur equality
+to the general element `g`, using `norm_irreducibleCharacter_le_natDegree` (the bound) and
+`RCLike.re_eq_self_of_le` (the unit-circle rigidity) at each summand. -/
+theorem irreducibleCharacter_mem_characterKernel_of_natSum_value_eq (g : G)
+    {ι : Type*} (s : Finset ι) (m : ι → ℕ)
+    (χ : ι → OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (d : ι → ℕ) (hd : ∀ i ∈ s, (χ i : ClassFunction G ℂ) 1 = (d i : ℂ))
+    (hval : ∑ i ∈ s, (m i : ℂ) * (χ i : ClassFunction G ℂ) g
+      = ∑ i ∈ s, (m i : ℂ) * (χ i : ClassFunction G ℂ) 1) :
+    ∀ i ∈ s, m i ≠ 0 → g ∈ characterKernel (χ i : ClassFunction G ℂ) := by
+  classical
+  -- Bound `‖χᵢ(g)‖ ≤ dᵢ`, and `Re χᵢ(g) ≤ ‖χᵢ(g)‖ ≤ dᵢ`, for every `i ∈ s`.
+  have hbound : ∀ i ∈ s, ‖(χ i : ClassFunction G ℂ) g‖ ≤ (d i : ℝ) := fun i hi =>
+    norm_irreducibleCharacter_le_natDegree (χ i) (hd i hi) g
+  have hre_le : ∀ i ∈ s, ((χ i : ClassFunction G ℂ) g).re ≤ (d i : ℝ) := fun i hi =>
+    le_trans (by rw [← RCLike.re_eq_complex_re]; exact RCLike.re_le_norm _) (hbound i hi)
+  -- Real parts: `∑ mᵢ Re χᵢ(g) = ∑ mᵢ dᵢ` (the RHS is real, `= ∑ mᵢ χᵢ(1)`).
+  have hre : ∑ i ∈ s, (m i : ℝ) * ((χ i : ClassFunction G ℂ) g).re
+      = ∑ i ∈ s, (m i : ℝ) * (d i : ℝ) := by
+    have hcast := congrArg Complex.re hval
+    rw [Complex.re_sum, Complex.re_sum] at hcast
+    refine Eq.trans ?_ (hcast.trans ?_) <;> refine Finset.sum_congr rfl fun i hi => ?_
+    · simp [Complex.mul_re]
+    · rw [hd i hi]; simp [Complex.mul_re]
+  -- Each summand deficit `mᵢ(dᵢ - Re χᵢ(g)) ≥ 0`, summing to `0`, so each is `0`.
+  have hnn : ∀ i ∈ s, (0 : ℝ) ≤ (m i : ℝ) * ((d i : ℝ) - ((χ i : ClassFunction G ℂ) g).re) :=
+    fun i hi => mul_nonneg (by positivity) (by linarith [hre_le i hi])
+  have hsum0 : ∑ i ∈ s, (m i : ℝ) * ((d i : ℝ) - ((χ i : ClassFunction G ℂ) g).re) = 0 := by
+    have hexp : ∀ i ∈ s, (m i : ℝ) * ((d i : ℝ) - ((χ i : ClassFunction G ℂ) g).re)
+        = (m i : ℝ) * (d i : ℝ) - (m i : ℝ) * ((χ i : ClassFunction G ℂ) g).re :=
+      fun i _ => by ring
+    rw [Finset.sum_congr rfl hexp, Finset.sum_sub_distrib, ← hre, sub_self]
+  have hzero := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hsum0
+  -- For `mᵢ ≠ 0`: `Re χᵢ(g) = dᵢ`, and with `‖χᵢ(g)‖ ≤ dᵢ` rigidity gives `χᵢ(g) = dᵢ = χᵢ(1)`.
+  intro i hi hmi
+  have hmi' : (m i : ℝ) ≠ 0 := by exact_mod_cast hmi
+  have hre_eq : ((χ i : ClassFunction G ℂ) g).re = (d i : ℝ) := by
+    have hterm : (d i : ℝ) - ((χ i : ClassFunction G ℂ) g).re = 0 :=
+      (mul_eq_zero.mp (hzero i hi)).resolve_left hmi'
+    linarith
+  -- `‖χᵢ(g)‖ ≤ dᵢ = Re χᵢ(g)`; unit-circle rigidity gives `χᵢ(g) = (Re χᵢ(g) : ℂ) = dᵢ`.
+  have hle : ‖(χ i : ClassFunction G ℂ) g‖ ≤ RCLike.re ((χ i : ClassFunction G ℂ) g) := by
+    rw [RCLike.re_eq_complex_re, hre_eq]; exact hbound i hi
+  have haeq : (χ i : ClassFunction G ℂ) g = (d i : ℂ) := by
+    rw [← RCLike.re_eq_self_of_le (K := ℂ) hle, RCLike.re_eq_complex_re, hre_eq]
+    push_cast
+    ring
+  rw [mem_characterKernel, characterDegree_def, haeq, hd i hi]
+
+end ConstituentKernel
 
 end OddOrder.Peterfalvi.S03

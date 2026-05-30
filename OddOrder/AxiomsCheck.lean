@@ -633,6 +633,13 @@ set_option linter.style.longLine false in
 -- Frobenius reciprocity via the Clifford `LiesOver` bridge (`exists_liesOver` +
 -- `inner_induce_ne_zero_iff_liesOver`); unconditional, no reference to a center `Z`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero
+-- Peterfalvi §3 (6.6) G2.2, the keystone-driven residual: a constituent inherits a kernel
+-- containment.  `‖χ(g)‖ ≤ χ(1)` (norm_irreducibleCharacter_le_natDegree, via the keystone bound)
+-- + the equality case give: if `(∑ mᵢ χᵢ)(g) = (∑ mᵢ χᵢ)(1)` then every `χᵢ` (mᵢ ≠ 0) has
+-- `g ∈ ker χᵢ`.  Closes the `needs-infra` piece flagged in notes/peterfalvi/s03.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.norm_irreducibleCharacter_le_natDegree
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq
 -- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
 -- characters contains no real class function. Discharges the `no_real_characters` field of the §7
 -- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
