@@ -421,6 +421,230 @@ theorem pow_mul_eq_commutator_mul (u v : G) (k : ℕ) :
     v ^ k * u = ⁅v ^ k, u⁆ * u * v ^ k := by
   rw [commutatorElement_def]; group
 
+/-! ### The full `(u*v)^n` collection formula `(4.4)`
+
+We now assemble BG's two-generator collection formula `(4.4)` (mmd L1430-1464). For
+`cl ≤ 3` the inner commutator `c := ⁅v, u⁆` is **not** central; what is central are the
+weight-`3` commutators `d₁ := ⁅⁅v, u⁆, u⁆` and `d₂ := ⁅⁅v, u⁆, v⁆`. Centrality of `d₁, d₂`
+is exactly `γ₄(G) = 1` (`hc4 : ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1`): e.g. `⁅d₁, g⁆ = ⁅⁅⁅v, u⁆, u⁆, g⁆ = 1`.
+
+The exponents `FF n = (n+1).choose 3` and `GG n = 2 * (n+1).choose 3` are **inlined as
+closed forms** (no `def`, to remove the "tweak until green" degree of freedom). These are
+model-verified (free nilpotent class-`3` group on two generators via the Magnus embedding,
+`n = 0..8`); BG's literal `f(n) = C(n,3)`, `g(n) = 2 C(n,3) + C(n,2)` are for the *opposite*
+commutator convention `[a,b] = a⁻¹b⁻¹ab` and are wrong here, as is `GG = (n+1).choose 3`.
+The genuine recurrences are `FF(k+1) = FF(k) + k + k.choose 2` and `GG = 2 * FF`. -/
+
+-- Soundness anchors (anti-scaffold `TRAP 1`): the inlined `FF`/`GG` values must match the
+-- model, ruling out the BG-literal and the `GG = C(n+1,3)` mistakes.
+example : (2 + 1).choose 3 = 1 := by decide          -- FF(2) = 1
+example : (3 + 1).choose 3 = 4 := by decide          -- FF(3) = 4  (BG-literal would be 1)
+example : (3 + 1).choose 3 ≠ 1 := by decide
+example : 2 * (2 + 1).choose 3 = 2 := by decide      -- GG(2) = 2
+example : 2 * (3 + 1).choose 3 = 8 := by decide      -- GG(3) = 8  (GG = C(n+1,3) would be 4)
+
+/-- The weight-`3` commutator `⁅⁅v, u⁆, w⁆` is central under `γ₄(G) = 1`: indeed
+`⁅⁅⁅v, u⁆, w⁆, g⁆ = 1` for every `g` (`hc4`). -/
+private theorem triple_commutator_mem_center
+    (hc4 : ∀ a b c d : G, ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1) (u v w : G) :
+    ⁅⁅v, u⁆, w⁆ ∈ Subgroup.center G :=
+  Subgroup.mem_center_iff.2 fun g =>
+    ((commutatorElement_eq_one_iff_commute.1 (hc4 v u w g)).symm).eq
+
+/-- Move a power of the (non-central) commutator `c := ⁅v, u⁆` past a single element `w`,
+picking up a central correction: `c ^ m * w = w * c ^ m * ⁅⁅v, u⁆, w⁆ ^ m`.
+
+Only the centrality of `⁅⁅v, u⁆, w⁆ = ⁅c, w⁆` (from `hc4`) is needed: write
+`c ^ m * w = ⁅c ^ m, w⁆ * w * c ^ m` (`pow_mul_eq_commutator_mul`) and
+`⁅c ^ m, w⁆ = ⁅c, w⁆ ^ m` (`commutatorElement_pow_left_of_central`, since `⁅c, w⁆` is
+central), then move the central correction to the right. With `w = u` this gives the
+`d₁`-motion and with `w = v` the `d₂`-motion of BG's collection. -/
+private theorem commutator_pow_mul_collect
+    (hc4 : ∀ a b c d : G, ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1) (u v w : G) (m : ℕ) :
+    ⁅v, u⁆ ^ m * w = w * ⁅v, u⁆ ^ m * ⁅⁅v, u⁆, w⁆ ^ m := by
+  have hcen := triple_commutator_mem_center hc4 u v w
+  -- `⁅⁅v, u⁆, w⁆` central ⇒ commutes with everything, in particular `w` and `c = ⁅v, u⁆`.
+  have hcd : ∀ g : G, Commute (⁅⁅v, u⁆, w⁆ ^ m) g :=
+    fun g => (show Commute ⁅⁅v, u⁆, w⁆ g from (Subgroup.mem_center_iff.mp hcen g).symm).pow_left m
+  rw [pow_mul_eq_commutator_mul w ⁅v, u⁆ m, commutatorElement_pow_left_of_central hcen m]
+  -- Goal: `⁅..⁆^m * w * c^m = w * c^m * ⁅..⁆^m`; move the central correction to the right.
+  rw [(hcd w).eq, mul_assoc, (hcd (⁅v, u⁆ ^ m)).eq, ← mul_assoc]
+
+/-- Iterated form: move `c ^ k = ⁅v, u⁆ ^ k` past a *power* `w ^ j`,
+`c ^ k * w ^ j = w ^ j * c ^ k * ⁅⁅v, u⁆, w⁆ ^ (k * j)`.
+
+The commutator `⁅c ^ k, w ^ j⁆` collects to `⁅c, w⁆ ^ (k * j) = ⁅⁅v, u⁆, w⁆ ^ (k * j)` by the
+central-commutator power laws (`commutatorElement_pow_left_of_central` then
+`commutatorElement_pow_right_of_central`, both valid since `⁅⁅v, u⁆, w⁆` is central under
+`hc4`); unfolding `⁅c ^ k, w ^ j⁆ = c^k w^j (c^k)⁻¹ (w^j)⁻¹` and moving the (central)
+correction across gives the claim. Used to move the `c ^ k` block past `v ^ (k+1)`. -/
+private theorem commutator_pow_mul_pow_collect
+    (hc4 : ∀ a b c d : G, ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1) (u v w : G) (k j : ℕ) :
+    ⁅v, u⁆ ^ k * w ^ j = w ^ j * ⁅v, u⁆ ^ k * ⁅⁅v, u⁆, w⁆ ^ (k * j) := by
+  have hcen := triple_commutator_mem_center hc4 u v w
+  have hcomm : ∀ g : G, Commute ⁅⁅v, u⁆, w⁆ g :=
+    fun g => (Subgroup.mem_center_iff.mp hcen g).symm
+  -- `⁅c, w^j⁆ = ⁅c, w⁆^j` is central, so the left slot collects too.
+  have hcenj : ⁅⁅v, u⁆, w ^ j⁆ ∈ Subgroup.center G :=
+    (commutatorElement_pow_right_of_central hcen j).symm ▸ (Subgroup.center G).pow_mem hcen j
+  -- `⁅c^k, w^j⁆ = ⁅c, w^j⁆^k = (⁅c, w⁆^j)^k = ⁅⁅v,u⁆,w⁆^(k*j)`.
+  have hcomm_collect : ⁅⁅v, u⁆ ^ k, w ^ j⁆ = ⁅⁅v, u⁆, w⁆ ^ (k * j) := by
+    rw [commutatorElement_pow_left_of_central hcenj k,
+      commutatorElement_pow_right_of_central hcen j, ← pow_mul, Nat.mul_comm]
+  -- From `⁅c^k, w^j⁆ = c^k w^j (c^k)⁻¹ (w^j)⁻¹` solve for `c^k * w^j`.
+  have hbase : ⁅v, u⁆ ^ k * w ^ j = ⁅⁅v, u⁆ ^ k, w ^ j⁆ * (w ^ j * ⁅v, u⁆ ^ k) := by
+    rw [commutatorElement_def]; group
+  -- Goal: `e^(k*j) * (w^j * c^k) = w^j * c^k * e^(k*j)`; `e^(k*j)` is central, move it right.
+  rw [hbase, hcomm_collect, ((hcomm (w ^ j * ⁅v, u⁆ ^ k)).pow_left (k * j)).eq]
+
+/-- The non-central collection step `(4.4)` for the skeleton `u ^ k * v ^ k * c ^ C(k,2)`:
+multiplying by `u * v` advances `k ↦ k + 1` while emitting the central corrections
+`d₁ ^ (k + C(k,2))` and `d₂ ^ (k * (k+1))`:
+`u^k v^k c^C(k,2) (u*v) = u^(k+1) v^(k+1) c^C(k+1,2) ⁅⁅v,u⁆,u⁆^(k+C(k,2)) ⁅⁅v,u⁆,v⁆^(k(k+1))`.
+
+This is the heart of the induction. Reading left to right (with `c := ⁅v, u⁆`,
+`d₁ := ⁅⁅v, u⁆, u⁆`, `d₂ := ⁅⁅v, u⁆, v⁆`):
+
+* `c^C(k,2) * u = u * c^C(k,2) * d₁^C(k,2)` (`commutator_pow_mul_collect`, `w = u`);
+* `c^C(k,2) * v = v * c^C(k,2) * d₂^C(k,2)` (`commutator_pow_mul_collect`, `w = v`);
+* `v^k * u = ⁅v^k, u⁆ * u * v^k` (`pow_mul_eq_commutator_mul`) with
+  `⁅v^k, u⁆ = c^k * d₂⁻¹^C(k,2)` (`commutatorElement_pow_left_of_triple_central` and
+  `⁅v, ⁅v, u⁆⁆ = d₂⁻¹`); the `d₂⁻¹^C(k,2)` cancels a `d₂^C(k,2)`;
+* `c^k * u = u * c^k * d₁^k` and `c^k * v^(k+1) = v^(k+1) * c^k * d₂^(k*(k+1))`
+  (`commutator_pow_mul_collect` / `commutator_pow_mul_pow_collect`).
+
+The `c`-exponent lands on `k + C(k,2) = C(k+1,2)` and the central exponents on
+`d₁^(k + C(k,2))`, `d₂^(k*(k+1))` (model-verified). -/
+private theorem collect_skeleton_step
+    (hc3 : ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G)
+    (hc4 : ∀ a b c d : G, ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1) (u v : G) (k : ℕ) :
+    u ^ k * v ^ k * ⁅v, u⁆ ^ (k.choose 2) * (u * v)
+      = u ^ (k + 1) * v ^ (k + 1) * ⁅v, u⁆ ^ ((k + 1).choose 2)
+          * ⁅⁅v, u⁆, u⁆ ^ (k + k.choose 2) * ⁅⁅v, u⁆, v⁆ ^ (k * (k + 1)) := by
+  -- Central correction atoms (`d₁, d₂` central by `hc4`). Abbreviations via `m` only.
+  have hd1cen := triple_commutator_mem_center hc4 u v u
+  have hd2cen := triple_commutator_mem_center hc4 u v v
+  have hd1 : ∀ g : G, Commute ⁅⁅v, u⁆, u⁆ g := fun g => (Subgroup.mem_center_iff.mp hd1cen g).symm
+  have hd2 : ∀ g : G, Commute ⁅⁅v, u⁆, v⁆ g := fun g => (Subgroup.mem_center_iff.mp hd2cen g).symm
+  -- `⁅v^k, u⁆ = ⁅v,u⁆^k * d₂⁻¹^C(k,2)`.
+  have hvk : ⁅v ^ k, u⁆ = ⁅v, u⁆ ^ k * (⁅⁅v, u⁆, v⁆⁻¹) ^ (k.choose 2) := by
+    rw [commutatorElement_pow_left_of_triple_central hc3 v u k, commutatorElement_inv]
+  set m := k.choose 2 with hm
+  have hchoose : (k + 1).choose 2 = k + m := by
+    rw [hm, Nat.choose_succ_succ' k 1, Nat.choose_one_right, Nat.add_comm]
+  -- `d₂⁻¹^m * d₂^m = 1`.
+  have hcancel : (⁅⁅v, u⁆, v⁆⁻¹) ^ m * ⁅⁅v, u⁆, v⁆ ^ m = 1 := by rw [inv_pow, inv_mul_cancel]
+  -- Central moves (push `d₁, d₂` powers rightward across an arbitrary tail `g`).
+  have e1 : ∀ (a : ℕ) (g : G), ⁅⁅v, u⁆, u⁆ ^ a * g = g * ⁅⁅v, u⁆, u⁆ ^ a :=
+    fun a g => ((hd1 g).pow_left a).eq
+  have e2 : ∀ (a : ℕ) (g : G), ⁅⁅v, u⁆, v⁆ ^ a * g = g * ⁅⁅v, u⁆, v⁆ ^ a :=
+    fun a g => ((hd2 g).pow_left a).eq
+  have e2inv : ∀ (a : ℕ) (g : G), (⁅⁅v, u⁆, v⁆⁻¹) ^ a * g = g * (⁅⁅v, u⁆, v⁆⁻¹) ^ a :=
+    fun a g => (((hd2 g).inv_left).pow_left a).eq
+  -- Step A: expose `⁅v,u⁆^m * u` and `⁅v,u⁆^m * v`, applying the two single-element motions.
+  rw [show u ^ k * v ^ k * ⁅v, u⁆ ^ m * (u * v) = u ^ k * v ^ k * (⁅v, u⁆ ^ m * u) * v by
+        simp only [mul_assoc],
+      commutator_pow_mul_collect hc4 u v u m]
+  simp only [mul_assoc]
+  -- Move the fresh `d₁^m` right past `v`, re-expose `⁅v,u⁆^m * v`, then the `v`-motion.
+  rw [e1 m v, ← mul_assoc (⁅v, u⁆ ^ m) v, commutator_pow_mul_collect hc4 u v v m]
+  simp only [mul_assoc]
+  -- Step C: expose `v^k * u`, expand it (`⁅v^k,u⁆ = ⁅v,u⁆^k * d₂⁻¹^m`).
+  rw [← mul_assoc (v ^ k) u, pow_mul_eq_commutator_mul u v k, hvk]
+  simp only [mul_assoc]
+  -- Push the central `d₂⁻¹^m` to the far right (past the whole tail).
+  rw [e2inv m (u * (v ^ k * (v * (⁅v, u⁆ ^ m * (⁅⁅v, u⁆, v⁆ ^ m * ⁅⁅v, u⁆, u⁆ ^ m)))))]
+  simp only [mul_assoc]
+  -- Now `… * (d₂^m * (d₁^m * d₂⁻¹^m))`; commute `d₁^m` past `d₂⁻¹^m`, then `d₂^m * d₂⁻¹^m = 1`.
+  rw [e1 m (⁅⁅v, u⁆, v⁆⁻¹ ^ m), inv_pow, ← mul_assoc (⁅⁅v, u⁆, v⁆ ^ m), mul_inv_cancel]
+  simp only [one_mul]
+  -- Step D: `⁅v,u⁆^k * u = u * ⁅v,u⁆^k * d₁^k`; merge `v^k * v = v^(k+1)`.
+  rw [← mul_assoc (⁅v, u⁆ ^ k) u, commutator_pow_mul_collect hc4 u v u k]
+  simp only [mul_assoc]
+  -- Move `d₁^k` right past `v^k, v, ⁅v,u⁆^m`, merge with `d₁^m` into `d₁^(k+m)`.
+  rw [e1 k (v ^ k * (v * (⁅v, u⁆ ^ m * ⁅⁅v, u⁆, u⁆ ^ m)))]
+  simp only [mul_assoc]
+  rw [← pow_add, Nat.add_comm m k]
+  -- Step E: merge `v^k * v = v^(k+1)`; then `⁅v,u⁆^k * v^(k+1)` motion; merge `u^k*u`, `⁅v,u⁆`.
+  rw [← mul_assoc (v ^ k) v, ← pow_succ, ← mul_assoc (⁅v, u⁆ ^ k) (v ^ (k + 1)),
+      commutator_pow_mul_pow_collect hc4 u v v k (k + 1)]
+  simp only [mul_assoc]
+  -- Push `d₂^(k(k+1))` to the right of `⁅v,u⁆^m * d₁^(k+m)`, merge `⁅v,u⁆^k * ⁅v,u⁆^m`, `u^k*u`.
+  rw [e2 (k * (k + 1)) (⁅v, u⁆ ^ m * ⁅⁅v, u⁆, u⁆ ^ (k + m))]
+  simp only [mul_assoc]
+  rw [← mul_assoc (⁅v, u⁆ ^ k) (⁅v, u⁆ ^ m), ← pow_add, ← hchoose,
+      ← mul_assoc (u ^ k) u, ← pow_succ]
+
+/-- Pascal recurrence for the `d₁`-exponent `FF n = (n+1).choose 3`:
+`(k + k.choose 2) + (k+1).choose 3 = (k+2).choose 3`. The skeleton step emits `d₁^(k+C(k,2))`,
+which combined with the carried `d₁^FF(k)` gives `d₁^FF(k+1)`. -/
+private theorem ff_succ (k : ℕ) :
+    k + k.choose 2 + (k + 1).choose 3 = (k + 2).choose 3 := by
+  have hc2 : (k + 1).choose 2 = k + k.choose 2 := by
+    rw [Nat.choose_succ_succ' k 1, Nat.choose_one_right, Nat.add_comm]
+  rw [show k + 2 = (k + 1) + 1 from rfl, Nat.choose_succ_succ' (k + 1) 2, hc2, Nat.add_comm]
+
+/-- Pascal recurrence for the `d₂`-exponent `GG n = 2 * (n+1).choose 3`:
+`k*(k+1) + 2 * (k+1).choose 3 = 2 * (k+2).choose 3`. The skeleton step emits `d₂^(k*(k+1))`,
+which combined with the carried `d₂^GG(k)` gives `d₂^GG(k+1)`; note `k*(k+1) = 2*(k+1).choose 2`
+(`Nat.succ_mul_choose_eq`). -/
+private theorem gg_succ (k : ℕ) :
+    k * (k + 1) + 2 * (k + 1).choose 3 = 2 * (k + 2).choose 3 := by
+  -- `k*(k+1) = 2 * (k+1).choose 2`.
+  have htwo : k * (k + 1) = 2 * (k + 1).choose 2 := by
+    have h := Nat.add_one_mul_choose_eq k 1
+    rw [Nat.choose_one_right] at h
+    -- `h : (k+1) * k = (k+1).choose 2 * 2`
+    rw [Nat.mul_comm k (k + 1), h, Nat.mul_comm]
+  rw [htwo, ← Nat.mul_add, show k + 2 = (k + 1) + 1 from rfl, Nat.choose_succ_succ' (k + 1) 2,
+    Nat.add_comm ((k + 1).choose 2)]
+
+/-- **BG Proposition 4.3(a), `(4.4)`: two-generator collection formula under `cl ≤ 3`.**
+For `γ₃(G) ⊆ Z(G)` (`hc3`) and `γ₄(G) = 1` (`hc4`), and all `u, v : G`, `n : ℕ`,
+`(u*v)^n = u^n v^n ⁅v,u⁆^(C(n,2)) ⁅⁅v,u⁆,u⁆^((n+1).choose 3) ⁅⁅v,u⁆,v⁆^(2*(n+1).choose 3)`.
+
+This is BG's `(uv)^n = u^n v^n [v,u]^{C(n,2)} [v,u,u]^{f(n)} [v,u,v]^{g(n)}` (mmd L1430-1464), but
+the BG-literal `f(n) = C(n,3)`, `g(n) = 2 C(n,3) + C(n,2)` are stated for the convention
+`[a,b] = a⁻¹b⁻¹ab`; in mathlib's convention `⁅a,b⁆ = a b a⁻¹ b⁻¹` the correct closed forms are
+`f(n) = (n+1).choose 3` and `g(n) = 2 * (n+1).choose 3` (model-verified by the Magnus embedding
+of the free nilpotent class-`3` group on two generators, `n = 0..8`). The exponents are inlined
+as closed forms (no `def`) so the statement is pinned to these values.
+
+Proof: induction on `n`. The non-central skeleton step (advancing `k ↦ k+1` while emitting
+`⁅⁅v,u⁆,u⁆^(k+C(k,2))` and `⁅⁅v,u⁆,v⁆^(k(k+1))`)
+is `collect_skeleton_step`; the carried central factors `⁅⁅v,u⁆,u⁆^FF(k)`, `⁅⁅v,u⁆,v⁆^GG(k)`
+commute to the right and combine via the Pascal recurrences `ff_succ`, `gg_succ`. -/
+theorem mul_pow_eq_collect_of_triple_central
+    (hc3 : ∀ a b c : G, ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center G)
+    (hc4 : ∀ a b c d : G, ⁅⁅⁅a, b⁆, c⁆, d⁆ = 1) (u v : G) (n : ℕ) :
+    (u * v) ^ n
+      = u ^ n * v ^ n * ⁅v, u⁆ ^ (n.choose 2)
+          * ⁅⁅v, u⁆, u⁆ ^ ((n + 1).choose 3)
+          * ⁅⁅v, u⁆, v⁆ ^ (2 * (n + 1).choose 3) := by
+  -- `d₁, d₂` central (by `hc4`).
+  have hd1 : ∀ g : G, Commute ⁅⁅v, u⁆, u⁆ g :=
+    fun g => (Subgroup.mem_center_iff.mp (triple_commutator_mem_center hc4 u v u) g).symm
+  have hd2 : ∀ g : G, Commute ⁅⁅v, u⁆, v⁆ g :=
+    fun g => (Subgroup.mem_center_iff.mp (triple_commutator_mem_center hc4 u v v) g).symm
+  induction n with
+  | zero => simp [Nat.choose_eq_zero_of_lt (by norm_num : 1 < 3)]
+  | succ k ih =>
+    rw [pow_succ, ih]
+    -- Push the carried central `d₁^FF(k)`, `d₂^GG(k)` to the right of `(u*v)`.
+    rw [mul_assoc (u ^ k * v ^ k * ⁅v, u⁆ ^ (k.choose 2) * ⁅⁅v, u⁆, u⁆ ^ ((k + 1).choose 3)),
+        ((hd2 (u * v)).pow_left (2 * (k + 1).choose 3)).eq,
+        ← mul_assoc, mul_assoc (u ^ k * v ^ k * ⁅v, u⁆ ^ (k.choose 2)),
+        ((hd1 (u * v)).pow_left ((k + 1).choose 3)).eq, ← mul_assoc,
+        collect_skeleton_step hc3 hc4 u v k]
+    -- Now `… d₁^(k+C(k,2)) * (d₂^(k(k+1)) * (d₁^FF(k) * d₂^GG(k)))`; commute `d₂^(k(k+1))` past
+    -- `d₁^FF(k)`, then combine the two `d₁` and the two `d₂` powers (`ff_succ`, `gg_succ`).
+    simp only [mul_assoc]
+    rw [← mul_assoc (⁅⁅v, u⁆, v⁆ ^ (k * (k + 1))),
+        ((hd2 (⁅⁅v, u⁆, u⁆ ^ ((k + 1).choose 3))).pow_left (k * (k + 1))).eq]
+    simp only [mul_assoc]
+    rw [← mul_assoc (⁅⁅v, u⁆, u⁆ ^ (k + k.choose 2)), ← pow_add, ff_succ k,
+        ← pow_add, gg_succ k]
+
 end Prop43ClassThreeCollection
 
 /-! ## §4B: existence of elementary abelian `E_{p²}` subgroups (Lemma 4.5(a))
