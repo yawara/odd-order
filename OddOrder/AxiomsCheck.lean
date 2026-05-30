@@ -1377,6 +1377,22 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
 
+-- Peterfalvi (5.1)/(5.4) Round-13 supply-ability + Round-24 (ii) per-step production.  The
+-- `CharacterPsiDecomposition.tau1_inner_eq_on_support` field (and the `ofProjection`/`decompositionPair`
+-- inputs) were weakened from a GLOBAL `IsIntegralIsometry` to LATTICE-RELATIVE inner-preservation on
+-- the supported sponsoring span `ℤ[χ, χ̄, ψ]` (the same Round-13 weakening already applied to
+-- `IsCoherent.extension_inner_eq`; a global isometry `CF(L)→CF(G)` does not exist in FT where
+-- `dim CF(L) > dim CF(G)`).  `support_subset_of_mem_zSpan_of_supported` is the `ℤ`-submodule closure
+-- fact (`Submodule.span_le` into `supportedSubmodule.restrictScalars ℤ`);
+-- `dadeIntegralCharacterMap_inner_eq_on_supported_span` SUPPLIES the weakened form from the Dade
+-- isometry's `CF(L,A)` inner-preservation (`IsDadeIsometry.inner_eq`, (2.6.a)).
+-- `decompositionPairFromDade` then PRODUCES the per-step `(D₀, Da)` pair directly from the Dade
+-- isometry — `htau1_inner_eq` discharged internally — closing Round-24 (ii).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.support_subset_of_mem_zSpan_of_supported
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDade
+
 -- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
 -- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
 -- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue

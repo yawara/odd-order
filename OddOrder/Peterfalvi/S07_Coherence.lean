@@ -764,8 +764,10 @@ The remaining inputs are exactly the *structural* data a per-step (5.4)/(5.5)/(5
 must still supply:
 * `imageFamily` — the signed-irreducible family `R(χ)` with `(χ − χ̄)^τ = ∑_{α} α` (from the Dade
   data / §3 keystone, `OrthonormalCharacterImageFamily`);
-* `tau1`, `htau1_isom`, `htau1_agrees` — the (5.4) auxiliary isometry `τ₁` on `ℤ[χ − ψ, χ − χ̄]`
-  agreeing with `τ` on `χ − χ̄`;
+* `tau1`, `htau1_inner_eq`, `htau1_agrees` — the (5.4) auxiliary isometry `τ₁`, supplied as
+  **lattice-relative** inner-preservation on the sponsoring lattice `ℤ[χ, χ̄, ψ]` (the Round-13
+  weakening: the Dade isometry / running extension preserves `⟨·,·⟩` only on the supported
+  sublattice, *not* globally on `CF(L)`), agreeing with `τ` on `χ − χ̄`;
 * the three (5.2.c)/(5.4) orthogonality scalars `⟨χ, ψ⟩ = ⟨χ̄, ψ⟩ = ⟨χ, χ̄⟩ = 0`.
 
 This isolates the genuinely missing primitives (the Dade `R(χ)` extractor and the `τ₁`
@@ -775,7 +777,9 @@ projection. -/
 noncomputable def ofProjection
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
-    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem : tau1 (χ - ψ) ∈ ZIrr G)
     (hχψ : ClassFunction.inner χ ψ = 0)
@@ -786,7 +790,7 @@ noncomputable def ofProjection
     imageFamily.mem_ZIrr imageFamily.orthonormal
   { imageFamily := imageFamily
     tau1 := tau1
-    tau1_inner_eq_on_support := fun φ ζ _ _ => htau1_isom.inner_eq φ ζ
+    tau1_inner_eq_on_support := htau1_inner_eq
     tau1_agrees := htau1_agrees
     X := ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α
     Y := -(tau1 (χ - ψ) - ∑ α ∈ imageFamily.imageSet, (proj.choose α : ℂ) • α)
@@ -825,7 +829,10 @@ The orthogonalities for `ψ = a·χ₁` are derived from the bare `⟨χ, χ₁�
 noncomputable def decompositionPair {a : ℕ} {chi1 : ClassFunction L ℂ}
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
-    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ζ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
     (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
@@ -841,9 +848,25 @@ noncomputable def decompositionPair {a : ℕ} {chi1 : ClassFunction L ℂ}
   have hχbaraχ1 : ClassFunction.inner χ.conj (a • chi1 : ClassFunction L ℂ) = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, OddOrder.RepresentationTheory.inner_smul_right,
       hχbarχ1, mul_zero]
-  (ofProjection imageFamily tau1 htau1_isom htau1_agrees htau1_mem0
+  -- The two per-`ψ` sponsoring lattices `{χ, χ̄, ψ}` (`ψ = 0` resp. `a·χ₁`) both sit inside the
+  -- shared lattice `{χ, χ̄, 0, a·χ₁}`, so the lattice-relative inner-preservation specializes by
+  -- `Submodule.span_mono`.  This is exactly how the Dade isometry supplies both decompositions:
+  -- one preservation fact on the supported span covers every difference generator.
+  have hsub0 : ({χ, χ.conj, (0 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
+      {χ, χ.conj, 0, a • chi1} := by
+    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
+  have hsuba : ({χ, χ.conj, (a • chi1 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
+      {χ, χ.conj, 0, a • chi1} := by
+    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
+  (ofProjection imageFamily tau1
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
+        (Submodule.span_mono hsub0 hφ) (Submodule.span_mono hsub0 hζ))
+      htau1_agrees htau1_mem0
       (by rw [ClassFunction.inner_zero_right]) (by rw [ClassFunction.inner_zero_right]) hχχbar,
-    ofProjection imageFamily tau1 htau1_isom htau1_agrees htau1_mema hχaχ1 hχbaraχ1 hχχbar)
+    ofProjection imageFamily tau1
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
+        (Submodule.span_mono hsuba hφ) (Submodule.span_mono hsuba hζ))
+      htau1_agrees htau1_mema hχaχ1 hχbaraχ1 hχχbar)
 
 /-- The two decompositions produced by `decompositionPair` share their auxiliary isometry: their
 `tau1` fields are literally the same `tau1`, so `Da.tau1 χ = D₀.tau1 χ` is `rfl`.  This is the
@@ -852,16 +875,19 @@ structurally rather than posited. -/
 theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
-    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ζ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
     (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
     (hχχ1 : ClassFunction.inner χ chi1 = 0)
     (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
     (hχχbar : ClassFunction.inner χ χ.conj = 0) :
-    ((decompositionPair imageFamily tau1 htau1_isom htau1_agrees htau1_mem0 htau1_mema
+    ((decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees htau1_mem0 htau1_mema
         hχχ1 hχbarχ1 hχχbar).2).tau1 χ =
-      ((decompositionPair imageFamily tau1 htau1_isom htau1_agrees htau1_mem0 htau1_mema
+      ((decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees htau1_mem0 htau1_mema
         hχχ1 hχbarχ1 hχχbar).1).tau1 χ :=
   rfl
 
@@ -2783,7 +2809,10 @@ noncomputable def retarget_isCoherent_of_sharedDecomposition
     {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
-    (htau1_isom : IsIntegralIsometry (L := L) (G := G) tau1)
+    (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
+      φ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ζ ∈ zSpan (L := L) {χ, χ.conj, 0, a • chi1} →
+      ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G)
     (htau1_mema : tau1 (χ - a • chi1) ∈ ZIrr G)
@@ -2803,15 +2832,15 @@ noncomputable def retarget_isCoherent_of_sharedDecomposition
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
     (hchi1 : chi1 ∈ S₁)
     (htau1_diff :
-      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
         htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 (χ - a • chi1) = τ (χ - a • chi1))
     (hY :
-      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
         htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).Y =
-        a • ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+        a • ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
           htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1)
     (htau1_chi1 :
-      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+      ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
         htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1 = hS₁.extension chi1)
     (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
@@ -2819,11 +2848,11 @@ noncomputable def retarget_isCoherent_of_sharedDecomposition
   -- The two decompositions are produced together against the *same* `τ₁`, so the τ₁-agreement
   -- `Da.tau1 χ = D₀.tau1 χ` is structural (`rfl`).
   retarget_isCoherent_of_decompositions_and_memberFamily hS₁
-    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
       htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').1
-    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_isom htau1_agrees
+    (CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
       htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2
-    (CharacterPsiDecomposition.decompositionPair_tau1_agree imageFamily tau1 htau1_isom
+    (CharacterPsiDecomposition.decompositionPair_tau1_agree imageFamily tau1 htau1_inner_eq
       htau1_agrees htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar')
     hχbar_eq hχχ hχbarχbar hχχbar hχbarχ Dmem hmemOrtho hmemTau1 hχ_S1 hχbar_S1 hchi1
     htau1_diff hY htau1_chi1 hgen
@@ -3424,6 +3453,128 @@ theorem dadeIntegralCharacterMap_apply_of_support (hyp : S04.Hypothesis G A L)
       SupportedClassFunctions (G := G) ℂ A L)
   simpa [dadeIntegralCharacterMap, LinearMap.restrictScalars_apply,
     Hypothesis.dadeLinearMap_apply] using key
+
+/-- Every element of the integral span `ℤ[S]` of a set `S` of **supported** class functions is
+itself supported.
+
+`supportedSubmodule (supportInSubgroup A L)` is a `ℂ`-submodule of `CF(L)`; its
+`restrictScalars ℤ` is a `ℤ`-submodule containing every generator `s ∈ S` (by hypothesis), hence
+contains the whole `ℤ`-span `Submodule.span ℤ S = zSpan S` (`Submodule.span_le`).  This is the
+lattice closure fact behind the supply-ability of the (5.4) auxiliary isometry: the difference
+generators `χ − χ̄`, `χ − a·χ₁` live in `Z[S, L^#] ⊆ CF(L,A)`, so the whole sponsoring lattice
+`ℤ[χ, χ̄, ψ]` is supported and the Dade isometry's `CF(L,A)` inner-preservation applies.
+
+(The ambient `Fintype`/`Invertible` section instances are unused here — this is a pure
+`ℤ`-submodule closure fact — but kept in scope for the supply-ability lemma that consumes it.) -/
+theorem support_subset_of_mem_zSpan_of_supported
+    {S : Set (ClassFunction (↥L) ℂ)}
+    (hS : ∀ s ∈ S, s.support ⊆ supportInSubgroup A L)
+    {φ : ClassFunction (↥L) ℂ} (hφ : φ ∈ zSpan (L := ↥L) S) :
+    φ.support ⊆ supportInSubgroup A L := by
+  have hle : zSpan (L := ↥L) S ≤
+      (ClassFunction.supportedSubmodule (G := ↥L) (k := ℂ)
+        (supportInSubgroup A L)).restrictScalars ℤ :=
+    Submodule.span_le.mpr (fun s hs => by
+      simpa only [Submodule.restrictScalars_mem, ClassFunction.mem_supportedSubmodule]
+        using hS s hs)
+  exact (ClassFunction.mem_supportedSubmodule).mp (hle hφ)
+
+/-- **Peterfalvi (5.1)/(5.4): the Dade base map supplies the lattice-relative isometry.**
+
+The (5.1) coherence base map `τ = dadeIntegralCharacterMap` preserves the inner product on the
+integral span `ℤ[S]` of any set `S` of **supported** class functions — exactly the
+**lattice-relative** `htau1_inner_eq` shape consumed by `CharacterPsiDecomposition.ofProjection`
+and `decompositionPair`.  This is the supply-ability witness for the Round-13 weakening: a *global*
+`IsIntegralIsometry` on all of `CF(L)` does **not** exist in Feit–Thompson (`dim CF(L) > dim
+CF(G)`), but the Dade isometry's `CF(L,A)` inner-preservation (`IsDadeIsometry.inner_eq`, the
+(2.6.a) isometry property of the explicit (2.5) Dade map) *does* hand back inner-preservation on
+every supported sublattice.
+
+Proof: every `φ, ζ ∈ zSpan S` is supported (`support_subset_of_mem_zSpan_of_supported`), so
+`dadeIntegralCharacterMap φ = hyp.dadeMap ⟨φ,_⟩` (`dadeIntegralCharacterMap_apply_of_support`); the
+isometry property of `hyp.dadeMap` (via `hyp.dadeIsometryData hconj`, whose `toDadeMap` *is*
+`hyp.dadeMap`) closes `⟨τ φ, τ ζ⟩ = ⟨φ, ζ⟩`.
+
+So for the running (5.4) `τ₁` *equal to* `τ` on the supported sublattice (the (5.1) base case, where
+`τ₁ = τ`), `decompositionPair`'s `htau1_inner_eq` is discharged by this lemma — the per-step
+`(D₀, Da)` are constructible from the Dade isometry.  (The general (5.4) `τ₁ ⊋ τ` extends this off
+the support; the supported-lattice inner-preservation used by the `(5.4.b)/(5.5)/(5.6.2)` proofs is
+exactly what this supplies.) -/
+theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S : Set (ClassFunction (↥L) ℂ)}
+    (hS : ∀ s ∈ S, s.support ⊆ supportInSubgroup A L)
+    {φ ζ : ClassFunction (↥L) ℂ}
+    (hφ : φ ∈ zSpan (L := ↥L) S) (hζ : ζ ∈ zSpan (L := ↥L) S) :
+    ClassFunction.inner
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) ζ) =
+      ClassFunction.inner φ ζ := by
+  have hφsupp : φ.support ⊆ supportInSubgroup A L :=
+    support_subset_of_mem_zSpan_of_supported hS hφ
+  have hζsupp : ζ.support ⊆ supportInSubgroup A L :=
+    support_subset_of_mem_zSpan_of_supported hS hζ
+  rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp,
+    dadeIntegralCharacterMap_apply_of_support hyp _ hζsupp]
+  -- The (2.6.a) isometry property of the explicit (2.5) Dade map, on the supported pair.
+  have hiso := (hyp.dadeIsometryData hconj).isDadeIsometry.inner_eq
+    (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
+      S04.SupportedClassFunctions (G := G) ℂ A L)
+    (⟨ζ, (ClassFunction.mem_supportedSubmodule).mpr hζsupp⟩ :
+      S04.SupportedClassFunctions (G := G) ℂ A L)
+  rwa [hyp.dadeIsometryData_toDadeMap hconj] at hiso
+
+/-- **Peterfalvi (5.6.3) / Round-24 (ii): the per-step decomposition pair `(D₀, Da)`, produced
+directly from the Dade isometry.**
+
+The concrete realization of `CharacterPsiDecomposition.decompositionPair` against the (5.1) base map
+`τ = dadeIntegralCharacterMap` itself (the (5.4) base case `τ₁ = τ`): from the orthonormal image
+family `R(χ)`, the supported difference generators (`χ`, `χ̄`, `a·χ₁` all in `CF(L,A)`), and the two
+`ZIrr`-membership facts `(χ−0)^τ, (χ−a·χ₁)^τ ∈ ℤ[Irr G]`, it builds **both** decompositions `D₀`
+(`ψ = 0`) and `Da` (`ψ = a·χ₁`) sharing the one running isometry `τ`.
+
+The previously missing lattice-relative inner-preservation input `htau1_inner_eq` is now discharged
+*internally* by `dadeIntegralCharacterMap_inner_eq_on_supported_span` — the Dade isometry's
+`CF(L,A)` inner-preservation specialized to the supported sponsoring lattice `ℤ[χ, χ̄, 0, a·χ₁]`.
+No global `IsIntegralIsometry` is needed or available; this is exactly what the Round-13 weakening
+unblocked.  The structural τ₁-agreement `Da.tau1 χ = D₀.tau1 χ` is `rfl`
+(`decompositionPair_tau1_agree`), so this pair feeds `retarget_isCoherent_of_sharedDecomposition`
+directly.  This closes Round-24 (ii): the per-step `(D₀, Da)` production from the Dade isometry. -/
+noncomputable def decompositionPairFromDade
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {χ chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ)
+    (hχsupp : χ.support ⊆ supportInSubgroup A L)
+    (hχbarsupp : χ.conj.support ⊆ supportInSubgroup A L)
+    (haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (htau1_mem0 :
+      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - 0) ∈ ZIrr G)
+    (htau1_mema :
+      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - a • chi1) ∈ ZIrr G)
+    (hχχ1 : ClassFunction.inner χ chi1 = 0)
+    (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ 0 ×
+      CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ (a • chi1) :=
+  -- Every generator of the sponsoring lattice `{χ, χ̄, 0, a·χ₁}` is supported, so the Dade
+  -- isometry's `CF(L,A)` inner-preservation supplies the lattice-relative `htau1_inner_eq`.
+  have hS : ∀ s ∈ ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction (↥L) ℂ)),
+      s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl | rfl | rfl
+    · exact hχsupp
+    · exact hχbarsupp
+    · simpa only [ClassFunction.support_zero] using Set.empty_subset _
+    · exact haχ1supp
+  CharacterPsiDecomposition.decompositionPair imageFamily
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (fun φ ζ hφ hζ =>
+      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hφ hζ)
+    rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar
 
 end DadeBaseMap
 
