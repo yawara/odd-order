@@ -203,6 +203,15 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - **正(半)定値性 infra** (ZIrrFourier, ℂ 全体一般・ZIrr 不要): `inner_self_eq_realCast`
     (⟨φ,φ⟩=(|G|:ℝ)⁻¹·∑‖φ(g)‖²) / `inner_self_re_nonneg` / `eq_zero_of_inner_self_re_eq_zero`。
   - AxiomsCheck: (5.5) を追加登録 (計 4 件, 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。
+- [x] (2026-05-31) (6.8)/(6.2) が依存する **§7 Theorem (5.6)** coherence-union hub の
+      family-free sub-lemma 2 件を `S07_Coherence.lean` に landing (sorry/axiom 無, 既存 axiom 件数不変):
+  - `int_eq_zero_of_sq_mul_le_of_two_mul_lt` ((5.6.2) integer-forcing core, division-free
+    `0<D, 0≤z, 0≤a, 2a<D, λ²D-2λa+z≤0 ⇒ λ=0`; sign trichotomy)。
+  - `CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi` ((5.6.2) 첫 norm bound
+    `‖Y‖² ≤ ‖ψ‖²`; landed (5.4.a) + total-norm 항등식에서 `linarith`)。
+  - 残 (5.6): (5.6.1) Y-decomposition (family `{χᵢ}`+degree ratio bundle 要), (5.6.3)/main の
+    `τ₂` **전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis →
+    전역 등거리)。상세 `notes/peterfalvi/s07_coherence.md` "(2026-05-31)" 절。
 
 ## 完了条件
 

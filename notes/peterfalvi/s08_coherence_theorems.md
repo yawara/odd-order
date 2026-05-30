@@ -57,6 +57,16 @@ structures for §8:
 - `coherence_inner_eq_on_supported`: proved coherence target があるとき、
   `Z[S,A]` 上で `τ` 自身が inner product を保存することを §8 setup から直接使う。
 
+### (2026-05-31) §7 (5.6) coherence-union 依存の sub-lemma 진척
+
+§8 (6.2)/(6.6)이 반복 invoke하는 **§7 Theorem (5.6)** (coherence-union hub)의
+family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axiom 無):
+`int_eq_zero_of_sq_mul_le_of_two_mul_lt` ((5.6.2) integer-forcing core, division-free
+`2a < D, λ²D-2λa+z ≤ 0 ⇒ λ=0`) + `CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi`
+((5.6.2) 첫 norm bound `‖Y‖² ≤ ‖ψ‖²`). 상세·잔여는 `notes/peterfalvi/s07_coherence.md`
+"(2026-05-31)" 절. (5.6) main `IsCoherent(S₁∪{χ,χ̄})`의 단일 blocker = `τ₂`의
+**전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis → 전역 등거리).
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

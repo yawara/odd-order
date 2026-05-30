@@ -593,6 +593,34 @@ roadmap의 무조건 ℚ→ℤ 형태는 채택하지 않음 (scaffolding/거짓
 **이후 leaf (미착수)**: (5.6.1) Y 분해, (5.6.2) `0 < b < 1 ⇒ λ = 0` quadratic forcing
 (`a` 와 `a_i` 가 본 lemma 出力), (5.4.a/b) Cauchy–Schwarz. 모두 R(χ) 一般 orthonormal lattice (B1) 선행 필요.
 
+### (2026-05-31) (5.6.2) integer-forcing + opening norm bound landing (S07)
+
+(5.6) coherence-union 정리를 향한 **family-free honest sub-lemma 2개**를 `S07_Coherence.lean`에
+landing (sorry/axiom 無). 둘 다 landed (5.4)/(5.5) API 위에 직접 구축, scaffolding 無.
+
+1. **`int_eq_zero_of_sq_mul_le_of_two_mul_lt`** (`S07_Coherence.lean`, namespace `S07`) — (5.6.2)의
+   integer-forcing core. division-free 형태: `0 < D` (rational), `0 ≤ z`, `0 ≤ a`,
+   **strict** `2a < D` (텍스트의 `b < 1`, `b = 2a/D`), `λ : ℤ`에 대해
+   `λ²·D - 2λa + z ≤ 0` ⟹ `λ = 0`. 부호별 trichotomy: `λ < 0`이면 `2λa ≤ 0 < λ²D` 모순;
+   `λ > 0`이면 `λ` 약분해 `λ·D ≤ 2a < D` + `λ ≥ 1` 모순. slack `z = ‖Z‖²`를 들고 있어 caller가
+   먼저 떨어뜨릴 필요 없음. **`λ` glyph는 식별자 불가** (lambda 예약) → 변수 `lam`, 가설 `hlamR`/`hlam1`.
+2. **`CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi`** — (5.6.2) 첫 줄 norm bound
+   `‖Y‖² ≤ ‖ψ‖²` (적용 시 `ψ = a·χ₁` → `‖Y‖² ≤ a²‖χ₁‖²`). landed `inner_self_chi_add_psi_eq`
+   (`‖χ‖²+‖ψ‖² = ‖X‖²+‖Y‖²`) + (5.4.a) `inner_self_chi_re_le_inner_self_X` (`‖χ‖² ≤ ‖X‖²`)에서 `linarith`로 즉시.
+
+**미착수 잔여 (정밀)**:
+- **(5.6.1) Y 분해** (`Y = a·χ₁^{τ₁} - λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, `λ ∈ ℤ`): family
+  `{χᵢ}` + degree ratio `aᵢ` + norm `‖χᵢ‖²` + cross-difference 직교
+  `⟨(χ-aχ₁)^τ, (χᵢ-aᵢχ₁)^τ⟩ = a·aᵢ‖χ₁‖²`를 담는 **새 ambient bundle**가 필요.
+  `CharacterPsiDecomposition`에는 family 데이터가 없음. (5.6.1) 결론을 가설로 패키징하면 scaffolding이라 금지 →
+  bundle을 실제 구성하고 inner-product 관계를 §5.2 직교성에서 유도해야 함 (~150-250 LOC).
+- **(5.6.3)/main `IsCoherent (S₁∪{χ,χ̄})`의 진짜 blocker**: `τ₂` extension은
+  `IntegralCharacterMap L G` (전체 `ClassFunction L ℂ` 위 ℤ-linear) + **global** `IsIntegralIsometry`
+  (`∀ φ ψ, ⟨τφ,τψ⟩=⟨φ,ψ⟩`)를 요구. 기저 `{χᵢ,χ,χ̄}` 위에서 정의해 ℤ-linear 확장해도 **전역 등거리**는
+  보장 안 됨 (lattice 등거리 ≪ 전역 등거리). repo/mathlib에 orthonormal-basis → 전역 등거리 확장
+  primitive **없음** (검색 확인: `grep LinearIsometry/extend` 무수확; `IsCoherent` 유일한 Type-level
+  생성자는 `S08.sibleySetup_is_coherent`의 sorry). 이 확장 생성자가 §5.6 main의 단일 미착수 장애물.
+
 ---
 
 ## 未解決 / TODO
