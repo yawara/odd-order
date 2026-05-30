@@ -1237,3 +1237,36 @@ D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive 
 
 1+2 が揃えば `ofProjection` で D₀/Da/Dmem 完成 → `Y_eq_nsmul_tau1_of_lambdaForm` (PASS 1) で `hY`,
 `retarget_isCoherent_of_decompositions_and_memberFamily` で (6.6) `hstep` 完全放電。
+
+**Round 24 PASS 2 (final) (2026-05-31) — per-step D₀/Da 生産パッケージ + 残の精密化**:
+- `CharacterPsiDecomposition.decompositionPair` (S07) : *同一* shared `(R(χ), τ₁, isom, agrees)` +
+  2 つの `ZIrr`-membership `(χ−0)^{τ₁}, (χ−a·χ₁)^{τ₁} ∈ ℤ[Irr G]` から `ofProjection` を 2 回呼び
+  D₀ (ψ=0) と Da (ψ=a·χ₁) を **同時生産** (`Prod`)。両者 `.tau1` が同一 `tau1` ゆえ
+  `Da.tau1 χ = D₀.tau1 χ` は構造的 `rfl` (`decompositionPair_tau1_agree`)。`a·χ₁` 直交性
+  `⟨χ, a·χ₁⟩ = a·⟨χ,χ₁⟩ = 0` は nsmul→ℂ-smul 変換 (`Nat.cast_smul_eq_nsmul` + `inner_smul_right`)。
+- `retarget_isCoherent_of_sharedDecomposition` (S07) : (5.6.3) per-step coherence entry point。
+  shared isometry data を取り pair を内部生産し `htau1_chi` を構造的放電 →
+  `retarget_isCoherent_of_decompositions_and_memberFamily` に委譲。`hmemOrtho` は
+  `D₀.imageFamily = imageFamily` (definitional; `ofProjection` が `imageFamily := imageFamily`) ゆえ
+  `Orthogonal imageFamily` で型整合。残 input は genuine Dade/running-extension facts
+  (per-member family Dmem/hmemOrtho/hmemTau1, (5.6.2) collapse hY, 各 agreement)。
+  これで per-step「ad-hoc 2 decomposition 供給 + τ₁ 共有 *主張*」義務を除去。
+
+**精密化した唯一の真の残 — global-vs-lattice isometry mismatch (本 round で確定)**: (6.6) hstep の
+*完全放電* の唯一の blocker は roadmap が「② τ₁ 2D Gram–Schmidt 拡張」と呼んだもの **だが、その global
+版は FT で構成不能 (statement が false)**:
+- `CharacterPsiDecomposition.tau1_isometry` は **global** `IsIntegralIsometry tau1`
+  (`∀ φ ψ : CF(L), ⟨τ₁φ,τ₁ψ⟩ = ⟨φ,ψ⟩`, CF(L) 全体) を要求。
+- だが Dade 等距 (`IsDadeIsometry`/`FullDadeIsometryData`) は **supported subspace `CF(L,A)` 上のみ**
+  isometric (`inner_eq : ∀ α β : SupportedClassFunctions A L, …`)。`dadeIntegralCharacterMap` の
+  `LinearMap.exists_extend` 拡張は off-support で非等距。
+- かつ FT では `dim CF(L) > dim CF(G)` ゆえ **global isometry CF(L)→CF(G) は一般に存在しない**
+  (`IsCoherent` docstring S07 L1023 が明言; だから `IsCoherent` は lattice-relative
+  `extension_inner_eq` を採用)。`retarget_isIntegralIsometry` (S07 L2023) も *global* τ₁ を要求し
+  global を産出する — retarget chain 全体が global 前提。
+- 健全な修正: `tau1_isometry` を `ℤ[χ−ψ, χ−χ̄]` 上の **lattice-relative isometry** に弱める。使用は
+  `inner_self_chi_eq_sum_coeff` (L904)/`inner_self_chi_add_psi_eq` (L971)/`RetargetTargetPair`
+  builder (L1838) の 3 箇所のみ、いずれも差分対 `{χ−ψ,χ−χ̄}` でしか `inner_eq` を使わない (weakening 健全)。
+  ただし `CharacterPsiDecomposition` 構造体 + 3 内部証明 + `ofProjection` + `decompositionPair` +
+  `retarget_isIntegralIsometry` (+ retarget chain 全体) に cascade する大規模・高リスク refactor で
+  別 round 推奨。①Dade R(χ) 抽出は②の lattice-relative 化が前提。

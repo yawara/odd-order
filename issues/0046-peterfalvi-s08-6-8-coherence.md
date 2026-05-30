@@ -870,11 +870,29 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     R → 整数 c α=⟨φ,α⟩ + 残差 Y⊥R) + `CharacterPsiDecomposition.ofProjection` (smart constructor:
     hard 6 fields を `(χ−ψ)^{τ₁}∈ZIrr G` から projection で *計算* 供給; 残 input = structural data
     のみ)。D₀/Da 生産を 2 primitive に縮約。sorry/axiom 無, AxiomsCheck 2 件 新規 全 allowlist; 緑 3360 jobs。
-  - **残 (次パス)**: D₀/Da/Dmem 完全生産に残る 2 純構成 primitive —
-    ① Dade R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`),
-    ② τ₁ isometry 拡張 (非実 χ で `ℤ[χ,χ̄]` 上 2D Gram–Schmidt, τ・running τ₁ と一致, ZIrr→ZIrr 保存)。
-    ②は from-scratch isometry-extension primitive で未実装。①②揃えば `ofProjection` で D₀/Da 完成
-    → `Y_eq_nsmul_tau1_of_lambdaForm` で hY → (6.6) hstep 完全放電。image-side (b)+(c) は完了。
+  - **Round 24 PASS 2 (final) (2026-05-31)**: source-side ② の per-step D₀/Da *生産パッケージ* 完了。
+    `CharacterPsiDecomposition.decompositionPair` — *同一* shared `(R(χ), τ₁, isom, agrees)` + 2 つの
+    `ZIrr`-membership `(χ−0)^{τ₁}, (χ−a·χ₁)^{τ₁} ∈ ℤ[Irr G]` から `ofProjection` を 2 回呼び D₀ (ψ=0) と
+    Da (ψ=a·χ₁) を *同時* 生産。両者の `.tau1` field が同一 `tau1` ゆえ τ₁-agreement
+    `Da.tau1 χ = D₀.tau1 χ` が **構造的** (`decompositionPair_tau1_agree`, `rfl`)。
+    `retarget_isCoherent_of_sharedDecomposition` — (5.6.3) per-step coherence entry point: shared
+    isometry data を取り pair を内部生産, `htau1_chi` を構造的放電。`a·χ₁` 直交性は bare χ⊥χ₁/χ̄⊥χ₁ から
+    nsmul で導出。sorry/axiom 無, AxiomsCheck 3 件 新規 全 allowlist; 緑 3360 jobs (commit f8bb55e)。
+    これで「ad-hoc な 2 decomposition を供給し τ₁ 共有を *主張*」する per-step 義務を除去。
+  - **残 (次パス) — 精密化した唯一の真の残**: (6.6) hstep の *完全放電* は **global-vs-lattice isometry
+    mismatch** で blocked。`CharacterPsiDecomposition.tau1_isometry` は *global* `IsIntegralIsometry tau1`
+    (= `∀ φ ψ, ⟨τ₁φ,τ₁ψ⟩=⟨φ,ψ⟩` on ALL of CF(L)) を要求するが、(a) Dade 等距 (`FullDadeIsometryData`/
+    `IsDadeIsometry`) は **supported subspace `CF(L,A)` 上のみ** isometric、(b) FT では
+    `dim CF(L) > dim CF(G)` ゆえ **global isometry は一般に存在しない** (`IsCoherent` docstring L1023 が
+    明言、だから `IsCoherent` は lattice-relative `extension_inner_eq` を採用)。よって roadmap の
+    「② τ₁ 2D Gram–Schmidt 拡張」は *global* 版としては **構成不能** (statement 自体が FT で false)。
+    真の修正は `tau1_isometry` を `ℤ[χ−ψ, χ−χ̄]` 上の **lattice-relative isometry** に弱める refactor
+    (使用は L904/L971/L1838 の 3 箇所のみ、いずれも差分対 `{χ−ψ,χ−χ̄}` 上でしか `inner_eq` を使わない —
+    weakening は健全)。ただしこれは `CharacterPsiDecomposition` 構造体 + 3 内部証明 + `ofProjection` +
+    `decompositionPair` + `retarget_isIntegralIsometry` (L2023 も *global* τ₁ を要求し global を産出する
+    retarget chain 全体) に cascade する大規模・高リスク refactor で、本ラウンド scope 外。
+    ① Dade R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) は依然 missing だが
+    ②の lattice-relative 化が前提。image-side (b)+(c) は完了済。
 
 ## 完了条件
 
