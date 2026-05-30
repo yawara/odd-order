@@ -652,6 +652,35 @@ pass 1의 sub-lemma 위에 (5.6.2)를 **완전히 닫고** (5.6.3)의 isometry �
 `τ₂`의 **전역** `IsIntegralIsometry` 확장 생성자 (orthonormal-basis → 전역 등거리 primitive,
 repo/mathlib 부재). main `IsCoherent(S₁∪{χ,χ̄})`는 이 둘이 갖춰지면 위 landed 계산으로 즉시 조립 가능.
 
+### (2026-05-31, pass 3) (5.6.3) re-targeting keystone + (5.6.1) family bundle landed
+
+`S07_Coherence.lean` `namespace IntegralCharacterMap` / `CharacterFamilyBundle` (sorry/axiom 無,
+AxiomsCheck 2 건 각 3 axiom 全 allowlist, full `lake build OddOrder` 緑 3351 jobs):
+
+- **`retarget`** (구성): `τ₁ ∘ₗ orthoResidualMap χ χ̄ + (innerLeftℤ χ).smulRight X +
+  (innerLeftℤ χ̄).smulRight X̄`. 곧 `τ₂ φ = τ₁ φ⊥ + ⟨φ,χ⟩·X + ⟨φ,χ̄⟩·X̄`,
+  `φ⊥ = φ − ⟨φ,χ⟩χ − ⟨φ,χ̄⟩χ̄`. **결정적 미묘점**: 잔차를 `τ₁` *전에* 취한다 — `τ₁`은 ℤ-선형뿐이라
+  복소 Fourier 계수를 통과시킬 수 없다. naive `τ₁ + ⟨·,χ⟩·(X−τ₁χ) + …` 형은 `τ₁(c•χ)≠c•τ₁χ`
+  (c∈ℂ) 때문에 틀린다 (이번 라운드 실측 확인). `innerLeftℤ`/`orthoResidualMap` 도 ℤ-선형으로 구성.
+- 일치 보조정리 (orthonormal pair 가정): `retarget_apply_left` (χ↦X), `retarget_apply_right`
+  (χ̄↦X̄), `retarget_eq_of_orthogonal` ({χ,χ̄}^⊥ 위 τ₁ 일치). `inner_orthoResidualMap_left/right`
+  (φ⊥ ⊥ {χ,χ̄}).
+- **`retarget_isIntegralIsometry`** (CRUX): `τ₁` 전역 등거리 + {χ,χ̄}/{X,X̄} 동일 gram orthonormal
+  + `∀ξ⊥{χ,χ̄}, ⟨τ₁ξ,X⟩=⟨τ₁ξ,X̄⟩=0` ⟹ `IsIntegralIsometry (retarget …)`. 증명: `inner_block_expand`
+  (sesquilinear block normal form, 일반 `W`) 을 source/image 양변에 적용 → 둘 다
+  `⟨φ⊥,ψ⊥⟩ + s·conj s' + t·conj t'` 로 환원, `τ₁` 등거리로 `⟨φ⊥,ψ⊥⟩=⟨τ₁φ⊥,τ₁ψ⊥⟩`.
+- **`CharacterFamilyBundle`** (5.6.1, posit 無): family `{χᵢ}_{i∈s}⊆S₁` + ratio aᵢ∈ℕ (a₁=1) +
+  degree scaling + `χ⊥S₁` + `{χᵢ}` pairwise 직교. **`crossDifference_inner`** (정리):
+  `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²` (i≠i₁) 를 `χ⊥S₁`+pairwise 에서 도출 (비-posit).
+
+**정밀 잔존 (main (5.6) 여전히 미착지, 새 brick 필요)**: repo `IsIntegralIsometry` 는 **전역**
+(∀φ,ψ) 인데 Peterfalvi (5.6.3) `τ₂` 등거리는 격자 `ℤ[S₁∪{χ,χ̄}]` 위에서만 검증된다. keystone 의
+가설 `∀ξ⊥{χ,χ̄}, ⟨τ₁ξ,X⟩=0` 은 `X∈ℤ[R(χ)]` 가 일반적으로 `span{τ₁χ,τ₁χ̄}` 밖이므로 주어진
+S₁-coherence 확장 τ₁ (span 밖 값 비제어) 에 대해 **충족 불가**. ⟹ main (5.6) 은 추가 brick =
+**"부분공간 등거리 → 전역 등거리 확장"** (유한차원 ℂ class-function 공간 Witt/Gram–Schmidt 확장)
+또는 격자-상대 `IsCoherent` 재정식화 필요. keystone 자체는 R(χ)⊆span{τ₁χ,τ₁χ̄} (2-원소 (5.2.d)
+base 등) 에서 직접 적용 가능하며 (5.6) 의 **대수적 심장**.
+
 ---
 
 ## 未解決 / TODO

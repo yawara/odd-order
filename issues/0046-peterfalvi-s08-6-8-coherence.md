@@ -225,6 +225,31 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `inner_self_conjImage_eq_card_sdiff` (`‖χ̄^{τ₂}‖²=|R(χ)|-|E|=‖χ̄‖²`),
     `inner_X_conjImage_eq_zero` (`⟨χ^{τ₂},χ̄^{τ₂}⟩=0`) — `τ₂` 구성 없이 (5.4.b) `E` 데이터에서.
   - 남은 단일 장애물 불변: (5.6.1) ambient bundle 구성 + `τ₂` 전역 `IsIntegralIsometry` 확장 생성자.
+- [x] (2026-05-31, pass 3) **(5.6.3) re-targeting keystone + (5.6.1) family bundle** を
+      `S07_Coherence.lean` に landing (sorry/axiom 無, AxiomsCheck 登録 2 件 各 3 axiom 全 allowlist,
+      full `lake build OddOrder` 緑 3351 jobs)。`namespace IntegralCharacterMap` /
+      `CharacterFamilyBundle`:
+  - **`retarget`** (構成): `τ₁ ∘ₗ orthoResidualMap + (innerLeftℤ χ).smulRight X +
+    (innerLeftℤ χ̄).smulRight Xbar`. 즉 `τ₂ φ = τ₁ φ⊥ + ⟨φ,χ⟩·X + ⟨φ,χ̄⟩·X̄`,
+    `φ⊥ = φ − ⟨φ,χ⟩χ − ⟨φ,χ̄⟩χ̄` (Gram–Schmidt 잔차). **핵심 미묘점**: 잔차를 `τ₁` *전에* 취함
+    — `τ₁` 은 ℤ-선형뿐이므로 복소 Fourier 계수를 통과시킬 수 없다 (naive `τ₁+correction` 형은 틀림).
+    `innerLeftℤ` (ℤ-선형 functional `φ↦⟨φ,η⟩`), `orthoResidualMap` (ℤ-선형 projection) 도 구성.
+  - 일치 보조정리: `retarget_apply_left` (χ↦X), `retarget_apply_right` (χ̄↦X̄),
+    `retarget_eq_of_orthogonal` ({χ,χ̄}^⊥ 위 τ₁ 일치) — 전부 orthonormal pair 가정에서.
+  - **`retarget_isIntegralIsometry`** (CRUX, 전역 등거리): `τ₁` 전역 등거리 + {χ,χ̄}/{X,X̄}
+    동일 gram orthonormal + `∀ξ⊥{χ,χ̄}, ⟨τ₁ξ,X⟩=⟨τ₁ξ,X̄⟩=0` ⟹ `IsIntegralIsometry (retarget …)`.
+    증명: `inner_block_expand` (sesquilinear block normal form) 을 source/image 양변에 적용,
+    둘 다 `⟨φ⊥,ψ⊥⟩+s·conj s'+t·conj t'` 로 환원 (φ⊥ 직교성 + 가설 직교성 + τ₁ 등거리).
+  - **`CharacterFamilyBundle`** (5.6.1 구성, posit 無): family `{χᵢ}_{i∈s}⊆S₁`, ratio aᵢ∈ℕ
+    (a₁=1), degree scaling, `χ⊥S₁` + `{χᵢ}` pairwise 직교. **`crossDifference_inner`** (정리, 비-posit):
+    `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²` (i≠i₁), `χ⊥S₁`+pairwise 직교에서 도출.
+  - **정밀 잔존 (main (5.6) 미착지)**: repo 의 `IsIntegralIsometry` 는 **전역** (모든 φ,ψ) 인데
+    Peterfalvi (5.6.3) 의 `τ₂` 등거리는 격자 `ℤ[S₁∪{χ,χ̄}]` 위에서만 검증된다. keystone 의
+    가설 `∀ξ⊥{χ,χ̄}, ⟨τ₁ξ,X⟩=0` 은 `X∈ℤ[R(χ)]` 가 `span{τ₁χ,τ₁χ̄}` 밖이면 (일반적으로 그렇다)
+    주어진 S₁-coherence 확장 τ₁ 에 대해 **충족 불가** (τ₁ 의 span 밖 값은 비제어). 따라서 main (5.6)
+    은 추가 brick = **"부분공간 등거리 → 전역 등거리 확장" (유한차원 ℂ class-function 공간의
+    Witt/Gram–Schmidt 확장)** 또는 격자-상대 `IsCoherent` 재정식화가 필요. keystone 자체는
+    R(χ)⊆span{τ₁χ,τ₁χ̄} (예: 2-원소 (5.2.d) base) 에서 직접 사용 가능하며 (5.6) 의 대수적 심장.
 
 ## 完了条件
 
