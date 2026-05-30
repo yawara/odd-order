@@ -10,6 +10,7 @@ import Mathlib.RepresentationTheory.Character
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
+import Mathlib.GroupTheory.PGroup
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
@@ -65,6 +66,9 @@ To each finite-dimensional irreducible complex representation `ρ` of `G` Schur'
   irreducible, `dim V` divides `|G|`.  The first orthogonality relation regrouped over conjugacy
   classes writes `|G| / χ_ρ(1) = ∑_C ω_ρ(C) · χ_ρ((g_C)⁻¹)` as a sum of products of algebraic
   integers, hence a rational algebraic integer ⇒ integer.
+* `OddOrder.RepresentationTheory.exists_finrank_eq_prime_pow_of_isPGroup` — **the degree of an
+  irreducible representation of a finite `p`-group is a power of `p`** (Isaacs Cor. 3.12): from
+  `finrank_dvd_card` together with `|G| = p ^ n` and `Nat.dvd_prime_pow`.
 
 ## References
 
@@ -816,6 +820,21 @@ theorem finrank_dvd_card (ρ : Representation ℂ G V) [IsIrreducible ρ] :
   -- `d ∣ |G|` in `ℤ`, hence in `ℕ`.
   have hdvdZ : (d : ℤ) ∣ (Nat.card G : ℤ) := ⟨n, by rw [← hZ]; ring⟩
   exact_mod_cast hdvdZ
+
+/-- **The degree of an irreducible representation of a `p`-group is a power of `p`** (Isaacs,
+*Character Theory of Finite Groups*, Cor. 3.12 / standard).  If `G` is a finite `p`-group and `ρ`
+is an irreducible complex representation of `G`, then `dim V = χ_ρ(1)` is a power of the prime `p`.
+
+This is the immediate divisibility corollary of `finrank_dvd_card`: writing `|G| = p ^ n`
+(`IsPGroup.iff_card`), the degree divides `p ^ n`, and a divisor of a prime power is itself a
+power of that prime (`Nat.dvd_prime_pow`). -/
+theorem exists_finrank_eq_prime_pow_of_isPGroup {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G)
+    (ρ : Representation ℂ G V) [IsIrreducible ρ] :
+    ∃ k : ℕ, finrank ℂ V = p ^ k := by
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp hG
+  have hdvd : finrank ℂ V ∣ p ^ n := hn ▸ finrank_dvd_card ρ
+  obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow (p := p) (Fact.out (p := p.Prime))).mp hdvd
+  exact ⟨k, hk⟩
 
 end CharacterDegreeDvdMain
 
