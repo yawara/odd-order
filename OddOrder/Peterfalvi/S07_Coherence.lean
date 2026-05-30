@@ -777,6 +777,35 @@ theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
     rw [D.inner_self_chi_eq_intCast]
     exact_mod_cast hcard
 
+/-- **Peterfalvi (5.5).**  Applying (5.4) with `ψ = 0`: the hypothesis `‖Y‖² ≥ ‖ψ‖² = 0`
+of (5.4.b) holds automatically (the inner product is positive semidefinite), so `Y = 0`
+and `χ^{τ₁} = X = ∑_{α ∈ E} α` for some `E ⊆ R(χ)` with `|E| = ‖χ‖²`.
+
+`‖ψ‖² = ⟨0, 0⟩ = 0 ≤ ‖Y‖²` feeds (5.4.b), whose norm equality `‖Y‖² = ‖ψ‖² = 0` forces
+`Y = 0` by positive definiteness of `ClassFunction.inner`.  Then
+`χ^{τ₁} = (χ - 0)^{τ₁} = X - Y = X`. -/
+theorem eq_sum_of_psi_eq_zero
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0) :
+    D.Y = 0 ∧ D.tau1 χ = D.X ∧
+      ∃ E ⊆ D.imageFamily.imageSet, D.X = ∑ α ∈ E, α ∧
+        (E.card : ℂ) = ClassFunction.inner χ χ := by
+  -- `‖ψ‖² = ‖0‖² = 0 ≤ ‖Y‖²` by positive semidefiniteness.
+  have hψY : (ClassFunction.inner (0 : ClassFunction L ℂ) 0).re ≤
+      (ClassFunction.inner D.Y D.Y).re := by
+    rw [ClassFunction.inner_zero_left, Complex.zero_re]
+    exact inner_self_re_nonneg D.Y
+  obtain ⟨_, hYnorm, E, hEsub, hXsum, hEcard⟩ := D.norm_eq_and_X_eq_sum_of_norm_Y_ge hψY
+  -- `‖Y‖² = ‖0‖² = 0`, so `Y = 0` by positive definiteness.
+  have hY0 : D.Y = 0 := by
+    apply eq_zero_of_inner_self_re_eq_zero
+    rw [← hYnorm, ClassFunction.inner_zero_left, Complex.zero_re]
+  -- `χ^{τ₁} = (χ - 0)^{τ₁} = X - Y = X`.
+  have hτ1χ : D.tau1 χ = D.X := by
+    have := D.tau1_image
+    rw [sub_zero] at this
+    rw [this, hY0, sub_zero]
+  exact ⟨hY0, hτ1χ, E, hEsub, hXsum, hEcard⟩
+
 end CharacterPsiDecomposition
 
 /-- Peterfalvi (5.1): `τ` is coherent for `(S,A)` if it admits an integral
