@@ -1026,4 +1026,46 @@ theorem int_eq_zero_of_sq_mul_le_of_two_mul_lt
     have hDle : D ≤ (lam : ℚ) * D := by nlinarith [hlam1, hD]
     linarith
 
+namespace CharacterPsiDecomposition
+
+open OddOrder.RepresentationTheory
+
+variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.2) quadratic bound.**  Suppose the orthogonal part `Y` of the (5.4)
+decomposition is written against an **orthogonal family** `v : ι → CF(G)` (indexed over
+`s`, with real gram `⟨v i, v j⟩ = if i = j then m i else 0`) plus a residual `Z` orthogonal
+to the family, with real coefficients `c`:
+
+`Y = (∑ i ∈ s, (c i) • v i) + Z`.
+
+Then `∑ i ∈ s, (c i)² · m i + ‖Z‖² ≤ ‖ψ‖²`.
+
+This is the geometric half of (5.6.2): the Pythagoras expansion of `‖Y‖²` against the
+orthogonal family, combined with the opening bound `‖Y‖² ≤ ‖ψ‖²` (`inner_self_Y_re_le_inner_self_psi`).
+The arithmetic half — substituting the (5.6.1) coefficients and forcing the integer `λ = 0` —
+is `int_eq_zero_of_sq_mul_le_of_two_mul_lt`. -/
+theorem sum_sq_mul_add_normSq_Z_le
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    {ι : Type*} (s : Finset ι) (v : ι → ClassFunction G ℂ) (c m : ι → ℝ)
+    (Z : ClassFunction G ℂ)
+    (hY : D.Y = (∑ i ∈ s, (c i : ℂ) • v i) + Z)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (v i) (v j) =
+      if i = j then (m i : ℂ) else 0)
+    (hZ : ∀ i ∈ s, ClassFunction.inner Z (v i) = 0) :
+    (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re ≤
+      (ClassFunction.inner ψ ψ).re := by
+  have hpyth := inner_self_orthogonalSum_add_re (G := G) s v c m Z horth hZ
+  have hYnorm : (ClassFunction.inner D.Y D.Y).re =
+      (∑ i ∈ s, (c i) ^ 2 * m i) + (ClassFunction.inner Z Z).re := by
+    rw [hY]; exact hpyth
+  have hbound := D.inner_self_Y_re_le_inner_self_psi
+  rw [hYnorm] at hbound
+  exact hbound
+
+end CharacterPsiDecomposition
+
 end OddOrder.Peterfalvi.S07
