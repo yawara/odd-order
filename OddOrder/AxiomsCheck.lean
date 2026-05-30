@@ -1116,6 +1116,12 @@ set_option linter.style.longLine false in
 -- `2a < D, λ²D-2λa+z ≤ 0 ⇒ λ = 0`. すべて (5.4)/(5.5) API 直載 sorry-free.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.inner_self_orthogonalSum_add_re
+-- (5.6.1) existence half (issue 0046): orthogonal projection of any `w` onto a finite orthogonal
+-- family `vᵢ` with nonzero real grams `mᵢ` — `w = ∑(⟨w,vᵢ⟩/mᵢ)•vᵢ + Z`, `Z ⊥ vⱼ`.  Pure diagonal
+-- projection (no completeness): supplies the (5.6.1) decomposition `Y − a·χ₁^{τ₁} = −λ·∑(aᵢ/‖χᵢ‖²)·
+-- χᵢ^{τ₁} + Z` whose coefficients are then computed from `χᵢ^{τ₁} ⊥ R(χ)` and fed to the capstone.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_orthogonalProjection_of_orthogonal_family
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi
 #assert_only_allowed_axioms

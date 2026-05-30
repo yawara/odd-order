@@ -455,6 +455,52 @@ theorem inner_self_orthogonalSum_add_re {ι : Type*} (s : Finset ι)
     ClassFunction.inner_add_right, hXZ, hZX, add_zero, zero_add, hXX,
     Complex.add_re, Complex.ofReal_re]
 
+open scoped Classical in
+omit [Finite G] in
+/-- **Orthogonal projection of a class function onto a finite orthogonal family.**
+Let `v : ι → ClassFunction G ℂ` (indexed over `s : Finset ι`) be **orthogonal** with real
+gram `⟨v i, v j⟩ = if i = j then (m i : ℂ) else 0`, where each gram is nonzero (`hm : ∀ i ∈ s,
+m i ≠ 0`).  Then any class function `w` decomposes as
+
+`w = (∑ i ∈ s, (c i) • v i) + Z`     with     `⟨Z, v j⟩ = 0` for all `j ∈ s`,
+
+where the projection coefficient is `c i = ⟨w, v i⟩ / (m i)`.
+
+This is the existence half of Peterfalvi (5.6.1): the orthogonal part `Y` of the (5.4)
+decomposition is written `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z` with `Z` orthogonal to the
+running family `χᵢ^{τ₁}` — i.e. `Y − a·χ₁^{τ₁}` is split into its projection onto `span{χᵢ^{τ₁}}`
+(an orthogonal family with grams `mᵢ = ‖χᵢ‖²`) plus the orthogonal residual `Z`.  The coefficients
+of that projection are subsequently *computed* (`λᵢ = λ·aᵢ/‖χᵢ‖²`) from the (5.5)+(5.2.e)
+orthogonality `χᵢ^{τ₁} ⊥ R(χ)`; this lemma supplies the *decomposition itself*, which is the pure
+linear-algebra primitive the integer-forcing capstone consumes via the λ-form. -/
+theorem exists_orthogonalProjection_of_orthogonal_family {ι : Type*} (s : Finset ι)
+    (v : ι → ClassFunction G ℂ) (m : ι → ℝ) (w : ClassFunction G ℂ)
+    (horth : ∀ i ∈ s, ∀ j ∈ s, ClassFunction.inner (v i) (v j) =
+      if i = j then (m i : ℂ) else 0)
+    (hm : ∀ i ∈ s, m i ≠ 0) :
+    ∃ (c : ι → ℂ) (Z : ClassFunction G ℂ),
+      (∀ i ∈ s, c i = ClassFunction.inner w (v i) / (m i : ℂ)) ∧
+      w = (∑ i ∈ s, c i • v i) + Z ∧
+      ∀ j ∈ s, ClassFunction.inner Z (v j) = 0 := by
+  classical
+  -- The projection coefficients `c i = ⟨w, vᵢ⟩ / mᵢ`.
+  set c : ι → ℂ := fun i => ClassFunction.inner w (v i) / (m i : ℂ) with hc
+  refine ⟨c, w - ∑ i ∈ s, c i • v i, fun i _ => rfl, by abel, ?_⟩
+  -- `⟨Z, vⱼ⟩ = ⟨w, vⱼ⟩ − ⟨∑ cᵢ•vᵢ, vⱼ⟩ = ⟨w, vⱼ⟩ − cⱼ·mⱼ = 0`.
+  intro j hj
+  rw [ClassFunction.inner_sub_left]
+  -- `⟨∑ cᵢ•vᵢ, vⱼ⟩ = ∑ cᵢ·⟨vᵢ,vⱼ⟩ = cⱼ·mⱼ` (diagonal survives by orthogonality).
+  have hproj : ClassFunction.inner (∑ i ∈ s, c i • v i) (v j) = c j * (m j : ℂ) := by
+    rw [inner_sum_left, Finset.sum_eq_single j]
+    · rw [ClassFunction.inner_smul_left, horth j hj j hj, if_pos rfl]
+    · intro i hi hij
+      rw [ClassFunction.inner_smul_left, horth i hi j hj, if_neg hij, mul_zero]
+    · intro hnj; exact absurd hj hnj
+  rw [hproj, hc]
+  -- `cⱼ·mⱼ = (⟨w,vⱼ⟩/mⱼ)·mⱼ = ⟨w,vⱼ⟩` since `mⱼ ≠ 0`.
+  have hmj : (m j : ℂ) ≠ 0 := by exact_mod_cast hm j hj
+  rw [div_mul_cancel₀ _ hmj, sub_self]
+
 set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- An irreducible representation has positive dimension. -/
