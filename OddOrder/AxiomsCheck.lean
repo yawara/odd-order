@@ -675,6 +675,12 @@ set_option linter.style.longLine false in
 -- discharged from the (6.7) setup (Sylow `P`, `Z ⊴ N_G(P)`, `P^#` TI) via (6.7.1)
 -- (`fixedPointFree_classPair_of_isTISubset` + `card_dvd_classSumCoeff_of_fixedPointFree`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong_of_isTISubset
+-- Peterfalvi (6.7.3) structure-constant atoms (the identity-class coefficients `a_{ij0}`):
+-- `classSumCoeff_one_eq_zero` is `a_{110} = 0` (no pair `(u,u⁻¹)` with both `u, u⁻¹ ∈ C₁` when
+-- `⟦z⁻¹⟧ ≠ ⟦z⟧`), and `classSumCoeff_one_eq_card` is `a_{120} = |C₁|` (the pairs with product `1`
+-- in `C₁ × C₁⁻¹` are exactly `(u, u⁻¹)`, `u ∈ C₁`).  These discharge two of the (6.7.3) atoms.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSumCoeff_one_eq_card
 -- Peterfalvi (6.7.3) (`ψ(z) ≡ ψ(1) (mod |P|)`), the congruence-arithmetic assembly of the two
 -- (6.7.2) instances at `(1,1)`/`(1,2)`: combine (transitivity) ⟶ substitute `ψ(1)α = |C₁|ψ(z)` and
 -- cancel the coprime factor `|C₁|` (`Cong.intMul_cancel_left`) ⟶ multiply the `1_G` congruence

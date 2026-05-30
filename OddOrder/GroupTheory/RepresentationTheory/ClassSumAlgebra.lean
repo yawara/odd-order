@@ -294,6 +294,66 @@ theorem classSum_mul (Ci Cj : ConjClasses G) :
 
 end StructureCoeff
 
+section StructureCoeffAtIdentity
+
+/-- `mk w = 1` (the identity conjugacy class) iff `w = 1`. -/
+private theorem mk_eq_one_iff_eq_one {w : G} : ConjClasses.mk w = 1 ↔ w = 1 := by
+  rw [ConjClasses.one_eq_mk_one, ConjClasses.mk_eq_mk_iff_isConj, isConj_one_left]
+
+variable [Fintype G] [DecidableEq (ConjClasses G)]
+
+/-- **Peterfalvi (6.7.3), structure constant `a_{ij0} = 0`.** The coefficient of the *identity*
+class in `classSumCoeff Ci Cj 1` counts ordered pairs `(u, v)` with `u ∈ C_i`, `v ∈ C_j` and
+`u·v = 1`, i.e. `v = u⁻¹` with `mk u = C_i` and `mk u⁻¹ = C_j`.  If no element of `C_i` has its
+inverse in `C_j` (`∀ u, mk u = C_i → mk u⁻¹ ≠ C_j`), the count is `0`.
+
+This is Peterfalvi's `a_{110} = 0`: with `C_i = C_j = C₁ = ⟦z⟧` and `⟦z⁻¹⟧ ≠ ⟦z⟧` (no nontrivial
+real class in odd order), an element `u ∈ C₁` has `u⁻¹ ∈ ⟦z⁻¹⟧ ≠ C₁`, so no pair multiplies to
+`1`. -/
+theorem classSumCoeff_one_eq_zero (Ci Cj : ConjClasses G)
+    (h : ∀ u : G, ConjClasses.mk u = Ci → ConjClasses.mk u⁻¹ ≠ Cj) :
+    classSumCoeff Ci Cj 1 = 0 := by
+  rw [classSumCoeff, Finset.card_eq_zero, Finset.filter_eq_empty_iff]
+  rintro ⟨u, v⟩ -
+  rintro ⟨hi, hj, huv⟩
+  -- `mk (u·v) = 1` forces `u·v = 1`, i.e. `u⁻¹ = v`; then `mk u⁻¹ = mk v = C_j` contradicts `h`.
+  rw [mk_eq_one_iff_eq_one] at huv
+  exact (h u hi) (by rw [inv_eq_of_mul_eq_one_right huv]; exact hj)
+
+/-- **Peterfalvi (6.7.3), structure constant `a_{ij0} = |C_i|`.** When `C_j` is the *inverse* class
+of `C_i` (every `u ∈ C_i` has `u⁻¹ ∈ C_j`), the coefficient of the identity class
+`classSumCoeff Ci Cj 1` equals `|C_i|`: the pairs with product `1` are exactly `(u, u⁻¹)` for
+`u ∈ C_i`, a bijection with `C_i`.
+
+This is Peterfalvi's `a_{120} = |C₁|`: with `C_i = C₁ = ⟦z⟧` and `C_j = C₂ = ⟦z⁻¹⟧`, each `u ∈ C₁`
+contributes the single pair `(u, u⁻¹)`.  The hypothesis `hinv` (that `mk u⁻¹ = C_j` for all
+`u ∈ C_i`) holds for `C_j = ⟦z⁻¹⟧` because `mk u = ⟦z⟧ ⟹ mk u⁻¹ = ⟦z⁻¹⟧`. -/
+theorem classSumCoeff_one_eq_card (Ci Cj : ConjClasses G)
+    (hinv : ∀ u : G, ConjClasses.mk u = Ci → ConjClasses.mk u⁻¹ = Cj) :
+    classSumCoeff Ci Cj 1 = Nat.card { x : G // ConjClasses.mk x = Ci } := by
+  classical
+  rw [classSumCoeff, Nat.card_eq_fintype_card,
+    Fintype.card_subtype (p := fun x => ConjClasses.mk x = Ci)]
+  -- The pair set `{(u,v) : mk u = Ci, mk v = Cj, mk (u·v) = 1}` is in bijection with
+  -- `{u : mk u = Ci}` via `u ↦ (u, u⁻¹)`, inverse `(u,v) ↦ u`.
+  refine Finset.card_nbij' (fun p => p.1) (fun u => (u, u⁻¹)) ?_ ?_ ?_ ?_
+  · rintro ⟨u, v⟩ hp
+    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp ⊢
+    exact hp.1
+  · intro u hu
+    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hu ⊢
+    refine ⟨hu, hinv u hu, ?_⟩
+    rw [mul_inv_cancel, mk_eq_one_iff_eq_one]
+  · rintro ⟨u, v⟩ hp
+    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp
+    obtain ⟨-, -, hs⟩ := hp
+    -- `mk (u·v) = 1` ⟹ `u·v = 1` ⟹ `v = u⁻¹`, so `(u, u⁻¹) = (u, v)`.
+    rw [mk_eq_one_iff_eq_one] at hs
+    simp [inv_eq_of_mul_eq_one_right hs]
+  · intro u _; rfl
+
+end StructureCoeffAtIdentity
+
 section FreeActionDivisibility
 
 /-- **A free action of a finite group divides the cardinality of the set acted on.** If a finite
