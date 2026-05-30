@@ -337,6 +337,67 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic (hR : IsPGroup 
     hR.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne hK hL hKL
   exact ⟨E, hE_elem, hE_card⟩
 
+/-- `Ω₁(Z(R))` as a subgroup of `R`: the central elements of order dividing `p`.
+The center is abelian, so this is the genuine `Ω₁` (the set is closed under
+multiplication). -/
+private def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
+  omega1OfAbelian R (Subgroup.center R) p
+    (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)
+
+omit [Finite R] [Fact p.Prime] in
+private theorem omega1Center_le_center : omega1Center R p ≤ Subgroup.center R :=
+  fun _ hg => hg.1
+
+omit [Finite R] [Fact p.Prime] in
+private theorem mem_omega1Center {g : R} :
+    g ∈ omega1Center R p ↔ g ∈ Subgroup.center R ∧ g ^ p = 1 := Iff.rfl
+
+/-- **BG Lemma 4.5(a)** (the *normal* conclusion, abelian-center case). If the
+central subgroup `Ω₁(Z(R))` of a finite `p`-group `R` is noncyclic — equivalently
+`p² ∣ |Ω₁(Z(R))|`, the situation when `Z(R)` itself is noncyclic — then `R` has a
+**normal** elementary abelian subgroup of order `p²`.
+
+Proof: `Ω₁(Z(R))` is central, hence its `p²`-order subgroup `B` (obtained from
+`Sylow.exists_subgroup_card_pow_prime_of_le_card`, valid since `B ≤ Ω₁(Z(R))` is a
+`p`-group of order `≥ p²`) is central in `R`, therefore normal; and `B`, being a
+subgroup of the elementary abelian group `Ω₁(Z(R))`, is itself elementary abelian.
+
+This is the case of Lemma 4.5(a) that the repo proves cleanly. The general (cyclic
+center, e.g. extraspecial) case is Gorenstein 5.4.10 and is deferred. -/
+theorem exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center
+    (hsq : p ^ 2 ∣ Nat.card (omega1Center R p)) :
+    ∃ E : Subgroup R, E.Normal ∧ E.IsElementaryAbelian p ∧ Nat.card E = p ^ 2 := by
+  -- `Ω₁(Z(R))` is an elementary abelian `p`-group (central, exponent dividing `p`).
+  have hΩ_elem : (omega1Center R p).IsElementaryAbelian p := by
+    refine ⟨fun x y => ?_, fun x => ?_⟩
+    · -- commutativity: both lie in the center.
+      apply Subtype.ext
+      exact (Subgroup.mem_center_iff.mp (omega1Center_le_center x.2) (y : R)).symm
+    · -- `x ^ p = 1` by definition of `Ω₁`.
+      apply Subtype.ext
+      have : (x : R) ^ p = 1 := (mem_omega1Center.mp x.2).2
+      simpa using this
+  have hΩ_pgroup : IsPGroup p (omega1Center R p) := hΩ_elem.isPGroup
+  -- A `p²`-order subgroup `B` of `↥(Ω₁(Z(R)))` (`p² ∣ |Ω| ⇒ p² ≤ |Ω|`).
+  have hΩ_le : p ^ 2 ≤ Nat.card (omega1Center R p) := Nat.le_of_dvd Nat.card_pos hsq
+  obtain ⟨B, hB_card⟩ :=
+    Sylow.exists_subgroup_card_pow_prime_of_le_card (n := 2) Fact.out hΩ_pgroup hΩ_le
+  -- Push `B` into `R`; the image lands in `Ω₁(Z(R)) ≤ Z(R)`.
+  set E : Subgroup R := B.map (omega1Center R p).subtype with hE_def
+  have hE_le_Ω : E ≤ omega1Center R p := by
+    rw [hE_def]; exact Subgroup.map_subtype_le B
+  have hE_le_center : E ≤ Subgroup.center R := le_trans hE_le_Ω omega1Center_le_center
+  refine ⟨E, ?_, ?_, ?_⟩
+  · -- `E` central ⇒ normal.
+    refine ⟨fun n hn g => ?_⟩
+    have hgn : g * n = n * g := Subgroup.mem_center_iff.mp (hE_le_center hn) g
+    simpa [mul_assoc, hgn] using hn
+  · -- `E` elementary abelian: image of the elementary abelian `B` under an injective map.
+    have hB_elem : B.IsElementaryAbelian p := hΩ_elem.to_subgroup B
+    exact hB_elem.map (omega1Center R p).subtype_injective
+  · -- `|E| = |B| = p²`.
+    rw [hE_def, Subgroup.card_map_of_injective (omega1Center R p).subtype_injective, hB_card]
+
 end ElementaryAbelianExistence
 
 end OddOrder.BG.Ch1.S04
