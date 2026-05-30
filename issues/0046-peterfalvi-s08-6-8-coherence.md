@@ -587,6 +587,28 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     固有値は 1 の冪根 (norm 1), `trace=Σλ_i=dim` ⇒ `|Σλ_i|≤Σ|λ_i|=dim` 等号で全 `λ_i=1`,
     semisimple+唯一固有値 1 ⇒ `ρ n=id` (`IsSemisimple.eq_zero_iff_forall_eigenvalue` 系)。
     この diagonalization keystone は数時間規模の独立 leaf = 次 PASS。入れば (b) sum-bijection は機械的。
+- [x] (2026-05-31, **DIAGONALIZATION KEYSTONE landed** — G2.2/G2.5 共有 gate) 上で予告した keystone
+      を honest + sorry/axiom 無で着地 (各 `#assert_only_allowed_axioms` = 3 axiom 全 allowlist; full
+      `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs)。commit c9723a1 / 89744b4 /
+      6512956 / a5bde78:
+  - **`RepresentationTheory.rep_eq_id_of_character_eq_one`** (`ClassSumAlgebra.lean`): 予告通りの経路
+      ((ρ g)^n=1 ⇒ squarefree `X^n−1` 零化 ⇒ `isSemisimple_of_squarefree_aeval_eq_zero`; trace =
+      `charpoly.roots.sum` = 単位円固有値和 = degree = roots.card ⇒ 三角等号
+      `all_eq_one_of_norm_eq_one_of_sum_eq_card` (real-part / 非負和論法) で全固有値 = 1; semisimple +
+      唯一固有値 1 ⇒ `IsSemisimple.iSup_eigenspace_eq_top` で `eigenspace 1 = ⊤` ⇒ `ρ g − 1 = 0`)。
+      `character_isIntegral` の eigenvalue/trace 機構を再利用。
+  - **G2.5 surjectivity 完了**: `RepresentationTheory.exists_inflate_eq_of_subset_characterKernel`
+      (`InflationCharacter.lean`) — `N ⊆ Ker χ` なる `χ∈Irr G` は `inflate N χ̄` の形。keystone で `ρ` が
+      `N` 上自明 ⇒ `Representation.ofQuotient ρ N` で `G⧸N` へ降下 (`σ` 既約は新 reverse lemma
+      `isIrreducible_of_isIrreducible_comp_of_surjective`, `compHomEquiv` 逆向き transport) ⇒
+      `χ_σ ∘ mk' = χ`。`inflate_injective` と合わせ degree 保存 **全単射**
+      `Irr(L/Z) ≃ {χ∈Irr L | Z⊆Ker χ}` 確定 ⇒ G2.5 degree-sum `Σ_{Z⊆Ker χ}χ(1)²=|L/Z|` が機械的に閉じる。
+  - **G2.2 needs-infra 完了**: `ClassSumAlgebra.norm_character_le_finrank` (一般 `‖χ(g)‖ ≤ χ(1)`,
+      中心限定 Schur の一般化) + `character_eq_one_iff_rep_eq_id` (等号両方向) →
+      `S03.norm_irreducibleCharacter_le_natDegree` + `S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`
+      (constituent-inherits-kernel 等号 case: `(∑ mᵢ χᵢ)(g) = (∑ mᵢ χᵢ)(1) ⟹ mᵢ≠0 の χᵢ で g∈Ker χᵢ`)。
+      上記「精密残 (G2.2 で R17 を超える唯一の piece)」を閉じる。**残**: ψ=Ind_K^L θ の `∑ mᵢ χᵢ` 分解
+      (genuine character = `Irr` 上 ℕ-結合) は別 leaf (G2.2 caller assembly)。
 
 ## 完了条件
 

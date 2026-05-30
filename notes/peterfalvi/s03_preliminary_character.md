@@ -161,6 +161,34 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
     Z ⊆ Ker χ`).  This is the general character-value bound `|χ(a)| ≤ χ(1)` with its equality case;
     the repo currently has only the **central**-element Schur equality `‖χ(z)‖² = χ(1)²`
     (`SchurCenterBound.lean:108`), so the general-`a` bound is `needs-infra`.
+- (2026-05-31, **DIAGONALIZATION KEYSTONE landed** — closes the G2.2 `needs-infra` above and the
+  G2.5 inflation-surjectivity gate; the shared gate of Round-18) The keystone and its character-value
+  consequences are now sorry/axiom-free (`#print axioms` = `{propext, Classical.choice, Quot.sound}`,
+  AxiomsCheck registered):
+  - `OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one` (`ClassSumAlgebra.lean`): for a
+    finite-dim complex rep `ρ` of a finite group and `g`, `ρ.character g = ρ.character 1`
+    (`= finrank ℂ V`) ⟹ `ρ g = LinearMap.id`.  `ρ g` finite-order ⇒ semisimple (squarefree
+    `X ^ n − 1`); trace = `charpoly.roots.sum` = sum of unit-modulus eigenvalues = degree = count
+    forces every eigenvalue `= 1` (triangle equality case
+    `all_eq_one_of_norm_eq_one_of_sum_eq_card`, a real-part / non-negative-sum argument); semisimple
+    + only eigenvalue `1` ⇒ `eigenspace 1 = ⊤` ⇒ `ρ g − 1 = 0`.  Reuses the
+    `character_isIntegral` eigenvalue/trace machinery.
+  - `norm_character_le_finrank` + `character_eq_one_iff_rep_eq_id` (`ClassSumAlgebra.lean`): the
+    **general** `‖χ(g)‖ ≤ χ(1)` bound (the `needs-infra` piece above, now closed) and its equality
+    case both directions — the general-`a` generalization of the central Schur equality.
+  - `S03.norm_irreducibleCharacter_le_natDegree` + `S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`
+    (`S03_PreliminaryCharacter.lean`): the **G2.2 constituent-inherits-kernel** equality case in
+    consumer form — for irreducible χᵢ with non-negative multiplicities mᵢ, `(∑ mᵢ χᵢ)(g) = (∑ mᵢ
+    χᵢ)(1)` ⟹ every `χᵢ` (`mᵢ ≠ 0`) has `g ∈ characterKernel χᵢ`.  A future G2.2 assembly supplies
+    the `ψ = ∑ mᵢ χᵢ` decomposition of `Ind_K^L θ` (genuine-character = ℕ-combination of irreducibles
+    over `Irr`, still `needs-infra`).
+  - **G2.5**: `RepresentationTheory.exists_inflate_eq_of_subset_characterKernel`
+    (`InflationCharacter.lean`): every irreducible `χ` of `G` with `N ⊆ ker χ` arises as
+    `inflate N χbar`.  The keystone makes `ρ` trivial on `N`, so `ρ` descends through
+    `Representation.ofQuotient` to an irreducible `σ` on `G ⧸ N` (`σ` irreducible via the new reverse
+    lemma `isIrreducible_of_isIrreducible_comp_of_surjective`) with `χ_σ ∘ mk' = χ`.  With
+    `inflate_injective` this is the full degree-preserving bijection `Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆
+    ker χ}`, giving the (6.6) degree-sum `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`.
 - `SecondOrthogonality` now exposes the next matrix proof-core bridge:
   `conjugacyClassSize_pos`,
   `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,
