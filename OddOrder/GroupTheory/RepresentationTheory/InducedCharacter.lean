@@ -9,6 +9,8 @@ import Mathlib.Data.Fintype.Card
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 
 /-!
 # Classical induction sums for class functions
@@ -279,6 +281,317 @@ theorem support_induce_subset_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
   exact hg (induce_eq_zero_of_not_conjugatesIntoSet hθ hnot)
 
 end Normalized
+
+section FrobeniusReciprocity
+
+variable [StarRing k]
+
+/-- The `x`-slice of the induction sum, paired with `star (χ g)`, does not depend on
+`x` when `χ` is a class function: conjugating `g ↦ x * g * x⁻¹` sends the `x`-slice to
+the `1`-slice and fixes `χ`. -/
+theorem sum_induceTerm_mul_star_eq (H : Subgroup G) (θ : ClassFunction ↥H k)
+    (χ : ClassFunction G k) (x : G) :
+    (∑ g : G, induceTerm H θ x g * star (χ g)) =
+      ∑ g : G, induceTerm H θ 1 g * star (χ g) := by
+  refine (Fintype.sum_equiv (MulAut.conj x).toEquiv _ _ ?_).symm
+  intro g
+  have hconj : (MulAut.conj x).toEquiv g = x * g * x⁻¹ := by simp [MulAut.conj_apply]
+  rw [hconj]
+  have hterm : induceTerm H θ x (x * g * x⁻¹) = induceTerm H θ 1 g := by
+    have := induceTerm_conj H θ x g x
+    rwa [inv_mul_cancel] at this
+  rw [hterm, χ.conj_eq g x]
+
+/-- The `1`-slice of the induction sum, paired with `star (χ g)`, collected over the
+subgroup: only `g ∈ H` contributes, where `induceTerm H θ 1 g = θ g`. -/
+theorem sum_induceTerm_one_mul_star_eq (H : Subgroup G) [Fintype H]
+    (θ : ClassFunction ↥H k) (χ : ClassFunction G k) :
+    (∑ g : G, induceTerm H θ 1 g * star (χ g)) =
+      ∑ h : H, θ h * star ((restrict H χ) h) := by
+  classical
+  set s : Finset G := Finset.univ.filter (fun g : G => g ∈ H) with hs
+  have hmem_iff : ∀ x : G, x ∈ s ↔ x ∈ H := fun x => by simp [hs]
+  -- Step 1: collapse the universe sum to the filtered sum (off-`H` terms vanish).
+  have hstep1 :
+      (∑ g : G, induceTerm H θ 1 g * star (χ g)) =
+        ∑ g ∈ s, induceTerm H θ 1 g * star (χ g) := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+    intro g _ hg
+    have hgH : g ∉ H := by rw [hmem_iff] at hg; exact hg
+    have hnmem : (1 : G)⁻¹ * g * 1 ∉ H := by simpa using hgH
+    rw [induceTerm_of_not_mem θ hnmem, zero_mul]
+  -- Step 2: identify the filtered sum with the subtype sum over `H`.
+  have hstep2 :
+      (∑ g ∈ s, induceTerm H θ 1 g * star (χ g)) =
+        ∑ h : H, θ h * star ((restrict H χ) h) := by
+    rw [Finset.sum_subtype s hmem_iff (fun g => induceTerm H θ 1 g * star (χ g))]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    have hmem : (1 : G)⁻¹ * (h : G) * 1 ∈ H := by
+      rw [inv_one, one_mul, mul_one]; exact h.2
+    rw [induceTerm_of_mem θ hmem]
+    have hθeq : (θ : ↥H → k) ⟨(1 : G)⁻¹ * (h : G) * 1, hmem⟩ = (θ : ↥H → k) h :=
+      congrArg (θ : ↥H → k) (by apply Subtype.ext; simp)
+    rw [hθeq]; rfl
+  rw [hstep1, hstep2]
+
+/-- **Frobenius reciprocity** for the classical induced class function, in
+unnormalized inner-sum form:
+
+`∑_{g∈G} (Ind θ)^{unscaled}(g) · star (χ g) = |G| · ∑_{h∈H} θ h · star (χ h)`.
+
+The factor `|G|` arises because each of the `|G|` slices indexed by `x ∈ G` contributes
+the same subgroup sum. -/
+theorem sum_induceSum_mul_star_eq (H : Subgroup G) [Fintype H] (θ : ClassFunction ↥H k)
+    (χ : ClassFunction G k) :
+    (∑ g : G, induceSum H θ g * star (χ g)) =
+      (Nat.card G : k) * ∑ h : H, θ h * star ((restrict H χ) h) := by
+  classical
+  have hswap :
+      (∑ g : G, induceSum H θ g * star (χ g)) =
+        ∑ x : G, ∑ g : G, induceTerm H θ x g * star (χ g) := by
+    simp only [induceSum_apply, Finset.sum_mul]
+    rw [Finset.sum_comm]
+  rw [hswap]
+  have hconst : ∀ x : G,
+      (∑ g : G, induceTerm H θ x g * star (χ g)) =
+        ∑ h : H, θ h * star ((restrict H χ) h) := by
+    intro x
+    rw [sum_induceTerm_mul_star_eq H θ χ x,
+      sum_induceTerm_one_mul_star_eq H θ χ]
+  rw [Finset.sum_congr rfl fun x _ => hconst x]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Nat.card_eq_fintype_card]
+
+/-- **Frobenius reciprocity** (numerical / class-function form):
+`(Ind_H^G θ, χ)_G = (θ, Res_H^G χ)_H`.
+
+This is [Is] Lemma 5.2, the adjunction between induction and restriction at the level of
+class-function inner products. -/
+theorem inner_induce_eq_inner_restrict (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card G : k)] [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) (χ : ClassFunction G k) :
+    ClassFunction.inner (induce H θ) χ =
+      ClassFunction.inner θ (restrict H χ) := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+    ClassFunction.innerSum]
+  have hL : ∀ g : G, (induce H θ) g * star (χ g) =
+      ⅟(Nat.card H : k) * (induceSum H θ g * star (χ g)) := by
+    intro g
+    rw [induce, ClassFunction.smul_apply, mul_assoc]
+  rw [Finset.sum_congr rfl fun g _ => hL g, ← Finset.mul_sum,
+    sum_induceSum_mul_star_eq H θ χ]
+  set S : k := ∑ h : H, θ h * star ((restrict H χ) h) with hS
+  -- LHS: ⅟|G| * (⅟|H| * (|G| * S))  =  ⅟|H| * S  :RHS
+  calc ⅟(Nat.card G : k) * (⅟(Nat.card H : k) * ((Nat.card G : k) * S))
+      = (⅟(Nat.card G : k) * (Nat.card G : k)) * (⅟(Nat.card H : k) * S) := by ring
+    _ = ⅟(Nat.card H : k) * S := by rw [invOf_mul_self, one_mul]
+
+end FrobeniusReciprocity
+
+section VirtualCharacters
+
+/-! ### Restriction and induction preserve virtual characters (Peterfalvi (2.6.b))
+
+The Dade isometry sends virtual characters to virtual characters.  The two facts that
+underlie this are:
+
+* `restrict_mem_ZIrr` — restriction `Res^G_H` maps `ℤ[Irr G]` into `ℤ[Irr H]`.  The base
+  case (an irreducible character `χ_ρ`) reduces to: the restriction of `ρ` to `H` is a
+  *finite-dimensional* (not necessarily irreducible) representation of `H`, whose character
+  lies in `ℤ[Irr H]` by `character_mem_ZIrr` (the completeness keystone).
+* `induce_mem_ZIrr` — induction `Ind_H^G` maps `ℤ[Irr H]` into `ℤ[Irr G]`.  By completeness
+  every class function is determined by its inner products against `Irr G`; numerical
+  Frobenius reciprocity (`inner_induce_eq_inner_restrict`) turns each such pairing into a
+  pairing over `H` of two virtual characters, which is an integer, so `Ind_H^G θ` is a
+  finite integer combination of irreducibles.
+
+These are the single biggest prerequisites of Peterfalvi (2.6.b).
+-/
+
+omit [Fintype G] in
+/-- The character of `ρ` restricted to a subgroup `H` is the restriction of the character of
+`ρ`: `Res^G_H (χ_ρ) = χ_{ρ ∘ H.subtype}`.  Here both sides are taken as class functions on
+`H`, the right-hand side being the character of the restricted representation
+`ρ.comp H.subtype : Representation ℂ H V`. -/
+theorem restrict_repCharacterClassFunction {V : Type} [AddCommGroup V] [Module ℂ V]
+    [FiniteDimensional ℂ V] (H : Subgroup G) (ρ : Representation ℂ G V) :
+    restrict H (repCharacterClassFunction ρ)
+      = repCharacterClassFunction (ρ.comp H.subtype) := by
+  ext h
+  rw [restrict_apply, repCharacterClassFunction_apply, repCharacterClassFunction_apply]
+  rfl
+
+variable [Finite G]
+
+omit [Fintype G] in
+/-- **Restriction preserves virtual characters.** For a subgroup `H ≤ G` and a virtual
+character `φ ∈ ℤ[Irr G]`, the restriction `Res^G_H φ` is a virtual character of `H`.
+
+This is one direction of Peterfalvi (2.6.b).  The proof is `Submodule.span_induction`: the
+linear cases are immediate from linearity of `restrict`, and the base case `φ ∈ Irr(G)` —
+the character of a finite-dimensional irreducible representation `ρ` — uses that
+`Res^G_H (χ_ρ)` is the character of the *finite-dimensional* (a priori reducible)
+representation `ρ.comp H.subtype` of `H`, which lies in `ℤ[Irr H]` by `character_mem_ZIrr`. -/
+theorem restrict_mem_ZIrr (H : Subgroup G) {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    restrict H φ ∈ ZIrr H := by
+  haveI : Finite H := Subtype.finite
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, _, hρeq⟩ := hx
+      have hx_eq : x = repCharacterClassFunction ρ := by
+        apply ClassFunction.ext
+        intro g
+        rw [repCharacterClassFunction_apply, congrFun hρeq g]
+      rw [hx_eq, restrict_repCharacterClassFunction H ρ]
+      exact character_mem_ZIrr (ρ.comp H.subtype)
+  | zero => rw [restrict_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [restrict_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, restrict_smul, Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ a ih
+
+omit [Fintype G] [Finite G] in
+/-- The pullback of the character of `ρ` along a group hom `f : H →* G` is the character of
+the pulled-back representation: `(χ_ρ) ∘ f = χ_{ρ ∘ f}`.  Here the right-hand side is the
+character of `ρ.comp f : Representation ℂ H V`. -/
+theorem compHom_repCharacterClassFunction {H : Type*} [Group H]
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (f : H →* G) (ρ : Representation ℂ G V) :
+    compHom f (repCharacterClassFunction ρ)
+      = repCharacterClassFunction (ρ.comp f) := by
+  ext h
+  rfl
+
+omit [Fintype G] [Finite G] in
+/-- **Pullback along a group hom preserves virtual characters.** For a group hom
+`f : H →* G` with `H` finite and a virtual character `φ ∈ ℤ[Irr G]`, the pullback
+`φ ∘ f` is a virtual character of `H`.
+
+This is the general "Res along a homomorphism" form needed for Peterfalvi (2.9): the class
+function `α_B = α ∘ f_B` is a virtual character of `M(B)` whenever `α ∈ ℤ[Irr L]`, where
+`f_B : M(B) →* L`.  As with `restrict_mem_ZIrr`, the proof is `Submodule.span_induction`;
+the base case uses that `(χ_ρ) ∘ f` is the character of the finite-dimensional
+representation `ρ.comp f`, which lies in `ℤ[Irr H]` by `character_mem_ZIrr` (irreducibility
+of `ρ.comp f` is *not* needed). -/
+theorem compHom_mem_ZIrr {H : Type*} [Group H] [Finite H] (f : H →* G)
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    compHom f φ ∈ ZIrr H := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, _, hρeq⟩ := hx
+      have hx_eq : x = repCharacterClassFunction ρ := by
+        apply ClassFunction.ext
+        intro g
+        rw [repCharacterClassFunction_apply, congrFun hρeq g]
+      rw [hx_eq, compHom_repCharacterClassFunction f ρ]
+      exact character_mem_ZIrr (ρ.comp f)
+  | zero => rw [compHom_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [compHom_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, compHom_smul, Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ a ih
+
+end VirtualCharacters
+
+section InduceVirtualCharacters
+
+/-! ### Induction preserves virtual characters -/
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- The inner product of two virtual characters is an integer.  Writing `ψ ∈ ℤ[Irr H]` as a
+`ℤ`-combination of irreducibles and using that `⟨φ, χ⟩` is an integer for each irreducible
+`χ` (`mem_ZIrr_inner_int`) and conjugate-linearity in the right argument. -/
+theorem inner_mem_ZIrr_int {φ ψ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (hψ : ψ ∈ ZIrr G) :
+    ∃ m : ℤ, ClassFunction.inner φ ψ = (m : ℂ) := by
+  induction hψ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨m, hm⟩ := mem_ZIrr_inner_int (⟨x, hx⟩ : IrreducibleCharacter G) hφ
+      exact ⟨m, hm⟩
+  | zero => exact ⟨0, by simp⟩
+  | add x y _ _ ihx ihy =>
+      obtain ⟨mx, hmx⟩ := ihx
+      obtain ⟨my, hmy⟩ := ihy
+      refine ⟨mx + my, ?_⟩
+      rw [ClassFunction.inner_add_right, hmx, hmy]; push_cast; ring
+  | smul a x _ ih =>
+      obtain ⟨m, hm⟩ := ih
+      refine ⟨a * m, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, inner_smul_right, hm]
+      simp only [star_intCast]; push_cast; ring
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Induction preserves virtual characters.** For a subgroup `H ≤ G` and a virtual
+character `θ ∈ ℤ[Irr H]`, the induced class function `Ind_H^G θ` is a virtual character of `G`.
+
+This is the other direction of Peterfalvi (2.6.b), the single biggest prerequisite of the
+construction of the Dade map.  The proof is `Submodule.span_induction` on `θ`; the linear
+cases follow from `induce_add` / `induce_smul`.  The base case `θ ∈ Irr(H)`:
+
+* For every irreducible `χ ∈ Irr(G)`, numerical Frobenius reciprocity
+  (`inner_induce_eq_inner_restrict`) gives `⟨Ind_H^G θ, χ⟩_G = ⟨θ, Res^G_H χ⟩_H`.
+  Since `Res^G_H χ ∈ ℤ[Irr H]` (`restrict_mem_ZIrr`) and `θ ∈ ℤ[Irr H]`, this is an integer
+  `f χ` (`inner_mem_ZIrr_int`).
+* Set `Φ = ∑_{χ ∈ Irr G} (f χ : ℂ) • χ ∈ ℤ[Irr G]`.  Then `Ind_H^G θ - Φ` is orthogonal to
+  every irreducible character (the diagonal Fourier coefficients agree by orthonormality), so
+  it is `0` by completeness (`classFunction_eq_zero_of_orthogonal`).  Hence `Ind_H^G θ = Φ`. -/
+theorem induce_mem_ZIrr (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : θ ∈ ZIrr H) :
+    induce H θ ∈ ZIrr G := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Finite H := Subtype.finite
+  haveI := finite_irreducibleCharacter (G := G)
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  classical
+  induction hθ using Submodule.span_induction with
+  | mem x hx =>
+      set θ₀ : ClassFunction ↥H ℂ := x with hθ₀
+      have hθ₀mem : θ₀ ∈ ZIrr H := Submodule.subset_span hx
+      -- For each irreducible `χ` of `G`, the Fourier coefficient `⟨Ind θ₀, χ⟩` is an integer.
+      have hcoeff : ∀ χ : IrreducibleCharacter G,
+          ∃ m : ℤ, ClassFunction.inner (induce H θ₀) (χ : ClassFunction G ℂ) = (m : ℂ) := by
+        intro χ
+        rw [inner_induce_eq_inner_restrict]
+        exact inner_mem_ZIrr_int hθ₀mem (restrict_mem_ZIrr H χ.mem_ZIrr)
+      choose f hf using hcoeff
+      -- The candidate virtual character `Φ = ∑_χ (f χ) • χ`.
+      set Φ : ClassFunction G ℂ :=
+        ∑ χ : IrreducibleCharacter G, (f χ : ℂ) • (χ : ClassFunction G ℂ) with hΦ
+      have hΦmem : Φ ∈ ZIrr G := by
+        rw [hΦ]
+        refine Submodule.sum_mem _ fun χ _ => ?_
+        rw [Int.cast_smul_eq_zsmul ℂ (f χ) (χ : ClassFunction G ℂ)]
+        exact Submodule.smul_mem _ _ χ.mem_ZIrr
+      -- `Ind θ₀ - Φ` is orthogonal to every irreducible character, hence zero.
+      have hortho : ∀ ψ : IrreducibleCharacter G,
+          ClassFunction.inner (induce H θ₀ - Φ) (ψ : ClassFunction G ℂ) = 0 := by
+        intro ψ
+        rw [ClassFunction.inner_sub_left, hf ψ, hΦ, inner_sum_left]
+        have hsum : (∑ χ : IrreducibleCharacter G,
+            ClassFunction.inner ((f χ : ℂ) • (χ : ClassFunction G ℂ)) (ψ : ClassFunction G ℂ))
+            = (f ψ : ℂ) := by
+          rw [Finset.sum_eq_single ψ]
+          · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_pos rfl,
+              mul_one]
+          · intro χ _ hχψ
+            rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_neg hχψ,
+              mul_zero]
+          · intro hψ; exact absurd (Finset.mem_univ ψ) hψ
+        rw [hsum, sub_self]
+      have hzero : induce H θ₀ - Φ = 0 := classFunction_eq_zero_of_orthogonal _ hortho
+      have : induce H θ₀ = Φ := by rw [← sub_eq_zero]; exact hzero
+      rw [this]; exact hΦmem
+  | zero => rw [induce_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [induce_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, induce_smul]
+      rw [Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ a ih
+
+end InduceVirtualCharacters
 
 end ClassFunction
 

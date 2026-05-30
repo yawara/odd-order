@@ -27,9 +27,10 @@ public API の `column_orthogonality_diag`, `column_orthogonality_conj`,
   element representative pairing へ戻す。
 - [x] 条件付き theorem として `column_orthogonality_cases` と同じ primitive cases
   shape へ束ねる。
-- [ ] finite/indexing と row orthogonality input を public
-  `column_orthogonality_cases` の仮定へ供給する。
-- [ ] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す。
+- [x] finite/indexing と row orthogonality input を public
+  `column_orthogonality_cases` の仮定へ供給する (2026-05-30, 下記参照)。
+- [x] conjugate/non-conjugate cases を `column_orthogonality_cases` に戻して `sorry` を消す
+  (= 無条件 public 定理 3 本を新ファイルで提供, 2026-05-30)。
 
 ## 2026-05-26 update
 
@@ -149,11 +150,45 @@ entry point to the public theorem.  Closing `column_orthogonality_cases` require
 **推定**: 残作業 200-400 行, 少なくとも 1 件の新規 connector ファイル.
 sub-agent 結論: 4 件の blocker は **structural (pre-proof gaps)** で「gymnastics」ではない.
 
-## 完了条件
+## 2026-05-30 update — 無条件化 landed, close
 
-- `OddOrder.RepresentationTheory.column_orthogonality_cases` から `sorry` が消える。
-- `lake build OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality` が通る。
-- `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` が通る。
+issue 0048 が completeness core + count (`card_irreducibleCharacter_eq`) +
+`CharacterTableIndexing.ofFinite'` / `instCharacterTableIndexingOfFinite` を
+sorry-free + axiom-checked で landing 済み (commits 5936a36, c562f17)。これで
+2026-05-26 deep dive が挙げた 4 blocker (indexing 構成 / weighted row orthogonality
+コンストラクタ / `IsIrreducibleCharacter`↔simple / count) が全て解消した。
+
+**無条件 public 定理 3 本を新ファイルに追加** (sorry-free, axiom = {propext, Classical.choice,
+Quot.sound}):
+
+- file: `OddOrder/GroupTheory/RepresentationTheory/ColumnOrthogonality.lean`
+  (imports `CharacterCompleteness` + `CharacterRowOrthogonality`; SecondOrthogonality より
+  **downstream**。SecondOrthogonality 自体は count を import できない upstream なので、
+  無条件版は必ず新規 downstream ファイルになる)。
+- 定理:
+  - `column_orthogonality_diagonal (g : G)` : `∑_{χ∈Irr} χ(g)·star(χ(g)) = |C_G(g)|`
+  - `column_orthogonality_conjugate (hgh : IsConj g h)` : `∑ χ(g)·star(χ(h)) = |C_G(g)|`
+  - `column_orthogonality_not_conjugate (hgh : ¬IsConj g h)` : `∑ χ(g)·star(χ(h)) = 0`
+  - いずれも typeclass 仮定は `[Group G] [Finite G]` のみ。`idx`/`hrow` は撤去。
+- 証明 = `column_orthogonality_{diag,conj,not_conj} instCharacterTableIndexingOfFinite
+  weightedRowOrthogonality_ofFinite`。後者は
+  `CharacterTableWeightedRowOrthogonality.ofRowOrthogonality … characterTableRowOrthogonality_holds`。
+  summation index の `Fintype` 差は `Subsingleton (Fintype _)` で吸収
+  (`sum_irreducibleCharacter_idx_eq`)。
+- `OddOrder.lean` と `OddOrder/AxiomsCheck.lean` に追加 (3 本とも allowlist-only を
+  `#assert_only_allowed_axioms` で確認)。
+
+注: 旧 `column_orthogonality_cases` 系 (idx/hrow を取る条件付き版) は
+`SecondOrthogonality.lean` にそのまま残る (matrix proof core として有用)。無条件化は
+それらを「呼び出し側で discharge」する形なので、upstream に sorry は元々無く、新規追加も無し。
+
+## 完了条件 (達成)
+
+- [x] public column orthogonality が `idx`/`hrow` 無し (`[Finite G]` のみ) で sorry-free。
+- [x] `lake build OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality` が通る。
+- [x] `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` が通る。
+- [x] `lake build OddOrder` 全体が通る。
+- [x] AxiomsCheck で 3 本とも allowlist-only。
 
 ## 参照
 

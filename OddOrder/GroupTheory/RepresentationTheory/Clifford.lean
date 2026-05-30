@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
@@ -38,10 +39,14 @@ precise statement is left as a TODO since it requires extra setup
   proof core needs.
 * `clifford_orbit_subset_inertia` is immediate from `ClassFunction.subgroup_le_inertia`.
 * Proof-core routing: the remaining Clifford theorem proof is split into
-  `issues/0026-peterfalvi-clifford-core.md`.  The blocker is not the current
-  statement shape; it is the missing character-level induction/restriction API:
-  numerical Frobenius reciprocity, restriction multiplicities, orbit equality of
-  irreducible constituents, and the inertia-bijection package.
+  `issues/0026-peterfalvi-clifford-core.md`.  Two prerequisite layers are now in place:
+  numerical Frobenius reciprocity (`ClassFunction.inner_induce_eq_inner_restrict`, in
+  `InducedCharacter`) and the orbit-transitivity ⇒ common-multiplicity step
+  (`IrreducibleCharacter.hasCommonRestrictionMultiplicity_of_singleOrbit`).  The single
+  remaining hard input is the module-theoretic core: a representation realizing `χ`
+  restricts to a genuine `H`-module whose irreducible constituents are permuted
+  transitively by `G` (giving both the single-orbit property and the integrality /
+  positivity of `e`).
 
 ## Main statements
 
@@ -59,6 +64,11 @@ precise statement is left as a TODO since it requires extra setup
   of `θ` and its quotient-by-inertia parametrization.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit`
   and `HasCommonRestrictionMultiplicity` — predicate-level Clifford conclusions.
+* `IrreducibleCharacter.hasCommonRestrictionMultiplicity_of_singleOrbit`
+  — the Clifford common-multiplicity step: single `G`-orbit ⇒ common multiplicity.
+* `OddOrder.RepresentationTheory.ClassFunction.induceSum_conjBy_eq` and `induce_conjBy_eq`
+  — Peterfalvi (1.5)(a): the induced character is invariant under `G`-conjugation of the
+  inducing character.
 * `OddOrder.RepresentationTheory.IrreducibleCharacter.HasCyclicInertiaQuotient` —
   the Peterfalvi §3 (1.7) cyclic inertia-quotient hypothesis.
 * `OddOrder.RepresentationTheory.clifford_orbit_subset_inertia` — `H ≤ I_G(θ)`.
@@ -197,6 +207,22 @@ theorem restrictionMultiplicity_conjBy_right [H.Normal]
     _ = inner (restrict H χ) θ :=
         inner_conjBy_conjBy (G := G) (H := H) g (restrict H χ) θ
 
+/-- **Integrality of the restriction multiplicity.** When the inducing class function
+`χ` and the constituent `θ` are both virtual characters, the normalized inner-product
+multiplicity `⟨Res^G_H χ, θ⟩` is an integer.
+
+This resolves the integer part of Clifford's multiplicity statement ([Is] Thm 6.5): the
+multiplicity `e_χ = ⟨Res χ, θ⟩` is `ℤ`-valued.  The proof combines `restrict_mem_ZIrr`
+(restriction maps `ℤ[Irr G]` into `ℤ[Irr H]`, Peterfalvi (2.6.b)) with the integrality of
+inner products of virtual characters (`inner_mem_ZIrr_int`).  Non-negativity of the
+multiplicity for a *genuine* character is a separate fact that needs the module-theoretic
+decomposition of `Res^G_H ρ` (see `issues/0026-peterfalvi-clifford-core.md`). -/
+theorem restrictionMultiplicity_int [Finite G]
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G)
+    {θ : ClassFunction H ℂ} (hθ : θ ∈ ZIrr H) :
+    ∃ m : ℤ, restrictionMultiplicity H χ θ = (m : ℂ) :=
+  inner_mem_ZIrr_int (restrict_mem_ZIrr H hχ) hθ
+
 /-- `θ` is an irreducible constituent of the restriction `Res^G_H χ`, expressed
 by nonzero normalized inner product. -/
 def IsRestrictionConstituent (χ : ClassFunction G ℂ) (θ : ClassFunction H ℂ) :
@@ -240,6 +266,51 @@ theorem IsRestrictionConstituent.conjBy [H.Normal]
   · rw [restrictionMultiplicity_conjBy_right (H := H) χ θ g]
     exact hθ.multiplicity_ne_zero
 
+section InduceConjBy
+
+omit [Fintype H] [Invertible (Nat.card H : ℂ)] in
+/-- Conjugating the inducing class function by an ambient `g : G` does not change the
+unscaled induced class function on a normal subgroup: `Ind_H^G (θ^g) = Ind_H^G θ`. -/
+theorem induceSum_conjBy_eq [Fintype G] [hH : H.Normal] (g : G) (θ : ClassFunction ↥H ℂ) :
+    induceSum H (conjBy (G := G) (H := H) g θ) = induceSum H θ := by
+  ext g₀
+  classical
+  simp only [induceSum_apply]
+  refine (Fintype.sum_equiv (Equiv.mulRight g)
+    (fun x' => induceTerm H θ x' g₀)
+    (fun x => induceTerm H (conjBy (G := G) (H := H) g θ) x g₀) ?_).symm
+  intro x'
+  change induceTerm H θ x' g₀ = induceTerm H (conjBy (G := G) (H := H) g θ) (x' * g) g₀
+  unfold induceTerm
+  by_cases hx : x'⁻¹ * g₀ * x' ∈ H
+  · have hxg : (x' * g)⁻¹ * g₀ * (x' * g) ∈ H := by
+      have hmem : g⁻¹ * (x'⁻¹ * g₀ * x') * g⁻¹⁻¹ ∈ H := hH.conj_mem _ hx g⁻¹
+      have heq : g⁻¹ * (x'⁻¹ * g₀ * x') * g⁻¹⁻¹ = (x' * g)⁻¹ * g₀ * (x' * g) := by group
+      rwa [heq] at hmem
+    rw [dif_pos hx, dif_pos hxg, conjBy_apply]
+    refine congrArg (θ : ↥H → ℂ) (Subtype.ext ?_)
+    change (x'⁻¹ * g₀ * x' : G) = g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹
+    group
+  · have hxg : (x' * g)⁻¹ * g₀ * (x' * g) ∉ H := by
+      intro hxg
+      apply hx
+      have hmem : g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹ ∈ H := hH.conj_mem _ hxg g
+      have heq : g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹ = x'⁻¹ * g₀ * x' := by group
+      rwa [heq] at hmem
+    rw [dif_neg hx, dif_neg hxg]
+
+omit [Fintype H] in
+/-- Conjugating the inducing class function by an ambient `g : G` does not change the
+normalized induced character on a normal subgroup: `Ind_H^G (θ^g) = Ind_H^G θ`.
+
+This is Peterfalvi (1.5)(a) at the class-function level: the induced character is
+invariant under `G`-conjugation of the inducing character. -/
+theorem induce_conjBy_eq [Fintype G] [H.Normal] (g : G) (θ : ClassFunction ↥H ℂ) :
+    induce H (conjBy (G := G) (H := H) g θ) = induce H θ := by
+  rw [induce, induce, induceSum_conjBy_eq]
+
+end InduceConjBy
+
 end ClassFunction
 
 namespace IrreducibleCharacter
@@ -274,6 +345,17 @@ theorem liesOver_iff_restrictionConstituent
   · exact liesOver_restrictionConstituent (H := H)
   · intro hθ
     exact hθ.multiplicity_ne_zero
+
+/-- **The constituent multiplicity of an irreducible character is an integer.** For
+irreducible characters `χ` of `G` and `θ` of `H`, the normalized inner product
+`⟨Res^G_H χ, θ⟩` is `ℤ`-valued.  This is the irreducible-character specialization of
+`ClassFunction.restrictionMultiplicity_int`, giving the integer part of Clifford's
+multiplicity statement ([Is] Thm 6.5). -/
+theorem restrictionMultiplicity_int [Finite G]
+    (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter H) :
+    ∃ m : ℤ, ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θ : ClassFunction H ℂ) = (m : ℂ) :=
+  ClassFunction.restrictionMultiplicity_int H χ.mem_ZIrr θ.mem_ZIrr
 
 end IrreducibleCharacter
 
@@ -496,6 +578,31 @@ theorem HasCommonRestrictionMultiplicity.eq_of_liesOver
         (η : ClassFunction H ℂ) := by
   rcases hχ with ⟨e, he⟩
   rw [he θ hθ, he η hη]
+
+/-- **Clifford common-multiplicity step** ([Is] Thm 6.5, second clause): once the
+irreducible constituents of `Res^G_H χ` form a single `G`-conjugation orbit, they all
+occur with the same normalized multiplicity.
+
+This is the orbit-transitivity ⇒ common-multiplicity implication of Clifford's theorem.
+The common value is `⟨Res χ, θ₀⟩` at any constituent `θ₀`; for any other constituent `η`,
+single-orbit transitivity provides `g` with `θ₀^g = η`, and
+`restrictionMultiplicity_conjBy_right` shows conjugation preserves the multiplicity. -/
+theorem hasCommonRestrictionMultiplicity_of_singleOrbit
+    {χ : IrreducibleCharacter G}
+    (hχ : RestrictionConstituentsSingleOrbit (H := H) χ) :
+    HasCommonRestrictionMultiplicity (H := H) χ := by
+  classical
+  by_cases hex : ∃ θ₀ : IrreducibleCharacter H, LiesOver H χ θ₀
+  · obtain ⟨θ₀, hθ₀⟩ := hex
+    refine ⟨ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+      (θ₀ : ClassFunction H ℂ), fun η hη => ?_⟩
+    obtain ⟨g, hg⟩ := hχ θ₀ η hθ₀ hη
+    rw [← hg, coe_conjBy,
+      ClassFunction.restrictionMultiplicity_conjBy_right
+        (H := H) (χ : ClassFunction G ℂ) (θ₀ : ClassFunction H ℂ) g]
+  · -- No constituent: the universally quantified condition is vacuously satisfiable.
+    refine ⟨0, fun θ hθ => ?_⟩
+    exact absurd ⟨θ, hθ⟩ hex
 
 end IrreducibleCharacter
 

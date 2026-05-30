@@ -201,7 +201,7 @@ Peterfalvi §3 が明示引用する [Is] results:
 | **Lem 2.21** | Kernel under induction | Phase 1 Ch.2 | (1.6) |
 | **Thm 6.11** | Induced from stabilizer | Phase 1 Ch.6 | (1.5), (1.7) |
 | **Cor 6.28** | Multiplicity-one criterion (abelian normalizer) | Phase 1 Ch.6 | (1.5.b), (1.7.c) |
-| **Cor 2.30** | Schur's bound χ(1)² ≤ \|G:Z(χ)\| | Phase 1 Ch.2 | (1.8) |
+| **Cor 2.30** | Schur's bound χ(1)² ≤ \|G:Z(χ)\| | Phase 1 Ch.2 — **✅ 実装済** `OddOrder/GroupTheory/RepresentationTheory/SchurCenterBound.lean` (`finrank_sq_le_index` rep 形 + `IsIrreducibleCharacter.exists_degree_sq_le_index` char 形) | (1.8); §8 (6.6)-(6.8); §9 Feit–Sibley |
 | **Lem 7.7** | TI-subset Ind isometry | Phase 1 Ch.7 | **§8 (Coherence) L150** (audit 訂正; (1.4) ではない) |
 | **Lem 3.2, Cor 3.5** | Cyclotomic arithmetic | Phase 1 Ch.3 | (1.10) |
 

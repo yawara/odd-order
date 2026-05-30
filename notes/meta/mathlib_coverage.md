@@ -25,6 +25,10 @@ mathlib (調査時 `v4.29.1`; **2026-05-27 に `v4.30.0-rc2` へ bump 済** — 
 - Maschke の定理: `Mathlib/RepresentationTheory/Maschke.lean`
 - 誘導表現 (adjunction 形): `Mathlib/RepresentationTheory/Induced.lean`
 - 半単純性, Schur の補題: `Mathlib/RepresentationTheory/Semisimple.lean`, `FDRep.lean`
+- **群環の代数射** `Representation.asAlgebraHom : ℂ[G] →ₐ[ℂ] End ℂ V`, `Subalgebra.center ℂ ℂ[G]` (中心)
+
+**本リポ実装済 (mathlib 不在分):**
+- **class-sum 代数 / 中心指標** `ω : Z(ℂ[G]) →ₐ[ℂ] ℂ`: `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` (`classSum`, `classSum_mem_center`, `classSumCoeff`, `classSum_mul_apply`, `centralCharacterOfRep`, `centralCharacterOfRep_classSum`). Isaacs §3 (p.35) / Peterfalvi (6.7.2) の `ClassSumAlgebraHom`。代数的整数性 (ω(C) が整数; (6.7.3) で使用) は未実装 (構造係数行列論法; 別 issue)。
 
 ## △ 部分的にあるもの (拡張/整備が必要)
 

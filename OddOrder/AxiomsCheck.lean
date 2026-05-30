@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 import Lean
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -17,6 +21,7 @@ import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
+import OddOrder.Peterfalvi.S04_DadeIsometry
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -560,6 +565,63 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
+-- (regular representation + Maschke + Schur).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
+-- RepresentationTheory: `|Irr G| = |ConjClasses G|` (completeness ⇒ the reverse inequality).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_eq
+-- RepresentationTheory: the irreducible characters span the class functions.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.span_irreducibleCharacter_eq_top
+-- RepresentationTheory (Peterfalvi §3, [Is] Thm 2.18/6.10): second (column) orthogonality is
+-- unconditional — the `CharacterTableIndexing` and weighted-row-orthogonality inputs of the
+-- matrix proof core are discharged for any `[Finite G]` (issue 0027 closed unconditionally).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
+-- RepresentationTheory (Peterfalvi §3 (1.1), [Is] Thm 6.32): Brauer's permutation lemma is
+-- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
+-- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.brauer_permutation_lemma'
+-- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
+-- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
+-- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
+-- add (`character_add_of_isCompl` = `trace_conj' + trace_prodMap'`); the irreducible base case is
+-- `exists_isIrreducibleCharacter_eq`. Unblocks `induce`/`restrict ∈ ℤ[Irr]` ⇒ Dade (2.6.b)/§9.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (2.6.b) prerequisites): restriction and induction preserve
+-- virtual characters. `restrict ∈ ℤ[Irr]` reduces (via span induction) to the keystone
+-- `character_mem_ZIrr` applied to `ρ.comp H.subtype`; `induce ∈ ℤ[Irr]` then follows from
+-- numerical Frobenius reciprocity (`inner_induce_eq_inner_restrict`) + integer Fourier
+-- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (2.9)): pullback `φ ∘ f` along a group hom `f : H →* G`
+-- preserves virtual characters (the "Res along a homomorphism" generalization of
+-- `restrict_mem_ZIrr`).  Same span-induction proof via `character_mem_ZIrr (ρ.comp f)`; this
+-- is the `α_B = α ∘ f_B ∈ ℤ[Irr M(B)]` step of the Dade-map construction.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.compHom_mem_ZIrr
+
+-- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
+-- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
+-- bijection: `N_L(B)` normalizes `H(B)` by (2.4.a), and `H(B) ∩ N_L(B) = 1`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.card_mBSubgroup
+-- Peterfalvi §4 (2.9): the quotient hom `f_B : M(B) →* L` has kernel `H(B)`, and the
+-- pullback `α_B = α ∘ f_B` sends virtual characters of `L` to virtual characters of `M(B)`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.ker_dadeQuotientHom
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.alphaB_mem_ZIrr
+-- Peterfalvi §4 (2.9): the defining equation `α_B(h·b) = α(b)` (h ∈ H(B), b ∈ N_L(B)),
+-- via `f_B` retracting `N_L(B)` (`dadeQuotientHom_coe_of_mem_nLStabilizerIn`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeQuotientHom_coe_of_mem_nLStabilizerIn
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.alphaB_apply_mul
+-- Peterfalvi §4 (2.10.2): `C_{H(B)}(a) = H(B ∪ {a})`, with the `O_{π'}`-containment lemma
+-- (a coprime-order element of `C_G(a)` lies in the normal complement `H(a)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.mem_H_of_mem_centralizer_coprime
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.centralizer_inf_hIntersection
+-- Peterfalvi §4 (2.5)/(2.6.a): the explicit pointwise Dade map `dadeMap` satisfies the (2.5)
+-- defining equations (`isDadeMap_dadeMap`, well-defined by (2.4.b)), and bundles with the
+-- (2.6.a) isometry into an actual `DadeIsometryData` (no longer an interface assumption).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.isDadeMap_dadeMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeIsometryData
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a

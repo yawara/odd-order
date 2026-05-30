@@ -23,7 +23,7 @@ normal p-complement + Lem 7.7 (N/C `p'`-quotient).
 
 ## やること
 
-- [ ] Resolve Thm 7.6 first (issue #30).
+- [x] Resolve Thm 7.6 first (issue #30).  ← **DONE** (0030 closed; `normal_J` landed・axiom-clean. 下記 2026-05-30 update)
 - [ ] Implement 7-step proof (mmd L3913-L3949):
   1. Reduce to minimum counterexample.
   2. Use Lem 7.7 to pass through O_{p'}(G).
@@ -66,3 +66,39 @@ Step breakdown:
 - `notes/isaacs/ch07_thompson.md` — section §7C
 - `references/isaacs/finite-group-theory.mmd` L3721, L3913-L3949
 - Issue #30 (Thm 7.6 — prerequisite)
+
+## 2026-05-30 update — 前提クリア、着手可能 (READY)
+
+**この issue が「Thm 7.1 の本物の §7C 7 ステップ証明」を追跡する正本** (重複 issue は作らない方針).
+唯一のブロッカーだった **Thm 7.6 (normal-J) が landed 済み**になり、本 issue は **blocked → ready** に昇格.
+
+### 前提の確定状況 (2026-05-30 検証)
+
+- **Thm 7.6 `normal_J`** (`Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean:1416`): 無条件・sorry-free.
+  `#print axioms OddOrder.Isaacs.Ch07.normal_J` → `{propext, Classical.choice, Quot.sound}` のみ
+  (AxiomsCheck.lean:504 でガード). issue **0030 は closed**.
+  - ⚠ doc 注意: `normal_J` の docstring は「Remaining local axioms: `step4_5_normal_J_hypotheses` /
+    `step8_normal_J_closure`」と書くが **これは stale** — `#print axioms` 上それらは依存に出ない
+    (= discharge 済み). 実装時に docstring を信用して二重に証明しないこと (docstring 修正は別途).
+- **Thm 5.26** `hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer`
+  (`Ch05_Transfer/Main.lean:2533`) — 両方向 sorry-free.
+- **Lem 7.7 (a)(b)** `normalizer_and_centralizer_map_of_coprime_kernel` (Main.lean:2623) — sorry-free.
+- **Lem 5.27 Part 1** `hasNormalPComplement_of_subgroup` (Main.lean:1983) — sorry-free.
+
+### 現状の scaffold (これを置換/超克する)
+
+`thompson_normal_p_complement` (`S7B2_NormalJ_PComplement.lean:1667`) は **forward 仮説版**:
+`(hJ_normal : (thompsonJ P p).Normal)` を仮定として取る 4 行 reduction (= J(P) が正規な退化ケースのみ).
+axiom-clean だが**本定理ではない**. 本 issue の 7 ステップ証明は `hJ_normal` を仮定せず、最小反例論法で
+本来の Thm 7.1 を確立する (mmd L3913-L3949). 命名は既存の `thompson_normal_p_complement` を本物の
+証明に差し替えるか、別名 + 旧 scaffold 廃止のいずれか (実装時に判断).
+
+### 残りの新規インフラ (2026-05-26 分析のまま有効)
+
+- **`HasNormalPComplement` quotient inheritance** helper (~30-50 LOC, 未実装) — Step 2 で要.
+  他の step (1,3,4,5,6,7) は上記 landed 補題で賄える. 全体 ~300-450 LOC.
+
+### 位置づけ
+
+Peterfalvi 指標理論ラインとは**別系統 (Isaacs/BG 側)**. flagship かつ既知スキャフォールド解消なので価値は高い.
+完成すると §6C (Thm 6.22-6.24 Frobenius 核冪零, 未形式化) の `6.23 → 7.1 → 6.24` ラインも前進可能になる.

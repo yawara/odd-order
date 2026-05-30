@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.CoprimeConjugacy
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.Peterfalvi.S02_Notation
 
 /-!
@@ -622,6 +623,59 @@ theorem card_centralizer_eq (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
         (Nat.card_congr (Equiv.ofBijective f hf)).symm
     _ = Nat.card (hyp.H a) * Nat.card (centralizerIn L a.1) := Nat.card_prod _ _
 
+/-- **The `O_{π'}`-containment behind `(2.4)`/`(2.10.2)`.**  Any `x ∈ C_G(a)` whose
+order is prime to `|C_L(a)|` already lies in `H(a)`.
+
+Since `H(a) ⊴ C_G(a)` (`H_normalized`) with relative index `[C_G(a) : H(a)] =
+|C_L(a)|` (`card_centralizer_eq`), the element `x ^ |C_L(a)|` lies in `H(a)`
+(`pow_index_mem`); and `x` is itself a power of `x ^ |C_L(a)|` because `|C_L(a)|`
+is prime to `orderOf x` (Chinese remainder).  Equivalently, the image of `x` in
+`C_G(a)/H(a) ≅ C_L(a)` has order prime to `|C_L(a)|`, hence is trivial. -/
+theorem mem_H_of_mem_centralizer_coprime (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) {x : G}
+    (hx : x ∈ Subgroup.centralizer ({a.1} : Set G))
+    (hcop : Nat.Coprime (orderOf x) (Nat.card (centralizerIn L a.1))) :
+    x ∈ hyp.H a := by
+  classical
+  set C := Subgroup.centralizer ({a.1} : Set G) with hCdef
+  set m := Nat.card (centralizerIn L a.1) with hmdef
+  have hHaC : hyp.H a ≤ C := by rw [hCdef, hyp.centralizer_eq_sup a]; exact le_sup_left
+  -- `C_G(a)` normalizes `H(a)` (both directions of `H_normalized`).
+  have hCnorm : C ≤ Subgroup.normalizer (hyp.H a) := by
+    intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    refine ⟨fun hh => hyp.H_normalized a c hc h hh, fun hh => ?_⟩
+    have hmem := hyp.H_normalized a c⁻¹ (Subgroup.inv_mem _ hc) _ hh
+    have heq : c⁻¹ * (c * h * c⁻¹) * (c⁻¹)⁻¹ = h := by group
+    rwa [heq] at hmem
+  haveI hnormal : ((hyp.H a).subgroupOf C).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHaC).mpr hCnorm
+  -- `[C_G(a) : H(a)] = |C_L(a)|`.
+  have hindex : ((hyp.H a).subgroupOf C).index = m := by
+    have hcard_sub : Nat.card ((hyp.H a).subgroupOf C) = Nat.card (hyp.H a) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHaC).toEquiv
+    have hmul := Subgroup.index_mul_card ((hyp.H a).subgroupOf C)
+    rw [hcard_sub] at hmul
+    have hCcard : Nat.card C = Nat.card (hyp.H a) * m := by
+      rw [hCdef, hmdef]; exact hyp.card_centralizer_eq a
+    rw [hCcard] at hmul
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos (by rw [hmul]; ring)
+  -- `x ^ |C_L(a)| ∈ H(a)`.
+  have hxm : x ^ m ∈ hyp.H a := by
+    have hpow := Subgroup.pow_index_mem ((hyp.H a).subgroupOf C) (⟨x, hx⟩ : C)
+    rw [hindex, Subgroup.mem_subgroupOf] at hpow
+    simpa using hpow
+  -- `x` is a power of `x ^ |C_L(a)|`.
+  obtain ⟨k, hk1, hk0⟩ := Nat.chineseRemainder hcop 1 0
+  have hxk : x ^ k = x := by
+    have : x ^ k = x ^ 1 := pow_eq_pow_iff_modEq.mpr hk1
+    simpa using this
+  obtain ⟨j, rfl⟩ := (Nat.modEq_zero_iff_dvd).mp hk0
+  have hxeq : x = (x ^ m) ^ j := by rw [← pow_mul, hxk]
+  rw [hxeq]
+  exact (hyp.H a).pow_mem hxm j
+
 open Classical in
 /-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,
 the centralizers `|C_L(a)|`, summed over the `a ∈ A` whose coset `aH(a)` meets
@@ -733,6 +787,410 @@ theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
     intro p hp
     exact absurd ⟨p.1, p.1.2, by
       rw [← (Finset.mem_filter.mp hp).2]; exact isConj_iff.mpr ⟨(p.2 : G), rfl⟩⟩ hQ
+
+/- 2.8: The semidirect structure `M(B) = H(B) ⋊ N_L(B)` (pp. 12) -/
+
+section SemidirectStructure
+
+open scoped Classical in
+/-- For `l ∈ L` and `a ∈ A`, the conjugate `l · a · l⁻¹` as an element of the subtype
+`{a : G // a ∈ A}`, using `L_normalizes_A`.  This is the conjugation action of `L` on `A`
+used to define `N_L(B)`. -/
+def conjA (hyp : Hypothesis G A L) (l : L) (a : {a : G // a ∈ A}) : {a : G // a ∈ A} :=
+  ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩
+
+@[simp] theorem conjA_coe (hyp : Hypothesis G A L) (l : L) (a : {a : G // a ∈ A}) :
+    (hyp.conjA l a).1 = (l : G) * a.1 * (l : G)⁻¹ := rfl
+
+theorem conjA_one (hyp : Hypothesis G A L) (a : {a : G // a ∈ A}) :
+    hyp.conjA 1 a = a := by
+  apply Subtype.ext; simp
+
+theorem conjA_mul (hyp : Hypothesis G A L) (l₁ l₂ : L) (a : {a : G // a ∈ A}) :
+    hyp.conjA (l₁ * l₂) a = hyp.conjA l₁ (hyp.conjA l₂ a) := by
+  apply Subtype.ext
+  simp only [conjA_coe, Subgroup.coe_mul, mul_inv_rev]
+  group
+
+theorem conjA_inv_conjA (hyp : Hypothesis G A L) (l : L) (a : {a : G // a ∈ A}) :
+    hyp.conjA l⁻¹ (hyp.conjA l a) = a := by
+  rw [← conjA_mul, inv_mul_cancel, conjA_one]
+
+theorem conjA_conjA_inv (hyp : Hypothesis G A L) (l : L) (a : {a : G // a ∈ A}) :
+    hyp.conjA l (hyp.conjA l⁻¹ a) = a := by
+  rw [← conjA_mul, mul_inv_cancel, conjA_one]
+
+/-- **Peterfalvi (2.8), `H(B)`.**  For a nonempty `B ⊆ A`, the subgroup
+`H(B) = ⋂_{a ∈ B} H(a)`. -/
+noncomputable def hIntersection (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) (hB : B.Nonempty) : Subgroup G :=
+  B.inf' hB (fun a => hyp.H a)
+
+theorem hIntersection_le (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {a : {a : G // a ∈ A}}
+    (ha : a ∈ B) : hIntersection hyp B hB ≤ hyp.H a :=
+  Finset.inf'_le _ ha
+
+theorem mem_hIntersection (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {x : G} :
+    x ∈ hIntersection hyp B hB ↔ ∀ a ∈ B, x ∈ hyp.H a := by
+  classical
+  refine ⟨fun hx a ha => hIntersection_le hyp hB ha hx, fun hx => ?_⟩
+  rw [hIntersection]
+  induction hB using Finset.Nonempty.cons_induction with
+  | singleton a => simpa using hx a (by simp)
+  | cons a s ha hs ih =>
+      rw [Finset.inf'_cons hs]
+      exact Subgroup.mem_inf.mpr
+        ⟨hx a (by simp), ih (fun b hb => hx b (by simp [hb]))⟩
+
+open scoped Classical in
+/-- **Peterfalvi (2.10.2).**  For a nonempty `B ⊆ A` and `a ∈ A`, the centralizer of
+`a` inside `H(B)` is `H(B ∪ {a})`:  `C_G(a) ⊓ H(B) = H(insert a B)`.
+
+`⊇`: `H(insert a B) ⊆ H(a) ⊆ C_G(a)` and `⊆ H(B)`.  `⊆`: any
+`x ∈ C_G(a) ⊓ H(B)` has order dividing some `|H(b₀)|` (`b₀ ∈ B`), which is prime to
+`|C_L(a)|` by `(2.2.c)`, so `x ∈ H(a)` by `mem_H_of_mem_centralizer_coprime`. -/
+theorem centralizer_inf_hIntersection (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (a : {a : G // a ∈ A}) :
+    Subgroup.centralizer ({a.1} : Set G) ⊓ hIntersection hyp B hB
+      = hIntersection hyp (insert a B) (Finset.insert_nonempty a B) := by
+  classical
+  ext x
+  simp only [Subgroup.mem_inf, mem_hIntersection]
+  constructor
+  · rintro ⟨hxC, hxB⟩ b hb
+    rw [Finset.mem_insert] at hb
+    rcases hb with hb | hb
+    · rw [hb]
+      obtain ⟨b₀, hb₀⟩ := hB
+      have hcop : Nat.Coprime (orderOf x) (Nat.card (centralizerIn L a.1)) :=
+        Nat.Coprime.coprime_dvd_left ((hyp.H b₀).orderOf_dvd_natCard (hxB b₀ hb₀))
+          (hyp.centralizer_coprime b₀ a)
+      exact hyp.mem_H_of_mem_centralizer_coprime a hxC hcop
+    · exact hxB b hb
+  · intro hx
+    refine ⟨?_, fun b hb => hx b (Finset.mem_insert_of_mem hb)⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    exact (hyp.commute_of_mem_H a (hx a (Finset.mem_insert_self a B))).symm
+
+/-- **Peterfalvi (2.8), `N_L(B)`.**  The `L`-set-stabilizer of `B` under conjugation:
+`{ℓ ∈ L | ℓ permutes B}`.  Mathlib's `Subgroup.setNormalizer` is `Subgroup.normalizer`
+(defined for subgroups, not a `Finset`), so `N_L(B)` is built by hand here.  Closure under
+inverses uses that conjugation by `ℓ` is an injective self-map of the finite set `B`, hence
+surjective. -/
+noncomputable def setLStabilizer (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) : Subgroup L where
+  carrier := {l : L | ∀ a ∈ B, hyp.conjA l a ∈ B}
+  one_mem' := by intro a ha; rwa [conjA_one]
+  mul_mem' {x y} hx hy := by
+    intro a ha; rw [conjA_mul]; exact hx _ (hy a ha)
+  inv_mem' {x} hx := by
+    classical
+    intro a ha
+    -- conjugation by `x` is an injective `MapsTo B B`, hence surjective on `B`
+    have hmaps : Set.MapsTo (hyp.conjA x) (B : Set {a : G // a ∈ A}) B := fun b hb => hx b hb
+    have hinj : Set.InjOn (hyp.conjA x) (B : Set {a : G // a ∈ A}) := by
+      intro b _ c _ hbc
+      have := congrArg (hyp.conjA x⁻¹) hbc
+      rwa [conjA_inv_conjA, conjA_inv_conjA] at this
+    have hsurj : Set.SurjOn (hyp.conjA x) (B : Set {a : G // a ∈ A}) B :=
+      Finset.surjOn_of_injOn_of_card_le (hyp.conjA x) hmaps hinj le_rfl
+    obtain ⟨b, hb, hbeq⟩ := hsurj (Finset.mem_coe.mpr ha)
+    -- `x b x⁻¹ = a`, so `x⁻¹ a x = b ∈ B`
+    have hba : hyp.conjA x⁻¹ a = b := by rw [← hbeq, conjA_inv_conjA]
+    rw [hba]; exact Finset.mem_coe.mp hb
+
+@[simp] theorem mem_setLStabilizer (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} {l : L} :
+    l ∈ setLStabilizer hyp B ↔ ∀ a ∈ B, hyp.conjA l a ∈ B := Iff.rfl
+
+/-- `N_L(B)`, viewed as a subgroup of the ambient group `G` (via `L.subtype`).  This is the
+right factor `N_L(B)` of `M(B) = H(B) · N_L(B)`. -/
+noncomputable def nLStabilizerIn (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) : Subgroup G :=
+  (setLStabilizer hyp B).map L.subtype
+
+theorem nLStabilizerIn_le_L (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) : nLStabilizerIn hyp B ≤ L := by
+  rw [nLStabilizerIn]
+  rintro _ ⟨l, _, rfl⟩
+  exact l.2
+
+theorem mem_nLStabilizerIn (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} {x : G} :
+    x ∈ nLStabilizerIn hyp B ↔
+      ∃ hx : x ∈ L, (⟨x, hx⟩ : L) ∈ setLStabilizer hyp B := by
+  rw [nLStabilizerIn]
+  constructor
+  · rintro ⟨l, hl, rfl⟩; exact ⟨l.2, by simpa using hl⟩
+  · rintro ⟨hx, hl⟩; exact ⟨⟨x, hx⟩, hl, rfl⟩
+
+/-- Membership in the conjugated subgroup `H(ℓ·a·ℓ⁻¹)`, via `(2.4.a)` `HConjInvariant`:
+`y ∈ H(conjA l a) ↔ ℓ⁻¹ y ℓ ∈ H(a)`. -/
+theorem mem_H_conjA_iff (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (a : {a : G // a ∈ A}) (l : L) {y : G} :
+    y ∈ hyp.H (hyp.conjA l a) ↔ (l : G)⁻¹ * y * (l : G) ∈ hyp.H a := by
+  have hHeq : hyp.H (hyp.conjA l a) = MulAut.conj (l : G) • hyp.H a := hconj a l
+  rw [hHeq, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  rw [show ((MulAut.conj (l : G))⁻¹ • y) = (MulAut.conj (l : G))⁻¹ y from rfl,
+    MulAut.conj_inv_apply]
+
+/-- **Peterfalvi (2.8), normality.**  `N_L(B)` normalizes `H(B)`.
+
+By `(2.4.a)`, conjugation by `ℓ ∈ N_L(B)` sends `H(a)` to `H(ℓ·a·ℓ⁻¹)`; since `ℓ` permutes
+`B`, it sends `H(B) = ⋂_{a∈B} H(a)` to itself. -/
+theorem nLStabilizerIn_le_normalizer (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    nLStabilizerIn hyp B ≤ Subgroup.normalizer (hIntersection hyp B hB) := by
+  intro x hx
+  obtain ⟨hxL, hxN⟩ := (mem_nLStabilizerIn hyp).mp hx
+  set l : L := ⟨x, hxL⟩ with hl
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  rw [mem_hIntersection, mem_hIntersection]
+  have hlx : (l : G) = x := rfl
+  have hlinv : ((l⁻¹ : L) : G) = x⁻¹ := by rw [Subgroup.coe_inv, hlx]
+  constructor
+  · -- `y ∈ H(B)` ⇒ `x y x⁻¹ ∈ H(B)`: for `a ∈ B`, `x⁻¹ a x ∈ B` (ℓ permutes B)
+    intro hy a ha
+    have hpre : hyp.conjA l⁻¹ a ∈ B :=
+      ((setLStabilizer hyp B).inv_mem hxN) a ha
+    have hmem := hy (hyp.conjA l⁻¹ a) hpre
+    rw [mem_H_conjA_iff hyp hconj, hlinv] at hmem
+    -- `hmem : (x⁻¹)⁻¹ * y * x⁻¹ ∈ H(a)`
+    rwa [show (x⁻¹)⁻¹ * y * x⁻¹ = x * y * x⁻¹ from by group] at hmem
+  · -- `x y x⁻¹ ∈ H(B)` ⇒ `y ∈ H(B)`
+    intro hy a ha
+    have hmem := hy (hyp.conjA l a) (hxN a ha)
+    rw [mem_H_conjA_iff hyp hconj, hlx] at hmem
+    -- `hmem : x⁻¹ * (x * y * x⁻¹) * x ∈ H(a)`
+    rwa [show x⁻¹ * (x * y * x⁻¹) * x = y from by group] at hmem
+
+/-- **Peterfalvi (2.8), disjointness.**  `H(B) ∩ N_L(B) = 1`.
+
+For any `a ∈ B`: `x ∈ H(B) ∩ N_L(B)` gives `x ∈ H(a)` (so `x` commutes with `a` by the
+centralizer decomposition `(2.2.b)`) and `x ∈ L`, hence `x ∈ C_L(a)`; but
+`H(a) ∩ C_L(a) = 1` (`centralizer_disjoint`), so `x = 1`. -/
+theorem hIntersection_disjoint_nLStabilizerIn (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Disjoint (hIntersection hyp B hB) (nLStabilizerIn hyp B) := by
+  obtain ⟨a, ha⟩ := hB.exists_mem
+  rw [disjoint_iff_inf_le]
+  intro x hx
+  obtain ⟨hxH, hxN⟩ := Subgroup.mem_inf.mp hx
+  have hxHa : x ∈ hyp.H a := hIntersection_le hyp hB ha hxH
+  have hxL : x ∈ L := nLStabilizerIn_le_L hyp B hxN
+  have hxCL : x ∈ centralizerIn L a.1 :=
+    mem_centralizerIn.mpr ⟨hxL, (hyp.commute_of_mem_H a hxHa).symm⟩
+  exact (disjoint_iff_inf_le.mp (hyp.centralizer_disjoint a)) (Subgroup.mem_inf.mpr ⟨hxHa, hxCL⟩)
+
+/-- **Peterfalvi (2.8), `M(B)`.**  `M(B) = H(B) · N_L(B)`, as the join subgroup
+`H(B) ⊔ N_L(B)` of `G`. -/
+noncomputable def mBSubgroup (hyp : Hypothesis G A L)
+    (B : Finset {a : G // a ∈ A}) (hB : B.Nonempty) : Subgroup G :=
+  hIntersection hyp B hB ⊔ nLStabilizerIn hyp B
+
+/-- The underlying set of `M(B) = H(B) ⊔ N_L(B)` is the product `H(B) · N_L(B)`, because
+`N_L(B)` normalizes `H(B)` (`(2.4.a)`). -/
+theorem coe_mBSubgroup (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    (↑(mBSubgroup hyp B hB) : Set G)
+      = (↑(hIntersection hyp B hB) : Set G) * (↑(nLStabilizerIn hyp B) : Set G) :=
+  Subgroup.coe_mul_of_right_le_normalizer_left _ _
+    (hyp.nLStabilizerIn_le_normalizer hconj hB)
+
+/-- **Peterfalvi (2.8), the semidirect order identity.**  `|M(B)| = |H(B)| · |N_L(B)|`.
+
+This is the internal-semidirect-product content of `M(B) = H(B) ⋊ N_L(B)`: the
+multiplication map `H(B) × N_L(B) → M(B)` is a bijection, because `N_L(B)` normalizes
+`H(B)` (`(2.4.a)`, gives the product is `M(B)`) and `H(B) ∩ N_L(B) = 1`
+(`hIntersection_disjoint_nLStabilizerIn`, gives injectivity).  Same argument as
+`card_centralizer_eq`. -/
+theorem card_mBSubgroup (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Nat.card (mBSubgroup hyp B hB)
+      = Nat.card (hIntersection hyp B hB) * Nat.card (nLStabilizerIn hyp B) := by
+  classical
+  have hHle : hIntersection hyp B hB ≤ mBSubgroup hyp B hB := le_sup_left
+  have hNle : nLStabilizerIn hyp B ≤ mBSubgroup hyp B hB := le_sup_right
+  have hcoe := hyp.coe_mBSubgroup hconj hB
+  let f : (hIntersection hyp B hB) × (nLStabilizerIn hyp B) → mBSubgroup hyp B hB :=
+    fun p => ⟨(p.1 : G) * (p.2 : G),
+      (mBSubgroup hyp B hB).mul_mem (hHle p.1.2) (hNle p.2.2)⟩
+  have hf : Function.Bijective f := by
+    refine ⟨fun p q hpq => ?_, fun g => ?_⟩
+    · have hval : (p.1 : G) * (p.2 : G) = (q.1 : G) * (q.2 : G) :=
+        congrArg Subtype.val hpq
+      exact Subgroup.mul_injective_of_disjoint
+        (hyp.hIntersection_disjoint_nLStabilizerIn hB) hval
+    · have hmem : (g : G) ∈
+          (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
+        rw [← hcoe]; exact g.2
+      obtain ⟨h, hh, n, hn, hgeq⟩ := hmem
+      exact ⟨(⟨h, hh⟩, ⟨n, hn⟩), Subtype.ext hgeq⟩
+  calc Nat.card (mBSubgroup hyp B hB)
+      = Nat.card ((hIntersection hyp B hB) × (nLStabilizerIn hyp B)) :=
+        (Nat.card_congr (Equiv.ofBijective f hf)).symm
+    _ = Nat.card (hIntersection hyp B hB) * Nat.card (nLStabilizerIn hyp B) :=
+        Nat.card_prod _ _
+
+theorem hIntersection_le_mBSubgroup (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    hIntersection hyp B hB ≤ mBSubgroup hyp B hB := le_sup_left
+
+theorem nLStabilizerIn_le_mBSubgroup (hyp : Hypothesis G A L)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    nLStabilizerIn hyp B ≤ mBSubgroup hyp B hB := le_sup_right
+
+/-- `H(B)` is normal in `M(B)`: `M(B) = H(B) ⊔ N_L(B)` and both factors normalize `H(B)`
+(self-normalization and `(2.4.a)` for `N_L(B)`). -/
+theorem hIntersection_subgroupOf_normal (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal := by
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer (hyp.hIntersection_le_mBSubgroup hB)]
+  rw [mBSubgroup]
+  exact sup_le (hIntersection hyp B hB).le_normalizer
+    (hyp.nLStabilizerIn_le_normalizer hconj hB)
+
+/-- `H(B)` and `N_L(B)` are complementary subgroups inside `M(B)`: this is the internal
+semidirect decomposition `M(B) = H(B) ⋊ N_L(B)` as a `Subgroup.IsComplement'`. -/
+theorem isComplement'_subgroupOf (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    Subgroup.IsComplement'
+      ((nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB))
+      ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)) := by
+  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  refine Subgroup.isComplement'_of_card_mul_and_disjoint ?_ ?_
+  · -- `|N_sub| · |H_sub| = |M(B)|`
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.hIntersection_le_mBSubgroup hB)).toEquiv,
+      mul_comm, ← hyp.card_mBSubgroup hconj hB]
+  · -- disjointness of the lifted subgroups
+    rw [disjoint_iff_inf_le]
+    intro x hx
+    obtain ⟨hxN, hxH⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_subgroupOf] at hxN hxH
+    have hxbot := (disjoint_iff_inf_le.mp
+      (hyp.hIntersection_disjoint_nLStabilizerIn hB)) (Subgroup.mem_inf.mpr ⟨hxH, hxN⟩)
+    rw [Subgroup.mem_bot] at hxbot
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext hxbot
+
+/-- **Peterfalvi (2.9), `f_B`.**  The natural homomorphism `f_B : M(B) →* L` with kernel
+`H(B)`, coming from the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`.
+
+Concretely `f_B` is the composite `M(B) → M(B)/H(B) ≅ N_L(B) ↪ L`, where the middle
+isomorphism is `IsComplement'.QuotientMulEquiv` (`H(B)` normal, `N_L(B)` a complement) and
+the last map is the inclusion `N_L(B) ≤ L`. -/
+noncomputable def dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    mBSubgroup hyp B hB →* L :=
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
+    (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
+      ((hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom.comp
+        (QuotientGroup.mk' _)))
+
+/-- **`f_B` has kernel `H(B)`.**  Confirms the Peterfalvi (2.9) description of `f_B` as "the
+natural homomorphism `M(B) → L` with kernel `H(B)`": everything after the quotient map
+`mk' : M(B) → M(B)/H(B)` is injective (an isomorphism followed by the inclusion
+`N_L(B) ≤ L`), so `ker f_B = ker mk' = H(B)` (as a subgroup of `M(B)`). -/
+theorem ker_dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    (hyp.dadeQuotientHom hconj hB).ker
+      = (hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB) := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  -- the post-`mk'` part of `f_B`
+  set post :=
+      (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
+        (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
+          (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom) with hpost
+  have hinj : Function.Injective post := by
+    rw [hpost]
+    refine (Set.inclusion_injective (hyp.nLStabilizerIn_le_L B)).comp ?_
+    exact (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).injective.comp
+      (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.injective
+  have hfB : hyp.dadeQuotientHom hconj hB = post.comp (QuotientGroup.mk' _) := rfl
+  rw [hfB]
+  ext x
+  simp only [MonoidHom.mem_ker, MonoidHom.comp_apply]
+  rw [← map_one post, hinj.eq_iff, ← MonoidHom.mem_ker, QuotientGroup.ker_mk']
+
+/-- **Peterfalvi (2.9), `α_B`.**  For `α ∈ CF(L)` and a nonempty `B ⊆ A`, the class function
+`α_B = α ∘ f_B` on `M(B)`. -/
+noncomputable def alphaB (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ) :
+    ClassFunction (mBSubgroup hyp B hB) ℂ :=
+  ClassFunction.compHom (hyp.dadeQuotientHom hconj hB) α
+
+/-- **Peterfalvi (2.9), virtual-character preservation.**  If `α` is a virtual character of
+`L`, then `α_B` is a virtual character of `M(B)`.
+
+Since `α_B = α ∘ f_B` is the pullback of `α` along the group hom `f_B : M(B) →* L`, this is
+the general `ClassFunction.compHom_mem_ZIrr` (pullback preserves `ℤ[Irr]`), which holds
+because the character of *any* finite-dimensional representation lies in `ℤ[Irr]`. -/
+theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
+    (hα : α ∈ ZIrr L) :
+    alphaB hyp hconj hB α ∈ ZIrr (mBSubgroup hyp B hB) := by
+  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hconj hB) hα
+
+/-- `IsComplement'.QuotientMulEquiv` is a retraction onto the complement: on the class of a
+complement element `x : H`, it returns `x` (`QuotientMulEquiv.symm x = mk' ↑x`). -/
+theorem _root_.Subgroup.IsComplement'.QuotientMulEquiv_mk'_coe {G' : Type*} [Group G']
+    {H K : Subgroup G'} [K.Normal] (h : H.IsComplement' K) (x : H) :
+    h.QuotientMulEquiv (QuotientGroup.mk' K (x : G')) = x := by
+  rw [show (QuotientGroup.mk' K (x : G')) = h.QuotientMulEquiv.symm x from rfl,
+    MulEquiv.apply_symm_apply]
+
+/-- **`f_B` retracts `N_L(B)`.**  For `m ∈ M(B)` whose underlying element lies in `N_L(B)`,
+`f_B(m) = m` (in `L`).  Together with `ker f_B = H(B)` this pins down `f_B` on the
+semidirect factors. -/
+theorem dadeQuotientHom_coe_of_mem_nLStabilizerIn (hyp : Hypothesis G A L)
+    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    (m : mBSubgroup hyp B hB) (hm : (m : G) ∈ nLStabilizerIn hyp B) :
+    ((hyp.dadeQuotientHom hconj hB m : L) : G) = (m : G) := by
+  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+    hyp.hIntersection_subgroupOf_normal hconj hB
+  set κ : (nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB) :=
+    ⟨m, (Subgroup.mem_subgroupOf).mpr hm⟩ with hκ
+  have hmk : (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv
+      (QuotientGroup.mk' _ m) = κ := by
+    rw [show (m : mBSubgroup hyp B hB) = ((κ : (nLStabilizerIn hyp B).subgroupOf _) :
+        mBSubgroup hyp B hB) from rfl]
+    exact (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv_mk'_coe κ
+  simp only [dadeQuotientHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hmk,
+    Subgroup.coe_inclusion]
+  rfl
+
+/-- **Peterfalvi (2.9), defining equation.**  For `h ∈ H(B)`, `b ∈ N_L(B)`, the class
+function `α_B = α ∘ f_B` satisfies `α_B(h·b) = α(b)`.  Indeed `f_B(h·b) = f_B(h)·f_B(b) =
+1·b = b`, since `H(B) = ker f_B` and `f_B` retracts `N_L(B)`. -/
+theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
+    {h b : G} (hh : h ∈ hIntersection hyp B hB) (hb : b ∈ nLStabilizerIn hyp B)
+    (hmem : h * b ∈ mBSubgroup hyp B hB) :
+    alphaB hyp hconj hB α ⟨h * b, hmem⟩
+      = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+  have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
+  have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
+  have hsplit : (⟨h * b, hmem⟩ : mBSubgroup hyp B hB)
+      = (⟨h, hhM⟩ : mBSubgroup hyp B hB) * ⟨b, hbM⟩ := rfl
+  have hfh : hyp.dadeQuotientHom hconj hB ⟨h, hhM⟩ = 1 := by
+    rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf]
+    exact hh
+  have hval : hyp.dadeQuotientHom hconj hB ⟨b, hbM⟩
+      = ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
+    apply Subtype.ext
+    exact hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB ⟨b, hbM⟩ hb
+  show α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
+  rw [hsplit, map_mul, hfh, one_mul, hval]
+
+end SemidirectStructure
 
 end Hypothesis
 
@@ -853,6 +1311,83 @@ theorem map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
     τ α g = 0 := by
   apply hτ.map_eq_zero_of_not_mem_dadeSupport
   rwa [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]
+
+/-! ### The explicit Dade map of Peterfalvi (2.5)
+
+We construct the Dade map `α ↦ α^τ` *pointwise* from its defining equations (2.5):
+`α^τ(g) = α(a)` if `g` is `G`-conjugate to an element of some coset `aH(a)`, and `0`
+otherwise.  Well-definedness (independence of the chosen `a`) is exactly (2.4.b).
+This realizes the previously interface-only `IsDadeMap` as an honest construction;
+together with `isDadeIsometry_of_isDadeMap` it gives a genuine `DadeIsometryData`.
+The remaining (2.6.b) virtual-character preservation, which needs the (2.10)
+inclusion–exclusion, upgrades it to a `FullDadeIsometryData`. -/
+
+/-- The value `α^τ(g)` of the Peterfalvi (2.5) Dade map: `α(a)` when `g` is
+`G`-conjugate to an element of some coset `aH(a)`, else `0`.  The chosen `a` is
+irrelevant by (2.4.b) (`dadeValue_eq`). -/
+noncomputable def Hypothesis.dadeValue (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) (g : G) : k := by
+  classical
+  exact if hg : g ∈ hyp.dadeSupport then
+      (α : ClassFunction L k)
+        ⟨(hyp.mem_dadeSupport_iff.mp hg).choose.1,
+          hyp.mem_L (hyp.mem_dadeSupport_iff.mp hg).choose.2⟩
+    else 0
+
+theorem Hypothesis.dadeValue_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) {g : G} (hg : g ∉ hyp.dadeSupport) :
+    hyp.dadeValue α g = 0 := by
+  rw [Hypothesis.dadeValue, dif_neg hg]
+
+/-- **Peterfalvi (2.5), well-definedness.**  `α^τ(g) = α(a)` whenever `g` is
+`G`-conjugate to an element of `aH(a)`.  Two such base points `a, a'` are
+`L`-conjugate by (2.4.b) (`isConj_in_L_of_mul_H`), and `α` is an `L`-class function. -/
+theorem Hypothesis.dadeValue_eq (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L)
+    {a : {a : G // a ∈ A}} {h g : G} (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    hyp.dadeValue α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ := by
+  classical
+  have hg : g ∈ hyp.dadeSupport := hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, hga⟩
+  rw [Hypothesis.dadeValue, dif_pos hg]
+  set a₀ := (hyp.mem_dadeSupport_iff.mp hg).choose with ha₀
+  obtain ⟨h₀, hh₀, hga₀⟩ := (hyp.mem_dadeSupport_iff.mp hg).choose_spec
+  obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a₀.2 a.2 hh₀ hh (hga₀.trans hga.symm)
+  refine ClassFunction.of_isConj (α : ClassFunction L k) (isConj_iff.mpr ⟨l, ?_⟩)
+  exact Subtype.ext (by simp only [Subgroup.coe_mul, Subgroup.coe_inv]; exact hl)
+
+/-- The Peterfalvi (2.5) Dade map as a `ClassFunction G k`.  Conjugation invariance:
+if `g` lies in `dadeSupport` it is `G`-conjugate to some `aH(a)`, hence so is
+`x g x⁻¹` with the *same* `a`, so both values are `α(a)`; off `dadeSupport` both are `0`
+(`dadeSupport` is conjugation-stable). -/
+noncomputable def Hypothesis.dadeMapCF (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) : ClassFunction G k :=
+  ⟨hyp.dadeValue α, by
+    intro g x
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [hyp.dadeValue_eq α hh (hga.trans (isConj_iff.mpr ⟨x, rfl⟩)),
+        hyp.dadeValue_eq α hh hga]
+    · have hxg : x * g * x⁻¹ ∉ hyp.dadeSupport := by
+        rw [hyp.mem_dadeSupport_conj_iff]; exact hg
+      rw [hyp.dadeValue_of_not_mem_dadeSupport α hxg,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg]⟩
+
+/-- **Peterfalvi (2.5).**  The explicit Dade map `τ : CF(L, A) → CF(G)`. -/
+noncomputable def Hypothesis.dadeMap (hyp : Hypothesis G A L) :
+    DadeMap (G := G) k A L :=
+  fun α => hyp.dadeMapCF α
+
+@[simp] theorem Hypothesis.dadeMap_apply (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) (g : G) :
+    hyp.dadeMap α g = hyp.dadeValue α g := rfl
+
+/-- **Peterfalvi (2.5).**  The explicit Dade map satisfies the defining equations,
+i.e. it `IsDadeMap`.  This discharges the `IsDadeMap` interface by construction. -/
+theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :
+    IsDadeMap hyp (hyp.dadeMap (k := k)) where
+  map_eq_of_isConj_hCoset α g a h hh hconj := hyp.dadeValue_eq α hh hconj
+  map_eq_zero_of_not_mem_dadeSupport α g hg :=
+    hyp.dadeValue_of_not_mem_dadeSupport α hg
 
 end IsDadeMap
 
@@ -1215,6 +1750,88 @@ theorem adjoint_formula
     _ = ⅟(Nat.card L : ℂ) * ClassFunction.innerSum (α : ClassFunction L ℂ) ψ := by
         rw [mul_comm (⅟(Nat.card G : ℂ)) (⅟(Nat.card L : ℂ)), mul_assoc,
           ← mul_assoc (⅟(Nat.card G : ℂ)), invOf_mul_self, one_mul]
+
+omit [Fintype L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)] in
+/-- For a Dade map `τ` and `β : CF(L, A)`, the (2.7) averaging map applied to the
+class function `τ β` recovers `β` on `A`.
+
+Indeed `τ β` is constant equal to `β(a)` on the coset `aH(a)` (this is the (2.5)
+defining equation `IsDadeMap.map_eq_of_mem_hCoset`), so averaging it over `H(a)`
+gives back `β(a)`.  This is the computation behind Peterfalvi's remark, at the
+start of the proof of (2.6.a), that "`β^τ` is constant on `aH(a)`". -/
+theorem adjointAverageFun_dadeMap_eq
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (β : SupportedClassFunctions (G := G) ℂ A L) (a : {a : G // a ∈ A}) :
+    adjointAverageFun hyp (τ β) ⟨a.1, hyp.subset_L a.2⟩ =
+      (β : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ := by
+  classical
+  -- unfold the averaging map at `a`
+  simp only [adjointAverageFun]
+  rw [dif_pos a.2]
+  -- `τ β` is constant `= β(a)` on the coset `a · H(a)`
+  have hconst : ∀ x : ↥(hyp.H ⟨a.1, a.2⟩),
+      (τ β) (a.1 * (x : G)) = (β : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ := by
+    intro x
+    have hx : a.1 * (x : G) ∈ hyp.hCoset a := ⟨(x : G), x.2, rfl⟩
+    simpa using hτ.map_eq_of_mem_hCoset β a hx
+  have hHne : (Nat.card (hyp.H ⟨a.1, a.2⟩) : ℂ) ≠ 0 := by
+    have : 0 < Nat.card (hyp.H ⟨a.1, a.2⟩) := Nat.card_pos
+    exact_mod_cast this.ne'
+  rw [Finset.sum_congr rfl (fun x _ => hconst x), Finset.sum_const, Finset.card_univ,
+    ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc,
+    inv_mul_cancel₀ hHne, one_mul]
+
+/-- **Peterfalvi (2.6.a).**  Any map `τ` satisfying the (2.5) Dade-map equations
+(`IsDadeMap`) and the (2.4.a) `L`-equivariance of the subgroups `H(a)`
+(`HConjInvariant`) automatically preserves Peterfalvi's normalized inner product:
+
+    `(α^τ, β^τ)_G = (α, β)_L`    for all `α, β ∈ CF(L, A)`.
+
+This is the textbook proof of (2.6.a): since `β^τ` is constant on each coset
+`aH(a)`, the (2.7) adjoint formula with `χ = β^τ` and `ψ = β` reduces the
+`G`-inner product to the `L`-inner product `(α, β)_L`.  Together with
+`IsDadeMap` this upgrades a Dade map to a full `DadeIsometryData` without
+assuming the isometry property separately. -/
+theorem isDadeIsometry_of_isDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    IsDadeIsometry (k := ℂ) τ where
+  inner_eq α β :=
+    adjoint_formula hyp τ hτ hconj α (τ β) (β : ClassFunction L ℂ)
+      (fun a => (adjointAverageFun_dadeMap_eq hyp τ hτ β a).symm)
+
+/-- Bundle a Dade map satisfying the (2.5) equations into a `DadeIsometryData`,
+using `isDadeIsometry_of_isDadeMap` to supply the (2.6.a) isometry property. -/
+noncomputable def DadeIsometryData.ofIsDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    DadeIsometryData (G := G) (k := ℂ) hyp where
+  toDadeMap := τ
+  isDadeMap := hτ
+  isDadeIsometry := isDadeIsometry_of_isDadeMap hyp τ hτ hconj
+
+@[simp] theorem DadeIsometryData.ofIsDadeMap_toDadeMap
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (hconj : hyp.HConjInvariant) :
+    (DadeIsometryData.ofIsDadeMap hyp τ hτ hconj).toDadeMap = τ :=
+  rfl
+
+/-- **The explicit Dade isometry of Peterfalvi (2.5)–(2.6.a).**  Bundles the pointwise
+Dade map `dadeMap` (satisfying the (2.5) equations, `isDadeMap_dadeMap`) with the (2.6.a)
+isometry property, supplied automatically by `isDadeIsometry_of_isDadeMap`.
+
+This realizes the previously interface-only `DadeIsometryData` as an actual construction,
+relative to Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+Virtual-character preservation (2.6.b) — which upgrades this to a `FullDadeIsometryData` —
+needs the (2.10) inclusion–exclusion and is tracked separately (issue 0040). -/
+noncomputable def Hypothesis.dadeIsometryData (hconj : hyp.HConjInvariant) :
+    DadeIsometryData (G := G) (k := ℂ) hyp :=
+  DadeIsometryData.ofIsDadeMap hyp (hyp.dadeMap (k := ℂ))
+    (hyp.isDadeMap_dadeMap (k := ℂ)) hconj
+
+@[simp] theorem Hypothesis.dadeIsometryData_toDadeMap (hconj : hyp.HConjInvariant) :
+    (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) :=
+  rfl
 
 end AdjointFormula
 

@@ -1,0 +1,347 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.RepresentationTheory.Character
+import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.Algebra.Subalgebra.Basic
+import Mathlib.Algebra.Group.Conj
+
+/-!
+# The class-sum algebra and central characters
+
+This module formalizes the **class-sum algebra** of a finite group `G` and the **central
+characters** attached to its irreducible representations, the apparatus used in **Isaacs,
+_Character Theory of Finite Groups_ (Academic Press, 1976), §3 (p. 35)** and invoked by
+**Peterfalvi (6.7.2)** (LMS LNS 272, pp. 31–32).
+
+For a conjugacy class `C` of `G`, the **class sum** `classSum C = ∑_{x ∈ C} x` is an element of
+the group algebra `ℂ[G]`.  Because conjugation permutes each class, every class sum is central in
+`ℂ[G]`.  The products of class sums expand with *natural-number* structure coefficients
+`a_{ijs}` (Peterfalvi's `a_{ijs} ∈ ℕ`): `C_i · C_j = ∑_s a_{ijs} · C_s`.
+
+To each finite-dimensional irreducible complex representation `ρ` of `G` Schur's lemma attaches a
+**central character** `ω_ρ : Z(ℂ[G]) →ₐ[ℂ] ℂ`: a central element `x` acts on `V` as a scalar
+`ω_ρ(x)`, and `x ↦ ω_ρ(x)` is a `ℂ`-algebra homomorphism.  On a class sum it evaluates to
+`ω_ρ(C) = |C| · χ_ρ(g) / χ_ρ(1)` for any `g ∈ C` (Isaacs (3.6); Peterfalvi (6.7.2)).
+
+## Main definitions and results
+
+* `OddOrder.RepresentationTheory.classSum` — the class sum `∑_{x ∈ C} x ∈ ℂ[G]`.
+* `OddOrder.RepresentationTheory.classSum_mem_center` — each class sum is central in `ℂ[G]`.
+* `OddOrder.RepresentationTheory.classSumCoeff` — the structure coefficients `a_{ijs} ∈ ℕ`.
+* `OddOrder.RepresentationTheory.classSum_mul` — `C_i · C_j = ∑_s a_{ijs} · C_s`.
+* `OddOrder.RepresentationTheory.exists_central_scalar_asAlgebraHom` — Schur: a central element of
+  `ℂ[G]` acts on an irreducible representation as a scalar.
+* `OddOrder.RepresentationTheory.centralCharacterOfRep` — the central-character algebra hom
+  `ω_ρ : Z(ℂ[G]) →ₐ[ℂ] ℂ`.
+* `OddOrder.RepresentationTheory.centralCharacterOfRep_classSum` — its value on a class sum,
+  `ω_ρ(C) = |C| · χ_ρ(g) / χ_ρ(1)`.
+
+The algebraic-integrality of `ω_ρ(C)` (used in the `mod |P|` congruence of (6.7.3)) is a separate,
+harder statement (structure-coefficient matrix argument); it is not formalized here.  See
+`notes/peterfalvi/s08_coherence_theorems.md`.
+
+## References
+
+* I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, §3 (p. 35), (3.6).
+* Peterfalvi, *Character Theory for the Odd Order Theorem*, (6.7.2).
+-/
+
+namespace OddOrder.RepresentationTheory
+
+open scoped MonoidAlgebra
+open Module (finrank)
+open Representation
+
+variable {G : Type*} [Group G]
+
+section ClassSum
+
+variable [Fintype G] [DecidableEq (ConjClasses G)]
+
+/-- The **class sum** of a conjugacy class `C` of `G`: the element `∑_{x ∈ C} x` of the group
+algebra `ℂ[G]`.  This is Peterfalvi's `C_s` and Isaacs' `\hat C` (§3, p. 35). -/
+noncomputable def classSum (C : ConjClasses G) : ℂ[G] :=
+  ∑ g : G, if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0
+
+/-- The coefficient of `classSum C` at a group element `x` is `1` if `x` lies in the class `C`
+and `0` otherwise. -/
+theorem classSum_apply (C : ConjClasses G) (x : G) :
+    classSum C x = if ConjClasses.mk x = C then 1 else 0 := by
+  classical
+  have hsum : classSum C x
+      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0) x := by
+    rw [classSum]; exact map_sum (Finsupp.applyAddHom x) _ Finset.univ
+  -- `(0 : ℂ[G]) y = 0` (the `MonoidAlgebra` zero coefficient), used below.
+  have hzero : ∀ y : G, (0 : MonoidAlgebra ℂ G) y = 0 := fun _ => rfl
+  -- The coefficient of each summand at `x`: `1` if `g = x` and `mk g = C`, else `0`.
+  have hterm : ∀ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0) x
+      = if g = x then (if ConjClasses.mk g = C then (1 : ℂ) else 0) else 0 := by
+    intro g
+    rw [apply_ite (fun f : MonoidAlgebra ℂ G => f x), MonoidAlgebra.of_apply,
+      MonoidAlgebra.single_apply, hzero x]
+    by_cases hg : g = x
+    · rw [if_pos hg, if_pos hg]
+    · rw [if_neg hg, if_neg hg, ite_self]
+  rw [hsum, Finset.sum_congr rfl (fun g _ => hterm g),
+    Finset.sum_ite_eq' Finset.univ x (fun g => if ConjClasses.mk g = C then (1 : ℂ) else 0)]
+  simp
+
+/-- **Class sums are central in `ℂ[G]`.** Conjugation by any group element permutes each conjugacy
+class, so `classSum C` commutes with every basis element `of ℂ G h`, hence with all of `ℂ[G]`.
+(Isaacs §3; Peterfalvi (6.7.2).) -/
+theorem classSum_mem_center (C : ConjClasses G) :
+    classSum C ∈ Subalgebra.center ℂ (ℂ[G]) := by
+  classical
+  rw [Subalgebra.mem_center_iff]
+  intro a
+  -- Reduce to basis elements `a = single h r` by linearity.
+  induction a using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => rw [add_mul, mul_add, hx, hy]
+  | single h r =>
+    -- `single h r = r • of ℂ G h`, and scalars commute, so reduce to `of ℂ G h`.
+    have hof : (MonoidAlgebra.single h r : ℂ[G]) = r • MonoidAlgebra.of ℂ G h := by
+      rw [MonoidAlgebra.of_apply, MonoidAlgebra.smul_single, smul_eq_mul, mul_one]
+    rw [hof, smul_mul_assoc, mul_smul_comm]
+    congr 1
+    -- Goal: `of h * classSum C = classSum C * of h`.
+    rw [classSum, Finset.mul_sum, Finset.sum_mul]
+    -- LHS term: `of h * (if mk g = C then of g else 0)`; reindex `g ↦ h * g * h⁻¹`.
+    rw [← Equiv.sum_comp (MulAut.conj h).toEquiv
+      (fun g => (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0) *
+        MonoidAlgebra.of ℂ G h)]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    have hconj : (MulAut.conj h).toEquiv g = h * g * h⁻¹ := by simp [MulAut.conj_apply]
+    rw [hconj]
+    have hclass : ConjClasses.mk (h * g * h⁻¹) = ConjClasses.mk g :=
+      ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨h⁻¹, by group⟩)
+    rw [hclass]
+    by_cases h0 : ConjClasses.mk g = C
+    · simp only [h0, if_true]
+      rw [← map_mul, ← map_mul]
+      congr 1
+      group
+    · simp [h0]
+
+end ClassSum
+
+section StructureCoeff
+
+variable [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)]
+
+/-- The **structure coefficient** `a_{ijs}`: the number of ordered pairs `(u, v)` with `u ∈ C_i`,
+`v ∈ C_j`, and `u·v ∈ C_s`.  These are the natural numbers in Peterfalvi's `C_i · C_j = ∑_s a_{ijs}
+· C_s` (note that the coefficient of the *class sum* `C_s` in that combination is `a_{ijs}/|C_s|`;
+the unscaled `a_{ijs}` counts pairs over the whole class). -/
+noncomputable def classSumCoeff (Ci Cj Cs : ConjClasses G) : ℕ :=
+  (Finset.univ.filter (fun p : G × G =>
+    ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj ∧ ConjClasses.mk (p.1 * p.2) = Cs)).card
+
+/-- **Coefficient of a product of class sums at a group element.** The coefficient of `w` in
+`classSum Ci * classSum Cj` is the number of factorizations `w = u·v` with `u ∈ C_i` and `v ∈ C_j`.
+(This per-element count is constant on each conjugacy class; summing it over a class `C_s` recovers
+the structure coefficient `classSumCoeff Ci Cj Cs`.) -/
+theorem classSum_mul_apply (Ci Cj : ConjClasses G) (w : G) :
+    (classSum Ci * classSum Cj) w =
+      (Finset.univ.filter (fun p : G × G =>
+        ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj ∧ p.1 * p.2 = w)).card := by
+  classical
+  -- Expand the product coefficient over all pairs `(u, v)` with `u * v = w`.
+  have hexp := MonoidAlgebra.mul_apply_antidiagonal (classSum Ci) (classSum Cj) w
+    (Finset.univ.filter (fun p : G × G => p.1 * p.2 = w)) (by intro p; simp)
+  rw [hexp]
+  -- Each summand is the product of two `0/1` indicators; combine into a single indicator.
+  have hbody : ∀ p : G × G,
+      (classSum Ci p.1) * (classSum Cj p.2)
+        = if ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj then (1 : ℂ) else 0 := by
+    intro p
+    rw [classSum_apply, classSum_apply, ite_and]
+    by_cases h1 : ConjClasses.mk p.1 = Ci <;> by_cases h2 : ConjClasses.mk p.2 = Cj <;>
+      simp [h1, h2]
+  rw [Finset.sum_congr rfl (fun p _ => hbody p)]
+  -- Sum of a `0/1` indicator over the antidiagonal is the cardinality of the counted set.
+  rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul, mul_one]
+  norm_cast
+  apply congrArg Finset.card
+  ext p
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  constructor
+  · rintro ⟨hw, hi, hj⟩; exact ⟨hi, hj, hw⟩
+  · rintro ⟨hi, hj, hw⟩; exact ⟨hw, hi, hj⟩
+
+end StructureCoeff
+
+section CentralCharacter
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+
+/-- **Schur's lemma for central elements of `ℂ[G]`.** A central element `x` of the group algebra
+acts on a finite-dimensional irreducible complex representation `ρ` as a scalar: there is `c : ℂ`
+with `ρ.asAlgebraHom x = c • LinearMap.id`.  (Isaacs (1.5)/§3.) -/
+theorem exists_central_scalar_asAlgebraHom (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    {x : ℂ[G]} (hx : x ∈ Subalgebra.center ℂ (ℂ[G])) :
+    ∃ c : ℂ, ρ.asAlgebraHom x = c • LinearMap.id := by
+  -- `asAlgebraHom ρ x` is an intertwiner: it commutes with every `ρ g`.
+  have hcomm : ∀ (g : G) (v : V), ρ.asAlgebraHom x (ρ g v) = ρ g (ρ.asAlgebraHom x v) := by
+    intro g v
+    have hgx : MonoidAlgebra.of ℂ G g * x = x * MonoidAlgebra.of ℂ G g :=
+      (Subalgebra.mem_center_iff (R := ℂ)).mp hx _
+    have h1 : ρ.asAlgebraHom (MonoidAlgebra.of ℂ G g * x)
+        = ρ.asAlgebraHom (x * MonoidAlgebra.of ℂ G g) := by rw [hgx]
+    simp only [map_mul, asAlgebraHom_of] at h1
+    have := LinearMap.congr_fun h1 v
+    simpa only [Module.End.mul_apply] using this.symm
+  let f : IntertwiningMap ρ ρ :=
+    (ρ.asAlgebraHom x).intertwiningMap_of_isIntertwiningMap ρ ρ hcomm
+  obtain ⟨c, hc⟩ :=
+    (IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed (ρ := ρ)).surjective f
+  refine ⟨c, ?_⟩
+  have hlin := congrArg IntertwiningMap.toLinearMap hc
+  rw [IntertwiningMap.algebraMap_apply, IntertwiningMap.toLinearMap_smul,
+    show (1 : IntertwiningMap ρ ρ).toLinearMap = LinearMap.id from rfl] at hlin
+  exact hlin.symm
+
+omit [FiniteDimensional ℂ V] in
+/-- `V` is nontrivial when `ρ` is irreducible (used so that `finrank ℂ V > 0`). -/
+theorem nontrivial_of_isIrreducible (ρ : Representation ℂ G V) [IsIrreducible ρ] :
+    Nontrivial V := by
+  haveI h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
+  have h2 : Nontrivial (Submodule ℂ V) :=
+    (Subrepresentation.toSubmodule_injective (ρ := ρ)).nontrivial
+  exact (Submodule.nontrivial_iff ℂ).mp h2
+
+/-- The unique scalar `c` with `ρ.asAlgebraHom x = c • id` is the normalized trace
+`trace(ρ.asAlgebraHom x) / finrank ℂ V`. -/
+theorem centralScalar_eq (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    {x : ℂ[G]} {c : ℂ} (hc : ρ.asAlgebraHom x = c • LinearMap.id) :
+    c = LinearMap.trace ℂ V (ρ.asAlgebraHom x) / (finrank ℂ V : ℂ) := by
+  haveI := nontrivial_of_isIrreducible ρ
+  have hfr : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+  rw [hc, map_smul, LinearMap.trace_id, smul_eq_mul, mul_div_assoc, div_self hfr, mul_one]
+
+/-- **The central character `ω_ρ : Z(ℂ[G]) →ₐ[ℂ] ℂ`** attached to a finite-dimensional irreducible
+complex representation `ρ` of `G`.  A central element `x` acts on `V` as the scalar `ω_ρ(x)`, and
+`x ↦ ω_ρ(x)` is a `ℂ`-algebra homomorphism.  This is the homomorphism `ω` of Isaacs §3 (p. 35),
+invoked in Peterfalvi (6.7.2).
+
+The value `ω_ρ(x)` is `trace(ρ.asAlgebraHom x) / finrank ℂ V`; the algebra-hom axioms hold because
+`ρ.asAlgebraHom` is multiplicative and each `ρ.asAlgebraHom x` (for central `x`) is a scalar matrix,
+whose normalized trace is exactly its scalar. -/
+noncomputable def centralCharacterOfRep (ρ : Representation ℂ G V) [IsIrreducible ρ] :
+    Subalgebra.center ℂ (ℂ[G]) →ₐ[ℂ] ℂ where
+  toFun x := LinearMap.trace ℂ V (ρ.asAlgebraHom x.val) / (finrank ℂ V : ℂ)
+  map_one' := by
+    have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
+      haveI := nontrivial_of_isIrreducible ρ
+      exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+    change LinearMap.trace ℂ V (ρ.asAlgebraHom (1 : ℂ[G])) / (finrank ℂ V : ℂ) = 1
+    rw [map_one, LinearMap.trace_one, div_self hfr]
+  map_mul' x y := by
+    have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
+      haveI := nontrivial_of_isIrreducible ρ
+      exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+    obtain ⟨cx, hcx⟩ := exists_central_scalar_asAlgebraHom ρ x.property
+    obtain ⟨cy, hcy⟩ := exists_central_scalar_asAlgebraHom ρ y.property
+    have hxy : (x * y : Subalgebra.center ℂ (ℂ[G])).val = x.val * y.val := rfl
+    change LinearMap.trace ℂ V (ρ.asAlgebraHom (x * y).val) / (finrank ℂ V : ℂ)
+        = (LinearMap.trace ℂ V (ρ.asAlgebraHom x.val) / (finrank ℂ V : ℂ))
+          * (LinearMap.trace ℂ V (ρ.asAlgebraHom y.val) / (finrank ℂ V : ℂ))
+    -- RHS: each normalized trace is the corresponding scalar.
+    rw [← centralScalar_eq ρ hcx, ← centralScalar_eq ρ hcy]
+    -- LHS: `asAlgebraHom (x*y) = (cx•id)*(cy•id) = (cx*cy)•id`, normalized trace is `cx*cy`.
+    rw [hxy, map_mul, hcx, hcy, smul_mul_smul_comm, Module.End.mul_eq_comp, LinearMap.id_comp,
+      map_smul, LinearMap.trace_id, smul_eq_mul, mul_div_assoc, div_self hfr, mul_one]
+  map_zero' := by
+    change LinearMap.trace ℂ V (ρ.asAlgebraHom (0 : ℂ[G])) / (finrank ℂ V : ℂ) = 0
+    rw [map_zero, map_zero, zero_div]
+  map_add' x y := by
+    change LinearMap.trace ℂ V (ρ.asAlgebraHom (x + y).val) / (finrank ℂ V : ℂ)
+        = LinearMap.trace ℂ V (ρ.asAlgebraHom x.val) / (finrank ℂ V : ℂ)
+          + LinearMap.trace ℂ V (ρ.asAlgebraHom y.val) / (finrank ℂ V : ℂ)
+    have hadd : (x + y : Subalgebra.center ℂ (ℂ[G])).val = x.val + y.val := rfl
+    rw [hadd, map_add, map_add, add_div]
+  commutes' r := by
+    have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
+      haveI := nontrivial_of_isIrreducible ρ
+      exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+    change LinearMap.trace ℂ V (ρ.asAlgebraHom ((algebraMap ℂ (Subalgebra.center ℂ (ℂ[G])) r)).val)
+        / (finrank ℂ V : ℂ) = r
+    rw [Subalgebra.coe_algebraMap, AlgHom.commutes, Module.algebraMap_end_eq_smul_id,
+      map_smul, LinearMap.trace_id, smul_eq_mul, mul_div_assoc, div_self hfr, mul_one]
+
+@[simp] theorem centralCharacterOfRep_apply (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    (x : Subalgebra.center ℂ (ℂ[G])) :
+    centralCharacterOfRep ρ x = LinearMap.trace ℂ V (ρ.asAlgebraHom x.val) / (finrank ℂ V : ℂ) :=
+  rfl
+
+end CentralCharacter
+
+section Evaluation
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+variable [Fintype G] [DecidableEq (ConjClasses G)]
+
+omit [FiniteDimensional ℂ V] in
+/-- The image of a class sum under the representation algebra map is `∑_{g ∈ C} ρ g`. -/
+theorem asAlgebraHom_classSum (ρ : Representation ℂ G V) (C : ConjClasses G) :
+    ρ.asAlgebraHom (classSum C) =
+      ∑ g : G, if ConjClasses.mk g = C then ρ g else 0 := by
+  rw [classSum, map_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  by_cases h : ConjClasses.mk g = C
+  · simp only [h, if_true, asAlgebraHom_of]
+  · simp [h]
+
+omit [FiniteDimensional ℂ V] in
+/-- The trace of `ρ.asAlgebraHom (classSum C)` is `∑_{g ∈ C} χ_ρ(g)`, i.e. `|C| · χ_ρ(g)` for any
+`g ∈ C` (since `χ_ρ` is a class function). -/
+theorem trace_asAlgebraHom_classSum (ρ : Representation ℂ G V) (C : ConjClasses G) :
+    LinearMap.trace ℂ V (ρ.asAlgebraHom (classSum C)) =
+      ∑ g : G, if ConjClasses.mk g = C then ρ.character g else 0 := by
+  rw [asAlgebraHom_classSum, map_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  by_cases h : ConjClasses.mk g = C
+  · simp only [h, if_true]; rfl
+  · simp [h]
+
+/-- **Evaluation of the central character on a class sum** (Isaacs (3.6); Peterfalvi (6.7.2)):
+`ω_ρ(C) = (∑_{g ∈ C} χ_ρ(g)) / χ_ρ(1)`.  Since `χ_ρ` is constant on `C`, the numerator equals
+`|C| · χ_ρ(g)` for any representative `g ∈ C`. -/
+theorem centralCharacterOfRep_classSum (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    (C : ConjClasses G) :
+    centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ =
+      (∑ g : G, if ConjClasses.mk g = C then ρ.character g else 0) / (finrank ℂ V : ℂ) := by
+  rw [centralCharacterOfRep_apply, trace_asAlgebraHom_classSum]
+
+omit [FiniteDimensional ℂ V] in
+/-- The numerator `∑_{g ∈ C} χ_ρ(g)` equals `|C| · χ_ρ(g)` for any `g ∈ C`: the character is
+constant on the class, and `|C|` is the number of group elements lying in `C`. -/
+theorem sum_character_eq_card_mul (ρ : Representation ℂ G V) (C : ConjClasses G) {g : G}
+    (hg : ConjClasses.mk g = C) :
+    (∑ g : G, if ConjClasses.mk g = C then ρ.character g else 0)
+      = (Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character g := by
+  classical
+  -- The character is constant on the class: replace `χ g'` by `χ g` under the guard.
+  have hbody : ∀ g' : G, (if ConjClasses.mk g' = C then ρ.character g' else 0)
+      = (if ConjClasses.mk g' = C then ρ.character g else 0) := by
+    intro g'
+    by_cases hg' : ConjClasses.mk g' = C
+    · have hconj : IsConj g g' := ConjClasses.mk_eq_mk_iff_isConj.mp (hg.trans hg'.symm)
+      obtain ⟨u, rfl⟩ := isConj_iff.mp hconj
+      rw [char_conj]
+    · simp [hg']
+  rw [Finset.sum_congr rfl (fun g' _ => hbody g')]
+  -- Now sum a constant over the class: `∑ g', (if mk g' = C then χ g else 0) = |C| · χ g`.
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+  congr 2
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+
+end Evaluation
+
+end OddOrder.RepresentationTheory

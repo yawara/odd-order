@@ -147,6 +147,43 @@ theorem restrict_smul (H : Subgroup G) (c : k) (φ : ClassFunction G k) :
 
 end Restrict
 
+section CompHom
+
+variable {G : Type*} [Group G] {H : Type*} [Group H] {k : Type*} [CommRing k]
+
+/-- The **pullback** `φ ∘ f : ClassFunction H k` of a class function on `G` along a group
+homomorphism `f : H →* G`.  Conjugation invariance is preserved because `f` is a
+homomorphism: `f (h₂ * h₁ * h₂⁻¹) = f h₂ * f h₁ * (f h₂)⁻¹`.
+
+This generalizes `restrict` (the special case `f = H.subtype`); it is the construction
+behind Peterfalvi (2.9)'s `α_B = α ∘ f_B`, where `f_B : M(B) →* L` is the quotient map of
+the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`. -/
+def compHom (f : H →* G) (φ : ClassFunction G k) : ClassFunction H k :=
+  ⟨fun h => φ (f h), fun h₁ h₂ => by
+    show φ (f (h₂ * h₁ * h₂⁻¹)) = φ (f h₁)
+    rw [map_mul, map_mul, map_inv]
+    exact φ.conj_eq (f h₁) (f h₂)⟩
+
+@[simp] theorem compHom_apply (f : H →* G) (φ : ClassFunction G k) (h : H) :
+    compHom f φ h = φ (f h) := rfl
+
+@[simp] theorem compHom_zero (f : H →* G) :
+    compHom f (0 : ClassFunction G k) = 0 := by ext h; simp
+
+theorem compHom_add (f : H →* G) (φ ψ : ClassFunction G k) :
+    compHom f (φ + ψ) = compHom f φ + compHom f ψ := by ext h; simp
+
+theorem compHom_neg (f : H →* G) (φ : ClassFunction G k) :
+    compHom f (-φ) = -compHom f φ := by ext h; simp
+
+theorem compHom_sub (f : H →* G) (φ ψ : ClassFunction G k) :
+    compHom f (φ - ψ) = compHom f φ - compHom f ψ := by ext h; simp
+
+theorem compHom_smul (f : H →* G) (c : k) (φ : ClassFunction G k) :
+    compHom f (c • φ) = c • compHom f φ := by ext h; simp
+
+end CompHom
+
 section Support
 
 variable {G : Type*} [Group G] {k : Type*} [CommRing k]
