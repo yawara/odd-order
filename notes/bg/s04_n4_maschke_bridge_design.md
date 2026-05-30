@@ -1,5 +1,16 @@
 # BG §4 — N-4 残り半分: Maschke A-invariant complement bridge 設計書
 
+> ✅ **実装完了 (2026-05-30, commit 91fc115)** — `OddOrder/BG/Ch1_Preliminary/OperatorMaschke.lean`,
+> `exists_aInvariant_complement_in_omega1_quotient`, sorry-free / axiom-clean。
+> ⚠ **本設計書からの逸脱**: §2.5/§2.6 が想定した `Representation.mapSubmodule` + `asModule` +
+> `MonoidAlgebra.Submodule.exists_isCompl` 直接適用は, **`asModule` の `AddCommMonoid` 二重 instance**
+> (`deriving` 由来 vs `AddCommGroup.toAddCommMonoid`) が defeq だが syntactic 不一致で
+> `exists_isCompl` 適用が型不整合 → 詰む (親書 §3.1 が予言した "asModule defeq地獄")。
+> **回避**: `Subrepresentation ρ` (= V=`Additive ↥E` 上の不変部分群束, asModule 合成不要) +
+> `IsSemisimpleRepresentation ρ` (mathlib Maschke が instance 提供) の
+> `ComplementedLattice.exists_isCompl` を使用。instance が V 上で一貫し trap 回避。
+> 商作用 `φ̄` は予告どおり既存 `quotientMulAutHom` (Ch04) を使用 (再発明せず)。
+
 > **目的**: BG Thm 4.12(a) step a-3 / Thm 4.16 B-2 が要求する
 > 「商 `R⧸S` の `Ω₁` を `F_p[A]`-加群と見て、与えられた A-submodule の **A-invariant
 > complement** を **subgroup-of-`R` 形 (`S ≤ X ≤ R`, `X⧸S` が complement, `X` A-invariant)**

@@ -54,6 +54,16 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 → **Prop 4.11 (Huppert) の gate (Lem 4.5(b)/agemo) が開いた**。次候補 = Prop 4.11 / N-4 Maschke / Prop 4.3(a) full / Lem 4.9+Prop 4.8 (handoff §8)。
 
+**N-4 Maschke A-invariant complement bridge 完了** (2026-05-30, commit 91fc115) — handoff §1/§8 が「最深 scaffold-trap gate」と名指しした所:
+
+- `OddOrder/BG/Ch1_Preliminary/OperatorMaschke.lean` 新規。中核 = `exists_aInvariant_complement_in_omega1_quotient`: `(|A|,|R|)` coprime 作用下で `Ω₁(R⧸S)` 内の A-不変 `W₀⧸S` に A-不変 complement `X⧸S` (`⊓=⊥`/`⊔=Ω₁` を field 化, `S≤X`)。Thm 4.12(a) a-3 / Thm 4.16 B-2 が直接呼べる。
+- 経路 = Ω₁ を `F_p[A]`-加群化 (`mulAutToEnd ∘ quotientMulAutHom.restrict`) → `Subrepresentation` + `IsSemisimpleRepresentation` (mathlib Maschke) で complement → order-iso (`AddSubgroup.toZModSubmodule`/`Subgroup.toAddSubgroup`) で R の subgroup に復元。
+- ⚠ 設計書 (`s04_n4_maschke_bridge_design.md`) は `mapSubmodule`/`asModule` 経由を想定したが, **`asModule` の AddCommMonoid 二重 instance (derived vs AddCommGroup.toAddCommMonoid) の defeq trap** で詰まり, **`Subrepresentation` 経由に変更** (V=Additive ↥E 上で instance 一貫, asModule 合成不要)。実装者向け教訓として記録。
+- sorry-free / axiom-clean (`[propext, Classical.choice, Quot.sound]`), `lake build OddOrder` green (3354 jobs)。`OddOrder.lean` に import 追加済。
+- 補助: `isElementaryAbelian_omega_one_of_comm` / `neZero_natCast_zmod_of_coprime` / `isAInvariant_{map_mk',comap_mk',subgroupOf_restrict,map_subtype_of_restrict}` / `mulAutToEnd` (AppA private helper の自前複製; 将来 AppA と共有 module 化候補)。
+
+→ **Thm 4.12(a) (Huppert, metacyclic+[R,A]=R⇒abelian) の最深 gate が開いた**。次候補 = Thm 4.12(a) 本体 (N-4 + Lem 4.10✅/4.5(b)✅ で書ける) / Prop 4.11 (Huppert) / Prop 4.3(a) full。⚠ Ch04 `quotientMulAutHom` の `_root_` 欠落 (二重 nest 実名) は未修正 — 本ファイルは explicit 実名で回避 (S7A2 と同様)。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
