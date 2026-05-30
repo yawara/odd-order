@@ -319,7 +319,8 @@ theorem exists_distinct_subgroups_card_prime_of_not_isCyclic (hR : IsPGroup p R)
       IsCyclic R :=
     fun h => OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hR hp_odd h
   by_contra h
-  push_neg at h
+  -- `push_neg` is deprecated in this toolchain; unfold the negated existential by hand.
+  simp only [not_exists, not_and, ne_eq, not_not] at h
   exact hnc (huniq fun K L hK hL => h K L hK hL)
 
 /-- **BG Lemma 4.5(a)** (existence half, normality deferred). An odd noncyclic
