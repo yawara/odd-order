@@ -5,6 +5,7 @@
 > **v1 = Wave 0 (PRank 性質/SCN₃/Prop 4.4a) + Lem 4.7** で §5/§7/§10 の §4 依存が解ける (Thm 4.16 フル分類は v2、設計先行が要る)。**Lem 4.17 は 0016 (Thm 1.13 = thompson_critical_omega) を直接使う → 最速**。
 > 真のゲート = 「性質ゼロ問題」(PRank/SCN/IsMetacyclic/IsExtraspecial は def のみ)。
 > 着手 (2026-05-30): v1 自律実装 workflow を起動 (Thm 4.16/Huppert は scaffold trap リスクで除外、設計先行)。
+> **✅ v1 完了** (2026-05-30, `bg-s04-v1-impl` workflow wf_ec23ca53-2a1, commits 7c42a85..6721be2, Verify genuinelyDone/scaffold-clean/build green 3351 jobs): **PRank 性質補強 (§4 最初の山) + SCN₃ + Prop 4.4(a) (`isSCN_iff_isMaximalAbelianNormal`) + Lem 4.7 ⇒ (`scn3_empty_of_pRank_le_two`, §7 を開く)** が sorry-free。部分: Lem 4.17 GL(2,p) エンジン (`isPGroup_commutator_of_faithful_two_dim_charP`), Lem 4.2, Lem 4.5(a) existence+abelian-center。**残 (sorry なし deferred, Wave2)**: Lem 4.7 ⇐ (Gorenstein 5.4.15), Lem 4.5 general (Gorenstein 5.4.10)/4.5(b)(c), Lem 4.17 本体, Prop 4.3(a) cl≤3, **Thm 4.16 Blackburn (設計先行)**。
 
 # BG §4 "p-Groups of Small Rank" — 実装計画 (統合)
 
