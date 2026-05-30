@@ -38,6 +38,9 @@ Thm 4.16 は §4 最難。memory `scaffold-sorry-free-not-done` が最も効く�
 | **issue 1 API (2026-05-30 完了)** | `IsCentralProduct` / `of_le_centralizer` (Case B-1 producer) / `inf_le_centralizer` (R₁⊓R₂≤Z(R) 導出) ・ `IsExpPExtraspecial` / `pow_eq_one` ・ `Agemo` (𝒰ⁿ) / `anti` / `characteristic` | `CentralProduct.lean` (新規) / `IsExtraspecial.lean` / `OmegaSubgroup.lean` |
 | **I-1b Prop 1.6(b) R-内部形 (2026-05-30 完了)** | `actionCommutator_restrict_self_eq_top` (`[[R,A],A]=[R,A]` ⇒ `[N,A]=N`, Thm 4.12(a) a-1「R=[R,A] WLOG」) + `..._map_subtype_eq` (G 内等式) + `..._toMulAutHom_map_subtype_map_inl` (一般橋) | `OperatorQuotientAction.lean` (新規) |
 | **N-4 φ̄ lift = Ch04 既存** | `IsAInvariant.quotientMulAutHom` (商作用持ち上げ) + `actionCommutator_quotient_eq_map` (descent) ⚠ 実名二重 nest (`_root_` 欠落, Ch04 修正待ち) | `Isaacs/Ch04_Commutators/Main.lean:2248` |
+| **Lem 4.5(b) 完全 (2026-05-30)** | `isElementaryAbelian_omega1_of_isCyclic_index_prime` (cyclic index-p ⇒ Ω₁≅E_{p²}) + crux `card_omega1_le_prime_sq_of_cyclic_index_prime` + `pow_mem_center_of_cyclic_index_prime` (x^p∈Z, Isaacs 6.12 engine) | `S04` (commit 46e9e5c) |
+| **Lem 4.10 完全 (2026-05-30)** | `isElementaryAbelian_omega1_of_isMetacyclic` (noncyclic metacyclic ⇒ Ω₁≅E_{p²}) | `S04` (commit 46e9e5c) |
+| **Prop 4.3(a) cl≤3 precursor (2026-05-30)** | `commutatorElement_pow_left_of_triple_central` (`⁅u^n,w⁆=⁅u,w⁆^n·⁅u,⁅u,w⁆⁆^C(n,2)`) のみ; **full Prop 4.3(a)/(b) は未完** | `S04` (commit 46e9e5c) |
 
 ## 3. Thm 4.16 に至る未実装の前提 (Wave 2 — D の実質的大半)
 
@@ -93,7 +96,9 @@ Thm 4.16 本体の前に要る (sorry なしで deferred 中):
 > - **N-4 の φ̄ lift 半分は Ch04 既存** (`quotientMulAutHom`@Ch04:2248) と判明 (設計書 §2 N-4 訂正済、再実装不可)。残 N-4 = **Maschke complement bridge のみ** = `notes/bg/s04_n4_maschke_bridge_design.md`。
 > - 3 大難所設計 = **`notes/bg/s04_prop411_thm416_design.md`** (scaffold-trap audit + sub-issue I-0a..I-5)。
 
-**次の選択肢** (どちらも gate 解消済): (A) **issue 2 = Prop 4.3(a) cl≤3 + Lem 4.5 general** (Wave 2、Prop 4.11/4.8 の前提)、または (B) **N-4 Maschke bridge** (`s04_n4_maschke_bridge_design.md`、Thm 4.12(a)/4.16 B-2 を開く)。設計書の依存表・risk を必ず先に読む。⚠ **既存 `quotientMulAutHom` の二重 nest 名 (Ch04 `_root_` 欠落) に注意** — Maschke 着手前に Ch04 修正が要る (spawn task 済)。
+> **更新 (2026-05-30, commit 46e9e5c)**: issue 2 のうち ✅ **Lem 4.5(b) + Lem 4.10 完全達成** (Prop 4.11 step 8 / Thm 4.12 の前提が開いた)。⚠ Prop 4.3(a) cl≤3 は **precursor のみ** (full collection は γ₄=1 を要し BG の f/g exponent が mathlib convention で誤り、§2 N-5 参照)。
+
+**次の選択肢**: (A) **Prop 4.11 (Huppert)** — gate の Lem 4.5(b) ✅/agemo ✅ が揃った; 残依存 = Lem 4.9 (`|Ω₁(R/T)|≤p²`) + abelian case (設計書 §3)。(B) **N-4 Maschke bridge** (`s04_n4_maschke_bridge_design.md`、Thm 4.12(a)/4.16 B-2 を開く、⚠ Ch04 `_root_` 修正 spawn task 後)。(C) **Prop 4.3(a) cl≤3 full + Prop 4.3(b)** (precursor の上に full collection+|R|帰納; mirror で f/g 再計算)。(D) **Lem 4.9 + Prop 4.8** (Wave 2 残)。設計書の依存表・risk を必ず先に読む。
 
 **最重要 risk (設計書より)**: 最深 scaffold-trap gate = **N-4 (A の R/S 商作用 + Maschke A-invariant complement)** — Thm 4.12(a) と Thm 4.16 Case B-2 が両方依存するが repo 不在。`MulAction A (R/S) := sorry` で誤魔化す誘惑が最大なので**最初に genuine 実装**。Thm 4.16 B-2 の `j²≡1` 矛盾は**純 ZMod p 算術で閉じる** (GL engine 経由でない — mis-routing 注意)。
 

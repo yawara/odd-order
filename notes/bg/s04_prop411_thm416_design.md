@@ -170,14 +170,17 @@ Ch03 に `MulAut.conj` の商への intertwine (`Ch03:942-943` の `h_intertwine
 **これが §4 で最も scaffold-trap を生みやすい**: 「`A` が `R/S` に作用する」を未構成 instance
 (`MulAction A (R⧸S) := sorry`) で誤魔化すと全体が崩れる。
 
-### N-5. Prop 4.8 / Lem 4.5 general / Lem 4.9 / Lem 4.10 — **needs-impl** (Wave 2、本書範囲外だが前提)
+### N-5. Prop 4.8 / Lem 4.5 general / Lem 4.9 / Lem 4.10 — **一部 DONE** (Wave 2、本書範囲外だが前提)
+
+> **更新 (2026-05-30, commit 46e9e5c)**: ✅ **Lem 4.5(b) + Lem 4.10 完全達成**, ⚠ Prop 4.3(a) cl≤3 は precursor のみ (下記)。残 needs-impl = Prop 4.8(a)(b) / Lem 4.5(a)-general / Lem 4.5(c) (4.5(a)-general 待ち) / Lem 4.9 / Prop 4.3(a) cl≤3 の full collection+|R|帰納 / Prop 4.3(b)。
 * **Prop 4.8(a)** (`r≤2` + exp p ⇒ `|R|≤p³`): SCN `A` を取り `|R/A|=|R/C_R(A)| ≤ |Aut A|_p ≤ |GL(2,p)|_p = p`
   (mmd L1516-1518)。`|Aut A|_p ≤ p` は **Aut(Eₚ²)≅GL(2,p)** 橋 + `|GL(2,p)|_p=p` 要 (N-6)。
 * **Prop 4.8(b)** (`p>3` ⇒ `Ω₁(R)` exp 1 or p): minimal counterexample + cl≤3 (mmd L1520)。
-* **Lem 4.5(b)** (cyclic index p ⇒ `Ω₁(R)≅Eₚ²`): Gorenstein 5.4.3/5.4.4。Prop 4.11/Thm 4.12 が多用。
+* ~~**Lem 4.5(b)**~~ ✅ **DONE** (2026-05-30, commit 46e9e5c, `isElementaryAbelian_omega1_of_isCyclic_index_prime` @S04, sorry-free/axiom-clean)。crux `|Ω₁|≤p²` を hoist せず証明 — 核 `x^p∈Z(R)` は **Gorenstein 5.4.3/4.4 を引かず Isaacs Thm 6.12/Lem 6.16 共役エンジン再利用**で達成 (ZMod 自前計算回避)。Prop 4.11 step 8 / Thm 4.12 が直接呼べる。
 * **Lem 4.5(c)** (`Ω₁(Z₂(R))` noncyclic exp p): 4.5(a)+Prop 4.3(a)。
 * **Lem 4.9** (`p>3`, `|Ω₁(R)|≤p²` ⇒ `|Ω₁(R/T)|≤p²` ∀ `T⊴R`): mmd L1522-1544、Prop 4.11 の帰納で必須。
-* **Lem 4.10** (metacyclic noncyclic ⇒ `Ω₁(R)≅Eₚ²`): mmd L1546-1552、Thm 4.12 が必須。
+* ~~**Lem 4.10**~~ ✅ **DONE** (2026-05-30, commit 46e9e5c, `isElementaryAbelian_omega1_of_isMetacyclic` @S04, sorry-free/axiom-clean)。4.5(b) の系。Thm 4.12 が直接呼べる。
+* ⚠ **Prop 4.3(a) cl≤3 は precursor のみ** (2026-05-30, commit 46e9e5c): linchpin `commutatorElement_pow_left_of_triple_central` (γ₃⊆Z ⇒ `⁅u^n,w⁆=⁅u,w⁆^n·⁅u,⁅u,w⁆⁆^C(n,2)`) + helper は green。**全 (u*v)^n collection + |R| 帰納は未完**。判明した注意: 全 collection は **γ₄=1** を要し, BG の f(n)=C(n,3)/g(n)=2C(n,3)+C(n,2) exponent は **mathlib commutator convention で誤り** (n=2 で `(uv)²=u·⁅v,u⁆·u·v²` の単一非中心項; 数値検証で BG-literal 形は 624/1200 失敗, mathlib-mirror 形は 0/1200)。再開時は mirror で f/g を再計算せよ。Prop 4.11 step (φ準同型) で要るのは Prop 4.3(**b**) で, これは未着手。
 
 ### N-6. Aut(Eₚⁿ) ≅ GL(n,p) 橋 — **needs-impl** ⭐ (Lem 4.13 / Prop 4.8 / Thm 4.16 文脈)
 elementary abelian `E` (order pⁿ) に対し `MulAut E ≃* GL (Fin n) (ZMod p)`。

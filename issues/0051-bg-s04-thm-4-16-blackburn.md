@@ -46,6 +46,14 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 次 = (A) issue 2 (Prop 4.3(a) cl≤3 + Lem 4.5 general) か (B) N-4 Maschke bridge。
 
+**issue 2 (Wave 2) 一部完了** — workflow `bg-s04-issue2-prop43-lem45b` (commit 46e9e5c, 全 sorry-free/axiom-clean):
+
+- ✅ **Lem 4.5(b) 完全** `isElementaryAbelian_omega1_of_isCyclic_index_prime` (crux `|Ω₁|≤p²` を hoist せず証明、核 `x^p∈Z` は Isaacs Thm 6.12/Lem 6.16 共役エンジン再利用で Gorenstein 5.4.3/4.4 を回避)。
+- ✅ **Lem 4.10 完全** `isElementaryAbelian_omega1_of_isMetacyclic` (4.5(b) の系)。
+- ⚠ **Prop 4.3(a) cl≤3 precursor のみ** `commutatorElement_pow_left_of_triple_central`。full collection+|R|帰納未完 (γ₄=1 要、BG の f/g exponent が mathlib convention で誤り判明)。
+
+→ **Prop 4.11 (Huppert) の gate (Lem 4.5(b)/agemo) が開いた**。次候補 = Prop 4.11 / N-4 Maschke / Prop 4.3(a) full / Lem 4.9+Prop 4.8 (handoff §8)。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
