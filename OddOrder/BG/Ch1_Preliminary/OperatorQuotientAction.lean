@@ -234,6 +234,27 @@ theorem isCyclic_le_center_of_actionCommutator_eq_top
   intro x hx
   exact (Subgroup.centralizer_eq_top_iff_subset.mp hle) hx
 
+/-- **BG Thm 4.12(a) step a-2, `S` の構成**: 有限群 `G` で `R' = commutator G` が cyclic なら,
+`R'` を含む cyclic A-不変部分群のうち**包含について極大**なもの `S` が存在する。
+
+`R'` 自身が cyclic (`hcyc`) かつ characteristic ゆえ A-不変 (`IsAInvariant.commutator_self`) なので
+述語 `IsAInvariant φ · ∧ IsCyclic · ∧ R' ≤ ·` を満たし, 有限部分群束の極大元
+(`Finite.exists_le_maximal`) を取って antisymmetry で極大性を仕上げる。
+
+(`IsCyclic ↥(commutator G)` は metacyclic から `IsMetacyclic.isCyclic_commutator` で供給される;
+ここでは `IsMetacyclic` import を避けるため仮説として受け取る。) -/
+theorem exists_maximal_isCyclic_isAInvariant_commutator_le
+    {A G : Type*} [Group A] [Group G] [Finite G] (φ : A →* MulAut G)
+    (hcyc : IsCyclic ↥(commutator G)) :
+    ∃ S : Subgroup G, IsAInvariant φ S ∧ IsCyclic ↥S ∧ commutator G ≤ S ∧
+      ∀ T : Subgroup G, IsAInvariant φ T → IsCyclic ↥T → commutator G ≤ T → S ≤ T → S = T := by
+  obtain ⟨S, hsub, hmax⟩ :=
+    Finite.exists_le_maximal
+      (p := fun H : Subgroup G => IsAInvariant φ H ∧ IsCyclic ↥H ∧ commutator G ≤ H)
+      ⟨IsAInvariant.commutator_self φ, hcyc, le_refl _⟩
+  exact ⟨S, hmax.1.1, hmax.1.2.1, hsub, fun T hT hTcyc hTle hST =>
+    le_antisymm hST (hmax.2 ⟨hT, hTcyc, hTle⟩ hST)⟩
+
 end CentralizerOfCyclicAInvariant
 
 end OddOrder.BG.Ch1.OperatorQuotientAction
