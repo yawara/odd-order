@@ -190,6 +190,159 @@ theorem exists_isIrreducibleCharacter_eq {W : Type*} [AddCommGroup W] [Module �
 
 end Transfer
 
+section VirtualCharacters
+
+variable {G : Type*} [Group G]
+
+/-- `IsCompl` of subrepresentations descends to `IsCompl` of the underlying submodules
+(`toSubmodule` is a bounded-lattice embedding). -/
+theorem isCompl_toSubmodule {V : Type*} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
+    {U U' : Subrepresentation ρ} (h : IsCompl U U') :
+    IsCompl U.toSubmodule U'.toSubmodule := by
+  constructor
+  · rw [disjoint_iff, ← Subrepresentation.toSubmodule_inf, disjoint_iff.mp h.disjoint]
+    rfl
+  · rw [codisjoint_iff, ← Subrepresentation.toSubmodule_sup, codisjoint_iff.mp h.codisjoint]
+    rfl
+
+/-- **Trace additivity along a direct sum of subrepresentations.** If `U, U' : Subrepresentation ρ`
+are complementary (`IsCompl U U'`), then `χ_ρ = χ_{U} + χ_{U'}` pointwise: the trace of `ρ g`
+decomposes as the sum of the traces of its restrictions to `U` and `U'`.
+
+The proof exhibits `ρ g` as the conjugate (by the iso `U.toSubmodule × U'.toSubmodule ≃ₗ V`) of the
+product map of the two restrictions, then applies `LinearMap.trace_conj'` and
+`LinearMap.trace_prodMap'`. -/
+theorem character_add_of_isCompl {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V) (U U' : Subrepresentation ρ) (h : IsCompl U U') (g : G) :
+    ρ.character g = U.toRepresentation.character g + U'.toRepresentation.character g := by
+  -- `IsCompl` transports from `Subrepresentation ρ` to the underlying submodules.
+  have hS : IsCompl U.toSubmodule U'.toSubmodule := isCompl_toSubmodule h
+  set e : (U.toSubmodule × U'.toSubmodule) ≃ₗ[ℂ] V :=
+    Submodule.prodEquivOfIsCompl U.toSubmodule U'.toSubmodule hS with he
+  -- `ρ g` is the conjugate of the product of the two restrictions.
+  have hconj : ρ g = e.conj
+      (LinearMap.prodMap (U.toRepresentation g) (U'.toRepresentation g)) := by
+    refine LinearMap.ext fun v => ?_
+    rw [LinearEquiv.conj_apply_apply, LinearMap.prodMap_apply]
+    -- `e (a, b) = ↑a + ↑b` for the prodEquivOfIsCompl.
+    rw [he, Submodule.coe_prodEquivOfIsCompl']
+    -- The two restrictions coerce back to `ρ g` applied to the coordinate (definitional);
+    -- then `↑(e.symm v).1 + ↑(e.symm v).2 = e (e.symm v) = v`.
+    have hsplit : ((e.symm v).1 : V) + ((e.symm v).2 : V) = v := by
+      have := e.apply_symm_apply v
+      rwa [he, Submodule.coe_prodEquivOfIsCompl'] at this
+    change ρ g v = ρ g ((e.symm v).1 : V) + ρ g ((e.symm v).2 : V)
+    rw [← map_add, hsplit]
+  rw [show ρ.character g = LinearMap.trace ℂ V (ρ g) from rfl, hconj, LinearMap.trace_conj',
+    LinearMap.trace_prodMap']
+  rfl
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **KEYSTONE.** The character of *any* finite-dimensional complex representation of a finite group
+is a virtual character (`∈ ZIrr G`).
+
+This is the universe-general, not-necessarily-irreducible extension of
+`repCharacterClassFunction_mem_ZIrr`. The proof is strong induction on `finrank ℂ V`:
+* `finrank = 0` ⇒ the character is `0 ∈ ZIrr G`.
+* `ρ` irreducible ⇒ `exists_isIrreducibleCharacter_eq` exhibits `χ_ρ ∈ irreducibleCharacters G`,
+  which lies in `ZIrr G`.
+* `ρ` reducible (and nonzero) ⇒ by Maschke (`IsSemisimpleRepresentation`) a proper nonzero
+  subrepresentation `U` has a complement `U'`; both have smaller `finrank`, and
+  `character_add_of_isCompl` writes `χ_ρ = χ_U + χ_{U'}`, so the induction hypothesis and
+  `Submodule.add_mem` conclude.
+
+This is the keystone that unblocks `induce`/`restrict ∈ ZIrr` and hence the Dade isometry
+(Peterfalvi (2.6.b)) / §9. -/
+theorem character_mem_ZIrr {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    {G : Type*} [Group G] [Finite G] (ρ : Representation ℂ G V) :
+    (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) ∈ ZIrr G := by
+  classical
+  -- Strong induction on `finrank ℂ V`, generalizing over the carrier `V'` (same universe).
+  let motive : ℕ → Prop := fun n =>
+    ∀ {V' : Type _} [AddCommGroup V'] [Module ℂ V'] [FiniteDimensional ℂ V'],
+      finrank ℂ V' = n → ∀ (ρ' : Representation ℂ G V'),
+        (⟨ρ'.character, fun g h => ρ'.char_conj g h⟩ : ClassFunction G ℂ) ∈ ZIrr G
+  refine (Nat.strongRecOn (motive := motive) (finrank ℂ V) ?_) rfl ρ
+  clear ρ
+  intro n ih V _ _ _ hn ρ
+  -- Base case `finrank = 0`: the character is identically `0`.
+  by_cases hn0 : n = 0
+  · subst hn0
+    have hV0 : finrank ℂ V = 0 := hn
+    haveI : Subsingleton V := Module.finrank_zero_iff.mp hV0
+    have hchar0 : (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) = 0 := by
+      apply ClassFunction.ext
+      intro g
+      change ρ.character g = 0
+      rw [show ρ.character g = LinearMap.trace ℂ V (ρ g) from rfl,
+        Subsingleton.elim (ρ g) 0, map_zero]
+    rw [hchar0]
+    exact Submodule.zero_mem _
+  -- Otherwise `n > 0`, so `V` is nontrivial.
+  have hpos : 0 < finrank ℂ V := by rw [hn]; exact Nat.pos_of_ne_zero hn0
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos hpos
+  by_cases hirr : Representation.IsIrreducible ρ
+  · -- Irreducible case: the character is an irreducible character, hence in `ZIrr`.
+    obtain ⟨φ, hφirr, hφeq⟩ := exists_isIrreducibleCharacter_eq ρ
+    have : (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) = φ := by
+      apply ClassFunction.ext
+      intro g
+      rw [show ((⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) : G → ℂ) g
+        = ρ.character g from rfl, congrFun hφeq g]
+    rw [this]
+    exact hφirr.mem_ZIrr
+  · -- Reducible nonzero case: split off a proper nonzero subrepresentation.
+    haveI : NeZero (Nat.card G : ℂ) :=
+      ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
+    -- `ρ` is not a simple order on `Subrepresentation ρ`; but it *is* nontrivial.
+    haveI : Nontrivial (Subrepresentation ρ) := by
+      refine ⟨⟨⊥, ⊤, ?_⟩⟩
+      intro hbt
+      have : (⊥ : Subrepresentation ρ).toSubmodule = (⊤ : Subrepresentation ρ).toSubmodule :=
+        congrArg Subrepresentation.toSubmodule hbt
+      simp only [show (⊥ : Subrepresentation ρ).toSubmodule = ⊥ from rfl,
+        show (⊤ : Subrepresentation ρ).toSubmodule = ⊤ from rfl] at this
+      exact absurd this.symm (top_ne_bot)
+    -- From `¬ IsIrreducible` extract `U` with `U ≠ ⊥` and `U ≠ ⊤`.
+    obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
+      by_contra hcon
+      push_neg at hcon
+      exact hirr ⟨fun U => or_iff_not_imp_left.mpr (hcon U)⟩
+    -- Maschke gives a complement.
+    obtain ⟨U', hUU'⟩ := ComplementedLattice.exists_isCompl U
+    -- Both summands have strictly smaller finrank.
+    have hUtop' : U.toSubmodule ≠ ⊤ := by
+      intro h; exact hUtop (Subrepresentation.toSubmodule_injective
+        (by rw [h]; rfl))
+    have hUfin : finrank ℂ U.toSubmodule < finrank ℂ V := Submodule.finrank_lt hUtop'
+    -- `U'.toSubmodule ≠ ⊤` because `U ≠ ⊥`.
+    have hSc : IsCompl U.toSubmodule U'.toSubmodule := isCompl_toSubmodule hUU'
+    have hU'top : U'.toSubmodule ≠ ⊤ := by
+      intro htop
+      apply hUbot
+      apply Subrepresentation.toSubmodule_injective
+      rw [show (⊥ : Subrepresentation ρ).toSubmodule = ⊥ from rfl]
+      have : U.toSubmodule = U.toSubmodule ⊓ U'.toSubmodule := by rw [htop, inf_top_eq]
+      rw [this, hSc.inf_eq_bot]
+    have hU'fin : finrank ℂ U'.toSubmodule < finrank ℂ V := Submodule.finrank_lt hU'top
+    -- Apply the induction hypothesis to both subrepresentations.
+    have hIH_U := ih (finrank ℂ U.toSubmodule) (hn ▸ hUfin) rfl U.toRepresentation
+    have hIH_U' := ih (finrank ℂ U'.toSubmodule) (hn ▸ hU'fin) rfl U'.toRepresentation
+    -- The whole character is the sum of the two.
+    have hsum : (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ)
+        = (⟨U.toRepresentation.character, fun g h => U.toRepresentation.char_conj g h⟩ :
+            ClassFunction G ℂ)
+          + (⟨U'.toRepresentation.character, fun g h => U'.toRepresentation.char_conj g h⟩ :
+            ClassFunction G ℂ) := by
+      apply ClassFunction.ext
+      intro g
+      rw [ClassFunction.add_apply]
+      exact character_add_of_isCompl ρ U U' hUU' g
+    rw [hsum]
+    exact Submodule.add_mem _ hIH_U hIH_U'
+
+end VirtualCharacters
+
 section Completeness
 
 open scoped MonoidAlgebra

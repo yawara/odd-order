@@ -577,6 +577,12 @@ set_option linter.style.longLine false in
 -- unconditional — `# real Irr = # real ConjClasses` for any `[Finite G]`. The conjugation
 -- involution `χ ↦ χ̄` is discharged via dual-representation irreducibility (issue 0022 closed).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.brauer_permutation_lemma'
+-- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
+-- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
+-- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
+-- add (`character_add_of_isCompl` = `trace_conj' + trace_prodMap'`); the irreducible base case is
+-- `exists_isIrreducibleCharacter_eq`. Unblocks `induce`/`restrict ∈ ℤ[Irr]` ⇒ Dade (2.6.b)/§9.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_mem_ZIrr
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
