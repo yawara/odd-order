@@ -22,7 +22,7 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
 - [x] chief factor / centralizer / Fitting の既存 API を棚卸しする。
 - [x] Prop 1.2 を実装するか、必要な shared module の最小スコープを決める。
 - [x] Prop 1.2 の前半包含 `F(G*) ≤ C_G(U/V)` for every chief factor を実装する。
-- [ ] Prop 1.2 の逆包含を chief series / normal interval induction で実装する。
+- [x] Prop 1.2 の逆包含を chief series / normal interval induction で実装する。
 - [x] Prop 1.3 `C_G(F(G)) ⊆ F(G)` を実装する。
 - [ ] Prop 1.4 coprime automorphism faithful-on-Fitting を実装する。
 
@@ -51,6 +51,11 @@ mathlib/現行 OddOrder には chief factor / composition series 周辺の share
   逆包含 `⋂ C_{G*}(U/V) ≤ F(G*)` の induction から進める。
 - Prop 1.4 は Prop 1.3 を使える状態になったが、semidirect product と Hall σ/core
   の形式化が残る。
+
+2026-05-30 (bg-parallel-frontier workflow + 本人確認):
+
+- **Prop 1.2 逆包含 `chiefFactorCentralizer_subset_le_fitting_of_isSolvable` (S01:378) は完成・axiom-clean** (#print axioms = propext/Classical.choice/Quot.sound)。上の checkbox は stale だったので [x] に更新。Prop 1.2 (両方向) + Prop 1.3 は DONE。
+- **本 issue の残務は Prop 1.4 のみ** (= Prop 1.4-only に縮約)。Prop 1.4 (coprime auto faithful on F(G)) は X=G⋊A solvable + Hall σ + O_σ(F)=1 分解を要し、**§1B Prop 1.5 (issue 0012, A-invariant Hall π 一般版) に依存**。0012 完成後に着手 (本計画では Wave 2)。
 
 ## 完了条件
 
