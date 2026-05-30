@@ -68,6 +68,25 @@ theorem of_isCyclic [IsCyclic G] : IsMetacyclic G := by
   · -- `IsCyclic (G ⧸ ⊥)` follows from `IsCyclic G` via the surjective quotient map
     exact isCyclic_of_surjective (QuotientGroup.mk' ⊥) (QuotientGroup.mk'_surjective ⊥)
 
+/-- A metacyclic group has cyclic commutator subgroup.
+
+Since `G ⧸ N` is cyclic (hence abelian), `commutator G ≤ N` by
+`Subgroup.Normal.quotient_commutative_iff_commutator_le`; and a subgroup of the cyclic
+group `N` is cyclic (`Subgroup.isCyclic`), so `commutator G` is cyclic via the
+group isomorphism `(commutator G).subgroupOf N ≃* commutator G`.
+
+**BG §4** Thm 4.12(a) の補題段 (mmd L1592: "R metacyclic ⇒ R′ cyclic"). -/
+theorem isCyclic_commutator (hmeta : IsMetacyclic G) : IsCyclic (commutator G) := by
+  obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := hmeta
+  haveI := hN
+  haveI : IsCyclic (G ⧸ N) := hQ_cyc
+  have hle : commutator G ≤ N :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
+  haveI : IsCyclic N := hN_cyc
+  haveI : IsCyclic ↥((commutator G).subgroupOf N) := Subgroup.isCyclic _
+  exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hle).toMonoidHom
+    (Subgroup.subgroupOfEquivOfLe hle).surjective
+
 /-- A metacyclic group is solvable.
 
 Cyclic groups are commutative hence solvable. The extension `1 → N → G → G ⧸ N → 1`
