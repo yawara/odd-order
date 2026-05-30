@@ -2738,6 +2738,53 @@ theorem sum_mobiusSummand_eq_singleton (hconj : hyp.HConjInvariant) (g : G)
       exact haB this
   rw [hzero, zero_add]
 
+/-- `H({a}) = H(a)`: the intersection over the singleton `{a}` is `H(a)`. -/
+theorem hIntersection_singleton (a : {a : G // a ∈ A}) :
+    hIntersection hyp {a} (Finset.singleton_nonempty a) = hyp.H a := by
+  apply le_antisymm
+  · exact hyp.hIntersection_le _ (Finset.mem_singleton_self a)
+  · intro x hx
+    rw [mem_hIntersection]
+    intro b hb
+    rw [Finset.mem_singleton] at hb
+    exact hb ▸ hx
+
+/-- **Peterfalvi (2.10), evaluation of the surviving `B = {a}` term.**  For `g ∈ (aH(a))^G`
+(witnessed by `h ∈ H(a)`, `IsConj (a·h) g`),
+
+    `mobiusSummand a g {a} = -(|C_L(a)| : ℂ)`.
+
+Indeed `|{a}| = 1`, `H({a}) = H(a)`, and the surviving conjugating set has
+`|𝒜(g, H(a)·a)| = |C_G(a)|` (`card_conjFiber_coset_eq_card_centralizer`), while
+`|C_G(a)| = |H(a)|·|C_L(a)|` (`card_centralizer_eq`); the `|H(a)|` cancels the denominator,
+leaving `(-1)·|C_L(a)|`. -/
+theorem mobiusSummand_singleton_eq (g : G) {a : {a : G // a ∈ A}} {h : G}
+    (hh : h ∈ hyp.H a) (hga : IsConj (a.1 * h) g) :
+    hyp.mobiusSummand a g {a} = -(Nat.card (centralizerIn L a.1) : ℂ) := by
+  classical
+  rw [hyp.mobiusSummand_of_nonempty a g (Finset.singleton_nonempty a)]
+  -- `H({a}) = H(a)`
+  have hHeq : hIntersection hyp {a} (Finset.singleton_nonempty a) = hyp.H a :=
+    hyp.hIntersection_singleton a
+  rw [hHeq, Finset.card_singleton, pow_one]
+  -- `|𝒜(g, H(a)·a)| = |C_G(a)|`
+  have hcomm : ∀ x ∈ hyp.H a, Commute a.1 x := fun x hx => hyp.commute_of_mem_H a hx
+  have hnorm : ∀ c ∈ Subgroup.centralizer ({a.1} : Set G), ∀ x ∈ hyp.H a, c * x * c⁻¹ ∈ hyp.H a :=
+    fun c hc x hx => hyp.H_normalized a c hc x hx
+  have hcop : Nat.Coprime (orderOf a.1) (Nat.card (hyp.H a)) := by
+    have := hyp.coprime_orderOf_card_hIntersection (Finset.singleton_nonempty a) a.2
+    rwa [hHeq] at this
+  have hAcard : (conjFiber g ((↑(hyp.H a) : Set G) * ({a.1} : Set G))).card
+      = Nat.card (Subgroup.centralizer ({a.1} : Set G)) :=
+    card_conjFiber_coset_eq_card_centralizer hcomm hnorm hcop hh hga
+  rw [hAcard]
+  -- `|C_G(a)| = |H(a)|·|C_L(a)|`
+  rw [hyp.card_centralizer_eq a]
+  -- `(-1)/|H(a)| · (|H(a)|·|C_L(a)|) = -|C_L(a)|`
+  have hHne : (Nat.card (hyp.H a) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  push_cast
+  field_simp
+
 end MobiusAssembly
 
 end SemidirectStructure
