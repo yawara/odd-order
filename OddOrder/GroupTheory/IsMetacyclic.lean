@@ -87,6 +87,51 @@ theorem isCyclic_commutator (hmeta : IsMetacyclic G) : IsCyclic (commutator G) :
   exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hle).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hle).surjective
 
+/-- **Every subgroup of a metacyclic group is metacyclic.**
+
+If `G` has a cyclic normal subgroup `N` with `G ⧸ N` cyclic, then for any `H ≤ G` the
+subgroup `N.subgroupOf H = N ∩ H` is normal in `H`, cyclic (it injects into the cyclic
+`N` via `x ↦ (x : G)`), and the quotient `H ⧸ (N.subgroupOf H)` is cyclic (it injects into
+the cyclic `G ⧸ N` via the lift of `mk' N ∘ H.subtype`, whose kernel is `N.subgroupOf H`).
+
+This is a genuine lemma — *not* a thin wrapper — and is needed in BG Theorem 4.12(b)(c)
+where part (a) is applied to the subgroup `T = [R, A]`. (The textbook leaves this implicit;
+mathlib v4.29.1 has no `IsMetacyclic`.)
+
+**BG §4** Thm 4.12(b)(c) の補題段 (Huppert). -/
+theorem subgroup {H : Subgroup G} (h : IsMetacyclic G) : IsMetacyclic ↥H := by
+  classical
+  obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := h
+  haveI := hN
+  refine ⟨N.subgroupOf H, hN.subgroupOf H, ?_, ?_⟩
+  · -- cyclic normal part: `N.subgroupOf H` injects into the cyclic `N`.
+    haveI : IsCyclic N := hN_cyc
+    let g : (N.subgroupOf H) →* N :=
+      { toFun := fun x => ⟨(x : G), by have hx := x.2; rwa [Subgroup.mem_subgroupOf] at hx⟩
+        map_one' := rfl, map_mul' := fun _ _ => rfl }
+    refine isCyclic_of_injective (G' := N) g ?_
+    intro a b hab
+    have h1 : ((g a : N) : G) = ((g b : N) : G) := congrArg (fun z : N => (z : G)) hab
+    exact Subtype.ext (Subtype.ext h1)
+  · -- cyclic quotient part: `H ⧸ (N.subgroupOf H)` injects into the cyclic `G ⧸ N`.
+    haveI : (N.subgroupOf H).Normal := hN.subgroupOf H
+    haveI : IsCyclic (G ⧸ N) := hQ_cyc
+    have hf_ker : N.subgroupOf H ≤ ((QuotientGroup.mk' N).comp H.subtype).ker := by
+      intro x hx
+      rw [Subgroup.mem_subgroupOf] at hx
+      simpa [MonoidHom.mem_ker, QuotientGroup.eq_one_iff] using hx
+    refine isCyclic_of_injective (G' := G ⧸ N)
+      (QuotientGroup.lift _ ((QuotientGroup.mk' N).comp H.subtype) hf_ker) ?_
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro x hx
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective (N.subgroupOf H) x
+    rw [MonoidHom.mem_ker, QuotientGroup.mk'_apply, QuotientGroup.lift_mk] at hx
+    simp only [MonoidHom.comp_apply, QuotientGroup.mk'_apply, Subgroup.coe_subtype,
+      QuotientGroup.eq_one_iff] at hx
+    rw [Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf]
+    exact hx
+
 /-- A metacyclic group is solvable.
 
 Cyclic groups are commutative hence solvable. The extension `1 → N → G → G ⧸ N → 1`
