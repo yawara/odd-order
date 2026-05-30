@@ -682,6 +682,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.sum_centralCharacter_mul_character_inv_mul_character_one
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card
+-- ClassFunction-level bridge: an irreducible character's value at 1 is the witnessing
+-- representation's dimension, and (Isaacs Thm 3.11) that natural number divides |G|.  This recasts
+-- `finrank_dvd_card` through `φ 1`, which is definitionally Peterfalvi's `characterDegree φ`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_finrank_charValue_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card
 -- Corollary (Isaacs Cor. 3.12): the degree of an irreducible representation of a finite p-group is
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms

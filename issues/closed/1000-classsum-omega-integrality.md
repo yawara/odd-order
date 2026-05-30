@@ -75,6 +75,26 @@ AxiomsCheck 登録済 (unconditional)。(6.7.3) や古典的 `χ(1) ∣ |G|` が
   `sum_eq_sum_conjClasses_of_isClassFun`) — 代数的整数の積和 ⟹ 有理代数的整数 ⟹ 整数 (上記)。
   古典 `χ(1) ∣ |G|` を mathlib に無い形で供給 (round-2 #1 unlock)。
 
+## 後続 (2026-05-30 第 3 波): characterDegree ↔ finrank 橋渡し (S03 層への接続)
+
+第 2 波の `finrank_dvd_card` は `Representation.character`/`finrank` レベルに留まり、S03 の
+`characterDegree`/`ClassFunction` 層へ流れていなかった (Peterfalvi の degree 文が消費できない)。
+`OddOrder/GroupTheory/RepresentationTheory/ZIrr.lean` に橋を 2 本追加 (AxiomsCheck 登録済,
+unconditional = propext/Classical.choice/Quot.sound のみ):
+
+- `IsIrreducibleCharacter.exists_finrank_charValue_one {φ} (hφ) :`
+  `∃ V .., Nonempty V ∧ φ 1 = (finrank ℂ V : ℂ)` — 既約指標 `φ` の `φ 1` は任意 witness 表現の次元。
+  `IsIrreducibleCharacter` の存在 witness を unpack → 仮説 `Representation.IsIrreducible ρ`
+  (= `IsSimpleOrder (Subrepresentation ρ)`, class) を `haveI` で instance 化 → `ρ.char_one`。`[Finite G]` 不要。
+- `IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card [Finite G] {φ} (hφ) :`
+  `∃ n:ℕ, 0<n ∧ φ 1 = (n:ℂ) ∧ n ∣ Nat.card G` — Isaacs Thm 3.11 の `ClassFunction` 層版。
+  `finrank_dvd_card ρ` を直接適用。
+
+消費経路: `characterDegree φ = φ 1` は `characterDegree_def` (`rfl`/`@[simp]`, S03) なので、S03 側で
+`rw [characterDegree_def]` 後に上記を当てれば `characterDegree φ ∣ |G|` が ℕ 上で出る。`ZIrr` は
+`ClassSumAlgebra` を新規 import (sibling, `ClassFunction` 経由で acyclic)。`characterDegree` 自身は
+S03 = downstream のため `ZIrr` からは参照せず `φ 1` 形で橋渡しした (上方 import によるサイクル回避)。
+
 ## 完了条件
 
 上記 `IsIntegral ℤ (ω_ρ(C_s))` が sorry/admit/axiom 無しで証明され `lake build OddOrder` が通る。

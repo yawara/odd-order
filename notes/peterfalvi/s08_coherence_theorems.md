@@ -267,6 +267,20 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 >   (`IsTISubset`+Sylow-in-L) を要し repo 未実装 = `needs-infra`. 揃えば (6.7.2)/(6.7.3) は本 module の
 >   `centralCharacterOfRep_classSum_mul` + `card_dvd_classSumCoeff_of_fixedPointFree` + `AlgInt.Cong` で assembly.
 
+> **進捗 2026-05-30 (characterDegree ↔ finrank bridge 完了)**: Round 3 の `finrank_dvd_card`
+> (`χ_ρ(1) ∣ |G|`, `ClassSumAlgebra.lean`) は `Representation.character` レベルだったため S03 の
+> `characterDegree`/`ClassFunction` 層へ流れず Peterfalvi の degree 文に乗らなかった。この橋を
+> `OddOrder/GroupTheory/RepresentationTheory/ZIrr.lean` に実装 (unconditional, AxiomsCheck 登録):
+> - `IsIrreducibleCharacter.exists_finrank_charValue_one` : 既約指標 `φ` の値 `φ 1` は任意の witness 表現
+>   `ρ` on `V` の次元 `finrank ℂ V` に等しい (`IsIrreducibleCharacter` の存在 witness を unpack →
+>   仮説 `Representation.IsIrreducible ρ` を `haveI` で instance 化 → `ρ.char_one`)。`[Finite G]` 不要。
+> - `IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card` `[Finite G]` : ∃ `n:ℕ`, `0<n ∧ φ 1 = n ∧ n ∣ |G|`
+>   (= Isaacs Thm 3.11 の `ClassFunction` 層への載せ替え; `finrank_dvd_card ρ` を直接適用)。
+> - **消費経路**: Peterfalvi の `characterDegree φ` は定義上 `φ 1` (`characterDegree_def`, `rfl`/`@[simp]`)
+>   なので S03 側で `rw [characterDegree_def]` 後に上記を当てれば `characterDegree φ ∣ |G|` (ℕ 鋳直し) が出る。
+>   `ZIrr` は `ClassSumAlgebra` を新規 import (両者 sibling, `ClassFunction` 経由で acyclic; `characterDegree`
+>   自体は S03 = downstream なので `ZIrr` からは参照せず `φ 1` 形で橋渡しした)。
+
 **Lean 表現**: 
 ```lean
 theorem S08_6_7 (G : Type*) [Group G] [Finite G] (p : ℕ) [Fact p.Prime]

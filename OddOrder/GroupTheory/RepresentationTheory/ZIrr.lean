@@ -8,6 +8,7 @@ import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.RepresentationTheory.Character
 import Mathlib.RepresentationTheory.Irreducible
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 
 /-!
 # The virtual character lattice `ℤ[Irr G]`
@@ -173,5 +174,49 @@ theorem repCharacterClassFunction_mem_ZIrr
 theorem irreducibleCharacters_subset_ZIrr :
     irreducibleCharacters G ⊆ (ZIrr G : Set (ClassFunction G ℂ)) :=
   fun _ hφ => IsIrreducibleCharacter.mem_ZIrr hφ
+
+section Degree
+
+open Module (finrank)
+
+/-- The value of an irreducible character at `1` is the dimension of any witnessing
+representation: if `φ = χ_ρ` for an irreducible `ρ` on `V`, then `φ 1 = dim_ℂ V`.
+
+This bridges the abstract `IsIrreducibleCharacter` predicate (which only records the *existence*
+of a witnessing representation) to `Representation.char_one` at the `finrank` level, the entry
+point of the integrality theory (`finrank_dvd_card`).  Combined with the definitional
+`characterDegree φ = φ 1` (Peterfalvi §3) it lets `χ_ρ(1) ∣ |G|` flow into Peterfalvi degree
+statements phrased through `characterDegree`. -/
+theorem IsIrreducibleCharacter.exists_finrank_charValue_one
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (_ : FiniteDimensional ℂ V),
+      Nonempty V ∧ φ 1 = (finrank ℂ V : ℂ) := by
+  obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  refine ⟨V, inferInstance, inferInstance, inferInstance, ⟨0⟩, ?_⟩
+  have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
+  rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
+
+/-- **The degree of an irreducible character divides the group order** (Isaacs,
+*Character Theory of Finite Groups*, Thm 3.11).  For an irreducible character `φ` of a finite
+group `G`, there is a positive natural number `n` (the dimension of any witnessing
+representation, i.e. the representation degree) with `φ 1 = n` and `n ∣ |G|`.
+
+This is the `IsIrreducibleCharacter`/`ClassFunction`-level restatement of `finrank_dvd_card`,
+making the classical integrality `χ(1) ∣ |G|` consumable through the value `φ 1`.  Since
+Peterfalvi's `characterDegree φ` is *definitionally* `φ 1` (`characterDegree_def`), this is
+exactly `characterDegree φ ∣ |G|` recast over `ℕ`. -/
+theorem IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ n : ℕ, 0 < n ∧ φ 1 = (n : ℂ) ∧ n ∣ Nat.card G := by
+  obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  refine ⟨finrank ℂ V, Module.finrank_pos, ?_, finrank_dvd_card ρ⟩
+  have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
+  rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
+
+end Degree
 
 end OddOrder.RepresentationTheory
