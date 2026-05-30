@@ -268,6 +268,32 @@ allowlist):
   (θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` → `two_mul_lt_sq_of_primePow_gap`).
   enumeration 자체는 `Fin n` 인덱스 monotone; pair-인덱스(`ℕ`)로의 캐스팅·base 분리는 별도 leaf.
 
+### (2026-05-31, G2.3) (6.6) "For all j, θⱼ(1) is a power of p" (mmd L80)
+
+(6.6) 証明 L80 の degree datum「`K` が `p`-群なら各 `θ ∈ Irr K` の `θ(1)` は `p` の冪」を **2 層**で
+landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allowlist, no `sorryAx`; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑):
+
+- **`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`** (`ZIrr.lean` の `Degree`
+  section, `exists_natDegree_charValue_one_dvd_card` 直後): `[Finite G]`, `[Fact p.Prime]`,
+  `IsPGroup p G`, `IsIrreducibleCharacter φ` ⟹ `∃ k, φ 1 = (p^k : ℂ)`。既存
+  `exists_natDegree_charValue_one_dvd_card` (`φ 1 ∣ |G|` のみ) を、より鋭い
+  `exists_finrank_eq_prime_pow_of_isPGroup` (証言表現の `dim V = p^k`) + `char_one` (`φ 1 = dim V`)
+  で精密化。証明は `exists_natDegree_charValue_one_dvd_card` を mirror し `finrank_dvd_card` の代わりに
+  p-群版を呼ぶだけ (~12 LOC)。
+- **`exists_characterDegree_eq_prime_pow_of_isPGroup`** (`S03_PreliminaryCharacter.lean`,
+  `exists_natDegree_characterDegree_dvd_card` 直後): `IrreducibleCharacter G` subtype + `characterDegree`
+  経由で `∃ k, characterDegree χ = (p^k:ℂ)`。`characterDegree_def` rewrite で RT 形を
+  bundled-character API に橋渡し (既存 `dvd_card` 版と同一の二層パターン = predicate→subtype +
+  `φ 1`→`characterDegree` の convention 適応)。これが (6.6) 本文が消費する形。
+- **依存 verify**: (6.5.b) の "`K` 非可換 `p`-群" は本 leaf では `IsPGroup p K` を**引数**で受ける
+  (honest fully-general; `p`-群結論を posit せず、それを供給する (6.5) は別 leaf)。消費 landed lemma
+  `exists_finrank_eq_prime_pow_of_isPGroup` は `ClassSumAlgebra.lean:1564` に既存・AxiomsCheck 済 — 確認済。
+- **honest 판정**: thin wrapper 아님 — 既存 `dvd_card` lemma 들은 `θ(1) ∣ |G|` 밖에 안 주므로
+  p-power 결론을 *재진술*이 아니라 더 강한 primitive (`exists_finrank_eq_prime_pow_of_isPGroup`)에서
+  새로 끌어옴. 二層 (RT predicate 형 + Peterfalvi `characterDegree`/subtype consumer 형)은 repo의
+  기존 `dvd_card` 쌍과 동일한 확립된 패턴.
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |

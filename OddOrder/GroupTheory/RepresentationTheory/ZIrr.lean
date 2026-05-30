@@ -217,6 +217,30 @@ theorem IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card [Finite G
   have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
   rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
 
+/-- **The degree of an irreducible character of a `p`-group is a power of `p`** (Isaacs,
+*Character Theory of Finite Groups*, Cor. 3.12 / standard).  If `G` is a finite `p`-group and `φ`
+is an irreducible complex character of `G`, then `φ 1` (the representation degree) is a power of
+the prime `p`.
+
+This refines `exists_natDegree_charValue_one_dvd_card` (which only records `φ 1 ∣ |G|`) using the
+sharper prime-power fact `exists_finrank_eq_prime_pow_of_isPGroup`: the witnessing irreducible
+representation has `dim V = p ^ k`, and `φ 1 = dim V` by `char_one`.  It is the degree datum
+behind Peterfalvi (6.6) ("for all `j`, `θⱼ(1)` is a power of `p`", mmd L80), where `K` is a
+non-abelian `p`-group by (6.5.b). -/
+theorem IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : IsPGroup p G)
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ k : ℕ, φ 1 = (p ^ k : ℂ) := by
+  obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  obtain ⟨k, hk⟩ := exists_finrank_eq_prime_pow_of_isPGroup hp ρ
+  refine ⟨k, ?_⟩
+  have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
+  rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one, hk]
+  push_cast
+  ring
+
 end Degree
 
 end OddOrder.RepresentationTheory

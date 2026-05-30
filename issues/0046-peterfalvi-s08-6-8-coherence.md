@@ -455,6 +455,26 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     prefix `{χ₁,…,χₖ}` (equal-minimal-degree, (1.1)+(1.4) coherent) 연결 + per-step (5.6) data 생산
     (θᵢ(1) p-power, [Is] Cor 2.30, `χᵢ(1)² ∣ ∑_{j<i}` → `two_mul_lt_sq_of_primePow_gap`). enumeration
     자체는 `Fin n` monotone; pair-인덱스(`ℕ`) 캐스팅·base 분리는 별도 leaf.
+- [x] (2026-05-31, G2.3) **(6.6) "For all `j`, `θⱼ(1)` is a power of `p`" (mmd L80)** =
+      induced-from-`K` の degree datum を 2 層で landing (sorry/axiom 無 — 各 `#assert_only_allowed_axioms`
+      = 3 axiom 全 allowlist, no `sorryAx`; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑).
+  - **`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`** (`ZIrr.lean`, RT 一般形):
+    `[Finite G]`, `[Fact p.Prime]`, `IsPGroup p G`, `IsIrreducibleCharacter φ` ⟹ `∃ k, φ 1 = (p^k : ℂ)`。
+    既存 `exists_natDegree_charValue_one_dvd_card` (`φ 1 ∣ |G|` のみ) を、より鋭い prime-power 事実
+    `exists_finrank_eq_prime_pow_of_isPGroup` (証言表現の `dim V = p^k`) + `char_one` (`φ 1 = dim V`)
+    で精密化。
+  - **`exists_characterDegree_eq_prime_pow_of_isPGroup`** (`S03_PreliminaryCharacter.lean`, Peterfalvi
+    consumer 形): `IrreducibleCharacter G` subtype + `characterDegree` 経由で `∃ k, characterDegree χ = (p^k:ℂ)`。
+    `characterDegree_def` (= `χ 1`) rewrite で RT 形を bundled-character/`characterDegree` API に橋渡し
+    (既存 `exists_natDegree_characterDegree_dvd_card` と同じ二層パターン — predicate→subtype + `φ 1`→`characterDegree`
+    の convention 適応)。
+  - **依存 verify**: (6.5.b) "`K/M` は非可換 `p`-群" の `p`-群仮説は本 leaf では `IsPGroup p K` として
+    *引数* に取る (honest fully-general; `K` が `p`-群という結論を仮定 posit せず、それを供給する (6.5) は
+    別 leaf)。消費した landed lemma = `exists_finrank_eq_prime_pow_of_isPGroup` (`ClassSumAlgebra.lean:1564`,
+    既に AxiomsCheck 登録済) — 確認済みで存在。
+  - **caller 측 残 (G2.3 以後)**: (6.6) 本文の "`θᵢ(1)² ∣ ∑_{j≥i} χⱼ(1)²`" は本 leaf の p-power 事実
+    + `sq_dvd_of_factored_coprime`/`two_mul_lt_sq_of_primePow_gap` (Round 15 landed) を `K=p群` setup で
+    instantiate して得る (degree-sort `exists_monotoneDegreeEnum` [G2.1] と接続)。
 
 ## 完了条件
 

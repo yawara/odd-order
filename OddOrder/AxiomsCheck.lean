@@ -774,6 +774,14 @@ set_option linter.style.longLine false in
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_finrank_eq_prime_pow_of_isPGroup
+-- ClassFunction-level form of the same corollary: an irreducible character of a finite p-group has
+-- `χ(1) = p^k`.  Routes the witnessing representation's `dim V = p^k` onto `χ 1` via `char_one`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup
+-- Peterfalvi-side consumer (the degree datum for (6.6) "θⱼ(1) is a power of p", mmd L80): the same
+-- prime-power degree on the `IrreducibleCharacter G` subtype, phrased through `characterDegree`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_characterDegree_eq_prime_pow_of_isPGroup
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product

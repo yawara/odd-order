@@ -201,6 +201,22 @@ theorem exists_natDegree_characterDegree_dvd_card [Finite G]
   obtain ⟨n, hpos, hval, hdvd⟩ := χ.isIrreducible.exists_natDegree_charValue_one_dvd_card
   exact ⟨n, hpos, by rw [characterDegree_def]; exact hval, hdvd⟩
 
+/-- **The degree of an irreducible character of a `p`-group is a power of `p`**, phrased through
+Peterfalvi's `characterDegree` (Isaacs, *Character Theory of Finite Groups*, Cor. 3.12; the degree
+datum behind Peterfalvi (6.6)).  For an irreducible character `χ` of a finite `p`-group `G` there
+is a natural number `k` with `characterDegree χ = p ^ k`.
+
+This is the consumer-facing form, through `characterDegree`, of
+`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`: under Hypothesis (6.4) with
+`M = 1`, once (6.5.b) gives that `K` is a non-abelian `p`-group, every `θ ∈ Irr K` has `θ(1)` a
+power of `p` (Peterfalvi (6.6) proof, mmd L80).  Because `characterDegree χ` is *definitionally*
+`χ 1` (`characterDegree_def`), this is exactly that statement recast over the value `χ 1`. -/
+theorem exists_characterDegree_eq_prime_pow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : IsPGroup p G) (χ : IrreducibleCharacter G) :
+    ∃ k : ℕ, characterDegree (χ : ClassFunction G ℂ) = (p ^ k : ℂ) := by
+  obtain ⟨k, hk⟩ := χ.isIrreducible.exists_charValue_one_eq_prime_pow_of_isPGroup hp
+  exact ⟨k, by rw [characterDegree_def]; exact hk⟩
+
 /-- **Degree-ratio integrality** (Peterfalvi (5.6), opening step "Set `χ(1) = a·χ₁(1)`").
 
 If `χ₁` is an irreducible character whose natural degree divides that of an irreducible
