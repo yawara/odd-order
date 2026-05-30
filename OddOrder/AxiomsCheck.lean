@@ -910,6 +910,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S04.Hypothesis.sum_transversalRep_eq_sum_div_orbit
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S04.Hypothesis.sum_mobiusSummand_conjFinset
+-- (2.10) STEP 3a per-`B` orbit-weight algebra (`mobiusSummand_orbit_weighted`):
+-- `(-1)^|B|/|orbit B|·(Ind α_B)(g) = (α(a)/|L|)·∑_{b∈N_L(B)∩a^L} (-1)^|B|/|H(B)|·|𝒜(g,H(B)b)|`,
+-- collapsing `1/(|orbit B||M(B)|) = 1/(|L||H(B)|)` via `card_orbit_mul_card_setLStabilizer` +
+-- `card_mBSubgroup` + `card_nLStabilizerIn_eq` (|N_L(B)|=|setLStabilizer B|).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S04.Hypothesis.mobiusSummand_orbit_weighted
 
 -- BG App.A Thm A.4(a) (= Gorenstein 6.5.1 翻訳): odd-order solvable + O_p(G)=1 ⇒ p-stable.
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4a
