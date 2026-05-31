@@ -103,7 +103,10 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - ✅ `exists_maximalAbelianNormal_ge` (SCN.lean) — abelian normal ⊆ maximal abelian normal (finiteness)。
 - ✅ `exists_maxRank_maximalAbelianNormal` (SCN.lean) — d_n を realise する maximal-abelian-normal A = Lemma 4.14 適用 companion (hA_maxAb / hA_maxRank をちょうど供給)。
 - ✅ `normalAbelian_pRank_le_two_of_scn3_empty` (S04 §SCN3Empty) — **translation/easy half**: SCN₃=∅ ⇒ ∀ normal abelian B, pRank B ≤ 2 (= d_n≤2)。anti-scaffold TRAP 1 回避 (normal abelian のみ制約、R 全体の rank bound でない)。
-- ⏳ **残 hard core = G Thm 4.15(i) 本体** `pRank_le_two_of_normalAbelian_pRank_le_two` (d_n≤2 ⇒ pRank R≤2): Lemma 4.14 を上記 A に適用 + **GL-action rank squeeze** — E elem ab rank3 ⇒ E₁=C_E(Ω₁A)⊆Ω₁A (4.14 conclusion + Omega-subtype plumbing) → 共役 hom E→MulAut(Ω₁A), ker=E₁ ⇒ E/E₁↪GL(≤2,p) p-群 ⇒ |E/E₁|≤p (`gl2_pSubgroup_card_le_prime`) → m(E₁)≥2 → E₁=Ω₁A → E⊆Ω₁A 矛盾。template = `S7A2_NormalPThm75.lean:276-340`。
+- ✅ **GL-squeeze kernel 完成 (PRank.lean, 全 sorry-free)** = G 4.15(i) の唯一の難所だった数値核:
+  - `card_le_prime_of_isPGroup_of_not_sq_dvd` — p²∤|G| ⇒ p-部分群 |K|≤p (抽象核)。
+  - `card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq` — elem-ab E (|E|≤p²) の MulAut の p-部分群は ≤p (p²∤|MulAut E|=∏(pⁿ-pⁱ) via `not_sq_dvd_prod_pow_sub`, n≤2)。GL(2,p) iso 不要、純 cardinality。
+- ⏳ **残 = G Thm 4.15(i) 本体の assembly (mechanical, kernels 全て手元)** `pRank_le_two_of_normalAbelian_pRank_le_two` (d_n≤2 ⇒ pRank P≤2): `pRank_le_iff` で E elem ab rank≥3 を背理法 → A = `exists_maxRank_maximalAbelianNormal` → Lemma 4.14 適用 (hA_comm/hA_maxAb を element 形に変換) → H=Ω₁A normal+elem-ab+|H|≤p² → φ=`MulAut.conjNormal(H:=H)∘E.subtype`, range は p-群 ⇒ |range|≤p (上記 kernel) → |E|=|ker φ|·|range|, ker φ=C.subgroupOf E, E₁:=E⊓C≤H (h414 の Omega-map 形 + `Omega.mem_of_pow_eq_one`) → log_p|E|≤log_p|E₁|+1, log_p|E₁|≤log_p|H|≤2 ⇒ E₁=H ⇒ H≤E ⇒ E abelian で E≤C ⇒ E≤Ω₁C=H ⇒ log_p|E|≤2 矛盾。~130 行 plumbing。
 - assemble: precursor(1) = G415i ∘ translation (translation が hdn をちょうど供給、1-liner)。
 
 ## 完了条件
