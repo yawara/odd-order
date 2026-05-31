@@ -44,8 +44,25 @@ workflow の外** (main-loop + 依存順キュー note が「1 ターゲット�
 | `mmdFile` | 原典ファイルパス override (Peterfalvi の章別 mmd で必須。例 `references/peterfalvi/04.8_*.mmd`) |
 | `mmd` | mmd 内の該当箇所 (例 `"(6.8) の証明 L136-243"`) |
 | `namespace` / `design_note` / `ready_deps` | namespace / 参照ノート / grep 確認すべき ready 前提 の override |
+| `mode` | `full` (既定, 3-phase) / `fast` (軽量, 下記) |
+| `verify` | fast mode で `false` にすると objective build/axiom 検証も省略 (= implementer 自己申告のみ、最速) |
+| `skeleton` / `target_file` | (任意) 設計済み target を fast に流すときの skeleton ヒント / 置き場所 |
 
-返り status: `PASS` / `VERIFY_FAILED` / `BLOCKED_DESIGN` / `BLOCKED_IMPL` (返り値に `book` フィールド付き)。
+返り status: `PASS` / `VERIFY_FAILED` / `BLOCKED_DESIGN` / `BLOCKED_IMPL` (返り値に `book`, fast 時 `mode:'fast'` フィールド付き)。
+
+## mode: full / fast — 精度 vs 速度
+
+| | `full` (既定) | `fast` |
+|---|---|---|
+| Design | 3並列調査 (mmd/API/scaffold) + synth (4 agent) | **implement に畳み込み (0 agent)** |
+| Implement | 逐次 1–2 | 逐次 1–2 |
+| Verify | 3並列 adversarial (build / scaffold-trap / faithfulness) | **objective build/axiom 1 つのみ** (`verify:false` で 0) |
+| agent 数 | ~8–9 | **~2–3** |
+| 適 | 重要 / 偽署名リスク高 / scaffold 誘惑大 な target | well-scoped で素早く数を稼ぎたい target、設計既知の target |
+
+**fast が犠牲にするもの**: ①独立 scaffold-trap 監査 ②statement 忠実性クロスチェック ③`tractable` 事前 gate
+(無理筋は実装中に判明 → revert)。**anti-scaffold 原則は implementer prompt に残し自衛** (外すと偽進捗量産)。
+判断系を落とすので、稀に Nougat 落ち署名や hoist が滑り込む — 重要 target は `full` に戻すか後で `full` 監査をかける運用。
 
 ## 起動例
 
