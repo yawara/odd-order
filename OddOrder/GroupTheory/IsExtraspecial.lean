@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Frattini
 import Mathlib.GroupTheory.Subgroup.Center
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Extraspecial p-Groups
@@ -70,6 +71,34 @@ structure IsExtraspecial (p : ℕ) (G : Type*) [Group G] : Prop where
   frattini_eq_center : frattini G = Subgroup.center G
   /-- The center has order `p`. -/
   center_card : Nat.card (Subgroup.center G) = p
+
+/-- **Special p-group** (Gorenstein, _Finite Groups_, §3, after Theorem 3.7): a `p`-group
+`G` is *special* if it is either elementary abelian, or of class `2` with
+`G' = Z(G) = Φ(G)` elementary abelian. (The class-`2` case with `|G'| = p` is exactly
+extraspecial.) Equivalently `Φ(G) = G' ⊆ Z(G)` with `G/G'` and the common subgroup
+elementary abelian.
+
+Used in **BG §4 Lemma 4.13** (= **G** Theorem 4.15(ii), precursor 2, issue 0051): a minimal
+`A`-invariant subgroup on which a nontrivial `p'`-automorphism acts is special of exponent
+`p` (Gorenstein Theorems 3.7/3.8/3.10). -/
+def IsSpecial (p : ℕ) (G : Type*) [Group G] : Prop :=
+  IsPGroup p G ∧
+    (IsElementaryAbelian p G ∨
+      (commutator G = Subgroup.center G ∧ frattini G = Subgroup.center G ∧
+        (Subgroup.center G).IsElementaryAbelian p))
+
+namespace IsSpecial
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+/-- A special `p`-group is a `p`-group. -/
+theorem isPGroup (h : IsSpecial p G) : IsPGroup p G := h.1
+
+/-- An elementary abelian `p`-group is special. -/
+theorem of_isElementaryAbelian (h : IsElementaryAbelian p G) : IsSpecial p G :=
+  ⟨h.isPGroup, Or.inl h⟩
+
+end IsSpecial
 
 namespace IsExtraspecial
 
