@@ -1369,6 +1369,13 @@ set_option linter.style.longLine false in
 -- computes the single integer `λ` via the cross-orthogonality `crossDifference_inner` transported
 -- through the isometry, and collapses `λ = 0` with `Y_eq_nsmul_tau1_of_lambdaForm`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_collapse_of_family
+-- (5.2.d) base coherence — the seed `h0`/`hS₁` every chain consumes but none constructed.
+-- `zSupportedSpan_pair_subset_span`: supported combos of `{χ,χ̄}` (equal degree, `1∉A`) are multiples
+-- of `χ−χ̄`.  `coherentPair`: `IsCoherent τ {χ,χ̄} A` from orthonormal target pair `{X,X̄}` (S₁=∅
+-- retarget).  `coherentPair_fromDade`: the seed at the real Dade τ, target pair from `retargetTargetPair`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_pair_subset_span
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPair
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPair_fromDade
 -- (5.6.1)→(5.6.2) at the Dade base map: the same Y-collapse for any `Da` with `Da.tau1 = τ`, with
 -- every hypothesis of `Y_collapse_of_family` discharged from the Dade isometry + prior coherence
 -- (`dadeIntegralCharacterMap_inner_eq_on_supported_span`, `inner_extension_member_orthogonal_imageSet`,
