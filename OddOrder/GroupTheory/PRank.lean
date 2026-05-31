@@ -217,6 +217,25 @@ theorem IsElementaryAbelian.card_mulAut
   rw [Nat.card_congr (hE.mulAutEquivGeneralLinearGroup).toEquiv,
       Matrix.card_GL_field, ZMod.card]
 
+/-- A `p`-subgroup `K` of a finite group whose order is **not** divisible by `p²` has
+`|K| ≤ p`. This is the abstract heart of the rank-`≤ 2` squeeze: a `p`-subgroup of
+`GL(n, p)` with `n ≤ 2` has order `≤ p`, because `p² ∤ |GL(n, p)|` for `n ≤ 2`. -/
+theorem card_le_prime_of_isPGroup_of_not_sq_dvd {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] {K : Subgroup G} (hK : IsPGroup p K) (hnsq : ¬ p ^ 2 ∣ Nat.card G) :
+    Nat.card K ≤ p := by
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hK
+  rw [hk]
+  by_contra hlt
+  push_neg at hlt
+  have hk2 : 2 ≤ k := by
+    by_contra h
+    push_neg at h
+    have hle : p ^ k ≤ p := by
+      calc p ^ k ≤ p ^ 1 := Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le (by omega)
+        _ = p := pow_one p
+    omega
+  exact hnsq ((pow_dvd_pow p hk2).trans (hk ▸ K.card_subgroup_dvd_card))
+
 end AutGL
 
 variable (G : Type*) [Group G]
