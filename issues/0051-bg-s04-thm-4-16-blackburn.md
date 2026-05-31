@@ -99,6 +99,13 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 **Gorenstein chain 進捗 (2026-05-31)**: `S04d_GorThm415.lean` に Gorenstein Lemma 4.12/4.13 (inline, commits e0378e9/34f04fb) + **Lemma 4.14** `omega1_centralizer_omega1_eq_omega1_of_maximal_rank`@S04d:857 (commit 17d0c0e) が着地し **S04d 全体 sorry-free**。自走キュー **#8.5 / #8.6 = PASS**。⇒ 残ゲートは **#8.7 precursor(1) `pRank_le_two_of_scn3_empty` (=G Thm4.15(i)=SCN₃=∅⇒pRank≤2; `S04_PGroupsSmallRank.lean:1036` にゲート明記、§5 も開く) → precursor(2) → BG Lem 4.13 (#9) → Thm 4.16 apex (#11, 未 statement)**。Thm 4.16 本体はまだ宣言されていない (docstring 言及のみ)。
 
+**precursor(1) 分解 + easy-half 着地 (2026-05-31, workflow なし直接証明, 全 sorry-free/build green)**:
+- ✅ `exists_maximalAbelianNormal_ge` (SCN.lean) — abelian normal ⊆ maximal abelian normal (finiteness)。
+- ✅ `exists_maxRank_maximalAbelianNormal` (SCN.lean) — d_n を realise する maximal-abelian-normal A = Lemma 4.14 適用 companion (hA_maxAb / hA_maxRank をちょうど供給)。
+- ✅ `normalAbelian_pRank_le_two_of_scn3_empty` (S04 §SCN3Empty) — **translation/easy half**: SCN₃=∅ ⇒ ∀ normal abelian B, pRank B ≤ 2 (= d_n≤2)。anti-scaffold TRAP 1 回避 (normal abelian のみ制約、R 全体の rank bound でない)。
+- ⏳ **残 hard core = G Thm 4.15(i) 本体** `pRank_le_two_of_normalAbelian_pRank_le_two` (d_n≤2 ⇒ pRank R≤2): Lemma 4.14 を上記 A に適用 + **GL-action rank squeeze** — E elem ab rank3 ⇒ E₁=C_E(Ω₁A)⊆Ω₁A (4.14 conclusion + Omega-subtype plumbing) → 共役 hom E→MulAut(Ω₁A), ker=E₁ ⇒ E/E₁↪GL(≤2,p) p-群 ⇒ |E/E₁|≤p (`gl2_pSubgroup_card_le_prime`) → m(E₁)≥2 → E₁=Ω₁A → E⊆Ω₁A 矛盾。template = `S7A2_NormalPThm75.lean:276-340`。
+- assemble: precursor(1) = G415i ∘ translation (translation が hdn をちょうど供給、1-liner)。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
