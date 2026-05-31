@@ -381,6 +381,19 @@ theorem pow_le_card_of_le_pRank [Finite G] [Fact p.Prime] {n : ℕ} (A : Subgrou
   have := le_pRank A hA
   rwa [hcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at this
 
+/-- For an elementary abelian `p`-group, `log_p |G| ≤ pRank G p`: `G` is its own maximal
+elementary abelian subgroup, so its rank is realised. Lets one bound `|G|` by a `pRank`
+bound (`|G| = p^{log_p|G|} ≤ p^{pRank}`). -/
+theorem IsElementaryAbelian.log_card_le_pRank [Finite G] [Fact p.Prime]
+    (hG : IsElementaryAbelian p G) :
+    Nat.log p (Nat.card G) ≤ pRank G p := by
+  haveI : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
+  have htop : (⊤ : Subgroup G).IsElementaryAbelian p :=
+    IsElementaryAbelian.of_mulEquiv Subgroup.topEquiv.symm hG
+  refine pow_le_card_of_le_pRank ⊤ htop ?_
+  rw [Subgroup.card_top, hG.log_card_eq_finrank]
+  exact hG.card_eq_pow_finrank
+
 /-- **Monotonicity under subgroup inclusion** (`[Finite G]`): an injective homomorphism
 `f : H →* G` (e.g. a subgroup inclusion) cannot increase the `p`-rank: `pRank H p ≤ pRank G p`.
 

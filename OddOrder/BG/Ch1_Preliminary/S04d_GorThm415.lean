@@ -1115,4 +1115,157 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
       _ ≤ Nat.log p (Nat.card ↥H) := hpRankA_le
   exact Nat.not_succ_le_self _ this
 
+/-! ## Gorenstein Theorem 4.15(i) + BG Lemma 4.7 hard direction (`SCN₃ = ∅ ⇒ pRank ≤ 2`) -/
+
+/-- **Gorenstein "Finite Groups" Theorem 4.15(i)** (`p` odd): if every normal abelian
+subgroup of a finite `p`-group `P` has `p`-rank `≤ 2` (i.e. `d_n(P) ≤ 2`), then `P` itself
+has `p`-rank `≤ 2` (`d(P) ≤ 2`).
+
+Pick a maximal abelian normal `A` of maximal rank (`exists_maxRank_maximalAbelianNormal`);
+`H = Ω₁(A)` is normal, elementary abelian, `|H| ≤ p²`. For an elementary abelian `E ≤ P`,
+the conjugation action `φ : E → Aut(H)` has image a `p`-subgroup of `Aut(H) ≅ GL(≤2,p)`,
+hence `|im φ| ≤ p` (`card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq`); its kernel maps
+into `Ω₁(C_P(H)) = H` (Lemma 4.14). If `m(E) ≥ 3` then `|ker φ| ≥ p²`, forcing
+`ker φ ≅ H ≤ E`; as `E` is abelian it then centralizes `H`, so `E ≤ Ω₁(C_P(H)) = H` and
+`m(E) ≤ 2` — contradiction. -/
+theorem pRank_le_two_of_normalAbelian_pRank_le_two
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hP : IsPGroup p P)
+    (hdn : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → pRank B p ≤ 2) :
+    pRank P p ≤ 2 := by
+  classical
+  have hp := (Fact.out : p.Prime)
+  rw [pRank_le_iff]
+  intro E hE
+  by_contra hElog
+  rw [not_le] at hElog
+  -- (1) maximal abelian normal `A` of maximal rank
+  obtain ⟨A, hAmax, hAmaxrank⟩ := exists_maxRank_maximalAbelianNormal (G := P) p
+  haveI hAnorm : A.Normal := hAmax.isNormal
+  haveI hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
+  have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x :=
+    fun x hx y hy => congrArg Subtype.val (mul_comm' (⟨x, hx⟩ : A) (⟨y, hy⟩ : A))
+  have hA_maxAb : ∀ N : Subgroup P, N.Normal →
+      (∀ x ∈ N, ∀ y ∈ N, x * y = y * x) → A ≤ N → N = A :=
+    fun N hN hNc hAN => hAmax.maximal N hN
+      (IsMulCommutative.of_comm fun x y => Subtype.ext (hNc x x.2 y y.2)) hAN
+  have h414 := omega1_centralizer_omega1_eq_omega1_of_maximal_rank hp_odd hP hA_comm hA_maxAb
+    hAmaxrank
+  set H := omega1OfAbelian P A p hA_comm with hHdef
+  set C := Subgroup.centralizer (↑H : Set P) with hCdef
+  have hH_le_A : H ≤ A := omega1OfAbelian_le
+  -- `H ◁ P`
+  have hH_normal : H.Normal := by
+    refine { conj_mem := fun h hh g => ?_ }
+    have hh' : h ∈ A ∧ h ^ p = 1 := hh
+    refine (mem_omega1OfAbelian).mpr ⟨hAnorm.conj_mem h hh'.1 g, ?_⟩
+    calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
+      _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
+  haveI : H.Normal := hH_normal
+  -- `H` elementary abelian
+  have hH_ea : IsElementaryAbelian p ↥H :=
+    ⟨fun x y => Subtype.ext (hA_comm x.val (hH_le_A x.2) y.val (hH_le_A y.2)),
+     fun x => Subtype.ext (by simpa using pow_eq_one_of_mem_omega1OfAbelian x.2)⟩
+  haveI hHcomm : IsMulCommutative ↥H := IsMulCommutative.of_comm hH_ea.comm
+  -- `|H| ≤ p²`
+  have hHcard_le : Nat.card ↥H ≤ p ^ 2 := by
+    have hlogle : Nat.log p (Nat.card ↥H) ≤ 2 :=
+      le_trans hH_ea.log_card_le_pRank (hdn H hH_normal hHcomm)
+    calc Nat.card ↥H = p ^ Nat.log p (Nat.card ↥H) := by
+            rw [hH_ea.log_card_eq_finrank, hH_ea.card_eq_pow_finrank]
+      _ ≤ p ^ 2 := Nat.pow_le_pow_right hp.one_le hlogle
+  -- `Ω₁(C_P(H)) ⊆ H` extractor (Lemma 4.14)
+  have hΩC_le_H : ∀ x : P, x ∈ C → x ^ p = 1 → x ∈ H := by
+    intro x hxC hxp
+    have hg1 : (⟨x, hxC⟩ : ↥C) ^ (p ^ 1) = 1 := by
+      rw [pow_one]; exact Subtype.ext (by push_cast; exact hxp)
+    have hmem : x ∈ (Omega (↥C) p 1).map C.subtype :=
+      ⟨⟨x, hxC⟩, Omega.mem_of_pow_eq_one hg1, rfl⟩
+    rwa [h414] at hmem
+  -- conjugation action `φ : ↥E →* MulAut ↥H`
+  let φ : ↥E →* MulAut ↥H := (MulAut.conjNormal (H := H)).comp E.subtype
+  -- `|range φ| ≤ p`
+  have hrange_pg : IsPGroup p ↥φ.range :=
+    hE.isPGroup.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
+  have hrange_le : Nat.card ↥φ.range ≤ p :=
+    card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq hH_ea hHcard_le hrange_pg
+  -- `|E| = |range φ| · |ker φ|`
+  have hLagrange : Nat.card ↥E = Nat.card ↥φ.range * Nat.card ↥φ.ker := by
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker,
+        Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv]
+  -- `ker φ ↦ H` (Lemma 4.14)
+  have hker_map_le : φ.ker.map E.subtype ≤ H := by
+    rintro _ hx
+    rw [Subgroup.mem_map] at hx
+    obtain ⟨e, he_ker, rfl⟩ := hx
+    have he_pow : (E.subtype e) ^ p = 1 := by
+      simpa using congrArg (Subgroup.subtype E) (hE.pow_eq_one e)
+    have hc1 : MulAut.conjNormal (H := H) (E.subtype e) = 1 := by
+      have hk : φ e = 1 := he_ker
+      simpa [φ, MonoidHom.comp_apply] using hk
+    have he_C : (E.subtype e) ∈ C := by
+      rw [hCdef, Subgroup.mem_centralizer_iff]
+      intro h hh
+      have happ : (MulAut.conjNormal (H := H) (E.subtype e)) ⟨h, hh⟩ = ⟨h, hh⟩ := by
+        rw [hc1]; rfl
+      have heq := congrArg Subtype.val happ
+      rw [MulAut.conjNormal_apply] at heq
+      -- heq : E.subtype e * h * (E.subtype e)⁻¹ = h
+      exact (mul_inv_eq_iff_eq_mul.mp heq).symm
+    exact hΩC_le_H (E.subtype e) he_C he_pow
+  -- arithmetic: `nE = p^cE`, `cE ≥ 3`
+  obtain ⟨cE, hcE⟩ := IsPGroup.iff_card.mp hE.isPGroup
+  have hcE3 : 3 ≤ cE := by
+    have : Nat.log p (Nat.card ↥E) = cE := by rw [hcE, Nat.log_pow hp.one_lt]
+    omega
+  have hpE : p ^ 3 ≤ Nat.card ↥E := by rw [hcE]; exact Nat.pow_le_pow_right hp.one_le hcE3
+  have hEpK : Nat.card ↥E ≤ p * Nat.card ↥φ.ker := by
+    rw [hLagrange]; exact Nat.mul_le_mul_right _ hrange_le
+  have hp2K : p ^ 2 ≤ Nat.card ↥φ.ker := by
+    have hp3 : p ^ 3 = p * p ^ 2 := by ring
+    have h3 : p * p ^ 2 ≤ p * Nat.card ↥φ.ker := by rw [← hp3]; exact le_trans hpE hEpK
+    exact Nat.le_of_mul_le_mul_left h3 hp.pos
+  -- `|ker φ| = |H|`, hence `ker φ ↦ H` is onto `H`
+  have hkmap_card : Nat.card ↥(φ.ker.map E.subtype) = Nat.card ↥φ.ker :=
+    Subgroup.card_map_of_injective E.subtype_injective
+  have hK_le_H : Nat.card ↥φ.ker ≤ Nat.card ↥H := by
+    rw [← hkmap_card]
+    exact Nat.card_le_card_of_injective (Subgroup.inclusion hker_map_le)
+      (Subgroup.inclusion_injective hker_map_le)
+  have hKH : Nat.card ↥φ.ker = Nat.card ↥H := le_antisymm hK_le_H (le_trans hHcard_le hp2K)
+  have hkmap_eq : φ.ker.map E.subtype = H :=
+    Subgroup.eq_of_le_of_card_ge hker_map_le (le_of_eq (hkmap_card.trans hKH).symm)
+  -- `H ≤ E`
+  have hH_le_E : H ≤ E := by
+    rw [← hkmap_eq]; exact Subgroup.map_subtype_le _
+  -- `E ≤ C_P(H)` (abelian `E ⊇ H`)
+  have hE_le_C : E ≤ C := by
+    intro x hx
+    rw [hCdef, Subgroup.mem_centralizer_iff]
+    intro h hh
+    exact congrArg Subtype.val (hE.comm ⟨h, hH_le_E hh⟩ ⟨x, hx⟩)
+  -- `E ≤ Ω₁(C_P(H)) = H`
+  have hE_le_H : E ≤ H := by
+    intro x hx
+    refine hΩC_le_H x (hE_le_C hx) ?_
+    simpa using congrArg (Subgroup.subtype E) (hE.pow_eq_one ⟨x, hx⟩)
+  -- contradiction
+  have hcard_le : Nat.card ↥E ≤ Nat.card ↥H :=
+    Nat.card_le_card_of_injective (Subgroup.inclusion hE_le_H)
+      (Subgroup.inclusion_injective hE_le_H)
+  rw [hcE] at hcard_le
+  have : p ^ cE ≤ p ^ 2 := le_trans hcard_le hHcard_le
+  have : cE ≤ 2 := (Nat.pow_le_pow_iff_right hp.one_lt).mp this
+  omega
+
+/-- **BG Lemma 4.7, hard direction** (= **G** Theorem 5.4.15(i)): a finite `p`-group `R`
+(`p` odd) with `SCN₃(R) = ∅` has `p`-rank `≤ 2`. Assembles the translation
+(`normalAbelian_pRank_le_two_of_scn3_empty`, giving `d_n(R) ≤ 2`) with Gorenstein 4.15(i)
+(`pRank_le_two_of_normalAbelian_pRank_le_two`). Opens §5 and BG Thm 4.16. -/
+theorem pRank_le_two_of_scn3_empty {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp : Odd p) (hpg : IsPGroup p R) (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A) :
+    pRank R p ≤ 2 :=
+  pRank_le_two_of_normalAbelian_pRank_le_two hp hpg
+    fun _ hB hBc => normalAbelian_pRank_le_two_of_scn3_empty hpg hSCN hB hBc
+
 end OddOrder.BG.Ch1.S04
