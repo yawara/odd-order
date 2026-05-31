@@ -285,4 +285,187 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq_of_comm (hR : IsPGroup p R)
     have hx : x ∈ (⊤ : Subgroup (R ⧸ Subgroup.zpowers a)) := Subgroup.mem_top x
     rwa [← hmkb_top] at hx
 
+/-- **BG Prop 4.11, equation (4.7)**: lift a metacyclic quotient `R/⟨z⟩` back to `R`.
+
+Let `R` be a finite `p`-group, `z ∈ Z(R)` of order `p` (so `T := ⟨z⟩` is normal), and suppose
+`R ⧸ T` is metacyclic. Then there exist `a, b ∈ R` with, writing `K := ⟨a, z⟩`:
+
+* `(i)`  `K ◁ R`               (`⟨a, z⟩` is normal);
+* `(ii)` `R' ⊆ K`              (the commutator subgroup lies in `⟨a, z⟩`);
+* `(iii)` `R = ⟨a, b, z⟩`;
+* `(iv)` `K / T` is cyclic      (`⟨a, z⟩/⟨z⟩` is cyclic; used by step 6 of Prop 4.11);
+* `(v)`  `R / K` is cyclic      (used by step 8 of Prop 4.11).
+
+Unpacking `IsMetacyclic (R ⧸ T)` gives a cyclic normal `N ◁ R/T` with `(R/T)/N` cyclic. Lifting
+a generator of `N` along `mk' T` gives `a` with `N = ⟨mk a⟩`; set `K := comap (mk' T) N`. Then
+`K ◁ R` (`Normal.comap`), `T ≤ K` (`le_comap_mk'`), `K.map (mk' T) = N`
+(`map_comap_eq_self_of_surjective`); and `(ii)` follows from `(R/T)/N` abelian, `(iv)` from
+the first isomorphism theorem `K/(T.subgroupOf K) ≃ K.map (mk' T) = N`, `(v)` from Noether's
+third isomorphism theorem `(R/T)/N ≃ R/K`. Lifting a generator of `(R/T)/N` twice gives `b`,
+whence `R = ⟨a, b, z⟩`. Finally `K = ⟨a, z⟩` is verified by `ext`.
+
+The conclusion is packaged with `K := ⟨a, z⟩` bound existentially together with its `Normal`
+instance, so that the cyclic quotients `K/T` and `R/K` are well-formed group quotients; the
+defining equation `K = ⟨a, z⟩` is part of the conclusion, so no content of `(4.7)` is lost.
+
+The hypothesis `(Subgroup.zpowers z).Normal` is the typeclass prerequisite for the quotient
+`R ⧸ ⟨z⟩` to be a group; it is a direct consequence of `z ∈ Z(R)` (which the caller, the
+induction body of Prop 4.11, has at hand) and is *not* hoisted hard content.
+
+This is the `(4.7)` step of the non-abelian induction of Prop 4.11 (mmd L1560-1564). -/
+theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (hR : IsPGroup p R)
+    {z : R} [(Subgroup.zpowers z).Normal] (hz : z ∈ Subgroup.center R) (hzp : orderOf z = p)
+    (hmeta : OddOrder.GroupTheory.IsMetacyclic (R ⧸ Subgroup.zpowers z)) :
+    ∃ (a b : R) (K : Subgroup R), ∃ _ : K.Normal,
+      K = Subgroup.closure ({a, z} : Set R) ∧
+      _root_.commutator R ≤ K ∧
+      Subgroup.closure ({a, b, z} : Set R) = ⊤ ∧
+      IsCyclic (K ⧸ (Subgroup.zpowers z).subgroupOf K) ∧
+      IsCyclic (R ⧸ K) := by
+  classical
+  set T : Subgroup R := Subgroup.zpowers z with hT
+  -- ⟨STEP 1⟩ Unpack `IsMetacyclic (R ⧸ T)`.
+  obtain ⟨N, hNnorm, hNcyc, hQcyc⟩ := hmeta
+  haveI := hNnorm; haveI := hNcyc; haveI := hQcyc
+  -- ⟨STEP 2⟩ A generator `ngen` of `N`, lifted to `a ∈ R`; so `N = ⟨mk' T a⟩`.
+  obtain ⟨ngen, hngen⟩ := hNcyc.exists_generator
+  obtain ⟨a, ha⟩ := QuotientGroup.mk'_surjective T ngen
+  have haN : QuotientGroup.mk' T a ∈ N := ha ▸ ngen.2
+  have hNeq : N = Subgroup.zpowers (QuotientGroup.mk' T a) := by
+    apply le_antisymm
+    · -- every `x ∈ N` is a power of the generator `ngen`, hence of `mk' T a = ↑ngen`.
+      intro x hx
+      obtain ⟨k, hk⟩ := (Subgroup.mem_zpowers_iff).mp (hngen ⟨x, hx⟩)
+      rw [Subgroup.mem_zpowers_iff]
+      refine ⟨k, ?_⟩
+      -- `(mk' T a)^k = (N.subtype ngen)^k = N.subtype (ngen^k) = N.subtype ⟨x,hx⟩ = x`.
+      have hsub : N.subtype (ngen ^ k) = x := by rw [hk]; rfl
+      rwa [map_zpow, Subgroup.coe_subtype, ← ha] at hsub
+    · rw [Subgroup.zpowers_le]; exact haN
+  -- ⟨STEP 3⟩ `K := comap (mk' T) N`; normal, contains `T`, and maps onto `N`.
+  set K : Subgroup R := N.comap (QuotientGroup.mk' T) with hK
+  haveI hKnorm : K.Normal := hNnorm.comap _
+  have hTleK : T ≤ K := QuotientGroup.le_comap_mk' T N
+  have hKmap : K.map (QuotientGroup.mk' T) = N :=
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective T) N
+  -- ⟨STEP 4 = (ii)⟩ `commutator R ≤ K`.
+  have hcommQ : _root_.commutator (R ⧸ T) ≤ N :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
+  have hcommR : _root_.commutator R ≤ K := by
+    rw [hK, ← Subgroup.map_le_iff_le_comap]
+    calc (_root_.commutator R).map (QuotientGroup.mk' T)
+        = _root_.commutator (R ⧸ T) := by
+          rw [_root_.commutator_def, _root_.commutator_def, Subgroup.map_commutator,
+              Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective T)]
+      _ ≤ N := hcommQ
+  -- ⟨STEP 5 = (iii)⟩ `R = ⟨a, b, z⟩`, with `b` a two-step lift of a generator of `(R/T)/N`.
+  obtain ⟨qgen, hqgen⟩ := hQcyc.exists_generator
+  obtain ⟨bq, hbq⟩ := QuotientGroup.mk'_surjective N qgen
+  obtain ⟨b, hb⟩ := QuotientGroup.mk'_surjective T bq
+  -- (a) `closure {mk' T a, mk' T b} = ⊤` in `R ⧸ T`.
+  have hmkclosure :
+      Subgroup.closure ({QuotientGroup.mk' T a, QuotientGroup.mk' T b} : Set (R ⧸ T)) = ⊤ := by
+    set C : Subgroup (R ⧸ T) :=
+      Subgroup.closure ({QuotientGroup.mk' T a, QuotientGroup.mk' T b} : Set (R ⧸ T)) with hC
+    -- `mk' T a ∈ N`, so `N = ⟨mk' T a⟩ ≤ C`.
+    have hNleC : N ≤ C := by
+      rw [hNeq, Subgroup.zpowers_le, hC]
+      exact Subgroup.subset_closure (by simp)
+    -- The image of `C` under `mk' N` is `⊤` (it contains the generator `qgen` of `(R/T)/N`).
+    have hmapN : C.map (QuotientGroup.mk' N) = ⊤ := by
+      rw [hC, MonoidHom.map_closure, Set.image_pair]
+      -- `mk' N (mk' T a) = 1` (since `mk' T a ∈ N`), `mk' N (mk' T b) = qgen`.
+      have hmka1 : QuotientGroup.mk' N (QuotientGroup.mk' T a) = 1 := by
+        rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact haN
+      have hmkbq : QuotientGroup.mk' N (QuotientGroup.mk' T b) = qgen := by
+        rw [hb, hbq]
+      rw [hmka1, hmkbq]
+      -- `closure {1, qgen} ⊇ zpowers qgen = ⊤`.
+      refine top_le_iff.mp (le_trans (fun y _ => hqgen y) ?_)
+      rw [Subgroup.zpowers_le]
+      exact Subgroup.subset_closure (Set.mem_insert_of_mem _ rfl)
+    -- `C ⊔ N = comap (mk' N) (map (mk' N) C) = comap ⊤ = ⊤`, and `N ≤ C`, so `C = ⊤`.
+    have hsupN : C ⊔ N = ⊤ := by
+      have hcm := Subgroup.comap_map_eq (f := QuotientGroup.mk' N) C
+      rw [hmapN, Subgroup.comap_top, QuotientGroup.ker_mk'] at hcm
+      exact hcm.symm
+    rw [sup_eq_left.mpr hNleC] at hsupN
+    rw [hC] at hsupN; exact hsupN
+  -- (b) Lift to `R`: `closure {a, b, z} = ⊤`.
+  have hiii : Subgroup.closure ({a, b, z} : Set R) = ⊤ := by
+    have hmap3 : (Subgroup.closure ({a, b, z} : Set R)).map (QuotientGroup.mk' T) = ⊤ := by
+      rw [MonoidHom.map_closure, Set.image_insert_eq, Set.image_insert_eq, Set.image_singleton]
+      have hmkz : QuotientGroup.mk' T z = 1 := by
+        rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, hT]; exact Subgroup.mem_zpowers z
+      rw [hmkz]
+      refine top_le_iff.mp ?_
+      rw [← hmkclosure]
+      apply Subgroup.closure_mono
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢
+      tauto
+    have hsup : Subgroup.closure ({a, b, z} : Set R) ⊔ T = ⊤ := by
+      have hcm := Subgroup.comap_map_eq (f := QuotientGroup.mk' T)
+        (Subgroup.closure ({a, b, z} : Set R))
+      rw [hmap3, Subgroup.comap_top, QuotientGroup.ker_mk'] at hcm; exact hcm.symm
+    have hzin : z ∈ Subgroup.closure ({a, b, z} : Set R) := Subgroup.subset_closure (by simp)
+    have hTin : T ≤ Subgroup.closure ({a, b, z} : Set R) := by
+      rw [hT, Subgroup.zpowers_le]; exact hzin
+    rw [sup_eq_left.mpr hTin] at hsup; exact hsup
+  -- ⟨STEP 6 = (iv)⟩ `K / (T.subgroupOf K)` is cyclic (`≅ K.map (mk' T) = N`).
+  haveI hiv : IsCyclic (K ⧸ (T.subgroupOf K)) := by
+    -- `φ := mk' T ∘ K.subtype : K →* R/T`, with `range φ = K.map (mk' T) = N` and
+    -- `ker φ = T.subgroupOf K`.
+    set φ : K →* (R ⧸ T) := (QuotientGroup.mk' T).comp K.subtype with hφ
+    have hrange : φ.range = N := by
+      rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]; exact hKmap
+    have hkereq : φ.ker = T.subgroupOf K := by
+      rw [hφ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+    haveI : IsCyclic ↥φ.range := by rw [hrange]; exact hNcyc
+    haveI : IsCyclic (K ⧸ φ.ker) :=
+      isCyclic_of_surjective (QuotientGroup.quotientKerEquivRange φ).symm.toMonoidHom
+        (QuotientGroup.quotientKerEquivRange φ).symm.surjective
+    haveI : (T.subgroupOf K).Normal := (inferInstance : T.Normal).subgroupOf K
+    -- transport `IsCyclic (K ⧸ φ.ker)` along the equality `φ.ker = T.subgroupOf K`.
+    exact isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hkereq).toMonoidHom
+      (QuotientGroup.quotientMulEquivOfEq hkereq).surjective
+  -- ⟨STEP 7 = (v)⟩ `R / K` is cyclic (`≅ (R/T)/N`).
+  haveI hv : IsCyclic (R ⧸ K) := by
+    -- `(R/T)/N ≃ (R/T)/(K.map (mk' T)) ≃ R/K`, and the first is cyclic.
+    have e : ((R ⧸ T) ⧸ N) ≃* (R ⧸ K) :=
+      (QuotientGroup.quotientMulEquivOfEq hKmap.symm).trans
+        (QuotientGroup.quotientQuotientEquivQuotient T K hTleK)
+    exact isCyclic_of_surjective e e.surjective
+  -- ⟨STEP 8⟩ Identify `K = closure {a, z}` by `ext`.
+  have hKeq : K = Subgroup.closure ({a, z} : Set R) := by
+    apply le_antisymm
+    · -- `x ∈ K = comap (mk' T) N ⟹ mk' T x ∈ N = ⟨mk' T a⟩ ⟹ x ∈ ⟨a, z⟩`.
+      intro x hx
+      rw [hK, Subgroup.mem_comap, hNeq, Subgroup.mem_zpowers_iff] at hx
+      obtain ⟨k, hk⟩ := hx
+      -- `mk' T x = (mk' T a)^k = mk' T (a^k)`, so `x * (a^k)⁻¹ ∈ ker (mk' T) = T = ⟨z⟩`.
+      have hxa : QuotientGroup.mk' T (x * (a ^ k)⁻¹) = 1 := by
+        rw [map_mul, map_inv, map_zpow, hk, mul_inv_cancel]
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, hT,
+        Subgroup.mem_zpowers_iff] at hxa
+      obtain ⟨m, hm⟩ := hxa
+      -- `x = z^m * a^k ∈ ⟨a, z⟩`.
+      have hzmem : z ∈ Subgroup.closure ({a, z} : Set R) :=
+        Subgroup.subset_closure (by simp)
+      have hamem : a ∈ Subgroup.closure ({a, z} : Set R) :=
+        Subgroup.subset_closure (by simp)
+      have hxeq : x = z ^ m * a ^ k := by
+        rw [hm]; group
+      rw [hxeq]
+      exact mul_mem ((Subgroup.closure ({a, z} : Set R)).zpow_mem hzmem m)
+        ((Subgroup.closure ({a, z} : Set R)).zpow_mem hamem k)
+    · -- `a, z ∈ K`.
+      rw [Subgroup.closure_le]
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl
+      · rw [SetLike.mem_coe, hK, Subgroup.mem_comap]; exact haN
+      · rw [SetLike.mem_coe]; exact hTleK (by rw [hT]; exact Subgroup.mem_zpowers _)
+  exact ⟨a, b, K, hKnorm, hKeq, hcommR, hiii, hiv, hv⟩
+
 end OddOrder.BG.Ch1.S04
