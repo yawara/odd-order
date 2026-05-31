@@ -57,17 +57,19 @@ precursor(2): minimal ψ-inv ⇒ special exp p
 - Lem 3.9 系 (class≤2 odd ⇒ Ω₁ exp p): S04d `Omega.exponent_eq_of_class_le_two` / `mul_pow_prime_eq_one_of_class_le_two`
 - `IsSpecial` def ✅ (IsExtraspecial.lean)
 
-**MISSING 🔴** (precursor(2) の本当の壁):
-- **G Thm 2.2** — A が abelian p-群に indecomposable に作用 ⇒ homocyclic。表現論的、repo 不在。
-- **G Thm 2.4** — coprime 作用の Ω₁-extension (Ω₁ 上自明 ⇒ 全体自明 for abelian)。repo 不在。
+**着地済 ✅ (2026-05-31)**:
+- **G Thm 2.4** (Ω₁-extension) = `actionCommutator_eq_bot_of_omega1_le_fixedPoints`@`GroupTheory/CoprimeAbelianPGroup.lean` (commit a2780ec, sorry-free)。**判明: Thm 2.2 に依存しない** — Thm 2.3 (`G=C×[G,A]`、既存 `fixedPoints_inf_actionCommutator_eq_bot_of_abelian`) + Cauchy のみで完結。`IsSpecial` def も着地 (IsExtraspecial.lean)。
+
+**MISSING 🔴** (precursor(2) の残る壁):
+- **G Thm 2.2** — A が abelian p-群に indecomposable に作用 ⇒ homocyclic。**最難**。要 Lemma 2.1 (非 homocyclic abelian の agemo `℧ⁿ⁻¹` / Ω₁ 構造、基底・type 論) + Thm 3.3.2 (elem ab の A-不変 direct factor に A-不変補空間 = coprime Maschke; repo の N-4 Maschke bridge `exists_aInvariant_complement_in_omega1_quotient` が近い)。`Agemo`@OmegaSubgroup あり。
 - **G Thm 3.6** — `[P,A,A]=[P,A]`。present infra から assemblable だが未着地。
 - **G Thm 3.7/3.8/3.10** 本体。
 
 ## 実装順 (推奨, 下層から; 各 leaf = 別 bg-prove ターゲット可)
 
 1. **G Thm 3.6** `actionCommutator_actionCommutator_eq_actionCommutator` (`[P,A,A]=[P,A]`): present `fixedPoints_sup_actionCommutator_eq_top` を P と A-invariant `H=[P,A]` に適用 (H への作用制限が plumbing)。**最も tractable な leaf、独立着手推奨**。
-2. **G Thm 2.4** (coprime Ω₁-extension): abelian p-群への coprime 作用で Ω₁ 上自明 ⇒ 全体自明。
-3. **G Thm 2.2** (indecomposable ⇒ homocyclic): 表現論寄り、最難。
+2. ✅ **G Thm 2.4** (coprime Ω₁-extension) — 着地済 (`CoprimeAbelianPGroup.lean`, commit a2780ec)。
+3. **G Thm 2.2** (indecomposable ⇒ homocyclic): 表現論寄り、**最難・次ターゲット**。要 Lemma 2.1 + Thm 3.3.2 (coprime Maschke on elem ab)。
 4. **G Thm 3.7** (核): 1-3 + Maschke + three-subgroups で (i)(ii)(iii) を assemble。
 5. **G Thm 3.8** (minimal ⇒ special): Thm 3.7 を minimal A-inv subgroup に適用。
 6. **G Thm 3.10** (Ω₁ 上自明 ⇒ trivial, p odd): Thm 3.7 + Lem 3.9 + Thm 3.2 + 帰納。
