@@ -107,4 +107,98 @@ private theorem lt_closure_conj_of_noncyclic (hP : IsPGroup p P) {x y : P}
   exact isCyclic_of_surjective (MulEquiv.subgroupCongr hQeq).toMonoidHom
     (MulEquiv.subgroupCongr hQeq).surjective
 
+/-! ## INLINE-2: Gorenstein Lemma 4.13 (element / commutator form) -/
+
+/-- **Gorenstein "Finite Groups" Lemma 4.13** (element form). Let `A` be a normal
+subgroup of `P` and `H ≤ A` an abelian subgroup. If two elements `g₁, g₂` each
+"stabilize" the series `A ⊇ H ⊇ 1` — i.e. their conjugation displaces every `a ∈ A`
+into `H` (`g⁻¹ a g a⁻¹ ∈ H`) and they centralize `H` — then their commutator
+`⁅g₂, g₁⁆` centralizes `A`.
+
+This is the element-level version of Gorenstein's stability-group lemma (the
+stabilizer of a two-step normal series with abelian top is abelian, mmd L4195,
+eq. (4.11)). Concretely, with `s = g₁⁻¹ a g₁ a⁻¹`, `t = g₂⁻¹ a g₂ a⁻¹ ∈ H`, one
+computes `⁅g₂, g₁⁆ a ⁅g₂, g₁⁆⁻¹ = (s t s⁻¹ t⁻¹) a = a`, the last step because
+`s, t ∈ H` commute. -/
+private theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
+    (hH_le : H ≤ A) (hH_comm : ∀ s ∈ H, ∀ t ∈ H, s * t = t * s) {g₁ g₂ : P}
+    (hdisp₁ : ∀ a ∈ A, g₁⁻¹ * a * g₁ * a⁻¹ ∈ H)
+    (hdisp₂ : ∀ a ∈ A, g₂⁻¹ * a * g₂ * a⁻¹ ∈ H)
+    (hfix₁ : ∀ w ∈ H, g₁ * w = w * g₁) (hfix₂ : ∀ w ∈ H, g₂ * w = w * g₂) :
+    ∀ a ∈ A, ⁅g₂, g₁⁆ * a = a * ⁅g₂, g₁⁆ := by
+  intro a ha
+  -- Displacement elements `s, t ∈ H`.
+  set s := g₁⁻¹ * a * g₁ * a⁻¹ with hs_def
+  set t := g₂⁻¹ * a * g₂ * a⁻¹ with ht_def
+  have hsH : s ∈ H := hdisp₁ a ha
+  have htH : t ∈ H := hdisp₂ a ha
+  -- `s, t ∈ A`.
+  have hsA : s ∈ A := hH_le hsH
+  have htA : t ∈ A := hH_le htH
+  -- `g₁⁻¹ a g₁ = s * a` and `g₂⁻¹ a g₂ = t * a`.
+  have hconj₁ : g₁⁻¹ * a * g₁ = s * a := by rw [hs_def]; group
+  have hconj₂ : g₂⁻¹ * a * g₂ = t * a := by rw [ht_def]; group
+  -- `g₁ a g₁⁻¹ = s⁻¹ * a`: from `g₁` fixing `s ∈ H`, `g₁ s g₁⁻¹ = s`, hence
+  -- `a g₁ a⁻¹ g₁⁻¹ = s`, so `g₁ a g₁⁻¹ = s⁻¹ a` (using `A` abelian via `H`-fix? no — direct).
+  have hg1s : g₁ * s = s * g₁ := hfix₁ s hsH
+  have hg2t : g₂ * t = t * g₂ := hfix₂ t htH
+  -- `s⁻¹ = g₁ a g₁⁻¹ a⁻¹`: conjugate `hconj₁` by `g₁`.
+  -- Conjugation-fix helpers: if `g` commutes with `w`, then `g w g⁻¹ = w` and `g⁻¹ w g = w`.
+  have fixR : ∀ (g w : P), g * w = w * g → g * w * g⁻¹ = w := fun g w hgw => by
+    rw [hgw]; group
+  have fixL : ∀ (g w : P), g * w = w * g → g⁻¹ * w * g = w := fun g w hgw => by
+    rw [mul_assoc, ← hgw]; group
+  have hconj₁' : g₁ * a * g₁⁻¹ = s⁻¹ * a := by
+    -- From `g₁⁻¹ a g₁ = s a` we get `a = (g₁ s g₁⁻¹)(g₁ a g₁⁻¹) = s (g₁ a g₁⁻¹)`.
+    have h1 : a = s * (g₁ * a * g₁⁻¹) := by
+      have h := congrArg (fun z => g₁ * z * g₁⁻¹) hconj₁
+      simp only at h
+      rw [show g₁ * (g₁⁻¹ * a * g₁) * g₁⁻¹ = a by group,
+        show g₁ * (s * a) * g₁⁻¹ = (g₁ * s * g₁⁻¹) * (g₁ * a * g₁⁻¹) by group,
+        fixR g₁ s hg1s] at h
+      exact h
+    refine mul_left_cancel (a := s) ?_
+    rw [← h1]; group
+  -- Similarly `g₂ a g₂⁻¹ = t⁻¹ * a`.
+  have hconj₂' : g₂ * a * g₂⁻¹ = t⁻¹ * a := by
+    have h1 : a = t * (g₂ * a * g₂⁻¹) := by
+      have h := congrArg (fun z => g₂ * z * g₂⁻¹) hconj₂
+      simp only at h
+      rw [show g₂ * (g₂⁻¹ * a * g₂) * g₂⁻¹ = a by group,
+        show g₂ * (t * a) * g₂⁻¹ = (g₂ * t * g₂⁻¹) * (g₂ * a * g₂⁻¹) by group,
+        fixR g₂ t hg2t] at h
+      exact h
+    refine mul_left_cancel (a := t) ?_
+    rw [← h1]; group
+  -- `s, t` commute (both in abelian `H`); also `s⁻¹ ∈ H`, fixed by `g₂`.
+  have hst : s * t = t * s := hH_comm s hsH t htH
+  -- Auxiliary fixings.
+  have hg2s : g₂ * s = s * g₂ := hfix₂ s hsH
+  have hg1t : g₁ * t = t * g₁ := hfix₁ t htH
+  have hg2si : g₂ * s⁻¹ = s⁻¹ * g₂ := hfix₂ s⁻¹ (H.inv_mem hsH)
+  -- Conjugation of `a` by `⁅g₂, g₁⁆` is trivial.
+  have hconj : ⁅g₂, g₁⁆ * a * (⁅g₂, g₁⁆)⁻¹ = a := by
+    rw [commutatorElement_def]
+    calc g₂ * g₁ * g₂⁻¹ * g₁⁻¹ * a * (g₂ * g₁ * g₂⁻¹ * g₁⁻¹)⁻¹
+        = g₂ * g₁ * g₂⁻¹ * (g₁⁻¹ * a * g₁) * g₂ * g₁⁻¹ * g₂⁻¹ := by group
+      _ = g₂ * g₁ * g₂⁻¹ * (s * a) * g₂ * g₁⁻¹ * g₂⁻¹ := by rw [hconj₁]
+      _ = g₂ * g₁ * (g₂⁻¹ * s * g₂) * (g₂⁻¹ * a * g₂) * g₁⁻¹ * g₂⁻¹ := by group
+      _ = g₂ * g₁ * s * (t * a) * g₁⁻¹ * g₂⁻¹ := by
+            rw [hconj₂, fixL g₂ s hg2s]
+      _ = g₂ * ((g₁ * s * g₁⁻¹) * (g₁ * t * g₁⁻¹) * (g₁ * a * g₁⁻¹)) * g₂⁻¹ := by group
+      _ = g₂ * (s * t * (s⁻¹ * a)) * g₂⁻¹ := by
+            rw [hconj₁', fixR g₁ s hg1s, fixR g₁ t hg1t]
+      _ = (g₂ * s * g₂⁻¹) * (g₂ * t * g₂⁻¹) * (g₂ * s⁻¹ * g₂⁻¹) * (g₂ * a * g₂⁻¹) := by group
+      _ = s * t * s⁻¹ * (t⁻¹ * a) := by
+            rw [hconj₂', fixR g₂ s hg2s, fixR g₂ t hg2t, fixR g₂ s⁻¹ hg2si]
+      _ = (s * t * s⁻¹ * t⁻¹) * a := by group
+      _ = a := by
+            rw [show s * t * s⁻¹ * t⁻¹ = 1 by
+              rw [hst]; group]
+            group
+  -- Convert conjugation-trivial to commuting.
+  have := hconj
+  rw [mul_inv_eq_iff_eq_mul] at this
+  rw [this]
+
 end OddOrder.BG.Ch1.S04
