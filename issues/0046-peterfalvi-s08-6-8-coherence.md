@@ -1103,6 +1103,43 @@ posited だった `hY` フィールドが消え、(6.6) coherence-of-X が **ima
 SibleySetup の data を per-step `DadeChainStep` stream に wire する組立 (別 issue 級の大物)。
 その後 S09:1589 ((7.10) `card_G0_lower_bound`)。
 
+## 進捗 (2026-05-31 続き, 等次数 coherence primitive `coherentEqualDegree[_fromDade]`)
+
+**前回 HANDOFF item #1「Y-coherence」の正体を訂正して landing** (commits `dd1b2b9` / `8e8fd93`、
+sorry/axiom 無 `{propext, Classical.choice, Quot.sound}`、AxiomsCheck 4 件登録、full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360 jobs)。
+
+**訂正**: 前回 HANDOFF は Y-coherence を「`DadeChainStep.advance` を degree-ratio=1 で反復 (wiring)」と
+書いたが**誤り**。(5.6) per-step の次数不等式 `hdeg_c: 2a < ∑ aᵢ²/‖χᵢ‖²` は等次数 (a=1, ‖χᵢ‖²=1) で
+`2 < |famS|` を要し、**2 番目の対を足す時点 (|S₁|=2) で偽**。教科書 (mmd 04.8 L156, 04.3 (1.4)) も Y を
+**「By (1.1) and (1.4)」直接**で coherent と言う — (5.6) 反復ではない。等次数 coherence は (1.4) 由来の
+**独立 primitive** で、(6.6) の base prefix `{χ₁,…,χ_k}` (等最小次数) も同じ primitive。
+
+- **`coherentEqualDegree`** (S07, 抽象 core): 直交等次数族 `χ : Fin n → CF(L)` (n≥2, 値 d≠0 at 1∉A,
+  差 χⱼ−χ₀ が A 上 supported) + 直交 target `X : Fin n → CF(G)` + (1.4) image eq `τ(χⱼ−χ₀)=Xⱼ−X₀`
+  ⟹ `IsCoherent τ (range χ) A`。拡張は **Fourier-image map** `ν φ = ∑ⱼ⟨φ,χⱼ⟩•Xⱼ` (`coherentImageMap`)。
+  **`retarget` の τ₁-residual 項は不要** — `ℤ[range χ]` 上で residual が消え、`extension_inner_eq` は
+  純 Parseval (`coherentImageMap_inner_eq`)、τ は `extends_on_supported` でのみ効く (差生成子
+  `zSupportedSpan_range_subset_span_sub_zero` = n 元版 `zSupportedSpan_pair_subset_span`)。
+  補助: `classFunction_sum_apply`/`coherentImageMap_apply[_eq]`/`eq_sum_inner_smul_of_mem_span`
+  (Fourier 展開)/`inner_eq_sum_inner_mul_conj` (Parseval)。import `LinearAlgebra.Finsupp.LinearCombination`
+  追加 (`Submodule.mem_span_range_iff_exists_fun`、R 明示引数)。
+- **`coherentEqualDegree_fromDade`** (S07, Dade 特化): τ=実 Dade `dadeIntegralCharacterMap`。(1.4)
+  `isometry_difference_pair_structure` を τ に適用し signed family `{μⱼ,ε}` を**構成** (3 仮説を
+  `dadeOrthonormalCharacterImageFamily` と同様 Dade 等距で放電)、target `Xⱼ=ε•μⱼ` (直交,
+  `classFunction_inner_eq_if`+`sign_mul_self` で ε²=1)、image eq `τ(χⱼ−χ₀)=ε•(μⱼ−μ₀)` から
+  `coherentEqualDegree` で組立。**opaque 仮説ゼロ** — 入力は genuine な等次数 + supports のみ。
+  `Exists.choose` 抽出 (結論は Type)。
+
+これで **(6.6) chain の `h0` (等最小次数 prefix) と (6.8) `Y=S(H')` の両方が実 Dade τ で直接構成可能**に
+なった (前者は `coherentPair_fromDade` の n=2 を任意 n に一般化、後者は新規)。
+
+**精密残 (次)**: (a) (6.6)/(6.8) で `coherentEqualDegree_fromDade` を実際に呼ぶには **§8 setup 由来の
+等次数族の構成** が要る — (6.8) Y は「η_j(1)=|W₁| for all j」を (c)+(1.6)+[Is]Thm 6.34 から出す
+setup-specific character theory、(6.6) prefix は degree-sort `exists_monotoneDegreeEnum` の
+等最小次数ブロック抽出。これらは未形式化 (posit すると scaffolding)。(b) capstone 本体
+(case A/B + (6.5)/(6.7) + τ₃-gluing `coherentUnion_of_glued` + (6.8.3))。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。
@@ -1166,22 +1203,28 @@ conjugation で破綻しない。
 sorry/axiom 無、AxiomsCheck 3 件登録、full build 緑 3360 jobs。
 
 ### 🎯 次の crux = (6.8) capstone (`sibleySetup_is_coherent`, S08:188)
-(6.6) coherence-of-X が image-side posit ゼロの完全 constructive、かつ chain の base seed
-(`coherentPair_fromDade`) も landed したので、残るは:
-1. **Y-coherence** (`Y = S(H')` = equal-degree irreducibles): seed `coherentPair_fromDade` を `h0` に、
-   `DadeChainStep.advance` を全 degree-ratio = 1 (equal degree) で反復。famRatio≡1, hdeg_c は
-   `2·1 < ∑1/‖χᵢ‖² = m` (m≥3) で成立。= `peterfalvi_66_coherence_of_X_from_dade` の equal-degree
-   instantiation (wiring、新 infra 不要)。
+(6.6) coherence-of-X が image-side posit ゼロの完全 constructive、chain の base seed
+(`coherentPair_fromDade`)、**かつ等次数 coherence primitive (`coherentEqualDegree[_fromDade]`,
+commits dd1b2b9/8e8fd93) も landed** したので、残るは:
+
+1. ~~Y-coherence = `DadeChainStep.advance` 反復~~ **← 誤り、解決済**。等次数では (5.6) 次数不等式が
+   2 番目の対で偽 ([上記 進捗節](#))。正しくは **(1.1)+(1.4) 由来の `coherentEqualDegree_fromDade`**
+   (landed)。これが (6.6) base prefix `h0` (任意 n に一般化済) と (6.8) `Y=S(H')` の両方を実 Dade τ で
+   供給する。**残る wiring** = §8 setup から**等次数族そのものを構成**: (6.8) Y の `η_j(1)=|W₁|`
+   ((c)+(1.6)+[Is]Thm 6.34)、(6.6) prefix の等最小次数ブロック抽出 (`exists_monotoneDegreeEnum`)。
+   未形式化 character theory ゆえ posit 不可 (scaffolding)。
 2. **(6.8) capstone** (mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B (Z=W₂) split、
-   各 case で (6.6) coherence-of-X (`peterfalvi_66_coherence_of_X_from_dade`) + Y-coherence を
-   `coherentUnion_of_glued` で結合。**未形式化の前提**: (6.5) (非可換 p群への還元)、(6.7) (合同
-   `ψ(z)≡ψ(1) mod |H|`、class-algebra 論法、self-contained だが ~300 行)、Isaacs Thm 6.34/Lemma 7.7/2.27。
-   → `sibleySetup_is_coherent` (S08:188) を discharge。
+   各 case で (6.6) coherence-of-X (`peterfalvi_66_coherence_of_X_from_dade`) + Y-coherence
+   (`coherentEqualDegree_fromDade`) を `coherentUnion_of_glued` で結合。**未形式化の前提**: (6.5)
+   (非可換 p群への還元)、(6.7) (合同 `ψ(z)≡ψ(1) mod |H|`、class-algebra 論法、self-contained だが
+   ~300 行)、Isaacs Thm 6.34/Lemma 7.7/2.27。→ `sibleySetup_is_coherent` (S08:188) を discharge。
 3. その後 **S09:1589** ((7.10) `card_G0_lower_bound`)。
 
-**主要 landed 部品 (S07)**: `coherentPair_fromDade` (base seed `h0`)、`peterfalvi_66_coherence_of_X_from_dade`
-(coherence-of-X)、`DadeChainStep` (~L4489、全 genuine フィールド) + `.advance`/`.chainStepAdvance`、
-`Y_collapse_of_family`/`dade_Y_collapse_of_family` (5.6.1 producer)、`coherentUnion_of_glued` (2族 assembler)。
+**主要 landed 部品 (S07)**: `coherentEqualDegree`/`coherentEqualDegree_fromDade` (等次数 base = (6.6)
+prefix `h0` + (6.8) Y; `coherentImageMap` Fourier-image 拡張)、`coherentPair_fromDade` (2 元 base seed)、
+`peterfalvi_66_coherence_of_X_from_dade` (coherence-of-X)、`DadeChainStep` (全 genuine フィールド) +
+`.advance`/`.chainStepAdvance`、`Y_collapse_of_family`/`dade_Y_collapse_of_family` (5.6.1 producer)、
+`coherentUnion_of_glued` (2族 assembler)。
 
 ### 運用上の制約 (厳守)
 - **共有 `main` は触らない** (ユーザー firm 指示)。作業は worktree `…/.claude/worktrees/naughty-nash-c3ffc7` の
