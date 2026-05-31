@@ -1515,6 +1515,9 @@ set_option linter.style.longLine false in
 -- Peterfalvi (6.6) degree-sum (the G2.5 payoff): the inflation bijection transports Burnside on
 -- `G ⧸ N` to `∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumInflatedDegreeSq
+-- Complement degree-sum (the planned G2.5 payoff): `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|`,
+-- the (6.6)/(6.8) set `X = {χ | Z ⊄ ker χ}` total `|L| − |L:Z|` (mmd 04.8 L78, L234).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the

@@ -329,6 +329,35 @@ theorem sumInflatedDegreeSq :
       ((Finset.mem_filter.mp hχ).2)).choose_spec)
     (fun χbar _ => by rw [inflate_apply_one])).symm
 
+open scoped Classical in
+/-- **Peterfalvi (6.6)/(6.8.3) degree-sum: the `N ⊄ ker χ` part.**
+
+The squared degrees of the irreducible characters of `G` *not* killing `N` sum to `|G| − |G ⧸ N|`:
+`∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|` in `ℂ`.
+
+The complement of `sumInflatedDegreeSq` inside the Burnside total `sumIrreducibleDegreeSq`
+(`∑_{χ ∈ Irr G} χ(1)² = |G|`): the filter on `N ⊆ ker χ` and its negation partition `Irr G`
+(`Finset.sum_filter_add_sum_filter_not`), so the `N ⊄ ker χ` sum is `|G|` minus the `N ⊆ ker χ`
+sum `|G ⧸ N|`.
+
+This is the (6.6)/(6.8) set `X = S − S(Z) = {χ ∈ Irr L | Z ⊄ ker χ}` degree-sum: with `N = Z`,
+`∑_{χ ∈ X} χ(1)² = |L| − |L : Z|` (mmd 04.8 L78, L234), the total feeding the (6.6) per-step
+square-divisibility (`∑_{j<i} χⱼ(1)² = |L| − |L:Z| − ∑_{j≥i} χⱼ(1)²`) and the (6.8.3) final
+inequality `∑_{χ ∈ X} χ(1)²/‖χ‖² = |W₁||H:Z|(|Z|−1)`. -/
+theorem sumNonInflatedDegreeSq :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        ¬ (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card G : ℂ) - (Nat.card (G ⧸ N) : ℂ) := by
+  classical
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (IrreducibleCharacter G))
+    (fun χ => (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))
+    (fun χ => ((χ : ClassFunction G ℂ) 1) ^ 2)
+  rw [sumInflatedDegreeSq (N := N),
+    show (∑ χ : IrreducibleCharacter G, ((χ : ClassFunction G ℂ) 1) ^ 2) = (Nat.card G : ℂ) from
+      sumIrreducibleDegreeSq] at hsplit
+  linear_combination hsplit
+
 end Inflation
 
 end OddOrder.RepresentationTheory
