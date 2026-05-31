@@ -358,6 +358,31 @@ theorem sumNonInflatedDegreeSq :
       sumIrreducibleDegreeSq] at hsplit
   linear_combination hsplit
 
+open scoped Classical in
+/-- **Peterfalvi (6.8.3) degree-sum, factored form.**  For a subgroup chain `N ≤ K ≤ G` with
+`N ⊴ G`, the squared degrees of the irreducibles of `G` not killing `N` factor as
+`[G:K]·[K:N]·(|N|−1)`:
+`∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = [G:K]·[K:N]·(|N|−1)`.
+
+Combines `sumNonInflatedDegreeSq` (`= |G| − |G⧸N|`) with the Lagrange index arithmetic
+`|G| − |G⧸N| = [G:K]·[K:N]·(|N|−1)` (`index_mul_card`, `relIndex_mul_index`, `index_eq_card`).
+
+This is the mmd 04.8 L234 identity `∑_{χ∈X} χ(1)²/‖χ‖² = |W₁||H:Z|(|Z|−1)` of the (6.8.3) final
+inequality, with `G = L`, `K = H` (so `[G:K] = [L:H] = |W₁|`) and `N = Z`: routing through Burnside
+on `L` (`sumNonInflatedDegreeSq`) rather than Peterfalvi's `Ind_H^L`-orbit counting makes it a
+clean, coherence-setup-free identity. -/
+theorem sumNonInflatedDegreeSq_eq_index_mul (K : Subgroup G) (hNK : N ≤ K) :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        ¬ (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) ^ 2
+      = (K.index : ℂ) * (N.relIndex K : ℂ) * ((Nat.card N : ℂ) - 1) := by
+  rw [sumNonInflatedDegreeSq (N := N), ← Subgroup.index_eq_card N]
+  have h1 : (N.index : ℂ) * (Nat.card N : ℂ) = (Nat.card G : ℂ) := by
+    exact_mod_cast Subgroup.index_mul_card N
+  have h2 : (N.relIndex K : ℂ) * (K.index : ℂ) = (N.index : ℂ) := by
+    exact_mod_cast Subgroup.relIndex_mul_index hNK
+  linear_combination (-1 : ℂ) * h1 + (1 - (Nat.card N : ℂ)) * h2
+
 end Inflation
 
 end OddOrder.RepresentationTheory

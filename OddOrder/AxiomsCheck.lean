@@ -1535,6 +1535,10 @@ set_option linter.style.longLine false in
 -- Complement degree-sum (the planned G2.5 payoff): `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|`,
 -- the (6.6)/(6.8) set `X = {χ | Z ⊄ ker χ}` total `|L| − |L:Z|` (mmd 04.8 L78, L234).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq
+-- Peterfalvi (6.8.3) degree-sum factored form: `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = [G:K][K:N](|N|−1)`
+-- for `N ⊴ G`, `N ≤ K ≤ G` (= `sumNonInflatedDegreeSq` + Lagrange index arithmetic).  The mmd
+-- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
