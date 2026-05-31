@@ -1525,3 +1525,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_inner_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_range_subset_span_sub_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree
+-- Dade specialization: equal-degree coherence at the real (5.1) base map `τ = dadeIntegralCharacterMap`.
+-- The (1.4) signed family `{μⱼ, ε}` is constructed by `isometry_difference_pair_structure` applied to
+-- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
+-- coherence with no opaque hypotheses — only the genuine equal degree and supports.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade

@@ -4691,6 +4691,101 @@ noncomputable def coherentPair_fromDade
     · intro h
       exact h1notA (by simpa using h)
 
+open IntegralCharacterMap in
+/-- **Peterfalvi (1.1)+(1.4): an equal-degree set is coherent — at the real Dade base map.**
+
+The Dade specialization of `coherentEqualDegree`: an injective, equal-degree family
+`χ : Fin n → Irr(L)` (`n ≥ 2`) of irreducible characters supported in `CF(L,A)` is coherent for the
+(5.1) base map `τ = dadeIntegralCharacterMap`.  The (1.4) signed-difference family `{μⱼ, ε}` is
+**constructed** by applying `isometry_difference_pair_structure` to `τ`, with its three hypotheses
+discharged from the Dade isometry exactly as in `dadeOrthonormalCharacterImageFamily`:
+
+* virtual-character images (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, (2.6.b));
+* vanish at `1` (`dadeIntegralCharacterMap_apply_one_eq_zero`, `1 ∉ dadeSupport`);
+* inner-product preservation on the supported lattice
+  (`dadeIntegralCharacterMap_inner_eq_on_supported_span`, (2.6.a)).
+
+The target family is `Xⱼ = ε • μⱼ` (orthonormal: `{μⱼ}` is, by `classFunction_inner_eq_if`, and
+`ε² = 1`), giving the image equation `τ(χⱼ − χ₀) = Xⱼ − X₀` (= `ε•(μⱼ − μ₀)`, the signed
+difference); `coherentEqualDegree` then assembles the coherence.  This is the **`h0` base of the
+(6.6) equal-minimal-degree prefix and the (6.8) `Y = S(H')`**, both produced directly from the real
+Dade τ with no opaque hypotheses (the equal degree and supports are the genuine (6.8) data). -/
+noncomputable def coherentEqualDegree_fromDade
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (χ : Fin n → IrreducibleCharacter (↥L))
+    (hχinj : Function.Injective χ)
+    (hdeg : ∀ j, ((χ j : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1
+      = ((χ 0 : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1)
+    (hsupp : ∀ j, (χ j : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (h1notA : (1 : G) ∉ A) :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (Set.range (fun j => (χ j : ClassFunction (↥L) ℂ))) (supportInSubgroup A L) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ
+  -- Source orthonormality from the distinct irreducible characters.
+  have horthχ : ∀ i j, ClassFunction.inner ((χ i : ClassFunction (↥L) ℂ))
+      ((χ j : ClassFunction (↥L) ℂ)) = if i = j then (1 : ℂ) else 0 := by
+    intro i j
+    rw [irreducibleCharacter_inner_eq_ite]
+    by_cases h : i = j
+    · rw [if_pos h, if_pos (congrArg χ h)]
+    · rw [if_neg h, if_neg (fun he => h (hχinj he))]
+  -- The supported difference generators of `ℤ[range χ]`.
+  have hdiff_supp : ∀ i, (irreducibleCharacterDifference χ i).support ⊆ supportInSubgroup A L :=
+    fun i => (ClassFunction.support_sub_subset _ _).trans (Set.union_subset (hsupp i) (hsupp 0))
+  have hSsupp : ∀ s ∈ Set.range (fun j => (χ j : ClassFunction (↥L) ℂ)),
+      s.support ⊆ supportInSubgroup A L := by
+    rintro s ⟨j, rfl⟩; exact hsupp j
+  have hdiff_zspan : ∀ i, irreducibleCharacterDifference χ i ∈
+      zSpan (L := ↥L) (Set.range (fun j => (χ j : ClassFunction (↥L) ℂ))) :=
+    fun i => Submodule.sub_mem _ (Submodule.subset_span (Set.mem_range_self i))
+      (Submodule.subset_span (Set.mem_range_self 0))
+  -- Discharge the three (1.4) hypotheses for the Dade base map.
+  have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ χ := fun i =>
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i)
+      (Submodule.sub_mem _ (χ i).mem_ZIrr (χ 0).mem_ZIrr)
+  have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ χ := fun i =>
+    dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+  have hisom : ∀ i j, ClassFunction.inner (isometryDifferenceImage τ χ i)
+      (isometryDifferenceImage τ χ j) =
+      ClassFunction.inner (irreducibleCharacterDifference χ i)
+        (irreducibleCharacterDifference χ j) := fun i j =>
+    dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSsupp
+      (hdiff_zspan i) (hdiff_zspan j)
+  -- (1.4): the signed irreducible-difference family `{μⱼ, ε}` (extracted via `Exists.choose`,
+  -- as the conclusion is data in `Type`, not a `Prop`).
+  have hex := isometry_difference_pair_structure (G := G) (H := ↥L) hn χ hχinj hdeg
+    τ hvirtual hzero hisom
+  set data := hex.choose with hdata_def
+  have hdata : ∀ i, isometryDifferenceImage τ χ i = data.signedDifference i := hex.choose_spec
+  -- Target family `Xⱼ = ε • μⱼ`.
+  set X : Fin n → ClassFunction G ℂ := fun j => data.sign • data.classFunction j with hX
+  have horthX : ∀ i j, ClassFunction.inner (X i) (X j) = if i = j then (1 : ℂ) else 0 := by
+    intro i j
+    have hmul : (data.sign : ℂ) * (data.sign : ℂ) = 1 := by exact_mod_cast data.sign_mul_self
+    simp only [hX]
+    rw [← Int.cast_smul_eq_zsmul ℂ data.sign (data.classFunction i),
+      ← Int.cast_smul_eq_zsmul ℂ data.sign (data.classFunction j),
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      star_intCast, ← mul_assoc, hmul, one_mul, data.classFunction_inner_eq_if i j]
+  -- Image equation `τ(χⱼ − χ₀) = Xⱼ − X₀ = ε•(μⱼ − μ₀)`.
+  have himg : ∀ j, τ ((fun k => (χ k : ClassFunction (↥L) ℂ)) j
+      - (fun k => (χ k : ClassFunction (↥L) ℂ)) 0) = X j - X 0 := by
+    intro j
+    have hXd : X j - X 0 = data.signedDifference j := by
+      show data.sign • data.classFunction j - data.sign • data.classFunction 0
+        = data.sign • (data.classFunction j - data.classFunction 0)
+      rw [smul_sub]
+    rw [hXd]; exact hdata j
+  -- The non-vanishing degree at `1` (irreducible characters have positive degree).
+  have hdeg0 : ((χ 0 : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1 ≠ 0 := by
+    obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (χ 0)
+    rw [hd1]; exact_mod_cast hd.ne'
+  -- `1 ∉ supportInSubgroup A L`.
+  have h1A : (1 : ↥L) ∉ supportInSubgroup A L := fun h => h1notA (by simpa using h)
+  exact coherentEqualDegree hn horthχ horthX himg hdeg hdeg0 h1A (fun j => hdiff_supp j)
+
 /-- **Round C: the per-step (6.6) `hstep`, discharged from the Dade isometry + prior coherence.**
 
 One adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` of the (6.6)
