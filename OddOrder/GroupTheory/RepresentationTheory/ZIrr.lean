@@ -175,6 +175,30 @@ theorem irreducibleCharacters_subset_ZIrr :
     irreducibleCharacters G ⊆ (ZIrr G : Set (ClassFunction G ℂ)) :=
   fun _ hφ => IsIrreducibleCharacter.mem_ZIrr hφ
 
+/-- A class function `φ : ClassFunction G ℂ` is a **(genuine) character** if there is a
+finite-dimensional `ℂ`-representation `ρ` of `G` (on a vector space in `Type 0`) whose
+character is `φ`.  This is the non-irreducible analogue of `IsIrreducibleCharacter`: the
+character of an actual module, as opposed to a virtual (`ℤ`-combination) character in
+`ZIrr G`.  Genuine characters are exactly those virtual characters whose Fourier
+coefficients `⟨φ, ψ⟩` are all non-negative integers (`IsCharacter.exists_natFinsupp_eq_sum`). -/
+def IsCharacter (φ : ClassFunction G ℂ) : Prop :=
+  ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (_ : FiniteDimensional ℂ V)
+      (ρ : Representation ℂ G V), (φ : G → ℂ) = ρ.character
+
+/-- An irreducible character is in particular a genuine character (forget irreducibility). -/
+theorem IsIrreducibleCharacter.isCharacter {φ : ClassFunction G ℂ}
+    (hφ : IsIrreducibleCharacter φ) : IsCharacter φ := by
+  obtain ⟨V, _, _, _, ρ, _, hρ⟩ := hφ
+  exact ⟨V, inferInstance, inferInstance, inferInstance, ρ, hρ⟩
+
+/-- The character of a finite-dimensional `ℂ`-representation (on `Type 0`) is a genuine
+character. -/
+theorem repCharacterClassFunction_isCharacter
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V) :
+    IsCharacter (repCharacterClassFunction ρ) :=
+  ⟨V, inferInstance, inferInstance, inferInstance, ρ, rfl⟩
+
 section Degree
 
 open Module (finrank)
@@ -216,6 +240,30 @@ theorem IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card [Finite G
   refine ⟨finrank ℂ V, Module.finrank_pos, ?_, finrank_dvd_card ρ⟩
   have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
   rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
+
+/-- **The degree of an irreducible character of a `p`-group is a power of `p`** (Isaacs,
+*Character Theory of Finite Groups*, Cor. 3.12 / standard).  If `G` is a finite `p`-group and `φ`
+is an irreducible complex character of `G`, then `φ 1` (the representation degree) is a power of
+the prime `p`.
+
+This refines `exists_natDegree_charValue_one_dvd_card` (which only records `φ 1 ∣ |G|`) using the
+sharper prime-power fact `exists_finrank_eq_prime_pow_of_isPGroup`: the witnessing irreducible
+representation has `dim V = p ^ k`, and `φ 1 = dim V` by `char_one`.  It is the degree datum
+behind Peterfalvi (6.6) ("for all `j`, `θⱼ(1)` is a power of `p`", mmd L80), where `K` is a
+non-abelian `p`-group by (6.5.b). -/
+theorem IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : IsPGroup p G)
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ k : ℕ, φ 1 = (p ^ k : ℂ) := by
+  obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  obtain ⟨k, hk⟩ := exists_finrank_eq_prime_pow_of_isPGroup hp ρ
+  refine ⟨k, ?_⟩
+  have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
+  rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one, hk]
+  push_cast
+  ring
 
 end Degree
 

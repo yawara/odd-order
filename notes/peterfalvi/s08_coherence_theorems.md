@@ -67,6 +67,332 @@ family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axio
 "(2026-05-31)" 절. (5.6) main `IsCoherent(S₁∪{χ,χ̄})`의 단일 blocker = `τ₂`의
 **전역** `IsIntegralIsometry` 확장 생성자 (repo/mathlib 부재; orthonormal-basis → 전역 등거리).
 
+### (2026-05-31, pass 5) USER-APPROVED def 약화 → general (5.6) UNCONDITIONAL 완성 (commit b14a987)
+
+위 blocker를 **정의 약화**로 해소하여 §5 coherence hub (5.6)을 일반형으로 닫음
+(`S07_Coherence.lean`/`S08_CoherenceTheorems.lean`/`AxiomsCheck.lean`; sorry/axiom 無 —
+`#print axioms retarget_isCoherent` = {propext, Classical.choice, Quot.sound}; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑).
+
+- **`IsCoherent` 약화** (USER-APPROVED, 이 branch 한정): 전역 필드
+  `extension_isometry : IsIntegralIsometry extension` → 격자-相對
+  `extension_inner_eq : ∀ φ ψ ∈ zSpan S, ⟨ν φ, ν ψ⟩ = ⟨φ, ψ⟩`. 이유: FT에서
+  `dim CF(L) > dim CF(G)`이라 character-difference 격자를 `CF(G)`로 보내는 **전역** 등거리는
+  일반적으로 부재; Peterfalvi (5.6.3)이 실제로 주장하는 대상은 **격자** 등거리이고, 모든 하류
+  consumer가 격자원 `ζ∈S`에만 inner-preservation을 쓴다.
+- **신규 keystone** (`namespace IntegralCharacterMap`, AxiomsCheck 등록 2건):
+  - `orthoResidualMap_mem_zSpan`: {χ,χ̄} Gram–Schmidt 잔차가 `ℤ[S₁∪{χ,χ̄}] → ℤ[S₁]`
+    (`span_induction`; 생성원 x∈S₁↦x [x⊥{χ,χ̄}], χ↦0, χ̄↦0). 이것이 전역 등거리 없이 격자
+    등거리를 가능케 하는 핵심 격자 사실.
+  - `retarget_inner_eq_on_zSpan_union`: `retarget_inner_eq_on`의 정직 충족형 integral-span 판.
+    재타게팅이 `ℤ[S₁∪{χ,χ̄}]` 전체에서 `⟨·,·⟩` 보존, **τ₁의 `ℤ[S₁]`-등거리** (= S₁ coherence)
+    + 격자 직교 `X,X̄ ⊥ τ₁ξ` (ξ∈ℤ[S₁]) 만 사용 (전역 등거리/over-strong 입력 불요). 잔차∈ℤ[S₁]
+    ⟹ `inner_block_expand`로 폐합.
+- **`retarget_isCoherent` 이제 UNCONDITIONAL general (5.6)**: `hX_ortho`/`hXbar_ortho`를 정직한
+  격자형 (`∀ξ∈ℤ[S₁]`)으로 약화 (전역 `∀ξ⊥{χ,χ̄}`보다 약한 가설 = 더 강한 정리), τ₂:=retarget
+  구성, `retarget_inner_eq_on_zSpan_union`로 약화된 `IsCoherent` 산출. **special-position 제한
+  제거**; X,X̄⊥S₁^{τ₁}는 진짜 (5.5)+(5.2.e) 격자 사실 (posit 無).
+- **S08 consumer 적응**: `IndChainDecomposition.ofIsCoherent`에 `hζ_mem : ∀ t, ζ t ∈ S` 추가,
+  `Submodule.subset_span` (ζt∈S⊆zSpan S)로 격자 `extension_inner_eq` 공급. 약화는 consumer
+  증명을 **쉽게** 만들 뿐 (전역성 미사용이었음). `sibleySetup_is_coherent` (S08:188, 여전히
+  sorry)는 약화된 `CoherenceTarget`에 그대로 typecheck — 향후 증명도 약화로 더 쉬워짐.
+- **의의**: (5.6)은 쌍 인접으로 coherence를 짓는 **귀납 엔진**, §6 (case-A/B coherence) 및
+  궁극적으로 S08:188 `sibleySetup_is_coherent`로의 관문. 상세는 issue 0046 pass-5.
+
+### (2026-05-31, pass 6) (6.8.1)/(6.8.2) `τ₃`-gluing의 algebraic heart landing (PARTIAL)
+
+`S07_Coherence.lean`에 **orthogonal coherent union** 항등식 2건 landing (sorry/axiom 無 —
+`#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각 3 axiom 전
+allowlist; full `lake build OddOrder` 緑 3351 jobs). **roadmap의 recommended first leaf
+`case_A_X_union_Y_coherent` (L2.2)는 NOT tractable로 판정** (아래), 대신 그 leaf와 case (B)가
+*공통으로* 소비하는 가장 foundational한 honest primitive를 landing:
+
+- **`inner_orthogonal_glued_eq`** (two-lattice block identity): `a,a'∈ℤ[X]`, `b,b'∈ℤ[Y]`에 대해
+  `νX`가 `ℤ[X]`에서, `νY`가 `ℤ[Y]`에서 `⟨·,·⟩` 보존 + source 직교 (`⟨a,b'⟩=⟨b,a'⟩=0`) + image
+  직교 (`⟨νX a, νY b'⟩=⟨νY b, νX a'⟩=0`) ⟹
+  `⟨νX a + νY b, νX a' + νY b'⟩ = ⟨a + b, a' + b'⟩`. `inner_block_expand`의 two-lattice 판; 양변이
+  대각 블록 `⟨a,a'⟩+⟨b,b'⟩`로 collapse. Peterfalvi의 "`τ₃`는 `τ₁`을 `Y`에, `τ₂`를 `X`에 일치"
+  (mmd L176/L224) gluing의 **대수적 심장**.
+- **`inner_eq_on_zSpan_union_of_orthogonal`**: 위 항등식을 `ℤ[X∪Y]=ℤ[X]⊔ℤ[Y]`
+  (`Submodule.span_union`) 전체로 lift — `νX`를 `ℤ[X]`에, `νY`를 `ℤ[Y]`에 일치시키는 **임의**의 map
+  `ν`에 대해 `ν`가 `ℤ[X∪Y]`에서 `⟨·,·⟩` 보존. `φ∈ℤ[X∪Y]`를 `a+b` (`mem_sup`)로 분해 ⟹
+  `ν φ=νX a+νY b` ⟹ `inner_orthogonal_glued_eq`로 폐합. = 합집합 `X∪Y`의 glued map `τ₃`에 대한
+  약화된 `IsCoherent.extension_inner_eq` field 그 자체.
+- **honest 판정 — L2.2가 NOT tractable인 이유** (roadmap의 "(5.6) direct consumer ~100-140 LOC"는
+  과대평가): (6.8.1) 증명 (mmd L158-176)은 `retarget_isCoherent` 1회 호출이 **아니다** —
+  (1) **(6.6)** coherence-of-`X` (별도의 ~8-step character theorem, 미형식화),
+  (2) **(6.7)** congruence forcing `b≡c≡0 (mod a)` + 명시적 `X=χ₁^{τ₁}` 동정 (미형식화),
+  (3) `τ₃` = **두 family** `X`, `Y` (임의 크기)의 orthonormal union — repo에는 single-pair
+  `retarget` closed-form만 있고 two-family union 구성 (free-module/orthonormal-basis extension)이
+  부재. 게다가 thin `SibleySetup`은 `S=Ind`/Dade isometry/`X`/`Y`/`τ₁`/`τ₂`/(6.6)를 전혀 안 들고
+  있어 statement화하면 case content를 가설로 외출 = memory `scaffold-sorry-free-not-done`가 금하는
+  scaffolding. 따라서 정직하게 **두 항등식 (gluing의 hard algebraic step)만 landing**.
+- **정밀 잔존 (full `case_A_X_union_Y_coherent` = L2.2)**:
+  (i) **(6.6)** coherence-of-`X` witness (별 issue/leaf),
+  (ii) `νX`(=τ₂)/`νY`(=τ₁) coherence extension 및 image 직교 `himg_ortho`를 case-A/B character
+  theory ((6.7) 포함)에서 *생성* (위 두 항등식의 honest 가설들을 채우는 작업),
+  (iii) glued map `ν=τ₃`의 **well-defined 구성** = orthonormal `X∪Y`의 ℤ-linear independence ⟹
+  free-module basis extension (repo/mathlib 부재 infra) + `extends_on_supported`
+  (`eq_on_zSpan_of_eq_on` generator 패턴, case별 difference-generator 구조 필요). (iii)이 본 leaf의
+  핵심 missing infra. 상세는 issue 0046 pass-6.
+
+### (2026-05-31, pass 7) (6.8.1)/(6.8.2) `τ₃` 두-family `IsCoherent` 조립기 landing (PARTIAL)
+
+`S07_Coherence.lean`에 **`coherentUnion_of_glued`** landing (sorry/axiom 無 —
+`#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 1건 3 axiom 全 allowlist;
+full `lake build OddOrder` 緑 3351 jobs). pass-6의 두 gluing 항등식의 **자연스러운 소비자** = 실제
+`IsCoherent (X∪Y) A` witness 산출, single-pair `retarget_isCoherent`의 **두-family 유사물**:
+
+- **`coherentUnion_of_glued`** (`noncomputable def`): 입력 = `hX : IsCoherent τ X A`,
+  `hY : IsCoherent τ Y A` (**공급** 데이터, posit 無; (6.6) 와 (1.1)·(1.4)의 결론), 글루 map
+  `ν : IntegralCharacterMap L G` (`hX.extension`에 `ℤ[X]`, `hY.extension`에 `ℤ[Y]`에서 일치 =
+  Peterfalvi의 `τ₃`), source 직교 `hsrc_ortho`, image 직교 `himg_ortho`, (5.1)-type 생성 가설 `hgen`.
+  출력 = `IsCoherent τ (X∪Y) A`. 두 field 방전: `extension_inner_eq` =
+  `inner_eq_on_zSpan_union_of_orthogonal` (격자 등거리 `hX`/`hY.extension_inner_eq` + 직교성 투입),
+  `extends_on_supported` = `eq_on_zSpan_of_eq_on` over generator `Z[X,A]∪Z[Y,A]` (각 lattice 위
+  `ν=νX=τ` / `ν=νY=τ`, `hagreeX`+`hX.extends_on_supported` 등), `nonzero`는 `X⊆X∪Y`에서 상속.
+- **honest 판정**: 조립기는 character theory 미포함 — 입력 `hX`/`hY`/`hagreeX`/`hagreeY`/직교성/`hgen`을
+  *생산*하는 ((6.7) congruence, 명시 `X=χ₁^{τ₁}` 동정, Dade isometry) 가 별도 작업으로 남음. glued map
+  `ν=τ₃` 자체의 canonical 구성은 ℂ-valued 공간이라 ℤ-projection이 비정수 계수 ⟹ free-module 기저 확장
+  infra 필요 (부재) ⟹ `ν`를 supplied data로 받음 (Peterfalvi의 `τ₃`가 orthonormal 기저에서 실제로
+  구성되는 정직한 입력). **조립기는 완결**; 남은 건 (i) (6.6) coherence-of-X `hX`, (ii) case-A/B
+  character theory (가장 무거운 덩어리), (iii)-canonical glued-map 구성. 상세는 issue 0046 pass-7.
+
+### (2026-05-31, pass 8) (6.6) "repeated use of (5.6)" iteration engine `coherentPairChain` landing
+
+`S07_Coherence.lean`에 **(6.6) 증명의 결론 단계** "Repeated use of Theorem (5.6) then shows that X is
+coherent" (mmd L84)를 형식화한 **반복 엔진** landing (sorry/axiom 無 — `#print axioms coherentPairChain`
+= {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각 3 axiom 전 allowlist; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs). single-pair `retarget_isCoherent`를
+pair 수에 대한 induction으로 fold하는 정직한 핵심:
+
+- **`pairSet pair i`** (= `{(pair i).1, (pair i).2}` = i-번째 pair `{χᵢ, χ̄ᵢ}`), **`pairUnion S₀ pair`**
+  (`0 ↦ S₀`, `i+1 ↦ pairUnion … i ∪ pairSet … i` = i번 adjoin 후 누적집합), `pairUnion_zero`/
+  `pairUnion_succ` (simp), `subset_pairUnion_succ`, **`pairUnion_mono`** (`i≤j ⟹ ⊆`).
+- **`coherentPairChain`** (`noncomputable def`): `h0 : IsCoherent τ S₀ A` (base = (1.1)/(1.4) prefix
+  coherence) + `hstep : ∀ i<N, IsCoherent τ (pairUnion S₀ pair i) A → IsCoherent τ (pairUnion S₀
+  pair (i+1)) A` (각 step = (5.6) 1회 = `retarget_isCoherent`) ⟹ `IsCoherent τ (pairUnion S₀ pair N) A`.
+  proof는 `N`에 대한 recursion (`0↦h0`, `N+1↦hstep N _ (recurse N, step 약화)`). 엔진은 induction
+  자체만 기여 — 최종 coherence는 **derived** (posit 無). general·reusable (임의 chain). 각 `hstep i`의
+  (5.6) data (`hX_ortho`/`himg` 등)는 *현재* 확장 `hcoh.extension`을 참조하므로 running witness의
+  함수로 주어짐 = "repeated use"의 본질 구조.
+- **honest 판정 (G1 skip)**: 이번 round의 G1 plumbing (L1.1 Dade 추출 / L1.2 case-A/B split)은 honest
+  하지 않아 skip. `SibleySetup`는 Dade isometry 필드/X·Y 집합/case-A/B flag (`Z(H)∩[H,H]` vs `W₂`)/
+  (6.6) data를 **보유하지 않음** (필드 = `coherence`/`K`/`H`/`W1`/`H_sharp_ti`/normality). L1.1은
+  `hyp.coherence.tau` 필드 접근 (이미 `coherence_tau_inner_eq`로 노출) = thin wrapper (규약 금지);
+  L1.2는 `Z`·`W₂`·case 술어를 새 가설로 외출해야 함 = scaffolding (memory `scaffold-sorry-free-not-done`
+  금지). 상세는 issue 0046 pass-8.
+- **(6.6) 남은 작업**: 각 step의 (5.6) data 생산 (degree sort / θᵢ(1) = p-power / [Is] Cor 2.30
+  `θᵢ(1)²≤|K:Z|` / (6.4.c) `(|L:K|,p)=1` ⟹ `χᵢ(1)²∣∑_{j<i}χⱼ(1)²` ⟹ degree 부등식
+  `2χᵢ(1)χ₁(1)<∑_{j<i}χⱼ(1)²`) + base prefix coherence ((1.1)/(1.4)). 이들이 `coherentPairChain`의
+  `hstep`/`h0`를 채움.
+
+### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
+
+`coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <
+∑_{j<i}χⱼ(1)²`을 (6.6)의 prime-power 구조에서 정직하게 도출하는 number-theoretic leaf 3건을
+`S07_Coherence.lean` (`int_eq_zero_of_sq_mul_le_of_two_mul_lt` 직후 (5.6) section 안)에 landing
+(sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck 등록 2건 각
+3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs):
+
+- **`two_mul_lt_sq_of_primePow_gap`** (ℕ): `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹
+  `2·dᵢ·d₁ < dᵢ²`. proof: `q > 1` (else `dᵢ ≤ d₁`) + `q = p^m > 1` ⟹ `m ≥ 1` ⟹ `p ≤ q` ⟹
+  `dᵢ = q·d₁ ≥ p·d₁ ≥ 3·d₁`, `nlinarith`. = mmd L82의 `2χᵢ(1)χ₁(1) < pχᵢ(1)χ₁(1) ≤ χᵢ(1)²`의
+  load-bearing 산술 (χⱼ(1)=|L:K|·θⱼ(1), θⱼ(1) p-power ⟹ χᵢ(1)/χ₁(1)=p^m; `|L| odd ⟹ p ≥ 3`).
+- **`two_mul_lt_of_sq_dvd_of_gap`** (ℕ): gap + `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) + `0 < D` ⟹
+  `2·dᵢ·d₁ < D` (positivity로 `dᵢ² ≤ D`).
+- **`two_mul_degree_lt_sum_ratCast`** (ℚ, consumer-facing): 위 둘 합성 ⟹
+  `2·((dᵢ:ℚ)·(d₁:ℚ)) < (D:ℚ)` = (5.6) core의 `2·a < D` 전제 직접 공급. 각 `coherentPairChain` step의
+  (5.6.2) integer-forcing의 degree 가설이 ℕ degree data에서 방전됨.
+- **honest 판정**: prime-power gap (`dᵢ = q·d₁`)와 square-divisibility (`dᵢ² ∣ D`)는 둘 다 (6.6) data의
+  정직한 귀결 (K = p-group ⟹ θ degree p-power; (6.4.c) coprimality + sum identity). posited 아님.
+- **(6.6) 잔여 (pass-2 이후)**: degree sort + per-index prime-power gap 가설 (`χᵢ(1)=q·χ₁(1)`, `q=p^m`) +
+  square-divisibility (`χᵢ(1)² ∣ ∑_{j<i}`; [Is] Cor 2.30 + sum identity + (6.4.c)) 를 본 leaf에 plug +
+  base prefix coherence ((1.1)/(1.4)). degree-bound 부분은 본 leaf가 공급. 상세는 issue 0046 pass-2.
+
+**leaf 2 (square-divisibility producers, mmd L78-80)**: leaf 1의 `hdvd` (`χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`)을
+*생산*하는 mmd L80 chain의 두 산술 step을 `S07_Coherence.lean` (`two_mul_degree_lt_sum_ratCast` 직후)에
+landing (sorry/axiom 無 — `#print axioms` = {propext, Quot.sound}; AxiomsCheck 등록 2건 각 2 axiom 全
+allowlist):
+
+- **`dvd_of_add_eq_of_dvd_dvd`** (ℕ): `head + tail = total`, `a∣tail`, `a∣total` ⟹ `a∣head`. mmd
+  L78+L80 combination (`head=∑_{j<i}`, `tail=∑_{j≥i}`, `total=|L|-|L:Z|`; `θᵢ(1)²∣tail` + `θᵢ(1)²∣total`
+  ⟹ `θᵢ(1)²∣head`). **additive equation**로 진술해 ℕ subtraction 회피.
+- **`sq_dvd_of_factored_coprime`** (ℕ): `χᵢ(1)=idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`.
+  mmd L80 coprimality forcing (`(|L:K|,p)=1` & θ p-power ⟹ `Coprime idx² θ²`; coprime divisors 곱).
+- **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
+  `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
+  (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
+  sort + base prefix coherence ((1.1)/(1.4)). 상세는 issue 0046 pass-2 leaf 2.
+
+### (2026-05-31, G2.0) (6.6) opening "By (1.1), n ≥ 2" (mmd L76)
+
+(6.6) 증명의 *첫* 단계 "Let `n=|X|`. By (1.1), `n ≥ 2`"를 `S07_Coherence.lean` ((6.6) section의
+`pairSet` def 직전)에 landing (sorry/axiom 無 — AxiomsCheck 등록 1건 3 axiom 全 allowlist; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3351/3334 jobs):
+
+- **`two_le_ncard_of_conjugate_closed_of_noReal`**: `X : Set (ClassFunction L ℂ)`가 finite +
+  nonempty + `ClosedUnderConjugate` + `HasNoRealCharacters` ⟹ `2 ≤ X.ncard`. mmd L76의 정직한
+  일반형 — (1.1)이 공급하는 두 사실 [conjugation 폐쇄 (`χ∈X ⟹ χ̄∈X`; `Z` normal로 `Ker χ̄=Ker χ`),
+  non-self-conjugate (`χ̄ ≠ χ`; `|L|` odd & nontrivial)]가 nonempty와 결합해 `χ`, `χ̄` 두 distinct
+  member를 주어 `1 < X.ncard` (`Set.one_lt_ncard`) → `2 ≤ X.ncard` (`omega`). 사실 `|X|`은 even이나
+  (6.6)은 `≥ 2`만 사용 (= `Z[X,L^#] ≠ 0` 보증 + (1.4) prefix 시작).
+- **honest 판정**: thin wrapper 아님 — `Set.one_lt_ncard`는 bridge일 뿐, 내용은 conjugation
+  involution으로부터 distinct witness `χ̄ ≠ χ`를 *구성*하는 부분. 두 가설은 §7 `Hypothesis` 필드
+  (`conjugate_closed`/`no_real_characters`)이고 `X ⊆ S`로 상속 (`HasNoRealCharacters.mono`;
+  `ClosedUnderConjugate`는 caller가 `S(Z)` conj-폐쇄성과 함께 공급) — posited 아님.
+- **caller 측 잔여 (G2.0 이후)**: (6.6) 본문이 instantiate하려면 `X = S − S(Z)`의 nonemptiness
+  (`Z ≠ 1` ⟹ `Z ⊄ Ker χ`인 irreducible 존재) + `S(Z)` conj-폐쇄성 (→ `X` conj-폐쇄)을 공급해야
+  함 — §6 setup-specific character theory의 별도 leaf. 상세는 issue 0046 G2.0.
+
+### (2026-05-31, G2.1) (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76)
+
+(6.6) 증명이 `n=|X|` 다음 곧바로 하는 **degree-sort** "Set `X = {χ₁,…,χₙ}`, where `χ₁(1) ≤ ⋯ ≤
+χₙ(1)`"를 `S07_Coherence.lean` ((6.6) section, `two_le_ncard_…` 직전)에 landing (sorry/axiom 無 —
+`#print axioms exists_monotoneDegreeEnum` = `[propext, Classical.choice, Quot.sound]`; AxiomsCheck
+등록 1건 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑):
+
+- **`exists_monotoneDegreeEnum`**: `X : Set (ClassFunction L ℂ)` finite ⟹ `∃ e : Fin X.ncard →
+  ClassFunction L ℂ`, `e` injective + `∀ i, e i ∈ X` + `∀ χ∈X, ∃ i, e i = χ` (range = X) + real
+  degree key `χ ↦ (characterDegree χ).re` 따라 monotone (`i ≤ j ⟹ (deg (e i)).re ≤ (deg (e j)).re`).
+  구성: 유한성 → `Fintype.equivFinOfCardEq` 로 `g : X ≃ Fin n` (`n = X.ncard`, bridge `Fintype.card
+  = Nat.card = ncard`), key `k i := (deg (g.symm i)).re`, `σ := Tuple.sort k`, `e i := g.symm (σ i)`.
+  injective = `Subtype.val ∘ g.symm ∘ σ` 세 합성; surjective = `i = σ⁻¹(g⟨χ,_⟩)`; monotone =
+  `Tuple.monotone_sort k` (`k ∘ σ` monotone, 그리고 `(deg (e i)).re = (k∘σ) i` 정의적).
+- **honest 판정**: thin wrapper 아님 — `Tuple.sort`/`Tuple.monotone_sort`만으로는 *set*의 monotone
+  enumeration이 안 나옴 (set → 임의 `Fin n ≃ X` 선택 + key pull-back + injective/surjective/range 재조립
+  필요). 순수 order-이론적 "finite family를 real key로 sort" 단계로, irreducibility/induced-from-K/p-power
+  degree 사실 전혀 사용 안 함 — 임의 finite class-function set에 대해 일반형으로 statement.
+- **caller 측 잔여 (G2.1 이후)**: 이 enumeration을 `coherentPairChain`의 `pair : ℕ → χ×χ̄`와 base
+  prefix `{χ₁,…,χₖ}` (equal-minimal-degree, (1.1)+(1.4) coherent)로 연결 + per-step (5.6) data 생산
+  (θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` → `two_mul_lt_sq_of_primePow_gap`).
+  enumeration 자체는 `Fin n` 인덱스 monotone; pair-인덱스(`ℕ`)로의 캐스팅·base 분리는 별도 leaf.
+
+### (2026-05-31, G2.3) (6.6) "For all j, θⱼ(1) is a power of p" (mmd L80)
+
+(6.6) 証明 L80 の degree datum「`K` が `p`-群なら各 `θ ∈ Irr K` の `θ(1)` は `p` の冪」を **2 層**で
+landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allowlist, no `sorryAx`; full
+`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑):
+
+- **`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`** (`ZIrr.lean` の `Degree`
+  section, `exists_natDegree_charValue_one_dvd_card` 直後): `[Finite G]`, `[Fact p.Prime]`,
+  `IsPGroup p G`, `IsIrreducibleCharacter φ` ⟹ `∃ k, φ 1 = (p^k : ℂ)`。既存
+  `exists_natDegree_charValue_one_dvd_card` (`φ 1 ∣ |G|` のみ) を、より鋭い
+  `exists_finrank_eq_prime_pow_of_isPGroup` (証言表現の `dim V = p^k`) + `char_one` (`φ 1 = dim V`)
+  で精密化。証明は `exists_natDegree_charValue_one_dvd_card` を mirror し `finrank_dvd_card` の代わりに
+  p-群版を呼ぶだけ (~12 LOC)。
+- **`exists_characterDegree_eq_prime_pow_of_isPGroup`** (`S03_PreliminaryCharacter.lean`,
+  `exists_natDegree_characterDegree_dvd_card` 直後): `IrreducibleCharacter G` subtype + `characterDegree`
+  経由で `∃ k, characterDegree χ = (p^k:ℂ)`。`characterDegree_def` rewrite で RT 形を
+  bundled-character API に橋渡し (既存 `dvd_card` 版と同一の二層パターン = predicate→subtype +
+  `φ 1`→`characterDegree` の convention 適応)。これが (6.6) 本文が消費する形。
+- **依存 verify**: (6.5.b) の "`K` 非可換 `p`-群" は本 leaf では `IsPGroup p K` を**引数**で受ける
+  (honest fully-general; `p`-群結論を posit せず、それを供給する (6.5) は別 leaf)。消費 landed lemma
+  `exists_finrank_eq_prime_pow_of_isPGroup` は `ClassSumAlgebra.lean:1564` に既存・AxiomsCheck 済 — 確認済。
+- **honest 판정**: thin wrapper 아님 — 既存 `dvd_card` lemma 들은 `θ(1) ∣ |G|` 밖에 안 주므로
+  p-power 결론을 *재진술*이 아니라 더 강한 primitive (`exists_finrank_eq_prime_pow_of_isPGroup`)에서
+  새로 끌어옴. 二層 (RT predicate 형 + Peterfalvi `characterDegree`/subtype consumer 형)은 repo의
+  기존 `dvd_card` 쌍과 동일한 확립된 패턴.
+
+### (2026-05-31, G2.2) (6.6) coherence-of-X equality residual: 真正 character の ℕ-分解
+
+(6.6) の coherence-of-X equality case (Round-19 residual) が end-to-end で消費する
+**「真正 character は非負整数係数で irreducible に分解する」**を honest 一般形で
+`OddOrder/GroupTheory/RepresentationTheory/Clifford.lean` (+ `IsCharacter` 述語を `ZIrr.lean`)
+に landing (sorry/axiom 無 — `#print axioms` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+登録 4 件 各 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs):
+
+- **`IsCharacter`** (`ZIrr.lean`, `IsIrreducibleCharacter` の隣に新設): `φ : ClassFunction G ℂ` が
+  **有限次元 ℂ-表現 `ρ` の character** (= `(φ : G→ℂ) = ρ.character`, irreducibility を落とした版)。
+  `IsIrreducibleCharacter.isCharacter` (irreducible ⟹ genuine) /
+  `repCharacterClassFunction_isCharacter` で導入。virtual character (`ZIrr` の任意 ℤ-結合) と区別される
+  「実モジュールの character」の述語。
+- **`IsCharacter.mem_ZIrr`**: 真正 character ∈ ZIrr (`character_mem_ZIrr` を canonical class-function
+  同定後に適用; `[Finite G]` のみ要)。
+- **`IsCharacter.exists_natCast_inner_irreducible`** (非負性の核): 真正 `χ=χ_ρ`・irreducible `ψ=χ_σ` で
+  `⟨χ,ψ⟩ = dim_ℂ Hom_{ℂ[G]}(σ,ρ)` (cast ℕ)。これは Clifford `restrictionMultiplicity_nonneg`
+  (H-level の `⟨Res^G_H χ,θ⟩ ≥ 0`) の **G-level 版**: `inner χ ψ = ⅟|G| · ∑_g χ(g)·star(ψ g)` を
+  `star(χ_σ g)=χ_σ(g⁻¹)` (`character_inv`) で書き換え, mathlib の
+  `Representation.card_inv_mul_sum_char_mul_char_eq_finrank` (character scalar product = Hom-dim) に
+  `σ ρ` swap で流す。`inner_irreducible_nonneg` は `0 ≤ ⟨χ,ψ⟩` の即系。
+- **`IsCharacter.exists_natFinsupp_eq_sum`** (= GOAL, G2.2 が食う形): `∃ m : ClassFunction G ℂ →₀ ℕ`,
+  `supp m ⊆ Irr(G)`, `χ = ∑_{ψ∈supp m} (m ψ:ℂ)•ψ`, かつ `∀ψ∈Irr, (m ψ:ℂ)=⟨χ,ψ⟩`。証明:
+  `mem_ZIrr_repr` で `χ` の ℤ-Finsupp 分解 `c` を取り, `inner_eq_coeff_of_repr` で各係数 `c ψ = ⟨χ,ψ⟩`,
+  これが genuine character で `≥ 0` (`inner_irreducible_nonneg`), `Finsupp.mapRange Int.toNat` で ℕ 化
+  (support 不変: support 上の係数は正なので `Int.toNat` で値も support も保存)。Peterfalvi の
+  "χ = ∑ mᵢψᵢ with mᵢ = ⟨χ,ψᵢ⟩ ∈ ℕ".
+- **honest 판정**: thin wrapper 아님 — `IsCharacter` 는 genuine vs virtual character 의 진짜 새 述語;
+  비음성은 `restrictionMultiplicity_nonneg` (H-level) 가 안 주는 G-level Hom-dim 을 새로 끌어옴;
+  ℕ-Finsupp 分解은 ℤ-repr + 비음성 + `Int.toNat` support-preservation 의 비자명한 합성.
+- **배치 (import closure 判断)**: `Clifford.lean` 가 `character_mem_ZIrr` (CharacterCompleteness) +
+  Fourier (`mem_ZIrr_repr`/`inner_eq_coeff_of_repr`, ZIrrFourier) + `character_inv` (CharacterConjugate)
+  를 모두 import closure 에 가지는 유일 모듈이며, 概念的으로도 `restrictionMultiplicity_natCast`
+  (Clifford 多重度 비음성) 와 同族. `IsCharacter` 述語만 `ZIrr.lean` (其 `.mem_ZIrr` 는 downstream
+  `character_mem_ZIrr` 필요 ⟹ Clifford 에 둠).
+- **(6.6) 残作業 (G2.2 後)**: この ℕ-分解 leaf 자체는 G2.2 의 character-side primitive 로 완결.
+  (6.6) main 의 残 = pass-8/pass-2 의 `coherentPairChain` `hstep`/`h0` 입력 (degree sort →
+  per-step (5.6) data: θᵢ(1)=p-power, [Is] Cor 2.30, `χᵢ(1)²∣∑_{j<i}`) + base prefix coherence
+  ((1.1)/(1.4)) — character-theory/구조정수 작업으로 별도.
+
+### (2026-05-31, G2.6 WIRING) (6.6) coherence-of-X 결론 `IsCoherent τ X A` 의 조립
+
+(6.6) 증명의 결론 "Repeated use of Theorem (5.6) then shows that X is coherent" (mmd L84) 을, landed
+leaves (G2.1 degree-sort `exists_monotoneDegreeEnum`, pass-8 `coherentPairChain` 엔진, pass-2 gap leaf
+`two_mul_lt_sq_of_primePow_gap`, G2.5 degree-sum `sumInflatedDegreeSq`) 위에 honest 하게 조립하는
+**wiring 정리** 를 `S07_Coherence.lean` ((6.6) section 의 `coherentPairChain` 직후) 에 landing
+(sorry/axiom 無 — `#print axioms coherentOfPairChainCover` = {propext, Classical.choice, Quot.sound};
+AxiomsCheck 등록 3건 각 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑
+3360/3343 jobs):
+
+- **`mem_pairUnion`** (membership 특성화): `χ ∈ pairUnion S₀ pair N ↔ χ ∈ S₀ ∨ ∃ j<N, χ ∈ pairSet pair j`.
+  `N` induction. engine accumulator 의 멤버십 결정.
+- **`pairUnion_eq_of_cover`** (set-decomposition bridge): `S₀ ⊆ X` + 각 pair ⊆ X + `X` cover ⟹
+  `pairUnion S₀ pair N = X`. = degree-monotone enum (`exists_monotoneDegreeEnum`) 이 `X = S − S(Z)`
+  를 equal-min-degree prefix `S₀` 와 나머지 conjugate pair 들로 쪼갠 것을 engine accumulator
+  `pairUnion S₀ pair N` 와 동일시하는 다리. **본 round 의 핵심 신규 content** (`coherentPairChain` 미제공).
+- **`coherentOfPairChainCover`** (`noncomputable def`, = G2.6 GOAL): pair-chain decomposition data +
+  base coherence `h0 : IsCoherent τ S₀ A` ((1.1)+(1.4) prefix) + per-step (5.6) adjoining `hstep` ⟹
+  `IsCoherent τ X A`. 증명 = `pairUnion_eq_of_cover … ▸ coherentPairChain S₀ pair h0 N hstep`.
+- **honest 판정**: thin wrapper 아님 — `coherentPairChain` 은 `IsCoherent (pairUnion S₀ pair N) A` 만
+  주고, 본 정리는 set-decomposition bridge 를 추가해 **(6.6) 의 실제 결론 `IsCoherent τ X A`** 산출;
+  `h0`/`hstep` 은 (6.6) 증명구조의 *공급* 입력, 결론은 chain 으로 derived (posit 無). instruction 이
+  명시 허용한 wiring boundary 까지만 landing.
+- **정밀 잔존 (G2.7)**: `hstep` 각 step 의 `retarget_isCoherent` 입력 중 **target characters
+  `{Xᵢ, X̄ᵢ}` + image equation + lattice 직교** 의 *구성* = **Dade isometry ν basis extension** 미완
+  (degree 부등식 부분은 이미 landed). + caller 의 decomposition data (`pair`/`N`/cover) 를 enum +
+  conjugate-pairing 에서 구성하는 작업 (별도). 상세는 issue 0046 G2.6.
+
+### (2026-05-31, G2.6 PASS 2) (6.6) named conclusion `peterfalvi_66_coherence_of_X` + enum-cover bridge
+
+PASS 1 의 `coherentOfPairChainCover` (set-level cover `hcover` 를 opaque 가설로 받는 abstract assembler)
+를 (6.6) 의 실제 증명구조 — degree-monotone enumeration (mmd L76 "Set X = {χ₁,…,χₙ}, χ₁(1) ≤ ⋯ ≤
+χₙ(1)") 를 `coherentPairChain` accumulator 에 threading — 으로 끌어올려 **named (6.6) 결론**을 landing
+(`S07_Coherence.lean`, `coherentOfPairChainCover` 직후; sorry/axiom 無 —
+`#print axioms peterfalvi_66_coherence_of_X` = {propext, Classical.choice, Quot.sound}; AxiomsCheck
+등록 2건 각 3 axiom 全 allowlist; full `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360/3343 jobs):
+
+- **`pairUnion_eq_of_enumCover`** (genuinely new bridge): enum `e : Fin n → ClassFunction L ℂ` 의
+  *surjectivity* `hsurj : ∀ χ∈X, ∃ i, e i=χ` + **index-level** cover `hcoverIdx : ∀ i, e i ∈ S₀ ∨
+  ∃ j<N, e i ∈ pairSet pair j` ⟹ `pairUnion S₀ pair N = X`. `pairUnion_eq_of_cover` 의 set-level
+  cover 를 χ=e i 치환으로 index-level 에서 도출 — `exists_monotoneDegreeEnum` 가 `Fin n` 인덱스로
+  주는 사실들과 engine 의 set-level cover 사이의 connective tissue (PASS 1 note 의 residual
+  "threading the enum sort into the accumulator").
+- **`peterfalvi_66_coherence_of_X`** (`noncomputable def`, = G2.6 GOAL): enum `e`/`hsurj` (mmd L76
+  opening) + pair-chain decomposition (`S₀`/`pair`/`N`/`hS₀`/`hpairs` + index-cover `hcoverIdx`) +
+  base prefix coherence `h0` ((1.1)+(1.4)) + per-step (5.6) adjoining `hstep` (`retarget_isCoherent`)
+  ⟹ `IsCoherent τ X A` (mmd L84 "Repeated use of (5.6) shows X is coherent"). proof =
+  `pairUnion_eq_of_enumCover hsurj … ▸ coherentPairChain S₀ pair h0 N hstep`. `hXfin` 는 (6.6) X
+  유한성 (enum 존재 정당화).
+- **honest 판정**: thin wrapper 아님 — `coherentOfPairChainCover` 보다 (a) (6.6) named 결론을 textbook
+  altitude statement 로 제시, (b) `exists_monotoneDegreeEnum` 을 surjectivity 경유로 engine 에 연결
+  (set-level cover → index-level `hcoverIdx`). `h0`/`hstep`/decomposition 은 *공급* 데이터, 결론은
+  chain 으로 derived (posit 無).
+- **정밀 잔존 (G2.7, 불변)**: `hstep` 각 step 의 `retarget_isCoherent` 입력 중 **`{Xᵢ, X̄ᵢ}` target +
+  image equation + lattice 직교** 의 *구성* = **Dade isometry ν basis extension** (orthonormal set 의
+  ℤ-linear independence ⟹ free-module basis extension, repo/mathlib 부재). + decomposition data 를
+  enum + conjugate-pairing 에서 구성하는 작업 (conjugation-closed set 의 canonical pairing, 별도 leaf).
+  degree-inequality 측은 이미 landed (`two_mul_lt_sq_of_primePow_gap`/`sumInflatedDegreeSq`).
+
 ## §8 全結果表
 
 | # | mmd 行 | 種別 | Statement 概要 | 数学的意義 | 形式化難度 | §9-§16 被引用 |
@@ -661,3 +987,476 @@ structure CoherenceHypothesis ... where
 ---
 
 *作成: 2026-05-22. 出典: `references/peterfalvi/04.8_pp_30_37_Some_Coherence_Theorems.mmd` (243 行) + `04.7_pp_25_29_Coherence.mmd` (136 行). クロス参照確認済: §7 (5.1)-(5.9), (6.1)-(6.8) self-contained, §9 (7.1)-(7.6) 依存. Phase 2b 第 3 波着手予定は §7 完成後.*
+
+---
+
+## 追記 (2026-05-31): G2.7 gate 調査結論 + (5.2.d) `R(χ)` producer landing
+
+(6.6) `peterfalvi_66_coherence_of_X` / `coherentPairChain` の `hstep` (= G2.7 gate) について調査:
+
+**型レベルの honest verdict (Round-20 roadmap の「Dade wiring」判定を訂正)**: `hstep` 構成は Dade
+isometry の wiring **ではなく** genuine 新 infra。理由 — `IsCoherent`/`retarget_isCoherent`/
+`CharacterPsiDecomposition` は `IntegralCharacterMap L G = ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ`
+(全 class function 上の ℤ-線形, `L G` 独立群) で動くのに対し, `FullDadeIsometryData`/`DadeMap`
+(`OddOrder/Peterfalvi/S04_DadeIsometry.lean`) は `SupportedClassFunctions ℂ A L → ClassFunction G ℂ`
+(supported 部分加群上のみの bare 関数, `L : Subgroup G`) で**別型**。各 step が要求する running
+`τ₁ = hS₁.extension` (χᵢ 含む `Z[S₁]` 全体への isometry) は固定 Dade τ から得られず, mmd 04.8
+L156/L166 通りこの lattice isometry の存在こそ (5.6)/(6.6) の結論 (FT では `dim CF(L) > dim CF(G)`
+で大域 isometry 不在)。`CharacterPsiDecomposition` は repo 内 constructor 皆無,
+`isometry_difference_pair_structure` も適用例皆無で §7↔§3 が断絶していた。
+
+**landed (G2.7 最基礎 brick, sorry-free, axioms 3 個 allowlist; `S07_Coherence.lean`)**: (5.2.d)
+`R(χ)` の producer。§3 (1.4) keystone `isometry_difference_pair_structure` の初の実 consumer。
+
+- `characterDifferenceImageOfIsometry` — `τ`, non-real irreducible `χ`, family `{χ,χ̄}` 上の (1.4)
+  三仮定から `CharacterDifferenceImage τ χ` を**構成** (`Exists.choose` で signed irreducible
+  difference を抽出, `image_eq : τ(χ−χ̄)=ε•(μ−ν)`)。従来 constructor 無しで全 §7 補題が仮定取りして
+  いた欠落を埋める。`toOrthonormalImage` 経由で orthonormal `R(χ)` (`OrthonormalCharacterImageFamily`)
+  へ持ち上がる。
+- 補助: `conjIrreducibleCharacter`/`conjPairFamily`/`coe_conjIrreducibleCharacter`,
+  `irreducibleCharacter_conj_apply_one` (`χ̄(1)=χ(1)`, 指標値 at 1 = 自然数 ⟹ 共役不変)。
+
+詳細・残作業 (running `τ₁` 配線 + `CharacterPsiDecomposition` constructor) は issue 0046 の進捗節
+(2026-05-31) 参照。
+
+### G2.7 PASS 2 (2026-05-31): (5.6.3) target pair `{X, X̄}` を (5.5) から構成
+
+PASS 1 で genuine 新 infra と判定した G2.7 のうち **source-independent な layer** =
+`retarget_isCoherent` の `{X, X̄}` block を `CharacterPsiDecomposition τ χ 0` から **構成** (posit 無)。
+sorry/axiom 無, AxiomsCheck 登録 2 件 (3 axioms 全 allowlist), commit c6df07e。
+
+- **`CharacterPsiDecomposition.RetargetTargetPair` + `.retargetTargetPair`**: irreducible `χ`
+  (`‖χ‖²=1`) の (5.5) 分解 + source-pair orthonormality から `X := D.X`, `X̄ := D.X − (χ−χ̄)^τ` の
+  orthonormal pair (`‖X‖²=‖X̄‖²=1`, `⟨X,X̄⟩=0`, 両者 ∈ `ℤ[Irr G]`)。**`|R(χ)|=‖χ−χ̄‖²=2` を
+  `tau1_agrees`+τ₁-isometry で導き, `|E|=‖χ‖²=1` (5.5) と合わせ `‖X̄‖²=|R(χ)|−|E|=1`**。
+- **`retarget_isCoherent_of_decomposition`**: `{X,X̄}` を data でなく `D` から構成して
+  `retarget_isCoherent` に投入 ⟹ `IsCoherent (S₁∪{χ,χ̄}) A`。残仮説は **running `τ₁` 結合の 2 つ**
+  (`hX_ortho`/`hXbar_ortho` = (5.2.e) cross-orthogonality, `himg` = (5.6.2) image eq) のみに精密化。
+
+**Round-20 roadmap の反証**: 「Gram–Schmidt / free-module basis-extension 欠落 primitive が必要」は
+**誤り**。irreducible `χ` では `|E|=1` ゆえ `X` は単一 R(χ) 元, target pair は FORCED で rescaling
+不要。真の残 gap は orthonormalization でなく **(a) `CharacterPsiDecomposition` instance の構成
+(auxiliary `tau1` が running τ と `χ−χ̄` 上一致), (b) `hX_ortho`/`himg` の running-`τ₁` 放電**。
+両者は `hS₁.extension` に本質依存し固定 Dade τ から出ない (PASS 1 型ミスマッチ判定通り)。
+
+### G2.7 PASS 3 (2026-05-31): Dade isometry を (5.1) base map `τ` として実体化 (type-bridge)
+
+PASS 1/2 で「§4 Dade map (`SupportedClassFunctions ℂ A L → ClassFunction G ℂ`, bare partial,
+`L : Subgroup G`) と §7 `IntegralCharacterMap L G := ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ`
+(total ℤ-linear, `L G : Type*`) は別型」と判定した残 gap のうち, **base map `τ` 側の type-bridge を
+構成** (posit 無, sorry/axiom 無, AxiomsCheck 登録 3 件 全 allowlist)。
+
+**mmd 04.7 L3 (5.1) Definition の決定的読解**: coherence の base map `τ` は「`Z[S,A] ⊂ E ⊂ Z[Irr L]`
+上の `ℤ`-linear isometry」で, (5.6.3) (mmd L101) は `τ` を **supported sublattice `Z[S₁,L^#]` および
+差 `χ−aχ₁`, `χ−χ̄` 上で直接**使う。すなわち §4–§16 では **`τ` = §4 Dade isometry** (が supported span
+上で). Lean `IsCoherent τ S A` はこれを忠実に符号化: `τ` を制約するのは `extends_on_supported`
+(`zSupportedSpan S A` 上で `extension = τ`) **のみ**で, supported span 外の `τ` 値は一切 inspect
+されない。**roadmap の Q1「τ は別 running isometry」判定は `τ` と `extension` を混同したもので,
+正しくは Q2 (= τ は Dade isometry, supported span 上で一致する bridge が必要)**。
+
+- **`Hypothesis.dadeLinearMap` (S04)**: bare `DadeMap` (`hyp.dadeMap`) を `ℂ`-linear map
+  `CF(L,A) →ₗ[ℂ] CF(G)` として package。`dadeValue α g = α(a)` (固定基点 `a` での **評価**, support 外 0)
+  ゆえ `α` について `ℂ`-linear。`map_add'`/`map_smul'` は `dadeValue_eq`/`dadeValue_of_not_mem` の
+  case 分け + 係数加群 coe の `rfl`。
+- **`dadeIntegralCharacterMap` (S07)**: `LinearMap.exists_extend` (体 `ℂ` 上の部分空間の分裂) で
+  `dadeLinearMap` を `CF(L) →ₗ[ℂ] CF(G)` に延長 → `restrictScalars ℤ` で `IntegralCharacterMap ↥L G`。
+  **延長は非標準 (complement 任意) だが無害**: supported span 外は coherence が見ない。
+- **`dadeIntegralCharacterMap_apply_of_support`**: 定義性質 = supported subspace (`φ.support ⊆
+  supportInSubgroup A L`) 上で lift = Dade map (`hyp.dadeMap ⟨φ,_⟩`)。`LinearMap.exists_extend` の
+  `g ∘ subtype = dadeLinearMap` を `congr_fun` で評価。**これが (5.6.3) の `τ` on `Z[S,L^#]` を
+  実 §4 isometry から供給する**。
+
+**型整合**: S07 の `L G : Type*`, `A : Set L` を `↥L_subgroup`, `supportInSubgroup A_G L` で具体化。
+`zSupportedSpan S (supportInSubgroup A_G L)` の元は `support ⊆ supportInSubgroup A_G L` を満たし
+`dadeIntegralCharacterMap_apply_of_support` の仮説に直結。
+
+**PASS 3 後の残 (hstep の (5.6.2) image eq 本体)**: `peterfalvi_66_coherence_of_X` の `hstep` を
+`retarget_isCoherent_of_decomposition` で放電するには, `τ = dadeIntegralCharacterMap` に対し
+`himg : τ(χ−aχ₁) = D.X − a•hS₁.extension χ₁` ((5.6.2) `Y = aχ₁^{τ₁}`) を組む必要。(5.6.2) capstone
+`lambda_eq_zero_and_Z_eq_zero` (`λ=0 ∧ Z=0`) は landed なので, 残は **(5.6.1) の λ-係数分解 `hY`
+(= `Y = ∑ᵢ(a[i=i₁]−λ·rᵢ)•χᵢ^{τ₁} + Z`) を実際の Dade τ・running `τ₁ = hS₁.extension` から導き,
+`λ=0,Z=0` を代入して `Y = a•χ₁^{τ₁}` → `himg`** の assembly (wiring でなく (5.6.1) 本体, PASS 4+)。
+これは `D.tau1`↔`hS₁.extension` 結合と (5.6.1) の cross-difference 計算を要し本質的に hard。
+
+### G2.7 PASS 4 (2026-05-31): (5.6.2) image-equation supplier `himg` を *構成* + end-to-end 組立器
+
+PASS 3 後の残 (`himg` を **posit せず構成**) を解消。`peterfalvi_66_coherence_of_X` の `hstep` が
+Dade-isometry targets から放電可能になった (posit 無, sorry/axiom 無, AxiomsCheck 登録 2 件 全
+allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑)。
+
+**verdict 再確認 (mmd 04.7 (5.6.2)/(5.6.3) 精読)**: `retarget_isCoherent` の `himg : τ(χ−aχ₁) =
+X − a·τ₁χ₁` は **(5.6.1)+(5.6.2) そのもの** — `(χ−aχ₁)^τ = X−Y` の `R(χ)`-射影 + 整数強制 `λ=0` で
+`Y = a·χ₁^{τ₁}`。これは free wiring でなく (5.6) の核。`τ₁ = hS₁.extension` は (5.6.3) の "τ₂ が `τ` と
+`Z[S₁,L^#]`, `χ−aχ₁`, `χ−χ̄` 上で一致" の running isometry。`τ` (LHS) は Dade isometry (supported span 上)。
+
+- **`image_eq_of_decomposition`** (= (5.6.2) image-eq supplier): `himg` を (5.4)/(5.6.1) decomposition
+  `D : CharacterPsiDecomposition τ χ (a·χ₁)` と 3 honest 入力から *構成*:
+  - `htau1_diff : D.tau1 (χ−a·χ₁) = τ (χ−a·χ₁)` — (5.4) auxiliary isometry `D.tau1` が supported
+    difference 上で `τ` (Dade map) と一致 (mmd (5.4) "τ₁ coincides with τ on `Z[χ−ψ, χ−χ̄]`");
+  - `hY : D.Y = a • D.tau1 χ₁` — (5.6.2) 結論 `Y = a·χ₁^{τ₁}` (λ=0/Z=0 後);
+  - `htau1_chi1 : D.tau1 χ₁ = hS₁.extension χ₁` — `D.tau1` が running coherence 拡張と `χ₁∈S₁` で一致。
+  proof は 1 行: `rw [← htau1_diff, D.tau1_image, hY, htau1_chi1]` (連鎖
+  `τ(χ−aχ₁) = D.tau1(χ−aχ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁`)。
+  **これが §4↔§7 結合点の正準形**: Dade-isometry 側は `htau1_diff` の RHS `τ(χ−aχ₁)` で入る
+  (= supported difference の §4 Dade 像, `dadeIntegralCharacterMap_apply_of_support` で具体化可能)。
+- **`retarget_isCoherent_of_decompositions`** (= 完全 per-step adjoining, `himg` 内部放電):
+  (6.6)/(6.8) `coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` の
+  **単一入口**。(5.5) decomposition `D₀ : CharacterPsiDecomposition τ χ 0` (orthonormal pair
+  `{D₀.X, X̄}` 用) と (5.6.1) decomposition `Da : CharacterPsiDecomposition τ χ (a·χ₁)` (himg 用),
+  共通射影 `hX_eq : Da.X = D₀.X` ((5.6.2) 同定) を取り, `retargetTargetPair` で pair 構成 +
+  `image_eq_of_decomposition` で `himg` 内部放電 → `retarget_isCoherent_of_decomposition` に委譲。
+  `pairSet pair i = {(pair i).1, (pair i).2}`, `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪
+  pairSet pair i` ゆえ `hstep` target に直結。
+
+**PASS 4 後の残 (この round 範囲外, (5.4)/(5.6.1) 本体 content; wiring 部分は完了)**:
+1. 各 step の **decomposition `D₀`/`Da` の生産** — (5.4) auxiliary isometry `D.tau1` (Dade `τ` と
+   supported diff 上一致, running `τ₁` と `S₁` 上一致) の構成。
+2. **(5.6.2) `hY` の導出** — (5.6.1) λ-係数分解を `lambda_eq_zero_and_Z_eq_zero` に流す cross-difference
+   計算 (`crossDifference_inner` 系で source 側は landed, image 側 `χᵢ^{τ₁} ⊥ R(χ)` の (5.5)+(5.2.e)
+   結合が残)。capstone 自体は landed。
+3. **`Da.X = D₀.X` の (5.6.2) 同定** — 2 射影が同一 `∑_{α∈E}α` になること (`a·χ₁^{τ₁} ⊥ R(χ)` ゆえ)。
+
+### G2.7 Round 23 PASS 1 (2026-05-31): (5.6.3) 射影同定 `Da.X=D₀.X` + (5.5)+(5.2.e) image-side orthogonality を *構成*
+
+PASS 4 末尾の残 3 (`Da.X=D₀.X` 同定) と残 2 の image 側 (`χᵢ^{τ₁} ⊥ R(χ)` 結合の reduction) を解消。
+`retarget_isCoherent_of_decompositions` から **3 つの opaque 仮説** (`hX_eq`, `hX_ortho`, `hXbar_ortho`)
+が消え, genuine な (5.5)/(5.6.2)/(5.2.e) data から *構成*されるようになった (posit 無, sorry/axiom 無,
+AxiomsCheck 4 件 新規 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3360 jobs;
+commits 32a8c37 / e340467)。
+
+- **(a)+(c) 射影同定 `Da.X = D₀.X`** (`CharacterPsiDecomposition` namespace):
+  - `X_eq_tau1_chi_of_Y_eq` : (5.6.2) collapse `hY : Da.Y = a·χ₁^{τ₁}` から `Da.X = Da.tau1 χ`
+    (= χ^{τ₁})。proof は `Da.tau1 (χ−a·χ₁) = Da.X − Da.Y = Da.X − a·χ₁^{τ₁}` (tau1_image, hY) と
+    線形性 `= χ^{τ₁} − a·χ₁^{τ₁}` (map_sub, map_nsmul) を `sub_left_inj` で相殺。`a : ℕ` 必須
+    (map_nsmul)。これが (5.6.3) の「X が ψ に依らない」核。
+  - `X_eq_of_tau1_eq_on_chi` : `Da.X = Da.tau1 χ` (上) + `Da.tau1 χ = D₀.tau1 χ` (τ₁-agreement,
+    honest 入力) + `D₀.tau1 χ = D₀.X` (eq_sum_of_psi_eq_zero, (5.5)) を連鎖し `Da.X = D₀.X`。
+  - **`retarget_isCoherent_of_decompositions`**: posit していた `hX_eq : Da.X = D₀.X` を, より原始的な
+    honest 入力 `htau1_chi : Da.tau1 χ = D₀.tau1 χ` (両 decomposition が running τ₁ を χ で同一評価) に
+    置換し, `hX_eq` を `X_eq_of_tau1_eq_on_chi` で内部導出。
+- **(b) image-side orthogonality `X, X̄ ⊥ τ₁ξ`** (`CharacterPsiDecomposition` namespace):
+  - `inner_X_eq_zero_of_orthogonal_imageSet` : per-element `∀α∈R(χ), ⟨η,α⟩=0` ⟹ `⟨η, X⟩=0`,
+    via `X_eq : X = ∑ coeff•α` + `inner_sum_right`/`inner_smul_right`。
+  - `inner_conjImage_eq_zero_of_orthogonal_imageSet` : 同様に `⟨η, X̄⟩=0` (X̄ = X−(χ−χ̄)^τ;
+    `(χ−χ̄)^τ = ∑_{α∈R(χ)}α` ゆえ X̄ も ℤ[R(χ)])。
+  - **`retarget_isCoherent_of_decompositions`**: posit していた sum-level `hX_ortho`/`hXbar_ortho` を
+    単一 per-element 入力 `hperElem : ∀ξ∈ℤ[S₁], ∀α∈R(χ), ⟨τ₁ξ, α⟩=0` (genuine (5.5)+(5.2.e) fact;
+    残るは family `{R(χᵢ)}` への結合のみ) に置換し, 両者を内部導出。
+
+**Round 23 PASS 1 後の残 (この round 範囲外)**: `retarget_isCoherent_of_decompositions` に残る
+posited-conclusion 系仮説は **`hY : Da.Y = a·Da.tau1 χ₁` ((5.6.2) collapse 出力) ただ 1 つ**。これは
+(5.6.1) の `Y` を基底 `{χᵢ^{τ₁}} ∪ {直交補}` に展開した form (= (5.6.1) 存在主張, projection 存在を要する)
+を `lambda_eq_zero_and_Z_eq_zero` (landed) に流して得る。残は: ① 各 step の `D₀`/`Da` 生産 ((5.4)
+auxiliary isometry `D.tau1` を Dade τ + running τ₁ から構成), ② (5.6.1) form の存在 (Y の R(χ)/{χᵢ^τ₁}
+分解), ③ `hperElem` の family `{R(χᵢ)}` 結合 ((5.2.e) を extension 像へ)。①②③ が揃えば hstep 完全放電。
+
+### G2.7 Round 23 PASS 2 (2026-05-31): residual (b) `hperElem` を per-member (5.5)+(5.2.e) data から完全構成
+
+PASS 1 末尾の残 ③ (`hperElem` の family `{R(χᵢ)}` 結合) を解消。`hperElem` は
+`retarget_isCoherent_of_decompositions` の **最後の image-side opaque 仮説**だったが, honest per-member
+(5.5)+(5.2.e) data から *構成* (posit せず) できるようになった。これは mmd L77 一行
+「χᵢ^{τ₁} is orthogonal to R(χ) by (5.5) and (5.2.e)」を members → ℤ[S₁] へ lift したもの (sorry/axiom 無,
+AxiomsCheck 4 件 新規 全 allowlist; `lake build OddOrder`/`OddOrder.AxiomsCheck` 緑 3343 jobs; commit 8c48fe7)。
+
+- `CharacterPsiDecomposition.inner_X_orthogonal_imageSet_of_orthogonal` : (5.2.e) feed。
+  `X = D.X ∈ ℤ[R(χ')]` が `R(χ')⊥R(χ)` (`D.imageFamily.Orthogonal R₀`) なら 各 `α∈R(χ)` と直交。
+  `⟨X,α⟩ = ∑ coeff·⟨β,α⟩ = 0` (`X_eq` + `inner_sum_left` + `Orthogonal.inner_eq_zero`)。
+  PASS 1 の `inner_X_eq_zero_of_orthogonal_imageSet` の双対 (左因子が X, 右が外部 family R₀ の元)。
+- `inner_extension_member_orthogonal_imageSet` : per family member `χ'∈S₁`。その ψ=0 decomposition
+  `D'` (⟹ `χ'^{τ₁'}=D'.X` by (5.5), `eq_sum_of_psi_eq_zero`) + `R(χ')⊥R(χ)` (5.2.e) + running
+  agreement `D'.tau1 χ'=hS₁.extension χ'` から `⟨hS₁.extension χ', α⟩ = ⟨D'.tau1 χ', α⟩ = ⟨D'.X, α⟩ = 0`。
+- `inner_extension_orthogonal_imageSet_of_members` : span induction (`mem`/`zero`/`add`/`smul`) で
+  per-member 直交性を全 `ξ∈ℤ[S₁]` へ lift。extension の ℤ-線形性 (`map_zsmul`) + `⟨·,α⟩` の
+  ℤ-線形性 (`inner_add_left`/`inner_smul_left` via `Int.cast_smul_eq_zsmul`)。
+- `retarget_isCoherent_of_decompositions_and_memberFamily` : **完全** (5.6.3) per-step adjoining で
+  `hperElem` も内部放電。`hperElem` を per-member family `{Dmem, hmemOrtho, hmemTau1}` で置換し
+  上 2 lemma で導出 → `retarget_isCoherent_of_decompositions` に委譲。**(5.6.3) の image-side 入力が
+  全て genuine Dade-map / running-extension fact に帰着** — coupling は一切 posit されない。
+
+**Round 23 PASS 2 後の残 (image-side (b)+(c) は完了)**: 残るは **source-side のみ** — ① `hY : Da.Y =
+a·Da.tau1 χ₁` ((5.6.2) collapse 出力; (5.6.1) λ-form の cross-difference 計算を landed
+`lambda_eq_zero_and_Z_eq_zero` に流す本体), ② 各 step の `D₀`/`Da`/`Dmem` 生産 ((5.4) auxiliary isometry
+`D.tau1` を Dade `τ` と supported-diff 上で一致させる構成)。①② は wiring でなく (5.4)/(5.6.1) 本体 content。
+これらが揃えば (6.6) `peterfalvi_66_coherence_of_X` の `hstep` が Dade isometry から完全放電。
+
+### G2.8 Round 24 PASS 1 (2026-05-31): source-side ① `hY` producer を (5.6.1) λ-form から完全構成
+
+Round 23 PASS 2 末尾の source-side 残 ① (`hY : Da.Y = a·Da.tau1 χ₁` の生産) を解消。これまで `hY` は
+`X_eq_tau1_chi_of_Y_eq` / `image_eq_of_decomposition` / `retarget_isCoherent_of_decompositions[_and_memberFamily]`
+の 4 箇所で **消費** されるが, どこからも **生産** されていなかった (= source-side の唯一の posited-conclusion)。
+これを (5.6.1) λ-form + landed `lambda_eq_zero_and_Z_eq_zero` から *構成* (posit せず)。sorry/axiom 無
+(`#print axioms` = propext/Classical.choice/Quot.sound のみ), AxiomsCheck 1 件 新規 全 allowlist;
+`lake build OddOrder` 緑 3360 jobs / `OddOrder.AxiomsCheck` 緑 3343 jobs。
+
+- `CharacterPsiDecomposition.Y_eq_nsmul_tau1_of_lambdaForm` : (5.6.1)→(5.6.2) の `Y`-collapse 本体。
+  入力 = (5.6.1) λ-form `hYform : D.Y = (a:ℂ)•χ₁^{τ₁} − (lam:ℂ)•∑ᵢ(rcᵢ:ℂ)•vcᵢ + Z`
+  (`vc i = χᵢ^{τ₁}`, `vc i₁ = D.tau1 χ₁`, `rc i = aᵢ/‖χᵢ‖²`, `mc i = ‖χᵢ‖²`), 直交 gram `horth`,
+  `Z` の family 直交性 `hZ`, 教科書仮説 `hψ` (‖ψ‖²=a²‖χ₁‖²) / `hr₁` (a₁=1 ⟹ rc·mc=1) / `hD`
+  (degree (c) `2a < ∑(aᵢ/‖χᵢ‖²)²‖χᵢ‖²`)。本体: ① λ-form を capstone の pointwise-coeff form
+  `∑ᵢ(a[i=i₁]−λrcᵢ)•vcᵢ + Z` に bridge (`sub_smul`/`Finset.sum_sub_distrib`/`Finset.sum_ite_eq'`/
+  `Finset.smul_sum` + `module`), ② `lambda_eq_zero_and_Z_eq_zero` で λ=0 ∧ Z=0, ③ λ-form に戻し
+  `(a:ℂ)•χ₁^{τ₁} = a•χ₁^{τ₁}` (`Nat.cast_smul_eq_nsmul`) → `D.Y = a • D.tau1 χ₁` (= `hY`)。
+
+**Round 24 PASS 1 後の残 (source-side ① 完了)**: 残るは source-side ② のみ — 各 step の `D₀`/`Da`/`Dmem`
+**instance 生産** ((5.4) auxiliary isometry `D.tau1` を Dade `τ` + running `τ₁ = hS₁.extension` から構成し,
+τ₁-image を `OrthonormalCharacterImageFamily R(χ)` に projection して X−Y split を作る; (5.6.1) λ-form
+`hYform` 自体の供給も含む)。これは projection infra ((5.6.1) の Y 分解存在 = 有限正規直交族への直交射影) を
+要し, PASS 2 の対象。② が揃えば (6.6) `peterfalvi_66_coherence_of_X` の `hstep` が Dade isometry から
+完全放電し, coherence-of-X が実 Dade isometry で instantiable。
+
+### G2.9 Round 24 PASS 2 (2026-05-31): integral 直交射影 primitive + ofProjection 構成子
+
+PASS 1 末尾の source-side ② のうち **projection infra (有限 ZIrr-正規直交族への整数係数直交射影)** を解消し,
+D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive に縮約する seam を landed。sorry/axiom 無
+(`#print axioms` = propext/Classical.choice/Quot.sound のみ), AxiomsCheck 2 件 新規 全 allowlist;
+`lake build OddOrder` 緑 3360 jobs / `OddOrder.AxiomsCheck` 緑 3343 jobs。
+
+- `ClassFunction.exists_intProjection_of_orthonormal_ZIrr` (InducedCharacter.lean) : **整数係数直交射影**
+  本体。`φ ∈ ZIrr G` + 有限 ZIrr-正規直交族 `R` (`∀α∈R, α∈ZIrr G` + orthonormal) から *整数* 係数
+  `c α = ⟨φ,α⟩` (整数性は `inner_mem_ZIrr_int` ← R⊆ZIrr) + 直交残差 `Y = φ − ∑c•α ⊥ R` を生産。
+  `φ = (∑c•α) + Y`, `⟨Y,α⟩ = ⟨φ,α⟩ − ⟨X,α⟩ = c α − c α = 0` (orthonormal coeff recovery)。
+  これが (5.4)/(5.5)/(5.6.1) の **X-side (整数 ℤ[R(χ)]) / Y-side / coeff** を供給する genuine primitive。
+  係数整数性 (signed-irreducible family R(χ) ⊆ ZIrr 上) が load-bearing, Y 直交性は純線型代数。
+- `CharacterPsiDecomposition.ofProjection` (S07) : **smart constructor**。`CharacterPsiDecomposition`
+  の hard 6 fields (`X`/`Y`/`tau1_image`/`coeff`/`X_eq`/`Y_orthogonal`) を 単一 number-theoretic input
+  `htau1_mem : (χ−ψ)^{τ₁} ∈ ZIrr G` から上 projection で *計算* 供給。`X := ∑c•α`,
+  `Y := −((χ−ψ)^{τ₁} − X)` で `tau1_image : (χ−ψ)^{τ₁} = X − Y` は純 algebra (`sub_neg_eq_add; abel`)。
+  残 input = structural data のみ: `imageFamily` (R(χ); Dade data / §3 keystone),
+  `tau1`+`htau1_isom`+`htau1_agrees` ((5.4) auxiliary isometry), 3 直交スカラー
+  `⟨χ,ψ⟩=⟨χ̄,ψ⟩=⟨χ,χ̄⟩=0`。`htau1_mem` は IntegralCharacterMap の ℤ-線型性からは導けない genuine input
+  (nominal "integral"; 実 Dade map / 拡張のみが ZIrr→ZIrr; carried property)。
+
+**Round 24 PASS 2 後の残 (projection infra 完了)**: D₀/Da/Dmem 完全生産に残る 2 primitive は純構成 (本 round
+範囲外, projection は seam として landed):
+1. **Dade R(χ) 抽出**: `dadeIntegralCharacterMap` から各 χ∈S₁∪{χ} の `OrthonormalCharacterImageFamily`
+   を読み出す (irreducible は `characterDifferenceImageOfIsometry` + `toOrthonormalImage`;
+   reducible は Thm 4.9 経由)。
+2. **τ₁ isometry 拡張**: 非実 χ で `χ−χ̄` の像を 2 次元格子 `ℤ[χ,χ̄]` 上の full isometry に拡張し
+   τ (Dade) と差で, running τ₁ = hS₁.extension と S₁ で一致させる構成 (2D Gram–Schmidt; ZIrr→ZIrr 保存
+   = `ofProjection` の `htau1_mem` 供給)。これは from-scratch isometry-extension primitive で未実装。
+
+1+2 が揃えば `ofProjection` で D₀/Da/Dmem 完成 → `Y_eq_nsmul_tau1_of_lambdaForm` (PASS 1) で `hY`,
+`retarget_isCoherent_of_decompositions_and_memberFamily` で (6.6) `hstep` 完全放電。
+
+**Round 24 PASS 2 (final) (2026-05-31) — per-step D₀/Da 生産パッケージ + 残の精密化**:
+- `CharacterPsiDecomposition.decompositionPair` (S07) : *同一* shared `(R(χ), τ₁, isom, agrees)` +
+  2 つの `ZIrr`-membership `(χ−0)^{τ₁}, (χ−a·χ₁)^{τ₁} ∈ ℤ[Irr G]` から `ofProjection` を 2 回呼び
+  D₀ (ψ=0) と Da (ψ=a·χ₁) を **同時生産** (`Prod`)。両者 `.tau1` が同一 `tau1` ゆえ
+  `Da.tau1 χ = D₀.tau1 χ` は構造的 `rfl` (`decompositionPair_tau1_agree`)。`a·χ₁` 直交性
+  `⟨χ, a·χ₁⟩ = a·⟨χ,χ₁⟩ = 0` は nsmul→ℂ-smul 変換 (`Nat.cast_smul_eq_nsmul` + `inner_smul_right`)。
+- `retarget_isCoherent_of_sharedDecomposition` (S07) : (5.6.3) per-step coherence entry point。
+  shared isometry data を取り pair を内部生産し `htau1_chi` を構造的放電 →
+  `retarget_isCoherent_of_decompositions_and_memberFamily` に委譲。`hmemOrtho` は
+  `D₀.imageFamily = imageFamily` (definitional; `ofProjection` が `imageFamily := imageFamily`) ゆえ
+  `Orthogonal imageFamily` で型整合。残 input は genuine Dade/running-extension facts
+  (per-member family Dmem/hmemOrtho/hmemTau1, (5.6.2) collapse hY, 各 agreement)。
+  これで per-step「ad-hoc 2 decomposition 供給 + τ₁ 共有 *主張*」義務を除去。
+
+**精密化した唯一の真の残 — global-vs-lattice isometry mismatch (本 round で確定)**: (6.6) hstep の
+*完全放電* の唯一の blocker は roadmap が「② τ₁ 2D Gram–Schmidt 拡張」と呼んだもの **だが、その global
+版は FT で構成不能 (statement が false)**:
+- `CharacterPsiDecomposition.tau1_isometry` は **global** `IsIntegralIsometry tau1`
+  (`∀ φ ψ : CF(L), ⟨τ₁φ,τ₁ψ⟩ = ⟨φ,ψ⟩`, CF(L) 全体) を要求。
+- だが Dade 等距 (`IsDadeIsometry`/`FullDadeIsometryData`) は **supported subspace `CF(L,A)` 上のみ**
+  isometric (`inner_eq : ∀ α β : SupportedClassFunctions A L, …`)。`dadeIntegralCharacterMap` の
+  `LinearMap.exists_extend` 拡張は off-support で非等距。
+- かつ FT では `dim CF(L) > dim CF(G)` ゆえ **global isometry CF(L)→CF(G) は一般に存在しない**
+  (`IsCoherent` docstring S07 L1023 が明言; だから `IsCoherent` は lattice-relative
+  `extension_inner_eq` を採用)。`retarget_isIntegralIsometry` (S07 L2023) も *global* τ₁ を要求し
+  global を産出する — retarget chain 全体が global 前提。
+- 健全な修正: `tau1_isometry` を `ℤ[χ−ψ, χ−χ̄]` 上の **lattice-relative isometry** に弱める。使用は
+  `inner_self_chi_eq_sum_coeff` (L904)/`inner_self_chi_add_psi_eq` (L971)/`RetargetTargetPair`
+  builder (L1838) の 3 箇所のみ、いずれも差分対 `{χ−ψ,χ−χ̄}` でしか `inner_eq` を使わない (weakening 健全)。
+  ただし `CharacterPsiDecomposition` 構造体 + 3 内部証明 + `ofProjection` + `decompositionPair` +
+  `retarget_isIntegralIsometry` (+ retarget chain 全体) に cascade する大規模・高リスク refactor で
+  別 round 推奨。①Dade R(χ) 抽出は②の lattice-relative 化が前提。
+
+### G2.10 Round 25 (2026-05-31): `tau1_isometry` lattice-relative 化 (Round-13 原理の適用) 完了
+
+上記 Round-24 PASS 2 (final) の「精密化した唯一の真の残 — global-vs-lattice isometry mismatch」を解消。
+Round-13 (pass 5, commit b14a987) で `IsCoherent.extension_isometry` を lattice-relative に弱めたのと
+**同一の原理** (USER 永続承認) を `CharacterPsiDecomposition.tau1_isometry` に適用。sorry/axiom 無
+(`#print axioms` 不変 = propext/Classical.choice/Quot.sound), AxiomsCheck 件数不変 (S07 既存 5 件
+全 3 axiom allowlist 内); `lake build OddOrder` 緑 3360 jobs / `OddOrder.AxiomsCheck` 緑 3343 jobs。
+
+- **field 弱化** (S07 構造体 `CharacterPsiDecomposition`):
+  `tau1_isometry : IsIntegralIsometry tau1` (global, CF(L) 全体) →
+  `tau1_inner_eq_on_support : ∀ φ ζ : CF(L), φ ∈ zSpan {χ, χ.conj, ψ} → ζ ∈ zSpan {χ, χ.conj, ψ} →
+  ⟨τ₁ φ, τ₁ ζ⟩ = ⟨φ, ζ⟩`。Round-13 の `extension_inner_eq` と完全並行 (sponsoring lattice が
+  S→{χ, χ̄, ψ} に変わるだけ)。FT で `dim CF(L) > dim CF(G)` ゆえ global 等距は一般不在; Dade 等距/
+  running extension は supported sublattice `ℤ[χ, χ̄, ψ]` 上でのみ inner 保存 — それが全使用に充分。
+- **新規 helper 2 件** (membership cert): `chi_sub_conj_mem_zSpan_support` (`χ−χ̄ ∈ zSpan {χ,χ̄,ψ}`) /
+  `chi_sub_psi_mem_zSpan_support` (`χ−ψ ∈ zSpan {χ,χ̄,ψ}`), 各 `Submodule.sub_mem` +
+  `Submodule.subset_span (by simp)` の 4 行。
+- **blast radius 実測 (前 note の見積りを訂正)**: field アクセスは `.inner_eq` 経由 **3 箇所のみ** —
+  `inner_self_chi_eq_sum_coeff` (L904, 引数 `(χ−ψ, χ−χ̄)`)/`inner_self_chi_add_psi_eq` (L971, 引数
+  `(χ−ψ, χ−ψ)`)/`retargetTargetPair` 内 `hχχbar_equiv_card_R` (L1838, 引数 `(χ−χ̄, χ−χ̄)`)。各 rewrite に
+  上 helper を cert として渡すのみ。構造分解・pattern-match 無。
+- **`retarget_isIntegralIsometry` は blast radius 外 (前 note の「retarget chain 全体に cascade」は誤り)**:
+  S07 L2023 の `retarget_isIntegralIsometry` は struct field を経由せず **standalone global `τ₁` 仮説**
+  (`hτ₁ : IsIntegralIsometry τ₁`) を取り global retarget を産む *別系統* で、本 refactor と完全独立・不変。
+  global `τ₁` を扱う retarget chain は `CharacterPsiDecomposition.tau1` の lattice-relative 化と直交。
+- **constructor 供給**: `ofProjection` は入力 `htau1_isom : IsIntegralIsometry tau1` (global) を保持し
+  field を `fun φ ζ _ _ => htau1_isom.inner_eq φ ζ` で供給 (global→lattice は健全な特殊化)。
+  `decompositionPair`/`retarget_isCoherent_of_sharedDecomposition` の global 入力も変更不要。
+- **supply-ability (= Round-24 (ii) per-step D production の構造的 unblock)**: 弱化は field レベルのみ
+  ⟹ 構造体に *global isometry を要求する field が皆無* (唯一だった `tau1_isometry` を除去)。よって将来の
+  per-step D₀/Da 生産者が `tau1` を **Dade 等距 + running `IsCoherent.extension`** から組む際 (extension は
+  lattice-relative `extension_inner_eq` しか証明し得ず global 等距は不在)、`tau1_inner_eq_on_support` を
+  直接供給して `CharacterPsiDecomposition` を *手構成* 可能に。`IsCoherent` 自身の構成と完全に並行する形で、
+  ②「τ₁ 2D Gram–Schmidt 拡張」を *global ではなく lattice-relative* な達成可能形へ確定した。残 = ①Dade
+  R(χ) 抽出 (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) のみ。
+
+### G2.10 Round 25 PASS 2 (2026-05-31): constructor 弱化 + supply-ability 橋 + per-step D 生産者
+
+PASS 1 (commit 8577211) は *field* `tau1_inner_eq_on_support` のみ弱化し、constructor の入力は global
+`htau1_isom : IsIntegralIsometry tau1` のままだった (上 PASS-1 note の「constructor 供給」参照、`fun φ ζ _ _
+=> htau1_isom.inner_eq φ ζ` で global を捨てて field を供給)。**だが「Dade 等距から per-step D を組む」には
+constructor 自身が lattice-relative 入力を受理せねばならない** — Dade 等距は global isometry を *供給し得ない*
+(supported `CF(L,A)` 上のみ isometric, FT で `dim CF(L) > dim CF(G)`)。PASS 2 でこの最後のギャップを解消し、
+Round-24 (ii) per-step `(D₀, Da)` production を **実 Lean で**閉じた。sorry/axiom 無; full
+`lake build OddOrder` / `OddOrder.AxiomsCheck` 緑; 新規 3 定義全 3 axiom allowlist 内。
+
+- **constructor cascade** (S07): `ofProjection` / `decompositionPair` / `decompositionPair_tau1_agree` /
+  `retarget_isCoherent_of_sharedDecomposition` の `htau1_isom : IsIntegralIsometry tau1` 入力を
+  lattice-relative `htau1_inner_eq : ∀ φ ζ ∈ zSpan {χ, χ̄, ψ}, ⟨τ₁ φ, τ₁ ζ⟩ = ⟨φ, ζ⟩` に置換。
+  `decompositionPair` は 2 つの `ofProjection` 呼出 (`ψ=0`/`ψ=a·χ₁`) を **共有格子 `{χ, χ̄, 0, a·χ₁}`**
+  上の 1 つの inner-eq から `Submodule.span_mono` で各 `{χ, χ̄, ψ}` へ特殊化 (これが Dade 等距の供給形:
+  supported span 上の 1 つの保存則が全差分生成子を覆う)。`decompositionPair_tau1_agree` の `rfl` 不変。
+  外部 caller 0 (`AxiomsCheck` の登録は名前参照ゆえ不変)。
+- **supply-ability 橋 (prose でなく実 Lean 証明)** — Dade 基底写像が weakened form を *実際に供給* する証拠:
+  - `support_subset_of_mem_zSpan_of_supported` — supported 生成系 `S` の `ℤ[S]` 全体が supported。
+    `supportedSubmodule (supportInSubgroup A L)` の `restrictScalars ℤ` が全生成子を含む ⟹
+    `Submodule.span_le` で `zSpan S = span ℤ S` を含む。純 `ℤ`-submodule closure。
+  - `dadeIntegralCharacterMap_inner_eq_on_supported_span` — (5.1) 基底写像
+    `τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)` が **任意の supported span 上で
+    inner 保存**。証明: 元が supported ⟹ `dadeIntegralCharacterMap_apply_of_support` で
+    `τ φ = hyp.dadeMap ⟨φ,_⟩`、`IsDadeIsometry.inner_eq` (2.6.a) を `hyp.dadeIsometryData hconj` 経由で
+    適用 (`dadeIsometryData_toDadeMap : (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap`, rfl)。
+- **per-step D 生産者** `decompositionPairFromDade` (Round-24 (ii) を閉じる): orthonormal `R(χ)` +
+  supported `χ, χ̄, a·χ₁` (`0` は `support_zero` で自動) + 2 つの `ZIrr`-membership
+  `(χ−0)^τ, (χ−a·χ₁)^τ ∈ ℤ[Irr G]` から `(D₀, Da)` を **基底写像 `τ` から直接構成**。欠けていた
+  `htau1_inner_eq` を上記橋で *内部放電* (global 等距仮説なし)。(5.4) 基底ケース `τ₁ = τ` の実体化で、
+  `retarget_isCoherent_of_sharedDecomposition` に直接供給可。
+- **残 (本パス後)**: 一般 (5.4) `τ₁ ⊋ τ` (running coherence extension への τ₁ 拡張) と ①Dade `R(χ)` 抽出
+  (`dadeIntegralCharacterMap` → `OrthonormalCharacterImageFamily`) は別パス。ただし両者とも
+  lattice-relative 化が前提で、その前提は本パスで完全除去 — per-step `hstep` を `decompositionPairFromDade`
+  + `retarget_isCoherent_of_sharedDecomposition` で組む経路が **型レベルで開通**した。
+
+## Round B (2026-05-31): Dade `R(χ)` extractor + ZIrr-membership (上記残① を閉じる)
+
+`decompositionPairFromDade` が **入力**として要求していた `imageFamily : OrthonormalCharacterImageFamily τ χ`
+と 2 つの `ZIrr`-membership を **Dade 等距から構成**。これで per-step `(5.6)` 入力が opaque 仮説ゼロで
+実 Dade τ から得られる (基底ケース `τ₁=τ`)。
+
+- **`Hypothesis.one_notMem_dadeSupport`** (S04, support-side keystone): `1 ∉ dadeSupport`。
+  `1 ∈ dadeSupport ⟹ IsConj (a·h) 1 ⟹ a·h=1` (`isConj_one_left`) `⟹ a=h⁻¹∈H(a)`; 一方 `a∈C_L(a)`
+  (a∈L, 自己可換)、`centralizer_disjoint` ((2.2)) で `a∈H(a)⊓C_L(a)=⊥ ⟹ a=1`、`ne_one` (A⊆G^#) と矛盾。
+  vanish-at-1 の土台。
+- **`dadeIntegralCharacterMap_apply_one_eq_zero`** (S07): supported φ の Dade 像は `dadeSupport` 外で 0
+  (`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` via `isDadeMap_dadeMap`)、`1 ∉ dadeSupport` ゆえ
+  `(φ^τ)(1)=0`。(1.4) `IsometryDifferenceImagesVanishAtOne` を放電。
+- **`dadeIntegralCharacterMap_mem_ZIrr_of_supported`** (S07): supported かつ `φ∈ℤ[Irr L]` なら
+  `φ^τ∈ℤ[Irr G]` ((2.6.b) `PreservesVirtualCharacters`/`maps_virtualCharacter`、`apply_of_support` で
+  `hyp.dadeMap` に移送)。(1.4) `IsometryDifferenceImagesAreVirtual` + `htau1_mem0`/`htau1_mema` 双方を放電。
+- **`dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp`** (S07, R(χ) extractor):
+  χ irreducible 非実 + χ,χ̄ supported から、`conjPairFamily χ=![χ,χ̄]` 上で (1.4) keystone
+  `characterDifferenceImageOfIsometry` の 3 仮説を上記で放電 (inner-eq は差が `ℤ[χ,χ̄]` 内ゆえ
+  `dadeIntegralCharacterMap_inner_eq_on_supported_span` で供給)、`toOrthonormalImage` で
+  `OrthonormalCharacterImageFamily τ χ` を構成。**①Dade `R(χ)` 抽出を実装**。
+- **`decompositionPairFromDadeOfIrreducible`** (S07, full assembly): χ irreducible 非実 supported +
+  `χ₁∈ℤ[Irr L]` から `R(χ)`・`htau1_mem0`・`htau1_mema` を **すべて内部構成**し `(D₀,Da)` を生産。
+  per-step `(5.6)` 入力が opaque 仮説ゼロで実 Dade τ から得られる。
+- **残 (Round C)**: `decompositionPairFromDadeOfIrreducible` は基底ケース `τ₁=τ` を構成。running chain では
+  τ₁ = `hS₁.extension` (前段 coherence の extension) で、Dade-derived τ と新差分 χ−χ̄ 上で agree することを
+  示す (`htau1_agrees`/`himg` を running extension に対し成立させる) のが Round C。それが済めば
+  `coherentPairChain` の各 `hstep` が Dade 等距 + 前段 coherence から DISCHARGE され、
+  `peterfalvi_66_coherence_of_X` が実 Dade τ で INSTANTIABLE になる。
+
+## Round C (2026-05-31): running-`τ₁` instantiation `retarget_isCoherent_fromDade`
+
+`coherentPairChain` の 1 step `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A` を **基底写像
+`τ = dadeIntegralCharacterMap` を running 補助等距 `τ₁ = τ` *そのもの* として** DISCHARGE する producer。
+Round B 残「running τ₁ = hS₁.extension への一般化」を閉じる。要点 = `τ₁ := τ` で
+`retarget_isCoherent_of_sharedDecomposition` の 4 agreement を **内部放電**:
+
+- `htau1_agrees`/`htau1_diff` — 共に `rfl` (decomposition の `tau1` field が `τ` そのもの)。
+- `htau1_chi1 : τ χ₁ = hS₁.extension χ₁` / per-member `hmemTau1 : (Dmem x).tau1 x = hS₁.extension x` —
+  **`IsCoherent.extends_on_supported`** から。running extension は supported sublattice `Z[S₁,A]` 上で
+  基底 `τ` と一致し、χ₁ も全 member `x∈S₁` も supported (`hchi1supp`/`hmemSupp`) ゆえ
+  `(Dmem x).tau1 x = τ x = hS₁.extension x`。これが「base case `τ₁=τ` を running extension へ一般化」の核心:
+  *running extension が新規 τ₁ を必要とせず、`τ` 自身が supported lattice 上の agreement を提供する*。
+- `R(χ)` + 2 `ZIrr` facts = Round B; `htau1_inner_eq` = `dadeIntegralCharacterMap_inner_eq_on_supported_span`。
+- per-member `Dmem x` も Dade 等距から生産 (`.tau1=τ` を `hmemTau1Base` で保証)。
+
+**残 input** = 真正 (6.6) 文字次数内容 (Dade 等距の責務外): (5.6.2) collapse `hY`、per-member (5.2.e)
+image-orthogonality `hmemOrtho`、source orthogonalities、generation `hgen`。これらは (6.6) enumeration が
+供給する degree 算術で、本 round の対象外 (roadmap "Residual (post-instantiation)" と一致)。
+
+**`peterfalvi_66_coherence_of_X` 完全 instantiate の到達性**: `hstep` から opaque 補助等距 agreement は
+除去済 (B+C)。だが各 step の `hY`/`hmemOrtho`/次数比/`hgen` がなお必要で、これは (6.6) per-step degree
+データの threading (別 round)。本 round は `retarget_isCoherent_fromDade` までを landing。
+
+## Round C assembly (2026-05-31): instantiated `peterfalvi_66_coherence_of_X_from_dade`
+
+上記「(6.6) per-step degree データの threading (別 round)」を消化。Round C の per-step engine
+`retarget_isCoherent_fromDade` を `coherentPairChain` accumulator 形に組み上げ、(6.6) coherence-of-X を
+**実 Dade 等距 `τ = dadeIntegralCharacterMap` で instantiate** する。`hstep` はもはや posit されず、
+各 step が Dade 等距 + 前段 coherence からの 1 つの (5.6) adjoining として **構成** される。
+
+3 piece (すべて `S07_Coherence.lean` `DadeBaseMap` section 末尾):
+
+- **`pairUnion_succ_eq_union_pair`** (汎用 set 橋, `pairUnion` 一般 section): `(pair i)=(c₁,c₂)` のとき
+  `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i ∪ {c₁,c₂}`。`pairUnion_succ` + `pairSet` の rewrite。
+  per-step adjoining engine の `S₁∪{χ,χ̄}` 結論を engine accumulator 形へ接続する connective tissue。
+
+- **`DadeChainStep hyp hconj S₁ A χ`** (構造体): Dade 等距が供給しきった後に残る**真正 (6.6) per-step
+  文字次数内容**を field として束ねる *残余 interface*。field = `χ₁`/`a`/`χ` 非実性/`χ,χ̄,a·χ₁` の
+  supports/`χ₁∈ℤ[Irr L]`/orthonormality (`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar'`)/per-member (5.5)+(5.2.e)
+  family (`Dmem`/`hmemTau1Base`/`hmemSupp`/`hmemOrtho`)/source orthogonalities (`hχ_S1`/`hχbar_S1`)/
+  `χ₁∈S₁` & supported/(5.6.2) collapse `hY`/(5.1) generation `hgen`。どれも Dade 等距の *image-side*
+  構造に触れない (= source-side degree/orthogonality = (6.6) enumeration の責務)。
+  - `DadeChainStep.advance`: prior coherence + step から `IsCoherent τ (S₁∪{χ,χ̄}) A` を
+    `retarget_isCoherent_fromDade` 1 回で放電 (R(χ) [Round B] / ZIrr [2.6.b] / inner-preservation /
+    `τ₁=τ` agreement は内部供給)。
+  - `DadeChainStep.chainStepAdvance`: 橋で accumulator 形 `pairUnion S₀ pair (i+1)` へ書き換え。
+
+- **`peterfalvi_66_coherence_of_X_from_dade`** (主定理 = milestone): 上記を `peterfalvi_66_coherence_of_X`
+  の `hstep` 引数として chain 上で fold。`τ` を実 Dade map に固定し、各 `i<N` に対し
+  `IrreducibleCharacter χᵢ` (`pair i = (↑χᵢ,(↑χᵢ).conj)`) + `DadeChainStep` over `pairUnion S₀ pair i`
+  を取る。残 input = enumeration `e`/cover `hcoverIdx`/base coherence `h0`/per-step `hstepData`+`hpairχ`
+  のみ。これで **§5/§6 coherence engine が実 Dade τ に対し完全 constructive**。
+
+sorry/axiom 無; `#assert_only_allowed_axioms` 4 新規全 3 axiom allowlist 内; full `lake build OddOrder`
+緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。**残 (post-instantiation)**: per-step `DadeChainStep` の構成
+(degree 比 `a` の整数性、`hY`/`hgen` の (6.6) 列挙からの供給) は依然 (6.6) degree 算術であり、Dade 等距の
+責務外 — これは設計上の正しい境界 (Dade 等距 ↔ (6.6) enumeration の責務分離)。
+
+### `DadeChainStep` source-side fields 放電試行 + (5.6.1) existence-half primitive (2026-05-31)
+
+`DadeChainStep` の source-side fields (`hY`/`hmemOrtho`/`hgen`) を landed pieces で WIRE し
+(6.6) coherence-of-X を 真正 (6.6) setup 仮説のみへ帰着する試み。精査で **3 fields いずれも
+wiring-size では放電不能**と確定 (各々 真正に新規数学 + interface 拡張を要す)。本 round は
+最も基礎的かつ完全 closable な (5.6.1) **existence-half primitive** のみ landing。
+
+- **`exists_orthogonalProjection_of_orthogonal_family`** (`ZIrrFourier.lean`, commit 741e769,
+  AxiomsCheck 登録): orthogonal family `vᵢ` (実 gram `δᵢⱼmᵢ`, `mᵢ≠0`) への任意 `w` の射影
+  `w = ∑ᵢ(⟨w,vᵢ⟩/mᵢ)•vᵢ + Z`, `Z⊥vⱼ`。純 diagonal Gram 射影 (completeness 不要)。
+  (5.6.1) λ-form `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z` の **存在半** (step 1)。
+  Pythagoras `inner_self_orthogonalSum_add_re` の sibling。
+- **各 field の正直な放電障害**:
+  - `hY` = `Da.Y = a•Da.tau1 chi1`。tautology ではない。`Y_eq_nsmul_tau1_of_lambdaForm` は `hYform`
+    (λ-form) を消費するが producer 不在。core 障害 = **joint-lattice isometry**: 係数計算 (mmd L79)
+    `aaᵢ‖χ₁‖² = ((χ−aχ₁)^τ,(χᵢ−aᵢχ₁)^τ)` は `χ−aχ₁` と `χᵢ−aᵢχ₁` を *同時に* 含む格子
+    `Z[S₁∪{χ−χ̄,χ−aχ₁}]` 上の等距を要すが `Da.tau1_inner_eq_on_support` は `{χ,χ̄,ψ}` のみ。
+    existence-half は landing 済、残 = coefficient-value (`λᵢ=λaᵢ/‖χᵢ‖²`) + integrality (`λ∈ℤ`) +
+    joint-等距 transport。
+  - `hmemOrtho` = `(Dmem x).imageFamily.Orthogonal R(χ)`。`Dmem` は field (任意データ) ゆえ構成法
+    不明では証明不能。放電には `Dmem` も Dade 構成化 (`decompositionPairFromDade…`) + Dade
+    `R(x)⊥R(χ)` を `x⊥{χ,χ̄}` から (4.1)型で導く必要。
+  - `hgen` = pure module theory ではなく (4.7) `Z[S,L^#]=Z[S,A]` を要す (χ 単体は A 上 supported とは
+    限らず `mχ+nχ̄` の support 制約が差 generator 経由の関係を強制)。(4.7) 未形式化・データ外。
+- 結論: milestone (真正 (6.6) setup のみへの帰着) は本 round 未到達 (3 fields とも interface 拡張 +
+  新規数学)。純益 = existence-half primitive (汎用・再利用可・λ-form の step 1)。
+  次 step = (a) `DadeChainStep` に joint-isometry field 追加で coefficient-value + integrality を載せ
+  `hY` 放電、(b) (4.7) 形式化で `hgen`、(c) `Dmem` 構成化で `hmemOrtho`。

@@ -20,6 +20,7 @@ import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.LinearAlgebra.Eigenspace.Charpoly
+import Mathlib.LinearAlgebra.Eigenspace.Semisimple
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Polynomial.RationalRoot
@@ -948,6 +949,48 @@ theorem centralCharacterOfRep_classSum_mul (ρ : Representation ℂ G V) [IsIrre
           ((classSum Ci * classSum Cj) Cs.out) • (ω ρ Cs) := by
         rw [map_sum]; exact Finset.sum_congr rfl fun Cs _ => map_smul _ _ _
 
+omit [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)] [FiniteDimensional ℂ V] [Fintype G] in
+/-- **The centralizer of a TI-subset element lies in the TI normalizer.**
+
+If `A` is a TI-subset of `G` with normalizer-bound `L` and `x ∈ A`, then `C_G(x) ≤ L`: any `g`
+centralizing `x` fixes `x ∈ A` under conjugation (`g x g⁻¹ = x ∈ A`), so the TI condition forces
+`g ∈ L`.  This is the group-theoretic fact behind Peterfalvi (6.7)'s `|C_G(z)| = |C_L(z)|` for
+`z ∈ Z^# ⊆ P^#`: with `C_G(z) ⊆ L = N_G(P)`, the centralizer in `G` equals the centralizer in `L`,
+so the hypothesis `|C_L(z)|` constant on `Z^#` makes `|⟦z⟧| = [G : C_G(z)]` constant, feeding the
+class-size hypothesis of `centralCharacterOfRep_eq_of_card_eq_of_character_eq`. -/
+theorem centralizer_le_of_mem_isTISubset {A : Set G} {L : Subgroup G}
+    (hA : OddOrder.GroupTheory.IsTISubset A L) {x : G} (hx : x ∈ A) :
+    Subgroup.centralizer ({x} : Set G) ≤ L := by
+  intro g hg
+  refine hA g ⟨x, hx, ?_⟩
+  have hcomm : x * g = g * x := (Subgroup.mem_centralizer_iff.mp hg) x (Set.mem_singleton x)
+  have hfix : g * x * g⁻¹ = x := by rw [← hcomm]; group
+  rw [hfix]; exact hx
+
+omit [Fintype (ConjClasses G)] in
+/-- **The central-character value `ω_ρ(⟦z⟧)` depends only on `χ_ρ(z)` and the class size `|⟦z⟧|`.**
+
+`ω_ρ(⟦z⟧) = |⟦z⟧| · χ_ρ(z) / χ_ρ(1)` (`centralCharacterOfRep_classSum` + `sum_character_eq_card_mul`),
+so if `z, z'` have equal class size (`|⟦z⟧| = |⟦z'⟧|`) and equal character value
+(`χ_ρ(z) = χ_ρ(z')`) then `ω_ρ(⟦z⟧) = ω_ρ(⟦z'⟧)`.
+
+This is the constancy Peterfalvi (6.7) uses ("`α` does not depend on `s`", mmd 04.8 L102): on `Z^#`
+both `ψ(z)` (`ψ` constant on `Z^#`, a hypothesis) and `|⟦z⟧| = [G : C_G(z)]` are independent of `z`
+— the latter because `|C_G(z)| = |C_L(z)|` (`C_G(z) ⊆ L` from the `P^#`-TI-subset,
+`centralizer_le_normalizer_of_mem_tiSubset`) is constant by hypothesis.  This lemma isolates the
+*character-theoretic* constancy; the *group-theoretic* class-size constancy (`hcard`) is supplied by
+the caller from the TI-subset / `|C_L(z)|`-constancy data. -/
+theorem centralCharacterOfRep_eq_of_card_eq_of_character_eq (ρ : Representation ℂ G V)
+    [IsIrreducible ρ] {z z' : G}
+    (hcard : Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
+      = Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z' })
+    (hchar : ρ.character z = ρ.character z') :
+    ω ρ (ConjClasses.mk z) = ω ρ (ConjClasses.mk z') := by
+  rw [centralCharacterOfRep_classSum ρ (ConjClasses.mk z),
+    centralCharacterOfRep_classSum ρ (ConjClasses.mk z'),
+    sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl,
+    sum_character_eq_card_mul ρ (ConjClasses.mk z') (g := z') rfl, hcard, hchar]
+
 omit [Fintype (ConjClasses G)] in
 /-- **Algebraic integrality of the central-character value `ω_ρ(C)`** (Isaacs (3.7); the
 structure-constant integrality used in Peterfalvi (6.7.3)).  For an irreducible representation `ρ`
@@ -1102,6 +1145,216 @@ theorem character_isIntegral (ρ : Representation ℂ G V) [Finite G] (g : G) :
   have hroot : (ρ g).charpoly.IsRoot μ :=
     (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
   exact isIntegral_of_pow_eq_one hn (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot)
+
+/-- **A complex number of unit modulus with real part `1` is `1`.** If `‖z‖ = 1` and `z.re = 1`
+then `z = 1`: from `z.re ^ 2 + z.im ^ 2 = ‖z‖ ^ 2 = 1` and `z.re = 1` we get `z.im = 0`. -/
+private theorem eq_one_of_norm_eq_one_of_re_eq_one {z : ℂ} (hz : ‖z‖ = 1) (hre : z.re = 1) :
+    z = 1 := by
+  -- `z.im ^ 2 = ‖z‖ ^ 2 - z.re ^ 2 = 1 - 1 = 0`, so `z.im = 0`; with `z.re = 1` this is `1`.
+  have hns : z.re * z.re + z.im * z.im = 1 := by
+    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
+  have him : z.im = 0 := by nlinarith [sq_nonneg z.im, hns, hre]
+  apply Complex.ext <;> simp [hre, him]
+
+/-- **A complex number of unit modulus has real part at most `1`.** -/
+private theorem re_le_one_of_norm_eq_one {z : ℂ} (hz : ‖z‖ = 1) : z.re ≤ 1 := by
+  have hns : z.re * z.re + z.im * z.im = 1 := by
+    rw [← Complex.normSq_apply, Complex.normSq_eq_norm_sq, hz]; norm_num
+  nlinarith [sq_nonneg z.im, sq_nonneg (z.re - 1), hns]
+
+/-- **Unit complex numbers summing to their count are all `1`** (the equality case of the triangle
+inequality, for the keystone `character g = degree ⟹ ρ g = id`).  If a multiset `s` of complex
+numbers has `‖z‖ = 1` for every `z ∈ s` and `∑_{z ∈ s} z = card s`, then `z = 1` for every
+`z ∈ s`.
+
+Proof (real-part / non-negative-sum argument).  Taking real parts of `∑ z = card s` gives
+`∑ z.re = card s`.  Each `z.re ≤ ‖z‖ = 1`, so the multiset `card s · 1 - ∑ z.re = ∑ (1 - z.re)`
+is a sum of non-negatives equal to `0`; hence every `1 - z.re = 0`, i.e. `z.re = 1`.  A unit-modulus
+complex number with real part `1` is `1` (`eq_one_of_norm_eq_one_of_re_eq_one`). -/
+theorem all_eq_one_of_norm_eq_one_of_sum_eq_card {s : Multiset ℂ}
+    (hnorm : ∀ z ∈ s, ‖z‖ = 1) (hsum : s.sum = (Multiset.card s : ℂ)) :
+    ∀ z ∈ s, z = 1 := by
+  -- Reduce to `z.re = 1` for every `z ∈ s`, then apply the unit-modulus rigidity.
+  suffices hre : ∀ z ∈ s, z.re = 1 by
+    intro z hz; exact eq_one_of_norm_eq_one_of_re_eq_one (hnorm z hz) (hre z hz)
+  -- The deficits `1 - z.re ≥ 0` sum to `card s - ∑ z.re = card s - (∑ z).re = card s - card s = 0`.
+  have hdef_sum : (s.map fun z => 1 - z.re).sum = 0 := by
+    -- `∑ (1 - z.re) = card s · 1 - ∑ z.re`, computed by induction on the multiset.
+    have key : ∀ t : Multiset ℂ,
+        (t.map fun z => 1 - z.re).sum = (Multiset.card t : ℝ) - (t.map fun z => z.re).sum := by
+      intro t
+      induction t using Multiset.induction with
+      | empty => simp
+      | cons a t ih => simp only [Multiset.map_cons, Multiset.sum_cons, Multiset.card_cons,
+          ih, Nat.cast_add, Nat.cast_one]; ring
+    rw [key]
+    -- `(∑ z).re = ∑ z.re` (real part is additive over the multiset).
+    have hre_sum : (s.map fun z => z.re).sum = ((s.sum).re : ℝ) := by
+      have := map_multiset_sum Complex.reAddGroupHom s
+      simpa [Complex.coe_reAddGroupHom] using this.symm
+    rw [hre_sum, hsum]; simp
+  -- Each deficit is non-negative, and their sum is `0`, so each deficit is `0`.
+  have hnn : ∀ x ∈ (s.map fun z => 1 - z.re), (0 : ℝ) ≤ x := by
+    intro x hx
+    rw [Multiset.mem_map] at hx
+    obtain ⟨z, hzs, rfl⟩ := hx
+    linarith [re_le_one_of_norm_eq_one (hnorm z hzs)]
+  have hzero := Multiset.all_zero_of_le_zero_le_of_sum_eq_zero hnn hdef_sum
+  intro z hz
+  have : (1 : ℝ) - z.re = 0 := hzero _ (Multiset.mem_map_of_mem _ hz)
+  linarith
+
+variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+
+/-- **Diagonalization keystone: character value equals degree forces the identity operator.**
+For a finite-dimensional complex representation `ρ` of a finite group `G` and `g : G`, if the
+character value at `g` equals the degree, `ρ.character g = ρ.character 1` (`= finrank ℂ V`), then
+the operator `ρ g` is the identity.
+
+This is the unique shared gate for Peterfalvi (6.6) G2.2 and G2.5: it provides
+(a) inflation surjectivity / quotient-representation well-definedness (`ρ` factors through
+`G ⧸ ⟨⟨ker χ⟩⟩` when `χ(g) = χ(1)`), and (b) the constituent-inherits-kernel fact.
+
+Proof.  `g` has finite order `n = |G|`, so `(ρ g) ^ n = 1` and `ρ g` is annihilated by the
+squarefree polynomial `X ^ n - 1`, hence **semisimple** (`isSemisimple_of_squarefree_aeval_eq_zero`)
+and **diagonalizable**: its eigenspaces span `V` (`IsSemisimple.iSup_eigenspace_eq_top`).  The trace
+`character g = (ρ g).charpoly.roots.sum` is the sum of the eigenvalues (with multiplicity), each a
+root of unity (`‖μ‖ = 1`), and equals `character 1 = finrank ℂ V = roots.card`.  The equality case
+of the triangle inequality (`all_eq_one_of_norm_eq_one_of_sum_eq_card`) forces every root, hence
+every eigenvalue, to be `1`.  A semisimple operator whose only eigenvalue is `1` has
+`eigenspace 1 = ⊤`, i.e. `ρ g - 1 = 0`. -/
+theorem rep_eq_id_of_character_eq_one (ρ : Representation ℂ G V) [Finite G] {g : G}
+    (h : ρ.character g = ρ.character 1) :
+    ρ g = LinearMap.id := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set n : ℕ := Nat.card G with hn_def
+  have hn : n ≠ 0 := Nat.card_pos.ne'
+  -- `(ρ g) ^ n = 1` since `g ^ |G| = 1`.
+  have hfn : (ρ g) ^ n = 1 := by rw [← map_pow, pow_card_eq_one', map_one]
+  -- `ρ g` is a root of the squarefree polynomial `X ^ n - C 1`, hence semisimple.
+  have hsq : Squarefree (Polynomial.X ^ n - Polynomial.C (1 : ℂ)) :=
+    (Polynomial.separable_X_pow_sub_C 1 (by exact_mod_cast hn) one_ne_zero).squarefree
+  have haeval : (Polynomial.aeval (ρ g)) (Polynomial.X ^ n - Polynomial.C (1 : ℂ)) = 0 := by
+    rw [map_sub, map_pow, Polynomial.aeval_X, Polynomial.aeval_C, hfn]
+    simp
+  have hss : Module.End.IsSemisimple (ρ g) :=
+    Module.End.isSemisimple_of_squarefree_aeval_eq_zero hsq haeval
+  -- The trace is the sum of the (splitting) charpoly roots; the degree is their count.
+  have hsplits : (ρ g).charpoly.Splits := IsAlgClosed.splits _
+  have htrace : ρ.character g = (ρ g).charpoly.roots.sum :=
+    Module.End.trace_eq_sum_roots_charpoly_of_splits hsplits
+  have hcard : Multiset.card (ρ g).charpoly.roots = Module.finrank ℂ V := by
+    rw [hsplits.natDegree_eq_card_roots.symm, (ρ g).charpoly_natDegree]
+  -- Each root is a root of unity, so has unit modulus.
+  have hroot_norm : ∀ μ ∈ (ρ g).charpoly.roots, ‖μ‖ = 1 := by
+    intro μ hμ
+    have hroot : (ρ g).charpoly.IsRoot μ :=
+      (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
+    exact Complex.norm_eq_one_of_pow_eq_one
+      (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot) hn
+  -- The hypothesis `character g = character 1 = finrank` says `roots.sum = roots.card`.
+  have hsum : (ρ g).charpoly.roots.sum = (Multiset.card (ρ g).charpoly.roots : ℂ) := by
+    rw [← htrace, h, ρ.char_one, hcard]
+  -- Triangle-inequality equality case: every root equals `1`.
+  have hroot_one : ∀ μ ∈ (ρ g).charpoly.roots, μ = 1 :=
+    all_eq_one_of_norm_eq_one_of_sum_eq_card hroot_norm hsum
+  -- Hence the only eigenvalue of `ρ g` is `1`.
+  have heig_one : ∀ μ : ℂ, Module.End.HasEigenvalue (ρ g) μ → μ = 1 := by
+    intro μ hμ
+    exact hroot_one μ ((Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mpr
+      ((Module.End.hasEigenvalue_iff_isRoot_charpoly (ρ g) μ).mp hμ))
+  -- A semisimple operator whose eigenvalues are all `1`: its eigenspaces (spanning `V`) collapse to
+  -- the `μ = 1` eigenspace, so `eigenspace 1 = ⊤`, i.e. `ρ g - 1 = 0`.
+  have htop : Module.End.eigenspace (ρ g) 1 = ⊤ := by
+    rw [← hss.iSup_eigenspace_eq_top]
+    refine le_antisymm (le_iSup _ 1) (iSup_le fun μ => ?_)
+    rcases eq_or_ne μ 1 with rfl | hμ
+    · exact le_refl _
+    · have : Module.End.eigenspace (ρ g) μ = ⊥ := by
+        by_contra hne
+        exact hμ (heig_one μ hne)
+      simp [this]
+  -- `eigenspace 1 = ker (ρ g - 1) = ⊤` gives `ρ g - 1 = 0`, i.e. `ρ g = id`.
+  rw [Module.End.eigenspace_def, one_smul, LinearMap.ker_eq_top, sub_eq_zero] at htop
+  exact htop
+
+/-- **Character value equals degree iff the operator is the identity** (the equality case of the
+`|χ(g)| ≤ χ(1)` bound, both directions).  The forward direction is the diagonalization keystone
+`rep_eq_id_of_character_eq_one`; the reverse is immediate, as `trace (LinearMap.id) = finrank ℂ V =
+ρ.character 1`. -/
+theorem character_eq_one_iff_rep_eq_id (ρ : Representation ℂ G V) [Finite G] {g : G} :
+    ρ.character g = ρ.character 1 ↔ ρ g = LinearMap.id := by
+  refine ⟨rep_eq_id_of_character_eq_one ρ, fun h => ?_⟩
+  rw [ρ.char_one, Representation.character, h, LinearMap.trace_id]
+
+/-- **Character values are bounded by the degree** (the general `|χ(g)| ≤ χ(1)` bound; Isaacs
+*Character Theory*, the inequality underlying Lemma 2.27 and the equality case of (2.21)/(2.27)).
+For a finite-dimensional complex representation `ρ` of a finite group `G` and `g : G`,
+`‖ρ.character g‖ ≤ ρ.character 1 = finrank ℂ V`.
+
+Proof.  `g` has finite order, so `(ρ g) ^ |G| = 1` and the (splitting) charpoly roots — the
+eigenvalues with multiplicity — are roots of unity (`‖μ‖ = 1`).  The trace is their sum, and the
+triangle inequality gives `‖∑ μ‖ ≤ ∑ ‖μ‖ = roots.card = finrank ℂ V`.
+
+This is the general-`g` companion of the central Schur equality `‖χ(z)‖² = χ(1)²`; the equality case
+`‖χ(g)‖ = χ(1)` together with positivity of the trace at the kernel is what
+`rep_eq_id_of_character_eq_one` (the keystone) sharpens to `ρ g = id`. -/
+theorem norm_character_le_finrank (ρ : Representation ℂ G V) [Finite G] (g : G) :
+    ‖ρ.character g‖ ≤ (Module.finrank ℂ V : ℝ) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set n : ℕ := Nat.card G with hn_def
+  have hn : n ≠ 0 := Nat.card_pos.ne'
+  have hfn : (ρ g) ^ n = 1 := by rw [← map_pow, pow_card_eq_one', map_one]
+  -- `character g = roots.sum`, with `roots.card = finrank`.
+  have hsplits : (ρ g).charpoly.Splits := IsAlgClosed.splits _
+  have htrace : ρ.character g = (ρ g).charpoly.roots.sum :=
+    Module.End.trace_eq_sum_roots_charpoly_of_splits hsplits
+  have hcard : Multiset.card (ρ g).charpoly.roots = Module.finrank ℂ V := by
+    rw [hsplits.natDegree_eq_card_roots.symm, (ρ g).charpoly_natDegree]
+  -- Each root is a root of unity: `‖μ‖ = 1`.
+  have hroot_norm : ∀ μ ∈ (ρ g).charpoly.roots, ‖μ‖ = 1 := by
+    intro μ hμ
+    have hroot : (ρ g).charpoly.IsRoot μ :=
+      (Polynomial.mem_roots ((ρ g).charpoly_monic).ne_zero).mp hμ
+    exact Complex.norm_eq_one_of_pow_eq_one
+      (pow_eq_one_of_isRoot_charpoly_of_pow_eq_one hfn hroot) hn
+  -- Triangle inequality: `‖∑ μ‖ ≤ ∑ ‖μ‖ = ∑ 1 = card = finrank`.
+  rw [htrace]
+  refine (norm_multiset_sum_le _).trans ?_
+  have hmap : ((ρ g).charpoly.roots.map fun μ => ‖μ‖) = (ρ g).charpoly.roots.map fun _ => (1 : ℝ) :=
+    Multiset.map_congr rfl hroot_norm
+  rw [hmap, Multiset.map_const', Multiset.sum_replicate, hcard, nsmul_eq_mul, mul_one]
+
+/-- **Peterfalvi (6.6) G2.2: a subrepresentation inherits a kernel containment** (the
+representation-level constituent-inherits-kernel fact, via the diagonalization keystone).  If the
+character of `ρ` at `g` equals its degree (`ρ.character g = ρ.character 1`, i.e. `g` lies in the
+character kernel of `ρ`), then for **every** subrepresentation `ρ'` of `ρ` the same holds of its
+character: `ρ'.toRepresentation.character g = ρ'.toRepresentation.character 1`.
+
+This is the honest, fully-general form of "an irreducible constituent inherits a kernel containment
+of the ambient character": a constituent is a subrepresentation, and the keystone
+`rep_eq_id_of_character_eq_one` makes `ρ g = id`, which *restricts* to the identity on the invariant
+submodule `ρ'.toSubmodule`; the trace of the identity is the dimension, i.e. the degree of `ρ'`.  No
+character-decomposition (`ψ = ∑ mᵢ χᵢ`) is needed — the statement is purely at the
+representation/subrepresentation level, which is exactly the structural content (6.6) reads off
+(`Z ⊆ ker (Ind θ) ⟹ Z ⊆ ker χ` for a constituent `χ`). -/
+theorem subrepresentation_character_eq_one_of_character_eq_one
+    (ρ : Representation ℂ G V) [Finite G] (ρ' : Subrepresentation ρ) {g : G}
+    (h : ρ.character g = ρ.character 1) :
+    ρ'.toRepresentation.character g = ρ'.toRepresentation.character 1 := by
+  -- Keystone: `ρ g = id`.
+  have hid : ρ g = LinearMap.id := rep_eq_id_of_character_eq_one ρ h
+  -- Restricting the identity to the invariant submodule is the identity.
+  have hrestr : ρ'.toRepresentation g = LinearMap.id := by
+    show (ρ g).restrict (ρ'.apply_mem_toSubmodule g) = LinearMap.id
+    ext v
+    simp [LinearMap.restrict_apply, hid]
+  -- Both sides are the dimension of the submodule (`trace id = finrank`).
+  rw [show ρ'.toRepresentation.character g
+        = LinearMap.trace ℂ ρ'.toSubmodule (ρ'.toRepresentation g) from rfl, hrestr,
+      Representation.char_one, LinearMap.trace_id]
 
 /-- **A rational algebraic integer is an integer.** If `q : ℚ` is integral over `ℤ` when viewed
 inside `ℂ`, then `q` is the image of an integer: there is `n : ℤ` with `(q : ℂ) = n`.

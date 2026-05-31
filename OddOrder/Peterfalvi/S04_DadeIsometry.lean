@@ -385,6 +385,34 @@ theorem hCoset_subset_dadeSupport (hyp : Hypothesis G A L)
   rintro _ ⟨h, hh, rfl⟩
   exact hyp.mem_dadeSupport_of_mem_hCoset hh
 
+/-- The identity lies outside the Dade support `⋃_{a∈A} (a·H(a))^G`.
+
+If `1 ∈ dadeSupport`, then `IsConj (a·h) 1` for some `a ∈ A`, `h ∈ H(a)`, hence `a·h = 1`
+(`isConj_one_left`) and `a = h⁻¹ ∈ H(a)`.  But `a` also lies in `C_L(a)` (it is in `L` and
+commutes with itself), and `H(a)` is disjoint from `C_L(a)` (`centralizer_disjoint` of
+Hypothesis (2.2)), so `a ∈ H(a) ⊓ C_L(a) = ⊥`, i.e. `a = 1` — contradicting `a ≠ 1`
+(`ne_one`, from `A ⊆ G^#`).  This is the support-side fact behind vanishing-at-`1` of the Dade
+map: any Dade image vanishes off `dadeSupport` (`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`),
+hence at `1`. -/
+theorem one_notMem_dadeSupport (hyp : Hypothesis G A L) :
+    (1 : G) ∉ hyp.dadeSupport := by
+  intro hone
+  obtain ⟨a, h, hh, hconj⟩ := hyp.mem_dadeSupport_iff.mp hone
+  have hah : a.1 * h = 1 := isConj_one_left.mp hconj
+  -- `a = h⁻¹ ∈ H(a)`.
+  have ha_eq : a.1 = h⁻¹ := by
+    rw [eq_inv_iff_mul_eq_one]; exact hah
+  have ha_H : a.1 ∈ hyp.H a := by
+    rw [ha_eq]; exact (hyp.H a).inv_mem hh
+  -- `a ∈ C_L(a)`.
+  have ha_cent : a.1 ∈ centralizerIn L a.1 :=
+    mem_centralizerIn.mpr ⟨hyp.mem_L a.2, rfl⟩
+  -- Disjointness forces `a = 1`.
+  have ha_one : a.1 = 1 := by
+    have := (Subgroup.disjoint_def.mp (hyp.centralizer_disjoint a)) ha_H ha_cent
+    simpa using this
+  exact hyp.ne_one a.2 ha_one
+
 theorem conj_mem_dadeSupport (hyp : Hypothesis G A L) {g x : G}
     (hg : g ∈ hyp.dadeSupport) :
     x * g * x⁻¹ ∈ hyp.dadeSupport := by
@@ -3554,6 +3582,43 @@ noncomputable def Hypothesis.dadeMap (hyp : Hypothesis G A L) :
 @[simp] theorem Hypothesis.dadeMap_apply (hyp : Hypothesis G A L)
     (α : SupportedClassFunctions (G := G) k A L) (g : G) :
     hyp.dadeMap α g = hyp.dadeValue α g := rfl
+
+/-- The Peterfalvi (2.5) Dade map is `k`-linear in its argument.
+
+`dadeValue α g` is, at each `g ∈ dadeSupport`, the *evaluation* `α(a)` at a fixed base point `a`
+(and `0` off the support), so it is `k`-linear in `α`: `dadeValue (c•α+β) g = c·dadeValue α g +
+dadeValue β g` pointwise.  This packages the bare `DadeMap` function `hyp.dadeMap` as an honest
+`k`-linear map `CF(L,A) →ₗ[k] CF(G)` — the form needed to extend it to a total integral character
+map (the coherence base map `τ` of Peterfalvi (5.1)). -/
+noncomputable def Hypothesis.dadeLinearMap (hyp : Hypothesis G A L) :
+    SupportedClassFunctions (G := G) k A L →ₗ[k] ClassFunction G k where
+  toFun := hyp.dadeMap (k := k)
+  map_add' α β := by
+    ext g
+    classical
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [ClassFunction.add_apply, hyp.dadeMap_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_eq α hh hga, hyp.dadeValue_eq β hh hga, hyp.dadeValue_eq (α + β) hh hga]
+      rfl
+    · rw [ClassFunction.add_apply, hyp.dadeMap_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg, hyp.dadeValue_of_not_mem_dadeSupport β hg,
+        hyp.dadeValue_of_not_mem_dadeSupport (α + β) hg, add_zero]
+  map_smul' c α := by
+    ext g
+    classical
+    by_cases hg : g ∈ hyp.dadeSupport
+    · obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
+      rw [RingHom.id_apply, ClassFunction.smul_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_eq α hh hga, hyp.dadeValue_eq (c • α) hh hga]
+      rfl
+    · rw [RingHom.id_apply, ClassFunction.smul_apply, hyp.dadeMap_apply, hyp.dadeMap_apply,
+        hyp.dadeValue_of_not_mem_dadeSupport α hg,
+        hyp.dadeValue_of_not_mem_dadeSupport (c • α) hg, mul_zero]
+
+@[simp] theorem Hypothesis.dadeLinearMap_apply (hyp : Hypothesis G A L)
+    (α : SupportedClassFunctions (G := G) k A L) :
+    hyp.dadeLinearMap (k := k) α = hyp.dadeMap (k := k) α := rfl
 
 /-- **Peterfalvi (2.5).**  The explicit Dade map satisfies the defining equations,
 i.e. it `IsDadeMap`.  This discharges the `IsDadeMap` interface by construction. -/

@@ -501,6 +501,53 @@ theorem inner_induce_eq_inner_restrict (H : Subgroup G) [Fintype H]
 
 end FrobeniusReciprocity
 
+section NormalSubgroupValue
+
+/-! ### Value of the induced character on a normal subgroup contained in `H`
+
+For `A ⊴ G` with `A ≤ H`, every conjugate `x⁻¹ a x` of `a ∈ A` stays in `A ≤ H`, so the
+induction sum at `a` has **no** vanishing terms: it runs over all of `G`, each summand being
+`θ` evaluated at the conjugate.  This is the computational core behind Peterfalvi (1.6.a):
+if `θ` is constant (equal to its degree) on `A`, then so is `Ind_H^G θ`. -/
+
+omit [Fintype G] in
+/-- For a normal subgroup `A ⊴ G` with `A ≤ H` and `a ∈ A`, the `x`-summand of the
+induction sum at `a` is `θ` evaluated at the conjugate `x⁻¹ a x ∈ A ≤ H` (no term vanishes,
+since `A` is closed under `G`-conjugation). -/
+theorem induceTerm_of_mem_normal {A H : Subgroup G} (hAH : A ≤ H) [hA : A.Normal]
+    (θ : ClassFunction ↥H k) {a : G} (ha : a ∈ A) (x : G) :
+    induceTerm H θ x a =
+      θ ⟨x⁻¹ * a * x, hAH (hA.conj_mem' a ha x)⟩ := by
+  have hxa : x⁻¹ * a * x ∈ H := hAH (hA.conj_mem' a ha x)
+  rw [induceTerm_of_mem θ hxa]
+
+variable [Fintype G]
+
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Value of `Ind_H^G θ` on a normal subgroup, constant case.**  Let `A ⊴ G` with `A ≤ H`,
+and suppose `θ` takes a single value `c` on all of `A` (as a subset of `H`).  Then `Ind_H^G θ`
+takes the value `|G|·c·|H|⁻¹` at every `a ∈ A`.
+
+This is the heart of the forward direction of Peterfalvi (1.6.a): since every conjugate of
+`a ∈ A` lands back in `A` (normality) and `θ` is constant on `A`, all `|G|` summands of the
+induction sum coincide. -/
+theorem induce_apply_of_mem_normal_of_const {A H : Subgroup G} (hAH : A ≤ H) [A.Normal]
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) {c : k}
+    (hc : ∀ a' : G, ∀ ha' : a' ∈ A, θ ⟨a', hAH ha'⟩ = c) {a : G} (ha : a ∈ A) :
+    induce H θ a = ⅟(Nat.card H : k) * ((Nat.card G : k) * c) := by
+  rw [induce_apply]
+  congr 1
+  have hterm : ∀ x : G, induceTerm H θ x a = c := by
+    intro x
+    have hconj : x⁻¹ * a * x ∈ A := (‹A.Normal›.conj_mem' a ha x)
+    rw [induceTerm_of_mem_normal hAH θ ha x]
+    exact hc _ hconj
+  rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul, Nat.card_eq_fintype_card]
+
+end NormalSubgroupValue
+
 section VirtualCharacters
 
 /-! ### Restriction and induction preserve virtual characters (Peterfalvi (2.6.b))
@@ -634,6 +681,48 @@ theorem inner_mem_ZIrr_int {φ ψ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (
       refine ⟨a * m, ?_⟩
       rw [← Int.cast_smul_eq_zsmul ℂ a x, inner_smul_right, hm]
       simp only [star_intCast]; push_cast; ring
+
+open scoped Classical in
+set_option linter.unusedSectionVars false in
+set_option linter.unusedFintypeInType false in
+/-- **Integral orthogonal projection onto a finite ZIrr-orthonormal family.**
+For a virtual character `φ ∈ ZIrr G` and a finite family `R : Finset (CF G)` of virtual
+characters (`hZ : ∀ α ∈ R, α ∈ ZIrr G`) that is orthonormal (`horth : ⟨α, β⟩ = δ_{α,β}`),
+there are *integer* coefficients `c α = ⟨φ, α⟩ ∈ ℤ` (an integer because both `φ` and `α` are
+virtual characters, `inner_mem_ZIrr_int`) and an orthogonal residual `Y` with
+
+`φ = (∑_{α ∈ R} c α • α) + Y`     and     `⟨Y, α⟩ = 0` for all `α ∈ R`.
+
+The integral span part `X := ∑_{α ∈ R} c α • α` is the orthogonal projection of `φ` onto
+`ℤ[R]`; `Y := φ − X` is automatically orthogonal to `R` because, by orthonormality,
+`⟨X, α⟩ = c α = ⟨φ, α⟩` so `⟨Y, α⟩ = ⟨φ, α⟩ − ⟨X, α⟩ = 0`.
+
+This is the genuine *projection primitive* of Peterfalvi §7 (5.4)/(5.5)/(5.6.1): it supplies the
+integral `X`-side, the orthogonal `Y`-side, and the integer coefficient function of a
+`CharacterPsiDecomposition` from the single number-theoretic input `(χ − ψ)^{τ₁} ∈ ZIrr G`.  The
+coefficient integrality (over the signed-irreducible family `R(χ) ⊆ ZIrr G`) is the load-bearing
+content; the orthogonality of `Y` is then pure linear algebra. -/
+theorem exists_intProjection_of_orthonormal_ZIrr
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    {R : Finset (ClassFunction G ℂ)} (hZ : ∀ α ∈ R, α ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) :
+    ∃ (c : ClassFunction G ℂ → ℤ) (Y : ClassFunction G ℂ),
+      (∀ α ∈ R, (ClassFunction.inner φ α : ℂ) = (c α : ℂ)) ∧
+      φ = (∑ α ∈ R, (c α : ℂ) • α) + Y ∧
+      ∀ α ∈ R, ClassFunction.inner Y α = 0 := by
+  classical
+  -- Integer coefficients `c α := the integer value of ⟨φ, α⟩`.
+  set c : ClassFunction G ℂ → ℤ :=
+    fun α => if hα : α ∈ R then (inner_mem_ZIrr_int hφ (hZ α hα)).choose else 0 with hc
+  -- Key: on `R`, `⟨φ, α⟩ = c α`.
+  have hcoeff : ∀ α ∈ R, ClassFunction.inner φ α = (c α : ℂ) := by
+    intro α hα
+    rw [hc]; simp only [dif_pos hα]
+    exact (inner_mem_ZIrr_int hφ (hZ α hα)).choose_spec
+  refine ⟨c, φ - ∑ α ∈ R, (c α : ℂ) • α, hcoeff, by abel, ?_⟩
+  -- `⟨Y, α⟩ = ⟨φ, α⟩ − ⟨X, α⟩ = c α − c α = 0`.
+  intro α hα
+  rw [ClassFunction.inner_sub_left, inner_orthonormalSum_eq_coeff horth hα, hcoeff α hα, sub_self]
 
 set_option linter.unusedSectionVars false in
 set_option linter.unusedFintypeInType false in

@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -620,6 +621,26 @@ set_option linter.style.longLine false in
 -- Peterfalvi §3 (1.1), conjugate-difference (nondegeneracy) form for §7: in a finite group of
 -- odd order, the conjugate difference `χ - χ̄` of a nontrivial irreducible character is nonzero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.conjugateDifference_ne_zero_of_ne_trivial_of_odd_card
+-- Peterfalvi §3 (1.6.a), forward direction: for `A ⊴ G` with `A ≤ H`, if `A ⊆ Ker θ` (as a
+-- subgroup of `H`) then `A ⊆ Ker (Ind_H^G θ)`.  Elementary from the value formula
+-- `induce_apply_of_mem_normal_of_const`; the converse is [Is] Lemma 2.21 (not formalised).
+-- (6.6) uses the contrapositive: `Z ⊄ Ker (Ind_H^G θ)` ⟹ `Z ⊄ Ker θ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+-- Peterfalvi §3 (1.6.a), contrapositive form (the (6.6) `X`-characterization consumes this):
+-- `Z ⊄ Ker (Ind_H^G θ)` ⟹ `Z ⊄ Ker θ`.  Literal contrapositive of the forward (1.6.a) lemma.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.not_subsetCharacterKernel_of_not_induce
+-- Peterfalvi §3 (6.6) `X`-characterization, constituent-existence half (mmd 04.8 L76): every
+-- `χ ∈ Irr G` is a constituent of `Ind_H^G θ` for some `θ ∈ Irr H` (`⟨Ind_H^G θ, χ⟩ ≠ 0`).
+-- Frobenius reciprocity via the Clifford `LiesOver` bridge (`exists_liesOver` +
+-- `inner_induce_ne_zero_iff_liesOver`); unconditional, no reference to a center `Z`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero
+-- Peterfalvi §3 (6.6) G2.2, the keystone-driven residual: a constituent inherits a kernel
+-- containment.  `‖χ(g)‖ ≤ χ(1)` (norm_irreducibleCharacter_le_natDegree, via the keystone bound)
+-- + the equality case give: if `(∑ mᵢ χᵢ)(g) = (∑ mᵢ χᵢ)(1)` then every `χᵢ` (mᵢ ≠ 0) has
+-- `g ∈ ker χᵢ`.  Closes the `needs-infra` piece flagged in notes/peterfalvi/s03.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.norm_irreducibleCharacter_le_natDegree
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq
 -- Peterfalvi §3 (1.1), set form: in a finite group of odd order the set of nontrivial irreducible
 -- characters contains no real class function. Discharges the `no_real_characters` field of the §7
 -- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
@@ -637,11 +658,32 @@ set_option linter.style.longLine false in
 -- coefficients (`inner_mem_ZIrr_int`) + completeness (`classFunction_eq_zero_of_orthogonal`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr
+-- RepresentationTheory (Peterfalvi §7 (5.4) projection primitive): integral orthogonal projection
+-- of a virtual character `φ ∈ ZIrr G` onto a finite ZIrr-orthonormal family `R`.  Integer
+-- coefficients `c α = ⟨φ, α⟩` (integral because `R ⊆ ZIrr G`, `inner_mem_ZIrr_int`); residual
+-- `Y = φ − ∑ c•α ⊥ R` by orthonormal coefficient recovery.  Supplies the `X`/`Y`/`coeff` fields of
+-- `CharacterPsiDecomposition` (the (5.4)/(5.5)/(5.6.1) projection content), consumed by
+-- `CharacterPsiDecomposition.ofProjection`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.exists_intProjection_of_orthonormal_ZIrr
 -- RepresentationTheory (Peterfalvi (2.10.3) transversal value): the induction sum at `g`
 -- collapses to a sum over only those `x` with `x⁻¹ g x ∈ H` (off-support terms vanish via
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (Peterfalvi (1.6.a) value core): for a normal subgroup `A ⊴ G` with
+-- `A ≤ H` on which `θ` is constant `= c`, every term of the induction sum at `a ∈ A` is `c`
+-- (conjugates `x⁻¹ a x` stay in `A ≤ H` by normality), so `Ind_H^G θ(a) = |G|·c·|H|⁻¹`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_of_mem_normal_of_const
+-- RepresentationTheory (Peterfalvi §3 (1.6.b)-bridge): `χ` is a constituent of `Ind_H^G θ`
+-- (`⟨Ind θ, χ⟩ ≠ 0`) iff `χ` lies over `θ`.  Numerical Frobenius reciprocity
+-- (`inner_induce_eq_inner_restrict`) packaged into `LiesOver`; the constituent multiplicity
+-- `⟨θ, Res χ⟩` is the conjugate of the restriction multiplicity `⟨Res χ, θ⟩`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver
+-- RepresentationTheory (lies-over existence): every `χ ∈ Irr G` lies over some `θ ∈ Irr H`.
+-- Completeness: `Res^G_H χ ≠ 0` (value `χ(1) > 0` at `1`), so it is not orthogonal to all
+-- irreducibles of `H` (`classFunction_eq_zero_of_orthogonal`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
 -- RepresentationTheory (Peterfalvi (2.10.1) L-conjugacy invariance): inducing from a conjugate
 -- subgroup `H^ℓ = H.map (MulAut.conj ℓ)` with the transported class function `transportConj ℓ θ`
 -- equals inducing from `H`.  Re-index the induction sum by `x ↦ x * ℓ` (`induceTerm_transportConj`);
@@ -775,6 +817,14 @@ set_option linter.style.longLine false in
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_finrank_eq_prime_pow_of_isPGroup
+-- ClassFunction-level form of the same corollary: an irreducible character of a finite p-group has
+-- `χ(1) = p^k`.  Routes the witnessing representation's `dim V = p^k` onto `χ 1` via `char_one`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup
+-- Peterfalvi-side consumer (the degree datum for (6.6) "θⱼ(1) is a power of p", mmd L80): the same
+-- prime-power degree on the `IrreducibleCharacter G` subtype, phrased through `characterDegree`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_characterDegree_eq_prime_pow_of_isPGroup
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
@@ -1019,6 +1069,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
 
+-- 真正 character の ℕ-分解 (issue 0046, Peterfalvi (6.6) G2.2 residual): 真正 character `χ_ρ`
+-- の Fourier 係数 ⟨χ,ψ⟩ は非負整数 (= dim Hom(σ,ρ)) で, χ = ∑_{ψ∈Irr} ⟨χ,ψ⟩•ψ と ℕ-係数で分解.
+-- G-level 非負性 (restrictionMultiplicity_nonneg の G 版) + mem_ZIrr_repr/inner_eq_coeff_of_repr 合成.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.mem_ZIrr
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsCharacter.exists_natCast_inner_irreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.inner_irreducible_nonneg
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.exists_natFinsupp_eq_sum
+
 -- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
 -- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
 -- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.
@@ -1031,6 +1090,21 @@ set_option linter.style.longLine false in
 -- orthonormal Parseval (ZIrrFourier) で sorry-free.
 -- (5.2.d) gateway の非空性証拠 (2 元 CharacterDifferenceImage → 一般 family).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage
+-- (5.4) projection smart-constructor (issue 0046): `CharacterPsiDecomposition` の hard
+-- `X`/`Y`/`coeff`/`X_eq`/`Y_orthogonal` 6 fields を, 単一 number-theoretic input
+-- `(χ−ψ)^{τ₁} ∈ ZIrr G` から integral projection (`exists_intProjection_of_orthonormal_ZIrr`) で
+-- *計算* 供給。残 input = structural data (imageFamily R(χ), tau1 + isom + agrees, 3 直交スカラー)。
+-- 各 step の D₀/Da 生産を「Dade R(χ) 抽出 + τ₁ isometry 拡張」の 2 primitive に縮約する seam。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+-- (5.6.3) PASS 2 (ii): per-step shared-isometry decomposition PAIR.  `decompositionPair` produces
+-- BOTH `D₀` (ψ=0) and `Da` (ψ=a·χ₁) from ONE shared `(R(χ), τ₁, isom, agrees)` + the two
+-- `ZIrr`-membership facts `(χ−0)^{τ₁}, (χ−a·χ₁)^{τ₁} ∈ ℤ[Irr G]` via two `ofProjection` calls, so
+-- the τ₁-agreement `Da.tau1 χ = D₀.tau1 χ` is STRUCTURAL (`decompositionPair_tau1_agree`, `rfl`) —
+-- never posited.  This is the honest packaging of the per-step D₀/Da production from the running τ₁.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.decompositionPair
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.decompositionPair_tau1_agree
 -- (5.4.a) ‖X‖² ≥ ‖χ‖².
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_chi_re_le_inner_self_X
@@ -1048,6 +1122,12 @@ set_option linter.style.longLine false in
 -- `2a < D, λ²D-2λa+z ≤ 0 ⇒ λ = 0`. すべて (5.4)/(5.5) API 直載 sorry-free.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.inner_self_orthogonalSum_add_re
+-- (5.6.1) existence half (issue 0046): orthogonal projection of any `w` onto a finite orthogonal
+-- family `vᵢ` with nonzero real grams `mᵢ` — `w = ∑(⟨w,vᵢ⟩/mᵢ)•vᵢ + Z`, `Z ⊥ vⱼ`.  Pure diagonal
+-- projection (no completeness): supplies the (5.6.1) decomposition `Y − a·χ₁^{τ₁} = −λ·∑(aᵢ/‖χᵢ‖²)·
+-- χᵢ^{τ₁} + Z` whose coefficients are then computed from `χᵢ^{τ₁} ⊥ R(χ)` and fed to the capstone.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_orthogonalProjection_of_orthogonal_family
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_Y_re_le_inner_self_psi
 #assert_only_allowed_axioms
@@ -1059,6 +1139,39 @@ set_option linter.style.longLine false in
 -- (5.6.1) 分解データ (構成可能) を消費し (5.6.2) 結論 `Y = a·χ₁^{τ₁}` を出す。
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.lambda_eq_zero_and_Z_eq_zero
+-- (5.6.1)→(5.6.2) `Y`-collapse producer `Y = a·χ₁^{τ₁}` (issue 0046): consumes the (5.6.1) λ-form
+-- `Y = a·χ₁^{τ₁} − λ·∑(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, bridges it to the capstone's pointwise-coefficient
+-- form, applies `lambda_eq_zero_and_Z_eq_zero` (λ=0, Z=0), and feeds back → `D.Y = a • D.tau1 χ₁`.
+-- CONSTRUCTS the `hY` hypothesis that `X_eq_tau1_chi_of_Y_eq` / `image_eq_of_decomposition` /
+-- `retarget_isCoherent_of_decompositions[_and_memberFamily]` consume, not posited.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_eq_nsmul_tau1_of_lambdaForm
+-- (5.6.3) projection identity `Da.X = D₀.X` (issue 0046): the `R(χ)`-projection `X` is independent
+-- of `ψ`.  `X_eq_tau1_chi_of_Y_eq` : from the (5.6.2) collapse `Y = a·χ₁^{τ₁}` (`hY`), the
+-- `ψ = a·χ₁` decomposition has `X = χ^{τ₁}` (linearity of `tau1` on `χ - a·χ₁`).
+-- `X_eq_of_tau1_eq_on_chi` : chaining with `D₀.tau1 χ = D₀.X` (5.5) and the τ₁-agreement
+-- `Da.tau1 χ = D₀.tau1 χ` gives `Da.X = D₀.X` — CONSTRUCTS the `hX_eq` hypothesis of
+-- `retarget_isCoherent_of_decompositions`, not posited.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_tau1_chi_of_Y_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.X_eq_of_tau1_eq_on_chi
+-- (5.5)+(5.2.e) image-side orthogonality (issue 0046): the (5.6.3) lattice orthogonalities
+-- `hX_ortho`/`hXbar_ortho` (`⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`) derived from the per-element
+-- `R(χ)`-orthogonality `∀ α ∈ R(χ), ⟨η, α⟩ = 0`.  `inner_X_eq_zero_of_orthogonal_imageSet` :
+-- `X = ∑ coeff•α` (`X_eq`) ⟹ `⟨η, X⟩ = 0`.  `inner_conjImage_eq_zero_of_orthogonal_imageSet` :
+-- `X̄ = X − (χ−χ̄)^τ` with `(χ−χ̄)^τ = ∑_{α∈R(χ)}α` both in `ℤ[R(χ)]` ⟹ `⟨η, X̄⟩ = 0`.  These
+-- CONSTRUCT the `hperElem`-fed `hX_ortho`/`hXbar_ortho` of `retarget_isCoherent_of_decompositions`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_eq_zero_of_orthogonal_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_conjImage_eq_zero_of_orthogonal_imageSet
+-- (5.2.e) FEED `inner_X_orthogonal_imageSet_of_orthogonal` (issue 0046, PASS 2): the dual of the
+-- above — `X = D.X ∈ ℤ[R(χ')]` is orthogonal to every member `α` of a *second* family `R(χ)` when
+-- `R(χ') ⊥ R(χ)` (`D.imageFamily.Orthogonal R₀`).  `⟨X, α⟩ = ∑ coeff·⟨β, α⟩ = 0`.  This is the
+-- per-character half of mmd L77 "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)".
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_orthogonal_imageSet_of_orthogonal
 -- Peterfalvi §7 (5.6.3) conjugate-image computation (issue 0046): given the (5.4.b)/(5.5)
 -- output `X = ∑_{α∈E} α`, the candidate `χ̄^{τ₂} = X - (χ-χ̄)^τ = -∑_{α∈R(χ)-E} α`, with
 -- `‖χ̄^{τ₂}‖² = |R(χ)| - |E|` and `⟨X, χ̄^{τ₂}⟩ = 0`.  orthonormal `R(χ)` の Parseval/card で
@@ -1069,3 +1182,367 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_self_conjImage_eq_card_sdiff
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.inner_X_conjImage_eq_zero
+-- (5.2.d) PRODUCER `characterDifferenceImageOfIsometry` (issue 0046): the first actual consumer of
+-- the §3 (1.4) keystone `isometry_difference_pair_structure`.  CONSTRUCTS (not posits) the §7
+-- `CharacterDifferenceImage τ χ` record — the two-element `R(χ) = {μ,ν}` gateway used throughout §7
+-- — from an integral isometry `τ`, a non-real irreducible `χ` (so `χ ≠ χ̄`), and the three (1.4)
+-- hypotheses on the family `{χ,χ̄}` (images virtual, vanish at 1, norm-preserving).  Reads `μ,ν,ε`
+-- off the `SignedIrreducibleDifferenceFamily` delivered by the keystone (`Exists.choose`, hence
+-- `noncomputable`); `image_eq : τ(χ-χ̄) = ε•(μ-ν)` from the index-1 family equation
+-- `τ(χ̄-χ) = ε•(μ₁-μ₀)`.  Until now the §7 `CharacterDifferenceImage` had NO constructor — every §7
+-- lemma took it hypothetically; this supplies the missing existence (`toOrthonormalImage` then lifts
+-- it to `OrthonormalCharacterImageFamily`, the orthonormal `R(χ)`).  Equal-degree of `χ,χ̄` is
+-- `irreducibleCharacter_conj_apply_one` (char value at 1 is a natural number, fixed by conjugation).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.irreducibleCharacter_conj_apply_one
+-- (5.6.3) keystone: the orthonormal-block isometry re-targeting constructor `τ₂`.  Given a global
+-- integral isometry `τ₁` and orthonormal pairs `{χ,χ̄}`, `{X,X̄}` with the same gram, with `X,X̄ ⊥
+-- τ₁ ξ` for every `ξ ⊥ {χ,χ̄}`, the rank-2 re-targeting is again a global integral isometry.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_isIntegralIsometry
+-- (5.6.3) lattice-relative keystone (the genuinely satisfiable form): the re-targeting preserves
+-- `⟨·,·⟩` *on a submodule `M`* (closed under the Gram–Schmidt residual against `{χ,χ̄}`, `χ,χ̄∈M`)
+-- requiring `X,X̄ ⊥ τ₁ ξ` only for `ξ ∈ M ⊥ {χ,χ̄}`.  For `M = span_ℂ(S₁∪{χ,χ̄})` the residual of
+-- `φ∈M` lies in `span_ℂ S₁`, so this is the honest (5.5)+(5.2.e) `X,X̄ ⊥ S₁^{τ₁}` (not the
+-- over-strong global version that forces `X,X̄ ∈ span{τ₁χ,τ₁χ̄}`).  This is the (5.6.3) *lattice*
+-- isometry `Z[S₁∪{χ,χ̄}] → Z[Irr G]`.  The weakened `IsCoherent.extension_inner_eq` is the
+-- *integral-span* form below (`retarget_inner_eq_on_zSpan_union`), needing only the `ℤ[S₁]`-isometry
+-- of `τ₁` — no global lift is required (and none exists in FT, where `dim CF(L) > dim CF(G)`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_inner_eq_on
+-- (5.6.3) integral-span keystone (the honest realization of `IsCoherent.extension_inner_eq`): the
+-- re-targeting preserves `⟨·,·⟩` on all of `ℤ[S₁∪{χ,χ̄}]`, using only the `ℤ[S₁]`-isometry of
+-- `τ₁ = hS₁.extension` and the lattice orthogonality `X,X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`.  Every
+-- Gram–Schmidt residual of `φ∈ℤ[S₁∪{χ,χ̄}]` lands in `ℤ[S₁]` (`orthoResidualMap_mem_zSpan`), so the
+-- block expansion closes with no global-isometry input — directly feeding the weakened `IsCoherent`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.orthoResidualMap_mem_zSpan
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_inner_eq_on_zSpan_union
+-- (5.6.1) family bundle: the source-side cross-difference orthogonality
+-- `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ·‖χ₁‖²`, derived (not posited) from `χ ⊥ S₁` + pairwise orthogonality.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterFamilyBundle.crossDifference_inner
+-- (5.6.3) MAIN coherence-union assembly (general (5.6), UNCONDITIONAL): `IsCoherent (S₁ ∪ {χ,χ̄}) A`.
+-- CONSTRUCTS the extension `τ₂ := retarget τ₁ χ χ̄ X X̄`, proves it a *lattice* isometry on
+-- `ℤ[S₁∪{χ,χ̄}]` (`retarget_inner_eq_on_zSpan_union`, the weakened `extension_inner_eq` field — no
+-- global isometry, none exists in FT), and discharges `extends_on_supported` by agreement on the
+-- three difference generators `{χ−χ̄, χ−a·χ₁} ∪ Z[S₁,L^#]` (`eq_on_zSpan_of_eq_on`).  The data
+-- threaded in are the honest (5.4)/(5.5)/(5.6.2) outputs (orthonormal `{X,X̄}`, `X̄ = X−(χ−χ̄)^τ`, the
+-- *lattice* (5.5)+(5.2.e) orthogonality `X,X̄ ⊥ τ₁ ξ` for `ξ ∈ ℤ[S₁]`, the (5.6.2) image equation)
+-- plus the (5.1)-type generation `hgen`.  No special-position restriction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent
+-- (5.6.3) target-pair PRODUCER (G2.7 foundational brick): CONSTRUCTS the orthonormal `{X,X̄}` block
+-- of `retarget_isCoherent` *from* a (5.5) decomposition `D : CharacterPsiDecomposition τ χ 0` of an
+-- irreducible `χ` (`‖χ‖²=1`) plus the source-pair orthonormality.  `X := D.X`, `X̄ := D.X−(χ−χ̄)^τ`;
+-- `(5.5)` gives `X = ∑_{E}α` with `|E|=‖χ‖²=1` (single element, ‖X‖²=1), `|R(χ)|=‖χ−χ̄‖²=2` (via
+-- `tau1_agrees`+τ₁-isometry), so `‖X̄‖²=|R(χ)|−|E|=1`; `⟨X,X̄⟩=0` off the orthonormal family; both
+-- ∈ℤ[Irr G].  This refutes the Round-20 "missing Gram–Schmidt/basis-extension" claim: for irreducible
+-- `χ` the target pair is FORCED, no rescaling/orthonormalization primitive is needed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.retargetTargetPair
+-- (5.6.3) per-step assembly with target pair constructed from (5.5): `IsCoherent (S₁∪{χ,χ̄}) A` where
+-- `{X,X̄}` is NOT data but built from `D` via `retargetTargetPair`.  Isolates exactly the residual that
+-- genuinely couples to the running `τ₁ = hS₁.extension`: the (5.2.e) cross-orthogonality `X,X̄ ⊥ τ₁ ξ`
+-- (`hX_ortho`/`hXbar_ortho`) and the (5.6.2) image equation `(χ−aχ₁)^τ = D.X − a·τ₁χ₁` (`himg`).  All
+-- else (orthonormality + virtual-character membership of `{D.X, X̄}`) comes from `D`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decomposition
+-- (5.6.2) IMAGE-EQUATION SUPPLIER (G2.7 wiring): CONSTRUCTS the `himg : τ(χ−aχ₁) = X − a·τ₁χ₁`
+-- hypothesis of `retarget_isCoherent` — the single genuinely running-τ₁-coupled fact — from the
+-- (5.4)/(5.6.1) decomposition `D : CharacterPsiDecomposition τ χ (a·χ₁)` and three honest textbook
+-- inputs: `htau1_diff` ((5.4) τ₁'=τ on the supported difference `χ−aχ₁`), `hY` ((5.6.2) `Y=a·χ₁^{τ₁'}`
+-- after λ=0/Z=0), `htau1_chi1` (τ₁' agrees with the running coherence extension at `χ₁∈S₁`).  Chains
+-- `τ(χ−aχ₁) = D.tau1(χ−aχ₁) = D.X − D.Y = D.X − a·D.tau1 χ₁ = D.X − a·hS₁.extension χ₁` via `tau1_image`.
+-- This is the precise §4↔§7 coupling: the Dade-isometry side enters as `τ(χ−aχ₁)` (LHS, the §4 Dade
+-- image of the supported difference via `dadeIntegralCharacterMap_apply_of_support`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.image_eq_of_decomposition
+-- (5.6.3) COMPLETE per-step adjoining with `himg` discharged internally: the single entry point a
+-- (6.6)/(6.8) `coherentPairChain` step calls — `IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A`.
+-- Consumes BOTH (5.5)/(5.6.1) decompositions `D₀`/`Da` and their common `R(χ)`-projection
+-- (`hX_eq : Da.X = D₀.X`, the (5.6.2) identification), builds the orthonormal pair `{D₀.X, X̄}` via
+-- `retargetTargetPair` AND discharges `retarget_isCoherent`'s `himg` via `image_eq_of_decomposition`.
+-- Makes (6.6) `peterfalvi_66_coherence_of_X`'s `hstep` dischargeable from the Dade-isometry targets.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions
+-- (5.5)+(5.2.e) IMAGE-SIDE coupling `hperElem`, *constructed* not posited (issue 0046, PASS 2).
+-- `inner_extension_member_orthogonal_imageSet` : for a member `χ'∈S₁` with its `ψ=0` decomposition
+-- `D'` (so `χ'^{τ₁'}=D'.X` by (5.5)) and `R(χ')⊥R(χ)` (5.2.e) + the running agreement
+-- `D'.tau1 χ'=hS₁.extension χ'`, the running image `χ'^{τ₁}` is ⊥ `R(χ)` — the per-member mmd L77.
+-- `inner_extension_orthogonal_imageSet_of_members` : span induction lifts that to all `ξ∈ℤ[S₁]`
+-- (`ℤ`-linearity of the extension and of `⟨·,α⟩`).  These two SUPPLY the `hperElem` of
+-- `retarget_isCoherent_of_decompositions` from honest per-member data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.inner_extension_orthogonal_imageSet_of_members
+-- (5.6.3) COMPLETE per-step adjoining with ALSO `hperElem` discharged internally (issue 0046,
+-- PASS 2): the final form where every (5.6.3) input reduces to genuine Dade-map / running-extension
+-- facts — no image-side coupling remains posited.  Replaces `hperElem` by the per-member family of
+-- `ψ=0` decompositions `Dmem`/orthogonality `hmemOrtho`/agreement `hmemTau1`, deriving `hperElem`
+-- via the two lemmas above.  This makes (6.6) `peterfalvi_66_coherence_of_X`'s `hstep` dischargeable
+-- from the actual Dade isometry's per-member (5.5)+(5.2.e) data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_decompositions_and_memberFamily
+-- (5.6.3) PASS 2 (ii) ENTRY POINT: per-step coherence from a SHARED-isometry decomposition pair.
+-- `retarget_isCoherent_of_sharedDecomposition` takes the shared `(R(χ), τ₁, isom, agrees)` + the two
+-- `ZIrr`-membership facts, builds `(D₀, Da)` via `decompositionPair`, and discharges the τ₁-agreement
+-- `htau1_chi : Da.tau1 χ = D₀.tau1 χ` STRUCTURALLY (`decompositionPair_tau1_agree`).  The (5.6.3)
+-- projection identity `Da.X = D₀.X` then follows from the structural agreement.  This is the clean
+-- (6.6) `hstep` shape: a caller supplies the per-step Dade `R(χ)` + global τ₁ + per-member family.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_sharedDecomposition
+-- (5.6.3) supporting bricks: span-agreement (`eq_on_zSpan_of_eq_on`), orthogonality lifts to the
+-- ℤ-span (`inner_eq_zero_of_mem_zSpan`), and the re-targeting collapses to `τ₁` on the span of any
+-- set orthogonal to `{χ,χ̄}` (`retarget_eq_on_zSpan_of_orthogonal`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.eq_on_zSpan_of_eq_on
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_eq_on_zSpan_of_orthogonal
+-- (5.5)+(5.2.e) orthogonality in sum form: from `X = ∑_{α∈R} c(α)·α` (the (5.5) `X ∈ ℤ[R(χ)]` in
+-- explicit `X_eq` form) and per-element `⟨η, α⟩ = 0`, conclude `⟨η, X⟩ = 0`.  Packages the
+-- `hX_ortho`/`hXbar_ortho` inputs of `retarget_isCoherent` from the per-`R(χ)`-element (5.2.e) fact.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_eq_intCast_sum
+-- (6.8.1)/(6.8.2) orthogonal coherent union: the two-lattice block identity
+-- `⟨νX a + νY b, νX a' + νY b'⟩ = ⟨a + b, a' + b'⟩` for `a,a'∈ℤ[X]`, `b,b'∈ℤ[Y]` under source +
+-- image orthogonality (the algebraic heart of Peterfalvi's `τ₃` gluing of two coherent pieces).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_orthogonal_glued_eq
+-- (6.8.1)/(6.8.2) the same identity lifted to all of `ℤ[X∪Y]` for any map `ν` agreeing with `νX` on
+-- `ℤ[X]` and `νY` on `ℤ[Y]` (`Submodule.span_union` decomposition) — the weakened
+-- `IsCoherent.extension_inner_eq` field for the union `X ∪ Y` once the two coherent pieces exist.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_eq_on_zSpan_union_of_orthogonal
+-- (6.8.1)/(6.8.2) the `τ₃` assembly into an actual `IsCoherent (X∪Y) A` witness: from two coherence
+-- witnesses `hX`, `hY`, a glued map `ν` agreeing with `hX.extension`/`hY.extension` on `ℤ[X]`/`ℤ[Y]`,
+-- and source+image orthogonality, build `IsCoherent τ (X∪Y) A` — `extension_inner_eq` via
+-- `inner_eq_on_zSpan_union_of_orthogonal`, `extends_on_supported` via `eq_on_zSpan_of_eq_on` on the
+-- generator `Z[X,A] ∪ Z[Y,A]` and a (5.1)-type generation hypothesis.  The two-family analogue of
+-- `retarget_isCoherent`; carries no character theory (its inputs are supplied by (6.6)/(6.7)/Dade).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued
+-- (6.6) "repeated use of (5.6)" iteration engine: from a coherent base `S₀` and a per-index
+-- adjoining step `IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` (each step
+-- one application of (5.6) = `retarget_isCoherent` with the caller's per-step data), the union after
+-- `N` adjoinings `pairUnion S₀ pair N` is coherent — the induction is derived, never posited.  The
+-- accumulated-set monotonicity helper is `pairUnion_mono`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPairChain
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_mono
+-- (6.6) conclusion "X is coherent" (mmd L84): `coherentOfPairChainCover` assembles it from the
+-- degree-ordered pair-chain decomposition of `X` (base prefix `S₀` + remaining conjugate pairs,
+-- certified to recover `X` by `pairUnion_eq_of_cover` via the membership lemma `mem_pairUnion`)
+-- and the `coherentPairChain` engine.  The base coherence `h0` (= (1.1)+(1.4) prefix) and the
+-- per-step (5.6) adjoining `hstep` are *supplied* (the residual to fill is `hstep`'s per-step
+-- `{Xᵢ, X̄ᵢ}` target data, needing the Dade-isometry ν basis extension, G2.7); the conclusion
+-- `IsCoherent τ X A` is derived from them through the chain.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mem_pairUnion
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_eq_of_cover
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentOfPairChainCover
+-- (6.6) named conclusion `peterfalvi_66_coherence_of_X : … → IsCoherent τ X A` (mmd L74/L84):
+-- "X = {χ ∈ Irr L | Z ⊄ Ker χ} is coherent".  Assembles the (6.6) proof at the textbook altitude
+-- by threading the degree-monotone enumeration `e` of `exists_monotoneDegreeEnum` (mmd L76 opening
+-- "Set X = {χ₁,…,χₙ}, χ₁(1) ≤ ⋯ ≤ χₙ(1)") into the `coherentPairChain` accumulator via
+-- `pairUnion_eq_of_enumCover`: the enum's *surjectivity* onto `X` reduces the engine's set-level
+-- cover to the index-level cover `hcoverIdx` (checked along χ₁,…,χₙ), so the accumulator
+-- `pairUnion S₀ pair N` is identified with `X` and folded coherence (`coherentPairChain`) lands as
+-- `IsCoherent τ X A`.  Base prefix coherence `h0` ((1.1)+(1.4)) and per-step (5.6) adjoining `hstep`
+-- (degree side already discharged by `two_mul_lt_sq_of_primePow_gap`/`sumInflatedDegreeSq`) are
+-- supplied; the residual is `hstep`'s per-step `{Xᵢ,X̄ᵢ}` target data (Dade-isometry ν extension, G2.7).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_eq_of_enumCover
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X
+-- (6.6) opening "Set X = {χ₁,…,χₙ} where χ₁(1) ≤ ⋯ ≤ χₙ(1)" (mmd L76): the degree-sorted indexing
+-- of the finite set `X = S − S(Z)`.  `exists_monotoneDegreeEnum` produces an injective surjection
+-- `e : Fin (X.ncard) → X` monotone in the real degree key `χ ↦ (characterDegree χ).re` — the purely
+-- order-theoretic "sort a finite family by a real key" step (`Tuple.sort`/`Tuple.monotone_sort`),
+-- stated for an arbitrary finite class-function set (no irreducibility / induced-structure used).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_monotoneDegreeEnum
+-- (6.6) opening "By (1.1), n ≥ 2" (mmd L76): the count `n = |X|` of the irreducible characters of
+-- `L` not killing `Z` satisfies `n ≥ 2`.  The two consequences of (1.1) used — closure under
+-- conjugation (`ClosedUnderConjugate`) and no real character (`HasNoRealCharacters`), both §7
+-- `Hypothesis` fields inherited by `X ⊆ S` — plus nonemptiness yield, via the conjugation
+-- involution `χ ↦ χ̄`, a second distinct member, hence `2 ≤ X.ncard` (`Set.one_lt_ncard`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_le_ncard_of_conjugate_closed_of_noReal
+-- (6.6) prime-power degree gap (mmd L82): the strict bound `2·χᵢ(1)·χ₁(1) < ∑_{j<i}χⱼ(1)²` that
+-- each `coherentPairChain` step's (5.6.2) integer-forcing (`int_eq_zero_of_sq_mul_le_of_two_mul_lt`)
+-- consumes.  `two_mul_lt_sq_of_primePow_gap`: `dᵢ = q·d₁`, `q = p^m`, `p ≥ 3`, `d₁ < dᵢ` ⟹
+-- `2·dᵢ·d₁ < dᵢ²` (`q ≥ p ≥ 3` gives `dᵢ ≥ 3·d₁`).  `two_mul_degree_lt_sum_ratCast`: chains the gap
+-- through the square-divisibility `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) to the `ℚ` bound `2·a < D`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_primePow_gap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_degree_lt_sum_ratCast
+-- (5.6.1)→(5.6.2) Y-collapse producer (mmd L71-97): from the (5.4) decomposition `Da` and the
+-- source family bundle `B`, *constructs* `Da.Y = a·χ₁^{τ₁}` — projects `Y` onto `{χᵢ^{τ₁}}`,
+-- computes the single integer `λ` via the cross-orthogonality `crossDifference_inner` transported
+-- through the isometry, and collapses `λ = 0` with `Y_eq_nsmul_tau1_of_lambdaForm`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_collapse_of_family
+-- (5.2.d) base coherence — the seed `h0`/`hS₁` every chain consumes but none constructed.
+-- `zSupportedSpan_pair_subset_span`: supported combos of `{χ,χ̄}` (equal degree, `1∉A`) are multiples
+-- of `χ−χ̄`.  `coherentPair`: `IsCoherent τ {χ,χ̄} A` from orthonormal target pair `{X,X̄}` (S₁=∅
+-- retarget).  `coherentPair_fromDade`: the seed at the real Dade τ, target pair from `retargetTargetPair`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_pair_subset_span
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPair
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentPair_fromDade
+-- (5.6.1)→(5.6.2) at the Dade base map: the same Y-collapse for any `Da` with `Da.tau1 = τ`, with
+-- every hypothesis of `Y_collapse_of_family` discharged from the Dade isometry + prior coherence
+-- (`dadeIntegralCharacterMap_inner_eq_on_supported_span`, `inner_extension_member_orthogonal_imageSet`,
+-- `dadeIntegralCharacterMap_mem_ZIrr_of_supported`).  Only genuine (6.6) source data remains as input.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dade_Y_collapse_of_family
+-- (6.6) square-divisibility producers (mmd L78-80): the `hdvd : χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` input.
+-- `dvd_of_add_eq_of_dvd_dvd`: additive complement `head + tail = total`, `a∣tail`, `a∣total` ⟹
+-- `a∣head` (combine `θᵢ(1)² ∣ ∑_{j≥i}` and `θᵢ(1)² ∣ |L|-|L:Z|` through the sum identity).
+-- `sq_dvd_of_factored_coprime`: `χᵢ(1) = idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`
+-- (mmd L80 coprimality forcing, `idx = |L:K|` prime to `p`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
+
+-- Peterfalvi (5.1) Dade-isometry base map (G2.7 type-bridge): the §4 Dade map is `ℂ`-linear on the
+-- supported subspace `CF(L,A)` (`Hypothesis.dadeLinearMap`, the bare `DadeMap` repackaged via the
+-- pointwise `dadeValue α g = α(a)` evaluation), and `dadeIntegralCharacterMap` extends it to a total
+-- `IntegralCharacterMap ↥L G` (`LinearMap.exists_extend` over the field `ℂ`, then `restrictScalars
+-- ℤ`).  `dadeIntegralCharacterMap_apply_of_support` is its defining property: on `CF(L,A)` the lift
+-- *is* the Dade map, supplying the (5.6.3) base map `τ` from the actual §4 isometry.  The extension
+-- off `CF(L,A)` is unconstrained — `IsCoherent τ S A` only inspects `τ` on `zSupportedSpan S A`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.dadeLinearMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+
+-- Peterfalvi (5.1)/(5.4) Round-13 supply-ability + Round-24 (ii) per-step production.  The
+-- `CharacterPsiDecomposition.tau1_inner_eq_on_support` field (and the `ofProjection`/`decompositionPair`
+-- inputs) were weakened from a GLOBAL `IsIntegralIsometry` to LATTICE-RELATIVE inner-preservation on
+-- the supported sponsoring span `ℤ[χ, χ̄, ψ]` (the same Round-13 weakening already applied to
+-- `IsCoherent.extension_inner_eq`; a global isometry `CF(L)→CF(G)` does not exist in FT where
+-- `dim CF(L) > dim CF(G)`).  `support_subset_of_mem_zSpan_of_supported` is the `ℤ`-submodule closure
+-- fact (`Submodule.span_le` into `supportedSubmodule.restrictScalars ℤ`);
+-- `dadeIntegralCharacterMap_inner_eq_on_supported_span` SUPPLIES the weakened form from the Dade
+-- isometry's `CF(L,A)` inner-preservation (`IsDadeIsometry.inner_eq`, (2.6.a)).
+-- `decompositionPairFromDade` then PRODUCES the per-step `(D₀, Da)` pair directly from the Dade
+-- isometry — `htau1_inner_eq` discharged internally — closing Round-24 (ii).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.support_subset_of_mem_zSpan_of_supported
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDade
+
+-- Round B: the Dade `R(χ)` extractor + ZIrr-membership, constructing the per-step (5.6) inputs
+-- ENTIRELY from the Dade isometry (no opaque `OrthonormalCharacterImageFamily`/`ZIrr` hypotheses).
+-- `one_notMem_dadeSupport` (S04): `1 ∉ dadeSupport` (from `a ≠ 1` + `centralizer_disjoint`).
+-- `dadeIntegralCharacterMap_apply_one_eq_zero`: the Dade image vanishes at `1` (vanishes off
+-- `dadeSupport` via `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`; `1 ∉ dadeSupport`) — discharges
+-- the (1.4) `IsometryDifferenceImagesVanishAtOne`.  `dadeIntegralCharacterMap_mem_ZIrr_of_supported`:
+-- supported virtual characters map into `ℤ[Irr G]` ((2.6.b) `PreservesVirtualCharacters`/
+-- `maps_virtualCharacter`) — discharges the (1.4) `IsometryDifferenceImagesAreVirtual` and the two
+-- `htau1_mem0`/`htau1_mema` facts.  `dadeOrthonormalCharacterImageFamily` is the R(χ) extractor: it
+-- discharges the three (1.4) hypotheses of `characterDifferenceImageOfIsometry` for the Dade map on
+-- `{χ, χ̄}` and lifts via `toOrthonormalImage` to `OrthonormalCharacterImageFamily`.
+-- `decompositionPairFromDadeOfIrreducible` is the full assembly: from `χ` irreducible non-real +
+-- supported + `χ₁ ∈ ℤ[Irr L]` it builds BOTH `R(χ)` AND the `ZIrr` facts internally, producing the
+-- per-step `(D₀, Da)` pair for `retarget_isCoherent_of_sharedDecomposition` from the real Dade τ.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.one_notMem_dadeSupport
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_conjDifference_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDadeOfIrreducible
+
+-- Round C: the running-`τ₁` instantiation.  `retarget_isCoherent_fromDade` discharges one (6.6)
+-- `coherentPairChain` step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` against the (5.1)
+-- base map `τ = dadeIntegralCharacterMap` AS the running auxiliary isometry `τ₁ = τ` itself.  The
+-- four agreement obligations of `retarget_isCoherent_of_sharedDecomposition` are discharged
+-- internally: `htau1_agrees`/`htau1_diff` are `rfl` (the decomposition's `tau1` field IS `τ`), and
+-- `htau1_chi1`/`hmemTau1` (agreement with the running `hS₁.extension` on `χ₁` and on every member
+-- `x ∈ S₁`) come from `IsCoherent.extends_on_supported` — the running extension agrees with `τ` on
+-- the supported sublattice `Z[S₁, A]`, where `χ₁` and the members are supported.  The `R(χ)` family +
+-- `ZIrr` facts are Round B; the residual inputs (`hY` (5.6.2) collapse, `hmemOrtho` (5.2.e) image
+-- orthogonality, source orthogonalities, `hgen`) are the genuine per-step (6.6) character-degree
+-- content (the (6.6) enumeration's responsibility, not the Dade isometry's).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.retarget_isCoherent_fromDade
+
+-- Round C assembly: the (6.6) coherence-of-X INSTANTIATED at the real Dade isometry.
+-- `pairUnion_succ_eq_union_pair`: the set-level bridge `pairUnion S₀ pair (i+1) = pairUnion S₀ pair i
+-- ∪ {c₁, c₂}` when `(pair i) = (c₁, c₂)` — connects the per-step adjoining engine's `S₁ ∪ {χ, χ̄}`
+-- conclusion to the `coherentPairChain` accumulator shape.  `DadeChainStep` bundles the genuine
+-- per-step (6.6) character-degree content (the residual after the Dade isometry supplies `R(χ)`, the
+-- `ZIrr` facts, the inner-preservation, the `τ₁ = τ` agreements); `DadeChainStep.advance` discharges
+-- one (5.6) step via `retarget_isCoherent_fromDade`, and `DadeChainStep.chainStepAdvance` rewrites it
+-- into the accumulator shape.  `peterfalvi_66_coherence_of_X_from_dade` then folds these over the
+-- chain: the (6.6) `hstep` is no longer posited but CONSTRUCTED from the Dade isometry + prior
+-- coherence, so the §5/§6 coherence engine is fully constructive against the real Dade `τ`.  The only
+-- remaining inputs (enumeration `e`, cover `hcoverIdx`, base coherence `h0`, per-step `hstepData`/
+-- `hpairχ`) are the genuine (6.6) character content, not the Dade isometry's responsibility.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair
+-- `zSupportedSpan_adjoinPair_subset_span`: the (5.6.3) generation containment `ℤ[S₁ ∪ {χ, χ̄}, A] ⊆
+-- ℤ[ℤ[S₁, A] ∪ {χ − χ̄, χ − a·χ₁}]`, discharged as pure ℤ-module theory routed through the
+-- difference generators (no (4.7) `ℤ[S, L^#] = ℤ[S, A]` needed): `χ = (χ − a·χ₁) + a·χ₁`,
+-- `χ̄ = χ − (χ − χ̄)`, every `s ∈ S₁` a right-hand generator by supportedness.  This is what makes
+-- `DadeChainStep.advance` discharge the (5.1) generation hypothesis internally rather than positing it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.advance
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.chainStepAdvance
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X_from_dade
+
+-- Diagonalization keystone (shared gate for Peterfalvi (6.6) G2.2 + G2.5):
+-- `character g = character 1 ⟹ ρ g = id`.  `ρ g` finite-order ⇒ semisimple (squarefree
+-- `X ^ n - 1`); trace = sum of unit-modulus eigenvalues = degree = count forces every eigenvalue
+-- to be `1` (triangle-inequality equality case `all_eq_one_of_norm_eq_one_of_sum_eq_card`).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.all_eq_one_of_norm_eq_one_of_sum_eq_card
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_eq_one_iff_rep_eq_id
+-- Peterfalvi (6.7) central-character constancy core: `ω_ρ(⟦z⟧) = |⟦z⟧|·χ_ρ(z)/χ_ρ(1)` depends only
+-- on `χ_ρ(z)` and `|⟦z⟧|`, so equal class size + equal char value ⟹ equal `ω` (the "α does not
+-- depend on s" of mmd 04.8 L102).  Plus the TI fact `C_G(x) ⊆ L` (`x ∈ A`, `A` TI / normalizer `L`)
+-- giving `|C_G(z)| = |C_L(z)|`, the source of the class-size constancy from `|C_L(z)|`-constancy.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.centralCharacterOfRep_eq_of_card_eq_of_character_eq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralizer_le_of_mem_isTISubset
+-- General character-value bound `|χ(g)| ≤ χ(1)` (the inequality the (6.6) G2.2 residual flags as
+-- needs-infra), via the same root-of-unity / triangle machinery; equality case is the keystone.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.norm_character_le_finrank
+-- Peterfalvi (6.6) G2.2 representation-level constituent-inherits-kernel: `g ∈ ker χ_ρ` (whole-rep
+-- character = degree) ⟹ `g ∈ ker χ_{ρ'}` for every subrepresentation `ρ'` (keystone: `ρ g = id`
+-- restricts to `id` on the invariant submodule, so its character = dimension = degree).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.subrepresentation_character_eq_one_of_character_eq_one
+
+-- Inflation infrastructure ([Isaacs] (2.22), gating Peterfalvi (6.6) G2.5 degree-sum):
+-- irreducibility is preserved under surjective precomposition, hence the inflation map
+-- `Irr(G ⧸ N) → Irr G`, `χ̄ ↦ χ̄ ∘ (mk' N)`, is degree-preserving with `N ⊆ ker`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Representation.isIrreducible_comp_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_apply_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.subset_characterKernel_inflate
+-- Injective half of the inflation bijection: distinct quotient characters inflate to distinct
+-- characters (surjective precomposition is injective on class functions).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.compHom_injective_of_surjective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inflate_injective
+-- Surjective half (the keystone consumer): every irreducible `χ` with `N ⊆ ker χ` is an inflation
+-- `inflate N χbar`.  `ρ n = id` on `N` (keystone) ⇒ `ρ` descends through `Representation.ofQuotient`
+-- to an irreducible `σ` on `G ⧸ N` with `χ_σ ∘ mk' = χ`.  Completes the inflation bijection (2.22).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Representation.isIrreducible_of_isIrreducible_comp_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_inflate_eq_of_subset_characterKernel
+-- Peterfalvi (6.6) degree-sum (the G2.5 payoff): the inflation bijection transports Burnside on
+-- `G ⧸ N` to `∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumInflatedDegreeSq
+-- Complement degree-sum (the planned G2.5 payoff): `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|`,
+-- the (6.6)/(6.8) set `X = {χ | Z ⊄ ker χ}` total `|L| − |L:Z|` (mmd 04.8 L78, L234).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq
+-- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
+-- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
+-- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
+-- (6.8) set `Y = S(H')`, where the (5.6) degree induction is unavailable.  The isometry on
+-- `ℤ[range χ]` is pure Parseval (`coherentImageMap_inner_eq`); the supported sublattice is
+-- generated by the differences `χⱼ − χ₀` (`zSupportedSpan_range_subset_span_sub_zero`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_inner_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_range_subset_span_sub_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree
+-- Dade specialization: equal-degree coherence at the real (5.1) base map `τ = dadeIntegralCharacterMap`.
+-- The (1.4) signed family `{μⱼ, ε}` is constructed by `isometry_difference_pair_structure` applied to
+-- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
+-- coherence with no opaque hypotheses — only the genuine equal degree and supports.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade

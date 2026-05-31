@@ -1,0 +1,363 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.GroupTheory.QuotientGroup.Basic
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+
+/-!
+# Inflation of irreducible characters
+
+For a surjective group homomorphism `f : H →* G`, precomposition of class functions
+(`ClassFunction.compHom f`) carries irreducible characters of `G` to irreducible characters
+of `H`, and preserves degrees.  Specialized to the quotient map `f = QuotientGroup.mk' N`
+for a normal subgroup `N ⊴ G`, this is the classical **inflation** correspondence
+([Isaacs] (2.22)): an irreducible character `χbar` of `G ⧸ N` inflates to the irreducible
+character `χbar ∘ (mk' N)` of `G`, whose kernel contains `N`.
+
+The representation-theoretic core is that for a surjective `f`, the lattice of
+subrepresentations of `σ.comp f` coincides (identically on the underlying submodule) with that
+of `σ`: a submodule invariant under all `σ (f h)` is invariant under all `σ g` because `f` is
+onto.  Transporting `IsSimpleOrder` along the resulting order isomorphism gives irreducibility
+preservation.  Trace (hence degree) is preserved because `σ.comp f` and `σ` act by the *same*
+linear maps on the same space (`(σ.comp f) h = σ (f h)`).
+
+This is the first brick of the Inflation infrastructure gating Peterfalvi (6.6) G2.5
+(the degree-sum identity over the characters with `Z ⊆ ker`): the inflation map embeds
+`Irr(G ⧸ N)` into `{χ ∈ Irr G | N ⊆ ker χ}` degree-preservingly, which feeds the
+`Σ χ(1)²` bookkeeping via the Burnside identity `sumIrreducibleDegreeSq`.
+
+## Main definitions / results
+
+* `OddOrder.RepresentationTheory.Subrepresentation.compHomEquiv` — for surjective `f : H →* G`,
+  the order isomorphism `Subrepresentation (σ.comp f) ≃o Subrepresentation σ`.
+* `OddOrder.RepresentationTheory.Representation.isIrreducible_comp_of_surjective` — irreducibility
+  of `σ` transfers to `σ.comp f` for surjective `f`.
+* `OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective` — for surjective
+  `f`, `ClassFunction.compHom f χ` is an irreducible character of `H` whenever `χ` is one of `G`.
+* `OddOrder.RepresentationTheory.inflate` — the inflation map
+  `IrreducibleCharacter (G ⧸ N) → IrreducibleCharacter G`, `χbar ↦ χbar ∘ (mk' N)`.
+* `OddOrder.RepresentationTheory.inflate_apply_one` — degree preservation.
+* `OddOrder.RepresentationTheory.inflate_injective` — injectivity of the inflation map.
+* `OddOrder.RepresentationTheory.subset_characterKernel_inflate` — `N ⊆ ker (inflate N χbar)`.
+* `OddOrder.RepresentationTheory.exists_inflate_eq_of_subset_characterKernel` — surjectivity of
+  `inflate` onto `{χ ∈ Irr G | N ⊆ ker χ}` (the reverse inclusion, via the diagonalization
+  keystone descending `ρ` through `Representation.ofQuotient`).
+* `OddOrder.RepresentationTheory.sumInflatedDegreeSq` — the Peterfalvi (6.6) degree-sum identity
+  `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`, obtained by transporting Burnside on `G ⧸ N` across the
+  inflation bijection.
+
+Together these realize `inflate` as a **degree-preserving bijection**
+`Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆ ker χ}`.  The surjectivity onto the kernel-subset set rests on
+descending the witnessing representation through `Representation.ofQuotient`, which needs `ρ` to act
+trivially on `N`; that step uses the diagonalization fact `χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id`
+(finite-order operators over `ℂ` are semisimple, `rep_eq_id_of_character_eq_one`).  The bijection
+delivers the degree-sum corollary `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|` (`sumInflatedDegreeSq`) from
+Burnside's `Σ_{Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`.
+
+## References
+
+* [Isaacs], *Character Theory of Finite Groups*, (2.22) (inflation / characters of `G ⧸ N`).
+* Peterfalvi §6 (6.6) (degree-sum over `Z ⊆ ker`).
+-/
+
+namespace OddOrder.RepresentationTheory
+
+namespace Subrepresentation
+
+variable {G H V : Type*} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
+  {f : H →* G}
+
+/-- Push a subrepresentation of `σ.comp f` forward to a subrepresentation of `σ`, when `f` is
+surjective.  The underlying submodule is unchanged; invariance under every `σ g` follows from
+invariance under every `σ (f h)` because `f` is onto. -/
+def ofCompSurjective (σ : Representation ℂ G V) (hf : Function.Surjective f)
+    (R : Subrepresentation (σ.comp f)) : Subrepresentation σ where
+  toSubmodule := R.toSubmodule
+  apply_mem_toSubmodule g v hv := by
+    obtain ⟨h, rfl⟩ := hf g
+    exact R.apply_mem_toSubmodule h hv
+
+/-- Pull a subrepresentation of `σ` back to a subrepresentation of `σ.comp f`.  The underlying
+submodule is unchanged; invariance under `σ (f h)` is a special case of invariance under all
+`σ g`. -/
+def comapComp (σ : Representation ℂ G V) (R : Subrepresentation σ) :
+    Subrepresentation (σ.comp f) where
+  toSubmodule := R.toSubmodule
+  apply_mem_toSubmodule h _v hv := R.apply_mem_toSubmodule (f h) hv
+
+/-- For a surjective `f : H →* G`, the lattice of subrepresentations of `σ.comp f` is order
+isomorphic to that of `σ`, identically on the underlying submodule. -/
+def compHomEquiv (σ : Representation ℂ G V) (hf : Function.Surjective f) :
+    Subrepresentation (σ.comp f) ≃o Subrepresentation σ where
+  toFun := ofCompSurjective σ hf
+  invFun := comapComp σ
+  left_inv R := by cases R; rfl
+  right_inv R := by cases R; rfl
+  map_rel_iff' := Iff.rfl
+
+end Subrepresentation
+
+namespace Representation
+
+variable {G H V : Type*} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
+  {f : H →* G}
+
+/-- **Irreducibility is preserved under surjective precomposition.** If `f : H →* G` is
+surjective and `σ` is an irreducible representation of `G`, then `σ.comp f` is an irreducible
+representation of `H`.
+
+The proof transports `IsSimpleOrder (Subrepresentation σ)` (the definition of irreducibility)
+along the order isomorphism `Subrepresentation.compHomEquiv`. -/
+theorem isIrreducible_comp_of_surjective (σ : Representation ℂ G V)
+    (hf : Function.Surjective f) (hσ : Representation.IsIrreducible σ) :
+    Representation.IsIrreducible (σ.comp f) := by
+  have : IsSimpleOrder (Subrepresentation σ) := hσ
+  exact (Subrepresentation.compHomEquiv σ hf).isSimpleOrder
+
+/-- **Irreducibility descends along a surjective precomposition.** If `f : H →* G` is surjective
+and `σ.comp f` is an irreducible representation of `H`, then `σ` is an irreducible representation of
+`G`.  This is the converse of `isIrreducible_comp_of_surjective`, transporting
+`IsSimpleOrder (Subrepresentation (σ.comp f))` backwards along the order isomorphism
+`Subrepresentation.compHomEquiv`.  It is the step that makes the *descended* representation
+(`Representation.ofQuotient`) irreducible in the inflation-surjectivity argument. -/
+theorem isIrreducible_of_isIrreducible_comp_of_surjective (σ : Representation ℂ G V)
+    (hf : Function.Surjective f) (hσ : Representation.IsIrreducible (σ.comp f)) :
+    Representation.IsIrreducible σ := by
+  have : IsSimpleOrder (Subrepresentation (σ.comp f)) := hσ
+  exact (Subrepresentation.compHomEquiv σ hf).symm.isSimpleOrder
+
+end Representation
+
+variable {G H : Type*} [Group G] [Group H]
+
+/-- **Precomposition by a surjective homomorphism is injective on class functions.**
+If `f : H →* G` is surjective then `ClassFunction.compHom f` is injective: two class functions
+on `G` that agree after pulling back along `f` agree everywhere, because every `g : G` is `f h`
+for some `h`.
+
+This is the injectivity half of the inflation correspondence ([Isaacs] (2.22)): distinct
+characters of the quotient inflate to distinct characters of `G`. -/
+theorem ClassFunction.compHom_injective_of_surjective {f : H →* G}
+    (hf : Function.Surjective f) :
+    Function.Injective (ClassFunction.compHom f : ClassFunction G ℂ → ClassFunction H ℂ) := by
+  intro φ ψ hφψ
+  ext g
+  obtain ⟨h, rfl⟩ := hf g
+  exact congrFun (congrArg (fun (χ : ClassFunction H ℂ) => (χ : H → ℂ)) hφψ) h
+
+/-- **Inflation along a surjective homomorphism preserves irreducible characters.**
+If `f : H →* G` is surjective and `φ` is an irreducible character of `G`, then its pullback
+`ClassFunction.compHom f φ` is an irreducible character of `H`.
+
+This is the homomorphism-general form of [Isaacs] (2.22): the witnessing irreducible
+representation `σ` of `G` (with `φ = χ_σ`) precomposes to `σ.comp f`, which is irreducible by
+`Representation.isIrreducible_comp_of_surjective` and whose character is `χ_σ ∘ f`, i.e. exactly
+`compHom f φ`. -/
+theorem IsIrreducibleCharacter.compHom_of_surjective {f : H →* G}
+    (hf : Function.Surjective f) {φ : ClassFunction G ℂ}
+    (hφ : IsIrreducibleCharacter φ) :
+    IsIrreducibleCharacter (ClassFunction.compHom f φ) := by
+  obtain ⟨V, _, _, _, σ, hσ, hχ⟩ := hφ
+  refine ⟨V, inferInstance, inferInstance, inferInstance, σ.comp f,
+    Representation.isIrreducible_comp_of_surjective σ hf hσ, ?_⟩
+  funext h
+  change φ (f h) = Representation.character (σ.comp f) h
+  rw [show Representation.character (σ.comp f) h = σ.character (f h) from rfl,
+    show (φ : G → ℂ) (f h) = σ.character (f h) from congrFun hχ (f h)]
+
+section Inflation
+
+variable (N : Subgroup G) [N.Normal]
+
+/-- **Inflation map** ([Isaacs] (2.22)).  An irreducible character of `G ⧸ N` inflates to the
+irreducible character of `G` obtained by precomposing with the quotient map `QuotientGroup.mk' N`.
+
+`QuotientGroup.mk' N` is surjective, so `IsIrreducibleCharacter.compHom_of_surjective` provides
+the irreducibility of the inflated character. -/
+def inflate (χbar : IrreducibleCharacter (G ⧸ N)) : IrreducibleCharacter G :=
+  ⟨ClassFunction.compHom (QuotientGroup.mk' N) (χbar : ClassFunction (G ⧸ N) ℂ),
+    IsIrreducibleCharacter.compHom_of_surjective (QuotientGroup.mk'_surjective N)
+      χbar.isIrreducible⟩
+
+@[simp] theorem inflate_coe (χbar : IrreducibleCharacter (G ⧸ N)) :
+    ((inflate N χbar : IrreducibleCharacter G) : ClassFunction G ℂ) =
+      ClassFunction.compHom (QuotientGroup.mk' N) (χbar : ClassFunction (G ⧸ N) ℂ) :=
+  rfl
+
+@[simp] theorem inflate_apply (χbar : IrreducibleCharacter (G ⧸ N)) (g : G) :
+    ((inflate N χbar : IrreducibleCharacter G) : ClassFunction G ℂ) g =
+      (χbar : ClassFunction (G ⧸ N) ℂ) (QuotientGroup.mk' N g) :=
+  rfl
+
+/-- **Inflation preserves degree.** The inflated character evaluated at `1` equals the original
+character of `G ⧸ N` evaluated at `1`: the quotient map sends `1` to `1`. -/
+@[simp] theorem inflate_apply_one (χbar : IrreducibleCharacter (G ⧸ N)) :
+    ((inflate N χbar : IrreducibleCharacter G) : ClassFunction G ℂ) 1 =
+      (χbar : ClassFunction (G ⧸ N) ℂ) 1 := by
+  rw [inflate_apply, map_one]
+
+/-- **Inflation is injective** ([Isaacs] (2.22)).  Distinct irreducible characters of `G ⧸ N`
+inflate to distinct irreducible characters of `G`.  The quotient map `QuotientGroup.mk' N` is
+surjective, so precomposition by it is injective on class functions
+(`ClassFunction.compHom_injective_of_surjective`), and `inflate` is that precomposition packaged
+on irreducible characters.
+
+Together with `inflate_apply_one` (degree preservation) and `subset_characterKernel_inflate`
+(image lands in `{χ ∈ Irr G | N ⊆ ker χ}`), this realizes the inflation map as a
+degree-preserving injection `Irr(G ⧸ N) ↪ {χ ∈ Irr G | N ⊆ ker χ}`.  Surjectivity of this
+injection (every irreducible character of `G` with `N ⊆ ker` arises by inflation) is the
+remaining half of the bijection. -/
+theorem inflate_injective : Function.Injective (inflate N) := by
+  intro χbar ψbar h
+  apply Subtype.ext
+  exact ClassFunction.compHom_injective_of_surjective (QuotientGroup.mk'_surjective N)
+    (congrArg (Subtype.val) h)
+
+/-- **The kernel of an inflated character contains `N`** ([Isaacs] (2.22)).  Every `n ∈ N` maps
+to `1` in `G ⧸ N`, so `(inflate N χbar) n = χbar 1 = (inflate N χbar) 1`, i.e. `n` lies in the
+character kernel of `inflate N χbar`.
+
+This places the image of the inflation map inside `{χ ∈ Irr G | N ⊆ ker χ}`, the set that the
+Peterfalvi (6.6) degree-sum bookkeeping ranges over. -/
+theorem subset_characterKernel_inflate (χbar : IrreducibleCharacter (G ⧸ N)) :
+    (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+      ((inflate N χbar : IrreducibleCharacter G) : ClassFunction G ℂ) := by
+  intro n hn
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def, inflate_apply, inflate_apply_one,
+    (QuotientGroup.mk'_apply N n).trans ((QuotientGroup.eq_one_iff n).mpr hn)]
+
+variable [Finite G]
+
+/-- **Inflation is surjective onto the kernel-containing irreducible characters** ([Isaacs] (2.22),
+the reverse inclusion).  Every irreducible character `χ` of `G` whose character kernel contains the
+normal subgroup `N` arises by inflation: there is an irreducible character `χbar` of `G ⧸ N` with
+`inflate N χbar = χ`.
+
+This is the half of the inflation bijection that the **diagonalization keystone**
+(`rep_eq_id_of_character_eq_one`) unlocks.  Take a witnessing irreducible representation `ρ` of `G`
+with `χ = χ_ρ`.  For `n ∈ N`, `N ⊆ ker χ` gives `χ_ρ(n) = χ_ρ(1)`, so the keystone forces
+`ρ n = id`; i.e. `ρ` is trivial on `N`.  Hence `ρ` descends through the quotient
+(`Representation.ofQuotient`) to a representation `σ` of `G ⧸ N` with `σ.comp (mk' N) = ρ`, which is
+irreducible because `ρ` is (`isIrreducible_of_isIrreducible_comp_of_surjective`).  Then
+`χbar := χ_σ` is an irreducible character of `G ⧸ N`, and `inflate N χbar = χ_σ ∘ mk' = χ_ρ = χ`.
+
+Together with `inflate_injective`, `inflate_apply_one` (degree preservation) and
+`subset_characterKernel_inflate`, this realizes the inflation map as a degree-preserving
+*bijection* `Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆ ker χ}`, hence the (6.6) degree-sum identity
+`Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`. -/
+theorem exists_inflate_eq_of_subset_characterKernel (χ : IrreducibleCharacter G)
+    (hker : (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+      (χ : ClassFunction G ℂ)) :
+    ∃ χbar : IrreducibleCharacter (G ⧸ N), inflate N χbar = χ := by
+  -- Unpack a witnessing irreducible representation `ρ` of `G` with `χ = χ_ρ`.
+  obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
+  -- The keystone makes `ρ` trivial on `N`: `n ∈ N ⟹ χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id`.
+  haveI htriv : Representation.IsTrivial (ρ.comp N.subtype) := by
+    refine ⟨fun n => ?_⟩
+    have hval : ρ.character (n : G) = ρ.character 1 := by
+      have hn := hker n.2
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def] at hn
+      rw [← congrFun hχ (n : G), ← congrFun hχ 1]
+      exact hn
+    exact OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one ρ hval
+  -- Descend `ρ` to `σ = ofQuotient ρ N` on `G ⧸ N`; then `σ.comp (mk' N) = ρ`.
+  set σ : Representation ℂ (G ⧸ N) V := Representation.ofQuotient ρ N with hσ_def
+  have hcomp : σ.comp (QuotientGroup.mk' N) = ρ := by
+    ext g v
+    simp [hσ_def, Representation.ofQuotient_coe_apply]
+  -- `σ` is irreducible because `σ.comp (mk' N) = ρ` is.
+  have hσ_irr : Representation.IsIrreducible σ :=
+    Representation.isIrreducible_of_isIrreducible_comp_of_surjective σ
+      (QuotientGroup.mk'_surjective N) (by rw [hcomp]; exact hρ)
+  -- `χbar := χ_σ` is an irreducible character of `G ⧸ N`.
+  refine ⟨⟨OddOrder.RepresentationTheory.repCharacterClassFunction σ,
+    V, inferInstance, inferInstance, inferInstance, σ, hσ_irr, rfl⟩, ?_⟩
+  -- `inflate N χbar = χ_σ ∘ mk' = χ_ρ = χ`.
+  apply Subtype.ext
+  ext g
+  rw [inflate_apply]
+  change σ.character (QuotientGroup.mk' N g) = (χ : ClassFunction G ℂ) g
+  rw [show σ.character (QuotientGroup.mk' N g)
+      = Representation.character (σ.comp (QuotientGroup.mk' N)) g from rfl,
+    hcomp, ← congrFun hχ g]
+
+open scoped Classical in
+/-- **Peterfalvi (6.6) degree-sum identity** ([Isaacs] (2.22) corollary).  The sum of the squared
+degrees over exactly the irreducible characters of `G` whose kernel contains the normal subgroup
+`N` equals the order of the quotient `G ⧸ N`:
+`∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|` in `ℂ`.
+
+This is the payoff of the **diagonalization keystone**: the keystone makes
+`exists_inflate_eq_of_subset_characterKernel` (the surjectivity of inflation onto the
+kernel-containing characters) available, so together with `inflate_injective`,
+`subset_characterKernel_inflate` (image lands in the kernel-subset set) and `inflate_apply_one`
+(degree preservation) the inflation map is a degree-preserving **bijection**
+`Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆ ker χ}`.  Transporting the Burnside identity
+`sumIrreducibleDegreeSq` for `G ⧸ N` (`∑_{χbar ∈ Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`) across this
+bijection — via `Finset.sum_bij'` with `inflate N` as the forward map and the inflation-surjectivity
+witness as its inverse — yields the displayed identity.
+
+This is the form Peterfalvi (6.6) reads off the inflation correspondence: the irreducible
+characters of `G` killing `N` are precisely the inflations of those of `G ⧸ N`, and their squared
+degrees sum to `|G ⧸ N|` by Burnside on the quotient. -/
+theorem sumInflatedDegreeSq :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card (G ⧸ N) : ℂ) := by
+  rw [← sumIrreducibleDegreeSq (G := G ⧸ N)]
+  refine (Finset.sum_bij' (fun χbar _ => inflate N χbar)
+    (fun χ hχ => (exists_inflate_eq_of_subset_characterKernel N χ
+      ((Finset.mem_filter.mp hχ).2)).choose)
+    (fun χbar _ => by
+      rw [Finset.mem_filter]
+      exact ⟨Finset.mem_univ _, subset_characterKernel_inflate N χbar⟩)
+    (fun _ _ => Finset.mem_univ _)
+    (fun χbar _ => by
+      -- `choose (inflate N χbar) = χbar` by injectivity of `inflate N`.
+      apply inflate_injective N
+      exact (exists_inflate_eq_of_subset_characterKernel N (inflate N χbar)
+        (subset_characterKernel_inflate N χbar)).choose_spec)
+    (fun χ hχ => (exists_inflate_eq_of_subset_characterKernel N χ
+      ((Finset.mem_filter.mp hχ).2)).choose_spec)
+    (fun χbar _ => by rw [inflate_apply_one])).symm
+
+open scoped Classical in
+/-- **Peterfalvi (6.6)/(6.8.3) degree-sum: the `N ⊄ ker χ` part.**
+
+The squared degrees of the irreducible characters of `G` *not* killing `N` sum to `|G| − |G ⧸ N|`:
+`∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|` in `ℂ`.
+
+The complement of `sumInflatedDegreeSq` inside the Burnside total `sumIrreducibleDegreeSq`
+(`∑_{χ ∈ Irr G} χ(1)² = |G|`): the filter on `N ⊆ ker χ` and its negation partition `Irr G`
+(`Finset.sum_filter_add_sum_filter_not`), so the `N ⊄ ker χ` sum is `|G|` minus the `N ⊆ ker χ`
+sum `|G ⧸ N|`.
+
+This is the (6.6)/(6.8) set `X = S − S(Z) = {χ ∈ Irr L | Z ⊄ ker χ}` degree-sum: with `N = Z`,
+`∑_{χ ∈ X} χ(1)² = |L| − |L : Z|` (mmd 04.8 L78, L234), the total feeding the (6.6) per-step
+square-divisibility (`∑_{j<i} χⱼ(1)² = |L| − |L:Z| − ∑_{j≥i} χⱼ(1)²`) and the (6.8.3) final
+inequality `∑_{χ ∈ X} χ(1)²/‖χ‖² = |W₁||H:Z|(|Z|−1)`. -/
+theorem sumNonInflatedDegreeSq :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        ¬ (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card G : ℂ) - (Nat.card (G ⧸ N) : ℂ) := by
+  classical
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (IrreducibleCharacter G))
+    (fun χ => (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))
+    (fun χ => ((χ : ClassFunction G ℂ) 1) ^ 2)
+  rw [sumInflatedDegreeSq (N := N),
+    show (∑ χ : IrreducibleCharacter G, ((χ : ClassFunction G ℂ) 1) ^ 2) = (Nat.card G : ℂ) from
+      sumIrreducibleDegreeSq] at hsplit
+  linear_combination hsplit
+
+end Inflation
+
+end OddOrder.RepresentationTheory

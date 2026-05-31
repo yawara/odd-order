@@ -130,6 +130,97 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `characterKernel_trivialClassFunction`, `characterKernel_conj`,
   `subsetCharacterKernel_trivialClassFunction`,
   `subsetCharacterKernel_conj_iff`, and `SubsetCharacterKernel.mono`.
+- (2026-05-31) **(1.6.a) forward direction landed** (the (6.6) G2.2 use case):
+  `subsetCharacterKernel_induce_of_subgroupOf` — for `A ⊴ G` with `A ≤ H`, if
+  `(A.subgroupOf H : Set ↥H) ⊆ characterKernel θ` then
+  `(A : Set G) ⊆ characterKernel (induce H θ)`.  Built on the RT value formula
+  `ClassFunction.induce_apply_of_mem_normal_of_const` (`InducedCharacter.lean`):
+  normality makes every conjugate `x⁻¹ a x` of `a ∈ A` land back in `A ≤ H`, so when
+  `θ` is constant `= c` on `A` the whole induction sum at `a` collapses to `|G|·c·|H|⁻¹`.
+  The (6.6) consumer uses the contrapositive `Z ⊄ Ker (Ind θ) ⟹ Z ⊄ Ker θ`.  The
+  **converse** ((1.6.a) `⟸`) is [Is] *Character Theory* Lemma 2.21 (an eigenvalue
+  argument on the genuine character `θ`) and is **not yet formalised** — the repo's
+  value-based `characterKernel` lacks the representation-kernel eigenvalue machinery.
+  Companion constituent infra in `Clifford.lean`:
+  `IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver` (`⟨Ind θ, χ⟩ ≠ 0 ↔ LiesOver`,
+  Frobenius reciprocity packaging) and `IrreducibleCharacter.exists_liesOver`
+  (every `χ ∈ Irr G` lies over some `θ ∈ Irr H`, via completeness on the nonzero `Res χ`).
+- (2026-05-31, G2.2 assembly) **(6.6) `X`-characterization, the two honest bricks** assembled
+  from the R17 infra above (commit b45164f) and landed in `S03_PreliminaryCharacter.lean`
+  (sorry/axiom-free; `#print axioms` = `{propext, Classical.choice, Quot.sound}`; AxiomsCheck
+  registered):
+  - `not_subsetCharacterKernel_of_not_induce` — the literal **contrapositive** of (1.6.a)-forward,
+    `Z ⊄ Ker (Ind_H^G θ) ⟹ Z ⊄ Ker θ`, in the consumer-facing shape (6.6) reads `Z ⊄ Ker θ` from.
+  - `exists_inner_induce_ne_zero` — the **constituent-existence half**: every `χ ∈ Irr G` is a
+    constituent of `Ind_H^G θ` for some `θ ∈ Irr H` (`⟨Ind_H^G θ, χ⟩ ≠ 0`), by composing
+    `exists_liesOver` with `inner_induce_ne_zero_iff_liesOver`.  Unconditional, no center `Z` — the
+    existence backbone of the (1.7)-type characterization.
+  - **Residual beyond R17** (the one piece (6.6) needs that this round does *not* close): the link
+    `Z ⊄ Ker χ ⟹ Z ⊄ Ker (Ind_H^G θ)` for a constituent `χ` — equivalently "an irreducible
+    constituent inherits a kernel containment of the ambient character" (`Z ⊆ Ker (Ind θ) ⟹
+    Z ⊆ Ker χ`).  This is the general character-value bound `|χ(a)| ≤ χ(1)` with its equality case;
+    the repo currently has only the **central**-element Schur equality `‖χ(z)‖² = χ(1)²`
+    (`SchurCenterBound.lean:108`), so the general-`a` bound is `needs-infra`.
+- (2026-05-31, **DIAGONALIZATION KEYSTONE landed** — closes the G2.2 `needs-infra` above and the
+  G2.5 inflation-surjectivity gate; the shared gate of Round-18) The keystone and its character-value
+  consequences are now sorry/axiom-free (`#print axioms` = `{propext, Classical.choice, Quot.sound}`,
+  AxiomsCheck registered):
+  - `OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one` (`ClassSumAlgebra.lean`): for a
+    finite-dim complex rep `ρ` of a finite group and `g`, `ρ.character g = ρ.character 1`
+    (`= finrank ℂ V`) ⟹ `ρ g = LinearMap.id`.  `ρ g` finite-order ⇒ semisimple (squarefree
+    `X ^ n − 1`); trace = `charpoly.roots.sum` = sum of unit-modulus eigenvalues = degree = count
+    forces every eigenvalue `= 1` (triangle equality case
+    `all_eq_one_of_norm_eq_one_of_sum_eq_card`, a real-part / non-negative-sum argument); semisimple
+    + only eigenvalue `1` ⇒ `eigenspace 1 = ⊤` ⇒ `ρ g − 1 = 0`.  Reuses the
+    `character_isIntegral` eigenvalue/trace machinery.
+  - `norm_character_le_finrank` + `character_eq_one_iff_rep_eq_id` (`ClassSumAlgebra.lean`): the
+    **general** `‖χ(g)‖ ≤ χ(1)` bound (the `needs-infra` piece above, now closed) and its equality
+    case both directions — the general-`a` generalization of the central Schur equality.
+  - `S03.norm_irreducibleCharacter_le_natDegree` + `S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`
+    (`S03_PreliminaryCharacter.lean`): the **G2.2 constituent-inherits-kernel** equality case in
+    consumer form — for irreducible χᵢ with non-negative multiplicities mᵢ, `(∑ mᵢ χᵢ)(g) = (∑ mᵢ
+    χᵢ)(1)` ⟹ every `χᵢ` (`mᵢ ≠ 0`) has `g ∈ characterKernel χᵢ`.  A future G2.2 assembly supplies
+    the `ψ = ∑ mᵢ χᵢ` decomposition of `Ind_K^L θ` (genuine-character = ℕ-combination of irreducibles
+    over `Irr`, still `needs-infra`).
+  - **G2.5**: `RepresentationTheory.exists_inflate_eq_of_subset_characterKernel`
+    (`InflationCharacter.lean`): every irreducible `χ` of `G` with `N ⊆ ker χ` arises as
+    `inflate N χbar`.  The keystone makes `ρ` trivial on `N`, so `ρ` descends through
+    `Representation.ofQuotient` to an irreducible `σ` on `G ⧸ N` (`σ` irreducible via the new reverse
+    lemma `isIrreducible_of_isIrreducible_comp_of_surjective`) with `χ_σ ∘ mk' = χ`.  With
+    `inflate_injective` this is the full degree-preserving bijection `Irr(G ⧸ N) ≃ {χ ∈ Irr G | N ⊆
+    ker χ}`, giving the (6.6) degree-sum `Σ_{N ⊆ ker χ} χ(1)² = |G ⧸ N|`.
+- (2026-05-31, **keystone PASS 2** — G2.5 degree-sum + G2.2 subrep form landed end-to-end;
+  sorry/axiom-free, `#print axioms` = `{propext, Classical.choice, Quot.sound}`, AxiomsCheck
+  registered, full `lake build OddOrder`/`OddOrder.AxiomsCheck` green 3360/3343 jobs):
+  - **G2.5 degree-sum, now a single theorem** `RepresentationTheory.sumInflatedDegreeSq`
+    (`InflationCharacter.lean`, commit 131c124): `∑_{χ ∈ Irr G, N ⊆ ker χ} χ(1)² = |G ⧸ N|` in `ℂ`.
+    The keystone-unlocked inflation **bijection** (inject `inflate_injective` + surject
+    `exists_inflate_eq_of_subset_characterKernel` + degree `inflate_apply_one` + kernel-subset
+    `subset_characterKernel_inflate`) transports Burnside `sumIrreducibleDegreeSq` on `G ⧸ N`
+    (`∑_{Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`) across via `Finset.sum_bij'` (forward `inflate N`,
+    inverse = the surjectivity witness `.choose`, left-inverse via `inflate_injective`).  This is
+    the literal "(6.6) degree-sum" — previously all four bijection bricks were present but the
+    identity itself was not a statement.
+  - **G2.2 representation-level constituent-inherits-kernel**
+    `RepresentationTheory.subrepresentation_character_eq_one_of_character_eq_one`
+    (`ClassSumAlgebra.lean`, next to the keystone): `ρ.character g = ρ.character 1` ⟹ for **every**
+    subrepresentation `ρ'` of `ρ`, `ρ'.toRepresentation.character g = ρ'.toRepresentation.character 1`.
+    The honest, fully-general (any-universe), no-decomposition-needed form of "a constituent inherits
+    a kernel containment of the ambient character" — exactly the structural link (6.6) reads off
+    (`Z ⊆ ker (Ind θ) ⟹ Z ⊆ ker χ`).  Proof: keystone `rep_eq_id_of_character_eq_one` gives
+    `ρ g = id`, which *restricts* to `id` on the invariant submodule `ρ'.toSubmodule`
+    (`LinearMap.restrict` of `id` is `id`), so `χ_{ρ'}(g) = trace id = finrank = χ_{ρ'}(1)`.  This
+    complements the already-landed character-value-bound consumer
+    `irreducibleCharacter_mem_characterKernel_of_natSum_value_eq` (the `ψ = ∑ mᵢ χᵢ` ℕ-combination
+    form).  Note: a `repCharacterClassFunction`/`characterKernel`-phrased wrapper is **not** added —
+    `repCharacterClassFunction` restricts `V` to `Type 0` while `ρ'.toSubmodule` is general-universe,
+    so the wrapper would be artificial; the `Representation.character` form is the natural altitude.
+  - **Residual unchanged**: the one genuine G2.2 `needs-infra` remains the
+    **genuine-character decomposition** `Ind_K^L θ = ∑ mᵢ χᵢ` as an ℕ-combination of `Irr L`
+    (Maschke multiplicity tracking / completeness with non-negativity — `restrictionMultiplicity_*`
+    in `Clifford.lean` give the non-negative *restriction* multiplicities, but the ambient
+    `⟨Ind θ, χⱼ⟩ ∈ ℕ` + the `= ∑ ⟨⟩ χⱼ` expansion is not yet assembled).  Both consumer forms above
+    discharge the *equality-case* content; only the decomposition that feeds them is outstanding.
 - `SecondOrthogonality` now exposes the next matrix proof-core bridge:
   `conjugacyClassSize_pos`,
   `characterTableClassSizeSquareMatrix_mul_columnGram_eq_cardDiagonal`,
