@@ -1140,6 +1140,16 @@ setup-specific character theory、(6.6) prefix は degree-sort `exists_monotoneD
 等最小次数ブロック抽出。これらは未形式化 (posit すると scaffolding)。(b) capstone 本体
 (case A/B + (6.5)/(6.7) + τ₃-gluing `coherentUnion_of_glued` + (6.8.3))。
 
+**追加 landed (同セッション, commit `f60d1c1`)**: G2.5 degree-sum の **complement** `sumNonInflatedDegreeSq`
+(`InflationCharacter.lean`, sorry/axiom 無, AxiomsCheck 登録): `∑_{χ∈Irr G, N⊄Ker χ} χ(1)² =
+|G|−|G⧸N|` = landed `sumInflatedDegreeSq` (`∑_{N⊆Ker} = |G⧸N|`) の Burnside `sumIrreducibleDegreeSq`
+(`∑_{Irr} = |G|`) 内補集合 (`Finset.sum_filter_add_sum_filter_not` + `linear_combination`)。N=Z で
+**(6.6)/(6.8) の X=S−S(Z) total `∑_{χ∈X}χ(1)² = |L|−|L:Z|`** (mmd 04.8 L78/L234) = (6.6) per-step
+square-divisibility (`∑_{j<i} = |L|−|L:Z| − ∑_{j≥i}`) と (6.8.3) final inequality の入力。
+issue notes 627-628 の「infra が入れば 機械的」を消化。**残**: (6.6) は enum split (∑_{j<i}/∑_{j≥i})、
+(6.8.3) は `|L|−|L:Z|=|W₁||H:Z|(|Z|−1)` 群位数算術 (L=H⋊W₁ setup) — どちらも setup-specific。
+ℂ→ℕ companion (`∑(natDegree)²=card G−card(G⧸N)`) は (6.6) ℕ-divisibility 用に将来有用だが未着。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。
