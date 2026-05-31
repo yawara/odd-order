@@ -700,6 +700,12 @@ set_option linter.style.longLine false in
 -- `restrict_mem_ZIrr`).  Same span-induction proof via `character_mem_ZIrr (ρ.comp f)`; this
 -- is the `α_B = α ∘ f_B ∈ ℤ[Irr M(B)]` step of the Dade-map construction.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.compHom_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (1.5.a), inertia/coset well-definedness): conjugation by an
+-- element of the normal subgroup `H` acts trivially on class functions of `H` (`θ^g = θ` for
+-- `g ∈ H`).  `conjBy g θ` evaluates `θ` at the `H`-conjugate `⟨g⟩ * h * ⟨g⟩⁻¹`, and class
+-- functions are `H`-conjugacy invariant.  This is what makes `θ^x = θ^y ⇔ y ∈ I(θ)x`, i.e.
+-- `conjBy w θ` constant on the coset `wH` in the Mackey restriction formula.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.conjBy_eq_self_of_mem
 -- RepresentationTheory (Peterfalvi §2 orthogonality): class functions with disjoint supports
 -- are orthogonal (`⟨φ, ψ⟩_G = 0`). Each summand `φ g · star (ψ g)` vanishes since `g` lies
 -- outside at least one support. Basic vanishing for the Dade isometry / §9 coherence arguments.

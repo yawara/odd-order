@@ -75,6 +75,27 @@ def conjBy (g : G) (θ : ClassFunction ↥H k) : ClassFunction ↥H k where
 @[simp] theorem conjBy_apply (g : G) (θ : ClassFunction ↥H k) (h : ↥H) :
     (conjBy g θ) h = θ ⟨g * (h : G) * g⁻¹, hH.conj_mem (h : G) h.property g⟩ := rfl
 
+/-- Conjugation by an element **already in `H`** acts trivially on class functions
+of `H`: if `g ∈ H` then `θ^g = θ`. Indeed `conjBy g θ` evaluates `θ` at the
+`H`-conjugate `⟨g, hg⟩ * h * ⟨g, hg⟩⁻¹`, and class functions are constant on
+`H`-conjugacy classes.
+
+This is the elementary fact underlying the well-definedness in Peterfalvi (1.5)(a)
+of the conjugate `θ^x` as a function of the left coset `I_G(θ)·x`: the relation
+`θ^x = θ^y ⇔ y ∈ I(θ)x` rests on `θ^g = θ` for `g ∈ H ⊆ I_G(θ)`, which lets
+`conjBy w θ` be constant on the coset `wH` in the Mackey restriction formula. -/
+theorem conjBy_eq_self_of_mem {g : G} (hg : g ∈ H) (θ : ClassFunction ↥H k) :
+    conjBy g θ = θ := by
+  ext h
+  rw [conjBy_apply]
+  let y : ↥H := ⟨g, hg⟩
+  have hconj :
+      (⟨g * (h : G) * g⁻¹, hH.conj_mem (h : G) h.property g⟩ : ↥H) =
+        y * h * y⁻¹ :=
+    Subtype.ext rfl
+  rw [hconj]
+  exact θ.conj_eq h y
+
 /-- The permutation of `H` induced by conjugation by an ambient element `g : G`.
 
 Normality of `H` is exactly what makes this an equivalence of the subtype `H`. -/
@@ -186,15 +207,7 @@ elements of `H`. -/
 theorem subgroup_le_inertia (θ : ClassFunction ↥H k) : H ≤ inertia θ := by
   intro h hh
   rw [mem_inertia]
-  ext x
-  let y : ↥H := ⟨h, hh⟩
-  have hconj :
-      (⟨h * (x : G) * h⁻¹, hH.conj_mem (x : G) x.property h⟩ : ↥H) =
-        y * x * y⁻¹ := by
-    apply Subtype.ext
-    rfl
-  rw [conjBy_apply, hconj]
-  exact θ.conj_eq x y
+  exact conjBy_eq_self_of_mem hh θ
 
 /-- Since `H ⊴ G`, the subgroup `H` remains normal inside the inertia group
 `I_G(θ)`. -/
