@@ -103,7 +103,34 @@ Gorenstein は「A acts indecomposably on P̄ (**which is therefore homocyclic b
 
 ---
 
-## (旧) G Thm 2.2 (indecomposable ⇒ homocyclic) — proof architecture ※precursor(2)には不要と判明、独立に価値があれば参照
+## ★ Thm 3.7 proof plan (ASSEMBLY-READY, 全 API 確認済 2026-05-31)
+
+**Thm 3.7** (G mmd L3812+): `φ:A→*MulAut P` coprime (`p'`-group A on p-group P), `ψ:A`, `ψ≠1`,
+`hψ`: ψ が**全 proper A-invariant normal subgroup上 pointwise 自明**。⇒ (i) `P'⊆Z(P)`,
+(ii) `P/P'` elem ab + A irreducible + ψ nontrivial on P/P', (iii) P elem ab ∨ (class 2, `P'=Z=Φ` elem ab)。
+配置 = 新 BG file (downstream of OperatorMaschke/OperatorQuotientAction/CoprimeAbelianPGroup)。
+
+**確認済 API (全部 public/ready)**:
+- 2-step stability `coprime_actsTrivially_of_normal_and_quotient`@**S01:670** (public)
+- Thm 2.4 `actionCommutator_eq_bot_of_omega1_le_fixedPoints`@CoprimeAbelianPGroup (⟨ψ⟩ へ restrict して適用)
+- Thm 3.5 `fixedPoints_sup_actionCommutator_eq_top`@Ch04:2741、Thm 3.6 `actionCommutator_restrict_self_map_subtype_eq`@OperatorQuotientAction:113
+- Maschke `OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient` (S=P', Ω₁(P/P')=P/P')
+- `IsAInvariant.{derivedSeries,of_characteristic,inf,sup,top,bot,center,quotientMulAutHom}`@Ch03/Ch04
+- three-subgroups `commutator_commutator_le_of_rotate`@Ch04:1535、`actionCommutator_eq_bot_iff_acts_trivially`@Ch04:2184
+
+**7 steps** (Gorenstein L3812-3830 准拠、irreducible/indecomposable は predicate でなく具体形で):
+1. ψ trivial on `P'=derivedSeries P 1` (P' proper A-inv normal; proper ∵ p-群 nilpotent ⇒ P'⊊⊤)。`hψ` 適用。
+2. **ψ nontrivial on P̄=P/P'**: 否定なら ψ trivial on P' と P/P' ⇒ `coprime_actsTrivially_of_normal_and_quotient` で ψ=1 on P、⟨ψ⟩faithful で ψ=1、矛盾。
+3. **A indecomposable on P̄** (具体形「P̄=W₁×W₂ A-inv ⇒ Wᵢ=⊥ の一方」): 分解の preimage Pᵢ proper A-inv ⇒ ψ trivial 各 ⇒ ψ trivial P̄、step2 矛盾。
+4. **P̄ elem ab**: Ω₁(P̄)⊊P̄ なら preimage proper ⇒ ψ trivial Ω₁(P̄) ⇒ **Thm 2.4 を ⟨ψ⟩ に** ⇒ ψ trivial P̄、step2 矛盾。⇒ Ω₁(P̄)=P̄。
+5. **A irreducible on P̄** (具体形「proper nonzero A-inv W ⇒ ⊥」): Maschke で W に A-inv complement ⇒ 分解、step3 (indecomposable) 矛盾。→ (ii) 完成。
+6. **(i) P'⊆Z(P)**: B=`normalClosure {ψ}`@A、B trivial on P'。H=actionCommutator(B制限)... H⊆P'⇒[P,B,B]=1⇒B=1(Thm3.6系)⇒ψ∈B=1矛盾; H⊊P⇒H̄ nontrivial A-inv⇒=P̄(irred)、ψ trivial H⇒trivial P̄矛盾。∴H=[P,B]=P。[P',P,B]=1,[B,P',P]=1⇒[P,B,P']=1(three-sub)⇒[P,P']=1⇒P'⊆Z。
+7. **(iii) special**: P not elem ab ⇒ P'≠1、Z̄ proper A-inv⇒=1(irred)⇒Z=P'(class2)、Φ̄ 同様⇒Φ=P'。[x,y]=z∈P'=Z、[x,y^p]=z^p、y^p∈P'(P̄ elem ab)⇒z^p=1⇒[x,y]^p=1⇒P' elem ab。
+
+**規模 ~200行、dedicated session 推奨** (infra は全 ready なので precursor(1) body と同型の「assembly」)。
+次 = **Thm 3.7 を上記 plan で一気に**。その後 Thm 3.8 (minimal D に 3.7、~小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + 3.2 帰納) → precursor(2)。
+
+## (旧・参考) G Thm 2.2 (indecomposable ⇒ homocyclic) ※precursor(2)には不要
 
 Gorenstein 原文 = `references/gorenstein/finite-groups.mmd` **L3696-3757** (Ch.3 §2)。完全な攻略図:
 
