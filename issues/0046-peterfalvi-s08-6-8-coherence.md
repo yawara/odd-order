@@ -1068,6 +1068,41 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     - sorry/axiom 無; primitive `#assert_only_allowed_axioms` 3 axiom allowlist 内; full
       `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
 
+## 進捗 (2026-05-31 続き, (5.6.1) λ-form hY を完全放電 — crux 解決)
+
+HANDOFF が指す「次の crux = `DadeChainStep.hY` = (5.6.1) λ-form」を **3 コミットで完全に解決**
+(commits `ae6b8e4` / `26c6509` / `968f2c5`、いずれ sorry/axiom 無・AxiomsCheck 登録・full build 緑 3360 jobs)。
+posited だった `hY` フィールドが消え、(6.6) coherence-of-X が **image-side の posit を一切持たず**
+真正の source-side 文字次数データのみから実 Dade τ で構成されるようになった。
+
+- **`CharacterPsiDecomposition.Y_collapse_of_family`** (S07, 汎用 producer): (5.4) 分解 `Da` +
+  source family bundle `B` から (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` を *構成*。教科書 (5.6.1)/(5.6.2)
+  (mmd 04.7 L71-97) をそのまま形式化 — (i) `Y` を直交族 `{χᵢ^{τ₁}}` に射影
+  (`exists_orthogonalProjection_of_orthogonal_family`)、(ii) 各 i≠i₁ の係数を cross-orthogonality
+  `crossDifference_inner` を等距で transport して単一 λ に同定 (`c i = a·[i=i₁] − λ·aᵢ/‖χᵢ‖²`)、
+  (iii) λ∈ℤ を `inner_mem_ZIrr_int` + `‖χ₁‖²∈ℤ` で示し、(iv) `Y_eq_nsmul_tau1_of_lambdaForm`
+  (既存 capstone) で λ=0,Z=0 に collapse。**繊細点 (HANDOFF 警告) はクリア**: 係数計算は running
+  isometry 像 `χᵢ^{τ₁}` の直交性 (`hiso_fam`) を使い、全 scalar が実 (a,aᵢ,‖χᵢ‖²) ゆえ
+  conjugation で破綻しない。
+- **`dade_Y_collapse_of_family`** (S07, Dade 特化): 上 producer の全仮説を **Dade 等距 + (5.5)** から
+  放電 — `hiso_fam`/`hiso_cross` ← `dadeIntegralCharacterMap_inner_eq_on_supported_span`、`hXortho`
+  (R(χ)⊥S₁^{τ₁}) ← 各 member の `(Dmem χᵢ).X` (`eq_sum_of_psi_eq_zero` +
+  `inner_X_orthogonal_imageSet_of_orthogonal`、**hS₁ 不要**)、`χ₁^{τ₁}∈ZIrr` ←
+  `dadeIntegralCharacterMap_mem_ZIrr_of_supported`、norm 実性/正値 ← `inner_self_eq_realCast` 等。
+  `Da.tau1 = τ` な任意 `Da` で動く (hDa_tau1 仮説)。
+- **`DadeChainStep` の posited `hY` を除去 → 真正フィールドに置換**: `famS`(S₁ の Finset 列挙)/
+  `famS_eq`/`famRatio`/`famRatio_chi1`/`famDegree`/`famDegree_chi`/`famPairwise`/`famNe`/`famSupp`/
+  `hdeg_c` (= (5.6) (c))。`advance` が `CharacterFamilyBundle` (ι=CF(L), chiFam=id) を組んで
+  `dade_Y_collapse_of_family` で `hY` を *証明*。**memory `scaffold-sorry-free-not-done` の観点**:
+  hY は posited から「genuine data から constructible」に転換 — 残るフィールドは全て (6.6) 列挙が
+  供給する文字次数・直交性データ (image-side の posit ゼロ)。
+
+**次の crux** = **(6.8) capstone** (`S08_CoherenceTheorems.lean:188` sorry,
+`sibleySetup_is_coherent`)。(6.6) coherence-of-X が実 Dade τ で完全 constructive になったので、
+残りは mmd 04.8 L150- の H 非可換 p群 case-A/case-B split を `coherentUnion_of_glued` で結合し、
+SibleySetup の data を per-step `DadeChainStep` stream に wire する組立 (別 issue 級の大物)。
+その後 S09:1589 ((7.10) `card_G0_lower_bound`)。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。
@@ -1086,10 +1121,14 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
 
 ---
 
-## 🔁 HANDOFF (2026-05-31, 別セッション引き継ぎ) — branch `claude/naughty-nash-c3ffc7` @ `698bc25`
+## 🔁 HANDOFF (2026-05-31 更新, 別セッション引き継ぎ) — branch `claude/naughty-nash-c3ffc7` @ `968f2c5`
 
-**状態**: build green (`lake build OddOrder OddOrder.AxiomsCheck`)、tree clean。実 sorry は 2 個のみ:
-`S08_CoherenceTheorems.lean:193` (`sibleySetup_is_coherent` = (6.8))、`S09_NonexistenceCertain.lean:1596` ((7.10))。
+**状態**: build green (`lake build OddOrder OddOrder.AxiomsCheck`、3360 jobs)、tree clean。実 sorry は 2 個のみ:
+`S08_CoherenceTheorems.lean:188` (`sibleySetup_is_coherent` = (6.8))、`S09_NonexistenceCertain.lean:1589` ((7.10))。
+
+**⚡ 前回 HANDOFF の crux「(5.6.1) λ-form hY」は解決済** (commits ae6b8e4/26c6509/968f2c5、上記 進捗節参照)。
+posited `hY` フィールドは `DadeChainStep` から除去され、真正 (6.6) family data から `advance` 内で証明される。
+(6.6) coherence-of-X が実 Dade τ で image-side posit ゼロの完全 constructive に到達。**次の crux は (6.8) capstone**。
 
 ### ここまでに構成済み (§4-§6 coherence engine、全て sorry-free/axiom-clean)
 - **§4 Dade 等距 = `FullDadeIsometryData`** (issue 0040 closed) — `(2.6)` 実構成。
@@ -1100,34 +1139,31 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
 - **型ブリッジ G2.7**: `dadeIntegralCharacterMap` (S07 ~L3640) = Dade 写像を total ℤ-linear に lift。
   `decompositionPairFromDadeOfIrreducible` (~L3927) = per-step (D₀,Da) producer。
   `dadeOrthonormalCharacterImageFamily` (~L3794) = R(χ) producer。
-- **DadeChainStep field 進捗**: `hgen` discharge 済 (Round 27)。**`hmemOrtho` content 済** (本日 698bc25:
-  `dadeOrthonormalCharacterImageFamily_orthogonal` + `dadeIntegralCharacterMap_inner_conjDifference_eq_zero`、S07 ~L3863)。
-  `Dmem`/`hmemTau1Base` は `decompositionPairFromDadeOfIrreducible` でほぼ定義的。
+- **DadeChainStep field**: 全フィールドが genuine (6.6) data に到達 (**posited フィールド ゼロ**)。`hgen`
+  discharge 済、`hmemOrtho` content 済、**`hY` 除去済** (本更新: famS/famRatio/famPairwise/hdeg_c 等の
+  source-side フィールドに置換し `advance` 内で `dade_Y_collapse_of_family` で証明)。`Dmem`/`hmemTau1Base`
+  は `decompositionPairFromDadeOfIrreducible` でほぼ定義的。
 
-### 🎯 次の crux = `DadeChainStep.hY` = Peterfalvi (5.6.1) λ-form 定理
-**目標**: `Da.Y = a • Da.tau1 χ₁` ((5.6.2) collapse) を構成し、`DadeChainStep.hY` field を埋める。
-最終段 `Y_eq_nsmul_tau1_of_lambdaForm` (S07 ~L1801) は λ-form を仮説 `hYform` に取り collapse する — **要は `hYform`
-((5.6.1) λ-form `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, λ∈ℤ) を生成する (5.6.1) 定理本体が残**。
+### ✅ 解決済: `DadeChainStep.hY` = Peterfalvi (5.6.1) λ-form (前回 crux)
+3 コミットで完了 (上記 進捗節に詳細)。`Y_collapse_of_family` (汎用 (5.6.1)/(5.6.2) producer) +
+`dade_Y_collapse_of_family` (Dade 特化、hS₁ 不要) + `DadeChainStep` の hY 除去 + `advance` 内証明。
+教科書 mmd 04.7 L71-97 をそのまま形式化。前回 HANDOFF の「繊細点」(running τ₁ の直交性、conjugation) は
+クリア済 — `Y_collapse_of_family` は `hiso_fam` (running 等距の族直交性) を仮説に取り、全 scalar が実ゆえ
+conjugation で破綻しない。
 
-**部品 (全て landed)**: `exists_orthogonalProjection_of_orthogonal_family` (ZIrrFourier、射影 primitive)、
-`CharacterFamilyBundle` + `crossDifference_inner` (S07 ~L3542、source-side `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ‖χ₁‖²`)、
-`Y_eq_nsmul_tau1_of_lambdaForm`、`lambda_eq_zero_and_Z_eq_zero` (整数 forcing)、gap leaf `two_mul_lt_sq_of_primePow_gap`、
-degree-sum `sumInflatedDegreeSq`。
+### 🎯 次の crux = (6.8) capstone (`sibleySetup_is_coherent`, S08:188)
+(6.6) coherence-of-X (`peterfalvi_66_coherence_of_X_from_dade`) が実 Dade τ で **image-side posit ゼロ**の
+完全 constructive に到達したので、残るは:
+1. **(6.8) capstone** (最重・未 scaffold、mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B
+   (Z=W₂) split、各 case で (6.6) coherence-of-X + 中心 coherence を `coherentUnion_of_glued` で結合、
+   SibleySetup の data を per-step `DadeChainStep` stream (= famS/famRatio/famDegree/famPairwise/hdeg_c 等の
+   真正 source-side data) + 列挙/cover/base に wire → `sibleySetup_is_coherent` (S08:188) を discharge。
+   **`DadeChainStep` 構築 = 全フィールドが genuine (6.6) 列挙データ**ゆえ、(6.8) の文字次数列挙が直接供給する。
+2. その後 **S09:1589** ((7.10) `card_G0_lower_bound`、上記 coherence + (7.x) 評価)。
 
-**⚠️ 繊細な点 (ここで間違えやすい — 教科書 04.7 mmd L86-105 を精読のこと)**:
-(5.6.1) の係数計算は **full running 等距 `τ₁` (= `hS₁.extension`、S₁ 全体で等距)** を使う。per-pair の
-`Da.tau1` (span{χ,χ̄,a·χ₁} 上のみ lattice-relative 等距) と**混同すると λ=0 が自明に出て破綻する**(両者は overlap χ₁,
-χ−χ̄ 上で一致)。正しい導出: 各 i≠i₁ で `⟨−Y, χᵢ^{τ₁} − aᵢ·χ₁^{τ₁}⟩ = a·aᵢ‖χ₁‖²` (= crossDifference_inner を
-τ₁ 等距で image 側へ transport) から `λᵢ = λ₁·aᵢ‖χ₁‖²/‖χᵢ‖² = λ·aᵢ/‖χᵢ‖²` (λ := λ₁‖χ₁‖²)。λ₁ は自由で、
-`(Y,χ₁^{τ₁}) = (a − λ/‖χ₁‖²)‖χ₁‖² ∈ ℤ` より λ∈ℤ。collapse は (5.6.2): `‖Y‖²≤a²‖χ₁‖²` + degree 不等式 (c)
-`2a < ∑aᵢ²/‖χᵢ‖²` ⇒ `λ²−bλ≤0, 0<b<1` ⇒ λ=0。これは~数十-100行の careful な補題。
-
-### その後の経路 (honest 見積り: S08:193 まで数セッション)
-1. `hY` 完成後 → **`DadeChainStep.ofGenuine` constructor** (~25 field を genuine (6.6) data から discharge)。
-2. **(6.8) capstone** (最重・未 scaffold、mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B (Z=W₂) split、
-   各 case で (6.6) coherence-of-X + 中心 coherence を `coherentUnion_of_glued` で結合、SibleySetup の data を
-   per-step `DadeChainStep` stream + 列挙/cover/base に wire → `sibleySetup_is_coherent` (S08:193) を discharge。
-3. その後 **S09:1596** ((7.10) `card_G0_lower_bound`、上記 coherence + (7.x) 評価)。
+**主要 landed 部品 (S07)**: `peterfalvi_66_coherence_of_X_from_dade` (~L4400+、実 Dade τ で coherence-of-X)、
+`DadeChainStep` (~L4489、全 genuine フィールド) + `.advance`/`.chainStepAdvance`、
+`Y_collapse_of_family`/`dade_Y_collapse_of_family` (5.6.1 producer)、`coherentUnion_of_glued` (2族 assembler)。
 
 ### 運用上の制約 (厳守)
 - **共有 `main` は触らない** (ユーザー firm 指示)。作業は worktree `…/.claude/worktrees/naughty-nash-c3ffc7` の
@@ -1140,7 +1176,10 @@ degree-sum `sumInflatedDegreeSq`。
   が深い鎖には速い (再読込/decompose-report オーバーヘッド無し)。memory `peterfalvi-frontier-workflow-pattern` 参照。
 
 ### 主要ファイル
-- `OddOrder/Peterfalvi/S07_Coherence.lean` (coherence engine 4310+ 行; DadeChainStep ~L4106, from_dade ~L4285,
-  Y_eq_nsmul_tau1_of_lambdaForm ~L1801, CharacterFamilyBundle ~L3542, (5.2.e) Dade lemmas ~L3863)。
-- `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:193` (sorry, SibleySetup/CoherenceTarget)。
-- `references/peterfalvi/04.7_pp_25_29_Coherence.mmd` (L86-105 = (5.6.1)/(5.6.2) 証明) / `04.8_*` (L150- = (6.8) case split)。
+- `OddOrder/Peterfalvi/S07_Coherence.lean` (coherence engine 4600+ 行; `DadeChainStep` ~L4489 (全 genuine
+  フィールド), `.advance` ~L4576 (hY を内部証明), `peterfalvi_66_coherence_of_X_from_dade` ~L4400+,
+  `Y_collapse_of_family` ~L3650, `dade_Y_collapse_of_family` ~L4240, `CharacterFamilyBundle` ~L3542,
+  `Y_eq_nsmul_tau1_of_lambdaForm` ~L1801, (5.2.e) Dade lemmas ~L3863)。
+- `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:188` (sorry, SibleySetup/CoherenceTarget = 次の crux)。
+- `references/peterfalvi/04.7_pp_25_29_Coherence.mmd` (L86-105 = (5.6.1)/(5.6.2) 証明、形式化済) /
+  `04.8_*` (L150- = (6.8) case split、次のターゲット)。
