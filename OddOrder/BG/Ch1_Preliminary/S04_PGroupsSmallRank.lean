@@ -1076,6 +1076,30 @@ This is the v1 goal opening the §4 dependency of §5 / §7 (Thompson transitivi
 theorem scn3_empty_of_pRank_le_two (hr : pRank R p ≤ 2) (A : Subgroup R) :
     ¬ IsSCN₃ p A := fun h => not_le_pRank_of_pRank_le_two hr A h.le_pRank
 
+/-- **`SCN₃(R) = ∅ ⇒ d_n(R) ≤ 2`** — the *translation* half of the hard direction of BG
+Lemma 4.7 (= **G** Theorem 5.4.15(i)). In a finite `p`-group with no `SCN₃` subgroup, every
+**normal abelian** subgroup has `p`-rank `≤ 2`.
+
+Each abelian normal `B` lies in a maximal abelian normal `A`
+(`exists_maximalAbelianNormal_ge`), which is `SCN` in a `p`-group
+(`IsMaximalAbelianNormal.isSCN`); since `A` is `SCN` but not `SCN₃`, we get `pRank A p ≤ 2`,
+and `pRank B p ≤ pRank A p` by monotonicity (`pRank_le_of_injective` on the inclusion
+`B ↪ A`). This `d_n(R) ≤ 2` statement is the genuine hypothesis fed to `G` Theorem 4.15(i)
+(`pRank ≤ 2` for the *whole* group); it is **not** itself a rank bound on `R` (it constrains
+only normal abelian subgroups), so it does not pre-suppose the conclusion. -/
+theorem normalAbelian_pRank_le_two_of_scn3_empty [Fact p.Prime] (hR : IsPGroup p R)
+    (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A)
+    {B : Subgroup R} (hBnorm : B.Normal) (hBcomm : IsMulCommutative B) :
+    pRank B p ≤ 2 := by
+  obtain ⟨A, hBA, hAmax⟩ := exists_maximalAbelianNormal_ge hBnorm hBcomm
+  have hAscn : IsSCN A := hAmax.isSCN hR
+  have hApr : pRank A p ≤ 2 := by
+    by_contra h
+    exact hSCN A ⟨hAscn, by omega⟩
+  have hmono : pRank B p ≤ pRank A p :=
+    pRank_le_of_injective (Subgroup.inclusion_injective hBA)
+  omega
+
 end SCN3Empty
 
 /-! ## §4C: BG Lemma 4.5(b) — cyclic subgroup of index `p` ⇒ `Ω₁(R) ≅ E_{p²}`
