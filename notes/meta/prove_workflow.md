@@ -91,6 +91,21 @@ Workflow({ name: 'bg-prove', args: { name: 'Thm 4.16 ...', decl: '...', mmd: 'Th
 - **Verify**: 3 並列 adversarial (①build/axiom = 唯一の builder ②scaffold-trap read-only
   ③statement 忠実性 vs mmd) → 全 OK で `PASS`、逸脱は `VERIFY_FAILED`。
 
+## 検証結果 (2026-05-31, Peterfalvi で実測)
+
+同一クラスの character-theory lemma で full / fast を実走比較:
+
+| run | mode | target | agent | tokens | 所要 | 結果 |
+|---|---|---|---|---|---|---|
+| 1 | full (誤発火※) | `induce_apply_one` (Ind θ(1)=[G:H]θ(1)) | 8 | 441k | ~9.5分 | PASS, 独立監査で faithful/緑/axiom-clean 確認 |
+| 2 | **fast** | `conjBy_eq_self_of_mem` (g∈H⇒θ^g=θ) | **2** | **83k** | **~4.4分** | PASS, 独立監査で faithful/緑/axiom-clean + load-bearing refactor 確認 |
+
+**fast は約 5× 安・約 2× 速**。well-scoped target では judgment verify を落としても健全な結果(implementer が anti-thin-wrapper を守り `subgroup_le_inertia` を新 lemma 呼び出しに refactor するなど)。
+
+**※ args 文字列化の footgun**: run 1 で `args` が JSON 文字列として届き `T=args||{}` が文字列に → `T.book`/`T.mode` が undefined → 既定 bg/full に落ちた(`book:"BG"`, verify 3, agent 8 が証拠。設計 agent は「追加情報」の JSON 文字列から target を読めたので結果的に landed)。→ **`prove.js` を string-robust 化済**(`typeof T==='string'` なら `JSON.parse`)。
+
+**運用モデルの確証**: fast mode が落とす精度次元(scaffold-trap / faithfulness / thin-wrapper)は **main loop が独立監査**(diff 精読 + `lake build OddOrder OddOrder.AxiomsCheck` + sorry数 + `#assert_only_allowed_axioms`)で補う。result の `book`/`mode`/`agent_count`/`verify` フィールドで「意図したモードで走ったか」を必ず確認(self-reported status を鵜呑みにしない)。重要 / scaffold 誘惑大 / 偽署名リスク高な target は full mode に上げる。
+
 ## durability (重要)
 
 `/.claude/` は `.gitignore` で丸ごと除外 = **workflow スクリプトは git versioned されない**。さらに
