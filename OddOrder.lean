@@ -2,6 +2,7 @@ import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.CoprimeAbelianPGroup
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.FrattiniPGroup
