@@ -1,5 +1,15 @@
 # BG §4 precursor(2): minimal ψ-invariant ⇒ special exp p (Gorenstein Thm 3.7/3.8/3.10)
 
+> ## 🔁 NEXT-SESSION HANDOFF (2026-05-31)
+> **次の一手 = Gorenstein Thm 3.7 を本ノート §「★ Thm 3.7 proof plan」の 7-step で書き切る** (~200行,
+> precursor(1) 本体と同型の assembly)。**全 infra は public/ready と確認済**(2-step stability
+> `coprime_actsTrivially_of_normal_and_quotient`@S01:670 / Thm 2.4`actionCommutator_eq_bot_of_omega1_le_fixedPoints`@CoprimeAbelianPGroup / Thm 3.5`fixedPoints_sup_actionCommutator_eq_top` / Thm 3.6`actionCommutator_restrict_self_map_subtype_eq`@OperatorQuotientAction / Maschke`OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient` を S=P' で / three-subgroups / `IsAInvariant.{derivedSeries,of_characteristic,quotientMulAutHom,…}`)。
+> 配置 = 新 BG file (例 `OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean`、downstream of OperatorMaschke/OperatorQuotientAction/CoprimeAbelianPGroup、OddOrder.lean に import 追加 + AxiomsCheck 登録)。
+> **⚠ G Thm 2.2 (homocyclic) は不要** (本ノート「⚠⚠ 重要発見」参照 — Thm 3.7 の elem-ab は Thm 2.4 を ⟨ψ⟩ に適用して出る)。
+> 着地後: Thm 3.8 (minimal D に 3.7、小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + stability 帰納) → **precursor(2)** `isSpecial_expP_of_minimal_pprime_action` → BG Lem 4.13 (q∣p²-1) → BG Lem 4.14 → **Thm 4.16 (Blackburn) apex**。
+> tracker = issue 0051 / queue #8.8。tree は緑 (3373 jobs, 実 sorry 2=S08 0046/S09 0044, BG 由来ゼロ)。
+
+
 > 2026-05-31 作成。precursor(1) `pRank_le_two_of_scn3_empty` (= G Thm 4.15(i)) 完成 (commit c1d23e8)
 > 後の次ゲート。**BG Lem 4.13 (= G Thm 4.15(ii), q∣p²-1) の本体入力**。設計ノート、cold-start
 > でここから着手可能。⚠ **これは 【大】 — 複数セッション規模** (coprime-action 構造論を §3.6-3.10 で要構築)。
