@@ -171,6 +171,20 @@ theorem isSCN_iff_isMaximalAbelianNormal {p : ℕ} [Fact p.Prime] [Finite G] (hG
     IsSCN A ↔ IsMaximalAbelianNormal A :=
   ⟨IsSCN.isMaximalAbelianNormal, IsMaximalAbelianNormal.isSCN hG⟩
 
+/-- **Every abelian normal subgroup lies below a maximal abelian normal one** (`[Finite G]`).
+Standard finiteness argument: among the (finitely many) abelian normal subgroups containing
+`B`, pick a `≤`-maximal one. Underlies "`SCN(R)` covers every normal abelian subgroup",
+used in BG §4 (e.g. translating `SCN₃(R) = ∅` into a bound on `d_n(R)`). -/
+theorem exists_maximalAbelianNormal_ge [Finite G] {B : Subgroup G}
+    (hBnorm : B.Normal) (hBcomm : IsMulCommutative B) :
+    ∃ A : Subgroup G, B ≤ A ∧ IsMaximalAbelianNormal A := by
+  obtain ⟨A, hBA, hAmax⟩ :=
+    exists_maximal_ge_of_wellFoundedGT
+      (fun N : Subgroup G => N.Normal ∧ IsMulCommutative N) B ⟨hBnorm, hBcomm⟩
+  refine ⟨A, hBA, { isNormal := hAmax.1.1, isMulCommutative := hAmax.1.2, maximal := ?_ }⟩
+  intro N hN_norm hN_comm hAN
+  exact le_antisymm (hAmax.2 ⟨hN_norm, hN_comm⟩ hAN) hAN
+
 end MaximalAbelianNormal
 
 /-! ## 4B: `SCN_n(R)` — SCN subgroups of rank `≥ n` (pp. 33) -/
