@@ -1364,6 +1364,11 @@ set_option linter.style.longLine false in
 -- through the square-divisibility `dᵢ² ∣ D` (= `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`) to the `ℚ` bound `2·a < D`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_primePow_gap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_degree_lt_sum_ratCast
+-- (5.6.1)→(5.6.2) Y-collapse producer (mmd L71-97): from the (5.4) decomposition `Da` and the
+-- source family bundle `B`, *constructs* `Da.Y = a·χ₁^{τ₁}` — projects `Y` onto `{χᵢ^{τ₁}}`,
+-- computes the single integer `λ` via the cross-orthogonality `crossDifference_inner` transported
+-- through the isometry, and collapses `λ = 0` with `Y_eq_nsmul_tau1_of_lambdaForm`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_collapse_of_family
 -- (6.6) square-divisibility producers (mmd L78-80): the `hdvd : χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` input.
 -- `dvd_of_add_eq_of_dvd_dvd`: additive complement `head + tail = total`, `a∣tail`, `a∣total` ⟹
 -- `a∣head` (combine `θᵢ(1)² ∣ ∑_{j≥i}` and `θᵢ(1)² ∣ |L|-|L:Z|` through the sum identity).
