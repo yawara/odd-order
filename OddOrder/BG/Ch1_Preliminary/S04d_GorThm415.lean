@@ -601,4 +601,145 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
   have heq : x⁻¹ * a * x * a⁻¹ = x⁻¹ * (a * x * a⁻¹ * x⁻¹) * (x⁻¹)⁻¹ := by group
   rw [heq]; exact hconj_mem
 
+/-! ## PART 2: `D = Ω₁(C_P(Ω₁(A)))` has exponent `p` -/
+
+/-- **Gorenstein "Finite Groups" Lemma 4.14, PART 2** (`D` exponent `p`).
+With `C = C_P(Ω₁(A))`, the order-`p` elements of `C` are closed under products: if
+`u, v ∈ C` with `u^p = v^p = 1` then `(u v)^p = 1`.
+
+Proof (Gorenstein, mmd L4213): minimal counterexample on `|⟨u, v⟩|`. If `⟨u, v⟩` is
+cyclic it is abelian, done. Otherwise `⟨u, v⟩` would have class `≥ 3` (else
+`mul_pow_prime_eq_one_of_class_le_two`); but Lemma 4.12 gives `⟨v, vᵘ⟩ ⊊ ⟨u, v⟩`, so
+by minimality `⁅v, u⁆ = v⁻¹ vᵘ` has order dividing `p`. Both `u, v` stabilize
+`A ⊇ Ω₁(A)` (PART 1), so `⁅v, u⁆` centralizes `A` (Lemma 4.13); as `C_P(A) = A`
+(Lemma 3.12), `⁅v, u⁆ ∈ Ω₁(A)`, whence it is central in `⟨u, v⟩` (which centralizes
+`Ω₁(A)`), forcing class `≤ 2` — a contradiction. -/
+private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
+    {A : Subgroup P} [A.Normal] (hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hA_maxAb : ∀ N : Subgroup P, N.Normal →
+      (∀ x ∈ N, ∀ y ∈ N, x * y = y * x) → A ≤ N → N = A) :
+    ∀ u v : P, u ∈ Subgroup.centralizer (↑(omega1OfAbelian P A p hA_comm) : Set P) →
+      v ∈ Subgroup.centralizer (↑(omega1OfAbelian P A p hA_comm) : Set P) →
+      u ^ p = 1 → v ^ p = 1 → (u * v) ^ p = 1 := by
+  classical
+  set H := omega1OfAbelian P A p hA_comm with hH_def
+  set C := Subgroup.centralizer (↑H : Set P) with hC_def
+  have hp : p.Prime := Fact.out
+  have hH_le_A : H ≤ A := omega1OfAbelian_le
+  have hHA_comm : ∀ s ∈ H, ∀ t ∈ H, s * t = t * s :=
+    fun s hs t ht => hA_comm s (hH_le_A hs) t (hH_le_A ht)
+  -- `C_P(A) = A` (Lemma 3.12).
+  have hCA : Subgroup.centralizer (↑A : Set P) = A :=
+    centralizer_eq_self_of_maximal_abelian_normal hP hA_comm hA_maxAb
+  -- An element of `C` of order `| p` lies in `Ω₁(A)` iff it lies in `A`.
+  -- Strong induction on `|⟨u, v⟩|`.
+  have key : ∀ n : ℕ, ∀ u v : P, u ∈ C → v ∈ C → u ^ p = 1 → v ^ p = 1 →
+      Nat.card ↥(Subgroup.closure ({u, v} : Set P)) = n → (u * v) ^ p = 1 := by
+    intro n
+    induction n using Nat.strong_induction_on with
+    | _ n ih =>
+      intro u v huC hvC hup hvp hcard
+      -- The conjugate `vᵘ = u v u⁻¹` is in `C` (both `u, v` centralize `Ω₁(A)`).
+      have hconj_C : u * v * u⁻¹ ∈ C := by
+        rw [hC_def, Subgroup.mem_centralizer_iff]
+        intro w hw
+        have hxw : Commute w u := (Subgroup.mem_centralizer_iff.mp huC) w hw
+        have hyw : Commute w v := (Subgroup.mem_centralizer_iff.mp hvC) w hw
+        exact ((hxw.mul_right hyw).mul_right hxw.inv_right).eq
+      -- Class `≤ 2` of `⟨u, v⟩` would finish; otherwise derive a contradiction.
+      set K := Subgroup.closure ({u, v} : Set P) with hK_def
+      have huK : u ∈ K := Subgroup.subset_closure (by simp)
+      have hvK : v ∈ K := Subgroup.subset_closure (by simp)
+      by_cases hcl : _root_.commutator ↥K ≤ Subgroup.center ↥K
+      · -- `cl ≤ 2`: `(u v)^p = 1` directly.
+        have hup' : (⟨u, huK⟩ : ↥K) ^ p = 1 := by
+          apply Subtype.ext; rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, Subgroup.coe_mk]
+          exact hup
+        have hvp' : (⟨v, hvK⟩ : ↥K) ^ p = 1 := by
+          apply Subtype.ext; rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, Subgroup.coe_mk]
+          exact hvp
+        have hmul := mul_pow_prime_eq_one_of_class_le_two hp_odd hcl hup' hvp'
+        have h2 : (((⟨u, huK⟩ : ↥K) * ⟨v, hvK⟩) ^ p : ↥K) = (1 : ↥K) := hmul
+        have h3 : ((((⟨u, huK⟩ : ↥K) * ⟨v, hvK⟩) ^ p : ↥K) : P) = ((1 : ↥K) : P) := by rw [h2]
+        rwa [SubmonoidClass.coe_pow, Subgroup.coe_mul, Subgroup.coe_mk, Subgroup.coe_mk,
+          OneMemClass.coe_one] at h3
+      · -- `cl ≥ 3`: contradiction. First `⟨u, v⟩` noncyclic.
+        exfalso
+        -- `K` noncyclic (else abelian ⇒ class ≤ 2).
+        have hncyc : ¬ IsCyclic ↥K := by
+          intro hcyc
+          apply hcl
+          haveI := hcyc
+          -- cyclic ⇒ abelian ⇒ `center ↥K = ⊤`, so everything is `≤ center`.
+          have hcomm_K : ∀ a b : ↥K, a * b = b * a :=
+            commutative_of_cyclic_center_quotient (MonoidHom.id ↥K) (by simp)
+          have hcenter_top : Subgroup.center ↥K = ⊤ := by
+            rw [eq_top_iff]
+            intro z _
+            rw [Subgroup.mem_center_iff]
+            intro w; exact hcomm_K w z
+          rw [hcenter_top]; exact le_top
+        -- `⟨u, vᵘ⟩ ⊊ K` (Lemma 4.12 with `x := v`, `y := u`).
+        have hVU_eq : Subgroup.closure ({v, u} : Set P) = K := by
+          rw [hK_def, Set.pair_comm v u]
+        have hncyc' : ¬ IsCyclic ↥(Subgroup.closure ({v, u} : Set P)) := by
+          rw [hVU_eq]; exact hncyc
+        have hlt : Subgroup.closure ({u, v * u * v⁻¹} : Set P) < K := by
+          have hlt0 := lt_closure_conj_of_noncyclic (x := v) (y := u) hP hncyc'
+          rwa [hVU_eq] at hlt0
+        -- `v u v⁻¹ ∈ C`, order `p`; IH gives `(⁅v, u⁆)^p = 1`.
+        have hconj_C' : v * u * v⁻¹ ∈ C := by
+          rw [hC_def, Subgroup.mem_centralizer_iff]
+          intro w hw
+          have hxw : Commute w v := (Subgroup.mem_centralizer_iff.mp hvC) w hw
+          have hyw : Commute w u := (Subgroup.mem_centralizer_iff.mp huC) w hw
+          exact ((hxw.mul_right hyw).mul_right hxw.inv_right).eq
+        have hvuv_p : (v * u * v⁻¹) ^ p = 1 := by rw [conj_pow, hup, mul_one, mul_inv_cancel]
+        have huinv_p : (u⁻¹) ^ p = 1 := by rw [inv_pow, hup, inv_one]
+        -- `⟨v u v⁻¹, u⁻¹⟩ ⊆ closure {u, v u v⁻¹} ⊊ K`, so by IH `(⁅v,u⁆)^p = 1`.
+        have hsub_le : Subgroup.closure ({v * u * v⁻¹, u⁻¹} : Set P) ≤
+            Subgroup.closure ({u, v * u * v⁻¹} : Set P) := by
+          rw [Subgroup.closure_le]
+          rintro z hz
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+          rcases hz with rfl | rfl
+          · exact Subgroup.subset_closure (by simp)
+          · exact Subgroup.inv_mem _ (Subgroup.subset_closure (by simp))
+        -- `Nat.card ↥S = (↑S).ncard` bridge.
+        have hncard : ∀ S : Subgroup P, Nat.card ↥S = (S : Set P).ncard := fun S => by
+          rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+        have hcard_sub : Nat.card ↥(Subgroup.closure ({v * u * v⁻¹, u⁻¹} : Set P)) < n := by
+          rw [← hcard, hncard, hncard]
+          calc ((Subgroup.closure ({v * u * v⁻¹, u⁻¹} : Set P)) : Set P).ncard
+              ≤ ((Subgroup.closure ({u, v * u * v⁻¹} : Set P)) : Set P).ncard :=
+                Set.ncard_le_ncard hsub_le (Set.toFinite _)
+            _ < (K : Set P).ncard := Set.ncard_lt_ncard hlt (Set.toFinite _)
+        -- IH: `((v u v⁻¹) * u⁻¹)^p = 1`, i.e. `(⁅v, u⁆)^p = 1`.
+        have hvu_comm_p : (v * u * v⁻¹ * u⁻¹) ^ p = 1 := by
+          have := ih _ (hcard ▸ hcard_sub) (v * u * v⁻¹) u⁻¹ hconj_C' (C.inv_mem huC)
+            hvuv_p huinv_p rfl
+          rwa [show v * u * v⁻¹ * u⁻¹ = (v * u * v⁻¹) * u⁻¹ by group]
+        -- `u, v` stabilize `A ⊇ Ω₁(A)` (PART 1).
+        have hu_cent : ∀ w ∈ H, u * w = w * u := fun w hw =>
+          ((Subgroup.mem_centralizer_iff.mp huC) w hw).symm
+        have hv_cent : ∀ w ∈ H, v * w = w * v := fun w hw =>
+          ((Subgroup.mem_centralizer_iff.mp hvC) w hw).symm
+        have hstab_u : ∀ a ∈ A, u⁻¹ * a * u * a⁻¹ ∈ H :=
+          stabilizes_of_order_p_centralizing hp_odd hP hA_comm hu_cent hup
+        have hstab_v : ∀ a ∈ A, v⁻¹ * a * v * a⁻¹ ∈ H :=
+          stabilizes_of_order_p_centralizing hp_odd hP hA_comm hv_cent hvp
+        -- `⁅v, u⁆` centralizes `A` (Lemma 4.13), so `⁅v, u⁆ ∈ A`, and order `| p` ⇒ `∈ H`.
+        have hcomm_cent_A : ∀ a ∈ A, ⁅v, u⁆ * a = a * ⁅v, u⁆ :=
+          commutator_centralizes_of_stabilize hH_le_A hHA_comm hstab_u hstab_v hu_cent hv_cent
+        have hcomm_in_A : ⁅v, u⁆ ∈ A := by
+          rw [← hCA, Subgroup.mem_centralizer_iff]
+          intro a ha; exact (hcomm_cent_A a ha).symm
+        have hcomm_p : (⁅v, u⁆) ^ p = 1 := by rw [commutatorElement_def]; exact hvu_comm_p
+        have hcomm_in_H : ⁅v, u⁆ ∈ H := (mem_omega1OfAbelian).mpr ⟨hcomm_in_A, hcomm_p⟩
+        -- `⁅v, u⁆` is central in `K = ⟨u, v⟩` (commutes with `u, v ∈ C = C(Ω₁(A)) ⊇ ⁅v,u⁆`).
+        -- Hence `commutator ↥K ≤ center ↥K`, contradicting `hcl`.
+        apply hcl
+        sorry
+  exact fun u v huC hvC hup hvp => key _ u v huC hvC hup hvp rfl
+
 end OddOrder.BG.Ch1.S04
