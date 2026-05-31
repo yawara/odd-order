@@ -61,6 +61,30 @@ open OddOrder.BG.Ch1_Preliminary (isAInvariant_comap_mk' isAInvariant_map_mk'
   pow_eq_one_of_mem_omega_one_of_comm exists_aInvariant_complement_in_omega1_quotient
   isAInvariant_map_subtype_of_restrict)
 
+/-- **Gorenstein "Finite Groups" Lemma 3.9(ii).** In a group `G` of class `≤ 2` with `p` odd
+such that every `p`-th power lies in `Z(G)` (e.g. `G/Z(G)` elementary abelian), the `p`-th
+power map is multiplicative: `(x * y) ^ p = x ^ p * y ^ p`.
+
+Proof: the class-`≤ 2` collection formula gives `(xy)^p = x^p y^p ⁅y,x⁆^(p(p-1)/2)`; since
+`y^p ∈ Z` we get `⁅y,x⁆^p = ⁅y^p, x⁆ = 1`, and `p ∣ p(p-1)/2` for odd `p`, so the last factor
+vanishes. -/
+private theorem mul_pow_prime_of_class_le_two_of_pow_mem_center {G : Type*} [Group G] {p : ℕ}
+    (hp_odd : Odd p) (hcl : _root_.commutator G ≤ Subgroup.center G)
+    (hZ : ∀ g : G, g ^ p ∈ Subgroup.center G) (x y : G) :
+    (x * y) ^ p = x ^ p * y ^ p := by
+  have hcen : ⁅y, x⁆ ∈ Subgroup.center G :=
+    hcl (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
+  have hyp : ⁅y, x⁆ ^ p = 1 := by
+    rw [← commutatorElement_pow_left_of_central hcen p, commutatorElement_eq_one_iff_commute]
+    exact (Subgroup.mem_center_iff.mp (hZ y) x).symm
+  have hdvd : p ∣ p * (p - 1) / 2 := by
+    obtain ⟨k, rfl⟩ := hp_odd
+    rw [show 2 * k + 1 - 1 = 2 * k by omega,
+      Nat.mul_div_assoc _ (Dvd.intro k rfl : 2 ∣ 2 * k), Nat.mul_div_cancel_left k two_pos]
+    exact Dvd.intro k rfl
+  obtain ⟨m, hm⟩ := hdvd
+  rw [mul_pow_of_class_le_two hcl, hm, pow_mul, hyp, one_pow, mul_one]
+
 variable {A P : Type*} [Group A] [Group P] [Finite A] [Finite P] {p : ℕ} [Fact p.Prime]
 
 /-! ## Helpers: pointwise stabilizer in the operator group, single-element stability -/
@@ -587,5 +611,92 @@ theorem exists_minimal_aInvariant_isSpecial_of_pprimeAction
     exact hψ_triv_N (n : P) (Subgroup.mem_map_of_mem _ hn)
   exact (isSpecial_of_pprimeAction_trivialOnProper hQ_inv.restrict hQ_pgroup hQ_cop
     hψ_nt_Q hψ_proper_Q).2.2.2.2
+
+/-- **precursor 2 of BG Lemma 4.13** (= **G** Theorem 4.15(ii) input; Gorenstein Theorems
+3.7/3.8/3.10 combined, `p` odd). Let `A` be a `p′`-group of automorphisms of the `p`-group `P`
+(`φ`, coprime) and `ψ : A` acting nontrivially on `P`. Then `P` has a minimal `A`-invariant
+subgroup `Q` on which `ψ` acts nontrivially, and `Q` is **special of exponent `p`**.
+
+The exponent-`p` half replaces the full induction of Gorenstein Theorem 3.10: as `Q` is already
+special (Theorem 3.8) and minimal, `ψ` acts trivially on the proper `A`-invariant characteristic
+subgroups `Q′` and `Ω₁(Q)`. With `Q′` this gives `[Q, ψ] ⊆ Ω₁(Q)` (via Lemma 3.9(ii) and
+`q^p ∈ Q′`), and then `Ω₁(Q) = Q` follows from the stabilization theorem; `Ω₁(Q) = Q` plus class
+`≤ 2` and `p` odd give exponent `p` (Lemma 3.9(i)). -/
+theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction (hp_odd : Odd p)
+    (φ : A →* MulAut P) (hP : IsPGroup p P)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
+    {ψ : A} (hψ_ntriv : ¬ ∀ g : P, (φ ψ) g = g) :
+    ∃ Q : Subgroup P, IsAInvariant φ Q ∧ (∃ g ∈ Q, (φ ψ) g ≠ g) ∧
+      IsSpecial p ↥Q ∧ Monoid.exponent ↥Q = p := by
+  obtain ⟨Q, hQ_inv, hψ_nt, hQ_special, hmin⟩ :=
+    exists_minimal_aInvariant_isSpecial_of_pprimeAction φ hP hCop hψ_ntriv
+  refine ⟨Q, hQ_inv, hψ_nt, hQ_special, ?_⟩
+  set φQ : A →* MulAut ↥Q := hQ_inv.restrict with hφQ_def
+  haveI : Finite ↥Q := inferInstance
+  have hQ_pgroup : IsPGroup p ↥Q := hP.to_subgroup Q
+  haveI hQ_nilp : Group.IsNilpotent ↥Q := hQ_pgroup.isNilpotent
+  have hQ_cop : Nat.Coprime (Nat.card A) (Nat.card ↥Q) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card Q)
+  haveI hQ_nt : Nontrivial ↥Q := by
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt
+    have hg1 : g ≠ 1 := fun h => hg (by rw [h, map_one])
+    exact ⟨⟨g, hgQ⟩, 1, fun h => hg1 (congrArg Subtype.val h)⟩
+  -- `ψ` acts nontrivially on `↥Q`.
+  have hψ_nt_Q : ¬ ∀ x : ↥Q, (φQ ψ) x = x := by
+    intro h
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt
+    apply hg
+    have hgg := h ⟨g, hgQ⟩
+    rwa [Subtype.ext_iff, IsAInvariant.restrict_apply_val] at hgg
+  -- `ψ` acts trivially on every proper `A`-invariant subgroup of `↥Q` (minimality).
+  have hψ_triv_proper : ∀ K : Subgroup ↥Q, IsAInvariant φQ K → K ≠ ⊤ →
+      ∀ z ∈ K, (φQ ψ) z = z := by
+    intro K hK_inv hK_ne z hz
+    set N := K.map Q.subtype with hN_def
+    have hN_inv : IsAInvariant φ N := isAInvariant_map_subtype_of_restrict hQ_inv hK_inv
+    have hN_ne : N ≠ Q := by
+      intro hNQ
+      apply hK_ne
+      have hQtop : Q = (⊤ : Subgroup ↥Q).map Q.subtype := by
+        rw [← MonoidHom.range_eq_map, Q.range_subtype]
+      exact Subgroup.map_injective Q.subtype_injective (hN_def ▸ hNQ.trans hQtop)
+    have hψ_triv_N : ∀ m ∈ N, (φ ψ) m = m := fun m hm => by
+      by_contra hmne
+      exact hN_ne (hmin N hN_inv (Subgroup.map_subtype_le K) ⟨m, hm, hmne⟩)
+    apply Subtype.ext
+    rw [IsAInvariant.restrict_apply_val]
+    exact hψ_triv_N (z : P) (Subgroup.mem_map_of_mem _ hz)
+  -- `Q` special ⇒ class `≤ 2` and `p`-th powers lie in `Q′ ⊆ Z(Q)`.
+  have hcl : _root_.commutator ↥Q ≤ Subgroup.center ↥Q := by
+    rcases hQ_special.2 with hea | ⟨hcomm, _, _⟩
+    · exact fun x _ => Subgroup.mem_center_iff.mpr fun g => hea.comm g x
+    · exact le_of_eq hcomm
+  have hZcomm : ∀ g : ↥Q, g ^ p ∈ _root_.commutator ↥Q := by
+    intro g
+    rcases hQ_special.2 with hea | ⟨hcomm, hfrat, _⟩
+    · rw [hea.pow_eq_one g]; exact one_mem _
+    · rw [hcomm, ← hfrat]; exact hQ_special.1.pow_mem_frattini g
+  have hZ : ∀ g : ↥Q, g ^ p ∈ Subgroup.center ↥Q := fun g => hcl (hZcomm g)
+  -- `ψ` trivial on `Q′ = [Q,Q]` (proper `A`-invariant).
+  have hψ_triv_comm : ∀ z ∈ _root_.commutator ↥Q, (φQ ψ) z = z :=
+    hψ_triv_proper _ (IsAInvariant.commutator_self φQ)
+      (commutator_lt_self_of_isNilpotent_ambient (E := ⊤) (F := ⊤) bot_lt_top.ne').ne
+  -- `[Q, ψ] ⊆ Ω₁(Q)`: `(φψ x · x⁻¹)^p = 1`.
+  have hquot : ∀ x : ↥Q, (φQ ψ) x * x⁻¹ ∈ Omega ↥Q p 1 := by
+    intro x
+    refine Omega.mem_of_pow_eq_one (n := 1) ?_
+    rw [pow_one, mul_pow_prime_of_class_le_two_of_pow_mem_center hp_odd hcl hZ,
+      ← map_pow, inv_pow, hψ_triv_comm (x ^ p) (hZcomm x), mul_inv_cancel]
+  -- `Ω₁(Q) = ⊤` (else stabilization forces `ψ` trivial on `Q`).
+  have hOmega_top : Omega ↥Q p 1 = ⊤ := by
+    by_contra hne
+    have hOmega_inv : IsAInvariant φQ (Omega ↥Q p 1) := IsAInvariant.of_characteristic φQ
+    haveI : (Omega ↥Q p 1).Normal := inferInstance
+    exact hψ_nt_Q (acts_trivially_of_trivial_on_normal_quotient φQ hQ_pgroup hQ_cop
+      hOmega_inv (hψ_triv_proper _ hOmega_inv hne) hquot)
+  -- exponent `= p`.
+  rw [Monoid.exponent_eq_prime_iff Fact.out]
+  exact fun g hg => orderOf_eq_prime
+    (Omega.pow_eq_one_of_class_le_two hp_odd hcl (hOmega_top ▸ Subgroup.mem_top g)) hg
 
 end OddOrder.BG.Ch1.S04

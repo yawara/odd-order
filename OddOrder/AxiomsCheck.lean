@@ -1064,6 +1064,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
 -- Gorenstein Thm 3.8 (precursor 2): minimal A-不変 (ψ 非自明) 部分群 Q は special (Thm 3.7 適用)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.exists_minimal_aInvariant_isSpecial_of_pprimeAction
+-- precursor 2 完成 (= G Thm 4.15(ii) 入力, p odd): minimal A-不変 (ψ 非自明) 部分群 Q は
+-- special かつ exp p。Thm 3.8 + minimality で full Thm 3.10 帰納を回避 (Lem 3.9 + stability)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction
 -- Clifford BLOCKER A (issue 0026): ρ g は simple ℂ[H]-部分加群を simple に送る.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Representation.isSimpleModule_map_conjBySimpleSemilinear
