@@ -56,6 +56,7 @@ import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
+import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
