@@ -14,9 +14,12 @@
 > (a) D abelian ⇒ elem ab, ψ∈GL(≤2,p) order q ⇒ q∣p²-1; (b) D nonabelian ⇒ |D|=p³ extraspecial,
 > ψ on D/Φ(D)=elem ab rank2 ⇒ 同様。
 >
-> ## ✅ GL 数論 kernel 完成 (2026-05-31, commit 9c34e48)
-> `prime_dvd_prime_sq_sub_one_of_orderOf_mulAut`@PRank: E elem ab |E|≤p², σ:MulAut E prime order
-> q≠p ⇒ q∣p²-1。これが G Thm 4.15(ii) の (a)(b) 両方の「数論層」。sorry-free。
+> ## ✅✅ 数論層 完成 (2026-05-31, commits 9c34e48 + 2795e0c)
+> - `prime_dvd_prime_sq_sub_one_of_orderOf_mulAut`@PRank: E elem ab |E|≤p², σ:MulAut E prime
+>   order q≠p ⇒ q∣p²-1。
+> - `lt_of_prime_dvd_prime_sq_sub_one`@PRank: p,q prime, p odd, q≠p, q∣p²-1 ⇒ q<p。
+> 両者で G Thm 4.15(ii) の数論結論 (q∣p²-1 ∧ q<p) を rank≤2 elem ab 作用から供給。sorry-free。
+> **⇒ 残る Lem 4.13 ピースは構造論 (extraspecial reduction) + 配線のみ** (数論は完了)。
 >
 > ## 🔁 残る Lem 4.13 ピース (2 個):
 > **(I) abelian 分岐**: D=precursor(2) Q が abelian ⇒ special abelian = elem ab。d(D)≤2
