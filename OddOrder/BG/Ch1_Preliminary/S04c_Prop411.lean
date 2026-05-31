@@ -468,4 +468,168 @@ theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (hR : IsPGr
       · rw [SetLike.mem_coe]; exact hTleK (by rw [hT]; exact Subgroup.mem_zpowers _)
   exact ⟨a, b, K, hKnorm, hKeq, hcommR, hiii, hiv, hv⟩
 
+/-- **BG Prop 4.11, step 8** (mmd L1584-1586): a finite `p`-group `R` (`p` odd) with
+`|Ω₁(R)| ≤ p²` whose commutator subgroup `R'` is cyclic is metacyclic.
+
+This is the closing step of the non-abelian induction of Prop 4.11, stated as a clean
+stand-alone lemma (the `a, b, z` setup of the induction is not needed). The general form
+subsumes the abelian case (`R' = ⊥` is cyclic), so it faithfully captures the BG argument
+without weakening the conclusion.
+
+Proof (following BG): if `R` is cyclic it is metacyclic. Otherwise let `S` be a cyclic
+subgroup maximal subject to `R' ⊆ S` (exists by finiteness, with witness `R'` itself,
+which is cyclic by hypothesis). Since `R' ⊆ S`, `S ⊴ R`, and `S ≠ R` as `R` is not cyclic.
+For *any* `S₁` with `S ≤ S₁` and `|S₁/S| = p` (i.e. `S₁ = comap (mk' S) P̄` for an order-`p`
+subgroup `P̄ ≤ R/S`): `S₁` is not cyclic (else `S = S₁` by maximality, contradicting
+`S.relIndex S₁ = p ≠ 1`), so by Lemma 4.5(b) `|Ω₁(S₁)| = p²`. Pushing `Ω₁(↥S₁)` into `R` and
+squeezing against `|Ω₁(R)| ≤ p²` gives `Ω₁(S₁) = Ω₁(R)` (so `|Ω₁(R)| = p²`), hence
+`Ω₁(R) ≤ S₁` and `S₁ = S ⊔ Ω₁(R)` (a tower-`relIndex` computation, using `Ω₁(R) ⊄ S`). As
+`S ⊔ Ω₁(R)` does not depend on `P̄`, every order-`p` subgroup of `R/S` is
+`(S ⊔ Ω₁(R)).map (mk' S)`, so `R/S` has a unique subgroup of order `p` and is cyclic
+(`isCyclic_of_subgroups_card_prime_unique_of_odd`). Then `⟨S, R/S⟩` witnesses metacyclicity. -/
+theorem isMetacyclic_of_isCyclic_commutator_of_card_omega1_le
+    (hR : IsPGroup p R) (hp_odd : Odd p)
+    (hΩ : Nat.card (Omega R p 1) ≤ p ^ 2)
+    (hcyc : IsCyclic (_root_.commutator R)) :
+    OddOrder.GroupTheory.IsMetacyclic R := by
+  classical
+  have hp : p.Prime := Fact.out
+  -- ⟨STEP 0⟩ If `R` is cyclic, it is metacyclic; otherwise work with `hRcyc : ¬ IsCyclic R`.
+  by_cases hRcyc : IsCyclic R
+  · haveI := hRcyc
+    exact OddOrder.GroupTheory.IsMetacyclic.of_isCyclic
+  -- ⟨STEP 1⟩ Maximal cyclic `S` subject to `R' ⊆ S`, from finiteness (witness = `R'`).
+  obtain ⟨S, hSsub, hSmax⟩ :=
+    Finite.exists_le_maximal
+      (p := fun H : Subgroup R => IsCyclic ↥H ∧ _root_.commutator R ≤ H) ⟨hcyc, le_refl _⟩
+  have hScyc : IsCyclic ↥S := hSmax.1.1
+  have hRprime_le : _root_.commutator R ≤ S := hSmax.1.2
+  haveI := hScyc
+  -- ⟨STEP 2⟩ `S ⊴ R` (since `R' ⊆ S`) and `S ≠ ⊤` (since `R` is not cyclic).
+  have hSnorm : S.Normal := OddOrder.Isaacs.Ch06.normal_of_commutator_le hRprime_le
+  haveI := hSnorm
+  -- `R/S` is a `p`-group.
+  haveI hQpg : IsPGroup p (R ⧸ S) := hR.to_quotient S
+  -- ⟨STEP 5⟩ Uniqueness of order-`p` subgroups of `R/S` ⇒ `R/S` cyclic.
+  have hRScyc : IsCyclic (R ⧸ S) := by
+    refine OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hQpg hp_odd ?_
+    -- For each order-`p` subgroup `P̄ ≤ R/S`, its preimage `S₁ = comap (mk' S) P̄` equals
+    -- the fixed subgroup `S ⊔ Ω₁(R)`; hence `P̄ = (S ⊔ Ω₁(R)).map (mk' S)` for every `P̄`.
+    have key : ∀ P : Subgroup (R ⧸ S), Nat.card P = p →
+        Subgroup.comap (QuotientGroup.mk' S) P = S ⊔ Omega R p 1 := by
+      intro P hP
+      set S₁ : Subgroup R := Subgroup.comap (QuotientGroup.mk' S) P with hS₁_def
+      have hS_le_S₁ : S ≤ S₁ := QuotientGroup.le_comap_mk' S P
+      have hS₁pg : IsPGroup p S₁ := hR.to_subgroup S₁
+      -- (5b) `S.relIndex S₁ = p`.
+      have hSrel : S.relIndex S₁ = p := by
+        have hker : S = (QuotientGroup.mk' S).ker := (QuotientGroup.ker_mk' S).symm
+        rw [hker, Subgroup.relIndex_ker, hS₁_def,
+          Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S)]
+        exact hP
+      -- (5c) `S₁` is not cyclic: else maximality forces `S = S₁`, but `relIndex = p ≠ 1`.
+      have hS₁nc : ¬ IsCyclic ↥S₁ := by
+        intro hS₁cyc
+        have hle : S₁ ≤ S := hSmax.2 ⟨hS₁cyc, hRprime_le.trans hS_le_S₁⟩ hS_le_S₁
+        have hSeqS₁ : S = S₁ := le_antisymm hS_le_S₁ hle
+        rw [← hSeqS₁, Subgroup.relIndex_self] at hSrel
+        exact hp.one_lt.ne' hSrel.symm
+      -- (5d) `S.subgroupOf S₁` is cyclic (`≅ ↥S`) of index `p`; apply Lemma 4.5(b) to `↥S₁`.
+      have hSsub_cyc : IsCyclic ↥(S.subgroupOf S₁) :=
+        isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hS_le_S₁).symm.toMonoidHom
+          (Subgroup.subgroupOfEquivOfLe hS_le_S₁).symm.surjective
+      have hSsub_idx : (S.subgroupOf S₁).index = p := hSrel
+      obtain ⟨_hΩS₁_ea, hΩS₁_card⟩ :=
+        isElementaryAbelian_omega1_of_isCyclic_index_prime hS₁pg hp_odd hS₁nc hSsub_cyc hSsub_idx
+      -- (5e) `(Ω₁ ↥S₁).map S₁.subtype ≤ Ω₁(R)` and has order `p²`; squeeze with `hΩ` ⇒ equal.
+      have hΩmap_le : (Omega (↥S₁) p 1).map S₁.subtype ≤ Omega R p 1 := by
+        rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+        rintro ⟨g, hgS₁⟩ (hg : (⟨g, hgS₁⟩ : ↥S₁) ^ (p ^ 1) = 1)
+        change (⟨g, hgS₁⟩ : ↥S₁) ∈ Subgroup.comap S₁.subtype (Omega R p 1)
+        rw [Subgroup.mem_comap]
+        refine Omega.mem_of_pow_eq_one ?_
+        rw [pow_one]
+        have hval := congrArg (Subgroup.subtype S₁) hg
+        rw [map_pow, pow_one, map_one] at hval
+        simpa using hval
+      have hΩmap_card : Nat.card ((Omega (↥S₁) p 1).map S₁.subtype) = p ^ 2 := by
+        rw [Subgroup.card_map_of_injective S₁.subtype_injective, hΩS₁_card]
+      have hΩeq : (Omega (↥S₁) p 1).map S₁.subtype = Omega R p 1 :=
+        Subgroup.eq_of_le_of_card_ge hΩmap_le (by rw [hΩmap_card]; exact hΩ)
+      -- `|Ω₁(R)| = p²` (consequence of the squeeze) and `Ω₁(R) ≤ S₁`.
+      have hΩR_card : Nat.card (Omega R p 1) = p ^ 2 := by rw [← hΩeq, hΩmap_card]
+      have hΩR_le_S₁ : Omega R p 1 ≤ S₁ := by rw [← hΩeq]; exact Subgroup.map_subtype_le _
+      -- `Ω₁(R)` is elementary abelian (image of the e.a. `Ω₁ ↥S₁`), so every element is
+      -- `p`-torsion.
+      have hΩR_ea : (Omega R p 1).IsElementaryAbelian p :=
+        hΩeq ▸ _hΩS₁_ea.map S₁.subtype_injective
+      have hΩR_pow : ∀ g : R, g ∈ Omega R p 1 → g ^ p = 1 := by
+        intro g hg
+        have := hΩR_ea.pow_eq_one ⟨g, hg⟩
+        simpa using congrArg (Subtype.val) this
+      -- `Ω₁(R) ⊄ S`: else `Ω₁(R) ≤ (Ω₁ ↥S).map subtype`, forcing `p² = |Ω₁(R)| ≤ |Ω₁ ↥S| = p`.
+      have hΩR_not_le_S : ¬ Omega R p 1 ≤ S := by
+        intro hle
+        -- `S` is nontrivial (it contains the nontrivial `Ω₁(R)`, of order `p²`).
+        haveI hS_nt : Nontrivial ↥S := by
+          rw [← Finite.one_lt_card_iff_nontrivial]
+          have h1 : Nat.card (Omega R p 1) ≤ Nat.card ↥S := Subgroup.card_le_of_le hle
+          have h2 : 1 < Nat.card (Omega R p 1) := by
+            rw [hΩR_card]; exact Nat.one_lt_pow (by norm_num) hp.one_lt
+          omega
+        -- each generator of `Ω₁(R)` lies in `(Ω₁ ↥S).map S.subtype`.
+        have hΩR_le_ΩS : Omega R p 1 ≤ (Omega (↥S) p 1).map S.subtype := by
+          intro x hx
+          have hxS : x ∈ S := hle hx
+          rw [Subgroup.mem_map]
+          refine ⟨⟨x, hxS⟩, ?_, rfl⟩
+          refine Omega.mem_of_pow_eq_one ?_
+          rw [pow_one]
+          ext
+          rw [SubmonoidClass.coe_pow, Subgroup.coe_mk, OneMemClass.coe_one]
+          exact hΩR_pow x hx
+        have hΩS_card : Nat.card (Omega ↥S p 1) = p :=
+          card_omega1_eq_prime_of_isCyclic (hR.to_subgroup S)
+        have hΩSmap_card : Nat.card ((Omega ↥S p 1).map S.subtype) = p := by
+          rw [Subgroup.card_map_of_injective S.subtype_injective, hΩS_card]
+        have hle_card : Nat.card (Omega R p 1) ≤ p := by
+          calc Nat.card (Omega R p 1)
+              ≤ Nat.card ((Omega ↥S p 1).map S.subtype) := Subgroup.card_le_of_le hΩR_le_ΩS
+            _ = p := hΩSmap_card
+        rw [hΩR_card] at hle_card
+        -- `p² ≤ p` is false for `p ≥ 2`.
+        nlinarith [hp.two_le]
+      -- (5f) `S₁ = S ⊔ Ω₁(R)` via a tower `relIndex` computation.
+      have hSup_le : S ⊔ Omega R p 1 ≤ S₁ := sup_le hS_le_S₁ hΩR_le_S₁
+      have hS_le_sup : S ≤ S ⊔ Omega R p 1 := le_sup_left
+      have htower : S.relIndex (S ⊔ Omega R p 1) * (S ⊔ Omega R p 1).relIndex S₁ = p := by
+        rw [Subgroup.relIndex_mul_relIndex S (S ⊔ Omega R p 1) S₁ hS_le_sup hSup_le]; exact hSrel
+      have hfirst_ne_one : S.relIndex (S ⊔ Omega R p 1) ≠ 1 := by
+        rw [Ne, Subgroup.relIndex_eq_one]
+        intro hle
+        exact hΩR_not_le_S (le_trans le_sup_right hle)
+      have hsecond_eq_one : (S ⊔ Omega R p 1).relIndex S₁ = 1 := by
+        -- `a * b = p` prime with `a ≠ 1` forces `a = p`, hence `b = 1`.
+        set a := S.relIndex (S ⊔ Omega R p 1)
+        set b := (S ⊔ Omega R p 1).relIndex S₁
+        have hadvd : a ∣ p := Dvd.intro_left b (by rw [mul_comm]; exact htower)
+        have ha_eq_p : a = p := (hp.eq_one_or_self_of_dvd a hadvd).resolve_left hfirst_ne_one
+        rw [ha_eq_p] at htower
+        have hp_pos : 0 < p := hp.pos
+        have : p * b = p * 1 := by rw [mul_one]; exact htower
+        exact Nat.eq_of_mul_eq_mul_left hp_pos this
+      have hge : S₁ ≤ S ⊔ Omega R p 1 := Subgroup.relIndex_eq_one.mp hsecond_eq_one
+      exact le_antisymm hge hSup_le
+    -- Close uniqueness: both order-`p` subgroups map back to the same `comap`.
+    intro P Q hP hQ
+    have hPc := key P hP
+    have hQc := key Q hQ
+    have hPm : (Subgroup.comap (QuotientGroup.mk' S) P).map (QuotientGroup.mk' S) = P :=
+      Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S) P
+    have hQm : (Subgroup.comap (QuotientGroup.mk' S) Q).map (QuotientGroup.mk' S) = Q :=
+      Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective S) Q
+    rw [← hPm, ← hQm, hPc, hQc]
+  -- ⟨STEP 7⟩ `⟨S, R/S⟩` witnesses metacyclicity.
+  exact ⟨S, hSnorm, hScyc, hRScyc⟩
+
 end OddOrder.BG.Ch1.S04
