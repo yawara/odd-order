@@ -236,6 +236,62 @@ theorem card_le_prime_of_isPGroup_of_not_sq_dvd {G : Type*} [Group G] [Finite G]
     omega
   exact hnsq ((pow_dvd_pow p hk2).trans (hk ▸ K.card_subgroup_dvd_card))
 
+/-- `p² ∤ ∏_{i<n}(pⁿ - pⁱ)` for `n ≤ 2` (`p` prime). This is the order of `GL(n, p)`; its
+`p`-adic valuation is `n(n-1)/2 ≤ 1` when `n ≤ 2`. -/
+private theorem not_sq_dvd_prod_pow_sub {p n : ℕ} (hp : p.Prime) (hn : n ≤ 2) :
+    ¬ p ^ 2 ∣ ∏ i : Fin n, (p ^ n - p ^ (i : ℕ)) := by
+  have h2p : 2 ≤ p := hp.two_le
+  interval_cases n
+  · -- n = 0: empty product = 1
+    simp only [Finset.univ_eq_empty, Finset.prod_empty]
+    intro h
+    have hle := Nat.le_of_dvd one_pos h
+    have h4 : (2 : ℕ) ^ 2 ≤ p ^ 2 := Nat.pow_le_pow_left h2p 2
+    norm_num at h4
+    omega
+  · -- n = 1: product = p - 1
+    simp only [Fin.prod_univ_one, Fin.val_zero, pow_zero, pow_one]
+    intro h
+    have hle := Nat.le_of_dvd (by omega) h
+    have hps : p ≤ p ^ 2 := Nat.le_self_pow two_ne_zero p
+    omega
+  · -- n = 2: product = (p² - 1)(p² - p)
+    simp only [Fin.prod_univ_two, Fin.val_zero, Fin.val_one, pow_zero, pow_one]
+    have hpp : p ^ 2 - p = p * (p - 1) := by rw [Nat.mul_sub_one, pow_two]
+    have hfac : (p ^ 2 - 1) * (p ^ 2 - p) = p * ((p ^ 2 - 1) * (p - 1)) := by
+      rw [hpp]; ring
+    intro hdvd
+    rw [hfac, pow_two] at hdvd
+    have hM : p ∣ (p * p - 1) * (p - 1) := (Nat.mul_dvd_mul_iff_left hp.pos).mp hdvd
+    rcases hp.dvd_mul.mp hM with h1 | h2
+    · -- p ∣ p*p - 1 : impossible since p ∣ p*p
+      have hpsq : p ∣ p * p := dvd_mul_right p p
+      have hd1 : p ∣ p * p - (p * p - 1) := Nat.dvd_sub hpsq h1
+      have hX1 : 1 ≤ p * p := by nlinarith
+      have : p * p - (p * p - 1) = 1 := by omega
+      rw [this] at hd1
+      exact hp.one_lt.ne' (Nat.dvd_one.mp hd1)
+    · -- p ∣ p - 1 : impossible since 0 < p - 1 < p
+      have := Nat.le_of_dvd (by omega) h2
+      omega
+
+/-- **`|p`-subgroup of `Aut(E)| ≤ p`** for an elementary abelian `E` of order `≤ p²`
+(`p` prime): since `p² ∤ |Aut(E)|` when `m(E) ≤ 2`, any `p`-subgroup of `MulAut E` has
+order `≤ p`. This is the rank-`≤ 2` GL squeeze, packaged for the conjugation action in
+Gorenstein Theorem 4.15(i). -/
+theorem card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq
+    {E : Type*} [Group E] [Finite E] {p : ℕ} [Fact p.Prime]
+    (hE : IsElementaryAbelian p E) (hcard : Nat.card E ≤ p ^ 2)
+    {K : Subgroup (MulAut E)} (hK : IsPGroup p K) :
+    Nat.card K ≤ p := by
+  have hp := (Fact.out : p.Prime)
+  refine card_le_prime_of_isPGroup_of_not_sq_dvd hK ?_
+  rw [hE.card_mulAut]
+  refine not_sq_dvd_prod_pow_sub hp ?_
+  have hcardE := hE.card_eq_pow_finrank
+  rw [hcardE] at hcard
+  exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hcard
+
 end AutGL
 
 variable (G : Type*) [Group G]
