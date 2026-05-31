@@ -516,7 +516,7 @@ proof は純算術で閉じる。
   gate: I-0a。
 - **I-2c Prop 4.8** (`r≤2`+exp p ⇒ `|R|≤p³`, `p>3`⇒Ω₁ exp p)。gate: I-2a, I-2b, I-0d。
 - **I-2d Lem 4.9** (`|Ω₁(R/T)|≤p²`)。gate: I-2c。
-- **I-2e Lem 4.13/4.14** (q∣|Aut R| ⇒ q∣p²-1, q<p)。gate: I-0d。
+- **I-2e Lem 4.13/4.14** (q∣|Aut R| ⇒ q∣p²-1, q<p)。~~gate: I-0d。~~ ⚠ **訂正 (2026-05-31)**: 「gate=I-0d (GL橋) のみ」は **誤り**。Lem4.13 = Gorenstein Thm4.15(ii) で **(i)=`pRank_le_two_of_scn3_empty` (SCN₃=∅⇒pRank≤2, §5/§7 共有ゲート) + Thm3.7/3.10 (minimal ψ-inv⇒special exp p)** を消費。GL橋は最終 descent だけ。**完全 precursor tree + 実装順 = [`s04_lem413_gorenstein_precursors.md`](s04_lem413_gorenstein_precursors.md)** (#9 BLOCKED_DESIGN が暴いた)。
 
 ### Wave 3 — §3 山 (設計先行, multi-sub)
 - **I-3 Prop 4.11 (Huppert)** ⭐ — §3 の skeleton。

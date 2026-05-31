@@ -95,6 +95,8 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 → **Thm 4.16 Case A の gate (Prop4.11 + Thm4.12) が両方開いた**。Thm4.16 残ゲート = **Lem 4.13/4.14** (q∣\|Aut R\|⇒q∣p²-1, q<p; ⚠ "Lem4.7 and **G** Thm5.4.15" の Gorenstein行間)。
 
+**Thm 4.16 最終ゲート = Gorenstein Thm 4.15 chain (2026-05-31, #9 BLOCKED_DESIGN が map)** — Lem4.13=G Thm4.15(ii) が **precursor(1) `pRank_le_two_of_scn3_empty` (=G Thm4.15(i)=SCN₃=∅⇒pRank≤2, §5共有) + precursor(2) (minimal ψ-inv⇒special exp p=G Thm3.7/3.10)** を消費。底辺補題 (G 3.9(i)/3.12/1.3.4/GL橋) は present。**完全 precursor tree + 実装順 + 7 anti-scaffold trap = [`../notes/bg/s04_lem413_gorenstein_precursors.md`](../notes/bg/s04_lem413_gorenstein_precursors.md)**。自走キュー #8.5→8.6→8.7→9。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
