@@ -949,6 +949,48 @@ theorem centralCharacterOfRep_classSum_mul (ρ : Representation ℂ G V) [IsIrre
           ((classSum Ci * classSum Cj) Cs.out) • (ω ρ Cs) := by
         rw [map_sum]; exact Finset.sum_congr rfl fun Cs _ => map_smul _ _ _
 
+omit [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)] [FiniteDimensional ℂ V] [Fintype G] in
+/-- **The centralizer of a TI-subset element lies in the TI normalizer.**
+
+If `A` is a TI-subset of `G` with normalizer-bound `L` and `x ∈ A`, then `C_G(x) ≤ L`: any `g`
+centralizing `x` fixes `x ∈ A` under conjugation (`g x g⁻¹ = x ∈ A`), so the TI condition forces
+`g ∈ L`.  This is the group-theoretic fact behind Peterfalvi (6.7)'s `|C_G(z)| = |C_L(z)|` for
+`z ∈ Z^# ⊆ P^#`: with `C_G(z) ⊆ L = N_G(P)`, the centralizer in `G` equals the centralizer in `L`,
+so the hypothesis `|C_L(z)|` constant on `Z^#` makes `|⟦z⟧| = [G : C_G(z)]` constant, feeding the
+class-size hypothesis of `centralCharacterOfRep_eq_of_card_eq_of_character_eq`. -/
+theorem centralizer_le_of_mem_isTISubset {A : Set G} {L : Subgroup G}
+    (hA : OddOrder.GroupTheory.IsTISubset A L) {x : G} (hx : x ∈ A) :
+    Subgroup.centralizer ({x} : Set G) ≤ L := by
+  intro g hg
+  refine hA g ⟨x, hx, ?_⟩
+  have hcomm : x * g = g * x := (Subgroup.mem_centralizer_iff.mp hg) x (Set.mem_singleton x)
+  have hfix : g * x * g⁻¹ = x := by rw [← hcomm]; group
+  rw [hfix]; exact hx
+
+omit [Fintype (ConjClasses G)] in
+/-- **The central-character value `ω_ρ(⟦z⟧)` depends only on `χ_ρ(z)` and the class size `|⟦z⟧|`.**
+
+`ω_ρ(⟦z⟧) = |⟦z⟧| · χ_ρ(z) / χ_ρ(1)` (`centralCharacterOfRep_classSum` + `sum_character_eq_card_mul`),
+so if `z, z'` have equal class size (`|⟦z⟧| = |⟦z'⟧|`) and equal character value
+(`χ_ρ(z) = χ_ρ(z')`) then `ω_ρ(⟦z⟧) = ω_ρ(⟦z'⟧)`.
+
+This is the constancy Peterfalvi (6.7) uses ("`α` does not depend on `s`", mmd 04.8 L102): on `Z^#`
+both `ψ(z)` (`ψ` constant on `Z^#`, a hypothesis) and `|⟦z⟧| = [G : C_G(z)]` are independent of `z`
+— the latter because `|C_G(z)| = |C_L(z)|` (`C_G(z) ⊆ L` from the `P^#`-TI-subset,
+`centralizer_le_normalizer_of_mem_tiSubset`) is constant by hypothesis.  This lemma isolates the
+*character-theoretic* constancy; the *group-theoretic* class-size constancy (`hcard`) is supplied by
+the caller from the TI-subset / `|C_L(z)|`-constancy data. -/
+theorem centralCharacterOfRep_eq_of_card_eq_of_character_eq (ρ : Representation ℂ G V)
+    [IsIrreducible ρ] {z z' : G}
+    (hcard : Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
+      = Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z' })
+    (hchar : ρ.character z = ρ.character z') :
+    ω ρ (ConjClasses.mk z) = ω ρ (ConjClasses.mk z') := by
+  rw [centralCharacterOfRep_classSum ρ (ConjClasses.mk z),
+    centralCharacterOfRep_classSum ρ (ConjClasses.mk z'),
+    sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl,
+    sum_character_eq_card_mul ρ (ConjClasses.mk z') (g := z') rfl, hcard, hchar]
+
 omit [Fintype (ConjClasses G)] in
 /-- **Algebraic integrality of the central-character value `ω_ρ(C)`** (Isaacs (3.7); the
 structure-constant integrality used in Peterfalvi (6.7.3)).  For an irreducible representation `ρ`

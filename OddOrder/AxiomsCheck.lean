@@ -1482,6 +1482,13 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.all_eq_one_of_norm_eq_one_of_sum_eq_card
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.rep_eq_id_of_character_eq_one
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.character_eq_one_iff_rep_eq_id
+-- Peterfalvi (6.7) central-character constancy core: `ω_ρ(⟦z⟧) = |⟦z⟧|·χ_ρ(z)/χ_ρ(1)` depends only
+-- on `χ_ρ(z)` and `|⟦z⟧|`, so equal class size + equal char value ⟹ equal `ω` (the "α does not
+-- depend on s" of mmd 04.8 L102).  Plus the TI fact `C_G(x) ⊆ L` (`x ∈ A`, `A` TI / normalizer `L`)
+-- giving `|C_G(z)| = |C_L(z)|`, the source of the class-size constancy from `|C_L(z)|`-constancy.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.centralCharacterOfRep_eq_of_card_eq_of_character_eq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.centralizer_le_of_mem_isTISubset
 -- General character-value bound `|χ(g)| ≤ χ(1)` (the inequality the (6.6) G2.2 residual flags as
 -- needs-infra), via the same root-of-unity / triangle machinery; equality case is the keystone.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.norm_character_le_finrank
