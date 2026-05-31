@@ -12,8 +12,29 @@
 > ⇒ **Lem 4.13 = 残るは G Thm 4.15(ii) の assembly のみ** (precursor1+2 + GL数論)。
 > G Thm 4.15(ii) proof = `finite-groups.mmd` L4225-4231: D=precursor(2) の minimal special exp-p Q、
 > (a) D abelian ⇒ elem ab, ψ∈GL(≤2,p) order q ⇒ q∣p²-1; (b) D nonabelian ⇒ |D|=p³ extraspecial,
-> ψ on D/Φ(D)=elem ab rank2 ⇒ 同様。要 infra: GL橋 `mulAutEquivGeneralLinearGroup`@PRank +
-> GL(2,p) order (q≠p⇒q∣(p-1)(p+1)) + nonabelian special D⇒|D|=p³ (m(Z(D))=1)。d(D)≤2 は precursor(1) 由来。
+> ψ on D/Φ(D)=elem ab rank2 ⇒ 同様。
+>
+> ## ✅ GL 数論 kernel 完成 (2026-05-31, commit 9c34e48)
+> `prime_dvd_prime_sq_sub_one_of_orderOf_mulAut`@PRank: E elem ab |E|≤p², σ:MulAut E prime order
+> q≠p ⇒ q∣p²-1。これが G Thm 4.15(ii) の (a)(b) 両方の「数論層」。sorry-free。
+>
+> ## 🔁 残る Lem 4.13 ピース (2 個):
+> **(I) abelian 分岐**: D=precursor(2) Q が abelian ⇒ special abelian = elem ab。d(D)≤2
+> (precursor(1) 由来, D≤P) ⇒ |D|≤p²。ψ (order q, =q∣|Aut R| を Cauchy で実体化) を D に作用、
+> GL kernel ⇒ q∣p²-1。**容易** (GL kernel 直適用 + |D|≤p² の rank 翻訳)。
+> **(II) nonabelian 分岐 = extraspecial reduction (構造論, 本体)**: nonabelian special D + pRank(D)≤2 (=d≤2)
+> ⇒ |D|=p³。Gorenstein 初等論法 (L4229, structure theorem 不要):
+>   1. m(Z(D))=1 ⇒ |Z(D)|=p ⇒ D extraspecial。 (m(Z)≥2 なら x∉Z + rank2 central で rank3 elem ab、
+>      pRank≤2 矛盾)。
+>   2. E := Z₂(D) 内の |E:Z(D)|=p subgroup (Z₂(D)/Z(D)=Z(D/Z(D))≠1, nilpotent)。E◁D, |E|=p²,
+>      E elem ab rank2 (exp p)。
+>   3. C_D(E)=E: C⊋E なら y∈C∖E で ⟨E,y⟩ abelian exp p rank3、pRank≤2 矛盾。
+>   4. D/E=D/C_D(E) ↪ MulAut(E) faithful, p-群 ⇒ **既存 `card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq`**
+>      @PRank で |D/E|≤p。⇒ |D|=|E||D/E|≤p³。nonabelian⇒|D|≥p³。∴|D|=p³。⇒ D/Φ(D)=D/D' elem ab rank2、
+>      ψ 作用、GL kernel ⇒ q∣p²-1。
+> **規模**: (II) ~120-180行 (Z₂存在 / rank3 構成 / D/E↪MulAut(E) 共役同変埋込 / Sylux bound 既存)。
+> **配線**: + q<p の数論 (q∣p²-1 ∧ q≠p ∧ p odd ⇒ q<p, ~15行 ℕ lemma) + SCN₃=∅⟺pRank≤2 (precursor(1)) +
+> q∣|Aut R| を ψ order q に (Cauchy)。→ Lem 4.13 完成 → Lem 4.14 (q∣½(p±1)) → Thm 4.16 apex。
 
 ## 発見 (設計note の誤りを訂正)
 
