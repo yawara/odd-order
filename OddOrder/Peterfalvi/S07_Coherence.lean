@@ -344,6 +344,117 @@ def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
   ∀ ⦃φ η : ClassFunction G ℂ⦄, φ ∈ hχ.imageSet → η ∈ hψ.imageSet →
     ClassFunction.inner φ η = 0
 
+open scoped Classical in
+/-- **Peterfalvi (4.1) for two-element families (the `u = v = 1` case): cross-orthogonality from
+orthogonal signed differences.**
+
+If the signed differences `(χ − χ̄)^τ = ε·(μ − ν)` and `(ψ − ψ̄)^τ = ε'·(μ' − ν')` of two
+two-element image families are orthogonal, then `R(χ) = {μ, ν}` is orthogonal to `R(ψ) = {μ', ν'}`:
+the four irreducibles are pairwise orthogonal across the families.
+
+This is the special `u = v = 1` instance of Peterfalvi (4.1) (mmd 04.6 L5), where the degree /
+value-at-`1` hypotheses are not needed: for `α, β, γ, δ ∈ ±Irr` with `(α, β) = (γ, δ) = 0` and the
+*single* difference pairing `(α − β, γ − δ) = 0`, suppose two of `μ, ν, μ', ν'` coincide as
+irreducibles.  Expanding `0 = (ε(μ−ν), ε'(μ'−ν')) = εε'·((μ,μ') − (μ,ν') − (ν,μ') + (ν,ν'))` against
+the orthonormality of `Irr G` (`irreducibleCharacter_inner`) and the within-family distinctness
+(`μ ≠ ν`, `μ' ≠ ν'`) collapses the bracket to `±(1 + δ) = 0` with `δ ∈ {0, 1}` a Kronecker delta —
+impossible.  So no irreducible is shared, and every cross pairing is `0`.
+
+This is the genuine (5.2.e)/(4.1) content for the Dade families, discharged from the isometry's
+inner-preservation `((χ − χ̄)^τ, (ψ − ψ̄)^τ) = 0` (itself a consequence of `χ ⊥ {ψ, ψ̄}`). -/
+theorem orthogonal_of_signedDifference_inner_eq_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ)
+    (hinner : ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0) :
+    hχ.Orthogonal hψ := by
+  classical
+  -- Abbreviations for the four irreducible characters of the two families.
+  set μ := hχ.mu with hμ
+  set ν := hχ.nu with hν
+  set μ' := hψ.mu with hμ'
+  set ν' := hψ.nu with hν'
+  -- The bracket value `b = (μ,μ') − (μ,ν') − (ν,μ') + (ν,ν')` as a Kronecker-delta combination.
+  -- Each cross pairing is `δ` by `irreducibleCharacter_inner`.
+  have hcross : ∀ a c : IrreducibleCharacter G,
+      ClassFunction.inner (a : ClassFunction G ℂ) (c : ClassFunction G ℂ) =
+        if a = c then (1 : ℂ) else 0 :=
+    fun a c => OddOrder.RepresentationTheory.irreducibleCharacter_inner a c
+  -- Sign squares: `εχ·εχ = 1`, `εψ·εψ = 1`.
+  have hsχ : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
+    have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  have hsψ : (hψ.sign : ℂ) * (hψ.sign : ℂ) = 1 := by
+    have := hψ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
+  -- Expand `0 = (ε(μ−ν), ε'(μ'−ν'))` to the bracket equation `εχ·εψ·(bracket) = 0`.
+  have hexpand :
+      (hχ.sign : ℂ) * (hψ.sign : ℂ) *
+        ((if μ = μ' then (1 : ℂ) else 0) - (if μ = ν' then (1 : ℂ) else 0)
+          - (if ν = μ' then (1 : ℂ) else 0) + (if ν = ν' then (1 : ℂ) else 0)) = 0 := by
+    have h := hinner
+    -- Unfold the abbreviations and convert the `ℤ`-smul signs to `ℂ`-smul.
+    simp only [signedDifference, difference, muClassFunction, nuClassFunction] at h
+    rw [← Int.cast_smul_eq_zsmul ℂ hχ.sign, ← Int.cast_smul_eq_zsmul ℂ hψ.sign,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, star_intCast,
+      hcross μ μ', hcross μ ν', hcross ν μ', hcross ν ν'] at h
+    -- `h : εχ · (εψ · (bracket)) = 0`; reassociate to the bracket form.
+    linear_combination h
+  -- The product of nonzero signs is nonzero, so the bracket itself is `0`.
+  have hsignprod : (hχ.sign : ℂ) * (hψ.sign : ℂ) ≠ 0 := by
+    have h1 : (hχ.sign : ℂ) ≠ 0 := by
+      rcases hχ.sign_eq with h | h <;> simp [h]
+    have h2 : (hψ.sign : ℂ) ≠ 0 := by
+      rcases hψ.sign_eq with h | h <;> simp [h]
+    exact mul_ne_zero h1 h2
+  have hbracket :
+      (if μ = μ' then (1 : ℂ) else 0) - (if μ = ν' then (1 : ℂ) else 0)
+        - (if ν = μ' then (1 : ℂ) else 0) + (if ν = ν' then (1 : ℂ) else 0) = 0 :=
+    (mul_eq_zero.mp hexpand).resolve_left hsignprod
+  -- Within-family distinctness.
+  have hμν : μ ≠ ν := hχ.distinct
+  have hμ'ν' : μ' ≠ ν' := hψ.distinct
+  -- No irreducible is shared across the two families: each cross-equality contradicts `hbracket`.
+  -- We show all four `if` conditions are false.  In each case the other three deltas are forced,
+  -- collapsing the bracket to `1 + (0 or 1) ≥ 1 ≠ 0`.
+  have key : μ ≠ μ' ∧ μ ≠ ν' ∧ ν ≠ μ' ∧ ν ≠ ν' := by
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · -- `μ = μ'`: then `μ ≠ ν'` (else `μ' = ν'`), `ν ≠ μ'` (else `ν = μ`); bracket `= 1 + [ν=ν']`.
+      intro h
+      have hμν' : μ ≠ ν' := fun he => hμ'ν' (h ▸ he)
+      have hνμ' : ν ≠ μ' := fun he => hμν (he.trans h.symm).symm
+      rw [if_pos h, if_neg hμν', if_neg hνμ'] at hbracket
+      revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
+    · -- `μ = ν'`: then `μ ≠ μ'` (else `μ' = ν'`), `ν ≠ ν'` (else `ν = μ`); bracket `= −1 − [ν=μ']`.
+      intro h
+      have hμμ' : μ ≠ μ' := fun he => hμ'ν' (he.symm.trans h)
+      have hνν' : ν ≠ ν' := fun he => hμν (he.trans h.symm).symm
+      rw [if_pos h, if_neg hμμ', if_neg hνν'] at hbracket
+      revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
+    · -- `ν = μ'`: then `ν ≠ ν'` (else `μ' = ν'`), `μ ≠ μ'` (else `μ = ν`); bracket `= −1 − [μ=ν']`.
+      intro h
+      have hνν' : ν ≠ ν' := fun he => hμ'ν' (h ▸ he)
+      have hμμ' : μ ≠ μ' := fun he => hμν (he.trans h.symm)
+      rw [if_pos h, if_neg hνν', if_neg hμμ'] at hbracket
+      revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
+    · -- `ν = ν'`: then `ν ≠ μ'` (else `μ' = ν'`), `μ ≠ ν'` (else `μ = ν`); bracket `= 1 + [μ=μ']`.
+      intro h
+      have hνμ' : ν ≠ μ' := fun he => hμ'ν' (he.symm.trans h)
+      have hμν' : μ ≠ ν' := fun he => hμν (he.trans h.symm)
+      rw [if_pos h, if_neg hνμ', if_neg hμν'] at hbracket
+      revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
+  -- Conclude orthogonality of the image sets.
+  intro φ η hφ hη
+  rw [hχ.mem_imageSet_iff] at hφ
+  rw [hψ.mem_imageSet_iff] at hη
+  obtain ⟨h1, h2, h3, h4⟩ := key
+  rcases hφ with rfl | rfl <;> rcases hη with rfl | rfl <;>
+    simp only [muClassFunction, nuClassFunction]
+  · rw [hcross μ μ', if_neg h1]
+  · rw [hcross μ ν', if_neg h2]
+  · rw [hcross ν μ', if_neg h3]
+  · rw [hcross ν ν', if_neg h4]
+
 /-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
 theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     τ (OddOrder.Peterfalvi.S03.conjugateDifference χ) =
