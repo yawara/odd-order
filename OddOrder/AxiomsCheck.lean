@@ -23,6 +23,7 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -1054,6 +1055,9 @@ set_option linter.style.longLine false in
 -- characteristic H = Ω₁(C) (C critical) で [H,G]⊆Z(H), cl≤2, exp=p, C_{Aut G}(H) p-群.
 -- 証明本体は OddOrder.GroupTheory.CriticalSubgroup (Gorenstein Finite Groups Thm 5.3.11+5.3.13).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.thompson_critical_omega
+-- BG §4 Lem 4.7 hard dir = **G** Thm 5.4.15(i) (precursor 1, issue 0051): p odd 非自明 p-群 R で
+-- SCN₃(R)=∅ ⇒ pRank R ≤ 2. Gorenstein Lemma 4.14 + GL(≤2,p) rank squeeze。§5 / Thm 4.16 の gate.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.pRank_le_two_of_scn3_empty
 -- Clifford BLOCKER A (issue 0026): ρ g は simple ℂ[H]-部分加群を simple に送る.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Representation.isSimpleModule_map_conjBySimpleSemilinear
