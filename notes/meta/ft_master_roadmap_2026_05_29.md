@@ -5,6 +5,21 @@
 > スクリプト: `~/.claude/projects/.../workflows/scripts/ft-master-roadmap-wf_c3f1f84f-929.js` (再実行可)。
 > このファイルは **横断スナップショット**。個別ゲートの掘り下げは各 `notes/` と `issues/` が正本。
 
+---
+
+## ⚠ 2026-05-31 訂正ヘッダ (本体は 2026-05-29 時点、§4–§6 が drift)
+
+本体は 2026-05-29 のスナップショットで以下が既に古い。**正確な live 状況は memory `ft-master-roadmap` が保持**。2026-05-29 以降の確定差分:
+
+- ✅ **BG App.A 完結**: A.4(c) PSTAB (本体 §0/§4/§5/§6 が 🔴「repo 最高レバレッジ単一 sorry」と呼ぶもの) は**解消済**、A.4(b)/A.5 も完成 (issue 0047/0049 close)。→ §4「Top Blockers」#1・§5 の ⭐`bg-appa-a4c-pstab`・§6 DAG の 🔴`bg-appa-a4c-pstab` は **DONE**。
+- ✅ **App.B B.1–B.4(b) + BG Thm 6.2 一般形** `Z(L(S))·O_{p'}(G)⊴G` 完成 (`OddOrder/BG/AppB_Thm62.lean`, issue 2000/2001/2002)。→ §4 #2・§6 DAG の `bg-appb-puig`/`bg-thm-6-2-general` は **DONE** (§7–§16 の normal-J ハブが開いた)。
+- ✅ **BG §1 Thm 1.13** critical subgroup (issue 0016)。→ §6 DAG `bg-s01-thm-1-11-1-13` の Thm 1.13 部分は DONE。
+- 🔄 **BG §4 Blackburn は「全ファイル無」ではない** (§4/§6/§7 の記述が古い): Thm 4.12(a)(b)(c)/Prop 4.3/4.8/**4.11 Huppert**/Lem 4.9/4.15/GL 橋/Gorenstein Lem 4.12–4.14 が sorry-free 着地。**残 = Gorenstein Thm 4.15(i) precursor (SCN₃=∅⇒pRank≤2) → BG Lem 4.13 → Thm 4.16 apex (未 statement)**。
+- 🔄 **Peterfalvi 並行ブランチを main へ merge** (f5bcb14 + 834b76c)。§7 coherence/§8/§9/Dade/Clifford/ZIrr/InflationCharacter 配線済、worktree も ff 同期。
+- 実 `sorry` は依然 **2 個** (S08 `sibleySetup_is_coherent`=0046 / S09 `card_G0_lower_bound`=0044)。§0/§1.3 の census 方法論は今も有効。
+
+以下、2026-05-29 スナップショット原文 ↓
+
 ## 0. TL;DR
 
 - **実 `sorry` proof-term は 2 個** (2026-05-29 更新: PSTAB 解消で 3→2)。`axiom` 宣言 **0**、`admit` **0**(全件 grep + `AxiomsCheck.lean` の `#assert_only_allowed_axioms` で検証済み)。
