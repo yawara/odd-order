@@ -714,6 +714,34 @@ noncomputable def toOrthonormalImage
     rw [hχ.image_eq, Finset.sum_pair hχ.signMu_ne_negSignNu, neg_smul, ← sub_eq_add_neg,
       ← smul_sub]
 
+open scoped Classical in
+/-- **The two-element-family orthogonality transports through `toOrthonormalImage`.**
+
+If the unsigned families `R(χ) = {μ, ν}` and `R(ψ) = {μ', ν'}` of two `CharacterDifferenceImage`s
+are cross-orthogonal (`hχ.Orthogonal hψ`, the (5.2.e) conclusion), then the orthonormal families
+`{ε·μ, −ε·ν}` and `{ε'·μ', −ε'·ν'}` produced by `toOrthonormalImage` are orthogonal as
+`OrthonormalCharacterImageFamily`s: scaling by the `±1` signs preserves the vanishing cross
+pairings `⟨a, b⟩ = 0` (`a ∈ {μ, ν}`, `b ∈ {μ', ν'}`) since `⟨s • a, t • b⟩ = s̄·t·⟨a, b⟩`. -/
+theorem toOrthonormalImage_orthogonal
+    {ψ : ClassFunction L ℂ}
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ)
+    (h : hχ.Orthogonal hψ) :
+    hχ.toOrthonormalImage.Orthogonal hψ.toOrthonormalImage := by
+  classical
+  intro α hα β hβ
+  -- Unfold the two scaled-pair image sets.
+  simp only [toOrthonormalImage, Finset.mem_insert, Finset.mem_singleton] at hα hβ
+  -- Each cross pairing `⟨s • a, t • b⟩ = s̄ · t · ⟨a, b⟩` with `⟨a, b⟩ = 0` from `h`.  Convert the
+  -- `ℤ`-smul signs to `ℂ`-smul so `inner_smul_left`/`inner_smul_right` apply.
+  rcases hα with rfl | rfl <;> rcases hβ with rfl | rfl <;>
+    rw [← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+  · rw [h hχ.muClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [h hχ.muClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [h hχ.nuClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [h hχ.nuClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
+
 end CharacterDifferenceImage
 
 /-! ### Peterfalvi (5.2.d) producer: the difference image from the §3 (1.4) keystone
