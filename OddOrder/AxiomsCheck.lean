@@ -1445,6 +1445,12 @@ set_option linter.style.longLine false in
 -- remaining inputs (enumeration `e`, cover `hcoverIdx`, base coherence `h0`, per-step `hstepData`/
 -- `hpairχ`) are the genuine (6.6) character content, not the Dade isometry's responsibility.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair
+-- `zSupportedSpan_adjoinPair_subset_span`: the (5.6.3) generation containment `ℤ[S₁ ∪ {χ, χ̄}, A] ⊆
+-- ℤ[ℤ[S₁, A] ∪ {χ − χ̄, χ − a·χ₁}]`, discharged as pure ℤ-module theory routed through the
+-- difference generators (no (4.7) `ℤ[S, L^#] = ℤ[S, A]` needed): `χ = (χ − a·χ₁) + a·χ₁`,
+-- `χ̄ = χ − (χ − χ̄)`, every `s ∈ S₁` a right-hand generator by supportedness.  This is what makes
+-- `DadeChainStep.advance` discharge the (5.1) generation hypothesis internally rather than positing it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.advance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.chainStepAdvance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X_from_dade
