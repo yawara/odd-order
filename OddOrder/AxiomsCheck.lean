@@ -1369,6 +1369,11 @@ set_option linter.style.longLine false in
 -- computes the single integer `λ` via the cross-orthogonality `crossDifference_inner` transported
 -- through the isometry, and collapses `λ = 0` with `Y_eq_nsmul_tau1_of_lambdaForm`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.Y_collapse_of_family
+-- (5.6.1)→(5.6.2) at the Dade base map: the same Y-collapse for any `Da` with `Da.tau1 = τ`, with
+-- every hypothesis of `Y_collapse_of_family` discharged from the Dade isometry + prior coherence
+-- (`dadeIntegralCharacterMap_inner_eq_on_supported_span`, `inner_extension_member_orthogonal_imageSet`,
+-- `dadeIntegralCharacterMap_mem_ZIrr_of_supported`).  Only genuine (6.6) source data remains as input.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dade_Y_collapse_of_family
 -- (6.6) square-divisibility producers (mmd L78-80): the `hdvd : χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` input.
 -- `dvd_of_add_eq_of_dvd_dvd`: additive complement `head + tail = total`, `a∣tail`, `a∣total` ⟹
 -- `a∣head` (combine `θᵢ(1)² ∣ ∑_{j≥i}` and `θᵢ(1)² ∣ |L|-|L:Z|` through the sum identity).
