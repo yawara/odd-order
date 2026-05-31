@@ -390,8 +390,34 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
     obtain ⟨h, hh, z, hz, rfl⟩ := hb'
     obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
     exact ⟨h, hh, k, rfl⟩
-  -- Order-`p` elements of any subgroup `M` between `B₁` and `G` (with `x ∈ M`) lie in `B₁`,
-  -- via class `≤ 2` of `M = (A ⊓ M)·⟨x⟩`.
+  -- `B₁` is abelian: `H` abelian, `x` centralizes `H`, `⟨x⟩` abelian.
+  have hB₁_comm : ∀ b ∈ B₁, ∀ b' ∈ B₁, b * b' = b' * b := by
+    intro b hb b' hb'
+    obtain ⟨h, hh, k, rfl⟩ := hmem_B₁ hb
+    obtain ⟨h', hh', k', rfl⟩ := hmem_B₁ hb'
+    -- `x^k` commutes with `h'` (x centralizes H) and `h` with `h'`.
+    have hxkh' : x ^ k * h' = h' * x ^ k := by
+      have hxh' : x * h' = h' * x := hx_cent h' hh'
+      exact (Commute.zpow_left (h := hxh') k).eq
+    have hxk'h : x ^ k' * h = h * x ^ k' := by
+      have : x * h = h * x := hx_cent h hh
+      exact (Commute.zpow_left (h := this) k').eq
+    have hhh' : h * h' = h' * h := hHA_comm h hh h' hh'
+    calc h * x ^ k * (h' * x ^ k') = h * (x ^ k * h') * x ^ k' := by group
+      _ = h * (h' * x ^ k) * x ^ k' := by rw [hxkh']
+      _ = (h * h') * (x ^ k * x ^ k') := by group
+      _ = (h' * h) * (x ^ k' * x ^ k) := by rw [hhh', ← zpow_add, ← zpow_add, add_comm]
+      _ = h' * (h * x ^ k') * x ^ k := by group
+      _ = h' * (x ^ k' * h) * x ^ k := by rw [hxk'h]
+      _ = h' * x ^ k' * (h * x ^ k) := by group
+  -- `G' ≤ G = A ⊔ ⟨x⟩`, so each `m ∈ G'` is `a·x^k` with `a ∈ A`.
+  have hmem_G : ∀ {m : P}, m ∈ G → ∃ a ∈ A, ∃ k : ℤ, m = a * x ^ k := by
+    intro m hm
+    have hm' : m ∈ (↑A : Set P) * (↑(Subgroup.zpowers x) : Set P) := by
+      rw [← Subgroup.normal_mul A (Subgroup.zpowers x)]; exact hm
+    obtain ⟨a, haA, z, hz, rfl⟩ := hm'
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    exact ⟨a, haA, k, rfl⟩
   -- **Induction**: `B₁ ◁ G'` for every `B₁ ≤ G' ≤ G`, by strong induction on `|G'|`.
   have hnorm_all : ∀ n : ℕ, ∀ G' : Subgroup P, Nat.card ↥G' = n → B₁ ≤ G' → G' ≤ G →
       ∀ b ∈ B₁, ∀ g ∈ G', g * b * g⁻¹ ∈ B₁ := by
@@ -399,11 +425,62 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
     induction n using Nat.strong_induction_on with
     | _ n ih =>
       intro G' hcard hB₁G' hG'G b hb g hg
-      -- If `G' = B₁`, `g ∈ B₁` and `B₁ ◁ ?`… we instead handle `B₁ = G'` and `B₁ < G'`.
       rcases eq_or_lt_of_le hB₁G' with hEq | hLt
-      · -- `G' = B₁`. Show `B₁` is closed under conjugation by its own elements... not normal a priori.
+      · -- `G' = B₁`: `g ∈ B₁`, `b ∈ B₁` ⇒ `g b g⁻¹ ∈ B₁` (subgroup closed).
+        have hgB₁ : g ∈ B₁ := hEq ▸ hg
+        exact B₁.mul_mem (B₁.mul_mem hgB₁ hb) (B₁.inv_mem hgB₁)
+      · -- `B₁ < G'`: descend to a maximal `M` with `B₁ ≤ M < G'`.
+        haveI hG'pg : IsPGroup p ↥G' := hP.to_subgroup G'
+        haveI : Finite ↥G' := inferInstance
+        -- `B₁.subgroupOf G' < ⊤`.
+        have hsub_lt : B₁.subgroupOf G' < ⊤ := by
+          rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+          exact fun hle => absurd (le_antisymm hB₁G' hle) (ne_of_lt hLt)
+        -- A coatom `M'` of `↥G'` above `B₁.subgroupOf G'`.
+        obtain ⟨M', hM'_coat, hM'_ge⟩ :=
+          (IsCoatomic.eq_top_or_exists_le_coatom (B₁.subgroupOf G')).resolve_left
+            (ne_of_lt hsub_lt)
+        set M : Subgroup P := M'.map G'.subtype with hM_def
+        -- `M ≤ G'`, `B₁ ≤ M`, `x ∈ M`.
+        have hM_le_G' : M ≤ G' := by rw [hM_def]; exact Subgroup.map_subtype_le M'
+        have hB₁_le_M : B₁ ≤ M := by
+          rw [hM_def]
+          intro y hy
+          rw [Subgroup.mem_map]
+          exact ⟨⟨y, hB₁G' hy⟩, hM'_ge (by rw [Subgroup.mem_subgroupOf]; exact hy), rfl⟩
+        have hxM : x ∈ M := hB₁_le_M hxB₁
+        have hM_le_G : M ≤ G := le_trans hM_le_G' hG'G
+        -- `M ◁ G'` (coatom in `p`-group): element-wise.
+        haveI hM'_normal : M'.Normal := hM'_coat.normal_of_isPGroup hG'pg
+        have hM_normal_in_G' : ∀ m ∈ M, ∀ g' ∈ G', g' * m * g'⁻¹ ∈ M := by
+          intro m hm g' hg'
+          rw [hM_def, Subgroup.mem_map] at hm ⊢
+          obtain ⟨m₀, hm₀, rfl⟩ := hm
+          refine ⟨(⟨g', hg'⟩ : ↥G') * m₀ * (⟨g', hg'⟩ : ↥G')⁻¹,
+            hM'_normal.conj_mem m₀ hm₀ ⟨g', hg'⟩, ?_⟩
+          push_cast
+          rfl
+        -- `M < G'`, so `|M| < |G'|`.
+        have hM_lt_G' : M < G' := by
+          rw [hM_def]
+          refine lt_of_le_of_ne (Subgroup.map_subtype_le M') (fun heq => ?_)
+          -- `M = G'` ⇒ `M' = ⊤`, contradicting `M'` coatom.
+          apply hM'_coat.1
+          have htop_map : (⊤ : Subgroup ↥G').map G'.subtype = G' :=
+            (MonoidHom.range_eq_map G'.subtype).symm.trans G'.range_subtype
+          exact Subgroup.map_injective G'.subtype_injective (heq.trans htop_map.symm)
+        have hcard_lt : Nat.card ↥M < Nat.card ↥G' := by
+          have hssub : (M : Set P) ⊂ (G' : Set P) := hM_lt_G'
+          have h1 : Nat.card ↥M = (M : Set P).ncard := by
+            rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+          have h2 : Nat.card ↥G' = (G' : Set P).ncard := by
+            rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+          rw [h1, h2]
+          exact Set.ncard_lt_ncard hssub
+        -- IH applied to `M`.
+        have hIH : ∀ b ∈ B₁, ∀ g ∈ M, g * b * g⁻¹ ∈ B₁ :=
+          ih (Nat.card ↥M) (hcard ▸ hcard_lt) M rfl hB₁_le_M hM_le_G
         sorry
-      · sorry
   -- Apply the induction with `G' = G`.
   have hB₁_normal_in_G : ∀ b ∈ B₁, ∀ g ∈ G, g * b * g⁻¹ ∈ B₁ :=
     hnorm_all (Nat.card ↥G) G rfl hB₁_le_G le_rfl
