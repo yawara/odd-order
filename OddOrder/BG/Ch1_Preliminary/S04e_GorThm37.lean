@@ -58,7 +58,8 @@ open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
 open OddOrder.BG.Ch1.S01 (coprime_actsTrivially_of_normal_and_quotient)
 open OddOrder.BG.Ch1.OperatorQuotientAction (actionCommutator_restrict_self_map_subtype_eq)
 open OddOrder.BG.Ch1_Preliminary (isAInvariant_comap_mk' isAInvariant_map_mk'
-  pow_eq_one_of_mem_omega_one_of_comm exists_aInvariant_complement_in_omega1_quotient)
+  pow_eq_one_of_mem_omega_one_of_comm exists_aInvariant_complement_in_omega1_quotient
+  isAInvariant_map_subtype_of_restrict)
 
 variable {A P : Type*} [Group A] [Group P] [Finite A] [Finite P] {p : ℕ} [Fact p.Prime]
 
@@ -521,5 +522,70 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
         exact hcomm_pow x.1 x.2
       exact ⟨ha, hb, hc⟩
   exact ⟨h_i, hPbar_elemab, h_irred, hψ_ntriv_bar, h_special⟩
+
+/-- **Gorenstein "Finite Groups" Theorem 3.8.** Let `A` be a `p′`-group of automorphisms of the
+`p`-group `P` (`φ : A →* MulAut P`, coprime) and `ψ : A` acting nontrivially on `P`. Then `P`
+has an `A`-invariant subgroup `Q`, **minimal** among `A`-invariant subgroups on which `ψ` acts
+nontrivially, and `Q` is a **special** `p`-group.
+
+(Gorenstein's full statement also records that `A` acts irreducibly on `Q/Φ(Q)`, `ψ`
+nontrivially on `Q/Φ(Q)`, and trivially on `Φ(Q)`; for a special group `Φ(Q) = Q′`, so those are
+exactly conjuncts (ii)/(i) of Theorem 3.7 applied to `Q` and are available on demand. The
+payload needed downstream — precursor 2 of BG Lem 4.13 — is `IsSpecial p ↥Q` together with the
+minimality, which drives the exponent-`p` argument via Theorem 3.10.)
+
+Proof: choose `Q` minimal `A`-invariant with `ψ` nontrivial (finite lattice). By minimality `ψ`
+acts trivially on every proper `A`-invariant (normal) subgroup of `Q`, so Theorem 3.7 applied to
+the restricted action `φ|_Q` gives `Q` special. -/
+theorem exists_minimal_aInvariant_isSpecial_of_pprimeAction
+    (φ : A →* MulAut P) (hP : IsPGroup p P)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
+    {ψ : A} (hψ_ntriv : ¬ ∀ g : P, (φ ψ) g = g) :
+    ∃ Q : Subgroup P, IsAInvariant φ Q ∧ (∃ g ∈ Q, (φ ψ) g ≠ g) ∧ IsSpecial p ↥Q ∧
+      ∀ N : Subgroup P, IsAInvariant φ N → N ≤ Q → (∃ g ∈ N, (φ ψ) g ≠ g) → N = Q := by
+  classical
+  -- Minimal `A`-invariant subgroup on which `ψ` acts nontrivially.
+  set S : Set (Subgroup P) := {Q | IsAInvariant φ Q ∧ ∃ g ∈ Q, (φ ψ) g ≠ g} with hS_def
+  have hS_ne : S.Nonempty := by
+    obtain ⟨g, hg⟩ := not_forall.mp hψ_ntriv
+    exact ⟨⊤, IsAInvariant.top φ, g, Subgroup.mem_top g, hg⟩
+  obtain ⟨Q, ⟨hQ_inv, hψ_nt⟩, hQ_min⟩ := (Set.toFinite S).exists_minimal hS_ne
+  have hmin : ∀ N : Subgroup P, IsAInvariant φ N → N ≤ Q → (∃ g ∈ N, (φ ψ) g ≠ g) → N = Q :=
+    fun N hN_inv hN_le hN_nt => le_antisymm hN_le (hQ_min ⟨hN_inv, hN_nt⟩ hN_le)
+  refine ⟨Q, hQ_inv, hψ_nt, ?_, hmin⟩
+  -- Apply Theorem 3.7 to the restricted action `φ|_Q : A →* MulAut ↥Q`.
+  haveI : Finite ↥Q := inferInstance
+  have hQ_pgroup : IsPGroup p ↥Q := hP.to_subgroup Q
+  have hQ_cop : Nat.Coprime (Nat.card A) (Nat.card ↥Q) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card Q)
+  -- hypothesis: `ψ` nontrivial on `↥Q`.
+  have hψ_nt_Q : ¬ ∀ x : ↥Q, (hQ_inv.restrict ψ) x = x := by
+    intro h
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt
+    apply hg
+    have hgg := h ⟨g, hgQ⟩
+    rwa [Subtype.ext_iff, IsAInvariant.restrict_apply_val] at hgg
+  -- hypothesis: `ψ` trivial on every proper `A`-invariant normal subgroup of `↥Q`.
+  have hψ_proper_Q : ∀ N' : Subgroup ↥Q, N'.Normal → IsAInvariant hQ_inv.restrict N' → N' ≠ ⊤ →
+      ∀ n ∈ N', (hQ_inv.restrict ψ) n = n := by
+    intro N' _ hN'_inv hN'_ne n hn
+    set N := N'.map Q.subtype with hN_def
+    have hN_inv : IsAInvariant φ N := isAInvariant_map_subtype_of_restrict hQ_inv hN'_inv
+    have hN_le : N ≤ Q := Subgroup.map_subtype_le N'
+    have hN_ne : N ≠ Q := by
+      intro hNQ
+      apply hN'_ne
+      have hQtop : Q = (⊤ : Subgroup ↥Q).map Q.subtype := by
+        rw [← MonoidHom.range_eq_map, Q.range_subtype]
+      exact Subgroup.map_injective Q.subtype_injective (hN_def ▸ hNQ.trans hQtop)
+    have hψ_triv_N : ∀ m ∈ N, (φ ψ) m = m := by
+      intro m hm
+      by_contra hmne
+      exact hN_ne (hmin N hN_inv hN_le ⟨m, hm, hmne⟩)
+    apply Subtype.ext
+    rw [IsAInvariant.restrict_apply_val]
+    exact hψ_triv_N (n : P) (Subgroup.mem_map_of_mem _ hn)
+  exact (isSpecial_of_pprimeAction_trivialOnProper hQ_inv.restrict hQ_pgroup hQ_cop
+    hψ_nt_Q hψ_proper_Q).2.2.2.2
 
 end OddOrder.BG.Ch1.S04

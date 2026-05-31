@@ -1062,6 +1062,8 @@ set_option linter.style.longLine false in
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
+-- Gorenstein Thm 3.8 (precursor 2): minimal A-不変 (ψ 非自明) 部分群 Q は special (Thm 3.7 適用)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.exists_minimal_aInvariant_isSpecial_of_pprimeAction
 -- Clifford BLOCKER A (issue 0026): ρ g は simple ℂ[H]-部分加群を simple に送る.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Representation.isSimpleModule_map_conjBySimpleSemilinear
