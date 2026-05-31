@@ -4238,8 +4238,7 @@ orthogonality of `S₁`), the family memberships/supports/non-vanishing, the per
 (`Dmem`/`hmemTau1`/`hmemOrtho`, exactly the `DadeChainStep` fields), and the degree inequality (c). -/
 theorem dade_Y_collapse_of_family
     (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
-    {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
-    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A')
+    {S₁ : Set (ClassFunction (↥L) ℂ)}
     {χ chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (Da : CharacterPsiDecomposition (L := ↥L) (G := G)
       (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ (a • chi1))
@@ -4249,7 +4248,6 @@ theorem dade_Y_collapse_of_family
     (hfam_mem : ∀ i ∈ s, B.chiFam i ∈ S₁)
     (hfam_ne : ∀ i ∈ s, B.chiFam i ≠ 0)
     (hfam_supp : ∀ i ∈ s, (B.chiFam i).support ⊆ supportInSubgroup A L)
-    (hfam_suppA' : ∀ i ∈ s, B.chiFam i ∈ zSupportedSpan (L := ↥L) S₁ A')
     (hchi1_supp : chi1.support ⊆ supportInSubgroup A L)
     (hchi1_ZIrr : chi1 ∈ ZIrr (↥L))
     (hχ_supp : χ.support ⊆ supportInSubgroup A L)
@@ -4319,20 +4317,20 @@ theorem dade_Y_collapse_of_family
     rw [hDa_tau1]
     exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS₀supp
       hdiff_zspan (hfamdiff_zspan i hi)
-  -- `R(χ) ⊥ S₁^{τ₁}` from the per-member (5.5) decompositions.
+  -- `R(χ) ⊥ S₁^{τ₁}` ((5.5)+(5.2.e)): `χᵢ^{τ₁} = (Dmem χᵢ).X ∈ ℤ[R(χᵢ)] ⊥ R(χ)`.
   have hXortho : ∀ α ∈ Da.imageFamily.imageSet, ∀ i ∈ s,
       ClassFunction.inner α (Da.tau1 (B.chiFam i)) = 0 := by
     intro α hα i hi
-    rw [hDa_tau1]
     have hmem := hfam_mem i hi
-    have htau1eq : (Dmem (B.chiFam i) hmem).tau1 (B.chiFam i) = hS₁.extension (B.chiFam i) := by
-      rw [hmemTau1 (B.chiFam i) hmem]
-      exact (hS₁.extends_on_supported (B.chiFam i) (hfam_suppA' i hi)).symm
-    have h0 : ClassFunction.inner (hS₁.extension (B.chiFam i)) α = 0 :=
-      inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily (Dmem (B.chiFam i) hmem)
-        (hmemOrtho (B.chiFam i) hmem) htau1eq hα
-    rw [hS₁.extends_on_supported (B.chiFam i) (hfam_suppA' i hi)] at h0
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, h0, star_zero]
+    -- `χᵢ^{τ₁} = (Dmem χᵢ).X` by (5.5) (the `ψ = 0` decomposition collapses `Y = 0`).
+    have hX : Da.tau1 (B.chiFam i) = (Dmem (B.chiFam i) hmem).X :=
+      (DFunLike.congr_fun (hDa_tau1.trans (hmemTau1 (B.chiFam i) hmem).symm) (B.chiFam i)).trans
+        ((Dmem (B.chiFam i) hmem).eq_sum_of_psi_eq_zero).2.1
+    have h0 : ClassFunction.inner α (Dmem (B.chiFam i) hmem).X = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        (Dmem (B.chiFam i) hmem).inner_X_orthogonal_imageSet_of_orthogonal Da.imageFamily
+          (hmemOrtho (B.chiFam i) hmem) hα, star_zero]
+    exact (congrArg (ClassFunction.inner α) hX).trans h0
   have hvc1_ZIrr : Da.tau1 chi1 ∈ ZIrr G := by
     rw [hDa_tau1]
     exact dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj hchi1_supp hchi1_ZIrr
@@ -4538,47 +4536,29 @@ structure DadeChainStep
   hχχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) chi1 = 0
   /-- `⟨χ̄, χ₁⟩ = 0`. -/
   hχbarχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj chi1 = 0
-  /-- The (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` for the Dade-built `Da` (the `.2` of the per-step
-  decomposition pair). -/
-  hY :
-    ((CharacterPsiDecomposition.decompositionPair
-      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-      (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
-        (by
-          intro s hs
-          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
-          rcases hs with rfl | rfl | rfl | rfl
-          · exact hχsupp
-          · exact hχbarsupp
-          · simpa only [ClassFunction.support_zero] using Set.empty_subset _
-          · exact haχ1supp) hφ hζ)
-      rfl
-      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-        (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
-      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-        ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
-        (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a)))
-      hχχ1 hχbarχ1 hχχbar').2).Y =
-      a • ((CharacterPsiDecomposition.decompositionPair
-      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-      (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
-        (by
-          intro s hs
-          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
-          rcases hs with rfl | rfl | rfl | rfl
-          · exact hχsupp
-          · exact hχbarsupp
-          · simpa only [ClassFunction.support_zero] using Set.empty_subset _
-          · exact haχ1supp) hφ hζ)
-      rfl
-      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-        (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
-      (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-        ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
-        (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a)))
-      hχχ1 hχbarχ1 hχχbar').2).tau1 chi1
+  /-- A finite enumeration of `S₁` carrying the (5.6.1) source family `{χᵢ}`. -/
+  famS : Finset (ClassFunction (↥L) ℂ)
+  /-- `famS` enumerates exactly `S₁`. -/
+  famS_eq : ↑famS = S₁
+  /-- The integer degree ratios `aᵢ` with `χᵢ(1) = aᵢ·χ₁(1)`. -/
+  famRatio : ClassFunction (↥L) ℂ → ℕ
+  /-- `a₁ = 1`. -/
+  famRatio_chi1 : famRatio chi1 = 1
+  /-- The degree scaling `χᵢ(1) = aᵢ·χ₁(1)` for each family member. -/
+  famDegree : ∀ x ∈ famS, OddOrder.Peterfalvi.S03.characterDegree x =
+    (famRatio x : ℂ) * OddOrder.Peterfalvi.S03.characterDegree chi1
+  /-- `χ(1) = a·χ₁(1)`. -/
+  famDegree_chi : OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction (↥L) ℂ) =
+    (a : ℂ) * OddOrder.Peterfalvi.S03.characterDegree chi1
+  /-- `S₁` is pairwise orthogonal ((5.2.c)). -/
+  famPairwise : ∀ x ∈ famS, ∀ y ∈ famS, x ≠ y → ClassFunction.inner x y = 0
+  /-- Family members are nonzero. -/
+  famNe : ∀ x ∈ famS, x ≠ 0
+  /-- Family members are supported in `CF(L,A)`. -/
+  famSupp : ∀ x ∈ famS, x.support ⊆ supportInSubgroup A L
+  /-- The (5.6) degree inequality (c): `2·a < ∑ᵢ aᵢ²/‖χᵢ‖²`. -/
+  hdeg_c : 2 * (a : ℝ) < ∑ x ∈ famS,
+    ((famRatio x : ℝ) / (ClassFunction.inner x x).re) ^ 2 * (ClassFunction.inner x x).re
 
 namespace DadeChainStep
 
@@ -4596,8 +4576,23 @@ genuine character data is read off `step`'s fields.  It is a single call to
 noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
     (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A') :
     IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-      (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
-  retarget_isCoherent_fromDade hyp hconj hS₁ χ step.hreal step.hχsupp step.hχbarsupp
+      (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' := by
+  have hmemS₁ : ∀ x ∈ step.famS, x ∈ S₁ := fun x hx => step.famS_eq ▸ Finset.mem_coe.mpr hx
+  have hchi1mem : step.chi1 ∈ step.famS := by
+    rw [← Finset.mem_coe, step.famS_eq]; exact step.hchi1
+  -- The (5.6.1) source family bundle of `S₁`, with `chiFam = id` over `famS`.
+  let B : CharacterFamilyBundle (L := ↥L) (χ : ClassFunction (↥L) ℂ) step.chi1 (step.a : ℝ)
+      step.famS step.chi1 :=
+    { i₁_mem := hchi1mem
+      chiFam := id
+      chi1_eq := rfl
+      ratio := step.famRatio
+      ratio_one := step.famRatio_chi1
+      degree_eq := step.famDegree
+      degree_chi := step.famDegree_chi
+      chi_orthogonal := fun i hi => step.hχ_S1 i (hmemS₁ i hi)
+      chiFam_pairwise := step.famPairwise }
+  refine retarget_isCoherent_fromDade hyp hconj hS₁ χ step.hreal step.hχsupp step.hχbarsupp
     step.haχ1supp
     (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
       (by simpa only [sub_zero] using step.hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
@@ -4606,7 +4601,15 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
       (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
     step.hχχ step.hχbarχbar step.hχbarχ step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
     step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp step.hχχ1 step.hχbarχ1 step.hχχbar'
-    step.hY (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
+    ?_ (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
+  -- The (5.6.2) collapse `hY`, now *proved* from the family data via the (5.6.1) producer.
+  exact dade_Y_collapse_of_family hyp hconj _ rfl B (fun i hi => hmemS₁ i hi) step.famNe
+    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hχsupp step.Dmem step.hmemTau1Base
+    step.hmemOrtho
+    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
+      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
+    step.hdeg_c
 
 /-- **One `coherentPairChain` step, in the engine's accumulator shape, from the Dade isometry.**
 
