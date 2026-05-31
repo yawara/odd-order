@@ -32,7 +32,7 @@ import OddOrder.GroupTheory.FrattiniPGroup
 * **PART 3** (`Ω₁(A) = D`): rank squeeze (`dₙ(P)` 最大性 + Lem 1.3.4).
 -/
 
-open scoped commutatorElement
+open scoped commutatorElement Pointwise
 
 namespace OddOrder.BG.Ch1.S04
 
@@ -302,5 +302,138 @@ private theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal
   have := hconj
   rw [mul_inv_eq_iff_eq_mul] at this
   rw [this]
+
+/-! ## Helpers for `omega1Map` as a closure of order-`p` elements -/
+
+/-- `omega1Map M p = ⟨{n ∈ M : n^p = 1}⟩` as a subgroup of the ambient group. -/
+private theorem omega1Map_eq_closure (M : Subgroup P) :
+    omega1Map M p = Subgroup.closure {n : P | n ∈ M ∧ n ^ p = 1} := by
+  rw [omega1Map, Omega, MonoidHom.map_closure]
+  congr 1
+  ext n
+  simp only [Set.mem_image, Set.mem_setOf_eq, Subgroup.coe_subtype, pow_one]
+  constructor
+  · rintro ⟨m, hm, rfl⟩
+    refine ⟨m.2, ?_⟩
+    have : ((m ^ p : M) : P) = ((1 : M) : P) := by rw [hm]
+    rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at this
+  · rintro ⟨hnM, hnp⟩
+    refine ⟨⟨n, hnM⟩, ?_, rfl⟩
+    apply Subtype.ext
+    rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]
+    exact hnp
+
+/-- If conjugation by `g` preserves `M` (`g M g⁻¹ = M`, as the membership equivalence
+`hM`), then it preserves `omega1Map M p`. -/
+private theorem conj_mem_omega1Map {M : Subgroup P} {g n : P}
+    (hM : ∀ m : P, m ∈ M → g * m * g⁻¹ ∈ M) (hn : n ∈ omega1Map M p) :
+    g * n * g⁻¹ ∈ omega1Map M p := by
+  rw [omega1Map_eq_closure] at hn ⊢
+  induction hn using Subgroup.closure_induction with
+  | mem w hw =>
+    refine Subgroup.subset_closure ⟨hM w hw.1, ?_⟩
+    rw [conj_pow, hw.2, mul_one, mul_inv_cancel]
+  | one => simpa using one_mem _
+  | mul a b _ _ ha hb =>
+    rw [show g * (a * b) * g⁻¹ = (g * a * g⁻¹) * (g * b * g⁻¹) by group]
+    exact Subgroup.mul_mem _ ha hb
+  | inv a _ ha =>
+    rw [show g * a⁻¹ * g⁻¹ = (g * a * g⁻¹)⁻¹ by group]
+    exact Subgroup.inv_mem _ ha
+
+/-! ## PART 1: stabilization -/
+
+/-- **Gorenstein "Finite Groups" Lemma 4.14, PART 1** (stabilization step).
+For a finite `p`-group `P` (`p` odd) with `A ◁ P` abelian, an element `x` of order
+dividing `p` that centralizes `Ω₁(A)` also centralizes `A/Ω₁(A)`: for every `a ∈ A`,
+`x⁻¹ a x a⁻¹ ∈ Ω₁(A)`.
+
+Proof (Gorenstein, mmd L4207–4211): with `H = Ω₁(A)` and `B₁ = ⟨H, x⟩`, one shows
+`B₁ ◁ ⟨A, x⟩` by descending induction along an index-`p` chain: at each maximal step
+`M`, the group `M = (A ⊓ M)·⟨x⟩` has class `≤ 2`, so its order-`p` elements all lie in
+`B₁`, identifying `B₁ = Ω₁(M)`, characteristic in `M`. Normality of `B₁` then yields
+`a x a⁻¹ ∈ B₁`, whence `⁅a, x⁆ = h·x^{k-1}` with `h ∈ H`; as `⁅a, x⁆ ∈ A` and
+`(x^{k-1})^p = 1`, we get `x^{k-1} ∈ H`, so `⁅a, x⁆ ∈ H`. -/
+private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGroup p P)
+    {A : Subgroup P} [A.Normal] (hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x) {x : P}
+    (hx_cent : ∀ w ∈ omega1OfAbelian P A p hA_comm, x * w = w * x) (hxp : x ^ p = 1) :
+    ∀ a ∈ A, x⁻¹ * a * x * a⁻¹ ∈ omega1OfAbelian P A p hA_comm := by
+  classical
+  set H := omega1OfAbelian P A p hA_comm with hH_def
+  -- `H ≤ A` and `H ◁ P` (characteristic in `A`).
+  have hH_le_A : H ≤ A := omega1OfAbelian_le
+  have hHA_comm : ∀ s ∈ H, ∀ t ∈ H, s * t = t * s :=
+    fun s hs t ht => hA_comm s (hH_le_A hs) t (hH_le_A ht)
+  -- `G = ⟨A, x⟩` and `B₁ = ⟨H, x⟩`.
+  set G := A ⊔ Subgroup.zpowers x with hG_def
+  set B₁ := H ⊔ Subgroup.zpowers x with hB₁_def
+  have hxG : x ∈ G := Subgroup.mem_sup_right (Subgroup.mem_zpowers x)
+  have hxB₁ : x ∈ B₁ := Subgroup.mem_sup_right (Subgroup.mem_zpowers x)
+  have hA_le_G : A ≤ G := le_sup_left
+  have hB₁_le_G : B₁ ≤ G := sup_le (le_trans hH_le_A hA_le_G) le_sup_right
+  -- `H ◁ P`: `H = {g ∈ A : g^p = 1}`, preserved by conjugation (`A ◁ P`).
+  have hH_normal : H.Normal := by
+    refine { conj_mem := ?_ }
+    intro h hh g
+    have hh' : h ∈ A ∧ h ^ p = 1 := hh
+    refine (mem_omega1OfAbelian).mpr ⟨(inferInstance : A.Normal).conj_mem h hh'.1 g, ?_⟩
+    calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
+      _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
+  haveI hH_norm_inst : H.Normal := hH_normal
+  -- `↑B₁ = ↑H * ↑⟨x⟩` (as sets), so elements of `B₁` are `h·x^k`.
+  have hB₁_mul : (↑B₁ : Set P) = (↑H : Set P) * (↑(Subgroup.zpowers x) : Set P) := by
+    rw [hB₁_def]; exact Subgroup.normal_mul H (Subgroup.zpowers x)
+  have hmem_B₁ : ∀ {b : P}, b ∈ B₁ → ∃ h ∈ H, ∃ k : ℤ, b = h * x ^ k := by
+    intro b hb
+    have hb' : b ∈ (↑H : Set P) * (↑(Subgroup.zpowers x) : Set P) := by
+      rw [← hB₁_mul]; exact hb
+    obtain ⟨h, hh, z, hz, rfl⟩ := hb'
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    exact ⟨h, hh, k, rfl⟩
+  -- Order-`p` elements of any subgroup `M` between `B₁` and `G` (with `x ∈ M`) lie in `B₁`,
+  -- via class `≤ 2` of `M = (A ⊓ M)·⟨x⟩`.
+  -- **Induction**: `B₁ ◁ G'` for every `B₁ ≤ G' ≤ G`, by strong induction on `|G'|`.
+  have hnorm_all : ∀ n : ℕ, ∀ G' : Subgroup P, Nat.card ↥G' = n → B₁ ≤ G' → G' ≤ G →
+      ∀ b ∈ B₁, ∀ g ∈ G', g * b * g⁻¹ ∈ B₁ := by
+    intro n
+    induction n using Nat.strong_induction_on with
+    | _ n ih =>
+      intro G' hcard hB₁G' hG'G b hb g hg
+      -- If `G' = B₁`, `g ∈ B₁` and `B₁ ◁ ?`… we instead handle `B₁ = G'` and `B₁ < G'`.
+      rcases eq_or_lt_of_le hB₁G' with hEq | hLt
+      · -- `G' = B₁`. Show `B₁` is closed under conjugation by its own elements... not normal a priori.
+        sorry
+      · sorry
+  -- Apply the induction with `G' = G`.
+  have hB₁_normal_in_G : ∀ b ∈ B₁, ∀ g ∈ G, g * b * g⁻¹ ∈ B₁ :=
+    hnorm_all (Nat.card ↥G) G rfl hB₁_le_G le_rfl
+  -- **Extraction**: for `a ∈ A`, `a x a⁻¹ ∈ B₁`, so `⁅a, x⁆ ∈ H`, hence the conclusion.
+  intro a ha
+  have haxa : a * x * a⁻¹ ∈ B₁ := hB₁_normal_in_G x hxB₁ a (hA_le_G ha)
+  obtain ⟨h, hh, k, hk⟩ := hmem_B₁ haxa
+  -- `⁅a, x⁆ = a x a⁻¹ x⁻¹ = h x^{k-1}`.
+  have hcomm_eq : a * x * a⁻¹ * x⁻¹ = h * x ^ (k - 1) := by
+    rw [hk, zpow_sub, zpow_one]; group
+  -- `⁅a, x⁆ ∈ A`.
+  have hcomm_A : a * x * a⁻¹ * x⁻¹ ∈ A := by
+    have h1 : x * a⁻¹ * x⁻¹ ∈ A := (inferInstance : A.Normal).conj_mem a⁻¹ (A.inv_mem ha) x
+    have : a * (x * a⁻¹ * x⁻¹) ∈ A := A.mul_mem ha h1
+    rwa [show a * (x * a⁻¹ * x⁻¹) = a * x * a⁻¹ * x⁻¹ by group] at this
+  -- `x^{k-1} = h⁻¹ * ⁅a, x⁆ ∈ A`.
+  have hxk_A : x ^ (k - 1) ∈ A := by
+    have : x ^ (k - 1) = h⁻¹ * (a * x * a⁻¹ * x⁻¹) := by rw [hcomm_eq]; group
+    rw [this]; exact A.mul_mem (A.inv_mem (hH_le_A hh)) hcomm_A
+  -- `(x^{k-1})^p = 1`, so `x^{k-1} ∈ H`.
+  have hxk_pow : (x ^ (k - 1)) ^ p = 1 := by
+    rw [← zpow_natCast (x ^ (k - 1)) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hxp,
+      one_zpow]
+  have hxk_H : x ^ (k - 1) ∈ H := (mem_omega1OfAbelian).mpr ⟨hxk_A, hxk_pow⟩
+  -- `⁅a, x⁆ = h * x^{k-1} ∈ H`.
+  have hcomm_H : a * x * a⁻¹ * x⁻¹ ∈ H := by rw [hcomm_eq]; exact H.mul_mem hh hxk_H
+  -- `x⁻¹ a x a⁻¹ = x⁻¹ ⁅a,x⁆ x ∈ H` (`H ◁ P`).
+  have hconj_mem : x⁻¹ * (a * x * a⁻¹ * x⁻¹) * (x⁻¹)⁻¹ ∈ H :=
+    hH_normal.conj_mem _ hcomm_H x⁻¹
+  have heq : x⁻¹ * a * x * a⁻¹ = x⁻¹ * (a * x * a⁻¹ * x⁻¹) * (x⁻¹)⁻¹ := by group
+  rw [heq]; exact hconj_mem
 
 end OddOrder.BG.Ch1.S04
