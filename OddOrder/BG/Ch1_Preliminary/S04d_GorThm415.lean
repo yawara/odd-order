@@ -848,4 +848,63 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
           intro s t _ _ h; rw [map_inv]; exact h.inv_right
   exact fun u v huC hvC hup hvp => key _ u v huC hvC hup hvp rfl
 
+/-! ## Main theorem: Gorenstein Lemma 4.14 -/
+
+/-- **Gorenstein "Finite Groups" Lemma 4.14.** Let `P` be a finite `p`-group, `p`
+odd, and let `A` be a maximal abelian normal subgroup of `P` of maximal `p`-rank
+among normal abelian subgroups (`m(A) = d_n(P)`). Then
+`Ω₁(C_P(Ω₁(A))) = Ω₁(A)`. -/
+theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
+    (hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hA_maxAb : ∀ N : Subgroup P, N.Normal →
+      (∀ x ∈ N, ∀ y ∈ N, x * y = y * x) → A ≤ N → N = A)
+    (hA_maxRank : ∀ B : Subgroup P, B.Normal → IsMulCommutative B →
+      pRank B p ≤ pRank A p) :
+    (Omega (↥(Subgroup.centralizer ((omega1OfAbelian P A p hA_comm : Subgroup P) : Set P))) p 1).map
+        (Subgroup.centralizer
+          ((omega1OfAbelian P A p hA_comm : Subgroup P) : Set P)).subtype
+      = omega1OfAbelian P A p hA_comm := by
+  classical
+  set H := omega1OfAbelian P A p hA_comm with hH_def
+  set C := Subgroup.centralizer (↑H : Set P) with hC_def
+  have hp : p.Prime := Fact.out
+  have hH_le_A : H ≤ A := omega1OfAbelian_le
+  -- The goal's LHS is `omega1Map C p = D`.
+  show omega1Map C p = H
+  -- `D = ⟨{n ∈ C : n^p = 1}⟩`; the set is closed under product (PART 2), so `D` is exp `p`.
+  have hmul := omega1_centralizer_mul_pow hp_odd hP hA_comm hA_maxAb
+  -- `D = {n ∈ C : n^p = 1}` as a subgroup, with `∀ d ∈ D, d^p = 1`.
+  -- `{n ∈ C : n^p = 1}` is a subgroup (closed under `*` by PART 2).
+  let Dsub : Subgroup P :=
+    { carrier := {n : P | n ∈ C ∧ n ^ p = 1}
+      mul_mem' := fun {a b} ha hb => ⟨C.mul_mem ha.1 hb.1, hmul a b ha.1 hb.1 ha.2 hb.2⟩
+      one_mem' := ⟨C.one_mem, one_pow p⟩
+      inv_mem' := fun {a} ha => ⟨C.inv_mem ha.1, by rw [inv_pow, ha.2, inv_one]⟩ }
+  have hDset : ∀ d : P, d ∈ omega1Map C p ↔ d ∈ C ∧ d ^ p = 1 := by
+    intro d
+    rw [omega1Map_eq_closure]
+    constructor
+    · intro hd
+      have hsub : Subgroup.closure {n : P | n ∈ C ∧ n ^ p = 1} ≤ Dsub := by
+        rw [Subgroup.closure_le]; exact fun z hz => hz
+      exact hsub hd
+    · intro ⟨hdC, hdp⟩
+      exact Subgroup.subset_closure ⟨hdC, hdp⟩
+  -- `H ≤ C` (H abelian) and `H ≤ D`.
+  have hH_le_C : H ≤ C := by
+    rw [hC_def]
+    intro h hh
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    exact (hA_comm w (hH_le_A hw) h (hH_le_A hh))
+  have hH_le_D : H ≤ omega1Map C p := by
+    intro h hh
+    rw [hDset]
+    exact ⟨hH_le_C hh, ((mem_omega1OfAbelian).mp hh).2⟩
+  -- The hard inclusion `D ≤ H` (PART 3, rank squeeze).
+  refine le_antisymm ?_ hH_le_D
+  sorry
+
 end OddOrder.BG.Ch1.S04
