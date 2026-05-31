@@ -3,6 +3,17 @@
 > 2026-05-31 作成。`bg-prove` workflow (#9 Lem4.13) の **BLOCKED_DESIGN** (run wf_aa5d5280-3ff,
 > 357k tokens, 4 agent) が暴いた precursor tree を永続化。**§4 Thm 4.16 (Blackburn apex) の唯一残ゲート**。
 > cold-start でこのノートから着手可能。
+>
+> ## ✅✅ 状態更新 (2026-05-31): precursor(1) も precursor(2) も完成
+> - **precursor(1)** `pRank_le_two_of_scn3_empty` ✅ (commit c1d23e8, S04d) = G Thm 4.15(i)。
+> - **precursor(2)** `exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction` ✅ (commit 4caebe5, S04e)
+>   = minimal ψ-inv ⇒ special exp p (Thm 3.7+3.8 経由、**full Thm 3.10 帰納は回避** — minimal special D で
+>   minimality が ψ-trivial-on-D′ を供給。下記 tree の「precursor(2) …【大】」「G Thm 3.10」は不要に)。
+> ⇒ **Lem 4.13 = 残るは G Thm 4.15(ii) の assembly のみ** (precursor1+2 + GL数論)。
+> G Thm 4.15(ii) proof = `finite-groups.mmd` L4225-4231: D=precursor(2) の minimal special exp-p Q、
+> (a) D abelian ⇒ elem ab, ψ∈GL(≤2,p) order q ⇒ q∣p²-1; (b) D nonabelian ⇒ |D|=p³ extraspecial,
+> ψ on D/Φ(D)=elem ab rank2 ⇒ 同様。要 infra: GL橋 `mulAutEquivGeneralLinearGroup`@PRank +
+> GL(2,p) order (q≠p⇒q∣(p-1)(p+1)) + nonabelian special D⇒|D|=p³ (m(Z(D))=1)。d(D)≤2 は precursor(1) 由来。
 
 ## 発見 (設計note の誤りを訂正)
 

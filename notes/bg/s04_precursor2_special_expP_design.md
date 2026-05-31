@@ -1,6 +1,25 @@
 # BG §4 precursor(2): minimal ψ-invariant ⇒ special exp p (Gorenstein Thm 3.7/3.8/3.10)
 
-> ## 🔁 NEXT-SESSION HANDOFF (2026-05-31 更新)
+> ## 🔁🔁 NEXT-SESSION HANDOFF (2026-05-31 第2更新) — **precursor(2) 完成!**
+> **✅✅ precursor(2) 完成** (commit 4caebe5, S04e): `exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction`
+> (p odd) = ψ 非自明 on P ⇒ ∃ Q minimal A-不変 (ψ 非自明) `IsSpecial p ↥Q ∧ Monoid.exponent ↥Q = p`。
+> Thm 3.7 (9916cd4) → Thm 3.8 (5cbe0ef) → precursor(2) (4caebe5) の chain 完結、全 axiom-clean。
+> **full Gorenstein Thm 3.10 は回避**した (minimal special D で minimality が ψ-trivial-on-D′ を供給、
+> 型多相 |P| 帰納 不要; 詳細は下記「⚠⚠⚠ 大発見」)。S04e 全体 = Thm3.7/3.8/precursor2 + helpers
+> (`fixerSubgroup` / `acts_trivially_of_trivial_on_normal_quotient` / `isAInvariant_actionCommutator_comp`
+> / `mul_pow_prime_of_class_le_two_of_pow_mem_center` = Lem 3.9(ii))。702 行。
+>
+> **🔁 次の一手 = BG Lem 4.13 (= G Thm 4.15(ii), q∣p²-1)** — precursor(1)✅+precursor(2)✅+GL数論の assembly。
+> cold-start = `notes/bg/s04_lem413_gorenstein_precursors.md` + G Thm 4.15(ii) proof (`finite-groups.mmd` L4225-4231)。
+> G Thm 4.15(ii) proof: D := precursor(2) の minimal special exp-p Q。(a) D abelian ⇒ D elem ab,
+> ψ が GL(≤2,p) の order-q 元 ⇒ q∣p²-1 (Thm 2.8.1=GL order bound); (b) D nonabelian ⇒ |D|=p³
+> extraspecial, ψ が D/Φ(D)=elem ab rank2 上 order-q ⇒ 同様。**要確認 infra**: GL橋
+> `IsElementaryAbelian.mulAutEquivGeneralLinearGroup`@PRank + GL(2,p) order (q≠p⇒q∣(p-1)(p+1));
+> nonabelian D ⇒ |D|=p³ の extraspecial reduction (m(Z(D))=1)。**d(D)≤2 は precursor(1)
+> `pRank_le_two_of_scn3_empty` 由来**。注: BG は SCN₃(R)=∅ 仮説、G は d_n(P)≤2 — 翻訳は SCN/depth API。
+>
+> ---
+> ## (旧) HANDOFF (Thm 3.7 着地時)
 > **✅ Gorenstein Thm 3.7 完成** (commit 9916cd4, `OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean`,
 > sorry-free + axiom-clean, 525行)。theorem 名 = `isSpecial_of_pprimeAction_trivialOnProper`
 > (namespace `OddOrder.BG.Ch1.S04`)。下記 7-step plan 通り、純 assembly で着地。
