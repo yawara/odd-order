@@ -1150,6 +1150,49 @@ issue notes 627-628 の「infra が入れば 機械的」を消化。**残**: (6
 (6.8.3) は `|L|−|L:Z|=|W₁||H:Z|(|Z|−1)` 群位数算術 (L=H⋊W₁ setup) — どちらも setup-specific。
 ℂ→ℕ companion (`∑(natDegree)²=card G−card(G⧸N)`) は (6.6) ℕ-divisibility 用に将来有用だが未着。
 
+## 進捗 (2026-05-31, worktree `gracious-hermann` — degree-sum leaf + 6.34 frontier 確定)
+
+別 worktree (`claude/gracious-hermann-78e4d8`) で (6.8) capstone 攻略開始。worktree セットアップ
+(symlink `.lake/packages`/`references`、`.lake/build` は独立) 後 baseline green 確認 (3373 jobs)。
+
+### ✅ landed: (6.8.3) degree-sum factored form (commit `78e7561`)
+`OddOrder/GroupTheory/RepresentationTheory/InflationCharacter.lean` に
+**`sumNonInflatedDegreeSq_eq_index_mul`** : `N ⊴ G`, `N ≤ K ≤ G` で
+`∑_{χ∈Irr G, N⊄ker χ}χ(1)² = [G:K]·[K:N]·(|N|−1)`。landed `sumNonInflatedDegreeSq` (`=|G|−|G⧸N|`)
++ Lagrange index 算術 (`index_mul_card`/`relIndex_mul_index`/`index_eq_card`) を cast→`linear_combination`
+で合成。= mmd 04.8 L234 の `∑_{χ∈X}χ(1)²/‖χ‖²=|W₁||H:Z|(|Z|−1)` ((6.8.3) 最終不等式の degree-sum、
+`G=L`/`K=H` (⇒[G:K]=|W₁|)/`N=Z`)。sorry/axiom 無 (`{propext, Classical.choice, Quot.sound}`)、
+AxiomsCheck 登録、full build green。**Burnside-on-L 経由ゆえ Peterfalvi の `Ind_H^L`-orbit counting
+不要の clean・coherence-setup-free identity**、§10–§16 degree counting でも再利用可。
+
+### (6.8) frontier 確定マッピング — 残り = 3 つの未形式化 character-theory prerequisite
+coherence ENGINE は完成済 (`coherentUnion_of_glued` (S07:3468) の入力 = `hX`/`hY`/glued `ν`/
+source・image 直交/`hgen`)。これらを供給する character theory が残:
+1. **[Is]Thm 6.34** (Frobenius/Dade induced irreducibility): `θ∈Irr H, θ≠1 ⟹ Ind_H^L θ∈Irr L,
+   degree=|W₁|θ(1)`。**η_j(1)=|W₁| と X⊂Irr L の両方を供給 (case-A/B 共通) = 最高レバレッジ**。repo 未実装。
+2. **Peterfalvi (1.9)** Galois action on Irr + **(5.9.a)** Galois-coherence invariance ((6.8.2.1) 用)。未実装。
+3. **(6.8.1)/(6.8.2.1-3) の計算** (b≡c≡0 mod a congruence chain, (6.7) 適用, regular char formula)。
+
+(NB: tractable-but-small な (6.8.3) final 算術 `4|W₁|²>[H:Z](|Z|−1)²` は単独 pre-landing せず —
+case-A/B fixed-point-free order bounds (Hyp 4.6 構造、本層未露出) と合流時に hypotheses を正確化して
+inline 化する方が honest。`d²≤[H:Z]` = `SchurCenterBound.exists_degree_sq_le_index` は済。)
+
+### 🎯 次の major target = [Is]Thm 6.34 (Mackey-first, multi-session)
+依存確認済: Frobenius 相互律 `inner_induce_eq_inner_restrict` (InducedCharacter:482)✅、inertia group
+(Inertia:162)✅、Brauer permutation lemma unconditional (`brauer_permutation_lemma'`)✅、per-element
+共役値 `induceTerm_of_mem_normal` (InducedCharacter:517)✅、conjBy (Inertia:57, 規約 `conjBy g θ h=θ(ghg⁻¹)`)✅。
+**欠落の核 = Mackey 制限公式** (repo/mathlib に ready-made の coset-sum 無)。build chain (各 sorry-free leaf):
+- **(i) Mackey 制限** `Res_H(Ind_H^L θ)=∑_{w∈transversal} conjBy w⁻¹ θ` (H⊴L)。導出:
+  `(Ind θ)(g)=⅟|H|∑_{x∈L}θ(x⁻¹gx)` (`induceTerm_of_mem_normal` A=H) `=⅟|H|∑_x(conjBy x⁻¹ θ)(g)`、
+  `x=h'·w` 分解で `conjBy x⁻¹ θ=conjBy w⁻¹(conjBy h'⁻¹ θ)=conjBy w⁻¹ θ` (h'∈H で conjBy 自明、
+  `θ.conj_eq` 5行 inline) ⟹ `=∑_w(conjBy w⁻¹ θ)(g)`。coset-sum は `Subgroup.groupEquivQuotientProdSubgroup`
+  /`IsComplement`。~60-100 LOC、最も重い brick。
+- **(ii) norm 公式** `‖Ind θ‖²=|I_L(θ):H|`: `inner_induce_eq_inner_restrict` + (i) + `⟨θ,θ^w⟩=δ`。
+- **(iii) Frobenius 既約性** θ≠1 ⟹ `I_L(θ)=H` (Brauer: W₁ が Irr(H)∖{1} に自由作用 ← classes∖{1} 自由)
+  ⟹ `‖Ind θ‖²=1`+genuine ⟹ `Ind θ∈Irr L`。
+- **(iv) degree** `(Ind θ)(1)=|W₁|θ(1)` (`induce` の 1 評価 + [L:H]=|W₁|)。
+配置案: 新 `OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean` (Frobenius char theory の家)。
+
 ## 完了条件
 
 - `sibleySetup_is_coherent` statement が定義される (proof は sorry で OK)。
