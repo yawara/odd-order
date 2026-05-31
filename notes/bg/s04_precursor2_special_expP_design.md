@@ -82,7 +82,28 @@ precursor(2): minimal ψ-inv ⇒ special exp p
 - Thm 2.2 (homocyclic) を仮定フィールドに逃がさない (これが本当の payload の一つ)。
 - exp-p の「Ω₁(D)=D」を仮定に積まない (minimality + Thm 3.10 から genuine に出す)。
 
-## G Thm 2.2 (indecomposable ⇒ homocyclic) — proof architecture (2026-05-31 調査確定)
+## ⚠⚠ 重要発見 (2026-05-31): **G Thm 2.2 (homocyclic) は precursor(2) に不要**
+
+Thm 3.7 (precursor 2 の唯一の Thm 2.2 consumer) の証明を精読した結果、**Thm 2.2 は使われていない**:
+Gorenstein は「A acts indecomposably on P̄ (**which is therefore homocyclic by Theorem 2.2**)」と
+**括弧の remark** で homocyclic に言及するが、結論「P̄ elementary abelian」は直後に **Theorem 2.4
+(着地済!)** で導く — Ω₁(P̄)⊊P̄ なら Ω₁(P̄) は proper A-inv なので ψ がその上自明 ⇒ **Thm 2.4 を
+⟨ψ⟩ に適用** ⇒ ψ が P̄ 全体で自明 ⇒ ψ nontrivial に矛盾。よって P̄=Ω₁(P̄)=elem ab。
+**homocyclic は以後一切使われない** (irreducibility は Maschke、(i) は Thm 3.6+three-subgroups)。
+
+⇒ **Lemma 2.1 / 有限 abelian 基底・type 論 / IsHomocyclic は全部不要**。precursor(2) の本当の残路:
+- ✅ **Thm 2.4** (Ω₁-extension) — 着地済 (`CoprimeAbelianPGroup.lean`)。⟨ψ⟩ への適用で Thm 3.7 の elem-ab を出す。
+- ✅ **Thm 3.5** (P=C·[P,A], 一般 P) = `fixedPoints_sup_actionCommutator_eq_top` (G p-群⇒solvable で hSolv 充足)。
+- ✅ **Thm 3.6** (`[[G,A],A]=[G,A]`) = `actionCommutator_restrict_self_map_subtype_eq`@`OperatorQuotientAction.lean:113` (coprime+solvable、既存; Thm 4.12(a) で構築済)。「=1⇒A=1」系は actionCommutator=⊥⟺acts_trivially (Ch04:2184)。
+- ✅ **Maschke** (elem ab で A-不変 complement / indecomposable⇒irreducible) = `OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient` を **S=P' で再利用** (P/P' elem ab なら Ω₁(P/P')=P/P' なので一般 Thm 3.3.2 不要)。
+- ⏳ **Thm 3.7** (核, 組立) → 3.8 → 3.10 → precursor(2)。
+
+### ⇒ **precursor(2) は新規インフラ不要・純 assembly に確定** (precursor(1) と同型の状況)
+全 kernel が手元: Thm 2.4✅ / Thm 3.5✅ / Thm 3.6✅ / Maschke✅ / three-subgroups✅ / stability(Ch04:2184)✅ / 交換子恒等式(Ch04/mathlib)。残りは **Thm 3.7/3.8/3.10/precursor(2) の証明組立のみ** (有限 abelian 構造論・homocyclic は完全に不要)。Thm 3.7 assembly ~150-250行 (dedicated session 推奨; cold-start は本ノート §「Thm 3.7 proof architecture」+ Gorenstein L3835-3925)。
+
+---
+
+## (旧) G Thm 2.2 (indecomposable ⇒ homocyclic) — proof architecture ※precursor(2)には不要と判明、独立に価値があれば参照
 
 Gorenstein 原文 = `references/gorenstein/finite-groups.mmd` **L3696-3757** (Ch.3 §2)。完全な攻略図:
 
