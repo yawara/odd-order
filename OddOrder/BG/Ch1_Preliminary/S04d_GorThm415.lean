@@ -1013,6 +1013,106 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le_E).toEquiv
     rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (H.subgroupOf E), hquot_card,
       hcard_H_sub]
-  sorry
+  -- `E` is abelian (Gorenstein Lemma 1.3.4): `E/H` cyclic, `H ≤ Z(E)`.
+  -- `H.subgroupOf E ≤ center ↥E`.
+  have hHsub_le_center : (H.subgroupOf E) ≤ Subgroup.center ↥E := by
+    intro h hh
+    rw [Subgroup.mem_subgroupOf] at hh
+    rw [Subgroup.mem_center_iff]
+    intro e
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    -- `(e : P) ∈ E ≤ C` centralizes `(h : P) ∈ H`.
+    have heC : (e : P) ∈ C := hE_le_C e.2
+    exact ((Subgroup.mem_centralizer_iff.mp heC) _ hh).symm
+  -- `E/H` is cyclic (≅ ⟨x̄⟩).
+  haveI hEH_cyclic : IsCyclic (E ⧸ H.subgroupOf E) := by
+    have hf_mem : ∀ e : E, q (e : P) ∈ Subgroup.zpowers xbar := fun e => e.2
+    set f : E →* Subgroup.zpowers xbar :=
+      (q.comp E.subtype).codRestrict (Subgroup.zpowers xbar) hf_mem with hf_def
+    have hf_surj : Function.Surjective f := by
+      rintro ⟨z, hz⟩
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      obtain ⟨w, hw_eq⟩ := QuotientGroup.mk'_surjective H xbar
+      refine ⟨⟨w ^ k, ?_⟩, ?_⟩
+      · rw [hE_def, Subgroup.mem_comap, hq_def, map_zpow, hw_eq]
+        exact Subgroup.mem_zpowers_iff.mpr ⟨k, rfl⟩
+      · apply Subtype.ext
+        rw [hf_def]
+        simp only [MonoidHom.codRestrict_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
+        rw [map_zpow, hw_eq]
+    have hf_ker : f.ker = H.subgroupOf E := by
+      ext e
+      rw [MonoidHom.mem_ker, hf_def, Subgroup.mem_subgroupOf]
+      constructor
+      · intro he
+        have : q (e : P) = 1 := by
+          have := congrArg Subtype.val he
+          simpa [MonoidHom.codRestrict_apply] using this
+        exact (QuotientGroup.eq_one_iff _).mp this
+      · intro he
+        apply Subtype.ext
+        simp only [MonoidHom.codRestrict_apply, MonoidHom.comp_apply, Subgroup.coe_subtype,
+          OneMemClass.coe_one]
+        rw [hq_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact he
+    -- `↥E ⧸ ker f ≅ ⟨x̄⟩` cyclic; transport along `ker f = H.subgroupOf E`.
+    haveI : IsCyclic (Subgroup.zpowers xbar) := inferInstance
+    have hcyc_ker : IsCyclic (E ⧸ f.ker) := isCyclic_of_surjective
+      (QuotientGroup.quotientKerEquivOfSurjective f hf_surj).symm.toMonoidHom
+      (QuotientGroup.quotientKerEquivOfSurjective f hf_surj).symm.surjective
+    exact isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hf_ker).toMonoidHom
+      (QuotientGroup.quotientMulEquivOfEq hf_ker).surjective
+  have hE_comm : ∀ a ∈ E, ∀ b ∈ E, a * b = b * a := by
+    intro a ha b hb
+    have := commutative_of_cyclic_center_quotient (QuotientGroup.mk' (H.subgroupOf E))
+      (le_trans (le_of_eq (QuotientGroup.ker_mk' _)) hHsub_le_center) ⟨a, ha⟩ ⟨b, hb⟩
+    exact congrArg Subtype.val this
+  haveI hE_mulcomm : IsMulCommutative ↥E := ⟨⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2)⟩⟩
+  -- `E` is elementary abelian (`E ≤ D` exp `p`).
+  have hE_elemAb : E.IsElementaryAbelian p := by
+    refine ⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2), fun e => ?_⟩
+    apply Subtype.ext
+    rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]
+    exact ((hDset (e : P)).mp (hE_le_D e.2)).2
+  -- **Rank squeeze**: `pRank ↥E ≥ log_p|E| = log_p|H| + 1 > pRank ↥A ≥ pRank ↥E`.
+  -- `Nat.log p |E| ≤ pRank ↥E`.
+  have hlogE_le : Nat.log p (Nat.card ↥E) ≤ pRank ↥E p := by
+    have htop : (⊤ : Subgroup ↥E).IsElementaryAbelian p :=
+      (hE_elemAb : OddOrder.GroupTheory.IsElementaryAbelian p ↥E).to_subgroup ⊤
+    have hle := le_pRank (⊤ : Subgroup ↥E) htop
+    rwa [Subgroup.card_top] at hle
+  -- `Nat.log p |E| = Nat.log p |H| + 1`.
+  have hcardH_pos : Nat.card ↥H ≠ 0 := Nat.card_pos.ne'
+  have hlogE_eq : Nat.log p (Nat.card ↥E) = Nat.log p (Nat.card ↥H) + 1 := by
+    rw [hcard_E, mul_comm, Nat.log_mul_base hp.one_lt hcardH_pos]
+  -- `pRank ↥A ≤ Nat.log p |H|` (elem-ab subgroups of `A` lie in `H = Ω₁(A)`).
+  have hpRankA_le : pRank ↥A p ≤ Nat.log p (Nat.card ↥H) := by
+    rw [pRank_le_iff]
+    intro B hB
+    -- `B.map A.subtype ≤ H`.
+    have hBH : B.map A.subtype ≤ H := by
+      rintro _ ⟨b, hbB, rfl⟩
+      refine (mem_omega1OfAbelian).mpr ⟨b.2, ?_⟩
+      -- `b^p = 1` in `↥B`, hence `(b : A)^p = 1` in `↥A`, hence `(b : P)^p = 1`.
+      have hbp : (⟨b, hbB⟩ : ↥B) ^ p = 1 := hB.pow_eq_one ⟨b, hbB⟩
+      have hbA : (b : A) ^ p = 1 := by
+        have h2 : (((⟨b, hbB⟩ : ↥B) ^ p : ↥B) : ↥A) = ((1 : ↥B) : ↥A) := by rw [hbp]
+        simpa using h2
+      have h3 : (((b : A) ^ p : ↥A) : P) = ((1 : ↥A) : P) := by rw [hbA]
+      simpa [Subgroup.coe_subtype] using h3
+    calc Nat.log p (Nat.card B) = Nat.log p (Nat.card (B.map A.subtype)) := by
+          rw [Subgroup.card_map_of_injective A.subtype_injective]
+      _ ≤ Nat.log p (Nat.card ↥H) :=
+          Nat.log_mono_right (Nat.card_le_card_of_injective _
+            (Subgroup.inclusion_injective hBH))
+  -- `hA_maxRank E : pRank ↥E ≤ pRank ↥A`.
+  have hmaxRank := hA_maxRank E hE_normal hE_mulcomm
+  -- Contradiction: `log|H| + 1 ≤ pRank ↥E ≤ pRank ↥A ≤ log|H|`.
+  have : Nat.log p (Nat.card ↥H) + 1 ≤ Nat.log p (Nat.card ↥H) :=
+    calc Nat.log p (Nat.card ↥H) + 1 = Nat.log p (Nat.card ↥E) := hlogE_eq.symm
+      _ ≤ pRank ↥E p := hlogE_le
+      _ ≤ pRank ↥A p := hmaxRank
+      _ ≤ Nat.log p (Nat.card ↥H) := hpRankA_le
+  exact Nat.not_succ_le_self _ this
 
 end OddOrder.BG.Ch1.S04
