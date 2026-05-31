@@ -903,8 +903,116 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
     intro h hh
     rw [hDset]
     exact ⟨hH_le_C hh, ((mem_omega1OfAbelian).mp hh).2⟩
+  -- `H ◁ P` and `D ◁ P`.
+  have hH_normal : H.Normal := by
+    refine { conj_mem := ?_ }
+    intro h hh g
+    have hh' : h ∈ A ∧ h ^ p = 1 := hh
+    refine (mem_omega1OfAbelian).mpr ⟨(inferInstance : A.Normal).conj_mem h hh'.1 g, ?_⟩
+    calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
+      _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
+  haveI := hH_normal
+  haveI hC_normal : C.Normal := by rw [hC_def]; infer_instance
+  have hD_normal : (omega1Map C p).Normal :=
+    normal_of_characteristic_subgroupOf omega1Map_le
+      (by rw [omega1Map]; rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
+        C.subtype_injective]; exact Omega.characteristic)
   -- The hard inclusion `D ≤ H` (PART 3, rank squeeze).
   refine le_antisymm ?_ hH_le_D
+  by_contra hnotle
+  -- `H < D`.
+  have hHD_lt : H < omega1Map C p := lt_of_le_of_ne hH_le_D (fun heq => hnotle (heq ▸ le_rfl))
+  -- Work in `Q = P ⧸ H`.
+  set q := QuotientGroup.mk' H with hq_def
+  haveI hPQ : IsPGroup p (P ⧸ H) := hP.to_quotient H
+  set Dbar := (omega1Map C p).map q with hDbar_def
+  haveI hDbar_normal : Dbar.Normal :=
+    Subgroup.Normal.map hD_normal q (QuotientGroup.mk'_surjective H)
+  have hDbar_ne : Dbar ≠ ⊥ := by
+    obtain ⟨d, hdD, hdH⟩ := SetLike.exists_of_lt hHD_lt
+    intro hbot
+    apply hdH
+    have : q d ∈ Dbar := Subgroup.mem_map_of_mem q hdD
+    rw [hbot, Subgroup.mem_bot] at this
+    exact (QuotientGroup.eq_one_iff d).mp this
+  -- A central order-`p` element `x̄ ∈ Dbar`.
+  obtain ⟨xbar, hxbar_D, hxbar_center, hxbar_ne, hxbar_p⟩ :=
+    exists_mem_omega1_center_of_normal_ne_bot hPQ hDbar_ne
+  -- `E = preimage of ⟨x̄⟩`; normal, `H < E ≤ D`, `|E : H| = p`.
+  have hzp_center : Subgroup.zpowers xbar ≤ Subgroup.center (P ⧸ H) :=
+    Subgroup.zpowers_le.mpr hxbar_center
+  haveI hzp_normal : (Subgroup.zpowers xbar).Normal :=
+    { conj_mem := fun n hn g => by
+        rw [Subgroup.mem_center_iff.mp (hzp_center hn) g, mul_assoc, mul_inv_cancel, mul_one]
+        exact hn }
+  set E := (Subgroup.zpowers xbar).comap q with hE_def
+  haveI hE_normal : E.Normal := inferInstance
+  -- `H ≤ E`, `E ≤ D`, `H < E`.
+  have hH_le_E : H ≤ E := by
+    intro h hh
+    rw [hE_def, Subgroup.mem_comap, hq_def, QuotientGroup.mk'_apply,
+      (QuotientGroup.eq_one_iff h).mpr hh]
+    exact one_mem _
+  have hE_le_D : E ≤ omega1Map C p := by
+    have h1 : E ≤ Dbar.comap q := Subgroup.comap_mono (Subgroup.zpowers_le.mpr hxbar_D)
+    have h2 : Dbar.comap q = H ⊔ omega1Map C p := by
+      rw [hDbar_def, hq_def, QuotientGroup.comap_map_mk']
+    rwa [h2, sup_eq_right.mpr hH_le_D] at h1
+  have hHE_lt : H < E := by
+    refine lt_of_le_of_ne hH_le_E (fun heq => hxbar_ne ?_)
+    -- if `E = H` then `x̄ = 1` (its preimage lies in `H = ker q`).
+    obtain ⟨x, hx_eq⟩ := QuotientGroup.mk'_surjective H xbar
+    have hxE : x ∈ E := by
+      rw [hE_def, Subgroup.mem_comap, hq_def, hx_eq]; exact Subgroup.mem_zpowers xbar
+    have hxH : x ∈ H := by rw [heq]; exact hxE
+    rw [← hx_eq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hxH
+  -- `E` centralizes `H` (E ≤ D ≤ C), so `H ≤ Z(E)`; and `E/H` cyclic of order `p`.
+  have hE_le_C : E ≤ C := le_trans hE_le_D omega1Map_le
+  -- `Nat.card ↥E = p * Nat.card ↥H` via `↥E ⧸ H.subgroupOf E ≅ ⟨x̄⟩`.
+  have hcard_E : Nat.card ↥E = p * Nat.card ↥H := by
+    -- `f : ↥E →* ⟨x̄⟩` surjective with kernel `H.subgroupOf E`.
+    have hf_mem : ∀ e : E, q (e : P) ∈ Subgroup.zpowers xbar := fun e => e.2
+    set f : E →* Subgroup.zpowers xbar :=
+      (q.comp E.subtype).codRestrict (Subgroup.zpowers xbar) hf_mem with hf_def
+    have hf_surj : Function.Surjective f := by
+      rintro ⟨z, hz⟩
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      obtain ⟨w, hw_eq⟩ := QuotientGroup.mk'_surjective H xbar
+      refine ⟨⟨w ^ k, ?_⟩, ?_⟩
+      · rw [hE_def, Subgroup.mem_comap, hq_def, map_zpow, hw_eq]
+        exact Subgroup.mem_zpowers_iff.mpr ⟨k, rfl⟩
+      · apply Subtype.ext
+        rw [hf_def]
+        simp only [MonoidHom.codRestrict_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
+        rw [map_zpow, hw_eq]
+    have hf_ker : f.ker = H.subgroupOf E := by
+      ext e
+      rw [MonoidHom.mem_ker, hf_def, Subgroup.mem_subgroupOf]
+      constructor
+      · intro he
+        have : q (e : P) = 1 := by
+          have := congrArg Subtype.val he
+          simpa [MonoidHom.codRestrict_apply] using this
+        exact (QuotientGroup.eq_one_iff _).mp this
+      · intro he
+        apply Subtype.ext
+        simp only [MonoidHom.codRestrict_apply, MonoidHom.comp_apply, Subgroup.coe_subtype,
+          OneMemClass.coe_one]
+        rw [hq_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact he
+    -- `↥E ⧸ H.subgroupOf E ≅ ⟨x̄⟩`, of card `p`.
+    have hord : orderOf xbar = p := by
+      have hdvd : orderOf xbar ∣ p := orderOf_dvd_of_pow_eq_one hxbar_p
+      rcases (hp.eq_one_or_self_of_dvd _ hdvd) with h1 | h1
+      · exact absurd (orderOf_eq_one_iff.mp h1) hxbar_ne
+      · exact h1
+    have hquot_card : Nat.card (E ⧸ H.subgroupOf E) = p := by
+      rw [← hf_ker, Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective f hf_surj).toEquiv,
+        Nat.card_zpowers, hord]
+    -- `Nat.card ↥E = |E/H| * |H|`.
+    have hcard_H_sub : Nat.card ↥(H.subgroupOf E) = Nat.card ↥H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le_E).toEquiv
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (H.subgroupOf E), hquot_card,
+      hcard_H_sub]
   sorry
 
 end OddOrder.BG.Ch1.S04
