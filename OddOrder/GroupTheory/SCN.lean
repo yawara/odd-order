@@ -185,6 +185,27 @@ theorem exists_maximalAbelianNormal_ge [Finite G] {B : Subgroup G}
   intro N hN_norm hN_comm hAN
   exact le_antisymm (hAmax.2 ⟨hN_norm, hN_comm⟩ hAN) hAN
 
+/-- **A maximal abelian normal subgroup of maximal `p`-rank exists** (`[Finite G]`).
+Companion to Gorenstein Lemma 4.14: produces an `A` that is maximal-abelian-normal *and*
+realises `d_n(G) = ⨆ { m(B) : B normal abelian }` (`∀ B normal abelian, pRank B ≤ pRank A`),
+i.e. exactly the subgroup to which Lemma 4.14 applies. -/
+theorem exists_maxRank_maximalAbelianNormal [Finite G] (p : ℕ) :
+    ∃ A : Subgroup G, IsMaximalAbelianNormal A ∧
+      ∀ B : Subgroup G, B.Normal → IsMulCommutative B → pRank B p ≤ pRank A p := by
+  classical
+  haveI hbot : IsMulCommutative (⊥ : Subgroup G) :=
+    IsMulCommutative.of_comm (fun a b => Subsingleton.elim _ _)
+  obtain ⟨A₀, -, hA₀⟩ :=
+    exists_maximalAbelianNormal_ge (B := (⊥ : Subgroup G)) inferInstance hbot
+  haveI : Nonempty {A : Subgroup G // IsMaximalAbelianNormal A} := ⟨⟨A₀, hA₀⟩⟩
+  obtain ⟨A, hA⟩ := Finite.exists_max
+    (fun A : {A : Subgroup G // IsMaximalAbelianNormal A} => pRank (A : Subgroup G) p)
+  refine ⟨A.1, A.2, fun B hBnorm hBcomm => ?_⟩
+  obtain ⟨A_B, hBA_B, hA_Bmax⟩ := exists_maximalAbelianNormal_ge hBnorm hBcomm
+  calc pRank B p
+      ≤ pRank A_B p := pRank_le_of_injective (Subgroup.inclusion_injective hBA_B)
+    _ ≤ pRank (A : Subgroup G) p := hA ⟨A_B, hA_Bmax⟩
+
 end MaximalAbelianNormal
 
 /-! ## 4B: `SCN_n(R)` — SCN subgroups of rank `≥ n` (pp. 33) -/
