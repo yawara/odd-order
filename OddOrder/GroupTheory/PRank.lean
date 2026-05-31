@@ -334,6 +334,31 @@ theorem prime_dvd_prime_sq_sub_one_of_orderOf_mulAut {p q : ℕ} [Fact p.Prime] 
       · exact absurd ((Nat.prime_dvd_prime_iff_eq hq hp).mp hpp) hqp
       · exact hp1.trans hp1dvd
 
+/-- **`q < p` companion** for BG Lemma 4.13 (`p` odd). If `p, q` are primes, `p` is odd,
+`q ≠ p`, and `q ∣ p² - 1`, then `q < p`.
+
+`p² - 1 = (p-1)(p+1)`; a prime `q ≠ p` dividing it divides `p-1` (giving `q ≤ p-1 < p`) or
+`p+1`. For odd `p` the factor `p+1` is even and `> 2`, so it is not prime, hence `q ≠ p+1` and
+`q ≤ p+1` forces `q ≤ p-1 < p`. (Pairs with `prime_dvd_prime_sq_sub_one_of_orderOf_mulAut`.) -/
+theorem lt_of_prime_dvd_prime_sq_sub_one {p q : ℕ} (hp : p.Prime) (hpo : Odd p) (hq : q.Prime)
+    (hqp : q ≠ p) (hdvd : q ∣ p ^ 2 - 1) : q < p := by
+  have hp2 : 2 ≤ p := hp.two_le
+  have hfac : p ^ 2 - 1 = (p - 1) * (p + 1) := by
+    rcases p with _ | b
+    · simp
+    · rw [Nat.succ_sub_one, show (b + 1) ^ 2 = b * (b + 2) + 1 from by ring, Nat.add_sub_cancel]
+  rw [hfac] at hdvd
+  rcases hq.dvd_mul.mp hdvd with h1 | h2
+  · exact lt_of_le_of_lt (Nat.le_of_dvd (by omega) h1) (by omega)
+  · have hle : q ≤ p + 1 := Nat.le_of_dvd (by omega) h2
+    have hqne1 : q ≠ p + 1 := by
+      intro hq1
+      have hev : Even (p + 1) := hpo.add_one
+      rw [← hq1] at hev
+      have : q = 2 := (Nat.Prime.even_iff hq).mp hev
+      omega
+    omega
+
 end AutGL
 
 variable (G : Type*) [Group G]
