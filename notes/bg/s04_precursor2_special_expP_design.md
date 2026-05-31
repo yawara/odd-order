@@ -82,6 +82,34 @@ precursor(2): minimal ψ-inv ⇒ special exp p
 - Thm 2.2 (homocyclic) を仮定フィールドに逃がさない (これが本当の payload の一つ)。
 - exp-p の「Ω₁(D)=D」を仮定に積まない (minimality + Thm 3.10 から genuine に出す)。
 
+## G Thm 2.2 (indecomposable ⇒ homocyclic) — proof architecture (2026-05-31 調査確定)
+
+Gorenstein 原文 = `references/gorenstein/finite-groups.mmd` **L3696-3757** (Ch.3 §2)。完全な攻略図:
+
+**必要な部品 (順に):**
+1. **`IsHomocyclic p G` def** (新規, 未着地)。clean な特徴付け = exp `p^n` の abelian p-群で
+   **`Agemo G p (n-1) = Omega G p 1`** (⟺ Gorenstein の `r=m`; ℧ⁿ⁻¹⊆Ω₁ は常に成立、等号⟺homocyclic)。
+   `Agemo`@OmegaSubgroup あり。n-1 を避けるなら exp で parametrize。
+2. **Thm 3.3.2 (coprime Maschke on elem ab)** = `OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
+   から **R/S quotient 層を外した一般形**: 「elem ab `G`, `φ:A→*MulAut G` coprime, `W≤G` A-不変
+   ⇒ A-不変 complement `X` (`X⊓W=⊥`, `X⊔W=⊤`)」。証明構造は OperatorMaschke L172-254 と同型
+   (zmodModule → ρ=`mulAutToEnd G p ∘ φ` → `pW` invtSubmodule → `ComplementedLattice.exists_isCompl`
+   → `Φ=(toZModSubmodule).symm.trans toSubgroup'` で subgroup 復元)。**quotient lift (L255-277) は不要**で
+   むしろ短い。⚠ **layering**: `mulAutToEnd` は BG (AppA/OperatorMaschke) にしかない。Thm 3.3.2 を
+   GroupTheory に置くなら `mulAutToEnd` を GroupTheory へ移し OperatorMaschke を consumer 化するのが
+   筋 (将来 refactor)。当面は **BG 配下** (OperatorMaschke downstream) に置けば再利用可。Lemma 2.1 が 2 回使う。
+3. **Lemma 2.1** (L3706): 非 homocyclic abelian `P` (exp `p^n`, `X=℧ⁿ⁻¹(P)`) に対し
+   (i) A-不変 `T≠1` で `T∩X=1` (Ω₁(P)=X×T を Thm 3.3.2 で分解); (ii) `T∩X=1` ⇒ `P/T` exp `p^n`
+   かつ `℧ⁿ⁻¹(P/T)=X̄`。**要: 有限 abelian p-群の基底・type 論** (mathlib の有限 abelian 分類
+   `Mathlib.Algebra.Group.FiniteAbelian` 系 — 基底 `{xᵢ}` orders `pⁿⁱ`, `yᵢ=xᵢ^(pⁿⁱ⁻¹)`, `r=#{nᵢ=n}`)。
+   repo に基底抽出の bridge 無し = **重い新規インフラ**。
+4. **Thm 2.2** (L3715): `T`=maximal A-不変 disjoint from `X` (`Finite.exists_maximal`) → `P/T` homocyclic
+   (Lemma 2.1 反復) → `Q=⟨xᵢ:i≤r⟩` で `P=T×Q` → Thm 3.3.2 で `P=T×R` (`R≠1`) ⇒ indecomposable 矛盾。
+
+**規模**: Thm 3.3.2 ~80行 (OperatorMaschke 流用), Lemma 2.1 ~重 (基底論), Thm 2.2 ~中。
+**= dedicated session 推奨** (precursor(1) と違い repo に無い有限 abelian 構造論を建てる)。
+着手は Thm 3.3.2 (再利用効くし最も決定的) または `IsHomocyclic` def から。
+
 ## 参照パス
 
 - BG: `references/bg/local-analysis.mmd` L1624-1628 (Lem 4.13/4.14)
