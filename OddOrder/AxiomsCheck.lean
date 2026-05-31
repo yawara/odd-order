@@ -1417,6 +1417,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_conjDifference_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamily_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDadeOfIrreducible
 
 -- Round C: the running-`τ₁` instantiation.  `retarget_isCoherent_fromDade` discharges one (6.6)

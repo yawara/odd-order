@@ -3861,6 +3861,80 @@ noncomputable def dadeOrthonormalCharacterImageFamily
   -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
 
+/-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
+
+`⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in `CF(L,A)`
+and `x, x̄` are each orthogonal to both `χ` and `χ̄`.  The Dade isometry's `CF(L,A)`
+inner-preservation (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) reduces it to
+`⟨x − x̄, χ − χ̄⟩`, which expands to the four cross pairings — all zero.  This is the source-side
+input of `orthogonal_of_signedDifference_inner_eq_zero` for the Dade `R(·)` families (feeding the
+per-member `(5.2.e)` orthogonality `hmemOrtho` of `DadeChainStep`). -/
+theorem dadeIntegralCharacterMap_inner_conjDifference_eq_zero
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {x χ : ClassFunction (↥L) ℂ}
+    (hxsupp : x.support ⊆ supportInSubgroup A L)
+    (hxbarsupp : x.conj.support ⊆ supportInSubgroup A L)
+    (hχsupp : χ.support ⊆ supportInSubgroup A L)
+    (hχbarsupp : χ.conj.support ⊆ supportInSubgroup A L)
+    (hxχ : ClassFunction.inner x χ = 0) (hxχbar : ClassFunction.inner x χ.conj = 0)
+    (hxbarχ : ClassFunction.inner x.conj χ = 0)
+    (hxbarχbar : ClassFunction.inner x.conj χ.conj = 0) :
+    ClassFunction.inner
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (x - x.conj))
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - χ.conj)) = 0 := by
+  classical
+  have hS : ∀ s ∈ ({x, x.conj, χ, χ.conj} : Set (ClassFunction (↥L) ℂ)),
+      s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl | rfl | rfl
+    · exact hxsupp
+    · exact hxbarsupp
+    · exact hχsupp
+    · exact hχbarsupp
+  have hx_span : (x - x.conj) ∈
+      zSpan (L := ↥L) ({x, x.conj, χ, χ.conj} : Set (ClassFunction (↥L) ℂ)) :=
+    Submodule.sub_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+  have hχ_span : (χ - χ.conj) ∈
+      zSpan (L := ↥L) ({x, x.conj, χ, χ.conj} : Set (ClassFunction (↥L) ℂ)) :=
+    Submodule.sub_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+  rw [dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hx_span hχ_span]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_zero, sub_self]
+
+/-- **Peterfalvi (5.2.e) for the Dade `R(·)` families.**
+
+The orthonormal image families `R(x)` and `R(χ)` produced from the Dade isometry
+(`dadeOrthonormalCharacterImageFamily`) are orthogonal whenever `x, x̄` are each orthogonal to both
+`χ` and `χ̄`.  Reduces — via `toOrthonormalImage_orthogonal` and
+`orthogonal_of_signedDifference_inner_eq_zero` — to `⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0`
+(`dadeIntegralCharacterMap_inner_conjDifference_eq_zero`).  This is exactly the per-member
+`(5.2.e)` orthogonality `hmemOrtho` of `DadeChainStep` for members built by
+`decompositionPairFromDadeOfIrreducible`. -/
+theorem dadeOrthonormalCharacterImageFamily_orthogonal
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {x χ : IrreducibleCharacter (↥L)}
+    (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction (↥L) ℂ))
+    (hxsupp : (x : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hxbarsupp : (x : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L)
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L)
+    (hxχ : ClassFunction.inner (x : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 0)
+    (hxχbar : ClassFunction.inner (x : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0)
+    (hxbarχ : ClassFunction.inner (x : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
+    (hxbarχbar :
+      ClassFunction.inner (x : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ).conj = 0) :
+    (dadeOrthonormalCharacterImageFamily hyp hconj x hxreal hxsupp hxbarsupp).Orthogonal
+      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp) := by
+  unfold dadeOrthonormalCharacterImageFamily
+  refine CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
+    (CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero _ _ ?_)
+  rw [← CharacterDifferenceImage.image_eq_signedDifference,
+    ← CharacterDifferenceImage.image_eq_signedDifference]
+  exact dadeIntegralCharacterMap_inner_conjDifference_eq_zero hyp hconj
+    hxsupp hxbarsupp hχsupp hχbarsupp hxχ hxχbar hxbarχ hxbarχbar
+
 /-- **Peterfalvi (5.6.3) / Round-24 (ii): the per-step decomposition pair `(D₀, Da)`, produced
 directly from the Dade isometry.**
 
