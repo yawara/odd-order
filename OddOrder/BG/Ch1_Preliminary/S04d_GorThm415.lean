@@ -480,7 +480,95 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
         -- IH applied to `M`.
         have hIH : ∀ b ∈ B₁, ∀ g ∈ M, g * b * g⁻¹ ∈ B₁ :=
           ih (Nat.card ↥M) (hcard ▸ hcard_lt) M rfl hB₁_le_M hM_le_G
-        sorry
+        -- `X = B₁.subgroupOf M`, `Y = A.subgroupOf M`: abelian normal in `↥M`, sup `= ⊤`.
+        set X : Subgroup ↥M := B₁.subgroupOf M with hX_def
+        set Y : Subgroup ↥M := A.subgroupOf M with hY_def
+        haveI hY_normal : Y.Normal := by
+          rw [hY_def]; exact (inferInstance : A.Normal).comap M.subtype
+        haveI hX_normal : X.Normal := by
+          refine { conj_mem := ?_ }
+          intro w hw g
+          rw [hX_def, Subgroup.mem_subgroupOf] at hw ⊢
+          have hconj := hIH (w : P) hw (g : P) g.2
+          rw [Subgroup.coe_mul, Subgroup.coe_mul, InvMemClass.coe_inv]
+          exact hconj
+        have hX_comm : ∀ a ∈ X, ∀ b ∈ X, a * b = b * a := by
+          intro a ha b hb
+          rw [hX_def, Subgroup.mem_subgroupOf] at ha hb
+          exact Subtype.ext (hB₁_comm (a : P) ha (b : P) hb)
+        have hY_comm : ∀ a ∈ Y, ∀ b ∈ Y, a * b = b * a := by
+          intro a ha b hb
+          rw [hY_def, Subgroup.mem_subgroupOf] at ha hb
+          exact Subtype.ext (hA_comm (a : P) ha (b : P) hb)
+        have hXY_top : X ⊔ Y = ⊤ := by
+          rw [eq_top_iff]
+          intro m _
+          obtain ⟨a, haA, k, hk⟩ := hmem_G (hM_le_G m.2)
+          -- `a = m·x^{-k} ∈ M`, and `x^k ∈ B₁ ⊓ M`.
+          have haM : a ∈ M := by
+            have : a = (m : P) * (x ^ k)⁻¹ := by rw [hk]; group
+            rw [this]; exact M.mul_mem m.2 (M.inv_mem (M.zpow_mem hxM k))
+          have hxkM : x ^ k ∈ M := M.zpow_mem hxM k
+          have hxkB₁ : x ^ k ∈ B₁ := B₁.zpow_mem hxB₁ k
+          -- `m = ⟨a⟩ * ⟨x^k⟩` with `⟨a⟩ ∈ Y`, `⟨x^k⟩ ∈ X`.
+          have hmem_a : (⟨a, haM⟩ : ↥M) ∈ Y := by rw [hY_def, Subgroup.mem_subgroupOf]; exact haA
+          have hmem_xk : (⟨x ^ k, hxkM⟩ : ↥M) ∈ X := by
+            rw [hX_def, Subgroup.mem_subgroupOf]; exact hxkB₁
+          have hsplit : m = (⟨a, haM⟩ : ↥M) * ⟨x ^ k, hxkM⟩ := by
+            apply Subtype.ext; rw [Subgroup.coe_mul]; exact hk
+          rw [hsplit]
+          exact Subgroup.mul_mem _ (Subgroup.mem_sup_right hmem_a) (Subgroup.mem_sup_left hmem_xk)
+        -- `cl(M) ≤ 2`.
+        have hcl_M : _root_.commutator ↥M ≤ Subgroup.center ↥M :=
+          class_le_two_of_two_abelian_normal hX_comm hY_comm hXY_top
+        -- `B₁ = omega1Map M p`.
+        have hB₁_eq : B₁ = omega1Map M p := by
+          rw [omega1Map_eq_closure]
+          apply le_antisymm
+          · -- `B₁ ≤ closure {n ∈ M : n^p = 1}`: generators `H ∪ {x}` qualify.
+            have hH_le_M : H ≤ M := le_trans le_sup_left hB₁_le_M
+            rw [hB₁_def]
+            apply sup_le
+            · intro h hh
+              exact Subgroup.subset_closure ⟨hH_le_M hh, ((mem_omega1OfAbelian).mp hh).2⟩
+            · rw [Subgroup.zpowers_le]
+              exact Subgroup.subset_closure ⟨hxM, hxp⟩
+          · -- `closure {n ∈ M : n^p = 1} ≤ B₁`: each order-`p` element of `M` is in `B₁`.
+            rw [Subgroup.closure_le]
+            rintro n ⟨hnM, hnp⟩
+            obtain ⟨a, haA, k, hk⟩ := hmem_G (hM_le_G hnM)
+            have haM : a ∈ M := by
+              have : a = n * (x ^ k)⁻¹ := by rw [hk]; group
+              rw [this]; exact M.mul_mem hnM (M.inv_mem (M.zpow_mem hxM k))
+            have hxkM : x ^ k ∈ M := M.zpow_mem hxM k
+            -- In `↥M`: `a' = n' * (x^k)'⁻¹` has order `| p` (class ≤ 2).
+            have hxkpP : (x ^ k) ^ p = 1 := by
+              rw [← zpow_natCast (x ^ k) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hxp,
+                one_zpow]
+            have hap : a ^ p = 1 := by
+              have hnp' : (⟨n, hnM⟩ : ↥M) ^ p = 1 := by
+                apply Subtype.ext
+                rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, Subgroup.coe_mk]; exact hnp
+              have hxkp' : ((⟨x ^ k, hxkM⟩ : ↥M)⁻¹) ^ p = 1 := by
+                apply Subtype.ext
+                rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, InvMemClass.coe_inv,
+                  Subgroup.coe_mk, inv_pow, hxkpP, inv_one]
+              have hmul := mul_pow_prime_eq_one_of_class_le_two hp_odd hcl_M hnp' hxkp'
+              -- `(n' * xk'⁻¹ : P) = n * (x^k)⁻¹ = a`.
+              have hcoe : (((⟨n, hnM⟩ : ↥M) * (⟨x ^ k, hxkM⟩ : ↥M)⁻¹ : ↥M) : P) = a := by
+                simp only [Subgroup.coe_mul, InvMemClass.coe_inv, Subgroup.coe_mk]
+                rw [hk]; group
+              have hfin : ((((⟨n, hnM⟩ : ↥M) * (⟨x ^ k, hxkM⟩ : ↥M)⁻¹) ^ p : ↥M) : P)
+                  = ((1 : ↥M) : P) := by rw [hmul]
+              rwa [SubmonoidClass.coe_pow, hcoe, OneMemClass.coe_one] at hfin
+            -- `a ∈ Ω₁(A) = H`, so `n = a x^k ∈ B₁`.
+            have haH : a ∈ H := (mem_omega1OfAbelian).mpr ⟨haA, hap⟩
+            have haB₁ : a ∈ B₁ := by rw [hB₁_def]; exact Subgroup.mem_sup_left haH
+            rw [hk]
+            exact B₁.mul_mem haB₁ (B₁.zpow_mem hxB₁ k)
+        -- Finally, `g b g⁻¹ ∈ B₁` via conjugation preserving `omega1Map M p`.
+        rw [hB₁_eq] at hb ⊢
+        exact conj_mem_omega1Map (fun m hm => hM_normal_in_G' m hm g hg) hb
   -- Apply the induction with `G' = G`.
   have hB₁_normal_in_G : ∀ b ∈ B₁, ∀ g ∈ G, g * b * g⁻¹ ∈ B₁ :=
     hnorm_all (Nat.card ↥G) G rfl hB₁_le_G le_rfl
