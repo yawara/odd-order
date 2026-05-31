@@ -1431,3 +1431,32 @@ sorry/axiom 無; `#assert_only_allowed_axioms` 4 新規全 3 axiom allowlist 内
 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。**残 (post-instantiation)**: per-step `DadeChainStep` の構成
 (degree 比 `a` の整数性、`hY`/`hgen` の (6.6) 列挙からの供給) は依然 (6.6) degree 算術であり、Dade 等距の
 責務外 — これは設計上の正しい境界 (Dade 等距 ↔ (6.6) enumeration の責務分離)。
+
+### `DadeChainStep` source-side fields 放電試行 + (5.6.1) existence-half primitive (2026-05-31)
+
+`DadeChainStep` の source-side fields (`hY`/`hmemOrtho`/`hgen`) を landed pieces で WIRE し
+(6.6) coherence-of-X を 真正 (6.6) setup 仮説のみへ帰着する試み。精査で **3 fields いずれも
+wiring-size では放電不能**と確定 (各々 真正に新規数学 + interface 拡張を要す)。本 round は
+最も基礎的かつ完全 closable な (5.6.1) **existence-half primitive** のみ landing。
+
+- **`exists_orthogonalProjection_of_orthogonal_family`** (`ZIrrFourier.lean`, commit 741e769,
+  AxiomsCheck 登録): orthogonal family `vᵢ` (実 gram `δᵢⱼmᵢ`, `mᵢ≠0`) への任意 `w` の射影
+  `w = ∑ᵢ(⟨w,vᵢ⟩/mᵢ)•vᵢ + Z`, `Z⊥vⱼ`。純 diagonal Gram 射影 (completeness 不要)。
+  (5.6.1) λ-form `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z` の **存在半** (step 1)。
+  Pythagoras `inner_self_orthogonalSum_add_re` の sibling。
+- **各 field の正直な放電障害**:
+  - `hY` = `Da.Y = a•Da.tau1 chi1`。tautology ではない。`Y_eq_nsmul_tau1_of_lambdaForm` は `hYform`
+    (λ-form) を消費するが producer 不在。core 障害 = **joint-lattice isometry**: 係数計算 (mmd L79)
+    `aaᵢ‖χ₁‖² = ((χ−aχ₁)^τ,(χᵢ−aᵢχ₁)^τ)` は `χ−aχ₁` と `χᵢ−aᵢχ₁` を *同時に* 含む格子
+    `Z[S₁∪{χ−χ̄,χ−aχ₁}]` 上の等距を要すが `Da.tau1_inner_eq_on_support` は `{χ,χ̄,ψ}` のみ。
+    existence-half は landing 済、残 = coefficient-value (`λᵢ=λaᵢ/‖χᵢ‖²`) + integrality (`λ∈ℤ`) +
+    joint-等距 transport。
+  - `hmemOrtho` = `(Dmem x).imageFamily.Orthogonal R(χ)`。`Dmem` は field (任意データ) ゆえ構成法
+    不明では証明不能。放電には `Dmem` も Dade 構成化 (`decompositionPairFromDade…`) + Dade
+    `R(x)⊥R(χ)` を `x⊥{χ,χ̄}` から (4.1)型で導く必要。
+  - `hgen` = pure module theory ではなく (4.7) `Z[S,L^#]=Z[S,A]` を要す (χ 単体は A 上 supported とは
+    限らず `mχ+nχ̄` の support 制約が差 generator 経由の関係を強制)。(4.7) 未形式化・データ外。
+- 結論: milestone (真正 (6.6) setup のみへの帰着) は本 round 未到達 (3 fields とも interface 拡張 +
+  新規数学)。純益 = existence-half primitive (汎用・再利用可・λ-form の step 1)。
+  次 step = (a) `DadeChainStep` に joint-isometry field 追加で coefficient-value + integrality を載せ
+  `hY` 放電、(b) (4.7) 形式化で `hgen`、(c) `Dmem` 構成化で `hmemOrtho`。

@@ -1031,6 +1031,42 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
     - sorry/axiom 無; `#assert_only_allowed_axioms` 4 新規 (`pairUnion_succ_eq_union_pair`/
       `DadeChainStep.advance`/`DadeChainStep.chainStepAdvance`/`peterfalvi_66_coherence_of_X_from_dade`)
       全 3 axiom allowlist 内; full `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
+  - **`DadeChainStep` source-side fields 放電 — (5.6.1) existence-half primitive landing + 残余
+    精密化 (2026-05-31)**: 目標は `DadeChainStep` の source-side fields (`hY`/`hmemOrtho`/`hgen`) を
+    landed pieces で WIRE し、(6.6) coherence-of-X を 真正 (6.6) setup 仮説のみに帰着すること。
+    精査の結果、3 fields はいずれも *wiring-size* では放電不能 (roadmap の「clean wiring / pure
+    algebra」評価は誤り) で、各々 真正に新規の数学内容を要する。本 round では **最も基礎的かつ
+    完全 closable な (5.6.1) existence-half primitive** を landing:
+    - `OddOrder.RepresentationTheory.exists_orthogonalProjection_of_orthogonal_family`
+      (`OddOrder/GroupTheory/RepresentationTheory/ZIrrFourier.lean`, commit 741e769): 任意の `w` を
+      有限 orthogonal family `vᵢ` (実 gram `⟨vᵢ,vⱼ⟩=δᵢⱼmᵢ`, `mᵢ≠0`) 上に射影 —
+      `w = ∑ᵢ(⟨w,vᵢ⟩/mᵢ)•vᵢ + Z`, `Z ⊥ vⱼ`。純 diagonal Gram 射影 (completeness 不要)。
+      これは (5.6.1) λ-form `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z` の **存在半** (step 1)。
+      Pythagoras `inner_self_orthogonalSum_add_re` の sibling、AxiomsCheck 登録済、緑。
+    - **正直な残余 (各 field がなぜ wiring 不能か)**:
+      * `hY` (5.6.2 collapse `Da.Y = a•Da.tau1 chi1`): tautology ではない (roadmap 誤認)。
+        `Y_eq_nsmul_tau1_of_lambdaForm` は `hYform` (λ-form) を *消費*するが、その producer が無い。
+        producer の core 障害 = **joint-lattice isometry**: 係数計算 (mmd L79)
+        `aaᵢ‖χ₁‖² = ((χ−aχ₁)^τ, (χᵢ−aᵢχ₁)^τ)` は `χ−aχ₁` と `χᵢ−aᵢχ₁` を *同時に* 含む格子
+        `Z[S₁∪{χ−χ̄,χ−aχ₁}]` 上の等距を要するが、`Da.tau1_inner_eq_on_support` は `{χ,χ̄,ψ}` 上のみ。
+        `DadeChainStep` 現 fields はこの joint 等距を供給せず → interface 拡張 (joint 等距 field 追加)
+        無しには放電不能。existence-half (上記 primitive) は landing 済だが coefficient-value
+        (`λᵢ=λaᵢ/‖χᵢ‖²`) + integrality (`λ∈ℤ`) + joint-等距 transport が残る。
+      * `hmemOrtho` (`R(x) ⊥ R(χ)`): `Dmem` は `DadeChainStep` の **field (任意データ)**。任意データの
+        image family 直交性は構成法を知らずには証明不能。放電には `Dmem` も Dade 等距から *構成*
+        (`decompositionPairFromDade…`) し Dade `R(x) ⊥ R(χ)` を `x⊥{χ,χ̄}` から (4.1)型で導く必要 →
+        interface 変更 (Dmem を field でなく構成へ)。
+      * `hgen` (生成 `Z[S₁∪{χ,χ̄},A] ⊆ ℤ[Z[S₁,A]∪{χ−χ̄,χ−aχ₁}]`): pure module theory ではない
+        (roadmap 誤認)。(4.7) `Z[S,L^#]=Z[S,A]` を要する (χ 単体は A 上 supported とは限らず、
+        `mχ+nχ̄` の support 制約が差 generator 経由の関係を強制)。(4.7) は未形式化、`DadeChainStep`
+        のデータに無い。
+    - 結論: `peterfalvi_66_coherence_of_X` を 真正 (6.6) setup のみへ帰着する milestone は本 round 未到達
+      (3 fields とも interface 拡張 + 新規数学を要す)。本 round の純益 = (5.6.1) existence-half
+      primitive (汎用・再利用可・λ-form の step 1)。次 step 候補 = (a) `DadeChainStep` に joint-lattice
+      isometry field を足し coefficient-value 計算 + integrality を載せ `hY` 放電、(b) (4.7) 形式化で
+      `hgen`、(c) `Dmem` の Dade 構成化で `hmemOrtho`。
+    - sorry/axiom 無; primitive `#assert_only_allowed_axioms` 3 axiom allowlist 内; full
+      `lake build OddOrder` 緑 3360 jobs、`OddOrder.AxiomsCheck` 緑。
 
 ## 完了条件
 
