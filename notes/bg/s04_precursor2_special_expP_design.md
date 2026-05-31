@@ -1,13 +1,25 @@
 # BG §4 precursor(2): minimal ψ-invariant ⇒ special exp p (Gorenstein Thm 3.7/3.8/3.10)
 
-> ## 🔁 NEXT-SESSION HANDOFF (2026-05-31)
-> **次の一手 = Gorenstein Thm 3.7 を本ノート §「★ Thm 3.7 proof plan」の 7-step で書き切る** (~200行,
-> precursor(1) 本体と同型の assembly)。**全 infra は public/ready と確認済**(2-step stability
-> `coprime_actsTrivially_of_normal_and_quotient`@S01:670 / Thm 2.4`actionCommutator_eq_bot_of_omega1_le_fixedPoints`@CoprimeAbelianPGroup / Thm 3.5`fixedPoints_sup_actionCommutator_eq_top` / Thm 3.6`actionCommutator_restrict_self_map_subtype_eq`@OperatorQuotientAction / Maschke`OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient` を S=P' で / three-subgroups / `IsAInvariant.{derivedSeries,of_characteristic,quotientMulAutHom,…}`)。
-> 配置 = 新 BG file (例 `OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean`、downstream of OperatorMaschke/OperatorQuotientAction/CoprimeAbelianPGroup、OddOrder.lean に import 追加 + AxiomsCheck 登録)。
-> **⚠ G Thm 2.2 (homocyclic) は不要** (本ノート「⚠⚠ 重要発見」参照 — Thm 3.7 の elem-ab は Thm 2.4 を ⟨ψ⟩ に適用して出る)。
-> 着地後: Thm 3.8 (minimal D に 3.7、小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + stability 帰納) → **precursor(2)** `isSpecial_expP_of_minimal_pprime_action` → BG Lem 4.13 (q∣p²-1) → BG Lem 4.14 → **Thm 4.16 (Blackburn) apex**。
-> tracker = issue 0051 / queue #8.8。tree は緑 (3373 jobs, 実 sorry 2=S08 0046/S09 0044, BG 由来ゼロ)。
+> ## 🔁 NEXT-SESSION HANDOFF (2026-05-31 更新)
+> **✅ Gorenstein Thm 3.7 完成** (commit 9916cd4, `OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean`,
+> sorry-free + axiom-clean, 525行)。theorem 名 = `isSpecial_of_pprimeAction_trivialOnProper`
+> (namespace `OddOrder.BG.Ch1.S04`)。下記 7-step plan 通り、純 assembly で着地。
+> 結論 = (i) `commutator P ≤ center P` ∧ (ii.a) `IsElementaryAbelian p (P⧸commutator P)` ∧
+> (ii.b) irreducible 形 `∀ N, IsAInvariant φ N → commutator P ≤ N → N=commutator P ∨ N=⊤` ∧
+> (ii.c) `∃ g, (φ ψ) g * g⁻¹ ∉ commutator P` ∧ (iii) `IsSpecial p P`。
+> **設計上の一般化**: Gorenstein の「ψ≠1 + faithful」を **`hψ_ntriv : ¬∀g, φψ g=g`** (ψ が P 上非自明)
+> に置換 (faithfulness 不要、Thm 3.8 の minimal 選択がそのまま供給する)。helper: `fixerSubgroup`
+> (P′ の pointwise stabilizer, normal in A) / `acts_trivially_of_trivial_on_normal_quotient`
+> (single-element stability via ⟨ψ⟩) / `isAInvariant_actionCommutator_comp` ([P,B] A-inv for B◁A)。
+>
+> **次の一手 = Gorenstein Thm 3.8** (`OddOrder.BG.Ch1.S04` か新 file): A p′-群 on p-群 P, ψ∈A*。
+> `Q` = ψ が非自明に作用する **minimal A-不変部分群** (`Finite.exists_minimal` 系) を取り、
+> Q への制限作用 `φ.comp (...).toMulAutHom`-ish に **Thm 3.7 を適用**。Q minimal ⇒ hψ_proper
+> (proper A-inv normal 上 ψ trivial)、hψ_ntriv (Q 上非自明) が両方出る。⇒ Q special + A irred on
+> Q/Φ(Q) + ψ nontrivial on Q/Φ(Q) + ψ trivial on Φ(Q) (special では Φ(Q)=Q′)。**小規模**。
+> その後 Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + stability 帰納) → **precursor(2)**
+> `isSpecial_expP_of_minimal_pprime_action` → BG Lem 4.13 (q∣p²-1) → Lem 4.14 → **Thm 4.16 apex**。
+> tracker = issue 0051 / queue #8.8。tree 緑 (3374 jobs, 実 sorry 2=S08 0046/S09 0044, BG 由来ゼロ)。
 
 
 > 2026-05-31 作成。precursor(1) `pRank_le_two_of_scn3_empty` (= G Thm 4.15(i)) 完成 (commit c1d23e8)
@@ -106,7 +118,7 @@ Gorenstein は「A acts indecomposably on P̄ (**which is therefore homocyclic b
 - ✅ **Thm 3.5** (P=C·[P,A], 一般 P) = `fixedPoints_sup_actionCommutator_eq_top` (G p-群⇒solvable で hSolv 充足)。
 - ✅ **Thm 3.6** (`[[G,A],A]=[G,A]`) = `actionCommutator_restrict_self_map_subtype_eq`@`OperatorQuotientAction.lean:113` (coprime+solvable、既存; Thm 4.12(a) で構築済)。「=1⇒A=1」系は actionCommutator=⊥⟺acts_trivially (Ch04:2184)。
 - ✅ **Maschke** (elem ab で A-不変 complement / indecomposable⇒irreducible) = `OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient` を **S=P' で再利用** (P/P' elem ab なら Ω₁(P/P')=P/P' なので一般 Thm 3.3.2 不要)。
-- ⏳ **Thm 3.7** (核, 組立) → 3.8 → 3.10 → precursor(2)。
+- ✅ **Thm 3.7** (核, 組立) — 着地済 (commit 9916cd4, S04e_GorThm37.lean)。→ 次 3.8 → 3.10 → precursor(2)。
 
 ### ⇒ **precursor(2) は新規インフラ不要・純 assembly に確定** (precursor(1) と同型の状況)
 全 kernel が手元: Thm 2.4✅ / Thm 3.5✅ / Thm 3.6✅ / Maschke✅ / three-subgroups✅ / stability(Ch04:2184)✅ / 交換子恒等式(Ch04/mathlib)。残りは **Thm 3.7/3.8/3.10/precursor(2) の証明組立のみ** (有限 abelian 構造論・homocyclic は完全に不要)。Thm 3.7 assembly ~150-250行 (dedicated session 推奨; cold-start は本ノート §「Thm 3.7 proof architecture」+ Gorenstein L3835-3925)。
@@ -137,8 +149,13 @@ Gorenstein は「A acts indecomposably on P̄ (**which is therefore homocyclic b
 6. **(i) P'⊆Z(P)**: B=`normalClosure {ψ}`@A、B trivial on P'。H=actionCommutator(B制限)... H⊆P'⇒[P,B,B]=1⇒B=1(Thm3.6系)⇒ψ∈B=1矛盾; H⊊P⇒H̄ nontrivial A-inv⇒=P̄(irred)、ψ trivial H⇒trivial P̄矛盾。∴H=[P,B]=P。[P',P,B]=1,[B,P',P]=1⇒[P,B,P']=1(three-sub)⇒[P,P']=1⇒P'⊆Z。
 7. **(iii) special**: P not elem ab ⇒ P'≠1、Z̄ proper A-inv⇒=1(irred)⇒Z=P'(class2)、Φ̄ 同様⇒Φ=P'。[x,y]=z∈P'=Z、[x,y^p]=z^p、y^p∈P'(P̄ elem ab)⇒z^p=1⇒[x,y]^p=1⇒P' elem ab。
 
-**規模 ~200行、dedicated session 推奨** (infra は全 ready なので precursor(1) body と同型の「assembly」)。
-次 = **Thm 3.7 を上記 plan で一気に**。その後 Thm 3.8 (minimal D に 3.7、~小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + 3.2 帰納) → precursor(2)。
+**✅ 着地済** (実際 525行、commit 9916cd4)。infra は全 ready で precursor(1) body と同型の純 assembly だった。
+次 = **Thm 3.8** (minimal D に 3.7 適用、~小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + 3.2 帰納) → precursor(2)。
+**Thm 3.8 着手メモ**: minimal A-不変部分群 Q (ψ 非自明) を `Finite.exists_minimal`-系で取り、Q への制限作用
+`hQinv.toMulAutHom : A →* MulAut ↥Q` に `isSpecial_of_pprimeAction_trivialOnProper` を適用。
+hψ_ntriv (Q 上非自明) は Q の選択から、hψ_proper (proper A-inv normal 上 ψ trivial) は Q minimality から。
+注: 制限作用の hψ_ntriv/hψ_proper を ↥Q の subgroup ↔ Q の subgroup 対応で言い換える plumbing が要 (S04e の
+hψ_triv_proper_bar / correspondence と同型)。special なら Φ(Q)=Q′ なので "irred on Q/Φ(Q)" = (ii.b)。
 
 ## (旧・参考) G Thm 2.2 (indecomposable ⇒ homocyclic) ※precursor(2)には不要
 
