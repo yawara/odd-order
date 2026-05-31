@@ -86,6 +86,15 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 → **Thm 4.12(a) の a-2 ビルディングブロック全完**。次 frontier = **D-a3 (Maschke 統合 `Ω₁(R/S)=Ω₁(R)S/S`)** (gate: D-a2✅ / N-4 Maschke✅ / Lem4.10✅ / LEAF-4✅ 全揃い) → D-main (|R|帰納) → D-bc。S⊴R は R'⊆S から即。
 
+**Prop 4.11 (Huppert) 完全形式化完了** (2026-05-31, 逐次分解 workflow `bg-prove` ×3, 全 PASS 独立監査済) — §4 第2の山:
+
+- ✅ (4.7) lift `exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime` (be039f2): metacyclic 商 R/⟨z⟩ ⇒ ⟨a,z⟩◁R, R'⊆⟨a,z⟩, R=⟨a,b,z⟩, ⟨a,z⟩/⟨z⟩・R/⟨a,z⟩ cyclic (K-bundle 形)。
+- ✅ step8 `isMetacyclic_of_isCyclic_commutator_of_card_omega1_le` (630cd73): R' cyclic + |Ω₁|≤p² + Odd p ⇒ metacyclic (maximal cyclic S + Lem4.5(b) + 唯一 order-p 部分群 ⇒ R/S cyclic)。
+- ✅ main `isMetacyclic_of_omega1_card_le_prime_sq` (0ed392e, S04c, faithful 追加仮説0): |R|強帰納で 8 step 統合 (abelian base + (4.7)lift + Lem4.9 + 𝒰¹(R') 分岐: ≠⊥⇒K=⟨a⟩cyclic / =⊥⇒[a,b]∈Z⇒R'cyclic→step8)。新 private helper 4個 (Cauchy/closure-form/STEP4+5 bundle) 全て β 出力等から genuine discharge。
+- 全 sorry-free / axiom-clean (`[propext, Classical.choice, Quot.sound]`) / `lake build OddOrder` green 3362 jobs。S04c_Prop411.lean 1150 行。
+
+→ **Thm 4.16 Case A の gate (Prop4.11 + Thm4.12) が両方開いた**。Thm4.16 残ゲート = **Lem 4.13/4.14** (q∣\|Aut R\|⇒q∣p²-1, q<p; ⚠ "Lem4.7 and **G** Thm5.4.15" の Gorenstein行間)。
+
 ## 完了条件
 
 - BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
