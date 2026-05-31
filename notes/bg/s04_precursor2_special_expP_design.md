@@ -151,11 +151,33 @@ Gorenstein は「A acts indecomposably on P̄ (**which is therefore homocyclic b
 
 **✅ 着地済** (実際 525行、commit 9916cd4)。infra は全 ready で precursor(1) body と同型の純 assembly だった。
 次 = **Thm 3.8** (minimal D に 3.7 適用、~小) → Thm 3.10 (Ω₁自明⇒trivial, p odd; Lem 3.9 + 3.7 + 3.2 帰納) → precursor(2)。
-**Thm 3.8 着手メモ**: minimal A-不変部分群 Q (ψ 非自明) を `Finite.exists_minimal`-系で取り、Q への制限作用
-`hQinv.toMulAutHom : A →* MulAut ↥Q` に `isSpecial_of_pprimeAction_trivialOnProper` を適用。
-hψ_ntriv (Q 上非自明) は Q の選択から、hψ_proper (proper A-inv normal 上 ψ trivial) は Q minimality から。
-注: 制限作用の hψ_ntriv/hψ_proper を ↥Q の subgroup ↔ Q の subgroup 対応で言い換える plumbing が要 (S04e の
-hψ_triv_proper_bar / correspondence と同型)。special なら Φ(Q)=Q′ なので "irred on Q/Φ(Q)" = (ii.b)。
+**✅ Thm 3.8 完成** (commit 5cbe0ef, S04e): `exists_minimal_aInvariant_isSpecial_of_pprimeAction`
+= ψ 非自明 ⇒ ∃ Q, A-不変 ∧ (ψ 非自明 on Q) ∧ `IsSpecial p ↥Q` ∧ minimality。
+`Set.Finite.exists_minimal` で最小 Q を取り `hQ_inv.restrict` に Thm 3.7 適用、minimality⇒hψ_proper。
+
+## ⚠⚠⚠ 大発見 (2026-05-31): **full Gorenstein Thm 3.10 は precursor(2) に不要**
+
+Thm 3.10 (一般 p-群 P で A が Ω₁(P) 上自明 ⇒ A=1) は **型多相 |P| 帰納** が必要な【大】定理だが、
+**precursor(2) が要るのはその特殊形「minimal special D + 単一 ψ」だけ**で、これは帰納なしで出る:
+full Thm 3.10 の帰納は「A が proper 部分群上自明」を作るが、**minimal D では minimality が
+「ψ は D′=commutator D 上自明」(D′⊊D A-不変) を直接供給**する (D は Thm 3.8 で既に special なので
+Thm 3.7 再適用も不要)。⇒ **precursor(2) は Thm 3.8 + 下記 exp-p 引数で直接到達、full Thm 3.10 は飛ばす**
+(一般 Thm 3.10 は Thm 3.13=critical subgroup でしか使われず、それは repo `thompson_critical_omega` で済)。
+
+**precursor(2) `isExpP_of_minimal_special` 攻略 (次の一手)**: D = Thm 3.8 の minimal special Q。
+1. **Lem 3.9(ii) helper** (`(xy)^p=x^p y^p`, class≤2 ∧ ∀g g^p∈Z ∧ p odd): `mul_pow_of_class_le_two`@Ch04:1414
+   ((xy)^n=x^n y^n ⁅y,x⁆^(n(n-1)/2)) + `commutatorElement_pow_left_of_central`@S04_PGroupsSmallRank
+   (⁅y^p,x⁆=⁅y,x⁆^p, central) で ⁅y,x⁆^p=⁅y^p,x⁆=1 (y^p∈Z) + p odd ⇒ p∣p(p-1)/2 ⇒ 末項=1。
+2. **Ω₁(↥D)=⊤**: 否定 ⇒ Ω₁(↥D) char/A-不変/proper ⇒ map で D の proper A-不変部分群 ⇒ minimality で
+   ψ trivial on Ω₁(D)。次に **[D,ψ]⊆Ω₁(D)**: ∀g, u:=g⁻¹·φ(ψ)g に対し u^p = (g^p)⁻¹·φ(ψ)(g^p)
+   (Lem3.9(ii), φψ hom) で g^p∈D′ (D/D′ elem ab) ∧ **ψ trivial on D′** (minimality, D′⊊D A-inv) ⇒
+   φ(ψ)(g^p)=g^p ⇒ u^p=1 ⇒ u∈Ω₁(D)。`actionCommutator_le_iff_left` で [D,ψ]⊆Ω₁(D)。
+   ⇒ ψ stabilizes D⊇Ω₁(D)⊇1 ⇒ **stability** (`coprime_actsTrivially_of_normal_and_quotient`,⟨ψ⟩ へ,
+   既 helper `acts_trivially_of_trivial_on_normal_quotient` 流用可) ⇒ ψ trivial on D、ψ 非自明に矛盾。
+3. **exp p**: Ω₁(↥D)=⊤ + class≤2 + p odd ⇒ `Omega.exponent_eq_of_class_le_two`@CriticalSubgroup で
+   `Monoid.exponent ↥D = p`。
+⇒ precursor(2) = `IsSpecial p ↥D ∧ Monoid.exponent ↥D = p` (= D special exp p)。→ BG Lem 4.13。
+全 infra ready (Lem3.9(i)(ii)/stability/Thm3.8/actionCommutator API)。型多相帰納は **回避**。
 
 ## (旧・参考) G Thm 2.2 (indecomposable ⇒ homocyclic) ※precursor(2)には不要
 
