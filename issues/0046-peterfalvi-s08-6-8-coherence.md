@@ -1083,3 +1083,64 @@ G2.7 への最基礎の一個 = **(5.2.d) `R(χ)` の producer**。§3 (1.4) key
 - file: `OddOrder/Peterfalvi/S07_Coherence.lean` (IsCoherent, IntegralCharacterMap)
 - mmd: `references/peterfalvi/04.8_pp_30_37_Some_Coherence_Theorems.mmd` L136 以降
 - mmd: `references/peterfalvi/04.9_pp_38_43_*.mmd` L133-135 (consumer 使用箇所)
+
+---
+
+## 🔁 HANDOFF (2026-05-31, 別セッション引き継ぎ) — branch `claude/naughty-nash-c3ffc7` @ `698bc25`
+
+**状態**: build green (`lake build OddOrder OddOrder.AxiomsCheck`)、tree clean。実 sorry は 2 個のみ:
+`S08_CoherenceTheorems.lean:193` (`sibleySetup_is_coherent` = (6.8))、`S09_NonexistenceCertain.lean:1596` ((7.10))。
+
+### ここまでに構成済み (§4-§6 coherence engine、全て sorry-free/axiom-clean)
+- **§4 Dade 等距 = `FullDadeIsometryData`** (issue 0040 closed) — `(2.6)` 実構成。
+- **§5 coherence hub (5.4)/(5.5)/(5.6)** — `retarget_isCoherent` (S07)、lattice-relative `IsCoherent`
+  (`extension_inner_eq`、Round-13 弱化済)、`coherentUnion_of_glued` (2族 assembler)、`coherentPairChain` ((5.6) 反復engine)。
+- **§6 (6.6) coherence-of-X を実 Dade τ で instantiate** = `peterfalvi_66_coherence_of_X_from_dade` (S07 ~L4285)。
+  opaque hstep は除去済。残るのは per-step `DadeChainStep` (S07 ~L4106) の field を genuine (6.6) data から discharge すること。
+- **型ブリッジ G2.7**: `dadeIntegralCharacterMap` (S07 ~L3640) = Dade 写像を total ℤ-linear に lift。
+  `decompositionPairFromDadeOfIrreducible` (~L3927) = per-step (D₀,Da) producer。
+  `dadeOrthonormalCharacterImageFamily` (~L3794) = R(χ) producer。
+- **DadeChainStep field 進捗**: `hgen` discharge 済 (Round 27)。**`hmemOrtho` content 済** (本日 698bc25:
+  `dadeOrthonormalCharacterImageFamily_orthogonal` + `dadeIntegralCharacterMap_inner_conjDifference_eq_zero`、S07 ~L3863)。
+  `Dmem`/`hmemTau1Base` は `decompositionPairFromDadeOfIrreducible` でほぼ定義的。
+
+### 🎯 次の crux = `DadeChainStep.hY` = Peterfalvi (5.6.1) λ-form 定理
+**目標**: `Da.Y = a • Da.tau1 χ₁` ((5.6.2) collapse) を構成し、`DadeChainStep.hY` field を埋める。
+最終段 `Y_eq_nsmul_tau1_of_lambdaForm` (S07 ~L1801) は λ-form を仮説 `hYform` に取り collapse する — **要は `hYform`
+((5.6.1) λ-form `Y = a·χ₁^{τ₁} − λ·∑ᵢ(aᵢ/‖χᵢ‖²)·χᵢ^{τ₁} + Z`, λ∈ℤ) を生成する (5.6.1) 定理本体が残**。
+
+**部品 (全て landed)**: `exists_orthogonalProjection_of_orthogonal_family` (ZIrrFourier、射影 primitive)、
+`CharacterFamilyBundle` + `crossDifference_inner` (S07 ~L3542、source-side `⟨χ−aχ₁, χᵢ−aᵢχ₁⟩ = a·aᵢ‖χ₁‖²`)、
+`Y_eq_nsmul_tau1_of_lambdaForm`、`lambda_eq_zero_and_Z_eq_zero` (整数 forcing)、gap leaf `two_mul_lt_sq_of_primePow_gap`、
+degree-sum `sumInflatedDegreeSq`。
+
+**⚠️ 繊細な点 (ここで間違えやすい — 教科書 04.7 mmd L86-105 を精読のこと)**:
+(5.6.1) の係数計算は **full running 等距 `τ₁` (= `hS₁.extension`、S₁ 全体で等距)** を使う。per-pair の
+`Da.tau1` (span{χ,χ̄,a·χ₁} 上のみ lattice-relative 等距) と**混同すると λ=0 が自明に出て破綻する**(両者は overlap χ₁,
+χ−χ̄ 上で一致)。正しい導出: 各 i≠i₁ で `⟨−Y, χᵢ^{τ₁} − aᵢ·χ₁^{τ₁}⟩ = a·aᵢ‖χ₁‖²` (= crossDifference_inner を
+τ₁ 等距で image 側へ transport) から `λᵢ = λ₁·aᵢ‖χ₁‖²/‖χᵢ‖² = λ·aᵢ/‖χᵢ‖²` (λ := λ₁‖χ₁‖²)。λ₁ は自由で、
+`(Y,χ₁^{τ₁}) = (a − λ/‖χ₁‖²)‖χ₁‖² ∈ ℤ` より λ∈ℤ。collapse は (5.6.2): `‖Y‖²≤a²‖χ₁‖²` + degree 不等式 (c)
+`2a < ∑aᵢ²/‖χᵢ‖²` ⇒ `λ²−bλ≤0, 0<b<1` ⇒ λ=0。これは~数十-100行の careful な補題。
+
+### その後の経路 (honest 見積り: S08:193 まで数セッション)
+1. `hY` 完成後 → **`DadeChainStep.ofGenuine` constructor** (~25 field を genuine (6.6) data から discharge)。
+2. **(6.8) capstone** (最重・未 scaffold、mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B (Z=W₂) split、
+   各 case で (6.6) coherence-of-X + 中心 coherence を `coherentUnion_of_glued` で結合、SibleySetup の data を
+   per-step `DadeChainStep` stream + 列挙/cover/base に wire → `sibleySetup_is_coherent` (S08:193) を discharge。
+3. その後 **S09:1596** ((7.10) `card_G0_lower_bound`、上記 coherence + (7.x) 評価)。
+
+### 運用上の制約 (厳守)
+- **共有 `main` は触らない** (ユーザー firm 指示)。作業は worktree `…/.claude/worktrees/naughty-nash-c3ffc7` の
+  branch `claude/naughty-nash-c3ffc7` のみ。`/home/ywr/odd-order/OddOrder/...` (primary=main) は OFF LIMITS。
+- coherence isometry field の **global→lattice-relative 弱化は durably authorized** (Round 13/25、`IsCoherent`/
+  `CharacterPsiDecomposition.tau1_isometry` が前例; FT で `dim CF(L)>dim CF(G)` ゆえ全域等距は非存在)。
+- NO sorry/admit/axiom、scaffolding 禁止 (hard content を仮説に逃がさない、memory `scaffold-sorry-free-not-done`)、
+  thin wrapper 禁止、AxiomsCheck 登録、commit は green 単位ごと + 末尾 `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`。
+- 進め方の知見: ループ workflow より**単一集中セッション (直接編集 + leaf build `lake build OddOrder.Peterfalvi.S07_Coherence`)**
+  が深い鎖には速い (再読込/decompose-report オーバーヘッド無し)。memory `peterfalvi-frontier-workflow-pattern` 参照。
+
+### 主要ファイル
+- `OddOrder/Peterfalvi/S07_Coherence.lean` (coherence engine 4310+ 行; DadeChainStep ~L4106, from_dade ~L4285,
+  Y_eq_nsmul_tau1_of_lambdaForm ~L1801, CharacterFamilyBundle ~L3542, (5.2.e) Dade lemmas ~L3863)。
+- `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:193` (sorry, SibleySetup/CoherenceTarget)。
+- `references/peterfalvi/04.7_pp_25_29_Coherence.mmd` (L86-105 = (5.6.1)/(5.6.2) 証明) / `04.8_*` (L150- = (6.8) case split)。
