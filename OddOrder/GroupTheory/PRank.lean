@@ -292,6 +292,48 @@ theorem card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq
   rw [hcardE] at hcard
   exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hcard
 
+/-- **GL number-theory kernel for BG Lemma 4.13 / Gorenstein Theorem 4.15(ii).** Let `E` be an
+elementary abelian `p`-group of order `≤ p²` and `σ : MulAut E` an automorphism of prime order
+`q ≠ p`. Then `q ∣ p² - 1`.
+
+Here `Aut(E) = GL(m, p)` with `m = m(E) ≤ 2`, and `|GL(m, p)| = ∏_{i<m}(pᵐ - pⁱ)`. For `m ≤ 2`
+the `p`-free part of this order divides `(p² - 1)(p - 1)`, so a prime `q ≠ p` dividing it divides
+`p² - 1` (using `p - 1 ∣ p² - 1`). This is the rank-`≤ 2` half of BG's `q ∣ p² - 1` and is used
+once `q` is realized as acting on the elementary abelian quotient `D / Φ(D)` of the minimal
+special subgroup `D` of precursor 2. -/
+theorem prime_dvd_prime_sq_sub_one_of_orderOf_mulAut {p q : ℕ} [Fact p.Prime] (hq : q.Prime)
+    (hqp : q ≠ p) {E : Type*} [Group E] [Finite E] (hE : IsElementaryAbelian p E)
+    (hcard : Nat.card E ≤ p ^ 2) {σ : MulAut E} (hσ : orderOf σ = q) :
+    q ∣ p ^ 2 - 1 := by
+  have hp := (Fact.out : p.Prime)
+  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  letI := hE.zmodModule
+  -- `q = |σ| ∣ |MulAut E| = ∏_{i<n}(pⁿ - pⁱ)`, `n = m(E) ≤ 2`.
+  set n := Module.finrank (ZMod p) (Additive E) with hn
+  have hcardE : Nat.card E = p ^ n := hE.card_eq_pow_finrank
+  have hn2 : n ≤ 2 := (Nat.pow_le_pow_iff_right hp.one_lt).mp (hcardE ▸ hcard)
+  have hqdvd : q ∣ ∏ i : Fin n, (p ^ n - p ^ (i : ℕ)) := by
+    rw [← hE.card_mulAut, ← hσ]; exact orderOf_dvd_natCard σ
+  -- `p - 1 ∣ p² - 1`.
+  have hp1dvd : p - 1 ∣ p ^ 2 - 1 := by
+    rcases p with _ | b
+    · simp
+    · rw [Nat.succ_sub_one, show (b + 1) ^ 2 = b * (b + 2) + 1 from by ring, Nat.add_sub_cancel]
+      exact dvd_mul_right b (b + 2)
+  -- Split on `m(E) ∈ {0, 1, 2}`.
+  interval_cases n
+  · simp only [Finset.univ_eq_empty, Finset.prod_empty, Nat.dvd_one] at hqdvd
+    exact absurd hqdvd hq.ne_one
+  · simp only [Fin.prod_univ_one, Fin.val_zero, pow_zero, pow_one] at hqdvd
+    exact hqdvd.trans hp1dvd
+  · simp only [Fin.prod_univ_two, Fin.val_zero, Fin.val_one, pow_zero, pow_one,
+      show p ^ 2 - p = p * (p - 1) from by rw [Nat.mul_sub_one, pow_two]] at hqdvd
+    rcases hq.dvd_mul.mp hqdvd with h1 | h2
+    · exact h1
+    · rcases hq.dvd_mul.mp h2 with hpp | hp1
+      · exact absurd ((Nat.prime_dvd_prime_iff_eq hq hp).mp hpp) hqp
+      · exact hp1.trans hp1dvd
+
 end AutGL
 
 variable (G : Type*) [Group G]
