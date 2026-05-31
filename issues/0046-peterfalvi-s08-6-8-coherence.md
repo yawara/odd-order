@@ -1151,18 +1151,36 @@ posited `hY` フィールドは `DadeChainStep` から除去され、真正 (6.6
 クリア済 — `Y_collapse_of_family` は `hiso_fam` (running 等距の族直交性) を仮説に取り、全 scalar が実ゆえ
 conjugation で破綻しない。
 
-### 🎯 次の crux = (6.8) capstone (`sibleySetup_is_coherent`, S08:188)
-(6.6) coherence-of-X (`peterfalvi_66_coherence_of_X_from_dade`) が実 Dade τ で **image-side posit ゼロ**の
-完全 constructive に到達したので、残るは:
-1. **(6.8) capstone** (最重・未 scaffold、mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B
-   (Z=W₂) split、各 case で (6.6) coherence-of-X + 中心 coherence を `coherentUnion_of_glued` で結合、
-   SibleySetup の data を per-step `DadeChainStep` stream (= famS/famRatio/famDegree/famPairwise/hdeg_c 等の
-   真正 source-side data) + 列挙/cover/base に wire → `sibleySetup_is_coherent` (S08:188) を discharge。
-   **`DadeChainStep` 構築 = 全フィールドが genuine (6.6) 列挙データ**ゆえ、(6.8) の文字次数列挙が直接供給する。
-2. その後 **S09:1589** ((7.10) `card_G0_lower_bound`、上記 coherence + (7.x) 評価)。
+### ✅ 追加で解決: (5.2.d) base coherence seed (chain の `h0`) — commit `c265a3c`
+(6.8) prerequisite を調査中に発見した **構造的ギャップ**を解消: 全 coherence producer
+(`coherentPairChain`/`retarget_isCoherent_fromDade`/`peterfalvi_66_coherence_of_X_from_dade`/
+`coherentUnion_of_glued`) は prior `IsCoherent` (`h0`/`hS₁`) を **consume するのみで construct しない**
+— 最小種 `IsCoherent τ {χ,χ̄} A` (1 共役対) を作る base case が皆無だった。これを実装:
+- `zSupportedSpan_pair_subset_span`: `Z[{χ,χ̄}]` の supported 部分は `χ−χ̄` で生成 (supported ⟹ 1 で
+  消える (`1∉A`)、equal degree `χ̄(1)=χ(1)≠0` で `m+n=0`)。`adjoinPair` の `S₁=∅` 版 (χ₁ で χ を
+  再構成できないため vanish-at-1 論法)。
+- `coherentPair`: orthonormal target pair `{X,X̄}` (`X̄=X−τ(χ−χ̄)`) から `IsCoherent τ {χ,χ̄} A`。
+  (5.6.3) retarget の `S₁=∅` 退化 (`retarget`/`retarget_inner_eq_on_zSpan_union`、残差消滅)。
+- `coherentPair_fromDade`: 実 Dade τ での seed。`R(χ)` (ψ=0 分解 + `retargetTargetPair`) が `{X,X̄}` を、
+  generation は `irreducibleCharacter_apply_one_eq_pos_natCast`/`_conj_apply_one`/`1∉A` で供給。
+sorry/axiom 無、AxiomsCheck 3 件登録、full build 緑 3360 jobs。
 
-**主要 landed 部品 (S07)**: `peterfalvi_66_coherence_of_X_from_dade` (~L4400+、実 Dade τ で coherence-of-X)、
-`DadeChainStep` (~L4489、全 genuine フィールド) + `.advance`/`.chainStepAdvance`、
+### 🎯 次の crux = (6.8) capstone (`sibleySetup_is_coherent`, S08:188)
+(6.6) coherence-of-X が image-side posit ゼロの完全 constructive、かつ chain の base seed
+(`coherentPair_fromDade`) も landed したので、残るは:
+1. **Y-coherence** (`Y = S(H')` = equal-degree irreducibles): seed `coherentPair_fromDade` を `h0` に、
+   `DadeChainStep.advance` を全 degree-ratio = 1 (equal degree) で反復。famRatio≡1, hdeg_c は
+   `2·1 < ∑1/‖χᵢ‖² = m` (m≥3) で成立。= `peterfalvi_66_coherence_of_X_from_dade` の equal-degree
+   instantiation (wiring、新 infra 不要)。
+2. **(6.8) capstone** (mmd 04.8 L150-): H 非可換 p群の case-A (Z=Z(H)∩[H,H]) / case-B (Z=W₂) split、
+   各 case で (6.6) coherence-of-X (`peterfalvi_66_coherence_of_X_from_dade`) + Y-coherence を
+   `coherentUnion_of_glued` で結合。**未形式化の前提**: (6.5) (非可換 p群への還元)、(6.7) (合同
+   `ψ(z)≡ψ(1) mod |H|`、class-algebra 論法、self-contained だが ~300 行)、Isaacs Thm 6.34/Lemma 7.7/2.27。
+   → `sibleySetup_is_coherent` (S08:188) を discharge。
+3. その後 **S09:1589** ((7.10) `card_G0_lower_bound`)。
+
+**主要 landed 部品 (S07)**: `coherentPair_fromDade` (base seed `h0`)、`peterfalvi_66_coherence_of_X_from_dade`
+(coherence-of-X)、`DadeChainStep` (~L4489、全 genuine フィールド) + `.advance`/`.chainStepAdvance`、
 `Y_collapse_of_family`/`dade_Y_collapse_of_family` (5.6.1 producer)、`coherentUnion_of_glued` (2族 assembler)。
 
 ### 運用上の制約 (厳守)
