@@ -271,4 +271,46 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
       IsUniquelyMaximal (Subgroup.normalizer (X : Set G) ⊓ (P : Subgroup G))) := by
   sorry
 
+/-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
+
+/-- **BG Corollary 10.9 (a)(1)(2)** (mmd L2826): `M ∈ ℳ`, `p, q ∈ β(M)'` distinct, `X` を `M` の
+`q`-部分群で `X ⊆ M'` または `p < q` とする。(1) `X` は `M_σ` の Sylow `p`-部分群を中心化する;
+(2) `p ∈ α(M)` なら `C_M(X) ∈ 𝒰`。(原典 (a)(3) と (b) `M = M_β(H∩M)` は後続。) -/
+theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hpβ : p ∉ beta M) (hqβ : q ∉ beta M)
+    {X : Subgroup G} (hXM : X ≤ M) (hXq : IsPGroup q ↥X)
+    (hcase : X ≤ Ch2.S07.derivedInG M ∨ p < q) :
+    (∃ S : Sylow p ↥(Msigma M),
+      X ≤ Subgroup.centralizer
+        (((S : Subgroup ↥(Msigma M)).map (Msigma M).subtype : Subgroup G) : Set G)) ∧
+    (p ∈ alpha M → IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M)) := by
+  sorry
+
+/-! ## Proposition 10.10 — N_G(P) の分解 (mmd L2844) -/
+
+/-- **BG Proposition 10.10 (a)(b)(c)** (mmd L2844): `p ≠ q`, `A ∈ ℰ_p²(G)∩ℰ_p*(G)`,
+`Q ∈ ℋ_G*(A;q)`, `q ∈ π(C_G(A))`。すると `A ⊆ P` となるある `P ∈ Syl_p(G)` で、
+(a) `N_G(P) = O_{p'}(C_G(P))·(N_G(P)∩N_G(Q))`; (b) `P ⊆ N_G(Q)'`;
+(c) `Q` が cyclic または `ℰ²(Q)∩ℰ*(Q) ≠ ∅` なら `P` は `Q` を中心化する。 -/
+theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAmax : IsMaximalElementaryAbelian p A)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ A {q})
+    (hqc : q ∈ (Nat.card ↥(Subgroup.centralizer (A : Set G))).primeFactors) :
+    ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧
+      (∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G),
+        ∃ c ∈ Ch2.S07.opiCoreInG {p}ᶜ (Subgroup.centralizer ((P : Subgroup G) : Set G)),
+          ∃ m ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) ⊓
+            Subgroup.normalizer (Q : Set G), n = c * m) ∧
+      (P : Subgroup G) ≤ Ch2.S07.derivedInG (Subgroup.normalizer (Q : Set G)) ∧
+      ((IsCyclic ↥Q ∨ ∃ B : Subgroup ↥Q, Nat.card ↥B = q ^ 2 ∧ IsMaximalElementaryAbelian q B) →
+        (P : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) := by
+  sorry
+
+-- **TODO (BG Lemma 10.13)** (mmd L2885 付近): `A∈ℰ_p²(G)∩ℰ_p*(G)`, `P` nonabelian `p`-群 ⊇ `A`,
+-- `Z₀=Ω₁(Z(P))`, `A₀∈ℰ¹(A)`, `A₀≠Z₀` ⇒ (a) `Z₀∈ℰ¹(A)`; (b) `C_P(A)=A₀×Z` (`Z` cyclic ⊇`Z₀`);
+-- (c) `N_P(A)` は `ℰ¹(A)−{Z₀}` 上推移的。`Ω₁(Z(P))` の入れ子 + 内部直積 `A₀×Z` + 推移性の faithful
+-- encoding を要するため後続 (Ω₁/centralizer の subtype-map 整備後)。
+
 end OddOrder.BG.Ch3.S10
