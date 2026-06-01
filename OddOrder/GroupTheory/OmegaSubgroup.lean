@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Algebra.Group.Subgroup.Map
+import OddOrder.GroupTheory.PRank
 
 /-!
 # Omega Subgroups
@@ -219,5 +220,41 @@ theorem pow_eq_one_of_mem_omega1OfAbelian {H : Subgroup G} {p : ℕ}
     {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} {g : G}
     (hg : g ∈ omega1OfAbelian G H p hH) : g ^ p = 1 :=
   hg.2
+
+/-- If an abelian subgroup `H` has `p`-rank at least `n > 0`, then
+`p^n` divides the order of its ambient `Ω₁(H)`.
+
+The proof takes an elementary abelian witness inside `H`, maps it into the ambient group,
+and observes that its image lies in `omega1OfAbelian G H p hH`. -/
+theorem pow_dvd_card_omega1OfAbelian_of_pos_le_pRank [Finite G]
+    {H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} {n : ℕ}
+    (hnpos : 0 < n) (hn : n ≤ pRank H p) :
+    p ^ n ∣ Nat.card (omega1OfAbelian G H p hH) := by
+  obtain ⟨E, hE, hlog⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := H) (p := p) hnpos hn
+  let K : Subgroup G := E.map H.subtype
+  have hK_le : K ≤ omega1OfAbelian G H p hH := by
+    rintro x ⟨e, heE, rfl⟩
+    refine (mem_omega1OfAbelian).mpr ⟨e.2, ?_⟩
+    change ((e : H) : G) ^ p = 1
+    have hepowH : (e : H) ^ p = 1 := by
+      exact congrArg Subtype.val (hE.pow_eq_one ⟨e, heE⟩)
+    exact congrArg Subtype.val hepowH
+  have hK_card : Nat.card K = Nat.card E :=
+    Subgroup.card_map_of_injective H.subtype_injective
+  have hE_card := hE.card_eq_pow_finrank
+  have hE_log := hE.log_card_eq_finrank
+  have hpow_dvd_E : p ^ n ∣ Nat.card E := by
+    rw [hE_card]
+    exact pow_dvd_pow p (by simpa [hE_log] using hlog)
+  have hE_dvd_omega : Nat.card E ∣ Nat.card (omega1OfAbelian G H p hH) := by
+    have hsub : Nat.card (K.subgroupOf (omega1OfAbelian G H p hH)) ∣
+        Nat.card (omega1OfAbelian G H p hH) :=
+      Subgroup.card_subgroup_dvd_card (K.subgroupOf (omega1OfAbelian G H p hH))
+    have hsub_card : Nat.card (K.subgroupOf (omega1OfAbelian G H p hH)) = Nat.card K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK_le).toEquiv
+    rwa [hsub_card, hK_card] at hsub
+  exact hpow_dvd_E.trans hE_dvd_omega
 
 end OddOrder.GroupTheory

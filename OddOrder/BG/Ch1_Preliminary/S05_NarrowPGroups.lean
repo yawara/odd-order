@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.PLength
@@ -55,6 +56,7 @@ namespace OddOrder.BG.Ch1.S05
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open scoped IsMulCommutative
 
 variable {R : Type*} [Group R]
 
@@ -76,6 +78,51 @@ theorem scn3_nonempty_of_three_le_pRank [Finite R] {p : ℕ} [Fact p.Prime]
   by_contra hcon
   rw [not_exists] at hcon
   exact absurd (S04.pRank_le_two_of_scn3_empty hp hpg hcon) (by omega)
+
+/-- **BG Lemma 5.1(b), first construction step**: from an `SCN₃` subgroup `A`,
+BG Lemma 1.22 produces a normal elementary abelian subgroup of order `p³`.
+
+This packages the textbook line “by (a) and Lemma 1.22, there exists a normal elementary
+abelian subgroup `B` of order `p³` in `R`”: use `3 ≤ pRank A p` to see that `p³` divides
+`|Ω₁(A)|`, then apply Lemma 1.22 inside the normal subgroup `Ω₁(A)`. -/
+theorem exists_normal_isElementaryAbelian_card_prime_cube_of_scn3
+    [Finite R] {p : ℕ} [Fact p.Prime] (hpg : IsPGroup p R)
+    {A : Subgroup R} (hA : IsSCN₃ p A) :
+    ∃ B : Subgroup R, B.Normal ∧ B.IsElementaryAbelian p ∧ Nat.card B = p ^ 3 := by
+  have hA_scn : IsSCN A := hA.isSCN
+  have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := by
+    letI : IsMulCommutative A := hA_scn.isMulCommutative
+    intro x hx y hy
+    exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : A) ⟨y, hy⟩)
+  set H : Subgroup R := omega1OfAbelian R A p hA_comm with hHdef
+  have hH_le_A : H ≤ A := by
+    simpa [hHdef] using
+      (omega1OfAbelian_le (G := R) (H := A) (p := p) (hH := hA_comm))
+  have hH_normal : H.Normal := by
+    refine { conj_mem := fun h hh g => ?_ }
+    have hh' : h ∈ A ∧ h ^ p = 1 := by simpa [hHdef] using hh
+    rw [hHdef]
+    refine (mem_omega1OfAbelian).mpr ⟨hA_scn.isNormal.conj_mem h hh'.1 g, ?_⟩
+    calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
+      _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
+  have hH_elem : H.IsElementaryAbelian p := by
+    rw [hHdef]
+    exact
+      ⟨fun x y => Subtype.ext (hA_comm x.val x.2.1 y.val y.2.1),
+       fun x => Subtype.ext (by simpa using pow_eq_one_of_mem_omega1OfAbelian x.2)⟩
+  have hH_dvd : p ^ 3 ∣ Nat.card H := by
+    simpa [hHdef] using
+      (pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (G := R) (H := A)
+        (p := p) (hH := hA_comm) (n := 3) (by norm_num) hA.le_pRank)
+  haveI : H.Normal := hH_normal
+  obtain ⟨B, hB_normal, hB_le_H, hB_card⟩ :=
+    OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup
+      (G := R) (p := p) hpg (N := H) (r := 3) hH_dvd
+  have hB_elem : B.IsElementaryAbelian p := by
+    have hB_sub_elem : (B.subgroupOf H).IsElementaryAbelian p :=
+      hH_elem.to_subgroup (B.subgroupOf H)
+    exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hB_le_H) hB_sub_elem
+  exact ⟨B, hB_normal, hB_elem, hB_card⟩
 
 /-- **BG Lemma 5.1(b)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。`E ∈ ℰ²(R)` (elem-ab,
 位数 `p²`) かつ `E ⊴ R` ⇒ `E` は `SCN₃(R)` のある元に含まれる。
