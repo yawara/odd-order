@@ -133,47 +133,9 @@ structure OddOrderSpecialization (S : Set (ClassFunction L ℂ)) (A : Set L)
   M_le_K : M ≤ K
   quotient_nilpotent : Prop
 
-/-- Peterfalvi (6.8): the final §8 setup that packages a coherent input and a
-TI-subset condition. -/
-structure SibleySetup (S : Set (ClassFunction L ℂ)) (A : Set L)
-    [Fintype L] [Fintype G]
-    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] : Type _ extends
-    OddOrderSpecialization (L := L) (G := G) S A where
-  H : Subgroup L
-  W1 : Subgroup L
-  H_normal : H.Normal
-  H_sharp_ti :
-    OddOrder.GroupTheory.IsTISubset ((H : Set L) \ {1})
-      (Subgroup.normalizer (H : Set L))
-  W1_nontrivial : W1 ≠ ⊥
-
-namespace SibleySetup
-
-variable {S : Set (ClassFunction L ℂ)} {A : Set L}
-variable [Fintype L] [Fintype G]
-variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-
-/-- The coherence target carried by the setup.  Later §8 theorems prove this
-under the numerical and class-sum hypotheses. -/
-abbrev CoherenceTarget (hyp : SibleySetup (L := L) (G := G) S A) :=
-  OddOrder.Peterfalvi.S07.Hypothesis.IsCoherentTarget hyp.coherence
-
-theorem coherence_tau_inner_eq (hyp : SibleySetup (L := L) (G := G) S A)
-    (φ ψ : ClassFunction L ℂ) :
-    ClassFunction.inner (hyp.coherence.tau φ) (hyp.coherence.tau ψ) =
-      ClassFunction.inner φ ψ :=
-  hyp.coherence.tau_inner_eq φ ψ
-
-theorem coherence_inner_eq_on_supported
-    (hyp : SibleySetup (L := L) (G := G) S A)
-    (hcoh : hyp.CoherenceTarget) {φ ψ : ClassFunction L ℂ}
-    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A)
-    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A) :
-    ClassFunction.inner (hyp.coherence.tau φ) (hyp.coherence.tau ψ) =
-      ClassFunction.inner φ ψ :=
-  hcoh.inner_eq_on_supported hφ hψ
-
-end SibleySetup
+-- The legacy `SibleySetup`/`CoherenceTarget` (which carried an opaque `coherence.tau` with a
+-- *global* `IsIntegralIsometry`, nonexistent in Feit–Thompson) is replaced by the Dade-based
+-- `SibleyDadeHypothesis` below (T1; see issue 0046 / notes/peterfalvi/s08_6_8_assembly_plan.md).
 
 /-- `H^# = H ∖ {1}` viewed as a subset of the ambient group `G`, for `H ≤ L ≤ G`.  This is the
 support set `A` of the §4 Dade hypothesis in Peterfalvi (6.8): the nonidentity elements of `H`,
@@ -258,24 +220,25 @@ abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L H) :=
 
 end SibleyDadeHypothesis
 
-/-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the Sibley
-setup, the input set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is coherent — there
-is an integral isometric extension of `τ` from `Z[S, A]` to `Z[S]`.
+/-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
+hypotheses `SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is
+coherent: there is an integral isometric extension of the §4 Dade map `τ` from `Z[S, H^#]` to
+`Z[S]` (`hyp.CoherenceTarget = IsCoherent hyp.tau S H^#`).
 
-The full proof is the central technical content of §8, requiring the
-(6.1)/(6.4)/(6.5)/(6.6)/(5.2) machinery and the case split on `H` being a
-non-abelian `p`-group (cases (A), (B) in the mmd L150-).  This is the main
-sorry blocking the §9 (7.10) `card_G0_lower_bound` proof; see
-`issues/0046-peterfalvi-s08-6-8-coherence.md`.
+The full proof is the central technical content of §8 — the reduction to `H` a non-abelian
+`p`-group ((6.5)), the case split (A)/(B) on `Z(H) ∩ W₂` (mmd L150-), and gluing the
+`Y = S(H')`-coherence (equal degree `|W₁|`, via [Is] Thm 6.34, now available as
+`isIrreducibleCharacter_induce_of_inertia_eq`) with the `X = S − S(Z)`-coherence ((6.6)) through
+the §7 engine `coherentUnion_of_glued`. This is one of the two sorries blocking §9 (7.10)
+`card_G0_lower_bound`; see `issues/0046-peterfalvi-s08-6-8-coherence.md` and
+`notes/peterfalvi/s08_6_8_assembly_plan.md` (task DAG T0–T11).
 
-This is a `noncomputable def` rather than a `theorem` because `CoherenceTarget`
-(an instance of `IsCoherent`) carries the extension map `ν` as a data field, so
-it lives in `Type`, not `Prop`. -/
-noncomputable def sibleySetup_is_coherent
-    {S : Set (ClassFunction L ℂ)} {A : Set L}
-    [Fintype L] [Fintype G]
-    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (hyp : SibleySetup (L := L) (G := G) S A) : hyp.CoherenceTarget := by
+`noncomputable def` (not `theorem`) because `CoherenceTarget` (an `IsCoherent`) carries the
+extension map `ν` as data, living in `Type`, not `Prop`. -/
+noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+    {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
+    (hyp : SibleyDadeHypothesis G L H) : hyp.CoherenceTarget := by
   sorry
 
 /-- **Peterfalvi (6.8) → (7.10) consumer interface.**
