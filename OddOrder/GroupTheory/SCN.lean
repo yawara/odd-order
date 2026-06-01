@@ -253,6 +253,22 @@ theorem exists_scn3_ge_of_normal_abelian_pRank_ge_three
     pRank_le_of_injective (Subgroup.inclusion_injective hBA)
   exact ⟨A, ⟨hAscn, hBrank.trans hrank_le⟩, hBA⟩
 
+/-- A normal elementary abelian subgroup of order `p^3` is contained in an `SCN₃`
+subgroup of a finite `p`-group.
+
+This is the most direct reusable form of the final Prop 4.4(a) step in BG Lemma 5.1(b)
+once the proof has constructed the normal elementary abelian subgroup `B` of order `p^3`. -/
+theorem exists_scn3_ge_of_normal_isElementaryAbelian_card_prime_cube
+    [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G)
+    {B : Subgroup G} (hBnorm : B.Normal) (hB : B.IsElementaryAbelian p)
+    (hBcard : Nat.card B = p ^ 3) :
+    ∃ A : Subgroup G, IsSCN₃ p A ∧ B ≤ A := by
+  have hBcomm : IsMulCommutative B := IsMulCommutative.of_comm hB.comm
+  have hBrank : 3 ≤ pRank B p := by
+    have hlog := hB.log_card_le_pRank
+    rwa [hBcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at hlog
+  exact exists_scn3_ge_of_normal_abelian_pRank_ge_three hG hBnorm hBcomm hBrank
+
 end SCN_n
 
 end OddOrder.GroupTheory
