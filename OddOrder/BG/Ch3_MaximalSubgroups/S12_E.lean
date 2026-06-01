@@ -138,4 +138,23 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   sorry
 
+/-- **BG Lemma 12.3** (mmd L3023-): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
+`N_G(A₀) ⊆ M*` なら `A` は `M_σ ∩ M*` と `M_α ∩ M*` を中心化する。 -/
+theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] {A A₀ : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
+    (hAM : A ≤ M ⊓ Mstar) (hA₀ : A₀ ∈ elemAbelianOfRank G p 1) (hA₀A : A₀ ≤ A)
+    (hN : Subgroup.normalizer (A₀ : Set G) ≤ Mstar) :
+    A ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) ∧
+    A ≤ Subgroup.centralizer ((S10.Malpha M ⊓ Mstar : Subgroup G) : Set G) := by
+  sorry
+
+/-- **BG Lemma 12.19** (mmd L3023-): `E'` は `M_σ` の Hall `β(M)'`-部分群を中心化する。 -/
+theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    ∃ W : Subgroup G, W ≤ S10.Msigma M ∧
+      Ch03.IsHallSubgroup (S10.beta M)ᶜ (W.subgroupOf (S10.Msigma M)) ∧
+      Ch2.S07.derivedInG E ≤ Subgroup.centralizer (W : Set G) := by
+  sorry
+
 end OddOrder.BG.Ch3.S12
