@@ -1309,6 +1309,23 @@ private theorem blackburn_noncentral_prime_dvd_centralizer_card
     exact dvd_mul_right p p
   exact hp_dvd_T.trans hT_dvd_D
 
+/-- Blackburn 4.16 Case B-2 support: if `T` is elementary abelian of exponent `p`,
+then the image of `T.subgroupOf D` in any quotient `D/(C.subgroupOf D)` lies in `Ω₁`. -/
+private theorem subgroupOf_image_le_omega_quotient_of_isElementaryAbelian
+    {R : Type*} [Group R] {p : ℕ} {C D T : Subgroup R}
+    [(C.subgroupOf D).Normal] (hT_elem : T.IsElementaryAbelian p) :
+    (T.subgroupOf D).map (QuotientGroup.mk' (C.subgroupOf D)) ≤
+      Omega (D ⧸ C.subgroupOf D) p 1 := by
+  rintro q ⟨d, hdT, rfl⟩
+  refine Omega.mem_of_pow_eq_one ?_
+  rw [pow_one, ← map_pow]
+  have hd_pow_D : d ^ p = 1 := by
+    apply Subtype.ext
+    change (d : R) ^ p = 1
+    exact congrArg Subtype.val
+      (hT_elem.pow_eq_one ⟨(d : R), Subgroup.mem_subgroupOf.mp hdT⟩)
+  rw [hd_pow_D, map_one]
+
 /-- Blackburn 4.16 Case B-2: the image `TC/C` in `R/C`, where
 `C = C_R(S)`, has order `p` and lies in `Ω₁(R/C)`. -/
 private theorem blackburn_noncentral_commutator_map_centralizer_card_and_omega
