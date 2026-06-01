@@ -257,13 +257,15 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
 /-- **BG Corollary 14.12** (mmd L4035): if `M` is type `P2`, then the maximal
 subgroup attached to a Sylow subgroup of the `U`-factor lies in the Frobenius
 family `M_F`, and intersections with the type-P dual pair have the prescribed
-shape. -/
+shape.  The exact Sylow-`r` and dual-pair data are deferred, but the intersection
+uses the BG `U K` factor rather than the chosen subgroup `R ≤ U`. -/
 theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M U R : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    {M K U R : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hUle : U ≤ M) (hRle : R ≤ U) (hRne : R ≠ ⊥) :
     ∃ H : Subgroup G,
       H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
-      IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ R := by
+      IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K := by
   sorry
 
 /-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
