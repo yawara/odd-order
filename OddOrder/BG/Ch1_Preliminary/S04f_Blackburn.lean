@@ -1386,6 +1386,104 @@ private theorem blackburn_noncentral_centralizer_quotient_commutative
     ((Subgroup.Normal.quotient_commutative_iff_commutator_le
       (N := C.subgroupOf D)).mpr hcomm_le)
 
+/-- If conjugation by `d` moves `s` by an element `u` centralized by `d` and
+`u ^ p = 1`, then `d ^ p` centralizes `s`.  This is the elementary collection
+calculation used in Blackburn 4.16 to show `C_R(T)/C_R(S)` has exponent `p`. -/
+private theorem pow_centralizes_of_displacement_order_p
+    {G : Type*} [Group G] {d s u : G} {p : ℕ}
+    (hconj : d⁻¹ * s * d = u * s)
+    (hdu : d * u = u * d)
+    (hup : u ^ p = 1) :
+    s * d ^ p = d ^ p * s := by
+  have hdu_pow : ∀ n : ℕ, d⁻¹ * u ^ n * d = u ^ n := by
+    intro n
+    have hcomm_du : Commute d u := hdu
+    have hcomm_pow : d * u ^ n = u ^ n * d := hcomm_du.pow_right n |>.eq
+    calc
+      d⁻¹ * u ^ n * d = d⁻¹ * (u ^ n * d) := by group
+      _ = d⁻¹ * (d * u ^ n) := by rw [← hcomm_pow]
+      _ = u ^ n := by group
+  have hiter : ∀ n : ℕ, (d⁻¹) ^ n * s * d ^ n = u ^ n * s := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ n ih =>
+        calc
+          (d⁻¹) ^ (n + 1) * s * d ^ (n + 1)
+              = d⁻¹ * ((d⁻¹) ^ n * s * d ^ n) * d := by group
+          _ = d⁻¹ * (u ^ n * s) * d := by rw [ih]
+          _ = (d⁻¹ * u ^ n * d) * (d⁻¹ * s * d) := by group
+          _ = u ^ n * (u * s) := by rw [hdu_pow n, hconj]
+          _ = u ^ (n + 1) * s := by rw [pow_succ]; group
+  have hfixed : (d ^ p)⁻¹ * s * d ^ p = s := by
+    have hpiter := hiter p
+    simpa [← inv_pow, hup] using hpiter
+  calc
+    s * d ^ p = d ^ p * ((d ^ p)⁻¹ * s * d ^ p) := by group
+    _ = d ^ p * s := by rw [hfixed]
+
+/-- Blackburn 4.16 Case B-2: `D/C` has exponent `p`, stated as
+`Ω₁(D/C) = ⊤`.  For `d ∈ D = C_R(T)` and `s ∈ S = Ω₁(R)`, the displacement
+`d⁻¹ s d s⁻¹` lies in `T`; since `d` centralizes `T` and `T` has exponent `p`,
+the collection lemma gives that `d ^ p` centralizes every element of `S`. -/
+private theorem blackburn_noncentral_centralizer_quotient_omega_eq_top
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    let hCD_normal : (C.subgroupOf D).Normal :=
+      (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+    letI : (C.subgroupOf D).Normal := hCD_normal
+    Omega (D ⧸ C.subgroupOf D) p 1 = ⊤ := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
+  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hT_le_S : T ≤ S := hT_facts.2.1.le
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  apply eq_top_iff.mpr
+  intro q _
+  obtain ⟨d, rfl⟩ := QuotientGroup.mk'_surjective (C.subgroupOf D) q
+  refine Omega.mem_of_pow_eq_one ?_
+  rw [pow_one, ← map_pow]
+  change QuotientGroup.mk' (C.subgroupOf D) (d ^ p) = 1
+  have hd_pow_C : d ^ p ∈ C.subgroupOf D := by
+    rw [Subgroup.mem_subgroupOf]
+    change ((d : R) ^ p) ∈ C
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hsS
+    let u : R := (d : R)⁻¹ * s * (d : R) * s⁻¹
+    have huT : u ∈ T := by
+      have hmem : ⁅(d : R)⁻¹, s⁆ ∈ (⁅(⊤ : Subgroup R), S⁆ : Subgroup R) :=
+        Subgroup.commutator_mem_commutator (Subgroup.mem_top _) hsS
+      have hexpr : (d : R)⁻¹ * s * (d : R) * s⁻¹ = ⁅(d : R)⁻¹, s⁆ := by
+        rw [commutatorElement_def]
+        group
+      dsimp [u]
+      rw [hexpr]
+      rwa [Subgroup.commutator_comm] at hmem
+    have hconj : (d : R)⁻¹ * s * (d : R) = u * s := by
+      dsimp [u]
+      group
+    have hdu : (d : R) * u = u * (d : R) :=
+      (Subgroup.mem_centralizer_iff.mp d.property u huT).symm
+    have hup : u ^ p = 1 :=
+      congrArg Subtype.val (hT_elem.pow_eq_one ⟨u, huT⟩)
+    exact pow_centralizes_of_displacement_order_p hconj hdu hup
+  exact (QuotientGroup.eq_one_iff (d ^ p)).mpr hd_pow_C
+
 /-- Blackburn 4.16 Case B-2 Maschke step for `D/C`.
 
 This packages the application of `exists_aInvariant_complement_in_omega1_quotient` to
