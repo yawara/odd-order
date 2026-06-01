@@ -2142,6 +2142,19 @@ lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
   have hmul : F.e i * 2 ≤ F.e i * m := Nat.mul_le_mul_left _ hm_ge2
   omega
 
+/-- There is an index whose kernel order is minimal among the family. -/
+lemma exists_min_h_index [Finite G] (F : FrobeniusFamily G k) :
+    ∃ i : Fin k, ∀ j : Fin k, F.h i ≤ F.h j := by
+  classical
+  have hkpos : 0 < k := by
+    have htwo : 2 ≤ k := F.two_le
+    omega
+  have hne : (Finset.univ : Finset (Fin k)).Nonempty :=
+    ⟨⟨0, hkpos⟩, by simp⟩
+  rcases Finset.exists_min_image (Finset.univ : Finset (Fin k)) (fun i => F.h i) hne with
+    ⟨i, _hi, hmin⟩
+  exact ⟨i, fun j => hmin j (by simp)⟩
+
 /-- If `h_i` is chosen minimal, then every other odd coprime kernel order is at
 least `h_i + 2`. -/
 lemma h_add_two_le_h_of_min [Finite G] (F : FrobeniusFamily G k)
