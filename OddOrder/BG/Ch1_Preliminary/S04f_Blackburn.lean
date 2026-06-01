@@ -543,6 +543,36 @@ private theorem isMulCommutative_of_omega1_card_le_prime_sq_blackburn
   exact OddOrder.BG.Ch1.S04b.isMulCommutative_of_metacyclic_actionCommutator_eq_top
     hp_odd hR hmeta hcop hRA
 
+/-- Blackburn 4.16, start of Case B. If `p > 3`, `pRank R p ≤ 2`, and
+`|Ω₁(R)| > p²`, then `Ω₁(R)` has exponent dividing `p` and exact order `p³`.
+This is the Prop. 4.8 input used before setting `S = Ω₁(R)` in the printed proof. -/
+private theorem omega1_large_card_eq_prime_cube_and_pow_eq_one
+    {R : Type*} [Group R] [Finite R]
+    {p : ℕ} [Fact p.Prime] (hR : IsPGroup p R) (hp3 : 3 < p)
+    (hrank : pRank R p ≤ 2)
+    (hΩ_large : ¬ Nat.card (Omega R p 1) ≤ p ^ 2) :
+    Nat.card (Omega R p 1) = p ^ 3 ∧ ∀ x : Omega R p 1, x ^ p = 1 := by
+  have hp : p.Prime := Fact.out
+  have hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1 := by
+    intro x
+    apply Subtype.ext
+    rw [Subgroup.coe_pow, Subgroup.coe_one]
+    exact omega1_pow_eq_one_of_pRank_le_two_of_three_lt hR hp3 hrank x.2
+  have hΩ_pg : IsPGroup p (Omega R p 1) := hR.to_subgroup _
+  have hΩ_rank : pRank (Omega R p 1) p ≤ 2 :=
+    (pRank_mono_of_le (Omega R p 1)).trans hrank
+  have hΩ_le_cube : Nat.card (Omega R p 1) ≤ p ^ 3 :=
+    card_le_prime_cube_of_pRank_le_two_of_exponent_prime hΩ_pg hΩ_rank hΩ_pow
+  have hΩ_gt_sq : p ^ 2 < Nat.card (Omega R p 1) := lt_of_not_ge hΩ_large
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hΩ_pg
+  have hcard : Nat.card (Omega R p 1) = p ^ 3 := by
+    rw [hn] at hΩ_le_cube hΩ_gt_sq ⊢
+    have h2 : 2 < n := (Nat.pow_lt_pow_iff_right hp.one_lt).mp hΩ_gt_sq
+    have h3 : n ≤ 3 := (Nat.pow_le_pow_iff_right hp.one_lt).mp hΩ_le_cube
+    have hn3 : n = 3 := by omega
+    rw [hn3]
+  exact ⟨hcard, hΩ_pow⟩
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -553,8 +583,8 @@ cyclic, and `Ω₁(R₂)=R₁'`.
 
 In Lean, because `R` is a `p`-group, BG's rank hypothesis `r(R) ≤ 2` is represented
 as `pRank R p ≤ 2`; see the §4C comments above `scn3_empty_of_pRank_le_two`.
-The `p > 3` component and the small-`Ω₁` abelian branch are discharged; the remaining
-`sorry` is the large-`Ω₁` central-product/contradiction branch. -/
+The `p > 3` component, the small-`Ω₁` abelian branch, and the large-`Ω₁` Prop. 4.8
+setup are discharged; the remaining `sorry` is the central-product/contradiction branch. -/
 theorem blackburnRankTwoClassification
     {R : Type*} [Group R] [Finite R] [Nontrivial R]
     {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
@@ -570,6 +600,7 @@ theorem blackburnRankTwoClassification
   by_cases hΩ : Nat.card (Omega R p 1) ≤ p ^ 2
   · exact Or.inl (isMulCommutative_of_omega1_card_le_prime_sq_blackburn
       hp_odd hR hp3 hcop hΩ hRA)
+  have hΩ_large := omega1_large_card_eq_prime_cube_and_pow_eq_one hR hp3 hrank hΩ
   sorry
 
 end BlackburnClassification
