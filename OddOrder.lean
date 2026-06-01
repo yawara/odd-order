@@ -95,4 +95,9 @@ import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.BG.AppC_FinalContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki
+import OddOrder.Peterfalvi.Appendices.Huppert
+import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.FeitSibley
 import OddOrder.AxiomsCheck
