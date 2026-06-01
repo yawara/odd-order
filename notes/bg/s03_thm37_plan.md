@@ -58,6 +58,22 @@
 
 **注意**: 探索 agent の signature は近似 (要 build 検証)。`Representation.ofModule` の `[Module k[G] M]` 構築が gate#2 の核。
 
+### 進捗 (2026-06-01, `S03c_Thm37.lean`)
+- ✅✅ **same-prime case 完成・sorry-free** (commit b0acb75): `commutator_eq_bot_of_normal_pgroup_minimalNormal`
+  (正規 q-部分群 K が minimal-normal q-部分群 V を中心化)。`K⊔V` の中心と V の交わり
+  (`GroupTheory.exists_mem_center_of_normal_ne_bot`, private→public 化) + minimality。
+  **module/irreducibility を完全回避** (BG の O_q ルートより簡潔, 群論のみ)。
+- ⏳ **coprime case** = Representation bridge + Lemma 3.3。**bridge の核 API 判明**:
+  `AddMonoidHom.toZModLinearMap n (f : M →+ M₁) : M →ₗ[ZMod n] M₁` (`Algebra/Module/ZMod.lean:81`,
+  ZMod-module 間の加法 hom は自動で ZMod-線形)。よって bridge =
+  「chief factor (elem-abelian s-群) の `Additive` を `zmodModule` で ZMod s-module 化 →
+  共役 `MulDistribMulAction G` から各 g の `AddMonoidHom` を `toZModLinearMap` で線形化 →
+  `G →* Module.End (ZMod s) (Additive ·)` を MonoidHom として組む (map_one/map_mul)」。
+  chief factor の群モデル (`↥U⧸V.subgroupOf U` or `U.map(mk' V)`) + G-共役作用 setup が残る fiddly 部分。
+  → 構成後 `S03b.centralizer_ne_bot_of_nontrivial_kernel` に C_V(R̄)=0 と共に食わせる。
+- ⏳ **|K|-induction** (Thm 3.7 本体): L=maxProperNormalOrBot K で K̄=K/L を elem-abelian 化 →
+  各 chief factor V (X⊆K) に same-prime/coprime dichotomy → Prop 1.2 で nilpotent。
+
 **残 partition の具体ルート (vector-level, MonoidAlgebra 係数計算を回避)**:
 `frobeniusGroup h : SubgroupPartition G` の `.parts = insert N (conjugatesFinset A)` (=K ∪ Rの共役;
 `frobeniusGroup` def @FrobeniusGroup.lean:619, `parts_card = |K|+1`)。
