@@ -2114,6 +2114,72 @@ lemma sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G [Finite G]
     _ = 1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) :=
         F.sum_card_kernelSpread_div_card_G_eq_one_sub_card_G0_div_card_G
 
+/-- The weighted spread ratio term is nonnegative. -/
+lemma h_sub_one_div_h_mul_e_nonneg [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    0 ≤ ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hh1_nat : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have he1_nat : 1 ≤ F.e i := by
+    have h2 := F.two_le_e i
+    omega
+  have hh1 : (1 : ℚ) ≤ F.h i := by exact_mod_cast hh1_nat
+  have hhpos : (0 : ℚ) < F.h i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one hh1_nat)
+  have hepos : (0 : ℚ) < F.e i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one he1_nat)
+  exact div_nonneg (sub_nonneg.mpr hh1) (le_of_lt (mul_pos hhpos hepos))
+
+/-- The unweighted `𝓑`-sum term from Peterfalvi (7.10) is nonnegative. -/
+lemma h_sub_one_div_e_nonneg [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    0 ≤ ((F.h i : ℚ) - 1) / (F.e i : ℚ) := by
+  have hh1_nat : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have he1_nat : 1 ≤ F.e i := by
+    have h2 := F.two_le_e i
+    omega
+  have hh1 : (1 : ℚ) ≤ F.h i := by exact_mod_cast hh1_nat
+  have hepos : (0 : ℚ) < F.e i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one he1_nat)
+  exact div_nonneg (sub_nonneg.mpr hh1) (le_of_lt hepos)
+
+/-- Removing one index from the global weighted balance. -/
+lemma sum_erase_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G_sub [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (∑ j ∈ (Finset.univ.erase i),
+        ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) -
+        ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hsum := F.sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G
+  have hi : i ∈ (Finset.univ : Finset (Fin k)) := by simp
+  rw [← Finset.add_sum_erase (Finset.univ : Finset (Fin k))
+      (fun j => ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) hi] at hsum
+  linarith
+
+/-- A subset of the non-minimal indices has weighted sum bounded by the erased
+weighted balance. -/
+lemma sum_h_sub_one_div_h_mul_e_le_sum_erase [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} (s : Finset (Fin k))
+    (hs : s ⊆ Finset.univ.erase i) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) ≤
+      ∑ j ∈ (Finset.univ.erase i),
+        ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ)) := by
+  exact Finset.sum_le_sum_of_subset_of_nonneg hs fun j _ _ =>
+    F.h_sub_one_div_h_mul_e_nonneg j
+
+/-- A subset of the non-minimal indices has unweighted sum bounded by the erased
+unweighted sum. -/
+lemma sum_h_sub_one_div_e_le_sum_erase [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} (s : Finset (Fin k))
+    (hs : s ⊆ Finset.univ.erase i) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      ∑ j ∈ (Finset.univ.erase i), ((F.h j : ℚ) - 1) / (F.e j : ℚ) := by
+  exact Finset.sum_le_sum_of_subset_of_nonneg hs fun j _ _ =>
+    F.h_sub_one_div_e_nonneg j
+
 /-- `2 e_i + 1 ≤ h_i`.  From `e_i ∣ h_i - 1` (Frobenius: `|H_i| ≡ 1 mod e_i`)
 together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
 quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
