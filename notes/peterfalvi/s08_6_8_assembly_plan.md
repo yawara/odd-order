@@ -172,3 +172,24 @@ atoms (`peterfalvi_673`@ClassSumAlgebra:1651, `AlgInt.Cong.*`, `centralCharacter
 `peterfalvi_66_coherence_of_X_from_dade`(5120)、`DadeChainStep`(4936)+`.advance`、`dadeIntegralCharacterMap`(4127)。
 S04: `Hypothesis`(192), `HConjInvariant`(492), `supportInSubgroup`(137), `fullDadeIsometryData`(4315)。
 S06: `CertainTypeHypothesis`(38), `W2`。
+
+## D. (6.8) proof 着手 (T6, 2026-06-01)
+
+- **✅ engine unblock (commit 17 本目)**: `coherentEqualDegree_fromDade` (S07:4713) の support 仮説を
+  **個別 `(χ j).support ⊆ A` → 差分 `(χ j − χ 0).support ⊆ A` (`hsuppdiff`)** に弱化。動機 = 誘導既約
+  `Ind θ` は `Ind θ(1)=|W₁|≠0` で個別には A=H^# 上に supported でない (1 で非零) が、**等次数差分は 1 で消える**
+  (`(η_j−η_0)(1)=|W₁|−|W₁|=0`) ので差分 support なら満たす。下層 `coherentEqualDegree` (S07:2940) は元々
+  差分 support のみ要求、唯一 個別を使う helper `dadeIntegralCharacterMap_inner_eq_on_supported_span` も
+  「与えた元の support を導く」だけ ⟹ `S := {差分}` で適用可。caller 0 ゆえ in-place 弱化が安全・厳密に一般化。
+  build+AxiomsCheck green。
+- **残 T6 (Y coherent の family 構成側)**: `coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj hηdeg
+  hηsuppdiff h1notA : IsCoherent hyp.tau (range η) H^#` を呼ぶには:
+  (1) **Y family** `η : Fin m → IrreducibleCharacter ↥L` を `Irr(H/H')∖{1}` (= H' を核に含む θ、degree 1) の
+      `Ind_H^L θ` として構成 (`m = |Irr(H/H')|−1 = |H/H'|−1`)。
+  (2) **各 η_j 既約** = 6.34 `isIrreducibleCharacter_induce_of_inertia_eq` (要 `inertia(θ)=H`)。
+  (3) **`inertia(θ)=H` (自由作用)** = (c1) Frobenius / (c2) から θ≠1 の stabilizer 自明を導く character theory
+      (`brauer_permutation_lemma'` が classes∖{1} 自由を供給; W₁ の Irr(H)∖{1} 自由作用へ) — **最重・未着手**。
+  (4) **等次数** `η_j(1)=|W₁|`: 6.34 degree `[L:H]·θ(1)` + θ degree 1 + `[L:H]=|W1|` (`IsComplement.card_left`
+      @mathlib `Complement.lean:240`、`hyp.split` から)。
+  (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。
+  → これらは深い character theory ((3) が核)。T7 (X) / T8 (DadeChainStep) / T9-T11 (glue) は後続。
