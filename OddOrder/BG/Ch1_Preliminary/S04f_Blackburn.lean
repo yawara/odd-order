@@ -1341,6 +1341,187 @@ private theorem blackburn_noncentral_commutator_image_relations
     hT_facts hT_elem hT_quot_cards
   exact ⟨Subgroup.map_mono hT_le_D, hTC.1, hTC.2⟩
 
+/-- If an elementary abelian subgroup `T` is centralized by an element `x` of
+order dividing `p`, then `T ⊔ ⟨x⟩` is elementary abelian. -/
+private theorem isElementaryAbelian_sup_zpowers_of_centralizes
+    {R : Type*} [Group R] {p : ℕ} {T : Subgroup R} [T.Normal]
+    (hT_elem : T.IsElementaryAbelian p) {x : R} (hxp : x ^ p = 1)
+    (hx_cent : ∀ t ∈ T, t * x = x * t) :
+    (T ⊔ Subgroup.zpowers x).IsElementaryAbelian p := by
+  let X : Subgroup R := Subgroup.zpowers x
+  let E : Subgroup R := T ⊔ X
+  have hE_mul : (↑E : Set R) = (↑T : Set R) * (↑X : Set R) := by
+    dsimp [E, X]
+    exact Subgroup.normal_mul T (Subgroup.zpowers x)
+  have hX_comm : ∀ u ∈ X, ∀ v ∈ X, u * v = v * u := by
+    intro u hu v hv
+    obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hu
+    obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp hv
+    exact (Commute.zpow_zpow_self x i j).eq
+  have hT_X_comm : ∀ t ∈ T, ∀ u ∈ X, t * u = u * t := by
+    intro t ht u hu
+    obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hu
+    exact ((show Commute t x from hx_cent t ht).zpow_right i).eq
+  refine ⟨?_, ?_⟩
+  · intro a b
+    have haE : (a : R) ∈ (↑T : Set R) * (↑X : Set R) := by
+      rw [← hE_mul]
+      exact a.2
+    have hbE : (b : R) ∈ (↑T : Set R) * (↑X : Set R) := by
+      rw [← hE_mul]
+      exact b.2
+    obtain ⟨t₁, ht₁, u₁, hu₁, ha⟩ := haE
+    obtain ⟨t₂, ht₂, u₂, hu₂, hb⟩ := hbE
+    apply Subtype.ext
+    change (a : R) * (b : R) = (b : R) * (a : R)
+    rw [← ha, ← hb]
+    have ht₁t₂ : t₁ * t₂ = t₂ * t₁ :=
+      congrArg Subtype.val (hT_elem.comm ⟨t₁, ht₁⟩ ⟨t₂, ht₂⟩)
+    have hu₁u₂ : u₁ * u₂ = u₂ * u₁ := hX_comm u₁ hu₁ u₂ hu₂
+    have hu₁t₂ : u₁ * t₂ = t₂ * u₁ := (hT_X_comm t₂ ht₂ u₁ hu₁).symm
+    have ht₁u₂ : t₁ * u₂ = u₂ * t₁ := hT_X_comm t₁ ht₁ u₂ hu₂
+    calc
+      t₁ * u₁ * (t₂ * u₂) = t₁ * t₂ * (u₁ * u₂) := by
+        rw [show t₁ * u₁ * (t₂ * u₂) = t₁ * (u₁ * t₂) * u₂ by group,
+          hu₁t₂]
+        group
+      _ = t₂ * t₁ * (u₂ * u₁) := by rw [ht₁t₂, hu₁u₂]
+      _ = t₂ * u₂ * (t₁ * u₁) := by
+        rw [show t₂ * u₂ * (t₁ * u₁) = t₂ * (u₂ * t₁) * u₁ by group,
+          ← ht₁u₂]
+        group
+  · intro a
+    have haE : (a : R) ∈ (↑T : Set R) * (↑X : Set R) := by
+      rw [← hE_mul]
+      exact a.2
+    obtain ⟨t, ht, u, hu, ha⟩ := haE
+    apply Subtype.ext
+    change (a : R) ^ p = 1
+    rw [← ha]
+    have htu : Commute t u := hT_X_comm t ht u hu
+    rw [htu.mul_pow]
+    have ht_pow : t ^ p = 1 := congrArg Subtype.val (hT_elem.pow_eq_one ⟨t, ht⟩)
+    have hu_pow : u ^ p = 1 := by
+      obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hu
+      rw [← zpow_natCast (x ^ i) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+        hxp, one_zpow]
+    rw [ht_pow, hu_pow, mul_one]
+
+/-- Blackburn 4.16 Case B-2: every order-`p` element of `D = C_R(T)`
+already lies in `T = [Ω₁(R), R]`.  Otherwise `T ⊔ ⟨x⟩` would be elementary
+abelian of order `p³`, contradicting `pRank R p ≤ 2`. -/
+private theorem blackburn_noncentral_order_p_mem_commutator
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hrank : pRank R p ≤ 2)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    ∀ x : R, x ∈ D → x ^ p = 1 → x ∈ T := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  intro x hxD hxp
+  by_contra hxT
+  let X : Subgroup R := Subgroup.zpowers x
+  have hp : p.Prime := Fact.out
+  haveI hT_normal : T.Normal := by
+    dsimp [T]
+    exact Subgroup.commutator_normal S (⊤ : Subgroup R)
+  have hx_ne : x ≠ 1 := by
+    intro hx
+    exact hxT (hx ▸ T.one_mem)
+  have hx_order : orderOf x = p := orderOf_eq_prime hxp hx_ne
+  have hX_card : Nat.card X = p := by
+    rw [show X = Subgroup.zpowers x from rfl, Nat.card_zpowers, hx_order]
+  have hTX_card_dvd : Nat.card (T ⊓ X : Subgroup R) ∣ p := by
+    have hsub_dvd := Subgroup.card_subgroup_dvd_card ((T ⊓ X).subgroupOf X)
+    have hsub_card : Nat.card ((T ⊓ X).subgroupOf X) = Nat.card (T ⊓ X : Subgroup R) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_right : T ⊓ X ≤ X)).toEquiv
+    rwa [hsub_card, hX_card] at hsub_dvd
+  have hTX_card : Nat.card (T ⊓ X : Subgroup R) = 1 := by
+    rcases (Nat.dvd_prime hp).mp hTX_card_dvd with hcard | hcard
+    · exact hcard
+    · have hTX_eq_X : T ⊓ X = X := by
+        apply Subgroup.eq_of_le_of_card_ge inf_le_right
+        rw [hX_card, hcard]
+      have hx_mem_TX : x ∈ T ⊓ X := by
+        rw [hTX_eq_X]
+        exact Subgroup.mem_zpowers x
+      exact False.elim (hxT hx_mem_TX.1)
+  have hTX_bot : T ⊓ X = ⊥ := Subgroup.eq_bot_of_card_eq _ hTX_card
+  have hXT_bot : X ⊓ T = ⊥ := by rw [inf_comm, hTX_bot]
+  have hsup_card : Nat.card (T ⊔ X : Subgroup R) = p ^ 3 := by
+    have hcard_XT : Nat.card (X ⊔ T : Subgroup R) = Nat.card X * Nat.card T :=
+      OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal
+        (T := X) (M := T) hXT_bot
+    calc
+      Nat.card (T ⊔ X : Subgroup R) = Nat.card (X ⊔ T : Subgroup R) := by rw [sup_comm]
+      _ = Nat.card X * Nat.card T := hcard_XT
+      _ = p * p ^ 2 := by rw [hX_card, hT_facts.2.2]
+      _ = p ^ 3 := by ring
+  have hx_cent : ∀ t ∈ T, t * x = x * t := by
+    rw [Subgroup.mem_centralizer_iff] at hxD
+    intro t ht
+    exact hxD t ht
+  have hsup_elem : (T ⊔ X).IsElementaryAbelian p :=
+    isElementaryAbelian_sup_zpowers_of_centralizes hT_elem hxp hx_cent
+  have hprank_ge : 3 ≤ pRank R p :=
+    pow_le_card_of_le_pRank (T ⊔ X : Subgroup R) hsup_elem hsup_card
+  have : (3 : ℕ) ≤ 2 := hprank_ge.trans hrank
+  omega
+
+/-- Blackburn 4.16 Case B-2: `Ω₁(D)` maps onto `T`, where
+`D = C_R(T)` and `T = [Ω₁(R), R]`. -/
+private theorem blackburn_noncentral_omega1_centralizer_eq_commutator
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hrank : pRank R p ≤ 2)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    (Omega D p 1).map D.subtype = T := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+  have hT_le_D : T ≤ D := hrelations.2.1
+  apply le_antisymm
+  · rw [Subgroup.map_le_iff_le_comap]
+    change Subgroup.closure {d : D | d ^ (p ^ 1) = 1} ≤ Subgroup.comap D.subtype T
+    rw [Subgroup.closure_le]
+    intro d hd
+    change (d : R) ∈ T
+    have hd_pow_D : d ^ p = 1 := by simpa [pow_one] using hd
+    have hd_pow_R : (d : R) ^ p = 1 := congrArg Subtype.val hd_pow_D
+    exact blackburn_noncentral_order_p_mem_commutator hrank hT_facts hT_elem
+      (d : R) d.2 hd_pow_R
+  · intro t htT
+    refine ⟨⟨t, hT_le_D htT⟩, ?_, rfl⟩
+    refine Omega.mem_of_pow_eq_one ?_
+    rw [pow_one]
+    apply Subtype.ext
+    change t ^ p = 1
+    exact congrArg (fun u : T => (u : R)) (hT_elem.pow_eq_one ⟨t, htT⟩)
+
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1519,6 +1700,8 @@ theorem blackburnRankTwoClassification
     have hSC_top :=
       blackburn_noncentral_omega1_sup_centralizer_eq_top hR hT_facts hT_elem
     have hCDT_relations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+    have hΩD_eq_T :=
+      blackburn_noncentral_omega1_centralizer_eq_commutator hrank hT_facts hT_elem
     have hTC_image :=
       blackburn_noncentral_commutator_image_relations hT_facts hT_elem hT_quot_cards
     obtain ⟨hΩC_eq_center, hC_cyclic, hΩC_eq_comm⟩ :=
