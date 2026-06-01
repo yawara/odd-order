@@ -58,6 +58,7 @@ F.sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G
 また (7.10) 後半の最小 kernel order と `𝓑`-sum 評価に対応する
 
 ```lean
+F.exists_min_h_index
 F.h_add_two_le_h_of_min
 F.h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two
 F.sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two
