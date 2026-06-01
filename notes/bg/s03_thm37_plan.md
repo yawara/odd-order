@@ -28,7 +28,13 @@
 - ✅ `groupSumMap ρ H = ∑_{h:H} ρ ↑h` (averaging endomorphism)
 - ✅ `fixed_apply_groupSumMap`: `(∑_{h∈H} ρ h) v` は `H`-不動 (左乗 `Equiv.mulLeft` で reindex)
 - ✅ `trivial_of_groupSumMap_eq_card_smul`: `groupSumMap ρ K = |K|•id ⇒ K 自明` (`smul_right_injective`)
-- ⏳ `centralizer_ne_bot_of_nontrivial_kernel` (Lemma 3.3 本体, sorry) — **残 = partition identity のみ**
+- ✅ `groupSumMap_conjugate_eq_zero`: `C_V(R)=0 ⇒ groupSumMap ρ (conj x•R) v = 0` (+`rep_apply_apply`/`mulAut_smul_eq_map`)
+- ⏳ `centralizer_ne_bot_of_nontrivial_kernel` (Lemma 3.3 本体, sorry) — **残 = partition identity の組立のみ**
+
+**残 partition の note**: `σ_K σ_R = σ_G` (complement bijection `K×R≃G` 由来, formalize 容易) は
+`groupSumMap ρ ⊤ = 0` を即与えるが **K 自明には不足** (σ_K を isolate できない)。本筋は下記の
+SubgroupPartition + nonidentitySigmaTo (conjugate 分割) が必須。same-prime case の infra も確認済
+(`PGroupFixedVector.lean` `IsPGroup.invariants_ne_bot`/`exists_fixed_vector_ne_zero`)。
 
 **残 partition の具体ルート (vector-level, MonoidAlgebra 係数計算を回避)**:
 `frobeniusGroup h : SubgroupPartition G` の `.parts = insert N (conjugatesFinset A)` (=K ∪ Rの共役;
