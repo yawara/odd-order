@@ -1903,6 +1903,11 @@ theorem blackburnRankTwoClassification
         hp_odd hR hΩ_pow hΩ_extraspecial
     have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
+    have hD_quot_ab :=
+      blackburn_noncentral_centralizer_quotient_commutative hT_facts hT_elem
+    obtain ⟨X, hC_le_X, hX_inv, hX_omega, hX_inf_T, hX_sup_T⟩ :=
+      blackburn_noncentral_exists_centralizer_quotient_complement
+        (φ := φ) hcop hT_facts hT_elem hD_quot_ab
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
     sorry
