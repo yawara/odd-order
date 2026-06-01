@@ -80,7 +80,8 @@ These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
 (`OddOrder.RepresentationTheory`, §4-§8).  The §9 headline results (7.10)-(7.11)
 below do not reference them — those are pure group-theoretic statements.
 
-This file installs (7.1)-(7.8), all sorry-free:
+This file installs (7.1)-(7.8), all sorry-free, and names the faithful
+(7.9) two-family non-orthogonality target as a predicate:
 * (7.1)-(7.3): the hypothesis bundle (`Hypothesis71`), the `ρ` map
   (`chiRho` / `chiRhoCF` / `chiRhoSupp`), (7.2.a) `chiRho_dadeImage_eq`,
   (7.2.b) `chiRho_norm_sq_le`, (7.3) `chiRho_integral_inequality`;
@@ -88,14 +89,16 @@ This file installs (7.1)-(7.8), all sorry-free:
 * (7.6)-(7.7): the normal-subgroup case `A = H^#` (`Hypothesis76`), with
   (7.7.a) `chiRho_explicit_formula` and (7.7.b) `chiRho_norm_sq_double_sum`;
 * (7.8): the coherence-based formula (`Hypothesis78`), with (7.8.c.i)
-  `chiRho_eq_inner_beta_on_A` and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`.
+  `chiRho_eq_inner_beta_on_A` and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`;
+* (7.9): the statement interface `Hypothesis79` and its conclusion predicate
+  `Hypothesis79.conclusion`.
 
 The (7.7.a) and (7.8.c.i) pointwise identities are carried as structural
 certificates (`Hypothesis76.chiRho_decomp`, `Hypothesis78.chiRho_eq_inner_beta`):
 they encode Peterfalvi's `CF(L,A)`-basis / coherence reductions, whose proofs
 need the induced/restricted-character decomposition theory not yet in this file.
 The norm-square corollaries (7.7.b)/(7.8.c.ii) are then proved here outright.
-(7.9) remains as follow-on. -/
+The proof of (7.9) remains as follow-on. -/
 
 section Section_7_1_to_7_3
 
@@ -1456,6 +1459,76 @@ theorem chiRho_norm_sq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
 end Hypothesis78
 
 end Section_7_8
+
+section Section_7_9
+
+/-! ### (7.9): two-family non-orthogonality
+
+Peterfalvi (7.9) is the final two-family character-theoretic input used in the
+proof of (7.10).  The proof combines (7.8.a), (5.9), odd-order non-realness
+(1.1), and the cross-family disjointness of Dade supports.  Here we name the
+faithful hypothesis bundle and conclusion predicate, without adding it as a new
+assumption to the group-theoretic `(7.10)` theorem. -/
+
+/-- **Peterfalvi (7.9) hypothesis interface.**  Two instances of the (7.8)
+coherence/norm setup over the same odd-order group, with disjoint Dade supports
+`A₁^{τ₁}` and `A₂^{τ₂}` as in Hypothesis (7.4) for `I = {1,2}`. -/
+structure Hypothesis79 (G : Type*) [Group G] [Fintype G]
+    (A₁ : Set G) (L₁ : Subgroup G) [Fintype L₁]
+    [Invertible (Nat.card L₁ : ℂ)]
+    (A₂ : Set G) (L₂ : Subgroup G) [Fintype L₂]
+    [Invertible (Nat.card L₂ : ℂ)]
+    [Invertible (Nat.card G : ℂ)] where
+  /-- The ambient group has odd order. -/
+  odd_card : Odd (Nat.card G)
+  /-- The first coherent normal-subgroup setup. -/
+  first : Hypothesis78 G A₁ L₁
+  /-- The second coherent normal-subgroup setup. -/
+  second : Hypothesis78 G A₂ L₂
+  /-- The Dade supports `A₁^{τ₁}` and `A₂^{τ₂}` are disjoint. -/
+  dadeSupport_disjoint :
+    Disjoint first.hyp76.hyp71.hyp.dadeSupport second.hyp76.hyp71.hyp.dadeSupport
+
+namespace Hypothesis79
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {A₁ : Set G} {L₁ : Subgroup G} [Fintype L₁]
+variable [Invertible (Nat.card L₁ : ℂ)]
+variable {A₂ : Set G} {L₂ : Subgroup G} [Fintype L₂]
+variable [Invertible (Nat.card L₂ : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- The image `ζ₁^{ν₁}` of the distinguished first `ζ`. -/
+noncomputable def firstZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction G ℂ :=
+  H79.first.nu (H79.first.hyp76.zeta H79.first.zetaDistinct)
+
+/-- The image `ζ₂^{ν₂}` of the distinguished second `ζ`. -/
+noncomputable def secondZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction G ℂ :=
+  H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)
+
+/-- **Peterfalvi (7.9) conclusion.**  The two cross inner products cannot both
+vanish: `(β₁, ζ₂^{ν₂}) ≠ 0` or `(β₂, ζ₁^{ν₁}) ≠ 0`. -/
+def conclusion (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) : Prop :=
+  ClassFunction.inner H79.first.beta H79.secondZetaImage ≠ 0 ∨
+    ClassFunction.inner H79.second.beta H79.firstZetaImage ≠ 0
+
+/-- Swapping the two families preserves the (7.9) hypothesis interface. -/
+def swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    Hypothesis79 G A₂ L₂ A₁ L₁ where
+  odd_card := H79.odd_card
+  first := H79.second
+  second := H79.first
+  dadeSupport_disjoint := H79.dadeSupport_disjoint.symm
+
+/-- The (7.9) conclusion is symmetric in the two families. -/
+theorem conclusion_swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    H79.swap.conclusion ↔ H79.conclusion := by
+  simp [conclusion, swap, firstZetaImage, secondZetaImage, or_comm]
+
+end Hypothesis79
+
+end Section_7_9
 
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
