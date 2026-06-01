@@ -89,7 +89,8 @@ This file installs (7.1)-(7.8), all sorry-free, and names the faithful
 * (7.6)-(7.7): the normal-subgroup case `A = H^#` (`Hypothesis76`), with
   (7.7.a) `chiRho_explicit_formula` and (7.7.b) `chiRho_norm_sq_double_sum`;
 * (7.8): the coherence-based formula (`Hypothesis78`), with the (7.8.a)
-  target `Hypothesis78.BetaDecomp`, (7.8.c.i) `chiRho_eq_inner_beta_on_A`,
+  target `Hypothesis78.BetaDecomp`, the (7.8.b) target
+  `Hypothesis78.NormEstimates`, (7.8.c.i) `chiRho_eq_inner_beta_on_A`,
   and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`;
 * (7.9): the statement interface `Hypothesis79` and its conclusion predicate
   `Hypothesis79.conclusion`.
@@ -1423,6 +1424,50 @@ structure BetaDecomp (H78 : Hypothesis78 G A L) where
     H78.beta =
       Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta H78.zetaDistinct) +
         (a : ℂ) • H78.weightedNuSum + Gamma
+
+/-- Kernel order `h = |H|` for Peterfalvi (7.8.b). -/
+noncomputable def kernelOrder (H78 : Hypothesis78 G A L) : ℕ :=
+  Nat.card H78.hyp76.H
+
+/-- Complement index `e = |L:H|` for Peterfalvi (7.8.b), stored as
+`|L| / |H|` using the ambient normal-subgroup data. -/
+noncomputable def complementIndex (H78 : Hypothesis78 G A L) : ℕ :=
+  Nat.card L / Nat.card H78.hyp76.H
+
+/-- The size hypothesis `e ≤ (h - 1) / 2`, written without division as
+`2e + 1 ≤ h`. -/
+noncomputable def smallIndex (H78 : Hypothesis78 G A L) : Prop :=
+  2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+
+/-- The class function `(ζ^ν)^ρ` whose norm is estimated in Peterfalvi (7.8.b). -/
+noncomputable def zetaNuRho (H78 : Hypothesis78 G A L) : ClassFunction L ℂ :=
+  H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+
+/-- The real norm square `‖(ζ^ν)^ρ‖²` from Peterfalvi (7.8.b). -/
+noncomputable def zetaNuRhoNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re
+
+/-- The real norm square `‖Γ‖²` from Peterfalvi (7.8.b). -/
+noncomputable def gammaNormSq (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : ℝ :=
+  (ClassFunction.inner hBD.Gamma hBD.Gamma).re
+
+/-- **Peterfalvi (7.8.b) target.**  Under `2e + 1 ≤ h`, the coherent
+`ζ`-image satisfies `‖(ζ^ν)^ρ‖² ≥ 1 - e/h`, and the residual term from
+(7.8.a) satisfies `‖Γ‖² ≤ e - 1`.
+
+As with `BetaDecomp`, this is a standalone future-proof target rather than a
+new field of `Hypothesis78`. -/
+structure NormEstimates (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : Prop where
+  /-- `‖(ζ^ν)^ρ‖² ≥ 1 - e/h`. -/
+  zetaNuRho_norm_sq_ge :
+    H78.smallIndex →
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        H78.zetaNuRhoNormSq
+  /-- `‖Γ‖² ≤ e - 1`. -/
+  gamma_norm_sq_le :
+    H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
 
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
