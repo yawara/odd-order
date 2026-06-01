@@ -188,15 +188,16 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   * **(c2)** Hypothesis (4.6) holds — encoded by a `S06.CertainTypeHypothesis` on the *same* Dade
     datum (`cert.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime and `W₂ ⊆ [H,H]`.
 
-  NB (faithfulness caveat): the (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H`
-  (hence `cert.K = H`). The c2 disjunct is stated with only the constraints the textbook makes
-  explicit; its faithfulness inherits that of `S06.CertainTypeHypothesis` as a model of (4.6),
-  whose `W₁ ⊔ W₂ = ⊤` field does not obviously reconcile with (4.6)'s `W₂ ⊂ H ⊂ K` — pending an
-  S06 audit (see `notes/peterfalvi/s08_6_8_assembly_plan.md`). -/
+  The (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H` (hence `cert.K = H`), and the
+  (4.2)/(6.8) complement is shared (`cert.W1 = W1`, both giving `L = H ⋊ W₁`). With the S06 audit
+  done (`S06.CertainTypeHypothesis` now faithfully encodes (4.2): the false `W₁ ⊔ W₂ = ⊤` removed,
+  and complement / cyclic / `W₂ ≤ K` / `C_K(x) = W₂` / odd-`W` added), this matches textbook
+  (6.8)(c2). -/
   cases :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H W1 ∨
     ∃ cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L,
-      cert.dade = dade ∧ cert.K = H ∧ (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆
+      cert.dade = dade ∧ cert.K = H ∧ cert.W1 = W1 ∧
+        (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆
 
 namespace SibleyDadeHypothesis
 

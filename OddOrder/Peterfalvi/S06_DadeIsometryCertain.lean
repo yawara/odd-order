@@ -41,10 +41,24 @@ structure CertainTypeHypothesis (A : Set G) (L : Subgroup G) where
   W1 : Subgroup L
   W2 : Subgroup L
   K_normal : K.Normal
+  /-- (4.2)(a): `L = K ⋊ W₁` — `W₁` is a complement to the normal subgroup `K`. -/
+  isComplement : Subgroup.IsComplement' K W1
+  /-- (4.2)(a): `W₁ ≠ 1` is cyclic. -/
   W1_nontrivial : W1 ≠ ⊥
+  W1_cyclic : IsCyclic W1
+  /-- (4.2)(b): `W₂ ≠ 1` is a cyclic subgroup of `K`. -/
   W2_nontrivial : W2 ≠ ⊥
-  W_sup : W1 ⊔ W2 = ⊤
+  W2_cyclic : IsCyclic W2
+  W2_le_K : W2 ≤ K
+  /-- (4.2)(b): `C_K(x) = W₂` for every `x ∈ W₁^#`. -/
+  centralizer_W2 : ∀ x : L, x ∈ W1 → x ≠ 1 →
+    Subgroup.centralizer ({x} : Set L) ⊓ K = W2
+  /-- `W₁ ∩ W₂ = 1` (automatic, as `W₁ ∩ K = 1` and `W₂ ≤ K`), so `W = W₁ × W₂` is an internal
+  direct product — a *proper* subgroup of `L` in general (corrects the earlier `W₁ ⊔ W₂ = ⊤`,
+  which falsely asserted `L = W₁ × W₂`, contradicting `L = K ⋊ W₁` with `W₂ ⊊ K`). -/
   W_disjoint : Disjoint W1 W2
+  /-- (4.2)(c): `W = W₁ × W₂` has odd order. -/
+  W_odd : Odd (Nat.card ↥(W1 ⊔ W2))
 
 namespace CertainTypeHypothesis
 
