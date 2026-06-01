@@ -2,6 +2,7 @@
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Mathlib.GroupTheory.Perm.Cycle.Type
 import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
@@ -95,6 +96,15 @@ private theorem prime_dvd_half_factor_of_odd_dvd_sq_sub_one {p q : ℕ}
     · left
       rwa [hb]
 
+/-- Cauchy extraction for BG Lemma 4.13: a prime divisor of `|Aut R|` is realized
+by an automorphism of order exactly that prime. -/
+private theorem exists_mulAut_orderOf_eq_prime_of_prime_dvd_card
+    {R : Type*} [Group R] [Finite R] {q : ℕ}
+    (hq : q.Prime) (hq_dvd : q ∣ Nat.card (MulAut R)) :
+    ∃ ψ : MulAut R, orderOf ψ = q := by
+  letI : Fact q.Prime := ⟨hq⟩
+  exact exists_prime_orderOf_dvd_card' q hq_dvd
+
 /-- **BG Lemma 4.13** (via Gorenstein Theorem 4.15(ii)). Suppose `p` is an odd
 prime, `R` is a finite `p`-group, and `q` is a prime divisor of `|Aut R|`. If
 `SCN₃(R)` is empty and `q ≠ p`, then `q ∣ p^2 - 1` and `q < p`.
@@ -108,6 +118,11 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A)
     (hq : q.Prime) (hqp : q ≠ p) (hq_dvd : q ∣ Nat.card (MulAut R)) :
     q ∣ p ^ 2 - 1 ∧ q < p := by
+  obtain ⟨ψ, hψ_order⟩ := exists_mulAut_orderOf_eq_prime_of_prime_dvd_card hq hq_dvd
+  have hψ_ne_one : ψ ≠ 1 := by
+    intro hψ
+    have hq_one : q = 1 := by rw [← hψ_order, hψ, orderOf_one]
+    exact hq.ne_one hq_one
   sorry
 
 /-- **BG Lemma 4.14.** Under the hypotheses of Lemma 4.13, `q` divides one of the
