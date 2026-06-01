@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
 
 /-!
 # Frobenius irreducibility of induced characters ([Is] Theorem 6.34)
@@ -78,5 +80,56 @@ theorem card_smul_restrict_induce (θ : ClassFunction ↥H k) :
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [induceTerm_of_mem_normal (le_refl H) θ h.property x, conjBy_apply]
   exact congrArg θ (Subtype.ext (by group))
+
+section Complex
+
+variable [Fintype H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+
+/-- **Norm of an induced character via the Mackey sum** (any class function).
+
+`|H| · ⟨Ind_H^G θ, Ind_H^G θ⟩ = ∑_{x ∈ G} ⟨θ, θ^{x⁻¹}⟩`.
+
+This is Frobenius reciprocity combined with the Mackey restriction formula
+`card_smul_restrict_induce`: pairing `θ` against `|H| • Res_H (Ind θ) = ∑_x θ^{x⁻¹}` and using
+that the inner product is conjugate-linear on the right (`inner_smul_right`, with
+`star (|H| : ℂ) = |H|`). No irreducibility is needed yet. -/
+theorem card_mul_inner_self_induce (θ : ClassFunction ↥H ℂ) :
+    (Nat.card H : ℂ) *
+        ClassFunction.inner (induce H θ) (induce H θ) =
+      ∑ x : G, ClassFunction.inner θ (conjBy x⁻¹ θ) := by
+  have key : ClassFunction.inner θ ((Nat.card H : ℂ) • restrict H (induce H θ))
+      = (Nat.card H : ℂ) * ClassFunction.inner (induce H θ) (induce H θ) := by
+    rw [inner_smul_right, star_natCast, ← inner_induce_eq_inner_restrict]
+  rw [← key, card_smul_restrict_induce, inner_sum_right]
+
+/-- **Norm of an induced irreducible character** ([Is] Thm 6.34, norm part).
+
+For an irreducible character `θ` of `H ⊴ G`, `|H| · ‖Ind_H^G θ‖² = |I_G(θ)|`, equivalently
+`‖Ind_H^G θ‖² = [I_G(θ) : H]`: the squared norm counts the cosets of `H` in the inertia group.
+
+Each Mackey summand `⟨θ, θ^{x⁻¹}⟩` is `1` if `x ∈ I_G(θ)` and `0` otherwise, by orthonormality
+of irreducible characters (`irreducibleCharacter_inner_eq_ite`) together with
+`θ^{x⁻¹} = θ ⇔ x ∈ I_G(θ)`. Summing the indicator over `G` gives `|I_G(θ)|`. -/
+theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H) :
+    (Nat.card H : ℂ) *
+        ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+          (induce H (θ : ClassFunction ↥H ℂ))
+      = (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥H ℂ)) : ℂ) := by
+  classical
+  rw [card_mul_inner_self_induce]
+  have hterm : ∀ x : G,
+      ClassFunction.inner (θ : ClassFunction ↥H ℂ) (conjBy x⁻¹ (θ : ClassFunction ↥H ℂ))
+        = if x ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) then (1 : ℂ) else 0 := by
+    intro x
+    rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite]
+    have hcond : (θ = IrreducibleCharacter.conjBy x⁻¹ θ)
+        ↔ x ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) := by
+      rw [eq_comm, IrreducibleCharacter.ext_iff, IrreducibleCharacter.coe_conjBy,
+        ← ClassFunction.mem_inertia, Subgroup.inv_mem_iff]
+    simp only [hcond]
+  rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
+    Nat.card_eq_fintype_card]
+
+end Complex
 
 end OddOrder.RepresentationTheory

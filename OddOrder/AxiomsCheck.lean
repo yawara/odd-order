@@ -1581,3 +1581,7 @@ set_option linter.style.longLine false in
 -- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
 -- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_smul_restrict_induce
+-- [Is] Thm 6.34 (norm part): `|H| · ‖Ind_H^G θ‖² = |I_G(θ)|` for irreducible `θ` (= `[I_G(θ):H]`),
+-- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
