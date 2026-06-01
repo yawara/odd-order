@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
@@ -190,6 +191,26 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
       Ch05.HasNormalPComplement p ↥(Ch2.S07.derivedInG M) ∧
       Ch05.HasNormalPComplement p ↥(Msigma M)) := by
+  sorry
+
+/-! ## Lemma 10.3 / 10.5 — centralizer と normalizer (mmd gap, PDF p.87 回収) -/
+
+/-- **BG Lemma 10.3** (mmd MISSING_PAGE, PDF p.87): `M ∈ ℳ`, `X` を `M` の `α(M)'`-部分群とし
+`r(C_{M_α}(X)) ≥ 2` なら `C_M(X) ∈ 𝒰`。 -/
+theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {X : Subgroup G} (hXM : X ≤ M)
+    (hXpi : Subgroup.IsPiSubgroup (alpha M)ᶜ X)
+    (hr : 2 ≤ rank ↥(Subgroup.centralizer (X : Set G) ⊓ Malpha M)) :
+    IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M) := by
+  sorry
+
+/-- **BG Lemma 10.5** (mmd MISSING_PAGE, PDF p.87): `p ∈ σ(M)'`, `X ∈ ℰ_p¹(G)`,
+`N_G(X) ⊆ M` なら `r_p(M) = 2`、`p` は ideal でなく、`X ⊆ A` となる `A ∈ ℰ_p²(G)` が存在する。 -/
+theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∉ sigma M)
+    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1)
+    (hN : Subgroup.normalizer (X : Set G) ≤ M) :
+    pRank ↥M p = 2 ∧ ¬ idealPrime p G ∧ ∃ A ∈ elemAbelianOfRank G p 2, X ≤ A := by
   sorry
 
 end OddOrder.BG.Ch3.S10
