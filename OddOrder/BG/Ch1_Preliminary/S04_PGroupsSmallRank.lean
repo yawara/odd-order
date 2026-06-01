@@ -14,7 +14,6 @@ import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.PRank
@@ -3093,64 +3092,5 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
 
 end Prop48ExponentP
 
-section BlackburnClassification
-
-open OddOrder.GroupTheory
-
-/-! ## §4F: Blackburn rank-two classification (Theorem 4.16)
-
-The current declaration makes the BG Theorem 4.16 endpoint visible in Lean.
-Its proof is the remaining Blackburn apex of issue 0051; the statement is kept
-close to the printed theorem:
-
-* `A` is represented by an operator action `φ : A →* MulAut R`.
-* "`A` is a `p'`-group of automorphisms" is represented in the repo's standard
-  coprime-action form `Nat.Coprime (Nat.card A) (Nat.card R)`.
-* `[R,A]=R` is `OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤`.
-* `R = R₁ ∘ R₂` is the internal central product
-  `IsCentralProduct (⊤ : Subgroup R) R₁ R₂`.
--/
-
-/-- **BG Theorem 4.16, case (2)** (Blackburn): `R` is the central product
-`R₁ ∘ R₂`, where `R₁` is nonabelian of order `p^3` and exponent `p`, `R₂` is
-cyclic, and `Ω₁(R₂) = R₁'`.
-
-The equality `Ω₁(R₂) = R₁'` is stated after mapping both subgroups into the
-ambient group `R`: `Ω₁(R₂)` is `(Omega R₂ p 1).map R₂.subtype`, and `R₁'` is
-`(commutator R₁).map R₁.subtype`. -/
-def BlackburnCentralProductCase (p : ℕ) (R : Type*) [Group R] : Prop :=
-  ∃ R₁ R₂ : Subgroup R,
-    IsCentralProduct (⊤ : Subgroup R) R₁ R₂ ∧
-      ¬ IsMulCommutative ↥R₁ ∧
-      Nat.card ↥R₁ = p ^ 3 ∧
-      Monoid.exponent ↥R₁ = p ∧
-      IsCyclic ↥R₂ ∧
-      (Omega ↥R₂ p 1).map R₂.subtype =
-        (_root_.commutator ↥R₁).map R₁.subtype
-
-/-- **BG Theorem 4.16** (Blackburn rank-two classification).
-
-Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
-`p'`-group of automorphisms of `R`.  If `r(R) ≤ 2`, `[R,A]=R`, and `|A|` is odd,
-then `p > 3` and either `R` is abelian, or `R` is a central product
-`R₁ ∘ R₂` where `R₁` is nonabelian of order `p^3` and exponent `p`, `R₂` is
-cyclic, and `Ω₁(R₂)=R₁'`.
-
-In Lean, because `R` is a `p`-group, BG's rank hypothesis `r(R) ≤ 2` is represented
-as `pRank R p ≤ 2`; see the §4C comments above `scn3_empty_of_pRank_le_two`.
-The proof is intentionally still `sorry`: this declaration makes the missing
-Blackburn apex visible to the mainline `sorry` census and downstream dependencies. -/
-theorem blackburnRankTwoClassification
-    {R : Type*} [Group R] [Finite R] [Nontrivial R]
-    {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
-    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
-    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
-    (hrank : pRank R p ≤ 2)
-    (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤)
-    (hAodd : Odd (Nat.card A)) :
-    3 < p ∧ (IsMulCommutative R ∨ BlackburnCentralProductCase p R) := by
-  sorry
-
-end BlackburnClassification
 
 end OddOrder.BG.Ch1.S04

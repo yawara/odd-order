@@ -117,9 +117,18 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - Verification: `lake build OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` green.
 - Remaining: proof body of `blackburnRankTwoClassification` and its upstream gates; the theorem is now visible in bare-`sorry` census.
 
+
+**Blackburn endpoint routing + Lem 4.13/4.14 statements (2026-06-02, `codex/bg-s04-blackburn`)**:
+
+- ✅ 新 leaf `OddOrder/BG/Ch1_Preliminary/S04f_Blackburn.lean` を追加。`S04e_GorThm37` が `S04_PGroupsSmallRank` を import するため、Thm 4.16 proof endpoint は S04 本体ではなく downstream leaf に置く必要がある。これで precursor(1) `pRank_le_two_of_scn3_empty` と precursor(2) `exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction` の両方を Thm 4.16 側から呼べる。
+- ✅ BG Lem 4.13 faithful statement を Lean に着地: `dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty` (`SCN₃(R)=∅`, `q ∣ |Aut R|`, `q ≠ p` ⇒ `q ∣ p^2 - 1 ∧ q < p`)。proof は `sorry`。
+- ✅ BG Lem 4.14 faithful statement を Lean に着地: `dvd_half_prime_add_or_sub_of_prime_dvd_aut_of_scn3_empty` (Lem 4.13 hypotheses ⇒ `q ∣ (p+1)/2 ∨ q ∣ (p-1)/2`)。proof は `sorry`。
+- 🔁 `BlackburnCentralProductCase` / `blackburnRankTwoClassification` は S04 本体から S04f に移動。statement は同一 namespace/name のまま。
+- Verification: `lake build OddOrder.BG.Ch1_Preliminary.S04f_Blackburn` green.
+
 ## 完了条件
 
-- BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` に着地。
+- BG Thm 4.16 が sorry-free / axiom-clean で `OddOrder/BG/Ch1_Preliminary/S04f_Blackburn.lean` に着地。
 - `lake build OddOrder` + `lake build OddOrder.AxiomsCheck` green。
 - ⚠ **scaffold trap 厳守** (handoff §1): hard content を未充足仮説に hoist しない、`/goal` 単発不可、設計先行 + sub-issue 分割。
 
@@ -128,5 +137,5 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - **handoff (cold-start 手順)**: `notes/bg/s04_thm416_handoff.md`
 - 全体計画: `notes/bg/s04_implementation_plan_2026_05_30.md`
 - BG 原典: `references/bg/local-analysis.mmd` L1636-1704 (Thm 4.16 本体)
-- 既存: `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean`, `OddOrder/GroupTheory/{PRank,SCN,CriticalSubgroup,IsMetacyclic,IsExtraspecial}.lean`
+- 既存: `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean`, `OddOrder/BG/Ch1_Preliminary/S04f_Blackburn.lean`, `OddOrder/GroupTheory/{PRank,SCN,CriticalSubgroup,IsMetacyclic,IsExtraspecial}.lean`
 - 設計 workflow: `bg-s04-design` wf_39c356b8-eb2 / 実装 v1: `bg-s04-v1-impl` wf_ec23ca53-2a1

@@ -147,7 +147,7 @@ private theorem isAInvariant_actionCommutator_comp (φ : A →* MulAut P) {B : S
 /-- **Single-element stability** (Gorenstein Thm 3.2 for `⟨ψ⟩`). If `ψ` fixes an `A`-invariant
 normal subgroup `N ≤ P` pointwise and acts trivially on `P/N`, then `ψ` acts trivially on `P`
 (coprime action of the `p′`-element `ψ`). -/
-private theorem acts_trivially_of_trivial_on_normal_quotient
+theorem acts_trivially_of_trivial_on_normal_quotient
     (φ : A →* MulAut P) (hP : IsPGroup p P) (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
     {ψ : A} {N : Subgroup P} [N.Normal] (hN : IsAInvariant φ N)
     (hfix : ∀ n ∈ N, (φ ψ) n = n) (hquot : ∀ g : P, (φ ψ) g * g⁻¹ ∈ N) :
@@ -612,9 +612,10 @@ theorem exists_minimal_aInvariant_isSpecial_of_pprimeAction
   exact (isSpecial_of_pprimeAction_trivialOnProper hQ_inv.restrict hQ_pgroup hQ_cop
     hψ_nt_Q hψ_proper_Q).2.2.2.2
 
-/-- **precursor 2 of BG Lemma 4.13** (= **G** Theorem 4.15(ii) input; Gorenstein Theorems
-3.7/3.8/3.10 combined, `p` odd). Let `A` be a `p′`-group of automorphisms of the `p`-group `P`
-(`φ`, coprime) and `ψ : A` acting nontrivially on `P`. Then `P` has a minimal `A`-invariant
+/-- **precursor 2 of BG Lemma 4.13** (= **G** Theorem 4.15(ii) input, with
+minimality retained; Gorenstein Theorems 3.7/3.8/3.10 combined, `p` odd).
+Let `A` be a `p′`-group of automorphisms of the `p`-group `P` (`φ`, coprime)
+and `ψ : A` acting nontrivially on `P`. Then `P` has a minimal `A`-invariant
 subgroup `Q` on which `ψ` acts nontrivially, and `Q` is **special of exponent `p`**.
 
 The exponent-`p` half replaces the full induction of Gorenstein Theorem 3.10: as `Q` is already
@@ -622,15 +623,18 @@ special (Theorem 3.8) and minimal, `ψ` acts trivially on the proper `A`-invaria
 subgroups `Q′` and `Ω₁(Q)`. With `Q′` this gives `[Q, ψ] ⊆ Ω₁(Q)` (via Lemma 3.9(ii) and
 `q^p ∈ Q′`), and then `Ω₁(Q) = Q` follows from the stabilization theorem; `Ω₁(Q) = Q` plus class
 `≤ 2` and `p` odd give exponent `p` (Lemma 3.9(i)). -/
-theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction (hp_odd : Odd p)
+theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality
+    (hp_odd : Odd p)
     (φ : A →* MulAut P) (hP : IsPGroup p P)
     (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
     {ψ : A} (hψ_ntriv : ¬ ∀ g : P, (φ ψ) g = g) :
     ∃ Q : Subgroup P, IsAInvariant φ Q ∧ (∃ g ∈ Q, (φ ψ) g ≠ g) ∧
-      IsSpecial p ↥Q ∧ Monoid.exponent ↥Q = p := by
+      IsSpecial p ↥Q ∧ Monoid.exponent ↥Q = p ∧
+        ∀ N : Subgroup P, IsAInvariant φ N → N ≤ Q →
+          (∃ g ∈ N, (φ ψ) g ≠ g) → N = Q := by
   obtain ⟨Q, hQ_inv, hψ_nt, hQ_special, hmin⟩ :=
     exists_minimal_aInvariant_isSpecial_of_pprimeAction φ hP hCop hψ_ntriv
-  refine ⟨Q, hQ_inv, hψ_nt, hQ_special, ?_⟩
+  refine ⟨Q, hQ_inv, hψ_nt, hQ_special, ?_, hmin⟩
   set φQ : A →* MulAut ↥Q := hQ_inv.restrict with hφQ_def
   haveI : Finite ↥Q := inferInstance
   have hQ_pgroup : IsPGroup p ↥Q := hP.to_subgroup Q
@@ -698,5 +702,19 @@ theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction (hp_odd : Odd p)
   rw [Monoid.exponent_eq_prime_iff Fact.out]
   exact fun g hg => orderOf_eq_prime
     (Omega.pow_eq_one_of_class_le_two hp_odd hcl (hOmega_top ▸ Subgroup.mem_top g)) hg
+
+/-- **precursor 2 of BG Lemma 4.13** (= **G** Theorem 4.15(ii) input;
+Gorenstein Theorems 3.7/3.8/3.10 combined, `p` odd). This is the public
+payload without the retained minimality clause. -/
+theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction (hp_odd : Odd p)
+    (φ : A →* MulAut P) (hP : IsPGroup p P)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
+    {ψ : A} (hψ_ntriv : ¬ ∀ g : P, (φ ψ) g = g) :
+    ∃ Q : Subgroup P, IsAInvariant φ Q ∧ (∃ g ∈ Q, (φ ψ) g ≠ g) ∧
+      IsSpecial p ↥Q ∧ Monoid.exponent ↥Q = p := by
+  obtain ⟨Q, hQ_inv, hψ_nt, hQ_special, hQ_exp, _hmin⟩ :=
+    exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality
+      hp_odd φ hP hCop hψ_ntriv
+  exact ⟨Q, hQ_inv, hψ_nt, hQ_special, hQ_exp⟩
 
 end OddOrder.BG.Ch1.S04

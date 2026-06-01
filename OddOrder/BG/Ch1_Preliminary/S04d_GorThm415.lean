@@ -211,6 +211,7 @@ private theorem class_le_two_of_two_abelian_normal {M : Type*} [Group M]
 
 /-! ## INLINE-2: Gorenstein Lemma 4.13 (element / commutator form) -/
 
+omit [Finite P] in
 /-- **Gorenstein "Finite Groups" Lemma 4.13** (element form). Let `A` be a normal
 subgroup of `P` and `H ≤ A` an abelian subgroup. If two elements `g₁, g₂` each
 "stabilize" the series `A ⊇ H ⊇ 1` — i.e. their conjugation displaces every `a ∈ A`
@@ -222,7 +223,7 @@ stabilizer of a two-step normal series with abelian top is abelian, mmd L4195,
 eq. (4.11)). Concretely, with `s = g₁⁻¹ a g₁ a⁻¹`, `t = g₂⁻¹ a g₂ a⁻¹ ∈ H`, one
 computes `⁅g₂, g₁⁆ a ⁅g₂, g₁⁆⁻¹ = (s t s⁻¹ t⁻¹) a = a`, the last step because
 `s, t ∈ H` commute. -/
-private theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
+theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
     (hH_le : H ≤ A) (hH_comm : ∀ s ∈ H, ∀ t ∈ H, s * t = t * s) {g₁ g₂ : P}
     (hdisp₁ : ∀ a ∈ A, g₁⁻¹ * a * g₁ * a⁻¹ ∈ H)
     (hdisp₂ : ∀ a ∈ A, g₂⁻¹ * a * g₂ * a⁻¹ ∈ H)
