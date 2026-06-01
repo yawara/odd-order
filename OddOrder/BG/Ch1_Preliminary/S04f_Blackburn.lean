@@ -162,6 +162,39 @@ private theorem card_le_prime_cube_of_scn3_empty_exp_prime_subgroup
   exact card_le_prime_cube_of_pRank_le_two_of_exponent_prime
     (hR.to_subgroup Q) hQ_rank hQ_pow
 
+/-- Frattini-quotient support for the non-elementary branch of BG Lemma 4.13.
+If a finite `p`-group has order at most `p³` but is not elementary abelian, then
+its Frattini quotient has order at most `p²`. -/
+private theorem card_quotient_frattini_le_prime_sq_of_not_elementary
+    {Q : Type*} [Group Q] [Finite Q] {p : ℕ} [Fact p.Prime]
+    (hQ : IsPGroup p Q) (hQ_card : Nat.card Q ≤ p ^ 3)
+    (hQ_not_elem : ¬ IsElementaryAbelian p Q) :
+    Nat.card (Q ⧸ frattini Q) ≤ p ^ 2 := by
+  have hp : p.Prime := Fact.out
+  have hfr_ne_bot : frattini Q ≠ ⊥ := by
+    intro hfr
+    exact hQ_not_elem (hQ.isElementaryAbelian_of_frattini_eq_bot hfr)
+  have hfr_pgroup : IsPGroup p (frattini Q) := hQ.to_subgroup (frattini Q)
+  have hp_dvd_fr : p ∣ Nat.card (frattini Q) := by
+    rcases hfr_pgroup.card_eq_or_dvd with hfr_card | hp_dvd
+    · exact False.elim (hfr_ne_bot (Subgroup.eq_bot_of_card_eq _ hfr_card))
+    · exact hp_dvd
+  have hp_le_fr : p ≤ Nat.card (frattini Q) := Nat.le_of_dvd Nat.card_pos hp_dvd_fr
+  have hlag : Nat.card Q = Nat.card (Q ⧸ frattini Q) * Nat.card (frattini Q) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (frattini Q)
+  have hmul_le : Nat.card (Q ⧸ frattini Q) * p ≤ p ^ 3 := by
+    calc
+      Nat.card (Q ⧸ frattini Q) * p
+          ≤ Nat.card (Q ⧸ frattini Q) * Nat.card (frattini Q) :=
+            Nat.mul_le_mul_left _ hp_le_fr
+      _ = Nat.card Q := hlag.symm
+      _ ≤ p ^ 3 := hQ_card
+  have hmul_le_sq : Nat.card (Q ⧸ frattini Q) * p ≤ p ^ 2 * p := by
+    calc
+      Nat.card (Q ⧸ frattini Q) * p ≤ p ^ 3 := hmul_le
+      _ = p ^ 2 * p := by ring
+  exact Nat.le_of_mul_le_mul_right hmul_le_sq hp.pos
+
 /-- If an operator has prime-power-one relation and acts nontrivially on an
 invariant subgroup, then its restricted automorphism has that prime order. -/
 private theorem orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial
@@ -263,6 +296,11 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     card_le_prime_cube_of_scn3_empty_exp_prime_subgroup hp_odd hR hSCN hQ_exp
   have hQ_elem_card_le : IsElementaryAbelian p Q → Nat.card Q ≤ p ^ 2 :=
     card_le_prime_sq_of_scn3_empty_elementaryAbelian_subgroup hp_odd hR hSCN
+  have hQ_quot_frattini_elem : IsElementaryAbelian p (Q ⧸ frattini Q) :=
+    IsPGroup.quotient_frattini_isElementaryAbelian hQ_special.1
+  have hQ_quot_frattini_card_le :
+      ¬ IsElementaryAbelian p Q → Nat.card (Q ⧸ frattini Q) ≤ p ^ 2 :=
+    card_quotient_frattini_le_prime_sq_of_not_elementary hQ_special.1 hQ_card_cube
   have hψA_pow : ψA ^ q = 1 := by
     apply Subtype.ext
     change ψ ^ q = 1
