@@ -1506,6 +1506,30 @@ def G0 (F : FrobeniusFamily G k) : Set G :=
 theorem mem_G0_iff (F : FrobeniusFamily G k) {x : G} :
     x ∈ F.G0 ↔ ∀ i, x ∉ F.kernelSpread i := Iff.rfl
 
+/-- The implementation of kernelSpread is the usual conjugacy closure of H_i^#. -/
+lemma mem_kernelSpread_iff_conjugatesOfSet (F : FrobeniusFamily G k) (i : Fin k)
+    {x : G} :
+    x ∈ F.kernelSpread i ↔ x ∈ Group.conjugatesOfSet ((F.H i : Set G) \ {1}) := by
+  constructor
+  · rintro ⟨g, hg⟩
+    rw [Group.mem_conjugatesOfSet_iff]
+    refine ⟨g * x * g⁻¹, hg, ?_⟩
+    rw [isConj_iff]
+    refine ⟨g⁻¹, ?_⟩
+    group
+  · intro hx
+    rcases Group.mem_conjugatesOfSet_iff.mp hx with ⟨y, hy, hconj⟩
+    rcases isConj_iff.mp hconj with ⟨g, hg⟩
+    refine ⟨g⁻¹, ?_⟩
+    rw [← hg]
+    have hback : g⁻¹ * (g * y * g⁻¹) * g = y := by group
+    simpa [hback] using hy
+
+lemma kernelSpread_eq_conjugatesOfSet (F : FrobeniusFamily G k) (i : Fin k) :
+    F.kernelSpread i = Group.conjugatesOfSet ((F.H i : Set G) \ {1}) := by
+  ext x
+  exact F.mem_kernelSpread_iff_conjugatesOfSet i
+
 lemma one_not_mem_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
     (1 : G) ∉ F.kernelSpread i := by
   rintro ⟨g, hg⟩
