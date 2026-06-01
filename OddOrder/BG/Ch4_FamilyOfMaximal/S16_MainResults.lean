@@ -183,10 +183,10 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       Supports (ASet M U) (S14.zTilde K Kstar ∪ A0Set M K) := by
   sorry
 
-/-! ## Proposition 16.1: BG local taxonomy equals Peterfalvi type I--V -/
+/-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **BG Proposition 16.1** (mmd L4352): the §14--§15 local families are exactly
-Peterfalvi's Type I--V maximal subgroups. -/
+the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi. -/
 theorem proposition_type_classification [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
