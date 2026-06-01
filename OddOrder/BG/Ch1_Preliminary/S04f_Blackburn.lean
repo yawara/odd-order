@@ -1017,6 +1017,27 @@ private theorem blackburn_noncentral_centralizer_normalities
     infer_instance
   exact ⟨hC_normal, hD_normal, hC_normal.subgroupOf D⟩
 
+/-- Blackburn 4.16 Case B-2: the subgroups `S = Omega R p 1`, `T = [S,R]`,
+`C = C_R(S)`, and `D = C_R(T)` are invariant under every operator action on `R`. -/
+private theorem blackburn_noncentral_operator_invariances
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    {A : Type*} [Group A] {φ : A →* MulAut R} :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    IsAInvariant φ S ∧ IsAInvariant φ T ∧ IsAInvariant φ C ∧ IsAInvariant φ D := by
+  dsimp
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hS_inv : IsAInvariant φ S := IsAInvariant.of_characteristic φ
+  have hT_inv : IsAInvariant φ T := hS_inv.commutator (IsAInvariant.top φ)
+  have hC_inv : IsAInvariant φ C := hS_inv.centralizer
+  have hD_inv : IsAInvariant φ D := hT_inv.centralizer
+  exact ⟨hS_inv, hT_inv, hC_inv, hD_inv⟩
+
 /-- Blackburn 4.16 Case B-2: the conjugation quotient on
 `T = [Ω₁(R),R]` has order at most `p`.  The image is a `p`-subgroup of
 `Aut(T)`, and `T` is elementary abelian of order `p²`, so the GL squeeze applies. -/
@@ -1260,6 +1281,33 @@ private theorem blackburn_noncentral_centralizer_relations
         rw [Subgroup.mem_centralizer_iff]
         intro s hsS
         exact congrArg Subtype.val ((Subgroup.mem_center_iff.mp hz_center) ⟨s, hsS⟩)
+
+/-- Blackburn 4.16 Case B-2: `D = C_R(T)` has order divisible by `p`, because
+`T ≤ D` and `|T| = p²`. -/
+private theorem blackburn_noncentral_prime_dvd_centralizer_card
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    p ∣ Nat.card D := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+  have hT_dvd_D : Nat.card T ∣ Nat.card D := Subgroup.card_dvd_of_le hrelations.2.1
+  have hp_dvd_T : p ∣ Nat.card T := by
+    rw [hT_facts.2.2, pow_two]
+    exact dvd_mul_right p p
+  exact hp_dvd_T.trans hT_dvd_D
 
 /-- Blackburn 4.16 Case B-2: the image `TC/C` in `R/C`, where
 `C = C_R(S)`, has order `p` and lies in `Ω₁(R/C)`. -/
