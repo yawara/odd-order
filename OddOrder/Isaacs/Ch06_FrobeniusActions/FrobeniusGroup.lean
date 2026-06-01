@@ -735,6 +735,14 @@ theorem frobeniusGroup_parts_card [Finite G] {N A : Subgroup G}
   rw [frobeniusGroup, Finset.card_insert_of_notMem hN_not_mem,
     conjugatesFinset_card_eq_index h.ne_bot_complement hTI, hindex]
 
+/-- Membership in the Frobenius partition: the parts are the kernel `N` and the conjugates of
+the complement `A`. -/
+theorem mem_frobeniusGroup_parts [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) {C : Subgroup G} :
+    C ∈ (frobeniusGroup h).parts ↔ C = N ∨ ∃ g : G, C = MulAut.conj g • A := by
+  classical
+  rw [frobeniusGroup, Finset.mem_insert, mem_conjugatesFinset]
+
 end SubgroupPartition
 
 /-- **Isaacs Thm 6.9** (Frobenius-group branch, abelian target): a Frobenius actor cannot
