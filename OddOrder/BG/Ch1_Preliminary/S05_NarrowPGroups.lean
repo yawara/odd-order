@@ -392,6 +392,42 @@ theorem mem_scn3_of_normal_isElementaryAbelian_card_prime_sq [Finite R] {p : ℕ
 
 /-! ## Lemma 5.2 — `T = C_R(W)` の中心構造 (mmd L1808-1836) -/
 
+/-- **BG Lemma 5.2 support**: if `E ∈ E*(R)` has order `p²`, then
+`C_R(E)` has `p`-rank at most `2`.
+
+Indeed, any elementary abelian `p`-subgroup of `C_R(E)` centralizes `E`; adjoining it
+to `E` is still elementary abelian, so maximality of `E` forces the subgroup back
+inside `E`. -/
+theorem pRank_centralizer_le_two_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] {E : Subgroup R}
+    (hEcard : Nat.card ↥E = p ^ 2) (hEstar : IsMaximalElementaryAbelian p E) :
+    pRank ↥(Subgroup.centralizer (E : Set R)) p ≤ 2 := by
+  rw [pRank_le_iff]
+  intro A hA
+  let C : Subgroup R := Subgroup.centralizer (E : Set R)
+  let F : Subgroup R := A.map C.subtype
+  have hF : F.IsElementaryAbelian p := by
+    dsimp [F, C]
+    exact Subgroup.IsElementaryAbelian.map C.subtype_injective hA
+  have hE_le_cent_F : E ≤ Subgroup.centralizer (F : Set R) := by
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hxF
+    change x ∈ A.map C.subtype at hxF
+    rw [Subgroup.mem_map] at hxF
+    obtain ⟨a, _, rfl⟩ := hxF
+    exact (Subgroup.mem_centralizer_iff.mp a.2 e he).symm
+  have hF_le_E : F ≤ E :=
+    hEstar.le_of_le_centralizer (F := F) hF hE_le_cent_F
+  calc
+    Nat.log p (Nat.card A) = Nat.log p (Nat.card F) := by
+      dsimp [F, C]
+      rw [Subgroup.card_map_of_injective C.subtype_injective]
+    _ ≤ Nat.log p (Nat.card E) :=
+      Nat.log_mono_right (Subgroup.card_le_of_le hF_le_E)
+    _ = 2 := by
+      rw [hEcard, Nat.log_pow (Fact.out : p.Prime).one_lt]
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
