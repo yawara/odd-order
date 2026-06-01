@@ -54,6 +54,20 @@ F.sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G
 
 で `|(H_i^#)^G| / |G| = (h_i - 1)/(h_i e_i)` および
 `∑_i (h_i - 1)/(h_i e_i) = 1 - |G₀|/|G|` まで Lean 化済み。
+
+また (7.10) 後半の最小 kernel order と `𝓑`-sum 評価に対応する
+
+```lean
+F.h_add_two_le_h_of_min
+F.h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two
+F.sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two
+F.lowerBoundTerm_of_penultimate
+F.exists_lowerBoundTerm_of_exists_penultimate
+```
+
+を追加。これで「`h = min h_i` なら `i ≠ j` で `h + 2 ≤ h_j`」から
+`∑_{j∈𝓑} (h_j - 1)/(h_j e_j) ≤ (e - 1)/(h + 2)` への純算術部分と,
+penultimate inequality から (7.10) 表示形への最終 rearrangement が Lean 化済み。
 残る (7.10) 本体は依然として (7.8.a/b), (7.9), (6.8) coherence 本体,
 および Thompson/Frobenius-family bridge の合成が必要。
 
