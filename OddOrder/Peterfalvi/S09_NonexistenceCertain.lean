@@ -1684,6 +1684,52 @@ lemma kernelSpread_eq_iUnion_quotient (F : FrobeniusFamily G k) (i : Fin k) :
     convert ha using 1
     group
 
+/-- The quotient-indexed conjugate images of `H_i^#` are pairwise disjoint. -/
+lemma kernel_sharp_conj_image_quotient_pairwiseDisjoint
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Pairwise (Function.onFun Disjoint fun q : G ⧸ F.L i =>
+      ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+        ((F.H i : Set G) \ {1}))) := by
+  intro q r hqr
+  apply F.disjoint_kernel_sharp_conj_image_of_inv_mul_notMem_L i
+  intro hmem
+  have hrel : (QuotientGroup.leftRel (F.L i)) (Quotient.out r : G)
+      (Quotient.out q : G) := by
+    rw [QuotientGroup.leftRel_apply]
+    exact hmem
+  have hrq : r = q := Quotient.out_equiv_out.mp hrel
+  exact hqr hrq.symm
+
+/-- Cardinality of a kernel spread: `|(H_i^#)^G| = [G : L_i] (|H_i| - 1)`. -/
+lemma ncard_kernelSpread_eq_index_mul [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (F.kernelSpread i).ncard = (F.L i).index * (Nat.card (F.H i) - 1) := by
+  classical
+  letI : Fintype (G ⧸ F.L i) := Fintype.ofFinite _
+  let S : G ⧸ F.L i → Set G := fun q =>
+    ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+      ((F.H i : Set G) \ {1}))
+  have hpair : Pairwise (Function.onFun Disjoint S) := by
+    simpa [S] using F.kernel_sharp_conj_image_quotient_pairwiseDisjoint i
+  have h_union : (⋃ q : G ⧸ F.L i, S q).ncard =
+      ∑ᶠ q : G ⧸ F.L i, (S q).ncard :=
+    Set.ncard_iUnion_of_finite (s := S) (fun _ => Set.toFinite _) hpair
+  have h_sum : ∑ᶠ q : G ⧸ F.L i, (S q).ncard =
+      (F.L i).index * (Nat.card (F.H i) - 1) := by
+    rw [finsum_eq_sum_of_fintype]
+    simp_rw [S, F.ncard_kernel_sharp_conj_image]
+    rw [Finset.sum_const, nsmul_eq_mul, Finset.card_univ,
+      ← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card]
+    norm_num
+  rw [F.kernelSpread_eq_iUnion_quotient i, h_union, h_sum]
+
+/-- Cardinality of a kernel spread as a `Nat.card` identity. -/
+lemma card_kernelSpread_eq_index_mul [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (F.kernelSpread i) = (F.L i).index * (Nat.card (F.H i) - 1) := by
+  rw [Nat.card_coe_set_eq]
+  exact F.ncard_kernelSpread_eq_index_mul i
+
 lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
     (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
   rintro rfl
