@@ -2383,6 +2383,73 @@ lemma exists_lowerBoundTerm_of_exists_penultimate [Finite G]
   rcases hpen with ⟨i, hi⟩
   exact ⟨i, F.lowerBoundTerm_of_penultimate i hi⟩
 
+/-- The `𝓑`-sum estimate in Peterfalvi (7.10) gives the penultimate displayed
+inequality once the main character-theoretic estimate has isolated the same
+`𝓑`-sum. -/
+lemma penultimate_of_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hbase :
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)) := by
+  have hBweighted := F.sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two
+    hodd hmin B hB_ne hBsum
+  linarith
+
+/-- The `𝓑`-sum estimate plus the main character-theoretic estimate gives the
+final displayed lower bound for the same minimal index. -/
+lemma lowerBoundTerm_of_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hbase :
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  exact F.lowerBoundTerm_of_penultimate i
+    (F.penultimate_of_Bsum_bound hodd hmin B hB_ne hBsum hbase)
+
+/-- Existential wrapper for the final assembly step of Peterfalvi (7.10): once a
+minimal index and its `𝓑`-set satisfy the character-theoretic base estimate and
+unweighted `𝓑`-sum bound, the displayed lower bound follows. -/
+lemma exists_lowerBoundTerm_of_exists_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          1 - (F.e i : ℚ) / (F.h i : ℚ) -
+            (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+            (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+              ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
+  exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
