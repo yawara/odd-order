@@ -24,6 +24,26 @@ This file is intentionally a scaffold: definitions and faithful theorem surfaces
 are placed now so downstream sections can import stable names.  Proofs are left
 as `sorry` because they depend on the full §10--§13 local analysis and the
 counting argument around the missing-page Lemma 14.6.
+
+## Lane C interface and proof-gate notes
+
+- BG §14 starts from Theorem 13.9: the `sigma(M)` sets partition `pi(G)`, and
+  Corollary 12.16 identifies sigma-length at most one with nonempty `M_sigma(g)`.
+  `SigmaDecompositionData` is explicit data so downstream files cannot assume a fake construction.
+- Lemma 14.1 in BG uses `p in pi(M) \ (sigma(M) union kappa(M))`, `S in Syl_p(M)`,
+  and `A = Omega_1(S)`. The Lean theorem records the clean downstream consequence for an
+  ambient `A`; the exact `Omega_1(S)` binding is deferred until the subgroup-map encoding
+  is settled.
+- Proposition 14.2 depends on Lemma 12.1, Corollary 13.11, Theorem 13.5, Lemma
+  13.12, Lemma 13.7, Lemma 13.13, Lemma 13.6, Theorem 10.1(a), Corollary
+  12.16, Lemma 14.1, Theorem 3.10(a), Lemma 12.19, and Lemma 12.17 (mmd L3789-L3820).
+- Theorem 14.4 gates on Theorem 13.9, Theorem 10.1(b), Proposition 12.15,
+  Corollary 14.3, and Corollary 12.6(a)(b) (mmd L3837-L3861).
+- Lemma 14.6 is recovered from the missing page and drives Theorem 14.7,
+  Corollary 14.9, and Corollary 14.10. Its statement remains implicit in this file;
+  do not replace it by Peterfalvi type assumptions.
+- Theorem 14.7 is the BG source of the Type-P duality used by §§15--16; it should
+  feed shared type predicates, not import Peterfalvi.
 -/
 
 namespace OddOrder.BG.Ch4.S14
