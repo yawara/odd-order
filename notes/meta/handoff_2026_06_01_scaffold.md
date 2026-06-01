@@ -38,8 +38,12 @@
 - **§1–§9 は Lean 化済** (`OddOrder/Peterfalvi/S01–S09`; §1–§7 sorry-free, §8/§9 = 既知 2 sorry)。**§10–§16 は Lean ファイル無し = scaffold 対象**。
 - §10–§16 = 最小単純群 G の構造 (§10) + 極大部分群 type II/III/IV/V (§11–§14) + 部分群 S,T (§15) + G の非存在 (§16)。
   **BG Thm A–E を入力**とし、固定 G は **`OddOrder.BG.IsMinimalSimpleOdd` と同一** (= 共有/再利用)。BG §7–§16 と完全に並行する scaffold タスク。
-- **詳細計画** = `notes/peterfalvi/scaffold_feasibility_2026_06_01.md` (本セッション末に workflow `peterfalvi-scaffold-survey` で生成)。per-section の定義/結果/Tier A-C/BG 依存を記載。
-- 共有検討: BG §16 と Pf の **Type I–V 述語**は同一概念の可能性 → `GroupTheory` か共有 BG/Pf モジュールに 1 度だけ定義 (ROADMAP の Peterfalvi §10–§16 と BG Ch4 を同 wave で設計)。
+- **詳細計画 = `notes/peterfalvi/scaffold_feasibility_2026_06_01.md`** (workflow `peterfalvi-scaffold-survey` で生成済、per-section 定義/結果/Tier A-C/BG 依存)。要点:
+  - **~60 results 中 ~47 が Tier C** (apex 指標算術 + type 分類 + 最終矛盾)。**foundation-first 必須**。
+  - **4 つの global gate**: (1) **§10 Type 分類塔** (`IsTypeF/I/P/II/III/IV/V` + Ms + A₁/A/A₀) = 唯一の「今すぐ高価値」ファイル、§11–§16 の全 hypothesis が参照; (2) **`M_F`** (極大 nilpotent normal Hall) = **BG §15 と同一対象** → 共有 module 化 (`fittingInG` は別物!); (3) **指標 index 族 `ω/η/μ/ν`** (S03/S04 に未材料化) → §13/§15/§16 の norm-cascade をブロック; (4) **BG Thm A–E + App.C が未 scaffold** → §10 構造定理 (8.8/8.11–8.13) と §16 最終矛盾の proof をブロック。
+  - **今すぐ Tier A で書ける standalone 数論補題**: (11.1) `p^q>4q²+1` / (13.14) cyclotomic / (14.8a) `q^{p+1}>p^{q+1}` / (9.1) Wielandt — proof も可能。
+  - **再利用確定**: `OddOrder.BG.IsMinimalSimpleOdd G` (= Pf §10 の固定 G と同一、再定義不可)、`Peterfalvi.S05.TICyclicHypothesis` の設計 (type 𝒫 の V-normalizer 条件)、GroupTheory foundation 一式。
+- **共有 module 化**: (a) `M_F` → new `GroupTheory/MaxNilpotentNormalHall.lean` (BG §15 + Pf §10 横断); (b) **Type I–V 述語** → new `GroupTheory/MaximalSubgroupType.lean` (BG §16 と Pf 同一分類)。BG Ch4 §14–16 と Pf §10–16 を**同 wave で設計**。
 
 ## 次セッションで workflow を高速 scaffold に使う方針
 逐次 build-fix-commit がボトルネックなので、**worktree 分離した並列 scaffold** が有効:
