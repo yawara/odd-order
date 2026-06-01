@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
+import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
