@@ -1078,6 +1078,90 @@ private theorem blackburn_noncentral_centralizer_quotient_card_eq_prime
   · exact le_antisymm hquot_le
       (Nat.le_of_dvd (Nat.lt_trans Nat.zero_lt_one hquot_gt_one) hp_dvd)
 
+/-- Blackburn 4.16 Case B-2: `S = Ω₁(R)` is not contained in `C_R(T)` when
+`Z(S) < T = [S,R]`. -/
+private theorem blackburn_noncentral_omega1_not_le_centralizer
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    ¬ S ≤ Subgroup.centralizer (T : Set R) := by
+  dsimp at hT_facts ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  have hzS : z ∈ S := hT_facts.2.1.le hzT
+  intro hS_le_C
+  have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by
+    rw [Subgroup.mem_center_iff]
+    intro s
+    apply S.subtype_injective
+    exact ((hS_le_C s.2) z hzT).symm
+  exact hzZ ⟨⟨z, hzS⟩, hz_center, rfl⟩
+
+/-- Blackburn 4.16 Case B-2, equation (4.12), product part:
+`R = Ω₁(R) C_R(T)` for `T = [Ω₁(R),R]` in the noncentral commutator branch. -/
+private theorem blackburn_noncentral_omega1_sup_centralizer_eq_top
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    S ⊔ Subgroup.centralizer (T : Set R) = ⊤ := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (T : Set R)
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  haveI hT_normal : T.Normal := by
+    dsimp [T]
+    exact Subgroup.commutator_normal S (⊤ : Subgroup R)
+  have hquot_card : Nat.card (R ⧸ C) = p := by
+    dsimp [C]
+    exact blackburn_noncentral_centralizer_quotient_card_eq_prime hR hT_facts hT_elem
+  have hS_not_le_C : ¬ S ≤ C := by
+    dsimp [C]
+    exact blackburn_noncentral_omega1_not_le_centralizer (R := R) (p := p) hT_facts
+  have hSmap_ne_bot : S.map (QuotientGroup.mk' C) ≠ ⊥ := by
+    intro hbot
+    apply hS_not_le_C
+    intro s hsS
+    have hsmap : (QuotientGroup.mk' C) s ∈ S.map (QuotientGroup.mk' C) :=
+      Subgroup.mem_map.mpr ⟨s, hsS, rfl⟩
+    rw [hbot, Subgroup.mem_bot] at hsmap
+    exact (QuotientGroup.eq_one_iff s).mp hsmap
+  have hSmap_card_ne_one : Nat.card (S.map (QuotientGroup.mk' C)) ≠ 1 := by
+    intro hcard
+    exact hSmap_ne_bot (Subgroup.eq_bot_of_card_eq _ hcard)
+  have hSmap_card_dvd : Nat.card (S.map (QuotientGroup.mk' C)) ∣ p := by
+    rw [← hquot_card]
+    exact Subgroup.card_subgroup_dvd_card (S.map (QuotientGroup.mk' C))
+  have hSmap_card : Nat.card (S.map (QuotientGroup.mk' C)) = p := by
+    rcases (Nat.dvd_prime (Fact.out : Nat.Prime p)).mp hSmap_card_dvd with hcard_one | hcard_p
+    · exact False.elim (hSmap_card_ne_one hcard_one)
+    · exact hcard_p
+  have hSmap_top : S.map (QuotientGroup.mk' C) = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq (H := S.map (QuotientGroup.mk' C))
+    rw [hSmap_card, hquot_card]
+  have hcomap : (S.map (QuotientGroup.mk' C)).comap (QuotientGroup.mk' C) = C ⊔ S :=
+    QuotientGroup.comap_map_mk' C S
+  have hCS_top : C ⊔ S = ⊤ := by
+    rw [hSmap_top, Subgroup.comap_top] at hcomap
+    exact hcomap.symm
+  rw [sup_comm]
+  exact hCS_top
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1251,8 +1335,10 @@ theorem blackburnRankTwoClassification
     have hT_elem := blackburn_noncentral_commutator_isElementaryAbelian hΩ_pow hT_facts
     have hT_quot_cards :=
       blackburn_noncentral_commutator_quotient_cards hΩ_card hΩ_extraspecial hT_facts
-    have hRT_centralizer_card_le :=
-      blackburn_noncentral_centralizer_quotient_card_le_prime hR hT_facts hT_elem
+    have hRT_centralizer_card :=
+      blackburn_noncentral_centralizer_quotient_card_eq_prime hR hT_facts hT_elem
+    have hSC_top :=
+      blackburn_noncentral_omega1_sup_centralizer_eq_top hR hT_facts hT_elem
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
