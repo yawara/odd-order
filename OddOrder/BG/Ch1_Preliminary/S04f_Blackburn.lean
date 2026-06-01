@@ -213,8 +213,9 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     apply hψ_ne_one
     ext g
     exact hfix g
-  obtain ⟨Q, hQ_inv, hψ_nt_Q, hQ_special, hQ_exp⟩ :=
-    exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction hp_odd φ hR hA_cop hψA_ntriv
+  obtain ⟨Q, hQ_inv, hψ_nt_Q, hQ_special, hQ_exp, hQ_min⟩ :=
+    exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality
+      hp_odd φ hR hA_cop hψA_ntriv
   have hQ_rank : pRank Q p ≤ 2 :=
     pRank_subgroup_le_two_of_scn3_empty hp_odd hR hSCN Q
   have hQ_card_cube : Nat.card Q ≤ p ^ 3 :=
