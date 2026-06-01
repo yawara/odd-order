@@ -1297,3 +1297,30 @@ prefix `h0` + (6.8) Y; `coherentImageMap` Fourier-image 拡張)、`coherentPair_
 - `OddOrder/Peterfalvi/S08_CoherenceTheorems.lean:188` (sorry, SibleySetup/CoherenceTarget = 次の crux)。
 - `references/peterfalvi/04.7_pp_25_29_Coherence.mmd` (L86-105 = (5.6.1)/(5.6.2) 証明、形式化済) /
   `04.8_*` (L150- = (6.8) case split、次のターゲット)。
+
+---
+
+## 進捗 (2026-06-01, worktree `lucid-kapitsa-c87a31`) — [Is]Thm 6.34 bricks + 完全 assembly plan
+
+**正本 plan = 新ノート `notes/peterfalvi/s08_6_8_assembly_plan.md`** (2 並列 explore 統合 + 監査訂正 +
+T0–T11 task DAG)。以下サマリ。
+
+### [Is]Thm 6.34 (induced irreducibility) 着手 — 新 file `OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean`
+6.8 の `Y=S(H')` (η_j(1)=|W₁|) + case-A `X⊂Irr L` を供給する最高レバレッジ brick。**landed (sorry-free,
+axiom-clean, AxiomsCheck 登録)**:
+- **(i) Mackey 制限** `card_smul_restrict_induce` (commit 8e1b74e): `|H|•Res_H(Ind θ)=∑_{x∈G} θ^{x⁻¹}`。
+  **非正規化形**で transversal/Quotient.out/fiber-card を全回避 (設計上の鍵)。
+- **(ii-pre)** `card_mul_inner_self_induce` + **(ii)** `card_mul_inner_self_induce_eq_card_inertia`
+  (commit 9c505fc): `|H|·‖Ind θ‖²=|I_G(θ)|` (=`[I_G(θ):H]`)、irreducible θ。Frobenius∘Mackey∘orthonormality。
+- **残**: (iv) degree = `induce_apply_one` **既存**; (iii) 既約性 = `induce_mem_ZIrr`(764) +
+  ‖·‖²=1 ⟹ ±irr (新 sub-brick, `exists_irr_sub_irr_of_inner_self_two`@ZIrrFourier:528 を template に) +
+  degree>0 で符号確定。
+
+### 監査訂正 (explore が code 照合; handoff の stale 箇所)
+1. **(6.7) は ~90% 既 landed** (`peterfalvi_673`@ClassSumAlgebra:1651 等)。handoff の「~300行未実装」は誤り。
+   残=上位定理 wiring + (iii)-collapse + rationality (~150-250 LOC, **6.34 非依存・今すぐ可**)。
+2. **隠れた最重 blocker = `SibleySetup` が thin** (T1): `coherence.tau` が opaque+大域等距だが engine は
+   `dadeIntegralCharacterMap` 専用に `IsCoherent` を産む。**再 param + `tau:=dadeIntegralCharacterMap` 必須**
+   (詳細・field 骨子・build-order はノート §B)。**(6.8.a) は H NILPOTENT** (IsPGroup 化は scaffolding)、
+   現 `H_sharp_ti` は ambient 誤り。shared/frozen file 変更ゼロで実行可。
+3. **今すぐ並行可 (6.34 非依存) leaf**: T0(Cor2.30) / T1(SibleySetup) / T3(6.7 wiring) / T4(Galois) / T5(Lem2.27)。
