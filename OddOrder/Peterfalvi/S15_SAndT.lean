@@ -64,8 +64,8 @@ structure Hypothesis where
   W_cyclic : IsCyclic ↥W
   P_eq_SF : P = maxNilpotentNormalHall S
   Q_eq_TF : Q = maxNilpotentNormalHall T
-  S_deriv_eq_PU : derivedInAmbient S = P ⊔ U
-  T_deriv_eq_QV : derivedInAmbient T = Q ⊔ V
+  S_deriv_eq_PU : derivedInG S = P ⊔ U
+  T_deriv_eq_QV : derivedInG T = Q ⊔ V
   C_eq : C = U ⊓ Subgroup.centralizer (P : Set G)
   D_eq : D = V ⊓ Subgroup.centralizer (Q : Set G)
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)

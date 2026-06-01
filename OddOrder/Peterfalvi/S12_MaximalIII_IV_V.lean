@@ -56,7 +56,7 @@ namespace Hypothesis
 
 /-- Peterfalvi's `M'`, represented as an ambient subgroup. -/
 def Mderiv {M : Subgroup G} (_hyp : Hypothesis M) : Subgroup G :=
-  derivedInAmbient M
+  derivedInG M
 
 /-- Peterfalvi's `M''`, represented as an ambient subgroup. -/
 def Msecond {M : Subgroup G} (_hyp : Hypothesis M) : Subgroup G :=
@@ -175,10 +175,10 @@ theorem tau1_values_and_norm_bound [Finite G] [Fintype G]
 /-- A carrier for the conclusion of Peterfalvi (10.7): `[S,S]` is a Frobenius
 group with kernel `S_F`. -/
 structure DerivedFrobeniusData (S : Subgroup G) where
-  kernel : Subgroup ↥(derivedInAmbient S)
-  complement : Subgroup ↥(derivedInAmbient S)
+  kernel : Subgroup ↥(derivedInG S)
+  complement : Subgroup ↥(derivedInG S)
   kernel_is_SF : Prop
-  frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInAmbient S) kernel complement
+  frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S) kernel complement
 
 /-- **Peterfalvi (10.7)**: if `S` is a maximal subgroup of type II, then
 `[S,S]` is Frobenius with kernel `S_F`. -/

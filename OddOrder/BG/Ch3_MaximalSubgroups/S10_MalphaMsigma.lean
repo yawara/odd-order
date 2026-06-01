@@ -34,9 +34,9 @@ Ch3 (§11–§13) と Ch4 全体がこの定義層に依存する。
 - `idealPrime p G` (p が *ideal*): `r_p(G) ≥ 3` かつ 全 Sylow `p` で `ℰ²(P)∩ℰ*(P) = ∅`。
 - `alpha M` = `α(M) = {p ∈ π(M) | r_p(M) ≥ 3}`; `beta M` = `{p ∈ α(M) | p ideal}`;
   `sigma M` = `{p ∈ π(M) | ∃ Sylow_p P of M, N_G(P) ⊆ M}`。
-- `Malpha/Mbeta/Msigma M` = `O_{α/β/σ(M)}(M)` (`Ch2.S07.opiCoreInG`);
+- `Malpha/Mbeta/Msigma M` = `O_{α/β/σ(M)}(M)` (`opiCoreInG`);
   `Fsigma/Fsigma' M` = `O_{σ(M)/σ'}(F(M))`。
-- `r_p` = `pRank ↥· p`; `r` = `rank ↥·`; `M'` = `Ch2.S07.derivedInG M`;
+- `r_p` = `pRank ↥· p`; `r` = `rank ↥·`; `M'` = `derivedInG M`;
   `F(M)` = `Ch2.S08.fittingInG M`。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
@@ -79,21 +79,21 @@ def sigma (M : Subgroup G) : Set ℕ :=
     ∃ P : Sylow p ↥M, Subgroup.normalizer ((P : Subgroup ↥M).map M.subtype) ≤ M}
 
 /-- **BG `M_α = O_{α(M)}(M)`**。 -/
-noncomputable def Malpha (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (alpha M) M
+noncomputable def Malpha (M : Subgroup G) : Subgroup G := opiCoreInG (alpha M) M
 
 /-- **BG `M_β = O_{β(M)}(M)`**。 -/
-noncomputable def Mbeta (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (beta M) M
+noncomputable def Mbeta (M : Subgroup G) : Subgroup G := opiCoreInG (beta M) M
 
 /-- **BG `M_σ = O_{σ(M)}(M)`**。 -/
-noncomputable def Msigma (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (sigma M) M
+noncomputable def Msigma (M : Subgroup G) : Subgroup G := opiCoreInG (sigma M) M
 
 /-- **BG `F_σ(M) = O_{σ(M)}(F(M))`**。 -/
 noncomputable def Fsigma (M : Subgroup G) : Subgroup G :=
-  Ch2.S07.opiCoreInG (sigma M) (Ch2.S08.fittingInG M)
+  opiCoreInG (sigma M) (Ch2.S08.fittingInG M)
 
 /-- **BG `F_{σ'}(M) = O_{σ(M)'}(F(M))`**。 -/
 noncomputable def Fsigma' (M : Subgroup G) : Subgroup G :=
-  Ch2.S07.opiCoreInG (sigma M)ᶜ (Ch2.S08.fittingInG M)
+  opiCoreInG (sigma M)ᶜ (Ch2.S08.fittingInG M)
 
 /-! ## Theorem 10.6 — proper subgroup は p-length one (mmd L2779) -/
 
@@ -135,7 +135,7 @@ theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (sigma M) (Msigma M) ∧
     Ch03.IsHallSubgroup (alpha M) (Malpha M) ∧
-    Malpha M ≤ Msigma M ∧ Msigma M ≤ Ch2.S07.derivedInG M ∧
+    Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧
     Msigma M ≠ ⊥ := by
   sorry
 
@@ -154,7 +154,7 @@ theorem sylow_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p
       (P : Subgroup G) ⊓ V = ⊥ →
       (P : Subgroup G) ⊔ V = Subgroup.normalizer ((P : Subgroup G) : Set G) →
       (P : Subgroup G) = ⁅(P : Subgroup G), V⁆ ∧
-        (P : Subgroup G) ≤ Ch2.S07.derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G))) ∧
+        (P : Subgroup G) ≤ derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G))) ∧
     (rank ↥(P : Subgroup G) ≤ 2 →
       IsMulCommutative (P : Subgroup G) ∨
       ∃ P₁ P₂ : Subgroup G, P₁ ≤ (P : Subgroup G) ∧ P₂ ≤ (P : Subgroup G) ∧
@@ -183,13 +183,13 @@ theorem sylow_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p
 theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (beta M) (Mbeta M) ∧
-    (∃ W : Subgroup G, W ≤ Ch2.S07.derivedInG M ∧
-      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (Ch2.S07.derivedInG M)) ∧
+    (∃ W : Subgroup G, W ≤ derivedInG M ∧
+      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (derivedInG M)) ∧
       Group.IsNilpotent ↥W) ∧
     (∃ W : Subgroup G, W ≤ Msigma M ∧
       Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (Msigma M)) ∧ Group.IsNilpotent ↥W) ∧
     (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
-      Ch05.HasNormalPComplement p ↥(Ch2.S07.derivedInG M) ∧
+      Ch05.HasNormalPComplement p ↥(derivedInG M) ∧
       Ch05.HasNormalPComplement p ↥(Msigma M)) := by
   sorry
 
@@ -239,9 +239,9 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) :
     ¬ IsUniquelyMaximal K ∧
     rank ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K) ≤ 1 ∧
-    (IsCyclic ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ Ch2.S07.derivedInG M) ∧
+    (IsCyclic ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M) ∧
       M ≤ Subgroup.normalizer
-        ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ Ch2.S07.derivedInG M : Subgroup G) :
+        ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M : Subgroup G) :
           Set G)) := by
   sorry
 
@@ -280,7 +280,7 @@ theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hpq : p ≠ q) (hpβ : p ∉ beta M) (hqβ : q ∉ beta M)
     {X : Subgroup G} (hXM : X ≤ M) (hXq : IsPGroup q ↥X)
-    (hcase : X ≤ Ch2.S07.derivedInG M ∨ p < q) :
+    (hcase : X ≤ derivedInG M ∨ p < q) :
     (∃ S : Sylow p ↥(Msigma M),
       X ≤ Subgroup.centralizer
         (((S : Subgroup ↥(Msigma M)).map (Msigma M).subtype : Subgroup G) : Set G)) ∧
@@ -300,10 +300,10 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
     (hqc : q ∈ (Nat.card ↥(Subgroup.centralizer (A : Set G))).primeFactors) :
     ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧
       (∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G),
-        ∃ c ∈ Ch2.S07.opiCoreInG {p}ᶜ (Subgroup.centralizer ((P : Subgroup G) : Set G)),
+        ∃ c ∈ opiCoreInG {p}ᶜ (Subgroup.centralizer ((P : Subgroup G) : Set G)),
           ∃ m ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) ⊓
             Subgroup.normalizer (Q : Set G), n = c * m) ∧
-      (P : Subgroup G) ≤ Ch2.S07.derivedInG (Subgroup.normalizer (Q : Set G)) ∧
+      (P : Subgroup G) ≤ derivedInG (Subgroup.normalizer (Q : Set G)) ∧
       ((IsCyclic ↥Q ∨ ∃ B : Subgroup ↥Q, Nat.card ↥B = q ^ 2 ∧ IsMaximalElementaryAbelian q B) →
         (P : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) := by
   sorry

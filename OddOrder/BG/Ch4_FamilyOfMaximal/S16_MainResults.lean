@@ -78,8 +78,8 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       Kstar ≠ ⊥ ∧
       (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
       S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
-      OddOrder.BG.Ch3.S10.Msigma M ≤ OddOrder.BG.Ch2.S07.derivedInG M ∧
-      derivedInAmbient (OddOrder.BG.Ch2.S07.derivedInG M) ≤ S15.fittingInAmbient M ∧
+      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
+      derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
       (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
   sorry
@@ -113,8 +113,8 @@ theorem theoremC_paired_structure [Finite G]
       (U.subgroupOf M)) :
     IsMulCommutative ↥U ∧ ¬ Subgroup.normalizer (U : Set G) ≤ M ∧
       Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ S15.MF M ∧
-      OddOrder.BG.Ch2.S07.derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
-      Kstar ≤ derivedInAmbient (OddOrder.BG.Ch2.S07.derivedInG M) ∧
+      derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
+      Kstar ≤ derivedInG (derivedInG M) ∧
       (∃! Mstar : Subgroup G,
         Mstar ∈ maximalSubgroups G ∧ S14.IsTypeP Mstar ∧
           ¬ S14.IsConjugateSubgroup M Mstar ∧
@@ -171,7 +171,7 @@ theorem proposition_type_classification [Finite G]
         S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) ∧
       (OddOrder.GroupTheory.IsTypeV M ↔
         S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) ∧
-      (OddOrder.BG.Ch2.S07.derivedInG M =
+      (derivedInG M =
         (⊤ : Subgroup G) ⊔ OddOrder.BG.Ch3.S10.Msigma M ↔
           ¬ OddOrder.GroupTheory.IsTypeI M) ∧
       (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔

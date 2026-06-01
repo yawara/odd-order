@@ -24,19 +24,9 @@ namespace OddOrder.GroupTheory
 
 variable {G : Type*} [Group G]
 
-/-- The relative `pi`-core of `M`: the supremum of normal `pi`-subgroups of `M`,
-realized as a subgroup of the ambient group.  This is the generic object behind
-notations such as `O_p(M)` and `O_{p'}(M)` when the subgroup is viewed in `G`. -/
-noncomputable def piCoreIn (pi : Set ℕ) (M : Subgroup G) : Subgroup G :=
-  sSup {N : Subgroup G | N ≤ M ∧ (N.subgroupOf M).Normal ∧ Subgroup.IsPiSubgroup pi N}
-
-/-- `O_{p'}(M)`, viewed as a subgroup of the ambient group. -/
-noncomputable def pPrimeCoreIn (p : ℕ) (M : Subgroup G) : Subgroup G :=
-  piCoreIn ({p}ᶜ) M
-
-/-- `O_p(M)`, viewed as a subgroup of the ambient group. -/
-noncomputable def pCoreIn (p : ℕ) (M : Subgroup G) : Subgroup G :=
-  piCoreIn {p} M
+-- The `O_π(M)` / `O_p(M)` / `O_{p'}(M)`-in-`G` constructions formerly defined here
+-- (`piCoreIn` / `pCoreIn` / `pPrimeCoreIn`) are unified into the canonical
+-- `OddOrder.GroupTheory.opiCoreInG` in `GroupTheory.SubgroupInAmbient` (issue 0052).
 
 /-- Peterfalvi's `M_F`: the maximal nilpotent normal Hall subgroup of `M`,
 realized in the ambient group.  The Hall set is the set of prime divisors of the

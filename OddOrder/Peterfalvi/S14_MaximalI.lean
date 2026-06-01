@@ -62,7 +62,7 @@ def H {L : Subgroup G} (hyp : Hypothesis L) : Subgroup G :=
 
 /-- Peterfalvi's `H'`, represented as an ambient subgroup. -/
 def Hprime {L : Subgroup G} (hyp : Hypothesis L) : Subgroup G :=
-  derivedInAmbient hyp.H
+  derivedInG hyp.H
 
 /-- Peterfalvi's ambient `A(L)` set from Definition (8.3). -/
 def ambientA {L : Subgroup G} (hyp : Hypothesis L) : Set G :=
@@ -187,7 +187,7 @@ structure CounterexampleHypothesis where
   M_maximal : M ∈ maximalSubgroups G
   M_typeI : IsTypeI M
   K_eq_MF : K = maxNilpotentNormalHall M
-  Kprime_eq : Kprime = derivedInAmbient K
+  Kprime_eq : Kprime = derivedInG K
   P0_le_M : P0 ≤ M
   P0_sylow_quotient : Prop
   P0_noncyclic_quotient : Prop

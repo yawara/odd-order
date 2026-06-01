@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import Mathlib.GroupTheory.IsSubnormal
 import Mathlib.Algebra.Group.Subgroup.Pointwise
@@ -53,19 +54,10 @@ variable {G : Type*} [Group G]
 /-- `π(A)`: `|A|` の素因子集合。 -/
 def primesOf (A : Subgroup G) : Set ℕ := {q | q ∈ (Nat.card ↥A).primeFactors}
 
-/-- `O_π(H)` を `G` 内の部分群として実現したもの (= `(O_π(↥H)).map H.subtype`)。BG の
-`O_{π'}(X)` / `O_{π'}(C_G(P))` を `Subgroup G` として扱うための橋。 -/
-def opiCoreInG (π : Set ℕ) (H : Subgroup G) : Subgroup G :=
-  (Ch03.oPiCore π ↥H).map H.subtype
-
-/-- `K = O_{π'}(C_G(A))` (Hypothesis 7.1 の `K`)。 -/
+/-- `K = O_{π'}(C_G(A))` (Hypothesis 7.1 の `K`)。`opiCoreInG` と `derivedInG` の canonical は
+`OddOrder.GroupTheory.SubgroupInAmbient` に移動 (issue 0052; `open OddOrder.GroupTheory` で参照)。 -/
 def kSubgroup (A : Subgroup G) : Subgroup G :=
   opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (A : Set G))
-
-/-- `H′` (`H` の derived subgroup) を `G` 内の部分群として実現したもの。Thm 7.4(d) の
-`N_G(P)′ ⊆ N_G(Q)′` を述べるため。 -/
-def derivedInG (H : Subgroup G) : Subgroup G :=
-  (commutator ↥H).map H.subtype
 
 /-- `K` が部分群の集合 `S` 上 conjugation で **推移的に作用**する: 任意の `Q₁,Q₂ ∈ S` に対し
 ある `k ∈ K` で `Q₁^k = Q₂` (`MulAut.conj k • Q₁ = Q₂`)。 -/

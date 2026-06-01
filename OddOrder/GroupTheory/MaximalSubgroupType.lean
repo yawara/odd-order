@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.MaxNilpotentNormalHall
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.TISubset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
@@ -28,13 +29,10 @@ open OddOrder.Isaacs
 
 variable {G : Type*} [Group G]
 
-/-- The derived subgroup of `M`, viewed as a subgroup of the ambient group. -/
-def derivedInAmbient (M : Subgroup G) : Subgroup G :=
-  (commutator ↥M).map M.subtype
-
-/-- The second derived subgroup of `M`, viewed in the ambient group. -/
+/-- The second derived subgroup `M''` of `M`, viewed in the ambient group.
+(`M' = derivedInG M`, canonical in `GroupTheory.SubgroupInAmbient`, issue 0052.) -/
 def secondDerivedInAmbient (M : Subgroup G) : Subgroup G :=
-  derivedInAmbient (derivedInAmbient M)
+  derivedInG (derivedInG M)
 
 /-- Nonidentity elements of a subgroup, as a subset of the ambient group. -/
 def sharpSubgroup (H : Subgroup G) : Set G :=
@@ -96,7 +94,7 @@ structure TypeIData (M : Subgroup G) where
     ((∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥typeF.H).primeFactors →
         Monoid.exponent typeF.U ∣ p - 1) ∧
       ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥typeF.H).primeFactors ∧
-        IsCyclic ↥(pPrimeCoreIn p typeF.H))
+        IsCyclic ↥(opiCoreInG {p}ᶜ typeF.H))
 
 /-- Predicate form of Peterfalvi type I. -/
 def IsTypeI (M : Subgroup G) : Prop :=
@@ -114,8 +112,8 @@ structure TypePData (M : Subgroup G) where
   W2 : Subgroup G
   W : Subgroup G
   H_eq : H = maxNilpotentNormalHall M
-  H_le : H ≤ derivedInAmbient M
-  U_le : U ≤ derivedInAmbient M
+  H_le : H ≤ derivedInG M
+  U_le : U ≤ derivedInG M
   W1_le : W1 ≤ M
   W2_le : W2 ≤ H ⊓ secondDerivedInAmbient M
   W_eq : W = W1 ⊔ W2
@@ -124,18 +122,18 @@ structure TypePData (M : Subgroup G) where
   W2_nontrivial : W2 ≠ ⊥
   W1_cyclic : IsCyclic ↥W1
   W2_cyclic : IsCyclic ↥W2
-  M_complement : Subgroup.IsComplement' ((derivedInAmbient M).subgroupOf M) (W1.subgroupOf M)
-  U_normal : (U.subgroupOf (derivedInAmbient M)).Normal
+  M_complement : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (W1.subgroupOf M)
+  U_normal : (U.subgroupOf (derivedInG M)).Normal
   U_nilpotent : Group.IsNilpotent ↥U
   derived_complement :
-    Subgroup.IsComplement' (H.subgroupOf (derivedInAmbient M)) (U.subgroupOf (derivedInAmbient M))
+    Subgroup.IsComplement' (H.subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M))
   H_noncyclic : ¬ IsCyclic ↥H
   secondDerived_le_fitting :
     secondDerivedInAmbient M ≤ H ⊔ (U ⊓ Subgroup.centralizer (H : Set G))
   fitting_eq : maxNilpotentNormalHall M = H ⊔ (U ⊓ Subgroup.centralizer (H : Set G))
-  fitting_lt_derived : maxNilpotentNormalHall M < derivedInAmbient M
+  fitting_lt_derived : maxNilpotentNormalHall M < derivedInG M
   centralizer_W1 : ∀ x ∈ W1, x ≠ 1 →
-    derivedInAmbient M ⊓ Subgroup.centralizer ({x} : Set G) = W2
+    derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = W2
   normalizer_V : ∀ X : Set G, X.Nonempty →
     X ⊆ (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) → Subgroup.normalizer X = W
 
@@ -155,8 +153,8 @@ structure TypeIIData (M : Subgroup G) where
   common : TypePNontrivialCore M typeP
   U_commutative : IsMulCommutative ↥typeP.U
   normalizer_not_le : ¬ Subgroup.normalizer (typeP.U : Set G) ≤ M
-  derived_typeF : IsTypeF (derivedInAmbient M)
-  derived_fitting_eq : maxNilpotentNormalHall (derivedInAmbient M) = typeP.H
+  derived_typeF : IsTypeF (derivedInG M)
+  derived_fitting_eq : maxNilpotentNormalHall (derivedInG M) = typeP.H
 
 /-- Data for Peterfalvi type III. -/
 structure TypeIIIData (M : Subgroup G) where
@@ -179,10 +177,10 @@ structure TypeVData (M : Subgroup G) where
   alternative :
     IsTISubset (sharpSubgroup typeP.H) (Subgroup.normalizer (typeP.H : Set G)) ∨
     (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥typeP.H).primeFactors ∧
-      Nat.card ↥typeP.W1 ∣ p - 1 ∧ IsCyclic ↥(pPrimeCoreIn p typeP.H)) ∨
+      Nat.card ↥typeP.W1 ∣ p - 1 ∧ IsCyclic ↥(opiCoreInG {p}ᶜ typeP.H)) ∨
     (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥typeP.H).primeFactors ∧
-      Nat.card ↥(pCoreIn p typeP.H) = p ^ 3 ∧ Nat.card ↥typeP.W1 ∣ p + 1 ∧
-      IsCyclic ↥(pPrimeCoreIn p typeP.H))
+      Nat.card ↥(opiCoreInG {p} typeP.H) = p ^ 3 ∧ Nat.card ↥typeP.W1 ∣ p + 1 ∧
+      IsCyclic ↥(opiCoreInG {p}ᶜ typeP.H))
 
 /-- Predicate form of Peterfalvi type II. -/
 def IsTypeII (M : Subgroup G) : Prop :=
@@ -222,8 +220,8 @@ def HasPeterfalviType (tau : PeterfalviType) (M : Subgroup G) : Prop :=
 `M'` for types III, IV. -/
 noncomputable def mainSubgroup (M : Subgroup G) (tau : PeterfalviType) : Subgroup G :=
   match tau with
-  | .III => derivedInAmbient M
-  | .IV => derivedInAmbient M
+  | .III => derivedInG M
+  | .IV => derivedInG M
   | .I => maxNilpotentNormalHall M
   | .II => maxNilpotentNormalHall M
   | .V => maxNilpotentNormalHall M
@@ -238,7 +236,7 @@ def typeIA (M : Subgroup G) (data : TypeIData M) : Set G :=
 
 /-- The `A(M)` set associated to type `P` data. -/
 def typePA (M : Subgroup G) (_data : TypePData M) : Set G :=
-  centralizerSupport (sharpSubgroup M) (derivedInAmbient M)
+  centralizerSupport (sharpSubgroup M) (derivedInG M)
 
 /-- The exceptional `V = W - (W_1 union W_2)` set attached to type `P` data. -/
 def typePV (M : Subgroup G) (data : TypePData M) : Set G :=

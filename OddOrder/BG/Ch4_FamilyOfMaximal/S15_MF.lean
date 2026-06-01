@@ -76,9 +76,9 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       (U.subgroupOf M)) :
     M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
       IsCyclic ↥K ∧
-      OddOrder.BG.Ch3.S10.Msigma M ≤ OddOrder.BG.Ch2.S07.derivedInG M ∧
-      derivedInAmbient (OddOrder.BG.Ch2.S07.derivedInG M) ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
-      (K ≠ ⊥ → OddOrder.BG.Ch2.S07.derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
+      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
+      derivedInG (derivedInG M) ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+      (K ≠ ⊥ → derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
         IsMulCommutative ↥U) ∧
       (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
@@ -114,8 +114,8 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         Q0 = Q ⊓ Subgroup.centralizer (D : Set G) ∧
         M ≤ Subgroup.normalizer (Q0 : Set G) ∧
         Nat.card ↥(Q.subgroupOf (Q ⊔ Q0)) = q ^ p ∧
-        OddOrder.BG.Ch3.S10.Msigma M = OddOrder.BG.Ch2.S07.derivedInG M ∧
-        derivedInAmbient (OddOrder.BG.Ch2.S07.derivedInG M) ≤ fittingInAmbient M := by
+        OddOrder.BG.Ch3.S10.Msigma M = derivedInG M ∧
+        derivedInG (derivedInG M) ≤ fittingInAmbient M := by
   sorry
 
 /-- **BG Corollary 15.3** (mmd L4154): centralizer and conjugacy control for Hall
@@ -158,7 +158,7 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ MF M ∧
-      Kstar ≤ derivedInAmbient (OddOrder.BG.Ch2.S07.derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
+      Kstar ≤ derivedInG (derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
   sorry
 
 /-! ## Theorems 15.7--15.9: TI failure and final local constraints -/
@@ -171,7 +171,7 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
       ∃ X : Subgroup G,
         X ≤ MF M ∧ X ≠ ⊥ ∧ IsCyclic ↥X ∧
-        OddOrder.BG.Ch2.S07.derivedInG M = fittingInAmbient M ∧
+        derivedInG M = fittingInAmbient M ∧
         (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
           p ∉ OddOrder.BG.Ch3.S10.beta M ∧
           (IsMulCommutative ↥(MF M) ∨

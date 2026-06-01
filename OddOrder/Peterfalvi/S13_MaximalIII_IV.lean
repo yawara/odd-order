@@ -59,9 +59,9 @@ structure Hypothesis (M : Subgroup G) where
   C_le_U : C ≤ base.typeP.U
   C_eq_centralizer : Prop
   Hprime : Subgroup G
-  Hprime_eq : Hprime = derivedInAmbient base.typeP.H
+  Hprime_eq : Hprime = derivedInG base.typeP.H
   Uprime : Subgroup G
-  Uprime_eq : Uprime = derivedInAmbient base.typeP.U
+  Uprime_eq : Uprime = derivedInG base.typeP.U
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
   quotientBoundFormula : Subgroup G → Prop
   secondDerived_eq_HC : Prop
@@ -121,7 +121,7 @@ theorem coherent_quotient_bound [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) (hH1_norm : M ≤ Subgroup.normalizer (H1 : Set G))
-    (hH1_lt : H1 < derivedInAmbient M)
+    (hH1_lt : H1 < derivedInG M)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
     hyp.quotientBoundFormula H1 := by

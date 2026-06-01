@@ -31,7 +31,7 @@ Lem 12.18 / Lem 12.19)。clean core を述べ、`Ω₁(P)=A`・内部直積の c
 
 - `tau1/tau2/tau3 M` (`Set ℕ`): `σ(M)'` を rank と `π(M')` で 3 分割 (mmd L3029)。
 - `SubgroupESetup M E E₁ E₂ E₃`: `E` は `M_σ` の `M` 内補群、`Eᵢ` は `E` の Hall `τᵢ(M)`-部分群。
-- `M'` = `Ch2.S07.derivedInG M`; `M_σ` = `S10.Msigma M`; `r_p` = `pRank ↥· p`。
+- `M'` = `derivedInG M`; `M_σ` = `S10.Msigma M`; `r_p` = `pRank ↥· p`。
 - 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。残り 18 結果 (12.2–12.19) は後続。
 -/
 
@@ -47,7 +47,7 @@ variable {G : Type*} [Group G]
 
 /-- **BG `τ₁(M)`** (mmd L3029): `{p ∈ σ(M)' | p ∉ π(M') ∧ r_p(M)=1}`。 -/
 def tau1 (M : Subgroup G) : Set ℕ :=
-  {p | p ∉ S10.sigma M ∧ p ∉ (Nat.card ↥(Ch2.S07.derivedInG M)).primeFactors ∧ pRank ↥M p = 1}
+  {p | p ∉ S10.sigma M ∧ p ∉ (Nat.card ↥(derivedInG M)).primeFactors ∧ pRank ↥M p = 1}
 
 /-- **BG `τ₂(M)`** (mmd L3029): `{p ∈ σ(M)' | r_p(M)=2}`。 -/
 def tau2 (M : Subgroup G) : Set ℕ :=
@@ -55,7 +55,7 @@ def tau2 (M : Subgroup G) : Set ℕ :=
 
 /-- **BG `τ₃(M)`** (mmd L3029): `{p ∈ σ(M)' | p ∈ π(M') ∧ r_p(M)=1}`。 -/
 def tau3 (M : Subgroup G) : Set ℕ :=
-  {p | p ∉ S10.sigma M ∧ p ∈ (Nat.card ↥(Ch2.S07.derivedInG M)).primeFactors ∧ pRank ↥M p = 1}
+  {p | p ∉ S10.sigma M ∧ p ∈ (Nat.card ↥(derivedInG M)).primeFactors ∧ pRank ↥M p = 1}
 
 /-- **BG §12 setup**: `E` は `M_σ` の `M` 内補群 (`M_σ ⊓ E = 1`, `M_σ ⊔ E = M`)、`E₁/E₂/E₃` は
 `E` の Hall `τ₁/τ₂/τ₃(M)`-部分群。`E₁₂ = E₁E₂` (= `E₁ ⊔ E₂`)。 -/
@@ -79,8 +79,8 @@ structure SubgroupESetup (M E E₁ E₂ E₃ : Subgroup G) : Prop where
 (g) `p∈τ₂(M)`, `A∈ℰ_p²(M)` ⇒ `A∈ℰ_p*(G)` かつ `p` は ideal でない (⇒ `p∉β(G)`)。 -/
 theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (h : SubgroupESetup M E E₁ E₂ E₃) :
-    Group.IsNilpotent ↥(Ch2.S07.derivedInG E) ∧
-    (E₃ ≤ Ch2.S07.derivedInG E ∧ E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G)) ∧
+    Group.IsNilpotent ↥(derivedInG E) ∧
+    (E₃ ≤ derivedInG E ∧ E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G)) ∧
     (E₂ = ⊥ → E₁ ≠ ⊥) ∧
     (IsCyclic ↥E₁ ∧ IsCyclic ↥E₃) ∧
     (E = E₁ ⊔ E₂ ⊔ E₃ ∧
@@ -123,7 +123,7 @@ theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd 
 theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
     {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXM : X ≤ M)
-    (hcase : p ∈ S10.beta M ∨ X ≤ Ch2.S07.derivedInG (S10.Msigma M)) :
+    (hcase : p ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)) :
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
   sorry
 
@@ -139,7 +139,7 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
 (原典の `M_σ ∩ M^g` cyclic 評価は後続。) -/
 theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
-    Subgroup.centralizer (E : Set G) ⊓ S10.Msigma M ≤ Ch2.S07.derivedInG (S10.Msigma M) ∧
+    Subgroup.centralizer (E : Set G) ⊓ S10.Msigma M ≤ derivedInG (S10.Msigma M) ∧
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   sorry
 
@@ -159,7 +159,7 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     ∃ W : Subgroup G, W ≤ S10.Msigma M ∧
       Ch03.IsHallSubgroup (S10.beta M)ᶜ (W.subgroupOf (S10.Msigma M)) ∧
-      Ch2.S07.derivedInG E ≤ Subgroup.centralizer (W : Set G) := by
+      derivedInG E ≤ Subgroup.centralizer (W : Set G) := by
   sorry
 
 /-! ## §12 τ₂(M) ≠ ∅ の場合 (mmd L3129-3344) — 最複雑 subsection -/
@@ -237,8 +237,8 @@ theorem E2_abelian_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     (S : Sylow p G) (hAS : A ≤ (S : Subgroup G)) (hSab : IsMulCommutative (S : Subgroup G)) :
     (IsMulCommutative ↥E₂ ∧ E ≤ Subgroup.normalizer (E₂ : Set G)) ∧
     Ch03.IsHallSubgroup (tau2 M) E₂ ∧
-    ((S : Subgroup G) ≤ Ch2.S07.derivedInG (Subgroup.normalizer ((S : Subgroup G) : Set G)) ∧
-      Ch2.S07.derivedInG (Subgroup.normalizer ((S : Subgroup G) : Set G)) ≤ Ch2.S08.fittingInG E ∧
+    ((S : Subgroup G) ≤ derivedInG (Subgroup.normalizer ((S : Subgroup G) : Set G)) ∧
+      derivedInG (Subgroup.normalizer ((S : Subgroup G) : Set G)) ≤ Ch2.S08.fittingInG E ∧
       Ch2.S08.fittingInG E ≤ Subgroup.centralizer ((S : Subgroup G) : Set G) ∧
       Subgroup.centralizer ((S : Subgroup G) : Set G) ≤ E) ∧
     (Subgroup.normalizer (A : Set G) = Subgroup.normalizer ((S : Subgroup G) : Set G) ∧
@@ -283,7 +283,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     (∀ N : Subgroup G, N ≤ M → Subgroup.IsPiSubgroup ((S10.sigma M)ᶜ) N →
       Group.IsNilpotent ↥N → IsMulCommutative ↥N) ∧
-    (IsMulCommutative ↥E₂ ∧ IsMulCommutative ↥(Ch2.S07.derivedInG E)) ∧
+    (IsMulCommutative ↥E₂ ∧ IsMulCommutative ↥(derivedInG E)) ∧
     (∀ p : ℕ, p ∈ tau2 M → ∀ A ∈ elemAbelianOfRank G p 2, A ≤ E →
       E₂ ⊔ E₃ ≤ E ⊓ Subgroup.centralizer (A : Set G) ∧
       E ≤ Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set G) ∧

@@ -15,6 +15,8 @@ local-analysis consequences for a minimal simple CN-group of odd order.
 namespace OddOrder.BG.AppD
 -- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
+open OddOrder.GroupTheory
+
 variable {G : Type*} [Group G]
 
 /-! ## CN-groups -/
@@ -51,7 +53,7 @@ theorem sylow_le_commutator_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
     (hyp : MinimalSimpleCNHypothesis (G := G)) (P : Sylow p G)
     (hPne : (P : Subgroup G) ≠ ⊥) :
     (P : Subgroup G) ≤
-      Ch2.S07.derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+      derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
   sorry
 
 /-- The Appendix D reduction package: Lemmas D.1 and D.2 are the local-analysis
