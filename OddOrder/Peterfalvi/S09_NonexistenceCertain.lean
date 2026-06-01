@@ -2026,6 +2026,69 @@ lemma two_le_e [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.e i :=
   have h1 : 1 < Nat.card C := Finite.one_lt_card_iff_nontrivial.mpr hnt
   omega
 
+/-- Lagrange plus the Frobenius product formula: `|G| = [G : L_i] h_i e_i`. -/
+lemma index_mul_h_mul_e_eq_card_G [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (F.L i).index * (F.h i * F.e i) = Nat.card G := by
+  rw [F.h_mul_e_eq_card_L i]
+  exact (F.L i).index_mul_card
+
+/-- The spread count in `h_i` notation. -/
+lemma card_kernelSpread_eq_index_mul_h_sub_one [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (F.kernelSpread i) = (F.L i).index * (F.h i - 1) := by
+  simpa [h] using F.card_kernelSpread_eq_index_mul i
+
+/-- `H_i^#` has cardinality `h_i - 1` as a `Nat.card` statement. -/
+lemma card_kernel_sharp_eq_h_sub_one [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) = F.h i - 1 := by
+  rw [Nat.card_coe_set_eq]
+  exact F.ncard_kernel_sharp i
+
+/-- The local sharp-kernel ratio `|H_i^#| / |L_i| = (h_i - 1)/(h_i e_i)`. -/
+lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℚ) /
+        (Nat.card (F.L i) : ℚ) =
+      ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
+  norm_num [Nat.cast_sub hh1]
+
+/-- The global spread ratio equals the same local ratio `(h_i - 1)/(h_i e_i)`. -/
+lemma card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) =
+      ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hidx_pos : 0 < (F.L i).index := by
+    rw [Subgroup.index_eq_card]
+    exact Nat.card_pos
+  have hidx_ne : ((F.L i).index : ℚ) ≠ 0 := by
+    exact_mod_cast hidx_pos.ne'
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have hh_ne : (F.h i : ℚ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := F.H i)).ne'
+  have he_ne : (F.e i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_e i
+    positivity
+  rw [F.card_kernelSpread_eq_index_mul_h_sub_one i, ← F.index_mul_h_mul_e_eq_card_G i]
+  norm_num [Nat.cast_sub hh1]
+  field_simp [hidx_ne, hh_ne, he_ne]
+
+/-- The global spread ratio matches the local sharp-kernel ratio. -/
+lemma card_kernelSpread_div_card_G_eq_card_kernel_sharp_div_card_L [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) =
+      (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℚ) /
+        (Nat.card (F.L i) : ℚ) := by
+  rw [F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e,
+    F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e]
+
 /-- `2 e_i + 1 ≤ h_i`.  From `e_i ∣ h_i - 1` (Frobenius: `|H_i| ≡ 1 mod e_i`)
 together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
 quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
