@@ -29,7 +29,7 @@ L2315-2485, **1 結果** (Thm 8.1, (a)(b) 2 部).
 - `SCN₃(P)` (Sylow `P` of `M` 内) = `IsSCN₃ p (A.subgroupOf (P:Subgroup ↥M))`。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
-## proof は後続
+## Lane C proof-gate notes
 
 faithful statement + `sorry`。proof は §7 (Thm 7.2/7.4/7.6) + §6 Thm 6.2 一般形 + Prop 1.10/1.3
 に依存 (foundation-first)。§5 Lem 5.1 is only the nonemptiness remark for `SCN₃(P)`

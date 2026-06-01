@@ -37,7 +37,7 @@ L2486-2630, **6 結果** (Thm 9.1, 9.6 + Cor 9.2, 9.3 + Lem 9.4, 9.5)。
 faithful statement + `sorry`。proof は §7 (Thm 7.4/7.6) + §8 (Thm 8.1) + §6 Thm 6.2
 + §5 Lem 5.1 + §4 (Thm 4.20, Cor 4.19) + Prop 1.16 に依存 (foundation-first)。
 
-## Gate map for §4/§5 obligations
+## Lane C gate map for §4/§5 obligations
 
 * 9.1 consumes BG Thm 8.1 and BG Thm 4.20 at mmd L2533. It does not directly consume
   BG Lem 4.13, BG Thm 4.16, or the §5 narrow classification theorems.
