@@ -26,6 +26,19 @@ Thm 13.4/13.5/13.9/13.10)。
 
 **注**: Thm 13.10/Cor 13.11 の結論 bullet は Nougat が脱落 → PDF p.102-103 を画像読みで復元
 (`notes/meta/nougat_missing_page_recovery.md`)。
+
+## Lane C dependency gates
+
+- Import boundary: §13 imports §12 only. The §11 exceptional-maximal input is carried by
+  §12, because Prop 12.4 and Thm 12.5 are the first places using Hypothesis 11.1.
+- Lemma 13.1 uses Lemma 10.8 and Corollary 12.16(a) (mmd L3504/L3508).
+  This is the first §13 gate back into the β-radical and τ₂ exclusion machinery.
+- Corollary 13.2 uses Lemma 12.2(a) plus Lemma 13.1 (mmd L3524).
+- Theorem 13.4 uses Theorem 12.13 and Lemma 12.18 (mmd L3552/L3568);
+  these are centralizer-control interfaces, not new assumptions on `ActsPrimeOn`.
+- Lemma 13.8 and Theorem 13.10 use Proposition 10.14(d) and Lemma 12.18
+  (mmd L3646/L3656/L3692). Prop 10.14(d) is still deferred in §10, so these
+  statements must stay as honest scaffolds until that upstream clause exists.
 -/
 
 namespace OddOrder.BG.Ch3.S13
