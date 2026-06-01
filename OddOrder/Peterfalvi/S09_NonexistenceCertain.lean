@@ -1452,6 +1452,47 @@ noncomputable def gammaNormSq (H78 : Hypothesis78 G A L)
     (hBD : H78.BetaDecomp) : ℝ :=
   (ClassFunction.inner hBD.Gamma hBD.Gamma).re
 
+/-- Arithmetic core of Peterfalvi (7.8.b): if `2e + 1 ≤ h`, then the
+quadratic correction `u a² - 2 v a` is nonnegative for every integer `a`, where
+`u = (1/e)(1 - 1/h)` and `v = 1/h`. -/
+lemma quadraticTerm_nonneg_of_smallIndex {e h : ℝ} (a : ℤ)
+    (he : 0 < e) (hsmall : 2 * e + 1 ≤ h) :
+    0 ≤ (1 / e) * (1 - 1 / h) * (a : ℝ) ^ 2 - 2 * (1 / h) * (a : ℝ) := by
+  have hh_pos : 0 < h := by linarith
+  have he_ne : e ≠ 0 := ne_of_gt he
+  have hh_ne : h ≠ 0 := ne_of_gt hh_pos
+  have hsmall' : 2 * e ≤ h - 1 := by linarith
+  have hu_eq : (1 / e) * (1 - 1 / h) = (h - 1) / (e * h) := by
+    field_simp [he_ne, hh_ne]
+  have hkey : 2 * (1 / h) ≤ (1 / e) * (1 - 1 / h) := by
+    rw [hu_eq]
+    rw [show 2 * (1 / h) = 2 / h by ring]
+    rw [div_le_div_iff₀ hh_pos (mul_pos he hh_pos)]
+    nlinarith
+  have hv_nonneg : 0 ≤ 2 * (1 / h) := by
+    rw [one_div]
+    exact mul_nonneg (by norm_num) (inv_nonneg.mpr hh_pos.le)
+  have hu_nonneg : 0 ≤ (1 / e) * (1 - 1 / h) := le_trans hv_nonneg hkey
+  by_cases ha_nonpos_int : a ≤ 0
+  · have ha_nonpos : (a : ℝ) ≤ 0 := by exact_mod_cast ha_nonpos_int
+    have hsq_nonneg : 0 ≤ (a : ℝ) ^ 2 := sq_nonneg _
+    have hterm1 : 0 ≤ (1 / e) * (1 - 1 / h) * (a : ℝ) ^ 2 :=
+      mul_nonneg hu_nonneg hsq_nonneg
+    have hprod_nonpos : 2 * (1 / h) * (a : ℝ) ≤ 0 :=
+      mul_nonpos_of_nonneg_of_nonpos hv_nonneg ha_nonpos
+    nlinarith
+  · have ha_ge_one_int : 1 ≤ a := by omega
+    have ha_ge_one : (1 : ℝ) ≤ a := by exact_mod_cast ha_ge_one_int
+    have ha_nonneg : 0 ≤ (a : ℝ) := by linarith
+    have ha_sq_ge : (a : ℝ) ≤ (a : ℝ) ^ 2 := by nlinarith
+    have hmul1 : 2 * (1 / h) * (a : ℝ) ≤
+        ((1 / e) * (1 - 1 / h)) * (a : ℝ) :=
+      mul_le_mul_of_nonneg_right hkey ha_nonneg
+    have hmul2 : ((1 / e) * (1 - 1 / h)) * (a : ℝ) ≤
+        ((1 / e) * (1 - 1 / h)) * (a : ℝ) ^ 2 :=
+      mul_le_mul_of_nonneg_left ha_sq_ge hu_nonneg
+    nlinarith
+
 /-- **Peterfalvi (7.8.b) target.**  Under `2e + 1 ≤ h`, the coherent
 `ζ`-image satisfies `‖(ζ^ν)^ρ‖² ≥ 1 - e/h`, and the residual term from
 (7.8.a) satisfies `‖Γ‖² ≤ e - 1`.
