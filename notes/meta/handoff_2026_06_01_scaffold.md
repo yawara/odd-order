@@ -12,7 +12,8 @@
 - **Peterfalvi** §10–§16 (S10–S16) + Appendices (Suzuki/Huppert/NearFields/FeitSibley/Suzuki2Groups)。§15 で ω/η/μ/ν を実型 field 化。
 - **最上位** `OddOrder/FeitThompson.lean` (`feitThompson` sorry + honest final-contradiction bridge)。
 - **design**: 群論=faithful 実構造、文字理論の恒等式のみ opaque `_formula:Prop` placeholder (217箇所; gate#3 ω/η/μ/ν 未材料化; sorry 化済で laundering 無)。convention = `notes/meta/scaffold_opaque_prop_convention.md`。
-- **フォローアップ**: opaque `_formula` rider 含む定理結論は部分 vacuous; `GroupTheory.derivedInAmbient`/`piCoreIn` が `Ch2.S07.derivedInG`/`opiCoreInG` と重複 (issue 登録済) → proof フェーズで統一。
+- **フォローアップ**: opaque `_formula` rider 含む定理結論は部分 vacuous (要 ω/η/μ/ν 材料化)。
+- **✅ 重複定義 統一済 (issue 0052 closed, eae67a0 + 42fab0f)**: `derivedInAmbient`/`piCoreIn`/`pCoreIn`/`pPrimeCoreIn` → 新 canonical `GroupTheory/SubgroupInAmbient.{derivedInG,opiCoreInG}`; `conjugacySaturation` → 既存 `ConjClassSet.conjClassSet`。残: `MF`=`maxNilpotentNormalHall` (abbrev, 慣用名で OK)、`S14.IsTypeF`(κ-based)≠`GroupTheory.IsTypeF`(構造-based, §16 で ↔ 対応)、`sharpSubgroup`/`S04.sharp` (trivial `\{1}`, S04 proven ゆえ放置)。
 - **次フェーズ = proof 充填** (本線 §4 Lem 4.13 → §16 → Pf §8/§9)。
 
 ---
