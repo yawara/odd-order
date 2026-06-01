@@ -194,9 +194,8 @@ remaining (6.8) hypotheses — `S = {Ind_H^L θ | θ ≠ 1}`, the split `L = H �
 the case (c1)/(c2) disjunction (`S06.CertainTypeHypothesis`) — are added next, after which
 `sibleySetup_is_coherent` is restated against this carrier and the legacy `SibleySetup` removed. -/
 structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (L : Subgroup G) [Fintype ↥L] [Invertible (Nat.card L : ℂ)] where
-  /-- The normal subgroup `H ⊴ L` (Peterfalvi (6.8.a)). -/
-  H : Subgroup ↥L
+    (L : Subgroup G) [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+    (H : Subgroup ↥L) [Invertible (Nat.card ↥H : ℂ)] where
   /-- A complement-side subgroup `W₁`; the split `L = H ⋊ W₁` is added in the next migration step. -/
   W1 : Subgroup ↥L
   H_ne_bot : H ≠ ⊥
@@ -208,17 +207,22 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   /-- The §4 Dade datum on `A = H^#`; its Dade isometry *is* `tau`. -/
   dade : OddOrder.Peterfalvi.S04.Hypothesis G (sharpImage H) L
   hconj : dade.HConjInvariant
-  /-- The base character set (`{Ind_H^L θ | θ ≠ 1}`; the explicit characterization is added next). -/
+  /-- The base character set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` (Peterfalvi (6.8.b)). -/
   S : Set (ClassFunction ↥L ℂ)
+  /-- `S` is exactly the set of characters induced from nontrivial irreducibles of `H`. -/
+  S_eq : S = {φ : ClassFunction ↥L ℂ | ∃ θ : IrreducibleCharacter ↥H,
+    θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H ∧
+    φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ)}
 
 namespace SibleyDadeHypothesis
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
 /-- The coherence map `τ` of the (6.8) setup, realized as the genuine §4 Dade isometry
 (`dadeIntegralCharacterMap`) — **not** an opaque global isometry. -/
-noncomputable abbrev tau (hyp : SibleyDadeHypothesis G L) :
+noncomputable abbrev tau (hyp : SibleyDadeHypothesis G L H) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G :=
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
     (hyp.dade.fullDadeIsometryData hyp.hconj)
@@ -226,9 +230,9 @@ noncomputable abbrev tau (hyp : SibleyDadeHypothesis G L) :
 /-- The (6.8) coherence target: `S` is coherent for the **real Dade map** `tau`.  This is exactly
 the conclusion shape produced by the §7 engine, hence honestly dischargeable — unlike the legacy
 `SibleySetup.CoherenceTarget`, which required a nonexistent global isometry. -/
-abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L) :=
+abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L H) :=
   OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S
-    (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage hyp.H) L)
+    (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
 
 end SibleyDadeHypothesis
 
