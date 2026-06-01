@@ -2142,6 +2142,85 @@ lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
   have hmul : F.e i * 2 ≤ F.e i * m := Nat.mul_le_mul_left _ hm_ge2
   omega
 
+/-- If `h_i` is chosen minimal, then every other odd coprime kernel order is at
+least `h_i + 2`. -/
+lemma h_add_two_le_h_of_min [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) {i j : Fin k} (hij : i ≠ j)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) : F.h i + 2 ≤ F.h j := by
+  have hcop : Nat.Coprime (F.h i) (F.h j) := by
+    simpa [h] using F.coprime_kernel hij
+  have hne : F.h i ≠ F.h j := by
+    intro heq
+    have hone : F.h i = 1 := Nat.eq_one_of_dvd_coprimes hcop dvd_rfl (by
+      rw [← heq])
+    have h2 := F.two_le_h i
+    omega
+  have hi_odd : Odd (F.h i) := F.odd_h hodd i
+  have hj_odd : Odd (F.h j) := F.odd_h hodd j
+  have hlt : F.h i < F.h j := by
+    have hle := hmin j
+    omega
+  obtain ⟨a, ha⟩ := hi_odd
+  obtain ⟨b, hb⟩ := hj_odd
+  omega
+
+/-- A minimal kernel order gives the denominator comparison used in the
+`𝓑`-sum estimate in Peterfalvi (7.10). -/
+lemma h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i j : Fin k}
+    (hij : i ≠ j) (hmin : ∀ l : Fin k, F.h i ≤ F.h l) :
+    ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)) ≤
+      (((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) := by
+  have hden_le_nat : F.h i + 2 ≤ F.h j := F.h_add_two_le_h_of_min hodd hij hmin
+  have hhj_ge2 : 2 ≤ F.h j := F.two_le_h j
+  have hej_ge2 : 2 ≤ F.e j := F.two_le_e j
+  have hhj_ne : (F.h j : ℚ) ≠ 0 := by positivity
+  have hei_ne : (F.e j : ℚ) ≠ 0 := by positivity
+  have hden_ne : (F.h i : ℚ) + 2 ≠ 0 := by positivity
+  have hden_le : (F.h i : ℚ) + 2 ≤ (F.h j : ℚ) := by
+    exact_mod_cast hden_le_nat
+  field_simp [hhj_ne, hei_ne, hden_ne]
+  have hsub_nonneg : 0 ≤ (F.h j : ℚ) - 1 := by
+    exact sub_nonneg.mpr (by exact_mod_cast (by omega : 1 ≤ F.h j))
+  nlinarith
+
+/-- Summed denominator comparison for any set of indices avoiding the chosen
+minimal index. -/
+lemma sum_h_sub_one_div_h_mul_e_le_sum_h_sub_one_div_e_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (s : Finset (Fin k))
+    (hs : ∀ j ∈ s, i ≠ j) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ))) ≤
+      (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) := by
+  calc
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))
+        ≤ ∑ j ∈ s, (((F.h j : ℚ) - 1) / (F.e j : ℚ)) /
+            ((F.h i : ℚ) + 2) := by
+            refine Finset.sum_le_sum fun j hj => ?_
+            exact F.h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two
+              hodd (hs j hj) hmin
+    _ = (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) /
+          ((F.h i : ℚ) + 2) := by
+        rw [Finset.sum_div]
+
+/-- If the unweighted `𝓑`-sum is bounded by `e_i - 1`, then the weighted sum is
+bounded by `(e_i - 1)/(h_i + 2)`, as in Peterfalvi (7.10). -/
+lemma sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (s : Finset (Fin k))
+    (hs : ∀ j ∈ s, i ≠ j)
+    (hsum : (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ))) ≤
+      ((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2) := by
+  have hden_pos : 0 < (F.h i : ℚ) + 2 := by positivity
+  have hweighted := F.sum_h_sub_one_div_h_mul_e_le_sum_h_sub_one_div_e_div_min_add_two
+    hodd hmin s hs
+  have hscaled :
+      (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) ≤
+        ((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2) := by
+    exact div_le_div_of_nonneg_right hsum (le_of_lt hden_pos)
+  linarith
+
 /-- The explicit right-hand side in Peterfalvi (7.10) is positive for every member
 of an odd-order Frobenius family.  This is the arithmetic input used in the final
 (7.11) contradiction once `(7.10)` gives the lower bound. -/
