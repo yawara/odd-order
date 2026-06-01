@@ -836,6 +836,88 @@ private theorem blackburnCentralProductCase_of_omega1_commutator_le_center
     rw [hΩC_eq_center, hΩ_extraspecial.commutator_eq_center]
   exact ⟨S, C, hcentral, hΩ_noncomm, hΩ_card, hΩ_exp, hC_cyclic, hΩC_eq_comm⟩
 
+/-- A strict subgroup inclusion in a finite ambient group gives a strict cardinality
+inequality. -/
+private theorem subgroup_card_lt_of_lt
+    {G : Type*} [Group G] [Finite G] {H K : Subgroup G} (h : H < K) :
+    Nat.card H < Nat.card K := by
+  have hle : Nat.card H ≤ Nat.card K := Subgroup.card_le_of_le h.le
+  exact lt_of_le_of_ne hle (by
+    intro hcard
+    have heq : H = K := Subgroup.eq_of_le_of_card_ge h.le (by rw [hcard])
+    exact h.ne heq)
+
+/-- A finite `p`-group whose order is strictly between `p` and `p³` has order `p²`. -/
+private theorem card_eq_prime_sq_of_pgroup_card_gt_prime_lt_cube
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hG : IsPGroup p G) (hp_lt : p < Nat.card G) (hlt_cube : Nat.card G < p ^ 3) :
+    Nat.card G = p ^ 2 := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hG
+  have h1n : 1 < n := by
+    have hpow : p ^ 1 < p ^ n := by simpa [hn] using hp_lt
+    exact (Nat.pow_lt_pow_iff_right hp.one_lt).mp hpow
+  have hn3 : n < 3 := by
+    rw [hn] at hlt_cube
+    exact (Nat.pow_lt_pow_iff_right hp.one_lt).mp hlt_cube
+  have hn2 : n = 2 := by omega
+  rw [hn, hn2]
+
+/-- Blackburn 4.16 Case B-2 setup: if `R` does not centralize `S/S'` for
+`S = Ω₁(R)`, then `T = [S,R]` satisfies `Z(S) < T < S` and `|T| = p²`. -/
+private theorem blackburn_noncentral_commutator_facts
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R)
+    (hΩ_card : Nat.card (Omega R p 1) = p ^ 3)
+    (hΩ_extraspecial : IsExtraspecial p (Omega R p 1))
+    (hnot : ¬ ⁅(Omega R p 1 : Subgroup R), (⊤ : Subgroup R)⁆ ≤
+      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2 := by
+  dsimp
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  haveI : Group.IsNilpotent R := hR.isNilpotent
+  haveI : S.Normal := by dsimp [S]; infer_instance
+  have hS_card_gt_one : 1 < Nat.card S := by
+    dsimp [S]
+    rw [hΩ_card]
+    exact one_lt_pow₀ (Fact.out (p := p.Prime)).one_lt (by norm_num : 3 ≠ 0)
+  have hS_ne_bot : S ≠ ⊥ := (Subgroup.one_lt_card_iff_ne_bot S).mp hS_card_gt_one
+  have hT_lt_S : T < S := by
+    dsimp [T]
+    exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient
+      (E := S) (F := (⊤ : Subgroup R)) hS_ne_bot
+  have hcenter_eq_comm_map :
+      (Subgroup.center S).map S.subtype = ⁅S, S⁆ := by
+    dsimp [S]
+    rw [← hΩ_extraspecial.commutator_eq_center, Subgroup.map_subtype_commutator]
+  have hcenter_le_T : (Subgroup.center S).map S.subtype ≤ T := by
+    dsimp [T]
+    rw [hcenter_eq_comm_map]
+    exact Subgroup.commutator_mono le_rfl le_top
+  have hcenter_lt_T : (Subgroup.center S).map S.subtype < T := by
+    refine lt_of_le_of_ne hcenter_le_T ?_
+    intro heq
+    apply hnot
+    dsimp [S, T] at heq ⊢
+    exact le_of_eq heq.symm
+  have hcenter_map_card : Nat.card ((Subgroup.center S).map S.subtype) = p := by
+    rw [Subgroup.card_map_of_injective S.subtype_injective, hΩ_extraspecial.center_card]
+  have hp_lt_T : p < Nat.card T := by
+    have hlt : Nat.card ((Subgroup.center S).map S.subtype) < Nat.card T :=
+      subgroup_card_lt_of_lt hcenter_lt_T
+    rw [hcenter_map_card] at hlt
+    exact hlt
+  have hT_card_lt_cube : Nat.card T < p ^ 3 := by
+    have hlt := subgroup_card_lt_of_lt hT_lt_S
+    dsimp [S] at hlt
+    simpa [hΩ_card] using hlt
+  have hT_pg : IsPGroup p T := hR.to_subgroup T
+  exact ⟨hcenter_lt_T, hT_lt_S,
+    card_eq_prime_sq_of_pgroup_card_gt_prime_lt_cube hT_pg hp_lt_T hT_card_lt_cube⟩
+
 /-- The final congruence contradiction in Blackburn 4.16 Case B-2.
 
 BG obtains `jk ≡ i` and `ij ≡ k`, with `i ≠ 0`, while the odd-order action gives
@@ -897,7 +979,8 @@ theorem blackburnRankTwoClassification
       (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype
   · exact Or.inr (blackburnCentralProductCase_of_omega1_commutator_le_center
       hp_odd hR hΩ_card hΩ_pow hΩ_noncomm hΩ_exp hΩ_extraspecial hSR)
-  · sorry
+  · have hT_facts := blackburn_noncentral_commutator_facts hR hΩ_card hΩ_extraspecial hSR
+    sorry
 
 end BlackburnClassification
 
