@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S07_Coherence
 import Mathlib.GroupTheory.Solvable
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.GroupTheory.Complement
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -200,6 +202,10 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   W1 : Subgroup ↥L
   H_ne_bot : H ≠ ⊥
   H_normal : H.Normal
+  /-- `H` is nilpotent (Peterfalvi (6.8.a)). -/
+  H_nilpotent : Group.IsNilpotent ↥H
+  /-- `L = H ⋊ W₁`: `W₁` is a complement to the normal `H` (Peterfalvi (6.8.a)). -/
+  split : Subgroup.IsComplement' H W1
   W1_nontrivial : W1 ≠ ⊥
   card_L_odd : Odd (Nat.card L)
   /-- `H^#` is a TI-subset of `G` relative to `L` (corrected ambient: TI in `G`, not in `↥L`). -/
