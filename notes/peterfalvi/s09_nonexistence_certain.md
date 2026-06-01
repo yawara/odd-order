@@ -116,6 +116,10 @@ theorem not_trivial_G0 (F) (hodd) (hG0 : F.G0 = {1}) : False  -- (7.11), 証明 
 結論: **3 件とも現状 sorry-free では実装不能** (下記 blocker)。Lean には一切手を入れていない (revert 不要)。
 本節に精密ステートメント (repo の実型に合わせて検証済) と各々の証明計画・blocker を記録する。
 
+2026-06-02 update: proof は依然 blocker 待ちだが、`Hypothesis78` に仮定を足さない
+standalone target として `Hypothesis78.BetaDecomp`, `Hypothesis78.NormEstimates`,
+`Hypothesis79.conclusion` を Lean 側に追加済み。
+
 ### 重要な前提: §9 の証明書 (certificate) パターン
 
 `S09_NonexistenceCertain.lean` の §9 は **「難所の pointwise 恒等式を構造体フィールドに hoist し、系のみ証明する」** 方式で書かれている (memory `scaffold-sorry-free-not-done` 参照):
@@ -201,6 +205,8 @@ theorem Gamma_norm_sq_le (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
 注: prior pass の `(β,χ)²` は誤り。repo の (7.8.c.ii) は `inner β χ * star (inner β χ)` 形。
 また `e = ζ_{ind1H}(1:L)` は `ℂ` 値なので `e ≤ (h−1)/2` は `Nat.card` ベース (`[L:H]=e`) で書くのが安全
 (`.re.toNat` は避ける)。`(ν ζ)^ρ` のノルムは `chiRhoCF` over `L` 上の `ClassFunction.inner`。
+Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
+`zetaNuRhoNormSq`, `gammaNormSq`, `NormEstimates` としてこの target を名前付け済み。
 
 **Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` を `Ind1_H−ζ` に適用 + `L` 上での
 `‖Ind1_H−ζ‖²=e+1` 計算 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
