@@ -24,6 +24,24 @@
 
 ## 欠落 (これから建てる)
 
+### 進捗 (2026-06-01, `S03b_Lemma33.lean`, build-green)
+- ✅ `groupSumMap ρ H = ∑_{h:H} ρ ↑h` (averaging endomorphism)
+- ✅ `fixed_apply_groupSumMap`: `(∑_{h∈H} ρ h) v` は `H`-不動 (左乗 `Equiv.mulLeft` で reindex)
+- ✅ `trivial_of_groupSumMap_eq_card_smul`: `groupSumMap ρ K = |K|•id ⇒ K 自明` (`smul_right_injective`)
+- ⏳ `centralizer_ne_bot_of_nontrivial_kernel` (Lemma 3.3 本体, sorry) — **残 = partition identity のみ**
+
+**残 partition の具体ルート (vector-level, MonoidAlgebra 係数計算を回避)**:
+`frobeniusGroup h : SubgroupPartition G` の `.parts = insert N (conjugatesFinset A)` (=K ∪ Rの共役;
+`frobeniusGroup` def @FrobeniusGroup.lean:619, `parts_card = |K|+1`)。
+`nonidentitySigmaTo_injective/_surjective` (FrobeniusActionTI:794/816) から `Equiv`:
+`{g:G//g≠1} ≃ Σ (X∈parts) {x∈X//x≠1}`。これで
+`groupSumMap ρ ⊤ v = ∑_{g:G} ρ g v = v + ∑_{g≠1} ρ g v = v + ∑_{X∈parts}(groupSumMap ρ X v − v)
+ = (∑_{X∈parts} groupSumMap ρ X v) − |K|•v` (parts 数 |K|+1)。
+仮定 `C_V(R)=0` ⇒ `groupSumMap ρ ⊤ v = 0` (⊤-不動⊆R-不動=0) かつ各共役部分 `C=conj g•R` で
+`groupSumMap ρ C v = 0` (C_V(C)=ρ(g)(C_V(R))=0)。ゆえ `0 = groupSumMap ρ K v − |K|•v`、
+`groupSumMap ρ K v = |K|•v` → `trivial_of_groupSumMap_eq_card_smul` で K 自明、`hKnt` と矛盾。
+最重 step = `∑_{g≠1} f g = ∑_{X∈parts}∑_{x∈X,x≠1} f x` の Σ-type reindex (Equiv.sum_comp/Fintype.sum_bijective)。
+
 ### (1) Lemma 3.3 (mmd L845, Wielandt) — **crux**
 「`G=KR` Frobenius, `V` over `F` with `char F ∤ |K|`, `K` が `V` に非自明作用 ⇒ `C_V(R)≠0`」。
 証明: `Representation F G V` → `ρ.asAlgebraHom : MonoidAlgebra F G →ₐ Module.End F V`。
