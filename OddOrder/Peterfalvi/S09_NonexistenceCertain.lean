@@ -1415,6 +1415,36 @@ theorem betaNormSq_eq_sourceDiffNormSq (H78 : Hypothesis78 G A L) :
     H78.betaNormSq = H78.sourceDiffNormSq := by
   rw [betaNormSq, sourceDiffNormSq, H78.beta_inner_self_eq_sourceDiff_inner_self]
 
+/-- Source-side expansion of `‖Ind 1_H - ζ‖²`.  This isolates the remaining
+character-theoretic facts needed to turn the source norm into `e + 1`. -/
+theorem sourceDiff_inner_self_expand (H78 : Hypothesis78 G A L) :
+    ClassFunction.inner
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct) =
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+          (H78.hyp76.zeta H78.zetaDistinct) +
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.zetaDistinct) := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right]
+  ring
+
+/-- Real-valued source-side expansion corresponding to
+`sourceDiff_inner_self_expand`. -/
+theorem sourceDiffNormSq_expand (H78 : Hypothesis78 G A L) :
+    H78.sourceDiffNormSq =
+      (ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+          (H78.hyp76.zeta H78.zetaDistinct) +
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.zetaDistinct)).re := by
+  rw [sourceDiffNormSq, H78.sourceDiff_inner_self_expand]
+
 /-- The weighted `S^ν`-sum occurring in Peterfalvi (7.8.a):
 `Σ_{φ ∈ S} φ(1)/(e ‖φ‖²) · φ^ν`, where `S = T \ {Ind 1_H}` and
 `e = ζ(1)` for the distinguished `ζ`. -/
