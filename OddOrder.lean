@@ -67,6 +67,7 @@ import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
