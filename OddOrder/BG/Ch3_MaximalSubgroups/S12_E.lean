@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.GroupTheory.NarrowPGroup
@@ -26,6 +27,11 @@ statement + `sorry`** scaffold (定義層 + Lem 12.1 / Lem 12.2(a) / Lem 12.3 / 
 τ₂-case Thm 12.5–12.12 / Thm 12.13 / Cor 12.14 / Prop 12.15 / Cor 12.16(a) / Lem 12.17 /
 Lem 12.18 / Lem 12.19)。clean core を述べ、`Ω₁(P)=A`・内部直積の commuting・商型 nilpotent/rank
 等の fragile sub-clause は各 docstring で defer。proof は別フェーズ。
+
+Import boundary: §12 mathematically sits after §11. Prop 12.4 activates the
+exceptional-maximal setup, and Thm 12.5 uses the §11 consequences under Hypothesis 11.1.
+This file imports `S11_ExceptionalMaximal` even when an individual scaffolded statement only
+mentions §10 notation, keeping the BG §16 endpoint closure honest.
 
 ## 定義 (BG → repo, mmd L3029)
 
