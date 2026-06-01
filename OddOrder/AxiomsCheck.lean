@@ -1585,3 +1585,7 @@ set_option linter.style.longLine false in
 -- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+-- Norm-1 virtual character with positive degree is irreducible (reusable Fourier criterion).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
+-- [Is] Thm 6.34 capstone: H ⊴ G, θ ∈ Irr H, I_G(θ) = H  ⟹  Ind_H^G θ ∈ Irr G.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq

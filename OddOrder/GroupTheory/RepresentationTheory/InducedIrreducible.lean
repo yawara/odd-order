@@ -130,6 +130,110 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
     Nat.card_eq_fintype_card]
 
+/-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
+summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
+`exists_pair_of_sum_sq_eq_two`.) -/
+theorem exists_single_of_sum_sq_eq_one {ι : Type*} [DecidableEq ι] {s : Finset ι} {c : ι → ℤ}
+    (hne : ∀ a ∈ s, c a ≠ 0) (hsum : ∑ a ∈ s, c a ^ 2 = 1) :
+    ∃ α, s = {α} ∧ (c α = 1 ∨ c α = -1) := by
+  classical
+  have hge : ∀ a ∈ s, 1 ≤ c a ^ 2 := fun a ha => by
+    have h := Int.one_le_abs (hne a ha)
+    calc (1 : ℤ) = 1 ^ 2 := by ring
+      _ ≤ |c a| ^ 2 := by gcongr
+      _ = c a ^ 2 := sq_abs (c a)
+  have hcard : s.card = 1 := by
+    have hle : (s.card : ℤ) ≤ ∑ a ∈ s, c a ^ 2 := by
+      calc (s.card : ℤ) = ∑ _a ∈ s, (1 : ℤ) := by rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+        _ ≤ ∑ a ∈ s, c a ^ 2 := Finset.sum_le_sum hge
+    rw [hsum] at hle
+    have hpos : 0 < s.card := by
+      rcases Finset.eq_empty_or_nonempty s with rfl | h
+      · simp at hsum
+      · exact Finset.card_pos.mpr h
+    omega
+  obtain ⟨α, rfl⟩ := Finset.card_eq_one.mp hcard
+  rw [Finset.sum_singleton] at hsum
+  refine ⟨α, rfl, ?_⟩
+  have hmul : c α * c α = 1 := by rw [← sq]; exact hsum
+  rcases Int.eq_one_or_neg_one_of_mul_eq_one' hmul with ⟨h, _⟩ | ⟨h, _⟩
+  · exact Or.inl h
+  · exact Or.inr h
+
+/-- **A virtual character of squared norm `1` and positive degree is irreducible.**
+
+If `φ ∈ ℤ[Irr G]` has `‖φ‖² = 1` and `φ(1)` is a positive natural number, then `φ` is an
+irreducible character. By Parseval its Fourier coefficients are integers with `∑ cᵢ² = 1`, so
+exactly one is `±1`; positivity of `φ(1)` rules out the `-1` case, leaving `φ = χ` for an
+irreducible `χ`. (The norm-`1` analogue of `exists_irr_sub_irr_of_inner_self_two`.) -/
+theorem isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    (hnorm : ClassFunction.inner φ φ = 1)
+    (hpos : ∃ d : ℕ, 0 < d ∧ (φ : G → ℂ) 1 = (d : ℂ)) :
+    IsIrreducibleCharacter φ := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 1 := hsq.symm.trans hnorm
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 1 := by exact_mod_cast hsumC
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨α₀, hs, hcα⟩ := exists_single_of_sum_sq_eq_one hne hsumZ
+  have hα₀ : α₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  rw [hs, Finset.sum_singleton] at hrepr
+  obtain ⟨d, hd, hφ1⟩ := hpos
+  obtain ⟨e, he, hα1⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨α₀, hα₀⟩ : IrreducibleCharacter G)
+  simp only [IrreducibleCharacter.coe_mk] at hα1
+  rcases hcα with hcα | hcα
+  · -- c α₀ = 1: φ = α₀, which is irreducible
+    rw [hrepr, hcα]
+    simp only [Int.cast_one, one_smul]
+    exact hα₀
+  · -- c α₀ = -1: φ(1) = -e < 0, contradicting φ(1) = d > 0
+    exfalso
+    have hval : (φ : G → ℂ) 1 = -(e : ℂ) := by
+      rw [hrepr, hcα]
+      simp only [Int.cast_neg, Int.cast_one, ClassFunction.smul_apply, hα1]
+      ring
+    rw [hval] at hφ1
+    have hsum0 : (d : ℂ) + (e : ℂ) = 0 := by linear_combination -hφ1
+    rw [← Nat.cast_add] at hsum0
+    have : d + e = 0 := by exact_mod_cast hsum0
+    omega
+
+/-- **[Is] Theorem 6.34** (Frobenius/Dade induced irreducibility).
+
+For `H ⊴ G` and an irreducible character `θ` of `H` whose inertia group in `G` is just `H`
+(the free-action / Frobenius condition — which holds for `θ ≠ 1` when `G/H` acts freely on
+`Irr H ∖ {1}`), the induced character `Ind_H^G θ` is irreducible. Its degree is `[G : H] · θ(1)`
+(`induce_apply_one`).
+
+Proof: `Ind θ ∈ ℤ[Irr G]` (`induce_mem_ZIrr`); `‖Ind θ‖² = |I_G(θ)|/|H| = 1` from
+`card_mul_inner_self_induce_eq_card_inertia` with `I_G(θ) = H`; and `Ind θ (1) = [G:H]·θ(1) > 0`.
+Norm `1` with positive degree forces irreducibility. -/
+theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H)
+    (hfree : ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H) :
+    IsIrreducibleCharacter (induce H (θ : ClassFunction ↥H ℂ)) := by
+  have hmem : induce H (θ : ClassFunction ↥H ℂ) ∈ ZIrr G :=
+    induce_mem_ZIrr H θ.property.mem_ZIrr
+  have hcardH : (Nat.card H : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  have hnorm : ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+      (induce H (θ : ClassFunction ↥H ℂ)) = 1 := by
+    have h := card_mul_inner_self_induce_eq_card_inertia θ
+    rw [hfree] at h
+    exact mul_left_cancel₀ hcardH (by rw [h, mul_one])
+  have hpos : ∃ d : ℕ, 0 < d ∧ (induce H (θ : ClassFunction ↥H ℂ) : G → ℂ) 1 = (d : ℂ) := by
+    haveI : Finite G := Finite.of_fintype G
+    obtain ⟨e, he, hθ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
+      have hmc := H.index_mul_card
+      rw [h0, zero_mul] at hmc
+      exact (Nat.card_pos (α := G)).ne' hmc.symm
+    refine ⟨H.index * e, Nat.mul_pos hidx he, ?_⟩
+    rw [induce_apply_one, hθ1, Nat.cast_mul]
+  exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hmem hnorm hpos
+
 end Complex
 
 end OddOrder.RepresentationTheory
