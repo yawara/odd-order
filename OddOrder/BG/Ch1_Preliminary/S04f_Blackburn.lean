@@ -643,6 +643,34 @@ private theorem omega1_centralizer_omega1_map_le_center_map
   apply (Omega R p 1).subtype_injective
   simpa using hxC (y : R) y.2
 
+/-- The ambient image of `Z(Ω₁(R))` lies in the image of `Ω₁(C_R(Ω₁(R)))` when
+`Ω₁(R)` has exponent `p`. -/
+private theorem center_map_le_omega1_centralizer_omega1_map
+    {R : Type*} [Group R] {p : ℕ}
+    (hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1) :
+    let S : Subgroup R := Omega R p 1
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    (Subgroup.center S).map S.subtype ≤ (Omega C p 1).map C.subtype := by
+  dsimp
+  rintro x ⟨z, hz, rfl⟩
+  have hzC : (z : R) ∈ Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have hz_center : z ∈ Subgroup.center (Omega R p 1) := hz
+    exact congrArg Subtype.val ((Subgroup.mem_center_iff.mp hz_center) ⟨y, hy⟩)
+  have hz_pow : (⟨(z : R), hzC⟩ :
+      Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) ^ p = 1 := by
+    apply Subtype.ext
+    change ((z : R) ^ p) = 1
+    exact congrArg Subtype.val (hΩ_pow z)
+  have hz_omega : (⟨(z : R), hzC⟩ :
+      Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) ∈
+      Omega (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) p 1 := by
+    refine Omega.mem_of_pow_eq_one ?_
+    rw [pow_one]
+    exact hz_pow
+  exact ⟨⟨(z : R), hzC⟩, hz_omega, rfl⟩
+
 /-- A nonabelian finite group of order `p³` has center of order `p`. -/
 private theorem center_card_eq_prime_of_noncomm_card_prime_cube
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
@@ -762,6 +790,52 @@ private theorem isExtraspecial_of_noncomm_card_prime_cube_exp_prime
     exact hcomm_eq_frattini.symm
   exact ⟨hG, hcomm_eq_center, hfrat_eq_center, hcenter_card⟩
 
+/-- Blackburn 4.16 Case B-1: if `R` centralizes `S/S'` for `S = Ω₁(R)`, then
+`R = S ∘ C_R(S)` gives the central-product conclusion. -/
+private theorem blackburnCentralProductCase_of_omega1_commutator_le_center
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hΩ_card : Nat.card (Omega R p 1) = p ^ 3)
+    (hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1)
+    (hΩ_noncomm : ¬ IsMulCommutative (Omega R p 1))
+    (hΩ_exp : Monoid.exponent (Omega R p 1) = p)
+    (hΩ_extraspecial : IsExtraspecial p (Omega R p 1))
+    (hSR : ⁅(Omega R p 1 : Subgroup R), (⊤ : Subgroup R)⁆ ≤
+      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype) :
+    BlackburnCentralProductCase p R := by
+  let S : Subgroup R := Omega R p 1
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  have hΩC_eq_center :
+      (Omega C p 1).map C.subtype = (Subgroup.center S).map S.subtype := by
+    change (Omega (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) p 1).map
+        (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)).subtype =
+      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype
+    exact le_antisymm
+      (omega1_centralizer_omega1_map_le_center_map (R := R) (p := p))
+      (center_map_le_omega1_centralizer_omega1_map (R := R) (p := p) hΩ_pow)
+  have hΩC_card_le_p : Nat.card (Omega C p 1) ≤ p := by
+    have hmap_card : Nat.card ((Omega C p 1).map C.subtype) = Nat.card (Omega C p 1) := by
+      rw [Subgroup.card_map_of_injective C.subtype_injective]
+    rw [← hmap_card, hΩC_eq_center,
+      Subgroup.card_map_of_injective S.subtype_injective, hΩ_extraspecial.center_card]
+  have hC_pg : IsPGroup p C := hR.to_subgroup C
+  have hC_cyclic : IsCyclic C :=
+    isCyclic_of_card_omega1_le_prime hC_pg hp_odd hΩC_card_le_p
+  have hsup : S ⊔ C = ⊤ := by
+    change (Omega R p 1 : Subgroup R) ⊔
+        Subgroup.centralizer (((Omega R p 1 : Subgroup R)) : Set R) = ⊤
+    exact mul_centralizer_eq_top_of_isExtraspecial (S := (Omega R p 1 : Subgroup R))
+      hΩ_extraspecial hSR
+  have hS_le_centC : S ≤ Subgroup.centralizer (C : Set R) :=
+    Subgroup.le_centralizer_iff.mp
+      (le_rfl : C ≤ Subgroup.centralizer (S : Set R))
+  have hcentral : IsCentralProduct (⊤ : Subgroup R) S C :=
+    IsCentralProduct.of_le_centralizer hsup.symm hS_le_centC
+  have hΩC_eq_comm :
+      (Omega C p 1).map C.subtype = (_root_.commutator S).map S.subtype := by
+    rw [hΩC_eq_center, hΩ_extraspecial.commutator_eq_center]
+  exact ⟨S, C, hcentral, hΩ_noncomm, hΩ_card, hΩ_exp, hC_cyclic, hΩC_eq_comm⟩
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -799,8 +873,11 @@ theorem blackburnRankTwoClassification
     center_card_eq_prime_of_noncomm_card_prime_cube hΩ_card hΩ_noncomm
   have hΩ_extraspecial : IsExtraspecial p (Omega R p 1) :=
     isExtraspecial_of_noncomm_card_prime_cube_exp_prime hΩ_card hΩ_noncomm hΩ_exp
-  have hΩC_center := omega1_centralizer_omega1_map_le_center_map (R := R) (p := p)
-  sorry
+  by_cases hSR : ⁅(Omega R p 1 : Subgroup R), (⊤ : Subgroup R)⁆ ≤
+      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype
+  · exact Or.inr (blackburnCentralProductCase_of_omega1_commutator_le_center
+      hp_odd hR hΩ_card hΩ_pow hΩ_noncomm hΩ_exp hΩ_extraspecial hSR)
+  · sorry
 
 end BlackburnClassification
 
