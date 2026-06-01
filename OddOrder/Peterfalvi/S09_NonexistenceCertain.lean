@@ -1612,6 +1612,60 @@ lemma mem_G0_or_exists_mem_kernelSpread (F : FrobeniusFamily G k) (x : G) :
   · exact Or.inl hx
   · exact Or.inr ((F.not_mem_G0_iff).mp hx)
 
+/-- The sets `G₀` and the pairwise-disjoint kernel spreads partition the ambient
+group.  This is the cardinality form of Peterfalvi (7.10)(d). -/
+lemma card_eq_card_G0_add_sum_card_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card G = Nat.card F.G0 + ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+  classical
+  letI := Fintype.ofFinite G
+  have h_disjFin :
+      ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint
+        (fun i => (F.kernelSpread i).toFinset) := by
+    intro i _hi j _hj hij
+    rw [Function.onFun, Set.disjoint_toFinset]
+    exact F.kernelSpread_disjoint hij
+  have h_biUnion_card :
+      ((Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset)).card =
+        ∑ i : Fin k, (F.kernelSpread i).toFinset.card :=
+    Finset.card_biUnion h_disjFin
+  have h_biUnion_set :
+      (Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset) = F.G0.toFinsetᶜ := by
+    ext g
+    simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, Finset.mem_compl,
+      Set.mem_toFinset, F.mem_G0_iff, not_forall, not_not]
+  have hG0_le : F.G0.toFinset.card ≤ Fintype.card G := by
+    rw [← Finset.card_univ (α := G)]
+    exact Finset.card_le_card (Finset.subset_univ _)
+  have hG0_card_eq : F.G0.toFinset.card = Nat.card F.G0 := by
+    rw [Set.toFinset_card, Nat.card_eq_fintype_card]
+  have hspread_card_eq : ∀ i : Fin k,
+      (F.kernelSpread i).toFinset.card = Nat.card (F.kernelSpread i) := by
+    intro i
+    rw [Set.toFinset_card, Nat.card_eq_fintype_card]
+  have h_compl_card :
+      F.G0.toFinsetᶜ.card = Nat.card G - Nat.card F.G0 := by
+    rw [Finset.card_compl]
+    rw [show Fintype.card G = Nat.card G from by rw [Nat.card_eq_fintype_card],
+      hG0_card_eq]
+  have h_biUnion_card_nat :
+      ((Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset)).card =
+        ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+    rw [h_biUnion_card]
+    exact Finset.sum_congr rfl (fun i _ => hspread_card_eq i)
+  rw [h_biUnion_set] at h_biUnion_card_nat
+  have hsum :
+      (∑ i : Fin k, Nat.card (F.kernelSpread i)) =
+        Nat.card G - Nat.card F.G0 :=
+    h_biUnion_card_nat.symm.trans h_compl_card
+  have hG0_le_nat : Nat.card F.G0 ≤ Nat.card G := by
+    rw [← hG0_card_eq, Nat.card_eq_fintype_card]
+    exact hG0_le
+  omega
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
