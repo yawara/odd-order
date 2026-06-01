@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch1_Preliminary.PLength
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.NarrowPGroup
@@ -260,16 +262,308 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2900 付近) -/
 
+/-- **Cyclic uniqueness by order**: in a finite cyclic group, two subgroups of equal
+cardinality coincide. (Each order-`d` subgroup equals the unique order-`d` kernel
+`(powMonoidHom d).ker`; this is the order-`d` generalisation of the order-`p` argument in
+`OddOrder.BG.Ch1_Preliminary.S04`.) Used in Prop 10.14(c): a subgroup of the cyclic `N_P(X)`
+is characteristic. -/
+private theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {K L : Subgroup C} (h : Nat.card K = Nat.card L) : K = L := by
+  letI : CommGroup C := IsCyclic.commGroup
+  -- Each order-`d` subgroup `M` equals the unique order-`d` kernel `(powMonoidHom d).ker`.
+  have key : ∀ {M : Subgroup C} {d : ℕ}, Nat.card M = d → M = (powMonoidHom d : C →* C).ker := by
+    intro M d hM
+    have hM_le : M ≤ (powMonoidHom d : C →* C).ker := by
+      intro g hg
+      rw [MonoidHom.mem_ker, powMonoidHom_apply]
+      have hg1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
+      have := congrArg (Subtype.val) hg1
+      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hM] at this
+    have hd_dvd : d ∣ Nat.card C := hM ▸ M.card_subgroup_dvd_card
+    have hker_card : Nat.card (powMonoidHom d : C →* C).ker = d := by
+      rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd_dvd]
+    exact Subgroup.eq_of_le_of_card_ge hM_le (by rw [hker_card, hM])
+  exact (key (d := Nat.card K) rfl).trans (key (d := Nat.card K) h.symm).symm
+
+/-- **Monotonicity of `𝒰` under inclusion within a proper subgroup** (the fiddly lemma of
+Prop 10.14(b)): if `A ∈ 𝒰`, `A ≤ R`, and `R` is proper, then `R ∈ 𝒰`. The unique maximal
+`M ⊇ A` is the unique maximal `⊇ R`: any coatom `⊇ R` also `⊇ A`, hence equals it; and `R`
+proper lies in some coatom (`IsCoatomic`). -/
+private theorem isUniquelyMaximal_of_le [Finite G] {A R : Subgroup G}
+    (hA : IsUniquelyMaximal A) (hAR : A ≤ R) (hR : R < ⊤) : IsUniquelyMaximal R := by
+  obtain ⟨_, M, ⟨hMc, _⟩, hMu⟩ := hA
+  refine ⟨hR, M, ?_, ?_⟩
+  · -- `M` is a coatom containing `R`: it contains some coatom `⊇ R`, which `⊇ A`, hence `= M`.
+    obtain ⟨N, hNc, hRN⟩ :=
+      (IsCoatomic.eq_top_or_exists_le_coatom R).resolve_left hR.ne
+    have hNeqM : N = M := hMu N ⟨hNc, hAR.trans hRN⟩
+    exact ⟨hNeqM ▸ hNc, hNeqM ▸ hRN⟩
+  · -- Uniqueness: any coatom `⊇ R` also `⊇ A`, so equals `M`.
+    intro N hN
+    exact hMu N ⟨hN.1, hAR.trans hN.2⟩
+
+/-- A finite cyclic group has `rank ≤ 1`: any elementary abelian `q`-subgroup `A` is cyclic
+(subgroup of cyclic), so its exponent equals its order and divides `q`, whence `|A| ≤ q` and
+`log_q |A| ≤ 1`. Contrapositive used in Prop 10.14(b): `2 ≤ rank ↥R ⇒ R` noncyclic. -/
+private theorem rank_le_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C] :
+    rank C ≤ 1 := by
+  rw [rank_le_iff]
+  intro q
+  rw [pRank_le_iff]
+  intro A hA
+  -- `A` is cyclic, elementary abelian `q`, so `|A| = exponent A ∣ q`, hence `|A| ≤ q`.
+  haveI : IsCyclic ↥A := Subgroup.isCyclic A
+  have hexp : Monoid.exponent ↥A ∣ q :=
+    Monoid.exponent_dvd_of_forall_pow_eq_one (fun g => hA.pow_eq_one g)
+  rw [IsCyclic.exponent_eq_card (α := ↥A)] at hexp
+  rcases Nat.eq_zero_or_pos q with hq0 | hqpos
+  · -- `q = 0`: `|A| ∣ 0` is no info, but `Nat.log 0 _ = 0`.
+    subst hq0; rw [Nat.log_zero_left]; exact Nat.zero_le _
+  · have hcard_le : Nat.card ↥A ≤ q := Nat.le_of_dvd hqpos hexp
+    calc Nat.log q (Nat.card ↥A) ≤ Nat.log q q := Nat.log_mono_right hcard_le
+      _ ≤ 1 := by
+        rcases Nat.lt_or_ge q 2 with hq1 | hq2
+        · -- `0 < q < 2` forces `q = 1`, where `Nat.log 1 1 = 0`.
+          interval_cases q
+          simp
+        · rw [Nat.log_eq_one_iff'.mpr ⟨le_refl q, by nlinarith⟩]
+
+/-- The `p`-rank is realised inside any Sylow `p`-subgroup: `pRank G p ≤ pRank ↥P p`.
+Every elementary abelian `p`-subgroup `A ≤ G` is conjugate into `P` (Sylow conjugacy),
+and conjugation preserves elementary-abelianness and order. Used in Prop 10.14(c) to get
+`3 ≤ pRank G p ≤ rank ↥P` from `idealPrime`. -/
+private theorem pRank_le_pRank_sylow [Finite G] [Fact p.Prime] (P : Sylow p G) :
+    pRank G p ≤ pRank ↥(P : Subgroup G) p := by
+  rw [pRank_le_iff]
+  intro A hA
+  -- `A` is a `p`-group, so `A ≤ Q'` for some Sylow `Q'`, and `Q'` is conjugate to `P`.
+  obtain ⟨Q', hAQ'⟩ := hA.isPGroup.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q' P
+  have hgcoe : MulAut.conj g • (Q' : Subgroup G) = (P : Subgroup G) := by
+    rw [← Sylow.coe_subgroup_smul]
+    exact congrArg (fun S : Sylow p G => (S : Subgroup G)) hg
+  -- `A' := conj g • A ≤ conj g • Q' = P`, elementary abelian of order `|A|`.
+  set A' : Subgroup G := A.map (MulAut.conj g).toMonoidHom with hA'_def
+  have hA'_le : A' ≤ (P : Subgroup G) := by
+    rw [hA'_def]
+    rintro y ⟨x, hx, rfl⟩
+    rw [← hgcoe]
+    exact Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) Q' (hAQ' hx)
+  have hA'_elem : A'.IsElementaryAbelian p :=
+    hA.map (MulAut.conj g).injective
+  have hA'_card : Nat.card ↥A' = Nat.card ↥A := by
+    rw [hA'_def, Subgroup.card_map_of_injective (MulAut.conj g).injective]
+  -- Transfer `A'` into `↥P` and bound its `log_p`-rank.
+  have hA'P_elem : (A'.subgroupOf (P : Subgroup G)).IsElementaryAbelian p := by
+    apply Subgroup.IsElementaryAbelian.of_map (f := (P : Subgroup G).subtype)
+      (P : Subgroup G).subtype_injective
+    rwa [Subgroup.map_subgroupOf_eq_of_le hA'_le]
+  have hA'P_card : Nat.card ↥(A'.subgroupOf (P : Subgroup G)) = Nat.card ↥A := by
+    rw [← hA'_card, ← Subgroup.card_map_of_injective (P : Subgroup G).subtype_injective,
+      Subgroup.map_subgroupOf_eq_of_le hA'_le]
+  calc Nat.log p (Nat.card ↥A) = Nat.log p (Nat.card ↥(A'.subgroupOf (P : Subgroup G))) := by
+        rw [hA'P_card]
+    _ ≤ pRank ↥(P : Subgroup G) p := le_pRank _ hA'P_elem
+
 /-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2900 付近): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
 (a) `ℰ_p²(G) ∩ ℰ_p*(G) = ∅`; (b) `p`-部分群 `R` で `r(R) ≥ 2` なら `R ∈ 𝒰`;
-(c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d): nonid `β(M)`-部分群 `Y` ⇒ `N_G(Y)⊆M` — 後続。) -/
+(c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d): nonid `β(M)`-部分群 `Y` ⇒ `N_G(Y)⊆M` — 後続。)
+
+Proof: (a) `A ∈ ℰ²(G) ∩ ℰ*(G)` ⇒ `A ≤ Q` for some Sylow `Q` (`exists_le_sylow`), `A.subgroupOf Q`
+maximal-elem-ab of order `p²` in `↥Q`, contradicting `idealPrime`. (b) `2 ≤ rank ↥R` ⇒ `R`
+noncyclic ⇒ `A ∈ ℰ²(R)` (S04), not maximal by (a), so `A ∈ 𝒰` by §9's
+`isUniquelyMaximal_of_mem_e2_not_maximal` (Uniqueness Theorem — cited), lifted to `R` by
+`isUniquelyMaximal_of_le`. (c) `Q = N_P(X)`: if `r(Q) ≥ 2` use (b); else `Q` cyclic, `X char Q`
+(cyclic uniqueness), `N_P(Q) ⊆ N_P(X) = Q`, so `Q = P` by the nilpotent normalizer condition,
+contradicting `3 ≤ pRank G p ≤ rank ↥P`. -/
 theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     (hp : idealPrime p G) (P : Sylow p G) :
     (¬ ∃ A : Subgroup G, A ∈ elemAbelianOfRank G p 2 ∧ IsMaximalElementaryAbelian p A) ∧
     (∀ R : Subgroup G, IsPGroup p ↥R → 2 ≤ rank ↥R → IsUniquelyMaximal R) ∧
     (∀ X : Subgroup G, X ≤ (P : Subgroup G) →
       IsUniquelyMaximal (Subgroup.normalizer (X : Set G) ⊓ (P : Subgroup G))) := by
-  sorry
+  obtain ⟨hpRank3, hpIdeal⟩ := hp
+  have hp_prime : p.Prime := Fact.out
+  -- `p ∣ |G|` (from `pRank G p ≥ 3 > 0`), hence `p` is odd.
+  have hp_odd : Odd p := by
+    -- `¬ pRank G p ≤ 0` gives an elem-ab `A` with `1 ≤ log_p |A|`, so `p ≤ |A|`.
+    have hnle : ¬ pRank G p ≤ 0 := by omega
+    rw [pRank_le_iff] at hnle
+    simp only [not_forall, not_le] at hnle
+    obtain ⟨A, hA_elem, hAlog⟩ := hnle
+    have hp_le_A : p ≤ Nat.card ↥A := by
+      have h1 : 1 ≤ Nat.log p (Nat.card ↥A) := by omega
+      calc p = p ^ 1 := (pow_one p).symm
+        _ ≤ Nat.card ↥A := Nat.pow_le_of_le_log Nat.card_pos.ne' h1
+    have hp_dvd_A : p ∣ Nat.card ↥A := by
+      obtain ⟨j, hj⟩ := (IsPGroup.iff_card (p := p)).mp hA_elem.isPGroup
+      have hjpos : 1 ≤ j := by
+        rcases Nat.eq_zero_or_pos j with hj0 | hjpos
+        · rw [hj, hj0, pow_zero] at hp_le_A
+          exact absurd hp_le_A (by have := hp_prime.one_lt; omega)
+        · exact hjpos
+      rw [hj]; exact dvd_pow_self p (by omega : j ≠ 0)
+    have hp_dvd_G : p ∣ Nat.card G := hp_dvd_A.trans A.card_subgroup_dvd_card
+    exact hG.odd.of_dvd_nat hp_dvd_G
+  -- ===== Part (a) =====
+  have partA : ¬ ∃ A : Subgroup G,
+      A ∈ elemAbelianOfRank G p 2 ∧ IsMaximalElementaryAbelian p A := by
+    rintro ⟨A, hA2, hAmax⟩
+    rw [mem_elemAbelianOfRank] at hA2
+    obtain ⟨hA_elem, hA_card⟩ := hA2
+    -- `A` is a `p`-group, land it in a Sylow `Q`.
+    obtain ⟨Q, hAQ⟩ := hA_elem.isPGroup.exists_le_sylow
+    -- `A.subgroupOf Q` has order `p²` and is maximal-elem-ab in `↥Q`, contradicting `idealPrime`.
+    refine hpIdeal Q ⟨A.subgroupOf (Q : Subgroup G), ?_, ?_⟩
+    · rw [← Subgroup.card_map_of_injective (Q : Subgroup G).subtype_injective,
+        Subgroup.map_subgroupOf_eq_of_le hAQ, hA_card]
+    · refine ⟨?_, ?_⟩
+      · apply Subgroup.IsElementaryAbelian.of_map (f := (Q : Subgroup G).subtype)
+          (Q : Subgroup G).subtype_injective
+        rwa [Subgroup.map_subgroupOf_eq_of_le hAQ]
+      · intro F' hF'_elem hF'_ge
+        -- map `F' ≤ ↥Q` to `G`; it is elem-ab, ⊇ `A`, so `= A` by `G`-maximality.
+        have hF_elem : (F'.map (Q : Subgroup G).subtype).IsElementaryAbelian p :=
+          hF'_elem.map (Q : Subgroup G).subtype_injective
+        have hAF : A ≤ F'.map (Q : Subgroup G).subtype := by
+          calc A = (A.subgroupOf (Q : Subgroup G)).map (Q : Subgroup G).subtype :=
+                (Subgroup.map_subgroupOf_eq_of_le hAQ).symm
+            _ ≤ F'.map (Q : Subgroup G).subtype := Subgroup.map_mono hF'_ge
+        have hFeqA : F'.map (Q : Subgroup G).subtype = A := hAmax.2 _ hF_elem hAF
+        -- inject back: `F' = A.subgroupOf Q`.
+        have := hFeqA.trans (Subgroup.map_subgroupOf_eq_of_le hAQ).symm
+        exact Subgroup.map_injective (Q : Subgroup G).subtype_injective this
+  -- ===== Part (b) =====
+  have partB : ∀ R : Subgroup G, IsPGroup p ↥R → 2 ≤ rank ↥R → IsUniquelyMaximal R := by
+    intro R hR_pg hR_rank
+    -- `2 ≤ rank ↥R` ⇒ `R` noncyclic ⇒ `R` has `E ∈ ℰ²(↥R)` (S04).
+    have hR_nc : ¬ IsCyclic ↥R := by
+      intro hRc
+      haveI := hRc
+      have : rank ↥R ≤ 1 := rank_le_one_of_isCyclic (C := ↥R)
+      omega
+    obtain ⟨E, hE_elem, hE_card⟩ :=
+      OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+        hR_pg hp_odd hR_nc
+    -- map `E ≤ ↥R` to `A ≤ R` in `G`.
+    set A : Subgroup G := E.map R.subtype with hA_def
+    have hAR : A ≤ R := Subgroup.map_subtype_le E
+    have hA_elem : A.IsElementaryAbelian p :=
+      hE_elem.map R.subtype_injective
+    have hA_card : Nat.card ↥A = p ^ 2 := by
+      rw [hA_def, Subgroup.card_map_of_injective R.subtype_injective, hE_card]
+    have hA2 : A ∈ elemAbelianOfRank G p 2 := by
+      rw [mem_elemAbelianOfRank]; exact ⟨hA_elem, hA_card⟩
+    -- By (a), `A` is not maximal-elem-ab, so `A ∈ 𝒰` (§9 Uniqueness Theorem corollary).
+    have hAns : ¬ IsMaximalElementaryAbelian p A := fun hAmax => partA ⟨A, hA2, hAmax⟩
+    have hAU : IsUniquelyMaximal A :=
+      OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_mem_e2_not_maximal hG hA2 hAns
+    -- `R` is proper (`R = ⊤` ⇒ `G` is a solvable `p`-group, contradiction), so lift `A ∈ 𝒰`.
+    have hR_lt : R < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro hRtop
+      have hGpg : IsPGroup p G :=
+        hR_pg.of_equiv (hRtop ▸ Subgroup.topEquiv : (↥R : Type _) ≃* G)
+      haveI : Group.IsNilpotent G := hGpg.isNilpotent
+      exact hG.notSolvable inferInstance
+    exact isUniquelyMaximal_of_le hAU hAR hR_lt
+  -- ===== Part (c) =====
+  refine ⟨partA, partB, ?_⟩
+  intro X hXP
+  set Q : Subgroup G := Subgroup.normalizer (X : Set G) ⊓ (P : Subgroup G) with hQ_def
+  -- `Q ≤ P`, so `Q` is a `p`-group.
+  have hQP : Q ≤ (P : Subgroup G) := inf_le_right
+  have hQ_pg : IsPGroup p ↥Q :=
+    P.2.of_injective (Subgroup.inclusion hQP) (Subgroup.inclusion_injective hQP)
+  by_cases hrank : 2 ≤ rank ↥Q
+  · exact partB Q hQ_pg hrank
+  · -- `rank ↥Q ≤ 1`; derive a contradiction (`Q = P` but `rank ↥P ≥ 3`).
+    exfalso
+    -- `Q` is cyclic: else it has an `E_{p²}`, forcing `rank ↥Q ≥ 2`.
+    have hQ_cyclic : IsCyclic ↥Q := by
+      by_contra hQnc
+      obtain ⟨E, hE_elem, hE_card⟩ :=
+        OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+          hQ_pg hp_odd hQnc
+      have : 2 ≤ pRank ↥Q p := pow_le_card_of_le_pRank E hE_elem hE_card
+      have : 2 ≤ rank ↥Q := le_trans this (pRank_le_rank p)
+      omega
+    -- `X ≤ Q` (`X` normalizes itself and `X ≤ P`).
+    have hXQ : X ≤ Q := by
+      rw [hQ_def, le_inf_iff]
+      exact ⟨Subgroup.le_normalizer, hXP⟩
+    -- `N_G(Q) ⊓ P ≤ Q`: any `g ∈ P` normalizing `Q` normalizes the characteristic `X`.
+    have hself : Subgroup.normalizer (Q : Set G) ⊓ (P : Subgroup G) ≤ Q := by
+      rintro g ⟨hgN, hgP⟩
+      rw [hQ_def, Subgroup.mem_inf]
+      refine ⟨?_, hgP⟩
+      -- `g` normalizes `Q`: `∀ n, n ∈ Q ↔ g n g⁻¹ ∈ Q`.
+      have hgN' : ∀ n, n ∈ (Q : Set G) ↔ g * n * g⁻¹ ∈ (Q : Set G) :=
+        Subgroup.mem_set_normalizer_iff.mp hgN
+      -- `X' = gXg⁻¹` is a subgroup of `Q` of order `|X|`, so `X' = X` (cyclic uniqueness in `↥Q`).
+      set X' : Subgroup G := X.map (MulAut.conj g).toMonoidHom with hX'_def
+      have hX'Q : X' ≤ Q := by
+        rw [hX'_def]
+        rintro y ⟨x, hx, rfl⟩
+        have hxQ : (x : G) ∈ (Q : Set G) := hXQ hx
+        have : g * x * g⁻¹ ∈ (Q : Set G) := (hgN' x).mp hxQ
+        simpa [MulAut.conj_apply] using this
+      have hX'_card : Nat.card ↥X' = Nat.card ↥X := by
+        rw [hX'_def, Subgroup.card_map_of_injective (MulAut.conj g).injective]
+      -- Inside `↥Q`: the two `subgroupOf`s have equal card, hence are equal.
+      have hsubOf_card : Nat.card ↥(X'.subgroupOf Q) = Nat.card ↥(X.subgroupOf Q) := by
+        rw [← Subgroup.card_map_of_injective Q.subtype_injective,
+          Subgroup.map_subgroupOf_eq_of_le hX'Q,
+          ← Subgroup.card_map_of_injective Q.subtype_injective,
+          Subgroup.map_subgroupOf_eq_of_le hXQ, hX'_card]
+      have hsubOf_eq : X'.subgroupOf Q = X.subgroupOf Q :=
+        cyclic_subgroup_eq_of_card_eq (C := ↥Q) hsubOf_card
+      -- Map back along `Q.subtype`: `X' = X`.
+      have hX'eqX : X' = X := by
+        have hmap : (X'.subgroupOf Q).map Q.subtype = (X.subgroupOf Q).map Q.subtype :=
+          congrArg (Subgroup.map Q.subtype) hsubOf_eq
+        rwa [Subgroup.map_subgroupOf_eq_of_le hX'Q,
+          Subgroup.map_subgroupOf_eq_of_le hXQ] at hmap
+      -- `X.map (conj g) = X` gives `g h g⁻¹ ∈ X ↔ h ∈ X`.
+      rw [Subgroup.mem_normalizer_iff]
+      intro h
+      constructor
+      · intro hh
+        have : g * h * g⁻¹ ∈ X' := by
+          rw [hX'_def, Subgroup.mem_map]
+          exact ⟨h, hh, by simp [MulAut.conj_apply]⟩
+        rwa [hX'eqX] at this
+      · intro hh
+        rw [← hX'eqX, hX'_def, Subgroup.mem_map] at hh
+        obtain ⟨x, hx, hxeq⟩ := hh
+        simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hxeq
+        -- `g * x * g⁻¹ = g * h * g⁻¹` ⇒ `x = h`.
+        have hxh : x = h := by
+          have h1 : g * x = g * h := mul_right_cancel hxeq
+          exact mul_left_cancel h1
+        rwa [← hxh]
+    -- `Q = P` by the nilpotent normalizer condition.
+    have hQeqP : Q = (P : Subgroup G) := by
+      by_contra hQne
+      have hQlt : Q < (P : Subgroup G) := lt_of_le_of_ne hQP hQne
+      haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
+      have hNC : NormalizerCondition ↥(P : Subgroup G) :=
+        normalizerCondition_of_isNilpotent (G := ↥(P : Subgroup G))
+      have hQsub_lt : Q.subgroupOf (P : Subgroup G) < ⊤ := by
+        rw [lt_top_iff_ne_top]
+        intro htop
+        rw [Subgroup.subgroupOf_eq_top] at htop
+        exact hQne (le_antisymm hQP htop)
+      obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hQsub_lt)
+      rw [← Subgroup.subgroupOf_normalizer_eq hQP, Subgroup.mem_subgroupOf] at ht_norm
+      rw [Subgroup.mem_subgroupOf] at ht_not
+      -- `↑t ∈ N_G(Q) ⊓ P ≤ Q`, so `↑t ∈ Q`, contradicting `t ∉ Q.subgroupOf P`.
+      exact ht_not (hself ⟨ht_norm, t.2⟩)
+    -- But `rank ↥P ≥ 3 > 1 ≥ rank ↥Q = rank ↥P`.
+    have hPrank : 3 ≤ rank ↥(P : Subgroup G) :=
+      le_trans (le_trans hpRank3 (pRank_le_pRank_sylow P)) (pRank_le_rank p)
+    rw [hQeqP] at hrank
+    omega
 
 /-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
 
