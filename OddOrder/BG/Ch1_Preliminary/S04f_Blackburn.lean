@@ -1306,6 +1306,41 @@ private theorem blackburn_noncentral_commutator_map_centralizer_card_and_omega
     rw [ht_pow, map_one]
   exact ⟨hTmap_card, hTmap_omega⟩
 
+/-- Blackburn 4.16 Case B-2: the image `TC/C` lies inside the image
+`D/C`, where `D = C_R(T)`, and keeps its order-`p`/`Ω₁` facts. -/
+private theorem blackburn_noncentral_commutator_image_relations
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p)
+    (hT_quot_cards :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      let Z : Subgroup R := (Subgroup.center S).map S.subtype
+      Nat.card (S ⧸ T.subgroupOf S) = p ∧ Nat.card (T ⧸ Z.subgroupOf T) = p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    T.map (QuotientGroup.mk' C) ≤ D.map (QuotientGroup.mk' C) ∧
+      Nat.card (T.map (QuotientGroup.mk' C)) = p ∧
+      T.map (QuotientGroup.mk' C) ≤ Omega (R ⧸ C) p 1 := by
+  dsimp at hT_facts hT_elem hT_quot_cards ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+  have hT_le_D : T ≤ D := hrelations.2.1
+  have hTC := blackburn_noncentral_commutator_map_centralizer_card_and_omega
+    hT_facts hT_elem hT_quot_cards
+  exact ⟨Subgroup.map_mono hT_le_D, hTC.1, hTC.2⟩
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1484,9 +1519,8 @@ theorem blackburnRankTwoClassification
     have hSC_top :=
       blackburn_noncentral_omega1_sup_centralizer_eq_top hR hT_facts hT_elem
     have hCDT_relations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
-    have hTC_map :=
-      blackburn_noncentral_commutator_map_centralizer_card_and_omega
-        hT_facts hT_elem hT_quot_cards
+    have hTC_image :=
+      blackburn_noncentral_commutator_image_relations hT_facts hT_elem hT_quot_cards
     obtain ⟨hΩC_eq_center, hC_cyclic, hΩC_eq_comm⟩ :=
       blackburn_omega1_centralizer_eq_center_cyclic_and_commutator
         hp_odd hR hΩ_pow hΩ_extraspecial
