@@ -5,7 +5,12 @@
 > `IsPGroup p G`, `N⊴G`, `p^r ∣ |N|` ⇒ ∃ `L⊴G`, `L≤N`, `|L|=p^r` — BG Lem 1.22 と完全一致。
 > (前 survey agent は Isaacs Ch01 のみ検索し BG §1 S01 を見落とした。) ⇒ **Lem 5.1(b) の Lem 1.22 依存は充足済**;
 > §5 前半の残 gate は **Lem 4.7⇒ (=Lem 5.1(a), Gorenstein 5.4.15)** と **Lem 4.5(c) noncyclic 半 (=Lem 4.5(a) general, Gorenstein 5.4.10)** のみ (ともに §4 側)。
-> なお S5-0 infra (IsNarrow / E*(R) / Ω₁(Z₂(R)) / Lem 4.5(c) exp-p 半) は `OddOrder/GroupTheory/NarrowPGroup.lean` に**着地済** (commits bcfb437..539aeae)。実装設計は `notes/bg/s05_design_2026_05_30.md`。
+> なお S5-0 infra (IsNarrow / E*(R) / Ω₁(Z₂(R)) / Lem 4.5(c) exp-p 半 / `T=C_R(W)` の char・`Z(R)⊆T`・`R'⊆T`) は `OddOrder/GroupTheory/NarrowPGroup.lean` に**着地済** (R'⊆T は 2026-06-02, three-subgroups)。実装設計は `notes/bg/s05_design_2026_05_30.md`。
+> **追記 (2026-06-02, Lane B)**: Lem 5.1(b) の前段も部分着地。
+> `OddOrder.GroupTheory.exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank`、
+> `OddOrder.GroupTheory.pow_dvd_card_omega1OfAbelian_of_pos_le_pRank`、
+> `OddOrder.BG.Ch1.S05.exists_normal_isElementaryAbelian_card_prime_cube_of_scn3` により、`SCN₃` 元から
+> Lem 1.22 で normal elementary abelian subgroup of order `p^3` を取る行は theorem 化済。
 
 > **目的**: 別エージェントが BG §5 (`OddOrder/BG/Ch1_Preliminary/S05_NarrowPGroups.lean`, 未作成) を
 > **cold start** で実装できる水準の調査。READ-ONLY 調査の成果物 (Lean 未編集)。
@@ -92,7 +97,7 @@ Thm 5.3 + Thm 5.5 ──→ Thm 5.7
 | §4 結果 | §5 でどこで使うか | mmd statement 要約 | Lean 現状 | 状態 |
 |---|---|---|---|---|
 | **Lem 4.7** | 5.1(a) (L1800), 5.5(c) (L1935) | `SCN₃(R)=∅ ⟺ r(R)≤2` | `scn3_empty_of_pRank_le_two` = **⇐ のみ** (r≤2⇒空)。5.1(a) が要るのは **⇒ (r≥3⇒SCN₃≠∅) = 未実装** (Gorenstein 5.4.15) | ⚠ **⇒ 欠落** |
-| **Lem 1.22** | 5.1(b) (L1800) | p-群 `N⊴G`, `\|N\|=p^k`, `r≤k` ⇒ N 内に位数 p^r の `G`-normal 部分群 | repo 検索: **未実装** (S04 にも無い) | ❌ 欠落 |
+| **Lem 1.22** | 5.1(b) (L1800) | p-群 `N⊴G`, `p^r ∣ |N|` ⇒ N 内に位数 p^r の `G`-normal 部分群 | `OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup` ✅。さらに `SCN₃` 元から適用対象 `Ω₁(A)` を作る `exists_normal_isElementaryAbelian_card_prime_cube_of_scn3` も着地 | ✅ |
 | **Prop 4.4** | 5.1(b) (L1800, "B* が SCN₃ 元に含まれる") | (a) `SCN(R)=maximal-abelian-normal`、(b) Syl_p ⇒ `C_G(A)=A×H` | (a) = `isSCN_iff_isMaximalAbelianNormal` ✅。5.1 が使うのは "elem-ab `B*`⊴R, `\|B*\|≥p³` ⇒ SCN₃ 元に含まれる" = **Prop 4.4(a) + 拡大補題、要 maximal-abelian-normal の存在/拡大** | △ 部分 |
 | **Lem 4.5(c)** | 5.2 proof (L1818) | `Ω₁(Z₂(R))` は noncyclic exponent p | repo: **未実装** (S04 に 4.5(a)/(b) はあるが (c) 無し)。Prop 4.3(a) cl≤2 = `Omega.exponent_eq_of_class_le_two` で exponent 部分は近い | ⚠ 欠落 |
 | **Lem 4.5** (general) | (5.2 経由) | (a) normal `E_p²` 存在 | `exists_normal_isElementaryAbelian_..._omega1Center` = **abelian-center case のみ** | △ 部分 |
@@ -169,7 +174,7 @@ Thm 5.3 + Thm 5.5 ──→ Thm 5.7
 
 - **mathlib**: `upperCentralSeries G n` (Z_n(G)、`Z₂=upperCentralSeries G 2`)、`Subgroup.center`、`Subgroup.centralizer`、`Subgroup.IsElementaryAbelian` (repo 拡張)、`IsPGroup` 全般、`commutator`/`⁅·,·⁆` API。
 - **repo**: `pRank`/`rank` 評価補題群、`IsSCN`/`IsSCN₃`、`Omega`/`Agemo`/`omega1OfAbelian`、`thompson_critical_omega` (Thm 1.13、Thm 5.5 用)、Lem 1.9 2-step (`S01_Solvable.lean:656`)、`IsCentralProduct`/`IsExtraspecial` (Thm 4.16 接続用)。
-- **要新規**: `E*(R)` (極大 elem-ab) 述語 + `E²∩E*` 補題、`Ω₁(Z₂(R))` の noncyclic/exp-p/`[W,R]⊆Z` 補題 (Lem 4.5(c) 依存)、A-invariant 鎖 stabilization (Thm 5.5)、Lem 1.22 (p-群の normal subgroup 内に各位数の normal subgroup)。
+- **要新規**: `E*(R)` (極大 elem-ab) 述語 + `E²∩E*` 補題、`Ω₁(Z₂(R))` の noncyclic/exp-p/`[W,R]⊆Z` 補題 (Lem 4.5(c) 依存)、A-invariant 鎖 stabilization (Thm 5.5)。Lem 1.22 本体と `SCN₃` から normal elem-ab `p^3` を取る前段は 2026-06-02 時点で着地済。
 
 ---
 
@@ -245,6 +250,9 @@ memory `scaffold-sorry-free-not-done` 厳守。以下は hard content を未充�
 位数 p の R₀ と cyclic R₁ で C_R(R₀)=R₀×R₁ となるものを持つ。 -/
 def IsNarrow (p : ℕ) (R : Type*) [Group R] : Prop :=
   pRank R p ≤ 2 ∨ ∃ R₀ R₁ : Subgroup R, Nat.card R₀ = p ∧ IsCyclic R₁ ∧
-    Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁ ∧ ... (内部直積条件)
+    R₀ ⊓ R₁ = ⊥ ∧ Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁
 ```
-(注: "no elem-ab of order p³" ⟺ `pRank R p ≤ 2` は Lem 4.7 で同値。定義に `pRank≤2` を採るか "no E_p³" を採るかは実装時判断。直積 `R₀×R₁` は `IsInternalDirectProduct` 的な条件で表現。Thm 5.3/Cor 5.4 が rank≥3 での同値刻画を与えるので、定義はこの素朴形で十分。)
+(注: "no elem-ab of order p³" ⟺ `pRank R p ≤ 2` は Lem 4.7 で同値。実装は素朴形
+`pRank≤2` を採る。直積 `R₀×R₁` は centralizer 内での `R₀ ⊓ R₁=⊥` と
+`C_R(R₀)=R₀⊔R₁` で表し、ambient `R` の complement を要求する `Subgroup.IsComplement'` は使わない。
+Thm 5.3/Cor 5.4 が rank≥3 での同値刻画を与えるので、定義はこの素朴形で十分。)

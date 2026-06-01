@@ -439,6 +439,22 @@ theorem pRank_le_iff [Finite G] {n : ℕ} :
   · intro h A
     exact h A.val A.2
 
+/-- **Existence side for a positive `pRank` lower bound** (`[Finite G]`).
+If `n ≤ pRank G p` and `n > 0`, then some elementary abelian subgroup has
+`p`-logarithmic order at least `n`. This is the contrapositive form of
+`pRank_le_iff`, avoiding direct manipulation of the `iSup` witness. -/
+theorem exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank [Finite G] {n : ℕ}
+    (hnpos : 0 < n) (hn : n ≤ pRank G p) :
+    ∃ A : Subgroup G, A.IsElementaryAbelian p ∧ n ≤ Nat.log p (Nat.card A) := by
+  by_contra hnone
+  push Not at hnone
+  have hrank_le : pRank G p ≤ n - 1 := by
+    rw [pRank_le_iff]
+    intro A hA
+    have hlt : Nat.log p (Nat.card A) < n := hnone A hA
+    omega
+  omega
+
 /-- **`pRank` lower bound** (`[Finite G]`, `p` prime): an elementary abelian subgroup of
 order `p ^ n` witnesses `n ≤ pRank G p`. This is the existence-side companion to the
 evaluation lemma `pRank_le_iff`. -/
