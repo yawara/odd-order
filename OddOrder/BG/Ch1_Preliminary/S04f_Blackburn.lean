@@ -27,6 +27,7 @@ open scoped Pointwise commutatorElement
 namespace OddOrder.BG.Ch1.S04
 
 open OddOrder.GroupTheory
+open OddOrder.Isaacs.Ch03 (IsAInvariant)
 
 section AutOrderConstraints
 
@@ -160,6 +161,29 @@ private theorem card_le_prime_cube_of_scn3_empty_exp_prime_subgroup
   exact card_le_prime_cube_of_pRank_le_two_of_exponent_prime
     (hR.to_subgroup Q) hQ_rank hQ_pow
 
+/-- If an operator has prime-power-one relation and acts nontrivially on an
+invariant subgroup, then its restricted automorphism has that prime order. -/
+private theorem orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial
+    {A R : Type*} [Group A] [Group R] {φ : A →* MulAut R}
+    {Q : Subgroup R} (hQ_inv : IsAInvariant φ Q) {ψ : A} {q : ℕ}
+    (hq : q.Prime) (hψ_pow : ψ ^ q = 1)
+    (hψ_nt : ∃ g ∈ Q, (φ ψ) g ≠ g) :
+    orderOf (hQ_inv.restrict ψ) = q := by
+  have hres_ne_one : hQ_inv.restrict ψ ≠ 1 := by
+    intro hres
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt
+    apply hg
+    have hfix : (hQ_inv.restrict ψ) ⟨g, hgQ⟩ = ⟨g, hgQ⟩ := by
+      rw [hres]
+      rfl
+    exact congrArg Subtype.val hfix
+  have hres_pow : (hQ_inv.restrict ψ) ^ q = 1 := by
+    rw [← map_pow, hψ_pow, map_one]
+  have hdvd : orderOf (hQ_inv.restrict ψ) ∣ q := orderOf_dvd_of_pow_eq_one hres_pow
+  rcases hq.eq_one_or_self_of_dvd _ hdvd with h1 | hqeq
+  · exact (hres_ne_one (orderOf_eq_one_iff.mp h1)).elim
+  · exact hqeq
+
 /-- **BG Lemma 4.13** (via Gorenstein Theorem 4.15(ii)). Suppose `p` is an odd
 prime, `R` is a finite `p`-group, and `q` is a prime divisor of `|Aut R|`. If
 `SCN₃(R)` is empty and `q ≠ p`, then `q ∣ p^2 - 1` and `q < p`.
@@ -197,6 +221,20 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     card_le_prime_cube_of_scn3_empty_exp_prime_subgroup hp_odd hR hSCN hQ_exp
   have hQ_elem_card_le : IsElementaryAbelian p Q → Nat.card Q ≤ p ^ 2 :=
     card_le_prime_sq_of_scn3_empty_elementaryAbelian_subgroup hp_odd hR hSCN
+  have hψA_pow : ψA ^ q = 1 := by
+    apply Subtype.ext
+    change ψ ^ q = 1
+    rw [← hψ_order]
+    exact pow_orderOf_eq_one ψ
+  have hψQ_order : orderOf (hQ_inv.restrict ψA) = q :=
+    orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial hQ_inv hq hψA_pow hψ_nt_Q
+  have hQ_elem_dvd : IsElementaryAbelian p Q → q ∣ p ^ 2 - 1 := by
+    intro hQ_elem
+    exact prime_dvd_prime_sq_sub_one_of_orderOf_mulAut hq hqp hQ_elem
+      (hQ_elem_card_le hQ_elem) hψQ_order
+  have hQ_elem_lt : IsElementaryAbelian p Q → q < p := by
+    intro hQ_elem
+    exact lt_of_prime_dvd_prime_sq_sub_one Fact.out hp_odd hq hqp (hQ_elem_dvd hQ_elem)
   sorry
 
 /-- **BG Lemma 4.14.** Under the hypotheses of Lemma 4.13, `q` divides one of the
