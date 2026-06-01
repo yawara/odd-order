@@ -55,6 +55,22 @@ theorem fixed_apply_groupSumMap (ρ : Representation F G V) (H : Subgroup G) [Fi
   rw [Finset.sum_congr rfl (fun h _ => hreindex h)]
   exact Equiv.sum_comp (Equiv.mulLeft (⟨h₀, hh₀⟩ : H)) (fun h => ρ ((h : H) : G) v)
 
+/-- **Endgame of Wielandt**: if the `K`-averaging map equals `|K| • id`, then `K` acts
+trivially. (`|K| • v` is `K`-fixed by `fixed_apply_groupSumMap`, so `|K| • ρ k v = |K| • v`;
+cancel the nonzero scalar `|K|`.) -/
+theorem trivial_of_groupSumMap_eq_card_smul (ρ : Representation F G V) (K : Subgroup G)
+    [Fintype K] (hchar : (Nat.card K : F) ≠ 0)
+    (h : groupSumMap ρ K = (Nat.card K : F) • LinearMap.id) :
+    ∀ k : K, ρ (k : G) = 1 := by
+  intro k
+  ext v
+  have hfix : ρ (k : G) (groupSumMap ρ K v) = groupSumMap ρ K v :=
+    fixed_apply_groupSumMap ρ K k.2 v
+  rw [h] at hfix
+  simp only [LinearMap.smul_apply, LinearMap.id_coe, id_eq, map_smul] at hfix
+  have := smul_right_injective V hchar hfix
+  simpa using this
+
 /-- **BG Lemma 3.3** (Wielandt, mmd L845): if `G = KR` is a Frobenius group and `K` acts
 nontrivially on a representation `V` over a field `F` of characteristic not dividing `|K|`,
 then `C_V(R) ≠ 0` (some nonzero vector is fixed by all of `R`). -/
