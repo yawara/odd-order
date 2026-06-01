@@ -737,7 +737,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     IsMulCommutative (S : Subgroup ↥M) := by
   sorry
 
-/-- **BG Corollary 11.6 (a)(b)** (mmd L2974 付近): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
+/-- **BG Corollary 11.6 (a)(b)** (mmd L2977): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
 (原典 (c): `g₁,g₂∈N_G(P)−N_M(P)` で `C_{M_σ}(A₀^{gᵢ})=1` ∧ `A=A₁×A₂` — 後続。) -/
 theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :

@@ -142,9 +142,9 @@ theorem fusion_control_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     (Subgroup.centralizer (X : Set G) ≤ M → ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) := by
   sorry
 
-/-! ## Theorem 10.2 — M_σ/M_α の Hall 構造 (mmd L2680 付近) -/
+/-! ## Theorem 10.2 — M_σ/M_α の Hall 構造 (mmd L2713) -/
 
-/-- **BG Theorem 10.2**: `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
+/-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
 `M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
 quotient 型の `Normal` instance 整備後に追加予定。) -/
 theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -274,7 +274,7 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
       Msigma M ⊓ Msigma H = ⊥ ∧ sigma M ∩ sigma H = ∅) := by
   sorry
 
-/-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2900 付近) -/
+/-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2894) -/
 
 /-- **Cyclic uniqueness by order**: in a finite cyclic group, two subgroups of equal
 cardinality coincide. (Each order-`d` subgroup equals the unique order-`d` kernel
@@ -379,7 +379,7 @@ private theorem pRank_le_pRank_sylow [Finite G] [Fact p.Prime] (P : Sylow p G) :
         rw [hA'P_card]
     _ ≤ pRank ↥(P : Subgroup G) p := le_pRank _ hA'P_elem
 
-/-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2900 付近): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
+/-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2894): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
 (a) `ℰ_p²(G) ∩ ℰ_p*(G) = ∅`; (b) `p`-部分群 `R` で `r(R) ≥ 2` なら `R ∈ 𝒰`;
 (c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d): nonid `β(M)`-部分群 `Y` ⇒ `N_G(Y)⊆M` — 後続。)
 
@@ -616,8 +616,10 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
         (P : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) := by
   sorry
 
--- **TODO (BG Lemma 10.13)** (mmd L2885 付近): `A∈ℰ_p²(G)∩ℰ_p*(G)`, `P` nonabelian `p`-群 ⊇ `A`,
--- `Z₀=Ω₁(Z(P))`, `A₀∈ℰ¹(A)`, `A₀≠Z₀` ⇒ (a) `Z₀∈ℰ¹(A)`; (b) `C_P(A)=A₀×Z` (`Z` cyclic ⊇`Z₀`);
+-- **TODO (BG Lemma 10.13)** (missing page near mmd L2885-L2892):
+-- `A∈ℰ_p²(G)∩ℰ_p*(G)`, `P` nonabelian `p`-群 ⊇ `A`,
+-- `Z₀=Ω₁(Z(P))`, `A₀∈ℰ¹(A)`, `A₀≠Z₀` ⇒ (a) `Z₀∈ℰ¹(A)`;
+-- (b) `C_P(A)=A₀×Z` (`Z` cyclic ⊇`Z₀`);
 -- (c) `N_P(A)` は `ℰ¹(A)−{Z₀}` 上推移的。`Ω₁(Z(P))` の入れ子 + 内部直積 `A₀×Z` + 推移性の faithful
 -- encoding を要するため後続 (Ω₁/centralizer の subtype-map 整備後)。
 

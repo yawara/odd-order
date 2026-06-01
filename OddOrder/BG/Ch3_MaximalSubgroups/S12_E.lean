@@ -135,7 +135,7 @@ theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     p ∈ S10.sigma Mstar ∨ p ∈ tau2 Mstar := by
   sorry
 
-/-- **BG Proposition 12.4(a)** (mmd L3023-): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
+/-- **BG Proposition 12.4(a)** (mmd L3095): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
 (原典 (b): `N_G(A₀)` の uniqueness ⇒ `p∈σ(M), M_α=1, M_σ` nilpotent は後続。) -/
 theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
@@ -143,14 +143,14 @@ theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.centralizer (A : Set G) ≤ M := by
   sorry
 
-/-- **BG Theorem 12.13** (mmd L3023-): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
+/-- **BG Theorem 12.13** (mmd L3347): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
     (hPnab : ¬ IsMulCommutative P) :
     IsUniquelyMaximal P := by
   sorry
 
-/-- **BG Corollary 12.14** (mmd L3023-): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
+/-- **BG Corollary 12.14** (mmd L3369): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
 `X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
 theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
@@ -159,7 +159,7 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
   sorry
 
-/-- **BG Corollary 12.16(a)** (mmd L3023-): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
+/-- **BG Corollary 12.16(a)** (mmd L3423): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
 (`∃ g ∈ M, Y^g ⊆ M_σ`)。(原典 (b) の rank/derived 評価は後続。) -/
 theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
@@ -167,7 +167,7 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
   sorry
 
-/-- **BG Lemma 12.17** (mmd L3023-): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
+/-- **BG Lemma 12.17** (mmd L3448): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
 (原典の `M_σ ∩ M^g` cyclic 評価は後続。) -/
 theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
@@ -175,7 +175,7 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   sorry
 
-/-- **BG Lemma 12.3** (mmd L3023-): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
+/-- **BG Lemma 12.3** (mmd L3071): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
 `N_G(A₀) ⊆ M*` なら `A` は `M_σ ∩ M*` と `M_α ∩ M*` を中心化する。 -/
 theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
     {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
@@ -186,7 +186,7 @@ theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
     A ≤ Subgroup.centralizer ((S10.Malpha M ⊓ Mstar : Subgroup G) : Set G) := by
   sorry
 
-/-- **BG Lemma 12.19** (mmd L3023-): `E'` は `M_σ` の Hall `β(M)'`-部分群を中心化する。 -/
+/-- **BG Lemma 12.19** (mmd L3480): `E'` は `M_σ` の Hall `β(M)'`-部分群を中心化する。 -/
 theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     ∃ W : Subgroup G, W ≤ S10.Msigma M ∧
