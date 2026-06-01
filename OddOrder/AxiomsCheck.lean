@@ -25,6 +25,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -1069,6 +1070,8 @@ set_option linter.style.longLine false in
 -- BG §4 Lem 4.7 hard dir = **G** Thm 5.4.15(i) (precursor 1, issue 0051): p odd 非自明 p-群 R で
 -- SCN₃(R)=∅ ⇒ pRank R ≤ 2. Gorenstein Lemma 4.14 + GL(≤2,p) rank squeeze。§5 / Thm 4.16 の gate.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.pRank_le_two_of_scn3_empty
+-- BG §5 Lem 5.1(a): p odd 有限 p-群 R, r(R)≥3 ⇒ SCN₃(R)≠∅ (= Lem 4.7 hard dir の対偶)。§5 着手。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

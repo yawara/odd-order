@@ -53,6 +53,7 @@ import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
