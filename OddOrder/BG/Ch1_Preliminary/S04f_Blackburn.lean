@@ -691,6 +691,77 @@ private theorem center_card_eq_prime_of_noncomm_card_prime_cube
       exact (Subgroup.mem_center_iff.mp hx y).symm
     exact hnoncomm (IsMulCommutative.of_comm hcomm)
 
+/-- A nonabelian group of order `p³` and exponent `p` is extraspecial.
+
+This packages the standard rank-two Blackburn Case B structure: the quotient by the
+center has order `p²`, hence is abelian, so the commutator subgroup is nontrivial and
+lies in the center of order `p`; exponent `p` then collapses the p-power part in
+BG Lemma 1.7(d), giving `Φ(G)=G'=Z(G)`. -/
+private theorem isExtraspecial_of_noncomm_card_prime_cube_exp_prime
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hcard : Nat.card G = p ^ 3)
+    (hnoncomm : ¬ IsMulCommutative G)
+    (hexp : Monoid.exponent G = p) :
+    IsExtraspecial p G := by
+  have hp : p.Prime := Fact.out
+  have hG : IsPGroup p G := IsPGroup.of_card (n := 3) hcard
+  have hcenter_card : Nat.card (Subgroup.center G) = p :=
+    center_card_eq_prime_of_noncomm_card_prime_cube hcard hnoncomm
+  have hlag : Nat.card G =
+      Nat.card (G ⧸ Subgroup.center G) * Nat.card (Subgroup.center G) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.center G)
+  have hquot_center_card : Nat.card (G ⧸ Subgroup.center G) = p ^ 2 := by
+    have hmul : Nat.card (G ⧸ Subgroup.center G) * p = (p ^ 2) * p := by
+      calc
+        Nat.card (G ⧸ Subgroup.center G) * p
+            = Nat.card (G ⧸ Subgroup.center G) * Nat.card (Subgroup.center G) := by
+              rw [hcenter_card]
+        _ = Nat.card G := hlag.symm
+        _ = p ^ 3 := hcard
+        _ = (p ^ 2) * p := by ring
+    exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
+  have hquot_comm : ∀ x y : G ⧸ Subgroup.center G, x * y = y * x :=
+    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hquot_center_card
+  have hcomm_le_center : _root_.commutator G ≤ Subgroup.center G :=
+    (Subgroup.Normal.quotient_commutative_iff_commutator_le
+      (N := Subgroup.center G)).mp ⟨⟨hquot_comm⟩⟩
+  have hcomm_ne_bot : _root_.commutator G ≠ (⊥ : Subgroup G) := by
+    intro hbot
+    exact hnoncomm ((commutator_eq_bot_iff G).mp hbot)
+  have hcomm_pg : IsPGroup p (_root_.commutator G) := hG.to_subgroup _
+  have hcomm_card_ne_one : Nat.card (_root_.commutator G) ≠ 1 := by
+    intro hcard_one
+    exact hcomm_ne_bot (Subgroup.card_eq_one.mp hcard_one)
+  have hcomm_card_le_p : Nat.card (_root_.commutator G) ≤ p := by
+    rw [← hcenter_card]
+    exact Subgroup.card_le_of_le hcomm_le_center
+  have hp_dvd_comm : p ∣ Nat.card (_root_.commutator G) := by
+    rcases hcomm_pg.card_eq_or_dvd with h1 | hdvd
+    · exact False.elim (hcomm_card_ne_one h1)
+    · exact hdvd
+  have hp_le_comm : p ≤ Nat.card (_root_.commutator G) :=
+    Nat.le_of_dvd Nat.card_pos hp_dvd_comm
+  have hcomm_card : Nat.card (_root_.commutator G) = p :=
+    le_antisymm hcomm_card_le_p hp_le_comm
+  have hcomm_eq_center : _root_.commutator G = Subgroup.center G :=
+    Subgroup.eq_of_le_of_card_ge hcomm_le_center (by rw [hcomm_card, hcenter_card])
+  have hpow_closure_bot :
+      Subgroup.closure (Set.range (fun x : G => x ^ p)) = (⊥ : Subgroup G) := by
+    apply le_antisymm
+    · rw [Subgroup.closure_le]
+      rintro y ⟨x, rfl⟩
+      change x ^ p = 1
+      simpa [hexp] using (Monoid.pow_exponent_eq_one x)
+    · exact bot_le
+  have hcomm_eq_frattini :
+      _root_.commutator G = frattini G := by
+    simpa [hpow_closure_bot] using
+      (OddOrder.BG.Ch1.S01.commutator_sup_pow_closure_eq_frattini hG)
+  have hfrat_eq_center : frattini G = Subgroup.center G := by
+    rw [← hcomm_eq_center]
+    exact hcomm_eq_frattini.symm
+  exact ⟨hG, hcomm_eq_center, hfrat_eq_center, hcenter_card⟩
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -726,6 +797,8 @@ theorem blackburnRankTwoClassification
     exponent_eq_prime_of_card_prime_cube_and_pow_eq_one hΩ_card hΩ_pow
   have hΩ_center_card : Nat.card (Subgroup.center (Omega R p 1)) = p :=
     center_card_eq_prime_of_noncomm_card_prime_cube hΩ_card hΩ_noncomm
+  have hΩ_extraspecial : IsExtraspecial p (Omega R p 1) :=
+    isExtraspecial_of_noncomm_card_prime_cube_exp_prime hΩ_card hΩ_noncomm hΩ_exp
   have hΩC_center := omega1_centralizer_omega1_map_le_center_map (R := R) (p := p)
   sorry
 
