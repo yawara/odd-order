@@ -34,6 +34,7 @@ namespace OddOrder.BG.Ch3.S12
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -83,6 +84,58 @@ theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E�
     Subgroup.centralizer (E : Set G) ⊓ E₃ = ⊥ ∧
     (∀ p : ℕ, p ∈ tau2 M → ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
       IsMaximalElementaryAbelian p A ∧ ¬ S10.idealPrime p G) := by
+  sorry
+
+/-! ## §12 追加結果 (clean core; 多部分の一部は後続) -/
+
+/-- **BG Lemma 12.2(a)** (mmd L3062): `X` を `M` の非自明 `p`-部分群、`M* ∈ ℳ(N_G(X))` とすると
+`p ∈ σ(M*) ∪ τ₂(M*)`。(原典 (b) の τ₁∪τ₃ 非共役は後続。) -/
+theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {X : Subgroup G} (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXp : IsPGroup p ↥X)
+    {Mstar : Subgroup G}
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    p ∈ S10.sigma Mstar ∨ p ∈ tau2 Mstar := by
+  sorry
+
+/-- **BG Proposition 12.4(a)** (mmd L3023-): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
+(原典 (b): `N_G(A₀)` の uniqueness ⇒ `p∈σ(M), M_α=1, M_σ` nilpotent は後続。) -/
+theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) :
+    Subgroup.centralizer (A : Set G) ≤ M := by
+  sorry
+
+/-- **BG Theorem 12.13** (mmd L3023-): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
+theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
+    (hPnab : ¬ IsMulCommutative P) :
+    IsUniquelyMaximal P := by
+  sorry
+
+/-- **BG Corollary 12.14** (mmd L3023-): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
+`X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
+theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
+    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXM : X ≤ M)
+    (hcase : p ∈ S10.beta M ∨ X ≤ Ch2.S07.derivedInG (S10.Msigma M)) :
+    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
+  sorry
+
+/-- **BG Corollary 12.16(a)** (mmd L3023-): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
+(`∃ g ∈ M, Y^g ⊆ M_σ`)。(原典 (b) の rank/derived 評価は後続。) -/
+theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
+    (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y) :
+    ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
+  sorry
+
+/-- **BG Lemma 12.17** (mmd L3023-): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
+(原典の `M_σ ∩ M^g` cyclic 評価は後続。) -/
+theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Subgroup.centralizer (E : Set G) ⊓ S10.Msigma M ≤ Ch2.S07.derivedInG (S10.Msigma M) ∧
+    ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   sorry
 
 end OddOrder.BG.Ch3.S12
