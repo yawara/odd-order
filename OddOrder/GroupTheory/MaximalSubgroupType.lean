@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.MaxNilpotentNormalHall
 import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.TISubset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
@@ -38,14 +39,11 @@ def secondDerivedInAmbient (M : Subgroup G) : Subgroup G :=
 def sharpSubgroup (H : Subgroup G) : Set G :=
   (H : Set G) \ {1}
 
-/-- The conjugacy saturation of a subset of the ambient group. -/
-def conjugacySaturation (A : Set G) : Set G :=
-  {x | ∃ a ∈ A, ∃ g : G, x = g * a * g⁻¹}
-
 /-- Peterfalvi's support relation: every element of `T` is conjugate to an
- element of `S`. -/
+ element of `S`. The conjugacy-closure is the canonical `conjClassSet` (= BG `𝒞_G`,
+ `GroupTheory.ConjClassSet`; the former local `conjugacySaturation` was a duplicate, issue 0052). -/
 def Supports (T S : Set G) : Prop :=
-  T ⊆ conjugacySaturation S
+  T ⊆ conjClassSet S
 
 /-- A centralizer-union set: nonidentity elements of `host` centralizing some
  element of `source`.  This packages the repeated `A(M)` pattern in (8.10). -/
@@ -244,6 +242,6 @@ def typePV (M : Subgroup G) (data : TypePData M) : Set G :=
 
 /-- Peterfalvi (8.10), `A_0(M) = A(M) union V^G` for type `P` data. -/
 def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
-  typePA M data ∪ conjugacySaturation (typePV M data)
+  typePA M data ∪ conjClassSet (typePV M data)
 
 end OddOrder.GroupTheory

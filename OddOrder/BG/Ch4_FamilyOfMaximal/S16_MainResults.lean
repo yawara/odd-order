@@ -45,7 +45,7 @@ def ASet (M U : Subgroup G) : Set G :=
 /-- BG Theorem E notation: `A_0(M) = hat M_sigma - C_M(K#)`, represented as the
 part of `hat M_sigma` outside the `M`-conjugacy saturation of `K#`. -/
 def A0Set (M K : Subgroup G) : Set G :=
-  hatMsigma M \ conjugacySaturation (sharpSubgroup K)
+  hatMsigma M \ conjClassSet (sharpSubgroup K)
 
 /-- BG's `pi*`: the primes whose Sylow subgroup is cyclic, or has the cyclic
 centralizer splitting described in the type-I alternatives. -/

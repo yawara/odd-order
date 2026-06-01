@@ -115,8 +115,8 @@ def K (hyp : Hypothesis (G := G)) : Subgroup G :=
 /-- The generic set `G_0 = G# - ((H#)^G union (Q#)^G)` from (13.9). -/
 def G0 (hyp : Hypothesis (G := G)) : Set G :=
   sharpSubgroup (⊤ : Subgroup G) \
-    (conjugacySaturation (sharpSubgroup hyp.H) ∪
-      conjugacySaturation (sharpSubgroup hyp.Q))
+    (conjClassSet (sharpSubgroup hyp.H) ∪
+      conjClassSet (sharpSubgroup hyp.Q))
 
 end Hypothesis
 

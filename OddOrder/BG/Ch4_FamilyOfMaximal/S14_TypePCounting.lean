@@ -96,7 +96,7 @@ def sigmaSharp (M : Subgroup G) : Set G :=
 
 /-- The conjugacy saturation `C_G(M_tilde)` used in the counting formulas. -/
 def sigmaConjugacySaturation (M : Subgroup G) : Set G :=
-  conjugacySaturation (sigmaSharp M)
+  conjClassSet (sigmaSharp M)
 
 /-- Subgroup conjugacy in the ambient group. -/
 def IsConjugateSubgroup (M N : Subgroup G) : Prop :=
@@ -223,7 +223,7 @@ theorem nonidentity_covered_by_sigma_pieces [Finite G]
       M ∈ maximalSubgroups G ∧ Mstar ∈ maximalSubgroups G ∧
       IsTypeP M ∧ IsTypeP Mstar ∧
       ∀ x : G, x ≠ 1 →
-        x ∈ conjugacySaturation (zTilde K Kstar) ∨
+        x ∈ conjClassSet (zTilde K Kstar) ∨
         ∃ H : Subgroup G,
           H ∈ maximalSubgroups G ∧ IsTypeF H ∧ x ∈ sigmaConjugacySaturation H) := by
   sorry
