@@ -2721,6 +2721,46 @@ lemma exists_lowerBoundTerm_of_exists_Bsum_bound [Finite G]
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
+/-- **Peterfalvi (7.10) character-estimate target.**  This is the exact data
+still to be built from the character-theoretic inputs (7.5), (7.8), (7.9), and
+(6.8): a minimal kernel index, the corresponding `𝓑`-set, the unweighted
+`𝓑`-sum bound, and the base estimate before the final arithmetic rearrangement.
+
+It is standalone target data, not a field of `FrobeniusFamily`. -/
+structure CharacterEstimateData [Finite G] (F : FrobeniusFamily G k) where
+  /-- The index with minimal kernel order. -/
+  i : Fin k
+  /-- Minimality of `h_i`. -/
+  hmin : ∀ l : Fin k, F.h i ≤ F.h l
+  /-- The Peterfalvi `𝓑`-set of non-minimal indices. -/
+  B : Finset (Fin k)
+  /-- The chosen `𝓑`-indices avoid the minimal index. -/
+  B_avoids_min : ∀ j ∈ B, i ≠ j
+  /-- The unweighted `𝓑`-sum bound coming from (7.8.b) and (7.9). -/
+  Bsum_le :
+    (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1
+  /-- The base estimate isolated from (7.5), before bounding the `𝓑`-sum. -/
+  base_estimate :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ)))
+
+/-- The named character-estimate data implies the displayed lower bound of
+Peterfalvi (7.10). -/
+lemma lowerBoundTerm_of_characterEstimateData [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : F.CharacterEstimateData) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
+  exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
@@ -2737,7 +2777,10 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
         ((F.e i : ℚ) - 1) *
           (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
             2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-  sorry
+  have hdata : F.CharacterEstimateData := by
+    -- TODO: assemble from (7.5), (7.8), (7.9), and (6.8).
+    sorry
+  exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
 
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 

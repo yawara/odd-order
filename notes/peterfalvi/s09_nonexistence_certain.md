@@ -294,6 +294,14 @@ theorem non_orthogonality_two_families
    `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
 5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
 
+### 2026-06-02 — (7.10) final assembly target
+
+`FrobeniusFamily.CharacterEstimateData` を追加し、最終 `card_G0_lower_bound` の残りを
+「minimal index + `𝓑`-set + unweighted `𝓑`-sum bound + base estimate」の data 構成に局所化。
+`lowerBoundTerm_of_characterEstimateData` はその data から表示下界を sorry-free で返す。
+したがって算術 bridge は閉じており、残る `sorry` は (7.5)(7.8)(7.9)(6.8)+Thompson から
+`CharacterEstimateData` を作る指標論・coherence 側。
+
 **現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside (1.5.d)) はすべて完了。
 残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
 (7.8.a/b)/(7.9) のいずれも outright sorry-free 化は依然不能。
