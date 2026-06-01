@@ -1327,6 +1327,65 @@ private theorem subgroupOf_image_le_omega_quotient_of_isElementaryAbelian
       (hT_elem.pow_eq_one ⟨(d : R), Subgroup.mem_subgroupOf.mp hdT⟩)
   rw [hd_pow_D, map_one]
 
+/-- Blackburn 4.16 Case B-2: `D/C` is abelian for `D = C_R(T)` and
+`C = C_R(S)`.  This is the subgroup form of BG's assertion that `C_R(T)/C`
+embeds in the elementary abelian stabilizer group of the series `S ⊵ T ⊵ 1`:
+commutators of elements centralizing `T` centralize all of `S`. -/
+private theorem blackburn_noncentral_centralizer_quotient_commutative
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    let hCD_normal : (C.subgroupOf D).Normal :=
+      (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+    letI : (C.subgroupOf D).Normal := hCD_normal
+    ∀ x y : D ⧸ C.subgroupOf D, x * y = y * x := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
+  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hT_le_S : T ≤ S := hT_facts.2.1.le
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_comm : ∀ s ∈ T, ∀ t ∈ T, s * t = t * s := by
+    intro s hs t ht
+    exact congrArg Subtype.val (hT_elem.1 ⟨s, hs⟩ ⟨t, ht⟩)
+  have hdisp : ∀ d : D, ∀ s ∈ S, (d : R)⁻¹ * s * (d : R) * s⁻¹ ∈ T := by
+    intro d s hs
+    have hmem : ⁅(d : R)⁻¹, s⁆ ∈ (⁅(⊤ : Subgroup R), S⁆ : Subgroup R) :=
+      Subgroup.commutator_mem_commutator (Subgroup.mem_top _) hs
+    have hexpr : (d : R)⁻¹ * s * (d : R) * s⁻¹ = ⁅(d : R)⁻¹, s⁆ := by
+      rw [commutatorElement_def]
+      group
+    rw [hexpr]
+    rwa [Subgroup.commutator_comm] at hmem
+  have hfix : ∀ d : D, ∀ w ∈ T, (d : R) * w = w * (d : R) := by
+    intro d w hw
+    exact (Subgroup.mem_centralizer_iff.mp d.property w hw).symm
+  have hcomm_le : _root_.commutator D ≤ C.subgroupOf D := by
+    rw [_root_.commutator_def, Subgroup.commutator_le]
+    intro d₁ _ d₂ _
+    rw [Subgroup.mem_subgroupOf]
+    change ⁅(d₁ : R), (d₂ : R)⁆ ∈ C
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    exact (commutator_centralizes_of_stabilize hT_le_S hT_comm
+      (hdisp d₂) (hdisp d₁) (hfix d₂) (hfix d₁) s hs).symm
+  exact isMulCommutative_iff.mp
+    ((Subgroup.Normal.quotient_commutative_iff_commutator_le
+      (N := C.subgroupOf D)).mpr hcomm_le)
+
 /-- Blackburn 4.16 Case B-2 Maschke step for `D/C`.
 
 This packages the application of `exists_aInvariant_complement_in_omega1_quotient` to
