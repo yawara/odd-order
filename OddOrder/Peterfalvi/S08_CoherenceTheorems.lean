@@ -293,6 +293,17 @@ variable {n : ℕ} [NeZero n]
     τ (ζ 0 - (d 0) • ζ 0) = 0 := by
   rw [data.d_zero, one_smul, sub_self, map_zero]
 
+/-- The output family of an `IndChainDecomposition` is orthonormal, packaged as a
+single `if` formula. -/
+theorem inner_chi_eq_ite
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) (t u : Fin n) :
+    ClassFunction.inner (data.χ t) (data.χ u) = if t = u then 1 else 0 := by
+  by_cases htu : t = u
+  · subst u
+    rw [if_pos rfl, data.norm_one]
+  · rw [if_neg htu, data.pairwise_inner_zero htu]
+
 /-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
 together with the membership `ζ_t ∈ S`, the orthonormality of the input family `ζ`,
 and the support of each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`.

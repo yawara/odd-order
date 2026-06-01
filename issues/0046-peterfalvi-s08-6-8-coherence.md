@@ -34,6 +34,9 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       各フィールドを `extension_inner_eq` (isometry) と `extends_on_supported`
       + `LinearMap.map_sub` + `map_zsmul` で組み立て。sorry-free。
 - [x] `IndChainDecomposition.image_eq_zero` simp lemma (`t = 0` 時の vacuous case)。
+- [x] (2026-06-02) `IndChainDecomposition.inner_chi_eq_ite`: output family `χ` の
+      orthonormality を `if t = u then 1 else 0` 形にまとめる consumer lemma。sorry-free、
+      `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

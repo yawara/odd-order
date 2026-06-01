@@ -199,6 +199,8 @@ S06: `CertainTypeHypothesis`(38), `W2`。
   (4) ✅ **等次数 infra done** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`
       via `Subgroup.IsComplement.card_right` on `hyp.split`)。6.34 degree `[L:H]·θ(1)` + θ degree 1 と
       合わせ `η_j(1)=|W₁|`。
+      2026-06-02 追記: `IndChainDecomposition.inner_chi_eq_ite` で (6.8) consumer の output
+      orthonormality を 1 lemma に集約済み。
   (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。tractable。
   → **T6 の律速 = (3) general Brauer for conjugation** (新 infra)。これが立てば 6.34 + (4)/(5) + engine
     (difference-support 版) で T6 完成。T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
