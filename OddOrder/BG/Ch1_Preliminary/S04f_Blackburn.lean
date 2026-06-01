@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.GroupTheory.Perm.Cycle.Type
+import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
 import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
@@ -17,6 +18,7 @@ This downstream leaf hosts the BG §4 endpoint declarations that must see both
 * `S04d_GorThm415`: `SCN₃(R)=∅ ⇒ pRank R p ≤ 2`.
 * `S04e_GorThm37`: the minimal `p′`-operator subgroup is special of exponent `p`.
 * `S04c_Prop411`: Huppert's metacyclic criterion.
+* `S04b_Thm412`: metacyclic coprime operator case implies abelian.
 
 Keeping the Blackburn apex here avoids an import cycle: `S04e_GorThm37` imports
 `S04_PGroupsSmallRank`, so the final Theorem 4.16 proof cannot live in S04 itself.
@@ -525,6 +527,22 @@ private theorem three_lt_of_odd_coprime_actionCommutator_top_rank_le_two
     exact hq_ne_two hq_eq_two
   · exact hq.ne_one hq_dvd_one
 
+/-- Blackburn 4.16, Case A. If `|Ω₁(R)| ≤ p²`, Proposition 4.11 makes `R`
+metacyclic, and Huppert's operator theorem 4.12(a) then makes `R` abelian from
+`[R,A]=R`. -/
+private theorem isMulCommutative_of_omega1_card_le_prime_sq_blackburn
+    {R : Type*} [Group R] [Finite R]
+    {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R) (hp3 : 3 < p)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
+    (hΩ : Nat.card (Omega R p 1) ≤ p ^ 2)
+    (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤) :
+    IsMulCommutative R := by
+  have hmeta : OddOrder.GroupTheory.IsMetacyclic R :=
+    isMetacyclic_of_omega1_card_le_prime_sq hR hp3 hΩ
+  exact OddOrder.BG.Ch1.S04b.isMulCommutative_of_metacyclic_actionCommutator_eq_top
+    hp_odd hR hmeta hcop hRA
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -535,8 +553,8 @@ cyclic, and `Ω₁(R₂)=R₁'`.
 
 In Lean, because `R` is a `p`-group, BG's rank hypothesis `r(R) ≤ 2` is represented
 as `pRank R p ≤ 2`; see the §4C comments above `scn3_empty_of_pRank_le_two`.
-The `p > 3` component is discharged from Lemma 4.14; the remaining `sorry` is only the
-abelian/central-product classification branch. -/
+The `p > 3` component and the small-`Ω₁` abelian branch are discharged; the remaining
+`sorry` is the large-`Ω₁` central-product/contradiction branch. -/
 theorem blackburnRankTwoClassification
     {R : Type*} [Group R] [Finite R] [Nontrivial R]
     {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
@@ -546,8 +564,12 @@ theorem blackburnRankTwoClassification
     (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤)
     (hAodd : Odd (Nat.card A)) :
     3 < p ∧ (IsMulCommutative R ∨ BlackburnCentralProductCase p R) := by
-  refine ⟨three_lt_of_odd_coprime_actionCommutator_top_rank_le_two
-    hp_odd hR hcop hrank hRA hAodd, ?_⟩
+  have hp3 : 3 < p := three_lt_of_odd_coprime_actionCommutator_top_rank_le_two
+    hp_odd hR hcop hrank hRA hAodd
+  refine ⟨hp3, ?_⟩
+  by_cases hΩ : Nat.card (Omega R p 1) ≤ p ^ 2
+  · exact Or.inl (isMulCommutative_of_omega1_card_le_prime_sq_blackburn
+      hp_odd hR hp3 hcop hΩ hRA)
   sorry
 
 end BlackburnClassification
