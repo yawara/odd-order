@@ -1587,6 +1587,31 @@ lemma kernelSpread_disjoint [Finite G] (F : FrobeniusFamily G k)
       (F.orderOf_dvd_card_kernel_of_mem_kernelSpread hxj)
   exact F.ne_one_of_mem_kernelSpread hxi (orderOf_eq_one_iff.mp horder_one)
 
+lemma kernelSpread_pairwiseDisjoint [Finite G] (F : FrobeniusFamily G k) :
+    ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint F.kernelSpread := by
+  intro i _hi j _hj hij
+  exact F.kernelSpread_disjoint hij
+
+lemma G0_disjoint_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
+    Disjoint F.G0 (F.kernelSpread i) := by
+  rw [Set.disjoint_left]
+  intro x hx hxi
+  exact hx i hxi
+
+lemma kernelSpread_disjoint_G0 (F : FrobeniusFamily G k) (i : Fin k) :
+    Disjoint (F.kernelSpread i) F.G0 :=
+  (F.G0_disjoint_kernelSpread i).symm
+
+lemma not_mem_G0_iff (F : FrobeniusFamily G k) {x : G} :
+    x ∉ F.G0 ↔ ∃ i, x ∈ F.kernelSpread i := by
+  simp [G0]
+
+lemma mem_G0_or_exists_mem_kernelSpread (F : FrobeniusFamily G k) (x : G) :
+    x ∈ F.G0 ∨ ∃ i, x ∈ F.kernelSpread i := by
+  by_cases hx : x ∈ F.G0
+  · exact Or.inl hx
+  · exact Or.inr ((F.not_mem_G0_iff).mp hx)
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
