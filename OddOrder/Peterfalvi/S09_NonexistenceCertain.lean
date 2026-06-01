@@ -1752,6 +1752,28 @@ lemma card_eq_card_G0_add_sum_card_kernelSpread [Finite G]
     exact hG0_le
   omega
 
+/-- The partition (7.10)(d) implies `|G₀| ≤ |G|`. -/
+lemma card_G0_le_card_G [Finite G] (F : FrobeniusFamily G k) :
+    Nat.card F.G0 ≤ Nat.card G := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
+/-- Difference form of the (7.10)(d) partition: the spread sizes sum to
+`|G| - |G₀|`. -/
+lemma sum_card_kernelSpread_eq_card_G_sub_card_G0 [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, Nat.card (F.kernelSpread i)) = Nat.card G - Nat.card F.G0 := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
+/-- Difference form of the (7.10)(d) partition: `|G₀|` is the complement
+of the spreads. -/
+lemma card_G0_eq_card_G_sub_sum_card_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card F.G0 = Nat.card G - ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
