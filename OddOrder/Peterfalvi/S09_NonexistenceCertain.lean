@@ -2270,6 +2270,40 @@ lemma lowerBoundTerm_final_rearrange [Finite G]
   field_simp [he_ne, hh_ne, hh2_ne]
   ring
 
+/-- The penultimate estimate in Peterfalvi (7.10) implies the displayed lower
+bound for the same index. -/
+lemma lowerBoundTerm_of_penultimate [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k)
+    (hpen : ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rw [← F.lowerBoundTerm_final_rearrange i]
+  exact hpen
+
+/-- Existential form of `lowerBoundTerm_of_penultimate`, matching the target shape
+of Peterfalvi (7.10). -/
+lemma exists_lowerBoundTerm_of_exists_penultimate [Finite G]
+    (F : FrobeniusFamily G k)
+    (hpen : ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2))) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hpen with ⟨i, hi⟩
+  exact ⟨i, F.lowerBoundTerm_of_penultimate i hi⟩
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
