@@ -836,6 +836,26 @@ private theorem blackburnCentralProductCase_of_omega1_commutator_le_center
     rw [hΩC_eq_center, hΩ_extraspecial.commutator_eq_center]
   exact ⟨S, C, hcentral, hΩ_noncomm, hΩ_card, hΩ_exp, hC_cyclic, hΩC_eq_comm⟩
 
+/-- The final congruence contradiction in Blackburn 4.16 Case B-2.
+
+BG obtains `jk ≡ i` and `ij ≡ k`, with `i ≠ 0`, while the odd-order action gives
+`j² ≠ 1`.  The two congruences imply `i * j² = i`, hence `j² = 1` in `ZMod p`. -/
+private theorem blackburn_zmod_congruence_contradiction
+    {p : ℕ} [Fact p.Prime] {i j k : ZMod p}
+    (hi : i ≠ 0) (hj : j ^ 2 ≠ 1)
+    (hjk : j * k = i) (hij : i * j = k) : False := by
+  have hpow : i * j ^ 2 = i := by
+    calc
+      i * j ^ 2 = (i * j) * j := by ring
+      _ = k * j := by rw [hij]
+      _ = j * k := by rw [mul_comm]
+      _ = i := hjk
+  have hzero : i * (j ^ 2 - 1) = 0 := by
+    rw [mul_sub, hpow, mul_one, sub_self]
+  rcases mul_eq_zero.mp hzero with hi_zero | hj_zero
+  · exact hi hi_zero
+  · exact hj (sub_eq_zero.mp hj_zero)
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
