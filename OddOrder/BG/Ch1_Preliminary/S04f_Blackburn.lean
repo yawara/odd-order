@@ -32,7 +32,8 @@ open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply)
-open OddOrder.BG.Ch1_Preliminary (isAInvariant_map_subtype_of_restrict)
+open OddOrder.BG.Ch1_Preliminary (isAInvariant_map_subtype_of_restrict
+  isAInvariant_subgroupOf_restrict)
 
 section AutOrderConstraints
 
@@ -1325,6 +1326,75 @@ private theorem subgroupOf_image_le_omega_quotient_of_isElementaryAbelian
     exact congrArg Subtype.val
       (hT_elem.pow_eq_one ⟨(d : R), Subgroup.mem_subgroupOf.mp hdT⟩)
   rw [hd_pow_D, map_one]
+
+/-- Blackburn 4.16 Case B-2 Maschke step for `D/C`.
+
+This packages the application of `exists_aInvariant_complement_in_omega1_quotient` to
+`D = C_R(T)` and `C = C_R(S)`.  The only substantial BG input left as an assumption is that
+`D/C` is abelian; the divisibility, coprimality, invariance, and `Ω₁` image hypotheses are
+assembled from the earlier B-2 support lemmas. -/
+private theorem blackburn_noncentral_exists_centralizer_quotient_complement
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p)
+    (hD_quot_ab :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      let C : Subgroup R := Subgroup.centralizer (S : Set R)
+      let D : Subgroup R := Subgroup.centralizer (T : Set R)
+      let hCD_normal : (C.subgroupOf D).Normal :=
+        (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+      letI : (C.subgroupOf D).Normal := hCD_normal
+      ∀ x y : D ⧸ C.subgroupOf D, x * y = y * x) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    let hInv := blackburn_noncentral_operator_invariances (p := p) (φ := φ)
+    let hD_inv : IsAInvariant φ D := hInv.2.2.2
+    let hCD_normal : (C.subgroupOf D).Normal :=
+      (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+    letI : (C.subgroupOf D).Normal := hCD_normal
+    ∃ X : Subgroup D,
+      C.subgroupOf D ≤ X ∧ IsAInvariant hD_inv.restrict X ∧
+      X.map (QuotientGroup.mk' (C.subgroupOf D)) ≤ Omega (D ⧸ C.subgroupOf D) p 1 ∧
+      X.map (QuotientGroup.mk' (C.subgroupOf D)) ⊓
+          (T.subgroupOf D).map (QuotientGroup.mk' (C.subgroupOf D)) = ⊥ ∧
+      X.map (QuotientGroup.mk' (C.subgroupOf D)) ⊔
+          (T.subgroupOf D).map (QuotientGroup.mk' (C.subgroupOf D)) =
+        Omega (D ⧸ C.subgroupOf D) p 1 := by
+  dsimp at hT_facts hT_elem hD_quot_ab ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
+  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hInv := blackburn_noncentral_operator_invariances (p := p) (φ := φ)
+  have hT_inv : IsAInvariant φ T := hInv.2.1
+  have hC_inv : IsAInvariant φ C := hInv.2.2.1
+  have hD_inv : IsAInvariant φ D := hInv.2.2.2
+  have hpD : p ∣ Nat.card D :=
+    blackburn_noncentral_prime_dvd_centralizer_card hT_facts hT_elem
+  have hcopD : Nat.Coprime (Nat.card A) (Nat.card D) :=
+    hcop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card D)
+  have hCsub_inv : IsAInvariant hD_inv.restrict (C.subgroupOf D) :=
+    isAInvariant_subgroupOf_restrict hD_inv hC_inv
+  have hTsub_inv : IsAInvariant hD_inv.restrict (T.subgroupOf D) :=
+    isAInvariant_subgroupOf_restrict hD_inv hT_inv
+  have hTΩ : (T.subgroupOf D).map (QuotientGroup.mk' (C.subgroupOf D)) ≤
+      Omega (D ⧸ C.subgroupOf D) p 1 :=
+    subgroupOf_image_le_omega_quotient_of_isElementaryAbelian (C := C) (D := D) hT_elem
+  exact OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient
+    hpD hcopD hCsub_inv hD_quot_ab hTsub_inv hTΩ
 
 /-- Blackburn 4.16 Case B-2: the image `TC/C` in `R/C`, where
 `C = C_R(S)`, has order `p` and lies in `Ω₁(R/C)`. -/
