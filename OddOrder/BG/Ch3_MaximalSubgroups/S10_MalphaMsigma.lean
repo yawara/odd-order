@@ -42,11 +42,25 @@ Ch3 (§11–§13) と Ch4 全体がこの定義層に依存する。
   `F(M)` = `Ch2.S08.fittingInG M`。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
-## このコミットの範囲
+## 現在の scaffold 範囲
 
-**定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') + Thm 10.6** を faithful に配置。残り 13 結果
-(10.1/10.2/10.3/10.4/10.5/10.7–10.14; 多くが多部分・一部 PDF 回収要) は後続。proof は §9 Uniqueness
-+ §7 Transitivity + §6 Lem 6.3/6.6 + §4 Thm 4.18/4.20 + Thm 3.6 に依存 (foundation-first)。
+定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') と、BG 10.1--10.12/10.14
+の statement skeleton を配置済み。Lemma 10.13 は `Ω₁(Z(P))` の入れ子 encoding と内部直積の
+表現を決めるまで TODO のままにする。proof は別フェーズで、既存の `sorry` はこの節の interface
+を後続 §11--§16 に先に渡すためのもの。
+
+## Lane C proof-gate notes
+
+- `idealPrime` は BG §10 の literal 定義を保つ (mmd L2643)。Theorem 5.3 との narrow
+  equivalence (mmd L1838/L2643) は proof gate であり、追加仮定や structure field にはしない。
+- Corollary 10.7(b) は Corollary 10.7(a) と BG Theorem 4.16 に依存する
+  (mmd L2799; Theorem 4.16 statement L1636)。rank-two Sylow 構造はここで proving する。
+- Lemma 10.8(c) は Theorem 10.6 の p-length one と BG Theorem 5.6 を使う
+  (mmd L2817; Theorem 5.6 statement L1945)。`p ∉ beta M` から narrow 側へ降りる gate。
+- Proposition 10.10(a) uses §7 Proposition 7.5/Theorems 7.3--7.4 (mmd L2852),
+  (b) uses Corollary 10.7 plus Lemma 6.5, and (c) uses BG Theorem 5.5(a) (mmd L2854).
+  These are exact upstream interfaces, not hypotheses to hide in the downstream §12--§16 spine.
+
 -/
 
 namespace OddOrder.BG.Ch3.S10
