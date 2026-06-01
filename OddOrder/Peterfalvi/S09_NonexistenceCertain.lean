@@ -1567,6 +1567,16 @@ lemma exists_L_conj_of_isConj_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
   exact ⟨⟨g, F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i hx (by
     simpa [hg] using hy)⟩, hg⟩
 
+/-- The sharp kernel H_i^# has cardinality |H_i| - 1. -/
+lemma ncard_kernel_sharp [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    ((F.H i : Set G) \ ({1} : Set G)).ncard = Nat.card (F.H i) - 1 := by
+  have hHcard : (F.H i : Set G).ncard = Nat.card (F.H i) := by
+    rw [← Nat.card_coe_set_eq]
+    rfl
+  have h1_mem : (1 : G) ∈ (F.H i : Set G) := (F.H i).one_mem
+  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+    Set.ncard_singleton, hHcard]
+
 lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
     (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
   rintro rfl
