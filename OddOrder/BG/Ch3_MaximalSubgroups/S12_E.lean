@@ -39,6 +39,32 @@ mentions §10 notation, keeping the BG §16 endpoint closure honest.
 - `SubgroupESetup M E E₁ E₂ E₃`: `E` は `M_σ` の `M` 内補群、`Eᵢ` は `E` の Hall `τᵢ(M)`-部分群。
 - `M'` = `derivedInG M`; `M_σ` = `S10.Msigma M`; `r_p` = `pRank ↥· p`。
 - 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。残り 18 結果 (12.2–12.19) は後続。
+
+## Lane C proof-gate notes
+
+- Import boundary: §12 imports §11. This is intentional even when a theorem statement
+  only mentions §10 notation; Proposition 12.4 and Theorem 12.5 activate the
+  exceptional-maximal interface and must remain on the BG spine.
+- Lemma 12.1 gates on Theorem 10.2, Lemma 4.5, Proposition 1.6(d), and
+  Lemma 10.4(c) (mmd L3035-L3060). These are proof obligations, not fields of
+  `SubgroupESetup`.
+- Lemma 12.2 uses Lemma 10.5 and Theorem 10.1(b) (mmd L3062-L3069). The Lean
+  surface currently records part (a); part (b) is a deferred nonconjugacy clause.
+- Proposition 12.4 uses the Uniqueness Theorem, Lemma 12.3, Proposition 1.16,
+  Proposition 10.11(b), and Theorem 10.2 (mmd L3095-L3126).
+- Theorem 12.5 is the bridge from §11 into §12: Proposition 12.4 supplies
+  Hypothesis 11.1, then Theorems 11.3, 11.5, 11.7, Corollary 11.6, and
+  Lemma 12.3 give the six conclusions (mmd L3129-L3148).
+- Theorem 12.12 packages the Frobenius-complement endpoint from Theorem 12.7,
+  Lemma 12.8, Corollary 12.6, and Lemma 12.11 (mmd L3306-L3344). The internal
+  cyclic `Z_p` construction remains deferred.
+- Proposition 12.15, Corollary 12.16, and Lemma 12.17 are the direct §13--§14
+  gates (mmd L3385-L3453). The Lean surfaces intentionally keep only the clauses
+  currently consumed downstream; Corollary 12.16(b) and the cyclic `β(M)'`/derived
+  intersection tail of Lemma 12.17 remain deferred proof obligations.
+- Lemmas 12.18 and 12.19 use Theorem 1.13, Theorem 3.7, Corollary 10.9(a), and
+  the Uniqueness Theorem (mmd L3454-L3482). Do not replace them by downstream
+  prime-action assumptions in §13.
 -/
 
 namespace OddOrder.BG.Ch3.S12
