@@ -88,8 +88,9 @@ This file installs (7.1)-(7.8), all sorry-free, and names the faithful
 * (7.4)-(7.5): `FamilyHypothesis71` and `family_inequality`;
 * (7.6)-(7.7): the normal-subgroup case `A = H^#` (`Hypothesis76`), with
   (7.7.a) `chiRho_explicit_formula` and (7.7.b) `chiRho_norm_sq_double_sum`;
-* (7.8): the coherence-based formula (`Hypothesis78`), with (7.8.c.i)
-  `chiRho_eq_inner_beta_on_A` and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`;
+* (7.8): the coherence-based formula (`Hypothesis78`), with the (7.8.a)
+  target `Hypothesis78.BetaDecomp`, (7.8.c.i) `chiRho_eq_inner_beta_on_A`,
+  and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`;
 * (7.9): the statement interface `Hypothesis79` and its conclusion predicate
   `Hypothesis79.conclusion`.
 
@@ -1386,6 +1387,42 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
         ⟨H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct,
           H78.diff_support⟩ :=
   rfl
+
+/-- The weighted `S^ν`-sum occurring in Peterfalvi (7.8.a):
+`Σ_{φ ∈ S} φ(1)/(e ‖φ‖²) · φ^ν`, where `S = T \ {Ind 1_H}` and
+`e = ζ(1)` for the distinguished `ζ`. -/
+noncomputable def weightedNuSum (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
+  ∑ i ∈ (Finset.univ.erase H78.ind1H),
+    (H78.hyp76.zeta i (1 : L) /
+        (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))) •
+      H78.nu (H78.hyp76.zeta i)
+
+/-- **Peterfalvi (7.8.a) target.**  The coherent images `S^ν` are orthogonal to
+`1_G`, and `β` has the displayed decomposition
+`β = 1_G - ζ^ν + a · Σ_{φ∈S} φ(1)/(e‖φ‖²) φ^ν + Γ`, with `a ∈ ℤ`
+and `Γ` orthogonal to `S^ν ∪ {1_G}`.
+
+This is a standalone target for the future proof of (7.8.a), not a field of
+`Hypothesis78`; hence it does not add a new assumption to already-green results. -/
+structure BetaDecomp (H78 : Hypothesis78 G A L) where
+  /-- `S^ν ⊥ 1_G`. -/
+  orth_one : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i)) (Hypothesis71.constOne G) = 0
+  /-- The integer coefficient `a` in Peterfalvi (7.8.a). -/
+  a : ℤ
+  /-- The residual term `Γ`. -/
+  Gamma : ClassFunction G ℂ
+  /-- `Γ` is orthogonal to `S^ν`. -/
+  Gamma_orth_nu : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner Gamma (H78.nu (H78.hyp76.zeta i)) = 0
+  /-- `Γ` is orthogonal to `1_G`. -/
+  Gamma_orth_one : ClassFunction.inner Gamma (Hypothesis71.constOne G) = 0
+  /-- The displayed decomposition of `β`. -/
+  beta_eq :
+    H78.beta =
+      Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta H78.zetaDistinct) +
+        (a : ℂ) • H78.weightedNuSum + Gamma
 
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
