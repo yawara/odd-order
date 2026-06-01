@@ -211,9 +211,11 @@ Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
 `0 ≤ (1/e)(1-1/h)a² - 2(1/h)a` を出す純算術部分は sorry-free 化済み。
 `beta_inner_self_eq_sourceDiff_inner_self` / `betaNormSq_eq_sourceDiffNormSq` により、
 `‖β‖²` を Dade isometry で source 側 `‖Ind 1_H - ζ‖²` に移す bridge も済み。
+さらに `sourceDiff_inner_self_expand` / `sourceDiffNormSq_expand` で source norm を
+4 つの inner product に展開済み。
 
 **Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` で source norm へ移す部分は解消済み。
-残りは `L` 上での `‖Ind1_H−ζ‖²=e+1` 計算 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
+残りは `L` 上での source-side inner product 4 項の評価 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
 `Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
 `|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
 の計算が必要で、これは (7.8.a) の `BetaDecomp` (係数 `a`) に依存する。よって (7.8.a) が先。算術 `ua²−2va≥0`
