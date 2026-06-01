@@ -28,6 +28,8 @@ namespace OddOrder.BG.Ch1.S04
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply)
 open OddOrder.BG.Ch1_Preliminary (isAInvariant_map_subtype_of_restrict)
 
 section AutOrderConstraints
@@ -195,6 +197,33 @@ private theorem card_quotient_frattini_le_prime_sq_of_not_elementary
       _ = p ^ 2 * p := by ring
   exact Nat.le_of_mul_le_mul_right hmul_le_sq hp.pos
 
+/-- In a nontrivial finite group, the Frattini subgroup is proper. -/
+private theorem frattini_ne_top_of_nontrivial
+    {Q : Type*} [Group Q] [Finite Q] [Nontrivial Q] :
+    frattini Q ≠ ⊤ := by
+  obtain ⟨M, hM, _⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup Q)).resolve_left bot_lt_top.ne
+  exact fun htop => hM.1 (le_antisymm le_top (htop ▸ frattini_le_coatom hM))
+
+/-- Quotient-action support for BG Lemma 4.13: if `ψ` fixes a normal invariant
+subgroup but acts nontrivially on the whole group, then it acts nontrivially on
+the quotient. -/
+private theorem quotient_action_nontrivial_of_fixed_normal_and_nontrivial
+    {A Q : Type*} [Group A] [Finite A] [Group Q] [Finite Q]
+    {p : ℕ} [Fact p.Prime] {φ : A →* MulAut Q}
+    (hQ : IsPGroup p Q) (hCop : Nat.Coprime (Nat.card A) (Nat.card Q))
+    {ψ : A} {N : Subgroup Q} [N.Normal] (hN_inv : IsAInvariant φ N)
+    (hfix : ∀ n ∈ N, (φ ψ) n = n)
+    (hψ_nt : ¬ ∀ g : Q, (φ ψ) g = g) :
+    ¬ ∀ x : Q ⧸ N, (quotientMulAutHom hN_inv ψ) x = x := by
+  intro hquot
+  apply hψ_nt
+  exact acts_trivially_of_trivial_on_normal_quotient φ hQ hCop hN_inv hfix (by
+    intro g
+    have hg := hquot (g : Q ⧸ N)
+    rw [quotientMulAutHom_apply, QuotientGroup.eq_iff_div_mem, div_eq_mul_inv] at hg
+    exact hg)
+
 /-- If an operator has prime-power-one relation and acts nontrivially on an
 invariant subgroup, then its restricted automorphism has that prime order. -/
 private theorem orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial
@@ -301,6 +330,12 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
   have hQ_quot_frattini_card_le :
       ¬ IsElementaryAbelian p Q → Nat.card (Q ⧸ frattini Q) ≤ p ^ 2 :=
     card_quotient_frattini_le_prime_sq_of_not_elementary hQ_special.1 hQ_card_cube
+  haveI hQ_nontrivial : Nontrivial Q := by
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt_Q
+    have hg1 : g ≠ 1 := fun h => hg (by rw [h, map_one])
+    exact ⟨⟨g, hgQ⟩, 1, fun h => hg1 (congrArg Subtype.val h)⟩
+  have hQ_cop : Nat.Coprime (Nat.card A) (Nat.card Q) :=
+    hA_cop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card Q)
   have hψA_pow : ψA ^ q = 1 := by
     apply Subtype.ext
     change ψ ^ q = 1
@@ -312,6 +347,35 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
       ∀ z ∈ K, (hQ_inv.restrict ψA) z = z :=
     fun K hK_inv hK_ne =>
       restrict_acts_trivially_on_proper_of_minimal_nontrivial hQ_inv hQ_min hK_inv hK_ne
+  have hψ_nt_Q_restrict : ¬ ∀ x : Q, (hQ_inv.restrict ψA) x = x := by
+    intro hfix
+    obtain ⟨g, hgQ, hg⟩ := hψ_nt_Q
+    apply hg
+    have hgg := hfix ⟨g, hgQ⟩
+    rwa [Subtype.ext_iff, IsAInvariant.restrict_apply_val] at hgg
+  have hfr_inv : IsAInvariant hQ_inv.restrict (frattini Q) :=
+    IsAInvariant.frattini hQ_inv.restrict
+  have hfr_ne_top : frattini Q ≠ ⊤ := frattini_ne_top_of_nontrivial
+  have hfr_fix : ∀ z ∈ frattini Q, (hQ_inv.restrict ψA) z = z :=
+    hQ_min_fix (frattini Q) hfr_inv hfr_ne_top
+  have hψ_fr_quot_nt :
+      ¬ ∀ x : Q ⧸ frattini Q, (quotientMulAutHom hfr_inv ψA) x = x :=
+    quotient_action_nontrivial_of_fixed_normal_and_nontrivial hQ_special.1 hQ_cop
+      hfr_inv hfr_fix hψ_nt_Q_restrict
+  have hψ_fr_quot_order : orderOf (quotientMulAutHom hfr_inv ψA) = q := by
+    have hbar_ne_one : quotientMulAutHom hfr_inv ψA ≠ 1 := by
+      intro hbar
+      apply hψ_fr_quot_nt
+      intro x
+      rw [hbar]
+      rfl
+    have hbar_pow : (quotientMulAutHom hfr_inv ψA) ^ q = 1 := by
+      rw [← map_pow, hψA_pow, map_one]
+    have hdvd : orderOf (quotientMulAutHom hfr_inv ψA) ∣ q :=
+      orderOf_dvd_of_pow_eq_one hbar_pow
+    rcases hq.eq_one_or_self_of_dvd _ hdvd with h1 | hqeq
+    · exact (hbar_ne_one (orderOf_eq_one_iff.mp h1)).elim
+    · exact hqeq
   have hQ_elem_dvd : IsElementaryAbelian p Q → q ∣ p ^ 2 - 1 := by
     intro hQ_elem
     exact prime_dvd_prime_sq_sub_one_of_orderOf_mulAut hq hqp hQ_elem
@@ -319,7 +383,17 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
   have hQ_elem_lt : IsElementaryAbelian p Q → q < p := by
     intro hQ_elem
     exact lt_of_prime_dvd_prime_sq_sub_one Fact.out hp_odd hq hqp (hQ_elem_dvd hQ_elem)
-  sorry
+  have hQ_non_elem_dvd : ¬ IsElementaryAbelian p Q → q ∣ p ^ 2 - 1 := by
+    intro hQ_not_elem
+    exact prime_dvd_prime_sq_sub_one_of_orderOf_mulAut hq hqp hQ_quot_frattini_elem
+      (hQ_quot_frattini_card_le hQ_not_elem) hψ_fr_quot_order
+  have hQ_non_elem_lt : ¬ IsElementaryAbelian p Q → q < p := by
+    intro hQ_not_elem
+    exact lt_of_prime_dvd_prime_sq_sub_one Fact.out hp_odd hq hqp
+      (hQ_non_elem_dvd hQ_not_elem)
+  by_cases hQ_elem : IsElementaryAbelian p Q
+  · exact ⟨hQ_elem_dvd hQ_elem, hQ_elem_lt hQ_elem⟩
+  · exact ⟨hQ_non_elem_dvd hQ_elem, hQ_non_elem_lt hQ_elem⟩
 
 /-- **BG Lemma 4.14.** Under the hypotheses of Lemma 4.13, `q` divides one of the
 half-factors `(p + 1) / 2` or `(p - 1) / 2`.

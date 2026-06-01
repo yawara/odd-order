@@ -147,7 +147,7 @@ private theorem isAInvariant_actionCommutator_comp (φ : A →* MulAut P) {B : S
 /-- **Single-element stability** (Gorenstein Thm 3.2 for `⟨ψ⟩`). If `ψ` fixes an `A`-invariant
 normal subgroup `N ≤ P` pointwise and acts trivially on `P/N`, then `ψ` acts trivially on `P`
 (coprime action of the `p′`-element `ψ`). -/
-private theorem acts_trivially_of_trivial_on_normal_quotient
+theorem acts_trivially_of_trivial_on_normal_quotient
     (φ : A →* MulAut P) (hP : IsPGroup p P) (hCop : Nat.Coprime (Nat.card A) (Nat.card P))
     {ψ : A} {N : Subgroup P} [N.Normal] (hN : IsAInvariant φ N)
     (hfix : ∀ n ∈ N, (φ ψ) n = n) (hquot : ∀ g : P, (φ ψ) g * g⁻¹ ∈ N) :
