@@ -1324,3 +1324,49 @@ axiom-clean, AxiomsCheck 登録)**:
    (詳細・field 骨子・build-order はノート §B)。**(6.8.a) は H NILPOTENT** (IsPGroup 化は scaffolding)、
    現 `H_sharp_ti` は ambient 誤り。shared/frozen file 変更ゼロで実行可。
 3. **今すぐ並行可 (6.34 非依存) leaf**: T0(Cor2.30) / T1(SibleySetup) / T3(6.7 wiring) / T4(Galois) / T5(Lem2.27)。
+
+---
+
+## 🔁 HANDOFF (2026-06-01, worktree `lucid-kapitsa-c87a31`)
+
+### 操作状態 (まず読む)
+- **branch `claude/lucid-kapitsa-c87a31`、main (`d46ded5`) から 20 commits ahead、push/merge 未**
+  (local-first; push は指示時のみ)。**継続はこの branch 上で**、または先に main へ merge。
+- worktree setup 済 (mathlib `.lake/packages` symlink + 自前 olean を main からコピー)
+  → `lake build OddOrder OddOrder.AxiomsCheck` が **~数秒で green (3412 jobs)**。手順は
+  `notes/meta/worktree_setup.md` (olean warm-start 追記済)。
+- **real sorry は不変の 2 個**: `S08_CoherenceTheorems.lean:251` `sibleySetup_is_coherent` ((6.8))、
+  `S09_NonexistenceCertain.lean:1596` `card_G0_lower_bound` ((7.10))。`#assert_only_allowed_axioms` 全 green。
+
+### このセッションで landed (5 件、全 green/axiom-clean)
+1. **[Is]Thm 6.34 完全形式化** (`GroupTheory/RepresentationTheory/InducedIrreducible.lean`,
+   commits 8e1b74e/9c505fc/2f7d545): capstone `isIrreducibleCharacter_induce_of_inertia_eq`
+   (`H⊴G, θ:Irr H, inertia(θ)=H ⟹ Ind θ∈Irr G`) + reusable `card_smul_restrict_induce` (Mackey 非正規化),
+   `card_mul_inner_self_induce_eq_card_inertia` (‖Ind θ‖²=|I_G(θ)|), `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos` (norm-1 判定)。
+2. **T1 完了** (commits 3f83e90/a01dafc/ebf2c60/48af3d5/53bbbf9): `SibleyDadeHypothesis` (S08) が
+   (6.8)(a)(b)(c) faithful + 実 Dade `tau:=dadeIntegralCharacterMap`、`sibleySetup_is_coherent` を
+   それに retarget・legacy opaque `SibleySetup` 削除。
+3. **S06 監査+修正** (commit e6090a0): `CertainTypeHypothesis.W_sup:W1⊔W2=⊤` の実バグ ((4.2.c) では
+   `W=W₁×W₂` は真部分群) を発見・修正 → 真の (4.2) (`isComplement`/cyclic/`W2≤K`/`C_K(x)=W₂`/`W_odd`)。
+4. **(6.8) T6 engine unblock** (commit): `coherentEqualDegree_fromDade` を個別→**差分 support** に弱化
+   (誘導既約は 1 で非零ゆえ個別不可、等次数差分は OK)。
+5. **(6.8) T6 等次数 infra** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`)。
+
+### 現フロンティア = (6.8) proof T6 の律速 = **general Brauer for conjugation** (新 infra・未着手)
+- (6.8) proof は `sibleySetup_is_coherent` (S08:251) を埋める作業。task DAG (T0–T11) + 全 spec の
+  **正本 = `notes/peterfalvi/s08_6_8_assembly_plan.md`** (§A 6.34 / §B-C T1 / §D T6)。
+- **T6 (Y coherent) の律速** = `inertia(θ)=H` (W₁ が Irr(H)∖{1} に自由作用、6.34 の前提)。精査結果:
+  repo `brauer_permutation_lemma'` は **inversion 専用**、一般版 `brauer_permutation_lemma`
+  (BrauerPermutation.lean:264) に **W₁-共役 permutation を instantiate** する新 infra が必要 (群レベル
+  自由作用は Frobenius `FrobeniusActionTI` で既存 → Irr レベルへの Brauer bridge が残)。
+  **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
+- 次セッション推奨: **general Brauer for conjugation を独立タスク**として立てる (これが立てば 6.34 +
+  index_H_eq_card_W1 + difference-support engine で T6 完成 → T7/T8/T9–T11)。
+
+### 並行可能な独立 leaf (6.34/Brauer 非依存、`s08_6_8_assembly_plan.md` C 表)
+T0 (Cor 2.30) / T3 ((6.7) 上位 wiring、atoms は ClassSumAlgebra/AlgInt 既存) / T4 ((1.9)+(5.9.a) Galois,
+case B) / T5 ([Is]Lem 2.27)。他に S09 (7.10) の (7.8.a)(7.9) (issue 0044)。
+
+### 厳守事項
+shared `main` 不可侵 / NO sorry-admit-axiom (scaffolding 禁止) / AxiomsCheck 登録 / green 単位 commit +
+`Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` / push は指示時のみ。
