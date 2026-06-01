@@ -46,6 +46,7 @@ namespace OddOrder.BG.Ch3.S10
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -97,6 +98,40 @@ Lem 6.3/10.4 + Thm 3.6。 -/
 theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     (H : Subgroup G) (hH : H < ⊤) :
     Ch1.hasPLengthOne p ↥H := by
+  sorry
+
+/-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
+
+/-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。
+(a) `X, X^g ⊆ M ⇒ g = cm` (`c∈C_G(X)`, `m∈M`); (b) `C_G(X)` は `{M^g | X⊆M^g}` 上推移的;
+(c) `X⊆M ⇒ N_G(X)=N_M(X)C_G(X)`; (d) `X∈Syl_p(M), X^g⊆M ⇒ g∈M`; (e) `C_G(X)⊆M, X^g⊆M ⇒ g∈M`。
+共役 `X^g` は `MulAut.conj g • X`、(c) の積分解は要素形で述べる。 -/
+theorem fusion_control_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M)
+    {X : Subgroup G} (hXne : X ≠ ⊥) (hXp : IsPGroup p X) :
+    (X ≤ M → ∀ g : G, MulAut.conj g • X ≤ M →
+      ∃ c ∈ Subgroup.centralizer (X : Set G), ∃ m ∈ M, g = c * m) ∧
+    (∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
+      ∃ c ∈ Subgroup.centralizer (X : Set G),
+        MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M) ∧
+    (X ≤ M → ∀ n ∈ Subgroup.normalizer X,
+      ∃ a ∈ Subgroup.normalizer X ⊓ M, ∃ c ∈ Subgroup.centralizer (X : Set G), n = a * c) ∧
+    ((∃ P : Sylow p ↥M, X = (P : Subgroup ↥M).map M.subtype) →
+      ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) ∧
+    (Subgroup.centralizer (X : Set G) ≤ M → ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) := by
+  sorry
+
+/-! ## Theorem 10.2 — M_σ/M_α の Hall 構造 (mmd L2680 付近) -/
+
+/-- **BG Theorem 10.2**: `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
+`M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
+quotient 型の `Normal` instance 整備後に追加予定。) -/
+theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (sigma M) (Msigma M) ∧
+    Ch03.IsHallSubgroup (alpha M) (Malpha M) ∧
+    Malpha M ≤ Msigma M ∧ Msigma M ≤ Ch2.S07.derivedInG M ∧
+    Msigma M ≠ ⊥ := by
   sorry
 
 end OddOrder.BG.Ch3.S10
