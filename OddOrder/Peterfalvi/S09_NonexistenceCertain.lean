@@ -1577,6 +1577,33 @@ lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
   rw [he_eq, hh_eq]
   omega
 
+/-- The explicit right-hand side in Peterfalvi (7.10) is positive for every member
+of an odd-order Frobenius family.  This is the arithmetic input used in the final
+(7.11) contradiction once `(7.10)` gives the lower bound. -/
+lemma lowerBoundTerm_pos [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) :
+    0 < ((F.e i : ℚ) - 1) *
+      (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+          ((F.e i : ℚ) * (F.h i : ℚ)) +
+        2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  have he2 : (2 : ℚ) ≤ (F.e i : ℚ) := by
+    exact_mod_cast F.two_le_e i
+  have hh2 : 2 * (F.e i : ℚ) + 1 ≤ (F.h i : ℚ) := by
+    exact_mod_cast F.two_mul_e_add_one_le_h hodd i
+  have hepos : (0 : ℚ) < (F.e i : ℚ) := by linarith
+  have hhpos : (0 : ℚ) < (F.h i : ℚ) := by linarith
+  have heh : (0 : ℚ) < (F.e i : ℚ) * (F.h i : ℚ) := mul_pos hepos hhpos
+  have hh2pos : (0 : ℚ) < (F.h i : ℚ) * ((F.h i : ℚ) + 2) :=
+    mul_pos hhpos (by linarith)
+  refine mul_pos (by linarith) ?_
+  have h1 : 0 ≤
+      ((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+        ((F.e i : ℚ) * (F.h i : ℚ)) :=
+    div_nonneg (by linarith) (le_of_lt heh)
+  have h2 : 0 < (2 : ℚ) / ((F.h i : ℚ) * ((F.h i : ℚ) + 2)) :=
+    div_pos (by norm_num) hh2pos
+  linarith
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
@@ -1610,23 +1637,8 @@ theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
   obtain ⟨i, hi⟩ := card_G0_lower_bound F hodd
   -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
   have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
-  -- The two arithmetic facts coming from the Frobenius structure.
-  have he2 : (2 : ℚ) ≤ (F.e i : ℚ) := by exact_mod_cast F.two_le_e i
-  have hh2 : 2 * (F.e i : ℚ) + 1 ≤ (F.h i : ℚ) := by
-    exact_mod_cast F.two_mul_e_add_one_le_h hodd i
-  have hepos : (0 : ℚ) < (F.e i : ℚ) := by linarith
-  have hhpos : (0 : ℚ) < (F.h i : ℚ) := by linarith
-  have heh : (0 : ℚ) < (F.e i : ℚ) * (F.h i : ℚ) := mul_pos hepos hhpos
-  have hh2pos : (0 : ℚ) < (F.h i : ℚ) * ((F.h i : ℚ) + 2) := mul_pos hhpos (by linarith)
-  -- The right-hand side of (7.10) is then strictly positive.
-  have hRHS : 0 < ((F.e i : ℚ) - 1) *
-      (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
-        2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-    refine mul_pos (by linarith) ?_
-    have h1 : 0 ≤ ((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) :=
-      div_nonneg (by linarith) (le_of_lt heh)
-    have h2 : 0 < (2 : ℚ) / ((F.h i : ℚ) * ((F.h i : ℚ) + 2)) := div_pos (by norm_num) hh2pos
-    linarith
+  -- The right-hand side of (7.10) is strictly positive.
+  have hRHS := F.lowerBoundTerm_pos hodd i
   -- But (7.10) says it is `≤ 0` — contradiction.
   rw [hcard] at hi
   have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
