@@ -266,6 +266,27 @@ theorem induce_apply_eq_sum_filter (H : Subgroup G) [Invertible (Nat.card H : k)
         ∑ x ∈ Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ H), induceTerm H θ x g := by
   rw [induce_apply, ← induceSum_apply, induceSum_apply_eq_sum_filter]
 
+/-- **Degree of the induced class function** ([Is] Thm 6.34, degree part).  The induced
+class function `Ind_H^G θ` at the identity equals `[G : H] · θ(1)`.
+
+Every conjugate `x⁻¹ · 1 · x = 1` lies in `H`, so all `|G|` summands of the induction sum
+equal `θ(1)`; dividing by `|H|` and using `|G| = [G : H] · |H|` (`Subgroup.index_mul_card`)
+leaves the index factor `[G : H]`.  This is the final degree computation behind Frobenius'
+induced-character degree formula. -/
+theorem induce_apply_one (H : Subgroup G) [Invertible (Nat.card H : k)]
+    (θ : ClassFunction ↥H k) :
+    induce H θ (1 : G) = (H.index : k) * θ (1 : ↥H) := by
+  rw [induce_apply]
+  have hterm : ∀ x : G, induceTerm H θ x (1 : G) = θ (1 : ↥H) := by
+    intro x
+    have hx : x⁻¹ * (1 : G) * x ∈ H := by simp [H.one_mem]
+    rw [induceTerm_of_mem θ hx]
+    exact congrArg θ (Subtype.ext (by simp))
+  rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const, Finset.card_univ,
+      nsmul_eq_mul, ← Nat.card_eq_fintype_card, ← H.index_mul_card]
+  push_cast
+  rw [mul_comm (H.index : k) _, ← mul_assoc, ← mul_assoc, invOf_mul_self, one_mul]
+
 @[simp] theorem card_smul_induce (H : Subgroup G) [Invertible (Nat.card H : k)]
     (θ : ClassFunction ↥H k) :
     (Nat.card H : k) • induce H θ = induceSum H θ := by

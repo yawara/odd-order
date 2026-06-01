@@ -673,6 +673,10 @@ set_option linter.style.longLine false in
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory ([Is] Thm 6.34 degree part): the induced class function at `1` is
+-- `[G : H] · θ(1)`.  All `|G|` conjugates `x⁻¹ · 1 · x = 1` lie in `H`, so every summand is
+-- `θ(1)`; dividing by `|H|` and using `|G| = [G:H]·|H|` (`Subgroup.index_mul_card`) leaves `[G:H]`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_one
 -- RepresentationTheory (Peterfalvi (1.6.a) value core): for a normal subgroup `A ⊴ G` with
 -- `A ≤ H` on which `θ` is constant `= c`, every term of the induction sum at `a ∈ A` is `c`
 -- (conjugates `x⁻¹ a x` stay in `A ≤ H` by normality), so `Ind_H^G θ(a) = |G|·c·|H|⁻¹`.
@@ -697,6 +701,12 @@ set_option linter.style.longLine false in
 -- `restrict_mem_ZIrr`).  Same span-induction proof via `character_mem_ZIrr (ρ.comp f)`; this
 -- is the `α_B = α ∘ f_B ∈ ℤ[Irr M(B)]` step of the Dade-map construction.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.compHom_mem_ZIrr
+-- RepresentationTheory (Peterfalvi (1.5.a), inertia/coset well-definedness): conjugation by an
+-- element of the normal subgroup `H` acts trivially on class functions of `H` (`θ^g = θ` for
+-- `g ∈ H`).  `conjBy g θ` evaluates `θ` at the `H`-conjugate `⟨g⟩ * h * ⟨g⟩⁻¹`, and class
+-- functions are `H`-conjugacy invariant.  This is what makes `θ^x = θ^y ⇔ y ∈ I(θ)x`, i.e.
+-- `conjBy w θ` constant on the coset `wH` in the Mackey restriction formula.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.conjBy_eq_self_of_mem
 -- RepresentationTheory (Peterfalvi §2 orthogonality): class functions with disjoint supports
 -- are orthogonal (`⟨φ, ψ⟩_G = 0`). Each summand `φ g · star (ψ g)` vanishes since `g` lies
 -- outside at least one support. Basic vanishing for the Dade isometry / §9 coherence arguments.
@@ -1544,6 +1554,10 @@ set_option linter.style.longLine false in
 -- Complement degree-sum (the planned G2.5 payoff): `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|`,
 -- the (6.6)/(6.8) set `X = {χ | Z ⊄ ker χ}` total `|L| − |L:Z|` (mmd 04.8 L78, L234).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq
+-- Peterfalvi (6.8.3) degree-sum factored form: `∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)² = [G:K][K:N](|N|−1)`
+-- for `N ⊴ G`, `N ≤ K ≤ G` (= `sumNonInflatedDegreeSq` + Lagrange index arithmetic).  The mmd
+-- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
