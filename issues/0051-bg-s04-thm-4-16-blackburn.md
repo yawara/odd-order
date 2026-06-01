@@ -22,6 +22,7 @@ BG §4 の頂点定理 = **Theorem 4.16 (Blackburn)**。p 奇, R 非自明 p-群
 handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨):
 
 - [x] 新規 API: `OddOrder/GroupTheory/CentralProduct.lean` + exp-p extraspecial + agemo `℧` ✅ **2026-05-30 完了** (workflow `bg-s04-thm416-api-bundle`, commits 4656738/560312b/4d0269a, sorry-free/axiom-clean/build green 3352 jobs)
+- [x] Thm 4.16 faithful statement を Lean に着地 (`blackburnRankTwoClassification`, proof は `sorry`) ✅ **2026-06-02**
 - [ ] Prop 4.3(a) cl≤3 分岐 + Lem 4.5 general/4.5(b)(c) (Gorenstein 5.4.10/5.4.3 行間)
 - [ ] Prop 4.8 + Prop 4.11 Huppert + Thm 4.12 (§4 第2の山, 設計先行)
 - [ ] Lem 4.13/4.14/4.15 (aut order + extraspecial commutator)
@@ -108,6 +109,13 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
   - `card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq` — elem-ab E (|E|≤p²) の MulAut の p-部分群は ≤p (p²∤|MulAut E|=∏(pⁿ-pⁱ) via `not_sq_dvd_prod_pow_sub`, n≤2)。GL(2,p) iso 不要、純 cardinality。
 - ✅ **G Thm 4.15(i) 本体完成** `pRank_le_two_of_normalAbelian_pRank_le_two` (d_n≤2 ⇒ pRank P≤2, S04d, sorry-free): Lemma 4.14 を A に適用 → H=Ω₁A normal+elem-ab+|H|≤p² → φ=`MulAut.conjNormal(H)∘E.subtype` の range p-群 ⇒ |range|≤p → |E|=|range|·|ker φ| ⇒ |ker|≥p² ⇒ ker↦H ⇒ H≤E ⇒ E abelian で E≤C_P(H) ⇒ E≤Ω₁(C_P(H))=H ⇒ 矛盾。補助 `IsElementaryAbelian.log_card_le_pRank`@PRank。
 - ✅ **precursor(1) `pRank_le_two_of_scn3_empty` COMPLETE** (commit c1d23e8, S04d) = G415i ∘ translation。**AxiomsCheck で axiom-clean 確認済** (3 標準公理, `OddOrder.BG.Ch1.S04.pRank_le_two_of_scn3_empty`)。→ **§5 (Lem 5.1(a) 等) と Thm 4.16 への gate が開いた**。残 §4 = precursor(2) (special exp p, G Thm 3.7/3.10) → BG Lem 4.13/4.14 (q∣p²-1) → Thm 4.16 apex。
+
+**Thm 4.16 faithful statement visible (2026-06-02)**:
+
+- ✅ `BlackburnCentralProductCase`: printed condition (2) をそのまま package — `R = R₁ ∘ R₂`, `R₁` nonabelian of order `p^3` and exponent `p`, `R₂` cyclic, `Ω₁(R₂)=R₁'` (both sides mapped into ambient `R`).
+- ✅ `blackburnRankTwoClassification`: printed Theorem 4.16 statement — `p > 3` and either `R` is abelian or `BlackburnCentralProductCase p R`. Operator hypotheses use the existing §4 convention `φ : A →* MulAut R`, `Nat.Coprime (Nat.card A) (Nat.card R)`, and `actionCommutator φ = ⊤`.
+- Verification: `lake build OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` green.
+- Remaining: proof body of `blackburnRankTwoClassification` and its upstream gates; the theorem is now visible in bare-`sorry` census.
 
 ## 完了条件
 
