@@ -215,9 +215,12 @@ Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
 4 つの inner product に展開済み。`SourceDiffNormEvaluation` は残る source-side 評価
 `sourceDiffNormSq = e+1` を standalone target として固定し、
 `betaNormSq_eq_complementIndex_add_one` はそれを `‖β‖²=e+1` に戻す bridge。
+`sourceDiffNormEvaluation_of_inner_values` /
+`betaNormSq_eq_complementIndex_add_one_of_inner_values` により、残る source-side 評価は
+`⟨Ind1H,Ind1H⟩=e`, `⟨ζ,Ind1H⟩=0`, `⟨Ind1H,ζ⟩=0`, `⟨ζ,ζ⟩=1` の 4 事実に局所化。
 
 **Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` で source norm へ移す部分と、
-source target から beta norm identity へ戻す部分は解消済み。
+4 source inner-product 評価から beta norm identity へ戻す部分は解消済み。
 残りは `L` 上での source-side inner product 4 項の評価 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
 `Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
 `|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
