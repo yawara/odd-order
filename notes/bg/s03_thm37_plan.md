@@ -29,12 +29,16 @@
 - ✅ `fixed_apply_groupSumMap`: `(∑_{h∈H} ρ h) v` は `H`-不動 (左乗 `Equiv.mulLeft` で reindex)
 - ✅ `trivial_of_groupSumMap_eq_card_smul`: `groupSumMap ρ K = |K|•id ⇒ K 自明` (`smul_right_injective`)
 - ✅ `groupSumMap_conjugate_eq_zero`: `C_V(R)=0 ⇒ groupSumMap ρ (conj x•R) v = 0` (+`rep_apply_apply`/`mulAut_smul_eq_map`)
-- ⏳ `centralizer_ne_bot_of_nontrivial_kernel` (Lemma 3.3 本体, sorry) — **残 = partition identity の組立のみ**
+- ✅✅ **`centralizer_ne_bot_of_nontrivial_kernel` (Lemma 3.3 本体) 完成・sorry-free** (commit e529f11)。
+  partition 組立 = `frobeniusGroup hFrob` の `nonidentitySigmaTo` bijection + `Fintype.sum_sigma` で
+  `∑_{g≠1} ρ g v` を parts 上に reindex → kernel part = `groupSumMap ρ K v − v`、各 conjugate part = `−v`
+  (計 |K| 個) → `∑_{g:G} ρ g v = 0` (G-fixed⊆R-fixed=0) で `groupSumMap ρ K v = |K|•v` → endgame。
+  **必要だった API 追加**: `Ch06.SubgroupPartition.mem_frobeniusGroup_parts` (commit 08df6a6, 非kernel part=Rの共役を public 化)。
 
-**残 partition の note**: `σ_K σ_R = σ_G` (complement bijection `K×R≃G` 由来, formalize 容易) は
-`groupSumMap ρ ⊤ = 0` を即与えるが **K 自明には不足** (σ_K を isolate できない)。本筋は下記の
-SubgroupPartition + nonidentitySigmaTo (conjugate 分割) が必須。same-prime case の infra も確認済
-(`PGroupFixedVector.lean` `IsPGroup.invariants_ne_bot`/`exists_fixed_vector_ne_zero`)。
+**✅ Lemma 3.3 (§3B) DONE。残り BG Thm 3.7 = (2) same-prime case + (3) |K|-induction。**
+- (2) same-prime: infra 確認済 (`PGroupFixedVector.lean` `IsPGroup.invariants_ne_bot`/`exists_fixed_vector_ne_zero`)。
+  **最難の未整備ピース = chief factor を irreducible `𝔽_q[Ḡ]`-module へ橋渡し** (elementary abelian ≃ 𝔽_q ベクトル空間 + 共役作用 ≃ Representation + minimal normal ≃ irreducible)。explore 済 (S04e/同探索ログ参照)。
+- (3) induction: Lemma 3.1/3.2 (S03 済) + Lemma 3.3 (済) + Prop 1.2 (`ChiefFactor.isNilpotent_of_chief_factor_centralization` 済) + chief factor 機構で組立。
 
 **残 partition の具体ルート (vector-level, MonoidAlgebra 係数計算を回避)**:
 `frobeniusGroup h : SubgroupPartition G` の `.parts = insert N (conjugatesFinset A)` (=K ∪ Rの共役;
