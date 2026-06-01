@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
 # BG §16: The Main Results
@@ -13,11 +13,15 @@ import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 (LMS LNS 188, 1994), Chapter IV §16 (pp. 123--134), mmd
 `references/bg/local-analysis.mmd` L4256--4449.
 
-This is the local-analysis endpoint.  BG §16 packages the previous sections into
+This is the local-analysis endpoint. BG §16 packages the previous sections into
 Theorems A--E, Proposition 16.1 (the Type I--V classification), and Theorems I--II
-(the statements consumed by the character-theory half, especially Peterfalvi
-§10).  This scaffold gives those endpoints stable Lean names and connects the BG
-`kappa`/`M_F` taxonomy to the shared Peterfalvi type predicates.
+(the statements consumed by the character-theory half, especially Peterfalvi §10).
+This scaffold gives those endpoints stable Lean names and connects the BG `kappa`/`M_F`
+taxonomy to the shared Type I--V predicates in `GroupTheory.MaximalSubgroupType`.
+
+Import boundary: this file intentionally does not import Peterfalvi modules. Peterfalvi
+§10+ should consume these BG endpoints through the shared type predicates, while the BG
+local-analysis spine remains independent of character-theory hypotheses.
 -/
 
 namespace OddOrder.BG.Ch4.S16
