@@ -1565,6 +1565,36 @@ theorem sourceDiffNormEvaluation_of_inner_values_of_zeta_irreducible
     hind_norm hzeta_ind hind_zeta
     (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
 
+/-- Variant using Hermitian symmetry: one orthogonality direction determines the other. -/
+theorem sourceDiffNormEvaluation_of_zeta_ind_orthogonal (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    H78.SourceDiffNormEvaluation := by
+  refine H78.sourceDiffNormEvaluation_of_inner_values hind_norm hzeta_ind ?_ hzeta_norm
+  rw [Hypothesis71.ClassFunction.inner_symm, hzeta_ind, star_zero]
+
+/-- Variant using one orthogonality direction and irreducibility of the chosen `ζ`. -/
+theorem sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.SourceDiffNormEvaluation :=
+  H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal
+    hind_norm hzeta_ind
+    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+
 /-- Combined beta-norm form of `sourceDiffNormEvaluation_of_inner_values`. -/
 theorem betaNormSq_eq_complementIndex_add_one_of_inner_values
     (H78 : Hypothesis78 G A L)
@@ -1601,6 +1631,21 @@ theorem betaNormSq_eq_complementIndex_add_one_of_inner_values_of_zeta_irreducibl
   exact H78.betaNormSq_eq_complementIndex_add_one
     (H78.sourceDiffNormEvaluation_of_inner_values_of_zeta_irreducible
       hind_norm hzeta_ind hind_zeta hzeta_irr)
+
+/-- Combined beta-norm form using one orthogonality direction and irreducibility of `ζ`. -/
+theorem betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  exact H78.betaNormSq_eq_complementIndex_add_one
+    (H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+      hind_norm hzeta_ind hzeta_irr)
 
 /-- The size hypothesis `e ≤ (h - 1) / 2`, written without division as
 `2e + 1 ≤ h`. -/

@@ -221,11 +221,15 @@ Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
 2026-06-02 追記: `zetaDistinct_inner_self_eq_one_of_irreducible` と
 `*_of_zeta_irreducible` bridge を追加し、最後の `⟨ζ,ζ⟩=1` は
 `IsIrreducibleCharacter ζ` から `irreducibleCharacter_inner_eq_ite` で即座に出せる形へ縮小。
+さらに `sourceDiffNormEvaluation_of_zeta_ind_orthogonal` 系で
+Hermitian symmetry から `⟨Ind1H,ζ⟩=0` を自動生成し、source-side 入力は
+`⟨Ind1H,Ind1H⟩=e`, `⟨ζ,Ind1H⟩=0`, `IsIrreducibleCharacter ζ` に縮小。
 
 **Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` で source norm へ移す部分と、
 4 source inner-product 評価から beta norm identity へ戻す部分は解消済み。
-残りは `L` 上での source-side inner product 評価で、`⟨ζ,ζ⟩=1` は
-`IsIrreducibleCharacter ζ` へ縮小済み (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
+残りは `L` 上での source-side inner product 評価で、self term は
+`IsIrreducibleCharacter ζ` へ、反対向き直交は Hermitian symmetry へ縮小済み
+(`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
 `Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
 `|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
 の計算が必要で、これは (7.8.a) の `BetaDecomp` (係数 `a`) に依存する。よって (7.8.a) が先。算術 `ua²−2va≥0`
