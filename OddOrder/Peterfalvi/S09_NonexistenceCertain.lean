@@ -1515,6 +1515,25 @@ lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
   intro i
   exact F.one_not_mem_kernelSpread i
 
+lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
+    (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
+  rintro rfl
+  exact F.one_not_mem_kernelSpread i hx
+
+lemma orderOf_dvd_card_kernel_of_mem_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} {x : G}
+    (hx : x ∈ F.kernelSpread i) : orderOf x ∣ Nat.card (F.H i) := by
+  rcases hx with ⟨g, hg⟩
+  have hsub : orderOf (⟨g * x * g⁻¹, hg.1⟩ : F.H i) ∣ Nat.card (F.H i) :=
+    orderOf_dvd_natCard _
+  have hy_dvd : orderOf (g * x * g⁻¹) ∣ Nat.card (F.H i) := by
+    simpa [Subgroup.orderOf_mk] using hsub
+  have hsc : SemiconjBy g x (g * x * g⁻¹) := by
+    rw [SemiconjBy]
+    group
+  have horder : orderOf x = orderOf (g * x * g⁻¹) := SemiconjBy.orderOf_eq g hsc
+  simpa [horder] using hy_dvd
+
 /-- `(H_i^#)^G` is closed under ambient conjugation. -/
 lemma kernelSpread_conj_mem (F : FrobeniusFamily G k) (i : Fin k)
     (g : G) {x : G} (hx : x ∈ F.kernelSpread i) :
@@ -1552,6 +1571,21 @@ lemma mem_G0_conj_iff (F : FrobeniusFamily G k) (g x : G) :
     simpa [mul_assoc] using hback
   · intro hx
     exact F.G0_conj_mem g hx
+
+/-- Distinct kernel spreads in Peterfalvi (7.10) are disjoint.  Any element in
+their intersection has order dividing both coprime kernel orders, hence is the
+identity, contradicting membership in a sharp conjugate spread. -/
+lemma kernelSpread_disjoint [Finite G] (F : FrobeniusFamily G k)
+    {i j : Fin k} (hij : i ≠ j) : Disjoint (F.kernelSpread i) (F.kernelSpread j) := by
+  rw [Set.disjoint_left]
+  intro x hxi hxj
+  have hcop : Nat.Coprime (orderOf x) (Nat.card (F.H j)) :=
+    Nat.Coprime.coprime_dvd_left
+      (F.orderOf_dvd_card_kernel_of_mem_kernelSpread hxi) (F.coprime_kernel hij)
+  have horder_one : orderOf x = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop dvd_rfl
+      (F.orderOf_dvd_card_kernel_of_mem_kernelSpread hxj)
+  exact F.ne_one_of_mem_kernelSpread hxi (orderOf_eq_one_iff.mp horder_one)
 
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
