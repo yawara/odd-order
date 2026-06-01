@@ -56,7 +56,7 @@ namespace OddOrder.BG.Ch1.S05
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
-open scoped IsMulCommutative
+open scoped IsMulCommutative commutatorElement
 
 variable {R : Type*} [Group R]
 
@@ -95,6 +95,57 @@ theorem omega1Center_le_of_maximalElementaryAbelian {p : ℕ} {E : Subgroup R}
     intro z hz
     exact (Subgroup.mem_center_iff.mp (omega1Center_le_center hz) x).symm
   exact hEstar.le_of_le_centralizer omega1Center_isElementaryAbelian hE_le_cent
+
+/-- **BG Lemma 5.2 support**: `Ω₁(Z(R)) ≤ Ω₁(Z₂(R))`. -/
+theorem omega1Center_le_omega1UpperCentralTwo {p : ℕ} :
+    omega1Center R p ≤ omega1UpperCentralTwo R p := by
+  intro z hz
+  rw [omega1UpperCentralTwo, Subgroup.mem_map]
+  have hz_pow : z ^ p = 1 := (mem_omega1Center.mp hz).2
+  have hzZ2 : z ∈ upperCentralSeries R 2 := by
+    exact (upperCentralSeries_mono R (by norm_num : (1 : ℕ) ≤ 2))
+      (by
+        rw [upperCentralSeries_one]
+        exact (mem_omega1Center.mp hz).1)
+  refine ⟨⟨z, hzZ2⟩, ?_, rfl⟩
+  refine Omega.mem_of_pow_eq_one ?_
+  rw [pow_one]
+  exact Subtype.ext (by simpa using hz_pow)
+
+/-- **BG Lemma 5.2 support**: once Lemma 4.5(c) supplies noncyclicity of
+`Ω₁(Z₂(R))`, the inclusion `Ω₁(Z(R)) ≤ Ω₁(Z₂(R))` is strict whenever
+`|Ω₁(Z(R))| = p`. -/
+theorem omega1Center_lt_omega1UpperCentralTwo_of_not_isCyclic
+    [Finite R] {p : ℕ} [Fact p.Prime]
+    (hZcard : Nat.card ↥(omega1Center R p) = p)
+    (hWnc : ¬ IsCyclic ↥(omega1UpperCentralTwo R p)) :
+    omega1Center R p < omega1UpperCentralTwo R p := by
+  refine lt_of_le_of_ne omega1Center_le_omega1UpperCentralTwo ?_
+  intro hZW
+  have hZcyc : IsCyclic ↥(omega1Center R p) := isCyclic_of_prime_card hZcard
+  have hWcyc : IsCyclic ↥(omega1UpperCentralTwo R p) := by
+    haveI : IsCyclic ↥(omega1Center R p) := hZcyc
+    exact isCyclic_of_surjective (MulEquiv.subgroupCongr hZW).toMonoidHom
+      (MulEquiv.subgroupCongr hZW).surjective
+  exact hWnc hWcyc
+
+/-- **BG Lemma 5.2 support**: `[Ω₁(Z₂(R)), R] ≤ Ω₁(Z(R))`.
+For `w ∈ Ω₁(Z₂(R))`, the inclusion `w ∈ Z₂(R)` puts `⁅w, r⁆` in the centre.
+The odd-prime exponent statement for `Ω₁(Z₂(R))`, together with the central
+commutator power identity, gives `(⁅w, r⁆)^p = 1`. -/
+theorem commutator_omega1UpperCentralTwo_le_omega1Center {p : ℕ} (hp : Odd p) :
+    ⁅omega1UpperCentralTwo R p, (⊤ : Subgroup R)⁆ ≤ omega1Center R p := by
+  rw [Subgroup.commutator_le]
+  intro w hw r _
+  have hwZ2 : w ∈ upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hw
+  have hcomm_center : ⁅w, r⁆ ∈ Subgroup.center R := by
+    have hmem : w * r * w⁻¹ * r⁻¹ ∈ upperCentralSeries R 1 :=
+      mem_upperCentralSeries_succ_iff.mp hwZ2 r
+    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+  refine (mem_omega1Center).mpr ⟨hcomm_center, ?_⟩
+  have hwpow : w ^ p = 1 := pow_eq_one_of_mem_omega1UpperCentralTwo hp hw
+  have hpow := S04.commutatorElement_pow_left_of_central hcomm_center p
+  rw [← hpow, hwpow, commutatorElement_one_left]
 
 /-! ## Lemma 5.1 — SCN₃ の非空性と normal `ℰ²` の埋め込み (mmd L1795-1806) -/
 
@@ -391,6 +442,268 @@ theorem mem_scn3_of_normal_isElementaryAbelian_card_prime_sq [Finite R] {p : ℕ
   exact exists_scn3_ge_of_bStar_card_ge_prime_cube hpg hE hB hBstar_card
 
 /-! ## Lemma 5.2 — `T = C_R(W)` の中心構造 (mmd L1808-1836) -/
+
+/-- **BG Lemma 5.2 support / Lemma 4.5(c) in the `r(R) ≥ 3` context**:
+`W = Ω₁(Z₂(R))` is noncyclic.
+
+We avoid the still-deferred general Lemma 4.5(a) by using the stronger local hypothesis
+`r(R) ≥ 3`: Lemma 5.1's SCN₃ construction gives a normal elementary abelian subgroup
+of order `p³`; BG Lemma 1.22 extracts a normal elementary abelian subgroup `S` of
+order `p²`. Since `R` is nilpotent, `[S,R]` is a proper subgroup of `S`; hence it has
+order `1` or `p`, and in the latter case it is central. Thus `S ≤ Z₂(R)`, and since
+`S` has exponent `p`, `S ≤ W`. A cyclic `W` would make its subgroup `S` cyclic,
+contradicting `|S| = p²` and elementary abelianness. -/
+theorem omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) :
+    ¬ IsCyclic ↥(omega1UpperCentralTwo R p) := by
+  obtain ⟨A, hA⟩ := scn3_nonempty_of_three_le_pRank hp hpg h3
+  obtain ⟨B, hB_normal, hB_elem, hBcard⟩ :=
+    exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hpg hA
+  haveI : B.Normal := hB_normal
+  have hB_dvd : p ^ 2 ∣ Nat.card B := by
+    rw [hBcard]
+    exact pow_dvd_pow p (by norm_num : 2 ≤ 3)
+  obtain ⟨S, hS_normal, hS_le_B, hScard⟩ :=
+    OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup
+      (G := R) (p := p) hpg (N := B) (r := 2) hB_dvd
+  haveI : S.Normal := hS_normal
+  have hS_elem : S.IsElementaryAbelian p := by
+    have hS_sub_elem : (S.subgroupOf B).IsElementaryAbelian p :=
+      hB_elem.to_subgroup (S.subgroupOf B)
+    exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hS_le_B) hS_sub_elem
+  have hS_ne_bot : S ≠ ⊥ := by
+    intro hSbot
+    have hcard_one : Nat.card S = 1 := by rw [hSbot, Subgroup.card_bot]
+    have hp_sq_gt_one : 1 < p ^ 2 :=
+      one_lt_pow₀ (Fact.out : p.Prime).one_lt two_ne_zero
+    exact (ne_of_gt hp_sq_gt_one) (by rw [← hScard, hcard_one])
+  haveI : Group.IsNilpotent R := IsPGroup.isNilpotent hpg
+  let H : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  have hHlt : H < S := by
+    dsimp [H]
+    exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient
+      (E := S) (F := (⊤ : Subgroup R)) hS_ne_bot
+  have hH_le_S : H ≤ S := hHlt.le
+  haveI hH_normal : H.Normal := by
+    dsimp [H]
+    infer_instance
+  have hH_le_center : H ≤ Subgroup.center R := by
+    by_cases hHbot : H = ⊥
+    · rw [hHbot]
+      exact bot_le
+    · have hH_dvd : Nat.card H ∣ p ^ 2 := by
+        rw [← hScard]
+        exact Subgroup.card_dvd_of_le hH_le_S
+      obtain ⟨j, hj_le, hj_eq⟩ :=
+        (Nat.dvd_prime_pow (p := p) (Fact.out (p := p.Prime))).mp hH_dvd
+      have hj_ne_zero : j ≠ 0 := by
+        intro hj0
+        have hHcard_one : Nat.card H = 1 := by simpa [hj0] using hj_eq
+        exact hHbot ((Subgroup.card_eq_one (H := H)).mp hHcard_one)
+      have hj_ne_two : j ≠ 2 := by
+        intro hj2
+        have hHcard_eq_S : Nat.card H = Nat.card S := by
+          rw [hj_eq, hj2, hScard]
+        have hHS : H = S :=
+          Subgroup.eq_of_le_of_card_ge hH_le_S (le_of_eq hHcard_eq_S.symm)
+        exact hHlt.ne hHS
+      have hj_eq_one : j = 1 := by omega
+      have hHcard : Nat.card H = p := by simpa [hj_eq_one] using hj_eq
+      exact S04.le_center_of_card_eq_prime_of_normal hpg hHcard
+  have hS_le_Z2 : S ≤ upperCentralSeries R 2 := by
+    intro s hs
+    rw [mem_upperCentralSeries_succ_iff]
+    intro r
+    have hcomm_center : ⁅s, r⁆ ∈ Subgroup.center R := by
+      exact hH_le_center (by
+        dsimp [H]
+        exact Subgroup.commutator_mem_commutator hs trivial)
+    simpa [upperCentralSeries_one, commutatorElement_def] using hcomm_center
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  have hS_le_W : S ≤ W := by
+    intro s hs
+    dsimp [W]
+    rw [omega1UpperCentralTwo, Subgroup.mem_map]
+    have hs_pow_sub := hS_elem.pow_eq_one (⟨s, hs⟩ : S)
+    have hs_pow : s ^ p = 1 := by
+      simpa using congrArg Subtype.val hs_pow_sub
+    refine ⟨⟨s, hS_le_Z2 hs⟩, ?_, rfl⟩
+    refine Omega.mem_of_pow_eq_one ?_
+    rw [pow_one]
+    exact Subtype.ext (by simpa using hs_pow)
+  have hS_not_cyclic : ¬ IsCyclic ↥S :=
+    hS_elem.not_isCyclic_of_card_prime_sq (Fact.out : p.Prime) hScard
+  intro hWcyc
+  have hSsub_cyc : IsCyclic ↥(S.subgroupOf W) := by
+    haveI : IsCyclic ↥W := by simpa [W] using hWcyc
+    exact Subgroup.isCyclic _
+  have hS_cyc : IsCyclic ↥S := by
+    haveI : IsCyclic ↥(S.subgroupOf W) := hSsub_cyc
+    exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hS_le_W).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hS_le_W).surjective
+  exact hS_not_cyclic hS_cyc
+
+/-- **BG Lemma 5.2 support**: if `E ∈ E*(R)` has order `p²`, then
+`C_R(E)` has `p`-rank at most `2`.
+
+Indeed, any elementary abelian `p`-subgroup of `C_R(E)` centralizes `E`; adjoining it
+to `E` is still elementary abelian, so maximality of `E` forces the subgroup back
+inside `E`. -/
+theorem pRank_centralizer_le_two_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] {E : Subgroup R}
+    (hEcard : Nat.card ↥E = p ^ 2) (hEstar : IsMaximalElementaryAbelian p E) :
+    pRank ↥(Subgroup.centralizer (E : Set R)) p ≤ 2 := by
+  rw [pRank_le_iff]
+  intro A hA
+  let C : Subgroup R := Subgroup.centralizer (E : Set R)
+  let F : Subgroup R := A.map C.subtype
+  have hF : F.IsElementaryAbelian p := by
+    dsimp [F, C]
+    exact Subgroup.IsElementaryAbelian.map C.subtype_injective hA
+  have hE_le_cent_F : E ≤ Subgroup.centralizer (F : Set R) := by
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hxF
+    change x ∈ A.map C.subtype at hxF
+    rw [Subgroup.mem_map] at hxF
+    obtain ⟨a, _, rfl⟩ := hxF
+    exact (Subgroup.mem_centralizer_iff.mp a.2 e he).symm
+  have hF_le_E : F ≤ E :=
+    hEstar.le_of_le_centralizer (F := F) hF hE_le_cent_F
+  calc
+    Nat.log p (Nat.card A) = Nat.log p (Nat.card F) := by
+      dsimp [F, C]
+      rw [Subgroup.card_map_of_injective C.subtype_injective]
+    _ ≤ Nat.log p (Nat.card E) :=
+      Nat.log_mono_right (Subgroup.card_le_of_le hF_le_E)
+    _ = 2 := by
+      rw [hEcard, Nat.log_pow (Fact.out : p.Prime).one_lt]
+
+/-- **BG Lemma 5.2 support**: in the same situation, `Ω₁(Z(R))` is a proper
+subgroup of `E`, and hence has order `p`.
+
+This is the textbook step after `Z ≤ E`: if `Z = E`, then `E` is central, so
+`C_R(E) = R`, contradicting `r(R) ≥ 3` and the rank bound for `C_R(E)`. The
+order calculation uses the central subgroup of order `p` in a nontrivial finite
+`p`-group and the divisibility `|Z| ∣ |E| = p²`. -/
+theorem omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1Center R p < E ∧ Nat.card ↥(omega1Center R p) = p := by
+  have hZleE : omega1Center R p ≤ E :=
+    omega1Center_le_of_maximalElementaryAbelian hEstar
+  have hZ_ne_E : omega1Center R p ≠ E := by
+    intro hZE
+    have hE_le_center : E ≤ Subgroup.center R := by
+      intro x hx
+      rw [← hZE] at hx
+      exact omega1Center_le_center hx
+    have hCtop : Subgroup.centralizer (E : Set R) = ⊤ := by
+      rw [eq_top_iff]
+      intro x _
+      rw [Subgroup.mem_centralizer_iff]
+      intro e he
+      exact (Subgroup.mem_center_iff.mp (hE_le_center he) x).symm
+    let C : Subgroup R := Subgroup.centralizer (E : Set R)
+    let toC : R →* C :=
+      { toFun := fun r => ⟨r, by
+          dsimp [C]
+          rw [hCtop]
+          exact Subgroup.mem_top r⟩
+        map_one' := Subtype.ext rfl
+        map_mul' := fun _ _ => Subtype.ext rfl }
+    have hR_le_C : pRank R p ≤ pRank C p :=
+      pRank_le_of_injective (G := C) (H := R) (f := toC)
+        (fun _ _ hxy => congrArg Subtype.val hxy)
+    have h3C : 3 ≤ pRank ↥(Subgroup.centralizer (E : Set R)) p := by
+      simpa [C] using h3.trans hR_le_C
+    have hC_le_two :
+        pRank ↥(Subgroup.centralizer (E : Set R)) p ≤ 2 :=
+      pRank_centralizer_le_two_of_maximalElementaryAbelian_card_prime_sq hEcard hEstar
+    have : (3 : ℕ) ≤ 2 := h3C.trans hC_le_two
+    omega
+  have hZltE : omega1Center R p < E := lt_of_le_of_ne hZleE hZ_ne_E
+  have hE_card_gt_one : 1 < Nat.card E := by
+    rw [hEcard]
+    exact one_lt_pow₀ (Fact.out : p.Prime).one_lt two_ne_zero
+  haveI : Nontrivial E := Finite.one_lt_card_iff_nontrivial.mp hE_card_gt_one
+  obtain ⟨e, he_ne⟩ := exists_ne (1 : E)
+  haveI : Nontrivial R := ⟨⟨(e : R), 1, fun heq => he_ne (Subtype.ext heq)⟩⟩
+  obtain ⟨K, hK_le_center, hKcard⟩ := hpg.exists_subgroup_le_center_card_prime
+  have hK_le_Z : K ≤ omega1Center R p := by
+    intro x hx
+    refine ⟨hK_le_center hx, ?_⟩
+    have hxpow := pow_card_eq_one' (G := K) (x := (⟨x, hx⟩ : K))
+    have hxpow_coe := congrArg Subtype.val hxpow
+    simpa [hKcard] using hxpow_coe
+  have hp_le_Z : p ≤ Nat.card (omega1Center R p) := by
+    simpa [hKcard] using (Subgroup.card_le_of_le hK_le_Z)
+  have hZdvd : Nat.card (omega1Center R p) ∣ p ^ 2 := by
+    rw [← hEcard]
+    exact Subgroup.card_dvd_of_le hZleE
+  obtain ⟨j, hj_le, hj_eq⟩ :=
+    (Nat.dvd_prime_pow (p := p) (Fact.out (p := p.Prime))).mp hZdvd
+  have hj_ne_zero : j ≠ 0 := by
+    intro hj0
+    have hp_le_one : p ≤ 1 := by
+      simpa [hj0, hj_eq] using hp_le_Z
+    exact (not_lt_of_ge hp_le_one) (Fact.out : p.Prime).one_lt
+  have hj_ne_two : j ≠ 2 := by
+    intro hj2
+    have hZcard_eq_E : Nat.card (omega1Center R p) = Nat.card E := by
+      rw [hj_eq, hj2, hEcard]
+    have hZE : omega1Center R p = E :=
+      Subgroup.eq_of_le_of_card_ge hZleE (le_of_eq hZcard_eq_E.symm)
+    exact hZ_ne_E hZE
+  have hj_eq_one : j = 1 := by omega
+  refine ⟨hZltE, ?_⟩
+  simpa [hj_eq_one] using hj_eq
+
+/-- **BG Lemma 5.2 support**: under `r(R) ≥ 3` and `E ∈ E*(R)` with `|E| = p²`,
+`Ω₁(Z(R))` is a proper subgroup of `Ω₁(Z₂(R))`, and `|Ω₁(Z(R))| = p`.
+This packages the textbook transition from `Z < E`, `|Z| = p`, and Lemma 4.5(c)'s
+noncyclicity of `W = Ω₁(Z₂(R))` to `Z < W`. -/
+theorem omega1Center_lt_omega1UpperCentralTwo_and_card_eq_prime
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1Center R p < omega1UpperCentralTwo R p ∧
+      Nat.card ↥(omega1Center R p) = p := by
+  have hZ :=
+    omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+      hpg h3 hEcard hEstar
+  have hWnc := omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank hp hpg h3
+  exact ⟨omega1Center_lt_omega1UpperCentralTwo_of_not_isCyclic hZ.2 hWnc, hZ.2⟩
+
+/-- **BG Lemma 5.2 front-half support**: the portion of the proof up through
+`Z < W` and `[W, R] ≤ Z`, together with the centralizer rank bound.
+
+This is the reusable sorry-free package for the initial paragraphs of Lemma 5.2:
+from `E ∈ E*(R)` and `|E| = p²`, `C_R(E)` has `p`-rank at most `2`; then
+`Z = Ω₁(Z(R))` is a proper subgroup of `E` of order `p`; Lemma 4.5(c) in the
+`r(R) ≥ 3` context makes `W = Ω₁(Z₂(R))` noncyclic, hence `Z < W`, and the
+upper-central-series argument gives `[W, R] ≤ Z`. -/
+theorem lemma52_frontHalf_support
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    pRank ↥(Subgroup.centralizer (E : Set R)) p ≤ 2 ∧
+      omega1Center R p < E ∧
+      Nat.card ↥(omega1Center R p) = p ∧
+      ¬ IsCyclic ↥(omega1UpperCentralTwo R p) ∧
+      omega1Center R p < omega1UpperCentralTwo R p ∧
+      ⁅omega1UpperCentralTwo R p, (⊤ : Subgroup R)⁆ ≤ omega1Center R p := by
+  have hC : pRank ↥(Subgroup.centralizer (E : Set R)) p ≤ 2 :=
+    pRank_centralizer_le_two_of_maximalElementaryAbelian_card_prime_sq hEcard hEstar
+  have hZ :=
+    omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+      hpg h3 hEcard hEstar
+  have hWnc := omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank hp hpg h3
+  have hZW : omega1Center R p < omega1UpperCentralTwo R p :=
+    omega1Center_lt_omega1UpperCentralTwo_of_not_isCyclic hZ.2 hWnc
+  exact ⟨hC, hZ.1, hZ.2, hWnc, hZW, commutator_omega1UpperCentralTwo_le_omega1Center hp⟩
 
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
