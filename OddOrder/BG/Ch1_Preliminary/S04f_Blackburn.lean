@@ -28,6 +28,7 @@ namespace OddOrder.BG.Ch1.S04
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.BG.Ch1_Preliminary (isAInvariant_map_subtype_of_restrict)
 
 section AutOrderConstraints
 
@@ -184,6 +185,46 @@ private theorem orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial
   · exact (hres_ne_one (orderOf_eq_one_iff.mp h1)).elim
   · exact hqeq
 
+/-- Minimality support for BG Lemma 4.13: if `Q` is minimal among `φ`-invariant
+subgroups on which `ψ` acts nontrivially, then `ψ` fixes every proper
+`φ`-invariant subgroup of `Q` pointwise. -/
+private theorem acts_trivially_on_proper_of_minimal_nontrivial
+    {A R : Type*} [Group A] [Group R] {φ : A →* MulAut R}
+    {Q : Subgroup R} {ψ : A}
+    (hmin : ∀ N : Subgroup R, IsAInvariant φ N → N ≤ Q →
+      (∃ g ∈ N, (φ ψ) g ≠ g) → N = Q)
+    {N : Subgroup R} (hN_inv : IsAInvariant φ N) (hN_le : N ≤ Q)
+    (hN_ne : N ≠ Q) :
+    ∀ n ∈ N, (φ ψ) n = n := by
+  intro n hn
+  by_contra hn_ne
+  exact hN_ne (hmin N hN_inv hN_le ⟨n, hn, hn_ne⟩)
+
+/-- Restricted form of `acts_trivially_on_proper_of_minimal_nontrivial`, for
+proper invariant subgroups of the selected subgroup `Q`. -/
+private theorem restrict_acts_trivially_on_proper_of_minimal_nontrivial
+    {A R : Type*} [Group A] [Group R] {φ : A →* MulAut R}
+    {Q : Subgroup R} (hQ_inv : IsAInvariant φ Q) {ψ : A}
+    (hmin : ∀ N : Subgroup R, IsAInvariant φ N → N ≤ Q →
+      (∃ g ∈ N, (φ ψ) g ≠ g) → N = Q)
+    {K : Subgroup Q} (hK_inv : IsAInvariant hQ_inv.restrict K)
+    (hK_ne : K ≠ ⊤) :
+    ∀ z ∈ K, (hQ_inv.restrict ψ) z = z := by
+  intro z hz
+  let N : Subgroup R := K.map Q.subtype
+  have hN_inv : IsAInvariant φ N := isAInvariant_map_subtype_of_restrict hQ_inv hK_inv
+  have hN_le : N ≤ Q := Subgroup.map_subtype_le K
+  have hN_ne : N ≠ Q := by
+    intro hNQ
+    apply hK_ne
+    have hQtop : Q = (⊤ : Subgroup Q).map Q.subtype := by
+      rw [← MonoidHom.range_eq_map, Q.range_subtype]
+    exact Subgroup.map_injective Q.subtype_injective (hNQ.trans hQtop)
+  apply Subtype.ext
+  rw [IsAInvariant.restrict_apply_val]
+  exact acts_trivially_on_proper_of_minimal_nontrivial hmin hN_inv hN_le hN_ne
+    (z : R) (Subgroup.mem_map_of_mem _ hz)
+
 /-- **BG Lemma 4.13** (via Gorenstein Theorem 4.15(ii)). Suppose `p` is an odd
 prime, `R` is a finite `p`-group, and `q` is a prime divisor of `|Aut R|`. If
 `SCN₃(R)` is empty and `q ≠ p`, then `q ∣ p^2 - 1` and `q < p`.
@@ -229,6 +270,10 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     exact pow_orderOf_eq_one ψ
   have hψQ_order : orderOf (hQ_inv.restrict ψA) = q :=
     orderOf_restrict_eq_prime_of_pow_eq_one_and_nontrivial hQ_inv hq hψA_pow hψ_nt_Q
+  have hQ_min_fix : ∀ K : Subgroup Q, IsAInvariant hQ_inv.restrict K → K ≠ ⊤ →
+      ∀ z ∈ K, (hQ_inv.restrict ψA) z = z :=
+    fun K hK_inv hK_ne =>
+      restrict_acts_trivially_on_proper_of_minimal_nontrivial hQ_inv hQ_min hK_inv hK_ne
   have hQ_elem_dvd : IsElementaryAbelian p Q → q ∣ p ^ 2 - 1 := by
     intro hQ_elem
     exact prime_dvd_prime_sq_sub_one_of_orderOf_mulAut hq hqp hQ_elem
