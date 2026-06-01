@@ -116,6 +116,50 @@ private theorem coprime_card_zpowers_mulAut_of_prime_order_ne
   rw [Nat.card_zpowers, hψ_order, hn]
   exact ((Nat.coprime_primes hq Fact.out).mpr hqp).pow_right n
 
+/-- Subgroups inherit the BG Lemma 4.7 rank bound from the ambient `SCN₃`-empty
+`p`-group. -/
+private theorem pRank_subgroup_le_two_of_scn3_empty
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A) (Q : Subgroup R) :
+    pRank Q p ≤ 2 :=
+  (pRank_mono_of_le Q).trans (pRank_le_two_of_scn3_empty hp_odd hR hSCN)
+
+/-- Abelian branch support for BG Lemma 4.13: an elementary abelian subgroup of an
+`SCN₃`-empty finite `p`-group has order at most `p²`. -/
+private theorem card_le_prime_sq_of_scn3_empty_elementaryAbelian_subgroup
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A) {Q : Subgroup R}
+    (hQ : IsElementaryAbelian p Q) :
+    Nat.card Q ≤ p ^ 2 := by
+  have hQ_rank : pRank Q p ≤ 2 :=
+    pRank_subgroup_le_two_of_scn3_empty hp_odd hR hSCN Q
+  have hlog_le : Nat.log p (Nat.card Q) ≤ 2 := hQ.log_card_le_pRank.trans hQ_rank
+  have hcard : Nat.card Q = p ^ Nat.log p (Nat.card Q) := by
+    letI : IsMulCommutative Q := IsMulCommutative.of_comm hQ.comm
+    letI := hQ.zmodModule
+    rw [hQ.log_card_eq_finrank]
+    exact hQ.card_eq_pow_finrank
+  rw [hcard]
+  exact Nat.pow_le_pow_right (Fact.out : p.Prime).pos hlog_le
+
+/-- Exponent-`p` support for BG Lemma 4.13: a subgroup of an `SCN₃`-empty finite
+`p`-group with exponent `p` has order at most `p³`. -/
+private theorem card_le_prime_cube_of_scn3_empty_exp_prime_subgroup
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A) {Q : Subgroup R}
+    (hQ_exp : Monoid.exponent Q = p) :
+    Nat.card Q ≤ p ^ 3 := by
+  have hQ_rank : pRank Q p ≤ 2 :=
+    pRank_subgroup_le_two_of_scn3_empty hp_odd hR hSCN Q
+  have hQ_pow : ∀ x : Q, x ^ p = 1 := by
+    intro x
+    simpa [hQ_exp] using (Monoid.pow_exponent_eq_one x)
+  exact card_le_prime_cube_of_pRank_le_two_of_exponent_prime
+    (hR.to_subgroup Q) hQ_rank hQ_pow
+
 /-- **BG Lemma 4.13** (via Gorenstein Theorem 4.15(ii)). Suppose `p` is an odd
 prime, `R` is a finite `p`-group, and `q` is a prime divisor of `|Aut R|`. If
 `SCN₃(R)` is empty and `q ≠ p`, then `q ∣ p^2 - 1` and `q < p`.
@@ -147,6 +191,12 @@ theorem dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty
     exact hfix g
   obtain ⟨Q, hQ_inv, hψ_nt_Q, hQ_special, hQ_exp⟩ :=
     exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction hp_odd φ hR hA_cop hψA_ntriv
+  have hQ_rank : pRank Q p ≤ 2 :=
+    pRank_subgroup_le_two_of_scn3_empty hp_odd hR hSCN Q
+  have hQ_card_cube : Nat.card Q ≤ p ^ 3 :=
+    card_le_prime_cube_of_scn3_empty_exp_prime_subgroup hp_odd hR hSCN hQ_exp
+  have hQ_elem_card_le : IsElementaryAbelian p Q → Nat.card Q ≤ p ^ 2 :=
+    card_le_prime_sq_of_scn3_empty_elementaryAbelian_subgroup hp_odd hR hSCN
   sorry
 
 /-- **BG Lemma 4.14.** Under the hypotheses of Lemma 4.13, `q` divides one of the
