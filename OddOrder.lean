@@ -106,4 +106,5 @@ import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
+import OddOrder.FeitThompson
 import OddOrder.AxiomsCheck
