@@ -2169,6 +2169,28 @@ lemma lowerBoundTerm_pos [Finite G] (F : FrobeniusFamily G k)
     div_pos (by norm_num) hh2pos
   linarith
 
+/-- The final arithmetic rearrangement in Peterfalvi (7.10). -/
+lemma lowerBoundTerm_final_rearrange [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)) =
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  have he_ne : (F.e i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_e i
+    positivity
+  have hh_ne : (F.h i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_h i
+    positivity
+  have hh2_ne : (F.h i : ℚ) + 2 ≠ 0 := by
+    have h2 := F.two_le_h i
+    positivity
+  field_simp [he_ne, hh_ne, hh2_ne]
+  ring
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
