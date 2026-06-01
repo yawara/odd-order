@@ -29,10 +29,13 @@ L2315-2485, **1 結果** (Thm 8.1, (a)(b) 2 部).
 - `SCN₃(P)` (Sylow `P` of `M` 内) = `IsSCN₃ p (A.subgroupOf (P:Subgroup ↥M))`。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
-## proof は後続
+## Lane C proof-gate notes
 
 faithful statement + `sorry`。proof は §7 (Thm 7.2/7.4/7.6) + §6 Thm 6.2 一般形 + Prop 1.10/1.3
-+ §5 Lem 5.1 (SCN₃ 非空) に依存 (foundation-first)。
+に依存 (foundation-first)。§5 Lem 5.1 is only the nonemptiness remark for `SCN₃(P)`
+(mmd L2324); the part (b) statement is universal over all `A ∈ SCN₃(P)` and should not
+carry Lem 5.1 as an extra assumption. No §5 narrow classification theorem or BG Thm 4.16
+assumption belongs in §8.
 -/
 
 namespace OddOrder.BG.Ch2.S08
@@ -66,7 +69,8 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
-`SCN₃(P)` 非空は §5 Lem 5.1 (Remark, mmd L2324)。 -/
+`SCN₃(P)` 非空は §5 Lem 5.1 (Remark, mmd L2324) で保証されるが、この定理型では
+非空性を仮定にせず、BG 本文どおり `SCN₃(P)` の任意の元に対する結論として保持する。 -/
 theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)

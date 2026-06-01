@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.GroupTheory.NarrowPGroup
@@ -27,12 +28,43 @@ statement + `sorry`** scaffold (定義層 + Lem 12.1 / Lem 12.2(a) / Lem 12.3 / 
 Lem 12.18 / Lem 12.19)。clean core を述べ、`Ω₁(P)=A`・内部直積の commuting・商型 nilpotent/rank
 等の fragile sub-clause は各 docstring で defer。proof は別フェーズ。
 
+Import boundary: §12 mathematically sits after §11. Prop 12.4 activates the
+exceptional-maximal setup, and Thm 12.5 uses the §11 consequences under Hypothesis 11.1.
+This file imports `S11_ExceptionalMaximal` even when an individual scaffolded statement only
+mentions §10 notation, keeping the BG §16 endpoint closure honest.
+
 ## 定義 (BG → repo, mmd L3029)
 
 - `tau1/tau2/tau3 M` (`Set ℕ`): `σ(M)'` を rank と `π(M')` で 3 分割 (mmd L3029)。
 - `SubgroupESetup M E E₁ E₂ E₃`: `E` は `M_σ` の `M` 内補群、`Eᵢ` は `E` の Hall `τᵢ(M)`-部分群。
 - `M'` = `derivedInG M`; `M_σ` = `S10.Msigma M`; `r_p` = `pRank ↥· p`。
 - 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。残り 18 結果 (12.2–12.19) は後続。
+
+## Lane C proof-gate notes
+
+- Import boundary: §12 imports §11. This is intentional even when a theorem statement
+  only mentions §10 notation; Proposition 12.4 and Theorem 12.5 activate the
+  exceptional-maximal interface and must remain on the BG spine.
+- Lemma 12.1 gates on Theorem 10.2, Lemma 4.5, Proposition 1.6(d), and
+  Lemma 10.4(c) (mmd L3035-L3060). These are proof obligations, not fields of
+  `SubgroupESetup`.
+- Lemma 12.2 uses Lemma 10.5 and Theorem 10.1(b) (mmd L3062-L3069). The Lean
+  surface currently records part (a); part (b) is a deferred nonconjugacy clause.
+- Proposition 12.4 uses the Uniqueness Theorem, Lemma 12.3, Proposition 1.16,
+  Proposition 10.11(b), and Theorem 10.2 (mmd L3095-L3126).
+- Theorem 12.5 is the bridge from §11 into §12: Proposition 12.4 supplies
+  Hypothesis 11.1, then Theorems 11.3, 11.5, 11.7, Corollary 11.6, and
+  Lemma 12.3 give the six conclusions (mmd L3129-L3148).
+- Theorem 12.12 packages the Frobenius-complement endpoint from Theorem 12.7,
+  Lemma 12.8, Corollary 12.6, and Lemma 12.11 (mmd L3306-L3344). The internal
+  cyclic `Z_p` construction remains deferred.
+- Proposition 12.15, Corollary 12.16, and Lemma 12.17 are the direct §13--§14
+  gates (mmd L3385-L3453). The Lean surfaces intentionally keep only the clauses
+  currently consumed downstream; Corollary 12.16(b) and the cyclic `β(M)'`/derived
+  intersection tail of Lemma 12.17 remain deferred proof obligations.
+- Lemmas 12.18 and 12.19 use Theorem 1.13, Theorem 3.7, Corollary 10.9(a), and
+  the Uniqueness Theorem (mmd L3454-L3482). Do not replace them by downstream
+  prime-action assumptions in §13.
 -/
 
 namespace OddOrder.BG.Ch3.S12
@@ -103,7 +135,7 @@ theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     p ∈ S10.sigma Mstar ∨ p ∈ tau2 Mstar := by
   sorry
 
-/-- **BG Proposition 12.4(a)** (mmd L3023-): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
+/-- **BG Proposition 12.4(a)** (mmd L3095): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
 (原典 (b): `N_G(A₀)` の uniqueness ⇒ `p∈σ(M), M_α=1, M_σ` nilpotent は後続。) -/
 theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
@@ -111,14 +143,14 @@ theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.centralizer (A : Set G) ≤ M := by
   sorry
 
-/-- **BG Theorem 12.13** (mmd L3023-): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
+/-- **BG Theorem 12.13** (mmd L3347): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
     (hPnab : ¬ IsMulCommutative P) :
     IsUniquelyMaximal P := by
   sorry
 
-/-- **BG Corollary 12.14** (mmd L3023-): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
+/-- **BG Corollary 12.14** (mmd L3369): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
 `X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
 theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
@@ -127,7 +159,7 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
   sorry
 
-/-- **BG Corollary 12.16(a)** (mmd L3023-): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
+/-- **BG Corollary 12.16(a)** (mmd L3423): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
 (`∃ g ∈ M, Y^g ⊆ M_σ`)。(原典 (b) の rank/derived 評価は後続。) -/
 theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
@@ -135,7 +167,7 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
   sorry
 
-/-- **BG Lemma 12.17** (mmd L3023-): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
+/-- **BG Lemma 12.17** (mmd L3448): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
 (原典の `M_σ ∩ M^g` cyclic 評価は後続。) -/
 theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
@@ -143,7 +175,7 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   sorry
 
-/-- **BG Lemma 12.3** (mmd L3023-): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
+/-- **BG Lemma 12.3** (mmd L3071): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
 `N_G(A₀) ⊆ M*` なら `A` は `M_σ ∩ M*` と `M_α ∩ M*` を中心化する。 -/
 theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
     {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
@@ -154,7 +186,7 @@ theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
     A ≤ Subgroup.centralizer ((S10.Malpha M ⊓ Mstar : Subgroup G) : Set G) := by
   sorry
 
-/-- **BG Lemma 12.19** (mmd L3023-): `E'` は `M_σ` の Hall `β(M)'`-部分群を中心化する。 -/
+/-- **BG Lemma 12.19** (mmd L3480): `E'` は `M_σ` の Hall `β(M)'`-部分群を中心化する。 -/
 theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     ∃ W : Subgroup G, W ≤ S10.Msigma M ∧

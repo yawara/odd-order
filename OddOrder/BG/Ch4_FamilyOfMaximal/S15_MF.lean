@@ -27,6 +27,23 @@ The main scaffold endpoints are:
 
 Proofs are deferred; the purpose here is a stable importable surface for §16 and
 Peterfalvi §§15--16.
+
+## Lane C interface and proof-gate notes
+
+- Import boundary: §15 imports §14 only. The §10--§13 and §12 exceptional-maximal
+  gates are reached through the BG local-analysis spine, not through Peterfalvi modules.
+- Lemma 15.1 uses Theorem 14.7(d)(h), Corollary 12.10(b), Theorem 10.2(c),
+  Corollary 14.3, Theorem 12.5(d), and Theorem 12.12 (mmd L4144-L4148).
+- Theorem 15.2 uses Lemma 14.1, Theorem 14.7(f), Proposition 14.2(a),
+  Lemma 6.3(a), Theorem 3.8, Proposition 1.5(a)(d), Theorem 3.7,
+  Theorem 3.10, and Theorem 5.5(a) (mmd L4160-L4172).
+- Theorem 15.7 is a BG local case split for `F(M)` not TI. Its Lean statement
+  records the compressed endpoint; the `E_i`, exponent-divisibility, and
+  `Omega_1(Z(P))` subclauses remain deferred until the §12/§10.13 encodings are complete
+  (mmd L4204-L4230).
+- Theorem 15.8 and Corollary 15.9 are the Feit--Thompson/Sibley local endpoints
+  feeding §16. They depend on Corollary 14.12, Theorem 15.2, Corollary 12.6,
+  the Uniqueness Theorem, Lemma 12.17, and Theorem 14.4 (mmd L4234-L4288).
 -/
 
 namespace OddOrder.BG.Ch4.S15
@@ -127,7 +144,7 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     Subgroup.centralizer (X : Set G) ≤ M ∨
       ∃ N : Subgroup G,
         N ∈ maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) ∧
-        S14.IsTypeF N ∨ S14.IsTypeP2 N := by
+          (S14.IsTypeF N ∨ S14.IsTypeP2 N) := by
   sorry
 
 /-- **BG Corollary 15.4** (mmd L4161): nilpotent Hall subgroups embed into the

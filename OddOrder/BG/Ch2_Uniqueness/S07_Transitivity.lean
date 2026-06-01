@@ -39,6 +39,14 @@ L2131-2314, **6 結果** (Lem 7.1 + Thm 7.2/7.3/7.4/7.6 + Prop 7.5).
 
 全 6 結果は faithful statement + `sorry`。proof は Prop 1.16 (coprime action generation, §1),
 Lem 6.5/6.6 (§6), Thm 6.7, SCN/p-stability に依存 (foundation-first scaffold)。
+
+## Lane C proof-gate notes
+
+§7 itself does not consume the Blackburn classification (BG Thm 4.16) or the §5
+narrow-p-group theorems. The only §4/§5-sensitive notation here is `SCN_n`: Prop 7.5
+assumes `A ∈ SCN₂(P)` directly, and Thm 7.6 assumes `A ∈ SCN₃(p)`. Existence of such
+subgroups is a downstream §8/§9 concern (BG Lem 5.1, mmd L1795-1806, L2324, L2629),
+not a hypothesis to add to §7.
 -/
 
 namespace OddOrder.BG.Ch2.S07

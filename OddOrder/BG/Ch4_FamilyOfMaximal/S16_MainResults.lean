@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
 # BG §16: The Main Results
@@ -13,11 +13,34 @@ import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 (LMS LNS 188, 1994), Chapter IV §16 (pp. 123--134), mmd
 `references/bg/local-analysis.mmd` L4256--4449.
 
-This is the local-analysis endpoint.  BG §16 packages the previous sections into
+This is the local-analysis endpoint. BG §16 packages the previous sections into
 Theorems A--E, Proposition 16.1 (the Type I--V classification), and Theorems I--II
-(the statements consumed by the character-theory half, especially Peterfalvi
-§10).  This scaffold gives those endpoints stable Lean names and connects the BG
-`kappa`/`M_F` taxonomy to the shared Peterfalvi type predicates.
+(the statements consumed by the character-theory half, especially Peterfalvi §10).
+This scaffold gives those endpoints stable Lean names and connects the BG `kappa`/`M_F`
+taxonomy to the shared Type I--V predicates in `GroupTheory.MaximalSubgroupType`.
+
+Import boundary: this file intentionally does not import Peterfalvi modules. Peterfalvi
+§10+ should consume these BG endpoints through the shared type predicates, while the BG
+local-analysis spine remains independent of character-theory hypotheses.
+
+## Lane C endpoint and proof-gate notes
+
+- Theorems A--E are schematic packages of earlier BG results, not new Peterfalvi
+  assumptions. The source proof table gives the exact gates: A uses Theorem 10.2,
+  Lemma 15.1, Proposition 14.2, Theorem 15.2, Corollary 15.5, and Theorem 15.7
+  (mmd L4392-L4398).
+- Theorem B uses Lemma 12.1(d), Theorem 12.5(b), and Lemma 15.1(c)(d)(e)
+  (mmd L4400-L4402).
+- Theorem C uses Corollary 14.12, Corollary 15.6, Lemma 15.1(b), Theorem 10.1(b),
+  Theorem 14.7, Proposition 14.2, Theorem A, and Theorem 15.7 (mmd L4404-L4410).
+- Theorem D uses Corollary 15.3(b), Lemma 12.17, Theorem 14.4, Theorem A(8),
+  and Corollary 15.9 (mmd L4412-L4414).
+- Theorem E is the counting endpoint from Lemma 14.5(c), Theorem 13.9, and
+  Corollary 14.9 (mmd L4416-L4418). The current Lean `aSets_support_slice` records
+  the `A(M)`/`A_0(M)` support slice; the sigma-counting surface remains in §14.
+- Proposition 16.1 is the BG-local bridge from the §14 families to the shared
+  Type I--V predicates. This file may mention Peterfalvi as a consumer, but it must
+  not import or assume Peterfalvi character-theory structure.
 -/
 
 namespace OddOrder.BG.Ch4.S16
@@ -147,9 +170,11 @@ theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
           (S14.IsTypeF N ∨ S14.IsTypeP2 N)) := by
   sorry
 
-/-- **BG Theorem E** (mmd L4285): the auxiliary sets from this section have the
-TI and support properties used in Peterfalvi's `A(M)`/`A_0(M)` arguments. -/
-theorem theoremE_A_sets [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **BG §16 `A(M)`/`A_0(M)` support slice**: the auxiliary sets from this section
+have the TI and support properties used by the downstream character-theory interface.
+This is not the full BG Theorem E counting statement; that endpoint is represented by
+the §14 sigma-counting surfaces until `R(x)`/`M_tilde` data is encoded here. -/
+theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
@@ -158,10 +183,10 @@ theorem theoremE_A_sets [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       Supports (ASet M U) (S14.zTilde K Kstar ∪ A0Set M K) := by
   sorry
 
-/-! ## Proposition 16.1: BG local taxonomy equals Peterfalvi type I--V -/
+/-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **BG Proposition 16.1** (mmd L4352): the §14--§15 local families are exactly
-Peterfalvi's Type I--V maximal subgroups. -/
+the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi. -/
 theorem proposition_type_classification [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
@@ -171,8 +196,10 @@ theorem proposition_type_classification [Finite G]
         S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) ∧
       (OddOrder.GroupTheory.IsTypeV M ↔
         S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) ∧
-      (derivedInG M =
-        (⊤ : Subgroup G) ⊔ OddOrder.BG.Ch3.S10.Msigma M ↔
+      ((∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+          (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M) ↔
           ¬ OddOrder.GroupTheory.IsTypeI M) ∧
       (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔
         OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨

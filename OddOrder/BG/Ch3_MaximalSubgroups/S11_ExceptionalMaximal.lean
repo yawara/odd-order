@@ -28,6 +28,28 @@ L2913-3022, **7 結果** (Lem 11.1 + Thm 11.3/11.5/11.7 + Cor 11.2/11.4/11.6)。
   `A∈ℰ_p*(G)` を `Hypothesis111 M p A₀ A P` に束ねる。`M_σ` = `S10.Msigma M`。
 - 「`A`-不変 Sylow `q`-部分群」= `IsAInvSylowIn` (M_σ 内の `A`-不変・`q`-極大 部分群)。
 - 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。proof は §7/§10 + Thm 3.7 等に依存 (全 sorry)。
+
+## Lane C proof-gate notes
+
+- Import boundary: §11 imports §10 plus BG setup/group-theory support. §12 imports
+  this file explicitly so the exceptional-maximal spine is compiler-visible.
+- `Hypothesis111` keeps the literal BG Hypothesis 11.1 data and the Lemma 10.5
+  derived `A`/`P` choices. Do not replace Theorems 11.3, 11.5, or 11.7 by
+  downstream structure fields or Peterfalvi-style type hypotheses.
+- Lemma 11.1 uses Proposition 7.5, Lemma 7.1, and Theorem 10.1(d)
+  (mmd L2939-L2944). Thompson transitivity is an upstream §7 proof gate.
+- Corollary 11.2 uses Lemma 11.1 and Proposition 1.5 (mmd L2946-L2953).
+- Theorem 11.3 uses Corollary 11.2(b) and Theorem 3.7 (mmd L2955-L2957).
+- Corollary 11.4 uses Theorem 11.3, Lemma 10.12(b), and Corollary 11.2(a)
+  (mmd L2959-L2961).
+- Theorem 11.5 uses Lemma 11.1(b), Proposition 1.16, and Lemma 10.13(c)
+  (mmd L2963-L2975).
+- Corollary 11.6 uses Theorem 11.5, Corollary 11.2(b), and the odd-order
+  index argument in `N_G(P)` (mmd L2977-L2993).
+- Theorem 11.7 is the real §4/§10-heavy gate: it uses Theorem 4.20,
+  Lemma 10.4(c), Proposition 10.10(c), Proposition 10.11(d), and
+  Proposition 1.6(d) (mmd L2997-L3021). It should not be hidden behind
+  BG Theorem 4.16, §5 narrow hypotheses, or Peterfalvi assumptions.
 -/
 
 namespace OddOrder.BG.Ch3.S11
@@ -715,7 +737,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     IsMulCommutative (S : Subgroup ↥M) := by
   sorry
 
-/-- **BG Corollary 11.6 (a)(b)** (mmd L2974 付近): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
+/-- **BG Corollary 11.6 (a)(b)** (mmd L2977): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
 (原典 (c): `g₁,g₂∈N_G(P)−N_M(P)` で `C_{M_σ}(A₀^{gᵢ})=1` ∧ `A=A₁×A₂` — 後続。) -/
 theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
