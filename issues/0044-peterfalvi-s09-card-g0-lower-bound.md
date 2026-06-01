@@ -150,10 +150,15 @@ Hypothesis78.beta_inner_self_eq_sourceDiff_inner_self
 Hypothesis78.betaNormSq_eq_sourceDiffNormSq
 Hypothesis78.sourceDiff_inner_self_expand
 Hypothesis78.sourceDiffNormSq_expand
+Hypothesis78.SourceDiffNormEvaluation
+Hypothesis78.betaNormSq_eq_complementIndex_add_one
 ```
 
-を sorry-free で追加。これで `‖β‖²=e+1` 側は、Dade isometry bridge と source norm の
-4 inner-product 展開まで Lean 化済み。残りは source 側 4 項の character computation と、
+を sorry-free で追加。`SourceDiffNormEvaluation` は standalone target として
+`sourceDiffNormSq = e+1` を名前付けし、
+`betaNormSq_eq_complementIndex_add_one` は既存の Dade bridge から `‖β‖²=e+1` を即座に戻す。
+これで `‖β‖²=e+1` 側は、Dade isometry bridge、source norm の
+4 inner-product 展開、source target から beta target への接続まで Lean 化済み。残りは source 側 4 項の character computation と、
 (7.7.b)/(7.8.a) から `u,v,w` 形へつなぐ指標論側。
 残る (7.10) 本体は依然として (7.8.a/b) proof, (7.9) proof,
 (6.8) coherence 本体, および Thompson/Frobenius-family bridge の合成が必要。

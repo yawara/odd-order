@@ -1490,6 +1490,25 @@ noncomputable def kernelOrder (H78 : Hypothesis78 G A L) : ℕ :=
 noncomputable def complementIndex (H78 : Hypothesis78 G A L) : ℕ :=
   Nat.card L / Nat.card H78.hyp76.H
 
+/-- **Peterfalvi (7.8.b) source norm target.**  The remaining source-side
+character computation for `‖β‖² = e + 1`, after the Dade-isometry bridge has
+reduced the norm of `β` to `‖Ind 1_H - ζ‖²`.
+
+This is standalone target data, not a field of `Hypothesis78`; completing it
+requires evaluating the four source inner products isolated by
+`sourceDiffNormSq_expand`. -/
+structure SourceDiffNormEvaluation (H78 : Hypothesis78 G A L) : Prop where
+  /-- `‖Ind 1_H - ζ‖² = e + 1`. -/
+  sourceDiffNormSq_eq :
+    H78.sourceDiffNormSq = (H78.complementIndex : ℝ) + 1
+
+/-- Once the source-side norm computation is available, the beta norm identity
+`‖β‖² = e + 1` follows from the Dade isometry. -/
+theorem betaNormSq_eq_complementIndex_add_one (H78 : Hypothesis78 G A L)
+    (hsrc : H78.SourceDiffNormEvaluation) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  rw [H78.betaNormSq_eq_sourceDiffNormSq, hsrc.sourceDiffNormSq_eq]
+
 /-- The size hypothesis `e ≤ (h - 1) / 2`, written without division as
 `2e + 1 ≤ h`. -/
 noncomputable def smallIndex (H78 : Hypothesis78 G A L) : Prop :=
