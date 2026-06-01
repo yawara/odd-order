@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.LinearAlgebra.Matrix.Permutation
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
@@ -214,6 +216,26 @@ noncomputable def classInvPerm {G : Type*} [Group G] (idx : CharacterTableIndexi
     classInvPerm idx ψ = idx.rowColumnEquiv.symm (ConjClasses.inv (idx.rowColumnEquiv ψ)) :=
   rfl
 
+/-- The pullback to `IrreducibleCharacter G` of an arbitrary permutation `π` of the conjugacy
+classes, via a `CharacterTableIndexing` row-column equivalence.  This generalizes `classInvPerm`
+(the `π = ConjClasses.inv` case) to an arbitrary class permutation, as needed for Brauer's
+permutation lemma applied to a conjugation (rather than inversion) action. -/
+noncomputable def classPerm {G : Type*} [Group G] (idx : CharacterTableIndexing G)
+    (π : Equiv.Perm (ConjClasses G)) : Equiv.Perm (IrreducibleCharacter G) :=
+  (idx.rowColumnEquiv.trans π).trans idx.rowColumnEquiv.symm
+
+@[simp] theorem classPerm_apply {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) (π : Equiv.Perm (ConjClasses G))
+    (ψ : IrreducibleCharacter G) :
+    classPerm idx π ψ = idx.rowColumnEquiv.symm (π (idx.rowColumnEquiv ψ)) :=
+  rfl
+
+theorem rowColumnEquiv_classPerm {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) (π : Equiv.Perm (ConjClasses G))
+    (ψ : IrreducibleCharacter G) :
+    idx.rowColumnEquiv (classPerm idx π ψ) = π (idx.rowColumnEquiv ψ) := by
+  simp
+
 theorem classInvPerm_involutive {G : Type*} [Group G]
     (idx : CharacterTableIndexing G) : Function.Involutive (classInvPerm idx) := by
   intro ψ
@@ -239,6 +261,58 @@ noncomputable def realClassEquivFixedPointsClassInv {G : Type*} [Group G]
     exact h⟩
   left_inv C := by ext; simp
   right_inv ψ := by ext; simp
+
+/-- Fixed points of `classPerm idx π` are in bijection with `π`-fixed conjugacy classes via the
+row-column equivalence.  Generalizes `realClassEquivFixedPointsClassInv` (the inversion case). -/
+noncomputable def fixedPointsClassPermEquiv {G : Type*} [Group G]
+    (idx : CharacterTableIndexing G) (π : Equiv.Perm (ConjClasses G)) :
+    {ψ : IrreducibleCharacter G // classPerm idx π ψ = ψ} ≃
+      {C : ConjClasses G // π C = C} where
+  toFun ψ := ⟨idx.rowColumnEquiv (ψ : IrreducibleCharacter G), by
+    have hψ : classPerm idx π (ψ : IrreducibleCharacter G) = (ψ : IrreducibleCharacter G) := ψ.2
+    have h := congrArg idx.rowColumnEquiv hψ
+    rwa [rowColumnEquiv_classPerm] at h⟩
+  invFun C := ⟨idx.rowColumnEquiv.symm (C : ConjClasses G), by
+    have hC : π (C : ConjClasses G) = (C : ConjClasses G) := C.2
+    simp [hC]⟩
+  left_inv ψ := by ext; simp
+  right_inv C := by ext; simp
+
+/-- Fixed points of a permutation and its inverse are naturally equivalent. -/
+noncomputable def fixedPointsPermSymmEquiv {α : Type*} (e : Equiv.Perm α) :
+    Function.fixedPoints e.symm ≃ Function.fixedPoints e where
+  toFun x := ⟨x.1, ((Equiv.symm_apply_eq e).1 x.2).symm⟩
+  invFun x := ⟨x.1, (Equiv.symm_apply_eq e).2 x.2.symm⟩
+  left_inv x := by ext; rfl
+  right_inv x := by ext; rfl
+
+/-- **Matrix-algebra core of Brauer's permutation lemma.**
+
+If the permutation matrices of `σ` and `τ` are conjugate via an invertible matrix `A`
+(`σ.permMatrix * A = A * τ.permMatrix`), then `σ` and `τ` have the same number of fixed points:
+their permutation matrices, being conjugate, share a trace, and the trace of a permutation matrix
+over `ℂ` counts fixed points (`Matrix.trace_permutation`).
+
+This is the reusable matrix kernel shared by the inversion form `brauer_permutation_lemma` and the
+conjugation form `brauer_permutation_lemma_general`. -/
+theorem ncard_fixedPoints_eq_of_permMatrix_conj {n : Type*} [Fintype n] [DecidableEq n]
+    (σ τ : Equiv.Perm n) (A : Matrix n n ℂ) [Invertible A]
+    (hmat : σ.permMatrix ℂ * A = A * τ.permMatrix ℂ) :
+    (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard := by
+  have hσ_conj : σ.permMatrix ℂ = A * τ.permMatrix ℂ * A⁻¹ := by
+    have h := congrArg (fun M => M * A⁻¹) hmat
+    simp only at h
+    rwa [Matrix.mul_assoc (σ.permMatrix ℂ), Matrix.mul_inv_of_invertible, Matrix.mul_one] at h
+  have htrace : Matrix.trace (σ.permMatrix ℂ) = Matrix.trace (τ.permMatrix ℂ) := by
+    rw [hσ_conj, Matrix.trace_mul_cycle, Matrix.inv_mul_of_invertible, Matrix.one_mul]
+  have hσ_tr : Matrix.trace (σ.permMatrix ℂ) = ((Function.fixedPoints σ).ncard : ℂ) :=
+    Matrix.trace_permutation σ
+  have hτ_tr : Matrix.trace (τ.permMatrix ℂ) = ((Function.fixedPoints τ).ncard : ℂ) :=
+    Matrix.trace_permutation τ
+  have hncard_cast :
+      ((Function.fixedPoints σ).ncard : ℂ) = ((Function.fixedPoints τ).ncard : ℂ) := by
+    rw [← hσ_tr, ← hτ_tr]; exact htrace
+  exact_mod_cast hncard_cast
 
 /-- **Brauer's permutation lemma** ([Is] Thm 6.32).
 
@@ -277,7 +351,6 @@ theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G]
   letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
   -- Class-inversion permutation, pulled back to IrreducibleCharacter G via rowColumnEquiv.
   set τ : Equiv.Perm (IrreducibleCharacter G) := classInvPerm idx with hτ_def
-  have hτ_invol : Function.Involutive τ := classInvPerm_involutive idx
   have hτ_symm : τ.symm = τ := classInvPerm_symm idx
   -- Matrix identity (entry form): A (σ χ) ψ = A χ (τ ψ).
   have hentry : ∀ (χ ψ : IrreducibleCharacter G),
@@ -294,29 +367,9 @@ theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G]
       PEquiv.toMatrix_toPEquiv_mul, PEquiv.mul_toMatrix_toPEquiv,
       Matrix.submatrix_apply, Matrix.submatrix_apply, id, id, hτ_symm]
     exact hentry χ ψ
-  -- Multiply on the right by A⁻¹ to isolate σ.permMatrix.
-  have hσ_conj : σ.permMatrix ℂ =
-      characterTableSquareMatrix idx * τ.permMatrix ℂ *
-        (characterTableSquareMatrix idx)⁻¹ := by
-    have h := congrArg (fun M => M * (characterTableSquareMatrix idx)⁻¹) hmat
-    simp only at h
-    rw [Matrix.mul_assoc (σ.permMatrix ℂ), Matrix.mul_inv_of_invertible, Matrix.mul_one] at h
-    exact h
-  -- Take trace.
-  have htrace : Matrix.trace (σ.permMatrix ℂ) = Matrix.trace (τ.permMatrix ℂ) := by
-    rw [hσ_conj]
-    rw [Matrix.trace_mul_cycle]
-    rw [Matrix.inv_mul_of_invertible, Matrix.one_mul]
-  -- Identify traces with fixed point counts.
-  have hσ_tr : Matrix.trace (σ.permMatrix ℂ) =
-      ((Function.fixedPoints σ).ncard : ℂ) := Matrix.trace_permutation σ
-  have hτ_tr : Matrix.trace (τ.permMatrix ℂ) =
-      ((Function.fixedPoints τ).ncard : ℂ) := Matrix.trace_permutation τ
-  have hncard_cast :
-      ((Function.fixedPoints σ).ncard : ℂ) = ((Function.fixedPoints τ).ncard : ℂ) := by
-    rw [← hσ_tr, ← hτ_tr]; exact htrace
-  have hncard : (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard := by
-    exact_mod_cast hncard_cast
+  -- Conjugate permutation matrices share their fixed-point count (matrix-algebra core).
+  have hncard : (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard :=
+    ncard_fixedPoints_eq_of_permMatrix_conj σ τ (characterTableSquareMatrix idx) hmat
   -- Translate to Nat.card.
   have hσ_nat : Nat.card (Function.fixedPoints σ) = Nat.card (RealIrreducibleCharacter G) := by
     rw [Nat.card_coe_set_eq]
@@ -394,5 +447,79 @@ theorem not_isReal_of_ne_trivial_of_odd_card {G : Type*} [Group G]
   intro hreal
   exact hχ (realIrreducibleCharacter_eq_trivial_of_odd_card (G := G) idx hrow σ
     h_real_irr h_compat hodd ⟨χ, hreal⟩)
+
+/-- **Brauer's permutation lemma, general (arbitrary class permutation) form.**
+
+For a finite group `G`, given a permutation `σ` of `Irr G` and a permutation `π` of
+`ConjClasses G` compatible at the level of character-table entries
+(`(σ χ)(C) = χ(π C)`), the number of `σ`-fixed irreducible characters equals the number of
+`π`-fixed conjugacy classes:
+
+`# { χ ∈ Irr G | σ χ = χ } = # { C ∈ ConjClasses G | π C = C }`.
+
+This generalizes `brauer_permutation_lemma` (the `π = ConjClasses.inv` case) to an arbitrary
+class permutation `π`, the form needed for an automorphism / conjugation action `θ ↦ θ^g`.
+
+The matrix identity `σ.permMatrix * A = A * τ.permMatrix` permutes columns of `A` by `τ.symm`;
+pulling `π` back as `τ = classPerm idx π.symm` makes `τ.symm = classPerm idx π` match the supplied
+compatibility `(σ χ)(C) = χ(π C)`. -/
+theorem brauer_permutation_lemma_general {G : Type*} [Group G] [Finite G]
+    (idx : CharacterTableIndexing G)
+    (hrow : CharacterTableWeightedRowOrthogonality idx)
+    (σ : Equiv.Perm (IrreducibleCharacter G))
+    (π : Equiv.Perm (ConjClasses G))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (π C)) :
+    Nat.card (Function.fixedPoints σ) = Nat.card (Function.fixedPoints π) := by
+  letI := idx.irrFintype
+  letI := idx.classFintype
+  letI := Classical.decEq (IrreducibleCharacter G)
+  letI := Classical.decEq (ConjClasses G)
+  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  set τ : Equiv.Perm (IrreducibleCharacter G) := (classPerm idx π).symm with hτ_def
+  -- `τ.symm = classPerm idx π`, so the columns of `A * τ.permMatrix` match `h_compat`.
+  have hτ_symm : τ.symm = classPerm idx π := by
+    simp [hτ_def]
+  have hentry : ∀ (χ ψ : IrreducibleCharacter G),
+      characterTableSquareMatrix idx (σ χ) ψ =
+        characterTableSquareMatrix idx χ ((classPerm idx π) ψ) := by
+    intro χ ψ
+    simp only [characterTableSquareMatrix_apply, rowColumnEquiv_classPerm]
+    exact h_compat χ (idx.rowColumnEquiv ψ)
+  have hmat : σ.permMatrix ℂ * characterTableSquareMatrix idx =
+      characterTableSquareMatrix idx * τ.permMatrix ℂ := by
+    ext χ ψ
+    rw [show σ.permMatrix ℂ = σ.toPEquiv.toMatrix from rfl,
+      show τ.permMatrix ℂ = τ.toPEquiv.toMatrix from rfl,
+      PEquiv.toMatrix_toPEquiv_mul, PEquiv.mul_toMatrix_toPEquiv,
+      Matrix.submatrix_apply, Matrix.submatrix_apply, id, id, hτ_symm]
+    exact hentry χ ψ
+  have hncard : (Function.fixedPoints σ).ncard = (Function.fixedPoints τ).ncard :=
+    ncard_fixedPoints_eq_of_permMatrix_conj σ τ (characterTableSquareMatrix idx) hmat
+  have hτ_nat : Nat.card (Function.fixedPoints τ) = Nat.card (Function.fixedPoints π) := by
+    subst τ
+    apply Nat.card_congr
+    exact (fixedPointsPermSymmEquiv (classPerm idx π)).trans (fixedPointsClassPermEquiv idx π)
+  calc Nat.card (Function.fixedPoints σ)
+      = (Function.fixedPoints σ).ncard := Nat.card_coe_set_eq _
+    _ = (Function.fixedPoints τ).ncard := hncard
+    _ = Nat.card (Function.fixedPoints τ) := (Nat.card_coe_set_eq _).symm
+    _ = Nat.card (Function.fixedPoints π) := hτ_nat
+
+/-- Conjugation form of Brauer's permutation lemma, unconditional (no character-table
+hypotheses; the indexing and weighted row orthogonality are discharged internally for the
+finite group `G`). -/
+theorem brauer_permutation_lemma_general' {G : Type*} [Group G] [Finite G]
+    (σ : Equiv.Perm (IrreducibleCharacter G)) (π : Equiv.Perm (ConjClasses G))
+    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
+      characterTableEntry (σ χ) C = characterTableEntry χ (π C)) :
+    Nat.card (Function.fixedPoints σ) = Nat.card (Function.fixedPoints π) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact brauer_permutation_lemma_general (instCharacterTableIndexingOfFinite (G := G))
+    (CharacterTableWeightedRowOrthogonality.ofRowOrthogonality
+      (instCharacterTableIndexingOfFinite (G := G)) (characterTableRowOrthogonality_holds (G := G)))
+    σ π h_compat
 
 end OddOrder.RepresentationTheory
