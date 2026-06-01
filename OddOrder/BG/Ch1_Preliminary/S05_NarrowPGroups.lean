@@ -150,6 +150,38 @@ theorem bStar_normal_isElementaryAbelian_of_normal_isElementaryAbelian
       exact Subgroup.le_centralizer_iff.mpr inf_le_right
     exact Subgroup.IsElementaryAbelian.sup_of_le_centralizer hE hK_elem hE_le_cent_K
 
+/-- **BG Lemma 5.1(b), large `B*` branch**: if the subgroup
+`B* = E ⊔ (B ⊓ C_R(E))` constructed from normal elementary abelian `E` and `B` has
+cardinality at least `p^3`, then `E` is contained in some `SCN₃` subgroup. -/
+theorem exists_scn3_ge_of_bStar_card_ge_prime_cube
+    [Finite R] {p : ℕ} [Fact p.Prime] (hpg : IsPGroup p R)
+    {E B : Subgroup R} [E.Normal] [B.Normal]
+    (hE : E.IsElementaryAbelian p) (hB : B.IsElementaryAbelian p)
+    (hcard : p ^ 3 ≤ Nat.card ↥(E ⊔ (B ⊓ Subgroup.centralizer (E : Set R)))) :
+    ∃ A : Subgroup R, IsSCN₃ p A ∧ E ≤ A := by
+  let Bstar : Subgroup R := E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))
+  have hBstar := bStar_normal_isElementaryAbelian_of_normal_isElementaryAbelian
+    (E := E) (B := B) hE hB
+  have hBstar_norm : Bstar.Normal := by
+    simpa [Bstar] using hBstar.1
+  have hBstar_elem : Bstar.IsElementaryAbelian p := by
+    simpa [Bstar] using hBstar.2
+  have hBstar_comm : IsMulCommutative Bstar :=
+    IsMulCommutative.of_comm hBstar_elem.comm
+  have hcard' : p ^ 3 ≤ Nat.card Bstar := by
+    simpa [Bstar] using hcard
+  have hlog : 3 ≤ Nat.log p (Nat.card Bstar) :=
+    Nat.le_log_of_pow_le (Fact.out : p.Prime).one_lt hcard'
+  have hBrank : 3 ≤ pRank Bstar p :=
+    hlog.trans hBstar_elem.log_card_le_pRank
+  obtain ⟨A, hA, hBstar_le_A⟩ :=
+    exists_scn3_ge_of_normal_abelian_pRank_ge_three hpg hBstar_norm hBstar_comm hBrank
+  refine ⟨A, hA, ?_⟩
+  have hE_le_Bstar : E ≤ Bstar := by
+    dsimp [Bstar]
+    exact le_sup_left
+  exact hE_le_Bstar.trans hBstar_le_A
+
 /-- **BG Lemma 5.1(b)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。`E ∈ ℰ²(R)` (elem-ab,
 位数 `p²`) かつ `E ⊴ R` ⇒ `E` は `SCN₃(R)` のある元に含まれる。
 
