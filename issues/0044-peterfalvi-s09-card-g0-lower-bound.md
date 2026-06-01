@@ -27,6 +27,24 @@ unconditional 系 `card_realIrreducibleCharacters_eq_one_of_odd_card'` (`# real 
 subsingleton 一意性 (`Nat.card_eq_one_iff_exists`) で導出。AxiomsCheck clean, full build green。
 note `notes/peterfalvi/s09_nonexistence_certain.md` の blocker 1 / plan 1 を更新済。
 
+## 進捗 (2026-06-02, Lane D)
+
+`FrobeniusFamily` の純群論 counting 側を前進。`kernelSpread i = (H_i^#)^G` を
+`G ⧸ L_i` の代表による disjoint union として分解し,
+
+```lean
+F.card_kernelSpread_eq_index_mul i :
+  Nat.card (F.kernelSpread i) = (F.L i).index * (Nat.card (F.H i) - 1)
+```
+
+を sorry-free で追加。あわせて partition 公式へ接続する
+`sum_card_kernelSpread_eq_sum_index_mul`, `card_G0_eq_card_G_sub_sum_index_mul`,
+`sum_index_mul_eq_card_G_sub_card_G0` も landed。
+
+これで (7.10)(d) の `G₀ = G - ⋃(H_i^#)^G` から `|G₀|` を
+`[G:L_i]` と `|H_i|` で直接展開できる。残る (7.10) 本体は依然として
+(7.8.a/b), (7.9), (6.8) coherence 本体, および Thompson/Frobenius-family bridge の合成が必要。
+
 ## 全体構造 (Peterfalvi §9 mmd `04.9_pp_38_43_*.mmd` より)
 
 (7.10) は次の構成ブロックの **合成定理**:
