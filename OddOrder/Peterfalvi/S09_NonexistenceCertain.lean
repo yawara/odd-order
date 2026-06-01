@@ -1759,6 +1759,12 @@ noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H
 noncomputable def e (F : FrobeniusFamily G k) (i : Fin k) : ℕ :=
   Nat.card (F.L i) / Nat.card (F.H i)
 
+/-- `G₀` is nonempty: it contains the identity. -/
+lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :
+    1 ≤ Nat.card F.G0 := by
+  have : Nonempty F.G0 := ⟨⟨1, F.one_mem_G0⟩⟩
+  exact Nat.card_pos
+
 /-- `e_i = |L_i : H_i|` equals the order of the Frobenius complement `C`. -/
 lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
     {C : Subgroup ↥(F.L i)} (hC : IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
@@ -1770,6 +1776,73 @@ lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
   have h := Nat.mul_div_cancel_left (Nat.card C) (Nat.card_pos (α := F.H i))
   rw [hprod] at h
   exact h
+
+/-- The Frobenius product formula `|H_i| * e_i = |L_i|`. -/
+lemma h_mul_e_eq_card_L [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    F.h i * F.e i = Nat.card (F.L i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  rw [F.e_eq_card_complement i hC]
+  exact hprod
+
+/-- The Frobenius congruence gives `e_i ∣ h_i - 1`. -/
+lemma e_dvd_h_sub_one [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    F.e i ∣ F.h i - 1 := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hmod : Nat.card (F.H i) ≡ 1 [MOD Nat.card C] := by
+    have := hC.card_kernel_modEq_one
+    rwa [hN_card] at this
+  have hdvd : Nat.card C ∣ Nat.card (F.H i) - 1 :=
+    (Nat.modEq_iff_dvd' (Nat.card_pos (α := F.H i))).mp hmod.symm
+  rw [F.e_eq_card_complement i hC]
+  exact hdvd
+
+/-- A Frobenius kernel in the family is nontrivial, so `2 ≤ h_i`. -/
+lemma two_le_h [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.h i := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hh_eq : F.h i = Nat.card (F.H i) := rfl
+  rw [hh_eq, ← hN_card]
+  have hnt : Nontrivial ((F.H i).subgroupOf (F.L i)) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hC.ne_bot_kernel
+  have h1 : 1 < Nat.card ((F.H i).subgroupOf (F.L i)) :=
+    Finite.one_lt_card_iff_nontrivial.mpr hnt
+  omega
+
+/-- In an odd-order ambient group, each Frobenius kernel order `h_i` is odd. -/
+lemma odd_h [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) : Odd (F.h i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  have hLodd : Odd (Nat.card ↥(F.L i)) :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  exact (Nat.odd_mul.mp (hprod ▸ hLodd)).1
+
+/-- In an odd-order ambient group, each complement index `e_i` is odd. -/
+lemma odd_e [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) : Odd (F.e i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  have hLodd : Odd (Nat.card ↥(F.L i)) :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  have hCodd : Odd (Nat.card C) := (Nat.odd_mul.mp (hprod ▸ hLodd)).2
+  rw [F.e_eq_card_complement i hC]
+  exact hCodd
 
 /-- The Frobenius complement of `L_i` is nontrivial, so `e_i = |L_i : H_i| ≥ 2`. -/
 lemma two_le_e [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.e i := by
@@ -1784,46 +1857,27 @@ together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
 quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
 lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G)) (i : Fin k) : 2 * F.e i + 1 ≤ F.h i := by
-  obtain ⟨C, hC⟩ := F.isFrobenius i
-  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
-  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
-    rw [← hN_card]; exact hC.isComplement.card_mul
-  have he_eq : F.e i = Nat.card C := F.e_eq_card_complement i hC
-  have hh_eq : F.h i = Nat.card (F.H i) := rfl
-  -- `|L_i|` is odd (a subgroup of the odd-order group `G`), so `|H_i|` and `|C|` are odd.
-  have hLodd : Odd (Nat.card ↥(F.L i)) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
-  obtain ⟨hHodd, hCodd⟩ := Nat.odd_mul.mp (hprod ▸ hLodd)
-  -- `|C| ∣ |H_i| - 1`.
-  have hmod : Nat.card (F.H i) ≡ 1 [MOD Nat.card C] := by
-    have := hC.card_kernel_modEq_one; rwa [hN_card] at this
-  have hdvd : Nat.card C ∣ Nat.card (F.H i) - 1 :=
-    (Nat.modEq_iff_dvd' (Nat.card_pos (α := F.H i))).mp hmod.symm
-  -- `|H_i| ≥ 2` (nontrivial kernel).
-  have hHge2 : 2 ≤ Nat.card (F.H i) := by
-    rw [← hN_card]
-    have hnt : Nontrivial ((F.H i).subgroupOf (F.L i)) :=
-      (Subgroup.nontrivial_iff_ne_bot _).mpr hC.ne_bot_kernel
-    have h1 : 1 < Nat.card ((F.H i).subgroupOf (F.L i)) :=
-      Finite.one_lt_card_iff_nontrivial.mpr hnt
-    omega
-  -- The cofactor `m = (|H_i|-1)/|C|` is even and positive, hence `≥ 2`.
-  obtain ⟨m, hm⟩ := hdvd
-  have hHsub_even : Even (Nat.card (F.H i) - 1) := by
-    obtain ⟨j, hj⟩ := hHodd; exact ⟨j, by omega⟩
+  obtain ⟨m, hm⟩ := F.e_dvd_h_sub_one i
+  have hh_odd : Odd (F.h i) := F.odd_h hodd i
+  have he_odd : Odd (F.e i) := F.odd_e hodd i
+  have hh_ge2 : 2 ≤ F.h i := F.two_le_h i
+  have hh_sub_even : Even (F.h i - 1) := by
+    obtain ⟨j, hj⟩ := hh_odd
+    exact ⟨j, by omega⟩
   have hm_even : Even m := by
-    rw [hm] at hHsub_even
-    rcases Nat.even_mul.mp hHsub_even with h | h
-    · exact absurd h (Nat.not_even_iff_odd.mpr hCodd)
-    · exact h
+    rw [hm] at hh_sub_even
+    rcases Nat.even_mul.mp hh_sub_even with he_even | hm_even
+    · exact absurd he_even (Nat.not_even_iff_odd.mpr he_odd)
+    · exact hm_even
   have hmpos : 0 < m := by
     rcases Nat.eq_zero_or_pos m with h0 | h0
-    · rw [h0, Nat.mul_zero] at hm; omega
+    · rw [h0, Nat.mul_zero] at hm
+      omega
     · exact h0
   have hm_ge2 : 2 ≤ m := by
-    rcases hm_even with ⟨t, ht⟩; omega
-  have hmul : Nat.card C * 2 ≤ Nat.card C * m := Nat.mul_le_mul_left _ hm_ge2
-  rw [he_eq, hh_eq]
+    rcases hm_even with ⟨t, ht⟩
+    omega
+  have hmul : F.e i * 2 ≤ F.e i * m := Nat.mul_le_mul_left _ hm_ge2
   omega
 
 /-- The explicit right-hand side in Peterfalvi (7.10) is positive for every member
