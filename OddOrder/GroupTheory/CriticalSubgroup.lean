@@ -115,7 +115,7 @@ Proof mirrors `IsPGroup.center_nontrivial`: `ConjAct P` is a `p`-group acting on
 `↥K` by conjugation (well-defined as `K` is normal); its fixed points are the
 elements of `K` central in `P`. Fixed-point counting (`p ∣ |K|` since `K ≠ ⊥`,
 and `1` is a fixed point) yields a second fixed point. -/
-private theorem exists_mem_center_of_normal_ne_bot {p : ℕ} [Fact p.Prime] [Finite P]
+theorem exists_mem_center_of_normal_ne_bot {p : ℕ} [Fact p.Prime] [Finite P]
     (hP : IsPGroup p P) {K : Subgroup P} [K.Normal] (hK : K ≠ ⊥) :
     ∃ x : P, x ∈ K ∧ x ∈ Subgroup.center P ∧ x ≠ 1 := by
   -- `ConjAct P` is a `p`-group acting on `↥K`.
