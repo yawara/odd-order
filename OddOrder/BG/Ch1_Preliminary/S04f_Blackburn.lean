@@ -1484,6 +1484,46 @@ private theorem blackburn_noncentral_centralizer_quotient_omega_eq_top
     exact pow_centralizes_of_displacement_order_p hconj hdu hup
   exact (QuotientGroup.eq_one_iff (d ^ p)).mpr hd_pow_C
 
+/-- Blackburn 4.16 Case B-2: the centralizer quotient `D/C` is elementary
+abelian.  This packages the two explicit ingredients above: commutativity and
+`Ω₁(D/C)=⊤`. -/
+private theorem blackburn_noncentral_centralizer_quotient_isElementaryAbelian
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    let hCD_normal : (C.subgroupOf D).Normal :=
+      (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+    letI : (C.subgroupOf D).Normal := hCD_normal
+    IsElementaryAbelian p (D ⧸ C.subgroupOf D) := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
+  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  let Q : Type _ := D ⧸ C.subgroupOf D
+  have hcomm : ∀ x y : Q, x * y = y * x :=
+    blackburn_noncentral_centralizer_quotient_commutative hT_facts hT_elem
+  have hΩtop : Omega Q p 1 = ⊤ :=
+    blackburn_noncentral_centralizer_quotient_omega_eq_top hT_facts hT_elem
+  have hΩea : IsElementaryAbelian p (Omega Q p 1) :=
+    OddOrder.BG.Ch1_Preliminary.isElementaryAbelian_omega_one_of_comm hcomm
+  have e : (Omega Q p 1) ≃* Q := by
+    rw [hΩtop]
+    exact Subgroup.topEquiv
+  exact IsElementaryAbelian.of_mulEquiv e hΩea
+
 /-- Lift a quotient-level product decomposition through `G/N`, when the kernel
 `N` is already contained in the first factor. -/
 private theorem sup_eq_top_of_quotient_sup_eq_top
