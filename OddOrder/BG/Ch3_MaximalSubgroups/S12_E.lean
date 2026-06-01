@@ -21,7 +21,11 @@ L3023-3483, **19 結果** (Lem 12.1/12.2/12.11/12.17/12.18/12.19 + Prop 12.4/12.
 Thm 12.5/12.7/12.13 + Cor 12.6/12.8/12.9/12.10/12.14/12.16 + Lem 12.3)。
 
 §12 は maximal subgroup `M` の **複合体 `E`** (= `M_σ` の補群、`E ≅ M/M_σ`) の構造を解析する大規模節。
-`r(E) ≤ 2`, `E'` nilpotent, 各 Sylow abelian 等。本ファイルは §12 の **定義層 + Lemma 12.1**。
+`r(E) ≤ 2`, `E'` nilpotent, 各 Sylow abelian 等。本ファイルは §12 全 19 結果の **faithful な
+statement + `sorry`** scaffold (定義層 + Lem 12.1 / Lem 12.2(a) / Lem 12.3 / Prop 12.4(a) /
+τ₂-case Thm 12.5–12.12 / Thm 12.13 / Cor 12.14 / Prop 12.15 / Cor 12.16(a) / Lem 12.17 /
+Lem 12.18 / Lem 12.19)。clean core を述べ、`Ω₁(P)=A`・内部直積の commuting・商型 nilpotent/rank
+等の fragile sub-clause は各 docstring で defer。proof は別フェーズ。
 
 ## 定義 (BG → repo, mmd L3029)
 
@@ -325,6 +329,54 @@ theorem frobenius_factorization_of_regular [Finite G] (hG : IsMinimalSimpleOdd G
       Ch06.IsFrobeniusGroup ↥(S10.Msigma M ⊔ E₀)
         ((S10.Msigma M).subgroupOf (S10.Msigma M ⊔ E₀))
         (E₀.subgroupOf (S10.Msigma M ⊔ E₀))) := by
+  sorry
+
+/-! ## §12 σ(M) の埋め込みと一意性 (mmd L3385-3479) -/
+
+/-- **BG Proposition 12.15** (mmd L3387): `q ∈ σ(M)`, `X` を `M` の非自明 `q`-部分群、
+`M* ∈ ℳ(N_G(X)) - {M}`、`S` を `X` を含む `M ∩ M*` の Sylow `q`-部分群とすると
+(a) `M*` は `M` と非共役; (b) `N_G(S) ⊆ M`; (c) `S` は `M*` の Sylow `q`;
+(d) `q ∈ σ(M*)` なら `M*=(M∩M*)M*_β`, `τ₁(M*)⊆τ₁(M)∪α(M)`, `M_β=M_α≠1`;
+(e) `q ∉ σ(M*)` なら `q ∈ τ₂(M*)`, `π(M)∩σ(M*)⊆β(M*)`, `M∩M*` は `M*_σ` の補群。 -/
+theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (hq : q ∈ S10.sigma M) {X : Subgroup G} (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXq : IsPGroup q ↥X)
+    {Mstar : Subgroup G}
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)))
+    (hMstarne : Mstar ≠ M) {S : Subgroup G} (hSle : S ≤ M ⊓ Mstar) (hXS : X ≤ S)
+    (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T) :
+    (¬ ∃ g : G, MulAut.conj g • M = Mstar) ∧
+    Subgroup.normalizer (S : Set G) ≤ M ∧
+    (∀ T : Subgroup G, T ≤ Mstar → IsPGroup q ↥T → S ≤ T → S = T) ∧
+    (q ∈ S10.sigma Mstar →
+      Mstar = (M ⊓ Mstar) ⊔ S10.Mbeta Mstar ∧
+      tau1 Mstar ⊆ tau1 M ∪ S10.alpha M ∧
+      S10.Mbeta M = S10.Malpha M ∧ S10.Malpha M ≠ ⊥) ∧
+    (q ∉ S10.sigma Mstar →
+      q ∈ tau2 Mstar ∧
+      (∀ r ∈ (Nat.card ↥M).primeFactors, r ∈ S10.sigma Mstar → r ∈ S10.beta Mstar) ∧
+      S10.Msigma Mstar ⊓ (M ⊓ Mstar) = ⊥ ∧ S10.Msigma Mstar ⊔ (M ⊓ Mstar) = Mstar) := by
+  sorry
+
+/-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
+`P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
+(a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
+(b) `Q` が `M` の Sylow `q` なら `α(M)=β(M)` で (a) の状況が成立。 -/
+theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hqp : q ≠ p) (hp : p ∈ tau1 M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPM : P ≤ M) {Q : Subgroup G} (hQM : Q ≤ M) (hQne : Q ≠ ⊥) (hQq : IsPGroup q ↥Q)
+    (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
+    (hCQP : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hMNQ : maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) ≠ {M}) :
+    (S10.Malpha M ≠ ⊥ → q ∉ S10.alpha M →
+      S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
+      S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) ∧
+    ((∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T) →
+      S10.alpha M = S10.beta M ∧ S10.Malpha M ≠ ⊥ ∧ q ∉ S10.alpha M ∧
+      S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
+      S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) := by
   sorry
 
 end OddOrder.BG.Ch3.S12
