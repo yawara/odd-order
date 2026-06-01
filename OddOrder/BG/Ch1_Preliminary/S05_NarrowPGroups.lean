@@ -182,6 +182,68 @@ theorem exists_scn3_ge_of_bStar_card_ge_prime_cube
     exact le_sup_left
   exact hE_le_Bstar.trans hBstar_le_A
 
+/-- **BG Lemma 5.1(b), centralizer-count support**: if `E` has order `p^2` and
+`B` has order `p^3`, both elementary abelian, then the centralizer of `E` inside `B`
+has order at least `p^2`. This is the Lean form of the textbook estimate
+`|B / C_B(E)| ≤ p`, obtained from the conjugation action of `B` on `E`. -/
+theorem card_inf_centralizer_ge_prime_sq_of_card_prime_cube
+    [Finite R] {p : ℕ} [Fact p.Prime]
+    {E B : Subgroup R} [E.Normal]
+    (hE : E.IsElementaryAbelian p) (hEcard : Nat.card E = p ^ 2)
+    (hB : B.IsElementaryAbelian p) (hBcard : Nat.card B = p ^ 3) :
+    p ^ 2 ≤ Nat.card ↥(B ⊓ Subgroup.centralizer (E : Set R)) := by
+  let φ : B →* MulAut E := (MulAut.conjNormal (H := E)).comp B.subtype
+  have hrange_pg : IsPGroup p φ.range :=
+    hB.isPGroup.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
+  have hEcard_le : Nat.card E ≤ p ^ 2 := by
+    rw [hEcard]
+  have hrange_le : Nat.card φ.range ≤ p :=
+    card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq hE hEcard_le hrange_pg
+  have hLagrange : Nat.card B = Nat.card φ.range * Nat.card φ.ker := by
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker,
+      Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv]
+  have hker_map_eq : φ.ker.map B.subtype = B ⊓ Subgroup.centralizer (E : Set R) := by
+    ext x
+    constructor
+    · intro hx
+      rw [Subgroup.mem_map] at hx
+      obtain ⟨b, hbker, rfl⟩ := hx
+      refine ⟨b.2, ?_⟩
+      change B.subtype b ∈ Subgroup.centralizer (E : Set R)
+      rw [Subgroup.mem_centralizer_iff]
+      intro e he
+      have hfix : (MulAut.conjNormal (H := E) (B.subtype b)) ⟨e, he⟩ = ⟨e, he⟩ := by
+        have hφb : φ b = 1 := MonoidHom.mem_ker.mp hbker
+        simpa [φ] using congrArg (fun σ : MulAut E => σ ⟨e, he⟩) hφb
+      have hfix_val := congrArg Subtype.val hfix
+      rw [MulAut.conjNormal_apply] at hfix_val
+      exact (mul_inv_eq_iff_eq_mul.mp hfix_val).symm
+    · intro hx
+      obtain ⟨hxB, hxC⟩ := hx
+      rw [Subgroup.mem_map]
+      refine ⟨⟨x, hxB⟩, ?_, rfl⟩
+      rw [MonoidHom.mem_ker]
+      ext e
+      change x * (e : R) * x⁻¹ = (e : R)
+      have hcomm : (e : R) * x = x * (e : R) :=
+        Subgroup.mem_centralizer_iff.mp hxC (e : R) e.2
+      rw [← hcomm]
+      group
+  have hker_card : Nat.card ↥(B ⊓ Subgroup.centralizer (E : Set R)) = Nat.card φ.ker := by
+    rw [← hker_map_eq, Subgroup.card_map_of_injective B.subtype_injective]
+  have hB_le : Nat.card B ≤ p * Nat.card φ.ker := by
+    rw [hLagrange]
+    exact Nat.mul_le_mul_right _ hrange_le
+  have hp3_le : p ^ 3 ≤ p * Nat.card φ.ker := by
+    rw [← hBcard]
+    exact hB_le
+  have hp3_eq : p ^ 3 = p * p ^ 2 := by ring
+  have hp2_le_ker : p ^ 2 ≤ Nat.card φ.ker := by
+    have hmul : p * p ^ 2 ≤ p * Nat.card φ.ker := by
+      rwa [← hp3_eq]
+    exact Nat.le_of_mul_le_mul_left hmul (Fact.out : p.Prime).pos
+  rwa [hker_card]
+
 /-- **BG Lemma 5.1(b)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。`E ∈ ℰ²(R)` (elem-ab,
 位数 `p²`) かつ `E ⊴ R` ⇒ `E` は `SCN₃(R)` のある元に含まれる。
 
