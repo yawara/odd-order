@@ -83,6 +83,19 @@ F.sum_h_sub_one_div_e_le_sum_erase
 も追加。これで最小 index `i` を外した和を全体 balance
 `∑_j (h_j - 1)/(h_j e_j) = 1 - |G₀|/|G|` から直接抑えるための
 集合和の単調性補題が Lean 化済み。
+
+続いて (7.5)/(7.8) 由来の base estimate と (7.9) 由来の `𝓑`-sum bound を
+最終表示形へ接続する bridge として
+
+```lean
+F.penultimate_of_Bsum_bound
+F.lowerBoundTerm_of_Bsum_bound
+F.exists_lowerBoundTerm_of_exists_Bsum_bound
+```
+
+を追加。これにより、残りの指標論側が「最小 index `i` と `𝓑` に対する
+base inequality + `∑_{j∈𝓑}(h_j-1)/e_j ≤ e_i-1`」を渡せば、(7.10) の
+表示下界は `F.exists_lowerBoundTerm_of_exists_Bsum_bound` で閉じられる。
 残る (7.10) 本体は依然として (7.8.a/b), (7.9), (6.8) coherence 本体,
 および Thompson/Frobenius-family bridge の合成が必要。
 
@@ -103,7 +116,7 @@ F.sum_h_sub_one_div_e_le_sum_erase
 | (7.9) Key Lemma | `I={1,2}`, `G` 奇位数, coherent ⟹ `(β_1, ζ_2^{ν_2}) ≠ 0` または `(β_2, ζ_1^{ν_1}) ≠ 0` | ⬜ 未 stmt |
 | (6.8) Theorem | 直交族分解 `Ind_{L_i}^G (ζ_{it} - d_{it}ζ_{i1}) = χ_{it} - d_{it}χ_{i1}` | 🟡 `sibleySetup_is_coherent` stmt + `IndChainDecomposition` (issue 0046, 本体 proof 別途) |
 | Thompson kernel-nilpotent | Frobenius kernel 冪零 | ✅ Isaacs Ch.6 |
-| (7.10) | 上記の合成 + 算術操作 | ⬜ sorry (S09:2395) |
+| (7.10) | 上記の合成 + 算術操作 | ⬜ sorry (S09:2462) |
 
 各内部依存: (7.2)←(2.7),(2.6); (7.3)←(7.2); (7.5)←(7.3); (7.7)←(7.6);
 (7.8)←(7.7),(1.5),(2.7); (7.9)←(7.8),(5.9),(1.1),(4.1); (7.10)←(7.5),(7.8),(7.9),(6.8) + Thompson; (7.11)←(7.10).
@@ -119,7 +132,7 @@ F.sum_h_sub_one_div_e_le_sum_erase
 - [ ] sub-issue: (7.8.a/b/c) norm estimates — (7.8.c) `Hypothesis78` + `chiRho_eq_inner_beta_on_A` (証明書) + `chiRho_norm_sq_eq_card_ratio_mul` (proved) done 2026-05-29; **(7.8.a)/(7.8.b) 未** (`β = 1_G - ζ^ν + aΣ + Γ` 分解と `‖ζ^{νρ}‖² ≥ 1-e/h`, `‖Γ‖² ≤ e-1`) — 精密 spec + blocker は `notes/peterfalvi/s09_nonexistence_certain.md` 2026-05-30 節 (B: 整数射影 / `‖β‖²=e+1` / ~~Burnside (1.5.d)~~ / `nu↔coherence` 未組立; outright proof 不能のため証明書追加も見送り)。**Burnside (1.5.d) building block は 2026-05-30 解消** → `ColumnOrthogonality.lean` の `sumIrreducibleDegreeSq` (`Σ χ(1)²=|G|`) + `sumNontrivialIrreducibleDegreeSq` (`Σ_{χ≠1} χ(1)²=|G|−1`), AxiomsCheck clean
 - [ ] sub-issue: (7.9) 2-family non-orthogonality — 精密 spec + blocker は同ノート 2026-05-30 節 ((5.9) nu 接続; **disjoint-support inner=0 補題は 2026-05-30 解消** → `ClassFunction.inner_eq_zero_of_disjoint_support` (+ `innerSum_eq_zero_of_disjoint_support`); **`Odd card ⇒ ¬IsReal χ` も 2026-05-30 解消**)
 - [ ] sub-issue: (6.8) 本体 proof ((6.1)-(6.7), (5.2), (4.6) の積み上げ)
-- [ ] (7.10) 最終 assembly: (7.5)(7.8)(7.9)(6.8)+Thompson の連立 + 算術（counting/ratio, minimal-index, erased-sum arithmetic は 2026-06-02 までに実装済み）
+- [ ] (7.10) 最終 assembly: (7.5)(7.8)(7.9)(6.8)+Thompson の連立 + 算術（counting/ratio, minimal-index, erased-sum arithmetic, B-sum→displayed-bound bridge は 2026-06-02 までに実装済み）
 
 ## 完了条件
 
