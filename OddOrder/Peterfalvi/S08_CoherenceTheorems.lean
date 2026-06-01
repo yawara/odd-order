@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -219,6 +220,21 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   S_eq : S = {φ : ClassFunction ↥L ℂ | ∃ θ : IrreducibleCharacter ↥H,
     θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H ∧
     φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ)}
+  /-- Peterfalvi (6.8)(c): the configuration is one of two cases.
+
+  * **(c1)** `L` is a Frobenius group with kernel `H` and complement `W₁`.
+  * **(c2)** Hypothesis (4.6) holds — encoded by a `S06.CertainTypeHypothesis` on the *same* Dade
+    datum (`cert.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime and `W₂ ⊆ [H,H]`.
+
+  NB (faithfulness caveat): the (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H`
+  (hence `cert.K = H`). The c2 disjunct is stated with only the constraints the textbook makes
+  explicit; its faithfulness inherits that of `S06.CertainTypeHypothesis` as a model of (4.6),
+  whose `W₁ ⊔ W₂ = ⊤` field does not obviously reconcile with (4.6)'s `W₂ ⊂ H ⊂ K` — pending an
+  S06 audit (see `notes/peterfalvi/s08_6_8_assembly_plan.md`). -/
+  cases :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H W1 ∨
+    ∃ cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L,
+      cert.dade = dade ∧ cert.K = H ∧ (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆
 
 namespace SibleyDadeHypothesis
 
