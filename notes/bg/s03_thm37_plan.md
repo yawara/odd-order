@@ -40,6 +40,24 @@
   **最難の未整備ピース = chief factor を irreducible `𝔽_q[Ḡ]`-module へ橋渡し** (elementary abelian ≃ 𝔽_q ベクトル空間 + 共役作用 ≃ Representation + minimal normal ≃ irreducible)。explore 済 (S04e/同探索ログ参照)。
 - (3) induction: Lemma 3.1/3.2 (S03 済) + Lemma 3.3 (済) + Prop 1.2 (`ChiefFactor.isNilpotent_of_chief_factor_centralization` 済) + chief factor 機構で組立。
 
+### chief-factor-as-module bridge — 詳細ロードマップ (2026-06-01 探索済, 配置案 = 新 `OddOrder/GroupTheory/RepresentationTheory/ChiefFactorModule.lean`)
+
+**既存 infra (proven, sorry-free)**:
+- `IsElementaryAbelian.zmodModule` (`GroupTheory/PRank.lean:86`): elem-abelian `q`-群 → `Module (ZMod q) (Additive G)`。
+- mathlib `AddCommGroup.zmodModule` (`Algebra/Module/ZMod.lean:44`, `n•x=0 ∀x → Module (ZMod n)`) + `QuotientAddGroup.zmodModule` (:53)。
+- `IsChiefFactor.isMinimalNormal_map_quotient` (`ChiefFactor.lean:318`): chief factor → `Ch02.IsMinimalNormal (U.map (mk' V))`。
+- `IsChiefFactor.commutator_le_of_isSolvable` (`ChiefFactor.lean:370`): solvable chief factor `⁅U,U⁆≤V` (⇒ abelian)。
+- `invariantQuotientMulDistribMulAction` (`Ch06/FrobeniusActionTI.lean:136`): 不変正規部分群上の商に `MulDistribMulAction` を lift。
+- mathlib `Representation.ofModule` (`RepresentationTheory/Basic.lean`) + `Subrepresentation` (`Subrepresentation.lean`) + `IsIrreducible` = `IsSimpleModule k[G] ρ.asModule` (`Irreducible.lean`)。
+
+**未整備 (build, 依存順)**:
+1. (短) chief factor 商を `ZMod q`-module 化: `commutator_le_of_isSolvable` で abelian + `isPGroup`/exponent q → `zmodModule`。
+2. (中) 共役作用 → `(ZMod q)[Ḡ]`-module (ConjAct/`invariantQuotientMulDistribMulAction` 経由) → `Representation.ofModule`。`Representation.ofDistribMulAction` は **無い** ので `k[G]`-module を経由して `ofModule`。
+3. (**最難 ~50-70行**) **irreducible**: 不変部分 module ↔ `V` と `U` の間の正規部分群 の lattice duality (`map`/`comap` via `mk' V`)。`isMinimalNormal_map_quotient` で proper 無 → `IsIrreducible`。**最も load-bearing**。
+4. (短) Lemma 3.3 へ wire: `S03b.centralizer_ne_bot_of_nontrivial_kernel` に食わせる wrapper。
+
+**注意**: 探索 agent の signature は近似 (要 build 検証)。`Representation.ofModule` の `[Module k[G] M]` 構築が gate#2 の核。
+
 **残 partition の具体ルート (vector-level, MonoidAlgebra 係数計算を回避)**:
 `frobeniusGroup h : SubgroupPartition G` の `.parts = insert N (conjugatesFinset A)` (=K ∪ Rの共役;
 `frobeniusGroup` def @FrobeniusGroup.lean:619, `parts_card = |K|+1`)。
