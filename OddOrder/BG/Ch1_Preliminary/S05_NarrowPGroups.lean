@@ -129,7 +129,7 @@ theorem narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
 に対し `C_T(S)` は cyclic, `S ∩ R' = S ∩ T = 1`, かつ `C_R(S) = S × C_T(S)`。
 
 mmd L1859-1867。`C_T(S) = C_R(S) ⊓ T`。内部直積 `C_R(S)=S×C_T(S)` は
-`IsComplement' S (C_R(S)⊓T)` + `centralizer S = S ⊔ (C_R(S)⊓T)` で表す。 -/
+`S ⊓ T = ⊥` と `centralizer S = S ⊔ (C_R(S)⊓T)` で表す。 -/
 theorem narrow_centralizer_decomp [Finite R] {p : ℕ} [Fact p.Prime]
     (hp : Odd p) (hpg : IsPGroup p R) (h3 : 3 ≤ pRank R p) (hnarrow : IsNarrow p R)
     (S : Subgroup R) (hScard : Nat.card ↥S = p)

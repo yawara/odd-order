@@ -245,6 +245,9 @@ memory `scaffold-sorry-free-not-done` 厳守。以下は hard content を未充�
 位数 p の R₀ と cyclic R₁ で C_R(R₀)=R₀×R₁ となるものを持つ。 -/
 def IsNarrow (p : ℕ) (R : Type*) [Group R] : Prop :=
   pRank R p ≤ 2 ∨ ∃ R₀ R₁ : Subgroup R, Nat.card R₀ = p ∧ IsCyclic R₁ ∧
-    Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁ ∧ ... (内部直積条件)
+    R₀ ⊓ R₁ = ⊥ ∧ Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁
 ```
-(注: "no elem-ab of order p³" ⟺ `pRank R p ≤ 2` は Lem 4.7 で同値。定義に `pRank≤2` を採るか "no E_p³" を採るかは実装時判断。直積 `R₀×R₁` は `IsInternalDirectProduct` 的な条件で表現。Thm 5.3/Cor 5.4 が rank≥3 での同値刻画を与えるので、定義はこの素朴形で十分。)
+(注: "no elem-ab of order p³" ⟺ `pRank R p ≤ 2` は Lem 4.7 で同値。実装は素朴形
+`pRank≤2` を採る。直積 `R₀×R₁` は centralizer 内での `R₀ ⊓ R₁=⊥` と
+`C_R(R₀)=R₀⊔R₁` で表し、ambient `R` の complement を要求する `Subgroup.IsComplement'` は使わない。
+Thm 5.3/Cor 5.4 が rank≥3 での同値刻画を与えるので、定義はこの素朴形で十分。)
