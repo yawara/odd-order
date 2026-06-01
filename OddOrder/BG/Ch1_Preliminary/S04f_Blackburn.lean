@@ -609,6 +609,40 @@ private theorem omega1_large_not_isMulCommutative
     rw [hΩ_card, Nat.log_pow hp.one_lt]
   omega
 
+/-- The image of `Ω₁(H)` in an ambient group lies in `Ω₁(R)`. -/
+private theorem omega1_subgroup_map_le_omega1
+    {R : Type*} [Group R] {p : ℕ} (H : Subgroup R) :
+    (Omega H p 1).map H.subtype ≤ Omega R p 1 := by
+  rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+  intro g hg
+  change (g : R) ∈ Omega R p 1
+  refine Omega.mem_of_pow_eq_one ?_
+  rw [pow_one]
+  have hgp : (g : H) ^ p = 1 := by simpa [pow_one] using hg
+  exact congrArg Subtype.val hgp
+
+/-- For `S = Ω₁(R)` and `C = C_R(S)`, the image of `Ω₁(C)` lies in the ambient
+image of `Z(S)`. This is the formal `Ω₁(C) ≤ S ∩ C ≤ Z(S)` step in BG 4.16. -/
+private theorem omega1_centralizer_omega1_map_le_center_map
+    {R : Type*} [Group R] {p : ℕ} :
+    let S : Subgroup R := Omega R p 1
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    (Omega C p 1).map C.subtype ≤ (Subgroup.center S).map S.subtype := by
+  dsimp
+  intro x hx
+  have hxS : x ∈ Omega R p 1 :=
+    omega1_subgroup_map_le_omega1
+      (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) hx
+  have hxC : x ∈ Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R) := by
+    rcases hx with ⟨c, _hc, rfl⟩
+    exact c.2
+  refine ⟨⟨x, hxS⟩, ?_, rfl⟩
+  change ⟨x, hxS⟩ ∈ Subgroup.center (Omega R p 1)
+  rw [Subgroup.mem_center_iff]
+  intro y
+  apply (Omega R p 1).subtype_injective
+  simpa using hxC (y : R) y.2
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -642,6 +676,7 @@ theorem blackburnRankTwoClassification
     omega1_large_not_isMulCommutative hrank hΩ_card hΩ_pow
   have hΩ_exp : Monoid.exponent (Omega R p 1) = p :=
     exponent_eq_prime_of_card_prime_cube_and_pow_eq_one hΩ_card hΩ_pow
+  have hΩC_center := omega1_centralizer_omega1_map_le_center_map (R := R) (p := p)
   sorry
 
 end BlackburnClassification
