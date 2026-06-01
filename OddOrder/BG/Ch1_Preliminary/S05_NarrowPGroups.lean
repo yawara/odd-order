@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.GroupTheory.OpResidual
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §5: Narrow `p`-Groups
@@ -176,17 +179,27 @@ theorem solvableAut_of_narrow [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (
 
 /-! ## Theorem 5.6 / 5.7 — solvable group での narrow Sylow (mmd L1945-1967) -/
 
--- **TODO (BG Theorem 5.6)** — `hasPLengthOne` 述語 (foundation `PLength.lean`) 待ち。
--- faithful statement (mmd L1945-1953):
---   `G` solvable odd, `p ∈ π(G)`, `S` narrow Sylow `p`-subgroup。`r(S) ≥ 3` なら `G` が
---   p-length one (`G = O_{p',p,p'}(G)`) と仮定。すると:
---   (a) `p` は `|G/O_{p'}(G)|` の最大素因子;
---   (b) `p=3` または `p` が `|G|` の最小素因子なら `G` は normal `p`-complement を持つ;
---   (c) `G'` は normal `p`-complement を持つ;
---   (d) `G'` の任意の `p'`-subgroup は `O_{p'}(G')` に含まれる;
---   (e) `G/O_{p',p}(G)` は abelian `p'`-群。
--- proof: `r(S)≤2` で Thm 4.18, `r(S)≥3` で Thm 5.5 + Thm 4.18 の方法。
--- p-length-one 述語 (= `G = O_{p',p,p'}(G)`) が foundation で入り次第 statement 化する。
+/-- **BG Theorem 5.6**: `G` solvable odd, `p ∈ π(G)`, `S` を narrow Sylow `p`-subgroup と
+する。`r(S) ≥ 3` なら、さらに `G` が `p`-length one (`hasPLengthOne`) と仮定する。すると:
+
+* (a) `p` は `|G/O_{p'}(G)|` の最大素因子;
+* (b) `p = 3` または `p` が `|G|` の最小素因子なら、`G` は normal `p`-complement を持つ;
+* (c) `G'` は normal `p`-complement を持つ;
+* (d) `G'` の任意の `p'`-subgroup は `O_{p'}(G')` に含まれる;
+* (e) `G/O_{p',p}(G)` は abelian `p'`-群 (`p'` 部は `hasPLengthOne p G`)。
+
+mmd L1945-1953。`r(S)≤2` で Thm 4.18, `r(S)≥3` で Thm 5.5 + Thm 4.18 の方法。 -/
+theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
+    (S : Sylow p G) (hSnarrow : IsNarrow p ↥S)
+    (hpl : 3 ≤ pRank ↥S p → hasPLengthOne p G) :
+    (∀ q ∈ (Nat.card (G ⧸ Ch03.oPiCore {r | r ≠ p} G)).primeFactors, q ≤ p) ∧
+    ((p = 3 ∨ ∀ q ∈ (Nat.card G).primeFactors, p ≤ q) → Ch05.HasNormalPComplement p G) ∧
+    Ch05.HasNormalPComplement p ↥(commutator G) ∧
+    (∀ K : Subgroup ↥(commutator G), Subgroup.IsPiSubgroup {r | r ≠ p} K →
+      K ≤ Ch03.oPiCore {r | r ≠ p} ↥(commutator G)) ∧
+    ((∀ x y : G ⧸ Ch03.oPiPrimePiCore {p} G, x * y = y * x) ∧ hasPLengthOne p G) := by
+  sorry
 
 /-- **BG Theorem 5.7**: `G` solvable odd, `p ∈ π(G)`, `E` を `F(G)` の elem-ab `p`-subgroup と
 し、`r(C_{F(G)}(E)) ≤ 2` を仮定。すると `G' ⊆ F(G)`。
