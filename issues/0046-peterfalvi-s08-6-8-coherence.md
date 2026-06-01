@@ -1359,11 +1359,13 @@ axiom-clean, AxiomsCheck 登録)**:
 - (6.8) proof は `sibleySetup_is_coherent` (S08:251) を埋める作業。task DAG (T0–T11) + 全 spec の
   **正本 = `notes/peterfalvi/s08_6_8_assembly_plan.md`** (§A 6.34 / §B-C T1 / §D T6)。
 - **T6 (Y coherent) の律速** = `inertia(θ)=H` (W₁ が Irr(H)∖{1} に自由作用、6.34 の前提)。精査結果:
-  repo `brauer_permutation_lemma'` は **inversion 専用**、一般版 `brauer_permutation_lemma`
-  (BrauerPermutation.lean:264) に **W₁-共役 permutation を instantiate** する新 infra が必要 (群レベル
-  自由作用は Frobenius `FrobeniusActionTI` で既存 → Irr レベルへの Brauer bridge が残)。
+  repo `brauer_permutation_lemma'` は **inversion 専用**だったが、2026-06-02 までに一般版 Layer A と
+  conjugation 実体化 Layer B (`ConjugationBrauer.lean`: `IrreducibleCharacter.conjByPerm`,
+  `ConjClasses.conjByPerm`, `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`) が landed。
+  群レベル自由作用は Frobenius `FrobeniusActionTI` で既存なので、残る Irr レベル bridge は
+  **Layer C: fixed conjugacy classes が単位類のみ ⇒ nontrivial Irr は固定されない ⇒ inertia=H**。
   **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
-- 次セッション推奨: **general Brauer for conjugation を独立タスク**として立てる (これが立てば 6.34 +
+- 次セッション推奨: issue 0053 Layer C を進める (これが立てば 6.34 +
   index_H_eq_card_W1 + difference-support engine で T6 完成 → T7/T8/T9–T11)。
 
 ### 並行可能な独立 leaf (6.34/Brauer 非依存、`s08_6_8_assembly_plan.md` C 表)
