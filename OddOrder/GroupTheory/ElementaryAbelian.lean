@@ -530,6 +530,62 @@ theorem IsElementaryAbelian.of_map {p : ℕ} {N : Type*} [Group N] {H : Subgroup
   OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
     (Subgroup.equivMapOfInjective H f hf).symm hH
 
+/-- The join of two elementary abelian subgroups is elementary abelian when the two
+subgroups centralize each other. -/
+theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
+    (hH : H.IsElementaryAbelian p) (hK : K.IsElementaryAbelian p)
+    (hHK : H ≤ Subgroup.centralizer (K : Set G)) :
+    (H ⊔ K).IsElementaryAbelian p := by
+  let S : Set G := (H : Set G) ∪ (K : Set G)
+  have hsup_closure : H ⊔ K = Subgroup.closure S := by
+    dsimp [S]
+    rw [Subgroup.closure_union, H.closure_eq, K.closure_eq]
+  have hgen_comm : ∀ x ∈ S, ∀ y ∈ S, x * y = y * x := by
+    intro x hx y hy
+    rcases hx with hxH | hxK
+    · rcases hy with hyH | hyK
+      · exact congrArg Subtype.val (hH.comm ⟨x, hxH⟩ ⟨y, hyH⟩)
+      · exact (hHK hxH y hyK).symm
+    · rcases hy with hyH | hyK
+      · exact hHK hyH x hxK
+      · exact congrArg Subtype.val (hK.comm ⟨x, hxK⟩ ⟨y, hyK⟩)
+  have hclosure_comm : IsMulCommutative (Subgroup.closure S) :=
+    Subgroup.isMulCommutative_closure hgen_comm
+  refine ⟨?_, ?_⟩
+  · intro x y
+    have hx : (x : G) ∈ Subgroup.closure S := by
+      rw [← hsup_closure]
+      exact x.2
+    have hy : (y : G) ∈ Subgroup.closure S := by
+      rw [← hsup_closure]
+      exact y.2
+    letI : IsMulCommutative (Subgroup.closure S) := hclosure_comm
+    apply Subtype.ext
+    change (x : G) * (y : G) = (y : G) * (x : G)
+    simpa using congrArg (fun z : Subgroup.closure S => (z : G))
+      (mul_comm (⟨(x : G), hx⟩ : Subgroup.closure S) ⟨(y : G), hy⟩)
+  · intro x
+    have hx : (x : G) ∈ Subgroup.closure S := by
+      rw [← hsup_closure]
+      exact x.2
+    apply Subtype.ext
+    change ((x : G) ^ p = 1)
+    refine Subgroup.closure_induction (p := fun g _ => g ^ p = 1) ?_ ?_ ?_ ?_ hx
+    · intro g hg
+      rcases hg with hgH | hgK
+      · exact congrArg Subtype.val (hH.pow_eq_one ⟨g, hgH⟩)
+      · exact congrArg Subtype.val (hK.pow_eq_one ⟨g, hgK⟩)
+    · simp
+    · intro a b ha hb hap hbp
+      letI : IsMulCommutative (Subgroup.closure S) := hclosure_comm
+      have hab_eq : a * b = b * a := by
+        exact congrArg Subtype.val
+          (mul_comm (⟨a, ha⟩ : Subgroup.closure S) ⟨b, hb⟩)
+      have hab : Commute a b := hab_eq
+      rw [hab.mul_pow p, hap, hbp, one_mul]
+    · intro a ha hap
+      simpa [inv_pow] using congrArg Inv.inv hap
+
 /-- An elementary abelian subgroup of order `p^2` contains two distinct ambient subgroups of
 order `p`. -/
 theorem exists_distinct_subgroups_card_prime_of_isElementaryAbelian_card_prime_sq

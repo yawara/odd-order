@@ -124,6 +124,32 @@ theorem exists_normal_isElementaryAbelian_card_prime_cube_of_scn3
     exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hB_le_H) hB_sub_elem
   exact ⟨B, hB_normal, hB_elem, hB_card⟩
 
+/-- **BG Lemma 5.1(b), `B* = E C_B(E)` support**: if `E` and `B` are normal
+elementary abelian `p`-subgroups, then the Lean encoding
+`E ⊔ (B ⊓ C_R(E))` of the textbook product `E C_B(E)` is again normal and elementary
+abelian. -/
+theorem bStar_normal_isElementaryAbelian_of_normal_isElementaryAbelian
+    {p : ℕ} {E B : Subgroup R} [E.Normal] [B.Normal]
+    (hE : E.IsElementaryAbelian p) (hB : B.IsElementaryAbelian p) :
+    (E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))).Normal ∧
+      (E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))).IsElementaryAbelian p := by
+  constructor
+  · haveI : (Subgroup.centralizer (E : Set R)).Normal := Subgroup.normal_centralizer
+    infer_instance
+  · let K : Subgroup R := B ⊓ Subgroup.centralizer (E : Set R)
+    have hK_le_B : K ≤ B := by
+      dsimp [K]
+      exact inf_le_left
+    have hK_elem : K.IsElementaryAbelian p := by
+      have hK_sub_elem : (K.subgroupOf B).IsElementaryAbelian p :=
+        hB.to_subgroup (K.subgroupOf B)
+      exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe hK_le_B) hK_sub_elem
+    have hE_le_cent_K : E ≤ Subgroup.centralizer (K : Set R) := by
+      dsimp [K]
+      exact Subgroup.le_centralizer_iff.mpr inf_le_right
+    exact Subgroup.IsElementaryAbelian.sup_of_le_centralizer hE hK_elem hE_le_cent_K
+
 /-- **BG Lemma 5.1(b)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。`E ∈ ℰ²(R)` (elem-ab,
 位数 `p²`) かつ `E ⊴ R` ⇒ `E` は `SCN₃(R)` のある元に含まれる。
 
