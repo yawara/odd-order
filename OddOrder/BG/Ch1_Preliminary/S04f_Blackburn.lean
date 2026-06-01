@@ -1214,6 +1214,51 @@ private theorem blackburn_noncentral_centralizer_relations
         intro s hsS
         exact congrArg Subtype.val ((Subgroup.mem_center_iff.mp hz_center) ⟨s, hsS⟩)
 
+/-- Blackburn 4.16 Case B-2: the image `TC/C` in `R/C`, where
+`C = C_R(S)`, has order `p` and lies in `Ω₁(R/C)`. -/
+private theorem blackburn_noncentral_commutator_map_centralizer_card_and_omega
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p)
+    (hT_quot_cards :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      let Z : Subgroup R := (Subgroup.center S).map S.subtype
+      Nat.card (S ⧸ T.subgroupOf S) = p ∧ Nat.card (T ⧸ Z.subgroupOf T) = p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    Nat.card (T.map (QuotientGroup.mk' C)) = p ∧
+      T.map (QuotientGroup.mk' C) ≤ Omega (R ⧸ C) p 1 := by
+  dsimp at hT_facts hT_elem hT_quot_cards ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+  have hTC_eq_Z : T ⊓ C = Z := hrelations.2.2
+  have hCsubT_eq_ZsubT : C.subgroupOf T = Z.subgroupOf T := by
+    rw [← Subgroup.inf_subgroupOf_right C T, inf_comm, hTC_eq_Z]
+  have hTmap_card : Nat.card (T.map (QuotientGroup.mk' C)) = p := by
+    rw [← Subgroup.nat_card_quotient_subgroupOf_eq_card_map C T,
+      hCsubT_eq_ZsubT, hT_quot_cards.2]
+  have hTmap_omega : T.map (QuotientGroup.mk' C) ≤ Omega (R ⧸ C) p 1 := by
+    rintro q ⟨t, htT, rfl⟩
+    refine Omega.mem_of_pow_eq_one ?_
+    rw [pow_one]
+    rw [← map_pow]
+    change QuotientGroup.mk' C (t ^ p) = 1
+    have ht_pow : t ^ p = 1 := congrArg Subtype.val (hT_elem.pow_eq_one ⟨t, htT⟩)
+    rw [ht_pow, map_one]
+  exact ⟨hTmap_card, hTmap_omega⟩
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1392,6 +1437,9 @@ theorem blackburnRankTwoClassification
     have hSC_top :=
       blackburn_noncentral_omega1_sup_centralizer_eq_top hR hT_facts hT_elem
     have hCDT_relations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+    have hTC_map :=
+      blackburn_noncentral_commutator_map_centralizer_card_and_omega
+        hT_facts hT_elem hT_quot_cards
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
