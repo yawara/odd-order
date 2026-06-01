@@ -918,6 +918,32 @@ private theorem blackburn_noncentral_commutator_facts
   exact ⟨hcenter_lt_T, hT_lt_S,
     card_eq_prime_sq_of_pgroup_card_gt_prime_lt_cube hT_pg hp_lt_T hT_card_lt_cube⟩
 
+/-- In Blackburn 4.16 Case B-2, `T = [S,R]` is elementary abelian once
+`Z(S) < T < S = Ω₁(R)` and `|T| = p²` are known. -/
+private theorem blackburn_noncentral_commutator_isElementaryAbelian
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    T.IsElementaryAbelian p := by
+  dsimp at hT_facts ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  have hT_le_S : T ≤ S := hT_facts.2.1.le
+  have hT_comm : ∀ x y : T, x * y = y * x :=
+    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hT_facts.2.2
+  refine ⟨hT_comm, ?_⟩
+  intro x
+  have hxpow : (⟨(x : R), hT_le_S x.2⟩ : S) ^ p = 1 :=
+    hΩ_pow ⟨(x : R), hT_le_S x.2⟩
+  ext
+  change (x : R) ^ p = 1
+  exact congrArg Subtype.val hxpow
+
 /-- The final congruence contradiction in Blackburn 4.16 Case B-2.
 
 BG obtains `jk ≡ i` and `ij ≡ k`, with `i ≠ 0`, while the odd-order action gives
@@ -980,6 +1006,7 @@ theorem blackburnRankTwoClassification
   · exact Or.inr (blackburnCentralProductCase_of_omega1_commutator_le_center
       hp_odd hR hΩ_card hΩ_pow hΩ_noncomm hΩ_exp hΩ_extraspecial hSR)
   · have hT_facts := blackburn_noncentral_commutator_facts hR hΩ_card hΩ_extraspecial hSR
+    have hT_elem := blackburn_noncentral_commutator_isElementaryAbelian hΩ_pow hT_facts
     sorry
 
 end BlackburnClassification
