@@ -446,6 +446,85 @@ def BlackburnCentralProductCase (p : ℕ) (R : Type*) [Group R] : Prop :=
       (Omega ↥R₂ p 1).map R₂.subtype =
         (_root_.commutator ↥R₁).map R₁.subtype
 
+/-- Nontriviality bridge for Blackburn 4.16: if `[R,A]=R` and `R ≠ 1`, then the image
+of the operator group supplies a prime divisor common to `|A|` and `|Aut R|`. -/
+private theorem exists_prime_dvd_actor_and_aut_of_actionCommutator_eq_top
+    {R : Type*} [Group R] [Finite R] [Nontrivial R]
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤) :
+    ∃ q : ℕ, q.Prime ∧ q ∣ Nat.card A ∧ q ∣ Nat.card (MulAut R) := by
+  have hφ_range_ne_bot : φ.range ≠ (⊥ : Subgroup (MulAut R)) := by
+    intro hφ_range_bot
+    have htriv : ∀ a : A, ∀ g : R, (φ a) g = g := by
+      intro a g
+      have ha : φ a ∈ φ.range := ⟨a, rfl⟩
+      rw [hφ_range_bot] at ha
+      have hφa : φ a = 1 := Subgroup.mem_bot.mp ha
+      rw [hφa]
+      rfl
+    have hcomm_bot : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+      (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially φ).mpr htriv
+    have htop_bot : (⊤ : Subgroup R) = ⊥ := by rw [← hRA, hcomm_bot]
+    exact (top_ne_bot : (⊤ : Subgroup R) ≠ ⊥) htop_bot
+  have hcard_ne_one : Nat.card φ.range ≠ 1 := fun hcard =>
+    hφ_range_ne_bot (Subgroup.card_eq_one.mp hcard)
+  obtain ⟨q, hq, hq_dvd_range⟩ := Nat.exists_prime_and_dvd hcard_ne_one
+  exact ⟨q, hq, hq_dvd_range.trans (Subgroup.card_range_dvd φ),
+    hq_dvd_range.trans (Subgroup.card_subgroup_dvd_card φ.range)⟩
+
+/-- The first conclusion of Blackburn 4.16. BG derives `p > 3` immediately from
+Lemma 4.13/4.14: a nontrivial odd `p'` operator image provides an odd prime
+`q ≠ p` dividing `|Aut R|`; when `p = 3`, Lemma 4.14 forces `q ∣ 2` or `q ∣ 1`. -/
+private theorem three_lt_of_odd_coprime_actionCommutator_top_rank_le_two
+    {R : Type*} [Group R] [Finite R] [Nontrivial R]
+    {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
+    (hrank : pRank R p ≤ 2)
+    (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤)
+    (hAodd : Odd (Nat.card A)) :
+    3 < p := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨q, hq, hq_dvd_A, hq_dvd_aut⟩ :=
+    exists_prime_dvd_actor_and_aut_of_actionCommutator_eq_top (φ := φ) hRA
+  have hp_dvd_R : p ∣ Nat.card R := by
+    rcases hR.card_eq_or_dvd with hcard | hdvd
+    · have hR_card_gt_one : 1 < Nat.card R :=
+        Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+      omega
+    · exact hdvd
+  have hq_ne_p : q ≠ p := by
+    intro hqp
+    have hp_dvd_A : p ∣ Nat.card A := by simpa [hqp] using hq_dvd_A
+    exact (Nat.not_coprime_of_dvd_of_dvd hp.one_lt hp_dvd_A hp_dvd_R) hcop
+  have hq_ne_two : q ≠ 2 := by
+    intro hq2
+    have h2_dvd_A : 2 ∣ Nat.card A := by simpa [hq2] using hq_dvd_A
+    exact (Nat.not_even_iff_odd.mpr hAodd) (even_iff_two_dvd.mpr h2_dvd_A)
+  by_contra hp_not_three_lt
+  have hp_ne_two : p ≠ 2 := by
+    intro hp2
+    rw [hp2] at hp_odd
+    rcases hp_odd with ⟨k, hk⟩
+    omega
+  have hp_eq_three : p = 3 := by
+    have hp_ge_two : 2 ≤ p := hp.two_le
+    omega
+  have hSCN : ∀ B : Subgroup R, ¬ IsSCN₃ p B :=
+    scn3_empty_of_pRank_le_two hrank
+  have hhalf :=
+    dvd_half_prime_add_or_sub_of_prime_dvd_aut_of_scn3_empty
+      (R := R) (p := p) (q := q) hp_odd hR hSCN hq hq_ne_p hq_dvd_aut
+  rw [hp_eq_three] at hhalf
+  norm_num at hhalf
+  rcases hhalf with hq_dvd_two | hq_dvd_one
+  · have hq_eq_two : q = 2 := by
+      rcases (Nat.dvd_prime Nat.prime_two).mp hq_dvd_two with hq_one | hq_two
+      · exact absurd hq_one hq.one_lt.ne'
+      · exact hq_two
+    exact hq_ne_two hq_eq_two
+  · exact hq.ne_one hq_dvd_one
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -456,8 +535,8 @@ cyclic, and `Ω₁(R₂)=R₁'`.
 
 In Lean, because `R` is a `p`-group, BG's rank hypothesis `r(R) ≤ 2` is represented
 as `pRank R p ≤ 2`; see the §4C comments above `scn3_empty_of_pRank_le_two`.
-The proof is intentionally still `sorry`: this declaration makes the missing
-Blackburn apex visible to the mainline `sorry` census and downstream dependencies. -/
+The `p > 3` component is discharged from Lemma 4.14; the remaining `sorry` is only the
+abelian/central-product classification branch. -/
 theorem blackburnRankTwoClassification
     {R : Type*} [Group R] [Finite R] [Nontrivial R]
     {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
@@ -467,6 +546,8 @@ theorem blackburnRankTwoClassification
     (hRA : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤)
     (hAodd : Odd (Nat.card A)) :
     3 < p ∧ (IsMulCommutative R ∨ BlackburnCentralProductCase p R) := by
+  refine ⟨three_lt_of_odd_coprime_actionCommutator_top_rank_le_two
+    hp_odd hR hcop hrank hRA hAodd, ?_⟩
   sorry
 
 end BlackburnClassification
