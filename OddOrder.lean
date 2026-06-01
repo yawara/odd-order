@@ -73,6 +73,7 @@ import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
