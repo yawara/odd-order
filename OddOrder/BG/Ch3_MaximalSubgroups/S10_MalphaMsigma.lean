@@ -1,0 +1,102 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.Ch1_Preliminary.PLength
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.GroupTheory.MaximalSubgroup
+import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.NarrowPGroup
+
+/-!
+# BG §10: The Subgroups `M_α` and `M_σ`
+
+**スコープ**: Bender–Glauberman, _Local Analysis for the Odd Order Theorem_
+(LMS LNS 188, 1994), Chapter III §10 (pp. 66-76), mmd `references/bg/local-analysis.mmd`
+L2637-2912, **14 結果** (Thm 10.1/10.2/10.6 + Cor 10.7/10.9 + Lem 10.3/10.4/10.5/10.8/10.12/10.13
++ Prop 10.10/10.11/10.14)。
+
+§10 は Uniqueness Theorem (§9) の内部構造への帰結。maximal subgroup `M` の **prime 集合**
+`σ(M)/α(M)/β(M)` と対応する **Hall 部分群** `M_σ/M_α/M_β` を定義し (本ファイルの定義層)、`M_σ` が
+`G` の Hall 部分群で `M/M_σ` の rank ≤ 2 (Thm 10.2)、`M` は全 `p` で p-length one (Thm 10.6) 等を示す。
+Ch3 (§11–§13) と Ch4 全体がこの定義層に依存する。
+
+## 定義 (BG → repo, mmd L2643-2647)
+
+- `idealPrime p G` (p が *ideal*): `r_p(G) ≥ 3` かつ 全 Sylow `p` で `ℰ²(P)∩ℰ*(P) = ∅`。
+- `alpha M` = `α(M) = {p ∈ π(M) | r_p(M) ≥ 3}`; `beta M` = `{p ∈ α(M) | p ideal}`;
+  `sigma M` = `{p ∈ π(M) | ∃ Sylow_p P of M, N_G(P) ⊆ M}`。
+- `Malpha/Mbeta/Msigma M` = `O_{α/β/σ(M)}(M)` (`Ch2.S07.opiCoreInG`);
+  `Fsigma/Fsigma' M` = `O_{σ(M)/σ'}(F(M))`。
+- `r_p` = `pRank ↥· p`; `r` = `rank ↥·`; `M'` = `Ch2.S07.derivedInG M`;
+  `F(M)` = `Ch2.S08.fittingInG M`。
+- 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
+
+## このコミットの範囲
+
+**定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') + Thm 10.6** を faithful に配置。残り 13 結果
+(10.1/10.2/10.3/10.4/10.5/10.7–10.14; 多くが多部分・一部 PDF 回収要) は後続。proof は §9 Uniqueness
++ §7 Transitivity + §6 Lem 6.3/6.6 + §4 Thm 4.18/4.20 + Thm 3.6 に依存 (foundation-first)。
+-/
+
+namespace OddOrder.BG.Ch3.S10
+
+open OddOrder.GroupTheory
+open OddOrder.Isaacs
+
+variable {G : Type*} [Group G]
+
+/-! ## §10 定義層 (mmd L2643-2647) -/
+
+/-- **BG ideal prime** (mmd L2643): `p` が *ideal* とは、`r_p(G) ≥ 3` かつ 全シロー `p`-部分群 `P`
+で `ℰ²(P) ∩ ℰ*(P) = ∅` (位数 `p²` の極大 elem-ab 部分群が無い) こと。Thm 5.3 により「`G` の
+Sylow `p` が narrow でない」と同値だが、定義としては BG の literal 形を採る。 -/
+def idealPrime (p : ℕ) (G : Type*) [Group G] : Prop :=
+  3 ≤ pRank G p ∧
+    ∀ P : Sylow p G, ¬ ∃ A : Subgroup ↥(P : Subgroup G),
+      Nat.card ↥A = p ^ 2 ∧ IsMaximalElementaryAbelian p A
+
+/-- **BG `α(M)`** (mmd L2647): `{p ∈ π(M) | r_p(M) ≥ 3}`。 -/
+def alpha (M : Subgroup G) : Set ℕ :=
+  {p | p ∈ (Nat.card ↥M).primeFactors ∧ 3 ≤ pRank ↥M p}
+
+/-- **BG `β(M)`** (mmd L2647): `{p ∈ α(M) | p ideal}`。 -/
+def beta (M : Subgroup G) : Set ℕ :=
+  {p | p ∈ alpha M ∧ idealPrime p G}
+
+/-- **BG `σ(M)`** (mmd L2647): `{p ∈ π(M) | あるシロー p-部分群 P of M で N_G(P) ⊆ M}`。 -/
+def sigma (M : Subgroup G) : Set ℕ :=
+  {p | p ∈ (Nat.card ↥M).primeFactors ∧
+    ∃ P : Sylow p ↥M, Subgroup.normalizer ((P : Subgroup ↥M).map M.subtype) ≤ M}
+
+/-- **BG `M_α = O_{α(M)}(M)`**。 -/
+noncomputable def Malpha (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (alpha M) M
+
+/-- **BG `M_β = O_{β(M)}(M)`**。 -/
+noncomputable def Mbeta (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (beta M) M
+
+/-- **BG `M_σ = O_{σ(M)}(M)`**。 -/
+noncomputable def Msigma (M : Subgroup G) : Subgroup G := Ch2.S07.opiCoreInG (sigma M) M
+
+/-- **BG `F_σ(M) = O_{σ(M)}(F(M))`**。 -/
+noncomputable def Fsigma (M : Subgroup G) : Subgroup G :=
+  Ch2.S07.opiCoreInG (sigma M) (Ch2.S08.fittingInG M)
+
+/-- **BG `F_{σ'}(M) = O_{σ(M)'}(F(M))`**。 -/
+noncomputable def Fsigma' (M : Subgroup G) : Subgroup G :=
+  Ch2.S07.opiCoreInG (sigma M)ᶜ (Ch2.S08.fittingInG M)
+
+/-! ## Theorem 10.6 — proper subgroup は p-length one (mmd L2779) -/
+
+/-- **BG Theorem 10.6** (mmd L2779): `p` prime、`H` を `G` の真部分群とすると、`H` は `p`-length
+one を持つ。`M ∈ ℳ(H)` を取り `M` で示す: `r_p(M) ≤ 2` は Thm 4.18、`≥ 3` は Thm 10.2 +
+Lem 6.3/10.4 + Thm 3.6。 -/
+theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    (H : Subgroup G) (hH : H < ⊤) :
+    Ch1.hasPLengthOne p ↥H := by
+  sorry
+
+end OddOrder.BG.Ch3.S10
