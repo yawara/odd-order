@@ -49,7 +49,12 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
     `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`。
 - [ ] **Layer C — free action ⟹ inertia=H**:
   - `conjClassPerm g` は単位類固定; `g∉H`+free `C_L(h)≤H` ⟹ 単位類のみ固定 ⟹ `#fix=1`
-  - ⟹ `#fix(conjByPermIrr g)=1` ⟹ 自明指標のみ ⟹ `inertia_eq_of_freeAction` (θ≠1 ⟹ `inertia θ = H`)
+  - ✅ 2026-06-02 partial: `conjByPerm_trivialIrreducibleCharacter`,
+    `fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one`,
+    `conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one`,
+    `not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one` を追加。
+  - 残: 群論側 free action から `Nat.card (Function.fixedPoints (ConjClasses.conjByPerm g)) = 1` を作り、
+    `inertia_eq_of_freeAction` (θ≠1 ⟹ `inertia θ = H`) に束ねる。
 - [ ] **Layer D — wiring** (T6 proper / 別 commit): free-action を Frobenius (case c1) 等から放電し
   6.34 + `index_H_eq_card_W1` + difference-support engine で `Y` coherent。
 

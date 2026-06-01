@@ -1362,8 +1362,9 @@ axiom-clean, AxiomsCheck 登録)**:
   repo `brauer_permutation_lemma'` は **inversion 専用**だったが、2026-06-02 までに一般版 Layer A と
   conjugation 実体化 Layer B (`ConjugationBrauer.lean`: `IrreducibleCharacter.conjByPerm`,
   `ConjClasses.conjByPerm`, `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`) が landed。
-  群レベル自由作用は Frobenius `FrobeniusActionTI` で既存なので、残る Irr レベル bridge は
-  **Layer C: fixed conjugacy classes が単位類のみ ⇒ nontrivial Irr は固定されない ⇒ inertia=H**。
+  群レベル自由作用は Frobenius `FrobeniusActionTI` で既存。Layer C のうち
+  **fixed conjugacy classes count = 1 ⇒ nontrivial Irr は固定されない** は 2026-06-02 に landed。
+  残る bridge は、群論側 free action から fixed conjugacy classes count = 1 を出して `inertia=H` に束ねる部分。
   **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
 - 次セッション推奨: issue 0053 Layer C を進める (これが立てば 6.34 +
   index_H_eq_card_W1 + difference-support engine で T6 完成 → T7/T8/T9–T11)。

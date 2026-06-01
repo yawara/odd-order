@@ -100,4 +100,55 @@ theorem card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm
     (ConjClasses.conjByPerm (G := G) (H := H) g)
     (characterTableEntry_conjByPerm (G := G) (H := H) g)
 
+@[simp] theorem conjByPerm_trivialIrreducibleCharacter (g : G) :
+    IrreducibleCharacter.conjByPerm (G := G) (H := H) g
+        (trivialIrreducibleCharacter H) = trivialIrreducibleCharacter H := by
+  apply IrreducibleCharacter.ext
+  ext h
+  simp [IrreducibleCharacter.conjByPerm]
+
+/-- If the conjugation permutation fixes exactly one conjugacy class, any fixed irreducible
+character is the trivial character. -/
+theorem fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one [Finite H]
+    (g : G)
+    (hclass : Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g)) = 1)
+    {θ : IrreducibleCharacter H}
+    (hθ : IrreducibleCharacter.conjByPerm (G := G) (H := H) g θ = θ) :
+    θ = trivialIrreducibleCharacter H := by
+  have hirr_card :
+      Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := G) (H := H) g)) = 1 :=
+    (card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm
+      (G := G) (H := H) g).trans hclass
+  have hsub :
+      Subsingleton (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := G) (H := H) g)) :=
+    (Nat.card_eq_one_iff_unique.mp hirr_card).1
+  let θfix : Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := G) (H := H) g) :=
+    ⟨θ, hθ⟩
+  let onefix : Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := G) (H := H) g) :=
+    ⟨trivialIrreducibleCharacter H,
+      conjByPerm_trivialIrreducibleCharacter (G := G) (H := H) g⟩
+  exact congrArg Subtype.val (Subsingleton.elim θfix onefix)
+
+/-- Contrapositive form: under the same one-fixed-class hypothesis, a nontrivial irreducible
+character is not fixed by the conjugation permutation. -/
+theorem conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one [Finite H]
+    (g : G)
+    (hclass : Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g)) = 1)
+    {θ : IrreducibleCharacter H} (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    IrreducibleCharacter.conjByPerm (G := G) (H := H) g θ ≠ θ := by
+  intro hfix
+  exact hθ_ne (fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one
+    (G := G) (H := H) g hclass hfix)
+
+/-- Inertia form of the one-fixed-class bridge. -/
+theorem not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one [Finite H]
+    (g : G)
+    (hclass : Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g)) = 1)
+    {θ : IrreducibleCharacter H} (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    g ∉ IrreducibleCharacter.inertia (G := G) (H := H) θ := by
+  intro hg
+  rw [IrreducibleCharacter.mem_inertia] at hg
+  exact conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one
+    (G := G) (H := H) g hclass hθ_ne (by simpa using hg)
+
 end OddOrder.RepresentationTheory
