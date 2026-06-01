@@ -1571,6 +1571,47 @@ lemma mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp
     g ∈ F.L i :=
   F.isTI i g ⟨x, hx, hconj⟩
 
+/-- Conjugate images of `H_i^#` are equal when the conjugators differ by
+an element of `L_i = N_G(H_i)`. -/
+lemma kernel_sharp_conj_image_eq_of_inv_mul_mem_L
+    (F : FrobeniusFamily G k) (i : Fin k) {g h : G}
+    (hmem : h⁻¹ * g ∈ F.L i) :
+    ((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1})) =
+      ((fun x : G => h * x * h⁻¹) '' ((F.H i : Set G) \ {1})) := by
+  ext x
+  constructor
+  · rintro ⟨a, ha, rfl⟩
+    refine ⟨(h⁻¹ * g) * a * (h⁻¹ * g)⁻¹, ?_, ?_⟩
+    · exact (F.mem_kernel_sharp_conj_iff_of_mem_L i hmem).mpr ha
+    · group
+  · rintro ⟨a, ha, rfl⟩
+    refine ⟨(h⁻¹ * g)⁻¹ * a * (h⁻¹ * g), ?_, ?_⟩
+    · have hinv : (h⁻¹ * g)⁻¹ ∈ F.L i := (F.L i).inv_mem hmem
+      simpa using (F.mem_kernel_sharp_conj_iff_of_mem_L i hinv).mpr ha
+    · group
+
+/-- Distinct `L_i`-cosets give disjoint conjugate images of `H_i^#`. -/
+lemma disjoint_kernel_sharp_conj_image_of_inv_mul_notMem_L
+    (F : FrobeniusFamily G k) (i : Fin k) {g h : G}
+    (hnot : h⁻¹ * g ∉ F.L i) :
+    Disjoint ((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1}))
+      ((fun x : G => h * x * h⁻¹) '' ((F.H i : Set G) \ {1})) := by
+  rw [Set.disjoint_left]
+  rintro x ⟨a, ha, rfl⟩ ⟨b, hb, hb_eq⟩
+  have hconj : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ ∈ (F.H i : Set G) \ {1} := by
+    have hb_eq' : h * b * h⁻¹ = g * a * g⁻¹ := by
+      simpa only using hb_eq
+    have hab0 : h⁻¹ * (g * a * g⁻¹) * h = b := by
+      rw [← hb_eq']
+      group
+    have hab : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = b := by
+      calc
+        (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = h⁻¹ * (g * a * g⁻¹) * h := by group
+        _ = b := hab0
+    rw [hab]
+    exact hb
+  exact hnot (F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i ha hconj)
+
 /-- A centralizer of a nonidentity kernel element is contained in the corresponding
 normalizer L_i. -/
 lemma centralizer_le_L_of_mem_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
