@@ -1162,6 +1162,58 @@ private theorem blackburn_noncentral_omega1_sup_centralizer_eq_top
   rw [sup_comm]
   exact hCS_top
 
+/-- Blackburn 4.16 Case B-2 centralizer relations.  With
+`S = Ω₁(R)`, `T = [S,R]`, `C = C_R(S)`, and `D = C_R(T)`, we have
+`C ≤ D`, `T ≤ D`, and `T ∩ C = Z(S)` (embedded in `R`). -/
+private theorem blackburn_noncentral_centralizer_relations
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    let D : Subgroup R := Subgroup.centralizer (T : Set R)
+    let Z : Subgroup R := (Subgroup.center S).map S.subtype
+    C ≤ D ∧ T ≤ D ∧ T ⊓ C = Z := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  have hT_le_S : T ≤ S := hT_facts.2.1.le
+  refine ⟨?_, ?_, ?_⟩
+  · intro c hcC
+    rw [Subgroup.mem_centralizer_iff] at hcC ⊢
+    intro t htT
+    exact hcC t (hT_le_S htT)
+  · intro t htT
+    rw [Subgroup.mem_centralizer_iff]
+    intro u huT
+    exact congrArg Subtype.val (hT_elem.1 ⟨u, huT⟩ ⟨t, htT⟩)
+  · apply le_antisymm
+    · intro x hx
+      have hxS : x ∈ S := hT_le_S hx.1
+      refine ⟨⟨x, hxS⟩, ?_, rfl⟩
+      change ⟨x, hxS⟩ ∈ Subgroup.center S
+      rw [Subgroup.mem_center_iff]
+      intro s
+      apply S.subtype_injective
+      exact hx.2 (s : R) s.2
+    · rintro x ⟨z, hz_center, rfl⟩
+      constructor
+      · exact hT_facts.1.le ⟨z, hz_center, rfl⟩
+      · change (z : R) ∈ C
+        rw [Subgroup.mem_centralizer_iff]
+        intro s hsS
+        exact congrArg Subtype.val ((Subgroup.mem_center_iff.mp hz_center) ⟨s, hsS⟩)
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1339,6 +1391,7 @@ theorem blackburnRankTwoClassification
       blackburn_noncentral_centralizer_quotient_card_eq_prime hR hT_facts hT_elem
     have hSC_top :=
       blackburn_noncentral_omega1_sup_centralizer_eq_top hR hT_facts hT_elem
+    have hCDT_relations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
