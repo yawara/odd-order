@@ -213,4 +213,62 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
     pRank ↥M p = 2 ∧ ¬ idealPrime p G ∧ ∃ A ∈ elemAbelianOfRank G p 2, X ≤ A := by
   sorry
 
+/-! ## Lemma 10.4 — α(M) の判定 (mmd MISSING_PAGE, PDF p.87) -/
+
+/-- **BG Lemma 10.4 (a)(c)** (mmd MISSING_PAGE, PDF p.87): `M ∈ ℳ`。
+(a) `p ∣ |M/M'|` ⇒ `p ∉ α(M)`; (c) `p ∈ α(M)`, `r_p(M) = 2` ⇒ `p` は ideal でなく、`M` の位数 `p²`
+elem-ab はすべて `G` の極大 elem-ab。
+(原典 (b): `p∈α(M), M_α≠1` ⇒ `∃ x∈Ω₁(Z(P))#: ℳ(C_G(x))={M} ∧ C_{M_α}(x) Z-group` —
+`Ω₁(Z(P))` の入れ子 encoding は後続。`IsZGroup`/`maximalSubgroupsContaining` は整備済。) -/
+theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    (∀ p : ℕ, p.Prime → p ∣ (commutator ↥M).index → p ∉ alpha M) ∧
+    (∀ p : ℕ, p.Prime → p ∈ alpha M → pRank ↥M p = 2 →
+      ¬ idealPrime p G ∧
+      ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
+        IsMaximalElementaryAbelian p A) := by
+  sorry
+
+/-! ## Proposition 10.11 — σ(M)'-部分群の rank (mmd L2856) -/
+
+/-- **BG Proposition 10.11 (a)(b)(c)** (mmd L2856): `M ∈ ℳ`, `K` を `M` の `σ(M)'`-部分群とする。
+(a) `K ∉ 𝒰`; (b) `r(C_K(M_σ)) ≤ 1`; (c) `C_K(M_σ) ∩ M'` は cyclic で `M` に normal。
+(原典 (d) は `[K,P]` の作用条件 — 後続。) -/
+theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {K : Subgroup G} (hKM : K ≤ M)
+    (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) :
+    ¬ IsUniquelyMaximal K ∧
+    rank ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K) ≤ 1 ∧
+    (IsCyclic ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ Ch2.S07.derivedInG M) ∧
+      M ≤ Subgroup.normalizer
+        ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ Ch2.S07.derivedInG M : Subgroup G) :
+          Set G)) := by
+  sorry
+
+/-! ## Lemma 10.12 — 非共役 maximal の σ-disjointness (mmd L2885) -/
+
+/-- **BG Lemma 10.12** (mmd L2885): `M, H ∈ ℳ` が `G` で非共役なら、
+(a) `M_α ⊓ H_σ = 1` かつ `α(M) ∩ σ(H) = ∅`; (b) `M_σ` が nilpotent なら `M_σ ⊓ H_σ = 1` かつ
+`σ(M) ∩ σ(H) = ∅`。 -/
+theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    (Malpha M ⊓ Msigma H = ⊥ ∧ alpha M ∩ sigma H = ∅) ∧
+    (Group.IsNilpotent ↥(Msigma M) →
+      Msigma M ⊓ Msigma H = ⊥ ∧ sigma M ∩ sigma H = ∅) := by
+  sorry
+
+/-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2900 付近) -/
+
+/-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2900 付近): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
+(a) `ℰ_p²(G) ∩ ℰ_p*(G) = ∅`; (b) `p`-部分群 `R` で `r(R) ≥ 2` なら `R ∈ 𝒰`;
+(c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d): nonid `β(M)`-部分群 `Y` ⇒ `N_G(Y)⊆M` — 後続。) -/
+theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    (hp : idealPrime p G) (P : Sylow p G) :
+    (¬ ∃ A : Subgroup G, A ∈ elemAbelianOfRank G p 2 ∧ IsMaximalElementaryAbelian p A) ∧
+    (∀ R : Subgroup G, IsPGroup p ↥R → 2 ≤ rank ↥R → IsUniquelyMaximal R) ∧
+    (∀ X : Subgroup G, X ≤ (P : Subgroup G) →
+      IsUniquelyMaximal (Subgroup.normalizer (X : Set G) ⊓ (P : Subgroup G))) := by
+  sorry
+
 end OddOrder.BG.Ch3.S10
