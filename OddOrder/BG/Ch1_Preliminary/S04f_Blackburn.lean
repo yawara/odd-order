@@ -643,6 +643,54 @@ private theorem omega1_centralizer_omega1_map_le_center_map
   apply (Omega R p 1).subtype_injective
   simpa using hxC (y : R) y.2
 
+/-- A nonabelian finite group of order `p³` has center of order `p`. -/
+private theorem center_card_eq_prime_of_noncomm_card_prime_cube
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hcard : Nat.card G = p ^ 3) (hnoncomm : ¬ IsMulCommutative G) :
+    Nat.card (Subgroup.center G) = p := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨k, hk_pos, hk⟩ :=
+    IsPGroup.card_center_eq_prime_pow (G := G) (p := p) (n := 3) hcard (by norm_num)
+  have hk_le_three : k ≤ 3 := by
+    have hle : p ^ k ≤ p ^ 3 := by
+      rw [← hk, ← hcard]
+      simpa [Subgroup.card_top] using
+        (Subgroup.card_le_of_le (le_top : Subgroup.center G ≤ (⊤ : Subgroup G)))
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hle
+  have hk_cases : k = 1 ∨ k = 2 ∨ k = 3 := by omega
+  rcases hk_cases with hk1 | hk2 | hk3
+  · simpa [hk1] using hk
+  · exfalso
+    have hlag : Nat.card G =
+        Nat.card (G ⧸ Subgroup.center G) * Nat.card (Subgroup.center G) :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.center G)
+    have hquot_card : Nat.card (G ⧸ Subgroup.center G) = p := by
+      have hmul : Nat.card (G ⧸ Subgroup.center G) * (p ^ 2) = p * (p ^ 2) := by
+        calc
+          Nat.card (G ⧸ Subgroup.center G) * (p ^ 2)
+              = Nat.card (G ⧸ Subgroup.center G) * Nat.card (Subgroup.center G) := by
+                rw [hk, hk2]
+          _ = Nat.card G := hlag.symm
+          _ = p ^ 3 := hcard
+          _ = p * (p ^ 2) := by ring
+      exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
+    have hcyc : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hquot_card
+    haveI := hcyc
+    have hcomm : ∀ x y : G, x * y = y * x :=
+      commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center G))
+        (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center G)))
+    exact hnoncomm (IsMulCommutative.of_comm hcomm)
+  · exfalso
+    have hcenter_card_top : Nat.card (Subgroup.center G) = Nat.card G := by
+      rw [hk, hk3, hcard]
+    have hcenter_top : Subgroup.center G = ⊤ :=
+      Subgroup.eq_top_of_card_eq (H := Subgroup.center G) hcenter_card_top
+    have hcomm : ∀ x y : G, x * y = y * x := by
+      intro x y
+      have hx : x ∈ Subgroup.center G := by rw [hcenter_top]; exact Subgroup.mem_top x
+      exact (Subgroup.mem_center_iff.mp hx y).symm
+    exact hnoncomm (IsMulCommutative.of_comm hcomm)
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -676,6 +724,8 @@ theorem blackburnRankTwoClassification
     omega1_large_not_isMulCommutative hrank hΩ_card hΩ_pow
   have hΩ_exp : Monoid.exponent (Omega R p 1) = p :=
     exponent_eq_prime_of_card_prime_cube_and_pow_eq_one hΩ_card hΩ_pow
+  have hΩ_center_card : Nat.card (Subgroup.center (Omega R p 1)) = p :=
+    center_card_eq_prime_of_noncomm_card_prime_cube hΩ_card hΩ_noncomm
   have hΩC_center := omega1_centralizer_omega1_map_le_center_map (R := R) (p := p)
   sorry
 
