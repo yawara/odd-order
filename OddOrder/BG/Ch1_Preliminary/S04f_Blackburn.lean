@@ -31,6 +31,70 @@ section AutOrderConstraints
 
 /-! ## §4E: automorphism-order constraints (Lemmas 4.13 and 4.14) -/
 
+/-- Arithmetic half of BG Lemma 4.14.  For odd `p`, every prime divisor `q` of
+`p^2 - 1` divides one of the half-factors `(p + 1) / 2` or `(p - 1) / 2`.
+
+The only small wrinkle is `q = 2`: since `p` is odd, exactly one of
+`(p - 1) / 2`, `(p + 1) / 2` is even.  For odd `q`, remove the factor `4` from
+`p^2 - 1 = 4 * ((p - 1) / 2) * ((p + 1) / 2)`. -/
+private theorem prime_dvd_half_factor_of_odd_dvd_sq_sub_one {p q : ℕ}
+    (hp_odd : Odd p) (hq : q.Prime) (hq_dvd : q ∣ p ^ 2 - 1) :
+    q ∣ (p + 1) / 2 ∨ q ∣ (p - 1) / 2 := by
+  classical
+  by_cases hq2 : q = 2
+  · subst q
+    have hp_repr : 2 * (p / 2) + 1 = p := Nat.two_mul_div_two_add_one_of_odd hp_odd
+    have hsub : (p - 1) / 2 = p / 2 := by omega
+    have hadd : (p + 1) / 2 = p / 2 + 1 := by omega
+    rcases Nat.even_or_odd (p / 2) with h_even | h_odd
+    · right
+      rw [hsub]
+      exact Even.two_dvd h_even
+    · left
+      rw [hadd]
+      exact Even.two_dvd h_odd.add_one
+  · set a := (p - 1) / 2 with ha
+    set b := (p + 1) / 2 with hb
+    have hsub_even : Even (p - 1) := by
+      rcases hp_odd with ⟨k, rfl⟩
+      rw [Nat.add_sub_cancel]
+      exact even_two_mul k
+    have hadd_even : Even (p + 1) := hp_odd.add_one
+    have hsub : p - 1 = 2 * a := by
+      rw [ha]
+      exact (Nat.two_mul_div_two_of_even hsub_even).symm
+    have hadd : p + 1 = 2 * b := by
+      rw [hb]
+      exact (Nat.two_mul_div_two_of_even hadd_even).symm
+    have hsq : p ^ 2 - 1 = (p - 1) * (p + 1) := by
+      rcases p with _ | n
+      · simp
+      · rw [Nat.succ_sub_one,
+          show (n + 1) ^ 2 = n * (n + 2) + 1 from by ring, Nat.add_sub_cancel]
+    have hfac : p ^ 2 - 1 = 4 * (a * b) := by
+      calc
+        p ^ 2 - 1 = (p - 1) * (p + 1) := hsq
+        _ = (2 * a) * (2 * b) := by rw [hsub, hadd]
+        _ = 4 * (a * b) := by ring
+    have hq_dvd_four_mul : q ∣ 4 * (a * b) := by rwa [hfac] at hq_dvd
+    have hq_not_dvd_four : ¬ q ∣ 4 := by
+      intro hq4
+      have hq_le4 : q ≤ 4 := Nat.le_of_dvd (by norm_num) hq4
+      have hq_ge2 : 2 ≤ q := hq.two_le
+      interval_cases q
+      · exact hq2 rfl
+      · exact (by decide : ¬ 3 ∣ 4) hq4
+      · exact (by decide : ¬ Nat.Prime 4) hq
+    have hq_coprime_four : Nat.Coprime q 4 :=
+      hq.coprime_iff_not_dvd.mpr hq_not_dvd_four
+    have hq_dvd_ab : q ∣ a * b :=
+      (Nat.Coprime.dvd_mul_left hq_coprime_four).mp hq_dvd_four_mul
+    rcases hq.dvd_mul.mp hq_dvd_ab with hqa | hqb
+    · right
+      rwa [ha]
+    · left
+      rwa [hb]
+
 /-- **BG Lemma 4.13** (via Gorenstein Theorem 4.15(ii)). Suppose `p` is an odd
 prime, `R` is a finite `p`-group, and `q` is a prime divisor of `|Aut R|`. If
 `SCN₃(R)` is empty and `q ≠ p`, then `q ∣ p^2 - 1` and `q < p`.
@@ -58,7 +122,9 @@ theorem dvd_half_prime_add_or_sub_of_prime_dvd_aut_of_scn3_empty
     (hSCN : ∀ A : Subgroup R, ¬ IsSCN₃ p A)
     (hq : q.Prime) (hqp : q ≠ p) (hq_dvd : q ∣ Nat.card (MulAut R)) :
     q ∣ (p + 1) / 2 ∨ q ∣ (p - 1) / 2 := by
-  sorry
+  exact prime_dvd_half_factor_of_odd_dvd_sq_sub_one hp_odd hq
+    (dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty hp_odd hR hSCN hq hqp
+      hq_dvd).1
 
 end AutOrderConstraints
 
