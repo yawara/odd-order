@@ -1515,6 +1515,58 @@ lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
   intro i
   exact F.one_not_mem_kernelSpread i
 
+/-- Elements of L_i = N_G(H_i) conjugate H_i to itself. -/
+lemma mem_kernel_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
+    {g x : G} (hg : g ∈ F.L i) :
+    g * x * g⁻¹ ∈ F.H i ↔ x ∈ F.H i := by
+  have hnorm : g ∈ Subgroup.normalizer (F.H i : Set G) := by
+    rw [← F.normalizer_eq i]
+    exact hg
+  exact (Subgroup.mem_normalizer_iff.mp hnorm x).symm
+
+/-- Elements of L_i conjugate the sharp kernel H_i^# to itself. -/
+lemma mem_kernel_sharp_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
+    {g x : G} (hg : g ∈ F.L i) :
+    g * x * g⁻¹ ∈ (F.H i : Set G) \ {1} ↔ x ∈ (F.H i : Set G) \ {1} := by
+  constructor
+  · intro hx
+    exact ⟨(F.mem_kernel_conj_iff_of_mem_L i hg).mp hx.1, by
+      intro hx1
+      exact hx.2 (by simpa using hx1)⟩
+  · intro hx
+    exact ⟨(F.mem_kernel_conj_iff_of_mem_L i hg).mpr hx.1, by
+      intro hconj
+      exact hx.2 (conj_eq_one_iff.mp hconj)⟩
+
+/-- TI for H_i^# says that any element carrying one sharp-kernel element back
+into H_i^# already lies in L_i. -/
+lemma mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp
+    (F : FrobeniusFamily G k) (i : Fin k) {g x : G}
+    (hx : x ∈ (F.H i : Set G) \ {1})
+    (hconj : g * x * g⁻¹ ∈ (F.H i : Set G) \ {1}) :
+    g ∈ F.L i :=
+  F.isTI i g ⟨x, hx, hconj⟩
+
+/-- A centralizer of a nonidentity kernel element is contained in the corresponding
+normalizer L_i. -/
+lemma centralizer_le_L_of_mem_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
+    {x : G} (hx : x ∈ (F.H i : Set G) \ {1}) :
+    Subgroup.centralizer ({x} : Set G) ≤ F.L i := by
+  intro g hg
+  refine F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i hx ?_
+  have hcomm : g * x = x * g := Subgroup.mem_centralizer_singleton_iff.mp hg
+  have hconj : g * x * g⁻¹ = x := mul_inv_eq_iff_eq_mul.mpr hcomm
+  simpa [hconj] using hx
+
+/-- Inside H_i^#, ambient conjugacy is already L_i-conjugacy. -/
+lemma exists_L_conj_of_isConj_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
+    {x y : G} (hx : x ∈ (F.H i : Set G) \ {1})
+    (hy : y ∈ (F.H i : Set G) \ {1}) (hxy : IsConj x y) :
+    ∃ l : F.L i, (l : G) * x * (l : G)⁻¹ = y := by
+  rcases isConj_iff.mp hxy with ⟨g, hg⟩
+  exact ⟨⟨g, F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i hx (by
+    simpa [hg] using hy)⟩, hg⟩
+
 lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
     (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
   rintro rfl
