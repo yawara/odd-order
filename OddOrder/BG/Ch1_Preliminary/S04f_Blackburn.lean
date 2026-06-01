@@ -573,6 +573,42 @@ private theorem omega1_large_card_eq_prime_cube_and_pow_eq_one
     rw [hn3]
   exact ⟨hcard, hΩ_pow⟩
 
+/-- If a finite group has order `p³` and all elements have `p`-th power one, its
+exponent is exactly `p`. -/
+private theorem exponent_eq_prime_of_card_prime_cube_and_pow_eq_one
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hcard : Nat.card G = p ^ 3) (hpow : ∀ x : G, x ^ p = 1) :
+    Monoid.exponent G = p := by
+  have hp : p.Prime := Fact.out
+  have hcard_gt_one : 1 < Nat.card G := by
+    rw [hcard]
+    exact one_lt_pow₀ hp.one_lt (by norm_num : 3 ≠ 0)
+  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt_one
+  rw [Monoid.exponent_eq_prime_iff hp]
+  intro g hg
+  exact orderOf_eq_prime (hpow g) hg
+
+/-- In Blackburn 4.16 Case B, `S = Ω₁(R)` cannot be abelian: otherwise it would
+be elementary abelian of order `p³`, contradicting `pRank R p ≤ 2`. -/
+private theorem omega1_large_not_isMulCommutative
+    {R : Type*} [Group R] [Finite R]
+    {p : ℕ} [Fact p.Prime]
+    (hrank : pRank R p ≤ 2)
+    (hΩ_card : Nat.card (Omega R p 1) = p ^ 3)
+    (hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1) :
+    ¬ IsMulCommutative (Omega R p 1) := by
+  intro hcomm
+  have hp : p.Prime := Fact.out
+  have hΩ_ea : IsElementaryAbelian p (Omega R p 1) :=
+    ⟨isMulCommutative_iff.mp hcomm, hΩ_pow⟩
+  have hΩ_rank : pRank (Omega R p 1) p ≤ 2 :=
+    (pRank_mono_of_le (Omega R p 1)).trans hrank
+  have hlog_le : Nat.log p (Nat.card (Omega R p 1)) ≤ 2 :=
+    hΩ_ea.log_card_le_pRank.trans hΩ_rank
+  have hlog_eq : Nat.log p (Nat.card (Omega R p 1)) = 3 := by
+    rw [hΩ_card, Nat.log_pow hp.one_lt]
+  omega
+
 /-- **BG Theorem 4.16** (Blackburn rank-two classification).
 
 Let `p` be an odd prime, `R` a nonidentity finite `p`-group, and `A` a
@@ -584,7 +620,8 @@ cyclic, and `Ω₁(R₂)=R₁'`.
 In Lean, because `R` is a `p`-group, BG's rank hypothesis `r(R) ≤ 2` is represented
 as `pRank R p ≤ 2`; see the §4C comments above `scn3_empty_of_pRank_le_two`.
 The `p > 3` component, the small-`Ω₁` abelian branch, and the large-`Ω₁` Prop. 4.8
-setup are discharged; the remaining `sorry` is the central-product/contradiction branch. -/
+setup are discharged; in the large branch `S = Ω₁(R)` is now known to be nonabelian of
+exponent `p`. The remaining `sorry` is the central-product/contradiction branch. -/
 theorem blackburnRankTwoClassification
     {R : Type*} [Group R] [Finite R] [Nontrivial R]
     {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hR : IsPGroup p R)
@@ -600,7 +637,11 @@ theorem blackburnRankTwoClassification
   by_cases hΩ : Nat.card (Omega R p 1) ≤ p ^ 2
   · exact Or.inl (isMulCommutative_of_omega1_card_le_prime_sq_blackburn
       hp_odd hR hp3 hcop hΩ hRA)
-  have hΩ_large := omega1_large_card_eq_prime_cube_and_pow_eq_one hR hp3 hrank hΩ
+  obtain ⟨hΩ_card, hΩ_pow⟩ := omega1_large_card_eq_prime_cube_and_pow_eq_one hR hp3 hrank hΩ
+  have hΩ_noncomm : ¬ IsMulCommutative (Omega R p 1) :=
+    omega1_large_not_isMulCommutative hrank hΩ_card hΩ_pow
+  have hΩ_exp : Monoid.exponent (Omega R p 1) = p :=
+    exponent_eq_prime_of_card_prime_cube_and_pow_eq_one hΩ_card hΩ_pow
   sorry
 
 end BlackburnClassification
