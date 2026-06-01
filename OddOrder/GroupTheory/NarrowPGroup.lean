@@ -80,6 +80,25 @@ theorem eq_of_le (h : IsMaximalElementaryAbelian p E) (hF : F.IsElementaryAbelia
     (hEF : E ≤ F) : F = E :=
   h.2 F hF hEF
 
+/-- If an elementary abelian subgroup `F` centralizes a maximal elementary abelian
+subgroup `E`, then adjoining `F` to `E` adds nothing. -/
+theorem sup_eq_left_of_le_centralizer (h : IsMaximalElementaryAbelian p E)
+    (hF : F.IsElementaryAbelian p) (hEF : E ≤ Subgroup.centralizer (F : Set R)) :
+    E ⊔ F = E :=
+  h.eq_of_le
+    (Subgroup.IsElementaryAbelian.sup_of_le_centralizer h.isElementaryAbelian hF hEF)
+    le_sup_left
+
+/-- If an elementary abelian subgroup `F` centralizes a maximal elementary abelian
+subgroup `E`, then `F ≤ E`. -/
+theorem le_of_le_centralizer (h : IsMaximalElementaryAbelian p E)
+    (hF : F.IsElementaryAbelian p) (hEF : E ≤ Subgroup.centralizer (F : Set R)) :
+    F ≤ E := by
+  have hsup : E ⊔ F = E := h.sup_eq_left_of_le_centralizer hF hEF
+  intro x hx
+  rw [← hsup]
+  exact (le_sup_right : F ≤ E ⊔ F) hx
+
 end IsMaximalElementaryAbelian
 
 /-- **Existence of a maximal elementary abelian subgroup above a given one** (used by

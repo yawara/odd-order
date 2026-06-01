@@ -66,6 +66,36 @@ private def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
   omega1OfAbelian R (Subgroup.center R) p
     (fun _ hx _ _ => (Subgroup.mem_center_iff.mp hx _).symm)
 
+private theorem omega1Center_le_center {p : ℕ} : omega1Center R p ≤ Subgroup.center R :=
+  fun _ hg => hg.1
+
+private theorem mem_omega1Center {p : ℕ} {g : R} :
+    g ∈ omega1Center R p ↔ g ∈ Subgroup.center R ∧ g ^ p = 1 := Iff.rfl
+
+/-- `Ω₁(Z(R))` is elementary abelian: it is central and every element has
+`p`-th power `1` by definition. -/
+private theorem omega1Center_isElementaryAbelian {p : ℕ} :
+    (omega1Center R p).IsElementaryAbelian p := by
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · apply Subtype.ext
+    exact (Subgroup.mem_center_iff.mp (omega1Center_le_center x.2) (y : R)).symm
+  · apply Subtype.ext
+    have : (x : R) ^ p = 1 := (mem_omega1Center.mp x.2).2
+    simpa using this
+
+/-- **BG Lemma 5.2 support**: the central subgroup `Ω₁(Z(R))` is contained in any
+maximal elementary abelian subgroup `E`. This packages the textbook step `EZ = E`
+from `E ∈ E*(R)`. -/
+theorem omega1Center_le_of_maximalElementaryAbelian {p : ℕ} {E : Subgroup R}
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1Center R p ≤ E := by
+  have hE_le_cent : E ≤ Subgroup.centralizer (omega1Center R p : Set R) := by
+    intro x _
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    exact (Subgroup.mem_center_iff.mp (omega1Center_le_center hz) x).symm
+  exact hEstar.le_of_le_centralizer omega1Center_isElementaryAbelian hE_le_cent
+
 /-! ## Lemma 5.1 — SCN₃ の非空性と normal `ℰ²` の埋め込み (mmd L1795-1806) -/
 
 /-- **BG Lemma 5.1(a)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3` ⇒ `SCN₃(R) ≠ ∅`。
