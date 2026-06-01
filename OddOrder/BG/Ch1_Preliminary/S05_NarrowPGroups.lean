@@ -244,6 +244,104 @@ theorem card_inf_centralizer_ge_prime_sq_of_card_prime_cube
     exact Nat.le_of_mul_le_mul_left hmul (Fact.out : p.Prime).pos
   rwa [hker_card]
 
+/-- **BG Lemma 5.1(b), small-branch contradiction packaged as a lower bound**:
+if `E` has order `p^2` and `B` has order `p^3`, both elementary abelian, then
+the Lean encoding `E ⊔ (B ⊓ C_R(E))` of `E C_B(E)` has order at least `p^3`.
+This is the formal version of BG's argument that the alternative `|E C_B(E)| < p^3`
+would force `C_B(E)=E` and then, since `B` is abelian, `B=C_B(E)`, contradicting
+`|B|=p^3` and `|E|=p^2`. -/
+theorem bStar_card_ge_prime_cube_of_card_prime_cube
+    [Finite R] {p : ℕ} [Fact p.Prime]
+    {E B : Subgroup R} [E.Normal]
+    (hE : E.IsElementaryAbelian p) (hEcard : Nat.card E = p ^ 2)
+    (hB : B.IsElementaryAbelian p) (hBcard : Nat.card B = p ^ 3) :
+    p ^ 3 ≤ Nat.card ↥(E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))) := by
+  let K : Subgroup R := B ⊓ Subgroup.centralizer (E : Set R)
+  let Bstar : Subgroup R := E ⊔ K
+  by_contra hnot
+  have hsmall : Nat.card Bstar < p ^ 3 := Nat.lt_of_not_ge hnot
+  have hK_le_B : K ≤ B := by
+    intro x hx
+    dsimp [K] at hx
+    exact hx.1
+  have hK_elem : K.IsElementaryAbelian p := by
+    have hK_sub_elem : (K.subgroupOf B).IsElementaryAbelian p :=
+      hB.to_subgroup (K.subgroupOf B)
+    exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hK_le_B) hK_sub_elem
+  have hE_le_cent_K : E ≤ Subgroup.centralizer (K : Set R) := by
+    dsimp [K]
+    exact Subgroup.le_centralizer_iff.mpr inf_le_right
+  have hBstar_elem : Bstar.IsElementaryAbelian p := by
+    simpa [Bstar] using
+      Subgroup.IsElementaryAbelian.sup_of_le_centralizer hE hK_elem hE_le_cent_K
+  letI : IsMulCommutative Bstar := IsMulCommutative.of_comm hBstar_elem.comm
+  letI := hBstar_elem.zmodModule
+  let m : ℕ := Module.finrank (ZMod p) (Additive Bstar)
+  have hBstar_card_pow : Nat.card Bstar = p ^ m := by
+    dsimp [m]
+    simpa using hBstar_elem.card_eq_pow_finrank
+  have hE_le_Bstar : E ≤ Bstar := by
+    dsimp [Bstar]
+    exact le_sup_left
+  have hK_le_Bstar : K ≤ Bstar := by
+    dsimp [Bstar]
+    exact le_sup_right
+  have hE_card_le_Bstar : Nat.card E ≤ Nat.card Bstar :=
+    Nat.card_le_card_of_injective
+      (fun x : E => (⟨x.1, hE_le_Bstar x.2⟩ : Bstar))
+      (fun x y hxy => Subtype.ext (congrArg (fun z : Bstar => (z : R)) hxy))
+  have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
+  have hm_lt : m < 3 := by
+    have hp_lt : p ^ m < p ^ 3 := by
+      simpa [hBstar_card_pow] using hsmall
+    exact (Nat.pow_lt_pow_iff_right hp1).mp hp_lt
+  have hm_ge : 2 ≤ m := by
+    have hp_le : p ^ 2 ≤ p ^ m := by
+      simpa [hEcard, hBstar_card_pow] using hE_card_le_Bstar
+    exact (Nat.pow_le_pow_iff_right hp1).mp hp_le
+  have hm_eq : m = 2 := by omega
+  have hBstar_card_eq : Nat.card Bstar = p ^ 2 := by
+    rw [hBstar_card_pow, hm_eq]
+  have hBstar_card_le_E : Nat.card Bstar ≤ Nat.card E := by
+    simp [hBstar_card_eq, hEcard]
+  have hE_eq_Bstar : E = Bstar :=
+    Subgroup.eq_of_le_of_card_ge hE_le_Bstar hBstar_card_le_E
+  have hK_card : p ^ 2 ≤ Nat.card K := by
+    simpa [K] using
+      card_inf_centralizer_ge_prime_sq_of_card_prime_cube
+        (E := E) (B := B) hE hEcard hB hBcard
+  have hBstar_card_le_K : Nat.card Bstar ≤ Nat.card K :=
+    hBstar_card_eq.le.trans hK_card
+  have hK_eq_Bstar : K = Bstar :=
+    Subgroup.eq_of_le_of_card_ge hK_le_Bstar hBstar_card_le_K
+  have hE_eq_K : E = K := hE_eq_Bstar.trans hK_eq_Bstar.symm
+  have hE_le_B : E ≤ B := by
+    intro x hx
+    have hxK : x ∈ K := by
+      simpa [hE_eq_K] using hx
+    dsimp [K] at hxK
+    exact hxK.1
+  have hB_le_cent : B ≤ Subgroup.centralizer (E : Set R) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro e he
+    have heB : e ∈ B := hE_le_B he
+    have hcomm : x * e = e * x :=
+      congrArg (fun z : B => (z : R)) (hB.comm ⟨x, hx⟩ ⟨e, heB⟩)
+    exact hcomm.symm
+  have hB_le_K : B ≤ K := by
+    intro x hx
+    dsimp [K]
+    exact ⟨hx, hB_le_cent hx⟩
+  have hB_eq_K : B = K := le_antisymm hB_le_K hK_le_B
+  have hB_eq_E : B = E := hB_eq_K.trans hE_eq_K.symm
+  have hp32_ne : p ^ 3 ≠ p ^ 2 := by
+    exact ne_of_gt ((Nat.pow_lt_pow_iff_right hp1).mpr (by norm_num : (2 : ℕ) < 3))
+  have hp32_eq : p ^ 3 = p ^ 2 := by
+    rw [← hBcard, hB_eq_E, hEcard]
+  exact hp32_ne hp32_eq
+
 /-- **BG Lemma 5.1(b)**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。`E ∈ ℰ²(R)` (elem-ab,
 位数 `p²`) かつ `E ⊴ R` ⇒ `E` は `SCN₃(R)` のある元に含まれる。
 
@@ -254,7 +352,13 @@ theorem mem_scn3_of_normal_isElementaryAbelian_card_prime_sq [Finite R] {p : ℕ
     (E : Subgroup R) (hE : E.IsElementaryAbelian p) (hEcard : Nat.card ↥E = p ^ 2)
     [E.Normal] :
     ∃ A : Subgroup R, IsSCN₃ p A ∧ E ≤ A := by
-  sorry
+  obtain ⟨A, hA⟩ := scn3_nonempty_of_three_le_pRank hp hpg h3
+  obtain ⟨B, hB_normal, hB, hBcard⟩ :=
+    exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hpg hA
+  haveI : B.Normal := hB_normal
+  have hBstar_card : p ^ 3 ≤ Nat.card ↥(E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))) :=
+    bStar_card_ge_prime_cube_of_card_prime_cube hE hEcard hB hBcard
+  exact exists_scn3_ge_of_bStar_card_ge_prime_cube hpg hE hB hBstar_card
 
 /-! ## Lemma 5.2 — `T = C_R(W)` の中心構造 (mmd L1808-1836) -/
 
