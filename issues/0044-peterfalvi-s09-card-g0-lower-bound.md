@@ -42,8 +42,20 @@ F.card_kernelSpread_eq_index_mul i :
 `sum_index_mul_eq_card_G_sub_card_G0` も landed。
 
 これで (7.10)(d) の `G₀ = G - ⋃(H_i^#)^G` から `|G₀|` を
-`[G:L_i]` と `|H_i|` で直接展開できる。残る (7.10) 本体は依然として
-(7.8.a/b), (7.9), (6.8) coherence 本体, および Thompson/Frobenius-family bridge の合成が必要。
+`[G:L_i]` と `|H_i|` で直接展開できる。
+
+さらに `h_i = |H_i|`, `e_i = [L_i:H_i]` への有理比率変換を追加し,
+
+```lean
+F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e i
+F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e i
+F.sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G
+```
+
+で `|(H_i^#)^G| / |G| = (h_i - 1)/(h_i e_i)` および
+`∑_i (h_i - 1)/(h_i e_i) = 1 - |G₀|/|G|` まで Lean 化済み。
+残る (7.10) 本体は依然として (7.8.a/b), (7.9), (6.8) coherence 本体,
+および Thompson/Frobenius-family bridge の合成が必要。
 
 ## 全体構造 (Peterfalvi §9 mmd `04.9_pp_38_43_*.mmd` より)
 
