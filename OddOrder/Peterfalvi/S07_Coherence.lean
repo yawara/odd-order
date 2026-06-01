@@ -4717,7 +4717,7 @@ noncomputable def coherentEqualDegree_fromDade
     (hχinj : Function.Injective χ)
     (hdeg : ∀ j, ((χ j : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1
       = ((χ 0 : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1)
-    (hsupp : ∀ j, (χ j : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
+    (hsuppdiff : ∀ j, (irreducibleCharacterDifference χ j).support ⊆ supportInSubgroup A L)
     (h1notA : (1 : G) ∉ A) :
     IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       (Set.range (fun j => (χ j : ClassFunction (↥L) ℂ))) (supportInSubgroup A L) := by
@@ -4731,16 +4731,16 @@ noncomputable def coherentEqualDegree_fromDade
     by_cases h : i = j
     · rw [if_pos h, if_pos (congrArg χ h)]
     · rw [if_neg h, if_neg (fun he => h (hχinj he))]
-  -- The supported difference generators of `ℤ[range χ]`.
+  -- The supported difference generators `χⱼ − χ₀` of `ℤ[range χ]` (this is the support
+  -- hypothesis directly, so the individual `χⱼ` need not be supported on `A`).
   have hdiff_supp : ∀ i, (irreducibleCharacterDifference χ i).support ⊆ supportInSubgroup A L :=
-    fun i => (ClassFunction.support_sub_subset _ _).trans (Set.union_subset (hsupp i) (hsupp 0))
-  have hSsupp : ∀ s ∈ Set.range (fun j => (χ j : ClassFunction (↥L) ℂ)),
+    hsuppdiff
+  have hdiffSset : ∀ s ∈ Set.range (fun j => irreducibleCharacterDifference χ j),
       s.support ⊆ supportInSubgroup A L := by
-    rintro s ⟨j, rfl⟩; exact hsupp j
+    rintro s ⟨j, rfl⟩; exact hdiff_supp j
   have hdiff_zspan : ∀ i, irreducibleCharacterDifference χ i ∈
-      zSpan (L := ↥L) (Set.range (fun j => (χ j : ClassFunction (↥L) ℂ))) :=
-    fun i => Submodule.sub_mem _ (Submodule.subset_span (Set.mem_range_self i))
-      (Submodule.subset_span (Set.mem_range_self 0))
+      zSpan (L := ↥L) (Set.range (fun j => irreducibleCharacterDifference χ j)) :=
+    fun i => Submodule.subset_span (Set.mem_range_self i)
   -- Discharge the three (1.4) hypotheses for the Dade base map.
   have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ χ := fun i =>
     dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i)
@@ -4751,7 +4751,7 @@ noncomputable def coherentEqualDegree_fromDade
       (isometryDifferenceImage τ χ j) =
       ClassFunction.inner (irreducibleCharacterDifference χ i)
         (irreducibleCharacterDifference χ j) := fun i j =>
-    dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSsupp
+    dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hdiffSset
       (hdiff_zspan i) (hdiff_zspan j)
   -- (1.4): the signed irreducible-difference family `{μⱼ, ε}` (extracted via `Exists.choose`,
   -- as the conclusion is data in `Type`, not a `Prop`).
