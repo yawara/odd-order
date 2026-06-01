@@ -1009,6 +1009,75 @@ private theorem blackburn_noncentral_centralizer_quotient_card_le_prime
   rw [hquot_range]
   exact hrange_le
 
+/-- Blackburn 4.16 Case B-2: `C_R(T)` is proper when
+`Z(S) < T = [Ω₁(R),R]`.  If every element of `S` centralized `T`, then each
+`z ∈ T` would be central in `S`, contradicting `Z(S) < T`. -/
+private theorem blackburn_noncentral_centralizer_ne_top
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    Subgroup.centralizer (T : Set R) ≠ ⊤ := by
+  dsimp at hT_facts ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  have hzS : z ∈ S := hT_facts.2.1.le hzT
+  intro hC_top
+  have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by
+    rw [Subgroup.mem_center_iff]
+    intro s
+    apply S.subtype_injective
+    have hsC : (s : R) ∈ Subgroup.centralizer (T : Set R) := by
+      rw [hC_top]
+      exact Subgroup.mem_top (s : R)
+    exact (hsC z hzT).symm
+  exact hzZ ⟨⟨z, hzS⟩, hz_center, rfl⟩
+
+/-- Blackburn 4.16 Case B-2, equation (4.12), cardinal part:
+`|R/C_R(T)| = p` for `T = [Ω₁(R),R]` in the noncentral commutator branch. -/
+private theorem blackburn_noncentral_centralizer_quotient_card_eq_prime
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    Nat.card (R ⧸ Subgroup.centralizer (T : Set R)) = p := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (T : Set R)
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  haveI hT_normal : T.Normal := by
+    dsimp [T]
+    exact Subgroup.commutator_normal S (⊤ : Subgroup R)
+  have hC_ne_top : C ≠ ⊤ := by
+    dsimp [C]
+    exact blackburn_noncentral_centralizer_ne_top (R := R) (p := p) hT_facts
+  have hquot_nontrivial : Nontrivial (R ⧸ C) :=
+    Subgroup.nontrivial_quotient_of_ne_top hC_ne_top
+  have hquot_gt_one : 1 < Nat.card (R ⧸ C) :=
+    Finite.one_lt_card_iff_nontrivial.mpr hquot_nontrivial
+  have hquot_pg : IsPGroup p (R ⧸ C) := hR.to_quotient C
+  have hquot_le : Nat.card (R ⧸ C) ≤ p := by
+    dsimp [C]
+    exact blackburn_noncentral_centralizer_quotient_card_le_prime hR hT_facts hT_elem
+  rcases hquot_pg.card_eq_or_dvd with hquot_one | hp_dvd
+  · exact False.elim ((ne_of_gt hquot_gt_one) hquot_one)
+  · exact le_antisymm hquot_le
+      (Nat.le_of_dvd (Nat.lt_trans Nat.zero_lt_one hquot_gt_one) hp_dvd)
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
