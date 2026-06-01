@@ -1642,6 +1642,48 @@ lemma ncard_kernel_sharp [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
   rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
     Set.ncard_singleton, hHcard]
 
+/-- A conjugate image of `H_i^#` has cardinality `|H_i| - 1`. -/
+lemma ncard_kernel_sharp_conj_image [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (g : G) :
+    (((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1})).ncard =
+      Nat.card (F.H i) - 1) := by
+  rw [Set.ncard_image_of_injective _]
+  · exact F.ncard_kernel_sharp i
+  · intro a b hab
+    have hcancel := congrArg (fun z : G => g⁻¹ * z * g) hab
+    simpa using hcancel
+
+/-- `kernelSpread i` is the disjoint union, indexed by `G ⧸ L_i`, of the
+conjugate images of `H_i^#` from a choice of coset representatives. -/
+lemma kernelSpread_eq_iUnion_quotient (F : FrobeniusFamily G k) (i : Fin k) :
+    F.kernelSpread i =
+      ⋃ q : G ⧸ F.L i,
+        ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+          ((F.H i : Set G) \ {1})) := by
+  ext x
+  constructor
+  · rintro ⟨a, ha⟩
+    let g : G := a⁻¹
+    let q : G ⧸ F.L i := ⟦g⟧
+    have hxg :
+        x ∈ ((fun y : G => g * y * g⁻¹) '' ((F.H i : Set G) \ {1})) := by
+      refine ⟨a * x * a⁻¹, ha, ?_⟩
+      simp only [g]
+      group
+    have hout_mem : (Quotient.out q : G)⁻¹ * g ∈ F.L i := by
+      have hq : (⟦(Quotient.out q : G)⟧ : G ⧸ F.L i) = ⟦g⟧ := by
+        exact Quotient.out_eq' q
+      exact QuotientGroup.leftRel_apply.mp (Quotient.exact' hq)
+    have himg := F.kernel_sharp_conj_image_eq_of_inv_mul_mem_L i
+      (g := g) (h := (Quotient.out q : G)) hout_mem
+    exact Set.mem_iUnion.mpr ⟨q, himg ▸ hxg⟩
+  · intro hx
+    rcases Set.mem_iUnion.mp hx with ⟨q, hxq⟩
+    rcases hxq with ⟨a, ha, rfl⟩
+    refine ⟨(Quotient.out q : G)⁻¹, ?_⟩
+    convert ha using 1
+    group
+
 lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
     (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
   rintro rfl
