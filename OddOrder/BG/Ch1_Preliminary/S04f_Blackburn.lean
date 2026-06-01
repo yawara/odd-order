@@ -991,22 +991,6 @@ private theorem conjNormal_ker_eq_centralizer_for_subgroup
     rw [← hcomm]
     group
 
-/-- The centralizer of a normal subgroup is normal. -/
-private theorem centralizer_normal_of_normal
-    {G : Type*} [Group G] {H : Subgroup G} [H.Normal] :
-    (Subgroup.centralizer (H : Set G)).Normal where
-  conj_mem := by
-    intro c hc g
-    rw [Subgroup.mem_centralizer_iff] at hc ⊢
-    intro h hh
-    have hh_conj : g⁻¹ * h * g ∈ H := by
-      simpa using (inferInstance : H.Normal).conj_mem h hh g⁻¹
-    have hcomm := hc (g⁻¹ * h * g) hh_conj
-    calc
-      h * (g * c * g⁻¹) = g * ((g⁻¹ * h * g) * c) * g⁻¹ := by group
-      _ = g * (c * (g⁻¹ * h * g)) * g⁻¹ := by rw [← hcomm]
-      _ = g * c * g⁻¹ * h := by group
-
 /-- Blackburn 4.16 Case B-2: `C = C_R(S)` and `D = C_R(T)` are normal,
 and so `C.subgroupOf D` is normal inside `D`. -/
 private theorem blackburn_noncentral_centralizer_normalities
@@ -1027,10 +1011,10 @@ private theorem blackburn_noncentral_centralizer_normalities
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hC_normal : C.Normal := by
     dsimp [C]
-    exact centralizer_normal_of_normal (H := S)
+    infer_instance
   have hD_normal : D.Normal := by
     dsimp [D]
-    exact centralizer_normal_of_normal (H := T)
+    infer_instance
   exact ⟨hC_normal, hD_normal, hC_normal.subgroupOf D⟩
 
 /-- Blackburn 4.16 Case B-2: the conjugation quotient on
