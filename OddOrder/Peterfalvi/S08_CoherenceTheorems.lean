@@ -219,6 +219,14 @@ abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L H) :=
   OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S
     (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
 
+/-- (6.8)(a) consequence: `[L : H] = |W₁|`.  From the complement `L = H ⋊ W₁` (`hyp.split`).
+This is the common degree of the members of `Y = S(H')`: by [Is] Thm 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`), `(Ind_H^L θ)(1) = [L:H]·θ(1) = |W₁|` for the
+degree-`1` characters `θ ∈ Irr(H/H')`. -/
+theorem index_H_eq_card_W1 (hyp : SibleyDadeHypothesis G L H) :
+    H.index = Nat.card hyp.W1 :=
+  (Subgroup.IsComplement.card_right (Subgroup.isComplement'_def.mp hyp.split)).symm
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
