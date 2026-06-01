@@ -10,6 +10,10 @@ import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.NarrowPGroup
+import OddOrder.GroupTheory.CentralProduct
+import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.OmegaSubgroup
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §10: The Subgroups `M_α` and `M_σ`
@@ -132,6 +136,60 @@ theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
     Ch03.IsHallSubgroup (alpha M) (Malpha M) ∧
     Malpha M ≤ Msigma M ∧ Msigma M ≤ Ch2.S07.derivedInG M ∧
     Msigma M ≠ ⊥ := by
+  sorry
+
+/-! ## Corollary 10.7 — Sylow `p`-部分群の構造 (mmd L2787) -/
+
+/-- **BG Corollary 10.7** (mmd L2787): `p` prime, `P ∈ Syl_p(G)`。
+(a) `V` を `N_G(P)` 内の `P` の補群 (`P⊓V=1`, `P⊔V=N_G(P)`) とすると `P=[P,V]⊆N_G(P)'`;
+(b) `r(P)≤2` ⇒ `P` abelian、または `P` は位数 `p³` exp `p` の nonabelian `P₁` と cyclic `P₂`
+  (`Ω₁(P₂)=Z(P₁)`) の central product;
+(c) `Q⊆P`, `Q^x⊆P` ⇒ `Q^x=Q^y` (`y∈N_G(P)`);
+(d) 任意の `Q≤P` で `N_P(Q)` (= `N_G(Q)⊓P`) は `N_G(Q)` の Sylow `p`-部分群;
+(e) `R` `p`-部分群, `Q⊆P∩R`, `Q⊴N_G(P)` (= `N_G(P)≤N_G(Q)`) ⇒ `Q⊴N_G(R)`。 -/
+theorem sylow_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    (∀ V : Subgroup G, V ≤ Subgroup.normalizer ((P : Subgroup G) : Set G) →
+      (P : Subgroup G) ⊓ V = ⊥ →
+      (P : Subgroup G) ⊔ V = Subgroup.normalizer ((P : Subgroup G) : Set G) →
+      (P : Subgroup G) = ⁅(P : Subgroup G), V⁆ ∧
+        (P : Subgroup G) ≤ Ch2.S07.derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G))) ∧
+    (rank ↥(P : Subgroup G) ≤ 2 →
+      IsMulCommutative (P : Subgroup G) ∨
+      ∃ P₁ P₂ : Subgroup G, P₁ ≤ (P : Subgroup G) ∧ P₂ ≤ (P : Subgroup G) ∧
+        IsExpPExtraspecial p ↥P₁ ∧ Nat.card ↥P₁ = p ^ 3 ∧ IsCyclic ↥P₂ ∧
+        (Omega ↥P₂ p 1).map P₂.subtype = (Subgroup.center ↥P₁).map P₁.subtype ∧
+        IsCentralProduct (P : Subgroup G) P₁ P₂) ∧
+    (∀ Q : Subgroup G, Q ≤ (P : Subgroup G) → ∀ x : G, MulAut.conj x • Q ≤ (P : Subgroup G) →
+      ∃ y ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), MulAut.conj x • Q = MulAut.conj y • Q) ∧
+    (∀ Q : Subgroup G, Q ≤ (P : Subgroup G) →
+      ∃ S : Sylow p ↥(Subgroup.normalizer (Q : Set G)),
+        (S : Subgroup ↥(Subgroup.normalizer (Q : Set G))).map
+            (Subgroup.normalizer (Q : Set G)).subtype =
+          Subgroup.normalizer (Q : Set G) ⊓ (P : Subgroup G)) ∧
+    (∀ R Q : Subgroup G, IsPGroup p ↥R → Q ≤ (P : Subgroup G) ⊓ R →
+      Subgroup.normalizer ((P : Subgroup G) : Set G) ≤ Subgroup.normalizer (Q : Set G) →
+      Subgroup.normalizer (R : Set G) ≤ Subgroup.normalizer (Q : Set G)) := by
+  sorry
+
+/-! ## Lemma 10.8 — `M_β` の Hall 性 (mmd L2810) -/
+
+/-- **BG Lemma 10.8** (mmd L2810): `M ∈ ℳ`。
+(a) `M_β` は `M` および `G` の Hall 部分群;
+(b) `M'` と `M_σ` は nilpotent な Hall `β(M)'`-部分群を持つ;
+(c) `p ∈ π(M)−β(M)` ⇒ `M'` と `M_σ` は normal `p`-complement を持つ (`M_β` を含む)。
+(原典 (c) はさらに「`p` は `|M/O_{p'}(M)|` の最大素因子」を含む — quotient 型整備後に追加予定。) -/
+theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (beta M) (Mbeta M) ∧
+    (∃ W : Subgroup G, W ≤ Ch2.S07.derivedInG M ∧
+      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (Ch2.S07.derivedInG M)) ∧
+      Group.IsNilpotent ↥W) ∧
+    (∃ W : Subgroup G, W ≤ Msigma M ∧
+      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (Msigma M)) ∧ Group.IsNilpotent ↥W) ∧
+    (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
+      Ch05.HasNormalPComplement p ↥(Ch2.S07.derivedInG M) ∧
+      Ch05.HasNormalPComplement p ↥(Msigma M)) := by
   sorry
 
 end OddOrder.BG.Ch3.S10
