@@ -1903,6 +1903,29 @@ lemma card_G0_eq_card_G_sub_sum_card_kernelSpread [Finite G]
   have h := F.card_eq_card_G0_add_sum_card_kernelSpread
   omega
 
+/-- The sum of spread cardinalities in normalizer-index form. -/
+lemma sum_card_kernelSpread_eq_sum_index_mul [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, Nat.card (F.kernelSpread i)) =
+      ∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1) := by
+  exact Finset.sum_congr rfl (fun i _ => F.card_kernelSpread_eq_index_mul i)
+
+/-- Difference form of the partition with each spread counted by normalizer index. -/
+lemma card_G0_eq_card_G_sub_sum_index_mul [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card F.G0 =
+      Nat.card G - ∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1) := by
+  rw [F.card_G0_eq_card_G_sub_sum_card_kernelSpread,
+    F.sum_card_kernelSpread_eq_sum_index_mul]
+
+/-- The index-counted spreads have total size `|G| - |G₀|`. -/
+lemma sum_index_mul_eq_card_G_sub_card_G0 [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1)) =
+      Nat.card G - Nat.card F.G0 := by
+  rw [← F.sum_card_kernelSpread_eq_sum_index_mul,
+    F.sum_card_kernelSpread_eq_card_G_sub_card_G0]
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
