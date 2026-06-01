@@ -24,19 +24,21 @@ case-A の `X⊂Irr L` を供給する最高レバレッジ brick。
   `irreducibleCharacter_inner_eq_ite` + `coe_conjBy` + `mem_inertia` で inertia 指示関数に潰し
   `Finset.sum_boole`/`Fintype.card_subtype` で count。
 
-### 残 brick (次の本線タスク)
-- **brick (iv) degree**: **既に存在** = `induce_apply_one` (InducedCharacter:276)
-  `induce H θ 1 = (H.index:k)·θ 1`。
-- **brick (iii) 既約性**: `θ≠1` + 自由作用 (`ClassFunction.inertia (θ:CF) = H`) ⟹ `Ind θ ∈ Irr G`。
-  経路: (a) `induce H (θ:CF) ∈ ZIrr G` = `induce_mem_ZIrr` (InducedCharacter:764, 要 `(θ:CF)∈ZIrr H`
-  = `θ.isIrreducible.mem_ZIrr`); (b) brick(ii)+`inertia=H` ⟹ `‖Ind θ‖²=1`; (c) **新 sub-brick**
-  `exists_irr_of_inner_self_one` (`φ∈ZIrr, ‖φ‖²=1 ⟹ ∃ χ:Irr, φ=χ ∨ φ=-χ`) — ZIrrFourier の
-  `exists_irr_sub_irr_of_inner_self_two` (:528) / `mem_ZIrr_inner_self_eq_sum_sq` (:234) /
-  `mem_ZIrr_repr` (:104) を template に ~60-80 LOC; (d) degree `>0` (`induce_apply_one`,
-  `θ(1)>0`) で `+` 符号を選び `Ind θ = χ` irreducible。
-- **6.34 最終 statement**: 自由作用仮説をどう持つか = Peterfalvi では W₁ の Irr(H)∖{1} 自由作用
-  (Frobenius complement 由来)。statement は `inertia (θ:CF) = H` を仮説に取る形が honest
-  (自由作用 ⟹ stabilizer=H を別 lemma で供給)。`brauer_permutation_lemma'` が classes∖{1} 自由を供給。
+### ✅✅ 6.34 COMPLETE (2026-06-01, commit 2f7d545; 全 sorry-free, axiom-clean, AxiomsCheck 登録)
+- **brick (iii) 既約性 + capstone** `isIrreducibleCharacter_induce_of_inertia_eq` :
+  `H⊴G, θ:Irr H, ClassFunction.inertia (θ:CF)=H ⟹ IsIrreducibleCharacter (induce H (θ:CF))`。
+  (a) `induce_mem_ZIrr H θ.property.mem_ZIrr` (∈ZIrr G); (b) brick(ii)+`inertia=H` で `‖Ind θ‖²=1`
+  (`mul_left_cancel₀`); (c) degree `[G:H]·θ(1)>0` (`induce_apply_one`+`H.index_mul_card` で index>0);
+  (d) reusable 判定 `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`
+  (`φ∈ZIrr,‖φ‖²=1,φ(1)=正nat ⟹ Irr`) = `exists_irr_sub_irr_of_inner_self_two` の ‖·‖²=1 版,
+  helper `exists_single_of_sum_sq_eq_one` (∑cᵢ²=1⟹単一±1) + 符号は degree>0 で確定。
+- **brick (iv) degree** = `induce_apply_one` (pre-existing)。
+- **自由作用仮説**: statement は `inertia (θ:CF)=H` を直接取る (honest)。実適用では Peterfalvi の
+  W₁=G/H が Irr(H)∖{1} に自由作用 (Frobenius complement; `brauer_permutation_lemma'` が classes∖{1}
+  自由を供給) ⟹ θ≠1 で stabilizer=H を別途供給する wiring が (6.8) Y/X 構成時に必要 (T6/T7)。
+
+**⟹ §A 完了。本線の次 = T1 (SibleySetup 再構築) で engine の goal shape を整え、T6 (Y coherent,
+6.34 で η_j(1)=|W₁|) から assembly 開始。**
 
 ## B. T1 (最重要・隠れた構造 blocker): `SibleySetup` を faithful に作り直す
 
