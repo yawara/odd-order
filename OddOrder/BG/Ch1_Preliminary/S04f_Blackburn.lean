@@ -944,6 +944,71 @@ private theorem blackburn_noncentral_commutator_isElementaryAbelian
   change (x : R) ^ p = 1
   exact congrArg Subtype.val hxpow
 
+/-- The kernel of conjugation on a normal subgroup is its ambient centralizer. -/
+private theorem conjNormal_ker_eq_centralizer_for_subgroup
+    {G : Type*} [Group G] {V : Subgroup G} [V.Normal] :
+    (MulAut.conjNormal (H := V)).ker = Subgroup.centralizer (V : Set G) := by
+  ext g
+  rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hg v hv
+    have hfix : (MulAut.conjNormal g (⟨v, hv⟩ : V) : G) = ((⟨v, hv⟩ : V) : G) := by
+      rw [hg]
+      rfl
+    rw [MulAut.conjNormal_apply] at hfix
+    have hcomm : g * v = v * g := by
+      have : g * v * g⁻¹ * g = v * g := by rw [hfix]
+      simpa [mul_assoc] using this
+    exact hcomm.symm
+  · intro hg
+    apply MulEquiv.ext
+    intro v
+    apply Subtype.ext
+    simp only [MulAut.one_apply]
+    rw [MulAut.conjNormal_apply]
+    have hcomm : (v : G) * g = g * (v : G) := hg (v : G) v.property
+    rw [← hcomm]
+    group
+
+/-- Blackburn 4.16 Case B-2: the conjugation quotient on
+`T = [Ω₁(R),R]` has order at most `p`.  The image is a `p`-subgroup of
+`Aut(T)`, and `T` is elementary abelian of order `p²`, so the GL squeeze applies. -/
+private theorem blackburn_noncentral_centralizer_quotient_card_le_prime
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hR : IsPGroup p R)
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    Nat.card (R ⧸ Subgroup.centralizer (T : Set R)) ≤ p := by
+  dsimp at hT_facts hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  have hT_card_le : Nat.card T ≤ p ^ 2 := le_of_eq hT_facts.2.2
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  haveI hT_normal : T.Normal := by
+    dsimp [T]
+    exact Subgroup.commutator_normal S (⊤ : Subgroup R)
+  let φ : R →* MulAut T := MulAut.conjNormal (H := T)
+  have hker : φ.ker = Subgroup.centralizer (T : Set R) := by
+    simpa [φ] using conjNormal_ker_eq_centralizer_for_subgroup (G := R) (V := T)
+  have hquot_range : Nat.card (R ⧸ Subgroup.centralizer (T : Set R)) = Nat.card φ.range := by
+    rw [← hker]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv
+  have hrange_pg : IsPGroup p φ.range :=
+    hR.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
+  have hrange_le : Nat.card φ.range ≤ p :=
+    card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq hT_elem hT_card_le hrange_pg
+  change Nat.card (R ⧸ Subgroup.centralizer (T : Set R)) ≤ p
+  rw [hquot_range]
+  exact hrange_le
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1117,6 +1182,8 @@ theorem blackburnRankTwoClassification
     have hT_elem := blackburn_noncentral_commutator_isElementaryAbelian hΩ_pow hT_facts
     have hT_quot_cards :=
       blackburn_noncentral_commutator_quotient_cards hΩ_card hΩ_extraspecial hT_facts
+    have hRT_centralizer_card_le :=
+      blackburn_noncentral_centralizer_quotient_card_le_prime hR hT_facts hT_elem
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
