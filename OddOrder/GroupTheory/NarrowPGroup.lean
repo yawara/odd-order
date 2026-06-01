@@ -182,11 +182,11 @@ theorem pow_eq_one_of_mem_omega1UpperCentralTwo
 
 /-! ### `T = C_R(W)`: basic properties (BG §5, used in Theorem 5.3 (c)(d))
 
-`T = C_R(W) = Subgroup.centralizer (Ω₁(Z₂(R)))`. Two basic facts hold for any
-`p`-group: `T` is characteristic (centralizer of the characteristic `W`) and
-`Z(R) ⊆ T` (the centre centralises everything). The third BG property `R' ⊆ T`
-(mmd L1862) is genuinely true but its nested-commutator proof is deferred to the
-Theorem 5.3(d) work. -/
+`T = C_R(W) = Subgroup.centralizer (Ω₁(Z₂(R)))`. Three basic facts hold for any
+`p`-group: `T` is characteristic (centralizer of the characteristic `W`),
+`Z(R) ⊆ T` (the centre centralises everything), and `R' ⊆ T`. The last one is a
+three-subgroups argument from `W ≤ Z₂(R)`: both `[W,R]` and `[R,W]` lie in `Z(R)`,
+so `[[R,R],W]=1`. -/
 
 /-- **`T = C_R(W)` is characteristic** (BG §5). The centralizer of the
 characteristic subgroup `W = Ω₁(Z₂(R))` is characteristic
@@ -202,6 +202,36 @@ theorem center_le_centralizer_omega1UpperCentralTwo
     {R : Type*} [Group R] {p : ℕ} :
     Subgroup.center R ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) :=
   Subgroup.center_le_centralizer _
+
+/-- `R' ⊆ T = C_R(W)` (BG §5, mmd L1862), where `W = Ω₁(Z₂(R))`.
+
+This only uses `W ≤ Z₂(R)`: for `w ∈ W`, the defining property of `Z₂(R)` gives
+`[w,R] ≤ Z(R)`, hence also `[R,w] ≤ Z(R)`. The three-subgroups lemma then gives
+`[[R,R],W]=1`, i.e. the commutator subgroup centralizes `W`. -/
+theorem commutator_le_centralizer_omega1UpperCentralTwo
+    {R : Type*} [Group R] {p : ℕ} :
+    _root_.commutator R ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) := by
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  have hW_top_center : ⁅W, (⊤ : Subgroup R)⁆ ≤ Subgroup.center R := by
+    rw [Subgroup.commutator_le]
+    intro x hx y _
+    have hxZ2 : x ∈ upperCentralSeries R 2 := omega1UpperCentralTwo_le R p hx
+    have hmem : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries R 1 :=
+      mem_upperCentralSeries_succ_iff.mp hxZ2 y
+    rwa [upperCentralSeries_one, ← commutatorElement_def] at hmem
+  have htop_W_center : ⁅(⊤ : Subgroup R), W⁆ ≤ Subgroup.center R := by
+    rw [Subgroup.commutator_comm]
+    exact hW_top_center
+  have hW_top_top : ⁅⁅W, (⊤ : Subgroup R)⁆, (⊤ : Subgroup R)⁆ = ⊥ :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mpr
+      (hW_top_center.trans (Subgroup.center_le_centralizer _))
+  have htop_W_top : ⁅⁅(⊤ : Subgroup R), W⁆, (⊤ : Subgroup R)⁆ = ⊥ :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mpr
+      (htop_W_center.trans (Subgroup.center_le_centralizer _))
+  have hderived_W : ⁅⁅(⊤ : Subgroup R), (⊤ : Subgroup R)⁆, W⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate htop_W_top hW_top_top
+  rw [_root_.commutator_def]
+  exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hderived_W
 
 end Omega1UpperCentralTwo
 

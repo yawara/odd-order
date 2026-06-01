@@ -5,7 +5,7 @@
 > `IsPGroup p G`, `N⊴G`, `p^r ∣ |N|` ⇒ ∃ `L⊴G`, `L≤N`, `|L|=p^r` — BG Lem 1.22 と完全一致。
 > (前 survey agent は Isaacs Ch01 のみ検索し BG §1 S01 を見落とした。) ⇒ **Lem 5.1(b) の Lem 1.22 依存は充足済**;
 > §5 前半の残 gate は **Lem 4.7⇒ (=Lem 5.1(a), Gorenstein 5.4.15)** と **Lem 4.5(c) noncyclic 半 (=Lem 4.5(a) general, Gorenstein 5.4.10)** のみ (ともに §4 側)。
-> なお S5-0 infra (IsNarrow / E*(R) / Ω₁(Z₂(R)) / Lem 4.5(c) exp-p 半) は `OddOrder/GroupTheory/NarrowPGroup.lean` に**着地済** (commits bcfb437..539aeae)。実装設計は `notes/bg/s05_design_2026_05_30.md`。
+> なお S5-0 infra (IsNarrow / E*(R) / Ω₁(Z₂(R)) / Lem 4.5(c) exp-p 半 / `T=C_R(W)` の char・`Z(R)⊆T`・`R'⊆T`) は `OddOrder/GroupTheory/NarrowPGroup.lean` に**着地済** (R'⊆T は 2026-06-02, three-subgroups)。実装設計は `notes/bg/s05_design_2026_05_30.md`。
 
 > **目的**: 別エージェントが BG §5 (`OddOrder/BG/Ch1_Preliminary/S05_NarrowPGroups.lean`, 未作成) を
 > **cold start** で実装できる水準の調査。READ-ONLY 調査の成果物 (Lean 未編集)。
