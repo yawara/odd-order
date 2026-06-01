@@ -671,6 +671,43 @@ private theorem center_map_le_omega1_centralizer_omega1_map
     exact hz_pow
   exact ⟨⟨(z : R), hzC⟩, hz_omega, rfl⟩
 
+/-- Blackburn 4.16 centralizer core: for `S = Ω₁(R)` and `C = C_R(S)`,
+`Ω₁(C)` is the ambient copy of `Z(S)`; in the extraspecial case this is `S'`,
+and `C` is cyclic. -/
+private theorem blackburn_omega1_centralizer_eq_center_cyclic_and_commutator
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hΩ_pow : ∀ x : Omega R p 1, x ^ p = 1)
+    (hΩ_extraspecial : IsExtraspecial p (Omega R p 1)) :
+    let S : Subgroup R := Omega R p 1
+    let C : Subgroup R := Subgroup.centralizer (S : Set R)
+    (Omega C p 1).map C.subtype = (Subgroup.center S).map S.subtype ∧
+      IsCyclic C ∧
+      (Omega C p 1).map C.subtype = (_root_.commutator S).map S.subtype := by
+  dsimp
+  let S : Subgroup R := Omega R p 1
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  have hΩC_eq_center :
+      (Omega C p 1).map C.subtype = (Subgroup.center S).map S.subtype := by
+    change (Omega (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) p 1).map
+        (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)).subtype =
+      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype
+    exact le_antisymm
+      (omega1_centralizer_omega1_map_le_center_map (R := R) (p := p))
+      (center_map_le_omega1_centralizer_omega1_map (R := R) (p := p) hΩ_pow)
+  have hΩC_card_le_p : Nat.card (Omega C p 1) ≤ p := by
+    have hmap_card : Nat.card ((Omega C p 1).map C.subtype) = Nat.card (Omega C p 1) := by
+      rw [Subgroup.card_map_of_injective C.subtype_injective]
+    rw [← hmap_card, hΩC_eq_center,
+      Subgroup.card_map_of_injective S.subtype_injective, hΩ_extraspecial.center_card]
+  have hC_pg : IsPGroup p C := hR.to_subgroup C
+  have hC_cyclic : IsCyclic C :=
+    isCyclic_of_card_omega1_le_prime hC_pg hp_odd hΩC_card_le_p
+  have hΩC_eq_comm :
+      (Omega C p 1).map C.subtype = (_root_.commutator S).map S.subtype := by
+    rw [hΩC_eq_center, hΩ_extraspecial.commutator_eq_center]
+  exact ⟨hΩC_eq_center, hC_cyclic, hΩC_eq_comm⟩
+
 /-- A nonabelian finite group of order `p³` has center of order `p`. -/
 private theorem center_card_eq_prime_of_noncomm_card_prime_cube
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
@@ -805,22 +842,9 @@ private theorem blackburnCentralProductCase_of_omega1_commutator_le_center
     BlackburnCentralProductCase p R := by
   let S : Subgroup R := Omega R p 1
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
-  have hΩC_eq_center :
-      (Omega C p 1).map C.subtype = (Subgroup.center S).map S.subtype := by
-    change (Omega (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)) p 1).map
-        (Subgroup.centralizer ((Omega R p 1 : Subgroup R) : Set R)).subtype =
-      (Subgroup.center (Omega R p 1)).map (Omega R p 1).subtype
-    exact le_antisymm
-      (omega1_centralizer_omega1_map_le_center_map (R := R) (p := p))
-      (center_map_le_omega1_centralizer_omega1_map (R := R) (p := p) hΩ_pow)
-  have hΩC_card_le_p : Nat.card (Omega C p 1) ≤ p := by
-    have hmap_card : Nat.card ((Omega C p 1).map C.subtype) = Nat.card (Omega C p 1) := by
-      rw [Subgroup.card_map_of_injective C.subtype_injective]
-    rw [← hmap_card, hΩC_eq_center,
-      Subgroup.card_map_of_injective S.subtype_injective, hΩ_extraspecial.center_card]
-  have hC_pg : IsPGroup p C := hR.to_subgroup C
-  have hC_cyclic : IsCyclic C :=
-    isCyclic_of_card_omega1_le_prime hC_pg hp_odd hΩC_card_le_p
+  obtain ⟨_hΩC_eq_center, hC_cyclic, hΩC_eq_comm⟩ :=
+    blackburn_omega1_centralizer_eq_center_cyclic_and_commutator
+      hp_odd hR hΩ_pow hΩ_extraspecial
   have hsup : S ⊔ C = ⊤ := by
     change (Omega R p 1 : Subgroup R) ⊔
         Subgroup.centralizer (((Omega R p 1 : Subgroup R)) : Set R) = ⊤
@@ -831,9 +855,6 @@ private theorem blackburnCentralProductCase_of_omega1_commutator_le_center
       (le_rfl : C ≤ Subgroup.centralizer (S : Set R))
   have hcentral : IsCentralProduct (⊤ : Subgroup R) S C :=
     IsCentralProduct.of_le_centralizer hsup.symm hS_le_centC
-  have hΩC_eq_comm :
-      (Omega C p 1).map C.subtype = (_root_.commutator S).map S.subtype := by
-    rw [hΩC_eq_center, hΩ_extraspecial.commutator_eq_center]
   exact ⟨S, C, hcentral, hΩ_noncomm, hΩ_card, hΩ_exp, hC_cyclic, hΩC_eq_comm⟩
 
 /-- A strict subgroup inclusion in a finite ambient group gives a strict cardinality
@@ -1440,6 +1461,9 @@ theorem blackburnRankTwoClassification
     have hTC_map :=
       blackburn_noncentral_commutator_map_centralizer_card_and_omega
         hT_facts hT_elem hT_quot_cards
+    obtain ⟨hΩC_eq_center, hC_cyclic, hΩC_eq_comm⟩ :=
+      blackburn_omega1_centralizer_eq_center_cyclic_and_commutator
+        hp_odd hR hΩ_pow hΩ_extraspecial
     have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
