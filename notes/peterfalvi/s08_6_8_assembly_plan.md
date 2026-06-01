@@ -193,13 +193,20 @@ S06: `CertainTypeHypothesis`(38), `W2`。
       一般版 `brauer_permutation_lemma` (BrauerPermutation.lean:264) は任意 permutation+compat を取るので、
       **W₁(⟨g⟩)-共役 permutation を character table 上に構成して instantiate** すれば良いが substantial (新 infra)。
       群レベルの自由作用は Frobenius で既存 (`IsFrobeniusGroup` → `FrobeniusActionTI.stabilizer_eq_bot` /
-      `fixedPointFree_toMulAut`)。⟹ 残 = 「群レベル自由 ⟹ Irr レベル自由 (inertia=H)」の **general Brauer
-      for conjugation の instantiation** (別 multi-session 課題; これが (6.8)/§9-§16 の Frobenius-induced
-      irreducibility 全体の鍵)。
+      `fixedPointFree_toMulAut`)。2026-06-02 追記: general Brauer Layer B は
+      `ConjugationBrauer.lean` として landed (`IrreducibleCharacter.conjByPerm`, `ConjClasses.conjByPerm`,
+      `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`)。Layer C のうち、
+      fixed conjugacy classes count = 1 から nontrivial Irr 非固定を出す bridge も landed
+      (`not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)。⟹ 残 = 群論側 free action から
+      fixed conjugacy classes count = 1 を作り、`inertia(θ)=H` へ束ねる部分。
   (4) ✅ **等次数 infra done** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`
       via `Subgroup.IsComplement.card_right` on `hyp.split`)。6.34 degree `[L:H]·θ(1)` + θ degree 1 と
       合わせ `η_j(1)=|W₁|`。
+      2026-06-02 追記: `IndChainDecomposition.inner_chi_eq_ite` で (6.8) consumer の output
+      orthonormality を 1 lemma に集約済み。
   (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。tractable。
-  → **T6 の律速 = (3) general Brauer for conjugation** (新 infra)。これが立てば 6.34 + (4)/(5) + engine
-    (difference-support 版) で T6 完成。T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
+  → **T6 の律速 = (3) general Brauer for conjugation Layer C の群論側**。Layer B と
+    fixed class count = 1 → nontrivial Irr 非固定 bridge は landed 済みなので、残る fixed class count を
+    free action から出せば 6.34 + (4)/(5) + engine (difference-support 版) で T6 完成。
+    T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
     T9-T11 (glue) は後続。

@@ -34,6 +34,9 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       各フィールドを `extension_inner_eq` (isometry) と `extends_on_supported`
       + `LinearMap.map_sub` + `map_zsmul` で組み立て。sorry-free。
 - [x] `IndChainDecomposition.image_eq_zero` simp lemma (`t = 0` 時の vacuous case)。
+- [x] (2026-06-02) `IndChainDecomposition.inner_chi_eq_ite`: output family `χ` の
+      orthonormality を `if t = u then 1 else 0` 形にまとめる consumer lemma。sorry-free、
+      `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。
@@ -1356,11 +1359,14 @@ axiom-clean, AxiomsCheck 登録)**:
 - (6.8) proof は `sibleySetup_is_coherent` (S08:251) を埋める作業。task DAG (T0–T11) + 全 spec の
   **正本 = `notes/peterfalvi/s08_6_8_assembly_plan.md`** (§A 6.34 / §B-C T1 / §D T6)。
 - **T6 (Y coherent) の律速** = `inertia(θ)=H` (W₁ が Irr(H)∖{1} に自由作用、6.34 の前提)。精査結果:
-  repo `brauer_permutation_lemma'` は **inversion 専用**、一般版 `brauer_permutation_lemma`
-  (BrauerPermutation.lean:264) に **W₁-共役 permutation を instantiate** する新 infra が必要 (群レベル
-  自由作用は Frobenius `FrobeniusActionTI` で既存 → Irr レベルへの Brauer bridge が残)。
+  repo `brauer_permutation_lemma'` は **inversion 専用**だったが、2026-06-02 までに一般版 Layer A と
+  conjugation 実体化 Layer B (`ConjugationBrauer.lean`: `IrreducibleCharacter.conjByPerm`,
+  `ConjClasses.conjByPerm`, `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`) が landed。
+  群レベル自由作用は Frobenius `FrobeniusActionTI` で既存。Layer C のうち
+  **fixed conjugacy classes count = 1 ⇒ nontrivial Irr は固定されない** は 2026-06-02 に landed。
+  残る bridge は、群論側 free action から fixed conjugacy classes count = 1 を出して `inertia=H` に束ねる部分。
   **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
-- 次セッション推奨: **general Brauer for conjugation を独立タスク**として立てる (これが立てば 6.34 +
+- 次セッション推奨: issue 0053 Layer C を進める (これが立てば 6.34 +
   index_H_eq_card_W1 + difference-support engine で T6 完成 → T7/T8/T9–T11)。
 
 ### 並行可能な独立 leaf (6.34/Brauer 非依存、`s08_6_8_assembly_plan.md` C 表)

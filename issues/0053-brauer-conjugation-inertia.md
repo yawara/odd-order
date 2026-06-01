@@ -42,19 +42,26 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - **`brauer_permutation_lemma_general`** (idx,hrow,σ,π,h_compat ⟹ `Nat.card(fixedPoints σ)=Nat.card(fixedPoints π)`)
   - **`brauer_permutation_lemma_general'`** ([Finite] のみ; idx/hrow を `instCharacterTableIndexingOfFinite`+row-orthogonality で放電)
   - `brauer_permutation_lemma` を core 共有に refactor (anti-dup; statement 不変ゆえ downstream 無影響)
-- [ ] **Layer B — conjugation action を compatible (σ,π) で実体化** (新 file `ConjugationBrauer.lean`):
-  - `IsIrreducibleCharacter (conjBy g θ)` (= `compHom (conjByMulEquiv g) θ` 経由) + `conjByPermIrr g : Equiv.Perm (IrreducibleCharacter ↥H)`
-  - `conjClassPerm g : Equiv.Perm (ConjClasses ↥H)` (⟦h⟧↦⟦g·h·g⁻¹⟧, `Quotient.lift`, well-defined ← H normal)
-  - 互換性補題 + Layer A 適用 ⟹ `Nat.card(fixedPoints(conjByPermIrr g))=Nat.card(fixedPoints(conjClassPerm g))`
+- [x] **Layer B — conjugation action を compatible (σ,π) で実体化** (新 file `ConjugationBrauer.lean`, 2026-06-02):
+  - `IrreducibleCharacter.conjByPerm g : Equiv.Perm (IrreducibleCharacter ↥H)`
+  - `ConjClasses.conjByPerm g : Equiv.Perm (ConjClasses ↥H)` (⟦h⟧↦⟦g·h·g⁻¹⟧, `ConjClasses.map` で定義)
+  - `characterTableEntry_conjByPerm` + `brauer_permutation_lemma_general'` による
+    `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`。
 - [ ] **Layer C — free action ⟹ inertia=H**:
   - `conjClassPerm g` は単位類固定; `g∉H`+free `C_L(h)≤H` ⟹ 単位類のみ固定 ⟹ `#fix=1`
-  - ⟹ `#fix(conjByPermIrr g)=1` ⟹ 自明指標のみ ⟹ `inertia_eq_of_freeAction` (θ≠1 ⟹ `inertia θ = H`)
+  - ✅ 2026-06-02 partial: `conjByPerm_trivialIrreducibleCharacter`,
+    `fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one`,
+    `conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one`,
+    `not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one` を追加。
+  - 残: 群論側 free action から `Nat.card (Function.fixedPoints (ConjClasses.conjByPerm g)) = 1` を作り、
+    `inertia_eq_of_freeAction` (θ≠1 ⟹ `inertia θ = H`) に束ねる。
 - [ ] **Layer D — wiring** (T6 proper / 別 commit): free-action を Frobenius (case c1) 等から放電し
   6.34 + `index_H_eq_card_W1` + difference-support engine で `Y` coherent。
 
 ## 完了条件
 
 - Layer A/B/C が sorry/axiom 無 (`#assert_only_allowed_axioms` 3 axiom 全 allowlist)、`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑。
+  - 2026-06-02: Layer B 追加後 `lake build OddOrder` 緑。
 - `inertia_eq_of_freeAction` (free-action 仮説 + θ≠1 ⟹ inertia θ = H) が statement 化・証明される。
 - これと 6.34 で (6.8) T6 の `Y` family 既約性が機械的に従う (Layer D は別 issue/commit でも可)。
 

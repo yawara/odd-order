@@ -80,22 +80,27 @@ These are the *proof* ingredients of (7.10): the map `ρ`, the family inequality
 (`OddOrder.RepresentationTheory`, §4-§8).  The §9 headline results (7.10)-(7.11)
 below do not reference them — those are pure group-theoretic statements.
 
-This file installs (7.1)-(7.8), all sorry-free:
+This file installs (7.1)-(7.8), all sorry-free, and names the faithful
+(7.9) two-family non-orthogonality target as a predicate:
 * (7.1)-(7.3): the hypothesis bundle (`Hypothesis71`), the `ρ` map
   (`chiRho` / `chiRhoCF` / `chiRhoSupp`), (7.2.a) `chiRho_dadeImage_eq`,
   (7.2.b) `chiRho_norm_sq_le`, (7.3) `chiRho_integral_inequality`;
 * (7.4)-(7.5): `FamilyHypothesis71` and `family_inequality`;
 * (7.6)-(7.7): the normal-subgroup case `A = H^#` (`Hypothesis76`), with
   (7.7.a) `chiRho_explicit_formula` and (7.7.b) `chiRho_norm_sq_double_sum`;
-* (7.8): the coherence-based formula (`Hypothesis78`), with (7.8.c.i)
-  `chiRho_eq_inner_beta_on_A` and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`.
+* (7.8): the coherence-based formula (`Hypothesis78`), with the (7.8.a)
+  target `Hypothesis78.BetaDecomp`, the (7.8.b) target
+  `Hypothesis78.NormEstimates`, (7.8.c.i) `chiRho_eq_inner_beta_on_A`,
+  and (7.8.c.ii) `chiRho_norm_sq_eq_card_ratio_mul`;
+* (7.9): the statement interface `Hypothesis79` and its conclusion predicate
+  `Hypothesis79.conclusion`.
 
 The (7.7.a) and (7.8.c.i) pointwise identities are carried as structural
 certificates (`Hypothesis76.chiRho_decomp`, `Hypothesis78.chiRho_eq_inner_beta`):
 they encode Peterfalvi's `CF(L,A)`-basis / coherence reductions, whose proofs
 need the induced/restricted-character decomposition theory not yet in this file.
 The norm-square corollaries (7.7.b)/(7.8.c.ii) are then proved here outright.
-(7.9) remains as follow-on. -/
+The proof of (7.9) remains as follow-on. -/
 
 section Section_7_1_to_7_3
 
@@ -1384,6 +1389,340 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The real norm square `‖β‖²` used in Peterfalvi (7.8.b). -/
+noncomputable def betaNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner H78.beta H78.beta).re
+
+/-- The source-side norm square `‖Ind 1_H - ζ‖²` corresponding to `β`. -/
+noncomputable def sourceDiffNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner
+    (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+    (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)).re
+
+/-- The Dade-isometry step in Peterfalvi (7.8.b): the norm of `β` equals the
+norm of the source difference `Ind 1_H - ζ`.  The remaining `‖β‖² = e + 1`
+calculation is therefore a source-side character computation. -/
+theorem beta_inner_self_eq_sourceDiff_inner_self (H78 : Hypothesis78 G A L) :
+    ClassFunction.inner H78.beta H78.beta =
+      ClassFunction.inner
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct) := by
+  simpa [beta, indMinusZetaSupp] using
+    H78.hyp76.isDadeIsometry.inner_eq H78.indMinusZetaSupp H78.indMinusZetaSupp
+
+/-- Real-valued form of `beta_inner_self_eq_sourceDiff_inner_self`. -/
+theorem betaNormSq_eq_sourceDiffNormSq (H78 : Hypothesis78 G A L) :
+    H78.betaNormSq = H78.sourceDiffNormSq := by
+  rw [betaNormSq, sourceDiffNormSq, H78.beta_inner_self_eq_sourceDiff_inner_self]
+
+/-- Source-side expansion of `‖Ind 1_H - ζ‖²`.  This isolates the remaining
+character-theoretic facts needed to turn the source norm into `e + 1`. -/
+theorem sourceDiff_inner_self_expand (H78 : Hypothesis78 G A L) :
+    ClassFunction.inner
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct) =
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+          (H78.hyp76.zeta H78.zetaDistinct) +
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.zetaDistinct) := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right]
+  ring
+
+/-- Real-valued source-side expansion corresponding to
+`sourceDiff_inner_self_expand`. -/
+theorem sourceDiffNormSq_expand (H78 : Hypothesis78 G A L) :
+    H78.sourceDiffNormSq =
+      (ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.ind1H) -
+        ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+          (H78.hyp76.zeta H78.zetaDistinct) +
+        ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+          (H78.hyp76.zeta H78.zetaDistinct)).re := by
+  rw [sourceDiffNormSq, H78.sourceDiff_inner_self_expand]
+
+/-- The weighted `S^ν`-sum occurring in Peterfalvi (7.8.a):
+`Σ_{φ ∈ S} φ(1)/(e ‖φ‖²) · φ^ν`, where `S = T \ {Ind 1_H}` and
+`e = ζ(1)` for the distinguished `ζ`. -/
+noncomputable def weightedNuSum (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
+  ∑ i ∈ (Finset.univ.erase H78.ind1H),
+    (H78.hyp76.zeta i (1 : L) /
+        (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))) •
+      H78.nu (H78.hyp76.zeta i)
+
+/-- **Peterfalvi (7.8.a) target.**  The coherent images `S^ν` are orthogonal to
+`1_G`, and `β` has the displayed decomposition
+`β = 1_G - ζ^ν + a · Σ_{φ∈S} φ(1)/(e‖φ‖²) φ^ν + Γ`, with `a ∈ ℤ`
+and `Γ` orthogonal to `S^ν ∪ {1_G}`.
+
+This is a standalone target for the future proof of (7.8.a), not a field of
+`Hypothesis78`; hence it does not add a new assumption to already-green results. -/
+structure BetaDecomp (H78 : Hypothesis78 G A L) where
+  /-- `S^ν ⊥ 1_G`. -/
+  orth_one : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i)) (Hypothesis71.constOne G) = 0
+  /-- The integer coefficient `a` in Peterfalvi (7.8.a). -/
+  a : ℤ
+  /-- The residual term `Γ`. -/
+  Gamma : ClassFunction G ℂ
+  /-- `Γ` is orthogonal to `S^ν`. -/
+  Gamma_orth_nu : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+    ClassFunction.inner Gamma (H78.nu (H78.hyp76.zeta i)) = 0
+  /-- `Γ` is orthogonal to `1_G`. -/
+  Gamma_orth_one : ClassFunction.inner Gamma (Hypothesis71.constOne G) = 0
+  /-- The displayed decomposition of `β`. -/
+  beta_eq :
+    H78.beta =
+      Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta H78.zetaDistinct) +
+        (a : ℂ) • H78.weightedNuSum + Gamma
+
+/-- Kernel order `h = |H|` for Peterfalvi (7.8.b). -/
+noncomputable def kernelOrder (H78 : Hypothesis78 G A L) : ℕ :=
+  Nat.card H78.hyp76.H
+
+/-- Complement index `e = |L:H|` for Peterfalvi (7.8.b), stored as
+`|L| / |H|` using the ambient normal-subgroup data. -/
+noncomputable def complementIndex (H78 : Hypothesis78 G A L) : ℕ :=
+  Nat.card L / Nat.card H78.hyp76.H
+
+/-- **Peterfalvi (7.8.b) source norm target.**  The remaining source-side
+character computation for `‖β‖² = e + 1`, after the Dade-isometry bridge has
+reduced the norm of `β` to `‖Ind 1_H - ζ‖²`.
+
+This is standalone target data, not a field of `Hypothesis78`; completing it
+requires evaluating the four source inner products isolated by
+`sourceDiffNormSq_expand`. -/
+structure SourceDiffNormEvaluation (H78 : Hypothesis78 G A L) : Prop where
+  /-- `‖Ind 1_H - ζ‖² = e + 1`. -/
+  sourceDiffNormSq_eq :
+    H78.sourceDiffNormSq = (H78.complementIndex : ℝ) + 1
+
+/-- Once the source-side norm computation is available, the beta norm identity
+`‖β‖² = e + 1` follows from the Dade isometry. -/
+theorem betaNormSq_eq_complementIndex_add_one (H78 : Hypothesis78 G A L)
+    (hsrc : H78.SourceDiffNormEvaluation) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  rw [H78.betaNormSq_eq_sourceDiffNormSq, hsrc.sourceDiffNormSq_eq]
+
+/-- The four source-side inner-product evaluations needed for
+`‖Ind 1_H - ζ‖² = e + 1` imply `SourceDiffNormEvaluation`.
+
+In the textbook proof these are the normal-subgroup character computations for
+`Ind_H^L 1_H` and the chosen irreducible `ζ`: the induced principal character
+has norm square `e`, it is orthogonal to `ζ` on both sides, and `ζ` has norm
+one. -/
+theorem sourceDiffNormEvaluation_of_inner_values (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hind_zeta :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.zetaDistinct) = 0)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    H78.SourceDiffNormEvaluation where
+  sourceDiffNormSq_eq := by
+    rw [H78.sourceDiffNormSq_expand, hind_norm, hzeta_ind, hind_zeta, hzeta_norm]
+    simp
+
+/-- The chosen non-principal `ζ` has norm one once it is known to be irreducible. -/
+theorem zetaDistinct_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 := by
+  simpa using
+    (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L)
+      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L))
+
+/-- Variant of `sourceDiffNormEvaluation_of_inner_values` using irreducibility of
+the chosen `ζ` instead of a raw self-inner-product evaluation. -/
+theorem sourceDiffNormEvaluation_of_inner_values_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hind_zeta :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.zetaDistinct) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.SourceDiffNormEvaluation :=
+  H78.sourceDiffNormEvaluation_of_inner_values
+    hind_norm hzeta_ind hind_zeta
+    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- Variant using Hermitian symmetry: one orthogonality direction determines the other. -/
+theorem sourceDiffNormEvaluation_of_zeta_ind_orthogonal (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    H78.SourceDiffNormEvaluation := by
+  refine H78.sourceDiffNormEvaluation_of_inner_values hind_norm hzeta_ind ?_ hzeta_norm
+  rw [Hypothesis71.ClassFunction.inner_symm, hzeta_ind, star_zero]
+
+/-- Variant using one orthogonality direction and irreducibility of the chosen `ζ`. -/
+theorem sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.SourceDiffNormEvaluation :=
+  H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal
+    hind_norm hzeta_ind
+    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- Combined beta-norm form of `sourceDiffNormEvaluation_of_inner_values`. -/
+theorem betaNormSq_eq_complementIndex_add_one_of_inner_values
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hind_zeta :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.zetaDistinct) = 0)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  exact H78.betaNormSq_eq_complementIndex_add_one
+    (H78.sourceDiffNormEvaluation_of_inner_values hind_norm hzeta_ind hind_zeta hzeta_norm)
+
+/-- Combined beta-norm form using irreducibility of the chosen `ζ`. -/
+theorem betaNormSq_eq_complementIndex_add_one_of_inner_values_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hind_zeta :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.zetaDistinct) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  exact H78.betaNormSq_eq_complementIndex_add_one
+    (H78.sourceDiffNormEvaluation_of_inner_values_of_zeta_irreducible
+      hind_norm hzeta_ind hind_zeta hzeta_irr)
+
+/-- Combined beta-norm form using one orthogonality direction and irreducibility of `ζ`. -/
+theorem betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H) =
+        (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.betaNormSq = (H78.complementIndex : ℝ) + 1 := by
+  exact H78.betaNormSq_eq_complementIndex_add_one
+    (H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+      hind_norm hzeta_ind hzeta_irr)
+
+/-- The size hypothesis `e ≤ (h - 1) / 2`, written without division as
+`2e + 1 ≤ h`. -/
+noncomputable def smallIndex (H78 : Hypothesis78 G A L) : Prop :=
+  2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+
+/-- The class function `(ζ^ν)^ρ` whose norm is estimated in Peterfalvi (7.8.b). -/
+noncomputable def zetaNuRho (H78 : Hypothesis78 G A L) : ClassFunction L ℂ :=
+  H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+
+/-- The real norm square `‖(ζ^ν)^ρ‖²` from Peterfalvi (7.8.b). -/
+noncomputable def zetaNuRhoNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re
+
+/-- The real norm square `‖Γ‖²` from Peterfalvi (7.8.b). -/
+noncomputable def gammaNormSq (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : ℝ :=
+  (ClassFunction.inner hBD.Gamma hBD.Gamma).re
+
+/-- Arithmetic core of Peterfalvi (7.8.b): if `2e + 1 ≤ h`, then the
+quadratic correction `u a² - 2 v a` is nonnegative for every integer `a`, where
+`u = (1/e)(1 - 1/h)` and `v = 1/h`. -/
+lemma quadraticTerm_nonneg_of_smallIndex {e h : ℝ} (a : ℤ)
+    (he : 0 < e) (hsmall : 2 * e + 1 ≤ h) :
+    0 ≤ (1 / e) * (1 - 1 / h) * (a : ℝ) ^ 2 - 2 * (1 / h) * (a : ℝ) := by
+  have hh_pos : 0 < h := by linarith
+  have he_ne : e ≠ 0 := ne_of_gt he
+  have hh_ne : h ≠ 0 := ne_of_gt hh_pos
+  have hsmall' : 2 * e ≤ h - 1 := by linarith
+  have hu_eq : (1 / e) * (1 - 1 / h) = (h - 1) / (e * h) := by
+    field_simp [he_ne, hh_ne]
+  have hkey : 2 * (1 / h) ≤ (1 / e) * (1 - 1 / h) := by
+    rw [hu_eq]
+    rw [show 2 * (1 / h) = 2 / h by ring]
+    rw [div_le_div_iff₀ hh_pos (mul_pos he hh_pos)]
+    nlinarith
+  have hv_nonneg : 0 ≤ 2 * (1 / h) := by
+    rw [one_div]
+    exact mul_nonneg (by norm_num) (inv_nonneg.mpr hh_pos.le)
+  have hu_nonneg : 0 ≤ (1 / e) * (1 - 1 / h) := le_trans hv_nonneg hkey
+  by_cases ha_nonpos_int : a ≤ 0
+  · have ha_nonpos : (a : ℝ) ≤ 0 := by exact_mod_cast ha_nonpos_int
+    have hsq_nonneg : 0 ≤ (a : ℝ) ^ 2 := sq_nonneg _
+    have hterm1 : 0 ≤ (1 / e) * (1 - 1 / h) * (a : ℝ) ^ 2 :=
+      mul_nonneg hu_nonneg hsq_nonneg
+    have hprod_nonpos : 2 * (1 / h) * (a : ℝ) ≤ 0 :=
+      mul_nonpos_of_nonneg_of_nonpos hv_nonneg ha_nonpos
+    nlinarith
+  · have ha_ge_one_int : 1 ≤ a := by omega
+    have ha_ge_one : (1 : ℝ) ≤ a := by exact_mod_cast ha_ge_one_int
+    have ha_nonneg : 0 ≤ (a : ℝ) := by linarith
+    have ha_sq_ge : (a : ℝ) ≤ (a : ℝ) ^ 2 := by nlinarith
+    have hmul1 : 2 * (1 / h) * (a : ℝ) ≤
+        ((1 / e) * (1 - 1 / h)) * (a : ℝ) :=
+      mul_le_mul_of_nonneg_right hkey ha_nonneg
+    have hmul2 : ((1 / e) * (1 - 1 / h)) * (a : ℝ) ≤
+        ((1 / e) * (1 - 1 / h)) * (a : ℝ) ^ 2 :=
+      mul_le_mul_of_nonneg_left ha_sq_ge hu_nonneg
+    nlinarith
+
+/-- **Peterfalvi (7.8.b) target.**  Under `2e + 1 ≤ h`, the coherent
+`ζ`-image satisfies `‖(ζ^ν)^ρ‖² ≥ 1 - e/h`, and the residual term from
+(7.8.a) satisfies `‖Γ‖² ≤ e - 1`.
+
+As with `BetaDecomp`, this is a standalone future-proof target rather than a
+new field of `Hypothesis78`. -/
+structure NormEstimates (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : Prop where
+  /-- `‖(ζ^ν)^ρ‖² ≥ 1 - e/h`. -/
+  zetaNuRho_norm_sq_ge :
+    H78.smallIndex →
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        H78.zetaNuRhoNormSq
+  /-- `‖Γ‖² ≤ e - 1`. -/
+  gamma_norm_sq_le :
+    H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
+
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
 theorem chiRho_eq_inner_beta_on_A (H78 : Hypothesis78 G A L)
@@ -1457,6 +1796,76 @@ end Hypothesis78
 
 end Section_7_8
 
+section Section_7_9
+
+/-! ### (7.9): two-family non-orthogonality
+
+Peterfalvi (7.9) is the final two-family character-theoretic input used in the
+proof of (7.10).  The proof combines (7.8.a), (5.9), odd-order non-realness
+(1.1), and the cross-family disjointness of Dade supports.  Here we name the
+faithful hypothesis bundle and conclusion predicate, without adding it as a new
+assumption to the group-theoretic `(7.10)` theorem. -/
+
+/-- **Peterfalvi (7.9) hypothesis interface.**  Two instances of the (7.8)
+coherence/norm setup over the same odd-order group, with disjoint Dade supports
+`A₁^{τ₁}` and `A₂^{τ₂}` as in Hypothesis (7.4) for `I = {1,2}`. -/
+structure Hypothesis79 (G : Type*) [Group G] [Fintype G]
+    (A₁ : Set G) (L₁ : Subgroup G) [Fintype L₁]
+    [Invertible (Nat.card L₁ : ℂ)]
+    (A₂ : Set G) (L₂ : Subgroup G) [Fintype L₂]
+    [Invertible (Nat.card L₂ : ℂ)]
+    [Invertible (Nat.card G : ℂ)] where
+  /-- The ambient group has odd order. -/
+  odd_card : Odd (Nat.card G)
+  /-- The first coherent normal-subgroup setup. -/
+  first : Hypothesis78 G A₁ L₁
+  /-- The second coherent normal-subgroup setup. -/
+  second : Hypothesis78 G A₂ L₂
+  /-- The Dade supports `A₁^{τ₁}` and `A₂^{τ₂}` are disjoint. -/
+  dadeSupport_disjoint :
+    Disjoint first.hyp76.hyp71.hyp.dadeSupport second.hyp76.hyp71.hyp.dadeSupport
+
+namespace Hypothesis79
+
+variable {G : Type*} [Group G] [Fintype G]
+variable {A₁ : Set G} {L₁ : Subgroup G} [Fintype L₁]
+variable [Invertible (Nat.card L₁ : ℂ)]
+variable {A₂ : Set G} {L₂ : Subgroup G} [Fintype L₂]
+variable [Invertible (Nat.card L₂ : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- The image `ζ₁^{ν₁}` of the distinguished first `ζ`. -/
+noncomputable def firstZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction G ℂ :=
+  H79.first.nu (H79.first.hyp76.zeta H79.first.zetaDistinct)
+
+/-- The image `ζ₂^{ν₂}` of the distinguished second `ζ`. -/
+noncomputable def secondZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction G ℂ :=
+  H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)
+
+/-- **Peterfalvi (7.9) conclusion.**  The two cross inner products cannot both
+vanish: `(β₁, ζ₂^{ν₂}) ≠ 0` or `(β₂, ζ₁^{ν₁}) ≠ 0`. -/
+def conclusion (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) : Prop :=
+  ClassFunction.inner H79.first.beta H79.secondZetaImage ≠ 0 ∨
+    ClassFunction.inner H79.second.beta H79.firstZetaImage ≠ 0
+
+/-- Swapping the two families preserves the (7.9) hypothesis interface. -/
+def swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    Hypothesis79 G A₂ L₂ A₁ L₁ where
+  odd_card := H79.odd_card
+  first := H79.second
+  second := H79.first
+  dadeSupport_disjoint := H79.dadeSupport_disjoint.symm
+
+/-- The (7.9) conclusion is symmetric in the two families. -/
+theorem conclusion_swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    H79.swap.conclusion ↔ H79.conclusion := by
+  simp [conclusion, swap, firstZetaImage, secondZetaImage, or_comm]
+
+end Hypothesis79
+
+end Section_7_9
+
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
 /-- **Peterfalvi (7.10) hypothesis.** A family of `k` Frobenius subgroups of `G`
@@ -1503,12 +1912,441 @@ kernel. -/
 def G0 (F : FrobeniusFamily G k) : Set G :=
   {x : G | ∀ i, x ∉ F.kernelSpread i}
 
+theorem mem_G0_iff (F : FrobeniusFamily G k) {x : G} :
+    x ∈ F.G0 ↔ ∀ i, x ∉ F.kernelSpread i := Iff.rfl
+
+/-- The implementation of kernelSpread is the usual conjugacy closure of H_i^#. -/
+lemma mem_kernelSpread_iff_conjugatesOfSet (F : FrobeniusFamily G k) (i : Fin k)
+    {x : G} :
+    x ∈ F.kernelSpread i ↔ x ∈ Group.conjugatesOfSet ((F.H i : Set G) \ {1}) := by
+  constructor
+  · rintro ⟨g, hg⟩
+    rw [Group.mem_conjugatesOfSet_iff]
+    refine ⟨g * x * g⁻¹, hg, ?_⟩
+    rw [isConj_iff]
+    refine ⟨g⁻¹, ?_⟩
+    group
+  · intro hx
+    rcases Group.mem_conjugatesOfSet_iff.mp hx with ⟨y, hy, hconj⟩
+    rcases isConj_iff.mp hconj with ⟨g, hg⟩
+    refine ⟨g⁻¹, ?_⟩
+    rw [← hg]
+    have hback : g⁻¹ * (g * y * g⁻¹) * g = y := by group
+    simpa [hback] using hy
+
+lemma kernelSpread_eq_conjugatesOfSet (F : FrobeniusFamily G k) (i : Fin k) :
+    F.kernelSpread i = Group.conjugatesOfSet ((F.H i : Set G) \ {1}) := by
+  ext x
+  exact F.mem_kernelSpread_iff_conjugatesOfSet i
+
+lemma one_not_mem_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
+    (1 : G) ∉ F.kernelSpread i := by
+  rintro ⟨g, hg⟩
+  exact hg.2 (by simp)
+
+lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
+  intro i
+  exact F.one_not_mem_kernelSpread i
+
+/-- Elements of L_i = N_G(H_i) conjugate H_i to itself. -/
+lemma mem_kernel_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
+    {g x : G} (hg : g ∈ F.L i) :
+    g * x * g⁻¹ ∈ F.H i ↔ x ∈ F.H i := by
+  have hnorm : g ∈ Subgroup.normalizer (F.H i : Set G) := by
+    rw [← F.normalizer_eq i]
+    exact hg
+  exact (Subgroup.mem_normalizer_iff.mp hnorm x).symm
+
+/-- Elements of L_i conjugate the sharp kernel H_i^# to itself. -/
+lemma mem_kernel_sharp_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
+    {g x : G} (hg : g ∈ F.L i) :
+    g * x * g⁻¹ ∈ (F.H i : Set G) \ {1} ↔ x ∈ (F.H i : Set G) \ {1} := by
+  constructor
+  · intro hx
+    exact ⟨(F.mem_kernel_conj_iff_of_mem_L i hg).mp hx.1, by
+      intro hx1
+      exact hx.2 (by simpa using hx1)⟩
+  · intro hx
+    exact ⟨(F.mem_kernel_conj_iff_of_mem_L i hg).mpr hx.1, by
+      intro hconj
+      exact hx.2 (conj_eq_one_iff.mp hconj)⟩
+
+/-- TI for H_i^# says that any element carrying one sharp-kernel element back
+into H_i^# already lies in L_i. -/
+lemma mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp
+    (F : FrobeniusFamily G k) (i : Fin k) {g x : G}
+    (hx : x ∈ (F.H i : Set G) \ {1})
+    (hconj : g * x * g⁻¹ ∈ (F.H i : Set G) \ {1}) :
+    g ∈ F.L i :=
+  F.isTI i g ⟨x, hx, hconj⟩
+
+/-- Conjugate images of `H_i^#` are equal when the conjugators differ by
+an element of `L_i = N_G(H_i)`. -/
+lemma kernel_sharp_conj_image_eq_of_inv_mul_mem_L
+    (F : FrobeniusFamily G k) (i : Fin k) {g h : G}
+    (hmem : h⁻¹ * g ∈ F.L i) :
+    ((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1})) =
+      ((fun x : G => h * x * h⁻¹) '' ((F.H i : Set G) \ {1})) := by
+  ext x
+  constructor
+  · rintro ⟨a, ha, rfl⟩
+    refine ⟨(h⁻¹ * g) * a * (h⁻¹ * g)⁻¹, ?_, ?_⟩
+    · exact (F.mem_kernel_sharp_conj_iff_of_mem_L i hmem).mpr ha
+    · group
+  · rintro ⟨a, ha, rfl⟩
+    refine ⟨(h⁻¹ * g)⁻¹ * a * (h⁻¹ * g), ?_, ?_⟩
+    · have hinv : (h⁻¹ * g)⁻¹ ∈ F.L i := (F.L i).inv_mem hmem
+      simpa using (F.mem_kernel_sharp_conj_iff_of_mem_L i hinv).mpr ha
+    · group
+
+/-- Distinct `L_i`-cosets give disjoint conjugate images of `H_i^#`. -/
+lemma disjoint_kernel_sharp_conj_image_of_inv_mul_notMem_L
+    (F : FrobeniusFamily G k) (i : Fin k) {g h : G}
+    (hnot : h⁻¹ * g ∉ F.L i) :
+    Disjoint ((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1}))
+      ((fun x : G => h * x * h⁻¹) '' ((F.H i : Set G) \ {1})) := by
+  rw [Set.disjoint_left]
+  rintro x ⟨a, ha, rfl⟩ ⟨b, hb, hb_eq⟩
+  have hconj : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ ∈ (F.H i : Set G) \ {1} := by
+    have hb_eq' : h * b * h⁻¹ = g * a * g⁻¹ := by
+      simpa only using hb_eq
+    have hab0 : h⁻¹ * (g * a * g⁻¹) * h = b := by
+      rw [← hb_eq']
+      group
+    have hab : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = b := by
+      calc
+        (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = h⁻¹ * (g * a * g⁻¹) * h := by group
+        _ = b := hab0
+    rw [hab]
+    exact hb
+  exact hnot (F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i ha hconj)
+
+/-- A centralizer of a nonidentity kernel element is contained in the corresponding
+normalizer L_i. -/
+lemma centralizer_le_L_of_mem_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
+    {x : G} (hx : x ∈ (F.H i : Set G) \ {1}) :
+    Subgroup.centralizer ({x} : Set G) ≤ F.L i := by
+  intro g hg
+  refine F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i hx ?_
+  have hcomm : g * x = x * g := Subgroup.mem_centralizer_singleton_iff.mp hg
+  have hconj : g * x * g⁻¹ = x := mul_inv_eq_iff_eq_mul.mpr hcomm
+  simpa [hconj] using hx
+
+/-- Inside H_i^#, ambient conjugacy is already L_i-conjugacy. -/
+lemma exists_L_conj_of_isConj_kernel_sharp (F : FrobeniusFamily G k) (i : Fin k)
+    {x y : G} (hx : x ∈ (F.H i : Set G) \ {1})
+    (hy : y ∈ (F.H i : Set G) \ {1}) (hxy : IsConj x y) :
+    ∃ l : F.L i, (l : G) * x * (l : G)⁻¹ = y := by
+  rcases isConj_iff.mp hxy with ⟨g, hg⟩
+  exact ⟨⟨g, F.mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp i hx (by
+    simpa [hg] using hy)⟩, hg⟩
+
+/-- The sharp kernel H_i^# has cardinality |H_i| - 1. -/
+lemma ncard_kernel_sharp [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    ((F.H i : Set G) \ ({1} : Set G)).ncard = Nat.card (F.H i) - 1 := by
+  have hHcard : (F.H i : Set G).ncard = Nat.card (F.H i) := by
+    rw [← Nat.card_coe_set_eq]
+    rfl
+  have h1_mem : (1 : G) ∈ (F.H i : Set G) := (F.H i).one_mem
+  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+    Set.ncard_singleton, hHcard]
+
+/-- A conjugate image of `H_i^#` has cardinality `|H_i| - 1`. -/
+lemma ncard_kernel_sharp_conj_image [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (g : G) :
+    (((fun x : G => g * x * g⁻¹) '' ((F.H i : Set G) \ {1})).ncard =
+      Nat.card (F.H i) - 1) := by
+  rw [Set.ncard_image_of_injective _]
+  · exact F.ncard_kernel_sharp i
+  · intro a b hab
+    have hcancel := congrArg (fun z : G => g⁻¹ * z * g) hab
+    simpa using hcancel
+
+/-- `kernelSpread i` is the disjoint union, indexed by `G ⧸ L_i`, of the
+conjugate images of `H_i^#` from a choice of coset representatives. -/
+lemma kernelSpread_eq_iUnion_quotient (F : FrobeniusFamily G k) (i : Fin k) :
+    F.kernelSpread i =
+      ⋃ q : G ⧸ F.L i,
+        ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+          ((F.H i : Set G) \ {1})) := by
+  ext x
+  constructor
+  · rintro ⟨a, ha⟩
+    let g : G := a⁻¹
+    let q : G ⧸ F.L i := ⟦g⟧
+    have hxg :
+        x ∈ ((fun y : G => g * y * g⁻¹) '' ((F.H i : Set G) \ {1})) := by
+      refine ⟨a * x * a⁻¹, ha, ?_⟩
+      simp only [g]
+      group
+    have hout_mem : (Quotient.out q : G)⁻¹ * g ∈ F.L i := by
+      have hq : (⟦(Quotient.out q : G)⟧ : G ⧸ F.L i) = ⟦g⟧ := by
+        exact Quotient.out_eq' q
+      exact QuotientGroup.leftRel_apply.mp (Quotient.exact' hq)
+    have himg := F.kernel_sharp_conj_image_eq_of_inv_mul_mem_L i
+      (g := g) (h := (Quotient.out q : G)) hout_mem
+    exact Set.mem_iUnion.mpr ⟨q, himg ▸ hxg⟩
+  · intro hx
+    rcases Set.mem_iUnion.mp hx with ⟨q, hxq⟩
+    rcases hxq with ⟨a, ha, rfl⟩
+    refine ⟨(Quotient.out q : G)⁻¹, ?_⟩
+    convert ha using 1
+    group
+
+/-- The quotient-indexed conjugate images of `H_i^#` are pairwise disjoint. -/
+lemma kernel_sharp_conj_image_quotient_pairwiseDisjoint
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Pairwise (Function.onFun Disjoint fun q : G ⧸ F.L i =>
+      ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+        ((F.H i : Set G) \ {1}))) := by
+  intro q r hqr
+  apply F.disjoint_kernel_sharp_conj_image_of_inv_mul_notMem_L i
+  intro hmem
+  have hrel : (QuotientGroup.leftRel (F.L i)) (Quotient.out r : G)
+      (Quotient.out q : G) := by
+    rw [QuotientGroup.leftRel_apply]
+    exact hmem
+  have hrq : r = q := Quotient.out_equiv_out.mp hrel
+  exact hqr hrq.symm
+
+/-- Cardinality of a kernel spread: `|(H_i^#)^G| = [G : L_i] (|H_i| - 1)`. -/
+lemma ncard_kernelSpread_eq_index_mul [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (F.kernelSpread i).ncard = (F.L i).index * (Nat.card (F.H i) - 1) := by
+  classical
+  letI : Fintype (G ⧸ F.L i) := Fintype.ofFinite _
+  let S : G ⧸ F.L i → Set G := fun q =>
+    ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
+      ((F.H i : Set G) \ {1}))
+  have hpair : Pairwise (Function.onFun Disjoint S) := by
+    simpa [S] using F.kernel_sharp_conj_image_quotient_pairwiseDisjoint i
+  have h_union : (⋃ q : G ⧸ F.L i, S q).ncard =
+      ∑ᶠ q : G ⧸ F.L i, (S q).ncard :=
+    Set.ncard_iUnion_of_finite (s := S) (fun _ => Set.toFinite _) hpair
+  have h_sum : ∑ᶠ q : G ⧸ F.L i, (S q).ncard =
+      (F.L i).index * (Nat.card (F.H i) - 1) := by
+    rw [finsum_eq_sum_of_fintype]
+    simp_rw [S, F.ncard_kernel_sharp_conj_image]
+    rw [Finset.sum_const, nsmul_eq_mul, Finset.card_univ,
+      ← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card]
+    norm_num
+  rw [F.kernelSpread_eq_iUnion_quotient i, h_union, h_sum]
+
+/-- Cardinality of a kernel spread as a `Nat.card` identity. -/
+lemma card_kernelSpread_eq_index_mul [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (F.kernelSpread i) = (F.L i).index * (Nat.card (F.H i) - 1) := by
+  rw [Nat.card_coe_set_eq]
+  exact F.ncard_kernelSpread_eq_index_mul i
+
+lemma ne_one_of_mem_kernelSpread (F : FrobeniusFamily G k) {i : Fin k} {x : G}
+    (hx : x ∈ F.kernelSpread i) : x ≠ 1 := by
+  rintro rfl
+  exact F.one_not_mem_kernelSpread i hx
+
+lemma orderOf_dvd_card_kernel_of_mem_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} {x : G}
+    (hx : x ∈ F.kernelSpread i) : orderOf x ∣ Nat.card (F.H i) := by
+  rcases hx with ⟨g, hg⟩
+  have hsub : orderOf (⟨g * x * g⁻¹, hg.1⟩ : F.H i) ∣ Nat.card (F.H i) :=
+    orderOf_dvd_natCard _
+  have hy_dvd : orderOf (g * x * g⁻¹) ∣ Nat.card (F.H i) := by
+    simpa [Subgroup.orderOf_mk] using hsub
+  have hsc : SemiconjBy g x (g * x * g⁻¹) := by
+    rw [SemiconjBy]
+    group
+  have horder : orderOf x = orderOf (g * x * g⁻¹) := SemiconjBy.orderOf_eq g hsc
+  simpa [horder] using hy_dvd
+
+/-- `(H_i^#)^G` is closed under ambient conjugation. -/
+lemma kernelSpread_conj_mem (F : FrobeniusFamily G k) (i : Fin k)
+    (g : G) {x : G} (hx : x ∈ F.kernelSpread i) :
+    g * x * g⁻¹ ∈ F.kernelSpread i := by
+  rcases hx with ⟨a, ha⟩
+  refine ⟨a * g⁻¹, ?_⟩
+  have hconj : (a * g⁻¹) * (g * x * g⁻¹) * (a * g⁻¹)⁻¹ = a * x * a⁻¹ := by
+    group
+  rwa [hconj]
+
+lemma mem_kernelSpread_conj_iff (F : FrobeniusFamily G k) (i : Fin k)
+    (g x : G) :
+    g * x * g⁻¹ ∈ F.kernelSpread i ↔ x ∈ F.kernelSpread i := by
+  constructor
+  · intro hx
+    have hback := F.kernelSpread_conj_mem i g⁻¹ hx
+    simpa [mul_assoc] using hback
+  · intro hx
+    exact F.kernelSpread_conj_mem i g hx
+
+/-- `G₀`, the complement of the conjugate spreads, is conjugation-invariant. -/
+lemma G0_conj_mem (F : FrobeniusFamily G k) (g : G) {x : G}
+    (hx : x ∈ F.G0) : g * x * g⁻¹ ∈ F.G0 := by
+  intro i hsp
+  have hxsp : x ∈ F.kernelSpread i := by
+    have hback := F.kernelSpread_conj_mem i g⁻¹ hsp
+    simpa [mul_assoc] using hback
+  exact hx i hxsp
+
+lemma mem_G0_conj_iff (F : FrobeniusFamily G k) (g x : G) :
+    g * x * g⁻¹ ∈ F.G0 ↔ x ∈ F.G0 := by
+  constructor
+  · intro hx
+    have hback := F.G0_conj_mem g⁻¹ hx
+    simpa [mul_assoc] using hback
+  · intro hx
+    exact F.G0_conj_mem g hx
+
+/-- Distinct kernel spreads in Peterfalvi (7.10) are disjoint.  Any element in
+their intersection has order dividing both coprime kernel orders, hence is the
+identity, contradicting membership in a sharp conjugate spread. -/
+lemma kernelSpread_disjoint [Finite G] (F : FrobeniusFamily G k)
+    {i j : Fin k} (hij : i ≠ j) : Disjoint (F.kernelSpread i) (F.kernelSpread j) := by
+  rw [Set.disjoint_left]
+  intro x hxi hxj
+  have hcop : Nat.Coprime (orderOf x) (Nat.card (F.H j)) :=
+    Nat.Coprime.coprime_dvd_left
+      (F.orderOf_dvd_card_kernel_of_mem_kernelSpread hxi) (F.coprime_kernel hij)
+  have horder_one : orderOf x = 1 :=
+    Nat.eq_one_of_dvd_coprimes hcop dvd_rfl
+      (F.orderOf_dvd_card_kernel_of_mem_kernelSpread hxj)
+  exact F.ne_one_of_mem_kernelSpread hxi (orderOf_eq_one_iff.mp horder_one)
+
+lemma kernelSpread_pairwiseDisjoint [Finite G] (F : FrobeniusFamily G k) :
+    ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint F.kernelSpread := by
+  intro i _hi j _hj hij
+  exact F.kernelSpread_disjoint hij
+
+lemma G0_disjoint_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
+    Disjoint F.G0 (F.kernelSpread i) := by
+  rw [Set.disjoint_left]
+  intro x hx hxi
+  exact hx i hxi
+
+lemma kernelSpread_disjoint_G0 (F : FrobeniusFamily G k) (i : Fin k) :
+    Disjoint (F.kernelSpread i) F.G0 :=
+  (F.G0_disjoint_kernelSpread i).symm
+
+lemma not_mem_G0_iff (F : FrobeniusFamily G k) {x : G} :
+    x ∉ F.G0 ↔ ∃ i, x ∈ F.kernelSpread i := by
+  simp [G0]
+
+lemma mem_G0_or_exists_mem_kernelSpread (F : FrobeniusFamily G k) (x : G) :
+    x ∈ F.G0 ∨ ∃ i, x ∈ F.kernelSpread i := by
+  by_cases hx : x ∈ F.G0
+  · exact Or.inl hx
+  · exact Or.inr ((F.not_mem_G0_iff).mp hx)
+
+/-- The sets `G₀` and the pairwise-disjoint kernel spreads partition the ambient
+group.  This is the cardinality form of Peterfalvi (7.10)(d). -/
+lemma card_eq_card_G0_add_sum_card_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card G = Nat.card F.G0 + ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+  classical
+  letI := Fintype.ofFinite G
+  have h_disjFin :
+      ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint
+        (fun i => (F.kernelSpread i).toFinset) := by
+    intro i _hi j _hj hij
+    rw [Function.onFun, Set.disjoint_toFinset]
+    exact F.kernelSpread_disjoint hij
+  have h_biUnion_card :
+      ((Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset)).card =
+        ∑ i : Fin k, (F.kernelSpread i).toFinset.card :=
+    Finset.card_biUnion h_disjFin
+  have h_biUnion_set :
+      (Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset) = F.G0.toFinsetᶜ := by
+    ext g
+    simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, Finset.mem_compl,
+      Set.mem_toFinset, F.mem_G0_iff, not_forall, not_not]
+  have hG0_le : F.G0.toFinset.card ≤ Fintype.card G := by
+    rw [← Finset.card_univ (α := G)]
+    exact Finset.card_le_card (Finset.subset_univ _)
+  have hG0_card_eq : F.G0.toFinset.card = Nat.card F.G0 := by
+    rw [Set.toFinset_card, Nat.card_eq_fintype_card]
+  have hspread_card_eq : ∀ i : Fin k,
+      (F.kernelSpread i).toFinset.card = Nat.card (F.kernelSpread i) := by
+    intro i
+    rw [Set.toFinset_card, Nat.card_eq_fintype_card]
+  have h_compl_card :
+      F.G0.toFinsetᶜ.card = Nat.card G - Nat.card F.G0 := by
+    rw [Finset.card_compl]
+    rw [show Fintype.card G = Nat.card G from by rw [Nat.card_eq_fintype_card],
+      hG0_card_eq]
+  have h_biUnion_card_nat :
+      ((Finset.univ : Finset (Fin k)).biUnion
+          (fun i => (F.kernelSpread i).toFinset)).card =
+        ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+    rw [h_biUnion_card]
+    exact Finset.sum_congr rfl (fun i _ => hspread_card_eq i)
+  rw [h_biUnion_set] at h_biUnion_card_nat
+  have hsum :
+      (∑ i : Fin k, Nat.card (F.kernelSpread i)) =
+        Nat.card G - Nat.card F.G0 :=
+    h_biUnion_card_nat.symm.trans h_compl_card
+  have hG0_le_nat : Nat.card F.G0 ≤ Nat.card G := by
+    rw [← hG0_card_eq, Nat.card_eq_fintype_card]
+    exact hG0_le
+  omega
+
+/-- The partition (7.10)(d) implies `|G₀| ≤ |G|`. -/
+lemma card_G0_le_card_G [Finite G] (F : FrobeniusFamily G k) :
+    Nat.card F.G0 ≤ Nat.card G := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
+/-- Difference form of the (7.10)(d) partition: the spread sizes sum to
+`|G| - |G₀|`. -/
+lemma sum_card_kernelSpread_eq_card_G_sub_card_G0 [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, Nat.card (F.kernelSpread i)) = Nat.card G - Nat.card F.G0 := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
+/-- Difference form of the (7.10)(d) partition: `|G₀|` is the complement
+of the spreads. -/
+lemma card_G0_eq_card_G_sub_sum_card_kernelSpread [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card F.G0 = Nat.card G - ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
+  have h := F.card_eq_card_G0_add_sum_card_kernelSpread
+  omega
+
+/-- The sum of spread cardinalities in normalizer-index form. -/
+lemma sum_card_kernelSpread_eq_sum_index_mul [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, Nat.card (F.kernelSpread i)) =
+      ∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1) := by
+  exact Finset.sum_congr rfl (fun i _ => F.card_kernelSpread_eq_index_mul i)
+
+/-- Difference form of the partition with each spread counted by normalizer index. -/
+lemma card_G0_eq_card_G_sub_sum_index_mul [Finite G]
+    (F : FrobeniusFamily G k) :
+    Nat.card F.G0 =
+      Nat.card G - ∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1) := by
+  rw [F.card_G0_eq_card_G_sub_sum_card_kernelSpread,
+    F.sum_card_kernelSpread_eq_sum_index_mul]
+
+/-- The index-counted spreads have total size `|G| - |G₀|`. -/
+lemma sum_index_mul_eq_card_G_sub_card_G0 [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, (F.L i).index * (Nat.card (F.H i) - 1)) =
+      Nat.card G - Nat.card F.G0 := by
+  rw [← F.sum_card_kernelSpread_eq_sum_index_mul,
+    F.sum_card_kernelSpread_eq_card_G_sub_card_G0]
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
 /-- Complement index `e_i = |L_i : H_i|` (exact, since `H_i ≤ L_i`). -/
 noncomputable def e (F : FrobeniusFamily G k) (i : Fin k) : ℕ :=
   Nat.card (F.L i) / Nat.card (F.H i)
+
+/-- `G₀` is nonempty: it contains the identity. -/
+lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :
+    1 ≤ Nat.card F.G0 := by
+  have : Nonempty F.G0 := ⟨⟨1, F.one_mem_G0⟩⟩
+  exact Nat.card_pos
 
 /-- `e_i = |L_i : H_i|` equals the order of the Frobenius complement `C`. -/
 lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
@@ -1522,6 +2360,73 @@ lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
   rw [hprod] at h
   exact h
 
+/-- The Frobenius product formula `|H_i| * e_i = |L_i|`. -/
+lemma h_mul_e_eq_card_L [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    F.h i * F.e i = Nat.card (F.L i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  rw [F.e_eq_card_complement i hC]
+  exact hprod
+
+/-- The Frobenius congruence gives `e_i ∣ h_i - 1`. -/
+lemma e_dvd_h_sub_one [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
+    F.e i ∣ F.h i - 1 := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hmod : Nat.card (F.H i) ≡ 1 [MOD Nat.card C] := by
+    have := hC.card_kernel_modEq_one
+    rwa [hN_card] at this
+  have hdvd : Nat.card C ∣ Nat.card (F.H i) - 1 :=
+    (Nat.modEq_iff_dvd' (Nat.card_pos (α := F.H i))).mp hmod.symm
+  rw [F.e_eq_card_complement i hC]
+  exact hdvd
+
+/-- A Frobenius kernel in the family is nontrivial, so `2 ≤ h_i`. -/
+lemma two_le_h [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.h i := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hh_eq : F.h i = Nat.card (F.H i) := rfl
+  rw [hh_eq, ← hN_card]
+  have hnt : Nontrivial ((F.H i).subgroupOf (F.L i)) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hC.ne_bot_kernel
+  have h1 : 1 < Nat.card ((F.H i).subgroupOf (F.L i)) :=
+    Finite.one_lt_card_iff_nontrivial.mpr hnt
+  omega
+
+/-- In an odd-order ambient group, each Frobenius kernel order `h_i` is odd. -/
+lemma odd_h [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) : Odd (F.h i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  have hLodd : Odd (Nat.card ↥(F.L i)) :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  exact (Nat.odd_mul.mp (hprod ▸ hLodd)).1
+
+/-- In an odd-order ambient group, each complement index `e_i` is odd. -/
+lemma odd_e [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) : Odd (F.e i) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius i
+  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
+  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
+    rw [← hN_card]
+    exact hC.isComplement.card_mul
+  have hLodd : Odd (Nat.card ↥(F.L i)) :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  have hCodd : Odd (Nat.card C) := (Nat.odd_mul.mp (hprod ▸ hLodd)).2
+  rw [F.e_eq_card_complement i hC]
+  exact hCodd
+
 /-- The Frobenius complement of `L_i` is nontrivial, so `e_i = |L_i : H_i| ≥ 2`. -/
 lemma two_le_e [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.e i := by
   obtain ⟨C, hC⟩ := F.isFrobenius i
@@ -1530,52 +2435,469 @@ lemma two_le_e [Finite G] (F : FrobeniusFamily G k) (i : Fin k) : 2 ≤ F.e i :=
   have h1 : 1 < Nat.card C := Finite.one_lt_card_iff_nontrivial.mpr hnt
   omega
 
+/-- Lagrange plus the Frobenius product formula: `|G| = [G : L_i] h_i e_i`. -/
+lemma index_mul_h_mul_e_eq_card_G [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (F.L i).index * (F.h i * F.e i) = Nat.card G := by
+  rw [F.h_mul_e_eq_card_L i]
+  exact (F.L i).index_mul_card
+
+/-- The spread count in `h_i` notation. -/
+lemma card_kernelSpread_eq_index_mul_h_sub_one [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (F.kernelSpread i) = (F.L i).index * (F.h i - 1) := by
+  simpa [h] using F.card_kernelSpread_eq_index_mul i
+
+/-- `H_i^#` has cardinality `h_i - 1` as a `Nat.card` statement. -/
+lemma card_kernel_sharp_eq_h_sub_one [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) = F.h i - 1 := by
+  rw [Nat.card_coe_set_eq]
+  exact F.ncard_kernel_sharp i
+
+/-- The local sharp-kernel ratio `|H_i^#| / |L_i| = (h_i - 1)/(h_i e_i)`. -/
+lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℚ) /
+        (Nat.card (F.L i) : ℚ) =
+      ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
+  norm_num [Nat.cast_sub hh1]
+
+/-- The global spread ratio equals the same local ratio `(h_i - 1)/(h_i e_i)`. -/
+lemma card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) =
+      ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hidx_pos : 0 < (F.L i).index := by
+    rw [Subgroup.index_eq_card]
+    exact Nat.card_pos
+  have hidx_ne : ((F.L i).index : ℚ) ≠ 0 := by
+    exact_mod_cast hidx_pos.ne'
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have hh_ne : (F.h i : ℚ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := F.H i)).ne'
+  have he_ne : (F.e i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_e i
+    positivity
+  rw [F.card_kernelSpread_eq_index_mul_h_sub_one i, ← F.index_mul_h_mul_e_eq_card_G i]
+  norm_num [Nat.cast_sub hh1]
+  field_simp [hidx_ne, hh_ne, he_ne]
+
+/-- The global spread ratio matches the local sharp-kernel ratio. -/
+lemma card_kernelSpread_div_card_G_eq_card_kernel_sharp_div_card_L [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) =
+      (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℚ) /
+        (Nat.card (F.L i) : ℚ) := by
+  rw [F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e,
+    F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e]
+
+/-- The sum of all spread ratios is the complement of the `G₀` ratio. -/
+lemma sum_card_kernelSpread_div_card_G_eq_one_sub_card_G0_div_card_G [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ)) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) := by
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hG_ne : (Nat.card G : ℚ) ≠ 0 := by
+    exact_mod_cast hG_pos.ne'
+  rw [← Finset.sum_div, ← Nat.cast_sum, F.sum_card_kernelSpread_eq_card_G_sub_card_G0,
+    Nat.cast_sub (F.card_G0_le_card_G)]
+  field_simp [hG_ne]
+
+/-- The same balance formula in `h_i, e_i` notation. -/
+lemma sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ))) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) := by
+  calc
+    (∑ i : Fin k, ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)))
+        = ∑ i : Fin k, (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) := by
+            refine Finset.sum_congr rfl fun i _ => ?_
+            exact (F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e i).symm
+    _ = 1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) :=
+        F.sum_card_kernelSpread_div_card_G_eq_one_sub_card_G0_div_card_G
+
+/-- The weighted spread ratio term is nonnegative. -/
+lemma h_sub_one_div_h_mul_e_nonneg [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    0 ≤ ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hh1_nat : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have he1_nat : 1 ≤ F.e i := by
+    have h2 := F.two_le_e i
+    omega
+  have hh1 : (1 : ℚ) ≤ F.h i := by exact_mod_cast hh1_nat
+  have hhpos : (0 : ℚ) < F.h i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one hh1_nat)
+  have hepos : (0 : ℚ) < F.e i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one he1_nat)
+  exact div_nonneg (sub_nonneg.mpr hh1) (le_of_lt (mul_pos hhpos hepos))
+
+/-- The unweighted `𝓑`-sum term from Peterfalvi (7.10) is nonnegative. -/
+lemma h_sub_one_div_e_nonneg [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    0 ≤ ((F.h i : ℚ) - 1) / (F.e i : ℚ) := by
+  have hh1_nat : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  have he1_nat : 1 ≤ F.e i := by
+    have h2 := F.two_le_e i
+    omega
+  have hh1 : (1 : ℚ) ≤ F.h i := by exact_mod_cast hh1_nat
+  have hepos : (0 : ℚ) < F.e i := by
+    exact_mod_cast (Nat.lt_of_lt_of_le Nat.zero_lt_one he1_nat)
+  exact div_nonneg (sub_nonneg.mpr hh1) (le_of_lt hepos)
+
+/-- Removing one index from the global weighted balance. -/
+lemma sum_erase_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G_sub [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (∑ j ∈ (Finset.univ.erase i),
+        ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) -
+        ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)) := by
+  have hsum := F.sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G
+  have hi : i ∈ (Finset.univ : Finset (Fin k)) := by simp
+  rw [← Finset.add_sum_erase (Finset.univ : Finset (Fin k))
+      (fun j => ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) hi] at hsum
+  linarith
+
+/-- A subset of the non-minimal indices has weighted sum bounded by the erased
+weighted balance. -/
+lemma sum_h_sub_one_div_h_mul_e_le_sum_erase [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} (s : Finset (Fin k))
+    (hs : s ⊆ Finset.univ.erase i) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ))) ≤
+      ∑ j ∈ (Finset.univ.erase i),
+        ((F.h j : ℚ) - 1) / ((F.h j : ℚ) * (F.e j : ℚ)) := by
+  exact Finset.sum_le_sum_of_subset_of_nonneg hs fun j _ _ =>
+    F.h_sub_one_div_h_mul_e_nonneg j
+
+/-- A subset of the non-minimal indices has unweighted sum bounded by the erased
+unweighted sum. -/
+lemma sum_h_sub_one_div_e_le_sum_erase [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k} (s : Finset (Fin k))
+    (hs : s ⊆ Finset.univ.erase i) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      ∑ j ∈ (Finset.univ.erase i), ((F.h j : ℚ) - 1) / (F.e j : ℚ) := by
+  exact Finset.sum_le_sum_of_subset_of_nonneg hs fun j _ _ =>
+    F.h_sub_one_div_e_nonneg j
+
 /-- `2 e_i + 1 ≤ h_i`.  From `e_i ∣ h_i - 1` (Frobenius: `|H_i| ≡ 1 mod e_i`)
 together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
 quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
 lemma two_mul_e_add_one_le_h [Finite G] (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G)) (i : Fin k) : 2 * F.e i + 1 ≤ F.h i := by
-  obtain ⟨C, hC⟩ := F.isFrobenius i
-  have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
-  have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
-    rw [← hN_card]; exact hC.isComplement.card_mul
-  have he_eq : F.e i = Nat.card C := F.e_eq_card_complement i hC
-  have hh_eq : F.h i = Nat.card (F.H i) := rfl
-  -- `|L_i|` is odd (a subgroup of the odd-order group `G`), so `|H_i|` and `|C|` are odd.
-  have hLodd : Odd (Nat.card ↥(F.L i)) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
-  obtain ⟨hHodd, hCodd⟩ := Nat.odd_mul.mp (hprod ▸ hLodd)
-  -- `|C| ∣ |H_i| - 1`.
-  have hmod : Nat.card (F.H i) ≡ 1 [MOD Nat.card C] := by
-    have := hC.card_kernel_modEq_one; rwa [hN_card] at this
-  have hdvd : Nat.card C ∣ Nat.card (F.H i) - 1 :=
-    (Nat.modEq_iff_dvd' (Nat.card_pos (α := F.H i))).mp hmod.symm
-  -- `|H_i| ≥ 2` (nontrivial kernel).
-  have hHge2 : 2 ≤ Nat.card (F.H i) := by
-    rw [← hN_card]
-    have hnt : Nontrivial ((F.H i).subgroupOf (F.L i)) :=
-      (Subgroup.nontrivial_iff_ne_bot _).mpr hC.ne_bot_kernel
-    have h1 : 1 < Nat.card ((F.H i).subgroupOf (F.L i)) :=
-      Finite.one_lt_card_iff_nontrivial.mpr hnt
-    omega
-  -- The cofactor `m = (|H_i|-1)/|C|` is even and positive, hence `≥ 2`.
-  obtain ⟨m, hm⟩ := hdvd
-  have hHsub_even : Even (Nat.card (F.H i) - 1) := by
-    obtain ⟨j, hj⟩ := hHodd; exact ⟨j, by omega⟩
+  obtain ⟨m, hm⟩ := F.e_dvd_h_sub_one i
+  have hh_odd : Odd (F.h i) := F.odd_h hodd i
+  have he_odd : Odd (F.e i) := F.odd_e hodd i
+  have hh_ge2 : 2 ≤ F.h i := F.two_le_h i
+  have hh_sub_even : Even (F.h i - 1) := by
+    obtain ⟨j, hj⟩ := hh_odd
+    exact ⟨j, by omega⟩
   have hm_even : Even m := by
-    rw [hm] at hHsub_even
-    rcases Nat.even_mul.mp hHsub_even with h | h
-    · exact absurd h (Nat.not_even_iff_odd.mpr hCodd)
-    · exact h
+    rw [hm] at hh_sub_even
+    rcases Nat.even_mul.mp hh_sub_even with he_even | hm_even
+    · exact absurd he_even (Nat.not_even_iff_odd.mpr he_odd)
+    · exact hm_even
   have hmpos : 0 < m := by
     rcases Nat.eq_zero_or_pos m with h0 | h0
-    · rw [h0, Nat.mul_zero] at hm; omega
+    · rw [h0, Nat.mul_zero] at hm
+      omega
     · exact h0
   have hm_ge2 : 2 ≤ m := by
-    rcases hm_even with ⟨t, ht⟩; omega
-  have hmul : Nat.card C * 2 ≤ Nat.card C * m := Nat.mul_le_mul_left _ hm_ge2
-  rw [he_eq, hh_eq]
+    rcases hm_even with ⟨t, ht⟩
+    omega
+  have hmul : F.e i * 2 ≤ F.e i * m := Nat.mul_le_mul_left _ hm_ge2
   omega
+
+/-- There is an index whose kernel order is minimal among the family. -/
+lemma exists_min_h_index [Finite G] (F : FrobeniusFamily G k) :
+    ∃ i : Fin k, ∀ j : Fin k, F.h i ≤ F.h j := by
+  classical
+  have hkpos : 0 < k := by
+    have htwo : 2 ≤ k := F.two_le
+    omega
+  have hne : (Finset.univ : Finset (Fin k)).Nonempty :=
+    ⟨⟨0, hkpos⟩, by simp⟩
+  rcases Finset.exists_min_image (Finset.univ : Finset (Fin k)) (fun i => F.h i) hne with
+    ⟨i, _hi, hmin⟩
+  exact ⟨i, fun j => hmin j (by simp)⟩
+
+/-- If `h_i` is chosen minimal, then every other odd coprime kernel order is at
+least `h_i + 2`. -/
+lemma h_add_two_le_h_of_min [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) {i j : Fin k} (hij : i ≠ j)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) : F.h i + 2 ≤ F.h j := by
+  have hcop : Nat.Coprime (F.h i) (F.h j) := by
+    simpa [h] using F.coprime_kernel hij
+  have hne : F.h i ≠ F.h j := by
+    intro heq
+    have hone : F.h i = 1 := Nat.eq_one_of_dvd_coprimes hcop dvd_rfl (by
+      rw [← heq])
+    have h2 := F.two_le_h i
+    omega
+  have hi_odd : Odd (F.h i) := F.odd_h hodd i
+  have hj_odd : Odd (F.h j) := F.odd_h hodd j
+  have hlt : F.h i < F.h j := by
+    have hle := hmin j
+    omega
+  obtain ⟨a, ha⟩ := hi_odd
+  obtain ⟨b, hb⟩ := hj_odd
+  omega
+
+/-- A minimal kernel order gives the denominator comparison used in the
+`𝓑`-sum estimate in Peterfalvi (7.10). -/
+lemma h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i j : Fin k}
+    (hij : i ≠ j) (hmin : ∀ l : Fin k, F.h i ≤ F.h l) :
+    ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)) ≤
+      (((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) := by
+  have hden_le_nat : F.h i + 2 ≤ F.h j := F.h_add_two_le_h_of_min hodd hij hmin
+  have hhj_ge2 : 2 ≤ F.h j := F.two_le_h j
+  have hej_ge2 : 2 ≤ F.e j := F.two_le_e j
+  have hhj_ne : (F.h j : ℚ) ≠ 0 := by positivity
+  have hei_ne : (F.e j : ℚ) ≠ 0 := by positivity
+  have hden_ne : (F.h i : ℚ) + 2 ≠ 0 := by positivity
+  have hden_le : (F.h i : ℚ) + 2 ≤ (F.h j : ℚ) := by
+    exact_mod_cast hden_le_nat
+  field_simp [hhj_ne, hei_ne, hden_ne]
+  have hsub_nonneg : 0 ≤ (F.h j : ℚ) - 1 := by
+    exact sub_nonneg.mpr (by exact_mod_cast (by omega : 1 ≤ F.h j))
+  nlinarith
+
+/-- Summed denominator comparison for any set of indices avoiding the chosen
+minimal index. -/
+lemma sum_h_sub_one_div_h_mul_e_le_sum_h_sub_one_div_e_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (s : Finset (Fin k))
+    (hs : ∀ j ∈ s, i ≠ j) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ))) ≤
+      (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) := by
+  calc
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))
+        ≤ ∑ j ∈ s, (((F.h j : ℚ) - 1) / (F.e j : ℚ)) /
+            ((F.h i : ℚ) + 2) := by
+            refine Finset.sum_le_sum fun j hj => ?_
+            exact F.h_sub_one_div_h_mul_e_le_h_sub_one_div_e_div_min_add_two
+              hodd (hs j hj) hmin
+    _ = (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) /
+          ((F.h i : ℚ) + 2) := by
+        rw [Finset.sum_div]
+
+/-- If the unweighted `𝓑`-sum is bounded by `e_i - 1`, then the weighted sum is
+bounded by `(e_i - 1)/(h_i + 2)`, as in Peterfalvi (7.10). -/
+lemma sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (s : Finset (Fin k))
+    (hs : ∀ j ∈ s, i ≠ j)
+    (hsum : (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1) :
+    (∑ j ∈ s, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ))) ≤
+      ((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2) := by
+  have hden_pos : 0 < (F.h i : ℚ) + 2 := by positivity
+  have hweighted := F.sum_h_sub_one_div_h_mul_e_le_sum_h_sub_one_div_e_div_min_add_two
+    hodd hmin s hs
+  have hscaled :
+      (∑ j ∈ s, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) / ((F.h i : ℚ) + 2) ≤
+        ((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2) := by
+    exact div_le_div_of_nonneg_right hsum (le_of_lt hden_pos)
+  linarith
+
+/-- The explicit right-hand side in Peterfalvi (7.10) is positive for every member
+of an odd-order Frobenius family.  This is the arithmetic input used in the final
+(7.11) contradiction once `(7.10)` gives the lower bound. -/
+lemma lowerBoundTerm_pos [Finite G] (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (i : Fin k) :
+    0 < ((F.e i : ℚ) - 1) *
+      (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+          ((F.e i : ℚ) * (F.h i : ℚ)) +
+        2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  have he2 : (2 : ℚ) ≤ (F.e i : ℚ) := by
+    exact_mod_cast F.two_le_e i
+  have hh2 : 2 * (F.e i : ℚ) + 1 ≤ (F.h i : ℚ) := by
+    exact_mod_cast F.two_mul_e_add_one_le_h hodd i
+  have hepos : (0 : ℚ) < (F.e i : ℚ) := by linarith
+  have hhpos : (0 : ℚ) < (F.h i : ℚ) := by linarith
+  have heh : (0 : ℚ) < (F.e i : ℚ) * (F.h i : ℚ) := mul_pos hepos hhpos
+  have hh2pos : (0 : ℚ) < (F.h i : ℚ) * ((F.h i : ℚ) + 2) :=
+    mul_pos hhpos (by linarith)
+  refine mul_pos (by linarith) ?_
+  have h1 : 0 ≤
+      ((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+        ((F.e i : ℚ) * (F.h i : ℚ)) :=
+    div_nonneg (by linarith) (le_of_lt heh)
+  have h2 : 0 < (2 : ℚ) / ((F.h i : ℚ) * ((F.h i : ℚ) + 2)) :=
+    div_pos (by norm_num) hh2pos
+  linarith
+
+/-- The final arithmetic rearrangement in Peterfalvi (7.10). -/
+lemma lowerBoundTerm_final_rearrange [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)) =
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  have he_ne : (F.e i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_e i
+    positivity
+  have hh_ne : (F.h i : ℚ) ≠ 0 := by
+    have h2 := F.two_le_h i
+    positivity
+  have hh2_ne : (F.h i : ℚ) + 2 ≠ 0 := by
+    have h2 := F.two_le_h i
+    positivity
+  field_simp [he_ne, hh_ne, hh2_ne]
+  ring
+
+/-- The penultimate estimate in Peterfalvi (7.10) implies the displayed lower
+bound for the same index. -/
+lemma lowerBoundTerm_of_penultimate [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k)
+    (hpen : ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rw [← F.lowerBoundTerm_final_rearrange i]
+  exact hpen
+
+/-- Existential form of `lowerBoundTerm_of_penultimate`, matching the target shape
+of Peterfalvi (7.10). -/
+lemma exists_lowerBoundTerm_of_exists_penultimate [Finite G]
+    (F : FrobeniusFamily G k)
+    (hpen : ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2))) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hpen with ⟨i, hi⟩
+  exact ⟨i, F.lowerBoundTerm_of_penultimate i hi⟩
+
+/-- The `𝓑`-sum estimate in Peterfalvi (7.10) gives the penultimate displayed
+inequality once the main character-theoretic estimate has isolated the same
+`𝓑`-sum. -/
+lemma penultimate_of_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hbase :
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)) := by
+  have hBweighted := F.sum_h_sub_one_div_h_mul_e_le_e_sub_one_div_min_add_two
+    hodd hmin B hB_ne hBsum
+  linarith
+
+/-- The `𝓑`-sum estimate plus the main character-theoretic estimate gives the
+final displayed lower bound for the same minimal index. -/
+lemma lowerBoundTerm_of_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hbase :
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) / ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  exact F.lowerBoundTerm_of_penultimate i
+    (F.penultimate_of_Bsum_bound hodd hmin B hB_ne hBsum hbase)
+
+/-- Existential wrapper for the final assembly step of Peterfalvi (7.10): once a
+minimal index and its `𝓑`-set satisfy the character-theoretic base estimate and
+unweighted `𝓑`-sum bound, the displayed lower bound follows. -/
+lemma exists_lowerBoundTerm_of_exists_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          1 - (F.e i : ℚ) / (F.h i : ℚ) -
+            (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+            (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+              ((F.e j : ℚ) * (F.h j : ℚ)))) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
+  exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
+
+/-- **Peterfalvi (7.10) character-estimate target.**  This is the exact data
+still to be built from the character-theoretic inputs (7.5), (7.8), (7.9), and
+(6.8): a minimal kernel index, the corresponding `𝓑`-set, the unweighted
+`𝓑`-sum bound, and the base estimate before the final arithmetic rearrangement.
+
+It is standalone target data, not a field of `FrobeniusFamily`. -/
+structure CharacterEstimateData [Finite G] (F : FrobeniusFamily G k) where
+  /-- The index with minimal kernel order. -/
+  i : Fin k
+  /-- Minimality of `h_i`. -/
+  hmin : ∀ l : Fin k, F.h i ≤ F.h l
+  /-- The Peterfalvi `𝓑`-set of non-minimal indices. -/
+  B : Finset (Fin k)
+  /-- The chosen `𝓑`-indices avoid the minimal index. -/
+  B_avoids_min : ∀ j ∈ B, i ≠ j
+  /-- The unweighted `𝓑`-sum bound coming from (7.8.b) and (7.9). -/
+  Bsum_le :
+    (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1
+  /-- The base estimate isolated from (7.5), before bounding the `𝓑`-sum. -/
+  base_estimate :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ)))
+
+/-- The named character-estimate data implies the displayed lower bound of
+Peterfalvi (7.10). -/
+lemma lowerBoundTerm_of_characterEstimateData [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : F.CharacterEstimateData) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
+  exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
 end FrobeniusFamily
 
@@ -1593,7 +2915,10 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
         ((F.e i : ℚ) - 1) *
           (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
             2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-  sorry
+  have hdata : F.CharacterEstimateData := by
+    -- TODO: assemble from (7.5), (7.8), (7.9), and (6.8).
+    sorry
+  exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
 
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 
@@ -1610,23 +2935,8 @@ theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
   obtain ⟨i, hi⟩ := card_G0_lower_bound F hodd
   -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
   have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
-  -- The two arithmetic facts coming from the Frobenius structure.
-  have he2 : (2 : ℚ) ≤ (F.e i : ℚ) := by exact_mod_cast F.two_le_e i
-  have hh2 : 2 * (F.e i : ℚ) + 1 ≤ (F.h i : ℚ) := by
-    exact_mod_cast F.two_mul_e_add_one_le_h hodd i
-  have hepos : (0 : ℚ) < (F.e i : ℚ) := by linarith
-  have hhpos : (0 : ℚ) < (F.h i : ℚ) := by linarith
-  have heh : (0 : ℚ) < (F.e i : ℚ) * (F.h i : ℚ) := mul_pos hepos hhpos
-  have hh2pos : (0 : ℚ) < (F.h i : ℚ) * ((F.h i : ℚ) + 2) := mul_pos hhpos (by linarith)
-  -- The right-hand side of (7.10) is then strictly positive.
-  have hRHS : 0 < ((F.e i : ℚ) - 1) *
-      (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) +
-        2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-    refine mul_pos (by linarith) ?_
-    have h1 : 0 ≤ ((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ)) :=
-      div_nonneg (by linarith) (le_of_lt heh)
-    have h2 : 0 < (2 : ℚ) / ((F.h i : ℚ) * ((F.h i : ℚ) + 2)) := div_pos (by norm_num) hh2pos
-    linarith
+  -- The right-hand side of (7.10) is strictly positive.
+  have hRHS := F.lowerBoundTerm_pos hodd i
   -- But (7.10) says it is `≤ 0` — contradiction.
   rw [hcard] at hi
   have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num

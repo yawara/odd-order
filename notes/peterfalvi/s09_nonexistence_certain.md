@@ -116,6 +116,10 @@ theorem not_trivial_G0 (F) (hodd) (hG0 : F.G0 = {1}) : False  -- (7.11), 証明 
 結論: **3 件とも現状 sorry-free では実装不能** (下記 blocker)。Lean には一切手を入れていない (revert 不要)。
 本節に精密ステートメント (repo の実型に合わせて検証済) と各々の証明計画・blocker を記録する。
 
+2026-06-02 update: proof は依然 blocker 待ちだが、`Hypothesis78` に仮定を足さない
+standalone target として `Hypothesis78.BetaDecomp`, `Hypothesis78.NormEstimates`,
+`Hypothesis79.conclusion` を Lean 側に追加済み。
+
 ### 重要な前提: §9 の証明書 (certificate) パターン
 
 `S09_NonexistenceCertain.lean` の §9 は **「難所の pointwise 恒等式を構造体フィールドに hoist し、系のみ証明する」** 方式で書かれている (memory `scaffold-sorry-free-not-done` 参照):
@@ -201,13 +205,35 @@ theorem Gamma_norm_sq_le (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
 注: prior pass の `(β,χ)²` は誤り。repo の (7.8.c.ii) は `inner β χ * star (inner β χ)` 形。
 また `e = ζ_{ind1H}(1:L)` は `ℂ` 値なので `e ≤ (h−1)/2` は `Nat.card` ベース (`[L:H]=e`) で書くのが安全
 (`.re.toNat` は避ける)。`(ν ζ)^ρ` のノルムは `chiRhoCF` over `L` 上の `ClassFunction.inner`。
+Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
+`zetaNuRhoNormSq`, `gammaNormSq`, `NormEstimates` としてこの target を名前付け済み。
+また `quadraticTerm_nonneg_of_smallIndex` で、`a∈ℤ`, `2e+1≤h` から
+`0 ≤ (1/e)(1-1/h)a² - 2(1/h)a` を出す純算術部分は sorry-free 化済み。
+`beta_inner_self_eq_sourceDiff_inner_self` / `betaNormSq_eq_sourceDiffNormSq` により、
+`‖β‖²` を Dade isometry で source 側 `‖Ind 1_H - ζ‖²` に移す bridge も済み。
+さらに `sourceDiff_inner_self_expand` / `sourceDiffNormSq_expand` で source norm を
+4 つの inner product に展開済み。`SourceDiffNormEvaluation` は残る source-side 評価
+`sourceDiffNormSq = e+1` を standalone target として固定し、
+`betaNormSq_eq_complementIndex_add_one` はそれを `‖β‖²=e+1` に戻す bridge。
+`sourceDiffNormEvaluation_of_inner_values` /
+`betaNormSq_eq_complementIndex_add_one_of_inner_values` により、残る source-side 評価は
+`⟨Ind1H,Ind1H⟩=e`, `⟨ζ,Ind1H⟩=0`, `⟨Ind1H,ζ⟩=0`, `⟨ζ,ζ⟩=1` の 4 事実に局所化。
+2026-06-02 追記: `zetaDistinct_inner_self_eq_one_of_irreducible` と
+`*_of_zeta_irreducible` bridge を追加し、最後の `⟨ζ,ζ⟩=1` は
+`IsIrreducibleCharacter ζ` から `irreducibleCharacter_inner_eq_ite` で即座に出せる形へ縮小。
+さらに `sourceDiffNormEvaluation_of_zeta_ind_orthogonal` 系で
+Hermitian symmetry から `⟨Ind1H,ζ⟩=0` を自動生成し、source-side 入力は
+`⟨Ind1H,Ind1H⟩=e`, `⟨ζ,Ind1H⟩=0`, `IsIrreducibleCharacter ζ` に縮小。
 
-**Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` を `Ind1_H−ζ` に適用 + `L` 上での
-`‖Ind1_H−ζ‖²=e+1` 計算 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
+**Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` で source norm へ移す部分と、
+4 source inner-product 評価から beta norm identity へ戻す部分は解消済み。
+残りは `L` 上での source-side inner product 評価で、self term は
+`IsIrreducibleCharacter ζ` へ、反対向き直交は Hermitian symmetry へ縮小済み
+(`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
 `Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
 `|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
 の計算が必要で、これは (7.8.a) の `BetaDecomp` (係数 `a`) に依存する。よって (7.8.a) が先。算術 `ua²−2va≥0`
-自体は `ℚ`/`ℝ` で容易だが、`u,v,w`・`‖β‖²` を構造から導く層が未組立。
+自体は `quadraticTerm_nonneg_of_smallIndex` として解消済みだが、`u,v,w`・`‖β‖²` を構造から導く層が未組立。
 
 ### (7.9) — 2 族の非直交性
 
@@ -278,6 +304,14 @@ theorem non_orthogonality_two_families
    それらが `IsCoherent.extension` から構成可能であることを別途示す責務が伴う** (memory
    `scaffold-sorry-free-not-done`: 「hypothesis が構成可能か」で done を判定)。
 5. 上記 1-4 が揃った後、(7.8.a) 射影 → (7.8.b) 算術 → (7.9) parity の順で outright 証明可能になる見込み。
+
+### 2026-06-02 — (7.10) final assembly target
+
+`FrobeniusFamily.CharacterEstimateData` を追加し、最終 `card_G0_lower_bound` の残りを
+「minimal index + `𝓑`-set + unweighted `𝓑`-sum bound + base estimate」の data 構成に局所化。
+`lowerBoundTerm_of_characterEstimateData` はその data から表示下界を sorry-free で返す。
+したがって算術 bridge は閉じており、残る `sorry` は (7.5)(7.8)(7.9)(6.8)+Thompson から
+`CharacterEstimateData` を作る指標論・coherence 側。
 
 **現時点の判定**: plan 1/2/3 (奇位数⇒非実 / disjoint-support inner=0 / Burnside (1.5.d)) はすべて完了。
 残る律速は plan 4 (B1: nu ↔ coherence、証明書追加に構成責務が伴う) で、これが未組立のため
