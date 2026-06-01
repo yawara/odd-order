@@ -1005,6 +1005,53 @@ private theorem blackburn_noncentral_commutator_quotient_cards
     exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
   exact ⟨hS_quot_card, hT_quot_card⟩
 
+/-- Normality support for Blackburn 4.16 Case B-2.  `T = [S,R]` is
+normal in `R`, hence `T.subgroupOf S` is normal in `S`; since `T` is elementary
+abelian, the embedded center `S' = Z(S)` is normal inside `T`. -/
+private theorem blackburn_noncentral_commutator_normalities
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let Z : Subgroup R := (Subgroup.center S).map S.subtype
+    T.Normal ∧ (T.subgroupOf S).Normal ∧ (Z.subgroupOf T).Normal := by
+  dsimp at hT_elem ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_normal : T.Normal := by
+    dsimp [T]
+    exact Subgroup.commutator_normal S (⊤ : Subgroup R)
+  have hT_sub_S_normal : (T.subgroupOf S).Normal := hT_normal.subgroupOf S
+  haveI hT_comm_inst : IsMulCommutative T := ⟨⟨hT_elem.1⟩⟩
+  have hZ_sub_T_normal : (Z.subgroupOf T).Normal :=
+    Subgroup.normal_of_isMulCommutative (Z.subgroupOf T)
+  exact ⟨hT_normal, hT_sub_S_normal, hZ_sub_T_normal⟩
+
+/-- Witnesses for Blackburn 4.16 Case B-2: choose `y ∈ S - T` and
+`z ∈ T - S'` from the two strict inclusions `S' < T < S`. -/
+private theorem blackburn_noncentral_commutator_witnesses
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let Z : Subgroup R := (Subgroup.center S).map S.subtype
+    ∃ y : R, y ∈ S ∧ y ∉ T ∧ ∃ z : R, z ∈ T ∧ z ∉ Z := by
+  dsimp at hT_facts ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  obtain ⟨y, hyS, hyT⟩ := SetLike.exists_of_lt hT_facts.2.1
+  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  exact ⟨y, hyS, hyT, z, hzT, hzZ⟩
+
 /-- The final congruence contradiction in Blackburn 4.16 Case B-2.
 
 BG obtains `jk ≡ i` and `ij ≡ k`, with `i ≠ 0`, while the odd-order action gives
@@ -1070,6 +1117,9 @@ theorem blackburnRankTwoClassification
     have hT_elem := blackburn_noncentral_commutator_isElementaryAbelian hΩ_pow hT_facts
     have hT_quot_cards :=
       blackburn_noncentral_commutator_quotient_cards hΩ_card hΩ_extraspecial hT_facts
+    have hT_norms := blackburn_noncentral_commutator_normalities hT_elem
+    obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
+      blackburn_noncentral_commutator_witnesses hT_facts
     sorry
 
 end BlackburnClassification
