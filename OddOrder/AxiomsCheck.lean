@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
@@ -1576,3 +1577,7 @@ set_option linter.style.longLine false in
 -- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
 -- coherence with no opaque hypotheses — only the genuine equal degree and supports.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade
+-- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
+-- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
+-- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_smul_restrict_induce
