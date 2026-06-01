@@ -382,6 +382,27 @@ Irr(L) = {μ_ij | 0≤i<w₁, 0≤j<w₂} ∪ {Ind_K^L χ | χ ∈ Irr(K) \ {χ_
 
 4. **§5 との relationship clarity**: §5, §6 の順序が論理的に reverse か (§5 → §6) forward か (§6 独立か) を mmd 跡付けで最終確認.
 
+---
+
+## 監査 + 修正 (2026-06-01): `CertainTypeHypothesis` の (4.2) faithfulness バグ
+
+Peterfalvi (6.8)(c2) (= "Hyp (4.6) holds with H=K") の formalize 中に `CertainTypeHypothesis` を
+監査し、**実バグを発見・修正** (commit e6090a0、build+AxiomsCheck green、sorry 不変):
+
+- **バグ**: 旧 field `W_sup : W1 ⊔ W2 = ⊤` は**数学的に誤り**。(4.2)(c) の `W = W₁ × W₂` は `L` の
+  **真部分群** (`W₂ ⊊ K` ゆえ `|W| = w₁w₂ < |K|w₁ = |L|`); `W₁⊔W₂=⊤` は `L = W₁×W₂` を主張し (4.2)(a)
+  `L = K⋊W₁` (K 非自明 normal) と矛盾。`W_disjoint` と併せ K 自明でない限り **vacuous** だった。
+- **load-bearing 0**: repo 内で `CertainTypeHypothesis` の construct ゼロ・`W_sup`/`W1` 参照ゼロ
+  (`DadeApplication`/`FullDadeApplication` は `.dade` のみ、Pf (6.8)(c2) は `.dade/.K/.W2/.W1`) ⟹ 安全。
+- **修正後 (真の (4.2))**: `W_sup` 削除 → `isComplement : IsComplement' K W1` ((4.2.a) L=K⋊W₁) /
+  `W1_cyclic`/`W2_cyclic` / `W2_le_K` ((4.2.b)) / `centralizer_W2` ((4.2.b) `C_K(x)=W₂ ∀x∈W₁^#`) /
+  `W_odd` ((4.2.c) `|W₁⊔W₂|` odd)。`W_disjoint` 保持 (真: W₁∩W₂⊆W₁∩K=⊥)。
+- **full (4.6) への残り** (§6 を §9-§16 で使う際に要追加): (4.6.b) `(3.1)` for `(G,W)`、(4.6.c) `H` normal
+  with `W₂⊂H⊂K`、(4.6.d) Dade `A` の bounds `∪_{h∈H^#}C_K(h)^#⊂A⊂K^#` + `A₀=A∪V^L`、(4.2.a) Hall 性。
+  **ただし (6.8)(c2) は H=K ((4.6)H が K に collapse) ゆえ現 (4.2)-core + dade で十分。**
+- 帰結: Pf (6.8)(c2) を `cert.K=H ∧ cert.W1=W1 ∧ cert.dade=dade ∧ w₂素 ∧ W₂⊆[H,H]` に強化
+  (`cert.W1=W1` は W_sup 撤去で初めて無矛盾)。
+
 5. **(4.3.c) character value evaluation の tactics**: ω_ij, δ_j の explicit formula を Lean で derive する際、induction lemma + restriction formula の apply 順序最適化.
 
 ---
