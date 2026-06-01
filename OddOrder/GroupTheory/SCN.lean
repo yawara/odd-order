@@ -236,6 +236,23 @@ theorem IsSCN_n.mono {p m n : ℕ} {A : Subgroup G} (hmn : m ≤ n) (h : IsSCN_n
     IsSCN_n p m A :=
   ⟨h.1, hmn.trans h.2⟩
 
+/-- A normal abelian subgroup of `p`-rank at least `3` is contained in an `SCN₃`
+subgroup of a finite `p`-group.
+
+This is the reusable Prop 4.4(a) step in BG Lemma 5.1(b): enlarge the normal abelian
+subgroup to a maximal abelian normal subgroup, identify it as SCN in a `p`-group, and
+transport the rank lower bound along inclusion. -/
+theorem exists_scn3_ge_of_normal_abelian_pRank_ge_three
+    [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G)
+    {B : Subgroup G} (hBnorm : B.Normal) (hBcomm : IsMulCommutative B)
+    (hBrank : 3 ≤ pRank B p) :
+    ∃ A : Subgroup G, IsSCN₃ p A ∧ B ≤ A := by
+  obtain ⟨A, hBA, hAmax⟩ := exists_maximalAbelianNormal_ge hBnorm hBcomm
+  have hAscn : IsSCN A := hAmax.isSCN hG
+  have hrank_le : pRank B p ≤ pRank A p :=
+    pRank_le_of_injective (Subgroup.inclusion_injective hBA)
+  exact ⟨A, ⟨hAscn, hBrank.trans hrank_le⟩, hBA⟩
+
 end SCN_n
 
 end OddOrder.GroupTheory
