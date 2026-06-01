@@ -187,9 +187,19 @@ S06: `CertainTypeHypothesis`(38), `W2`。
   (1) **Y family** `η : Fin m → IrreducibleCharacter ↥L` を `Irr(H/H')∖{1}` (= H' を核に含む θ、degree 1) の
       `Ind_H^L θ` として構成 (`m = |Irr(H/H')|−1 = |H/H'|−1`)。
   (2) **各 η_j 既約** = 6.34 `isIrreducibleCharacter_induce_of_inertia_eq` (要 `inertia(θ)=H`)。
-  (3) **`inertia(θ)=H` (自由作用)** = (c1) Frobenius / (c2) から θ≠1 の stabilizer 自明を導く character theory
-      (`brauer_permutation_lemma'` が classes∖{1} 自由を供給; W₁ の Irr(H)∖{1} 自由作用へ) — **最重・未着手**。
-  (4) **等次数** `η_j(1)=|W₁|`: 6.34 degree `[L:H]·θ(1)` + θ degree 1 + `[L:H]=|W1|` (`IsComplement.card_left`
-      @mathlib `Complement.lean:240`、`hyp.split` から)。
-  (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。
-  → これらは深い character theory ((3) が核)。T7 (X) / T8 (DadeChainStep) / T9-T11 (glue) は後続。
+  (3) **`inertia(θ)=H` (自由作用) = T6 の律速・深い blocker (未着手)**: (c1) Frobenius / (c2) から θ≠1 の
+      stabilizer 自明を導く。**精査結果 (2026-06-01)**: repo `brauer_permutation_lemma'`
+      (BrauerPermutationUnconditional:196) は **inversion 専用** (`#RealIrr=#RealClass`)、一般 action 不可。
+      一般版 `brauer_permutation_lemma` (BrauerPermutation.lean:264) は任意 permutation+compat を取るので、
+      **W₁(⟨g⟩)-共役 permutation を character table 上に構成して instantiate** すれば良いが substantial (新 infra)。
+      群レベルの自由作用は Frobenius で既存 (`IsFrobeniusGroup` → `FrobeniusActionTI.stabilizer_eq_bot` /
+      `fixedPointFree_toMulAut`)。⟹ 残 = 「群レベル自由 ⟹ Irr レベル自由 (inertia=H)」の **general Brauer
+      for conjugation の instantiation** (別 multi-session 課題; これが (6.8)/§9-§16 の Frobenius-induced
+      irreducibility 全体の鍵)。
+  (4) ✅ **等次数 infra done** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`
+      via `Subgroup.IsComplement.card_right` on `hyp.split`)。6.34 degree `[L:H]·θ(1)` + θ degree 1 と
+      合わせ `η_j(1)=|W₁|`。
+  (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。tractable。
+  → **T6 の律速 = (3) general Brauer for conjugation** (新 infra)。これが立てば 6.34 + (4)/(5) + engine
+    (difference-support 版) で T6 完成。T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
+    T9-T11 (glue) は後続。
