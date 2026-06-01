@@ -1389,6 +1389,32 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The real norm square `‖β‖²` used in Peterfalvi (7.8.b). -/
+noncomputable def betaNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner H78.beta H78.beta).re
+
+/-- The source-side norm square `‖Ind 1_H - ζ‖²` corresponding to `β`. -/
+noncomputable def sourceDiffNormSq (H78 : Hypothesis78 G A L) : ℝ :=
+  (ClassFunction.inner
+    (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+    (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)).re
+
+/-- The Dade-isometry step in Peterfalvi (7.8.b): the norm of `β` equals the
+norm of the source difference `Ind 1_H - ζ`.  The remaining `‖β‖² = e + 1`
+calculation is therefore a source-side character computation. -/
+theorem beta_inner_self_eq_sourceDiff_inner_self (H78 : Hypothesis78 G A L) :
+    ClassFunction.inner H78.beta H78.beta =
+      ClassFunction.inner
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct) := by
+  simpa [beta, indMinusZetaSupp] using
+    H78.hyp76.isDadeIsometry.inner_eq H78.indMinusZetaSupp H78.indMinusZetaSupp
+
+/-- Real-valued form of `beta_inner_self_eq_sourceDiff_inner_self`. -/
+theorem betaNormSq_eq_sourceDiffNormSq (H78 : Hypothesis78 G A L) :
+    H78.betaNormSq = H78.sourceDiffNormSq := by
+  rw [betaNormSq, sourceDiffNormSq, H78.beta_inner_self_eq_sourceDiff_inner_self]
+
 /-- The weighted `S^ν`-sum occurring in Peterfalvi (7.8.a):
 `Σ_{φ ∈ S} φ(1)/(e ‖φ‖²) · φ^ν`, where `S = T \ {Ind 1_H}` and
 `e = ζ(1)` for the distinguished `ζ`. -/
