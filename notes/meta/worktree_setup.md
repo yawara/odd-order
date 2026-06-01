@@ -25,13 +25,17 @@ mathlib は `lakefile.toml` で `v4.30.0-rc2` に pin されており worktree �
   - 単一 issue 攻略: `issue-0002-pcomplement` 等
 - 衝突確認: `ls -d /Users/ywr/odd-order*`
 
-### 2. 作成 + symlink (4 コマンド)
+### 2. 作成 + symlink + olean warm-start コピー (5 コマンド)
 
 ```bash
 git worktree add /Users/ywr/odd-order-<slug> -b <slug>
 mkdir -p /Users/ywr/odd-order-<slug>/.lake
 ln -s /Users/ywr/odd-order/.lake/packages /Users/ywr/odd-order-<slug>/.lake/packages
 ln -s /Users/ywr/odd-order/references /Users/ywr/odd-order-<slug>/references
+# 本プロジェクト olean を main から warm-start コピー (symlink は不可 = 並行ビルド衝突).
+# `cp -a` で mtime を保つと lake の trace fast-path が効く. 新 worktree の HEAD が main と
+# 近い (= 共有コミットが多い) ほど初回ビルドはほぼ no-op、離れていても stale 分だけ再ビルドで無害.
+cp -a /Users/ywr/odd-order/.lake/build /Users/ywr/odd-order-<slug>/.lake/build
 ```
 
 ### 3. references symlink の untracked 抑制 (1 回だけ)
@@ -46,7 +50,7 @@ echo "references" >> /Users/ywr/odd-order/.git/info/exclude
 
 ### 4. 初回ビルド
 
-新 worktree 内で `lake build OddOrder.Isaacs.ChXX_...` を直接実行. mathlib olean は symlink 経由で既存キャッシュを利用するので `lake exe cache get` は **不要**. Ch.01-Ch.04 等の本プロジェクト olean だけビルドが走る (数分).
+新 worktree 内で `lake build OddOrder` (または leaf) を直接実行. mathlib olean は symlink 経由で既存キャッシュを利用するので `lake exe cache get` は **不要**. **手順 2 で `.lake/build` を main からコピー済なら, HEAD 一致時は初回ビルドが warm cache で数秒の no-op** (trace 検証 + 最終リンクのみ); コピーしなければ本プロジェクト olean が全て再ビルド (数分). 実測: HEAD 一致の worktree で `cp -a` 後の `lake build OddOrder` = 3411 jobs / 約 3 秒。
 
 ### 5. issue 採番レンジの割り当て (並行発行の衝突予防)
 
@@ -68,7 +72,7 @@ export ODD_ISSUE_BASE=1000
 | パス | 状態 | 理由 |
 |---|---|---|
 | `.lake/packages/` | symlink (共有) | mathlib pin 固定で drift しない. 6.5 GB 節約 |
-| `.lake/build/` | 独立 (worktree ごと) | 本プロジェクト olean. 並行 `lake build` 衝突回避 |
+| `.lake/build/` | 独立 (worktree ごと) — ただし作成時に main から **コピー**して warm-start | 本プロジェクト olean. 並行 `lake build` 衝突回避のため symlink 不可. コピーは HEAD 一致時に初回ビルドをほぼ no-op 化 (mtime 保持に `cp -a`) |
 | `references/` | symlink (共有) | gitignored, 別 private リポで重い |
 | `.git/info/exclude` | 共有 (主 `.git` 直下) | `references` 行は worktree 共通で害なし |
 
