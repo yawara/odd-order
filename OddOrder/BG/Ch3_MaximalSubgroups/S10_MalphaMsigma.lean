@@ -44,15 +44,18 @@ Ch3 (§11–§13) と Ch4 全体がこの定義層に依存する。
 
 ## 現在の scaffold 範囲
 
-定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') と、BG 10.1--10.12/10.14
-の statement skeleton を配置済み。Lemma 10.13 は `Ω₁(Z(P))` の入れ子 encoding と内部直積の
-表現を決めるまで TODO のままにする。proof は別フェーズで、既存の `sorry` はこの節の interface
+定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') と、BG 10.1--10.14
+の statement skeleton を配置済み。Lemma 10.13 は `Ω₁(Z(P))` と `ℰ¹(A)` の ambient subgroup
+encoding を本ファイル内に置く。proof は別フェーズで、既存の `sorry` はこの節の interface
 を後続 §11--§16 に先に渡すためのもの。
 
 ## Lane C proof-gate notes
 
 - `idealPrime` は BG §10 の literal 定義を保つ (mmd L2643)。Theorem 5.3 との narrow
   equivalence (mmd L1838/L2643) は proof gate であり、追加仮定や structure field にはしない。
+- Lemma 10.13 は mmd の missing page (PDF p.79) から statement を回収済み。`Z₀=Ω₁(Z(P))`
+  は `omega1CenterInG P p` として ambient `G` の subgroup に map し、`X∈ℰ¹(A)` は
+  `elemAbelianOfRankIn p 1 A X` で表す。
 - Corollary 10.7(b) は Corollary 10.7(a) と BG Theorem 4.16 に依存する
   (mmd L2799; Theorem 4.16 statement L1636)。rank-two Sylow 構造はここで proving する。
 - Lemma 10.8(c) は Theorem 10.6 の p-length one と BG Theorem 5.6 を使う
@@ -110,6 +113,21 @@ noncomputable def Fsigma (M : Subgroup G) : Subgroup G :=
 /-- **BG `F_{σ'}(M) = O_{σ(M)'}(F(M))`**。 -/
 noncomputable def Fsigma' (M : Subgroup G) : Subgroup G :=
   opiCoreInG (sigma M)ᶜ (Ch2.S08.fittingInG M)
+
+/-! ## Lemma 10.13 用の局所記法 -/
+
+/-- `X ∈ ℰ_p^n(H)` encoded in the ambient group `G`: `X` is elementary abelian of
+rank `n` in `G` and lies in `H`. BG Lemma 10.13 uses this mainly as `X ∈ ℰ¹(A)`. -/
+def elemAbelianOfRankIn (p n : ℕ) (H X : Subgroup G) : Prop :=
+  X ∈ elemAbelianOfRank G p n ∧ X ≤ H
+
+/-- `Ω₁(Z(P))` for a subgroup `P ≤ G`, mapped back to the ambient group `G`.
+
+The center of `P` is abelian, so this uses the set-form `omega1OfAbelian` rather than the
+generated subgroup `Omega`. This is the `Z₀` notation in BG Lemma 10.13. -/
+def omega1CenterInG (P : Subgroup G) (p : ℕ) : Subgroup G :=
+  (omega1OfAbelian ↥P (Subgroup.center ↥P) p
+    (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)).map P.subtype
 
 /-! ## Theorem 10.6 — proper subgroup は p-length one (mmd L2779) -/
 
@@ -616,11 +634,30 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
         (P : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) := by
   sorry
 
--- **TODO (BG Lemma 10.13)** (missing page near mmd L2885-L2892):
--- `A∈ℰ_p²(G)∩ℰ_p*(G)`, `P` nonabelian `p`-群 ⊇ `A`,
--- `Z₀=Ω₁(Z(P))`, `A₀∈ℰ¹(A)`, `A₀≠Z₀` ⇒ (a) `Z₀∈ℰ¹(A)`;
--- (b) `C_P(A)=A₀×Z` (`Z` cyclic ⊇`Z₀`);
--- (c) `N_P(A)` は `ℰ¹(A)−{Z₀}` 上推移的。`Ω₁(Z(P))` の入れ子 + 内部直積 `A₀×Z` + 推移性の faithful
--- encoding を要するため後続 (Ω₁/centralizer の subtype-map 整備後)。
+/-! ## Lemma 10.13 — `Ω₁(Z(P))` と rank-two elementary abelian subgroup (PDF p.79) -/
+
+/-- **BG Lemma 10.13** (mmd MISSING_PAGE, PDF p.79): `p ∈ π(G)`,
+`A ∈ ℰ_p²(G) ∩ ℰ_p*(G)`, and `P` is a nonabelian `p`-subgroup of `G` containing
+`A`. Let `Z₀ = Ω₁(Z(P))` and let `A₀ ∈ ℰ¹(A)` with `A₀ ≠ Z₀`. Then
+(a) `Z₀ ∈ ℰ¹(A)`; (b) `C_P(A) = A₀ × Z` for a cyclic subgroup `Z` containing
+`Z₀`; and (c) `N_P(A)` acts transitively by conjugation on `ℰ¹(A) - {Z₀}`.
+
+Here `Z₀` is `omega1CenterInG P p`, `C_P(A)` is
+`Subgroup.centralizer (A : Set G) ⊓ P`, and the internal product in (b) is encoded by
+trivial intersection plus equality with the join, following the existing `IsNarrow` convention. -/
+theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    (hpG : p ∈ (Nat.card G).primeFactors)
+    {A P A₀ : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
+    (hAmax : IsMaximalElementaryAbelian p A) (hPp : IsPGroup p ↥P)
+    (hPnonab : ¬ IsMulCommutative ↥P) (hAP : A ≤ P)
+    (hA₀ : elemAbelianOfRankIn p 1 A A₀) (hA₀ne : A₀ ≠ omega1CenterInG P p) :
+    elemAbelianOfRankIn p 1 A (omega1CenterInG P p) ∧
+    (∃ Z : Subgroup G, Z ≤ P ∧ IsCyclic ↥Z ∧ omega1CenterInG P p ≤ Z ∧
+      A₀ ⊓ Z = ⊥ ∧ Subgroup.centralizer (A : Set G) ⊓ P = A₀ ⊔ Z) ∧
+    (∀ X Y : Subgroup G, elemAbelianOfRankIn p 1 A X → X ≠ omega1CenterInG P p →
+      elemAbelianOfRankIn p 1 A Y → Y ≠ omega1CenterInG P p →
+        ∃ n ∈ Subgroup.normalizer (A : Set G) ⊓ P, MulAut.conj n • X = Y) := by
+  sorry
 
 end OddOrder.BG.Ch3.S10
