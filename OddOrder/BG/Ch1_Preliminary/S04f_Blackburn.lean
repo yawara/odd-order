@@ -1716,6 +1716,109 @@ private theorem blackburn_noncentral_omega1_centralizer_eq_commutator
     exact congrArg (fun u : T => (u : R)) (hT_elem.pow_eq_one ⟨t, htT⟩)
 
 
+/-- Blackburn 4.16 Case B-2: a Maschke complement `X/C` in
+`D/C = C_R(T)/C_R(S)` is cyclic.  The key point is that every order-`p`
+generator of `Ω₁(X)` lies in `Ω₁(D)=T`; its quotient image lies in both the
+`X/C` and `TC/C` summands, hence is trivial and the generator lies in `C`.
+Since `Ω₁(C)` has order `p`, the rank-one cyclicity criterion applies to `X`. -/
+private theorem blackburn_noncentral_centralizer_complement_isCyclic
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp_odd : Odd p) (hR : IsPGroup p R)
+    (hΩ_extraspecial : IsExtraspecial p (Omega R p 1))
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2)
+    (hT_elem :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      T.IsElementaryAbelian p)
+    (hΩD_eq_T :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      let D : Subgroup R := Subgroup.centralizer (T : Set R)
+      (Omega D p 1).map D.subtype = T)
+    (hΩC_eq_center :
+      let S : Subgroup R := Omega R p 1
+      let C : Subgroup R := Subgroup.centralizer (S : Set R)
+      (Omega C p 1).map C.subtype = (Subgroup.center S).map S.subtype)
+    {X : Subgroup (Subgroup.centralizer ((⁅Omega R p 1, (⊤ : Subgroup R)⁆ : Subgroup R) : Set R))}
+    (hX_inf_T :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      let C : Subgroup R := Subgroup.centralizer (S : Set R)
+      let D : Subgroup R := Subgroup.centralizer (T : Set R)
+      let hCD_normal : (C.subgroupOf D).Normal :=
+        (blackburn_noncentral_centralizer_normalities (R := R) (p := p)).2.2
+      letI : (C.subgroupOf D).Normal := hCD_normal
+      X.map (QuotientGroup.mk' (C.subgroupOf D)) ⊓
+          (T.subgroupOf D).map (QuotientGroup.mk' (C.subgroupOf D)) = ⊥) :
+    IsCyclic X := by
+  dsimp at hT_facts hT_elem hΩD_eq_T hΩC_eq_center hX_inf_T ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  let D : Subgroup R := Subgroup.centralizer (T : Set R)
+  have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
+  have hT_le_D : T ≤ D := hrelations.2.1
+  have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
+  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  let q : D →* D ⧸ C.subgroupOf D := QuotientGroup.mk' (C.subgroupOf D)
+  let f : X →* R := D.subtype.comp X.subtype
+  have hf_inj : Function.Injective f := by
+    intro a b hab
+    apply Subtype.ext
+    exact D.subtype_injective hab
+  have hΩX_map_le : (Omega X p 1).map f ≤ (Omega C p 1).map C.subtype := by
+    rw [Subgroup.map_le_iff_le_comap]
+    change Subgroup.closure {x : X | x ^ (p ^ 1) = 1} ≤
+      Subgroup.comap f ((Omega C p 1).map C.subtype)
+    rw [Subgroup.closure_le]
+    intro x hxpow
+    change f x ∈ (Omega C p 1).map C.subtype
+    have hxpow_X : (x : X) ^ p = 1 := by simpa [pow_one] using hxpow
+    have hxpow_D : (x : D) ^ p = 1 := congrArg Subtype.val hxpow_X
+    have hxΩD : (x : D) ∈ Omega D p 1 := by
+      refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]
+      exact hxpow_D
+    have hxT : ((x : D) : R) ∈ T := by
+      have hxmap : ((x : D) : R) ∈ (Omega D p 1).map D.subtype :=
+        ⟨(x : D), hxΩD, rfl⟩
+      rwa [hΩD_eq_T] at hxmap
+    have hxTsub : (x : D) ∈ T.subgroupOf D := by
+      rw [Subgroup.mem_subgroupOf]
+      exact hxT
+    have hxXmap : q (x : D) ∈ X.map q := ⟨(x : D), x.property, rfl⟩
+    have hxTmap : q (x : D) ∈ (T.subgroupOf D).map q :=
+      ⟨(x : D), hxTsub, rfl⟩
+    have hxq_one : q (x : D) = 1 := by
+      have hxinf : q (x : D) ∈ X.map q ⊓ (T.subgroupOf D).map q := ⟨hxXmap, hxTmap⟩
+      rw [hX_inf_T, Subgroup.mem_bot] at hxinf
+      exact hxinf
+    have hxC : (x : D) ∈ C.subgroupOf D := (QuotientGroup.eq_one_iff (x : D)).mp hxq_one
+    refine ⟨⟨((x : D) : R), Subgroup.mem_subgroupOf.mp hxC⟩, ?_, ?_⟩
+    · refine Omega.mem_of_pow_eq_one ?_
+      rw [pow_one]
+      apply Subtype.ext
+      change ((x : D) : R) ^ p = 1
+      exact congrArg Subtype.val hxpow_D
+    · rfl
+  have hΩC_map_card : Nat.card ((Omega C p 1).map C.subtype) = p := by
+    rw [hΩC_eq_center, Subgroup.card_map_of_injective S.subtype_injective,
+      hΩ_extraspecial.center_card]
+  have hΩX_card_le : Nat.card (Omega X p 1) ≤ p := by
+    have hΩX_map_card : Nat.card ((Omega X p 1).map f) = Nat.card (Omega X p 1) :=
+      Subgroup.card_map_of_injective (K := Omega X p 1) hf_inj
+    calc
+      Nat.card (Omega X p 1) = Nat.card ((Omega X p 1).map f) := hΩX_map_card.symm
+      _ ≤ Nat.card ((Omega C p 1).map C.subtype) := Subgroup.card_le_of_le hΩX_map_le
+      _ = p := hΩC_map_card
+  have hD_pg : IsPGroup p D := hR.to_subgroup D
+  have hX_pg : IsPGroup p X := hD_pg.to_subgroup X
+  exact isCyclic_of_card_omega1_le_prime hX_pg hp_odd hΩX_card_le
+
+
 /-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
 `|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
 have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
@@ -1908,6 +2011,9 @@ theorem blackburnRankTwoClassification
     obtain ⟨X, hC_le_X, hX_inv, hX_omega, hX_inf_T, hX_sup_T⟩ :=
       blackburn_noncentral_exists_centralizer_quotient_complement
         (φ := φ) hcop hT_facts hT_elem hD_quot_ab
+    have hX_cyclic :=
+      blackburn_noncentral_centralizer_complement_isCyclic
+        hp_odd hR hΩ_extraspecial hT_facts hT_elem hΩD_eq_T hΩC_eq_center hX_inf_T
     obtain ⟨y, hyS, hyT, z, hzT, hzZ⟩ :=
       blackburn_noncentral_commutator_witnesses hT_facts
     sorry
