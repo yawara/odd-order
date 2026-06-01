@@ -34,8 +34,20 @@ L2486-2630, **6 結果** (Thm 9.1, 9.6 + Cor 9.2, 9.3 + Lem 9.4, 9.5)。
 
 ## proof は後続
 
-faithful statement + `sorry`。proof は §7 (Thm 7.4/7.6) + §8 (Thm 8.1) + §6 Thm 6.2 + §5 Lem 5.1
-+ §4 (Thm 4.20, Cor 4.19) + Prop 1.16 に依存 (foundation-first)。
+faithful statement + `sorry`。proof は §7 (Thm 7.4/7.6) + §8 (Thm 8.1) + §6 Thm 6.2
++ §5 Lem 5.1 + §4 (Thm 4.20, Cor 4.19) + Prop 1.16 に依存 (foundation-first)。
+
+## Gate map for §4/§5 obligations
+
+* 9.1 consumes BG Thm 8.1 and BG Thm 4.20 at mmd L2533. It does not directly consume
+  BG Lem 4.13, BG Thm 4.16, or the §5 narrow classification theorems.
+* 9.3 uses BG Lem 4.5 at mmd L2549, then Cor 9.2. This is p-group infrastructure,
+  not the Blackburn endpoint.
+* 9.5 consumes BG Thm 7.6 + Thm 7.4 at mmd L2579, Cor 4.19 at L2605, and Thm 4.20 at
+  L2615. Its `SCN₃(p)` input is already explicit.
+* 9.6 is the one direct §5 gate in §9: mmd L2629 uses BG Lem 5.1 to choose
+  `A ∈ SCN₃(P)`. That gate depends on BG Lem 4.7's hard direction, not on Thm 4.16.
+  Keep Blackburn/narrow type-classification assumptions downstream in §10+.
 -/
 
 namespace OddOrder.BG.Ch2.S09
@@ -46,7 +58,10 @@ open OddOrder.Isaacs
 variable {G : Type*} [Group G]
 
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
-(a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。 -/
+(a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
+
+Proof gate: mmd L2533 invokes BG Thm 8.1 and BG Thm 4.20 after Eq. (9.5). Do not add
+BG Lem 4.13, BG Thm 4.16, or §5 narrow hypotheses to this theorem. -/
 theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {B : Subgroup G} (hBea : B.IsElementaryAbelian p) (hBle : B ≤ M) (hBnc : ¬ IsCyclic ↥B)
@@ -80,14 +95,23 @@ theorem abelian_rank_three_isUniquelyMaximal_of_fitting [Finite G] (hG : IsMinim
     ∀ A : Subgroup G, IsMulCommutative A → IsPGroup p A → 3 ≤ rank ↥A → IsUniquelyMaximal A := by
   sorry
 
-/-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。 -/
+/-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
+
+Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
+Thm 4.20. The `SCN₃(p)` input is the right interface, so no §5 narrow or Thm 4.16
+assumption should be introduced here. -/
 theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
     IsUniquelyMaximal A := by
   sorry
 
 /-- **BG Theorem 9.6 (The Uniqueness Theorem)** (mmd L2627): `K ⊆ G`, `r(K) ≥ 2`、
-`r(K) ≥ 3` または `r(C_G(K)) ≥ 3` ⇒ `K ∈ 𝒰`。線形チェーン 9.1→9.5 の終結。 -/
+`r(K) ≥ 3` または `r(C_G(K)) ≥ 3` ⇒ `K ∈ 𝒰`。線形チェーン 9.1→9.5 の終結。
+
+Proof gate: mmd L2629 applies BG Lem 5.1 to obtain an `SCN₃(P)` subgroup inside a
+Sylow `p`-subgroup containing an elementary abelian subgroup of rank 3. This is the
+direct §5 dependency for §9 and should not be replaced by Peterfalvi-style type
+classification hypotheses. -/
 theorem uniquenessTheorem [Finite G] (hG : IsMinimalSimpleOdd G)
     {K : Subgroup G} (hr2 : 2 ≤ rank ↥K)
     (hr3 : 3 ≤ rank ↥K ∨ 3 ≤ rank ↥(Subgroup.centralizer (K : Set G))) :
