@@ -1503,6 +1503,56 @@ kernel. -/
 def G0 (F : FrobeniusFamily G k) : Set G :=
   {x : G | ∀ i, x ∉ F.kernelSpread i}
 
+theorem mem_G0_iff (F : FrobeniusFamily G k) {x : G} :
+    x ∈ F.G0 ↔ ∀ i, x ∉ F.kernelSpread i := Iff.rfl
+
+lemma one_not_mem_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
+    (1 : G) ∉ F.kernelSpread i := by
+  rintro ⟨g, hg⟩
+  exact hg.2 (by simp)
+
+lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
+  intro i
+  exact F.one_not_mem_kernelSpread i
+
+/-- `(H_i^#)^G` is closed under ambient conjugation. -/
+lemma kernelSpread_conj_mem (F : FrobeniusFamily G k) (i : Fin k)
+    (g : G) {x : G} (hx : x ∈ F.kernelSpread i) :
+    g * x * g⁻¹ ∈ F.kernelSpread i := by
+  rcases hx with ⟨a, ha⟩
+  refine ⟨a * g⁻¹, ?_⟩
+  have hconj : (a * g⁻¹) * (g * x * g⁻¹) * (a * g⁻¹)⁻¹ = a * x * a⁻¹ := by
+    group
+  rwa [hconj]
+
+lemma mem_kernelSpread_conj_iff (F : FrobeniusFamily G k) (i : Fin k)
+    (g x : G) :
+    g * x * g⁻¹ ∈ F.kernelSpread i ↔ x ∈ F.kernelSpread i := by
+  constructor
+  · intro hx
+    have hback := F.kernelSpread_conj_mem i g⁻¹ hx
+    simpa [mul_assoc] using hback
+  · intro hx
+    exact F.kernelSpread_conj_mem i g hx
+
+/-- `G₀`, the complement of the conjugate spreads, is conjugation-invariant. -/
+lemma G0_conj_mem (F : FrobeniusFamily G k) (g : G) {x : G}
+    (hx : x ∈ F.G0) : g * x * g⁻¹ ∈ F.G0 := by
+  intro i hsp
+  have hxsp : x ∈ F.kernelSpread i := by
+    have hback := F.kernelSpread_conj_mem i g⁻¹ hsp
+    simpa [mul_assoc] using hback
+  exact hx i hxsp
+
+lemma mem_G0_conj_iff (F : FrobeniusFamily G k) (g x : G) :
+    g * x * g⁻¹ ∈ F.G0 ↔ x ∈ F.G0 := by
+  constructor
+  · intro hx
+    have hback := F.G0_conj_mem g⁻¹ hx
+    simpa [mul_assoc] using hback
+  · intro hx
+    exact F.G0_conj_mem g hx
+
 /-- Kernel order `h_i = |H_i|`. -/
 noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H i)
 
