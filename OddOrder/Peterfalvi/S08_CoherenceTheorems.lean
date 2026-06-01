@@ -172,6 +172,66 @@ theorem coherence_inner_eq_on_supported
 
 end SibleySetup
 
+/-- `H^# = H ∖ {1}` viewed as a subset of the ambient group `G`, for `H ≤ L ≤ G`.  This is the
+support set `A` of the §4 Dade hypothesis in Peterfalvi (6.8): the nonidentity elements of `H`,
+mapped from `↥L` into `G` along the inclusions. -/
+def sharpImage {G : Type*} [Group G] {L : Subgroup G} (H : Subgroup ↥L) : Set G :=
+  ((Subgroup.map L.subtype H : Subgroup G) : Set G) \ {1}
+
+/-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
+
+The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
+which does not exist in Feit–Thompson (`dim CF(L) > dim CF(G)`); its `CoherenceTarget` was
+therefore undischargeable. This carrier instead packages the genuine §4 Dade datum
+`dade : S04.Hypothesis G H^# L`, so the coherence map `tau` is the **real**
+`dadeIntegralCharacterMap` and `CoherenceTarget` is `IsCoherent` for that map — exactly the shape
+the §7 coherence engine produces (`coherentUnion_of_glued`, `coherentEqualDegree_fromDade`, …),
+realizing "τ coincides with the Dade isometry relative to (A,L,G)" (mmd 04.8 L150).
+
+**Migration status (T1, `notes/peterfalvi/s08_6_8_assembly_plan.md`)**: this commit lands the
+re-parametrization (`L : Subgroup G`, source type `↥L`) and the real-`tau` `CoherenceTarget`. The
+remaining (6.8) hypotheses — `S = {Ind_H^L θ | θ ≠ 1}`, the split `L = H ⋊ W₁`, `H` nilpotent, and
+the case (c1)/(c2) disjunction (`S06.CertainTypeHypothesis`) — are added next, after which
+`sibleySetup_is_coherent` is restated against this carrier and the legacy `SibleySetup` removed. -/
+structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (L : Subgroup G) [Fintype ↥L] [Invertible (Nat.card L : ℂ)] where
+  /-- The normal subgroup `H ⊴ L` (Peterfalvi (6.8.a)). -/
+  H : Subgroup ↥L
+  /-- A complement-side subgroup `W₁`; the split `L = H ⋊ W₁` is added in the next migration step. -/
+  W1 : Subgroup ↥L
+  H_ne_bot : H ≠ ⊥
+  H_normal : H.Normal
+  W1_nontrivial : W1 ≠ ⊥
+  card_L_odd : Odd (Nat.card L)
+  /-- `H^#` is a TI-subset of `G` relative to `L` (corrected ambient: TI in `G`, not in `↥L`). -/
+  H_sharp_ti : OddOrder.GroupTheory.IsTISubset (sharpImage H) L
+  /-- The §4 Dade datum on `A = H^#`; its Dade isometry *is* `tau`. -/
+  dade : OddOrder.Peterfalvi.S04.Hypothesis G (sharpImage H) L
+  hconj : dade.HConjInvariant
+  /-- The base character set (`{Ind_H^L θ | θ ≠ 1}`; the explicit characterization is added next). -/
+  S : Set (ClassFunction ↥L ℂ)
+
+namespace SibleyDadeHypothesis
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+
+/-- The coherence map `τ` of the (6.8) setup, realized as the genuine §4 Dade isometry
+(`dadeIntegralCharacterMap`) — **not** an opaque global isometry. -/
+noncomputable abbrev tau (hyp : SibleyDadeHypothesis G L) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G :=
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
+    (hyp.dade.fullDadeIsometryData hyp.hconj)
+
+/-- The (6.8) coherence target: `S` is coherent for the **real Dade map** `tau`.  This is exactly
+the conclusion shape produced by the §7 engine, hence honestly dischargeable — unlike the legacy
+`SibleySetup.CoherenceTarget`, which required a nonexistent global isometry. -/
+abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L) :=
+  OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S
+    (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage hyp.H) L)
+
+end SibleyDadeHypothesis
+
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the Sibley
 setup, the input set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is coherent — there
 is an integral isometric extension of `τ` from `Z[S, A]` to `Z[S]`.
