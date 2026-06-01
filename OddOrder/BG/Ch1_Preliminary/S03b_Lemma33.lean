@@ -116,6 +116,88 @@ theorem centralizer_ne_bot_of_nontrivial_kernel [Finite G] {K R : Subgroup G}
     (hchar : (Nat.card K : F) ≠ 0)
     (hKnt : ∃ k : K, ρ (k : G) ≠ 1) :
     ∃ v : V, v ≠ 0 ∧ ∀ r : R, ρ (r : G) v = v := by
-  sorry
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  by_contra hCon
+  push_neg at hCon
+  have hCR : ∀ w : V, (∀ r : R, ρ (r : G) w = w) → w = 0 := fun w hw => by
+    by_contra hw0; obtain ⟨r, hr⟩ := hCon w hw0; exact hr (hw r)
+  -- The nonidentity part of `groupSumMap ρ H w` over a finite subgroup `H`.
+  have hsplit : ∀ (H : Subgroup G) (w : V),
+      (∑ x : {x : H // x ≠ 1}, ρ ((x : H) : G) w) = groupSumMap ρ H w - w := by
+    intro H w
+    have h1 : groupSumMap ρ H w = ∑ h : H, ρ (h : G) w := by
+      rw [groupSumMap, LinearMap.sum_apply]
+    rw [h1, ← Finset.add_sum_erase Finset.univ (fun h : H => ρ (h : G) w) (Finset.mem_univ 1)]
+    simp only [Subgroup.coe_one, map_one, Module.End.one_apply, add_sub_cancel_left]
+    exact (Finset.sum_subtype (Finset.univ.erase 1) (p := fun h : H => h ≠ 1)
+      (fun h => by simp [Finset.mem_erase]) (fun h : H => ρ (h : G) w)).symm
+  have hKtriv : ∀ k : K, ρ (k : G) = 1 := by
+    apply trivial_of_groupSumMap_eq_card_smul ρ K hchar
+    ext v
+    rw [LinearMap.smul_apply, LinearMap.id_coe, id_eq]
+    -- the full-group sum is `0` (it lands in `C_V(G) ⊆ C_V(R) = 0`)
+    have hS0 : (∑ g : G, ρ g v) = 0 := by
+      refine hCR _ (fun r => ?_)
+      rw [map_sum, Finset.sum_congr rfl (fun g _ => rep_apply_apply ρ (r : G) g v)]
+      exact Equiv.sum_comp (Equiv.mulLeft (r : G)) (fun g => ρ g v)
+    set partn := SubgroupPartition.frobeniusGroup hFrob with hpartn
+    have hbij : Function.Bijective partn.nonidentitySigmaTo :=
+      ⟨partn.nonidentitySigmaTo_injective, partn.nonidentitySigmaTo_surjective⟩
+    -- reindex the nonidentity sum across the partition parts
+    have hreindex :
+        (∑ y : {g : G // g ≠ 1}, ρ (y : G) v)
+          = ∑ X : {X : Subgroup G // X ∈ partn.parts},
+              ∑ x : {x : X.1 // x ≠ 1}, ρ ((x : X.1) : G) v := by
+      rw [← Fintype.sum_bijective partn.nonidentitySigmaTo hbij
+            (fun p => ρ ((p.2.1 : p.1.1) : G) v) (fun y => ρ (y : G) v) (fun _ => rfl)]
+      rw [Fintype.sum_sigma]
+    -- the full-group sum splits as identity + nonidentity
+    have hGsum : (∑ g : G, ρ g v) = v + ∑ y : {g : G // g ≠ 1}, ρ (y : G) v := by
+      rw [← Finset.add_sum_erase Finset.univ (fun g : G => ρ g v) (Finset.mem_univ 1)]
+      congr 1
+      · simp
+      · exact Finset.sum_subtype (Finset.univ.erase 1) (p := fun g : G => g ≠ 1)
+          (fun g => by simp [Finset.mem_erase]) (fun g : G => ρ g v)
+    -- the partition sum collapses: kernel gives `groupSumMap ρ K v - v`, conjugates give `-v`
+    have hmem_parts : ∀ X : Subgroup G,
+        X ∈ partn.parts ↔ X = K ∨ ∃ g : G, X = MulAut.conj g • R := by
+      rw [hpartn]; exact fun X => SubgroupPartition.mem_frobeniusGroup_parts hFrob
+    have hKmem : K ∈ partn.parts := (hmem_parts K).mpr (Or.inl rfl)
+    have hcard : partn.parts.card = Nat.card K + 1 := by
+      rw [hpartn]; exact SubgroupPartition.frobeniusGroup_parts_card hFrob
+    -- non-kernel parts are conjugates of `R`, on which the average vanishes.
+    have hconj_term : ∀ X ∈ partn.parts.erase K, groupSumMap ρ X v - v = -v := by
+      intro X hX
+      rw [Finset.mem_erase] at hX
+      obtain ⟨hXne, hXp⟩ := hX
+      obtain hXK | ⟨g, rfl⟩ := (hmem_parts X).mp hXp
+      · exact absurd hXK hXne
+      · rw [groupSumMap_conjugate_eq_zero ρ g hCR v, zero_sub]
+    have hpart_sum :
+        (∑ X : {X : Subgroup G // X ∈ partn.parts},
+            ∑ x : {x : X.1 // x ≠ 1}, ρ ((x : X.1) : G) v)
+          = groupSumMap ρ K v - v - (Nat.card K) • v :=
+      calc (∑ X : {X : Subgroup G // X ∈ partn.parts},
+              ∑ x : {x : X.1 // x ≠ 1}, ρ ((x : X.1) : G) v)
+          = ∑ X : {X : Subgroup G // X ∈ partn.parts}, (groupSumMap ρ X.1 v - v) :=
+            Finset.sum_congr rfl (fun X _ => hsplit X.1 v)
+        _ = ∑ X ∈ partn.parts, (groupSumMap ρ X v - v) :=
+            Finset.sum_coe_sort partn.parts (fun X => groupSumMap ρ X v - v)
+        _ = (groupSumMap ρ K v - v) + ∑ X ∈ partn.parts.erase K, (groupSumMap ρ X v - v) :=
+            (Finset.add_sum_erase partn.parts (fun X => groupSumMap ρ X v - v) hKmem).symm
+        _ = (groupSumMap ρ K v - v) + ∑ _X ∈ partn.parts.erase K, (-v) := by
+            rw [Finset.sum_congr rfl hconj_term]
+        _ = (groupSumMap ρ K v - v) + (partn.parts.erase K).card • (-v) := by
+            rw [Finset.sum_const]
+        _ = (groupSumMap ρ K v - v) + (Nat.card K) • (-v) := by
+            rw [Finset.card_erase_of_mem hKmem, hcard, Nat.add_sub_cancel]
+        _ = groupSumMap ρ K v - v - (Nat.card K) • v := by rw [smul_neg]; abel
+    have hcombine : groupSumMap ρ K v - (Nat.card K) • v = 0 := by
+      rw [← hS0, hGsum, hreindex, hpart_sum]; abel
+    rw [sub_eq_zero] at hcombine
+    rw [hcombine, Nat.cast_smul_eq_nsmul]
+  obtain ⟨k, hk⟩ := hKnt
+  exact hk (hKtriv k)
 
 end OddOrder.BG.Ch1.S03b
