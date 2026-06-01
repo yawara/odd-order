@@ -28,6 +28,7 @@ fully wired into this layer.
 -/
 
 namespace OddOrder.Peterfalvi.S12
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

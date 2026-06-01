@@ -24,6 +24,7 @@ maximal-subgroup layer.
 -/
 
 namespace OddOrder.Peterfalvi.S14
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

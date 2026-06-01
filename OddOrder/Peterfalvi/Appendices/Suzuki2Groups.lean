@@ -17,6 +17,7 @@ classification obligations explicit.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {P V W F : Type*} [Group P]
 

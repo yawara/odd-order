@@ -13,6 +13,7 @@ local-analysis consequences for a minimal simple CN-group of odd order.
 -/
 
 namespace OddOrder.BG.AppD
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {G : Type*} [Group G]
 

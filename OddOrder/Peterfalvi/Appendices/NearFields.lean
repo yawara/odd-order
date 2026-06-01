@@ -16,6 +16,7 @@ Suzuki theorem and records the special Zassenhaus classification needed there.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {G Ω F : Type*} [Group G]
 

@@ -29,6 +29,7 @@ model of all induced-character sums in the `omega_ij`/`eta_ij` grid.
 -/
 
 namespace OddOrder.Peterfalvi.S15
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

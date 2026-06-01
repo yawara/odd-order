@@ -17,6 +17,7 @@ Sections 7--8; this file records the appendix-specific induction-isometry setup.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.RepresentationTheory
 

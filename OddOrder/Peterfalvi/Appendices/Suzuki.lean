@@ -18,6 +18,7 @@ global hypotheses (A1)--(A3), Theorem A, and the chapter-level reductions.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {G Ω : Type*} [Group G]
 

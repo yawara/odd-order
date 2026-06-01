@@ -26,6 +26,7 @@ of the quotient module `H/H_0`.
 -/
 
 namespace OddOrder.Peterfalvi.S11
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

@@ -4,6 +4,19 @@
 > 横断スナップショット = memory `ft-master-roadmap`。BG 計画 = `notes/bg/scaffold_feasibility_2026_06_01.md`。
 > Peterfalvi 計画 = `notes/peterfalvi/scaffold_feasibility_2026_06_01.md` (本セッション末に workflow で生成)。
 
+## ✅✅ 更新 (2026-06-01 後半): scaffold **全完了** (build-green)
+
+下記「継続タスク」は**すべて landed**。現 HEAD で `lake build OddOrder` green (3410 jobs)、AxiomsCheck 不変。
+- **BG**: §12=19/19 (2708462/a519a4d), §13 (S13_PrimeAction, 11結果+2def; 13.10(c)/13.11 結論を PDF 画像読みで復元→mmd splice 705dd47), Ch4 §14/§15/§16 (S14_TypePCounting/S15_MF/S16_MainResults, **faithful 実 statement**, §16 に BG↔Pf Type 対応), App.C/D/E。
+- **共有 module**: `GroupTheory/MaxNilpotentNormalHall` (M_F) + `GroupTheory/MaximalSubgroupType` (Type I–V 塔, **完全 faithful**)。
+- **Peterfalvi** §10–§16 (S10–S16) + Appendices (Suzuki/Huppert/NearFields/FeitSibley/Suzuki2Groups)。§15 で ω/η/μ/ν を実型 field 化。
+- **最上位** `OddOrder/FeitThompson.lean` (`feitThompson` sorry + honest final-contradiction bridge)。
+- **design**: 群論=faithful 実構造、文字理論の恒等式のみ opaque `_formula:Prop` placeholder (217箇所; gate#3 ω/η/μ/ν 未材料化; sorry 化済で laundering 無)。convention = `notes/meta/scaffold_opaque_prop_convention.md`。
+- **フォローアップ**: opaque `_formula` rider 含む定理結論は部分 vacuous; `GroupTheory.derivedInAmbient`/`piCoreIn` が `Ch2.S07.derivedInG`/`opiCoreInG` と重複 (issue 登録済) → proof フェーズで統一。
+- **次フェーズ = proof 充填** (本線 §4 Lem 4.13 → §16 → Pf §8/§9)。
+
+---
+
 ## このセッションでやったこと (全 push 済 origin/main = fd99137)
 
 **方針**: 教科書の定理を **faithful な Lean statement + `sorry`** で scaffold (true-stub 不可)、定義は埋める、

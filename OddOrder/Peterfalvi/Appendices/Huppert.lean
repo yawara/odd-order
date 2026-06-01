@@ -18,6 +18,7 @@ finite-field realization pattern.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {D E : Type*} [Group D] [Group E]
 

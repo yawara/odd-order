@@ -24,6 +24,7 @@ formalized.  The final bridge to Peterfalvi Section 16 is already connected.
 -/
 
 namespace OddOrder.BG.AppC
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 open OddOrder.GroupTheory
 open OddOrder.Peterfalvi

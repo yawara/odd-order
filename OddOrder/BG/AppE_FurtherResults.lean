@@ -12,6 +12,7 @@ extensions around regular operator actions on `p`-groups.
 -/
 
 namespace OddOrder.BG.AppE
+-- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 variable {G R B : Type*} [Group G] [Group R] [Group B]
 
