@@ -944,6 +944,67 @@ private theorem blackburn_noncentral_commutator_isElementaryAbelian
   change (x : R) ^ p = 1
   exact congrArg Subtype.val hxpow
 
+/-- Blackburn 4.16 Case B-2 quotient sizes: from `Z(S) < T < S`,
+`|S| = p³`, `|T| = p²`, and `|Z(S)| = p`, both `S/T` and `T/S'`
+have order `p`.  The second quotient uses `S' = Z(S)` from extraspeciality,
+transported into the ambient group by `S.subtype`. -/
+private theorem blackburn_noncentral_commutator_quotient_cards
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hΩ_card : Nat.card (Omega R p 1) = p ^ 3)
+    (hΩ_extraspecial : IsExtraspecial p (Omega R p 1))
+    (hT_facts :
+      let S : Subgroup R := Omega R p 1
+      let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+      (Subgroup.center S).map S.subtype < T ∧ T < S ∧ Nat.card T = p ^ 2) :
+    let S : Subgroup R := Omega R p 1
+    let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+    let Z : Subgroup R := (Subgroup.center S).map S.subtype
+    Nat.card (S ⧸ T.subgroupOf S) = p ∧ Nat.card (T ⧸ Z.subgroupOf T) = p := by
+  dsimp at hT_facts ⊢
+  let S : Subgroup R := Omega R p 1
+  let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
+  let Z : Subgroup R := (Subgroup.center S).map S.subtype
+  have hp : p.Prime := Fact.out
+  have hZ_lt_T : Z < T := hT_facts.1
+  have hT_lt_S : T < S := hT_facts.2.1
+  have hT_card : Nat.card T = p ^ 2 := hT_facts.2.2
+  have hZ_le_T : Z ≤ T := hZ_lt_T.le
+  have hT_le_S : T ≤ S := hT_lt_S.le
+  have hTsub_card : Nat.card (T.subgroupOf S) = Nat.card T :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hT_le_S).toEquiv
+  have hS_lagrange : Nat.card S =
+      Nat.card (S ⧸ T.subgroupOf S) * Nat.card (T.subgroupOf S) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (T.subgroupOf S)
+  have hS_quot_card : Nat.card (S ⧸ T.subgroupOf S) = p := by
+    have hmul : Nat.card (S ⧸ T.subgroupOf S) * p ^ 2 = p * p ^ 2 := by
+      calc
+        Nat.card (S ⧸ T.subgroupOf S) * p ^ 2
+            = Nat.card (S ⧸ T.subgroupOf S) * Nat.card (T.subgroupOf S) := by
+              rw [hTsub_card, hT_card]
+        _ = Nat.card S := hS_lagrange.symm
+        _ = p ^ 3 := hΩ_card
+        _ = p * p ^ 2 := by ring
+    exact Nat.eq_of_mul_eq_mul_right (Nat.pow_pos hp.pos : 0 < p ^ 2) hmul
+  have hZ_card : Nat.card Z = p := by
+    dsimp [Z]
+    rw [Subgroup.card_map_of_injective S.subtype_injective, hΩ_extraspecial.center_card]
+  have hZsub_card : Nat.card (Z.subgroupOf T) = Nat.card Z :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZ_le_T).toEquiv
+  have hT_lagrange : Nat.card T =
+      Nat.card (T ⧸ Z.subgroupOf T) * Nat.card (Z.subgroupOf T) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (Z.subgroupOf T)
+  have hT_quot_card : Nat.card (T ⧸ Z.subgroupOf T) = p := by
+    have hmul : Nat.card (T ⧸ Z.subgroupOf T) * p = p * p := by
+      calc
+        Nat.card (T ⧸ Z.subgroupOf T) * p
+            = Nat.card (T ⧸ Z.subgroupOf T) * Nat.card (Z.subgroupOf T) := by
+              rw [hZsub_card, hZ_card]
+        _ = Nat.card T := hT_lagrange.symm
+        _ = p ^ 2 := hT_card
+        _ = p * p := by ring
+    exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
+  exact ⟨hS_quot_card, hT_quot_card⟩
+
 /-- The final congruence contradiction in Blackburn 4.16 Case B-2.
 
 BG obtains `jk ≡ i` and `ij ≡ k`, with `i ≠ 0`, while the odd-order action gives
@@ -1007,6 +1068,8 @@ theorem blackburnRankTwoClassification
       hp_odd hR hΩ_card hΩ_pow hΩ_noncomm hΩ_exp hΩ_extraspecial hSR)
   · have hT_facts := blackburn_noncentral_commutator_facts hR hΩ_card hΩ_extraspecial hSR
     have hT_elem := blackburn_noncentral_commutator_isElementaryAbelian hΩ_pow hT_facts
+    have hT_quot_cards :=
+      blackburn_noncentral_commutator_quotient_cards hΩ_card hΩ_extraspecial hT_facts
     sorry
 
 end BlackburnClassification
