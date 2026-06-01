@@ -2089,6 +2089,31 @@ lemma card_kernelSpread_div_card_G_eq_card_kernel_sharp_div_card_L [Finite G]
   rw [F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e,
     F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e]
 
+/-- The sum of all spread ratios is the complement of the `G₀` ratio. -/
+lemma sum_card_kernelSpread_div_card_G_eq_one_sub_card_G0_div_card_G [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ)) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) := by
+  have hG_pos : 0 < Nat.card G := Nat.card_pos
+  have hG_ne : (Nat.card G : ℚ) ≠ 0 := by
+    exact_mod_cast hG_pos.ne'
+  rw [← Finset.sum_div, ← Nat.cast_sum, F.sum_card_kernelSpread_eq_card_G_sub_card_G0,
+    Nat.cast_sub (F.card_G0_le_card_G)]
+  field_simp [hG_ne]
+
+/-- The same balance formula in `h_i, e_i` notation. -/
+lemma sum_h_sub_one_div_h_mul_e_eq_one_sub_card_G0_div_card_G [Finite G]
+    (F : FrobeniusFamily G k) :
+    (∑ i : Fin k, ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ))) =
+      1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) := by
+  calc
+    (∑ i : Fin k, ((F.h i : ℚ) - 1) / ((F.h i : ℚ) * (F.e i : ℚ)))
+        = ∑ i : Fin k, (Nat.card (F.kernelSpread i) : ℚ) / (Nat.card G : ℚ) := by
+            refine Finset.sum_congr rfl fun i _ => ?_
+            exact (F.card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e i).symm
+    _ = 1 - (Nat.card F.G0 : ℚ) / (Nat.card G : ℚ) :=
+        F.sum_card_kernelSpread_div_card_G_eq_one_sub_card_G0_div_card_G
+
 /-- `2 e_i + 1 ≤ h_i`.  From `e_i ∣ h_i - 1` (Frobenius: `|H_i| ≡ 1 mod e_i`)
 together with `|L_i|` odd (whence `e_i` is odd and `h_i - 1` is even), the
 quotient `(h_i - 1)/e_i` is even and positive, so `h_i - 1 ≥ 2 e_i`. -/
