@@ -84,4 +84,5 @@ import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.AxiomsCheck
