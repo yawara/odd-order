@@ -207,13 +207,15 @@ theorem Gamma_norm_sq_le (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
 (`.re.toNat` は避ける)。`(ν ζ)^ρ` のノルムは `chiRhoCF` over `L` 上の `ClassFunction.inner`。
 Lean 実装では `kernelOrder`, `complementIndex`, `smallIndex`, `zetaNuRho`,
 `zetaNuRhoNormSq`, `gammaNormSq`, `NormEstimates` としてこの target を名前付け済み。
+また `quadraticTerm_nonneg_of_smallIndex` で、`a∈ℤ`, `2e+1≤h` から
+`0 ≤ (1/e)(1-1/h)a² - 2(1/h)a` を出す純算術部分は sorry-free 化済み。
 
 **Blocker (7.8.b)**: (1) `‖β‖²=e+1` — `IsDadeIsometry.inner_eq` を `Ind1_H−ζ` に適用 + `L` 上での
 `‖Ind1_H−ζ‖²=e+1` 計算 (`chiRho_norm_sq_double_sum` の素材だが shape 不一致)。(2) **(1.5.d)**
 `Σ_{θ∈Irr H, θ≠1}θ(1)²=h−1` (Burnside/第二直交関係) が repo に named lemma として無い (issue 0048 は
 `|Irr|=|ConjClasses|` で別物・未完)。(3) (7.7.b) を `ζ_1=Ind1_H` 配置で適用するには `c_1=a, c_2=1, c_{i>2}=0`
 の計算が必要で、これは (7.8.a) の `BetaDecomp` (係数 `a`) に依存する。よって (7.8.a) が先。算術 `ua²−2va≥0`
-自体は `ℚ`/`ℝ` で容易だが、`u,v,w`・`‖β‖²` を構造から導く層が未組立。
+自体は `quadraticTerm_nonneg_of_smallIndex` として解消済みだが、`u,v,w`・`‖β‖²` を構造から導く層が未組立。
 
 ### (7.9) — 2 族の非直交性
 
