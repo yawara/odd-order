@@ -7,6 +7,8 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Frobenius irreducibility of induced characters ([Is] Theorem 6.34)
@@ -53,6 +55,28 @@ right-hand side of the Mackey restriction formula. -/
   | empty => simp
   | @insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+
+section FrobeniusInertia
+
+variable [Finite G] [Finite H]
+
+/-- Frobenius-group specialization of the Brauer-conjugation inertia bridge.
+
+If `G = H ⋊ W` is a Frobenius group with kernel `H`, every nontrivial irreducible character of
+`H` has inertia subgroup exactly `H`.  This is the form needed in Peterfalvi (6.8), where
+`[Is]` Theorem 6.34 is applied to `Ind_H^L θ` in the Frobenius case. -/
+theorem inertia_eq_of_frobeniusGroup {W : Subgroup G}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G H W)
+    {θ : IrreducibleCharacter H} (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    ClassFunction.inertia (G := G) (H := H) (θ : ClassFunction H ℂ) = H := by
+  refine inertia_eq_of_freeAction (G := G) (H := H) ?_ hθ_ne
+  intro h hh
+  have hhG : (h : G) ≠ 1 := by
+    intro h1
+    exact hh (Subtype.ext h1)
+  exact hF.centralizer_kernel_le (h : G) h.property hhG
+
+end FrobeniusInertia
 
 variable [Fintype G] [Invertible (Nat.card H : k)]
 
@@ -233,6 +257,19 @@ theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H
     refine ⟨H.index * e, Nat.mul_pos hidx he, ?_⟩
     rw [induce_apply_one, hθ1, Nat.cast_mul]
   exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hmem hnorm hpos
+
+/-- Frobenius-group form of **[Is] Theorem 6.34**.
+
+In a Frobenius group with kernel `H`, inducing any nontrivial irreducible character of `H`
+to the ambient group gives an irreducible character.  The proof combines
+`inertia_eq_of_frobeniusGroup` with `isIrreducibleCharacter_induce_of_inertia_eq`; the degree
+formula remains `ClassFunction.induce_apply_one`. -/
+theorem isIrreducibleCharacter_induce_of_frobeniusGroup {W : Subgroup G}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G H W)
+    (θ : IrreducibleCharacter H) (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    IsIrreducibleCharacter (induce H (θ : ClassFunction H ℂ)) :=
+  isIrreducibleCharacter_induce_of_inertia_eq θ
+    (inertia_eq_of_frobeniusGroup hF hθ_ne)
 
 end Complex
 

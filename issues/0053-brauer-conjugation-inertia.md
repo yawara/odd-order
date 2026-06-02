@@ -55,15 +55,21 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - `not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le` と
     `inertia_eq_of_freeAction` で、非自明 `θ : Irr H` について
     `ClassFunction.inertia (θ : ClassFunction H ℂ) = H` に束ねた。
-- [ ] **Layer D — wiring** (T6 proper / 別 commit): free-action を Frobenius (case c1) 等から放電し
-  6.34 + `index_H_eq_card_W1` + difference-support engine で `Y` coherent。
+- [x] **Layer D1 — Frobenius case wiring** (2026-06-02): `IsFrobeniusGroup.centralizer_kernel_le` を
+  `inertia_eq_of_freeAction` に渡す `inertia_eq_of_frobeniusGroup` と、6.34 まで合成した
+  `isIrreducibleCharacter_induce_of_frobeniusGroup` を `InducedIrreducible.lean` に landing。
+  これで (6.8.c1) Frobenius case の `θ≠1 ⟹ Ind_H^L θ ∈ Irr L` prerequisite は直接呼べる。
+- [ ] **Layer D2 — T6 family wiring**: `Y=S(H')` の family construction、degree `|W₁|`、差分 support、
+  および case c2 側の inertia discharge を `coherentEqualDegree_fromDade` に接続する。
 
 ## 完了条件
 
 - Layer A/B/C が sorry/axiom 無 (`#assert_only_allowed_axioms` 3 axiom 全 allowlist)、`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑。
   - 2026-06-02: Layer B 追加後 `lake build OddOrder` 緑。
 - ✅ 2026-06-02: `inertia_eq_of_freeAction` (centralizer-free-action 仮説 + θ≠1 ⟹ inertia θ = H) を statement 化・証明。
-- これと 6.34 で (6.8) T6 の `Y` family 既約性が機械的に従う (Layer D は別 issue/commit でも可)。
+- ✅ 2026-06-02: Frobenius-group case を `inertia_eq_of_frobeniusGroup` /
+  `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
+- 残: `Y=S(H')` family construction と case c2 側の inertia discharge を T6 本体で接続する。
 
 ## 参照
 

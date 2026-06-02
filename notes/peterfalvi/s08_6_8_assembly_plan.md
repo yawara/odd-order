@@ -197,8 +197,10 @@ S06: `CertainTypeHypothesis`(38), `W2`。
       `ConjugationBrauer.lean` として landed (`IrreducibleCharacter.conjByPerm`, `ConjClasses.conjByPerm`,
       `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`)。Layer C のうち、
       fixed conjugacy classes count = 1 から nontrivial Irr 非固定を出す bridge も landed
-      (`not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)。⟹ 残 = 群論側 free action から
-      fixed conjugacy classes count = 1 を作り、`inertia(θ)=H` へ束ねる部分。
+      (`not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)。2026-06-02 追記: Frobenius case
+      (c1) は `IsFrobeniusGroup.centralizer_kernel_le` から `inertia_eq_of_frobeniusGroup` を経由し、
+      6.34 まで合成した `isIrreducibleCharacter_induce_of_frobeniusGroup` が landed。
+      ⟹ 残 = `Y=S(H')` family construction / degree・差分 support wiring、および case c2 側の inertia discharge。
   (4) ✅ **等次数 infra done** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`
       via `Subgroup.IsComplement.card_right` on `hyp.split`)。6.34 degree `[L:H]·θ(1)` + θ degree 1 と
       合わせ `η_j(1)=|W₁|`。
