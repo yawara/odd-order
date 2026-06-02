@@ -32,6 +32,7 @@ import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -1117,6 +1118,11 @@ set_option linter.style.longLine false in
 -- + O_q(G) narrow (q≠p は Fitting 異素数可換で排除; q=p は EZ ∈ ℰ²∩ℰ* + Thm 5.3)
 -- + Thm 5.5(a) で G' の Ū-作用が q-群 + 固定点論法 (Isaacs Lem 4.32) + Ū minimal normal。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two
+-- BG Prop 1.16(2) (mmd L501): noncyclic abelian A が coprime 作用 ⇒ G=⟨C_G(Y)|A/Y cyclic⟩
+-- (第1式 G=⟨C_G(x)|x∈A^#⟩ = Gorenstein 6.2.4 = Isaacs 6.21 既存; 第2式を |A| 帰納で構成)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
+-- BG Prop 1.16(1) = Gorenstein 6.2.4 = Isaacs 6.21 の φ:A→*MulAut G 形 (interface 適応)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
 -- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
 -- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer
