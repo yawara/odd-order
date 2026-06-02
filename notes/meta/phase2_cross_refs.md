@@ -123,7 +123,7 @@ BG §1-§16 で書かれた "Theorem X.Y" の Gorenstein 引用を、Isaacs に�
 | **Thm 1.11** | G 5.3.10 (p.184) | **Isaacs Thm 4.36** | p-odd p-群への p'-操作 + Ω₁ trivial |
 | **Thm 1.13** | G 5.3.11-13 (pp.185-6) | **Isaacs Thm 1.13** (= 4.31 Thompson critical) | Thompson critical subgroup |
 | **Prop 1.15** | G 6.3.3 + 6.2.2 | **Isaacs Thm 3.21 (Hall-Higman 1.2.3)** | π-Hall theorem |
-| **Prop 1.16** | G 6.2.4 (p.225) | Isaacs Thm 3.16 | noncyclic abelian auto |
+| **Prop 1.16** | G 6.2.4 (p.225) | **第1式 = Isaacs FGT 6.21** = repo `Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`; 第2式 = 新 `BG.Ch1.S01b.cocyclicFixedByClosure_eq_top_of_not_isCyclic` | noncyclic abelian auto 生成 ✅ commit d71cbe4 (旧記載 "Isaacs 3.16" は誤り) |
 | **Thm 1.17** | G 7.3.4 (p.250) | **Isaacs Thm 5.21** (Focal Subgroup) | Focal subgroup theorem |
 | **Thm 1.18** | (古典, 標準証明) | **Isaacs Thm 5.13** | Burnside normal p-complement |
 | **Thm 1.20** | (古典, Maschke) | mathlib `Maschke` | Maschke の定理 |
@@ -141,6 +141,16 @@ BG §1-§16 で書かれた "Theorem X.Y" の Gorenstein 引用を、Isaacs に�
 | **Thm 6.2** | (本書独自 odd-order 版) | **Isaacs Thm 7.6** (normal-J theorem) | `Z(J(S))·O_{p'}(G) ⊴ G` for solvable odd-order |
 
 **観察**: BG §1-§6 の主要 Gorenstein 引用は **大半が Isaacs Ch.1-§7 に直接対応**. Phase 2a §1 着手時には Isaacs Ch.1, 3, 4, 5 が完成していれば、BG §1 は **薄いラッパー or section docstring レベル** で済む見込み (mathlib ラッパー方針 §2.7 に従い、純粋リネームは避ける).
+
+## 5b. 証明内 (mid-proof) の "**G** X.Y.Z" 引用 → repo 定理
+
+§5 の表は **BG 番号付き結果** をキーにするため、後続節の **証明本文中**に "by **G**, Theorem X.Y.Z" として現れる引用は載らない (これを見落としやすい ← memory `bg-gorenstein-reread-as-isaacs` の再発ミス源)。確認済みの mid-proof 引用を repo 定理に解決した索引 (解決し次第ここに追記する):
+
+| BG 出現箇所 | Gorenstein | repo 定理 (確認済み, file:line) | 内容 |
+|---|---|---|---|
+| §7 Prop 7.5 proof (mmd L2272) | **G 2.6.4** (p.31) | `Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial` (`OddOrder/Isaacs/Ch01_Sylow/Main.lean:355`) | 有限 p-群の非自明正規部分群は中心と非自明に交わる (`1≠N⊴P ⟹ N⊓Z(P)≠1`) |
+
+**運用ルール**: 後続節の proof を Lean 化中に "**G** X.Y.Z" を見たら — (1) §5 + 本 §5b を引く、(2) 無ければ `OddOrder/Isaacs` `OddOrder/GroupTheory` + mathlib を grep (新規形式化と即断しない)、(3) `references/gorenstein/finite-groups.mmd` を読むのは Isaacs が真に欠く場合のみ (ZJ / p-stability / critical subgroup — いずれも形式化済)、(4) 解決した対応は本表に追記して次回の引きどころにする。詳細は memory `bg-gorenstein-reread-as-isaacs`。
 
 ## 6. 未解決の参照 (TBD)
 
