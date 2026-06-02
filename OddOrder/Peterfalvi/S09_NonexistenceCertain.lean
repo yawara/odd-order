@@ -1505,6 +1505,49 @@ theorem complementIndex_pos (H78 : Hypothesis78 G A L) : 0 < H78.complementIndex
     exact Subgroup.card_subgroup_dvd_card ((H78.hyp76.H).subgroupOf L)
   exact Nat.div_pos (Nat.le_of_dvd Nat.card_pos hdvd) Nat.card_pos
 
+/-- Lagrange in the notation of (7.8.b): `h * e = |L|`. -/
+theorem kernelOrder_mul_complementIndex_eq_card_L (H78 : Hypothesis78 G A L) :
+    H78.kernelOrder * H78.complementIndex = Nat.card L := by
+  rw [kernelOrder, complementIndex]
+  have hH_card : Nat.card ((H78.hyp76.H).subgroupOf L) = Nat.card H78.hyp76.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe H78.hyp76.H_le_L).toEquiv
+  have hdvd : Nat.card H78.hyp76.H ∣ Nat.card L := by
+    rw [← hH_card]
+    exact Subgroup.card_subgroup_dvd_card ((H78.hyp76.H).subgroupOf L)
+  exact Nat.mul_div_cancel' hdvd
+
+/-- Since `A = H#`, its cardinality is `h - 1`. -/
+theorem card_A_eq_kernelOrder_sub_one (H78 : Hypothesis78 G A L) :
+    Nat.card A = H78.kernelOrder - 1 := by
+  conv_lhs => rw [H78.hyp76.A_eq_H_sharp]
+  rw [kernelOrder, Nat.card_coe_set_eq]
+  have hHcard : (H78.hyp76.H : Set G).ncard = Nat.card H78.hyp76.H := by
+    rw [← Nat.card_coe_set_eq]
+    rfl
+  have h1_mem : (1 : G) ∈ (H78.hyp76.H : Set G) := H78.hyp76.H.one_mem
+  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+    Set.ncard_singleton, hHcard]
+
+/-- The local support ratio `|A|/|L|` in the `(h,e)` notation of (7.8.b). -/
+theorem card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_complex
+    (H78 : Hypothesis78 G A L) :
+    (Nat.card A : ℂ) / (Nat.card L : ℂ) =
+      ((H78.kernelOrder : ℂ) - 1) /
+        ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) := by
+  have hh1 : 1 ≤ H78.kernelOrder := Nat.succ_le_of_lt H78.kernelOrder_pos
+  rw [H78.card_A_eq_kernelOrder_sub_one, ← H78.kernelOrder_mul_complementIndex_eq_card_L]
+  norm_num [Nat.cast_sub hh1]
+
+/-- Real-valued form of the local support ratio `|A|/|L| = (h-1)/(he)`. -/
+theorem card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_real
+    (H78 : Hypothesis78 G A L) :
+    (Nat.card A : ℝ) / (Nat.card L : ℝ) =
+      ((H78.kernelOrder : ℝ) - 1) /
+        ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ)) := by
+  have hh1 : 1 ≤ H78.kernelOrder := Nat.succ_le_of_lt H78.kernelOrder_pos
+  rw [H78.card_A_eq_kernelOrder_sub_one, ← H78.kernelOrder_mul_complementIndex_eq_card_L]
+  norm_num [Nat.cast_sub hh1]
+
 /-- **Peterfalvi (7.8.b) source norm target.**  The remaining source-side
 character computation for `‖β‖² = e + 1`, after the Dade-isometry bridge has
 reduced the norm of `β` to `‖Ind 1_H - ζ‖²`.
@@ -2025,6 +2068,37 @@ theorem zetaNuRhoNormSq_eq_card_ratio_mul_int_sub_one
         (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re := by
   rw [H78.zetaNuRhoNormSq_eq_card_ratio_mul hnu_irr hnu_orth, hbeta]
   rw [show star ((hBD.a : ℂ) - 1) = (hBD.a : ℂ) - 1 by simp]
+
+/-- The same `(ζ^ν)^ρ` norm formula with `|A|/|L|` rewritten as `(h-1)/(he)`. -/
+theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hbeta :
+      ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+        (hBD.a : ℂ) - 1) :
+    H78.zetaNuRhoNormSq =
+      (((H78.kernelOrder : ℝ) - 1) /
+          ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) := by
+  rw [H78.zetaNuRhoNormSq_eq_card_ratio_mul_int_sub_one hBD hnu_irr hnu_orth hbeta]
+  rw [H78.card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_complex]
+  let r : ℝ :=
+    ((H78.kernelOrder : ℝ) - 1) /
+      ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ)) *
+    (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1))
+  have hprodCast :
+      ((H78.kernelOrder : ℂ) - 1) /
+            ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) *
+          (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1)) = (r : ℂ) := by
+    norm_num [r, Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
+  change
+    (((H78.kernelOrder : ℂ) - 1) /
+          ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) *
+        (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re = r
+  exact (congrArg Complex.re hprodCast).trans (Complex.ofReal_re r)
 
 end Hypothesis78
 
