@@ -34,6 +34,8 @@ import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -1118,6 +1120,30 @@ set_option linter.style.longLine false in
 -- + O_q(G) narrow (q≠p は Fitting 異素数可換で排除; q=p は EZ ∈ ℰ²∩ℰ* + Thm 5.3)
 -- + Thm 5.5(a) で G' の Ū-作用が q-群 + 固定点論法 (Isaacs Lem 4.32) + Ū minimal normal。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two
+-- BG Prop 1.16(2) (mmd L501): noncyclic abelian A が coprime 作用 ⇒ G=⟨C_G(Y)|A/Y cyclic⟩
+-- (第1式 G=⟨C_G(x)|x∈A^#⟩ = Gorenstein 6.2.4 = Isaacs 6.21 既存; 第2式を |A| 帰納で構成)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
+-- BG Prop 1.16(1) = Gorenstein 6.2.4 = Isaacs 6.21 の φ:A→*MulAut G 形 (interface 適応)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+-- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
+-- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer
+-- BG §7 Lemma 7.1 (Inductive Lemma, mmd L2147, 推移性の核): Hyp 7.1, q∈π', Q₁,Q₂∈ℋ_G*(A;q),
+-- 真部分群 H⊇A で H⊓Q₁≠1≠H⊓Q₂ ⇒ Q₂=Q₁^k (k∈K)。|G|-|Q₁∩Q₂| 強帰納 + 共通構成 (Prop 1.5(b)(c)
+-- を O_{π'}(H) 上で適用) + Case B normalizer 増大 (q-群 nilpotent)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.inductiveLemma
+-- BG Prop 1.16(1) 共役形 (§7 Thm 7.2/7.3 + §8–§16 で再利用): noncyclic abelian B が coprime な
+-- Q≠1 を正規化 ⇒ ∃ x∈B^#, Q⊓C_G(x)≠1 (Isaacs 6.21 を conjAction に橋渡し)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic
+-- BG Thm 7.3 (mmd L2187): Hyp 7.1, q∈π', m(Z(A))≥2, q∈π(C_G(A)) ⇒ K は ℋ_G*(A;q) 上推移的
+-- (Prop 1.16 共役形で B∈ℰ_p²(Z(A)) の C_{Qᵢ}(x)≠1 → Cauchy で R 経由 Lem 7.1 連鎖)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.transitive_of_two_le_rank_center_of_dvd
+-- BG Prop 1.16(2) 共役形 (Thm 7.2 + §8–§16 で再利用): noncyclic abelian B が coprime Q≠1 を
+-- 正規化 ⇒ ∃ Y≤B (B/Y cyclic) で Q⊓C_G(Y)≠1 (Prop 1.16(2) cocyclic を conjAction に橋渡し)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic
+-- BG Thm 7.2 (mmd L2177): Hyp 7.1, q∈π', m(Z(A))≥3 ⇒ K は ℋ_G*(A;q) 上推移的 (Prop 1.16(2)
+-- cocyclic 共役形で B∈ℰ_p³(Z(A)) の noncyclic Y → C_{Q₁}(Y)⊆C_G(z) (z∈Y) → Lem 7.1)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.transitive_of_three_le_rank_center
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

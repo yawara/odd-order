@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.OpResidual
+import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # `A`-invariant `π`-subgroup families `ℋ_H(A;π)` and `ℋ_H*(A;π)`
@@ -110,5 +111,98 @@ theorem hInvariantStar_eq_of_le {H A : Subgroup G} {π : Set ℕ} {Q Q' : Subgro
     (hQ : Q ∈ hInvariantStar H A π) (hQ' : Q' ∈ hInvariant H A π) (hQQ' : Q ≤ Q') :
     Q' = Q :=
   hQ.2 Q' hQ' hQQ'
+
+/-! ## Existence of maximal members and conjugation stability (BG §7 Lemma 7.1 API) -/
+
+open scoped Pointwise
+
+/-- Conjugation by an element of the normalizer fixes the subgroup (pointwise-`smul` form). -/
+theorem conj_smul_eq_self_of_mem_normalizer {Q : Subgroup G} {a : G}
+    (ha : a ∈ Subgroup.normalizer Q) : MulAut.conj a • Q = Q := by
+  have hnorm := Subgroup.mem_normalizer_iff.mp ha
+  ext x
+  rw [Subgroup.pointwise_smul_def, Subgroup.mem_map]
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    exact (hnorm y).mp hy
+  · intro hx
+    refine ⟨a⁻¹ * x * a, ?_, ?_⟩
+    · have h2 := hnorm (a⁻¹ * x * a)
+      have h3 : a * (a⁻¹ * x * a) * a⁻¹ = x := by group
+      rw [h3] at h2
+      exact h2.mpr hx
+    · show MulAut.conj a (a⁻¹ * x * a) = x
+      simp only [MulAut.conj_apply]
+      group
+
+/-- Converse of `conj_smul_eq_self_of_mem_normalizer`. -/
+theorem mem_normalizer_of_conj_smul_eq_self {Q : Subgroup G} {a : G}
+    (h : MulAut.conj a • Q = Q) : a ∈ Subgroup.normalizer Q := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · intro hy
+    rw [← h, Subgroup.pointwise_smul_def, Subgroup.mem_map]
+    exact ⟨y, hy, rfl⟩
+  · intro hy
+    rw [← h, Subgroup.pointwise_smul_def, Subgroup.mem_map] at hy
+    obtain ⟨z, hz, hz_eq⟩ := hy
+    have h1 : a * z * a⁻¹ = a * y * a⁻¹ := by
+      simpa only [MulAut.conj_apply] using hz_eq
+    have hzy : z = y := mul_left_cancel (mul_right_cancel h1)
+    exact hzy ▸ hz
+
+/-- **`ℋ_⊤(A;π)` is stable under conjugation by `C_G(A)`**. -/
+theorem conj_smul_mem_hInvariant_top {A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariant ⊤ A π) {k : G} (hk : k ∈ Subgroup.centralizer (A : Set G)) :
+    MulAut.conj k • Q ∈ hInvariant ⊤ A π := by
+  obtain ⟨-, hQnorm, hQpi⟩ := hQ
+  refine ⟨le_top, ?_, ?_⟩
+  · intro a ha
+    apply mem_normalizer_of_conj_smul_eq_self
+    have hcomm : a * k = k * a := Subgroup.mem_centralizer_iff.mp hk a ha
+    calc MulAut.conj a • MulAut.conj k • Q
+        = MulAut.conj (a * k) • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj (k * a) • Q := by rw [hcomm]
+      _ = MulAut.conj k • MulAut.conj a • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj k • Q := by
+          rw [conj_smul_eq_self_of_mem_normalizer (hQnorm ha)]
+  · have hcard : Nat.card ↥(MulAut.conj k • Q) = Nat.card ↥Q :=
+      (Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) Q).toEquiv).symm
+    intro r hr
+    rw [hcard] at hr
+    exact hQpi r hr
+
+/-- **`ℋ_⊤*(A;π)` is stable under conjugation by `C_G(A)`**: maximality transports along
+the order isomorphism `Q ↦ Q^k`. -/
+theorem conj_smul_mem_hInvariantStar_top {A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar ⊤ A π) {k : G} (hk : k ∈ Subgroup.centralizer (A : Set G)) :
+    MulAut.conj k • Q ∈ hInvariantStar ⊤ A π := by
+  obtain ⟨hQmem, hQmax⟩ := hQ
+  refine ⟨conj_smul_mem_hInvariant_top hQmem hk, ?_⟩
+  intro Q' hQ' hle
+  have h1 : MulAut.conj k⁻¹ • Q' ∈ hInvariant ⊤ A π :=
+    conj_smul_mem_hInvariant_top hQ' (inv_mem hk)
+  have h2 : Q ≤ MulAut.conj k⁻¹ • Q' := by
+    calc Q = MulAut.conj k⁻¹ • MulAut.conj k • Q := by
+          rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ ≤ MulAut.conj k⁻¹ • Q' := by
+          rw [Subgroup.pointwise_smul_le_pointwise_smul_iff]
+          exact hle
+  have h3 : MulAut.conj k⁻¹ • Q' = Q := hQmax _ h1 h2
+  calc Q' = MulAut.conj k • MulAut.conj k⁻¹ • Q' := by
+        rw [smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    _ = MulAut.conj k • Q := by rw [h3]
+
+/-- **Every `A`-invariant `π`-subgroup extends to a maximal one** (`[Finite G]`):
+`Q ∈ ℋ_H(A;π)` lies under some `Q* ∈ ℋ_H*(A;π)`. -/
+theorem exists_le_hInvariantStar [Finite G] {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariant H A π) :
+    ∃ Qs ∈ hInvariantStar H A π, Q ≤ Qs := by
+  obtain ⟨Qs, hQQs, hQs_mem, hQs_max⟩ :=
+    exists_maximal_ge_of_wellFoundedGT (· ∈ hInvariant H A π) Q hQ
+  refine ⟨Qs, ⟨hQs_mem, ?_⟩, hQQs⟩
+  intro Q' hQ' hle
+  exact le_antisymm (hQs_max hQ' hle) hle
 
 end OddOrder.GroupTheory

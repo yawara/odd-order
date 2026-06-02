@@ -17,6 +17,8 @@
 - 🔄 **BG §4 Blackburn は「全ファイル無」ではない** (§4/§6/§7 の記述が古い): Thm 4.12(a)(b)(c)/Prop 4.3/4.8/**4.11 Huppert**/Lem 4.9/4.15/GL 橋/Gorenstein Lem 4.12–4.14 が sorry-free 着地。**残 = Gorenstein Thm 4.15(i) precursor (SCN₃=∅⇒pRank≤2) → BG Lem 4.13 → Thm 4.16 apex (未 statement)**。
 - 🔄 **Peterfalvi 並行ブランチを main へ merge** (f5bcb14 + 834b76c)。§7 coherence/§8/§9/Dade/Clifford/ZIrr/InflationCharacter 配線済、worktree も ff 同期。
 - 実 `sorry` は依然 **2 個** (S08 `sibleySetup_is_coherent`=0046 / S09 `card_G0_lower_bound`=0044)。§0/§1.3 の census 方法論は今も有効。
+- **🆕 2026-06-03 追補差分** (本体 §1/§4/§5/§7 の記述はさらに古い): ✅ **BG §4 Thm 4.16 apex 完成** (「未 statement」は stale)。✅ **BG §5 完結** (Thm 5.3–5.7)。✅ **BG §7 Lemma 7.1 (推移性 keystone)** + ✅ **BG Prop 1.16** (`S01b_Prop116.lean`)。→ 本体 §1 の「Prop 1.15(b)/1.16 全部欠落」は **stale** (1.15(b) は App.A で, 1.16 は S01b で形式化済)。
+- **🆕 2026-06-03 Gorenstein 監査結論**: 「Isaacs で対応できず Gorenstein を形式化しないといけない部分」= **p-stability (App.A, G 3.8.1/§6.5) + ZJ/Z(J) (App.B Puig L(S) = G 6.5.1/8.2.11 代替) + critical subgroup (Thm 1.13 = G 5.3.11/13) + §4 precursors (Gor Thm 3.7/3.8 = G 3.x)** は**全て形式化済**。BG mmd の Gorenstein "**G**" 引用 12 件は全て Isaacs/mathlib 被覆 or BG 自己再証明 (Thompson Transitivity 8.5.4 = §7 が構築中)。**未形式化で残る "真に Gorenstein 専用" の項目は無い**。残る未形式化は BG 自己完結 (Thm 3.7 coprime case, §7–§16 proof) か rep-theory-via-mathlib (Clifford G 3.4.1 proof = issue 0026)。
 
 以下、2026-05-29 スナップショット原文 ↓
 

@@ -38,4 +38,50 @@ def derivedInG (H : Subgroup G) : Subgroup G :=
 def opiCoreInG (π : Set ℕ) (H : Subgroup G) : Subgroup G :=
   (Ch03.oPiCore π ↥H).map H.subtype
 
+/-- `O_π(H) ≤ H` in the ambient group. -/
+theorem opiCoreInG_le (π : Set ℕ) (H : Subgroup G) : opiCoreInG π H ≤ H :=
+  Subgroup.map_subtype_le _
+
+/-- The order of `opiCoreInG π H` agrees with the order of the `π`-core of `↥H`. -/
+theorem card_opiCoreInG (π : Set ℕ) (H : Subgroup G) :
+    Nat.card ↥(opiCoreInG π H) = Nat.card ↥(Ch03.oPiCore π ↥H) :=
+  (Nat.card_congr (Subgroup.equivMapOfInjective _ H.subtype
+    H.subtype_injective).toEquiv).symm
+
+/-- **`H` normalizes `O_π(H)`** (in the ambient group): the `π`-core is characteristic
+in `↥H`, so conjugation by an element of `H` (which restricts to an automorphism of
+`↥H`) fixes its image in `G`. -/
+theorem le_normalizer_opiCoreInG (π : Set ℕ) (H : Subgroup G) :
+    H ≤ Subgroup.normalizer (opiCoreInG π H) := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hfix := Subgroup.characteristic_iff_comap_eq.mp
+    (Ch03.oPiCore.characteristic π ↥H) (MulAut.conj (⟨x, hx⟩ : ↥H))
+  constructor
+  · rintro ⟨z, hz, rfl⟩
+    refine ⟨MulAut.conj (⟨x, hx⟩ : ↥H) z, ?_, rfl⟩
+    have h1 : z ∈ (Ch03.oPiCore π ↥H).comap
+        (MulAut.conj (⟨x, hx⟩ : ↥H)).toMonoidHom := by
+      rw [hfix]
+      exact hz
+    exact Subgroup.mem_comap.mp h1
+  · intro hy
+    obtain ⟨z, hz, hz_eq⟩ := hy
+    have hy_mem : y ∈ H := by
+      have hyH : x * y * x⁻¹ ∈ H := hz_eq ▸ z.2
+      have h1 : x⁻¹ * (x * y * x⁻¹) * x = y := by group
+      rw [← h1]
+      exact H.mul_mem (H.mul_mem (H.inv_mem hx) hyH) hx
+    have hzy : z = MulAut.conj (⟨x, hx⟩ : ↥H) (⟨y, hy_mem⟩ : ↥H) := by
+      apply Subtype.ext
+      simpa [MulAut.conj_apply] using hz_eq
+    have h2 : (⟨y, hy_mem⟩ : ↥H) ∈ (Ch03.oPiCore π ↥H).comap
+        (MulAut.conj (⟨x, hx⟩ : ↥H)).toMonoidHom := by
+      rw [Subgroup.mem_comap]
+      rw [hzy] at hz
+      exact hz
+    rw [hfix] at h2
+    exact ⟨⟨y, hy_mem⟩, h2, rfl⟩
+
 end OddOrder.GroupTheory
