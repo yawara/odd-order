@@ -1665,6 +1665,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_mapRingEquiv_comm
+-- Peterfalvi (6.8.2.1), generic forms: the coherent extension takes equal values at x and
+-- x^k ((1.9.b) + (5.9.a) + Dade value restoration), hence is constant on Z^# for prime Z.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_apply_coe_pow_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IsCoherent.extension_constant_on_sharp_of_prime
 -- [Is] Lemma 2.27 (central restriction): Res_Z χ = χ(1)·φ with φ a linear character of
 -- Z ≤ Z(G), via Schur central scalars.  Peterfalvi (6.8.2.3) `Res^H_Z θ = a·φ`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_complex_rep

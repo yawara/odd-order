@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.Peterfalvi.S07_Coherence
 
@@ -344,5 +345,168 @@ theorem IsCoherent.extension_mapRingEquiv_comm
       have h0 : d ψ hψ = 0 := Nat.cast_eq_zero.mp hsum
       have := hdpos ψ hψ
       omega
+
+/-- **Peterfalvi (6.8.2.1), core step.**  In the (5.9.a) situation, let `η ∈ S` take its
+degree value at some `x ∈ L` with `(x : G) ∈ A` (in the application `x ∈ Z ⊆ H' ⊆ Ker η`),
+and let `σc` act as `(· ^ k)` on `orderOf (x : G)`-th roots of unity (supplied by (1.9.b)
+via `exists_complexRingEquiv_pow_and_fixed`).  Then the coherent extension satisfies
+
+`(τ₁ η)((x : G) ^ k) = (τ₁ η)(x : G)`.
+
+Chain: `(τ₁η)(x^k) = (τ₁η)^{σc}(x)` by the (1.9.b) value formula (`τ₁η ∈ ℤ[Irr G]`);
+`(τ₁η)^{σc} = τ₁(η^{σc})` by (5.9.a); and `η^{σc} − η` vanishes at `1` (degrees are
+rationals, fixed by `σc`), hence is supported on `A'` and `τ₁ = τ` there, so its value at
+`x ∈ A` is restored by the Dade map: `(τ(η^{σc} − η))(x) = (η^{σc} − η)(x) = 0` since
+`η(x) = η(1)` is rational.  This is the engine behind "`η^{τ₁}` is constant on `Z^#`"
+((6.8.2.1), mmd 04.8 L182-184). -/
+theorem IsCoherent.extension_apply_coe_pow_eq
+    {hyp : S04.Hypothesis G A L} {dade : S04.FullDadeIsometryData (G := G) hyp}
+    {S : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
+    (hτ : IsCoherent (dadeIntegralCharacterMap hyp dade) S A')
+    (hA' : A' ⊆ supportInSubgroup A L)
+    (hSirr : S ⊆ irreducibleCharacters ↥L)
+    (hspan : ∀ φ ∈ zSpan (L := ↥L) S, φ 1 = 0 → φ.support ⊆ A')
+    (σc : ℂ ≃+* ℂ) (hSu : ∀ φ ∈ S, ClassFunction.mapRingEquiv σc φ ∈ S)
+    (hlat : ∀ φ ∈ S, hτ.extension φ ∈ ZIrr G)
+    {η : ClassFunction (↥L) ℂ} (hη : η ∈ S) (hpair : ∃ ψ ∈ S, ψ ≠ η)
+    {x : ↥L} (hxA : (x : G) ∈ A) (hηx : η x = η 1)
+    {k : ℕ} (hσpow : ∀ ζ : ℂ, ζ ^ orderOf ((x : G)) = 1 → σc ζ = ζ ^ k) :
+    hτ.extension η ((x : G) ^ k) = hτ.extension η (x : G) := by
+  classical
+  -- the degree `η 1` is a natural number, hence fixed by `σc`
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+    (⟨η, hSirr hη⟩ : IrreducibleCharacter ↥L)
+  have hσ1 : σc (η 1) = η 1 := by rw [hd, map_natCast]
+  -- (1.9.b) value formula for the virtual character `τ₁ η ∈ ℤ[Irr G]`
+  have h1 : ClassFunction.mapRingEquiv σc (hτ.extension η) (x : G) =
+      hτ.extension η (((x : G)) ^ k) :=
+    mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr (hlat η hη) σc
+      (isOfFinOrder_of_finite _) hσpow
+  -- (5.9.a): the extension commutes with `σc` on `S`
+  have hcomm := hτ.extension_mapRingEquiv_comm hA' hSirr hspan σc hSu hlat hη hpair
+  -- the difference `δ = η^{σc} − η` is supported and its Dade image vanishes at `x`
+  set δ : ClassFunction (↥L) ℂ := ClassFunction.mapRingEquiv σc η - η with hδdef
+  have hδspan : δ ∈ zSpan (L := ↥L) S :=
+    sub_mem (Submodule.subset_span (hSu η hη)) (Submodule.subset_span hη)
+  have hδ1 : δ 1 = 0 := by
+    rw [hδdef]
+    simp only [ClassFunction.sub_apply, ClassFunction.mapRingEquiv_apply, hσ1, sub_self]
+  have hδsupp : δ.support ⊆ A' := hspan δ hδspan hδ1
+  have hτδx : hτ.extension δ (x : G) = 0 := by
+    rw [hτ.extends_on_supported δ ⟨hδspan, hδsupp⟩,
+      dadeIntegralCharacterMap_apply_mem hyp dade (hδsupp.trans hA') hxA]
+    rw [hδdef]
+    simp only [ClassFunction.sub_apply, ClassFunction.mapRingEquiv_apply]
+    rw [show ((⟨(x : G), hyp.mem_L hxA⟩ : ↥L)) = x from rfl, hηx, hσ1, sub_self]
+  -- assemble
+  have hsplit : hτ.extension (ClassFunction.mapRingEquiv σc η) =
+      hτ.extension η + hτ.extension δ := by
+    rw [hδdef, map_sub]
+    abel
+  calc hτ.extension η ((x : G) ^ k)
+      = ClassFunction.mapRingEquiv σc (hτ.extension η) (x : G) := h1.symm
+    _ = hτ.extension (ClassFunction.mapRingEquiv σc η) (x : G) := by rw [hcomm]
+    _ = hτ.extension η (x : G) + hτ.extension δ (x : G) := by
+        rw [hsplit]
+        rfl
+    _ = hτ.extension η (x : G) := by rw [hτδx, add_zero]
+
+/-- **Peterfalvi (6.8.2.1)** (generic Z^#-constancy form).  Let `Z ≤ L` have prime order
+with `Z^# ⊆ A` (coe to `G`), and let `η ∈ S` take its degree value on `Z` (in the
+application `Z ⊆ H' ⊆ Ker η`).  If `S` is closed under all coefficientwise automorphisms,
+then the coherent extension `τ₁ η` is **constant on `Z^#`**: for `x, y ∈ Z^#`,
+`(τ₁ η)(y) = (τ₁ η)(x)`.
+
+The required automorphism is produced by (1.9): writing `|G| = w₂^e · m` with `w₂ ∤ m`
+(`Nat.exists_eq_pow_mul_and_not_dvd`), `exists_complexRingEquiv_pow_and_fixed` provides
+`σ` acting as `(· ^ k)` on `w₂^e`-th roots of unity, and `y = x^k` since `x` generates the
+prime-order `Z`. -/
+theorem IsCoherent.extension_constant_on_sharp_of_prime
+    {hyp : S04.Hypothesis G A L} {dade : S04.FullDadeIsometryData (G := G) hyp}
+    {S : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
+    (hτ : IsCoherent (dadeIntegralCharacterMap hyp dade) S A')
+    (hA' : A' ⊆ supportInSubgroup A L)
+    (hSirr : S ⊆ irreducibleCharacters ↥L)
+    (hspan : ∀ φ ∈ zSpan (L := ↥L) S, φ 1 = 0 → φ.support ⊆ A')
+    (hSu : ∀ σc : ℂ ≃+* ℂ, ∀ φ ∈ S, ClassFunction.mapRingEquiv σc φ ∈ S)
+    (hlat : ∀ φ ∈ S, hτ.extension φ ∈ ZIrr G)
+    {η : ClassFunction (↥L) ℂ} (hη : η ∈ S) (hpair : ∃ ψ ∈ S, ψ ≠ η)
+    {Z : Subgroup ↥L} (hZp : (Nat.card Z).Prime)
+    (hZA : ∀ ⦃z : ↥L⦄, z ∈ Z → z ≠ 1 → (z : G) ∈ A)
+    {x : ↥L} (hx : x ∈ Z) (hx1 : x ≠ 1) (hηx : η x = η 1)
+    {y : ↥L} (hy : y ∈ Z) (hy1 : y ≠ 1) :
+    hτ.extension η (y : G) = hτ.extension η (x : G) := by
+  classical
+  set w₂ : ℕ := Nat.card ↥Z with hw₂
+  haveI : Finite ↥Z := Subtype.finite
+  -- `x` has order `w₂` and generates `Z`
+  have hordx' : orderOf (⟨x, hx⟩ : ↥Z) = w₂ := by
+    rcases (Nat.dvd_prime hZp).mp (orderOf_dvd_natCard (⟨x, hx⟩ : ↥Z)) with h | h
+    · exfalso
+      exact hx1 (congrArg (Subtype.val : ↥Z → ↥L) (orderOf_eq_one_iff.mp h))
+    · exact h
+  have hgen : (⟨y, hy⟩ : ↥Z) ∈ Subgroup.zpowers (⟨x, hx⟩ : ↥Z) := by
+    have htop : Subgroup.zpowers (⟨x, hx⟩ : ↥Z) = ⊤ := by
+      apply Subgroup.eq_top_of_card_eq
+      rw [Nat.card_zpowers, hordx', hw₂]
+    rw [htop]
+    trivial
+  obtain ⟨k, hk⟩ := (mem_powers_iff_mem_zpowers.mpr hgen :
+    (⟨y, hy⟩ : ↥Z) ∈ Submonoid.powers (⟨x, hx⟩ : ↥Z))
+  replace hk : (⟨x, hx⟩ : ↥Z) ^ k = (⟨y, hy⟩ : ↥Z) := hk
+  -- normalize the exponent to `0 < k' < w₂`
+  set k' : ℕ := k % w₂ with hk'def
+  have hk'eq : (⟨x, hx⟩ : ↥Z) ^ k' = (⟨y, hy⟩ : ↥Z) := by
+    rw [hk'def, ← hordx', pow_mod_orderOf, hk]
+  have hk'lt : k' < w₂ := Nat.mod_lt _ hZp.pos
+  have hk'ne : k' ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero] at hk'eq
+    exact hy1 (congrArg (Subtype.val : ↥Z → ↥L) hk'eq.symm)
+  have hkcop : k'.Coprime w₂ :=
+    (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd hZp).mpr
+      (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hk'ne) hk'lt)))
+  -- the coe relation `y = x^{k'}` in `G`
+  have hyL : x ^ k' = y := by
+    have h := congrArg (Subtype.val : ↥Z → ↥L) hk'eq
+    rwa [SubmonoidClass.coe_pow] at h
+  have hyx : (y : G) = ((x : G)) ^ k' := by
+    rw [← hyL, SubmonoidClass.coe_pow]
+  -- the order of `(x : G)` is `w₂`
+  have hordG : orderOf ((x : G)) = w₂ := by
+    have h1 : orderOf ((x : G)) = orderOf x :=
+      orderOf_injective L.subtype Subtype.val_injective x
+    have h2 : orderOf x = orderOf (⟨x, hx⟩ : ↥Z) :=
+      orderOf_injective Z.subtype Subtype.val_injective ⟨x, hx⟩
+    rw [h1, h2, hordx']
+  -- (1.9): the automorphism acting as `(· ^ k')` on `w₂`-power roots of unity
+  obtain ⟨e, m, hmnd, hGem⟩ := Nat.exists_eq_pow_mul_and_not_dvd
+    (Nat.card_pos (α := G)).ne' w₂ hZp.one_lt.ne'
+  have hw₂G : w₂ ∣ Nat.card G := by
+    rw [← hordG]
+    exact orderOf_dvd_natCard _
+  have he0 : e ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero, one_mul] at hGem
+    exact hmnd (hGem ▸ hw₂G)
+  have ha : w₂ ^ e ≠ 0 := pow_ne_zero _ hZp.pos.ne'
+  have hm : m ≠ 0 := by
+    intro h0
+    rw [h0, mul_zero] at hGem
+    exact (Nat.card_pos (α := G)).ne' hGem
+  have hab : (w₂ ^ e).Coprime m :=
+    Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd hZp).mpr hmnd)
+  have hka : k'.Coprime (w₂ ^ e) := Nat.Coprime.pow_right _ hkcop
+  obtain ⟨σc, hσa, _⟩ := exists_complexRingEquiv_pow_and_fixed ha hm hab hka
+  -- apply the core step
+  rw [hyx]
+  exact hτ.extension_apply_coe_pow_eq hA' hSirr hspan σc (hSu σc) hlat hη hpair
+    (hZA hx hx1) hηx
+    (fun ζ hζ => hσa ζ (by
+      rw [hordG] at hζ
+      have hee : e - 1 + 1 = e := Nat.succ_pred_eq_of_pos (Nat.pos_of_ne_zero he0)
+      have hpow : ζ ^ (w₂ ^ e) = (ζ ^ w₂) ^ (w₂ ^ (e - 1)) := by
+        rw [← pow_mul, ← pow_succ', hee]
+      rw [hpow, hζ, one_pow]))
 
 end OddOrder.Peterfalvi.S07
