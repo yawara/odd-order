@@ -355,6 +355,24 @@ theorem cyclotomic_quotient_dvd_of_modEq_one {p q : ℕ} (hp : p.Prime)
   have hsum_one : (∑ k ∈ Finset.range q, 1 : ℕ) = q := by simp
   exact hterms.trans (by simp [hsum_one])
 
+/-- The coprimality part of **Peterfalvi (13.14)** when `p` is not `1 mod q`. -/
+theorem cyclotomic_quotient_coprime_of_not_modEq_one {p q : ℕ} (hp : p.Prime)
+    (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [Nat.coprime_iff_gcd_eq_one]
+  have hpmod : p ≡ 1 [MOD p - 1] := Nat.modEq_sub (le_of_lt hp.one_lt)
+  have hterms : (∑ k ∈ Finset.range q, p ^ k) ≡ ∑ k ∈ Finset.range q, 1 [MOD p - 1] :=
+    Nat.ModEq.sum fun k _ => by simpa using Nat.ModEq.pow k hpmod
+  have hsum_one : (∑ k ∈ Finset.range q, 1 : ℕ) = q := by simp
+  have hmod : (∑ k ∈ Finset.range q, p ^ k) ≡ q [MOD p - 1] := by
+    exact hterms.trans (by rw [hsum_one])
+  rw [hmod.gcd_eq]
+  exact Nat.coprime_iff_gcd_eq_one.mp <|
+    hq.coprime_iff_not_dvd.mpr fun hdiv => hpq <| by
+      exact ((Nat.modEq_iff_dvd'
+        (show 1 ≤ p from le_of_lt hp.one_lt)).mpr hdiv).symm
+
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
 theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
@@ -366,7 +384,9 @@ theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
           ∀ x : ℕ, x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
   refine ⟨cyclotomic_quotient_odd hp hpodd hqodd, ?_, ?_⟩
   · exact cyclotomic_quotient_dvd_of_modEq_one hp
-  · sorry
+  · intro hpq
+    refine ⟨cyclotomic_quotient_coprime_of_not_modEq_one hp hq hpq, ?_⟩
+    sorry
 
 /-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
 value, depending on whether `p` is `1 mod q`. -/
