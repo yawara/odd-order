@@ -71,6 +71,15 @@ theorem tSide_cyclotomic_quotient_coprime (hyp : Hypothesis (G := G)) :
   OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
     hyp.base.q_prime hyp.base.p_prime hyp.q_not_modEq_one_mod_p
 
+/-- Every positive divisor of the T-side cyclotomic quotient from
+**Peterfalvi (14.4)** is `1 mod p`. -/
+theorem tSide_cyclotomic_quotient_divisor_modEq_one (hyp : Hypothesis (G := G)) :
+    ∀ x : ℕ, x ≠ 0 →
+      x ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) →
+        x ≡ 1 [MOD hyp.base.p] :=
+  OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one
+    hyp.base.q_prime hyp.base.p_prime hyp.q_not_modEq_one_mod_p
+
 end Hypothesis
 
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
