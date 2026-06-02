@@ -810,6 +810,103 @@ theorem normal_of_omega1UpperCentralTwo_inf_centralizer_eq
     OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le hER_le_E
   exact Subgroup.normalizer_eq_top_iff.mp (eq_top_iff.mpr htop_le_norm)
 
+
+/-- **BG Lemma 5.2 support**: the branch `C_W(E) = E` is impossible.
+
+If `C_W(E) = E`, the preceding support lemma makes `E` normal in `R`. Lemma 5.1(b)
+then embeds `E` in an `SCN₃` subgroup `A`. The elementary abelian subgroup
+`Ω₁(A)` contains `E`, so maximality collapses it back to `E`; but the `SCN₃`
+rank condition forces `p³ ∣ |Ω₁(A)|`, contradicting `|E| = p²`. -/
+theorem omega1UpperCentralTwo_inf_centralizer_ne_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) ≠ E := by
+  intro hCW_eq
+  have hE_normal : E.Normal :=
+    normal_of_omega1UpperCentralTwo_inf_centralizer_eq hp hpg h3 hEcard hEstar hCW_eq
+  letI : E.Normal := hE_normal
+  obtain ⟨A, hA, hEA⟩ :=
+    mem_scn3_of_normal_isElementaryAbelian_card_prime_sq hp hpg h3 E
+      hEstar.isElementaryAbelian hEcard
+  have hA_scn : IsSCN A := hA.isSCN
+  have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := by
+    letI : IsMulCommutative A := hA_scn.isMulCommutative
+    intro x hx y hy
+    exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : A) ⟨y, hy⟩)
+  let F : Subgroup R := omega1OfAbelian R A p hA_comm
+  have hF_elem : F.IsElementaryAbelian p := by
+    dsimp [F]
+    exact
+      ⟨fun x y => Subtype.ext (hA_comm x.val x.2.1 y.val y.2.1),
+       fun x => Subtype.ext (by simpa using pow_eq_one_of_mem_omega1OfAbelian x.2)⟩
+  have hE_le_F : E ≤ F := by
+    intro e he
+    dsimp [F]
+    refine (mem_omega1OfAbelian).mpr ⟨hEA he, ?_⟩
+    have hep := hEstar.isElementaryAbelian.pow_eq_one (⟨e, he⟩ : E)
+    simpa using congrArg Subtype.val hep
+  have hF_eq_E : F = E := hEstar.eq_of_le hF_elem hE_le_F
+  have hF_dvd : p ^ 3 ∣ Nat.card F := by
+    simpa [F] using
+      (pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (G := R) (H := A)
+        (p := p) (hH := hA_comm) (n := 3) (by norm_num) hA.le_pRank)
+  have hF_ge : p ^ 3 ≤ Nat.card F := Nat.le_of_dvd (Nat.card_pos : 0 < Nat.card F) hF_dvd
+  have hle : p ^ 3 ≤ p ^ 2 := by
+    rw [hF_eq_E, hEcard] at hF_ge
+    exact hF_ge
+  have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
+  have hp_sq_lt_cube : p ^ 2 < p ^ 3 :=
+    (Nat.pow_lt_pow_iff_right hp1).mpr (by norm_num : (2 : ℕ) < 3)
+  exact (not_le_of_gt hp_sq_lt_cube) hle
+
+/-- **BG Lemma 5.2 support**: `C_W(E)` is exactly `Ω₁(Z(R))`.
+
+The squeeze `Z ≤ C_W(E) ≤ E`, the preceding exclusion of `C_W(E)=E`, and
+`|Z| = p`, `|E| = p²` leave only the order-`p` possibility. -/
+theorem omega1UpperCentralTwo_inf_centralizer_eq_omega1Center
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) = omega1Center R p := by
+  let K : Subgroup R := omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R)
+  have hZleK : omega1Center R p ≤ K := omega1Center_le_omega1UpperCentralTwo_inf_centralizer
+  have hKleE : K ≤ E := by
+    dsimp [K]
+    exact omega1UpperCentralTwo_inf_centralizer_le_of_maximalElementaryAbelian hp hEstar
+  have hK_ne_E : K ≠ E := by
+    dsimp [K]
+    exact omega1UpperCentralTwo_inf_centralizer_ne_of_maximalElementaryAbelian_card_prime_sq
+      hp hpg h3 hEcard hEstar
+  have hZcard : Nat.card ↥(omega1Center R p) = p :=
+    (omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+      hpg h3 hEcard hEstar).2
+  have hp_le_K : p ≤ Nat.card K := by
+    simpa [hZcard] using Subgroup.card_le_of_le hZleK
+  have hKdvd : Nat.card K ∣ p ^ 2 := by
+    rw [← hEcard]
+    exact Subgroup.card_dvd_of_le hKleE
+  obtain ⟨j, hj_le, hj_eq⟩ :=
+    (Nat.dvd_prime_pow (p := p) (Fact.out (p := p.Prime))).mp hKdvd
+  have hj_ne_zero : j ≠ 0 := by
+    intro hj0
+    have hp_le_one : p ≤ 1 := by
+      simpa [hj0, hj_eq] using hp_le_K
+    exact (not_lt_of_ge hp_le_one) (Fact.out : p.Prime).one_lt
+  have hj_ne_two : j ≠ 2 := by
+    intro hj2
+    have hKcard_eq_E : Nat.card K = Nat.card E := by
+      rw [hj_eq, hj2, hEcard]
+    have hKE : K = E :=
+      Subgroup.eq_of_le_of_card_ge hKleE (le_of_eq hKcard_eq_E.symm)
+    exact hK_ne_E hKE
+  have hj_eq_one : j = 1 := by omega
+  have hKcard : Nat.card K = p := by
+    simpa [hj_eq_one] using hj_eq
+  have hZ_eq_K : omega1Center R p = K :=
+    Subgroup.eq_of_le_of_card_ge hZleK (by rw [hKcard, hZcard])
+  simpa [K] using hZ_eq_K.symm
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
