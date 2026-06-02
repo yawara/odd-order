@@ -3896,6 +3896,55 @@ lemma Bsum_le_of_orthogonal_integer_decomposition [Fintype G]
     B v x F.BsumWeight Γ Γ₁ M hΓ horth' hΓ₁ hm_nonneg hx_nonzero hbound
   simpa [BsumWeight, M] using hrat
 
+/-- The reduced output of Peterfalvi (7.5), after inserting the (7.8) lower
+bounds and the identity contribution on `G₀`, is exactly the `base_estimate`
+field of `CharacterEstimateData`.  This is the algebraic bridge from the real
+family inequality to the rational display used in (7.10). -/
+lemma base_estimate_of_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (B : Finset (Fin k))
+    (hred :
+      ((1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ)) +
+        (1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+            ((F.e j : ℚ) * (F.h j : ℚ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  have hG_ne : (Nat.card G : ℚ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := G)).ne'
+  have hneg :
+      (1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ) =
+        -(((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ)) := by
+    field_simp [hG_ne]
+    ring
+  rw [hneg] at hred
+  linarith
+
+/-- Constructor form of `CharacterEstimateData` from the reduced family
+inequality and the separately proved `𝓑`-sum bound. -/
+noncomputable def characterEstimateData_of_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ)) +
+        (1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+            ((F.e j : ℚ) * (F.h j : ℚ)))) ≤ 0) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate := F.base_estimate_of_reduced_family_inequality i B hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]
