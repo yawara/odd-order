@@ -108,8 +108,7 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
     Nat.Coprime
       ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
       (hyp.base.p - 1)
-  Q_elementaryAbelian : Prop
-  Q_elementaryAbelian_holds : Q_elementaryAbelian
+  Q_elementaryAbelian : IsElementaryAbelian hyp.base.q ↥hyp.base.Q
   W2_normalizes_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G)
   y : G
   y_mem_Q : y ∈ hyp.base.Q

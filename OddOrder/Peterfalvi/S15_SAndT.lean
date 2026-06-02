@@ -168,8 +168,7 @@ structure BasicStructureData (hyp : Hypothesis (G := G)) where
   UW1_frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
     ↥(hyp.U ⊔ hyp.W1) (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1))
       (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1))
-  P_elementaryAbelian : Prop
-  P_elementaryAbelian_holds : P_elementaryAbelian
+  P_elementaryAbelian : IsElementaryAbelian hyp.p ↥hyp.P
   P_order : Nat.card ↥hyp.P = hyp.p ^ hyp.q
   u_bound : hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
   A0S_TI : Prop
@@ -182,7 +181,7 @@ abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset. -/
 theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : BasicStructureData hyp,
-      (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ data.P_elementaryAbelian ∧
+      (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ IsElementaryAbelian hyp.p ↥hyp.P ∧
         Nat.card ↥hyp.P = hyp.p ^ hyp.q ∧
         hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
   sorry

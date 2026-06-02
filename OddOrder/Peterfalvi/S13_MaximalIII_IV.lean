@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Peterfalvi Section 13: Maximal Subgroups of Types III and IV
@@ -116,11 +117,11 @@ structure Hypothesis (M : Subgroup G) where
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
   quotientBoundFormula : Subgroup G → Prop
   secondDerived_eq_HC : Prop
-  H_is_pgroup : Prop
+  H_is_pgroup : IsPGroup base.w2 ↥base.typeP.H
   U_centralizes_H0 : Prop
   H0_eq_Hprime : Prop
   C_eq_Uprime : Prop
-  H_elementaryAbelian : Prop
+  H_elementaryAbelian : IsElementaryAbelian base.w2 ↥base.typeP.H
   H_order_prime_power : Nat.card ↥base.typeP.H = base.w2 ^ base.w1
   H0_eq_bot : chief.H0 = ⊥
   notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
@@ -190,14 +191,16 @@ theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 `H_0 = H'`, and `C = U'`. -/
 theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.H_is_pgroup ∧ hyp.U_centralizes_H0 ∧ hyp.H0_eq_Hprime ∧ hyp.C_eq_Uprime := by
+    IsPGroup hyp.p ↥hyp.H ∧ hyp.U_centralizes_H0 ∧ hyp.H0_eq_Hprime ∧
+      hyp.C_eq_Uprime := by
   sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and
 `H_0 = 1`. -/
 theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.H_elementaryAbelian ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧ hyp.chief.H0 = ⊥ := by
+    IsElementaryAbelian hyp.p ↥hyp.H ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧
+      hyp.chief.H0 = ⊥ := by
   sorry
 
 /-! ## (11.8): the main orthogonality calculation -/
