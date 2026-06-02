@@ -60,9 +60,13 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   Glauberman 3.24(b) gives conjugacy by an element fixed by all operators in `A`.
 - **Prop 1.5(d)** remains direct no-wrapper use of
   `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`.
-- **Remaining Prop 1.5 blockers**: (b) the induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup; (e) the commutator containment, now with statement
-  precision confirmed.
+- **Prop 1.5(e) completed** as
+  `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`: complementary Hall
+  cardinal arithmetic gives `Subgroup.IsComplement' K H` (BG `G = KH`), so each generator
+  `g⁻¹ * a(g)` of `[G,A]` lies in an `A`-invariant Hall `π`-subgroup `H`; normality then
+  puts `[G,A]` inside `O_π(G)`.
+- **Remaining Prop 1.5 blocker**: (b) the induction placing an `A`-invariant `π`-subgroup
+  inside an `A`-invariant Hall subgroup.
 
 ## TL;DR
 
@@ -315,7 +319,7 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 2. **Peterfalvi [Is] 対応**: Peterfalvi が引く "Isaacs character theory" results (Thm 6.32, 6.5, 2.21 等) を mathlib `RepresentationTheory.Character` とマッチング — Phase 2b 着手時.
 3. **Goldschmidt citation**: BG Prop 1.15(b) の原 Goldschmidt 論文を Phase 2a 時点で確保するか (Isaacs Ch.3 で代替証明可か要確認).
 4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.
-5. **Prop 1.5(e)**: statement は BG L412-L414 で確認済み (`C_G(A)` contains a Hall `π'`-subgroup ⇒ `[G,A] ⊆ O_π(G)`). `aInvariant_hall` と `oPiCore` を使って commutator containment を実装する.
+5. **Prop 1.5(e)**: ✅ implemented as `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`; BG L412-L414 の `G = KH` を complementary Hall `IsComplement'` として形式化し, `[G,A] ≤ O_π(G)` を証明済み.
 
 ---
 

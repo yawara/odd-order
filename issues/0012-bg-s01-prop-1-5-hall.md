@@ -29,9 +29,9 @@ Prop 1.5(e) commutator containment。
   - [ ] Prop 1.5(b) containment: BG induction remains
   - [x] Prop 1.5(c) conjugacy: `aInvariant_hall_conj`
 - [x] Prop 1.5(d) は no-wrapper 方針に従い、必要なら section docstring で直接対応を明示する。
-- [ ] Prop 1.5(e) の仮定を精密化し、実装または別 issue へ分割する。
+- [x] Prop 1.5(e) の仮定を精密化し、実装する。
   - [x] statement 精密化: `C_G(A)` contains a Hall `π'`-subgroup ⇒ `[G,A] ⊆ O_π(G)`
-  - [ ] implementation remains
+  - [x] implementation: `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`
 
 
 ## 進捗
@@ -44,7 +44,11 @@ Prop 1.5(e) commutator containment。
   - Prop 1.5(a): `exists_aInvariant_hall`
   - Prop 1.5(c): `aInvariant_hall_conj`
 - Prop 1.5(d) は引き続き `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient` を直接使用。
-- 残りは Prop 1.5(b) containment induction と Prop 1.5(e) commutator containment。
+- Prop 1.5(e) commutator containment を `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` として実装。
+  Complementary Hall subgroups `K` (`π'`) and `H` (`π`) are packaged as `Subgroup.IsComplement' K H`,
+  yielding the BG factorization `G = KH`; the generator calculation proves `[G,A] ≤ H`, then normality
+  gives `[G,A] ≤ O_π(G)`.
+- 残りは Prop 1.5(b) containment induction。
 
 ## 完了条件
 

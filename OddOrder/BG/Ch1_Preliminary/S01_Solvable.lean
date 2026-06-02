@@ -493,7 +493,7 @@ Hall statements. Prop. 1.5(d) remains a no-wrapper direct use of Isaacs Cor. 3.2
 | Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
 | **Prop 1.5(c)** A-inv Hall 共役 | Hall-C + Lem 3.24(b) | `aInvariant_hall_conj` ✅ | 共役元は `C_G(A)` |
 | **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
-| Prop 1.5(e) C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | (新規) | (未実装) | Prop 1.5(e) は coprime + commutator structure, Hall API 整備後 |
+| **Prop 1.5(e)** C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | Hall product + action commutator | `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` ✅ | BG L412-L414 を `IsComplement' K H` + `[G,A] ≤ H` で実装 |
 | **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
 | **Prop 1.6(b) [G,A,A]=[G,A]** | **Lem 4.29** | **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅ | **無 wrapper**: SemidirectProduct Γ-form |
 | Prop 1.6(c) [G,A,A]=1 ⇒ trivial | (Three-Sub Lem 系) | (未実装) | Ch.4 §4D 完成依存 |
@@ -635,6 +635,110 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
       hH_fix hK_fix
   refine ⟨c, hc_fix, ?_⟩
   exact congrArg Subtype.val hc_smul
+
+/-- Complementary Hall subgroups have coprime orders. -/
+private theorem hall_compl_card_coprime {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K H : Subgroup G}
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
+    Nat.Coprime (Nat.card K) (Nat.card H) := by
+  have hHK : Nat.Coprime (Nat.card H) (Nat.card K) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne'
+      hH.1
+      (fun p hp => by simpa using hK.1 p hp)
+  exact hHK.symm
+
+/-- The index of a `π'`-Hall subgroup and the index of a `π`-Hall subgroup are coprime. -/
+private theorem hall_compl_index_coprime {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K H : Subgroup G}
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
+    Nat.Coprime K.index H.index := by
+  refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    Subgroup.index_ne_zero_of_finite Subgroup.index_ne_zero_of_finite ?_ hH.2
+  intro p hp
+  by_contra hp_not
+  exact hK.2 p hp hp_not
+
+/-- If `K` is Hall `π'` and `H` is Hall `π`, then `|K| * |H| = |G|`. -/
+private theorem hall_compl_card_mul {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K H : Subgroup G}
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
+    Nat.card K * Nat.card H = Nat.card G := by
+  have h_card_cop : Nat.Coprime (Nat.card K) (Nat.card H) :=
+    hall_compl_card_coprime hK hH
+  have h_index_cop : Nat.Coprime H.index K.index :=
+    (hall_compl_index_coprime hK hH).symm
+  have hK_dvd_Hindex : Nat.card K ∣ H.index := by
+    have hdiv : Nat.card K ∣ Nat.card H * H.index := by
+      rw [Subgroup.card_mul_index H]
+      exact Subgroup.card_subgroup_dvd_card K
+    rw [mul_comm] at hdiv
+    exact h_card_cop.dvd_of_dvd_mul_right hdiv
+  have hHindex_dvd_K : H.index ∣ Nat.card K := by
+    have hdivG : H.index ∣ Nat.card G :=
+      ⟨Nat.card H, by rw [mul_comm, Subgroup.card_mul_index H]⟩
+    have hdiv : H.index ∣ Nat.card K * K.index := by
+      rwa [← Subgroup.card_mul_index K] at hdivG
+    exact h_index_cop.dvd_of_dvd_mul_right hdiv
+  have hK_card_eq : Nat.card K = H.index :=
+    Nat.dvd_antisymm hK_dvd_Hindex hHindex_dvd_K
+  calc
+    Nat.card K * Nat.card H = H.index * Nat.card H := by rw [hK_card_eq]
+    _ = Nat.card H * H.index := by rw [mul_comm]
+    _ = Nat.card G := Subgroup.card_mul_index H
+
+/-- Complementary Hall subgroups multiply bijectively. This is the Lean form of BG's
+`G = K H` line in Prop. 1.5(e). -/
+private theorem hall_compl_isComplement {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K H : Subgroup G}
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
+    Subgroup.IsComplement' K H :=
+  Subgroup.isComplement'_of_coprime (hall_compl_card_mul hK hH)
+    (hall_compl_card_coprime hK hH)
+
+/-- **BG Prop 1.5(e)**: if `C_G(A)` contains a Hall `π'`-subgroup, then the action
+commutator `[G,A]` lies in the `π`-core of `G`.
+
+The containment proof follows BG L412-L414. Choose an `A`-invariant Hall `π`-subgroup `H`.
+For `g = k*h` with `k ∈ K ≤ C_G(A)` and `h ∈ H`, each generator
+`g⁻¹ * (φ a) g` of `[G,A]` reduces to `h⁻¹ * (φ a) h ∈ H`; hence `[G,A] ≤ H`.
+Since `[G,A]` is normal, it is a normal `π`-subgroup and therefore lies in `O_π(G)`. -/
+theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    {π : Set ℕ} {K : Subgroup G}
+    (hK_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
+    (hK_le_fixed : K ≤ Subgroup.fixedPointsOfMulAut φ) :
+    OddOrder.Isaacs.Ch04.actionCommutator φ ≤ OddOrder.Isaacs.Ch03.oPiCore π G := by
+  obtain ⟨H, hH_hall, hH_inv⟩ := exists_aInvariant_hall hCop π
+  have hCompl : Subgroup.IsComplement' K H :=
+    hall_compl_isComplement hK_hall hH_hall
+  have hAC_le_H : OddOrder.Isaacs.Ch04.actionCommutator φ ≤ H := by
+    exact (OddOrder.Isaacs.Ch04.actionCommutator_le_iff_left φ H).mpr
+      (fun a g => by
+        obtain ⟨⟨k, h⟩, hg⟩ := hCompl.2 g
+        have hk_fix : (φ a) (k : G) = k :=
+          (Subgroup.mem_fixedPointsOfMulAut.mp (hK_le_fixed k.2)) a
+        have hh_smul : (φ a) (h : G) ∈ H := hH_inv.smul_mem a h.2
+        rw [← hg]
+        change (((k : G) * (h : G))⁻¹ * (φ a) ((k : G) * (h : G))) ∈ H
+        rw [map_mul, hk_fix]
+        have hcalc :
+            ((k : G) * (h : G))⁻¹ * ((k : G) * (φ a) (h : G)) =
+              (h : G)⁻¹ * (φ a) (h : G) := by
+          group
+        rw [hcalc]
+        exact H.mul_mem (H.inv_mem h.2) hh_smul)
+  have hAC_pi :
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π
+        (OddOrder.Isaacs.Ch04.actionCommutator φ) :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hAC_le_H hH_hall.1
+  exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hAC_pi
 
 end AInvariantHall
 
