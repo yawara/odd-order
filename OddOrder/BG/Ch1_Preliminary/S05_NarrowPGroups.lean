@@ -1220,6 +1220,20 @@ theorem lemma52 [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup
       centralizer_omega1UpperCentralTwo_index_eq_prime_of_maximalElementaryAbelian_card_prime_sq
         hp hpg h3 hEcard hEstar⟩
 
+/-- **BG §5 narrow witness extraction**: when `r(R) ≥ 3`, the first disjunct in the
+definition of `IsNarrow` is impossible, so a narrow group supplies BG's order-`p`
+witness `R₀` and cyclic complement `R₁` inside `C_R(R₀)`.
+
+This is the definition-level forward support for Corollary 5.4; it does not assert the
+hard rank/decomposition conclusions of Theorem 5.3. -/
+theorem exists_narrow_witness_of_three_le_pRank {p : ℕ}
+    (h3 : 3 ≤ pRank R p) (hnarrow : IsNarrow p R) :
+    ∃ R₀ R₁ : Subgroup R, Nat.card R₀ = p ∧ IsCyclic R₁ ∧
+      R₀ ⊓ R₁ = ⊥ ∧ Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁ := by
+  rcases hnarrow with hrank | hwitness
+  · omega
+  · exact hwitness
+
 /-! ## Theorem 5.3 / Corollary 5.4 — narrow の特徴づけ (mmd L1838-1879) -/
 
 /-- **BG Theorem 5.3** (narrow 特徴づけ): 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。すると
