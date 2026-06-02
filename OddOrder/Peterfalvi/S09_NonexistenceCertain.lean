@@ -3923,6 +3923,45 @@ lemma base_estimate_of_reduced_family_inequality [Finite G]
   rw [hneg] at hred
   linarith
 
+/-- Real-valued input form of `base_estimate_of_reduced_family_inequality`.
+This matches the actual codomain of (7.5), (7.8.b), and the norm estimates before
+the final rational display of Peterfalvi (7.10). -/
+lemma base_estimate_of_real_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (B : Finset (Fin k))
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  have hG_ne : (Nat.card G : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := G)).ne'
+  have hneg :
+      (1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ) =
+        -(((Nat.card F.G0 : ℝ) - 1) / (Nat.card G : ℝ)) := by
+    field_simp [hG_ne]
+    ring
+  rw [hneg] at hred
+  have hreal :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) -
+        (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+        (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+          ((F.e j : ℝ) * (F.h j : ℝ))) ≤
+        ((Nat.card F.G0 : ℝ) - 1) / (Nat.card G : ℝ) := by
+    linarith
+  rw [ge_iff_le]
+  rw [← Rat.cast_le (K := ℝ)]
+  norm_num
+  have hG0_ncard : (F.G0.ncard : ℝ) = Nat.card F.G0 := by
+    exact_mod_cast (Nat.card_coe_set_eq F.G0)
+  rw [hG0_ncard]
+  linarith
+
 /-- Constructor form of `CharacterEstimateData` from the reduced family
 inequality and the separately proved `𝓑`-sum bound. -/
 noncomputable def characterEstimateData_of_reduced_family_inequality [Finite G]
