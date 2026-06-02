@@ -1234,6 +1234,159 @@ theorem exists_narrow_witness_of_three_le_pRank {p : ℕ}
   · omega
   · exact hwitness
 
+private theorem pRank_centralizer_le_two_of_narrow_witness
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    {S K : Subgroup R} (hScard : Nat.card S = p) (hKcyc : IsCyclic K)
+    (hSKinf : S ⊓ K = ⊥) (hCeq : Subgroup.centralizer (S : Set R) = S ⊔ K) :
+    pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 := by
+  classical
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  have hScomm : ∀ a ∈ S, ∀ b ∈ S, a * b = b * a := by
+    have hScyc : IsCyclic S := isCyclic_of_prime_card hScard
+    haveI : IsCyclic S := hScyc
+    letI : CommGroup S := IsCyclic.commGroup
+    intro a ha b hb
+    exact congrArg Subtype.val (mul_comm (⟨a, ha⟩ : S) (⟨b, hb⟩ : S))
+  have hSleC : S ≤ C := by
+    intro s hs
+    dsimp [C]
+    rw [Subgroup.mem_centralizer_iff]
+    intro t ht
+    exact (hScomm s hs t ht).symm
+  have hKleC : K ≤ C := by
+    dsimp [C]
+    rw [hCeq]
+    exact le_sup_right
+  let Ssub : Subgroup C := S.subgroupOf C
+  let Ksub : Subgroup C := K.subgroupOf C
+  have hSsub_card : Nat.card Ssub = p := by
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSleC).toEquiv).trans hScard
+  have hKsub_cyc : IsCyclic Ksub := by
+    haveI : IsCyclic K := hKcyc
+    exact isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKleC).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hKleC).injective
+  have hSsub_inf : Ssub ⊓ Ksub = ⊥ := by
+    refine le_antisymm ?_ bot_le
+    intro x hx
+    rw [Subgroup.mem_bot]
+    apply Subtype.ext
+    change (x : R) = 1
+    have hxR : (x : R) ∈ S ⊓ K := by
+      exact ⟨hx.1, hx.2⟩
+    rwa [hSKinf, Subgroup.mem_bot] at hxR
+  have hSsub_le_center : Ssub ≤ Subgroup.center C := by
+    intro s hs
+    rw [Subgroup.mem_center_iff]
+    intro c
+    apply Subtype.ext
+    exact (Subgroup.mem_centralizer_iff.mp c.2 (s : R) hs).symm
+  haveI hSsub_normal : Ssub.Normal := by
+    refine { conj_mem := fun x hx g => ?_ }
+    have hx_center : x ∈ Subgroup.center C := hSsub_le_center hx
+    have hconj : g * x * g⁻¹ = x := by
+      have hcomm := Subgroup.mem_center_iff.mp hx_center g
+      calc g * x * g⁻¹ = x * g * g⁻¹ := by rw [hcomm]
+        _ = x := by group
+    rwa [hconj]
+  have hSup_top : Ssub ⊔ Ksub = ⊤ := by
+    calc
+      Ssub ⊔ Ksub = (S ⊔ K).subgroupOf C :=
+        (Subgroup.subgroupOf_sup hSleC hKleC).symm
+      _ = ⊤ := by
+        rw [← hCeq]
+        exact Subgroup.subgroupOf_self C
+  have hCcard : Nat.card C = p * Nat.card Ksub := by
+    have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Ssub Ksub
+    rw [← Subgroup.normal_mul Ssub Ksub, hSsub_inf, Subgroup.card_bot, hSsub_card,
+      mul_one, hSup_top] at hcard
+    simpa [Subgroup.coe_top] using hcard
+  have hKsub_index : Ksub.index = p := by
+    have hmul : Ksub.index * Nat.card Ksub = Nat.card C := Ksub.index_mul_card
+    have hmul' : Ksub.index * Nat.card Ksub = p * Nat.card Ksub := by
+      simpa [hCcard] using hmul
+    exact Nat.mul_right_cancel (Nat.card_pos (α := Ksub)) hmul'
+  obtain ⟨x, hx⟩ := (Subgroup.isCyclic_iff_exists_zpowers_eq_top Ksub).mp hKsub_cyc
+  have hidx : (Subgroup.zpowers x).index = p := by
+    rw [hx]
+    exact hKsub_index
+  have hOmega_le : Nat.card (Omega C p 1) ≤ p ^ 2 :=
+    OddOrder.BG.Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime
+      (hpg.to_subgroup C) hp hidx
+  rw [pRank_le_iff]
+  intro A hA
+  have hA_le_omega : A ≤ Omega C p 1 := by
+    rw [Omega]
+    intro a ha
+    exact Subgroup.subset_closure (by
+      rw [Set.mem_setOf_eq, pow_one]
+      exact congrArg Subtype.val (hA.pow_eq_one ⟨a, ha⟩))
+  have hAcard_le : Nat.card A ≤ Nat.card (Omega C p 1) := Subgroup.card_le_of_le hA_le_omega
+  have hlog_le : Nat.log p (Nat.card A) ≤ Nat.log p (p ^ 2) :=
+    Nat.log_mono_right (hAcard_le.trans hOmega_le)
+  simpa [Nat.log_pow (Fact.out : p.Prime).one_lt] using hlog_le
+
+/-- **BG Theorem 5.3(d) support**: if an order-p subgroup has centralizer
+p-rank at most two, then it meets Omega_1 of the center trivially under the
+standing rank-at-least-three hypothesis. -/
+private theorem inf_omega1Center_eq_bot_of_card_prime_centralizer_pRank_le_two
+    [Finite R] {p : ℕ} [Fact p.Prime] (h3 : 3 ≤ pRank R p)
+    {S : Subgroup R} (hScard : Nat.card S = p)
+    (hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2) :
+    S ⊓ omega1Center R p = ⊥ := by
+  classical
+  let Z : Subgroup R := omega1Center R p
+  let C : Subgroup R := Subgroup.centralizer (S : Set R)
+  have hS_not_le_Z : ¬ S ≤ Z := by
+    intro hSleZ
+    have hCtop : C = ⊤ := by
+      rw [eq_top_iff]
+      intro x _
+      dsimp [C]
+      rw [Subgroup.mem_centralizer_iff]
+      intro s hs
+      exact (Subgroup.mem_center_iff.mp (omega1Center_le_center (hSleZ hs)) x).symm
+    let toC : R →* C :=
+      { toFun := fun r => ⟨r, by rw [hCtop]; exact trivial⟩
+        map_one' := rfl
+        map_mul' := fun _ _ => rfl }
+    have htoC_inj : Function.Injective toC := by
+      intro x y hxy
+      exact congrArg Subtype.val hxy
+    have hRrank_le_C : pRank R p ≤ pRank C p :=
+      pRank_le_of_injective (G := C) (H := R) (f := toC) htoC_inj
+    exact absurd (hRrank_le_C.trans hSrank) (by omega)
+  let H : Subgroup S := (S ⊓ Z).subgroupOf S
+  haveI : Fact (Nat.card S).Prime := ⟨by rw [hScard]; exact (Fact.out : p.Prime)⟩
+  rcases Subgroup.eq_bot_or_eq_top_of_prime_card H with hHbot | hHtop
+  · refine le_antisymm ?_ bot_le
+    intro x hx
+    have hxH : (⟨x, hx.1⟩ : S) ∈ H := by
+      dsimp [H]
+      rw [Subgroup.mem_subgroupOf]
+      exact hx
+    rw [hHbot, Subgroup.mem_bot] at hxH
+    exact Subtype.ext_iff.mp hxH
+  · exfalso
+    apply hS_not_le_Z
+    intro s hs
+    have hsH : (⟨s, hs⟩ : S) ∈ H := by
+      rw [hHtop]
+      exact trivial
+    exact (Subgroup.mem_subgroupOf.mp hsH).2
+
+/-- **BG Corollary 5.4 forward support**: under rank at least three, a definitional
+narrow witness has centralizer p-rank at most two. This is the direct Lean version
+of the first sentence of BG Corollary 5.4, using the cyclic-complement form of narrowness. -/
+theorem exists_card_prime_centralizer_pRank_le_two_of_narrow
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) (hnarrow : IsNarrow p R) :
+    ∃ S : Subgroup R, Nat.card S = p ∧
+      pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 := by
+  obtain ⟨S, K, hScard, hKcyc, hSKinf, hCeq⟩ :=
+    exists_narrow_witness_of_three_le_pRank h3 hnarrow
+  exact ⟨S, hScard,
+    pRank_centralizer_le_two_of_narrow_witness hp hpg hScard hKcyc hSKinf hCeq⟩
+
 /-! ## Theorem 5.3 / Corollary 5.4 — narrow の特徴づけ (mmd L1838-1879) -/
 
 /-- **BG Theorem 5.3(d) support**: since `R' ≤ T = C_R(Ω₁(Z₂(R)))`,
@@ -1556,8 +1709,7 @@ theorem narrow_iff_exists_card_prime_centralizer_pRank_le_two
         pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 := by
   constructor
   · intro hnarrow
-    exact exists_card_prime_centralizer_pRank_le_two_of_maximalElementaryAbelian_card_prime_sq
-      hpg h3 ((narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hp hpg h3).1 hnarrow)
+    exact exists_card_prime_centralizer_pRank_le_two_of_narrow hp hpg h3 hnarrow
   · intro h
     exact (narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hp hpg h3).2
       (exists_maximalElementaryAbelian_card_prime_sq_of_card_prime_centralizer_pRank_le_two
