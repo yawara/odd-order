@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Data.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Galois actions on class functions
@@ -11,8 +12,7 @@ automorphism `σ : ℂ ≃+* ℂ`.
 
 The API is intentionally at the class-function and integral-lattice level.  Proving that a
 field automorphism permutes irreducible characters is a deeper representation-theoretic
-statement; downstream code can combine these transport lemmas with such a permutation theorem
-when it is available.
+statement; this file packages the reusable API conditional on that preservation theorem.
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -139,6 +139,144 @@ theorem mapRingEquiv_inner (σ : ℂ ≃+* ℂ)
   rw [inner_eq_inv_card_mul_innerSum, inner_eq_inv_card_mul_innerSum, map_mul,
     mapRingEquiv_innerSum σ hσ φ ψ]
   simp
+
+end ClassFunction
+
+/-- A coefficientwise automorphism of `ℂ` preserves the irreducible characters of `G`.
+
+This is the explicit representation-theoretic input needed to turn `ClassFunction.mapRingEquiv`
+into a permutation of `Irr(G)`.  For Peterfalvi's cyclotomic Galois automorphisms this is the
+usual "Galois conjugates of irreducible characters are irreducible" theorem; the present file
+keeps that theorem as a named hypothesis and develops the downstream API from it. -/
+def PreservesIrreducibleCharacters (G : Type*) [Group G] (σ : ℂ ≃+* ℂ) : Prop :=
+  ∀ χ : IrreducibleCharacter G,
+    IsIrreducibleCharacter
+      (ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ))
+
+theorem preservesIrreducibleCharacters_refl (G : Type*) [Group G] :
+    PreservesIrreducibleCharacters G (RingEquiv.refl ℂ) := by
+  intro χ
+  simp
+
+namespace IrreducibleCharacter
+
+variable {G : Type*} [Group G]
+
+/-- The irreducible character obtained by coefficientwise Galois transport, conditional on
+irreducible-character preservation. -/
+noncomputable def galoisMap (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) :
+    IrreducibleCharacter G :=
+  ⟨ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ), hσ χ⟩
+
+@[simp] theorem galoisMap_apply_coe (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) :
+    ((galoisMap σ hσ χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
+      ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ) :=
+  rfl
+
+@[simp] theorem galoisMap_apply_apply (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) (g : G) :
+    ((galoisMap σ hσ χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
+      σ ((χ : ClassFunction G ℂ) g) :=
+  rfl
+
+@[simp] theorem galoisMap_refl (χ : IrreducibleCharacter G) :
+    galoisMap (RingEquiv.refl ℂ) (preservesIrreducibleCharacters_refl G) χ = χ := by
+  apply IrreducibleCharacter.ext
+  simp [galoisMap]
+
+/-- A coefficientwise automorphism gives a permutation of `Irr(G)` once both it and its inverse
+are known to preserve irreducible characters. -/
+noncomputable def galoisPerm (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    (hσsymm : PreservesIrreducibleCharacters G σ.symm) :
+    Equiv.Perm (IrreducibleCharacter G) where
+  toFun := galoisMap σ hσ
+  invFun := galoisMap σ.symm hσsymm
+  left_inv χ := by
+    apply IrreducibleCharacter.ext
+    simp [galoisMap]
+  right_inv χ := by
+    apply IrreducibleCharacter.ext
+    simp [galoisMap]
+
+@[simp] theorem galoisPerm_apply_coe (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
+    (χ : IrreducibleCharacter G) :
+    ((galoisPerm σ hσ hσsymm χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
+      ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ) :=
+  rfl
+
+@[simp] theorem galoisPerm_apply_apply (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
+    (χ : IrreducibleCharacter G) (g : G) :
+    ((galoisPerm σ hσ hσsymm χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
+      σ ((χ : ClassFunction G ℂ) g) :=
+  rfl
+
+@[simp] theorem galoisPerm_refl :
+    galoisPerm (G := G) (RingEquiv.refl ℂ)
+      (preservesIrreducibleCharacters_refl G) (preservesIrreducibleCharacters_refl G) =
+        Equiv.refl (IrreducibleCharacter G) := by
+  ext χ g
+  simp [galoisPerm, galoisMap]
+
+theorem galoisPerm_symm (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    (hσsymm : PreservesIrreducibleCharacters G σ.symm) :
+    (galoisPerm σ hσ hσsymm).symm = galoisPerm σ.symm hσsymm hσ := by
+  ext χ g
+  rfl
+
+end IrreducibleCharacter
+
+namespace ClassFunction
+
+variable {G : Type*} [Group G]
+
+/-- A coefficientwise automorphism preserving irreducible characters sends `Irr(G)` into
+`Irr(G)`. -/
+theorem mapRingEquiv_mem_irreducibleCharacters (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ irreducibleCharacters G) :
+    mapRingEquiv σ φ ∈ irreducibleCharacters G :=
+  hσ ⟨φ, hφ⟩
+
+/-- A coefficientwise automorphism preserving irreducible characters preserves the virtual
+character lattice `ℤ[Irr G]`. -/
+theorem mapRingEquiv_mem_ZIrr (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
+    mapRingEquiv σ φ ∈ ZIrr G := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      exact IsIrreducibleCharacter.mem_ZIrr
+        (mapRingEquiv_mem_irreducibleCharacters σ hσ hx)
+  | zero =>
+      rw [mapRingEquiv_zero]
+      exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+      rw [mapRingEquiv_add]
+      exact Submodule.add_mem _ hx hy
+  | smul n x _ hx =>
+      rw [mapRingEquiv_zsmul]
+      exact Submodule.smul_mem _ n hx
+
+/-- Membership in the virtual-character lattice is invariant under a coefficientwise automorphism
+when the automorphism and its inverse preserve irreducible characters. -/
+theorem mapRingEquiv_mem_ZIrr_iff (σ : ℂ ≃+* ℂ)
+    (hσ : PreservesIrreducibleCharacters G σ)
+    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
+    {φ : ClassFunction G ℂ} :
+    mapRingEquiv σ φ ∈ ZIrr G ↔ φ ∈ ZIrr G := by
+  constructor
+  · intro hφ
+    have hφ' := mapRingEquiv_mem_ZIrr σ.symm hσsymm hφ
+    simpa using hφ'
+  · exact mapRingEquiv_mem_ZIrr σ hσ
 
 end ClassFunction
 

@@ -1580,8 +1580,16 @@ set_option linter.style.longLine false in
 -- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
 
--- Coefficientwise Galois transport for class functions and S07 coherence data.
+-- Coefficientwise Galois transport for class functions, irreducible-character indices,
+-- virtual-character lattices, and S07 coherence data.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_inner
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.preservesIrreducibleCharacters_refl
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisMap
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisPerm
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_irreducibleCharacters
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_ZIrr_iff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSpan_image
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSupportedSpan_image
