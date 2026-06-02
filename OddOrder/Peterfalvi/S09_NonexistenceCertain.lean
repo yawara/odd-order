@@ -1872,6 +1872,48 @@ theorem zetaImage_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) hBD.Gamma = 0 := by
   rw [Hypothesis71.ClassFunction.inner_symm, H78.gamma_orth_zetaImage hBD, star_zero]
 
+/-- Hermitian-symmetric form of `BetaDecomp.Gamma_orth_one`. -/
+theorem constOne_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, hBD.Gamma_orth_one, star_zero]
+
+/-- Each coherent image in `S^ν` is orthogonal to `Γ`, in the opposite direction. -/
+theorem nu_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (i : Fin (H78.hyp76.n + 1)) (hi : i ≠ H78.ind1H) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i)) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, hBD.Gamma_orth_nu i hi, star_zero]
+
+/-- The weighted `S^ν`-sum is orthogonal to `1_G`. -/
+theorem weightedNuSum_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.weightedNuSum (Hypothesis71.constOne G) = 0 := by
+  classical
+  rw [weightedNuSum, inner_sum_left]
+  refine Finset.sum_eq_zero fun i hi => ?_
+  have hi_ne : i ≠ H78.ind1H := (Finset.mem_erase.mp hi).1
+  rw [ClassFunction.inner_smul_left, hBD.orth_one i hi_ne, mul_zero]
+
+/-- Hermitian-symmetric form of `weightedNuSum_orth_one`. -/
+theorem constOne_orth_weightedNuSum
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) H78.weightedNuSum = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_one hBD, star_zero]
+
+/-- The weighted `S^ν`-sum is orthogonal to the residual `Γ`. -/
+theorem weightedNuSum_orth_gamma
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.weightedNuSum hBD.Gamma = 0 := by
+  classical
+  rw [weightedNuSum, inner_sum_left]
+  refine Finset.sum_eq_zero fun i hi => ?_
+  have hi_ne : i ≠ H78.ind1H := (Finset.mem_erase.mp hi).1
+  rw [ClassFunction.inner_smul_left, H78.nu_orth_gamma hBD i hi_ne, mul_zero]
+
+/-- Hermitian-symmetric form of `weightedNuSum_orth_gamma`. -/
+theorem gamma_orth_weightedNuSum
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner hBD.Gamma H78.weightedNuSum = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_gamma hBD, star_zero]
+
 /-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
 theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
     (hzeta_norm :
