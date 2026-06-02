@@ -25,8 +25,10 @@ Peterfalvi-numbered entry points and the main scaffold statements.  Proofs of
 (8.8), (8.11), (8.12), and (8.13) are intentionally left as `sorry`: they quote
 BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
 
-The Nougat extract drops the statements around (8.14)--(8.17); those are left as
-TODO comments until the PDF page is recovered.
+The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
+has now been recovered; this file records the Type-II TI endpoint and leaves the
+`R(x)`/thickened-support notation and BG Theorem E covering statement as precise
+TODOs until their lower-level interfaces are available.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -148,11 +150,36 @@ theorem escapingCentralizers_control [Finite G]
             (IsTypeI L ∨ IsTypeII L) := by
   sorry
 
+/-! ## (8.14)--(8.17): support notation and TI-covering facts -/
+
+/-- **Peterfalvi (8.16)**: for a maximal subgroup of Type II, the three sets
+`A_0(M)`, `A(M)`, and `A_1(M)` are TI-subsets of `G` with normalizer `M`.
+
+This is the directly usable part of the PDF-recovered missing page.  The proof is
+BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument. -/
+theorem typeII_A_sets_TI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
+    IsTISubset (typePA0 M data.typeP) M ∧
+      IsTISubset (typePA M data.typeP) M ∧
+        IsTISubset (A1 M PeterfalviType.II) M := by
+  sorry
+
+/-- **Peterfalvi (8.16)**, normalizer form: for Type II, the normalizers of
+`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`. -/
+theorem typeII_A_sets_normalizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
+    Subgroup.normalizer (typePA0 M data.typeP) = M ∧
+      Subgroup.normalizer (typePA M data.typeP) = M ∧
+        Subgroup.normalizer (A1 M PeterfalviType.II) = M := by
+  sorry
+
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
-The statements (8.14)--(8.17) are absent from the current Nougat extraction; this
-result is kept as the usable endpoint of that block, with the proof deferred
-until the missing page is recovered. -/
+The proof uses the recovered (8.14)--(8.17) support notation and BG Theorem E
+covering facts.  Those interfaces are still recorded below as TODOs, so this
+remains the usable endpoint of the block for downstream files. -/
 theorem support_mutual_exclusion [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G) :
@@ -160,8 +187,22 @@ theorem support_mutual_exclusion [Finite G]
         Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
   sorry
 
--- TODO (Peterfalvi (8.14)--(8.17)): recover the dropped statements from the PDF
--- page before adding Lean statements.  The current mmd has a missing-page marker
--- in this range, and fake statements here would break traceability.
+-- TODO (Peterfalvi (8.14)): materialize the recovered support notation `R(x)` and
+-- the thickened sets `tilde A(M)`, `tilde A_0(M)`, and `tilde A_1(M)`.
+-- PDF p.48 defines `L supports M`, sets `R(x)=1` off the escaping-centralizer
+-- set and `R(x)=C_{L_F}(x)` on it, then defines the three thickened conjugacy
+-- saturations as unions over `a` of `(aR(a))^G`.
+--
+-- TODO (Peterfalvi (8.15)): once the Section 2.2/4.6/5.2 hypothesis
+-- structures have stable section-level names, add the recovered statement that
+-- `M = N_G(A)` for `A = A_0(M), A(M), A_1(M)`, and that the relevant Dade
+-- hypotheses hold with `L=M`, `H(a)=R(a)`, `K=M_prime`, and `H=M_F` or `M_s`.
+--
+-- TODO (Peterfalvi (8.17)): add the BG Theorem E interface.  The PDF-recovered
+-- statement says that for conjugacy-class representatives of maximal subgroups:
+-- (a) `pi(G)` is the disjoint union of the `pi((M_i)_s)`; (b) the thickened
+-- `A_1(M_i)` has cardinal `(|(M_i)_s|-1) |G:M_i|`; and (c) `G#` is the
+-- disjoint union of these thickened `A_1(M_i)` sets in case (8.8.a), while in
+-- case (8.8.b) the union also includes the conjugates of `W#`.
 
 end OddOrder.Peterfalvi.S10

@@ -56,11 +56,18 @@ structure Hypothesis where
   D : Subgroup G
   S_maximal : S ∈ maximalSubgroups G
   T_maximal : T ∈ maximalSubgroups G
+  S_ne_T : S ≠ T
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  theorem88_caseB :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
+        (∃ g : G, MulAut.conj g • M = T)
   W_eq_inter : W = S ⊓ T
   W_eq_join : W = W1 ⊔ W2
+  W1_inf_W2_eq_bot : W1 ⊓ W2 = ⊥
+  W1_commutes_W2 : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y
   W_cyclic : IsCyclic ↥W
   P_eq_SF : P = maxNilpotentNormalHall S
   Q_eq_TF : Q = maxNilpotentNormalHall T
@@ -74,6 +81,8 @@ structure Hypothesis where
   p : ℕ
   q_prime : q.Prime
   p_prime : p.Prime
+  q_odd : Odd q
+  p_odd : Odd p
   q_eq_card_W1 : q = Nat.card ↥W1
   p_eq_card_W2 : p = Nat.card ↥W2
   u : ℕ
@@ -291,7 +300,8 @@ theorem caseA_parameters [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
-theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime) :
+theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hpodd : Odd p) (hqodd : Odd q) :
     Odd ((p ^ q - 1) / (p - 1)) ∧
       (p ≡ 1 [MOD q] → q ∣ (p ^ q - 1) / (p - 1)) ∧
       (¬ (p ≡ 1 [MOD q]) →

@@ -41,6 +41,24 @@ structure Hypothesis where
   base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)
   q_lt_p : base.q < base.p
 
+namespace Hypothesis
+
+/-- Under **Peterfalvi (14.1)**, the two prime parameters are distinct. -/
+theorem p_ne_q (hyp : Hypothesis (G := G)) : hyp.base.p ≠ hyp.base.q := by
+  exact ne_of_gt hyp.q_lt_p
+
+/-- The congruence used in **Peterfalvi (14.4)**: from `q < p` and `q` prime,
+`q` cannot be `1 mod p`. -/
+theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
+    ¬ hyp.base.q ≡ 1 [MOD hyp.base.p] := by
+  intro hmod
+  have hp_gt_one : 1 < hyp.base.p := hyp.base.q_prime.one_lt.trans hyp.q_lt_p
+  have hq_eq_one : hyp.base.q = 1 :=
+    Nat.ModEq.eq_of_lt_of_lt hmod hyp.q_lt_p hp_gt_one
+  exact hyp.base.q_prime.ne_one hq_eq_one
+
+end Hypothesis
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The field model itself is represented propositionally until
 near-field and semidirect-product APIs are fixed for the final integration. -/
