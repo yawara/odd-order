@@ -636,6 +636,161 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
   refine ⟨c, hc_fix, ?_⟩
   exact congrArg Subtype.val hc_smul
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- An `A`-invariant subgroup maps to an `A`-invariant subgroup in an `A`-invariant
+quotient. This is the quotient-action transport used in BG Prop. 1.5(b). -/
+private theorem isAInvariant_map_mk'
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hN)
+      (H.map (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a q hq
+  rw [Subgroup.mem_map] at hq ⊢
+  obtain ⟨g, hg, rfl⟩ := hq
+  exact ⟨(φ a) g, hH.smul_mem a hg, by rw [quotientMulAutHom_apply_mk']⟩
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- The preimage of an invariant subgroup of an `A`-invariant quotient is invariant in the
+original group. -/
+private theorem isAInvariant_comap_mk'
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {Y : Subgroup (G ⧸ N)}
+    (hY : OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hN) Y) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (Y.comap (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a g hg
+  rw [Subgroup.mem_comap] at hg ⊢
+  rw [← quotientMulAutHom_apply_mk']
+  exact hY.smul_mem a hg
+
+/-- Restrict an invariant subgroup into an invariant ambient subgroup. -/
+private theorem isAInvariant_subgroupOf_restrict
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {U H : Subgroup G} (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant hU.restrict (H.subgroupOf U) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a h hh
+  rw [Subgroup.mem_subgroupOf] at hh ⊢
+  rw [OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val]
+  exact hH.smul_mem a hh
+
+/-- Push an invariant subgroup of an invariant ambient subgroup back to the original group. -/
+private theorem isAInvariant_map_subtype_of_restrict
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {U : Subgroup G} (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    {L : Subgroup U} (hL : OddOrder.Isaacs.Ch03.IsAInvariant hU.restrict L) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (L.map U.subtype) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [Subgroup.mem_map] at hx ⊢
+  obtain ⟨l, hl, rfl⟩ := hx
+  exact ⟨(hU.restrict a) l, hL.smul_mem a hl,
+    OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val hU a l⟩
+
+/-- A Hall subgroup of an invariant subgroup whose ambient index is a `π'`-number is a Hall
+subgroup after pushing it back to the whole group. This is the Hall-index transfer needed in
+the `H < G` branch of BG Prop. 1.5(b). -/
+private theorem isHallSubgroup_map_subtype_of_index_no_pi
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {H : Subgroup G} {L : Subgroup H}
+    (hL : OddOrder.Isaacs.Ch03.IsHallSubgroup π L)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π (L.map H.subtype) := by
+  have hcard : Nat.card ↥(L.map H.subtype) = Nat.card ↥L :=
+    (Nat.card_congr
+      (Subgroup.equivMapOfInjective L H.subtype H.subtype_injective).toEquiv).symm
+  have hindex : (L.map H.subtype).index = L.index * H.index := by
+    have hpos : 0 < Nat.card ↥L := Nat.card_pos
+    have hmul : Nat.card ↥L * (L.map H.subtype).index =
+        Nat.card ↥L * (L.index * H.index) := by
+      calc
+        Nat.card ↥L * (L.map H.subtype).index
+            = Nat.card ↥(L.map H.subtype) * (L.map H.subtype).index := by rw [hcard]
+        _ = Nat.card G := Subgroup.card_mul_index (L.map H.subtype)
+        _ = Nat.card H * H.index := (Subgroup.card_mul_index H).symm
+        _ = (Nat.card ↥L * L.index) * H.index := by rw [Subgroup.card_mul_index L]
+        _ = Nat.card ↥L * (L.index * H.index) := by ring
+    exact Nat.mul_left_cancel hpos hmul
+  refine ⟨?_, ?_⟩
+  · intro p hp
+    rw [hcard] at hp
+    exact hL.1 p hp
+  · intro p hp hp_pi
+    rw [hindex] at hp
+    rw [Nat.mem_primeFactors] at hp
+    obtain ⟨hp_prime, hp_dvd, _⟩ := hp
+    rcases hp_prime.dvd_mul.mp hp_dvd with hp_L | hp_H
+    · exact hL.2 p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_L, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+    · exact hH_index p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_H, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+
+
+/-- A `π`-subgroup remains a `π`-subgroup after mapping to an invariant quotient. -/
+private theorem isPiGroup_map_mk'
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {N K : Subgroup G} [N.Normal]
+    (hK : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K) :
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (K.map (QuotientGroup.mk' N)) := by
+  intro p hp
+  apply hK
+  rw [Nat.mem_primeFactors] at hp ⊢
+  exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+
+/-- Quotienting by a nontrivial normal subgroup strictly lowers finite group order. -/
+private theorem card_quotient_lt_card_of_ne_bot
+    {G : Type*} [Group G] [Finite G] {N : Subgroup G} [N.Normal] (hN_ne_bot : N ≠ ⊥) :
+    Nat.card (G ⧸ N) < Nat.card G := by
+  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have hN_one_lt : 1 < Nat.card N := Finite.one_lt_card
+  have hQ_pos : 0 < Nat.card (G ⧸ N) := Nat.card_pos
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N]
+  exact lt_mul_of_one_lt_right hQ_pos hN_one_lt
+
+/-- Coprime operator order descends to a quotient of the acted-on group. -/
+private theorem coprime_card_quotient_of_coprime
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {N : Subgroup G} [N.Normal] (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card (G ⧸ N)) :=
+  hCop.coprime_dvd_right (Subgroup.card_quotient_dvd_card N)
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom) in
+/-- Pull back a quotient Hall subgroup containing the image of `K`.
+
+This packages the quotient/comap step in BG Prop. 1.5(b): once induction in `G/M` gives an
+`A`-invariant Hall subgroup containing the image of `K`, its preimage in `G` is
+`A`-invariant, contains `K`, and has π-free index. -/
+private theorem quotient_hall_preimage_frame
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K M : Subgroup G} [M.Normal]
+    (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
+    {Hbar : Subgroup (G ⧸ M)}
+    (hHbar_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π Hbar)
+    (hHbar_inv : OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hM_inv) Hbar)
+    (hK_image_le : K.map (QuotientGroup.mk' M) ≤ Hbar) :
+    ∃ H : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H ∧ K ≤ H ∧
+        (∀ p ∈ H.index.primeFactors, p ∉ π) ∧
+        H = Hbar.comap (QuotientGroup.mk' M) := by
+  let q : G →* G ⧸ M := QuotientGroup.mk' M
+  let H : Subgroup G := Hbar.comap q
+  refine ⟨H, ?_, ?_, ?_, rfl⟩
+  · exact isAInvariant_comap_mk' hM_inv hHbar_inv
+  · intro k hk
+    change q k ∈ Hbar
+    exact hK_image_le (by
+      rw [Subgroup.mem_map]
+      exact ⟨k, hk, rfl⟩)
+  · have hindex : H.index = Hbar.index :=
+      Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+    rw [hindex]
+    exact hHbar_hall.2
+
 /-- A nontrivial finite group has a minimal nontrivial `A`-invariant normal subgroup. -/
 private theorem exists_minimal_normal_aInvariant
     {G A : Type*} [Group G] [Finite G] [Nontrivial G]

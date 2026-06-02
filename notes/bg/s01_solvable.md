@@ -71,9 +71,14 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   `exists_prime_isPGroup_of_minimal_normal_aInvariant`.  These prove that a nontrivial
   minimal `A`-invariant normal subgroup exists and, in the finite solvable case, is a
   commutative `p`-group.
+- **Prop 1.5(b) quotient/comap frame added**: private helpers now show quotient images
+  preserve `π`-subgroup status, quotient order is smaller and stays coprime to `|A|`,
+  quotient Hall preimages are `A`-invariant overgroups of `K` with π-free index, and Hall
+  subgroups found inside a proper invariant overgroup can be pushed back to `G` when that
+  overgroup has π-free index.
 - **Remaining Prop 1.5 blocker**: (b) the full induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup.  The remaining formal work is the quotient/comap
-  induction step and the final `H = G` conjugacy step inside `K M`.
+  inside an `A`-invariant Hall subgroup.  The remaining formal work is recursive assembly and
+  the final `H = G` conjugacy step inside `K M`.
 
 ## TL;DR
 
@@ -325,7 +330,7 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 1. **BG mmd セクション境界確認**: §1 末が L585 か明確に (推定値).
 2. **Peterfalvi [Is] 対応**: Peterfalvi が引く "Isaacs character theory" results (Thm 6.32, 6.5, 2.21 等) を mathlib `RepresentationTheory.Character` とマッチング — Phase 2b 着手時.
 3. **Goldschmidt citation**: BG Prop 1.15(b) の原 Goldschmidt 論文を Phase 2a 時点で確保するか (Isaacs Ch.3 で代替証明可か要確認).
-4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.
+4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.  Minimal-normal と quotient/comap transfer support は green; recursive assembly と `H = G` conjugacy branch が残る.
 5. **Prop 1.5(e)**: ✅ implemented as `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`; BG L412-L414 の `G = KH` を complementary Hall `IsComplement'` として形式化し, `[G,A] ≤ O_π(G)` を証明済み.
 
 ---
