@@ -301,7 +301,8 @@ $$E_1 E_3 \text{ acts prime on } M_\sigma$$
 - Assume config exists. By (3)-(5), Q = nonidentity Sylow of M for prime q ∉ α(M).
 - M = N_M(Q)M_α (Frattini + Thm 10.2 hierarchy).
 - Lemma 12.18 ⟹ C_{M_β}(P) ≠ 1, C_{M_β}(PQ) = 1, etc.
-- Hall construction (H = Hall β(M) ∪ β(M*) subgroup of C_G(P)) and Prop 10.14(d) ⟹ M = M^g ⊇ H.
+- Hall construction (H = Hall β(M) ∪ β(M*) subgroup of C_G(P)) and Prop 10.14(d)
+  (`S10.normalizer_le_of_nontrivial_beta_subgroup`) ⟹ M = M^g ⊇ H.
 - Then r ∈ β(M*) ∩ π(H) ⟹ R ⊆ N_M(Q), so R ⊆ N_G(Q) ⊆ M*.
 - Thm 13.4 ⟹ C_{M_σ}(P) ⊆ C_{M_σ}(R), but then [X, Q] = 1 for X ∈ C_{M_σ}(P).
 - **最終矛盾**: [X, Q] ⊆ M_α by careful subgroup analysis, but X ⊆ C_{M_α}(PQ) = 1 (Lemma 12.18) ⟹ contradiction.
@@ -342,7 +343,7 @@ $$E_1 E_3 \text{ acts prime on } M_\sigma$$
 - P acts regularly on Sylow Q of E₃ (by non-centralization assumption) ⟹ Q = [Q, P] ⊆ E'.
 - Take M* ∈ ℳ(N_G(Q)). Lemma 12.2(b) ⟹ M* ≄ M.
 - Lemma 12.18 ⟹ C_{M_α}(P) ≠ 1, C_{M_α}(PQ) = 1 ⟹ (c).
-- (a) follows from non-regularity. (b): If C_{M_σ}(E₃) ≠ 1, then by (c) and Lemma 13.6, M(C_G(Q*)) ≠ {M}, contradiction ⟹ (b).
+- (a) follows from non-regularity. (b): If C_{M_σ}(E₃) ≠ 1, then by (c) and Lemma 13.6, M(C_G(Q*)) ≠ {M}; Prop 10.14(d) handles the `q*∈β(M)` branch, while the other branch is the definition of σ(M). This contradiction gives (b).
 
 **形式化見積**: 100-120 行.
 
@@ -404,6 +405,27 @@ Thompson のこの論文は **p-局所群の derived series に基づく action 
 | Thm 13.10, Cor 13.11 | Lemma 12.2(b), Lemma 12.18, Lemma 13.6, Lemma 13.7 | E₁E₃ interaction |
 
 **計**: §13 全 7 結果中，**13 spots** で §12 を引用. §12 の 19 結果のうち，**8–9 個** が §13 で essential.
+
+### §10 β/σ-prime gate audit (2026-06-02)
+
+**Direct §13 gates**:
+- `S10.normalizer_le_of_nontrivial_beta_subgroup` = Prop 10.14(d). Used explicitly in
+  Lemma 13.8 and Theorem 13.10 where β-subgroup normalizers must be forced back into the
+  corresponding maximal subgroup.
+- `S10.disjoint_of_not_conj` = Lemma 10.12. Used in Lemma 13.8 for the final
+  `M_α ∩ M*_α = 1` contradiction.
+- `S10.isHall_Msigma_Malpha` = Theorem 10.2 surface. Lemma 13.8 still needs the deferred
+  quotient nilpotence tail `M'/M_α` from the original theorem; do not replace that by a
+  new §13 hypothesis.
+
+**§12-mediated §10 gates now visible in Lean**:
+- `S10.beta_complement_normalizer_derived_contains_sylow` = Cor 10.9(a)(3). This is the
+  derived-normalizer Sylow containment needed for β-complement Frattini/fusion steps.
+- `S10.beta_factorization_of_sylow_normalizer_in_intersection` = Cor 10.9(b). This feeds
+  the §12 maximal-interaction branch used before Theorem 13.4 / Lemma 13.8.
+- `S10.sigma_complement_commutator_cyclic_normal` = Prop 10.11(d). This is used earlier
+  in the §11/§12 exceptional and τ₂ machinery consumed by §13; keep it as an upstream
+  proof gate rather than a field of `SubgroupESetup`.
 
 ---
 
