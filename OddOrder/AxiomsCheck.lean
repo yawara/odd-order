@@ -1581,9 +1581,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
--- virtual-character lattices, and S07 coherence data.
+-- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
+-- characters are irreducible (unconditional; witness = the σ-twisted representation
+-- `galoisTwist`), giving the Galois permutation of Irr(G) and ℤ[Irr G] invariance.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_inner
-#assert_only_allowed_axioms OddOrder.RepresentationTheory.preservesIrreducibleCharacters_refl
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_galoisTwist
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_galoisTwist
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsIrreducibleCharacter.mapRingEquiv
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisMap
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisPerm
 #assert_only_allowed_axioms

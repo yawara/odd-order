@@ -1,18 +1,30 @@
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Data.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.LinearAlgebra.Trace
+import Mathlib.RepresentationTheory.Character
+import Mathlib.RepresentationTheory.Irreducible
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
-# Galois actions on class functions
+# Galois actions on class functions and irreducible characters
 
 This file contains coefficientwise automorphism infrastructure for class functions.  The
-main operation is `ClassFunction.mapRingEquiv σ φ`, sending `g ↦ σ (φ g)` for a ring
+basic operation is `ClassFunction.mapRingEquiv σ φ`, sending `g ↦ σ (φ g)` for a ring
 automorphism `σ : ℂ ≃+* ℂ`.
 
-The API is intentionally at the class-function and integral-lattice level.  Proving that a
-field automorphism permutes irreducible characters is a deeper representation-theoretic
-statement; this file packages the reusable API conditional on that preservation theorem.
+The main theorem is `IsIrreducibleCharacter.mapRingEquiv`: **Galois conjugates of
+irreducible characters are irreducible** (for Peterfalvi's cyclotomic Galois automorphisms
+this is the usual statement; we prove it for every ring automorphism of `ℂ`).  The witness
+is the `σ`-twisted representation `galoisTwist σ ρ b`, obtained by conjugating `ρ` with the
+`σ`-semilinear coordinate bijection `galoisCoord σ b` of a basis `b`: the twist is again
+`ℂ`-linear, its character is `σ ∘ χ_ρ` (`character_galoisTwist`), and its subrepresentation
+lattice is isomorphic to that of `ρ` (`isIrreducible_galoisTwist`).
+
+Downstream this yields the Galois permutation `IrreducibleCharacter.galoisPerm σ` of
+`Irr(G)` and invariance of the virtual-character lattice `ℤ[Irr G]`
+(`ClassFunction.mapRingEquiv_mem_ZIrr_iff`).
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -142,92 +154,281 @@ theorem mapRingEquiv_inner (σ : ℂ ≃+* ℂ)
 
 end ClassFunction
 
-/-- A coefficientwise automorphism of `ℂ` preserves the irreducible characters of `G`.
+section GaloisTwist
 
-This is the explicit representation-theoretic input needed to turn `ClassFunction.mapRingEquiv`
-into a permutation of `Irr(G)`.  For Peterfalvi's cyclotomic Galois automorphisms this is the
-usual "Galois conjugates of irreducible characters are irreducible" theorem; the present file
-keeps that theorem as a named hypothesis and develops the downstream API from it. -/
-def PreservesIrreducibleCharacters (G : Type*) [Group G] (σ : ℂ ≃+* ℂ) : Prop :=
-  ∀ χ : IrreducibleCharacter G,
-    IsIrreducibleCharacter
-      (ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ))
+/-! ### The `σ`-twist of a representation
 
-theorem preservesIrreducibleCharacters_refl (G : Type*) [Group G] :
-    PreservesIrreducibleCharacters G (RingEquiv.refl ℂ) := by
-  intro χ
-  simp
+For a basis `b : Basis ι ℂ V`, the map `galoisCoord σ b : v ↦ (σ (b.repr v i))ᵢ` is an
+additive, `σ`-semilinear bijection `V ≃+ (ι → ℂ)`.  Conjugating a representation
+`ρ : Representation ℂ G V` by it produces a genuinely `ℂ`-linear representation on `ι → ℂ`
+(the two coordinate twists cancel the semilinearity) whose character is `σ ∘ χ_ρ` and whose
+subrepresentation lattice is isomorphic to that of `ρ`.  This is the classical construction
+behind "Galois conjugates of irreducible characters are irreducible". -/
+
+open Module (Basis)
+
+variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {ι : Type*} [Fintype ι]
+
+/-- The `σ`-twisted coordinate bijection attached to a basis `b` of `V`: send `v` to its
+coordinate vector with `σ` applied entrywise.  It is additive and `σ`-semilinear
+(`galoisCoord_smul`); we package only the additive bijection and carry the twisted scalar
+action as a separate lemma, which is all the lattice transfer below needs. -/
+noncomputable def galoisCoord (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) : V ≃+ (ι → ℂ) where
+  toFun v := fun i => σ (b.repr v i)
+  invFun w := b.repr.symm (Finsupp.equivFunOnFinite.symm fun i => σ.symm (w i))
+  left_inv v := by
+    have h : (fun i => σ.symm (σ (b.repr v i))) = ⇑(b.repr v) := by
+      funext i
+      rw [RingEquiv.symm_apply_apply]
+    change b.repr.symm (Finsupp.equivFunOnFinite.symm fun i => σ.symm (σ (b.repr v i))) = v
+    rw [h, Finsupp.equivFunOnFinite_symm_coe]
+    exact b.repr.symm_apply_apply v
+  right_inv w := by
+    funext i
+    change σ (b.repr (b.repr.symm (Finsupp.equivFunOnFinite.symm fun i => σ.symm (w i))) i) = w i
+    rw [LinearEquiv.apply_symm_apply]
+    exact σ.apply_symm_apply (w i)
+  map_add' v₁ v₂ := by
+    funext i
+    change σ (b.repr (v₁ + v₂) i) = σ (b.repr v₁ i) + σ (b.repr v₂ i)
+    rw [map_add, Finsupp.add_apply, map_add]
+
+@[simp] theorem galoisCoord_apply (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) (v : V) (i : ι) :
+    galoisCoord σ b v i = σ (b.repr v i) :=
+  rfl
+
+/-- `galoisCoord` is `σ`-semilinear. -/
+theorem galoisCoord_smul (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) (c : ℂ) (v : V) :
+    galoisCoord σ b (c • v) = σ c • galoisCoord σ b v := by
+  funext i
+  rw [galoisCoord_apply, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Pi.smul_apply,
+    smul_eq_mul, galoisCoord_apply]
+
+theorem galoisCoord_symm_smul (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) (c : ℂ) (w : ι → ℂ) :
+    (galoisCoord σ b).symm (c • w) = σ.symm c • (galoisCoord σ b).symm w := by
+  apply (galoisCoord σ b).injective
+  rw [AddEquiv.apply_symm_apply, galoisCoord_smul, RingEquiv.apply_symm_apply,
+    AddEquiv.apply_symm_apply]
+
+theorem galoisCoord_basis [DecidableEq ι] (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) (j : ι) :
+    galoisCoord σ b (b j) = Pi.single j 1 := by
+  funext i
+  rw [galoisCoord_apply, Basis.repr_self]
+  rcases eq_or_ne i j with rfl | h
+  · rw [Finsupp.single_eq_same, map_one, Pi.single_eq_same]
+  · rw [Finsupp.single_eq_of_ne h, map_zero, Pi.single_eq_of_ne h]
+
+theorem galoisCoord_symm_single [DecidableEq ι] (σ : ℂ ≃+* ℂ) (b : Basis ι ℂ V) (j : ι) :
+    (galoisCoord σ b).symm (Pi.single j 1) = b j := by
+  rw [AddEquiv.symm_apply_eq, galoisCoord_basis]
+
+/-- The `σ`-twist of a representation `ρ : Representation ℂ G V`, realized on the coordinate
+space `ι → ℂ` of a basis `b`: conjugate each `ρ g` by `galoisCoord σ b`.  The two coordinate
+twists cancel the semilinearity, so each map is genuinely `ℂ`-linear. -/
+noncomputable def galoisTwist (σ : ℂ ≃+* ℂ) (ρ : Representation ℂ G V) (b : Basis ι ℂ V) :
+    Representation ℂ G (ι → ℂ) where
+  toFun g :=
+    { toFun := fun w => galoisCoord σ b (ρ g ((galoisCoord σ b).symm w))
+      map_add' := fun w₁ w₂ => by rw [map_add, map_add, map_add]
+      map_smul' := fun c w => by
+        rw [RingHom.id_apply, galoisCoord_symm_smul, map_smul, galoisCoord_smul,
+          RingEquiv.apply_symm_apply] }
+  map_one' := by
+    ext w
+    simp
+  map_mul' g h := by
+    ext w
+    simp [Module.End.mul_apply]
+
+@[simp] theorem galoisTwist_apply (σ : ℂ ≃+* ℂ) (ρ : Representation ℂ G V)
+    (b : Basis ι ℂ V) (g : G) (w : ι → ℂ) :
+    galoisTwist σ ρ b g w = galoisCoord σ b (ρ g ((galoisCoord σ b).symm w)) :=
+  rfl
+
+theorem galoisTwist_apply_galoisCoord (σ : ℂ ≃+* ℂ) (ρ : Representation ℂ G V)
+    (b : Basis ι ℂ V) (g : G) (v : V) :
+    galoisTwist σ ρ b g (galoisCoord σ b v) = galoisCoord σ b (ρ g v) := by
+  rw [galoisTwist_apply, AddEquiv.symm_apply_apply]
+
+/-- The character of the `σ`-twist is the `σ`-image of the character: in the standard basis
+of `ι → ℂ` the matrix of `galoisTwist σ ρ b g` is the entrywise `σ`-image of the matrix of
+`ρ g` in the basis `b`. -/
+theorem character_galoisTwist (σ : ℂ ≃+* ℂ) (ρ : Representation ℂ G V) (b : Basis ι ℂ V)
+    (g : G) :
+    (galoisTwist σ ρ b).character g = σ (ρ.character g) := by
+  classical
+  have hmat : LinearMap.toMatrix (Pi.basisFun ℂ ι) (Pi.basisFun ℂ ι) (galoisTwist σ ρ b g) =
+      (LinearMap.toMatrix b b (ρ g)).map ⇑σ := by
+    ext i j
+    simp only [LinearMap.toMatrix_apply, Matrix.map_apply, Pi.basisFun_repr, Pi.basisFun_apply,
+      galoisTwist_apply, galoisCoord_symm_single, galoisCoord_apply]
+  change LinearMap.trace ℂ (ι → ℂ) (galoisTwist σ ρ b g) = σ (LinearMap.trace ℂ V (ρ g))
+  rw [LinearMap.trace_eq_matrix_trace ℂ (Pi.basisFun ℂ ι), hmat,
+    LinearMap.trace_eq_matrix_trace ℂ b, AddMonoidHom.map_trace]
+
+/-- The `σ`-twist of an irreducible representation is irreducible: pulling a
+subrepresentation of the twist back along `galoisCoord σ b` (an additive bijection that
+intertwines the two actions and twists scalars by the bijection `σ`) yields a
+subrepresentation of `ρ`. -/
+theorem isIrreducible_galoisTwist (σ : ℂ ≃+* ℂ) {ρ : Representation ℂ G V}
+    (b : Basis ι ℂ V) (hρ : ρ.IsIrreducible) : (galoisTwist σ ρ b).IsIrreducible := by
+  haveI := hρ
+  haveI : Nontrivial V := by
+    by_contra hV
+    rw [not_nontrivial_iff_subsingleton] at hV
+    have hbt : (⊥ : Submodule ℂ V) = ⊤ := by
+      ext v
+      simp [Subsingleton.elim v 0]
+    exact bot_ne_top (α := Subrepresentation ρ)
+      (Subrepresentation.toSubmodule_injective hbt)
+  refine { toNontrivial := ?_, eq_bot_or_eq_top := fun S' => ?_ }
+  · -- `⊥ ≠ ⊤` for subrepresentations of the twist, since `ι → ℂ` is nontrivial
+    refine ⟨⊥, ⊤, fun h => ?_⟩
+    have hsub : (⊥ : Submodule ℂ (ι → ℂ)) = ⊤ := congrArg Subrepresentation.toSubmodule h
+    obtain ⟨v, w, hvw⟩ := exists_pair_ne V
+    refine hvw ((galoisCoord σ b).injective ?_)
+    have hmem : ∀ u : ι → ℂ, u ∈ (⊥ : Submodule ℂ (ι → ℂ)) := fun u => by
+      rw [hsub]; exact Submodule.mem_top
+    have h₁ := Submodule.mem_bot ℂ |>.mp (hmem (galoisCoord σ b v))
+    have h₂ := Submodule.mem_bot ℂ |>.mp (hmem (galoisCoord σ b w))
+    rw [h₁, h₂]
+  · -- pull `S'` back along `galoisCoord σ b` to a subrepresentation of `ρ`
+    let p : Submodule ℂ V :=
+      { carrier := {v : V | galoisCoord σ b v ∈ S'.toSubmodule}
+        add_mem' := fun {v₁ v₂} h₁ h₂ => by
+          change galoisCoord σ b (v₁ + v₂) ∈ S'.toSubmodule
+          rw [map_add]
+          exact S'.toSubmodule.add_mem h₁ h₂
+        zero_mem' := by
+          change galoisCoord σ b 0 ∈ S'.toSubmodule
+          rw [map_zero]
+          exact S'.toSubmodule.zero_mem
+        smul_mem' := fun c v hv => by
+          change galoisCoord σ b (c • v) ∈ S'.toSubmodule
+          rw [galoisCoord_smul]
+          exact S'.toSubmodule.smul_mem (σ c) hv }
+    have hp : ∀ (g : G) ⦃v : V⦄, v ∈ p → ρ g v ∈ p := fun g v hv => by
+      change galoisCoord σ b (ρ g v) ∈ S'.toSubmodule
+      rw [← galoisTwist_apply_galoisCoord σ ρ b g v]
+      exact S'.apply_mem_toSubmodule g hv
+    rcases hρ.eq_bot_or_eq_top ⟨p, hp⟩ with h | h
+    · left
+      apply Subrepresentation.toSubmodule_injective
+      have hp_bot : p = (⊥ : Submodule ℂ V) := congrArg Subrepresentation.toSubmodule h
+      change S'.toSubmodule = (⊥ : Submodule ℂ (ι → ℂ))
+      rw [Submodule.eq_bot_iff]
+      intro w hw
+      have hv : (galoisCoord σ b).symm w ∈ p := by
+        change galoisCoord σ b ((galoisCoord σ b).symm w) ∈ S'.toSubmodule
+        rw [AddEquiv.apply_symm_apply]
+        exact hw
+      rw [hp_bot, Submodule.mem_bot] at hv
+      rw [← (galoisCoord σ b).apply_symm_apply w, hv, map_zero]
+    · right
+      apply Subrepresentation.toSubmodule_injective
+      have hp_top : p = (⊤ : Submodule ℂ V) := congrArg Subrepresentation.toSubmodule h
+      change S'.toSubmodule = (⊤ : Submodule ℂ (ι → ℂ))
+      rw [Submodule.eq_top_iff']
+      intro w
+      have hv : (galoisCoord σ b).symm w ∈ p := by
+        rw [hp_top]
+        exact Submodule.mem_top
+      have hw : galoisCoord σ b ((galoisCoord σ b).symm w) ∈ S'.toSubmodule := hv
+      rwa [AddEquiv.apply_symm_apply] at hw
+
+/-- **Galois conjugates of irreducible characters are irreducible.**  For any ring
+automorphism `σ : ℂ ≃+* ℂ` and any irreducible character `φ` of `G`, the coefficientwise
+transport `g ↦ σ (φ g)` is again an irreducible character: the witnessing representation is
+the `σ`-twist `galoisTwist σ ρ b` of a witness `ρ` for `φ`. -/
+theorem IsIrreducibleCharacter.mapRingEquiv {φ : ClassFunction G ℂ} (σ : ℂ ≃+* ℂ)
+    (hφ : IsIrreducibleCharacter φ) :
+    IsIrreducibleCharacter (ClassFunction.mapRingEquiv σ φ) := by
+  classical
+  obtain ⟨W, _, _, _, ρ, hirr, hchar⟩ := hφ
+  let b := Module.Free.chooseBasis ℂ W
+  refine ⟨Module.Free.ChooseBasisIndex ℂ W → ℂ, inferInstance, inferInstance, inferInstance,
+    galoisTwist σ ρ b, isIrreducible_galoisTwist σ b hirr, ?_⟩
+  funext g
+  change σ (φ g) = (galoisTwist σ ρ b).character g
+  rw [character_galoisTwist]
+  exact congrArg σ (congrFun hchar g)
+
+/-- Coefficientwise transport by a ring automorphism both preserves and reflects
+irreducibility of characters. -/
+theorem isIrreducibleCharacter_mapRingEquiv_iff (σ : ℂ ≃+* ℂ) {φ : ClassFunction G ℂ} :
+    IsIrreducibleCharacter (ClassFunction.mapRingEquiv σ φ) ↔ IsIrreducibleCharacter φ := by
+  constructor
+  · intro h
+    have h' := h.mapRingEquiv σ.symm
+    rwa [ClassFunction.mapRingEquiv_symm_mapRingEquiv] at h'
+  · exact fun h => h.mapRingEquiv σ
+
+end GaloisTwist
 
 namespace IrreducibleCharacter
 
 variable {G : Type*} [Group G]
 
-/-- The irreducible character obtained by coefficientwise Galois transport, conditional on
-irreducible-character preservation. -/
-noncomputable def galoisMap (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) :
+/-- The irreducible character obtained by coefficientwise Galois transport. -/
+noncomputable def galoisMap (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
     IrreducibleCharacter G :=
-  ⟨ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ), hσ χ⟩
+  ⟨ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ),
+    IsIrreducibleCharacter.mapRingEquiv σ χ.2⟩
 
-@[simp] theorem galoisMap_apply_coe (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) :
-    ((galoisMap σ hσ χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
+@[simp] theorem galoisMap_apply_coe (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
+    ((galoisMap σ χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
       ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ) :=
   rfl
 
-@[simp] theorem galoisMap_apply_apply (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ) (χ : IrreducibleCharacter G) (g : G) :
-    ((galoisMap σ hσ χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
+@[simp] theorem galoisMap_apply_apply (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) (g : G) :
+    ((galoisMap σ χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
       σ ((χ : ClassFunction G ℂ) g) :=
   rfl
 
 @[simp] theorem galoisMap_refl (χ : IrreducibleCharacter G) :
-    galoisMap (RingEquiv.refl ℂ) (preservesIrreducibleCharacters_refl G) χ = χ := by
+    galoisMap (RingEquiv.refl ℂ) χ = χ := by
   apply IrreducibleCharacter.ext
   simp [galoisMap]
 
-/-- A coefficientwise automorphism gives a permutation of `Irr(G)` once both it and its inverse
-are known to preserve irreducible characters. -/
-noncomputable def galoisPerm (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
-    (hσsymm : PreservesIrreducibleCharacters G σ.symm) :
-    Equiv.Perm (IrreducibleCharacter G) where
-  toFun := galoisMap σ hσ
-  invFun := galoisMap σ.symm hσsymm
-  left_inv χ := by
-    apply IrreducibleCharacter.ext
-    simp [galoisMap]
-  right_inv χ := by
-    apply IrreducibleCharacter.ext
-    simp [galoisMap]
+@[simp] theorem galoisMap_symm_galoisMap (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
+    galoisMap σ.symm (galoisMap σ χ) = χ := by
+  apply IrreducibleCharacter.ext
+  simp [galoisMap]
 
-@[simp] theorem galoisPerm_apply_coe (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
-    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
-    (χ : IrreducibleCharacter G) :
-    ((galoisPerm σ hσ hσsymm χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
+@[simp] theorem galoisMap_galoisMap_symm (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
+    galoisMap σ (galoisMap σ.symm χ) = χ := by
+  apply IrreducibleCharacter.ext
+  simp [galoisMap]
+
+/-- Coefficientwise Galois transport as a permutation of `Irr(G)`. -/
+noncomputable def galoisPerm (σ : ℂ ≃+* ℂ) : Equiv.Perm (IrreducibleCharacter G) where
+  toFun := galoisMap σ
+  invFun := galoisMap σ.symm
+  left_inv := galoisMap_symm_galoisMap σ
+  right_inv := galoisMap_galoisMap_symm σ
+
+@[simp] theorem galoisPerm_apply (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
+    galoisPerm σ χ = galoisMap σ χ :=
+  rfl
+
+@[simp] theorem galoisPerm_apply_coe (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) :
+    ((galoisPerm σ χ : IrreducibleCharacter G) : ClassFunction G ℂ) =
       ClassFunction.mapRingEquiv σ (χ : ClassFunction G ℂ) :=
   rfl
 
-@[simp] theorem galoisPerm_apply_apply (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
-    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
-    (χ : IrreducibleCharacter G) (g : G) :
-    ((galoisPerm σ hσ hσsymm χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
+@[simp] theorem galoisPerm_apply_apply (σ : ℂ ≃+* ℂ) (χ : IrreducibleCharacter G) (g : G) :
+    ((galoisPerm σ χ : IrreducibleCharacter G) : ClassFunction G ℂ) g =
       σ ((χ : ClassFunction G ℂ) g) :=
   rfl
 
 @[simp] theorem galoisPerm_refl :
-    galoisPerm (G := G) (RingEquiv.refl ℂ)
-      (preservesIrreducibleCharacters_refl G) (preservesIrreducibleCharacters_refl G) =
-        Equiv.refl (IrreducibleCharacter G) := by
+    galoisPerm (G := G) (RingEquiv.refl ℂ) = Equiv.refl (IrreducibleCharacter G) := by
   ext χ g
   simp [galoisPerm, galoisMap]
 
-theorem galoisPerm_symm (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
-    (hσsymm : PreservesIrreducibleCharacters G σ.symm) :
-    (galoisPerm σ hσ hσsymm).symm = galoisPerm σ.symm hσsymm hσ := by
+theorem galoisPerm_symm (σ : ℂ ≃+* ℂ) :
+    (galoisPerm (G := G) σ).symm = galoisPerm σ.symm := by
   ext χ g
   rfl
 
@@ -237,24 +438,31 @@ namespace ClassFunction
 
 variable {G : Type*} [Group G]
 
-/-- A coefficientwise automorphism preserving irreducible characters sends `Irr(G)` into
-`Irr(G)`. -/
+/-- A coefficientwise automorphism sends `Irr(G)` into `Irr(G)`. -/
 theorem mapRingEquiv_mem_irreducibleCharacters (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
     {φ : ClassFunction G ℂ} (hφ : φ ∈ irreducibleCharacters G) :
     mapRingEquiv σ φ ∈ irreducibleCharacters G :=
-  hσ ⟨φ, hφ⟩
+  IsIrreducibleCharacter.mapRingEquiv σ hφ
 
-/-- A coefficientwise automorphism preserving irreducible characters preserves the virtual
-character lattice `ℤ[Irr G]`. -/
+/-- A coefficientwise automorphism permutes `Irr(G)`. -/
+@[simp] theorem mapRingEquiv_image_irreducibleCharacters (σ : ℂ ≃+* ℂ) :
+    mapRingEquiv σ '' irreducibleCharacters G = irreducibleCharacters G := by
+  ext φ
+  constructor
+  · rintro ⟨ψ, hψ, rfl⟩
+    exact mapRingEquiv_mem_irreducibleCharacters σ hψ
+  · intro hφ
+    exact ⟨mapRingEquiv σ.symm φ, mapRingEquiv_mem_irreducibleCharacters σ.symm hφ,
+      mapRingEquiv_mapRingEquiv_symm σ φ⟩
+
+/-- A coefficientwise automorphism preserves the virtual character lattice `ℤ[Irr G]`. -/
 theorem mapRingEquiv_mem_ZIrr (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
     {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
     mapRingEquiv σ φ ∈ ZIrr G := by
   induction hφ using Submodule.span_induction with
   | mem x hx =>
       exact IsIrreducibleCharacter.mem_ZIrr
-        (mapRingEquiv_mem_irreducibleCharacters σ hσ hx)
+        (mapRingEquiv_mem_irreducibleCharacters σ hx)
   | zero =>
       rw [mapRingEquiv_zero]
       exact Submodule.zero_mem _
@@ -265,18 +473,15 @@ theorem mapRingEquiv_mem_ZIrr (σ : ℂ ≃+* ℂ)
       rw [mapRingEquiv_zsmul]
       exact Submodule.smul_mem _ n hx
 
-/-- Membership in the virtual-character lattice is invariant under a coefficientwise automorphism
-when the automorphism and its inverse preserve irreducible characters. -/
-theorem mapRingEquiv_mem_ZIrr_iff (σ : ℂ ≃+* ℂ)
-    (hσ : PreservesIrreducibleCharacters G σ)
-    (hσsymm : PreservesIrreducibleCharacters G σ.symm)
-    {φ : ClassFunction G ℂ} :
+/-- Membership in the virtual-character lattice is invariant under coefficientwise
+automorphisms. -/
+theorem mapRingEquiv_mem_ZIrr_iff (σ : ℂ ≃+* ℂ) {φ : ClassFunction G ℂ} :
     mapRingEquiv σ φ ∈ ZIrr G ↔ φ ∈ ZIrr G := by
   constructor
   · intro hφ
-    have hφ' := mapRingEquiv_mem_ZIrr σ.symm hσsymm hφ
+    have hφ' := mapRingEquiv_mem_ZIrr σ.symm hφ
     simpa using hφ'
-  · exact mapRingEquiv_mem_ZIrr σ hσ
+  · exact mapRingEquiv_mem_ZIrr σ
 
 end ClassFunction
 
