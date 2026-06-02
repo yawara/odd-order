@@ -163,3 +163,20 @@ identifies `J(Pbar)` and `Z(Pbar)` with the quotient images of `J(P)` and `Z(P)`
 the existing hypotheses on `N_G(J(P))` and `C_G(Z(P))` can be pushed to the quotient
 normalizer and centralizer.  Step 2 still needs the separate `U ≤ X ≤ P` lift and
 bad-subgroup maximality argument for `J(P/U)` and `Z(P/U)`.
+
+
+## 2026-06-02 update — Thompson J quotient identification
+
+Landed the Step 3 `J(P)` quotient bridge:
+
+- `thompsonJ_map_of_coprime_kernel`: if `N ⊴ G` is a normal `p'`-subgroup and
+  `P` is a `p`-subgroup, then
+  `J(P.map (QuotientGroup.mk' N)) = (J(P)).map (QuotientGroup.mk' N)`.
+
+The proof uses coprimality to get `P ∩ N = 1`, restricts the quotient map to an
+injective homomorphism on `P`, applies the existing injective-image theorem for
+Thompson `J` to `⊤ ≤ P`, and transports the result back to ambient subgroups.
+Together with the normalizer image inheritance already landed, this removes the
+missing `J(Pbar)` identification needed to push the `N_G(J(P))` hypothesis through
+`p'`-quotients in Step 3.  The analogous center/`Z(Pbar)` quotient identification
+remains open for the centralizer half.

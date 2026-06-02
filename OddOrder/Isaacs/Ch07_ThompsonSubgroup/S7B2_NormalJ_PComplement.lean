@@ -1748,6 +1748,62 @@ theorem hasNormalPComplement_centralizer_map_of_coprime_kernel
     simpa [f] using centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
   exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
 
+/-- Thompson's `J` commutes with quotient by a normal `p'`-kernel on `p`-subgroups.
+
+The quotient map is not injective on all of `G`, but it is injective on any
+`p`-subgroup `P` because `P ∩ N = 1`.  This is the `J(P)` identification needed
+when Steps 2 and 3 pass Thompson-normalizer hypotheses to `G/N`. -/
+theorem thompsonJ_map_of_coprime_kernel
+    [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P) :
+    Subgroup.thompsonJ (P.map (QuotientGroup.mk' N)) p =
+      (Subgroup.thompsonJ P p).map (QuotientGroup.mk' N) := by
+  classical
+  let q : G →* G ⧸ N := QuotientGroup.mk' N
+  let qP : ↥P →* G ⧸ N := q.comp P.subtype
+  obtain ⟨k, hP_card⟩ : ∃ k, Nat.card ↥P = p ^ k := IsPGroup.iff_card.mp hP_pgroup
+  have hp_prime : p.Prime := Fact.out
+  have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
+    rw [hP_card]
+    exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
+  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  have hqP_inj : Function.Injective qP := by
+    rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
+    intro x hx
+    have hx_N : (x : G) ∈ N := by
+      have : (x : G) ∈ (QuotientGroup.mk' N).ker := hx
+      rw [QuotientGroup.ker_mk'] at this
+      exact this
+    have hx_inf : (x : G) ∈ P ⊓ N := ⟨x.property, hx_N⟩
+    rw [hP_inf_N, Subgroup.mem_bot] at hx_inf
+    exact Subtype.ext hx_inf
+  have htop_qP : (⊤ : Subgroup ↥P).map qP = P.map q := by
+    ext y
+    constructor
+    · rintro ⟨x, _hx_top, rfl⟩
+      exact ⟨(x : G), x.property, rfl⟩
+    · rintro ⟨x, hxP, rfl⟩
+      exact ⟨⟨x, hxP⟩, trivial, rfl⟩
+  have htop_subtype : (⊤ : Subgroup ↥P).map P.subtype = P := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have hJ_subtype :
+      (Subgroup.thompsonJ (⊤ : Subgroup ↥P) p).map P.subtype =
+        Subgroup.thompsonJ P p := by
+    have h :=
+      Subgroup.thompsonJ_map_of_injective P.subtype_injective (⊤ : Subgroup ↥P) p
+    rw [htop_subtype] at h
+    exact h.symm
+  have hJ_qP :
+      Subgroup.thompsonJ ((⊤ : Subgroup ↥P).map qP) p =
+        (Subgroup.thompsonJ (⊤ : Subgroup ↥P) p).map qP :=
+    Subgroup.thompsonJ_map_of_injective hqP_inj (⊤ : Subgroup ↥P) p
+  change Subgroup.thompsonJ (P.map q) p = (Subgroup.thompsonJ P p).map q
+  rw [← htop_qP, hJ_qP]
+  change (Subgroup.thompsonJ (⊤ : Subgroup ↥P) p).map (q.comp P.subtype) =
+    (Subgroup.thompsonJ P p).map q
+  rw [← Subgroup.map_map, hJ_subtype]
+
 /-- **Isaacs Thm 7.1, Step 7 reduction** (normal `J(P)` case).
 
 This helper packages the last observation in Isaacs Step 7: once `J(P) ⊴ G`, the
