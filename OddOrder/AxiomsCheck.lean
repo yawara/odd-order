@@ -1522,6 +1522,21 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.centralCharacterOfRep_eq_of_card_eq_of_character_eq
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.centralizer_le_of_mem_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_class_eq_of_inf_centralizer_card_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.centralCharacterOfRep_eq_of_tiSubset_card_eq_of_character_eq
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_one_mul_centralCharacterOfRep_mk
+-- Peterfalvi (6.7.2)/(6.7.3) RHS collapse and top wiring: split the `C_s ∩ Z` sum into the
+-- identity class and the nonidentity `Z^#` classes, then feed the two collapsed congruences into
+-- the existing (6.7.3) arithmetic assembly to obtain `ψ(z) ≡ ψ(1) (mod |P|)`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.classSum_mul_apply_one_eq_classSumCoeff_one
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIntegral_sum_classSum_mul_coeff
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.nonidentityZClassCoeffSum_isIntegral
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_67
 -- General character-value bound `|χ(g)| ≤ χ(1)` (the inequality the (6.6) G2.2 residual flags as
 -- needs-infra), via the same root-of-unity / triangle machinery; equality case is the keystone.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.norm_character_le_finrank
