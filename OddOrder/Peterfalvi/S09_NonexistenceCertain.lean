@@ -2015,6 +2015,51 @@ theorem zetaImage_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
   H78.zetaImage_inner_self_eq_one
     (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
 
+/-- Irreducibility and distinctness of the source `S`-family give its
+orthogonality matrix. -/
+theorem sourceZeta_orthogonal_of_irreducible_distinct (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0 := by
+  intro i hi j hj
+  by_cases hij : i = j
+  · rw [if_pos hij, hij]
+  · rw [if_neg hij]
+    let χ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+      ⟨H78.hyp76.zeta i, hirr i hi⟩
+    let ψ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+      ⟨H78.hyp76.zeta j, hirr j hj⟩
+    have hne : χ ≠ ψ := by
+      intro hχψ
+      exact hdistinct i hi j hj hij (congrArg
+        (fun θ : OddOrder.RepresentationTheory.IrreducibleCharacter L =>
+          (θ : ClassFunction L ℂ)) hχψ)
+    simpa [χ, ψ, hne] using
+      (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ ψ)
+
+/-- Irreducibility of the source `S`-family makes every source norm nonzero. -/
+theorem sourceZeta_norm_ne_of_irreducible (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 := by
+  intro i hi
+  let χ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+    ⟨H78.hyp76.zeta i, hirr i hi⟩
+  have hχ : ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1 := by
+    simpa [χ] using
+      (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ χ)
+  rw [hχ]
+  norm_num
+
 /-- If the source `ζ_i` are orthogonal to the distinguished `ζ`, the weighted
 `S^ν`-sum has inner product `1` with `νζ`.
 
@@ -2263,6 +2308,34 @@ theorem normEstimates_of_source_orthogonal
   H78.normEstimates_of_normQuadraticCorrection_eqs hBD hzeta
     (H78.gammaNormSq_eq_of_source_orthogonal hBD hsrc
       horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
+
+/-- Version of `normEstimates_of_source_orthogonal` using the natural source
+hypotheses that the `S`-family consists of distinct irreducible characters. -/
+theorem normEstimates_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD := by
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  exact H78.normEstimates_of_source_orthogonal hBD hsrc
+    (H78.sourceZeta_orthogonal_of_irreducible_distinct hirr hdistinct)
+    (H78.sourceZeta_norm_ne_of_irreducible hirr)
+    hzeta_degree hdegree_sum (hirr H78.zetaDistinct hzeta_mem) hzeta
 
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
