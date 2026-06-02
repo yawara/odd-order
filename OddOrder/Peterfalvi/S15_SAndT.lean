@@ -324,6 +324,25 @@ theorem caseA_parameters [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     caseA_for_S → hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
   sorry
 
+/-- The parity calculation behind **Peterfalvi (13.14)**: if `p` is odd, the
+geometric sum of its first `q` powers has the same parity as `q`. -/
+private theorem sum_range_pow_mod_two_eq {p q : ℕ} (hpodd : Odd p) :
+    (∑ k ∈ Finset.range q, p ^ k) % 2 = q % 2 := by
+  induction q with
+  | zero =>
+      simp
+  | succ q ih =>
+      have hpow : p ^ q % 2 = 1 := Nat.odd_iff.mp hpodd.pow
+      rw [Finset.sum_range_succ, Nat.add_mod, ih, hpow]
+      omega
+
+/-- The oddness part of **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_odd {p q : ℕ} (hp : p.Prime)
+    (hpodd : Odd p) (hqodd : Odd q) :
+    Odd ((p ^ q - 1) / (p - 1)) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [Nat.odd_iff, sum_range_pow_mod_two_eq hpodd, Nat.odd_iff.mp hqodd]
+
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
 theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
@@ -333,7 +352,9 @@ theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
       (¬ (p ≡ 1 [MOD q]) →
         Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) ∧
           ∀ x : ℕ, x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
-  sorry
+  refine ⟨cyclotomic_quotient_odd hp hpodd hqodd, ?_, ?_⟩
+  · sorry
+  · sorry
 
 /-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
 value, depending on whether `p` is `1 mod q`. -/
