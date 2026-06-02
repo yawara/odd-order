@@ -1398,6 +1398,19 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The residual `Δ = β - 1_G + ζ^ν` used in Peterfalvi (7.9). -/
+noncomputable def delta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
+  H78.beta - Hypothesis71.constOne G +
+    H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+
+/-- The defining rearrangement `β = 1_G - ζ^ν + Δ`. -/
+theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
+    H78.beta =
+      Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta H78.zetaDistinct) +
+        H78.delta := by
+  rw [delta]
+  abel
+
 /-- The real norm square `‖β‖²` used in Peterfalvi (7.8.b). -/
 noncomputable def betaNormSq (H78 : Hypothesis78 G A L) : ℝ :=
   (ClassFunction.inner H78.beta H78.beta).re
@@ -1950,6 +1963,26 @@ theorem gamma_orth_weightedNuSum
     (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
     ClassFunction.inner hBD.Gamma H78.weightedNuSum = 0 := by
   rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_gamma hBD, star_zero]
+
+/-- `BetaDecomp` identifies the (7.9) residual `Δ` with the weighted part plus
+`Γ`. -/
+theorem delta_eq_weightedNuSum_add_gamma
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    H78.delta = (hBD.a : ℂ) • H78.weightedNuSum + hBD.Gamma := by
+  rw [delta, hBD.beta_eq]
+  abel
+
+/-- The residual `Δ` is orthogonal to `1_G`. -/
+theorem delta_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.delta (Hypothesis71.constOne G) = 0 := by
+  rw [H78.delta_eq_weightedNuSum_add_gamma hBD, ClassFunction.inner_add_left,
+    ClassFunction.inner_smul_left, H78.weightedNuSum_orth_one hBD,
+    hBD.Gamma_orth_one, mul_zero, add_zero]
+
+/-- Hermitian-symmetric form of `delta_orth_one`. -/
+theorem constOne_orth_delta (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) H78.delta = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.delta_orth_one hBD, star_zero]
 
 /-- Orthogonal expansion of the beta decomposition in Peterfalvi (7.8.a).
 
