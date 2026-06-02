@@ -50,3 +50,17 @@ proof を差分で thread、rebuild。
 (各 iteration はここに「やったこと・build 状態・次の一手」を追記)
 - 2026-06-03 setup: worktree 作成・warm build green (3562)。未着手。次 = `coherentEqualDegree_fromDade`
   と `DadeChainStep`/`dadeOrthonormalCharacterImageFamily` の proof を読み、差分 support 弱化の最小 diff を設計。
+- 2026-06-03 iter1 (調査・feasibility ✅、コード変更なし・build green 維持): `dadeOrthonormalCharacterImageFamily`
+  (S07:4410) の個別 `hχsupp`/`hχbarsupp` の使用箇所を trace。2 箇所: (a) `hdiff_supp`(4440, 差分 support 導出=OK)
+  (b) **`hSsupp`(4451) → `dadeIntegralCharacterMap_inner_eq_on_supported_span`(4326) が span 生成元 {χ,χ̄} の
+  個別 support `hS:∀s∈S,s.support⊆A` を要求** ← X-member (Ind θ, χ(1)≠0) で偽。**確定した修正方針**:
+  isometry を {χ,χ̄}-span でなく**差分集合 {diff 0=0, diff 1=χ̄−χ}-span** に適用する (diff 0=0 は常に supported、
+  diff 1=χ̄−χ は新仮説 hdiffsupp で supported)。`dadeIntegralCharacterMap_inner_eq_on_supported_span` は
+  S={差分} で適用でき、個別 support 不要。`hdiff_zspan` も {χ̄−χ}-span に。⟹ agents の「差分のみ使用」裏付け。
+  **実行計画**: (1) `dadeOrthonormalCharacterImageFamily` の hyp `hχsupp`/`hχbarsupp` → 単一
+  `hdiffsupp : ((χ:CF).conj − (χ:CF)).support ⊆ supportInSubgroup A L`、内部 hSsupp/hdiff_zspan を差分集合に。
+  (2) caller 連鎖を伝播: `DadeChainStep`(5065) の hχsupp/hχbarsupp/haχ1supp → 差分形、`retarget_isCoherent_fromDade`(4946)、
+  `coherentPair_fromDade`(4787)。(3) consumer `peterfalvi_66_coherence_of_X_from_dade`(5249) が差分 support を供給できるか確認。
+  各 step build-green + AxiomsCheck。抽象 `peterfalvi_66_coherence_of_X`(3934) は不変。
+  **次 iter**: 計画(1) = `dadeOrthonormalCharacterImageFamily` の差分化 edit に着手 (まず DadeChainStep/retarget の
+  hχsupp 使用箇所も精読して signature 連鎖を確定してから編集、build-green 維持)。
