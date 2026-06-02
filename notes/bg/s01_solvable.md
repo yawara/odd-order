@@ -81,9 +81,13 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   inside `H` returns an invariant Hall subgroup containing `K.subgroupOf H`.
 - **Prop 1.5(b) recursive proper-overgroup frame added**: `proper_overgroup_branch_frame`
   now assembles the induction result inside `H` into the ambient Hall overgroup of `K`.
-- **Remaining Prop 1.5 blocker**: (b) the full induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup.  The remaining formal work is top-level induction
-  assembly and the final `H = G` conjugacy step inside `K M`.
+- **Prop 1.5(b) completed** as `aInvariant_piSubgroup_le_aInvariant_hall`: the proof inducts
+  on `Nat.card G`, pushes quotient induction through the preimage frame, uses the proper-overgroup
+  frame when the preimage is proper, and handles the `H = G` branch by complementing a minimal
+  normal `p`-subgroup `M` with an invariant Hall subgroup `Q`; Hall conjugacy inside `K ⊔ M`
+  gives an `A`-fixed conjugate of `Q` containing `K`.
+- **Prop 1.5 status**: (a), (b), (c), and (e) are implemented as Lean theorems; (d) remains a
+  no-wrapper direct use of `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`.
 
 ## TL;DR
 
