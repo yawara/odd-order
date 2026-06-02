@@ -8,6 +8,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
@@ -1578,6 +1579,14 @@ set_option linter.style.longLine false in
 -- for `N ⊴ G`, `N ≤ K ≤ G` (= `sumNonInflatedDegreeSq` + Lagrange index arithmetic).  The mmd
 -- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
+
+-- Coefficientwise Galois transport for class functions and S07 coherence data.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSpan_image
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSupportedSpan_image
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IntegralCharacterMap.galoisTransport
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.galoisTransport
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the

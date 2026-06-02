@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.Data.Fin.Tuple.Sort
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
@@ -163,6 +164,82 @@ theorem zSupportedSpan_adjoinPair_subset_span
 the class-function level. -/
 abbrev IntegralCharacterMap (L G : Type*) [Group L] [Group G] :=
   ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ
+
+namespace ClassFunction
+
+open OddOrder.RepresentationTheory.ClassFunction
+
+/-- A coefficientwise automorphism sends `ℤ[S]` into the span of the transformed set. -/
+theorem mapRingEquiv_mem_zSpan_image (σ : ℂ ≃+* ℂ)
+    {S : Set (ClassFunction L ℂ)} {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSpan (L := L) S) :
+    mapRingEquiv σ φ ∈ zSpan (L := L) (mapRingEquiv σ '' S) := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      exact Submodule.subset_span ⟨x, hx, rfl⟩
+  | zero =>
+      rw [mapRingEquiv_zero]
+      exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+      rw [mapRingEquiv_add]
+      exact Submodule.add_mem _ hx hy
+  | smul n x _ hx =>
+      rw [mapRingEquiv_zsmul]
+      exact Submodule.smul_mem _ n hx
+
+/-- Pulling a transformed-span element back by the inverse automorphism lands in the original
+integral span. -/
+theorem mapRingEquiv_symm_mem_zSpan_of_mem_image (σ : ℂ ≃+* ℂ)
+    {S : Set (ClassFunction L ℂ)} {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSpan (L := L) (mapRingEquiv σ '' S)) :
+    mapRingEquiv σ.symm φ ∈ zSpan (L := L) S := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      rcases hx with ⟨y, hy, rfl⟩
+      simpa using (Submodule.subset_span hy : y ∈ zSpan (L := L) S)
+  | zero =>
+      rw [mapRingEquiv_zero]
+      exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+      rw [mapRingEquiv_add]
+      exact Submodule.add_mem _ hx hy
+  | smul n x _ hx =>
+      rw [mapRingEquiv_zsmul]
+      exact Submodule.smul_mem _ n hx
+
+/-- A coefficientwise automorphism preserves support while transporting `ℤ[S]` to
+`ℤ[σS]`. -/
+theorem mapRingEquiv_mem_zSupportedSpan_image (σ : ℂ ≃+* ℂ)
+    {S : Set (ClassFunction L ℂ)} {A : Set L} {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) S A) :
+    mapRingEquiv σ φ ∈ zSupportedSpan (L := L) (mapRingEquiv σ '' S) A :=
+  ⟨mapRingEquiv_mem_zSpan_image σ hφ.1, by simpa [support_mapRingEquiv] using hφ.2⟩
+
+/-- Pullback form of `mapRingEquiv_mem_zSupportedSpan_image`. -/
+theorem mapRingEquiv_symm_mem_zSupportedSpan_of_mem_image (σ : ℂ ≃+* ℂ)
+    {S : Set (ClassFunction L ℂ)} {A : Set L} {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSupportedSpan (L := L) (mapRingEquiv σ '' S) A) :
+    mapRingEquiv σ.symm φ ∈ zSupportedSpan (L := L) S A :=
+  ⟨mapRingEquiv_symm_mem_zSpan_of_mem_image σ hφ.1,
+    by simpa [support_mapRingEquiv] using hφ.2⟩
+
+end ClassFunction
+
+namespace IntegralCharacterMap
+
+/-- Transport an integral character map by coefficientwise automorphism on source and target. -/
+def galoisTransport (σ : ℂ ≃+* ℂ) (τ : IntegralCharacterMap L G) :
+    IntegralCharacterMap L G :=
+  (ClassFunction.mapRingEquivLinear (G := G) σ).comp
+    (τ.comp (ClassFunction.mapRingEquivLinear (G := L) σ.symm))
+
+@[simp] theorem galoisTransport_apply (σ : ℂ ≃+* ℂ) (τ : IntegralCharacterMap L G)
+    (φ : ClassFunction L ℂ) :
+    galoisTransport σ τ φ =
+      ClassFunction.mapRingEquiv σ (τ (ClassFunction.mapRingEquiv σ.symm φ)) :=
+  rfl
+
+end IntegralCharacterMap
 
 /-- The normalized inner-product part of an integral isometry. -/
 structure IsIntegralIsometry (τ : IntegralCharacterMap L G)
@@ -1366,6 +1443,58 @@ theorem inner_eq_on_supported (hτ : IsCoherent τ S A)
     ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ := by
   rw [← hτ.extension_agrees hφ, ← hτ.extension_agrees hψ]
   exact hτ.extension_inner_eq φ ψ hφ.1 hψ.1
+
+/-- Coherence is invariant under coefficientwise automorphisms that commute with `star`.
+
+The coherent set is transported to `σS`, and the base map is conjugated as
+`σ ∘ τ ∘ σ⁻¹`.  This is the reusable Galois-coherence transport needed by Peterfalvi
+(5.9.a)-style arguments; it does not assume a capstone-specific theorem about which
+irreducible characters form the set. -/
+def galoisTransport (hτ : IsCoherent τ S A) (σ : ℂ ≃+* ℂ)
+    (hσ : ∀ z : ℂ, σ (star z) = star (σ z)) :
+    IsCoherent (IntegralCharacterMap.galoisTransport (L := L) (G := G) σ τ)
+      (ClassFunction.mapRingEquiv σ '' S) A := by
+  classical
+  have hσsymm : ∀ z : ℂ, σ.symm (star z) = star (σ.symm z) := by
+    intro z
+    apply σ.injective
+    rw [RingEquiv.apply_symm_apply, hσ, RingEquiv.apply_symm_apply]
+  refine
+    { nonzero := ?_
+      extension := IntegralCharacterMap.galoisTransport (L := L) (G := G) σ hτ.extension
+      extension_inner_eq := ?_
+      extends_on_supported := ?_ }
+  · rcases hτ.nonzero with ⟨φ, hφ, hφne⟩
+    exact ⟨ClassFunction.mapRingEquiv σ φ,
+      ClassFunction.mapRingEquiv_mem_zSupportedSpan_image σ hφ,
+      (ClassFunction.mapRingEquiv_ne_zero_iff σ φ).mpr hφne⟩
+  · intro φ ψ hφ hψ
+    have hφ' : ClassFunction.mapRingEquiv σ.symm φ ∈ zSpan (L := L) S :=
+      ClassFunction.mapRingEquiv_symm_mem_zSpan_of_mem_image σ hφ
+    have hψ' : ClassFunction.mapRingEquiv σ.symm ψ ∈ zSpan (L := L) S :=
+      ClassFunction.mapRingEquiv_symm_mem_zSpan_of_mem_image σ hψ
+    calc
+      ClassFunction.inner
+          (IntegralCharacterMap.galoisTransport (L := L) (G := G) σ hτ.extension φ)
+          (IntegralCharacterMap.galoisTransport (L := L) (G := G) σ hτ.extension ψ)
+          = σ (ClassFunction.inner
+              (hτ.extension (ClassFunction.mapRingEquiv σ.symm φ))
+              (hτ.extension (ClassFunction.mapRingEquiv σ.symm ψ))) := by
+            rw [IntegralCharacterMap.galoisTransport_apply,
+              IntegralCharacterMap.galoisTransport_apply,
+              ClassFunction.mapRingEquiv_inner σ hσ]
+      _ = σ (ClassFunction.inner (ClassFunction.mapRingEquiv σ.symm φ)
+              (ClassFunction.mapRingEquiv σ.symm ψ)) := by
+            rw [hτ.extension_inner_eq _ _ hφ' hψ']
+      _ = ClassFunction.inner φ ψ := by
+            rw [← ClassFunction.mapRingEquiv_inner (G := L) σ hσ
+              (ClassFunction.mapRingEquiv σ.symm φ) (ClassFunction.mapRingEquiv σ.symm ψ)]
+            simp
+  · intro φ hφ
+    have hφ' : ClassFunction.mapRingEquiv σ.symm φ ∈ zSupportedSpan (L := L) S A :=
+      ClassFunction.mapRingEquiv_symm_mem_zSupportedSpan_of_mem_image σ hφ
+    rw [IntegralCharacterMap.galoisTransport_apply, IntegralCharacterMap.galoisTransport_apply,
+      hτ.extends_on_supported _ hφ']
 
 end IsCoherent
 
