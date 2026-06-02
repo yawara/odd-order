@@ -91,6 +91,19 @@ theorem conjugatesIntoSet_subset_conjugatesInto (H : Subgroup G) (A : Set ↥H) 
   · rintro ⟨x, hx⟩
     exact ⟨x, hx, Set.mem_univ _⟩
 
+/-- If H is normal, being conjugate into H is the same as lying in H. -/
+theorem conjugatesInto_eq_of_normal (H : Subgroup G) [H.Normal] :
+    conjugatesInto H = H := by
+  ext g
+  constructor
+  · rintro ⟨x, hx⟩
+    have hg := (‹H.Normal›.conj_mem' (x⁻¹ * g * x) hx x⁻¹)
+    have hg' : x * (x⁻¹ * g * x) * x⁻¹ ∈ H := by simpa using hg
+    have heq : x * (x⁻¹ * g * x) * x⁻¹ = g := by group
+    exact heq ▸ hg'
+  · intro hg
+    exact ⟨1, by simpa using hg⟩
+
 /-- The `x`-summand in the classical induction formula. It is zero unless
 `x⁻¹ * g * x ∈ H`. -/
 def induceTerm (H : Subgroup G) (θ : ClassFunction ↥H k) (x g : G) : k :=
@@ -318,6 +331,21 @@ theorem support_induce_subset_conjugatesInto (H : Subgroup G)
   intro g hg
   by_contra hnot
   exact hg (induce_eq_zero_of_not_conjugatesInto θ hnot)
+
+/-- If H is normal, Ind_H^G θ vanishes outside H. -/
+theorem induce_eq_zero_of_not_mem_normal {H : Subgroup G} [H.Normal]
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) {g : G} (hg : g ∉ H) :
+    induce H θ g = 0 := by
+  exact induce_eq_zero_of_not_conjugatesInto θ (by
+    simpa [conjugatesInto_eq_of_normal H] using hg)
+
+/-- If H is normal, Ind_H^G θ is supported on H. -/
+theorem support_induce_subset_of_normal (H : Subgroup G) [H.Normal]
+    [Invertible (Nat.card H : k)] (θ : ClassFunction ↥H k) :
+    (induce H θ).support ⊆ H := by
+  intro g hg
+  have hconj := support_induce_subset_conjugatesInto H θ hg
+  simpa [conjugatesInto_eq_of_normal H] using hconj
 
 theorem induce_eq_zero_of_not_conjugatesIntoSet {H : Subgroup G} {A : Set ↥H}
     [Invertible (Nat.card H : k)] {θ : ClassFunction ↥H k} (hθ : θ.support ⊆ A)

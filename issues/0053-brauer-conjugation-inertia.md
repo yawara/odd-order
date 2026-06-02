@@ -55,15 +55,29 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - `not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le` と
     `inertia_eq_of_freeAction` で、非自明 `θ : Irr H` について
     `ClassFunction.inertia (θ : ClassFunction H ℂ) = H` に束ねた。
-- [ ] **Layer D — wiring** (T6 proper / 別 commit): free-action を Frobenius (case c1) 等から放電し
-  6.34 + `index_H_eq_card_W1` + difference-support engine で `Y` coherent。
+- [x] **Layer D1 — Frobenius case wiring** (2026-06-02): `IsFrobeniusGroup.centralizer_kernel_le` を
+  `inertia_eq_of_freeAction` に渡す `inertia_eq_of_frobeniusGroup` と、6.34 まで合成した
+  `isIrreducibleCharacter_induce_of_frobeniusGroup` を `InducedIrreducible.lean` に landing。
+  これで (6.8.c1) Frobenius case の `θ≠1 ⟹ Ind_H^L θ ∈ Irr L` prerequisite は直接呼べる。
+- [x] **Layer D2a — T6 degree wiring** (2026-06-02):
+  SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one を S08 に landing。
+  degree-one source θ について (Ind_H^L θ)(1)=|W₁| を直接呼べる。
+- [x] **Layer D2b — T6 difference-support wiring** (2026-06-02):
+  support_sub_induce_subset_sharpImage_of_degree_one を S08 に landing。
+  normal H の induced support と degree-one equality から (Ind θ_i - Ind θ_0).support ⊆ H^# を直接呼べる。
+- [ ] **Layer D2c — T6 family / engine wiring**: Y=S(Hprime) の family construction、
+  coherentEqualDegree_fromDade への接続、および case c2 側の inertia discharge。
 
 ## 完了条件
 
 - Layer A/B/C が sorry/axiom 無 (`#assert_only_allowed_axioms` 3 axiom 全 allowlist)、`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑。
   - 2026-06-02: Layer B 追加後 `lake build OddOrder` 緑。
 - ✅ 2026-06-02: `inertia_eq_of_freeAction` (centralizer-free-action 仮説 + θ≠1 ⟹ inertia θ = H) を statement 化・証明。
-- これと 6.34 で (6.8) T6 の `Y` family 既約性が機械的に従う (Layer D は別 issue/commit でも可)。
+- ✅ 2026-06-02: Frobenius-group case を `inertia_eq_of_frobeniusGroup` /
+  `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
+- ✅ 2026-06-02: S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| を packaging。
+- ✅ 2026-06-02: S08 で degree-one induced differences の H^# support を packaging。
+- 残: Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
 
 ## 参照
 
