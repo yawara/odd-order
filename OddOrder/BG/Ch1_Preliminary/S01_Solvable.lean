@@ -827,6 +827,39 @@ private theorem lift_hall_from_invariant_overgroup
       rw [Subgroup.mem_subgroupOf]
       exact hk)
 
+
+/-- Assemble the recursive proper-overgroup branch of BG Prop. 1.5(b).
+
+This is the branch after quotient induction has produced an invariant overgroup `H` of `K`
+with π-free index.  If the main induction hypothesis has already produced, inside `H`, an
+invariant Hall subgroup containing `K.subgroupOf H`, then this packages the lift back to `G`.
+-/
+private theorem proper_overgroup_branch_frame
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K)
+    (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
+    (hK_le_H : K ≤ H)
+    (hIH_H : ∀ {Ksub : Subgroup H},
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π Ksub →
+        OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict Ksub →
+        ∃ L : Subgroup H,
+          OddOrder.Isaacs.Ch03.IsHallSubgroup π L ∧
+            OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict L ∧ Ksub ≤ L) :
+    ∃ Lg : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π Lg ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ Lg ∧ K ≤ Lg := by
+  let Ksub : Subgroup H := K.subgroupOf H
+  have hKsub_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π Ksub :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hK_le_H hK_pi
+  have hKsub_inv : OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict Ksub :=
+    isAInvariant_subgroupOf_restrict hH_inv hK_inv
+  obtain ⟨L, hL_hall, hL_inv, hKsub_le_L⟩ := hIH_H hKsub_pi hKsub_inv
+  exact lift_hall_from_invariant_overgroup hH_inv hH_index hK_le_H
+    hL_hall hL_inv hKsub_le_L
+
 /-- A nontrivial finite group has a minimal nontrivial `A`-invariant normal subgroup. -/
 private theorem exists_minimal_normal_aInvariant
     {G A : Type*} [Group G] [Finite G] [Nontrivial G]

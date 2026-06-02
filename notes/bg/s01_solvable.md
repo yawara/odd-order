@@ -79,9 +79,11 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
 - **Prop 1.5(b) proper-overgroup lift added**: `coprime_card_subgroup_of_coprime` and
   `lift_hall_from_invariant_overgroup` package the recursive `H < G` branch once induction
   inside `H` returns an invariant Hall subgroup containing `K.subgroupOf H`.
+- **Prop 1.5(b) recursive proper-overgroup frame added**: `proper_overgroup_branch_frame`
+  now assembles the induction result inside `H` into the ambient Hall overgroup of `K`.
 - **Remaining Prop 1.5 blocker**: (b) the full induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup.  The remaining formal work is recursive assembly and
-  the final `H = G` conjugacy step inside `K M`.
+  inside an `A`-invariant Hall subgroup.  The remaining formal work is top-level induction
+  assembly and the final `H = G` conjugacy step inside `K M`.
 
 ## TL;DR
 
@@ -333,7 +335,7 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 1. **BG mmd セクション境界確認**: §1 末が L585 か明確に (推定値).
 2. **Peterfalvi [Is] 対応**: Peterfalvi が引く "Isaacs character theory" results (Thm 6.32, 6.5, 2.21 等) を mathlib `RepresentationTheory.Character` とマッチング — Phase 2b 着手時.
 3. **Goldschmidt citation**: BG Prop 1.15(b) の原 Goldschmidt 論文を Phase 2a 時点で確保するか (Isaacs Ch.3 で代替証明可か要確認).
-4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.  Minimal-normal, quotient/comap transfer, and proper-overgroup lift support are green; recursive assembly と `H = G` conjugacy branch が残る.
+4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.  Minimal-normal, quotient/comap transfer, proper-overgroup lift, and recursive proper-overgroup frame support are green; top-level induction assembly と `H = G` conjugacy branch が残る.
 5. **Prop 1.5(e)**: ✅ implemented as `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`; BG L412-L414 の `G = KH` を complementary Hall `IsComplement'` として形式化し, `[G,A] ≤ O_π(G)` を証明済み.
 
 ---
