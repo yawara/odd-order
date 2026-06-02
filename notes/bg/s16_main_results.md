@@ -10,14 +10,14 @@
 
 ## TL;DR — Theorem A-E が最小反例 G の局所構造の最終形
 
-§16 は本文 1 つの主結果 **Theorem B (Type I-V 分類)**、その周辺に **Theorem A (Sylow normalizer 性質), C (Case 二分法), D (Centralizer 分解), E (補助記号)** を配置した最終統合章。
+§16 は Theorems A--E で最大部分群の局所構造を再包装し、Proposition 16.1 と Theorems I--II で Type I--V / character-theory interface へ渡す最終統合章。
 
 **FT 構造**:
 - **Theorem A** (8 条件): M_σ（σ-部分群）と κ-部分群 K の基本構造
 - **Theorem B** (5 条件): U の Sylow と A(M)-M_σ の TI 性質
 - **Theorem C** (11 条件, K ≠ 1 時): K* (centralizer) と paired maximal M*
-- **Theorem D** (4 条件): M_σ の共役性 + R(x) (normalizer action)
-- **Theorem E** (補助): Z, Ẑ, Ĥ_M_σ の記号定義 + 補題 (A(M) 性質)
+- **Theorem D** (4 条件 + recovered tail): M_σ の共役性 + R(x) normal complement/action + escaping centralizer の Type I/II landing
+- **Theorem E** (3 条件): `\widetilde M = ⋃ xR(x)` の counting、`σ(M_i)` の `π(G)` 分割、`G#` の covering
 
 **Proposition 16.1**: M の Type (I, II, III, IV, V) 分類と A-E の対応を統合的に述べる重要補題. M_F = M_σ ⟺ Type I, II, V を確立.
 
@@ -59,7 +59,7 @@ M_σ = normal Hall subgroup on σ(M)-primes
 𝒞_Y(X) = {x^y | x ∈ X, y ∈ Y}  (conjugates by Y)
 ```
 
-### Part 2: Theorem A-E (pp.124-129, L4274-4316)
+### Part 2: Theorem A-E (pp.124-129, L4274-4388)
 
 #### **Theorem A** (L4274-4283) — 8 条件、最大部分群の基礎構造
 
@@ -130,7 +130,7 @@ Assume K ≠ 1. Then:
 - (7)-(9): **TI-subset covering**: Z, Ẑ の global embedding
 - (10)-(11): U 存在・非存在時の type 分化
 
-#### **Theorem D** (L4317-4323) — 4 条件、M_σ の共役性と R(x) normalizer
+#### **Theorem D** (L4317-4368) — 4 条件、M_σ の共役性と R(x) normalizer
 
 ```
 1. Whenever two elements of M_σ are conjugate in G, they are conjugate in M
@@ -140,6 +140,8 @@ Assume K ≠ 1. Then:
 4. If x ∈ M_σ# ∧ C_G(x) ⊄ M, then C_G(x) lies in unique maximal N = N(x) of G:
    R(x) = C_{N_σ}(x), N_σ = N_F
    x ∈ A(N) - N_σ, N ∈ ℳ_𝓕 ∪ ℳ_{𝓟₂}
+   M ∩ N complements N_σ in N
+   if N ∈ ℳ_{𝓟₂}, then M ∈ ℳ_𝓟, M is Frobenius with cyclic complement, and M_F is not TI
 ```
 
 **要点**:
@@ -147,15 +149,22 @@ Assume K ≠ 1. Then:
 - (3): **Thompson R(x) subgroup**: normalizer action on maximal cosets
 - (4): **Centralizer localization** — C_G(x) ⊆ unique maximal (Type I or II)
 
-#### **Theorem E** (L4285-4287) — 補助記号定義
+#### **Theorem E** (L4370-4388) — `\widetilde M` counting and `σ` partition
 
 ```
-Z = K × K*
-Ẑ = Z - (K ∪ K*)
-Ĥ_{M_σ} = {a ∈ M | C_{M_σ}(a) ≠ 1}
-A(M) = Ĥ_{M_σ} ∩ UM_σ
-A_0(M) = Ĥ_{M_σ} - 𝒞_M(K#)
+For each x ∈ M_σ#, take R(x) from Theorem D and define
+  \widetilde M = ⋃_{x∈M_σ#} xR(x).
+
+1. |𝒞_G(\widetilde M)| = (|M_σ| - 1)|G:M|.
+2. If M_i represent maximal-subgroup conjugacy classes, then π(G) is the
+   disjoint union of the σ(M_i).
+3. The union of the 𝒞_G(\widetilde M_i) is disjoint; it covers G# when
+   ℳ_𝓟 is empty, and otherwise G# is the disjoint union of that union and
+   𝒞_G(Ẑ) for M ∈ ℳ_𝓟.
 ```
+
+Lean status: `theoremE_sigma_partition_and_counting` now records these three clauses.
+The older `aSets_support_slice` remains as a separate Peterfalvi-facing A(M)/A_0(M) support surface, not as a replacement for Theorem E.
 
 ---
 
@@ -339,7 +348,7 @@ For M maximal, X ∈ {A(M), A_0(M)}, D = {x ∈ X# | C_G(x) ⊄ M}:
 | **C** | Prop 16.1, Thm 15.7(c) | §15, §14 | Type 𝓕, 𝓟 分類の基礎 |
 | **D** | Thm A, B, C | §16 | M_σ の global conjugacy property |
 | **D** | Thm 6.2 (normal-J via R(x)) | §6 | Normalizer stabilizer R(x) |
-| **E** | Thm A-D | §16 | Notation unification |
+| **E** | Lemma 14.5(c), Theorem 13.9, Corollary 14.9 | §14/§13 | `\widetilde M` counting, `σ` partition, `G#` covering |
 | **I** | Cor 15.3, 15.4 | §15 | Nilpotent Hall subgroup の normality |
 | **II** | Thm B(5), C(9), D(4) | §16 | TI-subset supporting subgroup system |
 
@@ -554,13 +563,11 @@ structure TheoremA_Structure (M : Subgroup G) where
 
 ## 미해결 사항 및 TODO
 
-### 1. mmd 공백 부분 (L4324-4326)
+### 1. recovered §16 page gap
 
-**Status**: MISSING_PAGE_EMPTY:139, 140 (BG PDF pp.139-140)
+**Status**: resolved in `references/bg/local-analysis.mmd` at L4366--4388. The recovered text contains the Theorem D(4) tail and the full Theorem E statement.
 
-**영향범위**: Theorem E 증명 → Proposition 16.1 도입 사이
-
-**조치**: PDF 직접 참고 (mmd skip 복구 필요)
+**Lean status**: `S16_MainResults.lean` exposes the recovered D(4) tail and a named `theoremE_sigma_partition_and_counting` endpoint. Remaining work is proof filling from Lemma 14.5(c), Theorem 13.9, and Corollary 14.9, not source recovery.
 
 ### 2. App.A (p-Stability) 의존성
 

@@ -36,8 +36,9 @@ local-analysis spine remains independent of character-theory hypotheses.
 - Theorem D uses Corollary 15.3(b), Lemma 12.17, Theorem 14.4, Theorem A(8),
   and Corollary 15.9 (mmd L4412-L4414).
 - Theorem E is the counting endpoint from Lemma 14.5(c), Theorem 13.9, and
-  Corollary 14.9 (mmd L4416-L4418). The current Lean `aSets_support_slice` records
-  the `A(M)`/`A_0(M)` support slice; the sigma-counting surface remains in §14.
+  Corollary 14.9 (mmd L4416-L4418). The Lean surface below keeps the
+  `\widetilde M`/representative-family partition visible here; it does not replace the
+  §14 proof gates by a Peterfalvi type hypothesis.
 - Proposition 16.1 is the BG-local bridge from the §14 families to the shared
   Type I--V predicates. This file may mention Peterfalvi as a consumer, but it must
   not import or assume Peterfalvi character-theory structure.
@@ -69,6 +70,34 @@ def ASet (M U : Subgroup G) : Set G :=
 part of `hat M_sigma` outside the `M`-conjugacy saturation of `K#`. -/
 def A0Set (M K : Subgroup G) : Set G :=
   hatMsigma M \ conjClassSet (sharpSubgroup K)
+
+/-- BG Theorem D(3) action language: `R` acts sharply transitively by conjugation on
+a set of maximal subgroups. -/
+def ConjSharplyTransitiveOn (R : Subgroup G) (S : Set (Subgroup G)) : Prop :=
+  ∀ A ∈ S, ∀ B ∈ S, ∃! r : G, r ∈ R ∧ B = MulAut.conj r • A
+
+/-- The set of conjugates of `M` that contain `x`, from BG Theorem D(3). -/
+def maximalConjugatesContaining (M : Subgroup G) (x : G) : Set (Subgroup G) :=
+  {N | ∃ g : G, N = MulAut.conj g • M ∧ x ∈ N}
+
+/-- BG Theorem D(3) local data for `R(x)`: `C_M(x)` is a Hall subgroup of
+`C_G(x)`, and `R` is a normal complement acting sharply transitively on the
+maximal conjugates that contain `x`. -/
+def RData (M : Subgroup G) (x : G) (R : Subgroup G) : Prop :=
+  let Cx : Subgroup G := Subgroup.centralizer ({x} : Set G)
+  Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) ((M ⊓ Cx).subgroupOf Cx) ∧
+    (R.subgroupOf Cx).Normal ∧
+    Subgroup.IsComplement' ((M ⊓ Cx).subgroupOf Cx) (R.subgroupOf Cx) ∧
+    ConjSharplyTransitiveOn R (maximalConjugatesContaining M x)
+
+/-- BG Theorem E notation: `xR(x)` as a left coset, represented as a set. -/
+def rCoset (x : G) (R : G → Subgroup G) : Set G :=
+  {y | ∃ r ∈ R x, y = x * r}
+
+/-- BG Theorem E notation:
+`\widetilde M = \bigcup_{x \in M_sigma#} x R(x)`. -/
+def tildeM (M : Subgroup G) (R : G → Subgroup G) : Set G :=
+  {y | ∃ x ∈ sigmaSharp M, y ∈ rCoset x R}
 
 /-- BG's `pi*`: the primes whose Sylow subgroup is cyclic, or has the cyclic
 centralizer splitting described in the type-I alternatives. -/
@@ -148,32 +177,76 @@ theorem theoremC_paired_structure [Finite G]
       (U = ⊥ → ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q) := by
   sorry
 
-/-- **BG Theorem D** (mmd L4317): conjugacy and centralizer control for
-`M_sigma`, including the `R(x)` subgroup and the unique maximal subgroup attached
-to escaping centralizers. -/
+/-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
+control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
+action, and the unique maximal subgroup attached to escaping centralizers.
+
+The final conjunct is the recovered BG D(4) tail: `M ∩ N` complements `N_sigma` in
+`N`, and if `N` is type `P2` then `M` is type `P`, Frobenius with cyclic complement,
+and `M_F` is not TI. -/
 theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
     (∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
       (∀ g : G, g ∉ M → IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ (MulAut.conj g • M))) ∧
-      (∀ x : G, x ∈ sigmaSharp M →
-        ∃ R : Subgroup G,
-          R ≤ Subgroup.centralizer ({x} : Set G) ∧
-          Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
-            (R.subgroupOf (Subgroup.centralizer ({x} : Set G)))) ∧
+      (∀ x : G, x ∈ sigmaSharp M → ∃ R : Subgroup G, RData M x R) ∧
       (∀ x : G, x ∈ sigmaSharp M → ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
-        ∃! N : Subgroup G,
-          N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
-          S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
-          x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
-          (S14.IsTypeF N ∨ S14.IsTypeP2 N)) := by
+        ∃ R : Subgroup G,
+          RData M x R ∧
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+            S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
+            x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
+            (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+            Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+              ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
+            (S14.IsTypeP2 N →
+              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+                ∃ E : Subgroup G,
+                  E ≤ M ∧ IsCyclic ↥E ∧
+                  Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+                    (E.subgroupOf M) ∧
+                  OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+                    ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) := by
+  sorry
+
+/-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
+`\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
+`\widetilde M` has the stated size, the representative maximal subgroups give a
+disjoint partition of `π(G)` by the `σ(M_i)`, and the nonidentity elements of `G`
+are covered by the corresponding `\widetilde M_i` pieces, with the additional
+`\widehat Z` piece exactly in the type-P case.
+
+Proof gates: Lemma 14.5(c) for the cardinal formula, Theorem 13.9 for the
+`σ(M_i)` disjoint union, and Corollary 14.9 for the final covering. -/
+theorem theoremE_sigma_partition_and_counting [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (R : Subgroup G → G → Subgroup G) (reps : Set (Subgroup G))
+    (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi) :
+    Nat.card (conjClassSet (tildeM M (R M))) =
+        (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1) * M.index ∧
+      (∀ p : ℕ, p ∈ (Nat.card G).primeFactors ↔
+        ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi) ∧
+      (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
+        OddOrder.BG.Ch3.S10.sigma Mi ∩ OddOrder.BG.Ch3.S10.sigma Mj = ∅) ∧
+      (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
+        conjClassSet (tildeM Mi (R Mi)) ∩ conjClassSet (tildeM Mj (R Mj)) = ∅) ∧
+      (let tildeG : Set G :=
+        {g | ∃ Mi : Subgroup G, Mi ∈ reps ∧ g ∈ conjClassSet (tildeM Mi (R Mi))}
+       (S14.maximalTypePFamily G = ∅ → sharpSubgroup (⊤ : Subgroup G) = tildeG) ∧
+        (S14.maximalTypePFamily G ≠ ∅ → S14.IsTypeP M →
+          sharpSubgroup (⊤ : Subgroup G) = tildeG ∪ conjClassSet (S14.zTilde K Kstar))) := by
   sorry
 
 /-- **BG §16 `A(M)`/`A_0(M)` support slice**: the auxiliary sets from this section
 have the TI and support properties used by the downstream character-theory interface.
-This is not the full BG Theorem E counting statement; that endpoint is represented by
-the §14 sigma-counting surfaces until `R(x)`/`M_tilde` data is encoded here. -/
+This is a separate Peterfalvi-facing slice, not a replacement for BG Theorem E; the
+full local counting/partition statement is `theoremE_sigma_partition_and_counting`. -/
 theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))

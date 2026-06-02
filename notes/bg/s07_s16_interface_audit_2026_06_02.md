@@ -9,12 +9,11 @@ local-analysis spine from §7 through §16. It is not a proof-completion report.
 Build command used after the latest interface edits:
 
 ```bash
-lake build OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma \
-  OddOrder.BG.Ch3_MaximalSubgroups.S12_E \
-  OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+lake build OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 ```
 
 Result: build succeeded. Existing `sorry` and pre-existing long-line/style warnings remain.
+A previous lane check also built `S10_MalphaMsigma`, `S12_E`, and `S16_MainResults` together.
 
 Import boundary checks:
 
@@ -45,7 +44,9 @@ Import boundary checks:
   Proposition 10.14(d) as a deferred upstream proof gate.
 - §14--§16 record the endpoint gate table from the BG mmd source. §16 treats
   Theorems A--E as BG-local packages and Proposition 16.1 as a bridge to shared
-  Type I--V predicates consumed downstream by Peterfalvi.
+  Type I--V predicates consumed downstream by Peterfalvi. The recovered Theorem D(4)
+  tail and the full Theorem E `\widetilde M` counting/partition statement are now
+  explicit Lean surfaces, separate from the Peterfalvi-facing `A(M)` support slice.
 
 ## Remaining mathematical proof gates
 
@@ -61,7 +62,8 @@ exposes rather than hides.
   Proposition 12.4(b), Corollary 12.16(b), and the cyclic `β(M)'` intersection tail of
   Lemma 12.17.
 - BG §13--§16: proof terms remain `sorry`; endpoint statements are interface surfaces, not
-  completed local-analysis proofs.
+  completed local-analysis proofs. Theorem E now exposes its BG §14 proof gates instead
+  of being represented only by downstream support-set notation.
 
 Conclusion: after this pass, no Peterfalvi-driven assumption or hidden §4/§5 obligation was
 found in the BG §7--§16 interface. The remaining work is the exposed BG mathematical proof
