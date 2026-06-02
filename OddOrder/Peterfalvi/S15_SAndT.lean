@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
+import Mathlib.Algebra.BigOperators.ModEq
 
 /-!
 # Peterfalvi Section 15: The Subgroups S and T
@@ -343,6 +344,17 @@ theorem cyclotomic_quotient_odd {p q : ℕ} (hp : p.Prime)
   rw [← Nat.geomSum_eq hp.two_le q]
   rw [Nat.odd_iff, sum_range_pow_mod_two_eq hpodd, Nat.odd_iff.mp hqodd]
 
+/-- The `p ≡ 1 [MOD q]` divisibility part of **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_dvd_of_modEq_one {p q : ℕ} (hp : p.Prime)
+    (hpq : p ≡ 1 [MOD q]) :
+    q ∣ (p ^ q - 1) / (p - 1) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [← Nat.modEq_zero_iff_dvd]
+  have hterms : (∑ k ∈ Finset.range q, p ^ k) ≡ ∑ k ∈ Finset.range q, 1 [MOD q] :=
+    Nat.ModEq.sum fun k _ => by simpa using Nat.ModEq.pow k hpq
+  have hsum_one : (∑ k ∈ Finset.range q, 1 : ℕ) = q := by simp
+  exact hterms.trans (by simp [hsum_one])
+
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
 theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
@@ -353,7 +365,7 @@ theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
         Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) ∧
           ∀ x : ℕ, x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
   refine ⟨cyclotomic_quotient_odd hp hpodd hqodd, ?_, ?_⟩
-  · sorry
+  · exact cyclotomic_quotient_dvd_of_modEq_one hp
   · sorry
 
 /-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
