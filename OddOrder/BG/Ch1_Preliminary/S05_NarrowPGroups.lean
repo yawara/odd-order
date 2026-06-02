@@ -1923,36 +1923,35 @@ private theorem inf_centralizer_omega1UpperCentralTwo_eq_bot_of_narrow
       hp hpg h3 (exists_card_prime_centralizer_pRank_le_two_of_narrow hp hpg h3 hnarrow))
     hScard hSrank
 
-/-- **BG Theorem 5.3(d) core (cyclicity)**: if `r(C_R(S)) ≤ 2` and `S ∩ T = 1`, then
-`C_T(S) = C_R(S) ∩ T` is cyclic (mmd L1865-1867). Otherwise `C_T(S)` contains an
+/-- **Rank-2 centralizer squeeze (general form)**: if `|S| = p`, `r(C_R(S)) ≤ 2`, and
+`K ≤ C_R(S)` meets `S` trivially, then `K` is cyclic. Otherwise `K` contains an
 `E_{p²}` (existence half of Lemma 4.5(a),
 `S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`); joining it with the
 order-`p` factor `S` — which centralizes it — yields an elementary abelian subgroup of
-order `p³` inside `C_R(S)`, contradicting `r(C_R(S)) ≤ 2`. -/
-private theorem isCyclic_inf_centralizer_omega1UpperCentralTwo_of_centralizer_pRank_le_two
+order `p³` inside `C_R(S)`, contradicting `r(C_R(S)) ≤ 2`.
+
+Instances: `C_T(S)` for Thm 5.3(d) (mmd L1865-1867) and `C_H(R₀)` for Thm 5.5
+(mmd L1901-1904). -/
+private theorem isCyclic_of_le_centralizer_of_inf_eq_bot_of_pRank_le_two
     [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
-    {S : Subgroup R} (hScard : Nat.card S = p)
+    {S K : Subgroup R} (hScard : Nat.card S = p)
     (hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2)
-    (hST : S ⊓ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) = ⊥) :
-    IsCyclic ↥(Subgroup.centralizer (S : Set R) ⊓
-      Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)) := by
+    (hK_le : K ≤ Subgroup.centralizer (S : Set R)) (hSK : S ⊓ K = ⊥) :
+    IsCyclic ↥K := by
   classical
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
-  let T : Subgroup R := Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)
-  let H : Subgroup R := C ⊓ T
-  change IsCyclic ↥H
   by_contra hnc
-  -- `Ω₁`-level input: an `E_{p²}` inside the noncyclic `p`-group `H` (Lem 4.5(a) half).
+  -- `Ω₁`-level input: an `E_{p²}` inside the noncyclic `p`-group `K` (Lem 4.5(a) half).
   obtain ⟨E', hE'_elem, hE'_card⟩ :=
     OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
-      (hpg.to_subgroup H) hp hnc
+      (hpg.to_subgroup K) hp hnc
   -- Push `E'` down to a subgroup of `R`.
-  let E : Subgroup R := E'.map H.subtype
-  have hE_le_H : E ≤ H := Subgroup.map_subtype_le E'
-  have hE_elem : E.IsElementaryAbelian p := hE'_elem.map H.subtype_injective
+  let E : Subgroup R := E'.map K.subtype
+  have hE_le_K : E ≤ K := Subgroup.map_subtype_le E'
+  have hE_elem : E.IsElementaryAbelian p := hE'_elem.map K.subtype_injective
   have hE_card : Nat.card E = p ^ 2 := by
     have h := Nat.card_congr
-      (Subgroup.equivMapOfInjective E' H.subtype H.subtype_injective).toEquiv
+      (Subgroup.equivMapOfInjective E' K.subtype K.subtype_injective).toEquiv
     dsimp [E]
     rw [← h]
     exact hE'_card
@@ -1962,7 +1961,7 @@ private theorem isCyclic_inf_centralizer_omega1UpperCentralTwo_of_centralizer_pR
     intro s hs
     rw [Subgroup.mem_centralizer_iff]
     intro e he
-    exact (Subgroup.mem_centralizer_iff.mp (hE_le_H he).1 s hs).symm
+    exact (Subgroup.mem_centralizer_iff.mp (hK_le (hE_le_K he)) s hs).symm
   let F : Subgroup R := S ⊔ E
   have hF_elem : F.IsElementaryAbelian p :=
     Subgroup.IsElementaryAbelian.sup_of_le_centralizer hS_elem hE_elem hS_le_cent_E
@@ -1972,13 +1971,13 @@ private theorem isCyclic_inf_centralizer_omega1UpperCentralTwo_of_centralizer_pR
     rw [Subgroup.mem_centralizer_iff]
     intro t ht
     exact congrArg Subtype.val (hS_elem.comm ⟨t, ht⟩ ⟨s, hs⟩)
-  have hE_le_C : E ≤ C := fun e he => (hE_le_H he).1
+  have hE_le_C : E ≤ C := fun e he => hK_le (hE_le_K he)
   have hF_le_C : F ≤ C := sup_le hS_le_C hE_le_C
   have hSE_inf : S ⊓ E = ⊥ := by
     refine le_antisymm ?_ bot_le
     intro x hx
-    have hxST : x ∈ S ⊓ T := ⟨hx.1, (hE_le_H hx.2).2⟩
-    rwa [hST] at hxST
+    have hxSK : x ∈ S ⊓ K := ⟨hx.1, hE_le_K hx.2⟩
+    rwa [hSK] at hxSK
   -- Compute `p³ ≤ |F|` inside the commutative group `F`.
   have hS_le_F : S ≤ F := le_sup_left
   have hE_le_F : E ≤ F := le_sup_right
@@ -2022,6 +2021,23 @@ private theorem isCyclic_inf_centralizer_omega1UpperCentralTwo_of_centralizer_pR
   have h3rank : 3 ≤ pRank C p := hlog_ge.trans (le_pRank Fsub hFsub_elem)
   have : (3 : ℕ) ≤ 2 := h3rank.trans hSrank
   omega
+
+/-- **BG Theorem 5.3(d) core (cyclicity)**: `C_T(S) = C_R(S) ∩ T` is cyclic
+(mmd L1865-1867); instance of the general rank-2 squeeze with `K := C_R(S) ⊓ T`. -/
+private theorem isCyclic_inf_centralizer_omega1UpperCentralTwo_of_centralizer_pRank_le_two
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    {S : Subgroup R} (hScard : Nat.card S = p)
+    (hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2)
+    (hST : S ⊓ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) = ⊥) :
+    IsCyclic ↥(Subgroup.centralizer (S : Set R) ⊓
+      Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)) := by
+  refine isCyclic_of_le_centralizer_of_inf_eq_bot_of_pRank_le_two hp hpg hScard hSrank
+    inf_le_left ?_
+  refine le_antisymm ?_ bot_le
+  intro x hx
+  have hxST : x ∈ S ⊓ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) :=
+    ⟨hx.1, hx.2.2⟩
+  rwa [hST] at hxST
 
 /-- **BG Theorem 5.3** (narrow 特徴づけ): 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。すると
 `R` が narrow ⇔ `ℰ²(R) ∩ ℰ*(R) ≠ ∅` (位数 `p²` の elem-ab で位数 `p³` の elem-ab に含まれない
@@ -2175,6 +2191,244 @@ private theorem quotient_opCore_comm_and_not_dvd_of_isPGroup_commutator
     rw [← ha]
     exact (QuotientGroup.eq_one_iff a).mpr (hP_le ha_mem)
   exact hx_ne hx_one
+
+/-- A characteristic subgroup of exponent `p` is nontrivial as a subgroup
+(`exponent ⊥ = 1 ≠ p`). Shared input for the `H ∩ Z(R) ≠ 1` steps of Thm 5.5. -/
+private theorem ne_bot_of_exponent_eq_prime
+    {p : ℕ} [Fact p.Prime] {H : Subgroup R} (hHexp : Monoid.exponent ↥H = p) :
+    H ≠ ⊥ := by
+  intro hbot
+  have h1 : Monoid.exponent ↥H = 1 := by
+    haveI : Subsingleton ↥H := by rw [hbot]; infer_instance
+    exact Monoid.exp_eq_one_of_subsingleton
+  rw [hHexp] at h1
+  exact (Fact.out : p.Prime).one_lt.ne' h1
+
+/-- **BG Theorem 5.5 support (Brick A)**: under `r(R) ≥ 3`, a narrow witness `S = R₀`
+(order `p`, `C_R(S) = S ⊔ K` with `K` cyclic) cannot lie inside the Thompson critical
+subgroup `H` (characteristic, `⁅H,⊤⁆ ≤ Z(H)`, exponent `p`).
+
+Otherwise `U = S ⊔ Z(H)` is a normal (via `⁅H,⊤⁆ ≤ Z(H) ≤ U`) elementary abelian
+subgroup of `C_R(S)` of order `p` — forcing `S = U ⊇ H ∩ Z(R) ≠ 1`, so `S ≤ Z(R)` and
+`C_R(S) = R` has rank `≥ 3` — or of order `p²` — feeding Lemma 5.1(b) and producing an
+`SCN₃` element inside `C_R(S)`. Both contradict `r(C_R(S)) ≤ 2`. mmd L1893-1900. -/
+private theorem not_narrow_witness_le_critical
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p)
+    {S K H : Subgroup R} (hScard : Nat.card S = p) (hKcyc : IsCyclic K)
+    (hSKinf : S ⊓ K = ⊥) (hCeq : Subgroup.centralizer (S : Set R) = S ⊔ K)
+    (hHchar : H.Characteristic)
+    (hHcomm : ⁅H, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center ↥H).map H.subtype)
+    (hHexp : Monoid.exponent ↥H = p) :
+    ¬ S ≤ H := by
+  classical
+  haveI : H.Characteristic := hHchar
+  intro hSH
+  have hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 :=
+    pRank_centralizer_le_two_of_narrow_witness hp hpg hScard hKcyc hSKinf hCeq
+  have hS_elem : S.IsElementaryAbelian p := isElementaryAbelian_of_card_prime hScard
+  -- `Z(H)` mapped into `R`, and `U = S ⊔ Z(H)`.
+  set ZH : Subgroup R := (Subgroup.center ↥H).map H.subtype with hZH_def
+  have hZH_le_H : ZH ≤ H := Subgroup.map_subtype_le _
+  have hZH_elem : ZH.IsElementaryAbelian p := by
+    constructor
+    · rintro ⟨x, hx⟩ ⟨y, hy⟩
+      obtain ⟨x', hx'_center, rfl⟩ := hx
+      obtain ⟨y', hy'_center, rfl⟩ := hy
+      apply Subtype.ext
+      show (x' : R) * (y' : R) = (y' : R) * (x' : R)
+      exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hy'_center x')
+    · rintro ⟨x, hx⟩
+      apply Subtype.ext
+      obtain ⟨x', _, rfl⟩ := hx
+      have : x' ^ p = 1 := by
+        rw [← hHexp]
+        exact Monoid.pow_exponent_eq_one x'
+      calc ((⟨(x' : R), _⟩ : ↥ZH) ^ p : ↥ZH).val = (x' : R) ^ p := rfl
+        _ = ((x' ^ p : ↥H) : R) := rfl
+        _ = 1 := by rw [this]; rfl
+  have hS_le_cent_ZH : S ≤ Subgroup.centralizer (ZH : Set R) := by
+    intro s hs
+    rw [Subgroup.mem_centralizer_iff]
+    rintro z hz
+    obtain ⟨z', hz'_center, rfl⟩ := hz
+    exact (congrArg Subtype.val
+      (Subgroup.mem_center_iff.mp hz'_center ⟨s, hSH hs⟩)).symm
+  set U : Subgroup R := S ⊔ ZH with hU_def
+  have hU_elem : U.IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.sup_of_le_centralizer hS_elem hZH_elem hS_le_cent_ZH
+  have hS_le_C : S ≤ Subgroup.centralizer (S : Set R) := by
+    intro s hs
+    rw [Subgroup.mem_centralizer_iff]
+    intro t ht
+    exact congrArg Subtype.val (hS_elem.comm ⟨t, ht⟩ ⟨s, hs⟩)
+  have hZH_le_C : ZH ≤ Subgroup.centralizer (S : Set R) := by
+    rintro z hz
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    obtain ⟨z', hz'_center, rfl⟩ := hz
+    exact congrArg Subtype.val
+      (Subgroup.mem_center_iff.mp hz'_center ⟨s, hSH hs⟩)
+  have hU_le_C : U ≤ Subgroup.centralizer (S : Set R) := sup_le hS_le_C hZH_le_C
+  -- `U ⊴ R` via `⁅U,⊤⁆ ≤ ⁅H,⊤⁆ ≤ Z(H) ≤ U`.
+  have hU_le_H : U ≤ H := sup_le hSH hZH_le_H
+  haveI hU_normal : U.Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff]
+    rw [eq_top_iff]
+    apply OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le
+    calc ⁅U, (⊤ : Subgroup R)⁆ ≤ ⁅H, (⊤ : Subgroup R)⁆ :=
+          Subgroup.commutator_mono hU_le_H le_rfl
+      _ ≤ ZH := hHcomm
+      _ ≤ U := le_sup_right
+  -- `|U| = p ^ d` with `1 ≤ d ≤ 2`.
+  obtain ⟨d, hd⟩ := IsPGroup.iff_card.mp (hpg.to_subgroup U)
+  have hd_ge : 1 ≤ d := by
+    rcases Nat.eq_zero_or_pos d with h0 | h
+    · exfalso
+      rw [h0, pow_zero] at hd
+      have hcard_le : Nat.card S ≤ 1 := by
+        rw [← hd]
+        exact Subgroup.card_le_of_le le_sup_left
+      rw [hScard] at hcard_le
+      have := (Fact.out : p.Prime).one_lt
+      omega
+    · exact h
+  have hd_le : d ≤ 2 := by
+    let Usub : Subgroup ↥(Subgroup.centralizer (S : Set R)) :=
+      U.subgroupOf (Subgroup.centralizer (S : Set R))
+    have hUsub_elem : Usub.IsElementaryAbelian p :=
+      IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le_C).symm hU_elem
+    have hUsub_card : Nat.card Usub = Nat.card U :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU_le_C).toEquiv
+    have hlog := (pRank_le_iff.mp hSrank) Usub hUsub_elem
+    rw [hUsub_card, hd, Nat.log_pow (Fact.out : p.Prime).one_lt] at hlog
+    exact hlog
+  -- `H ∩ Z(R) ≠ 1` supplies a nontrivial central element of `H`.
+  obtain ⟨z, hzH, hzZR, hz_ne⟩ :=
+    OddOrder.GroupTheory.exists_mem_center_of_normal_ne_bot hpg (K := H)
+      (ne_bot_of_exponent_eq_prime hHexp)
+  have hz_ZH : z ∈ ZH := by
+    have hz_center : (⟨z, hzH⟩ : ↥H) ∈ Subgroup.center ↥H := by
+      rw [Subgroup.mem_center_iff]
+      intro h
+      exact Subtype.ext (Subgroup.mem_center_iff.mp hzZR (h : R))
+    exact ⟨⟨z, hzH⟩, hz_center, rfl⟩
+  interval_cases d
+  -- `d = 1`: `U = S`, so `S` contains `z`, is central, and `C_R(S) = ⊤` has rank ≥ 3.
+  · have hUS : S = U := by
+      refine Subgroup.eq_of_le_of_card_ge le_sup_left (le_of_eq ?_)
+      rw [hd, pow_one, hScard]
+    have hzU : z ∈ U := Subgroup.mem_sup_right hz_ZH
+    have hzS : z ∈ S := by rw [hUS]; exact hzU
+    have hzpow_eq : Subgroup.zpowers z = S := by
+      refine Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hzS) ?_
+      have hdvd : Nat.card (Subgroup.zpowers z) ∣ Nat.card S :=
+        Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hzS)
+      have hne1 : Nat.card (Subgroup.zpowers z) ≠ 1 := by
+        rw [Nat.card_zpowers]
+        intro h1
+        exact hz_ne (orderOf_eq_one_iff.mp h1)
+      rw [hScard] at hdvd ⊢
+      rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hdvd with h | h
+      · exact absurd h hne1
+      · omega
+    have hS_le_center : S ≤ Subgroup.center R := by
+      rw [← hzpow_eq]
+      exact Subgroup.zpowers_le.mpr hzZR
+    have hCtop : Subgroup.centralizer (S : Set R) = ⊤ := by
+      rw [eq_top_iff]
+      intro x _
+      rw [Subgroup.mem_centralizer_iff]
+      intro s hs
+      exact (Subgroup.mem_center_iff.mp (hS_le_center hs) x).symm
+    let toC : R →* ↥(Subgroup.centralizer (S : Set R)) :=
+      { toFun := fun r => ⟨r, by rw [hCtop]; exact trivial⟩
+        map_one' := rfl
+        map_mul' := fun _ _ => rfl }
+    have htoC_inj : Function.Injective toC := fun x y hxy => congrArg Subtype.val hxy
+    have hRrank_le : pRank R p ≤ pRank ↥(Subgroup.centralizer (S : Set R)) p :=
+      pRank_le_of_injective (f := toC) htoC_inj
+    omega
+  -- `d = 2`: `U` is a normal `E_{p²}`, so Lemma 5.1(b) puts an `SCN₃` element in `C_R(S)`.
+  · obtain ⟨A, hA_scn3, hUA⟩ :=
+      mem_scn3_of_normal_isElementaryAbelian_card_prime_sq hp hpg h3 U hU_elem hd
+    have hA_le_CS : A ≤ Subgroup.centralizer (S : Set R) := by
+      intro a ha
+      rw [Subgroup.mem_centralizer_iff]
+      intro s hs
+      have hsA : s ∈ A := hUA (Subgroup.mem_sup_left hs)
+      haveI := hA_scn3.isSCN.isMulCommutative
+      exact congrArg Subtype.val (mul_comm (⟨s, hsA⟩ : ↥A) ⟨a, ha⟩)
+    have hArank_le : pRank ↥A p ≤ pRank ↥(Subgroup.centralizer (S : Set R)) p :=
+      pRank_le_of_injective (f := Subgroup.inclusion hA_le_CS)
+        (Subgroup.inclusion_injective hA_le_CS)
+    have h3A : 3 ≤ pRank ↥A p := hA_scn3.le_pRank
+    omega
+
+/-- **BG (5.5) `|C_H(S)| = p`** (Brick B): for a narrow witness `S` not inside the
+Thompson critical `H` (exponent `p`), the centralizer `C_H(S) = H ⊓ C_R(S)` has order
+exactly `p`: it is cyclic of exponent `p` (rank-2 squeeze), and contains the
+nontrivial `H ∩ Z(R)`. mmd L1901-1904, (5.5). -/
+private theorem card_inf_critical_centralizer_eq_prime
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    {S K H : Subgroup R} (hScard : Nat.card S = p) (hKcyc : IsCyclic K)
+    (hSKinf : S ⊓ K = ⊥) (hCeq : Subgroup.centralizer (S : Set R) = S ⊔ K)
+    (hHchar : H.Characteristic) (hHexp : Monoid.exponent ↥H = p)
+    (hSH : ¬ S ≤ H) :
+    Nat.card ↥(H ⊓ Subgroup.centralizer (S : Set R)) = p := by
+  classical
+  haveI : H.Characteristic := hHchar
+  have hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 :=
+    pRank_centralizer_le_two_of_narrow_witness hp hpg hScard hKcyc hSKinf hCeq
+  have hSH_bot : S ⊓ H = ⊥ := by
+    by_contra hne
+    exact hSH (le_of_inf_ne_bot_of_card_prime hScard hne)
+  have hScap : S ⊓ (H ⊓ Subgroup.centralizer (S : Set R)) = ⊥ := by
+    refine le_antisymm ?_ bot_le
+    intro x hx
+    have : x ∈ S ⊓ H := ⟨hx.1, hx.2.1⟩
+    rwa [hSH_bot] at this
+  have hcyc : IsCyclic ↥(H ⊓ Subgroup.centralizer (S : Set R)) :=
+    isCyclic_of_le_centralizer_of_inf_eq_bot_of_pRank_le_two hp hpg hScard hSrank
+      inf_le_right hScap
+  -- cyclic of exponent dividing `p` ⇒ order divides `p`
+  have hexp_dvd : Monoid.exponent ↥(H ⊓ Subgroup.centralizer (S : Set R)) ∣ p := by
+    apply Monoid.exponent_dvd_of_forall_pow_eq_one
+    intro x
+    apply Subtype.ext
+    have hxH : (x : R) ∈ H := x.2.1
+    have : ((⟨(x : R), hxH⟩ : ↥H) ^ p : ↥H) = 1 := by
+      rw [← hHexp]
+      exact Monoid.pow_exponent_eq_one _
+    calc ((x ^ p : ↥(H ⊓ Subgroup.centralizer (S : Set R))) : R)
+        = (x : R) ^ p := rfl
+      _ = ((⟨(x : R), hxH⟩ : ↥H) ^ p : ↥H) := rfl
+      _ = 1 := by rw [this]; rfl
+  have hcard_dvd : Nat.card ↥(H ⊓ Subgroup.centralizer (S : Set R)) ∣ p := by
+    haveI := hcyc
+    calc Nat.card ↥(H ⊓ Subgroup.centralizer (S : Set R))
+        = Monoid.exponent ↥(H ⊓ Subgroup.centralizer (S : Set R)) :=
+          IsCyclic.exponent_eq_card.symm
+      _ ∣ p := hexp_dvd
+  -- the nontrivial `H ∩ Z(R)` lands in `C_H(S)`
+  obtain ⟨z, hzH, hzZR, hz_ne⟩ :=
+    OddOrder.GroupTheory.exists_mem_center_of_normal_ne_bot hpg (K := H)
+      (ne_bot_of_exponent_eq_prime hHexp)
+  have hz_mem : z ∈ H ⊓ Subgroup.centralizer (S : Set R) := by
+    refine ⟨hzH, ?_⟩
+    show z ∈ Subgroup.centralizer (S : Set R)
+    rw [Subgroup.mem_centralizer_iff]
+    intro s _
+    exact Subgroup.mem_center_iff.mp hzZR s
+  have hcard_ne1 : Nat.card ↥(H ⊓ Subgroup.centralizer (S : Set R)) ≠ 1 := by
+    intro h1
+    have hbot : H ⊓ Subgroup.centralizer (S : Set R) = ⊥ :=
+      Subgroup.eq_bot_of_card_eq _ h1
+    rw [hbot, Subgroup.mem_bot] at hz_mem
+    exact hz_ne hz_mem
+  rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hcard_dvd with h | h
+  · exact absurd h hcard_ne1
+  · exact h
 
 /-- **BG Theorem 5.5**: 奇素数 `p`, narrow な有限 `p`-群 `R`, `A` を `R` の自己同型群の solvable
 odd 位数部分群 (`φ : A →* MulAut R` faithful, `[IsSolvable A]`, `Odd |A|`) とする。すると:
