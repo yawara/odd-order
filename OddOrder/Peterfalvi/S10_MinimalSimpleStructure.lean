@@ -26,10 +26,10 @@ Peterfalvi-numbered entry points and the main scaffold statements.  Proofs of
 BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
 
 The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
-has now been recovered; this file records the `R(x)`/thickened-support notation
-and the Type-II TI endpoint, and leaves the remaining Dade-hypothesis and BG
-Theorem E covering statements as precise TODOs until their lower-level
-interfaces are available.
+has now been recovered; this file records the `R(x)`/thickened-support notation,
+the Type-II TI endpoint, and the BG Theorem E covering interface.  The remaining
+Dade-hypothesis interface is left as a precise TODO until the lower-level
+section hypotheses have stable names.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -202,11 +202,101 @@ noncomputable abbrev typePThickenedA (L M : Subgroup G) (data : TypePData M) :=
 noncomputable abbrev typePThickenedA0 (L M : Subgroup G) (data : TypePData M) :=
   OddOrder.GroupTheory.typePThickenedA0 L M data
 
+
+/-- **Peterfalvi (8.17)**: BG Theorem E data for a set of conjugacy-class
+representatives of maximal subgroups.
+
+The field `ι` indexes the representatives `M_i`.  The prime-factor fields record
+the statement that `π(G)` is the disjoint union of the `π((M_i)_s)`, while
+`thickenedA1_card` records
+`|⋃_{x ∈ A_1(M_i)} (x R(x))^G| = (|(M_i)_s| - 1) |G : M_i|`. -/
+structure BGTheoremECoverData (G : Type*) [Group G] where
+  /-- Indexing type for the representative maximal subgroups. -/
+  ι : Type*
+  /-- The representative maximal subgroup `M_i`. -/
+  reps : ι → Subgroup G
+  /-- The Peterfalvi type attached to `M_i`. -/
+  tau : ι → PeterfalviType
+  /-- The representatives form a finite family. -/
+  finite_index : Fintype ι
+  /-- Every representative is maximal. -/
+  maximal : ∀ i : ι, reps i ∈ maximalSubgroups G
+  /-- Every representative has its indicated Peterfalvi type. -/
+  typed : ∀ i : ι, HasPeterfalviType (tau i) (reps i)
+  /-- Every maximal subgroup is conjugate to one of the representatives. -/
+  representatives :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      ∃ i : ι, ∃ g : G, MulAut.conj g • M = reps i
+  /-- The representatives have no repeated conjugacy classes. -/
+  nonconjugate :
+    ∀ i j : ι, (∃ g : G, MulAut.conj g • reps i = reps j) → i = j
+  /-- `π(G)` is covered by the `π((M_i)_s)`. -/
+  primeFactors_cover :
+    ∀ p : ℕ, p.Prime →
+      (p ∈ (Nat.card G).primeFactors ↔
+        ∃ i : ι, p ∈ (Nat.card ↥(mainSubgroup (reps i) (tau i))).primeFactors)
+  /-- The `π((M_i)_s)` are pairwise disjoint. -/
+  primeFactors_disjoint :
+    ∀ i j : ι, i ≠ j →
+      Disjoint
+        ((Nat.card ↥(mainSubgroup (reps i) (tau i))).primeFactors : Finset ℕ)
+        ((Nat.card ↥(mainSubgroup (reps j) (tau j))).primeFactors : Finset ℕ)
+  /-- The cardinality formula for the thickened `A_1(M_i)` sets. -/
+  thickenedA1_card :
+    ∀ i : ι,
+      Nat.card ↥(thickenedA1 (reps i) (reps i) (tau i)) =
+        (Nat.card ↥(mainSubgroup (reps i) (tau i)) - 1) * (reps i).index
+
+/-- **Peterfalvi (8.17), case (8.8.a)**: when all maximal subgroups are type I,
+`G#` is the disjoint union of the thickened `A_1(M_i)` sets. -/
+structure BGTheoremETypeICovering (data : BGTheoremECoverData G) : Prop where
+  /-- The thickened `A_1(M_i)` sets cover all nonidentity elements of `G`. -/
+  cover_nonidentity :
+    sharpSubgroup (⊤ : Subgroup G) =
+      ⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+  /-- The cover by thickened `A_1(M_i)` sets is disjoint. -/
+  pairwise_disjoint_thickened :
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
+      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+
+/-- **Peterfalvi (8.17), case (8.8.b)**: in the two-exceptional-subgroup case,
+`G#` is covered by the thickened `A_1(M_i)` sets together with the conjugates of
+the exceptional `W#`. -/
+structure BGTheoremENonTypeICovering (data : BGTheoremECoverData G) where
+  /-- The exceptional subgroup whose nonidentity conjugates supplement the cover. -/
+  W : Subgroup G
+  /-- The thickened `A_1(M_i)` sets and the conjugates of `W#` cover `G#`. -/
+  cover_nonidentity :
+    sharpSubgroup (⊤ : Subgroup G) =
+      (⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)) ∪
+        conjClassSet (sharpSubgroup W)
+  /-- The thickened `A_1(M_i)` part of the cover is disjoint. -/
+  pairwise_disjoint_thickened :
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
+      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+  /-- The exceptional part is disjoint from every thickened `A_1(M_i)`. -/
+  exceptional_disjoint_thickened :
+    ∀ i : data.ι,
+      Disjoint (conjClassSet (sharpSubgroup W))
+        (thickenedA1 (data.reps i) (data.reps i) (data.tau i))
+
+/-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
+interface.
+
+This statement deliberately does not prove BG Theorem E.  It records the exact
+data Peterfalvi uses after (8.14): the `π(G)` partition by the `M_i_s`, the
+cardinality of each thickened `A_1(M_i)`, and the appropriate `G#` cover in the
+two cases from (8.8). -/
+theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ∃ data : BGTheoremECoverData G,
+      BGTheoremETypeICovering data ∨ Nonempty (BGTheoremENonTypeICovering data) := by
+  sorry
+
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
 The proof uses the recovered (8.14)--(8.17) support notation and BG Theorem E
-covering facts.  Those interfaces are still recorded below as TODOs, so this
-remains the usable endpoint of the block for downstream files. -/
+covering facts.  It remains the usable endpoint of the block for downstream
+files. -/
 theorem support_mutual_exclusion [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G) :
@@ -219,11 +309,5 @@ theorem support_mutual_exclusion [Finite G]
 -- `M = N_G(A)` for `A = A_0(M), A(M), A_1(M)`, and that the relevant Dade
 -- hypotheses hold with `L=M`, `H(a)=R(a)`, `K=M_prime`, and `H=M_F` or `M_s`.
 --
--- TODO (Peterfalvi (8.17)): add the BG Theorem E interface.  The PDF-recovered
--- statement says that for conjugacy-class representatives of maximal subgroups:
--- (a) `pi(G)` is the disjoint union of the `pi((M_i)_s)`; (b) the thickened
--- `A_1(M_i)` has cardinal `(|(M_i)_s|-1) |G:M_i|`; and (c) `G#` is the
--- disjoint union of these thickened `A_1(M_i)` sets in case (8.8.a), while in
--- case (8.8.b) the union also includes the conjugates of `W#`.
 
 end OddOrder.Peterfalvi.S10
