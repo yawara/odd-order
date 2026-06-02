@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.SetTheory.Cardinal.Finite
+import OddOrder.GroupTheory.MaximalSubgroup
 
 /-!
 # The fixed minimal counterexample `G` (BG §7)
@@ -62,6 +63,22 @@ variable {G : Type*} [Group G] [Finite G]
 theorem nontrivial (hG : IsMinimalSimpleOdd G) : Nontrivial G :=
   have : IsSimpleGroup G := hG.simple
   inferInstance
+
+/-- Every proper subgroup of a minimal counterexample is solvable. -/
+theorem solvable_of_lt_top (hG : IsMinimalSimpleOdd G) (M : Subgroup G) (hM : M < ⊤) :
+    IsSolvable M :=
+  hG.properSolvable M hM
+
+/-- Every maximal subgroup of a minimal counterexample is solvable. -/
+theorem solvable_of_isCoatom (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : IsCoatom M) :
+    IsSolvable M :=
+  hG.solvable_of_lt_top M hM.lt_top
+
+/-- The `ℳ`-membership form of `solvable_of_isCoatom`. -/
+theorem solvable_of_mem_maximalSubgroups (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G) :
+    IsSolvable M :=
+  hG.solvable_of_isCoatom (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM)
 
 end IsMinimalSimpleOdd
 

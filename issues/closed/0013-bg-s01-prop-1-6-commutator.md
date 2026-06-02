@@ -17,11 +17,11 @@ Prop 1.5(d) と Ch.4 の commutator/coprime action API に依存する。
 
 ## やること
 
-- [ ] BG Prop 1.6(a)-(e) の statement を mmd で確認し、Lean で扱いやすい形に分ける。
-- [ ] `[G,A]` の既存表現 (`actionCommutator` など) との対応を決める。
-- [ ] Prop 1.6(a)-(c) を実装する。
-- [ ] abelian case の direct product decomposition (d)(e) を実装する。
-- [ ] Prop 1.5 との依存関係を issue 0012 に明記する。
+- [x] BG Prop 1.6(a)-(e) の statement を mmd で確認し、Lean で扱いやすい形に分ける。
+- [x] `[G,A]` の既存表現 (`actionCommutator` など) との対応を決める。
+- [x] Prop 1.6(a)-(c) を実装する。
+- [x] abelian case の direct product decomposition (d)(e) を実装する。
+- [x] Prop 1.5 との依存関係を issue 0012 に明記する。
 
 ## 進捗 (2026-05-30, bg-parallel-frontier workflow + 本人確認)
 
@@ -30,10 +30,10 @@ Prop 1.5(d) と Ch.4 の commutator/coprime action API に依存する。
 - **(a) `G = C_G(A)[G,A]`** → `Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top` ✅ sorry-free (no-wrapper)
 - **(b) `[G,A,A]=[G,A]`** → `Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one` ✅ sorry-free
 - **(e) abelian p群 + p'作用** → `Isaacs.Ch04` §4D ✅ sorry-free
-- **(c) `[G,A,A]=1 ⇒ [G,A]=1`** → docstring「未実装」。(b) の系として 1 行で従う見込みだが明示 decl 無し。
-- **(d) abelian 直積 `G = C_G(A) × [G,A]`** → docstring「存在予定」。(a) + `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` (Ch04:3396) から構成可能と見込まれる。
+- **(c) `[G,A,A]=1 ⇒ [G,A]=1`** → `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` ✅ sorry-free; Ch04 Lem 4.29 の Γ-form equality から導出。
+- **(d) abelian 直積 `G = C_G(A) × [G,A]`** → `fixedPoints_isComplement_actionCommutator_of_abelian` ✅ sorry-free; Ch04 Lem 4.28 の sup と Thm 4.34 の trivial intersection を `Subgroup.IsComplement'` として package。
 
-→ **(a)(b)(e) done, (c)(d) 未確定**。本 issue は **open 維持** (workflow の verify は `Main:3396/3442` を見て「全部 done」と早合点したが docstring が否定)。(c)(d) の decl 化 or doc-only 判断は §1B (Prop 1.5 = issue 0012) 本格着手時にまとめて行う。FT クリティカル経路上、§1B が gate するのは §7 (Prop 1.5 経由) であって Prop 1.6 単独ではない。
+→ **Prop 1.6(a)-(e) resolved**。Public BG-facing declarations are present for (c)(d); (a)(b)(e) remain no-wrapper/direct Ch04 references as recorded in the S01 table.
 
 ## 完了条件
 

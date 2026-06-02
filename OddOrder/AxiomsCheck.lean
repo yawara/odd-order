@@ -29,6 +29,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -683,6 +684,11 @@ set_option linter.style.longLine false in
 -- `[G : H] · θ(1)`.  All `|G|` conjugates `x⁻¹ · 1 · x = 1` lie in `H`, so every summand is
 -- `θ(1)`; dividing by `|H|` and using `|G| = [G:H]·|H|` (`Subgroup.index_mul_card`) leaves `[G:H]`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_one
+-- RepresentationTheory (induction support): if H is normal, then conjugates into H are exactly
+-- elements of H, so Ind_H^G θ vanishes outside H and is supported on H.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.conjugatesInto_eq_of_normal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_of_normal
 -- RepresentationTheory (Peterfalvi (1.6.a) value core): for a normal subgroup `A ⊴ G` with
 -- `A ≤ H` on which `θ` is constant `= c`, every term of the induction sum at `a ∈ A` is `c`
 -- (conjugates `x⁻¹ a x` stay in `A ≤ H` by normality), so `Ind_H^G θ(a) = |G|·c·|H|⁻¹`.
@@ -1075,8 +1081,34 @@ set_option linter.style.longLine false in
 -- BG §4 Lem 4.7 hard dir = **G** Thm 5.4.15(i) (precursor 1, issue 0051): p odd 非自明 p-群 R で
 -- SCN₃(R)=∅ ⇒ pRank R ≤ 2. Gorenstein Lemma 4.14 + GL(≤2,p) rank squeeze。§5 / Thm 4.16 の gate.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.pRank_le_two_of_scn3_empty
+-- BG §4 Lem 4.17 (§4G): p odd, r(R)≤2, A ≤ Aut R faithful odd ⇒ A' は p-群。Thm 1.13 critical +
+-- Thm 1.8 Burnside (elementwise) + Prop 4.8 + Thm 2.6 GL(2,p) engine。§5 Thm 5.5(a)/Thm 4.18 の gate。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
+-- BG §4 Thm 4.18 (§4H): G solvable odd, p∣|G|, r_p(G)≤2 ⇒ (a) p は |G/O_{p'}| の最大素因子
+-- (b) p=3∨p最小 ⇒ normal p-complement (c) G' が normal p-complement (d) G' の p'-部分群 ⊆ O_{p'}(G')
+-- (e) G/O_{p',p} abelian p'-群。Hall-Higman 1.2.3 (= G Thm 6.3.2) + Lem 4.17 + Lem 4.13。§5 Thm 5.6/5.7 の gate。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.solvable_structure_of_pRank_le_two
 -- BG §5 Lem 5.1(a): p odd 有限 p-群 R, r(R)≥3 ⇒ SCN₃(R)≠∅ (= Lem 4.7 hard dir の対偶)。§5 着手。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank
+-- BG §5 Lem 5.2: E∈ℰ²∩ℰ* ⇒ E⊄T ∧ (|Ω₁(Z(R))|=p ∧ W=Ω₁(Z₂(R))∈ℰ²) ∧ [R:T]=p (T=C_R(W))。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.lemma52
+-- BG §5 Thm 5.3: r(R)≥3 ⇒ (narrow ⟺ ℰ²(R)∩ℰ*(R)≠∅)。⇐ は 5.3(d) の分解論法で witness 構成。
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
+-- BG §5 Thm 5.3(d): narrow, |S|=p, r(C_R(S))≤2 ⇒ C_T(S) cyclic ∧ S∩R'=S∩T=1 ∧ C_R(S)=S×C_T(S)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+-- BG §5 Cor 5.4: r(R)≥3 ⇒ (narrow ⟺ ∃S, |S|=p ∧ r(C_R(S))≤2)。
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
+-- BG §5 Thm 5.5 (§5 最重量): p odd, R narrow, A ≤ Aut R solvable odd ⇒ (a) A/O_p(A) abelian p'-群
+-- (b) r≥3 で p'-元の位数 ∣ p-1 (critical H_i 降鎖 + Lem 1.9 stability) (c) |A|=q prime ∤ p(p-1) で
+-- q ∣ (p+1)/2 (Lem 4.14) + R=[R,A] 非可換なら |R|=p³ (Thm 4.16 Blackburn + Aut(C_{p^t}) totient)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.solvableAut_of_narrow
+-- BG §5 Thm 5.6: G solvable odd, S narrow Sylow p (r(S)≥3 なら p-length one 仮定) ⇒ Thm 4.18 と
+-- 同じ結論 5 連。r(S)≤2 は Sylow-rank 橋 (pRank_le_pRank_sylow) + Thm 4.18; r(S)≥3 は
+-- Ḡ=G/O_{p'} で S̄=O_p(Ḡ) が唯一の Sylow → Thm 5.5(a)(b) を Lem 4.17/4.13 の代替に使う
+-- core56 + 共通 assembly (structure_of_quotient_commutator_le_opCore)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_sylow_solvable_structure
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
@@ -1655,5 +1687,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.inertia_eq_of_freeAction
+-- Frobenius-group specialization: centralizer-kernel property from Isaacs Ch.6 discharges inertia.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inertia_eq_of_frobeniusGroup
 -- [Is] Thm 6.34 capstone: H ⊴ G, θ ∈ Irr H, I_G(θ) = H  ⟹  Ind_H^G θ ∈ Irr G.
-#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
+-- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup

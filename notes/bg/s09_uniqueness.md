@@ -311,3 +311,13 @@ def CentralJHelper (M : Subgroup G) : Subgroup G :=
 **形式化予定**: Phase 2a 第 3 波（§8 完成後）.  
 **本ノート確度**: ★★★★☆ (mmd full read, overview cross-check, §8-§10 context confirm).
 
+---
+
+## Lean API status (2026-06-02 lane B6)
+
+Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`.
+
+- §9 intentionally introduces no new local definitions: it consumes the shared `IsUniquelyMaximal`/`hInvariant` API, §7 `scn3Global`, and §8 `fittingInG`.
+- Shared uniqueness API landed in `OddOrder/GroupTheory/MaximalSubgroup.lean`: `IsUniquelyMaximal.uniqueMaximalSubgroup`, its membership/coatom/le accessors, equality of maximal overgroups, and `maximalSubgroupsContaining_eq_singleton`.
+- Shared `hInvariant`/`hInvariantStar` destructors landed in `OddOrder/GroupTheory/AInvariantPiSubgroups.lean`, so §9 proofs can project ambient containment, normalizer containment, pi-subgroup status, and star maximality without unfolding definitions by hand.
+- Remaining §9 `sorry`s are exactly Theorem 9.1, Corollary 9.2, Corollary 9.3, Lemma 9.4, Lemma 9.5, Theorem 9.6, and the `E^2 - E*` particular case. They remain hard because they depend on the unlanded §7/§8 chain, BG §6 Theorem 6.2, BG §5 Lemma 5.1, and BG §4 rank/centralizer inputs; no Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.

@@ -55,6 +55,44 @@ theorem isNarrow_of_pRank_le_two {p : ℕ} {R : Type*} [Group R] (h : pRank R p 
     IsNarrow p R :=
   Or.inl h
 
+/-- **`IsNarrow` is invariant under group isomorphism**: transport the rank bound or the
+narrow witness `(R₀, R₁)` along `e : R ≃* R'`. Used to move narrowness between a Sylow
+subgroup and its isomorphic images (BG Thm 5.6: `S ≅ S̄ ≤ G/O_{p'}(G)`,
+`S̄ = O_p(Ḡ)`). -/
+theorem IsNarrow.of_mulEquiv {p : ℕ} {R R' : Type*} [Group R] [Group R'] [Finite R]
+    (e : R ≃* R') (h : IsNarrow p R) : IsNarrow p R' := by
+  haveI : Finite R' := Finite.of_equiv R e.toEquiv
+  rcases h with hrank | ⟨R₀, R₁, hcard, hcyc, hinf, hcent⟩
+  · exact Or.inl (le_trans
+      (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective) hrank)
+  · refine Or.inr ⟨R₀.map e.toMonoidHom, R₁.map e.toMonoidHom, ?_, ?_, ?_, ?_⟩
+    · rw [← hcard]
+      exact (Nat.card_congr
+        (Subgroup.equivMapOfInjective R₀ e.toMonoidHom e.injective).toEquiv).symm
+    · haveI := hcyc
+      exact isCyclic_of_surjective _ (e.toMonoidHom.subgroupMap_surjective R₁)
+    · rw [← Subgroup.map_inf R₀ R₁ e.toMonoidHom e.injective, hinf, Subgroup.map_bot]
+    · have hmap_cent :
+          Subgroup.centralizer ((R₀.map e.toMonoidHom : Subgroup R') : Set R') =
+            (Subgroup.centralizer (R₀ : Set R)).map e.toMonoidHom := by
+        ext x
+        constructor
+        · intro hx
+          have hx' := Subgroup.mem_centralizer_iff.mp hx
+          refine ⟨e.symm x, ?_, by simp⟩
+          rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+          intro r hr
+          apply e.injective
+          rw [map_mul, map_mul]
+          simp only [MulEquiv.apply_symm_apply]
+          exact hx' (e r) ⟨r, hr, rfl⟩
+        · rintro ⟨y, hy, rfl⟩
+          rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff] at hy
+          rw [Subgroup.mem_centralizer_iff]
+          rintro _ ⟨r, hr, rfl⟩
+          rw [← map_mul, ← map_mul, hy r hr]
+      rw [hmap_cent, hcent, Subgroup.map_sup]
+
 /-- **`E*(R)`: maximal elementary abelian subgroup** (BG §5 p.45). A subgroup `E ≤ R` is
 `p`-elementary abelian and is contained in no strictly larger `p`-elementary abelian
 subgroup of `R`.

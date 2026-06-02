@@ -27,7 +27,8 @@ L2131-2314, **6 結果** (Lem 7.1 + Thm 7.2/7.3/7.4/7.6 + Prop 7.5).
 
 ## 記法 (BG → repo)
 
-- `ℳ`/`ℳ(H)`/`𝒰` = `GroupTheory.MaximalSubgroup`; `ℋ_H(A;π)`/`ℋ*` = `GroupTheory.AInvariantPiSubgroups`。
+- `ℳ`/`ℳ(H)`/`𝒰` = `GroupTheory.MaximalSubgroup`。
+- `ℋ_H(A;π)`/`ℋ*` = `GroupTheory.AInvariantPiSubgroups`。
 - `ℋ_G*(A;q)` (H = G) = `hInvariantStar ⊤ A {q}`。
 - `π(A)` = `primesOf A`; `π'` = `(primesOf A)ᶜ`。`O_π(H)` を `G` 内に戻したもの = `opiCoreInG π H`。
 - `K = O_{π'}(C_G(A))` = `kSubgroup A`。`m(Z(A))` = `rank ↥(Subgroup.center ↥A)`。
@@ -77,6 +78,32 @@ def ConjTransitiveOn (K : Subgroup G) (S : Set (Subgroup G)) : Prop :=
 def scn3Global (p : ℕ) (G : Type*) [Group G] : Set (Subgroup G) :=
   {A | ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ IsSCN₃ p (A.subgroupOf (P : Subgroup G))}
 
+@[simp]
+theorem mem_scn3Global {p : ℕ} {A : Subgroup G} :
+    A ∈ scn3Global p G ↔
+      ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ IsSCN₃ p (A.subgroupOf (P : Subgroup G)) :=
+  Iff.rfl
+
+/-- Unpack global `SCN₃(p)` membership into the Sylow subgroup that witnesses it. -/
+theorem exists_sylow_of_mem_scn3Global {p : ℕ} {A : Subgroup G}
+    (hA : A ∈ scn3Global p G) :
+    ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ IsSCN₃ p (A.subgroupOf (P : Subgroup G)) :=
+  hA
+
+/-- Global `SCN₃(p)` membership also gives the `SCN₂` input used in Proposition 7.5. -/
+theorem exists_scn2_sylow_of_mem_scn3Global {p : ℕ} {A : Subgroup G}
+    (hA : A ∈ scn3Global p G) :
+    ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)) := by
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  exact ⟨P, hAP, IsSCN_n.mono (by norm_num) hAscn3⟩
+
+/-- The rank bound carried by global `SCN₃(p)` membership. -/
+theorem exists_three_le_pRank_of_mem_scn3Global {p : ℕ} {A : Subgroup G}
+    (hA : A ∈ scn3Global p G) :
+    ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ 3 ≤ pRank (A.subgroupOf (P : Subgroup G)) p := by
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  exact ⟨P, hAP, hAscn3.2⟩
+
 /-! ## Hypothesis 7.1 -/
 
 /-- **BG Hypothesis 7.1** (mmd L2141): `A` についての固定設定。`π = π(A)`,
@@ -93,6 +120,16 @@ structure Hypothesis71 (A : Subgroup G) : Prop where
   /-- (2): `A ⊆ X < G` なら `⟨ℋ_X(A;π')⟩ = O_{π'}(X)`。 -/
   generated_eq : ∀ X : Subgroup G, A ≤ X → X < ⊤ →
     sSup (hInvariant X A (primesOf A)ᶜ) = opiCoreInG (primesOf A)ᶜ X
+
+namespace Hypothesis71
+
+/-- The generated-subgroup equality from BG Hypothesis 7.1(2), as a named accessor. -/
+theorem generated_eq_of_le_of_lt_top {A X : Subgroup G} (hA : Hypothesis71 A)
+    (hAX : A ≤ X) (hX : X < ⊤) :
+    sSup (hInvariant X A (primesOf A)ᶜ) = opiCoreInG (primesOf A)ᶜ X :=
+  hA.generated_eq X hAX hX
+
+end Hypothesis71
 
 /-! ## Lemma 7.1 — 推移性の基底補題 -/
 

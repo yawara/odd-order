@@ -1,5 +1,17 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 2026-06-02 B7 foundation checkpoint
+
+Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S12_E.lean`.
+
+Concrete surfaces now present:
+- Definitions: `tau1`, `tau2`, `tau3`, and `SubgroupESetup` for `E` complement data and Hall `E₁/E₂/E₃`.
+- New API: membership rewrites for `tau1`/`tau2`/`tau3`, `tau_i ⊆ sigma(M)'` projections, rank/derived-prime projections for `tau_i`, disjointness helpers between `tau1` and `tau3`, named joins `E12`, `E23`, `E123`, and `SubgroupESetup` projection lemmas (`E_complement`, `E1_le_M`, `E2_le_M`, `E3_le_M`, `E12_le_E/M`, `E23_le_E/M`, `E123_le_E`).
+
+Current Lean inventory: 19 theorem-level `sorry`s remain in §12, matching the 19-result scaffold.
+
+Main proof blockers: §10 Hall/fusion/beta results, §11 exceptional maximal endpoints, BG Lemma 4.5/Thm 4.20, Proposition 1.6(d), Theorem 1.13, Theorem 3.7, and the Uniqueness Theorem. The `SubgroupESetup` fields intentionally do not include any of these hard conclusions.
+
 **スコープ**: BG §12 (pp.83–96), mmd L3023-3483, **19 結果** (そのうち主要 15 個).  
 形式化先 (予定): `OddOrder/BG/Ch3_MaximalSubgroups/S12_SubgroupE.lean` (2 ファイル分割の可能性大)  
 ROADMAP 上の位置: Phase 2a 第 4 波 (§10-§11 完成必須)  

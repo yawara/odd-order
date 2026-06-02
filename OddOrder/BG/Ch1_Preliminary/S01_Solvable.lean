@@ -490,14 +490,14 @@ Hall statements. Prop. 1.5(d) remains a no-wrapper direct use of Isaacs Cor. 3.2
 | BG | Isaacs §3E / §4D | Lean (本リポ) | 備考 |
 |---|---|---|---|
 | **Prop 1.5(a)** A-inv Hall 存在 | Hall-E + Hall-C + Lem 3.24(a) | `exists_aInvariant_hall` ✅ | Hall `π` 一般版 |
-| Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
+| **Prop 1.5(b)** A-inv π-sub ⊆ A-inv Hall | Hall induction + Glauberman conjugacy | `aInvariant_piSubgroup_le_aInvariant_hall` ✅ | minimal normal quotient induction + `H = G` complement branch |
 | **Prop 1.5(c)** A-inv Hall 共役 | Hall-C + Lem 3.24(b) | `aInvariant_hall_conj` ✅ | 共役元は `C_G(A)` |
 | **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
 | **Prop 1.5(e)** C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | Hall product + action commutator | `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` ✅ | BG L412-L414 を `IsComplement' K H` + `[G,A] ≤ H` で実装 |
 | **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
 | **Prop 1.6(b) [G,A,A]=[G,A]** | **Lem 4.29** | **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅ | **無 wrapper**: SemidirectProduct Γ-form |
-| Prop 1.6(c) [G,A,A]=1 ⇒ trivial | (Three-Sub Lem 系) | (未実装) | Ch.4 §4D 完成依存 |
-| Prop 1.6(d) abelian 直積分解 | **Thm 4.34 Fitting** | (Ch.4 §4D に存在予定) | abelian 仮定下 G = C_G(A) × [G, A] |
+| **Prop 1.6(c)** [G,A,A]=1 ⇒ trivial | Lem 4.29 | `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` ✅ | BG-facing consequence of Ch04 Γ-form equality |
+| **Prop 1.6(d)** abelian 直積分解 | **Thm 4.34 Fitting** | `fixedPoints_isComplement_actionCommutator_of_abelian` ✅ | complement form of `G = C_G(A) × [G,A]` |
 | **Prop 1.6(e) abelian p-群 + p'-A** | **Cor 4.35** | **`OddOrder.Isaacs.Ch04.*` (Ch.4 §4D 3422 行)** ✅ | **無 wrapper**: G abelian p-群 + A p'-群 fixes order-p elements |
 
 **使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
@@ -636,6 +636,230 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
   refine ⟨c, hc_fix, ?_⟩
   exact congrArg Subtype.val hc_smul
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- An `A`-invariant subgroup maps to an `A`-invariant subgroup in an `A`-invariant
+quotient. This is the quotient-action transport used in BG Prop. 1.5(b). -/
+private theorem isAInvariant_map_mk'
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hN)
+      (H.map (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a q hq
+  rw [Subgroup.mem_map] at hq ⊢
+  obtain ⟨g, hg, rfl⟩ := hq
+  exact ⟨(φ a) g, hH.smul_mem a hg, by rw [quotientMulAutHom_apply_mk']⟩
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- The preimage of an invariant subgroup of an `A`-invariant quotient is invariant in the
+original group. -/
+private theorem isAInvariant_comap_mk'
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
+    {Y : Subgroup (G ⧸ N)}
+    (hY : OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hN) Y) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (Y.comap (QuotientGroup.mk' N)) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a g hg
+  rw [Subgroup.mem_comap] at hg ⊢
+  rw [← quotientMulAutHom_apply_mk']
+  exact hY.smul_mem a hg
+
+/-- Restrict an invariant subgroup into an invariant ambient subgroup. -/
+private theorem isAInvariant_subgroupOf_restrict
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {U H : Subgroup G} (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant hU.restrict (H.subgroupOf U) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a h hh
+  rw [Subgroup.mem_subgroupOf] at hh ⊢
+  rw [OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val]
+  exact hH.smul_mem a hh
+
+/-- Push an invariant subgroup of an invariant ambient subgroup back to the original group. -/
+private theorem isAInvariant_map_subtype_of_restrict
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {U : Subgroup G} (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    {L : Subgroup U} (hL : OddOrder.Isaacs.Ch03.IsAInvariant hU.restrict L) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (L.map U.subtype) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [Subgroup.mem_map] at hx ⊢
+  obtain ⟨l, hl, rfl⟩ := hx
+  exact ⟨(hU.restrict a) l, hL.smul_mem a hl,
+    OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val hU a l⟩
+
+/-- A Hall subgroup of an invariant subgroup whose ambient index is a `π'`-number is a Hall
+subgroup after pushing it back to the whole group. This is the Hall-index transfer needed in
+the `H < G` branch of BG Prop. 1.5(b). -/
+private theorem isHallSubgroup_map_subtype_of_index_no_pi
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {H : Subgroup G} {L : Subgroup H}
+    (hL : OddOrder.Isaacs.Ch03.IsHallSubgroup π L)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π (L.map H.subtype) := by
+  have hcard : Nat.card ↥(L.map H.subtype) = Nat.card ↥L :=
+    (Nat.card_congr
+      (Subgroup.equivMapOfInjective L H.subtype H.subtype_injective).toEquiv).symm
+  have hindex : (L.map H.subtype).index = L.index * H.index := by
+    have hpos : 0 < Nat.card ↥L := Nat.card_pos
+    have hmul : Nat.card ↥L * (L.map H.subtype).index =
+        Nat.card ↥L * (L.index * H.index) := by
+      calc
+        Nat.card ↥L * (L.map H.subtype).index
+            = Nat.card ↥(L.map H.subtype) * (L.map H.subtype).index := by rw [hcard]
+        _ = Nat.card G := Subgroup.card_mul_index (L.map H.subtype)
+        _ = Nat.card H * H.index := (Subgroup.card_mul_index H).symm
+        _ = (Nat.card ↥L * L.index) * H.index := by rw [Subgroup.card_mul_index L]
+        _ = Nat.card ↥L * (L.index * H.index) := by ring
+    exact Nat.mul_left_cancel hpos hmul
+  refine ⟨?_, ?_⟩
+  · intro p hp
+    rw [hcard] at hp
+    exact hL.1 p hp
+  · intro p hp hp_pi
+    rw [hindex] at hp
+    rw [Nat.mem_primeFactors] at hp
+    obtain ⟨hp_prime, hp_dvd, _⟩ := hp
+    rcases hp_prime.dvd_mul.mp hp_dvd with hp_L | hp_H
+    · exact hL.2 p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_L, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+    · exact hH_index p
+        (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_H, Subgroup.index_ne_zero_of_finite⟩) hp_pi
+
+
+/-- A `π`-subgroup remains a `π`-subgroup after mapping to an invariant quotient. -/
+private theorem isPiGroup_map_mk'
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {N K : Subgroup G} [N.Normal]
+    (hK : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K) :
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (K.map (QuotientGroup.mk' N)) := by
+  intro p hp
+  apply hK
+  rw [Nat.mem_primeFactors] at hp ⊢
+  exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+
+/-- Quotienting by a nontrivial normal subgroup strictly lowers finite group order. -/
+private theorem card_quotient_lt_card_of_ne_bot
+    {G : Type*} [Group G] [Finite G] {N : Subgroup G} [N.Normal] (hN_ne_bot : N ≠ ⊥) :
+    Nat.card (G ⧸ N) < Nat.card G := by
+  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have hN_one_lt : 1 < Nat.card N := Finite.one_lt_card
+  have hQ_pos : 0 < Nat.card (G ⧸ N) := Nat.card_pos
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N]
+  exact lt_mul_of_one_lt_right hQ_pos hN_one_lt
+
+/-- Coprime operator order descends to a quotient of the acted-on group. -/
+private theorem coprime_card_quotient_of_coprime
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {N : Subgroup G} [N.Normal] (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card (G ⧸ N)) :=
+  hCop.coprime_dvd_right (Subgroup.card_quotient_dvd_card N)
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom) in
+/-- Pull back a quotient Hall subgroup containing the image of `K`.
+
+This packages the quotient/comap step in BG Prop. 1.5(b): once induction in `G/M` gives an
+`A`-invariant Hall subgroup containing the image of `K`, its preimage in `G` is
+`A`-invariant, contains `K`, and has π-free index. -/
+private theorem quotient_hall_preimage_frame
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K M : Subgroup G} [M.Normal]
+    (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
+    {Hbar : Subgroup (G ⧸ M)}
+    (hHbar_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π Hbar)
+    (hHbar_inv : OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom hM_inv) Hbar)
+    (hK_image_le : K.map (QuotientGroup.mk' M) ≤ Hbar) :
+    ∃ H : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H ∧ K ≤ H ∧
+        (∀ p ∈ H.index.primeFactors, p ∉ π) ∧
+        H = Hbar.comap (QuotientGroup.mk' M) := by
+  let q : G →* G ⧸ M := QuotientGroup.mk' M
+  let H : Subgroup G := Hbar.comap q
+  refine ⟨H, ?_, ?_, ?_, rfl⟩
+  · exact isAInvariant_comap_mk' hM_inv hHbar_inv
+  · intro k hk
+    change q k ∈ Hbar
+    exact hK_image_le (by
+      rw [Subgroup.mem_map]
+      exact ⟨k, hk, rfl⟩)
+  · have hindex : H.index = Hbar.index :=
+      Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+    rw [hindex]
+    exact hHbar_hall.2
+
+
+/-- Coprime operator order descends to a subgroup of the acted-on group. -/
+private theorem coprime_card_subgroup_of_coprime
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {H : Subgroup G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card H) :=
+  hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
+
+/-- Lift the recursive result from a proper invariant overgroup back to the ambient group.
+
+In the `H < G` branch of BG Prop. 1.5(b), quotient induction first produces an invariant
+overgroup `H` of `K` with π-free index.  Applying the main induction hypothesis inside `H`
+gives an invariant Hall subgroup `L ≤ H` containing `K`; this helper pushes `L` back to `G`.
+-/
+private theorem lift_hall_from_invariant_overgroup
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_le_H : K ≤ H) {L : Subgroup H}
+    (hL_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π L)
+    (hL_inv : OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict L)
+    (hK_sub_le_L : K.subgroupOf H ≤ L) :
+    ∃ Lg : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π Lg ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ Lg ∧ K ≤ Lg := by
+  refine ⟨L.map H.subtype, ?_, ?_, ?_⟩
+  · exact isHallSubgroup_map_subtype_of_index_no_pi hL_hall hH_index
+  · exact isAInvariant_map_subtype_of_restrict hH_inv hL_inv
+  · intro k hk
+    rw [Subgroup.mem_map]
+    refine ⟨⟨k, hK_le_H hk⟩, ?_, rfl⟩
+    exact hK_sub_le_L (by
+      rw [Subgroup.mem_subgroupOf]
+      exact hk)
+
+
+/-- Assemble the recursive proper-overgroup branch of BG Prop. 1.5(b).
+
+This is the branch after quotient induction has produced an invariant overgroup `H` of `K`
+with π-free index.  If the main induction hypothesis has already produced, inside `H`, an
+invariant Hall subgroup containing `K.subgroupOf H`, then this packages the lift back to `G`.
+-/
+private theorem proper_overgroup_branch_frame
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K)
+    (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
+    (hK_le_H : K ≤ H)
+    (hIH_H : ∀ {Ksub : Subgroup H},
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π Ksub →
+        OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict Ksub →
+        ∃ L : Subgroup H,
+          OddOrder.Isaacs.Ch03.IsHallSubgroup π L ∧
+            OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict L ∧ Ksub ≤ L) :
+    ∃ Lg : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π Lg ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ Lg ∧ K ≤ Lg := by
+  let Ksub : Subgroup H := K.subgroupOf H
+  have hKsub_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π Ksub :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hK_le_H hK_pi
+  have hKsub_inv : OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict Ksub :=
+    isAInvariant_subgroupOf_restrict hH_inv hK_inv
+  obtain ⟨L, hL_hall, hL_inv, hKsub_le_L⟩ := hIH_H hKsub_pi hKsub_inv
+  exact lift_hall_from_invariant_overgroup hH_inv hH_index hK_le_H
+    hL_hall hL_inv hKsub_le_L
+
 /-- A nontrivial finite group has a minimal nontrivial `A`-invariant normal subgroup. -/
 private theorem exists_minimal_normal_aInvariant
     {G A : Type*} [Group G] [Finite G] [Nontrivial G]
@@ -743,6 +967,361 @@ private theorem exists_prime_isPGroup_of_minimal_normal_aInvariant
     rwa [← hcardP]
   exact ⟨p, hp_prime, (IsPGroup.iff_card (p := p) (G := M)).mpr ⟨n, hcardM⟩⟩
 
+/-- A proper subgroup of a finite group has strictly smaller cardinality. -/
+private theorem subgroup_card_lt_card_of_ne_top
+    {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH_ne_top : H ≠ ⊤) :
+    Nat.card H < Nat.card G := by
+  have hindex_ne_one : H.index ≠ 1 := fun hidx => hH_ne_top (Subgroup.index_eq_one.mp hidx)
+  have hindex_gt_one : 1 < H.index :=
+    Nat.one_lt_iff_ne_zero_and_ne_one.mpr
+      ⟨Subgroup.index_ne_zero_of_finite, hindex_ne_one⟩
+  calc
+    Nat.card H < Nat.card H * H.index := lt_mul_of_one_lt_right Nat.card_pos hindex_gt_one
+    _ = Nat.card G := Subgroup.card_mul_index H
+
+/-- A `p`-group is a `π`-group once `p ∈ π`. -/
+private theorem subgroup_isPiGroup_of_isPGroup_of_mem
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {H : Subgroup G}
+    {p : ℕ} [Fact p.Prime] (hH : IsPGroup p H) (hpπ : p ∈ π) :
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π H := by
+  intro q hq
+  have hsingle : q ∈ ({p} : Set ℕ) :=
+    OddOrder.Isaacs.Ch04.isPiGroup_singleton_of_isPGroup hH q hq
+  rw [Set.mem_singleton_iff] at hsingle
+  rw [hsingle]
+  exact hpπ
+
+/-- A `π`-subgroup has trivial intersection with a `p`-group for `p ∉ π`. -/
+private theorem inf_eq_bot_of_isPiGroup_of_isPGroup_not_mem
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {K M : Subgroup G}
+    {p : ℕ} [Fact p.Prime]
+    (hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K)
+    (hM_p : IsPGroup p M) (hp_not_pi : p ∉ π) :
+    K ⊓ M = ⊥ := by
+  apply Subgroup.eq_bot_of_card_eq
+  have hM_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ π} M :=
+    subgroup_isPiGroup_of_isPGroup_of_mem hM_p hp_not_pi
+  have hdvdK : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card K :=
+    Subgroup.card_dvd_of_le inf_le_left
+  have hdvdM : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card M :=
+    Subgroup.card_dvd_of_le inf_le_right
+  have hcop : Nat.Coprime (Nat.card K) (Nat.card M) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      Nat.card_pos.ne' Nat.card_pos.ne' hK_pi hM_pi'
+  have hdvd_gcd : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.gcd (Nat.card K) (Nat.card M) :=
+    Nat.dvd_gcd hdvdK hdvdM
+  rw [hcop] at hdvd_gcd
+  exact Nat.dvd_one.mp hdvd_gcd
+
+/-- Package complementary subgroups inside a specified ambient subgroup. -/
+private theorem isComplement_subgroupOf_of_disjoint_mul_eq_univ
+    {G : Type*} [Group G] {U H M : Subgroup G}
+    (hH_le_U : H ≤ U) (hM_le_U : M ≤ U) (hHM_bot : H ⊓ M = ⊥)
+    (hmul : ∀ x ∈ U, ∃ m ∈ M, ∃ h ∈ H, m * h = x) :
+    Subgroup.IsComplement' (M.subgroupOf U) (H.subgroupOf U) := by
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot,
+      Subtype.ext_iff, OneMemClass.coe_one]
+    refine ⟨?_, fun hx => by simp [hx]⟩
+    rintro ⟨hxM, hxH⟩
+    have hx : (x : G) ∈ H ⊓ M := ⟨hxH, hxM⟩
+    rw [hHM_bot, Subgroup.mem_bot] at hx
+    exact hx
+  · rw [Set.eq_univ_iff_forall]
+    intro x
+    obtain ⟨m, hmM, h, hhH, hmh⟩ := hmul x x.2
+    refine ⟨⟨m, hM_le_U hmM⟩, hmM, ⟨h, hH_le_U hhH⟩, hhH, ?_⟩
+    ext
+    exact hmh
+
+/-- A complement to a `π'`-subgroup is a Hall `π`-subgroup of the ambient subgroup. -/
+private theorem isHallSubgroup_subgroupOf_of_complement_pi_pi'
+    {G : Type*} [Group G] [Finite G] {π : Set ℕ} {U H M : Subgroup G}
+    (hH_le_U : H ≤ U) (hM_le_U : M ≤ U)
+    (hH_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π H)
+    (hM_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {p | p ∉ π} M)
+    (hComp : Subgroup.IsComplement' (M.subgroupOf U) (H.subgroupOf U)) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π (H.subgroupOf U) := by
+  refine ⟨?_, ?_⟩
+  · exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hH_le_U hH_pi
+  · have hMsub_pi' :
+        OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {p | p ∉ π} (M.subgroupOf U) :=
+      OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hM_le_U hM_pi'
+    intro q hq hq_pi
+    rw [hComp.index_eq_card] at hq
+    exact hMsub_pi' q hq hq_pi
+
+/-- Conjugating an invariant subgroup by an `A`-fixed element preserves invariance. -/
+private theorem isAInvariant_mulAut_conj_smul_of_fixed
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    {c : G} (hc : ∀ a : A, (φ a) c = c) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (MulAut.conj c • H) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [mulAut_smul_eq_map] at hx ⊢
+  obtain ⟨y, hy, rfl⟩ := hx
+  refine ⟨(φ a) y, hH.smul_mem a hy, ?_⟩
+  simp [MulAut.conj_apply, map_mul, map_inv, hc a]
+
+/-- Assemble the `H = G` branch of BG Prop. 1.5(b).
+
+Here quotient induction has produced the whole preimage, so `G/M` is a `π`-group.
+For a minimal normal `p`-subgroup `M`, the non-`π` assumption on `G` forces `p ∉ π`.
+An invariant Hall subgroup `Q` complements `M`; inside `K ⊔ M`, the subgroups `K` and
+`Q ∩ (K ⊔ M)` are invariant Hall `π`-subgroups, hence are conjugate by an `A`-fixed element
+of `K ⊔ M`.  The conjugate of `Q` is the desired invariant Hall overgroup of `K`.
+-/
+private theorem top_preimage_branch_frame
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    {π : Set ℕ} {K M : Subgroup G} [M.Normal]
+    (hG_not_pi : ¬ ∀ q ∈ (Nat.card G).primeFactors, q ∈ π)
+    (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
+    {p : ℕ} [Fact p.Prime] (hM_p : IsPGroup p M)
+    (hquot_pi : ∀ q ∈ (Nat.card (G ⧸ M)).primeFactors, q ∈ π)
+    (hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K)
+    (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K) :
+    ∃ L : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π L ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ L ∧ K ≤ L := by
+  classical
+  have hp_not_pi : p ∉ π := by
+    intro hp_pi
+    have hM_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π M :=
+      subgroup_isPiGroup_of_isPGroup_of_mem hM_p hp_pi
+    have hG_pi : OddOrder.Isaacs.Ch03.IsPiGroup π G :=
+      OddOrder.Isaacs.Ch03.IsPiGroup.of_normal_quotient (N := M) hM_pi hquot_pi
+    exact hG_not_pi hG_pi
+  have hM_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ π} M :=
+    subgroup_isPiGroup_of_isPGroup_of_mem hM_p hp_not_pi
+  obtain ⟨Q, hQ_hall, hQ_inv⟩ := exists_aInvariant_hall hCop π
+  have hQ_M_bot : Q ⊓ M = ⊥ :=
+    inf_eq_bot_of_isPiGroup_of_isPGroup_not_mem hQ_hall.1 hM_p hp_not_pi
+  have hQbar_top : Q.map (QuotientGroup.mk' M) = ⊤ := by
+    have htop_pi :
+        OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (⊤ : Subgroup (G ⧸ M)) := by
+      intro q hq
+      rw [Subgroup.card_top] at hq
+      exact hquot_pi q hq
+    have hQbar_hall :
+        OddOrder.Isaacs.Ch03.IsHallSubgroup π (Q.map (QuotientGroup.mk' M)) :=
+      hQ_hall.map_quotient
+    exact eq_top_iff.mpr
+      (OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.normal_le_hall htop_pi hQbar_hall)
+  have hQM_top : Q ⊔ M = ⊤ := by
+    rw [eq_top_iff]
+    intro g _
+    have hgbar : (QuotientGroup.mk' M) g ∈ Q.map (QuotientGroup.mk' M) := by
+      rw [hQbar_top]
+      trivial
+    rw [Subgroup.mem_map] at hgbar
+    obtain ⟨q, hqQ, hqeq⟩ := hgbar
+    have hm : q⁻¹ * g ∈ M := by
+      apply (QuotientGroup.eq_one_iff (N := M) (q⁻¹ * g)).mp
+      change (QuotientGroup.mk' M) (q⁻¹ * g) = 1
+      rw [map_mul, map_inv, hqeq, inv_mul_cancel]
+    have hg : g = q * (q⁻¹ * g) := by group
+    rw [hg]
+    exact Subgroup.mul_mem_sup hqQ hm
+  let U : Subgroup G := K ⊔ M
+  have hK_le_U : K ≤ U := le_sup_left
+  have hM_le_U : M ≤ U := le_sup_right
+  have hU_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ U :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.sup hK_inv hM_inv
+  have hK_M_bot : K ⊓ M = ⊥ :=
+    inf_eq_bot_of_isPiGroup_of_isPGroup_not_mem hK_pi hM_p hp_not_pi
+  have hK_comp : Subgroup.IsComplement' (M.subgroupOf U) (K.subgroupOf U) := by
+    refine isComplement_subgroupOf_of_disjoint_mul_eq_univ hK_le_U hM_le_U hK_M_bot ?_
+    intro x hxU
+    have hx : (x : G) ∈ M ⊔ K := by
+      rw [sup_comm]
+      exact hxU
+    rw [Subgroup.mem_sup_of_normal_left] at hx
+    obtain ⟨m, hmM, k, hkK, hmk⟩ := hx
+    exact ⟨m, hmM, k, hkK, hmk⟩
+  have hKsub_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π (K.subgroupOf U) :=
+    isHallSubgroup_subgroupOf_of_complement_pi_pi' hK_le_U hM_le_U hK_pi hM_pi' hK_comp
+  let QKU : Subgroup G := Q ⊓ U
+  have hQKU_le_U : QKU ≤ U := inf_le_right
+  have hQKU_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π QKU :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le inf_le_left hQ_hall.1
+  have hQKU_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ QKU :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.inf hQ_inv hU_inv
+  have hQKU_M_bot : QKU ⊓ M = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    have hxQM : x ∈ Q ⊓ M := ⟨hx.1.1, hx.2⟩
+    rw [hQ_M_bot] at hxQM
+    exact hxQM
+  have hQKU_comp : Subgroup.IsComplement' (M.subgroupOf U) (QKU.subgroupOf U) := by
+    refine isComplement_subgroupOf_of_disjoint_mul_eq_univ hQKU_le_U hM_le_U hQKU_M_bot ?_
+    intro x hxU
+    have hxQM : (x : G) ∈ Q ⊔ M := by
+      rw [hQM_top]
+      trivial
+    rw [Subgroup.mem_sup_of_normal_right] at hxQM
+    obtain ⟨q, hqQ, m, hmM, hqm⟩ := hxQM
+    have hqU : q ∈ U := by
+      have hq_eq : q = (x : G) * m⁻¹ := by
+        rw [← hqm]
+        group
+      rw [hq_eq]
+      exact U.mul_mem hxU (U.inv_mem (hM_le_U hmM))
+    have hm_conj : q * m * q⁻¹ ∈ M :=
+      (inferInstance : M.Normal).conj_mem m hmM q
+    refine ⟨q * m * q⁻¹, hm_conj, q, ⟨hqQ, hqU⟩, ?_⟩
+    rw [← hqm]
+    group
+  have hQKUsub_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π (QKU.subgroupOf U) :=
+    isHallSubgroup_subgroupOf_of_complement_pi_pi' hQKU_le_U hM_le_U hQKU_pi hM_pi'
+      hQKU_comp
+  have hKsub_inv : OddOrder.Isaacs.Ch03.IsAInvariant hU_inv.restrict (K.subgroupOf U) :=
+    isAInvariant_subgroupOf_restrict hU_inv hK_inv
+  have hQKUsub_inv : OddOrder.Isaacs.Ch03.IsAInvariant hU_inv.restrict (QKU.subgroupOf U) :=
+    isAInvariant_subgroupOf_restrict hU_inv hQKU_inv
+  have hCop_U : Nat.Coprime (Nat.card A) (Nat.card U) :=
+    coprime_card_subgroup_of_coprime hCop
+  obtain ⟨c, hc_fix, hc_conj⟩ :=
+    aInvariant_hall_conj (G := U) (A := A) (φ := hU_inv.restrict) hCop_U
+      hQKUsub_hall hKsub_hall hQKUsub_inv hKsub_inv
+  let cG : G := c
+  have hc_fix_G : ∀ a : A, (φ a) cG = cG := by
+    intro a
+    have h := congrArg Subtype.val (hc_fix a)
+    simpa [cG, OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val] using h
+  refine ⟨MulAut.conj cG • Q, ?_, ?_, ?_⟩
+  · exact isHallSubgroup_mulAut_smul (MulAut.conj cG) hQ_hall
+  · exact isAInvariant_mulAut_conj_smul_of_fixed hQ_inv hc_fix_G
+  · intro k hkK
+    rw [mulAut_smul_eq_map, Subgroup.mem_map]
+    let kU : U := ⟨k, hK_le_U hkK⟩
+    have hkU : kU ∈ K.subgroupOf U := by
+      change (kU : G) ∈ K
+      exact hkK
+    have hkU_conj : kU ∈ MulAut.conj c • (QKU.subgroupOf U) := by
+      rw [hc_conj]
+      exact hkU
+    rw [mulAut_smul_eq_map, Subgroup.mem_map] at hkU_conj
+    obtain ⟨y, hyQKU, hy_eq⟩ := hkU_conj
+    refine ⟨(y : G), ?_, ?_⟩
+    · have hyQKU_G : (y : G) ∈ QKU := hyQKU
+      exact hyQKU_G.1
+    · change (MulAut.conj cG) (y : G) = k
+      simpa [cG] using congrArg Subtype.val hy_eq
+
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom) in
+/-- Induction kernel for BG Prop. 1.5(b). -/
+private theorem aInvariant_piSubgroup_le_aInvariant_hall_aux :
+    ∀ n : ℕ,
+      ∀ (G A : Type*) [Group G] [Finite G] [IsSolvable G]
+        [Group A] [Finite A],
+        Nat.card G ≤ n → ∀ {φ : A →* MulAut G}
+        (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+        {π : Set ℕ} {K : Subgroup G},
+        OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K →
+        OddOrder.Isaacs.Ch03.IsAInvariant φ K →
+        ∃ H : Subgroup G,
+          OddOrder.Isaacs.Ch03.IsHallSubgroup π H ∧
+            OddOrder.Isaacs.Ch03.IsAInvariant φ H ∧ K ≤ H := by
+  intro n
+  induction n with
+  | zero =>
+      intro G A _ _ _ _ _ hcard φ _hCop π K hK_pi hK_inv
+      have hpos : 0 < Nat.card G := Nat.card_pos
+      omega
+  | succ n ih =>
+      intro G A _ _ _ _ _ hcard φ hCop π K hK_pi hK_inv
+      by_cases hsmall : Nat.card G ≤ n
+      · exact ih G A hsmall hCop hK_pi hK_inv
+      by_cases hG_pi : ∀ p ∈ (Nat.card G).primeFactors, p ∈ π
+      · refine ⟨⊤, ?_, OddOrder.Isaacs.Ch03.IsAInvariant.top φ, le_top⟩
+        exact (OddOrder.Isaacs.Ch03.IsHallSubgroup.top_iff (G := G) π).mpr hG_pi
+      have hG_card_ne_one : Nat.card G ≠ 1 := by
+        intro hcard_one
+        exact hG_pi (by
+          intro p hp
+          rw [hcard_one, Nat.primeFactors_one] at hp
+          simp at hp)
+      have hG_card_gt_one : 1 < Nat.card G :=
+        Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_card_ne_one⟩
+      haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hG_card_gt_one
+      obtain ⟨M, hM_normal, hM_inv, hM_ne_bot, hM_min⟩ :=
+        exists_minimal_normal_aInvariant (G := G) (A := A) (φ := φ)
+      haveI : M.Normal := hM_normal
+      obtain ⟨p, hp_prime, hM_p⟩ :=
+        exists_prime_isPGroup_of_minimal_normal_aInvariant hM_inv hM_ne_bot hM_min
+      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have hquot_lt : Nat.card (G ⧸ M) < Nat.card G :=
+        card_quotient_lt_card_of_ne_bot hM_ne_bot
+      have hquot_le_n : Nat.card (G ⧸ M) ≤ n := by
+        omega
+      have hKbar_pi :
+          OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (K.map (QuotientGroup.mk' M)) :=
+        isPiGroup_map_mk' (N := M) hK_pi
+      have hKbar_inv :
+          OddOrder.Isaacs.Ch03.IsAInvariant
+            (quotientMulAutHom hM_inv) (K.map (QuotientGroup.mk' M)) :=
+        isAInvariant_map_mk' hM_inv hK_inv
+      have hCop_quot : Nat.Coprime (Nat.card A) (Nat.card (G ⧸ M)) :=
+        coprime_card_quotient_of_coprime (N := M) hCop
+      obtain ⟨Hbar, hHbar_hall, hHbar_inv, hKbar_le⟩ :=
+        ih (G ⧸ M) A hquot_le_n hCop_quot hKbar_pi hKbar_inv
+      obtain ⟨H, hH_inv, hK_le_H, hH_index, hH_eq⟩ :=
+        quotient_hall_preimage_frame hM_inv hHbar_hall hHbar_inv hKbar_le
+      by_cases hH_top : H = ⊤
+      · have hHbar_top : Hbar = ⊤ := by
+          apply eq_top_iff.mpr
+          intro y hy
+          obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (N := M) y
+          have hgH : g ∈ H := by
+            rw [hH_top]
+            trivial
+          rw [hH_eq] at hgH
+          exact hgH
+        have hquot_pi : ∀ q ∈ (Nat.card (G ⧸ M)).primeFactors, q ∈ π := by
+          have htop_hall :
+              OddOrder.Isaacs.Ch03.IsHallSubgroup π (⊤ : Subgroup (G ⧸ M)) := by
+            simpa [hHbar_top] using hHbar_hall
+          exact (OddOrder.Isaacs.Ch03.IsHallSubgroup.top_iff (G := G ⧸ M) π).mp
+            htop_hall
+        exact top_preimage_branch_frame hCop hG_pi hM_inv hM_p hquot_pi hK_pi hK_inv
+      · have hH_le_n : Nat.card H ≤ n := by
+          have hH_lt : Nat.card H < Nat.card G :=
+            subgroup_card_lt_card_of_ne_top hH_top
+          omega
+        have hCop_H : Nat.Coprime (Nat.card A) (Nat.card H) :=
+          coprime_card_subgroup_of_coprime (H := H) hCop
+        have hIH_H : ∀ {Ksub : Subgroup H},
+            OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π Ksub →
+              OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict Ksub →
+              ∃ L : Subgroup H,
+                OddOrder.Isaacs.Ch03.IsHallSubgroup π L ∧
+                  OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict L ∧ Ksub ≤ L := by
+          intro Ksub hKsub_pi hKsub_inv
+          exact ih H A hH_le_n hCop_H hKsub_pi hKsub_inv
+        exact proper_overgroup_branch_frame hH_inv hH_index hK_pi hK_inv hK_le_H hIH_H
+
+/-- **BG Prop 1.5(b)**: if a finite solvable group `G` is acted on by a finite operator
+ group `A` with coprime order, every `A`-invariant `π`-subgroup is contained in an
+`A`-invariant Hall `π`-subgroup. -/
+theorem aInvariant_piSubgroup_le_aInvariant_hall
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    {π : Set ℕ} {K : Subgroup G}
+    (hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π K)
+    (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K) :
+    ∃ H : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π H ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ H ∧ K ≤ H :=
+  aInvariant_piSubgroup_le_aInvariant_hall_aux (Nat.card G) G A le_rfl hCop hK_pi hK_inv
+
 /-- Complementary Hall subgroups have coprime orders. -/
 private theorem hall_compl_card_coprime {G : Type*} [Group G] [Finite G]
     {π : Set ℕ} {K H : Subgroup G}
@@ -846,6 +1425,57 @@ theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
         (OddOrder.Isaacs.Ch04.actionCommutator φ) :=
     OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hAC_le_H hH_hall.1
   exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hAC_pi
+
+
+/-- **BG Prop 1.6(c)**: if `[G,A,A] = 1`, then `[G,A] = 1`.
+
+This is the immediate consequence of Isaacs Lemma 4.29, represented in the semidirect-product
+`Γ = G ⋊[φ] A` form used by the Ch.4 API. -/
+theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_two : OddOrder.Isaacs.Ch04.iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 = ⊥) :
+    OddOrder.Isaacs.Ch04.iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 = ⊥ := by
+  have h_eq := OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one
+    (φ := φ) hCop hSolv
+  rw [← h_eq, h_two]
+
+/-- **BG Prop 1.6(d)**: if `G` is abelian, then
+`G = C_G(A) × [G,A]`.
+
+Lean packages the internal direct product as a complement: multiplication from
+`C_G(A) × [G,A]` onto `G` is bijective. -/
+theorem fixedPoints_isComplement_actionCommutator_of_abelian
+    {G A : Type*} [CommGroup G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Subgroup.IsComplement' (Subgroup.fixedPointsOfMulAut φ)
+      (OddOrder.Isaacs.Ch04.actionCommutator φ) := by
+  have hsup : Subgroup.fixedPointsOfMulAut φ ⊔
+      OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := φ) hCop (Or.inr inferInstance)
+  have hinf : Subgroup.fixedPointsOfMulAut φ ⊓
+      OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hCop
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    exact hinf
+  · rw [Set.eq_univ_iff_forall]
+    intro g
+    have hg : g ∈ Subgroup.fixedPointsOfMulAut φ ⊔
+        OddOrder.Isaacs.Ch04.actionCommutator φ := by
+      rw [hsup]
+      trivial
+    rw [Subgroup.mem_sup_of_normal_right] at hg
+    obtain ⟨c, hc, d, hd, hcd⟩ := hg
+    exact ⟨c, hc, d, hd, hcd⟩
 
 end AInvariantHall
 
@@ -1032,6 +1662,82 @@ theorem coprime_actsTrivially_of_normal_and_quotient
   obtain ⟨n, hn_in, hc_eq⟩ := hc_coset
   have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
   rw [hg_eq, map_mul, hc_fix a, map_inv, h_triv_N a n hn_in]
+
+open OddOrder.Isaacs.Ch03 in
+/-- **BG Lemma 1.9 (多段一般形, coprime 核)**: 有限群 `K` に有限群 `A` が
+`ψ : A →* MulAut K` で coprime (`(|A|,|K|)=1`) 作用し, `A` または `K` が可解とする.
+`K` の正規降鎖 `s` (`Antitone`, `s 0 = ⊤`, `s n = ⊥`, 各 `s i ◁ K`, `ψ`-不変) を `A` が
+**stabilize** (各 factor `s i / s (i+1)` 上自明: `∀ x ∈ s i, ∃ y ∈ s (i+1), ψ a x = x * y`)
+するなら, `ψ` は自明 (`∀ a, ψ a = 1`).
+
+BG Lem 1.9 の原 statement「`G` solvable π-群, `A` が normal series を stabilize ⇒
+`A/C_A(G)` は π-群」は, π'-元 `a` に対し `⟨a⟩` を本補題に渡す (coprime 性 = π'-性) ことで
+elementwise に従う (§5 Thm 5.5 がこの形で使用)。AppA (PSTAB) の chain-stabilizer 補題も
+本補題経由 (旧 AppA private から §1 へ昇格, 2026-06-02)。
+
+`coprime_actsTrivially_of_normal_and_quotient` (2-step) を `↥(s i)` 上へ
+`IsAInvariant.restrict` で制限し, 鎖を `m`-bound 付き上向き帰納で下降して `s 0 = ⊤` に到達. -/
+theorem coprime_stabilizes_chain_trivial
+    {K : Type*} [Group K] [Finite K] {A : Type*} [Group A] [Finite A]
+    (ψ : A →* MulAut K) (hcop : (Nat.card A).Coprime (Nat.card K))
+    (hsolv : IsSolvable A ∨ IsSolvable K)
+    (s : ℕ → Subgroup K) (hanti : Antitone s) (hs0 : s 0 = ⊤) {n : ℕ} (hsn : s n = ⊥)
+    (hnorm : ∀ i, (s i).Normal)
+    (hinv : ∀ i, IsAInvariant ψ (s i))
+    (htriv : ∀ i, ∀ a : A, ∀ x ∈ s i, ∃ y ∈ s (i + 1), (ψ a) x = x * y) :
+    ∀ a : A, ψ a = 1 := by
+  -- One step down: trivial on `s (i+1)` ⇒ trivial on `s i` (via the coprime 2-step lemma).
+  have stepdown : ∀ i, (∀ a : A, ∀ x, x ∈ s (i + 1) → (ψ a) x = x) →
+      ∀ a : A, ∀ x, x ∈ s i → (ψ a) x = x := by
+    intro i hIH
+    haveI hN1 : (s (i + 1)).Normal := hnorm (i + 1)
+    have hcopi : (Nat.card A).Coprime (Nat.card ↥(s i)) :=
+      hcop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card (s i))
+    have hsolvi : IsSolvable A ∨ IsSolvable ↥(s i) := by
+      rcases hsolv with h | h
+      · exact Or.inl h
+      · haveI := h; exact Or.inr inferInstance
+    have hInvN : IsAInvariant ((hinv i).restrict) ((s (i + 1)).subgroupOf (s i)) := by
+      rw [isAInvariant_iff_smul_mem]
+      intro a' g hg
+      rw [Subgroup.mem_subgroupOf] at hg ⊢
+      rw [IsAInvariant.restrict_apply_val]
+      exact (hinv (i + 1)).smul_mem a' hg
+    have htrivN : ∀ a' : A, ∀ g ∈ (s (i + 1)).subgroupOf (s i),
+        ((hinv i).restrict a') g = g := by
+      intro a' g hg
+      rw [Subgroup.mem_subgroupOf] at hg
+      exact Subtype.ext (by rw [IsAInvariant.restrict_apply_val]; exact hIH a' g.val hg)
+    have htrivQ : ∀ a' : A, ∀ g : ↥(s i),
+        ∃ y ∈ (s (i + 1)).subgroupOf (s i), ((hinv i).restrict a') g = g * y := by
+      intro a' g
+      obtain ⟨y, hy_mem, hy_eq⟩ := htriv i a' g.val g.property
+      refine ⟨⟨y, hanti (Nat.le_succ i) hy_mem⟩, ?_, ?_⟩
+      · rw [Subgroup.mem_subgroupOf]; exact hy_mem
+      · exact Subtype.ext (by rw [IsAInvariant.restrict_apply_val, Subgroup.coe_mul]; exact hy_eq)
+    have hconc := coprime_actsTrivially_of_normal_and_quotient
+      (φ := (hinv i).restrict) hcopi hsolvi hInvN htrivN htrivQ
+    intro a x hx
+    have h2 := congrArg Subtype.val (hconc a ⟨x, hx⟩)
+    rw [IsAInvariant.restrict_apply_val] at h2
+    exact h2
+  -- `s i = ⊥` for `i ≥ n`, and `stepdown` propagates triviality down to `s 0 = ⊤`.
+  have key : ∀ m i, n ≤ i + m → ∀ a : A, ∀ x, x ∈ s i → (ψ a) x = x := by
+    intro m
+    induction m with
+    | zero =>
+      intro i hi a x hx
+      have hxn : x ∈ s n := hanti (by simpa using hi) hx
+      rw [hsn, Subgroup.mem_bot] at hxn
+      subst hxn
+      exact map_one (ψ a)
+    | succ m ih =>
+      intro i hi a x hx
+      exact stepdown i (ih (i + 1) (by omega)) a x hx
+  intro a
+  refine MulEquiv.ext (fun x => ?_)
+  show (ψ a) x = x
+  exact key n 0 (by omega) a x (by rw [hs0]; exact Subgroup.mem_top x)
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant) in
 /-- 演算子作用 `φ : A →* MulAut G` を `A`-不変部分群 `H` へ制限し `A →* MulAut ↥H` を得る.

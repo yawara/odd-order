@@ -89,6 +89,71 @@ def tau2 (M : Subgroup G) : Set ℕ :=
 def tau3 (M : Subgroup G) : Set ℕ :=
   {p | p ∉ S10.sigma M ∧ p ∈ (Nat.card ↥(derivedInG M)).primeFactors ∧ pRank ↥M p = 1}
 
+/-! ### Basic API for the τ-partition -/
+
+@[simp] theorem mem_tau1_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ tau1 M ↔
+      p ∉ S10.sigma M ∧ p ∉ (Nat.card ↥(derivedInG M)).primeFactors ∧ pRank ↥M p = 1 :=
+  Iff.rfl
+
+@[simp] theorem mem_tau2_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ tau2 M ↔ p ∉ S10.sigma M ∧ pRank ↥M p = 2 :=
+  Iff.rfl
+
+@[simp] theorem mem_tau3_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ tau3 M ↔
+      p ∉ S10.sigma M ∧ p ∈ (Nat.card ↥(derivedInG M)).primeFactors ∧ pRank ↥M p = 1 :=
+  Iff.rfl
+
+theorem tau1_subset_sigma_compl (M : Subgroup G) : tau1 M ⊆ (S10.sigma M)ᶜ :=
+  fun _ hp => hp.1
+
+theorem tau2_subset_sigma_compl (M : Subgroup G) : tau2 M ⊆ (S10.sigma M)ᶜ :=
+  fun _ hp => hp.1
+
+theorem tau3_subset_sigma_compl (M : Subgroup G) : tau3 M ⊆ (S10.sigma M)ᶜ :=
+  fun _ hp => hp.1
+
+theorem tau1_not_mem_derived_primeFactors {M : Subgroup G} {p : ℕ} (hp : p ∈ tau1 M) :
+    p ∉ (Nat.card ↥(derivedInG M)).primeFactors :=
+  hp.2.1
+
+theorem tau3_mem_derived_primeFactors {M : Subgroup G} {p : ℕ} (hp : p ∈ tau3 M) :
+    p ∈ (Nat.card ↥(derivedInG M)).primeFactors :=
+  hp.2.1
+
+theorem tau1_pRank_eq_one {M : Subgroup G} {p : ℕ} (hp : p ∈ tau1 M) :
+    pRank ↥M p = 1 :=
+  hp.2.2
+
+theorem tau2_pRank_eq_two {M : Subgroup G} {p : ℕ} (hp : p ∈ tau2 M) :
+    pRank ↥M p = 2 :=
+  hp.2
+
+theorem tau3_pRank_eq_one {M : Subgroup G} {p : ℕ} (hp : p ∈ tau3 M) :
+    pRank ↥M p = 1 :=
+  hp.2.2
+
+theorem not_mem_tau3_of_mem_tau1 {M : Subgroup G} {p : ℕ} (hp : p ∈ tau1 M) :
+    p ∉ tau3 M :=
+  fun hp3 => hp.2.1 hp3.2.1
+
+theorem not_mem_tau1_of_mem_tau3 {M : Subgroup G} {p : ℕ} (hp : p ∈ tau3 M) :
+    p ∉ tau1 M :=
+  fun hp1 => hp1.2.1 hp.2.1
+
+/-- `E₁E₂` in BG §12, represented as the subgroup join. -/
+def E12 (E₁ E₂ : Subgroup G) : Subgroup G :=
+  E₁ ⊔ E₂
+
+/-- `E₂E₃` in BG §12, represented as the subgroup join. -/
+def E23 (E₂ E₃ : Subgroup G) : Subgroup G :=
+  E₂ ⊔ E₃
+
+/-- `E₁E₂E₃` in BG §12, represented as iterated subgroup join. -/
+def E123 (E₁ E₂ E₃ : Subgroup G) : Subgroup G :=
+  E₁ ⊔ E₂ ⊔ E₃
+
 /-- **BG §12 setup**: `E` は `M_σ` の `M` 内補群 (`M_σ ⊓ E = 1`, `M_σ ⊔ E = M`)、`E₁/E₂/E₃` は
 `E` の Hall `τ₁/τ₂/τ₃(M)`-部分群。`E₁₂ = E₁E₂` (= `E₁ ⊔ E₂`)。 -/
 structure SubgroupESetup (M E E₁ E₂ E₃ : Subgroup G) : Prop where
@@ -102,6 +167,40 @@ structure SubgroupESetup (M E E₁ E₂ E₃ : Subgroup G) : Prop where
   E₁_hall : Ch03.IsHallSubgroup (tau1 M) (E₁.subgroupOf E)
   E₂_hall : Ch03.IsHallSubgroup (tau2 M) (E₂.subgroupOf E)
   E₃_hall : Ch03.IsHallSubgroup (tau3 M) (E₃.subgroupOf E)
+
+namespace SubgroupESetup
+
+variable {M E E₁ E₂ E₃ : Subgroup G}
+
+theorem E_complement (h : SubgroupESetup M E E₁ E₂ E₃) :
+    S10.Msigma M ⊓ E = ⊥ ∧ S10.Msigma M ⊔ E = M :=
+  ⟨h.E_compl_inf, h.E_compl_sup⟩
+
+theorem E1_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E₁ ≤ M :=
+  h.E₁_le.trans h.E_le
+
+theorem E2_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E₂ ≤ M :=
+  h.E₂_le.trans h.E_le
+
+theorem E3_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E₃ ≤ M :=
+  h.E₃_le.trans h.E_le
+
+theorem E12_le_E (h : SubgroupESetup M E E₁ E₂ E₃) : E12 E₁ E₂ ≤ E :=
+  sup_le h.E₁_le h.E₂_le
+
+theorem E23_le_E (h : SubgroupESetup M E E₁ E₂ E₃) : E23 E₂ E₃ ≤ E :=
+  sup_le h.E₂_le h.E₃_le
+
+theorem E123_le_E (h : SubgroupESetup M E E₁ E₂ E₃) : E123 E₁ E₂ E₃ ≤ E :=
+  sup_le (sup_le h.E₁_le h.E₂_le) h.E₃_le
+
+theorem E12_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E12 E₁ E₂ ≤ M :=
+  (h.E12_le_E).trans h.E_le
+
+theorem E23_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E23 E₂ E₃ ≤ M :=
+  (h.E23_le_E).trans h.E_le
+
+end SubgroupESetup
 
 /-! ## Lemma 12.1 — `E` の構造の易しい帰結 (mmd L3035) -/
 

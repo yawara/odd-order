@@ -71,9 +71,28 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   `exists_prime_isPGroup_of_minimal_normal_aInvariant`.  These prove that a nontrivial
   minimal `A`-invariant normal subgroup exists and, in the finite solvable case, is a
   commutative `p`-group.
-- **Remaining Prop 1.5 blocker**: (b) the full induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup.  The remaining formal work is the quotient/comap
-  induction step and the final `H = G` conjugacy step inside `K M`.
+- **Prop 1.5(b) quotient/comap frame added**: private helpers now show quotient images
+  preserve `π`-subgroup status, quotient order is smaller and stays coprime to `|A|`,
+  quotient Hall preimages are `A`-invariant overgroups of `K` with π-free index, and Hall
+  subgroups found inside a proper invariant overgroup can be pushed back to `G` when that
+  overgroup has π-free index.
+- **Prop 1.5(b) proper-overgroup lift added**: `coprime_card_subgroup_of_coprime` and
+  `lift_hall_from_invariant_overgroup` package the recursive `H < G` branch once induction
+  inside `H` returns an invariant Hall subgroup containing `K.subgroupOf H`.
+- **Prop 1.5(b) recursive proper-overgroup frame added**: `proper_overgroup_branch_frame`
+  now assembles the induction result inside `H` into the ambient Hall overgroup of `K`.
+- **Prop 1.5(b) completed** as `aInvariant_piSubgroup_le_aInvariant_hall`: the proof inducts
+  on `Nat.card G`, pushes quotient induction through the preimage frame, uses the proper-overgroup
+  frame when the preimage is proper, and handles the `H = G` branch by complementing a minimal
+  normal `p`-subgroup `M` with an invariant Hall subgroup `Q`; Hall conjugacy inside `K ⊔ M`
+  gives an `A`-fixed conjugate of `Q` containing `K`.
+- **Prop 1.5 status**: (a), (b), (c), and (e) are implemented as Lean theorems; (d) remains a
+  no-wrapper direct use of `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`.
+- **Prop 1.6(c)(d) completed**: `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` packages
+  the `[G,A,A]=1 ⇒ [G,A]=1` consequence of Ch04 Lemma 4.29, and
+  `fixedPoints_isComplement_actionCommutator_of_abelian` packages the abelian direct product
+  `G = C_G(A) × [G,A]` as `Subgroup.IsComplement'`.  Prop 1.6(a)(b)(e) remain direct
+  no-wrapper Ch04 references in the S01 table.
 
 ## TL;DR
 
@@ -325,7 +344,7 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 1. **BG mmd セクション境界確認**: §1 末が L585 か明確に (推定値).
 2. **Peterfalvi [Is] 対応**: Peterfalvi が引く "Isaacs character theory" results (Thm 6.32, 6.5, 2.21 等) を mathlib `RepresentationTheory.Character` とマッチング — Phase 2b 着手時.
 3. **Goldschmidt citation**: BG Prop 1.15(b) の原 Goldschmidt 論文を Phase 2a 時点で確保するか (Isaacs Ch.3 で代替証明可か要確認).
-4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.
+4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.  Minimal-normal, quotient/comap transfer, proper-overgroup lift, and recursive proper-overgroup frame support are green; top-level induction assembly と `H = G` conjugacy branch が残る.
 5. **Prop 1.5(e)**: ✅ implemented as `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement`; BG L412-L414 の `G = KH` を complementary Hall `IsComplement'` として形式化し, `[G,A] ≤ O_π(G)` を証明済み.
 
 ---

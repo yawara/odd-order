@@ -129,6 +129,114 @@ def omega1CenterInG (P : Subgroup G) (p : ℕ) : Subgroup G :=
   (omega1OfAbelian ↥P (Subgroup.center ↥P) p
     (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)).map P.subtype
 
+/-! ### Basic API for the §10 definitions -/
+
+@[simp] theorem mem_idealPrime_iff (p : ℕ) (G : Type*) [Group G] :
+    idealPrime p G ↔
+      3 ≤ pRank G p ∧
+        ∀ P : Sylow p G, ¬ ∃ A : Subgroup ↥(P : Subgroup G),
+          Nat.card ↥A = p ^ 2 ∧ IsMaximalElementaryAbelian p A :=
+  Iff.rfl
+
+@[simp] theorem mem_alpha_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ alpha M ↔ p ∈ (Nat.card ↥M).primeFactors ∧ 3 ≤ pRank ↥M p :=
+  Iff.rfl
+
+@[simp] theorem mem_beta_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ beta M ↔ p ∈ alpha M ∧ idealPrime p G :=
+  Iff.rfl
+
+@[simp] theorem mem_sigma_iff (M : Subgroup G) (p : ℕ) :
+    p ∈ sigma M ↔
+      p ∈ (Nat.card ↥M).primeFactors ∧
+        ∃ P : Sylow p ↥M, Subgroup.normalizer ((P : Subgroup ↥M).map M.subtype) ≤ M :=
+  Iff.rfl
+
+theorem alpha_subset_primeFactors (M : Subgroup G) :
+    alpha M ⊆ (Nat.card ↥M).primeFactors :=
+  fun _ hp => hp.1
+
+theorem beta_subset_alpha (M : Subgroup G) :
+    beta M ⊆ alpha M :=
+  fun _ hp => hp.1
+
+theorem beta_subset_primeFactors (M : Subgroup G) :
+    beta M ⊆ (Nat.card ↥M).primeFactors :=
+  (beta_subset_alpha M).trans (alpha_subset_primeFactors M)
+
+theorem Malpha_le (M : Subgroup G) : Malpha M ≤ M :=
+  Subgroup.map_subtype_le _
+
+theorem Mbeta_le (M : Subgroup G) : Mbeta M ≤ M :=
+  Subgroup.map_subtype_le _
+
+theorem Msigma_le (M : Subgroup G) : Msigma M ≤ M :=
+  Subgroup.map_subtype_le _
+
+theorem Fsigma_le_fitting (M : Subgroup G) : Fsigma M ≤ Ch2.S08.fittingInG M :=
+  Subgroup.map_subtype_le _
+
+theorem Fsigma'_le_fitting (M : Subgroup G) : Fsigma' M ≤ Ch2.S08.fittingInG M :=
+  Subgroup.map_subtype_le _
+
+@[simp] theorem Malpha_subgroupOf (M : Subgroup G) :
+    (Malpha M).subgroupOf M = Ch03.oPiCore (alpha M) ↥M := by
+  rw [Subgroup.subgroupOf, Malpha, OddOrder.GroupTheory.opiCoreInG,
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+
+@[simp] theorem Mbeta_subgroupOf (M : Subgroup G) :
+    (Mbeta M).subgroupOf M = Ch03.oPiCore (beta M) ↥M := by
+  rw [Subgroup.subgroupOf, Mbeta, OddOrder.GroupTheory.opiCoreInG,
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+
+@[simp] theorem Msigma_subgroupOf (M : Subgroup G) :
+    (Msigma M).subgroupOf M = Ch03.oPiCore (sigma M) ↥M := by
+  rw [Subgroup.subgroupOf, Msigma, OddOrder.GroupTheory.opiCoreInG,
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+
+theorem Malpha_isPiGroup [Finite G] (M : Subgroup G) :
+    Ch03.Subgroup.IsPiGroup (alpha M) (Malpha M) := by
+  intro r hr
+  have hcard : Nat.card ↥(Malpha M) = Nat.card ↥(Ch03.oPiCore (alpha M) ↥M) := by
+    rw [Malpha, OddOrder.GroupTheory.opiCoreInG,
+      Subgroup.card_map_of_injective M.subtype_injective]
+  rw [hcard] at hr
+  exact Ch03.oPiCore.isPiGroup (alpha M) r hr
+
+theorem Mbeta_isPiGroup [Finite G] (M : Subgroup G) :
+    Ch03.Subgroup.IsPiGroup (beta M) (Mbeta M) := by
+  intro r hr
+  have hcard : Nat.card ↥(Mbeta M) = Nat.card ↥(Ch03.oPiCore (beta M) ↥M) := by
+    rw [Mbeta, OddOrder.GroupTheory.opiCoreInG,
+      Subgroup.card_map_of_injective M.subtype_injective]
+  rw [hcard] at hr
+  exact Ch03.oPiCore.isPiGroup (beta M) r hr
+
+theorem Msigma_isPiGroup [Finite G] (M : Subgroup G) :
+    Ch03.Subgroup.IsPiGroup (sigma M) (Msigma M) := by
+  intro r hr
+  have hcard : Nat.card ↥(Msigma M) = Nat.card ↥(Ch03.oPiCore (sigma M) ↥M) := by
+    rw [Msigma, OddOrder.GroupTheory.opiCoreInG,
+      Subgroup.card_map_of_injective M.subtype_injective]
+  rw [hcard] at hr
+  exact Ch03.oPiCore.isPiGroup (sigma M) r hr
+
+@[simp] theorem mem_elemAbelianOfRankIn_iff (p n : ℕ) (H X : Subgroup G) :
+    elemAbelianOfRankIn p n H X ↔ X ∈ elemAbelianOfRank G p n ∧ X ≤ H :=
+  Iff.rfl
+
+theorem elemAbelianOfRankIn.le {p n : ℕ} {H X : Subgroup G}
+    (hX : elemAbelianOfRankIn p n H X) : X ≤ H :=
+  hX.2
+
+theorem elemAbelianOfRankIn.mem_elemAbelianOfRank {p n : ℕ} {H X : Subgroup G}
+    (hX : elemAbelianOfRankIn p n H X) : X ∈ elemAbelianOfRank G p n :=
+  hX.1
+
+theorem omega1CenterInG_le (P : Subgroup G) (p : ℕ) :
+    omega1CenterInG P p ≤ P :=
+  Subgroup.map_subtype_le _
+
 /-! ## Theorem 10.6 — proper subgroup は p-length one (mmd L2779) -/
 
 /-- **BG Theorem 10.6** (mmd L2779): `p` prime、`H` を `G` の真部分群とすると、`H` は `p`-length

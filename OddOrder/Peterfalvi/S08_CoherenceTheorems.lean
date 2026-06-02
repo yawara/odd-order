@@ -227,6 +227,64 @@ theorem index_H_eq_card_W1 (hyp : SibleyDadeHypothesis G L H) :
     H.index = Nat.card hyp.W1 :=
   (Subgroup.IsComplement.card_right (Subgroup.isComplement'_def.mp hyp.split)).symm
 
+/-- Degree-one source characters induce to class functions of degree |W1| in the (6.8)
+setup. This is the degree side of the Y = S(Hprime) family used in the final coherence assembly. -/
+theorem induce_apply_one_eq_card_W1_of_degree_one
+    (hyp : SibleyDadeHypothesis G L H) (θ : IrreducibleCharacter ↥H)
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1) :
+    OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L) =
+      (Nat.card hyp.W1 : ℂ) := by
+  rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ_one, mul_one,
+    hyp.index_H_eq_card_W1]
+
+/-- If two source class functions induce to the same value at 1, their induced difference is
+supported on H-sharp in the (6.8) Dade support. -/
+theorem support_sub_induce_subset_sharpImage_of_apply_one_eq
+    (hyp : SibleyDadeHypothesis G L H) (θ ψ : ClassFunction ↥H ℂ)
+    (hone : OddOrder.RepresentationTheory.ClassFunction.induce H θ (1 : ↥L) =
+      OddOrder.RepresentationTheory.ClassFunction.induce H ψ (1 : ↥L)) :
+    (OddOrder.RepresentationTheory.ClassFunction.induce H θ -
+        OddOrder.RepresentationTheory.ClassFunction.induce H ψ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  letI : H.Normal := hyp.H_normal
+  intro x hx
+  have hθsupp :
+      (OddOrder.RepresentationTheory.ClassFunction.induce H θ).support ⊆ H :=
+    OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_of_normal
+      (G := ↥L) (k := ℂ) H θ
+  have hψsupp :
+      (OddOrder.RepresentationTheory.ClassFunction.induce H ψ).support ⊆ H :=
+    OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_of_normal
+      (G := ↥L) (k := ℂ) H ψ
+  have hxH : x ∈ H := by
+    rcases OddOrder.RepresentationTheory.ClassFunction.support_sub_subset
+        (OddOrder.RepresentationTheory.ClassFunction.induce H θ)
+        (OddOrder.RepresentationTheory.ClassFunction.induce H ψ) hx with hxθ | hxψ
+    · exact hθsupp hxθ
+    · exact hψsupp hxψ
+  have hxne : x ≠ 1 := by
+    intro hx1
+    apply hx
+    rw [hx1, OddOrder.RepresentationTheory.ClassFunction.sub_apply, hone, sub_self]
+  change (x : G) ∈ sharpImage H
+  refine ⟨?_, ?_⟩
+  · exact Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩
+  · intro hx1G
+    exact hxne (Subtype.ext hx1G)
+
+/-- Degree-one source characters give induced differences supported on H-sharp. -/
+theorem support_sub_induce_subset_sharpImage_of_degree_one
+    (hyp : SibleyDadeHypothesis G L H) (θ ψ : IrreducibleCharacter ↥H)
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
+    (hψ_one : (ψ : ClassFunction ↥H ℂ) (1 : ↥H) = 1) :
+    (OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) -
+        OddOrder.RepresentationTheory.ClassFunction.induce H (ψ : ClassFunction ↥H ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  hyp.support_sub_induce_subset_sharpImage_of_apply_one_eq
+    (θ : ClassFunction ↥H ℂ) (ψ : ClassFunction ↥H ℂ) (by
+      rw [hyp.induce_apply_one_eq_card_W1_of_degree_one θ hθ_one,
+        hyp.induce_apply_one_eq_card_W1_of_degree_one ψ hψ_one])
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

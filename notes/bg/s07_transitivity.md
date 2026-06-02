@@ -482,3 +482,13 @@ def H_q_star (H : Subgroup G) (A : Subgroup G) (q : ℕ) [Fact (Nat.Prime q)] : 
 *出典: `references/bg/local-analysis.mmd` lines 2131-2314 (§7 全文)*
 *クロス参照: `notes/bg/_overview.md` (overview), `notes/bg/s06_additional.md` (§6 dependent), `notes/isaacs/ch07_thompson.md` (Phase 1 J(P))*
 
+---
+
+## Lean API status (2026-06-02 lane B6)
+
+Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S07_Transitivity.lean`.
+
+- Shared BG families are imported from `OddOrder.GroupTheory`: `maximalSubgroups`, `maximalSubgroupsContaining`, `IsUniquelyMaximal`, `hInvariant`, and `hInvariantStar`.
+- §7-local setup definitions are `primesOf`, `kSubgroup`, `ConjTransitiveOn`, `scn3Global`, and `Hypothesis71`.
+- Landed tractable API: `mem_scn3Global`, `exists_sylow_of_mem_scn3Global`, `exists_scn2_sylow_of_mem_scn3Global`, `exists_three_le_pRank_of_mem_scn3Global`, and `Hypothesis71.generated_eq_of_le_of_lt_top`.
+- Remaining §7 `sorry`s are exactly Lemma 7.1, Theorem 7.2, Theorem 7.3, Theorem 7.4, Proposition 7.5, and Theorem 7.6. They remain hard because they need the BG §6 coprime-action and p-length machinery, SCN/p-stability inputs, and the induction on `|G|_q / |Q1 ∩ Q2|`; no theorem-conclusion field was hoisted into the setup.

@@ -1354,8 +1354,13 @@ axiom-clean, AxiomsCheck 登録)**:
 4. **(6.8) T6 engine unblock** (commit): `coherentEqualDegree_fromDade` を個別→**差分 support** に弱化
    (誘導既約は 1 で非零ゆえ個別不可、等次数差分は OK)。
 5. **(6.8) T6 等次数 infra** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`)。
+6. **(6.8) T6 c1+degree consumer** (2026-06-02): Frobenius case c1 は
+   inertia_eq_of_frobeniusGroup / isIrreducibleCharacter_induce_of_frobeniusGroup まで landing。
+   さらに S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| helper を landing。
+7. **(6.8) T6 difference-support consumer** (2026-06-02): normal H の induction support を
+   generic infra として landing し、S08 で degree-one induced differences の H^# support helper を landing。
 
-### 現フロンティア = (6.8) proof T6 の律速 = **general Brauer for conjugation** (新 infra・未着手)
+### 現フロンティア = (6.8) proof T6 family / case-c2 wiring
 - (6.8) proof は `sibleySetup_is_coherent` (S08:251) を埋める作業。task DAG (T0–T11) + 全 spec の
   **正本 = `notes/peterfalvi/s08_6_8_assembly_plan.md`** (§A 6.34 / §B-C T1 / §D T6)。
 - **T6 (Y coherent) の律速** = `inertia(θ)=H` (W₁ が Irr(H)∖{1} に自由作用、6.34 の前提)。精査結果:
@@ -1364,10 +1369,12 @@ axiom-clean, AxiomsCheck 登録)**:
   `ConjClasses.conjByPerm`, `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`) が landed。
   群レベル自由作用は Frobenius `FrobeniusActionTI` で既存。Layer C のうち
   **fixed conjugacy classes count = 1 ⇒ nontrivial Irr は固定されない** は 2026-06-02 に landed。
-  残る bridge は、群論側 free action から fixed conjugacy classes count = 1 を出して `inertia=H` に束ねる部分。
+  Frobenius case (c1) は centralizer_kernel_le から inertia=H、6.34、degree-one source の
+  (Ind θ)(1)=|W₁| helper まで landed。
+  残る T6 は Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
   **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
-- 次セッション推奨: issue 0053 Layer C を進める (これが立てば 6.34 +
-  index_H_eq_card_W1 + difference-support engine で T6 完成 → T7/T8/T9–T11)。
+- 次セッション推奨: issue 0053 Layer D2c を進める。Y=S(Hprime) family construction を
+  S08 の新 degree/support helpers + difference-support engine に接続し、case c2 の inertia を別途放電する。
 
 ### 並行可能な独立 leaf (6.34/Brauer 非依存、`s08_6_8_assembly_plan.md` C 表)
 T0 (Cor 2.30) / T3 ((6.7) 上位 wiring、atoms は ClassSumAlgebra/AlgInt 既存) / T4 ((1.9)+(5.9.a) Galois,
