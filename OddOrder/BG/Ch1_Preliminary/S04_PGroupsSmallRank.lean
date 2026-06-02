@@ -9,7 +9,9 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Index
 import Mathlib.Data.Finite.Card
 import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Algebra.Module.ZMod
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
@@ -3092,5 +3094,309 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
 
 end Prop48ExponentP
 
+section Lemma417
+
+/-! ## §4G: Lemma 4.17 — rank-`≤ 2` `p`-群の odd 自己同型群の導来部分群 (mmd L1706-1732)
+
+`A ≤ Aut R` odd, `r(R) ≤ 2` ⇒ `A'` は `p`-群。BG は `A` solvable も仮定するが,
+本証明が使う §2 エンジン (`odd_two_dim_abelian` /
+`isPGroup_commutator_of_faithful_two_dim_charP`) は odd のみで成立するため不要。
+
+証明: Thm 1.13 の critical `H` (`exp p`, `C_{Aut R}(H)` は `p`-群) を取り
+`V = H/Φ(H)`, `C = C_A(V)` とおく。
+(i) `C` は `p`-群: `c ∈ C` の `p'`-part は `Φ(H)` mod 自明に作用するので Thm 1.8
+(Burnside) で `C_A(H)` に落ち, それが `p`-群 (Thm 1.13) ゆえ自明。
+(ii) `|H| ≤ p³` (Prop 4.8) で `|V| ∈ {p, p², p³}`。`|V| = p³` なら `Φ(H) = 1`,
+`H` elem-ab rank 3 で `r(R) ≤ 2` に矛盾。
+(iii) `|V| = p`: `Aut V` abelian ⇒ `A' ≤ C`。
+(iv) `|V| = p²`: `A/C ↪ Aut V ≅ GL(2,p)` faithful。`p ∣ |A/C|` なら Thm 2.6(b) 形
+(`isPGroup_commutator_of_faithful_two_dim_charP`) で `(A/C)'` は `p`-群, さもなくば
+Thm 2.6(a) (`odd_two_dim_abelian`) で `A/C` abelian。いずれも kernel `C` (p-群) と
+合成して `A'` は `p`-群。 -/
+
+open OddOrder.GroupTheory
+open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+open scoped commutatorElement IsMulCommutative
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- **Burnside kernel step (elementwise BG Thm 1.8)**: a `p'`-order automorphism `f` of a
+finite `p`-group `H` all of whose powers act trivially modulo `Φ(H)` is trivial.
+
+This is `burnside_operator` applied to the cyclic group `⟨f⟩` (coprimality = `p'`-order). -/
+private theorem mulAut_eq_one_of_coprime_orderOf_of_frattini
+    {H : Type*} [Group H] [Finite H] (hH : IsPGroup p H)
+    (f : MulAut H) (hcop : Nat.Coprime (orderOf f) p)
+    (htriv : ∀ z : ℤ, ∀ r : H, ∃ x ∈ _root_.frattini H, (f ^ z) r = r * x) :
+    f = 1 := by
+  classical
+  set B : Subgroup (MulAut H) := Subgroup.zpowers f with hB
+  set ψ : ↥B →* MulAut H := B.subtype with hψ
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hH
+  have hcop' : Nat.Coprime (Nat.card ↥B) (Nat.card H) := by
+    rw [hB, Nat.card_zpowers, hn]
+    exact Nat.Coprime.pow_right n hcop
+  have htriv' : ∀ b : ↥B, ∀ r : H, ∃ x ∈ _root_.frattini H, (ψ b) r = r * x := by
+    rintro ⟨b, hb⟩ r
+    rw [hB, Subgroup.mem_zpowers_iff] at hb
+    obtain ⟨z, rfl⟩ := hb
+    exact htriv z r
+  have hconc := OddOrder.BG.Ch1.S01.burnside_operator hH (φ := ψ) hcop' htriv'
+  ext r
+  rw [MulAut.one_apply]
+  exact hconc ⟨f, Subgroup.mem_zpowers f⟩ r
+
+/-- **GL(2,p) branch engine for Lemma 4.17**: a finite odd-order group `B` mapping
+injectively into `GL (Fin 2) (ZMod p)` either has `p`-group commutator (`p ∣ |B|`,
+Thm 2.6(b) via `isPGroup_commutator_of_faithful_two_dim_charP`) or is abelian
+(`p ∤ |B|`, Thm 2.6(a) via `odd_two_dim_abelian`). The representation lives on the
+concrete module `Fin 2 → ZMod p` (via `Matrix.GeneralLinearGroup.toLin`), keeping all
+instances global — a `letI`-bound module on `Additive Q` would wedge instance synthesis
+(cf. the warning at `IsElementaryAbelian.addAutEquivGL`). -/
+private theorem isPGroup_commutator_or_comm_of_homGLTwo
+    {p : ℕ} [Fact p.Prime] {B : Type*} [Group B] [Finite B] (hB_odd : Odd (Nat.card B))
+    (ι : B →* Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
+    (hι : Function.Injective ι) :
+    IsPGroup p (_root_.commutator B) ∨ ∀ x y : B, x * y = y * x := by
+  classical
+  have hdim : Module.finrank (ZMod p) (Fin 2 → ZMod p) = 2 := by
+    rw [Module.finrank_pi]
+    simp
+  let ρ : Representation (ZMod p) B (Fin 2 → ZMod p) :=
+    (Units.coeHom (Module.End (ZMod p) (Fin 2 → ZMod p))).comp
+      (Matrix.GeneralLinearGroup.toLin.toMonoidHom.comp ι)
+  have hρ_inj : Function.Injective ρ := by
+    simp only [ρ, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom]
+    exact Function.Injective.comp (fun _ _ h => Units.ext h)
+      (Function.Injective.comp Matrix.GeneralLinearGroup.toLin.injective hι)
+  by_cases hp_dvd : p ∣ Nat.card B
+  · exact Or.inl (isPGroup_commutator_of_faithful_two_dim_charP hB_odd hdim ρ hρ_inj
+      hp_dvd (ZMod.charP p))
+  · refine Or.inr ?_
+    have hchar' : ∀ q : ℕ, q.Prime → q ∣ Nat.card B → ¬ CharP (ZMod p) q := by
+      intro q hq hq_dvd hcharq
+      exact hp_dvd ((CharP.eq (ZMod p) hcharq (ZMod.charP p)) ▸ hq_dvd)
+    have hcomm := OddOrder.BG.Ch1.S02.odd_two_dim_abelian hB_odd hdim ρ hρ_inj hchar'
+    exact fun x y => hcomm.comm x y
+
+/-- **BG Lemma 4.17** (mmd L1706): `p` 奇素数, `R` 有限 `p`-群 with `r(R) ≤ 2`, `A` を
+`R` の自己同型群の odd 位数部分群 (`φ : A →* MulAut R` faithful) とすると, `A'`
+(`commutator A`) は `p`-群。
+
+BG は `A` solvable も仮定するが, 本証明の §2 エンジンは odd のみで成立するため不要
+(docstring 冒頭の section コメント参照)。下流: Thm 4.18 / BG §5 Thm 5.5(a) (rank ≤ 2 分岐) /
+Cor 4.19。 -/
+theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
+    (hp_odd : Odd p) (hR : IsPGroup p R) (hrank : pRank R p ≤ 2)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hφ : Function.Injective φ) (hA_odd : Odd (Nat.card A)) :
+    IsPGroup p (_root_.commutator A) := by
+  classical
+  have hp : p.Prime := Fact.out
+  have hp2 : p ≠ 2 := by
+    rintro rfl
+    rw [Nat.odd_iff] at hp_odd
+    norm_num at hp_odd
+  -- R trivial: A embeds in the trivial `MulAut R`, so `A` and `A'` are trivial.
+  rcases subsingleton_or_nontrivial R with hsub | hnontriv
+  · haveI : Subsingleton (MulAut R) := ⟨fun f g => by ext r; exact Subsingleton.elim _ _⟩
+    haveI : Subsingleton A := ⟨fun a b => hφ (Subsingleton.elim _ _)⟩
+    intro g
+    exact ⟨0, by
+      rw [pow_zero, pow_one]
+      exact Subtype.ext (Subsingleton.elim _ _)⟩
+  -- Theorem 1.13: critical characteristic `H` with `exp H = p`, `C_{Aut R}(H)` a `p`-group.
+  obtain ⟨H, hHchar, hHcommtop, hHcommcenter, hHexp, hHaut⟩ :=
+    OddOrder.BG.Ch1.S01.thompson_critical_omega (p := p) hp2 hR
+  haveI : H.Characteristic := hHchar
+  have hH_inv : IsAInvariant φ H := IsAInvariant.of_characteristic φ
+  set ψH : A →* MulAut ↥H := OddOrder.BG.Ch1.S01.restrictAction hH_inv with hψH_def
+  have hH_pg : IsPGroup p ↥H := hR.to_subgroup H
+  -- `C_A(H) = ker ψH` is a `p`-group (pulled back from `C_{Aut R}(H)` along the faithful `φ`).
+  have hkerH_le : ψH.ker ≤ (autCentralizer H).comap φ := by
+    intro a ha
+    rw [Subgroup.mem_comap, mem_autCentralizer]
+    intro h hh
+    have := congrArg (fun e : MulAut ↥H => ((e ⟨h, hh⟩ : ↥H) : R)) ha
+    simpa [hψH_def, OddOrder.BG.Ch1.S01.restrictAction_apply] using this
+  have hkerH_pg : IsPGroup p ψH.ker :=
+    (hHaut.comap_of_injective φ hφ).to_le hkerH_le
+  -- `V = H/Φ(H)` with the induced `A`-action; `C = C_A(V)`.
+  haveI : (_root_.frattini ↥H).Normal := inferInstance
+  have hΦ_inv : IsAInvariant ψH (_root_.frattini ↥H) := IsAInvariant.of_characteristic ψH
+  set ψV : A →* MulAut (↥H ⧸ _root_.frattini ↥H) :=
+    quotientMulAutHom hΦ_inv with hψV_def
+  set C : Subgroup A := ψV.ker with hC_def
+  -- (i) `C` is a `p`-group.
+  have hC_pg : IsPGroup p ↥C := by
+    intro c
+    set a : A := (c : A) with ha_def
+    have ha_mem : a ∈ C := c.2
+    have hn_pos : 0 < orderOf a := orderOf_pos a
+    obtain ⟨k, m, hpm, hmn⟩ :=
+      Nat.exists_eq_pow_mul_and_not_dvd hn_pos.ne' p hp.ne_one
+    have hm_cop : Nat.Coprime p m := hp.coprime_iff_not_dvd.mpr hpm
+    -- the `p'`-part `a' = a ^ p ^ k` has order dividing `m`
+    have ha'_pow_m : (a ^ p ^ k) ^ m = 1 := by
+      rw [← pow_mul, ← hmn, pow_orderOf_eq_one]
+    have ha'_order_dvd : orderOf (a ^ p ^ k) ∣ m := orderOf_dvd_of_pow_eq_one ha'_pow_m
+    -- all powers of `a'` lie in `C`, hence act trivially mod `Φ(H)`
+    have ha'_mem_C : a ^ p ^ k ∈ C := C.pow_mem ha_mem _
+    have htriv : ∀ z : ℤ, ∀ r : ↥H,
+        ∃ x ∈ _root_.frattini ↥H, ((ψH (a ^ p ^ k)) ^ z) r = r * x := by
+      intro z r
+      have hz_mem : (a ^ p ^ k) ^ z ∈ C := C.zpow_mem ha'_mem_C z
+      have hz_ker : ψV ((a ^ p ^ k) ^ z) = 1 := hz_mem
+      have hcoset : (((ψH ((a ^ p ^ k) ^ z)) r : ↥H) : ↥H ⧸ _root_.frattini ↥H) =
+          (r : ↥H ⧸ _root_.frattini ↥H) := by
+        rw [hψV_def] at hz_ker
+        have h2 := congrArg (fun e : MulAut (↥H ⧸ _root_.frattini ↥H) =>
+          e (r : ↥H ⧸ _root_.frattini ↥H)) hz_ker
+        simp only [MulAut.one_apply] at h2
+        exact h2
+      refine ⟨r⁻¹ * (ψH ((a ^ p ^ k) ^ z)) r, QuotientGroup.eq.mp hcoset.symm, ?_⟩
+      rw [← map_zpow]
+      group
+    -- Burnside: the `p'`-part acts trivially on `H`, so it lies in the `p`-group `ker ψH`.
+    have hψ_cop : Nat.Coprime (orderOf (ψH (a ^ p ^ k))) p :=
+      Nat.Coprime.coprime_dvd_left ((orderOf_map_dvd ψH _).trans ha'_order_dvd) hm_cop.symm
+    have hf_one : ψH (a ^ p ^ k) = 1 :=
+      mulAut_eq_one_of_coprime_orderOf_of_frattini hH_pg _ hψ_cop htriv
+    have ha'_kerH : a ^ p ^ k ∈ ψH.ker := hf_one
+    -- inside the `p`-group `ker ψH`, a `p'`-order element is trivial
+    obtain ⟨j, hj⟩ := hkerH_pg ⟨a ^ p ^ k, ha'_kerH⟩
+    have hj' : (a ^ p ^ k) ^ p ^ j = 1 := by
+      have := congrArg (Subtype.val) hj
+      simpa using this
+    have hdvd_pj : orderOf (a ^ p ^ k) ∣ p ^ j := orderOf_dvd_of_pow_eq_one hj'
+    have ha'_one : a ^ p ^ k = 1 := by
+      rw [← orderOf_eq_one_iff]
+      have hcop' : Nat.Coprime (orderOf (a ^ p ^ k)) (p ^ j) :=
+        Nat.Coprime.pow_right j (Nat.Coprime.coprime_dvd_left ha'_order_dvd hm_cop.symm)
+      exact Nat.eq_one_of_dvd_coprimes hcop' dvd_rfl hdvd_pj
+    exact ⟨k, Subtype.ext (by simpa using ha'_one)⟩
+  -- `|H| ≤ p³` (Prop 4.8) and `H ≠ 1`.
+  have hHexp' : ∀ x : ↥H, x ^ p = 1 := fun x => by
+    rw [← hHexp]; exact Monoid.pow_exponent_eq_one x
+  have hHrank : pRank ↥H p ≤ 2 :=
+    le_trans (pRank_le_of_injective (f := H.subtype) H.subtype_injective) hrank
+  have hHcard : Nat.card ↥H ≤ p ^ 3 :=
+    card_le_prime_cube_of_pRank_le_two_of_exponent_prime hH_pg hHrank hHexp'
+  haveI hH_nontriv : Nontrivial ↥H := by
+    rcases subsingleton_or_nontrivial ↥H with h | h
+    · exfalso
+      have h1 : Monoid.exponent ↥H = 1 := Monoid.exp_eq_one_of_subsingleton
+      rw [hHexp] at h1
+      exact hp.one_lt.ne' h1
+    · exact h
+  -- `V` is elementary abelian of order `p ^ d`, `1 ≤ d ≤ 3`.
+  have hV_pg : IsPGroup p (↥H ⧸ _root_.frattini ↥H) := hH_pg.to_quotient _
+  obtain ⟨d, hd⟩ := IsPGroup.iff_card.mp hV_pg
+  have hV_elem : OddOrder.GroupTheory.IsElementaryAbelian p (↥H ⧸ _root_.frattini ↥H) :=
+    hH_pg.quotient_frattini_isElementaryAbelian
+  have hV_dvd : Nat.card (↥H ⧸ _root_.frattini ↥H) ∣ Nat.card ↥H := by
+    have := Subgroup.index_dvd_card (_root_.frattini ↥H)
+    simpa [Subgroup.index] using this
+  have hΦ_ne_top : _root_.frattini ↥H ≠ ⊤ := by
+    obtain ⟨M, hM, _⟩ :=
+      (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup ↥H)).resolve_left bot_lt_top.ne
+    exact fun htop => hM.1 (le_antisymm le_top (htop ▸ frattini_le_coatom hM))
+  have hV_ne_one : Nat.card (↥H ⧸ _root_.frattini ↥H) ≠ 1 := by
+    intro h1
+    exact hΦ_ne_top (Subgroup.index_eq_one.mp (by simpa [Subgroup.index] using h1))
+  have hd_pos : 1 ≤ d := by
+    rcases Nat.eq_zero_or_pos d with h0 | h
+    · exact absurd (by simpa [h0] using hd) hV_ne_one
+    · exact h
+  have hd_le : d ≤ 3 := by
+    have hle : p ^ d ≤ p ^ 3 :=
+      le_trans (Nat.le_of_dvd Nat.card_pos (hd ▸ hV_dvd)) hHcard
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hle
+  -- Case split on `d = m(V)`.
+  interval_cases d
+  -- (iii) `|V| = p`: `Aut V` is abelian, so `A' ≤ C`.
+  · haveI hVcyc : IsCyclic (↥H ⧸ _root_.frattini ↥H) :=
+      isCyclic_of_prime_card (by simpa using hd)
+    let e := IsCyclic.mulAutMulEquiv (↥H ⧸ _root_.frattini ↥H)
+    letI : CommGroup (MulAut (↥H ⧸ _root_.frattini ↥H)) :=
+      e.toMonoidHom.commGroupOfInjective e.injective
+    have hA'_le : _root_.commutator A ≤ C := by
+      rw [_root_.commutator, Subgroup.commutator_le]
+      intro g₁ _ g₂ _
+      have : ψV ⁅g₁, g₂⁆ = 1 := by
+        rw [map_commutatorElement]
+        exact commutatorElement_eq_one_iff_commute.mpr (mul_comm _ _)
+      exact this
+    exact hC_pg.to_le hA'_le
+  -- (iv) `|V| = p²`: `A/C` acts faithfully on the 2-dimensional `F_p`-space `V`.
+  · have hquot_dvd : Nat.card (A ⧸ C) ∣ Nat.card A := by
+      have := Subgroup.index_dvd_card C
+      simpa [Subgroup.index] using this
+    have hquot_odd : Odd (Nat.card (A ⧸ C)) := by
+      rcases Nat.even_or_odd (Nat.card (A ⧸ C)) with he | ho
+      · exfalso
+        have h2 : (2 : ℕ) ∣ Nat.card A := dvd_trans he.two_dvd hquot_dvd
+        rw [Nat.odd_iff] at hA_odd
+        omega
+      · exact ho
+    -- `MulAut V ≃* GL (Fin 2) (ZMod p)` via the elementary abelian bridge
+    have hfinrank := hV_elem.log_card_eq_finrank
+    rw [hd, Nat.log_pow hp.one_lt] at hfinrank
+    have ν := hV_elem.mulAutEquivGeneralLinearGroup
+    rw [← hfinrank] at ν
+    rcases isPGroup_commutator_or_comm_of_homGLTwo hquot_odd
+        (ν.toMonoidHom.comp (QuotientGroup.kerLift ψV))
+        (fun x y hxy => QuotientGroup.kerLift_injective ψV (ν.injective hxy))
+        with hQ | hcomm
+    · -- Thm 2.6(b): `(A/C)'` is a `p`-group; extend by the `p`-group `C`.
+      have hker_pg : IsPGroup p ((QuotientGroup.mk' C).ker) := by
+        rw [QuotientGroup.ker_mk']
+        exact hC_pg
+      have hcomap : IsPGroup p
+          ((_root_.commutator (A ⧸ C)).comap (QuotientGroup.mk' C)) :=
+        hQ.comap_of_ker_isPGroup (QuotientGroup.mk' C) hker_pg
+      refine hcomap.to_le ?_
+      have hmap : (_root_.commutator A).map (QuotientGroup.mk' C) =
+          _root_.commutator (A ⧸ C) := by
+        rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator,
+          Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective C)]
+      rw [← hmap]
+      exact Subgroup.le_comap_map _ _
+    · -- Thm 2.6(a): `A/C` is abelian, so `A' ≤ C`.
+      have hA'_le : _root_.commutator A ≤ C := by
+        rw [_root_.commutator, Subgroup.commutator_le]
+        intro g₁ _ g₂ _
+        have hmk : (QuotientGroup.mk' C) ⁅g₁, g₂⁆ = 1 := by
+          rw [map_commutatorElement]
+          exact commutatorElement_eq_one_iff_commute.mpr (hcomm _ _)
+        exact (QuotientGroup.eq_one_iff _).mp (by simpa using hmk)
+      exact hC_pg.to_le hA'_le
+  -- (ii) `|V| = p³` is impossible: `Φ(H) = 1` makes `H` elementary abelian of rank 3.
+  · exfalso
+    have hmul : Nat.card (_root_.frattini ↥H) * Nat.card (↥H ⧸ _root_.frattini ↥H) =
+        Nat.card ↥H := by
+      have := Subgroup.card_mul_index (_root_.frattini ↥H)
+      simpa [Subgroup.index] using this
+    have hΦ1 : Nat.card (_root_.frattini ↥H) = 1 := by
+      have hle : Nat.card (_root_.frattini ↥H) * p ^ 3 ≤ 1 * p ^ 3 := by
+        rw [one_mul]
+        calc Nat.card (_root_.frattini ↥H) * p ^ 3
+            = Nat.card (_root_.frattini ↥H) * Nat.card (↥H ⧸ _root_.frattini ↥H) := by
+              rw [hd]
+          _ = Nat.card ↥H := hmul
+          _ ≤ p ^ 3 := hHcard
+      have hle' := Nat.le_of_mul_le_mul_right hle (pow_pos hp.pos 3)
+      have hpos := Nat.card_pos (α := ↥(_root_.frattini ↥H))
+      omega
+    have hΦbot : _root_.frattini ↥H = ⊥ := Subgroup.eq_bot_of_card_eq _ hΦ1
+    have hH_elem : OddOrder.GroupTheory.IsElementaryAbelian p ↥H :=
+      hH_pg.isElementaryAbelian_of_frattini_eq_bot hΦbot
+    have hHcard3 : Nat.card ↥H = p ^ 3 := by
+      rw [← hmul, hΦ1, one_mul, hd]
+    have h3rank : 3 ≤ pRank R p := pow_le_card_of_le_pRank H hH_elem hHcard3
+    omega
+
+end Lemma417
 
 end OddOrder.BG.Ch1.S04
