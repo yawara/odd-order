@@ -1850,6 +1850,34 @@ theorem normEstimates_of_normQuadraticCorrection_eqs
   gamma_norm_sq_le :=
     H78.gammaNormSq_le_of_normQuadraticCorrection_eq hBD hgamma
 
+/-- Once the orthogonal expansion of `‖β‖²` is known, the residual norm formula
+for `Γ` is just the arithmetic rearrangement in Peterfalvi (7.8.b). -/
+theorem gammaNormSq_eq_of_betaNormSq_expand
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hbetaNorm : H78.betaNormSq = (H78.complementIndex : ℝ) + 1)
+    (hexpand : H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD) :
+    H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD := by
+  have hh_ne : (H78.kernelOrder : ℝ) ≠ 0 := by
+    exact_mod_cast H78.kernelOrder_pos.ne'
+  have he_ne : (H78.complementIndex : ℝ) ≠ 0 := by
+    exact_mod_cast H78.complementIndex_pos.ne'
+  rw [hbetaNorm] at hexpand
+  have hquad :
+      (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD =
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) := by
+    rw [normQuadraticCorrection]
+    field_simp [hh_ne, he_ne]
+  rw [hquad]
+  linarith
+
 /-- The distinguished `νζ` is orthogonal to `1_G`, in the displayed direction. -/
 theorem zetaImage_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
