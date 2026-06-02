@@ -2800,6 +2800,36 @@ theorem sum_weights_le_of_orthogonal_integer_decomposition
   rw [hΓ_norm] at hΓ_bound
   linarith
 
+open scoped Classical in
+/-- Rational-valued version of the integer-coefficient Pythagoras bridge.  This
+matches the `𝓑`-sum in Peterfalvi (7.10), whose weights are rational ratios such
+as `(h_j - 1) / e_j`, while the norm inequality lives in `ℝ`. -/
+theorem sum_rat_weights_le_of_orthogonal_integer_decomposition
+    (B : Finset ι) (v : ι → ClassFunction G ℂ) (x : ι → ℤ) (m : ι → ℚ)
+    (Γ Γ₁ : ClassFunction G ℂ) (M : ℚ)
+    (hΓ : Γ = (∑ i ∈ B, (((x i : ℝ) : ℂ) • v i)) + Γ₁)
+    (horth : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) = if i = j then (m i : ℂ) else 0)
+    (hΓ₁ : ∀ i ∈ B, ClassFunction.inner Γ₁ (v i) = 0)
+    (hm_nonneg : ∀ i ∈ B, 0 ≤ m i)
+    (hx_nonzero : ∀ i ∈ B, x i ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (M : ℝ)) :
+    (∑ i ∈ B, m i) ≤ M := by
+  have horth_real : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) =
+        if i = j then (((m i : ℝ) : ℂ)) else 0 := by
+    intro i hi j hj
+    simpa using horth i hi j hj
+  have hm_nonneg_real : ∀ i ∈ B, 0 ≤ (m i : ℝ) := by
+    intro i hi
+    exact_mod_cast hm_nonneg i hi
+  have hreal := sum_weights_le_of_orthogonal_integer_decomposition
+    B v x (fun i => (m i : ℝ)) Γ Γ₁ (M : ℝ) hΓ horth_real hΓ₁ hm_nonneg_real
+    hx_nonzero hΓ_bound
+  have hcast : ((∑ i ∈ B, m i) : ℝ) ≤ (M : ℝ) := by
+    simpa using hreal
+  exact_mod_cast hcast
+
 end OrthogonalIntegerDecomposition
 
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
@@ -3795,6 +3825,12 @@ lemma exists_lowerBoundTerm_of_exists_Bsum_bound [Finite G]
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
+/-- The unweighted local contribution `(h_j - 1) / e_j` attached to an index in
+Peterfalvi's `𝓑`-sum.  Naming it keeps the `ℚ`-to-`ℂ` coercion from being
+elaborated as a complex division in orthogonality hypotheses. -/
+noncomputable def BsumWeight (F : FrobeniusFamily G k) (j : Fin k) : ℚ :=
+  ((F.h j : ℚ) - 1) / (F.e j : ℚ)
+
 /-- **Peterfalvi (7.10) character-estimate target.**  This is the exact data
 still to be built from the character-theoretic inputs (7.5), (7.8), (7.9), and
 (6.8): a minimal kernel index, the corresponding `𝓑`-set, the unweighted
@@ -3820,6 +3856,45 @@ structure CharacterEstimateData [Finite G] (F : FrobeniusFamily G k) where
         (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
         (∑ j ∈ B, ((F.h j : ℚ) - 1) /
           ((F.e j : ℚ) * (F.h j : ℚ)))
+
+/-- Direct `𝓑`-sum bridge for Peterfalvi (7.10): an orthogonal integer
+combination with diagonal weights `(h_j - 1) / e_j` and norm at most `e_i - 1`
+gives exactly the `Bsum_le` field required by `CharacterEstimateData`. -/
+lemma Bsum_le_of_orthogonal_integer_decomposition [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k} (B : Finset (Fin k))
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1) :
+    (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1 := by
+  classical
+  have horth' : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        @ite ℂ (j = l) (Classical.propDecidable (j = l))
+          (F.BsumWeight j : ℂ) 0 := by
+    intro j hj l hl
+    by_cases h : j = l
+    · simpa [h] using horth j hj l hl
+    · simpa [h] using horth j hj l hl
+  have hm_nonneg : ∀ j ∈ B, 0 ≤ F.BsumWeight j := by
+    intro j _hj
+    simpa [BsumWeight] using F.h_sub_one_div_e_nonneg j
+  let M : ℚ := (F.e i : ℚ) - 1
+  have hM_eq : (M : ℝ) = (F.e i : ℝ) - 1 := by
+    dsimp [M]
+    norm_num
+  have hbound : (ClassFunction.inner Γ Γ).re ≤ (M : ℝ) := by
+    rw [hM_eq]
+    exact hΓ_bound
+  have hrat := sum_rat_weights_le_of_orthogonal_integer_decomposition
+    B v x F.BsumWeight Γ Γ₁ M hΓ horth' hΓ₁ hm_nonneg hx_nonzero hbound
+  simpa [BsumWeight, M] using hrat
 
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
