@@ -19,7 +19,8 @@ Prop 7.5 [§6 ✅ + p-stability]
 ```
 
 **ゲート状況**: Prop 1.5(a)(b)(c) ✅ (S01 §1B, φ : A →* MulAut G 型レベル);
-Lem 1.14 ✅; §6 sorry-free ✅; **Prop 1.16 ✅ 完成 (2026-06-03, `S01b_Prop116.lean`)**。
+Lem 1.14 ✅; **§6 は Thm 6.7/Lem 6.5 が未形式化** (S06_Additional.lean は別の J(P) 補題のみ・
+旧「§6 sorry-free ✅」は誤り, 2026-06-03 訂正); **Prop 1.16 ✅ 完成 (2026-06-03, `S01b_Prop116.lean`)**。
 〔**訂正 2026-06-03**: 旧記載「Prop 1.16 = G Thm 6.2.4, Isaacs に対応定理なし → Gorenstein
 参照例外」は**誤り**。第1式 = **G Thm 6.2.4 = Isaacs FGT Thm 6.21** で repo 既存
 (`Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`)。Gorenstein 形式化は
