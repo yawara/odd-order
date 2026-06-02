@@ -102,3 +102,81 @@ axiom-clean だが**本定理ではない**. 本 issue の 7 ステップ証明�
 
 Peterfalvi 指標理論ラインとは**別系統 (Isaacs/BG 側)**. flagship かつ既知スキャフォールド解消なので価値は高い.
 完成すると §6C (Thm 6.22-6.24 Frobenius 核冪零, 未形式化) の `6.23 → 7.1 → 6.24` ラインも前進可能になる.
+
+
+## 2026-06-02 update — lane I1 Step 7 + quotient inheritance landed
+
+Lane `codex/isaacs-ch07-pcomp` replaced the public scaffold surface around
+`thompson_normal_p_complement`: it no longer assumes raw
+`hJ_normal : (thompsonJ P p).Normal`.  The old final observation is now the private helper
+`thompson_normal_p_complement_of_thompsonJ_normal`, and the public theorem proves Step 7
+from the actual `normal_J` hypotheses:
+
+- `hp2 : p ≠ 2`
+- `h_pSolvable : IsPiSeparable ({p} : Set ℕ) G`
+- abelian Sylow `2`-subgroups
+- `O_{p'}(G) = 1`
+- `C_G(Z(P)) = P`
+- plus the original `N_G(J(P))` normal `p`-complement hypothesis
+
+Also landed the missing generic helper `hasNormalPComplement_quotient`: normal
+`p`-complements pass to quotient groups.  This discharges the "homomorphic images"
+inheritance infrastructure explicitly invoked in §7C and needed in Step 2/Step 3.
+
+Remaining work toward the full Isaacs Thm 7.1 statement:
+
+1. Formalize the minimum-counterexample setup and bad-subgroup choice used before Step 1.
+2. Step 1: prove the chosen bad subgroup `U` equals `O_p(G)` using normalizers-grow in
+   `p`-groups and the maximality conditions on `|N_G(U)|_p` and `|U|`.
+3. Step 2: prove `G/U` has a normal `p`-complement by showing the quotient hypotheses for
+   `N_{G/U}(J(P/U))` and `C_{G/U}(Z(P/U))`; use the new quotient inheritance helper for
+   the homomorphic-image part.
+4. Step 3: prove `O_{p'}(G)=1` using Lemma 7.7 and quotient inheritance for the images of
+   `N_G(J(P))` and `C_G(Z(P))`.
+5. Step 4: prove `P` is maximal in `G` using Step 2 p-solvability, Step 3, and the
+   Hall-Higman centralizer bound.
+6. Step 5: derive `C_G(Z(P)) = P` from maximality and the centralizer normal
+   `p`-complement hypothesis.
+7. Step 6: prove the normal `p`-complement of `G/U` is abelian, then derive the abelian
+   Sylow-2 hypothesis for `G`.
+8. Assemble the full theorem surface with the textbook hypotheses
+   `p ≠ 2`, `P : Sylow p G`, `HasNormalPComplement p C_G(Z(P))`, and
+   `HasNormalPComplement p N_G(J(P))`, feeding Steps 2-6 into the new Step 7 theorem.
+
+
+## 2026-06-02 update — subgroup image inheritance for Steps 2/3
+
+Landed the next inheritance bridge in lane `codex/isaacs-ch07-pcomp`:
+
+- `hasNormalPComplement_subgroup_map`: normal `p`-complements pass from a subgroup
+  to its homomorphic image.  This is the subgroup-image form of the "homomorphic
+  images" inheritance invoked before the seven-step proof.
+- `hasNormalPComplement_normalizer_map_of_coprime_kernel`: combines the above with
+  Lemma 7.7(a), so a normal `p`-complement in `N_G(X)` pushes to one in
+  `N_{G/N}(Xbar)` when `N` is a normal `p'`-subgroup and `X` is a nontrivial
+  `p`-subgroup.
+- `hasNormalPComplement_centralizer_map_of_coprime_kernel`: same for centralizers,
+  using Lemma 7.7(b).
+
+This makes the Step 3 quotient-hypothesis transfer explicit: once the eventual proof
+identifies `J(Pbar)` and `Z(Pbar)` with the quotient images of `J(P)` and `Z(P)`,
+the existing hypotheses on `N_G(J(P))` and `C_G(Z(P))` can be pushed to the quotient
+normalizer and centralizer.  Step 2 still needs the separate `U ≤ X ≤ P` lift and
+bad-subgroup maximality argument for `J(P/U)` and `Z(P/U)`.
+
+
+## 2026-06-02 update — Thompson J quotient identification
+
+Landed the Step 3 `J(P)` quotient bridge:
+
+- `thompsonJ_map_of_coprime_kernel`: if `N ⊴ G` is a normal `p'`-subgroup and
+  `P` is a `p`-subgroup, then
+  `J(P.map (QuotientGroup.mk' N)) = (J(P)).map (QuotientGroup.mk' N)`.
+
+The proof uses coprimality to get `P ∩ N = 1`, restricts the quotient map to an
+injective homomorphism on `P`, applies the existing injective-image theorem for
+Thompson `J` to `⊤ ≤ P`, and transports the result back to ambient subgroups.
+Together with the normalizer image inheritance already landed, this removes the
+missing `J(Pbar)` identification needed to push the `N_G(J(P))` hypothesis through
+`p'`-quotients in Step 3.  The analogous center/`Z(Pbar)` quotient identification
+remains open for the centralizer half.
