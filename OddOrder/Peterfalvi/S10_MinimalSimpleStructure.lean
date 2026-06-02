@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.MaximalSubgroup
@@ -27,9 +28,10 @@ BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
 
 The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
 has now been recovered; this file records the `R(x)`/thickened-support notation,
-the Type-II TI endpoint, and the BG Theorem E covering interface.  The remaining
-Dade-hypothesis interface is left as a precise TODO until the lower-level
-section hypotheses have stable names.
+the Type-II TI endpoint, the Dade (2.2) interface behind (8.15), and the BG
+Theorem E covering interface.  The higher §4.6/§5.2 Dade specializations remain
+as a precise TODO until their section-level carriers are stable enough to avoid
+opaque placeholders.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -202,6 +204,46 @@ noncomputable abbrev typePThickenedA (L M : Subgroup G) (data : TypePData M) :=
 noncomputable abbrev typePThickenedA0 (L M : Subgroup G) (data : TypePData M) :=
   OddOrder.GroupTheory.typePThickenedA0 L M data
 
+/-- Carrier for the Dade-hypothesis part of **Peterfalvi (8.15)** for a single
+support set `A`.
+
+It records the part already expressible with the existing §4 API: `L = M`,
+`N_G(A) = M`, the Dade Hypothesis (2.2), the recovered formula `H(a)=R(a)`, and
+that the §4 Dade support is the thickened support from (8.14).  The later
+Hypothesis (4.6)/(5.2) specializations add character-family data and are kept as
+a separate TODO below. -/
+structure DadeSupportHypothesisData [Fintype G] (M : Subgroup G) (A : Set G) where
+  /-- Peterfalvi (8.15): `M = N_G(A)`. -/
+  normalizer_eq : Subgroup.normalizer A = M
+  /-- Peterfalvi (8.15): Hypothesis (2.2) holds with `L = M`. -/
+  dade : OddOrder.Peterfalvi.S04.Hypothesis G A M
+  /-- Peterfalvi (8.15): the subgroups in Hypothesis (2.2) are the recovered
+  `R(a)` from (8.14). -/
+  H_eq_supportKernel :
+    ∀ a : {a : G // a ∈ A}, dade.H a = supportKernel M M A a.1
+  /-- The Dade support from §4 is the thickened support notation of (8.14). -/
+  dadeSupport_eq_thickenedSupport : dade.dadeSupport = thickenedSupport M M A
+
+/-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold
+for `A(M)=A_0(M)` and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
+theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    Nonempty (DadeSupportHypothesisData M (typeIA M data)) ∧
+      Nonempty (DadeSupportHypothesisData M (A1 M PeterfalviType.I)) := by
+  sorry
+
+/-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
+for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
+theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    {tau : PeterfalviType} (hType : HasPeterfalviType tau M) :
+    Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
+      Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
+        Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
+  sorry
+
 
 /-- **Peterfalvi (8.17)**: BG Theorem E data for a set of conjugacy-class
 representatives of maximal subgroups.
@@ -304,10 +346,10 @@ theorem support_mutual_exclusion [Finite G]
         Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
   sorry
 
--- TODO (Peterfalvi (8.15)): once the Section 2.2/4.6/5.2 hypothesis
--- structures have stable section-level names, add the recovered statement that
--- `M = N_G(A)` for `A = A_0(M), A(M), A_1(M)`, and that the relevant Dade
--- hypotheses hold with `L=M`, `H(a)=R(a)`, `K=M_prime`, and `H=M_F` or `M_s`.
+-- TODO (Peterfalvi (8.15), higher Dade specializations): add the recovered
+-- Hypothesis (4.6)/(5.2) statements with `K=M_prime` and `H=M_F` or `M_s`
+-- once those section-level carriers expose the needed `L=M` specialization
+-- without opaque placeholder propositions.
 --
 
 end OddOrder.Peterfalvi.S10
