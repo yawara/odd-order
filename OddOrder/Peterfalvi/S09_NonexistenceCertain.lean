@@ -1398,6 +1398,16 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The Dade image defining `β` is supported on the corresponding Dade support. -/
+theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :
+    H78.beta.support ⊆ H78.hyp76.hyp71.hyp.dadeSupport := by
+  intro g hg
+  by_contra hnot
+  exact hg (by
+    rw [H78.beta_def]
+    exact H78.hyp76.hyp71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport
+      H78.indMinusZetaSupp g hnot)
+
 /-- The residual `Δ = β - 1_G + ζ^ν` used in Peterfalvi (7.9). -/
 noncomputable def delta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
   H78.beta - Hypothesis71.constOne G +
@@ -2629,6 +2639,78 @@ def swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
 theorem conclusion_swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
     H79.swap.conclusion ↔ H79.conclusion := by
   simp [conclusion, swap, firstZetaImage, secondZetaImage, or_comm]
+
+/-- The two `β` functions are orthogonal when their Dade supports are disjoint. -/
+theorem beta_inner_beta_eq_zero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction.inner H79.first.beta H79.second.beta = 0 := by
+  have hdisj : Disjoint H79.first.beta.support H79.second.beta.support := by
+    rw [Set.disjoint_left]
+    intro g hg₁ hg₂
+    exact Set.disjoint_left.mp H79.dadeSupport_disjoint
+      (H79.first.beta_support_subset_dadeSupport hg₁)
+      (H79.second.beta_support_subset_dadeSupport hg₂)
+  exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
+
+/-- Expanding `β₁ = 1_G - ζ₁^ν + Δ₁` and `β₂ = 1_G - ζ₂^ν + Δ₂`
+gives the displayed algebraic identity used in Peterfalvi (7.9). -/
+theorem beta_inner_beta_expand_delta (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0) :
+    ClassFunction.inner H79.first.beta H79.second.beta =
+      1 - ClassFunction.inner H79.firstZetaImage H79.second.delta -
+        ClassFunction.inner H79.first.delta H79.secondZetaImage +
+          ClassFunction.inner H79.first.delta H79.second.delta := by
+  have hzeta_cross' :
+      ClassFunction.inner
+        (H79.first.nu (H79.first.hyp76.zeta H79.first.zetaDistinct))
+        (H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)) = 0 := by
+    simpa [firstZetaImage, secondZetaImage] using hzeta_cross
+  rw [H79.first.beta_eq_constOne_sub_zetaImage_add_delta,
+    H79.second.beta_eq_constOne_sub_zetaImage_add_delta]
+  simp only [firstZetaImage, secondZetaImage, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_sub_right]
+  rw [Hypothesis71.constOne_inner_self_eq_one,
+    H79.second.constOne_orth_zetaImage hBD₂,
+    H79.second.constOne_orth_delta hBD₂,
+    H79.first.zetaImage_orth_one hBD₁,
+    H79.first.delta_orth_one hBD₁,
+    hzeta_cross']
+  ring
+
+/-- The support and `ζ`-orthogonality inputs reduce Peterfalvi (7.9) to the
+parity/nonzero statement for the two residual cross terms. -/
+theorem delta_cross_equation (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0) :
+    0 = 1 - ClassFunction.inner H79.firstZetaImage H79.second.delta -
+        ClassFunction.inner H79.first.delta H79.secondZetaImage +
+          ClassFunction.inner H79.first.delta H79.second.delta := by
+  rw [← H79.beta_inner_beta_expand_delta hBD₁ hBD₂ hzeta_cross,
+    H79.beta_inner_beta_eq_zero]
+
+/-- If one of the residual cross terms is nonzero, then the original (7.9)
+non-orthogonality conclusion follows. -/
+theorem conclusion_of_delta_cross_nonzero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hdelta : ClassFunction.inner H79.first.delta H79.secondZetaImage ≠ 0 ∨
+      ClassFunction.inner H79.firstZetaImage H79.second.delta ≠ 0) :
+    H79.conclusion := by
+  rcases hdelta with hdelta | hdelta
+  · left
+    rw [H79.first.beta_inner_eq_delta_inner_of_orthogonal H79.secondZetaImage
+      (H79.second.constOne_orth_zetaImage hBD₂) hzeta_cross]
+    exact hdelta
+  · right
+    have hleft : ClassFunction.inner H79.firstZetaImage H79.second.beta ≠ 0 := by
+      rw [H79.second.inner_beta_eq_inner_delta_of_orthogonal H79.firstZetaImage
+        (H79.first.zetaImage_orth_one hBD₁) hzeta_cross]
+      exact hdelta
+    intro hzero
+    apply hleft
+    rw [Hypothesis71.ClassFunction.inner_symm H79.second.beta H79.firstZetaImage,
+      hzero, star_zero]
 
 end Hypothesis79
 
