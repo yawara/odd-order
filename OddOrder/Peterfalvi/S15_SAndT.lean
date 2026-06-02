@@ -127,6 +127,32 @@ def G0 (hyp : Hypothesis (G := G)) : Set G :=
     (conjClassSet (sharpSubgroup hyp.H) ∪
       conjClassSet (sharpSubgroup hyp.Q))
 
+
+/-- Under **Peterfalvi (13.1)**, the prime `q` is odd, hence not `2`. -/
+theorem q_ne_two (hyp : Hypothesis (G := G)) : hyp.q ≠ 2 := by
+  intro hq2
+  have hodd : Odd 2 := by simpa [hq2] using hyp.q_odd
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+/-- Under **Peterfalvi (13.1)**, the prime `p` is odd, hence not `2`. -/
+theorem p_ne_two (hyp : Hypothesis (G := G)) : hyp.p ≠ 2 := by
+  intro hp2
+  have hodd : Odd 2 := by simpa [hp2] using hyp.p_odd
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+/-- Under **Peterfalvi (13.1)**, `q` is at least `3`. -/
+theorem three_le_q (hyp : Hypothesis (G := G)) : 3 ≤ hyp.q := by
+  have htwo : 2 ≤ hyp.q := hyp.q_prime.two_le
+  have hne : hyp.q ≠ 2 := hyp.q_ne_two
+  omega
+
+/-- Under **Peterfalvi (13.1)**, `p` is at least `3`. -/
+theorem three_le_p (hyp : Hypothesis (G := G)) : 3 ≤ hyp.p := by
+  have htwo : 2 ≤ hyp.p := hyp.p_prime.two_le
+  have hne : hyp.p ≠ 2 := hyp.p_ne_two
+  omega
 end Hypothesis
 
 /-! ## (13.2): basic structure -/
