@@ -204,8 +204,29 @@ theorem exists_y_L_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 structure CaseBForSData (hyp : Hypothesis (G := G)) where
   caseB_formula : Prop
   caseB_holds : caseB_formula
+  order : OddOrder.Peterfalvi.S15.CaseBOrderUData hyp.base caseB_formula
   U_rank_obstruction : Prop
   U_rank_obstruction_holds : U_rank_obstruction
+
+namespace CaseBForSData
+
+/-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, the
+`p ≡ 1 mod q` branch gives the divided cyclotomic value of `u`. -/
+theorem u_eq_of_p_modEq_one {hyp : Hypothesis (G := G)} (data : CaseBForSData hyp) :
+    hyp.base.p ≡ 1 [MOD hyp.base.q] →
+      hyp.base.u =
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.q * (hyp.base.p - 1)) :=
+  data.order.u_eq_of_p_modEq_one
+
+/-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, the
+non-`p ≡ 1 mod q` branch gives the full cyclotomic value of `u`. -/
+theorem u_eq_of_not_modEq_one {hyp : Hypothesis (G := G)}
+    (data : CaseBForSData hyp) :
+    ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] →
+      hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+  data.order.u_eq_of_not_modEq_one
+
+end CaseBForSData
 
 /-- **Peterfalvi (14.6)**: case (9.7.b) holds for `S`. -/
 theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
