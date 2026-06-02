@@ -695,6 +695,43 @@ theorem exists_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
   haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
   exact bot_ne_top hle
 
+/-- **BG Prop 1.16(2), conjugation form**: a noncyclic abelian `B ≤ G` normalizing a coprime
+`Q ≠ 1` has a subgroup `Y ≤ B` with `B/Y` cyclic (`Y ⊔ ⟨b⟩ = B`) and `Q ⊓ C_G(Y) ≠ 1`. -/
+theorem exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
+    {B Q : Subgroup G} [IsMulCommutative ↥B] (hBQ : B ≤ Subgroup.normalizer Q)
+    (hB_nc : ¬ IsCyclic ↥B) (hCop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Q)) (hQ : Q ≠ ⊥) :
+    ∃ Y : Subgroup G, Y ≤ B ∧ (∃ b ∈ B, Y ⊔ Subgroup.zpowers b = B) ∧
+      Q ⊓ Subgroup.centralizer (Y : Set G) ≠ ⊥ := by
+  classical
+  have hQ_inv : Ch03.IsAInvariant (conjAction B) Q := isAInvariant_conjAction_iff.mpr hBQ
+  have htop := OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
+    hQ_inv.restrict hCop hB_nc
+  by_contra hcon
+  push_neg at hcon
+  have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure hQ_inv.restrict ≤ ⊥ := by
+    rw [OddOrder.BG.Ch1.S01.cocyclicFixedByClosure, Subgroup.closure_le]
+    rintro g ⟨Yb, ⟨b, hb⟩, hYfix⟩
+    set Y : Subgroup G := Yb.map B.subtype with hYdef
+    have hYcocyc : ∃ b' ∈ B, Y ⊔ Subgroup.zpowers b' = B := by
+      refine ⟨(b : G), b.2, ?_⟩
+      have hzp : Subgroup.zpowers (b : G) = (Subgroup.zpowers b).map B.subtype :=
+        (MonoidHom.map_zpowers B.subtype b).symm
+      rw [hYdef, hzp, ← Subgroup.map_sup, hb, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    have hmemG : (g : G) ∈ Q ⊓ Subgroup.centralizer (Y : Set G) := by
+      refine ⟨g.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
+      rintro y hy
+      rw [hYdef, Subgroup.coe_map, Set.mem_image] at hy
+      obtain ⟨yb, hyb, rfl⟩ := hy
+      have hval : ((hQ_inv.restrict yb) g : G) = (g : G) := congrArg Subtype.val (hYfix yb hyb)
+      rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+      simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hval
+      exact mul_inv_eq_iff_eq_mul.mp hval
+    rw [hcon Y (Subgroup.map_subtype_le _) hYcocyc] at hmemG
+    exact Subgroup.mem_bot.mpr (Subtype.ext (Subgroup.mem_bot.mp hmemG))
+  rw [htop, top_le_iff] at hle
+  haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
+  exact bot_ne_top hle
+
 /-- `n ≤ rank G` で `n > 0` なら、ある素数 `p` で `n ≤ pRank G p` (`rank_le_iff` の逆向き)。 -/
 private theorem exists_le_pRank_of_le_rank {H : Type*} [Group H] [Finite H] {n : ℕ}
     (hn : 0 < n) (h : n ≤ rank H) : ∃ p : ℕ, n ≤ pRank H p := by
