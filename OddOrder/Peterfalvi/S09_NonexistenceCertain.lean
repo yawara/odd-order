@@ -1951,6 +1951,53 @@ theorem gamma_orth_weightedNuSum
     ClassFunction.inner hBD.Gamma H78.weightedNuSum = 0 := by
   rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_gamma hBD, star_zero]
 
+/-- Orthogonal expansion of the beta decomposition in Peterfalvi (7.8.a).
+
+After the remaining source-side computation of `‖Σ‖² = (h - 1)/e`, the displayed
+decomposition of `β` gives the real norm formula used in (7.8.b). -/
+theorem betaNormSq_eq_of_weightedNuSum_norm
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta_norm :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted_zeta :
+      ClassFunction.inner H78.weightedNuSum
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted_norm :
+      ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+        ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ)) :
+    H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD := by
+  have hzeta_weighted :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        H78.weightedNuSum = 1 := by
+    rw [Hypothesis71.ClassFunction.inner_symm, hweighted_zeta, star_one]
+  have hinner :
+      ClassFunction.inner H78.beta H78.beta =
+        2 +
+          (hBD.a : ℂ) * (hBD.a : ℂ) *
+            ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ) -
+          2 * (hBD.a : ℂ) +
+          ClassFunction.inner hBD.Gamma hBD.Gamma := by
+    rw [hBD.beta_eq]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      Hypothesis71.constOne_inner_self_eq_one, H78.zetaImage_orth_one hBD,
+      H78.constOne_orth_zetaImage hBD, H78.weightedNuSum_orth_one hBD,
+      H78.constOne_orth_weightedNuSum hBD, hBD.Gamma_orth_one,
+      H78.constOne_orth_gamma hBD, H78.gamma_orth_zetaImage hBD,
+      H78.zetaImage_orth_gamma hBD, H78.weightedNuSum_orth_gamma hBD,
+      H78.gamma_orth_weightedNuSum hBD, hzeta_norm, hweighted_zeta, hzeta_weighted,
+      hweighted_norm, star_intCast, mul_zero, add_zero, sub_zero, zero_add]
+    ring
+  rw [betaNormSq, hinner, gammaNormSq]
+  norm_num [Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
+  ring
+
 /-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
 theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
     (hzeta_norm :
