@@ -2712,6 +2712,43 @@ theorem conclusion_of_delta_cross_nonzero (H79 : Hypothesis79 G A₁ L₁ A₂ L
     rw [Hypothesis71.ClassFunction.inner_symm H79.second.beta H79.firstZetaImage,
       hzero, star_zero]
 
+/-- Integer-parity form of the last step of Peterfalvi (7.9): once the two
+residual cross terms are integers and `(Δ₁,Δ₂)` is an even integer, the displayed
+`0 = 1 - ... + ...` equation forces one cross term to be nonzero. -/
+theorem conclusion_of_delta_cross_integral_parity
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hx : ∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ))
+    (hy : ∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ))
+    (hz : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  rcases hx with ⟨x, hx⟩
+  rcases hy with ⟨y, hy⟩
+  rcases hz with ⟨z, hz, hz_even⟩
+  have heqC := H79.delta_cross_equation hBD₁ hBD₂ hzeta_cross
+  rw [hx, hy, hz] at heqC
+  have heqZ : (0 : ℤ) = 1 - y - x + z := by
+    have hcast : ((0 : ℤ) : ℂ) = ((1 - y - x + z : ℤ) : ℂ) := by
+      simpa [Int.cast_sub, Int.cast_add] using heqC
+    exact_mod_cast hcast
+  have hnonzero : x ≠ 0 ∨ y ≠ 0 := by
+    by_contra hnot
+    push Not at hnot
+    rcases hz_even with ⟨t, ht⟩
+    omega
+  apply H79.conclusion_of_delta_cross_nonzero hBD₁ hBD₂ hzeta_cross
+  rcases hnonzero with hx_ne | hy_ne
+  · left
+    rw [hx]
+    exact_mod_cast hx_ne
+  · right
+    rw [hy]
+    exact_mod_cast hy_ne
+
 end Hypothesis79
 
 end Section_7_9
