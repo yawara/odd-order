@@ -28,6 +28,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -1081,6 +1082,10 @@ set_option linter.style.longLine false in
 -- BG §4 Lem 4.17 (§4G): p odd, r(R)≤2, A ≤ Aut R faithful odd ⇒ A' は p-群。Thm 1.13 critical +
 -- Thm 1.8 Burnside (elementwise) + Prop 4.8 + Thm 2.6 GL(2,p) engine。§5 Thm 5.5(a)/Thm 4.18 の gate。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
+-- BG §4 Thm 4.18 (§4H): G solvable odd, p∣|G|, r_p(G)≤2 ⇒ (a) p は |G/O_{p'}| の最大素因子
+-- (b) p=3∨p最小 ⇒ normal p-complement (c) G' が normal p-complement (d) G' の p'-部分群 ⊆ O_{p'}(G')
+-- (e) G/O_{p',p} abelian p'-群。Hall-Higman 1.2.3 (= G Thm 6.3.2) + Lem 4.17 + Lem 4.13。§5 Thm 5.6/5.7 の gate。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.solvable_structure_of_pRank_le_two
 -- BG §5 Lem 5.1(a): p odd 有限 p-群 R, r(R)≥3 ⇒ SCN₃(R)≠∅ (= Lem 4.7 hard dir の対偶)。§5 着手。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank
 -- BG §5 Lem 5.2: E∈ℰ²∩ℰ* ⇒ E⊄T ∧ (|Ω₁(Z(R))|=p ∧ W=Ω₁(Z₂(R))∈ℰ²) ∧ [R:T]=p (T=C_R(W))。
