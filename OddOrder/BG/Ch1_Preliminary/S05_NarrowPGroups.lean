@@ -789,6 +789,27 @@ theorem omega1Center_le_inf_centralizer_le_of_maximalElementaryAbelian
   ⟨omega1Center_le_omega1UpperCentralTwo_inf_centralizer,
     omega1UpperCentralTwo_inf_centralizer_le_of_maximalElementaryAbelian hp hEstar⟩
 
+/-- **BG Lemma 5.2 support**: if `C_W(E) = E`, then `E` is normal in `R`.
+Indeed, the equality puts `E` inside `W`; hence `[E,R] ≤ [W,R] ≤ Z < E`, and the
+commutator-normalizer criterion gives normality. -/
+theorem normal_of_omega1UpperCentralTwo_inf_centralizer_eq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E)
+    (hCW_eq : omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) = E) :
+    E.Normal := by
+  rcases lemma52_frontHalf_support hp hpg h3 hEcard hEstar with
+    ⟨_, hZltE, _, _, _, hWR_le_Z⟩
+  have hE_le_W : E ≤ omega1UpperCentralTwo R p := by
+    rw [← hCW_eq]
+    exact inf_le_left
+  have hER_le_Z : ⁅E, (⊤ : Subgroup R)⁆ ≤ omega1Center R p := by
+    exact (Subgroup.commutator_mono hE_le_W le_rfl).trans hWR_le_Z
+  have hER_le_E : ⁅E, (⊤ : Subgroup R)⁆ ≤ E := hER_le_Z.trans hZltE.le
+  have htop_le_norm : (⊤ : Subgroup R) ≤ Subgroup.normalizer (E : Set R) :=
+    OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le hER_le_E
+  exact Subgroup.normalizer_eq_top_iff.mp (eq_top_iff.mpr htop_le_norm)
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
