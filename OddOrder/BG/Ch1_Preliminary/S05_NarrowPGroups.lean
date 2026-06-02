@@ -2113,6 +2113,69 @@ theorem narrow_iff_exists_card_prime_centralizer_pRank_le_two
 
 /-! ## Theorem 5.5 — narrow `p`-群の solvable odd 自己同型群 (mmd L1881-1941) -/
 
+/-- **BG Theorem 5.5(a) core (generic)**: if `A'` is a `p`-group then `A/O_p(A)` is an
+abelian `p'`-group. Abelian: `A' ⊴ A` is a normal `p`-subgroup, so `A' ≤ O_p(A)`.
+`p'`: an order-`p` element of the abelian quotient (Cauchy) would generate a normal
+`p`-subgroup whose pullback is a normal `p`-subgroup of `A` not inside `O_p(A)`'s kernel.
+
+Both branches of Thm 5.5 (`r(R) ≤ 2` via Lemma 4.17, `r(R) ≥ 3` via the `H_i` chain)
+land here once `A'` is known to be a `p`-group. -/
+private theorem quotient_opCore_comm_and_not_dvd_of_isPGroup_commutator
+    {A : Type*} [Group A] [Finite A] {p : ℕ} [Fact p.Prime]
+    (hA' : IsPGroup p (_root_.commutator A)) :
+    (∀ x y : A ⧸ Ch01.opCore p A, x * y = y * x) ∧
+      ¬ p ∣ Nat.card (A ⧸ Ch01.opCore p A) := by
+  classical
+  have hA'_le : _root_.commutator A ≤ Ch01.opCore p A :=
+    Ch01.normal_pgroup_le_opCore hA'
+  have hcomm : ∀ x y : A ⧸ Ch01.opCore p A, x * y = y * x := by
+    intro x y
+    obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective x
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk_surjective y
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+    have hrw : (a * b)⁻¹ * (b * a) = ⁅b⁻¹, a⁻¹⁆ := by
+      rw [commutatorElement_def]
+      group
+    rw [hrw]
+    exact hA'_le (Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
+      (Subgroup.mem_top _))
+  refine ⟨hcomm, ?_⟩
+  intro hp_dvd
+  obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  have hx_ne : x ≠ 1 := by
+    intro h1
+    rw [h1, orderOf_one] at hx_ord
+    exact (Fact.out : p.Prime).one_lt.ne' hx_ord.symm
+  -- `⟨x⟩` is a normal `p`-subgroup of the abelian quotient.
+  have hS_pg : IsPGroup p (Subgroup.zpowers x) := by
+    apply IsPGroup.of_card (n := 1)
+    rw [Nat.card_zpowers, hx_ord, pow_one]
+  haveI hS_norm : (Subgroup.zpowers x).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hgn : g * n * g⁻¹ = n := by
+      rw [hcomm g n]
+      group
+    rwa [hgn]
+  -- Pull back along `mk'`: a normal `p`-subgroup of `A`, hence `≤ O_p(A)`.
+  have hP_pg : IsPGroup p
+      ((Subgroup.zpowers x).comap (QuotientGroup.mk' (Ch01.opCore p A))) := by
+    refine hS_pg.comap_of_ker_isPGroup _ ?_
+    rw [QuotientGroup.ker_mk']
+    exact Ch01.opCore_isPGroup p A
+  haveI hP_norm :
+      ((Subgroup.zpowers x).comap (QuotientGroup.mk' (Ch01.opCore p A))).Normal :=
+    Subgroup.Normal.comap hS_norm _
+  have hP_le := Ch01.normal_pgroup_le_opCore hP_pg
+  -- `x` lifts into `O_p(A)`, so it dies in the quotient: contradiction with `orderOf x = p`.
+  obtain ⟨a, ha⟩ := QuotientGroup.mk'_surjective (Ch01.opCore p A) x
+  have ha_mem : a ∈ (Subgroup.zpowers x).comap (QuotientGroup.mk' (Ch01.opCore p A)) := by
+    rw [Subgroup.mem_comap, ha]
+    exact Subgroup.mem_zpowers x
+  have hx_one : x = 1 := by
+    rw [← ha]
+    exact (QuotientGroup.eq_one_iff a).mpr (hP_le ha_mem)
+  exact hx_ne hx_one
+
 /-- **BG Theorem 5.5**: 奇素数 `p`, narrow な有限 `p`-群 `R`, `A` を `R` の自己同型群の solvable
 odd 位数部分群 (`φ : A →* MulAut R` faithful, `[IsSolvable A]`, `Odd |A|`) とする。すると:
 
