@@ -791,6 +791,42 @@ private theorem quotient_hall_preimage_frame
     rw [hindex]
     exact hHbar_hall.2
 
+
+/-- Coprime operator order descends to a subgroup of the acted-on group. -/
+private theorem coprime_card_subgroup_of_coprime
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {H : Subgroup G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Nat.Coprime (Nat.card A) (Nat.card H) :=
+  hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
+
+/-- Lift the recursive result from a proper invariant overgroup back to the ambient group.
+
+In the `H < G` branch of BG Prop. 1.5(b), quotient induction first produces an invariant
+overgroup `H` of `K` with π-free index.  Applying the main induction hypothesis inside `H`
+gives an invariant Hall subgroup `L ≤ H` containing `K`; this helper pushes `L` back to `G`.
+-/
+private theorem lift_hall_from_invariant_overgroup
+    {G A : Type*} [Group G] [Finite G] [Group A] {φ : A →* MulAut G}
+    {π : Set ℕ} {K H : Subgroup G}
+    (hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hH_index : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hK_le_H : K ≤ H) {L : Subgroup H}
+    (hL_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π L)
+    (hL_inv : OddOrder.Isaacs.Ch03.IsAInvariant hH_inv.restrict L)
+    (hK_sub_le_L : K.subgroupOf H ≤ L) :
+    ∃ Lg : Subgroup G,
+      OddOrder.Isaacs.Ch03.IsHallSubgroup π Lg ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ Lg ∧ K ≤ Lg := by
+  refine ⟨L.map H.subtype, ?_, ?_, ?_⟩
+  · exact isHallSubgroup_map_subtype_of_index_no_pi hL_hall hH_index
+  · exact isAInvariant_map_subtype_of_restrict hH_inv hL_inv
+  · intro k hk
+    rw [Subgroup.mem_map]
+    refine ⟨⟨k, hK_le_H hk⟩, ?_, rfl⟩
+    exact hK_sub_le_L (by
+      rw [Subgroup.mem_subgroupOf]
+      exact hk)
+
 /-- A nontrivial finite group has a minimal nontrivial `A`-invariant normal subgroup. -/
 private theorem exists_minimal_normal_aInvariant
     {G A : Type*} [Group G] [Finite G] [Nontrivial G]

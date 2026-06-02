@@ -29,6 +29,7 @@ Prop 1.5(e) commutator containment。
   - [ ] Prop 1.5(b) containment: BG induction remains
     - [x] minimal `A`-invariant normal existence / commutative / p-group support
     - [x] quotient/comap transfer frame and `H < G` index-transfer support
+    - [x] proper invariant-overgroup lift from recursive Hall result
     - [ ] assemble recursive containment induction
     - [ ] final `H = G` conjugacy step inside `K M`
   - [x] Prop 1.5(c) conjugacy: `aInvariant_hall_conj`
@@ -59,6 +60,9 @@ Prop 1.5(e) commutator containment。
   quotient cardinal/coprime transfer、induction が返す quotient Hall の preimage が
   `A`-invariant かつ `K` を含み π-free index を持つこと、および `H < G` branch で
   Hall subgroup を ambient group へ戻す index-transfer helper が green。
+- Proper-overgroup branch support も追加: coprimality descends to subgroups, and an
+  invariant Hall subgroup found inside a proper invariant overgroup `H` can be pushed back
+  to `G` while preserving Hall-ness, `A`-invariance, and containment of `K`.
 - 残りは Prop 1.5(b) 本体の recursive assembly と `H = G` 分岐の conjugacy inside `K M`。
 
 ## 完了条件
