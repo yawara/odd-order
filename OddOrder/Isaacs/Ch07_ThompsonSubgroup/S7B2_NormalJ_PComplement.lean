@@ -1642,29 +1642,48 @@ private theorem hasNormalPComplement_of_mulEquiv
       rw [hN_card, hQ_card]; exact h_coprime'
     exact Subgroup.isComplement'_of_coprime h_card_H h_coprime
 
-/-- **Isaacs Thm 7.1** (Thompson normal `p`-complement theorem, conditional on Thm 7.6).
+/-- Normal `p`-complements pass to quotient groups.
 
-The full theorem (Isaacs L3721, proved L3913 — §7C) states:
+This is the "homomorphic images" inheritance used at the start of Isaacs §7C, before
+the seven-step minimum-counterexample argument.  The complement is the quotient image
+of the upstairs normal complement, and `Sylow.mapSurjective` matches each Sylow
+subgroup of the quotient with the image of a Sylow subgroup upstairs. -/
+theorem hasNormalPComplement_quotient
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (hG : OddOrder.Isaacs.Ch05.HasNormalPComplement p G)
+    (L : Subgroup G) [L.Normal] :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p (G ⧸ L) := by
+  classical
+  obtain ⟨N, hN_normal, hN_compl⟩ := hG
+  let f : G →* G ⧸ L := QuotientGroup.mk' L
+  have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective L
+  refine ⟨N.map f, Subgroup.Normal.map hN_normal f hf_surj, fun Qbar => ?_⟩
+  obtain ⟨Q, hQ_mapSurj⟩ := Sylow.mapSurjective_surjective (p := p) hf_surj Qbar
+  have hQ_map : (Q : Subgroup G).map f = (Qbar : Subgroup (G ⧸ L)) := by
+    have h := congrArg (fun R : Sylow p (G ⧸ L) => (R : Subgroup (G ⧸ L))) hQ_mapSurj
+    simpa [f, Sylow.coe_mapSurjective] using h
+  have hQ_compl : Subgroup.IsComplement' N (Q : Subgroup G) := hN_compl Q
+  have hp_ndvd_N : ¬ p ∣ Nat.card N := by
+    rw [← hQ_compl.index_eq_card]
+    exact Q.not_dvd_index
+  obtain ⟨k, hQ_card⟩ : ∃ k, Nat.card (Q : Subgroup G) = p ^ k :=
+    IsPGroup.iff_card.mp Q.isPGroup'
+  have h_coprime : Nat.Coprime (Nat.card N) (Nat.card (Q : Subgroup G)) := by
+    rw [hQ_card]
+    exact (((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hp_ndvd_N).symm).pow_right k
+  have h_image_compl :
+      Subgroup.IsComplement' (N.map f) ((Q : Subgroup G).map f) :=
+    hQ_compl.map_mk' h_coprime L
+  rwa [hQ_map] at h_image_compl
 
-> Let `p ≠ 2`, `P ∈ Syl_p(G)`. If `C_G(Z(P))` and `N_G(J(P))` both have normal
-> `p`-complements, then `G` has a normal `p`-complement.
+/-- **Isaacs Thm 7.1, Step 7 reduction** (normal `J(P)` case).
 
-The textbook proof (Isaacs p.215-217) proceeds by a 7-step minimum-counterexample
-argument that establishes the five hypotheses of the **normal-J theorem (Thm 7.6)** for
-`G`, then concludes `J(P) ⊴ G`, and finally observes `G = N_G(J(P))` has a normal
-`p`-complement.
-
-**This formalization takes `J(P) ⊴ G` as a forward-dependency hypothesis**
-(`hJ_normal`), which is precisely the conclusion of normal-J 7.6 applied to the
-minimal counterexample. The Steps 1-6 establishing the normal-J hypotheses (`O_{p'}(G)
-= 1`, `P = C_G(Z(P))`, abelian Sylow-2, p-solvability, ...) require Thm 7.5 +
-Hall-Higman + Lem 7.7 + Frobenius 5.26 and will be back-filled when §7B normal-J
-lands (see `notes/isaacs/ch07_thompson.md`).
-
-Given the J(P)-normality hypothesis, the conclusion is immediate: `J(P) ⊴ G` ⇒
-`N_G(J(P)) = ⊤` ⇒ `↥(N_G(J(P))) ≃* G` ⇒ `HasNormalPComplement` transports from
-`N_G(J(P))` to `G`. -/
-theorem thompson_normal_p_complement
+This helper packages the last observation in Isaacs Step 7: once `J(P) ⊴ G`, the
+normalizer `N_G(J(P))` is all of `G`, so a normal `p`-complement in that normalizer
+transports across `N_G(J(P)) ≃* G`.  The public theorem below now obtains
+`J(P) ⊴ G` from the real `normal_J` hypotheses instead of exposing it as the
+main theorem's raw forward assumption. -/
+private theorem thompson_normal_p_complement_of_thompsonJ_normal
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     (hNJP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
@@ -1686,6 +1705,39 @@ theorem thompson_normal_p_complement
   let topToG : (⊤ : Subgroup G) ≃* G := Subgroup.topEquiv
   let e : ↥NG ≃* G := eqEquiv.trans topToG
   exact hasNormalPComplement_of_mulEquiv e hNJP
+
+
+/-- **Isaacs Thm 7.1, Step 7** (Thompson normal `p`-complement theorem,
+conditional on Steps 2-6 of the minimum-counterexample proof).
+
+The old scaffold for this theorem assumed `J(P) ⊴ G` directly.  This version
+replaces that raw forward normality hypothesis by the actual five hypotheses of
+Isaacs Thm 7.6 (`normal_J`): `p ≠ 2`, `p`-separability, abelian Sylow `2`-subgroups,
+`O_{p'}(G)=1`, and `C_G(Z(P)) = P`.
+
+Thus the remaining §7C work is exactly Steps 1-6: starting from the textbook
+hypotheses that `C_G(Z(P))` and `N_G(J(P))` have normal `p`-complements, the
+minimum-counterexample argument must derive these normal-J hypotheses.  Once they
+are available, Step 7 is now sorry-free: apply `normal_J`, so `N_G(J(P)) = G`, and
+transport the normal `p`-complement from the normalizer to `G`. -/
+theorem thompson_normal_p_complement
+    {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp2 : p ≠ 2)
+    (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
+    (h_centralizer_center :
+       Subgroup.centralizer
+         (((Subgroup.center (P : Subgroup G)).map (P : Subgroup G).subtype) : Set G)
+         = (P : Subgroup G))
+    (hNJP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.normalizer
+          ((Subgroup.thompsonJ (P : Subgroup G) p : Subgroup G) : Set G))) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  exact
+    thompson_normal_p_complement_of_thompsonJ_normal P hNJP
+      (normal_J P hp2 h_pSolvable h2abelian h_oPiPrime_trivial h_centralizer_center)
 
 
 
