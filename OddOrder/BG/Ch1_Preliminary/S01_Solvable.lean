@@ -480,15 +480,18 @@ recovers Hall's equality `F(G*) = ⋂_{U/V ∈ 𝒟*} C_{G*}(U/V)`.
   the present file now supplies the required self-centralizing Fitting endpoint.
 -/
 
-/-! ## §1B: A-invariant Hall theory (Prop 1.5, Prop 1.6) — Isaacs Ch.4/§3E 既存 API 経由
+/-! ## §1B: A-invariant Hall theory (Prop 1.5, Prop 1.6)
 
-CLAUDE.md no-wrapper policy 準拠. BG Prop 1.5-1.6 は Isaacs §3E coprime action machinery
-で完全カバーされており, 個別 theorem は書かない (mapping は本 docstring に集約).
+BG Prop. 1.5(a),(c) are obtained by applying the already-formalized Glauberman fixed-point
+lemma to the transitive `G`-set of Hall `π`-subgroups. This is not a pure wrapper: it adapts
+the abstract coprime-action fixed-point machinery to Hall subgroups and exposes the BG-facing
+Hall statements. Prop. 1.5(d) remains a no-wrapper direct use of Isaacs Cor. 3.28.
 
 | BG | Isaacs §3E / §4D | Lean (本リポ) | 備考 |
 |---|---|---|---|
-| Prop 1.5(a)(c) A-inv Hall 存在/共役 | Thm 3.23(a)(b) (Sylow), Lem 3.24 (Glauberman) | `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow`, `aInvariant_sylow_conj`, `glauberman_fixed_point_exists`, `glauberman_fixed_points_conj` | π = {p} 特殊化版が Ch.4 forward に存在; Hall π 一般版は §1B 内 Prop 1.5 完成時 |
+| **Prop 1.5(a)** A-inv Hall 存在 | Hall-E + Hall-C + Lem 3.24(a) | `exists_aInvariant_hall` ✅ | Hall `π` 一般版 |
 | Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
+| **Prop 1.5(c)** A-inv Hall 共役 | Hall-C + Lem 3.24(b) | `aInvariant_hall_conj` ✅ | 共役元は `C_G(A)` |
 | **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
 | Prop 1.5(e) C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | (新規) | (未実装) | Prop 1.5(e) は coprime + commutator structure, Hall API 整備後 |
 | **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
@@ -500,6 +503,140 @@ CLAUDE.md no-wrapper policy 準拠. BG Prop 1.5-1.6 は Isaacs §3E coprime acti
 **使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
 (= Prop 1.5(d) + Lem 1.7(a) 合成 = Isaacs Cor 3.29) を直接呼び出す.
 -/
+
+section AInvariantHall
+
+private abbrev HallSubgroups (π : Set ℕ) (G : Type*) [Group G] :=
+  {H : Subgroup G // OddOrder.Isaacs.Ch03.IsHallSubgroup π H}
+
+/-- The pointwise action of a `MulAut` on a subgroup is its image. -/
+private theorem mulAut_smul_eq_map {G : Type*} [Group G] (φ : MulAut G) (H : Subgroup G) :
+    φ • H = H.map (φ : G →* G) := by
+  rw [Subgroup.pointwise_smul_def]
+  rfl
+
+/-- A Hall subgroup stays Hall under any automorphism. -/
+private theorem isHallSubgroup_mulAut_smul {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {H : Subgroup G} (φ : MulAut G)
+    (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π (φ • H) := by
+  rw [mulAut_smul_eq_map]
+  refine ⟨?_, ?_⟩
+  · have hcard :
+        Nat.card ↥(H.map (φ : G →* G)) = Nat.card ↥H :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective H _ φ.injective).toEquiv).symm
+    rw [hcard]
+    exact hH.1
+  · have hidx : (H.map (φ : G →* G)).index = H.index :=
+      Subgroup.index_map_equiv H φ
+    rw [hidx]
+    exact hH.2
+
+private instance hallSubgroupsMulAutAction {G : Type*} [Group G] [Finite G] (π : Set ℕ) :
+    MulAction (MulAut G) (HallSubgroups π G) where
+  smul φ H := ⟨φ • H.1, isHallSubgroup_mulAut_smul φ H.2⟩
+  one_smul H := by
+    apply Subtype.ext
+    change (1 : MulAut G) • H.1 = H.1
+    simp
+  mul_smul φ ψ H := by
+    apply Subtype.ext
+    change (φ * ψ) • H.1 = φ • (ψ • H.1)
+    simp [mul_smul]
+
+private instance hallSubgroupsConjAction {G : Type*} [Group G] [Finite G] (π : Set ℕ) :
+    MulAction G (HallSubgroups π G) :=
+  MulAction.compHom (HallSubgroups π G) (MulAut.conj : G →* MulAut G)
+
+private theorem hallSubgroups_pretransitive {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (π : Set ℕ) :
+    MulAction.IsPretransitive G (HallSubgroups π G) := by
+  constructor
+  intro H K
+  obtain ⟨g, hg⟩ :=
+    OddOrder.Isaacs.Ch03.hall_C (G := G) (π := π) H.2 K.2
+  refine ⟨g, ?_⟩
+  apply Subtype.ext
+  change MulAut.conj g • H.1 = K.1
+  rw [mulAut_smul_eq_map]
+  exact hg
+
+/-- **BG Prop 1.5(a)**: if a finite solvable group `G` is acted on by a finite operator
+group `A` with coprime orders, then `A` fixes some Hall `π`-subgroup of `G`.
+
+Proof: let `G` act by conjugation and `A` act through `φ` on the type of Hall `π`-subgroups.
+Hall existence makes this type nonempty, Hall conjugacy makes the `G`-action transitive, and
+Glauberman's fixed-point lemma gives an `A`-fixed Hall subgroup. -/
+theorem exists_aInvariant_hall {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (π : Set ℕ) :
+    ∃ H : Subgroup G, OddOrder.Isaacs.Ch03.IsHallSubgroup π H ∧
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+  let Ω := HallSubgroups π G
+  letI : MulAction A Ω := MulAction.compHom Ω φ
+  haveI hΩ_nonempty : Nonempty Ω := by
+    obtain ⟨H, hH⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := G) π
+    exact ⟨⟨H, hH⟩⟩
+  have hcompat : OddOrder.Isaacs.Ch04.IsCompatibleMulAction φ Ω := by
+    intro a g H
+    apply Subtype.ext
+    change (φ a) • (MulAut.conj g • H.1) =
+      MulAut.conj ((φ a) g) • ((φ a) • H.1)
+    rw [← mul_smul, ← mul_smul]
+    congr 1
+    ext x
+    simp [MulAut.conj_apply, map_mul, map_inv]
+  obtain ⟨H, hH_fix⟩ :=
+    OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists
+      (G := G) (A := A) (φ := φ) hCop (Or.inr inferInstance)
+      (Ω := Ω) hcompat (hallSubgroups_pretransitive π)
+  refine ⟨H.1, H.2, ?_⟩
+  intro a
+  exact congrArg Subtype.val (hH_fix a)
+
+/-- **BG Prop 1.5(c)**: two `A`-invariant Hall `π`-subgroups of a finite solvable group
+under a coprime operator group are conjugate by an element fixed by every operator in `A`.
+
+This is the Hall-subgroup specialization of Glauberman's conjugacy fixed-point lemma. -/
+theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) {π : Set ℕ}
+    {H K : Subgroup G}
+    (hH_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π H)
+    (hK_hall : OddOrder.Isaacs.Ch03.IsHallSubgroup π K)
+    (hH_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ MulAut.conj c • H = K := by
+  let Ω := HallSubgroups π G
+  letI : MulAction A Ω := MulAction.compHom Ω φ
+  let HΩ : Ω := ⟨H, hH_hall⟩
+  let KΩ : Ω := ⟨K, hK_hall⟩
+  have hH_fix : ∀ a : A, a • HΩ = HΩ := by
+    intro a
+    apply Subtype.ext
+    exact hH_inv a
+  have hK_fix : ∀ a : A, a • KΩ = KΩ := by
+    intro a
+    apply Subtype.ext
+    exact hK_inv a
+  have hcompat : OddOrder.Isaacs.Ch04.IsCompatibleMulAction φ Ω := by
+    intro a g L
+    apply Subtype.ext
+    change (φ a) • (MulAut.conj g • L.1) =
+      MulAut.conj ((φ a) g) • ((φ a) • L.1)
+    rw [← mul_smul, ← mul_smul]
+    congr 1
+    ext x
+    simp [MulAut.conj_apply, map_mul, map_inv]
+  obtain ⟨c, hc_fix, hc_smul⟩ :=
+    OddOrder.Isaacs.Ch04.glauberman_fixed_points_conj
+      (G := G) (A := A) (φ := φ) hCop (Or.inr inferInstance)
+      (Ω := Ω) hcompat (hallSubgroups_pretransitive π)
+      hH_fix hK_fix
+  refine ⟨c, hc_fix, ?_⟩
+  exact congrArg Subtype.val hc_smul
+
+end AInvariantHall
 
 /-! ## §1C: Frattini + Burnside operator (Lem 1.7-1.10) -/
 

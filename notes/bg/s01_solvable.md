@@ -48,6 +48,22 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   (`HasPiLengthOne {p} G`). This reuses Phase 1 `OddOrder.Isaacs.Ch03.oPiCore`
   / `oPiPrimePiCore` instead of adding another O_π API.
 
+2026-06-02 lane B1 (`codex/bg-s01-hall`):
+
+- **Prop 1.5 statement rechecked** at `references/bg/local-analysis.mmd` L400-L414.
+  In particular, Prop 1.5(e) assumes `C_G(A)` contains a Hall `π'`-subgroup and concludes
+  `[G,A] ⊆ O_π(G)`.
+- **Prop 1.5(a) completed** as `exists_aInvariant_hall`: Hall-E gives nonempty Hall
+  `π`-subgroups, Hall-C gives transitivity under conjugation, and Glauberman 3.24(a) gives
+  an `A`-fixed Hall subgroup.
+- **Prop 1.5(c) completed** as `aInvariant_hall_conj`: the same Hall-subgroup action plus
+  Glauberman 3.24(b) gives conjugacy by an element fixed by all operators in `A`.
+- **Prop 1.5(d)** remains direct no-wrapper use of
+  `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`.
+- **Remaining Prop 1.5 blockers**: (b) the induction placing an `A`-invariant `π`-subgroup
+  inside an `A`-invariant Hall subgroup; (e) the commutator containment, now with statement
+  precision confirmed.
+
 ## TL;DR
 
 **§1 は BG 全 138 結果の基礎となる "solvable groups の operator action 理論" モジュール**. わずか 22 結果で、solvable 群族の **A-不変 Hall 定理** (Prop 1.5-1.6, Peterfalvi で多数引用) と **p-length の基本性質** (Lemma 1.21) をまとめる. 主要引用頻度: **Prop 1.5 は 28+ 回, Lemma 1.1 は 43+ 回, Prop 1.2 は 22 回引用** — BG 全章を通じた最重要ツール.
@@ -298,7 +314,8 @@ Lemma 1.7, Cor 1.12, Cor 1.19, Thm 1.20, Lemma 1.22 — 主に補助的 referenc
 1. **BG mmd セクション境界確認**: §1 末が L585 か明確に (推定値).
 2. **Peterfalvi [Is] 対応**: Peterfalvi が引く "Isaacs character theory" results (Thm 6.32, 6.5, 2.21 等) を mathlib `RepresentationTheory.Character` とマッチング — Phase 2b 着手時.
 3. **Goldschmidt citation**: BG Prop 1.15(b) の原 Goldschmidt 論文を Phase 2a 時点で確保するか (Isaacs Ch.3 で代替証明可か要確認).
-4. **Prop 1.5(e) statement 精密度**: "[G,A] ⊆ O_π(G)" 仮定が正確に "C_G(A) contains a Hall π'-subgroup" なのか, 別条件なのか再確認 (BG L412-414).
+4. **Prop 1.5(b)**: BG の `|G|` induction を Lean 化し, `A`-invariant `π`-subgroup を `A`-invariant Hall `π`-subgroup に含める.
+5. **Prop 1.5(e)**: statement は BG L412-L414 で確認済み (`C_G(A)` contains a Hall `π'`-subgroup ⇒ `[G,A] ⊆ O_π(G)`). `aInvariant_hall` と `oPiCore` を使って commutator containment を実装する.
 
 ---
 
