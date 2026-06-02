@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter

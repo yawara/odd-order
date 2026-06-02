@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
@@ -1599,6 +1600,19 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSupportedSpan_image
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IntegralCharacterMap.galoisTransport
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.galoisTransport
+-- Peterfalvi (1.9): cyclotomic Galois automorphisms of ℂ and the character value formula
+-- χ^σ(g) = χ(g^k).  Trace of finite-order endomorphisms (eigenvalue decomposition), the
+-- extension theorem (subfield automorphisms extend to ℂ via a transcendence basis), the
+-- CRT cyclotomic automorphism (1.9.a), and the uniform virtual-character form (1.9.b).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.map_trace_of_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_complexRingEquiv_extends
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_complexRingEquiv_pow_of_rootsOfUnity
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_complexRingEquiv_pow_and_fixed
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_complexRingEquiv_mapRingEquiv_eq_pow
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
