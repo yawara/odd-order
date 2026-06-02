@@ -227,7 +227,12 @@ theorem theoremE_sigma_partition_and_counting [Finite G] (hG : OddOrder.BG.IsMin
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (R : Subgroup G → G → Subgroup G) (reps : Set (Subgroup G))
     (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
-      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi) :
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
+    -- `R` must be the Theorem D normal-complement data `R(x)` (the docstring's
+    -- "`R(x)` as in Theorem D"); without this the conclusion would be claimed for an
+    -- arbitrary `R`, which is false. Pins `R M ·` and each `R Mi ·` to `RData`.
+    (hR : ∀ x ∈ sigmaSharp M, RData M x (R M x))
+    (hRreps : ∀ Mi ∈ reps, ∀ x ∈ sigmaSharp Mi, RData Mi x (R Mi x)) :
     Nat.card (conjClassSet (tildeM M (R M))) =
         (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1) * M.index ∧
       (∀ p : ℕ, p ∈ (Nat.card G).primeFactors ↔
