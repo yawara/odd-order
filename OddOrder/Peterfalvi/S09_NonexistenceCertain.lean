@@ -1490,6 +1490,21 @@ noncomputable def kernelOrder (H78 : Hypothesis78 G A L) : ℕ :=
 noncomputable def complementIndex (H78 : Hypothesis78 G A L) : ℕ :=
   Nat.card L / Nat.card H78.hyp76.H
 
+/-- The kernel order `h` is positive. -/
+theorem kernelOrder_pos (H78 : Hypothesis78 G A L) : 0 < H78.kernelOrder := by
+  rw [kernelOrder]
+  exact Nat.card_pos
+
+/-- The complement index `e = |L:H|` is positive. -/
+theorem complementIndex_pos (H78 : Hypothesis78 G A L) : 0 < H78.complementIndex := by
+  rw [complementIndex]
+  have hH_card : Nat.card ((H78.hyp76.H).subgroupOf L) = Nat.card H78.hyp76.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe H78.hyp76.H_le_L).toEquiv
+  have hdvd : Nat.card H78.hyp76.H ∣ Nat.card L := by
+    rw [← hH_card]
+    exact Subgroup.card_subgroup_dvd_card ((H78.hyp76.H).subgroupOf L)
+  exact Nat.div_pos (Nat.le_of_dvd Nat.card_pos hdvd) Nat.card_pos
+
 /-- **Peterfalvi (7.8.b) source norm target.**  The remaining source-side
 character computation for `‖β‖² = e + 1`, after the Dade-isometry bridge has
 reduced the norm of `β` to `‖Ind 1_H - ζ‖²`.
@@ -1652,6 +1667,20 @@ theorem betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zeta_irr
 noncomputable def smallIndex (H78 : Hypothesis78 G A L) : Prop :=
   2 * H78.complementIndex + 1 ≤ H78.kernelOrder
 
+/-- Real-valued form of `smallIndex`, for the arithmetic in (7.8.b). -/
+theorem smallIndex_real (H78 : Hypothesis78 G A L) (hsmall : H78.smallIndex) :
+    2 * (H78.complementIndex : ℝ) + 1 ≤ (H78.kernelOrder : ℝ) := by
+  rw [smallIndex] at hsmall
+  exact_mod_cast hsmall
+
+/-- The quadratic correction `u a² - 2 v a` in Peterfalvi (7.8.b), with
+`u = (1/e)(1 - 1/h)` and `v = 1/h`. -/
+noncomputable def normQuadraticCorrection (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : ℝ :=
+  (1 / (H78.complementIndex : ℝ)) *
+      (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+    2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ)
+
 /-- The class function `(ζ^ν)^ρ` whose norm is estimated in Peterfalvi (7.8.b). -/
 noncomputable def zetaNuRho (H78 : Hypothesis78 G A L) : ClassFunction L ℂ :=
   H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
@@ -1722,6 +1751,61 @@ structure NormEstimates (H78 : Hypothesis78 G A L)
   /-- `‖Γ‖² ≤ e - 1`. -/
   gamma_norm_sq_le :
     H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
+
+/-- Under `2e + 1 ≤ h`, Peterfalvi's quadratic correction is nonnegative. -/
+theorem normQuadraticCorrection_nonneg_of_smallIndex
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    H78.smallIndex → 0 ≤ H78.normQuadraticCorrection hBD := by
+  intro hsmall
+  rw [normQuadraticCorrection]
+  have he : 0 < (H78.complementIndex : ℝ) := by
+    exact_mod_cast H78.complementIndex_pos
+  exact quadraticTerm_nonneg_of_smallIndex hBD.a he (H78.smallIndex_real hsmall)
+
+/-- If `(ζ^ν)^ρ` has Peterfalvi's quadratic norm formula, its lower bound follows. -/
+theorem zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.smallIndex →
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        H78.zetaNuRhoNormSq := by
+  intro hsmall
+  rw [hzeta]
+  exact le_add_of_nonneg_left (H78.normQuadraticCorrection_nonneg_of_smallIndex hBD hsmall)
+
+/-- If `Γ` has Peterfalvi's residual norm formula, its upper bound follows. -/
+theorem gammaNormSq_le_of_normQuadraticCorrection_eq
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hgamma : H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD) :
+    H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1 := by
+  intro hsmall
+  rw [hgamma]
+  have hh_nonneg : 0 ≤ (H78.kernelOrder : ℝ) := by positivity
+  have hquad := H78.normQuadraticCorrection_nonneg_of_smallIndex hBD hsmall
+  have hprod : 0 ≤ (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD :=
+    mul_nonneg hh_nonneg hquad
+  linarith
+
+/-- Exact quadratic norm formulas are enough to package Peterfalvi (7.8.b)'s
+`NormEstimates`.  This isolates the remaining character-theoretic work to proving
+those two formulas from (7.7.b), `BetaDecomp`, and `‖β‖² = e + 1`. -/
+theorem normEstimates_of_normQuadraticCorrection_eqs
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hgamma : H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD) :
+    H78.NormEstimates hBD where
+  zetaNuRho_norm_sq_ge :=
+    H78.zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq hBD hzeta
+  gamma_norm_sq_le :=
+    H78.gammaNormSq_le_of_normQuadraticCorrection_eq hBD hgamma
 
 /-- The distinguished `νζ` is orthogonal to `1_G`, in the displayed direction. -/
 theorem zetaImage_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
