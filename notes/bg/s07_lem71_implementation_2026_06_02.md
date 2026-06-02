@@ -11,16 +11,19 @@ API 層 (AInvariantPiSubgroups + S07 helpers)
   → Note 補題 (π'-元 of C_G(A) ∈ K)     [Hyp 7.1 + simplicity]
   → 共通構成 (Prop 1.5(b)(c) 適用)       [§1B ✅]
   → Lem 7.1 (強帰納法)
-       → Thm 7.2  [+ Prop 1.16 ← 未形式化 (G Thm 6.2.4)]
-       → Thm 7.3  [+ Prop 1.16]
+       → Thm 7.2  [+ Prop 1.16 ✅ (S01b_Prop116, 第2式)]
+       → Thm 7.3  [+ Prop 1.16 ✅ (第1式 = Isaacs 6.21)]
        → Thm 7.4 (propagation; Lem 1.14 ✅ + 7.3)
 Prop 7.5 [§6 ✅ + p-stability]
   → Thm 7.6 = Prop 7.5(2) + Thm 7.2 (短)
 ```
 
 **ゲート状況**: Prop 1.5(a)(b)(c) ✅ (S01 §1B, φ : A →* MulAut G 型レベル);
-Lem 1.14 ✅; §6 sorry-free ✅; **Prop 1.16 のみ未形式化** (= **G** Thm 6.2.4 +
-帰納; Isaacs に対応定理なし → Gorenstein 参照例外)。
+Lem 1.14 ✅; §6 sorry-free ✅; **Prop 1.16 ✅ 完成 (2026-06-03, `S01b_Prop116.lean`)**。
+〔**訂正 2026-06-03**: 旧記載「Prop 1.16 = G Thm 6.2.4, Isaacs に対応定理なし → Gorenstein
+参照例外」は**誤り**。第1式 = **G Thm 6.2.4 = Isaacs FGT Thm 6.21** で repo 既存
+(`Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`)。Gorenstein 形式化は
+不要だった。第2式 (A/Y cyclic 版) のみ新規に card A 帰納で証明。〕
 
 ## Phase A: API 層 (`AInvariantPiSubgroups.lean` 追記)
 
@@ -66,12 +69,14 @@ Lem 1.14 ✅; §6 sorry-free ✅; **Prop 1.16 のみ未形式化** (= **G** Thm 
        `normalizerCondition_of_isNilpotent`, subgroupOf 形) → Q = Qᵢ → Qᵢ ≤ Q_{3-i}
        → ★maximality → Q₁ = Q₂, k = 1。
 
-## Phase C (後続): Prop 1.16 → Thm 7.2/7.3
+## Phase C (後続): Prop 1.16 ✅ → Thm 7.2/7.3
 
-- Prop 1.16 = **G** Thm 6.2.4 (`references/gorenstein/finite-groups.mmd` p.225) +
-  |G| 帰納。配置: S01 §1E。statement 案:
-  `(hA : IsElementaryAbelian-ish noncyclic abelian p) (φ : A →* MulAut G faithful?)
-   (hG : ¬ p ∣ |G|) : (⨆ x ∈ A^#, fixedPoints ⟨x⟩-action) = ⊤` の 2 形。
+- **Prop 1.16 ✅ 完成 (2026-06-03, `OddOrder/BG/Ch1_Preliminary/S01b_Prop116.lean`)**。
+  第1式 = **Isaacs 6.21 = G Thm 6.2.4** repo 既存 (no-wrapper で直接呼ぶ; φ 形は
+  `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`)。第2式 (A/Y cyclic) =
+  `cocyclicFixedByClosure_eq_top_of_not_isCyclic` (card A 帰納)。設計 = `s01_prop116_implementation.md`。
+  〔旧記載「Gorenstein 6.2.4 を |G| 帰納で形式化, 配置 S01 §1E」は Gorenstein 形式化を要する
+  という前提が誤りだった (Isaacs 6.21 で被覆済)。〕
 - Thm 7.2: B ≤ Z(A) elem-ab p³ → Prop 1.16 第 2 形で C_{Q₁}(C) ≠ 1 (C 位数 p²)
   → C noncyclic → 第 1 形で C_{Q₂}(z) ≠ 1 (z ∈ C^#) → H := C_G(z) で Lem 7.1。
 - Thm 7.3: B ∈ ℰ_p²(Z(A)), R ⊇ Syl_q(C_G(A)) A-inv maximal; C_R(A) ≠ 1;
