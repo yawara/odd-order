@@ -65,8 +65,15 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   cardinal arithmetic gives `Subgroup.IsComplement' K H` (BG `G = KH`), so each generator
   `g⁻¹ * a(g)` of `[G,A]` lies in an `A`-invariant Hall `π`-subgroup `H`; normality then
   puts `[G,A]` inside `O_π(G)`.
-- **Remaining Prop 1.5 blocker**: (b) the induction placing an `A`-invariant `π`-subgroup
-  inside an `A`-invariant Hall subgroup.
+- **Prop 1.5(b) induction support added**: the S01 file now has private, sorry-free
+  support for the minimal-normal step in BG L405-L411:
+  `exists_minimal_normal_aInvariant`, `isMulCommutative_of_minimal_normal_aInvariant`, and
+  `exists_prime_isPGroup_of_minimal_normal_aInvariant`.  These prove that a nontrivial
+  minimal `A`-invariant normal subgroup exists and, in the finite solvable case, is a
+  commutative `p`-group.
+- **Remaining Prop 1.5 blocker**: (b) the full induction placing an `A`-invariant `π`-subgroup
+  inside an `A`-invariant Hall subgroup.  The remaining formal work is the quotient/comap
+  induction step and the final `H = G` conjugacy step inside `K M`.
 
 ## TL;DR
 

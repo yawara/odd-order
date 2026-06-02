@@ -636,6 +636,113 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
   refine ⟨c, hc_fix, ?_⟩
   exact congrArg Subtype.val hc_smul
 
+/-- A nontrivial finite group has a minimal nontrivial `A`-invariant normal subgroup. -/
+private theorem exists_minimal_normal_aInvariant
+    {G A : Type*} [Group G] [Finite G] [Nontrivial G]
+    [Group A] {φ : A →* MulAut G} :
+    ∃ M : Subgroup G, M.Normal ∧ OddOrder.Isaacs.Ch03.IsAInvariant φ M ∧ M ≠ ⊥ ∧
+      ∀ N : Subgroup G, N.Normal → OddOrder.Isaacs.Ch03.IsAInvariant φ N →
+        N ≤ M → N ≠ ⊥ → M ≤ N := by
+  classical
+  let S : Set (Subgroup G) :=
+    {N | N.Normal ∧ OddOrder.Isaacs.Ch03.IsAInvariant φ N ∧ N ≠ ⊥}
+  have hS_fin : S.Finite := Set.toFinite S
+  have hS_nonempty : S.Nonempty :=
+    ⟨⊤, inferInstance, OddOrder.Isaacs.Ch03.IsAInvariant.top φ, top_ne_bot⟩
+  obtain ⟨M, hM_min⟩ := hS_fin.exists_minimal hS_nonempty
+  obtain ⟨⟨hM_normal, hM_inv, hM_ne_bot⟩, hM_minimal⟩ := hM_min
+  refine ⟨M, hM_normal, hM_inv, hM_ne_bot, ?_⟩
+  intro N hN_normal hN_inv hN_le hN_ne_bot
+  exact hM_minimal ⟨hN_normal, hN_inv, hN_ne_bot⟩ hN_le
+
+/-- A minimal nontrivial `A`-invariant normal subgroup of a finite solvable group is
+commutative.
+
+This is the abelian-chief-factor step needed for the induction in BG Prop. 1.5(b): the
+minimality is only among `A`-invariant normal subgroups below `M`, not among all normal
+subgroups.  Solvability still forces `⁅M, M⁆ < M`; since `⁅M, M⁆` is again normal and
+`A`-invariant, minimality makes the commutator trivial. -/
+private theorem isMulCommutative_of_minimal_normal_aInvariant
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] {φ : A →* MulAut G} {M : Subgroup G} [M.Normal]
+    (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
+    (hM_ne_bot : M ≠ ⊥)
+    (hM_min : ∀ N : Subgroup G, N.Normal →
+      OddOrder.Isaacs.Ch03.IsAInvariant φ N → N ≤ M → N ≠ ⊥ → M ≤ N) :
+    IsMulCommutative M := by
+  have hcomm_lt : ⁅M, M⁆ < M := IsSolvable.commutator_lt_of_ne_bot hM_ne_bot
+  have hcomm_bot : (⁅M, M⁆ : Subgroup G) = ⊥ := by
+    by_contra hcomm_ne_bot
+    have hM_le_comm : M ≤ ⁅M, M⁆ :=
+      hM_min ⁅M, M⁆ (Subgroup.commutator_normal M M)
+        (hM_inv.commutator hM_inv) hcomm_lt.le hcomm_ne_bot
+    exact hcomm_lt.not_ge hM_le_comm
+  rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at hcomm_bot
+  refine ⟨⟨fun x y => ?_⟩⟩
+  have hx_cent : (x : G) ∈ Subgroup.centralizer M := hcomm_bot x.2
+  rw [Subgroup.mem_centralizer_iff] at hx_cent
+  exact Subtype.ext ((hx_cent y y.2).symm)
+
+/-- A minimal nontrivial `A`-invariant normal subgroup of a finite solvable group is a
+`p`-group for some prime `p`.
+
+After the preceding commutativity lemma, a Sylow subgroup of `M` is characteristic in `M`;
+its image in `G` is therefore again normal and `A`-invariant. Minimality forces that image to
+be all of `M`. -/
+private theorem exists_prime_isPGroup_of_minimal_normal_aInvariant
+    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    [Group A] {φ : A →* MulAut G} {M : Subgroup G} [M.Normal]
+    (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
+    (hM_ne_bot : M ≠ ⊥)
+    (hM_min : ∀ N : Subgroup G, N.Normal →
+      OddOrder.Isaacs.Ch03.IsAInvariant φ N → N ≤ M → N ≠ ⊥ → M ≤ N) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p M := by
+  classical
+  haveI hM_comm : IsMulCommutative M :=
+    isMulCommutative_of_minimal_normal_aInvariant hM_inv hM_ne_bot hM_min
+  have hM_card_ne_one : Nat.card M ≠ 1 := by
+    intro hcard
+    exact hM_ne_bot ((Subgroup.eq_bot_iff_card M).mpr hcard)
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hM_card_ne_one
+  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  let P : Sylow p M := default
+  have hP_normal : (P : Subgroup M).Normal := Subgroup.normal_of_isMulCommutative (P : Subgroup M)
+  haveI hP_char : (P : Subgroup M).Characteristic :=
+    Sylow.characteristic_of_normal P hP_normal
+  let Pmap : Subgroup G := (P : Subgroup M).map M.subtype
+  have hPmap_normal : Pmap.Normal := by
+    dsimp [Pmap]
+    infer_instance
+  have hPmap_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ Pmap := by
+    dsimp [Pmap]
+    exact hM_inv.map_subtype_of_characteristic
+  have hPmap_le_M : Pmap ≤ M := by
+    dsimp [Pmap]
+    exact Subgroup.map_subtype_le (P : Subgroup M)
+  have hP_ne_bot : (P : Subgroup M) ≠ ⊥ := P.ne_bot_of_dvd_card hp_dvd
+  have hPmap_ne_bot : Pmap ≠ ⊥ := by
+    intro hbot
+    apply hP_ne_bot
+    have hmap_bot : (P : Subgroup M).map M.subtype = ⊥ := by
+      simpa [Pmap] using hbot
+    exact (Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp hmap_bot
+  have hM_le_Pmap : M ≤ Pmap :=
+    hM_min Pmap hPmap_normal hPmap_inv hPmap_le_M hPmap_ne_bot
+  have hPmap_eq_M : Pmap = M := le_antisymm hPmap_le_M hM_le_Pmap
+  have hP_eq_top : (P : Subgroup M) = ⊤ := by
+    apply (Subgroup.map_subtype_inj (H := M)).mp
+    have htop_map : (⊤ : Subgroup M).map M.subtype = M := by
+      rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    calc
+      (P : Subgroup M).map M.subtype = M := by simpa [Pmap] using hPmap_eq_M
+      _ = (⊤ : Subgroup M).map M.subtype := htop_map.symm
+  obtain ⟨n, hnP⟩ := (IsPGroup.iff_card (p := p) (G := P)).mp P.2
+  have hcardM : Nat.card M = p ^ n := by
+    have hcardP : Nat.card P = Nat.card M := by
+      rw [hP_eq_top, Subgroup.card_top]
+    rwa [← hcardP]
+  exact ⟨p, hp_prime, (IsPGroup.iff_card (p := p) (G := M)).mpr ⟨n, hcardM⟩⟩
+
 /-- Complementary Hall subgroups have coprime orders. -/
 private theorem hall_compl_card_coprime {G : Type*} [Group G] [Finite G]
     {π : Set ℕ} {K H : Subgroup G}

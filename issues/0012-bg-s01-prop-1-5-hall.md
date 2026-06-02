@@ -27,6 +27,9 @@ Prop 1.5(e) commutator containment。
 - [ ] Hall π 一般版の existence / containment / conjugacy を実装する。
   - [x] Prop 1.5(a) existence: `exists_aInvariant_hall`
   - [ ] Prop 1.5(b) containment: BG induction remains
+    - [x] minimal `A`-invariant normal existence / commutative / p-group support
+    - [ ] quotient/comap induction step
+    - [ ] final `H = G` conjugacy step inside `K M`
   - [x] Prop 1.5(c) conjugacy: `aInvariant_hall_conj`
 - [x] Prop 1.5(d) は no-wrapper 方針に従い、必要なら section docstring で直接対応を明示する。
 - [x] Prop 1.5(e) の仮定を精密化し、実装する。
@@ -48,7 +51,10 @@ Prop 1.5(e) commutator containment。
   Complementary Hall subgroups `K` (`π'`) and `H` (`π`) are packaged as `Subgroup.IsComplement' K H`,
   yielding the BG factorization `G = KH`; the generator calculation proves `[G,A] ≤ H`, then normality
   gives `[G,A] ≤ O_π(G)`.
-- 残りは Prop 1.5(b) containment induction。
+- Prop 1.5(b) containment induction の support として、最小 `A`-invariant normal subgroup
+  の existence、commutativity、p-group 化を private 補題として実装。これで BG proof の
+  `M` minimal step と `H = G` 分岐で必要な Sylow-prime 情報の入口が green になった。
+- 残りは Prop 1.5(b) 本体: quotient/comap induction step と `H = G` 分岐の conjugacy inside `K M`。
 
 ## 完了条件
 
