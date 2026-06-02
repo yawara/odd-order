@@ -57,16 +57,80 @@ variable {G : Type*} [Group G]
 
 /-! ## prime / regular action の定義 (mmd L3486, L3494) -/
 
+/-- `C_N(X)` in BG §13: elements of `N` centralizing the subgroup `X`. -/
+def fixedBy (N X : Subgroup G) : Subgroup G :=
+  N ⊓ Subgroup.centralizer (X : Set G)
+
+/-- `C_N(g)` in BG §13: elements of `N` centralizing the element `g`. -/
+def fixedByElement (N : Subgroup G) (g : G) : Subgroup G :=
+  N ⊓ Subgroup.centralizer ({g} : Set G)
+
 /-- **BG "X acts in a prime manner on N"** (mmd L3486): `X` の `N` への共役作用が
 `C_N(g) = C_N(X)` を満たす (全 `g ∈ X#`)。ここで `C_N(·) = N ⊓ C_G(·)`。
 同値な形 `C_N(P) ⊆ C_N(X)` (∀P∈ℰ¹(X)) も原典にある。 -/
 def ActsPrimeOn (N X : Subgroup G) : Prop :=
   ∀ g ∈ X, g ≠ 1 →
-    N ⊓ Subgroup.centralizer ({g} : Set G) = N ⊓ Subgroup.centralizer (X : Set G)
+    fixedByElement N g = fixedBy N X
 
 /-- **BG "X acts regularly on N"** (mmd L3494): `C_N(g) = 1` を満たす (全 `g ∈ X#`)。 -/
 def ActsRegularlyOn (N X : Subgroup G) : Prop :=
-  ∀ g ∈ X, g ≠ 1 → N ⊓ Subgroup.centralizer ({g} : Set G) = ⊥
+  ∀ g ∈ X, g ≠ 1 → fixedByElement N g = ⊥
+
+@[simp] theorem fixedBy_def (N X : Subgroup G) :
+    fixedBy N X = N ⊓ Subgroup.centralizer (X : Set G) :=
+  rfl
+
+@[simp] theorem fixedByElement_def (N : Subgroup G) (g : G) :
+    fixedByElement N g = N ⊓ Subgroup.centralizer ({g} : Set G) :=
+  rfl
+
+@[simp] theorem actsPrimeOn_iff (N X : Subgroup G) :
+    ActsPrimeOn N X ↔ ∀ g ∈ X, g ≠ 1 → fixedByElement N g = fixedBy N X :=
+  Iff.rfl
+
+@[simp] theorem actsRegularlyOn_iff (N X : Subgroup G) :
+    ActsRegularlyOn N X ↔ ∀ g ∈ X, g ≠ 1 → fixedByElement N g = ⊥ :=
+  Iff.rfl
+
+theorem fixedBy_le_fixedByElement {N X : Subgroup G} {g : G} (hg : g ∈ X) :
+    fixedBy N X ≤ fixedByElement N g := by
+  refine inf_le_inf_left N ?_
+  refine Subgroup.centralizer_le ?_
+  intro x hx
+  rcases Set.mem_singleton_iff.mp hx with rfl
+  exact hg
+
+theorem ActsRegularlyOn.toActsPrimeOn {N X : Subgroup G} (h : ActsRegularlyOn N X) :
+    ActsPrimeOn N X := by
+  intro g hg hgne
+  have hpoint : fixedByElement N g = ⊥ := h g hg hgne
+  have hfixed : fixedBy N X = ⊥ := by
+    exact le_bot_iff.mp ((fixedBy_le_fixedByElement (N := N) (X := X) hg).trans (by rw [hpoint]))
+  rw [hpoint, hfixed]
+
+theorem ActsRegularlyOn.mono_left {N₀ N X : Subgroup G} (hN₀ : N₀ ≤ N)
+    (h : ActsRegularlyOn N X) : ActsRegularlyOn N₀ X := by
+  intro g hg hgne
+  have hle : fixedByElement N₀ g ≤ fixedByElement N g := by
+    intro y hy
+    exact ⟨hN₀ hy.1, hy.2⟩
+  exact le_antisymm (hle.trans (by rw [h g hg hgne])) bot_le
+
+theorem ActsPrimeOn.mono_left {N₀ N X : Subgroup G} (hN₀ : N₀ ≤ N)
+    (h : ActsPrimeOn N X) : ActsPrimeOn N₀ X := by
+  intro g hg hgne
+  refine le_antisymm ?_ (fixedBy_le_fixedByElement (N := N₀) (X := X) hg)
+  intro y hy
+  have hy_big : y ∈ fixedByElement N g := ⟨hN₀ hy.1, hy.2⟩
+  have hy_fixed : y ∈ fixedBy N X := by
+    rwa [h g hg hgne] at hy_big
+  exact ⟨hy.1, hy_fixed.2⟩
+
+theorem actsPrimeOn_bot_left (X : Subgroup G) : ActsPrimeOn (⊥ : Subgroup G) X := by
+  simp [ActsPrimeOn, fixedByElement, fixedBy]
+
+theorem actsRegularlyOn_bot_left (X : Subgroup G) : ActsRegularlyOn (⊥ : Subgroup G) X := by
+  simp [ActsRegularlyOn, fixedByElement]
 
 /-! ## §13 初等的 prime action (mmd L3498-3572) -/
 
