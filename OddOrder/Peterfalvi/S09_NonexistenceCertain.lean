@@ -486,6 +486,15 @@ def constOne (G : Type*) [Group G] : ClassFunction G ℂ :=
 @[simp] theorem constOne_apply {G : Type*} [Group G] (g : G) :
     (constOne G : G → ℂ) g = 1 := rfl
 
+/-- The constant-one class function has norm one. -/
+theorem constOne_inner_self_eq_one {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] :
+    ClassFunction.inner (constOne G) (constOne G) = 1 := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]
+  simp only [constOne_apply, star_one, mul_one, Finset.sum_const, nsmul_eq_mul]
+  rw [Finset.card_univ, ← Nat.card_eq_fintype_card, invOf_eq_inv]
+  field_simp [show (Nat.card G : ℂ) ≠ 0 by exact_mod_cast (Nat.card_pos (α := G)).ne']
+
 open scoped Classical in
 /-- `chiRho` applied to the constant `1_G` is the indicator of `A` on `L`. -/
 theorem chiRho_constOne (H71 : Hypothesis71 G A L) (a : L) :
@@ -1389,6 +1398,53 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The Dade image defining `β` is supported on the corresponding Dade support. -/
+theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :
+    H78.beta.support ⊆ H78.hyp76.hyp71.hyp.dadeSupport := by
+  intro g hg
+  by_contra hnot
+  exact hg (by
+    rw [H78.beta_def]
+    exact H78.hyp76.hyp71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport
+      H78.indMinusZetaSupp g hnot)
+
+/-- The residual `Δ = β - 1_G + ζ^ν` used in Peterfalvi (7.9). -/
+noncomputable def delta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
+  H78.beta - Hypothesis71.constOne G +
+    H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+
+/-- The defining rearrangement `β = 1_G - ζ^ν + Δ`. -/
+theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
+    H78.beta =
+      Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta H78.zetaDistinct) +
+        H78.delta := by
+  rw [delta]
+  abel
+
+/-- If `χ` is orthogonal to both `1_G` and the distinguished `ζ^ν`, then
+`(β,χ) = (Δ,χ)`. -/
+theorem beta_inner_eq_delta_inner_of_orthogonal
+    (H78 : Hypothesis78 G A L) (χ : ClassFunction G ℂ)
+    (hone : ClassFunction.inner (Hypothesis71.constOne G) χ = 0)
+    (hzeta : ClassFunction.inner
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) χ = 0) :
+    ClassFunction.inner H78.beta χ = ClassFunction.inner H78.delta χ := by
+  rw [H78.beta_eq_constOne_sub_zetaImage_add_delta, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, hone, hzeta]
+  ring
+
+/-- Right-hand variant: if `χ` is orthogonal on the left to `1_G` and the
+ distinguished `ζ^ν`, then `(χ,β) = (χ,Δ)`. -/
+theorem inner_beta_eq_inner_delta_of_orthogonal
+    (H78 : Hypothesis78 G A L) (χ : ClassFunction G ℂ)
+    (hone : ClassFunction.inner χ (Hypothesis71.constOne G) = 0)
+    (hzeta : ClassFunction.inner χ
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0) :
+    ClassFunction.inner χ H78.beta = ClassFunction.inner χ H78.delta := by
+  rw [H78.beta_eq_constOne_sub_zetaImage_add_delta, ClassFunction.inner_add_right,
+    ClassFunction.inner_sub_right, hone, hzeta]
+  ring
+
 /-- The real norm square `‖β‖²` used in Peterfalvi (7.8.b). -/
 noncomputable def betaNormSq (H78 : Hypothesis78 G A L) : ℝ :=
   (ClassFunction.inner H78.beta H78.beta).re
@@ -1489,6 +1545,64 @@ noncomputable def kernelOrder (H78 : Hypothesis78 G A L) : ℕ :=
 `|L| / |H|` using the ambient normal-subgroup data. -/
 noncomputable def complementIndex (H78 : Hypothesis78 G A L) : ℕ :=
   Nat.card L / Nat.card H78.hyp76.H
+
+/-- The kernel order `h` is positive. -/
+theorem kernelOrder_pos (H78 : Hypothesis78 G A L) : 0 < H78.kernelOrder := by
+  rw [kernelOrder]
+  exact Nat.card_pos
+
+/-- The complement index `e = |L:H|` is positive. -/
+theorem complementIndex_pos (H78 : Hypothesis78 G A L) : 0 < H78.complementIndex := by
+  rw [complementIndex]
+  have hH_card : Nat.card ((H78.hyp76.H).subgroupOf L) = Nat.card H78.hyp76.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe H78.hyp76.H_le_L).toEquiv
+  have hdvd : Nat.card H78.hyp76.H ∣ Nat.card L := by
+    rw [← hH_card]
+    exact Subgroup.card_subgroup_dvd_card ((H78.hyp76.H).subgroupOf L)
+  exact Nat.div_pos (Nat.le_of_dvd Nat.card_pos hdvd) Nat.card_pos
+
+/-- Lagrange in the notation of (7.8.b): `h * e = |L|`. -/
+theorem kernelOrder_mul_complementIndex_eq_card_L (H78 : Hypothesis78 G A L) :
+    H78.kernelOrder * H78.complementIndex = Nat.card L := by
+  rw [kernelOrder, complementIndex]
+  have hH_card : Nat.card ((H78.hyp76.H).subgroupOf L) = Nat.card H78.hyp76.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe H78.hyp76.H_le_L).toEquiv
+  have hdvd : Nat.card H78.hyp76.H ∣ Nat.card L := by
+    rw [← hH_card]
+    exact Subgroup.card_subgroup_dvd_card ((H78.hyp76.H).subgroupOf L)
+  exact Nat.mul_div_cancel' hdvd
+
+/-- Since `A = H#`, its cardinality is `h - 1`. -/
+theorem card_A_eq_kernelOrder_sub_one (H78 : Hypothesis78 G A L) :
+    Nat.card A = H78.kernelOrder - 1 := by
+  conv_lhs => rw [H78.hyp76.A_eq_H_sharp]
+  rw [kernelOrder, Nat.card_coe_set_eq]
+  have hHcard : (H78.hyp76.H : Set G).ncard = Nat.card H78.hyp76.H := by
+    rw [← Nat.card_coe_set_eq]
+    rfl
+  have h1_mem : (1 : G) ∈ (H78.hyp76.H : Set G) := H78.hyp76.H.one_mem
+  rw [Set.ncard_diff (Set.singleton_subset_iff.mpr h1_mem) (Set.finite_singleton _),
+    Set.ncard_singleton, hHcard]
+
+/-- The local support ratio `|A|/|L|` in the `(h,e)` notation of (7.8.b). -/
+theorem card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_complex
+    (H78 : Hypothesis78 G A L) :
+    (Nat.card A : ℂ) / (Nat.card L : ℂ) =
+      ((H78.kernelOrder : ℂ) - 1) /
+        ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) := by
+  have hh1 : 1 ≤ H78.kernelOrder := Nat.succ_le_of_lt H78.kernelOrder_pos
+  rw [H78.card_A_eq_kernelOrder_sub_one, ← H78.kernelOrder_mul_complementIndex_eq_card_L]
+  norm_num [Nat.cast_sub hh1]
+
+/-- Real-valued form of the local support ratio `|A|/|L| = (h-1)/(he)`. -/
+theorem card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_real
+    (H78 : Hypothesis78 G A L) :
+    (Nat.card A : ℝ) / (Nat.card L : ℝ) =
+      ((H78.kernelOrder : ℝ) - 1) /
+        ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ)) := by
+  have hh1 : 1 ≤ H78.kernelOrder := Nat.succ_le_of_lt H78.kernelOrder_pos
+  rw [H78.card_A_eq_kernelOrder_sub_one, ← H78.kernelOrder_mul_complementIndex_eq_card_L]
+  norm_num [Nat.cast_sub hh1]
 
 /-- **Peterfalvi (7.8.b) source norm target.**  The remaining source-side
 character computation for `‖β‖² = e + 1`, after the Dade-isometry bridge has
@@ -1652,6 +1766,20 @@ theorem betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zeta_irr
 noncomputable def smallIndex (H78 : Hypothesis78 G A L) : Prop :=
   2 * H78.complementIndex + 1 ≤ H78.kernelOrder
 
+/-- Real-valued form of `smallIndex`, for the arithmetic in (7.8.b). -/
+theorem smallIndex_real (H78 : Hypothesis78 G A L) (hsmall : H78.smallIndex) :
+    2 * (H78.complementIndex : ℝ) + 1 ≤ (H78.kernelOrder : ℝ) := by
+  rw [smallIndex] at hsmall
+  exact_mod_cast hsmall
+
+/-- The quadratic correction `u a² - 2 v a` in Peterfalvi (7.8.b), with
+`u = (1/e)(1 - 1/h)` and `v = 1/h`. -/
+noncomputable def normQuadraticCorrection (H78 : Hypothesis78 G A L)
+    (hBD : H78.BetaDecomp) : ℝ :=
+  (1 / (H78.complementIndex : ℝ)) *
+      (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+    2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ)
+
 /-- The class function `(ζ^ν)^ρ` whose norm is estimated in Peterfalvi (7.8.b). -/
 noncomputable def zetaNuRho (H78 : Hypothesis78 G A L) : ClassFunction L ℂ :=
   H78.hyp76.hyp71.chiRhoCF (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
@@ -1723,6 +1851,592 @@ structure NormEstimates (H78 : Hypothesis78 G A L)
   gamma_norm_sq_le :
     H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
 
+/-- Under `2e + 1 ≤ h`, Peterfalvi's quadratic correction is nonnegative. -/
+theorem normQuadraticCorrection_nonneg_of_smallIndex
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    H78.smallIndex → 0 ≤ H78.normQuadraticCorrection hBD := by
+  intro hsmall
+  rw [normQuadraticCorrection]
+  have he : 0 < (H78.complementIndex : ℝ) := by
+    exact_mod_cast H78.complementIndex_pos
+  exact quadraticTerm_nonneg_of_smallIndex hBD.a he (H78.smallIndex_real hsmall)
+
+/-- If `(ζ^ν)^ρ` has Peterfalvi's quadratic norm formula, its lower bound follows. -/
+theorem zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.smallIndex →
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        H78.zetaNuRhoNormSq := by
+  intro hsmall
+  rw [hzeta]
+  exact le_add_of_nonneg_left (H78.normQuadraticCorrection_nonneg_of_smallIndex hBD hsmall)
+
+/-- If `Γ` has Peterfalvi's residual norm formula, its upper bound follows. -/
+theorem gammaNormSq_le_of_normQuadraticCorrection_eq
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hgamma : H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD) :
+    H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1 := by
+  intro hsmall
+  rw [hgamma]
+  have hh_nonneg : 0 ≤ (H78.kernelOrder : ℝ) := by positivity
+  have hquad := H78.normQuadraticCorrection_nonneg_of_smallIndex hBD hsmall
+  have hprod : 0 ≤ (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD :=
+    mul_nonneg hh_nonneg hquad
+  linarith
+
+/-- Exact quadratic norm formulas are enough to package Peterfalvi (7.8.b)'s
+`NormEstimates`.  This isolates the remaining character-theoretic work to proving
+those two formulas from (7.7.b), `BetaDecomp`, and `‖β‖² = e + 1`. -/
+theorem normEstimates_of_normQuadraticCorrection_eqs
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hgamma : H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD) :
+    H78.NormEstimates hBD where
+  zetaNuRho_norm_sq_ge :=
+    H78.zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq hBD hzeta
+  gamma_norm_sq_le :=
+    H78.gammaNormSq_le_of_normQuadraticCorrection_eq hBD hgamma
+
+/-- Once the orthogonal expansion of `‖β‖²` is known, the residual norm formula
+for `Γ` is just the arithmetic rearrangement in Peterfalvi (7.8.b). -/
+theorem gammaNormSq_eq_of_betaNormSq_expand
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hbetaNorm : H78.betaNormSq = (H78.complementIndex : ℝ) + 1)
+    (hexpand : H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD) :
+    H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD := by
+  have hh_ne : (H78.kernelOrder : ℝ) ≠ 0 := by
+    exact_mod_cast H78.kernelOrder_pos.ne'
+  have he_ne : (H78.complementIndex : ℝ) ≠ 0 := by
+    exact_mod_cast H78.complementIndex_pos.ne'
+  rw [hbetaNorm] at hexpand
+  have hquad :
+      (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD =
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) := by
+    rw [normQuadraticCorrection]
+    field_simp [hh_ne, he_ne]
+  rw [hquad]
+  linarith
+
+/-- The distinguished `νζ` is orthogonal to `1_G`, in the displayed direction. -/
+theorem zetaImage_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+      (Hypothesis71.constOne G) = 0 :=
+  hBD.orth_one H78.zetaDistinct H78.zetaDistinct_ne_ind1H
+
+/-- Hermitian-symmetric form of `zetaImage_orth_one`. -/
+theorem constOne_orth_zetaImage (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G)
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.zetaImage_orth_one hBD, star_zero]
+
+/-- The residual `Γ` is orthogonal to the distinguished `νζ`, in the displayed direction. -/
+theorem gamma_orth_zetaImage (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner hBD.Gamma (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0 :=
+  hBD.Gamma_orth_nu H78.zetaDistinct H78.zetaDistinct_ne_ind1H
+
+/-- Hermitian-symmetric form of `gamma_orth_zetaImage`. -/
+theorem zetaImage_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.gamma_orth_zetaImage hBD, star_zero]
+
+/-- Hermitian-symmetric form of `BetaDecomp.Gamma_orth_one`. -/
+theorem constOne_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, hBD.Gamma_orth_one, star_zero]
+
+/-- Each coherent image in `S^ν` is orthogonal to `Γ`, in the opposite direction. -/
+theorem nu_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (i : Fin (H78.hyp76.n + 1)) (hi : i ≠ H78.ind1H) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i)) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, hBD.Gamma_orth_nu i hi, star_zero]
+
+/-- The weighted `S^ν`-sum is orthogonal to `1_G`. -/
+theorem weightedNuSum_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.weightedNuSum (Hypothesis71.constOne G) = 0 := by
+  classical
+  rw [weightedNuSum, inner_sum_left]
+  refine Finset.sum_eq_zero fun i hi => ?_
+  have hi_ne : i ≠ H78.ind1H := (Finset.mem_erase.mp hi).1
+  rw [ClassFunction.inner_smul_left, hBD.orth_one i hi_ne, mul_zero]
+
+/-- Hermitian-symmetric form of `weightedNuSum_orth_one`. -/
+theorem constOne_orth_weightedNuSum
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) H78.weightedNuSum = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_one hBD, star_zero]
+
+/-- The weighted `S^ν`-sum is orthogonal to the residual `Γ`. -/
+theorem weightedNuSum_orth_gamma
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.weightedNuSum hBD.Gamma = 0 := by
+  classical
+  rw [weightedNuSum, inner_sum_left]
+  refine Finset.sum_eq_zero fun i hi => ?_
+  have hi_ne : i ≠ H78.ind1H := (Finset.mem_erase.mp hi).1
+  rw [ClassFunction.inner_smul_left, H78.nu_orth_gamma hBD i hi_ne, mul_zero]
+
+/-- Hermitian-symmetric form of `weightedNuSum_orth_gamma`. -/
+theorem gamma_orth_weightedNuSum
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner hBD.Gamma H78.weightedNuSum = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.weightedNuSum_orth_gamma hBD, star_zero]
+
+/-- `BetaDecomp` identifies the (7.9) residual `Δ` with the weighted part plus
+`Γ`. -/
+theorem delta_eq_weightedNuSum_add_gamma
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    H78.delta = (hBD.a : ℂ) • H78.weightedNuSum + hBD.Gamma := by
+  rw [delta, hBD.beta_eq]
+  abel
+
+/-- The residual `Δ` is orthogonal to `1_G`. -/
+theorem delta_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner H78.delta (Hypothesis71.constOne G) = 0 := by
+  rw [H78.delta_eq_weightedNuSum_add_gamma hBD, ClassFunction.inner_add_left,
+    ClassFunction.inner_smul_left, H78.weightedNuSum_orth_one hBD,
+    hBD.Gamma_orth_one, mul_zero, add_zero]
+
+/-- Hermitian-symmetric form of `delta_orth_one`. -/
+theorem constOne_orth_delta (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G) H78.delta = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.delta_orth_one hBD, star_zero]
+
+/-- Orthogonal expansion of the beta decomposition in Peterfalvi (7.8.a).
+
+After the remaining source-side computation of `‖Σ‖² = (h - 1)/e`, the displayed
+decomposition of `β` gives the real norm formula used in (7.8.b). -/
+theorem betaNormSq_eq_of_weightedNuSum_norm
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta_norm :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted_zeta :
+      ClassFunction.inner H78.weightedNuSum
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted_norm :
+      ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+        ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ)) :
+    H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD := by
+  have hzeta_weighted :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        H78.weightedNuSum = 1 := by
+    rw [Hypothesis71.ClassFunction.inner_symm, hweighted_zeta, star_one]
+  have hinner :
+      ClassFunction.inner H78.beta H78.beta =
+        2 +
+          (hBD.a : ℂ) * (hBD.a : ℂ) *
+            ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ) -
+          2 * (hBD.a : ℂ) +
+          ClassFunction.inner hBD.Gamma hBD.Gamma := by
+    rw [hBD.beta_eq]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      Hypothesis71.constOne_inner_self_eq_one, H78.zetaImage_orth_one hBD,
+      H78.constOne_orth_zetaImage hBD, H78.weightedNuSum_orth_one hBD,
+      H78.constOne_orth_weightedNuSum hBD, hBD.Gamma_orth_one,
+      H78.constOne_orth_gamma hBD, H78.gamma_orth_zetaImage hBD,
+      H78.zetaImage_orth_gamma hBD, H78.weightedNuSum_orth_gamma hBD,
+      H78.gamma_orth_weightedNuSum hBD, hzeta_norm, hweighted_zeta, hzeta_weighted,
+      hweighted_norm, star_intCast, mul_zero, add_zero, sub_zero, zero_add]
+    ring
+  rw [betaNormSq, hinner, gammaNormSq]
+  norm_num [Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
+  ring
+
+/-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
+theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
+  rw [H78.nu_isometry, hzeta_norm]
+
+/-- The source irreducibility of the distinguished `ζ` gives `‖νζ‖² = 1`. -/
+theorem zetaImage_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.zetaImage_inner_self_eq_one
+    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- Irreducibility and distinctness of the source `S`-family give its
+orthogonality matrix. -/
+theorem sourceZeta_orthogonal_of_irreducible_distinct (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0 := by
+  intro i hi j hj
+  by_cases hij : i = j
+  · rw [if_pos hij, hij]
+  · rw [if_neg hij]
+    let χ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+      ⟨H78.hyp76.zeta i, hirr i hi⟩
+    let ψ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+      ⟨H78.hyp76.zeta j, hirr j hj⟩
+    have hne : χ ≠ ψ := by
+      intro hχψ
+      exact hdistinct i hi j hj hij (congrArg
+        (fun θ : OddOrder.RepresentationTheory.IrreducibleCharacter L =>
+          (θ : ClassFunction L ℂ)) hχψ)
+    simpa [χ, ψ, hne] using
+      (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ ψ)
+
+/-- Irreducibility of the source `S`-family makes every source norm nonzero. -/
+theorem sourceZeta_norm_ne_of_irreducible (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 := by
+  intro i hi
+  let χ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
+    ⟨H78.hyp76.zeta i, hirr i hi⟩
+  have hχ : ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1 := by
+    simpa [χ] using
+      (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ χ)
+  rw [hχ]
+  norm_num
+
+/-- If the source `ζ_i` are orthogonal to the distinguished `ζ`, the weighted
+`S^ν`-sum has inner product `1` with `νζ`.
+
+This is the coefficient computation in Peterfalvi (7.8.a) that feeds the
+`(β, ζ^ν) = a - 1` identity used in (7.8.b). -/
+theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0)
+    (hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0) :
+    ClassFunction.inner H78.weightedNuSum
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  have hzeta_mem : H78.zetaDistinct ∈ s := by
+    simp [hs, H78.zetaDistinct_ne_ind1H]
+  rw [weightedNuSum, ← hs, inner_sum_left]
+  have hsum :
+      (∑ i ∈ s,
+        ClassFunction.inner
+          ((H78.hyp76.zeta i (1 : L) /
+            (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+              ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))) •
+            H78.nu (H78.hyp76.zeta i))
+          (H78.nu (H78.hyp76.zeta H78.zetaDistinct))) =
+        ∑ i ∈ s,
+          if i = H78.zetaDistinct then
+            H78.hyp76.zeta i (1 : L) /
+              (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+                ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+          else 0 := by
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, H78.nu_isometry, horth i hi]
+    by_cases hiz : i = H78.zetaDistinct
+    · rw [if_pos hiz, if_pos hiz, mul_one]
+    · rw [if_neg hiz, if_neg hiz, mul_zero]
+  rw [hsum, Finset.sum_ite_eq' s H78.zetaDistinct
+    (fun i =>
+      H78.hyp76.zeta i (1 : L) /
+        (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))),
+    if_pos hzeta_mem, horth H78.zetaDistinct hzeta_mem]
+  rw [if_pos rfl]
+  field_simp [hzeta_one_ne_zero]
+
+/-- Source orthogonality and the Burnside degree sum evaluate the norm of the
+weighted `S^ν`-sum in Peterfalvi (7.8.a).
+
+This is the source-side computation of `‖Σ‖² = (h - 1) / e`: after `ν` transports
+orthogonality from `L` to `G`, only diagonal terms remain, and the degree sum
+collapses to the non-principal part of the kernel. -/
+theorem weightedNuSum_inner_self_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+      ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ) := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  let coeff : Fin (H78.hyp76.n + 1) → ℂ := fun i =>
+    H78.hyp76.zeta i (1 : L) /
+      (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+  have he_ne : (H78.complementIndex : ℂ) ≠ 0 := by
+    exact_mod_cast H78.complementIndex_pos.ne'
+  have hinner :
+      ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+        ∑ i ∈ s, ∑ j ∈ s,
+          coeff i * star (coeff j) *
+            ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+              (H78.nu (H78.hyp76.zeta j)) := by
+    rw [weightedNuSum, ← hs]
+    change ClassFunction.inner
+        (∑ i ∈ s, coeff i • H78.nu (H78.hyp76.zeta i))
+        (∑ i ∈ s, coeff i • H78.nu (H78.hyp76.zeta i)) = _
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+    ring
+  have hcollapse :
+      (∑ i ∈ s, ∑ j ∈ s,
+        coeff i * star (coeff j) *
+          ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+            (H78.nu (H78.hyp76.zeta j))) =
+        ∑ i ∈ s,
+          coeff i * star (coeff i) *
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) := by
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [Finset.sum_eq_single i]
+    · rw [H78.nu_isometry, horth i (by simpa [hs] using hi) i (by simpa [hs] using hi),
+        if_pos rfl]
+    · intro j hj hji
+      rw [H78.nu_isometry, horth i (by simpa [hs] using hi) j (by simpa [hs] using hj),
+        if_neg (Ne.symm hji), mul_zero]
+    · intro hnot
+      exact False.elim (hnot hi)
+  have hdiag :
+      (∑ i ∈ s,
+        coeff i * star (coeff i) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        (∑ i ∈ s,
+          H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) /
+          (H78.complementIndex : ℂ) ^ 2 := by
+    rw [Finset.sum_div]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    have hn_star :
+        star (ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) :=
+      Hypothesis71.ClassFunction.star_inner_self _
+    have hn_ne : ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 :=
+      hnorm_ne i (by simpa [hs] using hi)
+    simp only [coeff, hzeta_degree]
+    rw [star_div₀, star_mul', hn_star]
+    simp only [star_natCast]
+    field_simp [he_ne, hn_ne]
+  rw [hinner, hcollapse, hdiag, show
+      (∑ i ∈ s,
+          H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ) from by
+        simpa [hs] using hdegree_sum]
+  field_simp [he_ne]
+  norm_num [Complex.ofReal_div, Complex.ofReal_sub]
+  ring
+
+/-- Source orthogonality and the kernel degree sum give the full orthogonal
+expansion of `‖β‖²` in Peterfalvi (7.8.b). -/
+theorem betaNormSq_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  have hzeta_mem : H78.zetaDistinct ∈ s := by
+    simp [hs, H78.zetaDistinct_ne_ind1H]
+  have hzeta_src_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+    H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr
+  have horth_zeta : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0 := by
+    intro i hi
+    have hi_s : i ∈ s := by simpa [hs] using hi
+    rw [horth i hi H78.zetaDistinct (by simpa [hs] using hzeta_mem)]
+    by_cases hiz : i = H78.zetaDistinct
+    · rw [if_pos hiz, if_pos hiz, hiz, hzeta_src_norm]
+    · rw [if_neg hiz, if_neg hiz]
+  have hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0 := by
+    rw [hzeta_degree]
+    exact_mod_cast H78.complementIndex_pos.ne'
+  exact H78.betaNormSq_eq_of_weightedNuSum_norm hBD
+    (H78.zetaImage_inner_self_eq_one hzeta_src_norm)
+    (H78.weightedNuSum_inner_zetaImage_eq_one horth_zeta hzeta_one_ne_zero)
+    (H78.weightedNuSum_inner_self_eq_of_source_orthogonal
+      horth hnorm_ne hzeta_degree hdegree_sum)
+
+/-- Source-side beta norm data give Peterfalvi's residual norm formula for `Γ`. -/
+theorem gammaNormSq_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD :=
+  H78.gammaNormSq_eq_of_betaNormSq_expand hBD
+    (H78.betaNormSq_eq_complementIndex_add_one hsrc)
+    (H78.betaNormSq_eq_of_source_orthogonal hBD
+      horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
+
+/-- Once the remaining `(ζ^ν)^ρ` quadratic formula is supplied, the source-side
+beta norm data package Peterfalvi (7.8.b)'s `NormEstimates`. -/
+theorem normEstimates_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_normQuadraticCorrection_eqs hBD hzeta
+    (H78.gammaNormSq_eq_of_source_orthogonal hBD hsrc
+      horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
+
+/-- Version of `normEstimates_of_source_orthogonal` using the natural source
+hypotheses that the `S`-family consists of distinct irreducible characters. -/
+theorem normEstimates_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD := by
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  exact H78.normEstimates_of_source_orthogonal hBD hsrc
+    (H78.sourceZeta_orthogonal_of_irreducible_distinct hirr hdistinct)
+    (H78.sourceZeta_norm_ne_of_irreducible hirr)
+    hzeta_degree hdegree_sum (hirr H78.zetaDistinct hzeta_mem) hzeta
+
+/-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
+`(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzetaImage_norm :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted :
+      ClassFunction.inner H78.weightedNuSum
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 := by
+  rw [hBD.beta_eq, ClassFunction.inner_add_left, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    H78.constOne_orth_zetaImage hBD, hzetaImage_norm, hweighted,
+    H78.gamma_orth_zetaImage hBD]
+  ring
+
+/-- Source-side orthogonality plus source irreducibility gives the coefficient
+identity `(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0)
+    (hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 :=
+  H78.beta_inner_zetaImage_eq_int_sub_one_of_weighted hBD
+    (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
+    (H78.weightedNuSum_inner_zetaImage_eq_one horth hzeta_one_ne_zero)
+
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
 theorem chiRho_eq_inner_beta_on_A (H78 : Hypothesis78 G A L)
@@ -1791,6 +2505,70 @@ theorem chiRho_norm_sq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
           H78.hyp76.hyp71.hyp.subset_L]
   rw [hcard]
   ring
+
+/-- Specialization of (7.8.c.ii) to the distinguished image `νζ`. -/
+theorem zetaNuRhoNormSq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0) :
+    H78.zetaNuRhoNormSq =
+      (((Nat.card A : ℂ) / (Nat.card L : ℂ)) *
+        (ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) *
+          star (ClassFunction.inner H78.beta
+            (H78.nu (H78.hyp76.zeta H78.zetaDistinct))))).re := by
+  rw [zetaNuRhoNormSq, zetaNuRho]
+  exact congrArg Complex.re (H78.chiRho_norm_sq_eq_card_ratio_mul
+    (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) hnu_irr hnu_orth)
+
+/-- Combined (7.8.b) bridge: after the coefficient computation
+`(β, ζ^ν) = a - 1`, the norm of `(ζ^ν)^ρ` is the card-ratio multiple of
+`(a - 1)^2`. -/
+theorem zetaNuRhoNormSq_eq_card_ratio_mul_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hbeta :
+      ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+        (hBD.a : ℂ) - 1) :
+    H78.zetaNuRhoNormSq =
+      (((Nat.card A : ℂ) / (Nat.card L : ℂ)) *
+        (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re := by
+  rw [H78.zetaNuRhoNormSq_eq_card_ratio_mul hnu_irr hnu_orth, hbeta]
+  rw [show star ((hBD.a : ℂ) - 1) = (hBD.a : ℂ) - 1 by simp]
+
+/-- The same `(ζ^ν)^ρ` norm formula with `|A|/|L|` rewritten as `(h-1)/(he)`. -/
+theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hbeta :
+      ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+        (hBD.a : ℂ) - 1) :
+    H78.zetaNuRhoNormSq =
+      (((H78.kernelOrder : ℝ) - 1) /
+          ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) := by
+  rw [H78.zetaNuRhoNormSq_eq_card_ratio_mul_int_sub_one hBD hnu_irr hnu_orth hbeta]
+  rw [H78.card_A_div_card_L_eq_kernel_sub_one_div_kernel_mul_complementIndex_complex]
+  let r : ℝ :=
+    ((H78.kernelOrder : ℝ) - 1) /
+      ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ)) *
+    (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1))
+  have hprodCast :
+      ((H78.kernelOrder : ℂ) - 1) /
+            ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) *
+          (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1)) = (r : ℂ) := by
+    norm_num [r, Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
+  change
+    (((H78.kernelOrder : ℂ) - 1) /
+          ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) *
+        (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re = r
+  exact (congrArg Complex.re hprodCast).trans (Complex.ofReal_re r)
 
 end Hypothesis78
 
@@ -1862,9 +2640,197 @@ theorem conclusion_swap (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
     H79.swap.conclusion ↔ H79.conclusion := by
   simp [conclusion, swap, firstZetaImage, secondZetaImage, or_comm]
 
+/-- The two `β` functions are orthogonal when their Dade supports are disjoint. -/
+theorem beta_inner_beta_eq_zero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
+    ClassFunction.inner H79.first.beta H79.second.beta = 0 := by
+  have hdisj : Disjoint H79.first.beta.support H79.second.beta.support := by
+    rw [Set.disjoint_left]
+    intro g hg₁ hg₂
+    exact Set.disjoint_left.mp H79.dadeSupport_disjoint
+      (H79.first.beta_support_subset_dadeSupport hg₁)
+      (H79.second.beta_support_subset_dadeSupport hg₂)
+  exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
+
+/-- Expanding `β₁ = 1_G - ζ₁^ν + Δ₁` and `β₂ = 1_G - ζ₂^ν + Δ₂`
+gives the displayed algebraic identity used in Peterfalvi (7.9). -/
+theorem beta_inner_beta_expand_delta (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0) :
+    ClassFunction.inner H79.first.beta H79.second.beta =
+      1 - ClassFunction.inner H79.firstZetaImage H79.second.delta -
+        ClassFunction.inner H79.first.delta H79.secondZetaImage +
+          ClassFunction.inner H79.first.delta H79.second.delta := by
+  have hzeta_cross' :
+      ClassFunction.inner
+        (H79.first.nu (H79.first.hyp76.zeta H79.first.zetaDistinct))
+        (H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)) = 0 := by
+    simpa [firstZetaImage, secondZetaImage] using hzeta_cross
+  rw [H79.first.beta_eq_constOne_sub_zetaImage_add_delta,
+    H79.second.beta_eq_constOne_sub_zetaImage_add_delta]
+  simp only [firstZetaImage, secondZetaImage, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_sub_right]
+  rw [Hypothesis71.constOne_inner_self_eq_one,
+    H79.second.constOne_orth_zetaImage hBD₂,
+    H79.second.constOne_orth_delta hBD₂,
+    H79.first.zetaImage_orth_one hBD₁,
+    H79.first.delta_orth_one hBD₁,
+    hzeta_cross']
+  ring
+
+/-- The support and `ζ`-orthogonality inputs reduce Peterfalvi (7.9) to the
+parity/nonzero statement for the two residual cross terms. -/
+theorem delta_cross_equation (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0) :
+    0 = 1 - ClassFunction.inner H79.firstZetaImage H79.second.delta -
+        ClassFunction.inner H79.first.delta H79.secondZetaImage +
+          ClassFunction.inner H79.first.delta H79.second.delta := by
+  rw [← H79.beta_inner_beta_expand_delta hBD₁ hBD₂ hzeta_cross,
+    H79.beta_inner_beta_eq_zero]
+
+/-- If one of the residual cross terms is nonzero, then the original (7.9)
+non-orthogonality conclusion follows. -/
+theorem conclusion_of_delta_cross_nonzero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hdelta : ClassFunction.inner H79.first.delta H79.secondZetaImage ≠ 0 ∨
+      ClassFunction.inner H79.firstZetaImage H79.second.delta ≠ 0) :
+    H79.conclusion := by
+  rcases hdelta with hdelta | hdelta
+  · left
+    rw [H79.first.beta_inner_eq_delta_inner_of_orthogonal H79.secondZetaImage
+      (H79.second.constOne_orth_zetaImage hBD₂) hzeta_cross]
+    exact hdelta
+  · right
+    have hleft : ClassFunction.inner H79.firstZetaImage H79.second.beta ≠ 0 := by
+      rw [H79.second.inner_beta_eq_inner_delta_of_orthogonal H79.firstZetaImage
+        (H79.first.zetaImage_orth_one hBD₁) hzeta_cross]
+      exact hdelta
+    intro hzero
+    apply hleft
+    rw [Hypothesis71.ClassFunction.inner_symm H79.second.beta H79.firstZetaImage,
+      hzero, star_zero]
+
+/-- Integer-parity form of the last step of Peterfalvi (7.9): once the two
+residual cross terms are integers and `(Δ₁,Δ₂)` is an even integer, the displayed
+`0 = 1 - ... + ...` equation forces one cross term to be nonzero. -/
+theorem conclusion_of_delta_cross_integral_parity
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hx : ∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ))
+    (hy : ∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ))
+    (hz : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  rcases hx with ⟨x, hx⟩
+  rcases hy with ⟨y, hy⟩
+  rcases hz with ⟨z, hz, hz_even⟩
+  have heqC := H79.delta_cross_equation hBD₁ hBD₂ hzeta_cross
+  rw [hx, hy, hz] at heqC
+  have heqZ : (0 : ℤ) = 1 - y - x + z := by
+    have hcast : ((0 : ℤ) : ℂ) = ((1 - y - x + z : ℤ) : ℂ) := by
+      simpa [Int.cast_sub, Int.cast_add] using heqC
+    exact_mod_cast hcast
+  have hnonzero : x ≠ 0 ∨ y ≠ 0 := by
+    by_contra hnot
+    push Not at hnot
+    rcases hz_even with ⟨t, ht⟩
+    omega
+  apply H79.conclusion_of_delta_cross_nonzero hBD₁ hBD₂ hzeta_cross
+  rcases hnonzero with hx_ne | hy_ne
+  · left
+    rw [hx]
+    exact_mod_cast hx_ne
+  · right
+    rw [hy]
+    exact_mod_cast hy_ne
+
 end Hypothesis79
 
 end Section_7_9
+
+section OrthogonalIntegerDecomposition
+
+variable {ι : Type*}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- Integer-coefficient Pythagoras bridge used in Peterfalvi (7.10): if a class
+function decomposes as an orthogonal integer combination plus an orthogonal
+residual, then an upper bound on its norm bounds the sum of the diagonal weights
+for every nonzero coefficient. -/
+theorem sum_weights_le_of_orthogonal_integer_decomposition
+    (B : Finset ι) (v : ι → ClassFunction G ℂ) (x : ι → ℤ) (m : ι → ℝ)
+    (Γ Γ₁ : ClassFunction G ℂ) (M : ℝ)
+    (hΓ : Γ = (∑ i ∈ B, (((x i : ℝ) : ℂ) • v i)) + Γ₁)
+    (horth : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) = if i = j then (m i : ℂ) else 0)
+    (hΓ₁ : ∀ i ∈ B, ClassFunction.inner Γ₁ (v i) = 0)
+    (hm_nonneg : ∀ i ∈ B, 0 ≤ m i)
+    (hx_nonzero : ∀ i ∈ B, x i ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ M) :
+    (∑ i ∈ B, m i) ≤ M := by
+  classical
+  have hpyth := inner_self_orthogonalSum_add_re (G := G) B v
+    (fun i => (x i : ℝ)) m Γ₁ horth hΓ₁
+  have hΓ_norm : (ClassFunction.inner Γ Γ).re =
+      (∑ i ∈ B, (x i : ℝ) ^ 2 * m i) +
+        (ClassFunction.inner Γ₁ Γ₁).re := by
+    rw [hΓ]
+    exact hpyth
+  have hsum_le_sq : (∑ i ∈ B, m i) ≤
+      ∑ i ∈ B, (x i : ℝ) ^ 2 * m i := by
+    refine Finset.sum_le_sum fun i hi => ?_
+    have hcases : x i ≤ -1 ∨ 1 ≤ x i := by
+      have hxi := hx_nonzero i hi
+      omega
+    have hx_sq : (1 : ℝ) ≤ (x i : ℝ) ^ 2 := by
+      rcases hcases with hle | hge
+      · have hle' : (x i : ℝ) ≤ -1 := by exact_mod_cast hle
+        nlinarith
+      · have hge' : (1 : ℝ) ≤ x i := by exact_mod_cast hge
+        nlinarith
+    simpa [one_mul] using mul_le_mul_of_nonneg_right hx_sq (hm_nonneg i hi)
+  have hΓ₁_nonneg : 0 ≤ (ClassFunction.inner Γ₁ Γ₁).re :=
+    inner_self_re_nonneg Γ₁
+  rw [hΓ_norm] at hΓ_bound
+  linarith
+
+open scoped Classical in
+/-- Rational-valued version of the integer-coefficient Pythagoras bridge.  This
+matches the `𝓑`-sum in Peterfalvi (7.10), whose weights are rational ratios such
+as `(h_j - 1) / e_j`, while the norm inequality lives in `ℝ`. -/
+theorem sum_rat_weights_le_of_orthogonal_integer_decomposition
+    (B : Finset ι) (v : ι → ClassFunction G ℂ) (x : ι → ℤ) (m : ι → ℚ)
+    (Γ Γ₁ : ClassFunction G ℂ) (M : ℚ)
+    (hΓ : Γ = (∑ i ∈ B, (((x i : ℝ) : ℂ) • v i)) + Γ₁)
+    (horth : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) = if i = j then (m i : ℂ) else 0)
+    (hΓ₁ : ∀ i ∈ B, ClassFunction.inner Γ₁ (v i) = 0)
+    (hm_nonneg : ∀ i ∈ B, 0 ≤ m i)
+    (hx_nonzero : ∀ i ∈ B, x i ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (M : ℝ)) :
+    (∑ i ∈ B, m i) ≤ M := by
+  have horth_real : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) =
+        if i = j then (((m i : ℝ) : ℂ)) else 0 := by
+    intro i hi j hj
+    simpa using horth i hi j hj
+  have hm_nonneg_real : ∀ i ∈ B, 0 ≤ (m i : ℝ) := by
+    intro i hi
+    exact_mod_cast hm_nonneg i hi
+  have hreal := sum_weights_le_of_orthogonal_integer_decomposition
+    B v x (fun i => (m i : ℝ)) Γ Γ₁ (M : ℝ) hΓ horth_real hΓ₁ hm_nonneg_real
+    hx_nonzero hΓ_bound
+  have hcast : ((∑ i ∈ B, m i) : ℝ) ≤ (M : ℝ) := by
+    simpa using hreal
+  exact_mod_cast hcast
+
+end OrthogonalIntegerDecomposition
 
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
@@ -2859,6 +3825,12 @@ lemma exists_lowerBoundTerm_of_exists_Bsum_bound [Finite G]
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
+/-- The unweighted local contribution `(h_j - 1) / e_j` attached to an index in
+Peterfalvi's `𝓑`-sum.  Naming it keeps the `ℚ`-to-`ℂ` coercion from being
+elaborated as a complex division in orthogonality hypotheses. -/
+noncomputable def BsumWeight (F : FrobeniusFamily G k) (j : Fin k) : ℚ :=
+  ((F.h j : ℚ) - 1) / (F.e j : ℚ)
+
 /-- **Peterfalvi (7.10) character-estimate target.**  This is the exact data
 still to be built from the character-theoretic inputs (7.5), (7.8), (7.9), and
 (6.8): a minimal kernel index, the corresponding `𝓑`-set, the unweighted
@@ -2884,6 +3856,156 @@ structure CharacterEstimateData [Finite G] (F : FrobeniusFamily G k) where
         (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
         (∑ j ∈ B, ((F.h j : ℚ) - 1) /
           ((F.e j : ℚ) * (F.h j : ℚ)))
+
+/-- Direct `𝓑`-sum bridge for Peterfalvi (7.10): an orthogonal integer
+combination with diagonal weights `(h_j - 1) / e_j` and norm at most `e_i - 1`
+gives exactly the `Bsum_le` field required by `CharacterEstimateData`. -/
+lemma Bsum_le_of_orthogonal_integer_decomposition [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k} (B : Finset (Fin k))
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1) :
+    (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1 := by
+  classical
+  have horth' : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        @ite ℂ (j = l) (Classical.propDecidable (j = l))
+          (F.BsumWeight j : ℂ) 0 := by
+    intro j hj l hl
+    by_cases h : j = l
+    · simpa [h] using horth j hj l hl
+    · simpa [h] using horth j hj l hl
+  have hm_nonneg : ∀ j ∈ B, 0 ≤ F.BsumWeight j := by
+    intro j _hj
+    simpa [BsumWeight] using F.h_sub_one_div_e_nonneg j
+  let M : ℚ := (F.e i : ℚ) - 1
+  have hM_eq : (M : ℝ) = (F.e i : ℝ) - 1 := by
+    dsimp [M]
+    norm_num
+  have hbound : (ClassFunction.inner Γ Γ).re ≤ (M : ℝ) := by
+    rw [hM_eq]
+    exact hΓ_bound
+  have hrat := sum_rat_weights_le_of_orthogonal_integer_decomposition
+    B v x F.BsumWeight Γ Γ₁ M hΓ horth' hΓ₁ hm_nonneg hx_nonzero hbound
+  simpa [BsumWeight, M] using hrat
+
+/-- The reduced output of Peterfalvi (7.5), after inserting the (7.8) lower
+bounds and the identity contribution on `G₀`, is exactly the `base_estimate`
+field of `CharacterEstimateData`.  This is the algebraic bridge from the real
+family inequality to the rational display used in (7.10). -/
+lemma base_estimate_of_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (B : Finset (Fin k))
+    (hred :
+      ((1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ)) +
+        (1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+            ((F.e j : ℚ) * (F.h j : ℚ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  have hG_ne : (Nat.card G : ℚ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := G)).ne'
+  have hneg :
+      (1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ) =
+        -(((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ)) := by
+    field_simp [hG_ne]
+    ring
+  rw [hneg] at hred
+  linarith
+
+/-- Real-valued input form of `base_estimate_of_reduced_family_inequality`.
+This matches the actual codomain of (7.5), (7.8.b), and the norm estimates before
+the final rational display of Peterfalvi (7.10). -/
+lemma base_estimate_of_real_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) (B : Finset (Fin k))
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  have hG_ne : (Nat.card G : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.card_pos (α := G)).ne'
+  have hneg :
+      (1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ) =
+        -(((Nat.card F.G0 : ℝ) - 1) / (Nat.card G : ℝ)) := by
+    field_simp [hG_ne]
+    ring
+  rw [hneg] at hred
+  have hreal :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) -
+        (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+        (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+          ((F.e j : ℝ) * (F.h j : ℝ))) ≤
+        ((Nat.card F.G0 : ℝ) - 1) / (Nat.card G : ℝ) := by
+    linarith
+  rw [ge_iff_le]
+  rw [← Rat.cast_le (K := ℝ)]
+  norm_num
+  have hG0_ncard : (F.G0.ncard : ℝ) = Nat.card F.G0 := by
+    exact_mod_cast (Nat.card_coe_set_eq F.G0)
+  rw [hG0_ncard]
+  linarith
+
+/-- Constructor form of `CharacterEstimateData` from the reduced family
+inequality and the separately proved `𝓑`-sum bound. -/
+noncomputable def characterEstimateData_of_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℚ)) / (Nat.card G : ℚ)) +
+        (1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+            ((F.e j : ℚ) * (F.h j : ℚ)))) ≤ 0) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate := F.base_estimate_of_reduced_family_inequality i B hred
+
+/-- Real-valued constructor form of `CharacterEstimateData` from the reduced
+family inequality and the separately proved `𝓑`-sum bound.  This is the direct
+interface for the estimates produced by Peterfalvi (7.5), (7.8.b), and (7.9). -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
 
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
