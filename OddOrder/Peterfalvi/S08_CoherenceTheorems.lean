@@ -285,6 +285,41 @@ theorem support_sub_induce_subset_sharpImage_of_degree_one
       rw [hyp.induce_apply_one_eq_card_W1_of_degree_one θ hθ_one,
         hyp.induce_apply_one_eq_card_W1_of_degree_one ψ hψ_one])
 
+/-- Equal-degree induced irreducible families from degree-one source characters are coherent for
+Sibley's Dade map. This is the engine-call form of the (6.8) Y = S(Hprime) step: once the
+eta-family of irreducible induced characters is constructed and shown injective, the remaining
+(1.1)+(1.4) equal-degree coherence hypotheses are discharged by the Sibley carrier. -/
+noncomputable def coherentInducedDegreeOneFamily
+    (hyp : SibleyDadeHypothesis G L H) {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (θ : Fin n → IrreducibleCharacter ↥H) (η : Fin n → IrreducibleCharacter ↥L)
+    (hη_ind : ∀ j,
+      (η j : ClassFunction ↥L ℂ) =
+        OddOrder.RepresentationTheory.ClassFunction.induce H (θ j : ClassFunction ↥H ℂ))
+    (hηinj : Function.Injective η)
+    (hθ_one : ∀ j, (θ j : ClassFunction ↥H ℂ) (1 : ↥H) = 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (Set.range (fun j => (η j : ClassFunction ↥L ℂ)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  have hdeg : ∀ j, ((η j : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 =
+      ((η 0 : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
+    intro j
+    rw [hη_ind j, hη_ind 0,
+      hyp.induce_apply_one_eq_card_W1_of_degree_one (θ j) (hθ_one j),
+      hyp.induce_apply_one_eq_card_W1_of_degree_one (θ 0) (hθ_one 0)]
+  have hsuppdiff : ∀ j,
+      (OddOrder.RepresentationTheory.irreducibleCharacterDifference η j).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    intro j
+    simpa [OddOrder.RepresentationTheory.irreducibleCharacterDifference, hη_ind j, hη_ind 0] using
+      hyp.support_sub_induce_subset_sharpImage_of_degree_one (θ j) (θ 0)
+        (hθ_one j) (hθ_one 0)
+  have h1notA : (1 : G) ∉ sharpImage H := by
+    intro h
+    exact h.2 rfl
+  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj
+    hdeg hsuppdiff h1notA
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

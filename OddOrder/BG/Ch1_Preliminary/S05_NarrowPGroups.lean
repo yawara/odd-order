@@ -52,8 +52,8 @@ solvable odd 自己同型群 `A` の構造)。下流 §6/§10/§16 + Peterfalvi 
 Lem 4.5(c) noncyclic 半 (TODO), Lem 4.14 ✅, Thm 4.16 (Blackburn) ✅, Lem 4.17 ✅,
 Thm 4.18 ✅ (`S04.solvable_structure_of_pRank_le_two`, S04g)。
 
-**現況**: Lem 5.1/5.2, Thm 5.3/5.3(d), Cor 5.4, Thm 5.5, Thm 5.6 は **証明済 (sorry-free)**。
-残 sorry = **Thm 5.7** (`derived_le_fitting_of_centralizer_pRank_le_two`) のみ。
+**現況**: §5 の 7 結果 (Lem 5.1/5.2, Thm 5.3/5.3(d), Cor 5.4, Thm 5.5, Thm 5.6, Thm 5.7)
+は **全て証明済 (sorry-free)** — 本ファイルに sorry はない。
 -/
 
 namespace OddOrder.BG.Ch1.S05
@@ -3376,16 +3376,459 @@ theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [IsSolv
       core56 hp_odd hodd_bar Sbar hSbar_narrow h3bar hredu_bar hpOp_bar
     exact S04.structure_of_quotient_commutator_le_opCore hodd hG'bar hlargest hpOp_bar
 
-/-- **BG Theorem 5.7**: `G` solvable odd, `p ∈ π(G)`, `E` を `F(G)` の elem-ab `p`-subgroup と
-し、`r(C_{F(G)}(E)) ≤ 2` を仮定。すると `G' ⊆ F(G)`。
+section Thm57
 
-mmd L1955-1967。Prop 1.2 (chief factor 還元) + 各 chief factor `U/V ⊆ F(G)` で
-`O_q(G)` が narrow ⇒ Thm 5.5 ⇒ `G'` が `q`-自己同型を誘導 ⇒ `G' ⊆ C_G(U/V)`。 -/
-theorem derived_le_fitting_of_centralizer_pRank_le_two {G : Type*} [Group G] [Finite G]
+variable {G : Type*} [Group G] [Finite G]
+
+/-- Prop 1.2 (`G* = G`) 用 glue: `F(⊤)` の subtype 像は `F(G)`。
+`≤` は Isaacs Cor 1.28(b) (`fitting_map_subtype_le_fitting`)、`≥` は `F(G)` が
+`↥⊤` 内で冪零正規 (`subgroupOf` 経由) であることから。 -/
+private theorem fitting_top_map_subtype_eq :
+    (Ch01.fitting ↥(⊤ : Subgroup G)).map (⊤ : Subgroup G).subtype = Ch01.fitting G := by
+  apply le_antisymm
+  · exact Ch01.fitting_map_subtype_le_fitting
+  · have h1 : ((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)).map (⊤ : Subgroup G).subtype =
+        Ch01.fitting G := Subgroup.map_subgroupOf_eq_of_le le_top
+    rw [← h1]
+    apply Subgroup.map_mono
+    haveI : ((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)).Normal :=
+      (Ch01.fitting.normal G).subgroupOf _
+    haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe le_top).symm
+    exact Ch01.nilpotent_normal_le_fitting
+
+/-- **`F(G)` 内の `q`-部分群は `O_q(G)` に入る**: `F(G)` は冪零なのでその Sylow `q` は
+正規 (`Sylow.normal_of_isNilpotent`) かつ特性的、その `G`-像は正規 `q`-部分群で
+Problem 1B.2 (`normal_pgroup_le_opCore`) から `O_q(G)` に入る。
+
+Thm 5.7 で 2 回使う: `E ≤ O_p(G)` と「`U` の Sylow `q` ≤ `O_q(G)`」。 -/
+private theorem le_opCore_of_isPGroup_of_le_fitting {q : ℕ} [Fact q.Prime]
+    {W : Subgroup G} (hW : IsPGroup q ↥W) (hWF : W ≤ Ch01.fitting G) :
+    W ≤ Ch01.opCore q G := by
+  classical
+  have hW'_pg : IsPGroup q ↥(W.subgroupOf (Ch01.fitting G)) :=
+    hW.of_injective (Subgroup.subgroupOfEquivOfLe hWF).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hWF).injective
+  obtain ⟨P, hWP⟩ := hW'_pg.exists_le_sylow
+  have hPnorm : P.Normal := Ch01.Sylow.normal_of_isNilpotent P
+  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+    Sylow.characteristic_of_normal P hPnorm
+  haveI : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
+    inferInstance
+  have hPmap_pg :
+      IsPGroup q ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype) :=
+    P.2.map _
+  calc W = (W.subgroupOf (Ch01.fitting G)).map (Ch01.fitting G).subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hWF).symm
+    _ ≤ (P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype :=
+        Subgroup.map_mono hWP
+    _ ≤ Ch01.opCore q G := Ch01.normal_pgroup_le_opCore hPmap_pg
+
+/-- **BG Theorem 5.7**: `G` solvable odd, `p ∈ π(G)`, `E` を `F(G)` の elem-ab `p`-subgroup と
+し、`r(C_{F(G)}(E)) ≤ 2` を仮定 (`r` = 全素数にわたる rank; BG §4 p.33)。すると
+`G' ⊆ F(G)`。
+
+mmd L1955-1967。Prop 1.2 (chief factor 還元, `S01`) + 各 chief factor `U/V ⊆ F(G)` で:
+`U/V` は `q`-chief factor、`R = O_q(G)` が narrow (`r(R) ≥ 3` なら `q = p` が強制され
+`EZ ∈ ℰ²(R) ∩ ℰ*(R)` を構成して Thm 5.3) ⇒ Thm 5.5(a) で `G'` が `U/V` に `q`-群の
+自己同型を誘導 ⇒ 固定点論法 (Isaacs Lem 4.32) + `U/V` の `G`-既約性で `G' ⊆ C_G(U/V)`。 -/
+theorem derived_le_fitting_of_centralizer_rank_le_two
     [IsSolvable G] (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime]
     (E : Subgroup G) (hE : E.IsElementaryAbelian p) (hEF : E ≤ Ch01.fitting G)
-    (hrank : pRank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) p ≤ 2) :
+    (hrank : OddOrder.GroupTheory.rank
+      ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) ≤ 2) :
     commutator G ≤ Ch01.fitting G := by
-  sorry
+  classical
+  -- Prop 1.2 (G* = G): it suffices that `G'` centralizes every chief factor inside `F(G)`
+  rw [← fitting_top_map_subtype_eq]
+  refine S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable le_top ?_
+  intro U V hVn hChief hU_le
+  haveI := hVn
+  rw [fitting_top_map_subtype_eq] at hU_le
+  -- ## Setup: `Ū ≤ Ĝ = G/V` is a minimal normal elementary abelian `q`-group
+  set Ubar : Subgroup (G ⧸ V) := U.map (QuotientGroup.mk' V) with hUbar_def
+  have hMin : Ch02.IsMinimalNormal Ubar :=
+    S01.isMinimalNormal_map_quotient_of_isChiefFactor hChief
+  obtain ⟨-, -, q, hq_prime, hUbar_elem⟩ :=
+    S01.isMinimalNormal_le_fitting_and_isElementaryAbelian hMin
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  haveI hUbar_norm : Ubar.Normal := hMin.1
+  have hUbar_ne : Ubar ≠ ⊥ := hMin.2.1
+  have hUbar_pg : IsPGroup q ↥Ubar := hUbar_elem.isPGroup
+  -- `q` is odd (it divides `|G|`)
+  have hq_dvd_G : q ∣ Nat.card G := by
+    have h1 : q ∣ Nat.card ↥Ubar := by
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hUbar_pg
+      rcases Nat.eq_zero_or_pos k with hk0 | hkpos
+      · exact absurd (Subgroup.card_eq_one.mp (by rw [hk, hk0, pow_zero])) hUbar_ne
+      · rw [hk]
+        exact dvd_pow_self q hkpos.ne'
+    have h2 : Nat.card ↥Ubar ∣ Nat.card (G ⧸ V) := Subgroup.card_subgroup_dvd_card _
+    have h3 : Nat.card (G ⧸ V) ∣ Nat.card G := by
+      have := Subgroup.index_dvd_card V
+      simpa [Subgroup.index] using this
+    exact h1.trans (h2.trans h3)
+  have hq_odd : Odd q := by
+    rcases Nat.even_or_odd q with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hq_dvd_G
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  -- `R := O_q(G)`
+  set R : Subgroup G := Ch01.opCore q G with hR_def
+  haveI hR_norm : R.Normal := Ch01.opCore.normal q G
+  have hR_pg : IsPGroup q ↥R := Ch01.opCore_isPGroup q G
+  have hR_le_F : R ≤ Ch01.fitting G := Ch01.opCore_le_fitting ⟨q, hq_prime⟩ G
+  -- ## `Ū` is covered by `U ⊓ R` (BG "we may assume `U ⊆ O_q(G)`"): a Sylow `q`-subgroup
+  -- of `U` surjects onto the `q`-group `Ū`, and it lies in `O_q(G)` since `U ≤ F(G)`
+  have hUbar_sub : ∀ z : G ⧸ V, z ∈ Ubar →
+      ∃ w, w ∈ U ⊓ R ∧ QuotientGroup.mk' V w = z := by
+    intro z hz
+    have hf_surj : Function.Surjective ((QuotientGroup.mk' V).subgroupMap U) :=
+      (QuotientGroup.mk' V).subgroupMap_surjective U
+    obtain ⟨Q⟩ : Nonempty (Sylow q ↥U) := Sylow.nonempty
+    have htop_pg : IsPGroup q ↥(⊤ : Subgroup ↥(U.map (QuotientGroup.mk' V))) := by
+      refine hUbar_pg.of_injective Subgroup.topEquiv.toMonoidHom ?_
+      exact Subgroup.topEquiv.injective
+    have hQbar_top : ((Q.mapSurjective hf_surj :
+        Sylow q ↥(U.map (QuotientGroup.mk' V))) :
+          Subgroup ↥(U.map (QuotientGroup.mk' V))) = ⊤ :=
+      ((Q.mapSurjective hf_surj).3 htop_pg le_top).symm
+    have hz' : (⟨z, hz⟩ : ↥(U.map (QuotientGroup.mk' V))) ∈
+        ((Q.mapSurjective hf_surj : Sylow q ↥(U.map (QuotientGroup.mk' V))) :
+          Subgroup ↥(U.map (QuotientGroup.mk' V))) := by
+      rw [hQbar_top]
+      trivial
+    obtain ⟨x, hxQ, hx_eq⟩ := hz'
+    refine ⟨(x : G), ⟨x.2, ?_⟩, ?_⟩
+    · have hQU_pg : IsPGroup q ↥((Q : Subgroup ↥U).map U.subtype) := Q.2.map _
+      have hQU_le : (Q : Subgroup ↥U).map U.subtype ≤ Ch01.fitting G :=
+        le_trans (Subgroup.map_subtype_le _) hU_le
+      exact le_opCore_of_isPGroup_of_le_fitting hQU_pg hQU_le ⟨x, hxQ, rfl⟩
+    · exact congrArg Subtype.val hx_eq
+  -- ## `R` is narrow
+  -- generic squeeze: any subgroup of `C_G(E) ⊓ F(G)` has `r`-rank ≤ 2 for every prime `r`
+  have hsq : ∀ (r : ℕ) (X : Subgroup G),
+      X ≤ Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G → pRank ↥X r ≤ 2 := by
+    intro r X hX
+    calc pRank ↥X r
+        ≤ pRank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) r :=
+          pRank_le_of_injective (f := Subgroup.inclusion hX) (Subgroup.inclusion_injective hX)
+      _ ≤ OddOrder.GroupTheory.rank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) :=
+          pRank_le_rank r
+      _ ≤ 2 := hrank
+  have hE_self : E ≤ Subgroup.centralizer (E : Set G) := by
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro e' he'
+    exact congrArg Subtype.val (hE.comm ⟨e', he'⟩ ⟨e, he⟩)
+  have hR_narrow : IsNarrow q ↥R := by
+    by_cases hrk : pRank ↥R q ≤ 2
+    · exact isNarrow_of_pRank_le_two hrk
+    have h3R : 3 ≤ pRank ↥R q := by omega
+    -- `q = p`: otherwise `R` centralizes `E` and the squeeze contradicts `r(R) ≥ 3`
+    have hq_eq_p : q = p := by
+      by_contra hq_ne
+      have hE_Op : E ≤ Ch01.opCore p G :=
+        le_opCore_of_isPGroup_of_le_fitting hE.isPGroup hEF
+      have hinf_bot : R ⊓ Ch01.opCore p G = ⊥ := by
+        have hinf_pg_q : IsPGroup q ↥(R ⊓ Ch01.opCore p G) := hR_pg.to_le inf_le_left
+        have hinf_pg_p : IsPGroup p ↥(R ⊓ Ch01.opCore p G) :=
+          (Ch01.opCore_isPGroup p G).to_le inf_le_right
+        obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hinf_pg_q
+        obtain ⟨b, hb⟩ := IsPGroup.iff_card.mp hinf_pg_p
+        rw [← Subgroup.card_eq_one]
+        rcases Nat.eq_zero_or_pos a with ha0 | hapos
+        · rw [ha, ha0, pow_zero]
+        · exfalso
+          have hq_dvd_pb : q ∣ p ^ b := by
+            rw [← hb, ha]
+            exact dvd_pow_self q hapos.ne'
+          exact hq_ne ((Nat.prime_dvd_prime_iff_eq hq_prime Fact.out).mp
+            (hq_prime.dvd_of_dvd_pow hq_dvd_pb))
+      have hcomm_bot : ⁅R, Ch01.opCore p G⁆ = ⊥ := by
+        rw [eq_bot_iff, ← hinf_bot]
+        exact le_inf (Subgroup.commutator_le_left _ _) (Subgroup.commutator_le_right _ _)
+      have hR_le_centE : R ≤ Subgroup.centralizer (E : Set G) := by
+        refine le_trans (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm_bot)
+          (Subgroup.centralizer_le ?_)
+        exact fun x hx => hE_Op hx
+      have := hsq q R (le_inf hR_le_centE hR_le_F)
+      omega
+    subst hq_eq_p
+    -- `E ≤ R = O_q(G)` and the interior of `R`: `Z = Ω₁(Z(R))`, `E' = E`-in-`R`
+    have hE_R : E ≤ R := le_opCore_of_isPGroup_of_le_fitting hE.isPGroup hEF
+    haveI hR_nontriv : Nontrivial ↥R := by
+      rcases subsingleton_or_nontrivial ↥R with hsub | h
+      · exfalso
+        have hle2 : pRank ↥R q ≤ 2 := by
+          rw [pRank_le_iff]
+          intro A hA
+          haveI : Subsingleton ↥A := ⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩
+          have hcard1 : Nat.card ↥A = 1 := Nat.card_eq_one_iff_unique.mpr ⟨‹_›, ⟨1⟩⟩
+          rw [hcard1]
+          simp
+        omega
+      · exact h
+    set Z : Subgroup ↥R := omega1Center ↥R q with hZ_def
+    have hZ_elem : Z.IsElementaryAbelian q := omega1Center_isElementaryAbelian
+    have hZ_ne : Z ≠ ⊥ := by
+      haveI := hR_pg.center_nontrivial
+      have hdvd : q ∣ Nat.card ↥(Subgroup.center ↥R) := by
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp (hR_pg.to_subgroup (Subgroup.center ↥R))
+        rcases Nat.eq_zero_or_pos k with h0 | hpos
+        · exfalso
+          have hlt := Finite.one_lt_card (α := ↥(Subgroup.center ↥R))
+          rw [hk, h0, pow_zero] at hlt
+          omega
+        · rw [hk]
+          exact dvd_pow_self q hpos.ne'
+      obtain ⟨z, hz_ord⟩ := exists_prime_orderOf_dvd_card' q hdvd
+      intro hbot
+      have hzZ : (z : ↥R) ∈ Z := by
+        refine mem_omega1Center.mpr ⟨z.2, ?_⟩
+        rw [← hz_ord]
+        calc (z : ↥R) ^ orderOf z = ((z ^ orderOf z : ↥(Subgroup.center ↥R)) : ↥R) := rfl
+          _ = 1 := by rw [pow_orderOf_eq_one z]; rfl
+      rw [hbot] at hzZ
+      have hz1 : z = 1 := Subtype.ext (Subgroup.mem_bot.mp hzZ)
+      rw [hz1, orderOf_one] at hz_ord
+      exact hq_prime.one_lt.ne' hz_ord.symm
+    have hE'_not_le : ¬ E.subgroupOf R ≤ Z := by
+      intro hle
+      have hR_le_centE : R ≤ Subgroup.centralizer (E : Set G) := by
+        intro r hr
+        rw [Subgroup.mem_centralizer_iff]
+        intro e he
+        have hcen := omega1Center_le_center (hle (Subgroup.mem_subgroupOf.mpr he :
+          (⟨e, hE_R he⟩ : ↥R) ∈ E.subgroupOf R))
+        exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp hcen ⟨r, hr⟩)).symm
+      have := hsq q R (le_inf hR_le_centE hR_le_F)
+      omega
+    -- `EZ := E' ⊔ Z` is elementary abelian of order exactly `q²` and maximal
+    have hE'_elem : (E.subgroupOf R).IsElementaryAbelian q :=
+      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe hE_R).symm hE
+    have hZ_cent_top : Subgroup.centralizer (Z : Set ↥R) = ⊤ :=
+      Subgroup.centralizer_eq_top_iff_subset.mpr fun z hz => omega1Center_le_center hz
+    have hEZ_elem : (E.subgroupOf R ⊔ Z).IsElementaryAbelian q :=
+      Subgroup.IsElementaryAbelian.sup_of_le_centralizer hE'_elem hZ_elem
+        (by rw [hZ_cent_top]; exact le_top)
+    -- log-card squeeze for elementary abelian subgroups of `R` centralizing `E`
+    have hlog_le_two : ∀ Y : Subgroup ↥R, Y.IsElementaryAbelian q →
+        Y.map R.subtype ≤ Subgroup.centralizer (E : Set G) →
+        Nat.log q (Nat.card ↥Y) ≤ 2 := by
+      intro Y hY hYc
+      have hY_le : Y.map R.subtype ≤ Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G :=
+        le_inf hYc (le_trans (Subgroup.map_subtype_le _) hR_le_F)
+      have h1 : (Y.map R.subtype).IsElementaryAbelian q :=
+        Subgroup.IsElementaryAbelian.map R.subtype_injective hY
+      have h2 : ((Y.map R.subtype).subgroupOf
+          (Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G)).IsElementaryAbelian q :=
+        OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+          (Subgroup.subgroupOfEquivOfLe hY_le).symm h1
+      have hcard2 : Nat.card ↥((Y.map R.subtype).subgroupOf
+          (Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G)) = Nat.card ↥Y := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY_le).toEquiv]
+        exact (Nat.card_congr
+          (Subgroup.equivMapOfInjective Y R.subtype R.subtype_injective).toEquiv).symm
+      calc Nat.log q (Nat.card ↥Y)
+          = Nat.log q (Nat.card ↥((Y.map R.subtype).subgroupOf
+              (Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G))) := by rw [hcard2]
+        _ ≤ pRank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) q := le_pRank _ h2
+        _ ≤ OddOrder.GroupTheory.rank
+              ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) := pRank_le_rank q
+        _ ≤ 2 := hrank
+    have hEZ_map_le : (E.subgroupOf R ⊔ Z).map R.subtype ≤
+        Subgroup.centralizer (E : Set G) := by
+      rw [Subgroup.map_sup]
+      apply sup_le
+      · rw [Subgroup.map_subgroupOf_eq_of_le hE_R]
+        exact hE_self
+      · rintro _ ⟨z, hzZ, rfl⟩
+        rw [Subgroup.mem_centralizer_iff]
+        intro e he
+        exact congrArg Subtype.val
+          (Subgroup.mem_center_iff.mp (omega1Center_le_center hzZ) ⟨e, hE_R he⟩)
+    have hEZ_card : Nat.card ↥(E.subgroupOf R ⊔ Z) = q ^ 2 := by
+      obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hEZ_elem.isPGroup
+      have hm_le : m ≤ 2 := by
+        have h := hlog_le_two _ hEZ_elem hEZ_map_le
+        rwa [hm, Nat.log_pow hq_prime.one_lt] at h
+      have hm_ge : 2 ≤ m := by
+        have hZ_le : Z ≤ E.subgroupOf R ⊔ Z := le_sup_right
+        have hZ_ne_EZ : Z ≠ E.subgroupOf R ⊔ Z := by
+          intro h
+          exact hE'_not_le (h ▸ le_sup_left)
+        obtain ⟨z, hz⟩ := IsPGroup.iff_card.mp (hZ_elem.isPGroup)
+        have hlt : Nat.card ↥Z < Nat.card ↥(E.subgroupOf R ⊔ Z) := by
+          rcases lt_or_eq_of_le (Subgroup.card_le_of_le hZ_le) with h | h
+          · exact h
+          · exact absurd (Subgroup.eq_of_le_of_card_ge hZ_le h.ge) hZ_ne_EZ
+        have hz_pos : 1 ≤ z := by
+          rcases Nat.eq_zero_or_pos z with h0 | h
+          · exfalso
+            apply hZ_ne
+            rw [← Subgroup.card_eq_one, hz, h0, pow_zero]
+          · exact h
+        rw [hz, hm] at hlt
+        have := (Nat.pow_lt_pow_iff_right hq_prime.one_lt).mp hlt
+        omega
+      have : m = 2 := le_antisymm hm_le hm_ge
+      rw [hm, this]
+    have hEZ_max : IsMaximalElementaryAbelian q (E.subgroupOf R ⊔ Z) := by
+      refine ⟨hEZ_elem, ?_⟩
+      intro F hF hleF
+      have hF_map_le : F.map R.subtype ≤ Subgroup.centralizer (E : Set G) := by
+        rintro _ ⟨f, hfF, rfl⟩
+        rw [Subgroup.mem_centralizer_iff]
+        intro e he
+        have heF : (⟨e, hE_R he⟩ : ↥R) ∈ F :=
+          hleF (Subgroup.mem_sup_left (Subgroup.mem_subgroupOf.mpr he))
+        exact congrArg Subtype.val (congrArg Subtype.val
+          (hF.comm ⟨⟨e, hE_R he⟩, heF⟩ ⟨f, hfF⟩))
+      obtain ⟨mF, hmF⟩ := IsPGroup.iff_card.mp hF.isPGroup
+      have hmF_le : mF ≤ 2 := by
+        have h := hlog_le_two F hF hF_map_le
+        rwa [hmF, Nat.log_pow hq_prime.one_lt] at h
+      refine (Subgroup.eq_of_le_of_card_ge hleF ?_).symm
+      rw [hEZ_card, hmF]
+      exact Nat.pow_le_pow_right hq_prime.pos hmF_le
+    exact (narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hq_odd hR_pg h3R).mpr
+      ⟨E.subgroupOf R ⊔ Z, hEZ_card, hEZ_max⟩
+  -- ## Theorem 5.5: `(G ⧸ C_G(R))'` is a `q`-group
+  set ψ : G →* MulAut ↥R := MulAut.conjNormal with hψ_def
+  have hker : ψ.ker = Subgroup.centralizer (R : Set G) := by
+    rw [hψ_def]
+    exact S04.conjNormal_ker
+  have hquot_dvd : Nat.card (G ⧸ ψ.ker) ∣ Nat.card G := by
+    have := Subgroup.index_dvd_card ψ.ker
+    simpa [Subgroup.index] using this
+  have hquot_odd : Odd (Nat.card (G ⧸ ψ.ker)) := by
+    rcases Nat.even_or_odd (Nat.card (G ⧸ ψ.ker)) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  obtain ⟨hcomm, -, -, -⟩ := solvableAut_of_narrow hq_odd hR_pg hR_narrow
+    (QuotientGroup.kerLift ψ) (QuotientGroup.kerLift_injective ψ) hquot_odd
+  have hA' : IsPGroup q (_root_.commutator (G ⧸ ψ.ker)) := by
+    have hle : _root_.commutator (G ⧸ ψ.ker) ≤ Ch01.opCore q (G ⧸ ψ.ker) := by
+      rw [_root_.commutator, Subgroup.commutator_le]
+      intro x _ y _
+      have h1 : QuotientGroup.mk' (Ch01.opCore q (G ⧸ ψ.ker)) ⁅x, y⁆ = 1 := by
+        rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+        exact hcomm _ _
+      exact (QuotientGroup.eq_one_iff _).mp h1
+    exact (Ch01.opCore_isPGroup q _).to_le hle
+  -- ## the image of `Ĝ' = D` in `MulAut Ū` is a `q`-group (the action factors through `G ⧸ C_G(R)`)
+  set α : (G ⧸ V) →* MulAut ↥Ubar := MulAut.conjNormal with hα_def
+  set D : Subgroup (G ⧸ V) := _root_.commutator (G ⧸ V) with hD_def
+  set β : G →* MulAut ↥Ubar := α.comp (QuotientGroup.mk' V) with hβ_def
+  have hmapV : (_root_.commutator G).map (QuotientGroup.mk' V) = D := by
+    rw [hD_def, _root_.commutator, _root_.commutator, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective V)]
+  have hker_le : ψ.ker ≤ β.ker := by
+    intro c hc
+    rw [hker] at hc
+    rw [MonoidHom.mem_ker]
+    ext u
+    obtain ⟨w, ⟨hwU, hwR⟩, hw_eq⟩ := hUbar_sub (u : G ⧸ V) u.2
+    have hcw : c * w * c⁻¹ = w := by
+      rw [← Subgroup.mem_centralizer_iff.mp hc w hwR, mul_inv_cancel_right]
+    calc (((β c) u : ↥Ubar) : G ⧸ V)
+        = (QuotientGroup.mk' V c) * (u : G ⧸ V) * (QuotientGroup.mk' V c)⁻¹ :=
+          MulAut.conjNormal_apply _ _
+      _ = (u : G ⧸ V) := by
+          rw [← hw_eq, ← map_inv, ← map_mul, ← map_mul, hcw]
+      _ = ((1 : MulAut ↥Ubar) u : G ⧸ V) := rfl
+  have hD_pg : IsPGroup q ↥(D.map α) := by
+    have hmapK : (_root_.commutator G).map (QuotientGroup.mk' ψ.ker) =
+        _root_.commutator (G ⧸ ψ.ker) := by
+      rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator,
+        Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective ψ.ker)]
+    set β' : (G ⧸ ψ.ker) →* MulAut ↥Ubar :=
+      QuotientGroup.lift ψ.ker β (fun x hx => MonoidHom.mem_ker.mp (hker_le hx))
+      with hβ'_def
+    have h1 : D.map α = (_root_.commutator G).map β := by
+      rw [← hmapV, Subgroup.map_map]
+    have h2 : (_root_.commutator G).map β =
+        (_root_.commutator (G ⧸ ψ.ker)).map β' := by
+      rw [← hmapK, Subgroup.map_map]
+      congr 1
+    rw [h1, h2]
+    exact hA'.map β'
+  -- ## fixed points of the `q`-group action on `Ū`: nontrivial, `Ĝ`-normal, hence all of `Ū`
+  haveI hUbar_nontriv : Nontrivial ↥Ubar := by
+    rcases Subgroup.bot_or_nontrivial Ubar with h | h
+    · exact absurd h hUbar_ne
+    · exact h
+  have hfix_ne : Subgroup.fixedPointsOfMulAut (D.map α).subtype ≠ ⊥ :=
+    Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup hUbar_pg hD_pg _
+  haveI hD_norm : D.Normal := by
+    rw [hD_def, _root_.commutator]
+    infer_instance
+  set W' : Subgroup (G ⧸ V) :=
+    (Subgroup.fixedPointsOfMulAut (D.map α).subtype).map Ubar.subtype with hW'_def
+  have hW'_mem : ∀ x : G ⧸ V, x ∈ W' ↔ x ∈ Ubar ∧ ∀ d ∈ D, d * x * d⁻¹ = x := by
+    intro x
+    constructor
+    · rintro ⟨⟨u, hu⟩, hfix, rfl⟩
+      refine ⟨hu, fun d hd => ?_⟩
+      have h1 := Subgroup.mem_fixedPointsOfMulAut.mp hfix
+        ⟨α d, Subgroup.mem_map.mpr ⟨d, hd, rfl⟩⟩
+      have h2 := congrArg Subtype.val h1
+      calc d * (Ubar.subtype ⟨u, hu⟩) * d⁻¹
+          = (((α d) ⟨u, hu⟩ : ↥Ubar) : G ⧸ V) :=
+            (MulAut.conjNormal_apply d (⟨u, hu⟩ : ↥Ubar)).symm
+        _ = Ubar.subtype ⟨u, hu⟩ := h2
+    · rintro ⟨hxU, hxfix⟩
+      refine ⟨⟨x, hxU⟩, ?_, rfl⟩
+      rw [SetLike.mem_coe, Subgroup.mem_fixedPointsOfMulAut]
+      intro a
+      obtain ⟨d, hd, ha⟩ := a.2
+      have h3 : a.1 ⟨x, hxU⟩ = (⟨x, hxU⟩ : ↥Ubar) := by
+        rw [← ha]
+        apply Subtype.ext
+        calc (((α d) ⟨x, hxU⟩ : ↥Ubar) : G ⧸ V)
+            = d * x * d⁻¹ := MulAut.conjNormal_apply d (⟨x, hxU⟩ : ↥Ubar)
+          _ = x := hxfix d hd
+      exact h3
+  have hW'_le : W' ≤ Ubar := Subgroup.map_subtype_le _
+  have hW'_ne : W' ≠ ⊥ := by
+    intro h
+    apply hfix_ne
+    rw [hW'_def, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff] at h
+    exact h
+  have hW'_norm : W'.Normal := by
+    constructor
+    intro n hn g
+    obtain ⟨hnU, hnfix⟩ := (hW'_mem n).mp hn
+    refine (hW'_mem _).mpr ⟨hUbar_norm.conj_mem n hnU g, fun d hd => ?_⟩
+    have hd' : g⁻¹ * d * g ∈ D := by
+      have := hD_norm.conj_mem d hd g⁻¹
+      simpa [mul_assoc] using this
+    have hfix := hnfix _ hd'
+    calc d * (g * n * g⁻¹) * d⁻¹
+        = g * ((g⁻¹ * d * g) * n * (g⁻¹ * d * g)⁻¹) * g⁻¹ := by group
+      _ = g * n * g⁻¹ := by rw [hfix]
+  -- minimality forces `W' = Ū`, so `Ĝ'` centralizes `Ū`
+  rcases hMin.2.2 W' hW'_norm hW'_le with h | h
+  · exact absurd h hW'_ne
+  · have hD_cent : D ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) := by
+      intro d hd
+      rw [Subgroup.mem_centralizer_iff]
+      intro u hu
+      have hu' : u ∈ W' := by rw [h]; exact hu
+      have hfix := ((hW'_mem u).mp hu').2 d hd
+      calc u * d = (d * u * d⁻¹) * d := by rw [hfix]
+        _ = d * u := by group
+    refine OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer ?_
+    rw [hmapV]
+    exact hD_cent
+
+end Thm57
 
 end OddOrder.BG.Ch1.S05
