@@ -1723,6 +1723,123 @@ structure NormEstimates (H78 : Hypothesis78 G A L)
   gamma_norm_sq_le :
     H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
 
+/-- The distinguished `νζ` is orthogonal to `1_G`, in the displayed direction. -/
+theorem zetaImage_orth_one (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+      (Hypothesis71.constOne G) = 0 :=
+  hBD.orth_one H78.zetaDistinct H78.zetaDistinct_ne_ind1H
+
+/-- Hermitian-symmetric form of `zetaImage_orth_one`. -/
+theorem constOne_orth_zetaImage (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (Hypothesis71.constOne G)
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.zetaImage_orth_one hBD, star_zero]
+
+/-- The residual `Γ` is orthogonal to the distinguished `νζ`, in the displayed direction. -/
+theorem gamma_orth_zetaImage (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner hBD.Gamma (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0 :=
+  hBD.Gamma_orth_nu H78.zetaDistinct H78.zetaDistinct_ne_ind1H
+
+/-- Hermitian-symmetric form of `gamma_orth_zetaImage`. -/
+theorem zetaImage_orth_gamma (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) hBD.Gamma = 0 := by
+  rw [Hypothesis71.ClassFunction.inner_symm, H78.gamma_orth_zetaImage hBD, star_zero]
+
+/-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
+theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
+  rw [H78.nu_isometry, hzeta_norm]
+
+/-- The source irreducibility of the distinguished `ζ` gives `‖νζ‖² = 1`. -/
+theorem zetaImage_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.zetaImage_inner_self_eq_one
+    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- If the source `ζ_i` are orthogonal to the distinguished `ζ`, the weighted
+`S^ν`-sum has inner product `1` with `νζ`.
+
+This is the coefficient computation in Peterfalvi (7.8.a) that feeds the
+`(β, ζ^ν) = a - 1` identity used in (7.8.b). -/
+theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0)
+    (hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0) :
+    ClassFunction.inner H78.weightedNuSum
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  have hzeta_mem : H78.zetaDistinct ∈ s := by
+    simp [hs, H78.zetaDistinct_ne_ind1H]
+  rw [weightedNuSum, ← hs, inner_sum_left]
+  have hsum :
+      (∑ i ∈ s,
+        ClassFunction.inner
+          ((H78.hyp76.zeta i (1 : L) /
+            (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+              ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))) •
+            H78.nu (H78.hyp76.zeta i))
+          (H78.nu (H78.hyp76.zeta H78.zetaDistinct))) =
+        ∑ i ∈ s,
+          if i = H78.zetaDistinct then
+            H78.hyp76.zeta i (1 : L) /
+              (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+                ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+          else 0 := by
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, H78.nu_isometry, horth i hi]
+    by_cases hiz : i = H78.zetaDistinct
+    · rw [if_pos hiz, if_pos hiz, mul_one]
+    · rw [if_neg hiz, if_neg hiz, mul_zero]
+  rw [hsum, Finset.sum_ite_eq' s H78.zetaDistinct
+    (fun i =>
+      H78.hyp76.zeta i (1 : L) /
+        (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))),
+    if_pos hzeta_mem, horth H78.zetaDistinct hzeta_mem]
+  rw [if_pos rfl]
+  field_simp [hzeta_one_ne_zero]
+
+/-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
+`(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzetaImage_norm :
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1)
+    (hweighted :
+      ClassFunction.inner H78.weightedNuSum
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 := by
+  rw [hBD.beta_eq, ClassFunction.inner_add_left, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    H78.constOne_orth_zetaImage hBD, hzetaImage_norm, hweighted,
+    H78.gamma_orth_zetaImage hBD]
+  ring
+
+/-- Source-side orthogonality plus source irreducibility gives the coefficient
+identity `(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0)
+    (hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 :=
+  H78.beta_inner_zetaImage_eq_int_sub_one_of_weighted hBD
+    (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
+    (H78.weightedNuSum_inner_zetaImage_eq_one horth hzeta_one_ne_zero)
+
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
 theorem chiRho_eq_inner_beta_on_A (H78 : Hypothesis78 G A L)
@@ -1791,6 +1908,39 @@ theorem chiRho_norm_sq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
           H78.hyp76.hyp71.hyp.subset_L]
   rw [hcard]
   ring
+
+/-- Specialization of (7.8.c.ii) to the distinguished image `νζ`. -/
+theorem zetaNuRhoNormSq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0) :
+    H78.zetaNuRhoNormSq =
+      (((Nat.card A : ℂ) / (Nat.card L : ℂ)) *
+        (ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) *
+          star (ClassFunction.inner H78.beta
+            (H78.nu (H78.hyp76.zeta H78.zetaDistinct))))).re := by
+  rw [zetaNuRhoNormSq, zetaNuRho]
+  exact congrArg Complex.re (H78.chiRho_norm_sq_eq_card_ratio_mul
+    (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) hnu_irr hnu_orth)
+
+/-- Combined (7.8.b) bridge: after the coefficient computation
+`(β, ζ^ν) = a - 1`, the norm of `(ζ^ν)^ρ` is the card-ratio multiple of
+`(a - 1)^2`. -/
+theorem zetaNuRhoNormSq_eq_card_ratio_mul_int_sub_one
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hbeta :
+      ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+        (hBD.a : ℂ) - 1) :
+    H78.zetaNuRhoNormSq =
+      (((Nat.card A : ℂ) / (Nat.card L : ℂ)) *
+        (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re := by
+  rw [H78.zetaNuRhoNormSq_eq_card_ratio_mul hnu_irr hnu_orth, hbeta]
+  rw [show star ((hBD.a : ℂ) - 1) = (hBD.a : ℂ) - 1 by simp]
 
 end Hypothesis78
 
