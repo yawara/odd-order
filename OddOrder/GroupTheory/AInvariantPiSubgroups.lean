@@ -63,4 +63,52 @@ theorem hInvariantStar_subset_hInvariant {H A : Subgroup G} {π : Set ℕ} :
     hInvariantStar H A π ⊆ hInvariant H A π :=
   fun _ hQ => hQ.1
 
+/-- A member of `ℋ_H(A;π)` lies in the ambient subgroup `H`. -/
+theorem hInvariant_le_ambient {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariant H A π) :
+    Q ≤ H :=
+  hQ.1
+
+/-- A member of `ℋ_H(A;π)` is normalized by `A`. -/
+theorem hInvariant_le_normalizer {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariant H A π) :
+    A ≤ Subgroup.normalizer Q :=
+  hQ.2.1
+
+/-- A member of `ℋ_H(A;π)` is a `π`-subgroup. -/
+theorem hInvariant_isPiSubgroup {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariant H A π) :
+    Subgroup.IsPiSubgroup π Q :=
+  hQ.2.2
+
+/-- A member of `ℋ_H*(A;π)` is in `ℋ_H(A;π)`. -/
+theorem hInvariantStar_mem_hInvariant {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar H A π) :
+    Q ∈ hInvariant H A π :=
+  hQ.1
+
+/-- A member of `ℋ_H*(A;π)` lies in the ambient subgroup `H`. -/
+theorem hInvariantStar_le_ambient {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar H A π) :
+    Q ≤ H :=
+  hQ.1.1
+
+/-- A member of `ℋ_H*(A;π)` is normalized by `A`. -/
+theorem hInvariantStar_le_normalizer {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar H A π) :
+    A ≤ Subgroup.normalizer Q :=
+  hQ.1.2.1
+
+/-- A member of `ℋ_H*(A;π)` is a `π`-subgroup. -/
+theorem hInvariantStar_isPiSubgroup {H A : Subgroup G} {π : Set ℕ} {Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar H A π) :
+    Subgroup.IsPiSubgroup π Q :=
+  hQ.1.2.2
+
+/-- Maximality inside `ℋ_H(A;π)` for a member of `ℋ_H*(A;π)`. -/
+theorem hInvariantStar_eq_of_le {H A : Subgroup G} {π : Set ℕ} {Q Q' : Subgroup G}
+    (hQ : Q ∈ hInvariantStar H A π) (hQ' : Q' ∈ hInvariant H A π) (hQQ' : Q ≤ Q') :
+    Q' = Q :=
+  hQ.2 Q' hQ' hQQ'
+
 end OddOrder.GroupTheory

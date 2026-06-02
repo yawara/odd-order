@@ -353,3 +353,13 @@ theorem theorem_8_1 (M : Subgroup G) (p : ℕ) (A₀ : Subgroup (fitting_subgrou
 - BG §7 ノート確定 (Thm 7.2, 7.4, 7.6, Hypothesis 7.1)
 - §8 formal proof sketch (Lean 3 / Lean 4 syntax check)
 - Phase 2a 第 3 波スケジュール (§7 完成後)
+
+---
+
+## Lean API status (2026-06-02 lane B6)
+
+Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S08_FittingOfMaximal.lean`.
+
+- `fittingInG M` is the canonical `G`-ambient realization of `F(M)`, with `fittingInG_le` recording `F(M) ≤ M`.
+- `isMaxElemAbelianIn p A0 H` is the concrete `E_p^*(H)` predicate. Accessors landed: `isMaxElemAbelianIn_isElementaryAbelian`, `isMaxElemAbelianIn_le`, and `isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le`.
+- Remaining §8 `sorry`s are exactly Theorem 8.1(a) and Theorem 8.1(b). They remain hard because the proofs consume §7 transitivity plus BG §6 normal-J/p-length inputs; the statement still keeps Lemma 5.1 nonemptiness out of the theorem hypothesis.
