@@ -907,6 +907,290 @@ theorem omega1UpperCentralTwo_inf_centralizer_eq_omega1Center
     Subgroup.eq_of_le_of_card_ge hZleK (by rw [hKcard, hZcard])
   simpa [K] using hZ_eq_K.symm
 
+
+/-- **BG Lemma 5.2 support**: the conjugation action of
+`W = Ω₁(Z₂(R))` on `E` gives `|W| ≤ p²`.
+
+Since `W ≤ N_R(E)`, restrict the normalizer action `N_R(E) → Aut(E)` to `W`.
+Its kernel is `C_W(E) = Ω₁(Z(R))`, already proved above, hence has order `p`; the
+image is a `p`-subgroup of `Aut(E)` and has order at most `p` because `|E| = p²`. -/
+theorem omega1UpperCentralTwo_card_le_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    Nat.card ↥(omega1UpperCentralTwo R p) ≤ p ^ 2 := by
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  let Z : Subgroup R := omega1Center R p
+  let N : Subgroup R := Subgroup.normalizer (E : Set R)
+  let C : Subgroup R := Subgroup.centralizer (E : Set R)
+  have hWleN : W ≤ N := by
+    dsimp [W, N]
+    exact omega1UpperCentralTwo_le_normalizer_of_maximalElementaryAbelian_card_prime_sq
+      hp hpg h3 hEcard hEstar
+  let WN : Subgroup N := W.subgroupOf N
+  let φ : WN →* MulAut E := E.normalizerMonoidHom.comp WN.subtype
+  have hZcard : Nat.card ↥Z = p := by
+    dsimp [Z]
+    exact (omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+      hpg h3 hEcard hEstar).2
+  have hCW_eq_Z : W ⊓ C = Z := by
+    dsimp [W, C, Z]
+    exact omega1UpperCentralTwo_inf_centralizer_eq_omega1Center hp hpg h3 hEcard hEstar
+  let incl : WN →* R := N.subtype.comp WN.subtype
+  have hincl : Function.Injective incl := by
+    intro a b hab
+    apply Subtype.ext
+    apply Subtype.ext
+    exact hab
+  have hker_map : φ.ker.map incl = Z := by
+    ext x
+    constructor
+    · intro hx
+      rw [Subgroup.mem_map] at hx
+      obtain ⟨w, hwker, rfl⟩ := hx
+      rw [← hCW_eq_Z]
+      have hwW : (w : R) ∈ W := w.2
+      have hwC : (w : R) ∈ C := by
+        have hwNker : WN.subtype w ∈ E.normalizerMonoidHom.ker := by
+          rw [MonoidHom.mem_ker]
+          have hφw : φ w = 1 := MonoidHom.mem_ker.mp hwker
+          simpa [φ] using hφw
+        have hwC_N : WN.subtype w ∈ C.subgroupOf N := by
+          simpa [Subgroup.normalizerMonoidHom_ker, C] using hwNker
+        exact hwC_N
+      exact ⟨hwW, hwC⟩
+    · intro hxZ
+      have hxK : x ∈ W ⊓ C := by
+        rw [hCW_eq_Z]
+        exact hxZ
+      rw [Subgroup.mem_map]
+      have hxN : x ∈ N := hWleN hxK.1
+      let n : N := ⟨x, hxN⟩
+      have hnWN : n ∈ WN := by
+        change (n : R) ∈ W
+        exact hxK.1
+      let w : WN := ⟨n, hnWN⟩
+      refine ⟨w, ?_, rfl⟩
+      rw [MonoidHom.mem_ker]
+      have hwNker : WN.subtype w ∈ E.normalizerMonoidHom.ker := by
+        rw [Subgroup.normalizerMonoidHom_ker]
+        change (x : R) ∈ C
+        exact hxK.2
+      simpa [φ] using MonoidHom.mem_ker.mp hwNker
+  have hker_card : Nat.card φ.ker = p := by
+    have hmap_card : Nat.card (φ.ker.map incl) = Nat.card φ.ker := by
+      rw [Subgroup.card_map_of_injective hincl]
+    rw [← hmap_card, hker_map, hZcard]
+  have hWN_pg : IsPGroup p WN := by
+    exact (hpg.to_subgroup W).of_equiv (Subgroup.subgroupOfEquivOfLe hWleN).symm
+  have hrange_pg : IsPGroup p φ.range :=
+    hWN_pg.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
+  have hEcard_le : Nat.card E ≤ p ^ 2 := by
+    rw [hEcard]
+  have hrange_le : Nat.card φ.range ≤ p :=
+    card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq hEstar.isElementaryAbelian hEcard_le
+      hrange_pg
+  have hLagrange : Nat.card WN = Nat.card φ.range * Nat.card φ.ker := by
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker,
+      Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv]
+  have hWN_le : Nat.card WN ≤ p ^ 2 := by
+    rw [hLagrange, hker_card, pow_two]
+    exact Nat.mul_le_mul_right p hrange_le
+  have hW_card : Nat.card W = Nat.card WN :=
+    (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWleN).toEquiv).symm
+  simpa [W] using hW_card.trans_le hWN_le
+
+/-- **BG Lemma 5.2 support**: `W = Ω₁(Z₂(R))` has order `p²`. -/
+theorem omega1UpperCentralTwo_card_eq_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    Nat.card ↥(omega1UpperCentralTwo R p) = p ^ 2 := by
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  let Z : Subgroup R := omega1Center R p
+  change Nat.card W = p ^ 2
+  have hWle : Nat.card W ≤ p ^ 2 := by
+    simpa [W] using
+      omega1UpperCentralTwo_card_le_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar
+  rcases lemma52_frontHalf_support hp hpg h3 hEcard hEstar with
+    ⟨_, _, hZcard, _, hZltW, _⟩
+  have hZcard' : Nat.card Z = p := by
+    simpa [Z] using hZcard
+  have hZltW' : Z < W := by
+    simpa [Z, W] using hZltW
+  have hZ_card_lt_W : Nat.card Z < Nat.card W :=
+    Set.Finite.card_lt_card (Set.toFinite _) (hZltW' : (Z : Set R) ⊂ (W : Set R))
+  have hp_lt_W : p < Nat.card W := by
+    simpa [hZcard'] using hZ_card_lt_W
+  have hW_pg : IsPGroup p W := hpg.to_subgroup W
+  obtain ⟨j, hj⟩ := IsPGroup.iff_card.mp hW_pg
+  have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
+  have hj_le_two : j ≤ 2 := by
+    have hpow_le : p ^ j ≤ p ^ 2 := by
+      rw [← hj]
+      exact hWle
+    exact (Nat.pow_le_pow_iff_right hp1).mp hpow_le
+  have hj_ne_zero : j ≠ 0 := by
+    intro hj0
+    have hp_lt_one : p < 1 := by
+      rw [hj, hj0, pow_zero] at hp_lt_W
+      exact hp_lt_W
+    exact (not_lt_of_ge hp1.le) hp_lt_one
+  have hj_ne_one : j ≠ 1 := by
+    intro hj1
+    have hp_lt_self : p < p := by
+      rw [hj, hj1, pow_one] at hp_lt_W
+      exact hp_lt_W
+    exact (lt_irrefl p) hp_lt_self
+  have hj_eq_two : j = 2 := by omega
+  rw [hj, hj_eq_two]
+
+/-- **BG Lemma 5.2 support**: `W = Ω₁(Z₂(R))` is elementary abelian. -/
+theorem omega1UpperCentralTwo_isElementaryAbelian_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    (omega1UpperCentralTwo R p).IsElementaryAbelian p := by
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  change W.IsElementaryAbelian p
+  have hWcard : Nat.card W = p ^ 2 := by
+    simpa [W] using
+      omega1UpperCentralTwo_card_eq_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar
+  refine ⟨?_, ?_⟩
+  · intro x y
+    exact IsPGroup.commutative_of_card_eq_prime_sq (p := p) (G := W) hWcard x y
+  · intro x
+    apply Subtype.ext
+    exact pow_eq_one_of_mem_omega1UpperCentralTwo hp x.2
+
+/-- **BG Lemma 5.2 support**: `E` does not centralize `W = Ω₁(Z₂(R))`. -/
+theorem not_le_centralizer_omega1UpperCentralTwo_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    ¬ E ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) := by
+  intro hE_le_T
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  let Z : Subgroup R := omega1Center R p
+  let C : Subgroup R := Subgroup.centralizer (E : Set R)
+  have hCW_eq_Z : W ⊓ C = Z := by
+    dsimp [W, C, Z]
+    exact omega1UpperCentralTwo_inf_centralizer_eq_omega1Center hp hpg h3 hEcard hEstar
+  rcases lemma52_frontHalf_support hp hpg h3 hEcard hEstar with
+    ⟨_, _, _, _, hZltW, _⟩
+  have hZltW' : Z < W := by
+    simpa [Z, W] using hZltW
+  have hW_le_C : W ≤ C := by
+    intro w hw
+    dsimp [C]
+    rw [Subgroup.mem_centralizer_iff]
+    intro e he
+    have heT : e ∈ Subgroup.centralizer (W : Set R) := by
+      simpa [W] using hE_le_T he
+    exact (Subgroup.mem_centralizer_iff.mp heT w hw).symm
+  have hW_le_Z : W ≤ Z := by
+    intro w hw
+    rw [← hCW_eq_Z]
+    exact ⟨hw, hW_le_C hw⟩
+  exact hZltW'.ne (le_antisymm hZltW'.le hW_le_Z)
+
+private theorem conjNormal_ker_eq_centralizer_for_subgroup
+    {G : Type*} [Group G] {V : Subgroup G} [V.Normal] :
+    (MulAut.conjNormal (H := V)).ker = Subgroup.centralizer (V : Set G) := by
+  ext g
+  rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hg v hv
+    have hfix : (MulAut.conjNormal g (⟨v, hv⟩ : V) : G) = ((⟨v, hv⟩ : V) : G) := by
+      rw [hg]
+      rfl
+    rw [MulAut.conjNormal_apply] at hfix
+    have hcomm : g * v = v * g := by
+      have : g * v * g⁻¹ * g = v * g := by rw [hfix]
+      simpa [mul_assoc] using this
+    exact hcomm.symm
+  · intro hg
+    apply MulEquiv.ext
+    intro v
+    apply Subtype.ext
+    simp only [MulAut.one_apply]
+    rw [MulAut.conjNormal_apply]
+    have hcomm : (v : G) * g = g * (v : G) := hg (v : G) v.property
+    rw [← hcomm]
+    group
+
+/-- **BG Lemma 5.2 support**: `T = C_R(W)` has index `p`. -/
+theorem centralizer_omega1UpperCentralTwo_index_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).index = p := by
+  let W : Subgroup R := omega1UpperCentralTwo R p
+  let T : Subgroup R := Subgroup.centralizer (W : Set R)
+  haveI hW_normal : W.Normal := by
+    dsimp [W]
+    infer_instance
+  haveI hT_normal : T.Normal := by
+    dsimp [T, W]
+    infer_instance
+  have hWcard : Nat.card W = p ^ 2 := by
+    simpa [W] using
+      omega1UpperCentralTwo_card_eq_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar
+  have hWelem : W.IsElementaryAbelian p := by
+    simpa [W] using
+      omega1UpperCentralTwo_isElementaryAbelian_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar
+  let φ : R →* MulAut W := MulAut.conjNormal (H := W)
+  have hker : φ.ker = T := by
+    simpa [φ, T] using conjNormal_ker_eq_centralizer_for_subgroup (G := R) (V := W)
+  have hquot_range : Nat.card (R ⧸ T) = Nat.card φ.range := by
+    rw [← hker]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv
+  have hrange_pg : IsPGroup p φ.range :=
+    hpg.of_surjective φ.rangeRestrict φ.rangeRestrict_surjective
+  have hWcard_le : Nat.card W ≤ p ^ 2 := by
+    rw [hWcard]
+  have hrange_le : Nat.card φ.range ≤ p :=
+    card_pSubgroup_mulAut_le_prime_of_card_le_prime_sq hWelem hWcard_le hrange_pg
+  have hquot_le : Nat.card (R ⧸ T) ≤ p := by
+    rw [hquot_range]
+    exact hrange_le
+  have hT_ne_top : T ≠ ⊤ := by
+    intro hTtop
+    have hE_le_T : E ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) := by
+      intro e he
+      change e ∈ T
+      rw [hTtop]
+      exact trivial
+    exact not_le_centralizer_omega1UpperCentralTwo_of_maximalElementaryAbelian_card_prime_sq
+      hp hpg h3 hEcard hEstar hE_le_T
+  have hquot_nontriv : Nontrivial (R ⧸ T) :=
+    Subgroup.nontrivial_quotient_of_ne_top hT_ne_top
+  have hquot_gt_one : 1 < Nat.card (R ⧸ T) :=
+    Finite.one_lt_card_iff_nontrivial.mpr hquot_nontriv
+  have hquot_pg : IsPGroup p (R ⧸ T) := hpg.to_quotient T
+  obtain ⟨j, hj⟩ := IsPGroup.iff_card.mp hquot_pg
+  have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
+  have hj_le_one : j ≤ 1 := by
+    have hpow_le : p ^ j ≤ p ^ 1 := by
+      rw [← hj, pow_one]
+      exact hquot_le
+    exact (Nat.pow_le_pow_iff_right hp1).mp hpow_le
+  have hj_ne_zero : j ≠ 0 := by
+    intro hj0
+    have hone_lt_one : 1 < 1 := by
+      rw [hj, hj0, pow_zero] at hquot_gt_one
+      exact hquot_gt_one
+    exact (lt_irrefl 1) hone_lt_one
+  have hj_eq_one : j = 1 := by omega
+  have hquot_card : Nat.card (R ⧸ T) = p := by
+    rw [hj, hj_eq_one, pow_one]
+  rw [Subgroup.index_eq_card]
+  exact hquot_card
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
@@ -924,7 +1208,17 @@ theorem lemma52 [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup
       (omega1UpperCentralTwo R p).IsElementaryAbelian p ∧
       Nat.card ↥(omega1UpperCentralTwo R p) = p ^ 2) ∧
     (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).index = p := by
-  sorry
+  exact
+    ⟨not_le_centralizer_omega1UpperCentralTwo_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar,
+      ⟨(omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+          hpg h3 hEcard hEstar).2,
+        omega1UpperCentralTwo_isElementaryAbelian_of_maximalElementaryAbelian_card_prime_sq
+          hp hpg h3 hEcard hEstar,
+        omega1UpperCentralTwo_card_eq_prime_sq_of_maximalElementaryAbelian_card_prime_sq
+          hp hpg h3 hEcard hEstar⟩,
+      centralizer_omega1UpperCentralTwo_index_eq_prime_of_maximalElementaryAbelian_card_prime_sq
+        hp hpg h3 hEcard hEstar⟩
 
 /-! ## Theorem 5.3 / Corollary 5.4 — narrow の特徴づけ (mmd L1838-1879) -/
 
