@@ -2156,6 +2156,57 @@ theorem weightedNuSum_inner_self_eq_of_source_orthogonal
   norm_num [Complex.ofReal_div, Complex.ofReal_sub]
   ring
 
+/-- Source orthogonality and the kernel degree sum give the full orthogonal
+expansion of `‖β‖²` in Peterfalvi (7.8.b). -/
+theorem betaNormSq_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.betaNormSq =
+      2 +
+        (((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) *
+          (hBD.a : ℝ) ^ 2 -
+        2 * (hBD.a : ℝ) + H78.gammaNormSq hBD := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  have hzeta_mem : H78.zetaDistinct ∈ s := by
+    simp [hs, H78.zetaDistinct_ne_ind1H]
+  have hzeta_src_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+    H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr
+  have horth_zeta : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0 := by
+    intro i hi
+    have hi_s : i ∈ s := by simpa [hs] using hi
+    rw [horth i hi H78.zetaDistinct (by simpa [hs] using hzeta_mem)]
+    by_cases hiz : i = H78.zetaDistinct
+    · rw [if_pos hiz, if_pos hiz, hiz, hzeta_src_norm]
+    · rw [if_neg hiz, if_neg hiz]
+  have hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0 := by
+    rw [hzeta_degree]
+    exact_mod_cast H78.complementIndex_pos.ne'
+  exact H78.betaNormSq_eq_of_weightedNuSum_norm hBD
+    (H78.zetaImage_inner_self_eq_one hzeta_src_norm)
+    (H78.weightedNuSum_inner_zetaImage_eq_one horth_zeta hzeta_one_ne_zero)
+    (H78.weightedNuSum_inner_self_eq_of_source_orthogonal
+      horth hnorm_ne hzeta_degree hdegree_sum)
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
