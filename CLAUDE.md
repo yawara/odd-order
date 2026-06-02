@@ -17,6 +17,7 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - **leanblueprint は使わない** — TeX 依存グラフ方式は採用しない。教科書 (PDF/mmd) → Lean を直接書く。「blueprint を立てよう」「TeX で証明概略を…」等の提案は不可。
 - **mathlib 本体への PR は当面しない** — 汎用補題 (Fitting, Hall, Frobenius 群, ZJ 等) も `OddOrder` namespace 配下に書く。理由は速度優先で手元で完結させたいから。将来の upstream は視野に入れるので、mathlib 互換のスタイル・命名は常に維持する。
 - **Gorenstein 1968 _Finite Groups_ は形式化対象ではない**(2026-05-28 refinement)— 「使わない」のではなく「**全形式化はしない**」。形式化対象は上記 3 冊(Isaacs / BG / Peterfalvi)に限定し、Gorenstein は **BG の行間を埋めるためにのみ原文参照する**(`references/gorenstein/finite-groups.{pdf,mmd}`)。具体的には BG が "**G**, Thm X.Y.Z" として証明本体を省略する箇所(典型: BG App.A の A.2/A.3/A.4 が "follow the proof of **G** Thm 3.8.1 / §6.5" と書く部分)で Gorenstein 原文を読み Lean に書き起こす。**Gorenstein 本体の章節を独立に形式化することはしない**。BG 中の "**G**, Thm X.Y.Z" 引用は、まず Isaacs に対応定理があれば Isaacs に読み替え、Isaacs が欠く場合(典型: ZJ / p-stability 周り = **G** Ch.3 §8 / Ch.6 §5 / Ch.8 §2)のみ Gorenstein を参照。なお同名タイトルの Gorenstein "Classification of Finite Simple Groups I" (BAMS 1979) は教科書ではなくサーベイ論文で、別物・対象外。
+- **「workflow」の語が出ただけで Workflow ツールを起動しない** — ハーネスは「keyword 'workflow' を検出した→Workflow ツールを使え」という system-reminder を毎ターン注入してくる (これを無効化する設定キーは Claude Code に**存在しない**ので、本指示で打ち消す) が、**これ単体を opt-in と見なさない**。Workflow (マルチエージェント orchestration) の起動は「workflow を回して / orchestrate して / fan-out して」等、ユーザーが**明示的に実行を依頼したときだけ**。workflow について質問・議論・診断しているだけのときは起動せず、通常の Agent ツールか直接調査で答える。
 
 ## 開発規約
 
@@ -56,14 +57,16 @@ mathlib に直接対応がある定理の **薄いラッパー** (`theorem foo :
 
 ### commit の区切り
 
-作業の論理的な単位ごとに git commit を作る. 1 セッション分を最後にまとめて 1 コミットで上げるのは避ける.
+作業の論理的な単位ごとに git commit を作る. 単位は **feature / subsection 粒度** — 主定理とそれを支える補助補題群をまとめて 1 コミット (定理 1 つ・証明ステップ 1 つごとには刻まない). ただし 1 セッション分を最後にまとめて 1 コミットで上げるのは避ける (下限と上限の両方を守る).
 
-- 定理 1 つを `sorry` 無しで証明できたら → すぐコミット (次の定理に進む前に)
-- ノート整備 / 対応表更新が独立な意味を持つなら → 単独コミット
-- 同質なリファクタ (例: ラッパー削除 N 件) は **同質単位ならまとめてよい**, 異質な作業 (リファクタ + ノート + 新定理) は分ける
-- どうしてもまとめる場合, commit message で各単位を明示
+- **主定理 + その helper 補題群 = 1 コミット** (例: Lemma 5.2 と支える ~10 helper で 1 つ). 中間ステップでは刻まない
+- subsection / 独立 feature の境界で区切る (例: §5 の Lemma 5.2 と Thm 5.3 は別, BG §10 の各 Prop は機能単位でまとめる)
+- ノート整備 / 対応表更新が独立な意味を持つなら → 単独コミット (Lean 変更と混ぜない)
+- 同質なリファクタ (例: ラッパー削除 N 件) はまとめてよい, 異質な作業 (リファクタ + ノート + 新定理) は分ける
+- まとめる場合, commit message 本文で各単位を明示
+- 別ブランチ (worktree / 並列セッション) の取り込みは `--no-ff` merge → first-parent に lane = 大単位が残り, 内部の細かいコミットは詳細ビューに温存される
 
-理由: 履歴を細かく追え, 並列エージェントの cherry-pick / revert / rebase 単位が揃い, 失敗時の巻き戻しが楽.
+理由: feature 単位なら revert / cherry-pick / レビューが一貫した塊で効き, 「1 補題 = 1 コミット」のノイズを避けられる. 各コミットは build-green を維持.
 
 ## ノート・小ロードマップの管理
 
