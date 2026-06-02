@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Subgroup.Centralizer
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 
@@ -76,6 +77,49 @@ noncomputable def conjByPerm (g : G) : Equiv.Perm (ConjClasses H) where
       ConjClasses.mk (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) :=
   rfl
 
+@[simp] theorem conjByPerm_one (g : G) :
+    conjByPerm (G := G) (H := H) g (1 : ConjClasses H) = 1 := by
+  change conjByPerm (G := G) (H := H) g (ConjClasses.mk (1 : H)) =
+    ConjClasses.mk (1 : H)
+  rw [conjByPerm_mk]
+  simp
+
+/-- If the centralizer of every nonidentity element of `H` lies in `H`, then an element
+outside `H` can only fix the identity conjugacy class of `H`. -/
+theorem fixed_eq_one_of_not_mem_of_centralizer_le (g : G) (hg : g ∉ H)
+    (hcent : ∀ h : H, h ≠ 1 → Subgroup.centralizer ({(h : G)} : Set G) ≤ H)
+    {C : ConjClasses H} (hfix : conjByPerm (G := G) (H := H) g C = C) :
+    C = 1 := by
+  rcases ConjClasses.exists_rep C with ⟨h, rfl⟩
+  by_cases hh : h = 1
+  · rw [hh, ConjClasses.one_eq_mk_one]
+  exfalso
+  have hmk :
+      ConjClasses.mk (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) =
+        ConjClasses.mk h := by
+    simpa [conjByPerm_mk] using hfix
+  have hisConj :
+      IsConj (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) h :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp hmk
+  obtain ⟨c, hc⟩ := isConj_iff.mp hisConj
+  have hcG :
+      (c : G) * (g * (h : G) * g⁻¹) * (c : G)⁻¹ = (h : G) := by
+    simpa only [Subgroup.coe_mul, Subgroup.coe_inv, ClassFunction.conjByMulEquiv_apply]
+      using congrArg Subtype.val hc
+  have hxconj :
+      ((c : G) * g) * (h : G) * (((c : G) * g)⁻¹) = (h : G) := by
+    simpa [mul_assoc] using hcG
+  have hxcent : (c : G) * g ∈ Subgroup.centralizer ({(h : G)} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hmul := congrArg (fun y : G => y * ((c : G) * g)) hxconj
+    simpa [mul_assoc] using hmul
+  have hxH : (c : G) * g ∈ H := hcent h hh hxcent
+  have hgH : g ∈ H := by
+    have hcH : (c : G) ∈ H := c.property
+    have hprod : (c : G)⁻¹ * ((c : G) * g) ∈ H := H.mul_mem (H.inv_mem hcH) hxH
+    simpa [mul_assoc] using hprod
+  exact hg hgH
+
 end ConjClasses
 
 /-- Compatibility of ambient conjugation on irreducible characters with ambient conjugation on
@@ -99,6 +143,23 @@ theorem card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm
     (IrreducibleCharacter.conjByPerm (G := G) (H := H) g)
     (ConjClasses.conjByPerm (G := G) (H := H) g)
     (characterTableEntry_conjByPerm (G := G) (H := H) g)
+
+/-- Under the usual fixed-point-free centralizer condition, an element outside `H` fixes exactly
+one conjugacy class of `H`: the identity class. -/
+theorem card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le [Finite H]
+    (g : G) (hg : g ∉ H)
+    (hcent : ∀ h : H, h ≠ 1 → Subgroup.centralizer ({(h : G)} : Set G) ≤ H) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g)) = 1 := by
+  rw [Nat.card_eq_one_iff_unique]
+  refine ⟨⟨fun C D => Subtype.ext ?_⟩,
+    ⟨⟨1, ConjClasses.conjByPerm_one (G := G) (H := H) g⟩⟩⟩
+  have hC : (C : ConjClasses H) = 1 :=
+    ConjClasses.fixed_eq_one_of_not_mem_of_centralizer_le
+      (G := G) (H := H) g hg hcent C.2
+  have hD : (D : ConjClasses H) = 1 :=
+    ConjClasses.fixed_eq_one_of_not_mem_of_centralizer_le
+      (G := G) (H := H) g hg hcent D.2
+  exact hC.trans hD.symm
 
 @[simp] theorem conjByPerm_trivialIrreducibleCharacter (g : G) :
     IrreducibleCharacter.conjByPerm (G := G) (H := H) g
@@ -150,5 +211,30 @@ theorem not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one [Finite H]
   rw [IrreducibleCharacter.mem_inertia] at hg
   exact conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one
     (G := G) (H := H) g hclass hθ_ne (by simpa using hg)
+
+/-- Pointwise inertia exclusion from the centralizer form of the free conjugation action. -/
+theorem not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le [Finite H]
+    (g : G) (hg : g ∉ H)
+    (hcent : ∀ h : H, h ≠ 1 → Subgroup.centralizer ({(h : G)} : Set G) ≤ H)
+    {θ : IrreducibleCharacter H} (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    g ∉ IrreducibleCharacter.inertia (G := G) (H := H) θ := by
+  exact not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one
+    (G := G) (H := H) g
+    (card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le
+      (G := G) (H := H) g hg hcent)
+    hθ_ne
+
+/-- Free ambient conjugation on nonidentity classes forces the inertia group of a nontrivial
+irreducible character to be exactly `H`. -/
+theorem inertia_eq_of_freeAction [Finite H]
+    (hcent : ∀ h : H, h ≠ 1 → Subgroup.centralizer ({(h : G)} : Set G) ≤ H)
+    {θ : IrreducibleCharacter H} (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    ClassFunction.inertia (G := G) (H := H) (θ : ClassFunction H ℂ) = H := by
+  apply le_antisymm
+  · intro g hg
+    by_contra hgH
+    exact not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le
+      (G := G) (H := H) g hgH hcent hθ_ne hg
+  · exact ClassFunction.subgroup_le_inertia (G := G) (H := H) (θ : ClassFunction H ℂ)
 
 end OddOrder.RepresentationTheory
