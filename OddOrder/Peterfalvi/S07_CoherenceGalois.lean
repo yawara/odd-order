@@ -66,6 +66,21 @@ theorem dadeIntegralCharacterMap_mapRingEquiv_comm
   · rw [hyp.dadeValue_of_not_mem_dadeSupport _ hg, hyp.dadeValue_of_not_mem_dadeSupport _ hg,
       map_zero]
 
+/-- **The Dade map restores values on `A`**: `(τ φ)(a) = φ(a)` for `a ∈ A`.
+
+`a = a·1` with `1 ∈ H(a)`, so `a` is its own base point in the Dade-support
+decomposition.  This is the evaluation step of (6.8.2.1): if `ζ ∈ ℤ[S, A]` vanishes at
+`x ∈ Z^# ⊆ A`, then so does `(τ ζ)(x) = ζ(x) = 0`. -/
+theorem dadeIntegralCharacterMap_apply_mem
+    (hyp : S04.Hypothesis G A L) (dade : S04.FullDadeIsometryData (G := G) hyp)
+    {φ : ClassFunction (↥L) ℂ} (hφ : φ.support ⊆ supportInSubgroup A L)
+    {a : G} (ha : a ∈ A) :
+    dadeIntegralCharacterMap hyp dade φ a = φ ⟨a, hyp.mem_L ha⟩ := by
+  rw [dadeIntegralCharacterMap_apply_of_support hyp dade hφ]
+  simp only [Hypothesis.dadeMap_apply]
+  refine hyp.dadeValue_eq (a := ⟨a, ha⟩) _ (Subgroup.one_mem _) ?_
+  rw [mul_one]
+
 /-- **Dade images vanish at the identity**: `1 ∉ dadeSupport`. -/
 theorem dadeIntegralCharacterMap_apply_one
     (hyp : S04.Hypothesis G A L) (dade : S04.FullDadeIsometryData (G := G) hyp)

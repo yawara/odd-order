@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
@@ -1655,7 +1656,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_mapRingEquiv_comm
+-- [Is] Lemma 2.27 (central restriction): Res_Z χ = χ(1)·φ with φ a linear character of
+-- Z ≤ Z(G), via Schur central scalars.  Peterfalvi (6.8.2.3) `Res^H_Z θ = a·φ`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_complex_rep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
