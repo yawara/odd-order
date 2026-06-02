@@ -2459,6 +2459,80 @@ theorem normEstimates_of_irreducible_source_data
     (H78.sourceZeta_norm_ne_of_irreducible hirr)
     hzeta_degree hdegree_sum (hirr H78.zetaDistinct hzeta_mem) hzeta
 
+/-- Source irreducibility data plus the textbook `u,v,w` formula give
+Peterfalvi (7.8.b)'s `NormEstimates`.
+
+This is the natural source-data version of
+`normEstimates_of_source_orthogonal_and_uv_formula`: it converts the `u,v,w`
+formula to the internal quadratic-correction API and derives the source
+orthogonality matrix from irreducibility and distinctness. -/
+theorem normEstimates_of_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_irreducible_source_data hBD hsrc hirr hdistinct
+    hzeta_degree hdegree_sum
+    (H78.zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula hBD hzeta_uv)
+
+/-- Source inner-product values, source irreducibility data, and the textbook
+`u,v,w` formula give Peterfalvi (7.8.b)'s `NormEstimates`.
+
+This removes the standalone `SourceDiffNormEvaluation` premise by using the
+already isolated source computation
+`‖Ind 1_H - ζ‖² = e + 1` from the three source-side inputs
+`⟨Ind1H,Ind1H⟩ = e`, `⟨ζ,Ind1H⟩ = 0`, and irreducibility of `ζ`. -/
+theorem normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD := by
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  exact H78.normEstimates_of_irreducible_source_data_and_uv_formula hBD
+    (H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+      hind_norm hzeta_ind (hirr H78.zetaDistinct hzeta_mem))
+    hirr hdistinct hzeta_degree hdegree_sum hzeta_uv
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
