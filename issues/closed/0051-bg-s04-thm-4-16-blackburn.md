@@ -139,3 +139,13 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - BG 原典: `references/bg/local-analysis.mmd` L1636-1704 (Thm 4.16 本体)
 - 既存: `OddOrder/BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean`, `OddOrder/BG/Ch1_Preliminary/S04f_Blackburn.lean`, `OddOrder/GroupTheory/{PRank,SCN,CriticalSubgroup,IsMetacyclic,IsExtraspecial}.lean`
 - 設計 workflow: `bg-s04-design` wf_39c356b8-eb2 / 実装 v1: `bg-s04-v1-impl` wf_ec23ca53-2a1
+
+## 完了 (2026-06-02)
+
+- `OddOrder/BG/Ch1_Preliminary/S04f_Blackburn.lean` の BG Lemma 4.13/4.14 経由の Blackburn Theorem 4.16 endpoint `blackburnRankTwoClassification` を sorry-free にした。
+- Case B-2 は `R = S ⊔ X`、`z = ⁅x,y⁆`、`w = ⁅y,z⁆` から作用スカラー `i,j,k` を取り、Lean 内で `ij = k` と `jk = i` を導いて `j^2 ≠ 1` と矛盾させる形で discharge。`pRank ≤ 2` 等の hard content は新規仮定へ hoist していない。
+- 検証:
+  - `lake build OddOrder.BG.Ch1_Preliminary.S04f_Blackburn`
+  - `lake build OddOrder`
+  - `lake build OddOrder.AxiomsCheck`
+  - `#print axioms OddOrder.BG.Ch1.S04.blackburnRankTwoClassification` = `[propext, Classical.choice, Quot.sound]`
