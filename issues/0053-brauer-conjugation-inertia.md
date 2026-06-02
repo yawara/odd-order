@@ -62,8 +62,11 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - [x] **Layer D2a — T6 degree wiring** (2026-06-02):
   SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one を S08 に landing。
   degree-one source θ について (Ind_H^L θ)(1)=|W₁| を直接呼べる。
-- [ ] **Layer D2b — T6 family wiring**: Y=S(Hprime) の family construction、差分 support、
-  および case c2 側の inertia discharge を coherentEqualDegree_fromDade に接続する。
+- [x] **Layer D2b — T6 difference-support wiring** (2026-06-02):
+  support_sub_induce_subset_sharpImage_of_degree_one を S08 に landing。
+  normal H の induced support と degree-one equality から (Ind θ_i - Ind θ_0).support ⊆ H^# を直接呼べる。
+- [ ] **Layer D2c — T6 family / engine wiring**: Y=S(Hprime) の family construction、
+  coherentEqualDegree_fromDade への接続、および case c2 側の inertia discharge。
 
 ## 完了条件
 
@@ -73,7 +76,8 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - ✅ 2026-06-02: Frobenius-group case を `inertia_eq_of_frobeniusGroup` /
   `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
 - ✅ 2026-06-02: S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| を packaging。
-- 残: Y=S(Hprime) family construction、差分 support、case c2 側の inertia discharge を T6 本体で接続する。
+- ✅ 2026-06-02: S08 で degree-one induced differences の H^# support を packaging。
+- 残: Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
 
 ## 参照
 

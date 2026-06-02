@@ -200,7 +200,7 @@ S06: `CertainTypeHypothesis`(38), `W2`。
       (`not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)。2026-06-02 追記: Frobenius case
       (c1) は `IsFrobeniusGroup.centralizer_kernel_le` から `inertia_eq_of_frobeniusGroup` を経由し、
       6.34 まで合成した `isIrreducibleCharacter_induce_of_frobeniusGroup` が landed。
-      ⟹ 残 = `Y=S(H')` family construction / degree・差分 support wiring、および case c2 側の inertia discharge。
+      ⟹ 残 = Y=S(Hprime) family construction / engine call wiring、および case c2 側の inertia discharge。
   (4) ✅ **等次数 infra done** (commit dde1dcd): `SibleyDadeHypothesis.index_H_eq_card_W1` (`[L:H]=|W₁|`
       via `Subgroup.IsComplement.card_right` on `hyp.split`)。6.34 degree `[L:H]·θ(1)` + θ degree 1 と
       合わせ `η_j(1)=|W₁|`。
@@ -208,8 +208,10 @@ S06: `CertainTypeHypothesis`(38), `W2`。
       orthonormality を 1 lemma に集約済み。
       2026-06-02 追記: SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one を追加し、
       degree-one source θ から η_j(1)=|W₁| を直接放電できる形にした。
-  (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。tractable。
-  → **T6 の現律速** = Y=S(Hprime) family construction / 差分 support wiring + case c2 inertia。
+  (5) ✅ **差分 support**: support_sub_induce_subset_sharpImage_of_degree_one を S08 に追加。
+      normal H で Ind_H^L θ は H 上に supported、degree-one source の等次数で 1 が消えるため、
+      (Ind θ_i - Ind θ_0).support ⊆ H^# を直接放電できる。
+  → **T6 の現律速** = Y=S(Hprime) family construction / engine call wiring + case c2 inertia。
     c1 Frobenius path は inertia=H → 6.34 → degree-one source の η_j(1)=|W₁| まで landed。
     c2 には同等の inertia discharge がまだ必要。
     T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /

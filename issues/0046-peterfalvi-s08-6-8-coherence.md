@@ -1357,6 +1357,8 @@ axiom-clean, AxiomsCheck 登録)**:
 6. **(6.8) T6 c1+degree consumer** (2026-06-02): Frobenius case c1 は
    inertia_eq_of_frobeniusGroup / isIrreducibleCharacter_induce_of_frobeniusGroup まで landing。
    さらに S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| helper を landing。
+7. **(6.8) T6 difference-support consumer** (2026-06-02): normal H の induction support を
+   generic infra として landing し、S08 で degree-one induced differences の H^# support helper を landing。
 
 ### 現フロンティア = (6.8) proof T6 family / case-c2 wiring
 - (6.8) proof は `sibleySetup_is_coherent` (S08:251) を埋める作業。task DAG (T0–T11) + 全 spec の
@@ -1369,10 +1371,10 @@ axiom-clean, AxiomsCheck 登録)**:
   **fixed conjugacy classes count = 1 ⇒ nontrivial Irr は固定されない** は 2026-06-02 に landed。
   Frobenius case (c1) は centralizer_kernel_le から inertia=H、6.34、degree-one source の
   (Ind θ)(1)=|W₁| helper まで landed。
-  残る T6 は Y=S(Hprime) family construction、差分 support、case c2 側の inertia discharge。
+  残る T6 は Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
   **これが (6.8)/§9–§16 の Frobenius-induced irreducibility 全体の鍵**。
-- 次セッション推奨: issue 0053 Layer D2b を進める。Y=S(Hprime) family construction と
-  差分 support を S08 の新 degree helper + difference-support engine に接続し、case c2 の inertia を別途放電する。
+- 次セッション推奨: issue 0053 Layer D2c を進める。Y=S(Hprime) family construction を
+  S08 の新 degree/support helpers + difference-support engine に接続し、case c2 の inertia を別途放電する。
 
 ### 並行可能な独立 leaf (6.34/Brauer 非依存、`s08_6_8_assembly_plan.md` C 表)
 T0 (Cor 2.30) / T3 ((6.7) 上位 wiring、atoms は ClassSumAlgebra/AlgInt 既存) / T4 ((1.9)+(5.9.a) Galois,

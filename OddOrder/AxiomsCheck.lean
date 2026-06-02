@@ -680,6 +680,11 @@ set_option linter.style.longLine false in
 -- `[G : H] · θ(1)`.  All `|G|` conjugates `x⁻¹ · 1 · x = 1` lie in `H`, so every summand is
 -- `θ(1)`; dividing by `|H|` and using `|G| = [G:H]·|H|` (`Subgroup.index_mul_card`) leaves `[G:H]`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_one
+-- RepresentationTheory (induction support): if H is normal, then conjugates into H are exactly
+-- elements of H, so Ind_H^G θ vanishes outside H and is supported on H.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.conjugatesInto_eq_of_normal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_eq_zero_of_not_mem_normal
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.support_induce_subset_of_normal
 -- RepresentationTheory (Peterfalvi (1.6.a) value core): for a normal subgroup `A ⊴ G` with
 -- `A ≤ H` on which `θ` is constant `= c`, every term of the induction sum at `a ∈ A` is `c`
 -- (conjugates `x⁻¹ a x` stay in `A ≤ H` by normality), so `Ind_H^G θ(a) = |G|·c·|H|⁻¹`.
