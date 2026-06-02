@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
 import Mathlib.Algebra.BigOperators.ModEq
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 
 /-!
 # Peterfalvi Section 15: The Subgroups S and T
@@ -373,6 +375,96 @@ theorem cyclotomic_quotient_coprime_of_not_modEq_one {p q : ℕ} (hp : p.Prime)
       exact ((Nat.modEq_iff_dvd'
         (show 1 ≤ p from le_of_lt hp.one_lt)).mpr hdiv).symm
 
+/-- If `p` is not `1 mod q`, then the prime `q` does not divide the
+cyclotomic quotient in **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_not_dvd_self_of_not_modEq_one {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    ¬ q ∣ (p ^ q - 1) / (p - 1) := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  intro hdiv
+  rw [← Nat.geomSum_eq hp.two_le q] at hdiv
+  have hsum_zero_nat : ((∑ k ∈ Finset.range q, p ^ k : ℕ) : ZMod q) = 0 :=
+    (ZMod.natCast_eq_zero_iff _ _).mpr hdiv
+  have hsum_zero_zmod : (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) = 0 := by
+    simpa [Nat.cast_sum, Nat.cast_pow] using hsum_zero_nat
+  have hgeom :
+      (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) * ((p : ZMod q) - 1) =
+        (p : ZMod q) ^ q - 1 :=
+    geom_sum_mul (p : ZMod q) q
+  have hp_eq_one : (p : ZMod q) = 1 := by
+    have hzero :
+        (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) * ((p : ZMod q) - 1) = 0 := by
+      rw [hsum_zero_zmod, zero_mul]
+    rw [hgeom, ZMod.pow_card] at hzero
+    exact sub_eq_zero.mp hzero
+  exact hpq ((ZMod.natCast_eq_natCast_iff p 1 q).mp (by simpa using hp_eq_one))
+
+/-- Prime divisors of the cyclotomic quotient in the non-`1 mod q` case are
+`1 mod q`. -/
+theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q])
+    (hr : r.Prime) (hrdvd : r ∣ (p ^ q - 1) / (p - 1)) :
+    r ≡ 1 [MOD q] := by
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  have hr_ne_q : r ≠ q := by
+    intro h
+    exact cyclotomic_quotient_not_dvd_self_of_not_modEq_one hp hq hpq
+      (by simpa [h] using hrdvd)
+  have hr_not_dvd_q : ¬ r ∣ q := by
+    intro hdiv
+    rcases (Nat.dvd_prime hq).mp hdiv with hr_eq_one | hr_eq_q
+    · exact hr.ne_one hr_eq_one
+    · exact hr_ne_q hr_eq_q
+  haveI : NeZero (q : ZMod r) :=
+    NeZero.of_not_dvd (ZMod r) hr_not_dvd_q
+  have hrdvd_sum : r ∣ ∑ k ∈ Finset.range q, p ^ k := by
+    simpa [Nat.geomSum_eq hp.two_le q] using hrdvd
+  have hroot :
+      Polynomial.IsRoot (Polynomial.cyclotomic q (ZMod r))
+        (Nat.castRingHom (ZMod r) p) := by
+    rw [Polynomial.IsRoot.def, Polynomial.cyclotomic_prime]
+    rw [Polynomial.eval_finset_sum]
+    simp only [Polynomial.eval_pow, Polynomial.eval_X]
+    simpa [Nat.cast_sum, Nat.cast_pow] using
+      (ZMod.natCast_eq_zero_iff (∑ k ∈ Finset.range q, p ^ k) r).mpr hrdvd_sum
+  have hcop : p.Coprime r :=
+    Polynomial.coprime_of_root_cyclotomic hq.pos hroot
+  have hnot_r_dvd_p : ¬ r ∣ p :=
+    hr.coprime_iff_not_dvd.mp hcop.symm
+  have hp_ne_zero : (p : ZMod r) ≠ 0 := by
+    intro hzero
+    exact hnot_r_dvd_p ((ZMod.natCast_eq_zero_iff p r).mp hzero)
+  have horder_dvd : orderOf (p : ZMod r) ∣ r - 1 :=
+    ZMod.orderOf_dvd_card_sub_one hp_ne_zero
+  have horder_eq : q = orderOf (p : ZMod r) :=
+    (Polynomial.isRoot_cyclotomic_iff.mp hroot).eq_orderOf
+  rw [← horder_eq] at horder_dvd
+  exact ((Nat.modEq_iff_dvd' hr.pos).mpr horder_dvd).symm
+
+/-- If every prime factor of `x` is `1 mod q`, then `x` is `1 mod q`. -/
+theorem modEq_one_of_forall_primeFactors_modEq_one {x q : ℕ} (hx : x ≠ 0)
+    (h : ∀ r ∈ x.primeFactors, r ≡ 1 [MOD q]) :
+    x ≡ 1 [MOD q] := by
+  rw [Nat.prod_pow_primeFactors_factorization hx]
+  have hprod :
+      (∏ r ∈ x.primeFactors, r ^ x.factorization r) ≡
+        ∏ r ∈ x.primeFactors, 1 [MOD q] :=
+    Nat.ModEq.prod fun r hr => by
+      simpa using (h r hr).pow (x.factorization r)
+  simpa using hprod
+
+/-- The divisor-congruence part of **Peterfalvi (13.14)** when `p` is not
+`1 mod q`. -/
+theorem cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    ∀ x : ℕ, x ≠ 0 → x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q] := by
+  intro x hx hxdvd
+  refine modEq_one_of_forall_primeFactors_modEq_one hx fun r hrx => ?_
+  exact cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one hp hq hpq
+    (Nat.prime_of_mem_primeFactors hrx)
+    ((Nat.dvd_of_mem_primeFactors hrx).trans hxdvd)
+
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
 theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
@@ -381,12 +473,12 @@ theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
       (p ≡ 1 [MOD q] → q ∣ (p ^ q - 1) / (p - 1)) ∧
       (¬ (p ≡ 1 [MOD q]) →
         Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) ∧
-          ∀ x : ℕ, x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
+          ∀ x : ℕ, x ≠ 0 → x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
   refine ⟨cyclotomic_quotient_odd hp hpodd hqodd, ?_, ?_⟩
   · exact cyclotomic_quotient_dvd_of_modEq_one hp
   · intro hpq
-    refine ⟨cyclotomic_quotient_coprime_of_not_modEq_one hp hq hpq, ?_⟩
-    sorry
+    exact ⟨cyclotomic_quotient_coprime_of_not_modEq_one hp hq hpq,
+      cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one hp hq hpq⟩
 
 /-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
 value, depending on whether `p` is `1 mod q`. -/
