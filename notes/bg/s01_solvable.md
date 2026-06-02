@@ -88,6 +88,11 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
   gives an `A`-fixed conjugate of `Q` containing `K`.
 - **Prop 1.5 status**: (a), (b), (c), and (e) are implemented as Lean theorems; (d) remains a
   no-wrapper direct use of `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`.
+- **Prop 1.6(c)(d) completed**: `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` packages
+  the `[G,A,A]=1 ⇒ [G,A]=1` consequence of Ch04 Lemma 4.29, and
+  `fixedPoints_isComplement_actionCommutator_of_abelian` packages the abelian direct product
+  `G = C_G(A) × [G,A]` as `Subgroup.IsComplement'`.  Prop 1.6(a)(b)(e) remain direct
+  no-wrapper Ch04 references in the S01 table.
 
 ## TL;DR
 

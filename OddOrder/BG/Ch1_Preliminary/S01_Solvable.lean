@@ -490,14 +490,14 @@ Hall statements. Prop. 1.5(d) remains a no-wrapper direct use of Isaacs Cor. 3.2
 | BG | Isaacs §3E / §4D | Lean (本リポ) | 備考 |
 |---|---|---|---|
 | **Prop 1.5(a)** A-inv Hall 存在 | Hall-E + Hall-C + Lem 3.24(a) | `exists_aInvariant_hall` ✅ | Hall `π` 一般版 |
-| Prop 1.5(b) A-inv π-sub ⊆ A-inv Hall | (Sylow 拡張版) | `OddOrder.Isaacs.Ch04.aInvariant_sylow_containing` | π-sub ⊆ Hall π 一般版は Prop 1.5 完成時 |
+| **Prop 1.5(b)** A-inv π-sub ⊆ A-inv Hall | Hall induction + Glauberman conjugacy | `aInvariant_piSubgroup_le_aInvariant_hall` ✅ | minimal normal quotient induction + `H = G` complement branch |
 | **Prop 1.5(c)** A-inv Hall 共役 | Hall-C + Lem 3.24(b) | `aInvariant_hall_conj` ✅ | 共役元は `C_G(A)` |
 | **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
 | **Prop 1.5(e)** C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | Hall product + action commutator | `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` ✅ | BG L412-L414 を `IsComplement' K H` + `[G,A] ≤ H` で実装 |
 | **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
 | **Prop 1.6(b) [G,A,A]=[G,A]** | **Lem 4.29** | **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅ | **無 wrapper**: SemidirectProduct Γ-form |
-| Prop 1.6(c) [G,A,A]=1 ⇒ trivial | (Three-Sub Lem 系) | (未実装) | Ch.4 §4D 完成依存 |
-| Prop 1.6(d) abelian 直積分解 | **Thm 4.34 Fitting** | (Ch.4 §4D に存在予定) | abelian 仮定下 G = C_G(A) × [G, A] |
+| **Prop 1.6(c)** [G,A,A]=1 ⇒ trivial | Lem 4.29 | `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` ✅ | BG-facing consequence of Ch04 Γ-form equality |
+| **Prop 1.6(d)** abelian 直積分解 | **Thm 4.34 Fitting** | `fixedPoints_isComplement_actionCommutator_of_abelian` ✅ | complement form of `G = C_G(A) × [G,A]` |
 | **Prop 1.6(e) abelian p-群 + p'-A** | **Cor 4.35** | **`OddOrder.Isaacs.Ch04.*` (Ch.4 §4D 3422 行)** ✅ | **無 wrapper**: G abelian p-群 + A p'-群 fixes order-p elements |
 
 **使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
@@ -1425,6 +1425,57 @@ theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
         (OddOrder.Isaacs.Ch04.actionCommutator φ) :=
     OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le hAC_le_H hH_hall.1
   exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hAC_pi
+
+
+/-- **BG Prop 1.6(c)**: if `[G,A,A] = 1`, then `[G,A] = 1`.
+
+This is the immediate consequence of Isaacs Lemma 4.29, represented in the semidirect-product
+`Γ = G ⋊[φ] A` form used by the Ch.4 API. -/
+theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (h_two : OddOrder.Isaacs.Ch04.iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 = ⊥) :
+    OddOrder.Isaacs.Ch04.iterCommutator
+        (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+        (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 = ⊥ := by
+  have h_eq := OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one
+    (φ := φ) hCop hSolv
+  rw [← h_eq, h_two]
+
+/-- **BG Prop 1.6(d)**: if `G` is abelian, then
+`G = C_G(A) × [G,A]`.
+
+Lean packages the internal direct product as a complement: multiplication from
+`C_G(A) × [G,A]` onto `G` is bijective. -/
+theorem fixedPoints_isComplement_actionCommutator_of_abelian
+    {G A : Type*} [CommGroup G] [Finite G] [IsSolvable G]
+    [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    Subgroup.IsComplement' (Subgroup.fixedPointsOfMulAut φ)
+      (OddOrder.Isaacs.Ch04.actionCommutator φ) := by
+  have hsup : Subgroup.fixedPointsOfMulAut φ ⊔
+      OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := φ) hCop (Or.inr inferInstance)
+  have hinf : Subgroup.fixedPointsOfMulAut φ ⊓
+      OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hCop
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    exact hinf
+  · rw [Set.eq_univ_iff_forall]
+    intro g
+    have hg : g ∈ Subgroup.fixedPointsOfMulAut φ ⊔
+        OddOrder.Isaacs.Ch04.actionCommutator φ := by
+      rw [hsup]
+      trivial
+    rw [Subgroup.mem_sup_of_normal_right] at hg
+    obtain ⟨c, hc, d, hd, hcd⟩ := hg
+    exact ⟨c, hc, d, hd, hcd⟩
 
 end AInvariantHall
 
