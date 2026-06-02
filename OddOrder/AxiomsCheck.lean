@@ -10,12 +10,14 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
@@ -1690,11 +1692,21 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_mapRingEquiv_comm
+-- Peterfalvi (6.8.2.1), generic forms: the coherent extension takes equal values at x and
+-- x^k ((1.9.b) + (5.9.a) + Dade value restoration), hence is constant on Z^# for prime Z.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_apply_coe_pow_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IsCoherent.extension_constant_on_sharp_of_prime
 -- [Is] Lemma 2.27 (central restriction): Res_Z χ = χ(1)·φ with φ a linear character of
 -- Z ≤ Z(G), via Schur central scalars.  Peterfalvi (6.8.2.3) `Res^H_Z θ = a·φ`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_complex_rep
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction
+-- Peterfalvi (6.7), odd-order assembly: hreal from |L| odd, the structure-constant
+-- congruence from the trivial-character specialization of (6.7.2)-(6.7.3).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.nonidentityZClassCoeffSum_cong_of_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_67_of_odd
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
@@ -1718,6 +1730,27 @@ set_option linter.style.longLine false in
 -- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+-- Cross Mackey inner product + orthogonality of induced characters from non-conjugate irreducibles
+-- (`⟨Ind θ, Ind ψ⟩ = 0`), used to prove the (6.8) `Y = S(H')` family `j ↦ Ind_H^L θ_j` injective.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_induce
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inner_induce_eq_zero_of_not_conj
+-- Linear (degree-one) irreducible character from a hom `H →* ℂˣ`: the source characters of the
+-- (6.8) `Y = S(H')` family are the nontrivial linear characters of `H` (`= Irr(H/H') ∖ {1}`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIrreducibleCharacter
+-- Degree-one irreducible characters are multiplicative / kill commutators — lets a linear `θ` of `H`
+-- inflate from the abelian quotient `H/⁅H,H⁆` (the (6.8)(c2) inertia bridge).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.map_mul_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_one
+-- (6.8)(c2) inertia bridge infra: inflation–conjugation equivariance + inertia transfer
+-- (`g ∈ I_L(inflate θ̄) ↔ ḡ ∈ I_Ḡ(θ̄)`), and the abelian Brauer count (`C_{H̄}(ḡ)=1 ⟹ ḡ` fixes only
+-- the trivial class). With Isaacs 3.28 these discharge `inertia(θ)=H` for linear `θ` in case c2.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjBy_compHom_eq_compHom_conjBy
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mem_inertia_compHom_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
 -- Norm-1 virtual character with positive degree is irreducible (reusable Fourier criterion).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
 -- Brauer conjugation bridge: if ambient centralizers of nonidentity elements of `H` lie in `H`,

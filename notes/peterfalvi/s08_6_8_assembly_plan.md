@@ -153,7 +153,7 @@ c2=`S06.CertainTypeHypothesis` + `K=H` + `w₂`素 + `W₂⊆[H,H]` + `certain.d
 | T0 | [Is]Cor 2.30 producer `θ(1)²≤[H:Z]` (Z≤Z(H)) — **✅ 既存と判明 (2026-06-02 監査)**: `SchurCenterBound.lean` の `finrank_sq_le_index` + character 形 `IsIrreducibleCharacter.exists_degree_sq_le_index` | — | — | ✅ **完了** |
 | T1 | **SibleySetup 再構築** (§B) | ~120 | — | ✅ |
 | T2 | (5.2.a/b) discharge → `S07.Hypothesis` の tau=τ_D | ~120 | T1 | 一部 |
-| **T3** | **(6.7) 上位定理** `peterfalvi_67` (ψ(z)≡ψ(1) mod|P|) — **atoms は ClassSumAlgebra/AlgInt に既存(~90%)**、残=top wiring+(iii)-collapse(`ω(C_s)=α`)+rationality | ~150-250 | — | ✅ **今すぐ可** |
+| **T3** | **(6.7) 上位定理** `ψ(z)≡ψ(1) mod \|P\|` — **✅ 完了 (2026-06-02 R1, 67164c6)**: `peterfalvi_67_of_odd`@新 `SylowTICongruence.lean`。`peterfalvi_67`@ClassSumAlgebra の残仮説 2 つを放電: hreal=⟦z⁻¹⟧≠⟦z⟧ (\|L\| odd, `not_isConj_inv_of_isTISubset`) + hone=a₁₁≡1+a₁₂ (**自明指標特殊化** `nonidentityZClassCoeffSum_cong_of_isTISubset`: 自明表現で ω(C)=\|C\|, 同じ collapse 機構 + \|C₁\| cancel)。結論は [ALGMOD \|P\|] 形; **ℤ-合同への昇格は consumer 側** ((6.8.2.2) は Res_Z ψ=aρ_Z+b1_Z から b∈ℤ 既知 → `isIntegral_rat_imp_int`)。書籍の「ψ(z)∈ℤ」前半は未形式化 (consumer 不要; 要るなら Res∈ZIrr(Z)+`mem_ZIrr_inner_int` 経由 ~80行) | — | — | ✅ **完了** |
 | **T4** | **(1.9)Galois作用+(5.9.a)coherence不変** — **✅✅ 完了 (2026-06-02 R1)**。(1.9) = `CyclotomicGaloisAction.lean` (`exists_complexRingEquiv_mapRingEquiv_eq_pow` 一様σ値公式 + (1.9.a) CRT 形 + ℂ延長定理 + 有限位数 trace 公式)。(5.9.a) = `S07_CoherenceGalois.lean` **`IsCoherent.extension_mapRingEquiv_comm`**: Dade 基底 coherence 拡張 τ₁ は S 上で σ と可換 ((τ₁χ)^σ = τ₁(χ^σ))。入力 = `dadeIntegralCharacterMap_mapRingEquiv_comm` (Dade 点評価 ⟹ σ-可換) + `dadeIntegralCharacterMap_apply_one` (1 で消滅 ⟹ 一様符号) + `exists_zsmul_irreducibleCharacter_of_inner_self_one` (norm-1 ⟹ ±Irr)。**star-可換仮定不要** (内積を σ 輸送しない) ので wild σ に直接適用可 — `IsCoherent.galoisTransport` の hσ 弱化は (5.9.a) には不要と判明 (galoisTransport 自体は σ∈{id,conj} 専用のまま; 必要になれば値レベル弱化可)。consumer = (6.8.2.1): (1.9.b)+(5.9.a)+「(η^u−η)^τ が Z 上で消える」(Dade 点評価から導出可) | — | (1.9)✅ (5.9.a)✅ | ✅ **完了** |
 | T5 | [Is]Lem 2.27 `Res_Z θ=θ(1)·φ` (Z≤Z(H)) — **✅ 完了 (2026-06-02 R1, 376f4e6)**: `IsIrreducibleCharacter.exists_central_linear_restriction`@SchurCenterBound (φ linear ∧ φ(1)=1 ∧ Res=χ(1)•φ ∧ pointwise 形; φ≠1 は pointwise+χ(1)≠0 から)。+ `dadeIntegralCharacterMap_apply_mem` (τ の A 上値復元, (6.8.2.1) の評価 step)@S07_CoherenceGalois (fe8895d) | — | — | ✅ **完了** |
 | T6 | `Y` coherent: 等次数族 η:Fin m→Irr L (η_j(1)=|W₁| ← 6.34) で `coherentEqualDegree_fromDade` | ~120 | T1,T2,**6.34** | — |
@@ -173,6 +173,13 @@ atoms (`peterfalvi_673`@ClassSumAlgebra:1651, `AlgInt.Cong.*`, `centralCharacter
 S04: `Hypothesis`(192), `HConjInvariant`(492), `supportInSubgroup`(137), `fullDadeIsometryData`(4315)。
 S06: `CertainTypeHypothesis`(38), `W2`。
 
+## D'. (6.8.2.1) 一般形 完了 (2026-06-03, R1 lane, 069348a)
+
+S08 非依存の一般形 2 本が `S07_CoherenceGalois.lean` に landed (axiom-clean):
+- **`IsCoherent.extension_apply_coe_pow_eq`** (core): (5.9.a) 状況 + η が x で degree 値 + σ が ord(x)-乗根上 `(·^k)` ⟹ `(τ₁η)(x^k) = (τ₁η)(x)`。chain = (1.9.b) 値公式 (τ₁η∈ℤ[Irr G], hlat) → (5.9.a) 可換 → δ=η^σ−η の Dade A-値復元 (`dadeIntegralCharacterMap_apply_mem`) で δ(x)=0。
+- **`IsCoherent.extension_constant_on_sharp_of_prime`** (=(6.8.2.1)): Z 素数位数 w₂, Z^#⊆A, η は Z 上 degree 値 (応用: Z⊆H'⊆Ker η) ⟹ **τ₁η は Z^# 上定数**。σ は `Nat.exists_eq_pow_mul_and_not_dvd` + `exists_complexRingEquiv_pow_and_fixed` で内部生成; x が素数位数 Z を生成し y=x^k。
+- **case-B 接続に必要な残り**: S := range(Y-family) に対する hSu (∀σ 閉性; Ind∘mapRingEquiv 可換 + galoisMap で ~40行) / hlat (τ₁(Y)⊆ℤ[Irr G]; coherence 構成から) / hker (Z=cert.W2≤H'≤Ker η; 誘導指標の値) / hZA (W₂^#⊆H^#-image)。T6 の Y-family 構成と同時に配線。
+
 ## D. (6.8) proof 着手 (T6, 2026-06-01)
 
 - **✅ engine unblock (commit 17 本目)**: `coherentEqualDegree_fromDade` (S07:4713) の support 仮説を
@@ -185,7 +192,9 @@ S06: `CertainTypeHypothesis`(38), `W2`。
 - **残 T6 (Y coherent の family 構成側)**: `coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj hηdeg
   hηsuppdiff h1notA : IsCoherent hyp.tau (range η) H^#` を呼ぶには:
   (1) **Y family** `η : Fin m → IrreducibleCharacter ↥L` を `Irr(H/H')∖{1}` (= H' を核に含む θ、degree 1) の
-      `Ind_H^L θ` として構成 (`m = |Irr(H/H')|−1 = |H/H'|−1`)。
+      `Ind_H^L θ` として構成。⚠️ **濃度訂正 (2026-06-03, §E 参照)**: `m = |H/H'|−1` は**誤り**。
+      `Ind_H^L(θ^g)=Ind_H^L θ` (`induce_conjBy_eq`) ゆえ Ind は W₁-軌道上で定数、inertia(θ)=H で軌道サイズ=|W₁|
+      ⟹ 真の濃度は **`m = (|H/H'|−1)/|W₁|`**、η は**軌道代表 1 つずつ**で単射。
   (2) **各 η_j 既約** = 6.34 `isIrreducibleCharacter_induce_of_inertia_eq` (要 `inertia(θ)=H`)。
   (3) **`inertia(θ)=H` (自由作用) = T6 の律速・深い blocker (未着手)**: (c1) Frobenius / (c2) から θ≠1 の
       stabilizer 自明を導く。**精査結果 (2026-06-01)**: repo `brauer_permutation_lemma'`
@@ -216,3 +225,179 @@ S06: `CertainTypeHypothesis`(38), `W2`。
     c2 には同等の inertia discharge がまだ必要。
     T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
     T9-T11 (glue) は後続。
+
+## E. ✅ T6 設計完全確定 (2026-06-03, 3 並列 Plan agent + mmd 照合、数学的不確実性ゼロ)
+
+引っ越し後の再開セッション。2 つの設計問題 (Y-family 構成 / inertia=H discharge) を Plan agent で詰め、
+c2 bridge を mmd (4.2)(4.5) で逐語検証した。**残りは機械的 Lean 記述のみ** (新数学なし)。
+
+### 訂正 2 件 (旧 §C/§D の framing バグ — 両 agent 独立に発見)
+1. **orbit 濃度**: 上記 (1) 訂正参照。`m = (|H/H'|−1)/|W₁|`、η=Ind∘θ は軌道代表で単射。
+   `hηinj` は source 単射でなく **cross-Mackey 内積=0 (非共役) vs =1 (norm)** から。
+2. **`hn : 2 ≤ n` は局所構成不能**: 「H nilpotent≠⊥ + |L| odd」からは `|H/H'|≥3` (⟹ Y 非空) 止まり。
+   `m ≥ 2` は (6.8.3) の (6.5) chief-factor 背理法由来 ⟹ **caller 供給仮説** (局所捏造=scaffolding)。
+
+### c1 (Frobenius): 新規 infra ~0、即 build-green
+`isIrreducibleCharacter_induce_of_frobeniusGroup` (InducedIrreducible:291, 任意非自明 θ に一般) が直接適用。
+
+### c2 (CertainTypeHypothesis): Route 1 確定、Ḡ=↥L⧸H' 実現
+- **mmd 検証**: (4.2.a)「W₁ cyclic **Hall**」⟹ `(|K|,w₁)=1` は教科書帰結 (faithful, scaffolding でない)。
+  c2 論証は (4.5.b) 逐語 = [Is]6.32(landed Brauer) + (1.5.b)(landed 6.34)。Y-family は `W₂⊆[H,H]`
+  (`cases` c2 既存) で **H/H' 上 FPF** (fixed=1) と clean に出る。
+- **核心の気付き**: 抽象 MulAut 用 Brauer は不要。`Ḡ:=↥L⧸H'`, `H̄:=H.map(mk' H')⊴Ḡ` (abelian) と置くと、
+  Ḡ 内の元 `q̄=mk' H' g` による共役が**既存 `ClassFunction.conjBy` engine そのもの** ⟹ Brauer 新規コード 0。
+- **新規 lemma (ConjugationBrauer.lean 末尾、`inertia_eq_of_freeAction`@:229 を mirror)**:
+  - `quotientSubgroupHom hNH : ↥H →* ↥(H.map(mk' N))` 余制限 + 全射 (~15 LOC)
+  - **Lemma A** `conjBy_compHom_quotientSubgroup` (inflation–共役 equivariance; `compHom_apply`/`conjBy_apply`
+    が rfl ゆえ機械的, ~20 LOC) — **repo に equivariance 補題は無い (grep 確認済)**、これが核
+  - **Lemma A′** `mem_inertia_iff_mem_inertia_quotient` (`compHom_injective_of_surjective` 経由, ~12 LOC)
+  - **Lemma B** `inertia_eq_of_freeAction_on_abelianization` (le_antisymm, ~30 LOC)
+  - **Lemma C** `inertia_eq_H_of_c2` @S08 (cert.centralizer_W2 + Hall + B1′ を Lemma B に供給, ~35 LOC)
+- **隠れコスト 2 件 (先の楽観的見積りを上方修正)**:
+  - **B1′ は wrapper call でなく新規 ~45 LOC**: landed `quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift`
+    (S03:307) の前提は `centralizer⊓K=⊥` (=H 上 FPF) で **c2 では偽** (C_H(g)=W₂≠1)。c2 の内容は H/H' 上 FPF。
+    ⟹ `coprime_fixedPoints_quotient` (Isaacs 3.28, ForwardFromCh03:808) を直接呼び、fixed point を ⊥ でなく
+    `W₂⊆H'` に着地させる新コード (S03:202-251 を mirror)。材料は全 landed。
+  - **inflation 全射性の一般化 ~15 LOC**: `exists_inflate_eq_of_subset_characterKernel` (InflationCharacter:255)
+    は whole-group `mk' N` 用、subgroup 余制限 `q:↥H→H̄` 用に任意全射へ一般化 (proof は全射性のみ使うので素直)。
+- **Hall 仮説の追加**: `SibleyDadeHypothesis` に `H_W1_coprime : Nat.Coprime (Nat.card ↥H) (Nat.card W1)`
+  field (または c2 `cases` 存在子に thread)。(4.2.a) 由来で dischargeable、(6.8) 構成時 ((7.10)/§9) に放電。
+
+### 確定 LOC + 実装順
+| # | 内容 | file | LOC |
+|---|------|------|-----|
+| 1 | `linearIrreducibleCharacter` infra (1-dim rep, hθ_one 自動, 単射) | 新 `LinearCharacter.lean` | ~110 |
+| 2 | `card_linearCharacters = card(Abelianization H)` (mathlib duality) | 同上 | ~40 |
+| 3 | cross-Mackey `card_mul_inner_induce` + `inner_induce_eq_zero_of_not_conj` (hηinj 用) | InducedIrreducible | ~55 |
+| 4 | unification `isIrreducibleCharacter_induce_of_degree_one` (c1/c2 case split→6.34) | S08 | ~30 |
+| 5 | c2 bridge (quotientSubgroupHom/Lemma A/A′/B + inflation 一般化 + B1′ + Lemma C + Hall field) | ConjugationBrauer/InflationCharacter/S08/S03 | ~190 |
+| 6 | `coherentYFamily` (hn・軌道代表・irr を入力→engine) | S08 | ~70 |
+
+**実装順 (c1-first で早期 build-green)**: #1→#2→#3→#4(c1分岐)→#6 で **c1 のみ build-green マイルストーン到達**
+(coherentInducedDegreeOneFamily@S08:292 は landed なので Y coherent が c1 で閉じる)。c2 は #5 で後追い、
+#4 の c2 分岐 sorry を埋める。**seam**: `coherentYFamily` は (hn[背理法 context], 軌道代表 linear sources,
+pairwise 非共役) を入力に取り Y coherent を産む。各代表の inertia=H/既約性は #4-5 が供給。
+T7 (X) → T8 (DadeChainStep) → T9/T10 (glue) → T11 (X∪Y=S + 最終 assembly) は後続 (critical path 不変)。
+
+### ✅ 実装進捗 (2026-06-03, c1 path build-green)
+**#1/#3/#4(c1)/#6 landed, full `lake build OddOrder` green, AxiomsCheck 登録 (#1/#3 の sorry-free 3 補題)**:
+- **#1** `OddOrder/GroupTheory/RepresentationTheory/LinearCharacter.lean` (新): `linearClassFunction` /
+  `linearIrreducibleCharacter` (χ:H→*ℂˣ ⟹ 1-dim rep `χ•id`, `isIrreducible_complex_rep`) +
+  `_apply`/`_apply_one`(degree 1)/`_injective`/`_eq_trivial_iff`。`SchurCenterBound` の rep 構成を template。
+- **#3** `InducedIrreducible.lean`: `card_mul_inner_induce` (2 引数 Mackey, self 版の near-copy) +
+  `inner_induce_eq_zero_of_not_conj` (非共役 irreducible ⟹ ⟨Ind,Ind⟩=0; `conjBy_conjBy_inv` で矛盾)。
+- **#4** S08 `isIrreducibleCharacter_induce_of_degree_one` (c1 分岐 = `isIrreducibleCharacter_induce_of_frobeniusGroup`
+  で **sorry-free**; **c2 分岐のみ sorry** = S08:~334、唯一の新規 sorry、T6 §5 bridge 待ち)。
+- **#6** S08 `coherentYFamily` (**sorry-free**): hyp+[H.Normal]+hn+χ+hpairwise+hirr ⟹ `Y=range(Ind∘linear∘χ)`
+  coherent。hηinj は #3+norm-1(`irreducibleCharacter_inner_eq_ite`)、hθ_one は #1、engine= `coherentInducedDegreeOneFamily`。
+  注: signature の `IrreducibleCharacter.conjBy` が `[H.Normal]` を要求するため instance binder で供給 (field は同 signature 内で instance 化不可の Lean 制約)。
+- **#2 (card 列挙) は未実装** = T6 coherence には不要 (coherentYFamily は family を入力に取る); enumeration/T11 degree-sum 用に後続。
+- **残**: #5 (c2 inertia bridge, S08:~334 sorry を埋める) → その後 coherentYFamily を実 family で呼ぶ (6.8) 本体 (T9–T11)。
+
+### ✅ #5 完了 (2026-06-03, c2 inertia bridge — S08 c2 sorry 除去, full build green, axiom-clean)
+**`isIrreducibleCharacter_induce_of_degree_one` の c2 分岐を `inertia_eq_H_of_c2` で閉じた。唯一残る
+S08 sorry は capstone `sibleySetup_is_coherent` のみ。** 全補題 `[propext, Classical.choice, Quot.sound]`
+のみ依存 (sorryAx なし、`#print axioms` 確認済)。
+
+**追加した Hall 仮説 (faithful, scaffolding ではない)**: `SibleyDadeHypothesis.cases` の c2 連言に
+`∧ Nat.Coprime (Nat.card ↥H) (Nat.card W1)` を追加 (S08:~202)。これは Peterfalvi (4.2.a) 「W₁ は L の
+cyclic **Hall** subgroup」= `|W₁|` と `[L:W₁]=|H|` が互いに素、という本物の (6.8) 事実。`SibleyDadeHypothesis`
+を構成する箇所はリポジトリに皆無 (grep 確認) なので連言追加は安全、将来カリア構成時に honest に供給される。
+
+**証明骨子 (Route Y, 商 `Ḡ=L/⁅H,H⁆`・像 `H̄=H/⁅H,H⁆` で一貫)**:
+- `θ` linear ⟹ `⁅H,H⁆.subgroupOf H = commutator ↥H ⊆ ker θ` (新 `IsIrreducibleCharacter.map_mul_of_apply_one_eq_one`
+  /`apply_commutatorElement_eq_one_of_apply_one_eq_one` @ LinearCharacter.lean: 1-dim rep ⟹ `ρ g = θ(g)•id`
+  ⟹ θ multiplicative ⟹ commutator を 1 に送る)。
+- `θ` を `q : ↥H ↠ ↥H̄` に沿って `θ̄ : Irr H̄` から inflate (新 `exists_compHom_eq_of_subset_characterKernel`
+  @ InflationCharacter.lean: `exists_inflate_eq` を任意全射準同型へ一般化、`quotientKerEquivOfSurjective` で transport)。
+- **B1′** `C_{H̄}(w̄)=⊥` (w̄∈W̄₁∖1): 新 S03 補題 `quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift_of_le`
+  (既存 `=⊥` 版を `C_K(x)⊓K ≤ N` 版へ緩和; c2 では `C_H(w)=W₂⊆⁅H,H⁆=N` で `=⊥` は偽だが `≤N` は真) +
+  `fixedPoint_lift_of_generator_quotient_fixed` (Isaacs 3.28, coprime lift)。coprimality は Hall 仮説 + `orderOf w ∣ |W₁|`。
+- H̄ abelian + B1′ ⟹ Brauer で `#fixed conj-classes(w̄)=1` (新 `card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot`
+  @ ConjugationBrauer.lean) ⟹ `w̄ ∉ I_Ḡ(θ̄)` (既存 `not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)。
+- **inertia transfer** `w∈I_L(θ) ↔ w̄∈I_Ḡ(θ̄)` (新 `conjBy_compHom_eq_compHom_conjBy`/`mem_inertia_compHom_iff`
+  @ ConjugationBrauer.lean: inflation–conjugation 同変性)。
+- `I_L(θ)=H` を `le_antisymm`: `≥`=`subgroup_le_inertia`; `≤`= 一般 `g∉H` を complement `L=H⋊W₁` で `g=h·w`
+  (w∈W₁∖1) に分解、`h∈H⊆I_L(θ)` を吸収して `w∈I_L(θ)` に帰着、上記 transfer で矛盾。
+
+**新規 generic 補題 (再利用可能)**: ClassFunction.compHom_comp; LinearCharacter の 3 補題;
+InflationCharacter.exists_compHom_eq_of_subset_characterKernel; ConjugationBrauer の abelian-bridge +
+transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
+
+## F. T7 (X 特徴付け) 詳細設計 (2026-06-03, 2 並列 Plan agent + mmd L136-244 / (4.5)@04.6 照合)
+
+**(6.8) 全体構造 (mmd L150-244)**: `S coherent` を**背理法**で示す。(6.5) で「H 非可換 p-群」に還元
+(d_i∈ℕ=p冪, Z(H)∩H'≠1)。**重要 (anti-scaffold)**: p-群は `SibleyDadeHypothesis` の field に**しない**
+((6.8) statement は H nilpotent のみ仮定; field 化は over-constrain で §9 caller が使えない)。代わりに
+`sibleySetup_is_coherent` を `by_contra hnc` で開き、`peterfalvi_65_reduction hyp hnc` で p-群構造を
+**背理法分岐内の局所仮説**として得る (peterfalvi_65_reduction は別 ~200-300 LOC task=T9/T11 圏、T7 外)。
+
+**定義** (S08 `namespace SibleyDadeHypothesis` に直接 def; `FiltrationData`@S08:42 は dead legacy で不使用・将来削除):
+- `SsubFiltration hyp (A:Subgroup ↥L) := {Ind_H^L θ | θ≠1, A.subgroupOf H ⊆ ker θ}` (= (6.1) S(A))
+- `Z : Subgroup ↥L` — case A `(center ↥H).map H.subtype ⊓ ⁅H,H⁆` / case B `cert.W2`。`Z⊆H'` (caseA=inf_le_right / caseB=hW2), `Z⊆Z(H)` (caseA=inf_le_left / caseB=要 W₂⊆Z(H)=case B 定義), `Z≠⊥` (caseA=p-群還元由来=分岐内, caseB=cert.W2_nontrivial)
+- `SsubZ hyp Z := SsubFiltration hyp Z`; `Xset hyp Z := hyp.S \ hyp.SsubZ Z`; `Y = SsubFiltration hyp ⁅H,H⁆`
+- 推奨: `SibleyCaseAB` inductive (caseA/caseB, 各 branch が Z の 3 事実を供給)
+
+**T7-c1 (Frobenius): 機械的・sorry-free, ~255 LOC**。S03 に既 landed の atoms で組める:
+`not_subsetCharacterKernel_of_not_induce`(S03:589, (1.6.a) 逆)/`subsetCharacterKernel_induce_of_subgroupOf`
+(S03:563)/`exists_inner_induce_ne_zero`(S03:636)/`irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`
+(S03:696, (6.6) G2.2 keystone)。`S⊆Irr L` は `isIrreducibleCharacter_induce_of_frobeniusGroup` (任意非自明θ)。
+`X={χ∈Irr L|Z⊄ker χ}` は `S⊆Irr L` + 1.6.a bridge。`Xset⊆Irr L`=`diff_subset`。
+
+**T7-c2 = `X⊆Irr L` (= 「θ≠1, Z⊄ker θ ⟹ inertia(θ)=H」+ 6.34) — 設計確定 (2026-06-03 brick② focused 設計で大幅訂正・縮小)**:
+- **🔴 重大訂正 1: `X⊆Irr L` は case A 限定**。**case B は X⊆Irr L を必要としない**: mmd (6.8.2) L178-256 は
+  可約 χ=Ind_H^L θ (Z⊄ker θ) を**許し**、(6.8.2.1/2/3) の isometry 拡張 (τ₂, η₁^τ₂=Y) で coherence を出す。
+  ⟹ case B は **T10** (前提 T3/T4/T5 全 landed)。T7-c2 は **case A の X⊆Irr L のみ**にスコープ。
+- **🔴 重大訂正 2: counting route (旧 ②a-d) は dead end**。②c (`#fixed classes H = #fixed classes H/Z`) は
+  ConjClasses 対応として偽 (inj/surj 両方失敗; lift は Glauberman-Isaacs 類対応=未 landed・重い) で、真値は
+  µ_ij 由来。**旧記載の「brick 2 つ / ~400-500 LOC」は撤回**。
+- **✅ case A の clean 直接証明 (~95-115 LOC, sorry-free, 残不確実性ゼロ)**: case A 定義 `Z(H)∩W₂=1` ⟹
+  `C_Z(w)=Z∩C_H(w)=Z∩W₂=1` ⟹ **w は Z 上 FPF** (mmd (6.8.3) L256 と一致)。θ が w-fixed なら [Is]2.27
+  (`exists_central_linear_restriction`, Z≤Z(H)) の中心線形指標 φ が w-不変 → **新補題**
+  `map_eq_one_of_fixedPointFree_invariant` (mathlib `MonoidHom.FixedPointFree.commutatorMap_surjective`,
+  `a=b/fb` + 不変性 ⟹ φa=φb/φ(fb)=1, ~10 LOC) で φ=1 ⟹ Z⊆ker θ = **brick② (case A)**。
+  wrapper `inertia_eq_H_of_c2_caseA` は T6 の le_antisymm/complement-split (S08:466-487) を**流用** (linearity 不使用) +
+  `isIrreducibleCharacter_induce_of_inertia_eq` (6.34, 一般 θ)。**case-B は brick② 偽ゆえ touch しない**。
+  - 新規: `map_eq_one_of_fixedPointFree_invariant` (~10) + `subset_characterKernel_of_inertia_caseA` (~55-75, FPF-equiv 構成が主) + wrapper (~30, 流用)。landed: 2.27 / FixedPointFree / 6.34 / S06 centralizer_W2。
+- 要 (1.6.a) `A⊆ker θ ⟺ A⊆ker Ind θ` (case A の特徴付け, ~50 LOC, 未形式化だが小)。
+- **case A の Z≠⊥ は p-群還元由来 (背理法分岐内)**; case-split `Z(H)∩W₂=1` は branch 仮説。
+
+**T7→T8 (6.6) engine interface**: `peterfalvi_66_coherence_of_X_from_dade`(S07:5249) + `DadeChainStep`(S07:5065)
++ `coherentEqualDegree_fromDade`(S07:4842) + `exists_monotoneDegreeEnum`(S07:3661)。T7 が供給するのは
+`Xset hyp Z`:Set + `Xset⊆Irr L` + `Xset={χ∈Irr L|Z⊄ker χ}`。degree-sum collapse (mmd L234) が hdeg_c に効く。
+**⚠️ T8 境界 gap (T7 外だが要注意)**:
+- **G1**: `DadeChainStep.hχsupp`(S07:5076) が**個別** `χ_i.support⊆H^#` 要求 — だが Ind θ_i は 1 で非零。
+  Y-family は `coherentEqualDegree_fromDade` の差分 support 弱化 (S07:4713) で回避したが、`peterfalvi_66`/`DadeChainStep`
+  は未弱化。`retarget_isCoherent_fromDade` の実 support 使用を読んで確認要 (差分のみ使うなら同様弱化で解決)。
+- **G2**: `DadeChainStep.Dmem` per-member ψ=0 分解が T8 主負荷 (~300-450 LOC の大半)。
+
+**T7 実装順 (c1-first)**: defs (Z/X/S(Z)/SibleyCaseAB ~95) → c1 特徴付け (S⊆Irr L / Xset_eq / Xset⊆Irr L ~100)
+→ engine seam (~40) で **c1 build-green**。c2 は brick①②を後追い (~400-500, brick② 高リスク)。
+
+## G. 🔴 方針監査結果 (2026-06-03, 4 並列 adversarial agent + 全 BLOCKER を自己再検証)
+
+エラー頻度上昇を受けた全 spine 監査。**load-bearing な主張は grep/read で独立検証済**。
+
+### BLOCKER (検証済・要対処)
+- **(A) engine support-interface bug** [Agent 2+3 独立確認, 自己検証済]: `DadeChainStep.hχsupp`(S07:5076)/`retarget_isCoherent_fromDade`/`dadeOrthonormalCharacterImageFamily`(S07:4410) が **個別** `χ.support ⊆ supportInSubgroup A L` を要求。だが `A=sharpImage H` は 1 を除外、`χ=Ind_H^L θ` は χ(1)=|W₁|θ(1)≠0 ⟹ **X-member で偽=充足不能**。⟹ `peterfalvi_66_coherence_of_X_from_dade`(S07:5249) は実 X-family で **instantiate 不能 = T8 を塞ぐ**。抽象版 `peterfalvi_66_coherence_of_X`(S07:3934) は support field なしで健全。**内部は差分しか使わない**(両 agent が trace) ⟹ 修正 = Y-family が受けた差分 support 弱化 (`coherentEqualDegree_fromDade` S07:4842) を `DadeChainStep`/`retarget_isCoherent_fromDade`/`dadeOrthonormalCharacterImageFamily`/`dadeIntegralCharacterMap_inner_eq_on_supported_span`(S07:4326) に伝播。**T8 の前提タスク**(frozen-ish file の engine surgery、per-task LOC 見積りに未計上)。
+- **(B) Track A/B 断絶 + 「実 sorry 2」の framing 誤り** [Agent 4, 自己検証済]: `card_G0_lower_bound`/`sibleySetup_is_coherent`/`IndChainDecomposition`/`FrobeniusFamily` は **defining file 外で消費者 0**。S09 は S08 シンボル不使用 ((6.8)→(7.10) は TODO コメントのみ)。`feitThompson`(FeitThompson.lean:21) は **body なし裸 sorry** (minimal-counterexample 還元 欠落)。実 FeitThompson 経路 = **Track B: BG.IsMinimalSimpleOdd + S16.Hypothesis → BG.AppC.final_contradiction**。「実 sorry 2 (0046/0044)」は **AxiomsCheck-guard 島のみ**の指標で、FeitThompson 推移閉包は ~144 sorry + opaque-Prop placeholder 多数 (vacuity risk は proof-fill 時、現状 consumer も sorry ゆえ benign)。**(6.8)/(7.10) は genuine な Peterfalvi 結果だが orphaned** — §10-16 が hoist しており、wiring は未構築の大タスク。**axiom-laundering / 循環は発見されず** (scaffold は honest)。
+
+### STRATEGIC (検証要/対処要)
+- **B4 m≥2 未解決** [Agent 3]: Y coherence ((1.4)) は n≥2 必須。plan §E は「caller 供給 (6.5 背理法由来)」とするが**導出が示されていない**。m=(|H/H'|−1)/|W₁|; (6.5) で H/H' は chief factor ⟹ W₁ が Irr(H/H')∖{1} に推移的なら m=1 で Y 非 coherent。要 Peterfalvi-level 解決 (odd-order FPF 境界 |H/H'|−1≥2|W₁| 等)。
+- **Finding 1 H-Sylow** [Agent 1]: (6.7)=`peterfalvi_67_of_odd` は P Sylow 前提。(6.8) は P=H で適用 (mod |H|) ⟹ 「H^# TI p-群 ⟹ H∈Sylow」を T9/T10 が (6.5) 還元 context から放電要 (carrier にない)。
+- **B1 (5.6) 反転欠落** [Agent 3]: (6.8.3) は (5.6) を**対偶**で使う (非 coherent ⟹ 次数和下界) が、engine は forward (`retarget_isCoherent` S07:2835) のみ。IsCoherent は Type なので `¬Nonempty(IsCoherent …)` の Prop-対偶 wrapper を書く要。T11 を塞ぐ (plan は「既landed」と誤記)。
+- **B2 X-side degree-sum bridge 欠落** [Agent 3]: landed `sumNonInflatedDegreeSq_eq_index_mul`(InflationCharacter:374) は **Irr-L 側**和。(6.8.3) は **X 側** `Σχ(1)²/‖χ‖²` (case B で X は可約!) を扱う。bridge=(1.5.c,d) 共役崩壊は未 landed。T11 で要 (case A は両者一致ゆえ landed で足りるが case B は不足)。
+- **Finding 3 / 「(4.2)-core で c2 足りる」未証明** [Agent 1]: plan の主張は (4.5) counting 経由なら (4.6)(b)(c)(d) 要。**ただし brick② の直接 FPF-on-Z 設計 (§F 訂正) が (4.5) を sidestep するので case A では moot** — brick② が正しく landed すれば Finding 3 は解消。
+- **M1 (6.5) reduction は DAG node 欠落** [Agent 3]: (6.5)⟸(6.3)⟸(6.2)⟸(5.6)+(1.5) の深い依存、~200-300 LOC、T9/T10/T11 を塞ぐ。B1/B2 の機構を共有。
+- **Finding 2 W-cyclic 欠落** [Agent 1, MINOR]: `CertainTypeHypothesis` に (4.2.c) W cyclic がない (消費者 0 で latent、(4.3)/(4.5) 構築時に必要)。
+- **M2 I_L(φ)=L trap** [Agent 3, MINOR]: (6.8.2.2) は `[I_L(φ):Z] ≤ [L:Z]` 不等式形で足りる、=L を証明しようとすると hard/偽。T10 implementer 向け注意。
+
+### VERIFIED-OK (健全確認 — 安心材料)
+- **case-A-only X⊆Irr L** (V1): §F の訂正 (case B は X⊆Irr L 不要、reducible 許容) は mmd L160/L210 と一致・正しい。
+- **tau = dadeIntegralCharacterMap は faithful な Dade map** (legacy global-isometry bug は解消済); IsCoherent core は (5.1) lattice-relative で faithful。
+- **T4 (1.9)+(5.9.a) / T5 [Is]2.27 / T0 Cor2.30 健全** (axiom-clean 確認); 「wild-σ / star-commute 不要」は over-claim でない。
+- **IndChainDecomposition + ofIsCoherent は faithful・proven** (orphaned だが正しい); (7.7.a)/(7.8)/(7.9) は honest 証明書 scaffold (laundering なし)。
+- **brick② (T7-c2 case A) 設計は Finding 3 を sidestep** — (4.5)/(4.6)bcd 不要の直接 FPF route。
+
+### 戦略的含意
+本作業 (T6 完成, T7 設計) は **genuine な Peterfalvi 形式化**だが、現状 FeitThompson の実 critical path (Track B) には未配線。優先順位 = {(A)engine 修正して (6.8) 続行 / Track B (BG§7-16+S16/AppC+top-level 還元) に pivot / roadmap 全体を訂正版で再計画} の判断が必要。

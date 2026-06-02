@@ -353,6 +353,64 @@ theorem quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift
   rw [← hyq, ← hcy, hc_inf]
   simp
 
+/-- **BG Lemma 3.2 (quotient centralizer bridge, `C_K(x) ≤ N` form)**: a relaxation of
+`quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift` in which the upstairs centralizers
+`C_G(x) ⊓ K` need not be trivial, only land *inside the normal subgroup `N` being quotiented out*.
+This still forces `C_{K/N}(\bar x) = 1`, because the lifted `x`-fixed representative `c` lies in
+`C_G(x) ⊓ K ≤ N`, hence maps to `1` in `G/N`.
+
+This is exactly the Peterfalvi (6.8)(c2) situation: there `C_K(x) = W₂ ⊆ ⁅K,K⁆ = N` (nontrivial),
+so the `= ⊥` hypothesis of the original lemma fails, but the `≤ N` hypothesis holds and the
+quotient `K/⁅K,K⁆` still has fixed-point-free `\bar x`-action. -/
+theorem quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift_of_le
+    {G : Type*} [Group G] {K R N : Subgroup G} [N.Normal]
+    (hcentral :
+      ∀ x ∈ R, x ≠ 1 → Subgroup.centralizer ({x} : Set G) ⊓ K ≤ N)
+    (hlift :
+      ∀ x ∈ R, x ≠ 1 → ∀ y ∈ K,
+        (QuotientGroup.mk' N) (x * y * x⁻¹) = (QuotientGroup.mk' N) y →
+          ∃ c : G,
+            c ∈ K ∧ (QuotientGroup.mk' N) c = (QuotientGroup.mk' N) y ∧
+              x * c * x⁻¹ = c) :
+    ∀ qx ∈ R.map (QuotientGroup.mk' N), qx ≠ 1 →
+      Subgroup.centralizer ({qx} : Set (G ⧸ N)) ⊓ K.map (QuotientGroup.mk' N) = ⊥ := by
+  intro qx hqxR hqx_ne
+  rw [eq_bot_iff]
+  intro qy hqy
+  rw [Subgroup.mem_inf] at hqy
+  obtain ⟨hqy_centralizes, hqyK⟩ := hqy
+  obtain ⟨x, hxR, hxq⟩ := hqxR
+  obtain ⟨y, hyK, hyq⟩ := hqyK
+  rw [Subgroup.mem_bot]
+  have hx_ne : x ≠ 1 := by
+    intro hx_one
+    apply hqx_ne
+    rw [← hxq, hx_one]
+    simp
+  rw [Subgroup.mem_centralizer_singleton_iff] at hqy_centralizes
+  have hq_conj : qx * qy * qx⁻¹ = qy := by
+    calc
+      qx * qy * qx⁻¹ = (qy * qx) * qx⁻¹ := by rw [← hqy_centralizes]
+      _ = qy := mul_inv_cancel_right qy qx
+  have h_conj_mod :
+      (QuotientGroup.mk' N) (x * y * x⁻¹) = (QuotientGroup.mk' N) y := by
+    have hxq_coe : (x : G ⧸ N) = qx := hxq
+    have hyq_coe : (y : G ⧸ N) = qy := hyq
+    change (x : G ⧸ N) * (y : G ⧸ N) * (x : G ⧸ N)⁻¹ = (y : G ⧸ N)
+    rw [hxq_coe, hyq_coe]
+    exact hq_conj
+  obtain ⟨c, hcK, hcy, hc_fixed⟩ := hlift x hxR hx_ne y hyK h_conj_mod
+  have hc_centralizes : c ∈ Subgroup.centralizer ({x} : Set G) := by
+    have h_comm : c * x = x * c := by
+      have h_mul := congrArg (fun z => z * x) hc_fixed
+      simpa only [mul_assoc, inv_mul_cancel, mul_one] using h_mul.symm
+    exact Subgroup.mem_centralizer_singleton_iff.mpr h_comm
+  have hc_inf : c ∈ Subgroup.centralizer ({x} : Set G) ⊓ K :=
+    Subgroup.mem_inf.mpr ⟨hc_centralizes, hcK⟩
+  have hc_N : c ∈ N := hcentral x hxR hx_ne hc_inf
+  have hc_mk : (QuotientGroup.mk' N) c = 1 := (QuotientGroup.eq_one_iff c).mpr hc_N
+  rw [← hyq, ← hcy, hc_mk]
+
 /-- **BG Lemma 3.2 (quotient Frobenius assembly, `N ≤ K`)**: in the easy branch
 where `N ⊴ G` lies in the Frobenius kernel `K`, the quotient is a Frobenius
 group as soon as the quotient centralizer condition is known.

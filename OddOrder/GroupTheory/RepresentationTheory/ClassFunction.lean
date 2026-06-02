@@ -167,6 +167,11 @@ def compHom (f : H →* G) (φ : ClassFunction G k) : ClassFunction H k :=
 @[simp] theorem compHom_apply (f : H →* G) (φ : ClassFunction G k) (h : H) :
     compHom f φ h = φ (f h) := rfl
 
+variable {K : Type*} [Group K] in
+/-- Pullback is contravariantly functorial: `(φ ∘ f) ∘ g = φ ∘ (f ∘ g)`. -/
+theorem compHom_comp (f : H →* G) (g : K →* H) (φ : ClassFunction G k) :
+    compHom g (compHom f φ) = compHom (f.comp g) φ := rfl
+
 @[simp] theorem compHom_zero (f : H →* G) :
     compHom f (0 : ClassFunction G k) = 0 := by ext h; simp
 

@@ -8,6 +8,10 @@ import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -26,6 +30,7 @@ Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
+open scoped commutatorElement
 
 variable {L G : Type*} [Group L] [Group G]
 
@@ -186,7 +191,10 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
 
   * **(c1)** `L` is a Frobenius group with kernel `H` and complement `W₁`.
   * **(c2)** Hypothesis (4.6) holds — encoded by a `S06.CertainTypeHypothesis` on the *same* Dade
-    datum (`cert.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime and `W₂ ⊆ [H,H]`.
+    datum (`cert.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime, `W₂ ⊆ [H,H]`, and
+    the Hall coprimality `gcd(|H|, |W₁|) = 1` (Peterfalvi (4.2.a): `W₁` is a cyclic *Hall* subgroup
+    of `L = H ⋊ W₁`, so its order is coprime to `|H| = [L : W₁]`).  This coprimality is the input to
+    Isaacs (3.28) that lifts a `W₁`-fixed coset of `H/[H,H]` to a `W₁`-fixed element of `H`.
 
   The (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H` (hence `cert.K = H`), and the
   (4.2)/(6.8) complement is shared (`cert.W1 = W1`, both giving `L = H ⋊ W₁`). With the S06 audit
@@ -197,7 +205,8 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H W1 ∨
     ∃ cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L,
       cert.dade = dade ∧ cert.K = H ∧ cert.W1 = W1 ∧
-        (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆
+        (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆ ∧
+        Nat.Coprime (Nat.card ↥H) (Nat.card W1)
 
 namespace SibleyDadeHypothesis
 
@@ -319,6 +328,256 @@ noncomputable def coherentInducedDegreeOneFamily
     exact h.2 rfl
   exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj
     hdeg hsuppdiff h1notA
+
+/-- **(6.8)(c2) inertia equality** for a nontrivial linear `θ`.
+
+Under the (4.6)/(c2) data — `H ⋊ W₁`, `C_H(w) = W₂ ⊆ ⁅H,H⁆` for `w ∈ W₁∖1`, and the Hall
+coprimality `gcd(|H|,|W₁|) = 1` — the inertia group of a nontrivial degree-one `θ` is exactly `H`.
+
+Proof.  Pass to `Ḡ = L/⁅H,H⁆`, `H̄ = H/⁅H,H⁆` (abelian).  `θ` is linear, so inflates from a
+nontrivial `θ̄ ∈ Irr H̄`.  The coprimality + Isaacs (3.28) lift gives `C_{H̄}(w̄) = 1` for
+`w̄ ∈ W̄₁∖1`; since `H̄` is abelian, Brauer's permutation lemma turns this into "`w̄` fixes only the
+trivial irreducible", so `w̄ ∉ I_{Ḡ}(θ̄)`.  The inertia-transfer bridge then gives `w ∉ I_L(θ)` for
+`w ∈ W₁∖1`, and the complement `L = H ⋊ W₁` reduces a general `g ∉ H` to this case (`I_L(θ) ⊇ H`, so
+the `H`-part is absorbed). -/
+theorem inertia_eq_H_of_c2 (hyp : SibleyDadeHypothesis G L H)
+    (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {θ : IrreducibleCharacter ↥H}
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
+    (hθ_ne : θ ≠ trivialIrreducibleCharacter ↥H) :
+    letI : H.Normal := hyp.H_normal
+    ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
+  -- The quotient `Ḡ = L/⁅H,H⁆` and the image `H̄ = H/⁅H,H⁆`.
+  set M : Subgroup ↥L := ⁅H, H⁆ with hM_def
+  haveI hMnormal : M.Normal := by rw [hM_def]; infer_instance
+  set mkM : ↥L →* (↥L ⧸ M) := QuotientGroup.mk' M with hmkM_def
+  set Hbar : Subgroup (↥L ⧸ M) := H.map mkM with hHbar_def
+  haveI hHbar_normal : Hbar.Normal := by rw [hHbar_def, hmkM_def]; infer_instance
+  -- `H̄` is abelian: images of `H` commute since their commutators land in `⁅H,H⁆ = ker mkM`.
+  have hHbar_comm : ∀ a b : ↥Hbar, Commute a b := by
+    rintro ⟨a, ha⟩ ⟨b, hb⟩
+    rw [hHbar_def, Subgroup.mem_map] at ha hb
+    obtain ⟨x, hxH, rfl⟩ := ha
+    obtain ⟨y, hyH, rfl⟩ := hb
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    -- `mkM x` and `mkM y` commute because `⁅x,y⁆ ∈ ⁅H,H⁆ = ker mkM`.
+    have hcomm_elt : ⁅(x : ↥L), (y : ↥L)⁆ ∈ M := by
+      rw [hM_def]; exact Subgroup.commutator_mem_commutator hxH hyH
+    have hmk_one : mkM ⁅(x : ↥L), (y : ↥L)⁆ = 1 := (QuotientGroup.eq_one_iff _).mpr hcomm_elt
+    rw [map_commutatorElement] at hmk_one
+    exact commutatorElement_eq_one_iff_mul_comm.mp hmk_one
+  -- The corestriction `q : ↥H →* ↥H̄` with `(q x : Ḡ) = mkM x`.
+  set q : ↥H →* ↥Hbar :=
+    (mkM.comp H.subtype).codRestrict Hbar (fun x => by
+      rw [hHbar_def]; exact Subgroup.mem_map.mpr ⟨x, x.property, rfl⟩) with hq_def
+  have hq : ∀ x : ↥H, ((q x : ↥Hbar) : ↥L ⧸ M) = mkM (x : ↥L) := fun x => rfl
+  have hq_surj : Function.Surjective q := by
+    rintro ⟨z, hz⟩
+    rw [hHbar_def, Subgroup.mem_map] at hz
+    obtain ⟨x, hxH, hxz⟩ := hz
+    exact ⟨⟨x, hxH⟩, Subtype.ext hxz⟩
+  have hqinj : Function.Injective
+      (ClassFunction.compHom q : ClassFunction ↥Hbar ℂ → ClassFunction ↥H ℂ) :=
+    ClassFunction.compHom_injective_of_surjective hq_surj
+  -- `θ` is linear, hence kills `⁅H,H⁆.subgroupOf H = commutator ↥H`, so inflates from `H̄`.
+  set N : Subgroup ↥H := M.subgroupOf H with hN_def
+  haveI hN_normal : N.Normal := by rw [hN_def, hM_def]; exact hMnormal.subgroupOf H
+  have hN_eq : N = _root_.commutator ↥H := by
+    rw [hN_def, hM_def, ← Subgroup.map_subtype_commutator H, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
+  have hker : (N : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
+    intro n hn
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hθ_one]
+    -- `θ` is multiplicative with `θ(1)=1`, so `{x | θ x = 1}` is a subgroup containing commutators.
+    have hθ1 : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1 := hθ_one
+    have hn' : n ∈ Subgroup.closure (commutatorSet ↥H) := by
+      have : n ∈ N := hn
+      rwa [hN_eq, _root_.commutator_eq_closure] at this
+    refine Subgroup.closure_induction
+      (p := fun g _ => (θ : ClassFunction ↥H ℂ) g = 1) ?_ ?_ ?_ ?_ hn'
+    · rintro _ ⟨a, b, rfl⟩
+      exact θ.isIrreducible.apply_commutatorElement_eq_one_of_apply_one_eq_one hθ1 a b
+    · exact hθ1
+    · intro a b _ _ ha hb
+      rw [θ.isIrreducible.map_mul_of_apply_one_eq_one hθ1, ha, hb, one_mul]
+    · intro a _ ha
+      have hai := θ.isIrreducible.map_mul_of_apply_one_eq_one hθ1 a a⁻¹
+      rw [mul_inv_cancel, hθ1, ha, one_mul] at hai
+      exact hai.symm
+  have hkerq : q.ker = N := by
+    ext x
+    rw [MonoidHom.mem_ker]
+    change q x = 1 ↔ (x : ↥L) ∈ M
+    constructor
+    · intro hx
+      have hx1 : mkM (x : ↥L) = 1 := by rw [← hq x, hx]; rfl
+      rw [hmkM_def] at hx1
+      exact (QuotientGroup.eq_one_iff _).mp hx1
+    · intro hx
+      apply Subtype.ext
+      rw [hq x, hmkM_def]
+      exact (QuotientGroup.eq_one_iff _).mpr hx
+  -- `θ` inflates from a `θ̄ : Irr ↥H̄` along the surjection `q` (linear ⟹ `ker q = N ⊆ ker θ`).
+  obtain ⟨θbar, hcompq⟩ :=
+    exists_compHom_eq_of_subset_characterKernel hq_surj θ (by rw [hkerq]; exact hker)
+  -- `θ̄` is nontrivial, else `θ = compHom q (triv) = triv`.
+  have hθbar_ne : θbar ≠ trivialIrreducibleCharacter ↥Hbar := by
+    intro hbar
+    apply hθ_ne
+    apply IrreducibleCharacter.ext
+    rw [← hcompq, hbar]
+    ext x
+    simp [ClassFunction.compHom_apply, trivialIrreducibleCharacter,
+      trivialClassFunction_apply]
+  -- **B1′** (fixed-point-free action of `W̄₁` on `H̄`): `C_{H̄}(w̄) = 1` for `w̄ ∈ W̄₁∖1`.
+  -- We only need the specific `w̄ = mkM w`; the S03 `≤ N` quotient lemma supplies it.
+  have hNK : (⁅H, H⁆ : Subgroup ↥L) ≤ H := Subgroup.commutator_le_left H H
+  have hcentral : ∀ x ∈ hyp.W1, x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥L) ⊓ H ≤ M := by
+    intro x hxW1 hxne
+    have hcw2 : Subgroup.centralizer ({x} : Set ↥L) ⊓ cert.K = cert.W2 :=
+      cert.centralizer_W2 x (hW1 ▸ hxW1) hxne
+    rw [hK] at hcw2
+    rw [hcw2, hM_def]; exact hW2
+  have hlift : ∀ x ∈ hyp.W1, x ≠ 1 → ∀ y ∈ H,
+      mkM (x * y * x⁻¹) = mkM y →
+        ∃ c : ↥L, c ∈ H ∧ mkM c = mkM y ∧ x * c * x⁻¹ = c := by
+    intro x hxW1 hxne y hyH hfix
+    have hcop_x : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥H) := by
+      rw [Nat.card_zpowers]
+      have hdvd : orderOf x ∣ Nat.card hyp.W1 := hyp.W1.orderOf_dvd_natCard hxW1
+      exact (hcop.coprime_dvd_right hdvd).symm
+    exact OddOrder.BG.Ch1.S03.fixedPoint_lift_of_generator_quotient_fixed
+      hNK hcop_x (Or.inl (by infer_instance)) hyH hfix
+  have hB1 : ∀ qx ∈ hyp.W1.map mkM, qx ≠ 1 →
+      Subgroup.centralizer ({qx} : Set (↥L ⧸ M)) ⊓ Hbar = ⊥ := by
+    rw [hHbar_def, hmkM_def]
+    exact OddOrder.BG.Ch1.S03.quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift_of_le
+      hcentral hlift
+  -- Assemble: `I_L(θ) = H` by `le_antisymm`.
+  apply le_antisymm
+  · -- `I_L(θ) ≤ H`: a `g ∉ H` is `h·w` with `w ∈ W₁∖1`, and `w ∉ I_L(θ)`.
+    intro g hg
+    by_contra hgH
+    -- Write `g = h * w` via the complement `L = H ⋊ W₁`.
+    obtain ⟨⟨h, w⟩, hgw⟩ := (hyp.split.existsUnique g).exists
+    rw [ClassFunction.mem_inertia] at hg
+    -- `w ≠ 1`, else `g = h ∈ H`.
+    have hwne : (w : ↥L) ≠ 1 := by
+      rintro hw1
+      apply hgH
+      have : g = (h : ↥L) := by rw [← hgw, hw1, mul_one]
+      rw [this]; exact h.property
+    -- `h ∈ H ⊆ I_L(θ)`, so `w = h⁻¹·g ∈ I_L(θ)`.
+    have hhinertia : (h : ↥L) ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) :=
+      ClassFunction.subgroup_le_inertia (θ : ClassFunction ↥H ℂ) h.property
+    have hwinertia : (w : ↥L) ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) := by
+      have hwval : (w : ↥L) = (h : ↥L)⁻¹ * g := by rw [← hgw]; group
+      rw [hwval]
+      exact (ClassFunction.inertia (θ : ClassFunction ↥H ℂ)).mul_mem
+        ((ClassFunction.inertia (θ : ClassFunction ↥H ℂ)).inv_mem hhinertia)
+        (ClassFunction.mem_inertia.mpr hg)
+    -- Transfer `w ∈ I_L(θ)` to `w̄ ∈ I_{Ḡ}(θ̄)`.
+    rw [← hcompq] at hwinertia
+    have hwbar : mkM (w : ↥L) ∈ ClassFunction.inertia (θbar : ClassFunction ↥Hbar ℂ) :=
+      (mem_inertia_compHom_iff q hq hqinj (θbar : ClassFunction ↥Hbar ℂ) (w : ↥L)).mp hwinertia
+    -- But `w̄ ∉ I_{Ḡ}(θ̄)`: `C_{H̄}(w̄) = 1`, abelian Brauer, `θ̄ ≠ triv`.
+    have hwbar_mem : mkM (w : ↥L) ∈ hyp.W1.map mkM :=
+      Subgroup.mem_map.mpr ⟨w, w.property, rfl⟩
+    have hwbar_ne : mkM (w : ↥L) ≠ 1 := by
+      intro hw1
+      have hwM : (w : ↥L) ∈ M := by
+        rw [hmkM_def, QuotientGroup.mk'_apply] at hw1
+        exact (QuotientGroup.eq_one_iff _).mp hw1
+      exact hwne (Subgroup.disjoint_def.mp hyp.split.disjoint (hNK (hM_def ▸ hwM)) w.property)
+    have hfree : Subgroup.centralizer ({mkM (w : ↥L)} : Set (↥L ⧸ M)) ⊓ Hbar = ⊥ :=
+      hB1 (mkM (w : ↥L)) hwbar_mem hwbar_ne
+    have hclass : Nat.card (Function.fixedPoints
+        (ConjClasses.conjByPerm (G := ↥L ⧸ M) (H := Hbar) (mkM (w : ↥L)))) = 1 :=
+      card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot
+        (mkM (w : ↥L)) hHbar_comm hfree
+    exact not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one
+      (G := ↥L ⧸ M) (H := Hbar) (mkM (w : ↥L)) hclass hθbar_ne hwbar
+  · exact ClassFunction.subgroup_le_inertia (θ : ClassFunction ↥H ℂ)
+
+/-- **Peterfalvi (6.8) Y-family irreducibility.**  For a nontrivial degree-one (linear) source
+character `θ` of `H`, the induced character `Ind_H^L θ` is irreducible.  Inertia `I_L(θ) = H`
+(free action of `W₁`) is discharged via the (6.8)(c) disjunction and fed to [Is] Thm 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`):
+
+* **(c1)** `L` Frobenius with kernel `H`: `isIrreducibleCharacter_induce_of_frobeniusGroup`
+  (needs only `θ ≠ 1`; degree-one not used).
+* **(c2)** Hyp (4.6): the inertia bridge `inertia_eq_H_of_c2` from
+  `CertainTypeHypothesis.centralizer_W2` + Hall coprimality + Isaacs 3.28 on `H/H'` (T6 §5). -/
+theorem isIrreducibleCharacter_induce_of_degree_one (hyp : SibleyDadeHypothesis G L H)
+    {θ : IrreducibleCharacter ↥H}
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
+    (hθ_ne : θ ≠ trivialIrreducibleCharacter ↥H) :
+    IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rcases hyp.cases with hF | ⟨cert, _hdade, hK, hW1, _hprime, hW2, hcop⟩
+  · exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
+  · -- (c2) inertia bridge: `I_L(θ) = H` via the abelian quotient `H/⁅H,H⁆` (Brauer + Isaacs 3.28).
+    exact isIrreducibleCharacter_induce_of_inertia_eq θ
+      (hyp.inertia_eq_H_of_c2 cert hK hW1 hW2 hcop hθ_one hθ_ne)
+
+/-- **(6.8) `Y = S(H')` coherence (engine call from a constructed family).**  Given a family of
+nontrivial linear source characters `χ_j : H →* ℂˣ` indexed by `Fin n` (`n ≥ 2`), pairwise
+non-`L`-conjugate, with each `Ind_H^L (linear χ_j)` irreducible (`hirr`), the induced family
+`Y = {Ind_H^L (linear χ_j)}` is coherent for Sibley's Dade map `tau`.
+
+This is the (6.8) `Y`-step: the `χ_j` are the `Irr(H/H') ∖ {1}` orbit representatives (degree one,
+so each `Ind` has the common degree `|W₁|`).  `hirr` and the pairwise non-conjugacy come from the
+free `W₁`-action (`isIrreducibleCharacter_induce_of_degree_one`).  Injectivity of
+`j ↦ Ind_H^L (linear χ_j)` is the cross-Mackey orthogonality `inner_induce_eq_zero_of_not_conj`;
+the equal-degree coherence is then `coherentInducedDegreeOneFamily`. -/
+noncomputable def coherentYFamily (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ} [NeZero n]
+    (hn : 2 ≤ n) (χ : Fin n → (↥H →* ℂˣ))
+    (hpairwise : ∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+      IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+        linearIrreducibleCharacter (χ j))
+    (hirr : ∀ j, IsIrreducibleCharacter
+      (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (Set.range (fun j => ClassFunction.induce H
+        (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hηinj : Function.Injective
+      (fun j => (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+        hirr j⟩ : IrreducibleCharacter ↥L)) := by
+    intro i j hij
+    by_contra hne
+    have h0 := inner_induce_eq_zero_of_not_conj
+      (linearIrreducibleCharacter (χ i)) (linearIrreducibleCharacter (χ j))
+      (fun g => hpairwise i j hne g)
+    have hcoe : ClassFunction.induce H (linearIrreducibleCharacter (χ i) : ClassFunction ↥H ℂ) =
+        ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ) :=
+      congrArg Subtype.val hij
+    rw [hcoe] at h0
+    have h1 : ClassFunction.inner
+        (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)) = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite
+        (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+          hirr j⟩ : IrreducibleCharacter ↥L)
+        (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ), hirr j⟩)
+    rw [h1] at h0
+    exact one_ne_zero h0
+  exact coherentInducedDegreeOneFamily hyp hn
+    (fun j => linearIrreducibleCharacter (χ j))
+    (fun j => ⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+      hirr j⟩)
+    (fun _ => rfl) hηinj (fun j => linearIrreducibleCharacter_apply_one (χ j))
 
 end SibleyDadeHypothesis
 

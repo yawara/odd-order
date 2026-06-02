@@ -385,4 +385,35 @@ theorem sumNonInflatedDegreeSq_eq_index_mul (K : Subgroup G) (hNK : N ≤ K) :
 
 end Inflation
 
+/-- **Inflation along an arbitrary surjective homomorphism.**  If `f : H →* G` is surjective and
+`χ` is an irreducible character of `H` whose character kernel contains `ker f`, then `χ` factors
+through `f`: there is an irreducible character `χbar` of `G` with `χ = χbar ∘ f`
+(`compHom f χbar = χ`).
+
+This generalizes `exists_inflate_eq_of_subset_characterKernel` (the case `f = mk' N`) to any
+surjective `f`, by factoring `f = (quotientKerEquivOfSurjective f) ∘ mk' (ker f)` and transporting
+the `mk'`-inflation `θ̄₀ : Irr(H ⧸ ker f)` across the iso `H ⧸ ker f ≃* G`.  It is the form needed
+in Peterfalvi (6.8)(c2), where `f` is the subgroup corestriction `↥H →* ↥(H/⁅H,H⁆)`. -/
+theorem exists_compHom_eq_of_subset_characterKernel {H G : Type*} [Group H] [Group G] [Finite H]
+    {f : H →* G} (hf : Function.Surjective f) (χ : IrreducibleCharacter H)
+    (hker : (f.ker : Set H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction H ℂ)) :
+    ∃ χbar : IrreducibleCharacter G,
+      ClassFunction.compHom f (χbar : ClassFunction G ℂ) = (χ : ClassFunction H ℂ) := by
+  -- Inflate from the kernel quotient, then transport along `e : H ⧸ ker f ≃* G`.
+  obtain ⟨θ0, hθ0⟩ := exists_inflate_eq_of_subset_characterKernel f.ker χ hker
+  set e : (H ⧸ f.ker) ≃* G := QuotientGroup.quotientKerEquivOfSurjective f hf with he_def
+  refine ⟨⟨ClassFunction.compHom e.symm.toMonoidHom (θ0 : ClassFunction (H ⧸ f.ker) ℂ),
+    IsIrreducibleCharacter.compHom_of_surjective e.symm.surjective θ0.isIrreducible⟩, ?_⟩
+  -- `e ∘ mk' (ker f) = f`, hence `e.symm ∘ f = mk' (ker f)`.
+  have he_fe : ∀ x : H, e (QuotientGroup.mk' f.ker x) = f x := fun x => by
+    rw [he_def, QuotientGroup.mk'_apply]; exact QuotientGroup.kerLift_mk _ x
+  have he_comp : e.symm.toMonoidHom.comp f = QuotientGroup.mk' f.ker := by
+    apply MonoidHom.ext; intro x
+    show e.symm (f x) = QuotientGroup.mk' f.ker x
+    rw [← he_fe x, MulEquiv.symm_apply_apply]
+  show ClassFunction.compHom f
+    (ClassFunction.compHom e.symm.toMonoidHom (θ0 : ClassFunction (H ⧸ f.ker) ℂ)) =
+      (χ : ClassFunction H ℂ)
+  rw [ClassFunction.compHom_comp, he_comp, ← inflate_coe f.ker θ0, hθ0]
+
 end OddOrder.RepresentationTheory

@@ -126,6 +126,41 @@ theorem card_mul_inner_self_induce (θ : ClassFunction ↥H ℂ) :
     rw [inner_smul_right, star_natCast, ← inner_induce_eq_inner_restrict]
   rw [← key, card_smul_restrict_induce, inner_sum_right]
 
+/-- **Cross inner product of two induced characters via the Mackey sum** (any class functions).
+
+`|H| · ⟨Ind_H^G θ, Ind_H^G ψ⟩ = ∑_{x ∈ G} ⟨θ, ψ^{x⁻¹}⟩`.  The two-argument generalization of
+`card_mul_inner_self_induce`; the proof is identical, using Frobenius reciprocity
+(`inner_induce_eq_inner_restrict`, general in the right argument) and the Mackey restriction
+formula `card_smul_restrict_induce` applied to `ψ`. -/
+theorem card_mul_inner_induce (θ ψ : ClassFunction ↥H ℂ) :
+    (Nat.card H : ℂ) *
+        ClassFunction.inner (induce H θ) (induce H ψ) =
+      ∑ x : G, ClassFunction.inner θ (conjBy x⁻¹ ψ) := by
+  have key : ClassFunction.inner θ ((Nat.card H : ℂ) • restrict H (induce H ψ))
+      = (Nat.card H : ℂ) * ClassFunction.inner (induce H θ) (induce H ψ) := by
+    rw [inner_smul_right, star_natCast, ← inner_induce_eq_inner_restrict]
+  rw [← key, card_smul_restrict_induce, inner_sum_right]
+
+/-- **Induced characters from non-conjugate irreducibles are orthogonal.**
+
+If no `G`-conjugate of `θ` equals `ψ` (the two irreducibles of `H` lie in distinct `G`-orbits),
+then `⟨Ind_H^G θ, Ind_H^G ψ⟩ = 0`.  Each Mackey summand `⟨θ, ψ^{x⁻¹}⟩` is an orthonormality
+indicator (`irreducibleCharacter_inner_eq_ite`) that vanishes because `θ = ψ^{x⁻¹}` would give
+`θ^x = ψ` (`conjBy_conjBy_inv`), contradicting the non-conjugacy hypothesis.  Used to prove the
+`Y = S(H')` family `j ↦ Ind_H^L θ_j` injective. -/
+theorem inner_induce_eq_zero_of_not_conj (θ ψ : IrreducibleCharacter H)
+    (h : ∀ g : G, IrreducibleCharacter.conjBy g θ ≠ ψ) :
+    ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+      (induce H (ψ : ClassFunction ↥H ℂ)) = 0 := by
+  classical
+  have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  apply mul_left_cancel₀ hcardH
+  rw [mul_zero, card_mul_inner_induce]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite, if_neg]
+  intro hθ
+  exact h x (by rw [hθ]; simp)
+
 /-- **Norm of an induced irreducible character** ([Is] Thm 6.34, norm part).
 
 For an irreducible character `θ` of `H ⊴ G`, `|H| · ‖Ind_H^G θ‖² = |I_G(θ)|`, equivalently

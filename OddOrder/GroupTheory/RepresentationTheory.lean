@@ -27,5 +27,6 @@ import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
