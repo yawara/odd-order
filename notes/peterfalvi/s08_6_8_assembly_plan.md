@@ -323,3 +323,81 @@ cyclic **Hall** subgroup」= `|W₁|` と `[L:W₁]=|H|` が互いに素、と�
 **新規 generic 補題 (再利用可能)**: ClassFunction.compHom_comp; LinearCharacter の 3 補題;
 InflationCharacter.exists_compHom_eq_of_subset_characterKernel; ConjugationBrauer の abelian-bridge +
 transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
+
+## F. T7 (X 特徴付け) 詳細設計 (2026-06-03, 2 並列 Plan agent + mmd L136-244 / (4.5)@04.6 照合)
+
+**(6.8) 全体構造 (mmd L150-244)**: `S coherent` を**背理法**で示す。(6.5) で「H 非可換 p-群」に還元
+(d_i∈ℕ=p冪, Z(H)∩H'≠1)。**重要 (anti-scaffold)**: p-群は `SibleyDadeHypothesis` の field に**しない**
+((6.8) statement は H nilpotent のみ仮定; field 化は over-constrain で §9 caller が使えない)。代わりに
+`sibleySetup_is_coherent` を `by_contra hnc` で開き、`peterfalvi_65_reduction hyp hnc` で p-群構造を
+**背理法分岐内の局所仮説**として得る (peterfalvi_65_reduction は別 ~200-300 LOC task=T9/T11 圏、T7 外)。
+
+**定義** (S08 `namespace SibleyDadeHypothesis` に直接 def; `FiltrationData`@S08:42 は dead legacy で不使用・将来削除):
+- `SsubFiltration hyp (A:Subgroup ↥L) := {Ind_H^L θ | θ≠1, A.subgroupOf H ⊆ ker θ}` (= (6.1) S(A))
+- `Z : Subgroup ↥L` — case A `(center ↥H).map H.subtype ⊓ ⁅H,H⁆` / case B `cert.W2`。`Z⊆H'` (caseA=inf_le_right / caseB=hW2), `Z⊆Z(H)` (caseA=inf_le_left / caseB=要 W₂⊆Z(H)=case B 定義), `Z≠⊥` (caseA=p-群還元由来=分岐内, caseB=cert.W2_nontrivial)
+- `SsubZ hyp Z := SsubFiltration hyp Z`; `Xset hyp Z := hyp.S \ hyp.SsubZ Z`; `Y = SsubFiltration hyp ⁅H,H⁆`
+- 推奨: `SibleyCaseAB` inductive (caseA/caseB, 各 branch が Z の 3 事実を供給)
+
+**T7-c1 (Frobenius): 機械的・sorry-free, ~255 LOC**。S03 に既 landed の atoms で組める:
+`not_subsetCharacterKernel_of_not_induce`(S03:589, (1.6.a) 逆)/`subsetCharacterKernel_induce_of_subgroupOf`
+(S03:563)/`exists_inner_induce_ne_zero`(S03:636)/`irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`
+(S03:696, (6.6) G2.2 keystone)。`S⊆Irr L` は `isIrreducibleCharacter_induce_of_frobeniusGroup` (任意非自明θ)。
+`X={χ∈Irr L|Z⊄ker χ}` は `S⊆Irr L` + 1.6.a bridge。`Xset⊆Irr L`=`diff_subset`。
+
+**T7-c2 = `X⊆Irr L` (= 「θ≠1, Z⊄ker θ ⟹ inertia(θ)=H」+ 6.34) — 設計確定 (2026-06-03 brick② focused 設計で大幅訂正・縮小)**:
+- **🔴 重大訂正 1: `X⊆Irr L` は case A 限定**。**case B は X⊆Irr L を必要としない**: mmd (6.8.2) L178-256 は
+  可約 χ=Ind_H^L θ (Z⊄ker θ) を**許し**、(6.8.2.1/2/3) の isometry 拡張 (τ₂, η₁^τ₂=Y) で coherence を出す。
+  ⟹ case B は **T10** (前提 T3/T4/T5 全 landed)。T7-c2 は **case A の X⊆Irr L のみ**にスコープ。
+- **🔴 重大訂正 2: counting route (旧 ②a-d) は dead end**。②c (`#fixed classes H = #fixed classes H/Z`) は
+  ConjClasses 対応として偽 (inj/surj 両方失敗; lift は Glauberman-Isaacs 類対応=未 landed・重い) で、真値は
+  µ_ij 由来。**旧記載の「brick 2 つ / ~400-500 LOC」は撤回**。
+- **✅ case A の clean 直接証明 (~95-115 LOC, sorry-free, 残不確実性ゼロ)**: case A 定義 `Z(H)∩W₂=1` ⟹
+  `C_Z(w)=Z∩C_H(w)=Z∩W₂=1` ⟹ **w は Z 上 FPF** (mmd (6.8.3) L256 と一致)。θ が w-fixed なら [Is]2.27
+  (`exists_central_linear_restriction`, Z≤Z(H)) の中心線形指標 φ が w-不変 → **新補題**
+  `map_eq_one_of_fixedPointFree_invariant` (mathlib `MonoidHom.FixedPointFree.commutatorMap_surjective`,
+  `a=b/fb` + 不変性 ⟹ φa=φb/φ(fb)=1, ~10 LOC) で φ=1 ⟹ Z⊆ker θ = **brick② (case A)**。
+  wrapper `inertia_eq_H_of_c2_caseA` は T6 の le_antisymm/complement-split (S08:466-487) を**流用** (linearity 不使用) +
+  `isIrreducibleCharacter_induce_of_inertia_eq` (6.34, 一般 θ)。**case-B は brick② 偽ゆえ touch しない**。
+  - 新規: `map_eq_one_of_fixedPointFree_invariant` (~10) + `subset_characterKernel_of_inertia_caseA` (~55-75, FPF-equiv 構成が主) + wrapper (~30, 流用)。landed: 2.27 / FixedPointFree / 6.34 / S06 centralizer_W2。
+- 要 (1.6.a) `A⊆ker θ ⟺ A⊆ker Ind θ` (case A の特徴付け, ~50 LOC, 未形式化だが小)。
+- **case A の Z≠⊥ は p-群還元由来 (背理法分岐内)**; case-split `Z(H)∩W₂=1` は branch 仮説。
+
+**T7→T8 (6.6) engine interface**: `peterfalvi_66_coherence_of_X_from_dade`(S07:5249) + `DadeChainStep`(S07:5065)
++ `coherentEqualDegree_fromDade`(S07:4842) + `exists_monotoneDegreeEnum`(S07:3661)。T7 が供給するのは
+`Xset hyp Z`:Set + `Xset⊆Irr L` + `Xset={χ∈Irr L|Z⊄ker χ}`。degree-sum collapse (mmd L234) が hdeg_c に効く。
+**⚠️ T8 境界 gap (T7 外だが要注意)**:
+- **G1**: `DadeChainStep.hχsupp`(S07:5076) が**個別** `χ_i.support⊆H^#` 要求 — だが Ind θ_i は 1 で非零。
+  Y-family は `coherentEqualDegree_fromDade` の差分 support 弱化 (S07:4713) で回避したが、`peterfalvi_66`/`DadeChainStep`
+  は未弱化。`retarget_isCoherent_fromDade` の実 support 使用を読んで確認要 (差分のみ使うなら同様弱化で解決)。
+- **G2**: `DadeChainStep.Dmem` per-member ψ=0 分解が T8 主負荷 (~300-450 LOC の大半)。
+
+**T7 実装順 (c1-first)**: defs (Z/X/S(Z)/SibleyCaseAB ~95) → c1 特徴付け (S⊆Irr L / Xset_eq / Xset⊆Irr L ~100)
+→ engine seam (~40) で **c1 build-green**。c2 は brick①②を後追い (~400-500, brick② 高リスク)。
+
+## G. 🔴 方針監査結果 (2026-06-03, 4 並列 adversarial agent + 全 BLOCKER を自己再検証)
+
+エラー頻度上昇を受けた全 spine 監査。**load-bearing な主張は grep/read で独立検証済**。
+
+### BLOCKER (検証済・要対処)
+- **(A) engine support-interface bug** [Agent 2+3 独立確認, 自己検証済]: `DadeChainStep.hχsupp`(S07:5076)/`retarget_isCoherent_fromDade`/`dadeOrthonormalCharacterImageFamily`(S07:4410) が **個別** `χ.support ⊆ supportInSubgroup A L` を要求。だが `A=sharpImage H` は 1 を除外、`χ=Ind_H^L θ` は χ(1)=|W₁|θ(1)≠0 ⟹ **X-member で偽=充足不能**。⟹ `peterfalvi_66_coherence_of_X_from_dade`(S07:5249) は実 X-family で **instantiate 不能 = T8 を塞ぐ**。抽象版 `peterfalvi_66_coherence_of_X`(S07:3934) は support field なしで健全。**内部は差分しか使わない**(両 agent が trace) ⟹ 修正 = Y-family が受けた差分 support 弱化 (`coherentEqualDegree_fromDade` S07:4842) を `DadeChainStep`/`retarget_isCoherent_fromDade`/`dadeOrthonormalCharacterImageFamily`/`dadeIntegralCharacterMap_inner_eq_on_supported_span`(S07:4326) に伝播。**T8 の前提タスク**(frozen-ish file の engine surgery、per-task LOC 見積りに未計上)。
+- **(B) Track A/B 断絶 + 「実 sorry 2」の framing 誤り** [Agent 4, 自己検証済]: `card_G0_lower_bound`/`sibleySetup_is_coherent`/`IndChainDecomposition`/`FrobeniusFamily` は **defining file 外で消費者 0**。S09 は S08 シンボル不使用 ((6.8)→(7.10) は TODO コメントのみ)。`feitThompson`(FeitThompson.lean:21) は **body なし裸 sorry** (minimal-counterexample 還元 欠落)。実 FeitThompson 経路 = **Track B: BG.IsMinimalSimpleOdd + S16.Hypothesis → BG.AppC.final_contradiction**。「実 sorry 2 (0046/0044)」は **AxiomsCheck-guard 島のみ**の指標で、FeitThompson 推移閉包は ~144 sorry + opaque-Prop placeholder 多数 (vacuity risk は proof-fill 時、現状 consumer も sorry ゆえ benign)。**(6.8)/(7.10) は genuine な Peterfalvi 結果だが orphaned** — §10-16 が hoist しており、wiring は未構築の大タスク。**axiom-laundering / 循環は発見されず** (scaffold は honest)。
+
+### STRATEGIC (検証要/対処要)
+- **B4 m≥2 未解決** [Agent 3]: Y coherence ((1.4)) は n≥2 必須。plan §E は「caller 供給 (6.5 背理法由来)」とするが**導出が示されていない**。m=(|H/H'|−1)/|W₁|; (6.5) で H/H' は chief factor ⟹ W₁ が Irr(H/H')∖{1} に推移的なら m=1 で Y 非 coherent。要 Peterfalvi-level 解決 (odd-order FPF 境界 |H/H'|−1≥2|W₁| 等)。
+- **Finding 1 H-Sylow** [Agent 1]: (6.7)=`peterfalvi_67_of_odd` は P Sylow 前提。(6.8) は P=H で適用 (mod |H|) ⟹ 「H^# TI p-群 ⟹ H∈Sylow」を T9/T10 が (6.5) 還元 context から放電要 (carrier にない)。
+- **B1 (5.6) 反転欠落** [Agent 3]: (6.8.3) は (5.6) を**対偶**で使う (非 coherent ⟹ 次数和下界) が、engine は forward (`retarget_isCoherent` S07:2835) のみ。IsCoherent は Type なので `¬Nonempty(IsCoherent …)` の Prop-対偶 wrapper を書く要。T11 を塞ぐ (plan は「既landed」と誤記)。
+- **B2 X-side degree-sum bridge 欠落** [Agent 3]: landed `sumNonInflatedDegreeSq_eq_index_mul`(InflationCharacter:374) は **Irr-L 側**和。(6.8.3) は **X 側** `Σχ(1)²/‖χ‖²` (case B で X は可約!) を扱う。bridge=(1.5.c,d) 共役崩壊は未 landed。T11 で要 (case A は両者一致ゆえ landed で足りるが case B は不足)。
+- **Finding 3 / 「(4.2)-core で c2 足りる」未証明** [Agent 1]: plan の主張は (4.5) counting 経由なら (4.6)(b)(c)(d) 要。**ただし brick② の直接 FPF-on-Z 設計 (§F 訂正) が (4.5) を sidestep するので case A では moot** — brick② が正しく landed すれば Finding 3 は解消。
+- **M1 (6.5) reduction は DAG node 欠落** [Agent 3]: (6.5)⟸(6.3)⟸(6.2)⟸(5.6)+(1.5) の深い依存、~200-300 LOC、T9/T10/T11 を塞ぐ。B1/B2 の機構を共有。
+- **Finding 2 W-cyclic 欠落** [Agent 1, MINOR]: `CertainTypeHypothesis` に (4.2.c) W cyclic がない (消費者 0 で latent、(4.3)/(4.5) 構築時に必要)。
+- **M2 I_L(φ)=L trap** [Agent 3, MINOR]: (6.8.2.2) は `[I_L(φ):Z] ≤ [L:Z]` 不等式形で足りる、=L を証明しようとすると hard/偽。T10 implementer 向け注意。
+
+### VERIFIED-OK (健全確認 — 安心材料)
+- **case-A-only X⊆Irr L** (V1): §F の訂正 (case B は X⊆Irr L 不要、reducible 許容) は mmd L160/L210 と一致・正しい。
+- **tau = dadeIntegralCharacterMap は faithful な Dade map** (legacy global-isometry bug は解消済); IsCoherent core は (5.1) lattice-relative で faithful。
+- **T4 (1.9)+(5.9.a) / T5 [Is]2.27 / T0 Cor2.30 健全** (axiom-clean 確認); 「wild-σ / star-commute 不要」は over-claim でない。
+- **IndChainDecomposition + ofIsCoherent は faithful・proven** (orphaned だが正しい); (7.7.a)/(7.8)/(7.9) は honest 証明書 scaffold (laundering なし)。
+- **brick② (T7-c2 case A) 設計は Finding 3 を sidestep** — (4.5)/(4.6)bcd 不要の直接 FPF route。
+
+### 戦略的含意
+本作業 (T6 完成, T7 設計) は **genuine な Peterfalvi 形式化**だが、現状 FeitThompson の実 critical path (Track B) には未配線。優先順位 = {(A)engine 修正して (6.8) 続行 / Track B (BG§7-16+S16/AppC+top-level 還元) に pivot / roadmap 全体を訂正版で再計画} の判断が必要。
