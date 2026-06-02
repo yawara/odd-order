@@ -2376,6 +2376,61 @@ theorem normEstimates_of_source_orthogonal
     (H78.gammaNormSq_eq_of_source_orthogonal hBD hsrc
       horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
 
+/-- Textbook `u,v,w` form of the `(ζ^ν)^ρ` norm rewrites to the internal
+`normQuadraticCorrection + (1 - e / h)` form.
+
+This is the arithmetic bridge from the (7.7.b) double-sum evaluation in
+Peterfalvi (7.8.b), where
+`u = (1/e)(1 - 1/h)`, `v = 1/h`, and `w = 1 - e/h`. -/
+theorem zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) := by
+  rw [hzeta, normQuadraticCorrection]
+
+/-- Source-side beta norm data plus the textbook `u,v,w` formula package
+Peterfalvi (7.8.b)'s `NormEstimates`.
+
+The remaining character-theoretic input is now exactly the (7.7.b) evaluation
+of `‖(ζ^ν)^ρ‖²` in `u,v,w` form; this theorem performs the API conversion and
+reuses the already proved source-side `Γ` norm formula. -/
+theorem normEstimates_of_source_orthogonal_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_source_orthogonal hBD hsrc
+    horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr
+    (H78.zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula hBD hzeta_uv)
+
 /-- Version of `normEstimates_of_source_orthogonal` using the natural source
 hypotheses that the `S`-family consists of distinct irreducible characters. -/
 theorem normEstimates_of_irreducible_source_data
@@ -2403,6 +2458,80 @@ theorem normEstimates_of_irreducible_source_data
     (H78.sourceZeta_orthogonal_of_irreducible_distinct hirr hdistinct)
     (H78.sourceZeta_norm_ne_of_irreducible hirr)
     hzeta_degree hdegree_sum (hirr H78.zetaDistinct hzeta_mem) hzeta
+
+/-- Source irreducibility data plus the textbook `u,v,w` formula give
+Peterfalvi (7.8.b)'s `NormEstimates`.
+
+This is the natural source-data version of
+`normEstimates_of_source_orthogonal_and_uv_formula`: it converts the `u,v,w`
+formula to the internal quadratic-correction API and derives the source
+orthogonality matrix from irreducibility and distinctness. -/
+theorem normEstimates_of_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_irreducible_source_data hBD hsrc hirr hdistinct
+    hzeta_degree hdegree_sum
+    (H78.zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula hBD hzeta_uv)
+
+/-- Source inner-product values, source irreducibility data, and the textbook
+`u,v,w` formula give Peterfalvi (7.8.b)'s `NormEstimates`.
+
+This removes the standalone `SourceDiffNormEvaluation` premise by using the
+already isolated source computation
+`‖Ind 1_H - ζ‖² = e + 1` from the three source-side inputs
+`⟨Ind1H,Ind1H⟩ = e`, `⟨ζ,Ind1H⟩ = 0`, and irreducibility of `ζ`. -/
+theorem normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD := by
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  exact H78.normEstimates_of_irreducible_source_data_and_uv_formula hBD
+    (H78.sourceDiffNormEvaluation_of_zeta_ind_orthogonal_of_zeta_irreducible
+      hind_norm hzeta_ind (hirr H78.zetaDistinct hzeta_mem))
+    hirr hdistinct hzeta_degree hdegree_sum hzeta_uv
 
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
@@ -4007,6 +4136,38 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finit
   Bsum_le := hBsum
   base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
 
+/-- Constructor form of `CharacterEstimateData` from the real reduced family
+inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
+
+This combines the two final-assembly bridges: the norm bound on `Γ` gives the
+`Bsum_le` field through `Bsum_le_of_orthogonal_integer_decomposition`, while the
+real reduced family inequality supplies the `base_estimate` field. -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality hmin B hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]
@@ -4042,6 +4203,42 @@ lemma lowerBoundTerm_of_real_Bsum_bound [Finite G]
           2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
   exact F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum
     (F.base_estimate_of_real_reduced_family_inequality i B hred)
+
+/-- Direct displayed-bound form from the real reduced family inequality and the
+orthogonal integer decomposition controlling the `𝓑`-sum.
+
+This is the non-existential consumer for the final (7.10) assembly after the
+character theory has supplied the chosen minimal index, `𝓑`, the integer
+coefficients, and the norm bound on `Γ`. -/
+lemma lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) :=
+  F.lowerBoundTerm_of_real_Bsum_bound hodd hmin B hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hred
 
 /-- Existential real-valued wrapper for the final assembly step of Peterfalvi
 (7.10).  The input shape matches the real reduced estimate before converting to
