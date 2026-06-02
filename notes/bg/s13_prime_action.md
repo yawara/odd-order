@@ -1,5 +1,17 @@
 # BG §13: Prime Action — per-section 調査ノート
 
+## 2026-06-02 B7 foundation checkpoint
+
+Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeAction.lean`.
+
+Concrete surfaces now present:
+- Definitions: `fixedBy` (`C_N(X)`), `fixedByElement` (`C_N(g)`), `ActsPrimeOn`, and `ActsRegularlyOn`.
+- Basic API: definitional rewrites for the centralizer predicates, `fixedBy_le_fixedByElement`, `ActsRegularlyOn.toActsPrimeOn`, monotonicity in the acted-on subgroup for both regular and prime action, and bottom-subgroup constructors.
+
+Current Lean inventory: 11 theorem-level `sorry`s remain in §13. The two action predicates and their basic API are sorry-free.
+
+Main proof blockers: BG Lemma 10.8, Corollary 12.16(a), Lemma 12.18/12.19, §10 beta-complement/normalizer gates, and the remaining §12 tau/E structural results. These remain explicit theorem dependencies rather than fields on `ActsPrimeOn`.
+
 **スコープ**: BG §13 (pp.97-104 in PDF), mmd L3484-3739, **7 主要結果**.
 **形式化先 (予定)**: `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeAction.lean`
 **ROADMAP 上の位置**: Phase 2a 第 4 波 (§12 完成必須)

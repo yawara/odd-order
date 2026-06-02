@@ -1,5 +1,18 @@
 # BG §11: Exceptional Maximal Subgroups — mini-roadmap
 
+## 2026-06-02 B7 foundation checkpoint
+
+Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S11_ExceptionalMaximal.lean`.
+
+Concrete surfaces now present:
+- `Hypothesis111` records the literal BG Hypothesis 11.1 data plus the Lemma 10.5-derived `A`/`P` choices, without hiding theorem conclusions as fields.
+- `IsAInvSylowIn` gives the ambient API for `A`-invariant Sylow subgroups used by Lemma 11.1; both it and `Hypothesis111` now have small projection lemmas for downstream proofs.
+- Lemma 11.1 (`invariant_sylow_disjoint`) and Corollary 11.2 (`Msigma_meet_conjugate`) have substantial concrete proof bodies; the remaining named endpoints are still theorem gates.
+
+Current Lean inventory: 5 theorem-level `sorry`s remain in §11.
+
+Main proof blockers: BG Theorem 3.7, Proposition 1.16, Lemma 10.12, Lemma 10.13, Proposition 10.10/10.11, and the §7 transitivity/§10 fusion-control gates already exposed upstream.
+
 **スコープ**: BG §11 (pp.80-82 in BG PDF), mmd L2913-3022, **4 結果**.  
 **形式化先 (予定)**: `OddOrder/BG/Ch3_MaximalSubgroups/S11_ExceptionalMaximal.lean`  
 **ROADMAP 上の位置**: Phase 2a 第 4 波（§10 完成必須）  

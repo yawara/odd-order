@@ -1,5 +1,17 @@
 # BG §10: The Subgroups M_α and M_σ — mini-roadmap
 
+## 2026-06-02 B7 foundation checkpoint
+
+Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean`.
+
+Concrete surfaces now present:
+- Definitions: `idealPrime`, `alpha`, `beta`, `sigma`, `Malpha`, `Mbeta`, `Msigma`, `Fsigma`, `Fsigma'`, `elemAbelianOfRankIn`, `omega1CenterInG`.
+- Basic API: membership rewrites for `idealPrime`/`alpha`/`beta`/`sigma`, subset lemmas `alpha_subset_primeFactors`, `beta_subset_alpha`, `beta_subset_primeFactors`, ambient containment lemmas for `Malpha`/`Mbeta`/`Msigma`/`Fsigma`/`Fsigma'`, `subgroupOf` identities for the three `M_*` radicals, `Malpha_isPiGroup`/`Mbeta_isPiGroup`/`Msigma_isPiGroup`, and `elemAbelianOfRankIn`/`omega1CenterInG` projection lemmas.
+
+Current Lean inventory: 17 theorem-level `sorry`s remain in §10. These are not definitional blockers; they are BG hard results or downstream-facing theorem surfaces.
+
+Main proof blockers: §7 Thompson transitivity/§9 uniqueness, BG §4 rank and cyclic p-group results, §5 narrow p-group gates, and the full local-analysis proofs of BG 10.1--10.14. Do not turn these into fields of a setup structure.
+
 **スコープ**: BG §10 (pp.69-79 in PDF), mmd L2637-2912. 6 結果を扱う.
 **形式化先 (予定)**: `OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean`
 **ROADMAP 上の位置**: Phase 2a 第 4 波（§9 完成必須）
