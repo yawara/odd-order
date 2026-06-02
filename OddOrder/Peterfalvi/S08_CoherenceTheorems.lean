@@ -304,6 +304,46 @@ theorem inner_chi_eq_ite
     rw [if_pos rfl, data.norm_one]
   · rw [if_neg htu, data.pairwise_inner_zero htu]
 
+/-- The weighted output sum `∑ d_t χ_t` used in Peterfalvi (7.10). -/
+noncomputable def weightedOutput
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) : ClassFunction G ℂ :=
+  ∑ t : Fin n, (d t : ℂ) • data.χ t
+
+/-- Coefficient recovery for the weighted output sum. -/
+theorem inner_chi_weightedOutput
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) (t : Fin n) :
+    ClassFunction.inner (data.χ t) data.weightedOutput = (d t : ℂ) := by
+  classical
+  rw [weightedOutput, inner_sum_right]
+  have hsum :
+      (∑ u : Fin n, ClassFunction.inner (data.χ t) ((d u : ℂ) • data.χ u)) =
+        ∑ u : Fin n, (if u = t then (d u : ℂ) else 0) := by
+    refine Finset.sum_congr rfl fun u _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_smul_right, data.inner_chi_eq_ite t u, star_intCast]
+    by_cases hut : u = t
+    · subst u
+      rw [if_pos rfl, if_pos rfl, mul_one]
+    · rw [if_neg (Ne.symm hut), if_neg hut, mul_zero]
+  rw [hsum, Finset.sum_ite_eq' (Finset.univ : Finset (Fin n)) t]
+  simp
+
+/-- Parseval for the weighted output: `‖∑ d_tχ_t‖² = ∑ d_t²`. -/
+theorem weightedOutput_inner_self_eq_sum_sq
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    ClassFunction.inner data.weightedOutput data.weightedOutput =
+      ∑ t : Fin n, (d t : ℂ) ^ 2 := by
+  classical
+  rw [weightedOutput, inner_sum_left]
+  refine Finset.sum_congr rfl fun t _ => ?_
+  rw [ClassFunction.inner_smul_left]
+  have hinner := data.inner_chi_weightedOutput t
+  rw [weightedOutput] at hinner
+  rw [hinner]
+  ring
+
 /-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
 together with the membership `ζ_t ∈ S`, the orthonormality of the input family `ζ`,
 and the support of each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`.
