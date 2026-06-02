@@ -3984,6 +3984,29 @@ noncomputable def characterEstimateData_of_reduced_family_inequality [Finite G]
   Bsum_le := hBsum
   base_estimate := F.base_estimate_of_reduced_family_inequality i B hred
 
+/-- Real-valued constructor form of `CharacterEstimateData` from the reduced
+family inequality and the separately proved `𝓑`-sum bound.  This is the direct
+interface for the estimates produced by Peterfalvi (7.5), (7.8.b), and (7.9). -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finite G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]
