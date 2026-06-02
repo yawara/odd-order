@@ -4021,6 +4021,52 @@ lemma lowerBoundTerm_of_characterEstimateData [Finite G]
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
+/-- Real-valued form of `lowerBoundTerm_of_Bsum_bound`, matching the reduced
+inequality produced before Peterfalvi's final rational display. -/
+lemma lowerBoundTerm_of_real_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  exact F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum
+    (F.base_estimate_of_real_reduced_family_inequality i B hred)
+
+/-- Existential real-valued wrapper for the final assembly step of Peterfalvi
+(7.10).  The input shape matches the real reduced estimate before converting to
+the rational displayed lower bound. -/
+lemma exists_lowerBoundTerm_of_exists_real_Bsum_bound [Finite G]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+            (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+            (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+              ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hred⟩
+  exact ⟨i, F.lowerBoundTerm_of_real_Bsum_bound hodd hmin B hB_ne hBsum hred⟩
+
 end FrobeniusFamily
 
 /-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order, there is
