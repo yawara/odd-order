@@ -24,12 +24,15 @@ Prop 1.5(e) commutator containment。
 - [x] BG Prop 1.5(a)-(e) の statement を mmd で再確認する。
 - [x] 既存の `exists_aInvariant_sylow`, `aInvariant_sylow_conj`,
       `aInvariant_pSubgroup_le_aInvariant_sylow`, `coprime_fixedPoints_quotient` との対応を確定する。
-- [ ] Hall π 一般版の existence / containment / conjugacy を実装する。
+- [x] Hall π 一般版の existence / containment / conjugacy を実装する。
   - [x] Prop 1.5(a) existence: `exists_aInvariant_hall`
-  - [ ] Prop 1.5(b) containment: BG induction remains
+  - [x] Prop 1.5(b) containment: `aInvariant_piSubgroup_le_aInvariant_hall`
     - [x] minimal `A`-invariant normal existence / commutative / p-group support
-    - [ ] quotient/comap induction step
-    - [ ] final `H = G` conjugacy step inside `K M`
+    - [x] quotient/comap transfer frame and `H < G` index-transfer support
+    - [x] proper invariant-overgroup lift from recursive Hall result
+    - [x] recursive proper-overgroup branch frame
+    - [x] assemble top-level containment induction
+    - [x] final `H = G` conjugacy step inside `K M`
   - [x] Prop 1.5(c) conjugacy: `aInvariant_hall_conj`
 - [x] Prop 1.5(d) は no-wrapper 方針に従い、必要なら section docstring で直接対応を明示する。
 - [x] Prop 1.5(e) の仮定を精密化し、実装する。
@@ -54,7 +57,20 @@ Prop 1.5(e) commutator containment。
 - Prop 1.5(b) containment induction の support として、最小 `A`-invariant normal subgroup
   の existence、commutativity、p-group 化を private 補題として実装。これで BG proof の
   `M` minimal step と `H = G` 分岐で必要な Sylow-prime 情報の入口が green になった。
-- 残りは Prop 1.5(b) 本体: quotient/comap induction step と `H = G` 分岐の conjugacy inside `K M`。
+- 追加で quotient/comap transfer frame を実装: quotient image の `π`-subgroup 保存、
+  quotient cardinal/coprime transfer、induction が返す quotient Hall の preimage が
+  `A`-invariant かつ `K` を含み π-free index を持つこと、および `H < G` branch で
+  Hall subgroup を ambient group へ戻す index-transfer helper が green。
+- Proper-overgroup branch support も追加: coprimality descends to subgroups, and an
+  invariant Hall subgroup found inside a proper invariant overgroup `H` can be pushed back
+  to `G` while preserving Hall-ness, `A`-invariance, and containment of `K`.
+- Recursive proper-overgroup branch frame を追加し、induction inside `H` が返す
+  `K.subgroupOf H` containment result から ambient Hall overgroup を構成する部分も green。
+- Prop 1.5(b) containment induction を `aInvariant_piSubgroup_le_aInvariant_hall` として実装。
+  Proof は `Nat.card G` induction: quotient induction で得た preimage が proper なら
+  `proper_overgroup_branch_frame` で再帰的に持ち上げ、preimage が `⊤` なら minimal normal
+  `p`-subgroup `M` と invariant Hall `Q` の complement を使い、`K ⊔ M` 内の Hall conjugacy から
+  `K ≤ conj(c) • Q` を得る。
 
 ## 完了条件
 
