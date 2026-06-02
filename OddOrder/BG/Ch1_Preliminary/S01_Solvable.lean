@@ -1663,6 +1663,82 @@ theorem coprime_actsTrivially_of_normal_and_quotient
   have hg_eq : g = c * n⁻¹ := by rw [hc_eq]; group
   rw [hg_eq, map_mul, hc_fix a, map_inv, h_triv_N a n hn_in]
 
+open OddOrder.Isaacs.Ch03 in
+/-- **BG Lemma 1.9 (多段一般形, coprime 核)**: 有限群 `K` に有限群 `A` が
+`ψ : A →* MulAut K` で coprime (`(|A|,|K|)=1`) 作用し, `A` または `K` が可解とする.
+`K` の正規降鎖 `s` (`Antitone`, `s 0 = ⊤`, `s n = ⊥`, 各 `s i ◁ K`, `ψ`-不変) を `A` が
+**stabilize** (各 factor `s i / s (i+1)` 上自明: `∀ x ∈ s i, ∃ y ∈ s (i+1), ψ a x = x * y`)
+するなら, `ψ` は自明 (`∀ a, ψ a = 1`).
+
+BG Lem 1.9 の原 statement「`G` solvable π-群, `A` が normal series を stabilize ⇒
+`A/C_A(G)` は π-群」は, π'-元 `a` に対し `⟨a⟩` を本補題に渡す (coprime 性 = π'-性) ことで
+elementwise に従う (§5 Thm 5.5 がこの形で使用)。AppA (PSTAB) の chain-stabilizer 補題も
+本補題経由 (旧 AppA private から §1 へ昇格, 2026-06-02)。
+
+`coprime_actsTrivially_of_normal_and_quotient` (2-step) を `↥(s i)` 上へ
+`IsAInvariant.restrict` で制限し, 鎖を `m`-bound 付き上向き帰納で下降して `s 0 = ⊤` に到達. -/
+theorem coprime_stabilizes_chain_trivial
+    {K : Type*} [Group K] [Finite K] {A : Type*} [Group A] [Finite A]
+    (ψ : A →* MulAut K) (hcop : (Nat.card A).Coprime (Nat.card K))
+    (hsolv : IsSolvable A ∨ IsSolvable K)
+    (s : ℕ → Subgroup K) (hanti : Antitone s) (hs0 : s 0 = ⊤) {n : ℕ} (hsn : s n = ⊥)
+    (hnorm : ∀ i, (s i).Normal)
+    (hinv : ∀ i, IsAInvariant ψ (s i))
+    (htriv : ∀ i, ∀ a : A, ∀ x ∈ s i, ∃ y ∈ s (i + 1), (ψ a) x = x * y) :
+    ∀ a : A, ψ a = 1 := by
+  -- One step down: trivial on `s (i+1)` ⇒ trivial on `s i` (via the coprime 2-step lemma).
+  have stepdown : ∀ i, (∀ a : A, ∀ x, x ∈ s (i + 1) → (ψ a) x = x) →
+      ∀ a : A, ∀ x, x ∈ s i → (ψ a) x = x := by
+    intro i hIH
+    haveI hN1 : (s (i + 1)).Normal := hnorm (i + 1)
+    have hcopi : (Nat.card A).Coprime (Nat.card ↥(s i)) :=
+      hcop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card (s i))
+    have hsolvi : IsSolvable A ∨ IsSolvable ↥(s i) := by
+      rcases hsolv with h | h
+      · exact Or.inl h
+      · haveI := h; exact Or.inr inferInstance
+    have hInvN : IsAInvariant ((hinv i).restrict) ((s (i + 1)).subgroupOf (s i)) := by
+      rw [isAInvariant_iff_smul_mem]
+      intro a' g hg
+      rw [Subgroup.mem_subgroupOf] at hg ⊢
+      rw [IsAInvariant.restrict_apply_val]
+      exact (hinv (i + 1)).smul_mem a' hg
+    have htrivN : ∀ a' : A, ∀ g ∈ (s (i + 1)).subgroupOf (s i),
+        ((hinv i).restrict a') g = g := by
+      intro a' g hg
+      rw [Subgroup.mem_subgroupOf] at hg
+      exact Subtype.ext (by rw [IsAInvariant.restrict_apply_val]; exact hIH a' g.val hg)
+    have htrivQ : ∀ a' : A, ∀ g : ↥(s i),
+        ∃ y ∈ (s (i + 1)).subgroupOf (s i), ((hinv i).restrict a') g = g * y := by
+      intro a' g
+      obtain ⟨y, hy_mem, hy_eq⟩ := htriv i a' g.val g.property
+      refine ⟨⟨y, hanti (Nat.le_succ i) hy_mem⟩, ?_, ?_⟩
+      · rw [Subgroup.mem_subgroupOf]; exact hy_mem
+      · exact Subtype.ext (by rw [IsAInvariant.restrict_apply_val, Subgroup.coe_mul]; exact hy_eq)
+    have hconc := coprime_actsTrivially_of_normal_and_quotient
+      (φ := (hinv i).restrict) hcopi hsolvi hInvN htrivN htrivQ
+    intro a x hx
+    have h2 := congrArg Subtype.val (hconc a ⟨x, hx⟩)
+    rw [IsAInvariant.restrict_apply_val] at h2
+    exact h2
+  -- `s i = ⊥` for `i ≥ n`, and `stepdown` propagates triviality down to `s 0 = ⊤`.
+  have key : ∀ m i, n ≤ i + m → ∀ a : A, ∀ x, x ∈ s i → (ψ a) x = x := by
+    intro m
+    induction m with
+    | zero =>
+      intro i hi a x hx
+      have hxn : x ∈ s n := hanti (by simpa using hi) hx
+      rw [hsn, Subgroup.mem_bot] at hxn
+      subst hxn
+      exact map_one (ψ a)
+    | succ m ih =>
+      intro i hi a x hx
+      exact stepdown i (ih (i + 1) (by omega)) a x hx
+  intro a
+  refine MulEquiv.ext (fun x => ?_)
+  show (ψ a) x = x
+  exact key n 0 (by omega) a x (by rw [hs0]; exact Subgroup.mem_top x)
+
 open OddOrder.Isaacs.Ch03 (IsAInvariant) in
 /-- 演算子作用 `φ : A →* MulAut G` を `A`-不変部分群 `H` へ制限し `A →* MulAut ↥H` を得る.
 Prop 1.10 等で `A` の作用を `N_G(C)` などの不変部分群上で扱うための橋. -/
