@@ -244,8 +244,11 @@ theorem centralizer_fitting_le_fitting
   apply hK_not_le_F
   simpa [F, hF_def] using hK_le_fitting
 
-/-- A chief factor `U/V` is a minimal normal subgroup of `G/V`. -/
-private theorem isMinimalNormal_map_quotient_of_isChiefFactor
+/-- A chief factor `U/V` is a minimal normal subgroup of `G/V`.
+
+(Public: BG §5 Thm 5.7 が `Ū = U/V` の minimal normality と
+`isMinimalNormal_le_fitting_and_isElementaryAbelian` 経由の素数同定に使う。) -/
+theorem isMinimalNormal_map_quotient_of_isChiefFactor
     {G : Type*} [Group G] {U V : Subgroup G} [V.Normal]
     (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
     OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) := by

@@ -1107,6 +1107,12 @@ set_option linter.style.longLine false in
 -- Ḡ=G/O_{p'} で S̄=O_p(Ḡ) が唯一の Sylow → Thm 5.5(a)(b) を Lem 4.17/4.13 の代替に使う
 -- core56 + 共通 assembly (structure_of_quotient_commutator_le_opCore)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_sylow_solvable_structure
+-- BG §5 Thm 5.7 (§5 完結): G solvable odd, E elem-ab p ≤ F(G), r(C_{F(G)}(E)) ≤ 2 (全素数 rank;
+-- scaffold の pRank p は BG 原文に合わせ rank へ修正) ⇒ G' ≤ F(G)。Prop 1.2 chief-factor 還元
+-- (S01, G*=⊤ glue) + q-chief factor U/V は U⊓O_q(G) で被覆 (U の Sylow q ≤ F(G) の正規 Sylow)
+-- + O_q(G) narrow (q≠p は Fitting 異素数可換で排除; q=p は EZ ∈ ℰ²∩ℰ* + Thm 5.3)
+-- + Thm 5.5(a) で G' の Ū-作用が q-群 + 固定点論法 (Isaacs Lem 4.32) + Ū minimal normal。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
