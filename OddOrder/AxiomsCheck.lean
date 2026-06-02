@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
@@ -1663,6 +1664,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_complex_rep
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction
+-- Peterfalvi (6.7), odd-order assembly: hreal from |L| odd, the structure-constant
+-- congruence from the trivial-character specialization of (6.7.2)-(6.7.3).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.nonidentityZClassCoeffSum_cong_of_isTISubset
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_67_of_odd
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
