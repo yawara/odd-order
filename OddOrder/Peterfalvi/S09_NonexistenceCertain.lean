@@ -2060,6 +2060,102 @@ theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
   rw [if_pos rfl]
   field_simp [hzeta_one_ne_zero]
 
+/-- Source orthogonality and the Burnside degree sum evaluate the norm of the
+weighted `S^ν`-sum in Peterfalvi (7.8.a).
+
+This is the source-side computation of `‖Σ‖² = (h - 1) / e`: after `ν` transports
+orthogonality from `L` to `G`, only diagonal terms remain, and the degree sum
+collapses to the non-principal part of the kernel. -/
+theorem weightedNuSum_inner_self_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+      ((((H78.kernelOrder : ℝ) - 1) / (H78.complementIndex : ℝ)) : ℂ) := by
+  classical
+  set s : Finset (Fin (H78.hyp76.n + 1)) := Finset.univ.erase H78.ind1H with hs
+  let coeff : Fin (H78.hyp76.n + 1) → ℂ := fun i =>
+    H78.hyp76.zeta i (1 : L) /
+      (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+  have he_ne : (H78.complementIndex : ℂ) ≠ 0 := by
+    exact_mod_cast H78.complementIndex_pos.ne'
+  have hinner :
+      ClassFunction.inner H78.weightedNuSum H78.weightedNuSum =
+        ∑ i ∈ s, ∑ j ∈ s,
+          coeff i * star (coeff j) *
+            ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+              (H78.nu (H78.hyp76.zeta j)) := by
+    rw [weightedNuSum, ← hs]
+    change ClassFunction.inner
+        (∑ i ∈ s, coeff i • H78.nu (H78.hyp76.zeta i))
+        (∑ i ∈ s, coeff i • H78.nu (H78.hyp76.zeta i)) = _
+    rw [OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+    ring
+  have hcollapse :
+      (∑ i ∈ s, ∑ j ∈ s,
+        coeff i * star (coeff j) *
+          ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+            (H78.nu (H78.hyp76.zeta j))) =
+        ∑ i ∈ s,
+          coeff i * star (coeff i) *
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) := by
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [Finset.sum_eq_single i]
+    · rw [H78.nu_isometry, horth i (by simpa [hs] using hi) i (by simpa [hs] using hi),
+        if_pos rfl]
+    · intro j hj hji
+      rw [H78.nu_isometry, horth i (by simpa [hs] using hi) j (by simpa [hs] using hj),
+        if_neg (Ne.symm hji), mul_zero]
+    · intro hnot
+      exact False.elim (hnot hi)
+  have hdiag :
+      (∑ i ∈ s,
+        coeff i * star (coeff i) *
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        (∑ i ∈ s,
+          H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) /
+          (H78.complementIndex : ℂ) ^ 2 := by
+    rw [Finset.sum_div]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    have hn_star :
+        star (ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) :=
+      Hypothesis71.ClassFunction.star_inner_self _
+    have hn_ne : ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 :=
+      hnorm_ne i (by simpa [hs] using hi)
+    simp only [coeff, hzeta_degree]
+    rw [star_div₀, star_mul', hn_star]
+    simp only [star_natCast]
+    field_simp [he_ne, hn_ne]
+  rw [hinner, hcollapse, hdiag, show
+      (∑ i ∈ s,
+          H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ) from by
+        simpa [hs] using hdegree_sum]
+  field_simp [he_ne]
+  norm_num [Complex.ofReal_div, Complex.ofReal_sub]
+  ring
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
