@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.GroupTheory.CoprimeAction
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -35,48 +36,18 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-/-! ## (9.1): Wielandt's fixed-point formula -/
+/-! ## (9.1): Wielandt's fixed-point formula
 
-/-- A carrier for Peterfalvi (9.1): a coprime action of a Frobenius group
-`U E` on a finite solvable group `H`.
+The shared carrier and theorem statements for Peterfalvi (9.1) live in
+`OddOrder.GroupTheory.CoprimeAction`:
 
-The subgroups `fixedByUE`, `fixedByE`, and `fixedByU` are the three fixed-point
-subgroups appearing in Wielandt's formula.  They are stored explicitly because
-the action itself will later be supplied by the semidirect-product construction
-attached to `H/H_0`. -/
-structure CoprimeFrobeniusAction (L H : Type*) [Group L] [Group H] where
-  U : Subgroup L
-  E : Subgroup L
-  frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup L U E
-  H_solvable : IsSolvable H
-  coprime_order : Nat.Coprime (Nat.card H) (Nat.card L)
-  fixedByUE : Subgroup H
-  fixedByE : Subgroup H
-  fixedByU : Subgroup H
+* `OddOrder.GroupTheory.CoprimeFrobeniusAction`
+* `OddOrder.GroupTheory.wielandt_fixedPoint_frobenius`
+* `OddOrder.GroupTheory.wielandt_fixedPoint_trivial_E_fixed`
+* `OddOrder.GroupTheory.wielandt_fixedPoint_trivial_U_fixed`
 
-/-- **Peterfalvi (9.1)**: Wielandt's fixed-point formula for a coprime
-Frobenius action. -/
-theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :
-    Nat.card ↥act.fixedByUE ^ Nat.card ↥act.E * Nat.card H =
-      Nat.card ↥act.fixedByE ^ Nat.card ↥act.E * Nat.card ↥act.fixedByU := by
-  sorry
-
-/-- **Peterfalvi (9.1), first corollary**: if the `E`-fixed subgroup is trivial,
-then the Frobenius kernel centralizes the acted-on group. -/
-theorem wielandt_fixedPoint_trivial_E_fixed {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
-    (hE : act.fixedByE = ⊥) :
-    act.fixedByU = ⊤ := by
-  sorry
-
-/-- **Peterfalvi (9.1), second corollary**: if the `U`-fixed subgroup is
-trivial, then `|H| = |C_H(E)|^|E|`. -/
-theorem wielandt_fixedPoint_trivial_U_fixed {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
-    (hU : act.fixedByU = ⊥) :
-    Nat.card H = Nat.card ↥act.fixedByE ^ Nat.card ↥act.E := by
-  sorry
+They are kept outside this Peterfalvi section because the same coprime-action
+interface is expected to be reused by the BG and Isaacs layers. -/
 
 /-! ## (9.2)--(9.6): type II--IV setup and the chief factor `H/H_0` -/
 
