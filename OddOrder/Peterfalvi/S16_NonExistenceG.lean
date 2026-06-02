@@ -47,6 +47,16 @@ namespace Hypothesis
 theorem p_ne_q (hyp : Hypothesis (G := G)) : hyp.base.p ≠ hyp.base.q := by
   exact ne_of_gt hyp.q_lt_p
 
+/-- Under **Peterfalvi (14.1)**, the larger prime parameter is at least `5`. -/
+theorem five_le_p (hyp : Hypothesis (G := G)) : 5 ≤ hyp.base.p := by
+  have hp_gt_three : 3 < hyp.base.p := lt_of_le_of_lt hyp.base.three_le_q hyp.q_lt_p
+  have hp_ne_four : hyp.base.p ≠ 4 := by
+    intro hp4
+    have hodd : Odd 4 := by simpa [hp4] using hyp.base.p_odd
+    rcases hodd with ⟨k, hk⟩
+    omega
+  omega
+
 /-- The congruence used in **Peterfalvi (14.4)**: from `q < p` and `q` prime,
 `q` cannot be `1 mod p`. -/
 theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
@@ -145,6 +155,33 @@ structure CaseBForTData (hyp : Hypothesis (G := G)) where
   caseB_holds : caseB_formula
   D_eq_bot : hyp.base.D = ⊥
   v_eq : hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)
+
+namespace CaseBForTData
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+odd. -/
+theorem v_odd {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    Odd hyp.base.v := by
+  rw [data.v_eq]
+  exact hyp.tSide_cyclotomic_quotient_odd
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+coprime to `q - 1`. -/
+theorem v_coprime_q_sub_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    Nat.Coprime hyp.base.v (hyp.base.q - 1) := by
+  rw [data.v_eq]
+  exact hyp.tSide_cyclotomic_quotient_coprime
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, every
+positive divisor of `v` is `1 mod p`. -/
+theorem divisor_modEq_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    ∀ x : ℕ, x ≠ 0 → x ∣ hyp.base.v → x ≡ 1 [MOD hyp.base.p] := by
+  intro x hx hxdvd
+  apply hyp.tSide_cyclotomic_quotient_divisor_modEq_one x hx
+  rw [data.v_eq] at hxdvd
+  exact hxdvd
+
+end CaseBForTData
 
 /-- **Peterfalvi (14.4)**: case (9.7.b) holds for `T`, and
 `v = (q^p - 1) / (q - 1)`. -/
