@@ -1139,6 +1139,9 @@ set_option linter.style.longLine false in
 -- BG Prop 1.16(2) 共役形 (Thm 7.2 + §8–§16 で再利用): noncyclic abelian B が coprime Q≠1 を
 -- 正規化 ⇒ ∃ Y≤B (B/Y cyclic) で Q⊓C_G(Y)≠1 (Prop 1.16(2) cocyclic を conjAction に橋渡し)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic
+-- BG Thm 7.2 (mmd L2177): Hyp 7.1, q∈π', m(Z(A))≥3 ⇒ K は ℋ_G*(A;q) 上推移的 (Prop 1.16(2)
+-- cocyclic 共役形で B∈ℰ_p³(Z(A)) の noncyclic Y → C_{Q₁}(Y)⊆C_G(z) (z∈Y) → Lem 7.1)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.transitive_of_three_le_rank_center
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

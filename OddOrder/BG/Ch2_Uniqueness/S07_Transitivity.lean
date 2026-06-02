@@ -788,13 +788,134 @@ private theorem exists_elementaryAbelian_le_center_of_le_rank [Finite G]
     intro a ha
     exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hc ⟨a, ha⟩)
 
+/-- A cocyclic subgroup `Y` (`Y ⊔ ⟨b⟩ = B`) of an elementary abelian `p`-group `B` of rank
+`≥ 3` is noncyclic: `|B| ≤ |Y|·|⟨b⟩| ≤ |Y|·p`, so `|Y| ≥ p²`. -/
+private theorem not_isCyclic_of_cocyclic [Finite G] {p : ℕ} (hp2 : 2 ≤ p) {B Y : Subgroup G}
+    (hB_ea : B.IsElementaryAbelian p) (hlog : 3 ≤ Nat.log p (Nat.card ↥B))
+    (hYB : Y ≤ B) {b : G} (hb : b ∈ B) (hsup : Y ⊔ Subgroup.zpowers b = B) :
+    ¬ IsCyclic ↥Y := by
+  classical
+  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  set Y' : Subgroup ↥B := Y.subgroupOf B with hY'
+  set K : Subgroup ↥B := (Subgroup.zpowers b).subgroupOf B with hK
+  haveI : Y'.Normal := Subgroup.normal_of_isMulCommutative _
+  have hzple : Subgroup.zpowers b ≤ B := Subgroup.zpowers_le.mpr hb
+  have hsup' : Y' ⊔ K = ⊤ := by
+    apply Subgroup.map_injective B.subtype_injective
+    rw [Subgroup.map_sup, hY', hK, Subgroup.map_subgroupOf_eq_of_le hYB,
+      Subgroup.map_subgroupOf_eq_of_le hzple, hsup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have hKle : Nat.card ↥K ≤ p := by
+    rw [hK, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzple).toEquiv, Nat.card_zpowers]
+    refine Nat.le_of_dvd (by omega : 0 < p) (orderOf_dvd_of_pow_eq_one ?_)
+    have hbp := congrArg Subtype.val (hB_ea.2 (⟨b, hb⟩ : ↥B)); simpa using hbp
+  have hKmap : K.map (QuotientGroup.mk' Y') = ⊤ := by
+    have h1 : (Y' ⊔ K).map (QuotientGroup.mk' Y') = ⊤ := by
+      rw [hsup', Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective Y')]
+    rwa [Subgroup.map_sup,
+      (Subgroup.map_eq_bot_iff Y').mpr (le_of_eq (QuotientGroup.ker_mk' Y').symm),
+      bot_sup_eq] at h1
+  have hquot_le : Nat.card (↥B ⧸ Y') ≤ Nat.card ↥K :=
+    Nat.card_le_card_of_surjective ((QuotientGroup.mk' Y').comp K.subtype) (by
+      intro x
+      obtain ⟨k, hk, hkx⟩ := hKmap ▸ Subgroup.mem_top x
+      exact ⟨⟨k, hk⟩, hkx⟩)
+  have hcardB : Nat.card ↥B ≤ Nat.card ↥K * Nat.card ↥Y := by
+    have hY'card : Nat.card ↥Y' = Nat.card ↥Y :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hYB).toEquiv
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup Y', hY'card]
+    exact Nat.mul_le_mul_right _ hquot_le
+  intro hcyc
+  -- `Y` is elementary abelian and cyclic, so `|Y| ≤ p`.
+  have hY_ea : Y.IsElementaryAbelian p := by
+    refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
+    · show (x : G) * (y : G) = (y : G) * (x : G)
+      exact congrArg (Subtype.val : ↥B → G) (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩)
+    · show (x : G) ^ p = 1
+      exact congrArg (Subtype.val : ↥B → G) (hB_ea.2 (⟨(x : G), hYB x.2⟩ : ↥B))
+  have hYle : Nat.card ↥Y ≤ p := by
+    have hdvd : Monoid.exponent ↥Y ∣ p := by
+      rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]; exact hY_ea.2
+    rw [← hcyc.exponent_eq_card]; exact Nat.le_of_dvd (by omega : 0 < p) hdvd
+  have hp3 : p ^ 3 ≤ Nat.card ↥B :=
+    (Nat.le_log_iff_pow_le (by omega : 1 < p) Nat.card_pos.ne').mp hlog
+  have h1 : Nat.card ↥B ≤ p ^ 2 := by
+    rw [pow_two]; exact le_trans hcardB (Nat.mul_le_mul hKle hYle)
+  have h2 : p ^ 2 < p ^ 3 :=
+    Nat.pow_lt_pow_right (by omega : 1 < p) (by norm_num)
+  omega
+
+/-- `C_G(x) < ⊤` for `x ≠ 1` in a minimal simple group (`Z(G) = 1`). -/
+private theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x : G}
+    (hx : x ≠ (1 : G)) : Subgroup.centralizer ({x} : Set G) < ⊤ := by
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  rw [lt_top_iff_ne_top]
+  intro htop
+  refine hx (Subgroup.mem_bot.mp (hZbot ▸ ?_))
+  rw [Subgroup.mem_center_iff]
+  intro g
+  exact (Subgroup.mem_centralizer_iff.mp (htop ▸ Subgroup.mem_top g) x (Set.mem_singleton x)).symm
+
 /-- **BG Theorem 7.2** (mmd L2177): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 3` ⇒ `K` は
-`ℋ_G*(A;q)` 上推移的。Prop 1.16 で `Q₁ = ⟨C_{Q₁}(C)⟩` に分解し Lem 7.1 を適用。 -/
+`ℋ_G*(A;q)` 上推移的。Prop 1.16(2) で `B ∈ ℰ_p³(Z(A))` から cocyclic `Y` (noncyclic) を取り、
+`C_{Q₁}(Y) ⊆ C_G(z)` (z∈Y) で Lem 7.1 を適用。 -/
 theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G)
     {A : Subgroup G} (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
     (hm : 3 ≤ rank ↥(Subgroup.center ↥A)) :
     ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q}) := by
-  sorry
+  classical
+  have hCop : ∀ {S Q : Subgroup G}, S ≤ A → Q ∈ hInvariantStar ⊤ A {q} →
+      Nat.Coprime (Nat.card ↥S) (Nat.card ↥Q) := by
+    intro S Q hSA hQ
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := primesOf A) Nat.card_pos.ne' Nat.card_pos.ne' (fun r hr => ?_) (fun r hr => ?_)
+    · exact Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
+        dvd_trans (Nat.mem_primeFactors.mp hr).2.1 (Subgroup.card_dvd_of_le hSA), Nat.card_pos.ne'⟩
+    · rw [Set.mem_singleton_iff.mp (hInvariantStar_isPiSubgroup hQ r hr)]; exact hq
+  have hA_Cz : ∀ z : G, z ∈ Subgroup.centralizer (A : Set G) →
+      A ≤ Subgroup.centralizer ({z} : Set G) := by
+    intro z hz a ha
+    rw [Subgroup.mem_centralizer_iff]
+    rintro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
+    exact (Subgroup.mem_centralizer_iff.mp hz a ha).symm
+  obtain ⟨p, B, hB_ea, hB_nc, hB_log, hBA, hB_cent⟩ :=
+    exists_elementaryAbelian_le_center_of_le_rank (n := 3) (by norm_num) hm
+  have hp2 : 2 ≤ p := by
+    by_contra h; push_neg at h
+    rw [Nat.log_of_left_le_one (by omega)] at hB_log; omega
+  intro Q₁ hQ₁ Q₂ hQ₂
+  by_cases hQ₁bot : Q₁ = ⊥
+  · refine ⟨1, one_mem _, ?_⟩
+    rw [map_one, one_smul]
+    exact (hQ₁.2 Q₂ (hInvariantStar_mem_hInvariant hQ₂) (by rw [hQ₁bot]; exact bot_le)).symm
+  · have hQ₂bot : Q₂ ≠ ⊥ := fun h =>
+      hQ₁bot ((hQ₂.2 Q₁ (hInvariantStar_mem_hInvariant hQ₁) (by rw [h]; exact bot_le)).trans h)
+    haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+    obtain ⟨Y, hYB, ⟨b, hbB, hsup⟩, hYQ₁⟩ :=
+      exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic
+        (le_trans hBA (hInvariantStar_le_normalizer hQ₁)) hB_nc (hCop hBA hQ₁) hQ₁bot
+    have hY_nc : ¬ IsCyclic ↥Y := not_isCyclic_of_cocyclic hp2 hB_ea hB_log hYB hbB hsup
+    haveI : IsMulCommutative ↥Y :=
+      IsMulCommutative.of_comm fun x y => Subtype.ext (by
+        show (x : G) * (y : G) = (y : G) * (x : G)
+        exact congrArg (Subtype.val : ↥B → G) (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩))
+    have hYA : Y ≤ A := le_trans hYB hBA
+    obtain ⟨z, hzY, hz_ne, hzQ₂⟩ :=
+      exists_mem_inf_centralizer_ne_bot_of_not_isCyclic
+        (le_trans hYA (hInvariantStar_le_normalizer hQ₂)) hY_nc (hCop hYA hQ₂) hQ₂bot
+    have hHQ₁ : Subgroup.centralizer ({z} : Set G) ⊓ Q₁ ≠ ⊥ := by
+      rw [inf_comm]
+      refine fun h => hYQ₁ (le_bot_iff.mp ?_)
+      rw [← h]
+      exact le_inf inf_le_left (le_trans inf_le_right
+        (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hzY)))
+    obtain ⟨k, hk_K, hk_eq⟩ := inductiveLemma hG hA hq hQ₁ hQ₂
+      (Subgroup.centralizer ({z} : Set G)) (centralizer_singleton_lt_top hG hz_ne)
+      (hA_Cz z (le_trans hYB hB_cent hzY)) hHQ₁ (by rw [inf_comm]; exact hzQ₂)
+    exact ⟨k, hk_K, hk_eq⟩
 
 /-- **BG Theorem 7.3** (mmd L2187): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 2` かつ
 `q ∈ π(C_G(A))` ⇒ `K` は `ℋ_G*(A;q)` 上推移的。`R ⊇ Sylow_q(C_G(A))` 経由で Lem 7.1 を連鎖。 -/
