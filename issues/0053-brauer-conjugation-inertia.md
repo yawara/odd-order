@@ -59,8 +59,11 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   `inertia_eq_of_freeAction` に渡す `inertia_eq_of_frobeniusGroup` と、6.34 まで合成した
   `isIrreducibleCharacter_induce_of_frobeniusGroup` を `InducedIrreducible.lean` に landing。
   これで (6.8.c1) Frobenius case の `θ≠1 ⟹ Ind_H^L θ ∈ Irr L` prerequisite は直接呼べる。
-- [ ] **Layer D2 — T6 family wiring**: `Y=S(H')` の family construction、degree `|W₁|`、差分 support、
-  および case c2 側の inertia discharge を `coherentEqualDegree_fromDade` に接続する。
+- [x] **Layer D2a — T6 degree wiring** (2026-06-02):
+  SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one を S08 に landing。
+  degree-one source θ について (Ind_H^L θ)(1)=|W₁| を直接呼べる。
+- [ ] **Layer D2b — T6 family wiring**: Y=S(Hprime) の family construction、差分 support、
+  および case c2 側の inertia discharge を coherentEqualDegree_fromDade に接続する。
 
 ## 完了条件
 
@@ -69,7 +72,8 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - ✅ 2026-06-02: `inertia_eq_of_freeAction` (centralizer-free-action 仮説 + θ≠1 ⟹ inertia θ = H) を statement 化・証明。
 - ✅ 2026-06-02: Frobenius-group case を `inertia_eq_of_frobeniusGroup` /
   `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
-- 残: `Y=S(H')` family construction と case c2 側の inertia discharge を T6 本体で接続する。
+- ✅ 2026-06-02: S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| を packaging。
+- 残: Y=S(Hprime) family construction、差分 support、case c2 側の inertia discharge を T6 本体で接続する。
 
 ## 参照
 

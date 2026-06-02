@@ -227,6 +227,16 @@ theorem index_H_eq_card_W1 (hyp : SibleyDadeHypothesis G L H) :
     H.index = Nat.card hyp.W1 :=
   (Subgroup.IsComplement.card_right (Subgroup.isComplement'_def.mp hyp.split)).symm
 
+/-- Degree-one source characters induce to class functions of degree |W1| in the (6.8)
+setup. This is the degree side of the Y = S(Hprime) family used in the final coherence assembly. -/
+theorem induce_apply_one_eq_card_W1_of_degree_one
+    (hyp : SibleyDadeHypothesis G L H) (θ : IrreducibleCharacter ↥H)
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1) :
+    OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L) =
+      (Nat.card hyp.W1 : ℂ) := by
+  rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ_one, mul_one,
+    hyp.index_H_eq_card_W1]
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

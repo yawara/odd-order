@@ -206,9 +206,11 @@ S06: `CertainTypeHypothesis`(38), `W2`。
       合わせ `η_j(1)=|W₁|`。
       2026-06-02 追記: `IndChainDecomposition.inner_chi_eq_ite` で (6.8) consumer の output
       orthonormality を 1 lemma に集約済み。
+      2026-06-02 追記: SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one を追加し、
+      degree-one source θ から η_j(1)=|W₁| を直接放電できる形にした。
   (5) **差分 support** `(η_i−η_0).support ⊆ H^#`: 等次数で 1 消失 + 誘導 support が H 上 (H⊴L で共役不変) ∖{1}。tractable。
-  → **T6 の律速 = (3) general Brauer for conjugation Layer C の群論側**。Layer B と
-    fixed class count = 1 → nontrivial Irr 非固定 bridge は landed 済みなので、残る fixed class count を
-    free action から出せば 6.34 + (4)/(5) + engine (difference-support 版) で T6 完成。
+  → **T6 の現律速** = Y=S(Hprime) family construction / 差分 support wiring + case c2 inertia。
+    c1 Frobenius path は inertia=H → 6.34 → degree-one source の η_j(1)=|W₁| まで landed。
+    c2 には同等の inertia discharge がまだ必要。
     T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
     T9-T11 (glue) は後続。
