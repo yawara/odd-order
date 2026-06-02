@@ -1411,6 +1411,30 @@ theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
   rw [delta]
   abel
 
+/-- If `χ` is orthogonal to both `1_G` and the distinguished `ζ^ν`, then
+`(β,χ) = (Δ,χ)`. -/
+theorem beta_inner_eq_delta_inner_of_orthogonal
+    (H78 : Hypothesis78 G A L) (χ : ClassFunction G ℂ)
+    (hone : ClassFunction.inner (Hypothesis71.constOne G) χ = 0)
+    (hzeta : ClassFunction.inner
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) χ = 0) :
+    ClassFunction.inner H78.beta χ = ClassFunction.inner H78.delta χ := by
+  rw [H78.beta_eq_constOne_sub_zetaImage_add_delta, ClassFunction.inner_add_left,
+    ClassFunction.inner_sub_left, hone, hzeta]
+  ring
+
+/-- Right-hand variant: if `χ` is orthogonal on the left to `1_G` and the
+ distinguished `ζ^ν`, then `(χ,β) = (χ,Δ)`. -/
+theorem inner_beta_eq_inner_delta_of_orthogonal
+    (H78 : Hypothesis78 G A L) (χ : ClassFunction G ℂ)
+    (hone : ClassFunction.inner χ (Hypothesis71.constOne G) = 0)
+    (hzeta : ClassFunction.inner χ
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 0) :
+    ClassFunction.inner χ H78.beta = ClassFunction.inner χ H78.delta := by
+  rw [H78.beta_eq_constOne_sub_zetaImage_add_delta, ClassFunction.inner_add_right,
+    ClassFunction.inner_sub_right, hone, hzeta]
+  ring
+
 /-- The real norm square `‖β‖²` used in Peterfalvi (7.8.b). -/
 noncomputable def betaNormSq (H78 : Hypothesis78 G A L) : ℝ :=
   (ClassFunction.inner H78.beta H78.beta).re
