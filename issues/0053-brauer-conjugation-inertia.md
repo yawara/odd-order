@@ -47,14 +47,14 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - `ConjClasses.conjByPerm g : Equiv.Perm (ConjClasses ↥H)` (⟦h⟧↦⟦g·h·g⁻¹⟧, `ConjClasses.map` で定義)
   - `characterTableEntry_conjByPerm` + `brauer_permutation_lemma_general'` による
     `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`。
-- [ ] **Layer C — free action ⟹ inertia=H**:
-  - `conjClassPerm g` は単位類固定; `g∉H`+free `C_L(h)≤H` ⟹ 単位類のみ固定 ⟹ `#fix=1`
-  - ✅ 2026-06-02 partial: `conjByPerm_trivialIrreducibleCharacter`,
-    `fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one`,
-    `conjByPerm_ne_self_of_ne_trivial_of_card_fixedClasses_eq_one`,
-    `not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one` を追加。
-  - 残: 群論側 free action から `Nat.card (Function.fixedPoints (ConjClasses.conjByPerm g)) = 1` を作り、
-    `inertia_eq_of_freeAction` (θ≠1 ⟹ `inertia θ = H`) に束ねる。
+- [x] **Layer C — free action ⟹ inertia=H** (2026-06-02):
+  - `ConjClasses.conjByPerm_one` で単位類固定を formalize。
+  - `ConjClasses.fixed_eq_one_of_not_mem_of_centralizer_le` と
+    `card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le` で、
+    `g∉H` + `∀ h : H, h ≠ 1 → C_G(h) ≤ H` から固定 conjugacy class が単位類のみ (`#fix=1`) を証明。
+  - `not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le` と
+    `inertia_eq_of_freeAction` で、非自明 `θ : Irr H` について
+    `ClassFunction.inertia (θ : ClassFunction H ℂ) = H` に束ねた。
 - [ ] **Layer D — wiring** (T6 proper / 別 commit): free-action を Frobenius (case c1) 等から放電し
   6.34 + `index_H_eq_card_W1` + difference-support engine で `Y` coherent。
 
@@ -62,7 +62,7 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 
 - Layer A/B/C が sorry/axiom 無 (`#assert_only_allowed_axioms` 3 axiom 全 allowlist)、`lake build OddOrder`/`OddOrder.AxiomsCheck` 緑。
   - 2026-06-02: Layer B 追加後 `lake build OddOrder` 緑。
-- `inertia_eq_of_freeAction` (free-action 仮説 + θ≠1 ⟹ inertia θ = H) が statement 化・証明される。
+- ✅ 2026-06-02: `inertia_eq_of_freeAction` (centralizer-free-action 仮説 + θ≠1 ⟹ inertia θ = H) を statement 化・証明。
 - これと 6.34 で (6.8) T6 の `Y` family 既約性が機械的に従う (Layer D は別 issue/commit でも可)。
 
 ## 参照

@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -1587,5 +1588,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
 -- Norm-1 virtual character with positive degree is irreducible (reusable Fourier criterion).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
+-- Brauer conjugation bridge: if ambient centralizers of nonidentity elements of `H` lie in `H`,
+-- every `g ∉ H` fixes only the identity conjugacy class, hence nontrivial irreducibles have
+-- inertia group exactly `H`. This is the free-action input for [Is] Thm 6.34 in Peterfalvi (6.8).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inertia_eq_of_freeAction
 -- [Is] Thm 6.34 capstone: H ⊴ G, θ ∈ Irr H, I_G(θ) = H  ⟹  Ind_H^G θ ∈ Irr G.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
