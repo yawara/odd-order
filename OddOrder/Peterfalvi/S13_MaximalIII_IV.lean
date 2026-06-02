@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Peterfalvi Section 13: Maximal Subgroups of Types III and IV
@@ -35,12 +36,63 @@ variable {G : Type*} [Group G]
 
 /-! ## (11.1): the auxiliary prime inequality -/
 
+/-- For `n >= 5`, the elementary estimate used in **Peterfalvi (11.1)**. -/
+private theorem four_mul_sq_add_one_lt_three_pow {n : ℕ} (hn : 5 ≤ n) :
+    4 * n ^ 2 + 1 < 3 ^ n := by
+  induction n, hn using Nat.le_induction with
+  | base =>
+      norm_num
+  | succ n hn ih =>
+      have hstep : 4 * (n + 1) ^ 2 + 1 < 3 * (4 * n ^ 2 + 1) := by
+        nlinarith [hn]
+      calc
+        4 * (n + 1) ^ 2 + 1 < 3 * (4 * n ^ 2 + 1) := hstep
+        _ ≤ 3 * 3 ^ n := Nat.mul_le_mul_left 3 ih.le
+        _ = 3 ^ (n + 1) := by rw [pow_succ]; omega
+
 /-- **Peterfalvi (11.1)**: if `p` and `q` are distinct odd primes, then
 `p^q > 4 q^2 + 1`. -/
 theorem prime_pow_gt_four_mul_sq_add_one {p q : ℕ}
     (hp : p.Prime) (hq : q.Prime) (hpodd : Odd p) (hqodd : Odd q) (hpq : p ≠ q) :
     4 * q ^ 2 + 1 < p ^ q := by
-  sorry
+  have hp_three : 3 ≤ p := by
+    have hp_two : 2 ≤ p := hp.two_le
+    have hp_ne_two : p ≠ 2 := by
+      intro hp2
+      subst p
+      rcases hpodd with ⟨k, hk⟩
+      omega
+    omega
+  have hq_three : 3 ≤ q := by
+    have hq_two : 2 ≤ q := hq.two_le
+    have hq_ne_two : q ≠ 2 := by
+      intro hq2
+      subst q
+      rcases hqodd with ⟨k, hk⟩
+      omega
+    omega
+  rcases lt_trichotomy p q with hp_lt_q | hp_eq_q | hq_lt_p
+  · have hq_five : 5 ≤ q := by
+      have hpq_succ : p + 1 ≤ q := Nat.succ_le_of_lt hp_lt_q
+      have hq_ne_four : q ≠ 4 := by
+        intro hq4
+        subst q
+        rcases hqodd with ⟨k, hk⟩
+        omega
+      omega
+    calc
+      4 * q ^ 2 + 1 < 3 ^ q := four_mul_sq_add_one_lt_three_pow hq_five
+      _ ≤ p ^ q := Nat.pow_le_pow_left hp_three q
+  · exact (hpq hp_eq_q).elim
+  · have hbase : q + 1 ≤ p := Nat.succ_le_of_lt hq_lt_p
+    have hqpow_le : (q + 1) ^ q ≤ p ^ q := Nat.pow_le_pow_left hbase q
+    have hqpow_large : 4 * q ^ 2 + 1 < (q + 1) ^ q := by
+      have hqpow_three : (q + 1) ^ 3 ≤ (q + 1) ^ q :=
+        pow_le_pow_right' (by omega) hq_three
+      have hpoly : 4 * q ^ 2 + 1 < (q + 1) ^ 3 := by
+        nlinarith [hq_three]
+      exact hpoly.trans_le hqpow_three
+    exact hqpow_large.trans_le hqpow_le
 
 /-! ## (11.2): Type III/IV setup -/
 
@@ -65,11 +117,11 @@ structure Hypothesis (M : Subgroup G) where
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
   quotientBoundFormula : Subgroup G → Prop
   secondDerived_eq_HC : Prop
-  H_is_pgroup : Prop
+  H_is_pgroup : IsPGroup base.w2 ↥base.typeP.H
   U_centralizes_H0 : Prop
   H0_eq_Hprime : Prop
   C_eq_Uprime : Prop
-  H_elementaryAbelian : Prop
+  H_elementaryAbelian : IsElementaryAbelian base.w2 ↥base.typeP.H
   H_order_prime_power : Nat.card ↥base.typeP.H = base.w2 ^ base.w1
   H0_eq_bot : chief.H0 = ⊥
   notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
@@ -139,14 +191,16 @@ theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 `H_0 = H'`, and `C = U'`. -/
 theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.H_is_pgroup ∧ hyp.U_centralizes_H0 ∧ hyp.H0_eq_Hprime ∧ hyp.C_eq_Uprime := by
+    IsPGroup hyp.p ↥hyp.H ∧ hyp.U_centralizes_H0 ∧ hyp.H0_eq_Hprime ∧
+      hyp.C_eq_Uprime := by
   sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and
 `H_0 = 1`. -/
 theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.H_elementaryAbelian ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧ hyp.chief.H0 = ⊥ := by
+    IsElementaryAbelian hyp.p ↥hyp.H ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧
+      hyp.chief.H0 = ⊥ := by
   sorry
 
 /-! ## (11.8): the main orthogonality calculation -/

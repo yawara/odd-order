@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
+import Mathlib.Algebra.BigOperators.ModEq
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 
 /-!
 # Peterfalvi Section 15: The Subgroups S and T
@@ -56,11 +59,18 @@ structure Hypothesis where
   D : Subgroup G
   S_maximal : S ∈ maximalSubgroups G
   T_maximal : T ∈ maximalSubgroups G
+  S_ne_T : S ≠ T
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  theorem88_caseB :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
+        (∃ g : G, MulAut.conj g • M = T)
   W_eq_inter : W = S ⊓ T
   W_eq_join : W = W1 ⊔ W2
+  W1_inf_W2_eq_bot : W1 ⊓ W2 = ⊥
+  W1_commutes_W2 : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y
   W_cyclic : IsCyclic ↥W
   P_eq_SF : P = maxNilpotentNormalHall S
   Q_eq_TF : Q = maxNilpotentNormalHall T
@@ -74,6 +84,8 @@ structure Hypothesis where
   p : ℕ
   q_prime : q.Prime
   p_prime : p.Prime
+  q_odd : Odd q
+  p_odd : Odd p
   q_eq_card_W1 : q = Nat.card ↥W1
   p_eq_card_W2 : p = Nat.card ↥W2
   u : ℕ
@@ -118,6 +130,32 @@ def G0 (hyp : Hypothesis (G := G)) : Set G :=
     (conjClassSet (sharpSubgroup hyp.H) ∪
       conjClassSet (sharpSubgroup hyp.Q))
 
+
+/-- Under **Peterfalvi (13.1)**, the prime `q` is odd, hence not `2`. -/
+theorem q_ne_two (hyp : Hypothesis (G := G)) : hyp.q ≠ 2 := by
+  intro hq2
+  have hodd : Odd 2 := by simpa [hq2] using hyp.q_odd
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+/-- Under **Peterfalvi (13.1)**, the prime `p` is odd, hence not `2`. -/
+theorem p_ne_two (hyp : Hypothesis (G := G)) : hyp.p ≠ 2 := by
+  intro hp2
+  have hodd : Odd 2 := by simpa [hp2] using hyp.p_odd
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+/-- Under **Peterfalvi (13.1)**, `q` is at least `3`. -/
+theorem three_le_q (hyp : Hypothesis (G := G)) : 3 ≤ hyp.q := by
+  have htwo : 2 ≤ hyp.q := hyp.q_prime.two_le
+  have hne : hyp.q ≠ 2 := hyp.q_ne_two
+  omega
+
+/-- Under **Peterfalvi (13.1)**, `p` is at least `3`. -/
+theorem three_le_p (hyp : Hypothesis (G := G)) : 3 ≤ hyp.p := by
+  have htwo : 2 ≤ hyp.p := hyp.p_prime.two_le
+  have hne : hyp.p ≠ 2 := hyp.p_ne_two
+  omega
 end Hypothesis
 
 /-! ## (13.2): basic structure -/
@@ -130,8 +168,7 @@ structure BasicStructureData (hyp : Hypothesis (G := G)) where
   UW1_frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
     ↥(hyp.U ⊔ hyp.W1) (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1))
       (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1))
-  P_elementaryAbelian : Prop
-  P_elementaryAbelian_holds : P_elementaryAbelian
+  P_elementaryAbelian : IsElementaryAbelian hyp.p ↥hyp.P
   P_order : Nat.card ↥hyp.P = hyp.p ^ hyp.q
   u_bound : hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
   A0S_TI : Prop
@@ -144,7 +181,7 @@ abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset. -/
 theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : BasicStructureData hyp,
-      (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ data.P_elementaryAbelian ∧
+      (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ IsElementaryAbelian hyp.p ↥hyp.P ∧
         Nat.card ↥hyp.P = hyp.p ^ hyp.q ∧
         hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
   sorry
@@ -289,15 +326,158 @@ theorem caseA_parameters [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     caseA_for_S → hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
   sorry
 
+/-- The parity calculation behind **Peterfalvi (13.14)**: if `p` is odd, the
+geometric sum of its first `q` powers has the same parity as `q`. -/
+private theorem sum_range_pow_mod_two_eq {p q : ℕ} (hpodd : Odd p) :
+    (∑ k ∈ Finset.range q, p ^ k) % 2 = q % 2 := by
+  induction q with
+  | zero =>
+      simp
+  | succ q ih =>
+      have hpow : p ^ q % 2 = 1 := Nat.odd_iff.mp hpodd.pow
+      rw [Finset.sum_range_succ, Nat.add_mod, ih, hpow]
+      omega
+
+/-- The oddness part of **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_odd {p q : ℕ} (hp : p.Prime)
+    (hpodd : Odd p) (hqodd : Odd q) :
+    Odd ((p ^ q - 1) / (p - 1)) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [Nat.odd_iff, sum_range_pow_mod_two_eq hpodd, Nat.odd_iff.mp hqodd]
+
+/-- The `p ≡ 1 [MOD q]` divisibility part of **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_dvd_of_modEq_one {p q : ℕ} (hp : p.Prime)
+    (hpq : p ≡ 1 [MOD q]) :
+    q ∣ (p ^ q - 1) / (p - 1) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [← Nat.modEq_zero_iff_dvd]
+  have hterms : (∑ k ∈ Finset.range q, p ^ k) ≡ ∑ k ∈ Finset.range q, 1 [MOD q] :=
+    Nat.ModEq.sum fun k _ => by simpa using Nat.ModEq.pow k hpq
+  have hsum_one : (∑ k ∈ Finset.range q, 1 : ℕ) = q := by simp
+  exact hterms.trans (by simp [hsum_one])
+
+/-- The coprimality part of **Peterfalvi (13.14)** when `p` is not `1 mod q`. -/
+theorem cyclotomic_quotient_coprime_of_not_modEq_one {p q : ℕ} (hp : p.Prime)
+    (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) := by
+  rw [← Nat.geomSum_eq hp.two_le q]
+  rw [Nat.coprime_iff_gcd_eq_one]
+  have hpmod : p ≡ 1 [MOD p - 1] := Nat.modEq_sub (le_of_lt hp.one_lt)
+  have hterms : (∑ k ∈ Finset.range q, p ^ k) ≡ ∑ k ∈ Finset.range q, 1 [MOD p - 1] :=
+    Nat.ModEq.sum fun k _ => by simpa using Nat.ModEq.pow k hpmod
+  have hsum_one : (∑ k ∈ Finset.range q, 1 : ℕ) = q := by simp
+  have hmod : (∑ k ∈ Finset.range q, p ^ k) ≡ q [MOD p - 1] := by
+    exact hterms.trans (by rw [hsum_one])
+  rw [hmod.gcd_eq]
+  exact Nat.coprime_iff_gcd_eq_one.mp <|
+    hq.coprime_iff_not_dvd.mpr fun hdiv => hpq <| by
+      exact ((Nat.modEq_iff_dvd'
+        (show 1 ≤ p from le_of_lt hp.one_lt)).mpr hdiv).symm
+
+/-- If `p` is not `1 mod q`, then the prime `q` does not divide the
+cyclotomic quotient in **Peterfalvi (13.14)**. -/
+theorem cyclotomic_quotient_not_dvd_self_of_not_modEq_one {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    ¬ q ∣ (p ^ q - 1) / (p - 1) := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  intro hdiv
+  rw [← Nat.geomSum_eq hp.two_le q] at hdiv
+  have hsum_zero_nat : ((∑ k ∈ Finset.range q, p ^ k : ℕ) : ZMod q) = 0 :=
+    (ZMod.natCast_eq_zero_iff _ _).mpr hdiv
+  have hsum_zero_zmod : (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) = 0 := by
+    simpa [Nat.cast_sum, Nat.cast_pow] using hsum_zero_nat
+  have hgeom :
+      (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) * ((p : ZMod q) - 1) =
+        (p : ZMod q) ^ q - 1 :=
+    geom_sum_mul (p : ZMod q) q
+  have hp_eq_one : (p : ZMod q) = 1 := by
+    have hzero :
+        (∑ k ∈ Finset.range q, (p : ZMod q) ^ k) * ((p : ZMod q) - 1) = 0 := by
+      rw [hsum_zero_zmod, zero_mul]
+    rw [hgeom, ZMod.pow_card] at hzero
+    exact sub_eq_zero.mp hzero
+  exact hpq ((ZMod.natCast_eq_natCast_iff p 1 q).mp (by simpa using hp_eq_one))
+
+/-- Prime divisors of the cyclotomic quotient in the non-`1 mod q` case are
+`1 mod q`. -/
+theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q])
+    (hr : r.Prime) (hrdvd : r ∣ (p ^ q - 1) / (p - 1)) :
+    r ≡ 1 [MOD q] := by
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  have hr_ne_q : r ≠ q := by
+    intro h
+    exact cyclotomic_quotient_not_dvd_self_of_not_modEq_one hp hq hpq
+      (by simpa [h] using hrdvd)
+  have hr_not_dvd_q : ¬ r ∣ q := by
+    intro hdiv
+    rcases (Nat.dvd_prime hq).mp hdiv with hr_eq_one | hr_eq_q
+    · exact hr.ne_one hr_eq_one
+    · exact hr_ne_q hr_eq_q
+  haveI : NeZero (q : ZMod r) :=
+    NeZero.of_not_dvd (ZMod r) hr_not_dvd_q
+  have hrdvd_sum : r ∣ ∑ k ∈ Finset.range q, p ^ k := by
+    simpa [Nat.geomSum_eq hp.two_le q] using hrdvd
+  have hroot :
+      Polynomial.IsRoot (Polynomial.cyclotomic q (ZMod r))
+        (Nat.castRingHom (ZMod r) p) := by
+    rw [Polynomial.IsRoot.def, Polynomial.cyclotomic_prime]
+    rw [Polynomial.eval_finset_sum]
+    simp only [Polynomial.eval_pow, Polynomial.eval_X]
+    simpa [Nat.cast_sum, Nat.cast_pow] using
+      (ZMod.natCast_eq_zero_iff (∑ k ∈ Finset.range q, p ^ k) r).mpr hrdvd_sum
+  have hcop : p.Coprime r :=
+    Polynomial.coprime_of_root_cyclotomic hq.pos hroot
+  have hnot_r_dvd_p : ¬ r ∣ p :=
+    hr.coprime_iff_not_dvd.mp hcop.symm
+  have hp_ne_zero : (p : ZMod r) ≠ 0 := by
+    intro hzero
+    exact hnot_r_dvd_p ((ZMod.natCast_eq_zero_iff p r).mp hzero)
+  have horder_dvd : orderOf (p : ZMod r) ∣ r - 1 :=
+    ZMod.orderOf_dvd_card_sub_one hp_ne_zero
+  have horder_eq : q = orderOf (p : ZMod r) :=
+    (Polynomial.isRoot_cyclotomic_iff.mp hroot).eq_orderOf
+  rw [← horder_eq] at horder_dvd
+  exact ((Nat.modEq_iff_dvd' hr.pos).mpr horder_dvd).symm
+
+/-- If every prime factor of `x` is `1 mod q`, then `x` is `1 mod q`. -/
+theorem modEq_one_of_forall_primeFactors_modEq_one {x q : ℕ} (hx : x ≠ 0)
+    (h : ∀ r ∈ x.primeFactors, r ≡ 1 [MOD q]) :
+    x ≡ 1 [MOD q] := by
+  rw [Nat.prod_pow_primeFactors_factorization hx]
+  have hprod :
+      (∏ r ∈ x.primeFactors, r ^ x.factorization r) ≡
+        ∏ r ∈ x.primeFactors, 1 [MOD q] :=
+    Nat.ModEq.prod fun r hr => by
+      simpa using (h r hr).pow (x.factorization r)
+  simpa using hprod
+
+/-- The divisor-congruence part of **Peterfalvi (13.14)** when `p` is not
+`1 mod q`. -/
+theorem cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
+    ∀ x : ℕ, x ≠ 0 → x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q] := by
+  intro x hx hxdvd
+  refine modEq_one_of_forall_primeFactors_modEq_one hx fun r hrx => ?_
+  exact cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one hp hq hpq
+    (Nat.prime_of_mem_primeFactors hrx)
+    ((Nat.dvd_of_mem_primeFactors hrx).trans hxdvd)
+
 /-- **Peterfalvi (13.14)**: divisibility facts for
 `(p^q - 1) / (p - 1)`. -/
-theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime) :
+theorem cyclotomic_divisor_facts {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hpodd : Odd p) (hqodd : Odd q) :
     Odd ((p ^ q - 1) / (p - 1)) ∧
       (p ≡ 1 [MOD q] → q ∣ (p ^ q - 1) / (p - 1)) ∧
       (¬ (p ≡ 1 [MOD q]) →
         Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) ∧
-          ∀ x : ℕ, x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
-  sorry
+          ∀ x : ℕ, x ≠ 0 → x ∣ (p ^ q - 1) / (p - 1) → x ≡ 1 [MOD q]) := by
+  refine ⟨cyclotomic_quotient_odd hp hpodd hqodd, ?_, ?_⟩
+  · exact cyclotomic_quotient_dvd_of_modEq_one hp
+  · intro hpq
+    exact ⟨cyclotomic_quotient_coprime_of_not_modEq_one hp hq hpq,
+      cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one hp hq hpq⟩
 
 /-- **Peterfalvi (13.15)**: in case (9.7.b), `u` has the final cyclotomic
 value, depending on whether `p` is `1 mod q`. -/
@@ -309,6 +489,28 @@ theorem caseB_order_u [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (¬ (hyp.p ≡ 1 [MOD hyp.q]) →
           hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
   sorry
+
+/-- Carrier for the `u`-order conclusion in **Peterfalvi (13.15)** under
+case (9.7.b).  It packages the two congruence branches so Section 16 can carry
+the order data together with the case-(b) certificate. -/
+structure CaseBOrderUData (hyp : Hypothesis (G := G)) (caseB_for_S : Prop) where
+  caseB_holds : caseB_for_S
+  u_eq_of_p_modEq_one :
+    hyp.p ≡ 1 [MOD hyp.q] →
+      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))
+  u_eq_of_not_modEq_one :
+    ¬ hyp.p ≡ 1 [MOD hyp.q] →
+      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
+
+/-- Data form of **Peterfalvi (13.15)**, derived from `caseB_order_u`. -/
+theorem caseB_order_u_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {caseB_for_S : Prop} (hcase : caseB_for_S) :
+    CaseBOrderUData hyp caseB_for_S := by
+  rcases caseB_order_u hG hyp caseB_for_S hcase with ⟨hmod, hnot⟩
+  exact
+    { caseB_holds := hcase
+      u_eq_of_p_modEq_one := hmod
+      u_eq_of_not_modEq_one := hnot }
 
 /-! ## (13.16)--(13.19): normalizers and type-I interaction -/
 

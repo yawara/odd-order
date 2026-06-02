@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.MaximalSubgroup
@@ -25,8 +26,12 @@ Peterfalvi-numbered entry points and the main scaffold statements.  Proofs of
 (8.8), (8.11), (8.12), and (8.13) are intentionally left as `sorry`: they quote
 BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
 
-The Nougat extract drops the statements around (8.14)--(8.17); those are left as
-TODO comments until the PDF page is recovered.
+The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
+has now been recovered; this file records the `R(x)`/thickened-support notation,
+the Type-II TI endpoint, the Dade (2.2) interface behind (8.15), and the BG
+Theorem E covering interface.  The higher §4.6/§5.2 Dade specializations remain
+as a precise TODO until their section-level carriers are stable enough to avoid
+opaque placeholders.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -148,11 +153,192 @@ theorem escapingCentralizers_control [Finite G]
             (IsTypeI L ∨ IsTypeII L) := by
   sorry
 
+/-! ## (8.14)--(8.17): support notation and TI-covering facts -/
+
+/-- **Peterfalvi (8.16)**: for a maximal subgroup of Type II, the three sets
+`A_0(M)`, `A(M)`, and `A_1(M)` are TI-subsets of `G` with normalizer `M`.
+
+This is the directly usable part of the PDF-recovered missing page.  The proof is
+BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument. -/
+theorem typeII_A_sets_TI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
+    IsTISubset (typePA0 M data.typeP) M ∧
+      IsTISubset (typePA M data.typeP) M ∧
+        IsTISubset (A1 M PeterfalviType.II) M := by
+  sorry
+
+/-- **Peterfalvi (8.16)**, normalizer form: for Type II, the normalizers of
+`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`. -/
+theorem typeII_A_sets_normalizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
+    Subgroup.normalizer (typePA0 M data.typeP) = M ∧
+      Subgroup.normalizer (typePA M data.typeP) = M ∧
+        Subgroup.normalizer (A1 M PeterfalviType.II) = M := by
+  sorry
+
+/-- **Peterfalvi (8.14)**: the subgroup `R(x)`, shared as
+`OddOrder.GroupTheory.supportKernel`. -/
+noncomputable abbrev supportKernel (L M : Subgroup G) (X : Set G) (x : G) :=
+  OddOrder.GroupTheory.supportKernel L M X x
+
+/-- **Peterfalvi (8.14)**: the thickened support set
+`⋃_{x ∈ X} (x R(x))^G`, shared as `OddOrder.GroupTheory.thickenedSupport`. -/
+noncomputable abbrev thickenedSupport (L M : Subgroup G) (X : Set G) :=
+  OddOrder.GroupTheory.thickenedSupport L M X
+
+/-- **Peterfalvi (8.14)**: the thickened `A_1(M)`. -/
+noncomputable abbrev thickenedA1 (L M : Subgroup G) (tau : PeterfalviType) :=
+  OddOrder.GroupTheory.thickenedA1 L M tau
+
+/-- **Peterfalvi (8.14)**: the thickened `A(M)` for type-I data. -/
+noncomputable abbrev typeIThickenedA (L M : Subgroup G) (data : TypeIData M) :=
+  OddOrder.GroupTheory.typeIThickenedA L M data
+
+/-- **Peterfalvi (8.14)**: the thickened `A(M)` for type-`P` data. -/
+noncomputable abbrev typePThickenedA (L M : Subgroup G) (data : TypePData M) :=
+  OddOrder.GroupTheory.typePThickenedA L M data
+
+/-- **Peterfalvi (8.14)**: the thickened `A_0(M)` for type-`P` data. -/
+noncomputable abbrev typePThickenedA0 (L M : Subgroup G) (data : TypePData M) :=
+  OddOrder.GroupTheory.typePThickenedA0 L M data
+
+/-- Carrier for the Dade-hypothesis part of **Peterfalvi (8.15)** for a single
+support set `A`.
+
+It records the part already expressible with the existing §4 API: `L = M`,
+`N_G(A) = M`, the Dade Hypothesis (2.2), the recovered formula `H(a)=R(a)`, and
+that the §4 Dade support is the thickened support from (8.14).  The later
+Hypothesis (4.6)/(5.2) specializations add character-family data and are kept as
+a separate TODO below. -/
+structure DadeSupportHypothesisData [Fintype G] (M : Subgroup G) (A : Set G) where
+  /-- Peterfalvi (8.15): `M = N_G(A)`. -/
+  normalizer_eq : Subgroup.normalizer A = M
+  /-- Peterfalvi (8.15): Hypothesis (2.2) holds with `L = M`. -/
+  dade : OddOrder.Peterfalvi.S04.Hypothesis G A M
+  /-- Peterfalvi (8.15): the subgroups in Hypothesis (2.2) are the recovered
+  `R(a)` from (8.14). -/
+  H_eq_supportKernel :
+    ∀ a : {a : G // a ∈ A}, dade.H a = supportKernel M M A a.1
+  /-- The Dade support from §4 is the thickened support notation of (8.14). -/
+  dadeSupport_eq_thickenedSupport : dade.dadeSupport = thickenedSupport M M A
+
+/-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold
+for `A(M)=A_0(M)` and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
+theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    Nonempty (DadeSupportHypothesisData M (typeIA M data)) ∧
+      Nonempty (DadeSupportHypothesisData M (A1 M PeterfalviType.I)) := by
+  sorry
+
+/-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
+for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
+theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    {tau : PeterfalviType} (hType : HasPeterfalviType tau M) :
+    Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
+      Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
+        Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
+  sorry
+
+
+/-- **Peterfalvi (8.17)**: BG Theorem E data for a set of conjugacy-class
+representatives of maximal subgroups.
+
+The field `ι` indexes the representatives `M_i`.  The prime-factor fields record
+the statement that `π(G)` is the disjoint union of the `π((M_i)_s)`, while
+`thickenedA1_card` records
+`|⋃_{x ∈ A_1(M_i)} (x R(x))^G| = (|(M_i)_s| - 1) |G : M_i|`. -/
+structure BGTheoremECoverData (G : Type*) [Group G] where
+  /-- Indexing type for the representative maximal subgroups. -/
+  ι : Type*
+  /-- The representative maximal subgroup `M_i`. -/
+  reps : ι → Subgroup G
+  /-- The Peterfalvi type attached to `M_i`. -/
+  tau : ι → PeterfalviType
+  /-- The representatives form a finite family. -/
+  finite_index : Fintype ι
+  /-- Every representative is maximal. -/
+  maximal : ∀ i : ι, reps i ∈ maximalSubgroups G
+  /-- Every representative has its indicated Peterfalvi type. -/
+  typed : ∀ i : ι, HasPeterfalviType (tau i) (reps i)
+  /-- Every maximal subgroup is conjugate to one of the representatives. -/
+  representatives :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      ∃ i : ι, ∃ g : G, MulAut.conj g • M = reps i
+  /-- The representatives have no repeated conjugacy classes. -/
+  nonconjugate :
+    ∀ i j : ι, (∃ g : G, MulAut.conj g • reps i = reps j) → i = j
+  /-- `π(G)` is covered by the `π((M_i)_s)`. -/
+  primeFactors_cover :
+    ∀ p : ℕ, p.Prime →
+      (p ∈ (Nat.card G).primeFactors ↔
+        ∃ i : ι, p ∈ (Nat.card ↥(mainSubgroup (reps i) (tau i))).primeFactors)
+  /-- The `π((M_i)_s)` are pairwise disjoint. -/
+  primeFactors_disjoint :
+    ∀ i j : ι, i ≠ j →
+      Disjoint
+        ((Nat.card ↥(mainSubgroup (reps i) (tau i))).primeFactors : Finset ℕ)
+        ((Nat.card ↥(mainSubgroup (reps j) (tau j))).primeFactors : Finset ℕ)
+  /-- The cardinality formula for the thickened `A_1(M_i)` sets. -/
+  thickenedA1_card :
+    ∀ i : ι,
+      Nat.card ↥(thickenedA1 (reps i) (reps i) (tau i)) =
+        (Nat.card ↥(mainSubgroup (reps i) (tau i)) - 1) * (reps i).index
+
+/-- **Peterfalvi (8.17), case (8.8.a)**: when all maximal subgroups are type I,
+`G#` is the disjoint union of the thickened `A_1(M_i)` sets. -/
+structure BGTheoremETypeICovering (data : BGTheoremECoverData G) : Prop where
+  /-- The thickened `A_1(M_i)` sets cover all nonidentity elements of `G`. -/
+  cover_nonidentity :
+    sharpSubgroup (⊤ : Subgroup G) =
+      ⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+  /-- The cover by thickened `A_1(M_i)` sets is disjoint. -/
+  pairwise_disjoint_thickened :
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
+      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+
+/-- **Peterfalvi (8.17), case (8.8.b)**: in the two-exceptional-subgroup case,
+`G#` is covered by the thickened `A_1(M_i)` sets together with the conjugates of
+the exceptional `W#`. -/
+structure BGTheoremENonTypeICovering (data : BGTheoremECoverData G) where
+  /-- The exceptional subgroup whose nonidentity conjugates supplement the cover. -/
+  W : Subgroup G
+  /-- The thickened `A_1(M_i)` sets and the conjugates of `W#` cover `G#`. -/
+  cover_nonidentity :
+    sharpSubgroup (⊤ : Subgroup G) =
+      (⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)) ∪
+        conjClassSet (sharpSubgroup W)
+  /-- The thickened `A_1(M_i)` part of the cover is disjoint. -/
+  pairwise_disjoint_thickened :
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
+      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+  /-- The exceptional part is disjoint from every thickened `A_1(M_i)`. -/
+  exceptional_disjoint_thickened :
+    ∀ i : data.ι,
+      Disjoint (conjClassSet (sharpSubgroup W))
+        (thickenedA1 (data.reps i) (data.reps i) (data.tau i))
+
+/-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
+interface.
+
+This statement deliberately does not prove BG Theorem E.  It records the exact
+data Peterfalvi uses after (8.14): the `π(G)` partition by the `M_i_s`, the
+cardinality of each thickened `A_1(M_i)`, and the appropriate `G#` cover in the
+two cases from (8.8). -/
+theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ∃ data : BGTheoremECoverData G,
+      BGTheoremETypeICovering data ∨ Nonempty (BGTheoremENonTypeICovering data) := by
+  sorry
+
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
-The statements (8.14)--(8.17) are absent from the current Nougat extraction; this
-result is kept as the usable endpoint of that block, with the proof deferred
-until the missing page is recovered. -/
+The proof uses the recovered (8.14)--(8.17) support notation and BG Theorem E
+covering facts.  It remains the usable endpoint of the block for downstream
+files. -/
 theorem support_mutual_exclusion [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G) :
@@ -160,8 +346,10 @@ theorem support_mutual_exclusion [Finite G]
         Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
   sorry
 
--- TODO (Peterfalvi (8.14)--(8.17)): recover the dropped statements from the PDF
--- page before adding Lean statements.  The current mmd has a missing-page marker
--- in this range, and fake statements here would break traceability.
+-- TODO (Peterfalvi (8.15), higher Dade specializations): add the recovered
+-- Hypothesis (4.6)/(5.2) statements with `K=M_prime` and `H=M_F` or `M_s`
+-- once those section-level carriers expose the needed `L=M` specialization
+-- without opaque placeholder propositions.
+--
 
 end OddOrder.Peterfalvi.S10
