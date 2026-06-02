@@ -36,9 +36,14 @@ Thm 13.4/13.5/13.9/13.10)。
 - Corollary 13.2 uses Lemma 12.2(a) plus Lemma 13.1 (mmd L3524).
 - Theorem 13.4 uses Theorem 12.13 and Lemma 12.18 (mmd L3552/L3568);
   these are centralizer-control interfaces, not new assumptions on `ActsPrimeOn`.
-- Lemma 13.8 and Theorem 13.10 use Proposition 10.14(d) and Lemma 12.18
-  (mmd L3646/L3656/L3692). Prop 10.14(d) is still deferred in §10, so these
-  statements must stay as honest scaffolds until that upstream clause exists.
+- Lemma 13.8 and Theorem 13.10 use `S10.normalizer_le_of_nontrivial_beta_subgroup`
+  (BG Prop 10.14(d)) and Lemma 12.18 (mmd L3646/L3656/L3692). This gate is now
+  exposed in §10 as a theorem with `sorry`, not as a downstream hypothesis or setup field.
+- The §12 path into §13 also depends on the newly exposed §10 surfaces
+  `S10.beta_complement_normalizer_derived_contains_sylow` (Cor 10.9(a)(3)),
+  `S10.beta_factorization_of_sylow_normalizer_in_intersection` (Cor 10.9(b)), and
+  `S10.sigma_complement_commutator_cyclic_normal` (Prop 10.11(d)). Keep those as
+  upstream proof gates when filling Lemma 13.8 / Theorem 13.10.
 -/
 
 namespace OddOrder.BG.Ch3.S13
@@ -149,9 +154,14 @@ theorem E1E3_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
-/-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役), `p∈τ₁(M)∩τ₁(M*)`,
-`P∈ℰ_p¹(M∩M*)`, `Q,Q*` を `M∩M*` の `P`-不変 Sylow 部分群 (素数は異なってよい),
-`C_Q(P)=C_{Q*}(P)=1`, `N_G(Q)⊆M*`, `N_G(Q*)⊆M`。 -/
+/-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
+`p∈τ₁(M)∩τ₁(M*)`, `P∈ℰ_p¹(M∩M*)`, `Q,Q*` を `M∩M*` の `P`-不変 Sylow 部分群
+(素数は異なってよい), `C_Q(P)=C_{Q*}(P)=1`, `N_G(Q)⊆M*`, `N_G(Q*)⊆M`。
+
+§10 gates visible for proof-fill: Theorem 10.2's `M'/M_α` nilpotence tail,
+`S10.disjoint_of_not_conj` (Lemma 10.12), and
+`S10.normalizer_le_of_nontrivial_beta_subgroup` (Prop 10.14(d)). The Hall/Frattini pieces
+used through §12 must remain upstream theorem calls, not new hypotheses on this statement. -/
 theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Mstar : Subgroup G}
     (hMstar : Mstar ∈ maximalSubgroups G) (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar)
@@ -178,9 +188,13 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     Disjoint (S10.sigma M) (S10.sigma Mstar) := by
   sorry
 
-/-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元): ある `P∈ℰ_p¹(E₁)` が
-`E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用; (b) `E₃` は `M_σ` に regular 作用;
-(c) その `P` について `C_{M_σ}(P) ≠ 1`。 -/
+/-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
+ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
+(b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
+
+§10 gates visible for proof-fill: `S10.normalizer_le_of_nontrivial_beta_subgroup`
+(Prop 10.14(d)) supplies `N_G(Q*)⊆M` in the `q*∈β(M)` branch; the remaining branch uses
+`σ(M)` by definition. Lemma 12.18 / Lemma 12.19 carry the Cor 10.9 β-complement input. -/
 theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     (hP : ∃ p : ℕ, ∃ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 ∧ P ≤ E₁ ∧
