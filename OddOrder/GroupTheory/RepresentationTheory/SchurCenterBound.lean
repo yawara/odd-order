@@ -198,4 +198,116 @@ theorem IsIrreducibleCharacter.exists_degree_sq_le_index {φ : ClassFunction G �
   refine ⟨finrank ℂ W, ?_, finrank_sq_le_index ρ Z hZ⟩
   rw [congrFun hcoe 1, ρ.char_one]
 
+/-! ### Central restriction ([Is] Lemma 2.27) -/
+
+section CentralRestriction
+
+/-- Any representation of a group on the one-dimensional space `ℂ` is irreducible:
+the only `ℂ`-submodules of `ℂ` are `⊥` and `⊤`. -/
+theorem isIrreducible_complex_rep {H : Type*} [Group H] (ρ : Representation ℂ H ℂ) :
+    ρ.IsIrreducible := by
+  have hsub : ∀ S : Submodule ℂ ℂ, S = ⊥ ∨ S = ⊤ := by
+    intro S
+    by_cases hbot : S = ⊥
+    · exact Or.inl hbot
+    · right
+      obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hbot
+      rw [Submodule.eq_top_iff']
+      intro y
+      have hy : y = (y / x) • x := by
+        rw [smul_eq_mul]
+        field_simp
+      rw [hy]
+      exact S.smul_mem _ hx
+  refine { toNontrivial := ?_, eq_bot_or_eq_top := fun S' => ?_ }
+  · refine ⟨⊥, ⊤, fun h => ?_⟩
+    have hbt : (⊥ : Submodule ℂ ℂ) = ⊤ := congrArg Subrepresentation.toSubmodule h
+    have h1 : (1 : ℂ) ∈ (⊥ : Submodule ℂ ℂ) := by rw [hbt]; trivial
+    exact one_ne_zero ((Submodule.mem_bot ℂ).mp h1)
+  · rcases hsub S'.toSubmodule with h | h
+    · exact Or.inl (Subrepresentation.toSubmodule_injective h)
+    · exact Or.inr (Subrepresentation.toSubmodule_injective h)
+
+/-- **Isaacs, Character Theory of Finite Groups, Lemma 2.27 (central restriction).**
+
+Let `χ` be an irreducible (complex) character of `G` and let `Z ≤ Z(G)`.  There is a
+**linear** character `φ` of `Z` — an irreducible character with `φ(1) = 1` — such that
+`Res_Z χ = χ(1) • φ`; pointwise, `χ(z) = φ(z) · χ(1)` for all `z ∈ Z`.
+
+By Schur's lemma each central `z` acts on a witnessing irreducible representation as a
+scalar `φ(z)`, and the scalars form the linear character.  This is the decomposition behind
+Peterfalvi (6.8.2.3): `Res^H_Z θ = a·φ` with `a = θ(1)`, `φ ∈ Irr Z`, and `φ ≠ 1_Z`
+whenever `Z ⊄ ker θ` (which follows from the pointwise formula since `χ(1) ≠ 0`). -/
+theorem IsIrreducibleCharacter.exists_central_linear_restriction
+    {G : Type*} [Group G] {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    (Z : Subgroup G) (hZ : Z ≤ Subgroup.center G) :
+    ∃ φ : ClassFunction (↥Z) ℂ, IsIrreducibleCharacter φ ∧ φ 1 = 1 ∧
+      ClassFunction.restrict Z χ = χ 1 • φ ∧
+      ∀ z : ↥Z, χ (z : G) = φ z * χ 1 := by
+  classical
+  obtain ⟨W, _, _, _, ρ, hirr, hchar⟩ := hχ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  -- the central scalar function from Schur's lemma
+  choose c hc using fun z : ↥Z => exists_central_scalar ρ (hZ z.2)
+  have huniq : ∀ {c₁ c₂ : ℂ}, (c₁ • LinearMap.id : W →ₗ[ℂ] W) = c₂ • LinearMap.id →
+      c₁ = c₂ := by
+    intro c₁ c₂ h
+    obtain ⟨w, hw⟩ := exists_ne (0 : W)
+    have happ := congrArg (fun f : W →ₗ[ℂ] W => f w) h
+    simp only [LinearMap.smul_apply, LinearMap.id_apply] at happ
+    exact smul_left_injective ℂ hw happ
+  have hcmul : ∀ z₁ z₂ : ↥Z, c (z₁ * z₂) = c z₁ * c z₂ := by
+    intro z₁ z₂
+    apply huniq
+    rw [← hc (z₁ * z₂), show ((z₁ * z₂ : ↥Z) : G) = (z₁ : G) * (z₂ : G) from rfl,
+      map_mul, hc z₁, hc z₂]
+    ext w
+    simp [Module.End.mul_apply, smul_smul, mul_comm]
+  have hcone : c 1 = 1 := by
+    apply huniq
+    rw [← hc 1, show ((1 : ↥Z) : G) = 1 from rfl, map_one]
+    ext w
+    simp [Module.End.one_apply]
+  -- character values: `χ(z) = c z · χ(1)`
+  have hχ1 : χ 1 = (finrank ℂ W : ℂ) := by
+    rw [show χ 1 = (χ : G → ℂ) 1 from rfl, congrFun hchar 1, ρ.char_one]
+  have hval : ∀ z : ↥Z, χ (z : G) = c z * χ 1 := by
+    intro z
+    rw [show χ (z : G) = (χ : G → ℂ) (z : G) from rfl, congrFun hchar (z : G), hχ1]
+    change LinearMap.trace ℂ W (ρ (z : G)) = _
+    rw [hc z, map_smul, LinearMap.trace_id]
+    simp [smul_eq_mul]
+  -- elements of `Z` are central, so any function on `Z` is a class function
+  have hcomm : ∀ z₁ z₂ : ↥Z, z₂ * z₁ * z₂⁻¹ = z₁ := by
+    intro z₁ z₂
+    apply Subtype.ext
+    change (z₂ : G) * (z₁ : G) * (z₂ : G)⁻¹ = (z₁ : G)
+    rw [(Subgroup.mem_center_iff.mp (hZ z₂.2) (z₁ : G)).symm]
+    group
+  refine ⟨⟨fun z => c z, fun z₁ z₂ => by rw [hcomm]⟩, ?_, hcone, ?_, fun z => hval z⟩
+  · -- the witnessing one-dimensional representation `z ↦ c z • id`
+    refine ⟨ℂ, inferInstance, inferInstance, inferInstance,
+      { toFun := fun z => c z • LinearMap.id
+        map_one' := by
+          rw [hcone]
+          ext
+          simp [Module.End.one_apply]
+        map_mul' := fun z₁ z₂ => by
+          rw [hcmul]
+          ext
+          simp [Module.End.mul_apply, smul_smul, mul_comm] },
+      isIrreducible_complex_rep _, ?_⟩
+    funext z
+    change c z = LinearMap.trace ℂ ℂ (c z • LinearMap.id)
+    rw [map_smul, LinearMap.trace_id]
+    simp
+  · -- `Res_Z χ = χ(1) • φ`
+    ext z
+    rw [ClassFunction.restrict_apply, hval z, ClassFunction.smul_apply]
+    change c z * χ 1 = χ 1 * c z
+    ring
+
+end CentralRestriction
+
 end OddOrder.RepresentationTheory

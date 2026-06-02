@@ -9,6 +9,8 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
@@ -37,6 +39,7 @@ import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S07_CoherenceGalois
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1618,13 +1621,54 @@ set_option linter.style.longLine false in
 -- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
 
--- Coefficientwise Galois transport for class functions and S07 coherence data.
+-- Coefficientwise Galois transport for class functions, irreducible-character indices,
+-- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
+-- characters are irreducible (unconditional; witness = the σ-twisted representation
+-- `galoisTwist`), giving the Galois permutation of Irr(G) and ℤ[Irr G] invariance.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_inner
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_galoisTwist
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_galoisTwist
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IsIrreducibleCharacter.mapRingEquiv
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisMap
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.IrreducibleCharacter.galoisPerm
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_irreducibleCharacters
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_mem_ZIrr_iff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSpan_image
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.ClassFunction.mapRingEquiv_mem_zSupportedSpan_image
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IntegralCharacterMap.galoisTransport
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.galoisTransport
+-- Peterfalvi (1.9): cyclotomic Galois automorphisms of ℂ and the character value formula
+-- χ^σ(g) = χ(g^k).  Trace of finite-order endomorphisms (eigenvalue decomposition), the
+-- extension theorem (subfield automorphisms extend to ℂ via a transcendence basis), the
+-- CRT cyclotomic automorphism (1.9.a), and the uniform virtual-character form (1.9.b).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.map_trace_of_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_complexRingEquiv_extends
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_complexRingEquiv_pow_of_rootsOfUnity
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_complexRingEquiv_pow_and_fixed
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_complexRingEquiv_mapRingEquiv_eq_pow
+-- Peterfalvi (5.9)(a): coherent isometric extensions of the Dade map commute with
+-- coefficientwise automorphisms on the coherent set (no star-commutation needed).  Inputs:
+-- the explicit Dade map is pointwise evaluation (commutes with σ) and vanishes at 1; norm-1
+-- virtual characters are ± irreducible with a uniform sign.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_mapRingEquiv_comm
+-- [Is] Lemma 2.27 (central restriction): Res_Z χ = χ(1)·φ with φ a linear character of
+-- Z ≤ Z(G), via Schur central scalars.  Peterfalvi (6.8.2.3) `Res^H_Z θ = a·φ`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducible_complex_rep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
