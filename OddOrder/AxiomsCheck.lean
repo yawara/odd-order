@@ -1130,6 +1130,9 @@ set_option linter.style.longLine false in
 -- 真部分群 H⊇A で H⊓Q₁≠1≠H⊓Q₂ ⇒ Q₂=Q₁^k (k∈K)。|G|-|Q₁∩Q₂| 強帰納 + 共通構成 (Prop 1.5(b)(c)
 -- を O_{π'}(H) 上で適用) + Case B normalizer 増大 (q-群 nilpotent)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.inductiveLemma
+-- BG Prop 1.16(1) 共役形 (§7 Thm 7.2/7.3 + §8–§16 で再利用): noncyclic abelian B が coprime な
+-- Q≠1 を正規化 ⇒ ∃ x∈B^#, Q⊓C_G(x)≠1 (Isaacs 6.21 を conjAction に橋渡し)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

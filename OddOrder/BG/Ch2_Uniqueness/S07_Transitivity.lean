@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.SCN
@@ -55,6 +56,8 @@ namespace OddOrder.BG.Ch2.S07
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open OddOrder.Isaacs.Ch06 (actionFixedBy mem_actionFixedBy nontrivialActionFixedByClosure
+  nontrivialActionFixedByClosure_le_iff)
 open scoped Pointwise
 
 variable {G : Type*} [Group G]
@@ -645,6 +648,52 @@ theorem inductiveLemma [Finite G] (hG : IsMinimalSimpleOdd G)
         exact ⟨1, one_mem _, by rw [hQ₁Q₂, map_one, one_smul]⟩
 
 /-! ## Theorem 7.2 / 7.3 — 推移性の rank 条件 -/
+
+/-- `actionFixedBy` of the conjugation action of `B` on `Q` (= `C_Q(x) = Q ⊓ C_G(x)` in
+`subgroupOf` form). -/
+private theorem actionFixedBy_conjAction_restrict {B Q : Subgroup G}
+    (hQ_inv : Ch03.IsAInvariant (conjAction B) Q) (x : ↥B) :
+    actionFixedBy hQ_inv.restrict x
+      = (Q ⊓ Subgroup.centralizer ({(x : G)} : Set G)).subgroupOf Q := by
+  ext g
+  rw [mem_actionFixedBy, Subgroup.mem_subgroupOf, Subgroup.mem_inf]
+  constructor
+  · intro h
+    refine ⟨g.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => ?_)⟩
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    have hval : ((hQ_inv.restrict x) g : G) = (g : G) := congrArg Subtype.val h
+    rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+    simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hval
+    exact mul_inv_eq_iff_eq_mul.mp hval
+  · rintro ⟨-, hgC⟩
+    apply Subtype.ext
+    rw [Ch03.IsAInvariant.restrict_apply_val]
+    simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply]
+    rw [Subgroup.mem_centralizer_iff.mp hgC (x : G) (Set.mem_singleton _)]; group
+
+/-- **BG Prop 1.16(1), conjugation form**: a noncyclic abelian subgroup `B ≤ G` normalizing a
+coprime subgroup `Q ≠ 1` has a nonidentity element `x` with `Q ⊓ C_G(x) ≠ 1`. (If every
+`C_Q(x)` were trivial the centralizers would generate only `1`, contradicting Isaacs 6.21.) -/
+theorem exists_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
+    {B Q : Subgroup G} [IsMulCommutative ↥B] (hBQ : B ≤ Subgroup.normalizer Q)
+    (hB_nc : ¬ IsCyclic ↥B) (hCop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Q)) (hQ : Q ≠ ⊥) :
+    ∃ x ∈ B, x ≠ (1 : G) ∧ Q ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  classical
+  have hQ_inv : Ch03.IsAInvariant (conjAction B) Q := isAInvariant_conjAction_iff.mpr hBQ
+  have htop := OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+    hQ_inv.restrict hCop hB_nc
+  by_contra hcon
+  have hle : nontrivialActionFixedByClosure hQ_inv.restrict ≤ ⊥ := by
+    rw [nontrivialActionFixedByClosure_le_iff]
+    intro x hx_ne
+    rw [actionFixedBy_conjAction_restrict]
+    have hxbot : Q ⊓ Subgroup.centralizer ({(x : G)} : Set G) = ⊥ := by
+      by_contra hne
+      exact hcon ⟨(x : G), x.2, fun h => hx_ne (Subtype.ext (by rw [h]; rfl)), hne⟩
+    rw [hxbot, Subgroup.bot_subgroupOf]
+  rw [htop, top_le_iff] at hle
+  haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
+  exact bot_ne_top hle
 
 /-- **BG Theorem 7.2** (mmd L2177): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 3` ⇒ `K` は
 `ℋ_G*(A;q)` 上推移的。Prop 1.16 で `Q₁ = ⟨C_{Q₁}(C)⟩` に分解し Lem 7.1 を適用。 -/
