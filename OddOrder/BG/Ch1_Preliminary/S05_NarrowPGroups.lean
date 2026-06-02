@@ -1236,6 +1236,20 @@ theorem exists_narrow_witness_of_three_le_pRank {p : ℕ}
 
 /-! ## Theorem 5.3 / Corollary 5.4 — narrow の特徴づけ (mmd L1838-1879) -/
 
+/-- **BG Theorem 5.3(d) support**: since `R' ≤ T = C_R(Ω₁(Z₂(R)))`,
+the disjointness `S ∩ T = 1` implies `S ∩ R' = 1`.
+
+This isolates the already-green commutator-to-`T` input from the remaining hard
+centralizer decomposition proof. -/
+theorem inf_commutator_eq_bot_of_inf_centralizer_omega1UpperCentralTwo_eq_bot
+    {p : ℕ} {S : Subgroup R}
+    (hST : S ⊓ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) = ⊥) :
+    S ⊓ commutator R = ⊥ := by
+  refine le_antisymm ?_ bot_le
+  intro x hx
+  rw [← hST]
+  exact ⟨hx.1, commutator_le_centralizer_omega1UpperCentralTwo hx.2⟩
+
 /-- **BG Theorem 5.3** (narrow 特徴づけ): 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`。すると
 `R` が narrow ⇔ `ℰ²(R) ∩ ℰ*(R) ≠ ∅` (位数 `p²` の elem-ab で位数 `p³` の elem-ab に含まれない
 ものが存在)。
