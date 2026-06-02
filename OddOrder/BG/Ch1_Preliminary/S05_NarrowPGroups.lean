@@ -724,6 +724,71 @@ theorem omega1UpperCentralTwo_le_normalizer_of_maximalElementaryAbelian_card_pri
     exact hWE_le_Z.trans hZltE.le
   exact OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le hEW_le_E
 
+private theorem zpowers_isElementaryAbelian_of_pow_eq_one {p : ℕ} {x : R} (hxp : x ^ p = 1) :
+    (Subgroup.zpowers x).IsElementaryAbelian p := by
+  letI : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
+  refine ⟨?_, ?_⟩
+  · intro a b
+    exact Subtype.ext (congrArg Subtype.val (mul_comm a b))
+  · intro a
+    apply Subtype.ext
+    change (a : R) ^ p = 1
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    rw [← hi, ← zpow_natCast (x ^ i) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+      hxp, one_zpow]
+
+/-- **BG Lemma 5.2 support**: an order-`p` element centralizing a maximal elementary
+abelian subgroup already lies in it. This is the elementwise form used for
+`C_W(E) ≤ E`; it avoids assuming `W` is elementary abelian. -/
+theorem mem_of_mem_centralizer_pow_eq_one_of_maximalElementaryAbelian {p : ℕ}
+    {E : Subgroup R} (hEstar : IsMaximalElementaryAbelian p E) {x : R}
+    (hxC : x ∈ Subgroup.centralizer (E : Set R)) (hxp : x ^ p = 1) :
+    x ∈ E := by
+  let X : Subgroup R := Subgroup.zpowers x
+  have hX : X.IsElementaryAbelian p := by
+    dsimp [X]
+    exact zpowers_isElementaryAbelian_of_pow_eq_one hxp
+  have hE_le_cent_X : E ≤ Subgroup.centralizer (X : Set R) := by
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    change y ∈ Subgroup.zpowers x at hy
+    obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+    have hex : e * x = x * e := Subgroup.mem_centralizer_iff.mp hxC e he
+    exact ((show Commute e x from hex).zpow_right i).eq.symm
+  exact hEstar.le_of_le_centralizer (F := X) hX hE_le_cent_X (Subgroup.mem_zpowers x)
+
+/-- **BG Lemma 5.2 support**: `Z = Ω₁(Z(R))` lies in `C_W(E)`, where
+`W = Ω₁(Z₂(R))`. -/
+theorem omega1Center_le_omega1UpperCentralTwo_inf_centralizer {p : ℕ} {E : Subgroup R} :
+    omega1Center R p ≤ omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) := by
+  intro z hz
+  refine ⟨omega1Center_le_omega1UpperCentralTwo hz, ?_⟩
+  change z ∈ Subgroup.centralizer (E : Set R)
+  rw [Subgroup.mem_centralizer_iff]
+  intro e _
+  exact Subgroup.mem_center_iff.mp (omega1Center_le_center hz) e
+
+/-- **BG Lemma 5.2 support**: `C_W(E) ≤ E`, where `W = Ω₁(Z₂(R))`.
+Every element of `W` has `p`-th power `1`, and any element in `C_W(E)` centralizes
+`E`; maximality of `E` then absorbs the cyclic elementary abelian subgroup it
+generates. -/
+theorem omega1UpperCentralTwo_inf_centralizer_le_of_maximalElementaryAbelian
+    {p : ℕ} (hp : Odd p) {E : Subgroup R} (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) ≤ E := by
+  intro x hx
+  exact mem_of_mem_centralizer_pow_eq_one_of_maximalElementaryAbelian hEstar hx.2
+    (pow_eq_one_of_mem_omega1UpperCentralTwo hp hx.1)
+
+/-- **BG Lemma 5.2 support**: the centralizer `C_W(E)` is squeezed between
+`Ω₁(Z(R))` and `E`. -/
+theorem omega1Center_le_inf_centralizer_le_of_maximalElementaryAbelian
+    {p : ℕ} (hp : Odd p) {E : Subgroup R} (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1Center R p ≤ omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) ∧
+      omega1UpperCentralTwo R p ⊓ Subgroup.centralizer (E : Set R) ≤ E :=
+  ⟨omega1Center_le_omega1UpperCentralTwo_inf_centralizer,
+    omega1UpperCentralTwo_inf_centralizer_le_of_maximalElementaryAbelian hp hEstar⟩
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
