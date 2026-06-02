@@ -4136,6 +4136,38 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finit
   Bsum_le := hBsum
   base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
 
+/-- Constructor form of `CharacterEstimateData` from the real reduced family
+inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
+
+This combines the two final-assembly bridges: the norm bound on `Γ` gives the
+`Bsum_le` field through `Bsum_le_of_orthogonal_integer_decomposition`, while the
+real reduced family inequality supplies the `base_estimate` field. -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality hmin B hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]
@@ -4171,6 +4203,42 @@ lemma lowerBoundTerm_of_real_Bsum_bound [Finite G]
           2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
   exact F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum
     (F.base_estimate_of_real_reduced_family_inequality i B hred)
+
+/-- Direct displayed-bound form from the real reduced family inequality and the
+orthogonal integer decomposition controlling the `𝓑`-sum.
+
+This is the non-existential consumer for the final (7.10) assembly after the
+character theory has supplied the chosen minimal index, `𝓑`, the integer
+coefficients, and the norm bound on `Γ`. -/
+lemma lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) :=
+  F.lowerBoundTerm_of_real_Bsum_bound hodd hmin B hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hred
 
 /-- Existential real-valued wrapper for the final assembly step of Peterfalvi
 (7.10).  The input shape matches the real reduced estimate before converting to
