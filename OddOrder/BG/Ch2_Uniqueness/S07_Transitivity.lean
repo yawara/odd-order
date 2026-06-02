@@ -695,6 +695,62 @@ theorem exists_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
   haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
   exact bot_ne_top hle
 
+/-- `n ≤ rank G` で `n > 0` なら、ある素数 `p` で `n ≤ pRank G p` (`rank_le_iff` の逆向き)。 -/
+private theorem exists_le_pRank_of_le_rank {H : Type*} [Group H] [Finite H] {n : ℕ}
+    (hn : 0 < n) (h : n ≤ rank H) : ∃ p : ℕ, n ≤ pRank H p := by
+  by_contra hcon
+  push_neg at hcon
+  have : rank H ≤ n - 1 := by
+    rw [rank_le_iff]; intro p; have := hcon p; omega
+  omega
+
+/-- **`m(Z(A)) ≥ n` (n ≥ 2) から `Z(A)` 内の noncyclic elementary abelian 部分群を抽出**:
+ある `p ≥ 2` と `B ≤ A`, `B ≤ C_G(A)` (= `B ≤ Z(A)`) で `B` は elementary abelian `p`, noncyclic,
+`n ≤ log_p |B|`。Thm 7.2/7.3 の `B ∈ ℰ_p^n(Z(A))` 部分。`B ≤ A` から coprimality (`q ∈ π'` で
+`q ∤ |B|`) が従うので `p` の素数性は不要。 -/
+private theorem exists_elementaryAbelian_le_center_of_le_rank [Finite G]
+    {A : Subgroup G} {n : ℕ} (hn2 : 2 ≤ n) (hm : n ≤ rank ↥(Subgroup.center ↥A)) :
+    ∃ (p : ℕ) (B : Subgroup G), B.IsElementaryAbelian p ∧ ¬ IsCyclic ↥B ∧
+      n ≤ Nat.log p (Nat.card ↥B) ∧ B ≤ A ∧ B ≤ Subgroup.centralizer (A : Set G) := by
+  classical
+  set ZA : Subgroup G := (Subgroup.center ↥A).map A.subtype with hZA
+  have hrankZA : n ≤ rank ↥ZA :=
+    le_trans hm (rank_le_of_injective
+      (f := (Subgroup.equivMapOfInjective (Subgroup.center ↥A) A.subtype
+        A.subtype_injective).toMonoidHom)
+      (Subgroup.equivMapOfInjective (Subgroup.center ↥A) A.subtype A.subtype_injective).injective)
+  obtain ⟨p, hp_rank⟩ := exists_le_pRank_of_le_rank (by omega) hrankZA
+  obtain ⟨B₀, hB₀_ea, hB₀_log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (by omega : 0 < n) hp_rank
+  have hp2 : 2 ≤ p := by
+    rcases Nat.lt_or_ge p 2 with hlt | hge
+    · exfalso
+      have h0 : pRank ↥ZA p ≤ 0 := by
+        rw [pRank_le_iff]; intro A' _; rw [Nat.log_of_left_le_one (by omega)]
+      omega
+    · exact hge
+  set B : Subgroup G := B₀.map ZA.subtype with hB
+  have hB_ea : B.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.map ZA.subtype_injective hB₀_ea
+  have hlogB : n ≤ Nat.log p (Nat.card ↥B) := by
+    rw [hB, Subgroup.card_map_of_injective ZA.subtype_injective]; exact hB₀_log
+  refine ⟨p, B, hB_ea, ?_, hlogB, le_trans (Subgroup.map_subtype_le _) (Subgroup.map_subtype_le _),
+    ?_⟩
+  · -- ¬ IsCyclic: exponent ∣ p but |B| ≥ p² > p.
+    intro hcyc
+    have hexp : Monoid.exponent ↥B = Nat.card ↥B := hcyc.exponent_eq_card
+    have hdvd : Monoid.exponent ↥B ∣ p := by
+      rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]; exact hB_ea.pow_eq_one
+    rw [hexp] at hdvd
+    have hcard_le : Nat.card ↥B ≤ p := Nat.le_of_dvd (by omega) hdvd
+    have hp_sq : p ^ 2 ≤ Nat.card ↥B :=
+      (Nat.le_log_iff_pow_le (by omega) Nat.card_pos.ne').mp (le_trans hn2 hlogB)
+    rw [pow_two] at hp_sq; nlinarith
+  · refine le_trans (Subgroup.map_subtype_le _) ?_
+    rintro _ ⟨c, hc, rfl⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hc ⟨a, ha⟩)
+
 /-- **BG Theorem 7.2** (mmd L2177): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 3` ⇒ `K` は
 `ℋ_G*(A;q)` 上推移的。Prop 1.16 で `Q₁ = ⟨C_{Q₁}(C)⟩` に分解し Lem 7.1 を適用。 -/
 theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -710,7 +766,108 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
     (hm : 2 ≤ rank ↥(Subgroup.center ↥A))
     (hqc : q ∈ (Nat.card ↥(Subgroup.centralizer (A : Set G))).primeFactors) :
     ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q}) := by
-  sorry
+  classical
+  -- `Z(G) = 1` (nonabelian simple), so `C_G(x) < ⊤` for `x ≠ 1`.
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  have hCGx_proper : ∀ x : G, x ≠ 1 → Subgroup.centralizer ({x} : Set G) < ⊤ := by
+    intro x hx
+    rw [lt_top_iff_ne_top]
+    intro htop
+    refine hx (Subgroup.mem_bot.mp (hZbot ▸ ?_))
+    rw [Subgroup.mem_center_iff]
+    intro g
+    exact (Subgroup.mem_centralizer_iff.mp (htop ▸ Subgroup.mem_top g) x (Set.mem_singleton x)).symm
+  -- `B ≤ Z(A)` noncyclic elementary abelian.
+  obtain ⟨p, B, hB_ea, hB_nc, _hB_log, hBA, hB_cent⟩ :=
+    exists_elementaryAbelian_le_center_of_le_rank (n := 2) le_rfl hm
+  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  -- coprimality `(|B|, |Q|) = 1` for any `Q ∈ ℋ_G*(A;q)`.
+  have hCop_BQ : ∀ Q : Subgroup G, Q ∈ hInvariantStar ⊤ A {q} →
+      Nat.Coprime (Nat.card ↥B) (Nat.card ↥Q) := by
+    intro Q hQ
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := primesOf A) Nat.card_pos.ne' Nat.card_pos.ne' (fun r hr => ?_) (fun r hr => ?_)
+    · exact Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
+        dvd_trans (Nat.mem_primeFactors.mp hr).2.1 (Subgroup.card_dvd_of_le hBA), Nat.card_pos.ne'⟩
+    · rw [Set.mem_singleton_iff.mp (hInvariantStar_isPiSubgroup hQ r hr)]; exact hq
+  -- `B` normalizes every `Q ∈ ℋ_G*(A;q)` (via `B ≤ A`).
+  have hBnorm : ∀ Q : Subgroup G, Q ∈ hInvariantStar ⊤ A {q} → B ≤ Subgroup.normalizer Q :=
+    fun Q hQ => le_trans hBA (hInvariantStar_le_normalizer hQ)
+  -- Cauchy: a nonidentity `A`-invariant `q`-subgroup `cc ≤ C_G(A)`.
+  obtain ⟨c, hc_ord⟩ :=
+    exists_prime_orderOf_dvd_card' q (G := ↥(Subgroup.centralizer (A : Set G)))
+      (Nat.mem_primeFactors.mp hqc).2.1
+  set cc : Subgroup G := Subgroup.zpowers (c : G) with hcc
+  have hc_mem : (c : G) ∈ Subgroup.centralizer (A : Set G) := c.2
+  have hcc_le_cent : cc ≤ Subgroup.centralizer (A : Set G) := Subgroup.zpowers_le.mpr hc_mem
+  have hcc_card : Nat.card ↥cc = q := by
+    rw [hcc, Nat.card_zpowers]
+    exact (orderOf_injective (Subgroup.centralizer (A : Set G)).subtype
+      (Subgroup.subtype_injective _) c).trans hc_ord
+  have hcc_ne : cc ≠ ⊥ := by
+    intro h; rw [h, Subgroup.card_bot] at hcc_card
+    exact (Nat.Prime.one_lt (Fact.out : q.Prime)).ne hcc_card
+  have hcc_mem : cc ∈ hInvariant ⊤ A {q} := by
+    refine ⟨le_top, ?_, ?_⟩
+    · intro a ha
+      apply mem_normalizer_of_conj_smul_eq_self
+      have hac : a * (c : G) * a⁻¹ = (c : G) := by
+        rw [Subgroup.mem_centralizer_iff.mp hc_mem a ha, mul_inv_cancel_right]
+      ext y
+      rw [Subgroup.pointwise_smul_def, Subgroup.mem_map]
+      constructor
+      · rintro ⟨z, hz, rfl⟩
+        obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+        refine Subgroup.mem_zpowers_iff.mpr ⟨n, ?_⟩
+        show (c : G) ^ n = MulAut.conj a ((c : G) ^ n)
+        rw [map_zpow]; simp only [MulAut.conj_apply]; rw [hac]
+      · intro hy
+        obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hy
+        exact ⟨(c : G) ^ n, Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩, by
+          show MulAut.conj a ((c : G) ^ n) = y
+          rw [map_zpow]; simp only [MulAut.conj_apply]; rw [hac, hn]⟩
+    · intro r hr
+      rw [hcc_card] at hr
+      rw [Set.mem_singleton_iff,
+        ← Finset.mem_singleton, ← Nat.Prime.primeFactors (Fact.out : q.Prime)]
+      exact hr
+  -- every `Q ∈ ℋ_G*(A;q)` is nontrivial.
+  have hQne : ∀ Q : Subgroup G, Q ∈ hInvariantStar ⊤ A {q} → Q ≠ ⊥ := by
+    intro Q hQ hQbot
+    have heq : cc = Q := hQ.2 cc hcc_mem (by rw [hQbot]; exact bot_le)
+    rw [hQbot] at heq; exact hcc_ne heq
+  -- `A ≤ C_G(x)` and `C_R(x) ≠ 1` for `x ∈ B`.
+  have hA_CGx : ∀ x ∈ B, A ≤ Subgroup.centralizer ({x} : Set G) := by
+    intro x hx a ha
+    rw [Subgroup.mem_centralizer_iff]
+    rintro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
+    exact (Subgroup.mem_centralizer_iff.mp (hB_cent hx) a ha).symm
+  -- main transitivity.
+  intro Q₁ hQ₁ Q₂ hQ₂
+  obtain ⟨R, hR_mem, hcc_le_R⟩ := exists_le_hInvariantStar hcc_mem
+  have hCRx : ∀ x ∈ B, R ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+    intro x hx h
+    refine hcc_ne (le_bot_iff.mp ?_)
+    rw [← h]
+    exact le_inf hcc_le_R
+      (le_trans hcc_le_cent (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (hBA hx))))
+  obtain ⟨x, hxB, hx_ne, hQ₁x⟩ :=
+    exists_mem_inf_centralizer_ne_bot_of_not_isCyclic (hBnorm Q₁ hQ₁) hB_nc (hCop_BQ Q₁ hQ₁)
+      (hQne Q₁ hQ₁)
+  obtain ⟨f, hf_K, hf_eq⟩ := inductiveLemma hG hA hq hQ₁ hR_mem
+    (Subgroup.centralizer ({x} : Set G)) (hCGx_proper x hx_ne) (hA_CGx x hxB)
+    (by rw [inf_comm]; exact hQ₁x) (by rw [inf_comm]; exact hCRx x hxB)
+  obtain ⟨x', hx'B, hx'_ne, hQ₂x'⟩ :=
+    exists_mem_inf_centralizer_ne_bot_of_not_isCyclic (hBnorm Q₂ hQ₂) hB_nc (hCop_BQ Q₂ hQ₂)
+      (hQne Q₂ hQ₂)
+  obtain ⟨g, hg_K, hg_eq⟩ := inductiveLemma hG hA hq hR_mem hQ₂
+    (Subgroup.centralizer ({x'} : Set G)) (hCGx_proper x' hx'_ne) (hA_CGx x' hx'B)
+    (by rw [inf_comm]; exact hCRx x' hx'B) (by rw [inf_comm]; exact hQ₂x')
+  exact ⟨g * f, (kSubgroup A).mul_mem hg_K hf_K, by rw [map_mul, mul_smul, hf_eq]; exact hg_eq⟩
 
 /-! ## Theorem 7.4 — 推移性の伝播 -/
 
