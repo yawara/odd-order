@@ -6,7 +6,7 @@ Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S11_ExceptionalMaximal.lean`.
 
 Concrete surfaces now present:
 - `Hypothesis111` records the literal BG Hypothesis 11.1 data plus the Lemma 10.5-derived `A`/`P` choices, without hiding theorem conclusions as fields.
-- `IsAInvSylowIn` gives the ambient API for `A`-invariant Sylow subgroups used by Lemma 11.1.
+- `IsAInvSylowIn` gives the ambient API for `A`-invariant Sylow subgroups used by Lemma 11.1; both it and `Hypothesis111` now have small projection lemmas for downstream proofs.
 - Lemma 11.1 (`invariant_sylow_disjoint`) and Corollary 11.2 (`Msigma_meet_conjugate`) have substantial concrete proof bodies; the remaining named endpoints are still theorem gates.
 
 Current Lean inventory: 5 theorem-level `sorry`s remain in §11.

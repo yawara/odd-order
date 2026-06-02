@@ -79,10 +79,57 @@ structure Hypothesis111 (M : Subgroup G) (p : ℕ) (A₀ A P : Subgroup G) : Pro
   normalizer_P_not_le : ¬ Subgroup.normalizer (P : Set G) ≤ M
   A_maximal : IsMaximalElementaryAbelian p A
 
+namespace Hypothesis111
+
+variable {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G}
+
+theorem A0_le_M (h : Hypothesis111 M p A₀ A P) : A₀ ≤ M :=
+  h.A₀_le
+
+theorem A0_le_P (h : Hypothesis111 M p A₀ A P) : A₀ ≤ P :=
+  h.A₀_le_A.trans h.A_le_P
+
+theorem A_le_M_and_P (h : Hypothesis111 M p A₀ A P) : A ≤ M ∧ A ≤ P :=
+  ⟨h.A_le, h.A_le_P⟩
+
+theorem P_le_M (h : Hypothesis111 M p A₀ A P) : P ≤ M :=
+  h.P_le
+
+theorem A0_le_M_and_A (h : Hypothesis111 M p A₀ A P) : A₀ ≤ M ∧ A₀ ≤ A :=
+  ⟨h.A₀_le, h.A₀_le_A⟩
+
+end Hypothesis111
+
 /-- `Q` は `H` の `A`-不変 Sylow `q`-部分群 (= `Q ≤ H`, `q`-群, `A`-不変, `H` 内で `q`-極大)。 -/
 def IsAInvSylowIn (q : ℕ) (A Q H : Subgroup G) : Prop :=
   Q ≤ H ∧ IsPGroup q ↥Q ∧ A ≤ Subgroup.normalizer (Q : Set G) ∧
     ∀ R : Subgroup G, Q ≤ R → R ≤ H → IsPGroup q ↥R → R = Q
+
+@[simp] theorem isAInvSylowIn_iff (q : ℕ) (A Q H : Subgroup G) :
+    IsAInvSylowIn q A Q H ↔
+      Q ≤ H ∧ IsPGroup q ↥Q ∧ A ≤ Subgroup.normalizer (Q : Set G) ∧
+        ∀ R : Subgroup G, Q ≤ R → R ≤ H → IsPGroup q ↥R → R = Q :=
+  Iff.rfl
+
+namespace IsAInvSylowIn
+
+variable {q : ℕ} {A Q H : Subgroup G}
+
+theorem le (h : IsAInvSylowIn q A Q H) : Q ≤ H :=
+  h.1
+
+theorem isPGroup (h : IsAInvSylowIn q A Q H) : IsPGroup q ↥Q :=
+  h.2.1
+
+theorem A_le_normalizer (h : IsAInvSylowIn q A Q H) :
+    A ≤ Subgroup.normalizer (Q : Set G) :=
+  h.2.2.1
+
+theorem maximal (h : IsAInvSylowIn q A Q H) :
+    ∀ R : Subgroup G, Q ≤ R → R ≤ H → IsPGroup q ↥R → R = Q :=
+  h.2.2.2
+
+end IsAInvSylowIn
 
 /-- `φ • H = H.map φ`: the pointwise `MulAut`-action on a subgroup is its image under the
 corresponding monoid hom. -/
