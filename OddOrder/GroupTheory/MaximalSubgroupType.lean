@@ -54,6 +54,26 @@ def centralizerSupport (source : Set G) (host : Subgroup G) : Set G :=
 def escapingCentralizerSet (M : Subgroup G) (X : Set G) : Set G :=
   {x | x ∈ X ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
 
+/-- The left coset `aH`, as a subset of the ambient group. -/
+def leftCosetSet (a : G) (H : Subgroup G) : Set G :=
+  (fun h : G => a * h) '' (H : Set G)
+
+/-- Peterfalvi (8.14), the subgroup `R(x)` attached to `L`, `M`, and a support
+set `X`: it is trivial off the escaping-centralizer set and is
+`C_{L_F}(x)` on that set. -/
+noncomputable def supportKernel (L M : Subgroup G) (X : Set G) (x : G) : Subgroup G := by
+  classical
+  exact
+    if x ∈ escapingCentralizerSet M X then
+      maxNilpotentNormalHall L ⊓ Subgroup.centralizer ({x} : Set G)
+    else
+      ⊥
+
+/-- Peterfalvi (8.14), the thickened conjugacy-saturation
+`⋃_{x ∈ X} (x R(x))^G`. -/
+noncomputable def thickenedSupport (L M : Subgroup G) (X : Set G) : Set G :=
+  {y | ∃ x ∈ X, y ∈ conjClassSet (leftCosetSet x (supportKernel L M X x))}
+
 /-- Data for Peterfalvi (8.1), a solvable group of type `F`.
 
 `H` is `M_F`, `U` is a Hall complement in `M`, `U_1` is the abelian normal
@@ -243,5 +263,22 @@ def typePV (M : Subgroup G) (data : TypePData M) : Set G :=
 /-- Peterfalvi (8.10), `A_0(M) = A(M) union V^G` for type `P` data. -/
 def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
   typePA M data ∪ conjClassSet (typePV M data)
+
+/-- Peterfalvi (8.14), the thickened `A_1(M)` attached to a supporting maximal
+subgroup `L`. -/
+noncomputable def thickenedA1 (L M : Subgroup G) (tau : PeterfalviType) : Set G :=
+  thickenedSupport L M (A1 M tau)
+
+/-- Peterfalvi (8.14), the thickened `A(M)` for type-I data. -/
+noncomputable def typeIThickenedA (L M : Subgroup G) (data : TypeIData M) : Set G :=
+  thickenedSupport L M (typeIA M data)
+
+/-- Peterfalvi (8.14), the thickened `A(M)` for type-`P` data. -/
+noncomputable def typePThickenedA (L M : Subgroup G) (data : TypePData M) : Set G :=
+  thickenedSupport L M (typePA M data)
+
+/-- Peterfalvi (8.14), the thickened `A_0(M)` for type-`P` data. -/
+noncomputable def typePThickenedA0 (L M : Subgroup G) (data : TypePData M) : Set G :=
+  thickenedSupport L M (typePA0 M data)
 
 end OddOrder.GroupTheory

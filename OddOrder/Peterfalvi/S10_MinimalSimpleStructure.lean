@@ -26,9 +26,10 @@ Peterfalvi-numbered entry points and the main scaffold statements.  Proofs of
 BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
 
 The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
-has now been recovered; this file records the Type-II TI endpoint and leaves the
-`R(x)`/thickened-support notation and BG Theorem E covering statement as precise
-TODOs until their lower-level interfaces are available.
+has now been recovered; this file records the `R(x)`/thickened-support notation
+and the Type-II TI endpoint, and leaves the remaining Dade-hypothesis and BG
+Theorem E covering statements as precise TODOs until their lower-level
+interfaces are available.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -175,6 +176,32 @@ theorem typeII_A_sets_normalizer [Finite G]
         Subgroup.normalizer (A1 M PeterfalviType.II) = M := by
   sorry
 
+/-- **Peterfalvi (8.14)**: the subgroup `R(x)`, shared as
+`OddOrder.GroupTheory.supportKernel`. -/
+noncomputable abbrev supportKernel (L M : Subgroup G) (X : Set G) (x : G) :=
+  OddOrder.GroupTheory.supportKernel L M X x
+
+/-- **Peterfalvi (8.14)**: the thickened support set
+`⋃_{x ∈ X} (x R(x))^G`, shared as `OddOrder.GroupTheory.thickenedSupport`. -/
+noncomputable abbrev thickenedSupport (L M : Subgroup G) (X : Set G) :=
+  OddOrder.GroupTheory.thickenedSupport L M X
+
+/-- **Peterfalvi (8.14)**: the thickened `A_1(M)`. -/
+noncomputable abbrev thickenedA1 (L M : Subgroup G) (tau : PeterfalviType) :=
+  OddOrder.GroupTheory.thickenedA1 L M tau
+
+/-- **Peterfalvi (8.14)**: the thickened `A(M)` for type-I data. -/
+noncomputable abbrev typeIThickenedA (L M : Subgroup G) (data : TypeIData M) :=
+  OddOrder.GroupTheory.typeIThickenedA L M data
+
+/-- **Peterfalvi (8.14)**: the thickened `A(M)` for type-`P` data. -/
+noncomputable abbrev typePThickenedA (L M : Subgroup G) (data : TypePData M) :=
+  OddOrder.GroupTheory.typePThickenedA L M data
+
+/-- **Peterfalvi (8.14)**: the thickened `A_0(M)` for type-`P` data. -/
+noncomputable abbrev typePThickenedA0 (L M : Subgroup G) (data : TypePData M) :=
+  OddOrder.GroupTheory.typePThickenedA0 L M data
+
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
 The proof uses the recovered (8.14)--(8.17) support notation and BG Theorem E
@@ -187,12 +214,6 @@ theorem support_mutual_exclusion [Finite G]
         Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
   sorry
 
--- TODO (Peterfalvi (8.14)): materialize the recovered support notation `R(x)` and
--- the thickened sets `tilde A(M)`, `tilde A_0(M)`, and `tilde A_1(M)`.
--- PDF p.48 defines `L supports M`, sets `R(x)=1` off the escaping-centralizer
--- set and `R(x)=C_{L_F}(x)` on it, then defines the three thickened conjugacy
--- saturations as unions over `a` of `(aR(a))^G`.
---
 -- TODO (Peterfalvi (8.15)): once the Section 2.2/4.6/5.2 hypothesis
 -- structures have stable section-level names, add the recovered statement that
 -- `M = N_G(A)` for `A = A_0(M), A(M), A_1(M)`, and that the relevant Dade
