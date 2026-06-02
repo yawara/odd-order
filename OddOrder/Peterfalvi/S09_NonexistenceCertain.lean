@@ -486,6 +486,15 @@ def constOne (G : Type*) [Group G] : ClassFunction G ℂ :=
 @[simp] theorem constOne_apply {G : Type*} [Group G] (g : G) :
     (constOne G : G → ℂ) g = 1 := rfl
 
+/-- The constant-one class function has norm one. -/
+theorem constOne_inner_self_eq_one {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] :
+    ClassFunction.inner (constOne G) (constOne G) = 1 := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]
+  simp only [constOne_apply, star_one, mul_one, Finset.sum_const, nsmul_eq_mul]
+  rw [Finset.card_univ, ← Nat.card_eq_fintype_card, invOf_eq_inv]
+  field_simp [show (Nat.card G : ℂ) ≠ 0 by exact_mod_cast (Nat.card_pos (α := G)).ne']
+
 open scoped Classical in
 /-- `chiRho` applied to the constant `1_G` is the indicator of `A` on `L`. -/
 theorem chiRho_constOne (H71 : Hypothesis71 G A L) (a : L) :
