@@ -2753,6 +2753,55 @@ end Hypothesis79
 
 end Section_7_9
 
+section OrthogonalIntegerDecomposition
+
+variable {ι : Type*}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+open scoped Classical in
+/-- Integer-coefficient Pythagoras bridge used in Peterfalvi (7.10): if a class
+function decomposes as an orthogonal integer combination plus an orthogonal
+residual, then an upper bound on its norm bounds the sum of the diagonal weights
+for every nonzero coefficient. -/
+theorem sum_weights_le_of_orthogonal_integer_decomposition
+    (B : Finset ι) (v : ι → ClassFunction G ℂ) (x : ι → ℤ) (m : ι → ℝ)
+    (Γ Γ₁ : ClassFunction G ℂ) (M : ℝ)
+    (hΓ : Γ = (∑ i ∈ B, (((x i : ℝ) : ℂ) • v i)) + Γ₁)
+    (horth : ∀ i ∈ B, ∀ j ∈ B,
+      ClassFunction.inner (v i) (v j) = if i = j then (m i : ℂ) else 0)
+    (hΓ₁ : ∀ i ∈ B, ClassFunction.inner Γ₁ (v i) = 0)
+    (hm_nonneg : ∀ i ∈ B, 0 ≤ m i)
+    (hx_nonzero : ∀ i ∈ B, x i ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ M) :
+    (∑ i ∈ B, m i) ≤ M := by
+  classical
+  have hpyth := inner_self_orthogonalSum_add_re (G := G) B v
+    (fun i => (x i : ℝ)) m Γ₁ horth hΓ₁
+  have hΓ_norm : (ClassFunction.inner Γ Γ).re =
+      (∑ i ∈ B, (x i : ℝ) ^ 2 * m i) +
+        (ClassFunction.inner Γ₁ Γ₁).re := by
+    rw [hΓ]
+    exact hpyth
+  have hsum_le_sq : (∑ i ∈ B, m i) ≤
+      ∑ i ∈ B, (x i : ℝ) ^ 2 * m i := by
+    refine Finset.sum_le_sum fun i hi => ?_
+    have hcases : x i ≤ -1 ∨ 1 ≤ x i := by
+      have hxi := hx_nonzero i hi
+      omega
+    have hx_sq : (1 : ℝ) ≤ (x i : ℝ) ^ 2 := by
+      rcases hcases with hle | hge
+      · have hle' : (x i : ℝ) ≤ -1 := by exact_mod_cast hle
+        nlinarith
+      · have hge' : (1 : ℝ) ≤ x i := by exact_mod_cast hge
+        nlinarith
+    simpa [one_mul] using mul_le_mul_of_nonneg_right hx_sq (hm_nonneg i hi)
+  have hΓ₁_nonneg : 0 ≤ (ClassFunction.inner Γ₁ Γ₁).re :=
+    inner_self_re_nonneg Γ₁
+  rw [hΓ_norm] at hΓ_bound
+  linarith
+
+end OrthogonalIntegerDecomposition
+
 /- 7.10-7.11: the Frobenius-family non-existence theorem (pp. 42-43) -/
 
 /-- **Peterfalvi (7.10) hypothesis.** A family of `k` Frobenius subgroups of `G`
