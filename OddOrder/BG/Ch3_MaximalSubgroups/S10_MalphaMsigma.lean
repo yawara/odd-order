@@ -267,7 +267,7 @@ theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-- **BG Proposition 10.11 (a)(b)(c)** (mmd L2856): `M ∈ ℳ`, `K` を `M` の `σ(M)'`-部分群とする。
 (a) `K ∉ 𝒰`; (b) `r(C_K(M_σ)) ≤ 1`; (c) `C_K(M_σ) ∩ M'` は cyclic で `M` に normal。
-(原典 (d) は `[K,P]` の作用条件 — 後続。) -/
+(原典 (d) は `sigma_complement_commutator_cyclic_normal` として別 theorem に露出。) -/
 theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {K : Subgroup G} (hKM : K ≤ M)
     (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) :
@@ -277,6 +277,26 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
       M ≤ Subgroup.normalizer
         ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M : Subgroup G) :
           Set G)) := by
+  sorry
+
+/-! ## Proposition 10.11(d) — commutators with `σ(M)'`-subgroups (mmd L2856) -/
+
+/-- **BG Proposition 10.11(d)** (mmd L2856): `M ∈ ℳ`, `K` を `M` の `σ(M)'`-部分群とする。
+`p ∈ σ(M)'`, `P ∈ ℰ_p¹(N_M(K))`, `C_{M_σ}(P)=1`, かつ `K` が abelian `p'`-group なら、
+`[K,P]` は `M_σ` を中心化し、cyclic normal subgroup of `M` である。
+
+This is exposed separately because later §12/§13 arguments need the commutator conclusion,
+while Proposition 10.11(a)(b)(c) provides only the rank and cyclic-normal centralizer gate. -/
+theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {K : Subgroup G} (hKM : K ≤ M)
+    (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) {p : ℕ} [Fact p.Prime]
+    (hp : p ∉ sigma M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPN : P ≤ Subgroup.normalizer (K : Set G) ⊓ M)
+    (hCP : Msigma M ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hKab : IsMulCommutative ↥K) (hKp' : Subgroup.IsPiSubgroup (({p} : Set ℕ)ᶜ) K) :
+    ⁅K, P⁆ ≤ Subgroup.centralizer ((Msigma M : Subgroup G) : Set G) ∧
+    IsCyclic ↥(⁅K, P⁆ : Subgroup G) ∧
+    M ≤ Subgroup.normalizer ((⁅K, P⁆ : Subgroup G) : Set G) := by
   sorry
 
 /-! ## Lemma 10.12 — 非共役 maximal の σ-disjointness (mmd L2885) -/
@@ -617,7 +637,9 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
 
 /-- **BG Corollary 10.9 (a)(1)(2)** (mmd L2826): `M ∈ ℳ`, `p, q ∈ β(M)'` distinct, `X` を `M` の
 `q`-部分群で `X ⊆ M'` または `p < q` とする。(1) `X` は `M_σ` の Sylow `p`-部分群を中心化する;
-(2) `p ∈ α(M)` なら `C_M(X) ∈ 𝒰`。(原典 (a)(3) と (b) `M = M_β(H∩M)` は後続。) -/
+(2) `p ∈ α(M)` なら `C_M(X) ∈ 𝒰`。原典 (a)(3)/(b) は
+`beta_complement_normalizer_derived_contains_sylow` と
+`beta_factorization_of_sylow_normalizer_in_intersection` として別 theorem に露出。 -/
 theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hpq : p ≠ q) (hpβ : p ∉ beta M) (hqβ : q ∉ beta M)
@@ -627,6 +649,40 @@ theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
       X ≤ Subgroup.centralizer
         (((S : Subgroup ↥(Msigma M)).map (Msigma M).subtype : Subgroup G) : Set G)) ∧
     (p ∈ alpha M → IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M)) := by
+  sorry
+
+/-! ## Corollary 10.9(a)(3)/(b) — β(M)'-normalizer gates (mmd L2826) -/
+
+/-- **BG Corollary 10.9(a)(3)** (mmd L2826): in the setup of Corollary 10.9(a), if `X` is a
+Sylow `q`-subgroup of `M'`, then `N_M(X)'` contains a Sylow `p`-subgroup of `M'`.
+
+Here `X` is represented as a Sylow subgroup of `↥(M')`, mapped back to the ambient group `G`,
+and `N_M(X)` is encoded as `N_G(X) ∩ M`. -/
+theorem beta_complement_normalizer_derived_contains_sylow [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) (hpβ : p ∉ beta M) (hqβ : q ∉ beta M)
+    (X : Sylow q ↥(derivedInG M)) :
+    ∃ S : Sylow p ↥(derivedInG M),
+      ((S : Subgroup ↥(derivedInG M)).map (derivedInG M).subtype : Subgroup G) ≤
+        derivedInG
+          (Subgroup.normalizer
+              (((X : Subgroup ↥(derivedInG M)).map (derivedInG M).subtype : Subgroup G) :
+                Set G) ⊓
+            M) := by
+  sorry
+
+/-- **BG Corollary 10.9(b)** (mmd L2826): if `H ∈ ℳ - {M}` and `N_G(S) ⊆ H ∩ M` for some
+Sylow subgroup `S` of `G`, then `M = (H ∩ M)M_β` and `α(M)=β(M)`.
+
+The product is encoded as subgroup join, matching the existing convention for normal-factor
+statements in §12. -/
+theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M H : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G) (hHM : H ≠ M)
+    {q : ℕ} [Fact q.Prime] (S : Sylow q G)
+    (hN : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ H ⊓ M) :
+    M = (H ⊓ M) ⊔ Mbeta M ∧ alpha M = beta M := by
   sorry
 
 /-! ## Proposition 10.10 — N_G(P) の分解 (mmd L2844) -/

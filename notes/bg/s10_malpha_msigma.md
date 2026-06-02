@@ -256,6 +256,11 @@ M ∈ ℳ に対して:
 
 **(b)** H ∈ ℳ - {M}, N_G(S) ⊆ H ∩ M for Sylow S ⇒ M = (H ∩ M)M_β and α(M) = β(M).
 
+**Lean surface**:
+- `beta_complement_centralizes`: Cor 10.9(a)(1)(2).
+- `beta_complement_normalizer_derived_contains_sylow`: Cor 10.9(a)(3).
+- `beta_factorization_of_sylow_normalizer_in_intersection`: Cor 10.9(b).
+
 ### 引用：Lem 6.5（L2840）
 
 Corollary 10.9(a)(3) 証明:
@@ -294,6 +299,10 @@ M ∈ ℳ, K = σ(M)'-subgroup of M ⇒
 3. C_K(M_σ) ∩ M' is cyclic normal subgroup of M.
 4. (条件付) [K, P] centralizes M_σ and is cyclic normal in M.
 
+**Lean surface**:
+- `sigma_complement_rank_le_one`: Prop 10.11(a)(b)(c).
+- `sigma_complement_commutator_cyclic_normal`: Prop 10.11(d).
+
 ### Proposition 10.12（未掲示, mmd L2885-???）
 
 M, H ∈ ℳ, H not conjugate to M ⇒
@@ -307,6 +316,10 @@ p ∈ β(G), P = Sylow p-subgroup of G ⇒
 2. Every p-subgroup R with r(R) ≥ 2 lies in 𝒰.
 3. For subgroup X ⊆ P, N_P(X) ∈ 𝒰.
 4. For nonidentity β(M)-subgroup Y of M, N_G(Y) ⊆ M.
+
+**Lean surface**:
+- `beta_global_structure`: Prop 10.14(a)(b)(c).
+- `normalizer_le_of_nontrivial_beta_subgroup`: Prop 10.14(d), the direct §13 gate.
 
 ---
 
