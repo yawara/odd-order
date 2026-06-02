@@ -2376,6 +2376,61 @@ theorem normEstimates_of_source_orthogonal
     (H78.gammaNormSq_eq_of_source_orthogonal hBD hsrc
       horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
 
+/-- Textbook `u,v,w` form of the `(ζ^ν)^ρ` norm rewrites to the internal
+`normQuadraticCorrection + (1 - e / h)` form.
+
+This is the arithmetic bridge from the (7.7.b) double-sum evaluation in
+Peterfalvi (7.8.b), where
+`u = (1/e)(1 - 1/h)`, `v = 1/h`, and `w = 1 - e/h`. -/
+theorem zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzeta :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) := by
+  rw [hzeta, normQuadraticCorrection]
+
+/-- Source-side beta norm data plus the textbook `u,v,w` formula package
+Peterfalvi (7.8.b)'s `NormEstimates`.
+
+The remaining character-theoretic input is now exactly the (7.7.b) evaluation
+of `‖(ζ^ν)^ρ‖²` in `u,v,w` form; this theorem performs the API conversion and
+reuses the already proved source-side `Γ` norm formula. -/
+theorem normEstimates_of_source_orthogonal_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_source_orthogonal hBD hsrc
+    horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr
+    (H78.zetaNuRhoNormSq_eq_normQuadraticCorrection_of_uv_formula hBD hzeta_uv)
+
 /-- Version of `normEstimates_of_source_orthogonal` using the natural source
 hypotheses that the `S`-family consists of distinct irreducible characters. -/
 theorem normEstimates_of_irreducible_source_data
