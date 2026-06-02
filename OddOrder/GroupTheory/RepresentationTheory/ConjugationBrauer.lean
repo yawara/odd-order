@@ -122,6 +122,54 @@ theorem fixed_eq_one_of_not_mem_of_centralizer_le (g : G) (hg : g ∉ H)
 
 end ConjClasses
 
+/-- **Abelian fixed-class bridge.**  When `H` is abelian (all of its elements commute) and the
+ambient centralizer of `g : G` meets `H` only in the identity (`C_G(g) ⊓ H = ⊥`), the conjugation
+permutation of the conjugacy classes of `H` by `g` fixes exactly one class — the identity class.
+
+For abelian `H` conjugacy classes are singletons, so a `g`-fixed class `⟦h⟧` forces
+`g·h·g⁻¹ = h`, i.e. `h ∈ C_G(g) ⊓ H = ⊥`, hence `h = 1`.  This is the (6.8)(c2) replacement for
+`card_fixedPoints_conjClassPerm_eq_one_of_not_mem_of_centralizer_le`, which needs the full
+Frobenius centralizer condition `C_G(h) ≤ H` (false in the quotient `H̄`, where `H̄ ≤ C(h̄)`); the
+abelian quotient `H̄ = H/⁅H,H⁆` only supplies `C_{H̄}(ḡ) = 1` and abelianness. -/
+theorem card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot
+    [Finite H] (g : G) (hcomm : ∀ a b : H, Commute a b)
+    (hbot : Subgroup.centralizer ({g} : Set G) ⊓ H = ⊥) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g)) = 1 := by
+  -- Both fixed classes are the identity class: a fixed `⟦h⟧` forces `h ∈ C_G(g) ⊓ H = ⊥`.
+  have hfix_one : ∀ E : Function.fixedPoints (ConjClasses.conjByPerm (G := G) (H := H) g),
+      (E : ConjClasses H) = 1 := by
+    rintro ⟨E, hE⟩
+    rcases ConjClasses.exists_rep E with ⟨h, rfl⟩
+    have hmk :
+        ConjClasses.mk (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) = ConjClasses.mk h := by
+      simpa [ConjClasses.conjByPerm_mk] using hE
+    have hisConj :
+        IsConj (ClassFunction.conjByMulEquiv (G := G) (H := H) g h) h :=
+      ConjClasses.mk_eq_mk_iff_isConj.mp hmk
+    -- In an abelian `H`, conjugacy is equality.
+    have heq : ClassFunction.conjByMulEquiv (G := G) (H := H) g h = h := by
+      obtain ⟨c, hc⟩ := isConj_iff.mp hisConj
+      have hcomm_ch := (hcomm c (ClassFunction.conjByMulEquiv (G := G) (H := H) g h))
+      rw [hcomm_ch.eq, mul_inv_cancel_right] at hc
+      exact hc
+    -- `h` centralizes `g` and lies in `H`, hence in `⊥`.
+    have hcent : (h : G) ∈ Subgroup.centralizer ({g} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      have hval : g * (h : G) * g⁻¹ = (h : G) := congrArg Subtype.val heq
+      have := congrArg (fun z : G => z * g) hval
+      simpa [mul_assoc] using this.symm
+    have hh_bot : (h : G) ∈ (⊥ : Subgroup G) := by
+      rw [← hbot]; exact Subgroup.mem_inf.mpr ⟨hcent, h.property⟩
+    have hh_one : h = 1 := by
+      apply Subtype.ext
+      simpa using (Subgroup.mem_bot.mp hh_bot)
+    show ConjClasses.mk h = 1
+    rw [hh_one]
+    exact ConjClasses.one_eq_mk_one.symm
+  rw [Nat.card_eq_one_iff_unique]
+  exact ⟨⟨fun C D => Subtype.ext ((hfix_one C).trans (hfix_one D).symm)⟩,
+    ⟨⟨1, ConjClasses.conjByPerm_one (G := G) (H := H) g⟩⟩⟩
+
 /-- Compatibility of ambient conjugation on irreducible characters with ambient conjugation on
 conjugacy classes, in the exact form consumed by `brauer_permutation_lemma_general'`. -/
 theorem characterTableEntry_conjByPerm
@@ -236,5 +284,57 @@ theorem inertia_eq_of_freeAction [Finite H]
     exact not_mem_inertia_of_ne_trivial_of_not_mem_of_centralizer_le
       (G := G) (H := H) g hgH hcent hθ_ne hg
   · exact ClassFunction.subgroup_le_inertia (G := G) (H := H) (θ : ClassFunction H ℂ)
+
+/-! ### Inertia transfer along a quotient of a normal subgroup
+
+Let `M ≤ H ⊴ G` with `M ⊴ G`, and let `q : ↥H →* ↥H̄` be a homomorphism onto a normal subgroup
+`H̄ ⊴ G/M` that realizes the quotient corestriction (`(q x : G/M) = mk' M x`).  Inflating a class
+function `θ̄` of `H̄` to `θ = θ̄ ∘ q` is **equivariant** for the conjugation actions: conjugating `θ`
+by `g : G` equals inflating the conjugate of `θ̄` by `mk' M g`.  Consequently the inertia group of
+`θ` is the preimage of the inertia group of `θ̄`.  This is the bridge that, in Peterfalvi (6.8)(c2),
+reduces `I_L(θ) = H` for a linear `θ` to the fixed-point-free action of `W₁` on the abelian
+quotient `H̄ = H/⁅H,H⁆`. -/
+
+section InertiaTransfer
+
+variable {G : Type*} [Group G] {H : Subgroup G} [H.Normal] {M : Subgroup G} [M.Normal]
+  {H' : Subgroup (G ⧸ M)} [H'.Normal]
+
+/-- **Inflation–conjugation equivariance.**  For a quotient-corestriction `q : ↥H →* ↥H'`
+(`(q x : G/M) = mk' M x`), conjugating the inflated class function `θ̄ ∘ q` by `g : G` equals
+inflating the conjugate of `θ̄` by `mk' M g`. -/
+theorem conjBy_compHom_eq_compHom_conjBy (q : ↥H →* ↥H')
+    (hq : ∀ x : ↥H, ((q x : G ⧸ M)) = QuotientGroup.mk' M (x : G))
+    (θbar : ClassFunction ↥H' ℂ) (g : G) :
+    ClassFunction.conjBy g (ClassFunction.compHom q θbar) =
+      ClassFunction.compHom q
+        (ClassFunction.conjBy (QuotientGroup.mk' M g) θbar) := by
+  ext h
+  -- Both sides evaluate `θ̄` at `H'`-elements with equal `G/M`-values.
+  rw [ClassFunction.conjBy_apply, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    ClassFunction.conjBy_apply]
+  apply congrArg θbar
+  apply Subtype.ext
+  -- Reduce to an equality of `G/M`-values: both are `mk'(g)·mk'(h)·mk'(g)⁻¹`.
+  show ((q ⟨g * (h : G) * g⁻¹, ‹H.Normal›.conj_mem (h : G) h.property g⟩ : ↥H') : G ⧸ M) =
+    QuotientGroup.mk' M g * ((q h : ↥H') : G ⧸ M) * (QuotientGroup.mk' M g)⁻¹
+  rw [hq, hq]
+  simp only [QuotientGroup.mk'_apply, QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+
+/-- **Inertia transfer.**  Under the quotient corestriction `q`, membership in the inertia group of
+the inflated `θ = θ̄ ∘ q` corresponds to membership of `mk' M g` in the inertia group of `θ̄`,
+provided `compHom q` is injective (e.g. `q` surjective). -/
+theorem mem_inertia_compHom_iff (q : ↥H →* ↥H')
+    (hq : ∀ x : ↥H, ((q x : G ⧸ M)) = QuotientGroup.mk' M (x : G))
+    (hqinj : Function.Injective
+      (ClassFunction.compHom q : ClassFunction ↥H' ℂ → ClassFunction ↥H ℂ))
+    (θbar : ClassFunction ↥H' ℂ) (g : G) :
+    g ∈ ClassFunction.inertia (ClassFunction.compHom q θbar) ↔
+      QuotientGroup.mk' M g ∈ ClassFunction.inertia θbar := by
+  rw [ClassFunction.mem_inertia, ClassFunction.mem_inertia,
+    conjBy_compHom_eq_compHom_conjBy q hq θbar g]
+  exact ⟨fun h => hqinj h, fun h => congrArg (ClassFunction.compHom q) h⟩
+
+end InertiaTransfer
 
 end OddOrder.RepresentationTheory

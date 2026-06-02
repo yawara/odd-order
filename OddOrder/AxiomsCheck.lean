@@ -1711,6 +1711,20 @@ set_option linter.style.longLine false in
 -- Linear (degree-one) irreducible character from a hom `H →* ℂˣ`: the source characters of the
 -- (6.8) `Y = S(H')` family are the nontrivial linear characters of `H` (`= Irr(H/H') ∖ {1}`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIrreducibleCharacter
+-- Degree-one irreducible characters are multiplicative / kill commutators — lets a linear `θ` of `H`
+-- inflate from the abelian quotient `H/⁅H,H⁆` (the (6.8)(c2) inertia bridge).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.map_mul_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_one
+-- (6.8)(c2) inertia bridge infra: inflation–conjugation equivariance + inertia transfer
+-- (`g ∈ I_L(inflate θ̄) ↔ ḡ ∈ I_Ḡ(θ̄)`), and the abelian Brauer count (`C_{H̄}(ḡ)=1 ⟹ ḡ` fixes only
+-- the trivial class). With Isaacs 3.28 these discharge `inertia(θ)=H` for linear `θ` in case c2.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjBy_compHom_eq_compHom_conjBy
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mem_inertia_compHom_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
 -- Norm-1 virtual character with positive degree is irreducible (reusable Fourier criterion).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
 -- Brauer conjugation bridge: if ambient centralizers of nonidentity elements of `H` lie in `H`,
