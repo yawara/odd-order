@@ -56,14 +56,14 @@ section Thm418
 variable {G : Type*} [Group G] [Finite G]
 
 /-- `{q | q ∉ ({p} : Set ℕ)} = {r | r ≠ p}` — `oPiPrimePiCore` の内部表現と
-Thm 5.6 語彙の橋。 -/
-private theorem compl_singleton_eq {p : ℕ} :
+Thm 5.6 語彙の橋。S05 (Thm 5.6 narrow core) でも使う。 -/
+theorem compl_singleton_eq {p : ℕ} :
     {q : ℕ | q ∉ ({p} : Set ℕ)} = {r : ℕ | r ≠ p} := by
   ext q
   simp [Set.mem_singleton_iff]
 
 /-- π-glue: `p`-部分群は `{p}`-群。 -/
-private theorem isPiGroup_singleton_of_isPGroup {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+theorem isPiGroup_singleton_of_isPGroup {p : ℕ} [Fact p.Prime] {H : Subgroup G}
     (hH : IsPGroup p ↥H) : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H := by
   intro q hq
   obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hH
@@ -74,7 +74,7 @@ private theorem isPiGroup_singleton_of_isPGroup {p : ℕ} [Fact p.Prime] {H : Su
   simp [hq_eq]
 
 /-- π-glue: `{p}`-群は `p`-部分群。 -/
-private theorem isPGroup_of_isPiGroup_singleton {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+theorem isPGroup_of_isPiGroup_singleton {p : ℕ} [Fact p.Prime] {H : Subgroup G}
     (hH : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H) : IsPGroup p ↥H := by
   rw [IsPGroup.iff_card]
   refine ⟨(Nat.card ↥H).primeFactorsList.length, ?_⟩
@@ -85,15 +85,16 @@ private theorem isPGroup_of_isPiGroup_singleton {p : ℕ} [Fact p.Prime] {H : Su
   exact Set.mem_singleton_iff.mp (hH q hmem)
 
 /-- `p ∉ π` なら `p ∤ |O_π(G)|`。 -/
-private theorem not_dvd_card_oPiCore {p : ℕ} [Fact p.Prime] {π : Set ℕ}
+theorem not_dvd_card_oPiCore {p : ℕ} [Fact p.Prime] {π : Set ℕ}
     (hp_notin : p ∉ π) : ¬ p ∣ Nat.card ↥(Ch03.oPiCore π G) := by
   intro hdvd
   have hmem : p ∈ (Nat.card ↥(Ch03.oPiCore π G)).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩
   exact hp_notin (Ch03.oPiCore.isPiGroup π p hmem)
 
-/-- **`MulAut.conjNormal` の核は中心化群**。 -/
-private theorem conjNormal_ker {N : Subgroup G} [N.Normal] :
+omit [Finite G] in
+/-- **`MulAut.conjNormal` の核は中心化群**。S05 (Thm 5.6 narrow core) でも使う。 -/
+theorem conjNormal_ker {N : Subgroup G} [N.Normal] :
     (MulAut.conjNormal (G := G) (H := N)).ker = Subgroup.centralizer (N : Set G) := by
   ext a
   rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
@@ -364,19 +365,53 @@ private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
       exact (QuotientGroup.eq_one_iff a).mpr (hP_le ha_mem)
     exact hx_ne hx_one
 
-/-- **BG Theorem 4.18** (mmd L1734-1752): `G` solvable odd, `p ∣ |G|`, `r_p(G) ≤ 2`。
-すると:
+omit [Finite G] in
+/-- **第三同型 (card 版)**: `|G ⧸ O_{p',p}(G)| = |Ḡ ⧸ O_p(Ḡ)|` (`Ḡ = G/O_{p'}(G)`)。
+`hasPLengthOne p G` を `Ḡ`-側の `¬ p ∣ |Ḡ/O_p(Ḡ)|` へ移送する橋 (Thm 4.18 (e) /
+Thm 5.6 narrow core で使用)。`O_{p'}(G)` は `oPiPrimePiCore` の内部表現
+`{q | q ∉ ({p} : Set ℕ)}` 形で書く。 -/
+theorem card_quotient_oPiPrimePiCore {p : ℕ} :
+    Nat.card (G ⧸ Ch03.oPiPrimePiCore {p} G) =
+      Nat.card ((G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G) ⧸
+        Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G)) := by
+  classical
+  set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
+  haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+  have hOpp : Ch03.oPiPrimePiCore {p} G =
+      (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)).comap (QuotientGroup.mk' N) := by
+    rw [Ch03.oPiPrimePiCore]
+  haveI hOpp_norm : (Ch03.oPiPrimePiCore {p} G).Normal := inferInstance
+  have hN_le_Opp : N ≤ Ch03.oPiPrimePiCore {p} G := by
+    rw [hOpp]
+    intro x hx
+    rw [Subgroup.mem_comap]
+    have hx1 : QuotientGroup.mk' N x = 1 := (QuotientGroup.eq_one_iff x).mpr hx
+    rw [hx1]
+    exact Subgroup.one_mem _
+  have hmap_Opp : (Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N) =
+      Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N) := by
+    rw [hOpp]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) _
+  haveI : ((Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N)).Normal := by
+    rw [hmap_Opp]
+    infer_instance
+  have e := QuotientGroup.quotientQuotientEquivQuotient N
+    (Ch03.oPiPrimePiCore {p} G) hN_le_Opp
+  rw [← Nat.card_congr e.toEquiv, hmap_Opp]
 
-* (a) `p` は `|G/O_{p'}(G)|` の最大素因子;
-* (b) `p = 3` または `p` が `|G|` の最小素因子なら、`G` は normal `p`-complement を持つ;
-* (c) `G'` は normal `p`-complement を持つ;
-* (d) `G'` の任意の `p'`-subgroup は `O_{p'}(G')` に含まれる;
-* (e) `G/O_{p',p}(G)` は abelian `p'`-群。
-
-結論の語彙は §5 Thm 5.6 (`narrow_sylow_solvable_structure`) と一致させている。 -/
-theorem solvable_structure_of_pRank_le_two [IsSolvable G]
-    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
-    (hrank : pRank G p ≤ 2) :
+/-- **Thm 4.18 / Thm 5.6 共通 assembly**: `Ḡ = G/O_{p'}(G)` 上の core data
+((c)′ `Ḡ' ≤ O_p(Ḡ)`, (a)′ `p` が `|Ḡ|` の最大素因子, (e)′ `Ḡ/O_p(Ḡ)` が `p'`-群) から
+結論 5 連 (a)-(e) を組み立てる。Thm 4.18 (`r_p(G) ≤ 2`, core = Lemma 4.17 経由) と
+BG §5 Thm 5.6 (`S` narrow, `r(S) ≥ 3` + `p`-length one, core = Thm 5.5 経由;
+`S05_NarrowPGroups`) の両分岐がここに合流する。solvability・rank 仮定は不要。 -/
+theorem structure_of_quotient_commutator_le_opCore
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime]
+    (hG'bar : _root_.commutator (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G) ≤
+      Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G))
+    (hlargest : ∀ q ∈ (Nat.card
+      (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G)).primeFactors, q ≤ p)
+    (hp'quot : ¬ p ∣ Nat.card ((G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G) ⧸
+      Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G))) :
     (∀ q ∈ (Nat.card (G ⧸ Ch03.oPiCore {r | r ≠ p} G)).primeFactors, q ≤ p) ∧
     ((p = 3 ∨ ∀ q ∈ (Nat.card G).primeFactors, p ≤ q) →
       Ch05.HasNormalPComplement p G) ∧
@@ -386,13 +421,6 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
     ((∀ x y : G ⧸ Ch03.oPiPrimePiCore {p} G, x * y = y * x) ∧ hasPLengthOne p G) := by
   classical
   have hprime : p.Prime := Fact.out
-  have hp_odd : Odd p := by
-    rcases Nat.even_or_odd p with he | ho
-    · exfalso
-      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hp_mem
-      rw [Nat.odd_iff] at hodd
-      omega
-    · exact ho
   -- the `p'`-residual quotient `Ḡ = G ⧸ N` (`oPiPrimePiCore` の内部表現の集合形を使う)
   set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
   haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
@@ -404,19 +432,6 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
   have hquot_dvd_G : Nat.card (G ⧸ N) ∣ Nat.card G := by
     have := Subgroup.index_dvd_card N
     simpa [Subgroup.index] using this
-  have hodd_bar : Odd (Nat.card (G ⧸ N)) := by
-    rcases Nat.even_or_odd (Nat.card (G ⧸ N)) with he | ho
-    · exfalso
-      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd_G
-      rw [Nat.odd_iff] at hodd
-      omega
-    · exact ho
-  have hrank_bar : pRank (G ⧸ N) p ≤ 2 :=
-    le_trans (pRank_quotient_le_of_coprime hN_p') hrank
-  have hredu_bar : Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ N) = ⊥ := by
-    rw [show {r : ℕ | r ≠ p} = {q : ℕ | q ∉ ({p} : Set ℕ)} from compl_singleton_eq.symm]
-    exact Ch03.oPiCore_quotient_self_eq_bot _
-  obtain ⟨hG'bar, hlargest, hp'quot⟩ := core418 hp_odd hodd_bar hrank_bar hredu_bar
   -- `O_{p',p}(G)` is the preimage of `R̄ = O_p(Ḡ)` (definitional with this `N`)
   have hOpp : Ch03.oPiPrimePiCore {p} G =
       (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)).comap (QuotientGroup.mk' N) := by
@@ -435,26 +450,6 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
         (_root_.commutator G).map (QuotientGroup.mk' N) := ⟨x, hx, rfl⟩
     rw [hmap_comm] at hmem
     exact hG'bar hmem
-  -- third isomorphism: `|G ⧸ O_{p',p}(G)| = |Ḡ ⧸ R̄|`
-  have hN_le_Opp : N ≤ Ch03.oPiPrimePiCore {p} G := by
-    rw [hOpp]
-    intro x hx
-    rw [Subgroup.mem_comap]
-    have hx1 : QuotientGroup.mk' N x = 1 := (QuotientGroup.eq_one_iff x).mpr hx
-    rw [hx1]
-    exact Subgroup.one_mem _
-  have hmap_Opp : (Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N) =
-      Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N) := by
-    rw [hOpp]
-    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) _
-  have hcard_eq : Nat.card (G ⧸ Ch03.oPiPrimePiCore {p} G) =
-      Nat.card ((G ⧸ N) ⧸ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)) := by
-    haveI : ((Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N)).Normal := by
-      rw [hmap_Opp]
-      infer_instance
-    have e := QuotientGroup.quotientQuotientEquivQuotient N
-      (Ch03.oPiPrimePiCore {p} G) hN_le_Opp
-    rw [← Nat.card_congr e.toEquiv, hmap_Opp]
   -- (e)
   have he_comm : ∀ x y : G ⧸ Ch03.oPiPrimePiCore {p} G, x * y = y * x := by
     intro x y
@@ -468,7 +463,7 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
     exact hG'_le (Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
       (Subgroup.mem_top _))
   have he_pl : hasPLengthOne p G := by
-    rw [hasPLengthOne, hcard_eq]
+    rw [hasPLengthOne, card_quotient_oPiPrimePiCore (G := G) (p := p)]
     exact hp'quot
   -- (a)
   have ha : ∀ q ∈ (Nat.card (G ⧸ Ch03.oPiCore {r | r ≠ p} G)).primeFactors, q ≤ p := by
@@ -623,6 +618,59 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
       exact Nat.Coprime.pow_right _
         ((hprime.coprime_iff_not_dvd.mpr hN_p').symm)
   exact ⟨ha, hb, hc, hd, he_comm, he_pl⟩
+
+/-- **BG Theorem 4.18** (mmd L1734-1752): `G` solvable odd, `p ∣ |G|`, `r_p(G) ≤ 2`。
+すると:
+
+* (a) `p` は `|G/O_{p'}(G)|` の最大素因子;
+* (b) `p = 3` または `p` が `|G|` の最小素因子なら、`G` は normal `p`-complement を持つ;
+* (c) `G'` は normal `p`-complement を持つ;
+* (d) `G'` の任意の `p'`-subgroup は `O_{p'}(G')` に含まれる;
+* (e) `G/O_{p',p}(G)` は abelian `p'`-群。
+
+結論の語彙は §5 Thm 5.6 (`narrow_sylow_solvable_structure`) と一致させている。
+証明 = `core418` (`O_{p'} = 1` の場合; Hall–Higman + Lemma 4.17 + Lemma 4.13) を
+商 `Ḡ = G/O_{p'}(G)` に適用し、`structure_of_quotient_commutator_le_opCore` で引き戻す。 -/
+theorem solvable_structure_of_pRank_le_two [IsSolvable G]
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
+    (hrank : pRank G p ≤ 2) :
+    (∀ q ∈ (Nat.card (G ⧸ Ch03.oPiCore {r | r ≠ p} G)).primeFactors, q ≤ p) ∧
+    ((p = 3 ∨ ∀ q ∈ (Nat.card G).primeFactors, p ≤ q) →
+      Ch05.HasNormalPComplement p G) ∧
+    Ch05.HasNormalPComplement p ↥(_root_.commutator G) ∧
+    (∀ K : Subgroup ↥(_root_.commutator G), Subgroup.IsPiSubgroup {r | r ≠ p} K →
+      K ≤ Ch03.oPiCore {r | r ≠ p} ↥(_root_.commutator G)) ∧
+    ((∀ x y : G ⧸ Ch03.oPiPrimePiCore {p} G, x * y = y * x) ∧ hasPLengthOne p G) := by
+  classical
+  have hp_odd : Odd p := by
+    rcases Nat.even_or_odd p with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hp_mem
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  -- the `p'`-residual quotient `Ḡ = G ⧸ N`
+  set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
+  haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+  have hN_p' : ¬ p ∣ Nat.card ↥N :=
+    not_dvd_card_oPiCore (by simp)
+  have hquot_dvd_G : Nat.card (G ⧸ N) ∣ Nat.card G := by
+    have := Subgroup.index_dvd_card N
+    simpa [Subgroup.index] using this
+  have hodd_bar : Odd (Nat.card (G ⧸ N)) := by
+    rcases Nat.even_or_odd (Nat.card (G ⧸ N)) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd_G
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  have hrank_bar : pRank (G ⧸ N) p ≤ 2 :=
+    le_trans (pRank_quotient_le_of_coprime hN_p') hrank
+  have hredu_bar : Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ N) = ⊥ := by
+    rw [show {r : ℕ | r ≠ p} = {q : ℕ | q ∉ ({p} : Set ℕ)} from compl_singleton_eq.symm]
+    exact Ch03.oPiCore_quotient_self_eq_bot _
+  obtain ⟨hG'bar, hlargest, hp'quot⟩ := core418 hp_odd hodd_bar hrank_bar hredu_bar
+  exact structure_of_quotient_commutator_le_opCore hodd hG'bar hlargest hp'quot
 
 end Thm418
 

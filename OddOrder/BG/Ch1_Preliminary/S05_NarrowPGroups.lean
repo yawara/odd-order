@@ -7,6 +7,7 @@ import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
+import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.SCN
@@ -45,12 +46,14 @@ solvable odd 自己同型群 `A` の構造)。下流 §6/§10/§16 + Peterfalvi 
 `T = C_R(W)` の characteristic 性) は **共有モジュール `OddOrder/GroupTheory/NarrowPGroup.lean`
 に実装済 (sorry-free)**。本ファイルは §5 の 7 numbered result を faithful に述べる section file。
 
-## 証明の前提 (proof は後続)
+## 証明の前提
 
 §5 の hard 結果は **§4 capstone** に依存する: Lem 5.1(a)=Lem 4.7 hard dir (✅ `pRank_le_two_of_scn3_empty`),
-Lem 4.5(c) noncyclic 半 (TODO), Lem 4.14 (`q∣(p+1)/2`, §4 active frontier), Thm 4.16 (Blackburn),
-Lem 4.17, Thm 4.18 (= §5.5/5.6 が cite, repo 未命名)。statement は今 faithful に書けるが、proof は
-これら §4 capstone 完成後 (一部は本ファイルで close 可)。
+Lem 4.5(c) noncyclic 半 (TODO), Lem 4.14 ✅, Thm 4.16 (Blackburn) ✅, Lem 4.17 ✅,
+Thm 4.18 ✅ (`S04.solvable_structure_of_pRank_le_two`, S04g)。
+
+**現況**: Lem 5.1/5.2, Thm 5.3/5.3(d), Cor 5.4, Thm 5.5, Thm 5.6 は **証明済 (sorry-free)**。
+残 sorry = **Thm 5.7** (`derived_le_fitting_of_centralizer_pRank_le_two`) のみ。
 -/
 
 namespace OddOrder.BG.Ch1.S05
@@ -3122,6 +3125,159 @@ theorem solvableAut_of_narrow [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (
 
 /-! ## Theorem 5.6 / 5.7 — solvable group での narrow Sylow (mmd L1945-1967) -/
 
+section Thm56
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Sylow-rank 橋**: `r_p(G) ≤ r(S)` (`S : Sylow p G`)。任意の elementary abelian
+`p`-部分群はある Sylow `Q` に含まれ (`IsPGroup.exists_le_sylow`)、Sylow 同士は共役
+(`Sylow.equiv`) なので rank は `S` 内で実現される。逆向き `r(S) ≤ r_p(G)` は
+`pRank_le_of_injective` で自明なので実は等号だが、Thm 5.6 では `≤` だけ使う。
+`PRank.lean` への昇格候補。 -/
+theorem pRank_le_pRank_sylow {p : ℕ} [Fact p.Prime] (S : Sylow p G) :
+    pRank G p ≤ pRank ↥(S : Subgroup G) p := by
+  classical
+  rw [pRank_le_iff]
+  intro E hE
+  have hE_pg : IsPGroup p ↥E := fun x => ⟨1, by rw [pow_one]; exact hE.pow_eq_one x⟩
+  obtain ⟨Q, hQle⟩ := hE_pg.exists_le_sylow
+  have h1 : Nat.log p (Nat.card ↥E) ≤ pRank ↥(Q : Subgroup G) p := by
+    have hsub : (E.subgroupOf (Q : Subgroup G)).IsElementaryAbelian p :=
+      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe hQle).symm hE
+    have hcard : Nat.card ↥(E.subgroupOf (Q : Subgroup G)) = Nat.card ↥E :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv
+    rw [← hcard]
+    exact le_pRank _ hsub
+  refine le_trans h1 (pRank_le_of_injective (f := (Sylow.equiv Q S).toMonoidHom) ?_)
+  exact (Sylow.equiv Q S).injective
+
+/-- **Thm 5.6 narrow core** (`O_{p'}(G) = 1`, `r(S) ≥ 3` の場合): `G' ≤ O_p(G)` と
+最大素因子評価。`p`-length one から `p ∤ |G/O_p(G)|` なので `R = O_p(G)` が唯一の
+Sylow `p`-部分群、ゆえに `S = R` で `R` は narrow of rank ≥ 3。Hall–Higman 1.2.3 で
+`C := C_G(R) ≤ R`; **Thm 5.5(a)** で `(G/C)/O_p(G/C)` が abelian、すなわち `(G/C)'` が
+`p`-群 (Thm 4.18 core での Lemma 4.17 の代替) → `G' ≤ O_p(G)`; **Thm 5.5(b)** で
+`q ≠ p` 素因子は `q ∣ p - 1 < p` (Lemma 4.13 の代替)。組み立ては `core418` と同型。 -/
+private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
+    (hp : Odd p) (hodd : Odd (Nat.card G)) (S : Sylow p G)
+    (hSnarrow : IsNarrow p ↥S) (h3 : 3 ≤ pRank ↥(S : Subgroup G) p)
+    (hredu : Ch03.oPiCore {r : ℕ | r ≠ p} G = ⊥)
+    (hpOp : ¬ p ∣ Nat.card (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) :
+    _root_.commutator G ≤ Ch03.oPiCore ({p} : Set ℕ) G ∧
+      ∀ q ∈ (Nat.card G).primeFactors, q ≤ p := by
+  classical
+  have hprime : p.Prime := Fact.out
+  set R : Subgroup G := Ch03.oPiCore ({p} : Set ℕ) G with hR_def
+  haveI hR_normal : R.Normal := by rw [hR_def]; infer_instance
+  have hR_pg : IsPGroup p ↥R :=
+    S04.isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
+  -- `R` is a normal Sylow `p`-subgroup (`p ∤ |G/R|`), hence the unique one: `S = R`
+  have hR_idx : ¬ p ∣ R.index := by
+    simpa [Subgroup.index] using hpOp
+  have hSR : (S : Subgroup G) = R := by
+    have hnorm : ((hR_pg.toSylow hR_idx) : Subgroup G).Normal := by
+      rw [hR_pg.toSylow_coe hR_idx]
+      exact hR_normal
+    haveI := Sylow.unique_of_normal (hR_pg.toSylow hR_idx) hnorm
+    have h1 : S = hR_pg.toSylow hR_idx := Subsingleton.elim _ _
+    rw [h1]
+    exact hR_pg.toSylow_coe hR_idx
+  -- transport narrowness and rank from `S` to `R`
+  have eSR : ↥(S : Subgroup G) ≃* ↥R := MulEquiv.subgroupCongr hSR
+  have hR_narrow : IsNarrow p ↥R := IsNarrow.of_mulEquiv eSR hSnarrow
+  have hR_rank3 : 3 ≤ pRank ↥R p :=
+    le_trans h3 (pRank_le_of_injective (f := eSR.toMonoidHom) eSR.injective)
+  -- Hall–Higman 1.2.3: `C := C_G(R) ≤ R`
+  have hCR : Subgroup.centralizer (R : Set G) ≤ R := by
+    refine Ch03.hall_higman_1_2_3 ({p} : Set ℕ) ?_
+    rw [show {q : ℕ | q ∉ ({p} : Set ℕ)} = {r : ℕ | r ≠ p} from S04.compl_singleton_eq]
+    exact hredu
+  have hC_pg : IsPGroup p ↥(Subgroup.centralizer (R : Set G)) := hR_pg.to_le hCR
+  -- the conjugation action of `G` on `R`, with kernel `C`
+  set ψ : G →* MulAut ↥R := MulAut.conjNormal with hψ_def
+  have hker : ψ.ker = Subgroup.centralizer (R : Set G) := by
+    rw [hψ_def]
+    exact S04.conjNormal_ker
+  have hker_pg : IsPGroup p ↥ψ.ker := by
+    rw [hker]
+    exact hC_pg
+  have hquot_dvd : Nat.card (G ⧸ ψ.ker) ∣ Nat.card G := by
+    have := Subgroup.index_dvd_card ψ.ker
+    simpa [Subgroup.index] using this
+  have hquot_odd : Odd (Nat.card (G ⧸ ψ.ker)) := by
+    rcases Nat.even_or_odd (Nat.card (G ⧸ ψ.ker)) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  -- Theorem 5.5 for `A := G ⧸ C` acting faithfully on the narrow `R` of rank ≥ 3
+  obtain ⟨hcomm, -, hb, -⟩ := solvableAut_of_narrow hp hR_pg hR_narrow
+    (QuotientGroup.kerLift ψ) (QuotientGroup.kerLift_injective ψ) hquot_odd
+  -- 5.5(a): `(G ⧸ C)'` is a `p`-group (the Lemma 4.17 substitute)
+  have hA' : IsPGroup p (_root_.commutator (G ⧸ ψ.ker)) := by
+    have hle : _root_.commutator (G ⧸ ψ.ker) ≤ Ch01.opCore p (G ⧸ ψ.ker) := by
+      rw [_root_.commutator, Subgroup.commutator_le]
+      intro x _ y _
+      have h1 : QuotientGroup.mk' (Ch01.opCore p (G ⧸ ψ.ker)) ⁅x, y⁆ = 1 := by
+        rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+        exact hcomm _ _
+      exact (QuotientGroup.eq_one_iff _).mp h1
+    exact (Ch01.opCore_isPGroup p _).to_le hle
+  -- pull back: `G' ≤ R` (identical to the Thm 4.18 core assembly)
+  have hG'R : _root_.commutator G ≤ R := by
+    have hW_pg : IsPGroup p
+        ↥((_root_.commutator (G ⧸ ψ.ker)).comap (QuotientGroup.mk' ψ.ker)) := by
+      refine IsPGroup.comap_of_ker_isPGroup hA' _ ?_
+      rw [QuotientGroup.ker_mk']
+      exact hker_pg
+    haveI hW_norm :
+        ((_root_.commutator (G ⧸ ψ.ker)).comap (QuotientGroup.mk' ψ.ker)).Normal :=
+      Subgroup.Normal.comap inferInstance _
+    have hW_le_R :
+        (_root_.commutator (G ⧸ ψ.ker)).comap (QuotientGroup.mk' ψ.ker) ≤ R :=
+      Ch03.Subgroup.IsPiGroup.le_oPiCore (S04.isPiGroup_singleton_of_isPGroup hW_pg)
+    refine le_trans ?_ hW_le_R
+    have hmap : (_root_.commutator G).map (QuotientGroup.mk' ψ.ker) =
+        _root_.commutator (G ⧸ ψ.ker) := by
+      rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator,
+        Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective ψ.ker)]
+    rw [← hmap]
+    exact Subgroup.le_comap_map _ _
+  refine ⟨hG'R, ?_⟩
+  -- 5.5(b): a prime `q ≠ p` dividing `|G|` divides `p - 1` (the Lemma 4.13 substitute)
+  intro q hq
+  rw [Nat.mem_primeFactors] at hq
+  obtain ⟨hq_prime, hq_dvd, -⟩ := hq
+  rcases eq_or_ne q p with rfl | hq_ne
+  · exact le_rfl
+  · have hq_dvd_quot : q ∣ Nat.card (G ⧸ ψ.ker) := by
+      have hmul : Nat.card ↥ψ.ker * Nat.card (G ⧸ ψ.ker) = Nat.card G := by
+        have := Subgroup.card_mul_index ψ.ker
+        simpa [Subgroup.index] using this
+      rcases (Nat.Prime.dvd_mul hq_prime).mp (hmul ▸ hq_dvd) with h | h
+      · exfalso
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hker_pg
+        rw [hk] at h
+        exact hq_ne ((Nat.prime_dvd_prime_iff_eq hq_prime hprime).mp
+          (hq_prime.dvd_of_dvd_pow h))
+      · exact h
+    haveI : Fact q.Prime := ⟨hq_prime⟩
+    obtain ⟨α, hα⟩ := exists_prime_orderOf_dvd_card' q hq_dvd_quot
+    have hα_cop : Nat.Coprime (orderOf α) p := by
+      rw [hα]
+      exact (Nat.coprime_primes hq_prime hprime).mpr hq_ne
+    have hα_dvd := hb hR_rank3 α hα_cop
+    rw [hα] at hα_dvd
+    have hp3 : 3 ≤ p := by
+      have h2 := hprime.two_le
+      rcases hp with ⟨k, hk⟩
+      omega
+    have hqle : q ≤ p - 1 := Nat.le_of_dvd (by omega) hα_dvd
+    omega
+
+end Thm56
+
 /-- **BG Theorem 5.6**: `G` solvable odd, `p ∈ π(G)`, `S` を narrow Sylow `p`-subgroup と
 する。`r(S) ≥ 3` なら、さらに `G` が `p`-length one (`hasPLengthOne`) と仮定する。すると:
 
@@ -3142,7 +3298,83 @@ theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [IsSolv
     (∀ K : Subgroup ↥(commutator G), Subgroup.IsPiSubgroup {r | r ≠ p} K →
       K ≤ Ch03.oPiCore {r | r ≠ p} ↥(commutator G)) ∧
     ((∀ x y : G ⧸ Ch03.oPiPrimePiCore {p} G, x * y = y * x) ∧ hasPLengthOne p G) := by
-  sorry
+  classical
+  by_cases hrank : pRank ↥(S : Subgroup G) p ≤ 2
+  · -- `r(S) ≤ 2`: the Sylow-rank bridge gives `r_p(G) ≤ 2`; conclude by Theorem 4.18
+    exact S04.solvable_structure_of_pRank_le_two hodd hp_mem
+      (le_trans (pRank_le_pRank_sylow S) hrank)
+  · -- `r(S) ≥ 3`: `p`-length one holds; run the Thm 5.5 narrow core on `Ḡ = G/O_{p'}(G)`
+    have h3 : 3 ≤ pRank ↥(S : Subgroup G) p := by omega
+    have hpl' : hasPLengthOne p G := hpl h3
+    have hp_odd : Odd p := by
+      rcases Nat.even_or_odd p with he | ho
+      · exfalso
+        have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hp_mem
+        rw [Nat.odd_iff] at hodd
+        omega
+      · exact ho
+    set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
+    haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+    have hN_p' : ¬ p ∣ Nat.card ↥N := S04.not_dvd_card_oPiCore (by simp)
+    have hquot_dvd_G : Nat.card (G ⧸ N) ∣ Nat.card G := by
+      have := Subgroup.index_dvd_card N
+      simpa [Subgroup.index] using this
+    have hodd_bar : Odd (Nat.card (G ⧸ N)) := by
+      rcases Nat.even_or_odd (Nat.card (G ⧸ N)) with he | ho
+      · exfalso
+        have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd_G
+        rw [Nat.odd_iff] at hodd
+        omega
+      · exact ho
+    -- the image Sylow `S̄ = SN/N` of `Ḡ`, isomorphic to `S` (`p ∤ |N|`)
+    set Sbar : Sylow p (G ⧸ N) := S.mapSurjective (QuotientGroup.mk'_surjective N)
+      with hSbar_def
+    have hinj : Function.Injective
+        ((QuotientGroup.mk' N).subgroupMap (S : Subgroup G)) := by
+      rw [injective_iff_map_eq_one]
+      intro x hx
+      have hxN : (x : G) ∈ N := by
+        have h1 : QuotientGroup.mk' N (x : G) = 1 := congrArg Subtype.val hx
+        exact (QuotientGroup.eq_one_iff _).mp h1
+      obtain ⟨k, hk⟩ := S.2 x
+      have h1 : orderOf x ∣ p ^ k := orderOf_dvd_of_pow_eq_one hk
+      have h2 : orderOf x ∣ Nat.card ↥N := by
+        have he1 : orderOf ((S : Subgroup G).subtype x) = orderOf x :=
+          orderOf_injective (S : Subgroup G).subtype
+            (Subgroup.subtype_injective _) x
+        have he2 : orderOf (N.subtype ⟨(x : G), hxN⟩) =
+            orderOf (⟨(x : G), hxN⟩ : ↥N) :=
+          orderOf_injective N.subtype N.subtype_injective _
+        have he3 : orderOf ((x : G)) = orderOf (⟨(x : G), hxN⟩ : ↥N) := he2
+        calc orderOf x = orderOf (⟨(x : G), hxN⟩ : ↥N) := by
+              rw [← he1]
+              exact he3
+          _ ∣ Nat.card ↥N := orderOf_dvd_natCard _
+      have hcop : Nat.Coprime (p ^ k) (Nat.card ↥N) :=
+        Nat.Coprime.pow_left k ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hN_p')
+      have h3' : orderOf x = 1 := Nat.eq_one_of_dvd_coprimes hcop h1 h2
+      exact orderOf_eq_one_iff.mp h3'
+    have hSbar_coe : (Sbar : Subgroup (G ⧸ N)) =
+        (S : Subgroup G).map (QuotientGroup.mk' N) := rfl
+    have e : ↥(S : Subgroup G) ≃* ↥(Sbar : Subgroup (G ⧸ N)) :=
+      (MulEquiv.ofBijective ((QuotientGroup.mk' N).subgroupMap (S : Subgroup G))
+        ⟨hinj, (QuotientGroup.mk' N).subgroupMap_surjective (S : Subgroup G)⟩).trans
+        (MulEquiv.subgroupCongr hSbar_coe.symm)
+    have hSbar_narrow : IsNarrow p ↥(Sbar : Subgroup (G ⧸ N)) :=
+      IsNarrow.of_mulEquiv e hSnarrow
+    have h3bar : 3 ≤ pRank ↥(Sbar : Subgroup (G ⧸ N)) p :=
+      le_trans h3 (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
+    have hredu_bar : Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ N) = ⊥ := by
+      rw [show {r : ℕ | r ≠ p} = {q : ℕ | q ∉ ({p} : Set ℕ)} from
+        S04.compl_singleton_eq.symm]
+      exact Ch03.oPiCore_quotient_self_eq_bot _
+    -- `p`-length one transports to `p ∤ |Ḡ/O_p(Ḡ)|` by the third isomorphism theorem
+    have hpOp_bar : ¬ p ∣ Nat.card ((G ⧸ N) ⧸ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)) := by
+      rw [hasPLengthOne, S04.card_quotient_oPiPrimePiCore (G := G) (p := p)] at hpl'
+      exact hpl'
+    obtain ⟨hG'bar, hlargest⟩ :=
+      core56 hp_odd hodd_bar Sbar hSbar_narrow h3bar hredu_bar hpOp_bar
+    exact S04.structure_of_quotient_commutator_le_opCore hodd hG'bar hlargest hpOp_bar
 
 /-- **BG Theorem 5.7**: `G` solvable odd, `p ∈ π(G)`, `E` を `F(G)` の elem-ab `p`-subgroup と
 し、`r(C_{F(G)}(E)) ≤ 2` を仮定。すると `G' ⊆ F(G)`。

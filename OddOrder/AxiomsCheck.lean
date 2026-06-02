@@ -1102,6 +1102,11 @@ set_option linter.style.longLine false in
 -- (b) r≥3 で p'-元の位数 ∣ p-1 (critical H_i 降鎖 + Lem 1.9 stability) (c) |A|=q prime ∤ p(p-1) で
 -- q ∣ (p+1)/2 (Lem 4.14) + R=[R,A] 非可換なら |R|=p³ (Thm 4.16 Blackburn + Aut(C_{p^t}) totient)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.solvableAut_of_narrow
+-- BG §5 Thm 5.6: G solvable odd, S narrow Sylow p (r(S)≥3 なら p-length one 仮定) ⇒ Thm 4.18 と
+-- 同じ結論 5 連。r(S)≤2 は Sylow-rank 橋 (pRank_le_pRank_sylow) + Thm 4.18; r(S)≥3 は
+-- Ḡ=G/O_{p'} で S̄=O_p(Ḡ) が唯一の Sylow → Thm 5.5(a)(b) を Lem 4.17/4.13 の代替に使う
+-- core56 + 共通 assembly (structure_of_quotient_commutator_le_opCore)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_sylow_solvable_structure
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
