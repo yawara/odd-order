@@ -64,3 +64,38 @@ proof を差分で thread、rebuild。
   各 step build-green + AxiomsCheck。抽象 `peterfalvi_66_coherence_of_X`(3934) は不変。
   **次 iter**: 計画(1) = `dadeOrthonormalCharacterImageFamily` の差分化 edit に着手 (まず DadeChainStep/retarget の
   hχsupp 使用箇所も精読して signature 連鎖を確定してから編集、build-green 維持)。
+
+## 🛑 LOOP STOPPED (2026-06-03 iter2, anti-scaffold gate) — spec の前提が誤り、attended 必要
+
+**結論**: この goal の前提（「X-path の engine fix = `coherentEqualDegree_fromDade` の差分-support 弱化を mirror」）
+は**誤り**だった。X-path は `coherentEqualDegree_fromDade` を**通らない**。経路は
+`peterfalvi_66_coherence_of_X_from_dade` → `DadeChainStep.advance` → `retarget_isCoherent_fromDade` (4946)
+→ `retarget_isCoherent_of_sharedDecomposition` (3430) → **`decompositionPair` (1101)** → `ofProjection` (1049)。
+
+**真の blocker (support 弱化では解決不能)**: `decompositionPair` (S07:1101) が
+**`htau1_mem0 : tau1 (χ - 0) ∈ ZIrr G` (1109)** を要求。`χ − 0 = χ` ゆえこれは **τχ ∈ ZIrr G**。
+X-member `χ = Ind_H^L θ` は χ(1)=|W₁|θ(1)≠0 で **unsupported**、τ=dadeIntegralCharacterMap は off-support で
+**任意延長**ゆえ **τχ ∈ ZIrr は証明不能**。⟹ `decompositionPair`/`retarget_isCoherent_fromDade`/`DadeChainStep`
+は X-family で**呼び出し不能**。個別 support fields (hχsupp 等) は二次的症状にすぎず、**htau1_mem0 が一次 blocker**。
+(対照: Y-path の `coherentEqualDegree_fromDade` は χ_j−χ_0=1 で消える真の差分のみ使い、個別 χ を χ−0 で分解しないので
+この問題が無い。だから T6 Y-family は差分-support 弱化だけで通った。両者は parallel でない。)
+
+**監査 §G-A の sharpening**: 「support 仮説を差分形に弱化」では不十分。真の修正 =
+**`decompositionPair`/`ofProjection` を restructure して ψ=0 (χ−0) 成分が τχ∈ZIrr を要求しないようにする**。
+Agent2 監査の主張「χ−0 分解 (D₀=`.1`) の出力 X/Y/coeff は `retarget_isCoherent_of_sharedDecomposition` で
+never read (使うのは `.2` = supported 差分 χ−a•χ₁ 由来)」が正なら、htau1_mem0 を drop / supported 差分へ置換できる。
+**要検証**: `decompositionPair` (1101) の `.1`/`.2` 消費を `retarget_isCoherent_of_sharedDecomposition` (3430,
+特に 3461-3481) で精査し、`.1` が本当に未使用かを確認。真なら htau1_mem0 を除去/置換 + `ofProjection` を supported
+差分専用に。これは **core 分解フレームワーク (decompositionPair 1101 / ofProjection 1049 / sharedDecomposition 3430
++ 全 consumer) を触る intricate surgery** で、**下流多数を壊しうる**。
+
+**なぜ STOP したか (anti-scaffold)**: 無人自走で core フレームワークを restructure すると (a) flail (τχ∈ZIrr を
+証明しようとして無限ループ) か (b) scaffold (htau1_mem0 を vacuous に弱める/誤 restructure で consumer を壊す) の
+リスクが高い。本セッションで一日戦ってきた scaffolding 罠そのもの。⟹ **gate 通り STOP**。コード変更なし、
+build green 維持 (3562)、新 sorry 無し。
+
+**attended セッションでの推奨手順**: (1) `decompositionPair`(1101)+`ofProjection`(1049)+
+`retarget_isCoherent_of_sharedDecomposition`(3430) を精読し `.1`(χ−0) 出力の消費を確定。(2) `.1` 未使用なら
+htau1_mem0 を除去 (or supported 差分へ)、要 `ofProjection` 一般化。(3) `DadeChainStep`/`retarget_isCoherent_fromDade`
+の support fields を差分形に弱化 (この部分は iter1 設計済の `dadeOrthonormalCharacterImageFamily` 差分-span 化も含む)。
+(4) `peterfalvi_66_coherence_of_X_from_dade` が実 induced family で instantiate 可能になることを確認。各 step build-green。
