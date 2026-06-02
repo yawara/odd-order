@@ -57,6 +57,20 @@ theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
     Nat.ModEq.eq_of_lt_of_lt hmod hyp.q_lt_p hp_gt_one
   exact hyp.base.q_prime.ne_one hq_eq_one
 
+/-- The T-side cyclotomic quotient from **Peterfalvi (14.4)** is odd. -/
+theorem tSide_cyclotomic_quotient_odd (hyp : Hypothesis (G := G)) :
+    Odd ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) :=
+  OddOrder.Peterfalvi.S15.cyclotomic_quotient_odd
+    hyp.base.q_prime hyp.base.q_odd hyp.base.p_odd
+
+/-- The T-side cyclotomic quotient from **Peterfalvi (14.4)** is coprime to
+`q - 1`. -/
+theorem tSide_cyclotomic_quotient_coprime (hyp : Hypothesis (G := G)) :
+    Nat.Coprime ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+      (hyp.base.q - 1) :=
+  OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
+    hyp.base.q_prime hyp.base.p_prime hyp.q_not_modEq_one_mod_p
+
 end Hypothesis
 
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
