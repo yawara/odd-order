@@ -1093,6 +1093,10 @@ set_option linter.style.longLine false in
 -- BG §5 Cor 5.4: r(R)≥3 ⇒ (narrow ⟺ ∃S, |S|=p ∧ r(C_R(S))≤2)。
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
+-- BG §5 Thm 5.5 (§5 最重量): p odd, R narrow, A ≤ Aut R solvable odd ⇒ (a) A/O_p(A) abelian p'-群
+-- (b) r≥3 で p'-元の位数 ∣ p-1 (critical H_i 降鎖 + Lem 1.9 stability) (c) |A|=q prime ∤ p(p-1) で
+-- q ∣ (p+1)/2 (Lem 4.14) + R=[R,A] 非可換なら |R|=p³ (Thm 4.16 Blackburn + Aut(C_{p^t}) totient)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.solvableAut_of_narrow
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.SCN
@@ -2869,6 +2870,202 @@ private theorem isPGroup_commutator_and_orderOf_dvd_of_narrow_witness
       Nat.Coprime.coprime_dvd_left hα_pow_dvd hα_cop
     exact orderOf_dvd_of_pow_eq_one (hStab_p' _ hα_mem hα_pow_cop)
 
+open scoped Pointwise in
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **BG Theorem 5.5(c)** (`r(R) ≤ 2` assembly, mmd L1919-1941): if `|A| = q` is a
+prime not dividing `p(p-1)`, then `q ∣ (p+1)/2` (Lemma 4.14 under `SCN₃(R) = ∅`);
+if moreover `R = [R,A]` and `R` is nonabelian, then `|R| = p³`: Thm 4.16 (Blackburn)
+gives the central product `R = R₁ ∘ R₂` with `Ω₁(R) = R₁` of order `p³` and `R/Ω₁(R)`
+cyclic; `A` centralizes `R/Ω₁(R)` since `|Aut(C_{p^t})| = p^{t-1}(p-1)` is prime to
+`q` (the **G** Thm 5.4.1 step via `Nat.totient_prime_pow`), so
+`R = [R,A] ≤ Ω₁(R) = R₁`. -/
+private theorem thm55c_of_pRank_le_two
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (hrank : pRank R p ≤ 2)
+    {A : Type*} [Group A] [Finite A] (φ : A →* MulAut R)
+    (hφ : Function.Injective φ) (hAodd : Odd (Nat.card A))
+    (hq_prime : (Nat.card A).Prime) (hq_ndvd : ¬ Nat.card A ∣ p * (p - 1)) :
+    Nat.card A ∣ (p + 1) / 2 ∧
+      (OddOrder.Isaacs.Ch04.actionCommutator φ = ⊤ →
+        (¬ ∀ x y : R, x * y = y * x) → Nat.card R = p ^ 3) := by
+  classical
+  have hprime : p.Prime := Fact.out
+  have hq_ne_p : Nat.card A ≠ p := by
+    intro h
+    exact hq_ndvd (h ▸ dvd_mul_right p (p - 1))
+  have hSCN : ∀ B : Subgroup R, ¬ OddOrder.GroupTheory.IsSCN₃ p B := by
+    intro B hB
+    have h3 : 3 ≤ pRank ↥B p := hB.le_pRank
+    have hle : pRank ↥B p ≤ pRank R p :=
+      pRank_le_of_injective (f := B.subtype) B.subtype_injective
+    omega
+  have hq_dvd_aut : Nat.card A ∣ Nat.card (MulAut R) := by
+    have h1 : Nat.card A = Nat.card φ.range :=
+      Nat.card_congr (MonoidHom.ofInjective hφ).toEquiv
+    rw [h1]
+    exact Subgroup.card_subgroup_dvd_card φ.range
+  have h2dvd : (2 : ℕ) ∣ p - 1 := by
+    obtain ⟨t, ht⟩ := hp
+    exact ⟨t, by omega⟩
+  constructor
+  · rcases OddOrder.BG.Ch1.S04.dvd_half_prime_add_or_sub_of_prime_dvd_aut_of_scn3_empty
+      hp hpg hSCN hq_prime hq_ne_p hq_dvd_aut with h | h
+    · exact h
+    · exfalso
+      have hq_dvd_pm1 : Nat.card A ∣ p - 1 :=
+        dvd_trans h ⟨2, (Nat.div_mul_cancel h2dvd).symm⟩
+      exact hq_ndvd (Dvd.dvd.mul_left hq_dvd_pm1 p)
+  · intro hRA hnab
+    haveI : Nontrivial R := by
+      rcases subsingleton_or_nontrivial R with hs | hn
+      · exact absurd (fun x y => Subsingleton.elim _ _) hnab
+      · exact hn
+    have hcop : Nat.Coprime (Nat.card A) (Nat.card R) := by
+      obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hpg
+      rw [hn]
+      exact Nat.Coprime.pow_right n
+        ((Nat.coprime_primes hq_prime hprime).mpr hq_ne_p)
+    obtain ⟨hp3, hcase⟩ :=
+      OddOrder.BG.Ch1.S04.blackburnRankTwoClassification hp hpg hcop hrank hRA hAodd
+    rcases hcase with hcomm | hcp
+    · exfalso
+      haveI := hcomm
+      exact hnab fun x y => mul_comm x y
+    · obtain ⟨R₁, R₂, hcp', hR₁nab, hR₁card, hR₁exp, hR₂cyc, hΩeq⟩ := hcp
+      -- `R₁ ⊴ R` (it is centralized by `R₂` and normalized by itself).
+      haveI hR₁_normal : R₁.Normal := by
+        rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff]
+        rw [hcp'.sup_eq]
+        refine sup_le Subgroup.le_normalizer ?_
+        intro g hg
+        rw [Subgroup.mem_normalizer_iff]
+        intro x
+        constructor
+        · intro hx
+          have hc : Commute x g := hcp'.commute_of_mem hx hg
+          have hfix : g * x * g⁻¹ = x := by
+            calc g * x * g⁻¹ = (x * g) * g⁻¹ := by rw [← hc.eq]
+              _ = x := by group
+          rw [hfix]
+          exact hx
+        · intro hx
+          have hc : Commute (g * x * g⁻¹) g := hcp'.commute_of_mem hx hg
+          have hfix : x = g * x * g⁻¹ := by
+            calc x = g⁻¹ * (g * x * g⁻¹) * g := by group
+              _ = g⁻¹ * ((g * x * g⁻¹) * g) := by group
+              _ = g⁻¹ * (g * (g * x * g⁻¹)) := by rw [hc.eq]
+              _ = g * x * g⁻¹ := by group
+          rw [hfix]
+          exact hx
+      -- element decomposition along the central product.
+      have hdecomp : ∀ x : R, ∃ u ∈ R₁, ∃ v ∈ R₂, x = u * v := by
+        intro x
+        have hx : x ∈ R₁ ⊔ R₂ := by
+          rw [← hcp'.sup_eq]
+          exact Subgroup.mem_top x
+        have hx' : x ∈ (R₁ : Set R) * (R₂ : Set R) := by
+          rw [← Subgroup.normal_mul]
+          exact hx
+        obtain ⟨u, hu, v, hv, huv⟩ := hx'
+        exact ⟨u, hu, v, hv, huv.symm⟩
+      -- `Ω₁(R) = R₁`.
+      have hΩR : Omega R p 1 = R₁ := by
+        apply le_antisymm
+        · rw [Omega]
+          refine (Subgroup.closure_le _).mpr ?_
+          rintro x hx
+          rw [Set.mem_setOf_eq, pow_one] at hx
+          obtain ⟨u, hu, v, hv, huv⟩ := hdecomp x
+          subst huv
+          have hcomm_uv : Commute u v := hcp'.commute_of_mem hu hv
+          have hup : u ^ p = 1 := by
+            have h1 := Monoid.pow_exponent_eq_one (⟨u, hu⟩ : ↥R₁)
+            rw [hR₁exp] at h1
+            exact congrArg Subtype.val h1
+          have hvp : v ^ p = 1 := by
+            have hxp : (u * v) ^ p = u ^ p * v ^ p := hcomm_uv.mul_pow p
+            have h1 : u ^ p * v ^ p = 1 := by
+              rw [← hxp]
+              exact hx
+            rw [hup, one_mul] at h1
+            exact h1
+          have hv_mem : v ∈ (Omega ↥R₂ p 1).map R₂.subtype := by
+            refine ⟨⟨v, hv⟩, ?_, rfl⟩
+            apply Omega.mem_of_pow_eq_one
+            apply Subtype.ext
+            show v ^ p ^ 1 = 1
+            rw [pow_one]
+            exact hvp
+          rw [hΩeq] at hv_mem
+          exact R₁.mul_mem hu (Subgroup.map_subtype_le _ hv_mem)
+        · intro x hx
+          apply Omega.mem_of_pow_eq_one
+          rw [pow_one]
+          have h1 := Monoid.pow_exponent_eq_one (⟨x, hx⟩ : ↥R₁)
+          rw [hR₁exp] at h1
+          exact congrArg Subtype.val h1
+      -- the quotient `R ⧸ Ω₁(R)` is cyclic (image of `R₂`).
+      haveI : (Omega R p 1).Normal := inferInstance
+      have hΩ_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Omega R p 1) :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+      haveI hQcyc : IsCyclic (R ⧸ Omega R p 1) := by
+        apply isCyclic_of_surjective
+          ((QuotientGroup.mk' (Omega R p 1)).comp R₂.subtype)
+        intro q
+        obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+        obtain ⟨u, hu, v, hv, huv⟩ := hdecomp x
+        refine ⟨⟨v, hv⟩, ?_⟩
+        show ((v : R) : R ⧸ Omega R p 1) = ((x : R) : R ⧸ Omega R p 1)
+        rw [QuotientGroup.eq, hΩR]
+        have hcomm_uv : Commute u v := hcp'.commute_of_mem hu hv
+        have hval : v⁻¹ * x = u := by
+          rw [huv, hcomm_uv.eq]
+          group
+        rw [hval]
+        exact hu
+      -- `A` centralizes the cyclic `p`-group `R ⧸ Ω₁(R)`.
+      have hψQ_triv : ∀ a : A, quotientMulAutHom hΩ_inv a = 1 := by
+        intro a
+        rcases eq_or_ne (quotientMulAutHom hΩ_inv a) 1 with h | hne
+        · exact h
+        · exfalso
+          have ho_dvd_q : orderOf (quotientMulAutHom hΩ_inv a) ∣ Nat.card A :=
+            dvd_trans (orderOf_map_dvd _ a) (orderOf_dvd_natCard a)
+          have ho_dvd_aut : orderOf (quotientMulAutHom hΩ_inv a) ∣
+              Nat.card (MulAut (R ⧸ Omega R p 1)) := orderOf_dvd_natCard _
+          rcases (Nat.dvd_prime hq_prime).mp ho_dvd_q with h1 | hq
+          · exact hne (orderOf_eq_one_iff.mp h1)
+          · rw [hq] at ho_dvd_aut
+            obtain ⟨t, ht⟩ := IsPGroup.iff_card.mp (hpg.to_quotient (Omega R p 1))
+            rw [IsCyclic.card_mulAut, ht] at ho_dvd_aut
+            rcases Nat.eq_zero_or_pos t with ht0 | htpos
+            · rw [ht0, pow_zero, Nat.totient_one] at ho_dvd_aut
+              exact hq_prime.one_lt.ne' (Nat.dvd_one.mp ho_dvd_aut)
+            · rw [Nat.totient_prime_pow hprime htpos] at ho_dvd_aut
+              rcases (Nat.Prime.dvd_mul hq_prime).mp ho_dvd_aut with h | h
+              · have hqp : Nat.card A ∣ p := hq_prime.dvd_of_dvd_pow h
+                rcases (Nat.dvd_prime hprime).mp hqp with h1 | h1
+                · exact hq_prime.one_lt.ne' h1
+                · exact hq_ne_p h1
+              · exact hq_ndvd (Dvd.dvd.mul_left h p)
+      -- `[R,A] ≤ Ω₁(R)`, but `[R,A] = R`.
+      have hAC_le : OddOrder.Isaacs.Ch04.actionCommutator φ ≤ Omega R p 1 := by
+        have hψ_one : quotientMulAutHom hΩ_inv = 1 :=
+          MonoidHom.ext fun a => hψQ_triv a
+        have hmap : (OddOrder.Isaacs.Ch04.actionCommutator φ).map
+            (QuotientGroup.mk' (Omega R p 1)) = ⊥ := by
+          rw [← OddOrder.Isaacs.Ch04.actionCommutator_quotient_eq_map hΩ_inv, hψ_one]
+          exact OddOrder.Isaacs.Ch04.actionCommutator_one_eq_bot
+        rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hmap
+        exact hmap
+      rw [hRA] at hAC_le
+      have hΩtop : R₁ = ⊤ := by
+        rw [← hΩR]
+        exact le_antisymm le_top hAC_le
+      calc Nat.card R = Nat.card ↥(⊤ : Subgroup R) := Subgroup.card_top.symm
+        _ = Nat.card ↥R₁ := by rw [hΩtop]
+        _ = p ^ 3 := hR₁card
+
 /-- **BG Theorem 5.5**: 奇素数 `p`, narrow な有限 `p`-群 `R`, `A` を `R` の自己同型群の solvable
 odd 位数部分群 (`φ : A →* MulAut R` faithful, `[IsSolvable A]`, `Odd |A|`) とする。すると:
 
@@ -2888,7 +3085,40 @@ theorem solvableAut_of_narrow [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (
     ((Nat.card A).Prime → ¬ Nat.card A ∣ p * (p - 1) →
       Nat.card A ∣ (p + 1) / 2 ∧
         (Ch04.actionCommutator φ = ⊤ → (¬ ∀ x y : R, x * y = y * x) → Nat.card R = p ^ 3)) := by
-  sorry
+  classical
+  by_cases hrank : pRank R p ≤ 2
+  · -- `r(R) ≤ 2`: `A'` is a `p`-group by Lemma 4.17; (b) is vacuous; (c) by assembly.
+    have hA' : IsPGroup p (_root_.commutator A) :=
+      OddOrder.BG.Ch1.S04.isPGroup_commutator_of_mulAut_odd_of_pRank_le_two hp hpg
+        hrank hφ hAodd
+    obtain ⟨hcomm, hndvd⟩ := quotient_opCore_comm_and_not_dvd_of_isPGroup_commutator hA'
+    refine ⟨hcomm, hndvd, ?_, ?_⟩
+    · intro h3
+      exfalso
+      omega
+    · intro hq hndvd'
+      exact thm55c_of_pRank_le_two hp hpg hrank φ hφ hAodd hq hndvd'
+  · -- `r(R) ≥ 3`: chain machinery; the hypotheses of (c) cannot occur.
+    have h3 : 3 ≤ pRank R p := by omega
+    obtain ⟨S, K, hScard, hKcyc, hSKinf, hCeq⟩ :=
+      exists_narrow_witness_of_three_le_pRank h3 hnarrow
+    obtain ⟨hA', hb⟩ := isPGroup_commutator_and_orderOf_dvd_of_narrow_witness hp hpg h3
+      hScard hKcyc hSKinf hCeq hφ
+    obtain ⟨hcomm, hndvd⟩ := quotient_opCore_comm_and_not_dvd_of_isPGroup_commutator hA'
+    refine ⟨hcomm, hndvd, fun _ => hb, ?_⟩
+    intro hq hndvd'
+    exfalso
+    have hq_ne_p : Nat.card A ≠ p := by
+      intro h
+      exact hndvd' (h ▸ dvd_mul_right p (p - 1))
+    haveI : Fact (Nat.card A).Prime := ⟨hq⟩
+    obtain ⟨α, hα⟩ := exists_prime_orderOf_dvd_card' (Nat.card A) dvd_rfl
+    have hα_cop : Nat.Coprime (orderOf α) p := by
+      rw [hα]
+      exact (Nat.coprime_primes hq (Fact.out : p.Prime)).mpr hq_ne_p
+    have hα_dvd := hb α hα_cop
+    rw [hα] at hα_dvd
+    exact hndvd' (Dvd.dvd.mul_left hα_dvd p)
 
 /-! ## Theorem 5.6 / 5.7 — solvable group での narrow Sylow (mmd L1945-1967) -/
 
