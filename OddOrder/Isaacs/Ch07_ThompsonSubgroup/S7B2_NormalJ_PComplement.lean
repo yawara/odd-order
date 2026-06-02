@@ -1676,6 +1676,78 @@ theorem hasNormalPComplement_quotient
     hQ_compl.map_mk' h_coprime L
   rwa [hQ_map] at h_image_compl
 
+/-- Normal `p`-complements pass to homomorphic images of subgroups.
+
+This is the subgroup-image form of the inheritance principle quoted in Isaacs §7C.
+It will be used for quotient images of `N_G(X)` and `C_G(X)` in Steps 2 and 3. -/
+theorem hasNormalPComplement_subgroup_map
+    {G K : Type*} [Group G] [Finite G] [Group K] [Finite K]
+    {p : ℕ} [Fact p.Prime] (φ : G →* K) (H : Subgroup G)
+    (hH : OddOrder.Isaacs.Ch05.HasNormalPComplement p ↥H) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p ↥(H.map φ) := by
+  classical
+  let φH : ↥H →* K := φ.comp H.subtype
+  have hQuot : OddOrder.Isaacs.Ch05.HasNormalPComplement p (↥H ⧸ φH.ker) :=
+    hasNormalPComplement_quotient (G := ↥H) hH φH.ker
+  have hRange : OddOrder.Isaacs.Ch05.HasNormalPComplement p ↥φH.range :=
+    hasNormalPComplement_of_mulEquiv (QuotientGroup.quotientKerEquivRange φH) hQuot
+  have hRange_eq : φH.range = H.map φ := by
+    ext y
+    constructor
+    · rintro ⟨x, rfl⟩
+      exact ⟨(x : G), x.property, rfl⟩
+    · rintro ⟨x, hxH, rfl⟩
+      exact ⟨⟨x, hxH⟩, rfl⟩
+  exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hRange_eq) hRange
+
+/-- If `N ⊴ G` is a normal `p'`-subgroup, then a normal `p`-complement in
+`N_G(P)` pushes to a normal `p`-complement in `N_{G/N}(Pbar)`.
+
+This combines subgroup-image inheritance with Isaacs Lemma 7.7(a). -/
+theorem hasNormalPComplement_normalizer_map_of_coprime_kernel
+    [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P)
+    (hNP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.normalizer (P : Set G))) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.normalizer
+        (((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N)))) := by
+  classical
+  let f : G →* G ⧸ N := QuotientGroup.mk' N
+  have hImage : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥((Subgroup.normalizer P).map f) :=
+    hasNormalPComplement_subgroup_map f (Subgroup.normalizer P) hNP
+  have hEq :
+      Subgroup.normalizer ((P.map f : Subgroup (G ⧸ N)) : Set (G ⧸ N)) =
+        (Subgroup.normalizer P).map f := by
+    simpa [f] using normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+  exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
+
+/-- If `N ⊴ G` is a normal `p'`-subgroup, then a normal `p`-complement in
+`C_G(P)` pushes to a normal `p`-complement in `C_{G/N}(Pbar)`.
+
+This combines subgroup-image inheritance with Isaacs Lemma 7.7(b). -/
+theorem hasNormalPComplement_centralizer_map_of_coprime_kernel
+    [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
+    (hp_coprime : ¬ p ∣ Nat.card N)
+    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P)
+    (hCP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.centralizer (P : Set G))) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥(Subgroup.centralizer
+        (((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N)))) := by
+  classical
+  let f : G →* G ⧸ N := QuotientGroup.mk' N
+  have hImage : OddOrder.Isaacs.Ch05.HasNormalPComplement p
+      ↥((Subgroup.centralizer (P : Set G)).map f) :=
+    hasNormalPComplement_subgroup_map f (Subgroup.centralizer (P : Set G)) hCP
+  have hEq :
+      Subgroup.centralizer ((P.map f : Subgroup (G ⧸ N)) : Set (G ⧸ N)) =
+        (Subgroup.centralizer (P : Set G)).map f := by
+    simpa [f] using centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+  exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
+
 /-- **Isaacs Thm 7.1, Step 7 reduction** (normal `J(P)` case).
 
 This helper packages the last observation in Isaacs Step 7: once `J(P) ⊴ G`, the

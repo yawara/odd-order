@@ -142,3 +142,24 @@ Remaining work toward the full Isaacs Thm 7.1 statement:
 8. Assemble the full theorem surface with the textbook hypotheses
    `p ≠ 2`, `P : Sylow p G`, `HasNormalPComplement p C_G(Z(P))`, and
    `HasNormalPComplement p N_G(J(P))`, feeding Steps 2-6 into the new Step 7 theorem.
+
+
+## 2026-06-02 update — subgroup image inheritance for Steps 2/3
+
+Landed the next inheritance bridge in lane `codex/isaacs-ch07-pcomp`:
+
+- `hasNormalPComplement_subgroup_map`: normal `p`-complements pass from a subgroup
+  to its homomorphic image.  This is the subgroup-image form of the "homomorphic
+  images" inheritance invoked before the seven-step proof.
+- `hasNormalPComplement_normalizer_map_of_coprime_kernel`: combines the above with
+  Lemma 7.7(a), so a normal `p`-complement in `N_G(X)` pushes to one in
+  `N_{G/N}(Xbar)` when `N` is a normal `p'`-subgroup and `X` is a nontrivial
+  `p`-subgroup.
+- `hasNormalPComplement_centralizer_map_of_coprime_kernel`: same for centralizers,
+  using Lemma 7.7(b).
+
+This makes the Step 3 quotient-hypothesis transfer explicit: once the eventual proof
+identifies `J(Pbar)` and `Z(Pbar)` with the quotient images of `J(P)` and `Z(P)`,
+the existing hypotheses on `N_G(J(P))` and `C_G(Z(P))` can be pushed to the quotient
+normalizer and centralizer.  Step 2 still needs the separate `U ≤ X ≤ P` lift and
+bad-subgroup maximality argument for `J(P/U)` and `Z(P/U)`.
