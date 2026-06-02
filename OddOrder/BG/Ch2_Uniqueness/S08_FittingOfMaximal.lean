@@ -49,11 +49,34 @@ variable {G : Type*} [Group G]
 def fittingInG (M : Subgroup G) : Subgroup G :=
   (Ch01.fitting ↥M).map M.subtype
 
+/-- `F(M)`, realized in `G`, lies inside `M`. -/
+theorem fittingInG_le (M : Subgroup G) : fittingInG M ≤ M :=
+  Subgroup.map_subtype_le _
+
 /-- **`ℰ_p^*(H)` membership**: `A₀` は `H` の中で極大な `p`-elementary abelian 部分群
 (`A₀ ≤ H` elem-ab で、`H` 内の elem-ab `B ⊇ A₀` は `A₀` に戻る)。 -/
 def isMaxElemAbelianIn (p : ℕ) (A₀ H : Subgroup G) : Prop :=
   A₀.IsElementaryAbelian p ∧ A₀ ≤ H ∧
     ∀ B : Subgroup G, B.IsElementaryAbelian p → B ≤ H → A₀ ≤ B → B = A₀
+
+/-- A maximal elementary abelian subgroup is elementary abelian. -/
+theorem isMaxElemAbelianIn_isElementaryAbelian {p : ℕ} {A₀ H : Subgroup G}
+    (hA₀ : isMaxElemAbelianIn p A₀ H) :
+    A₀.IsElementaryAbelian p :=
+  hA₀.1
+
+/-- A maximal elementary abelian subgroup of `H` lies in `H`. -/
+theorem isMaxElemAbelianIn_le {p : ℕ} {A₀ H : Subgroup G}
+    (hA₀ : isMaxElemAbelianIn p A₀ H) :
+    A₀ ≤ H :=
+  hA₀.2.1
+
+/-- Maximality clause for `isMaxElemAbelianIn`. -/
+theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B : Subgroup G}
+    (hA₀ : isMaxElemAbelianIn p A₀ H) (hB : B.IsElementaryAbelian p) (hBH : B ≤ H)
+    (hA₀B : A₀ ≤ B) :
+    B = A₀ :=
+  hA₀.2.2 B hB hBH hA₀B
 
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
