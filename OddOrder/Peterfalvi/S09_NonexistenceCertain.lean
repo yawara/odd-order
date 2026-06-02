@@ -2207,6 +2207,63 @@ theorem betaNormSq_eq_of_source_orthogonal
     (H78.weightedNuSum_inner_self_eq_of_source_orthogonal
       horth hnorm_ne hzeta_degree hdegree_sum)
 
+/-- Source-side beta norm data give Peterfalvi's residual norm formula for `Γ`. -/
+theorem gammaNormSq_eq_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.gammaNormSq hBD =
+      (H78.complementIndex : ℝ) - 1 -
+        (H78.kernelOrder : ℝ) * H78.normQuadraticCorrection hBD :=
+  H78.gammaNormSq_eq_of_betaNormSq_expand hBD
+    (H78.betaNormSq_eq_complementIndex_add_one hsrc)
+    (H78.betaNormSq_eq_of_source_orthogonal hBD
+      horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
+
+/-- Once the remaining `(ζ^ν)^ρ` quadratic formula is supplied, the source-side
+beta norm data package Peterfalvi (7.8.b)'s `NormEstimates`. -/
+theorem normEstimates_of_source_orthogonal
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hsrc : H78.SourceDiffNormEvaluation)
+    (horth : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H),
+        ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) =
+          if i = j then
+            ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)
+          else 0)
+    (hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hzeta : H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD +
+        (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ))) :
+    H78.NormEstimates hBD :=
+  H78.normEstimates_of_normQuadraticCorrection_eqs hBD hzeta
+    (H78.gammaNormSq_eq_of_source_orthogonal hBD hsrc
+      horth hnorm_ne hzeta_degree hdegree_sum hzeta_irr)
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
