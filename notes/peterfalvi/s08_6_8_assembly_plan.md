@@ -154,7 +154,7 @@ c2=`S06.CertainTypeHypothesis` + `K=H` + `w₂`素 + `W₂⊆[H,H]` + `certain.d
 | T1 | **SibleySetup 再構築** (§B) | ~120 | — | ✅ |
 | T2 | (5.2.a/b) discharge → `S07.Hypothesis` の tau=τ_D | ~120 | T1 | 一部 |
 | **T3** | **(6.7) 上位定理** `peterfalvi_67` (ψ(z)≡ψ(1) mod|P|) — **atoms は ClassSumAlgebra/AlgInt に既存(~90%)**、残=top wiring+(iii)-collapse(`ω(C_s)=α`)+rationality | ~150-250 | — | ✅ **今すぐ可** |
-| **T4** | **(1.9)Galois作用+(5.9.a)coherence不変** (cyclotomic field-of-values) — case B 専用、分離可、repo 皆無 | ~200-350 | — | ✅ **今すぐ可** |
+| **T4** | **(1.9)Galois作用+(5.9.a)coherence不変** (cyclotomic field-of-values) — case B 専用、分離可。**🔄 R1 lane で infra 大半 landed (2026-06-02)**: `GaloisCharacter.lean` = `mapRingEquiv` 系 + **`IsIrreducibleCharacter.mapRingEquiv` (χ^σ∈Irr, 無条件, σ-twist 表現で証明) + `galoisPerm`** + `mapRingEquiv_mem_ZIrr_iff`; S07 `IsCoherent.galoisTransport` (= (5.9.a) 骨格, star-交換 hσ のみ仮定)。**残 = (1.9.a/b) 数論**: CRT で `χ^v(g)=χ(g^k)` (ord g∣a) / `=χ(g)` (ord g⊥a) の値公式を持つ v の存在 + ℂ≃+*ℂ への延長 (mathlib cyclotomic Galois `IsCyclotomicExtension.autEquivPow` 周り要調査) | ~150-250 | — | ✅ **今すぐ可** |
 | T5 | [Is]Lem 2.27 `Res_Z θ=θ(1)·φ` (Z≤Z(H)) | ~40 | — | ✅ (case B) |
 | T6 | `Y` coherent: 等次数族 η:Fin m→Irr L (η_j(1)=|W₁| ← 6.34) で `coherentEqualDegree_fromDade` | ~120 | T1,T2,**6.34** | — |
 | T7 | `X` 特徴付け `X={χ∈Irr L\|Z⊄ker χ}` (c1=6.34 / c2=(4.5)) | ~140 | T1,**6.34**,(4.5)? | — |
