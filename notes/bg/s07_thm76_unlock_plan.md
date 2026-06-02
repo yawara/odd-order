@@ -76,8 +76,20 @@ case(1) (p-length one, Thm 6.7 待ち) は **明示 sorry で残す** (今回ス
 (ii) A p-group ⟹ `primesOf A={p}` ⟹ `kSubgroup A = opiCoreInG {p}ᶜ (C_G(A))` 橋; `q≠p`⟹`q∈{p}ᶜ`;
 (iii) `A∈SCN₂` (SCN₃→SCN₂) で Prop 7.5(2) ⟹ `Hypothesis71 A`; Thm 7.2 適用。
 
-### brick 2 実装メモ (2026-06-03 深夜, 着手して判明した罠 — 次回はこれで省力化)
+### brick 2 進捗 (2026-06-03 深夜)
 - **✅ brick 1 完了** (commit cbce057, axiom-clean): `centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime`。
+- **✅ brick 2 core + 特殊形 完了** (commit 584cc9b, axiom-clean, full build 3562 green):
+  - `mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer` (private, **無条件** core): ∀u∈O_{p'}(C_G(R)), u が O_p(G) を中心化。⟨u⟩ が RT=R⊔O_p(G) に共役作用 (`normalizerMonoidHom`+`inclusion`) + Prop 1.10。最重部分=完了。
+  - `oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot` (public, **Prop 1.15(b) O_{p'}(G)=⊥ 形**): core + Prop 1.15(a) (`hall_higman_solvable_specialization`) で M⊆C_G(O_p)⊆O_p、M は p'-群 ⟹ M=⊥。
+- **🔜 残 = brick 2b (general 形) `oPiPrimeCore_centralizer_le_oPiPrimeCore`** (~80-100 LOC, quotient plumbing):
+  M₀:=O_{p'}(G), f:=mk' M₀, Ḡ:=G/M₀, R̄:=R.map f。`M ≤ M₀ ⟺ M.map f = ⊥` (`Subgroup.map_eq_bot_iff`+`ker_mk'`)。
+  K:=M.map f について `K ≤ opiCoreInG {p}ᶜ C_Ḡ(R̄) = ⊥` (特殊形@Ḡ, `oPiCore_quotient_self_eq_bot`) を示す:
+  (i) K≤C̄ (M≤C_G(R) 像 ⊆ centralizer 像, easy 方向 inline); (ii) **K⊴C̄ は relative-normality を map で運ぶのでなく
+  共役特徴付けで inline 証明**: brick1 で C̄=(C_G(R)).map f ⟹ c=f y (y∈C_G(R)), k=f m (m∈M), M⊴C_G(R)
+  (`le_normalizer_opiCoreInG`) ⟹ y m y⁻¹∈M ⟹ c k c⁻¹=f(ymyu⁻¹)∈K; (iii) K は {p}ᶜ-群 (card K∣card M, M p'-群);
+  ⟹ K.subgroupOf C̄ は ↥C̄ の normal {p}ᶜ-subgroup ⟹ `IsPiGroup.le_oPiCore` で ≤ oPiCore {p}ᶜ ↥C̄ ⟹
+  map subtype で K ≤ opiCoreInG。**罠予想**: G/C̄/↥C̄ 三層の型juggling, subgroupOf↔map subtype 往復。
+- 次の brick 2 罠メモ (旧):
 - brick 2 は **実測で大型 (~150-200 LOC) + 罠多数**。次回は **incremental skeleton 推奨**
   (hard sub-step を `sorry` で置いて型を通し→1 個ずつ埋める→頻繁 build)。一気書きは normalizer 罠で詰む。
 - **罠1: `Subgroup.normalizer` の Set/Subgroup 曖昧** (handoff §罠と同じ)。`u ∈ normalizer RT` は
