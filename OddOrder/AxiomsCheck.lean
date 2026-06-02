@@ -1080,6 +1080,16 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.pRank_le_two_of_scn3_empty
 -- BG §5 Lem 5.1(a): p odd 有限 p-群 R, r(R)≥3 ⇒ SCN₃(R)≠∅ (= Lem 4.7 hard dir の対偶)。§5 着手。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank
+-- BG §5 Lem 5.2: E∈ℰ²∩ℰ* ⇒ E⊄T ∧ (|Ω₁(Z(R))|=p ∧ W=Ω₁(Z₂(R))∈ℰ²) ∧ [R:T]=p (T=C_R(W))。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.lemma52
+-- BG §5 Thm 5.3: r(R)≥3 ⇒ (narrow ⟺ ℰ²(R)∩ℰ*(R)≠∅)。⇐ は 5.3(d) の分解論法で witness 構成。
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
+-- BG §5 Thm 5.3(d): narrow, |S|=p, r(C_R(S))≤2 ⇒ C_T(S) cyclic ∧ S∩R'=S∩T=1 ∧ C_R(S)=S×C_T(S)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+-- BG §5 Cor 5.4: r(R)≥3 ⇒ (narrow ⟺ ∃S, |S|=p ∧ r(C_R(S))≤2)。
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
