@@ -399,7 +399,8 @@ private theorem pRank_le_pRank_sylow [Finite G] [Fact p.Prime] (P : Sylow p G) :
 
 /-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2894): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
 (a) `ℰ_p²(G) ∩ ℰ_p*(G) = ∅`; (b) `p`-部分群 `R` で `r(R) ≥ 2` なら `R ∈ 𝒰`;
-(c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d): nonid `β(M)`-部分群 `Y` ⇒ `N_G(Y)⊆M` — 後続。)
+(c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d) は
+`normalizer_le_of_nontrivial_beta_subgroup` として別 theorem に露出。)
 
 Proof: (a) `A ∈ ℰ²(G) ∩ ℰ*(G)` ⇒ `A ≤ Q` for some Sylow `Q` (`exists_le_sylow`), `A.subgroupOf Q`
 maximal-elem-ab of order `p²` in `↥Q`, contradicting `idealPrime`. (b) `2 ≤ rank ↥R` ⇒ `R`
@@ -596,6 +597,21 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
       le_trans (le_trans hpRank3 (pRank_le_pRank_sylow P)) (pRank_le_rank p)
     rw [hQeqP] at hrank
     omega
+
+/-! ## Proposition 10.14(d) — nontrivial `β(M)`-subgroup normalizers (mmd L2894) -/
+
+/-- **BG Proposition 10.14(d)** (mmd L2894): `M ∈ ℳ` とし、`Y` を `M` の非自明
+`β(M)`-部分群とする。このとき `N_G(Y) ⊆ M`。
+
+This is the §13-facing clause used in Lemma 13.8 and Theorem 13.10. The proof is still a
+§10 proof gate: BG chooses a prime `q ∈ π(F(Y))`, reduces to `q ∈ β(M)`, applies
+Proposition 10.14(c) to `O_q(Y)`, and then obtains the ambient normalizer containment.
+It is intentionally exposed as a theorem, not hoisted into any downstream setup field. -/
+theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
+    (hYne : Y ≠ ⊥) (hYβ : Subgroup.IsPiSubgroup (beta M) Y) :
+    Subgroup.normalizer (Y : Set G) ≤ M := by
+  sorry
 
 /-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
 
