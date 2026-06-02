@@ -1125,6 +1125,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
 -- BG Prop 1.16(1) = Gorenstein 6.2.4 = Isaacs 6.21 の φ:A→*MulAut G 形 (interface 適応)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+-- BG Lem 1.14 (centralizer 形): C_{G/M}(TM/M) の引き戻し = C_G(T)·M (M⊴G p'-群, T p-群)。
+-- normalizer 形 + T⊓M=⊥ から導出 (Prop 1.15(b) の O_{p'}(G)=1 還元に使用)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime
 -- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
 -- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer

@@ -2197,6 +2197,88 @@ theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     Subgroup.mul_mem_sup hm_M h_mx_in_NT
   rwa [sup_comm] at h_in_M_NT
 
+/-- **BG Lemma 1.14 (centralizer-in-G form)**: `T` p-subgroup of `G`, `M ⊴ G` p'-subgroup.
+Writing `f = QuotientGroup.mk' M`, the preimage of `C_{G/M}(TM/M)` equals `C_G(T)·M`:
+`(C_{G/M}(T.map f)).comap f = C_G(T) ⊔ M`. Equivalently `C_G(T)` surjects onto `C_{G/M}(TM/M)`.
+
+This is the centralizer half of BG Lemma 1.14, derived from the normalizer half
+(`normalizer_sup_eq_normalizer_sup_of_pGroup_coprime`) plus `T ⊓ M = ⊥`
+(BG p.5: `CM ⊆ C* ⊆ N* = NM`, `C* ⊓ N = C`, so `C* = (C* ⊓ N)·M = CM`). Used for the
+`O_{p'}(G) = 1` reduction in Proposition 1.15(b). -/
+theorem centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    {M : Subgroup G} [M.Normal] (hM_p' : (Nat.card M).Coprime p) :
+    (Subgroup.centralizer
+        ((T.map (QuotientGroup.mk' M) : Subgroup (G ⧸ M)) : Set (G ⧸ M))).comap
+        (QuotientGroup.mk' M)
+      = Subgroup.centralizer (T : Set G) ⊔ M := by
+  set f := QuotientGroup.mk' M with hf
+  have hsurj : Function.Surjective f := QuotientGroup.mk'_surjective M
+  have hker : f.ker = M := QuotientGroup.ker_mk' M
+  have hdisj : T ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hT hM_p'
+  apply le_antisymm
+  · -- hard direction: `C* ⊆ C_G(T) ⊔ M`.
+    intro x hx
+    rw [Subgroup.mem_comap] at hx
+    -- `x ∈ N_G(T ⊔ M)` via the normalizer-of-quotient identity.
+    have hxN : x ∈ Subgroup.normalizer (T ⊔ M : Subgroup G) := by
+      have hxn : f x ∈ Subgroup.normalizer (T.map f : Subgroup (G ⧸ M)) :=
+        Subgroup.centralizer_le_normalizer _ hx
+      have e1 : (T.map f).comap f = (T ⊔ M : Subgroup G) := by
+        rw [Subgroup.comap_map_eq, hker]
+      have e2 := Subgroup.comap_normalizer_eq_of_surjective (T.map f) hsurj
+      have hmem : x ∈ (Subgroup.normalizer (T.map f : Subgroup (G ⧸ M))).comap f := by
+        rw [Subgroup.mem_comap]; exact hxn
+      rw [e2, e1] at hmem
+      exact hmem
+    rw [normalizer_sup_eq_normalizer_sup_of_pGroup_coprime hT hM_p', sup_comm] at hxN
+    obtain ⟨m, hm, n, hn, hmn⟩ := Subgroup.mem_sup_of_normal_left.mp hxN
+    -- `f m = 1`, hence `f n = f x`.
+    have hfm : f m = 1 := MonoidHom.mem_ker.mp (by rw [hker]; exact hm)
+    have hfn : f n = f x := by rw [← hmn, map_mul, hfm, one_mul]
+    -- `n` centralizes `T`.
+    have hn_cent : n ∈ Subgroup.centralizer (T : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro t ht
+      have htT : t ∈ T := SetLike.mem_coe.mp ht
+      -- `f n` commutes with `f t` (image of `T`).
+      have hcomm : f n * f t = f t * f n := by
+        have hft : (f t) ∈ (↑(T.map f) : Set (G ⧸ M)) :=
+          SetLike.mem_coe.mpr (Subgroup.mem_map_of_mem f htT)
+        rw [hfn]
+        exact (Subgroup.mem_centralizer_iff.mp hx (f t) hft).symm
+      -- `c := n*t*n⁻¹*t⁻¹ ∈ M` (vanishes mod `M`).
+      have hcM : n * t * n⁻¹ * t⁻¹ ∈ M := by
+        rw [← hker]
+        refine MonoidHom.mem_ker.mpr ?_
+        have : f n * f t * (f n)⁻¹ * (f t)⁻¹ = 1 := by rw [hcomm]; group
+        simpa [map_mul, map_inv] using this
+      -- `c ∈ T` since `n` normalizes `T`.
+      have hcT : n * t * n⁻¹ * t⁻¹ ∈ T := by
+        have hntn : n * t * n⁻¹ ∈ T := (Subgroup.mem_normalizer_iff.mp hn t).mp htT
+        exact T.mul_mem hntn (T.inv_mem htT)
+      have hc1 : n * t * n⁻¹ * t⁻¹ = 1 :=
+        Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hcT, hcM⟩)
+      have h1 : n * t * n⁻¹ = t := mul_inv_eq_one.mp hc1
+      calc t * n = (n * t * n⁻¹) * n := by rw [h1]
+        _ = n * t := by group
+    rw [sup_comm]
+    exact Subgroup.mem_sup_of_normal_left.mpr ⟨m, hm, n, hn_cent, hmn⟩
+  · -- easy direction: `C_G(T) ⊔ M ⊆ C*`.
+    rw [sup_le_iff]
+    refine ⟨?_, ?_⟩
+    · intro c hc
+      rw [Subgroup.mem_comap, Subgroup.mem_centralizer_iff]
+      rintro h ⟨t, ht, rfl⟩
+      rw [← map_mul, ← map_mul]
+      exact congrArg f (Subgroup.mem_centralizer_iff.mp hc t ht)
+    · intro μ hμ
+      rw [Subgroup.mem_comap]
+      have hμ1 : f μ = 1 := MonoidHom.mem_ker.mp (by rw [hker]; exact hμ)
+      rw [hμ1]
+      exact Subgroup.one_mem _
+
 /-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3", thin wrap)**: `G` 有限可解 +
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
 
