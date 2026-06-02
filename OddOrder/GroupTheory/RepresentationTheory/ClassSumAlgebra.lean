@@ -547,7 +547,8 @@ by an element of `L` (TI again), and `Z ⊴ L` forces `u, v ∈ Z`; then `u·v �
 theorem fixedPointFree_classPair_of_isTISubset {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     {Z : Subgroup G} (hZP : Z ≤ (P : Subgroup G))
     (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
-    (hti : IsTISubset ((P : Set G) \ {1}) (Subgroup.normalizer (P : Subgroup G)))
+    (hti : OddOrder.GroupTheory.IsTISubset ((P : Set G) \ {1})
+      (Subgroup.normalizer (P : Subgroup G)))
     {Ci Cj Cs : ConjClasses G}
     (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
     (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj)
@@ -990,6 +991,80 @@ theorem centralCharacterOfRep_eq_of_card_eq_of_character_eq (ρ : Representation
     centralCharacterOfRep_classSum ρ (ConjClasses.mk z'),
     sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl,
     sum_character_eq_card_mul ρ (ConjClasses.mk z') (g := z') rfl, hcard, hchar]
+
+omit [Fintype (ConjClasses G)] in
+/-- **Class-size constancy from centralizer constancy inside a subgroup.**  If the ambient
+centralizers `C_G(z)` and `C_G(z')` both lie in `L`, then equality of the `L`-centralizer sizes
+`|L ∩ C_G(z)| = |L ∩ C_G(z')|` forces equality of the ambient conjugacy-class sizes
+`|⟦z⟧| = |⟦z'⟧|`.
+
+This is the group-theoretic bridge used in Peterfalvi (6.7): the TI condition puts
+`C_G(x) ≤ L` for `x ∈ P^#`, so a hypothesis that `|C_L(x)|` is constant on `Z^#` can be read as
+constancy of the ambient class size. -/
+theorem card_class_eq_of_inf_centralizer_card_eq (L : Subgroup G) {z z' : G}
+    (hz : Subgroup.centralizer ({z} : Set G) ≤ L)
+    (hz' : Subgroup.centralizer ({z'} : Set G) ≤ L)
+    (hcard : Nat.card ↥(L ⊓ Subgroup.centralizer ({z} : Set G))
+      = Nat.card ↥(L ⊓ Subgroup.centralizer ({z'} : Set G))) :
+    Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
+      = Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z' } := by
+  have hLz : L ⊓ Subgroup.centralizer ({z} : Set G)
+      = Subgroup.centralizer ({z} : Set G) := by
+    exact le_antisymm inf_le_right (le_inf hz le_rfl)
+  have hLz' : L ⊓ Subgroup.centralizer ({z'} : Set G)
+      = Subgroup.centralizer ({z'} : Set G) := by
+    exact le_antisymm inf_le_right (le_inf hz' le_rfl)
+  have hcent : Nat.card (Subgroup.centralizer ({z} : Set G))
+      = Nat.card (Subgroup.centralizer ({z'} : Set G)) := by
+    simpa [hLz, hLz'] using hcard
+  rw [card_class_eq_index_centralizer z, card_class_eq_index_centralizer z']
+  apply Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := Subgroup.centralizer ({z'} : Set G)))
+  calc
+    (Subgroup.centralizer ({z} : Set G)).index
+        * Nat.card (Subgroup.centralizer ({z'} : Set G))
+        = (Subgroup.centralizer ({z} : Set G)).index
+            * Nat.card (Subgroup.centralizer ({z} : Set G)) := by rw [hcent]
+    _ = Nat.card G := (Subgroup.centralizer ({z} : Set G)).index_mul_card
+    _ = (Subgroup.centralizer ({z'} : Set G)).index
+        * Nat.card (Subgroup.centralizer ({z'} : Set G)) :=
+      (Subgroup.centralizer ({z'} : Set G)).index_mul_card.symm
+
+omit [Fintype (ConjClasses G)] in
+/-- **Central-character constancy from TI, `L`-centralizer constancy, and character-value
+constancy.**  For elements `z, z'` in a TI-subset `A`, the TI condition gives
+`C_G(z), C_G(z') ≤ L`.  If the corresponding `L`-centralizer sizes agree and
+`χ_ρ(z) = χ_ρ(z')`, then the central-character values on their conjugacy classes agree.
+
+This packages the `(iii)` bridge in Peterfalvi (6.7): `ω(C_s)=α` on classes meeting `Z^#` follows
+from constancy of `ψ` and of `|C_L(-)|` on `Z^#`. -/
+theorem centralCharacterOfRep_eq_of_tiSubset_card_eq_of_character_eq
+    (ρ : Representation ℂ G V) [IsIrreducible ρ] {A : Set G} {L : Subgroup G}
+    (hA : OddOrder.GroupTheory.IsTISubset A L) {z z' : G} (hz : z ∈ A) (hz' : z' ∈ A)
+    (hcard : Nat.card ↥(L ⊓ Subgroup.centralizer ({z} : Set G))
+      = Nat.card ↥(L ⊓ Subgroup.centralizer ({z'} : Set G)))
+    (hchar : ρ.character z = ρ.character z') :
+    ω ρ (ConjClasses.mk z) = ω ρ (ConjClasses.mk z') :=
+  centralCharacterOfRep_eq_of_card_eq_of_character_eq ρ
+    (card_class_eq_of_inf_centralizer_card_eq L
+      (centralizer_le_of_mem_isTISubset hA hz)
+      (centralizer_le_of_mem_isTISubset hA hz') hcard)
+    hchar
+
+omit [Fintype (ConjClasses G)] in
+/-- **Central-character substitution at a representative.**  For an irreducible representation,
+`χ(1) · ω(⟦z⟧) = |⟦z⟧| · χ(z)`.
+
+This is the equation `ψ(1)α = |C₁|ψ(z)` used in Peterfalvi (6.7.3), obtained directly from the
+central-character formula on a class sum. -/
+theorem character_one_mul_centralCharacterOfRep_mk (ρ : Representation ℂ G V)
+    [IsIrreducible ρ] (z : G) :
+    ρ.character 1 * (ω ρ (ConjClasses.mk z))
+      = (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } : ℂ) * ρ.character z := by
+  rw [centralCharacterOfRep_classSum ρ (ConjClasses.mk z),
+    sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl, ρ.char_one]
+  haveI := nontrivial_of_isIrreducible ρ
+  have hd : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
+  field_simp [hd]
 
 omit [Fintype (ConjClasses G)] in
 /-- **Algebraic integrality of the central-character value `ω_ρ(C)`** (Isaacs (3.7); the
@@ -1438,6 +1513,52 @@ theorem coeff_mul_card_eq_classSumCoeff (Ci Cj Cs : ConjClasses G) :
   congr 2
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
+omit [DecidableEq G] in
+/-- **Identity-class class-sum coefficient.**  The per-element coefficient of `1` in
+`classSum Ci * classSum Cj` is the identity-class pair count `classSumCoeff Ci Cj 1`, since the
+identity conjugacy class has one element. -/
+theorem classSum_mul_apply_one_eq_classSumCoeff_one (Ci Cj : ConjClasses G) :
+    (classSum Ci * classSum Cj) (1 : G) = (classSumCoeff Ci Cj 1 : ℂ) := by
+  classical
+  have hcard : Nat.card { x : G // ConjClasses.mk x = (1 : ConjClasses G) } = 1 := by
+    rw [Nat.card_eq_one_iff_unique]
+    refine ⟨⟨fun a b => Subtype.ext ?_⟩, ⟨⟨1, (ConjClasses.one_eq_mk_one).symm⟩⟩⟩
+    have ha : (a : G) = 1 := mk_eq_one_iff_eq_one.mp a.2
+    have hb : (b : G) = 1 := mk_eq_one_iff_eq_one.mp b.2
+    rw [ha, hb]
+  have hout : (classSum Ci * classSum Cj) (1 : ConjClasses G).out
+      = (classSum Ci * classSum Cj) (1 : G) := by
+    simpa [ConjClasses.one_eq_mk_one] using (classSum_mul_apply_out Ci Cj (1 : G)).symm
+  have h := coeff_mul_card_eq_classSumCoeff Ci Cj (1 : ConjClasses G)
+  rw [hcard, Nat.cast_one, mul_one, hout] at h
+  exact h
+
+omit [DecidableEq G] [Fintype (ConjClasses G)] in
+/-- The sum of per-element class-sum coefficients over any finite family of conjugacy classes is an
+algebraic integer. -/
+theorem isIntegral_sum_classSum_mul_coeff (Ci Cj : ConjClasses G) (s : Finset (ConjClasses G)) :
+    IsIntegral ℤ (∑ Cs ∈ s, (classSum Ci * classSum Cj) Cs.out) := by
+  classical
+  refine IsIntegral.sum _ fun Cs _ => ?_
+  rw [classSum_mul_apply]
+  exact isIntegral_algebraMap
+
+/-- The nonidentity part of the class-sum product coefficient over the classes meeting `Z`.
+
+This is Peterfalvi's `a_{ij}` after the `(6.7.2)` RHS has been collapsed: it sums the per-element
+coefficients over the classes that meet `Z^#`. -/
+noncomputable def nonidentityZClassCoeffSum (Z : Subgroup G) (Ci Cj : ConjClasses G) : ℂ := by
+  classical
+  exact ∑ Cs ∈ Finset.univ.filter
+      (fun Cs : ConjClasses G => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z ∧ w ≠ 1),
+    (classSum Ci * classSum Cj) Cs.out
+
+/-- The nonidentity `Z`-class coefficient sum is an algebraic integer. -/
+theorem nonidentityZClassCoeffSum_isIntegral (Z : Subgroup G) (Ci Cj : ConjClasses G) :
+    IsIntegral ℤ (nonidentityZClassCoeffSum Z Ci Cj) := by
+  classical
+  exact isIntegral_sum_classSum_mul_coeff Ci Cj _
+
 omit [DecidableEq G] [Fintype (ConjClasses G)] in
 /-- **The term `ψ(1)·a_{ijs}·ω(C_s)` evaluated** (Peterfalvi (6.7.2), per-class term).  For an
 irreducible representation `ρ` with character `ψ = χ_ρ`, the contribution of class `C_s` to
@@ -1552,7 +1673,8 @@ theorem centralCharacterOfRep_classSum_mul_cong_of_isTISubset [Finite G]
     (ρ : Representation ℂ G V) [IsIrreducible ρ] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
     {Z : Subgroup G} (hZP : Z ≤ (P : Subgroup G))
     (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
-    (hti : IsTISubset ((P : Set G) \ {1}) (Subgroup.normalizer (P : Subgroup G)))
+    (hti : OddOrder.GroupTheory.IsTISubset ((P : Set G) \ {1})
+      (Subgroup.normalizer (P : Subgroup G)))
     {Ci Cj : ConjClasses G}
     (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
     (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj) :
@@ -1576,6 +1698,130 @@ theorem centralCharacterOfRep_classSum_mul_cong_of_isTISubset [Finite G]
   have hdvd : Nat.card (P : Subgroup G) ∣ classSumCoeff Ci Cj Cs :=
     card_dvd_classSumCoeff_of_fixedPointFree (P : Subgroup G) Ci Cj Cs hfree
   exact_mod_cast hdvd
+
+open Classical in
+/-- **Collapse of the `(6.7.2)` RHS over `Z`.**  If the central-character value is constant with
+value `α` on every class meeting `Z^#`, then the sum over classes meeting `Z` splits into the
+identity-class term plus `α` times the nonidentity `Z`-class coefficient sum.
+
+This is the algebraic part of Peterfalvi's passage from the sum form of (6.7.2) to
+`ψ(1)(a_{ij0}+a_{ij}α)`. -/
+theorem centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
+    (ρ : Representation ℂ G V) [IsIrreducible ρ] (Z : Subgroup G)
+    (Ci Cj : ConjClasses G) {α : ℂ}
+    (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ (ConjClasses.mk w) = α) :
+    (∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
+        ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
+      = ρ.character 1 *
+          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+            + nonidentityZClassCoeffSum Z Ci Cj * α) := by
+  classical
+  let inZ : ConjClasses G → Prop := fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z
+  let inZsharp : ConjClasses G → Prop :=
+    fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z ∧ w ≠ 1
+  let term : ConjClasses G → ℂ := fun Cs =>
+    ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+  have hfilters :
+      (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs ≠ 1)
+        = Finset.univ.filter inZsharp := by
+    ext Cs
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨⟨w, hwCs, hwZ⟩, hCs1⟩
+      refine ⟨w, hwCs, hwZ, ?_⟩
+      intro hw1
+      exact hCs1 (by simpa [hw1, ConjClasses.one_eq_mk_one] using hwCs.symm)
+    · rintro ⟨w, hwCs, hwZ, hw1⟩
+      refine ⟨⟨w, hwCs, hwZ⟩, ?_⟩
+      intro hCs1
+      exact hw1 (mk_eq_one_iff_eq_one.mp (by simpa [hCs1] using hwCs))
+  have hid :
+      (∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs = 1), term Cs)
+        = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G)) := by
+    rw [Finset.sum_eq_single (1 : ConjClasses G)]
+    · have hout : (classSum Ci * classSum Cj) (1 : ConjClasses G).out
+          = (classSum Ci * classSum Cj) (1 : G) := by
+        simpa [ConjClasses.one_eq_mk_one] using (classSum_mul_apply_out Ci Cj (1 : G)).symm
+      change ρ.character 1 *
+          (((classSum Ci * classSum Cj) (1 : ConjClasses G).out : ℂ) * (ω ρ (1 : ConjClasses G)))
+        = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G))
+      rw [hout, centralCharacterOfRep_one]
+      ring
+    · intro Cs hCs hne
+      rw [Finset.mem_filter] at hCs
+      exact (hne hCs.2).elim
+    · intro hnot
+      exfalso
+      exact hnot (by
+        rw [Finset.mem_filter]
+        exact ⟨by
+          rw [Finset.mem_filter]
+          exact ⟨Finset.mem_univ _, ⟨1, (ConjClasses.one_eq_mk_one).symm, Z.one_mem⟩⟩, rfl⟩)
+  have hnon :
+      (∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs ≠ 1), term Cs)
+        = ρ.character 1 * (nonidentityZClassCoeffSum Z Ci Cj * α) := by
+    rw [hfilters, nonidentityZClassCoeffSum]
+    have hterm : ∀ Cs ∈ Finset.univ.filter inZsharp,
+        term Cs = ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α) := by
+      intro Cs hCs
+      rw [Finset.mem_filter] at hCs
+      obtain ⟨w, hwCs, hwZ, hw1⟩ := hCs.2
+      have hω : ω ρ Cs = α := by
+        simpa [hwCs] using hα hwZ hw1
+      change ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+        = ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α)
+      rw [hω]
+    calc
+      (∑ Cs ∈ Finset.univ.filter inZsharp, term Cs)
+          = ∑ Cs ∈ Finset.univ.filter inZsharp,
+              ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α) :=
+        Finset.sum_congr rfl hterm
+      _ = ρ.character 1 *
+          ((∑ Cs ∈ Finset.univ.filter inZsharp, (classSum Ci * classSum Cj) Cs.out) * α) := by
+        rw [Finset.sum_mul, Finset.mul_sum]
+  calc
+    (∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
+        ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
+        = ∑ Cs ∈ Finset.univ.filter inZ, term Cs := rfl
+    _ = (∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs = 1), term Cs)
+        + ∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs ≠ 1),
+            term Cs := by
+          rw [← Finset.sum_filter_add_sum_filter_not (Finset.univ.filter inZ)
+            (fun Cs : ConjClasses G => Cs = 1)]
+    _ = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G))
+        + ρ.character 1 * (nonidentityZClassCoeffSum Z Ci Cj * α) := by rw [hid, hnon]
+    _ = ρ.character 1 *
+          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+            + nonidentityZClassCoeffSum Z Ci Cj * α) := by ring
+
+/-- **Peterfalvi (6.7.2), collapsed geometric form.**  This combines the geometric product-rule
+congruence with the RHS collapse over the classes meeting `Z`: if `ω` is constant with value `α` on
+classes meeting `Z^#`, then
+`ψ(1)ω(C_i)ω(C_j) ≡ ψ(1)(a_{ij0}+a_{ij}α) (mod |P|)`, where `a_{ij0}` is the identity coefficient
+and `a_{ij}` is `nonidentityZClassCoeffSum`.
+
+The sole remaining mathematical input here is the constancy of `ω` on `Z^#`; the divisibility of
+the classes disjoint from `Z` has already been discharged from the TI/Sylow setup. -/
+theorem centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset [Finite G]
+    (ρ : Representation ℂ G V) [IsIrreducible ρ] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    {Z : Subgroup G} (hZP : Z ≤ (P : Subgroup G))
+    (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
+    (hti : OddOrder.GroupTheory.IsTISubset ((P : Set G) \ {1})
+      (Subgroup.normalizer (P : Subgroup G)))
+    {Ci Cj : ConjClasses G}
+    (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
+    (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj)
+    {α : ℂ} (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ (ConjClasses.mk w) = α) :
+    ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
+      ≡ ρ.character 1 *
+          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+            + nonidentityZClassCoeffSum Z Ci Cj * α)
+        [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+  classical
+  have hsum :=
+    centralCharacterOfRep_classSum_mul_cong_of_isTISubset ρ P hZP hZnormal hti hCi hCj
+  convert hsum using 1
+  exact (centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity ρ Z Ci Cj hα).symm
 
 /-! ### Peterfalvi (6.7.3): the congruence-arithmetic assembly
 
@@ -1658,6 +1904,90 @@ theorem peterfalvi_673 {n : ℤ} {ψ1 ψz α a₁₁ a₁₂ : ℂ} {q : ℤ}
     ψz ≡ ψ1 [ALGMOD n] :=
   peterfalvi_673_final hψz
     (peterfalvi_673_cancel hcop hψz hψ1 ha₁₁ ha₁₂ hsubst (peterfalvi_673_combine h11 h12)) hone
+
+/-- **Peterfalvi (6.7)**, wired to the final congruence.  In the (6.7) Sylow/TI setup, let
+`C₁=⟦z⟧`, `C₂=⟦z⁻¹⟧`, and let `a₁₁`, `a₁₂` be the collapsed nonidentity `Z`-class coefficient sums
+`nonidentityZClassCoeffSum Z C₁ C₁` and `nonidentityZClassCoeffSum Z C₁ C₂`.  If
+
+* `z⁻¹` is not conjugate to `z` (`a_{110}=0`; the downstream TI/odd-order wrapper discharges this),
+* `ψ` and `|N_G(P) ∩ C_G(-)|` are constant on `Z^#` (the `(iii)` central-character constancy atom),
+* the trivial-character specialization gives `a₁₁ ≡ 1 + a₁₂ (mod |P|)`,
+
+then `ψ(z) ≡ ψ(1) (mod |P|)`.
+
+Everything else in (6.7.3) is discharged here: the two collapsed (6.7.2) congruences, the
+`a_{120}=|C₁|` identity coefficient, `ψ(1)ω(C₁)=|C₁|ψ(z)`, algebraic integrality, and
+`(|C₁|,|P|)=1`. -/
+theorem peterfalvi_67 [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {Z : Subgroup G}
+    (hZP : Z ≤ (P : Subgroup G))
+    (hZnormal : (Z.subgroupOf (Subgroup.normalizer (P : Subgroup G))).Normal)
+    (hti : OddOrder.GroupTheory.IsTISubset ((P : Set G) \ {1})
+      (Subgroup.normalizer (P : Subgroup G)))
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hPz : (P : Subgroup G) ≤ Subgroup.centralizer {z})
+    (hreal : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z)
+    (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(Subgroup.normalizer (P : Subgroup G) ⊓ Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(Subgroup.normalizer (P : Subgroup G) ⊓ Subgroup.centralizer ({z} : Set G)))
+    (hone : nonidentityZClassCoeffSum Z (ConjClasses.mk z) (ConjClasses.mk z)
+      ≡ 1 + nonidentityZClassCoeffSum Z (ConjClasses.mk z) (ConjClasses.mk z⁻¹)
+        [ALGMOD (Nat.card (P : Subgroup G) : ℤ)]) :
+    ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+  classical
+  let C₁ : ConjClasses G := ConjClasses.mk z
+  let C₂ : ConjClasses G := ConjClasses.mk z⁻¹
+  let α : ℂ := ω ρ C₁
+  let a₁₁ : ℂ := nonidentityZClassCoeffSum Z C₁ C₁
+  let a₁₂ : ℂ := nonidentityZClassCoeffSum Z C₁ C₂
+  let q : ℤ := Nat.card { x : G // ConjClasses.mk x = C₁ }
+  have hzP : z ∈ (P : Subgroup G) := hZP hzZ
+  have hzA : z ∈ (P : Set G) \ {1} := ⟨hzP, by simpa using hz1⟩
+  have hωconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ (ConjClasses.mk w) = α := by
+    intro w hwZ hw1
+    have hwP : w ∈ (P : Subgroup G) := hZP hwZ
+    have hwA : w ∈ (P : Set G) \ {1} := ⟨hwP, by simpa using hw1⟩
+    rcases hconst hwZ hw1 with ⟨hchar, hcard⟩
+    exact centralCharacterOfRep_eq_of_tiSubset_card_eq_of_character_eq ρ hti hwA hzA hcard hchar
+  have hC₁ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₁ :=
+    ⟨z, hzZ, hz1, rfl⟩
+  have hC₂ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₂ :=
+    ⟨z⁻¹, Z.inv_mem hzZ, inv_ne_one.mpr hz1, rfl⟩
+  have hcoeff11 : (classSum C₁ * classSum C₁) (1 : G) = 0 := by
+    rw [classSum_mul_apply_one_eq_classSumCoeff_one]
+    rw [show classSumCoeff C₁ C₁ 1 = 0 by simpa [C₁] using classSumCoeff_self_one_eq_zero z hreal]
+    norm_num
+  have hcoeff12 : (classSum C₁ * classSum C₂) (1 : G) = (q : ℂ) := by
+    rw [classSum_mul_apply_one_eq_classSumCoeff_one]
+    rw [show classSumCoeff C₁ C₂ 1 = Nat.card { x : G // ConjClasses.mk x = C₁ } by
+      simpa [C₁, C₂] using classSumCoeff_self_inv_one_eq_card z]
+    simp [q]
+  have h11raw :=
+    centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset ρ P hZP hZnormal hti hC₁ hC₁
+      (α := α) hωconst
+  have h12raw :=
+    centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset ρ P hZP hZnormal hti hC₁ hC₂
+      (α := α) hωconst
+  have hωC₂ : ω ρ C₂ = α := by
+    simpa [C₂] using hωconst (Z.inv_mem hzZ) (inv_ne_one.mpr hz1)
+  have h11 : ρ.character 1 * α ^ 2 ≡ ρ.character 1 * (a₁₁ * α)
+      [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+    simpa [C₁, α, a₁₁, pow_two, hcoeff11] using h11raw
+  have h12 : ρ.character 1 * α ^ 2 ≡ ρ.character 1 * ((q : ℂ) + a₁₂ * α)
+      [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+    simpa [C₁, C₂, α, a₁₂, q, pow_two, hcoeff12, hωC₂] using h12raw
+  have hsubst : ρ.character 1 * α = (q : ℂ) * ρ.character z := by
+    simpa [C₁, α, q] using character_one_mul_centralCharacterOfRep_mk ρ z
+  have hcop : IsCoprime q (Nat.card (P : Subgroup G) : ℤ) := by
+    simpa [C₁, q] using coprime_card_class_card_sylow P hPz
+  have hψz : IsIntegral ℤ (ρ.character z) := character_isIntegral ρ z
+  have hψ1 : IsIntegral ℤ (ρ.character 1) := character_isIntegral ρ 1
+  have ha₁₁ : IsIntegral ℤ a₁₁ := by simpa [a₁₁, C₁] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₁
+  have ha₁₂ : IsIntegral ℤ a₁₂ := by simpa [a₁₂, C₁, C₂] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₂
+  have hone' : a₁₁ ≡ 1 + a₁₂ [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
+    simpa [a₁₁, a₁₂, C₁, C₂] using hone
+  exact peterfalvi_673 hcop hψz hψ1 ha₁₁ ha₁₂ h11 h12 hsubst hone'
 
 end ClassCongruence
 
