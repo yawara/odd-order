@@ -201,6 +201,30 @@ theorem isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
     have : d + e = 0 := by exact_mod_cast hsum0
     omega
 
+/-- **A virtual character of squared norm `1` is `±` an irreducible character.**
+
+The signed refinement of `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`: without
+the positivity input, Parseval still forces a single Fourier coefficient `±1`, so
+`φ = ε • ξ` with `ε ∈ {1, -1}` and `ξ ∈ Irr G`.  This is the normalization step of
+Peterfalvi (5.9.a) ("there is an integer `ε = ±1` such that `ε φ^{τ₁} ∈ Irr G`"). -/
+theorem exists_zsmul_irreducibleCharacter_of_inner_self_one
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    (hnorm : ClassFunction.inner φ φ = 1) :
+    ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧ φ = ε • (ξ : ClassFunction G ℂ) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 1 := hsq.symm.trans hnorm
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 1 := by exact_mod_cast hsumC
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨α₀, hs, hcα⟩ := exists_single_of_sum_sq_eq_one hne hsumZ
+  have hα₀ : α₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  rw [hs, Finset.sum_singleton] at hrepr
+  refine ⟨c α₀, ⟨α₀, hα₀⟩, hcα, ?_⟩
+  rw [hrepr]
+  exact Int.cast_smul_eq_zsmul ℂ (c α₀) α₀
+
 /-- **[Is] Theorem 6.34** (Frobenius/Dade induced irreducibility).
 
 For `H ⊴ G` and an irreducible character `θ` of `H` whose inertia group in `G` is just `H`

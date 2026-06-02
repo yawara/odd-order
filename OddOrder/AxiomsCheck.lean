@@ -37,6 +37,7 @@ import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S07_CoherenceGalois
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1613,6 +1614,16 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_complexRingEquiv_pow_and_fixed
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_complexRingEquiv_mapRingEquiv_eq_pow
+-- Peterfalvi (5.9)(a): coherent isometric extensions of the Dade map commute with
+-- coefficientwise automorphisms on the coherent set (no star-commutation needed).  Inputs:
+-- the explicit Dade map is pointwise evaluation (commutes with σ) and vanishes at 1; norm-1
+-- virtual characters are ± irreducible with a uniform sign.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.extension_mapRingEquiv_comm
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
