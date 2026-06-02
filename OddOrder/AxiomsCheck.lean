@@ -32,6 +32,7 @@ import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -1116,6 +1117,13 @@ set_option linter.style.longLine false in
 -- + O_q(G) narrow (q≠p は Fitting 異素数可換で排除; q=p は EZ ∈ ℰ²∩ℰ* + Thm 5.3)
 -- + Thm 5.5(a) で G' の Ū-作用が q-群 + 固定点論法 (Isaacs Lem 4.32) + Ū minimal normal。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two
+-- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
+-- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer
+-- BG §7 Lemma 7.1 (Inductive Lemma, mmd L2147, 推移性の核): Hyp 7.1, q∈π', Q₁,Q₂∈ℋ_G*(A;q),
+-- 真部分群 H⊇A で H⊓Q₁≠1≠H⊓Q₂ ⇒ Q₂=Q₁^k (k∈K)。|G|-|Q₁∩Q₂| 強帰納 + 共通構成 (Prop 1.5(b)(c)
+-- を O_{π'}(H) 上で適用) + Case B normalizer 増大 (q-群 nilpotent)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.inductiveLemma
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
