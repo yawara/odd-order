@@ -705,6 +705,25 @@ theorem lemma52_frontHalf_support
     omega1Center_lt_omega1UpperCentralTwo_of_not_isCyclic hZ.2 hWnc
   exact ⟨hC, hZ.1, hZ.2, hWnc, hZW, commutator_omega1UpperCentralTwo_le_omega1Center hp⟩
 
+/-- **BG Lemma 5.2 support**: `W = Ω₁(Z₂(R))` normalizes `E`.
+
+This is the textbook step following `(5.1)` and `(5.2)`: from
+`[W, R] ≤ Z = Ω₁(Z(R)) < E`, in particular `[E, W] ≤ E`, so `W ≤ N_R(E)`. -/
+theorem omega1UpperCentralTwo_le_normalizer_of_maximalElementaryAbelian_card_prime_sq
+    [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) {E : Subgroup R} (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    omega1UpperCentralTwo R p ≤ Subgroup.normalizer (E : Set R) := by
+  rcases lemma52_frontHalf_support hp hpg h3 hEcard hEstar with
+    ⟨_, hZltE, _, _, _, hWR_le_Z⟩
+  have hWE_le_Z : ⁅omega1UpperCentralTwo R p, E⁆ ≤ omega1Center R p := by
+    exact (Subgroup.commutator_mono le_rfl (show E ≤ (⊤ : Subgroup R) from le_top)).trans
+      hWR_le_Z
+  have hEW_le_E : ⁅E, omega1UpperCentralTwo R p⁆ ≤ E := by
+    rw [Subgroup.commutator_comm]
+    exact hWE_le_Z.trans hZltE.le
+  exact OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le hEW_le_E
+
 /-- **BG Lemma 5.2**: 奇素数 `p`, 有限 `p`-群 `R`, `r(R) ≥ 3`, `E ∈ ℰ²(R) ∩ ℰ*(R)` (位数 `p²`
 の maximal elem-ab)。`T = C_R(Ω₁(Z₂(R)))` とおくと:
 
