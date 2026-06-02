@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -319,6 +321,76 @@ noncomputable def coherentInducedDegreeOneFamily
     exact h.2 rfl
   exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj
     hdeg hsuppdiff h1notA
+
+/-- **Peterfalvi (6.8) Y-family irreducibility.**  For a nontrivial degree-one (linear) source
+character `θ` of `H`, the induced character `Ind_H^L θ` is irreducible.  Inertia `I_L(θ) = H`
+(free action of `W₁`) is discharged via the (6.8)(c) disjunction and fed to [Is] Thm 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`):
+
+* **(c1)** `L` Frobenius with kernel `H`: `isIrreducibleCharacter_induce_of_frobeniusGroup`
+  (needs only `θ ≠ 1`; degree-one not used).
+* **(c2)** Hyp (4.6): the inertia bridge from `CertainTypeHypothesis.centralizer_W2` + Hall
+  coprimality + Isaacs 3.28 on `H/H'` (T6 §5; tracked in `issues/0046`, currently `sorry`). -/
+theorem isIrreducibleCharacter_induce_of_degree_one (hyp : SibleyDadeHypothesis G L H)
+    {θ : IrreducibleCharacter ↥H}
+    (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
+    (hθ_ne : θ ≠ trivialIrreducibleCharacter ↥H) :
+    IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rcases hyp.cases with hF | ⟨cert, _hdade, _hK, _hW1, _hprime, _hW2⟩
+  · exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
+  · -- (c2) inertia bridge: see T6 §5 design in notes/peterfalvi/s08_6_8_assembly_plan.md
+    sorry
+
+/-- **(6.8) `Y = S(H')` coherence (engine call from a constructed family).**  Given a family of
+nontrivial linear source characters `χ_j : H →* ℂˣ` indexed by `Fin n` (`n ≥ 2`), pairwise
+non-`L`-conjugate, with each `Ind_H^L (linear χ_j)` irreducible (`hirr`), the induced family
+`Y = {Ind_H^L (linear χ_j)}` is coherent for Sibley's Dade map `tau`.
+
+This is the (6.8) `Y`-step: the `χ_j` are the `Irr(H/H') ∖ {1}` orbit representatives (degree one,
+so each `Ind` has the common degree `|W₁|`).  `hirr` and the pairwise non-conjugacy come from the
+free `W₁`-action (`isIrreducibleCharacter_induce_of_degree_one`).  Injectivity of
+`j ↦ Ind_H^L (linear χ_j)` is the cross-Mackey orthogonality `inner_induce_eq_zero_of_not_conj`;
+the equal-degree coherence is then `coherentInducedDegreeOneFamily`. -/
+noncomputable def coherentYFamily (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ} [NeZero n]
+    (hn : 2 ≤ n) (χ : Fin n → (↥H →* ℂˣ))
+    (hpairwise : ∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+      IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+        linearIrreducibleCharacter (χ j))
+    (hirr : ∀ j, IsIrreducibleCharacter
+      (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ))) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (Set.range (fun j => ClassFunction.induce H
+        (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hηinj : Function.Injective
+      (fun j => (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+        hirr j⟩ : IrreducibleCharacter ↥L)) := by
+    intro i j hij
+    by_contra hne
+    have h0 := inner_induce_eq_zero_of_not_conj
+      (linearIrreducibleCharacter (χ i)) (linearIrreducibleCharacter (χ j))
+      (fun g => hpairwise i j hne g)
+    have hcoe : ClassFunction.induce H (linearIrreducibleCharacter (χ i) : ClassFunction ↥H ℂ) =
+        ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ) :=
+      congrArg Subtype.val hij
+    rw [hcoe] at h0
+    have h1 : ClassFunction.inner
+        (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)) = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite
+        (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+          hirr j⟩ : IrreducibleCharacter ↥L)
+        (⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ), hirr j⟩)
+    rw [h1] at h0
+    exact one_ne_zero h0
+  exact coherentInducedDegreeOneFamily hyp hn
+    (fun j => linearIrreducibleCharacter (χ j))
+    (fun j => ⟨ClassFunction.induce H (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ),
+      hirr j⟩)
+    (fun _ => rfl) hηinj (fun j => linearIrreducibleCharacter_apply_one (χ j))
 
 end SibleyDadeHypothesis
 

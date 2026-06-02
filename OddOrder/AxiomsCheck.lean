@@ -17,6 +17,7 @@ import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
@@ -1703,6 +1704,13 @@ set_option linter.style.longLine false in
 -- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+-- Cross Mackey inner product + orthogonality of induced characters from non-conjugate irreducibles
+-- (`⟨Ind θ, Ind ψ⟩ = 0`), used to prove the (6.8) `Y = S(H')` family `j ↦ Ind_H^L θ_j` injective.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_induce
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.inner_induce_eq_zero_of_not_conj
+-- Linear (degree-one) irreducible character from a hom `H →* ℂˣ`: the source characters of the
+-- (6.8) `Y = S(H')` family are the nontrivial linear characters of `H` (`= Irr(H/H') ∖ {1}`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIrreducibleCharacter
 -- Norm-1 virtual character with positive degree is irreducible (reusable Fourier criterion).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
 -- Brauer conjugation bridge: if ambient centralizers of nonidentity elements of `H` lie in `H`,

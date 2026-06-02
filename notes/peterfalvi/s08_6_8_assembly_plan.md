@@ -192,7 +192,9 @@ S08 非依存の一般形 2 本が `S07_CoherenceGalois.lean` に landed (axiom-
 - **残 T6 (Y coherent の family 構成側)**: `coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj hηdeg
   hηsuppdiff h1notA : IsCoherent hyp.tau (range η) H^#` を呼ぶには:
   (1) **Y family** `η : Fin m → IrreducibleCharacter ↥L` を `Irr(H/H')∖{1}` (= H' を核に含む θ、degree 1) の
-      `Ind_H^L θ` として構成 (`m = |Irr(H/H')|−1 = |H/H'|−1`)。
+      `Ind_H^L θ` として構成。⚠️ **濃度訂正 (2026-06-03, §E 参照)**: `m = |H/H'|−1` は**誤り**。
+      `Ind_H^L(θ^g)=Ind_H^L θ` (`induce_conjBy_eq`) ゆえ Ind は W₁-軌道上で定数、inertia(θ)=H で軌道サイズ=|W₁|
+      ⟹ 真の濃度は **`m = (|H/H'|−1)/|W₁|`**、η は**軌道代表 1 つずつ**で単射。
   (2) **各 η_j 既約** = 6.34 `isIrreducibleCharacter_induce_of_inertia_eq` (要 `inertia(θ)=H`)。
   (3) **`inertia(θ)=H` (自由作用) = T6 の律速・深い blocker (未着手)**: (c1) Frobenius / (c2) から θ≠1 の
       stabilizer 自明を導く。**精査結果 (2026-06-01)**: repo `brauer_permutation_lemma'`
@@ -223,3 +225,71 @@ S08 非依存の一般形 2 本が `S07_CoherenceGalois.lean` に landed (axiom-
     c2 には同等の inertia discharge がまだ必要。
     T7 (X 特徴付け, 同じく 6.34/free-action 依存) / T8 (DadeChainStep) /
     T9-T11 (glue) は後続。
+
+## E. ✅ T6 設計完全確定 (2026-06-03, 3 並列 Plan agent + mmd 照合、数学的不確実性ゼロ)
+
+引っ越し後の再開セッション。2 つの設計問題 (Y-family 構成 / inertia=H discharge) を Plan agent で詰め、
+c2 bridge を mmd (4.2)(4.5) で逐語検証した。**残りは機械的 Lean 記述のみ** (新数学なし)。
+
+### 訂正 2 件 (旧 §C/§D の framing バグ — 両 agent 独立に発見)
+1. **orbit 濃度**: 上記 (1) 訂正参照。`m = (|H/H'|−1)/|W₁|`、η=Ind∘θ は軌道代表で単射。
+   `hηinj` は source 単射でなく **cross-Mackey 内積=0 (非共役) vs =1 (norm)** から。
+2. **`hn : 2 ≤ n` は局所構成不能**: 「H nilpotent≠⊥ + |L| odd」からは `|H/H'|≥3` (⟹ Y 非空) 止まり。
+   `m ≥ 2` は (6.8.3) の (6.5) chief-factor 背理法由来 ⟹ **caller 供給仮説** (局所捏造=scaffolding)。
+
+### c1 (Frobenius): 新規 infra ~0、即 build-green
+`isIrreducibleCharacter_induce_of_frobeniusGroup` (InducedIrreducible:291, 任意非自明 θ に一般) が直接適用。
+
+### c2 (CertainTypeHypothesis): Route 1 確定、Ḡ=↥L⧸H' 実現
+- **mmd 検証**: (4.2.a)「W₁ cyclic **Hall**」⟹ `(|K|,w₁)=1` は教科書帰結 (faithful, scaffolding でない)。
+  c2 論証は (4.5.b) 逐語 = [Is]6.32(landed Brauer) + (1.5.b)(landed 6.34)。Y-family は `W₂⊆[H,H]`
+  (`cases` c2 既存) で **H/H' 上 FPF** (fixed=1) と clean に出る。
+- **核心の気付き**: 抽象 MulAut 用 Brauer は不要。`Ḡ:=↥L⧸H'`, `H̄:=H.map(mk' H')⊴Ḡ` (abelian) と置くと、
+  Ḡ 内の元 `q̄=mk' H' g` による共役が**既存 `ClassFunction.conjBy` engine そのもの** ⟹ Brauer 新規コード 0。
+- **新規 lemma (ConjugationBrauer.lean 末尾、`inertia_eq_of_freeAction`@:229 を mirror)**:
+  - `quotientSubgroupHom hNH : ↥H →* ↥(H.map(mk' N))` 余制限 + 全射 (~15 LOC)
+  - **Lemma A** `conjBy_compHom_quotientSubgroup` (inflation–共役 equivariance; `compHom_apply`/`conjBy_apply`
+    が rfl ゆえ機械的, ~20 LOC) — **repo に equivariance 補題は無い (grep 確認済)**、これが核
+  - **Lemma A′** `mem_inertia_iff_mem_inertia_quotient` (`compHom_injective_of_surjective` 経由, ~12 LOC)
+  - **Lemma B** `inertia_eq_of_freeAction_on_abelianization` (le_antisymm, ~30 LOC)
+  - **Lemma C** `inertia_eq_H_of_c2` @S08 (cert.centralizer_W2 + Hall + B1′ を Lemma B に供給, ~35 LOC)
+- **隠れコスト 2 件 (先の楽観的見積りを上方修正)**:
+  - **B1′ は wrapper call でなく新規 ~45 LOC**: landed `quotient_centralizer_inf_kernel_eq_bot_of_fixedPoint_lift`
+    (S03:307) の前提は `centralizer⊓K=⊥` (=H 上 FPF) で **c2 では偽** (C_H(g)=W₂≠1)。c2 の内容は H/H' 上 FPF。
+    ⟹ `coprime_fixedPoints_quotient` (Isaacs 3.28, ForwardFromCh03:808) を直接呼び、fixed point を ⊥ でなく
+    `W₂⊆H'` に着地させる新コード (S03:202-251 を mirror)。材料は全 landed。
+  - **inflation 全射性の一般化 ~15 LOC**: `exists_inflate_eq_of_subset_characterKernel` (InflationCharacter:255)
+    は whole-group `mk' N` 用、subgroup 余制限 `q:↥H→H̄` 用に任意全射へ一般化 (proof は全射性のみ使うので素直)。
+- **Hall 仮説の追加**: `SibleyDadeHypothesis` に `H_W1_coprime : Nat.Coprime (Nat.card ↥H) (Nat.card W1)`
+  field (または c2 `cases` 存在子に thread)。(4.2.a) 由来で dischargeable、(6.8) 構成時 ((7.10)/§9) に放電。
+
+### 確定 LOC + 実装順
+| # | 内容 | file | LOC |
+|---|------|------|-----|
+| 1 | `linearIrreducibleCharacter` infra (1-dim rep, hθ_one 自動, 単射) | 新 `LinearCharacter.lean` | ~110 |
+| 2 | `card_linearCharacters = card(Abelianization H)` (mathlib duality) | 同上 | ~40 |
+| 3 | cross-Mackey `card_mul_inner_induce` + `inner_induce_eq_zero_of_not_conj` (hηinj 用) | InducedIrreducible | ~55 |
+| 4 | unification `isIrreducibleCharacter_induce_of_degree_one` (c1/c2 case split→6.34) | S08 | ~30 |
+| 5 | c2 bridge (quotientSubgroupHom/Lemma A/A′/B + inflation 一般化 + B1′ + Lemma C + Hall field) | ConjugationBrauer/InflationCharacter/S08/S03 | ~190 |
+| 6 | `coherentYFamily` (hn・軌道代表・irr を入力→engine) | S08 | ~70 |
+
+**実装順 (c1-first で早期 build-green)**: #1→#2→#3→#4(c1分岐)→#6 で **c1 のみ build-green マイルストーン到達**
+(coherentInducedDegreeOneFamily@S08:292 は landed なので Y coherent が c1 で閉じる)。c2 は #5 で後追い、
+#4 の c2 分岐 sorry を埋める。**seam**: `coherentYFamily` は (hn[背理法 context], 軌道代表 linear sources,
+pairwise 非共役) を入力に取り Y coherent を産む。各代表の inertia=H/既約性は #4-5 が供給。
+T7 (X) → T8 (DadeChainStep) → T9/T10 (glue) → T11 (X∪Y=S + 最終 assembly) は後続 (critical path 不変)。
+
+### ✅ 実装進捗 (2026-06-03, c1 path build-green)
+**#1/#3/#4(c1)/#6 landed, full `lake build OddOrder` green, AxiomsCheck 登録 (#1/#3 の sorry-free 3 補題)**:
+- **#1** `OddOrder/GroupTheory/RepresentationTheory/LinearCharacter.lean` (新): `linearClassFunction` /
+  `linearIrreducibleCharacter` (χ:H→*ℂˣ ⟹ 1-dim rep `χ•id`, `isIrreducible_complex_rep`) +
+  `_apply`/`_apply_one`(degree 1)/`_injective`/`_eq_trivial_iff`。`SchurCenterBound` の rep 構成を template。
+- **#3** `InducedIrreducible.lean`: `card_mul_inner_induce` (2 引数 Mackey, self 版の near-copy) +
+  `inner_induce_eq_zero_of_not_conj` (非共役 irreducible ⟹ ⟨Ind,Ind⟩=0; `conjBy_conjBy_inv` で矛盾)。
+- **#4** S08 `isIrreducibleCharacter_induce_of_degree_one` (c1 分岐 = `isIrreducibleCharacter_induce_of_frobeniusGroup`
+  で **sorry-free**; **c2 分岐のみ sorry** = S08:~334、唯一の新規 sorry、T6 §5 bridge 待ち)。
+- **#6** S08 `coherentYFamily` (**sorry-free**): hyp+[H.Normal]+hn+χ+hpairwise+hirr ⟹ `Y=range(Ind∘linear∘χ)`
+  coherent。hηinj は #3+norm-1(`irreducibleCharacter_inner_eq_ite`)、hθ_one は #1、engine= `coherentInducedDegreeOneFamily`。
+  注: signature の `IrreducibleCharacter.conjBy` が `[H.Normal]` を要求するため instance binder で供給 (field は同 signature 内で instance 化不可の Lean 制約)。
+- **#2 (card 列挙) は未実装** = T6 coherence には不要 (coherentYFamily は family を入力に取る); enumeration/T11 degree-sum 用に後続。
+- **残**: #5 (c2 inertia bridge, S08:~334 sorry を埋める) → その後 coherentYFamily を実 family で呼ぶ (6.8) 本体 (T9–T11)。
