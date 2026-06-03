@@ -464,6 +464,15 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
 **leaf 順**: T8.1✅/T8.2✅/T8.3a3b✅ (clean, done) → **pairing 構成 (次)** → base wiring → per-step (Dmem/hdeg_c) → assemble。
 clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。**T8 は feasible・大 (Frobenius case で ~400-600 LOC 見積)**。
 
+### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-7 完了)
+- ✅ **T8.4** `xSet_finite` (31eea58): X⊆Irr L 有限 = `hXfin`。
+- ✅ **T8.5** `xBaseBlock` + subset/degree_re_eq/closedUnderConjugate (79821fb): base S₀=最小次数ブロック。
+- ✅ **T8.6** `sMember_support_subset_H` + `sMember_diffSupport_of_charValue_eq` (eefc87e): 等次数差 χ−χ' ⊆ H^# = base `hsuppdiff`。
+- ✅ **T8.7** `exists_finEnum_irreducible` (41052b8): 有限既約集合→`Fin k` 単射 enum (range=T) = `coherentEqualDegree_fromDade` の Fin n interface bridge。
+- **次 = base coherence assembly**: S₀ を T8.7 で `Fin k` 化 → 等次数 value (re 等しい+irr で実 ⟹ value 等) + T8.6 (hsuppdiff) + `1∉sharpImage H` + n≥2 (T8.3+X.Nonempty) → `coherentEqualDegree_fromDade` → `h0 : IsCoherent τ S₀ A`。**X.Nonempty 要** ((6.5) context or 仮説)。
+- その後: suffix 共役 pairing (combinatorics) → per-step `DadeChainStep` (T8.1/2 + Dmem + hdeg_c 仮説) → `peterfalvi_66_coherence_of_X_from_dade`。
+- **全 leaf axiom-clean (propext/Classical.choice/Quot.sound), full build 3562 green**。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
