@@ -102,3 +102,12 @@ X で満たせる = scaffold 解消・de-scaffolded**。「stuck」状態は解�
 **残 (mechanical wiring)**: `retarget_isCoherent_fromDade_X` (Da=decompositionDaFromDadeOfDiff を step2
 `..._of_supportedDecomposition_and_memberFamily` に供給; hY は (5.6.2) collapse param) + `DadeChainStep` の
 support field を差分化 + `advance` を X-version に rewire → `peterfalvi_66_coherence_of_X_from_dade` 解禁。
+
+## ✅✅ COMPLETE (2026-06-03 attended) — B engine surgery 完了, T8 engine blocker 解消
+step4 まで全完了。`peterfalvi_66_coherence_of_X_from_dade` が **unsupported induced X-member (χ=Ind θ)
+で instantiate 可能**に。full X-path 全通 + build-green + AxiomsCheck。
+- `dade_Y_collapse_of_family` 差分-support 弱化 (50bf9f0)
+- `DadeChainStep` 差分-support 化 + `advance` を fromDade_X に rewrite (5dda578) → chainStepAdvance/
+  peterfalvi_66 は advance 経由で auto-adapt。DadeChainStep の instantiation は皆無 (scaffold 段階) ゆえ in-place 安全。
+**残 (full (6.8) capstone 用)**: T7 c2/Xset_eq (X 特徴付け) + 実 X-family の DadeChainStep instance 構成
+(degree 列挙) + T9/T10/T11 glue。engine 自体の blocker は解消済。

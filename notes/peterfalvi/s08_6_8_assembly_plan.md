@@ -491,3 +491,10 @@ step1-2 (`retarget_isCoherent_of_supportedDecomposition*`) は **X-family で sc
 support `hχsupp`/`hχbarsupp`/`haχ1supp` + famS 次数列) の X-version (`DadeChainStepX`: 差分-support 化) +
 `advance` の X-version (`advanceX`: fromDade_X を呼ぶ) + `peterfalvi_66_coherence_of_X_from_dade` を X-chain に。
 fromDade_X が per-step を供給済ゆえ、残りは structure の差分化と advance の付け替えのみ。
+
+### I 進捗 3 — ✅✅ B engine surgery 完了 (2026-06-03): T8 engine blocker 解消
+`peterfalvi_66_coherence_of_X_from_dade` が X-family で instantiate 可能に (full build + AxiomsCheck green)。
+chain: DadeChainStep(差分-support) → advance(fromDade_X) → step2 → step1 → retarget_isCoherent、
+Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。commits 50bf9f0/5dda578。
+**T8 の真の blocker (htau1_mem0/個別 support, 2 loop が STOP) 解消済**。残=T7 char data + DadeChainStep
+実 instance + T9-T11 glue。
