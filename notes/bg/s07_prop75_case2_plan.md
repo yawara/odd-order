@@ -37,6 +37,28 @@ p-power ≤ p²−1 ⟹ ∈{1,p}。さらに `|P₂:P₁|≤p`: P₂=Sylow_p(C_G
 構成 = `IsMulCommutative.of_comm`; `IsElementaryAbelian.1` = comm 関数 (∀ x y, 直接 IsMulCommutative でない)。
 `set ZP` 後の `mem_inf` は `rw [hZPdef]` で unfold 要 (fvar が unify 阻害)。S07 は S04 を import してなかった (追加済)。
 
+### orbit-stabilizer crux helper — 検証済み skeleton + API (次セッション即着手用)
+
+special-2 の `|P:C_P(b)|≤p` を private helper で。**全 API 確認済**、未解決は `Set.ncard`↔`Nat.card`
+橋と ConjAct の beta 簡約のみ (試作で 6 mechanical error まで詰めた; revert 済で main は緑):
+```
+private theorem card_conjOrbit_le_prime {p}[Fact p.Prime]{G}[Group G][Finite G]{P : Sylow p G}
+    {B : Subgroup G}(hBP : B ≤ ↑P)(hBcard : Nat.card ↥B = p^2)
+    (hBnorm : ∀ g ∈ (↑P:Subgroup G), ∀ x ∈ B, g*x*g⁻¹ ∈ B){b}(hb_ne : b≠1)(hbP : b∈↑P)(hbB : b∈B) :
+    Nat.card (MulAction.orbit (ConjAct ↥(↑P:Subgroup G)) (⟨b,hbP⟩)) ≤ p
+```
+証明: orbit ⊆ Bsub(=B.subgroupOf ↑P) かつ 1∉orbit ⟹ orbit ⊊ Bsub ⟹ card < p²; orbit-stab で card ∣ |P|=p^k
+⟹ card=p^j, p^j<p² ⟹ j≤1 ⟹ ≤p。
+- `ConjAct.smul_def c h : c•h = ofConjAct c * h * (ofConjAct c)⁻¹`; orbit membership `⟨c, rfl⟩` 後 **`show (c•bhat)∈_` で beta 簡約**してから smul_def。
+- `MulAction.card_orbit_mul_card_stabilizer_eq_card_group (ConjAct R) bhat : Fintype.card orbit * Fintype.card stab = Fintype.card (ConjAct R)`; `ConjAct.card (G:=R) : Fintype.card (ConjAct R)=Fintype.card R` (**引数取らない**, `R` 適用不可)。
+- `IsPGroup p R` = `P.isPGroup'` 直接 (ConjAct equiv 不要); `P.isPGroup'.exists_card_eq : ∃k, Nat.card R=p^k` (`iff_card` alias)。
+- `Nat.dvd_prime_pow (hp.Prime) : a ∣ p^k ↔ ∃ j≤k, a=p^j`。`Set.ncard_lt_ncard (ssub)(Set.toFinite _)`。
+- p^j<p²⟹≤p: `by_contra`+`Nat.pow_le_pow_right hp.one_lt.le (h:2≤j)` で p²≤p^j 矛盾; `Nat.pow_le_pow_right hp.one_lt.le (j≤1)`+`pow_one`。
+- **未解決**: `Nat.card (orbit:Set R)` ↔ `(orbit).ncard` の橋 (`Set.Nat.card_coe_set_eq` は v4.30 で別名/defeq か要確認; `Set.ncard s = Nat.card ↥s` の正しい lemma 名を local で grep)。
+
+この helper の後: P₂=Sylow_p(C_G(b))⊇P₁=C_P(b), |P₂|≤|P| ⟹ |P₂:P₁|≤p ⟹ P₁⊴P₂ (`Subgroup.normal_of_index_eq...`),
+Z(P₁)⊴P₂, `thmA4b` で z∈Z(P₁)⊆O_{p',p}(C_G(b))。これを `commutator_zpowers_le_oPiCore` に供給。
+
 ## 🟢 大進捗 (2026-06-03 goal-loop セッション): core claim の主要補題 全 build-green
 
 すべて `S07_Transitivity.lean` に private で実装・build-green・commit 済み:
