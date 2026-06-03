@@ -1686,6 +1686,59 @@ private theorem commutator_zpowers_le_oPiCore {p : ℕ} [Fact p.Prime]
   rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
   exact hbot
 
+/-- **Orbit-stabilizer crux for Proposition 7.5, special case 2**: if `b ≠ 1` lies in a subgroup
+`B ≤ P` of order `p²` invariant under `P`-conjugation (`B ⊴ P`), then `b`'s conjugacy orbit inside
+the `p`-group `↥P` has at most `p` elements (equivalently `|P : C_P(b)| ≤ p`). The orbit lies in
+`B ∖ {1}` (so `< p²` elements) and its size divides `|P|`, hence is a power of `p` below `p²`. -/
+private theorem card_conjOrbit_le_prime {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {P : Sylow p G} {B : Subgroup G} (hBP : B ≤ (P : Subgroup G)) (hBcard : Nat.card ↥B = p ^ 2)
+    (hBnorm : ∀ g ∈ (P : Subgroup G), ∀ x ∈ B, g * x * g⁻¹ ∈ B)
+    {b : G} (hb_ne : b ≠ 1) (hbP : b ∈ (P : Subgroup G)) (hbB : b ∈ B) :
+    Nat.card (MulAction.orbit (ConjAct ↥(P : Subgroup G)) (⟨b, hbP⟩ : ↥(P : Subgroup G))) ≤ p := by
+  classical
+  set R : Type _ := ↥(P : Subgroup G) with hRdef
+  set bhat : R := ⟨b, hbP⟩ with hbhat
+  set Bsub : Subgroup R := B.subgroupOf (P : Subgroup G) with hBsub
+  haveI : Finite (ConjAct R) := inferInstanceAs (Finite R)
+  have hBsub_card : Nat.card ↥Bsub = p ^ 2 := by
+    rw [hBsub, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBP).toEquiv, hBcard]
+  have horb_sub : MulAction.orbit (ConjAct R) bhat ⊆ (Bsub : Set R) := by
+    rintro _ ⟨c, rfl⟩
+    show (c • bhat) ∈ (Bsub : Set R)
+    rw [SetLike.mem_coe, hBsub, Subgroup.mem_subgroupOf, ConjAct.smul_def]
+    show (ConjAct.ofConjAct c : R).val * b * ((ConjAct.ofConjAct c : R).val)⁻¹ ∈ B
+    exact hBnorm _ (ConjAct.ofConjAct c).2 b hbB
+  have hone_not : (1 : R) ∉ MulAction.orbit (ConjAct R) bhat := by
+    rintro ⟨c, hc⟩
+    rw [show (fun m : ConjAct R => m • bhat) c = c • bhat from rfl, ConjAct.smul_def] at hc
+    have hb1 : bhat = 1 := by
+      have h2 : ConjAct.ofConjAct c * bhat = ConjAct.ofConjAct c * 1 := by
+        rw [mul_one]; exact mul_inv_eq_one.mp hc
+      exact mul_left_cancel h2
+    exact hb_ne (congrArg (Subtype.val : R → G) hb1)
+  have hBsub_ncard : (Bsub : Set R).ncard = p ^ 2 := by
+    rw [← Nat.card_coe_set_eq]; exact hBsub_card
+  have hlt : Nat.card (MulAction.orbit (ConjAct R) bhat) < p ^ 2 := by
+    calc Nat.card (MulAction.orbit (ConjAct R) bhat)
+        = (MulAction.orbit (ConjAct R) bhat).ncard := Nat.card_coe_set_eq _
+      _ < (Bsub : Set R).ncard :=
+          Set.ncard_lt_ncard ⟨horb_sub, fun h => hone_not (h Bsub.one_mem)⟩ (Set.toFinite _)
+      _ = p ^ 2 := hBsub_ncard
+  have hdvd : Nat.card (MulAction.orbit (ConjAct R) bhat) ∣ Nat.card R := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (ConjAct R) bhat),
+      Nat.card_congr (ConjAct.toConjAct (G := R)).toEquiv]
+    exact Subgroup.card_quotient_dvd_card _
+  obtain ⟨k, hk⟩ := P.isPGroup'.exists_card_eq
+  rw [← hRdef] at hk
+  obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp (hk ▸ hdvd)
+  rw [hj] at hlt ⊢
+  have hj1 : j ≤ 1 := by
+    by_contra h
+    push_neg at h
+    exact absurd hlt (not_lt.mpr (Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le h))
+  calc p ^ j ≤ p ^ 1 := Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le hj1
+    _ = p := pow_one p
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
