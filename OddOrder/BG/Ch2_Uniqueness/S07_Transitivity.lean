@@ -167,6 +167,23 @@ theorem isPiSubgroup_kSubgroup [Finite G] (A : Subgroup G) :
     Subgroup.IsPiSubgroup (primesOf A)ᶜ (kSubgroup A) :=
   isPiSubgroup_opiCoreInG _ _
 
+/-- **`N ≤ O_π(H)` for a normal `π`-subgroup** (ambient form): if `N ≤ H`, `N.subgroupOf H` is
+normal in `↥H`, and `N` is a `π`-subgroup, then `N ≤ opiCoreInG π H`. This packages the
+`subgroupOf`→`oPiCore`→`map subtype` chain (`oPiCore` maximality) used in the §7 Note and in
+Proposition 7.5's core claim (e.g. `O_{p'}(C_G(b)) ⊓ C_X(b) ≤ O_{p'}(C_X(b))`). -/
+theorem le_opiCoreInG_of_normal_of_isPiSubgroup {π : Set ℕ} {H N : Subgroup G}
+    (hNH : N ≤ H) (hNnorm : (N.subgroupOf H).Normal) (hNpi : Subgroup.IsPiSubgroup π N) :
+    N ≤ opiCoreInG π H := by
+  haveI := hNnorm
+  have hNpi_sub : Ch03.Subgroup.IsPiGroup π (N.subgroupOf H) := by
+    intro r hr
+    refine hNpi r ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv] at hr
+  calc N = (N.subgroupOf H).map H.subtype := (Subgroup.map_subgroupOf_eq_of_le hNH).symm
+    _ ≤ (Ch03.oPiCore π ↥H).map H.subtype :=
+        Subgroup.map_mono (Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi_sub)
+    _ = opiCoreInG π H := rfl
+
 /-- **BG §7 の Note** (Hypothesis 7.1 直後, mmd L2145): Hypothesis 7.1 のもとで、
 `C_G(A)` の任意の `π'`-元は `K = O_{π'}(C_G(A))` に入る。
 
@@ -258,16 +275,8 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
     constructor
     · exact (Subgroup.mem_normalizer_iff.mp hgO _).mp hn.1
     · exact C.mul_mem (C.mul_mem g.2 hn.2) (C.inv_mem g.2)
-  have hWC_pi : Ch03.Subgroup.IsPiGroup π' (W.subgroupOf C) := by
-    intro r hr
-    refine hW_pi' r ?_
-    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW_le_C).toEquiv] at hr
-  have hW_le_K : W ≤ kSubgroup A := by
-    have h1 : W.subgroupOf C ≤ Ch03.oPiCore π' ↥C :=
-      Ch03.Subgroup.IsPiGroup.le_oPiCore hWC_pi
-    calc W = (W.subgroupOf C).map C.subtype := (Subgroup.map_subgroupOf_eq_of_le hW_le_C).symm
-      _ ≤ (Ch03.oPiCore π' ↥C).map C.subtype := Subgroup.map_mono h1
-      _ = kSubgroup A := rfl
+  have hW_le_K : W ≤ kSubgroup A :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hW_le_C hWC_normal hW_pi'
   exact hW_le_K ⟨hc_O, hc⟩
 
 /-! ## Lemma 7.1 の証明部品 (action 制限・normalizer 増大・q-部分群の真性) -/
@@ -1071,6 +1080,19 @@ private theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
   refine le_antisymm (sSup_le hY) (le_sSup ?_)
   exact ⟨opiCoreInG_le π X, hAX.trans (le_normalizer_opiCoreInG π X),
     isPiSubgroup_opiCoreInG π X⟩
+
+/-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
+`hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
+private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAp : IsPGroup p A) (hAne : A ≠ ⊥) : primesOf A = ({p} : Set ℕ) := by
+  obtain ⟨n, hn⟩ := hAp.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hn
+    exact hAne (Subgroup.card_eq_one.mp hn)
+  ext q
+  simp only [primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
 
 /-- **BG Proposition 7.5** (mmd L2252): `p ∈ π(G)`, `A` abelian `p`-部分群で、
 (1) `A = {x ∈ C_G(A) : x^p = 1}` かつ `G` の全真部分群が `p`-length one、または

@@ -10,6 +10,9 @@
   `A ≤ X` かつ `∀ Y ∈ hInvariant X A π, Y ≤ opiCoreInG π X` ⟹ `sSup (hInvariant X A π) = opiCoreInG π X`。
   逆向きは `opiCoreInG π X ∈ hInvariant X A π` (自身が A-不変 π-部分群) から自動。**case 1/2 双方で使う**。
   これで Hypothesis71 の `generated_eq` は「**core claim**: 各 `Y ∈ ℋ_X(A;π')` が `O_{π'}(X)` に入る」に還元済。
+- **✅ ne_bot / proper 実証明 + core-claim helper 2 種** (S07, build-green):
+  - `primesOf_eq_singleton` (`IsPGroup p A` + `A≠⊥` ⟹ `primesOf A={p}`): `(primesOf A)ᶜ={p}ᶜ` 変換用。core claim で {p}-固有補題(Thm 6.1 等)を呼ぶ際に必要。
+  - `le_opiCoreInG_of_normal_of_isPiSubgroup` (`N≤H` + `(N.subgroupOf H).Normal` + `IsPiSubgroup π N` ⟹ `N≤opiCoreInG π H`): `subgroupOf→oPiCore→map subtype` 連鎖の packaging。general case の `O_{p'}(C_G(b))⊓C_X(b) ≤ O_{p'}(C_X(b))` 等で再利用。
 
 ## ゴール構造 (`hypothesis71_of_scn2_or_pLengthOne`)
 
@@ -85,12 +88,30 @@ case 1 から `|Z|=p`, `B = ⟨b⟩ × Z` と仮定可。`P₁ = C_P(b)`, `P₂`
 ⟹ `C_Y(b) ⊆ O_{p'}(C_X(b)) ⊆ O_{p'}(X)` (**Prop 1.15(b)**)。closure で `Y ⊆ O_{p'}(X)`。
 
 ## 要新規補題 (core claim 前に build)
-1. **Sylow-of-centralizer**: `b ∈ center P` (or `b ∈ Z(P_1)`) ⟹ `P ∈ Sylow p ↥(C_G(b))` (P ≤ C_G(b), index coprime p)。
-2. **bar-quotient bridge**: `(oPiPrimePiCore {p} X).map (mk' (oPiCore {p}ᶜ X)) = opCore p (X/O_{p'}(X))`
+1. **✅ `primesOf` = {p}** = `primesOf_eq_singleton` (done)。
+2. **✅ normal p'-subgroup → opiCoreInG** = `le_opiCoreInG_of_normal_of_isPiSubgroup` (done)。
+3. **Sylow-of-centralizer**: `b ∈ center P` (or `b ∈ Z(P_1)`) ⟹ `P ∈ Sylow p ↥(C_G(b))` (P ≤ C_G(b), index coprime p)。**型注意**: `Sylow p ↥(C_G(b))` は ↥(C_G(b)) 上, P を `.subgroupOf (C_G(b))` で持ち上げ。Thm 6.1 (`thmA4b`) が要求。
+4. **bar-quotient bridge**: `(oPiPrimePiCore {p} X).map (mk' (oPiCore {p}ᶜ X)) = opCore p (X/O_{p'}(X))`
    (`oPiPrimePiCore` 定義 unfold + `map_comap` + `oPiCore_singleton_eq_opCore`)。
    `[Ā,Ȳ]⊆O_p(X̄)∩Ȳ` の commutator-in-quotient 計算も。
-3. **`primesOf` = {p}** bridge: `IsPGroup p A` + `A≠⊥` ⟹ `(primesOf A)ᶜ = ({p}:Set ℕ)ᶜ`。
-4. **B-construction** (E_p² in A normal in P) helper (cyclic/noncyclic Z(P) 2 分岐 + G 2.6.4)。
+5. **🔴 relativized Prop 1.15(b)** (general case 律速・最大の型juggling): 絶対形
+   `oPiPrimeCore_centralizer_le_oPiPrimeCore` は「群 G'」版。general case の `O_{p'}(C_X(b)) ≤ O_{p'}(X)`
+   は **G' := ↥X** で適用 → 結論は ↥X 上の subgroup。これを ambient G の `opiCoreInG {p}ᶜ (C_X(b))`
+   (C_X(b) = centralizer b ⊓ X) ↔ `opiCoreInG {p}ᶜ X` に翻訳する transport 補題が要 (↥X ≃ X 経由,
+   `oPiCore`・`opiCoreInG` と `.subgroupOf X`/`.map X.subtype` の往復)。**~50-100 LOC, G/↥X/↥(C_X(b)) 三層**。
+   special2 の `C_Y(Z) ⊆ O_{p'}(C_X(Z)) ⟹ O_{p'}(X)` も同型。
+6. **B-construction** (E_p² in A normal in P) helper (cyclic/noncyclic Z(P) 2 分岐 + G 2.6.4)。
+
+### general case の精密分解 (helper 3/5 + 確認済 lemma で組める, 2026-06-03 設計)
+`Y ≤ X`, `A ≤ N_G(Y)`, `IsPiSubgroup {p}ᶜ Y`, B(E_p² ≤ A) 与え, special property
+`hspec : ∀ b∈B^#, ∀ W≤C_G(b) A-inv p', W ≤ opiCoreInG {p}ᶜ (C_G(b))` を仮定:
+1. Prop 1.16 (B↷Y 共役, coprime, noncyclic) で `Y = ⟨C_Y(b)|b∈B^#⟩`。
+2. 各 b∈B^#: `C_Y(b):=Y⊓C_G(b)`。A-inv (A≤N_G(Y) ∧ A≤C_G(b) (b∈A abelian) ⟹ A≤N_G(C_Y(b)))。p' (≤Y)。
+   `hspec` ⟹ `C_Y(b) ≤ opiCoreInG {p}ᶜ (C_G(b))`。
+3. `opiCoreInG {p}ᶜ (C_G(b)) ⊴ C_G(b)` (oPiCore characteristic の像) ⟹ `(それ)⊓C_X(b) ⊴ C_X(b)` (N⊴H,K≤H)
+   ⟹ **helper 2** で `≤ opiCoreInG {p}ᶜ (C_X(b))`。`C_Y(b) ≤ それ⊓C_X(b)` (C_Y(b)≤両方)。
+4. **helper 5** (relativized 1.15b) で `opiCoreInG {p}ᶜ (C_X(b)) ≤ opiCoreInG {p}ᶜ X`。
+5. closure (Prop 1.16 の sup) で `Y ≤ opiCoreInG {p}ᶜ X`。
 
 ## 確認済 lemma インベントリ (file:line, signature)
 - `Hypothesis71` = ⟨ne_bot:A≠⊥, proper:A<⊤, generated_eq:∀X,A≤X→X<⊤→sSup(hInvariant X A (primesOf A)ᶜ)=opiCoreInG (primesOf A)ᶜ X⟩ (S07:119)
