@@ -4,6 +4,34 @@
 > brick 2b (Prop 1.15(b) 一般形) 完了で前提が揃った。case (1) は Thm 6.7 待ちで明示 sorry。
 > mmd 出典: `references/bg/local-analysis.mmd` L2252-2307。
 
+## 🟢 大進捗 (2026-06-03 goal-loop セッション): core claim の主要補題 全 build-green
+
+すべて `S07_Transitivity.lean` に private で実装・build-green・commit 済み:
+1. **step 6** `mem_map_mk'_of_mem_oPiCore_quotient_of_commute` (crux `C_{O_p(X̄)}(Ā)⊆Ā`): `O_p(X̄)⊆mk(P)`
+   (Sylow.mapSurjective + opCore_le) で c=mk s (s∈P), `[a,s]∈N⊓P=⊥` ⟹ s∈C_P(A)⊆A。
+2. **specialCase** (special1 抽象形, `b`非依存): Sylow P + A SCN in P + Y A-inv p' ⟹ Y≤O_{p'}(G')。
+   bar-quotient 9-step (step6 + Prop1.10 + Prop1.15a + Thm6.1 + commute)。
+3. **le_opiCoreInG_of_le_opiCoreInG_centralizer** (per-b 橋): W≤X, W≤O_{p'}(C_G(b)) (b p-elt∈X) ⟹ W≤O_{p'}(X)
+   (H2 + relativized-1.15b)。
+4. **coreClaimGeneral** (general assembly): noncyclic B≤A of p-elts + hspec (∀b∈B^#, C_Y(b)≤O_{p'}(C_G(b)))
+   ⟹ Y≤O_{p'}(X) (Prop1.16 `nontrivialActionFixedByClosure=⊤` + per-b 橋)。
+5. 既: oPiCore_map_mulEquiv, opiCoreInG_eq_map_subgroupOf, **relativized 1.15b**, oPiPrimePiCore_map_mk'_eq,
+   primesOf_eq_singleton, le_opiCoreInG_of_normal_of_isPiSubgroup, 還元補題。
+
+### 🔜 core claim を閉じる残り = **wiring のみ** (新数学は special2 だけ)
+`hypothesis71_…` の case-2 core-claim sorry を埋めるには:
+- **(a) hspec for b∈Z(P)** = specialCase を `↥(C_G(b))` で適用し ambient へ transport。要 **Sylow-of-centralizer**
+  (`b∈Z(P) ⟹ P.subgroupOf(C_G(b)) ∈ Sylow p ↥(C_G(b))`, |C_G(b)|_p=|G|_p∵P≤C_G(b)) +
+  specialCase の結論 `Y'≤oPiCore{p}ᶜ ↥(C_G(b))` を `opiCoreInG{p}ᶜ(C_G(b))` へ (opiCoreInG_eq_map_subgroupOf 系)。
+  A SCN in P.subgroupOf も要 (A⊴P, C_P(A)⊆A を subgroupOf 形へ)。
+- **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。`P₁=C_P(b)`,`P₂` Sylow⊇P₁, `Z⊆Z(P₁)⊆O_{p',p}`(Thm6.1),
+  `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(specialCase@Z) ⟹(rel-1.15b) `C_Y(Z)⊆O_{p'}(C_G(b))`,
+  `Y=C_Y(Z)·[Y,Z]`。**唯一残る重い数学**。
+- **(c) B-construction** (E_p² in A, ⊴P): Z(P) noncyclic→B∈E_p²(Z(P))⊆Z(P) (全 b∈Z(P), special1=(a)で hspec);
+  Z(P) cyclic→B=⟨b⟩×Z, Z=Ω₁(Z(P)) (special2=(b))。G 2.6.4。
+- **(d) 配線**: core claim で `primesOf A={p}` (primesOf_eq_singleton) 変換 → by_cases Z(P) cyclic →
+  B 構成 → coreClaimGeneral (hspec を (a)/(b) で供給)。
+
 ## 完了済み (このセッション)
 
 - **✅ 還元補題 `generated_eq_of_forall_le_opiCoreInG`** (S07, private, build-green, axiom-clean):
