@@ -9,6 +9,7 @@ import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.SCN
@@ -1290,55 +1291,61 @@ private theorem conj_smul_opiCoreInG [Finite G] (π : Set ℕ) (φ : MulAut G) (
         rw [Ch03.oPiCore.map_eq_of_mulEquiv]
     _ = opiCoreInG π (φ • H) := rfl
 
+/-- **Conjugation by a normalizing element fixes the centralizer**: if `conj x • A = A`
+then `conj x • C_G(A) = C_G(A)`. -/
+private theorem conj_smul_centralizer_eq {A : Subgroup G} {x : G}
+    (hAeq : MulAut.conj x • A = A) :
+    MulAut.conj x • Subgroup.centralizer (A : Set G) = Subgroup.centralizer (A : Set G) := by
+  ext y
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+    Subgroup.mem_centralizer_iff]
+  have hAeq' : MulAut.conj x⁻¹ • A = A := by
+    conv_lhs => rw [← hAeq]
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hconj : ((MulAut.conj x)⁻¹ • y) = x⁻¹ * y * x := by
+    rw [← map_inv]
+    simp only [MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  constructor
+  · intro hy a ha
+    have haxA : x⁻¹ * a * x ∈ A := by
+      have hmem : MulAut.conj x⁻¹ a ∈ MulAut.conj x⁻¹ • A :=
+        Subgroup.smul_mem_pointwise_smul_iff.mpr ha
+      rw [hAeq'] at hmem
+      simpa only [MulAut.conj_apply, inv_inv] using hmem
+    have hc := hy (x⁻¹ * a * x) haxA
+    rw [hconj] at hc
+    have hkey : x⁻¹ * (a * y) * x = x⁻¹ * (y * a) * x := by
+      calc x⁻¹ * (a * y) * x = (x⁻¹ * a * x) * (x⁻¹ * y * x) := by group
+        _ = (x⁻¹ * y * x) * (x⁻¹ * a * x) := hc
+        _ = x⁻¹ * (y * a) * x := by group
+    exact mul_left_cancel (mul_right_cancel hkey)
+  · intro hy a ha
+    rw [hconj]
+    have haxA : x * a * x⁻¹ ∈ A := by
+      have hmem : MulAut.conj x a ∈ MulAut.conj x • A :=
+        Subgroup.smul_mem_pointwise_smul_iff.mpr ha
+      rw [hAeq] at hmem
+      simpa only [MulAut.conj_apply] using hmem
+    have hc := hy (x * a * x⁻¹) haxA
+    calc a * (x⁻¹ * y * x) = x⁻¹ * ((x * a * x⁻¹) * y) * x := by group
+      _ = x⁻¹ * (y * (x * a * x⁻¹)) * x := by rw [hc]
+      _ = x⁻¹ * y * x * a := by group
+
 /-- **`N_G(A)` normalizes `K = O_{π'}(C_G(A))`**: for `x ∈ N_G(A)`, conjugation fixes `C_G(A)`
 (centralizer of the normalized `A`) and hence (by equivariance) its `π'`-core `K`. -/
 private theorem conj_smul_kSubgroup_eq [Finite G] {A : Subgroup G} {x : G}
     (hx : x ∈ Subgroup.normalizer A) :
     MulAut.conj x • kSubgroup A = kSubgroup A := by
-  have hAeq : MulAut.conj x • A = A := conj_smul_eq_self_of_mem_normalizer hx
-  have hCeq : MulAut.conj x • Subgroup.centralizer (A : Set G)
-      = Subgroup.centralizer (A : Set G) := by
-    ext y
-    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
-      Subgroup.mem_centralizer_iff]
-    constructor
-    · intro hy a ha
-      -- `x⁻¹ y x` centralizes `A`, applied to `x⁻¹ a x ∈ A`.
-      have haxA : x⁻¹ * a * x ∈ A := by
-        have hmem : MulAut.conj x⁻¹ a ∈ MulAut.conj x⁻¹ • A :=
-          Subgroup.smul_mem_pointwise_smul_iff.mpr ha
-        have hAeq' : MulAut.conj x⁻¹ • A = A := by
-          conv_lhs => rw [← hAeq]
-          rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
-        rw [hAeq'] at hmem
-        simpa only [MulAut.conj_apply, inv_inv] using hmem
-      have hconj : ((MulAut.conj x)⁻¹ • y) = x⁻¹ * y * x := by
-        rw [← map_inv]
-        simp only [MulAut.smul_def, MulAut.conj_apply, inv_inv]
-      have hc := hy (x⁻¹ * a * x) haxA
-      rw [hconj] at hc
-      -- `(x⁻¹ax)(x⁻¹yx) = (x⁻¹yx)(x⁻¹ax)` ⟹ `a y = y a` by cancellation.
-      have hkey : x⁻¹ * (a * y) * x = x⁻¹ * (y * a) * x := by
-        calc x⁻¹ * (a * y) * x = (x⁻¹ * a * x) * (x⁻¹ * y * x) := by group
-          _ = (x⁻¹ * y * x) * (x⁻¹ * a * x) := hc
-          _ = x⁻¹ * (y * a) * x := by group
-      exact mul_left_cancel (mul_right_cancel hkey)
-    · intro hy a ha
-      have hconj : ((MulAut.conj x)⁻¹ • y) = x⁻¹ * y * x := by
-        rw [← map_inv]
-        simp only [MulAut.smul_def, MulAut.conj_apply, inv_inv]
-      rw [hconj]
-      -- goal `a * (x⁻¹yx) = (x⁻¹yx) * a`. Use `y` centralizes `x a x⁻¹ ∈ A`.
-      have haxA : x * a * x⁻¹ ∈ A := by
-        have hmem : MulAut.conj x a ∈ MulAut.conj x • A :=
-          Subgroup.smul_mem_pointwise_smul_iff.mpr ha
-        rw [hAeq] at hmem
-        simpa only [MulAut.conj_apply] using hmem
-      have hc := hy (x * a * x⁻¹) haxA
-      calc a * (x⁻¹ * y * x) = x⁻¹ * ((x * a * x⁻¹) * y) * x := by group
-        _ = x⁻¹ * (y * (x * a * x⁻¹)) * x := by rw [hc]
-        _ = x⁻¹ * y * x * a := by group
-  rw [kSubgroup, conj_smul_opiCoreInG, hCeq]
+  rw [kSubgroup, conj_smul_opiCoreInG,
+    conj_smul_centralizer_eq (conj_smul_eq_self_of_mem_normalizer hx)]
+
+/-- **`N_G(P)` normalizes `O_{π'}(C_G(P))`**: same equivariance, for any subgroup `P`. -/
+private theorem conj_smul_opiCore_centralizer_eq [Finite G] {π : Set ℕ} {P : Subgroup G} {x : G}
+    (hx : x ∈ Subgroup.normalizer (P : Set G)) :
+    MulAut.conj x • opiCoreInG π (Subgroup.centralizer (P : Set G))
+      = opiCoreInG π (Subgroup.centralizer (P : Set G)) := by
+  rw [conj_smul_opiCoreInG,
+    conj_smul_centralizer_eq (conj_smul_eq_self_of_mem_normalizer hx)]
 
 /-- **Conjugation transports normalization**: `S ≤ N(Q) ⟹ conj g • S ≤ N(conj g • Q)`. -/
 private theorem conj_smul_le_normalizer_of_le_normalizer {S Q : Subgroup G} {g : G}
@@ -1841,6 +1848,98 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
   have hcCP : c ∈ Subgroup.centralizer (P : Set G) :=
     mem_centralizer_of_mem_kSubgroup_normalizer hPnA hPK_bot hcK hcNP
   exact ⟨c, Subgroup.mem_inf.mpr ⟨hcCP, hcK⟩, hcQ⟩
+
+/-- **Theorem 7.4(d)** (mmd L2246-2248): for `Q ∈ ℋ*(P;q)`, `N_G(P) = O_{π'}(C_G(P))·(N(P)∩N(Q))`
+and `P ∩ N(P)′ ⊆ N(Q)′`. The factorization comes from (b) (transitivity): for `n ∈ N(P)`,
+`conj n • Q ∈ ℋ*(P;q)`, so some `c ∈ O_{π'}(C_G(P))` has `conj c • Q = conj n • Q`, whence
+`m := c⁻¹n ∈ N(P)∩N(Q)`. The commutator inclusion is **Lemma 6.5(a)**
+(`inf_commutator_eq_of_coprime`) in `↥N(P)` with `K := O_{π'}(C_G(P))`, `U := N(P)∩N(Q)`,
+`H := P`, using `derivedInG H = ⁅H,H⁆`. -/
+private theorem tp_d [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
+    {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (hAP : A ≤ P) (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P)
+    (hPlt : P < ⊤) (hPne : P ≠ ⊥)
+    (hb : ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
+        (hInvariantStar ⊤ P {q}))
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ P {q}) :
+    P ⊓ derivedInG (Subgroup.normalizer P) ≤ derivedInG (Subgroup.normalizer Q) ∧
+    ∀ n : G, n ∈ Subgroup.normalizer P →
+      ∃ c ∈ opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)),
+        ∃ m ∈ Subgroup.normalizer P ⊓ Subgroup.normalizer Q, n = c * m := by
+  classical
+  set π' : Set ℕ := (primesOf A)ᶜ with hπ'
+  set OC : Subgroup G := opiCoreInG π' (Subgroup.centralizer (P : Set G)) with hOC_def
+  set NP : Subgroup G := Subgroup.normalizer (P : Set G) with hNP_def
+  set NQ : Subgroup G := Subgroup.normalizer (Q : Set G) with hNQ_def
+  have hPnQ : P ≤ NQ := hInvariantStar_le_normalizer hQ
+  have hOC_le_CP : OC ≤ Subgroup.centralizer (P : Set G) := opiCoreInG_le _ _
+  have hOC_le_NP : OC ≤ NP := hOC_le_CP.trans (Subgroup.centralizer_le_normalizer _)
+  have hP_le_NP : P ≤ NP := Subgroup.le_normalizer
+  -- Factorization (the existential clause).
+  have hfact : ∀ n : G, n ∈ NP →
+      ∃ c ∈ OC, ∃ m ∈ NP ⊓ NQ, n = c * m := by
+    intro n hn
+    have hnP : MulAut.conj n • P = P := conj_smul_eq_self_of_mem_normalizer hn
+    have hnQmem : MulAut.conj n • Q ∈ hInvariantStar ⊤ P {q} :=
+      conj_smul_mem_hInvariantStar_of_normalizer hQ hnP
+    obtain ⟨c, hcOC, hcQeq⟩ := hb Q hQ (MulAut.conj n • Q) hnQmem
+    refine ⟨c, hcOC, c⁻¹ * n, ?_, by group⟩
+    have hcNP : c ∈ NP := hOC_le_NP hcOC
+    have hmNP : c⁻¹ * n ∈ NP := NP.mul_mem (NP.inv_mem hcNP) hn
+    have hmNQ : c⁻¹ * n ∈ NQ := by
+      apply mem_normalizer_of_conj_smul_eq_self
+      rw [map_mul, mul_smul, map_inv, ← hcQeq, inv_smul_smul]
+    exact Subgroup.mem_inf.mpr ⟨hmNP, hmNQ⟩
+  refine ⟨?_, hfact⟩
+  -- Commutator inclusion via Lemma 6.5(a) in `↥NP`.
+  -- `NP < ⊤` (`P` not normal: `P ≠ ⊥, ⊤`, `G` simple), hence `↥NP` solvable.
+  have hNP_lt : NP < ⊤ := by
+    rw [hNP_def, lt_top_iff_ne_top]
+    intro htop
+    haveI : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with h | h
+    · exact hPne h
+    · exact (ne_of_lt hPlt) h
+  haveI hNP_solv : IsSolvable ↥NP := hG.solvable_of_lt_top NP hNP_lt
+  -- `OC = O_{π'}(C_G(P)) ⊴ NP`.
+  have hOCnNP : NP ≤ Subgroup.normalizer (OC : Set G) := by
+    intro x hx
+    exact mem_normalizer_of_conj_smul_eq_self (conj_smul_opiCore_centralizer_eq hx)
+  haveI hOC_normal : (OC.subgroupOf NP).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hOC_le_NP).mpr hOCnNP
+  -- `OC ⊔ (NP ⊓ NQ) = NP` from the factorization, so `K ⊔ U = ⊤` in `↥NP`.
+  have hLU : OC ⊔ (NP ⊓ NQ) = NP := by
+    refine le_antisymm (sup_le hOC_le_NP inf_le_left) ?_
+    intro n hn
+    obtain ⟨c, hcOC, m, hmNPNQ, hncm⟩ := hfact n hn
+    rw [hncm]
+    exact (OC ⊔ (NP ⊓ NQ)).mul_mem (Subgroup.mem_sup_left hcOC) (Subgroup.mem_sup_right hmNPNQ)
+  have hKU : OC.subgroupOf NP ⊔ (NP ⊓ NQ).subgroupOf NP = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hOC_le_NP inf_le_left, hLU, Subgroup.subgroupOf_self]
+  -- Coprimality `|P|`, `|OC|`.
+  have hcop : Nat.Coprime (Nat.card ↥(P.subgroupOf NP)) (Nat.card ↥(OC.subgroupOf NP)) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_NP).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hOC_le_NP).toEquiv]
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := primesOf A) Nat.card_pos.ne' Nat.card_pos.ne' (fun p hp => hP_pi p hp) (fun p hp => ?_)
+    exact isPiSubgroup_opiCoreInG π' (Subgroup.centralizer (P : Set G)) p hp
+  have hHU : P.subgroupOf NP ≤ (NP ⊓ NQ).subgroupOf NP :=
+    Subgroup.comap_mono (le_inf hP_le_NP hPnQ)
+  -- Apply Lemma 6.5(a) inside `↥NP`.
+  have h65 := OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime
+    (G := ↥NP) (K := OC.subgroupOf NP) (U := (NP ⊓ NQ).subgroupOf NP)
+    (H := P.subgroupOf NP) hKU hHU hcop
+  -- Map the equation back to `G` and deduce the inclusion.
+  have hmap := congrArg (Subgroup.map NP.subtype) h65
+  simp only [Subgroup.map_inf _ _ _ NP.subtype_injective, Subgroup.subgroupOf_map_subtype,
+    Subgroup.map_subtype_commutator, Subgroup.map_commutator,
+    inf_of_le_left hP_le_NP] at hmap
+  -- `hmap : P ⊓ ⁅NP, NP⁆ = P ⊓ ⁅NP ⊓ NQ, NP ⊓ NQ⁆`.
+  rw [show derivedInG NP = ⁅(NP : Subgroup G), NP⁆ from Subgroup.map_subtype_commutator NP, hmap]
+  refine le_trans inf_le_right ?_
+  rw [show derivedInG NQ = ⁅(NQ : Subgroup G), NQ⁆ from Subgroup.map_subtype_commutator NQ]
+  exact Subgroup.commutator_mono (le_trans inf_le_left inf_le_right)
+    (le_trans inf_le_left inf_le_right)
 
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
