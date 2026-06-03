@@ -154,4 +154,114 @@ theorem thompsonJ_le_oPiPrimePiCore_of_odd [Finite G]
   (thompsonJ_le_opCore_of_odd hodd P hp2 h_oPiPrime_trivial h_centralizer_center).trans
     (opCore_le_oPiPrimePiCore p)
 
+/-! ## 6.5: 可解群の N/C 分解 (pp. 64-65, mmd L2048-2088)
+
+**Lemma 6.5**: `K, U, H ≤ G` 可解, `K ⊴ G`, `G = KU`, `H ⊆ U`, `(|H|, |K|) = 1` のとき
+(a) `H ∩ G' = H ∩ U'`, (b) `N_G(H) = C_K(H)·N_U(H)`, (c) `H^g ⊆ U ⇒ g = cu`
+(`c ∈ C_K(H)`, `u ∈ U`)。§8 (`N_G(P)=LC_K(P)`), §10, §13, Thm 7.4(d) で多用。
+原文どおり (b) は (c) から従い, (c) が本体 (Hall π-部分群の共役)。 -/
+
+section /- 6.5 -/
+
+open scoped Pointwise
+
+variable [Finite G]
+
+omit [Finite G] in
+/-- 互いに素な位数の部分群は自明な交わりを持つ (`|H ⊓ K|` は `gcd(|H|, |K|) = 1` を割る)。 -/
+private theorem inf_eq_bot_of_coprime_card {H K : Subgroup G}
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) : H ⊓ K = ⊥ := by
+  have h1 : Nat.card ↥(H ⊓ K) ∣ Nat.card H := Subgroup.card_dvd_of_le inf_le_left
+  have h2 : Nat.card ↥(H ⊓ K) ∣ Nat.card K := Subgroup.card_dvd_of_le inf_le_right
+  have hone : Nat.card ↥(H ⊓ K) = 1 :=
+    Nat.dvd_one.mp (hcop.gcd_eq_one ▸ Nat.dvd_gcd h1 h2)
+  exact Subgroup.card_eq_one.mp hone
+
+omit [Finite G] in
+/-- `G = KU` (`K ⊴ G`) のとき `G' ≤ K · U'`: 商 `G/K` は `U` の像で生成され,
+その像は可換 (`U'` が消える) なので `G/K` の commutator は像の commutator に一致。 -/
+private theorem commutator_le_sup_commutator {K U : Subgroup G} [K.Normal]
+    (hKU : K ⊔ U = ⊤) : commutator G ≤ K ⊔ ⁅U, U⁆ := by
+  set q := QuotientGroup.mk' K with hq
+  have hsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
+  have hkerq : q.ker = K := by rw [hq, QuotientGroup.ker_mk']
+  have hmapK : K.map q = ⊥ := (Subgroup.map_eq_bot_iff K).mpr hkerq.ge
+  have hmapU : U.map q = ⊤ := by
+    have h := congrArg (Subgroup.map q) hKU
+    rwa [Subgroup.map_sup, hmapK, bot_sup_eq, Subgroup.map_top_of_surjective _ hsurj] at h
+  -- 両辺の `q`-像が `⁅⊤,⊤⁆` で一致
+  have hmapeq : (commutator G).map q = (K ⊔ ⁅U, U⁆).map q := by
+    rw [map_commutator_eq, MonoidHom.range_eq_top_of_surjective _ hsurj, Subgroup.map_sup, hmapK,
+      bot_sup_eq, Subgroup.map_commutator, hmapU]
+  -- `K = ker q ≤ K ⊔ ⁅U,U⁆` ゆえ comap-map で復元
+  calc commutator G ≤ Subgroup.comap q ((commutator G).map q) := Subgroup.le_comap_map _ _
+    _ = Subgroup.comap q ((K ⊔ ⁅U, U⁆).map q) := by rw [hmapeq]
+    _ = K ⊔ ⁅U, U⁆ := Subgroup.comap_map_eq_self (by rw [hkerq]; exact le_sup_left)
+
+/-- **BG Lemma 6.5(a)** (mmd L2054): `G` 可解, `K ⊴ G`, `G = KU`, `H ≤ U`,
+`(|H|, |K|) = 1` のとき `H ∩ G' = H ∩ U'`。 -/
+theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Normal]
+    (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) :
+    H ⊓ commutator G = H ⊓ ⁅U, U⁆ := by
+  refine le_antisymm (le_inf inf_le_left ?_)
+    (inf_le_inf_left H (Subgroup.commutator_mono le_top le_top))
+  -- 残: `H ⊓ G' ≤ ⁅U,U⁆`。`d ∈ H ⊓ G'` を取り `d = k·b` (k ∈ U⊓K, b ∈ U') に分解,
+  -- `U/U'` での像の位数が `|H|` と `|K|` の両方を割る ⟹ 1 ⟹ `d ∈ U'`。
+  intro d hd
+  rw [Subgroup.mem_inf] at hd
+  obtain ⟨hdH, hdC⟩ := hd
+  have hdU : d ∈ U := hHU hdH
+  have hdKU : d ∈ K ⊔ ⁅U, U⁆ := commutator_le_sup_commutator hKU hdC
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hdKU
+  obtain ⟨k, hkK, b, hbUU, hkb⟩ := hdKU
+  have hbU : b ∈ U := Subgroup.commutator_le_self U hbUU
+  have hkU : k ∈ U := by
+    have hk_eq : k = d * b⁻¹ := by rw [← hkb]; group
+    rw [hk_eq]; exact U.mul_mem hdU (U.inv_mem hbU)
+  set φ := QuotientGroup.mk' (commutator ↥U) with hφ
+  have hbcomm : (⟨b, hbU⟩ : ↥U) ∈ commutator ↥U := by
+    rw [← Subgroup.map_subtype_commutator U] at hbUU
+    obtain ⟨x, hx, hxb⟩ := hbUU
+    have hxeq : x = ⟨b, hbU⟩ := Subtype.ext hxb
+    rwa [hxeq] at hx
+  have hφb : φ ⟨b, hbU⟩ = 1 := (QuotientGroup.eq_one_iff _).mpr hbcomm
+  have hdkb : (⟨d, hdU⟩ : ↥U) = ⟨k, hkU⟩ * ⟨b, hbU⟩ := Subtype.ext hkb.symm
+  have hφd : φ ⟨d, hdU⟩ = φ ⟨k, hkU⟩ := by rw [hdkb, map_mul, hφb, mul_one]
+  have hord_d : orderOf (φ ⟨d, hdU⟩) ∣ Nat.card H := by
+    refine (orderOf_map_dvd φ _).trans ?_
+    rw [Subgroup.orderOf_mk]
+    exact H.orderOf_dvd_natCard hdH
+  have hord_k : orderOf (φ ⟨d, hdU⟩) ∣ Nat.card K := by
+    rw [hφd]
+    refine (orderOf_map_dvd φ _).trans ?_
+    rw [Subgroup.orderOf_mk]
+    exact K.orderOf_dvd_natCard hkK
+  have hone : orderOf (φ ⟨d, hdU⟩) = 1 :=
+    Nat.dvd_one.mp (hcop.gcd_eq_one ▸ Nat.dvd_gcd hord_d hord_k)
+  have hdcomm : (⟨d, hdU⟩ : ↥U) ∈ commutator ↥U :=
+    (QuotientGroup.eq_one_iff _).mp (orderOf_eq_one_iff.mp hone)
+  rw [← Subgroup.map_subtype_commutator U]
+  exact ⟨⟨d, hdU⟩, hdcomm, rfl⟩
+
+/-- **BG Lemma 6.5(c)** (mmd L2056): 上記仮定で, `g ∈ G` が `H^g ≤ U` を満たすなら
+`g = c·u` (`c ∈ C_K(H)`, `u ∈ U`) と分解できる。 -/
+theorem exists_mem_centralizerK_mul_of_conj_le [IsSolvable G] {K U H : Subgroup G} [K.Normal]
+    (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card K))
+    {g : G} (hg : H.map (MulAut.conj g).toMonoidHom ≤ U) :
+    ∃ c ∈ Subgroup.centralizer (H : Set G) ⊓ K, ∃ u ∈ U, g = c * u := by
+  sorry
+
+/-- **BG Lemma 6.5(b)** (mmd L2055): 上記仮定で `N_G(H) = C_K(H)·N_U(H)` (集合等式)。 -/
+theorem normalizer_eq_centralizerK_mul_normalizerU [IsSolvable G] {K U H : Subgroup G}
+    [K.Normal] (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) :
+    SetLike.coe (Subgroup.normalizer H)
+      = SetLike.coe (Subgroup.centralizer (H : Set G) ⊓ K)
+        * SetLike.coe (Subgroup.normalizer H ⊓ U) := by
+  sorry
+
+end
+
 end OddOrder.BG.Ch1.S06
