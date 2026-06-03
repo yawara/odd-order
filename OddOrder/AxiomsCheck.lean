@@ -1180,6 +1180,10 @@ set_option linter.style.longLine false in
 -- B∈ℰ_p²(A), B⊴P を Z(P) cyclic/noncyclic で構成 (cyclic = Isaacs Lem 1.23 で ⟨z⟩<L≤Ω₁(A) +
 -- special case 2 の coprime 分解 / 軌道-stabilizer crux z∈O_{p',p}(C_G(b)))、coreClaimGeneral へ。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.hypothesis71_of_scn2
+-- BG Prop 7.5 完全形 (mmd L2252, 両分岐): A abelian p-部分群が (1) A=Ω₁(C_G(A)) ∧ 全真部分群
+-- p-length one, または (2) A∈SCN₂(P) ⇒ A は Hypothesis 7.1。case (1) は Thm 6.7 を ↥X に適用
+-- (A=Ω₁(C_G(A)) で A.subgroupOf X が包含極大 elem ab)。§7 完全 sorry-free 化の最終ピース。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.hypothesis71_of_scn2_or_pLengthOne
 -- BG Thm 7.6 ⭐⭐⭐ **FT クリティカル** (Thompson Transitivity, mmd L2311): A∈SCN₃(p), q∈p' ⇒
 -- O_{p'}(C_G(A)) が ℋ_G*(A;q) 上推移的。Prop 7.5(2) で Hyp 7.1 を得て Thm 7.2 (rank≥3) を適用。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.thompsonTransitivity

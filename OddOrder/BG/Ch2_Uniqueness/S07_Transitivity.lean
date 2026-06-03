@@ -41,10 +41,11 @@ L2131-2314, **6 結果** (Lem 7.1 + Thm 7.2/7.3/7.4/7.6 + Prop 7.5).
 - `SCN₃(p)` global = `scn3Global p` (`∃ Sylow P, A ≤ P ∧ A ∈ SCN₃(P)`; SCN は ↥P 相対)。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を各定理に明示的に通す (Peterfalvi Hypothesis 流儀)。
 
-## proof は後続
+## proof 完了 (§7 fully sorry-free, 2026-06-04)
 
-全 6 結果は faithful statement + `sorry`。proof は Prop 1.16 (coprime action generation, §1),
-Lem 6.5/6.6 (§6), Thm 6.7, SCN/p-stability に依存 (foundation-first scaffold)。
+全 6 結果 (Lem 7.1 + Thm 7.2/7.3/7.4/7.6 + Prop 7.5) 完全証明済。Prop 1.16 (coprime action
+generation, §1), Lem 6.5/6.6 + Thm 6.7 (§6), SCN/p-stability に依存。Prop 7.5 は case (2)
+(SCN₂) + case (1) (`A = Ω₁(C_G(A))` ∧ 全真部分群 p-length one, Thm 6.7 経由) の両分岐。
 
 ## Lane C proof-gate notes
 
@@ -3498,8 +3499,9 @@ theorem hypothesis71_of_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
 /-- **BG Proposition 7.5** (mmd L2252): `p ∈ π(G)`, `A` abelian `p`-部分群で、
 (1) `A = {x ∈ C_G(A) : x^p = 1}` かつ `G` の全真部分群が `p`-length one、または
 (2) ある Sylow `p`-部分群 `P` で `A ∈ SCN₂(P)`、
-のいずれかなら `A` は Hypothesis 7.1 を満たす。case (1) は Theorem 6.7 待ちで `sorry`; case (2) は
-`hypothesis71_of_scn2` へ委譲。 -/
+のいずれかなら `A` は Hypothesis 7.1 を満たす。case (1) は `A = Ω₁(C_G(A))` から `A` が `↥X` 内で
+包含極大 elementary abelian になることを使い Theorem 6.7 を適用; case (2) は `hypothesis71_of_scn2`
+へ委譲。 -/
 theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
     (A : Subgroup G) (hAab : IsMulCommutative A) (hAp : IsPGroup p A)
@@ -3510,9 +3512,123 @@ theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G
         IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)))) :
     Hypothesis71 A := by
   rcases hcase with hcase1 | hcase2
-  · -- **case (1)**: every proper subgroup is `p`-length one. Hypothesis 7.1 follows from
-    -- Theorem 6.7, which is not yet formalized (BG: "follows easily from Theorem 6.7").
-    sorry
+  · -- **case (1)**: `A = Ω₁(C_G(A))` and every proper subgroup is `p`-length one. Each
+    -- `Y ∈ ℋ_X(A;p')` lands in `O_{p'}(X)` by **Theorem 6.7** (applied inside `↥X`), using that
+    -- `A = {x ∈ C_G(A) : x^p = 1}` makes `A` maximal-by-inclusion elementary abelian in `↥X`.
+    classical
+    obtain ⟨hAeq, hplM⟩ := hcase1
+    -- `x ∈ A ↔ x ∈ C_G(A) ∧ x^p = 1` (membership unfolding of `hAeq`).
+    have hAmem : ∀ x : G, x ∈ A ↔
+        (x ∈ Subgroup.centralizer (A : Set G) ∧ x ^ p = 1) := fun x => by
+      simpa using Set.ext_iff.mp hAeq x
+    -- `p` is odd (it divides `|G|`, which is odd).
+    have hp_odd_prop : Odd p := hG.odd.of_dvd_nat hp_mem
+    have hp_odd : p ≠ 2 := by rintro rfl; rw [Nat.odd_iff] at hp_odd_prop; omega
+    -- `A` is elementary abelian: abelian (`hAab`) of exponent `p` (`hAmem`).
+    have hAelem : A.IsElementaryAbelian p := by
+      refine ⟨fun x y => ?_, fun x => ?_⟩
+      · exact isMulCommutative_iff.mp hAab x y
+      · exact Subtype.ext (by
+          rw [SubmonoidClass.coe_pow, Subgroup.coe_one]
+          exact ((hAmem (x : G)).mp x.2).2)
+    -- `A` is maximal-by-inclusion elementary abelian in `G`: any elementary abelian `F ⊇ A`
+    -- collapses to `A`, since every `f ∈ F` is `p`-torsion and (being in the abelian `F ⊇ A`)
+    -- centralizes `A`, hence lies in `A` by `hAmem`.
+    have hAmax : OddOrder.GroupTheory.IsMaximalElementaryAbelian p A := by
+      refine ⟨hAelem, fun F hF hAF => le_antisymm ?_ hAF⟩
+      intro f hf
+      refine (hAmem f).mpr ⟨?_, ?_⟩
+      · -- `f ∈ C_G(A)`: `f` and any `a ∈ A` both lie in the abelian `F`.
+        rw [Subgroup.mem_centralizer_iff]
+        intro a ha
+        have := hF.1 ⟨a, hAF ha⟩ ⟨f, hf⟩
+        exact congrArg Subtype.val this
+      · -- `f ^ p = 1`: `F` has exponent `p`.
+        have := hF.2 ⟨f, hf⟩
+        have := congrArg Subtype.val this
+        rwa [SubmonoidClass.coe_pow, Subgroup.coe_one] at this
+    -- `A ≠ ⊥`: otherwise `C_G(A) = ⊤`, so a Cauchy element of order `p` would satisfy `hAmem`
+    -- and land in `A = ⊥`, forcing it to be trivial.
+    have hAne : A ≠ ⊥ := by
+      intro hAbot
+      have hCtop : Subgroup.centralizer (A : Set G) = ⊤ := by
+        rw [Subgroup.centralizer_eq_top_iff_subset, hAbot]
+        intro x hx
+        rw [SetLike.mem_coe, Subgroup.mem_bot] at hx
+        rw [hx]
+        exact Subgroup.one_mem _
+      obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := G) p hp_mem
+      rw [orderOf_eq_prime_iff] at hg
+      have hgA : g ∈ A := (hAmem g).mpr ⟨hCtop ▸ Subgroup.mem_top g, hg.1⟩
+      rw [hAbot, Subgroup.mem_bot] at hgA
+      exact hg.2 hgA
+    -- `A < ⊤`: otherwise `G` is a `p`-group, hence nilpotent and solvable, contradicting `hG`.
+    have hAproper : A < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro hAtop
+      have hGp : IsPGroup p G :=
+        (hAtop ▸ hAp : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+          (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+      haveI : Group.IsNilpotent G := hGp.isNilpotent
+      exact hG.notSolvable inferInstance
+    refine ⟨hAne, hAproper, ?_⟩
+    intro X hAX hXlt
+    have hπ : primesOf A = ({p} : Set ℕ) := primesOf_eq_singleton hAp hAne
+    refine generated_eq_of_forall_le_opiCoreInG hAX ?_
+    intro Y hY
+    obtain ⟨hYX, hAnormY, hYpi⟩ := mem_hInvariant.mp hY
+    haveI hXsolv : IsSolvable ↥X := hG.solvable_of_lt_top X hXlt
+    -- **Translate to `↥X`** and apply Theorem 6.7 with `E := A.subgroupOf X`,
+    -- `L := Y.subgroupOf X`. `A.subgroupOf X` is maximal-by-inclusion elementary abelian
+    -- in `↥X` (lift of `hAmax`).
+    have hEXmax :
+        OddOrder.GroupTheory.IsMaximalElementaryAbelian p (A.subgroupOf X) := by
+      refine ⟨?_, fun Fbar hFbar hsub => ?_⟩
+      · -- elementary abelian, transported along `A.subgroupOf X ≃* A`.
+        exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+          (Subgroup.subgroupOfEquivOfLe hAX).symm hAelem
+      · -- maximality: push `Fbar` down to `F := Fbar.map X.subtype ≤ G`, which is elementary
+        -- abelian and contains `A`; by `hAmax`, `F = A`, so `Fbar = A.subgroupOf X`.
+        set F : Subgroup G := Fbar.map X.subtype with hFdef
+        have hF_elem : F.IsElementaryAbelian p := hFbar.map X.subtype_injective
+        have hAF : A ≤ F := by
+          have hmap : (A.subgroupOf X).map X.subtype ≤ Fbar.map X.subtype :=
+            Subgroup.map_mono hsub
+          rwa [Subgroup.map_subgroupOf_eq_of_le hAX] at hmap
+        have hFA : F = A := hAmax.2 F hF_elem hAF
+        -- `Fbar = (Fbar.map X.subtype).comap X.subtype = A.comap X.subtype = A.subgroupOf X`.
+        calc Fbar = (Fbar.map X.subtype).comap X.subtype :=
+              (Subgroup.comap_map_eq_self_of_injective X.subtype_injective Fbar).symm
+          _ = A.comap X.subtype := by rw [← hFdef, hFA]
+          _ = A.subgroupOf X := rfl
+    -- `Y.subgroupOf X` is a `p'`-group (its order equals `|Y|`, a `p'`-number).
+    have hLp' : ¬ p ∣ Nat.card (Y.subgroupOf X) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hYX).toEquiv]
+      intro hdvd
+      have hpmem : p ∈ (Nat.card ↥Y).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩
+      have : p ∈ (primesOf A)ᶜ := hYpi p hpmem
+      rw [hπ] at this
+      exact this rfl
+    -- `A.subgroupOf X` normalizes `Y.subgroupOf X` (lift of `hAnormY`).
+    have hELY : A.subgroupOf X ≤ Subgroup.normalizer (Y.subgroupOf X) := by
+      intro a ha
+      rw [Subgroup.mem_subgroupOf] at ha
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      have hcoe : ((a * y * a⁻¹ : ↥X) : G) = (a : G) * (y : G) * (a : G)⁻¹ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_inv]
+      rw [hcoe]
+      exact Subgroup.mem_normalizer_iff.mp (hAnormY ha) (y : G)
+    have hpl1X : OddOrder.BG.Ch1.hasPLengthOne p ↥X := hplM X hXlt
+    have key := OddOrder.BG.Ch1.S06.le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian
+      (G := ↥X) hp_odd hEXmax hLp' hELY hpl1X
+    -- `key : Y.subgroupOf X ≤ O_{p'}(↥X)`. Map back to `G` and rewrite `(primesOf A)ᶜ = {q ∉ {p}}`.
+    have hYeq : Y = (Y.subgroupOf X).map X.subtype := (Subgroup.map_subgroupOf_eq_of_le hYX).symm
+    have hcompl : (primesOf A)ᶜ = {q | q ∉ ({p} : Set ℕ)} := by rw [hπ]; rfl
+    rw [hcompl, opiCoreInG, hYeq]
+    exact Subgroup.map_mono key
   · -- **case (2)**: delegate to the `sorry`-free SCN₂ branch.
     obtain ⟨P, hAP, hAscn2⟩ := hcase2
     exact hypothesis71_of_scn2 hG hAab hAp P hAP hAscn2
