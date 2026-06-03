@@ -245,6 +245,88 @@ theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
   exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
     M.subtype M.subtype_injective)
 
+/-- An element normalizing `N` also normalizes the ambient realization of `F(N)`. -/
+theorem mem_normalizer_fittingInG_of_mem_normalizer {N : Subgroup G} {x : G}
+    (hxN : x ∈ Subgroup.normalizer (N : Set G)) :
+    x ∈ Subgroup.normalizer (fittingInG N : Set G) := by
+  have hforward : ∀ {z : G}, z ∈ Subgroup.normalizer (N : Set G) →
+      ∀ y : G, y ∈ fittingInG N → z * y * z⁻¹ ∈ fittingInG N := by
+    intro z hz y hy
+    have hyN : y ∈ N := fittingInG_le N hy
+    let φ : MulAut ↥N := N.normalizerMonoidHom ⟨z, hz⟩
+    have hchar : ((fittingInG N).subgroupOf N).map (φ : ↥N →* ↥N) =
+        (fittingInG N).subgroupOf N :=
+      Subgroup.characteristic_iff_map_eq.mp (fittingInG_subgroupOf_characteristic N) φ
+    have hySub : (⟨y, hyN⟩ : ↥N) ∈ (fittingInG N).subgroupOf N := by
+      simpa [Subgroup.mem_subgroupOf] using hy
+    have hmap : φ ⟨y, hyN⟩ ∈ ((fittingInG N).subgroupOf N).map (φ : ↥N →* ↥N) := by
+      rw [Subgroup.mem_map]
+      exact ⟨⟨y, hyN⟩, hySub, rfl⟩
+    rw [hchar] at hmap
+    have hmem : ((φ ⟨y, hyN⟩ : ↥N) : G) ∈ fittingInG N := by
+      exact Subgroup.mem_subgroupOf.mp hmap
+    simpa [φ] using hmem
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · exact hforward hxN y
+  · intro hy
+    have hxN_inv : x⁻¹ ∈ Subgroup.normalizer (N : Set G) :=
+      (Subgroup.normalizer (N : Set G)).inv_mem hxN
+    have hback : x⁻¹ * (x * y * x⁻¹) * (x⁻¹)⁻¹ ∈ fittingInG N :=
+      hforward hxN_inv (x * y * x⁻¹) hy
+    have hEq : x⁻¹ * (x * y * x⁻¹) * x = y := by group
+    simpa [hEq] using hback
+
+/-- If `N ≤ H` and `H` normalizes `N`, then the ambient realization of `F(N)`
+lies in the ambient realization of `F(H)`. -/
+theorem fittingInG_le_fittingInG_of_le_normalizer [Finite G] {N H : Subgroup G}
+    (hNH : N ≤ H) (hHN : H ≤ Subgroup.normalizer (N : Set G)) :
+    fittingInG N ≤ fittingInG H := by
+  have hFN_H : fittingInG N ≤ H := (fittingInG_le N).trans hNH
+  have hFN_norm_H : ((fittingInG N).subgroupOf H).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hFN_H]
+    intro x hx
+    exact mem_normalizer_fittingInG_of_mem_normalizer (hHN hx)
+  have hFN_nilp_H : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := by
+    haveI : Group.IsNilpotent ↥(fittingInG N) := fittingInG_isNilpotent N
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_H).symm
+  have hSub_le_fitH : (fittingInG N).subgroupOf H ≤ Ch01.fitting ↥H := by
+    haveI : ((fittingInG N).subgroupOf H).Normal := hFN_norm_H
+    haveI : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := hFN_nilp_H
+    exact Ch01.nilpotent_normal_le_fitting
+  calc fittingInG N = ((fittingInG N).subgroupOf H).map H.subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hFN_H).symm
+    _ ≤ (Ch01.fitting ↥H).map H.subtype := Subgroup.map_mono hSub_le_fitH
+    _ = fittingInG H := rfl
+
+/-- BG (8.7) Fitting-core bridge: `F(O_{p'}(H))` lies in `O_{p'}(F(H))`. -/
+theorem fittingInG_opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_fittingInG
+    [Finite G] {p : ℕ} [Fact p.Prime] (H : Subgroup G) :
+    fittingInG (opiCoreInG ({p} : Set ℕ)ᶜ H) ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H) := by
+  let N : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ H
+  change fittingInG N ≤ opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H)
+  have hN_H : N ≤ H := by
+    dsimp [N]
+    exact opiCoreInG_le ({p} : Set ℕ)ᶜ H
+  have hH_norm_N : H ≤ Subgroup.normalizer (N : Set G) := by
+    dsimp [N]
+    exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ H
+  have hFN_FH : fittingInG N ≤ fittingInG H :=
+    fittingInG_le_fittingInG_of_le_normalizer hN_H hH_norm_N
+  have hFN_norm_FH : ((fittingInG N).subgroupOf (fittingInG H)).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hFN_FH]
+    intro x hx
+    have hxH : x ∈ H := fittingInG_le H hx
+    exact mem_normalizer_fittingInG_of_mem_normalizer (hH_norm_N hxH)
+  have hFN_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (fittingInG N) := by
+    intro r hr
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ H r
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (fittingInG_le N))
+        Nat.card_pos.ne' hr)
+  exact le_opiCoreInG_of_normal_of_isPiSubgroup hFN_FH hFN_norm_FH hFN_pi
+
 /-- For a finite solvable subgroup `H`, its `π(F(H))`-complement core is trivial.
 
 This is the ambient form of the BG §8 step `O_{σ'}(H)=1`, where `σ=π(F(H))`.
@@ -1814,6 +1896,60 @@ theorem opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_com
   refine Subgroup.mem_centralizer_iff.mpr ?_
   intro y hy
   exact (Subgroup.mem_centralizer_iff.mp (hK_le_cent_Ap hy) x hx).symm
+
+/-- BG (8.7) plus Proposition 1.4: after `π(F(H)) = π(F(M))`, the `p`-core of
+`C_F(M)(A0)` centralizes `O_{p'}(H)`. -/
+theorem opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_compl
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hPrimes : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) =
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) :
+    opiCoreInG ({p} : Set ℕ) (cFittingInG M A0) ≤
+      Subgroup.centralizer (opiCoreInG ({p} : Set ℕ)ᶜ H : Set G) := by
+  let Ap : Subgroup G := opiCoreInG ({p} : Set ℕ) (cFittingInG M A0)
+  let N : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ H
+  change Ap ≤ Subgroup.centralizer (N : Set G)
+  have hN_H : N ≤ H := by
+    dsimp [N]
+    exact opiCoreInG_le ({p} : Set ℕ)ᶜ H
+  have hH_norm_N : H ≤ Subgroup.normalizer (N : Set G) := by
+    dsimp [N]
+    exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ H
+  have hAp_cent_FN : Ap ≤ Subgroup.centralizer (fittingInG N : Set G) := by
+    have hAp_cent_OFH : Ap ≤
+        Subgroup.centralizer (opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H) : Set G) := by
+      dsimp [Ap]
+      exact
+        opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_compl_fittingInG
+          hG hM hA0 hHsolv hAH hPrimes
+    have hFN_le_OFH : fittingInG N ≤ opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H) := by
+      dsimp [N]
+      exact fittingInG_opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_fittingInG H
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact Subgroup.mem_centralizer_iff.mp (hAp_cent_OFH ha) y (hFN_le_OFH hy)
+  have hAp_H : Ap ≤ H := by
+    dsimp [Ap]
+    exact (opiCoreInG_le ({p} : Set ℕ) (cFittingInG M A0)).trans hAH
+  have hAp_norm_N : Ap ≤ Subgroup.normalizer (N : Set G) := hAp_H.trans hH_norm_N
+  have hAp_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ) Ap := by
+    dsimp [Ap]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ) (cFittingInG M A0)
+  have hN_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ N := by
+    dsimp [N]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ H
+  have hCop : Nat.Coprime (Nat.card ↥Ap) (Nat.card ↥N) :=
+    coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hAp_pi hN_pi
+  haveI : IsSolvable ↥H := hHsolv
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_solvable_injective (f := Subgroup.inclusion hN_H)
+      (Subgroup.inclusion_injective hN_H)
+  exact le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
+    hAp_norm_N hCop hAp_cent_FN
 
 /-- BG (8.7): in the non-`p`-group case, each q-core of `F(H)` lies in the
 original maximal subgroup `M` whenever `H` contains `C_F(M)(A0)`. -/
