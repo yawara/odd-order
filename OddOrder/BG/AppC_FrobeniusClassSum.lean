@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.Set.Card.Arithmetic
 import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 
@@ -22,6 +23,19 @@ namespace OddOrder.BG.AppC.NormSet
 open OddOrder.RepresentationTheory
 
 variable (p q : ℕ)
+
+/-- The concrete Frobenius group `P ⋊ U` is finite; class-sum coefficients need
+a `Fintype` instance.  `SemidirectProduct` is structurally just the product of
+its left and right coordinates. -/
+noncomputable instance normOneFrobeniusGroup_fintype [Fact p.Prime] :
+    Fintype (normOneFrobeniusGroup p q) := by
+  letI : Fintype (additiveFieldGroup p q) := Fintype.ofFinite _
+  letI : Fintype (normOneUnits p q) := Fintype.ofFinite _
+  exact Fintype.ofEquiv (additiveFieldGroup p q × normOneUnits p q)
+    { toFun := fun x => ⟨x.1, x.2⟩
+      invFun := fun x => (x.left, x.right)
+      left_inv := by intro x; rfl
+      right_inv := by intro x; ext <;> rfl }
 
 /-- The conjugacy class in `H = P ⋊ U` of the additive-kernel element attached to
 `s ∈ 𝔽_{p^q}`.  BG Lemma C.2 uses the class of a nonzero `s ∈ P`. -/
@@ -125,6 +139,78 @@ def fixedProductClassPairSet [Fact p.Prime]
     (z : normOneFrobeniusGroup p q) :
     Set (normOneFrobeniusGroup p q × normOneFrobeniusGroup p q) :=
   {r | IsFixedProductClassPair (p := p) (q := q) Ci Cj z r}
+
+/-- Set version of the class-pair predicate, used to partition the full
+class-sum pair count by exact product. -/
+def classPairSet [Fact p.Prime]
+    (Ci Cj Cs : ConjClasses (normOneFrobeniusGroup p q)) :
+    Set (normOneFrobeniusGroup p q × normOneFrobeniusGroup p q) :=
+  {r | IsClassPair Ci Cj Cs r}
+
+/-- The full class-pair set is the disjoint union of exact-product fibers over
+the product conjugacy class.  This is the set-level form of the usual
+`a_{ij}^s |C_s|` class-sum count. -/
+theorem classPairSet_eq_iUnion_fixedProductClassPairSet [Fact p.Prime]
+    (Ci Cj Cs : ConjClasses (normOneFrobeniusGroup p q)) :
+    classPairSet p q Ci Cj Cs =
+      ⋃ z ∈ Cs.carrier, fixedProductClassPairSet (p := p) (q := q) Ci Cj z := by
+  ext r
+  constructor
+  · intro hr
+    refine Set.mem_iUnion.mpr ⟨r.1 * r.2, ?_⟩
+    refine Set.mem_iUnion.mpr ⟨?_, ?_⟩
+    · exact ConjClasses.mem_carrier_iff_mk_eq.mpr hr.2.2
+    · exact ⟨hr.1, hr.2.1, rfl⟩
+  · intro hr
+    rcases Set.mem_iUnion.mp hr with ⟨z, hzmem⟩
+    rcases Set.mem_iUnion.mp hzmem with ⟨hz, hfixed⟩
+    exact ⟨hfixed.1, hfixed.2.1, by
+      rw [hfixed.2.2]
+      exact ConjClasses.mem_carrier_iff_mk_eq.mp hz⟩
+
+/-- Cardinal form of `classPairSet_eq_iUnion_fixedProductClassPairSet`: the
+full class-pair count is the finite sum of the fixed-product fiber sizes over
+the product class. -/
+theorem classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard [Fact p.Prime]
+    (Ci Cj Cs : ConjClasses (normOneFrobeniusGroup p q)) :
+    (classPairSet p q Ci Cj Cs).ncard =
+      ∑ᶠ z ∈ Cs.carrier,
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard := by
+  classical
+  have hdisj :
+      Cs.carrier.PairwiseDisjoint
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj) := by
+    intro z _ w _ hzw
+    change Disjoint
+      (fixedProductClassPairSet (p := p) (q := q) Ci Cj z)
+      (fixedProductClassPairSet (p := p) (q := q) Ci Cj w)
+    rw [Set.disjoint_left]
+    intro r hz hw
+    exact hzw (hz.2.2.symm.trans hw.2.2)
+  rw [classPairSet_eq_iUnion_fixedProductClassPairSet]
+  exact Set.Finite.ncard_biUnion (Set.toFinite _) (fun _ _ => Set.toFinite _) hdisj
+
+/-- The set cardinality of `classPairSet` agrees with the existing class-sum
+structure coefficient. -/
+theorem classPairSet_ncard_eq_classSumCoeff [Fact p.Prime]
+    [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (Ci Cj Cs : ConjClasses (normOneFrobeniusGroup p q)) :
+    (classPairSet p q Ci Cj Cs).ncard = classSumCoeff Ci Cj Cs := by
+  rw [← card_classPair (G := normOneFrobeniusGroup p q) Ci Cj Cs]
+  rw [← Nat.card_coe_set_eq (classPairSet p q Ci Cj Cs)]
+  rfl
+
+/-- The class-sum structure coefficient is the sum of fixed-product fiber sizes
+over the product class.  The later App C step shows these fibers have equal
+cardinality in the concrete Frobenius group. -/
+theorem classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard [Fact p.Prime]
+    [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (Ci Cj Cs : ConjClasses (normOneFrobeniusGroup p q)) :
+    classSumCoeff Ci Cj Cs =
+      ∑ᶠ z ∈ Cs.carrier,
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard := by
+  rw [← classPairSet_ncard_eq_classSumCoeff p q Ci Cj Cs]
+  exact classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard p q Ci Cj Cs
 
 /-- A pair counted by `normOnePairSetAt s` gives a fixed-product class pair with
 product exactly `inl (2*s)`. -/

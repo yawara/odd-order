@@ -71,6 +71,9 @@ created: 2026-06-04
 - [x] **C.2 q≥5 additive-kernel class size**:
   `normOneClassAt_carrier_ncard_eq_normOneUnits_card` を追加し、`s≠0` で `|C_s| = |U|` を証明。
   `2≠0` の下で product class `C_{2s}` も同じ cardinality になる特殊形を登録。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 full class-pair fiber decomposition**:
+  `classPairSet` を exact-product fibers の disjoint union として分解し、`classSumCoeff` が
+  product class 上の fixed-product fiber cardinalities の有限和になることを証明。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

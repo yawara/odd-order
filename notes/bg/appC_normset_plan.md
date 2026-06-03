@@ -155,6 +155,14 @@ product class の fiber 和として分解し、class-size factor を整理す�
 `C_{2s}` も同じサイズを持つ形にした。次の target は full class-pair count を
 `|C_{2s}|` 個の fixed-product fiber に分解する補題。AxiomsCheck 登録済み。
 
+#### ✅ class-sum bridge: full class-pair fiber decomposition (2026-06-04)
+`classPairSet` を導入し、`classPairSet_eq_iUnion_fixedProductClassPairSet` で full `IsClassPair`
+を product class `C_s` 上の exact-product fiber の和として展開。
+`classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard` と
+`classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard` で、既存 `classSumCoeff` が fixed fiber
+cardinality の有限和であることを証明した。次は AppC の `H=P⋊U` で各 fiber の cardinality を
+代表元 fiber と同一視する conjugation-bijection。AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

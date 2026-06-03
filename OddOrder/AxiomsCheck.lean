@@ -1846,6 +1846,13 @@ set_option linter.style.longLine false in
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
 -- fixed-product fiber over `inl (2*s)` before passing to the full product class.
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classPairSet_eq_iUnion_fixedProductClassPairSet
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.classPairSet_ncard_eq_classSumCoeff
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isFixedProductClassPair
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.exists_normOnePairSetAt_of_isFixedProductClassPair
