@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.AppA_PStability
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
@@ -1223,6 +1224,150 @@ private theorem mem_map_mk'_of_mem_oPiCore_quotient_of_commute
       _ = s * a := by rw [h2]
   rw [← hsc]
   exact Subgroup.mem_map_of_mem _ (hCPA hs_cent)
+
+/-- **Abstract special case of BG Proposition 7.5** (mmd L2275-2285), `b`-independent and reusable:
+if `G'` is finite solvable of odd order, `P` is a Sylow `p`-subgroup, `A ≤ P` is abelian and normal
+in `P` with `C_P(A) ⊆ A`, and `Y` is an `A`-invariant `p'`-subgroup, then `Y ≤ O_{p'}(G')`.
+
+Proof (in the bar-quotient `X̄ = G'/O_{p'}(G')`): Theorem 6.1 puts `Ā ≤ O_p(X̄)`; the commutator
+`[Ā,Ȳ] ≤ O_p(X̄) ⊓ Ȳ = 1` so `Ā` centralizes `Ȳ`; step 6
+(`mem_map_mk'_of_mem_oPiCore_quotient_of_commute`) gives `C_{O_p(X̄)}(Ā) ⊆ Ā`; Proposition 1.10 then
+makes `Ȳ` centralize `O_p(X̄)`, and Proposition 1.15(a) forces `Ȳ ≤ O_p(X̄)`, whence `Ȳ = 1`. -/
+private theorem specialCase
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G'] [IsSolvable G']
+    (hp2 : p ≠ 2) (hodd : Odd (Nat.card G')) (P : Sylow p G')
+    {A : Subgroup G'} (hAP : A ≤ (P : Subgroup G')) [IsMulCommutative A]
+    (hAnormP : (P : Subgroup G') ≤ Subgroup.normalizer A)
+    (hCPA : Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') ≤ A)
+    {Y : Subgroup G'} (hYnorm : A ≤ Subgroup.normalizer Y)
+    (hYpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Y) :
+    Y ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
+  classical
+  set N : Subgroup G' := Ch03.oPiCore ({p} : Set ℕ)ᶜ G' with hN
+  set mk := QuotientGroup.mk' N with hmkdef
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective N
+  have hker : mk.ker = N := QuotientGroup.ker_mk' N
+  set Q : Subgroup (G' ⧸ N) := Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) with hQ
+  haveI hQnorm : Q.Normal := by rw [hQ]; infer_instance
+  set Ybar : Subgroup (G' ⧸ N) := Y.map mk with hYbar
+  set Abar : Subgroup (G' ⧸ N) := A.map mk with hAbar
+  -- `Q = O_p(X̄)` is a `p`-group; `Ȳ` is a `p'`-group; hence `Q ⊓ Ȳ = ⊥`.
+  have hQ_pg : IsPGroup p ↥Q := by
+    rw [hQ, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p _
+  have hYbar_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Ybar := by
+    intro q hq
+    have hdvd : Nat.card ↥Ybar ∣ Nat.card ↥Y := by rw [hYbar]; exact Subgroup.card_map_dvd _ _
+    exact hYpi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+  have hYbar_cop : Nat.Coprime (Nat.card ↥Ybar) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      exact hYbar_pi q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hQYbot : Q ⊓ Ybar = ⊥ := OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hQ_pg hYbar_cop
+  -- Theorem 6.1 (`thmA4b`) ⟹ `A ≤ O_{p',p}(G')` ⟹ `Ā ≤ Q`.
+  have hThm61 : A ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) G' :=
+    OddOrder.BG.AppA.thmA4b hp2 ‹IsSolvable G'› hodd P hAP hAnormP
+  have hAbar_le_Q : Abar ≤ Q := by rw [hAbar]; exact Subgroup.map_le_iff_le_comap.mpr hThm61
+  -- `[Ā,Ȳ] = 1`: each commutator lies in `Q ⊓ Ȳ = ⊥`.
+  have hcommute : ∀ a' ∈ Abar, ∀ y' ∈ Ybar, a' * y' * a'⁻¹ * y'⁻¹ = 1 := by
+    intro a' ha' y' hy'
+    have hin_Q : a' * y' * a'⁻¹ * y'⁻¹ ∈ Q := by
+      have ha'Q : a' ∈ Q := hAbar_le_Q ha'
+      have hconj : y' * a'⁻¹ * y'⁻¹ ∈ Q := hQnorm.conj_mem a'⁻¹ (Q.inv_mem ha'Q) y'
+      have heq : a' * y' * a'⁻¹ * y'⁻¹ = a' * (y' * a'⁻¹ * y'⁻¹) := by group
+      rw [heq]; exact Q.mul_mem ha'Q hconj
+    have hin_Y : a' * y' * a'⁻¹ * y'⁻¹ ∈ Ybar := by
+      rw [hAbar, Subgroup.mem_map] at ha'
+      rw [hYbar, Subgroup.mem_map] at hy'
+      obtain ⟨a, ha, rfl⟩ := ha'
+      obtain ⟨y, hy, rfl⟩ := hy'
+      have hY : a * y * a⁻¹ * y⁻¹ ∈ Y :=
+        Y.mul_mem ((Subgroup.mem_normalizer_iff.mp (hYnorm ha) y).mp hy) (Y.inv_mem hy)
+      have heq : mk a * mk y * (mk a)⁻¹ * (mk y)⁻¹ = mk (a * y * a⁻¹ * y⁻¹) := by
+        rw [map_mul, map_mul, map_mul, map_inv, map_inv]
+      rw [hYbar, heq]
+      exact Subgroup.mem_map_of_mem mk hY
+    exact Subgroup.mem_bot.mp (hQYbot ▸ Subgroup.mem_inf.mpr ⟨hin_Q, hin_Y⟩)
+  -- conjugation action of `Ȳ` on `Q`.
+  have hYbar_norm : Ybar ≤ Subgroup.normalizer Q := by
+    intro y _
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    constructor
+    · intro hz; exact hQnorm.conj_mem z hz y
+    · intro hz
+      have h := hQnorm.conj_mem _ hz y⁻¹
+      have heq : y⁻¹ * (y * z * y⁻¹) * y⁻¹⁻¹ = z := by group
+      rwa [heq] at h
+  set φ : ↥Ybar →* MulAut ↥Q := Q.normalizerMonoidHom.comp (Subgroup.inclusion hYbar_norm) with hφ
+  have hφcoe : ∀ (a : ↥Ybar) (g : ↥Q),
+      ((φ a) g : G' ⧸ N) = (a : G' ⧸ N) * (g : G' ⧸ N) * (a : G' ⧸ N)⁻¹ := by
+    intro a g; rw [hφ]; rfl
+  -- `Ā ≤ C_Q(Ȳ)`: `Ā` (inside `Q`) is fixed by `Ȳ`.
+  have hAbar_le_fix : Abar.subgroupOf Q ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro g hg
+    rw [Subgroup.mem_subgroupOf] at hg
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    refine Subtype.ext ?_
+    rw [hφcoe]
+    have hc := hcommute (g : G' ⧸ N) hg (a : G' ⧸ N) a.2
+    have h3 : (g : G' ⧸ N) * (a : G' ⧸ N) * (g : G' ⧸ N)⁻¹ = (a : G' ⧸ N) := mul_inv_eq_one.mp hc
+    have h4 : (g : G' ⧸ N) * (a : G' ⧸ N) = (a : G' ⧸ N) * (g : G' ⧸ N) := by
+      calc (g : G' ⧸ N) * (a : G' ⧸ N)
+          = ((g : G' ⧸ N) * (a : G' ⧸ N) * (g : G' ⧸ N)⁻¹) * (g : G' ⧸ N) := by group
+        _ = (a : G' ⧸ N) * (g : G' ⧸ N) := by rw [h3]
+    calc (a : G' ⧸ N) * (g : G' ⧸ N) * (a : G' ⧸ N)⁻¹
+        = (g : G' ⧸ N) * (a : G' ⧸ N) * (a : G' ⧸ N)⁻¹ := by rw [← h4]
+      _ = (g : G' ⧸ N) := by group
+  -- `C_Q(C_Q(Ȳ)) ⊆ C_Q(Ȳ)` for Proposition 1.10, using step 6.
+  have hCC : Subgroup.centralizer (Subgroup.fixedPointsOfMulAut φ : Set ↥Q)
+      ≤ Subgroup.fixedPointsOfMulAut φ := by
+    refine le_trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAbar_le_fix)) ?_
+    refine le_trans ?_ hAbar_le_fix
+    intro c hc
+    rw [Subgroup.mem_subgroupOf]
+    refine mem_map_mk'_of_mem_oPiCore_quotient_of_commute P hAP hCPA (c := (c : G' ⧸ N)) c.2 ?_
+    intro a ha
+    have hmkaAbar : mk a ∈ Abar := by rw [hAbar]; exact Subgroup.mem_map_of_mem mk ha
+    have hmkaQ : mk a ∈ Q := hAbar_le_Q hmkaAbar
+    have hmem : (⟨mk a, hmkaQ⟩ : ↥Q) ∈ Abar.subgroupOf Q := by
+      rw [Subgroup.mem_subgroupOf]; exact hmkaAbar
+    exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hc ⟨mk a, hmkaQ⟩ hmem)
+  haveI : Group.IsNilpotent ↥Q := hQ_pg.isNilpotent
+  have hcop : Nat.Coprime (Nat.card ↥Ybar) (Nat.card ↥Q) := by
+    obtain ⟨n, hn⟩ := hQ_pg.exists_card_eq
+    rw [hn]; exact hYbar_cop.pow_right n
+  have htrivφ := OddOrder.BG.Ch1.S01.coprime_nilpotent_acts_trivially_of_centralizer_self
+    (A := ↥Ybar) (G := ↥Q) (φ := φ) hcop hCC
+  -- `Ȳ` centralizes `Q`, so `Ȳ ≤ C_X̄(Q) ≤ Q` (Prop 1.15(a)), hence `Ȳ ≤ Q ⊓ Ȳ = ⊥`.
+  have hYbar_cent : Ybar ≤ Subgroup.centralizer (Q : Set (G' ⧸ N)) := by
+    intro yb hyb
+    rw [Subgroup.mem_centralizer_iff]
+    intro q hq
+    have h := htrivφ ⟨yb, hyb⟩ ⟨q, hq⟩
+    have hco := congrArg Subtype.val h
+    rw [hφcoe] at hco
+    have : yb * q * yb⁻¹ = q := hco
+    calc q * yb = (yb * q * yb⁻¹) * yb := by rw [this]
+      _ = yb * q := by group
+  have h115a : Subgroup.centralizer (Q : Set (G' ⧸ N)) ≤ Q := by
+    have hbot : Ch03.oPiCore ({q | q ∉ ({p} : Set ℕ)}) (G' ⧸ N) = ⊥ := by
+      have := Ch03.oPiCore_quotient_self_eq_bot (G := G') ({p} : Set ℕ)ᶜ
+      exact this
+    have := OddOrder.BG.Ch1.S01.hall_higman_solvable_specialization (p := p) (G := G' ⧸ N) hbot
+    rw [← hQ] at this
+    exact this
+  have hYbar_le_Q : Ybar ≤ Q := le_trans hYbar_cent h115a
+  have hYbar_bot : Ybar = ⊥ := le_bot_iff.mp (hQYbot ▸ le_inf hYbar_le_Q le_rfl)
+  -- `Y.map mk = ⊥` ⟹ `Y ≤ ker mk = N`.
+  have hYmap_bot : Y.map mk = ⊥ := by rw [← hYbar]; exact hYbar_bot
+  rw [Subgroup.map_eq_bot_iff, hker] at hYmap_bot
+  exact hYmap_bot
 
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
