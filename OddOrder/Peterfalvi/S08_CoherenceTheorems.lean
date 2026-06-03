@@ -910,6 +910,52 @@ theorem Xset_eq_irreducible_not_subset_characterKernel (hyp : SibleyDadeHypothes
         exact absurd hite hθinner
     rw [← heq]; exact hIndX
 
+/-- **(T8 leaf 1) `X`-member character facts** (Frobenius case).  Every `χ ∈ X = S − S(Z)` is
+non-real (Peterfalvi (1.1), `L` odd) with `‖χ‖² = ‖χ̄‖² = 1` and `⟨χ̄, χ⟩ = ⟨χ, χ̄⟩ = 0`.  These are
+the `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar'` fields of `S07.DadeChainStep`.  Non-triviality is
+read off the (6.6) characterization (`Z ⊄ Ker χ` via `Xset_eq_irreducible_not_subset_characterKernel`,
+so `χ ≠ 1`), then (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`) gives non-realness and
+`irreducibleCharacter_inner_eq_ite` gives the orthonormality. -/
+theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hirr : IsIrreducibleCharacter χ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hconjirr : IsIrreducibleCharacter χ.conj := hirr.conj
+  -- `Z ⊄ Ker χ` from the (6.6) characterization, hence `χ ≠ 1`.
+  have hZker : ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ) := by
+    have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
+      (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+    rw [hXeq] at hχX
+    exact hχX.2
+  have hne_triv : (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ≠
+      OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥L := by
+    intro htriv
+    apply hZker
+    have hχtriv : χ = OddOrder.RepresentationTheory.trivialClassFunction ↥L :=
+      congrArg Subtype.val htriv
+    rw [hχtriv, OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  have hreal : ¬ ClassFunction.IsReal χ :=
+    OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hyp.card_L_odd hne_triv
+  have hbi_ne : (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ, hirr⟩ :=
+    fun h => hreal (congrArg Subtype.val h)
+  refine ⟨hreal, ?_, ?_, ?_, ?_⟩
+  · simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
+  · simpa using
+      irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
+    rwa [if_neg hbi_ne] at h
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
+    rwa [if_neg (fun h => hbi_ne h.symm)] at h
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
