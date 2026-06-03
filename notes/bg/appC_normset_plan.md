@@ -98,3 +98,43 @@ C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statem
 - norm: 自前 `normN x := ∏_{i<q} x^{p^i}` で C.1/C.2(q=3) は完結。C.2(q≥5)/U 構造は `Algebra.norm` 接続が要。
 - `E⁻¹`: `Set.inv` (Pointwise), `a∈E⁻¹ ↔ a⁻¹∈E`。
 - C.3/ThmC は仮説 (B) (群 G 埋め込み) 必須 ⟹ 純下流でない (FieldNormalizerData の field_model materialize と共有)。
+
+---
+
+## App C 完成への残作業 — 精密 breakdown + 進捗 (2026-06-04, `/goal` "appC完成" 自走中)
+
+### ✅ 完成済 (build-green, sorry-free, axiom-clean)
+- **Remark (I)** `conditionA_iff_not_dvd`、**Lemma C.1** `lemmaC1` (E=E⁻¹∧|E|≥2⟹p≤q)。
+- **C.2 (q=3) 前半**: `exists_rootFree_cubic` (pigeonhole: ∃c, f_c が F_p に無根) +
+  `fCubic`/`fCubic_eval`/`fCubic_natDegree`(=3, compute_degree!)/`fCubic_irreducible`
+  (root-free ⟹ Irreducible, `irreducible_of_degree_le_three_of_not_isRoot`)。
+
+### 🔜 残 3 ブロック (いずれも multi-session の深い formalization)
+
+**(A) C.2 (q=3) 持ち上げ** (~200行, 有限体論): irreducible `fCubic c` から
+`a ∈ GaloisField p 3` で `normN a=1 ∧ normN(2-a)=1 ∧ a≠1` を得て `|normSetE p 3|≥2`。
+- **root 取得**: `AdjoinRoot (fCubic c)` (field, irreducible) の `powerBasis` で finrank=3
+  ⟹ card=p³ ⟹ `algEquivGaloisField` で `≃ₐ[ZMod p] GaloisField p 3`、root を transport。
+  (別経路: `fCubic|X^{p³}-X` (forward divisibility, mathlib に無し→要証明) + `Splits.of_dvd` + `exists_root_of_splits`。)
+- **Frobenius 軌道因数分解**: `f(a^p)=f(a)^p=0` (F_p 係数 + char p; eval=∑cᵢaⁱ, cᵢ^p=cᵢ),
+  `a,a^p,a^{p²}` 相異 (a∉F_p ∵ deg minpoly=3), monic deg-3 ⟹ `fCubic=∏(X-a^{p^i})`。
+- **norm 接続**: `fCubic(0)=∏(0-a^{p^i})=-normN a` ⟹ `normN a=-fCubic.eval 0=-(-1)=1`;
+  `fCubic(2)=∏(2-a^{p^i})=∏(2-a)^{p^i}=normN(2-a)=1` (∵2∈F_p, (2-a)^{p^i}=2-a^{p^i})。
+  (別経路: `Algebra.norm`+`PowerBasis.norm_gen_eq_coeff_zero_minpoly`+`minpoly`=fCubic、ただし
+  `normN=algebraMap∘Algebra.norm` bridge (~100行, `norm_eq_prod_automorphisms`+Gal=Frobenius冪
+  `Extension.exists_frob_pow_eq`/`exists_forall_apply_eq_pow`) が要。)
+
+**(B) C.2 (q≥5)** (**最重・新 infra**): Frobenius 群 `H=P⋊U` (P=(F_{p^q},+), U=norm-1) の指標論。
+`e=|E|`=構造定数 (K̂₁·K̂₁ の K̂₂ 係数) = `|{(u,v)∈U²|us+vs=2s}|`、既約指標 (|U| linear + (p-1) of
+degree |U| induced from P) + 直交関係で `|E|≥p^{q-2}-p^{q/2}>1`。**concrete Frobenius 群の指標構成 +
+class sum 構造定数 = repo の指標 infra から大規模に組む必要 (multi-session)**。
+
+**(C) Lemma C.3 + Theorem C** (**最難・半上流**): `E=E⁻¹` の generators-and-relations (BG Step1-4,
+mmd L4975-5005)。**仮説(B)=群G埋め込み σ:H→G, abelian p'-subgroup Q, y∈Q** が本質的に必要 ⟹
+`FieldNormalizerData.field_model` の materialize (現 opaque) = 設計判断 + 上流 interface 改変と共有。
+Theorem C = C.1∧C.2∧C.3 の assembly (容易) + 既存 scaffold `AppC.theoremC` への配線。
+
+### 正直な現状評価
+App C 完成は **3 つの深い研究レベル formalization (A 有限体持ち上げ / B Frobenius 群指標論 / C
+generators-relations+仮説B)** を要し、**単一 /goal 自走では完了不能** (各々 multi-session)。anti-scaffold
+原則ゆえ偽完成は不可。C.1 (最難 analytic core) + C.2(q=3) 前半は genuine に完成・commit 済。
