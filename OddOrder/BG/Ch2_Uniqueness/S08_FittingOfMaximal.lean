@@ -373,6 +373,25 @@ private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Fin
   by_contra hq_ne
   exact h ⟨q, Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩, hq_ne⟩
 
+/-- If Fitting M is not a p-group, BG (8.2) supplies a prime q whose center-core
+localizes the ambient centralizer of C_F(M)(A0) inside M. -/
+theorem centralizer_cFitting_le_maximal_of_not_isPGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hA0F : A0 ≤ fittingInG M)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
+    Subgroup.centralizer ((Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M : Subgroup G) : Set G)
+      ≤ M := by
+  obtain ⟨q, hqF, _⟩ := exists_primeFactor_ne_of_not_isPGroup hFnp
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
+  exact centralizer_cFitting_le_maximal_of_fitting_primeFactor hG hM hA0F hqF
+
+/-- The relative centralizer C_F(M)(A0) is proper whenever M is maximal. -/
+theorem cFitting_lt_top_of_mem_maximal {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) :
+    Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M < ⊤ :=
+  lt_of_le_of_lt (inf_le_right.trans (fittingInG_le M))
+    (mem_maximalSubgroups.mp hM).lt_top
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -382,6 +401,11 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
     (hm : 3 ≤ rank ↥A₀)
     (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
     IsUniquelyMaximal (Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M) := by
+  have hA0F : A₀ ≤ fittingInG M := isMaxElemAbelianIn_le hA₀
+  have hCentralizer_le_M :
+      Subgroup.centralizer
+          ((Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M : Subgroup G) : Set G) ≤ M :=
+    centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
