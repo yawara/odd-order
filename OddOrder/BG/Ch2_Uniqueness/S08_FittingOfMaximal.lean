@@ -79,6 +79,14 @@ theorem fittingInG_subgroupOf_normal (M : Subgroup G) :
   rw [fittingInG_subgroupOf_eq]
   exact Ch01.fitting.normal ↥M
 
+/-- Fitting M, realized in G, is nilpotent. -/
+theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
+    Group.IsNilpotent ↥(fittingInG M) := by
+  rw [fittingInG]
+  haveI : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
+  exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
+    M.subtype M.subtype_injective)
+
 /-- The center of `F(M)`, realized as a subgroup of the ambient group `G`. -/
 def centerFittingInG (M : Subgroup G) : Subgroup G :=
   (Subgroup.center ↥(fittingInG M)).map (fittingInG M).subtype
@@ -99,6 +107,15 @@ theorem centerFittingInG_isMulCommutative (M : Subgroup G) :
   rw [centerFittingInG]
   exact Subgroup.map_isMulCommutative (Subgroup.center ↥(fittingInG M))
     (fittingInG M).subtype
+
+/-- Every prime divisor of Fitting M divides the center of Fitting M. -/
+theorem mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG [Finite G]
+    {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
+    q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors := by
+  haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
+  rw [centerFittingInG, Subgroup.card_map_of_injective (fittingInG M).subtype_injective]
+  exact Ch01.mem_primeFactors_center_of_isNilpotent hq
 
 /-- The center of `F(M)`, viewed as a subgroup of `M`, is normal in `M`.
 
@@ -215,6 +232,14 @@ theorem centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center [Finite G]
   apply hN_ne
   exact le_bot_iff.mp (by rw [← hcore_bot]; exact hNle)
 
+/-- If q divides the order of Fitting M, then the q-core of its center is nontrivial. -/
+theorem centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG [Finite G]
+    {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
+    centerFittingOpCoreInG q M ≠ ⊥ :=
+  centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center
+    (mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG hq)
+
 /-- **BG (8.1), left inclusion**: `Z(F(M))` centralizes every subgroup contained in
 `F(M)`, hence lies in the relative centralizer `C_{F(M)}(A₀)`. -/
 theorem centerFittingInG_le_centralizer_inf {M A₀ : Subgroup G}
@@ -326,6 +351,16 @@ theorem centralizer_cFitting_le_maximal_of_centerFitting_primeFactor [Finite G]
       ≤ M :=
   centralizer_cFitting_le_maximal_of_centerFittingOpCore_ne hG hM hA0F
     (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center hq)
+
+/-- BG (8.2), Fitting-prime-factor form. -/
+theorem centralizer_cFitting_le_maximal_of_fitting_primeFactor [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hA0F : A0 ≤ fittingInG M)
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
+    Subgroup.centralizer ((Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M : Subgroup G) : Set G)
+      ≤ M :=
+  centralizer_cFitting_le_maximal_of_centerFitting_primeFactor hG hM hA0F
+    (mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG hq)
 
 private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Finite H]
     {p : ℕ} [Fact p.Prime] (hHnot : ¬ IsPGroup p H) :

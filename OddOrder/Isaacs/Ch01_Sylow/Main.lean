@@ -779,6 +779,87 @@ private theorem iSup_default_sylow_eq_top_of_nilpotent
   rw [hrange'] at hrange
   exact hrange
 
+/-- In a finite nilpotent group, the center of any Sylow subgroup lies in the center of the
+whole group. -/
+theorem center_sylow_le_center_of_isNilpotent [Finite G] [Group.IsNilpotent G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    (Subgroup.center ↥(P : Subgroup G)).map (P : Subgroup G).subtype ≤ Subgroup.center G := by
+  classical
+  intro z hz
+  obtain ⟨zp, hzp_center, hzp_eq⟩ := hz
+  have hzp_eqG : (zp : G) = z := hzp_eq
+  have hzP : z ∈ (P : Subgroup G) := by
+    rw [← hzp_eqG]
+    exact zp.2
+  rw [Subgroup.mem_center_iff]
+  intro g
+  have hg_sup :
+      g ∈ ⨆ r : (Nat.card G).primeFactors,
+          ((default : Sylow (r : ℕ) G) : Subgroup G) := by
+    rw [iSup_default_sylow_eq_top_of_nilpotent G]
+    exact trivial
+  refine Subgroup.iSup_induction _ (C := fun x => x * z = z * x) hg_sup ?mem ?one ?mul
+  · rintro ⟨r, hr⟩ x hx
+    haveI hrprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+    by_cases hrp : r = p
+    · subst p
+      have hP_normal : P.Normal := Sylow.normal_of_isNilpotent P
+      haveI : Unique (Sylow r G) := Sylow.unique_of_normal P hP_normal
+      have hxP : x ∈ (P : Subgroup G) := by
+        simpa [Subsingleton.elim (default : Sylow r G) P] using hx
+      have hcomm := congrArg Subtype.val
+        (Subgroup.mem_center_iff.mp hzp_center ⟨x, hxP⟩)
+      simpa [hzp_eqG] using hcomm
+    · have hD_normal : ((default : Sylow r G) : Subgroup G).Normal :=
+        Sylow.normal_of_isNilpotent _
+      have hP_normal : (P : Subgroup G).Normal := Sylow.normal_of_isNilpotent P
+      have hdisjoint : Disjoint ((default : Sylow r G) : Subgroup G) (P : Subgroup G) :=
+        IsPGroup.disjoint_of_ne r p hrp _ _ (default : Sylow r G).isPGroup' P.isPGroup'
+      exact (Subgroup.commute_of_normal_of_disjoint _ _ hD_normal hP_normal hdisjoint _ _
+        hx hzP).eq
+  · simp
+  · intro x y hx hy
+    calc
+      (x * y) * z = x * (y * z) := by group
+      _ = x * (z * y) := by rw [hy]
+      _ = (x * z) * y := by group
+      _ = (z * x) * y := by rw [hx]
+      _ = z * (x * y) := by group
+
+/-- In a finite nilpotent group, every prime divisor of the group order divides the center. -/
+theorem mem_primeFactors_center_of_isNilpotent [Finite G] [Group.IsNilpotent G]
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ (Nat.card G).primeFactors) :
+    p ∈ (Nat.card ↥(Subgroup.center G)).primeFactors := by
+  let P : Sylow p G := default
+  let ZP : Subgroup G := (Subgroup.center ↥(P : Subgroup G)).map (P : Subgroup G).subtype
+  have hp_dvd : p ∣ Nat.card G := (Nat.mem_primeFactors.mp hp).2.1
+  have hP_ne : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hp_dvd
+  have hZP_ne : ZP ≠ ⊥ := by
+    dsimp [ZP]
+    intro hbot
+    have hcenter_bot : Subgroup.center ↥(P : Subgroup G) = ⊥ :=
+      (Subgroup.map_eq_bot_iff_of_injective _ (P : Subgroup G).subtype_injective).mp hbot
+    haveI : Nontrivial ↥(P : Subgroup G) := (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne
+    exact (Subgroup.center _).nontrivial_iff_ne_bot.mp P.isPGroup'.center_nontrivial hcenter_bot
+  have hZP_le_center : ZP ≤ Subgroup.center G := by
+    dsimp [ZP]
+    exact center_sylow_le_center_of_isNilpotent P
+  have hZP_pgroup : IsPGroup p ZP := by
+    dsimp [ZP]
+    exact (P.isPGroup'.to_subgroup (Subgroup.center ↥(P : Subgroup G))).map
+      (P : Subgroup G).subtype
+  have hp_dvd_ZP : p ∣ Nat.card ↥ZP := by
+    obtain ⟨n, hn⟩ := hZP_pgroup.exists_card_eq
+    have hn0 : n ≠ 0 := by
+      intro hn0
+      apply hZP_ne
+      apply Subgroup.card_eq_one.mp
+      rw [hn, hn0, pow_zero]
+    rw [hn]
+    exact dvd_pow_self p hn0
+  exact Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd_ZP.trans
+    (Subgroup.card_dvd_of_le hZP_le_center), Nat.card_pos.ne'⟩
+
 /-- **Isaacs Cor 1.28(b)** (Fitting subgroup の最大性).
 任意の正規冪零部分群 `N` は `fitting G` に含まれる.
 
