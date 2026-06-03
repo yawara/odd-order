@@ -412,10 +412,10 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
 - ✅ **T8.1** `xMember_characterFacts` (commit ccf17e2, axiom-clean): `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/
   `hχχbar'`。非実 = (1.1) odd (`not_isReal_of_ne_trivial_of_odd_card'`) + `Xset_eq` の `Z⊄Ker χ` で χ≠1;
   ortho = `irreducibleCharacter_inner_eq_ite`。Frobenius case (χ 既約 = `isIrreducibleCharacter_of_mem_Xset_of_frobenius`)。
-- 🔜 **T8.2** `xMember_diffSupport` (/goal 向き, ~40-80 LOC): `hdiffsupp` `(χ.conj−χ).support ⊆
-  supportInSubgroup (sharpImage H) L`。χ=Ind θ, H 正規 ⟹ `support_induce_subset_of_normal`
-  (InducedCharacter:343) で support⊆H; χ.conj−χ は 1 で消える ⟹ ⊆ H^#=sharpImage H。
-  `supportInSubgroup`/`sharpImage` の def 照合要 (S04)。standalone per-χ。
+- ✅ **T8.2** `xMember_diffSupport` (commit 3e12608, axiom-clean, 初回 build green): `hdiffsupp`
+  `(χ.conj−χ).support ⊆ supportInSubgroup (sharpImage H) L`。χ=Ind θ, H 正規 ⟹
+  `support_induce_subset_of_normal` (InducedCharacter:343) で support⊆H; χ.conj−χ は 1 で消える
+  (χ(1)=(n:ℂ) 実 via `exists_natDegree_charValue_one_dvd_card`) ⟹ ⊆ H^#=`sharpImage H`=map\{1}。standalone per-χ。
 - **T8.3** degree data (`a`/`famRatio`/`famDegree`/`famDegree_chi`/`famRatio_chi1`): enumeration 依存ゆえ
   T8.6 と一体化 (induce_apply_one P1✅ + index_H_eq_card_W1✅ で χ(1)=|W₁|θ(1))。
 - **T8.4** `Dmem` per-member ψ=0 分解 (`CharacterPsiDecomposition`) — §H/§I G2 主負荷、design-heavy、**/goal 不向き=直接実装**。
