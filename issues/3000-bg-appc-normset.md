@@ -77,6 +77,9 @@ created: 2026-06-04
 - [x] **C.2 q≥5 class-size factor**:
   共役で fixed-product fiber cardinality が不変なことを証明し、
   `classSumCoeff(C_i,C_j,C_z) = |C_z| * |fixedFiber(z)|` まで整理。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 coefficient specialization**:
+  `C_s*C_s` の `C_{2s}` class-sum coefficient を `|U| * |normOnePairSetAt s|`、さらに
+  `|U| * |E|` に同一視。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

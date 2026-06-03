@@ -170,6 +170,12 @@ cardinality の有限和であることを証明した。次は AppC の `H=P⋊
 `classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard` を追加し、
 `classSumCoeff(C_i,C_j,C_z) = |C_z| * |fixedFiber(z)|` の形まで整理した。AxiomsCheck 登録済み。
 
+#### ✅ class-sum bridge: norm pair coefficient specialization (2026-06-04)
+`classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard` で
+`C_s*C_s` の `C_{2s}` 係数を `|U| * |normOnePairSetAt s|` に特殊化。さらに
+`normOnePairSetAt_ncard_eq_normSetE_ncard` を合成して `|U| * |E|` 版も登録した。
+AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

@@ -387,6 +387,41 @@ theorem normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard [Fact p.Prime]
     refine ⟨(u, v), huv, ?_⟩
     exact Prod.ext hx.symm hy.symm
 
+/-- For nonzero `s`, the class-sum coefficient for `C_s * C_s` landing in
+`C_{2s}` is `|U|` times the finite-field fixed-product pair count. -/
+theorem classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    {s : GaloisField p q} (hs : s ≠ 0) (h2 : (2 : GaloisField p q) ≠ 0) :
+    classSumCoeff (normOneClassAt p q s) (normOneClassAt p q s)
+        (normOneClassAt p q ((2 : GaloisField p q) * s)) =
+      Nat.card (normOneUnits p q) * (normOnePairSetAt p q s).ncard := by
+  classical
+  change classSumCoeff (normOneClassAt p q s) (normOneClassAt p q s)
+      (ConjClasses.mk
+        (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+          normOneFrobeniusGroup p q)) =
+    Nat.card (normOneUnits p q) * (normOnePairSetAt p q s).ncard
+  rw [classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard]
+  change (normOneClassAt p q ((2 : GaloisField p q) * s)).carrier.ncard *
+      (fixedProductClassPairSet (p := p) (q := q)
+        (normOneClassAt p q s) (normOneClassAt p q s)
+        (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+          normOneFrobeniusGroup p q)).ncard =
+    Nat.card (normOneUnits p q) * (normOnePairSetAt p q s).ncard
+  rw [normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card p q hs h2,
+    ← normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard p q hs]
+
+/-- Same coefficient identity with the norm set `E` from BG Appendix C. -/
+theorem classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normSetE_ncard
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hq : q ≠ 0) {s : GaloisField p q} (hs : s ≠ 0)
+    (h2 : (2 : GaloisField p q) ≠ 0) :
+    classSumCoeff (normOneClassAt p q s) (normOneClassAt p q s)
+        (normOneClassAt p q ((2 : GaloisField p q) * s)) =
+      Nat.card (normOneUnits p q) * (normSetE p q).ncard := by
+  rw [classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard
+      p q hs h2, normOnePairSetAt_ncard_eq_normSetE_ncard p q hq hs]
+
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
 `H = P ⋊ U`.  This is the one-way bridge needed before proving that the
