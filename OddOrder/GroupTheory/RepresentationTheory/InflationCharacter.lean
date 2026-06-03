@@ -330,6 +330,49 @@ theorem sumInflatedDegreeSq :
     (fun χbar _ => by rw [inflate_apply_one])).symm
 
 open scoped Classical in
+/-- **The non-trivial inflated degree-sum.**  Removing the trivial character from
+`sumInflatedDegreeSq`: the squared degrees of the *non-trivial* irreducibles of `G` killing `N`
+sum to `|G ⧸ N| − 1`:
+`∑_{χ ∈ Irr G, N ⊆ ker χ, χ ≠ 1} χ(1)² = |G ⧸ N| − 1`.
+
+This is the `∑_{θ ∈ Irr K, A ⊆ ker θ, θ ≠ 1_K} θ(1)² = |K : A| − 1` ingredient of Peterfalvi (6.2)'s
+degree-sum (mmd 04.8 L7), with `G = K`, `N = A`: the irreducibles of `K` containing `A` in their
+kernel are the inflations of `Irr(K ⧸ A)`, whose non-trivial squared degrees sum to `|K : A| − 1`
+(Burnside on `K ⧸ A`, `sumInflatedDegreeSq`, minus the trivial character's `1² = 1`). -/
+theorem sumInflatedDegreeSq_ntrivial :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ) ∧
+          χ ≠ trivialIrreducibleCharacter G),
+        ((χ : ClassFunction G ℂ) 1) ^ 2 = (Nat.card (G ⧸ N) : ℂ) - 1 := by
+  classical
+  have hsplit : (Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))) =
+      insert (trivialIrreducibleCharacter G) (Finset.univ.filter
+        (fun χ : IrreducibleCharacter G =>
+          (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ) ∧
+            χ ≠ trivialIrreducibleCharacter G)) := by
+    ext χ
+    simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_univ, true_and]
+    constructor
+    · intro hχ
+      by_cases h : χ = trivialIrreducibleCharacter G
+      · exact Or.inl h
+      · exact Or.inr ⟨hχ, h⟩
+    · rintro (rfl | ⟨hχ, _⟩)
+      · simp
+      · exact hχ
+  have hnotmem : trivialIrreducibleCharacter G ∉ Finset.univ.filter
+      (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ) ∧
+          χ ≠ trivialIrreducibleCharacter G) := by
+    simp
+  have hfull := sumInflatedDegreeSq (N := N)
+  rw [hsplit, Finset.sum_insert hnotmem] at hfull
+  have htrivdeg : ((trivialIrreducibleCharacter G : ClassFunction G ℂ) 1) ^ 2 = 1 := by simp
+  rw [htrivdeg] at hfull
+  linear_combination hfull
+
+open scoped Classical in
 /-- **Peterfalvi (6.6)/(6.8.3) degree-sum: the `N ⊄ ker χ` part.**
 
 The squared degrees of the irreducible characters of `G` *not* killing `N` sum to `|G| − |G ⧸ N|`:
