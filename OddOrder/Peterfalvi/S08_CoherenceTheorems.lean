@@ -1637,6 +1637,20 @@ theorem degreeBound_le_of_sqrt_bound {a b x : ℕ} (hb : 1 ≤ b) (hx : 1 ≤ x)
   have hxltN : x < 4 * a ^ 2 + 2 := by exact_mod_cast hxlt
   omega
 
+/-- **Extension of `p`-groups is a `p`-group.**  If a normal subgroup `N` and the quotient `Γ ⧸ N`
+are both `p`-groups (and `Γ` is finite), then `Γ` is a `p`-group: `|Γ| = |Γ ⧸ N|·|N| = p^b·p^a`
+(Lagrange, `card_eq_card_quotient_mul_card_subgroup`), so `|Γ|` is a `p`-power (`IsPGroup.iff_card`).
+
+A general group-theory brick; used by Peterfalvi (6.5)(b) to assemble "`K/M` is a `p`-group" from
+its commutator subgroup `H₁/M` and the chief factor `K/H₁` (a `p`-group). -/
+theorem isPGroup_of_quotient_of_subgroup {p : ℕ} [Fact p.Prime] {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Normal] (hN : IsPGroup p ↥N) (hQ : IsPGroup p (Γ ⧸ N)) :
+    IsPGroup p Γ := by
+  rw [IsPGroup.iff_card] at hN hQ ⊢
+  obtain ⟨a, ha⟩ := hN
+  obtain ⟨b, hb⟩ := hQ
+  exact ⟨b + a, by rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N, hb, ha, pow_add]⟩
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
