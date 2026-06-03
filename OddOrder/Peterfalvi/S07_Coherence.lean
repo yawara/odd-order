@@ -5406,14 +5406,17 @@ structure DadeChainStep
   a : ℕ
   /-- `χ` is non-real (Peterfalvi (1.1)). -/
   hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ)
-  /-- `χ` is supported in `CF(L,A)`. -/
-  hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
-  /-- `χ̄` is supported in `CF(L,A)`. -/
-  hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L
+  /-- The conjugate difference `χ̄ − χ` is supported in `CF(L,A)` (vanishes at `1`).  Replaces the
+  individual `χ`/`χ̄` supports — an induced X-member `χ = Ind θ` has `χ(1) ≠ 0`, so `χ` is *not*
+  supported, but `χ̄ − χ` is. -/
+  hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+    supportInSubgroup A L
   /-- `χ₁ ∈ ℤ[Irr L]`. -/
   hchi1Z : chi1 ∈ ZIrr (↥L)
-  /-- `a·χ₁` is supported in `CF(L,A)`. -/
-  haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
+  /-- The degree-matched difference `χ − a·χ₁` is supported in `CF(L,A)` (vanishes at `1`). -/
+  hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L
+  /-- `‖χ₁‖² = 1`. -/
+  hchi1chi1 : ClassFunction.inner chi1 chi1 = 1
   /-- `‖χ‖² = 1`. -/
   hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1
   /-- `‖χ̄‖² = 1`. -/
@@ -5435,7 +5438,7 @@ structure DadeChainStep
   /-- Per-member `R(x) ⊥ R(χ)` ((5.2.e)). -/
   hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
     (Dmem x hx).imageFamily.Orthogonal
-      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+      (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)
   /-- `χ ⊥ S₁`. -/
   hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0
   /-- `χ̄ ⊥ S₁`. -/
@@ -5504,25 +5507,31 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
       degree_chi := step.famDegree_chi
       chi_orthogonal := fun i hi => step.hχ_S1 i (hmemS₁ i hi)
       chiFam_pairwise := step.famPairwise }
-  refine retarget_isCoherent_fromDade hyp hconj hS₁ χ step.hreal step.hχsupp step.hχbarsupp
-    step.haχ1supp
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      (by simpa only [sub_zero] using step.hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
-      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
-    step.hχχ step.hχbarχbar step.hχbarχ step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
-    step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp step.hχχ1 step.hχbarχ1 step.hχχbar'
-    ?_ (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
-  -- The (5.6.2) collapse `hY`, now *proved* from the family data via the (5.6.1) producer.
-  exact dade_Y_collapse_of_family hyp hconj _ rfl B (fun i hi => hmemS₁ i hi) step.famNe
-    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z
-    ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
-    step.Dmem step.hmemTau1Base step.hmemOrtho
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
-      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
-    step.hdeg_c
+  -- `⟨χ, a·χ₁⟩ = ⟨χ̄, a·χ₁⟩ = 0` and `(χ − a·χ₁)^τ ∈ ℤ[Irr G]` (supported difference).
+  have hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ)
+      (step.a • step.chi1 : ClassFunction (↥L) ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ step.a step.chi1,
+      OddOrder.RepresentationTheory.inner_smul_right, step.hχχ1, mul_zero]
+  have hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
+      (step.a • step.chi1 : ClassFunction (↥L) ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ step.a step.chi1,
+      OddOrder.RepresentationTheory.inner_smul_right, step.hχbarχ1, mul_zero]
+  have htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - step.a • step.chi1) ∈ ZIrr G :=
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj step.hdiffasupp
+      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a))
+  refine retarget_isCoherent_fromDade_X hyp hconj hS₁ χ step.hreal step.hdiffsupp step.hdiffasupp
+    htau1_mema hχaχ1 hχbaraχ1 step.hχχ step.hχbarχbar step.hχbarχ step.hχχbar' step.hchi1chi1
+    step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
+    step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp ?_
+    (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
+  -- The (5.6.2) collapse `hY`, proved from the family data (difference-support).
+  exact dade_Y_collapse_of_family hyp hconj
+    (decompositionDaFromDadeOfDiff hyp hconj χ step.hreal step.hdiffsupp step.hdiffasupp htau1_mema
+      hχaχ1 hχbaraχ1 step.hχχbar')
+    rfl B (fun i hi => hmemS₁ i hi) step.famNe
+    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hdiffasupp step.Dmem step.hmemTau1Base
+    step.hmemOrtho htau1_mema step.hdeg_c
 
 /-- **One `coherentPairChain` step, in the engine's accumulator shape, from the Dade isometry.**
 
