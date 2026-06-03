@@ -1188,6 +1188,48 @@ theorem opiCoreInG_singleton_eq_bot_of_cFittingInG_le_of_not_pGroup
       isPiSubgroup_opiCoreInG ({q} : Set ℕ) H⟩
   exact hInvariant_eq_bot_of_cFittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hQ
 
+/-- If q divides `|F(H)|`, then the ambient q-core `O_q(H)` is nontrivial. -/
+theorem opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG [Finite G]
+    {q : ℕ} [Fact q.Prime] {H : Subgroup G}
+    (hq : q ∈ (Nat.card ↥(fittingInG H)).primeFactors) :
+    opiCoreInG ({q} : Set ℕ) H ≠ ⊥ := by
+  have hZne : centerFittingOpCoreInG q H ≠ ⊥ :=
+    centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hq
+  have hZpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) (centerFittingOpCoreInG q H) := by
+    dsimp [centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) (centerFittingInG H)
+  have hZleO : centerFittingOpCoreInG q H ≤ opiCoreInG ({q} : Set ℕ) H :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup (centerFittingOpCoreInG_le q H)
+      (centerFittingOpCoreInG_subgroupOf_normal q H) hZpi
+  intro hObot
+  apply hZne
+  exact le_bot_iff.mp (by
+    rw [← hObot]
+    exact hZleO)
+
+/-- BG (8.6), Fitting-prime support form: if `A = C_F(M)(A0)` lies in `H`, then
+`π(F(H)) ⊆ π(A)` in the non-p-group case. -/
+theorem primesOf_fittingInG_subset_primesOf_cFittingInG_of_cFittingInG_le_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hAH : cFittingInG M A0 ≤ H) :
+    OddOrder.BG.Ch2.S07.primesOf (fittingInG H) ⊆
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) := by
+  intro q hqF
+  have hqF_mem : q ∈ (Nat.card ↥(fittingInG H)).primeFactors := by
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hqF
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF_mem⟩
+  by_contra hqA
+  have hqcomp : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ := hqA
+  have hObot : opiCoreInG ({q} : Set ℕ) H = ⊥ :=
+    opiCoreInG_singleton_eq_bot_of_cFittingInG_le_of_not_pGroup
+      hG hM hA0 hm hFnp hA hqcomp hAH
+  exact opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG hqF_mem hObot
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
