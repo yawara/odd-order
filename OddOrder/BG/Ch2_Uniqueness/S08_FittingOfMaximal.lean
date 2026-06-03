@@ -3185,6 +3185,64 @@ theorem scn3_map_le_fittingInG_of_fittingInG_isPGroup [Finite G]
   exact (Subgroup.map_mono hA_le_OPP).trans
     (oPiPrimePiCore_singleton_map_le_fittingInG_of_fittingInG_isPGroup (M := M) hp hFp)
 
+/-- If a nontrivial subgroup `K ≤ S.map subtype` has normalizer exactly controlled by a
+maximal subgroup `M`, then the image of the Sylow subgroup `S` of `M` is a full Sylow
+subgroup of the ambient minimal simple group. -/
+theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] (S : Sylow p ↥M)
+    (hK_ne_bot : K ≠ ⊥) (hK_le_SH : K ≤ (S : Subgroup ↥M).map M.subtype)
+    (hM_norm_K : M ≤ Subgroup.normalizer (K : Set G))
+    (hN_SH_le_NK : Subgroup.normalizer (((S : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (K : Set G)) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) = (S : Subgroup ↥M).map M.subtype := by
+  classical
+  haveI : IsSimpleGroup G := hG.simple
+  set SH : Subgroup G := (S : Subgroup ↥M).map M.subtype with hSH_def
+  have hSH_p : IsPGroup p SH := S.isPGroup'.map M.subtype
+  obtain ⟨PH, hSH_le_PH⟩ := IsPGroup.exists_le_sylow hSH_p
+  have hK_le_M : K ≤ M := by
+    exact hK_le_SH.trans (hSH_def ▸ Subgroup.map_subtype_le _)
+  have hNK_eq_M : Subgroup.normalizer K = M :=
+    OddOrder.Isaacs.Ch07.maximal_eq_normalizer_of_M_normalizes
+      (mem_maximalSubgroups.mp hM) hK_ne_bot hK_le_M hM_norm_K
+  have hPH_subOf_p : IsPGroup p ((PH : Subgroup G).subgroupOf M) :=
+    PH.isPGroup'.comap_subtype
+  have hS_le_PH_subOf : (S : Subgroup ↥M) ≤ (PH : Subgroup G).subgroupOf M := by
+    intro s hs
+    have : M.subtype s ∈ SH := ⟨s, hs, rfl⟩
+    exact hSH_le_PH this
+  have hS_eq : (PH : Subgroup G).subgroupOf M = (S : Subgroup ↥M) :=
+    S.is_maximal' hPH_subOf_p hS_le_PH_subOf
+  suffices hSH_eq : SH = (PH : Subgroup G) by
+    exact ⟨PH, hSH_eq.symm.trans hSH_def⟩
+  refine le_antisymm hSH_le_PH ?_
+  by_contra hPH_not_le
+  have hSH_lt_PH : SH < (PH : Subgroup G) := lt_of_le_of_ne hSH_le_PH (by
+    intro h
+    exact hPH_not_le (le_of_eq h.symm))
+  haveI : Group.IsNilpotent ↥(PH : Subgroup G) := PH.isPGroup'.isNilpotent
+  have hNC : NormalizerCondition ↥(PH : Subgroup G) :=
+    normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup G))
+  have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hPH_not_le htop
+  have hlt := hNC (SH.subgroupOf (PH : Subgroup G)) hSH_subOf_lt_top
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  set tG : G := (t : G) with htG_def
+  have htG_norm_K : tG ∈ Subgroup.normalizer (K : Set G) := hN_SH_le_NK ht_norm
+  have htG_in_M : tG ∈ M := hNK_eq_M ▸ htG_norm_K
+  have htG_in_PH : tG ∈ (PH : Subgroup G) := t.2
+  have htM_in_S : (⟨tG, htG_in_M⟩ : ↥M) ∈ (S : Subgroup ↥M) := by
+    rw [← hS_eq, Subgroup.mem_subgroupOf]
+    exact htG_in_PH
+  have htG_in_SH : tG ∈ SH := ⟨⟨tG, htG_in_M⟩, htM_in_S, rfl⟩
+  exact ht_not htG_in_SH
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
