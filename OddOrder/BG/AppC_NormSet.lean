@@ -493,6 +493,37 @@ lemma root_not_mem_range [Fact p.Prime] {c : ZMod p} {a : GaloisField p 3}
   exact (Polynomial.aeval_algebraMap_eq_zero_iff_of_injective
     (algebraMap (ZMod p) (GaloisField p 3)).injective).mp hroot
 
+/-- The Frobenius-fixed elements of `𝔽_{p^q}` are exactly the prime field: if
+`x^p = x` then `x ∈ 𝔽_p` (the `p` roots of `X^p - X` are the prime field). -/
+lemma mem_range_of_pow_p_eq_self [Fact p.Prime] {x : GaloisField p q} (hx : x ^ p = x) :
+    x ∈ Set.range (algebraMap (ZMod p) (GaloisField p q)) := by
+  classical
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  set f : (GaloisField p q)[X] := X ^ p - X with hf
+  have hfne : f ≠ 0 := FiniteField.X_pow_card_sub_X_ne_zero _ (Fact.out : p.Prime).one_lt
+  have hfdeg : f.natDegree = p :=
+    FiniteField.X_pow_card_sub_X_natDegree_eq _ (Fact.out : p.Prime).one_lt
+  have hsub : (Finset.univ.image (algebraMap (ZMod p) (GaloisField p q))) ⊆ f.roots.toFinset := by
+    intro y hy
+    rw [Finset.mem_image] at hy
+    obtain ⟨b, _, rfl⟩ := hy
+    rw [Multiset.mem_toFinset, Polynomial.mem_roots hfne, Polynomial.IsRoot, hf]
+    simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X]
+    rw [← map_pow, ZMod.pow_card, sub_self]
+  have hxroot : x ∈ f.roots.toFinset := by
+    rw [Multiset.mem_toFinset, Polynomial.mem_roots hfne, Polynomial.IsRoot, hf]
+    simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, hx, sub_self]
+  have hcardimg : (Finset.univ.image (algebraMap (ZMod p) (GaloisField p q))).card = p := by
+    rw [Finset.card_image_of_injective _ (algebraMap (ZMod p) (GaloisField p q)).injective,
+      Finset.card_univ, ZMod.card]
+  have hcardroots : f.roots.toFinset.card ≤ p :=
+    (Multiset.toFinset_card_le _).trans ((Polynomial.card_roots' f).trans_eq hfdeg)
+  have heq : Finset.univ.image (algebraMap (ZMod p) (GaloisField p q)) = f.roots.toFinset :=
+    Finset.eq_of_subset_of_card_le hsub (by rw [hcardimg]; exact hcardroots)
+  rw [← heq, Finset.mem_image] at hxroot
+  obtain ⟨b, _, hb⟩ := hxroot
+  exact ⟨b, hb⟩
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
