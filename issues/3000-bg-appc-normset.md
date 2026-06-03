@@ -29,6 +29,10 @@ created: 2026-06-04
 - [x] **Remark (VII)** norm-one subgroup `U`: `normN` と `Algebra.norm` の bridge
   `normN_eq_algebraMap_norm`、`normOneUnits`、`mem_normOneUnits_iff_normN`、
   `normOneUnits_card : |U| = (p^q - 1)/(p - 1)` を追加し、AxiomsCheck 登録。
+- [x] **Remark (VII)** prime-field/norm-one decomposition:
+  `primeFieldUnits`、`unitsMap_norm_primeFieldUnit`、条件(A)下の `q` 乗全射
+  `zmodUnits_pow_surjective_of_conditionA`、および
+  `exists_primeFieldUnit_mul_normOne : 𝔽_{p^q}ˣ = 𝔽_pˣ · U` 型の分解補題を追加。
 - [x] **C.2 structure-constant bridge**: `normOnePairSet` と
   `normOnePairSet_ncard_eq_normSetE_ncard` を追加。`|E|` を `u+v=2` を満たす
   norm-one unit pairs の個数として同一視し、q≥5 の Frobenius 群 class-sum 計算への入口を materialize。

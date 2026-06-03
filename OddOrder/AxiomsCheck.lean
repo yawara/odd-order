@@ -1809,6 +1809,10 @@ set_option linter.style.longLine false in
 -- `(p^q - 1)/(p - 1)`, the `|U|` used in the `q ≥ 5` branch of Lemma C.2.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card
 
+-- BG App C Remark (VII): under condition (A), every unit of `𝔽_{p^q}` splits
+-- as a prime-field unit times a norm-one unit.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_primeFieldUnit_mul_normOne
+
 -- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
 -- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard

@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
@@ -45,6 +46,8 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
 * `conditionA_iff_not_dvd` — **Remark (I)**: condition (A) `⟺ q ∤ (p-1)`.
 * `normOneUnits_card` — **Remark (VII)**: the norm-one subgroup
   `U ≤ 𝔽_{p^q}ˣ` has order `(p^q - 1)/(p - 1)`.
+* `exists_primeFieldUnit_mul_normOne` — **Remark (VII)**: under condition (A),
+  every unit of `𝔽_{p^q}` is a prime-field unit times an element of `U`.
 * `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
   identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
 * `normOnePairSetAt_ncard_eq_normSetE_ncard` — the same bridge in BG
@@ -110,6 +113,12 @@ lemma normN_eq_algebraMap_norm [Fact p.Prime] (hq : q ≠ 0) (x : GaloisField p 
 noncomputable def normOneUnits [Fact p.Prime] : Subgroup (GaloisField p q)ˣ :=
   (Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))).ker
 
+/-- The subgroup of `𝔽_{p^q}ˣ` consisting of units coming from the prime field
+`𝔽_pˣ`.  Under condition (A), BG Appendix C Remark (VII) uses this subgroup
+together with `U` to decompose `𝔽_{p^q}ˣ`. -/
+noncomputable def primeFieldUnits [Fact p.Prime] : Subgroup (GaloisField p q)ˣ :=
+  (Units.map ((algebraMap (ZMod p) (GaloisField p q)).toMonoidHom)).range
+
 lemma mem_normOneUnits_iff_normN [Fact p.Prime] (hq : q ≠ 0)
     (u : (GaloisField p q)ˣ) :
     u ∈ normOneUnits p q ↔ normN p q (u : GaloisField p q) = 1 := by
@@ -147,6 +156,13 @@ theorem normOneUnits_card [Fact p.Prime] (hq : q ≠ 0) :
     rw [hker, ← hindex, f.ker.card_mul_index, hdom]
   exact Nat.eq_div_of_mul_eq_right (ne_of_gt (Nat.sub_pos_of_lt (Fact.out : p.Prime).one_lt))
     (by simpa [mul_comm] using hmul)
+
+/-- The norm of a prime-field unit, viewed in `𝔽_{p^q}`, is its `q`-th power. -/
+theorem unitsMap_norm_primeFieldUnit [Fact p.Prime] (hq : q ≠ 0) (b : (ZMod p)ˣ) :
+    Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))
+        (Units.map ((algebraMap (ZMod p) (GaloisField p q)).toMonoidHom) b) = b ^ q := by
+  ext
+  simp [Algebra.norm_algebraMap, GaloisField.finrank p hq]
 
 /-- The pair set `{(u, v) ∈ U × U | u + v = 2}` whose cardinality is the
 structure constant identified with `|E|` in BG Appendix C, Lemma C.2. -/
@@ -238,6 +254,56 @@ theorem conditionA_iff_not_dvd (hp : 2 ≤ p) (hq : q.Prime) :
     rw [hsum, ← ZMod.isUnit_iff_coprime, ← ZMod.isUnit_iff_coprime, hsumcast]
   rw [hcop]
   exact hq.coprime_iff_not_dvd
+
+/-- Under BG Appendix C condition (A), the `q`-power map on the prime-field unit
+group `(ZMod p)ˣ` is surjective.  This is the finite cyclic-group input in
+Remark (VII), used to split `𝔽_{p^q}ˣ` into prime-field units times `U`. -/
+theorem zmodUnits_pow_surjective_of_conditionA [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
+    Function.Surjective (fun b : (ZMod p)ˣ => b ^ q) := by
+  classical
+  have hnot : ¬ q ∣ (p - 1) :=
+    (conditionA_iff_not_dvd p q (Fact.out : p.Prime).two_le hq).mp hA
+  have hcop : Nat.Coprime (p - 1) q :=
+    ((hq.coprime_iff_not_dvd).mpr hnot).symm
+  have hgcd : (Nat.card (ZMod p)ˣ).gcd q = 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units]
+    exact hcop
+  have hindex : (powMonoidHom q : (ZMod p)ˣ →* (ZMod p)ˣ).range.index = 1 := by
+    rw [IsCyclic.index_powMonoidHom_range, hgcd]
+  have htop : (powMonoidHom q : (ZMod p)ˣ →* (ZMod p)ˣ).range = ⊤ :=
+    Subgroup.index_eq_one.mp hindex
+  intro x
+  have hx : x ∈ (powMonoidHom q : (ZMod p)ˣ →* (ZMod p)ˣ).range := by
+    rw [htop]
+    exact trivial
+  rcases hx with ⟨b, rfl⟩
+  exact ⟨b, rfl⟩
+
+/-- **BG Appendix C, Remark (VII)** decomposition: under condition (A), every unit
+of `𝔽_{p^q}` is a product of a prime-field unit and a norm-one unit.  This is the
+Lean form of `𝔽_{p^q}ˣ = 𝔽_pˣ · U` used before the generator-relation argument. -/
+theorem exists_primeFieldUnit_mul_normOne [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (x : (GaloisField p q)ˣ) :
+    ∃ b : (ZMod p)ˣ, ∃ u : normOneUnits p q,
+      x = Units.map ((algebraMap (ZMod p) (GaloisField p q)).toMonoidHom) b *
+        (u : (GaloisField p q)ˣ) := by
+  classical
+  let normMap : (GaloisField p q)ˣ →* (ZMod p)ˣ :=
+    Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))
+  obtain ⟨b, hb⟩ := zmodUnits_pow_surjective_of_conditionA p q hq hA (normMap x)
+  let bF : (GaloisField p q)ˣ :=
+    Units.map ((algebraMap (ZMod p) (GaloisField p q)).toMonoidHom) b
+  let uUnit : (GaloisField p q)ˣ := bF⁻¹ * x
+  have hu_mem : uUnit ∈ normOneUnits p q := by
+    change normMap uUnit = 1
+    calc
+      normMap uUnit = (normMap bF)⁻¹ * normMap x := by simp [uUnit, bF]
+      _ = (b ^ q)⁻¹ * normMap x := by rw [unitsMap_norm_primeFieldUnit p q hq.ne_zero b]
+      _ = 1 := by rw [← hb]; simp
+  refine ⟨b, ⟨uUnit, hu_mem⟩, ?_⟩
+  simp [uUnit, bF]
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 

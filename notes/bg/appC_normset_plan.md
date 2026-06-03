@@ -84,6 +84,16 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `normOneUnits_card : |U| = (p^q - 1)/(p - 1)` を sorry-free 証明し、AxiomsCheck に登録。
 これは C.2(q≥5) の Frobenius 群 `H=P⋊U` で使う `|U|` の基礎補題。
 
+#### ✅ Remark (VII) / `𝔽_{p^q}ˣ = 𝔽_pˣ · U` 分解完成 (2026-06-04)
+`primeFieldUnits` を `Units.map (algebraMap 𝔽_p 𝔽_{p^q})` の range として定義。
+条件(A)から `q∤(p-1)` を経由し、cyclic group API
+`IsCyclic.index_powMonoidHom_range` で `(ZMod p)ˣ` 上の `q` 乗写像が全射
+(`zmodUnits_pow_surjective_of_conditionA`) と証明。さらに
+`unitsMap_norm_primeFieldUnit` (`N(b)=b^q`) を使って、任意の `x∈𝔽_{p^q}ˣ` を
+`x = b * u` (`b∈𝔽_pˣ`, `u∈U`) と分解する
+`exists_primeFieldUnit_mul_normOne` を追加し、AxiomsCheck に登録。
+これは BG C.3 Step1 の `F^* = F_p^* × U` 使用箇所へ向けた前処理。
+
 #### ✅ C.2 structure-constant bridge 完成 (2026-06-04)
 `normOnePairSet : Set (U × U)` を `{(u,v) | u+v=2}` として定義し、
 `normOnePairSet_ncard_eq_normSetE_ncard` で `|E|` とこの pair set の個数を同一視。
