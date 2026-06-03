@@ -291,6 +291,41 @@ theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B :
     B = A₀ :=
   hA₀.2.2 B hB hBH hA₀B
 
+/-- The subgroup A0, restricted to C_F(M)(A0), lies in that relative centralizer's center. -/
+theorem subgroupOf_cFitting_le_center (M A0 : Subgroup G) :
+    A0.subgroupOf (Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M) ≤
+      Subgroup.center ↥(Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M) := by
+  let A : Subgroup G := Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M
+  change A0.subgroupOf A ≤ Subgroup.center ↥A
+  intro x hx
+  rw [Subgroup.mem_center_iff]
+  intro y
+  apply Subtype.ext
+  rw [Subgroup.mem_subgroupOf] at hx
+  have hycent : (y : G) ∈ Subgroup.centralizer (A0 : Set G) := y.2.1
+  exact (Subgroup.mem_centralizer_iff.mp hycent (x : G) hx).symm
+
+/-- If m(A0) >= 3, then m(Z(C_F(M)(A0))) >= 3. -/
+theorem three_le_rank_center_cFitting_of_isMaxElemAbelianIn [Finite G]
+    {p : ℕ} {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0) :
+    3 ≤ rank ↥(Subgroup.center ↥(Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M)) := by
+  let A : Subgroup G := Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M
+  have hA0A : A0 ≤ A := by
+    dsimp [A]
+    exact isMaxElemAbelianIn_le_centralizer_inf hA0
+  have hA0sub_le_center : A0.subgroupOf A ≤ Subgroup.center ↥A := by
+    dsimp [A]
+    exact subgroupOf_cFitting_le_center M A0
+  have hsub_rank : rank ↥(A0.subgroupOf A) ≤ rank ↥(Subgroup.center ↥A) :=
+    rank_le_of_injective (Subgroup.inclusion_injective hA0sub_le_center)
+  have hA0_rank_le_sub : rank ↥A0 ≤ rank ↥(A0.subgroupOf A) :=
+    rank_le_of_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hA0A).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hA0A).symm.injective
+  exact hm.trans (hA0_rank_le_sub.trans hsub_rank)
+
 private theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hLM : (L.subgroupOf M).Normal)
     (hLne : L ≠ ⊥) (hLleM : L ≤ M) :
@@ -406,6 +441,9 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
       Subgroup.centralizer
           ((Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M : Subgroup G) : Set G) ≤ M :=
     centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
+  have hCenterRank :
+      3 ≤ rank ↥(Subgroup.center ↥(Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M)) :=
+    three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA₀ hm
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
