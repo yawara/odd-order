@@ -1340,6 +1340,59 @@ private theorem conj_smul_kSubgroup_eq [Finite G] {A : Subgroup G} {x : G}
         _ = x⁻¹ * y * x * a := by group
   rw [kSubgroup, conj_smul_opiCoreInG, hCeq]
 
+/-- **Conjugation transports normalization**: `S ≤ N(Q) ⟹ conj g • S ≤ N(conj g • Q)`. -/
+private theorem conj_smul_le_normalizer_of_le_normalizer {S Q : Subgroup G} {g : G}
+    (hS : S ≤ Subgroup.normalizer Q) :
+    MulAut.conj g • S ≤ Subgroup.normalizer (MulAut.conj g • Q) := by
+  intro y hy
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy
+  have hyN : (MulAut.conj g)⁻¹ • y ∈ Subgroup.normalizer Q := hS hy
+  -- `y = conj g • ((conj g)⁻¹ • y)` normalizes `conj g • Q`.
+  apply mem_normalizer_of_conj_smul_eq_self
+  have hcval : ((MulAut.conj g)⁻¹ • y) = g⁻¹ * y * g := by
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply]; group
+  have hyeq : MulAut.conj y • (MulAut.conj g • Q)
+      = MulAut.conj g • (MulAut.conj ((MulAut.conj g)⁻¹ • y) • Q) := by
+    rw [hcval, smul_smul, smul_smul, ← map_mul, ← map_mul]
+    congr 2
+    group
+  rw [hyeq, conj_smul_eq_self_of_mem_normalizer hyN]
+
+/-- **A `K`-element normalizing `P` centralizes `P`** (`N_K(P) = C_K(P)`, mmd L2242): if
+`A ⊴ P` (so `P ≤ N_G(A)`, whence `P` normalizes `K = O_{π'}(C_G(A))`) and `P ⊓ K = 1`
+(coprime orders), then `c ∈ K` normalizing `P` lies in `C_G(P)`. For `x ∈ P`,
+`⁅x, c⁆ ∈ P` (as `c ∈ N(P)`) and `⁅x, c⁆ ∈ K` (as `P ≤ N(K)`, `c ∈ K`), so `⁅x,c⁆ ∈ P⊓K = 1`. -/
+private theorem mem_centralizer_of_mem_kSubgroup_normalizer [Finite G] {A P : Subgroup G}
+    (hPnA : P ≤ Subgroup.normalizer A) (hPK : P ⊓ kSubgroup A = ⊥)
+    {c : G} (hcK : c ∈ kSubgroup A) (hcN : c ∈ Subgroup.normalizer P) :
+    c ∈ Subgroup.centralizer (P : Set G) := by
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  -- `⁅x, c⁆ = x c x⁻¹ c⁻¹ ∈ P ⊓ K = 1`.
+  have hxcx : x * c * x⁻¹ ∈ kSubgroup A := by
+    have h := conj_smul_kSubgroup_eq (hPnA hx)
+    have hmem : MulAut.conj x c ∈ MulAut.conj x • kSubgroup A :=
+      Subgroup.smul_mem_pointwise_smul_iff.mpr hcK
+    rw [h] at hmem
+    simpa only [MulAut.conj_apply] using hmem
+  have hcomm_K : x * c * x⁻¹ * c⁻¹ ∈ kSubgroup A :=
+    (kSubgroup A).mul_mem hxcx ((kSubgroup A).inv_mem hcK)
+  have hcomm_P : x * c * x⁻¹ * c⁻¹ ∈ P := by
+    have hcxc : c * x⁻¹ * c⁻¹ ∈ P :=
+      (Subgroup.mem_normalizer_iff.mp hcN x⁻¹).mp (P.inv_mem hx)
+    have : x * c * x⁻¹ * c⁻¹ = x * (c * x⁻¹ * c⁻¹) := by group
+    rw [this]; exact P.mul_mem hx hcxc
+  have hcomm_one : x * c * x⁻¹ * c⁻¹ = 1 := by
+    have : x * c * x⁻¹ * c⁻¹ ∈ P ⊓ kSubgroup A := Subgroup.mem_inf.mpr ⟨hcomm_P, hcomm_K⟩
+    rw [hPK, Subgroup.mem_bot] at this
+    exact this
+  -- `x c x⁻¹ c⁻¹ = 1 ⟹ x * c = c * x`.
+  have : x * c = c * x := by
+    have h2 : x * c * x⁻¹ = c := mul_inv_eq_one.mp hcomm_one
+    calc x * c = (x * c * x⁻¹) * x := by group
+      _ = c * x := by rw [h2]
+  exact this
+
 /-- **`ℋ_⊤(A;π)` は `N_G(A)`-共役で安定** (C_G(A) 版 `conj_smul_mem_hInvariant_top` の N_G(A) 拡張)。
 `g` が `A` を (conj 作用で) 不変にすれば `conj g • Q` も `A`-不変。 -/
 private theorem conj_smul_mem_hInvariant_of_normalizer {A : Subgroup G} {π : Set ℕ}
