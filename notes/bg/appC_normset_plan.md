@@ -152,6 +152,14 @@ AxiomsCheck 登録済み。
 次の q≥5 target は、この全既約指標和を BG の induced degree-`|U|` characters 部分和の上界へ制限し、
 structure coefficient lower bound に組み込むこと。AxiomsCheck 登録済み。
 
+#### ✅ q≥5 induced-character Frobenius specialization (2026-06-04)
+`normOneFrobeniusKernel_index_eq_normOneUnits_card` で additive kernel `P≤H` の index を `|U|` に固定。
+さらに `InducedIrreducible` API を concrete Frobenius group に特殊化し、
+`normOneFrobeniusKernel_induce_isIrreducible` で非自明な `Irr(P)` の誘導が `Irr(H)` になること、
+`normOneFrobeniusKernel_induce_apply_one` で degree factor が `|U| * θ(1)` になることを証明した。
+次は `P` が abelian なので `θ(1)=1` となる側と、これら induced characters の値を class-sum coefficient
+の character formula に入れる側を作る。AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

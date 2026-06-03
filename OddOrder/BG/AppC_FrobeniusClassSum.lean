@@ -7,6 +7,7 @@ import Mathlib.Data.Set.Card.Arithmetic
 import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
@@ -131,6 +132,20 @@ theorem normOneFrobenius_isFrobeniusGroup [Fact p.Prime] (hq : 1 < q) :
       exact Units.ext huval
     exact ha (by simp [hu])
 
+/-- The additive kernel has index `|U|` in the concrete Frobenius group
+`H = P ⋊ U`. This is the degree factor for induced characters from `P` to `H`. -/
+theorem normOneFrobeniusKernel_index_eq_normOneUnits_card [Fact p.Prime] :
+    (normOneFrobeniusKernel p q).index = Nat.card (normOneUnits p q) := by
+  have hidx :
+      (normOneFrobeniusKernel p q).index =
+        Nat.card (normOneFrobeniusComplement p q) :=
+    (normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement p q).symm.index_eq_card
+  have hcard :
+      Nat.card (normOneUnits p q) = Nat.card (normOneFrobeniusComplement p q) :=
+    Nat.card_congr (Equiv.ofInjective _ SemidirectProduct.inr_injective
+      (β := normOneFrobeniusGroup p q))
+  rw [hidx, ← hcard]
+
 /-- The concrete Frobenius group `P ⋊ U` is finite; class-sum coefficients need
 a `Fintype` instance.  `SemidirectProduct` is structurally just the product of
 its left and right coordinates. -/
@@ -143,6 +158,45 @@ noncomputable instance normOneFrobeniusGroup_fintype [Fact p.Prime] :
       invFun := fun x => (x.left, x.right)
       left_inv := by intro x; rfl
       right_inv := by intro x; ext <;> rfl }
+
+/-- Over `ℂ`, the concrete Frobenius-group cardinality is invertible. -/
+noncomputable instance normOneFrobeniusGroup_card_invertible [Fact p.Prime] :
+    Invertible (Nat.card (normOneFrobeniusGroup p q) : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
+/-- The additive kernel is finite as a subtype of the concrete Frobenius group. -/
+noncomputable instance normOneFrobeniusKernel_fintype [Fact p.Prime] :
+    Fintype (normOneFrobeniusKernel p q) :=
+  Fintype.ofFinite _
+
+/-- Over `ℂ`, the additive-kernel cardinality is invertible. -/
+noncomputable instance normOneFrobeniusKernel_card_invertible [Fact p.Prime] :
+    Invertible (Nat.card (normOneFrobeniusKernel p q) : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
+/-- Nontrivial irreducible characters of the additive kernel induce irreducibly
+to the concrete Frobenius group `H = P ⋊ U`. This is the App C specialization
+of Isaacs Theorem 6.34 used to build the q≥5 induced-character family. -/
+theorem normOneFrobeniusKernel_induce_isIrreducible [Fact p.Prime] (hq : 1 < q)
+    (θ : IrreducibleCharacter (normOneFrobeniusKernel p q))
+    (hθ_ne : θ ≠ trivialIrreducibleCharacter (normOneFrobeniusKernel p q)) :
+    IsIrreducibleCharacter
+      (ClassFunction.induce (normOneFrobeniusKernel p q)
+        (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)) := by
+  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  exact isIrreducibleCharacter_induce_of_frobeniusGroup
+    (normOneFrobenius_isFrobeniusGroup p q hq) θ hθ_ne
+
+/-- Degree formula for induced class functions from the additive kernel: the
+index factor is the norm-one complement size `|U|`. -/
+theorem normOneFrobeniusKernel_induce_apply_one [Fact p.Prime]
+    (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) :
+    ClassFunction.induce (normOneFrobeniusKernel p q) θ
+        (1 : normOneFrobeniusGroup p q) =
+      (Nat.card (normOneUnits p q) : ℂ) *
+        θ (1 : normOneFrobeniusKernel p q) := by
+  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  rw [ClassFunction.induce_apply_one, normOneFrobeniusKernel_index_eq_normOneUnits_card]
 
 /-- A nonzero element of the additive kernel is nontrivial in the concrete
 Frobenius group `H = P ⋊ U`. -/
