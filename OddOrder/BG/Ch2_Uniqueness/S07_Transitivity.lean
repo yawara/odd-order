@@ -1081,6 +1081,78 @@ private theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
   exact ⟨opiCoreInG_le π X, hAX.trans (le_normalizer_opiCoreInG π X),
     isPiSubgroup_opiCoreInG π X⟩
 
+/-- **`oPiCore` is natural under a group isomorphism**: `(O_π G₁).map φ = O_π G₂` for
+`φ : G₁ ≃* G₂` (apply `oPiCore.map_le_of_surjective` to `φ` and to `φ.symm`). General lemma;
+could be promoted to `Ch03`. Used by `opiCoreInG_eq_map_subgroupOf`. -/
+private theorem oPiCore_map_mulEquiv {G₁ G₂ : Type*} [Group G₁] [Finite G₁] [Group G₂] [Finite G₂]
+    (π : Set ℕ) (φ : G₁ ≃* G₂) :
+    (Ch03.oPiCore π G₁).map φ.toMonoidHom = Ch03.oPiCore π G₂ := by
+  refine le_antisymm (Ch03.oPiCore.map_le_of_surjective π φ.toMonoidHom φ.surjective) ?_
+  intro h hh
+  exact ⟨φ.symm h,
+    Ch03.oPiCore.map_le_of_surjective π φ.symm.toMonoidHom φ.symm.surjective ⟨h, hh, rfl⟩, by simp⟩
+
+/-- **`opiCoreInG` transport to an intermediate subgroup**: for `K ≤ X`,
+`O_π(K) = O_π(K.subgroupOf X)` mapped from `↥X` back to `G`. Lets one apply a result proved
+inside `↥X` (e.g. Proposition 1.15(b) with ambient group `↥X`) to the ambient realization
+`opiCoreInG π K`. General lemma; could be promoted to `SubgroupInAmbient`. -/
+private theorem opiCoreInG_eq_map_subgroupOf [Finite G] {π : Set ℕ} {X K : Subgroup G}
+    (hKX : K ≤ X) :
+    opiCoreInG π K = (opiCoreInG π (K.subgroupOf X)).map X.subtype := by
+  have hcomp : X.subtype.comp (K.subgroupOf X).subtype
+      = K.subtype.comp (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom :=
+    MonoidHom.ext fun _ => rfl
+  calc opiCoreInG π K
+      = ((Ch03.oPiCore π ↥(K.subgroupOf X)).map
+            (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom).map K.subtype := by
+        rw [oPiCore_map_mulEquiv]; rfl
+    _ = (Ch03.oPiCore π ↥(K.subgroupOf X)).map
+            (K.subtype.comp (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom) := by
+        rw [Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥(K.subgroupOf X)).map (X.subtype.comp (K.subgroupOf X).subtype) := by
+        rw [hcomp]
+    _ = (opiCoreInG π (K.subgroupOf X)).map X.subtype := by
+        rw [← Subgroup.map_map]; rfl
+
+/-- **Relativized BG Proposition 1.15(b)**: for a finite solvable subgroup `X ≤ G` and a
+`p`-subgroup `R ≤ X`, `O_{p'}(C_X(R)) ≤ O_{p'}(X)` (both realized in the ambient `G`). Obtained
+from the absolute Prop 1.15(b) (`oPiPrimeCore_centralizer_le_oPiPrimeCore`) inside the group `↥X`,
+transported back to `G` via `opiCoreInG_eq_map_subgroupOf`. Here `C_X(R) = C_G(R) ⊓ X`. This is
+the cross-group bridge for Proposition 7.5's general case (and is reusable in §8–§16). -/
+private theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {R : Subgroup G} (hRX : R ≤ X) (hRp : IsPGroup p R) :
+    opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X)
+      ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  haveI := hXsolv
+  have hR'p : IsPGroup p (R.subgroupOf X) := by
+    obtain ⟨n, hn⟩ := hRp.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRX).toEquiv]; exact hn)
+  have hbridge : (Subgroup.centralizer (R : Set G) ⊓ X).subgroupOf X
+      = Subgroup.centralizer ((R.subgroupOf X : Subgroup ↥X) : Set ↥X) := by
+    ext x
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_inf, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+    constructor
+    · rintro ⟨hc, -⟩ m hm
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at hm
+      exact Subtype.ext (hc (m : G) hm)
+    · intro hc
+      refine ⟨?_, x.2⟩
+      intro r hr
+      exact congrArg Subtype.val
+        (hc ⟨r, hRX hr⟩ (by rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hr))
+  have habs := OddOrder.BG.Ch1.S01.oPiPrimeCore_centralizer_le_oPiPrimeCore (G := ↥X) hR'p
+  calc opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X)
+      = (opiCoreInG ({p} : Set ℕ)ᶜ
+          ((Subgroup.centralizer (R : Set G) ⊓ X).subgroupOf X)).map X.subtype :=
+        opiCoreInG_eq_map_subgroupOf inf_le_right
+    _ = (opiCoreInG ({p} : Set ℕ)ᶜ
+          (Subgroup.centralizer ((R.subgroupOf X : Subgroup ↥X) : Set ↥X))).map X.subtype := by
+        rw [hbridge]
+    _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥X).map X.subtype := Subgroup.map_mono habs
+    _ = opiCoreInG ({p} : Set ℕ)ᶜ X := rfl
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}

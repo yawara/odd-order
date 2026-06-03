@@ -94,12 +94,13 @@ case 1 から `|Z|=p`, `B = ⟨b⟩ × Z` と仮定可。`P₁ = C_P(b)`, `P₂`
 4. **bar-quotient bridge**: `(oPiPrimePiCore {p} X).map (mk' (oPiCore {p}ᶜ X)) = opCore p (X/O_{p'}(X))`
    (`oPiPrimePiCore` 定義 unfold + `map_comap` + `oPiCore_singleton_eq_opCore`)。
    `[Ā,Ȳ]⊆O_p(X̄)∩Ȳ` の commutator-in-quotient 計算も。
-5. **🔴 relativized Prop 1.15(b)** (general case 律速・最大の型juggling): 絶対形
-   `oPiPrimeCore_centralizer_le_oPiPrimeCore` は「群 G'」版。general case の `O_{p'}(C_X(b)) ≤ O_{p'}(X)`
-   は **G' := ↥X** で適用 → 結論は ↥X 上の subgroup。これを ambient G の `opiCoreInG {p}ᶜ (C_X(b))`
-   (C_X(b) = centralizer b ⊓ X) ↔ `opiCoreInG {p}ᶜ X` に翻訳する transport 補題が要 (↥X ≃ X 経由,
-   `oPiCore`・`opiCoreInG` と `.subgroupOf X`/`.map X.subtype` の往復)。**~50-100 LOC, G/↥X/↥(C_X(b)) 三層**。
-   special2 の `C_Y(Z) ⊆ O_{p'}(C_X(Z)) ⟹ O_{p'}(X)` も同型。
+5. **✅ relativized Prop 1.15(b)** = `opiCoreInG_centralizer_inf_le_opiCoreInG` (S07, done, build-green):
+   `IsSolvable ↥X` + `R≤X` p-subgroup ⟹ `opiCoreInG {p}ᶜ (C_G(R)⊓X) ≤ opiCoreInG {p}ᶜ X`。
+   絶対形を **G':=↥X** で適用 → transport で ambient へ。支える新規補題 (両方 done):
+   - `oPiCore_map_mulEquiv` (φ:G₁≃*G₂ ⟹ `(O_π G₁).map φ = O_π G₂`; `map_le_of_surjective` 両方向)。
+   - `opiCoreInG_eq_map_subgroupOf` (`K≤X` ⟹ `O_π(K) = (O_π(K.subgroupOf X)).map X.subtype`; iso-naturality + map_map)。
+   - centralizer bridge `(C_G(R)⊓X).subgroupOf X = centralizer (R.subgroupOf X : Set ↥X)` (inline)。
+   special2 の `C_Y(Z) ⊆ O_{p'}(C_X(Z)) ⟹ O_{p'}(X)` も同じ補題で。
 6. **B-construction** (E_p² in A normal in P) helper (cyclic/noncyclic Z(P) 2 分岐 + G 2.6.4)。
 
 ### general case の精密分解 (helper 3/5 + 確認済 lemma で組める, 2026-06-03 設計)
