@@ -33,6 +33,37 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `Polynomial.card_roots'` (#roots ≤ natDegree), `Nat.card_range_of_injective` (|F_p|=p)。
 **norm の積形**: 自前定義 `normN x := ∏_{i<q} x^{p^i}` (= 実 field norm; Algebra.norm 接続は C.2 用に後回し)。
 
+#### C.1 実装詳細 (2026-06-04 精緻化, 次セッション用ステップ)
+**✅ 済 (commit aab7be8/次)**: `normN_one`/`normN_mul`/`normN_ne_zero`/`mem_normSetE_iff`/
+`two_sub_mem_normSetE` (a∈E ⟹ 2-a∈E)/`one_mem_normSetE` (1∈E)。
+
+**残コア = 2 ブロック**:
+
+**(B1) `∀ k:ℕ, N(d_k) = 1`** where `d_k := (k+1 : F) - (k : F) * a` (= `(1-a)•k + 1`)。
+反復列 `a₀=a, a_{k+1} = (2 - a_k)⁻¹` を定義 (`Nat.rec`)。
+- `aₖ ∈ E` ∀k: 帰納。base a∈E; step `two_sub_mem_normSetE` + `hEinv` (E=E⁻¹) で `(2-aₖ)⁻¹∈E`
+  (`a∈E⁻¹ ↔ a⁻¹∈E`, `Set.mem_inv`)。⟹ `N(aₖ)=1`, `aₖ≠0`, `2-aₖ≠0` (norm 1 ⟹ ≠0; `ne_zero` 補題要追加: `normN x=1 ⟹ x≠0`, q>0 で `normN 0=0`)。
+- **closed form `aₖ = d_{k-1}/d_k` (k≥1) + `d_k≠0`**: 帰納。**鍵代数等式 `2·d_k - d_{k-1} = d_{k+1}`**
+  (`2((k+1)-ka) - (k-(k-1)a) = (k+2)-(k+1)a`, `ring`/`push_cast`+`ring` で k:ℕ→F cast 注意)。
+  step: `2 - aₖ = 2 - d_{k-1}/d_k = (2d_k - d_{k-1})/d_k = d_{k+1}/d_k` ≠0 (∵ 2-aₖ≠0) ⟹ d_{k+1}≠0,
+  `a_{k+1}=(2-aₖ)⁻¹ = d_k/d_{k+1}`。
+- `N(d_k)=1`: `aₖ=d_{k-1}/d_k∈E` ⟹ `N(d_{k-1}/d_k)=1` ⟹ `N(d_{k-1})=N(d_k)` (normN_mul + inv);
+  `N(d_0)=N(1)=1` から帰納。**別法 (簡)**: `∏_{j=1}^k aⱼ = d_0/d_k = 1/d_k` (telescoping) ⟹ `N(1/d_k)=1`。
+
+**(B2) 多項式根数 ⟹ p≤q**:
+- `frobPoly := ∏ i∈range q, (C ((1-a)^(p^i)) * X + 1) : F[X]`。`g := frobPoly - C 1`。
+- **`g.natDegree = q`**: 各因子 degree 1 (leading `(1-a)^{p^i}≠0` ∵ a≠1 ⟹ `normN_ne_zero`); `Polynomial.natDegree_prod`
+  (domain, 全因子≠0) ⟹ deg = ∑1 = q; `-C 1` は deg q≥1 不変 (`natDegree_sub_C`?)。
+- **eval at k∈F_p**: `g.eval (↑m) = N((1-a)•↑m + 1) - 1 = N(d_m)-1 = 0` (B1)。
+  ∵ `((1-a)↑m+1)^{p^i} = (1-a)^{p^i}·↑m + 1` (Frobenius: `frobenius`/`add_pow_char`+`(↑m)^{p^i}=↑m` で
+  `m∈F_p`; `FiniteField.pow_card`/prime subfield)。`frobPoly.eval ↑m = ∏((1-a)^{p^i}↑m+1) = N((1-a)↑m+1)`。
+- **p 個の root**: `Finset.image (algebraMap (ZMod p) F) univ` (card p, `Nat.card_range_of_injective`/`Finset.card_image_of_injective`)
+  ⊆ `g.roots.toFinset`。`g≠0` (deg q≥1)。`Polynomial.card_roots'` / `Finset.card_le_card` ⟹ `p ≤ #roots ≤ deg g = q`。
+
+**罠**: k:ℕ→F cast は `Nat.cast`; `d_k` の `(k:F)` と多項式の root `(↑m : F)` (m:ZMod p) の対応 =
+`m=0..p-1` の ℕcast が F_p の全元 (char p, ℕ→F が 0..p-1 で単射)。`push_cast`+`ring` 多用。
+`Set.ncard ≥ 2 ⟹ ∃ a∈E, a≠1`: `Set.one_lt_ncard_iff` 等で 2 元抽出, 1∈E と異なる方を採用。
+
 ### Lemma C.2 — `|E|≥2` 【q=3 純有限体 / q≥5 Frobenius 指標論】
 - **q=3**: 多項式 `f_c(x)=x(x-2)(x-c)+(x-1)`。ある c∈F_p で F_p に根なし ⟹ その根 a∈F_{p^3} が
   `N(a)=N(2-a)=1` ⟹ a∈E; さらに 1∈E ⟹ |E|≥2。純有限体。

@@ -71,6 +71,38 @@ noncomputable def normN [Fact p.Prime] (x : GaloisField p q) : GaloisField p q :
 def normSetE [Fact p.Prime] : Set (GaloisField p q) :=
   {a | normN p q a = 1 ∧ normN p q (2 - a) = 1}
 
+/-! ### Basic algebra of the norm and the norm set -/
+
+@[simp] lemma normN_one [Fact p.Prime] : normN p q (1 : GaloisField p q) = 1 := by
+  simp [normN]
+
+/-- The norm is multiplicative (it is a product of multiplicative maps). -/
+lemma normN_mul [Fact p.Prime] (x y : GaloisField p q) :
+    normN p q (x * y) = normN p q x * normN p q y := by
+  simp only [normN, mul_pow, Finset.prod_mul_distrib]
+
+/-- The norm of a nonzero element is nonzero. -/
+lemma normN_ne_zero [Fact p.Prime] {x : GaloisField p q} (hx : x ≠ 0) :
+    normN p q x ≠ 0 := by
+  simp only [normN]
+  exact Finset.prod_ne_zero_iff.mpr fun i _ => pow_ne_zero _ hx
+
+lemma mem_normSetE_iff [Fact p.Prime] {a : GaloisField p q} :
+    a ∈ normSetE p q ↔ normN p q a = 1 ∧ normN p q (2 - a) = 1 := Iff.rfl
+
+/-- `E` is symmetric under `a ↦ 2 - a` (the two norm conditions just swap). -/
+lemma two_sub_mem_normSetE [Fact p.Prime] {a : GaloisField p q}
+    (ha : a ∈ normSetE p q) : (2 - a) ∈ normSetE p q := by
+  refine ⟨ha.2, ?_⟩
+  rw [show (2 : GaloisField p q) - (2 - a) = a by ring]
+  exact ha.1
+
+/-- `1 ∈ E`, since `N(1) = N(2-1) = N(1) = 1`. -/
+lemma one_mem_normSetE [Fact p.Prime] : (1 : GaloisField p q) ∈ normSetE p q := by
+  refine ⟨normN_one p q, ?_⟩
+  rw [show (2 : GaloisField p q) - 1 = 1 by ring]
+  exact normN_one p q
+
 /-! ## Remark (I): condition (A) ⟺ q ∤ (p-1) -/
 
 /-- **BG Appendix C, Remark (I)** (mmd L4877): condition (A),
