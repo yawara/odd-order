@@ -416,6 +416,9 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
   `(χ.conj−χ).support ⊆ supportInSubgroup (sharpImage H) L`。χ=Ind θ, H 正規 ⟹
   `support_induce_subset_of_normal` (InducedCharacter:343) で support⊆H; χ.conj−χ は 1 で消える
   (χ(1)=(n:ℂ) 実 via `exists_natDegree_charValue_one_dvd_card`) ⟹ ⊆ H^#=`sharpImage H`=map\{1}。standalone per-χ。
+- ✅ **T8.3a/3b** `Xset_closedUnderConjugate` + `Xset_hasNoRealCharacters` (commit b6d0ce1, axiom-clean):
+  set-level `ClosedUnderConjugate`/`HasNoRealCharacters (Xset Z)`。conj-closure = `Xset_eq` +
+  `characterKernel_conj` (Z⊴L ⟹ Ker χ̄=Ker χ); no-real = T8.1 を quantify。**enumeration の入力**。
 - **T8.3** degree data (`a`/`famRatio`/`famDegree`/`famDegree_chi`/`famRatio_chi1`): enumeration 依存ゆえ
   T8.6 と一体化 (induce_apply_one P1✅ + index_H_eq_card_W1✅ で χ(1)=|W₁|θ(1))。
 - **T8.4** `Dmem` per-member ψ=0 分解 (`CharacterPsiDecomposition`) — §H/§I G2 主負荷、design-heavy、**/goal 不向き=直接実装**。
@@ -425,8 +428,50 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
 - **T8.7** assemble → `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A`。
 - → glue X∪Y (Y=T6✅) via `coherentUnion_of_glued` + (6.5)還元 (M1, §G) → capstone `sibleySetup_is_coherent`。
 
-**leaf 順 (clean→design)**: T8.1✅ → T8.2 (/goal) → {T8.4/T8.5/T8.6 = design pass 要、直接実装} → T8.3+T8.7。
-clean leaf (T8.1/T8.2) は /goal、design-heavy leaf (Dmem/hdeg_c/enum/(6.5)) は attended 直接。
+### J.1 design pass (2026-06-03, engine 通読・実 instance 構築可能性 確定)
+
+**🟢 全 engine backbone が landed — fundamental blocker 無 (Frobenius case)**:
+- enumeration: `exists_monotoneDegreeEnum` (S07:3804, degree-monotone e:Fin n→X) /
+  `two_le_ncard_of_conjugate_closed_of_noReal` (3851, n≥2 ← T8.3a/3b) / `pairSet`/`pairUnion` (3866/3874) /
+  `mem_pairUnion`/`pairUnion_eq_of_cover`/`pairUnion_eq_of_enumCover` (3915/3943/4031, cover→X 復元)。
+- iteration: `coherentPairChain` (3969, N-帰納) / `coherentOfPairChainCover` (4007) — `peterfalvi_66_coherence_of_X_from_dade`
+  (5593) が直接消費。
+- base: `coherentEqualDegree_fromDade` (5109, 等次数 n≥2 族→coherence)。
+- **Dmem 構成子 landed**: `decompositionDaFromDadeOfDiff` (S07:4708, B surgery) — `CharacterPsiDecomposition`
+  struct (974) は B surgery で `tau1_inner_eq_on_support` を差分 sublattice に弱化済 ⟹ X-member (χ(1)≠0) でも
+  構成可 (個別 support 不要)。`retarget_isCoherent_fromDade_X` (5314) / `DadeChainStep.advance` (5491) が使用。
+- **hdeg_c machinery landed**: `two_mul_lt_sq_of_primePow_gap` (S07:1696) + `sumInflatedDegreeSq`
+  (InflationCharacter:311)。**Frobenius case は X⊆Irr L (‖χ‖²=1) ⟹ X 側和=Σχ(1)² が Irr-L 側と一致** ⟹
+  §G B2 (X-side bridge) は **case B のみの問題**, Frobenius case は landed で足りる見込み (要実装確認)。
+
+**構築プラン (Frobenius case 先行)**: X=`Xset Z` に対し
+1. n≥2: T8.3a/3b + X.Nonempty (←broader context/(6.5)) → `two_le_ncard...`。
+2. enumeration e ← `exists_monotoneDegreeEnum`。**pairing 構成** (X を S₀=min-degree block + 共役 pair 列に分解、
+   cover 3 条件 `hS₀`/`hpairs`/`hcoverIdx` を証明) = **最も combinatorial な新規部分** (X conj-closed ゆえ非実 χ は
+   χ̄ と pair; 同次数ゆえ degree-monotone enum 内で隣接化可能だが injective enum は χ,χ̄ の隣接を保証しない →
+   pairing は別途構成要)。
+3. base S₀ coherence ← `coherentEqualDegree_fromDade` (S₀=min-degree 等次数, n≥2)。
+4. per-step `hstepData i`: `DadeChainStep` instance = T8.1(facts)✓ + T8.2(diffsupp)✓ + T8.3(degree, a/famRatio) +
+   T8.4(Dmem via `decompositionDaFromDadeOfDiff`) + T8.5(hdeg_c via gap leaf) + famS/famPairwise/famSupp 等
+   (T8.1/8.2 系の quantify)。
+5. → `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A`。
+
+**残リスク (design-heavy, 直接実装)**: (a) **pairing 構成** (step 2, 共役 pair への分割 = 新規 combinatorics,
+~100-200 LOC)。(b) **Dmem family** (step 4, 各 prior member の差分-support ψ=0 分解を `decompositionDaFromDadeOfDiff`
+から組む, engine-internal 理解要)。(c) **hdeg_c** (step 4, degree-sum→gap leaf wiring; Frobenius は landed 見込みだが
+未実装確認)。(d) X.Nonempty は (6.5)還元 context 由来 (standalone leaf では仮説化)。
+
+**leaf 順**: T8.1✅/T8.2✅/T8.3a3b✅ (clean, done) → **pairing 構成 (次)** → base wiring → per-step (Dmem/hdeg_c) → assemble。
+clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。**T8 は feasible・大 (Frobenius case で ~400-600 LOC 見積)**。
+
+### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-7 完了)
+- ✅ **T8.4** `xSet_finite` (31eea58): X⊆Irr L 有限 = `hXfin`。
+- ✅ **T8.5** `xBaseBlock` + subset/degree_re_eq/closedUnderConjugate (79821fb): base S₀=最小次数ブロック。
+- ✅ **T8.6** `sMember_support_subset_H` + `sMember_diffSupport_of_charValue_eq` (eefc87e): 等次数差 χ−χ' ⊆ H^# = base `hsuppdiff`。
+- ✅ **T8.7** `exists_finEnum_irreducible` (41052b8): 有限既約集合→`Fin k` 単射 enum (range=T) = `coherentEqualDegree_fromDade` の Fin n interface bridge。
+- **次 = base coherence assembly**: S₀ を T8.7 で `Fin k` 化 → 等次数 value (re 等しい+irr で実 ⟹ value 等) + T8.6 (hsuppdiff) + `1∉sharpImage H` + n≥2 (T8.3+X.Nonempty) → `coherentEqualDegree_fromDade` → `h0 : IsCoherent τ S₀ A`。**X.Nonempty 要** ((6.5) context or 仮説)。
+- その後: suffix 共役 pairing (combinatorics) → per-step `DadeChainStep` (T8.1/2 + Dmem + hdeg_c 仮説) → `peterfalvi_66_coherence_of_X_from_dade`。
+- **全 leaf axiom-clean (propext/Classical.choice/Quot.sound), full build 3562 green**。
 
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 

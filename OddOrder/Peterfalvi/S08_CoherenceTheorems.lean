@@ -212,6 +212,30 @@ theorem characterKernel_subset_of_inner_induce_ne_zero {Γ : Type*} [Group Γ] [
 
 /- 6: Some coherence theorems (pp. 30-37) -/
 
+/-- **Finite set of irreducible characters → injective `Fin k` enumeration.**  A finite set `T` of
+class functions all of which are irreducible characters is enumerated by an injective family
+`χ : Fin k → IrreducibleCharacter Γ` whose underlying-class-function range is exactly `T`.  This is
+the bridge to the `Fin n`-indexed family interface of `coherentEqualDegree_fromDade` (the base
+block `S₀`). -/
+theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFunction Γ ℂ)}
+    (hTfin : T.Finite) (hTirr : ∀ χ ∈ T, IsIrreducibleCharacter χ) :
+    ∃ (k : ℕ) (χ : Fin k → IrreducibleCharacter Γ),
+      Function.Injective χ ∧ Set.range (fun j => (χ j : ClassFunction Γ ℂ)) = T := by
+  classical
+  haveI : Fintype T := hTfin.fintype
+  let e := Fintype.equivFin T
+  refine ⟨Fintype.card T, fun j => ⟨(e.symm j : ClassFunction Γ ℂ), hTirr _ (e.symm j).2⟩, ?_, ?_⟩
+  · intro i j hij
+    have h : (e.symm i : ClassFunction Γ ℂ) = (e.symm j : ClassFunction Γ ℂ) :=
+      congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) hij
+    exact e.symm.injective (Subtype.ext h)
+  · ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact (e.symm j).2
+    · intro hφ
+      exact ⟨e ⟨φ, hφ⟩, by simp⟩
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
@@ -1131,6 +1155,141 @@ theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
+/-- **(T8 leaf 3a) `X` is closed under conjugation** (Frobenius case).  `Z ⊴ L` gives
+`Ker χ̄ = Ker χ` (`characterKernel_conj`), so the (6.6) characterization `X = {χ ∈ Irr L | Z ⊄ Ker χ}`
+is conjugation-invariant.  This is the `ClosedUnderConjugate` input to the degree-monotone
+enumeration of `X` into conjugate pairs (`S07.two_le_ncard_of_conjugate_closed_of_noReal`,
+`S07.exists_monotoneDegreeEnum`). -/
+theorem Xset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) := by
+  have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
+    (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+  intro χ hχX
+  rw [hXeq] at hχX ⊢
+  refine ⟨hχX.1.conj, ?_⟩
+  rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
+  exact hχX.2
+
+/-- **(T8 leaf 3b) `X` has no real characters** (Frobenius case).  Every `χ ∈ X` is non-real
+(`xMember_characterFacts`, Peterfalvi (1.1) for `L` odd).  This is the `HasNoRealCharacters` input
+to the conjugate-pair enumeration (with `Xset_closedUnderConjugate`, it gives `χ̄ ≠ χ`, hence the
+pairs `{χ, χ̄}` are genuine 2-element sets and `2 ≤ |X|`). -/
+theorem Xset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
+  fun _ hχX => (hyp.xMember_characterFacts hF hZH hχX).1
+
+/-- **(T8 leaf 4) `X` is finite** (Frobenius case).  `X = S − S(Z) ⊆ Irr L`
+(`isIrreducibleCharacter_of_mem_Xset_of_frobenius`) and `Irr L` is finite
+(`finite_irreducibleCharacter`).  This is the `hXfin` input to the degree-monotone enumeration
+`S07.exists_monotoneDegreeEnum` and the chain assembly. -/
+theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} :
+    (hyp.Xset Z).Finite := by
+  haveI := OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥L)
+  have hIrrFin : (irreducibleCharacters ↥L).Finite :=
+    (Set.finite_range (fun χ : IrreducibleCharacter ↥L => (χ : ClassFunction ↥L ℂ))).subset
+      (fun φ hφ => ⟨⟨φ, mem_irreducibleCharacters.mp hφ⟩, rfl⟩)
+  exact hIrrFin.subset
+    (fun χ hχ => mem_irreducibleCharacters.mpr
+      (hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ))
+
+/-- **(T8 leaf 5) the base block `S₀`**: the minimal-(real-)degree members of `X`.  This is the
+equal-minimal-degree prefix `{χ₁,…,χₖ}` of (6.6), on which (1.1)+(1.4) supplies the base coherence
+`coherentEqualDegree_fromDade` before the (5.6) adjoining of the strictly-higher-degree conjugate
+pairs.  `S₀` must contain **all** minimal-degree members (not just one pair): the first (5.6)
+adjoining of a pair of degree ratio `a` needs `2a < ∑_{S₀} aⱼ²`, which fails at equal degree. -/
+def xBaseBlock (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  {χ ∈ hyp.Xset Z | ∀ ψ ∈ hyp.Xset Z,
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re ≤
+      (OddOrder.Peterfalvi.S03.characterDegree ψ).re}
+
+theorem xBaseBlock_subset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    hyp.xBaseBlock Z ⊆ hyp.Xset Z :=
+  fun _ hχ => hχ.1
+
+/-- Any two members of the base block have the same degree (the base is an *equal*-degree family,
+the input shape of `coherentEqualDegree_fromDade`). -/
+theorem xBaseBlock_degree_re_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.xBaseBlock Z) (hχ' : χ' ∈ hyp.xBaseBlock Z) :
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ').re :=
+  le_antisymm (hχ.2 χ' hχ'.1) (hχ'.2 χ hχ.1)
+
+/-- The base block is closed under conjugation (Frobenius case): conjugation preserves the degree
+(`characterDegree_conj`) and `X` (`Xset_closedUnderConjugate`).  With the no-real property this makes
+`S₀` contain a conjugate pair, so `2 ≤ |S₀|`. -/
+theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) := by
+  intro χ hχ
+  refine ⟨hyp.Xset_closedUnderConjugate hF hZH hχ.1, fun ψ hψ => ?_⟩
+  have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ).re := by
+    simp [OddOrder.Peterfalvi.S03.characterDegree_conj]
+  rw [hre]
+  exact hχ.2 ψ hψ
+
+/-- A member `χ = Ind_H^L θ` of `S` is supported on `H` (its induced character vanishes off the
+normal subgroup `H`). -/
+theorem sMember_support_subset_H (hyp : SibleyDadeHypothesis G L H)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) :
+    χ.support ⊆ (H : Set ↥L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  rw [hχeq]
+  exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
+
+/-- **(T8 leaf 6) equal-degree difference support.**  For two members `χ, χ'` of `S` of equal
+degree (`χ(1) = χ'(1)`) the difference `χ − χ'` is supported on `H^# = sharpImage H`: both are
+supported on `H` (`sMember_support_subset_H`) and the difference vanishes at `1` (equal degree).
+This is the `hsuppdiff` input of `coherentEqualDegree_fromDade` for the equal-minimal-degree base
+block `S₀` (`irreducibleCharacterDifference χ j = χⱼ − χ₀`), and the (5.6) `χ − a·χ₁` support shape. -/
+theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
+    {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) (hdeg : χ 1 = χ' 1) :
+    (χ - χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  have hgH : g ∈ H := by
+    rcases eq_or_ne (χ g) 0 with hχg | hχg
+    · have hχ'g : χ' g ≠ 0 := fun h0 =>
+        hg (by rw [ClassFunction.sub_apply, hχg, h0, sub_self])
+      exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
+    · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
+/-- **(T8 leaf 8) `2 ≤ |S₀|`.**  If `X` is nonempty, its base block `S₀` (minimal-degree members)
+contains a minimal-degree `χ` together with its conjugate `χ̄ ≠ χ` (`Xset_hasNoRealCharacters`,
+`xBaseBlock_closedUnderConjugate`), so `2 ≤ |S₀|`.  This is the `2 ≤ n` input of
+`coherentEqualDegree_fromDade` for the base coherence.  (`X.Nonempty` comes from the broader (6.5)
+reduction context; here it is a hypothesis.) -/
+theorem two_le_xBaseBlock_ncard (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+    2 ≤ (hyp.xBaseBlock Z).ncard := by
+  have hXfin := hyp.xSet_finite hF (Z := Z)
+  obtain ⟨χ, hχX, hχmin⟩ := Set.exists_min_image (hyp.Xset Z)
+    (fun ψ => (OddOrder.Peterfalvi.S03.characterDegree ψ).re) hXfin hXne
+  have hχS₀ : χ ∈ hyp.xBaseBlock Z := ⟨hχX, hχmin⟩
+  have hconjS₀ : χ.conj ∈ hyp.xBaseBlock Z := hyp.xBaseBlock_closedUnderConjugate hF hZH hχS₀
+  have hne : χ.conj ≠ χ := hyp.Xset_hasNoRealCharacters hF hZH hχX
+  have hS₀fin : (hyp.xBaseBlock Z).Finite := hXfin.subset (hyp.xBaseBlock_subset Z)
+  have h1 : 1 < (hyp.xBaseBlock Z).ncard :=
+    (Set.one_lt_ncard hS₀fin).mpr ⟨χ.conj, hconjS₀, χ, hχS₀, hne⟩
+  omega
 
 end SibleyDadeHypothesis
 
