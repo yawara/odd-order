@@ -138,3 +138,23 @@ Theorem C = C.1∧C.2∧C.3 の assembly (容易) + 既存 scaffold `AppC.theore
 App C 完成は **3 つの深い研究レベル formalization (A 有限体持ち上げ / B Frobenius 群指標論 / C
 generators-relations+仮説B)** を要し、**単一 /goal 自走では完了不能** (各々 multi-session)。anti-scaffold
 原則ゆえ偽完成は不可。C.1 (最難 analytic core) + C.2(q=3) 前半は genuine に完成・commit 済。
+
+### C.2 (q=3) 持ち上げ後半 — 実装 recipe 精緻化 (2026-06-04, aeval_pow_p まで済)
+✅ 済: `exists_root_fCubic` (root a∈F_{p³}), `aeval_pow_p` (f(a)ᵖ=f(aᵖ))。
+残 (次セッション、~100行):
+- **a∉素体** `root_not_mem_range`: a=algebraMap b ⟹ `aeval (algebraMap b) fCubic = algebraMap (eval b fCubic)`
+  (`Polynomial.aeval_algebraMap_apply`/`map_aeval`)=0 ⟹ eval b fCubic=0 (algebraMap 単射) ⟹ root-free 矛盾。
+- **a,aᵖ,aᵖ² 相異**: `aeval_pow_p` で aᵖ,aᵖ² も根。`aᵖ³=a` (`FiniteField.pow_card`, card=p³)。
+  aᵖ=a ⟹ `minpoly (ZMod p) a | X^p-X` (∵ aeval a (X^p-X)=aᵖ-a=0, `minpoly.dvd`)。
+  `X^p-X=∏_{c}(X-C c)` over ZMod p (`roots_X_pow_card_sub_X`+`prod_multiset_X_sub_C_of_monic_of_roots_card_eq`)。
+  minpoly irreducible (`minpoly.irreducible`) | ∏ ⟹ | (X-C c) ⟹ deg minpoly=1 ⟹ a=algebraMap c ⟹ a∈素体, 矛盾。
+  aᵖ²≠a, aᵖ≠aᵖ² は aᵖ³=a で aᵖ=a に帰着。
+- **因数分解 fCubic.map=∏(X-a^{p^i})**: 3 相異根 ⟹ `{a,aᵖ,aᵖ²}.val ≤ roots`, `card_roots'`≤3 ⟹ card roots=3,
+  `splits_iff_card_roots` で Splits; `PerfectField.ofFinite`⟹`Irreducible.separable`⟹`nodup_roots` で
+  roots=`{a,aᵖ,aᵖ²}` (multiset)。
+- **norm 読み取り**: `Splits.eval_eq_prod_roots_of_monic` で `(fCubic.map).eval x = ∏_{r∈roots}(x-r)`。
+  `(fCubic.map).eval 0 = ∏(0-a^{p^i}) = -normN a`, かつ `(fCubic.map).eval 0 = algebraMap(fCubic.eval 0)=algebraMap(-1)=-1`
+  (`eval_map`+`hom_eval₂`) ⟹ normN a=1。eval 2: `(2-a)^{p^i}=2-a^{p^i}` (∵2∈F_p, `aeval_pow_p` 類似) ⟹
+  normN(2-a)=∏(2-a^{p^i})=(fCubic.map).eval 2=algebraMap(fCubic.eval 2)=1。
+- **a≠1**: a∉素体, 1∈素体 (=algebraMap 1)。
+- ⟹ `a∈normSetE p 3 ∧ a≠1` ⟹ `2≤(normSetE p 3).ncard` (lemmaC2 q=3 分岐, `Set.one_lt_ncard`/2 元 {a,1})。
