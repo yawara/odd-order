@@ -1061,6 +1061,44 @@ private theorem exists_conj_eq_of_isHall_subgroupOf [Finite G] {V : Subgroup G}
   rw [Subgroup.pointwise_smul_def]
   exact h
 
+/-- **nontrivial 有限可解群は素数指数の正規部分群を持つ** (Thm 7.4 還元 R1a, mmd L2206
+composition factor)。card 最大の proper 正規部分群 `N` を取ると `Q⧸N` は simple かつ solvable
+ゆえ abelian、`Group.is_simple_iff_prime_card` で素数位数 `= N.index`。 -/
+private theorem exists_normal_index_prime_of_solvable {Q : Type*} [Group Q] [Finite Q]
+    [IsSolvable Q] (hQ : Nontrivial Q) : ∃ N : Subgroup Q, N.Normal ∧ N.index.Prime := by
+  obtain ⟨N, hNmem, hNmax⟩ :=
+    Set.exists_max_image {N : Subgroup Q | N.Normal ∧ N < ⊤} (fun N : Subgroup Q => Nat.card ↥N)
+      (Set.toFinite _) ⟨⊥, inferInstance, bot_lt_top⟩
+  obtain ⟨hNnorm, hNlt⟩ := hNmem
+  haveI := hNnorm
+  refine ⟨N, hNnorm, ?_⟩
+  have hsurj : Function.Surjective (QuotientGroup.mk' N) := QuotientGroup.mk'_surjective N
+  haveI hntq : Nontrivial (Q ⧸ N) := by
+    obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hNlt
+    exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
+  haveI hsimple : IsSimpleGroup (Q ⧸ N) := by
+    refine ⟨fun Nbar hNbar => ?_⟩
+    set N' : Subgroup Q := Nbar.comap (QuotientGroup.mk' N) with hN'
+    haveI : N'.Normal := hNbar.comap _
+    have hNN' : N ≤ N' := by
+      intro x hx
+      rw [hN', Subgroup.mem_comap,
+        show (QuotientGroup.mk' N) x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+      exact one_mem _
+    have hmapeq : N'.map (QuotientGroup.mk' N) = Nbar := by
+      rw [hN', Subgroup.map_comap_eq_self_of_surjective hsurj]
+    rcases lt_or_eq_of_le (le_top : N' ≤ ⊤) with hN'lt | hN'top
+    · left
+      have hcard : Nat.card ↥N' ≤ Nat.card ↥N := hNmax N' ⟨inferInstance, hN'lt⟩
+      have hN'eqN : N = N' := Subgroup.eq_of_le_of_card_ge hNN' hcard
+      rw [← hmapeq, ← hN'eqN]
+      simp [QuotientGroup.map_mk'_self]
+    · right
+      rw [← hmapeq, hN'top, Subgroup.map_top_of_surjective _ hsurj]
+  haveI : IsMulCommutative (Q ⧸ N) := ⟨⟨IsSimpleGroup.comm_iff_isSolvable.mpr inferInstance⟩⟩
+  rw [Subgroup.index_eq_card]
+  exact Group.is_simple_iff_prime_card.mp hsimple
+
 /-- **Theorem 7.4(a)** (mmd L2204): `C_G(P) ⊓ K = O_{π'}(C_G(P))`。`A ≤ P` ⟹ `C_G(P) ⊆ C_G(A)`,
 `K = O_{π'}(C_G(A)) ⊴ C_G(A)` ゆえ `C_G(P)⊓K` は `C_G(P)` の正規 `π'`-部分群 (⊆ O_{π'});
 逆は O_{π'}(C_G(P)) の各元が `C_G(A)` の `π'`-元 ⟹ §7 Note で `K` 入り。 -/
