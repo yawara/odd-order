@@ -2281,7 +2281,7 @@ member of `ℋ_X(A;π)` is contained in `O_π(X)`. The reverse inclusion is auto
 `O_π(X) = opiCoreInG π X` is itself an `A`-invariant `π`-subgroup of `X`
 (`opiCoreInG_le` + `le_normalizer_opiCoreInG` with `A ≤ X` + `isPiSubgroup_opiCoreInG`).
 Used by both branches of Proposition 7.5. -/
-private theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
+theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
     {A X : Subgroup G} {π : Set ℕ} (hAX : A ≤ X)
     (hY : ∀ Y ∈ hInvariant X A π, Y ≤ opiCoreInG π X) :
     sSup (hInvariant X A π) = opiCoreInG π X := by
@@ -2327,7 +2327,7 @@ private theorem opiCoreInG_eq_map_subgroupOf [Finite G] {π : Set ℕ} {X K : Su
 from the absolute Prop 1.15(b) (`oPiPrimeCore_centralizer_le_oPiPrimeCore`) inside the group `↥X`,
 transported back to `G` via `opiCoreInG_eq_map_subgroupOf`. Here `C_X(R) = C_G(R) ⊓ X`. This is
 the cross-group bridge for Proposition 7.5's general case (and is reusable in §8–§16). -/
-private theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
+theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
     {X : Subgroup G} (hXsolv : IsSolvable ↥X) {R : Subgroup G} (hRX : R ≤ X) (hRp : IsPGroup p R) :
     opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X)
       ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
