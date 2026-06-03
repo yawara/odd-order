@@ -1280,6 +1280,206 @@ noncomputable def retarget_isCoherent_of_extensionImage
   exact OddOrder.Peterfalvi.S07.retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ
     hXX hXbarXbar hXXbar hXbarX hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
 
+open scoped Classical in
+/-- **(T-A1) Per-step X-family coherence adjoin from a member family.** (`noncomputable def`: the
+conclusion `IsCoherent` lives in `Type`, carrying the new extension `ν`.)
+
+The (5.6)/(6.6) per-step adjoining of a new induced X-pair `{χ, χ̄}` to a coherent set `S₁`, packaged
+as a function of the member-family enumeration data.  This wires the landed crux1 chain (the genuine
+(5.6.1)/(5.6.2) `Y`-collapse, `crux1_of_memberFamily`) into the adjoining bridge
+(`retarget_isCoherent_of_extensionImage`).
+
+Inputs: `IsCoherent τ S₁ A` for the Dade map `τ`, a non-real irreducible `χ` orthogonal to all of
+`S₁` (with `χ̄` likewise), and a finite orthonormal member family `{χmem i}ᵢ∈ₛ ⊆ S₁` with degree
+ratios `deg i` (base member `i₁` of ratio `1`), the degree-matched supported differences
+`χmem i − deg i·χmem i₁` and `χ − a·χmem i₁`, and the **ZIrr-codomain facts** `ν χmem i ∈ ZIrr`,
+`(χ − a·χmem i₁)^τ ∈ ZIrr` taken as explicit hypotheses (`IsCoherent` records no ZIrr-codomain — the
+running coherence engine supplies them, cf. `retarget_mem_ZIrr`).  The construction:
+
+* `Da := decompositionDaFromDadeOfDiff …` (the χ-decomposition for `χ − a·χ₁`), with `Da.Y ∈ ZIrr`
+  derived from `Da.X ∈ ℤ[R(χ)]` and `(χ − a·χ₁)^τ ∈ ZIrr`;
+* per member `i`, the (5.2.e) orthogonality `⟨Da.X, ν χᵢ⟩ = 0`
+  (`inner_decomposition_X_extension_member_eq_zero`) and the (5.6.1) cross-term `hfound`
+  (`inner_dade_extension_of_supported`) assemble the coefficient `⟨Da.Y, ν χᵢ⟩`
+  (`inner_Y_extension_member_eq`);
+* `crux1_of_memberFamily` collapses the λ-form (degree inequality `2a < ∑ aᵢ²`) into
+  crux1 `⟨τ(χ − a·χ₁), ν χ₁⟩ = −a`;
+* crux2 `⟨τ(χ − χ̄), ν χ₁⟩ = 0` is clean from `R(χ) ⊥ R(χ₁)`;
+* the bridge concludes `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`.
+
+The lattice-generation conditions `hSgen`/`hgen` (structural facts about the accumulator `S₁`) are
+threaded to the bridge; the chain fold (`xChainCoherent`) discharges them from the X-family
+enumeration. -/
+noncomputable def xAdjoinStep
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 1)
+    (hχbarχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ).conj = 1)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hχbarχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → IrreducibleCharacter ↥L) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ i ∈ s, ¬ ClassFunction.IsReal (χmem i : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ).conj - (χmem i : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemdegdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁)
+    (hmembarS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ).conj ∈ S₁)
+    (hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i : ClassFunction ↥L ℂ) ∈ ZIrr G)
+    (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+      (χmem i : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
+        if i = j then (1 : ℂ) else 0)
+    {a : ℕ}
+    (hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+        {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+         (χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)})) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
+  classical
+  -- The trivially-derived orthogonalities `χ, χ̄ ⊥ a·χ₁` for the χ-decomposition `Da`.
+  have hχaχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ)
+      (a • (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁ : ClassFunction ↥L ℂ),
+      OddOrder.RepresentationTheory.inner_smul_right, hχ_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  have hχbaraχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
+      (a • (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁ : ClassFunction ↥L ℂ),
+      OddOrder.RepresentationTheory.inner_smul_right, hχbar_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  -- The χ-decomposition for the degree-matched difference `χ − a·χ₁`.
+  -- (`let`, not `have`/`set`, so `Da.tau1 = τ` / `Da.imageFamily = R(χ)` reduce definitionally.)
+  let Da := OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj χ hrealχ hdiffsuppχ
+    hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar
+  -- `Da.X ∈ ZIrr` (integer combination of the orthonormal `R(χ)` family) ⟹ `Da.Y ∈ ZIrr`.
+  have hDaX_ZIrr : Da.X ∈ ZIrr G := by
+    rw [Da.X_eq]
+    refine Submodule.sum_mem _ (fun α hα => ?_)
+    rw [Int.cast_smul_eq_zsmul ℂ (Da.coeff α) α]
+    exact Submodule.smul_mem _ (Da.coeff α) (Da.imageFamily.mem_ZIrr α hα)
+  have hYeq : Da.Y = Da.X - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) := by
+    have h : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) = Da.X - Da.Y :=
+      Da.tau1_image
+    rw [h]; abel
+  have hDaY_ZIrr : Da.Y ∈ ZIrr G := by
+    rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
+  have hchi1chi1 : ClassFunction.inner (χmem i₁ : ClassFunction ↥L ℂ)
+      (χmem i₁ : ClassFunction ↥L ℂ) = 1 := by rw [hmemortho i₁ hi₁ i₁ hi₁]; simp
+  -- The four `χmem i ⊥ {χ, χ̄}` orthogonalities (conjugate symmetry of `hχ_S1`/`hχbar_S1`).
+  have hmemχ : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+      (χ : ClassFunction ↥L ℂ) = 0 := fun i hi => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_S1 _ (hmemS1 i hi), star_zero]
+  have hmemχbar : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+      (χ : ClassFunction ↥L ℂ).conj = 0 := fun i hi => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_S1 _ (hmemS1 i hi), star_zero]
+  have hmembarχ : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ) = 0 := fun i hi => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_S1 _ (hmembarS1 i hi), star_zero]
+  have hmembarχbar : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ).conj = 0 := fun i hi => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_S1 _ (hmembarS1 i hi), star_zero]
+  -- Per-member ν-aux decomposition `D'` and the (5.2.e) family orthogonality `R(χᵢ) ⊥ R(χ)`.
+  -- (`let`, not `have`, so `(Dmem i hi).tau1 = ν` reduces definitionally for the `rfl` arguments.)
+  let Dmem : ∀ i, i ∈ s → OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χmem i : ClassFunction ↥L ℂ) 0 := fun i hi =>
+    memberExtensionDecomposition hyp hconj hS₁ (χmem i) (hmemreal i hi) (hmemdiffsupp i hi)
+      (hmemS1 i hi) (hmembarS1 i hi) (hmemνZ i hi) (hmemconjortho i hi)
+  have hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal Da.imageFamily :=
+    fun i hi =>
+      dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp hconj (hmemreal i hi)
+        (hmemdiffsupp i hi) hrealχ hdiffsuppχ (hmemχ i hi) (hmemχbar i hi) (hmembarχ i hi)
+        (hmembarχbar i hi)
+  -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
+  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) = 0 :=
+    fun i hi => inner_decomposition_X_extension_member_eq_zero hS₁ Da (Dmem i hi) (hortho_mem i hi) rfl
+  -- (5.6.1) cross-term `hfound` per member (`inner_dade_extension_of_supported`).
+  have hfound : ∀ i ∈ s, ClassFunction.inner
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
+      (hS₁.extension ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ))) =
+      ClassFunction.inner ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ))
+        ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)) := fun i hi => by
+    refine inner_dade_extension_of_supported hyp hconj hS₁ hdiffasuppχ ?_
+    refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, hmemdegdiffsupp i hi⟩
+    refine Submodule.sub_mem _ (Submodule.subset_span (hmemS1 i hi)) ?_
+    rw [← Nat.cast_smul_eq_nsmul ℤ (deg i) (χmem i₁ : ClassFunction ↥L ℂ)]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i₁ hi₁))
+  -- The (5.6.1) member coefficient `⟨Da.Y, ν χᵢ⟩` in the `lambda_eq_zero_and_Z_eq_zero` form.
+  have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y
+      (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
+      (a : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) + ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+            ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
+          (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ))) * (deg i : ℂ) := by
+    intro i hi
+    have key := inner_Y_extension_member_eq hyp hconj hS₁ χ hYeq (hXortho i hi) (hfound i hi)
+      (hχ_S1 _ (hmemS1 i hi)) (hχ_S1 _ (hmemS1 i₁ hi₁)) hchi1chi1
+    rw [hmemortho i₁ hi₁ i hi] at key
+    rw [key]
+    rcases eq_or_ne i i₁ with h | h
+    · subst h; simp
+    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]
+  -- crux1 via the λ-form collapse.
+  have hcrux1 : ClassFunction.inner
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
+      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -(a : ℂ) :=
+    crux1_of_memberFamily hyp hconj
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
+      hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemνZ hmemS1
+      hmemortho hcoeffval htau1_memaχ ha1 hDeg
+  -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) ⊥ R(χ₁)`.
+  have hcrux2 : ClassFunction.inner
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj))
+      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, Da.imageFamily.image_eq,
+      OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_zero (fun α hα =>
+        OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily
+          (Dmem i₁ hi₁) (hortho_mem i₁ hi₁) rfl hα), star_zero]
+  -- Adjoin via the (T8.11 option A) bridge.
+  exact retarget_isCoherent_of_extensionImage hyp hconj
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
+    hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
+    (hmemS1 i₁ hi₁) hcrux1 hcrux2 hSgen hgen
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
