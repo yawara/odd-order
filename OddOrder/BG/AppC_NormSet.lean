@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.Algebra.Polynomial.Roots
+import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
 import Mathlib.Data.ZMod.Basic
 
@@ -415,6 +416,28 @@ lemma exists_rootFree_cubic [Fact p.Prime] (hpodd : Odd p) :
       _ = p := by rw [Finset.card_univ, ZMod.card]
   rw [hc1, hcard02] at key
   omega
+
+/-- The cubic `f_c(X) = X(X-2)(X-c) + (X-1)` of BG Lemma C.2 (`q = 3`). -/
+noncomputable def fCubic (c : ZMod p) : (ZMod p)[X] :=
+  X * (X - C 2) * (X - C c) + (X - C 1)
+
+lemma fCubic_eval (c x : ZMod p) :
+    (fCubic p c).eval x = x * (x - 2) * (x - c) + (x - 1) := by
+  simp [fCubic]
+
+lemma fCubic_natDegree [Fact p.Prime] (c : ZMod p) : (fCubic p c).natDegree = 3 := by
+  unfold fCubic
+  compute_degree!
+
+/-- A root-free `f_c` is irreducible over `𝔽_p` (a cubic with no root). -/
+lemma fCubic_irreducible [Fact p.Prime] (c : ZMod p)
+    (h : ∀ x : ZMod p, x * (x - 2) * (x - c) + (x - 1) ≠ 0) :
+    Irreducible (fCubic p c) := by
+  apply Polynomial.irreducible_of_degree_le_three_of_not_isRoot
+  · rw [Finset.mem_Icc, fCubic_natDegree]; omega
+  · intro x hx
+    rw [IsRoot, fCubic_eval] at hx
+    exact h x hx
 
 /-! ## Lemma C.2 -/
 
