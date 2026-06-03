@@ -160,6 +160,16 @@ structure coefficient lower bound に組み込むこと。AxiomsCheck 登録済�
 次は `P` が abelian なので `θ(1)=1` となる側と、これら induced characters の値を class-sum coefficient
 の character formula に入れる側を作る。AxiomsCheck 登録済み。
 
+#### ✅ q≥5 induced-character degree-one specialization (2026-06-04)
+`normOneFrobeniusKernel_isMulCommutative` / `normOneFrobeniusKernel_mul_comm` で `P` が abelian であることを明示し、
+mathlib の irreducible representation dimension-one theorem から
+`normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one : θ(1)=1` を証明。
+これを induction degree formula に代入し、
+`normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_card` で
+`Ind_P^H θ` の degree がちょうど `|U|` になる concrete statement にした。
+次はこれら induced degree-`|U|` characters の値を class-sum coefficient character formula に入れる側。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

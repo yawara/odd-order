@@ -174,6 +174,32 @@ noncomputable instance normOneFrobeniusKernel_card_invertible [Fact p.Prime] :
     Invertible (Nat.card (normOneFrobeniusKernel p q) : ℂ) :=
   invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
 
+/-- The additive kernel `P` is abelian. -/
+noncomputable instance normOneFrobeniusKernel_isMulCommutative [Fact p.Prime] :
+    IsMulCommutative (normOneFrobeniusKernel p q) := by
+  unfold normOneFrobeniusKernel
+  infer_instance
+
+/-- Elements of the additive kernel commute. -/
+theorem normOneFrobeniusKernel_mul_comm [Fact p.Prime]
+    (x y : normOneFrobeniusKernel p q) :
+    x * y = y * x :=
+  mul_comm' x y
+
+/-- Irreducible characters of the additive kernel are linear. -/
+theorem normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one [Fact p.Prime]
+    (θ : IrreducibleCharacter (normOneFrobeniusKernel p q)) :
+    (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)
+        (1 : normOneFrobeniusKernel p q) = 1 := by
+  obtain ⟨V, _, _, _, ρ, hρ, hθ⟩ := θ.isIrreducible
+  haveI : Representation.IsIrreducible ρ := hρ
+  have hdim : Module.finrank ℂ V = 1 :=
+    Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative ρ
+  change (((θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) :
+      normOneFrobeniusKernel p q → ℂ) 1) = 1
+  rw [congrFun hθ 1, ρ.char_one, hdim]
+  norm_num
+
 /-- Nontrivial irreducible characters of the additive kernel induce irreducibly
 to the concrete Frobenius group `H = P ⋊ U`. This is the App C specialization
 of Isaacs Theorem 6.34 used to build the q≥5 induced-character family. -/
@@ -197,6 +223,18 @@ theorem normOneFrobeniusKernel_induce_apply_one [Fact p.Prime]
         θ (1 : normOneFrobeniusKernel p q) := by
   letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   rw [ClassFunction.induce_apply_one, normOneFrobeniusKernel_index_eq_normOneUnits_card]
+
+/-- Irreducible characters induced from the additive kernel have degree `|U|`
+in the concrete Frobenius group `H = P ⋊ U`. -/
+theorem normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_card [Fact p.Prime]
+    (θ : IrreducibleCharacter (normOneFrobeniusKernel p q)) :
+    ClassFunction.induce (normOneFrobeniusKernel p q)
+        (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)
+        (1 : normOneFrobeniusGroup p q) =
+      (Nat.card (normOneUnits p q) : ℂ) := by
+  rw [normOneFrobeniusKernel_induce_apply_one,
+    normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one]
+  simp
 
 /-- A nonzero element of the additive kernel is nontrivial in the concrete
 Frobenius group `H = P ⋊ U`. -/
