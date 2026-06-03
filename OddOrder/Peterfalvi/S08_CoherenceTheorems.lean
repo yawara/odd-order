@@ -989,6 +989,33 @@ theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **(T8 leaf 3a) `X` is closed under conjugation** (Frobenius case).  `Z ⊴ L` gives
+`Ker χ̄ = Ker χ` (`characterKernel_conj`), so the (6.6) characterization `X = {χ ∈ Irr L | Z ⊄ Ker χ}`
+is conjugation-invariant.  This is the `ClosedUnderConjugate` input to the degree-monotone
+enumeration of `X` into conjugate pairs (`S07.two_le_ncard_of_conjugate_closed_of_noReal`,
+`S07.exists_monotoneDegreeEnum`). -/
+theorem Xset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) := by
+  have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
+    (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+  intro χ hχX
+  rw [hXeq] at hχX ⊢
+  refine ⟨hχX.1.conj, ?_⟩
+  rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
+  exact hχX.2
+
+/-- **(T8 leaf 3b) `X` has no real characters** (Frobenius case).  Every `χ ∈ X` is non-real
+(`xMember_characterFacts`, Peterfalvi (1.1) for `L` odd).  This is the `HasNoRealCharacters` input
+to the conjugate-pair enumeration (with `Xset_closedUnderConjugate`, it gives `χ̄ ≠ χ`, hence the
+pairs `{χ, χ̄}` are genuine 2-element sets and `2 ≤ |X|`). -/
+theorem Xset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
+  fun _ hχX => (hyp.xMember_characterFacts hF hZH hχX).1
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
