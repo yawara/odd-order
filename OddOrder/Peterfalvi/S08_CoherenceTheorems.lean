@@ -633,6 +633,15 @@ theorem isIrreducibleCharacter_of_mem_S_of_frobenius (hyp : SibleyDadeHypothesis
   obtain ⟨θ, hθ_ne, rfl⟩ := hφ
   exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
 
+/-- **(6.8.1), case (c1):** `X ⊆ Irr L` in the Frobenius case, since `X ⊆ S` and `S ⊆ Irr L`.
+This is the irreducibility input the §6 coherence engine (T8) consumes for the `X`-family (and the
+`hX` hypothesis of the (6.6) characterization). -/
+theorem isIrreducibleCharacter_of_mem_Xset_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Xset Z) :
+    IsIrreducibleCharacter φ :=
+  hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hyp.mem_Xset.mp hφ).1
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

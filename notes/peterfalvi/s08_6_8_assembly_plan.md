@@ -401,3 +401,28 @@ transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
 
 ### 戦略的含意
 本作業 (T6 完成, T7 設計) は **genuine な Peterfalvi 形式化**だが、現状 FeitThompson の実 critical path (Track B) には未配線。優先順位 = {(A)engine 修正して (6.8) 続行 / Track B (BG§7-16+S16/AppC+top-level 還元) に pivot / roadmap 全体を訂正版で再計画} の判断が必要。
+
+## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
+
+**landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
++ `mem_SsubFiltration`/`mem_Xset` + **c1 `S⊆Irr L`** (`isIrreducibleCharacter_of_mem_S_of_frobenius`,
+[Is]6.34) + **c1 `Xset⊆Irr L`** (`isIrreducibleCharacter_of_mem_Xset_of_frobenius`)。
+**c1 の engine-facing 部分 (Xset⊆Irr) 完了** = T8/B が要求する X-family 既約性入力を供給。
+
+**🟢 重大訂正: [Is] 2.21 は不要** (Plan agent が atom 照合で確定)。§F:362「要 (1.6.a) iff (2.21 converse 含む)」は
+**過剰**。`Xset_eq : X={χ∈Irr L|Z⊄Ker χ}` の両方向とも 2.21 を回避:
+- **(⊆)**: φ∈X (φ=Ind θ,θ≠1,φ∉S(Z)),φ既約。Z⊆Ker φ 仮定→**Res_H φ genuine** (H0)→θ は Res φ の
+  constituent (Frobenius `inner_induce_eq_inner_restrict` InducedCharacter:531)→G2.2 (S03:696, Res φ の
+  ℕ分解 via `exists_natFinsupp_eq_sum` Clifford:1009)→Z.subgroupOf H⊆Ker θ→φ∈S(Z) 矛盾。
+  **鍵: Ind θ を genuine 扱いしない** (induce は class-function-level only, `IsCharacter (Ind θ)` 不在)。
+- **(⊇)**: χ既約,Z⊄Ker χ。`exists_inner_induce_ne_zero`(S03:636)→θ。θ≠1 & Ind θ∉S(Z) は両方
+  「Z⊆Ker(Ind θ')→(G2.2 constituent inherit)→Z⊆Ker χ 矛盾」。inherit に **Ind θ の ℕ分解** (H2) 要
+  (Ind θ∈ZIrr `induce_mem_ZIrr` + Fourier係数≥0 via Frobenius+`inner_irreducible_nonneg` Clifford:988)。
+  最後 Ind θ∈X→hX→Ind θ既約→`irreducibleCharacter_inner_eq_ite`(ZIrrFourier:40)で Ind θ=χ。
+
+**残 T7 infra (full Xset_eq 用, ~200 LOC, B の downstream=T9/T11 degree-sum が消費, B 自体は不要)**:
+- **H0** `IsCharacter.restrict` (~8, `restrict_repCharacterClassFunction` InducedCharacter:625)
+- **H1** `characterKernel_subset_of_natFinsupp_eq_sum` (~40, G2.2 を natFinsupp data から; 両方向共通)
+- **H2** `induce_exists_natFinsupp_eq_sum` (~50, Ind θ の ℕ分解; exists_natFinsupp を ZIrr+Frobenius-nonneg で再現)
+- characterization 本体 (~100, ⊆/⊇)。最小 Z-仮説 = `Z≤H`+`[Z.Normal]` のみ (Z⊆Z(H)/Z≠⊥ は upstream)。
+- 配置: 当面 S08-local、将来 S03 ConstituentKernel へ移設可。c2 (case A X⊆Irr, FPF route) は §F 通り別途。
