@@ -1415,6 +1415,43 @@ private theorem le_opiCoreInG_of_le_opiCoreInG_centralizer
     rwa [heqcent, ← hH] at hrel
   exact (le_inf hW_le hWH).trans (hstep.trans hrel)
 
+/-- **General case of BG Proposition 7.5** (mmd L2299-2307): given a noncyclic abelian `B ≤ A`
+of `p`-elements that normalizes the `A`-invariant `p'`-subgroup `Y ≤ X` coprimely, if each
+`C_Y(b) ⊆ O_{p'}(C_G(b))` (`b ∈ B^#`, the special-case input `hspec`), then `Y ≤ O_{p'}(X)`.
+Proof: Proposition 1.16 gives `Y = ⟨C_Y(b) | b ∈ B^#⟩` (`nontrivialActionFixedByClosure = ⊤`),
+and `le_opiCoreInG_of_le_opiCoreInG_centralizer` sends each `C_Y(b)` into `O_{p'}(X)`. -/
+private theorem coreClaimGeneral
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {A : Subgroup G} (hAX : A ≤ X)
+    {B : Subgroup G} (hBA : B ≤ A) [IsMulCommutative ↥B] (hB_nc : ¬ IsCyclic ↥B)
+    (hBp : ∀ b ∈ B, IsPGroup p (Subgroup.zpowers b))
+    {Y : Subgroup G} (hYX : Y ≤ X) (hAY : A ≤ Subgroup.normalizer Y)
+    (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Y))
+    (hspec : ∀ b ∈ B, b ≠ (1 : G) →
+      Y ⊓ Subgroup.centralizer ({b} : Set G)
+        ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G))) :
+    Y ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  classical
+  have hBY : B ≤ Subgroup.normalizer Y := hBA.trans hAY
+  have hY_inv : Ch03.IsAInvariant (conjAction B) Y := isAInvariant_conjAction_iff.mpr hBY
+  have htop := OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+    hY_inv.restrict hcop hB_nc
+  have hle : nontrivialActionFixedByClosure hY_inv.restrict
+      ≤ (opiCoreInG ({p} : Set ℕ)ᶜ X ⊓ Y).subgroupOf Y := by
+    rw [nontrivialActionFixedByClosure_le_iff]
+    intro b hb_ne
+    rw [actionFixedBy_conjAction_restrict]
+    intro z hz
+    rw [Subgroup.mem_subgroupOf] at hz ⊢
+    have hb_ne' : (b : G) ≠ 1 := fun h => hb_ne (Subtype.ext h)
+    have hbX : (b : G) ∈ X := hAX (hBA b.2)
+    have hW_le_X : Y ⊓ Subgroup.centralizer ({(b : G)} : Set G) ≤ opiCoreInG ({p} : Set ℕ)ᶜ X :=
+      le_opiCoreInG_of_le_opiCoreInG_centralizer hXsolv (hBp (b : G) b.2) hbX
+        (le_trans inf_le_left hYX) (hspec (b : G) b.2 hb_ne')
+    exact Subgroup.mem_inf.mpr ⟨hW_le_X hz, (Subgroup.mem_inf.mp hz).1⟩
+  rw [htop, top_le_iff, Subgroup.subgroupOf_eq_top] at hle
+  exact le_trans hle inf_le_left
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
