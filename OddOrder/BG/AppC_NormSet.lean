@@ -481,6 +481,18 @@ lemma aeval_pow_p [Fact p.Prime] (a : GaloisField p q) (f : (ZMod p)[X]) :
   simpa only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, frobenius_def]
     using h
 
+/-- A root `a ∈ 𝔽_{p^3}` of a root-free `f_c` does not lie in the prime field `𝔽_p`
+(else `f_c` would have a root in `𝔽_p`). -/
+lemma root_not_mem_range [Fact p.Prime] {c : ZMod p} {a : GaloisField p 3}
+    (hroot : (Polynomial.aeval a) (fCubic p c) = 0)
+    (hrf : ∀ x : ZMod p, x * (x - 2) * (x - c) + (x - 1) ≠ 0) :
+    a ∉ Set.range (algebraMap (ZMod p) (GaloisField p 3)) := by
+  rintro ⟨b, rfl⟩
+  refine hrf b ?_
+  rw [← fCubic_eval, ← Polynomial.coe_aeval_eq_eval]
+  exact (Polynomial.aeval_algebraMap_eq_zero_iff_of_injective
+    (algebraMap (ZMod p) (GaloisField p 3)).injective).mp hroot
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
