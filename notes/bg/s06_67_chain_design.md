@@ -142,6 +142,33 @@ A p-群 ⟹ primesOf A={p} via `primesOf_eq_singleton hAp hAne`)。
 case1 A≠⊥: A=Ω₁(C_G(A)), A=⊥⟹C_G(A)=⊤⟹{x|x^p=1}=⊥⟹p∤|G|, hp_mem(p∣|G|)+Cauchy 矛盾。
 case1 A<⊤: A p-群, A=⊤⟹G p-群 nilpotent solvable, hG.notSolvable 矛盾。
 
+### case1 具体 skeleton (S07:~3503 sorry 置換)
+```
+obtain ⟨hAeq, hplM⟩ := hcase1        -- hAeq: (A:Set)={x|x∈C_G(A)∧x^p=1}; hplM: ∀M<⊤, hasPLengthOne p M
+have hp_odd : p ≠ 2 := fun h => (by subst h; exact (Nat.odd_iff.mp hG.odd ... ) ) -- p∣|G| odd ⟹ p≠2
+have hAelem : A.IsElementaryAbelian p := -- A⊆C_G(A) (hAeq) ⟹ abelian; x^p=1 (hAeq) ⟹ exp p
+have hAmax : IsMaximalElementaryAbelian p A := ⟨hAelem, fun F hF hAF => ...⟩
+   -- F elem ab ⊇ A: f∈F\A は order p, F abelian ⟹ f∈C_G(A), f^p=1 ⟹ f∈A (hAeq) 矛盾 ⟹ F=A
+have hAne : A ≠ ⊥ := ...; have hAproper : A < ⊤ := ...
+refine ⟨hAne, hAproper, ?_⟩; intro X hAX hXlt
+refine generated_eq_of_forall_le_opiCoreInG hAX ?_; intro Y hY
+obtain ⟨hYX, hAnormY, hYpi⟩ := mem_hInvariant.mp hY  -- Y≤X, A≤N(Y), IsPiSubgroup (primesOf A)ᶜ Y
+haveI : IsSolvable ↥X := hG.solvable_of_lt_top X hXlt
+-- E:=A.subgroupOf X, L:=Y.subgroupOf X に翻訳して Thm 6.7 @↥X
+have hπ : primesOf A = {p} := primesOf_eq_singleton hAp hAne
+have hEXmax : IsMaximalElementaryAbelian p (A.subgroupOf X) := -- hAmax を ↥X へ (subgroupOf, F̄=F.map X.subtype lift)
+have hLp' : ¬ p ∣ Nat.card (Y.subgroupOf X) := -- |.|=|Y|; hYpi+hπ ⟹ p∉primeFactors|Y|
+have hELY : A.subgroupOf X ≤ Subgroup.normalizer (Y.subgroupOf X) := -- hAnormY を subgroupOf へ
+have hpl1X : hasPLengthOne p ↥X := hplM X hXlt
+have key := le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian (G:=↥X) hp_odd hEXmax hLp' hELY hpl1X
+  -- key : Y.subgroupOf X ≤ Ch03.oPiCore {q∉{p}} ↥X
+-- goal Y ≤ opiCoreInG (primesOf A)ᶜ X。opiCoreInG π X = (oPiCore π ↥X).map X.subtype;
+-- Y=(Y.subgroupOf X).map X.subtype (Y≤X); (primesOf A)ᶜ={q∉{p}} (hπ) ⟹ map key で結論。
+```
+翻訳補題: `Subgroup.map_subgroupOf_eq_of_le (Y≤X) : (Y.subgroupOf X).map X.subtype = Y`;
+`opiCoreInG` def 展開; set 等式 `(primesOf A)ᶜ = {q|q∉{p}}` (hπ + `Set.compl_singleton`/funext)。
+hEXmax の ↥X 翻訳が case1 の主作業 (max-incl の subgroupOf 往復, ~40-60 行)。
+
 ## Thm 6.7 実装分割 (確定プラン, 最重)
 
 S06 に `import OddOrder.GroupTheory.NarrowPGroup` (IsMaximalElementaryAbelian) +

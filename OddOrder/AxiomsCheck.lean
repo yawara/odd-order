@@ -1153,6 +1153,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.sylow_le_commutator_normalizer_of_le_commutator
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizer_mul_normalizer_of_conj_subset_sylow
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizer_inf_conj_le_sylow
+-- BG Thm 6.7 (mmd L2105): G 可解, p 奇, E∈E*_p(G) (包含極大 elem ab), L p'-部分群 normalized by E,
+-- hasPLengthOne ⇒ L⊆O_{p'}(G)。reduced case (O_{p'}=⊥: 6.6 で S⊴G, Cor 1.12 で L 中心化 S,
+-- Prop 1.15(a) で L⊆S=O_p, L p'⟹L=⊥) + G/K reduction (E*_p quotient lift)。§7 Prop 7.5 case1 で使用。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian
 -- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
 -- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer

@@ -8,7 +8,9 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.BG.Ch1_Preliminary.PLength
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
@@ -968,6 +970,387 @@ theorem exists_mem_centralizer_inf_conj_le_sylow (S : Sylow p G)
       rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def, MulAut.conj_inv_apply]
       exact hz
     exact hmQ hzmem
+
+end
+
+
+section /- 6.7 -/
+
+open scoped Pointwise IsMulCommutative
+
+open OddOrder.BG.Ch1 (hasPLengthOne)
+open OddOrder.GroupTheory
+open OddOrder.BG.Ch1.S01 (corollary_1_12 hall_higman_solvable_specialization
+  inf_eq_bot_of_pGroup_coprime)
+
+variable [Finite G] [IsSolvable G] {p : ℕ} [Fact p.Prime]
+
+omit [IsSolvable G] in
+/-- `O_p(G) ≤ O_{p',p}(G)`: the `p`-radical sits inside the `O_{p',p}` layer.
+(`Ch03.oPiCore {p} G = Ch01.opCore p G` and `Ch01.opCore p G ≤ O_{p',p}(G)`.) -/
+private theorem oPiCore_singleton_le_oPiPrimePiCore :
+    Ch03.oPiCore ({p} : Set ℕ) G ≤ Ch03.oPiPrimePiCore {p} G := by
+  rw [Ch04.oPiCore_singleton_eq_opCore]
+  exact opCore_le_oPiPrimePiCore p
+
+omit [IsSolvable G] in
+/-- `⟨x⟩` is `p`-elementary abelian when `x ^ p = 1`. -/
+private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p = 1) :
+    (Subgroup.zpowers x).IsElementaryAbelian p := by
+  letI : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
+  refine ⟨?_, ?_⟩
+  · intro a b
+    exact Subtype.ext (congrArg Subtype.val (mul_comm a b))
+  · intro a
+    apply Subtype.ext
+    change (a : G) ^ p = 1
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    rw [← hi, ← zpow_natCast (x ^ i) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+      hxp, one_zpow]
+
+omit [IsSolvable G] in
+/-- **E*(S) characterization (membership form)**: if `E` is a maximal elementary abelian
+`p`-subgroup, then every order-`p` element of `C_G(E)` already lies in `E`. (Apply
+`IsMaximalElementaryAbelian.le_of_le_centralizer` to `F = ⟨x⟩`.) -/
+private theorem mem_of_mem_centralizer_pow_eq_one
+    {E : Subgroup G} (hE : OddOrder.GroupTheory.IsMaximalElementaryAbelian p E)
+    {x : G} (hxC : x ∈ Subgroup.centralizer (E : Set G)) (hxp : x ^ p = 1) :
+    x ∈ E := by
+  have hX : (Subgroup.zpowers x).IsElementaryAbelian p :=
+    zpowers_isElementaryAbelian_of_pow_eq_one hxp
+  have hEcent : E ≤ Subgroup.centralizer (Subgroup.zpowers x : Set G) := by
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hy
+    obtain ⟨i, hi⟩ := hy
+    have hxe : Commute x e := (Subgroup.mem_centralizer_iff.mp hxC e he).symm
+    have : Commute y e := by rw [← hi]; exact hxe.zpow_left i
+    exact this.eq
+  exact (hE.le_of_le_centralizer hX hEcent) (Subgroup.mem_zpowers x)
+
+omit [IsSolvable G] in
+/-- **O_{p'}(G) = ⊥ ⟹ O_{p',p}(G) = O_p(G)**: if the lower `p'`-layer is trivial, the
+`O_{p',p}` layer collapses to the `p`-radical. (`oPiPrimePiCore π G = comap (mk' M) (oPiCore π
+(G/M))` with `M = ⊥`; `mk' ⊥` is the inverse of `quotientBot`, and `oPiCore` transports.) -/
+private theorem oPiPrimePiCore_eq_oPiCore_of_compl_bot
+    (h : Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
+    Ch03.oPiPrimePiCore {p} G = Ch03.oPiCore ({p} : Set ℕ) G := by
+  have key : ∀ (M : Subgroup G) [M.Normal], M = ⊥ →
+      Subgroup.comap (QuotientGroup.mk' M) (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ M))
+        = Ch03.oPiCore ({p} : Set ℕ) G := by
+    intro M _ hM
+    subst hM
+    rw [show (QuotientGroup.mk' (⊥ : Subgroup G))
+        = (QuotientGroup.quotientBot (G := G)).symm.toMonoidHom from rfl]
+    rw [Subgroup.comap_equiv_eq_map_symm']
+    simp only [MulEquiv.symm_symm]
+    exact Ch03.oPiCore.map_eq_of_mulEquiv ({p} : Set ℕ) (QuotientGroup.quotientBot (G := G))
+  exact key _ h
+
+-- (B1) reduced case: O_{p'}(G) = ⊥
+private theorem thm67_reduced (hp_odd : p ≠ 2)
+    (hK : Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥)
+    (hpl1 : OddOrder.BG.Ch1.hasPLengthOne p G)
+    {E : Subgroup G} (hE : OddOrder.GroupTheory.IsMaximalElementaryAbelian p E)
+    {L : Subgroup G} (hLp' : ¬ p ∣ Nat.card L) (hEL : E ≤ Subgroup.normalizer L) :
+    L = ⊥ := by
+  classical
+  -- Step 1: a Sylow `p`-subgroup `S ⊇ E`.
+  obtain ⟨S, hES⟩ := (hE.isElementaryAbelian.isPGroup).exists_le_sylow
+  -- Step 2: `O_{p',p}(G) = S`.
+  have hN : Ch03.oPiPrimePiCore {p} G = (S : Subgroup G) := by
+    rw [oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow S hpl1, hK, bot_sup_eq]
+  -- Step 3: `S ⊴ G`.
+  haveI hSnorm : (S : Subgroup G).Normal := hN ▸ Ch03.oPiPrimePiCore.normal {p} G
+  -- Step 4: `S = O_p(G)`.
+  have hS_eq_Op : (S : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G := by
+    refine le_antisymm ?_ ?_
+    · apply Ch03.Subgroup.IsPiGroup.le_oPiCore
+      intro r hr
+      obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
+      rw [hn, Nat.mem_primeFactors] at hr
+      have : r = p := (Nat.prime_dvd_prime_iff_eq hr.1 Fact.out).mp (hr.1.dvd_of_dvd_pow hr.2.1)
+      rw [this]; exact Set.mem_singleton p
+    · calc Ch03.oPiCore ({p} : Set ℕ) G ≤ Ch03.oPiPrimePiCore {p} G :=
+            oPiCore_singleton_le_oPiPrimePiCore
+        _ = (S : Subgroup G) := hN
+  -- `L ⊓ S = ⊥` (`L` a `p'`-group, `S` a `p`-group).
+  have hScopL : Nat.Coprime (Nat.card (S : Subgroup G)) (Nat.card L) := by
+    obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
+    rw [hn]
+    exact ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hLp').pow_left n
+  have hLSbot : L ⊓ (S : Subgroup G) = ⊥ := inf_eq_bot_of_coprime_card hScopL.symm
+  -- Step 5: `L` centralizes `E`.
+  have hLcentE : ∀ l ∈ L, ∀ e ∈ E, l * e = e * l := by
+    intro l hl e he
+    have heS : e ∈ (S : Subgroup G) := hES he
+    have hcomm_S : l * e * l⁻¹ * e⁻¹ ∈ (S : Subgroup G) := by
+      have hleS : l * e * l⁻¹ ∈ (S : Subgroup G) := by
+        have := hSnorm.conj_mem e heS l
+        simpa [mul_assoc] using this
+      exact (S : Subgroup G).mul_mem hleS ((S : Subgroup G).inv_mem heS)
+    have hcomm_L : l * e * l⁻¹ * e⁻¹ ∈ L := by
+      have hconjL : e * l⁻¹ * e⁻¹ ∈ L :=
+        (Subgroup.mem_normalizer_iff.mp (hEL he) l⁻¹).mp (L.inv_mem hl)
+      have heq : l * e * l⁻¹ * e⁻¹ = l * (e * l⁻¹ * e⁻¹) := by group
+      rw [heq]; exact L.mul_mem hl hconjL
+    have hcomm1 : l * e * l⁻¹ * e⁻¹ = 1 := by
+      have : l * e * l⁻¹ * e⁻¹ ∈ L ⊓ (S : Subgroup G) :=
+        Subgroup.mem_inf.mpr ⟨hcomm_L, hcomm_S⟩
+      rw [hLSbot, Subgroup.mem_bot] at this; exact this
+    have h1 : l * e * l⁻¹ = e := mul_inv_eq_one.mp hcomm1
+    calc l * e = (l * e * l⁻¹) * l := by group
+      _ = e * l := by rw [h1]
+  -- Step 6+7: Cor 1.12 (conjugation form). `L ≤ N_G(S) = ⊤`; set up `φ : ↥L → Aut ↥S`.
+  have hLnormS : L ≤ Subgroup.normalizer ((S : Subgroup G) : Set G) := by
+    rw [Subgroup.normalizer_eq_top (S : Subgroup G)]; exact le_top
+  set φ : ↥L →* MulAut ↥(S : Subgroup G) :=
+    (S : Subgroup G).normalizerMonoidHom.comp (Subgroup.inclusion hLnormS) with hφ
+  have hφcoe : ∀ (a : ↥L) (g : ↥(S : Subgroup G)),
+      ((φ a) g : G) = (a : G) * (g : G) * (a : G)⁻¹ := by
+    intro a g; rw [hφ]; rfl
+  have hEsub : (E.subgroupOf (S : Subgroup G)).IsElementaryAbelian p := by
+    refine Subgroup.IsElementaryAbelian.of_map (S : Subgroup G).subtype_injective ?_
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hES]
+    exact hE.isElementaryAbelian
+  have h_fix : ∀ g : ↥(S : Subgroup G),
+      g ∈ Subgroup.centralizer ((E.subgroupOf (S : Subgroup G) :
+        Subgroup ↥(S : Subgroup G)) : Set ↥(S : Subgroup G)) →
+      g ^ p = 1 → ∀ a : ↥L, (φ a) g = g := by
+    intro g hg hgp a
+    have hgcentE : (g : G) ∈ Subgroup.centralizer (E : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      have hyS : y ∈ (S : Subgroup G) := hES hy
+      have hy' : (⟨y, hyS⟩ : ↥(S : Subgroup G)) ∈
+          (E.subgroupOf (S : Subgroup G) : Subgroup ↥(S : Subgroup G)) := by
+        rw [Subgroup.mem_subgroupOf]; exact hy
+      exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hg ⟨y, hyS⟩ hy')
+    have hgp' : (g : G) ^ p = 1 := by
+      have := congrArg (fun x : ↥(S : Subgroup G) => (x : G)) hgp
+      simpa using this
+    have hgE : (g : G) ∈ E := mem_of_mem_centralizer_pow_eq_one hE hgcentE hgp'
+    refine Subtype.ext ?_
+    rw [hφcoe, hLcentE (a : G) a.2 (g : G) hgE, mul_assoc, mul_inv_cancel, mul_one]
+  have htriv := corollary_1_12 (A := ↥L) (G := ↥(S : Subgroup G)) hp_odd S.isPGroup'
+    (by simpa using hLp') φ hEsub h_fix
+  have hLcentS : L ≤ Subgroup.centralizer (S : Set G) := by
+    intro l hl
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    have hco := congrArg Subtype.val (htriv ⟨l, hl⟩ ⟨s, hs⟩)
+    rw [hφcoe] at hco
+    have h1 : l * s * l⁻¹ = s := hco
+    calc s * l = (l * s * l⁻¹) * l := by rw [h1]
+      _ = l * s := by group
+  -- Step 8: Prop 1.15(a): `C_G(O_p) ≤ O_p`, so `L ≤ S`; with `L ⊓ S = ⊥`, `L = ⊥`.
+  have hHH : Subgroup.centralizer (Ch03.oPiCore ({p} : Set ℕ) G : Set G) ≤
+      Ch03.oPiCore ({p} : Set ℕ) G := hall_higman_solvable_specialization hK
+  have hL_le_S : L ≤ (S : Subgroup G) := by
+    rw [hS_eq_Op]
+    exact le_trans hLcentS (hS_eq_Op ▸ hHH)
+  have : L ≤ L ⊓ (S : Subgroup G) := le_inf le_rfl hL_le_S
+  rw [hLSbot, le_bot_iff] at this
+  exact this
+
+omit [IsSolvable G] in
+/-- **(B2) lift**: the image of a maximal elementary abelian `p`-subgroup under a quotient by
+a normal `p'`-subgroup `K` is again maximal elementary abelian. The maximality is the crux:
+a larger elementary abelian `Fbar` lifts to `F = Fbar.comap (mk' K)`, whose Sylow-`p`
+subgroup `PF` is elementary abelian (`PF ⊓ K = ⊥` with `F/K` abelian of exponent `p`) and
+contains `E`, so `PF = E` by maximality, and `PF` maps onto `Fbar`. -/
+private theorem isMaximalElementaryAbelian_map_mk'
+    (K : Subgroup G) [K.Normal] (hKp' : (Nat.card K).Coprime p)
+    {E : Subgroup G} (hE : OddOrder.GroupTheory.IsMaximalElementaryAbelian p E) :
+    OddOrder.GroupTheory.IsMaximalElementaryAbelian p (E.map (QuotientGroup.mk' K)) := by
+  classical
+  set q : G →* G ⧸ K := QuotientGroup.mk' K with hqdef
+  have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
+  have hqker : q.ker = K := QuotientGroup.ker_mk' K
+  -- `E ⊓ K = ⊥` ⟹ `q` injective on `E`.
+  have hEKbot : E ⊓ K = ⊥ := by
+    have hEcop : Nat.Coprime (Nat.card E) (Nat.card K) := by
+      obtain ⟨n, hn⟩ := hE.isElementaryAbelian.isPGroup.exists_card_eq
+      rw [hn]; exact (hKp'.symm.pow_left n)
+    exact inf_eq_bot_of_coprime_card hEcop
+  have hqinjE : Function.Injective (q.comp E.subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
+    intro x hx
+    rw [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype] at hx
+    have hxK : (x : G) ∈ K := by
+      rw [hqdef, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hx; exact hx
+    have hxEK : (x : G) ∈ E ⊓ K := Subgroup.mem_inf.mpr ⟨x.2, hxK⟩
+    rw [hEKbot, Subgroup.mem_bot] at hxEK
+    exact Subtype.ext hxEK
+  refine ⟨?_, ?_⟩
+  · -- `E.map q` elementary abelian.
+    have hmap_eq : E.map q = (⊤ : Subgroup E).map (q.comp (Subgroup.subtype E)) := by
+      rw [← Subgroup.map_map, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    rw [hmap_eq]
+    have htop : (⊤ : Subgroup E).IsElementaryAbelian p :=
+      IsElementaryAbelian.of_mulEquiv (Subgroup.topEquiv).symm hE.isElementaryAbelian
+    exact htop.map hqinjE
+  · -- maximality.
+    intro Fbar hFbar hEFbar
+    set F : Subgroup G := Fbar.comap q with hFdef
+    have hKF : K ≤ F := by
+      intro k hk
+      rw [hFdef, Subgroup.mem_comap]
+      have : q k = 1 := by rw [← MonoidHom.mem_ker, hqker]; exact hk
+      rw [this]; exact Fbar.one_mem
+    have hFmapq : F.map q = Fbar := by
+      rw [hFdef]; exact Subgroup.map_comap_eq_self_of_surjective hqsurj Fbar
+    have hFbarpg : IsPGroup p Fbar := hFbar.isPGroup
+    have hEF : E ≤ F := by
+      intro e he; rw [hFdef, Subgroup.mem_comap]; exact hEFbar (Subgroup.mem_map_of_mem q he)
+    have hEsubF : IsPGroup p (E.subgroupOf F) := by
+      have hmap : (E.subgroupOf F).map F.subtype = E ⊓ F := Subgroup.subgroupOf_map_subtype E F
+      have hiso := Subgroup.equivMapOfInjective (E.subgroupOf F) F.subtype F.subtype_injective
+      rw [hmap, inf_eq_left.mpr hEF] at hiso
+      exact hE.isElementaryAbelian.isPGroup.of_equiv hiso.symm
+    obtain ⟨PFsub, hEsub_le⟩ := hEsubF.exists_le_sylow
+    set PF : Subgroup G := (PFsub : Subgroup ↥F).map F.subtype with hPFdef
+    have hPF_le_F : PF ≤ F := by rw [hPFdef]; exact Subgroup.map_subtype_le _
+    have hE_le_PF : E ≤ PF := by
+      rw [hPFdef]; intro e he
+      exact ⟨⟨e, hEF he⟩, hEsub_le (by rw [Subgroup.mem_subgroupOf]; exact he), rfl⟩
+    have hPF_pg : IsPGroup p PF := by rw [hPFdef]; exact PFsub.2.map F.subtype
+    have hPFKbot : PF ⊓ K = ⊥ :=
+      OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPF_pg hKp'
+    have hPF_elem : PF.IsElementaryAbelian p := by
+      refine ⟨?_, ?_⟩
+      · intro a b
+        refine Subtype.ext ?_
+        change (a : G) * (b : G) = (b : G) * (a : G)
+        have hcomm_K : (a : G) * (b : G) * (a : G)⁻¹ * (b : G)⁻¹ ∈ K := by
+          rw [← hqker, MonoidHom.mem_ker]
+          have haF : q (a : G) ∈ Fbar := by
+            rw [← hFmapq]; exact Subgroup.mem_map_of_mem q (hPF_le_F a.2)
+          have hbF : q (b : G) ∈ Fbar := by
+            rw [← hFmapq]; exact Subgroup.mem_map_of_mem q (hPF_le_F b.2)
+          have habcomm : q (a:G) * q (b:G) = q (b:G) * q (a:G) :=
+            congrArg Subtype.val (hFbar.comm ⟨_, haF⟩ ⟨_, hbF⟩)
+          simp only [map_mul, map_inv]
+          rw [mul_inv_eq_one, mul_inv_eq_iff_eq_mul, habcomm]
+        have hcomm_PF : (a : G) * (b : G) * (a : G)⁻¹ * (b : G)⁻¹ ∈ PF :=
+          PF.mul_mem (PF.mul_mem (PF.mul_mem a.2 b.2) (PF.inv_mem a.2)) (PF.inv_mem b.2)
+        have hcomm1 : (a : G) * (b : G) * (a : G)⁻¹ * (b : G)⁻¹ = 1 := by
+          have : _ ∈ PF ⊓ K := Subgroup.mem_inf.mpr ⟨hcomm_PF, hcomm_K⟩
+          rw [hPFKbot, Subgroup.mem_bot] at this; exact this
+        have h1 : (a : G) * (b : G) * (a : G)⁻¹ = (b : G) := mul_inv_eq_one.mp hcomm1
+        calc (a : G) * (b : G) = ((a : G) * (b : G) * (a : G)⁻¹) * (a : G) := by group
+          _ = (b : G) * (a : G) := by rw [h1]
+      · intro x
+        refine Subtype.ext ?_
+        change (x : G) ^ p = 1
+        have hxp_K : (x : G) ^ p ∈ K := by
+          rw [← hqker, MonoidHom.mem_ker, map_pow]
+          have hxF : q (x : G) ∈ Fbar := by
+            rw [← hFmapq]; exact Subgroup.mem_map_of_mem q (hPF_le_F x.2)
+          exact congrArg Subtype.val (hFbar.pow_eq_one ⟨_, hxF⟩)
+        have hxp_PF : (x : G) ^ p ∈ PF := PF.pow_mem x.2 p
+        have : (x : G) ^ p ∈ PF ⊓ K := Subgroup.mem_inf.mpr ⟨hxp_PF, hxp_K⟩
+        rw [hPFKbot, Subgroup.mem_bot] at this; exact this
+    have hPF_eq_E : PF = E := hE.eq_of_le hPF_elem hE_le_PF
+    have hPFmapq : PF.map q = Fbar := by
+      have hle : PF.map q ≤ Fbar := by rw [← hFmapq]; exact Subgroup.map_mono hPF_le_F
+      have hcard_eq : Nat.card (PF.map q) = Nat.card PF := by
+        have h1 : Nat.card (PF.map q) = K.relIndex PF := by rw [← Subgroup.relIndex_ker, hqker]
+        have hbot' : K.subgroupOf PF = ⊥ :=
+          Subgroup.subgroupOf_eq_bot.mpr (by rw [disjoint_iff, inf_comm]; exact hPFKbot)
+        rw [h1]; change (K.subgroupOf PF).index = Nat.card PF
+        rw [hbot', Subgroup.index_bot]
+      have hcardKsub : Nat.card (K.subgroupOf F) = Nat.card K := by
+        have hm : (K.subgroupOf F).map F.subtype = K ⊓ F := Subgroup.subgroupOf_map_subtype K F
+        have hiso := Subgroup.equivMapOfInjective (K.subgroupOf F) F.subtype F.subtype_injective
+        rw [hm, inf_eq_left.mpr hKF] at hiso
+        exact Nat.card_congr hiso.toEquiv
+      have hcardF : Nat.card (F.map q) * Nat.card K = Nat.card F := by
+        have h1 : Nat.card (F.map q) = K.relIndex F := by rw [← Subgroup.relIndex_ker, hqker]
+        have h2 : Nat.card ↥F = K.relIndex F * Nat.card (K.subgroupOf F) := by
+          rw [Subgroup.relIndex]
+          exact Subgroup.card_eq_card_quotient_mul_card_subgroup (K.subgroupOf F)
+        rw [hcardKsub] at h2
+        rw [h1]; exact h2.symm
+      have hcardPF_idx : Nat.card PF * (PFsub : Subgroup ↥F).index = Nat.card F := by
+        have h1 : Nat.card PF = Nat.card (PFsub : Subgroup ↥F) := by
+          rw [hPFdef]
+          exact (Nat.card_congr (Subgroup.equivMapOfInjective _ F.subtype
+            F.subtype_injective).toEquiv).symm
+        rw [h1]; exact (PFsub : Subgroup ↥F).card_mul_index
+      have hidx_p' : ¬ p ∣ (PFsub : Subgroup ↥F).index := PFsub.not_dvd_index
+      have hcardPF_cop_K : Nat.Coprime (Nat.card PF) (Nat.card K) := by
+        obtain ⟨b, hb⟩ := hPF_pg.exists_card_eq
+        rw [hb]; exact hKp'.symm.pow_left b
+      have hcardFbar_cop_idx : Nat.Coprime (Nat.card Fbar) ((PFsub : Subgroup ↥F).index) := by
+        obtain ⟨a, ha⟩ := hFbarpg.exists_card_eq
+        rw [ha]; exact ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hidx_p').pow_left a
+      have hcardFbar : Nat.card Fbar = Nat.card (F.map q) := by rw [hFmapq]
+      have hPF_dvd : Nat.card PF ∣ Nat.card Fbar := by
+        have hdvd : Nat.card PF ∣ Nat.card (F.map q) * Nat.card K := by
+          rw [hcardF]; exact ⟨(PFsub : Subgroup ↥F).index, hcardPF_idx.symm⟩
+        rw [hcardFbar]; exact hcardPF_cop_K.dvd_of_dvd_mul_right hdvd
+      have hFbar_dvd : Nat.card Fbar ∣ Nat.card PF := by
+        have hdvd : Nat.card Fbar ∣ Nat.card PF * (PFsub : Subgroup ↥F).index := by
+          rw [hcardPF_idx, hcardFbar]; exact ⟨Nat.card K, hcardF.symm⟩
+        exact hcardFbar_cop_idx.dvd_of_dvd_mul_right hdvd
+      have hcardPF_eq : Nat.card PF = Nat.card Fbar := Nat.dvd_antisymm hPF_dvd hFbar_dvd
+      refine Subgroup.eq_of_le_of_card_ge hle ?_
+      rw [hcard_eq, hcardPF_eq]
+    rw [← hPFmapq, hPF_eq_E]
+
+-- (B2) general form. CONCLUSION = L ≤ O_{p'}(G).
+theorem le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian (hp_odd : p ≠ 2)
+    {E : Subgroup G} (hE : OddOrder.GroupTheory.IsMaximalElementaryAbelian p E)
+    {L : Subgroup G} (hLp' : ¬ p ∣ Nat.card L) (hEL : E ≤ Subgroup.normalizer L)
+    (hpl1 : OddOrder.BG.Ch1.hasPLengthOne p G) :
+    L ≤ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+  classical
+  set K : Subgroup G := Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hKdef
+  haveI : K.Normal := Ch03.oPiCore.normal _ G
+  set q : G →* G ⧸ K := QuotientGroup.mk' K with hqdef
+  have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
+  have hKp' : (Nat.card K).Coprime p := card_oPiPrimeCore_coprime_prime
+  -- (a) `O_{p'}(G/K) = ⊥`.
+  have hKq : Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} (G ⧸ K) = ⊥ :=
+    Ch03.oPiCore_quotient_self_eq_bot _
+  -- (b) `E.map q` is maximal elementary abelian in `G/K`.
+  have hEbar : OddOrder.GroupTheory.IsMaximalElementaryAbelian p (E.map q) :=
+    isMaximalElementaryAbelian_map_mk' K hKp' hE
+  -- (c) `L.map q` is a `p'`-group.
+  have hLbar_p' : ¬ p ∣ Nat.card (L.map q) := fun hdvd =>
+    hLp' (hdvd.trans (Subgroup.card_map_dvd L q))
+  -- (d) `E.map q` normalizes `L.map q`.
+  have hELbar : E.map q ≤ Subgroup.normalizer (L.map q) :=
+    le_trans (Subgroup.map_mono hEL) (Subgroup.le_normalizer_map q)
+  -- (e) `G/K` has `p`-length one (third isomorphism theorem).
+  have hpl1bar : OddOrder.BG.Ch1.hasPLengthOne p (G ⧸ K) := by
+    have hKle : K ≤ Ch03.oPiPrimePiCore {p} G := by
+      rw [hKdef]; exact Ch03.oPiCore_compl_le_oPiPrimePiCore {p} G
+    -- `(oPiPrimePiCore {p} G).map q = oPiCore {p}(G/K)`
+    -- (def: `oPiPrimePiCore {p} G = comap q O_p(G/K)`).
+    have hmapO : (Ch03.oPiPrimePiCore {p} G).map q = Ch03.oPiCore ({p} : Set ℕ) (G ⧸ K) := by
+      rw [hqdef]
+      change ((Ch03.oPiCore ({p} : Set ℕ) (G ⧸ K)).comap (QuotientGroup.mk' K)).map
+        (QuotientGroup.mk' K) = _
+      exact Subgroup.map_comap_eq_self_of_surjective hqsurj _
+    -- `oPiPrimePiCore {p}(G/K) = oPiCore {p}(G/K)` since `O_{p'}(G/K) = ⊥`.
+    have hOpp_GK : Ch03.oPiPrimePiCore {p} (G ⧸ K) = Ch03.oPiCore ({p} : Set ℕ) (G ⧸ K) :=
+      oPiPrimePiCore_eq_oPiCore_of_compl_bot hKq
+    -- third iso: `(G/K) ⧸ ((oPiPrimePiCore {p} G).map q) ≃* G ⧸ oPiPrimePiCore {p} G`.
+    have hcard_eq : Nat.card ((G ⧸ K) ⧸ Ch03.oPiPrimePiCore {p} (G ⧸ K)) =
+        Nat.card (G ⧸ Ch03.oPiPrimePiCore {p} G) := by
+      rw [hOpp_GK, ← hmapO]
+      exact Nat.card_congr
+        (QuotientGroup.quotientQuotientEquivQuotient K _ hKle).toEquiv
+    rw [hasPLengthOne] at hpl1 ⊢
+    rw [hcard_eq]; exact hpl1
+  -- apply the reduced case to `G/K`.
+  have hLbar_bot : L.map q = ⊥ :=
+    thm67_reduced (G := G ⧸ K) hp_odd hKq hpl1bar hEbar hLbar_p' hELbar
+  have hle : L ≤ q.ker := (Subgroup.map_eq_bot_iff L).mp hLbar_bot
+  rwa [hqdef, QuotientGroup.ker_mk'] at hle
 
 end
 
