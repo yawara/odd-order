@@ -8,6 +8,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Mathlib.SemidirectProduct
@@ -352,6 +353,72 @@ theorem normOneFrobenius_irreducibleCharacter_apply_inl_of_apply_one_eq_one
         (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) = 1 :=
   normOneFrobenius_linear_irreducible_apply_inl p q hq χ.property hχ1 s
 
+/-- If an irreducible character of the concrete Frobenius group kills the
+additive kernel, then it takes its degree value on every additive-kernel
+element. -/
+theorem normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset
+    [Fact p.Prime]
+    {χ : IrreducibleCharacter (normOneFrobeniusGroup p q)}
+    (hker : (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ))
+    (s : GaloisField p q) :
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) =
+      (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q) := by
+  have hmem :
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈
+        normOneFrobeniusKernel p q :=
+    ⟨Multiplicative.ofAdd s, rfl⟩
+  simpa [OddOrder.Peterfalvi.S03.characterDegree_def] using hker hmem
+
+open scoped Classical in
+/-- The degree-square sum over irreducible characters whose kernel contains the
+additive kernel is the order of the quotient `H/P`, namely `|U|`. -/
+theorem normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card
+    [Fact p.Prime] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)),
+      ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q)) ^ 2 =
+      (Nat.card (normOneUnits p q) : ℂ) := by
+  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  rw [OddOrder.RepresentationTheory.sumInflatedDegreeSq
+    (N := normOneFrobeniusKernel p q)]
+  rw [← Subgroup.index_eq_card, normOneFrobeniusKernel_index_eq_normOneUnits_card]
+
+open scoped Classical in
+/-- The column-orthogonality contribution at an additive-kernel element from the
+irreducible characters killing the additive kernel is exactly `|U|`. -/
+theorem normOneFrobenius_sum_kernelCharacter_column_inl_eq_normOneUnits_card
+    [Fact p.Prime] (s : GaloisField p q) :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)),
+      ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)) *
+        star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q))) =
+      (Nat.card (normOneUnits p q) : ℂ) := by
+  rw [← normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card p q]
+  refine Finset.sum_congr rfl fun χ hχ => ?_
+  have hker := (Finset.mem_filter.mp hχ).2
+  rw [normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset p q hker s]
+  obtain ⟨d, _hdpos, hdχ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  change ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q)) *
+      star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q))) =
+    ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q)) ^ 2
+  rw [hdχ, star_natCast, sq]
+
 /-- The additive kernel centralizes each of its own elements. This is the easy
 inclusion in the concrete centralizer computation used in the q≥5 character
 estimate of Lemma C.2. -/
@@ -449,6 +516,48 @@ theorem normOneFrobenius_column_sq_sum_two_mul_eq [Fact p.Prime] (hq : 1 < q)
               normOneFrobeniusGroup p q)))) =
       ((p ^ q : ℕ) : ℂ) :=
   normOneFrobenius_column_sq_sum_inl_eq p q hq (mul_ne_zero h2 hs)
+
+open scoped Classical in
+/-- The complementary column-orthogonality contribution at a nonzero
+additive-kernel element, from irreducible characters not killing the additive
+kernel, is `p^q - |U|`. -/
+theorem normOneFrobenius_sum_nonKernelCharacter_column_inl_eq
+    [Fact p.Prime] (hq : 1 < q) {s : GaloisField p q} (hs : s ≠ 0) :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        ¬ (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)),
+      ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)) *
+        star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q))) =
+      ((p ^ q : ℕ) : ℂ) - (Nat.card (normOneUnits p q) : ℂ) := by
+  let pred : IrreducibleCharacter (normOneFrobeniusGroup p q) → Prop := fun χ =>
+    (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+  let term : IrreducibleCharacter (normOneFrobeniusGroup p q) → ℂ := fun χ =>
+    ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+          normOneFrobeniusGroup p q)) *
+      star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+          normOneFrobeniusGroup p q)))
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (IrreducibleCharacter (normOneFrobeniusGroup p q))) pred term
+  have hkernel : ∑ χ ∈ Finset.univ.filter pred, term χ =
+      (Nat.card (normOneUnits p q) : ℂ) := by
+    simpa [pred, term] using
+      normOneFrobenius_sum_kernelCharacter_column_inl_eq_normOneUnits_card p q s
+  have htotal : ∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q), term χ =
+      ((p ^ q : ℕ) : ℂ) := by
+    simpa [term] using normOneFrobenius_column_sq_sum_inl_eq p q hq hs
+  have hsplit' := hsplit
+  rw [hkernel, htotal] at hsplit'
+  rw [add_comm] at hsplit'
+  exact eq_sub_of_add_eq hsplit'
 
 /-- The conjugacy class in `H = P ⋊ U` of the additive-kernel element attached to
 `s ∈ 𝔽_{p^q}`.  BG Lemma C.2 uses the class of a nonzero `s ∈ P`. -/

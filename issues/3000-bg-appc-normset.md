@@ -113,6 +113,11 @@ created: 2026-06-04
   `1<q` なら任意の `inl(s)∈P` が `H=P⋊U` の commutator であることを証明し、
   degree-one irreducible character / subtype 版が additive kernel 上で値 `1` になることを concrete theorem 化。
   q≥5 の class-sum character formula で linear characters の寄与を固定する入力。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 kernel-character main contribution split**:
+  `P⊆ker χ` で filter した既約指標の degree-square sum を `|H/P|=|U|` に固定し、
+  kernel 元 `inl(s)` 上での column contribution も `|U|` になる concrete theorem を追加。
+  total column norm `p^q` との差として、非 kernel 側の寄与が `p^q-|U|` になる split も theorem 化。
+  q≥5 coefficient lower bound を主項と non-kernel error に分ける数値入力。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

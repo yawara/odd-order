@@ -194,6 +194,18 @@ AxiomsCheck 登録済み。
 これは q≥5 の character formula で linear characters の寄与を `1` に固定する入力。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 kernel-character main contribution split (2026-06-04)
+Inflation API (`sumInflatedDegreeSq`) を concrete `H=P⋊U` に特殊化し、
+`P⊆ker χ` で filter した既約指標の degree-square sum が `|H/P|=|U|` になる
+`normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card` を追加。
+さらに `P⊆ker χ` なら `χ(inl s)=χ(1)` となる
+`normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset` と、kernel 元での column contribution が
+`|U|` になる `normOneFrobenius_sum_kernelCharacter_column_inl_eq_normOneUnits_card` を証明。
+加えて total column norm `p^q` との差として、非 kernel 側の寄与が
+`p^q-|U|` になる `normOneFrobenius_sum_nonKernelCharacter_column_inl_eq` も追加。
+これで q≥5 coefficient lower bound の主項と non-kernel error の数値分離が concrete theorem 化された。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

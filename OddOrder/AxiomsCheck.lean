@@ -1857,6 +1857,12 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.normOneFrobenius_linear_irreducible_apply_inl
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_irreducibleCharacter_apply_inl_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_kernelCharacter_column_inl_eq_normOneUnits_card
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_le_centralizer_inl
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_le_kernel
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_eq_kernel
@@ -1864,6 +1870,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_card_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_column_sq_sum_inl_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_column_sq_sum_two_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_column_inl_eq
 
 -- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
 -- corresponding product equation in the additive kernel of `H = P ⋊ U`.
