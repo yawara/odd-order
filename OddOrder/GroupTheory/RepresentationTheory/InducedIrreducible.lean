@@ -261,6 +261,61 @@ theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H)
   · rintro ⟨g, hg⟩
     exact ⟨hg ▸ hT θ₀ hθ₀ g, g⁻¹, by rw [← hg, ← IrreducibleCharacter.conjBy_mul]; simp⟩
 
+open scoped Classical in
+/-- **Peterfalvi (6.2), step 4a — the orbit-counted degree-sum identity.**  For a conjugation-
+invariant Finset `T ⊆ Irr H` (`H ⊴ G`), summing `χ(1)²/‖χ‖²` over the induced characters
+`S = {Ind_H^G θ | θ ∈ T}` equals `[G:H] · ∑_{θ∈T} θ(1)²`.
+
+Each `χ = Ind θ` is hit by the whole `G`-orbit of `θ` (`card_filter_induce_eq_index_inertia`), of
+size `[G:I_G(θ)]`, on which the degree is constant (`conjBy_apply_one`).  Combined with the norm
+`|H|·‖Ind θ‖² = |I_G(θ)|` (`card_mul_inner_self_induce_eq_card_inertia`) and the degree
+`Ind θ(1) = [G:H]·θ(1)` (`induce_apply_one`), the per-`χ` term telescopes via `[G:H]·|H| = |G| =
+[G:I]·|I|` to `[G:H]·([G:I]·θ(1)²)`, which is exactly `[G:H]` times the fibre's degree-sum. -/
+theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
+    (hT : ∀ θ ∈ T, ∀ g : G, IrreducibleCharacter.conjBy (G := G) (H := H) g θ ∈ T) :
+    ∑ χ ∈ T.image (fun θ => induce H θ.toClassFunction),
+        χ 1 ^ 2 / ClassFunction.inner χ χ
+      = (H.index : ℂ) * ∑ θ ∈ T, θ.toClassFunction 1 ^ 2 := by
+  have hcH : (Nat.card ↥H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  rw [Finset.mul_sum, ← Finset.sum_fiberwise_of_maps_to
+    (fun θ (hθ : θ ∈ T) => Finset.mem_image_of_mem (fun θ => induce H θ.toClassFunction) hθ)]
+  refine Finset.sum_congr rfl fun χ hχ => ?_
+  obtain ⟨θ₀, hθ₀T, rfl⟩ := Finset.mem_image.mp hχ
+  have hcI : (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  -- The fibre's `[G:H]·θ(1)²`-sum collapses to `[G:H]·[G:I]·θ₀(1)²` (constant degree + fibre card).
+  have hfib : ∑ θ ∈ T.filter (fun θ =>
+        induce H θ.toClassFunction = induce H θ₀.toClassFunction),
+        (H.index : ℂ) * θ.toClassFunction 1 ^ 2
+      = (H.index : ℂ)
+          * (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index * θ₀.toClassFunction 1 ^ 2 := by
+    have hconst : ∀ θ ∈ T.filter (fun θ =>
+        induce H θ.toClassFunction = induce H θ₀.toClassFunction),
+        (H.index : ℂ) * θ.toClassFunction 1 ^ 2 = (H.index : ℂ) * θ₀.toClassFunction 1 ^ 2 := by
+      intro θ hθ
+      rw [Finset.mem_filter] at hθ
+      obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ θ₀).mp hθ.2
+      rw [← hg, conjBy_apply_one]
+    rw [Finset.sum_congr rfl hconst, Finset.sum_const,
+      card_filter_induce_eq_index_inertia T hT θ₀ hθ₀T, nsmul_eq_mul]
+    ring
+  rw [hfib, induce_apply_one]
+  have hinner : ClassFunction.inner (induce H θ₀.toClassFunction) (induce H θ₀.toClassFunction)
+      = (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) / (Nat.card ↥H : ℂ) := by
+    rw [eq_div_iff hcH, mul_comm]
+    exact card_mul_inner_self_induce_eq_card_inertia θ₀
+  rw [hinner]
+  have hHmul : (H.index : ℂ) * (Nat.card ↥H : ℂ) = (Nat.card G : ℂ) := by
+    rw [← Nat.cast_mul, Subgroup.index_mul_card]
+  have hImul : ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
+      * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) = (Nat.card G : ℂ) := by
+    rw [← Nat.cast_mul, Subgroup.index_mul_card]
+  have hAB : (H.index : ℂ) * (Nat.card ↥H : ℂ)
+      = ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
+          * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) := hHmul.trans hImul.symm
+  rw [div_div_eq_mul_div, div_eq_iff hcI]
+  linear_combination (θ₀.toClassFunction 1 ^ 2 * (H.index : ℂ)) * hAB
+
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
 `exists_pair_of_sum_sq_eq_two`.) -/
