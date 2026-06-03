@@ -956,6 +956,39 @@ theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
     rwa [if_neg (fun h => hbi_ne h.symm)] at h
 
+/-- **(T8 leaf 2) `X`-member difference support** (Frobenius case).  For `χ ∈ X = S − S(Z)` the
+conjugate difference `χ̄ − χ` is supported on `H^# = sharpImage H` (the `hdiffsupp` field of
+`S07.DadeChainStep`).  Since `χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H`
+(`support_induce_subset_of_normal`); `χ̄ − χ` vanishes at `1` (the degree `χ(1)` is the real
+`(n : ℂ)`), so it omits `1` and lands in `H ∖ {1}`. -/
+theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hirr : IsIrreducibleCharacter χ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hχS : χ ∈ hyp.S := (hyp.mem_Xset.mp hχX).1
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast, sub_self])
+  have hχg : χ g ≠ 0 := fun h0 =>
+    hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_zero])
+  have hgH : g ∈ H := by
+    have hsupp : χ.support ⊆ (H : Set ↥L) := by
+      rw [hχeq]
+      exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
+    exact hsupp (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
