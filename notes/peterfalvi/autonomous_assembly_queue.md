@@ -174,19 +174,15 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
     **earlier「`HasEnoughRootsOfUnity ℂ` absent」で blocked と誤判定 → `IsSepClosed.hasEnoughRootsOfUnity` instance
     (ℂ sep closed + char 0) を `NeZero ((exponent:ℂ))` provision で発火させ攻略**。commits 6243ef1/9797ed4/684c9ac。
   - **step4b (`∑_{θ∈T}θ(1)²=|K:A|−1`)** = ✅ **LANDED** (`sumInflatedDegreeSq_ntrivial`, B2 core, T≅Irr(K/A)∖1)。
-  - **step4a (B2-orbit, `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_Tθ(1)²`)** = 🔶 残, **pure 文字理論 (framework 不要)**。
-    **✅✅ 両 key 再利用ピース LANDED (InducedIrreducible.lean, axiom-clean)**:
-    (1) `induce_eq_induce_iff_conj` (commit 3d29f2e): Ind θ=Ind ψ ⟺ ∃g, conjBy g θ=ψ — fibre=L-軌道。
-    (2) `card_conjByOrbit_eq_index_inertia` (commit 3547d3c): Nat.card(conjByOrbit θ)=[G:I] —
-    orbit-stab (Clifford `conjByOrbitEquivLeftCosets` G⧸I≃orbit 既存から Nat.card_congr)。
-    **proof sketch (導出済)**: T を L-共役で軌道分割。χ=Ind_K^Lθ, χ(1)=|L:K|θ(1) (`induce_apply_one`✅),
-    ‖χ‖²=[I_L(θ):K] (`card_mul_inner_self_induce_eq_card_inertia`✅ |H|‖Indθ‖²=|I| + `subgroup_le_inertia`✅),
-    軌道サイズ=[L:I] (orbit-stab), fibre=軌道 (✅ crux)。
-    χ(1)²/‖χ‖²=|L:K|²θ(1)²/[I:K]=|L:K|·[L:I]θ(1)² (∵|L:K|=[L:I][I:K]); ∑_T=∑_軌道[L:I]θ(1)²。
-    **残 assembly (~80 行, mechanical)**: ⚠ **MulAction G (IrreducibleCharacter H) instance 無** →
-    `g•θ := conjBy g⁻¹ θ` で左作用構成 (conjBy_one/conjBy_mul✅ で one_smul/mul_smul, stab=inertia) +
-    T-不変性 (A◁ ⟹ A⊆ker θ 保存, θ≠1 保存) + `MulAction.card_orbit_mul_card_stabilizer_eq_card_group`✅ +
-    `Finset.sum_fiberwise` + ℂ index 算術。fresh focus 推奨 (crux 済ゆえ残は組み立てのみ)。
+  - **step4a (B2-orbit, `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_Tθ(1)²`)** = ✅✅✅ **COMPLETE (commit 8acc696, axiom-clean, full build 3571)**。
+    `sum_div_normSq_induce_image_eq (T conjBy-invariant Finset ⊆ Irr H) : ∑_{Ind θ}χ(1)²/‖χ‖²=[G:H]∑_Tθ(1)²`。
+    abstract 形 (T-不変性を仮説化、K/A subgroup friction 回避)。組み立て: `Finset.sum_fiberwise_of_maps_to`
+    で T→S(A) fibre 分解; 各 fibre = θ₀ の G-軌道 (下記 sub-lemma) → degree 一定 + fibre-card で telescoping。
+    **sub-lemmas (全 axiom-clean, 再利用可)**:
+    (1) `induce_eq_induce_iff_conj` (3d29f2e): Ind θ=Ind ψ ⟺ ∃g conjBy g θ=ψ (fibre=軌道)。
+    (2) `card_conjByOrbit_eq_index_inertia` (3547d3c): Nat.card(conjByOrbit θ)=[G:I] (Clifford `conjByOrbitEquivLeftCosets`)。
+    (3) `conjBy_apply_one` + `card_filter_induce_eq_index_inertia` (fd8d8f0): degree 保存 + fibre-card=[G:I]。
+    算術 [G:H]|H|=|G|=[G:I]|I| (`Subgroup.index_mul_card`) → `linear_combination`。
   - **step3/5 (B1 = 5.6 quantitative, `2ψ(1)≥|K:A|−1`)** = 🔴 残, **Pf Thm 5.6 (quantitative coherence) keystone 要**。
   - **step6 (θ-bound `θ(1)≤|K:C|√|C:D|`)** = 🔴 残。**中心 case `θ(1)²≤|K:Z|, Z⊆Z(K)` = ✅ `exists_degree_sq_le_index`**。
     **🆕 重要: (6.6) p-群 path (mmd 04.8 L80) は [Is]Cor2.30 = 中心 case を直接使う (✅済)**; section case
