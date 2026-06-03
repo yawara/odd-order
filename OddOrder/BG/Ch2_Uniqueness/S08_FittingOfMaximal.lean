@@ -1009,6 +1009,135 @@ theorem centralizer_centerFittingOpCoreInG_inf_hInvariant_eq_bot_of_not_pGroup
     rw [← hY_cent_bot]
     exact le_inf inf_le_right hC_le_cent)
 
+/-- Coprime fixed-point decomposition in ambient subgroup form: if `B` normalizes `Y`,
+acts coprimely on it, and has no nontrivial fixed point in `Y`, then
+`Y <= ⁅B, Y⁆`. This is the subgroup version of BG Prop. 1.6(a) used in BG (8.4). -/
+theorem le_commutator_of_coprime_inf_centralizer_eq_bot [Finite G]
+    {B Y : Subgroup G} [IsSolvable ↥B] (hBY : B ≤ Subgroup.normalizer Y)
+    (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Y))
+    (hfixed : Y ⊓ Subgroup.centralizer (B : Set G) = ⊥) :
+    Y ≤ ⁅B, Y⁆ := by
+  classical
+  have hY_inv : Ch03.IsAInvariant (OddOrder.BG.Ch2.S07.conjAction B) Y :=
+    OddOrder.BG.Ch2.S07.isAInvariant_conjAction_iff.mpr hBY
+  have htop := OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+    (φ := hY_inv.restrict) hcop (Or.inl inferInstance)
+  rw [← Subgroup.subgroupOf_eq_top, eq_top_iff, ← htop, sup_le_iff]
+  refine ⟨?_, ?_⟩
+  · intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    have hx_fixed : (x : G) ∈ Y ⊓ Subgroup.centralizer (B : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨x.2, ?_⟩
+      rw [Subgroup.mem_centralizer_iff]
+      intro b hb
+      have hval := congrArg Subtype.val
+        (Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨b, hb⟩)
+      rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+      simp only [OddOrder.BG.Ch2.S07.conjAction, MonoidHom.comp_apply,
+        Subgroup.coe_subtype, MulAut.conj_apply] at hval
+      exact mul_inv_eq_iff_eq_mul.mp hval
+    have hx_one : (x : G) = 1 := by
+      simpa [hfixed] using hx_fixed
+    rw [hx_one]
+    exact Subgroup.one_mem _
+  · rw [OddOrder.Isaacs.Ch04.actionCommutator_le_iff]
+    intro a g
+    rw [Subgroup.mem_subgroupOf]
+    have hgen : (((hY_inv.restrict a) g * g⁻¹ : ↥Y) : G)
+        = (a : G) * (g : G) * (a : G)⁻¹ * (g : G)⁻¹ := by
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, Ch03.IsAInvariant.restrict_apply_val]
+      simp only [OddOrder.BG.Ch2.S07.conjAction, MonoidHom.comp_apply,
+        Subgroup.coe_subtype, MulAut.conj_apply]
+    rw [hgen]
+    exact Subgroup.commutator_mem_commutator a.2 g.2
+
+/-- The central q-core `O_q(Z(F(M)))` is solvable, since it lies in the center of `F(M)`. -/
+theorem centerFittingOpCoreInG_isSolvable (q : ℕ) (M : Subgroup G) :
+    IsSolvable ↥(centerFittingOpCoreInG q M) := by
+  haveI : IsMulCommutative ↥(centerFittingInG M) := centerFittingInG_isMulCommutative M
+  exact isSolvable_of_comm fun a b => by
+    apply Subtype.ext
+    exact setLike_mul_comm
+      (centerFittingOpCoreInG_le_centerFittingInG q M a.2)
+      (centerFittingOpCoreInG_le_centerFittingInG q M b.2)
+
+/-- `O_q(Z(F(M)))` lies in `C_F(M)(A0)` whenever `A0 ≤ F(M)`. -/
+theorem centerFittingOpCoreInG_le_cFittingInG {p q : ℕ} {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M)) :
+    centerFittingOpCoreInG q M ≤ cFittingInG M A0 :=
+  (centerFittingOpCoreInG_le_centerFittingInG q M).trans
+    (centerFittingInG_le_centralizer_inf (isMaxElemAbelianIn_le hA0))
+
+/-- Members of `ℋ_X(C_F(M)(A0); π(C_F(M)(A0))^c)` are normalized by
+`O_q(Z(F(M)))`. -/
+theorem centerFittingOpCoreInG_le_normalizer_of_hInvariant
+    {p q : ℕ} {M A0 X Y : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    centerFittingOpCoreInG q M ≤ Subgroup.normalizer Y :=
+  (centerFittingOpCoreInG_le_cFittingInG (q := q) hA0).trans
+    (hInvariant_le_normalizer hY)
+
+/-- For `q ∈ π(F(M))`, the central q-core `O_q(Z(F(M)))` is a
+`π(C_F(M)(A0))`-subgroup. -/
+theorem centerFittingOpCoreInG_isPiSubgroup_primesOf_cFittingInG [Finite G]
+    {p q : ℕ} [Fact q.Prime] {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
+    Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))
+      (centerFittingOpCoreInG q M) := by
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hBq : Subgroup.IsPiSubgroup ({q} : Set ℕ) (centerFittingOpCoreInG q M) := by
+    dsimp [centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) (centerFittingInG M)
+  intro r hr
+  have hrq : r ∈ ({q} : Set ℕ) := hBq r hr
+  rw [Set.mem_singleton_iff] at hrq
+  rw [hrq, hPrimes]
+  simpa [OddOrder.BG.Ch2.S07.primesOf] using hq
+
+/-- The action of `O_q(Z(F(M)))` on an `ℋ`-member for the complementary prime set is
+coprime. -/
+theorem coprime_card_centerFittingOpCoreInG_hInvariant [Finite G]
+    {p q : ℕ} [Fact q.Prime] {M A0 X Y : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Nat.Coprime (Nat.card ↥(centerFittingOpCoreInG q M)) (Nat.card ↥Y) :=
+  coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl
+    (centerFittingOpCoreInG_isPiSubgroup_primesOf_cFittingInG hA0 hq)
+    (hInvariant_isPiSubgroup hY)
+
+/-- BG (8.4), commutator form: in the non-p-group case, every
+`π(C_F(M)(A0))`-complement `ℋ`-member is generated by its commutators with
+`O_q(Z(F(M)))`, for each `q ∈ π(F(M))`. -/
+theorem hInvariant_le_commutator_centerFittingOpCoreInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Y ≤ ⁅centerFittingOpCoreInG q M, Y⁆ := by
+  have hfixed : Y ⊓
+      Subgroup.centralizer (centerFittingOpCoreInG q M : Set G) = ⊥ := by
+    simpa [inf_comm] using
+      centralizer_centerFittingOpCoreInG_inf_hInvariant_eq_bot_of_not_pGroup
+        hG hM hA0 hFnp hq hY
+  haveI : IsSolvable ↥(centerFittingOpCoreInG q M) :=
+    centerFittingOpCoreInG_isSolvable q M
+  exact le_commutator_of_coprime_inf_centralizer_eq_bot
+    (centerFittingOpCoreInG_le_normalizer_of_hInvariant (q := q) hA0 hY)
+    (coprime_card_centerFittingOpCoreInG_hInvariant hA0 hq hY) hfixed
+
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
 theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
