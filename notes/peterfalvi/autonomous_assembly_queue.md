@@ -86,13 +86,29 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
   bundle, ι:Type field) + `XAdjoinStepInput.adjoin` (→xAdjoinStep) + `xChainCoherent` (coherentOfPairChainCover
   fold; hstep を accumulator coherence hcoh の関数として取る route-B custom fold). **中間版** (member
   family + ZIrr ∀-仮説; IsCoherent 未強化). enum 接続 (exists_conjugatePairCover→hstep 構成) は T-A4.
-- 🔶 **T-A3/T-A4/T-A5 = blocked (ZIrr-codomain closure, multi-session; 下記ログ参照)**。T-A1/T-A2 で
-  per-step adjoin + fold skeleton は完成したが、最終 closure は §J.3.6 が予告した「route A / route B / checkpoint
-  の戦略判断」に帰着。S07 untouched (revert 不要), green な T-A1/T-A2 は保持。
+- ✅✅ **T-A3 (route A) 完了** (commit a054bc8 + payoff be9cd14, full build 3562 + AxiomsCheck + axiom-clean):
+  **§J.3.6 ZIrr-codomain blocker 完全解決**。`IsCoherent` に **`extension_mem_ZIrr : ∀φ∈zSpan S,
+  extension φ∈ZIrr G`** field 追加 (= ℤ[S] 上の ZIrr-codomain; **global ∀φ∈ZIrr L は coherentPair で偽**
+  ゆえ ℤ[S] が正しい)。全 6 constructor を uniform span_induction で discharge (各 generator が virtual char
+  に行く)。新仮説は X,Xbar∈ZIrr のみ (χ,χ̄∈ZIrr/Dade-global 不要)。cascade = retarget_isCoherent の X,Xbar∈ZIrr
+  を caller に thread (RetargetTargetPair.{X,conjImage}_mem_ZIrr / Da.imageFamily / classFunction_irreducible
+  / bridge hτaχ1Z+hτdiffZ)。**payoff**: xAdjoinStep/XAdjoinStepInput から `hmemνZ` 削除 → field 導出
+  (`hS₁.extension_mem_ZIrr (χmem i) (subset_span hmemS1)`)。⟹ chain fold が ν χⱼ∈ZIrr を無料で得る。
+- 🟢 **T-A4 = unblocked (ZIrr companion 解消済)**: 残 = enum 構成 (exists_conjugatePairCover→hstep の
+  XAdjoinStepInput を pairUnion accumulator から組む)。ZIrr facts は field 導出ゆえ provider 不要に。
+  member family/degrees/orthonormality/supports/hSgen/hgen の enum 接続のみ (design-heavy だが ZIrr 非依存)。
+- 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
 
-### T-A3 (route A: IsCoherent に extension_mem_ZIrr field 追加) — blocked: 大規模 invasive cascade
+> ⚠️ **更新 (2026-06-04 後続セッション)**: 下記 T-A3 blocked は **解決済** (route A 完遂, commit a054bc8 +
+> be9cd14)。当初「大規模 cascade で予算超過」と判断したが、open-ended goal で実施し full build green。
+> **重要な設計訂正**: field は global `∀φ∈ZIrr L` でなく **`∀φ∈zSpan S`** (ℤ[S] 上) が正しい
+> (global は coherentPair の `retarget (Dade τ)` で偽; Dade map は supported lattice のみ isometry)。
+> 全 constructor が uniform span_induction で discharge 可、新仮説は X,Xbar∈ZIrr のみ。T-A4/T-A5 も unblock。
+> 以下は当時の分析記録 (歴史的参考)。
+
+### T-A3 (route A: IsCoherent に extension_mem_ZIrr field 追加) — ✅ 解決済 (当時 blocked 判断)
 **欠落 primitive**: なし (数学的には全 site 証明可能)。**blocker = 機械的 cascade 規模が予算超過 + all-or-nothing**。
 - IsCoherent に field 追加すると **全 constructor site が新 field を強制** (sorry 不可ゆえ partial 不能):
   S07 の `galoisTransport`(1472)/`retarget_isCoherent`(2916)/`coherentEqualDegree`(3098)/`coherentEqualDegree_fromDade`(5109)/`coherentUnion_of_glued`(~3744) = 5-6 site。
