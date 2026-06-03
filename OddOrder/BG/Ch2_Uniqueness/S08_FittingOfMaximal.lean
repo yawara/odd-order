@@ -257,6 +257,26 @@ theorem normalizer_centerFittingOpCoreInG_eq_of_ne_bot [Finite G]
   normalizer_eq_of_normal_of_mem_maximal hG hM
     (centerFittingOpCoreInG_subgroupOf_normal q M) hO_ne (centerFittingOpCoreInG_le q M)
 
+/-- **BG (8.2), centralizer localization form**: if `O_q(Z(F(M)))` is nontrivial,
+then the ambient centralizer of `C_{F(M)}(A₀)` lies in `M`. -/
+theorem centralizer_cFitting_le_maximal_of_centerFittingOpCore_ne [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} {M A₀ : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hA₀F : A₀ ≤ fittingInG M)
+    (hO_ne : centerFittingOpCoreInG q M ≠ ⊥) :
+    Subgroup.centralizer ((Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M : Subgroup G) : Set G)
+      ≤ M := by
+  let A : Subgroup G := Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M
+  have hO_le_A : centerFittingOpCoreInG q M ≤ A :=
+    (centerFittingOpCoreInG_le_centerFittingInG q M).trans
+      (centerFittingInG_le_centralizer_inf hA₀F)
+  have hcent_le_norm :
+      Subgroup.centralizer (A : Set G) ≤
+        Subgroup.normalizer (centerFittingOpCoreInG q M : Set G) := by
+    exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hO_le_A)).trans
+      (Subgroup.centralizer_le_normalizer (centerFittingOpCoreInG q M : Set G))
+  simpa [A, normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM hO_ne]
+    using hcent_le_norm
+
 private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Finite H]
     {p : ℕ} [Fact p.Prime] (hHnot : ¬ IsPGroup p H) :
     ∃ q, q ∈ (Nat.card H).primeFactors ∧ q ≠ p := by
