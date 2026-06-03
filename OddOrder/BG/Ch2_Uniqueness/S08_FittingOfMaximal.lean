@@ -1425,6 +1425,44 @@ theorem le_opiCoreInG_compl_of_forall_le_opiCoreInG_singleton_compl
     exact hs_core (by simp)
   exact hYK.trans (le_opiCoreInG_of_normal_of_isPiSubgroup hKX hKnorm hKpi)
 
+/-- BG (8.5), support-detection form: if the `σ`-complement core of a solvable
+subgroup `X` containing `C_F(M)(A0)` is trivial and `σ ⊆ π(F(M))`, then every prime
+of `F(M)` lies in `σ`. -/
+theorem primesOf_fittingInG_subset_of_opiCoreInG_compl_eq_bot
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 X : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hXsolv : IsSolvable ↥X)
+    (hAX : cFittingInG M A0 ≤ X)
+    {σ : Set ℕ}
+    (hσπ : σ ⊆ OddOrder.BG.Ch2.S07.primesOf (fittingInG M))
+    (hOσ : opiCoreInG σᶜ X = ⊥) :
+    OddOrder.BG.Ch2.S07.primesOf (fittingInG M) ⊆ σ := by
+  intro r hrπ
+  by_contra hrσ
+  have hrF : r ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hrπ
+  haveI : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hrF).1⟩
+  have hBrX : centerFittingOpCoreInG r M ≤ X :=
+    (centerFittingOpCoreInG_le_cFittingInG (q := r) hA0).trans hAX
+  have hBr_core : centerFittingOpCoreInG r M ≤ opiCoreInG σᶜ X := by
+    refine le_opiCoreInG_compl_of_forall_le_opiCoreInG_singleton_compl hBrX ?_
+    intro q hqσ
+    have hqπ : q ∈ OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := hσπ hqσ
+    have hqF : q ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
+      simpa [OddOrder.BG.Ch2.S07.primesOf] using hqπ
+    haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
+    have hqr : q ≠ r := by
+      intro hqr
+      exact hrσ (by simpa [hqr] using hqσ)
+    exact centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
+      hG hM hA0 hXsolv hAX hqF hrF hqr
+  have hBr_bot : centerFittingOpCoreInG r M = ⊥ :=
+    le_bot_iff.mp (by
+      rw [← hOσ]
+      exact hBr_core)
+  exact (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hrF) hBr_bot
+
 /-- BG (8.5), generated-condition form: in the non-p-group case, every member of
 `ℋ_X(C_F(M)(A0); π(C_F(M)(A0))^c)` lies in `O_{π(C_F(M)(A0))^c}(X)`. -/
 theorem hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
@@ -1950,6 +1988,13 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
   have hO_pi_compl_bot :
       opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ H = ⊥ := by
     exact le_bot_iff.mp (by rw [← hO_sigma_compl_bot]; exact hO_pi_compl_le_sigma)
+  have hPi_subset_sigma : OddOrder.BG.Ch2.S07.primesOf (fittingInG M) ⊆
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG H) :=
+    primesOf_fittingInG_subset_of_opiCoreInG_compl_eq_bot
+      hG hM hA₀ hH_solvable hAH_cFitting hSigma_subset_pi hO_sigma_compl_bot
+  have hSigma_eq_pi : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) =
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M) :=
+    Set.Subset.antisymm hSigma_subset_pi hPi_subset_sigma
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
