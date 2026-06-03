@@ -163,8 +163,15 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   ((6.3) arith)。残 substantial = orbit counting / member-family(B1) / θ-bound(Clifford) / (6.2)。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
-- ✅ **(6.5)(b) ingredient landed** (commit 8215e94, axiom-clean): `isPGroup_of_quotient_of_subgroup`
-  (S08) = N⊴Γ + IsPGroup p N + IsPGroup p (Γ⧸N) ⟹ IsPGroup p Γ (Lagrange + iff_card; mathlib に無·汎用)。
+- ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
+  `isPGroup_of_isNilpotent_of_isPGroup_abelianization` (S08) = finite nilpotent Γ + Abelianization Γ が
+  p-群 ⟹ Γ が p-群。**quotient route で直積回避が成功**: P=Sylow_p normal (tfae idx 0→3) → Q=Γ⧸P の
+  Abelianization が p-群(image)かつ p'-群(order coprime, `Sylow.not_dvd_index`)⟹ trivial ⟹ Q perfect
+  nilpotent ⟹ trivial (`IsSolvable.commutator_lt_top_of_nontrivial`) ⟹ P=⊤。**API 罠解決**: tfae は tactic-mode
+  `(isNilpotent_of_finite_tfae (G:=Γ)).out 0 3 |>.mp ‹_› p ‹_› P` + `haveI hPnormal`; `commutator_lt_top` は
+  `(G:=Γ⧸↑P)` 明示; `@Nat.card_of_subsingleton α 1 inst` (引数順 α a inst)。
+  + helper `Abelianization.map_surjective` / `subsingleton_of_isPGroup_of_not_dvd` (汎用, mathlib に無)。
+- ✅ **(6.5)(b) ingredient** (commit 8215e94): `isPGroup_of_quotient_of_subgroup` (p-群拡大, Lagrange+iff_card)。
 - **(6.5)(b) 全体の clean strategy (Pi-type 直積 回避)**: P_p=Sylow_p(G) (nilpotent ⟹ normal·unique)。
   Γ⧸P_p は p'-quotient (order coprime p)。`(Γ⧸P_p)^{ab}` は **G^{ab} の商ゆえ p-群** かつ **order|Γ⧸P_p| ゆえ
   p'-群** ⟹ trivial (p^k coprime p ⟹ k=0)。⟹ Γ⧸P_p perfect nilpotent ⟹ **trivial** (← nontrivial nilpotent は
@@ -181,8 +188,18 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
      `IsSolvable.commutator_lt_top_of_nontrivial` で commutator<⊤ ⟹ 対偶で `Subsingleton Q`。
   6. Q=Γ⧸↑P trivial ⟹ `(↑P)=⊤` ⟹ **landed `isPGroup_of_quotient_of_subgroup` を N=↑P で直接消費**
      (P:Sylow は IsPGroup p ↥P, Q:trivial は IsPGroup p Q) ⟹ `IsPGroup p Γ`。
-  directProductOfNormal 不要。各 API 確認済ゆえ assembly は mechanical (但し Abelianization.map 全射性・
-  p∩p'=trivial の小補題に注意)。
+  directProductOfNormal 不要。
+  **🔶 bounded attempt 実施→revert (2026-06-04, anti-scaffold gate)**: full (6.5)(b) を書いたが 3 API friction
+  で 6 iteration 後 revert (p-群拡大 lemma は committed 保持)。**残 friction (focused continuation 用)**:
+  (i) **tfae 抽出構文**: `((isNilpotent_of_finite_tfae (G:=Γ)).out 0 3).mp …` が "Function expected"/
+  "instance expected" — `.out i j` の bounds autoParam か `IsNilpotent` instance 渡しの構文要調整 (代替:
+  Sylow normal-for-nilpotent の直接 instance 探索 or `normalizerCondition`/別 tfae index 経由)。
+  (ii) **perfect⟹trivial の type 整合**: `IsSolvable.commutator_lt_top_of_nontrivial` の `[Nontrivial Q]`
+  instance 化 + `(commutator Q).index = Nat.card (Abelianization Q)` の defeq/rw。
+  (iii) `Nat.card_of_subsingleton` の Subsingleton instance synthesis (haveI 化済だが 1712 で未解決)。
+  **✅ 2 helper は build 成功・正しい (revert 済だが再利用可)**: `Abelianization.map_surjective`
+  (f 全射⟹map 全射, `QuotientGroup.induction_on`+`Abelianization.map_of`), `subsingleton_of_isPGroup_of_not_dvd`
+  (p-群 + order coprime p ⟹ Subsingleton, `iff_card`+`dvd_pow_self`+`card_eq_one_iff_unique`)。
 - **B2 orbit counting**: `card_mul_inner_self_induce_eq_card_inertia` (InducedIrreducible:172, `|H|·‖Ind θ‖²=|I_G(θ)|`)
   + `induce_apply_one` (χ(1)=[L:K]θ(1)) で per-θ。残 = S(A)={distinct Ind θ}↔T の W₁-orbit 分割 (fiber=inertia-orbit,
   Frobenius で size=|L:K|・degree 一定) の degree-sum 組立。
