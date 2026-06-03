@@ -77,6 +77,16 @@ theorem eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl [Finite G] {π : Set 
   · exact False.elim (Nat.card_pos.ne' hzero)
   · exact hone
 
+/-- A `π`-subgroup and a `π`-complement subgroup intersect trivially. -/
+theorem inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl [Finite G] {π : Set ℕ}
+    {H K : Subgroup G} (hHpi : Subgroup.IsPiSubgroup π H)
+    (hKpi : Subgroup.IsPiSubgroup πᶜ K) :
+    H ⊓ K = ⊥ := by
+  refine eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl inf_le_left hHpi ?_
+  intro r hr
+  exact hKpi r
+    (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_right) Nat.card_pos.ne' hr)
+
 /-- If H is a pi-subgroup, then its ambient pi-complement core is trivial. -/
 theorem opiCoreInG_compl_eq_bot_of_isPiSubgroup [Finite G] {π : Set ℕ} {H : Subgroup G}
     (hHpi : Subgroup.IsPiSubgroup π H) :

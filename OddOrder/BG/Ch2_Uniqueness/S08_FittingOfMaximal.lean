@@ -867,6 +867,32 @@ theorem kSubgroup_cFittingInG_eq_bot_of_not_pGroup [Finite G]
   OddOrder.BG.Ch2.S07.kSubgroup_eq_bot_of_centralizer_isPiSubgroup
     (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp)
 
+/-- If `C_G(A)` is a `π(A)`-subgroup, then every member of `ℋ_X(A;π(A)-complement)`
+meets `C_G(A)` trivially. -/
+theorem hInvariant_inf_centralizer_eq_bot_of_centralizer_isPiSubgroup [Finite G]
+    {A X Y : Subgroup G}
+    (hCpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf A)
+      (Subgroup.centralizer (A : Set G)))
+    (hY : Y ∈ hInvariant X A (OddOrder.BG.Ch2.S07.primesOf A)ᶜ) :
+    Y ⊓ Subgroup.centralizer (A : Set G) = ⊥ := by
+  have hCY :
+      Subgroup.centralizer (A : Set G) ⊓ Y = ⊥ :=
+    inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl hCpi (hInvariant_isPiSubgroup hY)
+  simpa [inf_comm] using hCY
+
+/-- BG (8.4), first intersection form: in the non-p-group case, every
+`A = C_F(M)(A0)`-invariant `π(A)`-complement subgroup has trivial intersection with `C_G(A)`. -/
+theorem hInvariant_inf_centralizer_cFittingInG_eq_bot_of_not_pGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M A0 X Y : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Y ⊓ Subgroup.centralizer (cFittingInG M A0 : Set G) = ⊥ :=
+  hInvariant_inf_centralizer_eq_bot_of_centralizer_isPiSubgroup
+    (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp) hY
+
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
 theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
