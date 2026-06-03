@@ -34,6 +34,23 @@ open scoped commutatorElement
 
 variable {L G : Type*} [Group L] [Group G]
 
+/-! ### (6.6) `X`-characterization helpers (T7): constituent inherits a kernel containment
+
+The (6.6) `X = {χ∈Irr L | Z⊄Ker χ}` characterization needs "an irreducible constituent `χ` of a
+genuine character `ψ` inherits `g ∈ Ker ψ`".  Both directions of the characterization route this
+through a *genuine* character (`Res_H φ` for `⊆`, `Ind_K^L θ` for `⊇`) — never applying the Dade
+isometry to the unsupported `χ` itself — which is why [Is] Lemma 2.21 is **not** needed. -/
+
+/-- **(H0)** the restriction `Res^Γ_H φ` of a genuine character is genuine. -/
+theorem isCharacter_restrict {Γ : Type*} [Group Γ] [Finite Γ] {φ : ClassFunction Γ ℂ}
+    (hφ : IsCharacter φ) (H : Subgroup Γ) :
+    IsCharacter (ClassFunction.restrict H φ) := by
+  obtain ⟨V, _, _, _, ρ, hρ⟩ := hφ
+  have hφeq : φ = repCharacterClassFunction ρ :=
+    ClassFunction.ext fun g => by rw [repCharacterClassFunction_apply]; exact congrFun hρ g
+  rw [hφeq, ClassFunction.restrict_repCharacterClassFunction H ρ]
+  exact repCharacterClassFunction_isCharacter (ρ.comp H.subtype)
+
 /- 6: Some coherence theorems (pp. 30-37) -/
 
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
