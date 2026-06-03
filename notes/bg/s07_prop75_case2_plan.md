@@ -23,14 +23,13 @@
 - **✅ (a) hspec for b∈Z(P)** = `le_opiCoreInG_centralizer_of_mem_centralizer_sylow` (done, build-green):
   specialCase@↥(C_G(b)) (Sylow=sylow_subgroupOf_of_le, A.subgroupOf SCN 移送) → map_subgroupOf で ambient。
   **non-cyclic Z(P) ケース (B⊆Z(P)) の hspec はこれで全 b∈B^# 充足。**
-- **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。`P₁=C_P(b)`,`P₂` Sylow⊇P₁, `Z⊆Z(P₁)⊆O_{p',p}`(Thm6.1),
-  `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(=hspec(a) for z 生成元∈Z(P); `le_opiCoreInG_centralizer_of_mem_centralizer_sylow`✅)
-  ⟹(per-b 橋 `le_opiCoreInG_of_le_opiCoreInG_centralizer`✅, X=C_G(b), z) `C_Y(Z)⊆O_{p'}(C_G(b))`,
-  `Y=C_Y(Z)·[Y,Z]`。**要 assembly (新インフラ不要・ingredient 確認済 2026-06-03)**:
-  (i) **coprime 分解 `Y=C_Y(Z)·[Y,Z]` for NON-ABELIAN Y** — **ingredient あり**: `coprime_fixedPoints_quotient`
-    (Ch04, C_{Y/N}(A)=C_Y(A)N/N lift) + **Lemma 4.29** `⁅Y,A,A⁆=⁅Y,A⁆` (Ch04, actionCommutator 版) で
-    N=⁅Y,Z⁆ に対し Y/N で A 自明作用 ⟹ Y/N=C_{Y/N}=C_Y(Z)N/N ⟹ Y=C_Y(Z)·N。**Thm 4.34 は abelian 版** (CommGroup)
-    なので非可換 Y にはこの assembly が要 (~60-80 LOC);
+- **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。**✅ 内部 engine 2 種 build-green 完了 (2026-06-03 /goal)**:
+  (i) **✅ coprime 分解 reduction** = `le_of_centralizer_inf_le_of_commutator_le` (z normalizes W coprimely +
+    C_W(z)≤L + ⁅⟨z⟩,W⁆≤L ⟹ W≤L; via Ch04 `fixedPoints_sup_actionCommutator_eq_top` + actionCommutator/fixedPoints
+    の conjAction 翻訳)。`fixedPoints_sup_actionCommutator_eq_top` は **非可換 Y で成立** (Thm 4.34 の一般版が repo に在った)。
+  (ii) **✅ commutator part** = `commutator_zpowers_le_oPiCore` (z∈O_{p',p}(H) normalizes p'-W ⟹ ⁅⟨z⟩,W⁆≤O_{p'}(H);
+    W⊓O_{p',p} の mk' 像が p-群 O_p(H/O_{p'}) 内 p'-群 ⟹ ⊥; `oPiPrimePiCore_map_mk'_eq` 使用)。
+  + C_W(z)≤O_{p'}(C_G(b)) は hspec(a) for z + per-b 橋✅。**残 = z∈O_{p',p}(C_G(b)) のみ**:
   (ii) **`Z⊆Z(P₁)⊆O_{p',p}(C_G(b))`** = P₁=C_P(b), P₂ Sylow⊇P₁ (|P₂:P₁|≤p via 7.4), Z(P₁)⊴P₂, Thm6.1 (~50 LOC)。
 - **(c) B-construction** (E_p² in A, ⊴P): Z(P) noncyclic→B∈E_p²(Z(P))⊆Z(P) (全 b∈Z(P), special1=(a)で hspec);
   Z(P) cyclic→B=⟨b⟩×Z, Z=Ω₁(Z(P)) (special2=(b))。G 2.6.4。
