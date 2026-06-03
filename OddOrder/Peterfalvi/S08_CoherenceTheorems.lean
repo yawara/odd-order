@@ -1637,6 +1637,32 @@ theorem degreeBound_le_of_sqrt_bound {a b x : ℕ} (hb : 1 ≤ b) (hx : 1 ≤ x)
   have hxltN : x < 4 * a ^ 2 + 2 := by exact_mod_cast hxlt
   omega
 
+/-- **Peterfalvi (6.5)(a) chief-factor arithmetic.**  If `c` and `a` are odd, `c ∣ a − 1`, and
+`a > 1`, then `a ≥ 2c + 1` (mmd 04.8 L40).  Indeed `a − 1 = c·m` is even (as `a` is odd) and `c` is
+odd, so `m` is even and nonzero, hence `m ≥ 2` and `a − 1 = c·m ≥ 2c`.
+
+This is the step in (6.5)(a) ruling out an intermediate normal subgroup `H₁ ⊊ H₂ ⊊ K`: with
+`a = |K : H₂|` (odd, dividing the odd `|L|`) and `c = |L : K|`, hypothesis (6.4.c) gives `c ∣ a − 1`,
+so `|K : H₂| ≥ 2|L : K| + 1`; likewise `|H₂ : H₁| ≥ 2|L : K| + 1`, whence
+`|K : H₁| ≥ (2|L : K| + 1)² > 4|L : K|² + 1`, contradicting the (6.3) bound. -/
+theorem two_mul_add_one_le_of_odd_dvd {c a : ℕ} (hc : Odd c) (ha : Odd a) (hdvd : c ∣ a - 1)
+    (ha1 : 1 < a) : 2 * c + 1 ≤ a := by
+  obtain ⟨m, hm⟩ := hdvd
+  have hcodd : c % 2 = 1 := Nat.odd_iff.mp hc
+  have haodd : a % 2 = 1 := Nat.odd_iff.mp ha
+  have hmeven : m % 2 = 0 := by
+    have h1 : (c * m) % 2 = 0 := by
+      have h2 : (a - 1) % 2 = 0 := by omega
+      rwa [hm] at h2
+    rw [Nat.mul_mod, hcodd, one_mul] at h1
+    omega
+  have hm2 : 2 ≤ m := by
+    rcases Nat.eq_zero_or_pos m with hz | hpos
+    · rw [hz, mul_zero] at hm; omega
+    · omega
+  have h2c : 2 * c ≤ c * m := by nlinarith [hm2]
+  omega
+
 /-- **Extension of `p`-groups is a `p`-group.**  If a normal subgroup `N` and the quotient `Γ ⧸ N`
 are both `p`-groups (and `Γ` is finite), then `Γ` is a `p`-group: `|Γ| = |Γ ⧸ N|·|N| = p^b·p^a`
 (Lagrange, `card_eq_card_quotient_mul_card_subgroup`), so `|Γ|` is a `p`-power (`IsPGroup.iff_card`).
