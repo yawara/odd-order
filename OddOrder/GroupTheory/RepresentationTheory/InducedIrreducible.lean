@@ -189,6 +189,37 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
     Nat.card_eq_fintype_card]
 
+/-- **Induced irreducibles coincide iff the sources are `G`-conjugate.**  For `θ, ψ ∈ Irr H`
+(`H ⊴ G`), `Ind_H^G θ = Ind_H^G ψ` exactly when some `G`-conjugate of `θ` equals `ψ`.
+
+Forward: if no conjugate of `θ` is `ψ`, then `Ind θ ⊥ Ind ψ` (`inner_induce_eq_zero_of_not_conj`),
+so `Ind θ = Ind ψ` would force `‖Ind ψ‖² = 0`, contradicting `|H| · ‖Ind ψ‖² = |I_G(ψ)| > 0`
+(`card_mul_inner_self_induce_eq_card_inertia`).  Backward: induction is conjugation-invariant
+(`induce_conjBy_eq`).  This is the fibre description underpinning the orbit-counting of `S(A)`
+(Peterfalvi (6.2), step 4a): the map `θ ↦ Ind_K^L θ` has fibres exactly the `L`-conjugacy orbits. -/
+theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
+    induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ) ↔
+      ∃ g : G, IrreducibleCharacter.conjBy g θ = ψ := by
+  classical
+  constructor
+  · intro heq
+    by_contra hcon
+    push_neg at hcon
+    have h0 := inner_induce_eq_zero_of_not_conj θ ψ hcon
+    rw [heq] at h0
+    have hpos : ClassFunction.inner (induce H (ψ : ClassFunction ↥H ℂ))
+        (induce H (ψ : ClassFunction ↥H ℂ)) ≠ 0 := by
+      have hcard := card_mul_inner_self_induce_eq_card_inertia ψ
+      have hI : (Nat.card ↥(ClassFunction.inertia (ψ : ClassFunction ↥H ℂ)) : ℂ) ≠ 0 := by
+        rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+      intro hzero
+      rw [hzero, mul_zero] at hcard
+      exact hI hcard.symm
+    exact hpos h0
+  · rintro ⟨g, rfl⟩
+    haveI : Fintype G := Fintype.ofFinite G
+    rw [IrreducibleCharacter.coe_conjBy, induce_conjBy_eq]
+
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
 `exists_pair_of_sum_sq_eq_two`.) -/
