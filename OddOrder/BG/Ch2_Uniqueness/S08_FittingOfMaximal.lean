@@ -803,6 +803,32 @@ theorem centralizer_cFitting_isPiSubgroup_of_not_pGroup [Finite G]
   rw [hPrimes]
   exact centralizer_cFitting_isPiSubgroup_primesOf_fittingInG_of_le_maximal hA0 hCentM
 
+/-- BG (8.3) in `K`-notation: in the non-`p`-group case, the complement core
+`O_{π(A)^c}(C_G(A))` is trivial for `A = C_F(M)(A0)`. -/
+theorem kSubgroup_cFittingInG_eq_bot_of_not_pGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
+    OddOrder.BG.Ch2.S07.kSubgroup (cFittingInG M A0) = ⊥ :=
+  OddOrder.BG.Ch2.S07.kSubgroup_eq_bot_of_centralizer_isPiSubgroup
+    (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp)
+
+/-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
+`K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
+theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime] {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    OddOrder.BG.Ch2.S07.ConjTransitiveOn
+      (OddOrder.BG.Ch2.S07.kSubgroup (cFittingInG M A0))
+      (hInvariantStar ⊤ (cFittingInG M A0) {q}) :=
+  OddOrder.BG.Ch2.S07.transitive_of_three_le_rank_center hG hA hq (by
+    dsimp [cFittingInG]
+    exact three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA0 hm)
+
 /-- The relative centralizer C_F(M)(A0) is proper whenever M is maximal. -/
 theorem cFitting_lt_top_of_mem_maximal {M A0 : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
