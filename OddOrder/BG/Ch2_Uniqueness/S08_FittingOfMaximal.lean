@@ -1426,6 +1426,27 @@ theorem centerFittingOpCoreInG_le_cFittingInG {p q : ℕ} {M A0 : Subgroup G}
   (centerFittingOpCoreInG_le_centerFittingInG q M).trans
     (centerFittingInG_le_centralizer_inf (isMaxElemAbelianIn_le hA0))
 
+/-- `O_q(Z(F(M)))` lies in the q-core of `C_F(M)(A0)`. -/
+theorem centerFittingOpCoreInG_le_opiCoreInG_cFittingInG_singleton
+    [Finite G] {p q : ℕ} {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M)) :
+    centerFittingOpCoreInG q M ≤ opiCoreInG ({q} : Set ℕ) (cFittingInG M A0) := by
+  have hBA : centerFittingOpCoreInG q M ≤ cFittingInG M A0 :=
+    centerFittingOpCoreInG_le_cFittingInG (q := q) hA0
+  have hBnorm : ((centerFittingOpCoreInG q M).subgroupOf (cFittingInG M A0)).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hBA]
+    have hA_le_M : cFittingInG M A0 ≤ M := by
+      dsimp [cFittingInG]
+      exact inf_le_right.trans (fittingInG_le M)
+    have hM_norm_B : M ≤ Subgroup.normalizer (centerFittingOpCoreInG q M : Set G) :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer (centerFittingOpCoreInG_le q M)).mp
+        (centerFittingOpCoreInG_subgroupOf_normal q M)
+    exact hA_le_M.trans hM_norm_B
+  have hBpi_q : Subgroup.IsPiSubgroup ({q} : Set ℕ) (centerFittingOpCoreInG q M) := by
+    dsimp [centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) (centerFittingInG M)
+  exact le_opiCoreInG_of_normal_of_isPiSubgroup hBA hBnorm hBpi_q
+
 /-- If `r ≠ q`, then the central `r`-core of `F(M)` lies in the `q`-complement
 core of `C_F(M)(A0)`. This is the `A_r ≤ O_{q'}(A)` input for BG (8.7). -/
 theorem centerFittingOpCoreInG_le_opiCoreInG_cFittingInG_singleton_compl_of_ne
@@ -1950,6 +1971,39 @@ theorem opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_com
       (Subgroup.inclusion_injective hN_H)
   exact le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
     hAp_norm_N hCop hAp_cent_FN
+
+/-- BG (8.7) with (8.2): after `π(F(H)) = π(F(M))`, the `p`-complement core of
+`H` lies in the original maximal subgroup `M`. -/
+theorem opiCoreInG_singleton_compl_le_maximal_of_cFittingInG_le_of_primes_eq
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hPrimes : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) =
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) :
+    opiCoreInG ({p} : Set ℕ)ᶜ H ≤ M := by
+  let Ap : Subgroup G := opiCoreInG ({p} : Set ℕ) (cFittingInG M A0)
+  let N : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ H
+  change N ≤ M
+  have hN_cent_Ap : N ≤ Subgroup.centralizer (Ap : Set G) := by
+    have hAp_cent_N : Ap ≤ Subgroup.centralizer (N : Set G) := by
+      dsimp [Ap, N]
+      exact opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_compl
+        hG hM hA0 hHsolv hAH hPrimes
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact (Subgroup.mem_centralizer_iff.mp (hAp_cent_N hy) x hx).symm
+  have hCentAp_le_M : Subgroup.centralizer (Ap : Set G) ≤ M := by
+    have hOp_ne : centerFittingOpCoreInG p M ≠ ⊥ :=
+      centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hp
+    have hOp_le_Ap : centerFittingOpCoreInG p M ≤ Ap := by
+      dsimp [Ap]
+      exact centerFittingOpCoreInG_le_opiCoreInG_cFittingInG_singleton hA0
+    exact centralizer_le_maximal_of_centerFittingOpCoreInG_le hG hM hOp_ne hOp_le_Ap
+  exact hN_cent_Ap.trans hCentAp_le_M
 
 /-- BG (8.7): in the non-`p`-group case, each q-core of `F(H)` lies in the
 original maximal subgroup `M` whenever `H` contains `C_F(M)(A0)`. -/
