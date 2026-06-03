@@ -51,6 +51,164 @@ theorem isCharacter_restrict {Γ : Type*} [Group Γ] [Finite Γ] {φ : ClassFunc
   rw [hφeq, ClassFunction.restrict_repCharacterClassFunction H ρ]
   exact repCharacterClassFunction_isCharacter (ρ.comp H.subtype)
 
+/-- **(H1, decomposition form)** an irreducible constituent inherits a kernel containment of a
+non-negative integer combination.  If `ψ = ∑_{a ∈ supp m} (m a) • a` is a finite `ℕ`-combination
+of irreducible characters (`m : ClassFunction Γ ℂ →₀ ℕ` supported on `Irr Γ`) and `χ` is a
+summand with `m χ ≠ 0`, then `g ∈ Ker ψ` forces `g ∈ Ker χ`.
+
+This repackages the (6.6) G2.2 keystone
+`OddOrder.Peterfalvi.S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq` from a
+`Finsupp` decomposition: the family of summands is totalized to an `IrreducibleCharacter`-valued
+function off the support, and the kernel hypothesis `ψ(g) = ψ(1)` is read as the keystone's
+value-equality hypothesis. -/
+theorem characterKernel_subset_of_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Finite Γ]
+    {ψ : ClassFunction Γ ℂ} {m : ClassFunction Γ ℂ →₀ ℕ}
+    (hsupp : (↑m.support : Set (ClassFunction Γ ℂ)) ⊆ irreducibleCharacters Γ)
+    (hsum : ψ = ∑ a ∈ m.support, (m a : ℂ) • a)
+    {χ : ClassFunction Γ ℂ} (hχ : IsIrreducibleCharacter χ) (hmχ : m χ ≠ 0)
+    {g : Γ} (hg : g ∈ OddOrder.Peterfalvi.S03.characterKernel ψ) :
+    g ∈ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  classical
+  set χfam : ClassFunction Γ ℂ → IrreducibleCharacter Γ :=
+    fun a => if h : IsIrreducibleCharacter a then (⟨a, h⟩ : IrreducibleCharacter Γ)
+      else trivialIrreducibleCharacter Γ with hχfam_def
+  have hfam : ∀ a, IsIrreducibleCharacter a →
+      ((χfam a : IrreducibleCharacter Γ) : ClassFunction Γ ℂ) = a := by
+    intro a h; simp only [hχfam_def, dif_pos h]
+  have hirr : ∀ a ∈ m.support, IsIrreducibleCharacter a := fun a ha =>
+    mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha))
+  set d : ClassFunction Γ ℂ → ℕ :=
+    fun a => if h : IsIrreducibleCharacter a then
+      (h.exists_natDegree_charValue_one_dvd_card).choose else 0 with hd_def
+  have hdeg : ∀ a ∈ m.support, ((χfam a : ClassFunction Γ ℂ)) 1 = (d a : ℂ) := by
+    intro a ha
+    have h := hirr a ha
+    rw [hfam a h]
+    simp only [hd_def, dif_pos h]
+    exact (h.exists_natDegree_charValue_one_dvd_card).choose_spec.2.1
+  have hsumapp : ∀ x : Γ, ψ x = ∑ a ∈ m.support, (m a : ℂ) * a x := by
+    intro x
+    rw [hsum]
+    simp only [ClassFunction.finset_sum_apply, ClassFunction.smul_apply]
+  have hgg : ψ g = ψ 1 := by
+    have h := hg
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def] at h
+    exact h
+  have hval : ∑ a ∈ m.support, (m a : ℂ) * ((χfam a : ClassFunction Γ ℂ)) g
+      = ∑ a ∈ m.support, (m a : ℂ) * ((χfam a : ClassFunction Γ ℂ)) 1 := by
+    have eL : ∑ a ∈ m.support, (m a : ℂ) * ((χfam a : ClassFunction Γ ℂ)) g = ψ g := by
+      rw [hsumapp g]; exact Finset.sum_congr rfl fun a ha => by rw [hfam a (hirr a ha)]
+    have eR : ∑ a ∈ m.support, (m a : ℂ) * ((χfam a : ClassFunction Γ ℂ)) 1 = ψ 1 := by
+      rw [hsumapp 1]; exact Finset.sum_congr rfl fun a ha => by rw [hfam a (hirr a ha)]
+    rw [eL, eR, hgg]
+  have hkey :=
+    OddOrder.Peterfalvi.S03.irreducibleCharacter_mem_characterKernel_of_natSum_value_eq
+      (g := g) m.support (fun a => m a) χfam d hdeg hval χ
+      (Finsupp.mem_support_iff.mpr hmχ) hmχ
+  rwa [hfam χ hχ] at hkey
+
+/-- **(H1, genuine form)** an irreducible constituent of a genuine character inherits a kernel
+containment.  If `ψ` is a genuine character, `χ` is irreducible with `⟨ψ, χ⟩ ≠ 0` (a constituent),
+then `g ∈ Ker ψ` forces `g ∈ Ker χ`.  This is `characterKernel_subset_of_natFinsupp_eq_sum`
+applied to the `ℕ`-decomposition `IsCharacter.exists_natFinsupp_eq_sum` of `ψ`, whose
+`χ`-coefficient is the nonzero Fourier multiplicity `⟨ψ, χ⟩`. -/
+theorem characterKernel_subset_of_isCharacter_of_inner_ne_zero {Γ : Type*} [Group Γ]
+    [Fintype Γ] [Invertible (Nat.card Γ : ℂ)] {ψ : ClassFunction Γ ℂ} (hψ : IsCharacter ψ)
+    {χ : ClassFunction Γ ℂ} (hχ : IsIrreducibleCharacter χ)
+    (hχψ : ClassFunction.inner ψ χ ≠ 0)
+    {g : Γ} (hg : g ∈ OddOrder.Peterfalvi.S03.characterKernel ψ) :
+    g ∈ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := hψ.exists_natFinsupp_eq_sum
+  have hmχ : m χ ≠ 0 := fun h0 => hχψ (by rw [← hcoeff χ hχ, h0, Nat.cast_zero])
+  exact characterKernel_subset_of_natFinsupp_eq_sum hsupp hsum hχ hmχ hg
+
+open scoped ComplexOrder in
+/-- The inner product of two genuine characters is `≥ 0`.  Decompose the right argument into a
+non-negative integer combination of irreducibles (`exists_natFinsupp_eq_sum`); each summand
+`⟨χ, a⟩` is `≥ 0` by `inner_irreducible_nonneg`, and the multiplicities are non-negative. -/
+theorem inner_isCharacter_nonneg {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {χ ψ : ClassFunction Γ ℂ}
+    (hχ : IsCharacter χ) (hψ : IsCharacter ψ) :
+    0 ≤ ClassFunction.inner χ ψ := by
+  obtain ⟨m, hsupp, hsum, _⟩ := hψ.exists_natFinsupp_eq_sum
+  rw [hsum, inner_sum_right]
+  refine Finset.sum_nonneg fun a ha => ?_
+  have ha' : IsIrreducibleCharacter a :=
+    mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha))
+  rw [OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+  exact mul_nonneg (Nat.cast_nonneg _) (hχ.inner_irreducible_nonneg ha')
+
+set_option linter.unusedFintypeInType false in
+open scoped ComplexOrder in
+/-- **(H2)** the induced character `Ind_H^Γ θ` of a genuine character `θ` decomposes as a
+non-negative integer combination of irreducibles, with multiplicity `⟨Ind θ, ψ⟩` at `ψ ∈ Irr Γ`.
+Since `induce` lives only at the class-function level (`IsCharacter (Ind θ)` is not directly
+available), the decomposition is reconstructed from `Ind θ ∈ ZIrr Γ` (`induce_mem_ZIrr`) plus the
+non-negativity of `⟨Ind θ, ψ⟩ = ⟨θ, Res ψ⟩` (Frobenius reciprocity and `inner_isCharacter_nonneg`),
+pushed through `Int.toNat`. -/
+theorem induce_exists_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ) :
+    ∃ m : ClassFunction Γ ℂ →₀ ℕ, (↑m.support ⊆ irreducibleCharacters Γ) ∧
+      ClassFunction.induce H θ = ∑ a ∈ m.support, (m a : ℂ) • a ∧
+      ∀ ψ : ClassFunction Γ ℂ, IsIrreducibleCharacter ψ →
+        (m ψ : ℂ) = ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+  classical
+  obtain ⟨c, hsupp, hsum⟩ := mem_ZIrr_repr (ClassFunction.induce_mem_ZIrr H hθ.mem_ZIrr)
+  have hcoeff : ∀ ψ : ClassFunction Γ ℂ, ψ ∈ irreducibleCharacters Γ →
+      (c ψ : ℂ) = ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+    intro ψ hψ
+    have h := inner_eq_coeff_of_repr (⟨ψ, hψ⟩ : IrreducibleCharacter Γ) hsupp
+    rw [show ((⟨ψ, hψ⟩ : IrreducibleCharacter Γ) : ClassFunction Γ ℂ) = ψ from rfl] at h
+    rw [← h, hsum]
+  have hcnn : ∀ ψ : ClassFunction Γ ℂ, ψ ∈ c.support → 0 ≤ c ψ := by
+    intro ψ hψsupp
+    have hψ : ψ ∈ irreducibleCharacters Γ := hsupp (Finset.mem_coe.mpr hψsupp)
+    have hψirr : IsIrreducibleCharacter ψ := mem_irreducibleCharacters.mp hψ
+    have hnn : (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+      rw [ClassFunction.inner_induce_eq_inner_restrict]
+      exact inner_isCharacter_nonneg hθ (isCharacter_restrict hψirr.isCharacter H)
+    have : (0 : ℂ) ≤ (c ψ : ℂ) := by rw [hcoeff ψ hψ]; exact hnn
+    exact_mod_cast this
+  refine ⟨Finsupp.mapRange Int.toNat Int.toNat_zero c, ?_, ?_, ?_⟩
+  · refine subset_trans ?_ hsupp
+    intro ψ hψ
+    exact Finset.mem_coe.mpr (Finsupp.support_mapRange (Finset.mem_coe.mp hψ))
+  · have hsupp_eq : (Finsupp.mapRange Int.toNat Int.toNat_zero c).support = c.support := by
+      apply Finset.Subset.antisymm Finsupp.support_mapRange
+      intro a ha
+      rw [Finsupp.mem_support_iff, Finsupp.mapRange_apply]
+      have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+      omega
+    rw [hsum, hsupp_eq]
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [Finsupp.mapRange_apply]
+    have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c a)), Int.toNat_of_nonneg (le_of_lt this)]
+  · intro ψ hψ
+    rw [Finsupp.mapRange_apply, ← hcoeff ψ hψ]
+    have hnn : 0 ≤ c ψ := by
+      by_cases hsupp_mem : ψ ∈ c.support
+      · exact hcnn ψ hsupp_mem
+      · rw [Finsupp.notMem_support_iff.mp hsupp_mem]
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
+
+set_option linter.unusedFintypeInType false in
+/-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
+(`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
+`induce_exists_natFinsupp_eq_sum` feeds `characterKernel_subset_of_natFinsupp_eq_sum`. -/
+theorem characterKernel_subset_of_inner_induce_ne_zero {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ)
+    {χ : ClassFunction Γ ℂ} (hχ : IsIrreducibleCharacter χ)
+    (hχψ : ClassFunction.inner (ClassFunction.induce H θ) χ ≠ 0)
+    {g : Γ} (hg : g ∈ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce H θ)) :
+    g ∈ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := induce_exists_natFinsupp_eq_sum hθ
+  have hmχ : m χ ≠ 0 := fun h0 => hχψ (by rw [← hcoeff χ hχ, h0, Nat.cast_zero])
+  exact characterKernel_subset_of_natFinsupp_eq_sum hsupp hsum hχ hmχ hg
+
 /- 6: Some coherence theorems (pp. 30-37) -/
 
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
@@ -658,6 +816,99 @@ theorem isIrreducibleCharacter_of_mem_Xset_of_frobenius (hyp : SibleyDadeHypothe
     {Z : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Xset Z) :
     IsIrreducibleCharacter φ :=
   hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hyp.mem_Xset.mp hφ).1
+
+/-- **Peterfalvi (6.6) `X`-characterization** (mmd 04.8 L74-76).  For a normal `Z ≤ H` such that
+every member of `X = S − S(Z)` is irreducible (the (6.8) Frobenius/case-A input `hX`), `X` is
+exactly the set of irreducible characters of `L` whose kernel does not contain `Z`:
+`X = {χ ∈ Irr L | Z ⊄ Ker χ}`.
+
+Both inclusions route the kernel comparison through a *genuine* character — `Res_H φ` for `⊆`
+(via `characterKernel_subset_of_isCharacter_of_inner_ne_zero`) and `Ind_H^L θ` for `⊇` (via
+`characterKernel_subset_of_inner_induce_ne_zero`) — together with the (1.6.a) forward bridge
+`subsetCharacterKernel_induce_of_subgroupOf`; no use of [Is] Lemma 2.21 is needed. -/
+theorem Xset_eq_irreducible_not_subset_characterKernel (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
+    hyp.Xset Z = {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  ext φ
+  constructor
+  · -- (⊆): φ ∈ X is irreducible (hX); if `Z ⊆ Ker φ` then `φ = Ind θ ∈ S(Z)`, contradiction.
+    intro hφX
+    have hφirr : IsIrreducibleCharacter φ := hX φ hφX
+    refine ⟨hφirr, ?_⟩
+    obtain ⟨hφS, hφnotSZ⟩ := hyp.mem_Xset.mp hφX
+    rw [hyp.S_eq] at hφS
+    obtain ⟨θ, hθ_ne, hφeq⟩ := hφS
+    intro hZker
+    apply hφnotSZ
+    rw [hyp.mem_SsubFiltration]
+    refine ⟨θ, hθ_ne, ?_, hφeq⟩
+    -- `Z.subgroupOf H ⊆ Ker θ`: read off from `Res_H φ` (a genuine constituent of `θ`).
+    have hRes : IsCharacter (ClassFunction.restrict H φ) := isCharacter_restrict hφirr.isCharacter H
+    have hθirr : IsIrreducibleCharacter (θ : ClassFunction ↥H ℂ) := θ.property
+    have hnorm : ClassFunction.inner φ φ = 1 := by
+      have h := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
+        (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
+      simpa using h
+    have hinner_ne : ClassFunction.inner (ClassFunction.restrict H φ)
+        (θ : ClassFunction ↥H ℂ) ≠ 0 := by
+      have hfrob := ClassFunction.inner_induce_eq_inner_restrict H (θ : ClassFunction ↥H ℂ) φ
+      rw [← hφeq, hnorm] at hfrob
+      rw [inner_conj_symm θ (ClassFunction.restrict H φ), ← hfrob]
+      simp
+    intro n hn
+    refine characterKernel_subset_of_isCharacter_of_inner_ne_zero hRes hθirr hinner_ne ?_
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+    simp only [ClassFunction.restrict_apply]
+    have hnZ : ((n : ↥L)) ∈ Z := Subgroup.mem_subgroupOf.mp hn
+    have hker := hZker hnZ
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def] at hker
+    rw [hker, OneMemClass.coe_one]
+  · -- (⊇): χ irreducible with `Z ⊄ Ker χ`.  Take a source `θ` of `χ`; show `Ind θ ∈ X`, hence
+    -- irreducible (hX), hence `= χ` by orthonormality.
+    rintro ⟨hχirr, hχZ⟩
+    obtain ⟨θ, hθinner⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero (H := H)
+      (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
+    -- A source `θ'` of `χ` with `Z.subgroupOf H ⊆ Ker θ'` would force `Z ⊆ Ker χ` (contradiction).
+    have hkey : ∀ θ' : IrreducibleCharacter ↥H,
+        ClassFunction.inner (ClassFunction.induce H (θ' : ClassFunction ↥H ℂ)) φ ≠ 0 →
+        ((Z.subgroupOf H : Set ↥H) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ' : ClassFunction ↥H ℂ)) → False := by
+      intro θ' hθ'inner hθ'ker
+      apply hχZ
+      have hZind := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+        (G := ↥L) hZH (θ' : ClassFunction ↥H ℂ) hθ'ker
+      intro z hz
+      exact characterKernel_subset_of_inner_induce_ne_zero θ'.property.isCharacter hχirr
+        hθ'inner (hZind hz)
+    have hθ_ne : θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H := by
+      intro hθtriv
+      refine hkey θ hθinner (fun n _ => ?_)
+      rw [hθtriv]
+      simp [OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    have hIndnotSZ : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∉ hyp.SsubFiltration Z := by
+      intro hmem
+      rw [hyp.mem_SsubFiltration] at hmem
+      obtain ⟨θ', _, hθ'ker, hθ'eq⟩ := hmem
+      exact hkey θ' (by rw [← hθ'eq]; exact hθinner) hθ'ker
+    have hIndX : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∈ hyp.Xset Z :=
+      hyp.mem_Xset.mpr ⟨by rw [hyp.S_eq]; exact ⟨θ, hθ_ne, rfl⟩, hIndnotSZ⟩
+    have hIndirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :=
+      hX _ hIndX
+    have heq : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) = φ := by
+      have hite := irreducibleCharacter_inner_eq_ite
+        (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hIndirr⟩ : IrreducibleCharacter ↥L)
+        (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
+      by_cases hAB : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hIndirr⟩ :
+          IrreducibleCharacter ↥L) = (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
+      · exact congrArg Subtype.val hAB
+      · rw [if_neg hAB] at hite
+        exact absurd hite hθinner
+    rw [← heq]; exact hIndX
 
 end SibleyDadeHypothesis
 
