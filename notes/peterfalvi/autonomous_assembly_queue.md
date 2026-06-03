@@ -161,6 +161,18 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   ((6.1)/(6.4) = SibleyDadeHypothesis 拡張) の formalization が要。focused effort 推奨。
 - **landed §6 bricks (2)**: sumInflatedDegreeSq_ntrivial (B2 ingredient) + degreeBound_le_of_sqrt_bound
   ((6.3) arith)。残 substantial = orbit counting / member-family(B1) / θ-bound(Clifford) / (6.2)。
+
+### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
+- **(6.5)(b) p-群還元**: `Sylow.directProductOfNormal [Finite G]` (Sylow.lean:779, 全 Sylow normal ⟹
+  `(∀p, Sylow p G) ≃* G`) + `isNilpotent_of_finite_tfae` (Nilpotent.lean:941, nilpotent ⟺ 全 Sylow normal 等) で
+  G≃∏Sylow。残 = G^{ab}≃∏Sylow^{ab} + 各 q≠p で Sylow_q^{ab}=1⟹Sylow_q=1 の Pi-type 論証 (~50-100 LOC, MulEquiv/coprime)。
+  **nontrivial-ab は mathlib 既存**: `IsSolvable.commutator_lt_top_of_nontrivial` (Solvable.lean:160) + nilpotent⟹solvable。
+- **B2 orbit counting**: `card_mul_inner_self_induce_eq_card_inertia` (InducedIrreducible:172, `|H|·‖Ind θ‖²=|I_G(θ)|`)
+  + `induce_apply_one` (χ(1)=[L:K]θ(1)) で per-θ。残 = S(A)={distinct Ind θ}↔T の W₁-orbit 分割 (fiber=inertia-orbit,
+  Frobenius で size=|L:K|・degree 一定) の degree-sum 組立。
+- **(6.5)(c) arith motif**: `(2c+1)²>4c²+1 ⟺ c≥1` (inline 可, lemma 不要)。
+- **B1/θ-bound**: B1=Sibley-setup packaging (xAdjoinStep aux 仮説の always-true 化 + 対偶); θ-bound=Clifford
+  中心 section (基本 Schur `exists_degree_sq_le_index`@SchurCenterBound では不足)。両者 framework/Clifford 要・最重。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
