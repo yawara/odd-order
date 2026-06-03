@@ -47,6 +47,8 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
   `U ≤ 𝔽_{p^q}ˣ` has order `(p^q - 1)/(p - 1)`.
 * `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
   identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
+* `normOnePairSetAt_ncard_eq_normSetE_ncard` — the same bridge in BG
+  Lemma C.2 form, with `u * s + v * s = 2 * s` for nonzero `s`.
 
 Lemma C.1 and the `q = 3` branch of Lemma C.2 are formalized; the `q ≥ 5`
 branch of C.2, Lemma C.3, and the assembly into BG Theorem C are tracked in
@@ -151,6 +153,34 @@ structure constant identified with `|E|` in BG Appendix C, Lemma C.2. -/
 def normOnePairSet [Fact p.Prime] : Set (normOneUnits p q × normOneUnits p q) :=
   {uv | (((uv.1 : (GaloisField p q)ˣ) : GaloisField p q) +
       ((uv.2 : (GaloisField p q)ˣ) : GaloisField p q)) = 2}
+
+/-- The BG Appendix C, Lemma C.2 pair set at a nonzero additive element `s`: pairs
+`(u, v) ∈ U × U` satisfying `u * s + v * s = 2 * s`.  BG identifies the
+cardinality of this set with the structure constant of a class-sum product in
+the Frobenius group `H = P ⋊ U`. -/
+def normOnePairSetAt [Fact p.Prime] (s : GaloisField p q) :
+    Set (normOneUnits p q × normOneUnits p q) :=
+  {uv | (((uv.1 : (GaloisField p q)ˣ) : GaloisField p q) * s +
+      ((uv.2 : (GaloisField p q)ˣ) : GaloisField p q) * s) = 2 * s}
+
+/-- For `s ≠ 0`, the BG pair condition `u * s + v * s = 2 * s` is equivalent to
+`u + v = 2`. -/
+theorem normOnePairSetAt_eq_normOnePairSet_of_ne_zero [Fact p.Prime]
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    normOnePairSetAt p q s = normOnePairSet p q := by
+  ext uv
+  constructor
+  · intro h
+    dsimp [normOnePairSetAt, normOnePairSet] at h ⊢
+    have hmul : ((((uv.1 : (GaloisField p q)ˣ) : GaloisField p q) +
+        ((uv.2 : (GaloisField p q)ˣ) : GaloisField p q)) * s) =
+        (2 : GaloisField p q) * s := by
+      rw [right_distrib]
+      exact h
+    exact mul_right_cancel₀ hs hmul
+  · intro h
+    dsimp [normOnePairSetAt, normOnePairSet] at h ⊢
+    rw [← right_distrib, h]
 
 lemma mem_normSetE_iff [Fact p.Prime] {a : GaloisField p q} :
     a ∈ normSetE p q ↔ normN p q a = 1 ∧ normN p q (2 - a) = 1 := Iff.rfl
@@ -277,6 +307,15 @@ theorem normOnePairSet_ncard_eq_normSetE_ncard [Fact p.Prime] (hq : q ≠ 0) :
     · change (a + (2 - a) : F) = 2
       ring
     · rfl
+
+/-- BG Appendix C, Lemma C.2 structure-constant bridge in the form used in the
+class-sum calculation: for any nonzero `s`, the number of norm-one pairs with
+`u * s + v * s = 2 * s` is exactly `|E|`. -/
+theorem normOnePairSetAt_ncard_eq_normSetE_ncard [Fact p.Prime] (hq : q ≠ 0)
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    (normOnePairSetAt p q s).ncard = (normSetE p q).ncard := by
+  rw [normOnePairSetAt_eq_normOnePairSet_of_ne_zero p q hs,
+    normOnePairSet_ncard_eq_normSetE_ncard p q hq]
 
 /-- The sequence `d_k := (k+1) - k·a = (1-a)·k + 1` of BG Lemma C.1. -/
 noncomputable def dSeq [Fact p.Prime] (a : GaloisField p q) (k : ℕ) : GaloisField p q :=

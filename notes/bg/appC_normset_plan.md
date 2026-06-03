@@ -91,6 +91,13 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 これにより q≥5 branch で残る作業は、この pair count を Frobenius 群 `H=P⋊U` の class-sum
 構造定数へ持ち上げ、指標直交関係から下界 `p^{q-2}-p^{q/2}>1` を出す部分に絞られた。
 
+#### ✅ BG 本文の `us+vs=2s` 形式まで接続 (2026-06-04)
+`normOnePairSetAt s := {(u,v)∈U×U | u*s+v*s=2*s}` を定義し、`s≠0` なら
+`normOnePairSetAt s = normOnePairSet` を証明。従って
+`normOnePairSetAt_ncard_eq_normSetE_ncard : |{(u,v) | u*s+v*s=2*s}| = |E|`。
+これは BG C.2 の class-sum 構造定数 `card{(u,v)∈U² | us+vs=2s}` を Lean 側の norm set に
+直接接続する補題。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。
