@@ -86,8 +86,45 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
   bundle, ι:Type field) + `XAdjoinStepInput.adjoin` (→xAdjoinStep) + `xChainCoherent` (coherentOfPairChainCover
   fold; hstep を accumulator coherence hcoh の関数として取る route-B custom fold). **中間版** (member
   family + ZIrr ∀-仮説; IsCoherent 未強化). enum 接続 (exists_conjugatePairCover→hstep 構成) は T-A4.
-- 🔜 **T-A3 着手中** (route A invasive): IsCoherent に `extension_mem_ZIrr` field 追加で xAdjoinStep の
-  hmemνZ 仮説を導出可能化. 1 site ずつ full build 確認, base ZIrr 証明 hard なら revert+blocked 記録.
+- 🔶 **T-A3/T-A4/T-A5 = blocked (ZIrr-codomain closure, multi-session; 下記ログ参照)**。T-A1/T-A2 で
+  per-step adjoin + fold skeleton は完成したが、最終 closure は §J.3.6 が予告した「route A / route B / checkpoint
+  の戦略判断」に帰着。S07 untouched (revert 不要), green な T-A1/T-A2 は保持。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
-(なし)
+
+### T-A3 (route A: IsCoherent に extension_mem_ZIrr field 追加) — blocked: 大規模 invasive cascade
+**欠落 primitive**: なし (数学的には全 site 証明可能)。**blocker = 機械的 cascade 規模が予算超過 + all-or-nothing**。
+- IsCoherent に field 追加すると **全 constructor site が新 field を強制** (sorry 不可ゆえ partial 不能):
+  S07 の `galoisTransport`(1472)/`retarget_isCoherent`(2916)/`coherentEqualDegree`(3098)/`coherentEqualDegree_fromDade`(5109)/`coherentUnion_of_glued`(~3744) = 5-6 site。
+- 加えて `retarget_isCoherent` は ZIrr field を出すのに **X,Xbar∈ZIrr G + χ,chibar∈ZIrr L の新仮説が必要**
+  (retarget τ₁ χ χ̄ X Xbar の ZIrr 保存 = `retarget_mem_ZIrr`@S08:1010, ただし S07 に移送要)。この **signature 変更が
+  全 caller に cascade** — S07:3159/3503 + **S08 の `retarget_isCoherent_of_extensionImage` bridge (= T-A1 が依存)**。
+- **feasibility 確認済 (各 site は証明可能)**: base `coherentEqualDegree` の ν=`coherentImageMap χ X`,
+  `coherentImageMap χ X φ = ∑ⱼ⟨φ,χⱼ⟩•Xⱼ` (S07:2737) ⟹ χⱼ∈ZIrr L (irreducible) + Xⱼ∈ZIrr G なら
+  `⟨φ,χⱼ⟩∈ℤ`(inner_mem_ZIrr_int)•ZIrr ⟹ ∈ZIrr (≤20行)。galois も ZIrr 保存。retarget は retarget_mem_ZIrr。
+- **判断**: 各 site は tractable だが coordinated multi-site refactor (5-6 constructor + 3 caller cascade,
+  各 full `lake build OddOrder` 検証) は本セッション予算 (~8 turn) 超過、かつ **green な T-A1 bridge を壊すリスク**。
+  **route B (T-A2 の xChainCoherent companion thread) が ZIrr を仮説で運ぶ代替を既に提供**ゆえ route A は optional。
+  → 専用セッションで実施推奨 (multi-site script + 各 site 後 full build)。
+
+### T-A4 (enum 接続: xChainCoherent を Xset Z に特殊化) — blocked: ZIrr companion 維持
+**欠落 primitive**: per-step の `hmemνZ` (= accumulator member の ν∈ZIrr) を供給する **companion 維持機構**。
+- xChainCoherent の hstep は `hcoh : IsCoherent (pairUnion S₀ pair i)` を受けるが、`hcoh.extension` が
+  members 上 ZIrr 保存する事実 (`∀x∈acc_i, hcoh.extension x∈ZIrr`) は **IsCoherent に無い** (= §J.3.6 構造的発見1)。
+- これを供給するには (a) route A (T-A3, IsCoherent 強化) か、(b) **fold を companion 付きに強化**:
+  `Σ'(hcoh)(∀x∈acc_i, hcoh.extension x∈ZIrr)` を `Nat.rec` で thread (~50行 custom fold)、各 step で次 companion を
+  `retarget_mem_ZIrr` で維持。だが (b) は **xAdjoinStep の出力 extension が `retarget hS₁.extension χ χ̄ X Xbar`
+  であることの露出が必要** — 現状 `retarget_isCoherent` の出力 extension τ₂ は named lemma 未露出 (inline `refine ⟨?_,τ₂,…⟩`)、
+  bridge の内部 X=τ(χ-a·χ₁)+a·νχ₁ も未露出。**露出補題群 (retarget_isCoherent_extension_eq + bridge extension_eq + X,Xbar∈ZIrr)
+  が要新規** (~80-120行)。
+- 加えて enum 構成本体: pairUnion accumulator から member family (χmem/deg/i₁/orthonormality/supports) の再構成、
+  hSgen/hgen、degree 不等式 (6.6 gap `two_mul_lt_sq_of_primePow_gap`) の per-step 供給 = T8 backbone
+  (`exists_conjugatePairCover`@S08, `xBaseBlock`) との接続。intricate (§J.2/J.3.6)。
+- **判断**: ZIrr companion (露出補題 + custom fold) + enum 構成は合わせて multi-session。route A が入れば companion は
+  自動化され enum 構成のみ残る ⟹ **route A 先行を推奨**。
+
+### T-A5 (X∪Y glue + capstone sibleySetup_is_coherent) — blocked: T-A4 依存
+- `coherentUnion_of_glued`(S07:3744) で X-coherence (T-A4) ∪ Y-coherence (T6 完了済 `coherentYFamily`) を glue。
+- T-A4 未完ゆえ blocked。加えて (6.5) p-群還元 (M1, §G) / X∪Y=S (6.8.3) / m≥2 (B4) など §G STRATEGIC 項目も capstone
+  には必要 (これらは T-A4 とは独立の別 blocker)。
+- **判断**: T-A4 完了後に着手。capstone は本 queue scope 外の依存 (6.5 還元等) も持つ。
