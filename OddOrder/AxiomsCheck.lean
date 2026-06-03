@@ -1153,6 +1153,13 @@ set_option linter.style.longLine false in
 -- BG Thm 7.2 (mmd L2177): Hyp 7.1, q∈π', m(Z(A))≥3 ⇒ K は ℋ_G*(A;q) 上推移的 (Prop 1.16(2)
 -- cocyclic 共役形で B∈ℰ_p³(Z(A)) の noncyclic Y → C_{Q₁}(Y)⊆C_G(z) (z∈Y) → Lem 7.1)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.transitive_of_three_le_rank_center
+-- BG Prop 7.5 case (2) (mmd L2252, SCN₂ branch): A∈SCN₂(P) ⇒ A satisfies Hypothesis 7.1.
+-- B∈ℰ_p²(A), B⊴P を Z(P) cyclic/noncyclic で構成 (cyclic = Isaacs Lem 1.23 で ⟨z⟩<L≤Ω₁(A) +
+-- special case 2 の coprime 分解 / 軌道-stabilizer crux z∈O_{p',p}(C_G(b)))、coreClaimGeneral へ。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.hypothesis71_of_scn2
+-- BG Thm 7.6 ⭐⭐⭐ **FT クリティカル** (Thompson Transitivity, mmd L2311): A∈SCN₃(p), q∈p' ⇒
+-- O_{p'}(C_G(A)) が ℋ_G*(A;q) 上推移的。Prop 7.5(2) で Hyp 7.1 を得て Thm 7.2 (rank≥3) を適用。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.thompsonTransitivity
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper

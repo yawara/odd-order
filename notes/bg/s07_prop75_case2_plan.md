@@ -4,6 +4,29 @@
 > brick 2b (Prop 1.15(b) 一般形) 完了で前提が揃った。case (1) は Thm 6.7 待ちで明示 sorry。
 > mmd 出典: `references/bg/local-analysis.mmd` L2252-2307。
 
+## ✅✅✅ 完了 (2026-06-03 `/goal` セッション): cyclic 分岐 sorry 消滅 → Thm 7.6 axiom-clean
+
+`coreClaim_scn2` の **cyclic-`Z(P)` 分岐を sorry-free に**。`hypothesis71_of_scn2` /
+`thompsonTransitivity` (Thm 7.6) は `#print axioms` で `[propext, Classical.choice, Quot.sound]`
+のみ (sorryAx 無) を確認、`AxiomsCheck.lean` に登録済。full build green (3562 jobs)。
+新規 private helper 3 種 (S07, 全 axiom-clean):
+- `card_le_prime_mul_card_centralizer_inf` (旧 `card_conjOrbit_le_prime` を改修): 軌道≤p を
+  orbit-stabilizer (`index_stabilizer`+`index_mul_card`+`stabilizer`↪`C_G(b)⊓P` 単射) で
+  `|P| ≤ p·|C_P(b)|` に変換。
+- `mem_oPiPrimePiCore_centralizer_of_central` (crux z∈O_{p',p}(C_G(b))): P₁=C_P(b) を ↥(C_G(b))
+  内 Sylow P₂ に拡張 (`exists_le_sylow`), `|P₂|≤|P|` (`card_eq_multiplicity`+`pow_dvd_card`),
+  `|P₂:P₁|≤p` ⟹ P₁⊴P₂ (`normal_of_index_eq_one`/`_eq_minFac_card`), A'=C(P₁)⊓P₁ (=Z(P₁)) を
+  Thm 6.1 (`thmA4b`) に投入。`normal_subgroupOf_iff_le_normalizer` で P₁⊴P₂ → normalizer。
+- `centralizer_inf_le_opiCoreInG_of_central` (special-2 の hspec): `le_of_centralizer_inf_le_of_commutator_le`
+  に hcent (special-1@z + per-b 橋) と hcomm (`commutator_zpowers_le_oPiCore` を ↥(C_G(b)) で適用し
+  `map_commutator`+`map_zpowers`+`map_subgroupOf_eq_of_le` で G に transport) を供給。
+
+cyclic 分岐本体: z = Cauchy(`exists_prime_orderOf_dvd_card'`) で Z(↥P) から位数 p の中心元
+(`IsPGroup.center_nontrivial`)、B = Isaacs Lem 1.23 (`IsPGroup.exists_normal_index_eq_prime`) で
+`⟨z⟩ < L ≤ Ω₁(A)` (`Om.subgroupOf P ⊴ ↥P` は conj が `{a∈A:aᵖ=1}` を保つ + `map_pow (MulAut.conj g)`)、
+|B|=p² (relIndex·|⟨z⟩|)、elem-ab ⟹ ¬cyclic、`coreClaimGeneral` へ。**Thm 7.4 不要を実装で確認済**。
+残 S07 sorry = `transitivity_propagates` (別件) と case (1) (Thm 6.7 待ち) のみ。
+
 ## 🟢🟢 2026-06-03 PM (`/goal` セッション): Thm 7.6 配線 + noncyclic 分岐完了 (build-green)
 
 **達成 (commit `e2be859`, `7df2c6a`)**:
