@@ -53,6 +53,31 @@ def fittingInG (M : Subgroup G) : Subgroup G :=
 theorem fittingInG_le (M : Subgroup G) : fittingInG M ≤ M :=
   Subgroup.map_subtype_le _
 
+/-- Realizing `F(M)` in `G` and then restricting back to `M` recovers the original
+Fitting subgroup of the group `↥M`. -/
+theorem fittingInG_subgroupOf_eq (M : Subgroup G) :
+    (fittingInG M).subgroupOf M = Ch01.fitting ↥M := by
+  ext x
+  rw [Subgroup.mem_subgroupOf, fittingInG, Subgroup.mem_map]
+  constructor
+  · rintro ⟨y, hy, hy_eq⟩
+    have hyx : y = x := Subtype.ext hy_eq
+    rwa [← hyx]
+  · intro hx
+    exact ⟨x, hx, rfl⟩
+
+/-- `F(M)`, viewed as a subgroup of `M`, is characteristic. -/
+theorem fittingInG_subgroupOf_characteristic (M : Subgroup G) :
+    ((fittingInG M).subgroupOf M).Characteristic := by
+  rw [fittingInG_subgroupOf_eq]
+  exact Ch01.fitting.characteristic ↥M
+
+/-- `F(M)`, viewed as a subgroup of `M`, is normal. -/
+theorem fittingInG_subgroupOf_normal (M : Subgroup G) :
+    ((fittingInG M).subgroupOf M).Normal := by
+  rw [fittingInG_subgroupOf_eq]
+  exact Ch01.fitting.normal ↥M
+
 /-- **`ℰ_p^*(H)` membership**: `A₀` は `H` の中で極大な `p`-elementary abelian 部分群
 (`A₀ ≤ H` elem-ab で、`H` 内の elem-ab `B ⊇ A₀` は `A₀` に戻る)。 -/
 def isMaxElemAbelianIn (p : ℕ) (A₀ H : Subgroup G) : Prop :=
@@ -71,12 +96,44 @@ theorem isMaxElemAbelianIn_le {p : ℕ} {A₀ H : Subgroup G}
     A₀ ≤ H :=
   hA₀.2.1
 
+/-- A maximal elementary abelian subgroup of `F(M)` lies in its own centralizer inside
+`F(M)`.  This is the formal start of BG (8.1). -/
+theorem isMaxElemAbelianIn_le_centralizer_inf {p : ℕ} {M A₀ : Subgroup G}
+    (hA₀ : isMaxElemAbelianIn p A₀ (fittingInG M)) :
+    A₀ ≤ Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M := by
+  refine le_inf ?_ (isMaxElemAbelianIn_le hA₀)
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  exact congrArg Subtype.val (hA₀.1.comm ⟨y, hy⟩ ⟨x, hx⟩)
+
 /-- Maximality clause for `isMaxElemAbelianIn`. -/
 theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B : Subgroup G}
     (hA₀ : isMaxElemAbelianIn p A₀ H) (hB : B.IsElementaryAbelian p) (hBH : B ≤ H)
     (hA₀B : A₀ ≤ B) :
     B = A₀ :=
   hA₀.2.2 B hB hBH hA₀B
+
+private theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hLM : (L.subgroupOf M).Normal)
+    (hLne : L ≠ ⊥) (hLleM : L ≤ M) :
+    Subgroup.normalizer (L : Set G) = M := by
+  haveI : IsSimpleGroup G := hG.simple
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hMleN : M ≤ Subgroup.normalizer (L : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hLleM).mp hLM
+  have hNne : Subgroup.normalizer (L : Set G) ≠ ⊤ := by
+    intro hNtop
+    have hLnormal : L.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hLnormal.eq_bot_or_eq_top with hLbot | hLtop
+    · exact hLne hLbot
+    · have htop_le_M : ⊤ ≤ M := by
+        rw [← hLtop]
+        exact hLleM
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  have hNleM : Subgroup.normalizer (L : Set G) ≤ M :=
+    (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
+  exact le_antisymm hNleM hMleN
 
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
