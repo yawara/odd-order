@@ -65,11 +65,17 @@ M は p'-群 ∩ T は p-群 ⟹ M=⊥。
 (2a)@Ḡ ⟹ O_{p'}(C_Ḡ(R̄))=⊥ ⟹ O_{p'}(C_G(R)) ⊆ ker(mk' M₀)=M₀=O_{p'}(G)。
 **risk**: (2a) の RT-normalizer-action φ 構成 + fixedPoints=C_{RT}(M) の同定が最 fiddly。
 
-## brick 3: Prop 7.5 case(2) (S07:1065, 本体)
+## brick 3: Prop 7.5 case(2) (S07:1079, 本体) — **詳細プラン = `notes/bg/s07_prop75_case2_plan.md`**
 mmd L2266-2310。B 構成 (Z(P) cyclic/not 2 分岐, cyclic 側で G 2.6.4) → `Y⊆O_{p'}(X)` を inner claim と
 して 3 適用 (special b∈B^#∩Z → special 一般 b∈B^# → Prop 1.16 で一般 X)。bar = mod O_{p'}(X)。
 case(1) (p-length one, Thm 6.7 待ち) は **明示 sorry で残す** (今回スコープ外)。
 **risk**: bar-quotient 機構 + `Ω₁` + `B=⟨b⟩×Z`。`thmA4b`/`S04e`/`S04g` の商引き戻しパターン流用。
+- **✅ 還元補題 + foundation 完了 (2026-06-03, build-green)**: `generated_eq_of_forall_le_opiCoreInG`
+  (private, axiom-clean): `A≤X` + `∀Y∈ℋ_X(A;π),Y≤O_π(X)` ⟹ `sSup ℋ_X(A;π)=O_π(X)` (逆向きは O_π(X) 自身が
+  A-不変 π-部分群)。これで `hypothesis71_of_scn2_or_pLengthOne` を **再構成**: case 2 で **ne_bot**
+  (`pRank≥2`→`exists_isElementaryAbelian_log_card_ge`→p²≤card A) + **proper** (`A≤P<⊤`, Sylow proper:
+  P=⊤⟹IsPGroup G⟹IsNilpotent⟹IsSolvable と `notSolvable` 矛盾) を実証明, generated_eq を還元補題で
+  **core claim** (`Y≤O_{p'}(X)`) に還元。残 sorry = **case 1 (Thm 6.7)** + **core claim** の 2 個 (各 honest, 精密)。
 
 ## brick 4: Thm 7.6 (S07:1081, 短い assembly)
 `A∈scn3Global p` ⟹ (i) A abelian ⟹ `center ↥A=⊤`,`3≤rank(center ↥A)` from `IsSCN₃` pRank≥3;

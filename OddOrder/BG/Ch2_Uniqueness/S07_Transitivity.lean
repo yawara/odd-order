@@ -1058,6 +1058,20 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## Proposition 7.5 — Hypothesis 7.1 の十分条件 -/
 
+/-- **Reduction for Hypothesis 7.1(2)** (mmd L2273 "it suffices to show that `Y ⊆ O_{π'}(X)`"):
+for a fixed proper `X ⊇ A`, the equality `⟨ℋ_X(A;π)⟩ = O_π(X)` is equivalent to showing every
+member of `ℋ_X(A;π)` is contained in `O_π(X)`. The reverse inclusion is automatic because
+`O_π(X) = opiCoreInG π X` is itself an `A`-invariant `π`-subgroup of `X`
+(`opiCoreInG_le` + `le_normalizer_opiCoreInG` with `A ≤ X` + `isPiSubgroup_opiCoreInG`).
+Used by both branches of Proposition 7.5. -/
+private theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
+    {A X : Subgroup G} {π : Set ℕ} (hAX : A ≤ X)
+    (hY : ∀ Y ∈ hInvariant X A π, Y ≤ opiCoreInG π X) :
+    sSup (hInvariant X A π) = opiCoreInG π X := by
+  refine le_antisymm (sSup_le hY) (le_sSup ?_)
+  exact ⟨opiCoreInG_le π X, hAX.trans (le_normalizer_opiCoreInG π X),
+    isPiSubgroup_opiCoreInG π X⟩
+
 /-- **BG Proposition 7.5** (mmd L2252): `p ∈ π(G)`, `A` abelian `p`-部分群で、
 (1) `A = {x ∈ C_G(A) : x^p = 1}` かつ `G` の全真部分群が `p`-length one、または
 (2) ある Sylow `p`-部分群 `P` で `A ∈ SCN₂(P)`、
@@ -1071,7 +1085,46 @@ theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G
       (∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧
         IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)))) :
     Hypothesis71 A := by
-  sorry
+  rcases hcase with hcase1 | hcase2
+  · -- **case (1)**: every proper subgroup is `p`-length one. Hypothesis 7.1 follows from
+    -- Theorem 6.7, which is not yet formalized (BG: "follows easily from Theorem 6.7").
+    sorry
+  · -- **case (2)**: `A ∈ SCN₂(P)` for a Sylow `p`-subgroup `P`.
+    obtain ⟨P, hAP, hAscn2⟩ := hcase2
+    -- `A ≠ ⊥`: `pRank (A.subgroupOf P) ≥ 2` forces an elementary abelian subgroup of order `≥ p²`.
+    have hAne : A ≠ ⊥ := by
+      intro hAbot
+      obtain ⟨B, _, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+        (p := p) (by norm_num) hAscn2.le_pRank
+      have hp2 : p ^ 2 ≤ Nat.card ↥B := Nat.pow_le_of_le_log Nat.card_pos.ne' hBlog
+      have hBdvd : Nat.card ↥B ∣ Nat.card ↥(A.subgroupOf (P : Subgroup G)) :=
+        Subgroup.card_subgroup_dvd_card B
+      have hcard1 : Nat.card ↥(A.subgroupOf (P : Subgroup G)) = 1 := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAP).toEquiv, hAbot, Subgroup.card_bot]
+      rw [hcard1, Nat.dvd_one] at hBdvd
+      rw [hBdvd] at hp2
+      nlinarith [hp2, (Fact.out : p.Prime).two_le]
+    -- `A < ⊤`: `A ≤ P` and a Sylow `p`-subgroup of a (non-solvable) minimal simple group is proper.
+    have hAproper : A < ⊤ := by
+      have hP_lt : (P : Subgroup G) < ⊤ := by
+        rw [lt_top_iff_ne_top]
+        intro hPtop
+        have hGp : IsPGroup p G :=
+          (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+            (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+        haveI : Group.IsNilpotent G := hGp.isNilpotent
+        exact hG.notSolvable inferInstance
+      exact lt_of_le_of_lt hAP hP_lt
+    refine ⟨hAne, hAproper, ?_⟩
+    -- (2) of Hypothesis 7.1: reduce to the core claim `Y ⊆ O_{π'}(X)` (mmd L2273).
+    intro X hAX _hXlt
+    refine generated_eq_of_forall_le_opiCoreInG hAX ?_
+    intro Y _hY
+    -- **core claim** (mmd L2273-2307): every `A`-invariant `π'`-subgroup `Y ≤ X` lies in `O_{π'}(X)`.
+    -- Proof: construct `B ∈ E_p²(A)` with `B ⊴ P` (cyclic/noncyclic `Z(P)` split + G 2.6.4), then the
+    -- three claims of BG (special `b ∈ B^# ∩ Z` via Thm 6.1 + Prop 1.10 + 1.15(a); special `b ∈ B^#`
+    -- via Prop 1.15(b); general via Prop 1.16). See `notes/bg/s07_prop75_case2_plan.md`.
+    sorry
 
 /-! ## Theorem 7.6 — Thompson Transitivity Theorem -/
 
