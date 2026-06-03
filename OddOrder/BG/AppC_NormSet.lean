@@ -255,6 +255,18 @@ lemma normN_dSeq_eq_one [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
     rw [normN_mul, h1, one_mul] at hcong
     rw [hcong]; exact ih
 
+/-- Elements of the prime field `𝔽_p ⊆ 𝔽_{p^q}` are fixed by every power of the
+Frobenius: `(k : 𝔽_{p^q})^{p^i} = (k : 𝔽_{p^q})`. -/
+lemma natCast_pow_pPow [Fact p.Prime] (k i : ℕ) :
+    ((k : GaloisField p q)) ^ (p ^ i) = (k : GaloisField p q) := by
+  induction i with
+  | zero => simp
+  | succ i ih =>
+    rw [pow_succ, pow_mul, ih]
+    have hk : ((k : ℕ) : GaloisField p q)
+        = algebraMap (ZMod p) (GaloisField p q) (k : ZMod p) := (map_natCast _ k).symm
+    rw [hk, ← map_pow, ZMod.pow_card]
+
 /-! ## Lemma C.1 -/
 
 /-- **BG Appendix C, Lemma C.1** (mmd L4911): if the norm set is closed under
@@ -269,7 +281,72 @@ theorem lemmaC1 [Fact p.Prime] (hq : q.Prime)
     (hEinv : normSetE p q = (normSetE p q)⁻¹)
     (hcard : 2 ≤ (normSetE p q).ncard) :
     p ≤ q := by
-  sorry
+  classical
+  -- Start from `a ∈ E^#`.
+  obtain ⟨a, ha, hane⟩ := exists_mem_normSetE_ne_one p q hcard
+  have h1a : (1 : GaloisField p q) - a ≠ 0 := sub_ne_zero.mpr (Ne.symm hane)
+  haveI : CharP (GaloisField p q) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]; exact ZMod.charP p
+  -- The norm polynomial `P(X) = ∏_{i<q} ((1-a)^{p^i} X + 1) - 1`.
+  set P : (GaloisField p q)[X] :=
+    (∏ i ∈ Finset.range q, (C ((1 - a) ^ (p ^ i)) * X + C 1)) - C 1 with hP_def
+  have hcne : ∀ i, ((1 - a) ^ (p ^ i) : GaloisField p q) ≠ 0 := fun i => pow_ne_zero _ h1a
+  have hfac_ne : ∀ i ∈ Finset.range q,
+      (C ((1 - a) ^ (p ^ i)) * X + C 1 : (GaloisField p q)[X]) ≠ 0 := by
+    intro i _ hz
+    have hd1 := natDegree_linear (a := (1 - a) ^ (p ^ i)) (b := (1 : GaloisField p q)) (hcne i)
+    rw [hz, natDegree_zero] at hd1
+    exact one_ne_zero hd1.symm
+  -- `P` has degree exactly `q`.
+  have hdeg : P.natDegree = q := by
+    rw [hP_def, natDegree_sub_C, natDegree_prod _ _ hfac_ne,
+      Finset.sum_congr rfl (fun i _ => natDegree_linear (b := (1 : GaloisField p q)) (hcne i)),
+      Finset.sum_const, Finset.card_range, smul_eq_mul, mul_one]
+  -- Hence `P ≠ 0`.
+  have hPne : P ≠ 0 := by
+    intro hz
+    have h0 := hdeg
+    rw [hz, natDegree_zero] at h0
+    have := hq.pos
+    omega
+  -- Every element of `𝔽_p` is a root of `P`.
+  have heval : ∀ k : ℕ, P.eval ((k : ℕ) : GaloisField p q) = 0 := by
+    intro k
+    rw [hP_def, eval_sub, eval_C, eval_prod]
+    have hprod : ∏ i ∈ Finset.range q,
+        (C ((1 - a) ^ (p ^ i)) * X + C 1 : (GaloisField p q)[X]).eval ((k : ℕ) : GaloisField p q)
+          = 1 := by
+      have hstep : ∀ i ∈ Finset.range q,
+          (C ((1 - a) ^ (p ^ i)) * X + C 1 : (GaloisField p q)[X]).eval
+            ((k : ℕ) : GaloisField p q)
+            = ((1 - a) * ((k : ℕ) : GaloisField p q) + 1) ^ (p ^ i) := by
+        intro i _
+        simp only [eval_add, eval_mul, eval_C, eval_X]
+        rw [add_pow_char_pow, mul_pow, one_pow, natCast_pow_pPow]
+      rw [Finset.prod_congr rfl hstep, ← normN]
+      have hd : (1 - a) * ((k : ℕ) : GaloisField p q) + 1 = dSeq p q a k := by
+        rw [dSeq]; ring
+      rw [hd]
+      exact normN_dSeq_eq_one p q hq.pos hEinv ha k
+    rw [hprod]; ring
+  -- `𝔽_p` is a `p`-element finset of roots, and `#roots ≤ deg P = q`.
+  have hinj : Set.InjOn ((Nat.cast : ℕ → GaloisField p q))
+      (↑(Finset.range p)) := by
+    rw [Finset.coe_range]; exact CharP.natCast_injOn_Iio (GaloisField p q) p
+  have hScard : ((Finset.range p).image ((Nat.cast : ℕ → GaloisField p q))).card = p := by
+    rw [Finset.card_image_of_injOn hinj, Finset.card_range]
+  have hSsub : (Finset.range p).image ((Nat.cast : ℕ → GaloisField p q))
+      ⊆ P.roots.toFinset := by
+    intro x hx
+    rw [Finset.mem_image] at hx
+    obtain ⟨k, _, rfl⟩ := hx
+    rw [Multiset.mem_toFinset, mem_roots']
+    exact ⟨hPne, heval k⟩
+  calc p = ((Finset.range p).image ((Nat.cast : ℕ → GaloisField p q))).card := hScard.symm
+    _ ≤ P.roots.toFinset.card := Finset.card_le_card hSsub
+    _ ≤ Multiset.card P.roots := Multiset.toFinset_card_le _
+    _ ≤ P.natDegree := card_roots' P
+    _ = q := hdeg
 
 /-! ## Lemma C.2 -/
 

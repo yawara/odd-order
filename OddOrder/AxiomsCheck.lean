@@ -1804,3 +1804,8 @@ set_option linter.style.longLine false in
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd
+
+-- BG App C Lemma C.1: if the norm set `E = {a | N(a)=N(2-a)=1}` is inverse-closed and
+-- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,
+-- and the degree-`q` Frobenius polynomial `∏_{i<q}((1-a)^{p^i}X+1)-1` then has `p` roots.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC1
