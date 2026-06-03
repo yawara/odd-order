@@ -2470,6 +2470,105 @@ theorem oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot
     rw [← hg]; exact hMp'.pow_right n
   exact (Subgroup.card_eq_one).mp hcard1
 
+/-- **BG Proposition 1.15(b) (D. Goldschmidt)**, general form: if `G` is a finite solvable group
+and `R` is a `p`-subgroup, then `O_{p'}(C_G(R)) ≤ O_{p'}(G)`.
+
+This reduces the general statement to the `O_{p'}(G) = ⊥` case
+(`oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot`) modulo `M₀ := O_{p'}(G)`. Writing
+`f = mk' M₀`, `Ḡ = G/M₀`, `R̄ = R.map f`, Lemma 1.14 (`centralizer_comap_mk'_…`) gives
+`C_Ḡ(R̄) = C_G(R)·M₀/M₀ = (C_G(R)).map f`. Setting `K := M.map f` for `M := O_{p'}(C_G(R))`:
+`K` lies in `C̄ := C_Ḡ(R̄)`, is normalized by `C̄` (since `M ⊴ C_G(R)`), and is a `p'`-group, so
+`K.subgroupOf C̄ ≤ O_{p'}(↥C̄)`, i.e. `K ≤ O_{p'}(C_Ḡ(R̄))`. The special case at `Ḡ` (where
+`O_{p'}(Ḡ) = ⊥` by `oPiCore_quotient_self_eq_bot`) forces `K = ⊥`, hence `M ≤ ker f = M₀`. -/
+theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {R : Subgroup G} (hR : IsPGroup p R) :
+    OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) ≤
+      OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G := by
+  set M : Subgroup G := OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
+    (Subgroup.centralizer (R : Set G)) with hMdef
+  set M₀ : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G with hM₀def
+  -- goal is now `M ≤ M₀`.
+  haveI hM₀norm : M₀.Normal := by rw [hM₀def]; infer_instance
+  set f : G →* G ⧸ M₀ := QuotientGroup.mk' M₀ with hfdef
+  have hsurj : Function.Surjective f := QuotientGroup.mk'_surjective M₀
+  have hker : f.ker = M₀ := QuotientGroup.ker_mk' M₀
+  -- `M₀ = O_{p'}(G)` is a `p'`-group, so its order is coprime to `p`.
+  have hM₀p' : Nat.Coprime (Nat.card ↥M₀) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      rw [hM₀def] at hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hM₀map : M₀.map f = ⊥ := by rw [Subgroup.map_eq_bot_iff]; exact hker.ge
+  -- `Cbar = C_Ḡ(R̄)`, the centralizer of the image of `R`.
+  set Cbar : Subgroup (G ⧸ M₀) := Subgroup.centralizer ((R.map f) : Set (G ⧸ M₀)) with hCbardef
+  -- brick 1 (Lemma 1.14): the preimage of `Cbar` is `C_G(R) ⊔ M₀`.
+  have hbrick1 : Cbar.comap f = Subgroup.centralizer (R : Set G) ⊔ M₀ :=
+    centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime hR hM₀p'
+  -- hence `Cbar = (C_G(R)).map f` (apply `map f`, `M₀.map f = ⊥`).
+  have hCbareq : Cbar = (Subgroup.centralizer (R : Set G)).map f := by
+    have h := congrArg (Subgroup.map f) hbrick1
+    rwa [Subgroup.map_comap_eq_self_of_surjective hsurj, Subgroup.map_sup, hM₀map,
+      sup_bot_eq] at h
+  set K : Subgroup (G ⧸ M₀) := M.map f with hKdef
+  -- (A) `K ≤ Cbar`.
+  have hM_le_C : M ≤ Subgroup.centralizer (R : Set G) :=
+    OddOrder.GroupTheory.opiCoreInG_le _ _
+  have hKC : K ≤ Cbar := by rw [hKdef, hCbareq]; exact Subgroup.map_mono hM_le_C
+  -- (B) `Cbar` stabilizes `K` by conjugation (`M ⊴ C_G(R)`).
+  have hK_conj_stable : ∀ g ∈ Cbar, ∀ x ∈ K, g * x * g⁻¹ ∈ K := by
+    intro g hg x hx
+    rw [hCbareq] at hg
+    obtain ⟨y, hy, rfl⟩ := hg
+    rw [hKdef] at hx ⊢
+    obtain ⟨m, hm, rfl⟩ := hx
+    have hconj : y * m * y⁻¹ ∈ M :=
+      (Subgroup.mem_normalizer_iff.mp
+        (OddOrder.GroupTheory.le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ
+          (Subgroup.centralizer (R : Set G)) hy) m).mp hm
+    have heq : f y * f m * (f y)⁻¹ = f (y * m * y⁻¹) := by rw [map_mul, map_mul, map_inv]
+    rw [heq]
+    exact Subgroup.mem_map_of_mem f hconj
+  -- (C) `K.subgroupOf Cbar` is normal in `↥Cbar`.
+  haveI hK_norm : (K.subgroupOf Cbar).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+    exact hK_conj_stable (g : G ⧸ M₀) g.2 (n : G ⧸ M₀) hn
+  -- (D) `K` is a `p'`-group, so `K.subgroupOf Cbar ≤ O_{p'}(↥Cbar)`.
+  have hM_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)ᶜ M := by
+    intro q hq
+    rw [hMdef, OddOrder.GroupTheory.card_opiCoreInG] at hq
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)ᶜ K := by
+    intro q hq
+    have hdvd : Nat.card ↥K ∣ Nat.card ↥M := by rw [hKdef]; exact Subgroup.card_map_dvd _ _
+    exact hM_pi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+  have hK_le_oPiCore : K.subgroupOf Cbar ≤ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar :=
+    (OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hKC hK_pi).le_oPiCore
+  -- (E) `K ≤ O_{p'}(Cbar)` realized in `Ḡ`.
+  have hK_le : K ≤ OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ Cbar := by
+    intro x hx
+    have hxCbar : x ∈ Cbar := hKC hx
+    have hmem : (⟨x, hxCbar⟩ : ↥Cbar) ∈ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar :=
+      hK_le_oPiCore (by rw [Subgroup.mem_subgroupOf]; exact hx)
+    show x ∈ (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar).map Cbar.subtype
+    exact Subgroup.mem_map.mpr ⟨⟨x, hxCbar⟩, hmem, rfl⟩
+  -- (F) special case at `Ḡ`: `O_{p'}(Cbar) = ⊥` (because `O_{p'}(Ḡ) = ⊥`).
+  have hbarbot : OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ (G ⧸ M₀) = ⊥ :=
+    OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot ({p} : Set ℕ)ᶜ
+  have hCbarbot : OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ Cbar = ⊥ :=
+    oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot (hR.map f) hbarbot
+  -- conclude `K = ⊥`, hence `M ≤ ker f = M₀`.
+  have hKbot : K = ⊥ := le_bot_iff.mp (hK_le.trans hCbarbot.le)
+  have hMmap : M.map f = ⊥ := by rw [← hKdef]; exact hKbot
+  rw [Subgroup.map_eq_bot_iff, hker] at hMmap
+  exact hMmap
+
 /-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20)
 
 Focal/Burnside は Ch05 側に BG から引用する public entrypoint を置く.

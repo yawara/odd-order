@@ -81,14 +81,18 @@ case(1) (p-length one, Thm 6.7 待ち) は **明示 sorry で残す** (今回ス
 - **✅ brick 2 core + 特殊形 完了** (commit 584cc9b, axiom-clean, full build 3562 green):
   - `mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer` (private, **無条件** core): ∀u∈O_{p'}(C_G(R)), u が O_p(G) を中心化。⟨u⟩ が RT=R⊔O_p(G) に共役作用 (`normalizerMonoidHom`+`inclusion`) + Prop 1.10。最重部分=完了。
   - `oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot` (public, **Prop 1.15(b) O_{p'}(G)=⊥ 形**): core + Prop 1.15(a) (`hall_higman_solvable_specialization`) で M⊆C_G(O_p)⊆O_p、M は p'-群 ⟹ M=⊥。
-- **🔜 残 = brick 2b (general 形) `oPiPrimeCore_centralizer_le_oPiPrimeCore`** (~80-100 LOC, quotient plumbing):
+- **✅ brick 2b (general 形) `oPiPrimeCore_centralizer_le_oPiPrimeCore` 完了** (commit 待ち, axiom-clean):
   M₀:=O_{p'}(G), f:=mk' M₀, Ḡ:=G/M₀, R̄:=R.map f。`M ≤ M₀ ⟺ M.map f = ⊥` (`Subgroup.map_eq_bot_iff`+`ker_mk'`)。
-  K:=M.map f について `K ≤ opiCoreInG {p}ᶜ C_Ḡ(R̄) = ⊥` (特殊形@Ḡ, `oPiCore_quotient_self_eq_bot`) を示す:
-  (i) K≤C̄ (M≤C_G(R) 像 ⊆ centralizer 像, easy 方向 inline); (ii) **K⊴C̄ は relative-normality を map で運ぶのでなく
-  共役特徴付けで inline 証明**: brick1 で C̄=(C_G(R)).map f ⟹ c=f y (y∈C_G(R)), k=f m (m∈M), M⊴C_G(R)
-  (`le_normalizer_opiCoreInG`) ⟹ y m y⁻¹∈M ⟹ c k c⁻¹=f(ymyu⁻¹)∈K; (iii) K は {p}ᶜ-群 (card K∣card M, M p'-群);
-  ⟹ K.subgroupOf C̄ は ↥C̄ の normal {p}ᶜ-subgroup ⟹ `IsPiGroup.le_oPiCore` で ≤ oPiCore {p}ᶜ ↥C̄ ⟹
-  map subtype で K ≤ opiCoreInG。**罠予想**: G/C̄/↥C̄ 三層の型juggling, subgroupOf↔map subtype 往復。
+  K:=M.map f について `K ≤ opiCoreInG {p}ᶜ C_Ḡ(R̄) = ⊥` (特殊形@Ḡ, `oPiCore_quotient_self_eq_bot`) を示した:
+  (i) K≤Cbar (M≤C_G(R) 像 ⊆ centralizer 像); (ii) **Kの共役安定性を inline 証明**: brick1 で Cbar=(C_G(R)).map f
+  ⟹ c=f y (y∈C_G(R)), k=f m (m∈M), M⊴C_G(R) (`le_normalizer_opiCoreInG`) ⟹ y m y⁻¹∈M ⟹ c k c⁻¹=f(ymy⁻¹)∈K
+  ⟹ `(K.subgroupOf Cbar).Normal`; (iii) K は {p}ᶜ-群 (`card_map_dvd`, M p'-群); ⟹ `IsPiGroup.le_oPiCore` で
+  K.subgroupOf Cbar ≤ oPiCore {p}ᶜ ↥Cbar ⟹ map subtype で K ≤ opiCoreInG。これで **Prop 1.15(b) 完結**。
+  - **Lean 罠 (実測)**: (1) **変数名に結合マクロン `C̄` (U+0304) 不可** → parse error "expected token", `Cbar` にリネーム;
+    (2) `Subgroup.IsPiGroup`/`.subgroupOf`/`.le_oPiCore` は **`OddOrder.Isaacs.Ch03` namespace 配下** (full-qualify 要,
+    root `Subgroup.IsPiGroup` は Unknown constant); (3) `Subgroup.map_eq_bot_iff.mpr`/`.mp` は **term-mode 解決失敗** →
+    `rw [Subgroup.map_eq_bot_iff]` (rw は OK); (4) hbarbot の `rw [hM₀def]` は `G ⧸ M₀` 依存型で **motive ill-typed** →
+    `set` の defeq に任せた直接 term (`oPiCore_quotient_self_eq_bot _`) で回避。`set M₀` には `haveI M₀.Normal` 明示要 (TC が let-fvar を unfold しない)。
 - 次の brick 2 罠メモ (旧):
 - brick 2 は **実測で大型 (~150-200 LOC) + 罠多数**。次回は **incremental skeleton 推奨**
   (hard sub-step を `sorry` で置いて型を通し→1 個ずつ埋める→頻繁 build)。一気書きは normalizer 罠で詰む。
