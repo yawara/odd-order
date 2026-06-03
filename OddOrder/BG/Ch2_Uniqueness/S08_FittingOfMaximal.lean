@@ -356,6 +356,34 @@ theorem opiCoreInG_fittingInG_le_opiCoreInG [Finite G]
   exact le_opiCoreInG_of_normal_of_isPiSubgroup hNH hNnorm
     (isPiSubgroup_opiCoreInG π (fittingInG H))
 
+/-- The `π`-core of `F(H)` centralizes the `π`-complement core of `H`.
+
+This is the `D_q` versus `O_{q'}(H)` commutation part of BG (8.7), with
+`D = F(H)`. -/
+theorem opiCoreInG_fittingInG_commutator_compl_eq_bot [Finite G]
+    (π : Set ℕ) (H : Subgroup G) :
+    ⁅opiCoreInG π (fittingInG H), opiCoreInG πᶜ H⁆ = ⊥ := by
+  have hD_le : opiCoreInG π (fittingInG H) ≤ opiCoreInG π H :=
+    opiCoreInG_fittingInG_le_opiCoreInG π H
+  have hbig_bot : ⁅opiCoreInG π H, opiCoreInG πᶜ H⁆ ≤ ⊥ := by
+    rw [opiCoreInG_commutator_compl_eq_bot π H]
+  exact le_bot_iff.mp ((Subgroup.commutator_mono hD_le le_rfl).trans hbig_bot)
+
+/-- If a subgroup lies in `O_{π'}(H)`, then `O_π(F(H))` centralizes it. -/
+theorem opiCoreInG_fittingInG_le_centralizer_of_le_opiCoreInG_compl [Finite G]
+    (π : Set ℕ) {H K : Subgroup G}
+    (hK : K ≤ opiCoreInG πᶜ H) :
+    opiCoreInG π (fittingInG H) ≤ Subgroup.centralizer (K : Set G) := by
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+  have hcomm_le :
+      ⁅opiCoreInG π (fittingInG H), K⁆ ≤
+        ⁅opiCoreInG π (fittingInG H), opiCoreInG πᶜ H⁆ :=
+    Subgroup.commutator_mono le_rfl hK
+  have hbig_bot :
+      ⁅opiCoreInG π (fittingInG H), opiCoreInG πᶜ H⁆ ≤ ⊥ := by
+    rw [opiCoreInG_fittingInG_commutator_compl_eq_bot π H]
+  exact le_bot_iff.mp (hcomm_le.trans hbig_bot)
+
 /-- BG Proposition 1.10, packaged for the cyclic conjugation action on `F(M)`.
 
 If the fixed subgroup `C_{F(M)}(<x>)` is self-centralizing in `F(M)` and `<x>` has
@@ -1282,6 +1310,27 @@ theorem centralizer_opiCoreInG_cFittingInG_singleton_compl_le_maximal_of_not_pGr
       (H := ↥(fittingInG M)) hp hFnp q
   exact centralizer_opiCoreInG_cFittingInG_singleton_compl_le_maximal_of_ne
     hG hM hA0 hr (fun hqr => hrq hqr.symm)
+
+/-- BG (8.7), conditional endpoint: once `O_{q'}(C_F(M)(A0))` is absorbed by
+`O_{q'}(H)`, the q-core of `F(H)` lies in the original maximal subgroup `M`. -/
+theorem opiCoreInG_fittingInG_singleton_le_maximal_of_cFittingInG_compl_le_opiCoreInG_compl
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hcore : opiCoreInG ({q} : Set ℕ)ᶜ (cFittingInG M A0) ≤
+      opiCoreInG ({q} : Set ℕ)ᶜ H) :
+    opiCoreInG ({q} : Set ℕ) (fittingInG H) ≤ M := by
+  have hcent :
+      opiCoreInG ({q} : Set ℕ) (fittingInG H) ≤
+        Subgroup.centralizer
+          (opiCoreInG ({q} : Set ℕ)ᶜ (cFittingInG M A0) : Set G) :=
+    opiCoreInG_fittingInG_le_centralizer_of_le_opiCoreInG_compl ({q} : Set ℕ) hcore
+  exact hcent.trans
+    (centralizer_opiCoreInG_cFittingInG_singleton_compl_le_maximal_of_not_pGroup
+      hG hM hp hA0 hFnp hq)
 
 /-- Members of `ℋ_X(C_F(M)(A0); π(C_F(M)(A0))^c)` are normalized by
 `O_q(Z(F(M)))`. -/
