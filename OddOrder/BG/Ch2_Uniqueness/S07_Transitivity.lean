@@ -2152,7 +2152,127 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
       ∀ n : G, n ∈ Subgroup.normalizer P →
         ∃ c ∈ opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)),
           ∃ m ∈ Subgroup.normalizer P ⊓ Subgroup.normalizer Q, n = c * m) := by
-  sorry
+  classical
+  -- The four-conjunct conclusion for a pair `(A, P)`.
+  let Goal : Subgroup G → Subgroup G → Prop := fun A P =>
+    Subgroup.centralizer (P : Set G) ⊓ kSubgroup A =
+        opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)) ∧
+    ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
+        (hInvariantStar ⊤ P {q}) ∧
+    hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q} ∧
+    (∀ Q ∈ hInvariantStar ⊤ P {q},
+      P ⊓ derivedInG (Subgroup.normalizer P) ≤ derivedInG (Subgroup.normalizer Q) ∧
+      ∀ n : G, n ∈ Subgroup.normalizer P →
+        ∃ c ∈ opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)),
+          ∃ m ∈ Subgroup.normalizer P ⊓ Subgroup.normalizer Q, n = c * m)
+  suffices key : ∀ n : ℕ, ∀ A : Subgroup G, Hypothesis71 A → q ∈ (primesOf A)ᶜ →
+      ∀ P : Subgroup G, P < ⊤ → Subgroup.IsPiSubgroup (primesOf A) P → A ≤ P →
+      Subgroup.IsSubnormal (A.subgroupOf P) →
+      ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q}) →
+      (A.subgroupOf P).index = n → Goal A P by
+    exact key _ A hA hq P hPproper hPpi hAP hAsub htrans rfl
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro A hA hq P hPproper hPpi hAP hAsub htrans hn
+    have hAne : A ≠ ⊥ := hA.ne_bot
+    have hPne : P ≠ ⊥ := fun h => hAne (le_bot_iff.mp (h ▸ hAP))
+    by_cases hAeqP : A = P
+    · -- Base `A = P`: everything is reflexive / `tp_centralizer_eq`.
+      subst hAeqP
+      refine ⟨tp_centralizer_eq hG hA (le_refl A), ?_, ?_, ?_⟩
+      · -- (b): `O_{π'}(C_G(A)) = kSubgroup A`, transitive `= htrans`.
+        rw [show opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (A : Set G)) = kSubgroup A from rfl]
+        exact htrans
+      · exact le_refl _
+      · intro Q hQ
+        refine ⟨?_, ?_⟩
+        · exact tp_d hG hq (le_refl A) hPpi hPproper hPne
+            (by rw [show opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (A : Set G))
+              = kSubgroup A from rfl]; exact htrans) hQ |>.1
+        · exact tp_d hG hq (le_refl A) hPpi hPproper hPne
+            (by rw [show opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (A : Set G))
+              = kSubgroup A from rfl]; exact htrans) hQ |>.2
+    · -- `A < P`: reduce to a normal subgroup `B` of prime index.
+      have hAltP : A < P := lt_of_le_of_ne hAP hAeqP
+      obtain ⟨B, hAB, hBlt, hBnorm, hBindex⟩ := tp_reduction hG hAP hAltP hPproper hAsub
+      haveI := hBnorm
+      have hBP : B ≤ P := le_of_lt hBlt
+      -- `B` is a `π(A)`-subgroup; `primesOf B = primesOf A`.
+      have hBpi : Subgroup.IsPiSubgroup (primesOf A) B := fun r hr =>
+        hPpi r (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
+          (Nat.mem_primeFactors.mp hr).2.1.trans (Subgroup.card_dvd_of_le hBP), Nat.card_pos.ne'⟩)
+      have hprimesBA : primesOf B = primesOf A :=
+        primesOf_eq_of_le_of_isPiSubgroup hAB hBP hPpi
+      by_cases hAeqB : A = B
+      · -- `A = B`: prime-index base case.
+        subst hAeqB
+        haveI : (A.subgroupOf P).Normal := hBnorm
+        exact tp_base hG hA hq hAP hPpi hPproper hPne
+          (p := (A.subgroupOf P).index) hBindex rfl htrans
+      · -- `A < B`: double recursion on `(A, B)` and `(B, P)`.
+        have hABlt : A < B := lt_of_le_of_ne hAB hAeqB
+        have hBlt_top : B < ⊤ := lt_trans hBlt hPproper
+        have hBne : B ≠ ⊥ := fun h => hAne (le_bot_iff.mp (h ▸ hAB))
+        -- Measure: `|B:A| · |P:B| = |P:A| = n`, both factors `> 1`.
+        have hmul : (A.subgroupOf B).index * (B.subgroupOf P).index = (A.subgroupOf P).index := by
+          have h := Subgroup.relIndex_mul_relIndex A B P hAB hBP
+          simpa only [Subgroup.relIndex] using h
+        have hBA_ne0 : (A.subgroupOf B).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+        have hPB_ne0 : (B.subgroupOf P).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+        have hBA_gt : 1 < (A.subgroupOf B).index := by
+          rcases Nat.lt_or_ge 1 (A.subgroupOf B).index with h | h
+          · exact h
+          · exfalso
+            have : (A.subgroupOf B).index = 1 := by omega
+            rw [Subgroup.index_eq_one, Subgroup.subgroupOf_eq_top] at this
+            exact (ne_of_lt hABlt) (le_antisymm hAB this)
+        have hPB_gt : 1 < (B.subgroupOf P).index := by
+          rcases Nat.lt_or_ge 1 (B.subgroupOf P).index with h | h
+          · exact h
+          · exfalso
+            have : (B.subgroupOf P).index = 1 := by omega
+            rw [Subgroup.index_eq_one, Subgroup.subgroupOf_eq_top] at this
+            exact (ne_of_lt hBlt) (le_antisymm hBP this)
+        have hBA_lt_n : (A.subgroupOf B).index < n := by
+          rw [← hn, ← hmul]
+          exact lt_mul_of_one_lt_right (by omega) hPB_gt
+        have hPB_lt_n : (B.subgroupOf P).index < n := by
+          rw [← hn, ← hmul]
+          exact lt_mul_of_one_lt_left (by omega) hBA_gt
+        -- `A` subnormal in `B`, `B` subnormal in `P`.
+        have hAsubB : (A.subgroupOf B).IsSubnormal := by
+          have h := Subgroup.IsSubnormal.comap (Subgroup.inclusion hBP) hAsub
+          rwa [Subgroup.comap_inclusion_subgroupOf hBP] at h
+        have hBsubP : (B.subgroupOf P).IsSubnormal := (hBnorm).isSubnormal
+        -- IH on `(A, B)`.
+        obtain ⟨_, hbAB, hcAB, _⟩ :=
+          ih _ hBA_lt_n A hA hq B hBlt_top hBpi hAB hAsubB htrans rfl
+        -- `Hypothesis71 B`, `htrans` on `B`.
+        have hBhyp : Hypothesis71 B := tp_hyp71_of_le hA hAB hprimesBA hBne hBlt_top
+        have hqB : q ∈ (primesOf B)ᶜ := by rw [hprimesBA]; exact hq
+        have hPpiB : Subgroup.IsPiSubgroup (primesOf B) P := by rw [hprimesBA]; exact hPpi
+        have htransB : ConjTransitiveOn (kSubgroup B) (hInvariantStar ⊤ B {q}) := by
+          have heqK : kSubgroup B = opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (B : Set G)) := by
+            rw [kSubgroup, hprimesBA]
+          rw [heqK]; exact hbAB
+        -- IH on `(B, P)`.
+        obtain ⟨_, hbBP, hcBP, hdBP⟩ :=
+          ih _ hPB_lt_n B hBhyp hqB P hPproper hPpiB hBP hBsubP htransB rfl
+        -- Compose. `primesOf B = primesOf A` lets us re-tag the `O_{π'}` parts.
+        have hOCeq : opiCoreInG (primesOf B)ᶜ (Subgroup.centralizer (P : Set G))
+            = opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)) := by rw [hprimesBA]
+        refine ⟨tp_centralizer_eq hG hA hAP, ?_, ?_, ?_⟩
+        · rw [← hOCeq]; exact hbBP
+        · exact fun Q hQ => hcAB (hcBP hQ)
+        · intro Q hQ
+          obtain ⟨hd1, hd2⟩ := hdBP Q hQ
+          refine ⟨hd1, ?_⟩
+          intro nn hnn
+          obtain ⟨c, hc, m, hm, hcm⟩ := hd2 nn hnn
+          exact ⟨c, hOCeq ▸ hc, m, hm, hcm⟩
+
+/-! ## Proposition 7.5 — Hypothesis 7.1 の十分条件 -/
 
 /-! ## Proposition 7.5 — Hypothesis 7.1 の十分条件 -/
 
