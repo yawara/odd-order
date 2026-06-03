@@ -159,6 +159,13 @@ noncomputable instance normOneFrobeniusGroup_fintype [Fact p.Prime] :
       left_inv := by intro x; rfl
       right_inv := by intro x; ext <;> rfl }
 
+/-- The concrete semidirect product has order `|P| * |U| = p^q * |U|`. -/
+theorem normOneFrobeniusGroup_card_eq [Fact p.Prime] (hq : q ≠ 0) :
+    Nat.card (normOneFrobeniusGroup p q) = p ^ q * Nat.card (normOneUnits p q) := by
+  rw [normOneFrobeniusGroup, SemidirectProduct.card]
+  rw [← Nat.card_congr (Multiplicative.ofAdd : GaloisField p q ≃ additiveFieldGroup p q)]
+  rw [GaloisField.card p q hq]
+
 /-- Over `ℂ`, the concrete Frobenius-group cardinality is invertible. -/
 noncomputable instance normOneFrobeniusGroup_card_invertible [Fact p.Prime] :
     Invertible (Nat.card (normOneFrobeniusGroup p q) : ℂ) :=

@@ -1836,6 +1836,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card_gt_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_isFrobeniusGroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusGroup_card_eq
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_index_eq_normOneUnits_card
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_mul_comm

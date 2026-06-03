@@ -144,6 +144,12 @@ additive kernel の可換性から出す。さらに `normOneFrobeniusKernel_car
 `∑_{χ∈Irr(H)} |χ(s^j)|² = |C_H(s^j)| = |P|` に使う concrete 入力。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 semidirect-product group order (2026-06-04)
+`SemidirectProduct.card` と `GaloisField.card` から
+`normOneFrobeniusGroup_card_eq : |H| = p^q * |U|` を追加。
+これは class-sum coefficient の character formula で現れる denominator `|H|` を
+finite-field size と norm-one complement size に落とす concrete 入力。AxiomsCheck 登録済み。
+
 #### ✅ q≥5 concrete column-orthogonality specialization (2026-06-04)
 `OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality` の public theorem を concrete
 `H=P⋊U` に適用し、`normOneFrobenius_column_sq_sum_inl_eq` で

@@ -91,6 +91,9 @@ created: 2026-06-04
 - [x] **C.2 q≥5 centralizer size input**:
   `C_H(inl s)=P` for `s≠0` と `|C_H(inl s)|=p^q` を証明。BG の直交関係評価
   `∑|χ(s^j)|²=|C_H(s^j)|=|P|` の concrete group-theory side を固定。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 semidirect-product group order**:
+  `|H| = p^q * |U|` を `normOneFrobeniusGroup_card_eq` として証明。class-sum character formula の
+  denominator を整理するための concrete size input。AxiomsCheck 登録済み。
 - [x] **C.2 q≥5 column orthogonality specialization**:
   `∑_{χ∈Irr(H)} χ(inl s) * star(χ(inl s)) = p^q` (`s≠0`) と `2*s` 版を証明。
   AxiomsCheck 登録済み。
