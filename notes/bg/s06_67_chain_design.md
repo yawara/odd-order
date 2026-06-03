@@ -1,4 +1,11 @@
-# BG §6→§7 close-out 設計ノート (2026-06-04)
+# BG §6→§7 close-out 設計ノート (2026-06-04) — ✅✅✅ COMPLETE
+
+**✅ 完了 (2026-06-04)**: 連鎖全完走、§7 完全 sorry-free。commits 29de247/c52bf9f/38a794b/4fcb810/aa24260。
+全 sorry-free・axiom-clean ([propext,choice,Quot.sound])・AxiomsCheck 登録・full build 3562 green。
+実装定理名: `S06.exists_mem_centralizerK_mul_of_conj_le` (6.5c) / `S06.oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow`
+ほか 6.6 計5 / `S01.corollary_1_12` / `S06.le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian` (6.7)
+/ `S07.hypothesis71_of_scn2_or_pLengthOne` (Prop 7.5 両分岐)。E*(S) char は `S06.mem_of_mem_centralizer_pow_eq_one`
+(`IsMaximalElementaryAbelian.le_of_le_centralizer` 経由)。以下は実装時の設計記録 (参照用)。
 
 goal: §7 を 100% sorry-free にする。鎖 = **Lem 6.5(c) → Lem 6.6 → Cor 1.12 → E*(S) char → Thm 6.7 → §7 Prop 7.5 case1**。
 全 build-green・axiom-clean・AxiomsCheck 登録が完了条件。
