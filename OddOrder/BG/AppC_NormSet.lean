@@ -524,6 +524,124 @@ lemma mem_range_of_pow_p_eq_self [Fact p.Prime] {x : GaloisField p q} (hx : x ^ 
   obtain ⟨b, _, hb⟩ := hxroot
   exact ⟨b, hb⟩
 
+/-- The cubic `f_c` is monic. -/
+lemma fCubic_monic [Fact p.Prime] (c : ZMod p) : (fCubic p c).Monic := by
+  unfold fCubic; monicity!
+
+/-- `normN` over `𝔽_{p^3}` is the product of the three Frobenius conjugates. -/
+lemma normN_three [Fact p.Prime] (a : GaloisField p 3) :
+    normN p 3 a = a * a ^ p * a ^ (p ^ 2) := by
+  rw [normN, Finset.prod_range_succ, Finset.prod_range_succ, Finset.prod_range_one]
+  simp only [pow_zero, pow_one]
+
+/-- **BG Lemma C.2** (`q = 3`), the lift: a root-free `f_c` yields an element of `E`
+that is `≠ 1` (its Frobenius conjugates give `N(a) = N(2-a) = 1`). -/
+lemma exists_mem_normSetE_three [Fact p.Prime] (hpodd : Odd p) :
+    ∃ a : GaloisField p 3, a ∈ normSetE p 3 ∧ a ≠ 1 := by
+  classical
+  obtain ⟨c, hrf⟩ := exists_rootFree_cubic p hpodd
+  have hirr := fCubic_irreducible p c hrf
+  obtain ⟨a, hroot⟩ := exists_root_fCubic p c hirr
+  have ha_notmem := root_not_mem_range p hroot hrf
+  haveI : Fintype (GaloisField p 3) := Fintype.ofFinite _
+  haveI : CharP (GaloisField p 3) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p 3) p]; exact ZMod.charP p
+  have hp0 : p ≠ 0 := (Fact.out : p.Prime).pos.ne'
+  -- `a^{p^3} = a` and the Frobenius orbit relations.
+  have hpow3 : a ^ (p ^ 3) = a := by
+    have hc3 : Fintype.card (GaloisField p 3) = p ^ 3 := by
+      rw [← Nat.card_eq_fintype_card, GaloisField.card p 3 (by norm_num)]
+    rw [← hc3]; exact FiniteField.pow_card a
+  have hb1 : a ^ (p ^ 2) = (a ^ p) ^ p := by rw [← pow_mul, pow_two]
+  have hb2p : (a ^ (p ^ 2)) ^ p = a := by
+    rw [← pow_mul, show p ^ 2 * p = p ^ 3 from by ring, hpow3]
+  -- `a, a^p, a^{p²}` are distinct.
+  have hd01 : a ^ p ≠ a := fun h => ha_notmem (mem_range_of_pow_p_eq_self p 3 h)
+  have hd02 : a ^ (p ^ 2) ≠ a := fun h => hd01 (by have := hb2p; rwa [h] at this)
+  have hd12 : a ^ p ≠ a ^ (p ^ 2) := fun h => hd02 (by
+    calc a ^ (p ^ 2) = (a ^ p) ^ p := hb1
+      _ = (a ^ (p ^ 2)) ^ p := by rw [h]
+      _ = a := hb2p)
+  -- The mapped cubic `g` is monic of degree 3 with roots `a, a^p, a^{p²}`.
+  set g : (GaloisField p 3)[X] := (fCubic p c).map (algebraMap (ZMod p) (GaloisField p 3)) with hg
+  have hgeval : ∀ x : GaloisField p 3, g.eval x = (Polynomial.aeval x) (fCubic p c) := by
+    intro x; rw [hg, Polynomial.eval_map, ← Polynomial.aeval_def]
+  have hgmonic : g.Monic := (fCubic_monic p c).map _
+  have hgne : g ≠ 0 := hgmonic.ne_zero
+  have hgdeg : g.natDegree = 3 := by rw [hg, (fCubic_monic p c).natDegree_map, fCubic_natDegree]
+  have haevalp : (Polynomial.aeval (a ^ p)) (fCubic p c) = 0 := by
+    rw [← aeval_pow_p, hroot, zero_pow hp0]
+  have haevalp2 : (Polynomial.aeval (a ^ (p ^ 2))) (fCubic p c) = 0 := by
+    rw [hb1, ← aeval_pow_p, haevalp, zero_pow hp0]
+  have hra : g.eval a = 0 := by rw [hgeval]; exact hroot
+  have hrap : g.eval (a ^ p) = 0 := by rw [hgeval]; exact haevalp
+  have hrap2 : g.eval (a ^ (p ^ 2)) = 0 := by rw [hgeval]; exact haevalp2
+  -- The roots multiset of `g` is exactly `{a, a^p, a^{p²}}`.
+  set s : Multiset (GaloisField p 3) := {a, a ^ p, a ^ (p ^ 2)} with hs
+  have hs_card : s.card = 3 := rfl
+  have hs_nodup : s.Nodup := by
+    simp only [hs, Multiset.insert_eq_cons, Multiset.nodup_cons, Multiset.mem_cons,
+      Multiset.mem_singleton, Multiset.nodup_singleton, not_or, and_true]
+    exact ⟨⟨fun h => hd01 h.symm, fun h => hd02 h.symm⟩, fun h => hd12 h⟩
+  have hs_le : s ≤ g.roots := by
+    rw [Multiset.le_iff_count]
+    intro x
+    by_cases hx : x ∈ s
+    · rw [Multiset.count_eq_one_of_mem hs_nodup hx]
+      refine Multiset.one_le_count_iff_mem.mpr ?_
+      rw [Polynomial.mem_roots hgne]
+      simp only [hs, Multiset.insert_eq_cons, Multiset.mem_cons, Multiset.mem_singleton] at hx
+      rcases hx with rfl | rfl | rfl
+      · exact hra
+      · exact hrap
+      · exact hrap2
+    · rw [Multiset.count_eq_zero.mpr hx]; exact Nat.zero_le _
+  have hcard_le : g.roots.card ≤ s.card := by
+    rw [hs_card]; exact (Polynomial.card_roots' g).trans_eq hgdeg
+  have hgroots : g.roots = s := (Multiset.eq_of_le_of_card_le hs_le hcard_le).symm
+  have hgprod : g = (s.map (fun r => X - C r)).prod := by
+    rw [← hgroots]
+    exact (Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hgmonic
+      (by rw [hgroots, hs_card]; exact hgdeg.symm)).symm
+  -- Evaluate at 0 and 2: `g(0) = -(a a^p a^{p²}) = -N(a)`, `g(2) = N(2-a)`.
+  have hprodeval : ∀ x : GaloisField p 3,
+      g.eval x = (x - a) * (x - a ^ p) * (x - a ^ (p ^ 2)) := by
+    intro x
+    rw [hgprod, hs]
+    simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton,
+      Multiset.prod_cons, Multiset.prod_singleton, Polynomial.eval_mul, Polynomial.eval_sub,
+      Polynomial.eval_X, Polynomial.eval_C]
+    ring
+  have h2pow : (2 : GaloisField p 3) ^ p = 2 := by
+    rw [show (2 : GaloisField p 3) = algebraMap (ZMod p) (GaloisField p 3) 2 from
+      (map_ofNat _ 2).symm, ← map_pow, ZMod.pow_card]
+  have hfc0 : (fCubic p c).eval 0 = -1 := by rw [fCubic_eval]; ring
+  have hfc2 : (fCubic p c).eval 2 = 1 := by rw [fCubic_eval]; ring
+  have hN_a : normN p 3 a = 1 := by
+    have h0 : g.eval 0 = -1 := by
+      rw [hgeval,
+        show (0 : GaloisField p 3) = algebraMap (ZMod p) (GaloisField p 3) 0 from
+          (map_zero _).symm,
+        Polynomial.aeval_algebraMap_apply, Polynomial.coe_aeval_eq_eval, hfc0, map_neg, map_one]
+    rw [hprodeval] at h0
+    rw [normN_three]
+    linear_combination -h0
+  have hN_2a : normN p 3 (2 - a) = 1 := by
+    have h2 : g.eval 2 = 1 := by
+      rw [hgeval,
+        show (2 : GaloisField p 3) = algebraMap (ZMod p) (GaloisField p 3) 2 from
+          (map_ofNat _ 2).symm,
+        Polynomial.aeval_algebraMap_apply, Polynomial.coe_aeval_eq_eval, hfc2, map_one]
+    rw [hprodeval] at h2
+    rw [normN_three]
+    have e1 : (2 - a) ^ p = 2 - a ^ p := by rw [sub_pow_char, h2pow]
+    have e2 : (2 - a) ^ (p ^ 2) = 2 - a ^ (p ^ 2) := by
+      have hpp : (2 - a) ^ (p ^ 2) = ((2 - a) ^ p) ^ p := by rw [← pow_mul, pow_two]
+      rw [hpp, e1, sub_pow_char, h2pow, ← hb1]
+    rw [e1, e2]
+    linear_combination h2
+  exact ⟨a, ⟨hN_a, hN_2a⟩, fun h => ha_notmem ⟨1, by rw [h]; simp⟩⟩
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
@@ -537,6 +655,15 @@ yielding a root `a ∈ 𝔽_{p^3}` with `N(a) = N(2-a) = 1`, so `a, 1 ∈ E`. -/
 theorem lemmaC2 [Fact p.Prime] (hpodd : Odd p) (hq : q.Prime) (hqodd : Odd q)
     (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
     2 ≤ (normSetE p q).ncard := by
-  sorry
+  rcases eq_or_ne q 3 with rfl | hq3
+  · -- `q = 3`: the cubic argument exhibits an element of `E` distinct from `1`.
+    obtain ⟨a, ha, hane⟩ := exists_mem_normSetE_three p hpodd
+    have hsub : ({1, a} : Set (GaloisField p 3)) ⊆ normSetE p 3 := by
+      rw [Set.insert_subset_iff, Set.singleton_subset_iff]
+      exact ⟨one_mem_normSetE p 3, ha⟩
+    calc (2 : ℕ) = ({1, a} : Set (GaloisField p 3)).ncard := (Set.ncard_pair (Ne.symm hane)).symm
+      _ ≤ (normSetE p 3).ncard := Set.ncard_le_ncard hsub (normSetE p 3).toFinite
+  · -- `q ≥ 5`: the character theory of the Frobenius group `H = P ⋊ U`. TODO (issue 3000).
+    sorry
 
 end OddOrder.BG.AppC.NormSet

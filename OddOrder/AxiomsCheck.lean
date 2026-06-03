@@ -1809,3 +1809,8 @@ set_option linter.style.longLine false in
 -- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,
 -- and the degree-`q` Frobenius polynomial `∏_{i<q}((1-a)^{p^i}X+1)-1` then has `p` roots.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC1
+
+-- BG App C Lemma C.2 (q=3): a root-free cubic `f_c = X(X-2)(X-c)+(X-1)` (pigeonhole) is
+-- irreducible, its root `a ∈ 𝔽_{p^3}` has Frobenius orbit `{a, a^p, a^{p²}}` of 3 distinct
+-- roots, so `f_c = ∏(X - a^{p^i})` and reading `f_c(0)=-1`, `f_c(2)=1` gives `N(a)=N(2-a)=1`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_mem_normSetE_three
