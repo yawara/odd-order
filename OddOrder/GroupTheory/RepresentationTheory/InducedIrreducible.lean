@@ -220,6 +220,15 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
     haveI : Fintype G := Fintype.ofFinite G
     rw [IrreducibleCharacter.coe_conjBy, induce_conjBy_eq]
 
+/-- **Orbit size = inertia index.**  The `G`-conjugation orbit of `θ ∈ Irr H` (`H ⊴ G`) has
+cardinality `[G : I_G(θ)]`, via the coset parametrization `conjByOrbitEquivLeftCosets`.  Together
+with `induce_eq_induce_iff_conj` (orbit = fibre of `θ ↦ Ind θ`) this gives the multiplicity with
+which each `χ ∈ S(A)` is hit, for the Peterfalvi (6.2) step-4a orbit count. -/
+theorem card_conjByOrbit_eq_index_inertia (θ : IrreducibleCharacter H) :
+    Nat.card (IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ) =
+      (IrreducibleCharacter.inertia (G := G) (H := H) θ).index :=
+  (Nat.card_congr (IrreducibleCharacter.conjByOrbitEquivLeftCosets (G := G) (H := H) θ)).symm
+
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
 `exists_pair_of_sum_sq_eq_two`.) -/
