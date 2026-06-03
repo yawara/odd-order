@@ -1117,6 +1117,47 @@ private theorem exists_normal_index_prime_of_solvable {Q : Type*} [Group Q] [Fin
   rw [Subgroup.index_eq_card]
   exact Group.is_simple_iff_prime_card.mp hsimple
 
+/-- **Theorem 7.4 composition-series 還元** (R1, mmd L2206-2216): `A < P` subnormal, `P` 可解
+(`hG`+`P<⊤`) ⟹ `∃ B`, `A ≤ B < P`, `B ⊴ P`, `|P:B|` 素数。subnormal 系列頂点直下
+(`exists_normal_lt_top_of_isSubnormal`) を素数指数化 (`exists_normal_index_prime_of_solvable`
+@`↥P⧸B̄`) し pull back + `↥P`→`G` translate。「`A` subnormal in `B`」は R3 で別途。 -/
+private theorem tp_reduction [Finite G] (hG : IsMinimalSimpleOdd G) {A P : Subgroup G}
+    (hAP : A ≤ P) (hAlt : A < P) (hPlt : P < ⊤) (hAsub : (A.subgroupOf P).IsSubnormal) :
+    ∃ B : Subgroup G, A ≤ B ∧ B < P ∧ (B.subgroupOf P).Normal ∧ (B.subgroupOf P).index.Prime := by
+  haveI : IsSolvable ↥P := hG.solvable_of_lt_top P hPlt
+  have hA'lt : A.subgroupOf P < ⊤ := by
+    rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+    exact fun h => hAlt.not_ge h
+  obtain ⟨Bbar, hABbar, hBbarlt, hBbarnorm⟩ := exists_normal_lt_top_of_isSubnormal hAsub hA'lt
+  haveI := hBbarnorm
+  haveI hnt : Nontrivial (↥P ⧸ Bbar) := by
+    obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hBbarlt
+    exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
+  obtain ⟨Nbar, hNbarnorm, hNbarprime⟩ := exists_normal_index_prime_of_solvable hnt
+  set C : Subgroup ↥P := Nbar.comap (QuotientGroup.mk' Bbar) with hC
+  haveI : C.Normal := hNbarnorm.comap _
+  have hBbarC : Bbar ≤ C := by
+    intro x hx
+    rw [hC, Subgroup.mem_comap,
+      show (QuotientGroup.mk' Bbar) x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+    exact one_mem _
+  have hCindex : C.index = Nbar.index :=
+    Nbar.index_comap_of_surjective (QuotientGroup.mk'_surjective Bbar)
+  have hCeq : (C.map P.subtype).subgroupOf P = C :=
+    Subgroup.comap_map_eq_self_of_injective P.subtype_injective C
+  refine ⟨C.map P.subtype, ?_, ?_, ?_, ?_⟩
+  · have hAC : A.subgroupOf P ≤ C := hABbar.trans hBbarC
+    have hA_eq : (A.subgroupOf P).map P.subtype = A := by
+      rw [Subgroup.subgroupOf_map_subtype]; exact inf_eq_left.mpr hAP
+    rw [← hA_eq]; exact Subgroup.map_mono hAC
+  · refine lt_of_le_of_ne (Subgroup.map_subtype_le _) ?_
+    intro hBP
+    have : C = ⊤ := by rw [← hCeq, hBP, Subgroup.subgroupOf_self]
+    rw [this, Subgroup.index_top] at hCindex
+    exact hNbarprime.ne_one hCindex.symm
+  · rw [hCeq]; infer_instance
+  · rw [hCeq, hCindex]; exact hNbarprime
+
 /-- **Theorem 7.4(a)** (mmd L2204): `C_G(P) ⊓ K = O_{π'}(C_G(P))`。`A ≤ P` ⟹ `C_G(P) ⊆ C_G(A)`,
 `K = O_{π'}(C_G(A)) ⊴ C_G(A)` ゆえ `C_G(P)⊓K` は `C_G(P)` の正規 `π'`-部分群 (⊆ O_{π'});
 逆は O_{π'}(C_G(P)) の各元が `C_G(A)` の `π'`-元 ⟹ §7 Note で `K` 入り。 -/
