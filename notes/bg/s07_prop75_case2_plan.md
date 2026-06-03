@@ -18,12 +18,11 @@
 5. 既: oPiCore_map_mulEquiv, opiCoreInG_eq_map_subgroupOf, **relativized 1.15b**, oPiPrimePiCore_map_mk'_eq,
    primesOf_eq_singleton, le_opiCoreInG_of_normal_of_isPiSubgroup, 還元補題。
 
-### 🔜 core claim を閉じる残り = **wiring のみ** (新数学は special2 だけ)
+### 🔜 core claim を閉じる残り (新数学は special2 だけ)
 `hypothesis71_…` の case-2 core-claim sorry を埋めるには:
-- **(a) hspec for b∈Z(P)** = specialCase を `↥(C_G(b))` で適用し ambient へ transport。要 **Sylow-of-centralizer**
-  (`b∈Z(P) ⟹ P.subgroupOf(C_G(b)) ∈ Sylow p ↥(C_G(b))`, |C_G(b)|_p=|G|_p∵P≤C_G(b)) +
-  specialCase の結論 `Y'≤oPiCore{p}ᶜ ↥(C_G(b))` を `opiCoreInG{p}ᶜ(C_G(b))` へ (opiCoreInG_eq_map_subgroupOf 系)。
-  A SCN in P.subgroupOf も要 (A⊴P, C_P(A)⊆A を subgroupOf 形へ)。
+- **✅ (a) hspec for b∈Z(P)** = `le_opiCoreInG_centralizer_of_mem_centralizer_sylow` (done, build-green):
+  specialCase@↥(C_G(b)) (Sylow=sylow_subgroupOf_of_le, A.subgroupOf SCN 移送) → map_subgroupOf で ambient。
+  **non-cyclic Z(P) ケース (B⊆Z(P)) の hspec はこれで全 b∈B^# 充足。**
 - **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。`P₁=C_P(b)`,`P₂` Sylow⊇P₁, `Z⊆Z(P₁)⊆O_{p',p}`(Thm6.1),
   `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(specialCase@Z) ⟹(rel-1.15b) `C_Y(Z)⊆O_{p'}(C_G(b))`,
   `Y=C_Y(Z)·[Y,Z]`。**唯一残る重い数学**。
