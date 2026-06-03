@@ -1920,12 +1920,17 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_normSq_inl_eq
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.sum_normSq_mul_norm_le_sum_normSq_mul_sqrt_sum_normSq
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusClassSumConcreteTerm_norm_le_of_normOneUnits_card_le_degree
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusNonKernelContribution_norm_le_sum_of_degree_ge
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt_of_degree_ge
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
 -- fixed-product fiber over `inl (2*s)` before passing to the full product class.

@@ -1322,6 +1322,43 @@ theorem normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le
   have hU_nonneg : (0 : ℝ) ≤ (Nat.card (normOneUnits p q) : ℝ) := by positivity
   linarith
 
+omit p q in
+/-- Cauchy's inequality in the form used for the App C column estimates:
+`∑ |a_i|² |b_i| ≤ (∑ |a_i|²) sqrt(∑ |b_i|²)`. -/
+theorem sum_normSq_mul_norm_le_sum_normSq_mul_sqrt_sum_normSq
+    {ι : Type*} (s : Finset ι) (a b : ι → ℂ) :
+    ∑ i ∈ s, Complex.normSq (a i) * ‖b i‖ ≤
+      (∑ i ∈ s, Complex.normSq (a i)) *
+        √(∑ i ∈ s, Complex.normSq (b i)) := by
+  have hcs := Real.sum_mul_le_sqrt_mul_sqrt s
+    (fun i => Complex.normSq (a i)) (fun i => ‖b i‖)
+  have hA_nonneg : 0 ≤ ∑ i ∈ s, Complex.normSq (a i) := by
+    exact Finset.sum_nonneg fun i _ => Complex.normSq_nonneg _
+  have hAsq_le :
+      ∑ i ∈ s, Complex.normSq (a i) ^ 2 ≤
+        (∑ i ∈ s, Complex.normSq (a i)) ^ 2 :=
+    Finset.sum_sq_le_sq_sum_of_nonneg fun i _ => Complex.normSq_nonneg _
+  have hsqrtA_le :
+      √(∑ i ∈ s, Complex.normSq (a i) ^ 2) ≤
+        ∑ i ∈ s, Complex.normSq (a i) := by
+    rw [Real.sqrt_le_iff]
+    exact ⟨hA_nonneg, hAsq_le⟩
+  have hsqrtB_eq :
+      √(∑ i ∈ s, ‖b i‖ ^ 2) =
+        √(∑ i ∈ s, Complex.normSq (b i)) := by
+    congr 1
+    refine Finset.sum_congr rfl fun i _ => ?_
+    exact (Complex.normSq_eq_norm_sq (b i)).symm
+  calc
+    ∑ i ∈ s, Complex.normSq (a i) * ‖b i‖
+        ≤ √(∑ i ∈ s, Complex.normSq (a i) ^ 2) *
+            √(∑ i ∈ s, ‖b i‖ ^ 2) := hcs
+    _ ≤ (∑ i ∈ s, Complex.normSq (a i)) *
+          √(∑ i ∈ s, ‖b i‖ ^ 2) := by
+        gcongr
+    _ = (∑ i ∈ s, Complex.normSq (a i)) *
+          √(∑ i ∈ s, Complex.normSq (b i)) := by
+        rw [hsqrtB_eq]
 
 /-- A single non-kernel summand in the concrete class-sum formula is bounded by
 `|U| * |χ(1_field)|^2 * |χ(2_field)|`, assuming the character degree is at least
@@ -1424,6 +1461,66 @@ theorem normOneFrobeniusNonKernelContribution_norm_le_sum_of_degree_ge
         intro χ hχ
         exact normOneFrobeniusClassSumConcreteTerm_norm_le_of_normOneUnits_card_le_degree
           p q (χ := χ) (hdeg χ (Finset.mem_filter.mp hχ).2)
+
+open scoped Classical in
+/-- If every non-kernel character has degree at least `|U|`, column
+orthogonality bounds the whole non-kernel error by
+`|U| * p^q * sqrt(p^q)`. -/
+theorem normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt_of_degree_ge
+    [Fact p.Prime] (hpodd : Odd p) (hq : 1 < q)
+    (hdeg : ∀ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+      ¬ normOneFrobeniusKernelCharacterPred p q χ →
+        (Nat.card (normOneUnits p q) : ℝ) ≤
+          ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (1 : normOneFrobeniusGroup p q))‖) :
+    ‖normOneFrobeniusNonKernelContribution p q‖ ≤
+      (Nat.card (normOneUnits p q) : ℝ) *
+        (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) := by
+  let S : Finset (IrreducibleCharacter (normOneFrobeniusGroup p q)) :=
+    Finset.univ.filter
+      (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        ¬ normOneFrobeniusKernelCharacterPred p q χ)
+  let a : IrreducibleCharacter (normOneFrobeniusGroup p q) → ℂ := fun χ =>
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+        normOneFrobeniusGroup p q)
+  let b : IrreducibleCharacter (normOneFrobeniusGroup p q) → ℂ := fun χ =>
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+        normOneFrobeniusGroup p q)
+  let U : ℝ := (Nat.card (normOneUnits p q) : ℝ)
+  have hterm :=
+    normOneFrobeniusNonKernelContribution_norm_le_sum_of_degree_ge p q hdeg
+  have hsumCauchy :
+      ∑ χ ∈ S, Complex.normSq (a χ) * ‖b χ‖ ≤
+        (∑ χ ∈ S, Complex.normSq (a χ)) *
+          √(∑ χ ∈ S, Complex.normSq (b χ)) :=
+    sum_normSq_mul_norm_le_sum_normSq_mul_sqrt_sum_normSq S a b
+  have hA_le : ∑ χ ∈ S, Complex.normSq (a χ) ≤ ((p ^ q : ℕ) : ℝ) := by
+    simpa [S, a] using
+      normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le p q hq
+        (s := (1 : GaloisField p q)) one_ne_zero
+  have hB_le : ∑ χ ∈ S, Complex.normSq (b χ) ≤ ((p ^ q : ℕ) : ℝ) := by
+    simpa [S, b] using
+      normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le p q hq
+        (s := (2 : GaloisField p q)) (two_ne_zero_galoisField p q hpodd)
+  have hU_nonneg : 0 ≤ U := by positivity
+  calc
+    ‖normOneFrobeniusNonKernelContribution p q‖
+        ≤ ∑ χ ∈ S, U * Complex.normSq (a χ) * ‖b χ‖ := by
+          simpa [S, a, b, U] using hterm
+    _ = U * ∑ χ ∈ S, Complex.normSq (a χ) * ‖b χ‖ := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun χ _ => ?_
+          ring
+    _ ≤ U * ((∑ χ ∈ S, Complex.normSq (a χ)) *
+          √(∑ χ ∈ S, Complex.normSq (b χ))) := by
+          gcongr
+    _ ≤ U * (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) := by
+          gcongr
+    _ = (Nat.card (normOneUnits p q) : ℝ) *
+          (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) := by
+          rfl
 
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
