@@ -159,8 +159,17 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   G/[G,G]=∏ Sylow_q/[..] ⟹ p-Sylow のみ非自明)。self-contained・mathlib nilpotent/Sylow で landable 見込み。
 - **最高レバレッジ次ピース = member-family 構成** (B1 と T-A4 part(a) で共有)。Sibley-setup framework
   ((6.1)/(6.4) = SibleyDadeHypothesis 拡張) の formalization が要。focused effort 推奨。
-- **landed §6 bricks (2)**: sumInflatedDegreeSq_ntrivial (B2 ingredient) + degreeBound_le_of_sqrt_bound
-  ((6.3) arith)。残 substantial = orbit counting / member-family(B1) / θ-bound(Clifford) / (6.2)。
+- ✅ **(6.5)(a) 算術核 landed** (commit 353298c, axiom-clean): `two_mul_add_one_le_of_odd_dvd`
+  (Odd c, Odd a, c∣a−1, a>1 ⟹ a≥2c+1)。chief-factor 不在背理法で |K:H₂|≥2|L:K|+1。
+- 🔴 **(6.5)(c)** = 非可換 p-群⟹p²∣|G^{ab}| は **Frattini/Burnside-basis 要 (mathlib に Frattini API absent)** ゆえ
+  blocked; (6.8) critical path は (6.5)(b)✅ ゆえ非必須の見込み。
+- **landed §6 bricks (6 this session)**: sumInflatedDegreeSq_ntrivial (B2 core) / degreeBound_le_of_sqrt_bound
+  ((6.3) arith) / isPGroup_of_quotient_of_subgroup (p-群拡大) / Abelianization.map_surjective +
+  subsingleton_of_isPGroup_of_not_dvd (汎用) / **isPGroup_of_isNilpotent_of_isPGroup_abelianization
+  ((6.5)(b) reduction core)** / two_mul_add_one_le_of_odd_dvd ((6.5)(a) arith)。
+  **残 substantial (6.2 gateway, 文字理論)**: B1 (Sibley packaging) / B2-orbit (induced-char) /
+  θ-bound (Clifford section) + Sibley framework ((6.1)/(6.4))。これらは focused multi-iteration effort
+  ((6.5)(b) と同様の API navigation で攻略可)。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
