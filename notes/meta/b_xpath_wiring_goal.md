@@ -57,3 +57,33 @@
 - 2026-06-03 setup: step1-2 完了済 (htau1_mem0 解消)。未着手 = step3a (`dadeOrthonormalCharacterImageFamily`
   差分-support 弱化)。まず S07:~4500 の def を Read し、`hχsupp`/`hχbarsupp` の使用箇所 (特に 4451 付近の
   `hSsupp`→`dadeIntegralCharacterMap_inner_eq_on_supported_span`) を trace、差分集合 {0,χ̄−χ} 化の最小 diff を設計。
+
+## 🛑 LOOP STOPPED (2026-06-03, anti-scaffold gate) — step1-2 が scaffold と判明, 真の fix は structure-field 弱化
+
+**結論**: B step1-2 (`retarget_isCoherent_of_supportedDecomposition[_and_memberFamily]`, commits
+0ba7572/0a664bf) は **X-family に対して scaffold**。build-green だが、入力の
+`Da : CharacterPsiDecomposition τ χ (a•chi1)` が **X-member では構成不能**。
+
+**精密な blocker**: `CharacterPsiDecomposition` の field
+`tau1_inner_eq_on_support : ∀ φ ζ ∈ zSpan{χ,χ.conj,ψ}, ⟨tau1 φ, tau1 ζ⟩=⟨φ,ζ⟩` は **full lattice**
+(χ 単体を含む) で要求。Da 構成には tau1=τ (Dade) でこれを供給する必要があるが、unsupported χ=Ind θ では
+`⟨τχ,τχ⟩≠⟨χ,χ⟩` (Dade は off-support 任意延長)。`dadeIntegralCharacterMap_inner_eq_on_supported_span`
+は generators supported を要求するゆえ χ で使えない。⟹ **Da は X で構成不能** = step1-2 の hypothesis は
+unmeetable ([[scaffold-sorry-free-not-done]] の hoist パターン)。**「htau1_mem0 解消」は誤り** — blocker が
+D₀ から「Da 構成」へ移っただけ。**step1-2 は supported-χ では valid な conditional 定理** (削除不要だが X には効かない)。
+
+**🟢 真の fix を sharpening (loop iter2 の "core framework restructuring" を具体化)**:
+`tau1_inner_eq_on_support` の **4 つの使用箇所 (S07:1227/1296/2216/3473) は全て差分** (χ−ψ, χ−χ.conj) で、
+**χ 単体では一度も使われない** (grep 確認済)。⟹ field を **差分 sublattice `zSpan{χ−χ.conj, χ−ψ}`** に
+弱化すれば: (a) 使用側は差分ゆえそのまま valid、(b) X でも供給可 (差分 supported → step3a と同じ差分集合 isometry)。
+**blast radius**: htau1_inner_eq param が ofProjection(1052)→decompositionPair(1104)→
+retarget_isCoherent_of_sharedDecomposition(3437)→retarget_isCoherent_fromDade(4983) を貫流、各所で供給
+(現状 full {χ,χ.conj,..} supported S 経由 → 差分集合へ re-target) + helper `chi_sub_{psi,conj}_mem_zSpan_support`。
+~7-10 関数の mechanical だが invasive な structure 改修 = **attended 推奨** (autonomous で structure field 型変更は
+cascade 破壊リスク; loop が flag した intricate core surgery そのもの)。
+
+**✅ genuine な成果 (keep)**: **step3a `dadeOrthonormalCharacterImageFamilyOfDiff` (commit 18238b9)** は
+正しく X で構成可能な差分-support R(χ) = field 弱化後の X-path の正当な部品。T7 c1 + step1-2 (supported-χ 用) も build-green。
+
+**なぜ STOP**: structure field 弱化は ~7-10 関数貫流の invasive 改修で、autonomous 14-turn では cascade 破壊して
+broken build を残すリスク大。gate 通り scaffold せず停止。**stuck**。attended で field 弱化を実施推奨。

@@ -467,3 +467,13 @@ D₀ 結合は wrapper `retarget_isCoherent_of_decomposition`(3127, `D.retargetT
   (b) `retarget_isCoherent_fromDade_X`: Da を `ofProjection`(htau1_mema のみ, htau1_mem0 不要)で構成、
   差分-support imageFamily を渡し step2 を呼ぶ。
 - 🔜 **step4**: `DadeChainStep.advance`(5146) を X-version に rewire (or 分岐) → `peterfalvi_66_coherence_of_X_from_dade` 解禁。
+
+### I 訂正 (2026-06-03, anti-scaffold gate) — §I の「tractable adapter / htau1_mem0 解消」は誤り
+step1-2 (`retarget_isCoherent_of_supportedDecomposition*`) は **X-family で scaffold** と判明
+(`Da : CharacterPsiDecomposition τ χ (a•chi1)` が X で構成不能: structure field `tau1_inner_eq_on_support`
+が full lattice {χ,χ.conj,ψ} の τ₁-isometry を要求, unsupported χ で `⟨τχ,τχ⟩≠⟨χ,χ⟩`)。
+**真の fix = `CharacterPsiDecomposition.tau1_inner_eq_on_support` を差分 sublattice `zSpan{χ−χ.conj,χ−ψ}` に弱化**
+(全 4 使用箇所 S07:1227/1296/2216/3473 は差分のみ; ofProjection→decompositionPair→sharedDecomposition→fromDade を
+貫流する htau1_inner_eq param を差分集合 isometry に re-target, ~7-10 関数, invasive=attended)。
+詳細 = `notes/meta/b_xpath_wiring_goal.md` 🛑 LOOP STOPPED 節。✅ step3a (`dadeOrthonormalCharacterImageFamilyOfDiff`,
+18238b9) は genuine な差分-support R(χ) で field 弱化後の正当部品。
