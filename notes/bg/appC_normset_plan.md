@@ -148,6 +148,13 @@ product が代表元 `inl(2*s)` に等しい fiber 条件へ切り出した。
 fixed-product fiber の `ncard` と等しいことを証明した。残る cardinal bridge は、full class pair を
 product class の fiber 和として分解し、class-size factor を整理する部分。AxiomsCheck 登録済み。
 
+#### ✅ class-sum bridge: additive-kernel class size (2026-06-04)
+`normOneClassAt_carrier_ncard_eq_normOneUnits_card` で `s≠0` のとき
+`C_s = {inl(u*s) | u∈U}` の cardinality が `Nat.card U` と一致することを証明。
+あわせて `normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card` で `2≠0` の product class
+`C_{2s}` も同じサイズを持つ形にした。次の target は full class-pair count を
+`|C_{2s}|` 個の fixed-product fiber に分解する補題。AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

@@ -72,6 +72,43 @@ theorem exists_normOne_mul_of_mem_normOneClass [Fact p.Prime] (s : GaloisField p
   refine ⟨g.right, ?_⟩
   rw [← hg, normOneFrobenius_conj_inl_any]
 
+/-- A nonzero additive-kernel conjugacy class in `H = P ⋊ U` has exactly one
+point for each norm-one unit.  The bijection is `u ↦ inl (u*s)`, and `s ≠ 0`
+makes it injective. -/
+theorem normOneClassAt_carrier_ncard_eq_normOneUnits_card [Fact p.Prime]
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    (normOneClassAt p q s).carrier.ncard = Nat.card (normOneUnits p q) := by
+  classical
+  rw [← Set.ncard_univ (α := normOneUnits p q)]
+  symm
+  refine Set.ncard_congr
+    (fun u _ =>
+      (SemidirectProduct.inl
+        (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+          normOneFrobeniusGroup p q)) ?maps_to ?inj ?surj
+  · intro u _
+    exact ConjClasses.mem_carrier_iff_mk_eq.mpr (normOneClassAt_mul_eq p q s u)
+  · intro u₁ u₂ _ _ h
+    have hu_mul :
+        (((u₁ : (GaloisField p q)ˣ) : GaloisField p q) * s) =
+          (((u₂ : (GaloisField p q)ˣ) : GaloisField p q) * s) :=
+      Multiplicative.ofAdd.injective (SemidirectProduct.inl_inj.mp h)
+    exact Subtype.ext (Units.ext (mul_right_cancel₀ hs hu_mul))
+  · intro x hx
+    obtain ⟨u, rfl⟩ :=
+      exists_normOne_mul_of_mem_normOneClass p q s
+        (ConjClasses.mem_carrier_iff_mk_eq.mp hx)
+    exact ⟨u, trivial, rfl⟩
+
+/-- The product class `C_{2s}` has norm-one-unit size whenever `s ≠ 0` and
+`2` is nonzero in the field.  This is the class-size factor needed after the
+fixed-product fiber count. -/
+theorem normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card [Fact p.Prime]
+    {s : GaloisField p q} (hs : s ≠ 0) (h2 : (2 : GaloisField p q) ≠ 0) :
+    (normOneClassAt p q ((2 : GaloisField p q) * s)).carrier.ncard =
+      Nat.card (normOneUnits p q) :=
+  normOneClassAt_carrier_ncard_eq_normOneUnits_card p q (mul_ne_zero h2 hs)
+
 /-- Fixed-product version of `IsClassPair`: the two entries lie in prescribed
 classes and their product is the chosen representative `z`, not merely an
 element conjugate to `z`.  This is the fiber counted by the finite-field pair
