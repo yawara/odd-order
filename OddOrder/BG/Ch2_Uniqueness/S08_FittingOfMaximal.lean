@@ -340,6 +340,22 @@ theorem opiCoreInG_commutator_compl_eq_bot [Finite G]
     rw [← hinf]
     exact le_inf hleft hright)
 
+/-- The `π`-core of `F(H)` is absorbed by the `π`-core of `H`.
+This is the formal `D_q ≤ O_q(H)` bridge for BG (8.7), with `D = F(H)`. -/
+theorem opiCoreInG_fittingInG_le_opiCoreInG [Finite G]
+    (π : Set ℕ) (H : Subgroup G) :
+    opiCoreInG π (fittingInG H) ≤ opiCoreInG π H := by
+  have hNH : opiCoreInG π (fittingInG H) ≤ H :=
+    (opiCoreInG_le π (fittingInG H)).trans (fittingInG_le H)
+  have hNnorm : ((opiCoreInG π (fittingInG H)).subgroupOf H).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hNH]
+    have hH_norm_F : H ≤ Subgroup.normalizer (fittingInG H : Set G) := by
+      intro x hx
+      exact mem_normalizer_fittingInG_of_mem hx
+    exact le_normalizer_opiCoreInG_of_le_normalizer π hH_norm_F
+  exact le_opiCoreInG_of_normal_of_isPiSubgroup hNH hNnorm
+    (isPiSubgroup_opiCoreInG π (fittingInG H))
+
 /-- BG Proposition 1.10, packaged for the cyclic conjugation action on `F(M)`.
 
 If the fixed subgroup `C_{F(M)}(<x>)` is self-centralizing in `F(M)` and `<x>` has
