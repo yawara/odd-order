@@ -924,6 +924,25 @@ theorem hInvariantStar_eq_of_cFittingInG_of_hypothesis71_of_not_pGroup
     hG hA0 hm hA hq
     (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp) hQ₁ hQ₂
 
+/-- BG (8.6) after propagation to `F(M)`: in the non-`p`-group case, once
+Hypothesis 7.1 is verified for `C_F(M)(A0)`, the family `ℋ_G*(F(M);q)` is a
+singleton for every `q` outside `π(C_F(M)(A0))`. -/
+theorem hInvariantStar_eq_of_fittingInG_of_cFittingInG_hypothesis71_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    {Q₁ Q₂ : Subgroup G} (hQ₁ : Q₁ ∈ hInvariantStar ⊤ (fittingInG M) {q})
+    (hQ₂ : Q₂ ∈ hInvariantStar ⊤ (fittingInG M) {q}) :
+    Q₁ = Q₂ := by
+  have hprop := transitivity_propagates_to_fittingInG_of_cFittingInG
+    hG hM hA0 hm hA hq
+  exact hInvariantStar_eq_of_cFittingInG_of_hypothesis71_of_not_pGroup
+    hG hM hA0 hm hFnp hA hq (hprop.2.2.1 hQ₁) (hprop.2.2.1 hQ₂)
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
