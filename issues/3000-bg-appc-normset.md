@@ -26,6 +26,9 @@ created: 2026-06-04
   pigeonhole → 既約 → root∈𝔽_{p³} (AdjoinRoot iso) → Frobenius 軌道 {a,aᵖ,aᵖ²} 相異 (root∉𝔽_p +
   Frobenius 固定点=𝔽_p) → fCubic.map=∏(X-a^{p^i}) (roots multiset 同定) → eval 0/2 で normN 読み取り。
   helpers: `aeval_pow_p`/`exists_root_fCubic`/`root_not_mem_range`/`mem_range_of_pow_p_eq_self`/`fCubic_monic`/`normN_three`。
+- [x] **Remark (VII)** norm-one subgroup `U`: `normN` と `Algebra.norm` の bridge
+  `normN_eq_algebraMap_norm`、`normOneUnits`、`mem_normOneUnits_iff_normN`、
+  `normOneUnits_card : |U| = (p^q - 1)/(p - 1)` を追加し、AxiomsCheck 登録。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.FieldTheory.Finite.Trace
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
@@ -42,9 +43,12 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
 ## Main results (this file)
 
 * `conditionA_iff_not_dvd` — **Remark (I)**: condition (A) `⟺ q ∤ (p-1)`.
+* `normOneUnits_card` — **Remark (VII)**: the norm-one subgroup
+  `U ≤ 𝔽_{p^q}ˣ` has order `(p^q - 1)/(p - 1)`.
 
-Lemmas C.1, C.2 are stated here with `sorry`; their proofs and the assembly into
-BG Theorem C are tracked in issue 3000 / `notes/bg/appC_normset_plan.md`.
+Lemma C.1 and the `q = 3` branch of Lemma C.2 are formalized; the `q ≥ 5`
+branch of C.2, Lemma C.3, and the assembly into BG Theorem C are tracked in
+issue 3000 / `notes/bg/appC_normset_plan.md`.
 
 ## References
 
@@ -87,6 +91,58 @@ lemma normN_ne_zero [Fact p.Prime] {x : GaloisField p q} (hx : x ≠ 0) :
     normN p q x ≠ 0 := by
   simp only [normN]
   exact Finset.prod_ne_zero_iff.mpr fun i _ => pow_ne_zero _ hx
+
+/-- The product definition `normN` agrees with the mathlib finite-field norm after
+embedding `𝔽_p` into `𝔽_{p^q}`.  This is the bridge needed for the norm-one
+subgroup `U` used in BG Appendix C, Remark (VII). -/
+lemma normN_eq_algebraMap_norm [Fact p.Prime] (hq : q ≠ 0) (x : GaloisField p q) :
+    normN p q x = algebraMap (ZMod p) (GaloisField p q) (Algebra.norm (ZMod p) x) := by
+  simpa [normN, GaloisField.finrank p hq, Nat.card_zmod]
+    using (FiniteField.algebraMap_norm_eq_prod_pow
+      (ZMod p) (GaloisField p q) x).symm
+
+/-- **BG Appendix C, Remark (VII)**: the subgroup
+`U = {x ∈ 𝔽_{p^q}ˣ | N(x)=1}` of norm-one units. -/
+noncomputable def normOneUnits [Fact p.Prime] : Subgroup (GaloisField p q)ˣ :=
+  (Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))).ker
+
+lemma mem_normOneUnits_iff_normN [Fact p.Prime] (hq : q ≠ 0)
+    (u : (GaloisField p q)ˣ) :
+    u ∈ normOneUnits p q ↔ normN p q (u : GaloisField p q) = 1 := by
+  constructor
+  · intro hu
+    have hbase : Algebra.norm (ZMod p) (u : GaloisField p q) = 1 :=
+      congrArg Units.val hu
+    rw [normN_eq_algebraMap_norm p q hq, hbase, map_one]
+  · intro hu
+    ext
+    apply (algebraMap (ZMod p) (GaloisField p q)).injective
+    change algebraMap (ZMod p) (GaloisField p q)
+        (Algebra.norm (ZMod p) (u : GaloisField p q)) =
+      algebraMap (ZMod p) (GaloisField p q) (1 : ZMod p)
+    rw [← normN_eq_algebraMap_norm p q hq, hu, map_one]
+
+/-- **BG Appendix C, Remark (VII)**: `|U| = (p^q - 1)/(p - 1)` for the
+norm-one subgroup `U ≤ 𝔽_{p^q}ˣ`.  This is the `|U|` used in the `q ≥ 5`
+character-sum branch of Lemma C.2. -/
+theorem normOneUnits_card [Fact p.Prime] (hq : q ≠ 0) :
+    Nat.card (normOneUnits p q) = (p ^ q - 1) / (p - 1) := by
+  classical
+  let f : (GaloisField p q)ˣ →* (ZMod p)ˣ :=
+    Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))
+  have hf_surj : Function.Surjective f :=
+    FiniteField.unitsMap_norm_surjective (ZMod p) (GaloisField p q)
+  have hker : normOneUnits p q = f.ker := rfl
+  have hcod : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units]
+  have hdom : Nat.card (GaloisField p q)ˣ = p ^ q - 1 := by
+    rw [Nat.card_units, GaloisField.card p q hq]
+  have hindex : f.ker.index = p - 1 := by
+    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hf_surj, Subgroup.card_top, hcod]
+  have hmul : Nat.card (normOneUnits p q) * (p - 1) = p ^ q - 1 := by
+    rw [hker, ← hindex, f.ker.card_mul_index, hdom]
+  exact Nat.eq_div_of_mul_eq_right (ne_of_gt (Nat.sub_pos_of_lt (Fact.out : p.Prime).one_lt))
+    (by simpa [mul_comm] using hmul)
 
 lemma mem_normSetE_iff [Fact p.Prime] {a : GaloisField p q} :
     a ∈ normSetE p q ↔ normN p q a = 1 ∧ normN p q (2 - a) = 1 := Iff.rfl

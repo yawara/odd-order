@@ -77,6 +77,13 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 - **q≥5**: Frobenius 群 H の指標論。`e = |E|` = 構造定数 (Ŝ_1·Ŝ_1 の K̂_2 係数) = `card{(u,v)∈U²|us+vs=2s}`。
   直交関係で `e ≥ p^{q-2} - p^{q/2} > 1`。**concrete Frobenius 群の指標論が要 (重)**。
 
+#### ✅ Remark (VII) / `U` 位数 bridge 完成 (2026-06-04)
+`normN_eq_algebraMap_norm` で自前の積表示 `normN` と mathlib の `Algebra.norm` を接続し、
+`normOneUnits : Subgroup (GaloisField p q)ˣ` を `ker (Units.map (Algebra.norm ...))` として materialize。
+`FiniteField.unitsMap_norm_surjective` + `Subgroup.index_ker` から
+`normOneUnits_card : |U| = (p^q - 1)/(p - 1)` を sorry-free 証明し、AxiomsCheck に登録。
+これは C.2(q≥5) の Frobenius 群 `H=P⋊U` で使う `|U|` の基礎補題。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。
