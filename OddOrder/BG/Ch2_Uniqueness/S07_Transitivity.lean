@@ -1238,6 +1238,27 @@ private theorem tp_hyp71_of_le [Finite G] {A B : Subgroup G} (hA : Hypothesis71 
   · exact le_sSup ⟨opiCoreInG_le _ _, hBX.trans (le_normalizer_opiCoreInG _ _),
       isPiSubgroup_opiCoreInG _ _⟩
 
+/-- **(c) の `q`-群正規化条件 finish** (mmd L2230-2232): `Q ≤ Q₁` (`Q₁` `q`-群) かつ
+`Q₁ ⊓ N_G(Q) ≤ Q` なら `Q = Q₁` (`q`-群で自己正規化部分群は全体)。 -/
+private theorem eq_of_inf_normalizer_le [Finite G] {q : ℕ} [Fact q.Prime] {Q Q₁ : Subgroup G}
+    (hQ₁ : IsPGroup q ↥Q₁) (hQQ₁ : Q ≤ Q₁) (hself : Q₁ ⊓ Subgroup.normalizer Q ≤ Q) :
+    Q = Q₁ := by
+  rcases eq_or_lt_of_le hQQ₁ with h | h
+  · exact h
+  · have hlt := lt_normalizer_inf_of_pgroup_lt hQ₁ h
+    have heq : Q₁ ⊓ Subgroup.normalizer Q = Q :=
+      le_antisymm hself (le_inf hQQ₁ Subgroup.le_normalizer)
+    rw [heq] at hlt
+    exact absurd hlt (lt_irrefl Q)
+
+/-- **(c) の `Q ≤ O_{π'}(N_G(Q))`**: `π`-部分群 `Q` は自身の正規化群の `O_π` に入る
+(`Q ⊴ N_G(Q)` + `Q` は `π`-群; `le_opiCoreInG_of_normal_of_isPiSubgroup`)。 -/
+private theorem le_opiCoreInG_normalizer_self [Finite G] {π : Set ℕ} {Q : Subgroup G}
+    (hQpi : Subgroup.IsPiSubgroup π Q) :
+    Q ≤ opiCoreInG π (Subgroup.normalizer Q) :=
+  le_opiCoreInG_of_normal_of_isPiSubgroup Subgroup.le_normalizer
+    Subgroup.normal_in_normalizer hQpi
+
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
 
