@@ -164,23 +164,6 @@ theorem isPiSubgroup_kSubgroup [Finite G] (A : Subgroup G) :
     Subgroup.IsPiSubgroup (primesOf A)ᶜ (kSubgroup A) :=
   isPiSubgroup_opiCoreInG _ _
 
-/-- **`N ≤ O_π(H)` for a normal `π`-subgroup** (ambient form): if `N ≤ H`, `N.subgroupOf H` is
-normal in `↥H`, and `N` is a `π`-subgroup, then `N ≤ opiCoreInG π H`. This packages the
-`subgroupOf`→`oPiCore`→`map subtype` chain (`oPiCore` maximality) used in the §7 Note and in
-Proposition 7.5's core claim (e.g. `O_{p'}(C_G(b)) ⊓ C_X(b) ≤ O_{p'}(C_X(b))`). -/
-theorem le_opiCoreInG_of_normal_of_isPiSubgroup {π : Set ℕ} {H N : Subgroup G}
-    (hNH : N ≤ H) (hNnorm : (N.subgroupOf H).Normal) (hNpi : Subgroup.IsPiSubgroup π N) :
-    N ≤ opiCoreInG π H := by
-  haveI := hNnorm
-  have hNpi_sub : Ch03.Subgroup.IsPiGroup π (N.subgroupOf H) := by
-    intro r hr
-    refine hNpi r ?_
-    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv] at hr
-  calc N = (N.subgroupOf H).map H.subtype := (Subgroup.map_subgroupOf_eq_of_le hNH).symm
-    _ ≤ (Ch03.oPiCore π ↥H).map H.subtype :=
-        Subgroup.map_mono (Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi_sub)
-    _ = opiCoreInG π H := rfl
-
 /-- **BG §7 の Note** (Hypothesis 7.1 直後, mmd L2145): Hypothesis 7.1 のもとで、
 `C_G(A)` の任意の `π'`-元は `K = O_{π'}(C_G(A))` に入る。
 

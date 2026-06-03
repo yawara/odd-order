@@ -68,6 +68,23 @@ theorem isPGroup_opiCoreInG_singleton [Finite G] {q : ℕ} [Fact q.Prime]
     (H : Subgroup G) : IsPGroup q ↥(opiCoreInG ({q} : Set ℕ) H) :=
   isPGroup_of_isPiSubgroup_singleton (isPiSubgroup_opiCoreInG ({q} : Set ℕ) H)
 
+/-- If `N ≤ H` is normal in `H` and is a `π`-subgroup, then it lies in the
+ambient realization of `O_π(H)`. -/
+theorem le_opiCoreInG_of_normal_of_isPiSubgroup {π : Set ℕ} {H N : Subgroup G}
+    (hNH : N ≤ H) (hNnorm : (N.subgroupOf H).Normal)
+    (hNpi : Subgroup.IsPiSubgroup π N) :
+    N ≤ opiCoreInG π H := by
+  haveI := hNnorm
+  have hNpi_sub : Ch03.Subgroup.IsPiGroup π (N.subgroupOf H) := by
+    intro r hr
+    refine hNpi r ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv] at hr
+  calc N = (N.subgroupOf H).map H.subtype :=
+      (Subgroup.map_subgroupOf_eq_of_le hNH).symm
+    _ ≤ (Ch03.oPiCore π ↥H).map H.subtype :=
+        Subgroup.map_mono (Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi_sub)
+    _ = opiCoreInG π H := rfl
+
 /-- **`H` normalizes `O_π(H)`** (in the ambient group): the `π`-core is characteristic
 in `↥H`, so conjugation by an element of `H` (which restricts to an automorphism of
 `↥H`) fixes its image in `G`. -/
