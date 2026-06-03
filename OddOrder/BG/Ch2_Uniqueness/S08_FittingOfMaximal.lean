@@ -1119,6 +1119,56 @@ theorem hInvariantStar_eq_bot_of_fittingInG_of_not_pGroup
     exact hq
   exact eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hQleF hFpi hQpi_compl
 
+/-- BG (8.6) endpoint for `A = C_F(M)(A0)`: every member of `H_G*(A;q)` is
+trivial for `q` outside `π(A)` in the non-p-group case. -/
+theorem hInvariantStar_eq_bot_of_cFittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (cFittingInG M A0) {q}) :
+    Q = ⊥ := by
+  have hBotInvF : (⊥ : Subgroup G) ∈ hInvariant ⊤ (fittingInG M) {q} := by
+    rw [mem_hInvariant]
+    refine ⟨bot_le, ?_, ?_⟩
+    · intro x _
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      simp
+    · intro r hr
+      rw [Subgroup.card_bot] at hr
+      simp at hr
+  obtain ⟨R, hRstar, _hBotR⟩ := exists_le_hInvariantStar hBotInvF
+  have hRbot : R = ⊥ :=
+    hInvariantStar_eq_bot_of_fittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hRstar
+  have hprop := transitivity_propagates_to_fittingInG_of_cFittingInG
+    hG hM hA0 hm hA hq
+  have hRstarA : R ∈ hInvariantStar ⊤ (cFittingInG M A0) {q} := hprop.2.2.1 hRstar
+  have hQR : Q = R :=
+    hInvariantStar_eq_of_cFittingInG_of_hypothesis71_of_not_pGroup
+      hG hM hA0 hm hFnp hA hq hQ hRstarA
+  exact hQR.trans hRbot
+
+/-- BG (8.6), non-star form: every `A`-invariant q-subgroup is trivial for
+`A = C_F(M)(A0)` and `q` outside `π(A)` in the non-p-group case. -/
+theorem hInvariant_eq_bot_of_cFittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariant ⊤ (cFittingInG M A0) {q}) :
+    Q = ⊥ := by
+  obtain ⟨R, hRstar, hQR⟩ := exists_le_hInvariantStar hQ
+  have hRbot : R = ⊥ :=
+    hInvariantStar_eq_bot_of_cFittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hRstar
+  exact le_bot_iff.mp (by simpa [hRbot] using hQR)
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
