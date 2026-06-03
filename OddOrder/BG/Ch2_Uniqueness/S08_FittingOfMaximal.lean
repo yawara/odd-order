@@ -3068,6 +3068,52 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
       rw [hOpCompl_eq]
     _ = M := hNormalizer_OpComplM_eq_M
 
+/-- If `F(M)` is a nontrivial `p`-group, then its prime support is exactly `{p}`. -/
+theorem primesOf_fittingInG_eq_singleton_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {M : Subgroup G} (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hFp : IsPGroup p ↥(fittingInG M)) :
+    OddOrder.BG.Ch2.S07.primesOf (fittingInG M) = ({p} : Set ℕ) := by
+  have hF_ne_bot : fittingInG M ≠ ⊥ := by
+    intro hbot
+    have hcard : Nat.card ↥(fittingInG M) = 1 := Subgroup.card_eq_one.mpr hbot
+    rw [hcard, Nat.primeFactors_one] at hp
+    exact Finset.notMem_empty p hp
+  obtain ⟨n, hn⟩ := hFp.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    intro hn_zero
+    apply hF_ne_bot
+    rw [Subgroup.eq_bot_iff_card, hn, hn_zero, pow_zero]
+  ext q
+  simp only [OddOrder.BG.Ch2.S07.primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
+
+/-- BG 8.1(b), first p-group bridge: if `F(M)` is a `p`-group, then
+`O_{p'}(M)=1`. This is the formal version of
+`F(O_{p'}(M)) ≤ O_{p'}(F(M)) = 1`. -/
+theorem opiCoreInG_singleton_compl_eq_bot_of_fittingInG_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hFp : IsPGroup p ↥(fittingInG M)) :
+    opiCoreInG ({p} : Set ℕ)ᶜ M = ⊥ := by
+  have hπ : OddOrder.BG.Ch2.S07.primesOf (fittingInG M) = ({p} : Set ℕ) :=
+    primesOf_fittingInG_eq_singleton_of_isPGroup hp hFp
+  have hcore : opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ M = ⊥ :=
+    opiCoreInG_primesOf_fittingInG_compl_eq_bot
+  simpa [hπ] using hcore
+
+/-- BG 8.1(b), second p-group bridge: if `F(M)` is a `p`-group, then
+`F(M)=O_p(M)` in the ambient group. -/
+theorem fittingInG_eq_opiCoreInG_singleton_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G}
+    (hFp : IsPGroup p ↥(fittingInG M)) :
+    fittingInG M = opiCoreInG ({p} : Set ℕ) M := by
+  apply le_antisymm
+  · have hFpi : Subgroup.IsPiSubgroup ({p} : Set ℕ) (fittingInG M) :=
+      OddOrder.GroupTheory.isPiSubgroup_singleton_of_isPGroup hFp
+    exact le_opiCoreInG_of_normal_of_isPiSubgroup (fittingInG_le M)
+      (fittingInG_subgroupOf_normal M) hFpi
+  · exact opiCoreInG_singleton_le_fittingInG M
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
