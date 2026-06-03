@@ -1298,6 +1298,105 @@ theorem hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
       (OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hY_norm_core)
   exact hY_comm.trans hcomm_core
 
+/-- If `Y ≤ X` and `Y` lies in `O_{q'}(X)` for every `q ∈ π`, then `Y` lies in
+`O_{π'}(X)`. This packages the BG (8.5) intersection step
+`⋂_{q∈π} O_{q'}(X) = O_{π'}(X)` in the direction needed for Hypothesis 7.1. -/
+theorem le_opiCoreInG_compl_of_forall_le_opiCoreInG_singleton_compl
+    [Finite G] {π : Set ℕ} {X Y : Subgroup G} (hYX : Y ≤ X)
+    (hYq : ∀ q, q ∈ π → Y ≤ opiCoreInG ({q} : Set ℕ)ᶜ X) :
+    Y ≤ opiCoreInG πᶜ X := by
+  let K : Subgroup G :=
+    X ⊓ ⨅ q : {q : ℕ // q ∈ π}, opiCoreInG ({q.1} : Set ℕ)ᶜ X
+  have hYK : Y ≤ K := by
+    refine le_inf hYX ?_
+    refine le_iInf ?_
+    intro q
+    exact hYq q.1 q.2
+  have hKX : K ≤ X := inf_le_left
+  have hKnorm : (K.subgroupOf X).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hKX]
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    have hnormX := Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hx) y
+    constructor
+    · intro hy
+      simp only [K, Subgroup.mem_inf, Subgroup.mem_iInf] at hy ⊢
+      refine ⟨hnormX.mp hy.1, ?_⟩
+      intro q
+      have hnormCore :=
+        Subgroup.mem_normalizer_iff.mp
+          (le_normalizer_opiCoreInG ({q.1} : Set ℕ)ᶜ X hx) y
+      exact hnormCore.mp (hy.2 q)
+    · intro hy
+      simp only [K, Subgroup.mem_inf, Subgroup.mem_iInf] at hy ⊢
+      refine ⟨hnormX.mpr hy.1, ?_⟩
+      intro q
+      have hnormCore :=
+        Subgroup.mem_normalizer_iff.mp
+          (le_normalizer_opiCoreInG ({q.1} : Set ℕ)ᶜ X hx) y
+      exact hnormCore.mpr (hy.2 q)
+  have hKpi : Subgroup.IsPiSubgroup πᶜ K := by
+    intro s hs hsπ
+    have hK_le_core_s : K ≤ opiCoreInG ({s} : Set ℕ)ᶜ X := by
+      dsimp [K]
+      exact inf_le_right.trans
+        (iInf_le (fun q : {q : ℕ // q ∈ π} =>
+          opiCoreInG ({q.1} : Set ℕ)ᶜ X) ⟨s, hsπ⟩)
+    have hs_core : s ∈ ({s} : Set ℕ)ᶜ :=
+      isPiSubgroup_opiCoreInG ({s} : Set ℕ)ᶜ X s
+        (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hK_le_core_s)
+          Nat.card_pos.ne' hs)
+    exact hs_core (by simp)
+  exact hYK.trans (le_opiCoreInG_of_normal_of_isPiSubgroup hKX hKnorm hKpi)
+
+/-- BG (8.5), generated-condition form: in the non-p-group case, every member of
+`ℋ_X(C_F(M)(A0); π(C_F(M)(A0))^c)` lies in `O_{π(C_F(M)(A0))^c}(X)`. -/
+theorem hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hXsolv : IsSolvable ↥X)
+    (hAX : cFittingInG M A0 ≤ X)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Y ≤ opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ X := by
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  refine le_opiCoreInG_compl_of_forall_le_opiCoreInG_singleton_compl hY.1 ?_
+  intro q hqA
+  have hqF_primes : q ∈ OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    simpa [hPrimes] using hqA
+  have hqF : q ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hqF_primes
+  haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
+  exact hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
+    hG hM hA0 hXsolv hAX hp hFnp hqF hY
+
+/-- BG (8.5) verifies Hypothesis 7.1 for `A = C_F(M)(A0)` in the non-p-group case. -/
+theorem hypothesis71_cFittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
+    OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0) := by
+  refine ⟨?_, ?_, ?_⟩
+  · exact cFitting_ne_bot_of_isMaxElemAbelianIn hp hA0
+  · exact lt_of_le_of_lt (inf_le_right.trans (fittingInG_le M))
+      (mem_maximalSubgroups.mp hM).lt_top
+  · intro X hAX hXlt
+    refine OddOrder.BG.Ch2.S07.generated_eq_of_forall_le_opiCoreInG hAX ?_
+    intro Y hY
+    exact hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
+      hG hM hA0 (hG.solvable_of_lt_top X hXlt) hAX hp hFnp hY
+
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
 theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
