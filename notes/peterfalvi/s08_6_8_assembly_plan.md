@@ -493,6 +493,14 @@ clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。
 **option B(comparable depth)**: `coherentEqualDegree`(差分ベース・running ν 無)を **不等次数に一般化**(generators χⱼ−aⱼχ₁)。τ-vs-ν 整合問題が **構造的に発生しない**(incremental でなく一括)。(6.6) を実質再導出。
 **両者とも (6.6) の真の技術核**(supported-family 用 engine を induced X に拡張)。leaf でなく、どちらも multi-session の新規形式化。
 
+#### J.3.1 option A 完全 reduction (2026-06-03, user 承認後の深掘り — 実装 SPEC)
+
+surgery を 2 系統に分解(`IsCoherent` field 確認済: `extension`=ν, `extension_inner_eq`=ν は ℤ[S₁] 上 isometry, `extends_on_supported`=ν=τ on supported; `CharacterPsiDecomposition.Y_orthogonal`=Y⊥R は struct field S07:1008):
+
+- **member 側(clean fix・教科書通り、support 不要)**: 各 member の per-member 直交 `⟨ν x,α⟩=0`(α∈R(χ))は **member 分解の aux isometry を τ でなく ν にする**だけで解ける。`Dmem x : CharacterPsiDecomposition τ x 0` を **`tau1=ν` で構成**(base は τ だが aux = ν = `hS₁.extension`)。根拠: ν x∈ZIrr(coherence)かつ ‖ν x‖²=⟨x,x⟩=1 ⟹ ν x=±irr ⟹ ν x∈ℤ[R(x)](R(x)=`(x−x̄)^τ=ν(x−x̄)` の構成元={ν x,ν x̄})⟹ ψ=0 分解 Y=0, X=ν x 構成可。`tau1_agrees`(ν(x−x̄)=τ(x−x̄))は supported で ✓。すると `inner_extension_member_orthogonal_imageSet`(3243)の `htau1 : Dmem.tau1 x=ν x` が **rfl**(hmemSupp 不要)。`hmemOrtho`(R(x)⊥R(χ))は `⟨(x−x̄)^τ,(χ−χ̄)^τ⟩=⟨x−x̄,χ−χ̄⟩=0`(supported isometry, χ,χ̄⊥S₁)+ 直交正規(差分和直交⟹構成元集合 disjoint)で証明可。⟹ **adapter `retarget_isCoherent_of_supportedDecomposition_and_memberFamily`(3514)は member 側で既に support-free**(`hmemTau1` を抽象に取る)、`_fromDade_X`(5314)が `hmemSupp` 経由で製造する所だけ ν-aux 構成に差し替え。
+- **chi1/Da 側(真の crux・残)**: `Da`(新 pair, χ∉ℤ[S₁] を含む)は τ ベース必須 ⟹ `Da.tau1 chi1=τ chi1`。core が要求する `htau1_chi1 : Da.tau1 chi1=ν chi1` ⟹ `τ chi1=ν chi1`(=defect δ=ν chi1−τ chi1=0)が unsupported chi1 で偽。**δ は base block 上一定**(ν(chi_j−chi_0)=τ(chi_j−chi_0) ⟹ ν chi_j−τ chi_j=ν chi_0−τ chi_0)。原理的 fix = `ν'(χ):=τ(χ−a·chi1)+a·ν chi1`(両項 integral)で χ の像を定義 ⟹ Da を `tau1 χ=ν'(χ)` で構成すれば `Da.tau1 chi1=ν chi1` 成立。**残 crux = ν'(χ) が norm-1 + ν(S₁) と直交正規であること** ⟺ **`⟨τ(χ−a·chi1), ν chi1⟩=−a`**(norm 条件: ‖ν'(χ)‖²=(1+a²)+a²+2a·Re⟨τ(χ−a·chi1),ν chi1⟩=1)。supported chi1 なら Dade isometry で −a だが、unsupported chi1 では ν chi1 と Dade 像の内積を base coherence(coherentEqualDegree)の構成詳細から導く要 = (5.6) の真の content・multi-session。
+- **実装順(parallel 構成で build-green 維持)**: (1) member ν-aux 分解補題(上記, clean・先行可能)→ (2) crux `⟨τ(χ−a·chi1),ν chi1⟩=−a` を base coherence 構成から導出(hard)→ (3) 補正 Da 構成子(`tau1 χ=ν'(χ)`)→ (4) `retarget_isCoherent_fromDade_X` 差分化(hmemSupp/hchi1supp 除去)→ (5) `DadeChainStep` struct 差分化 + `advance` rewrite。**(2) が律速**。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
