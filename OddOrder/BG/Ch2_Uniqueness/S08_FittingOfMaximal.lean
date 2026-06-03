@@ -316,6 +316,17 @@ theorem centralizer_cFitting_le_maximal_of_centerFittingOpCore_ne [Finite G]
   simpa [A, normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM hO_ne]
     using hcent_le_norm
 
+/-- BG (8.2), prime-factor form: if q divides |Z(F(M))|, then the ambient
+centralizer of C_F(M)(A0) lies in M. -/
+theorem centralizer_cFitting_le_maximal_of_centerFitting_primeFactor [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hA0F : A0 ≤ fittingInG M)
+    (hq : q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors) :
+    Subgroup.centralizer ((Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M : Subgroup G) : Set G)
+      ≤ M :=
+  centralizer_cFitting_le_maximal_of_centerFittingOpCore_ne hG hM hA0F
+    (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center hq)
+
 private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Finite H]
     {p : ℕ} [Fact p.Prime] (hHnot : ¬ IsPGroup p H) :
     ∃ q, q ∈ (Nat.card H).primeFactors ∧ q ≠ p := by
