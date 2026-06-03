@@ -197,6 +197,46 @@ theorem fixedPoints_conjActionOnFittingInG_eq {M : Subgroup G} {x : G} (hxM : x 
     calc (a : G) * (f : G) * (a : G)⁻¹ = (f : G) * (a : G) * (a : G)⁻¹ := by rw [hcomm]
       _ = (f : G) := by group
 
+/-- Ambient form of BG Proposition 1.4: if a coprime subgroup `B` normalizes a
+finite solvable subgroup `N` and centralizes `F(N)`, then `B` centralizes `N`. -/
+theorem le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
+    [Finite G] {B N : Subgroup G} [IsSolvable ↥N]
+    (hBN : B ≤ Subgroup.normalizer (N : Set G))
+    (hCop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥N))
+    (hBF : B ≤ Subgroup.centralizer (fittingInG N : Set G)) :
+    B ≤ Subgroup.centralizer (N : Set G) := by
+  let φ : ↥B →* MulAut ↥N :=
+    N.normalizerMonoidHom.comp (Subgroup.inclusion hBN)
+  have hφcoe : ∀ (b : ↥B) (n : ↥N),
+      ((φ b) n : G) = (b : G) * (n : G) * (b : G)⁻¹ := by
+    intro b n
+    dsimp [φ]
+    rfl
+  have hF_le_fixed : Ch01.fitting ↥N ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro f hf
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro b
+    refine Subtype.ext ?_
+    rw [hφcoe]
+    have hfG : (f : G) ∈ fittingInG N := by
+      have hfSub : f ∈ (fittingInG N).subgroupOf N := by
+        rwa [fittingInG_subgroupOf_eq N]
+      exact Subgroup.mem_subgroupOf.mp hfSub
+    have hcomm : Commute (f : G) (b : G) :=
+      Subgroup.mem_centralizer_iff.mp (hBF b.2) (f : G) hfG
+    rw [hcomm.symm.eq, mul_assoc, mul_inv_cancel, mul_one]
+  have hAC_bot : OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.BG.Ch1.S01.actionCommutator_eq_bot_of_fitting_le_fixedPoints
+      hCop hF_le_fixed
+  have htriv : ∀ b : ↥B, ∀ n : ↥N, (φ b) n = n :=
+    (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially φ).mp hAC_bot
+  intro b hb
+  rw [Subgroup.mem_centralizer_iff]
+  intro n hn
+  have hval := congrArg Subtype.val (htriv ⟨b, hb⟩ ⟨n, hn⟩)
+  rw [hφcoe] at hval
+  exact (mul_inv_eq_iff_eq_mul.mp hval).symm
+
 /-- Fitting M, realized in G, is nilpotent. -/
 theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
     Group.IsNilpotent ↥(fittingInG M) := by
