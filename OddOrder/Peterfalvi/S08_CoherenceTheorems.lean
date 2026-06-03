@@ -671,6 +671,79 @@ noncomputable def memberExtensionDecomposition
     (by simp)
     hχχbar
 
+/-- **(5.2.e) conjugate-difference orthogonality via *difference* supports (induced case).**
+
+`⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the **conjugate differences** `x̄ − x` and `χ̄ − χ` are
+supported in `CF(L,A)` and `x, x̄ ⊥ χ, χ̄`.  Unlike
+`dadeIntegralCharacterMap_inner_conjDifference_eq_zero` (which needs the *individual* supports of
+`x, x̄, χ, χ̄`), this evaluates the Dade isometry directly on the two supported differences `x − x̄`,
+`χ − χ̄` (`dadeIntegralCharacterMap_inner_eq_on_supported_span` on the set `{x − x̄, χ − χ̄}`), so it
+applies to **induced** `x = Ind θ`, `χ = Ind θ'` whose individual values at `1` are nonzero.  The
+reduced source pairing `⟨x − x̄, χ − χ̄⟩` expands to the four cross terms, all zero. -/
+theorem inner_dadeDiff_conjDifference_eq_zero
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {x χ : ClassFunction ↥L ℂ}
+    (hxdiffsupp : (x.conj - x).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχdiffsupp : (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hxχ : ClassFunction.inner x χ = 0) (hxχbar : ClassFunction.inner x χ.conj = 0)
+    (hxbarχ : ClassFunction.inner x.conj χ = 0) (hxbarχbar : ClassFunction.inner x.conj χ.conj = 0) :
+    ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+          (x - x.conj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+          (χ - χ.conj)) = 0 := by
+  classical
+  have hS : ∀ s ∈ ({x - x.conj, χ - χ.conj} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [show x - x.conj = -(x.conj - x) by abel, ClassFunction.support_neg]; exact hxdiffsupp
+    · rw [show χ - χ.conj = -(χ.conj - χ) by abel, ClassFunction.support_neg]; exact hχdiffsupp
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS
+    (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_zero, sub_self]
+
+/-- **(5.2.e) Dade `R(·)`-family orthogonality via *difference* supports (induced case).**
+
+`R(x) ⊥ R(χ)` for the difference-support Dade families `dadeOrthonormalCharacterImageFamilyOfDiff`
+whenever `x, x̄ ⊥ χ, χ̄`.  Mirrors `dadeOrthonormalCharacterImageFamily_orthogonal` but reduces — via
+`toOrthonormalImage_orthogonal` and `orthogonal_of_signedDifference_inner_eq_zero` — to the
+*difference-support* orthogonality `inner_dadeDiff_conjDifference_eq_zero`, so it applies to the
+**unsupported induced** X-members.  This is the `hortho` ingredient of
+`inner_decomposition_X_extension_member_eq_zero`. -/
+theorem dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {x χ : IrreducibleCharacter ↥L}
+    (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥L ℂ))
+    (hxdiffsupp : ((x : ClassFunction ↥L ℂ).conj - (x : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hχdiffsupp : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hxχ : ClassFunction.inner (x : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 0)
+    (hxχbar : ClassFunction.inner (x : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hxbarχ : ClassFunction.inner (x : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
+    (hxbarχbar :
+      ClassFunction.inner (x : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ).conj = 0) :
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj x hxreal
+        hxdiffsupp).Orthogonal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal
+        hχdiffsupp) := by
+  unfold OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
+    (OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+      _ _ ?_)
+  rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference,
+    ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference]
+  exact inner_dadeDiff_conjDifference_eq_zero hyp hconj hxdiffsupp hχdiffsupp
+    hxχ hxχbar hxbarχ hxbarχbar
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
