@@ -167,9 +167,17 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   ((6.3) arith) / isPGroup_of_quotient_of_subgroup (p-群拡大) / Abelianization.map_surjective +
   subsingleton_of_isPGroup_of_not_dvd (汎用) / **isPGroup_of_isNilpotent_of_isPGroup_abelianization
   ((6.5)(b) reduction core)** / two_mul_add_one_le_of_odd_dvd ((6.5)(a) arith)。
-  **残 substantial (6.2 gateway, 文字理論)**: B1 (Sibley packaging) / B2-orbit (induced-char) /
-  θ-bound (Clifford section) + Sibley framework ((6.1)/(6.4))。これらは focused multi-iteration effort
-  ((6.5)(b) と同様の API navigation で攻略可)。
+  **残 substantial (6.2 gateway, 文字理論)** — 全て framework 依存 or API gap (clean brick 尽きた):
+  - **B1** = Sibley packaging (framework ((6.1)/(6.4)) 要)
+  - **B2-orbit** = induced-char W₁-orbit counting (`card_mul_inner_self_induce_eq_card_inertia` 基盤)
+  - **θ-bound section** = Clifford (中心 case `θ(1)²≤|K:A|, A⊆Z(K)` は **landed `exists_degree_sq_le_index` で済**;
+    section case D/B⊆Z(C/B) は Clifford restriction 要)
+  - **linear-char ingredient** (S(A) が degree-1 char 持つ): `exists_apply_ne_one_of_hasEnoughRootsOfUnity`
+    は **`HasEnoughRootsOfUnity ℂ` instance absent** (`AlgebraicClosure F` 用のみ) ⟹ ℂ⟶AlgClosure bridge or
+    **codebase rep theory** (IrreducibleCharacter count = conjClass count, nontrivial⟹≥2 irr) 経由要。
+  - **(6.5)(c)** = Frattini absent (上述)。
+  これらは focused multi-iteration effort ((6.5)(b) の ~10 iteration と同様の API navigation/bridge 構築で攻略可)。
+  **次着手推奨 = Sibley framework ((6.1)/(6.4) structure)** — B1/(6.2)/(6.3)/(6.5)-full の共通基盤ゆえ最高レバレッジ。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
