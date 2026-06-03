@@ -1817,6 +1817,10 @@ set_option linter.style.longLine false in
 -- the direct-product side of `𝔽_{p^q}ˣ = 𝔽_pˣ × U` under condition (A).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_inf_normOneUnits_eq_bot
 
+-- BG App C Remark (VII): the carrier-set product `𝔽_pˣ · U` is all of
+-- `𝔽_{p^q}ˣ` under condition (A).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
+
 -- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
 -- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard

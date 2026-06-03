@@ -96,6 +96,9 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 さらに `primeFieldUnits_inf_normOneUnits_eq_bot` で `𝔽_pˣ ∩ U = 1` を証明。
 `q` 乗写像の全射性から有限性で injectivity を得て、`b^q=1` なら `b=1` とする。
 これで Remark (VII) の「積で全体を覆う」だけでなく「交わり自明」も Lean 側に揃った。
+さらに `primeFieldUnits_mul_normOneUnits_eq_univ` で carrier-set product
+`(𝔽_pˣ : Set 𝔽_{p^q}ˣ) * (U : Set 𝔽_{p^q}ˣ) = Set.univ` を明示 theorem 化し、
+下流の class-sum/作用計算から `Set.mem_mul` で直接使える形にした。AxiomsCheck 登録済み。
 
 #### ✅ C.2 structure-constant bridge 完成 (2026-06-04)
 `normOnePairSet : Set (U × U)` を `{(u,v) | u+v=2}` として定義し、

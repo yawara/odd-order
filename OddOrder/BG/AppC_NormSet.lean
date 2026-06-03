@@ -50,6 +50,8 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
   every unit of `𝔽_{p^q}` is a prime-field unit times an element of `U`.
 * `primeFieldUnits_inf_normOneUnits_eq_bot` — **Remark (VII)**: the
   prime-field unit subgroup intersects `U` trivially under condition (A).
+* `primeFieldUnits_mul_normOneUnits_eq_univ` — **Remark (VII)**: the
+  carrier-set product `𝔽_pˣ · U` is all of `𝔽_{p^q}ˣ` under condition (A).
 * `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
   identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
 * `normOnePairSetAt_ncard_eq_normSetE_ncard` — the same bridge in BG
@@ -339,6 +341,24 @@ theorem primeFieldUnits_inf_normOneUnits_eq_bot [Fact p.Prime] (hq : q.Prime)
     rw [Subgroup.mem_bot] at hx
     rw [hx]
     exact Subgroup.one_mem _
+
+/-- **BG Appendix C, Remark (VII)**: under condition (A), the carrier-set product
+of prime-field units and norm-one units is all of `𝔽_{p^q}ˣ`.  Together with
+`primeFieldUnits_inf_normOneUnits_eq_bot`, this is the usable subgroup form of
+`𝔽_{p^q}ˣ = 𝔽_pˣ × U`. -/
+theorem primeFieldUnits_mul_normOneUnits_eq_univ [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
+    (primeFieldUnits p q : Set (GaloisField p q)ˣ) *
+        (normOneUnits p q : Set (GaloisField p q)ˣ) = Set.univ := by
+  classical
+  apply Set.eq_univ_of_forall
+  intro x
+  obtain ⟨b, u, hx⟩ := exists_primeFieldUnit_mul_normOne p q hq hA x
+  refine Set.mem_mul.mpr ⟨
+    Units.map ((algebraMap (ZMod p) (GaloisField p q)).toMonoidHom) b, ?_,
+    (u : (GaloisField p q)ˣ), ?_, hx.symm⟩
+  · exact ⟨b, rfl⟩
+  · exact u.property
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 

@@ -36,6 +36,9 @@ created: 2026-06-04
 - [x] **Remark (VII)** direct-product intersection:
   `primeFieldUnits_inf_normOneUnits_eq_bot` を追加。条件(A)下で `𝔽_pˣ ∩ U = 1`、
   したがって前項の積分解が直積分解として使える。
+- [x] **Remark (VII)** product decomposition carrier form:
+  `primeFieldUnits_mul_normOneUnits_eq_univ` を追加。条件(A)下で carrier-set product
+  `𝔽_pˣ · U` が `𝔽_{p^q}ˣ` 全体になることを、下流の class-sum/作用計算から直接使える形で固定。
 - [x] **C.2 structure-constant bridge**: `normOnePairSet` と
   `normOnePairSet_ncard_eq_normSetE_ncard` を追加。`|E|` を `u+v=2` を満たす
   norm-one unit pairs の個数として同一視し、q≥5 の Frobenius 群 class-sum 計算への入口を materialize。
