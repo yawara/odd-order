@@ -87,3 +87,18 @@ cascade 破壊リスク; loop が flag した intricate core surgery そのも�
 
 **なぜ STOP**: structure field 弱化は ~7-10 関数貫流の invasive 改修で、autonomous 14-turn では cascade 破壊して
 broken build を残すリスク大。gate 通り scaffold せず停止。**stuck**。attended で field 弱化を実施推奨。
+
+## ✅ RESOLVED (2026-06-03 attended) — field 弱化 完了, scaffold 解消, Da が X で構成可能に
+上の 🛑 で「attended 推奨」とした structure-field 弱化を **attended で実施・完了** (commit 9640c03):
+`CharacterPsiDecomposition.tau1_inner_eq_on_support` を差分 sublattice `zSpan{χ−χ.conj, χ−ψ}` に弱化。
+**blast radius は予測通り最小** (field + ofProjection param + helper 2 + decompositionPair の span_mono→span_le)。
+supported-χ caller は **不変** (decompositionPair が差分 sublattice ≤ full span の span_le で full inner-eq から供給)。
+`lake build OddOrder` 3562 + AxiomsCheck 3521 green。
+
+**✅ keystone: `decompositionDaFromDadeOfDiff` (commit ded579e)** — Da を X-member (unsupported χ=Ind θ) で
+`ofProjection` 直構成。差分集合 {χ−χ̄, χ−a•χ₁} の isometry + htau1_mema のみ。⟹ **step1-2 の Da hypothesis が
+X で満たせる = scaffold 解消・de-scaffolded**。「stuck」状態は解消。
+
+**残 (mechanical wiring)**: `retarget_isCoherent_fromDade_X` (Da=decompositionDaFromDadeOfDiff を step2
+`..._of_supportedDecomposition_and_memberFamily` に供給; hY は (5.6.2) collapse param) + `DadeChainStep` の
+support field を差分化 + `advance` を X-version に rewire → `peterfalvi_66_coherence_of_X_from_dade` 解禁。
