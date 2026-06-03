@@ -22,14 +22,11 @@
 6. **`exists_normal_lt_top_of_isSubnormal`** (R1 step1) = A' subnormal, A'<⊤ ⟹ ∃ B⊴Q, A'≤B<⊤
    (`IsSubnormal` 帰納)。
 
-## 残タスク (難度順, 各々 sub-development)
+### ✅✅ R1 完結 (commit c7bf8d9): `tp_reduction`
+`A<P` subnormal, P 可解 ⟹ `∃ B, A≤B<P, B⊴P, |P:B| prime`。step1+R1a+pullback+G-translate 全組立済。
+(「A subnormal in B」clause は外し、R3 で `inf_isSubnormal_subgroupOf`+equiv-transport で別途導出。)
 
-### R1. composition-series 還元 assembly `tp_reduction` (~50行) — step1+R1a は完成、組立のみ残
-A<P subnormal ⟹ ∃ G-部分群 B, A≤B<P, B⊴P, |P:B| prime, A subnormal in B。
-step1 (`exists_normal_lt_top_of_isSubnormal`@↥P) で B''⊴↥P, A.subgroupOf P≤B''<⊤ →
-R1a@(↥P⧸B'') で素数 index 正規 → pullback C⊴↥P (`index_comap_of_surjective`) →
-**G へ translate** (`C.map P.subtype`; B.subgroupOf P=C, `map_subtype_lt_top`) +
-A subnormal in B (`IsSubnormal.subgroupOf` / `inf_isSubnormal_subgroupOf`)。難所=quotient/subtype 往復。
+## 残タスク = R2 (base case 数学核心) + R3 (wiring)
 `A < P` subnormal (P 可解=`hG.solvable_of_lt_top`) ⟹ `∃ B, A≤B, (B.subgroupOf P).Normal, B<P,
 (P:B index) prime, (A.subgroupOf B).IsSubnormal`。
 - **step1**: subnormal 系列の second-from-top を取る。mathlib `Subgroup.isSubnormal_iff`
