@@ -1169,6 +1169,25 @@ theorem hInvariant_eq_bot_of_cFittingInG_of_not_pGroup
     hInvariantStar_eq_bot_of_cFittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hRstar
   exact le_bot_iff.mp (by simpa [hRbot] using hQR)
 
+/-- BG (8.6), q-core form: if `A = C_F(M)(A0)` lies in `H`, then the ambient
+q-core of `H` is trivial for `q` outside `π(A)` in the non-p-group case. -/
+theorem opiCoreInG_singleton_eq_bot_of_cFittingInG_le_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hAH : cFittingInG M A0 ≤ H) :
+    opiCoreInG ({q} : Set ℕ) H = ⊥ := by
+  have hQ : opiCoreInG ({q} : Set ℕ) H ∈ hInvariant ⊤ (cFittingInG M A0) {q} := by
+    rw [mem_hInvariant]
+    exact ⟨le_top,
+      hAH.trans (le_normalizer_opiCoreInG ({q} : Set ℕ) H),
+      isPiSubgroup_opiCoreInG ({q} : Set ℕ) H⟩
+  exact hInvariant_eq_bot_of_cFittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hQ
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
