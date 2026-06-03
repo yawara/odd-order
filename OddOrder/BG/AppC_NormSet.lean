@@ -48,6 +48,8 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
   `U ≤ 𝔽_{p^q}ˣ` has order `(p^q - 1)/(p - 1)`.
 * `exists_primeFieldUnit_mul_normOne` — **Remark (VII)**: under condition (A),
   every unit of `𝔽_{p^q}` is a prime-field unit times an element of `U`.
+* `primeFieldUnits_inf_normOneUnits_eq_bot` — **Remark (VII)**: the
+  prime-field unit subgroup intersects `U` trivially under condition (A).
 * `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
   identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
 * `normOnePairSetAt_ncard_eq_normSetE_ncard` — the same bridge in BG
@@ -304,6 +306,39 @@ theorem exists_primeFieldUnit_mul_normOne [Fact p.Prime] (hq : q.Prime)
       _ = 1 := by rw [← hb]; simp
   refine ⟨b, ⟨uUnit, hu_mem⟩, ?_⟩
   simp [uUnit, bF]
+
+/-- **BG Appendix C, Remark (VII)**: under condition (A), the prime-field unit
+subgroup and the norm-one subgroup meet trivially.  Together with
+`exists_primeFieldUnit_mul_normOne`, this is the direct-product content of
+`𝔽_{p^q}ˣ = 𝔽_pˣ × U`. -/
+theorem primeFieldUnits_inf_normOneUnits_eq_bot [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
+    primeFieldUnits p q ⊓ normOneUnits p q = ⊥ := by
+  classical
+  ext x
+  constructor
+  · intro hx
+    rw [Subgroup.mem_bot]
+    have hxmem : x ∈ primeFieldUnits p q ∧ x ∈ normOneUnits p q := by
+      simpa using hx
+    rcases hxmem.1 with ⟨b, hb⟩
+    let normMap : (GaloisField p q)ˣ →* (ZMod p)ˣ :=
+      Units.map (Algebra.norm (ZMod p) (S := GaloisField p q))
+    have hnorm : normMap x = 1 := by
+      simpa [normMap, normOneUnits] using hxmem.2
+    have hbq : b ^ q = 1 := by
+      rw [← unitsMap_norm_primeFieldUnit p q hq.ne_zero b, hb]
+      exact hnorm
+    have hsurj := zmodUnits_pow_surjective_of_conditionA p q hq hA
+    have hinj : Function.Injective (fun b : (ZMod p)ˣ => b ^ q) :=
+      (Finite.injective_iff_surjective).mpr hsurj
+    have hb1 : b = 1 := hinj (by simpa using hbq)
+    rw [hb1] at hb
+    simpa using hb.symm
+  · intro hx
+    rw [Subgroup.mem_bot] at hx
+    rw [hx]
+    exact Subgroup.one_mem _
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 

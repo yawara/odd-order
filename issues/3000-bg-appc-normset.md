@@ -33,6 +33,9 @@ created: 2026-06-04
   `primeFieldUnits`、`unitsMap_norm_primeFieldUnit`、条件(A)下の `q` 乗全射
   `zmodUnits_pow_surjective_of_conditionA`、および
   `exists_primeFieldUnit_mul_normOne : 𝔽_{p^q}ˣ = 𝔽_pˣ · U` 型の分解補題を追加。
+- [x] **Remark (VII)** direct-product intersection:
+  `primeFieldUnits_inf_normOneUnits_eq_bot` を追加。条件(A)下で `𝔽_pˣ ∩ U = 1`、
+  したがって前項の積分解が直積分解として使える。
 - [x] **C.2 structure-constant bridge**: `normOnePairSet` と
   `normOnePairSet_ncard_eq_normSetE_ncard` を追加。`|E|` を `u+v=2` を満たす
   norm-one unit pairs の個数として同一視し、q≥5 の Frobenius 群 class-sum 計算への入口を materialize。

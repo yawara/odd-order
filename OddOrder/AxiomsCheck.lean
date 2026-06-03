@@ -1813,6 +1813,10 @@ set_option linter.style.longLine false in
 -- as a prime-field unit times a norm-one unit.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_primeFieldUnit_mul_normOne
 
+-- BG App C Remark (VII): the prime-field units and `U` meet trivially, giving
+-- the direct-product side of `𝔽_{p^q}ˣ = 𝔽_pˣ × U` under condition (A).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_inf_normOneUnits_eq_bot
+
 -- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
 -- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard

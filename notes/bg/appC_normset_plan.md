@@ -93,6 +93,9 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `x = b * u` (`b∈𝔽_pˣ`, `u∈U`) と分解する
 `exists_primeFieldUnit_mul_normOne` を追加し、AxiomsCheck に登録。
 これは BG C.3 Step1 の `F^* = F_p^* × U` 使用箇所へ向けた前処理。
+さらに `primeFieldUnits_inf_normOneUnits_eq_bot` で `𝔽_pˣ ∩ U = 1` を証明。
+`q` 乗写像の全射性から有限性で injectivity を得て、`b^q=1` なら `b=1` とする。
+これで Remark (VII) の「積で全体を覆う」だけでなく「交わり自明」も Lean 側に揃った。
 
 #### ✅ C.2 structure-constant bridge 完成 (2026-06-04)
 `normOnePairSet : Set (U × U)` を `{(u,v) | u+v=2}` として定義し、
