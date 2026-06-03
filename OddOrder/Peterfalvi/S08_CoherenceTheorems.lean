@@ -904,6 +904,99 @@ theorem exists_indexed_intProjection_of_orthonormal_ZIrr
     fun i hi => hY (vc i) (Finset.mem_image_of_mem vc hi)⟩
   rw [hsum, Finset.sum_image hvcinj]
 
+open scoped Classical in
+/-- **(5.6.1)/(5.6.2) crux1 from the member family: `⟨τ(χ − a·χ₁), ν χ₁⟩ = −a`.**
+
+The capstone of the crux1 discharge — the genuine (5.6.1)/(5.6.2) `Y`-collapse for the induced
+X-family, producing crux1 directly.  Given the finite orthonormal member family `{χᵢ = χmem i}` (all
+in `S₁`, `‖χᵢ‖² = 1` — the case-A `X ⊆ Irr L`), the per-member (5.6.1) coefficient values
+`hcoeffval` (from `inner_Y_extension_member_eq`), `a₁ = 1`, and the (6.6) degree inequality
+`2a < ∑ aᵢ²`:
+
+* the indexed projection (`exists_indexed_intProjection_of_orthonormal_ZIrr`) writes
+  `Da.Y = ∑ᵢ (cᵢ:ℂ)·νχᵢ + Z` with integer `cᵢ = ⟨Da.Y, νχᵢ⟩`;
+* `hcoeffval` identifies `cᵢ = a·[i=i₁] − λ·aᵢ` with the integer `λ = a + μ`, `μ = ⟨τ(χ−a·χ₁), νχ₁⟩`
+  (an integer since both are virtual characters);
+* the (5.6.2) integer-forcing `lambda_eq_zero_and_Z_eq_zero` then forces `λ = 0` (`Z = 0`), i.e.
+  `μ = −a` — which **is** crux1.
+
+`μ ∈ ℤ` is the load-bearing fact making `λ = a + μ` an integer; the degree inequality (6.6) is what
+forces it to vanish. -/
+theorem crux1_of_memberFamily
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L) {a : ℕ}
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction ↥L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ
+      (χ : ClassFunction ↥L ℂ) (a • χmem i₁))
+    (hDaY_ZIrr : Da.Y ∈ ZIrr G)
+    (hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
+    (hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
+      (a : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) + ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
+          (hS₁.extension (χmem i₁))) * (deg i : ℂ))
+    (hμZ : τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2) :
+    ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
+      (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
+  classical
+  obtain ⟨μ, hμeq⟩ := ClassFunction.inner_mem_ZIrr_int hμZ (hνZ i₁ hi₁)
+  -- Orthonormality of the family `vc i = ν χᵢ` (ν isometry on `ℤ[S₁]` + member orthonormality).
+  have horth : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (hS₁.extension (χmem i)) (hS₁.extension (χmem j)) =
+        if i = j then (1 : ℂ) else 0 := by
+    intro i hi j hj
+    rw [hS₁.extension_inner_eq (χmem i) (χmem j) (Submodule.subset_span (hmemS1 i hi))
+      (Submodule.subset_span (hmemS1 j hj)), hmemortho i hi j hj]
+  have hvcinj : ∀ i ∈ s, ∀ j ∈ s,
+      hS₁.extension (χmem i) = hS₁.extension (χmem j) → i = j := by
+    intro i hi j hj hij
+    by_contra hne
+    have h0 := horth i hi j hj
+    rw [if_neg hne, hij, horth j hj j hj, if_pos rfl] at h0
+    exact one_ne_zero h0
+  obtain ⟨c, Z, hc_coeff, hYsum, hZortho⟩ :=
+    exists_indexed_intProjection_of_orthonormal_ZIrr hDaY_ZIrr s
+      (fun i => hS₁.extension (χmem i)) hνZ hvcinj horth
+  -- Coefficient identification `(c i : ℂ) = a·[i=i₁] − (a+μ)·aᵢ`.
+  have hcoeff_eq : ∀ i ∈ s, (c i : ℂ) =
+      (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ) := by
+    intro i hi
+    rw [← hc_coeff i hi, hcoeffval i hi, hμeq]
+    by_cases h : i = i₁
+    · simp only [if_pos h]; push_cast; ring
+    · simp only [if_neg h]; push_cast; ring
+  -- The (5.6.1) λ-form and the (5.6.2) integer-forcing.
+  have hY : Da.Y =
+      (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ)
+        • hS₁.extension (χmem i)) + Z := by
+    rw [hYsum]; congr 1
+    exact Finset.sum_congr rfl fun i hi => by rw [hcoeff_eq i hi]
+  have hψ : (ClassFunction.inner (a • χmem i₁ : ClassFunction ↥L ℂ) (a • χmem i₁)).re
+      = (a : ℝ) ^ 2 * 1 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl,
+      star_natCast, mul_one,
+      show (a : ℂ) * (a : ℂ) = (((a : ℝ) ^ 2 * 1 : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
+  obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) ((a : ℤ) + μ) Z
+    (fun i => hS₁.extension (χmem i)) (fun _ => 1) (fun i => (deg i : ℝ))
+    hY horth hZortho hψ (by simp [ha1]) (by positivity)
+    (by simp only [mul_one]; exact hDeg)
+  -- `λ = a + μ = 0 ⟹ μ = −a`, which is crux1.
+  have hμval : μ = -(a : ℤ) := by omega
+  rw [hμeq, hμval]; push_cast; ring
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
