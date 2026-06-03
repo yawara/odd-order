@@ -13,6 +13,8 @@ import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -1741,6 +1743,36 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   refine isPGroup_of_quotient_of_subgroup P.isPGroup' ?_
   rw [IsPGroup.iff_card]
   exact ⟨0, by rw [pow_zero]; exact @Nat.card_of_subsingleton (Γ ⧸ (↑P : Subgroup Γ)) 1 hQ_triv⟩
+
+/-- A finite group with non-trivial abelianization carries a non-trivial linear character
+`Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
+finite solvable group has one.
+
+This is the existence ingredient feeding **Peterfalvi (6.2)**: the section `K/A` (solvable and
+non-trivial, since `A ⊊ K`) carries an irreducible character of degree `1`, which is what makes
+`S(A)` non-empty so the degree bound `2|L:C|√|C:D| ≥ |K:A| − 1` has content. The proof reduces to
+the abelianization `Γ ⧸ ⁅Γ,Γ⁆` (non-trivial exactly when `⁅Γ,Γ⁆ ≠ ⊤`) and uses that `ℂ` is
+separably closed of characteristic zero, hence has enough roots of unity
+(`IsSepClosed.hasEnoughRootsOfUnity`, instantiated at `n = exponent` via the supplied `NeZero`). -/
+theorem exists_monoidHom_units_ne_one_of_commutator_ne_top {Γ : Type*} [Group Γ] [Finite Γ]
+    (h : commutator Γ ≠ ⊤) : ∃ χ : Γ →* ℂˣ, χ ≠ 1 := by
+  -- `Abelianization Γ = Γ ⧸ ⁅Γ,Γ⁆` is non-trivial precisely because `⁅Γ,Γ⁆ ≠ ⊤`.
+  haveI : Nontrivial (Abelianization Γ) := by
+    by_contra hns
+    rw [not_nontrivial_iff_subsingleton] at hns
+    exact h (by
+      rw [← Subgroup.index_eq_one]
+      exact @Nat.card_of_subsingleton (Abelianization Γ) 1 hns)
+  obtain ⟨a, ha⟩ := exists_ne (1 : Abelianization Γ)
+  -- `ℂ` separably closed + characteristic zero ⟹ enough roots of unity at `n = exponent`.
+  haveI : NeZero ((Monoid.exponent (Abelianization Γ) : ℂ)) :=
+    ⟨Nat.cast_ne_zero.mpr Monoid.exponent_ne_zero_of_finite⟩
+  obtain ⟨φ, hφ⟩ :=
+    CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Abelianization Γ) ℂ ha
+  -- Pull `φ` back along the surjection `Abelianization.of`; non-triviality transports.
+  refine ⟨φ.comp Abelianization.of, fun hcon => hφ ?_⟩
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective a
+  simpa using DFunLike.congr_fun hcon g
 
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
