@@ -348,6 +348,74 @@ theorem lemmaC1 [Fact p.Prime] (hq : q.Prime)
     _ ≤ P.natDegree := card_roots' P
     _ = q := hdeg
 
+/-! ## Lemma C.2 machinery (`q = 3` case): the cubic `f_c` -/
+
+/-- **BG Lemma C.2** (`q = 3`), pigeonhole step (mmd L4948): for some `c ∈ 𝔽_p` the
+cubic `f_c(x) = x(x-2)(x-c) + (x-1)` has no root in `𝔽_p`.
+
+If every `f_c` had a root `d`, then `d ∉ {0, 2}` (as `f_c(0) = -1`, `f_c(2) = 1`),
+and `c` is determined by `d` (`d(d-2)(d-c) = -(d-1)` with `d(d-2) ≠ 0`), so
+`c ↦ d` is injective from `𝔽_p` into `𝔽_p ∖ {0, 2}` — impossible by cardinality. -/
+lemma exists_rootFree_cubic [Fact p.Prime] (hpodd : Odd p) :
+    ∃ c : ZMod p, ∀ x : ZMod p, x * (x - 2) * (x - c) + (x - 1) ≠ 0 := by
+  have h3 : 3 ≤ p := by
+    have h2 := (Fact.out : p.Prime).two_le
+    rcases hpodd with ⟨k, hk⟩; omega
+  haveI : NeZero p := ⟨by omega⟩
+  have h02 : (0 : ZMod p) ≠ 2 := by
+    intro h
+    have h2cast : ((2 : ℕ) : ZMod p) = 0 := by exact_mod_cast h.symm
+    rw [CharP.cast_eq_zero_iff (ZMod p) p] at h2cast
+    have := Nat.le_of_dvd (by norm_num) h2cast
+    omega
+  by_contra hcon
+  push_neg at hcon
+  choose g hg using hcon
+  -- `g c ≠ 0` and `g c ≠ 2`, since `f_c(0) = -1`, `f_c(2) = 1`.
+  have hg0 : ∀ c, g c ≠ 0 := by
+    intro c h
+    have hgc := hg c; rw [h] at hgc
+    exact one_ne_zero (by linear_combination -hgc)
+  have hg2 : ∀ c, g c ≠ 2 := by
+    intro c h
+    have hgc := hg c; rw [h] at hgc
+    exact one_ne_zero (by linear_combination hgc)
+  -- `c ↦ g c` is injective (`c` is determined by the common root `d = g c`).
+  have hinj : Function.Injective g := by
+    intro c1 c2 h
+    have e1 := hg c1
+    have e2 := hg c2
+    rw [h] at e1
+    have hdne : g c2 * (g c2 - 2) ≠ 0 := mul_ne_zero (hg0 c2) (sub_ne_zero.mpr (hg2 c2))
+    have hfactor : g c2 * (g c2 - 2) * (g c2 - c1) = g c2 * (g c2 - 2) * (g c2 - c2) := by
+      linear_combination e1 - e2
+    have hsub := mul_left_cancel₀ hdne hfactor
+    linear_combination -hsub
+  -- Cardinality contradiction: injective map into `𝔽_p ∖ {0,2}` (size `p-2`).
+  have himg : Finset.univ.image g ⊆ (Finset.univ : Finset (ZMod p)) \ {0, 2} := by
+    intro y hy
+    simp only [Finset.mem_image, Finset.mem_univ, true_and] at hy
+    obtain ⟨c, rfl⟩ := hy
+    simp only [Finset.mem_sdiff, Finset.mem_univ, true_and, Finset.mem_insert,
+      Finset.mem_singleton, not_or]
+    exact ⟨hg0 c, hg2 c⟩
+  have hc1 : (Finset.univ.image g).card = p := by
+    rw [Finset.card_image_of_injective _ hinj, Finset.card_univ, ZMod.card]
+  have hcard02 : ({0, 2} : Finset (ZMod p)).card = 2 := Finset.card_pair h02
+  have hdisj : Disjoint (Finset.univ.image g) ({0, 2} : Finset (ZMod p)) := by
+    rw [Finset.disjoint_left]
+    intro a ha ha2
+    have := himg ha
+    rw [Finset.mem_sdiff] at this
+    exact this.2 ha2
+  have key : (Finset.univ.image g).card + ({0, 2} : Finset (ZMod p)).card ≤ p :=
+    calc (Finset.univ.image g).card + ({0, 2} : Finset (ZMod p)).card
+        = (Finset.univ.image g ∪ {0, 2}).card := (Finset.card_union_of_disjoint hdisj).symm
+      _ ≤ (Finset.univ : Finset (ZMod p)).card := Finset.card_le_card (Finset.subset_univ _)
+      _ = p := by rw [Finset.card_univ, ZMod.card]
+  rw [hc1, hcard02] at key
+  omega
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
