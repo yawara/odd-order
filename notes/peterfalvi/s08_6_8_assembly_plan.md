@@ -464,13 +464,15 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
 **leaf 順**: T8.1✅/T8.2✅/T8.3a3b✅ (clean, done) → **pairing 構成 (次)** → base wiring → per-step (Dmem/hdeg_c) → assemble。
 clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。**T8 は feasible・大 (Frobenius case で ~400-600 LOC 見積)**。
 
-### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-7 完了)
+### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-9 完了 — **base coherence 達成**)
 - ✅ **T8.4** `xSet_finite` (31eea58): X⊆Irr L 有限 = `hXfin`。
 - ✅ **T8.5** `xBaseBlock` + subset/degree_re_eq/closedUnderConjugate (79821fb): base S₀=最小次数ブロック。
 - ✅ **T8.6** `sMember_support_subset_H` + `sMember_diffSupport_of_charValue_eq` (eefc87e): 等次数差 χ−χ' ⊆ H^# = base `hsuppdiff`。
 - ✅ **T8.7** `exists_finEnum_irreducible` (41052b8): 有限既約集合→`Fin k` 単射 enum (range=T) = `coherentEqualDegree_fromDade` の Fin n interface bridge。
-- **次 = base coherence assembly**: S₀ を T8.7 で `Fin k` 化 → 等次数 value (re 等しい+irr で実 ⟹ value 等) + T8.6 (hsuppdiff) + `1∉sharpImage H` + n≥2 (T8.3+X.Nonempty) → `coherentEqualDegree_fromDade` → `h0 : IsCoherent τ S₀ A`。**X.Nonempty 要** ((6.5) context or 仮説)。
-- その後: suffix 共役 pairing (combinatorics) → per-step `DadeChainStep` (T8.1/2 + Dmem + hdeg_c 仮説) → `peterfalvi_66_coherence_of_X_from_dade`。
+- ✅ **T8.8** `two_le_xBaseBlock_ncard` (8f6271e): `X.Nonempty` → S₀ に χ と共役 χ̄≠χ → `2 ≤ |S₀|` = base の `2 ≤ n`。
+- ✅ **T8.9** `xBaseBlock_isCoherent` (本コミット, axiom-clean #print 確認済 propext/Classical.choice/Quot.sound): **base block S₀ coherence 完成**。`coherentEqualDegree_fromDade hyp.dade hyp.hconj` を `A = sharpImage H` で適用 → 結論の Dade map = `hyp.tau` (abbrev 同一)・set = `range χ` を `hrange` で `xBaseBlock Z` に rw。入力: enum=T8.7 (`choose` で Type-goal にデータ抽出, `obtain` 不可)・n≥2=T8.8・`hsuppdiff`=T8.6 (H^# = sharpImage H が engine の A と一致)・`hdeg`=`xBaseBlock_degree_re_eq` (re 等) + `irreducibleCharacter_apply_one_eq_pos_natCast` (degree=正整数 ⟹ re 等で value 等)・`h1notA`=`simp [sharpImage]`。**`noncomputable def` (IsCoherent は Type-値=ν 担持)**。`hZH`/`[Z.Normal]`/`hXne` 引数。
+- **次 = suffix 共役 pairing** (combinatorics, §J.1 step 2): S₀ より高次数の X-member を degree-monotone enum 内で共役 pair {χ,χ̄} に分割 (`pairSet`/`pairUnion` + cover 3 条件 `hS₀`/`hpairs`/`hcoverIdx`)。X conj-closed ゆえ非実 χ は χ̄ と pair。`pairUnion_eq_of_enumCover` で X 復元。
+- その後: per-step `DadeChainStep` instance (T8.1/2 + Dmem via `decompositionDaFromDadeOfDiff` + hdeg_c 仮説) → `coherentPairChain`/`coherentOfPairChainCover` → `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A` → glue X∪Y → capstone。
 - **全 leaf axiom-clean (propext/Classical.choice/Quot.sound), full build 3562 green**。
 
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)

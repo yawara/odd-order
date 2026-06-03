@@ -1291,6 +1291,73 @@ theorem two_le_xBaseBlock_ncard (hyp : SibleyDadeHypothesis G L H)
     (Set.one_lt_ncard hS₀fin).mpr ⟨χ.conj, hconjS₀, χ, hχS₀, hne⟩
   omega
 
+/-- **(T8 leaf 9) base coherence `IsCoherent τ S₀`.**  The minimal-degree base block
+`S₀ = xBaseBlock Z` is coherent for the real Dade map `tau`.  It is a finite, equal-degree family
+of `≥ 2` irreducible characters of `L` (`exists_finEnum_irreducible`, `xBaseBlock_degree_re_eq` with
+the integer degrees `irreducibleCharacter_apply_one_eq_pos_natCast`, `two_le_xBaseBlock_ncard`) whose
+pairwise differences `χⱼ − χ₀` vanish off `H^# = sharpImage H`
+(`sMember_diffSupport_of_charValue_eq`), so the §7 base engine `coherentEqualDegree_fromDade`
+((6.6) base case, via (1.1)+(1.4)) applies with `A = H^#` — matching
+`tau = dadeIntegralCharacterMap hyp.dade …`.  `(hyp.Xset Z).Nonempty` (from the broader (6.5)
+reduction context; here a hypothesis) supplies the `2 ≤ |S₀|` input.
+
+`noncomputable def` (not `theorem`): `IsCoherent` carries the isometric extension map as data
+(it lives in `Type`, not `Prop`), exactly like `sibleySetup_is_coherent`/`CoherenceTarget`. -/
+noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.xBaseBlock Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  -- Enumerate the finite irreducible base block `S₀` as `χ : Fin k → Irr L`.  The conclusion
+  -- `IsCoherent` is `Type`-valued (carries the extension map), so the enumeration data must be
+  -- extracted with `choose` (via choice), not `obtain` (which would large-eliminate a `Prop ∃`).
+  have hS₀fin : (hyp.xBaseBlock Z).Finite :=
+    (hyp.xSet_finite hF (Z := Z)).subset (hyp.xBaseBlock_subset Z)
+  have hS₀irr : ∀ φ ∈ hyp.xBaseBlock Z, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF
+      (hyp.xBaseBlock_subset Z hφ)
+  choose k χ hχinj hrange using exists_finEnum_irreducible hS₀fin hS₀irr
+  have hmemS₀ : ∀ j, (χ j : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z :=
+    fun j => hrange ▸ Set.mem_range_self j
+  -- `2 ≤ k`: the coerced enumeration is injective, so `|S₀| = k`.
+  have hcoeinj : Function.Injective (fun j => (χ j : ClassFunction ↥L ℂ)) := by
+    intro i j hij
+    exact hχinj (IrreducibleCharacter.ext hij)
+  have hk2 : 2 ≤ k := by
+    have hcard : (hyp.xBaseBlock Z).ncard = k := by
+      rw [← hrange, Set.ncard_range_of_injective hcoeinj, Nat.card_eq_fintype_card,
+        Fintype.card_fin]
+    have h2 := hyp.two_le_xBaseBlock_ncard hF hZH hXne
+    omega
+  haveI : NeZero k := ⟨by omega⟩
+  -- `S₀ ⊆ S`.
+  have hmemS : ∀ j, (χ j : ClassFunction ↥L ℂ) ∈ hyp.S :=
+    fun j => (hyp.mem_Xset.mp (hyp.xBaseBlock_subset Z (hmemS₀ j))).1
+  -- Equal degree: real parts equal (base block) and the degrees are positive integers.
+  have hdeg : ∀ j, ((χ j : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+      = ((χ 0 : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
+    intro j
+    obtain ⟨dj, _, hdj⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (χ j)
+    obtain ⟨d0, _, hd0⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (χ 0)
+    have hre := hyp.xBaseBlock_degree_re_eq (hmemS₀ j) (hmemS₀ 0)
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hdj, hd0] at hre
+    rw [hdj, hd0]
+    have hdd : dj = d0 := by exact_mod_cast hre
+    rw [hdd]
+  -- Difference support: `χⱼ − χ₀` vanishes off `H^#` (equal degree, both supported on `H`).
+  have hsuppdiff : ∀ j, (irreducibleCharacterDifference χ j).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    fun j => hyp.sMember_diffSupport_of_charValue_eq (hmemS j) (hmemS 0) (hdeg j)
+  -- `1 ∉ A = H^#`.
+  have h1notA : (1 : G) ∉ sharpImage H := by simp [sharpImage]
+  -- Apply the §7 base engine; its `range χ = S₀` and Dade map `= hyp.tau`.
+  have hcoh := OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj
+    hk2 χ hχinj hdeg hsuppdiff h1notA
+  rw [hrange] at hcoh
+  exact hcoh
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
