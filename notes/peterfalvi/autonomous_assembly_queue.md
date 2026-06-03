@@ -100,9 +100,24 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
   - **(a) member-family-from-accumulator**: pairUnion S₀ pair i の蓄積 X-members を orthonormal IrreducibleCharacter
     family (ι/s/χmem/deg/i₁) として列挙 + supports/orthonormality/conj-ortho/hSgen/hgen。enum 構成 (combinatorial)。
   - **🔴 (b) hDeg (degree 不等式 2a<∑deg²) は (6.5) 還元依存**: deg i=χmem i(1)/χ₁(1) の **p-power 構造**
-    (`two_mul_lt_sq_of_primePow_gap` S07:1696) が要る。p-power は **(6.5) chief-factor 還元** (§G M1:
-    (6.5)⟸(6.3)⟸(6.2)⟸(5.6)+(1.5), ~200-300 LOC, 未着手の §6 大タスク) から来る。⟹ **T-A4 の真の次 blocker = (6.5) 還元**。
-    by_contra hnc で開き peterfalvi_65_reduction で p-群構造を背理法分岐内局所仮説として得る (§F framing)。
+    (`two_mul_lt_sq_of_primePow_gap` S07:1696) が要る。p-power は **(6.5) chief-factor 還元**から来る。
+
+### 🔴 (6.5) 還元 = T-A4 の真の次 blocker (§6 degree-bound machinery, 未着手の大タスク)
+
+**mmd 04.8 L56-** (精読済): (6.5) は Hyp(6.4) + S(M) 非 coherent 下で **(a)** K/H₁ は L の chief factor かつ
+`|K:H₁|≤4|L:K|²+1` **(b)** ∃p, K/M は非可換 p-群 **(c)** |L:K|∤p−1。**(6.8) が使うのは (b)** (p-群還元)。
+**proof 依存 chain**: (6.5) ⟸ **(6.3)** (degree bound `|K:H₁|≤4|L:K|²+1`) + (6.4.c) + nilpotency。
+(6.3) ⟸ **(6.2)** + **(5.7)**。
+
+**既存状態 (grep 確認)**:
+- ✅ **(5.7)** (mmd 04.7 L107 「χ(1) が χ∈S で一定 ⟹ S coherent」= 等次数 coherence) ≈ **`coherentEqualDegree`/
+  `coherentEqualDegree_fromDade` 既 landed** (S07)。実質形式化済 (要確認: 厳密一致か)。
+- 🔴 **(6.2)/(6.3)** = degree-bound 定理 (Sibley 型 `|K:H₁|≤4|L:K|²+1`)。**未形式化**。これが (6.5) 還元の
+  律速。§6 の coherence-degree machinery を新規形式化要 (substantial, 複数定理)。
+
+**⟹ (6.8) capstone への残路 = (6.2)→(6.3)→(6.5) 形式化 → T-A4 part(a) member-family enum → T-A4 assemble →
+T-A5 glue (coherentUnion_of_glued, Y=coherentYFamily)。** route A で ZIrr は解決済ゆえ、残は純粋に
+§6 degree-bound machinery + enum 構成 (ZIrr 非依存)。**次セッションは (6.2)/(6.3) から着手推奨** (bottom-up)。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
