@@ -150,8 +150,17 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 - 🔴 **θ-degree bound**: `θ(1)≤|K:C|√|C:D|` (D/B⊆Z(C/B))。基本 Schur bound (`finrank_sq_le_index`/
   `exists_degree_sq_le_index`@SchurCenterBound, θ(1)²≤[K:Z(K)]) では不足、section D/B⊆Z(C/B) の Clifford 論証要。
 - **(6.2)→(6.3)→(6.5)**: 上記 B1/B2/θ-bound + Sibley-setup ((C).b 抽出) を組めば (6.2)、以降 (6.3)(6.5) は代数+帰納。
+- ✅ **(6.3) arithmetic core** (commit a6a2082, axiom-clean): `degreeBound_le_of_sqrt_bound`
+  (S08) = `b·x−1 ≤ 2ab√x (b,x≥1) ⟹ x ≤ 4a²+1`。(6.3) の degree-bound 帰結 (mmd L33) の純 ℝ/ℕ 算術核。
+  (6.3) は (6.2) + これ + minimal-A/maximal-B 帰納で完成。
+- **recurring 算術 motif** (記録): (6.5)(a)(c) は `(2c+1)²>4c²+1 ⟺ c≥1` を多用 (chief-factor 不在背理法,
+  |L:K|∤p−1)。小さく landable だが (6.2)/(6.3) の本体待ち。
+- **(6.5)(b) p-群還元の群論核**: 「G nilpotent finite + G/[G,G] が p-群 ⟹ G が p-群」(nilpotent=Sylow 直積,
+  G/[G,G]=∏ Sylow_q/[..] ⟹ p-Sylow のみ非自明)。self-contained・mathlib nilpotent/Sylow で landable 見込み。
 - **最高レバレッジ次ピース = member-family 構成** (B1 と T-A4 part(a) で共有)。Sibley-setup framework
   ((6.1)/(6.4) = SibleyDadeHypothesis 拡張) の formalization が要。focused effort 推奨。
+- **landed §6 bricks (2)**: sumInflatedDegreeSq_ntrivial (B2 ingredient) + degreeBound_le_of_sqrt_bound
+  ((6.3) arith)。残 substantial = orbit counting / member-family(B1) / θ-bound(Clifford) / (6.2)。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
