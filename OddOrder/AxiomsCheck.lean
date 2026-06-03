@@ -1160,6 +1160,11 @@ set_option linter.style.longLine false in
 -- BG Thm 7.6 ⭐⭐⭐ **FT クリティカル** (Thompson Transitivity, mmd L2311): A∈SCN₃(p), q∈p' ⇒
 -- O_{p'}(C_G(A)) が ℋ_G*(A;q) 上推移的。Prop 7.5(2) で Hyp 7.1 を得て Thm 7.2 (rank≥3) を適用。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.thompsonTransitivity
+-- BG Thm 7.4 (Propagation, mmd L2197): Hyp 7.1, q∈π', P 真 π-部分群が A を subnormal に含み K が
+-- ℋ_G*(A;q) 上推移的 ⇒ (a) C_K(P)=O_{π'}(C_G(P)), (b) O_{π'}(C_G(P)) が ℋ_G*(P;q) 上推移的,
+-- (c) ℋ_G*(P;q)⊆ℋ_G*(A;q), (d) P∩N(P)′⊆N(Q)′ かつ N(P)=O_{π'}(C_G(P))(N(P)∩N(Q))。
+-- |P:A| 帰納 + composition series 還元 ((7.3) 不動点 / Hall 共役 / Lem 6.5(a))。§8–§16 で多用。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S07.transitivity_propagates
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
