@@ -579,6 +579,60 @@ noncomputable def coherentYFamily (hyp : SibleyDadeHypothesis G L H) [H.Normal] 
       hirr j⟩)
     (fun _ => rfl) hηinj (fun j => linearIrreducibleCharacter_apply_one (χ j))
 
+/-! ### Peterfalvi (6.8) `X`-characterization (T7): the sets `S(A)`, `X = S − S(Z)`, `Y = S(H')`
+
+mmd 04.8 L150-164.  The (6.8) proof denotes `H' = [H,H]`, sets `Z = Z(H) ∩ H'` in case (A) and
+`Z = W₂` in case (B), and forms `X = S − S(Z)`, `Y = S(H')` (`Z ⊆ H'` makes `X ∩ Y = ∅`).
+`S(A)` is the (6.1) filtration: the members of `S` whose source `θ` has `A` in its kernel. -/
+
+/-- **Peterfalvi (6.1) filtration `S(A)`** in the (6.8) setup: the members `Ind_H^L θ` of `S`
+(`θ ∈ Irr H`, `θ ≠ 1_H`) whose source `θ` has `A` (as a subgroup of `H`) inside its kernel.
+`S(1) = S`, and the (6.8) sets are `X = S − S(Z)` and `Y = S(H')`. -/
+def SsubFiltration (_hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  {φ : ClassFunction ↥L ℂ | ∃ θ : IrreducibleCharacter ↥H,
+    θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H ∧
+    (A.subgroupOf H : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) ∧
+    φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ)}
+
+/-- The (6.8) set `X = S − S(Z)` (the (6.6) `X`-set) for a normal `Z ⊆ Z(H)`. -/
+def Xset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  hyp.S \ hyp.SsubFiltration Z
+
+/-- The (6.8) set `Y = S(H')` (`H' = [H,H]`), the equal-degree family handled by T6. -/
+def Yset (hyp : SibleyDadeHypothesis G L H) : Set (ClassFunction ↥L ℂ) :=
+  hyp.SsubFiltration ⁅H, H⁆
+
+/-- Membership in `S(A)`, unfolded. -/
+theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
+    {φ : ClassFunction ↥L ℂ} :
+    φ ∈ hyp.SsubFiltration A ↔ ∃ θ : IrreducibleCharacter ↥H,
+      θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H ∧
+      (A.subgroupOf H : Set ↥H) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) ∧
+      φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
+  Iff.rfl
+
+/-- Membership in `X = S − S(Z)`, unfolded. -/
+theorem mem_Xset (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {φ : ClassFunction ↥L ℂ} :
+    φ ∈ hyp.Xset Z ↔ φ ∈ hyp.S ∧ φ ∉ hyp.SsubFiltration Z :=
+  Iff.rfl
+
+/-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
+`X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
+nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irreducible. -/
+theorem isIrreducibleCharacter_of_mem_S_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.S) : IsIrreducibleCharacter φ := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hφ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hφ
+  exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
