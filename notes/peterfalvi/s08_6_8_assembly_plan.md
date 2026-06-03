@@ -476,6 +476,23 @@ clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。
 - その後 (assembly, 軽い): T8.10 cover を `Xset Z`/`S₀=xBaseBlock Z` に特殊化(`xSet_finite`/`Xset_closedUnderConjugate`/`Xset_hasNoRealCharacters`/`isIrreducibleCharacter_of_mem_Xset_of_frobenius`/`xBaseBlock_closedUnderConjugate` を供給)→ `xBaseBlock_isCoherent`(h0)+ T8.11(hstepData)→ `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A` → glue X∪Y → capstone。
 - **全 leaf axiom-clean (propext/Classical.choice/Quot.sound), full build 3562 green**。
 
+### J.3 🔴 T8.11 BLOCKER 検証 (2026-06-03 着手→独立監査): DadeChainStep は X で充足不能、engine 手術が真の残務
+
+**結論**: T8.11(per-step `DadeChainStep` instance)は **leaf でなく engine 手術**。`DadeChainStep`/`retarget` が **member 個別 support**(`x.support ⊆ H^#`)を要求するが、X-member `χ=Ind θ` は `χ(1)=|W₁|θ(1)≠0` ⟹ `1∈support`, `1∉H^#` ⟹ 充足不能。これは master-roadmap の 🔴 で、B-surgery round-1 では **未解決**(round-1 は新規 pair の差分 `hdiffsupp`/`hdiffasupp` のみ弱化、member family は手付かず)。§J.1/§I の「engine bug 解消」は member family については **誤り**(訂正)。
+
+**根本原因(コード照合済)**:
+- `zSupportedSpan S A = {φ | φ∈zSpan S ∧ φ.support⊆A}` ⟹ `DadeChainStep.hmemSupp`/`hchi1supp`/`famSupp` は個別 support 要求。
+- `retarget_isCoherent_fromDade_X`(S07:5314)は `hmemSupp`→`hmemTau1 (ν x=τ x)` と `hchi1supp`→`htau1_chi1 (ν chi1=τ chi1)` を `extends_on_supported` 経由で製造。両方 support 必須。
+- **より深い**: core `retarget_isCoherent_of_decompositions`(S07:3309)が `htau1_chi1 : Da.tau1 chi1 = ν chi1` を直接消費。`Da=decompositionDaFromDadeOfDiff` は `ofProjection ... τ ...`(S07:4739)で **`Da.tau1=τ`** ⟹ `htau1_chi1 = (τ chi1 = ν chi1)`、unsupported chi1 で **偽**。adapter だけでなく **core retarget** に届く。
+- 対照: `coherentEqualDegree`(S07:3078, T8.9 を X で構成)は `hsuppdiff` のみ・member support **不要** ⟹ 差分ベース all-at-once は X で動く実証。
+
+**原理的 fix(option A, deep)**: retarget が `ν(χ)` を「`τ chi1=ν chi1` 仮定」でなく **`ν(χ) := τ(χ−a·chi1) + a·ν(chi1)`**(両項 integral: supported 差分の Dade 像 + `ν chi1∈ZIrr`)で **定義** し直す ⟹ `τ chi1=ν chi1` 不要。`hperElem (∀ξ∈ℤ[S₁], ν ξ⊥R(χ))` は ℤ[S₁]=⟨chi1⟩∪{x−aₓchi1 (supported)} 生成で:
+  - (B) `⟨ν chi1,α⟩=0`: `a·ν chi1 = Da.Y`(↑の定義)+ `Da.Y_orthogonal`(struct field: Y⊥R(χ))+ `a≠0`。**solid**。
+  - (A′) `⟨ν(x−aₓchi1),α⟩=⟨τ(x−aₓchi1),α⟩=0`: degree-matched 差分 supported の Dade 像 ⊥ R(χ)(caller 供給、`hmemOrtho` と同形だが supported ⟹ 構成可)。
+  touch = `retarget_isCoherent_of_decompositions`(3309) core + 下流。multi-session 規模。
+**option B(comparable depth)**: `coherentEqualDegree`(差分ベース・running ν 無)を **不等次数に一般化**(generators χⱼ−aⱼχ₁)。τ-vs-ν 整合問題が **構造的に発生しない**(incremental でなく一括)。(6.6) を実質再導出。
+**両者とも (6.6) の真の技術核**(supported-family 用 engine を induced X に拡張)。leaf でなく、どちらも multi-session の新規形式化。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
