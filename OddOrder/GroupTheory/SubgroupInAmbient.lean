@@ -97,6 +97,34 @@ theorem eq_one_of_mem_of_isPiSubgroup_of_zpowers_isPiSubgroup_compl [Finite G]
   rw [hZbot] at hxZ
   exact Subgroup.mem_bot.mp hxZ
 
+/-- A finite subgroup is a pi-subgroup if every element whose cyclic subgroup is a
+pi-complement subgroup is trivial. -/
+theorem isPiSubgroup_of_forall_zpowers_isPiSubgroup_compl_eq_one [Finite G]
+    {π : Set ℕ} {H : Subgroup G}
+    (htriv : ∀ x : G, x ∈ H → Subgroup.IsPiSubgroup πᶜ (Subgroup.zpowers x) → x = 1) :
+    Subgroup.IsPiSubgroup π H := by
+  intro q hq
+  by_contra hq_not_pi
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  obtain ⟨x, hx_order⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥H) q (Nat.mem_primeFactors.mp hq).2.1
+  have hxH : (x : G) ∈ H := x.2
+  have hZpi : Subgroup.IsPiSubgroup πᶜ (Subgroup.zpowers (x : G)) := by
+    intro r hr
+    have hZcard : Nat.card ↥(Subgroup.zpowers (x : G)) = q := by
+      rw [Nat.card_zpowers]
+      exact (orderOf_injective H.subtype (Subgroup.subtype_injective H) x).trans hx_order
+    have hrq : r = q := by
+      rw [hZcard, Nat.Prime.primeFactors (Fact.out : q.Prime), Finset.mem_singleton] at hr
+      exact hr
+    rw [hrq]
+    simpa using hq_not_pi
+  have hx_one : (x : G) = 1 := htriv (x : G) hxH hZpi
+  have hx_sub_one : x = 1 := Subtype.ext hx_one
+  have hq_one : q = 1 := by
+    rw [← hx_order, hx_sub_one, orderOf_one]
+  exact (Fact.out : q.Prime).ne_one hq_one
+
 /-- A q-group is a singleton pi-subgroup. -/
 theorem isPiSubgroup_singleton_of_isPGroup [Finite G] {q : ℕ} [Fact q.Prime]
     {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H := by
