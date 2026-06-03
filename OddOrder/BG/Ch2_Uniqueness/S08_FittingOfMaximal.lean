@@ -909,6 +909,47 @@ theorem isMaxElemAbelianIn_le_centralizer_inf {p : ℕ} {M A₀ : Subgroup G}
   intro y hy
   exact congrArg Subtype.val (hA₀.1.comm ⟨y, hy⟩ ⟨x, hx⟩)
 
+/-- The `p`-complement core of `F(M)` is absorbed by the `p`-complement core of
+`A = C_F(M)(A0)`. This is the formal `O_{p'}(F) ≤ O_{p'}(A)` part of BG (8.8). -/
+theorem opiCoreInG_singleton_compl_fittingInG_le_opiCoreInG_singleton_compl_cFittingInG
+    [Finite G] {p : ℕ} [Fact p.Prime] {M A0 : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M)) :
+    opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ (cFittingInG M A0) := by
+  let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M)
+  change K ≤ opiCoreInG ({p} : Set ℕ)ᶜ (cFittingInG M A0)
+  have hA0_le_OpF : A0 ≤ opiCoreInG ({p} : Set ℕ) (fittingInG M) :=
+    le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+      (fittingInG_isNilpotent M) (isMaxElemAbelianIn_le hA0)
+      hA0.1.isPGroup
+  have hOpF_cent_K : opiCoreInG ({p} : Set ℕ) (fittingInG M) ≤
+      Subgroup.centralizer (K : Set G) := by
+    dsimp [K]
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+    exact opiCoreInG_commutator_compl_eq_bot ({p} : Set ℕ) (fittingInG M)
+  have hK_cent_A0 : K ≤ Subgroup.centralizer (A0 : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    exact (Subgroup.mem_centralizer_iff.mp (hOpF_cent_K (hA0_le_OpF ha)) x hx).symm
+  have hK_A : K ≤ cFittingInG M A0 := by
+    refine le_inf hK_cent_A0 ?_
+    dsimp [K]
+    exact opiCoreInG_le ({p} : Set ℕ)ᶜ (fittingInG M)
+  have hK_norm_A : (K.subgroupOf (cFittingInG M A0)).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hK_A]
+    have hA_le_F : cFittingInG M A0 ≤ fittingInG M := by
+      dsimp [cFittingInG]
+      exact inf_le_right
+    have hF_norm_K : fittingInG M ≤ Subgroup.normalizer (K : Set G) := by
+      dsimp [K]
+      exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M)
+    exact hA_le_F.trans hF_norm_K
+  have hK_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := by
+    dsimp [K]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M)
+  exact le_opiCoreInG_of_normal_of_isPiSubgroup hK_A hK_norm_A hK_pi
+
 /-- If `x` centralizes `C_F(M)(A0)`, then `C_F(M)(A0)` lies in
 `C_F(M)(<x>)`. -/
 theorem cFitting_le_centralizer_zpowers_inf_fittingInG_of_mem_centralizer
@@ -2570,6 +2611,163 @@ theorem opiCoreInG_singleton_fittingInG_ne_bot_of_mem_primeFactors [Finite G]
     rw [← hObot]
     exact hZleO)
 
+/-- BG (8.8), Prop 1.4 bridge: once `D_p = O_p(F(H))` is inside `M`,
+`D_p` centralizes the `p`-complement core of `M`. -/
+theorem opiCoreInG_fittingInG_singleton_le_centralizer_opiCoreInG_singleton_compl_maximal
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hDpM : opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤ M) :
+    opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤
+      Subgroup.centralizer (opiCoreInG ({p} : Set ℕ)ᶜ M : Set G) := by
+  let Dp : Subgroup G := opiCoreInG ({p} : Set ℕ) (fittingInG H)
+  let N : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ M
+  change Dp ≤ Subgroup.centralizer (N : Set G)
+  have hOFM_le_OA : opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ (cFittingInG M A0) :=
+    opiCoreInG_singleton_compl_fittingInG_le_opiCoreInG_singleton_compl_cFittingInG
+      hA0
+  have hOA_le_OH : opiCoreInG ({p} : Set ℕ)ᶜ (cFittingInG M A0) ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ H :=
+    opiCoreInG_cFittingInG_singleton_compl_le_opiCoreInG_singleton_compl
+      hG hM hA0 hHsolv hAH hp
+  have hOFM_le_OH : opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ H :=
+    hOFM_le_OA.trans hOA_le_OH
+  have hDp_cent_OFM : Dp ≤
+      Subgroup.centralizer (opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) : Set G) := by
+    dsimp [Dp]
+    exact opiCoreInG_fittingInG_le_centralizer_of_le_opiCoreInG_compl
+      ({p} : Set ℕ) hOFM_le_OH
+  have hN_M : N ≤ M := by
+    dsimp [N]
+    exact opiCoreInG_le ({p} : Set ℕ)ᶜ M
+  have hDp_norm_N : Dp ≤ Subgroup.normalizer (N : Set G) := by
+    dsimp [N]
+    exact hDpM.trans (le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ M)
+  have hDp_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ) Dp := by
+    dsimp [Dp]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ) (fittingInG H)
+  have hN_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ N := by
+    dsimp [N]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ M
+  have hCop : Nat.Coprime (Nat.card ↥Dp) (Nat.card ↥N) :=
+    coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hDp_pi hN_pi
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_solvable_injective (f := Subgroup.inclusion hN_M)
+      (Subgroup.inclusion_injective hN_M)
+  have hFN_le_OFM : fittingInG N ≤ opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) := by
+    dsimp [N]
+    exact fittingInG_opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_fittingInG M
+  have hDp_cent_FN : Dp ≤ Subgroup.centralizer (fittingInG N : Set G) := by
+    intro d hd
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact Subgroup.mem_centralizer_iff.mp (hDp_cent_OFM hd) y (hFN_le_OFM hy)
+  exact le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
+    hDp_norm_N hCop hDp_cent_FN
+
+/-- BG (8.8): the `p`-complement core of `M` lies in `H` once `D_p` lies in
+`M` and the Prop 1.4 centralizer bridge is available. -/
+theorem opiCoreInG_singleton_compl_maximal_le_of_fittingInG_singleton_le_maximal
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hpM : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hpH : p ∈ (Nat.card ↥(fittingInG H)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hDpM : opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤ M) :
+    opiCoreInG ({p} : Set ℕ)ᶜ M ≤ H := by
+  let Dp : Subgroup G := opiCoreInG ({p} : Set ℕ) (fittingInG H)
+  let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ M
+  change K ≤ H
+  have hDp_H : Dp ≤ H := by
+    dsimp [Dp]
+    exact (opiCoreInG_le ({p} : Set ℕ) (fittingInG H)).trans (fittingInG_le H)
+  have hDp_norm_H : (Dp.subgroupOf H).Normal := by
+    dsimp [Dp]
+    exact opiCoreInG_fittingInG_subgroupOf_normal ({p} : Set ℕ) H
+  have hDp_ne : Dp ≠ ⊥ := by
+    dsimp [Dp]
+    exact opiCoreInG_singleton_fittingInG_ne_bot_of_mem_primeFactors hpH
+  have hNormalizer_Dp_eq_H : Subgroup.normalizer (Dp : Set G) = H :=
+    normalizer_eq_of_normal_of_mem_maximal hG hH hDp_norm_H hDp_ne hDp_H
+  have hDp_cent_K : Dp ≤ Subgroup.centralizer (K : Set G) := by
+    dsimp [Dp, K]
+    exact opiCoreInG_fittingInG_singleton_le_centralizer_opiCoreInG_singleton_compl_maximal
+      hG hM hpM hA0 hHsolv hAH hDpM
+  have hK_cent_Dp : K ≤ Subgroup.centralizer (Dp : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro d hd
+    exact (Subgroup.mem_centralizer_iff.mp (hDp_cent_K hd) x hx).symm
+  exact hK_cent_Dp.trans (by
+    simpa [hNormalizer_Dp_eq_H] using Subgroup.centralizer_le_normalizer (Dp : Set G))
+
+/-- BG (8.8), reverse inclusion: once `O_{p'}(M)` lies in `H`, it is absorbed by
+`O_{p'}(H)`. -/
+theorem opiCoreInG_singleton_compl_maximal_le_opiCoreInG_singleton_compl_of_le_maximal
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hOMH : opiCoreInG ({p} : Set ℕ)ᶜ M ≤ H) :
+    opiCoreInG ({p} : Set ℕ)ᶜ M ≤ opiCoreInG ({p} : Set ℕ)ᶜ H := by
+  let R : Subgroup G := centerFittingOpCoreInG p M
+  let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ M
+  let NH : Subgroup G := Subgroup.normalizer (R : Set G) ⊓ H
+  let CH : Subgroup G := Subgroup.centralizer (R : Set G) ⊓ H
+  change K ≤ opiCoreInG ({p} : Set ℕ)ᶜ H
+  have hR_H : R ≤ H := by
+    dsimp [R]
+    exact (centerFittingOpCoreInG_le_cFittingInG (q := p) hA0).trans hAH
+  have hR_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ) R := by
+    dsimp [R, centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ) (centerFittingInG M)
+  have hR_ne : R ≠ ⊥ := by
+    dsimp [R]
+    exact centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hp
+  have hNormalizer_R_eq_M : Subgroup.normalizer (R : Set G) = M := by
+    dsimp [R]
+    exact normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM hR_ne
+  have hK_NH : K ≤ NH := by
+    intro x hx
+    refine ⟨?_, hOMH hx⟩
+    have hxM : x ∈ M := by
+      dsimp [K] at hx
+      exact opiCoreInG_le ({p} : Set ℕ)ᶜ M hx
+    simpa [hNormalizer_R_eq_M] using hxM
+  have hK_norm_NH : (K.subgroupOf NH).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hK_NH]
+    intro x hx
+    have hxM : x ∈ M := by
+      have hxN : x ∈ Subgroup.normalizer (R : Set G) := hx.1
+      simpa [hNormalizer_R_eq_M] using hxN
+    dsimp [K]
+    exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ M hxM
+  have hK_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := by
+    dsimp [K]
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ M
+  have hK_le_ONH : K ≤ opiCoreInG ({p} : Set ℕ)ᶜ NH :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hK_NH hK_norm_NH hK_pi
+  have hONH_le_OCH : opiCoreInG ({p} : Set ℕ)ᶜ NH ≤ opiCoreInG ({p} : Set ℕ)ᶜ CH := by
+    dsimp [NH, CH]
+    exact opiCoreInG_singleton_compl_normalizer_inf_le_centralizer_inf hR_H hR_pi
+  have hR_p : IsPGroup p ↥R :=
+    OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hR_pi
+  have hOCH_le_OH : opiCoreInG ({p} : Set ℕ)ᶜ CH ≤ opiCoreInG ({p} : Set ℕ)ᶜ H := by
+    dsimp [CH]
+    exact OddOrder.BG.Ch2.S07.opiCoreInG_centralizer_inf_le_opiCoreInG
+      hHsolv hR_H hR_p
+  exact hK_le_ONH.trans (hONH_le_OCH.trans hOCH_le_OH)
+
 /-- BG (8.8), first inclusion: if `D = F(H)` is already contained in `M`, then
 `O_{p'}(H)` is contained in `O_{p'}(M)`. -/
 theorem opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_of_fittingInG_le_maximal
@@ -2813,7 +3011,62 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
       opiCoreInG ({p} : Set ℕ)ᶜ M :=
     opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_of_fittingInG_le_maximal
       hG hM hH_mem hpFittingH hFittingH_le_M hOpComplH_le_M
-  sorry
+  have hDpH_le_M : opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤ M :=
+    (opiCoreInG_le ({p} : Set ℕ) (fittingInG H)).trans hFittingH_le_M
+  have hOpComplM_le_H : opiCoreInG ({p} : Set ℕ)ᶜ M ≤ H :=
+    opiCoreInG_singleton_compl_maximal_le_of_fittingInG_singleton_le_maximal
+      hG hM hH_mem hp hpFittingH hA₀ hH_solvable hAH_cFitting hDpH_le_M
+  have hOpComplM_le_OpComplH : opiCoreInG ({p} : Set ℕ)ᶜ M ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ H :=
+    opiCoreInG_singleton_compl_maximal_le_opiCoreInG_singleton_compl_of_le_maximal
+      hG hM hp hA₀ hH_solvable hAH_cFitting hOpComplM_le_H
+  have hOpCompl_eq : opiCoreInG ({p} : Set ℕ)ᶜ H =
+      opiCoreInG ({p} : Set ℕ)ᶜ M :=
+    le_antisymm hOpComplH_le_OpComplM hOpComplM_le_OpComplH
+  obtain ⟨r, hrFM, hrp⟩ :=
+    exists_primeFactor_ne_of_mem_primeFactor_not_isPGroup
+      (H := ↥(fittingInG M)) hp hFnp p
+  haveI hRprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hrFM⟩
+  have hBr_ne : centerFittingOpCoreInG r M ≠ ⊥ :=
+    centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hrFM
+  have hBr_le_OpComplM : centerFittingOpCoreInG r M ≤
+      opiCoreInG ({p} : Set ℕ)ᶜ M :=
+    centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
+      hG hM hA₀ (hG.solvable_of_mem_maximalSubgroups hM) (by
+        dsimp [cFittingInG]
+        exact inf_le_right.trans (fittingInG_le M)) hp hrFM (fun hpr => hrp hpr.symm)
+  have hOpComplM_ne : opiCoreInG ({p} : Set ℕ)ᶜ M ≠ ⊥ := by
+    intro hbot
+    exact hBr_ne (le_bot_iff.mp (by
+      rw [← hbot]
+      exact hBr_le_OpComplM))
+  have hOpComplH_ne : opiCoreInG ({p} : Set ℕ)ᶜ H ≠ ⊥ := by
+    rw [hOpCompl_eq]
+    exact hOpComplM_ne
+  have hOpComplH_H : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ H :=
+    opiCoreInG_le ({p} : Set ℕ)ᶜ H
+  have hOpComplH_norm_H : ((opiCoreInG ({p} : Set ℕ)ᶜ H).subgroupOf H).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hOpComplH_H]
+    exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ H
+  have hNormalizer_OpComplH_eq_H :
+      Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ H : Set G) = H :=
+    normalizer_eq_of_normal_of_mem_maximal hG hH_mem hOpComplH_norm_H
+      hOpComplH_ne hOpComplH_H
+  have hOpComplM_M : opiCoreInG ({p} : Set ℕ)ᶜ M ≤ M :=
+    opiCoreInG_le ({p} : Set ℕ)ᶜ M
+  have hOpComplM_norm_M : ((opiCoreInG ({p} : Set ℕ)ᶜ M).subgroupOf M).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hOpComplM_M]
+    exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ M
+  have hNormalizer_OpComplM_eq_M :
+      Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ M : Set G) = M :=
+    normalizer_eq_of_normal_of_mem_maximal hG hM hOpComplM_norm_M
+      hOpComplM_ne hOpComplM_M
+  calc
+    H = Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ H : Set G) :=
+      hNormalizer_OpComplH_eq_H.symm
+    _ = Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ M : Set G) := by
+      rw [hOpCompl_eq]
+    _ = M := hNormalizer_OpComplM_eq_M
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
