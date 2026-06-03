@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.GroupTheory.OpResidual
 
 /-!
 # Subgroup constructions realized in the ambient group
@@ -47,6 +48,25 @@ theorem card_opiCoreInG (π : Set ℕ) (H : Subgroup G) :
     Nat.card ↥(opiCoreInG π H) = Nat.card ↥(Ch03.oPiCore π ↥H) :=
   (Nat.card_congr (Subgroup.equivMapOfInjective _ H.subtype
     H.subtype_injective).toEquiv).symm
+
+/-- `opiCoreInG π H` is a `π`-subgroup (ambient form of `oPiCore.isPiGroup`). -/
+theorem isPiSubgroup_opiCoreInG [Finite G] (π : Set ℕ) (H : Subgroup G) :
+    Subgroup.IsPiSubgroup π (opiCoreInG π H) := by
+  intro r hr
+  rw [card_opiCoreInG] at hr
+  exact Ch03.oPiCore.isPiGroup π r hr
+
+/-- A `{q}`-subgroup is a `q`-group. -/
+theorem isPGroup_of_isPiSubgroup_singleton [Finite G] {q : ℕ} [Fact q.Prime]
+    {H : Subgroup G} (hH : Subgroup.IsPiSubgroup {q} H) : IsPGroup q ↥H :=
+  IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
+    (fun {d} hd hdvd => Set.mem_singleton_iff.mp
+      (hH d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))))
+
+/-- `O_q(H)` in the ambient group is a `q`-group. -/
+theorem isPGroup_opiCoreInG_singleton [Finite G] {q : ℕ} [Fact q.Prime]
+    (H : Subgroup G) : IsPGroup q ↥(opiCoreInG ({q} : Set ℕ) H) :=
+  isPGroup_of_isPiSubgroup_singleton (isPiSubgroup_opiCoreInG ({q} : Set ℕ) H)
 
 /-- **`H` normalizes `O_π(H)`** (in the ambient group): the `π`-core is characteristic
 in `↥H`, so conjugation by an element of `H` (which restricts to an automorphism of
