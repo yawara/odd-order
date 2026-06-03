@@ -1791,6 +1791,30 @@ theorem exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top {
   rw [Ne, OddOrder.RepresentationTheory.linearIrreducibleCharacter_eq_trivial_iff]
   exact hφ
 
+/-- **Peterfalvi (6.2): `S(A)` is non-empty when `K/A` is non-trivial.**  If `A ◁ K` is normal with
+`K/A` of non-trivial abelianization (in particular when `K/A` is a non-trivial solvable group, e.g.
+`A ⊊ K` with `K` solvable), then `K` carries a non-trivial irreducible character `θ` of degree `1`
+with `A ⊆ ker θ` — i.e. a member of `S(A) = {Ind_K^L θ | θ ∈ Irr K, A ⊆ ker θ, θ ≠ 1}`.
+
+This is the concrete, `(K, A)`-level existence ingredient for the (6.2) degree bound: it inflates
+the degree-one character produced on the section `K/A`
+(`exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`) back up to `K` via
+`OddOrder.RepresentationTheory.inflate`, transporting non-triviality
+(`inflate_eq_trivial_iff`), the kernel containment (`subset_characterKernel_inflate`) and the
+degree (`inflate_apply_one`). -/
+theorem exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top {K : Type*}
+    [Group K] [Finite K] (N : Subgroup K) [N.Normal] (h : commutator (K ⧸ N) ≠ ⊤) :
+    ∃ θ : IrreducibleCharacter K,
+      θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter K ∧
+      (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction K ℂ) ∧
+      (θ : ClassFunction K ℂ) (1 : K) = 1 := by
+  obtain ⟨χbar, hne, hdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top h
+  refine ⟨OddOrder.RepresentationTheory.inflate N χbar, ?_,
+    OddOrder.RepresentationTheory.subset_characterKernel_inflate N χbar, ?_⟩
+  · rw [Ne, OddOrder.RepresentationTheory.inflate_eq_trivial_iff]; exact hne
+  · rw [OddOrder.RepresentationTheory.inflate_apply_one]; exact hdeg
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
