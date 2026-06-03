@@ -723,7 +723,7 @@ instance fitting.normal (G : Type*) [Group G] : (fitting G).Normal := by
 Sylow が 1 つ. `noncommPiCoprod` 経由で `(∀ p ∈ pf(|N|), Sylow p N) →* N` を作り,
 互いに素な p-群より単射 (`independent_of_coprime_order`), 濃度比較で全射 ⇒ range = ⊤.
 range = `⨆ p, ↑(default Sylow)` (by `noncommPiCoprod_range`). -/
-private theorem iSup_default_sylow_eq_top_of_nilpotent
+theorem iSup_default_sylow_eq_top_of_nilpotent
     (N : Type*) [Group N] [Finite N] [Group.IsNilpotent N] :
     ⨆ p : (Nat.card N).primeFactors,
         ((default : Sylow (p : ℕ) N) : Subgroup N) = ⊤ := by
