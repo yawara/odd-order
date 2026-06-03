@@ -557,6 +557,29 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 
 **残 step 4-5 (本丸・(5.6.1)/(5.6.2) λ-form)**: member family `vc i=νχᵢ`(i over S₁ の有限 enum)を用意し、λ-form `Da.Y=a·νχ₁−λ∑rᵢνχᵢ+Z` を `⟨τ(χ−a·chi1),ν(χⱼ−aⱼchi1)⟩=⟨χ−a·chi1,χⱼ−aⱼchi1⟩`(`inner_dade_extension_of_supported` を δ=χⱼ−aⱼchi1 supported で適用)から係数計算 → 既存 `lambda_eq_zero_and_Z_eq_zero`(S07:1852, vc 自由)+ degree 不等式(c)で λ=0,Z=0 → collapse。**注意**: 既存 `Y_eq_nsmul_tau1_of_lambdaForm`(S07:1940)は vc i₁=D.tau1 chi1=τchi1 に hardwire ⟹ 不使用、`lambda_eq_zero_and_Z_eq_zero` 直叩き。member enum + λ-form 組立が残 work(multi-session)。
 
+#### J.3.5 ✅✅ crux1 完全 discharge — λ-form collapse capstone landed (2026-06-04)
+
+**crux1 → coherence の全 lemma chain が build-green・axiom-clean で landed**(step 4-5 含む全 step 完了):
+1. `inner_dade_extension_of_supported`(foundational cross-term, e1253de)
+2. `crux1_of_collapse`(端部代数, 60cdf56)
+3. `memberExtensionDecomposition`((5.5) member ν-aux, 4f6a19f)
+4. `inner_dadeDiff_conjDifference_eq_zero` + `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(差分 support family ⊥, 992c0c3)
+5. `inner_decomposition_X_extension_member_eq_zero` + `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`(member R-直交 assembled, b2c6a45)
+6. `inner_Y_extension_member_eq`((5.6.1) member coefficient `⟨Da.Y,νχⱼ⟩=a·⟨χ₁,χⱼ⟩−(a+μ)·aⱼ`, 88aaef1)
+7. `exists_indexed_intProjection_of_orthonormal_ZIrr`(indexed 直交射影, 1b368c4)
+8. **`crux1_of_memberFamily`(CAPSTONE: λ-form collapse ⟹ crux1, 8461d5c)** — indexed projection + 係数同定 `cᵢ=a·[i=i₁]−λ·aᵢ`(λ=a+μ, μ=⟨τ(χ−a·χ₁),νχ₁⟩∈ℤ via `inner_mem_ZIrr_int`)+ `lambda_eq_zero_and_Z_eq_zero`(degree 不等式 2a<∑aᵢ²)⟹ λ=0 ⟹ **μ=−a = crux1**。
+9. `retarget_isCoherent_of_extensionImage`(bridge: crux1 ⟹ coherence, e982181)
+
+⟹ **crux1 は X-family enumeration data の関数として完全証明済**。`crux1_of_memberFamily` の仮説 = case-A 用 (X⊆Irr L, ‖χᵢ‖²=1): finite orthonormal member family {χmem i}⊆S₁ + `hcoeffval`(= `inner_Y_extension_member_eq` を per-member 適用)+ a₁=1 + degree 不等式 + `Da`(=`decompositionDaFromDadeOfDiff`)+ Da.Y∈ZIrr + νχᵢ∈ZIrr 注入。
+
+**残 = 最終 assembly のみ(math 完了, glue 残)**: T8 backbone の X-family enum(`Xset Z`/`xBaseBlock`/`exists_conjugatePairCover` の conjugate-pair chain)を上記 lemma に wire:
+- per-step: `inner_Y_extension_member_eq`(member R-直交 + foundational cross-term から hcoeffval)→ `crux1_of_memberFamily`(crux1)→ `retarget_isCoherent_of_extensionImage`(coherence adjoin)。
+- chain: `xBaseBlock_isCoherent`(base)から conjugate-pair cover を induction で adjoin → `IsCoherent τ (Xset) A`。= **DadeChainStep 代替の per-step glue**(notes §J.3.1 step 5)。
+- 必要な X-family 固有 fact: 各 adjoined χ の `decompositionDaFromDadeOfDiff` 構成、degree 不等式(= (6.6) prime-power gap `two_mul_lt_sq_of_primePow_gap` S07:1696)、Da.Y∈ZIrr、νχᵢ∈ZIrr(coherence engine が供給)。
+- その後: glue X∪Y → capstone `sibleySetup_is_coherent`(S08 唯一の sorry)。
+
+**全 math lemma 完了ゆえ残は mechanical-ish wiring(但し T8 enum との接続は非自明・substantial)。**
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
