@@ -1581,6 +1581,51 @@ private theorem scn_ambient {p : ℕ} {G : Type*} [Group G] {P : Sylow p G} {A :
     rw [h.selfCentralizing] at hmem
     rwa [Subgroup.mem_subgroupOf] at hmem
 
+/-- **Coprime decomposition reduction** (for special case 2): if `z` normalizes `W` coprimely and
+both `C_W(z) = W ⊓ C_G(z)` and `⁅⟨z⟩, W⁆` lie in `L`, then `W ≤ L`. From the coprime decomposition
+`W = C_W(z)·⁅W,z⁆` (`fixedPoints_sup_actionCommutator_eq_top`): the `fixedPoints` summand is
+`C_W(z)` and the `actionCommutator` summand is `⁅⟨z⟩, W⁆`, both `≤ L`. -/
+private theorem le_of_centralizer_inf_le_of_commutator_le {G : Type*} [Group G] [Finite G]
+    {z : G} {W : Subgroup G} (hzW : z ∈ Subgroup.normalizer W)
+    (hcop : Nat.Coprime (orderOf z) (Nat.card ↥W)) {L : Subgroup G}
+    (hcent : W ⊓ Subgroup.centralizer ({z} : Set G) ≤ L)
+    (hcomm : ⁅Subgroup.zpowers z, W⁆ ≤ L) :
+    W ≤ L := by
+  classical
+  have hzpW : Subgroup.zpowers z ≤ Subgroup.normalizer W := Subgroup.zpowers_le.mpr hzW
+  have hW_inv : Ch03.IsAInvariant (conjAction (Subgroup.zpowers z)) W :=
+    isAInvariant_conjAction_iff.mpr hzpW
+  have hCop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers z)) (Nat.card ↥W) := by
+    rw [Nat.card_zpowers]; exact hcop
+  have htop := OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+    (φ := hW_inv.restrict) hCop' (Or.inl inferInstance)
+  rw [← Subgroup.subgroupOf_eq_top, eq_top_iff, ← htop, sup_le_iff]
+  refine ⟨?_, ?_⟩
+  · -- `fixedPoints ≤ L.subgroupOf W`: a fixed point centralizes `z`.
+    intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    refine hcent (Subgroup.mem_inf.mpr ⟨x.2, ?_⟩)
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    rw [Set.mem_singleton_iff] at hw
+    rw [hw]
+    have hval := congrArg Subtype.val
+      (Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨z, Subgroup.mem_zpowers z⟩)
+    rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+    simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hval
+    exact mul_inv_eq_iff_eq_mul.mp hval
+  · -- `actionCommutator ≤ L.subgroupOf W`: each generator is a `⁅z, w⁆`.
+    rw [OddOrder.Isaacs.Ch04.actionCommutator_le_iff]
+    intro a g
+    rw [Subgroup.mem_subgroupOf]
+    have hgen : (((hW_inv.restrict a) g * g⁻¹ : ↥W) : G)
+        = (a : G) * (g : G) * (a : G)⁻¹ * (g : G)⁻¹ := by
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, Ch03.IsAInvariant.restrict_apply_val]
+      simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply]
+      group
+    rw [hgen]
+    exact hcomm (Subgroup.commutator_mem_commutator a.2 g.2)
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
