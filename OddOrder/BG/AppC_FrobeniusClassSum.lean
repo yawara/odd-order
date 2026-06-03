@@ -1322,6 +1322,109 @@ theorem normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le
   have hU_nonneg : (0 : ℝ) ≤ (Nat.card (normOneUnits p q) : ℝ) := by positivity
   linarith
 
+
+/-- A single non-kernel summand in the concrete class-sum formula is bounded by
+`|U| * |χ(1_field)|^2 * |χ(2_field)|`, assuming the character degree is at least
+`|U|`.  The remaining q≥5 work is to supply this degree lower bound for the
+non-kernel characters. -/
+theorem normOneFrobeniusClassSumConcreteTerm_norm_le_of_normOneUnits_card_le_degree
+    [Fact p.Prime] {χ : IrreducibleCharacter (normOneFrobeniusGroup p q)}
+    (hχdeg : (Nat.card (normOneUnits p q) : ℝ) ≤
+      ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q))‖) :
+    ‖normOneFrobeniusClassSumConcreteTerm p q χ‖ ≤
+      (Nat.card (normOneUnits p q) : ℝ) *
+        Complex.normSq
+          ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q)) *
+        ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+            normOneFrobeniusGroup p q))‖ := by
+  let Uc : ℂ := (Nat.card (normOneUnits p q) : ℂ)
+  let Ur : ℝ := (Nat.card (normOneUnits p q) : ℝ)
+  let a : ℂ :=
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+        normOneFrobeniusGroup p q)
+  let b : ℂ :=
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+        normOneFrobeniusGroup p q)
+  let d : ℂ :=
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (1 : normOneFrobeniusGroup p q)
+  have hd_ne : d ≠ 0 := by
+    obtain ⟨n, hn, hnχ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+    dsimp [d]
+    rw [hnχ]
+    exact Nat.cast_ne_zero.mpr (ne_of_gt hn)
+  have hd_pos : 0 < ‖d‖ := norm_pos_iff.mpr hd_ne
+  have hU_norm : ‖Uc‖ = Ur := by
+    simp [Uc, Ur]
+  have hfrac : Ur / ‖d‖ ≤ 1 := (div_le_one hd_pos).mpr (by simpa [Ur, d] using hχdeg)
+  have hU_nonneg : 0 ≤ Ur := by positivity
+  have ha_nonneg : 0 ≤ ‖a‖ := norm_nonneg _
+  have hb_nonneg : 0 ≤ ‖b‖ := norm_nonneg _
+  calc
+    ‖normOneFrobeniusClassSumConcreteTerm p q χ‖
+        = ((Ur * ‖a‖) * (Ur * ‖a‖) / ‖d‖) * ‖b‖ := by
+            simp [normOneFrobeniusClassSumConcreteTerm, Ur, a, b, d]
+    _ = Ur * (Ur / ‖d‖) * (‖a‖ ^ 2 * ‖b‖) := by ring
+    _ ≤ Ur * 1 * (‖a‖ ^ 2 * ‖b‖) := by
+          gcongr
+    _ = Ur * Complex.normSq a * ‖b‖ := by
+          rw [Complex.normSq_eq_norm_sq]
+          ring
+
+open scoped Classical in
+/-- If every non-kernel character has degree at least `|U|`, the whole
+non-kernel contribution is bounded by the corresponding column-norm sum. -/
+theorem normOneFrobeniusNonKernelContribution_norm_le_sum_of_degree_ge
+    [Fact p.Prime]
+    (hdeg : ∀ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+      ¬ normOneFrobeniusKernelCharacterPred p q χ →
+        (Nat.card (normOneUnits p q) : ℝ) ≤
+          ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (1 : normOneFrobeniusGroup p q))‖) :
+    ‖normOneFrobeniusNonKernelContribution p q‖ ≤
+      ∑ χ ∈ Finset.univ.filter
+          (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+            ¬ normOneFrobeniusKernelCharacterPred p q χ),
+        (Nat.card (normOneUnits p q) : ℝ) *
+          Complex.normSq
+            ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+                normOneFrobeniusGroup p q)) *
+          ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+              normOneFrobeniusGroup p q))‖ := by
+  unfold normOneFrobeniusNonKernelContribution
+  calc
+    ‖∑ χ ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+          ¬ normOneFrobeniusKernelCharacterPred p q χ),
+        normOneFrobeniusClassSumConcreteTerm p q χ‖
+        ≤ ∑ χ ∈ Finset.univ.filter
+            (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+              ¬ normOneFrobeniusKernelCharacterPred p q χ),
+            ‖normOneFrobeniusClassSumConcreteTerm p q χ‖ := norm_sum_le _ _
+    _ ≤ ∑ χ ∈ Finset.univ.filter
+            (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+              ¬ normOneFrobeniusKernelCharacterPred p q χ),
+          (Nat.card (normOneUnits p q) : ℝ) *
+            Complex.normSq
+              ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+                (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+                  normOneFrobeniusGroup p q)) *
+            ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+                normOneFrobeniusGroup p q))‖ := by
+        refine Finset.sum_le_sum ?_
+        intro χ hχ
+        exact normOneFrobeniusClassSumConcreteTerm_norm_le_of_normOneUnits_card_le_degree
+          p q (χ := χ) (hdeg χ (Finset.mem_filter.mp hχ).2)
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
