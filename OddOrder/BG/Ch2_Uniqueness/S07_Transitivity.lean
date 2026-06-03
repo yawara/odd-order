@@ -1266,6 +1266,80 @@ private theorem le_opiCoreInG_normalizer_self [Finite G] {π : Set ℕ} {Q : Sub
   le_opiCoreInG_of_normal_of_isPiSubgroup Subgroup.le_normalizer
     Subgroup.normal_in_normalizer hQpi
 
+/-- **`opiCoreInG` is `MulAut`-equivariant**: `φ • O_π(H) = O_π(φ • H)`. The `π`-core
+`oPiCore π ↥H` is characteristic, so the iso `↥H ≃* ↥(φ•H)` induced by `φ` carries it onto
+`oPiCore π ↥(φ•H)` (`oPiCore.map_eq_of_mulEquiv`); mapping back along the subtypes agrees with
+applying `φ`. -/
+private theorem conj_smul_opiCoreInG [Finite G] (π : Set ℕ) (φ : MulAut G) (H : Subgroup G) :
+    φ • opiCoreInG π H = opiCoreInG π (φ • H) := by
+  -- `φ` restricts to an isomorphism `↥H ≃* ↥(φ • H)`.
+  have hHmap : H.map (φ : G →* G) = φ • H := (mulAut_smul_eq_map φ H).symm
+  let e : ↥H ≃* ↥(φ • H) :=
+    (Subgroup.equivMapOfInjective H (φ : G →* G) φ.injective).trans
+      (MulEquiv.subgroupCongr hHmap)
+  have hcomp : (φ • H).subtype.comp (e : ↥H →* ↥(φ • H)) = (φ : G →* G).comp H.subtype := by
+    ext x; rfl
+  calc φ • opiCoreInG π H
+      = (opiCoreInG π H).map (φ : G →* G) := mulAut_smul_eq_map φ _
+    _ = ((Ch03.oPiCore π ↥H).map H.subtype).map (φ : G →* G) := rfl
+    _ = (Ch03.oPiCore π ↥H).map ((φ : G →* G).comp H.subtype) := by rw [Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥H).map ((φ • H).subtype.comp (e : ↥H →* ↥(φ • H))) := by rw [hcomp]
+    _ = ((Ch03.oPiCore π ↥H).map (e : ↥H →* ↥(φ • H))).map (φ • H).subtype := by
+        rw [← Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥(φ • H)).map (φ • H).subtype := by
+        rw [Ch03.oPiCore.map_eq_of_mulEquiv]
+    _ = opiCoreInG π (φ • H) := rfl
+
+/-- **`N_G(A)` normalizes `K = O_{π'}(C_G(A))`**: for `x ∈ N_G(A)`, conjugation fixes `C_G(A)`
+(centralizer of the normalized `A`) and hence (by equivariance) its `π'`-core `K`. -/
+private theorem conj_smul_kSubgroup_eq [Finite G] {A : Subgroup G} {x : G}
+    (hx : x ∈ Subgroup.normalizer A) :
+    MulAut.conj x • kSubgroup A = kSubgroup A := by
+  have hAeq : MulAut.conj x • A = A := conj_smul_eq_self_of_mem_normalizer hx
+  have hCeq : MulAut.conj x • Subgroup.centralizer (A : Set G)
+      = Subgroup.centralizer (A : Set G) := by
+    ext y
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+    constructor
+    · intro hy a ha
+      -- `x⁻¹ y x` centralizes `A`, applied to `x⁻¹ a x ∈ A`.
+      have haxA : x⁻¹ * a * x ∈ A := by
+        have hmem : MulAut.conj x⁻¹ a ∈ MulAut.conj x⁻¹ • A :=
+          Subgroup.smul_mem_pointwise_smul_iff.mpr ha
+        have hAeq' : MulAut.conj x⁻¹ • A = A := by
+          conv_lhs => rw [← hAeq]
+          rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+        rw [hAeq'] at hmem
+        simpa only [MulAut.conj_apply, inv_inv] using hmem
+      have hconj : ((MulAut.conj x)⁻¹ • y) = x⁻¹ * y * x := by
+        rw [← map_inv]
+        simp only [MulAut.smul_def, MulAut.conj_apply, inv_inv]
+      have hc := hy (x⁻¹ * a * x) haxA
+      rw [hconj] at hc
+      -- `(x⁻¹ax)(x⁻¹yx) = (x⁻¹yx)(x⁻¹ax)` ⟹ `a y = y a` by cancellation.
+      have hkey : x⁻¹ * (a * y) * x = x⁻¹ * (y * a) * x := by
+        calc x⁻¹ * (a * y) * x = (x⁻¹ * a * x) * (x⁻¹ * y * x) := by group
+          _ = (x⁻¹ * y * x) * (x⁻¹ * a * x) := hc
+          _ = x⁻¹ * (y * a) * x := by group
+      exact mul_left_cancel (mul_right_cancel hkey)
+    · intro hy a ha
+      have hconj : ((MulAut.conj x)⁻¹ • y) = x⁻¹ * y * x := by
+        rw [← map_inv]
+        simp only [MulAut.smul_def, MulAut.conj_apply, inv_inv]
+      rw [hconj]
+      -- goal `a * (x⁻¹yx) = (x⁻¹yx) * a`. Use `y` centralizes `x a x⁻¹ ∈ A`.
+      have haxA : x * a * x⁻¹ ∈ A := by
+        have hmem : MulAut.conj x a ∈ MulAut.conj x • A :=
+          Subgroup.smul_mem_pointwise_smul_iff.mpr ha
+        rw [hAeq] at hmem
+        simpa only [MulAut.conj_apply] using hmem
+      have hc := hy (x * a * x⁻¹) haxA
+      calc a * (x⁻¹ * y * x) = x⁻¹ * ((x * a * x⁻¹) * y) * x := by group
+        _ = x⁻¹ * (y * (x * a * x⁻¹)) * x := by rw [hc]
+        _ = x⁻¹ * y * x * a := by group
+  rw [kSubgroup, conj_smul_opiCoreInG, hCeq]
+
 /-- **`ℋ_⊤(A;π)` は `N_G(A)`-共役で安定** (C_G(A) 版 `conj_smul_mem_hInvariant_top` の N_G(A) 拡張)。
 `g` が `A` を (conj 作用で) 不変にすれば `conj g • Q` も `A`-不変。 -/
 private theorem conj_smul_mem_hInvariant_of_normalizer {A : Subgroup G} {π : Set ℕ}
