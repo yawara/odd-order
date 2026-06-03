@@ -2068,6 +2068,65 @@ private theorem tp_card_hStar_dvd_kSubgroup [Finite G] {A : Subgroup G} {q : ℕ
   rw [hcard_orbit] at hdvd
   exact hdvd
 
+/-- **Theorem 7.4(c) base case** (mmd L2222-2232): `A ⊴ P` with `|P:A| = p` prime ⟹
+`ℋ*(P;q) ⊆ ℋ*(A;q)`. For `Q ≠ ⊥` it is `tp_c_main`; for `Q = ⊥` (so `ℋ*(P;q) = {⊥}`), (7.3)
+gives a `P`-normalized `Q₀ ∈ ℋ*(A;q)`, and `⊥`'s maximality in `ℋ(P;q)` forces `Q₀ = ⊥`. -/
+private theorem tp_c_full [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
+    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (hAP : A ≤ P) [hAnormal : (A.subgroupOf P).Normal]
+    (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P) {p : ℕ} (hp : p.Prime)
+    (hindex : (A.subgroupOf P).index = p)
+    (htrans : ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q})) :
+    hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q} := by
+  -- `p ∈ π = primesOf A`, so `p ∤ |K|`, hence `p ∤ |ℋ*(A;q)|`.
+  have hp_pi : p ∈ primesOf A := by
+    refine hP_pi p (Nat.mem_primeFactors.mpr ⟨hp, ?_, Nat.card_pos.ne'⟩)
+    have hdvd : (A.subgroupOf P).index ∣ Nat.card ↥P := by
+      rw [← Subgroup.index_mul_card (A.subgroupOf P)]; exact Dvd.intro _ rfl
+    rw [hindex] at hdvd; exact hdvd
+  have hpdvd : ¬ p ∣ Nat.card ↥(hInvariantStar ⊤ A {q}) := by
+    intro hpd
+    have hdvdK : p ∣ Nat.card ↥(kSubgroup A) :=
+      hpd.trans (tp_card_hStar_dvd_kSubgroup htrans)
+    exact (isPiSubgroup_kSubgroup A p (Nat.mem_primeFactors.mpr ⟨hp, hdvdK, Nat.card_pos.ne'⟩)) hp_pi
+  intro Q hQ
+  by_cases hQbot : Q = ⊥
+  · -- `Q = ⊥`: use (7.3) and maximality.
+    subst hQbot
+    obtain ⟨Q₀, hQ₀star, hPnQ₀⟩ :=
+      tp_exists_normalized_of_prime_index hAP hp hindex hpdvd
+    have hQ₀_hInvP : Q₀ ∈ hInvariant ⊤ P {q} :=
+      ⟨le_top, hPnQ₀, hInvariantStar_isPiSubgroup hQ₀star⟩
+    have hbot_eq : Q₀ = ⊥ := hInvariantStar_eq_of_le hQ hQ₀_hInvP bot_le
+    rw [← hbot_eq]; exact hQ₀star
+  · exact tp_c_main hG hA hq hAP hP_pi hQ hQbot
+
+/-- **BG Theorem 7.4 base case** (`A ⊴ P` with `|P:A|` prime): conjuncts (a)/(b)/(c)/(d). -/
+private theorem tp_base [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
+    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (hAP : A ≤ P) [hAnormal : (A.subgroupOf P).Normal]
+    (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P) (hPlt : P < ⊤) (hPne : P ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hindex : (A.subgroupOf P).index = p)
+    (htrans : ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q})) :
+    Subgroup.centralizer (P : Set G) ⊓ kSubgroup A =
+        opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)) ∧
+    ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
+        (hInvariantStar ⊤ P {q}) ∧
+    hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q} ∧
+    (∀ Q ∈ hInvariantStar ⊤ P {q},
+      P ⊓ derivedInG (Subgroup.normalizer P) ≤ derivedInG (Subgroup.normalizer Q) ∧
+      ∀ n : G, n ∈ Subgroup.normalizer P →
+        ∃ c ∈ opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)),
+          ∃ m ∈ Subgroup.normalizer P ⊓ Subgroup.normalizer Q, n = c * m) := by
+  have hcsub : hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q} :=
+    tp_c_full hG hA hq hAP hP_pi hp hindex htrans
+  have hbpart : ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
+      (hInvariantStar ⊤ P {q}) :=
+    tp_b hG hA hq hAP hP_pi hPlt htrans hcsub
+  refine ⟨tp_centralizer_eq hG hA hAP, hbpart, hcsub, ?_⟩
+  intro Q hQ
+  exact tp_d hG hq hAP hP_pi hPlt hPne hbpart hQ
+
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
 
