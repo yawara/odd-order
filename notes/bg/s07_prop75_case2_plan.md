@@ -26,9 +26,12 @@
 - **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。`P₁=C_P(b)`,`P₂` Sylow⊇P₁, `Z⊆Z(P₁)⊆O_{p',p}`(Thm6.1),
   `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(=hspec(a) for z 生成元∈Z(P); `le_opiCoreInG_centralizer_of_mem_centralizer_sylow`✅)
   ⟹(per-b 橋 `le_opiCoreInG_of_le_opiCoreInG_centralizer`✅, X=C_G(b), z) `C_Y(Z)⊆O_{p'}(C_G(b))`,
-  `Y=C_Y(Z)·[Y,Z]`。**🔴 要新規インフラ (repo/mathlib に無し, 確認済 2026-06-03)**:
-  (i) **coprime 分解 `Y=C_Y(Z)·[Y,Z]` for NON-ABELIAN Y** = Gorenstein 5.3.5 / Isaacs coprime action (~100 LOC);
-  (ii) **`Z⊆Z(P₁)⊆O_{p',p}(C_G(b))`** = P₁=C_P(b), P₂ Sylow⊇P₁ (|P₂:P₁|≤p via 7.4), Z(P₁)⊴P₂, Thm6.1。
+  `Y=C_Y(Z)·[Y,Z]`。**要 assembly (新インフラ不要・ingredient 確認済 2026-06-03)**:
+  (i) **coprime 分解 `Y=C_Y(Z)·[Y,Z]` for NON-ABELIAN Y** — **ingredient あり**: `coprime_fixedPoints_quotient`
+    (Ch04, C_{Y/N}(A)=C_Y(A)N/N lift) + **Lemma 4.29** `⁅Y,A,A⁆=⁅Y,A⁆` (Ch04, actionCommutator 版) で
+    N=⁅Y,Z⁆ に対し Y/N で A 自明作用 ⟹ Y/N=C_{Y/N}=C_Y(Z)N/N ⟹ Y=C_Y(Z)·N。**Thm 4.34 は abelian 版** (CommGroup)
+    なので非可換 Y にはこの assembly が要 (~60-80 LOC);
+  (ii) **`Z⊆Z(P₁)⊆O_{p',p}(C_G(b))`** = P₁=C_P(b), P₂ Sylow⊇P₁ (|P₂:P₁|≤p via 7.4), Z(P₁)⊴P₂, Thm6.1 (~50 LOC)。
 - **(c) B-construction** (E_p² in A, ⊴P): Z(P) noncyclic→B∈E_p²(Z(P))⊆Z(P) (全 b∈Z(P), special1=(a)で hspec);
   Z(P) cyclic→B=⟨b⟩×Z, Z=Ω₁(Z(P)) (special2=(b))。G 2.6.4。
   **🔴 要新規インフラ**: noncyclic 側 = **finite abelian p-group `¬IsCyclic ⟹ E_p²`** (gateway 対偶 `isCyclic_of_card_pow_eq_one_le`, ~50 LOC); cyclic 側 = G 2.6.4 + `(Ω₁(A)/Z)∩Z(P/Z)≠1` の B 持ち上げ。
