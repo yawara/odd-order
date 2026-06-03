@@ -945,6 +945,70 @@ theorem hInvariant_inf_fittingInG_cFittingInG_eq_bot [Finite G]
     simpa [OddOrder.BG.Ch2.S07.primesOf] using hr
   exact hInvariant_inf_eq_bot_of_isPiSubgroup hFpi hY
 
+/-- BG (8.4), centralizer step: for `q ∈ π(F(M))`, the subgroup
+`C_Y(O_q(Z(F(M))))` centralizes `A = C_F(M)(A0)` for every `A`-invariant
+`π(A)`-complement subgroup `Y`. -/
+theorem centralizer_centerFittingOpCoreInG_inf_hInvariant_le_centralizer_cFittingInG
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime]
+    {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Subgroup.centralizer (centerFittingOpCoreInG q M : Set G) ⊓ Y ≤
+      Subgroup.centralizer (cFittingInG M A0 : Set G) := by
+  let A : Subgroup G := cFittingInG M A0
+  let C : Subgroup G := Subgroup.centralizer (centerFittingOpCoreInG q M : Set G) ⊓ Y
+  change C ≤ Subgroup.centralizer (A : Set G)
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+  have hC_le_M : C ≤ M := by
+    dsimp [C]
+    exact inf_le_left.trans
+      (centralizer_le_maximal_of_centerFittingOpCoreInG_le_fitting_primeFactor
+        hG hM hq le_rfl)
+  have hA_le_F : A ≤ fittingInG M := by
+    dsimp [A, cFittingInG]
+    exact inf_le_right
+  have hM_norm_F : M ≤ Subgroup.normalizer (fittingInG M : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (fittingInG_le M)).mp
+      (fittingInG_subgroupOf_normal M)
+  have hC_norm_F : C ≤ Subgroup.normalizer (fittingInG M : Set G) :=
+    hC_le_M.trans hM_norm_F
+  have hcomm_le_Y : ⁅C, A⁆ ≤ Y := by
+    have hYA : ⁅Y, A⁆ ≤ Y :=
+      OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer (hInvariant_le_normalizer hY)
+    exact (Subgroup.commutator_mono (by dsimp [C]; exact inf_le_right) le_rfl).trans hYA
+  have hcomm_le_F : ⁅C, A⁆ ≤ fittingInG M := by
+    rw [Subgroup.commutator_comm C A]
+    exact (Subgroup.commutator_mono hA_le_F le_rfl).trans
+      (OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hC_norm_F)
+  have hcomm_le_YF : ⁅C, A⁆ ≤ Y ⊓ fittingInG M := by
+    intro x hx
+    exact ⟨hcomm_le_Y hx, hcomm_le_F hx⟩
+  exact le_bot_iff.mp (by
+    rw [← hInvariant_inf_fittingInG_cFittingInG_eq_bot hA0 hY]
+    exact hcomm_le_YF)
+
+/-- BG (8.4), centralizer vanishing in the non-p-group case: for `q ∈ π(F(M))`,
+`C_Y(O_q(Z(F(M)))) = 1`. -/
+theorem centralizer_centerFittingOpCoreInG_inf_hInvariant_eq_bot_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Subgroup.centralizer (centerFittingOpCoreInG q M : Set G) ⊓ Y = ⊥ := by
+  have hC_le_cent :=
+    centralizer_centerFittingOpCoreInG_inf_hInvariant_le_centralizer_cFittingInG
+      hG hM hA0 hq hY
+  have hY_cent_bot :=
+    hInvariant_inf_centralizer_cFittingInG_eq_bot_of_not_pGroup hG hM hA0 hFnp hY
+  exact le_bot_iff.mp (by
+    rw [← hY_cent_bot]
+    exact le_inf inf_le_right hC_le_cent)
+
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
 theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
