@@ -1322,7 +1322,6 @@ noncomputable def xAdjoinStep
         OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁)
     (hmembarS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ).conj ∈ S₁)
-    (hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i : ClassFunction ↥L ℂ) ∈ ZIrr G)
     (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
       (χmem i : ClassFunction ↥L ℂ).conj = 0)
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
@@ -1351,6 +1350,10 @@ noncomputable def xAdjoinStep
       (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
   classical
+  -- The ZIrr-codomain of each member is now recorded by the coherence's `extension_mem_ZIrr` field
+  -- (`χmem i ∈ S₁ ⊆ ℤ[S₁]`), so it need not be passed as a hypothesis (route A).
+  have hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i : ClassFunction ↥L ℂ) ∈ ZIrr G :=
+    fun i hi => hS₁.extension_mem_ZIrr _ (Submodule.subset_span (hmemS1 i hi))
   -- The trivially-derived orthogonalities `χ, χ̄ ⊥ a·χ₁` for the χ-decomposition `Da`.
   have hχaχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ)
       (a • (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
@@ -1510,7 +1513,6 @@ structure XAdjoinStepInput
       OddOrder.Peterfalvi.S04.supportInSubgroup A L
   hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁
   hmembarS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ).conj ∈ S₁
-  hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i : ClassFunction ↥L ℂ) ∈ ZIrr G
   hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
     (χmem i : ClassFunction ↥L ℂ).conj = 0
   hmemortho : ∀ i ∈ s, ∀ j ∈ s,
@@ -1551,7 +1553,7 @@ noncomputable def XAdjoinStepInput.adjoin
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
   xAdjoinStep hyp hconj hS₁ χ inp.hrealχ inp.hdiffsuppχ inp.hχχ inp.hχbarχbar inp.hχχbar inp.hχbarχ
     inp.hχ_S1 inp.hχbar_S1 inp.s inp.χmem inp.deg inp.i₁ inp.hi₁ inp.hmemreal inp.hmemdiffsupp
-    inp.hmemdegdiffsupp inp.hmemS1 inp.hmembarS1 inp.hmemνZ inp.hmemconjortho inp.hmemortho
+    inp.hmemdegdiffsupp inp.hmemS1 inp.hmembarS1 inp.hmemconjortho inp.hmemortho
     inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg inp.hSgen inp.hgen
 
 /-- **(T-A2) The X-family coherence chain fold.**
