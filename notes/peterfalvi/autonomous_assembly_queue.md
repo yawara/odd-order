@@ -167,17 +167,27 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   ((6.3) arith) / isPGroup_of_quotient_of_subgroup (p-群拡大) / Abelianization.map_surjective +
   subsingleton_of_isPGroup_of_not_dvd (汎用) / **isPGroup_of_isNilpotent_of_isPGroup_abelianization
   ((6.5)(b) reduction core)** / two_mul_add_one_le_of_odd_dvd ((6.5)(a) arith)。
-  **残 substantial (6.2 gateway, 文字理論)** — 全て framework 依存 or API gap (clean brick 尽きた):
-  - **B1** = Sibley packaging (framework ((6.1)/(6.4)) 要)
-  - **B2-orbit** = induced-char W₁-orbit counting (`card_mul_inner_self_induce_eq_card_inertia` 基盤)
-  - **θ-bound section** = Clifford (中心 case `θ(1)²≤|K:A|, A⊆Z(K)` は **landed `exists_degree_sq_le_index` で済**;
-    section case D/B⊆Z(C/B) は Clifford restriction 要)
-  - **linear-char ingredient** (S(A) が degree-1 char 持つ): `exists_apply_ne_one_of_hasEnoughRootsOfUnity`
-    は **`HasEnoughRootsOfUnity ℂ` instance absent** (`AlgebraicClosure F` 用のみ) ⟹ ℂ⟶AlgClosure bridge or
-    **codebase rep theory** (IrreducibleCharacter count = conjClass count, nontrivial⟹≥2 irr) 経由要。
-  - **(6.5)(c)** = Frattini absent (上述)。
-  これらは focused multi-iteration effort ((6.5)(b) の ~10 iteration と同様の API navigation/bridge 構築で攻略可)。
-  **次着手推奨 = Sibley framework ((6.1)/(6.4) structure)** — B1/(6.2)/(6.3)/(6.5)-full の共通基盤ゆえ最高レバレッジ。
+  **🆕 (6.2) 精密分解 (2026-06-04, mmd 04.8 L7-22 精読)** — (6.2) 証明は **5 ingredient**:
+  - **step2 (S(A) 非空)** = ✅✅ **LANDED this session** (existence layer 4 補題):
+    `exists_monoidHom_units_ne_one_of_commutator_ne_top` (Γ→*ℂˣ) → `_irreducibleCharacter_ne_trivial_degree_one_`
+    → `_subset_kernel_` (= θ∈S(A)) + `inflate_trivial`/`inflate_eq_trivial_iff` (InflationCharacter.lean)。
+    **earlier「`HasEnoughRootsOfUnity ℂ` absent」で blocked と誤判定 → `IsSepClosed.hasEnoughRootsOfUnity` instance
+    (ℂ sep closed + char 0) を `NeZero ((exponent:ℂ))` provision で発火させ攻略**。commits 6243ef1/9797ed4/684c9ac。
+  - **step4b (`∑_{θ∈T}θ(1)²=|K:A|−1`)** = ✅ **LANDED** (`sumInflatedDegreeSq_ntrivial`, B2 core, T≅Irr(K/A)∖1)。
+  - **step4a (B2-orbit, `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_Tθ(1)²`)** = 🔶 残, **pure 文字理論 (framework 不要)**。
+    **proof sketch (導出済)**: T を L-共役で軌道分割。χ=Ind_K^Lθ, χ(1)=|L:K|θ(1) (`induce_apply_one`✅),
+    ‖χ‖²=[I_L(θ):K] (`card_mul_inner_self_induce_eq_card_inertia`✅ |H|‖Indθ‖²=|I| + `subgroup_le_inertia`✅),
+    軌道サイズ=[L:I] (orbit-stab), Indθ=Indθ' ⟺ 同軌道 (Mackey/Clifford)。
+    χ(1)²/‖χ‖²=|L:K|²θ(1)²/[I:K]=|L:K|·[L:I]θ(1)² (∵|L:K|=[L:I][I:K]); ∑_T=∑_軌道[L:I]θ(1)²。
+    ~100 行 (軌道分割 Finset + fiber 対応 + orbit-stab)、fresh focus 推奨。
+  - **step3/5 (B1 = 5.6 quantitative, `2ψ(1)≥|K:A|−1`)** = 🔴 残, **Pf Thm 5.6 (quantitative coherence) keystone 要**。
+  - **step6 (θ-bound `θ(1)≤|K:C|√|C:D|`)** = 🔴 残。**中心 case `θ(1)²≤|K:Z|, Z⊆Z(K)` = ✅ `exists_degree_sq_le_index`**。
+    **🆕 重要: (6.6) p-群 path (mmd 04.8 L80) は [Is]Cor2.30 = 中心 case を直接使う (✅済)**; section case
+    (D/B⊆Z(C/B)) は (6.3) 一般形でのみ (Clifford restriction 要)。
+  - **(6.5)(c)** = Frattini absent (上述, ただし (6.5)(b)✅ ゆえ (6.8) critical path 非必須見込み)。
+  **次着手推奨**: (a) **B2-orbit** (self-contained 文字理論, proof sketch 確定済, framework 不要で着手可能) →
+  (b) **Pf Thm 5.6 quantitative coherence** (= B1 keystone, (6.2)/(6.3)/(6.6) 共通) → (c) **θ-bound section**。
+  framework は IsCoherent (S07) 既存; 残 keystone は **Thm 5.6 の量的不等式**。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
