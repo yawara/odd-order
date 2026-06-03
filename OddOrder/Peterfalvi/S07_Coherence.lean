@@ -990,7 +990,7 @@ structure CharacterPsiDecomposition (τ : IntegralCharacterMap L G)
   access is on `χ - ψ` or `χ - χ̄`, both in `ℤ[χ, χ̄, ψ]`). -/
   tau1_inner_eq_on_support :
     ∀ φ ζ : ClassFunction L ℂ,
-      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      φ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} → ζ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} →
       ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ
   /-- `τ₁` coincides with `τ` on `χ - χ̄`. -/
   tau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj)
@@ -1050,7 +1050,7 @@ noncomputable def ofProjection
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
     (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
-      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      φ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} → ζ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} →
       ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem : tau1 (χ - ψ) ∈ ZIrr G)
@@ -1124,20 +1124,31 @@ noncomputable def decompositionPair {a : ℕ} {chi1 : ClassFunction L ℂ}
   -- shared lattice `{χ, χ̄, 0, a·χ₁}`, so the lattice-relative inner-preservation specializes by
   -- `Submodule.span_mono`.  This is exactly how the Dade isometry supplies both decompositions:
   -- one preservation fact on the supported span covers every difference generator.
-  have hsub0 : ({χ, χ.conj, (0 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
-      {χ, χ.conj, 0, a • chi1} := by
-    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
-  have hsuba : ({χ, χ.conj, (a • chi1 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
-      {χ, χ.conj, 0, a • chi1} := by
-    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
+  -- Each per-`ψ` *difference* sublattice `ℤ[χ−χ̄, χ−ψ]` sits inside the shared (supported) span
+  -- `ℤ[χ, χ̄, 0, a·χ₁]` (its generators `χ−χ̄`, `χ−ψ` are differences of the shared generators), so
+  -- the full inner-preservation restricts to it.
+  have hle0 : zSpan (L := L) ({χ - χ.conj, χ - 0} : Set (ClassFunction L ℂ)) ≤
+      zSpan (L := L) ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction L ℂ)) :=
+    Submodule.span_le.mpr (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl <;>
+        exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp)))
+  have hlea : zSpan (L := L) ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)) ≤
+      zSpan (L := L) ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction L ℂ)) :=
+    Submodule.span_le.mpr (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl <;>
+        exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp)))
   (ofProjection imageFamily tau1
-      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
-        (Submodule.span_mono hsub0 hφ) (Submodule.span_mono hsub0 hζ))
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ (hle0 hφ) (hle0 hζ))
       htau1_agrees htau1_mem0
       (by rw [ClassFunction.inner_zero_right]) (by rw [ClassFunction.inner_zero_right]) hχχbar,
     ofProjection imageFamily tau1
-      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
-        (Submodule.span_mono hsuba hφ) (Submodule.span_mono hsuba hζ))
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ (hlea hφ) (hlea hζ))
       htau1_agrees htau1_mema hχaχ1 hχbaraχ1 hχχbar)
 
 /-- The two decompositions produced by `decompositionPair` share their auxiliary isometry: their
@@ -1163,19 +1174,17 @@ theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
         hχχ1 hχbarχ1 hχχbar).1).tau1 χ :=
   rfl
 
-/-- `χ - χ̄ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the conjugate difference. -/
+/-- `χ - χ̄ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the conjugate difference (it is a
+generator). -/
 theorem chi_sub_conj_mem_zSpan_support :
-    χ - χ.conj ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
-  Submodule.sub_mem _
-    (Submodule.subset_span (by simp))
-    (Submodule.subset_span (by simp))
+    χ - χ.conj ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} :=
+  Submodule.subset_span (by simp)
 
-/-- `χ - ψ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the `ψ`-difference. -/
+/-- `χ - ψ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the `ψ`-difference (it is a
+generator). -/
 theorem chi_sub_psi_mem_zSpan_support :
-    χ - ψ ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
-  Submodule.sub_mem _
-    (Submodule.subset_span (by simp))
-    (Submodule.subset_span (by simp))
+    χ - ψ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} :=
+  Submodule.subset_span (by simp)
 
 /-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
 theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
@@ -3406,6 +3415,140 @@ noncomputable def retarget_isCoherent_of_decompositions_and_memberFamily
 
 open scoped Classical in
 open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.3) per-step coherence from the SUPPORTED decomposition alone (X-family).**
+
+The `ψ = 0` decomposition `D₀` of `retarget_isCoherent_of_decomposition[s]` requires `τ₁χ ∈ ℤ[Irr G]`,
+which fails for an *unsupported* induced `χ = Ind θ` (there `τ` is an off-support arbitrary
+extension, so `τχ ∉ ℤ[Irr G]`).  This variant routes coherence entirely through the **supported**
+decomposition `Da` of `χ − a·χ₁` (built from `(χ − a·χ₁)^{τ₁} ∈ ℤ[Irr G]`, which holds because the
+degree-matched difference `χ − a·χ₁` vanishes at `1` and is supported on `A`): the target image is
+`X := Da.X`, and the `{X, X̄}` orthonormality is *derived* from `Da` via the (5.4.a) keystone
+`inner_self_chi_eq_sum_coeff` and the total-norm identity `inner_self_chi_add_psi_eq` — **never**
+`τχ ∈ ZIrr`.  The remaining inputs are those of `retarget_isCoherent_of_decompositions` minus the
+`ψ = 0` decomposition `D₀` and the `τ₁`-agreement, plus the member norm `‖χ₁‖² = 1`. -/
+noncomputable def retarget_isCoherent_of_supportedDecomposition
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    (hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ Da.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  subst hχbar_eq
+  -- `himg` from the supported decomposition (the (5.6.2) image equation).
+  have himg : τ (χ - a • chi1) = Da.X - a • hS₁.extension chi1 :=
+    image_eq_of_decomposition hS₁ Da htau1_diff hY htau1_chi1
+  -- `⟨a•χ₁, a•χ₁⟩ = a²`, `⟨τ₁χ₁, τ₁χ₁⟩ = ⟨χ₁,χ₁⟩ = 1`, hence `⟨Y, Y⟩ = a²`.
+  have hpsipsi : ClassFunction.inner (a • chi1 : ClassFunction L ℂ) (a • chi1) = (a : ℂ) ^ 2 := by
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a chi1]
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hchi1chi1,
+      star_natCast]
+    ring
+  have hextchi1 : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = 1 := by
+    rw [hS₁.extension_inner_eq chi1 chi1 (Submodule.subset_span hchi1)
+      (Submodule.subset_span hchi1), hchi1chi1]
+  have hYY : ClassFunction.inner Da.Y Da.Y = (a : ℂ) ^ 2 := by
+    rw [hY]
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a (Da.tau1 chi1)]
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, htau1_chi1,
+      hextchi1, star_natCast]
+    ring
+  -- `‖X‖² = 1` from the total-norm identity `‖χ‖² + ‖a•χ₁‖² = ‖X‖² + ‖Y‖²`.
+  have hXX : ClassFunction.inner Da.X Da.X = 1 := by
+    have h := Da.inner_self_chi_add_psi_eq
+    rw [hχχ, hpsipsi, hYY] at h
+    linear_combination -h
+  -- `⟨X, (χ−χ̄)^τ⟩ = ∑ coeff = ⟨χ,χ⟩ = 1` (the (5.4.a) keystone, supported route).
+  have hXtau : ClassFunction.inner Da.X (τ (χ - χ.conj)) = 1 := by
+    rw [Da.imageFamily.image_eq, Da.inner_X_sum, ← Da.inner_self_chi_eq_sum_coeff, hχχ]
+  have hXtau' : ClassFunction.inner (τ (χ - χ.conj)) Da.X = 1 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hXtau, star_one]
+  -- `‖(χ−χ̄)^τ‖² = ‖χ−χ̄‖² = 2` (isometry of `τ₁` on the supported difference).
+  have htautau : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) = 2 := by
+    rw [← Da.tau1_agrees, Da.tau1_inner_eq_on_support (χ - χ.conj) (χ - χ.conj)
+        (CharacterPsiDecomposition.chi_sub_conj_mem_zSpan_support (χ := χ) (ψ := a • chi1))
+        (CharacterPsiDecomposition.chi_sub_conj_mem_zSpan_support (χ := χ) (ψ := a • chi1)),
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      hχχ, hχbarχbar, hχχbar, hχbarχ]
+    ring
+  -- `{X, X̄}` orthonormality, `X̄ := X − (χ−χ̄)^τ`.
+  have hXbarXbar : ClassFunction.inner (Da.X - τ (χ - χ.conj)) (Da.X - τ (χ - χ.conj)) = 1 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      hXX, hXtau, hXtau', htautau]; ring
+  have hXXbar : ClassFunction.inner Da.X (Da.X - τ (χ - χ.conj)) = 0 := by
+    rw [ClassFunction.inner_sub_right, hXX, hXtau]; ring
+  have hXbarX : ClassFunction.inner (Da.X - τ (χ - χ.conj)) Da.X = 0 := by
+    rw [ClassFunction.inner_sub_left, hXX, hXtau']; ring
+  -- The running images `τ₁ ξ` (`ξ ∈ ℤ[S₁]`) are orthogonal to `X` and `X̄` (from `hperElem`).
+  have hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) Da.X = 0 := fun ξ hξ =>
+    Da.inner_X_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
+  have hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) (Da.X - τ (χ - χ.conj)) = 0 := fun ξ hξ =>
+    Da.inner_conjImage_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
+  exact retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ hXX hXbarXbar hXXbar hXbarX
+    hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
+/-- **(5.6.3) supported per-step coherence, `hperElem` discharged from the member family (X-family).**
+
+The X-family analogue of `retarget_isCoherent_of_decompositions_and_memberFamily`: routes through the
+supported decomposition `Da` only (no `ψ=0` `D₀`, no `τχ ∈ ZIrr`), discharging the per-element
+`R(χ)`-orthogonality `hperElem` from the per-member `ψ = 0` decompositions `Dmem` of `S₁` (mmd L77,
+"`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)"). -/
+noncomputable def retarget_isCoherent_of_supportedDecomposition_and_memberFamily
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    (Dmem : (x : ClassFunction L ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := L) (G := G) τ x 0)
+    (hmemOrtho : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal Da.imageFamily)
+    (hmemTau1 : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 x = hS₁.extension x)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  have hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ Da.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0 := by
+    intro ξ hξ α hα
+    refine inner_extension_orthogonal_imageSet_of_members hS₁.extension ?_ hξ
+    intro x hx
+    exact inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily (Dmem x hx)
+      (hmemOrtho x hx) (hmemTau1 x hx) hα
+  exact retarget_isCoherent_of_supportedDecomposition hS₁ Da hχbar_eq hχχ hχbarχbar hχχbar hχbarχ
+    hchi1chi1 hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY htau1_chi1 hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence from a shared-isometry decomposition pair.**
 
 The full (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` with the two
@@ -4477,6 +4620,128 @@ noncomputable def dadeOrthonormalCharacterImageFamily
   -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
 
+/-- **R(χ) from the Dade isometry, with only the DIFFERENCE `χ̄ − χ` supported (X-family).**
+
+The orthonormal image family `R(χ)` with `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α`, built from the Dade base
+map — but requiring only that the *difference* `χ̄ − χ` is supported in `CF(L,A)`, **not** the
+individual supports `hχsupp`/`hχbarsupp` of `dadeOrthonormalCharacterImageFamily`.  This is what the
+(6.8) `X`-family needs: an induced `χ = Ind_H^L θ` has `χ(1) = |W₁|θ(1) ≠ 0`, so `χ` itself is NOT
+supported (`1 ∉ A = H^#`), yet the conjugate difference `χ̄ − χ` vanishes at `1` and is supported on
+`H^#`.
+
+The Dade `CF(L,A)`-isometry is applied on the **difference set** `D = {0, χ̄ − χ}` (both supported:
+`0` trivially, `χ̄ − χ` by hypothesis), into which both keystone differences
+`irreducibleCharacterDifference fam i` (`= 0` for `i = 0`, `= χ̄ − χ` for `i = 1`) land — exactly the
+generators the (1.4)/(2.6.a) keystone uses.  No `χ`/`χ̄` individual support is touched.
+`dadeOrthonormalCharacterImageFamily` (individual supports) is recovered as the special case where
+`hdiffsupp` is derived from `hχsupp`, `hχbarsupp`. -/
+noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L) :
+    OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ_def
+  set fam : Fin 2 → IrreducibleCharacter (↥L) := conjPairFamily (L := ↥L) χ with hfam
+  have hfam0 : (fam 0 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ) := by
+    simp [hfam, conjPairFamily]
+  have hfam1 : (fam 1 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ).conj := by
+    simp [hfam, conjPairFamily]
+  -- `irreducibleCharacterDifference fam i = fam i − fam 0`: `0` for `i = 0`, `χ̄ − χ` for `i = 1`.
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 =
+      (χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ) := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  -- Each keystone difference is supported in `CF(L,A)`.
+  have hdiff_supp : ∀ i,
+      (irreducibleCharacterDifference fam i).support ⊆ supportInSubgroup A L := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]; simp
+    · rw [hdiff1]; exact hdiffsupp
+  -- The supported difference set `D = {0, χ̄ − χ}`, and the keystone differences land in `ℤ[D]`.
+  set D : Set (ClassFunction (↥L) ℂ) :=
+    {(0 : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)}
+    with hD
+  have hDsupp : ∀ s ∈ D, s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [hD, Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · simp
+    · exact hdiffsupp
+  have hdiff_in_D : ∀ i, irreducibleCharacterDifference fam i ∈ zSpan (L := ↥L) D := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]; exact Submodule.subset_span (by simp [hD])
+    · rw [hdiff1]; exact Submodule.subset_span (by simp [hD])
+  -- (1.4) hypotheses, all from the difference support.
+  have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ fam := by
+    intro i
+    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i) ?_
+    refine Submodule.sub_mem _ ?_ (fam 0).mem_ZIrr
+    exact (fam i).mem_ZIrr
+  have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ fam := by
+    intro i
+    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+  have hisom : ∀ i j,
+      ClassFunction.inner (isometryDifferenceImage τ fam i) (isometryDifferenceImage τ fam j) =
+        ClassFunction.inner (irreducibleCharacterDifference fam i)
+          (irreducibleCharacterDifference fam j) := by
+    intro i j
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hDsupp
+      (hdiff_in_D i) (hdiff_in_D j)
+  exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
+
+/-- **The supported per-step decomposition `Da` of `χ − a·χ₁`, for an UNSUPPORTED `χ` (X-family).**
+
+Builds `Da : CharacterPsiDecomposition τ χ (a·χ₁)` directly via `ofProjection` — **not**
+`decompositionPair`, which also builds the `ψ=0` `D₀` requiring the unprovable `τχ ∈ ZIrr`.  This is
+now constructible for an unsupported induced X-member `χ = Ind θ` thanks to the difference-sublattice
+weakening of `tau1_inner_eq_on_support`: the auxiliary isometry `τ₁ = τ` only needs inner-preservation
+on `ℤ[χ−χ̄, χ−a·χ₁]` (both supported differences — supplied by
+`dadeIntegralCharacterMap_inner_eq_on_supported_span` on the difference set `{χ−χ̄, χ−a·χ₁}`), and the
+`ZIrr`-membership only on `χ − a·χ₁` (`htau1_mema`, the degree-matched difference vanishing at `1`).
+`R(χ)` is the difference-support family `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
+noncomputable def decompositionDaFromDadeOfDiff
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L)
+    (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
+      (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0) :
+    CharacterPsiDecomposition (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) (a • chi1) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ
+  -- The difference set `{χ−χ̄, χ−a·χ₁}` is supported (`χ−χ̄` via `hdiffsupp` up to sign).
+  have hSdiff : ∀ s ∈ ({(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
+      (χ : ClassFunction (↥L) ℂ) - a • chi1} : Set (ClassFunction (↥L) ℂ)),
+      s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [show (χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj =
+          -((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)) by abel,
+        ClassFunction.support_neg]
+      exact hdiffsupp
+    · exact hdiffasupp
+  exact CharacterPsiDecomposition.ofProjection
+    (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp) τ
+    (fun φ ζ hφ hζ =>
+      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSdiff hφ hζ)
+    rfl htau1_mema hχaχ1 hχbaraχ1 hχχbar'
+
 /-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
 
 `⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in `CF(L,A)`
@@ -4681,7 +4946,7 @@ theorem dade_Y_collapse_of_family
     (hfam_supp : ∀ i ∈ s, (B.chiFam i).support ⊆ supportInSubgroup A L)
     (hchi1_supp : chi1.support ⊆ supportInSubgroup A L)
     (hchi1_ZIrr : chi1 ∈ ZIrr (↥L))
-    (hχ_supp : χ.support ⊆ supportInSubgroup A L)
+    (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
     (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
       CharacterPsiDecomposition (L := ↥L) (G := G)
         (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
@@ -4695,15 +4960,17 @@ theorem dade_Y_collapse_of_family
         (ClassFunction.inner (B.chiFam i) (B.chiFam i)).re) :
     Da.Y = a • Da.tau1 chi1 := by
   classical
-  set S₀ : Set (ClassFunction (↥L) ℂ) := insert χ (insert chi1 (B.chiFam '' ↑s)) with hS₀def
+  -- Generator set uses the supported difference `χ − a·χ₁` (NOT bare `χ`): the isometry is only ever
+  -- applied to family members and to differences, so no individual `χ`-support is needed (X-family).
+  set S₀ : Set (ClassFunction (↥L) ℂ) := insert ((χ : ClassFunction (↥L) ℂ) - a • chi1)
+    (insert chi1 (B.chiFam '' ↑s)) with hS₀def
   have hS₀supp : ∀ x ∈ S₀, x.support ⊆ supportInSubgroup A L := by
     intro x hx
     simp only [hS₀def, Set.mem_insert_iff, Set.mem_image, Finset.mem_coe] at hx
     rcases hx with rfl | rfl | ⟨i, hi, rfl⟩
-    · exact hχ_supp
+    · exact hdiffasupp
     · exact hchi1_supp
     · exact hfam_supp i hi
-  have hχ_mem : χ ∈ zSpan (L := ↥L) S₀ := Submodule.subset_span (by simp [hS₀def])
   have hchi1_mem : chi1 ∈ zSpan (L := ↥L) S₀ :=
     Submodule.subset_span (by simp [hS₀def])
   have hfam_zspan : ∀ i ∈ s, B.chiFam i ∈ zSpan (L := ↥L) S₀ := fun i hi =>
@@ -4711,7 +4978,7 @@ theorem dade_Y_collapse_of_family
       simp only [hS₀def, Set.mem_insert_iff, Set.mem_image, Finset.mem_coe]
       exact Or.inr (Or.inr ⟨i, hi, rfl⟩))
   have hdiff_zspan : χ - a • chi1 ∈ zSpan (L := ↥L) S₀ :=
-    Submodule.sub_mem _ hχ_mem (nsmul_mem hchi1_mem a)
+    Submodule.subset_span (by simp [hS₀def])
   have hfamdiff_zspan : ∀ i ∈ s, B.chiFam i - B.ratio i • chi1 ∈ zSpan (L := ↥L) S₀ := fun i hi =>
     Submodule.sub_mem _ (hfam_zspan i hi) (nsmul_mem hchi1_mem _)
   -- the norm function `mc i = ‖χᵢ‖²` (real and positive).
@@ -5034,6 +5301,73 @@ noncomputable def retarget_isCoherent_fromDade
     (hS₁.extends_on_supported chi1 hchi1supp).symm
     hgen
 
+open OddOrder.RepresentationTheory in
+/-- **The (5.6) Dade-base coherence step for an UNSUPPORTED induced X-member (X-family).**
+
+The X-family analogue of `retarget_isCoherent_fromDade`: adjoins `{χ, χ̄}` for an unsupported
+`χ = Ind_H^L θ` (`χ(1) ≠ 0`, `1 ∉ A`), routing through the supported decomposition `Da` of the
+degree-matched difference `χ − a·χ₁` (`decompositionDaFromDadeOfDiff`) into the supported-route
+adapter `retarget_isCoherent_of_supportedDecomposition_and_memberFamily` — **no** `ψ=0` `D₀`, **no**
+`τχ ∈ ZIrr`.  Individual supports `hχsupp`/`hχbarsupp`/`haχ1supp` are replaced by the difference
+supports `hdiffsupp : (χ̄ − χ) ∈ CF(L,A)` and `hdiffasupp : (χ − a·χ₁) ∈ CF(L,A)` (both vanish at
+`1`).  `htau1_diff` and `Da.tau1 = τ` are structural (`rfl`); `hY` is the (5.6.2) collapse. -/
+noncomputable def retarget_isCoherent_fromDade_X
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A')
+    (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L)
+    (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
+      (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1)
+    (hχbarχbar :
+      ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ).conj = 1)
+    (hχbarχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
+    (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0)
+    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := ↥L) (G := G)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
+    (hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A')
+    (hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal
+        (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp))
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (hchi1supp : chi1 ∈ zSupportedSpan (L := ↥L) S₁ A')
+    (hY :
+      (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+        hχaχ1 hχbaraχ1 hχχbar').Y =
+        a • (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+          hχaχ1 hχbaraχ1 hχχbar').tau1 chi1)
+    (hgen : zSupportedSpan (L := ↥L) (S₁ ∪ {(χ : ClassFunction (↥L) ℂ),
+        (χ : ClassFunction (↥L) ℂ).conj}) A' ⊆
+      Submodule.span ℤ (zSupportedSpan (L := ↥L) S₁ A' ∪
+        {(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
+         (χ : ClassFunction (↥L) ℂ) - a • chi1})) :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
+  retarget_isCoherent_of_supportedDecomposition_and_memberFamily hS₁
+    (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+      hχaχ1 hχbaraχ1 hχχbar')
+    rfl hχχ hχbarχbar hχχbar' hχbarχ hchi1chi1
+    Dmem hmemOrtho
+    (fun x hx => by
+      rw [hmemTau1Base x hx, (hS₁.extends_on_supported x (hmemSupp x hx)).symm])
+    hχ_S1 hχbar_S1 hchi1
+    rfl hY
+    (hS₁.extends_on_supported chi1 hchi1supp).symm
+    hgen
+
 /-- **The genuine per-step (6.6) content, after the Dade isometry has supplied everything it can.**
 
 `DadeChainStep hyp hconj S₁ A χ` bundles the inputs of one (5.6) adjoining step
@@ -5072,14 +5406,17 @@ structure DadeChainStep
   a : ℕ
   /-- `χ` is non-real (Peterfalvi (1.1)). -/
   hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ)
-  /-- `χ` is supported in `CF(L,A)`. -/
-  hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
-  /-- `χ̄` is supported in `CF(L,A)`. -/
-  hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L
+  /-- The conjugate difference `χ̄ − χ` is supported in `CF(L,A)` (vanishes at `1`).  Replaces the
+  individual `χ`/`χ̄` supports — an induced X-member `χ = Ind θ` has `χ(1) ≠ 0`, so `χ` is *not*
+  supported, but `χ̄ − χ` is. -/
+  hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+    supportInSubgroup A L
   /-- `χ₁ ∈ ℤ[Irr L]`. -/
   hchi1Z : chi1 ∈ ZIrr (↥L)
-  /-- `a·χ₁` is supported in `CF(L,A)`. -/
-  haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L
+  /-- The degree-matched difference `χ − a·χ₁` is supported in `CF(L,A)` (vanishes at `1`). -/
+  hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L
+  /-- `‖χ₁‖² = 1`. -/
+  hchi1chi1 : ClassFunction.inner chi1 chi1 = 1
   /-- `‖χ‖² = 1`. -/
   hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1
   /-- `‖χ̄‖² = 1`. -/
@@ -5101,7 +5438,7 @@ structure DadeChainStep
   /-- Per-member `R(x) ⊥ R(χ)` ((5.2.e)). -/
   hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
     (Dmem x hx).imageFamily.Orthogonal
-      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+      (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)
   /-- `χ ⊥ S₁`. -/
   hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0
   /-- `χ̄ ⊥ S₁`. -/
@@ -5170,24 +5507,31 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
       degree_chi := step.famDegree_chi
       chi_orthogonal := fun i hi => step.hχ_S1 i (hmemS₁ i hi)
       chiFam_pairwise := step.famPairwise }
-  refine retarget_isCoherent_fromDade hyp hconj hS₁ χ step.hreal step.hχsupp step.hχbarsupp
-    step.haχ1supp
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      (by simpa only [sub_zero] using step.hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr))
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
-      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
-    step.hχχ step.hχbarχbar step.hχbarχ step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
-    step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp step.hχχ1 step.hχbarχ1 step.hχχbar'
-    ?_ (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
-  -- The (5.6.2) collapse `hY`, now *proved* from the family data via the (5.6.1) producer.
-  exact dade_Y_collapse_of_family hyp hconj _ rfl B (fun i hi => hmemS₁ i hi) step.famNe
-    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hχsupp step.Dmem step.hmemTau1Base
-    step.hmemOrtho
-    (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
-      ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
-      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
-    step.hdeg_c
+  -- `⟨χ, a·χ₁⟩ = ⟨χ̄, a·χ₁⟩ = 0` and `(χ − a·χ₁)^τ ∈ ℤ[Irr G]` (supported difference).
+  have hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ)
+      (step.a • step.chi1 : ClassFunction (↥L) ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ step.a step.chi1,
+      OddOrder.RepresentationTheory.inner_smul_right, step.hχχ1, mul_zero]
+  have hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
+      (step.a • step.chi1 : ClassFunction (↥L) ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ step.a step.chi1,
+      OddOrder.RepresentationTheory.inner_smul_right, step.hχbarχ1, mul_zero]
+  have htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - step.a • step.chi1) ∈ ZIrr G :=
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj step.hdiffasupp
+      (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a))
+  refine retarget_isCoherent_fromDade_X hyp hconj hS₁ χ step.hreal step.hdiffsupp step.hdiffasupp
+    htau1_mema hχaχ1 hχbaraχ1 step.hχχ step.hχbarχbar step.hχbarχ step.hχχbar' step.hchi1chi1
+    step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
+    step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp ?_
+    (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
+  -- The (5.6.2) collapse `hY`, proved from the family data (difference-support).
+  exact dade_Y_collapse_of_family hyp hconj
+    (decompositionDaFromDadeOfDiff hyp hconj χ step.hreal step.hdiffsupp step.hdiffasupp htau1_mema
+      hχaχ1 hχbaraχ1 step.hχχbar')
+    rfl B (fun i hi => hmemS₁ i hi) step.famNe
+    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hdiffasupp step.Dmem step.hmemTau1Base
+    step.hmemOrtho htau1_mema step.hdeg_c
 
 /-- **One `coherentPairChain` step, in the engine's accumulator shape, from the Dade isometry.**
 

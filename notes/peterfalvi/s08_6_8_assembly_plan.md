@@ -401,3 +401,142 @@ transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
 
 ### 戦略的含意
 本作業 (T6 完成, T7 設計) は **genuine な Peterfalvi 形式化**だが、現状 FeitThompson の実 critical path (Track B) には未配線。優先順位 = {(A)engine 修正して (6.8) 続行 / Track B (BG§7-16+S16/AppC+top-level 還元) に pivot / roadmap 全体を訂正版で再計画} の判断が必要。
+
+## J. T8 (X-family DadeChainStep instance) leaf 分解 (2026-06-03, T7 完了後・active frontier)
+
+engine (`peterfalvi_66_coherence_of_X_from_dade` S07:5593) + base (`coherentEqualDegree_fromDade`
+S07:5109) + per-step (`DadeChainStep.advance` S07:5491) は全 landed (B surgery 完了)。残 = X=`Xset Z`
+に対し engine の入力 — enumeration `e`/`pair`/`N` + base `S₀` coherence + 各 pair の `DadeChainStep`
+instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, user 2026-06-03 承認):
+
+- ✅ **T8.1** `xMember_characterFacts` (commit ccf17e2, axiom-clean): `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/
+  `hχχbar'`。非実 = (1.1) odd (`not_isReal_of_ne_trivial_of_odd_card'`) + `Xset_eq` の `Z⊄Ker χ` で χ≠1;
+  ortho = `irreducibleCharacter_inner_eq_ite`。Frobenius case (χ 既約 = `isIrreducibleCharacter_of_mem_Xset_of_frobenius`)。
+- ✅ **T8.2** `xMember_diffSupport` (commit 3e12608, axiom-clean, 初回 build green): `hdiffsupp`
+  `(χ.conj−χ).support ⊆ supportInSubgroup (sharpImage H) L`。χ=Ind θ, H 正規 ⟹
+  `support_induce_subset_of_normal` (InducedCharacter:343) で support⊆H; χ.conj−χ は 1 で消える
+  (χ(1)=(n:ℂ) 実 via `exists_natDegree_charValue_one_dvd_card`) ⟹ ⊆ H^#=`sharpImage H`=map\{1}。standalone per-χ。
+- **T8.3** degree data (`a`/`famRatio`/`famDegree`/`famDegree_chi`/`famRatio_chi1`): enumeration 依存ゆえ
+  T8.6 と一体化 (induce_apply_one P1✅ + index_H_eq_card_W1✅ で χ(1)=|W₁|θ(1))。
+- **T8.4** `Dmem` per-member ψ=0 分解 (`CharacterPsiDecomposition`) — §H/§I G2 主負荷、design-heavy、**/goal 不向き=直接実装**。
+- **T8.5** `hdeg_c` (5.6) 次数不等式 `2a<∑aᵢ²/‖χᵢ‖²` — §G B2 (X-side degree-sum bridge) 要、design-heavy。
+- **T8.6** enumeration: X を degree-monotone 列挙 (`exists_monotoneDegreeEnum` S07:3804)→共役 pair {χ,χ̄}、
+  S₀=min-degree 等次数族→`coherentEqualDegree_fromDade` で base coherence。design。
+- **T8.7** assemble → `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A`。
+- → glue X∪Y (Y=T6✅) via `coherentUnion_of_glued` + (6.5)還元 (M1, §G) → capstone `sibleySetup_is_coherent`。
+
+**leaf 順 (clean→design)**: T8.1✅ → T8.2 (/goal) → {T8.4/T8.5/T8.6 = design pass 要、直接実装} → T8.3+T8.7。
+clean leaf (T8.1/T8.2) は /goal、design-heavy leaf (Dmem/hdeg_c/enum/(6.5)) は attended 直接。
+
+## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
+
+**landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
++ `mem_SsubFiltration`/`mem_Xset` + **c1 `S⊆Irr L`** (`isIrreducibleCharacter_of_mem_S_of_frobenius`,
+[Is]6.34) + **c1 `Xset⊆Irr L`** (`isIrreducibleCharacter_of_mem_Xset_of_frobenius`)。
+**c1 の engine-facing 部分 (Xset⊆Irr) 完了** = T8/B が要求する X-family 既約性入力を供給。
+
+**🟢 重大訂正: [Is] 2.21 は不要** (Plan agent が atom 照合で確定)。§F:362「要 (1.6.a) iff (2.21 converse 含む)」は
+**過剰**。`Xset_eq : X={χ∈Irr L|Z⊄Ker χ}` の両方向とも 2.21 を回避:
+- **(⊆)**: φ∈X (φ=Ind θ,θ≠1,φ∉S(Z)),φ既約。Z⊆Ker φ 仮定→**Res_H φ genuine** (H0)→θ は Res φ の
+  constituent (Frobenius `inner_induce_eq_inner_restrict` InducedCharacter:531)→G2.2 (S03:696, Res φ の
+  ℕ分解 via `exists_natFinsupp_eq_sum` Clifford:1009)→Z.subgroupOf H⊆Ker θ→φ∈S(Z) 矛盾。
+  **鍵: Ind θ を genuine 扱いしない** (induce は class-function-level only, `IsCharacter (Ind θ)` 不在)。
+- **(⊇)**: χ既約,Z⊄Ker χ。`exists_inner_induce_ne_zero`(S03:636)→θ。θ≠1 & Ind θ∉S(Z) は両方
+  「Z⊆Ker(Ind θ')→(G2.2 constituent inherit)→Z⊆Ker χ 矛盾」。inherit に **Ind θ の ℕ分解** (H2) 要
+  (Ind θ∈ZIrr `induce_mem_ZIrr` + Fourier係数≥0 via Frobenius+`inner_irreducible_nonneg` Clifford:988)。
+  最後 Ind θ∈X→hX→Ind θ既約→`irreducibleCharacter_inner_eq_ite`(ZIrrFourier:40)で Ind θ=χ。
+
+**✅✅ T7 char 完了 (2026-06-03, commit ece4803; full `lake build OddOrder` 3562 + AxiomsCheck green,
+axiom-clean = `#print axioms` で propext/Classical.choice/Quot.sound のみ, 新 sorry 0)**:
+- **H0** `isCharacter_restrict` (commit 3bb133a, S08:45) — `restrict_repCharacterClassFunction` 経由。
+- **H1-core** `characterKernel_subset_of_natFinsupp_eq_sum` (S08) — G2.2 keystone を Finsupp ℕ分解から
+  再パッケージ (dite-totalized `IrreducibleCharacter` 族 + natural degrees `exists_natDegree_charValue_one_dvd_card`)。
+- **H1-genuine** `characterKernel_subset_of_isCharacter_of_inner_ne_zero` — core ∘ `exists_natFinsupp_eq_sum`。
+- `inner_isCharacter_nonneg` (⟨genuine,genuine⟩≥0) — RHS 分解 → `inner_irreducible_nonneg` 各項。
+- **H2** `induce_exists_natFinsupp_eq_sum` — Ind θ の ℕ分解を `ClassFunction.induce_mem_ZIrr` +
+  Frobenius-nonneg (`ClassFunction.inner_induce_eq_inner_restrict` + `inner_isCharacter_nonneg`) で再現。
+- **H2-wrapper** `characterKernel_subset_of_inner_induce_ne_zero` — core ∘ H2。
+- 本体 `Xset_eq_irreducible_not_subset_characterKernel` (SibleyDadeHypothesis namespace, S08) — 最小 Z-仮説
+  `Z≤H`+`[Z.Normal]` のみ。⊆=H1-genuine on Res / ⊇=H2-wrapper on Ind + `exists_inner_induce_ne_zero` +
+  (1.6.a fwd `subsetCharacterKernel_induce_of_subgroupOf`) + orthonormality (`irreducibleCharacter_inner_eq_ite`)。
+- 配置: S08-local (将来 S03 ConstituentKernel へ移設可)。**[Is] 2.21 不使用を実証**。
+- **Lean 罠 (実装で判明)**: `inner_smul_right` は mathlib `_root_.inner_smul_right` と曖昧 → 完全修飾
+  `OddOrder.RepresentationTheory.inner_smul_right`。`induce_mem_ZIrr`/`inner_induce_eq_inner_restrict` は
+  nested `ClassFunction` namespace → `ClassFunction.` 前置。`coe_trivialIrreducibleCharacter` は
+  `IrreducibleCharacter.` namespace。`star (↑n)`=`star_natCast`。
+
+**🔜 T7 残**: c2 (case A `X⊆Irr L`, brick② FPF route) は §F の通り別途 (本 Xset_eq とは独立、case A 専用)。
+**次 = T8** (`DadeChainStep` 実 instance; B engine surgery で blocker 解消済 = `peterfalvi_66_coherence_of_X_from_dade`
+が X-family で instantiate 可) → T9/T10 (glue) → T11 + capstone `sibleySetup_is_coherent` (S08 唯一の sorry)。
+
+## I. B (engine surgery) refined plan — TRACTABLE adapter, NOT parallel engine (2026-06-03)
+
+**🟢 重大発見: `retarget_isCoherent`(S07:2835) は X,Xbar を bare class function で取る (D₀ 非依存)**。
+D₀ 結合は wrapper `retarget_isCoherent_of_decomposition`(3127, `D.retargetTargetPair` 経由) のみ。
+⟹ B = **X-family adapter** (既存 engine `retarget_isCoherent` を直接呼ぶ)、parallel engine 不要。
+
+**核心: X := Da.X** (Da = `CharacterPsiDecomposition τ χ (a•chi1)`, ψ=a•χ₁ supported decomp,
+`htau1_mema:τ(χ−a·χ₁)∈ZIrr` から構成。**htau1_mem0(τχ∈ZIrr) 不要**)。`Da.X = D₀.X` (hX_eq) ゆえ同値。
+
+**{X,X̄} facts は全部 supported route で導出可 (検証済, ψ=0/τχ∈ZIrr 不使用)**:
+- `‖X‖²=1`: himg `τ(χ−a·χ₁)=X−a·ext(χ₁)` + `‖τ(χ−a·χ₁)‖²=‖χ−a·χ₁‖²=1+a²`(supported isometry,χ⊥χ₁)
+  + `X⊥ext(χ₁)`((5.2.e) hperElem, X∈ℤ[R(χ)]⊥ext(χ₁)) + `‖ext(χ₁)‖²=‖χ₁‖²=1`。
+- `‖X̄‖²=1`,`⟨X,X̄⟩=0` (X̄=X−τ(χ−χ̄)): `⟨X,τ(χ−χ̄)⟩=⟨τ(χ−a·χ₁),τ(χ−χ̄)⟩=⟨χ−a·χ₁,χ−χ̄⟩=1`
+  (∑Da.coeff=⟨τ(χ−a·χ₁),∑R(χ)⟩=⟨τ(χ−a·χ₁),τ(χ−χ̄)⟩, supported isometry)。
+- `X∈ZIrr`/`X̄∈ZIrr`: Da.X_eq (∑ over R(χ)) + τ(χ−χ̄)∈ZIrr。
+
+**実装ステップ (build-green incremental, 既存 D₀/retargetTargetPair/of_decomposition stack は不変=supported-χ 用)**:
+1. **`retargetTargetPair_fromSupported`** (~80): X:=Da.X の {X,X̄} orthonormality+ZIrr を上記 supported 導出で。
+   入力 = Da + himg + supported-isometry facts + hperElem(X⊥ext(S₁)) + χ⊥χ₁/χ⊥χ̄/‖χ‖²=1 等。
+2. **`retarget_isCoherent_of_supportedDecomposition`** (~40): Da + data → (1) で X facts 構成 → `retarget_isCoherent` 直呼。
+3. **`retarget_isCoherent_fromDade_X`** (~60): Dade 層 wrapper。Da を htau1_mema (supported diff, provable) から構成、
+   個別 support → **difference-support 弱化** (χ−a·χ₁ は 1 で消え H^# supported)、(2) を呼ぶ。
+4. **rewire** `DadeChainStep.advance`(5173) を X-version に (or 分岐)。`peterfalvi_66_coherence_of_X_from_dade` 接続。
+5. 抽象 `peterfalvi_66_coherence_of_X`(3934) 不変、AxiomsCheck clean、各 step `lake build OddOrder` green。
+
+**要読込 (実装前)**: `RetargetTargetPair` struct(2169) / `eq_sum_of_psi_eq_zero` / supported-isometry lemma 名
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`) / `imageFamily.image_eq` / hperElem source。
+
+### I 進捗 (2026-06-03 セッション)
+- ✅ **step1** `retarget_isCoherent_of_supportedDecomposition` (commit 0ba7572, build-green): X:=Da.X の
+  {X,X̄} 6 facts を supported route で導出 (‖X‖²=1 via `inner_self_chi_add_psi_eq`, ‖Y‖²=a²,
+  ⟨X,(χ−χ̄)^τ⟩=⟨χ,χ⟩=1 via `inner_self_chi_eq_sum_coeff`)。**htau1_mem0 blocker 解消**。
+- ✅ **step2** `retarget_isCoherent_of_supportedDecomposition_and_memberFamily` (commit 0a664bf): hperElem を
+  Dmem family から discharge (既存 `inner_extension_*_orthogonal_imageSet*` 再利用)。
+- 🔜 **step3**: (a) `dadeOrthonormalCharacterImageFamily`(~4500) を**差分-support** に弱化
+  — `dadeIntegralCharacterMap_inner_eq_on_supported_span`(4460, 個別 support `hS:∀s∈S,supp⊆A` 要求) を
+  差分集合 S={0, χ̄−χ} 等で適用 (χ−χ̄ は 1 で消え A-supported; iter1 設計と同じ)。
+  (b) `retarget_isCoherent_fromDade_X`: Da を `ofProjection`(htau1_mema のみ, htau1_mem0 不要)で構成、
+  差分-support imageFamily を渡し step2 を呼ぶ。
+- 🔜 **step4**: `DadeChainStep.advance`(5146) を X-version に rewire (or 分岐) → `peterfalvi_66_coherence_of_X_from_dade` 解禁。
+
+### I 訂正 (2026-06-03, anti-scaffold gate) — §I の「tractable adapter / htau1_mem0 解消」は誤り
+step1-2 (`retarget_isCoherent_of_supportedDecomposition*`) は **X-family で scaffold** と判明
+(`Da : CharacterPsiDecomposition τ χ (a•chi1)` が X で構成不能: structure field `tau1_inner_eq_on_support`
+が full lattice {χ,χ.conj,ψ} の τ₁-isometry を要求, unsupported χ で `⟨τχ,τχ⟩≠⟨χ,χ⟩`)。
+**真の fix = `CharacterPsiDecomposition.tau1_inner_eq_on_support` を差分 sublattice `zSpan{χ−χ.conj,χ−ψ}` に弱化**
+(全 4 使用箇所 S07:1227/1296/2216/3473 は差分のみ; ofProjection→decompositionPair→sharedDecomposition→fromDade を
+貫流する htau1_inner_eq param を差分集合 isometry に re-target, ~7-10 関数, invasive=attended)。
+詳細 = `notes/meta/b_xpath_wiring_goal.md` 🛑 LOOP STOPPED 節。✅ step3a (`dadeOrthonormalCharacterImageFamilyOfDiff`,
+18238b9) は genuine な差分-support R(χ) で field 弱化後の正当部品。
+
+### I 進捗 2 (2026-06-03 attended, B engine surgery 大幅前進)
+**✅ 完了・build-green・commit 済 (X-family per-step coherence path 全通)**:
+- 真の fix: `tau1_inner_eq_on_support` 差分 sublattice 弱化 (9640c03)
+- `decompositionDaFromDadeOfDiff` (ded579e): Da を X で ofProjection 直構成
+- `dadeOrthonormalCharacterImageFamilyOfDiff` (18238b9): 差分-support R(χ)
+- step1 `retarget_isCoherent_of_supportedDecomposition` + step2 `_and_memberFamily` (de-scaffolded)
+- **`retarget_isCoherent_fromDade_X` (83f91c2)**: X-member の per-step adjoining 完成
+  chain = fromDade_X → step2 → step1 → `retarget_isCoherent`、D₀/τχ∈ZIrr/個別 support 一切なし。
+
+**🔜 残 step4 (DadeChainStep iteration layer, mechanical)**: `DadeChainStep`(S07:5397, ~30 field, 個別
+support `hχsupp`/`hχbarsupp`/`haχ1supp` + famS 次数列) の X-version (`DadeChainStepX`: 差分-support 化) +
+`advance` の X-version (`advanceX`: fromDade_X を呼ぶ) + `peterfalvi_66_coherence_of_X_from_dade` を X-chain に。
+fromDade_X が per-step を供給済ゆえ、残りは structure の差分化と advance の付け替えのみ。
+
+### I 進捗 3 — ✅✅ B engine surgery 完了 (2026-06-03): T8 engine blocker 解消
+`peterfalvi_66_coherence_of_X_from_dade` が X-family で instantiate 可能に (full build + AxiomsCheck green)。
+chain: DadeChainStep(差分-support) → advance(fromDade_X) → step2 → step1 → retarget_isCoherent、
+Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。commits 50bf9f0/5dda578。
+**T8 の真の blocker (htau1_mem0/個別 support, 2 loop が STOP) 解消済**。残=T7 char data + DadeChainStep
+実 instance + T9-T11 glue。
