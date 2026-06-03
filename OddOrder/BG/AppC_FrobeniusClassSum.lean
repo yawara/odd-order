@@ -8,7 +8,9 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # BG Appendix C: Frobenius Class-Sum Bridge
@@ -24,6 +26,7 @@ class-sum dependent layer for the `q >= 5` branch of Lemma C.2.
 namespace OddOrder.BG.AppC.NormSet
 
 open OddOrder.RepresentationTheory
+open scoped commutatorElement
 
 variable (p q : ℕ)
 
@@ -281,6 +284,73 @@ lemma normOneFrobenius_inl_ne_one [Fact p.Prime] {s : GaloisField p q} (hs : s �
     (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ≠ 1 := by
   intro h
   exact hs (ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h))
+
+/-- When `1 < q`, every additive-kernel element of `H = P ⋊ U` is a commutator.
+This is the concrete form of `[P,U]=P` used to show that linear characters of
+`H` kill the additive kernel. -/
+theorem normOneFrobenius_inl_eq_commutator [Fact p.Prime] (hq : 1 < q)
+    (s : GaloisField p q) :
+    ∃ x y : normOneFrobeniusGroup p q,
+      ⁅x, y⁆ =
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+          normOneFrobeniusGroup p q) := by
+  classical
+  haveI : Nontrivial (normOneUnits p q) :=
+    Finite.one_lt_card_iff_nontrivial.mp (normOneUnits_card_gt_one p q hq)
+  obtain ⟨u, hu⟩ := exists_ne (1 : normOneUnits p q)
+  let uval : GaloisField p q := ((u : (GaloisField p q)ˣ) : GaloisField p q)
+  have huval : uval ≠ 1 := by
+    intro h
+    apply hu
+    apply Subtype.ext
+    apply Units.ext
+    simpa [uval] using h
+  let denom : GaloisField p q := 1 - uval
+  have hdenom : denom ≠ 0 := by
+    intro h0
+    apply huval
+    have h : (1 : GaloisField p q) = uval := sub_eq_zero.mp h0
+    exact h.symm
+  let t : GaloisField p q := s / denom
+  have ht : t - uval * t = s := by
+    have hmul : denom * t = s := by
+      change denom * (s / denom) = s
+      field_simp [hdenom]
+    calc
+      t - uval * t = (1 - uval) * t := by ring
+      _ = denom * t := by rfl
+      _ = s := hmul
+  refine ⟨SemidirectProduct.inl (Multiplicative.ofAdd t),
+    SemidirectProduct.inr u, ?_⟩
+  rw [SemidirectProduct.commutator_inl_inr, SemidirectProduct.inl_inj]
+  apply Multiplicative.toAdd.injective
+  change (Multiplicative.ofAdd t *
+      (normOneMulAction p q u) (Multiplicative.ofAdd t)⁻¹).toAdd = s
+  simpa [normOneMulAction_apply, uval, sub_eq_add_neg] using ht
+
+/-- Degree-one irreducible class functions of the concrete Frobenius group are
+trivial on the additive kernel. -/
+theorem normOneFrobenius_linear_irreducible_apply_inl [Fact p.Prime] (hq : 1 < q)
+    {χ : ClassFunction (normOneFrobeniusGroup p q) ℂ}
+    (hχ : IsIrreducibleCharacter χ)
+    (hχ1 : χ (1 : normOneFrobeniusGroup p q) = 1)
+    (s : GaloisField p q) :
+    χ (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) = 1 := by
+  obtain ⟨x, y, hxy⟩ := normOneFrobenius_inl_eq_commutator p q hq s
+  rw [← hxy]
+  exact hχ.apply_commutatorElement_eq_one_of_apply_one_eq_one hχ1 x y
+
+/-- Irreducible-character subtype version: if an irreducible character of `H` has
+degree one, then it is trivial on the additive kernel. -/
+theorem normOneFrobenius_irreducibleCharacter_apply_inl_of_apply_one_eq_one
+    [Fact p.Prime] (hq : 1 < q)
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q))
+    (hχ1 : (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q) = 1)
+    (s : GaloisField p q) :
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) = 1 :=
+  normOneFrobenius_linear_irreducible_apply_inl p q hq χ.property hχ1 s
 
 /-- The additive kernel centralizes each of its own elements. This is the easy
 inclusion in the concrete centralizer computation used in the q≥5 character

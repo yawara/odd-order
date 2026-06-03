@@ -185,6 +185,15 @@ AxiomsCheck 登録済み。
 これは induced characters が q≥5 の class-sum character formula で kernel classes のみを見るための入力。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 linear-character kernel specialization (2026-06-04)
+`normOneFrobenius_inl_eq_commutator` で `1<q` の下、任意の additive-kernel 元 `inl(s)` が
+`H=P⋊U` 内の commutator であることを証明 (`u≠1` を取り `s=(1-u)t`)。
+これと degree-one irreducible character が commutator を殺す一般補題を合成し、
+`normOneFrobenius_linear_irreducible_apply_inl` と subtype 版
+`normOneFrobenius_irreducibleCharacter_apply_inl_of_apply_one_eq_one` を追加。
+これは q≥5 の character formula で linear characters の寄与を `1` に固定する入力。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

@@ -109,6 +109,10 @@ created: 2026-06-04
 - [x] **C.2 q≥5 induced-character support specialization**:
   `Ind_P^H θ` の support が `P` に含まれること、および非自明 complement 元 `inr u` 上では
   0 になることを concrete theorem 化。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 linear-character kernel specialization**:
+  `1<q` なら任意の `inl(s)∈P` が `H=P⋊U` の commutator であることを証明し、
+  degree-one irreducible character / subtype 版が additive kernel 上で値 `1` になることを concrete theorem 化。
+  q≥5 の class-sum character formula で linear characters の寄与を固定する入力。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
