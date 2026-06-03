@@ -541,6 +541,22 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 
 **⚠️ scope 評価**: crux1 = (5.6.1)/(5.6.2) engine を induced(unsupported)member 用に再導出 = (6.6)/(5.6) の真の技術核, **multi-session**。member R-family 注入で `IsCoherent` 拡張 or 新 carrier 要。かつ master-roadmap 上 (6.8) は **orphaned**(FeitThompson 未配線; 実 critical path = BG §7-16 Track B)⟹ crux1 grind 継続は戦略判断要。
 
+#### J.3.4 crux1 進捗 — member 側完全 discharge, 残 = (5.6.2) collapse のみ (2026-06-04, user「最終的に必要 → 続行」)
+
+ユーザー確認: (6.8) は orphaned だが Peterfalvi 指標理論の本物の片翼で **最終的に必須** → crux1 続行。
+**FeitThompson 配線の現状（grep 確認済）**: 最上位 `feitThompson`(`OddOrder/FeitThompson.lean:24`)= 裸 sorry(還元無)、`noMinimalSimpleOdd_of_section16` は `S16.Hypothesis`(未構成 carrier)を仮説に取るのみ、`sibleySetup_is_coherent` は消費者 0、S16 は coherence を import せず。⟹ crux1 完遂しても §10-16 配線が別途必要(全体が未完足場)。
+
+**✅ crux1 の step 1/3/6 + 端部代数を完全 landed**(S08, 全 axiom-clean, build 3320):
+- `crux1_of_collapse`(端部): `himg : w=X−Y` + collapse `Y=a·νχ₁` + `⟨X,νχ₁⟩=0` + `‖νχ₁‖²=1` ⟹ crux1 `⟨w,νχ₁⟩=−a`(純内積代数, abstract over G)。
+- `memberExtensionDecomposition`(step 2, (5.5) member ν-aux): member χ∈S₁ に `D':CharacterPsiDecomposition τ χ 0` を **tau1=ν** で構成(`ofProjection`; `ν χ∈ZIrr` を注入)⟹ `D'.tau1 χ=ν χ`(**rfl, 実 context で検証済**), `ν χ=D'.X∈ℤ[R(χ)]`。
+- `inner_dadeDiff_conjDifference_eq_zero` + `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(step 3, (5.2.e)): 差分 support 版 `R(χ₁)⊥R(χ)`(既存 individual-support 版は induced で不可ゆえ新規)。
+- `inner_decomposition_X_extension_member_eq_zero` + `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`(step 3 assembled): **`⟨Da.X,νχ₁⟩=0` を注入データから完全導出**(member ν-aux + family ⊥ + per-α 和)。
+- `inner_dade_extension_of_supported`(step 4 基盤, 既 landed): `⟨τ u,ν δ⟩=⟨u,δ⟩`(supported)。
+
+⟹ **crux1 残 = (5.6.2) collapse `Da.Y=a·νχ₁` ただ 1 本**(step 4-5)。これを得れば `crux1_of_collapse`(`himg`=`Da.tau1_image`(Da.tau1=τ)+`htau1_diff`, `‖νχ₁‖²=1`=ν-isometry, `⟨Da.X,νχ₁⟩=0`=上記)で crux1 → bridge → coherence。
+
+**残 step 4-5 (本丸・(5.6.1)/(5.6.2) λ-form)**: member family `vc i=νχᵢ`(i over S₁ の有限 enum)を用意し、λ-form `Da.Y=a·νχ₁−λ∑rᵢνχᵢ+Z` を `⟨τ(χ−a·chi1),ν(χⱼ−aⱼchi1)⟩=⟨χ−a·chi1,χⱼ−aⱼchi1⟩`(`inner_dade_extension_of_supported` を δ=χⱼ−aⱼchi1 supported で適用)から係数計算 → 既存 `lambda_eq_zero_and_Z_eq_zero`(S07:1852, vc 自由)+ degree 不等式(c)で λ=0,Z=0 → collapse。**注意**: 既存 `Y_eq_nsmul_tau1_of_lambdaForm`(S07:1940)は vc i₁=D.tau1 chi1=τchi1 に hardwire ⟹ 不使用、`lambda_eq_zero_and_Z_eq_zero` 直叩き。member enum + λ-form 組立が残 work(multi-session)。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
