@@ -257,6 +257,17 @@ theorem normalizer_centerFittingOpCoreInG_eq_of_ne_bot [Finite G]
   normalizer_eq_of_normal_of_mem_maximal hG hM
     (centerFittingOpCoreInG_subgroupOf_normal q M) hO_ne (centerFittingOpCoreInG_le q M)
 
+private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] (hHnot : ¬ IsPGroup p H) :
+    ∃ q, q ∈ (Nat.card H).primeFactors ∧ q ≠ p := by
+  by_contra h
+  apply hHnot
+  rw [IsPGroup.iff_card]
+  refine ⟨_, Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' ?_⟩
+  intro q hq_prime hq_dvd
+  by_contra hq_ne
+  exact h ⟨q, Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩, hq_ne⟩
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
