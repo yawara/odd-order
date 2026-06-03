@@ -4611,6 +4611,81 @@ noncomputable def dadeOrthonormalCharacterImageFamily
   -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
 
+/-- **R(χ) from the Dade isometry, with only the DIFFERENCE `χ̄ − χ` supported (X-family).**
+
+The orthonormal image family `R(χ)` with `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α`, built from the Dade base
+map — but requiring only that the *difference* `χ̄ − χ` is supported in `CF(L,A)`, **not** the
+individual supports `hχsupp`/`hχbarsupp` of `dadeOrthonormalCharacterImageFamily`.  This is what the
+(6.8) `X`-family needs: an induced `χ = Ind_H^L θ` has `χ(1) = |W₁|θ(1) ≠ 0`, so `χ` itself is NOT
+supported (`1 ∉ A = H^#`), yet the conjugate difference `χ̄ − χ` vanishes at `1` and is supported on
+`H^#`.
+
+The Dade `CF(L,A)`-isometry is applied on the **difference set** `D = {0, χ̄ − χ}` (both supported:
+`0` trivially, `χ̄ − χ` by hypothesis), into which both keystone differences
+`irreducibleCharacterDifference fam i` (`= 0` for `i = 0`, `= χ̄ − χ` for `i = 1`) land — exactly the
+generators the (1.4)/(2.6.a) keystone uses.  No `χ`/`χ̄` individual support is touched.
+`dadeOrthonormalCharacterImageFamily` (individual supports) is recovered as the special case where
+`hdiffsupp` is derived from `hχsupp`, `hχbarsupp`. -/
+noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L) :
+    OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ_def
+  set fam : Fin 2 → IrreducibleCharacter (↥L) := conjPairFamily (L := ↥L) χ with hfam
+  have hfam0 : (fam 0 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ) := by
+    simp [hfam, conjPairFamily]
+  have hfam1 : (fam 1 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ).conj := by
+    simp [hfam, conjPairFamily]
+  -- `irreducibleCharacterDifference fam i = fam i − fam 0`: `0` for `i = 0`, `χ̄ − χ` for `i = 1`.
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 =
+      (χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ) := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  -- Each keystone difference is supported in `CF(L,A)`.
+  have hdiff_supp : ∀ i,
+      (irreducibleCharacterDifference fam i).support ⊆ supportInSubgroup A L := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]; simp
+    · rw [hdiff1]; exact hdiffsupp
+  -- The supported difference set `D = {0, χ̄ − χ}`, and the keystone differences land in `ℤ[D]`.
+  set D : Set (ClassFunction (↥L) ℂ) :=
+    {(0 : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)}
+    with hD
+  have hDsupp : ∀ s ∈ D, s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [hD, Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · simp
+    · exact hdiffsupp
+  have hdiff_in_D : ∀ i, irreducibleCharacterDifference fam i ∈ zSpan (L := ↥L) D := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]; exact Submodule.subset_span (by simp [hD])
+    · rw [hdiff1]; exact Submodule.subset_span (by simp [hD])
+  -- (1.4) hypotheses, all from the difference support.
+  have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ fam := by
+    intro i
+    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i) ?_
+    refine Submodule.sub_mem _ ?_ (fam 0).mem_ZIrr
+    exact (fam i).mem_ZIrr
+  have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ fam := by
+    intro i
+    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+  have hisom : ∀ i j,
+      ClassFunction.inner (isometryDifferenceImage τ fam i) (isometryDifferenceImage τ fam j) =
+        ClassFunction.inner (irreducibleCharacterDifference fam i)
+          (irreducibleCharacterDifference fam j) := by
+    intro i j
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hDsupp
+      (hdiff_in_D i) (hdiff_in_D j)
+  exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
+
 /-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
 
 `⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in `CF(L,A)`
