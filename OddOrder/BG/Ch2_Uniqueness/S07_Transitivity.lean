@@ -1358,6 +1358,24 @@ private theorem conj_smul_le_normalizer_of_le_normalizer {S Q : Subgroup G} {g :
     group
   rw [hyeq, conj_smul_eq_self_of_mem_normalizer hyN]
 
+/-- **Conjugation commutes with the normalizer** (equality form): `conj g • N(Q) = N(conj g • Q)`. -/
+private theorem conj_smul_normalizer_eq (g : G) (Q : Subgroup G) :
+    MulAut.conj g • Subgroup.normalizer (Q : Set G)
+      = Subgroup.normalizer ((MulAut.conj g • Q : Subgroup G) : Set G) := by
+  refine le_antisymm (conj_smul_le_normalizer_of_le_normalizer (le_refl _)) ?_
+  have hback := conj_smul_le_normalizer_of_le_normalizer
+    (S := Subgroup.normalizer ((MulAut.conj g • Q : Subgroup G) : Set G))
+    (Q := MulAut.conj g • Q) (g := g⁻¹) (le_refl _)
+  have hQ' : MulAut.conj g⁻¹ • (MulAut.conj g • Q) = Q := by
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  rw [hQ'] at hback
+  intro y hy
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv]
+  have hmem : MulAut.conj g⁻¹ • y
+      ∈ MulAut.conj g⁻¹ • Subgroup.normalizer ((MulAut.conj g • Q : Subgroup G) : Set G) :=
+    Subgroup.smul_mem_pointwise_smul_iff.mpr hy
+  exact hback hmem
+
 /-- **A `K`-element normalizing `P` centralizes `P`** (`N_K(P) = C_K(P)`, mmd L2242): if
 `A ⊴ P` (so `P ≤ N_G(A)`, whence `P` normalizes `K = O_{π'}(C_G(A))`) and `P ⊓ K = 1`
 (coprime orders), then `c ∈ K` normalizing `P` lies in `C_G(P)`. For `x ∈ P`,
@@ -1623,6 +1641,206 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
   refine ⟨hInvariantStar_le_normalizer Q.2, ?_⟩
   rw [Subgroup.zpowers_le]
   exact mem_normalizer_of_conj_smul_eq_self hgN
+
+/-- **Theorem 7.4(b)** (mmd L2234-2244): `O_{π'}(C_G(P))` is transitive on `ℋ_G*(P;q)`.
+For `Q₁,Q₂ ∈ ℋ*(P;q)`: by (c) (`hc_sub`) both lie in `ℋ*(A;q)`, so `htrans` gives `k ∈ K`
+with `Q₂ = Q₁^k`. Inside `V := (K⊔P)⊓N(Q₂) = (K∩N(Q₂))·P`, the Hall-`π` subgroups `P` and
+`P^k` are conjugate by some `κ ∈ K∩N(Q₂)` (`exists_conj_eq_of_isHall_subgroupOf`); then
+`c := κk ∈ K∩N(P)`, which centralizes `P` (`mem_centralizer_of_mem_kSubgroup_normalizer`),
+so `c ∈ C_G(P)⊓K = O_{π'}(C_G(P))` by (a), and `Q₁^c = Q₂`. -/
+private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
+    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (hAP : A ≤ P) [hAnormal : (A.subgroupOf P).Normal]
+    (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P) (hPlt : P < ⊤)
+    (htrans : ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q}))
+    (hc_sub : hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q}) :
+    ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
+        (hInvariantStar ⊤ P {q}) := by
+  classical
+  set K : Subgroup G := kSubgroup A with hK_def
+  -- Standing facts.
+  have hPnA : P ≤ Subgroup.normalizer (A : Set G) := Subgroup.le_normalizer_of_normal_subgroupOf hAP
+  have hKnA : K ≤ Subgroup.normalizer (A : Set G) :=
+    (kSubgroup_le_centralizer A).trans (Subgroup.centralizer_le_normalizer _)
+  have hK_pi' : Subgroup.IsPiSubgroup (primesOf A)ᶜ K := isPiSubgroup_kSubgroup A
+  have hAne : A ≠ ⊥ := hA.ne_bot
+  have hNA_lt : Subgroup.normalizer (A : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    haveI : A.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal A inferInstance with h | h
+    · exact hAne h
+    · exact (ne_of_lt hA.proper) h
+  have hKsupP_lt : K ⊔ P < ⊤ := lt_of_le_of_lt (sup_le hKnA hPnA) hNA_lt
+  haveI hKsupP_solv : IsSolvable ↥(K ⊔ P) := hG.solvable_of_lt_top _ hKsupP_lt
+  -- `P` normalizes `K` (since `P ≤ N(A)` normalizes `K = O_{π'}(C_G(A))`).
+  have hPnK : P ≤ Subgroup.normalizer (K : Set G) :=
+    fun x hx => mem_normalizer_of_conj_smul_eq_self (conj_smul_kSubgroup_eq (hPnA hx))
+  have hKsupP_le_NK : K ⊔ P ≤ Subgroup.normalizer (K : Set G) := sup_le Subgroup.le_normalizer hPnK
+  haveI hKnorm : (K.subgroupOf (K ⊔ P)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr hKsupP_le_NK
+  -- `P ⊓ K = ⊥` (coprime orders: `P` is `π`, `K` is `π'`).
+  have hCopPK : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K) :=
+    OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := primesOf A) Nat.card_pos.ne' Nat.card_pos.ne'
+      (fun p hp => hP_pi p hp) (fun p hp => hK_pi' p hp)
+  have hPK_bot : P ⊓ K = ⊥ := by
+    have h1 : Nat.card ↥(P ⊓ K) ∣ Nat.card ↥P := Subgroup.card_dvd_of_le inf_le_left
+    have h2 : Nat.card ↥(P ⊓ K) ∣ Nat.card ↥K := Subgroup.card_dvd_of_le inf_le_right
+    have : Nat.card ↥(P ⊓ K) = 1 :=
+      Nat.dvd_one.mp (hCopPK.gcd_eq_one ▸ Nat.dvd_gcd h1 h2)
+    exact Subgroup.card_eq_one.mp this
+  -- Part (a): `O_{π'}(C_G(P)) = C_G(P) ⊓ K`.
+  have hpartA : opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G))
+      = Subgroup.centralizer (P : Set G) ⊓ K := (tp_centralizer_eq hG hA hAP).symm
+  rw [hpartA]
+  -- Main transitivity argument.
+  intro Q₁ hQ₁ Q₂ hQ₂
+  -- (c): both lie in `ℋ*(A;q)`; `htrans` gives `k ∈ K` with `Q₂ = Q₁^k`.
+  obtain ⟨k, hkK, hkeq⟩ := htrans Q₁ (hc_sub hQ₁) Q₂ (hc_sub hQ₂)
+  -- `P` normalizes both `Q₁, Q₂` and `P^k = conj k • P` normalizes `Q₂`.
+  have hPnQ₁ : P ≤ Subgroup.normalizer Q₁ := hInvariantStar_le_normalizer hQ₁
+  have hPnQ₂ : P ≤ Subgroup.normalizer Q₂ := hInvariantStar_le_normalizer hQ₂
+  have hP'nQ₂ : MulAut.conj k • P ≤ Subgroup.normalizer Q₂ := by
+    rw [← hkeq]; exact conj_smul_le_normalizer_of_le_normalizer hPnQ₁
+  set P' : Subgroup G := MulAut.conj k • P with hP'_def
+  set NQ₂ : Subgroup G := Subgroup.normalizer Q₂ with hNQ₂_def
+  set V : Subgroup G := (K ⊔ P) ⊓ NQ₂ with hV_def
+  set K' : Subgroup G := K ⊓ NQ₂ with hK'_def
+  -- `P' = conj k • P ≤ K ⊔ P` (`k ∈ K ≤ K⊔P`, `P ≤ K⊔P`).
+  have hP'_le_KsupP : P' ≤ K ⊔ P := by
+    rw [hP'_def]
+    intro y hy
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy
+    have hkmem : k ∈ K ⊔ P := Subgroup.mem_sup_left hkK
+    have h := (K ⊔ P).mul_mem ((K ⊔ P).mul_mem hkmem (Subgroup.mem_sup_right hy)) (inv_mem hkmem)
+    have heq : k * ((MulAut.conj k)⁻¹ • y) * k⁻¹ = y := by
+      rw [← map_inv, MulAut.smul_def, MulAut.conj_apply]; group
+    rwa [heq] at h
+  -- Memberships in `V`.
+  have hP_le_V : P ≤ V := le_inf le_sup_right hPnQ₂
+  have hP'_le_V : P' ≤ V := le_inf hP'_le_KsupP hP'nQ₂
+  have hK'_le_V : K' ≤ V := le_inf (le_trans inf_le_left le_sup_left) inf_le_right
+  have hV_lt : V < ⊤ := lt_of_le_of_lt (le_trans inf_le_left (le_refl _)) hKsupP_lt
+  haveI hV_solv : IsSolvable ↥V := hG.solvable_of_lt_top V hV_lt
+  -- `V = K' ⊔ P` (BG `N_{KP}(Q₂) = (K∩N(Q₂))·P`).
+  have hKP_mul : (↑(K ⊔ P) : Set G) = (K : Set G) * (P : Set G) :=
+    Subgroup.coe_mul_of_right_le_normalizer_left K P hPnK
+  have hV_eq : K' ⊔ P = V := by
+    refine le_antisymm (sup_le hK'_le_V hP_le_V) ?_
+    intro v hv
+    rw [hV_def, Subgroup.mem_inf] at hv
+    obtain ⟨hvKP, hvNQ₂⟩ := hv
+    rw [← SetLike.mem_coe, hKP_mul, Set.mem_mul] at hvKP
+    obtain ⟨κ, hκK, s, hsP, hvκs⟩ := hvKP
+    have hsNQ₂ : s ∈ NQ₂ := hPnQ₂ hsP
+    have hκNQ₂ : κ ∈ NQ₂ := by
+      have : κ = v * s⁻¹ := by rw [← hvκs]; group
+      rw [this]; exact NQ₂.mul_mem hvNQ₂ (NQ₂.inv_mem hsNQ₂)
+    have hκK' : κ ∈ K' := Subgroup.mem_inf.mpr ⟨hκK, hκNQ₂⟩
+    rw [← hvκs]
+    exact (K' ⊔ P).mul_mem (Subgroup.mem_sup_left hκK') (Subgroup.mem_sup_right hsP)
+  -- `K' ⊓ P = ⊥` (`K'≤K`, `K⊓P=⊥`).
+  have hK'P_bot : K' ⊓ P = ⊥ := by
+    rw [eq_bot_iff]
+    refine le_trans (inf_le_inf_right P (inf_le_left : K' ≤ K)) ?_
+    rw [inf_comm]; exact le_of_eq hPK_bot
+  -- `V` normalizes `K'` (each `v ∈ V` normalizes `K` and `N(Q₂)`).
+  have hVnK' : V ≤ Subgroup.normalizer (K' : Set G) := by
+    intro v hv
+    apply mem_normalizer_of_conj_smul_eq_self
+    have hvNK : MulAut.conj v • K = K := by
+      have : v ∈ K ⊔ P := (le_trans inf_le_left (le_refl (K ⊔ P))) hv
+      exact conj_smul_eq_self_of_mem_normalizer (hKsupP_le_NK this)
+    have hvNQ₂ : v ∈ NQ₂ := (le_trans inf_le_right (le_refl NQ₂)) hv
+    have hvNNQ₂ : MulAut.conj v • NQ₂ = NQ₂ := by
+      have hvQ₂ : MulAut.conj v • Q₂ = Q₂ := conj_smul_eq_self_of_mem_normalizer hvNQ₂
+      rw [hNQ₂_def, conj_smul_normalizer_eq, hvQ₂]
+    rw [hK'_def, Subgroup.smul_inf, hvNK, hvNNQ₂]
+  -- `K'` is normal in `↥V`.
+  haveI hK'_normal : (K'.subgroupOf V).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hK'_le_V).mpr hVnK'
+  -- `IsComplement'` of `K'` and `P` inside `↥V`, giving `|V| = |K'| * |P|`.
+  have hdisj : Disjoint (K'.subgroupOf V) (P.subgroupOf V) := by
+    rw [disjoint_iff]
+    rw [show K'.subgroupOf V ⊓ P.subgroupOf V = (K' ⊓ P).subgroupOf V from
+      (Subgroup.comap_inf K' P V.subtype).symm, hK'P_bot, Subgroup.bot_subgroupOf]
+  have hsup_top : K'.subgroupOf V ⊔ P.subgroupOf V = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hK'_le_V hP_le_V, hV_eq, Subgroup.subgroupOf_self]
+  have hcompl : Subgroup.IsComplement' (K'.subgroupOf V) (P.subgroupOf V) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
+    have hmul := Subgroup.normal_mul (K'.subgroupOf V) (P.subgroupOf V)
+    rw [hsup_top] at hmul
+    rw [← hmul]; rfl
+  have hVcard : Nat.card ↥K' * Nat.card ↥P = Nat.card ↥V := by
+    have h := hcompl.card_mul
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'_le_V).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_V).toEquiv] at h
+  -- `K'` is a `π'`-group (subgroup of `K`).
+  have hK'_pi' : Subgroup.IsPiSubgroup (primesOf A)ᶜ K' := fun p hp =>
+    hK_pi' p (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hp).1,
+      (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_dvd_of_le inf_le_left),
+      Nat.card_pos.ne'⟩)
+  -- Both `P` and `P'` are `π`-Hall subgroups of `V`.
+  have mkHall : ∀ R : Subgroup G, R ≤ V → Nat.card ↥R = Nat.card ↥P →
+      Ch03.IsHallSubgroup (primesOf A) (R.subgroupOf V) := by
+    intro R hRV hRcard
+    constructor
+    · intro p hp
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRV).toEquiv, hRcard] at hp
+      exact hP_pi p hp
+    · intro p hp
+      -- `index = card K'`, a `π'`-number.
+      have hidx : (R.subgroupOf V).index = Nat.card ↥K' := by
+        have hlag := Subgroup.card_mul_index (R.subgroupOf V)
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRV).toEquiv, hRcard, ← hVcard,
+          mul_comm (Nat.card ↥K')] at hlag
+        exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hlag
+      rw [hidx] at hp
+      exact hK'_pi' p hp
+  have hP_hall : Ch03.IsHallSubgroup (primesOf A) (P.subgroupOf V) := mkHall P hP_le_V rfl
+  have hP'_hall : Ch03.IsHallSubgroup (primesOf A) (P'.subgroupOf V) :=
+    mkHall P' hP'_le_V (by
+      rw [hP'_def, Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) P).toEquiv])
+  -- Conjugate `P'` to `P` inside `V` (Hall conjugacy).
+  obtain ⟨w, hwV, hwconj⟩ :=
+    exists_conj_eq_of_isHall_subgroupOf hV_solv hP'_le_V hP_le_V hP'_hall hP_hall
+  -- Decompose `w = s · κ` with `s ∈ P`, `κ ∈ K'` (`V = P · K'`, `K' ⊴ V`).
+  have hPnK' : P ≤ Subgroup.normalizer (K' : Set G) := hP_le_V.trans hVnK'
+  have hw_mem : w ∈ (P : Set G) * (K' : Set G) := by
+    have hVcoe : (V : Set G) = (P : Set G) * (K' : Set G) := by
+      rw [← hV_eq, sup_comm]
+      exact Subgroup.coe_mul_of_left_le_normalizer_right P K' hPnK'
+    rw [← SetLike.mem_coe, hVcoe] at hwV
+    exact hwV
+  obtain ⟨s, hsP, κ, hκK', hwsκ⟩ := hw_mem
+  simp only at hwsκ
+  -- `conj κ • P' = P` (cancel the `P`-factor `s`).
+  have hs : MulAut.conj s • P = P :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hsP)
+  have hs' : MulAut.conj s⁻¹ • P = P := by
+    conv_lhs => rw [← hs]
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hκconj : MulAut.conj κ • P' = P := by
+    have h1 : MulAut.conj s • (MulAut.conj κ • P') = P := by
+      rw [smul_smul, ← map_mul, hwsκ]; exact hwconj
+    have h2 : MulAut.conj s⁻¹ • (MulAut.conj s • (MulAut.conj κ • P'))
+        = MulAut.conj s⁻¹ • P := congrArg _ h1
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hs'] at h2
+    exact h2
+  -- The conjugator `c := κ · k ∈ K ∩ N(P)`, which centralizes `P` (part a route).
+  set c : G := κ * k with hc_def
+  have hκK : κ ∈ K := (Subgroup.mem_inf.mp hκK').1
+  have hκNQ₂ : κ ∈ NQ₂ := (Subgroup.mem_inf.mp hκK').2
+  have hcK : c ∈ K := K.mul_mem hκK hkK
+  have hcQ : MulAut.conj c • Q₁ = Q₂ := by
+    rw [hc_def, map_mul, mul_smul, hkeq, conj_smul_eq_self_of_mem_normalizer hκNQ₂]
+  have hcNP : c ∈ Subgroup.normalizer (P : Set G) := by
+    apply mem_normalizer_of_conj_smul_eq_self
+    rw [hc_def, map_mul, mul_smul, ← hP'_def, hκconj]
+  have hcCP : c ∈ Subgroup.centralizer (P : Set G) :=
+    mem_centralizer_of_mem_kSubgroup_normalizer hPnA hPK_bot hcK hcNP
+  exact ⟨c, Subgroup.mem_inf.mpr ⟨hcCP, hcK⟩, hcQ⟩
 
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
