@@ -1467,6 +1467,78 @@ private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] {G : Type*} [Gro
     P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
   exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
 
+/-- **`hspec` for `b ∈ Z(P)`** (special case 1, mmd L2275-2285 packaged for the general case): if
+`b ∈ Z(P)` (so `P ≤ C_G(b)`), then any `A`-invariant `p'`-subgroup `W` of `C_G(b)` lies in
+`O_{p'}(C_G(b))`. Proof: `P` is a Sylow `p`-subgroup of `K := C_G(b)` (`sylow_subgroupOf_of_le`),
+`A.subgroupOf K` is `SCN` in it (transported from `A ⊴ P`, `C_P(A) ⊆ A`), so `specialCase` at `↥K`
+gives `W.subgroupOf K ≤ O_{p'}(↥K)`, which maps back to `W ≤ O_{p'}(C_G(b))`. -/
+private theorem le_opiCoreInG_centralizer_of_mem_centralizer_sylow
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G)
+    (hp2 : p ≠ 2) (P : Sylow p G) {A : Subgroup G} (hAP : A ≤ (P : Subgroup G))
+    [hAcomm : IsMulCommutative A] (hAnormP : (P : Subgroup G) ≤ Subgroup.normalizer A)
+    (hCPA : Subgroup.centralizer (A : Set G) ⊓ (P : Subgroup G) ≤ A)
+    {b : G} (hb_ne : b ≠ 1) (hbP : (P : Subgroup G) ≤ Subgroup.centralizer ({b} : Set G))
+    {W : Subgroup G} (hWcent : W ≤ Subgroup.centralizer ({b} : Set G))
+    (hAW : A ≤ Subgroup.normalizer W) (hWpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ W) :
+    W ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G)) := by
+  classical
+  set K : Subgroup G := Subgroup.centralizer ({b} : Set G) with hK
+  haveI hKsolv : IsSolvable ↥K :=
+    hG.solvable_of_lt_top K (by rw [hK]; exact centralizer_singleton_lt_top hG hb_ne)
+  have hodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  have hAK : A ≤ K := le_trans hAP (by rw [hK]; exact hbP)
+  have hWK : W ≤ K := by rw [hK]; exact hWcent
+  obtain ⟨Q, hQeq⟩ := sylow_subgroupOf_of_le P hbP
+  -- `A.subgroupOf K` is abelian, contained in `Q`, normalized by `Q`, with `C_Q(A) ⊆ A`.
+  haveI : IsMulCommutative ↥(A.subgroupOf K) := by
+    refine ⟨⟨fun a c => Subtype.ext (Subtype.ext ?_)⟩⟩
+    have := (isMulCommutative_iff_of_setLike.mp hAcomm)
+    exact this _ (Subgroup.mem_subgroupOf.mp a.2) _ (Subgroup.mem_subgroupOf.mp c.2)
+  have hAQ : A.subgroupOf K ≤ (Q : Subgroup ↥K) := by
+    rw [hQeq]; intro x hx; rw [Subgroup.mem_subgroupOf] at hx ⊢; exact hAP hx
+  have hQnorm : (Q : Subgroup ↥K) ≤ Subgroup.normalizer (A.subgroupOf K) := by
+    rw [hQeq]; intro q hq
+    rw [Subgroup.mem_subgroupOf] at hq
+    have hqP : (q : G) ∈ Subgroup.normalizer A := hAnormP hq
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    exact Subgroup.mem_normalizer_iff.mp hqP (z : G)
+  have hCQA : Subgroup.centralizer ((A.subgroupOf K : Subgroup ↥K) : Set ↥K) ⊓ (Q : Subgroup ↥K)
+      ≤ A.subgroupOf K := by
+    rw [hQeq]
+    intro q hq
+    rw [Subgroup.mem_subgroupOf]
+    have hqP : (q : G) ∈ (P : Subgroup G) :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_inf.mp hq).2
+    have hqC : (q : G) ∈ Subgroup.centralizer (A : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro a ha
+      have haK : a ∈ K := hAK ha
+      have hmem : (⟨a, haK⟩ : ↥K) ∈ A.subgroupOf K := by rw [Subgroup.mem_subgroupOf]; exact ha
+      have := Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hq).1 ⟨a, haK⟩ hmem
+      exact congrArg Subtype.val this
+    exact hCPA (Subgroup.mem_inf.mpr ⟨hqC, hqP⟩)
+  -- `W.subgroupOf K` is `A`-invariant and a `p'`-subgroup.
+  have hWnorm : A.subgroupOf K ≤ Subgroup.normalizer (W.subgroupOf K) := by
+    intro a ha
+    rw [Subgroup.mem_subgroupOf] at ha
+    have haW : (a : G) ∈ Subgroup.normalizer W := hAW ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    exact Subgroup.mem_normalizer_iff.mp haW (z : G)
+  have hWpi' : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (W.subgroupOf K) := by
+    intro r hr
+    refine hWpi r ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWK).toEquiv] at hr
+  -- specialCase at `↥K`, then transport back.
+  have hW' := specialCase hp2 hodd Q hAQ hQnorm hCQA hWnorm hWpi'
+  rw [hK]
+  calc W = (W.subgroupOf K).map K.subtype := (Subgroup.map_subgroupOf_eq_of_le hWK).symm
+    _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥K).map K.subtype := Subgroup.map_mono hW'
+    _ = opiCoreInG ({p} : Set ℕ)ᶜ K := rfl
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
