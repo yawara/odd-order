@@ -175,8 +175,10 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
     (ℂ sep closed + char 0) を `NeZero ((exponent:ℂ))` provision で発火させ攻略**。commits 6243ef1/9797ed4/684c9ac。
   - **step4b (`∑_{θ∈T}θ(1)²=|K:A|−1`)** = ✅ **LANDED** (`sumInflatedDegreeSq_ntrivial`, B2 core, T≅Irr(K/A)∖1)。
   - **step4a (B2-orbit, `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_Tθ(1)²`)** = 🔶 残, **pure 文字理論 (framework 不要)**。
-    **✅ crux LANDED (commit 3d29f2e)**: `induce_eq_induce_iff_conj` (Ind θ=Ind ψ ⟺ ∃g, conjBy g θ=ψ;
-    InducedIrreducible.lean, axiom-clean) — fibre 記述 (θ↦Ind θ の fibre = L-共役軌道) 確定。
+    **✅✅ 両 key 再利用ピース LANDED (InducedIrreducible.lean, axiom-clean)**:
+    (1) `induce_eq_induce_iff_conj` (commit 3d29f2e): Ind θ=Ind ψ ⟺ ∃g, conjBy g θ=ψ — fibre=L-軌道。
+    (2) `card_conjByOrbit_eq_index_inertia` (commit 3547d3c): Nat.card(conjByOrbit θ)=[G:I] —
+    orbit-stab (Clifford `conjByOrbitEquivLeftCosets` G⧸I≃orbit 既存から Nat.card_congr)。
     **proof sketch (導出済)**: T を L-共役で軌道分割。χ=Ind_K^Lθ, χ(1)=|L:K|θ(1) (`induce_apply_one`✅),
     ‖χ‖²=[I_L(θ):K] (`card_mul_inner_self_induce_eq_card_inertia`✅ |H|‖Indθ‖²=|I| + `subgroup_le_inertia`✅),
     軌道サイズ=[L:I] (orbit-stab), fibre=軌道 (✅ crux)。
