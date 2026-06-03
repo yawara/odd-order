@@ -229,6 +229,38 @@ theorem card_conjByOrbit_eq_index_inertia (θ : IrreducibleCharacter H) :
       (IrreducibleCharacter.inertia (G := G) (H := H) θ).index :=
   (Nat.card_congr (IrreducibleCharacter.conjByOrbitEquivLeftCosets (G := G) (H := H) θ)).symm
 
+/-- **Conjugation preserves degree.**  `(θ^g)(1) = θ(1)`: conjugation evaluates `θ` at
+`g · 1 · g⁻¹ = 1`. -/
+@[simp] theorem conjBy_apply_one (g : G) (θ : IrreducibleCharacter H) :
+    ((IrreducibleCharacter.conjBy (G := G) (H := H) g θ : IrreducibleCharacter H) :
+        ClassFunction ↥H ℂ) 1 = (θ : ClassFunction ↥H ℂ) 1 := by
+  rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply]
+  refine congrArg _ (Subtype.ext ?_)
+  simp
+
+open scoped Classical in
+/-- **Fibre cardinality = inertia index.**  Inside a conjugation-invariant Finset `T` of
+irreducibles, the fibre `{θ ∈ T | Ind θ = Ind θ₀}` of the induction map equals the whole
+`G`-orbit of `θ₀` (by `induce_eq_induce_iff_conj` and `T`-invariance), so its cardinality is
+`[G : I_G(θ₀)]` (`card_conjByOrbit_eq_index_inertia`).  This is the multiplicity input to the
+Peterfalvi (6.2) step-4a orbit count. -/
+theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H))
+    (hT : ∀ θ ∈ T, ∀ g : G, IrreducibleCharacter.conjBy (G := G) (H := H) g θ ∈ T)
+    (θ₀ : IrreducibleCharacter H) (hθ₀ : θ₀ ∈ T) :
+    (T.filter fun θ => induce H θ.toClassFunction = induce H θ₀.toClassFunction).card
+      = (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index := by
+  rw [← card_conjByOrbit_eq_index_inertia (G := G) (H := H) θ₀,
+    Nat.card_coe_set_eq, ← Set.ncard_coe_finset]
+  congr 1
+  ext θ
+  simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_coe,
+    IrreducibleCharacter.mem_conjByOrbit, induce_eq_induce_iff_conj]
+  constructor
+  · rintro ⟨_, g, hg⟩
+    exact ⟨g⁻¹, by rw [← hg, ← IrreducibleCharacter.conjBy_mul]; simp⟩
+  · rintro ⟨g, hg⟩
+    exact ⟨hg ▸ hT θ₀ hθ₀ g, g⁻¹, by rw [← hg, ← IrreducibleCharacter.conjBy_mul]; simp⟩
+
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
 `exists_pair_of_sum_sq_eq_two`.) -/
