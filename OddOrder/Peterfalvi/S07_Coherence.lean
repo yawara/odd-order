@@ -4695,6 +4695,53 @@ noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
       (hdiff_in_D i) (hdiff_in_D j)
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
 
+/-- **The supported per-step decomposition `Da` of `χ − a·χ₁`, for an UNSUPPORTED `χ` (X-family).**
+
+Builds `Da : CharacterPsiDecomposition τ χ (a·χ₁)` directly via `ofProjection` — **not**
+`decompositionPair`, which also builds the `ψ=0` `D₀` requiring the unprovable `τχ ∈ ZIrr`.  This is
+now constructible for an unsupported induced X-member `χ = Ind θ` thanks to the difference-sublattice
+weakening of `tau1_inner_eq_on_support`: the auxiliary isometry `τ₁ = τ` only needs inner-preservation
+on `ℤ[χ−χ̄, χ−a·χ₁]` (both supported differences — supplied by
+`dadeIntegralCharacterMap_inner_eq_on_supported_span` on the difference set `{χ−χ̄, χ−a·χ₁}`), and the
+`ZIrr`-membership only on `χ − a·χ₁` (`htau1_mema`, the degree-matched difference vanishing at `1`).
+`R(χ)` is the difference-support family `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
+noncomputable def decompositionDaFromDadeOfDiff
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L)
+    (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
+      (a • chi1 : ClassFunction (↥L) ℂ) = 0)
+    (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0) :
+    CharacterPsiDecomposition (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) (a • chi1) := by
+  classical
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ
+  -- The difference set `{χ−χ̄, χ−a·χ₁}` is supported (`χ−χ̄` via `hdiffsupp` up to sign).
+  have hSdiff : ∀ s ∈ ({(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
+      (χ : ClassFunction (↥L) ℂ) - a • chi1} : Set (ClassFunction (↥L) ℂ)),
+      s.support ⊆ supportInSubgroup A L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [show (χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj =
+          -((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)) by abel,
+        ClassFunction.support_neg]
+      exact hdiffsupp
+    · exact hdiffasupp
+  exact CharacterPsiDecomposition.ofProjection
+    (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp) τ
+    (fun φ ζ hφ hζ =>
+      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSdiff hφ hζ)
+    rfl htau1_mema hχaχ1 hχbaraχ1 hχχbar'
+
 /-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
 
 `⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in `CF(L,A)`
