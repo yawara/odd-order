@@ -236,6 +236,156 @@ theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFuncti
     · intro hφ
       exact ⟨e ⟨φ, hφ⟩, by simp⟩
 
+/-- **(T8 leaf 10, combinatorial core) the conjugate-pair cover of `X` over a base `S₀`.**
+
+Given a finite set `X` of irreducible characters of `Γ`, closed under conjugation and with no real
+characters (Peterfalvi (1.1): for `|Γ|` odd a nontrivial irreducible is non-self-conjugate), and a
+conjugation-closed base `S₀ ⊆ X`, the complement `X ∖ S₀` is a disjoint union of conjugate pairs
+`{χ, χ̄}`.  This packages the data and facts consumed by `peterfalvi_66_coherence_of_X_from_dade`:
+the degree-monotone enumeration `e` (`exists_monotoneDegreeEnum`), the pair list `pair`/`N` with its
+irreducible first components `hpairχ`, the inclusions and index-level cover, plus the two facts the
+per-step (5.6) `DadeChainStep` needs — each adjoined pair is **disjoint from the prefix**
+`pairUnion S₀ pair j` (so `χⱼ, χ̄ⱼ ⊥ S₁`) and **degree-monotone** (so the (5.6) degree gap
+can hold).
+
+Construction: the conjugate-index involution `cidx i` (`e (cidx i) = (e i).conj`, fixed-point-free
+by no-real, preserving `∉ S₀`), the index transversal `T = {i | e i ∉ S₀ ∧ i < cidx i}` sorted by
+`Finset.orderEmbOfFin`, and `pair j = (e tⱼ, (e tⱼ).conj)` for the `j`-th transversal index `tⱼ`. -/
+theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
+    {X S₀ : Set (ClassFunction Γ ℂ)}
+    (hXfin : X.Finite)
+    (hXconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate X)
+    (hXreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters X)
+    (hXirr : ∀ χ ∈ X, IsIrreducibleCharacter χ)
+    (hS₀conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₀) :
+    ∃ (e : Fin X.ncard → ClassFunction Γ ℂ)
+      (pair : ℕ → ClassFunction Γ ℂ × ClassFunction Γ ℂ) (N : ℕ)
+      (hpairχ : ∀ i, i < N → IrreducibleCharacter Γ),
+      (∀ χ ∈ X, ∃ i, e i = χ) ∧
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair j ⊆ X) ∧
+      (∀ i : Fin X.ncard, e i ∈ S₀ ∨
+        ∃ j, j < N ∧ e i ∈ OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair j) ∧
+      (∀ (i : ℕ) (hi : i < N),
+        (pair i).1 = ((hpairχ i hi : IrreducibleCharacter Γ) : ClassFunction Γ ℂ)) ∧
+      (∀ (i : ℕ) (hi : i < N),
+        (pair i).2 = ((hpairχ i hi : IrreducibleCharacter Γ) : ClassFunction Γ ℂ).conj) ∧
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := Γ) S₀ pair j)) ∧
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) := by
+  classical
+  obtain ⟨e, he_inj, he_mem, he_surj, he_mono⟩ :=
+    OddOrder.Peterfalvi.S07.exists_monotoneDegreeEnum (L := Γ) hXfin
+  -- conjugate-index involution `cidx`
+  have hconjX : ∀ i, (e i).conj ∈ X := fun i => hXconj (he_mem i)
+  let cidx : Fin X.ncard → Fin X.ncard := fun i => (he_surj _ (hconjX i)).choose
+  have hcidx : ∀ i, e (cidx i) = (e i).conj := fun i => (he_surj _ (hconjX i)).choose_spec
+  have hcidx_invol : ∀ i, cidx (cidx i) = i := fun i =>
+    he_inj (by rw [hcidx (cidx i), hcidx i, ClassFunction.conj_conj])
+  have hcidx_inj : Function.Injective cidx := fun a b h => by
+    rw [← hcidx_invol a, h, hcidx_invol b]
+  have hcidx_ne : ∀ i, cidx i ≠ i := by
+    intro i hfix
+    apply hXreal (he_mem i)
+    show (e i).conj = e i
+    rw [← hcidx i, hfix]
+  have hcidx_notS₀ : ∀ {i}, e i ∉ S₀ → e (cidx i) ∉ S₀ := by
+    intro i hi hc
+    rw [hcidx i] at hc
+    exact hi (by simpa using hS₀conj hc)
+  -- index transversal `T`, enumerated by `orderEmbOfFin`
+  let T : Finset (Fin X.ncard) := Finset.univ.filter (fun i => e i ∉ S₀ ∧ i < cidx i)
+  let t : Fin T.card → Fin X.ncard := fun j => T.orderEmbOfFin rfl j
+  have htmono : StrictMono t := (T.orderEmbOfFin rfl).strictMono
+  have ht_mem : ∀ j, t j ∈ T := fun j => T.orderEmbOfFin_mem rfl j
+  have ht_spec : ∀ j, e (t j) ∉ S₀ ∧ t j < cidx (t j) := fun j =>
+    (Finset.mem_filter.mp (ht_mem j)).2
+  have ht_range : ∀ i ∈ T, ∃ j, t j = i := by
+    intro i hi
+    have hmem : i ∈ Set.range (T.orderEmbOfFin rfl) := by
+      rw [Finset.range_orderEmbOfFin]; exact Finset.mem_coe.mpr hi
+    obtain ⟨j, hj⟩ := hmem
+    exact ⟨j, hj⟩
+  -- the pair list
+  let pair : ℕ → ClassFunction Γ ℂ × ClassFunction Γ ℂ := fun j =>
+    if hj : j < T.card then (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) else (0, 0)
+  have hpair_eq : ∀ (j : ℕ) (hj : j < T.card),
+      pair j = (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) := fun j hj => dif_pos hj
+  have hfst : ∀ (j : ℕ) (hj : j < T.card), (pair j).1 = e (t ⟨j, hj⟩) := by
+    intro j hj; rw [hpair_eq j hj]
+  have hsnd : ∀ (j : ℕ) (hj : j < T.card), (pair j).2 = e (cidx (t ⟨j, hj⟩)) := by
+    intro j hj; rw [hpair_eq j hj]; exact (hcidx _).symm
+  refine ⟨e, pair, T.card, fun i hi => ⟨e (t ⟨i, hi⟩), hXirr _ (he_mem _)⟩,
+    he_surj, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · -- each pair lies in `X`
+    intro j hj φ hφ
+    simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff,
+      hfst j hj, hsnd j hj] at hφ
+    rcases hφ with rfl | rfl
+    · exact he_mem _
+    · exact he_mem _
+  · -- index-level cover
+    intro i
+    by_cases hiS₀ : e i ∈ S₀
+    · exact Or.inl hiS₀
+    · refine Or.inr ?_
+      rcases lt_or_gt_of_ne (hcidx_ne i) with hlt | hgt
+      · -- `cidx i < i` ⟹ `cidx i ∈ T`, and `e i` is the second component of its pair
+        have hcT : cidx i ∈ T := Finset.mem_filter.mpr
+          ⟨Finset.mem_univ _, hcidx_notS₀ hiS₀, by rw [hcidx_invol]; exact hlt⟩
+        obtain ⟨j, hj⟩ := ht_range _ hcT
+        refine ⟨j.val, j.isLt, ?_⟩
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff]
+        refine Or.inr ?_
+        rw [hsnd j.val j.isLt]
+        have hci : cidx (t ⟨j.val, j.isLt⟩) = i := by
+          rw [(hj : t ⟨j.val, j.isLt⟩ = cidx i)]; exact hcidx_invol i
+        rw [hci]
+      · -- `i < cidx i` ⟹ `i ∈ T`, and `e i` is the first component of its pair
+        have hiT : i ∈ T := Finset.mem_filter.mpr ⟨Finset.mem_univ _, hiS₀, hgt⟩
+        obtain ⟨j, hj⟩ := ht_range _ hiT
+        refine ⟨j.val, j.isLt, ?_⟩
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff]
+        refine Or.inl ?_
+        rw [hfst j.val j.isLt]
+        exact congrArg e hj.symm
+  · -- `(pair i).1 = χᵢ`
+    intro i hi; rw [hfst i hi]
+  · -- `(pair i).2 = χ̄ᵢ`
+    intro i hi; rw [hsnd i hi, hcidx]
+  · -- each pair is disjoint from the prefix accumulated before it
+    intro j hj
+    rw [Set.disjoint_left]
+    intro φ hφj hφu
+    rw [OddOrder.Peterfalvi.S07.mem_pairUnion] at hφu
+    simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff,
+      hfst j hj, hsnd j hj] at hφj
+    rcases hφu with hS₀mem | ⟨k, hkj, hφk⟩
+    · rcases hφj with rfl | rfl
+      · exact (ht_spec ⟨j, hj⟩).1 hS₀mem
+      · exact hcidx_notS₀ (ht_spec ⟨j, hj⟩).1 hS₀mem
+    · have hk : k < T.card := hkj.trans hj
+      simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff,
+        hfst k hk, hsnd k hk] at hφk
+      have htlt : t ⟨k, hk⟩ < t ⟨j, hj⟩ := htmono (Fin.mk_lt_mk.mpr hkj)
+      have hjT := (ht_spec ⟨j, hj⟩).2
+      rcases hφj with hj1 | hj1 <;> rcases hφk with hk1 | hk1
+      · have hee : t ⟨j, hj⟩ = t ⟨k, hk⟩ := he_inj (hj1.symm.trans hk1)
+        rw [hee] at htlt; exact absurd htlt (lt_irrefl _)
+      · have heq : t ⟨j, hj⟩ = cidx (t ⟨k, hk⟩) := he_inj (hj1.symm.trans hk1)
+        have hc : cidx (t ⟨j, hj⟩) = t ⟨k, hk⟩ := by rw [heq, hcidx_invol]
+        rw [hc] at hjT; exact absurd (hjT.trans htlt) (lt_irrefl _)
+      · have heq : cidx (t ⟨j, hj⟩) = t ⟨k, hk⟩ := he_inj (hj1.symm.trans hk1)
+        rw [heq] at hjT; exact absurd (hjT.trans htlt) (lt_irrefl _)
+      · have hee : t ⟨j, hj⟩ = t ⟨k, hk⟩ := hcidx_inj (he_inj (hj1.symm.trans hk1))
+        rw [hee] at htlt; exact absurd htlt (lt_irrefl _)
+  · -- adjacent pairs are degree-monotone
+    intro j hj1
+    have hj : j < T.card := by omega
+    rw [hfst j hj, hfst (j + 1) hj1]
+    exact he_mono (htmono.monotone (Fin.mk_le_mk.mpr (by omega)))
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
