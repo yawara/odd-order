@@ -4,6 +4,39 @@
 > brick 2b (Prop 1.15(b) 一般形) 完了で前提が揃った。case (1) は Thm 6.7 待ちで明示 sorry。
 > mmd 出典: `references/bg/local-analysis.mmd` L2252-2307。
 
+## 🟢🟢 2026-06-03 PM (`/goal` セッション): Thm 7.6 配線 + noncyclic 分岐完了 (build-green)
+
+**達成 (commit `e2be859`, `7df2c6a`)**:
+- **brick 4 = `thompsonTransitivity` 完成・直接 sorry-free** (SCN₃→SCN₂ + primesOf={p} + `kSubgroup` 橋
+  + `transitive_of_three_le_rank_center`; rank チェーン = A abelian⟹center=⊤, pRank(A.subgroupOf P)≤rank A)。
+- **`hypothesis71_of_scn2` を独立 lemma に factor out** (case-1 sorry を巻き込まない; 7.6 はこれを呼ぶ)。
+  `hypothesis71_of_scn2_or_pLengthOne` は case-2 をこれに委譲 (case-1 のみ sorry)。
+- **`coreClaim_scn2`** (新 private, S07): 前処理 (π(A)={p}, scn_ambient, `IsSolvable X`, `Z(P):=C_G(P)⊓P`,
+  Z(P)≤A) + `by_cases IsCyclic ↥Z(P)`。**noncyclic 分岐 完成**: S04 `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`
+  で中心 E_p² ⊆ Z(P), 全 b∈B^# 中心 ⟹ special-1 (`le_opiCoreInG_centralizer_of_mem_centralizer_sylow`)
+  ⟹ `coreClaimGeneral`。
+- **残 = cyclic-Z(P) 分岐のみ** (`coreClaim_scn2` 内 1 sorry, S07:~1762)。これだけが 7.6 の axiom-clean を阻む。
+
+**🔑 crux 解決 (Thm 7.4 不要を確定)**: special-2 の `z∈O_{p',p}(C_G(b))` は §7.4 を使わず導ける —
+`|P:C_P(b)|≤p` は **orbit-stabilizer**: b の P-共役は B⊴P 内 (B=E_p², |B|=p²) ⟹ orbit⊆B^# (p²−1 個) ⟹
+p-power ≤ p²−1 ⟹ ∈{1,p}。さらに `|P₂:P₁|≤p`: P₂=Sylow_p(C_G(b))⟹|P₂|≤|G|_p=|P|, |P₁|=|C_P(b)|≥|P|/p
+⟹ |P₂|/|P₁|≤p ⟹ P₁⊴P₂ ⟹ Z(P₁)⊴P₂ ⟹ Thm6.1(`thmA4b`) で z∈Z(P₁)⊆O_{p',p}(C_G(b))。
+
+**cyclic 分岐の残作業** (次セッション):
+1. Z:=Ω₁(Z(P)) cyclic ⟹ |Z|=p (`card_omega1_eq_prime_of_isCyclic` 系)。
+2. B=⟨b⟩×Z ∈ E_p²(A), B⊴P: **G 2.6.4** = `Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial` を
+   P/Z (bar-quotient) に適用し (Ω₁(A)/Z ∩ Z(P/Z))≠1 ⟹ B/Z 位数 p。最 fiddly。
+3. special-2 hspec: b∈B^#∖Z で `le_of_centralizer_inf_le_of_commutator_le` (z∈Z 生成元):
+   C_W(z)≤O_{p'}(C_G(b)) は special-1@z + per-b 橋 (`le_opiCoreInG_of_le_opiCoreInG_centralizer`);
+   ⁅⟨z⟩,W⁆≤O_{p'}(C_G(b)) は `commutator_zpowers_le_oPiCore` (要 z∈O_{p',p}(C_G(b)) = 上記 crux)。
+   b∈Z なら special-1 直接。
+
+**Lean 罠 (本セッション実測)**: `Subgroup.normalizer` は **Set G を取る** (`normalizer ↑Y`); `H⊓K` を normalizer
+引数に直書きすると Set-inter `↑H⊓↑K` に化け `mem_normalizer_iff` 不一致 → W を呼び先 (special-1) に
+推論させ `?_` で受ける。`IsMulCommutative` 抽出 = `isMulCommutative_iff.mp h` (`.comm` 不在),
+構成 = `IsMulCommutative.of_comm`; `IsElementaryAbelian.1` = comm 関数 (∀ x y, 直接 IsMulCommutative でない)。
+`set ZP` 後の `mem_inf` は `rw [hZPdef]` で unfold 要 (fvar が unify 阻害)。S07 は S04 を import してなかった (追加済)。
+
 ## 🟢 大進捗 (2026-06-03 goal-loop セッション): core claim の主要補題 全 build-green
 
 すべて `S07_Transitivity.lean` に private で実装・build-green・commit 済み:
