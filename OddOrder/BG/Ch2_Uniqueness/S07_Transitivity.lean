@@ -1626,6 +1626,65 @@ private theorem le_of_centralizer_inf_le_of_commutator_le {G : Type*} [Group G] 
     rw [hgen]
     exact hcomm (Subgroup.commutator_mem_commutator a.2 g.2)
 
+/-- **Commutator part of special case 2**: if `z ∈ O_{p',p}(H)` normalizes a `p'`-subgroup `W`,
+then `⁅⟨z⟩, W⁆ ≤ O_{p'}(H)`. Proof: `⁅⟨z⟩,W⁆ ≤ W` (z normalizes W) and `≤ O_{p',p}(H)`
+(z ∈ O_{p',p} ⊴ H), so `⁅⟨z⟩,W⁆ ≤ W ⊓ O_{p',p}(H)`, a `p'`-subgroup whose image in
+`H/O_{p'}(H) = O_p(quotient)` (via `oPiPrimePiCore_map_mk'_eq`) is a `p'`-subgroup of a `p`-group,
+hence trivial — so it lies in `ker = O_{p'}(H)`. -/
+private theorem commutator_zpowers_le_oPiCore {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] {z : H} (hz : z ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H)
+    {W : Subgroup H} (hzW : z ∈ Subgroup.normalizer W)
+    (hWpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ W) :
+    ⁅Subgroup.zpowers z, W⁆ ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ H := by
+  haveI hOnorm : (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).Normal := inferInstance
+  have hsubW : ⁅Subgroup.zpowers z, W⁆ ≤ W := by
+    rw [Subgroup.commutator_le]
+    intro a ha b hb
+    have hab : a * b * a⁻¹ ∈ W :=
+      (Subgroup.mem_normalizer_iff.mp ((Subgroup.zpowers_le.mpr hzW) ha) b).mp hb
+    simpa [commutatorElement_def, mul_assoc] using W.mul_mem hab (W.inv_mem hb)
+  have hsubO : ⁅Subgroup.zpowers z, W⁆ ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) H := by
+    rw [Subgroup.commutator_le]
+    intro a ha b _
+    have haO : a ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H := by
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+      exact (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).zpow_mem hz k
+    have hconj : b * a⁻¹ * b⁻¹ ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H :=
+      hOnorm.conj_mem a⁻¹ ((Ch03.oPiPrimePiCore ({p} : Set ℕ) H).inv_mem haO) b
+    simpa [commutatorElement_def, mul_assoc] using
+      (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).mul_mem haO hconj
+  -- `⁅⟨z⟩,W⁆ ≤ W ⊓ O_{p',p}(H)`; its mk'-image is a `p'`-subgroup of the `p`-group `O_p(H/O_{p'})`.
+  refine (le_inf hsubW hsubO).trans ?_
+  have hbridge : (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+        (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))
+      = Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H) :=
+    oPiPrimePiCore_map_mk'_eq ({p} : Set ℕ)
+  have hle : (W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+        (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))
+      ≤ Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H) :=
+    hbridge ▸ Subgroup.map_mono inf_le_right
+  have hT_pg : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H)) := by
+    rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p _
+  have hM_cop : Nat.Coprime (Nat.card ↥((W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+      (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H)))) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      have hdvd : Nat.card ↥((W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+            (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))) ∣ Nat.card ↥W :=
+        (Subgroup.card_map_dvd _ _).trans (Subgroup.card_dvd_of_le inf_le_left)
+      exact hWpi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hbot : (W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+      (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H)) = ⊥ := by
+    have hinf := OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hT_pg hM_cop
+    rwa [inf_eq_right.mpr hle] at hinf
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+  exact hbot
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
