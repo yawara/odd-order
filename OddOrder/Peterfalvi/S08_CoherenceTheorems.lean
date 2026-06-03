@@ -600,6 +600,77 @@ theorem inner_decomposition_X_extension_member_eq_zero
         hS₁ D.imageFamily D' hortho htau1 hα)
   rw [OddOrder.RepresentationTheory.inner_conj_symm, h1, star_zero]
 
+/-- **(5.5) member ν-aux decomposition: the running extension `ν` as the auxiliary isometry `τ₁`.**
+
+For a member `χ ∈ S₁` (non-real irreducible, with `χ̄ ∈ S₁` and `χ̄ − χ` supported), builds the (5.5)
+`ψ = 0` decomposition `D' : CharacterPsiDecomposition τ χ 0` whose **auxiliary isometry `τ₁` is the
+running extension `ν = hS₁.extension`** (not the Dade base map `τ`).  Then `D'.tau1 χ = ν χ`
+(definitionally) and, via (5.5) (`eq_sum_of_psi_eq_zero`), `ν χ = D'.X ∈ ℤ[R(χ)]`.
+
+This is the member family input that discharges the `D'`/`htau1` hypotheses of
+`inner_decomposition_X_extension_member_eq_zero` (and the (5.6.1) λ-form), built from the Dade
+`R(χ)` family (`dadeOrthonormalCharacterImageFamilyOfDiff`) and the coherent extension:
+
+* `htau1_inner_eq` — `ν` is a `ℤ[χ−χ̄, χ]`-isometry: both generators lie in `ℤ[S₁]` (since
+  `χ, χ̄ ∈ S₁`), where `hS₁.extension_inner_eq` applies;
+* `htau1_agrees` — `ν(χ−χ̄) = τ(χ−χ̄)` since `χ−χ̄` is supported (`extends_on_supported`);
+* `htau1_mem` — `ν χ ∈ ZIrr G` is the **injected** hypothesis `hνZ` (not derivable from `IsCoherent`,
+  whose `extension` is a bare `→ₗ[ℤ]` with no ZIrr-codomain field).
+
+The remaining (5.4) orthogonality scalars `⟨χ, 0⟩ = ⟨χ̄, 0⟩ = 0` are trivial and `⟨χ, χ̄⟩ = 0` is
+`hχχbar`. -/
+noncomputable def memberExtensionDecomposition
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L)
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsupp : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχ_S1 : (χ : ClassFunction ↥L ℂ) ∈ S₁)
+    (hχbar_S1 : (χ : ClassFunction ↥L ℂ).conj ∈ S₁)
+    (hνZ : hS₁.extension (χ : ClassFunction ↥L ℂ) ∈ ZIrr G)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction ↥L ℂ) 0 := by
+  classical
+  have hχmem : (χ : ClassFunction ↥L ℂ) ∈ Submodule.span ℤ S₁ := Submodule.subset_span hχ_S1
+  have hχbarmem : (χ : ClassFunction ↥L ℂ).conj ∈ Submodule.span ℤ S₁ :=
+    Submodule.subset_span hχbar_S1
+  -- The (5.4) sponsoring set `{χ − χ̄, χ − 0}` lies in `ℤ[S₁]`.
+  have hle : Submodule.span ℤ ({(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+      (χ : ClassFunction ↥L ℂ) - 0} : Set (ClassFunction ↥L ℂ)) ≤ Submodule.span ℤ S₁ := by
+    rw [Submodule.span_le]
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact Submodule.sub_mem _ hχmem hχbarmem
+    · rw [sub_zero]; exact hχmem
+  -- `χ − χ̄` is supported (vanishes off `A`), hence in `ℤ[S₁] ∩ CF(L,A)`.
+  have hdiffsupported : (χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
+    OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ hχmem hχbarmem, by
+        rw [show (χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj =
+            -((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)) by abel,
+          ClassFunction.support_neg]
+        exact hdiffsupp⟩
+  exact OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)
+    hS₁.extension
+    (fun φ ζ hφ hζ => hS₁.extension_inner_eq φ ζ (hle hφ) (hle hζ))
+    (hS₁.extends_on_supported _ hdiffsupported)
+    (by rw [sub_zero]; exact hνZ)
+    (by simp)
+    (by simp)
+    hχχbar
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
