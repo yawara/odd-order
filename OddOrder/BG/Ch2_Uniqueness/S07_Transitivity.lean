@@ -1698,10 +1698,66 @@ private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : S
   simp only [primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
   rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
 
+/-- **Core claim of BG Proposition 7.5, case (2)** (mmd L2273-2307): for `A ∈ SCN₂(P)`, every
+`A`-invariant `p'`-subgroup `Y ≤ X` (of a proper subgroup `X ⊇ A`) lies in `O_{p'}(X)`. Proof:
+build `B ∈ E_p²(A)` with `B ⊴ P` (cyclic/noncyclic `Z(P)` split via G 2.6.4), then feed the
+special-case inputs (`b ∈ Z(P)` via `le_opiCoreInG_centralizer_of_mem_centralizer_sylow`; general
+`b ∈ B^#` via the coprime decomposition) to `coreClaimGeneral`. -/
+private theorem coreClaim_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hAab : IsMulCommutative A) (hAp : IsPGroup p A)
+    {P : Sylow p G} (hAP : A ≤ (P : Subgroup G))
+    (hAscn2 : IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)))
+    {X : Subgroup G} (hAX : A ≤ X) (hXlt : X < ⊤)
+    {Y : Subgroup G} (hYX : Y ≤ X) (hAY : A ≤ Subgroup.normalizer Y)
+    (hYpi : Subgroup.IsPiSubgroup (primesOf A)ᶜ Y) :
+    Y ≤ opiCoreInG (primesOf A)ᶜ X := by
+  sorry
+
+/-- **BG Proposition 7.5, case (2)** (SCN₂ branch, mmd L2263-2309): if `A ∈ SCN₂(P)` for a Sylow
+`p`-subgroup `P`, then `A` satisfies Hypothesis 7.1. Separated from the `p`-length-one branch
+(`hypothesis71_of_scn2_or_pLengthOne` case 1, which awaits Theorem 6.7) so that the Thompson
+Transitivity Theorem (7.6) depends only on this `sorry`-free statement. -/
+theorem hypothesis71_of_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hAab : IsMulCommutative A) (hAp : IsPGroup p A)
+    (P : Sylow p G) (hAP : A ≤ (P : Subgroup G))
+    (hAscn2 : IsSCN_n p 2 (A.subgroupOf (P : Subgroup G))) :
+    Hypothesis71 A := by
+  -- `A ≠ ⊥`: `pRank (A.subgroupOf P) ≥ 2` forces an elementary abelian subgroup of order `≥ p²`.
+  have hAne : A ≠ ⊥ := by
+    intro hAbot
+    obtain ⟨B, _, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (p := p) (by norm_num) hAscn2.le_pRank
+    have hp2 : p ^ 2 ≤ Nat.card ↥B := Nat.pow_le_of_le_log Nat.card_pos.ne' hBlog
+    have hBdvd : Nat.card ↥B ∣ Nat.card ↥(A.subgroupOf (P : Subgroup G)) :=
+      Subgroup.card_subgroup_dvd_card B
+    have hcard1 : Nat.card ↥(A.subgroupOf (P : Subgroup G)) = 1 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAP).toEquiv, hAbot, Subgroup.card_bot]
+    rw [hcard1, Nat.dvd_one] at hBdvd
+    rw [hBdvd] at hp2
+    nlinarith [hp2, (Fact.out : p.Prime).two_le]
+  -- `A < ⊤`: `A ≤ P` and a Sylow `p`-subgroup of a (non-solvable) minimal simple group is proper.
+  have hAproper : A < ⊤ := by
+    have hP_lt : (P : Subgroup G) < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro hPtop
+      have hGp : IsPGroup p G :=
+        (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+          (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+      haveI : Group.IsNilpotent G := hGp.isNilpotent
+      exact hG.notSolvable inferInstance
+    exact lt_of_le_of_lt hAP hP_lt
+  refine ⟨hAne, hAproper, ?_⟩
+  intro X hAX hXlt
+  refine generated_eq_of_forall_le_opiCoreInG hAX ?_
+  intro Y hY
+  rw [mem_hInvariant] at hY
+  exact coreClaim_scn2 hG hAab hAp hAP hAscn2 hAX hXlt hY.1 hY.2.1 hY.2.2
+
 /-- **BG Proposition 7.5** (mmd L2252): `p ∈ π(G)`, `A` abelian `p`-部分群で、
 (1) `A = {x ∈ C_G(A) : x^p = 1}` かつ `G` の全真部分群が `p`-length one、または
 (2) ある Sylow `p`-部分群 `P` で `A ∈ SCN₂(P)`、
-のいずれかなら `A` は Hypothesis 7.1 を満たす。 -/
+のいずれかなら `A` は Hypothesis 7.1 を満たす。case (1) は Theorem 6.7 待ちで `sorry`; case (2) は
+`hypothesis71_of_scn2` へ委譲。 -/
 theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
     (A : Subgroup G) (hAab : IsMulCommutative A) (hAp : IsPGroup p A)
@@ -1715,42 +1771,9 @@ theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G
   · -- **case (1)**: every proper subgroup is `p`-length one. Hypothesis 7.1 follows from
     -- Theorem 6.7, which is not yet formalized (BG: "follows easily from Theorem 6.7").
     sorry
-  · -- **case (2)**: `A ∈ SCN₂(P)` for a Sylow `p`-subgroup `P`.
+  · -- **case (2)**: delegate to the `sorry`-free SCN₂ branch.
     obtain ⟨P, hAP, hAscn2⟩ := hcase2
-    -- `A ≠ ⊥`: `pRank (A.subgroupOf P) ≥ 2` forces an elementary abelian subgroup of order `≥ p²`.
-    have hAne : A ≠ ⊥ := by
-      intro hAbot
-      obtain ⟨B, _, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
-        (p := p) (by norm_num) hAscn2.le_pRank
-      have hp2 : p ^ 2 ≤ Nat.card ↥B := Nat.pow_le_of_le_log Nat.card_pos.ne' hBlog
-      have hBdvd : Nat.card ↥B ∣ Nat.card ↥(A.subgroupOf (P : Subgroup G)) :=
-        Subgroup.card_subgroup_dvd_card B
-      have hcard1 : Nat.card ↥(A.subgroupOf (P : Subgroup G)) = 1 := by
-        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAP).toEquiv, hAbot, Subgroup.card_bot]
-      rw [hcard1, Nat.dvd_one] at hBdvd
-      rw [hBdvd] at hp2
-      nlinarith [hp2, (Fact.out : p.Prime).two_le]
-    -- `A < ⊤`: `A ≤ P` and a Sylow `p`-subgroup of a (non-solvable) minimal simple group is proper.
-    have hAproper : A < ⊤ := by
-      have hP_lt : (P : Subgroup G) < ⊤ := by
-        rw [lt_top_iff_ne_top]
-        intro hPtop
-        have hGp : IsPGroup p G :=
-          (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
-            (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
-        haveI : Group.IsNilpotent G := hGp.isNilpotent
-        exact hG.notSolvable inferInstance
-      exact lt_of_le_of_lt hAP hP_lt
-    refine ⟨hAne, hAproper, ?_⟩
-    -- (2) of Hypothesis 7.1: reduce to the core claim `Y ⊆ O_{π'}(X)` (mmd L2273).
-    intro X hAX _hXlt
-    refine generated_eq_of_forall_le_opiCoreInG hAX ?_
-    intro Y _hY
-    -- **core claim** (mmd L2273-2307): every `A`-invariant `π'`-subgroup `Y ≤ X` lies in `O_{π'}(X)`.
-    -- Proof: construct `B ∈ E_p²(A)` with `B ⊴ P` (cyclic/noncyclic `Z(P)` split + G 2.6.4), then the
-    -- three claims of BG (special `b ∈ B^# ∩ Z` via Thm 6.1 + Prop 1.10 + 1.15(a); special `b ∈ B^#`
-    -- via Prop 1.15(b); general via Prop 1.16). See `notes/bg/s07_prop75_case2_plan.md`.
-    sorry
+    exact hypothesis71_of_scn2 hG hAab hAp P hAP hAscn2
 
 /-! ## Theorem 7.6 — Thompson Transitivity Theorem -/
 
@@ -1762,6 +1785,30 @@ theorem thompsonTransitivity [Finite G] (hG : IsMinimalSimpleOdd G)
     {A : Subgroup G} (hA : A ∈ scn3Global p G) {q : ℕ} [Fact q.Prime] (hq : q ≠ p) :
     ConjTransitiveOn (opiCoreInG {p}ᶜ (Subgroup.centralizer (A : Set G)))
       (hInvariantStar ⊤ A {q}) := by
-  sorry
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  have hAscn2 : IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)) := IsSCN_n.mono (by norm_num) hAscn3
+  haveI hAab : IsMulCommutative A := (scn_ambient hAP hAscn2.isSCN).1
+  have hAp : IsPGroup p ↥A := (P.isPGroup').to_le hAP
+  -- `A` satisfies Hypothesis 7.1 (Proposition 7.5, SCN₂ branch).
+  have hHyp : Hypothesis71 A := hypothesis71_of_scn2 hG hAab hAp P hAP hAscn2
+  -- `π(A) = {p}`, so `q ∈ (π A)ᶜ` and `kSubgroup A = O_{p'}(C_G(A))`.
+  have hπ : primesOf A = ({p} : Set ℕ) := primesOf_eq_singleton hAp hHyp.ne_bot
+  have hq' : q ∈ (primesOf A)ᶜ := by rw [hπ]; simpa using hq
+  -- `3 ≤ rank ↥(Z(A))`: `A` is abelian, so `Z(A) = ⊤`, and `pRank (A.subgroupOf P) ≥ 3`.
+  have hrank : 3 ≤ rank ↥(Subgroup.center ↥A) := by
+    have h3 : (3 : ℕ) ≤ pRank ↥A p :=
+      le_trans hAscn3.le_pRank
+        (pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hAP).toMonoidHom)
+          (Subgroup.subgroupOfEquivOfLe hAP).injective)
+    have hcenter : Subgroup.center (↥A) = ⊤ := by
+      rw [Subgroup.center_eq_top_iff]; exact hAab
+    rw [hcenter]
+    exact le_trans (le_trans h3 (pRank_le_rank p))
+      (rank_le_of_injective (f := (Subgroup.topEquiv (G := ↥A)).symm.toMonoidHom)
+        (Subgroup.topEquiv (G := ↥A)).symm.injective)
+  -- Theorem 7.2, then rewrite `kSubgroup A = O_{p'}(C_G(A))`.
+  have htrans := transitive_of_three_le_rank_center hG hHyp hq' hrank
+  rw [← hπ]
+  exact htrans
 
 end OddOrder.BG.Ch2.S07
