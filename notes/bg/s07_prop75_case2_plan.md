@@ -37,7 +37,24 @@ p-power ≤ p²−1 ⟹ ∈{1,p}。さらに `|P₂:P₁|≤p`: P₂=Sylow_p(C_G
 構成 = `IsMulCommutative.of_comm`; `IsElementaryAbelian.1` = comm 関数 (∀ x y, 直接 IsMulCommutative でない)。
 `set ZP` 後の `mem_inf` は `rw [hZPdef]` で unfold 要 (fvar が unify 阻害)。S07 は S04 を import してなかった (追加済)。
 
-### orbit-stabilizer crux helper — 検証済み skeleton + API (次セッション即着手用)
+### ✅ orbit-stabilizer crux helper 完成 (commit `cbf1c38`, axiom-clean, build-green)
+`card_conjOrbit_le_prime` (S07 private, sorry-free): b≠1 が P-共役不変な |B|=p² の B≤P に居れば
+b の ↥P 内共役 orbit は ≤p 要素。orbit⊆B∖{1} (<p²) + orbit-stab (`orbitEquivQuotientStabilizer`
++ `Subgroup.card_quotient_dvd_card`) で size∣|P|=p^k ⟹ p^j<p²⟹≤p。**Thm 7.4 不要を実装で確認**。
+**残: これを `|P:C_P(b)|≤p` に橋渡し** (orbit card = centralizer index via `orbitEquivQuotientStabilizer`
++ `ConjAct.stabilizer_eq_centralizer`; index = `card_mul_index`)。
+
+### z∈O_{p',p}(C_G(b)) 連鎖の残り API (検証済み building blocks + 1 gap)
+- `IsPGroup.exists_le_sylow (hP : IsPGroup p P₁sub) : ∃ Q : Sylow p ↥(C_G(b)), P₁sub ≤ Q` (P₂ 取得; ↥(C_G(b)) 内で適用)。
+- `Subgroup.centerCharacteristic : (center _).Characteristic` (Z(P₁) char P₁; P₁⊴P₂ ⟹ Z(P₁)⊴P₂)。
+- `Subgroup.card_mul_index : Nat.card H * H.index = Nat.card G` (|P₂:P₁| 計算)。`thmA4b` (Thm 6.1)。
+- **🔴 GAP: 「p-群 P₂ の index-p 部分群 P₁ は正規」** が mathlib に無い (index_eq_two のみ)。
+  p-群の maximal 部分群は正規 (nilpotent) で導けるが ~30 LOC 要。`Group.IsNilpotent`+maximal→normal or
+  Frattini 経由。|P₂:P₁|=1 の場合は自明。
+- 連鎖: P₁=C_P(b)=C_G(b)⊓↑P を ↥(C_G(b)) で P₂ に拡張, |P₂|≤|G|_p=|P| ∧ |P₁|≥|P|/p ⟹ |P₂:P₁|≤p,
+  P₁⊴P₂ (gap), Z(P₁)⊴P₂, thmA4b ⟹ z∈Z(P₁)⊆O_{p',p}(C_G(b))。
+
+### (旧) orbit-stabilizer crux helper — 検証済み skeleton + API (次セッション即着手用)
 
 special-2 の `|P:C_P(b)|≤p` を private helper で。**全 API 確認済**、未解決は `Set.ncard`↔`Nat.card`
 橋と ConjAct の beta 簡約のみ (試作で 6 mechanical error まで詰めた; revert 済で main は緑):
