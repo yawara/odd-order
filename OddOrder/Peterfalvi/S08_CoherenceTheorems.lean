@@ -1774,6 +1774,23 @@ theorem exists_monoidHom_units_ne_one_of_commutator_ne_top {Γ : Type*} [Group �
   obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective a
   simpa using DFunLike.congr_fun hcon g
 
+/-- A finite group with non-trivial abelianization carries a non-trivial **degree-one irreducible
+character**. This is the `IrreducibleCharacter`-level form of the **Peterfalvi (6.2)** existence
+ingredient: bridging `exists_monoidHom_units_ne_one_of_commutator_ne_top` through the linear
+character functor `linearIrreducibleCharacter`. Applied to the section `K/A` (non-trivial solvable)
+and inflated to `K`, it furnishes a non-trivial `θ ∈ Irr K` with `A ⊆ ker θ`, i.e. a member of
+`S(A)`. -/
+theorem exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top {Γ : Type*}
+    [Group Γ] [Finite Γ] (h : commutator Γ ≠ ⊤) :
+    ∃ χ : IrreducibleCharacter Γ,
+      χ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ ∧
+      (χ : ClassFunction Γ ℂ) (1 : Γ) = 1 := by
+  obtain ⟨φ, hφ⟩ := exists_monoidHom_units_ne_one_of_commutator_ne_top h
+  refine ⟨OddOrder.RepresentationTheory.linearIrreducibleCharacter φ, ?_,
+    OddOrder.RepresentationTheory.linearIrreducibleCharacter_apply_one φ⟩
+  rw [Ne, OddOrder.RepresentationTheory.linearIrreducibleCharacter_eq_trivial_iff]
+  exact hφ
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
