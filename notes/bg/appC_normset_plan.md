@@ -176,6 +176,11 @@ cardinality の有限和であることを証明した。次は AppC の `H=P⋊
 `normOnePairSetAt_ncard_eq_normSetE_ncard` を合成して `|U| * |E|` 版も登録した。
 AxiomsCheck 登録済み。
 
+#### ✅ class-sum bridge: coefficient lower bound reducer (2026-06-04)
+`normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card` で、将来の指標論から
+`classSumCoeff(C_s,C_s,C_{2s}) > |U|` が得られれば `|E| ≥ 2` へ直ちに落とせる形にした。
+q≥5 分岐の残りを concrete Frobenius group の coefficient lower bound に分離。AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

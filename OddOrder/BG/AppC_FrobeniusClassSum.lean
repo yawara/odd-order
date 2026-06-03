@@ -422,6 +422,28 @@ theorem classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normS
   rw [classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard
       p q hs h2, normOnePairSetAt_ncard_eq_normSetE_ncard p q hq hs]
 
+/-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
+coefficient larger than `|U|`, the norm set has at least two elements. -/
+theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hq : q ≠ 0) {s : GaloisField p q} (hs : s ≠ 0)
+    (h2 : (2 : GaloisField p q) ≠ 0)
+    (hcoeff :
+      Nat.card (normOneUnits p q) <
+        classSumCoeff (normOneClassAt p q s) (normOneClassAt p q s)
+          (normOneClassAt p q ((2 : GaloisField p q) * s))) :
+    2 ≤ (normSetE p q).ncard := by
+  rw [classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normSetE_ncard
+      p q hq hs h2] at hcoeff
+  by_contra hnot
+  have hE_le_one : (normSetE p q).ncard ≤ 1 := by omega
+  have hmul_le :
+      Nat.card (normOneUnits p q) * (normSetE p q).ncard ≤
+        Nat.card (normOneUnits p q) * 1 :=
+    Nat.mul_le_mul_left _ hE_le_one
+  rw [Nat.mul_one] at hmul_le
+  exact (Nat.not_lt_of_ge hmul_le) hcoeff
+
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
 `H = P ⋊ U`.  This is the one-way bridge needed before proving that the
