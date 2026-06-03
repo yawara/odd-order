@@ -137,7 +137,21 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
 5. T-A4 part(a) member-family enum → T-A4 assemble → T-A5 glue (coherentUnion_of_glued, Y=coherentYFamily)。
 
 route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が foundation) + enum 構成 (ZIrr 非依存)。
-**次セッション着手点 = §G B1 (5.6 量的形) または B2 (degree-sum)** (bottom-up, foundational)。
+
+### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
+- ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
+  (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
+  (= (6.2) の `∑_{θ∈T}θ(1)²=|K:A|−1`, G=K/N=A)。`sumInflatedDegreeSq` − trivial(1)。
+- 🔴 **B2 残 (orbit counting)**: `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_{θ∈T}θ(1)²` = induced-char の W₁-orbit
+  |L:K|-to-1 counting (χ=Ind θ, χ(1)=|L:K|θ(1), inertia=K で Ind 既約)。substantial・要 induced-char inertia 機構。
+- 🔴 **B1 = (5.6) 量的形**: `S₁ coherent ∧ S₁∪{ψ,ψ̄} 非coherent ⟹ 2ψ(1)d₁≥∑_{χ∈S₁}χ(1)²/‖χ‖²`。
+  forward (`retarget_isCoherent`/`xAdjoinStep`) の対偶だが aux 仮説 (member family 等) の Sibley-setup-packaging
+  が要 ⟹ **member-family 構成と共有** (T-A4 part(a) と同じ foundational piece)。
+- 🔴 **θ-degree bound**: `θ(1)≤|K:C|√|C:D|` (D/B⊆Z(C/B))。基本 Schur bound (`finrank_sq_le_index`/
+  `exists_degree_sq_le_index`@SchurCenterBound, θ(1)²≤[K:Z(K)]) では不足、section D/B⊆Z(C/B) の Clifford 論証要。
+- **(6.2)→(6.3)→(6.5)**: 上記 B1/B2/θ-bound + Sibley-setup ((C).b 抽出) を組めば (6.2)、以降 (6.3)(6.5) は代数+帰納。
+- **最高レバレッジ次ピース = member-family 構成** (B1 と T-A4 part(a) で共有)。Sibley-setup framework
+  ((6.1)/(6.4) = SibleyDadeHypothesis 拡張) の formalization が要。focused effort 推奨。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
