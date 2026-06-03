@@ -21,10 +21,12 @@ created: 2026-06-04
 
 - [x] 基盤: `normN` / `normSetE` 定義 + **Remark (I)** `conditionA_iff_not_dvd` (条件A ⟺ q∤(p-1), axiom-clean, AxiomsCheck 登録) — 2026-06-04 commit
 - [x] **Lemma C.1** `lemmaC1` (E=E⁻¹ ∧ |E|≥2 ⟹ p≤q) — **完成・sorry-free・axiom-clean・AxiomsCheck 登録** (2026-06-04 commit 32ae2f4)。τ-反復 `tauIter`/`dSeq`/`normN_dSeq_eq_one` (telescoping) + `natCast_pow_pPow` + degree-q Frobenius 多項式根数 (`natDegree_prod`/`card_roots'`/`CharP.natCast_injOn_Iio`)。
-- [~] **Lemma C.2 (q=3)**: 前半 ✅ (2026-06-04 commits 6f5324d/793d0ec): `exists_rootFree_cubic`
-  (pigeonhole ∃c 無根) + `fCubic`/`fCubic_natDegree`(=3)/`fCubic_irreducible`。**残**: 持ち上げ
-  (AdjoinRoot で root∈F_{p³} + Frobenius 軌道因数分解 + normN=-fCubic(0)/fCubic(2)) ~200行。詳細=plan note 「残作業 breakdown (A)」。
-- [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。別 infra・重。
+- [x] **Lemma C.2 (q=3)** — **完成** (2026-06-04 commit 5268ce0, sorry-free, axiom-clean, AxiomsCheck 登録):
+  `exists_mem_normSetE_three` (∃a∈𝔽_{p³}, N(a)=N(2-a)=1 ∧ a≠1) + lemmaC2 q=3 分岐配線。
+  pigeonhole → 既約 → root∈𝔽_{p³} (AdjoinRoot iso) → Frobenius 軌道 {a,aᵖ,aᵖ²} 相異 (root∉𝔽_p +
+  Frobenius 固定点=𝔽_p) → fCubic.map=∏(X-a^{p^i}) (roots multiset 同定) → eval 0/2 で normN 読み取り。
+  helpers: `aeval_pow_p`/`exists_root_fCubic`/`root_not_mem_range`/`mem_range_of_pow_p_eq_self`/`fCubic_monic`/`normN_three`。
+- [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
 
