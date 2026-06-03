@@ -1597,6 +1597,46 @@ noncomputable def xChainCoherent
       rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
       exact (hstep i hi hcoh).adjoin)
 
+/-- **Peterfalvi (6.3) degree-bound arithmetic core.**  The real/integer inequality at the heart of
+Theorem (6.3) (mmd 04.8 L33): from the (6.2) consequence `b·x − 1 ≤ 2·a·b·√x` (with `a = |L:K|`,
+`b = |K:H| ≥ 1`, `x = |H:A| ≥ 1`) one gets `x ≤ 4a² + 1`.
+
+Proof: dividing by `b` and using `b ≥ 1` gives `x − 1 ≤ 2a√x`; squaring (`x − 1 ≥ 0`) gives
+`(x − 1)² ≤ 4a²x`, i.e. `x² − (4a² + 2)x + 1 ≤ 0`; for a natural `x`, `x ≥ 4a² + 2` would give
+`x² − (4a² + 2)x + 1 = x·(x − (4a² + 2)) + 1 ≥ 1 > 0`, a contradiction.  This is what (6.3) combines
+with its hypothesis `|H:H₁| > 4|L:K|² + 1 ≤ x` to reach a contradiction (so `𝒮(M)` is coherent). -/
+theorem degreeBound_le_of_sqrt_bound {a b x : ℕ} (hb : 1 ≤ b) (hx : 1 ≤ x)
+    (h : (b : ℝ) * x - 1 ≤ 2 * a * b * Real.sqrt x) : x ≤ 4 * a ^ 2 + 1 := by
+  have hx0 : (0 : ℝ) ≤ (x : ℝ) := Nat.cast_nonneg x
+  have hsx : Real.sqrt x ^ 2 = (x : ℝ) := Real.sq_sqrt hx0
+  have hsx0 : (0 : ℝ) ≤ Real.sqrt x := Real.sqrt_nonneg x
+  have hb1 : (1 : ℝ) ≤ (b : ℝ) := by exact_mod_cast hb
+  have hbpos : (0 : ℝ) < (b : ℝ) := by linarith
+  have hx1 : (1 : ℝ) ≤ (x : ℝ) := by exact_mod_cast hx
+  -- `x − 1 ≤ 2a√x` (divide `h` by `b`, drop `1/b ≤ 1`).
+  have key : (x : ℝ) - 1 ≤ 2 * a * Real.sqrt x := by
+    have hbx : (b : ℝ) * ((x : ℝ) - 1) ≤ (b : ℝ) * (2 * a * Real.sqrt x) := by
+      have e1 : (b : ℝ) * ((x : ℝ) - 1) = (b : ℝ) * x - b := by ring
+      have e2 : (b : ℝ) * (2 * a * Real.sqrt x) = 2 * a * b * Real.sqrt x := by ring
+      rw [e1, e2]; nlinarith [h, hb1]
+    exact le_of_mul_le_mul_left hbx hbpos
+  -- `(x − 1)² ≤ (2a√x)² = 4a²x`.
+  have hkey0 : (0 : ℝ) ≤ (x : ℝ) - 1 := by linarith
+  have hrhs0 : (0 : ℝ) ≤ 2 * a * Real.sqrt x := by positivity
+  have hsq : ((x : ℝ) - 1) ^ 2 ≤ 4 * (a : ℝ) ^ 2 * x := by
+    have hprod := mul_le_mul key key hkey0 hrhs0
+    have hrw : (2 * (a : ℝ) * Real.sqrt x) * (2 * (a : ℝ) * Real.sqrt x) = 4 * (a : ℝ) ^ 2 * x := by
+      rw [show (2 * (a : ℝ) * Real.sqrt x) * (2 * (a : ℝ) * Real.sqrt x)
+          = 4 * (a : ℝ) ^ 2 * (Real.sqrt x * Real.sqrt x) by ring, Real.mul_self_sqrt hx0]
+    rw [hrw] at hprod
+    nlinarith [hprod]
+  -- `x² − 2x + 1 ≤ 4a²x` gives `x² < (4a²+2)x`, so `x < 4a²+2`, i.e. `x ≤ 4a²+1`.
+  have hxlt : (x : ℝ) < 4 * (a : ℝ) ^ 2 + 2 := by
+    have hxpos : (0 : ℝ) < (x : ℝ) := by linarith
+    nlinarith [hsq, hxpos]
+  have hxltN : x < 4 * a ^ 2 + 2 := by exact_mod_cast hxlt
+  omega
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
