@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -605,6 +606,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
+-- RepresentationTheory: conjugacy-class representative/cardinality adapters used by
+-- class-sum character formulae.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjClass_mk_out
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjClass_carrier_ncard_eq_natCard
+-- RepresentationTheory: class-sum coefficient character formula used in BG App C.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_classSumCoeff_mul_irreducibleCharacter_apply
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
 -- RepresentationTheory (Peterfalvi (1.5.d), Burnside degree-sum): the diagonal column relation
 -- at `g = 1` gives `∑_{χ ∈ Irr G} χ(1)² = |G|` and, restricted to nontrivial characters,
 -- `∑_{χ ≠ 1} χ(1)² = |G| - 1` (issue 0044 building block for §9 (7.8)).
@@ -1892,6 +1902,10 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.normOneClassAt_carrier_ncard_eq_normOneUnits_card
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_out_centralizer_card_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
 -- fixed-product fiber over `inl (2*s)` before passing to the full product class.

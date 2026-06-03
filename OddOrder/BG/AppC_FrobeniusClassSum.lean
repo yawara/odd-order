@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.Set.Card.Arithmetic
 import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -645,6 +646,33 @@ theorem normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card [Fact p.Prime]
       Nat.card (normOneUnits p q) :=
   normOneClassAt_carrier_ncard_eq_normOneUnits_card p q (mul_ne_zero h2 hs)
 
+
+/-- For a nonzero additive-kernel class, the centralizer of the chosen class representative
+`(normOneClassAt p q s).out` has the same cardinality as the concrete centralizer of `inl s`,
+namely `p^q`.  This is the denominator in the App C class-sum character formula. -/
+theorem normOneClassAt_out_centralizer_card_eq [Fact p.Prime]
+    (hq : 1 < q) {s : GaloisField p q} (hs : s ≠ 0) :
+    Nat.card
+        (Subgroup.centralizer
+          ({(normOneClassAt p q s).out} : Set (normOneFrobeniusGroup p q))) =
+      p ^ q := by
+  classical
+  let C : ConjClasses (normOneFrobeniusGroup p q) := normOneClassAt p q s
+  have hmk : ConjClasses.mk C.out = C := OddOrder.RepresentationTheory.conjClass_mk_out C
+  have hidx :
+      (Subgroup.centralizer ({C.out} : Set (normOneFrobeniusGroup p q))).index =
+        Nat.card (normOneUnits p q) := by
+    rw [← OddOrder.RepresentationTheory.card_class_eq_index_centralizer C.out]
+    rw [hmk]
+    rw [← OddOrder.RepresentationTheory.conjClass_carrier_ncard_eq_natCard C]
+    exact normOneClassAt_carrier_ncard_eq_normOneUnits_card p q hs
+  have hmul :=
+    (Subgroup.centralizer ({C.out} : Set (normOneFrobeniusGroup p q))).index_mul_card
+  rw [hidx, normOneFrobeniusGroup_card_eq p q (by omega)] at hmul
+  rw [Nat.mul_comm (Nat.card (normOneUnits p q))] at hmul
+  exact Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := normOneUnits p q)) hmul
+
+
 /-- Fixed-product version of `IsClassPair`: the two entries lie in prescribed
 classes and their product is the chosen representative `z`, not merely an
 element conjugate to `z`.  This is the fiber counted by the finite-field pair
@@ -958,6 +986,52 @@ lemma two_ne_zero_galoisField [Fact p.Prime] (hpodd : Odd p) :
   · exact (Fact.out : p.Prime).ne_one hp_eq_one
   · rcases hpodd with ⟨k, hk⟩
     omega
+
+open scoped Classical in
+/-- App C specialization of the class-sum coefficient character formula for
+`C_1 * C_1 -> C_2` in the concrete Frobenius group `H = P ⋊ U`.  The centralizer
+factor is `p^q`, and both input class sizes are `|U|`. -/
+theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hpodd : Odd p) (hq : 1 < q) :
+    (classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (2 : GaloisField p q)) : ℂ) *
+        ((p ^ q : ℕ) : ℂ) =
+      ∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+        (((Nat.card (normOneUnits p q) : ℂ) *
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (normOneClassAt p q (1 : GaloisField p q)).out *
+          ((Nat.card (normOneUnits p q) : ℂ) *
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (normOneClassAt p q (1 : GaloisField p q)).out)) /
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (1 : normOneFrobeniusGroup p q)) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (normOneClassAt p q (2 : GaloisField p q)).out⁻¹ := by
+  classical
+  letI : Fintype (ConjClasses (normOneFrobeniusGroup p q)) := Fintype.ofFinite _
+  have hcard1 :
+      Nat.card { x : normOneFrobeniusGroup p q //
+          ConjClasses.mk x = normOneClassAt p q (1 : GaloisField p q) } =
+        Nat.card (normOneUnits p q) := by
+    rw [← OddOrder.RepresentationTheory.conjClass_carrier_ncard_eq_natCard]
+    exact normOneClassAt_carrier_ncard_eq_normOneUnits_card p q one_ne_zero
+  have hcent :
+      Nat.card
+          (Subgroup.centralizer
+            ({(normOneClassAt p q (2 : GaloisField p q)).out} :
+              Set (normOneFrobeniusGroup p q))) =
+        p ^ q :=
+    normOneClassAt_out_centralizer_card_eq p q hq (two_ne_zero_galoisField p q hpodd)
+  have h :=
+    OddOrder.RepresentationTheory.classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
+      (G := normOneFrobeniusGroup p q)
+      (Ci := normOneClassAt p q (1 : GaloisField p q))
+      (Cj := normOneClassAt p q (1 : GaloisField p q))
+      (Cs := normOneClassAt p q (2 : GaloisField p q))
+  rw [hcent, hcard1] at h
+  exact h
 
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
