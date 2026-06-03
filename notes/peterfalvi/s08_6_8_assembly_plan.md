@@ -501,6 +501,22 @@ surgery を 2 系統に分解(`IsCoherent` field 確認済: `extension`=ν, `ext
 - **chi1/Da 側(真の crux・残)**: `Da`(新 pair, χ∉ℤ[S₁] を含む)は τ ベース必須 ⟹ `Da.tau1 chi1=τ chi1`。core が要求する `htau1_chi1 : Da.tau1 chi1=ν chi1` ⟹ `τ chi1=ν chi1`(=defect δ=ν chi1−τ chi1=0)が unsupported chi1 で偽。**δ は base block 上一定**(ν(chi_j−chi_0)=τ(chi_j−chi_0) ⟹ ν chi_j−τ chi_j=ν chi_0−τ chi_0)。原理的 fix = `ν'(χ):=τ(χ−a·chi1)+a·ν chi1`(両項 integral)で χ の像を定義 ⟹ Da を `tau1 χ=ν'(χ)` で構成すれば `Da.tau1 chi1=ν chi1` 成立。**残 crux = ν'(χ) が norm-1 + ν(S₁) と直交正規であること** ⟺ **`⟨τ(χ−a·chi1), ν chi1⟩=−a`**(norm 条件: ‖ν'(χ)‖²=(1+a²)+a²+2a·Re⟨τ(χ−a·chi1),ν chi1⟩=1)。supported chi1 なら Dade isometry で −a だが、unsupported chi1 では ν chi1 と Dade 像の内積を base coherence(coherentEqualDegree)の構成詳細から導く要 = (5.6) の真の content・multi-session。
 - **実装順(parallel 構成で build-green 維持)**: (1) member ν-aux 分解補題(上記, clean・先行可能)→ (2) crux `⟨τ(χ−a·chi1),ν chi1⟩=−a` を base coherence 構成から導出(hard)→ (3) 補正 Da 構成子(`tau1 χ=ν'(χ)`)→ (4) `retarget_isCoherent_fromDade_X` 差分化(hmemSupp/hchi1supp 除去)→ (5) `DadeChainStep` struct 差分化 + `advance` rewrite。**(2) が律速**。
 
+#### J.3.2 crux 攻略 — surgery を単一恒等式へ還元 (2026-06-03, user「crux 攻略」指示後)
+
+**🟢 base `retarget_isCoherent`(S07:2844)は再利用可・core 再導出不要**: image `X`/`Xbar` を **明示引数**で取り、`hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`(image 直交正規)・`hX_ortho`/`hXbar_ortho`(`⟨ν ξ,X⟩=0`)・`himg : τ(χ−a·chi1)=X−a·ν chi1` を **仮説**として取る(decomposition から X を計算しない)。⟹ **`X := ν'(χ) := τ(χ−a·chi1)+a·ν chi1` を直接渡せる** ⟹ `himg` は **rfl**(`htau1_chi1` を完全 bypass)。`hagree_ratio`(τ₂(χ−a·chi1)=τ(χ−a·chi1))も himg 経由で成立。
+
+**🎯 surgery 全体が単一恒等式 crux1 へ還元**(代数済): X=ν'(χ) で
+- `himg`: 定義より trivial。
+- `hX_ortho ⟨ν ξ,X⟩`: ξ=ξ_supp+m·chi1 分解 + ν-isometry(ℤ[S₁])+ Dade-isometry(supported)で `= m·(a + conj⟨τ(χ−a·chi1),ν chi1⟩)` ⟹ **crux1 ⟺ 0**。
+- `hXX ‖X‖²`: `= ‖τ(χ−a·chi1)‖² + 2a·Re⟨τ(χ−a·chi1),ν chi1⟩ + a²‖ν chi1‖² = (1+a²)+a²+2a·Re(crux1)` ⟹ **=1 ⟺ Re(crux1)=−a**。
+- `crux2 := ⟨τ(χ−χ̄),ν chi1⟩ = 0`: **clean**(`τ(χ−χ̄)∈ℤ[R(χ)]`, `ν chi1∈ℤ[R(chi1)]`(ν-aux 分解), `R(χ)⊥R(chi1)` ← `⟨(χ−χ̄)^τ,(chi1−c̄)^τ⟩=⟨χ−χ̄,chi1−c̄⟩=0`)⟹ `hXXbar`/`hXbar*` 系も crux1 のみに依存。
+
+⟹ **残 = crux1 `⟨τ(χ−a·chi1), ν chi1⟩ = −a` ただ 1 本**。`τ(χ−a·chi1)=Da.X−Da.Y`, `Da.X∈ℤ[R(χ)]⊥ν chi1`(R 直交)⟹ `crux1 = −⟨Da.Y,ν chi1⟩`、両者 ⊥R(χ) の overlap = (5.6) Feit–Sibley の真の content。supported case は `inner_self_chi_eq_sum_coeff`(S07:1220)+`inner_self_chi_add_psi_eq`(1300)+ degree 不等式で `‖Da.X‖²=1`(⟹`‖Da.Y‖²=a²`⟹`‖τ chi1‖²=1`)を導出。crux1 は同 machinery + degree 不等式の適応で出る見込み。
+
+**⚠️ bridge lemma は Dade レベル**: `‖τ(χ−a·chi1)‖²=1+a²` は χ∉ℤ[S₁] ゆえ IsCoherent の `inner_eq_on_supported`(ℤ[S₁] 限定)では出ず、**Dade isometry `dadeIntegralCharacterMap_inner_eq_on_supported_span`** が要る ⟹ bridge は `retarget_isCoherent_fromDade_*` レベルで書く。
+
+**次の committable piece** = `retarget_isCoherent_of_extensionImage`(Dade レベル, crux1 を仮説に取り X=ν'(χ) で `hXX`/`hX_ortho`/`hXbar*`/`himg` を導出 → base `retarget_isCoherent` 呼ぶ)。これで surgery が **crux1 単一補題**に帰着。その後 crux1 を decomposition norm machinery + degree 不等式で discharge(本丸)。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
