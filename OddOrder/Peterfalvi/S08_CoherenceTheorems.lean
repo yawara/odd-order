@@ -211,6 +211,30 @@ theorem characterKernel_subset_of_inner_induce_ne_zero {Γ : Type*} [Group Γ] [
 
 /- 6: Some coherence theorems (pp. 30-37) -/
 
+/-- **Finite set of irreducible characters → injective `Fin k` enumeration.**  A finite set `T` of
+class functions all of which are irreducible characters is enumerated by an injective family
+`χ : Fin k → IrreducibleCharacter Γ` whose underlying-class-function range is exactly `T`.  This is
+the bridge to the `Fin n`-indexed family interface of `coherentEqualDegree_fromDade` (the base
+block `S₀`). -/
+theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFunction Γ ℂ)}
+    (hTfin : T.Finite) (hTirr : ∀ χ ∈ T, IsIrreducibleCharacter χ) :
+    ∃ (k : ℕ) (χ : Fin k → IrreducibleCharacter Γ),
+      Function.Injective χ ∧ Set.range (fun j => (χ j : ClassFunction Γ ℂ)) = T := by
+  classical
+  haveI : Fintype T := hTfin.fintype
+  let e := Fintype.equivFin T
+  refine ⟨Fintype.card T, fun j => ⟨(e.symm j : ClassFunction Γ ℂ), hTirr _ (e.symm j).2⟩, ?_, ?_⟩
+  · intro i j hij
+    have h : (e.symm i : ClassFunction Γ ℂ) = (e.symm j : ClassFunction Γ ℂ) :=
+      congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) hij
+    exact e.symm.injective (Subtype.ext h)
+  · ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact (e.symm j).2
+    · intro hφ
+      exact ⟨e ⟨φ, hφ⟩, by simp⟩
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
