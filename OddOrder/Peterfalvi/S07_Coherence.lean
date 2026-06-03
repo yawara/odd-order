@@ -990,7 +990,7 @@ structure CharacterPsiDecomposition (τ : IntegralCharacterMap L G)
   access is on `χ - ψ` or `χ - χ̄`, both in `ℤ[χ, χ̄, ψ]`). -/
   tau1_inner_eq_on_support :
     ∀ φ ζ : ClassFunction L ℂ,
-      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      φ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} → ζ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} →
       ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ
   /-- `τ₁` coincides with `τ` on `χ - χ̄`. -/
   tau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj)
@@ -1050,7 +1050,7 @@ noncomputable def ofProjection
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     (tau1 : IntegralCharacterMap L G)
     (htau1_inner_eq : ∀ φ ζ : ClassFunction L ℂ,
-      φ ∈ zSpan (L := L) {χ, χ.conj, ψ} → ζ ∈ zSpan (L := L) {χ, χ.conj, ψ} →
+      φ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} → ζ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} →
       ClassFunction.inner (tau1 φ) (tau1 ζ) = ClassFunction.inner φ ζ)
     (htau1_agrees : tau1 (χ - χ.conj) = τ (χ - χ.conj))
     (htau1_mem : tau1 (χ - ψ) ∈ ZIrr G)
@@ -1124,20 +1124,31 @@ noncomputable def decompositionPair {a : ℕ} {chi1 : ClassFunction L ℂ}
   -- shared lattice `{χ, χ̄, 0, a·χ₁}`, so the lattice-relative inner-preservation specializes by
   -- `Submodule.span_mono`.  This is exactly how the Dade isometry supplies both decompositions:
   -- one preservation fact on the supported span covers every difference generator.
-  have hsub0 : ({χ, χ.conj, (0 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
-      {χ, χ.conj, 0, a • chi1} := by
-    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
-  have hsuba : ({χ, χ.conj, (a • chi1 : ClassFunction L ℂ)} : Set (ClassFunction L ℂ)) ⊆
-      {χ, χ.conj, 0, a • chi1} := by
-    intro x hx; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢; tauto
+  -- Each per-`ψ` *difference* sublattice `ℤ[χ−χ̄, χ−ψ]` sits inside the shared (supported) span
+  -- `ℤ[χ, χ̄, 0, a·χ₁]` (its generators `χ−χ̄`, `χ−ψ` are differences of the shared generators), so
+  -- the full inner-preservation restricts to it.
+  have hle0 : zSpan (L := L) ({χ - χ.conj, χ - 0} : Set (ClassFunction L ℂ)) ≤
+      zSpan (L := L) ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction L ℂ)) :=
+    Submodule.span_le.mpr (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl <;>
+        exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp)))
+  have hlea : zSpan (L := L) ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)) ≤
+      zSpan (L := L) ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction L ℂ)) :=
+    Submodule.span_le.mpr (by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with rfl | rfl <;>
+        exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp)))
   (ofProjection imageFamily tau1
-      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
-        (Submodule.span_mono hsub0 hφ) (Submodule.span_mono hsub0 hζ))
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ (hle0 hφ) (hle0 hζ))
       htau1_agrees htau1_mem0
       (by rw [ClassFunction.inner_zero_right]) (by rw [ClassFunction.inner_zero_right]) hχχbar,
     ofProjection imageFamily tau1
-      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ
-        (Submodule.span_mono hsuba hφ) (Submodule.span_mono hsuba hζ))
+      (fun φ ζ hφ hζ => htau1_inner_eq φ ζ (hlea hφ) (hlea hζ))
       htau1_agrees htau1_mema hχaχ1 hχbaraχ1 hχχbar)
 
 /-- The two decompositions produced by `decompositionPair` share their auxiliary isometry: their
@@ -1163,19 +1174,17 @@ theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
         hχχ1 hχbarχ1 hχχbar).1).tau1 χ :=
   rfl
 
-/-- `χ - χ̄ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the conjugate difference. -/
+/-- `χ - χ̄ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the conjugate difference (it is a
+generator). -/
 theorem chi_sub_conj_mem_zSpan_support :
-    χ - χ.conj ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
-  Submodule.sub_mem _
-    (Submodule.subset_span (by simp))
-    (Submodule.subset_span (by simp))
+    χ - χ.conj ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} :=
+  Submodule.subset_span (by simp)
 
-/-- `χ - ψ ∈ ℤ[χ, χ̄, ψ]`: the sponsoring lattice contains the `ψ`-difference. -/
+/-- `χ - ψ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the `ψ`-difference (it is a
+generator). -/
 theorem chi_sub_psi_mem_zSpan_support :
-    χ - ψ ∈ zSpan (L := L) {χ, χ.conj, ψ} :=
-  Submodule.sub_mem _
-    (Submodule.subset_span (by simp))
-    (Submodule.subset_span (by simp))
+    χ - ψ ∈ zSpan (L := L) {χ - χ.conj, χ - ψ} :=
+  Submodule.subset_span (by simp)
 
 /-- `⟨X, α⟩ = coeff α` for `α ∈ R(χ)` (orthonormal coefficient recovery). -/
 theorem inner_X_eq_coeff (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
