@@ -1,5 +1,12 @@
 # BG Theorem 7.4 (transitivity_propagates) 実装プラン — living note
 
+## ✅✅✅ COMPLETE (2026-06-04, commits 0cf0c48..cddd184 + AxiomsCheck bd38fdd)
+`transitivity_propagates` **sorry-free・axiom-clean** ([propext,choice,Quot.sound], #print 確認),
+AxiomsCheck 登録済, full build 3562 + AxiomsCheck 3522 green。statement は原形 (4-conjunct) 不変=laundering 無。
+全 helper (7.3 `tp_exists_normalized` / (b) `tp_b` / (d) `tp_d` (Lem6.5a 経由) / base `tp_base` / R3 strong-induction)
+完成。S07 が S06 を import (Lem6.5a)。**§7 残 = Prop 7.5 case1 (Thm 6.7 待ち) のみ** + S06 Lem6.5(c) (別件)。
+以下は実装中の living plan (歴史的記録)。
+
 > 2026-06-03。`S07_Transitivity.lean` の `transitivity_propagates` (mmd L2197-2250) を埋める。
 > §7 残 2 sorry の一つ (もう一つは Prop 7.5 case1 = Thm 6.7 待ち)。
 > **規模注意**: §7 最大級。`|P:A|` composition-series 帰納 + base case (b)(c)(d) で ~470 行見込み。
