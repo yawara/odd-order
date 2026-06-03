@@ -175,11 +175,16 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
     (ℂ sep closed + char 0) を `NeZero ((exponent:ℂ))` provision で発火させ攻略**。commits 6243ef1/9797ed4/684c9ac。
   - **step4b (`∑_{θ∈T}θ(1)²=|K:A|−1`)** = ✅ **LANDED** (`sumInflatedDegreeSq_ntrivial`, B2 core, T≅Irr(K/A)∖1)。
   - **step4a (B2-orbit, `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_Tθ(1)²`)** = 🔶 残, **pure 文字理論 (framework 不要)**。
+    **✅ crux LANDED (commit 3d29f2e)**: `induce_eq_induce_iff_conj` (Ind θ=Ind ψ ⟺ ∃g, conjBy g θ=ψ;
+    InducedIrreducible.lean, axiom-clean) — fibre 記述 (θ↦Ind θ の fibre = L-共役軌道) 確定。
     **proof sketch (導出済)**: T を L-共役で軌道分割。χ=Ind_K^Lθ, χ(1)=|L:K|θ(1) (`induce_apply_one`✅),
     ‖χ‖²=[I_L(θ):K] (`card_mul_inner_self_induce_eq_card_inertia`✅ |H|‖Indθ‖²=|I| + `subgroup_le_inertia`✅),
-    軌道サイズ=[L:I] (orbit-stab), Indθ=Indθ' ⟺ 同軌道 (Mackey/Clifford)。
+    軌道サイズ=[L:I] (orbit-stab), fibre=軌道 (✅ crux)。
     χ(1)²/‖χ‖²=|L:K|²θ(1)²/[I:K]=|L:K|·[L:I]θ(1)² (∵|L:K|=[L:I][I:K]); ∑_T=∑_軌道[L:I]θ(1)²。
-    ~100 行 (軌道分割 Finset + fiber 対応 + orbit-stab)、fresh focus 推奨。
+    **残 assembly (~80 行, mechanical)**: ⚠ **MulAction G (IrreducibleCharacter H) instance 無** →
+    `g•θ := conjBy g⁻¹ θ` で左作用構成 (conjBy_one/conjBy_mul✅ で one_smul/mul_smul, stab=inertia) +
+    T-不変性 (A◁ ⟹ A⊆ker θ 保存, θ≠1 保存) + `MulAction.card_orbit_mul_card_stabilizer_eq_card_group`✅ +
+    `Finset.sum_fiberwise` + ℂ index 算術。fresh focus 推奨 (crux 済ゆえ残は組み立てのみ)。
   - **step3/5 (B1 = 5.6 quantitative, `2ψ(1)≥|K:A|−1`)** = 🔴 残, **Pf Thm 5.6 (quantitative coherence) keystone 要**。
   - **step6 (θ-bound `θ(1)≤|K:C|√|C:D|`)** = 🔴 残。**中心 case `θ(1)²≤|K:Z|, Z⊆Z(K)` = ✅ `exists_degree_sq_le_index`**。
     **🆕 重要: (6.6) p-群 path (mmd 04.8 L80) は [Is]Cor2.30 = 中心 case を直接使う (✅済)**; section case
