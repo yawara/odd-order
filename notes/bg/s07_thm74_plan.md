@@ -16,9 +16,20 @@
 
 **(d) の §6 依存 = Lem 6.5(a) (`inf_commutator_eq_of_coprime`) は完成済** (commit f5160ee)。
 
+### ✅ 追加完成 (commits f57a538 / 474a517)
+5. **`exists_normal_index_prime_of_solvable`** (R1a) = nontrivial 有限可解 ⟹ ∃ N⊴, |G:N| prime
+   (card最大 proper 正規 N → Q⧸N simple+solvable → abelian → `is_simple_iff_prime_card`)。
+6. **`exists_normal_lt_top_of_isSubnormal`** (R1 step1) = A' subnormal, A'<⊤ ⟹ ∃ B⊴Q, A'≤B<⊤
+   (`IsSubnormal` 帰納)。
+
 ## 残タスク (難度順, 各々 sub-development)
 
-### R1. composition-series 還元 `tp_reduction` (~100行)
+### R1. composition-series 還元 assembly `tp_reduction` (~50行) — step1+R1a は完成、組立のみ残
+A<P subnormal ⟹ ∃ G-部分群 B, A≤B<P, B⊴P, |P:B| prime, A subnormal in B。
+step1 (`exists_normal_lt_top_of_isSubnormal`@↥P) で B''⊴↥P, A.subgroupOf P≤B''<⊤ →
+R1a@(↥P⧸B'') で素数 index 正規 → pullback C⊴↥P (`index_comap_of_surjective`) →
+**G へ translate** (`C.map P.subtype`; B.subgroupOf P=C, `map_subtype_lt_top`) +
+A subnormal in B (`IsSubnormal.subgroupOf` / `inf_isSubnormal_subgroupOf`)。難所=quotient/subtype 往復。
 `A < P` subnormal (P 可解=`hG.solvable_of_lt_top`) ⟹ `∃ B, A≤B, (B.subgroupOf P).Normal, B<P,
 (P:B index) prime, (A.subgroupOf B).IsSubnormal`。
 - **step1**: subnormal 系列の second-from-top を取る。mathlib `Subgroup.isSubnormal_iff`
