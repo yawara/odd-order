@@ -144,6 +144,117 @@ theorem conditionA_iff_not_dvd (hp : 2 ≤ p) (hq : q.Prime) :
   rw [hcop]
   exact hq.coprime_iff_not_dvd
 
+/-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
+
+/-- `N(0) = 0` (the `i = 0` factor `0^{p^0} = 0` makes the product vanish). -/
+lemma normN_zero [Fact p.Prime] (hq : 0 < q) :
+    normN p q (0 : GaloisField p q) = 0 := by
+  simp only [normN]
+  exact Finset.prod_eq_zero (Finset.mem_range.mpr hq) (by simp)
+
+/-- An element of `E` is nonzero (its norm is `1 ≠ 0`). -/
+lemma ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
+    (ha : a ∈ normSetE p q) : a ≠ 0 := by
+  intro h
+  have := ha.1
+  rw [h, normN_zero p q hq] at this
+  exact zero_ne_one this
+
+/-- For `a ∈ E`, `2 - a ≠ 0` (its norm is `1 ≠ 0`), so `(2-a)⁻¹` is genuine. -/
+lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
+    (ha : a ∈ normSetE p q) : (2 : GaloisField p q) - a ≠ 0 := by
+  intro h
+  have := ha.2
+  rw [h, normN_zero p q hq] at this
+  exact zero_ne_one this
+
+/-- The sequence `d_k := (k+1) - k·a = (1-a)·k + 1` of BG Lemma C.1. -/
+noncomputable def dSeq [Fact p.Prime] (a : GaloisField p q) (k : ℕ) : GaloisField p q :=
+  (k : GaloisField p q) + 1 - (k : GaloisField p q) * a
+
+@[simp] lemma dSeq_zero [Fact p.Prime] (a : GaloisField p q) : dSeq p q a 0 = 1 := by
+  simp [dSeq]
+
+lemma dSeq_one [Fact p.Prime] (a : GaloisField p q) : dSeq p q a 1 = 2 - a := by
+  simp only [dSeq, Nat.cast_one, one_mul]; ring
+
+/-- The three-term recurrence `d_{k+2} = 2·d_{k+1} - d_k`. -/
+lemma dSeq_recurrence [Fact p.Prime] (a : GaloisField p q) (k : ℕ) :
+    dSeq p q a (k + 2) = 2 * dSeq p q a (k + 1) - dSeq p q a k := by
+  simp only [dSeq]
+  push_cast
+  ring
+
+/-- The Möbius iterate `a₀ = a`, `a_{k+1} = (2 - aₖ)⁻¹` of BG Lemma C.1. -/
+noncomputable def tauIter [Fact p.Prime] (a : GaloisField p q) (k : ℕ) : GaloisField p q :=
+  Nat.rec a (fun _ prev => (2 - prev)⁻¹) k
+
+@[simp] lemma tauIter_zero [Fact p.Prime] (a : GaloisField p q) : tauIter p q a 0 = a := rfl
+
+lemma tauIter_succ [Fact p.Prime] (a : GaloisField p q) (k : ℕ) :
+    tauIter p q a (k + 1) = (2 - tauIter p q a k)⁻¹ := rfl
+
+/-- Every iterate `aₖ` lies in `E` (using `E = E⁻¹`). -/
+lemma tauIter_mem [Fact p.Prime] {a : GaloisField p q}
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) (ha : a ∈ normSetE p q) :
+    ∀ k, tauIter p q a k ∈ normSetE p q := by
+  intro k
+  induction k with
+  | zero => simpa using ha
+  | succ k ih =>
+    rw [tauIter_succ]
+    have h2 : (2 - tauIter p q a k) ∈ normSetE p q := two_sub_mem_normSetE p q ih
+    rw [hEinv] at h2
+    rwa [Set.mem_inv] at h2
+
+/-- Closed form of the iterate: `a_{k+1} = d_k / d_{k+1}`, with `d_{k+1} ≠ 0`. -/
+lemma tauIter_eq_dSeq_div [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) (ha : a ∈ normSetE p q) :
+    ∀ k, dSeq p q a (k + 1) ≠ 0 ∧
+      tauIter p q a (k + 1) = dSeq p q a k / dSeq p q a (k + 1) := by
+  intro k
+  induction k with
+  | zero =>
+    refine ⟨?_, ?_⟩
+    · rw [dSeq_one]; exact two_sub_ne_zero_of_mem_normSetE p q hq ha
+    · rw [tauIter_succ, tauIter_zero, dSeq_zero, dSeq_one, one_div]
+  | succ k ih =>
+    obtain ⟨hd1, htau⟩ := ih
+    have hmem : tauIter p q a (k + 1) ∈ normSetE p q := tauIter_mem p q hEinv ha (k + 1)
+    have hne : (2 : GaloisField p q) - tauIter p q a (k + 1) ≠ 0 :=
+      two_sub_ne_zero_of_mem_normSetE p q hq hmem
+    have hkey : (2 : GaloisField p q) - tauIter p q a (k + 1)
+        = dSeq p q a (k + 2) / dSeq p q a (k + 1) := by
+      rw [htau, dSeq_recurrence]
+      field_simp
+    refine ⟨?_, ?_⟩
+    · intro hcontra
+      apply hne
+      rw [hkey, hcontra, zero_div]
+    · rw [tauIter_succ, hkey, inv_div]
+
+/-- The multiplied form `a_{k+1} · d_{k+1} = d_k`. -/
+lemma tauIter_mul_dSeq [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) (ha : a ∈ normSetE p q) (k : ℕ) :
+    tauIter p q a (k + 1) * dSeq p q a (k + 1) = dSeq p q a k := by
+  obtain ⟨hd1, htau⟩ := tauIter_eq_dSeq_div p q hq hEinv ha k
+  rw [htau, div_mul_cancel₀ _ hd1]
+
+/-- **Key telescoping output**: `N(d_k) = 1` for every `k`, since each
+`a_{k+1} = d_k/d_{k+1} ∈ E` has norm `1` and the norm is multiplicative. -/
+lemma normN_dSeq_eq_one [Fact p.Prime] (hq : 0 < q) {a : GaloisField p q}
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) (ha : a ∈ normSetE p q) :
+    ∀ k, normN p q (dSeq p q a k) = 1 := by
+  intro k
+  induction k with
+  | zero => rw [dSeq_zero]; exact normN_one p q
+  | succ k ih =>
+    have hmul := tauIter_mul_dSeq p q hq hEinv ha k
+    have h1 : normN p q (tauIter p q a (k + 1)) = 1 := (tauIter_mem p q hEinv ha (k + 1)).1
+    have hcong := congrArg (normN p q) hmul
+    rw [normN_mul, h1, one_mul] at hcong
+    rw [hcong]; exact ih
+
 /-! ## Lemma C.1 -/
 
 /-- **BG Appendix C, Lemma C.1** (mmd L4911): if the norm set is closed under
