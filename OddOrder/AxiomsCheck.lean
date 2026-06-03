@@ -45,6 +45,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.FeitThompson
+import OddOrder.BG.AppC_NormSet
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1797,3 +1798,9 @@ set_option linter.style.longLine false in
 -- on `|G|` + `solvable_of_ker_le_range`); the only remaining gap of `feitThompson` itself is
 -- the upstream `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (BG §7–16 + Peterfalvi §10–16).
 #assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
+
+/-! ### BG Appendix C (finite-field norm-set argument). -/
+
+-- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
+-- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd

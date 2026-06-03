@@ -105,6 +105,7 @@ import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.AppC_FinalContradiction
+import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.Peterfalvi.Appendices.Suzuki
