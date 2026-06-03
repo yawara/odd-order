@@ -544,6 +544,62 @@ theorem inner_dade_extension_of_supported
   · exact husupp
   · exact hδsupp
 
+/-- **crux1 from the (5.6.2) `Y`-collapse.**  The bridge `retarget_isCoherent_of_extensionImage`
+consumes `crux1 : ⟨τ(χ − a·χ₁), ν χ₁⟩ = −a`.  This lemma reduces crux1 to its two genuine
+ingredients, isolating the remaining (5.6.1)/(5.6.2) content:
+
+* `hcollapse : Y = a·(ν χ₁)` — the (5.6.2) collapse `Da.Y = a·χ₁^{τ₁}` (mmd 04.7 (5.6.2)), where
+  `Y` is the orthogonal residual of `τ(χ − a·χ₁) = X − Y` against `R(χ)`;
+* `hXortho : ⟨X, ν χ₁⟩ = 0` — the (5.2.e) orthogonality `R(χ) ⊥ R(χ₁)` (since `X ∈ ℤ[R(χ)]` and
+  `ν χ₁ ∈ ℤ[R(χ₁)]`).
+
+Given `himg : τ(χ − a·χ₁) = X − Y` (the decomposition, from `Da.tau1_image` with `Da.tau1 = τ`) and
+the unit norm `‖ν χ₁‖² = 1` (from the ν-isometry, `⟨χ₁, χ₁⟩ = 1`), crux1 is then pure inner-product
+algebra: `⟨X − a·νχ₁, νχ₁⟩ = ⟨X, νχ₁⟩ − a·‖νχ₁‖² = 0 − a = −a`.
+
+Stated abstractly over `G` (no Dade/coherence structure): the remaining work is to *produce*
+`hcollapse` (the λ-form `Y = a·νχ₁ − λ·∑ rᵢ·νχᵢ + Z` collapsed via `lambda_eq_zero_and_Z_eq_zero`)
+and `hXortho` (per-`α` member orthogonality summed over `R(χ)`). -/
+theorem crux1_of_collapse {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {w X Y νchi1 : ClassFunction G ℂ} {a : ℕ}
+    (himg : w = X - Y)
+    (hcollapse : Y = a • νchi1)
+    (hXortho : ClassFunction.inner X νchi1 = 0)
+    (hνnorm : ClassFunction.inner νchi1 νchi1 = 1) :
+    ClassFunction.inner w νchi1 = -(a : ℂ) := by
+  rw [himg, hcollapse, ClassFunction.inner_sub_left, hXortho,
+    ← Nat.cast_smul_eq_nsmul ℂ a νchi1, ClassFunction.inner_smul_left, hνnorm]
+  ring
+
+/-- **(5.2.e) member R-orthogonality `⟨X, ν χ₁⟩ = 0` — the `hXortho` ingredient of `crux1_of_collapse`.**
+
+The `R(χ)`-part `X = D.X ∈ ℤ[R(χ)]` of the χ-decomposition `D` is orthogonal to the running image
+`ν χ₁ = hS₁.extension χ₁` of any member `χ₁ ∈ S₁`, given the member's own `ψ = 0` decomposition `D'`
+(so `ν χ₁ = D'.X ∈ ℤ[R(χ₁)]` by (5.5)) and the family orthogonality `R(χ₁) ⊥ R(χ)` ((5.2.e)).
+
+Per-`α` orthogonality `⟨ν χ₁, α⟩ = 0` for `α ∈ R(χ)` (`inner_extension_member_orthogonal_imageSet`,
+from `D'`/`hortho`/`htau1`) is summed over `R(χ)` by `inner_X_eq_zero_of_orthogonal_imageSet` to give
+`⟨ν χ₁, X⟩ = 0`; conjugate symmetry flips it to `⟨X, ν χ₁⟩ = 0`.  The remaining work for the actual
+`hXortho` is to *build* `D'` (the member ν-aux decomposition, needing `ν χ₁ ∈ ZIrr` injected since
+`IsCoherent` carries no ZIrr-codomain) and `hortho` (the Dade `R(·)`-family orthogonality). -/
+theorem inner_decomposition_X_extension_member_eq_zero
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S₁ : Set (ClassFunction L ℂ)} {A' : Set L}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A')
+    {χ ψ chi1 : ClassFunction L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    (D' : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := L) (G := G) τ chi1 0)
+    (hortho : D'.imageFamily.Orthogonal D.imageFamily)
+    (htau1 : D'.tau1 chi1 = hS₁.extension chi1) :
+    ClassFunction.inner D.X (hS₁.extension chi1) = 0 := by
+  have h1 : ClassFunction.inner (hS₁.extension chi1) D.X = 0 :=
+    D.inner_X_eq_zero_of_orthogonal_imageSet
+      (fun α hα => OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet
+        hS₁ D.imageFamily D' hortho htau1 hα)
+  rw [OddOrder.RepresentationTheory.inner_conj_symm, h1, star_zero]
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
