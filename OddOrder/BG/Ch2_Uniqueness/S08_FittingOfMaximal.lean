@@ -72,6 +72,35 @@ theorem fittingInG_subgroupOf_eq (M : Subgroup G) :
   · intro hx
     exact ⟨x, hx, rfl⟩
 
+/-- Ambient form of BG Proposition 1.3 for a subgroup M: elements of M centralizing
+F(M) lie in F(M). -/
+theorem mem_fittingInG_of_mem_centralizer_fittingInG [Finite G] {M : Subgroup G}
+    [IsSolvable ↥M] {x : G} (hxM : x ∈ M)
+    (hxC : x ∈ Subgroup.centralizer (fittingInG M : Set G)) :
+    x ∈ fittingInG M := by
+  have hxC_M : (⟨x, hxM⟩ : ↥M) ∈
+      Subgroup.centralizer ((Ch01.fitting ↥M : Subgroup ↥M) : Set ↥M) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    apply Subtype.ext
+    have hyF : (y : G) ∈ fittingInG M := by
+      have hySub : y ∈ (fittingInG M).subgroupOf M := by
+        rwa [fittingInG_subgroupOf_eq M]
+      exact Subgroup.mem_subgroupOf.mp hySub
+    exact Subgroup.mem_centralizer_iff.mp hxC (y : G) hyF
+  have hxF_M : (⟨x, hxM⟩ : ↥M) ∈ Ch01.fitting ↥M :=
+    OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting hxC_M
+  have hxSub : (⟨x, hxM⟩ : ↥M) ∈ (fittingInG M).subgroupOf M := by
+    rwa [fittingInG_subgroupOf_eq M]
+  exact Subgroup.mem_subgroupOf.mp hxSub
+
+/-- Subgroup form of the ambient self-centralizing property for F(M). -/
+theorem centralizer_fittingInG_inf_le_fittingInG [Finite G] {M : Subgroup G}
+    [IsSolvable ↥M] :
+    Subgroup.centralizer (fittingInG M : Set G) ⊓ M ≤ fittingInG M := by
+  intro x hx
+  exact mem_fittingInG_of_mem_centralizer_fittingInG hx.2 hx.1
+
 /-- `F(M)`, viewed as a subgroup of `M`, is characteristic. -/
 theorem fittingInG_subgroupOf_characteristic (M : Subgroup G) :
     ((fittingInG M).subgroupOf M).Characteristic := by
