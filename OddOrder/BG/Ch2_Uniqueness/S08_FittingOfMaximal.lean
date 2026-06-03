@@ -260,11 +260,21 @@ theorem mem_fittingInG_of_centralizer_self_zpowers [Finite G]
   exact mem_fittingInG_of_mem_centralizer_fittingInG hxM
     (mem_centralizer_fittingInG_of_centralizer_self_zpowers hxM hcop hCC)
 
+/-- A cyclic `π(F(M))`-complement subgroup has order coprime to `|F(M)|`. -/
+theorem coprime_card_zpowers_fittingInG_of_isPiSubgroup_primesOf_compl [Finite G]
+    {M : Subgroup G} {x : G}
+    (hxpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
+      (Subgroup.zpowers x)) :
+    Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥(fittingInG M)) :=
+  (coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl
+    (π := OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) (H := fittingInG M)
+    (K := Subgroup.zpowers x)
+    (fun r hr => by simpa [OddOrder.BG.Ch2.S07.primesOf] using hr) hxpi).symm
+
 /-- BG (8.3) endpoint for a cyclic pi-complement element: under the Prop 1.10
 self-centralizer condition, such an element is trivial. -/
 theorem eq_one_of_centralizer_self_zpowers_of_isPiSubgroup_primesOf_compl [Finite G]
     {M : Subgroup G} [IsSolvable ↥M] {x : G} (hxM : x ∈ M)
-    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥(fittingInG M)))
     (hCC :
       Subgroup.centralizer
         ((Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
@@ -275,18 +285,15 @@ theorem eq_one_of_centralizer_self_zpowers_of_isPiSubgroup_primesOf_compl [Finit
       (Subgroup.zpowers x)) :
     x = 1 :=
   eq_one_of_mem_fittingInG_of_zpowers_isPiSubgroup_primesOf_compl
-    (mem_fittingInG_of_centralizer_self_zpowers hxM hcop hCC) hxpi
+    (mem_fittingInG_of_centralizer_self_zpowers hxM
+      (coprime_card_zpowers_fittingInG_of_isPiSubgroup_primesOf_compl hxpi) hCC) hxpi
 
 /-- BG (8.3) criterion: if every cyclic pi-complement element in the ambient centralizer
-satisfies the Prop 1.10 coprime and self-centralizer hypotheses, then the centralizer is a
+satisfies the Prop 1.10 self-centralizer hypothesis, then the centralizer is a
 `π(F(M))`-subgroup. -/
 theorem centralizer_cFitting_isPiSubgroup_of_zpowers_centralizer_self [Finite G]
     {M A0 : Subgroup G} [IsSolvable ↥M]
     (hCentM : Subgroup.centralizer (cFittingInG M A0 : Set G) ≤ M)
-    (hcop : ∀ {x : G}, x ∈ Subgroup.centralizer (cFittingInG M A0 : Set G) →
-      Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
-        (Subgroup.zpowers x) →
-      Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥(fittingInG M)))
     (hCC : ∀ {x : G}, x ∈ Subgroup.centralizer (cFittingInG M A0 : Set G) →
       Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
         (Subgroup.zpowers x) →
@@ -300,7 +307,7 @@ theorem centralizer_cFitting_isPiSubgroup_of_zpowers_centralizer_self [Finite G]
   refine isPiSubgroup_of_forall_zpowers_isPiSubgroup_compl_eq_one ?_
   intro x hxC hxpi
   exact eq_one_of_centralizer_self_zpowers_of_isPiSubgroup_primesOf_compl
-    (hCentM hxC) (hcop hxC hxpi) (hCC hxC hxpi) hxpi
+    (hCentM hxC) (hCC hxC hxpi) hxpi
 
 /-- The center of `F(M)`, realized as a subgroup of the ambient group `G`. -/
 def centerFittingInG (M : Subgroup G) : Subgroup G :=

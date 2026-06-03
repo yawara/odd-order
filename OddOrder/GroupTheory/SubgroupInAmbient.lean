@@ -84,6 +84,14 @@ theorem opiCoreInG_compl_eq_bot_of_isPiSubgroup [Finite G] {π : Set ℕ} {H : S
   eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl
     (opiCoreInG_le πᶜ H) hHpi (isPiSubgroup_opiCoreInG πᶜ H)
 
+/-- The orders of a pi-subgroup and a pi-complement subgroup are coprime. -/
+theorem coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl [Finite G]
+    {π : Set ℕ} {H K : Subgroup G} (hHpi : Subgroup.IsPiSubgroup π H)
+    (hKpi : Subgroup.IsPiSubgroup πᶜ K) :
+    Nat.Coprime (Nat.card ↥H) (Nat.card ↥K) :=
+  OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    (π := π) Nat.card_pos.ne' Nat.card_pos.ne' hHpi hKpi
+
 /-- If an element lies in a pi-subgroup and its cyclic subgroup is a pi-complement
 subgroup, then the element is trivial. -/
 theorem eq_one_of_mem_of_isPiSubgroup_of_zpowers_isPiSubgroup_compl [Finite G]
