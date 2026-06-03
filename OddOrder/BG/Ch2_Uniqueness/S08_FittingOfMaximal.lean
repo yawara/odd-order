@@ -585,6 +585,19 @@ theorem centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_cFitting
     exact congrArg Subtype.val hcommF
   exact hA_le_C hyA
 
+/-- BG (8.3) packaged with the self-centralizer bridge for
+`A = C_F(M)(A0)`: once the ambient centralizer is known to lie in `M`, it is a
+`π(F(M))`-subgroup. -/
+theorem centralizer_cFitting_isPiSubgroup_primesOf_fittingInG_of_le_maximal [Finite G]
+    {p : ℕ} {M A0 : Subgroup G} [IsSolvable ↥M]
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hCentM : Subgroup.centralizer (cFittingInG M A0 : Set G) ≤ M) :
+    Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))
+      (Subgroup.centralizer (cFittingInG M A0 : Set G)) :=
+  centralizer_cFitting_isPiSubgroup_of_zpowers_centralizer_self hCentM
+    (fun hxC _hxpi =>
+      centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_cFitting hA0 hxC)
+
 /-- Maximality clause for `isMaxElemAbelianIn`. -/
 theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B : Subgroup G}
     (hA₀ : isMaxElemAbelianIn p A₀ H) (hB : B.IsElementaryAbelian p) (hBH : B ≤ H)
@@ -769,6 +782,27 @@ theorem centralizer_cFitting_le_maximal_of_not_isPGroup [Finite G]
   haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
   exact centralizer_cFitting_le_maximal_of_fitting_primeFactor hG hM hA0F hqF
 
+/-- BG (8.3) under the hypotheses used in Theorem 8.1(a): in the non-`p`-group case,
+the ambient centralizer of `C_F(M)(A0)` is a `π(C_F(M)(A0))`-subgroup. -/
+theorem centralizer_cFitting_isPiSubgroup_of_not_pGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
+    Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))
+      (Subgroup.centralizer (cFittingInG M A0 : Set G)) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hCentM : Subgroup.centralizer (cFittingInG M A0 : Set G) ≤ M :=
+    centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
+  rw [hPrimes]
+  exact centralizer_cFitting_isPiSubgroup_primesOf_fittingInG_of_le_maximal hA0 hCentM
+
 /-- The relative centralizer C_F(M)(A0) is proper whenever M is maximal. -/
 theorem cFitting_lt_top_of_mem_maximal {M A0 : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
@@ -822,6 +856,10 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
   have hCentralizer_le_M : Subgroup.centralizer (A : Set G) ≤ M := by
     dsimp [A]
     exact centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
+  have hCpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf A)
+      (Subgroup.centralizer (A : Set G)) := by
+    dsimp [A]
+    exact centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA₀ hFnp
   have hCenterRank : 3 ≤ rank ↥(Subgroup.center ↥A) := by
     dsimp [A]
     exact three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA₀ hm
