@@ -1031,6 +1031,44 @@ theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
     (fun χ hχ => mem_irreducibleCharacters.mpr
       (hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ))
 
+/-- **(T8 leaf 5) the base block `S₀`**: the minimal-(real-)degree members of `X`.  This is the
+equal-minimal-degree prefix `{χ₁,…,χₖ}` of (6.6), on which (1.1)+(1.4) supplies the base coherence
+`coherentEqualDegree_fromDade` before the (5.6) adjoining of the strictly-higher-degree conjugate
+pairs.  `S₀` must contain **all** minimal-degree members (not just one pair): the first (5.6)
+adjoining of a pair of degree ratio `a` needs `2a < ∑_{S₀} aⱼ²`, which fails at equal degree. -/
+def xBaseBlock (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  {χ ∈ hyp.Xset Z | ∀ ψ ∈ hyp.Xset Z,
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re ≤
+      (OddOrder.Peterfalvi.S03.characterDegree ψ).re}
+
+theorem xBaseBlock_subset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    hyp.xBaseBlock Z ⊆ hyp.Xset Z :=
+  fun _ hχ => hχ.1
+
+/-- Any two members of the base block have the same degree (the base is an *equal*-degree family,
+the input shape of `coherentEqualDegree_fromDade`). -/
+theorem xBaseBlock_degree_re_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.xBaseBlock Z) (hχ' : χ' ∈ hyp.xBaseBlock Z) :
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ').re :=
+  le_antisymm (hχ.2 χ' hχ'.1) (hχ'.2 χ hχ.1)
+
+/-- The base block is closed under conjugation (Frobenius case): conjugation preserves the degree
+(`characterDegree_conj`) and `X` (`Xset_closedUnderConjugate`).  With the no-real property this makes
+`S₀` contain a conjugate pair, so `2 ≤ |S₀|`. -/
+theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) := by
+  intro χ hχ
+  refine ⟨hyp.Xset_closedUnderConjugate hF hZH hχ.1, fun ψ hψ => ?_⟩
+  have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ).re := by
+    simp [OddOrder.Peterfalvi.S03.characterDegree_conj]
+  rw [hre]
+  exact hχ.2 ψ hψ
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
