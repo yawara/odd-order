@@ -1041,26 +1041,8 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
 
 /-! ## Theorem 7.4 — 推移性の伝播 -/
 
-/-- **Hall C in a subgroup** (mmd L2236 で使用): `↥V` 可解, `H₁,H₂ ≤ V` がともに `↥V` 内で
-`π`-Hall (`.subgroupOf V`) なら `V` の元で共役: `∃ w∈V, wH₁w⁻¹ = H₂`。`hall_C`@↥V を
-`subgroupOf`/`subtype` 翻訳。Thm 7.4(b) と (将来) Lem 6.5(c) の共通エンジン。 -/
-private theorem exists_conj_eq_of_isHall_subgroupOf [Finite G] {V : Subgroup G}
-    (hVsolv : IsSolvable ↥V) {π : Set ℕ} {H₁ H₂ : Subgroup G} (hH₁V : H₁ ≤ V) (hH₂V : H₂ ≤ V)
-    (hH₁ : Ch03.IsHallSubgroup π (H₁.subgroupOf V))
-    (hH₂ : Ch03.IsHallSubgroup π (H₂.subgroupOf V)) :
-    ∃ w ∈ V, MulAut.conj w • H₁ = H₂ := by
-  haveI := hVsolv
-  obtain ⟨w, hw⟩ := Ch03.hall_C hH₁ hH₂
-  refine ⟨(w : G), w.2, ?_⟩
-  have hcomp : V.subtype.comp (MulAut.conj w).toMonoidHom
-      = (MulAut.conj (w : G)).toMonoidHom.comp V.subtype := by
-    ext x
-    simp [MulAut.conj_apply]
-  have h := congrArg (Subgroup.map V.subtype) hw
-  rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
-    Subgroup.map_subgroupOf_eq_of_le hH₁V, Subgroup.map_subgroupOf_eq_of_le hH₂V] at h
-  rw [Subgroup.pointwise_smul_def]
-  exact h
+-- **Hall C in a subgroup** engine (`↥V` 可解 + `π`-Hall 共役) は §6 へ移動済:
+-- `OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf` (Thm 7.4(d) と Lem 6.5(c) の共有)。
 
 /-- **subnormal proper ⟹ 真の正規 overgroup** (Thm 7.4 還元 R1 step1): `A'` が `Q` で subnormal
 かつ `A' < ⊤` なら `∃ B ⊴ Q`, `A' ≤ B < ⊤`。subnormal 系列の頂点直下を `IsSubnormal` 帰納で。 -/
@@ -1878,7 +1860,7 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
       rw [hP'_def, Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) P).toEquiv])
   -- Conjugate `P'` to `P` inside `V` (Hall conjugacy).
   obtain ⟨w, hwV, hwconj⟩ :=
-    exists_conj_eq_of_isHall_subgroupOf hV_solv hP'_le_V hP_le_V hP'_hall hP_hall
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hV_solv hP'_le_V hP_le_V hP'_hall hP_hall
   -- Decompose `w = s · κ` with `s ∈ P`, `κ ∈ K'` (`V = P · K'`, `K' ⊴ V`).
   have hPnK' : P ≤ Subgroup.normalizer (K' : Set G) := hP_le_V.trans hVnK'
   have hw_mem : w ∈ (P : Set G) * (K' : Set G) := by

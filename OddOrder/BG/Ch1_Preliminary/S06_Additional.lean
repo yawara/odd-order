@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.GroupTheory.ThompsonSubgroup
+import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # BG §6: Additional Results — the normal-J hub (FT critical)
@@ -244,6 +245,138 @@ theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Norm
   rw [← Subgroup.map_subtype_commutator U]
   exact ⟨⟨d, hdU⟩, hdcomm, rfl⟩
 
+/-- **Hall π-部分群の `↥V` 内共役** (BG Lem 6.5(c)/Thm 7.4(d) 共有 engine): `V` 可解で
+`H₁, H₂ ≤ V` がともに `↥V` の `π`-Hall 部分群 (`subgroupOf` 形) なら、ある `w ∈ V` で
+`w H₁ w⁻¹ = H₂` (pointwise 共役)。Isaacs Thm 3.21 (`Ch03.hall_C`, 可解群の π-Hall 共役性) を
+`↥V → G` の `subtype` 像で `G` レベルへ持ち上げたもの。§7 Thm 7.4(d) と §6 Lem 6.5(c) の両方で使用。 -/
+theorem exists_conj_eq_of_isHall_subgroupOf {V : Subgroup G}
+    (hVsolv : IsSolvable ↥V) {π : Set ℕ} {H₁ H₂ : Subgroup G} (hH₁V : H₁ ≤ V) (hH₂V : H₂ ≤ V)
+    (hH₁ : Ch03.IsHallSubgroup π (H₁.subgroupOf V))
+    (hH₂ : Ch03.IsHallSubgroup π (H₂.subgroupOf V)) :
+    ∃ w ∈ V, MulAut.conj w • H₁ = H₂ := by
+  haveI := hVsolv
+  obtain ⟨w, hw⟩ := Ch03.hall_C hH₁ hH₂
+  refine ⟨(w : G), w.2, ?_⟩
+  have hcomp : V.subtype.comp (MulAut.conj w).toMonoidHom
+      = (MulAut.conj (w : G)).toMonoidHom.comp V.subtype := by
+    ext x
+    simp [MulAut.conj_apply]
+  have h := congrArg (Subgroup.map V.subtype) hw
+  rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+    Subgroup.map_subgroupOf_eq_of_le hH₁V, Subgroup.map_subgroupOf_eq_of_le hH₂V] at h
+  rw [Subgroup.pointwise_smul_def]
+  exact h
+
+omit [Finite G] in
+/-- **(infra)** `x ∈ H.comap (MulAut.conj a) ↔ a*x*a⁻¹ ∈ H`. -/
+private theorem mem_comap_conj {a x : G} {H : Subgroup G} :
+    x ∈ H.comap (MulAut.conj a).toMonoidHom ↔ a * x * a⁻¹ ∈ H := by
+  rw [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+
+omit [Finite G] in
+/-- **(infra)** pointwise 共役 `MulAut.conj w • H` を comap 形 `H.comap (MulAut.conj w⁻¹)`
+へ変換する橋。`exists_conj_eq_of_isHall_subgroupOf` の出力 (`smul`) を `comap` 計算へ載せる。 -/
+private theorem conj_smul_eq_comap_conj_inv (w : G) (H : Subgroup G) :
+    MulAut.conj w • H = H.comap (MulAut.conj w⁻¹).toMonoidHom := by
+  ext x
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def, MulAut.conj_inv_apply,
+    mem_comap_conj]
+  simp only [inv_inv]
+
+omit [Finite G] in
+/-- **(infra)** `H.comap (MulAut.conj (a*b)) = (H.comap (MulAut.conj a)).comap (MulAut.conj b)`. -/
+private theorem comap_conj_mul (a b : G) (H : Subgroup G) :
+    H.comap (MulAut.conj (a * b)).toMonoidHom
+      = (H.comap (MulAut.conj a).toMonoidHom).comap (MulAut.conj b).toMonoidHom := by
+  rw [Subgroup.comap_comap]
+  congr 1
+  ext x
+  simp [MulAut.conj_apply, mul_assoc]
+
+omit [Finite G] in
+/-- **(infra)** 共役同型による `comap` は位数を保つ: `|H.comap (conj k)| = |H|`. -/
+private theorem card_comap_conj (k : G) (H : Subgroup G) :
+    Nat.card (H.comap (MulAut.conj k).toMonoidHom) = Nat.card H := by
+  rw [Subgroup.comap_equiv_eq_map_symm' (MulAut.conj k) H]
+  exact Subgroup.card_map_of_injective (f := (MulAut.conj k).symm.toMonoidHom)
+    (MulAut.conj k).symm.injective
+
+omit [Finite G] in
+/-- **(infra)** `a ∈ H` なら `H.comap (MulAut.conj a) = H` (`H` 内元による共役は `H` を保つ). -/
+private theorem comap_conj_self_of_mem {a : G} {H : Subgroup G} (ha : a ∈ H) :
+    H.comap (MulAut.conj a).toMonoidHom = H := by
+  have h := Subgroup.conj_smul_eq_self_of_mem (H := H) (h := a⁻¹) (H.inv_mem ha)
+  rw [conj_smul_eq_comap_conj_inv, inv_inv] at h
+  exact h
+
+omit [Finite G] in
+/-- **(infra)** `K ⊴ G`, `H ⊓ K = ⊥` のとき `|H ⊔ K| = |H| · |K|` (第二同型). -/
+private theorem card_sup_eq_of_inf_bot {H K : Subgroup G} [K.Normal]
+    (hHKbot : H ⊓ K = ⊥) : Nat.card ↥(H ⊔ K) = Nat.card H * Nat.card K := by
+  -- Lagrange for `K.subgroupOf (H⊔K)` inside `↥(H⊔K)`.
+  have hlag := Subgroup.card_mul_index (K.subgroupOf (H ⊔ K))
+  -- `|K.subgroupOf (H⊔K)| = |K|`.
+  have hcardK : Nat.card (K.subgroupOf (H ⊔ K)) = Nat.card K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv
+  -- `(K.subgroupOf (H⊔K)).index = K.relIndex (H⊔K) = K.relIndex H`.
+  have hidx : (K.subgroupOf (H ⊔ K)).index = Nat.card H := by
+    have h1 : (K.subgroupOf (H ⊔ K)).index = K.relIndex (H ⊔ K) := rfl
+    rw [h1, Subgroup.relIndex_sup_right]
+    -- `K.relIndex H = (K.subgroupOf H).index`, and `K.subgroupOf H = ⊥`.
+    have hbot : K.subgroupOf H = ⊥ :=
+      Subgroup.subgroupOf_eq_bot.mpr (by rw [disjoint_iff, inf_comm]; exact hHKbot)
+    change (K.subgroupOf H).index = Nat.card H
+    rw [hbot, Subgroup.index_bot]
+  rw [hcardK, hidx] at hlag
+  -- `hlag : |K| * |H| = |H⊔K|`
+  rw [← hlag, mul_comm]
+
+/-- **(infra)** `W ≤ V := (H⊔K)⊓U` で `|W| = |H|` なら, `W.subgroupOf V` は
+`π := primeFactors|H|`-Hall (内側 `↥V`)。両端 `H` と `g⁻¹Hg` をこの一本で処理する。 -/
+private theorem isHall_subgroupOf_of_card_eq {K U H W : Subgroup G} [K.Normal]
+    (hHKbot : H ⊓ K = ⊥) (hcop : Nat.Coprime (Nat.card H) (Nat.card K))
+    (hWV : W ≤ (H ⊔ K) ⊓ U) (hWcard : Nat.card W = Nat.card H) :
+    Ch03.IsHallSubgroup {p | p ∈ (Nat.card H).primeFactors}
+      (W.subgroupOf ((H ⊔ K) ⊓ U)) := by
+  set V : Subgroup G := (H ⊔ K) ⊓ U with hV
+  have hWHK : W ≤ H ⊔ K := hWV.trans inf_le_left
+  have hVHK : V ≤ H ⊔ K := inf_le_left
+  -- `|W.subgroupOf V| = |W| = |H|`.
+  have hcardWV : Nat.card (W.subgroupOf V) = Nat.card H := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWV).toEquiv, hWcard]
+  -- `W.relIndex (H⊔K) = |K|`.
+  have hWrelHK : W.relIndex (H ⊔ K) = Nat.card K := by
+    have hlag := Subgroup.card_mul_index (W.subgroupOf (H ⊔ K))
+    have hc : Nat.card (W.subgroupOf (H ⊔ K)) = Nat.card H := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWHK).toEquiv, hWcard]
+    have hidx : (W.subgroupOf (H ⊔ K)).index = W.relIndex (H ⊔ K) := rfl
+    rw [hc, hidx, card_sup_eq_of_inf_bot hHKbot] at hlag
+    -- `hlag : |H| * W.relIndex (H⊔K) = |H| * |K|`
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hlag
+  -- `W.relIndex V ∣ W.relIndex (H⊔K) = |K|`.
+  have hdvd : W.relIndex V ∣ Nat.card K := by
+    have hmul := Subgroup.relIndex_mul_relIndex W V (H ⊔ K) hWV hVHK
+    rw [hWrelHK] at hmul
+    exact ⟨V.relIndex (H ⊔ K), hmul.symm⟩
+  refine ⟨?_, ?_⟩
+  · -- cond1: primeFactors of |W.subgroupOf V| ⊆ π
+    intro p hp
+    rw [hcardWV] at hp
+    exact hp
+  · -- cond2: primeFactors of index ∉ π
+    intro p hp hpπ
+    have hidxV : (W.subgroupOf V).index = W.relIndex V := rfl
+    rw [hidxV, Nat.mem_primeFactors] at hp
+    -- `p ∣ |K|`
+    have hpK : p ∣ Nat.card K := hp.2.1.trans hdvd
+    -- `p ∣ |H|` from `p ∈ π`
+    simp only [Set.mem_setOf_eq, Nat.mem_primeFactors] at hpπ
+    have hpH : p ∣ Nat.card H := hpπ.2.1
+    -- contradiction with coprimality
+    have : p ∣ Nat.gcd (Nat.card H) (Nat.card K) := Nat.dvd_gcd hpH hpK
+    rw [hcop.gcd_eq_one] at this
+    exact hp.1.one_lt.ne' (Nat.dvd_one.mp this)
+
 /-- **BG Lemma 6.5(c)** (mmd L2056): 上記仮定で, `g ∈ G` が `H^g = g⁻¹Hg ≤ U` を満たすなら
 `g = c·u` (`c ∈ C_K(H)`, `u ∈ U`) と分解できる。`H^g` は BG 規約 `g⁻¹Hg`
 (= `H.comap (MulAut.conj g)`)。 -/
@@ -252,7 +385,138 @@ theorem exists_mem_centralizerK_mul_of_conj_le [IsSolvable G] {K U H : Subgroup 
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K))
     {g : G} (hg : H.comap (MulAut.conj g).toMonoidHom ≤ U) :
     ∃ c ∈ Subgroup.centralizer (H : Set G) ⊓ K, ∃ u ∈ U, g = c * u := by
-  sorry
+  classical
+  -- `H ⊓ K = ⊥` from coprimality.
+  have hHKbot : H ⊓ K = ⊥ := inf_eq_bot_of_coprime_card hcop
+  -- Step 1: decompose `g = k * v`, `k ∈ K`, `v ∈ U`.
+  have hgmem : g ∈ K ⊔ U := by rw [hKU]; exact Subgroup.mem_top g
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hgmem
+  obtain ⟨k, hkK, v, hvU, hkv0⟩ := hgmem
+  have hkv : k * v = g := hkv0
+  -- abbreviation `Hk = k⁻¹Hk` (BG convention `comap (conj k)`)
+  let Hk : Subgroup G := H.comap (MulAut.conj k).toMonoidHom
+  have hHk : Hk = H.comap (MulAut.conj k).toMonoidHom := rfl
+  -- Step 2: `Hk ≤ U`.  From `hg` with `g = k*v`: `Hk.comap (conj v) ≤ U`, then de-conjugate.
+  have hgkv : H.comap (MulAut.conj g).toMonoidHom
+      = Hk.comap (MulAut.conj v).toMonoidHom := by
+    rw [hHk, ← comap_conj_mul, hkv]
+  have hg' : Hk.comap (MulAut.conj v).toMonoidHom ≤ U := hgkv ▸ hg
+  have hkU : Hk ≤ U := by
+    intro z hz
+    have hx : MulAut.conj v (v⁻¹ * z * v) ∈ Hk := by
+      rw [MulAut.conj_apply]
+      have heq : v * (v⁻¹ * z * v) * v⁻¹ = z := by group
+      rwa [heq]
+    have hzU' : v⁻¹ * z * v ∈ U := hg' (mem_comap_conj.mpr hx)
+    have heq : z = v * (v⁻¹ * z * v) * v⁻¹ := by group
+    rw [heq]; exact U.mul_mem (U.mul_mem hvU hzU') (U.inv_mem hvU)
+  -- Step 3: `Hk ≤ H ⊔ K`. Each element of `Hk` is `k⁻¹ h k` with `h ∈ H ≤ H⊔K`, `k ∈ K ≤ H⊔K`.
+  have hkHK : Hk ≤ H ⊔ K := by
+    intro z hz
+    rw [hHk, mem_comap_conj] at hz
+    -- `k*z*k⁻¹ ∈ H`, so `z = k⁻¹*(k*z*k⁻¹)*k ∈ H⊔K`.
+    have hzeq : z = k⁻¹ * (k * z * k⁻¹) * k := by group
+    rw [hzeq]
+    exact (H ⊔ K).mul_mem ((H ⊔ K).mul_mem
+      ((H ⊔ K).inv_mem (Subgroup.mem_sup_right hkK)) (Subgroup.mem_sup_left hz))
+      (Subgroup.mem_sup_right hkK)
+  -- `H ≤ H ⊔ K`
+  have hHHK : H ≤ H ⊔ K := le_sup_left
+  -- Set `V := (H⊔K) ⊓ U`, and verify `H, Hk ≤ V`.
+  set V : Subgroup G := (H ⊔ K) ⊓ U with hV
+  have hHV : H ≤ V := le_inf hHHK hHU
+  have hHkV : Hk ≤ V := le_inf hkHK hkU
+  -- `|Hk| = |H|`
+  have hcardHk : Nat.card Hk = Nat.card H := card_comap_conj k H
+  -- Both `H` and `Hk` are π-Hall of `V`.
+  have hHallH : Ch03.IsHallSubgroup {p | p ∈ (Nat.card H).primeFactors} (H.subgroupOf V) :=
+    isHall_subgroupOf_of_card_eq hHKbot hcop hHV rfl
+  have hHallHk : Ch03.IsHallSubgroup {p | p ∈ (Nat.card H).primeFactors} (Hk.subgroupOf V) :=
+    isHall_subgroupOf_of_card_eq hHKbot hcop hHkV hcardHk
+  -- Step 6: apply the conjugacy engine inside the solvable subgroup `↥V`.
+  obtain ⟨w₀, hw₀V, hconj⟩ :=
+    exists_conj_eq_of_isHall_subgroupOf (inferInstance : IsSolvable ↥V) hHV hHkV hHallH hHallHk
+  -- `hconj : MulAut.conj w₀ • H = Hk`, i.e. in comap form `H.comap (conj w₀⁻¹) = Hk`.
+  rw [conj_smul_eq_comap_conj_inv] at hconj
+  -- so with `w := w₀⁻¹ ∈ V`: `H.comap (conj w) = Hk`.
+  set w : G := w₀⁻¹ with hw
+  have hwV : w ∈ V := V.inv_mem hw₀V
+  have hconjw : H.comap (MulAut.conj w).toMonoidHom = Hk := hconj
+  -- Step 8: reduce `w` to `K ⊓ U`. `↑V = ↑H * ↑(K ⊓ U)` (Dedekind), so `w = h₀ * c₀`.
+  have hwmem : w ∈ (H : Set G) * (K ⊓ U : Subgroup G) := by
+    have hVcoe : (V : Set G) = (H : Set G) * (K ⊓ U : Subgroup G) := by
+      rw [Subgroup.mul_inf_assoc H K U hHU, ← Subgroup.mul_normal H K, hV, Subgroup.coe_inf]
+    rw [← hVcoe]; exact hwV
+  rw [Set.mem_mul] at hwmem
+  obtain ⟨h₀, hh₀H, c₀, hc₀, hw_eq⟩ := hwmem
+  rw [SetLike.mem_coe] at hh₀H hc₀
+  -- `H.comap (conj c₀) = H.comap (conj w) = Hk` because `h₀ ∈ H` ⟹ `comap (conj h₀) H = H`.
+  have hc₀conj : H.comap (MulAut.conj c₀).toMonoidHom = Hk := by
+    rw [← hconjw, ← hw_eq, comap_conj_mul, comap_conj_self_of_mem hh₀H]
+  -- `c₀ ∈ K` and `c₀ ∈ U`.
+  have hc₀K : c₀ ∈ K := (Subgroup.mem_inf.mp hc₀).1
+  have hc₀U : c₀ ∈ U := (Subgroup.mem_inf.mp hc₀).2
+  -- Step 9: build `c := k * c₀⁻¹` and `u := c₀ * v`.
+  refine ⟨k * c₀⁻¹, ?_, c₀ * v, U.mul_mem hc₀U hvU, ?_⟩
+  · -- `c = k * c₀⁻¹ ∈ centralizer (H) ⊓ K`.
+    rw [Subgroup.mem_inf]
+    refine ⟨?_, K.mul_mem hkK (K.inv_mem hc₀K)⟩
+    -- First: `c` normalizes `H`, i.e. `H.comap (conj c) = H`.
+    -- `H.comap (conj k) = H.comap (conj c₀)` (= Hk), so conjugating back by `c₀⁻¹` fixes `H`.
+    have hcNorm : H.comap (MulAut.conj (k * c₀⁻¹)).toMonoidHom = H := by
+      have hkc₀ : H.comap (MulAut.conj k).toMonoidHom = H.comap (MulAut.conj c₀).toMonoidHom :=
+        (hc₀conj.trans hHk).symm
+      rw [comap_conj_mul, hkc₀, ← comap_conj_mul]
+      -- now `H.comap (conj (c₀ * c₀⁻¹)) = H`
+      have h1 : c₀ * c₀⁻¹ = (1 : G) := mul_inv_cancel c₀
+      rw [h1]
+      ext x; rw [mem_comap_conj]; simp
+    -- `c⁻¹ H c = H` as well (apply `hcNorm` with `c⁻¹`).
+    have hcNormInv : H.comap (MulAut.conj (k * c₀⁻¹)⁻¹).toMonoidHom = H := by
+      have h2 := comap_conj_mul (k * c₀⁻¹) (k * c₀⁻¹)⁻¹ H
+      rw [mul_inv_cancel, hcNorm] at h2
+      -- `h2 : H.comap (conj 1) = H.comap (conj (k*c₀⁻¹)⁻¹)`
+      have h3 : H.comap (MulAut.conj (1 : G)).toMonoidHom = H := by
+        ext x; rw [mem_comap_conj]; simp
+      rw [h3] at h2; exact h2.symm
+    -- Now show centralizer membership.
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    -- `d := c⁻¹ * h * c * h⁻¹ ∈ H ⊓ K = ⊥`.
+    set c : G := k * c₀⁻¹ with hc
+    -- `c⁻¹ * h * c ∈ H` from `hcNormInv`.
+    have hconjH : c⁻¹ * h * c ∈ H := by
+      have : h ∈ H.comap (MulAut.conj c⁻¹).toMonoidHom := by rw [hcNormInv]; exact hh
+      rw [mem_comap_conj] at this
+      -- `this : c⁻¹ * h * (c⁻¹)⁻¹ ∈ H`
+      rwa [inv_inv] at this
+    have hdH : c⁻¹ * h * c * h⁻¹ ∈ H := H.mul_mem hconjH (H.inv_mem hh)
+    -- `d ∈ K`: `c ∈ K`, `K` normal ⟹ `h * c * h⁻¹ ∈ K`, so `c⁻¹ * (h*c*h⁻¹) ∈ K`.
+    have hcK : c ∈ K := K.mul_mem hkK (K.inv_mem hc₀K)
+    have hdK : c⁻¹ * h * c * h⁻¹ ∈ K := by
+      have hconjK : h * c * h⁻¹ ∈ K := by
+        have := (‹K.Normal›.conj_mem c hcK h)
+        simpa [mul_assoc] using this
+      have heq : c⁻¹ * h * c * h⁻¹ = c⁻¹ * (h * c * h⁻¹) := by group
+      rw [heq]; exact K.mul_mem (K.inv_mem hcK) hconjK
+    -- `d = 1`.
+    have hd1 : c⁻¹ * h * c * h⁻¹ = 1 := by
+      have : c⁻¹ * h * c * h⁻¹ ∈ H ⊓ K := Subgroup.mem_inf.mpr ⟨hdH, hdK⟩
+      rw [hHKbot, Subgroup.mem_bot] at this
+      exact this
+    -- conclude `h * c = c * h`.
+    have : c⁻¹ * h * c = h := by
+      have := mul_eq_one_iff_eq_inv.mp hd1
+      -- `this : c⁻¹ * h * c = (h⁻¹)⁻¹ = h`
+      rwa [inv_inv] at this
+    -- so `h * c = c * h`
+    have hgoal : h * c = c * h := by
+      have h4 : c * (c⁻¹ * h * c) = c * h := by rw [this]
+      calc h * c = c * (c⁻¹ * h * c) := by group
+        _ = c * h := by rw [this]
+    exact hgoal
+  · -- `g = c * u`: `(k * c₀⁻¹) * (c₀ * v) = k * v = g`.
+    rw [← hkv]; group
 
 omit [Finite G] in
 /-- 集合 `H` の中心化群は `H` (部分群) の正規化群に含まれる (`c` が各 `h∈H` と可換 ⟹

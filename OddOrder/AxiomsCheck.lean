@@ -1134,6 +1134,14 @@ set_option linter.style.longLine false in
 -- BG Prop 1.15(b) (Goldschmidt), general form: O_{p'}(C_G(R)) ≤ O_{p'}(G) (R p-subgroup, G solvable)。
 -- M₀=O_{p'}(G) で商 Ḡ=G/M₀ に落とし, Lem 1.14 で C_Ḡ(R̄)=(C_G(R)).map f, 特殊形@Ḡ で K=M.map f=⊥。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.oPiPrimeCore_centralizer_le_oPiPrimeCore
+-- BG §6/§7 共有 engine: ↥V 可解 + π-Hall 共役 (Isaacs hall_C を subtype 像で G レベルへ);
+-- §7 Thm 7.4(d) と §6 Lem 6.5(c) の両方で使用。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf
+-- BG §6 Lem 6.5 (可解 N/C 分解, mmd L2048): K⊴G, G=KU, H≤U, (|H|,|K|)=1 ⇒ (a) H⊓G'=H⊓U';
+-- (c) H^g=g⁻¹Hg≤U ⇒ g=cu (c∈C_K(H),u∈U); (b) N_G(H)=C_K(H)·N_U(H)。(c)=↥V=(H⊔K)⊓U 内 Hall 共役。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizerK_mul_of_conj_le
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.normalizer_eq_centralizerK_mul_normalizerU
 -- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
 -- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer
