@@ -75,6 +75,16 @@ noncomputable def uniqueMaximalSubgroup {H : Subgroup G} (h : IsUniquelyMaximal 
     Subgroup G :=
   Classical.choose h.existsUnique
 
+/-- To prove `H ∈ 𝒰`, it suffices to exhibit one maximal subgroup over `H` and prove
+that every maximal subgroup over `H` is that one. -/
+theorem of_unique_maximal {H M : Subgroup G}
+    (hH : H < ⊤) (hM : M ∈ maximalSubgroups G) (hHM : H ≤ M)
+    (huniq : ∀ N : Subgroup G, N ∈ maximalSubgroups G → H ≤ N → N = M) :
+    IsUniquelyMaximal H := by
+  refine ⟨hH, ⟨M, ⟨hM, hHM⟩, ?_⟩⟩
+  intro N hN
+  exact huniq N hN.1 hN.2
+
 /-- The chosen maximal subgroup over `H` is maximal and contains `H`. -/
 theorem uniqueMaximalSubgroup_spec {H : Subgroup G} (h : IsUniquelyMaximal H) :
     IsCoatom (h.uniqueMaximalSubgroup) ∧ H ≤ h.uniqueMaximalSubgroup :=
