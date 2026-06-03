@@ -1649,6 +1649,73 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
   rw [Subgroup.zpowers_le]
   exact mem_normalizer_of_conj_smul_eq_self hgN
 
+/-- **(7.3) for prime index** (mmd L2218-2220): if `A ⊴ P` with `|P:A| = p` prime and
+`p ∤ |ℋ*(A;q)|`, then `P` normalizes some element of `ℋ*(A;q)`. Extract a generator `g` of
+the cyclic prime-order quotient `↥P ⧸ A` and apply `tp_exists_normalized`. -/
+private theorem tp_exists_normalized_of_prime_index [Finite G] {A P : Subgroup G} {q : ℕ}
+    [Fact q.Prime] [hAnormal : (A.subgroupOf P).Normal] (hAP : A ≤ P) {p : ℕ} (hp : p.Prime)
+    (hindex : (A.subgroupOf P).index = p)
+    (hpdvd : ¬ p ∣ Nat.card ↥(hInvariantStar ⊤ A {q})) :
+    ∃ Q ∈ hInvariantStar ⊤ A {q}, P ≤ Subgroup.normalizer Q := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  set Bbar : Subgroup ↥P := A.subgroupOf P with hBbar
+  have hcardQ : Nat.card (↥P ⧸ Bbar) = p := by rw [← Subgroup.index_eq_card]; exact hindex
+  haveI hcyc : IsCyclic (↥P ⧸ Bbar) := isCyclic_of_prime_card hcardQ
+  obtain ⟨gbar, hgbar⟩ := isCyclic_iff_exists_zpowers_eq_top.mp hcyc
+  obtain ⟨g', rfl⟩ := QuotientGroup.mk'_surjective Bbar gbar
+  set g : G := (g' : G) with hg_def
+  have hgP : g ∈ P := g'.2
+  -- `g ^ p ∈ A`.
+  have hgpA : g ^ p ∈ A := by
+    have hpow : (QuotientGroup.mk' Bbar g') ^ p = 1 := by
+      rw [← hcardQ]; exact pow_card_eq_one'
+    rw [← map_pow] at hpow
+    have hmem : (g' ^ p) ∈ Bbar := (QuotientGroup.eq_one_iff _).mp hpow
+    rw [hBbar, Subgroup.mem_subgroupOf] at hmem
+    have hcoe : ((g' ^ p : ↥P) : G) = g ^ p := by rw [Subgroup.coe_pow]
+    rwa [hcoe] at hmem
+  -- `A ⊔ zpowers g = P`.
+  have hsup : A ⊔ Subgroup.zpowers g = P := by
+    have htop : Bbar ⊔ Subgroup.zpowers g' = ⊤ := by
+      rw [eq_top_iff]
+      intro x _
+      have hx : QuotientGroup.mk' Bbar x ∈ Subgroup.zpowers (QuotientGroup.mk' Bbar g') := by
+        rw [hgbar]; exact Subgroup.mem_top _
+      rw [Subgroup.mem_zpowers_iff] at hx
+      obtain ⟨n, hn⟩ := hx
+      rw [← map_zpow] at hn
+      have hmemB : x * (g' ^ n)⁻¹ ∈ Bbar := by
+        rw [← QuotientGroup.eq_one_iff]
+        rw [show ((x * (g' ^ n)⁻¹ : ↥P) : ↥P ⧸ Bbar) = QuotientGroup.mk' Bbar (x * (g' ^ n)⁻¹) from
+          rfl, map_mul, map_inv, hn, mul_inv_cancel]
+      have hx_eq : x = (x * (g' ^ n)⁻¹) * g' ^ n := by group
+      rw [hx_eq]
+      exact (Bbar ⊔ Subgroup.zpowers g').mul_mem (Subgroup.mem_sup_left hmemB)
+        (Subgroup.mem_sup_right (Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩))
+    -- Map `Bbar ⊔ ⟨g'⟩ = ⊤` from `↥P` to `G`.
+    apply le_antisymm
+    · exact sup_le hAP ((Subgroup.zpowers_le).mpr hgP)
+    · intro x hxP
+      have hximg : (⟨x, hxP⟩ : ↥P) ∈ Bbar ⊔ Subgroup.zpowers g' := htop ▸ Subgroup.mem_top _
+      rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hximg
+      obtain ⟨a, ha, z, hz, haz⟩ := hximg
+      rw [SetLike.mem_coe, hBbar, Subgroup.mem_subgroupOf] at ha
+      have hzG : (z : G) ∈ Subgroup.zpowers g := by
+        rw [SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hz
+        obtain ⟨n, hn⟩ := hz
+        have hzval : (z : G) = g ^ n := by rw [← hn, hg_def, Subgroup.coe_zpow]
+        rw [hzval]
+        exact Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩
+      have hxval : x = (a : G) * (z : G) := by
+        have hc := congrArg (Subtype.val : ↥P → G) haz
+        rw [Subgroup.coe_mul] at hc
+        exact hc.symm
+      rw [hxval]
+      exact (A ⊔ Subgroup.zpowers g).mul_mem (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hzG)
+  have hPnA : ∀ x ∈ P, MulAut.conj x • A = A := fun x hx =>
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer_of_normal_subgroupOf hAP hx)
+  exact tp_exists_normalized hPnA hgP hgpA hsup hpdvd
+
 /-- **Theorem 7.4(b)** (mmd L2234-2244): `O_{π'}(C_G(P))` is transitive on `ℋ_G*(P;q)`.
 For `Q₁,Q₂ ∈ ℋ*(P;q)`: by (c) (`hc_sub`) both lie in `ℋ*(A;q)`, so `htrans` gives `k ∈ K`
 with `Q₂ = Q₁^k`. Inside `V := (K⊔P)⊓N(Q₂) = (K∩N(Q₂))·P`, the Hall-`π` subgroups `P` and
