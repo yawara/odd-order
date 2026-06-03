@@ -426,3 +426,31 @@ transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
 - **H2** `induce_exists_natFinsupp_eq_sum` (~50, Ind θ の ℕ分解; exists_natFinsupp を ZIrr+Frobenius-nonneg で再現)
 - characterization 本体 (~100, ⊆/⊇)。最小 Z-仮説 = `Z≤H`+`[Z.Normal]` のみ (Z⊆Z(H)/Z≠⊥ は upstream)。
 - 配置: 当面 S08-local、将来 S03 ConstituentKernel へ移設可。c2 (case A X⊆Irr, FPF route) は §F 通り別途。
+
+## I. B (engine surgery) refined plan — TRACTABLE adapter, NOT parallel engine (2026-06-03)
+
+**🟢 重大発見: `retarget_isCoherent`(S07:2835) は X,Xbar を bare class function で取る (D₀ 非依存)**。
+D₀ 結合は wrapper `retarget_isCoherent_of_decomposition`(3127, `D.retargetTargetPair` 経由) のみ。
+⟹ B = **X-family adapter** (既存 engine `retarget_isCoherent` を直接呼ぶ)、parallel engine 不要。
+
+**核心: X := Da.X** (Da = `CharacterPsiDecomposition τ χ (a•chi1)`, ψ=a•χ₁ supported decomp,
+`htau1_mema:τ(χ−a·χ₁)∈ZIrr` から構成。**htau1_mem0(τχ∈ZIrr) 不要**)。`Da.X = D₀.X` (hX_eq) ゆえ同値。
+
+**{X,X̄} facts は全部 supported route で導出可 (検証済, ψ=0/τχ∈ZIrr 不使用)**:
+- `‖X‖²=1`: himg `τ(χ−a·χ₁)=X−a·ext(χ₁)` + `‖τ(χ−a·χ₁)‖²=‖χ−a·χ₁‖²=1+a²`(supported isometry,χ⊥χ₁)
+  + `X⊥ext(χ₁)`((5.2.e) hperElem, X∈ℤ[R(χ)]⊥ext(χ₁)) + `‖ext(χ₁)‖²=‖χ₁‖²=1`。
+- `‖X̄‖²=1`,`⟨X,X̄⟩=0` (X̄=X−τ(χ−χ̄)): `⟨X,τ(χ−χ̄)⟩=⟨τ(χ−a·χ₁),τ(χ−χ̄)⟩=⟨χ−a·χ₁,χ−χ̄⟩=1`
+  (∑Da.coeff=⟨τ(χ−a·χ₁),∑R(χ)⟩=⟨τ(χ−a·χ₁),τ(χ−χ̄)⟩, supported isometry)。
+- `X∈ZIrr`/`X̄∈ZIrr`: Da.X_eq (∑ over R(χ)) + τ(χ−χ̄)∈ZIrr。
+
+**実装ステップ (build-green incremental, 既存 D₀/retargetTargetPair/of_decomposition stack は不変=supported-χ 用)**:
+1. **`retargetTargetPair_fromSupported`** (~80): X:=Da.X の {X,X̄} orthonormality+ZIrr を上記 supported 導出で。
+   入力 = Da + himg + supported-isometry facts + hperElem(X⊥ext(S₁)) + χ⊥χ₁/χ⊥χ̄/‖χ‖²=1 等。
+2. **`retarget_isCoherent_of_supportedDecomposition`** (~40): Da + data → (1) で X facts 構成 → `retarget_isCoherent` 直呼。
+3. **`retarget_isCoherent_fromDade_X`** (~60): Dade 層 wrapper。Da を htau1_mema (supported diff, provable) から構成、
+   個別 support → **difference-support 弱化** (χ−a·χ₁ は 1 で消え H^# supported)、(2) を呼ぶ。
+4. **rewire** `DadeChainStep.advance`(5173) を X-version に (or 分岐)。`peterfalvi_66_coherence_of_X_from_dade` 接続。
+5. 抽象 `peterfalvi_66_coherence_of_X`(3934) 不変、AxiomsCheck clean、各 step `lake build OddOrder` green。
+
+**要読込 (実装前)**: `RetargetTargetPair` struct(2169) / `eq_sum_of_psi_eq_zero` / supported-isometry lemma 名
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`) / `imageFamily.image_eq` / hperElem source。
