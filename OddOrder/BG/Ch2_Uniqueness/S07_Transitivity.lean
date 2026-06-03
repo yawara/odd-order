@@ -1153,6 +1153,17 @@ private theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [F
     _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥X).map X.subtype := Subgroup.map_mono habs
     _ = opiCoreInG ({p} : Set ℕ)ᶜ X := rfl
 
+/-- **Bar-quotient bridge** for Proposition 7.5's special case: the image of `O_{π',π}(G')` under
+the quotient `mk' : G' → G'/O_{π'}(G')` is exactly `O_π(G'/O_{π'}(G'))` — i.e. `O_p(X̄) = mk(O_{p',p}(X))`.
+Immediate from `oPiPrimePiCore` being defined as `comap (mk' O_{π'}) (O_π of the quotient)` plus
+`map_comap_eq_self_of_surjective`. With Theorem 6.1 (`thmA4b`: `A ≤ O_{p',p}(X)`) this gives
+`Ā ≤ O_p(X̄)`. -/
+private theorem oPiPrimePiCore_map_mk'_eq {G' : Type*} [Group G'] (π : Set ℕ) :
+    (Ch03.oPiPrimePiCore π G').map (QuotientGroup.mk' (Ch03.oPiCore {p | p ∉ π} G'))
+      = Ch03.oPiCore π (G' ⧸ Ch03.oPiCore {p | p ∉ π} G') := by
+  rw [Ch03.oPiPrimePiCore]
+  exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}

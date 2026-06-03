@@ -59,6 +59,38 @@ intro Y hY            -- hY : Y ∈ hInvariant X A (primesOf A)ᶜ
   **罠**: P/Z 商 + Ω₁(A)/Z の正規性 + pullback。要 bar-quotient 補助。
 共通: `B ≤ A`, `B` elementary abelian 位数 p², `B ⊴ P`, `Nat.Coprime (card B) (card Y)` (B p-群, Y p'-群)。
 
+### 🎯 special case 抽象版 = `specialCase` (推奨 Lean 分解, 2026-06-03 設計) — `b` 非依存で再利用
+**狙い**: 群 `G'` (= ↥X = ↥C_G(b) の役) で `b` を消した抽象形を private 補題に切り出す:
+```
+specialCase {p}[Fact p.Prime]{G'}[Group G'][Finite G'][IsSolvable G'] (hp2 : p ≠ 2)
+  (hodd : Odd (Nat.card G')) (P : Sylow p G') {A : Subgroup G'} (hAP : A ≤ ↑P) [IsMulCommutative A]
+  (hAnormP : (↑P:Subgroup G') ≤ normalizer A) (hCPA : centralizer (A:Set G') ⊓ ↑P ≤ A)
+  {Y : Subgroup G'} (hYnorm : A ≤ normalizer Y) (hYpi : IsPiSubgroup {p}ᶜ Y) :
+  Y ≤ Ch03.oPiCore {p}ᶜ G'
+```
+✅ 既 build 済 helper: `oPiPrimePiCore_map_mk'_eq` (= `mk(O_{p',p})=O_p(X̄)`, bar 方向)。
+**proof 9 step** (mmd L2275-2285, step 7-8 は S01 `mem_centralizer_opCore_…` の写し):
+1. `N := Ch03.oPiCore {p}ᶜ G'` (=O_{p'}), `mk := mk' N`, `X̄ := G'/N`. `O_p(X̄) := Ch03.oPiCore {p} X̄`.
+2. **Thm 6.1** `thmA4b hp2 ‹IsSolvable G'› hodd P hAP hAnormP : A ≤ Ch03.oPiPrimePiCore {p} G'`.
+3. `Ā := A.map mk ≤ (oPiPrimePiCore {p} G').map mk = O_p(X̄)` via `oPiPrimePiCore_map_mk'_eq` + `map_mono`.
+4. `Ȳ := Y.map mk`. p'-群 (`card_map_dvd`). `Ā` が `Ȳ` 正規化 (A↷Y を mk で).
+5. `⁅Ā,Ȳ⁆ ≤ O_p(X̄) ⊓ Ȳ = ⊥`: ⊆Ȳ (Ā 正規化 Ȳ); ⊆O_p(X̄) (Ā≤O_p(X̄)⊴X̄); ⊓=⊥ (`inf_eq_bot_of_pGroup_coprime`)
+   ⟹ `Ā ≤ centralizer Ȳ` (commutator ⊥ = 中心化), 特に `Ā ≤ C_{O_p(X̄)}(Ȳ)`。
+6. **🔴 crux `C_{O_p(X̄)}(Ā) ⊆ Ā`** (= `C_P(A)⊆A` から; Sylow correspondence。**最大未解決 sub-design**):
+   - `S := ↑P ⊓ oPiPrimePiCore {p} G'` = **Sylow-p of O_{p',p}(G')** (Sylow∩normal=Sylow of normal; mathlib に
+     直接無し→`IsPGroup.inf_normalizer_sylow`(Sylow.lean:281) or 自作要)。`A ≤ S` (A≤P ∧ A≤O_{p',p}(step2))。
+   - `mk|_S : S ≃* O_p(X̄)`: 単射 (`S⊓N=⊥`, S p-群/N p'-群) + 全射 (`O_{p',p}=N·S` で `mk(S)=mk(O_{p',p})=O_p(X̄)`)。
+   - 同型下 `C_{O_p(X̄)}(Ā)=mk(C_S(A))`, `C_S(A)≤C_P(A)≤A` (S≤P) ⟹ `C_{O_p(X̄)}(Ā)≤mk(A)=Ā`。
+   - **代替案** (Sylow iso 回避): `c̄∈C_{O_p(X̄)}(Ā)` を S=P⊓O_{p',p} へ lift (mk|_S 全単射) し C_P(A)⊆A。同じ難度。
+7. **Prop 1.10** `coprime_nilpotent_acts_trivially_of_centralizer_self` (Ȳ↷O_p(X̄), φ=normalizerMonoidHom):
+   `fixedPoints=C_{O_p(X̄)}(Ȳ)`; hyp `C(C(Ȳ))⊆C(Ȳ)`: step5 `Ā⊆C(Ȳ)` ⟹ `C(C(Ȳ))⊆C(Ā)⊆Ā⊆C(Ȳ)` (step6);
+   coprime (Ȳ p'/O_p p), nilpotent (O_p p-群) ⟹ `Ȳ が O_p(X̄) 中心化` ⟹ `Ȳ ≤ C_{X̄}(O_p(X̄))`。
+8. **Prop 1.15(a)** `hall_higman_solvable_specialization` @X̄ (`oPiCore {p}ᶜ X̄=⊥` by `oPiCore_quotient_self_eq_bot`;
+   `oPiCore_singleton_eq_opCore` で opCore 整合): `C_{X̄}(O_p(X̄))⊆O_p(X̄)` ⟹ `Ȳ≤O_p(X̄)`。
+9. `Ȳ≤O_p(X̄)⊓Ȳ=⊥` (step5) ⟹ `Y.map mk=⊥` ⟹ `Y≤ker mk=N=oPiCore {p}ᶜ G'`。∎
+**step 7-8 は S01:2304-2431 `mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer` を G'=X̄ で写経**。
+**step 6 が唯一の重い未解決** (Sylow-of-normal + 商同型 + centralizer transport, ~80-120 LOC)。
+
 ### special case 1 (mmd L2275-2285): `X = C_G(b)`, `b ∈ B^# ∩ Z`
 - `P` は `X = C_G(b)` の Sylow p (b ∈ Z(P) ⟹ P ≤ C_G(b)=X, かつ |X|_p = |P|)。**要補題: P ∈ Sylow p X**。
 - `A` abelian normal in P ⟹ **Thm 6.1** (`thmA4b`, X solvable/odd を `hG.solvable_of_lt_top`+`hodd.of_dvd_nat`):
