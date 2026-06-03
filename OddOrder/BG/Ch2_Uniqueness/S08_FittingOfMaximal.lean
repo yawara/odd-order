@@ -3114,6 +3114,77 @@ theorem fittingInG_eq_opiCoreInG_singleton_of_isPGroup [Finite G]
       (fittingInG_subgroupOf_normal M) hFpi
   · exact opiCoreInG_singleton_le_fittingInG M
 
+/-- If the `p'`-core is trivial, the `O_{p',p}` layer collapses to the `p`-core. -/
+theorem oPiPrimePiCore_singleton_eq_oPiCore_singleton_of_compl_bot
+    {X : Type*} [Group X] [Finite X] {p : ℕ} [Fact p.Prime]
+    (h : Ch03.oPiCore (({p} : Set ℕ)ᶜ) X = ⊥) :
+    Ch03.oPiPrimePiCore ({p} : Set ℕ) X = Ch03.oPiCore ({p} : Set ℕ) X := by
+  have key : ∀ (N : Subgroup X) [N.Normal], N = ⊥ →
+      Subgroup.comap (QuotientGroup.mk' N) (Ch03.oPiCore ({p} : Set ℕ) (X ⧸ N))
+        = Ch03.oPiCore ({p} : Set ℕ) X := by
+    intro N _ hN
+    subst hN
+    rw [show (QuotientGroup.mk' (⊥ : Subgroup X))
+        = (QuotientGroup.quotientBot (G := X)).symm.toMonoidHom from rfl]
+    rw [Subgroup.comap_equiv_eq_map_symm']
+    simp only [MulEquiv.symm_symm]
+    exact Ch03.oPiCore.map_eq_of_mulEquiv ({p} : Set ℕ) (QuotientGroup.quotientBot (G := X))
+  simpa [Set.compl_setOf] using key _ h
+
+/-- BG 8.1(b), third p-group bridge: when `F(M)` is a `p`-group, `O_{p',p}(M)`,
+viewed in `G`, lies in `F(M)`. -/
+theorem oPiPrimePiCore_singleton_map_le_fittingInG_of_fittingInG_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hFp : IsPGroup p ↥(fittingInG M)) :
+    (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M).map M.subtype ≤ fittingInG M := by
+  have hmap_bot : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M).map M.subtype = ⊥ := by
+    simpa [opiCoreInG] using
+      (opiCoreInG_singleton_compl_eq_bot_of_fittingInG_isPGroup (M := M) hp hFp)
+  have hbot : Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M = ⊥ :=
+    (Subgroup.map_eq_bot_iff_of_injective
+      (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M) M.subtype_injective).mp hmap_bot
+  have hcollapse :
+      Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M = Ch03.oPiCore ({p} : Set ℕ) ↥M :=
+    oPiPrimePiCore_singleton_eq_oPiCore_singleton_of_compl_bot hbot
+  calc
+    (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M).map M.subtype
+        = (Ch03.oPiCore ({p} : Set ℕ) ↥M).map M.subtype := by rw [hcollapse]
+    _ = opiCoreInG ({p} : Set ℕ) M := rfl
+    _ ≤ fittingInG M := opiCoreInG_singleton_le_fittingInG M
+
+/-- BG 8.1(b), fourth p-group bridge: Theorem 6.1 puts every `SCN₃(P)` subgroup in
+`O_{p',p}(M)`, hence in `F(M)` when `F(M)` is a `p`-group. -/
+theorem scn3_map_le_fittingInG_of_fittingInG_isPGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    A.map M.subtype ≤ fittingInG M := by
+  have hp_dvd_G : p ∣ Nat.card G :=
+    (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_subgroup_dvd_card (fittingInG M))
+  have hp_odd_prop : Odd p := hG.odd.of_dvd_nat hp_dvd_G
+  have hp_odd : p ≠ 2 := by
+    rintro rfl
+    rw [Nat.odd_iff] at hp_odd_prop
+    omega
+  have hsolvM : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hoddM : Odd (Nat.card ↥M) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  haveI hAcomm : IsMulCommutative A :=
+    IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
+      congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp hA.1.isMulCommutative
+        (⟨a, hAP ha⟩ : ↥(P : Subgroup ↥M)) (Subgroup.mem_subgroupOf.mpr ha)
+        ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
+  have hA_norm : (P : Subgroup ↥M) ≤ Subgroup.normalizer (A : Set ↥M) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAP).mp hA.1.isNormal
+  have hA_le_OPP : A ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M :=
+    OddOrder.BG.AppA.thmA4b hp_odd hsolvM hoddM P hAP hA_norm
+  exact (Subgroup.map_mono hA_le_OPP).trans
+    (oPiPrimePiCore_singleton_map_le_fittingInG_of_fittingInG_isPGroup (M := M) hp hFp)
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
