@@ -1253,6 +1253,75 @@ theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_kernelContribution_add_non
         rw [hkernel]
         rfl
 
+
+open scoped Classical in
+/-- Real norm-square form of the non-kernel column-orthogonality contribution at
+an additive-kernel element.  This is the form used for the Cauchy estimate in
+BG Lemma C.2. -/
+theorem normOneFrobenius_sum_nonKernelCharacter_normSq_inl_eq
+    [Fact p.Prime] (hq : 1 < q) {s : GaloisField p q} (hs : s ≠ 0) :
+    ∑ χ ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+          ¬ normOneFrobeniusKernelCharacterPred p q χ),
+      Complex.normSq
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)) =
+      ((p ^ q : ℕ) : ℝ) - (Nat.card (normOneUnits p q) : ℝ) := by
+  have hcomplex :
+      ∑ χ ∈ Finset.univ.filter
+          (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+            ¬ normOneFrobeniusKernelCharacterPred p q χ),
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)) *
+          star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q))) =
+        ((p ^ q : ℕ) : ℂ) - (Nat.card (normOneUnits p q) : ℂ) := by
+    simpa [normOneFrobeniusKernelCharacterPred] using
+      normOneFrobenius_sum_nonKernelCharacter_column_inl_eq p q hq hs
+  have hcast :
+      ((∑ χ ∈ Finset.univ.filter
+          (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+            ¬ normOneFrobeniusKernelCharacterPred p q χ),
+        Complex.normSq
+          ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)) : ℝ) : ℂ) =
+        ∑ χ ∈ Finset.univ.filter
+          (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+            ¬ normOneFrobeniusKernelCharacterPred p q χ),
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)) *
+          star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q))) := by
+    rw [Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun χ _ => ?_
+    rw [Complex.star_def, Complex.mul_conj]
+  apply Complex.ofReal_injective
+  rw [hcast, hcomplex]
+  norm_num [Complex.ofReal_sub]
+
+open scoped Classical in
+/-- The non-kernel squared column norm at a nonzero additive-kernel element is
+bounded by the additive-kernel order `p^q`. -/
+theorem normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le
+    [Fact p.Prime] (hq : 1 < q) {s : GaloisField p q} (hs : s ≠ 0) :
+    ∑ χ ∈ Finset.univ.filter
+        (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+          ¬ normOneFrobeniusKernelCharacterPred p q χ),
+      Complex.normSq
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)) ≤
+      ((p ^ q : ℕ) : ℝ) := by
+  rw [normOneFrobenius_sum_nonKernelCharacter_normSq_inl_eq p q hq hs]
+  have hU_nonneg : (0 : ℝ) ≤ (Nat.card (normOneUnits p q) : ℝ) := by positivity
+  linarith
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
