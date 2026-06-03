@@ -1840,6 +1840,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl_any
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_of_mem_normOneClass
 
+-- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
+-- fixed-product fiber over `inl (2*s)` before passing to the full product class.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isFixedProductClassPair
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.exists_normOnePairSetAt_of_isFixedProductClassPair
+
 -- BG App C Lemma C.2 q≥5 class-sum bridge: a finite-field pair counted by
 -- `normOnePairSetAt` gives a class pair for the class-sum structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isClassPair

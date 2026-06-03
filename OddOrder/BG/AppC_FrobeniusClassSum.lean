@@ -72,6 +72,56 @@ theorem exists_normOne_mul_of_mem_normOneClass [Fact p.Prime] (s : GaloisField p
   refine ⟨g.right, ?_⟩
   rw [← hg, normOneFrobenius_conj_inl_any]
 
+/-- Fixed-product version of `IsClassPair`: the two entries lie in prescribed
+classes and their product is the chosen representative `z`, not merely an
+element conjugate to `z`.  This is the fiber counted by the finite-field pair
+set before multiplying by the size of the product conjugacy class. -/
+def IsFixedProductClassPair [Fact p.Prime]
+    (Ci Cj : ConjClasses (normOneFrobeniusGroup p q))
+    (z : normOneFrobeniusGroup p q)
+    (r : normOneFrobeniusGroup p q × normOneFrobeniusGroup p q) : Prop :=
+  ConjClasses.mk r.1 = Ci ∧ ConjClasses.mk r.2 = Cj ∧ r.1 * r.2 = z
+
+/-- A pair counted by `normOnePairSetAt s` gives a fixed-product class pair with
+product exactly `inl (2*s)`. -/
+theorem normOnePairSetAt_isFixedProductClassPair [Fact p.Prime]
+    (s : GaloisField p q) {u v : normOneUnits p q}
+    (h : (u, v) ∈ normOnePairSetAt p q s) :
+    IsFixedProductClassPair (p := p) (q := q)
+      (normOneClassAt p q s) (normOneClassAt p q s)
+      (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+        normOneFrobeniusGroup p q)
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+            normOneFrobeniusGroup p q),
+        (SemidirectProduct.inl
+          (Multiplicative.ofAdd (((v : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+            normOneFrobeniusGroup p q)) := by
+  refine ⟨normOneClassAt_mul_eq p q s u, normOneClassAt_mul_eq p q s v, ?_⟩
+  exact (mem_normOnePairSetAt_iff_inl_mul_inl p q s u v).mp h
+
+/-- Conversely, a fixed-product class pair over `C_s, C_s` with product
+`inl (2*s)` comes from a pair of norm-one units satisfying the BG equation
+`u*s + v*s = 2*s`. -/
+theorem exists_normOnePairSetAt_of_isFixedProductClassPair [Fact p.Prime]
+    (s : GaloisField p q) {x y : normOneFrobeniusGroup p q}
+    (h : IsFixedProductClassPair (p := p) (q := q)
+      (normOneClassAt p q s) (normOneClassAt p q s)
+      (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+        normOneFrobeniusGroup p q) (x, y)) :
+    ∃ u v : normOneUnits p q,
+      (u, v) ∈ normOnePairSetAt p q s ∧
+        x = SemidirectProduct.inl
+          (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) ∧
+        y = SemidirectProduct.inl
+          (Multiplicative.ofAdd (((v : (GaloisField p q)ˣ) : GaloisField p q) * s)) := by
+  obtain ⟨u, hx⟩ := exists_normOne_mul_of_mem_normOneClass p q s h.1
+  obtain ⟨v, hy⟩ := exists_normOne_mul_of_mem_normOneClass p q s h.2.1
+  refine ⟨u, v, ?_, hx, hy⟩
+  have hprod := h.2.2
+  rw [hx, hy] at hprod
+  exact (mem_normOnePairSetAt_iff_inl_mul_inl p q s u v).mpr hprod
+
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
 `H = P ⋊ U`.  This is the one-way bridge needed before proving that the

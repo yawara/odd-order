@@ -136,9 +136,15 @@ AxiomsCheck 登録済み。
 `normOneFrobenius_conj_inl_any` で、任意の `x∈H=P⋊U` による `inl s` の共役は
 `x.right * s` だけで決まることを証明。`P` 成分が消えるのは additive kernel が可換だから。
 これを使い `exists_normOne_mul_of_mem_normOneClass` で、`normOneClassAt s` の任意の元が
-`inl(u*s)` と書けることを固定した。残る class-sum cardinal bridge は、product class
-`C_{2s}` の各 fiber を fixed-product pair set に同定し、class-size factor を整理する部分。
-AxiomsCheck 登録済み。
+`inl(u*s)` と書けることを固定した。AxiomsCheck 登録済み。
+
+#### ✅ class-sum bridge: fixed-product fiber (2026-06-04)
+`IsFixedProductClassPair` を導入し、通常の `IsClassPair` の product-class 条件を
+product が代表元 `inl(2*s)` に等しい fiber 条件へ切り出した。
+`normOnePairSetAt_isFixedProductClassPair` と
+`exists_normOnePairSetAt_of_isFixedProductClassPair` で、`normOnePairSetAt s` がこの fiber を
+正確に parametrise することを証明。残る cardinal bridge は、full class pair を product class の
+fiber 和として分解し、class-size factor を整理する部分。AxiomsCheck 登録済み。
 
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。

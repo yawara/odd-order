@@ -58,6 +58,11 @@ created: 2026-06-04
   `normOneFrobenius_conj_inl_any` と `exists_normOne_mul_of_mem_normOneClass` を追加。
   任意の `H=P⋊U` 共役で additive-kernel 元の移動は `U` 成分だけで決まり、
   `inl s` の共役類が `U`-orbit と一致する逆向き bridge を固定。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 fixed-product fiber bridge**:
+  `IsFixedProductClassPair`、`normOnePairSetAt_isFixedProductClassPair`、
+  `exists_normOnePairSetAt_of_isFixedProductClassPair` を追加。`normOnePairSetAt s` が
+  class-pair 全体ではなく product が代表元 `inl(2*s)` に等しい fiber を正確に数えることを固定。
+  AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
