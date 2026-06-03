@@ -26,7 +26,25 @@
 `A<P` subnormal, P 可解 ⟹ `∃ B, A≤B<P, B⊴P, |P:B| prime`。step1+R1a+pullback+G-translate 全組立済。
 (「A subnormal in B」clause は外し、R3 で `inf_isSubnormal_subgroupOf`+equiv-transport で別途導出。)
 
+### ✅ R2 base-case helpers (commit dfddd4e)
+8. **`eq_of_inf_normalizer_le`**: Q≤Q₁ (q-群), Q₁⊓N_G(Q)≤Q ⟹ Q=Q₁ (mmd L2230-2232 finish)。
+9. **`le_opiCoreInG_normalizer_self`**: π-部分群 Q ≤ O_π(N_G(Q))。
+
 ## 残タスク = R2 (base case 数学核心) + R3 (wiring)
+
+### 🔑 (c) core の決定的パターン = `commonConstruction` (S07:358-457) を P で再利用
+`commonConstruction` が Prop 1.5(b) を `↥N` (N=O_{π'}(H)) に relativize する手順を完全に示している:
+`opiCoreInG`+`hG.solvable_of_lt_top`(↥N solvable)+`isAInvariant_conjAction_iff`+`IsAInvariant.restrict`
++`isAInvariant_subgroupOf_restrict`+`coprime_of_isPiGroup_of_isPiGroup_compl`+
+`aInvariant_piSubgroup_le_aInvariant_hall`(Prop 1.5b)+`map N.subtype` 戻し。
+**(c) はこれを A→P, H→N_G(Q), N→M:=O_{π'}(N_G(Q)) に置換**して `Q.subgroupOf M ≤ P-inv Hall{q} R`
+を得る (Q≤M は helper 9, Q P-inv は P≤N(Q))。+ Hyp7.1 で `N_{Q₁}(Q)⊆O_{π'}(N(Q))`, 順序不等式
+`|Q|=|R戻し|=|M|_q ≥ |N_{Q₁}(Q)| ≥ |Q|`, helper 8 で `Q=Q₁`。Q=⊥ は (7.3) 経由 (degenerate)。
+### (7.3) p-群不動点: P/A (位数 prime/1 の p-群) が ℋ*(A;q) に作用 (A⊴P で conj 保存, A 自明),
+|ℋ*(A;q)| ∣ |K| (π') ⟹ p∤|ℋ*|, `IsPGroup.card_modEq_card_fixedPoints` で不動点。MulAction-on-Set 設定が重い。
+### (b): (c)+htrans で Q₂=Q₁^k, P,P^k は N_{KP}(Q₂)=(K∩N(Q₂))P の Hall{π}, `exists_conj_eq_of_isHall_subgroupOf` で共役, kg∈C_K(P)。
+### (d): L=N(P)∩N(Q), N(P)=L·C_K(P) (a)(b), `inf_commutator_eq_of_coprime` (Lem6.5a) で P∩N(P)'⊆N(Q)'。
+### R3 wiring: strong induction on |P:A|, tp_reduction で B, A=B⟹base, A<B⟹二重再帰+(c)合成。「A subn in B」= inf_isSubnormal_subgroupOf+equiv-transport。
 `A < P` subnormal (P 可解=`hG.solvable_of_lt_top`) ⟹ `∃ B, A≤B, (B.subgroupOf P).Normal, B<P,
 (P:B index) prime, (A.subgroupOf B).IsSubnormal`。
 - **step1**: subnormal 系列の second-from-top を取る。mathlib `Subgroup.isSubnormal_iff`
