@@ -84,6 +84,19 @@ theorem opiCoreInG_compl_eq_bot_of_isPiSubgroup [Finite G] {π : Set ℕ} {H : S
   eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl
     (opiCoreInG_le πᶜ H) hHpi (isPiSubgroup_opiCoreInG πᶜ H)
 
+/-- If an element lies in a pi-subgroup and its cyclic subgroup is a pi-complement
+subgroup, then the element is trivial. -/
+theorem eq_one_of_mem_of_isPiSubgroup_of_zpowers_isPiSubgroup_compl [Finite G]
+    {π : Set ℕ} {H : Subgroup G} (hHpi : Subgroup.IsPiSubgroup π H)
+    {x : G} (hxH : x ∈ H) (hxpi : Subgroup.IsPiSubgroup πᶜ (Subgroup.zpowers x)) :
+    x = 1 := by
+  have hZle : Subgroup.zpowers x ≤ H := Subgroup.zpowers_le.mpr hxH
+  have hZbot : Subgroup.zpowers x = ⊥ :=
+    eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hZle hHpi hxpi
+  have hxZ : x ∈ Subgroup.zpowers x := Subgroup.mem_zpowers x
+  rw [hZbot] at hxZ
+  exact Subgroup.mem_bot.mp hxZ
+
 /-- A q-group is a singleton pi-subgroup. -/
 theorem isPiSubgroup_singleton_of_isPGroup [Finite G] {q : ℕ} [Fact q.Prime]
     {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H := by

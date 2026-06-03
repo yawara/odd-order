@@ -101,6 +101,16 @@ theorem centralizer_fittingInG_inf_le_fittingInG [Finite G] {M : Subgroup G}
   intro x hx
   exact mem_fittingInG_of_mem_centralizer_fittingInG hx.2 hx.1
 
+/-- If x lies in F(M) and generates a pi(F(M))-complement subgroup, then x is trivial. -/
+theorem eq_one_of_mem_fittingInG_of_zpowers_isPiSubgroup_primesOf_compl [Finite G]
+    {M : Subgroup G} {x : G} (hxF : x ∈ fittingInG M)
+    (hxpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
+      (Subgroup.zpowers x)) :
+    x = 1 :=
+  eq_one_of_mem_of_isPiSubgroup_of_zpowers_isPiSubgroup_compl
+    (π := OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) (H := fittingInG M)
+    (fun r hr => by simpa [OddOrder.BG.Ch2.S07.primesOf] using hr) hxF hxpi
+
 /-- `F(M)`, viewed as a subgroup of `M`, is characteristic. -/
 theorem fittingInG_subgroupOf_characteristic (M : Subgroup G) :
     ((fittingInG M).subgroupOf M).Characteristic := by
