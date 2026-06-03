@@ -55,6 +55,24 @@ def fittingInG (M : Subgroup G) : Subgroup G :=
 theorem fittingInG_le (M : Subgroup G) : fittingInG M ≤ M :=
   Subgroup.map_subtype_le _
 
+/-- The ambient q-core `O_q(M)` lies inside `F(M)`. -/
+theorem opiCoreInG_singleton_le_fittingInG [Finite G] {q : ℕ} [Fact q.Prime]
+    (M : Subgroup G) :
+    opiCoreInG ({q} : Set ℕ) M ≤ fittingInG M := by
+  rw [opiCoreInG, fittingInG]
+  refine Subgroup.map_mono ?_
+  rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) q]
+  exact Ch01.opCore_le_fitting ⟨q, Fact.out⟩ ↥M
+
+/-- A normal ambient q-subgroup of `M` lies inside `F(M)`. -/
+theorem le_fittingInG_of_normal_isPiSubgroup_singleton [Finite G]
+    {q : ℕ} [Fact q.Prime] {M Q : Subgroup G}
+    (hQM : Q ≤ M) (hQnorm : (Q.subgroupOf M).Normal)
+    (hQpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Q) :
+    Q ≤ fittingInG M :=
+  (le_opiCoreInG_of_normal_of_isPiSubgroup hQM hQnorm hQpi).trans
+    (opiCoreInG_singleton_le_fittingInG M)
+
 /-- The relative centralizer C_{F(M)}(A0), realized in the ambient group G. -/
 def cFittingInG (M A0 : Subgroup G) : Subgroup G :=
   Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M
@@ -709,6 +727,41 @@ private theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinima
     (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
   exact le_antisymm hNleM hMleN
 
+/-- If a maximal subgroup `M` normalizes a nontrivial q-subgroup `Q`, then `Q` lies
+inside `M`. -/
+theorem le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime]
+    {M Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hMQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQne : Q ≠ ⊥) (hQpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Q) :
+    Q ≤ M := by
+  by_contra hQnot_le
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hMQtop : M ⊔ Q = ⊤ := by
+    rcases hMco.le_iff.mp (le_sup_left : M ≤ M ⊔ Q) with htop | hsup_eq
+    · exact htop
+    · exfalso
+      apply hQnot_le
+      rw [← hsup_eq]
+      exact le_sup_right
+  have hsup_le_NQ : M ⊔ Q ≤ Subgroup.normalizer (Q : Set G) :=
+    sup_le hMQ Subgroup.le_normalizer
+  have hNQtop : Subgroup.normalizer (Q : Set G) = ⊤ := by
+    refine eq_top_iff.mpr ?_
+    rw [← hMQtop]
+    exact hsup_le_NQ
+  haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp hNQtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hQbot | hQtop
+  · exact hQne hQbot
+  · have hQp : IsPGroup q ↥Q :=
+      OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hQpi
+    have hGp : IsPGroup q G :=
+      (hQtop ▸ hQp : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
+        (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom
+        Subgroup.topEquiv.surjective
+    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    exact hG.notSolvable inferInstance
+
 /-- **BG (8.2) normalizer localization**: if `O_q(Z(F(M)))` is nontrivial, then its
 normalizer in the ambient minimal simple group is exactly the maximal subgroup `M`. -/
 theorem normalizer_centerFittingOpCoreInG_eq_of_ne_bot [Finite G]
@@ -942,6 +995,129 @@ theorem hInvariantStar_eq_of_fittingInG_of_cFittingInG_hypothesis71_of_not_pGrou
     hG hM hA0 hm hA hq
   exact hInvariantStar_eq_of_cFittingInG_of_hypothesis71_of_not_pGroup
     hG hM hA0 hm hFnp hA hq (hprop.2.2.1 hQ₁) (hprop.2.2.1 hQ₂)
+
+/-- BG (8.6), normalizer bridge: in the non-p-group case, the propagation
+ decomposition forces every element normalizing F(M) to normalize each member of
+ `H_G*(F(M);q)`. -/
+theorem normalizer_fittingInG_le_normalizer_of_hInvariantStar_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (fittingInG M) {q}) :
+    Subgroup.normalizer (fittingInG M : Set G) ≤ Subgroup.normalizer (Q : Set G) := by
+  have hprop := transitivity_propagates_to_fittingInG_of_cFittingInG
+    hG hM hA0 hm hA hq
+  have hKbot :
+      OddOrder.BG.Ch2.S07.kSubgroup (cFittingInG M A0) = ⊥ :=
+    kSubgroup_cFittingInG_eq_bot_of_not_pGroup hG hM hA0 hFnp
+  have hopi_bot :
+      opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ
+        (Subgroup.centralizer (fittingInG M : Set G)) = ⊥ := by
+    have hfirst := hprop.1
+    rw [hKbot, inf_bot_eq] at hfirst
+    exact hfirst.symm
+  intro n hn
+  obtain ⟨c, hc, m, hmN, hn_eq⟩ := (hprop.2.2.2 Q hQ).2 n hn
+  have hc_one : c = 1 := by
+    have hc_bot : c ∈ (⊥ : Subgroup G) := by
+      rwa [hopi_bot] at hc
+    exact Subgroup.mem_bot.mp hc_bot
+  have hmQ : m ∈ Subgroup.normalizer (Q : Set G) := hmN.2
+  rw [hn_eq, hc_one, one_mul]
+  exact hmQ
+
+/-- BG (8.6), maximal-subgroup form of the normalizer bridge: in the non-p-group
+ case, M normalizes every member of `H_G*(F(M);q)`. -/
+theorem maximal_le_normalizer_of_hInvariantStar_fittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (fittingInG M) {q}) :
+    M ≤ Subgroup.normalizer (Q : Set G) := by
+  intro x hxM
+  exact normalizer_fittingInG_le_normalizer_of_hInvariantStar_of_not_pGroup
+    hG hM hA0 hm hFnp hA hq hQ (mem_normalizer_fittingInG_of_mem hxM)
+
+/-- BG (8.6): a nontrivial member of `H_G*(F(M);q)` lies in the maximal subgroup
+`M` once `M` is known to normalize it. -/
+theorem hInvariantStar_le_maximal_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (fittingInG M) {q}) (hQne : Q ≠ ⊥) :
+    Q ≤ M :=
+  le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton hG hM
+    (maximal_le_normalizer_of_hInvariantStar_fittingInG_of_not_pGroup
+      hG hM hA0 hm hFnp hA hq hQ)
+    hQne (hInvariantStar_isPiSubgroup hQ)
+
+/-- BG (8.6): a nontrivial member of `H_G*(F(M);q)` is absorbed by `F(M)`. -/
+theorem hInvariantStar_le_fittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (fittingInG M) {q}) (hQne : Q ≠ ⊥) :
+    Q ≤ fittingInG M := by
+  have hQM : Q ≤ M :=
+    hInvariantStar_le_maximal_of_not_pGroup hG hM hA0 hm hFnp hA hq hQ hQne
+  have hMQ : M ≤ Subgroup.normalizer (Q : Set G) :=
+    maximal_le_normalizer_of_hInvariantStar_fittingInG_of_not_pGroup
+      hG hM hA0 hm hFnp hA hq hQ
+  have hQnorm : (Q.subgroupOf M).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hMQ
+  exact le_fittingInG_of_normal_isPiSubgroup_singleton hQM hQnorm
+    (hInvariantStar_isPiSubgroup hQ)
+
+/-- BG (8.6) endpoint for `F(M)`: every member of `H_G*(F(M);q)` is trivial for
+`q` outside `π(C_F(M)(A0))` in the non-p-group case. -/
+theorem hInvariantStar_eq_bot_of_fittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hQ : Q ∈ hInvariantStar ⊤ (fittingInG M) {q}) :
+    Q = ⊥ := by
+  by_cases hQbot : Q = ⊥
+  · exact hQbot
+  have hQleF : Q ≤ fittingInG M :=
+    hInvariantStar_le_fittingInG_of_not_pGroup hG hM hA0 hm hFnp hA hq hQ hQbot
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hFpi : Subgroup.IsPiSubgroup
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0)) (fittingInG M) := by
+    rw [hPrimes]
+    intro r hr
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hr
+  have hQpi_compl : Subgroup.IsPiSubgroup
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ Q := by
+    intro r hr
+    have hrq : r = q := Set.mem_singleton_iff.mp ((hInvariantStar_isPiSubgroup hQ) r hr)
+    rw [hrq]
+    exact hq
+  exact eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hQleF hFpi hQpi_compl
 
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
