@@ -1016,6 +1016,21 @@ theorem Xset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
   fun _ hχX => (hyp.xMember_characterFacts hF hZH hχX).1
 
+/-- **(T8 leaf 4) `X` is finite** (Frobenius case).  `X = S − S(Z) ⊆ Irr L`
+(`isIrreducibleCharacter_of_mem_Xset_of_frobenius`) and `Irr L` is finite
+(`finite_irreducibleCharacter`).  This is the `hXfin` input to the degree-monotone enumeration
+`S07.exists_monotoneDegreeEnum` and the chain assembly. -/
+theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} :
+    (hyp.Xset Z).Finite := by
+  haveI := OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥L)
+  have hIrrFin : (irreducibleCharacters ↥L).Finite :=
+    (Set.finite_range (fun χ : IrreducibleCharacter ↥L => (χ : ClassFunction ↥L ℂ))).subset
+      (fun φ hφ => ⟨⟨φ, mem_irreducibleCharacters.mp hφ⟩, rfl⟩)
+  exact hIrrFin.subset
+    (fun χ hχ => mem_irreducibleCharacters.mpr
+      (hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ))
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
