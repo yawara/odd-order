@@ -46,6 +46,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
+import OddOrder.BG.AppC_FrobeniusClassSum
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1828,6 +1829,14 @@ set_option linter.style.longLine false in
 -- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
 -- corresponding product equation in the additive kernel of `H = P ⋊ U`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.mem_normOnePairSetAt_iff_inl_mul_inl
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: every `U`-translate `u*s`
+-- lies in the conjugacy class of `s` in `H = P ⋊ U`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneClassAt_mul_eq
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: a finite-field pair counted by
+-- `normOnePairSetAt` gives a class pair for the class-sum structure constant.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isClassPair
 
 -- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
 -- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.

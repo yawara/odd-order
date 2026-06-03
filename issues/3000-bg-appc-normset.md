@@ -50,6 +50,10 @@ created: 2026-06-04
   `normOneFrobenius_conj_inl` で `H=P⋊U` 内の共役作用 `u s u⁻¹ = u*s` を固定。
   さらに `mem_normOnePairSetAt_iff_inl_mul_inl` で `us+vs=2s` を `P≤H` 内の積方程式に変換。
   AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 class-pair bridge**:
+  `AppC_FrobeniusClassSum.lean` を追加。`normOneClassAt`、`normOneClassAt_mul_eq`、
+  `normOnePairSetAt_isClassPair` で、`normOnePairSetAt` の pair を `H=P⋊U` の class-sum
+  structure constant が数える `IsClassPair` に送る片方向 bridge を固定。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

@@ -124,6 +124,16 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `ConjClasses H` に同定して `classSumCoeff` / `classSum_mul_apply` に接続する層。
 AxiomsCheck 登録済み。
 
+#### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
+`AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
+`normOneClassAt s := ConjClasses.mk (inl s)` を定義し、
+`normOneClassAt_mul_eq` で任意の `u∈U` について `inl(u*s)` が `inl s` の共役類にあることを証明。
+さらに `normOnePairSetAt_isClassPair` で、`normOnePairSetAt s` が数える `(u,v)` から
+`classSumCoeff (C_s) (C_s) (C_{2s})` の underlying pair predicate `IsClassPair` への map を構成。
+残る class-sum bridge は逆向き/全単射、すなわち `inl s` の共役類がちょうど `U`-orbit であること
+(特に `s≠0` で action free) を使った cardinal equality。
+AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。
