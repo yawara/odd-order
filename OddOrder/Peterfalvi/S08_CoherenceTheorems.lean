@@ -1651,6 +1651,71 @@ theorem isPGroup_of_quotient_of_subgroup {p : ℕ} [Fact p.Prime] {Γ : Type*} [
   obtain ⟨b, hb⟩ := hQ
   exact ⟨b + a, by rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N, hb, ha, pow_add]⟩
 
+/-- `Abelianization.map` of a surjective homomorphism is surjective. -/
+theorem Abelianization.map_surjective {Γ Δ : Type*} [Group Γ] [Group Δ] {f : Γ →* Δ}
+    (hf : Function.Surjective f) : Function.Surjective (Abelianization.map f) := by
+  intro y
+  induction y using QuotientGroup.induction_on with
+  | _ b =>
+    obtain ⟨a, rfl⟩ := hf b
+    exact ⟨Abelianization.of a, Abelianization.map_of f a⟩
+
+/-- A finite `p`-group whose order is coprime to `p` is trivial. -/
+theorem subsingleton_of_isPGroup_of_not_dvd {p : ℕ} [Fact p.Prime] {Δ : Type*} [Group Δ] [Finite Δ]
+    (hΔ : IsPGroup p Δ) (hnd : ¬ p ∣ Nat.card Δ) : Subsingleton Δ := by
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hΔ
+  have hk0 : k = 0 := by
+    by_contra hk0
+    exact hnd (by rw [hk]; exact dvd_pow_self p hk0)
+  rw [hk0, pow_zero] at hk
+  exact (Nat.card_eq_one_iff_unique.mp hk).1
+
+/-- **Peterfalvi (6.5)(b) reduction core: a finite nilpotent group with `p`-group abelianization is
+a `p`-group.**
+
+Let `P` be the Sylow `p`-subgroup, normal since `Γ` is nilpotent.  The quotient `Q = Γ ⧸ P` has order
+`[Γ:P]` coprime to `p`, so `Abelianization Q` — both a `p`-group (a homomorphic image of
+`Abelianization Γ`, `Abelianization.map` of `Γ ↠ Q`) and of order dividing `[Γ:P]` — is trivial.
+Hence `Q` is perfect (`commutator Q = ⊤`); being nilpotent (a quotient of `Γ`) and hence solvable, it
+is therefore trivial (`commutator_lt_top` for a nontrivial solvable group).  So `P = ⊤` and `Γ` is a
+`p`-group (`isPGroup_of_quotient_of_subgroup`).
+
+This is the (6.5)(b) step "since `K/M` is nilpotent with commutator `H₁/M` and `K/H₁` a chief factor,
+`K/M` is a `p`-group" (mmd 04.8 L45). -/
+theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Prime]
+    {Γ : Type*} [Group Γ] [Finite Γ] [Group.IsNilpotent Γ]
+    (h : IsPGroup p (Abelianization Γ)) : IsPGroup p Γ := by
+  classical
+  obtain ⟨P⟩ : Nonempty (Sylow p Γ) := inferInstance
+  haveI hPnormal : (↑P : Subgroup Γ).Normal := by
+    have htfae := (isNilpotent_of_finite_tfae (G := Γ)).out 0 3
+    exact htfae.mp ‹_› p ‹_› P
+  -- `Abelianization Q` is a `p`-group (image of `Abelianization Γ`).
+  have hQab_p : IsPGroup p (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
+    h.of_surjective _ (Abelianization.map_surjective (QuotientGroup.mk'_surjective _))
+  -- ... and trivial: its order divides `Nat.card Q = [Γ:P]`, coprime to `p`.
+  have hofsurj : Function.Surjective (Abelianization.of :
+      (Γ ⧸ (↑P : Subgroup Γ)) →* Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
+    fun y => QuotientGroup.induction_on y fun a => ⟨a, rfl⟩
+  haveI hQab_triv : Subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
+    subsingleton_of_isPGroup_of_not_dvd hQab_p
+      (fun hp => P.not_dvd_index (hp.trans (Subgroup.card_dvd_of_surjective _ hofsurj)))
+  -- `Abelianization Q` trivial ⟹ `commutator Q = ⊤` ⟹ (nilpotent ⟹ solvable) `Q` trivial.
+  haveI hQ_triv : Subsingleton (Γ ⧸ (↑P : Subgroup Γ)) := by
+    rcases subsingleton_or_nontrivial (Γ ⧸ (↑P : Subgroup Γ)) with hs | hns
+    · exact hs
+    · exfalso
+      haveI := hns
+      have hlt : commutator (Γ ⧸ (↑P : Subgroup Γ)) < ⊤ :=
+        IsSolvable.commutator_lt_top_of_nontrivial (G := Γ ⧸ (↑P : Subgroup Γ))
+      refine absurd ?_ hlt.ne
+      rw [← Subgroup.index_eq_one]
+      exact @Nat.card_of_subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) 1 hQab_triv
+  -- `Q` trivial ⟹ `Γ` is a `p`-group (Sylow `P` is `p`, quotient `Q` trivially `p`).
+  refine isPGroup_of_quotient_of_subgroup P.isPGroup' ?_
+  rw [IsPGroup.iff_card]
+  exact ⟨0, by rw [pow_zero]; exact @Nat.card_of_subsingleton (Γ ⧸ (↑P : Subgroup Γ)) 1 hQ_triv⟩
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
