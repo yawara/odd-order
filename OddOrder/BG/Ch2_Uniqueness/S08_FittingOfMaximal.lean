@@ -55,6 +55,10 @@ def fittingInG (M : Subgroup G) : Subgroup G :=
 theorem fittingInG_le (M : Subgroup G) : fittingInG M ≤ M :=
   Subgroup.map_subtype_le _
 
+/-- The relative centralizer C_{F(M)}(A0), realized in the ambient group G. -/
+def cFittingInG (M A0 : Subgroup G) : Subgroup G :=
+  Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M
+
 /-- Realizing `F(M)` in `G` and then restricting back to `M` recovers the original
 Fitting subgroup of the group `↥M`. -/
 theorem fittingInG_subgroupOf_eq (M : Subgroup G) :
@@ -504,6 +508,24 @@ theorem cFitting_lt_top_of_mem_maximal {M A0 : Subgroup G}
     Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M < ⊤ :=
   lt_of_le_of_lt (inf_le_right.trans (fittingInG_le M))
     (mem_maximalSubgroups.mp hM).lt_top
+
+/-- BG (8.6) packaged for A = C_{F(M)}(A0): once Hypothesis 7.1 and the
+centralizer pi-subgroup condition are known, H_G*(A;q) is a singleton. -/
+theorem hInvariantStar_eq_of_cFittingInG_of_hypothesis71_of_centralizer_isPiSubgroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime]
+    {M A0 : Subgroup G} (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ)
+    (hCpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))
+      (Subgroup.centralizer (cFittingInG M A0 : Set G)))
+    {Q₁ Q₂ : Subgroup G} (hQ₁ : Q₁ ∈ hInvariantStar ⊤ (cFittingInG M A0) {q})
+    (hQ₂ : Q₂ ∈ hInvariantStar ⊤ (cFittingInG M A0) {q}) :
+    Q₁ = Q₂ :=
+  OddOrder.BG.Ch2.S07.hInvariantStar_eq_of_three_le_rank_center_of_centralizer_isPiSubgroup
+    hG hA hq (by
+      dsimp [cFittingInG]
+      exact three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA0 hm) hCpi hQ₁ hQ₂
 
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
