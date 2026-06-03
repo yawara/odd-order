@@ -163,6 +163,13 @@ product class の fiber 和として分解し、class-size factor を整理す�
 cardinality の有限和であることを証明した。次は AppC の `H=P⋊U` で各 fiber の cardinality を
 代表元 fiber と同一視する conjugation-bijection。AxiomsCheck 登録済み。
 
+#### ✅ class-sum bridge: equal fibers and class-size factor (2026-06-04)
+`fixedProductClassPairSet_ncard_eq_of_isConj` で exact-product fibers が product の共役で
+同じ cardinality を持つことを証明。これを有限和に適用して
+`finsum_fixedProductClassPairSet_ncard_eq_carrier_ncard_mul` と
+`classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard` を追加し、
+`classSumCoeff(C_i,C_j,C_z) = |C_z| * |fixedFiber(z)|` の形まで整理した。AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

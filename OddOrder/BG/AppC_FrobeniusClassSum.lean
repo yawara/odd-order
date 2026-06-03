@@ -212,6 +212,98 @@ theorem classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard [Fact p.Prime]
   rw [← classPairSet_ncard_eq_classSumCoeff p q Ci Cj Cs]
   exact classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard p q Ci Cj Cs
 
+/-- Conjugation does not change the conjugacy-class label in the concrete
+Frobenius group.  This local form avoids depending on private helpers from the
+class-sum file. -/
+theorem normOneFrobenius_mk_conj_eq [Fact p.Prime]
+    (g x : normOneFrobeniusGroup p q) :
+    ConjClasses.mk (g * x * g⁻¹) = ConjClasses.mk x := by
+  exact ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨g⁻¹, by group⟩)
+
+/-- Fixed-product fibers over conjugate products have the same cardinality, by
+conjugating both entries of a pair. -/
+theorem fixedProductClassPairSet_ncard_eq_of_isConj [Fact p.Prime]
+    (Ci Cj : ConjClasses (normOneFrobeniusGroup p q))
+    {z w : normOneFrobeniusGroup p q} (hzw : IsConj z w) :
+    (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard =
+      (fixedProductClassPairSet (p := p) (q := q) Ci Cj w).ncard := by
+  classical
+  obtain ⟨g, hg⟩ := isConj_iff.mp hzw
+  refine Set.ncard_congr
+    (fun r _ => (g * r.1 * g⁻¹, g * r.2 * g⁻¹)) ?maps_to ?inj ?surj
+  · intro r hr
+    refine ⟨?_, ?_, ?_⟩
+    · exact (normOneFrobenius_mk_conj_eq p q g r.1).trans hr.1
+    · exact (normOneFrobenius_mk_conj_eq p q g r.2).trans hr.2.1
+    · rw [show g * r.1 * g⁻¹ * (g * r.2 * g⁻¹) =
+          g * (r.1 * r.2) * g⁻¹ by group, hr.2.2, hg]
+  · rintro ⟨x₁, y₁⟩ ⟨x₂, y₂⟩ _ _ hpair
+    apply Prod.ext
+    · have hx : g * x₁ * g⁻¹ = g * x₂ * g⁻¹ := by
+        simpa using congrArg Prod.fst hpair
+      have hx' : g⁻¹ * (g * x₁ * g⁻¹) * g = g⁻¹ * (g * x₂ * g⁻¹) * g := by
+        rw [hx]
+      simpa [mul_assoc] using hx'
+    · have hy : g * y₁ * g⁻¹ = g * y₂ * g⁻¹ := by
+        simpa using congrArg Prod.snd hpair
+      have hy' : g⁻¹ * (g * y₁ * g⁻¹) * g = g⁻¹ * (g * y₂ * g⁻¹) * g := by
+        rw [hy]
+      simpa [mul_assoc] using hy'
+  · intro r hr
+    refine ⟨(g⁻¹ * r.1 * g, g⁻¹ * r.2 * g), ?_, ?_⟩
+    · refine ⟨?_, ?_, ?_⟩
+      · exact (by
+          simpa using (normOneFrobenius_mk_conj_eq p q g⁻¹ r.1).trans hr.1)
+      · exact (by
+          simpa using (normOneFrobenius_mk_conj_eq p q g⁻¹ r.2).trans hr.2.1)
+      · have hback : g⁻¹ * w * g = z := by
+          rw [← hg]
+          group
+        rw [show (g⁻¹ * r.1 * g) * (g⁻¹ * r.2 * g) =
+            g⁻¹ * (r.1 * r.2) * g by group, hr.2.2, hback]
+    · apply Prod.ext <;> group
+
+/-- Summing fixed-product fiber sizes over one product conjugacy class multiplies
+the representative fiber size by the class size. -/
+theorem finsum_fixedProductClassPairSet_ncard_eq_carrier_ncard_mul [Fact p.Prime]
+    (Ci Cj : ConjClasses (normOneFrobeniusGroup p q))
+    (z : normOneFrobeniusGroup p q) :
+    (∑ᶠ w ∈ (ConjClasses.mk z).carrier,
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj w).ncard) =
+      (ConjClasses.mk z).carrier.ncard *
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard := by
+  classical
+  let C := (ConjClasses.mk z).carrier
+  have hCfin : C.Finite := Set.toFinite _
+  rw [finsum_mem_eq_finite_toFinset_sum _ hCfin]
+  have hconst :
+      ∀ w ∈ hCfin.toFinset,
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj w).ncard =
+          (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard := by
+    intro w hw
+    have hwC : w ∈ C := by
+      simpa [C] using hw
+    have hconj : IsConj z w :=
+      ConjClasses.mk_eq_mk_iff_isConj.mp
+        (ConjClasses.mem_carrier_iff_mk_eq.mp hwC).symm
+    exact (fixedProductClassPairSet_ncard_eq_of_isConj p q Ci Cj hconj).symm
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul,
+    Set.ncard_eq_toFinset_card _ hCfin]
+  simp
+
+/-- Class-sum pair counts factor as product-class size times one fixed-product
+fiber.  This is the cardinal bridge from `classSumCoeff` to the finite-field
+pair count used in App C. -/
+theorem classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard [Fact p.Prime]
+    [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (Ci Cj : ConjClasses (normOneFrobeniusGroup p q))
+    (z : normOneFrobeniusGroup p q) :
+    classSumCoeff Ci Cj (ConjClasses.mk z) =
+      (ConjClasses.mk z).carrier.ncard *
+        (fixedProductClassPairSet (p := p) (q := q) Ci Cj z).ncard := by
+  rw [classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard]
+  exact finsum_fixedProductClassPairSet_ncard_eq_carrier_ncard_mul p q Ci Cj z
+
 /-- A pair counted by `normOnePairSetAt s` gives a fixed-product class pair with
 product exactly `inl (2*s)`. -/
 theorem normOnePairSetAt_isFixedProductClassPair [Fact p.Prime]

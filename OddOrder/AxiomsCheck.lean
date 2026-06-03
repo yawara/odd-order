@@ -1853,6 +1853,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.classPairSet_ncard_eq_classSumCoeff
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_mk_conj_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.fixedProductClassPairSet_ncard_eq_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.finsum_fixedProductClassPairSet_ncard_eq_carrier_ncard_mul
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isFixedProductClassPair
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.exists_normOnePairSetAt_of_isFixedProductClassPair
