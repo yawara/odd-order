@@ -63,6 +63,11 @@ created: 2026-06-04
   `exists_normOnePairSetAt_of_isFixedProductClassPair` を追加。`normOnePairSetAt s` が
   class-pair 全体ではなく product が代表元 `inl(2*s)` に等しい fiber を正確に数えることを固定。
   AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 fixed-product fiber cardinality**:
+  `fixedProductClassPairSet` と
+  `normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard` を追加。`s≠0` で
+  `normOnePairSetAt s` の pair count が fixed-product fiber の `ncard` と等しいことを証明。
+  AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

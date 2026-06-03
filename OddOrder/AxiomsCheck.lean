@@ -1845,6 +1845,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isFixedProductClassPair
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.exists_normOnePairSetAt_of_isFixedProductClassPair
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: a finite-field pair counted by
 -- `normOnePairSetAt` gives a class pair for the class-sum structure constant.

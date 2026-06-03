@@ -82,6 +82,13 @@ def IsFixedProductClassPair [Fact p.Prime]
     (r : normOneFrobeniusGroup p q × normOneFrobeniusGroup p q) : Prop :=
   ConjClasses.mk r.1 = Ci ∧ ConjClasses.mk r.2 = Cj ∧ r.1 * r.2 = z
 
+/-- The set of fixed-product class pairs. -/
+def fixedProductClassPairSet [Fact p.Prime]
+    (Ci Cj : ConjClasses (normOneFrobeniusGroup p q))
+    (z : normOneFrobeniusGroup p q) :
+    Set (normOneFrobeniusGroup p q × normOneFrobeniusGroup p q) :=
+  {r | IsFixedProductClassPair (p := p) (q := q) Ci Cj z r}
+
 /-- A pair counted by `normOnePairSetAt s` gives a fixed-product class pair with
 product exactly `inl (2*s)`. -/
 theorem normOnePairSetAt_isFixedProductClassPair [Fact p.Prime]
@@ -121,6 +128,49 @@ theorem exists_normOnePairSetAt_of_isFixedProductClassPair [Fact p.Prime]
   have hprod := h.2.2
   rw [hx, hy] at hprod
   exact (mem_normOnePairSetAt_iff_inl_mul_inl p q s u v).mpr hprod
+
+/-- The finite-field pair count equals the cardinality of the fixed-product
+class-pair fiber over `inl (2*s)`.  The hypothesis `s ≠ 0` makes the `U`-action
+on `s` free, so the parametrization by `u, v ∈ U` is injective. -/
+theorem normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard [Fact p.Prime]
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    (normOnePairSetAt p q s).ncard =
+      (fixedProductClassPairSet (p := p) (q := q)
+        (normOneClassAt p q s) (normOneClassAt p q s)
+        (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+          normOneFrobeniusGroup p q)).ncard := by
+  classical
+  refine Set.ncard_congr
+    (fun uv _ =>
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd (((uv.1 : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+            normOneFrobeniusGroup p q),
+        (SemidirectProduct.inl
+          (Multiplicative.ofAdd (((uv.2 : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+            normOneFrobeniusGroup p q))) ?maps_to ?inj ?surj
+  · intro uv huv
+    exact normOnePairSetAt_isFixedProductClassPair p q s huv
+  · rintro ⟨u₁, v₁⟩ ⟨u₂, v₂⟩ _ _ hpair
+    have hu_pair := congrArg Prod.fst hpair
+    have hv_pair := congrArg Prod.snd hpair
+    have hu_mul :
+        (((u₁ : (GaloisField p q)ˣ) : GaloisField p q) * s) =
+          (((u₂ : (GaloisField p q)ˣ) : GaloisField p q) * s) :=
+      Multiplicative.ofAdd.injective (SemidirectProduct.inl_inj.mp hu_pair)
+    have hv_mul :
+        (((v₁ : (GaloisField p q)ˣ) : GaloisField p q) * s) =
+          (((v₂ : (GaloisField p q)ˣ) : GaloisField p q) * s) :=
+      Multiplicative.ofAdd.injective (SemidirectProduct.inl_inj.mp hv_pair)
+    have hu : u₁ = u₂ :=
+      Subtype.ext (Units.ext (mul_right_cancel₀ hs hu_mul))
+    have hv : v₁ = v₂ :=
+      Subtype.ext (Units.ext (mul_right_cancel₀ hs hv_mul))
+    exact Prod.ext hu hv
+  · intro r hr
+    obtain ⟨u, v, huv, hx, hy⟩ :=
+      exists_normOnePairSetAt_of_isFixedProductClassPair p q s hr
+    refine ⟨(u, v), huv, ?_⟩
+    exact Prod.ext hx.symm hy.symm
 
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
