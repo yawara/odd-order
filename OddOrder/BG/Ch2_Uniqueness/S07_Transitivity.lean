@@ -1164,6 +1164,66 @@ private theorem oPiPrimePiCore_map_mk'_eq {G' : Type*} [Group G'] (π : Set ℕ)
   rw [Ch03.oPiPrimePiCore]
   exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
 
+/-- **Step 6 of Prop 7.5's special case** (`C_{O_p(X̄)}(Ā) ⊆ Ā`): with `N = O_{p'}(G')` and
+`mk : G' → G'/N`, if `c ∈ O_p(G'/N)` commutes with `mk a` for every `a ∈ A`, then `c ∈ mk(A)`.
+Clean route avoiding an explicit Sylow iso: `O_p(X̄) ⊆ mk(P)` (image of the Sylow `P` is Sylow,
+and `O_p ≤` every Sylow), so `c = mk s` with `s ∈ P`; then for `a ∈ A`, `[a,s] ∈ N ⊓ P = ⊥`
+(it lies in `N` since `mk` kills it, and in `P` since `a, s ∈ P`), so `s ∈ C_P(A) ⊆ A`. -/
+private theorem mem_map_mk'_of_mem_oPiCore_quotient_of_commute
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G']
+    (P : Sylow p G') {A : Subgroup G'} (hAP : A ≤ (P : Subgroup G'))
+    (hCPA : Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') ≤ A)
+    {c : G' ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ G'}
+    (hc : c ∈ Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ G'))
+    (hcomm : ∀ a ∈ A, QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a * c
+        = c * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a) :
+    c ∈ A.map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) := by
+  have hsurj : Function.Surjective (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) :=
+    QuotientGroup.mk'_surjective _
+  -- `N := O_{p'}(G')` is a `p'`-group, so `P ⊓ N = ⊥`.
+  have hN_cop : Nat.Coprime (Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hPN : (P : Subgroup G') ⊓ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' = ⊥ :=
+    OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime P.2 hN_cop
+  -- `O_p(X̄) ⊆ mk(P)`: the image of the Sylow `P` is Sylow, and `O_p ≤` every Sylow.
+  have hc_inP :
+      c ∈ (P : Subgroup G').map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) := by
+    have hle := OddOrder.Isaacs.Ch01.opCore_le (P.mapSurjective hsurj)
+    rw [Sylow.coe_mapSurjective, ← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore] at hle
+    exact hle hc
+  obtain ⟨s, hsP, hsc⟩ := Subgroup.mem_map.mp hc_inP
+  -- `s ∈ C_P(A)`: for `a ∈ A`, `[a,s] ∈ N ⊓ P = ⊥`.
+  have hs_cent : s ∈ Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') := by
+    refine Subgroup.mem_inf.mpr ⟨?_, hsP⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    have hmkcomm : QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a
+          * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') s
+        = QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') s
+          * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a := by
+      rw [hsc]; exact hcomm a ha
+    have hin_N : a * s * a⁻¹ * s⁻¹ ∈ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
+      rw [← QuotientGroup.ker_mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G'), MonoidHom.mem_ker,
+        map_mul, map_mul, map_mul, map_inv, map_inv, hmkcomm]
+      group
+    have hin_P : a * s * a⁻¹ * s⁻¹ ∈ (P : Subgroup G') :=
+      (P : Subgroup G').mul_mem ((P : Subgroup G').mul_mem
+        ((P : Subgroup G').mul_mem (hAP ha) hsP) ((P : Subgroup G').inv_mem (hAP ha)))
+        ((P : Subgroup G').inv_mem hsP)
+    have h1 : a * s * a⁻¹ * s⁻¹ = 1 :=
+      Subgroup.mem_bot.mp (hPN ▸ Subgroup.mem_inf.mpr ⟨hin_P, hin_N⟩)
+    have h2 : a * s * a⁻¹ = s := mul_inv_eq_one.mp h1
+    calc a * s = a * s * a⁻¹ * a := by group
+      _ = s * a := by rw [h2]
+  rw [← hsc]
+  exact Subgroup.mem_map_of_mem _ (hCPA hs_cent)
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
