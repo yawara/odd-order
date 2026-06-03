@@ -1369,6 +1369,52 @@ private theorem specialCase
   rw [Subgroup.map_eq_bot_iff, hker] at hYmap_bot
   exact hYmap_bot
 
+/-- **Per-`b` bridge for Prop 7.5's general case**: if `W ≤ X` lies in `O_{p'}(C_G(b))` for a
+`p`-element `b ∈ X`, then `W ≤ O_{p'}(X)`. Combines `le_opiCoreInG_of_normal_of_isPiSubgroup`
+(`O_{p'}(C_G(b)) ⊓ C_X(b) ≤ O_{p'}(C_X(b))`) with the relativized Proposition 1.15(b)
+(`O_{p'}(C_X(b)) ≤ O_{p'}(X)`). -/
+private theorem le_opiCoreInG_of_le_opiCoreInG_centralizer
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {b : G} (hbp : IsPGroup p (Subgroup.zpowers b))
+    (hbX : b ∈ X) {W : Subgroup G} (hWX : W ≤ X)
+    (hW_le : W ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G))) :
+    W ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  set C := Subgroup.centralizer ({b} : Set G) with hC
+  set H := C ⊓ X with hH
+  have hW_cent : W ≤ C := hW_le.trans (opiCoreInG_le _ _)
+  have hWH : W ≤ H := le_inf hW_cent hWX
+  -- `O_{p'}(C) ⊓ H ≤ O_{p'}(H)` via the normal-`p'`-subgroup bridge.
+  have hstep : opiCoreInG ({p} : Set ℕ)ᶜ C ⊓ H ≤ opiCoreInG ({p} : Set ℕ)ᶜ H := by
+    refine le_opiCoreInG_of_normal_of_isPiSubgroup inf_le_right ?_ ?_
+    · constructor
+      intro n hn g
+      rw [Subgroup.mem_subgroupOf] at hn ⊢
+      have hgC : (g : G) ∈ Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ C) :=
+        le_normalizer_opiCoreInG _ _ (Subgroup.mem_inf.mp g.2).1
+      refine ⟨(Subgroup.mem_normalizer_iff.mp hgC _).mp hn.1, ?_⟩
+      exact H.mul_mem (H.mul_mem g.2 hn.2) (H.inv_mem g.2)
+    · intro r hr
+      refine isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ C r ?_
+      exact Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
+        dvd_trans (Nat.mem_primeFactors.mp hr).2.1 (Subgroup.card_dvd_of_le inf_le_left),
+        Nat.card_pos.ne'⟩
+  -- `O_{p'}(H) = O_{p'}(C_X(b)) ≤ O_{p'}(X)` via the relativized Proposition 1.15(b).
+  have hrel : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+    have heqcent : Subgroup.centralizer ((Subgroup.zpowers b : Subgroup G) : Set G) = C := by
+      rw [hC]
+      refine le_antisymm (Subgroup.centralizer_le
+        (Set.singleton_subset_iff.mpr (SetLike.mem_coe.mpr (Subgroup.mem_zpowers b)))) ?_
+      · intro g hg
+        rw [Subgroup.mem_centralizer_iff] at hg ⊢
+        intro z hz
+        rw [SetLike.mem_coe] at hz
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+        have hcom : Commute b g := hg b (Set.mem_singleton b)
+        exact hcom.zpow_left k
+    have hrel := opiCoreInG_centralizer_inf_le_opiCoreInG hXsolv (Subgroup.zpowers_le.mpr hbX) hbp
+    rwa [heqcent, ← hH] at hrel
+  exact (le_inf hW_le hWH).trans (hstep.trans hrel)
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
