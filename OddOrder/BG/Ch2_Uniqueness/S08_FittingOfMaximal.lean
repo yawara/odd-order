@@ -771,6 +771,30 @@ theorem normalizer_centerFittingOpCoreInG_eq_of_ne_bot [Finite G]
   normalizer_eq_of_normal_of_mem_maximal hG hM
     (centerFittingOpCoreInG_subgroupOf_normal q M) hO_ne (centerFittingOpCoreInG_le q M)
 
+/-- BG (8.2), general centralizer localization: any subgroup containing a nontrivial
+`O_q(Z(F(M)))` has ambient centralizer contained in `M`. -/
+theorem centralizer_le_maximal_of_centerFittingOpCoreInG_le [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hO_ne : centerFittingOpCoreInG q M ≠ ⊥)
+    (hOB : centerFittingOpCoreInG q M ≤ B) :
+    Subgroup.centralizer (B : Set G) ≤ M := by
+  have hcent_le_norm :
+      Subgroup.centralizer (B : Set G) ≤
+        Subgroup.normalizer (centerFittingOpCoreInG q M : Set G) :=
+    (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hOB)).trans
+      (Subgroup.centralizer_le_normalizer (centerFittingOpCoreInG q M : Set G))
+  simpa [normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM hO_ne]
+    using hcent_le_norm
+
+/-- BG (8.2), prime-factor form of the general centralizer localization. -/
+theorem centralizer_le_maximal_of_centerFittingOpCoreInG_le_fitting_primeFactor [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hOB : centerFittingOpCoreInG q M ≤ B) :
+    Subgroup.centralizer (B : Set G) ≤ M :=
+  centralizer_le_maximal_of_centerFittingOpCoreInG_le hG hM
+    (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hq) hOB
+
 /-- **BG (8.2), centralizer localization form**: if `O_q(Z(F(M)))` is nontrivial,
 then the ambient centralizer of `C_{F(M)}(A₀)` lies in `M`. -/
 theorem centralizer_cFitting_le_maximal_of_centerFittingOpCore_ne [Finite G]
@@ -867,6 +891,16 @@ theorem kSubgroup_cFittingInG_eq_bot_of_not_pGroup [Finite G]
   OddOrder.BG.Ch2.S07.kSubgroup_eq_bot_of_centralizer_isPiSubgroup
     (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp)
 
+/-- If `H` is a `π`-subgroup, then every member of `ℋ_X(A;π-complement)`
+meets `H` trivially. -/
+theorem hInvariant_inf_eq_bot_of_isPiSubgroup [Finite G] {π : Set ℕ}
+    {A H X Y : Subgroup G} (hHpi : Subgroup.IsPiSubgroup π H)
+    (hY : Y ∈ hInvariant X A πᶜ) :
+    Y ⊓ H = ⊥ := by
+  have hHY : H ⊓ Y = ⊥ :=
+    inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl hHpi (hInvariant_isPiSubgroup hY)
+  simpa [inf_comm] using hHY
+
 /-- If `C_G(A)` is a `π(A)`-subgroup, then every member of `ℋ_X(A;π(A)-complement)`
 meets `C_G(A)` trivially. -/
 theorem hInvariant_inf_centralizer_eq_bot_of_centralizer_isPiSubgroup [Finite G]
@@ -874,11 +908,8 @@ theorem hInvariant_inf_centralizer_eq_bot_of_centralizer_isPiSubgroup [Finite G]
     (hCpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf A)
       (Subgroup.centralizer (A : Set G)))
     (hY : Y ∈ hInvariant X A (OddOrder.BG.Ch2.S07.primesOf A)ᶜ) :
-    Y ⊓ Subgroup.centralizer (A : Set G) = ⊥ := by
-  have hCY :
-      Subgroup.centralizer (A : Set G) ⊓ Y = ⊥ :=
-    inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl hCpi (hInvariant_isPiSubgroup hY)
-  simpa [inf_comm] using hCY
+    Y ⊓ Subgroup.centralizer (A : Set G) = ⊥ :=
+  hInvariant_inf_eq_bot_of_isPiSubgroup hCpi hY
 
 /-- BG (8.4), first intersection form: in the non-p-group case, every
 `A = C_F(M)(A0)`-invariant `π(A)`-complement subgroup has trivial intersection with `C_G(A)`. -/
@@ -892,6 +923,27 @@ theorem hInvariant_inf_centralizer_cFittingInG_eq_bot_of_not_pGroup [Finite G]
     Y ⊓ Subgroup.centralizer (cFittingInG M A0 : Set G) = ⊥ :=
   hInvariant_inf_centralizer_eq_bot_of_centralizer_isPiSubgroup
     (centralizer_cFitting_isPiSubgroup_of_not_pGroup hG hM hA0 hFnp) hY
+
+/-- BG (8.4), Fitting intersection form: every `A = C_F(M)(A0)`-invariant
+`π(A)`-complement subgroup has trivial intersection with `F(M)`. -/
+theorem hInvariant_inf_fittingInG_cFittingInG_eq_bot [Finite G]
+    {p : ℕ} {M A0 X Y : Subgroup G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Y ⊓ fittingInG M = ⊥ := by
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hFpi : Subgroup.IsPiSubgroup
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0)) (fittingInG M) := by
+    rw [hPrimes]
+    intro r hr
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hr
+  exact hInvariant_inf_eq_bot_of_isPiSubgroup hFpi hY
 
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
