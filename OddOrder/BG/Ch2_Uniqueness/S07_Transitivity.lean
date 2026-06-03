@@ -1238,6 +1238,13 @@ private theorem tp_hyp71_of_le [Finite G] {A B : Subgroup G} (hA : Hypothesis71 
   · exact le_sSup ⟨opiCoreInG_le _ _, hBX.trans (le_normalizer_opiCoreInG _ _),
       isPiSubgroup_opiCoreInG _ _⟩
 
+/-- `{q}`-部分群は `q`-群 (`|H|` の素因子が `q` のみ ⟹ `|H| = q^n`)。 -/
+private theorem isPGroup_of_isPiSubgroup_singleton [Finite G] {q : ℕ} [Fact q.Prime]
+    {H : Subgroup G} (hH : Subgroup.IsPiSubgroup {q} H) : IsPGroup q ↥H :=
+  IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
+    (fun {d} hd hdvd => Set.mem_singleton_iff.mp
+      (hH d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))))
+
 /-- **(c) の `q`-群正規化条件 finish** (mmd L2230-2232): `Q ≤ Q₁` (`Q₁` `q`-群) かつ
 `Q₁ ⊓ N_G(Q) ≤ Q` なら `Q = Q₁` (`q`-群で自己正規化部分群は全体)。 -/
 private theorem eq_of_inf_normalizer_le [Finite G] {q : ℕ} [Fact q.Prime] {Q Q₁ : Subgroup G}
@@ -1258,6 +1265,106 @@ private theorem le_opiCoreInG_normalizer_self [Finite G] {π : Set ℕ} {Q : Sub
     Q ≤ opiCoreInG π (Subgroup.normalizer Q) :=
   le_opiCoreInG_of_normal_of_isPiSubgroup Subgroup.le_normalizer
     Subgroup.normal_in_normalizer hQpi
+
+/-- **Theorem 7.4(c) 主要 case** (mmd L2224-2232): `Q ∈ ℋ*(P;q)` 非自明 ⟹ `Q ∈ ℋ*(A;q)`。
+`Q ⊆ Q₁ ∈ ℋ*(A;q)`; `M := O_{π'}(N_G(Q))`; Prop 1.5(b) で `Q ⊆` P-不変 Sylow-q `R₂` of `M`,
+`Q ∈ ℋ*(P;q)` 極大で `Q = R₂`; Hyp 7.1 で `Q₁⊓N(Q) ⊆ M`; 位数 `|Q|=|R₂|=|M|_q ≥ |Q₁⊓N(Q)| ≥ |Q|`
+⟹ `Q = Q₁⊓N(Q)`, `eq_of_inf_normalizer_le` で `Q = Q₁`。`commonConstruction` の relativize を踏襲。 -/
+private theorem tp_c_main [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
+    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (hAP : A ≤ P) (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ P {q}) (hQne : Q ≠ ⊥) :
+    Q ∈ hInvariantStar ⊤ A {q} := by
+  classical
+  set π' : Set ℕ := (primesOf A)ᶜ with hπ'
+  have hPnQ : P ≤ Subgroup.normalizer Q := hInvariantStar_le_normalizer hQ
+  have hQpi : Subgroup.IsPiSubgroup {q} Q := hInvariantStar_isPiSubgroup hQ
+  have hQpi' : Subgroup.IsPiSubgroup π' Q := hQpi.mono (Set.singleton_subset_iff.mpr hq)
+  have hAnQ : A ≤ Subgroup.normalizer Q := hAP.trans hPnQ
+  obtain ⟨Q₁, hQ₁star, hQQ₁⟩ :=
+    exists_le_hInvariantStar (H := ⊤) (A := A) (π := {q}) ⟨le_top, hAnQ, hQpi⟩
+  suffices hQeqQ₁ : Q = Q₁ by rw [hQeqQ₁]; exact hQ₁star
+  have hQlt : Q < ⊤ := lt_top_of_mem_hInvariantStar hG hQ
+  have hNQ_lt : Subgroup.normalizer (Q : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
+    · exact hQne h
+    · exact (ne_of_lt hQlt) h
+  set NQ : Subgroup G := Subgroup.normalizer Q with hNQ
+  set M : Subgroup G := opiCoreInG π' NQ with hMdef
+  have hM_le : M ≤ NQ := opiCoreInG_le _ _
+  have hM_lt : M < ⊤ := lt_of_le_of_lt hM_le hNQ_lt
+  haveI hM_solv : IsSolvable ↥M := hG.solvable_of_lt_top M hM_lt
+  have hPnM : P ≤ Subgroup.normalizer M := hPnQ.trans (le_normalizer_opiCoreInG π' NQ)
+  have hM_inv : Ch03.IsAInvariant (conjAction P) M := isAInvariant_conjAction_iff.mpr hPnM
+  have hCop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥M) := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := primesOf A) Nat.card_pos.ne' Nat.card_pos.ne' (fun p hp => hP_pi p hp) (fun p hp => ?_)
+    exact isPiSubgroup_opiCoreInG π' NQ p hp
+  have hQM : Q ≤ M := le_opiCoreInG_normalizer_self hQpi'
+  have hQ_inv : Ch03.IsAInvariant (conjAction P) Q := isAInvariant_conjAction_iff.mpr hPnQ
+  have hQM_pi : Ch03.Subgroup.IsPiGroup {q} (Q.subgroupOf M) := by
+    intro p hp
+    exact hQpi p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQM).toEquiv] at hp)
+  have hQM_inv : Ch03.IsAInvariant hM_inv.restrict (Q.subgroupOf M) :=
+    isAInvariant_subgroupOf_restrict hM_inv hQ_inv
+  obtain ⟨R, hR_hall, hR_inv, hR_ge⟩ :=
+    OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
+      (G := ↥M) (A := ↥P) (φ := hM_inv.restrict) hCop hQM_pi hQM_inv
+  set R₂ : Subgroup G := R.map M.subtype with hR₂def
+  have hR₂_pi : Subgroup.IsPiSubgroup {q} R₂ := by
+    intro p hp
+    rw [hR₂def, ← Nat.card_congr (Subgroup.equivMapOfInjective R M.subtype
+      M.subtype_injective).toEquiv] at hp
+    exact hR_hall.1 p hp
+  have hR₂_inv : P ≤ Subgroup.normalizer R₂ :=
+    isAInvariant_conjAction_iff.mp (isAInvariant_map_subtype_of_restrict hM_inv hR_inv)
+  have hQR₂ : Q ≤ R₂ := by
+    rw [hR₂def]
+    calc Q = (Q.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hQM).symm
+      _ ≤ R.map M.subtype := Subgroup.map_mono hR_ge
+  have hQeqR₂ : R₂ = Q := hInvariantStar_eq_of_le hQ ⟨le_top, hR₂_inv, hR₂_pi⟩ hQR₂
+  -- `Q₁ ⊓ NQ ≤ M` via Hypothesis 7.1.
+  have hnorm : A ≤ Subgroup.normalizer (Q₁ ⊓ NQ) := by
+    intro a ha
+    apply mem_normalizer_of_conj_smul_eq_self (Q := Q₁ ⊓ NQ)
+    rw [Subgroup.smul_inf,
+      conj_smul_eq_self_of_mem_normalizer (hInvariantStar_le_normalizer hQ₁star ha),
+      conj_smul_eq_self_of_mem_normalizer ((hAnQ.trans Subgroup.le_normalizer) ha)]
+  have hQ₁NQ_pi' : Subgroup.IsPiSubgroup π' (Q₁ ⊓ NQ) := by
+    intro p hp
+    have hpq : p = q := Set.mem_singleton_iff.mp ((hInvariantStar_isPiSubgroup hQ₁star) p
+      (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hp).1,
+        (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_dvd_of_le inf_le_left),
+        Nat.card_pos.ne'⟩))
+    rw [hpq]; exact hq
+  have hNQ₁_le_M : Q₁ ⊓ NQ ≤ M := by
+    have h1 := le_sSup (s := hInvariant NQ A π') (a := Q₁ ⊓ NQ)
+      ⟨inf_le_right, hnorm, hQ₁NQ_pi'⟩
+    rwa [hA.generated_eq NQ hAnQ hNQ_lt] at h1
+  -- Order: `|Q₁ ⊓ NQ| ∣ |R| = |R₂| = |Q|`.
+  have h1 : Ch03.Subgroup.IsPiGroup {q} ((Q₁ ⊓ NQ).subgroupOf M) := by
+    intro p hp
+    have hp' : p ∈ (Nat.card ↥(Q₁ ⊓ NQ)).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNQ₁_le_M).toEquiv] at hp
+    exact (hInvariantStar_isPiSubgroup hQ₁star) p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp').1, (Nat.mem_primeFactors.mp hp').2.1.trans
+        (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
+  have hcard_dvd : Nat.card ↥(Q₁ ⊓ NQ) ∣ Nat.card ↥R := by
+    have hd := hR_hall.card_dvd_of_isPiGroup h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNQ₁_le_M).toEquiv] at hd
+  have hcardR_eq : Nat.card ↥R = Nat.card ↥Q := by
+    rw [← hQeqR₂, hR₂def,
+      Nat.card_congr (Subgroup.equivMapOfInjective R M.subtype M.subtype_injective).toEquiv]
+  have hle1 : Nat.card ↥(Q₁ ⊓ NQ) ≤ Nat.card ↥Q := by
+    rw [← hcardR_eq]; exact Nat.le_of_dvd Nat.card_pos hcard_dvd
+  have hQ_le_NQ₁ : Q ≤ Q₁ ⊓ NQ := le_inf hQQ₁ Subgroup.le_normalizer
+  have heq : Q = Q₁ ⊓ NQ := Subgroup.eq_of_le_of_card_ge hQ_le_NQ₁ hle1
+  exact eq_of_inf_normalizer_le
+    (isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ₁star)) hQQ₁
+    (le_of_eq heq.symm)
 
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
