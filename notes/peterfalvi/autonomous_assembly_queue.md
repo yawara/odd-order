@@ -75,5 +75,19 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
 `IsCoherent τ (Xset Z) A` が build-green+axiom-clean で commit 済 (= T-A4 達成), または T-A1..A5 が
 全て「完了 commit」か「blocked 記録」のいずれか。
 
+## 進捗ログ (2026-06-04 自走セッション)
+- ✅ **T-A1 完了** (commit c0c2e43, build-green 3320 + axiom-clean): `xAdjoinStep` (S08, noncomputable
+  def — IsCoherent は Type 値). member family + ZIrr injection を仮説に取り `crux1_of_memberFamily`
+  (crux1) + crux2 (R(χ)⊥R(χ₁) clean) + bridge `retarget_isCoherent_of_extensionImage` で
+  `IsCoherent τ (S₁∪{χ,χ̄}) A`. `Da.Y∈ZIrr`/`hχaχ1`/`hχbaraχ1` は内部導出. **Lean 罠**: `let Da`/`let Dmem`
+  (set/have は opaque 化で defeq 壊す; let は isDefEq が semireducible def を unfold) + `open scoped
+  Classical in` (hmemortho の `if i=j`).
+- ✅ **T-A2 完了** (commit afb4819, build-green 3320 + axiom-clean): `XAdjoinStepInput` (per-step premise
+  bundle, ι:Type field) + `XAdjoinStepInput.adjoin` (→xAdjoinStep) + `xChainCoherent` (coherentOfPairChainCover
+  fold; hstep を accumulator coherence hcoh の関数として取る route-B custom fold). **中間版** (member
+  family + ZIrr ∀-仮説; IsCoherent 未強化). enum 接続 (exists_conjugatePairCover→hstep 構成) は T-A4.
+- 🔜 **T-A3 着手中** (route A invasive): IsCoherent に `extension_mem_ZIrr` field 追加で xAdjoinStep の
+  hmemνZ 仮説を導出可能化. 1 site ずつ full build 確認, base ZIrr 証明 hard なら revert+blocked 記録.
+
 ## Blocked ログ (revert した task と欠落 primitive を追記)
 (なし)
