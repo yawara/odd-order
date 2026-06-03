@@ -84,4 +84,40 @@ theorem le_normalizer_opiCoreInG (π : Set ℕ) (H : Subgroup G) :
     rw [hfix] at h2
     exact ⟨⟨y, hy_mem⟩, h2, rfl⟩
 
+
+/-- Any subgroup normalizing `H` also normalizes the ambient realization of `O_π(H)`. -/
+theorem le_normalizer_opiCoreInG_of_le_normalizer (π : Set ℕ) {A H : Subgroup G}
+    (hAH : A ≤ Subgroup.normalizer (H : Set G)) :
+    A ≤ Subgroup.normalizer (opiCoreInG π H) := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hxH : x ∈ Subgroup.normalizer (H : Set G) := hAH hx
+  let ψ : MulAut ↥H := H.normalizerMonoidHom ⟨x, hxH⟩
+  have hfix := Subgroup.characteristic_iff_comap_eq.mp
+    (Ch03.oPiCore.characteristic π ↥H) ψ
+  constructor
+  · rintro ⟨z, hz, rfl⟩
+    refine ⟨ψ z, ?_, ?_⟩
+    · have hzCore : z ∈ (Ch03.oPiCore π ↥H).comap ψ.toMonoidHom := by
+        rw [hfix]
+        exact hz
+      exact Subgroup.mem_comap.mp hzCore
+    · change ↑(ψ z) = x * ↑z * x⁻¹
+      rfl
+  · intro hy
+    obtain ⟨z, hz, hz_eq⟩ := hy
+    have hyH : y ∈ H :=
+      (Subgroup.mem_normalizer_iff.mp hxH y).mpr (hz_eq ▸ z.2)
+    have hzy : z = (MulEquiv.toMonoidHom ψ) ⟨y, hyH⟩ := by
+      apply Subtype.ext
+      change (z : G) = x * y * x⁻¹
+      exact hz_eq
+    have hyCore : (⟨y, hyH⟩ : ↥H) ∈ (Ch03.oPiCore π ↥H).comap ψ.toMonoidHom := by
+      rw [Subgroup.mem_comap]
+      rw [← hzy]
+      exact hz
+    rw [hfix] at hyCore
+    exact ⟨⟨y, hyH⟩, hyCore, rfl⟩
+
 end OddOrder.GroupTheory

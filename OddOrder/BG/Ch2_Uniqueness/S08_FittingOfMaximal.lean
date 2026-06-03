@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.PRank
@@ -78,6 +79,118 @@ theorem fittingInG_subgroupOf_normal (M : Subgroup G) :
   rw [fittingInG_subgroupOf_eq]
   exact Ch01.fitting.normal ↥M
 
+/-- The center of `F(M)`, realized as a subgroup of the ambient group `G`. -/
+def centerFittingInG (M : Subgroup G) : Subgroup G :=
+  (Subgroup.center ↥(fittingInG M)).map (fittingInG M).subtype
+
+/-- `Z(F(M))`, realized in `G`, lies inside `F(M)`. -/
+theorem centerFittingInG_le_fittingInG (M : Subgroup G) :
+    centerFittingInG M ≤ fittingInG M :=
+  Subgroup.map_subtype_le _
+
+/-- `Z(F(M))`, realized in `G`, lies inside `M`. -/
+theorem centerFittingInG_le (M : Subgroup G) :
+    centerFittingInG M ≤ M :=
+  (centerFittingInG_le_fittingInG M).trans (fittingInG_le M)
+
+/-- The center of `F(M)`, viewed as a subgroup of `M`, is normal in `M`.
+
+This is the ambient form of the elementary fact that the center of a normal subgroup is
+normal.  It is used in BG (8.2), where nontrivial characteristic subgroups of `Z(F(M))`
+have normalizer exactly `M`. -/
+theorem centerFittingInG_subgroupOf_normal (M : Subgroup G) :
+    ((centerFittingInG M).subgroupOf M).Normal := by
+  let F : Subgroup G := fittingInG M
+  let Z : Subgroup G := centerFittingInG M
+  have hZF : Z ≤ F := by
+    dsimp [Z]
+    exact centerFittingInG_le_fittingInG M
+  have hZM : Z ≤ M := by
+    dsimp [Z]
+    exact centerFittingInG_le M
+  have hF_norm_M : M ≤ Subgroup.normalizer (F : Set G) := by
+    dsimp [F]
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer (fittingInG_le M)).mp
+      (fittingInG_subgroupOf_normal M)
+  have hconj_mem : ∀ m ∈ M, ∀ z ∈ Z, m * z * m⁻¹ ∈ Z := by
+    intro m hm z hz
+    have hzF : z ∈ F := hZF hz
+    have hconjF : m * z * m⁻¹ ∈ F :=
+      (Subgroup.mem_normalizer_iff.mp (hF_norm_M hm) z).mp hzF
+    obtain ⟨zc, hzc, hzc_eq⟩ := hz
+    have hzc_eqG : (zc : G) = z := hzc_eq
+    refine ⟨⟨m * z * m⁻¹, hconjF⟩, ?_, rfl⟩
+    refine Subgroup.mem_center_iff.mpr ?_
+    intro y
+    apply Subtype.ext
+    have hyF : (y : G) ∈ F := y.2
+    have hyPrimeF : m⁻¹ * (y : G) * m ∈ F := by
+      have hm_inv : m⁻¹ ∈ M := M.inv_mem hm
+      simpa using (Subgroup.mem_normalizer_iff.mp (hF_norm_M hm_inv) (y : G)).mp hyF
+    have hcomm :
+        (m⁻¹ * (y : G) * m) * z = z * (m⁻¹ * (y : G) * m) := by
+      have hcommPrime :
+          (m⁻¹ * (y : G) * m) * (zc : G) =
+            (zc : G) * (m⁻¹ * (y : G) * m) := by
+        simpa using
+          congrArg Subtype.val
+            (Subgroup.mem_center_iff.mp hzc ⟨m⁻¹ * (y : G) * m, hyPrimeF⟩)
+      simpa [hzc_eqG] using hcommPrime
+    calc
+      (y : G) * (m * z * m⁻¹) = m * ((m⁻¹ * (y : G) * m) * z) * m⁻¹ := by
+        group
+      _ = m * (z * (m⁻¹ * (y : G) * m)) * m⁻¹ := by rw [hcomm]
+      _ = m * z * m⁻¹ * (y : G) := by group
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer hZM]
+  intro m hm
+  rw [Subgroup.mem_normalizer_iff]
+  intro z
+  constructor
+  · exact hconj_mem m hm z
+  · intro hz
+    have hback := hconj_mem m⁻¹ (M.inv_mem hm) (m * z * m⁻¹) hz
+    have heq : m⁻¹ * (m * z * m⁻¹) * m⁻¹⁻¹ = z := by group
+    rwa [heq] at hback
+
+/-- The `q`-core of `Z(F(M))`, realized as a subgroup of the ambient group `G`. -/
+def centerFittingOpCoreInG (q : ℕ) (M : Subgroup G) : Subgroup G :=
+  opiCoreInG ({q} : Set ℕ) (centerFittingInG M)
+
+/-- `O_q(Z(F(M)))`, realized in `G`, lies inside `Z(F(M))`. -/
+theorem centerFittingOpCoreInG_le_centerFittingInG (q : ℕ) (M : Subgroup G) :
+    centerFittingOpCoreInG q M ≤ centerFittingInG M :=
+  opiCoreInG_le ({q} : Set ℕ) (centerFittingInG M)
+
+/-- `O_q(Z(F(M)))`, realized in `G`, lies inside `M`. -/
+theorem centerFittingOpCoreInG_le (q : ℕ) (M : Subgroup G) :
+    centerFittingOpCoreInG q M ≤ M :=
+  (centerFittingOpCoreInG_le_centerFittingInG q M).trans (centerFittingInG_le M)
+
+/-- `O_q(Z(F(M)))`, viewed as a subgroup of `M`, is normal in `M`. -/
+theorem centerFittingOpCoreInG_subgroupOf_normal (q : ℕ) (M : Subgroup G) :
+    ((centerFittingOpCoreInG q M).subgroupOf M).Normal := by
+  have hOM : centerFittingOpCoreInG q M ≤ M := centerFittingOpCoreInG_le q M
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer hOM]
+  have hMZ : M ≤ Subgroup.normalizer (centerFittingInG M : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (centerFittingInG_le M)).mp
+      (centerFittingInG_subgroupOf_normal M)
+  exact le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ) hMZ
+
+/-- **BG (8.1), left inclusion**: `Z(F(M))` centralizes every subgroup contained in
+`F(M)`, hence lies in the relative centralizer `C_{F(M)}(A₀)`. -/
+theorem centerFittingInG_le_centralizer_inf {M A₀ : Subgroup G}
+    (hA₀F : A₀ ≤ fittingInG M) :
+    centerFittingInG M ≤ Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M := by
+  refine le_inf ?_ (centerFittingInG_le_fittingInG M)
+  intro z hz
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  obtain ⟨zc, hzc, hzc_eq⟩ := hz
+  have hzc_eqG : (zc : G) = z := hzc_eq
+  have hcomm :=
+    congrArg Subtype.val (Subgroup.mem_center_iff.mp hzc ⟨y, hA₀F hy⟩)
+  simpa [hzc_eqG] using hcomm
+
 /-- **`ℰ_p^*(H)` membership**: `A₀` は `H` の中で極大な `p`-elementary abelian 部分群
 (`A₀ ≤ H` elem-ab で、`H` 内の elem-ab `B ⊇ A₀` は `A₀` に戻る)。 -/
 def isMaxElemAbelianIn (p : ℕ) (A₀ H : Subgroup G) : Prop :=
@@ -134,6 +247,15 @@ private theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinima
   have hNleM : Subgroup.normalizer (L : Set G) ≤ M :=
     (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
   exact le_antisymm hNleM hMleN
+
+/-- **BG (8.2) normalizer localization**: if `O_q(Z(F(M)))` is nontrivial, then its
+normalizer in the ambient minimal simple group is exactly the maximal subgroup `M`. -/
+theorem normalizer_centerFittingOpCoreInG_eq_of_ne_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hO_ne : centerFittingOpCoreInG q M ≠ ⊥) :
+    Subgroup.normalizer (centerFittingOpCoreInG q M : Set G) = M :=
+  normalizer_eq_of_normal_of_mem_maximal hG hM
+    (centerFittingOpCoreInG_subgroupOf_normal q M) hO_ne (centerFittingOpCoreInG_le q M)
 
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
