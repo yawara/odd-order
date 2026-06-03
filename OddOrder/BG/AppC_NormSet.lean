@@ -462,6 +462,25 @@ lemma exists_root_fCubic [Fact p.Prime] (c : ZMod p) (hirr : Irreducible (fCubic
     exact AdjoinRoot.eval₂_root (fCubic p c)
   rw [hr, map_zero]
 
+/-- Frobenius propagation: for `f` over `𝔽_p` and `a ∈ 𝔽_{p^q}`,
+`f(a)^p = f(a^p)` (the `p`-power map fixes the `𝔽_p`-coefficients of `f`). -/
+lemma aeval_pow_p [Fact p.Prime] (a : GaloisField p q) (f : (ZMod p)[X]) :
+    (Polynomial.aeval a f) ^ p = Polynomial.aeval (a ^ p) f := by
+  haveI : CharP (GaloisField p q) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]; exact ZMod.charP p
+  have key : (frobenius (GaloisField p q) p).comp (Polynomial.aeval (R := ZMod p) a).toRingHom
+      = (Polynomial.aeval (R := ZMod p) (a ^ p)).toRingHom := by
+    apply Polynomial.ringHom_ext
+    · intro b
+      simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+        Polynomial.aeval_C, frobenius_def]
+      rw [← map_pow, ZMod.pow_card]
+    · simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+        Polynomial.aeval_X, frobenius_def]
+  have h := RingHom.congr_fun key f
+  simpa only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, frobenius_def]
+    using h
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
