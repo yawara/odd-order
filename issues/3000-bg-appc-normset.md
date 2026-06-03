@@ -103,6 +103,9 @@ created: 2026-06-04
   `P` が abelian であることを `normOneFrobeniusKernel_mul_comm` として明示し、任意の
   `θ∈Irr(P)` について `θ(1)=1`、従って `Ind_P^H θ` の degree が `|U|` であることを証明。
   AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 induced-character support specialization**:
+  `Ind_P^H θ` の support が `P` に含まれること、および非自明 complement 元 `inr u` 上では
+  0 になることを concrete theorem 化。AxiomsCheck 登録済み。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

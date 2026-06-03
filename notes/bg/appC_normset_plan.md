@@ -170,6 +170,15 @@ mathlib の irreducible representation dimension-one theorem から
 次はこれら induced degree-`|U|` characters の値を class-sum coefficient character formula に入れる側。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 induced-character support specialization (2026-06-04)
+`P◁H` の normality から `ClassFunction.induce_eq_zero_of_not_mem_normal` を concrete 化し、
+`normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel` と
+`normOneFrobeniusKernel_induce_support_subset_kernel` を追加。
+さらに `normOneFrobeniusKernel_induce_apply_inr_eq_zero` で非自明な complement 元 `inr u` 上では
+`Ind_P^H θ` が 0 になることを明示した。
+これは induced characters が q≥5 の class-sum character formula で kernel classes のみを見るための入力。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

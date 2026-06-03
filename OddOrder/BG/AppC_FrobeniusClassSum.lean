@@ -236,6 +236,38 @@ theorem normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_car
     normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one]
   simp
 
+/-- Induced class functions from the additive kernel vanish off the kernel,
+because the kernel is normal. -/
+theorem normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel [Fact p.Prime]
+    (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)
+    {g : normOneFrobeniusGroup p q} (hg : g ∉ normOneFrobeniusKernel p q) :
+    ClassFunction.induce (normOneFrobeniusKernel p q) θ g = 0 := by
+  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  exact ClassFunction.induce_eq_zero_of_not_mem_normal θ hg
+
+/-- Equivalently, the support of an induced class function from `P` is contained
+in the additive kernel `P`. -/
+theorem normOneFrobeniusKernel_induce_support_subset_kernel [Fact p.Prime]
+    (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) :
+    (ClassFunction.induce (normOneFrobeniusKernel p q) θ).support ⊆
+      normOneFrobeniusKernel p q := by
+  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  exact ClassFunction.support_induce_subset_of_normal (normOneFrobeniusKernel p q) θ
+
+/-- Induced class functions from `P` vanish on nonidentity complement elements. -/
+theorem normOneFrobeniusKernel_induce_apply_inr_eq_zero [Fact p.Prime]
+    (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) {u : normOneUnits p q}
+    (hu : u ≠ 1) :
+    ClassFunction.induce (normOneFrobeniusKernel p q) θ
+        (SemidirectProduct.inr u : normOneFrobeniusGroup p q) = 0 := by
+  refine normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel p q θ ?_
+  intro hmem
+  rcases hmem with ⟨x, hx⟩
+  have hu_eq : u = 1 := by
+    symm
+    simpa using congrArg SemidirectProduct.right hx
+  exact hu hu_eq
+
 /-- A nonzero element of the additive kernel is nontrivial in the concrete
 Frobenius group `H = P ⋊ U`. -/
 lemma normOneFrobenius_inl_ne_one [Fact p.Prime] {s : GaloisField p q} (hs : s ≠ 0) :

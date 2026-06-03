@@ -1845,6 +1845,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_apply_one
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_support_subset_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_apply_inr_eq_zero
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_inl_ne_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_le_centralizer_inl
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_le_kernel
