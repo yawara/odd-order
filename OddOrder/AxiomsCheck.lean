@@ -597,6 +597,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_eq
 -- RepresentationTheory: the irreducible characters span the class functions.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.span_irreducibleCharacter_eq_top
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.irreducibleCharacter_apply_inv
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul
 -- RepresentationTheory (Peterfalvi §3, [Is] Thm 2.18/6.10): second (column) orthogonality is
 -- unconditional — the `CharacterTableIndexing` and weighted-row-orthogonality inputs of the
 -- matrix proof core are discharged for any `[Finite G]` (issue 0027 closed unconditionally).

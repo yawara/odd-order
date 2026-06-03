@@ -194,6 +194,13 @@ AxiomsCheck 登録済み。
 これは q≥5 の character formula で linear characters の寄与を `1` に固定する入力。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 character expansion infra (2026-06-04)
+`CharacterCompleteness.lean` に `irreducibleCharacter_apply_inv` と
+`sum_inner_irreducibleCharacter_smul` を追加。前者は subtype 版の `χ(g⁻¹)=star(χ(g))`、
+後者は任意の class function を既約指標基底へ Fourier 展開する公式。
+次の class-sum coefficient character formula で、central-character 積公式を列直交性で反転する入力。
+AxiomsCheck 登録済み。
+
 #### ✅ q≥5 kernel-character main contribution split (2026-06-04)
 Inflation API (`sumInflatedDegreeSq`) を concrete `H=P⋊U` に特殊化し、
 `P⊆ker χ` で filter した既約指標の degree-square sum が `|H/P|=|U|` になる

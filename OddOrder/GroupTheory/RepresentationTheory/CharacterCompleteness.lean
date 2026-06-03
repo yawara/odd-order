@@ -590,6 +590,53 @@ theorem span_irreducibleCharacter_eq_top [Finite G] :
     (linearIndependent_irreducibleCharacter (G := G)) ?_
   rw [finrank_classFunction (G := G), ← Nat.card_eq_fintype_card, card_irreducibleCharacter_eq]
 
+/-- Irreducible character values satisfy `χ(g⁻¹) = star (χ(g))`. -/
+theorem irreducibleCharacter_apply_inv [Finite G]
+    (χ : IrreducibleCharacter G) (g : G) :
+    (χ : ClassFunction G ℂ) g⁻¹ = star ((χ : ClassFunction G ℂ) g) := by
+  obtain ⟨V, _, _, _, ρ, _, hχ⟩ := χ.isIrreducible
+  rw [congrFun hχ g⁻¹, congrFun hχ g, character_inv ρ g]
+
+/-- Fourier expansion of a class function in the irreducible-character basis.
+The coefficient of `χ` is the normalized inner product `⟨f, χ⟩`. -/
+theorem sum_inner_irreducibleCharacter_smul [Fintype G]
+    [Fintype (IrreducibleCharacter G)] [Invertible (Nat.card G : ℂ)]
+    (f : ClassFunction G ℂ) :
+    (∑ χ : IrreducibleCharacter G,
+        ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ)) = f := by
+  have horth : ∀ ψ : IrreducibleCharacter G,
+      ClassFunction.inner
+          (f - ∑ χ : IrreducibleCharacter G,
+            ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ))
+          (ψ : ClassFunction G ℂ) = 0 := by
+    intro ψ
+    rw [ClassFunction.inner_sub_left]
+    have hproj :
+        ClassFunction.inner
+            (∑ χ : IrreducibleCharacter G,
+              ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ))
+            (ψ : ClassFunction G ℂ) =
+          ClassFunction.inner f (ψ : ClassFunction G ℂ) := by
+      change innerDual (ψ : ClassFunction G ℂ)
+          (∑ χ : IrreducibleCharacter G,
+            ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ)) =
+        ClassFunction.inner f (ψ : ClassFunction G ℂ)
+      rw [map_sum]
+      rw [Finset.sum_eq_single ψ]
+      · rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_pos rfl, smul_eq_mul,
+          mul_one]
+      · intro χ _ hχψ
+        rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_neg hχψ, smul_eq_mul,
+          mul_zero]
+      · intro hψ
+        exact (hψ (Finset.mem_univ ψ)).elim
+    rw [hproj, sub_self]
+  have hzero := classFunction_eq_zero_of_orthogonal
+    (f - ∑ χ : IrreducibleCharacter G,
+      ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ))
+    fun ψ => horth ψ
+  exact (sub_eq_zero.mp hzero).symm
+
 end Count
 
 section TableIndexing
