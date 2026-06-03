@@ -1452,6 +1452,21 @@ private theorem coreClaimGeneral
   rw [htop, top_le_iff, Subgroup.subgroupOf_eq_top] at hle
   exact le_trans hle inf_le_left
 
+/-- **Sylow-of-subgroup**: a Sylow `p`-subgroup `P` of `G` contained in `K ≤ G` restricts to a
+Sylow `p`-subgroup of `↥K` (with carrier `P.subgroupOf K`): `P.subgroupOf K` is a `p`-group, and
+`p ∤ (P.subgroupOf K).index` since it divides `P.index` (`relIndex_dvd_index_of_le`). Used for
+`b ∈ Z(P)`: `P` is a Sylow of `C_G(b)`. -/
+private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (P : Sylow p G) {K : Subgroup G} (hPK : (P : Subgroup G) ≤ K) :
+    ∃ Q : Sylow p ↥K, (Q : Subgroup ↥K) = (P : Subgroup G).subgroupOf K := by
+  have hpg : IsPGroup p ↥((P : Subgroup G).subgroupOf K) := by
+    obtain ⟨n, hn⟩ := P.2.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]; exact hn)
+  have hidx : ¬ p ∣ ((P : Subgroup G).subgroupOf K).index := fun h =>
+    P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
+  exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
