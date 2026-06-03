@@ -498,6 +498,52 @@ mapped from `↥L` into `G` along the inclusions. -/
 def sharpImage {G : Type*} [Group G] {L : Subgroup G} (H : Subgroup ↥L) : Set G :=
   ((Subgroup.map L.subtype H : Subgroup G) : Set G) \ {1}
 
+/-- **(5.6.1) supported-difference pairing: the Dade map `τ` pairs with the coherent extension `ν`
+as the source inner product.**
+
+For a supported `u` (`u.support ⊆ A`, e.g. the degree-matched difference `χ − a·χ₁`) and a
+*supported* lattice element `δ ∈ ℤ[S₁] ∩ CF(L,A)` (e.g. a member difference `χⱼ − aⱼ·χ₁`), the Dade
+image of `u` pairs with the running extension `ν = hS₁.extension` of `δ` exactly as the source pair:
+`⟨τ u, ν δ⟩ = ⟨u, δ⟩`.
+
+This is the recurring move of the (5.6.1) coefficient computation (mmd 04.7 L79): the cross terms
+`⟨(χ − a·χ₁)^τ, (χⱼ − aⱼ·χ₁)^τ⟩` are evaluated by the Dade isometry on the supported pair, with
+`(χⱼ − aⱼ·χ₁)^τ = (χⱼ − aⱼ·χ₁)^{τ₁} = ν δ` since `δ` is supported (`ν = τ` there,
+`extends_on_supported`).
+
+Note this does **not** apply with `δ = χ₁` itself: the induced anchor `χ₁ = Ind θ` is *unsupported*
+(`χ₁(1) ≠ 0`, so `1 ∈ supp χ₁ ∉ A`), which is precisely why crux1 `⟨τ(χ − a·χ₁), ν χ₁⟩ = −a` is not
+a direct corollary but needs the full (5.6.1)→(5.6.2) `Y`-collapse. -/
+theorem inner_dade_extension_of_supported
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    {u : ClassFunction ↥L ℂ}
+    (husupp : u.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {δ : ClassFunction ↥L ℂ}
+    (hδ : δ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
+    ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) u)
+        (hS₁.extension δ) =
+      ClassFunction.inner u δ := by
+  -- `ν δ = τ δ` since `δ` is supported (the coherent extension agrees with `τ` on `CF(L,A)`).
+  rw [hS₁.extends_on_supported δ hδ]
+  -- Dade isometry on the supported pair `{u, δ}`.
+  have hδsupp : δ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
+    (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hδ).2
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+    (S := {u, δ}) ?_ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+  intro s hs
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+  rcases hs with rfl | rfl
+  · exact husupp
+  · exact hδsupp
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair

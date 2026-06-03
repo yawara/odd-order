@@ -517,6 +517,30 @@ surgery を 2 系統に分解(`IsCoherent` field 確認済: `extension`=ν, `ext
 
 **✅ bridge 完成** = `retarget_isCoherent_of_extensionImage`(S08, **axiom-clean** propext/Classical.choice/Quot.sound, full build 3562 green): `τ`+`hτ:τ=dade` でパラメタ化し、crux1`⟨τ(χ−a·chi1),νchi1⟩=−a`+crux2`⟨τ(χ−χ̄),νchi1⟩=0`+`hSgen:ℤ[S₁]≤span(ℤ[S₁,A]∪{chi1})` を仮説に取り、`X:=τ(χ−a·chi1)+a·νchi1` で `hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`/`hX_ortho`/`hXbar_ortho`/`himg`(rfl) を全導出 → base `retarget_isCoherent` 呼ぶ。`hX_ortho` は生成系 induction(supported は Dade+ν isometry, chi1 は crux1)。**これで surgery が crux1+crux2+hSgen に帰着**(crux2/hSgen は clean に discharge 可)。**残 = crux1 を decomposition norm machinery(`inner_self_chi_eq_sum_coeff`/`inner_self_chi_add_psi_eq`)+ degree 不等式で discharge(本丸・(5.6) Feit–Sibley)→ DadeChainStep 代替の per-step glue → capstone**。**重要教訓(set の罠)**: `set τ`/`set ν` は τ/ν が `hS₁` の型に現れる/`hS₁.extension` を含むため `hS₁`→`hS₁✝` dagger を起こし、param `hcrux*` と goal の fold 不一致を招く ⟹ engine 補題は **τ を明示 param + `hτ:τ=dade`** で取るのが安全(`set` 回避)。
 
+#### J.3.3 crux1 深掘り精査 — crux1 = (5.6.1)/(5.6.2) collapse for induced χ (2026-06-03, 「続けてください」)
+
+mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精査し crux1 を厳密 scope:
+
+**crux1 = 真の (5.6.2) collapse `Da.Y = a·νχ₁`(ν=coherent extension)**:
+`τ(χ−a·chi1) = Da.X − Da.Y`(`Da.tau1_image`+`htau1_diff`)。`Da.X∈ℤ[R(χ)]`, `νchi1∈ℤ[R(chi1)]`, `R(χ)⊥R(chi1)`((5.2.e))⟹`⟨Da.X,νchi1⟩=0`。よって `Da.Y=a·νchi1` ⟹ `⟨τ(χ−a·chi1),νchi1⟩=⟨Da.X−a·νchi1,νchi1⟩=0−a·1=−a` = **crux1**。
+↔ (6.8.1) 流に言えば `⟨(χ−a·η₁)^τ,η₁^{τ₁}⟩=b−a`(L176)で **crux1 ⟺ b=0**(case A の b=0 論証=(6.7)+norm bound+a>1; X-chain 経由(6.6)では generic (5.6.2) λ-form)。
+
+**🔴 構造的発見 1(重大)**: `IsCoherent.extension : IntegralCharacterMap = CF L →ₗ[ℤ] CF G`(S07:165 abbrev)で **ZIrr-codomain field 無し**(struct field は `nonzero`/`extension`/`extension_inner_eq`/`extends_on_supported` のみ, S07:1421)⟹ **`ν x ∈ ZIrr` は IsCoherent から導出不能**。member ν-aux 分解(`CharacterPsiDecomposition τ x 0` を `ofProjection` で構成)は `htau1_mem : ν x∈ZIrr` 要求 ⟹ **member R-分解は仮説として注入要**(既存 engine の `Dmem` field と同形;`IsCoherent` を強化するか、caller=実 coherence engine が供給)。
+
+**🔴 構造的発見 2**: 既存 `Y_eq_nsmul_tau1_of_lambdaForm`(S07:1940)は `hvc1 : vc i₁ = D.tau1 chi1` で **member family を `D.tau1` に hardwire**。`Da=decompositionDaFromDadeOfDiff` は `Da.tau1=τ`(Dade)⟹ 結論 `Da.Y=a·D.tau1 chi1=a·τchi1`(≠`a·νchi1`!)。unsupported chi1 で τchi1≠νchi1 ⟹ **直接再利用不可**。代わりに `lambda_eq_zero_and_Z_eq_zero`(S07:1852, **family `vc` 自由**)を `vc i=νχᵢ` で直叩き要。
+
+**crux1 discharge 経路(確定, multi-session)**:
+1. `Da := decompositionDaFromDadeOfDiff hyp hconj χ …`(S07:4708, B-surgery, supported 差分のみ ⟹ **χ unsupported でも構成可**)→ `Da.X∈ℤ[R(χ)]`, `Da.Y`, `Da.tau1_image`, (5.4.a) opening bound。
+2. member ν-aux family(**仮説注入**, 発見1): 各 χᵢ∈S₁ に `νχᵢ∈ℤ[R(χᵢ)]`((5.5))+ orthonormal(ν isometry on ℤ[S₁])。
+3. member R-orthogonality `R(χᵢ)⊥R(χ)`((5.2.e), `⟨(χᵢ−χ̄ᵢ)^τ,(χ−χ̄)^τ⟩=0`)→ 既存 `inner_extension_orthogonal_imageSet_of_members`(S07:3267, **support-free**)で ℤ[S₁] へ lift。
+4. (5.6.1) λ-form `Da.Y=a·νχ₁−λ∑rᵢ·νχᵢ+Z`(**本丸 hard**): 係数を `⟨τ(χ−a·chi1),ν(χⱼ−aⱼchi1)⟩=⟨χ−a·chi1,χⱼ−aⱼchi1⟩`(↓foundational lemma)から計算。
+5. `lambda_eq_zero_and_Z_eq_zero`(degree 不等式(c) `2a<∑aᵢ²/‖χᵢ‖²` = (6.6) prime-power gap, S07:1696 landed)→ λ=0,Z=0 → `Da.Y=a·νχ₁`。
+6. crux1 = `⟨Da.X−a·νχ₁,νchi1⟩=−a`(発見の R-直交 + ‖νchi1‖²=1)。
+
+**✅ foundational lemma landed**(本コミット, S08 `inner_dade_extension_of_supported`, axiom-clean #print 確認): supported `u` + supported `δ∈ℤ[S₁]` で `⟨τ u,ν δ⟩=⟨u,δ⟩`(ν=τ on supported + Dade isometry)= (5.6.1) L79 cross-term の retargeting move(step 4 の基盤)。**注意: δ=chi1 には適用不可**(chi1=Ind θ unsupported)= crux1 が直接系でない理由を体現。
+
+**⚠️ scope 評価**: crux1 = (5.6.1)/(5.6.2) engine を induced(unsupported)member 用に再導出 = (6.6)/(5.6) の真の技術核, **multi-session**。member R-family 注入で `IsCoherent` 拡張 or 新 carrier 要。かつ master-roadmap 上 (6.8) は **orphaned**(FeitThompson 未配線; 実 critical path = BG §7-16 Track B)⟹ crux1 grind 継続は戦略判断要。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
