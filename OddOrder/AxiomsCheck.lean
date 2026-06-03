@@ -1821,6 +1821,14 @@ set_option linter.style.longLine false in
 -- `𝔽_{p^q}ˣ` under condition (A).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
 
+-- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
+-- conjugates additive-kernel elements by field multiplication.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
+
+-- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
+-- corresponding product equation in the additive kernel of `H = P ⋊ U`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.mem_normOnePairSetAt_iff_inl_mul_inl
+
 -- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
 -- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard

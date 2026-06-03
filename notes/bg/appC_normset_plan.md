@@ -114,6 +114,16 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 これは BG C.2 の class-sum 構造定数 `card{(u,v)∈U² | us+vs=2s}` を Lean 側の norm set に
 直接接続する補題。
 
+#### ✅ q≥5 用 Frobenius 半直積 `H=P⋊U` の concrete setup (2026-06-04)
+`P` を `additiveFieldGroup := Multiplicative 𝔽_{p^q}` として置き、
+`normOneMulAction : U →* MulAut P` を `AddAut.mulLeft` から構成。
+`normOneFrobeniusGroup := P ⋊ U` を定義し、
+`normOneFrobenius_conj_inl` で `H` 内の共役公式 `u s u⁻¹ = u*s` を Lean 化した。
+また `mem_normOnePairSetAt_iff_inl_mul_inl` で `us+vs=2s` を additive kernel `P≤H` 内の
+積方程式 `inl(us) * inl(vs) = inl(2s)` と同値化。これで次の残作業は、U 軌道を
+`ConjClasses H` に同定して `classSumCoeff` / `classSum_mul_apply` に接続する層。
+AxiomsCheck 登録済み。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

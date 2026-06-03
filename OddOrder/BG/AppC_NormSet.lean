@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.Algebra.Ring.AddAut
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
@@ -52,6 +54,10 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
   prime-field unit subgroup intersects `U` trivially under condition (A).
 * `primeFieldUnits_mul_normOneUnits_eq_univ` — **Remark (VII)**: the
   carrier-set product `𝔽_pˣ · U` is all of `𝔽_{p^q}ˣ` under condition (A).
+* `normOneFrobenius_conj_inl` — the concrete `H = P ⋊ U` action formula
+  `u s u⁻¹ = u*s` for the q≥5 Frobenius-group branch of Lemma C.2.
+* `mem_normOnePairSetAt_iff_inl_mul_inl` — the BG pair condition `us+vs=2s`
+  rewritten as a product equation inside the additive kernel of `H`.
 * `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
   identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
 * `normOnePairSetAt_ncard_eq_normSetE_ncard` — the same bridge in BG
@@ -359,6 +365,63 @@ theorem primeFieldUnits_mul_normOneUnits_eq_univ [Fact p.Prime] (hq : q.Prime)
     (u : (GaloisField p q)ˣ), ?_, hx.symm⟩
   · exact ⟨b, rfl⟩
   · exact u.property
+
+/-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
+
+/-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the
+kernel factor in mathlib's `SemidirectProduct`. -/
+abbrev additiveFieldGroup [Fact p.Prime] := Multiplicative (GaloisField p q)
+
+/-- The action of the norm-one subgroup `U` on the additive group `P = 𝔽_{p^q}`:
+`u` sends `s` to `u * s`.  This is the action used in the Frobenius group
+`H = P ⋊ U` in BG Appendix C, Lemma C.2. -/
+noncomputable def normOneMulAction [Fact p.Prime] :
+    normOneUnits p q →* MulAut (additiveFieldGroup p q) :=
+  (MulAutMultiplicative (GaloisField p q)).symm.toMonoidHom.comp
+    ((AddAut.mulLeft : (GaloisField p q)ˣ →* AddAut (GaloisField p q)).comp
+      (normOneUnits p q).subtype)
+
+/-- The concrete Frobenius group `H = P ⋊ U` from BG Appendix C, Lemma C.2, with
+`P` the additive group of `𝔽_{p^q}` and `U` the norm-one subgroup. -/
+abbrev normOneFrobeniusGroup [Fact p.Prime] :=
+  additiveFieldGroup p q ⋊[normOneMulAction p q] normOneUnits p q
+
+@[simp] theorem normOneMulAction_apply [Fact p.Prime] (u : normOneUnits p q)
+    (s : GaloisField p q) :
+    ((normOneMulAction p q u) (Multiplicative.ofAdd s)).toAdd =
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) * s := by
+  rfl
+
+/-- In the concrete Frobenius group `H = P ⋊ U`, conjugating an additive-kernel
+point `s` by `u ∈ U` is multiplication by `u` on the finite field.  This is the
+formal `u s u⁻¹ = u*s` bridge used to turn BG's class sums into the finite-field
+pair condition. -/
+theorem normOneFrobenius_conj_inl [Fact p.Prime] (u : normOneUnits p q)
+    (s : GaloisField p q) :
+    (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+        SemidirectProduct.inl (Multiplicative.ofAdd s) * SemidirectProduct.inr u⁻¹ =
+      SemidirectProduct.inl
+        (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) := by
+  rw [← SemidirectProduct.inl_aut, SemidirectProduct.inl_inj]
+  exact Multiplicative.toAdd.injective (normOneMulAction_apply p q u s)
+
+/-- The BG pair condition `u*s + v*s = 2*s`, already used in
+`normOnePairSetAt`, is exactly the assertion that the corresponding two elements
+of the additive kernel `P ≤ H = P ⋊ U` multiply to `2*s`.  This is the concrete
+entry point for the q≥5 class-sum structure constant calculation. -/
+theorem mem_normOnePairSetAt_iff_inl_mul_inl [Fact p.Prime] (s : GaloisField p q)
+    (u v : normOneUnits p q) :
+    (u, v) ∈ normOnePairSetAt p q s ↔
+      (SemidirectProduct.inl
+          (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) :
+            normOneFrobeniusGroup p q) *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd (((v : (GaloisField p q)ˣ) : GaloisField p q) * s)) =
+        SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) := by
+  dsimp [normOnePairSetAt]
+  rw [← map_mul (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q),
+    SemidirectProduct.inl_inj]
+  exact Iff.rfl
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 
