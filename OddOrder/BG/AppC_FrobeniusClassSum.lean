@@ -1174,6 +1174,85 @@ theorem normOneFrobenius_kernelCharacter_concrete_classSumContribution_eq
           change Uc ^ 2 * Uc = Uc ^ 3
           ring
 
+/-- Predicate selecting irreducible characters whose kernel contains the additive
+kernel of the concrete Frobenius group. -/
+def normOneFrobeniusKernelCharacterPred [Fact p.Prime]
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q)) : Prop :=
+  (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+    OddOrder.Peterfalvi.S03.characterKernel
+      (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+
+/-- The concrete summand in the `C_1 * C_1 -> C_2` class-sum character formula. -/
+noncomputable def normOneFrobeniusClassSumConcreteTerm [Fact p.Prime]
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q)) : ℂ :=
+  (((Nat.card (normOneUnits p q) : ℂ) *
+      (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+          normOneFrobeniusGroup p q) *
+    ((Nat.card (normOneUnits p q) : ℂ) *
+      (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+          normOneFrobeniusGroup p q))) /
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (1 : normOneFrobeniusGroup p q)) *
+    star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+      (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+        normOneFrobeniusGroup p q))
+
+open scoped Classical in
+/-- The non-kernel-character error term in the concrete `C_1 * C_1 -> C_2`
+class-sum formula. -/
+noncomputable def normOneFrobeniusNonKernelContribution [Fact p.Prime] : ℂ :=
+  ∑ χ ∈ Finset.univ.filter
+      (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        ¬ normOneFrobeniusKernelCharacterPred p q χ),
+    normOneFrobeniusClassSumConcreteTerm p q χ
+
+open scoped Classical in
+/-- The concrete class-sum formula split into the kernel contribution `|U|^3`
+and the remaining non-kernel-character contribution. -/
+theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_kernelContribution_add_nonKernelContribution
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hpodd : Odd p) (hq : 1 < q) :
+    (classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (2 : GaloisField p q)) : ℂ) *
+        ((p ^ q : ℕ) : ℂ) =
+      (Nat.card (normOneUnits p q) : ℂ) ^ 3 +
+        normOneFrobeniusNonKernelContribution p q := by
+  let pred : IrreducibleCharacter (normOneFrobeniusGroup p q) → Prop :=
+    normOneFrobeniusKernelCharacterPred p q
+  let term : IrreducibleCharacter (normOneFrobeniusGroup p q) → ℂ :=
+    normOneFrobeniusClassSumConcreteTerm p q
+  have hformula :
+      (classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+            (normOneClassAt p q (1 : GaloisField p q))
+            (normOneClassAt p q (2 : GaloisField p q)) : ℂ) *
+          ((p ^ q : ℕ) : ℂ) =
+        ∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q), term χ := by
+    simpa [term, normOneFrobeniusClassSumConcreteTerm] using
+      normOneFrobenius_classSumCoeff_one_mul_pow_eq_concrete_character_sum p q hpodd hq
+  have hkernel :
+      ∑ χ ∈ Finset.univ.filter pred, term χ =
+        (Nat.card (normOneUnits p q) : ℂ) ^ 3 := by
+    simpa [pred, term, normOneFrobeniusKernelCharacterPred,
+      normOneFrobeniusClassSumConcreteTerm] using
+      normOneFrobenius_kernelCharacter_concrete_classSumContribution_eq p q
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (IrreducibleCharacter (normOneFrobeniusGroup p q))) pred term
+  calc
+    (classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (2 : GaloisField p q)) : ℂ) *
+        ((p ^ q : ℕ) : ℂ)
+        = ∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q), term χ := hformula
+    _ = ∑ χ ∈ Finset.univ.filter pred, term χ +
+          ∑ χ ∈ Finset.univ.filter (fun χ => ¬ pred χ), term χ := hsplit.symm
+    _ = (Nat.card (normOneUnits p q) : ℂ) ^ 3 +
+          normOneFrobeniusNonKernelContribution p q := by
+        rw [hkernel]
+        rfl
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
