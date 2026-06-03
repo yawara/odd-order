@@ -130,8 +130,14 @@ AxiomsCheck 登録済み。
 `normOneClassAt_mul_eq` で任意の `u∈U` について `inl(u*s)` が `inl s` の共役類にあることを証明。
 さらに `normOnePairSetAt_isClassPair` で、`normOnePairSetAt s` が数える `(u,v)` から
 `classSumCoeff (C_s) (C_s) (C_{2s})` の underlying pair predicate `IsClassPair` への map を構成。
-残る class-sum bridge は逆向き/全単射、すなわち `inl s` の共役類がちょうど `U`-orbit であること
-(特に `s≠0` で action free) を使った cardinal equality。
+AxiomsCheck 登録済み。
+
+#### ✅ class-sum bridge: 共役類 = `U`-orbit の逆向き (2026-06-04)
+`normOneFrobenius_conj_inl_any` で、任意の `x∈H=P⋊U` による `inl s` の共役は
+`x.right * s` だけで決まることを証明。`P` 成分が消えるのは additive kernel が可換だから。
+これを使い `exists_normOne_mul_of_mem_normOneClass` で、`normOneClassAt s` の任意の元が
+`inl(u*s)` と書けることを固定した。残る class-sum cardinal bridge は、product class
+`C_{2s}` の各 fiber を fixed-product pair set に同定し、class-size factor を整理する部分。
 AxiomsCheck 登録済み。
 
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】

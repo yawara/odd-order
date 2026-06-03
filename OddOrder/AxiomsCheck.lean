@@ -1834,6 +1834,12 @@ set_option linter.style.longLine false in
 -- lies in the conjugacy class of `s` in `H = P ⋊ U`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneClassAt_mul_eq
 
+-- BG App C Lemma C.2 q≥5 class-sum bridge: arbitrary conjugation of an
+-- additive-kernel element is controlled by the `U`-coordinate, and hence the
+-- conjugacy class of `s` is exactly its `U`-orbit.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl_any
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_of_mem_normOneClass
+
 -- BG App C Lemma C.2 q≥5 class-sum bridge: a finite-field pair counted by
 -- `normOnePairSetAt` gives a class pair for the class-sum structure constant.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isClassPair

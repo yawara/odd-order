@@ -44,6 +44,34 @@ theorem normOneClassAt_mul_eq [Fact p.Prime] (s : GaloisField p q)
   refine isConj_iff.mpr ⟨SemidirectProduct.inr u, ?_⟩
   simpa using normOneFrobenius_conj_inl p q u s
 
+/-- Conjugating an additive-kernel point by an arbitrary element of
+`H = P ⋊ U` only uses the `U`-coordinate.  The additive `P`-coordinate acts
+trivially because `P` is abelian. -/
+theorem normOneFrobenius_conj_inl_any [Fact p.Prime]
+    (x : normOneFrobeniusGroup p q) (s : GaloisField p q) :
+    x * SemidirectProduct.inl (Multiplicative.ofAdd s) * x⁻¹ =
+      SemidirectProduct.inl
+        (Multiplicative.ofAdd
+          ((((x.right : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) * s)) := by
+  ext <;> simp [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+    SemidirectProduct.inv_left, SemidirectProduct.inv_right, normOneMulAction_apply]
+
+/-- The conjugacy class of `s ∈ P` in `H = P ⋊ U` is exactly the `U`-orbit of
+`s`.  This is the inverse direction to `normOneClassAt_mul_eq`. -/
+theorem exists_normOne_mul_of_mem_normOneClass [Fact p.Prime] (s : GaloisField p q)
+    {x : normOneFrobeniusGroup p q} (hx : ConjClasses.mk x = normOneClassAt p q s) :
+    ∃ u : normOneUnits p q,
+      x =
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) := by
+  unfold normOneClassAt at hx
+  have hconj : IsConj
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) x :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp hx.symm
+  rcases isConj_iff.mp hconj with ⟨g, hg⟩
+  refine ⟨g.right, ?_⟩
+  rw [← hg, normOneFrobenius_conj_inl_any]
+
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
 `H = P ⋊ U`.  This is the one-way bridge needed before proving that the
