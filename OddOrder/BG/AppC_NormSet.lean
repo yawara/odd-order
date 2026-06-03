@@ -103,6 +103,19 @@ lemma one_mem_normSetE [Fact p.Prime] : (1 : GaloisField p q) ∈ normSetE p q :
   rw [show (2 : GaloisField p q) - 1 = 1 by ring]
   exact normN_one p q
 
+/-- If `E` has at least two elements then it contains an element `≠ 1` — the
+`a ∈ E^#` with which the Lemma C.1 argument begins. -/
+lemma exists_mem_normSetE_ne_one [Fact p.Prime]
+    (hcard : 2 ≤ (normSetE p q).ncard) :
+    ∃ a ∈ normSetE p q, a ≠ 1 := by
+  by_contra h
+  push_neg at h
+  have hsub : normSetE p q ⊆ {1} := fun a ha => h a ha
+  have hle : (normSetE p q).ncard ≤ ({1} : Set (GaloisField p q)).ncard :=
+    Set.ncard_le_ncard hsub (Set.finite_singleton 1)
+  rw [Set.ncard_singleton] at hle
+  omega
+
 /-! ## Remark (I): condition (A) ⟺ q ∤ (p-1) -/
 
 /-- **BG Appendix C, Remark (I)** (mmd L4877): condition (A),
