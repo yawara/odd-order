@@ -58,11 +58,16 @@ proof: C:=C_G(A)=`fixedPointsOfMulAut φ`. (i) E⊆C (e∈E は order|p かつ �
 G nilpotent ∵ p-群) で C_G(C)≤C ⟹ A trivial on G。
 plumbing: `restrictAction` (S01 内, Prop 1.10 証明で使用例), `IsAInvariant.normalizer`/centralizer。
 
-interfaces:
+interfaces (全確認済):
 - `isaacs_thm_4_36 (hp_odd:p≠2) (φ:A→*MulAut G) (hG:IsPGroup p G) (hA_p':¬p∣card A)
    (h_fix:∀g,g^p=1→∀a,φ a g=g) : actionCommutator φ = ⊥` (Ch04:4161)
 - `coprime_nilpotent_acts_trivially_of_centralizer_self [IsNilpotent G] (hCop) 
    (hCC: centralizer (fixedPointsOfMulAut φ) ≤ fixedPointsOfMulAut φ) : ∀a g, φ a g = g` (S01:1770)
+- bridge: `actionCommutator_eq_bot_iff_acts_trivially φ : actionCommutator φ = ⊥ ↔ ∀a g, φ a g = g` (Ch04:2184)
+- `restrictAction (hH:IsAInvariant φ H) : A →* MulAut ↥H` + `restrictAction_apply` (S01:1750); `IsAInvariant`
+- `fixedPointsOfMulAut φ` (Mathlib/Subgroup.lean:149) + `mem_fixedPointsOfMulAut`
+- conj plumbing: `S.normalizerMonoidHom.comp (Subgroup.inclusion hL_le_norm) : ↥L →* MulAut ↥S`
+- p-群⟹nilpotent: `IsPGroup.isNilpotent`; G p-群 ⟹ G nilpotent (Cor 1.12 の Prop 1.10 適用に必要)
 
 **Thm 6.7 で要る conjugation 形**: L,S≤G, S p-群(p odd), E≤S elem ab, L p'-subgroup,
 L≤N_G(S) (conj 作用), L が C_S(E) の order-p 元中心化 ⟹ L が S 中心化 (⁅L,S⁆=1)。

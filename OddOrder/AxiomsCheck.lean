@@ -1142,6 +1142,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.inf_commutator_eq_of_coprime
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizerK_mul_of_conj_le
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.normalizer_eq_centralizerK_mul_normalizerU
+-- BG §6 Lem 6.6 (p-length 1 特性化, mmd L2090): G 可解, S∈Syl_p, hasPLengthOne ⇒
+-- foundation O_{p',p}=O_{p'}⊔S; (1b) G=O_{p'}⊔N_G(S) (Frattini); (2) S⊆G'⇒S⊆(N_G(S))';
+-- (3) Y⊆S, Y^x⊆S ⇒ ∃c∈C_G(Y),g∈N_G(S),cg=x (Lem6.5c); (4) Q p-部分群 ⇒ ∃x∈C_G(Q∩S),Q^x⊆S。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.top_eq_oPiPrimeCore_sup_normalizer_sylow
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.sylow_le_commutator_normalizer_of_le_commutator
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizer_mul_normalizer_of_conj_subset_sylow
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_mem_centralizer_inf_conj_le_sylow
 -- BG §7 Note (Hyp 7.1 直後, mmd L2145): C_G(A) の π'-元は K=O_{π'}(C_G(A)) に入る
 -- (X=A⊔C_G(A)<G simplicity + Hyp 7.1(2) で c∈O_{π'}(X), O_{π'}(X)⊓C ⊴ C は π'-群)。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S07.mem_kSubgroup_of_piPrime_mem_centralizer
