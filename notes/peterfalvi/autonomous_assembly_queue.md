@@ -94,9 +94,15 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
   を caller に thread (RetargetTargetPair.{X,conjImage}_mem_ZIrr / Da.imageFamily / classFunction_irreducible
   / bridge hτaχ1Z+hτdiffZ)。**payoff**: xAdjoinStep/XAdjoinStepInput から `hmemνZ` 削除 → field 導出
   (`hS₁.extension_mem_ZIrr (χmem i) (subset_span hmemS1)`)。⟹ chain fold が ν χⱼ∈ZIrr を無料で得る。
-- 🟢 **T-A4 = unblocked (ZIrr companion 解消済)**: 残 = enum 構成 (exists_conjugatePairCover→hstep の
-  XAdjoinStepInput を pairUnion accumulator から組む)。ZIrr facts は field 導出ゆえ provider 不要に。
-  member family/degrees/orthonormality/supports/hSgen/hgen の enum 接続のみ (design-heavy だが ZIrr 非依存)。
+- 🟢 **T-A4 = ZIrr unblocked, 残 2 ピース** (commit d0d13af で enum-compat prep: xChainCoherent hpair0/hpair1 を
+  ∀i<N に弱化 ⟹ exists_conjugatePairCover の partial hpairχ と直接互換; hcover は caller が hcoverIdx+hsurj から
+  inline 導出):
+  - **(a) member-family-from-accumulator**: pairUnion S₀ pair i の蓄積 X-members を orthonormal IrreducibleCharacter
+    family (ι/s/χmem/deg/i₁) として列挙 + supports/orthonormality/conj-ortho/hSgen/hgen。enum 構成 (combinatorial)。
+  - **🔴 (b) hDeg (degree 不等式 2a<∑deg²) は (6.5) 還元依存**: deg i=χmem i(1)/χ₁(1) の **p-power 構造**
+    (`two_mul_lt_sq_of_primePow_gap` S07:1696) が要る。p-power は **(6.5) chief-factor 還元** (§G M1:
+    (6.5)⟸(6.3)⟸(6.2)⟸(5.6)+(1.5), ~200-300 LOC, 未着手の §6 大タスク) から来る。⟹ **T-A4 の真の次 blocker = (6.5) 還元**。
+    by_contra hnc で開き peterfalvi_65_reduction で p-群構造を背理法分岐内局所仮説として得る (§F framing)。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
