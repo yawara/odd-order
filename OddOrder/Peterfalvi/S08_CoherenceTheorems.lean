@@ -744,6 +744,63 @@ theorem dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
   exact inner_dadeDiff_conjDifference_eq_zero hyp hconj hxdiffsupp hχdiffsupp
     hxχ hxχbar hxbarχ hxbarχbar
 
+/-- **Member-side R-orthogonality `⟨Da.X, ν χ₁⟩ = 0`, fully assembled for the induced `Da`.**
+
+The `hXortho` ingredient of `crux1_of_collapse`, with *every* member-side input discharged from the
+injected data: `Da = decompositionDaFromDadeOfDiff` (the χ-decomposition), the member ν-aux
+decomposition `D' = memberExtensionDecomposition` of `χ₁` (so `ν χ₁ = D'.X ∈ ℤ[R(χ₁)]` and
+`D'.tau1 χ₁ = ν χ₁` definitionally), and the difference-support family orthogonality `R(χ₁) ⊥ R(χ)`
+(`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`).  Chained through
+`inner_decomposition_X_extension_member_eq_zero`.
+
+This leaves only the (5.6.1)/(5.6.2) `Y`-collapse `Da.Y = a·ν χ₁` as the remaining input for crux1
+(via `crux1_of_collapse` + `Da.tau1_image`). -/
+theorem inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ chi1 : IrreducibleCharacter ↥L) {a : ℕ}
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (chi1 : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - a • (chi1 : ClassFunction ↥L ℂ)) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (a • (chi1 : ClassFunction ↥L ℂ)) = 0)
+    (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
+      (a • (chi1 : ClassFunction ↥L ℂ)) = 0)
+    (hχχbar' : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hrealc1 : ¬ ClassFunction.IsReal (chi1 : ClassFunction ↥L ℂ))
+    (hdiffsuppc1 : ((chi1 : ClassFunction ↥L ℂ).conj - (chi1 : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hc1S1 : (chi1 : ClassFunction ↥L ℂ) ∈ S₁) (hc1barS1 : (chi1 : ClassFunction ↥L ℂ).conj ∈ S₁)
+    (hνZc1 : hS₁.extension (chi1 : ClassFunction ↥L ℂ) ∈ ZIrr G)
+    (hc1c1bar : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ)
+      (chi1 : ClassFunction ↥L ℂ).conj = 0)
+    (hc1χ : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 0)
+    (hc1χbar : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hc1barχ : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
+    (hc1barχbar : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ).conj = 0) :
+    ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj χ hrealχ hdiffsuppχ
+          hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar').X
+        (hS₁.extension (chi1 : ClassFunction ↥L ℂ)) = 0 :=
+  inner_decomposition_X_extension_member_eq_zero hS₁
+    (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj χ hrealχ hdiffsuppχ
+      hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar')
+    (memberExtensionDecomposition hyp hconj hS₁ chi1 hrealc1 hdiffsuppc1 hc1S1 hc1barS1 hνZc1
+      hc1c1bar)
+    (dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp hconj hrealc1 hdiffsuppc1 hrealχ
+      hdiffsuppχ hc1χ hc1χbar hc1barχ hc1barχbar)
+    rfl
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
