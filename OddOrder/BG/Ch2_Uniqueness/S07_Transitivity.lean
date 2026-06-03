@@ -1040,6 +1040,86 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
 
 /-! ## Theorem 7.4 — 推移性の伝播 -/
 
+/-- **Theorem 7.4(a)** (mmd L2204): `C_G(P) ⊓ K = O_{π'}(C_G(P))`。`A ≤ P` ⟹ `C_G(P) ⊆ C_G(A)`,
+`K = O_{π'}(C_G(A)) ⊴ C_G(A)` ゆえ `C_G(P)⊓K` は `C_G(P)` の正規 `π'`-部分群 (⊆ O_{π'});
+逆は O_{π'}(C_G(P)) の各元が `C_G(A)` の `π'`-元 ⟹ §7 Note で `K` 入り。 -/
+private theorem tp_centralizer_eq [Finite G] (hG : IsMinimalSimpleOdd G)
+    {A : Subgroup G} (hA : Hypothesis71 A) {P : Subgroup G} (hAP : A ≤ P) :
+    Subgroup.centralizer (P : Set G) ⊓ kSubgroup A =
+        opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)) := by
+  set π' : Set ℕ := (primesOf A)ᶜ
+  set CP : Subgroup G := Subgroup.centralizer (P : Set G) with hCP
+  have hCPCA : CP ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff] at hx ⊢
+    exact fun y hy => hx y (hAP hy)
+  have hCPnK : CP ≤ Subgroup.normalizer (kSubgroup A) :=
+    hCPCA.trans (le_normalizer_opiCoreInG _ _)
+  apply le_antisymm
+  · refine le_opiCoreInG_of_normal_of_isPiSubgroup inf_le_left ?_ ?_
+    · rw [Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left]
+      intro x hx
+      rw [Subgroup.mem_normalizer_iff]
+      intro h
+      have h1 := Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hx) h
+      have h2 := Subgroup.mem_normalizer_iff.mp (hCPnK hx) h
+      constructor
+      · rintro ⟨ha, hb⟩; exact ⟨h1.mp ha, h2.mp hb⟩
+      · rintro ⟨ha, hb⟩; exact ⟨h1.mpr ha, h2.mpr hb⟩
+    · intro r hr
+      have hdvd : Nat.card ↥(CP ⊓ kSubgroup A) ∣ Nat.card ↥(kSubgroup A) :=
+        Subgroup.card_dvd_of_le inf_le_right
+      refine isPiSubgroup_kSubgroup A r ?_
+      rw [Nat.mem_primeFactors] at hr ⊢
+      exact ⟨hr.1, hr.2.1.trans hdvd, Nat.card_pos.ne'⟩
+  · refine le_inf (opiCoreInG_le _ _) ?_
+    intro c hc
+    refine mem_kSubgroup_of_piPrime_mem_centralizer hG hA (hCPCA (opiCoreInG_le _ _ hc)) ?_
+    have hzle : Subgroup.zpowers c ≤ opiCoreInG π' CP := Subgroup.zpowers_le.mpr hc
+    intro r hr
+    refine isPiSubgroup_opiCoreInG π' CP r ?_
+    have hdvd : Nat.card ↥(Subgroup.zpowers c) ∣ Nat.card ↥(opiCoreInG π' CP) :=
+      Subgroup.card_dvd_of_le hzle
+    rw [Nat.mem_primeFactors] at hr ⊢
+    exact ⟨hr.1, hr.2.1.trans hdvd, Nat.card_pos.ne'⟩
+
+/-- `A ≤ B ≤ P` で `P` が `π(A)`-群なら `π(B) = π(A)` (`A≤B` で `⊆`、`B≤P` で `⊇`)。
+Thm 7.4 帰納で `B` を `A` の役に据えるとき `π` 不変を保証。 -/
+private theorem primesOf_eq_of_le_of_isPiSubgroup [Finite G] {A B P : Subgroup G}
+    (hAB : A ≤ B) (hBP : B ≤ P) (hP : Subgroup.IsPiSubgroup (primesOf A) P) :
+    primesOf B = primesOf A := by
+  have hAB_card : Nat.card ↥A ∣ Nat.card ↥B := Subgroup.card_dvd_of_le hAB
+  have hBP_card : Nat.card ↥B ∣ Nat.card ↥P := Subgroup.card_dvd_of_le hBP
+  ext r
+  constructor
+  · intro hr
+    have hrB : r ∈ (Nat.card ↥B).primeFactors := hr
+    rw [Nat.mem_primeFactors] at hrB
+    exact hP r (Nat.mem_primeFactors.mpr ⟨hrB.1, hrB.2.1.trans hBP_card, Nat.card_pos.ne'⟩)
+  · intro hr
+    have hrA : r ∈ (Nat.card ↥A).primeFactors := hr
+    rw [Nat.mem_primeFactors] at hrA
+    exact Nat.mem_primeFactors.mpr ⟨hrA.1, hrA.2.1.trans hAB_card, Nat.card_pos.ne'⟩
+
+/-- **Hypothesis 7.1 の単調性** (mmd L2212 "Hypothesis 7.1 is satisfied with `B`"): `A ≤ B`,
+`π(B) = π(A)`, `B ≠ 1`, `B < ⊤` なら `Hypothesis71 B`。`generated_eq` は
+`ℋ_X(B;π') ⊆ ℋ_X(A;π')` と `O_{π'}(X) ∈ ℋ_X(B;π')` から。 -/
+private theorem tp_hyp71_of_le [Finite G] {A B : Subgroup G} (hA : Hypothesis71 A)
+    (hAB : A ≤ B) (hprimes : primesOf B = primesOf A) (hBne : B ≠ ⊥) (hBlt : B < ⊤) :
+    Hypothesis71 B := by
+  refine ⟨hBne, hBlt, ?_⟩
+  intro X hBX hXlt
+  rw [hprimes]
+  have hAX : A ≤ X := hAB.trans hBX
+  have hA_eq := hA.generated_eq X hAX hXlt
+  refine le_antisymm ?_ ?_
+  · rw [← hA_eq]
+    refine sSup_le_sSup ?_
+    intro Y hY
+    exact ⟨hY.1, hAB.trans hY.2.1, hY.2.2⟩
+  · exact le_sSup ⟨opiCoreInG_le _ _, hBX.trans (le_normalizer_opiCoreInG _ _),
+      isPiSubgroup_opiCoreInG _ _⟩
+
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
 
