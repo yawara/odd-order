@@ -997,6 +997,36 @@ theorem crux1_of_memberFamily
   have hμval : μ = -(a : ℤ) := by omega
   rw [hμeq, hμval]; push_cast; ring
 
+/-- **The retargeting map preserves virtual characters (ZIrr-codomain, inductive step).**
+
+`retarget τ₁ χ χ̄ X Xbar φ ∈ ℤ[Irr G]` for `φ ∈ ℤ[Irr L]`, given `X, Xbar ∈ ℤ[Irr G]`,
+`χ, χ̄ ∈ ℤ[Irr L]`, and that the prior extension `τ₁` already maps `ℤ[Irr L] → ℤ[Irr G]` (`hτ₁Z`).
+
+`retarget … φ = τ₁(φ − ⟨φ,χ⟩·χ − ⟨φ,χ̄⟩·χ̄) + ⟨φ,χ⟩·X + ⟨φ,χ̄⟩·Xbar`; the coefficients
+`⟨φ,χ⟩, ⟨φ,χ̄⟩ ∈ ℤ` (virtual-character inner products, `inner_mem_ZIrr_int`), so each `ℂ`-smul is a
+`ℤ`-smul of a virtual character.  This is the inductive step showing the (5.6.3) running extension
+keeps its **ZIrr-codomain** — the property `IsCoherent` does not record but the (6.6)/(6.8) chain
+needs (it makes `ν χⱼ ∈ ZIrr`, the load-bearing input of `crux1_of_memberFamily`). -/
+theorem retarget_mem_ZIrr
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G)
+    (hτ₁Z : ∀ ψ ∈ ZIrr L, τ₁ ψ ∈ ZIrr G)
+    {χ chibar : ClassFunction L ℂ} (hχZ : χ ∈ ZIrr L) (hchibarZ : chibar ∈ ZIrr L)
+    {X Xbar : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hXbarZ : Xbar ∈ ZIrr G)
+    {φ : ClassFunction L ℂ} (hφZ : φ ∈ ZIrr L) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget τ₁ χ chibar X Xbar φ ∈ ZIrr G := by
+  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hφZ hχZ
+  obtain ⟨m', hm'⟩ := ClassFunction.inner_mem_ZIrr_int hφZ hchibarZ
+  rw [OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_apply,
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.orthoResidualMap_apply,
+    hm, hm', Int.cast_smul_eq_zsmul ℂ m χ, Int.cast_smul_eq_zsmul ℂ m' chibar,
+    Int.cast_smul_eq_zsmul ℂ m X, Int.cast_smul_eq_zsmul ℂ m' Xbar]
+  refine Submodule.add_mem _ (Submodule.add_mem _ (hτ₁Z _ ?_) (Submodule.smul_mem _ m hXZ))
+    (Submodule.smul_mem _ m' hXbarZ)
+  exact Submodule.sub_mem _ (Submodule.sub_mem _ hφZ (Submodule.smul_mem _ m hχZ))
+    (Submodule.smul_mem _ m' hchibarZ)
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
