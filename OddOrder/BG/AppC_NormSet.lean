@@ -439,6 +439,29 @@ lemma fCubic_irreducible [Fact p.Prime] (c : ZMod p)
     rw [IsRoot, fCubic_eval] at hx
     exact h x hx
 
+/-- An irreducible cubic over `𝔽_p` has a root in `𝔽_{p^3} = GaloisField p 3`
+(its root field has cardinality `p^3`, hence is isomorphic to `GaloisField p 3`). -/
+lemma exists_root_fCubic [Fact p.Prime] (c : ZMod p) (hirr : Irreducible (fCubic p c)) :
+    ∃ a : GaloisField p 3, (Polynomial.aeval a) (fCubic p c) = 0 := by
+  haveI : Fact (Irreducible (fCubic p c)) := ⟨hirr⟩
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have hne : fCubic p c ≠ 0 := hirr.ne_zero
+  haveI : FiniteDimensional (ZMod p) (AdjoinRoot (fCubic p c)) :=
+    FiniteDimensional.of_fintype_basis (AdjoinRoot.powerBasis hne).basis
+  haveI : Finite (AdjoinRoot (fCubic p c)) := Module.finite_of_finite (ZMod p)
+  haveI : Fintype (AdjoinRoot (fCubic p c)) := Fintype.ofFinite _
+  have hfr : Module.finrank (ZMod p) (AdjoinRoot (fCubic p c)) = 3 := by
+    rw [(AdjoinRoot.powerBasis hne).finrank, AdjoinRoot.powerBasis_dim, fCubic_natDegree]
+  have hcard : Nat.card (AdjoinRoot (fCubic p c)) = p ^ 3 := by
+    rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), hfr, ZMod.card]
+  let e := GaloisField.algEquivGaloisField p 3 hcard
+  refine ⟨e (AdjoinRoot.root (fCubic p c)), ?_⟩
+  rw [Polynomial.aeval_algHom_apply]
+  have hr : (Polynomial.aeval (AdjoinRoot.root (fCubic p c))) (fCubic p c) = 0 := by
+    rw [Polynomial.aeval_def, AdjoinRoot.algebraMap_eq]
+    exact AdjoinRoot.eval₂_root (fCubic p c)
+  rw [hr, map_zero]
+
 /-! ## Lemma C.2 -/
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
