@@ -124,6 +124,17 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `ConjClasses H` に同定して `classSumCoeff` / `classSum_mul_apply` に接続する層。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 concrete Frobenius subgroup-pair formalization (2026-06-04)
+`AppC_FrobeniusClassSum.lean` で `normOneFrobeniusKernel` / `normOneFrobeniusComplement` を
+`H=P⋊U` 内の `inl(P)` / `inr(U)` range として定義し、
+`normOneFrobeniusKernel_normal`、`normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement`、
+`normOneFrobeniusKernel_ne_bot`、`normOneFrobeniusComplement_ne_bot` を証明。
+さらに `normOneFrobenius_isFrobeniusGroup` で、`1<q` の下でこの subgroup pair が
+`OddOrder.Isaacs.Ch06.IsFrobeniusGroup` であることを完全形式化した。
+既存の `OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible` API
+(`inertia_eq_of_frobeniusGroup`, `isIrreducibleCharacter_induce_of_frobeniusGroup`) に直接渡せる形。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

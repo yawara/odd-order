@@ -50,6 +50,11 @@ created: 2026-06-04
   `normOneFrobenius_conj_inl` で `H=P⋊U` 内の共役作用 `u s u⁻¹ = u*s` を固定。
   さらに `mem_normOnePairSetAt_iff_inl_mul_inl` で `us+vs=2s` を `P≤H` 内の積方程式に変換。
   AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 concrete Frobenius subgroup-pair**:
+  `AppC_FrobeniusClassSum.lean` で `normOneFrobeniusKernel = inl(P).range`、
+  `normOneFrobeniusComplement = inr(U).range` を定義し、normal/complement/nontrivial と
+  `normOneFrobenius_isFrobeniusGroup : IsFrobeniusGroup H P U` (`1<q`) を証明。
+  既存の induced-character Frobenius API に接続可能な subgroup-pair 形式。AxiomsCheck 登録済み。
 - [x] **C.2 q≥5 class-pair bridge**:
   `AppC_FrobeniusClassSum.lean` を追加。`normOneClassAt`、`normOneClassAt_mul_eq`、
   `normOnePairSetAt_isClassPair` で、`normOnePairSetAt` の pair を `H=P⋊U` の class-sum

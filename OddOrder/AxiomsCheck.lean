@@ -1826,6 +1826,17 @@ set_option linter.style.longLine false in
 -- conjugates additive-kernel elements by field multiplication.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
 
+-- BG App C Lemma C.2 q≥5 setup: the concrete semidirect product has a
+-- nontrivial normal additive kernel, a nontrivial norm-one complement, and the
+-- resulting subgroup pair is a Frobenius group.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_normal
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card_gt_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_isFrobeniusGroup
+
 -- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
 -- corresponding product equation in the additive kernel of `H = P ⋊ U`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.mem_normOnePairSetAt_iff_inl_mul_inl

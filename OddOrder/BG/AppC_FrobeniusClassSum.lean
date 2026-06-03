@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.Set.Card.Arithmetic
 import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # BG Appendix C: Frobenius Class-Sum Bridge
@@ -23,6 +24,111 @@ namespace OddOrder.BG.AppC.NormSet
 open OddOrder.RepresentationTheory
 
 variable (p q : ℕ)
+
+/-- The additive kernel `P` in the concrete Frobenius group `H = P ⋊ U`. -/
+noncomputable def normOneFrobeniusKernel [Fact p.Prime] :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q).range
+
+/-- The norm-one complement `U` in the concrete Frobenius group `H = P ⋊ U`. -/
+noncomputable def normOneFrobeniusComplement [Fact p.Prime] :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
+
+/-- In `H = P ⋊ U`, the additive kernel is normal. -/
+theorem normOneFrobeniusKernel_normal [Fact p.Prime] :
+    (normOneFrobeniusKernel p q).Normal := by
+  unfold normOneFrobeniusKernel normOneFrobeniusGroup
+  exact OddOrder.Isaacs.Ch03.inl_range_normal (φ := normOneMulAction p q)
+
+/-- In `H = P ⋊ U`, the additive kernel and norm-one complement are complements. -/
+theorem normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement [Fact p.Prime] :
+    (normOneFrobeniusKernel p q).IsComplement' (normOneFrobeniusComplement p q) := by
+  unfold normOneFrobeniusKernel normOneFrobeniusComplement normOneFrobeniusGroup
+  exact OddOrder.Isaacs.Ch03.inl_range_isComplement_inr_range (φ := normOneMulAction p q)
+
+/-- The additive kernel in `H = P ⋊ U` is nontrivial. -/
+theorem normOneFrobeniusKernel_ne_bot [Fact p.Prime] :
+    normOneFrobeniusKernel p q ≠ ⊥ := by
+  intro hbot
+  have hmem :
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+        normOneFrobeniusGroup p q) ∈ normOneFrobeniusKernel p q :=
+    ⟨Multiplicative.ofAdd (1 : GaloisField p q), rfl⟩
+  have h_eq_one :
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+        normOneFrobeniusGroup p q) = 1 := by
+    rw [hbot] at hmem
+    exact hmem
+  have hfield_zero : (1 : GaloisField p q) = 0 :=
+    ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h_eq_one)
+  exact one_ne_zero hfield_zero
+
+/-- If `1 < q`, then the norm-one subgroup has more than one element. -/
+theorem normOneUnits_card_gt_one [Fact p.Prime] (hq : 1 < q) :
+    1 < Nat.card (normOneUnits p q) := by
+  have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
+  have hq0 : q ≠ 0 := by omega
+  rw [normOneUnits_card p q hq0, ← Nat.geomSum_eq hp2 q]
+  have hrange : Finset.range 2 ⊆ Finset.range q := by
+    intro k hk
+    exact Finset.mem_range.mpr (by
+      have hk2 : k < 2 := Finset.mem_range.mp hk
+      omega)
+  have hle :
+      (∑ k ∈ Finset.range 2, p ^ k) ≤ ∑ k ∈ Finset.range q, p ^ k :=
+    Finset.sum_le_sum_of_subset_of_nonneg hrange
+      (fun _ _ _ => zero_le _)
+  have htwo : 1 < (∑ k ∈ Finset.range 2, p ^ k) := by
+    simp
+    omega
+  exact htwo.trans_le hle
+
+/-- If `1 < q`, then the norm-one complement in `H = P ⋊ U` is nontrivial. -/
+theorem normOneFrobeniusComplement_ne_bot [Fact p.Prime] (hq : 1 < q) :
+    normOneFrobeniusComplement p q ≠ ⊥ := by
+  have hcard : 1 < Nat.card (normOneFrobeniusComplement p q) := by
+    unfold normOneFrobeniusComplement
+    have h := Nat.card_congr (Equiv.ofInjective _ SemidirectProduct.inr_injective
+      (β := normOneFrobeniusGroup p q))
+    exact h ▸ normOneUnits_card_gt_one p q hq
+  exact (Subgroup.one_lt_card_iff_ne_bot _).mp hcard
+
+/-- The concrete group `H = P ⋊ U` used in BG Appendix C is a Frobenius group
+with additive kernel `P` and norm-one complement `U`. -/
+theorem normOneFrobenius_isFrobeniusGroup [Fact p.Prime] (hq : 1 < q) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup (normOneFrobeniusGroup p q)
+      (normOneFrobeniusKernel p q) (normOneFrobeniusComplement p q) where
+  isNormal := normOneFrobeniusKernel_normal p q
+  isComplement := normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement p q
+  ne_bot_kernel := normOneFrobeniusKernel_ne_bot p q
+  ne_bot_complement := normOneFrobeniusComplement_ne_bot p q hq
+  conj_frobenius := by
+    intro a haA ha n hnN hn hfix
+    rcases haA with ⟨u, rfl⟩
+    rcases hnN with ⟨x, rfl⟩
+    have hx : x.toAdd ≠ (0 : GaloisField p q) := by
+      intro hx0
+      apply hn
+      rw [← ofAdd_toAdd x, hx0, ofAdd_zero, map_one]
+    have hfix' :
+        SemidirectProduct.inl
+            (Multiplicative.ofAdd
+              (((u : (GaloisField p q)ˣ) : GaloisField p q) * x.toAdd)) =
+          (SemidirectProduct.inl (Multiplicative.ofAdd x.toAdd) :
+            normOneFrobeniusGroup p q) := by
+      rw [← normOneFrobenius_conj_inl p q u x.toAdd]
+      simpa [ofAdd_toAdd] using hfix
+    have hmul :
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) * x.toAdd) = x.toAdd :=
+      Multiplicative.ofAdd.injective (SemidirectProduct.inl_inj.mp hfix')
+    have huval : ((u : (GaloisField p q)ˣ) : GaloisField p q) = 1 := by
+      apply mul_right_cancel₀ hx
+      simpa using hmul
+    have hu : u = 1 := by
+      apply Subtype.ext
+      exact Units.ext huval
+    exact ha (by simp [hu])
 
 /-- The concrete Frobenius group `P ⋊ U` is finite; class-sum coefficients need
 a `Fintype` instance.  `SemidirectProduct` is structurally just the product of
