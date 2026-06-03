@@ -1266,6 +1266,57 @@ private theorem le_opiCoreInG_normalizer_self [Finite G] {π : Set ℕ} {Q : Sub
   le_opiCoreInG_of_normal_of_isPiSubgroup Subgroup.le_normalizer
     Subgroup.normal_in_normalizer hQpi
 
+/-- **`ℋ_⊤(A;π)` は `N_G(A)`-共役で安定** (C_G(A) 版 `conj_smul_mem_hInvariant_top` の N_G(A) 拡張)。
+`g` が `A` を (conj 作用で) 不変にすれば `conj g • Q` も `A`-不変。 -/
+private theorem conj_smul_mem_hInvariant_of_normalizer {A : Subgroup G} {π : Set ℕ}
+    {Q : Subgroup G} (hQ : Q ∈ hInvariant ⊤ A π) {g : G} (hgA : MulAut.conj g • A = A) :
+    MulAut.conj g • Q ∈ hInvariant ⊤ A π := by
+  obtain ⟨-, hQnorm, hQpi⟩ := hQ
+  have hgA' : MulAut.conj g⁻¹ • A = A := by
+    conv_lhs => rw [← hgA]
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  refine ⟨le_top, ?_, ?_⟩
+  · intro a ha
+    apply mem_normalizer_of_conj_smul_eq_self
+    have ha' : g⁻¹ * a * g ∈ A := by
+      have hmem : MulAut.conj g⁻¹ a ∈ MulAut.conj g⁻¹ • A :=
+        Subgroup.smul_mem_pointwise_smul_iff.mpr ha
+      rw [hgA'] at hmem
+      simpa only [MulAut.conj_apply, inv_inv] using hmem
+    calc MulAut.conj a • MulAut.conj g • Q
+        = MulAut.conj (a * g) • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj (g * (g⁻¹ * a * g)) • Q := by group
+      _ = MulAut.conj g • MulAut.conj (g⁻¹ * a * g) • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj g • Q := by
+          rw [conj_smul_eq_self_of_mem_normalizer (hQnorm ha')]
+  · have hcard : Nat.card ↥(MulAut.conj g • Q) = Nat.card ↥Q :=
+      (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) Q).toEquiv).symm
+    intro r hr
+    rw [hcard] at hr
+    exact hQpi r hr
+
+/-- **`ℋ_⊤*(A;π)` は `N_G(A)`-共役で安定**: 極大性は順序同型 `Q ↦ Q^g` で移送。 -/
+private theorem conj_smul_mem_hInvariantStar_of_normalizer {A : Subgroup G} {π : Set ℕ}
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ A π) {g : G} (hgA : MulAut.conj g • A = A) :
+    MulAut.conj g • Q ∈ hInvariantStar ⊤ A π := by
+  obtain ⟨hQmem, hQmax⟩ := hQ
+  have hgA' : MulAut.conj g⁻¹ • A = A := by
+    conv_lhs => rw [← hgA]
+    rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  refine ⟨conj_smul_mem_hInvariant_of_normalizer hQmem hgA, ?_⟩
+  intro Q' hQ' hle
+  have h1 : MulAut.conj g⁻¹ • Q' ∈ hInvariant ⊤ A π :=
+    conj_smul_mem_hInvariant_of_normalizer hQ' hgA'
+  have h2 : Q ≤ MulAut.conj g⁻¹ • Q' := by
+    calc Q = MulAut.conj g⁻¹ • MulAut.conj g • Q := by
+          rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ ≤ MulAut.conj g⁻¹ • Q' := by
+          rw [Subgroup.pointwise_smul_le_pointwise_smul_iff]; exact hle
+  have h3 : MulAut.conj g⁻¹ • Q' = Q := hQmax _ h1 h2
+  calc Q' = MulAut.conj g • MulAut.conj g⁻¹ • Q' := by
+        rw [smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    _ = MulAut.conj g • Q := by rw [h3]
+
 /-- **Theorem 7.4(c) 主要 case** (mmd L2224-2232): `Q ∈ ℋ*(P;q)` 非自明 ⟹ `Q ∈ ℋ*(A;q)`。
 `Q ⊆ Q₁ ∈ ℋ*(A;q)`; `M := O_{π'}(N_G(Q))`; Prop 1.5(b) で `Q ⊆` P-不変 Sylow-q `R₂` of `M`,
 `Q ∈ ℋ*(P;q)` 極大で `Q = R₂`; Hyp 7.1 で `Q₁⊓N(Q) ⊆ M`; 位数 `|Q|=|R₂|=|M|_q ≥ |Q₁⊓N(Q)| ≥ |Q|`
