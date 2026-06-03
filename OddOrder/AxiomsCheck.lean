@@ -44,6 +44,7 @@ import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.FeitThompson
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -1788,3 +1789,11 @@ set_option linter.style.longLine false in
 -- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
+
+/-! ### Top-level Feit–Thompson reduction (downstream). -/
+
+-- Minimal-counterexample reduction: *if* no minimal simple group of odd order exists,
+-- *then* every finite group of odd order is solvable. Pure group theory (strong induction
+-- on `|G|` + `solvable_of_ker_le_range`); the only remaining gap of `feitThompson` itself is
+-- the upstream `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (BG §7–16 + Peterfalvi §10–16).
+#assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
