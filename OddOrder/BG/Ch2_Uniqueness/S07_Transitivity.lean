@@ -8,6 +8,7 @@ import OddOrder.BG.AppA_PStability
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.SCN
@@ -1711,7 +1712,95 @@ private theorem coreClaim_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
     {Y : Subgroup G} (hYX : Y ≤ X) (hAY : A ≤ Subgroup.normalizer Y)
     (hYpi : Subgroup.IsPiSubgroup (primesOf A)ᶜ Y) :
     Y ≤ opiCoreInG (primesOf A)ᶜ X := by
-  sorry
+  classical
+  -- `A ≠ ⊥` from `pRank (A.subgroupOf P) ≥ 2`, then `π(A) = {p}`.
+  have hAne : A ≠ ⊥ := by
+    intro hAbot
+    obtain ⟨B, _, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (p := p) (by norm_num) hAscn2.le_pRank
+    have hp2 : p ^ 2 ≤ Nat.card ↥B := Nat.pow_le_of_le_log Nat.card_pos.ne' hBlog
+    have hBdvd : Nat.card ↥B ∣ Nat.card ↥(A.subgroupOf (P : Subgroup G)) :=
+      Subgroup.card_subgroup_dvd_card B
+    have hcard1 : Nat.card ↥(A.subgroupOf (P : Subgroup G)) = 1 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAP).toEquiv, hAbot, Subgroup.card_bot]
+    rw [hcard1, Nat.dvd_one] at hBdvd
+    rw [hBdvd] at hp2
+    nlinarith [hp2, (Fact.out : p.Prime).two_le]
+  have hπ : primesOf A = ({p} : Set ℕ) := primesOf_eq_singleton hAp hAne
+  rw [hπ] at hYpi ⊢
+  -- SCN ambient facts and solvability of `X` (a proper subgroup of a minimal simple group).
+  obtain ⟨_, hAnormP, hCPA⟩ := scn_ambient hAP hAscn2.isSCN
+  haveI hXsolv : IsSolvable ↥X := hG.solvable_of_lt_top X hXlt
+  -- `p` is odd (it divides `|G|`, which is odd).
+  have hpA : p ∣ Nat.card ↥A := by
+    obtain ⟨n, hn⟩ := hAp.exists_card_eq
+    rcases Nat.eq_zero_or_pos n with rfl | hn0
+    · rw [pow_zero] at hn; exact absurd (Subgroup.card_eq_one.mp hn) hAne
+    · rw [hn]; exact dvd_pow_self p hn0.ne'
+  have hp_odd : Odd p := hG.odd.of_dvd_nat (hpA.trans (Subgroup.card_subgroup_dvd_card A))
+  have hp2 : p ≠ 2 := by rintro rfl; rw [Nat.odd_iff] at hp_odd; omega
+  -- `Z(P)` inside `G`: elements of `P` that centralize `P`. `Z(P) ≤ A` (SCN), each is central in `P`.
+  set ZP : Subgroup G :=
+    Subgroup.centralizer ((P : Subgroup G) : Set G) ⊓ (P : Subgroup G) with hZPdef
+  have hZP_le_A : ZP ≤ A := by
+    intro x hx
+    rw [hZPdef, Subgroup.mem_inf] at hx
+    exact hCPA (Subgroup.mem_inf.mpr
+      ⟨Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAP) hx.1, hx.2⟩)
+  have hZP_cent : ∀ b ∈ ZP, (P : Subgroup G) ≤ Subgroup.centralizer ({b} : Set G) := by
+    intro b hb y hy
+    rw [hZPdef, Subgroup.mem_inf] at hb
+    rw [Subgroup.mem_centralizer_iff]
+    rintro z hz; rw [Set.mem_singleton_iff] at hz; subst hz
+    exact (Subgroup.mem_centralizer_iff.mp hb.1 y hy).symm
+  have hZP_le_P : ZP ≤ (P : Subgroup G) := by rw [hZPdef]; exact inf_le_right
+  have hZP_pg : IsPGroup p ↥ZP := (P.isPGroup').to_le hZP_le_P
+  by_cases hZPcyc : IsCyclic ↥ZP
+  · -- **cyclic `Z(P)`**: `B = ⟨b⟩ × Ω₁(Z(P))` via G 2.6.4; needs special case 2 (the coprime
+    -- decomposition `le_of_centralizer_inf_le_of_commutator_le` + `commutator_zpowers_le_oPiCore`,
+    -- whose `z ∈ O_{p',p}(C_G(b))` input is the Sylow setup of `s07_prop75_case2_plan.md`).
+    sorry
+  · -- **noncyclic `Z(P)`**: an `E_{p²} ⊆ Z(P) ⊆ A` of central elements; every `b ∈ B^#` lies in
+    -- `Z(P)`, so special case 1 (`le_opiCoreInG_centralizer_of_mem_centralizer_sylow`) applies.
+    obtain ⟨E, hE_elem, hE_card⟩ :=
+      OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+        hZP_pg hp_odd hZPcyc
+    set B : Subgroup G := E.map ZP.subtype with hBdef
+    have hB_le_ZP : B ≤ ZP := by rw [hBdef]; exact Subgroup.map_subtype_le E
+    have hBA : B ≤ A := hB_le_ZP.trans hZP_le_A
+    have hB_elem : B.IsElementaryAbelian p := by
+      rw [hBdef]; exact hE_elem.map ZP.subtype_injective
+    have hBcard : Nat.card ↥B = p ^ 2 := by
+      rw [hBdef, (Nat.card_congr
+        (Subgroup.equivMapOfInjective E ZP.subtype ZP.subtype_injective).toEquiv).symm]
+      exact hE_card
+    haveI hBcomm : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_elem.1
+    have hB_nc : ¬ IsCyclic ↥B := hB_elem.not_isCyclic_of_card_prime_sq Fact.out hBcard
+    have hBp : ∀ b ∈ B, IsPGroup p (Subgroup.zpowers b) := fun b hb =>
+      (P.isPGroup').to_le (Subgroup.zpowers_le.mpr (hZP_le_P (hB_le_ZP hb)))
+    have hpY : ¬ p ∣ Nat.card ↥Y := fun hdvd =>
+      hYpi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩) rfl
+    have hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Y) := by
+      rw [hBcard]; exact ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hpY).pow_left 2
+    refine coreClaimGeneral hXsolv hAX hBA hB_nc hBp hYX hAY hcop ?_
+    intro b hb hb_ne
+    have hbA : b ∈ A := hBA hb
+    have hA_le_Cb : A ≤ Subgroup.centralizer ({b} : Set G) := by
+      intro a ha
+      rw [Subgroup.mem_centralizer_iff]
+      rintro z hz; rw [Set.mem_singleton_iff] at hz; rw [hz]
+      exact congrArg Subtype.val (isMulCommutative_iff.mp hAab ⟨b, hbA⟩ ⟨a, ha⟩)
+    refine le_opiCoreInG_centralizer_of_mem_centralizer_sylow hG hp2 P hAP hAnormP hCPA hb_ne
+      (hZP_cent b (hB_le_ZP hb)) inf_le_right ?_ ?_
+    · -- `A ≤ N_G(Y ⊓ C_G(b))`: `A` normalizes both `Y` and `C_G(b)` (since `A ≤ C_G(b)`).
+      intro a ha
+      rw [Subgroup.mem_normalizer_iff]
+      intro x
+      rw [Subgroup.mem_inf, Subgroup.mem_inf, Subgroup.mem_normalizer_iff.mp (hAY ha) x,
+        Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer (hA_le_Cb ha)) x]
+    · -- `Y ⊓ C_G(b)` is a `p'`-subgroup (its order divides `|Y|`).
+      intro q hq
+      exact hYpi q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left) Nat.card_pos.ne' hq)
 
 /-- **BG Proposition 7.5, case (2)** (SCN₂ branch, mmd L2263-2309): if `A ∈ SCN₂(P)` for a Sylow
 `p`-subgroup `P`, then `A` satisfies Hypothesis 7.1. Separated from the `p`-length-one branch
