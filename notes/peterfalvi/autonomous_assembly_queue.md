@@ -163,10 +163,26 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   ((6.3) arith)。残 substantial = orbit counting / member-family(B1) / θ-bound(Clifford) / (6.2)。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
-- **(6.5)(b) p-群還元**: `Sylow.directProductOfNormal [Finite G]` (Sylow.lean:779, 全 Sylow normal ⟹
-  `(∀p, Sylow p G) ≃* G`) + `isNilpotent_of_finite_tfae` (Nilpotent.lean:941, nilpotent ⟺ 全 Sylow normal 等) で
-  G≃∏Sylow。残 = G^{ab}≃∏Sylow^{ab} + 各 q≠p で Sylow_q^{ab}=1⟹Sylow_q=1 の Pi-type 論証 (~50-100 LOC, MulEquiv/coprime)。
-  **nontrivial-ab は mathlib 既存**: `IsSolvable.commutator_lt_top_of_nontrivial` (Solvable.lean:160) + nilpotent⟹solvable。
+- ✅ **(6.5)(b) ingredient landed** (commit 8215e94, axiom-clean): `isPGroup_of_quotient_of_subgroup`
+  (S08) = N⊴Γ + IsPGroup p N + IsPGroup p (Γ⧸N) ⟹ IsPGroup p Γ (Lagrange + iff_card; mathlib に無·汎用)。
+- **(6.5)(b) 全体の clean strategy (Pi-type 直積 回避)**: P_p=Sylow_p(G) (nilpotent ⟹ normal·unique)。
+  Γ⧸P_p は p'-quotient (order coprime p)。`(Γ⧸P_p)^{ab}` は **G^{ab} の商ゆえ p-群** かつ **order|Γ⧸P_p| ゆえ
+  p'-群** ⟹ trivial (p^k coprime p ⟹ k=0)。⟹ Γ⧸P_p perfect nilpotent ⟹ **trivial** (← nontrivial nilpotent は
+  commutator<⊤ = `IsSolvable.commutator_lt_top_of_nontrivial`+nilpotent⟹solvable) ⟹ Γ=P_p ⟹ p-群。
+  **完全 recipe (全 mathlib 補題確定済, ~60-80 LOC の assembly のみ残)**:
+  1. `obtain ⟨P⟩ : Nonempty (Sylow p Γ) := inferInstance`。
+  2. `(↑P).Normal := (isNilpotent_of_finite_tfae (G:=Γ)).out 0 3 |>.mp inferInstance p inferInstance P`
+     (tfae idx 0=IsNilpotent, 3=∀ Sylow Normal)。
+  3. Q:=Γ⧸↑P。`Abelianization.map (QuotientGroup.mk' ↑P) : Abelianization Γ →* Abelianization Q` 全射
+     (mk' 全射 + Abelianization.map 全射性) ⟹ `IsPGroup p (Abelianization Q)` = `h.of_surjective …`。
+  4. `|Abelianization Q|` ∣ `|Q|` = `(↑P).index`, `Sylow.not_dvd_index P : ¬p∣(↑P).index` ⟹ Abelianization Q は
+     p-群(3)かつ order coprime p ⟹ `p^k coprime p ⟹ k=0` ⟹ `Subsingleton (Abelianization Q)`。
+  5. Abelianization Q trivial ⟹ Q=⁅Q,Q⁆ (perfect)。Q nilpotent (quotient)。nontrivial nilpotent は
+     `IsSolvable.commutator_lt_top_of_nontrivial` で commutator<⊤ ⟹ 対偶で `Subsingleton Q`。
+  6. Q=Γ⧸↑P trivial ⟹ `(↑P)=⊤` ⟹ **landed `isPGroup_of_quotient_of_subgroup` を N=↑P で直接消費**
+     (P:Sylow は IsPGroup p ↥P, Q:trivial は IsPGroup p Q) ⟹ `IsPGroup p Γ`。
+  directProductOfNormal 不要。各 API 確認済ゆえ assembly は mechanical (但し Abelianization.map 全射性・
+  p∩p'=trivial の小補題に注意)。
 - **B2 orbit counting**: `card_mul_inner_self_induce_eq_card_inertia` (InducedIrreducible:172, `|H|·‖Ind θ‖²=|I_G(θ)|`)
   + `induce_apply_one` (χ(1)=[L:K]θ(1)) で per-θ。残 = S(A)={distinct Ind θ}↔T の W₁-orbit 分割 (fiber=inertia-orbit,
   Frobenius で size=|L:K|・degree 一定) の degree-sum 組立。
