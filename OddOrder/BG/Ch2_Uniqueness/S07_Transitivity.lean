@@ -1417,6 +1417,86 @@ private theorem tp_c_main [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G
     (isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ₁star)) hQQ₁
     (le_of_eq heq.symm)
 
+/-- **BG Theorem 7.4 (7.3)** (mmd L2218-2220): `P` が `A` を (conj 作用で) 不変にし `g ∈ P`,
+`g^p ∈ A`, `A ⊔ ⟨g⟩ = P` かつ `p ∤ |ℋ*(A;q)|` なら `P` は `ℋ*(A;q)` のある元を正規化する。
+`P/A` は位数 `1` か `p` の `p`-群として `Ω = ℋ*(A;q)` に作用 (`A` は各元を固定) ⟹ 不動点
+(`card_modEq_card_fixedPoints` + `p ∤ |Ω|`)。証明では生成元 `g` の誘導 perm `σ` の `zpowers σ`
+を使う (`σ^p = 1` since `g^p ∈ A`)。 -/
+private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fact q.Prime]
+    {p : ℕ} [Fact p.Prime] (hPnA : ∀ x ∈ P, MulAut.conj x • A = A) {g : G} (hgP : g ∈ P)
+    (hgpA : g ^ p ∈ A) (hsup : A ⊔ Subgroup.zpowers g = P)
+    (hpdvd : ¬ p ∣ Nat.card ↥(hInvariantStar ⊤ A {q})) :
+    ∃ Q ∈ hInvariantStar ⊤ A {q}, P ≤ Subgroup.normalizer Q := by
+  classical
+  set S : Set (Subgroup G) := hInvariantStar ⊤ A {q} with hS_def
+  -- `↥P` acts on `↥S` by conjugation; `conj_smul_mem_hInvariantStar_of_normalizer` keeps us in `S`.
+  let smulFn : ↥P → ↥S → ↥S := fun x Q => ⟨MulAut.conj (x : G) • (Q : Subgroup G),
+      conj_smul_mem_hInvariantStar_of_normalizer Q.2 (hPnA (x : G) x.2)⟩
+  letI act : MulAction ↥P ↥S :=
+    { smul := smulFn
+      one_smul := fun Q => by
+        apply Subtype.ext
+        show MulAut.conj ((1 : ↥P) : G) • (Q : Subgroup G) = (Q : Subgroup G)
+        rw [Subgroup.coe_one, map_one, one_smul]
+      mul_smul := fun x y Q => by
+        apply Subtype.ext
+        show MulAut.conj (((x * y : ↥P)) : G) • (Q : Subgroup G)
+          = MulAut.conj ((x : G)) • MulAut.conj ((y : G)) • (Q : Subgroup G)
+        rw [Subgroup.coe_mul, map_mul, mul_smul] }
+  have hsmul_coe : ∀ (x : ↥P) (Q : ↥S),
+      ((x • Q : ↥S) : Subgroup G) = MulAut.conj (x : G) • (Q : Subgroup G) := fun _ _ => rfl
+  -- The induced permutation of the generator `g`.
+  set σ : Equiv.Perm ↥S := MulAction.toPermHom ↥P ↥S ⟨g, hgP⟩ with hσ_def
+  -- `σ ^ p = 1` because `g ^ p ∈ A` acts trivially (every `Q ∈ S` is `A`-invariant).
+  have hσp : σ ^ p = 1 := by
+    rw [hσ_def, ← map_pow]
+    apply Equiv.ext
+    intro Q
+    rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, Equiv.Perm.one_apply]
+    apply Subtype.ext
+    rw [hsmul_coe, Subgroup.coe_pow]
+    show MulAut.conj (g ^ p) • (Q : Subgroup G) = (Q : Subgroup G)
+    exact conj_smul_eq_self_of_mem_normalizer
+      ((hInvariantStar_le_normalizer Q.2) hgpA)
+  -- `zpowers σ` is a `p`-group: its order `= orderOf σ ∣ p`.
+  haveI hPgroup : IsPGroup p ↥(Subgroup.zpowers σ) := by
+    rcases (Nat.dvd_prime (Fact.out (p := p.Prime))).mp
+      (orderOf_dvd_of_pow_eq_one hσp) with h | h
+    · exact IsPGroup.of_card (n := 0) (by rw [Nat.card_zpowers, h, pow_zero])
+    · exact IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, h, pow_one])
+  -- `p ∤ |S|` ⟹ fixed points are nonempty (`card_modEq_card_fixedPoints`).
+  have hmod := hPgroup.card_modEq_card_fixedPoints (α := ↥S)
+  have hcard_ne : Nat.card (MulAction.fixedPoints ↥(Subgroup.zpowers σ) ↥S) ≠ 0 := by
+    intro hzero
+    apply hpdvd
+    have hSeq : Nat.card ↥S = Nat.card ↥(hInvariantStar ⊤ A {q}) := by rw [hS_def]
+    rw [hzero] at hmod
+    rw [← hSeq]
+    exact (Nat.modEq_zero_iff_dvd).mp hmod
+  haveI hne : Nonempty (MulAction.fixedPoints ↥(Subgroup.zpowers σ) ↥S) :=
+    (Nat.card_pos_iff.mp (Nat.pos_of_ne_zero hcard_ne)).1
+  obtain ⟨Q, hQfix⟩ := hne.some
+  -- Unfold the fixed-point property: `σ` fixes `Q`, i.e. `conj g • Q.1 = Q.1`.
+  have hσQ : (⟨σ, Subgroup.mem_zpowers σ⟩ : ↥(Subgroup.zpowers σ)) • Q = Q :=
+    hQfix ⟨σ, Subgroup.mem_zpowers σ⟩
+  -- The subgroup action of `⟨σ,_⟩` is `σ Q`, and `σ Q = ⟨g,hgP⟩ • Q` (`toPermHom`).
+  have hσval : σ Q = Q := by
+    rw [MulAction.subgroup_smul_def, Equiv.Perm.smul_def] at hσQ
+    exact hσQ
+  have h1 : (⟨g, hgP⟩ : ↥P) • Q = Q := by
+    have hstep : (⟨g, hgP⟩ : ↥P) • Q = σ Q := by
+      rw [hσ_def, MulAction.toPermHom_apply, MulAction.toPerm_apply]
+    rw [hstep, hσval]
+  have hgN : MulAut.conj g • (Q : Subgroup G) = (Q : Subgroup G) := by
+    have h2 := congrArg (Subtype.val : ↥S → Subgroup G) h1
+    rwa [hsmul_coe] at h2
+  refine ⟨(Q : Subgroup G), Q.2, ?_⟩
+  -- `P = A ⊔ ⟨g⟩ ≤ N(Q)`: `A` normalizes `Q` (membership of `S`), `g ∈ N(Q)` by `hgN`.
+  rw [← hsup, sup_le_iff]
+  refine ⟨hInvariantStar_le_normalizer Q.2, ?_⟩
+  rw [Subgroup.zpowers_le]
+  exact mem_normalizer_of_conj_smul_eq_self hgN
+
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
 
