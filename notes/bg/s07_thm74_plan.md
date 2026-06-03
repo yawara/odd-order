@@ -40,8 +40,21 @@
 **(c) はこれを A→P, H→N_G(Q), N→M:=O_{π'}(N_G(Q)) に置換**して `Q.subgroupOf M ≤ P-inv Hall{q} R`
 を得る (Q≤M は helper 9, Q P-inv は P≤N(Q))。+ Hyp7.1 で `N_{Q₁}(Q)⊆O_{π'}(N(Q))`, 順序不等式
 `|Q|=|R戻し|=|M|_q ≥ |N_{Q₁}(Q)| ≥ |Q|`, helper 8 で `Q=Q₁`。Q=⊥ は (7.3) 経由 (degenerate)。
-### (7.3) p-群不動点: P/A (位数 prime/1 の p-群) が ℋ*(A;q) に作用 (A⊴P で conj 保存, A 自明),
-|ℋ*(A;q)| ∣ |K| (π') ⟹ p∤|ℋ*|, `IsPGroup.card_modEq_card_fixedPoints` で不動点。MulAction-on-Set 設定が重い。
+### ✅✅ 追加完成 (commits dd26919 + N(A)-stability): 11→13 lemma
+- **`isPGroup_of_isPiSubgroup_singleton`** ({q}-部分群は q-群)。
+- **`tp_c_main`** = (c) 主要 case (非自明 Q∈ℋ*(P;q) ⟹ ∈ℋ*(A;q))。← **base case 数学核心、完成**。
+- **`conj_smul_mem_hInvariant_of_normalizer`** + **`..._hInvariantStar_of_normalizer`** = ℋ(*)が N(A)-共役安定。
+
+### (7.3) p-群不動点 [残, MulAction tail が要注意] — 構造は確定:
+statement `tp_exists_normalized`: `(∀x∈P, conj x•A=A) (g∈P) (g^p∈A) (A⊔zpowers g=P) (¬p∣|ℋ*(A;q)|)
+⟹ ∃Q∈ℋ*(A;q), P≤N(Q)`。証明:
+1. `letI act : MulAction ↥P ↥S` (S:=ℋ*(A;q)): `x•Q := ⟨conj↑x•Q.1, conj_smul_mem_hInvariantStar_of_normalizer Q.2 (hPnA ↑x x.2)⟩`; one_smul/mul_smul は Subtype.ext + `Subgroup.coe_mul`/`map_mul`/`mul_smul`。
+2. `σ := MulAction.toPermHom ↥P ↥S ⟨g,hgP⟩`; `σ^p=1` via `← map_pow` + `(⟨g,hgP⟩^p:↥P)=g^p` (push_cast) + `g^p∈A≤N(Q)` で各 Q 不変。
+3. `IsPGroup p (zpowers σ)`: `Nat.dvd_prime`+`orderOf_dvd_of_pow_eq_one hσp`+`Nat.card_zpowers`+`IsPGroup.of_card`。
+4. `card_modEq_card_fixedPoints` + `¬p∣|ℋ*|` ⟹ `0<card(fixedPoints (zpowers σ) ↥S)` (`Nat.modEq_zero_iff_dvd`)。
+5. **⚠️ tail (要 careful)**: fixedPoint x から `σ x = x` (`mem_fixedPoints` + ⟨σ,mem_zpowers⟩) →
+   subgroup/Perm/toPermHom smul を **explicit lemma で** unfold (rfl 不可の恐れ) → `conj g•x.1.1=x.1.1` →
+   `g∈N(x.1.1)` + `A≤N` で `P=A⊔zpowers g≤N`。`p∤|ℋ*|` は assembly で htrans (|ℋ*|∣|K| π', p∈π) から。
 ### (b): (c)+htrans で Q₂=Q₁^k, P,P^k は N_{KP}(Q₂)=(K∩N(Q₂))P の Hall{π}, `exists_conj_eq_of_isHall_subgroupOf` で共役, kg∈C_K(P)。
 ### (d): L=N(P)∩N(Q), N(P)=L·C_K(P) (a)(b), `inf_commutator_eq_of_coprime` (Lem6.5a) で P∩N(P)'⊆N(Q)'。
 ### R3 wiring: strong induction on |P:A|, tp_reduction で B, A=B⟹base, A<B⟹二重再帰+(c)合成。「A subn in B」= inf_isSubnormal_subgroupOf+equiv-transport。
