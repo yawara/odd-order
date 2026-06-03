@@ -1836,6 +1836,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card_gt_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_isFrobeniusGroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_inl_ne_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_le_centralizer_inl
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_le_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_eq_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_card_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_card_eq
 
 -- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
 -- corresponding product equation in the additive kernel of `H = P ⋊ U`.

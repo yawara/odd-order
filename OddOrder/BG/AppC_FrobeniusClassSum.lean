@@ -143,6 +143,82 @@ noncomputable instance normOneFrobeniusGroup_fintype [Fact p.Prime] :
       left_inv := by intro x; rfl
       right_inv := by intro x; ext <;> rfl }
 
+/-- A nonzero element of the additive kernel is nontrivial in the concrete
+Frobenius group `H = P ⋊ U`. -/
+lemma normOneFrobenius_inl_ne_one [Fact p.Prime] {s : GaloisField p q} (hs : s ≠ 0) :
+    (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ≠ 1 := by
+  intro h
+  exact hs (ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h))
+
+/-- The additive kernel centralizes each of its own elements. This is the easy
+inclusion in the concrete centralizer computation used in the q≥5 character
+estimate of Lemma C.2. -/
+theorem normOneFrobeniusKernel_le_centralizer_inl [Fact p.Prime]
+    (s : GaloisField p q) :
+    normOneFrobeniusKernel p q ≤
+      Subgroup.centralizer
+        ({(SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)} : Set (normOneFrobeniusGroup p q)) := by
+  intro x hx
+  rcases hx with ⟨a, rfl⟩
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  rw [← map_mul (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q),
+    ← map_mul (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q),
+    SemidirectProduct.inl_inj]
+  exact mul_comm a (Multiplicative.ofAdd s)
+
+/-- In the concrete Frobenius group, the centralizer of a nonzero additive-kernel
+element is contained in the kernel. -/
+theorem normOneFrobenius_centralizer_inl_le_kernel [Fact p.Prime] (hq : 1 < q)
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    Subgroup.centralizer
+        ({(SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)} : Set (normOneFrobeniusGroup p q)) ≤
+      normOneFrobeniusKernel p q := by
+  exact (normOneFrobenius_isFrobeniusGroup p q hq).centralizer_kernel_le
+    (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q)
+    ⟨Multiplicative.ofAdd s, rfl⟩
+    (normOneFrobenius_inl_ne_one p q hs)
+
+/-- In the concrete Frobenius group `H = P ⋊ U`, a nonzero additive-kernel
+element has centralizer exactly `P`. -/
+theorem normOneFrobenius_centralizer_inl_eq_kernel [Fact p.Prime] (hq : 1 < q)
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    Subgroup.centralizer
+        ({(SemidirectProduct.inl (Multiplicative.ofAdd s) :
+            normOneFrobeniusGroup p q)} : Set (normOneFrobeniusGroup p q)) =
+      normOneFrobeniusKernel p q := by
+  exact le_antisymm
+    (normOneFrobenius_centralizer_inl_le_kernel p q hq hs)
+    (normOneFrobeniusKernel_le_centralizer_inl p q s)
+
+/-- The additive kernel `P` in `H = P ⋊ U` has cardinality `p^q`. -/
+theorem normOneFrobeniusKernel_card_eq [Fact p.Prime] (hq : q ≠ 0) :
+    Nat.card (normOneFrobeniusKernel p q) = p ^ q := by
+  unfold normOneFrobeniusKernel
+  have hrange :
+      Nat.card (additiveFieldGroup p q) =
+        Nat.card ((SemidirectProduct.inl :
+          additiveFieldGroup p q →* normOneFrobeniusGroup p q).range) :=
+    Nat.card_congr (Equiv.ofInjective
+      (SemidirectProduct.inl : additiveFieldGroup p q → normOneFrobeniusGroup p q)
+      SemidirectProduct.inl_injective)
+  rw [← hrange]
+  rw [← Nat.card_congr (Multiplicative.ofAdd : GaloisField p q ≃ additiveFieldGroup p q)]
+  exact GaloisField.card p q hq
+
+/-- For nonzero `s ∈ P`, the centralizer size needed by the q≥5 column
+orthogonality estimate is `p^q`. -/
+theorem normOneFrobenius_centralizer_inl_card_eq [Fact p.Prime] (hq : 1 < q)
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    Nat.card
+        (Subgroup.centralizer
+          ({(SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)} : Set (normOneFrobeniusGroup p q))) =
+      p ^ q := by
+  rw [normOneFrobenius_centralizer_inl_eq_kernel p q hq hs]
+  exact normOneFrobeniusKernel_card_eq p q (by omega)
+
 /-- The conjugacy class in `H = P ⋊ U` of the additive-kernel element attached to
 `s ∈ 𝔽_{p^q}`.  BG Lemma C.2 uses the class of a nonzero `s ∈ P`. -/
 noncomputable def normOneClassAt [Fact p.Prime] (s : GaloisField p q) :

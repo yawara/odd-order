@@ -135,6 +135,15 @@ AxiomsCheck 登録済み。
 (`inertia_eq_of_frobeniusGroup`, `isIrreducibleCharacter_induce_of_frobeniusGroup`) に直接渡せる形。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 centralizer size for column orthogonality (2026-06-04)
+`normOneFrobenius_centralizer_inl_eq_kernel` で、非零 `s∈P` について
+`C_H(inl s)=P` を証明。`≤` は上の `IsFrobeniusGroup.centralizer_kernel_le`、`P≤C_H(s)` は
+additive kernel の可換性から出す。さらに `normOneFrobeniusKernel_card_eq` と
+`normOneFrobenius_centralizer_inl_card_eq` で `|C_H(inl s)|=p^q` を固定した。
+これは BG Lemma C.2 q≥5 の第二直交関係評価
+`∑_{χ∈Irr(H)} |χ(s^j)|² = |C_H(s^j)| = |P|` に使う concrete 入力。
+AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、
