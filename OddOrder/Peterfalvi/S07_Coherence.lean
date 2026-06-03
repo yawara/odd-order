@@ -3496,6 +3496,50 @@ noncomputable def retarget_isCoherent_of_supportedDecomposition
 
 open scoped Classical in
 open OddOrder.RepresentationTheory in
+/-- **(5.6.3) supported per-step coherence, `hperElem` discharged from the member family (X-family).**
+
+The X-family analogue of `retarget_isCoherent_of_decompositions_and_memberFamily`: routes through the
+supported decomposition `Da` only (no `ψ=0` `D₀`, no `τχ ∈ ZIrr`), discharging the per-element
+`R(χ)`-orthogonality `hperElem` from the per-member `ψ = 0` decompositions `Dmem` of `S₁` (mmd L77,
+"`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)"). -/
+noncomputable def retarget_isCoherent_of_supportedDecomposition_and_memberFamily
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    (Dmem : (x : ClassFunction L ℂ) → x ∈ S₁ →
+      CharacterPsiDecomposition (L := L) (G := G) τ x 0)
+    (hmemOrtho : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).imageFamily.Orthogonal Da.imageFamily)
+    (hmemTau1 : ∀ (x : ClassFunction L ℂ) (hx : x ∈ S₁),
+      (Dmem x hx).tau1 x = hS₁.extension x)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  have hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ Da.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0 := by
+    intro ξ hξ α hα
+    refine inner_extension_orthogonal_imageSet_of_members hS₁.extension ?_ hξ
+    intro x hx
+    exact inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily (Dmem x hx)
+      (hmemOrtho x hx) (hmemTau1 x hx) hα
+  exact retarget_isCoherent_of_supportedDecomposition hS₁ Da hχbar_eq hχχ hχbarχbar hχχbar hχbarχ
+    hchi1chi1 hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY htau1_chi1 hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence from a shared-isometry decomposition pair.**
 
 The full (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` with the two
