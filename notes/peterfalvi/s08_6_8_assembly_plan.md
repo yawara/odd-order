@@ -420,12 +420,28 @@ transfer 2 補題; S03 の `≤N` quotient-FPF 補題。
   (Ind θ∈ZIrr `induce_mem_ZIrr` + Fourier係数≥0 via Frobenius+`inner_irreducible_nonneg` Clifford:988)。
   最後 Ind θ∈X→hX→Ind θ既約→`irreducibleCharacter_inner_eq_ite`(ZIrrFourier:40)で Ind θ=χ。
 
-**残 T7 infra (full Xset_eq 用, ~200 LOC, B の downstream=T9/T11 degree-sum が消費, B 自体は不要)**:
-- **H0** `IsCharacter.restrict` (~8, `restrict_repCharacterClassFunction` InducedCharacter:625)
-- **H1** `characterKernel_subset_of_natFinsupp_eq_sum` (~40, G2.2 を natFinsupp data から; 両方向共通)
-- **H2** `induce_exists_natFinsupp_eq_sum` (~50, Ind θ の ℕ分解; exists_natFinsupp を ZIrr+Frobenius-nonneg で再現)
-- characterization 本体 (~100, ⊆/⊇)。最小 Z-仮説 = `Z≤H`+`[Z.Normal]` のみ (Z⊆Z(H)/Z≠⊥ は upstream)。
-- 配置: 当面 S08-local、将来 S03 ConstituentKernel へ移設可。c2 (case A X⊆Irr, FPF route) は §F 通り別途。
+**✅✅ T7 char 完了 (2026-06-03, commit ece4803; full `lake build OddOrder` 3562 + AxiomsCheck green,
+axiom-clean = `#print axioms` で propext/Classical.choice/Quot.sound のみ, 新 sorry 0)**:
+- **H0** `isCharacter_restrict` (commit 3bb133a, S08:45) — `restrict_repCharacterClassFunction` 経由。
+- **H1-core** `characterKernel_subset_of_natFinsupp_eq_sum` (S08) — G2.2 keystone を Finsupp ℕ分解から
+  再パッケージ (dite-totalized `IrreducibleCharacter` 族 + natural degrees `exists_natDegree_charValue_one_dvd_card`)。
+- **H1-genuine** `characterKernel_subset_of_isCharacter_of_inner_ne_zero` — core ∘ `exists_natFinsupp_eq_sum`。
+- `inner_isCharacter_nonneg` (⟨genuine,genuine⟩≥0) — RHS 分解 → `inner_irreducible_nonneg` 各項。
+- **H2** `induce_exists_natFinsupp_eq_sum` — Ind θ の ℕ分解を `ClassFunction.induce_mem_ZIrr` +
+  Frobenius-nonneg (`ClassFunction.inner_induce_eq_inner_restrict` + `inner_isCharacter_nonneg`) で再現。
+- **H2-wrapper** `characterKernel_subset_of_inner_induce_ne_zero` — core ∘ H2。
+- 本体 `Xset_eq_irreducible_not_subset_characterKernel` (SibleyDadeHypothesis namespace, S08) — 最小 Z-仮説
+  `Z≤H`+`[Z.Normal]` のみ。⊆=H1-genuine on Res / ⊇=H2-wrapper on Ind + `exists_inner_induce_ne_zero` +
+  (1.6.a fwd `subsetCharacterKernel_induce_of_subgroupOf`) + orthonormality (`irreducibleCharacter_inner_eq_ite`)。
+- 配置: S08-local (将来 S03 ConstituentKernel へ移設可)。**[Is] 2.21 不使用を実証**。
+- **Lean 罠 (実装で判明)**: `inner_smul_right` は mathlib `_root_.inner_smul_right` と曖昧 → 完全修飾
+  `OddOrder.RepresentationTheory.inner_smul_right`。`induce_mem_ZIrr`/`inner_induce_eq_inner_restrict` は
+  nested `ClassFunction` namespace → `ClassFunction.` 前置。`coe_trivialIrreducibleCharacter` は
+  `IrreducibleCharacter.` namespace。`star (↑n)`=`star_natCast`。
+
+**🔜 T7 残**: c2 (case A `X⊆Irr L`, brick② FPF route) は §F の通り別途 (本 Xset_eq とは独立、case A 専用)。
+**次 = T8** (`DadeChainStep` 実 instance; B engine surgery で blocker 解消済 = `peterfalvi_66_coherence_of_X_from_dade`
+が X-family で instantiate 可) → T9/T10 (glue) → T11 + capstone `sibleySetup_is_coherent` (S08 唯一の sorry)。
 
 ## I. B (engine surgery) refined plan — TRACTABLE adapter, NOT parallel engine (2026-06-03)
 

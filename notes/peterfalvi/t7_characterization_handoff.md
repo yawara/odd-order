@@ -1,5 +1,14 @@
 # 引き継ぎ: Peterfalvi (6.8) T7 — `Xset_eq` 特徴付け (H1 から再開)
 
+> **✅✅ 完了 (2026-06-03, commit ece4803)**: H1-core/H1-genuine/`inner_isCharacter_nonneg`/H2
+> (`induce_exists_natFinsupp_eq_sum`)/H2-wrapper + 本体 `Xset_eq_irreducible_not_subset_characterKernel`
+> 全 landed。full `lake build OddOrder` 3562 + AxiomsCheck green, axiom-clean
+> (propext/Classical.choice/Quot.sound のみ), 新 sorry 0。**この引き継ぎの目標は達成済**。
+> 設計は計画通りに通った (下記スケッチがほぼそのまま動作)。実装で判明した Lean 罠は
+> `s08_6_8_assembly_plan.md` §H 末尾に追記。次タスク = T8 (DadeChainStep 実 instance)。
+> 以下は歴史的記録として保存 (再開時の出発点だった H1 設計)。
+
+
 **作業場所**: `/home/ywr/odd-order-pf-engine` (branch `pf-engine-support`)。Bash cwd は毎回 main にリセット
 されるので全コマンド `cd /home/ywr/odd-order-pf-engine && …`。main 不可侵 / repr-infra は別セッション。
 
