@@ -93,6 +93,13 @@ theorem centerFittingInG_le (M : Subgroup G) :
     centerFittingInG M ≤ M :=
   (centerFittingInG_le_fittingInG M).trans (fittingInG_le M)
 
+/-- The ambient realization of Z(F(M)) is commutative. -/
+theorem centerFittingInG_isMulCommutative (M : Subgroup G) :
+    IsMulCommutative ↥(centerFittingInG M) := by
+  rw [centerFittingInG]
+  exact Subgroup.map_isMulCommutative (Subgroup.center ↥(fittingInG M))
+    (fittingInG M).subtype
+
 /-- The center of `F(M)`, viewed as a subgroup of `M`, is normal in `M`.
 
 This is the ambient form of the elementary fact that the center of a normal subgroup is
@@ -175,6 +182,38 @@ theorem centerFittingOpCoreInG_subgroupOf_normal (q : ℕ) (M : Subgroup G) :
     (Subgroup.normal_subgroupOf_iff_le_normalizer (centerFittingInG_le M)).mp
       (centerFittingInG_subgroupOf_normal M)
   exact le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ) hMZ
+
+/-- If q divides the order of Z(F(M)), then O_q(Z(F(M))) is nontrivial. -/
+theorem centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center [Finite G]
+    {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hq : q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors) :
+    centerFittingOpCoreInG q M ≠ ⊥ := by
+  let Z : Subgroup G := centerFittingInG M
+  let P : Sylow q ↥Z := default
+  let N : Subgroup G := (P : Subgroup ↥Z).map Z.subtype
+  have hq_dvd : q ∣ Nat.card ↥Z := (Nat.mem_primeFactors.mp hq).2.1
+  have hP_ne : (P : Subgroup ↥Z) ≠ ⊥ := P.ne_bot_of_dvd_card hq_dvd
+  have hN_ne : N ≠ ⊥ := by
+    intro hN_bot
+    exact hP_ne ((Subgroup.map_eq_bot_iff_of_injective (P : Subgroup ↥Z)
+      Z.subtype_injective).mp hN_bot)
+  haveI hZ_comm : IsMulCommutative ↥Z := by
+    dsimp [Z]
+    exact centerFittingInG_isMulCommutative M
+  have hNZ : N ≤ Z := by
+    dsimp [N]
+    exact Subgroup.map_subtype_le _
+  have hNnorm : (N.subgroupOf Z).Normal :=
+    Subgroup.normal_of_isMulCommutative (N.subgroupOf Z)
+  have hNpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) N := by
+    dsimp [N]
+    exact isPiSubgroup_singleton_of_isPGroup (P.isPGroup'.map Z.subtype)
+  have hNle : N ≤ centerFittingOpCoreInG q M := by
+    dsimp [centerFittingOpCoreInG, Z]
+    exact le_opiCoreInG_of_normal_of_isPiSubgroup hNZ hNnorm hNpi
+  intro hcore_bot
+  apply hN_ne
+  exact le_bot_iff.mp (by rw [← hcore_bot]; exact hNle)
 
 /-- **BG (8.1), left inclusion**: `Z(F(M))` centralizes every subgroup contained in
 `F(M)`, hence lies in the relative centralizer `C_{F(M)}(A₀)`. -/

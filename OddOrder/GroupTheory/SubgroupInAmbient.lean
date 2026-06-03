@@ -56,6 +56,17 @@ theorem isPiSubgroup_opiCoreInG [Finite G] (π : Set ℕ) (H : Subgroup G) :
   rw [card_opiCoreInG] at hr
   exact Ch03.oPiCore.isPiGroup π r hr
 
+/-- A q-group is a singleton pi-subgroup. -/
+theorem isPiSubgroup_singleton_of_isPGroup [Finite G] {q : ℕ} [Fact q.Prime]
+    {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H := by
+  intro r hr
+  obtain ⟨n, hn⟩ := hH.exists_card_eq
+  by_cases hn0 : n = 0
+  · rw [hn, hn0, pow_zero] at hr
+    simp at hr
+  · rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : q.Prime)] at hr
+    simpa using hr
+
 /-- A `{q}`-subgroup is a `q`-group. -/
 theorem isPGroup_of_isPiSubgroup_singleton [Finite G] {q : ℕ} [Fact q.Prime]
     {H : Subgroup G} (hH : Subgroup.IsPiSubgroup {q} H) : IsPGroup q ↥H :=
