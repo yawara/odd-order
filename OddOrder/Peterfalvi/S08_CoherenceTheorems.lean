@@ -1274,9 +1274,10 @@ as a function of the member-family enumeration data.  This wires the landed crux
 Inputs: `IsCoherent τ S₁ A` for the Dade map `τ`, a non-real irreducible `χ` orthogonal to all of
 `S₁` (with `χ̄` likewise), and a finite orthonormal member family `{χmem i}ᵢ∈ₛ ⊆ S₁` with degree
 ratios `deg i` (base member `i₁` of ratio `1`), the degree-matched supported differences
-`χmem i − deg i·χmem i₁` and `χ − a·χmem i₁`, and the **ZIrr-codomain facts** `ν χmem i ∈ ZIrr`,
-`(χ − a·χmem i₁)^τ ∈ ZIrr` taken as explicit hypotheses (`IsCoherent` records no ZIrr-codomain — the
-running coherence engine supplies them, cf. `retarget_mem_ZIrr`).  The construction:
+`χmem i − deg i·χmem i₁` and `χ − a·χmem i₁`, and the supported Dade-image ZIrr fact
+`(χ − a·χmem i₁)^τ ∈ ZIrr`.  The members' ZIrr-codomain `ν χmem i ∈ ZIrr` is read off the
+`IsCoherent.extension_mem_ZIrr` field (route A: `χmem i ∈ S₁ ⊆ ℤ[S₁]`), not passed as a hypothesis.
+The construction:
 
 * `Da := decompositionDaFromDadeOfDiff …` (the χ-decomposition for `χ − a·χ₁`), with `Da.Y ∈ ZIrr`
   derived from `Da.X ∈ ℤ[R(χ)]` and `(χ − a·χ₁)^τ ∈ ZIrr`;
