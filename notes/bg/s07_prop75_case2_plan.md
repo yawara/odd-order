@@ -48,9 +48,9 @@ b の ↥P 内共役 orbit は ≤p 要素。orbit⊆B∖{1} (<p²) + orbit-stab
 - `IsPGroup.exists_le_sylow (hP : IsPGroup p P₁sub) : ∃ Q : Sylow p ↥(C_G(b)), P₁sub ≤ Q` (P₂ 取得; ↥(C_G(b)) 内で適用)。
 - `Subgroup.centerCharacteristic : (center _).Characteristic` (Z(P₁) char P₁; P₁⊴P₂ ⟹ Z(P₁)⊴P₂)。
 - `Subgroup.card_mul_index : Nat.card H * H.index = Nat.card G` (|P₂:P₁| 計算)。`thmA4b` (Thm 6.1)。
-- **🔴 GAP: 「p-群 P₂ の index-p 部分群 P₁ は正規」** が mathlib に無い (index_eq_two のみ)。
-  p-群の maximal 部分群は正規 (nilpotent) で導けるが ~30 LOC 要。`Group.IsNilpotent`+maximal→normal or
-  Frattini 経由。|P₂:P₁|=1 の場合は自明。
+- **✅ GAP 解消: index-p⟹normal は `Subgroup.normal_of_index_eq_minFac_card` (IndexNormal.lean:45)**:
+  `H.index = (Nat.card G).minFac ⟹ H.Normal`。P₂ p-群ゆえ `(card P₂).minFac = p`、`P₁.index = p` で適用。
+  |P₂:P₁|=1 は `normal_of_index_eq_one`。**⟹ cyclic 分岐に missing infra は無し、純実装のみ**。
 - 連鎖: P₁=C_P(b)=C_G(b)⊓↑P を ↥(C_G(b)) で P₂ に拡張, |P₂|≤|G|_p=|P| ∧ |P₁|≥|P|/p ⟹ |P₂:P₁|≤p,
   P₁⊴P₂ (gap), Z(P₁)⊴P₂, thmA4b ⟹ z∈Z(P₁)⊆O_{p',p}(C_G(b))。
 
