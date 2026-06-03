@@ -3406,6 +3406,96 @@ noncomputable def retarget_isCoherent_of_decompositions_and_memberFamily
 
 open scoped Classical in
 open OddOrder.RepresentationTheory in
+/-- **Peterfalvi (5.6.3) per-step coherence from the SUPPORTED decomposition alone (X-family).**
+
+The `ψ = 0` decomposition `D₀` of `retarget_isCoherent_of_decomposition[s]` requires `τ₁χ ∈ ℤ[Irr G]`,
+which fails for an *unsupported* induced `χ = Ind θ` (there `τ` is an off-support arbitrary
+extension, so `τχ ∉ ℤ[Irr G]`).  This variant routes coherence entirely through the **supported**
+decomposition `Da` of `χ − a·χ₁` (built from `(χ − a·χ₁)^{τ₁} ∈ ℤ[Irr G]`, which holds because the
+degree-matched difference `χ − a·χ₁` vanishes at `1` and is supported on `A`): the target image is
+`X := Da.X`, and the `{X, X̄}` orthonormality is *derived* from `Da` via the (5.4.a) keystone
+`inner_self_chi_eq_sum_coeff` and the total-norm identity `inner_self_chi_add_psi_eq` — **never**
+`τχ ∈ ZIrr`.  The remaining inputs are those of `retarget_isCoherent_of_decompositions` minus the
+`ψ = 0` decomposition `D₀` and the `τ₁`-agreement, plus the member norm `‖χ₁‖² = 1`. -/
+noncomputable def retarget_isCoherent_of_supportedDecomposition
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A)
+    {χ chibar chi1 : ClassFunction L ℂ} {a : ℕ}
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1))
+    (hχbar_eq : chibar = χ.conj)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner chibar chibar = 1)
+    (hχχbar : ClassFunction.inner χ chibar = 0) (hχbarχ : ClassFunction.inner chibar χ = 0)
+    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    (hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ∀ α ∈ Da.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, chibar}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
+    IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
+  classical
+  subst hχbar_eq
+  -- `himg` from the supported decomposition (the (5.6.2) image equation).
+  have himg : τ (χ - a • chi1) = Da.X - a • hS₁.extension chi1 :=
+    image_eq_of_decomposition hS₁ Da htau1_diff hY htau1_chi1
+  -- `⟨a•χ₁, a•χ₁⟩ = a²`, `⟨τ₁χ₁, τ₁χ₁⟩ = ⟨χ₁,χ₁⟩ = 1`, hence `⟨Y, Y⟩ = a²`.
+  have hpsipsi : ClassFunction.inner (a • chi1 : ClassFunction L ℂ) (a • chi1) = (a : ℂ) ^ 2 := by
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a chi1]
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hchi1chi1,
+      star_natCast]
+    ring
+  have hextchi1 : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = 1 := by
+    rw [hS₁.extension_inner_eq chi1 chi1 (Submodule.subset_span hchi1)
+      (Submodule.subset_span hchi1), hchi1chi1]
+  have hYY : ClassFunction.inner Da.Y Da.Y = (a : ℂ) ^ 2 := by
+    rw [hY]
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a (Da.tau1 chi1)]
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, htau1_chi1,
+      hextchi1, star_natCast]
+    ring
+  -- `‖X‖² = 1` from the total-norm identity `‖χ‖² + ‖a•χ₁‖² = ‖X‖² + ‖Y‖²`.
+  have hXX : ClassFunction.inner Da.X Da.X = 1 := by
+    have h := Da.inner_self_chi_add_psi_eq
+    rw [hχχ, hpsipsi, hYY] at h
+    linear_combination -h
+  -- `⟨X, (χ−χ̄)^τ⟩ = ∑ coeff = ⟨χ,χ⟩ = 1` (the (5.4.a) keystone, supported route).
+  have hXtau : ClassFunction.inner Da.X (τ (χ - χ.conj)) = 1 := by
+    rw [Da.imageFamily.image_eq, Da.inner_X_sum, ← Da.inner_self_chi_eq_sum_coeff, hχχ]
+  have hXtau' : ClassFunction.inner (τ (χ - χ.conj)) Da.X = 1 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hXtau, star_one]
+  -- `‖(χ−χ̄)^τ‖² = ‖χ−χ̄‖² = 2` (isometry of `τ₁` on the supported difference).
+  have htautau : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) = 2 := by
+    rw [← Da.tau1_agrees, Da.tau1_inner_eq_on_support (χ - χ.conj) (χ - χ.conj)
+        (CharacterPsiDecomposition.chi_sub_conj_mem_zSpan_support (χ := χ) (ψ := a • chi1))
+        (CharacterPsiDecomposition.chi_sub_conj_mem_zSpan_support (χ := χ) (ψ := a • chi1)),
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      hχχ, hχbarχbar, hχχbar, hχbarχ]
+    ring
+  -- `{X, X̄}` orthonormality, `X̄ := X − (χ−χ̄)^τ`.
+  have hXbarXbar : ClassFunction.inner (Da.X - τ (χ - χ.conj)) (Da.X - τ (χ - χ.conj)) = 1 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      hXX, hXtau, hXtau', htautau]; ring
+  have hXXbar : ClassFunction.inner Da.X (Da.X - τ (χ - χ.conj)) = 0 := by
+    rw [ClassFunction.inner_sub_right, hXX, hXtau]; ring
+  have hXbarX : ClassFunction.inner (Da.X - τ (χ - χ.conj)) Da.X = 0 := by
+    rw [ClassFunction.inner_sub_left, hXX, hXtau']; ring
+  -- The running images `τ₁ ξ` (`ξ ∈ ℤ[S₁]`) are orthogonal to `X` and `X̄` (from `hperElem`).
+  have hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) Da.X = 0 := fun ξ hξ =>
+    Da.inner_X_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
+  have hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
+      ClassFunction.inner (hS₁.extension ξ) (Da.X - τ (χ - χ.conj)) = 0 := fun ξ hξ =>
+    Da.inner_conjImage_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
+  exact retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ hXX hXbarXbar hXXbar hXbarX
+    hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
+
+open scoped Classical in
+open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence from a shared-isometry decomposition pair.**
 
 The full (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` with the two
