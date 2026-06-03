@@ -144,6 +144,14 @@ additive kernel の可換性から出す。さらに `normOneFrobeniusKernel_car
 `∑_{χ∈Irr(H)} |χ(s^j)|² = |C_H(s^j)| = |P|` に使う concrete 入力。
 AxiomsCheck 登録済み。
 
+#### ✅ q≥5 concrete column-orthogonality specialization (2026-06-04)
+`OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality` の public theorem を concrete
+`H=P⋊U` に適用し、`normOneFrobenius_column_sq_sum_inl_eq` で
+`∑_{χ∈Irr(H)} χ(inl s) * star(χ(inl s)) = p^q` (`s≠0`) を証明。
+さらに product class 側の `2*s` 用に `normOneFrobenius_column_sq_sum_two_mul_eq` も追加した。
+次の q≥5 target は、この全既約指標和を BG の induced degree-`|U|` characters 部分和の上界へ制限し、
+structure coefficient lower bound に組み込むこと。AxiomsCheck 登録済み。
+
 #### ✅ class-sum `IsClassPair` への片方向 bridge (2026-06-04)
 `AppC_FrobeniusClassSum.lean` を追加し、class-sum 依存を finite-field leaf から分離。
 `normOneClassAt s := ConjClasses.mk (inl s)` を定義し、

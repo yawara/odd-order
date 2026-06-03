@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.Set.Card.Arithmetic
 import OddOrder.BG.AppC_NormSet
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
@@ -218,6 +219,35 @@ theorem normOneFrobenius_centralizer_inl_card_eq [Fact p.Prime] (hq : 1 < q)
       p ^ q := by
   rw [normOneFrobenius_centralizer_inl_eq_kernel p q hq hs]
   exact normOneFrobeniusKernel_card_eq p q (by omega)
+
+/-- Column orthogonality specialized to a nonzero additive-kernel element
+of the concrete Frobenius group `H = P ⋊ U`: the squared column norm is `p^q`. -/
+theorem normOneFrobenius_column_sq_sum_inl_eq [Fact p.Prime] (hq : 1 < q)
+    {s : GaloisField p q} (hs : s ≠ 0) :
+    (∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)) *
+          star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd s) :
+              normOneFrobeniusGroup p q)))) =
+      ((p ^ q : ℕ) : ℂ) := by
+  rw [column_orthogonality_diagonal]
+  rw [normOneFrobenius_centralizer_inl_card_eq p q hq hs]
+
+/-- The same column-orthogonality specialization at the additive-kernel element
+`2*s`, the product class representative in BG Lemma C.2. -/
+theorem normOneFrobenius_column_sq_sum_two_mul_eq [Fact p.Prime] (hq : 1 < q)
+    {s : GaloisField p q} (hs : s ≠ 0) (h2 : (2 : GaloisField p q) ≠ 0) :
+    (∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+        ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+              normOneFrobeniusGroup p q)) *
+          star (((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd ((2 : GaloisField p q) * s)) :
+              normOneFrobeniusGroup p q)))) =
+      ((p ^ q : ℕ) : ℂ) :=
+  normOneFrobenius_column_sq_sum_inl_eq p q hq (mul_ne_zero h2 hs)
 
 /-- The conjugacy class in `H = P ⋊ U` of the additive-kernel element attached to
 `s ∈ 𝔽_{p^q}`.  BG Lemma C.2 uses the class of a nonzero `s ∈ P`. -/
