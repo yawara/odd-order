@@ -1782,6 +1782,36 @@ theorem fittingInG_isPiSubgroup_primesOf_fittingInG_of_cFittingInG_le_of_not_pGr
   exact primesOf_fittingInG_subset_primesOf_cFittingInG_of_cFittingInG_le_of_not_pGroup
     hG hM hA0 hm hFnp hA hAH
 
+/-- BG (8.6), Fitting-prime support form with Hypothesis 7.1 supplied by BG (8.5). -/
+theorem primesOf_fittingInG_subset_primesOf_cFittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hAH : cFittingInG M A0 ≤ H) :
+    OddOrder.BG.Ch2.S07.primesOf (fittingInG H) ⊆
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) :=
+  primesOf_fittingInG_subset_primesOf_cFittingInG_of_cFittingInG_le_of_not_pGroup
+    hG hM hA0 hm hFnp
+    (hypothesis71_cFittingInG_of_not_pGroup hG hM hp hA0 hFnp) hAH
+
+/-- BG (8.6), pi-subgroup form with Hypothesis 7.1 supplied by BG (8.5). -/
+theorem fittingInG_isPiSubgroup_primesOf_fittingInG_of_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hAH : cFittingInG M A0 ≤ H) :
+    Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))
+      (fittingInG H) :=
+  fittingInG_isPiSubgroup_primesOf_fittingInG_of_cFittingInG_le_of_not_pGroup
+    hG hM hA0 hm hFnp
+    (hypothesis71_cFittingInG_of_not_pGroup hG hM hp hA0 hFnp) hAH
+
 /-- **BG Theorem 8.1(a)** (mmd L2319-2321): `M ∈ ℳ`, `p ∈ π(F(M))`, `A₀ ∈ ℰ_p^*(F(M))`,
 `m(A₀) ≥ 3`。`F(M)` が `p`-群でなければ `C_{F(M)}(A₀) ∈ 𝒰`。 -/
 theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -1820,6 +1850,17 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
   refine IsUniquelyMaximal.of_unique_maximal hA_proper hM hA_le_M ?_
   intro H hH hAH
   have hHco : IsCoatom H := hH
+  have hAH_cFitting : cFittingInG M A₀ ≤ H := by
+    dsimp [A] at hAH
+    exact hAH
+  have hFittingH_pi : Subgroup.IsPiSubgroup
+      (OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) (fittingInG H) :=
+    fittingInG_isPiSubgroup_primesOf_fittingInG_of_not_pGroup
+      hG hM hp hA₀ hm hFnp hAH_cFitting
+  have hSigma_subset_pi : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) ⊆
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    intro q hq
+    exact hFittingH_pi q (by simpa [OddOrder.BG.Ch2.S07.primesOf] using hq)
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
