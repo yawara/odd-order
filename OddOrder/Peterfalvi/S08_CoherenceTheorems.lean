@@ -1575,8 +1575,8 @@ noncomputable def xChainCoherent
     {X S₀ : Set (ClassFunction ↥L ℂ)}
     (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
     (χs : ℕ → IrreducibleCharacter ↥L)
-    (hpair0 : ∀ i, (pair i).1 = (χs i : ClassFunction ↥L ℂ))
-    (hpair1 : ∀ i, (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
+    (hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
     (hS₀ : S₀ ⊆ X)
     (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ X)
     (hcover : ∀ χ ∈ X, χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
@@ -1593,7 +1593,7 @@ noncomputable def xChainCoherent
       X (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
   OddOrder.Peterfalvi.S07.coherentOfPairChainCover pair N hS₀ hpairs hcover h0
     (fun i hi hcoh => by
-      rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i) (hpair1 i)]
+      rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
       exact (hstep i hi hcoh).adjoin)
 
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
