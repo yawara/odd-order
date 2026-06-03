@@ -580,6 +580,20 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 
 **全 math lemma 完了ゆえ残は mechanical-ish wiring(但し T8 enum との接続は非自明・substantial)。**
 
+#### J.3.6 🔶 最終 assembly の blocker = ZIrr-codomain gap (2026-06-04, 着手→診断)
+
+最終 assembly(chain fold で X-coherence 構築)を着手して判明: **`crux1_of_memberFamily` の `hνZ : νχⱼ∈ZIrr` が IsCoherent から取れない**(§J.3.3 構造的発見1 が最終段で blocker 化)。`νχⱼ∈ZIrr` の用途 = (a) indexed projection の integer 係数、(b) μ∈ℤ(`inner_mem_ZIrr_int`)— 両方必須。
+
+**chain fold は再利用可**: `peterfalvi_66_coherence_of_X`(S07, abstract)は per-step `hstep : ∀i<N, IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` を取る ⟹ bridge ベース per-step を供給すれば良い(`DadeChainStep` 不使用)。但し per-step が `crux1_of_memberFamily` を呼ぶ ⟹ running accumulator の member family(orthonormal + ZIrr + degree)が要る。
+
+**ZIrr-codomain は誘導的に維持可(コード診断済)**: `retarget τ₁ χ χ̄ X Xbar = τ₁∘orthoResidualMap + ⟨χ,·⟩•X + ⟨χ̄,·⟩•Xbar`(S07:2348)⟹ `retarget…φ ∈ ZIrr`(φ∈ZIrr L)は **X,Xbar∈ZIrr + 旧 τ₁ が ZIrr→ZIrr + orthoResidual が ZIrr 保存(χ,χ̄∈ZIrr L で integer projection)**で出る。bridge の X=τ(χ−a·chi1)+a·νchi1 は ZIrr(supported Dade 像 + νchi1∈ZIrr)、Xbar=X−τ(χ−χ̄) も ZIrr。⟹ **誘導不変量として thread 可能**。
+
+**2 つの実装路(設計 fork)**:
+- **(A) `IsCoherent` 強化**(正攻法・invasive): field `extension_mem_ZIrr : ∀φ∈ZIrr L, extension φ∈ZIrr G` 追加。影響 = S07 の IsCoherent 構成 ~5 site(`retarget_isCoherent`(2916, 要 X,Xbar∈ZIrr 新仮説 + χ,χ̄∈ZIrr L)/`coherentEqualDegree`(3095)/`coherentEqualDegree_fromDade`(5109)/`galoisTransport`(1471)/他)が新 field を証明。consumer(S08-S16)は不変(struct 強化のみ)。bridge/DadeChainStep に X,Xbar∈ZIrr 伝播。**正しい定義(coherence=ℤ[Irr G] への isometry)だが multi-site refactor、retarget ZIrr 証明は非自明**。
+- **(B) ZIrr companion thread**(localized・S08): `(IsCoherent τ Sᵢ A) × (∀x∈Sᵢ, ν x∈ZIrr)` を per-step で thread、custom chain fold(`peterfalvi_66_coherence_of_X` の induction を companion 付きで再導出)。S07 不変だが chain logic 重複。companion 維持: x∈S₁⟹τ₂ x=τ₁ x∈ZIrr(直交)、χ↦X∈ZIrr、χ̄↦Xbar∈ZIrr。
+
+**現状**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。(6.8) は orphaned ゆえ invasive (A) を打つか localized (B) か checkpoint かは戦略判断。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
