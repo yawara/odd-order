@@ -126,7 +126,12 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
 **⟹ (6.8) capstone への完全残路 (bottom-up)**:
 1. **§G B1** = Theorem (5.6) 量的形 (非coherence⟹degree-sum下界)。`retarget_isCoherent` の hypotheses (特に
    degree 不等式 `2a<∑aᵢ²`) の対偶。**foundational・未 landed**。
-2. **§G B2** = S(A)-side degree-sum 恒等式 `∑χ(1)²/‖χ‖²=|L:K|(|K:A|−1)`。
+2. **§G B2** = S(A)-side degree-sum 恒等式 `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|(|K:A|−1)`。**部分既 landed**:
+   `sumNonInflatedDegreeSq_eq_index_mul` (InflationCharacter:374) が **case A の Irr-L-side**
+   `∑_{χ∈Irr L, Z⊄ker χ}χ(1)²=[L:H][H:Z](|Z|−1)` を Burnside on L で供給 (case A は X⊆Irr L ゆえ X-side と一致)。
+   **(6.2) の S(A)-side は追加要**: `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|∑_{θ∈T}θ(1)²` (induced-char の W₁-orbit
+   |L:K|-to-1 counting) + `∑_{θ∈Irr(K/A)∖1}θ(1)²=|K:A|−1` (Burnside on K/A, core=`sumIrreducibleDegreeSq`+inflation 既存)。
+   orbit counting (S(A)={distinct Ind θ} ↔ T={θ} の |W₁|-to-1) が新規部分。
 3. θ(1)≤|K:C|√|C:D| bound。
 4. (6.2)→(6.3)→(6.5) (上記, B1/B2/bound 後は代数 + 帰納)。
 5. T-A4 part(a) member-family enum → T-A4 assemble → T-A5 glue (coherentUnion_of_glued, Y=coherentYFamily)。
