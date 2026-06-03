@@ -1480,6 +1480,132 @@ noncomputable def xAdjoinStep
     hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
     (hmemS1 i₁ hi₁) hcrux1 hcrux2 hSgen hgen
 
+open scoped Classical in
+/-- **(T-A2 input) Per-step `xAdjoinStep` data bundle.**
+
+Bundles the `xAdjoinStep` premises for one adjoining step of the X-family chain — the member family
+`{χmem i}ᵢ∈ₛ ⊆ S₁` (orthonormal, with the ZIrr-codomain injections `ν χmem i ∈ ZIrr`), the new
+character `χ`, the degree data, and the two lattice-generation conditions — into a single structure,
+so the chain fold `xChainCoherent` can take the per-step data as a function of the (inductively
+produced) accumulator coherence `hS₁`.  The index type `ι` is a field (each step has its own
+enumerated family). -/
+structure XAdjoinStepInput
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L) where
+  hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ)
+  hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+    OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  hχχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 1
+  hχbarχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ).conj = 1
+  hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0
+  hχbarχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0
+  hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0
+  hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0
+  ι : Type
+  s : Finset ι
+  χmem : ι → IrreducibleCharacter ↥L
+  deg : ι → ℕ
+  i₁ : ι
+  hi₁ : i₁ ∈ s
+  hmemreal : ∀ i ∈ s, ¬ ClassFunction.IsReal (χmem i : ClassFunction ↥L ℂ)
+  hmemdiffsupp : ∀ i ∈ s,
+    ((χmem i : ClassFunction ↥L ℂ).conj - (χmem i : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  hmemdegdiffsupp : ∀ i ∈ s,
+    ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁
+  hmembarS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ).conj ∈ S₁
+  hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i : ClassFunction ↥L ℂ) ∈ ZIrr G
+  hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+    (χmem i : ClassFunction ↥L ℂ).conj = 0
+  hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+    ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
+      if i = j then (1 : ℂ) else 0
+  a : ℕ
+  hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+    OddOrder.Peterfalvi.S04.supportInSubgroup A L
+  htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+    (hyp.fullDadeIsometryData hconj)
+    ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G
+  ha1 : deg i₁ = 1
+  hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2
+  hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+    (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)})
+  hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+    Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+      {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+       (χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)})
+
+/-- `xAdjoinStep` applied to a bundled `XAdjoinStepInput`, concluding coherence of `S₁ ∪ {χ, χ̄}`. -/
+noncomputable def XAdjoinStepInput.adjoin
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    {hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L} {hconj : hyp.HConjInvariant}
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    {hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L)}
+    {χ : IrreducibleCharacter ↥L} (inp : XAdjoinStepInput hyp hconj hS₁ χ) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
+  xAdjoinStep hyp hconj hS₁ χ inp.hrealχ inp.hdiffsuppχ inp.hχχ inp.hχbarχbar inp.hχχbar inp.hχbarχ
+    inp.hχ_S1 inp.hχbar_S1 inp.s inp.χmem inp.deg inp.i₁ inp.hi₁ inp.hmemreal inp.hmemdiffsupp
+    inp.hmemdegdiffsupp inp.hmemS1 inp.hmembarS1 inp.hmemνZ inp.hmemconjortho inp.hmemortho
+    inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg inp.hSgen inp.hgen
+
+/-- **(T-A2) The X-family coherence chain fold.**
+
+Folds the per-step adjoining `xAdjoinStep` (via `XAdjoinStepInput.adjoin`) over a degree-monotone
+conjugate-pair cover of `X` using the `coherentOfPairChainCover` engine: the base `S₀` is coherent
+(`h0`), the `i`-th step adjoins the pair `(pair i) = (χₛ i, (χₛ i)̄)` to the accumulator
+`pairUnion S₀ pair i` via `hstep i`, and the cover (`hS₀`/`hpairs`/`hcover`) recovers `X`.
+
+This is the route-B custom fold of the §J.3.6 plan: rather than strengthening `IsCoherent` with a
+ZIrr-codomain field (route A, T-A3), the per-step ZIrr-codomain facts are carried as fields of
+`XAdjoinStepInput hyp hconj hcoh (χₛ i)`, supplied as a function of the *inductively produced*
+accumulator coherence `hcoh`.  The construction of `hstep` from the actual degree-monotone
+enumeration of `X` (the `exists_conjugatePairCover` data) is the remaining T-A4 wiring. -/
+noncomputable def xChainCoherent
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {X S₀ : Set (ClassFunction ↥L ℂ)}
+    (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+    (χs : ℕ → IrreducibleCharacter ↥L)
+    (hpair0 : ∀ i, (pair i).1 = (χs i : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ i, (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
+    (hS₀ : S₀ ⊆ X)
+    (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ X)
+    (hcover : ∀ χ ∈ X, χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+    (h0 : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₀ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (hstep : ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) S₀ pair i)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L)),
+      XAdjoinStepInput hyp hconj hcoh (χs i)) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      X (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
+  OddOrder.Peterfalvi.S07.coherentOfPairChainCover pair N hS₀ hpairs hcover h0
+    (fun i hi hcoh => by
+      rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i) (hpair1 i)]
+      exact (hstep i hi hcoh).adjoin)
+
 /-- **Peterfalvi (6.8): Dade-based carrier** (T1, faithful replacement of `SibleySetup`).
 
 The legacy `SibleySetup` carried an opaque `coherence.tau` with a *global* `IsIntegralIsometry`,
