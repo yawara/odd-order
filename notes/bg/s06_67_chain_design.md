@@ -142,6 +142,45 @@ A p-群 ⟹ primesOf A={p} via `primesOf_eq_singleton hAp hAne`)。
 case1 A≠⊥: A=Ω₁(C_G(A)), A=⊥⟹C_G(A)=⊤⟹{x|x^p=1}=⊥⟹p∤|G|, hp_mem(p∣|G|)+Cauchy 矛盾。
 case1 A<⊤: A p-群, A=⊤⟹G p-群 nilpotent solvable, hG.notSolvable 矛盾。
 
+## Thm 6.7 実装分割 (確定プラン, 最重)
+
+S06 に `import OddOrder.GroupTheory.NarrowPGroup` (IsMaximalElementaryAbelian) +
+`import OddOrder.BG.Ch1_Preliminary.S01_Solvable` (Cor 1.12 + Prop 1.15(a)) 追加。
+
+**(B1) reduced-case lemma** `thm67_reduced` (O_{p'}=⊥ case, 数学的核心):
+仮定 `hK : oPiCore {q∉{p}} G = ⊥`, hpl1, `hE : IsMaximalElementaryAbelian p E`,
+`hLp' : ¬p∣|L|`, `hEL : E ≤ normalizer L` ⟹ `L = ⊥`。
+- S:Sylow p G, E≤S (`IsPGroup.exists_le_sylow` 系)。
+- 6.6 foundation + hK ⟹ `oPiPrimePiCore {p} G = S` ⟹ S⊴G (oPiPrimePiCore.normal)。
+- `S = oPiCore {p} G`: S≤O_p (`IsPiGroup.le_oPiCore`, S normal {p}-群); O_p≤O_{p',p}=S
+  (補題 `oPiCore {p} G ≤ oPiPrimePiCore {p} G`: O_p image≤O_p(G/M), pull back; or opCore 経由)。
+- `⁅L,E⁆ ≤ L⊓S = ⊥`: ⁅L,E⁆≤L (E≤N(L), `commutator_le_left`系/⁅E,L⁆≤L); ⁅L,E⁆≤S (E≤S⊴G);
+  L⊓S=⊥ (L p', S p-群)。⟹ L,E 各元可換 (L 中心化 E)。
+- E*(S) char: hE ⟹ E max-incl in S (E≤S) ⟹ ∀ x∈C_S(E), x^p=1 → x∈E
+  (`IsMaximalElementaryAbelian.le_of_le_centralizer` を F=⟨x⟩ で)。
+- **Cor 1.12 conj 適用**: φ := `S.normalizerMonoidHom.comp (inclusion (L≤N(S)=⊤))` : ↥L→*MulAut↥S;
+  `corollary_1_12 hp_odd (IsPGroup p ↥S = S.isPGroup') (¬p∣|↥L|) φ (E.subgroupOf S elem ab)
+   (h_fix: C_{↥S}(E.subgroupOf S) の order-p 元は E 内 ⟹ L 固定)` ⟹ ∀l∈L,s∈S, lsl⁻¹=s
+   (L 中心化 S, i.e. L≤C_G(S))。plumbing 先例 = S01 `mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer` (~L2350)。
+- Prop 1.15(a) `hall_higman_solvable_specialization hK : centralizer(oPiCore {p} G)≤oPiCore {p} G`。
+  S=oPiCore {p} ⟹ L≤C_G(S)≤S。L p'∩S p-群 ⟹ L≤L⊓S=⊥。`L=⊥`。
+
+**(B2) reduction + Thm 6.7** `thm67` (一般形): 結論 `L ≤ oPiCore {q∉{p}} G` (=O_{p'}(G))。
+K:=oPiCore {q∉{p}} G, q:=mk' K。
+- `oPiCore {q∉{p}} (G/K) = ⊥` (`oPiCore_quotient_self_eq_bot`)。
+- **Ē=E.map q ∈ IsMaximalElementaryAbelian p (G/K)** (lift, ~50 行): Ē elem ab (E∩K=1, ≅E);
+  max-incl: F̄⊇Ē elem ab, lift F̄=F/K (K≤F), P_F:Syl_p F ⊇E, P_F K=F (P_F surjects F/K),
+  ⁅P_F,P_F⁆≤K∩P_F=1 ∧ P_F^p≤K∩P_F=1 ⟹ P_F elem ab ≤G, E≤P_F, hE max-incl ⟹ P_F=E ⟹ F̄=Ē。
+- L̄=L.map q, ¬p∣|L̄| (image of p'); Ē≤normalizer L̄ (image normalizes image)。
+- **hasPLengthOne(G/K)**: `oPiPrimePiCore {p} G = comap q (oPiCore {p}(G/K))` (定義, K=M) ⟹
+  `(oPiPrimePiCore {p} G).map q = oPiCore {p}(G/K)` (map∘comap, q surj); O_{p',p}(G/K)=O_p(G/K)
+  (∵O_{p'}(G/K)=⊥) = O_{p',p}(G)/K; 第三同型 `quotientQuotientEquivQuotient`:
+  (G/K)/(O_{p',p}(G)/K) ≅ G/O_{p',p}(G) ⟹ card 一致, hpl1(G) ⟹ hasPLengthOne(G/K)。
+- `thm67_reduced` @G/K ⟹ L̄=L.map q=⊥ ⟹ L≤q.ker=K。∎
+
+**E*_p の述語**: `OddOrder.GroupTheory.IsMaximalElementaryAbelian p E`
+(= E.IsElementaryAbelian p ∧ ∀F elem ab, E≤F→F=E)。`.le_of_le_centralizer`,`.eq_of_le` helper 既存。
+
 ## E*(S) char (membership 形, Ω₁ 回避)
 
 ```lean

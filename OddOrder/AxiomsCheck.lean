@@ -1134,6 +1134,9 @@ set_option linter.style.longLine false in
 -- BG Prop 1.15(b) (Goldschmidt), general form: O_{p'}(C_G(R)) ≤ O_{p'}(G) (R p-subgroup, G solvable)。
 -- M₀=O_{p'}(G) で商 Ḡ=G/M₀ に落とし, Lem 1.14 で C_Ḡ(R̄)=(C_G(R)).map f, 特殊形@Ḡ で K=M.map f=⊥。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.oPiPrimeCore_centralizer_le_oPiPrimeCore
+-- BG Cor 1.12 (mmd L457): p 奇, G p-群, E elem ab, A p'-operators が C_G(E) の order-p 元を全固定
+-- ⇒ A は G 上自明。Thm 1.11 (=Isaacs 4.36) を C_G(C_G(A)) に + Prop 1.10 (G nilpotent)。Thm 6.7 で使用。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.corollary_1_12
 -- BG §6/§7 共有 engine: ↥V 可解 + π-Hall 共役 (Isaacs hall_C を subtype 像で G レベルへ);
 -- §7 Thm 7.4(d) と §6 Lem 6.5(c) の両方で使用。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf

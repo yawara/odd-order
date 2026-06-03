@@ -1917,6 +1917,91 @@ theorem thompson_critical_omega {G : Type*} [Group G] [Finite G] [Nontrivial G]
   rw [Subgroup.commutator_comm]
   exact hC.commutator_top_le_center_omega1Map
 
+open OddOrder.Isaacs.Ch03 (IsAInvariant) in
+/-- **BG Corollary 1.12** (mmd L457): `p` odd, `G` a `p`-group, `E` an elementary abelian
+subgroup, `A` a `p'`-group of operators on `G` (via `φ : A →* MulAut G`). If `A` fixes every
+order-`p` element of `C_G(E)`, then `A` acts trivially on `G`.
+
+**証明** (BG): `C := C_G(A)` (`fixedPointsOfMulAut φ`) とおく.
+- `E ⊆ C`: `E` の各元 `e` は `E` を中心化し (`E` abelian) かつ `eᵖ = 1` (`E` elementary
+  abelian) なので, `e ∈ C_G(E)` の order-`p` 元として仮定 `h_fix` で `A` に固定される,
+  すなわち `e ∈ C`.
+- `D := C_G(C)` は `A`-不変 (`IsAInvariant.centralizer`) で, `E ⊆ C` より `D ⊆ C_G(E)`
+  (centralizer の反単調性). `D` は `G` の部分群として `p`-群 (`hG.to_subgroup`).
+- `D` の order-`p` 元 `ḡ` は `(ḡ : G) ∈ D ⊆ C_G(E)` で `(ḡ)ᵖ = 1` ゆえ `h_fix` で `A` に固定;
+  ゆえに `restrictAction` 経由の `↥D` 上作用は全 order-`p` 元を固定. BG Thm 1.11 = Isaacs
+  Thm 4.36 (`isaacs_thm_4_36`) を `↥D` 上の制限作用に適用すると `A` は `↥D` 上自明に作用し,
+  これは `D ⊆ C`, すなわち `C_G(C) ⊆ C` を与える.
+- 最後に `G` は冪零 (`hG.isNilpotent`), `(|A|, |G|) = 1`, `C_G(C) ⊆ C` の三条件で BG
+  Prop 1.10 (`coprime_nilpotent_acts_trivially_of_centralizer_self`) を適用し結論. -/
+theorem corollary_1_12 {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2) (hG : IsPGroup p G) (hA_p' : ¬ p ∣ Nat.card A)
+    (φ : A →* MulAut G) {E : Subgroup G} (hE : E.IsElementaryAbelian p)
+    (h_fix : ∀ g : G, g ∈ Subgroup.centralizer (E : Set G) → g ^ p = 1 → ∀ a : A, (φ a) g = g) :
+    ∀ a : A, ∀ g : G, (φ a) g = g := by
+  set C := Subgroup.fixedPointsOfMulAut φ with hC
+  -- `C` is `A`-invariant (fixed pointwise), as in Prop 1.10.
+  have hC_inv : IsAInvariant φ C := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a g hg
+    rw [hC, Subgroup.mem_fixedPointsOfMulAut] at hg ⊢
+    intro a'
+    rw [hg a, hg a']
+  -- Step 1: `E ≤ C`.
+  have hE_le_C : E ≤ C := by
+    intro e he
+    rw [hC, Subgroup.mem_fixedPointsOfMulAut]
+    -- `e ∈ C_G(E)`: `e` commutes with every element of `E` (`E` abelian).
+    have he_cent : e ∈ Subgroup.centralizer (E : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [SetLike.mem_coe] at hy
+      have := hE.comm ⟨e, he⟩ ⟨y, hy⟩
+      exact congrArg Subtype.val this.symm
+    -- `e ^ p = 1` (`E` elementary abelian).
+    have he_pow : e ^ p = 1 := by
+      have h := congrArg (fun x : ↥E => (x : G)) (hE.pow_eq_one ⟨e, he⟩)
+      simpa using h
+    exact h_fix e he_cent he_pow
+  -- Step 2/3: `D := C_G(C)` is `A`-invariant and `D ≤ C_G(E)`.
+  set D := Subgroup.centralizer (C : Set G) with hD
+  have hD_inv : IsAInvariant φ D := hC_inv.centralizer
+  have hD_le_cE : D ≤ Subgroup.centralizer (E : Set G) :=
+    Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hE_le_C)
+  -- `D` is a `p`-group (subgroup of the `p`-group `G`).
+  have hD_pgroup : IsPGroup p ↥D := hG.to_subgroup D
+  -- Step 4: every order-`p` element of `↥D` is fixed by the restricted action.
+  have h_fixD : ∀ x : ↥D, x ^ p = 1 → ∀ a : A, (restrictAction hD_inv a) x = x := by
+    intro x hpow a
+    have hgD : (x : G) ∈ D := x.2
+    have hg_cent : (x : G) ∈ Subgroup.centralizer (E : Set G) := hD_le_cE hgD
+    have hg_pow : (x : G) ^ p = 1 := by
+      have h := congrArg (fun y : ↥D => (y : G)) hpow
+      simpa using h
+    apply Subtype.ext
+    rw [restrictAction_apply]
+    exact h_fix (x : G) hg_cent hg_pow a
+  -- Apply BG Thm 1.11 = Isaacs Thm 4.36 to the restricted action on `↥D`.
+  have hAC : OddOrder.Isaacs.Ch04.actionCommutator (restrictAction hD_inv) = ⊥ :=
+    OddOrder.Isaacs.Ch04.isaacs_thm_4_36 hp_odd (restrictAction hD_inv) hD_pgroup hA_p' h_fixD
+  have hTrivD : ∀ a : A, ∀ x : ↥D, (restrictAction hD_inv a) x = x :=
+    (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially (restrictAction hD_inv)).mp hAC
+  -- `D ≤ C`, i.e. `C_G(C) ⊆ C`.
+  have hCC : Subgroup.centralizer (C : Set G) ≤ C := by
+    intro g hg
+    rw [hC, Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    have := hTrivD a ⟨g, hg⟩
+    have h2 := congrArg Subtype.val this
+    rwa [restrictAction_apply] at h2
+  -- Step 5: conclude via BG Prop 1.10.
+  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have hCop : Nat.Coprime (Nat.card A) (Nat.card G) := by
+    obtain ⟨n, hn⟩ := hG.exists_card_eq
+    rw [hn]
+    exact (((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hA_p').symm).pow_right n
+  exact coprime_nilpotent_acts_trivially_of_centralizer_self hCop hCC
+
 /-! ## §1E: Sylow lift + Hall-Higman + noncyclic auto -/
 
 /-! ### Lem 1.14 helpers (Step 1-3 sorry-free, main statement 下方) -/
