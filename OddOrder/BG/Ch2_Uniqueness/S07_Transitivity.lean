@@ -1941,6 +1941,66 @@ private theorem tp_d [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
   exact Subgroup.commutator_mono (le_trans inf_le_left inf_le_right)
     (le_trans inf_le_left inf_le_right)
 
+/-- **`|ℋ*(A;q)| ∣ |K|`** (mmd L2218): `K` acts transitively on the finite set `ℋ*(A;q)` by
+conjugation (each `k ∈ K ≤ C_G(A) ≤ N(A)`), so by orbit-stabilizer its cardinality divides `|K|`. -/
+private theorem tp_card_hStar_dvd_kSubgroup [Finite G] {A : Subgroup G} {q : ℕ}
+    (htrans : ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q})) :
+    Nat.card ↥(hInvariantStar ⊤ A {q}) ∣ Nat.card ↥(kSubgroup A) := by
+  classical
+  set S : Set (Subgroup G) := hInvariantStar ⊤ A {q} with hS_def
+  set K : Subgroup G := kSubgroup A with hK_def
+  -- `↥K` acts on `↥S` by conjugation.
+  have hkA : ∀ k : ↥K, MulAut.conj (k : G) • A = A := fun k =>
+    conj_smul_eq_self_of_mem_normalizer
+      ((Subgroup.centralizer_le_normalizer _) (kSubgroup_le_centralizer A k.2))
+  let smulFn : ↥K → ↥S → ↥S := fun k Q => ⟨MulAut.conj (k : G) • (Q : Subgroup G),
+    conj_smul_mem_hInvariantStar_of_normalizer Q.2 (hkA k)⟩
+  letI act : MulAction ↥K ↥S :=
+    { smul := smulFn
+      one_smul := fun Q => by
+        apply Subtype.ext
+        show MulAut.conj ((1 : ↥K) : G) • (Q : Subgroup G) = (Q : Subgroup G)
+        rw [Subgroup.coe_one, map_one, one_smul]
+      mul_smul := fun x y Q => by
+        apply Subtype.ext
+        show MulAut.conj (((x * y : ↥K)) : G) • (Q : Subgroup G)
+          = MulAut.conj ((x : G)) • MulAut.conj ((y : G)) • (Q : Subgroup G)
+        rw [Subgroup.coe_mul, map_mul, mul_smul] }
+  have hsmul_coe : ∀ (k : ↥K) (Q : ↥S),
+      ((k • Q : ↥S) : Subgroup G) = MulAut.conj (k : G) • (Q : Subgroup G) := fun _ _ => rfl
+  haveI hpre : MulAction.IsPretransitive ↥K ↥S := by
+    refine ⟨fun Q₁ Q₂ => ?_⟩
+    obtain ⟨k, hkK, hkeq⟩ := htrans Q₁ Q₁.2 Q₂ Q₂.2
+    refine ⟨⟨k, hkK⟩, ?_⟩
+    apply Subtype.ext
+    rw [hsmul_coe]; exact hkeq
+  -- Orbit-stabilizer: `|orbit Q₀| = (stab).index ∣ |K|`, and `orbit Q₀ = ↥S`.
+  obtain ⟨Q₀⟩ : Nonempty ↥S := by
+    have hbot_norm : (A : Subgroup G) ≤ Subgroup.normalizer ((⊥ : Subgroup G) : Set G) := by
+      intro a _
+      rw [Subgroup.mem_normalizer_iff]
+      intro z
+      simp only [Subgroup.mem_bot]
+      constructor
+      · rintro rfl; group
+      · intro h
+        have : z = a⁻¹ * 1 * a := by rw [← (h : a * z * a⁻¹ = 1)]; group
+        simpa using this
+    have hbot_mem : (⊥ : Subgroup G) ∈ hInvariant ⊤ A {q} :=
+      ⟨le_top, hbot_norm, Subgroup.IsPiSubgroup.bot⟩
+    obtain ⟨Qs, hQs, _⟩ := exists_le_hInvariantStar hbot_mem
+    exact ⟨⟨Qs, hQs⟩⟩
+  have horb_univ : MulAction.orbit ↥K Q₀ = Set.univ :=
+    MulAction.orbit_eq_univ (M := ↥K) (α := ↥S) Q₀
+  have hcard_orbit : Nat.card ↥(MulAction.orbit ↥K Q₀) = Nat.card ↥S := by
+    rw [horb_univ]; exact Nat.card_congr (Equiv.Set.univ ↥S)
+  have hdvd : Nat.card ↥(MulAction.orbit ↥K Q₀) ∣ Nat.card ↥K := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer ↥K Q₀),
+      ← Subgroup.index_eq_card]
+    exact Subgroup.index_dvd_card _
+  rw [hcard_orbit] at hdvd
+  exact hdvd
+
 /-- **BG Theorem 7.4** (Propagation, mmd L2197): Hypothesis 7.1, `q ∈ π'`, `P` は `A` を
 subnormal に含む真 `π`-部分群、`K` は `ℋ_G*(A;q)` 上推移的とする。すると:
 
