@@ -33,7 +33,14 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `Polynomial.card_roots'` (#roots ≤ natDegree), `Nat.card_range_of_injective` (|F_p|=p)。
 **norm の積形**: 自前定義 `normN x := ∏_{i<q} x^{p^i}` (= 実 field norm; Algebra.norm 接続は C.2 用に後回し)。
 
-#### C.1 実装詳細 (2026-06-04 精緻化, 次セッション用ステップ)
+#### ✅✅ C.1 完成 (2026-06-04, commits 398e5f2/32ae2f4, sorry-free・axiom-clean・AxiomsCheck 登録)
+`lemmaC1` 完全証明。`dSeq`+`tauIter`+`tauIter_eq_dSeq_div`(閉形式)+`normN_dSeq_eq_one`(telescoping で N(dₖ)=1)
++ `natCast_pow_pPow`(F_p Frobenius 不変) + 多項式 `∏(C((1-a)^{p^i})X+C 1)-C 1` の degree-q 根数
+(`natDegree_prod`/`natDegree_linear`/`add_pow_char_pow`/`CharP.natCast_injOn_Iio`/`card_roots'`)。
+**罠**: `eval_C`(not eval_one); image は `Nat.cast` 統一(InjOn); `CharP.natCast_injOn_Iio (F) p` 明示引数; `classical` 要。
+**残 (次セッション)**: C.2(q=3/q≥5) → C.3 → Thm C 配線。以下は C.1 着手前の旧計画メモ (参考):
+
+#### C.1 実装詳細 (2026-06-04 精緻化, 旧メモ)
 **✅ 済 (commit aab7be8/次)**: `normN_one`/`normN_mul`/`normN_ne_zero`/`mem_normSetE_iff`/
 `two_sub_mem_normSetE` (a∈E ⟹ 2-a∈E)/`one_mem_normSetE` (1∈E)。
 
