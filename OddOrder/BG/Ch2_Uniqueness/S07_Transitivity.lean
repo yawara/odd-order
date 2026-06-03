@@ -1040,6 +1040,27 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
 
 /-! ## Theorem 7.4 — 推移性の伝播 -/
 
+/-- **Hall C in a subgroup** (mmd L2236 で使用): `↥V` 可解, `H₁,H₂ ≤ V` がともに `↥V` 内で
+`π`-Hall (`.subgroupOf V`) なら `V` の元で共役: `∃ w∈V, wH₁w⁻¹ = H₂`。`hall_C`@↥V を
+`subgroupOf`/`subtype` 翻訳。Thm 7.4(b) と (将来) Lem 6.5(c) の共通エンジン。 -/
+private theorem exists_conj_eq_of_isHall_subgroupOf [Finite G] {V : Subgroup G}
+    (hVsolv : IsSolvable ↥V) {π : Set ℕ} {H₁ H₂ : Subgroup G} (hH₁V : H₁ ≤ V) (hH₂V : H₂ ≤ V)
+    (hH₁ : Ch03.IsHallSubgroup π (H₁.subgroupOf V))
+    (hH₂ : Ch03.IsHallSubgroup π (H₂.subgroupOf V)) :
+    ∃ w ∈ V, MulAut.conj w • H₁ = H₂ := by
+  haveI := hVsolv
+  obtain ⟨w, hw⟩ := Ch03.hall_C hH₁ hH₂
+  refine ⟨(w : G), w.2, ?_⟩
+  have hcomp : V.subtype.comp (MulAut.conj w).toMonoidHom
+      = (MulAut.conj (w : G)).toMonoidHom.comp V.subtype := by
+    ext x
+    simp [MulAut.conj_apply]
+  have h := congrArg (Subgroup.map V.subtype) hw
+  rw [Subgroup.map_map, hcomp, ← Subgroup.map_map,
+    Subgroup.map_subgroupOf_eq_of_le hH₁V, Subgroup.map_subgroupOf_eq_of_le hH₂V] at h
+  rw [Subgroup.pointwise_smul_def]
+  exact h
+
 /-- **Theorem 7.4(a)** (mmd L2204): `C_G(P) ⊓ K = O_{π'}(C_G(P))`。`A ≤ P` ⟹ `C_G(P) ⊆ C_G(A)`,
 `K = O_{π'}(C_G(A)) ⊴ C_G(A)` ゆえ `C_G(P)⊓K` は `C_G(P)` の正規 `π'`-部分群 (⊆ O_{π'});
 逆は O_{π'}(C_G(P)) の各元が `C_G(A)` の `π'`-元 ⟹ §7 Note で `K` 入り。 -/
