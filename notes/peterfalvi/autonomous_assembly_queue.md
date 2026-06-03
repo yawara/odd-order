@@ -115,9 +115,24 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
 - 🔴 **(6.2)/(6.3)** = degree-bound 定理 (Sibley 型 `|K:H₁|≤4|L:K|²+1`)。**未形式化**。これが (6.5) 還元の
   律速。§6 の coherence-degree machinery を新規形式化要 (substantial, 複数定理)。
 
-**⟹ (6.8) capstone への残路 = (6.2)→(6.3)→(6.5) 形式化 → T-A4 part(a) member-family enum → T-A4 assemble →
-T-A5 glue (coherentUnion_of_glued, Y=coherentYFamily)。** route A で ZIrr は解決済ゆえ、残は純粋に
-§6 degree-bound machinery + enum 構成 (ZIrr 非依存)。**次セッションは (6.2)/(6.3) から着手推奨** (bottom-up)。
+**(6.2)/(6.3) 精読済 (mmd 04.8 L7-52)**:
+- **(6.2)** `2|L:C|√|C:D|≥|K:A|−1`: proof は **(i) Theorem (5.6) 量的形** = 非coherence (S₁ coherent ∧ S₁∪{ψ,ψ̄}
+  非coherent) ⟹ `2ψ(1)|L:K|≥∑_{χ∈S₁}χ(1)²/‖χ‖²` (= §G **B1** (5.6)反転, 未 landed; forward `retarget_isCoherent`
+  の量的逆) + **(ii) degree-sum 恒等式** `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|(|K:A|−1)` (= §G **B2**, X-side; `sumNonInflatedDegreeSq_eq_index_mul`
+  類は Irr-L 側のみ landed, S(A) 側は要拡張) + **(iii)** θ(1)≤|K:C|√|C:D| (Sibley char-degree bound, 要確認)。
+- **(6.3)** `|H:H₁|>4|L:K|²+1 ⟹ S(M) coherent`: (6.2) を C=H,D=A で適用 + minimal-A 帰納 (代数のみ, (6.2) 後は機械的)。
+- **(6.5)** `K/H₁ chief factor + p-群`: (6.3) の対偶 (`|K:H₁|≤4|L:K|²+1`) + (6.4.c) + nilpotency (代数)。
+
+**⟹ (6.8) capstone への完全残路 (bottom-up)**:
+1. **§G B1** = Theorem (5.6) 量的形 (非coherence⟹degree-sum下界)。`retarget_isCoherent` の hypotheses (特に
+   degree 不等式 `2a<∑aᵢ²`) の対偶。**foundational・未 landed**。
+2. **§G B2** = S(A)-side degree-sum 恒等式 `∑χ(1)²/‖χ‖²=|L:K|(|K:A|−1)`。
+3. θ(1)≤|K:C|√|C:D| bound。
+4. (6.2)→(6.3)→(6.5) (上記, B1/B2/bound 後は代数 + 帰納)。
+5. T-A4 part(a) member-family enum → T-A4 assemble → T-A5 glue (coherentUnion_of_glued, Y=coherentYFamily)。
+
+route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が foundation) + enum 構成 (ZIrr 非依存)。
+**次セッション着手点 = §G B1 (5.6 量的形) または B2 (degree-sum)** (bottom-up, foundational)。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
