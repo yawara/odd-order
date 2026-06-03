@@ -179,6 +179,13 @@ theorem isPiSubgroup_kSubgroup [Finite G] (A : Subgroup G) :
     Subgroup.IsPiSubgroup (primesOf A)ᶜ (kSubgroup A) :=
   isPiSubgroup_opiCoreInG _ _
 
+/-- If the centralizer C_G(A) is a pi(A)-subgroup, then K = O_{pi(A)-prime}(C_G(A))
+is trivial. This is the group-theoretic bridge used in BG (8.3) -> (8.6). -/
+theorem kSubgroup_eq_bot_of_centralizer_isPiSubgroup [Finite G] {A : Subgroup G}
+    (hCpi : Subgroup.IsPiSubgroup (primesOf A) (Subgroup.centralizer (A : Set G))) :
+    kSubgroup A = ⊥ :=
+  opiCoreInG_compl_eq_bot_of_isPiSubgroup hCpi
+
 /-- **BG §7 の Note** (Hypothesis 7.1 直後, mmd L2145): Hypothesis 7.1 のもとで、
 `C_G(A)` の任意の `π'`-元は `K = O_{π'}(C_G(A))` に入る。
 
@@ -932,6 +939,19 @@ theorem hInvariantStar_eq_of_three_le_rank_center_of_kSubgroup_eq_bot [Finite G]
     Q₁ = Q₂ :=
   hInvariantStar_eq_of_conjTransitiveOn_bot hKbot
     (transitive_of_three_le_rank_center hG hA hq hm) hQ₁ hQ₂
+
+/-- If C_G(A) is a pi(A)-subgroup, Theorem 7.2 makes H_G*(A;q) a singleton.
+This packages the kSubgroup-triviality bridge needed in BG (8.6). -/
+theorem hInvariantStar_eq_of_three_le_rank_center_of_centralizer_isPiSubgroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {A : Subgroup G} (hA : Hypothesis71 A)
+    {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    (hm : 3 ≤ rank ↥(Subgroup.center ↥A))
+    (hCpi : Subgroup.IsPiSubgroup (primesOf A) (Subgroup.centralizer (A : Set G)))
+    {Q₁ Q₂ : Subgroup G} (hQ₁ : Q₁ ∈ hInvariantStar ⊤ A {q})
+    (hQ₂ : Q₂ ∈ hInvariantStar ⊤ A {q}) :
+    Q₁ = Q₂ :=
+  hInvariantStar_eq_of_three_le_rank_center_of_kSubgroup_eq_bot hG hA hq hm
+    (kSubgroup_eq_bot_of_centralizer_isPiSubgroup hCpi) hQ₁ hQ₂
 
 /-- **BG Theorem 7.3** (mmd L2187): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 2` かつ
 `q ∈ π(C_G(A))` ⇒ `K` は `ℋ_G*(A;q)` 上推移的。`R ⊇ Sylow_q(C_G(A))` 経由で Lem 7.1 を連鎖。 -/

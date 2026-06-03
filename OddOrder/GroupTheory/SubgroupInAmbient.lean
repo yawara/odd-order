@@ -56,6 +56,34 @@ theorem isPiSubgroup_opiCoreInG [Finite G] (π : Set ℕ) (H : Subgroup G) :
   rw [card_opiCoreInG] at hr
   exact Ch03.oPiCore.isPiGroup π r hr
 
+/-- A subgroup of a pi-subgroup which is also a pi-complement subgroup is trivial. -/
+theorem eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl [Finite G] {π : Set ℕ}
+    {H N : Subgroup G} (hNH : N ≤ H) (hHpi : Subgroup.IsPiSubgroup π H)
+    (hNpic : Subgroup.IsPiSubgroup πᶜ N) :
+    N = ⊥ := by
+  apply Subgroup.card_eq_one.mp
+  have hEmpty : (Nat.card ↥N).primeFactors = ∅ := by
+    apply Finset.eq_empty_iff_forall_notMem.mpr
+    intro r hr
+    have hrH : r ∈ (Nat.card ↥H).primeFactors :=
+      Nat.mem_primeFactors.mpr
+        ⟨(Nat.mem_primeFactors.mp hr).1,
+          (Nat.mem_primeFactors.mp hr).2.1.trans (Subgroup.card_dvd_of_le hNH),
+          Nat.card_pos.ne'⟩
+    have hr_not_pi : r ∉ π := by
+      simpa using hNpic r hr
+    exact hr_not_pi (hHpi r hrH)
+  rcases Nat.primeFactors_eq_empty.mp hEmpty with hzero | hone
+  · exact False.elim (Nat.card_pos.ne' hzero)
+  · exact hone
+
+/-- If H is a pi-subgroup, then its ambient pi-complement core is trivial. -/
+theorem opiCoreInG_compl_eq_bot_of_isPiSubgroup [Finite G] {π : Set ℕ} {H : Subgroup G}
+    (hHpi : Subgroup.IsPiSubgroup π H) :
+    opiCoreInG πᶜ H = ⊥ :=
+  eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl
+    (opiCoreInG_le πᶜ H) hHpi (isPiSubgroup_opiCoreInG πᶜ H)
+
 /-- A q-group is a singleton pi-subgroup. -/
 theorem isPiSubgroup_singleton_of_isPGroup [Finite G] {q : ℕ} [Fact q.Prime]
     {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H := by
