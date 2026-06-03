@@ -356,6 +356,68 @@ theorem opiCoreInG_fittingInG_le_opiCoreInG [Finite G]
   exact le_opiCoreInG_of_normal_of_isPiSubgroup hNH hNnorm
     (isPiSubgroup_opiCoreInG π (fittingInG H))
 
+/-- Monotonicity of the ambient `π`-core in the set of primes. -/
+theorem opiCoreInG_mono [Finite G] {π ρ : Set ℕ}
+    (hπρ : π ⊆ ρ) (H : Subgroup G) :
+    opiCoreInG π H ≤ opiCoreInG ρ H := by
+  rw [opiCoreInG, opiCoreInG]
+  exact Subgroup.map_mono (Ch03.oPiCore_mono hπρ ↥H)
+
+/-- In a finite nilpotent subgroup `K`, every ambient p-subgroup of `K` lies in
+`O_p(K)`. -/
+theorem le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent [Finite G]
+    {p : ℕ} [Fact p.Prime] {K P : Subgroup G}
+    (hKnilp : Group.IsNilpotent ↥K)
+    (hPK : P ≤ K) (hPp : IsPGroup p ↥P) :
+    P ≤ opiCoreInG ({p} : Set ℕ) K := by
+  haveI : Group.IsNilpotent ↥K := hKnilp
+  have hPsub_p : IsPGroup p ↥(P.subgroupOf K) := by
+    obtain ⟨n, hn⟩ := hPp.exists_card_eq
+    exact IsPGroup.of_card (by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]
+      exact hn)
+  obtain ⟨S, hPS⟩ := hPsub_p.exists_le_sylow
+  haveI hSnormal : (S : Subgroup ↥K).Normal := Ch01.Sylow.normal_of_isNilpotent S
+  have hSpi : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) (S : Subgroup ↥K) := by
+    intro r hr
+    exact (isPiSubgroup_singleton_of_isPGroup (G := ↥K) S.isPGroup') r hr
+  have hSleCore : (S : Subgroup ↥K) ≤ Ch03.oPiCore ({p} : Set ℕ) ↥K :=
+    hSpi.le_oPiCore
+  calc P = (P.subgroupOf K).map K.subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hPK).symm
+    _ ≤ (S : Subgroup ↥K).map K.subtype := Subgroup.map_mono hPS
+    _ ≤ opiCoreInG ({p} : Set ℕ) K := Subgroup.map_mono hSleCore
+
+/-- The r-core of `C_F(M)(A0)` lies in the r-core of `F(M)`. -/
+theorem opiCoreInG_singleton_cFittingInG_le_opiCoreInG_fittingInG [Finite G]
+    {q : ℕ} [Fact q.Prime] {M A0 : Subgroup G} :
+    opiCoreInG ({q} : Set ℕ) (cFittingInG M A0) ≤
+      opiCoreInG ({q} : Set ℕ) (fittingInG M) := by
+  have hcore_le_F : opiCoreInG ({q} : Set ℕ) (cFittingInG M A0) ≤ fittingInG M :=
+    (opiCoreInG_le ({q} : Set ℕ) (cFittingInG M A0)).trans (by
+      dsimp [cFittingInG]
+      exact inf_le_right)
+  exact le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+    (fittingInG_isNilpotent M) hcore_le_F
+    (isPGroup_opiCoreInG_singleton (cFittingInG M A0))
+
+/-- If `r ≠ q`, then the r-core of `C_F(M)(A0)` lies in `O_{q'}(M)`. -/
+theorem opiCoreInG_singleton_cFittingInG_le_opiCoreInG_singleton_compl_maximal_of_ne
+    [Finite G] {q r : ℕ} [Fact q.Prime] [Fact r.Prime] {M A0 : Subgroup G}
+    (hqr : q ≠ r) :
+    opiCoreInG ({r} : Set ℕ) (cFittingInG M A0) ≤ opiCoreInG ({q} : Set ℕ)ᶜ M := by
+  have hArF : opiCoreInG ({r} : Set ℕ) (cFittingInG M A0) ≤
+      opiCoreInG ({r} : Set ℕ) (fittingInG M) :=
+    opiCoreInG_singleton_cFittingInG_le_opiCoreInG_fittingInG
+  have hArM : opiCoreInG ({r} : Set ℕ) (cFittingInG M A0) ≤
+      opiCoreInG ({r} : Set ℕ) M :=
+    hArF.trans (opiCoreInG_fittingInG_le_opiCoreInG ({r} : Set ℕ) M)
+  have hsubset : ({r} : Set ℕ) ⊆ ({q} : Set ℕ)ᶜ := by
+    intro s hs hsq
+    rw [Set.mem_singleton_iff] at hs hsq
+    exact hqr (hsq.symm.trans hs)
+  exact hArM.trans (opiCoreInG_mono hsubset M)
+
 /-- The `π`-core of `F(H)` centralizes the `π`-complement core of `H`.
 
 This is the `D_q` versus `O_{q'}(H)` commutation part of BG (8.7), with
@@ -519,6 +581,18 @@ theorem centerFittingInG_le_fittingInG (M : Subgroup G) :
 theorem centerFittingInG_le (M : Subgroup G) :
     centerFittingInG M ≤ M :=
   (centerFittingInG_le_fittingInG M).trans (fittingInG_le M)
+
+/-- Elements of `F(M)` centralize the ambient center `Z(F(M))`. -/
+theorem fittingInG_le_centralizer_centerFittingInG (M : Subgroup G) :
+    fittingInG M ≤ Subgroup.centralizer (centerFittingInG M : Set G) := by
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro z hz
+  obtain ⟨zc, hzc, hzc_eq⟩ := hz
+  have hzc_eqG : (zc : G) = z := hzc_eq
+  have hcomm :=
+    congrArg Subtype.val (Subgroup.mem_center_iff.mp hzc ⟨x, hx⟩)
+  simpa [hzc_eqG] using hcomm.symm
 
 /-- The ambient realization of Z(F(M)) is commutative. -/
 theorem centerFittingInG_isMulCommutative (M : Subgroup G) :
@@ -1517,6 +1591,101 @@ theorem centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
         opiCoreInG ({q} : Set ℕ)ᶜ X :=
     OddOrder.BG.Ch2.S07.opiCoreInG_centralizer_inf_le_opiCoreInG hXsolv hRqX hRqP
   exact hBr_le_core_Nq.trans (hcore_Nq_le_core_CX.trans hcore_CX_le_core_X)
+
+/-- BG (8.5), full cFitting-core form: for distinct primes `q,r`, the r-core
+of `A = C_F(M)(A0)` lies in `O_{q'}(X)` whenever `X` is solvable and contains `A`. -/
+theorem opiCoreInG_singleton_cFittingInG_le_opiCoreInG_singleton_compl_of_ne
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q r : ℕ}
+    [Fact p.Prime] [Fact q.Prime] [Fact r.Prime] {M A0 X : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hXsolv : IsSolvable ↥X)
+    (hAX : cFittingInG M A0 ≤ X)
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hqr : q ≠ r) :
+    opiCoreInG ({r} : Set ℕ) (cFittingInG M A0) ≤ opiCoreInG ({q} : Set ℕ)ᶜ X := by
+  let Rq : Subgroup G := centerFittingOpCoreInG q M
+  let Ar : Subgroup G := opiCoreInG ({r} : Set ℕ) (cFittingInG M A0)
+  let Nq : Subgroup G := Subgroup.normalizer (Rq : Set G) ⊓ X
+  have hRqX : Rq ≤ X :=
+    (centerFittingOpCoreInG_le_cFittingInG (q := q) hA0).trans hAX
+  have hRqpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Rq := by
+    dsimp [Rq, centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) (centerFittingInG M)
+  have hNq_eq_M : Subgroup.normalizer (Rq : Set G) = M := by
+    dsimp [Rq]
+    exact normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM
+      (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hq)
+  have hNq_le_M : Nq ≤ M := by
+    intro x hx
+    simpa [hNq_eq_M] using hx.1
+  have hArX : Ar ≤ X :=
+    (opiCoreInG_le ({r} : Set ℕ) (cFittingInG M A0)).trans hAX
+  have hArF : Ar ≤ fittingInG M := by
+    dsimp [Ar]
+    exact opiCoreInG_singleton_cFittingInG_le_opiCoreInG_fittingInG.trans
+      (opiCoreInG_le ({r} : Set ℕ) (fittingInG M))
+  have hAr_cent_Rq : Ar ≤ Subgroup.centralizer (Rq : Set G) := by
+    intro x hx
+    have hxF : x ∈ fittingInG M := hArF hx
+    have hxC := fittingInG_le_centralizer_centerFittingInG M hxF
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact Subgroup.mem_centralizer_iff.mp hxC y
+      (centerFittingOpCoreInG_le_centerFittingInG q M hy)
+  have hArNq : Ar ≤ Nq := by
+    refine le_inf ?_ hArX
+    exact hAr_cent_Rq.trans (Subgroup.centralizer_le_normalizer (Rq : Set G))
+  let L : Subgroup G := opiCoreInG ({q} : Set ℕ)ᶜ M ⊓ Nq
+  have hArOqM : Ar ≤ opiCoreInG ({q} : Set ℕ)ᶜ M := by
+    dsimp [Ar]
+    exact opiCoreInG_singleton_cFittingInG_le_opiCoreInG_singleton_compl_maximal_of_ne
+      hqr
+  have hArL : Ar ≤ L := le_inf hArOqM hArNq
+  have hLNq : L ≤ Nq := inf_le_right
+  have hLnorm : (L.subgroupOf Nq).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hLNq]
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · intro hy
+      have hyInf : y ∈ opiCoreInG ({q} : Set ℕ)ᶜ M ⊓ Nq := by simpa [L] using hy
+      have hxM : x ∈ M := hNq_le_M hx
+      have hnormO :=
+        Subgroup.mem_normalizer_iff.mp
+          (le_normalizer_opiCoreInG ({q} : Set ℕ)ᶜ M hxM) y
+      have hnormN := Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hx) y
+      simpa [L] using Subgroup.mem_inf.mpr ⟨hnormO.mp hyInf.1, hnormN.mp hyInf.2⟩
+    · intro hy
+      have hyInf : x * y * x⁻¹ ∈ opiCoreInG ({q} : Set ℕ)ᶜ M ⊓ Nq := by
+        simpa [L] using hy
+      have hxM : x ∈ M := hNq_le_M hx
+      have hnormO :=
+        Subgroup.mem_normalizer_iff.mp
+          (le_normalizer_opiCoreInG ({q} : Set ℕ)ᶜ M hxM) y
+      have hnormN := Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hx) y
+      simpa [L] using Subgroup.mem_inf.mpr ⟨hnormO.mpr hyInf.1, hnormN.mpr hyInf.2⟩
+  have hLpi : Subgroup.IsPiSubgroup ({q} : Set ℕ)ᶜ L := by
+    intro s hs
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ)ᶜ M s
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (inf_le_left : L ≤ _))
+        Nat.card_pos.ne' hs)
+  have hL_core_Nq : L ≤ opiCoreInG ({q} : Set ℕ)ᶜ Nq :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hLNq hLnorm hLpi
+  have hAr_core_Nq : Ar ≤ opiCoreInG ({q} : Set ℕ)ᶜ Nq := hArL.trans hL_core_Nq
+  have hcore_Nq_le_core_CX :
+      opiCoreInG ({q} : Set ℕ)ᶜ Nq ≤
+        opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.centralizer (Rq : Set G) ⊓ X) := by
+    dsimp [Nq]
+    exact opiCoreInG_singleton_compl_normalizer_inf_le_centralizer_inf hRqX hRqpi
+  have hRqP : IsPGroup q ↥Rq :=
+    OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hRqpi
+  have hcore_CX_le_core_X :
+      opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.centralizer (Rq : Set G) ⊓ X) ≤
+        opiCoreInG ({q} : Set ℕ)ᶜ X :=
+    OddOrder.BG.Ch2.S07.opiCoreInG_centralizer_inf_le_opiCoreInG hXsolv hRqX hRqP
+  exact hAr_core_Nq.trans (hcore_Nq_le_core_CX.trans hcore_CX_le_core_X)
 
 /-- BG (8.5) applied to the commutator form (8.4): if `q ∈ π(F(M))`, every
 `A = C_F(M)(A0)`-invariant `π(A)`-complement subgroup lies in `O_{q'}(X)`. -/
