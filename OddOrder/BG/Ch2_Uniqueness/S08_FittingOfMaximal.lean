@@ -514,14 +514,31 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
     (hm : 3 ≤ rank ↥A₀)
     (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
     IsUniquelyMaximal (Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M) := by
+  let A : Subgroup G := Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M
+  change IsUniquelyMaximal A
   have hA0F : A₀ ≤ fittingInG M := isMaxElemAbelianIn_le hA₀
-  have hCentralizer_le_M :
-      Subgroup.centralizer
-          ((Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M : Subgroup G) : Set G) ≤ M :=
-    centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
-  have hCenterRank :
-      3 ≤ rank ↥(Subgroup.center ↥(Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M)) :=
-    three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA₀ hm
+  have hA_le_M : A ≤ M := by
+    dsimp [A]
+    exact inf_le_right.trans (fittingInG_le M)
+  have hA_proper : A < ⊤ := by
+    dsimp [A]
+    exact cFitting_lt_top_of_mem_maximal hM
+  have hA_ne : A ≠ ⊥ := by
+    dsimp [A]
+    exact cFitting_ne_bot_of_isMaxElemAbelianIn hp hA₀
+  have hPrimesA :
+      OddOrder.BG.Ch2.S07.primesOf A = OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [A]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hCentralizer_le_M : Subgroup.centralizer (A : Set G) ≤ M := by
+    dsimp [A]
+    exact centralizer_cFitting_le_maximal_of_not_isPGroup hG hM hA0F hFnp
+  have hCenterRank : 3 ≤ rank ↥(Subgroup.center ↥A) := by
+    dsimp [A]
+    exact three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA₀ hm
+  refine IsUniquelyMaximal.of_unique_maximal hA_proper hM hA_le_M ?_
+  intro H hH hAH
+  have hHco : IsCoatom H := hH
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
