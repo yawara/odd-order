@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.AppA_PStability
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
@@ -167,6 +168,23 @@ theorem isPiSubgroup_kSubgroup [Finite G] (A : Subgroup G) :
     Subgroup.IsPiSubgroup (primesOf A)ᶜ (kSubgroup A) :=
   isPiSubgroup_opiCoreInG _ _
 
+/-- **`N ≤ O_π(H)` for a normal `π`-subgroup** (ambient form): if `N ≤ H`, `N.subgroupOf H` is
+normal in `↥H`, and `N` is a `π`-subgroup, then `N ≤ opiCoreInG π H`. This packages the
+`subgroupOf`→`oPiCore`→`map subtype` chain (`oPiCore` maximality) used in the §7 Note and in
+Proposition 7.5's core claim (e.g. `O_{p'}(C_G(b)) ⊓ C_X(b) ≤ O_{p'}(C_X(b))`). -/
+theorem le_opiCoreInG_of_normal_of_isPiSubgroup {π : Set ℕ} {H N : Subgroup G}
+    (hNH : N ≤ H) (hNnorm : (N.subgroupOf H).Normal) (hNpi : Subgroup.IsPiSubgroup π N) :
+    N ≤ opiCoreInG π H := by
+  haveI := hNnorm
+  have hNpi_sub : Ch03.Subgroup.IsPiGroup π (N.subgroupOf H) := by
+    intro r hr
+    refine hNpi r ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv] at hr
+  calc N = (N.subgroupOf H).map H.subtype := (Subgroup.map_subgroupOf_eq_of_le hNH).symm
+    _ ≤ (Ch03.oPiCore π ↥H).map H.subtype :=
+        Subgroup.map_mono (Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi_sub)
+    _ = opiCoreInG π H := rfl
+
 /-- **BG §7 の Note** (Hypothesis 7.1 直後, mmd L2145): Hypothesis 7.1 のもとで、
 `C_G(A)` の任意の `π'`-元は `K = O_{π'}(C_G(A))` に入る。
 
@@ -258,16 +276,8 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
     constructor
     · exact (Subgroup.mem_normalizer_iff.mp hgO _).mp hn.1
     · exact C.mul_mem (C.mul_mem g.2 hn.2) (C.inv_mem g.2)
-  have hWC_pi : Ch03.Subgroup.IsPiGroup π' (W.subgroupOf C) := by
-    intro r hr
-    refine hW_pi' r ?_
-    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW_le_C).toEquiv] at hr
-  have hW_le_K : W ≤ kSubgroup A := by
-    have h1 : W.subgroupOf C ≤ Ch03.oPiCore π' ↥C :=
-      Ch03.Subgroup.IsPiGroup.le_oPiCore hWC_pi
-    calc W = (W.subgroupOf C).map C.subtype := (Subgroup.map_subgroupOf_eq_of_le hW_le_C).symm
-      _ ≤ (Ch03.oPiCore π' ↥C).map C.subtype := Subgroup.map_mono h1
-      _ = kSubgroup A := rfl
+  have hW_le_K : W ≤ kSubgroup A :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hW_le_C hWC_normal hW_pi'
   exact hW_le_K ⟨hc_O, hc⟩
 
 /-! ## Lemma 7.1 の証明部品 (action 制限・normalizer 増大・q-部分群の真性) -/
@@ -1058,6 +1068,636 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## Proposition 7.5 — Hypothesis 7.1 の十分条件 -/
 
+/-- **Reduction for Hypothesis 7.1(2)** (mmd L2273 "it suffices to show that `Y ⊆ O_{π'}(X)`"):
+for a fixed proper `X ⊇ A`, the equality `⟨ℋ_X(A;π)⟩ = O_π(X)` is equivalent to showing every
+member of `ℋ_X(A;π)` is contained in `O_π(X)`. The reverse inclusion is automatic because
+`O_π(X) = opiCoreInG π X` is itself an `A`-invariant `π`-subgroup of `X`
+(`opiCoreInG_le` + `le_normalizer_opiCoreInG` with `A ≤ X` + `isPiSubgroup_opiCoreInG`).
+Used by both branches of Proposition 7.5. -/
+private theorem generated_eq_of_forall_le_opiCoreInG [Finite G]
+    {A X : Subgroup G} {π : Set ℕ} (hAX : A ≤ X)
+    (hY : ∀ Y ∈ hInvariant X A π, Y ≤ opiCoreInG π X) :
+    sSup (hInvariant X A π) = opiCoreInG π X := by
+  refine le_antisymm (sSup_le hY) (le_sSup ?_)
+  exact ⟨opiCoreInG_le π X, hAX.trans (le_normalizer_opiCoreInG π X),
+    isPiSubgroup_opiCoreInG π X⟩
+
+/-- **`oPiCore` is natural under a group isomorphism**: `(O_π G₁).map φ = O_π G₂` for
+`φ : G₁ ≃* G₂` (apply `oPiCore.map_le_of_surjective` to `φ` and to `φ.symm`). General lemma;
+could be promoted to `Ch03`. Used by `opiCoreInG_eq_map_subgroupOf`. -/
+private theorem oPiCore_map_mulEquiv {G₁ G₂ : Type*} [Group G₁] [Finite G₁] [Group G₂] [Finite G₂]
+    (π : Set ℕ) (φ : G₁ ≃* G₂) :
+    (Ch03.oPiCore π G₁).map φ.toMonoidHom = Ch03.oPiCore π G₂ := by
+  refine le_antisymm (Ch03.oPiCore.map_le_of_surjective π φ.toMonoidHom φ.surjective) ?_
+  intro h hh
+  exact ⟨φ.symm h,
+    Ch03.oPiCore.map_le_of_surjective π φ.symm.toMonoidHom φ.symm.surjective ⟨h, hh, rfl⟩, by simp⟩
+
+/-- **`opiCoreInG` transport to an intermediate subgroup**: for `K ≤ X`,
+`O_π(K) = O_π(K.subgroupOf X)` mapped from `↥X` back to `G`. Lets one apply a result proved
+inside `↥X` (e.g. Proposition 1.15(b) with ambient group `↥X`) to the ambient realization
+`opiCoreInG π K`. General lemma; could be promoted to `SubgroupInAmbient`. -/
+private theorem opiCoreInG_eq_map_subgroupOf [Finite G] {π : Set ℕ} {X K : Subgroup G}
+    (hKX : K ≤ X) :
+    opiCoreInG π K = (opiCoreInG π (K.subgroupOf X)).map X.subtype := by
+  have hcomp : X.subtype.comp (K.subgroupOf X).subtype
+      = K.subtype.comp (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom :=
+    MonoidHom.ext fun _ => rfl
+  calc opiCoreInG π K
+      = ((Ch03.oPiCore π ↥(K.subgroupOf X)).map
+            (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom).map K.subtype := by
+        rw [oPiCore_map_mulEquiv]; rfl
+    _ = (Ch03.oPiCore π ↥(K.subgroupOf X)).map
+            (K.subtype.comp (Subgroup.subgroupOfEquivOfLe hKX).toMonoidHom) := by
+        rw [Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥(K.subgroupOf X)).map (X.subtype.comp (K.subgroupOf X).subtype) := by
+        rw [hcomp]
+    _ = (opiCoreInG π (K.subgroupOf X)).map X.subtype := by
+        rw [← Subgroup.map_map]; rfl
+
+/-- **Relativized BG Proposition 1.15(b)**: for a finite solvable subgroup `X ≤ G` and a
+`p`-subgroup `R ≤ X`, `O_{p'}(C_X(R)) ≤ O_{p'}(X)` (both realized in the ambient `G`). Obtained
+from the absolute Prop 1.15(b) (`oPiPrimeCore_centralizer_le_oPiPrimeCore`) inside the group `↥X`,
+transported back to `G` via `opiCoreInG_eq_map_subgroupOf`. Here `C_X(R) = C_G(R) ⊓ X`. This is
+the cross-group bridge for Proposition 7.5's general case (and is reusable in §8–§16). -/
+private theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {R : Subgroup G} (hRX : R ≤ X) (hRp : IsPGroup p R) :
+    opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X)
+      ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  haveI := hXsolv
+  have hR'p : IsPGroup p (R.subgroupOf X) := by
+    obtain ⟨n, hn⟩ := hRp.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRX).toEquiv]; exact hn)
+  have hbridge : (Subgroup.centralizer (R : Set G) ⊓ X).subgroupOf X
+      = Subgroup.centralizer ((R.subgroupOf X : Subgroup ↥X) : Set ↥X) := by
+    ext x
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_inf, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+    constructor
+    · rintro ⟨hc, -⟩ m hm
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at hm
+      exact Subtype.ext (hc (m : G) hm)
+    · intro hc
+      refine ⟨?_, x.2⟩
+      intro r hr
+      exact congrArg Subtype.val
+        (hc ⟨r, hRX hr⟩ (by rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hr))
+  have habs := OddOrder.BG.Ch1.S01.oPiPrimeCore_centralizer_le_oPiPrimeCore (G := ↥X) hR'p
+  calc opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X)
+      = (opiCoreInG ({p} : Set ℕ)ᶜ
+          ((Subgroup.centralizer (R : Set G) ⊓ X).subgroupOf X)).map X.subtype :=
+        opiCoreInG_eq_map_subgroupOf inf_le_right
+    _ = (opiCoreInG ({p} : Set ℕ)ᶜ
+          (Subgroup.centralizer ((R.subgroupOf X : Subgroup ↥X) : Set ↥X))).map X.subtype := by
+        rw [hbridge]
+    _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥X).map X.subtype := Subgroup.map_mono habs
+    _ = opiCoreInG ({p} : Set ℕ)ᶜ X := rfl
+
+/-- **Bar-quotient bridge** for Proposition 7.5's special case: the image of `O_{π',π}(G')` under
+the quotient `mk' : G' → G'/O_{π'}(G')` is exactly `O_π(G'/O_{π'}(G'))` — i.e. `O_p(X̄) = mk(O_{p',p}(X))`.
+Immediate from `oPiPrimePiCore` being defined as `comap (mk' O_{π'}) (O_π of the quotient)` plus
+`map_comap_eq_self_of_surjective`. With Theorem 6.1 (`thmA4b`: `A ≤ O_{p',p}(X)`) this gives
+`Ā ≤ O_p(X̄)`. -/
+private theorem oPiPrimePiCore_map_mk'_eq {G' : Type*} [Group G'] (π : Set ℕ) :
+    (Ch03.oPiPrimePiCore π G').map (QuotientGroup.mk' (Ch03.oPiCore {p | p ∉ π} G'))
+      = Ch03.oPiCore π (G' ⧸ Ch03.oPiCore {p | p ∉ π} G') := by
+  rw [Ch03.oPiPrimePiCore]
+  exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
+
+/-- **Step 6 of Prop 7.5's special case** (`C_{O_p(X̄)}(Ā) ⊆ Ā`): with `N = O_{p'}(G')` and
+`mk : G' → G'/N`, if `c ∈ O_p(G'/N)` commutes with `mk a` for every `a ∈ A`, then `c ∈ mk(A)`.
+Clean route avoiding an explicit Sylow iso: `O_p(X̄) ⊆ mk(P)` (image of the Sylow `P` is Sylow,
+and `O_p ≤` every Sylow), so `c = mk s` with `s ∈ P`; then for `a ∈ A`, `[a,s] ∈ N ⊓ P = ⊥`
+(it lies in `N` since `mk` kills it, and in `P` since `a, s ∈ P`), so `s ∈ C_P(A) ⊆ A`. -/
+private theorem mem_map_mk'_of_mem_oPiCore_quotient_of_commute
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G']
+    (P : Sylow p G') {A : Subgroup G'} (hAP : A ≤ (P : Subgroup G'))
+    (hCPA : Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') ≤ A)
+    {c : G' ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ G'}
+    (hc : c ∈ Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ G'))
+    (hcomm : ∀ a ∈ A, QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a * c
+        = c * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a) :
+    c ∈ A.map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) := by
+  have hsurj : Function.Surjective (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) :=
+    QuotientGroup.mk'_surjective _
+  -- `N := O_{p'}(G')` is a `p'`-group, so `P ⊓ N = ⊥`.
+  have hN_cop : Nat.Coprime (Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hPN : (P : Subgroup G') ⊓ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' = ⊥ :=
+    OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime P.2 hN_cop
+  -- `O_p(X̄) ⊆ mk(P)`: the image of the Sylow `P` is Sylow, and `O_p ≤` every Sylow.
+  have hc_inP :
+      c ∈ (P : Subgroup G').map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G')) := by
+    have hle := OddOrder.Isaacs.Ch01.opCore_le (P.mapSurjective hsurj)
+    rw [Sylow.coe_mapSurjective, ← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore] at hle
+    exact hle hc
+  obtain ⟨s, hsP, hsc⟩ := Subgroup.mem_map.mp hc_inP
+  -- `s ∈ C_P(A)`: for `a ∈ A`, `[a,s] ∈ N ⊓ P = ⊥`.
+  have hs_cent : s ∈ Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') := by
+    refine Subgroup.mem_inf.mpr ⟨?_, hsP⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    have hmkcomm : QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a
+          * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') s
+        = QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') s
+          * QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G') a := by
+      rw [hsc]; exact hcomm a ha
+    have hin_N : a * s * a⁻¹ * s⁻¹ ∈ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
+      rw [← QuotientGroup.ker_mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ G'), MonoidHom.mem_ker,
+        map_mul, map_mul, map_mul, map_inv, map_inv, hmkcomm]
+      group
+    have hin_P : a * s * a⁻¹ * s⁻¹ ∈ (P : Subgroup G') :=
+      (P : Subgroup G').mul_mem ((P : Subgroup G').mul_mem
+        ((P : Subgroup G').mul_mem (hAP ha) hsP) ((P : Subgroup G').inv_mem (hAP ha)))
+        ((P : Subgroup G').inv_mem hsP)
+    have h1 : a * s * a⁻¹ * s⁻¹ = 1 :=
+      Subgroup.mem_bot.mp (hPN ▸ Subgroup.mem_inf.mpr ⟨hin_P, hin_N⟩)
+    have h2 : a * s * a⁻¹ = s := mul_inv_eq_one.mp h1
+    calc a * s = a * s * a⁻¹ * a := by group
+      _ = s * a := by rw [h2]
+  rw [← hsc]
+  exact Subgroup.mem_map_of_mem _ (hCPA hs_cent)
+
+/-- **Abstract special case of BG Proposition 7.5** (mmd L2275-2285), `b`-independent and reusable:
+if `G'` is finite solvable of odd order, `P` is a Sylow `p`-subgroup, `A ≤ P` is abelian and normal
+in `P` with `C_P(A) ⊆ A`, and `Y` is an `A`-invariant `p'`-subgroup, then `Y ≤ O_{p'}(G')`.
+
+Proof (in the bar-quotient `X̄ = G'/O_{p'}(G')`): Theorem 6.1 puts `Ā ≤ O_p(X̄)`; the commutator
+`[Ā,Ȳ] ≤ O_p(X̄) ⊓ Ȳ = 1` so `Ā` centralizes `Ȳ`; step 6
+(`mem_map_mk'_of_mem_oPiCore_quotient_of_commute`) gives `C_{O_p(X̄)}(Ā) ⊆ Ā`; Proposition 1.10 then
+makes `Ȳ` centralize `O_p(X̄)`, and Proposition 1.15(a) forces `Ȳ ≤ O_p(X̄)`, whence `Ȳ = 1`. -/
+private theorem specialCase
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G'] [IsSolvable G']
+    (hp2 : p ≠ 2) (hodd : Odd (Nat.card G')) (P : Sylow p G')
+    {A : Subgroup G'} (hAP : A ≤ (P : Subgroup G')) [IsMulCommutative A]
+    (hAnormP : (P : Subgroup G') ≤ Subgroup.normalizer A)
+    (hCPA : Subgroup.centralizer (A : Set G') ⊓ (P : Subgroup G') ≤ A)
+    {Y : Subgroup G'} (hYnorm : A ≤ Subgroup.normalizer Y)
+    (hYpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Y) :
+    Y ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
+  classical
+  set N : Subgroup G' := Ch03.oPiCore ({p} : Set ℕ)ᶜ G' with hN
+  set mk := QuotientGroup.mk' N with hmkdef
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective N
+  have hker : mk.ker = N := QuotientGroup.ker_mk' N
+  set Q : Subgroup (G' ⧸ N) := Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) with hQ
+  haveI hQnorm : Q.Normal := by rw [hQ]; infer_instance
+  set Ybar : Subgroup (G' ⧸ N) := Y.map mk with hYbar
+  set Abar : Subgroup (G' ⧸ N) := A.map mk with hAbar
+  -- `Q = O_p(X̄)` is a `p`-group; `Ȳ` is a `p'`-group; hence `Q ⊓ Ȳ = ⊥`.
+  have hQ_pg : IsPGroup p ↥Q := by
+    rw [hQ, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p _
+  have hYbar_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Ybar := by
+    intro q hq
+    have hdvd : Nat.card ↥Ybar ∣ Nat.card ↥Y := by rw [hYbar]; exact Subgroup.card_map_dvd _ _
+    exact hYpi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+  have hYbar_cop : Nat.Coprime (Nat.card ↥Ybar) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      exact hYbar_pi q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hQYbot : Q ⊓ Ybar = ⊥ := OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hQ_pg hYbar_cop
+  -- Theorem 6.1 (`thmA4b`) ⟹ `A ≤ O_{p',p}(G')` ⟹ `Ā ≤ Q`.
+  have hThm61 : A ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) G' :=
+    OddOrder.BG.AppA.thmA4b hp2 ‹IsSolvable G'› hodd P hAP hAnormP
+  have hAbar_le_Q : Abar ≤ Q := by rw [hAbar]; exact Subgroup.map_le_iff_le_comap.mpr hThm61
+  -- `[Ā,Ȳ] = 1`: each commutator lies in `Q ⊓ Ȳ = ⊥`.
+  have hcommute : ∀ a' ∈ Abar, ∀ y' ∈ Ybar, a' * y' * a'⁻¹ * y'⁻¹ = 1 := by
+    intro a' ha' y' hy'
+    have hin_Q : a' * y' * a'⁻¹ * y'⁻¹ ∈ Q := by
+      have ha'Q : a' ∈ Q := hAbar_le_Q ha'
+      have hconj : y' * a'⁻¹ * y'⁻¹ ∈ Q := hQnorm.conj_mem a'⁻¹ (Q.inv_mem ha'Q) y'
+      have heq : a' * y' * a'⁻¹ * y'⁻¹ = a' * (y' * a'⁻¹ * y'⁻¹) := by group
+      rw [heq]; exact Q.mul_mem ha'Q hconj
+    have hin_Y : a' * y' * a'⁻¹ * y'⁻¹ ∈ Ybar := by
+      rw [hAbar, Subgroup.mem_map] at ha'
+      rw [hYbar, Subgroup.mem_map] at hy'
+      obtain ⟨a, ha, rfl⟩ := ha'
+      obtain ⟨y, hy, rfl⟩ := hy'
+      have hY : a * y * a⁻¹ * y⁻¹ ∈ Y :=
+        Y.mul_mem ((Subgroup.mem_normalizer_iff.mp (hYnorm ha) y).mp hy) (Y.inv_mem hy)
+      have heq : mk a * mk y * (mk a)⁻¹ * (mk y)⁻¹ = mk (a * y * a⁻¹ * y⁻¹) := by
+        rw [map_mul, map_mul, map_mul, map_inv, map_inv]
+      rw [hYbar, heq]
+      exact Subgroup.mem_map_of_mem mk hY
+    exact Subgroup.mem_bot.mp (hQYbot ▸ Subgroup.mem_inf.mpr ⟨hin_Q, hin_Y⟩)
+  -- conjugation action of `Ȳ` on `Q`.
+  have hYbar_norm : Ybar ≤ Subgroup.normalizer Q := by
+    intro y _
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    constructor
+    · intro hz; exact hQnorm.conj_mem z hz y
+    · intro hz
+      have h := hQnorm.conj_mem _ hz y⁻¹
+      have heq : y⁻¹ * (y * z * y⁻¹) * y⁻¹⁻¹ = z := by group
+      rwa [heq] at h
+  set φ : ↥Ybar →* MulAut ↥Q := Q.normalizerMonoidHom.comp (Subgroup.inclusion hYbar_norm) with hφ
+  have hφcoe : ∀ (a : ↥Ybar) (g : ↥Q),
+      ((φ a) g : G' ⧸ N) = (a : G' ⧸ N) * (g : G' ⧸ N) * (a : G' ⧸ N)⁻¹ := by
+    intro a g; rw [hφ]; rfl
+  -- `Ā ≤ C_Q(Ȳ)`: `Ā` (inside `Q`) is fixed by `Ȳ`.
+  have hAbar_le_fix : Abar.subgroupOf Q ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro g hg
+    rw [Subgroup.mem_subgroupOf] at hg
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    refine Subtype.ext ?_
+    rw [hφcoe]
+    have hc := hcommute (g : G' ⧸ N) hg (a : G' ⧸ N) a.2
+    have h3 : (g : G' ⧸ N) * (a : G' ⧸ N) * (g : G' ⧸ N)⁻¹ = (a : G' ⧸ N) := mul_inv_eq_one.mp hc
+    have h4 : (g : G' ⧸ N) * (a : G' ⧸ N) = (a : G' ⧸ N) * (g : G' ⧸ N) := by
+      calc (g : G' ⧸ N) * (a : G' ⧸ N)
+          = ((g : G' ⧸ N) * (a : G' ⧸ N) * (g : G' ⧸ N)⁻¹) * (g : G' ⧸ N) := by group
+        _ = (a : G' ⧸ N) * (g : G' ⧸ N) := by rw [h3]
+    calc (a : G' ⧸ N) * (g : G' ⧸ N) * (a : G' ⧸ N)⁻¹
+        = (g : G' ⧸ N) * (a : G' ⧸ N) * (a : G' ⧸ N)⁻¹ := by rw [← h4]
+      _ = (g : G' ⧸ N) := by group
+  -- `C_Q(C_Q(Ȳ)) ⊆ C_Q(Ȳ)` for Proposition 1.10, using step 6.
+  have hCC : Subgroup.centralizer (Subgroup.fixedPointsOfMulAut φ : Set ↥Q)
+      ≤ Subgroup.fixedPointsOfMulAut φ := by
+    refine le_trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAbar_le_fix)) ?_
+    refine le_trans ?_ hAbar_le_fix
+    intro c hc
+    rw [Subgroup.mem_subgroupOf]
+    refine mem_map_mk'_of_mem_oPiCore_quotient_of_commute P hAP hCPA (c := (c : G' ⧸ N)) c.2 ?_
+    intro a ha
+    have hmkaAbar : mk a ∈ Abar := by rw [hAbar]; exact Subgroup.mem_map_of_mem mk ha
+    have hmkaQ : mk a ∈ Q := hAbar_le_Q hmkaAbar
+    have hmem : (⟨mk a, hmkaQ⟩ : ↥Q) ∈ Abar.subgroupOf Q := by
+      rw [Subgroup.mem_subgroupOf]; exact hmkaAbar
+    exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hc ⟨mk a, hmkaQ⟩ hmem)
+  haveI : Group.IsNilpotent ↥Q := hQ_pg.isNilpotent
+  have hcop : Nat.Coprime (Nat.card ↥Ybar) (Nat.card ↥Q) := by
+    obtain ⟨n, hn⟩ := hQ_pg.exists_card_eq
+    rw [hn]; exact hYbar_cop.pow_right n
+  have htrivφ := OddOrder.BG.Ch1.S01.coprime_nilpotent_acts_trivially_of_centralizer_self
+    (A := ↥Ybar) (G := ↥Q) (φ := φ) hcop hCC
+  -- `Ȳ` centralizes `Q`, so `Ȳ ≤ C_X̄(Q) ≤ Q` (Prop 1.15(a)), hence `Ȳ ≤ Q ⊓ Ȳ = ⊥`.
+  have hYbar_cent : Ybar ≤ Subgroup.centralizer (Q : Set (G' ⧸ N)) := by
+    intro yb hyb
+    rw [Subgroup.mem_centralizer_iff]
+    intro q hq
+    have h := htrivφ ⟨yb, hyb⟩ ⟨q, hq⟩
+    have hco := congrArg Subtype.val h
+    rw [hφcoe] at hco
+    have : yb * q * yb⁻¹ = q := hco
+    calc q * yb = (yb * q * yb⁻¹) * yb := by rw [this]
+      _ = yb * q := by group
+  have h115a : Subgroup.centralizer (Q : Set (G' ⧸ N)) ≤ Q := by
+    have hbot : Ch03.oPiCore ({q | q ∉ ({p} : Set ℕ)}) (G' ⧸ N) = ⊥ := by
+      have := Ch03.oPiCore_quotient_self_eq_bot (G := G') ({p} : Set ℕ)ᶜ
+      exact this
+    have := OddOrder.BG.Ch1.S01.hall_higman_solvable_specialization (p := p) (G := G' ⧸ N) hbot
+    rw [← hQ] at this
+    exact this
+  have hYbar_le_Q : Ybar ≤ Q := le_trans hYbar_cent h115a
+  have hYbar_bot : Ybar = ⊥ := le_bot_iff.mp (hQYbot ▸ le_inf hYbar_le_Q le_rfl)
+  -- `Y.map mk = ⊥` ⟹ `Y ≤ ker mk = N`.
+  have hYmap_bot : Y.map mk = ⊥ := by rw [← hYbar]; exact hYbar_bot
+  rw [Subgroup.map_eq_bot_iff, hker] at hYmap_bot
+  exact hYmap_bot
+
+/-- **Per-`b` bridge for Prop 7.5's general case**: if `W ≤ X` lies in `O_{p'}(C_G(b))` for a
+`p`-element `b ∈ X`, then `W ≤ O_{p'}(X)`. Combines `le_opiCoreInG_of_normal_of_isPiSubgroup`
+(`O_{p'}(C_G(b)) ⊓ C_X(b) ≤ O_{p'}(C_X(b))`) with the relativized Proposition 1.15(b)
+(`O_{p'}(C_X(b)) ≤ O_{p'}(X)`). -/
+private theorem le_opiCoreInG_of_le_opiCoreInG_centralizer
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {b : G} (hbp : IsPGroup p (Subgroup.zpowers b))
+    (hbX : b ∈ X) {W : Subgroup G} (hWX : W ≤ X)
+    (hW_le : W ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G))) :
+    W ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  set C := Subgroup.centralizer ({b} : Set G) with hC
+  set H := C ⊓ X with hH
+  have hW_cent : W ≤ C := hW_le.trans (opiCoreInG_le _ _)
+  have hWH : W ≤ H := le_inf hW_cent hWX
+  -- `O_{p'}(C) ⊓ H ≤ O_{p'}(H)` via the normal-`p'`-subgroup bridge.
+  have hstep : opiCoreInG ({p} : Set ℕ)ᶜ C ⊓ H ≤ opiCoreInG ({p} : Set ℕ)ᶜ H := by
+    refine le_opiCoreInG_of_normal_of_isPiSubgroup inf_le_right ?_ ?_
+    · constructor
+      intro n hn g
+      rw [Subgroup.mem_subgroupOf] at hn ⊢
+      have hgC : (g : G) ∈ Subgroup.normalizer (opiCoreInG ({p} : Set ℕ)ᶜ C) :=
+        le_normalizer_opiCoreInG _ _ (Subgroup.mem_inf.mp g.2).1
+      refine ⟨(Subgroup.mem_normalizer_iff.mp hgC _).mp hn.1, ?_⟩
+      exact H.mul_mem (H.mul_mem g.2 hn.2) (H.inv_mem g.2)
+    · intro r hr
+      refine isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ C r ?_
+      exact Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
+        dvd_trans (Nat.mem_primeFactors.mp hr).2.1 (Subgroup.card_dvd_of_le inf_le_left),
+        Nat.card_pos.ne'⟩
+  -- `O_{p'}(H) = O_{p'}(C_X(b)) ≤ O_{p'}(X)` via the relativized Proposition 1.15(b).
+  have hrel : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+    have heqcent : Subgroup.centralizer ((Subgroup.zpowers b : Subgroup G) : Set G) = C := by
+      rw [hC]
+      refine le_antisymm (Subgroup.centralizer_le
+        (Set.singleton_subset_iff.mpr (SetLike.mem_coe.mpr (Subgroup.mem_zpowers b)))) ?_
+      · intro g hg
+        rw [Subgroup.mem_centralizer_iff] at hg ⊢
+        intro z hz
+        rw [SetLike.mem_coe] at hz
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+        have hcom : Commute b g := hg b (Set.mem_singleton b)
+        exact hcom.zpow_left k
+    have hrel := opiCoreInG_centralizer_inf_le_opiCoreInG hXsolv (Subgroup.zpowers_le.mpr hbX) hbp
+    rwa [heqcent, ← hH] at hrel
+  exact (le_inf hW_le hWH).trans (hstep.trans hrel)
+
+/-- **General case of BG Proposition 7.5** (mmd L2299-2307): given a noncyclic abelian `B ≤ A`
+of `p`-elements that normalizes the `A`-invariant `p'`-subgroup `Y ≤ X` coprimely, if each
+`C_Y(b) ⊆ O_{p'}(C_G(b))` (`b ∈ B^#`, the special-case input `hspec`), then `Y ≤ O_{p'}(X)`.
+Proof: Proposition 1.16 gives `Y = ⟨C_Y(b) | b ∈ B^#⟩` (`nontrivialActionFixedByClosure = ⊤`),
+and `le_opiCoreInG_of_le_opiCoreInG_centralizer` sends each `C_Y(b)` into `O_{p'}(X)`. -/
+private theorem coreClaimGeneral
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {X : Subgroup G} (hXsolv : IsSolvable ↥X) {A : Subgroup G} (hAX : A ≤ X)
+    {B : Subgroup G} (hBA : B ≤ A) [IsMulCommutative ↥B] (hB_nc : ¬ IsCyclic ↥B)
+    (hBp : ∀ b ∈ B, IsPGroup p (Subgroup.zpowers b))
+    {Y : Subgroup G} (hYX : Y ≤ X) (hAY : A ≤ Subgroup.normalizer Y)
+    (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Y))
+    (hspec : ∀ b ∈ B, b ≠ (1 : G) →
+      Y ⊓ Subgroup.centralizer ({b} : Set G)
+        ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G))) :
+    Y ≤ opiCoreInG ({p} : Set ℕ)ᶜ X := by
+  classical
+  have hBY : B ≤ Subgroup.normalizer Y := hBA.trans hAY
+  have hY_inv : Ch03.IsAInvariant (conjAction B) Y := isAInvariant_conjAction_iff.mpr hBY
+  have htop := OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+    hY_inv.restrict hcop hB_nc
+  have hle : nontrivialActionFixedByClosure hY_inv.restrict
+      ≤ (opiCoreInG ({p} : Set ℕ)ᶜ X ⊓ Y).subgroupOf Y := by
+    rw [nontrivialActionFixedByClosure_le_iff]
+    intro b hb_ne
+    rw [actionFixedBy_conjAction_restrict]
+    intro z hz
+    rw [Subgroup.mem_subgroupOf] at hz ⊢
+    have hb_ne' : (b : G) ≠ 1 := fun h => hb_ne (Subtype.ext h)
+    have hbX : (b : G) ∈ X := hAX (hBA b.2)
+    have hW_le_X : Y ⊓ Subgroup.centralizer ({(b : G)} : Set G) ≤ opiCoreInG ({p} : Set ℕ)ᶜ X :=
+      le_opiCoreInG_of_le_opiCoreInG_centralizer hXsolv (hBp (b : G) b.2) hbX
+        (le_trans inf_le_left hYX) (hspec (b : G) b.2 hb_ne')
+    exact Subgroup.mem_inf.mpr ⟨hW_le_X hz, (Subgroup.mem_inf.mp hz).1⟩
+  rw [htop, top_le_iff, Subgroup.subgroupOf_eq_top] at hle
+  exact le_trans hle inf_le_left
+
+/-- **Sylow-of-subgroup**: a Sylow `p`-subgroup `P` of `G` contained in `K ≤ G` restricts to a
+Sylow `p`-subgroup of `↥K` (with carrier `P.subgroupOf K`): `P.subgroupOf K` is a `p`-group, and
+`p ∤ (P.subgroupOf K).index` since it divides `P.index` (`relIndex_dvd_index_of_le`). Used for
+`b ∈ Z(P)`: `P` is a Sylow of `C_G(b)`. -/
+private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (P : Sylow p G) {K : Subgroup G} (hPK : (P : Subgroup G) ≤ K) :
+    ∃ Q : Sylow p ↥K, (Q : Subgroup ↥K) = (P : Subgroup G).subgroupOf K := by
+  have hpg : IsPGroup p ↥((P : Subgroup G).subgroupOf K) := by
+    obtain ⟨n, hn⟩ := P.2.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]; exact hn)
+  have hidx : ¬ p ∣ ((P : Subgroup G).subgroupOf K).index := fun h =>
+    P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
+  exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
+
+/-- **`hspec` for `b ∈ Z(P)`** (special case 1, mmd L2275-2285 packaged for the general case): if
+`b ∈ Z(P)` (so `P ≤ C_G(b)`), then any `A`-invariant `p'`-subgroup `W` of `C_G(b)` lies in
+`O_{p'}(C_G(b))`. Proof: `P` is a Sylow `p`-subgroup of `K := C_G(b)` (`sylow_subgroupOf_of_le`),
+`A.subgroupOf K` is `SCN` in it (transported from `A ⊴ P`, `C_P(A) ⊆ A`), so `specialCase` at `↥K`
+gives `W.subgroupOf K ≤ O_{p'}(↥K)`, which maps back to `W ≤ O_{p'}(C_G(b))`. -/
+private theorem le_opiCoreInG_centralizer_of_mem_centralizer_sylow
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G)
+    (hp2 : p ≠ 2) (P : Sylow p G) {A : Subgroup G} (hAP : A ≤ (P : Subgroup G))
+    [hAcomm : IsMulCommutative A] (hAnormP : (P : Subgroup G) ≤ Subgroup.normalizer A)
+    (hCPA : Subgroup.centralizer (A : Set G) ⊓ (P : Subgroup G) ≤ A)
+    {b : G} (hb_ne : b ≠ 1) (hbP : (P : Subgroup G) ≤ Subgroup.centralizer ({b} : Set G))
+    {W : Subgroup G} (hWcent : W ≤ Subgroup.centralizer ({b} : Set G))
+    (hAW : A ≤ Subgroup.normalizer W) (hWpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ W) :
+    W ≤ opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer ({b} : Set G)) := by
+  classical
+  set K : Subgroup G := Subgroup.centralizer ({b} : Set G) with hK
+  haveI hKsolv : IsSolvable ↥K :=
+    hG.solvable_of_lt_top K (by rw [hK]; exact centralizer_singleton_lt_top hG hb_ne)
+  have hodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  have hAK : A ≤ K := le_trans hAP (by rw [hK]; exact hbP)
+  have hWK : W ≤ K := by rw [hK]; exact hWcent
+  obtain ⟨Q, hQeq⟩ := sylow_subgroupOf_of_le P hbP
+  -- `A.subgroupOf K` is abelian, contained in `Q`, normalized by `Q`, with `C_Q(A) ⊆ A`.
+  haveI : IsMulCommutative ↥(A.subgroupOf K) := by
+    refine ⟨⟨fun a c => Subtype.ext (Subtype.ext ?_)⟩⟩
+    have := (isMulCommutative_iff_of_setLike.mp hAcomm)
+    exact this _ (Subgroup.mem_subgroupOf.mp a.2) _ (Subgroup.mem_subgroupOf.mp c.2)
+  have hAQ : A.subgroupOf K ≤ (Q : Subgroup ↥K) := by
+    rw [hQeq]; intro x hx; rw [Subgroup.mem_subgroupOf] at hx ⊢; exact hAP hx
+  have hQnorm : (Q : Subgroup ↥K) ≤ Subgroup.normalizer (A.subgroupOf K) := by
+    rw [hQeq]; intro q hq
+    rw [Subgroup.mem_subgroupOf] at hq
+    have hqP : (q : G) ∈ Subgroup.normalizer A := hAnormP hq
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    exact Subgroup.mem_normalizer_iff.mp hqP (z : G)
+  have hCQA : Subgroup.centralizer ((A.subgroupOf K : Subgroup ↥K) : Set ↥K) ⊓ (Q : Subgroup ↥K)
+      ≤ A.subgroupOf K := by
+    rw [hQeq]
+    intro q hq
+    rw [Subgroup.mem_subgroupOf]
+    have hqP : (q : G) ∈ (P : Subgroup G) :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_inf.mp hq).2
+    have hqC : (q : G) ∈ Subgroup.centralizer (A : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro a ha
+      have haK : a ∈ K := hAK ha
+      have hmem : (⟨a, haK⟩ : ↥K) ∈ A.subgroupOf K := by rw [Subgroup.mem_subgroupOf]; exact ha
+      have := Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hq).1 ⟨a, haK⟩ hmem
+      exact congrArg Subtype.val this
+    exact hCPA (Subgroup.mem_inf.mpr ⟨hqC, hqP⟩)
+  -- `W.subgroupOf K` is `A`-invariant and a `p'`-subgroup.
+  have hWnorm : A.subgroupOf K ≤ Subgroup.normalizer (W.subgroupOf K) := by
+    intro a ha
+    rw [Subgroup.mem_subgroupOf] at ha
+    have haW : (a : G) ∈ Subgroup.normalizer W := hAW ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    exact Subgroup.mem_normalizer_iff.mp haW (z : G)
+  have hWpi' : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (W.subgroupOf K) := by
+    intro r hr
+    refine hWpi r ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWK).toEquiv] at hr
+  -- specialCase at `↥K`, then transport back.
+  have hW' := specialCase hp2 hodd Q hAQ hQnorm hCQA hWnorm hWpi'
+  rw [hK]
+  calc W = (W.subgroupOf K).map K.subtype := (Subgroup.map_subgroupOf_eq_of_le hWK).symm
+    _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥K).map K.subtype := Subgroup.map_mono hW'
+    _ = opiCoreInG ({p} : Set ℕ)ᶜ K := rfl
+
+/-- **SCN unpacked into ambient form**: if `A.subgroupOf P` is `SCN` in `↥P` (with `A ≤ P`), then
+`A` is abelian, `P ≤ N_G(A)`, and `C_G(A) ⊓ P ≤ A` — exactly the hypotheses `specialCase` /
+`le_opiCoreInG_centralizer_of_mem_centralizer_sylow` require. Transports normality/self-centralizing
+from `↥P` to `G`. -/
+private theorem scn_ambient {p : ℕ} {G : Type*} [Group G] {P : Sylow p G} {A : Subgroup G}
+    (hAP : A ≤ (P : Subgroup G)) (h : IsSCN (A.subgroupOf (P : Subgroup G))) :
+    IsMulCommutative A ∧ (P : Subgroup G) ≤ Subgroup.normalizer A ∧
+      Subgroup.centralizer (A : Set G) ⊓ (P : Subgroup G) ≤ A := by
+  haveI hAcomm : IsMulCommutative A :=
+    IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
+      congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp h.isMulCommutative
+        (⟨a, hAP ha⟩ : ↥(P : Subgroup G)) (Subgroup.mem_subgroupOf.mpr ha)
+        ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
+  refine ⟨hAcomm, ?_, ?_⟩
+  · intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro a
+    constructor
+    · intro ha
+      have := h.isNormal.conj_mem ⟨a, hAP ha⟩ (Subgroup.mem_subgroupOf.mpr ha) ⟨g, hg⟩
+      rw [Subgroup.mem_subgroupOf] at this
+      simpa [Subgroup.coe_mul, Subgroup.coe_inv] using this
+    · intro ha
+      have hga : g * a * g⁻¹ ∈ A := ha
+      have := h.isNormal.conj_mem ⟨g * a * g⁻¹, hAP hga⟩ (Subgroup.mem_subgroupOf.mpr hga)
+        ⟨g, hg⟩⁻¹
+      rw [Subgroup.mem_subgroupOf] at this
+      have heq : ((⟨g, hg⟩⁻¹ * ⟨g * a * g⁻¹, hAP hga⟩ * (⟨g, hg⟩⁻¹)⁻¹ : ↥(P : Subgroup G)) : G)
+          = a := by simp [Subgroup.coe_mul, Subgroup.coe_inv]; group
+      rwa [heq] at this
+  · intro x hx
+    have hmem : (⟨x, (Subgroup.mem_inf.mp hx).2⟩ : ↥(P : Subgroup G))
+        ∈ Subgroup.centralizer ((A.subgroupOf (P : Subgroup G) : Subgroup ↥(P : Subgroup G))
+          : Set ↥(P : Subgroup G)) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro a ha
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at ha
+      exact Subtype.ext
+        (Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hx).1 (a : G) ha)
+    rw [h.selfCentralizing] at hmem
+    rwa [Subgroup.mem_subgroupOf] at hmem
+
+/-- **Coprime decomposition reduction** (for special case 2): if `z` normalizes `W` coprimely and
+both `C_W(z) = W ⊓ C_G(z)` and `⁅⟨z⟩, W⁆` lie in `L`, then `W ≤ L`. From the coprime decomposition
+`W = C_W(z)·⁅W,z⁆` (`fixedPoints_sup_actionCommutator_eq_top`): the `fixedPoints` summand is
+`C_W(z)` and the `actionCommutator` summand is `⁅⟨z⟩, W⁆`, both `≤ L`. -/
+private theorem le_of_centralizer_inf_le_of_commutator_le {G : Type*} [Group G] [Finite G]
+    {z : G} {W : Subgroup G} (hzW : z ∈ Subgroup.normalizer W)
+    (hcop : Nat.Coprime (orderOf z) (Nat.card ↥W)) {L : Subgroup G}
+    (hcent : W ⊓ Subgroup.centralizer ({z} : Set G) ≤ L)
+    (hcomm : ⁅Subgroup.zpowers z, W⁆ ≤ L) :
+    W ≤ L := by
+  classical
+  have hzpW : Subgroup.zpowers z ≤ Subgroup.normalizer W := Subgroup.zpowers_le.mpr hzW
+  have hW_inv : Ch03.IsAInvariant (conjAction (Subgroup.zpowers z)) W :=
+    isAInvariant_conjAction_iff.mpr hzpW
+  have hCop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers z)) (Nat.card ↥W) := by
+    rw [Nat.card_zpowers]; exact hcop
+  have htop := OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+    (φ := hW_inv.restrict) hCop' (Or.inl inferInstance)
+  rw [← Subgroup.subgroupOf_eq_top, eq_top_iff, ← htop, sup_le_iff]
+  refine ⟨?_, ?_⟩
+  · -- `fixedPoints ≤ L.subgroupOf W`: a fixed point centralizes `z`.
+    intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    refine hcent (Subgroup.mem_inf.mpr ⟨x.2, ?_⟩)
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    rw [Set.mem_singleton_iff] at hw
+    rw [hw]
+    have hval := congrArg Subtype.val
+      (Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨z, Subgroup.mem_zpowers z⟩)
+    rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+    simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hval
+    exact mul_inv_eq_iff_eq_mul.mp hval
+  · -- `actionCommutator ≤ L.subgroupOf W`: each generator is a `⁅z, w⁆`.
+    rw [OddOrder.Isaacs.Ch04.actionCommutator_le_iff]
+    intro a g
+    rw [Subgroup.mem_subgroupOf]
+    have hgen : (((hW_inv.restrict a) g * g⁻¹ : ↥W) : G)
+        = (a : G) * (g : G) * (a : G)⁻¹ * (g : G)⁻¹ := by
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, Ch03.IsAInvariant.restrict_apply_val]
+      simp only [conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply]
+      group
+    rw [hgen]
+    exact hcomm (Subgroup.commutator_mem_commutator a.2 g.2)
+
+/-- **Commutator part of special case 2**: if `z ∈ O_{p',p}(H)` normalizes a `p'`-subgroup `W`,
+then `⁅⟨z⟩, W⁆ ≤ O_{p'}(H)`. Proof: `⁅⟨z⟩,W⁆ ≤ W` (z normalizes W) and `≤ O_{p',p}(H)`
+(z ∈ O_{p',p} ⊴ H), so `⁅⟨z⟩,W⁆ ≤ W ⊓ O_{p',p}(H)`, a `p'`-subgroup whose image in
+`H/O_{p'}(H) = O_p(quotient)` (via `oPiPrimePiCore_map_mk'_eq`) is a `p'`-subgroup of a `p`-group,
+hence trivial — so it lies in `ker = O_{p'}(H)`. -/
+private theorem commutator_zpowers_le_oPiCore {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] {z : H} (hz : z ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H)
+    {W : Subgroup H} (hzW : z ∈ Subgroup.normalizer W)
+    (hWpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ W) :
+    ⁅Subgroup.zpowers z, W⁆ ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ H := by
+  haveI hOnorm : (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).Normal := inferInstance
+  have hsubW : ⁅Subgroup.zpowers z, W⁆ ≤ W := by
+    rw [Subgroup.commutator_le]
+    intro a ha b hb
+    have hab : a * b * a⁻¹ ∈ W :=
+      (Subgroup.mem_normalizer_iff.mp ((Subgroup.zpowers_le.mpr hzW) ha) b).mp hb
+    simpa [commutatorElement_def, mul_assoc] using W.mul_mem hab (W.inv_mem hb)
+  have hsubO : ⁅Subgroup.zpowers z, W⁆ ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) H := by
+    rw [Subgroup.commutator_le]
+    intro a ha b _
+    have haO : a ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H := by
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+      exact (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).zpow_mem hz k
+    have hconj : b * a⁻¹ * b⁻¹ ∈ Ch03.oPiPrimePiCore ({p} : Set ℕ) H :=
+      hOnorm.conj_mem a⁻¹ ((Ch03.oPiPrimePiCore ({p} : Set ℕ) H).inv_mem haO) b
+    simpa [commutatorElement_def, mul_assoc] using
+      (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).mul_mem haO hconj
+  -- `⁅⟨z⟩,W⁆ ≤ W ⊓ O_{p',p}(H)`; its mk'-image is a `p'`-subgroup of the `p`-group `O_p(H/O_{p'})`.
+  refine (le_inf hsubW hsubO).trans ?_
+  have hbridge : (Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+        (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))
+      = Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H) :=
+    oPiPrimePiCore_map_mk'_eq ({p} : Set ℕ)
+  have hle : (W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+        (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))
+      ≤ Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H) :=
+    hbridge ▸ Subgroup.map_mono inf_le_right
+  have hT_pg : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) (H ⧸ Ch03.oPiCore ({p} : Set ℕ)ᶜ H)) := by
+    rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p _
+  have hM_cop : Nat.Coprime (Nat.card ↥((W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+      (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H)))) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      have hdvd : Nat.card ↥((W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+            (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H))) ∣ Nat.card ↥W :=
+        (Subgroup.card_map_dvd _ _).trans (Subgroup.card_dvd_of_le inf_le_left)
+      exact hWpi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hbot : (W ⊓ Ch03.oPiPrimePiCore ({p} : Set ℕ) H).map
+      (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ)ᶜ H)) = ⊥ := by
+    have hinf := OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hT_pg hM_cop
+    rwa [inf_eq_right.mpr hle] at hinf
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+  exact hbot
+
+/-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
+`hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
+private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAp : IsPGroup p A) (hAne : A ≠ ⊥) : primesOf A = ({p} : Set ℕ) := by
+  obtain ⟨n, hn⟩ := hAp.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hn
+    exact hAne (Subgroup.card_eq_one.mp hn)
+  ext q
+  simp only [primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
+
 /-- **BG Proposition 7.5** (mmd L2252): `p ∈ π(G)`, `A` abelian `p`-部分群で、
 (1) `A = {x ∈ C_G(A) : x^p = 1}` かつ `G` の全真部分群が `p`-length one、または
 (2) ある Sylow `p`-部分群 `P` で `A ∈ SCN₂(P)`、
@@ -1071,7 +1711,46 @@ theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G
       (∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧
         IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)))) :
     Hypothesis71 A := by
-  sorry
+  rcases hcase with hcase1 | hcase2
+  · -- **case (1)**: every proper subgroup is `p`-length one. Hypothesis 7.1 follows from
+    -- Theorem 6.7, which is not yet formalized (BG: "follows easily from Theorem 6.7").
+    sorry
+  · -- **case (2)**: `A ∈ SCN₂(P)` for a Sylow `p`-subgroup `P`.
+    obtain ⟨P, hAP, hAscn2⟩ := hcase2
+    -- `A ≠ ⊥`: `pRank (A.subgroupOf P) ≥ 2` forces an elementary abelian subgroup of order `≥ p²`.
+    have hAne : A ≠ ⊥ := by
+      intro hAbot
+      obtain ⟨B, _, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+        (p := p) (by norm_num) hAscn2.le_pRank
+      have hp2 : p ^ 2 ≤ Nat.card ↥B := Nat.pow_le_of_le_log Nat.card_pos.ne' hBlog
+      have hBdvd : Nat.card ↥B ∣ Nat.card ↥(A.subgroupOf (P : Subgroup G)) :=
+        Subgroup.card_subgroup_dvd_card B
+      have hcard1 : Nat.card ↥(A.subgroupOf (P : Subgroup G)) = 1 := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAP).toEquiv, hAbot, Subgroup.card_bot]
+      rw [hcard1, Nat.dvd_one] at hBdvd
+      rw [hBdvd] at hp2
+      nlinarith [hp2, (Fact.out : p.Prime).two_le]
+    -- `A < ⊤`: `A ≤ P` and a Sylow `p`-subgroup of a (non-solvable) minimal simple group is proper.
+    have hAproper : A < ⊤ := by
+      have hP_lt : (P : Subgroup G) < ⊤ := by
+        rw [lt_top_iff_ne_top]
+        intro hPtop
+        have hGp : IsPGroup p G :=
+          (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+            (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+        haveI : Group.IsNilpotent G := hGp.isNilpotent
+        exact hG.notSolvable inferInstance
+      exact lt_of_le_of_lt hAP hP_lt
+    refine ⟨hAne, hAproper, ?_⟩
+    -- (2) of Hypothesis 7.1: reduce to the core claim `Y ⊆ O_{π'}(X)` (mmd L2273).
+    intro X hAX _hXlt
+    refine generated_eq_of_forall_le_opiCoreInG hAX ?_
+    intro Y _hY
+    -- **core claim** (mmd L2273-2307): every `A`-invariant `π'`-subgroup `Y ≤ X` lies in `O_{π'}(X)`.
+    -- Proof: construct `B ∈ E_p²(A)` with `B ⊴ P` (cyclic/noncyclic `Z(P)` split + G 2.6.4), then the
+    -- three claims of BG (special `b ∈ B^# ∩ Z` via Thm 6.1 + Prop 1.10 + 1.15(a); special `b ∈ B^#`
+    -- via Prop 1.15(b); general via Prop 1.16). See `notes/bg/s07_prop75_case2_plan.md`.
+    sorry
 
 /-! ## Theorem 7.6 — Thompson Transitivity Theorem -/
 

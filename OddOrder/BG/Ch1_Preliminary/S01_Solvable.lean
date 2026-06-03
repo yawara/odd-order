@@ -9,6 +9,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.GroupTheory.AInvariantPiSubgroups
 import Mathlib.Order.Minimal
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
@@ -2197,6 +2199,88 @@ theorem normalizer_sup_eq_normalizer_sup_of_pGroup_coprime
     Subgroup.mul_mem_sup hm_M h_mx_in_NT
   rwa [sup_comm] at h_in_M_NT
 
+/-- **BG Lemma 1.14 (centralizer-in-G form)**: `T` p-subgroup of `G`, `M ⊴ G` p'-subgroup.
+Writing `f = QuotientGroup.mk' M`, the preimage of `C_{G/M}(TM/M)` equals `C_G(T)·M`:
+`(C_{G/M}(T.map f)).comap f = C_G(T) ⊔ M`. Equivalently `C_G(T)` surjects onto `C_{G/M}(TM/M)`.
+
+This is the centralizer half of BG Lemma 1.14, derived from the normalizer half
+(`normalizer_sup_eq_normalizer_sup_of_pGroup_coprime`) plus `T ⊓ M = ⊥`
+(BG p.5: `CM ⊆ C* ⊆ N* = NM`, `C* ⊓ N = C`, so `C* = (C* ⊓ N)·M = CM`). Used for the
+`O_{p'}(G) = 1` reduction in Proposition 1.15(b). -/
+theorem centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    {M : Subgroup G} [M.Normal] (hM_p' : (Nat.card M).Coprime p) :
+    (Subgroup.centralizer
+        ((T.map (QuotientGroup.mk' M) : Subgroup (G ⧸ M)) : Set (G ⧸ M))).comap
+        (QuotientGroup.mk' M)
+      = Subgroup.centralizer (T : Set G) ⊔ M := by
+  set f := QuotientGroup.mk' M with hf
+  have hsurj : Function.Surjective f := QuotientGroup.mk'_surjective M
+  have hker : f.ker = M := QuotientGroup.ker_mk' M
+  have hdisj : T ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hT hM_p'
+  apply le_antisymm
+  · -- hard direction: `C* ⊆ C_G(T) ⊔ M`.
+    intro x hx
+    rw [Subgroup.mem_comap] at hx
+    -- `x ∈ N_G(T ⊔ M)` via the normalizer-of-quotient identity.
+    have hxN : x ∈ Subgroup.normalizer (T ⊔ M : Subgroup G) := by
+      have hxn : f x ∈ Subgroup.normalizer (T.map f : Subgroup (G ⧸ M)) :=
+        Subgroup.centralizer_le_normalizer _ hx
+      have e1 : (T.map f).comap f = (T ⊔ M : Subgroup G) := by
+        rw [Subgroup.comap_map_eq, hker]
+      have e2 := Subgroup.comap_normalizer_eq_of_surjective (T.map f) hsurj
+      have hmem : x ∈ (Subgroup.normalizer (T.map f : Subgroup (G ⧸ M))).comap f := by
+        rw [Subgroup.mem_comap]; exact hxn
+      rw [e2, e1] at hmem
+      exact hmem
+    rw [normalizer_sup_eq_normalizer_sup_of_pGroup_coprime hT hM_p', sup_comm] at hxN
+    obtain ⟨m, hm, n, hn, hmn⟩ := Subgroup.mem_sup_of_normal_left.mp hxN
+    -- `f m = 1`, hence `f n = f x`.
+    have hfm : f m = 1 := MonoidHom.mem_ker.mp (by rw [hker]; exact hm)
+    have hfn : f n = f x := by rw [← hmn, map_mul, hfm, one_mul]
+    -- `n` centralizes `T`.
+    have hn_cent : n ∈ Subgroup.centralizer (T : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro t ht
+      have htT : t ∈ T := SetLike.mem_coe.mp ht
+      -- `f n` commutes with `f t` (image of `T`).
+      have hcomm : f n * f t = f t * f n := by
+        have hft : (f t) ∈ (↑(T.map f) : Set (G ⧸ M)) :=
+          SetLike.mem_coe.mpr (Subgroup.mem_map_of_mem f htT)
+        rw [hfn]
+        exact (Subgroup.mem_centralizer_iff.mp hx (f t) hft).symm
+      -- `c := n*t*n⁻¹*t⁻¹ ∈ M` (vanishes mod `M`).
+      have hcM : n * t * n⁻¹ * t⁻¹ ∈ M := by
+        rw [← hker]
+        refine MonoidHom.mem_ker.mpr ?_
+        have : f n * f t * (f n)⁻¹ * (f t)⁻¹ = 1 := by rw [hcomm]; group
+        simpa [map_mul, map_inv] using this
+      -- `c ∈ T` since `n` normalizes `T`.
+      have hcT : n * t * n⁻¹ * t⁻¹ ∈ T := by
+        have hntn : n * t * n⁻¹ ∈ T := (Subgroup.mem_normalizer_iff.mp hn t).mp htT
+        exact T.mul_mem hntn (T.inv_mem htT)
+      have hc1 : n * t * n⁻¹ * t⁻¹ = 1 :=
+        Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hcT, hcM⟩)
+      have h1 : n * t * n⁻¹ = t := mul_inv_eq_one.mp hc1
+      calc t * n = (n * t * n⁻¹) * n := by rw [h1]
+        _ = n * t := by group
+    rw [sup_comm]
+    exact Subgroup.mem_sup_of_normal_left.mpr ⟨m, hm, n, hn_cent, hmn⟩
+  · -- easy direction: `C_G(T) ⊔ M ⊆ C*`.
+    rw [sup_le_iff]
+    refine ⟨?_, ?_⟩
+    · intro c hc
+      rw [Subgroup.mem_comap, Subgroup.mem_centralizer_iff]
+      rintro h ⟨t, ht, rfl⟩
+      rw [← map_mul, ← map_mul]
+      exact congrArg f (Subgroup.mem_centralizer_iff.mp hc t ht)
+    · intro μ hμ
+      rw [Subgroup.mem_comap]
+      have hμ1 : f μ = 1 := MonoidHom.mem_ker.mp (by rw [hker]; exact hμ)
+      rw [hμ1]
+      exact Subgroup.one_mem _
+
 /-- **BG Proposition 1.15(a) (P. Hall & G. Higman "Lemma 1.2.3", thin wrap)**: `G` 有限可解 +
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
 
@@ -2216,6 +2300,274 @@ theorem hall_higman_solvable_specialization
     Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G : Set G) ≤
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
   OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hp'
+
+/-- **Prop 1.15(b) core** (`O_{p'}(G) = ⊥` case, per element): every `u ∈ M := O_{p'}(C_G(R))`
+centralizes `T := O_p(G)`. Proof mirrors `BG.AppA.thmA5_part2`: `⟨u⟩` acts by conjugation on the
+`p`-group `RT := R ⊔ T`, and `C_{RT}(C_{RT}(u)) ⊆ C_{RT}(R) ⊆ C_{RT}(u)` — the second inclusion
+because `C_{RT}(R) ⊆ C_G(R)` centralizes `u` (`[c,u] ∈ RT ⊓ M = ⊥`, since `M ⊴ C_G(R)` and `u`
+normalizes `RT`). Proposition 1.10 then makes `⟨u⟩` act trivially on `RT ⊇ T`. -/
+private theorem mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {R : Subgroup G} (hR : IsPGroup p R)
+    {u : G} (huM : u ∈ OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
+      (Subgroup.centralizer (R : Set G))) :
+    u ∈ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.opCore p G : Subgroup G) : Set G) := by
+  classical
+  set M : Subgroup G := OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
+    (Subgroup.centralizer (R : Set G)) with hM
+  set T : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hT
+  set RT : Subgroup G := R ⊔ T with hRT
+  -- `u ∈ C_G(R)` and `u` is a `p'`-element.
+  have huC : u ∈ Subgroup.centralizer (R : Set G) :=
+    OddOrder.GroupTheory.opiCoreInG_le _ _ huM
+  have hMp' : Nat.Coprime (Nat.card ↥M) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := ({p} : Set ℕ)ᶜ)
+      Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      rw [hM, OddOrder.GroupTheory.card_opiCoreInG] at hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hu_cop : (orderOf u).Coprime p := by
+    have hdvd : orderOf u ∣ Nat.card ↥M := by
+      have h : orderOf (⟨u, huM⟩ : ↥M) ∣ Nat.card ↥M := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk] at h
+    exact Nat.Coprime.coprime_dvd_left hdvd hMp'
+  -- `T` normal, `RT` a `p`-group; `RT ⊓ M = ⊥`.
+  haveI hTnorm : T.Normal := by rw [hT]; exact OddOrder.Isaacs.Ch01.opCore.normal p G
+  have hRT_pg : IsPGroup p ↥RT :=
+    hR.to_sup_of_normal_right (OddOrder.Isaacs.Ch01.opCore_isPGroup p G)
+  have hRTM_disj : RT ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hRT_pg hMp'
+  -- `u` normalizes `RT` (centralizes `R`, normalizes `T ⊴ G`).
+  have hu_norm_RT : u ∈ Subgroup.normalizer RT := by
+    have huNR : u ∈ Subgroup.normalizer (R : Set G) :=
+      Subgroup.centralizer_le_normalizer (R : Set G) huC
+    rw [hRT]
+    exact le_normalizer_sup_of_normal R T (Subgroup.mem_sup_left huNR)
+  have hzu_le : Subgroup.zpowers u ≤ Subgroup.normalizer RT :=
+    Subgroup.zpowers_le.mpr hu_norm_RT
+  -- conjugation action of `⟨u⟩` on `RT`.
+  set φ : ↥(Subgroup.zpowers u) →* MulAut ↥RT :=
+    RT.normalizerMonoidHom.comp (Subgroup.inclusion hzu_le) with hφ
+  have hφcoe : ∀ (a : ↥(Subgroup.zpowers u)) (g : ↥RT),
+      ((φ a) g : G) = (a : G) * (g : G) * (a : G)⁻¹ := by
+    intro a g; rw [hφ]; rfl
+  -- (i) `R.subgroupOf RT ≤ fixedPoints` (`R ⊆ C_{RT}(u)`).
+  have hR_le_fix : R.subgroupOf RT ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro g hg
+    rw [Subgroup.mem_subgroupOf] at hg
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    refine Subtype.ext ?_
+    rw [hφcoe]
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have hgu : Commute (g : G) u := Subgroup.mem_centralizer_iff.mp huC (g : G) hg
+    have hcomm : Commute (a : G) (g : G) := by rw [← hk]; exact (hgu.symm).zpow_left k
+    rw [hcomm.eq, mul_assoc, mul_inv_cancel, mul_one]
+  -- (ii) `C_{RT}(R) ≤ fixedPoints` (`C_{RT}(R)` centralizes `u`, via `[c,u] ∈ RT ⊓ M = ⊥`).
+  have hCRTR_le_fix : Subgroup.centralizer ((R.subgroupOf RT : Subgroup ↥RT) : Set ↥RT)
+      ≤ Subgroup.fixedPointsOfMulAut φ := by
+    intro c hc
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    refine Subtype.ext ?_
+    rw [hφcoe]
+    -- `c` centralizes `R`, so `c ∈ C_G(R)`.
+    have hc_cent_R : (c : G) ∈ Subgroup.centralizer (R : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro r hr
+      have hr' : (⟨r, Subgroup.mem_sup_left hr⟩ : ↥RT) ∈ (R.subgroupOf RT : Subgroup ↥RT) := by
+        rw [Subgroup.mem_subgroupOf]; exact hr
+      have hcr := Subgroup.mem_centralizer_iff.mp hc ⟨r, Subgroup.mem_sup_left hr⟩ hr'
+      exact congrArg Subtype.val hcr
+    -- `[c,u] ∈ M` (since `M ⊴ C_G(R)`).
+    have hcomm_M : (c : G) * u * (c : G)⁻¹ * u⁻¹ ∈ M := by
+      have hcu : (c : G) * u * (c : G)⁻¹ ∈ M :=
+        ((Subgroup.mem_normalizer_iff.mp
+          (OddOrder.GroupTheory.le_normalizer_opiCoreInG _ _ hc_cent_R)) u).mp huM
+      exact M.mul_mem hcu (M.inv_mem huM)
+    -- `[c,u] ∈ RT` (`c ∈ RT`, `u` normalizes `RT`).
+    have hcomm_RT : (c : G) * u * (c : G)⁻¹ * u⁻¹ ∈ RT := by
+      have hucu : u * (c : G)⁻¹ * u⁻¹ ∈ RT :=
+        ((Subgroup.mem_normalizer_iff.mp hu_norm_RT) (c : G)⁻¹).mp (RT.inv_mem c.2)
+      have hrw : (c : G) * u * (c : G)⁻¹ * u⁻¹ = (c : G) * (u * (c : G)⁻¹ * u⁻¹) := by group
+      rw [hrw]; exact RT.mul_mem c.2 hucu
+    -- so `[c,u] = 1`, i.e. `u` and `c` commute.
+    have hcomm1 : (c : G) * u * (c : G)⁻¹ * u⁻¹ = 1 :=
+      Subgroup.mem_bot.mp (hRTM_disj ▸ Subgroup.mem_inf.mpr ⟨hcomm_RT, hcomm_M⟩)
+    have hcu_eq : u * (c : G) = (c : G) * u := by
+      have h1 : (c : G) * u * (c : G)⁻¹ = u := mul_inv_eq_one.mp hcomm1
+      calc u * (c : G) = ((c : G) * u * (c : G)⁻¹) * (c : G) := by rw [h1]
+        _ = (c : G) * u := by group
+    have hcu : Commute u (c : G) := hcu_eq
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have hac : Commute (a : G) (c : G) := by rw [← hk]; exact hcu.zpow_left k
+    rw [hac.eq, mul_assoc, mul_inv_cancel, mul_one]
+  -- `C_{RT}(C_{RT}(u)) ⊆ C_{RT}(u)` for Prop 1.10.
+  have hCC : Subgroup.centralizer (Subgroup.fixedPointsOfMulAut φ : Set ↥RT)
+      ≤ Subgroup.fixedPointsOfMulAut φ :=
+    calc Subgroup.centralizer (Subgroup.fixedPointsOfMulAut φ : Set ↥RT)
+        ≤ Subgroup.centralizer ((R.subgroupOf RT : Subgroup ↥RT) : Set ↥RT) :=
+          Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR_le_fix)
+      _ ≤ Subgroup.fixedPointsOfMulAut φ := hCRTR_le_fix
+  haveI : Group.IsNilpotent ↥RT := hRT_pg.isNilpotent
+  have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers u)) (Nat.card ↥RT) := by
+    obtain ⟨n, hn⟩ := hRT_pg.exists_card_eq
+    rw [Nat.card_zpowers, hn]
+    exact hu_cop.pow_right n
+  have htrivφ := coprime_nilpotent_acts_trivially_of_centralizer_self
+    (A := ↥(Subgroup.zpowers u)) (G := ↥RT) (φ := φ) hcop hCC
+  -- `u` centralizes `T ≤ RT`.
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hxT
+  have hxRT : x ∈ RT := Subgroup.mem_sup_right hxT
+  have h := htrivφ ⟨u, Subgroup.mem_zpowers u⟩ ⟨x, hxRT⟩
+  have hco := congrArg Subtype.val h
+  rw [hφcoe] at hco
+  have hco' : u * x * u⁻¹ = x := hco
+  have hux : u * x = x * u := by
+    have hcg := congrArg (· * u) hco'; simpa [mul_assoc] using hcg
+  exact hux.symm
+
+/-- **BG Proposition 1.15(b), `O_{p'}(G) = ⊥` case** (D. Goldschmidt): if `G` is solvable with
+trivial `p'`-core and `R` is a `p`-subgroup, then `O_{p'}(C_G(R)) = ⊥`. From the unconditional
+`O_{p'}(C_G(R)) ⊆ C_G(O_p(G))` (`mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer`) and
+`C_G(O_p(G)) ⊆ O_p(G)` (Prop 1.15(a)): `O_{p'}(C_G(R))` is both a `p`-subgroup (`≤ O_p(G)`) and a
+`p'`-group, hence `⊥`. The general form (below) reduces to this case modulo `O_{p'}(G)`. -/
+theorem oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {R : Subgroup G} (hR : IsPGroup p R)
+    (hbot : OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G = ⊥) :
+    OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) = ⊥ := by
+  set M : Subgroup G := OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
+    (Subgroup.centralizer (R : Set G)) with hM
+  set T : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hT
+  -- `M ≤ C_G(T) ≤ T`.
+  have hM_le_T : M ≤ T := by
+    have hM_le_CT : M ≤ Subgroup.centralizer (T : Set G) := fun u hu =>
+      mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer hR (hM ▸ hu)
+    have hset : {q | q ∉ ({p} : Set ℕ)} = ({p} : Set ℕ)ᶜ := by ext q; simp
+    have hHH := hall_higman_solvable_specialization (p := p) (G := G) (by rw [hset]; exact hbot)
+    rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore, ← hT] at hHH
+    exact hM_le_CT.trans hHH
+  -- `card M` is coprime to `p` (`M` is a `p'`-group).
+  have hMp' : Nat.Coprime (Nat.card ↥M) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := ({p} : Set ℕ)ᶜ)
+      Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      rw [hM, OddOrder.GroupTheory.card_opiCoreInG] at hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  -- `card M ∣ card T = p^n` and coprime to `p` ⟹ `card M = 1` ⟹ `M = ⊥`.
+  obtain ⟨n, hn⟩ := (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).exists_card_eq
+  have hdvd : Nat.card ↥M ∣ Nat.card ↥T := Subgroup.card_dvd_of_le hM_le_T
+  rw [hT, hn] at hdvd
+  have hcard1 : Nat.card ↥M = 1 := by
+    have hg := Nat.gcd_eq_left hdvd
+    rw [← hg]; exact hMp'.pow_right n
+  exact (Subgroup.card_eq_one).mp hcard1
+
+/-- **BG Proposition 1.15(b) (D. Goldschmidt)**, general form: if `G` is a finite solvable group
+and `R` is a `p`-subgroup, then `O_{p'}(C_G(R)) ≤ O_{p'}(G)`.
+
+This reduces the general statement to the `O_{p'}(G) = ⊥` case
+(`oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot`) modulo `M₀ := O_{p'}(G)`. Writing
+`f = mk' M₀`, `Ḡ = G/M₀`, `R̄ = R.map f`, Lemma 1.14 (`centralizer_comap_mk'_…`) gives
+`C_Ḡ(R̄) = C_G(R)·M₀/M₀ = (C_G(R)).map f`. Setting `K := M.map f` for `M := O_{p'}(C_G(R))`:
+`K` lies in `C̄ := C_Ḡ(R̄)`, is normalized by `C̄` (since `M ⊴ C_G(R)`), and is a `p'`-group, so
+`K.subgroupOf C̄ ≤ O_{p'}(↥C̄)`, i.e. `K ≤ O_{p'}(C_Ḡ(R̄))`. The special case at `Ḡ` (where
+`O_{p'}(Ḡ) = ⊥` by `oPiCore_quotient_self_eq_bot`) forces `K = ⊥`, hence `M ≤ ker f = M₀`. -/
+theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {R : Subgroup G} (hR : IsPGroup p R) :
+    OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) ≤
+      OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G := by
+  set M : Subgroup G := OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
+    (Subgroup.centralizer (R : Set G)) with hMdef
+  set M₀ : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G with hM₀def
+  -- goal is now `M ≤ M₀`.
+  haveI hM₀norm : M₀.Normal := by rw [hM₀def]; infer_instance
+  set f : G →* G ⧸ M₀ := QuotientGroup.mk' M₀ with hfdef
+  have hsurj : Function.Surjective f := QuotientGroup.mk'_surjective M₀
+  have hker : f.ker = M₀ := QuotientGroup.ker_mk' M₀
+  -- `M₀ = O_{p'}(G)` is a `p'`-group, so its order is coprime to `p`.
+  have hM₀p' : Nat.Coprime (Nat.card ↥M₀) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      rw [hM₀def] at hq
+      exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hM₀map : M₀.map f = ⊥ := by rw [Subgroup.map_eq_bot_iff]; exact hker.ge
+  -- `Cbar = C_Ḡ(R̄)`, the centralizer of the image of `R`.
+  set Cbar : Subgroup (G ⧸ M₀) := Subgroup.centralizer ((R.map f) : Set (G ⧸ M₀)) with hCbardef
+  -- brick 1 (Lemma 1.14): the preimage of `Cbar` is `C_G(R) ⊔ M₀`.
+  have hbrick1 : Cbar.comap f = Subgroup.centralizer (R : Set G) ⊔ M₀ :=
+    centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime hR hM₀p'
+  -- hence `Cbar = (C_G(R)).map f` (apply `map f`, `M₀.map f = ⊥`).
+  have hCbareq : Cbar = (Subgroup.centralizer (R : Set G)).map f := by
+    have h := congrArg (Subgroup.map f) hbrick1
+    rwa [Subgroup.map_comap_eq_self_of_surjective hsurj, Subgroup.map_sup, hM₀map,
+      sup_bot_eq] at h
+  set K : Subgroup (G ⧸ M₀) := M.map f with hKdef
+  -- (A) `K ≤ Cbar`.
+  have hM_le_C : M ≤ Subgroup.centralizer (R : Set G) :=
+    OddOrder.GroupTheory.opiCoreInG_le _ _
+  have hKC : K ≤ Cbar := by rw [hKdef, hCbareq]; exact Subgroup.map_mono hM_le_C
+  -- (B) `Cbar` stabilizes `K` by conjugation (`M ⊴ C_G(R)`).
+  have hK_conj_stable : ∀ g ∈ Cbar, ∀ x ∈ K, g * x * g⁻¹ ∈ K := by
+    intro g hg x hx
+    rw [hCbareq] at hg
+    obtain ⟨y, hy, rfl⟩ := hg
+    rw [hKdef] at hx ⊢
+    obtain ⟨m, hm, rfl⟩ := hx
+    have hconj : y * m * y⁻¹ ∈ M :=
+      (Subgroup.mem_normalizer_iff.mp
+        (OddOrder.GroupTheory.le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ
+          (Subgroup.centralizer (R : Set G)) hy) m).mp hm
+    have heq : f y * f m * (f y)⁻¹ = f (y * m * y⁻¹) := by rw [map_mul, map_mul, map_inv]
+    rw [heq]
+    exact Subgroup.mem_map_of_mem f hconj
+  -- (C) `K.subgroupOf Cbar` is normal in `↥Cbar`.
+  haveI hK_norm : (K.subgroupOf Cbar).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+    exact hK_conj_stable (g : G ⧸ M₀) g.2 (n : G ⧸ M₀) hn
+  -- (D) `K` is a `p'`-group, so `K.subgroupOf Cbar ≤ O_{p'}(↥Cbar)`.
+  have hM_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)ᶜ M := by
+    intro q hq
+    rw [hMdef, OddOrder.GroupTheory.card_opiCoreInG] at hq
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) q hq
+  have hK_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)ᶜ K := by
+    intro q hq
+    have hdvd : Nat.card ↥K ∣ Nat.card ↥M := by rw [hKdef]; exact Subgroup.card_map_dvd _ _
+    exact hM_pi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+  have hK_le_oPiCore : K.subgroupOf Cbar ≤ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar :=
+    (OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hKC hK_pi).le_oPiCore
+  -- (E) `K ≤ O_{p'}(Cbar)` realized in `Ḡ`.
+  have hK_le : K ≤ OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ Cbar := by
+    intro x hx
+    have hxCbar : x ∈ Cbar := hKC hx
+    have hmem : (⟨x, hxCbar⟩ : ↥Cbar) ∈ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar :=
+      hK_le_oPiCore (by rw [Subgroup.mem_subgroupOf]; exact hx)
+    show x ∈ (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar).map Cbar.subtype
+    exact Subgroup.mem_map.mpr ⟨⟨x, hxCbar⟩, hmem, rfl⟩
+  -- (F) special case at `Ḡ`: `O_{p'}(Cbar) = ⊥` (because `O_{p'}(Ḡ) = ⊥`).
+  have hbarbot : OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ (G ⧸ M₀) = ⊥ :=
+    OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot ({p} : Set ℕ)ᶜ
+  have hCbarbot : OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ Cbar = ⊥ :=
+    oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot (hR.map f) hbarbot
+  -- conclude `K = ⊥`, hence `M ≤ ker f = M₀`.
+  have hKbot : K = ⊥ := le_bot_iff.mp (hK_le.trans hCbarbot.le)
+  have hMmap : M.map f = ⊥ := by rw [← hKdef]; exact hKbot
+  rw [Subgroup.map_eq_bot_iff, hker] at hMmap
+  exact hMmap
 
 /-! ## §1F: Focal + Burnside + Maschke (Thm 1.17-1.20)
 
