@@ -847,6 +847,15 @@ private theorem exists_primeFactor_ne_of_not_isPGroup {H : Type*} [Group H] [Fin
   by_contra hq_ne
   exact h ⟨q, Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩, hq_ne⟩
 
+private theorem exists_primeFactor_ne_of_mem_primeFactor_not_isPGroup {H : Type*}
+    [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card H).primeFactors) (hHnot : ¬ IsPGroup p H) (q : ℕ) :
+    ∃ r, r ∈ (Nat.card H).primeFactors ∧ r ≠ q := by
+  by_cases hqp : q = p
+  · obtain ⟨r, hr, hrp⟩ := exists_primeFactor_ne_of_not_isPGroup hHnot
+    exact ⟨r, hr, fun hrq => hrp (hrq.trans hqp)⟩
+  · exact ⟨p, hp, fun hpq => hqp hpq.symm⟩
+
 /-- If Fitting M is not a p-group, BG (8.2) supplies a prime q whose center-core
 localizes the ambient centralizer of C_F(M)(A0) inside M. -/
 theorem centralizer_cFitting_le_maximal_of_not_isPGroup [Finite G]
@@ -1137,6 +1146,157 @@ theorem hInvariant_le_commutator_centerFittingOpCoreInG_of_not_pGroup
   exact le_commutator_of_coprime_inf_centralizer_eq_bot
     (centerFittingOpCoreInG_le_normalizer_of_hInvariant (q := q) hA0 hY)
     (coprime_card_centerFittingOpCoreInG_hInvariant hA0 hq hY) hfixed
+
+/-- If `R` is a q-subgroup of `X`, then the q'-core of `N_X(R)` lies in the q'-core
+of `C_X(R)`. The point is that `K = O_{q'}(N_X(R))` normalizes `R`, while `R`
+normalizes `K`; hence `[K,R]` lies in both the q'-group `K` and the q-group `R`. -/
+theorem opiCoreInG_singleton_compl_normalizer_inf_le_centralizer_inf
+    [Finite G] {q : ℕ} [Fact q.Prime] {R X : Subgroup G}
+    (hRX : R ≤ X) (hRpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) R) :
+    opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.normalizer (R : Set G) ⊓ X) ≤
+      opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G) ⊓ X) := by
+  let N : Subgroup G := Subgroup.normalizer (R : Set G) ⊓ X
+  let C : Subgroup G := Subgroup.centralizer (R : Set G) ⊓ X
+  let K : Subgroup G := opiCoreInG ({q} : Set ℕ)ᶜ N
+  have hKN : K ≤ N := opiCoreInG_le ({q} : Set ℕ)ᶜ N
+  have hKX : K ≤ X := hKN.trans inf_le_right
+  have hK_norm_R : K ≤ Subgroup.normalizer (R : Set G) := hKN.trans inf_le_left
+  have hRN : R ≤ N := by
+    intro r hr
+    exact ⟨Subgroup.le_normalizer hr, hRX hr⟩
+  have hN_norm_K : N ≤ Subgroup.normalizer (K : Set G) := by
+    dsimp [K]
+    exact le_normalizer_opiCoreInG ({q} : Set ℕ)ᶜ N
+  have hR_norm_K : R ≤ Subgroup.normalizer (K : Set G) := hRN.trans hN_norm_K
+  have hcomm_le_K : ⁅K, R⁆ ≤ K :=
+    OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hR_norm_K
+  have hcomm_le_R : ⁅K, R⁆ ≤ R := by
+    rw [Subgroup.commutator_comm K R]
+    exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hK_norm_R
+  have hKpi : Subgroup.IsPiSubgroup ({q} : Set ℕ)ᶜ K := by
+    dsimp [K]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ)ᶜ N
+  have hcomm_pi : Subgroup.IsPiSubgroup ({q} : Set ℕ)ᶜ ⁅K, R⁆ := by
+    intro s hs
+    exact hKpi s
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hcomm_le_K) Nat.card_pos.ne' hs)
+  have hcomm_bot : ⁅K, R⁆ = ⊥ :=
+    eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hcomm_le_R hRpi hcomm_pi
+  have hK_cent : K ≤ Subgroup.centralizer (R : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
+    exact hcomm_bot
+  have hKC : K ≤ C := by
+    intro x hx
+    exact ⟨hK_cent hx, hKX hx⟩
+  have hC_le_N : C ≤ N := by
+    intro x hx
+    exact ⟨Subgroup.centralizer_le_normalizer (R : Set G) hx.1, hx.2⟩
+  have hKnormC : (K.subgroupOf C).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hKC]
+    exact hC_le_N.trans hN_norm_K
+  exact le_opiCoreInG_of_normal_of_isPiSubgroup hKC hKnormC hKpi
+
+/-- BG (8.5), central-core form: for distinct primes `q,r ∈ π(F(M))`, the central
+r-core `O_r(Z(F(M)))` lies in `O_{q'}(X)` whenever `X` is solvable and contains
+`C_F(M)(A0)`. -/
+theorem centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q r : ℕ}
+    [Fact p.Prime] [Fact q.Prime] [Fact r.Prime] {M A0 X : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hXsolv : IsSolvable ↥X)
+    (hAX : cFittingInG M A0 ≤ X)
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hr : r ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hqr : q ≠ r) :
+    centerFittingOpCoreInG r M ≤ opiCoreInG ({q} : Set ℕ)ᶜ X := by
+  let Rq : Subgroup G := centerFittingOpCoreInG q M
+  let Br : Subgroup G := centerFittingOpCoreInG r M
+  let Nq : Subgroup G := Subgroup.normalizer (Rq : Set G) ⊓ X
+  have hRqX : Rq ≤ X :=
+    (centerFittingOpCoreInG_le_cFittingInG (q := q) hA0).trans hAX
+  have hBrX : Br ≤ X :=
+    (centerFittingOpCoreInG_le_cFittingInG (q := r) hA0).trans hAX
+  have hRqpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Rq := by
+    dsimp [Rq, centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) (centerFittingInG M)
+  have hBrpi_r : Subgroup.IsPiSubgroup ({r} : Set ℕ) Br := by
+    dsimp [Br, centerFittingOpCoreInG]
+    exact isPiSubgroup_opiCoreInG ({r} : Set ℕ) (centerFittingInG M)
+  have hBrpi_qcompl : Subgroup.IsPiSubgroup ({q} : Set ℕ)ᶜ Br := by
+    refine hBrpi_r.mono ?_
+    intro s hs hsq
+    rw [Set.mem_singleton_iff] at hs hsq
+    exact hqr (hsq.symm.trans hs)
+  have hNq_eq_M : Subgroup.normalizer (Rq : Set G) = M := by
+    dsimp [Rq]
+    exact normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM
+      (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hq)
+  have hBrNq : Br ≤ Nq := by
+    refine le_inf ?_ hBrX
+    intro x hx
+    simpa [hNq_eq_M] using centerFittingOpCoreInG_le r M hx
+  have hBrnormNq : (Br.subgroupOf Nq).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hBrNq]
+    have hNq_le_M : Nq ≤ M := by
+      intro x hx
+      simpa [hNq_eq_M] using hx.1
+    have hBr_norm_eq_M : Subgroup.normalizer (Br : Set G) = M := by
+      dsimp [Br]
+      exact normalizer_centerFittingOpCoreInG_eq_of_ne_bot hG hM
+        (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hr)
+    have hM_norm_Br : M ≤ Subgroup.normalizer (Br : Set G) := by
+      rw [hBr_norm_eq_M]
+    exact hNq_le_M.trans hM_norm_Br
+  have hBr_le_core_Nq : Br ≤ opiCoreInG ({q} : Set ℕ)ᶜ Nq :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hBrNq hBrnormNq hBrpi_qcompl
+  have hcore_Nq_le_core_CX :
+      opiCoreInG ({q} : Set ℕ)ᶜ Nq ≤
+        opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.centralizer (Rq : Set G) ⊓ X) := by
+    dsimp [Nq]
+    exact opiCoreInG_singleton_compl_normalizer_inf_le_centralizer_inf hRqX hRqpi
+  have hRqP : IsPGroup q ↥Rq :=
+    OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hRqpi
+  have hcore_CX_le_core_X :
+      opiCoreInG ({q} : Set ℕ)ᶜ (Subgroup.centralizer (Rq : Set G) ⊓ X) ≤
+        opiCoreInG ({q} : Set ℕ)ᶜ X :=
+    OddOrder.BG.Ch2.S07.opiCoreInG_centralizer_inf_le_opiCoreInG hXsolv hRqX hRqP
+  exact hBr_le_core_Nq.trans (hcore_Nq_le_core_CX.trans hcore_CX_le_core_X)
+
+/-- BG (8.5) applied to the commutator form (8.4): if `q ∈ π(F(M))`, every
+`A = C_F(M)(A0)`-invariant `π(A)`-complement subgroup lies in `O_{q'}(X)`. -/
+theorem hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hXsolv : IsSolvable ↥X)
+    (hAX : cFittingInG M A0 ≤ X)
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hFnp : ¬ IsPGroup p ↥(fittingInG M))
+    (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hY : Y ∈ hInvariant X (cFittingInG M A0)
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Y ≤ opiCoreInG ({q} : Set ℕ)ᶜ X := by
+  obtain ⟨r, hr, hrq⟩ :=
+    exists_primeFactor_ne_of_mem_primeFactor_not_isPGroup
+      (H := ↥(fittingInG M)) hp hFnp q
+  haveI : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hr).1⟩
+  let Br : Subgroup G := centerFittingOpCoreInG r M
+  have hY_comm : Y ≤ ⁅Br, Y⁆ := by
+    dsimp [Br]
+    exact hInvariant_le_commutator_centerFittingOpCoreInG_of_not_pGroup
+      hG hM hA0 hFnp hr hY
+  have hBr_core : Br ≤ opiCoreInG ({q} : Set ℕ)ᶜ X := by
+    dsimp [Br]
+    exact centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
+      hG hM hA0 hXsolv hAX hq hr (fun hqr => hrq hqr.symm)
+  have hY_X : Y ≤ X := hY.1
+  have hY_norm_core : Y ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ)ᶜ X : Set G) :=
+    hY_X.trans (le_normalizer_opiCoreInG ({q} : Set ℕ)ᶜ X)
+  have hcomm_core : ⁅Br, Y⁆ ≤ opiCoreInG ({q} : Set ℕ)ᶜ X :=
+    (Subgroup.commutator_mono hBr_core le_rfl).trans
+      (OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hY_norm_core)
+  exact hY_comm.trans hcomm_core
 
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
