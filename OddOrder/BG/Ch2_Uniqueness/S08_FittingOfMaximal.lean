@@ -320,6 +320,26 @@ theorem opiCoreInG_primesOf_fittingInG_compl_eq_bot [Finite G]
       hB_pi_compl
   exact hB_ne_bot hB_bot
 
+/-- Ambient core commutation: `O_π(H)` centralizes `O_{π'}(H)` inside `H`.
+This is the core form of the `[O_q(H), O_{q'}(H)] = 1` step used in BG (8.7). -/
+theorem opiCoreInG_commutator_compl_eq_bot [Finite G]
+    (π : Set ℕ) (H : Subgroup G) :
+    ⁅opiCoreInG π H, opiCoreInG πᶜ H⁆ = ⊥ := by
+  have hleft : ⁅opiCoreInG π H, opiCoreInG πᶜ H⁆ ≤ opiCoreInG π H :=
+    OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer
+      ((opiCoreInG_le πᶜ H).trans (le_normalizer_opiCoreInG π H))
+  have hright : ⁅opiCoreInG π H, opiCoreInG πᶜ H⁆ ≤ opiCoreInG πᶜ H := by
+    rw [Subgroup.commutator_comm]
+    exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer
+      ((opiCoreInG_le π H).trans (le_normalizer_opiCoreInG πᶜ H))
+  have hinf : opiCoreInG π H ⊓ opiCoreInG πᶜ H = ⊥ :=
+    inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+      (isPiSubgroup_opiCoreInG π H)
+      (isPiSubgroup_opiCoreInG πᶜ H)
+  exact le_bot_iff.mp (by
+    rw [← hinf]
+    exact le_inf hleft hright)
+
 /-- BG Proposition 1.10, packaged for the cyclic conjugation action on `F(M)`.
 
 If the fixed subgroup `C_{F(M)}(<x>)` is self-centralizing in `F(M)` and `<x>` has
