@@ -1128,6 +1128,26 @@ theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **(T8 leaf 8) `2 ≤ |S₀|`.**  If `X` is nonempty, its base block `S₀` (minimal-degree members)
+contains a minimal-degree `χ` together with its conjugate `χ̄ ≠ χ` (`Xset_hasNoRealCharacters`,
+`xBaseBlock_closedUnderConjugate`), so `2 ≤ |S₀|`.  This is the `2 ≤ n` input of
+`coherentEqualDegree_fromDade` for the base coherence.  (`X.Nonempty` comes from the broader (6.5)
+reduction context; here it is a hypothesis.) -/
+theorem two_le_xBaseBlock_ncard (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+    2 ≤ (hyp.xBaseBlock Z).ncard := by
+  have hXfin := hyp.xSet_finite hF (Z := Z)
+  obtain ⟨χ, hχX, hχmin⟩ := Set.exists_min_image (hyp.Xset Z)
+    (fun ψ => (OddOrder.Peterfalvi.S03.characterDegree ψ).re) hXfin hXne
+  have hχS₀ : χ ∈ hyp.xBaseBlock Z := ⟨hχX, hχmin⟩
+  have hconjS₀ : χ.conj ∈ hyp.xBaseBlock Z := hyp.xBaseBlock_closedUnderConjugate hF hZH hχS₀
+  have hne : χ.conj ≠ χ := hyp.Xset_hasNoRealCharacters hF hZH hχX
+  have hS₀fin : (hyp.xBaseBlock Z).Finite := hXfin.subset (hyp.xBaseBlock_subset Z)
+  have h1 : 1 < (hyp.xBaseBlock Z).ncard :=
+    (Set.one_lt_ncard hS₀fin).mpr ⟨χ.conj, hconjS₀, χ, hχS₀, hne⟩
+  omega
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
