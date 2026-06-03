@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.SCN
@@ -255,6 +256,35 @@ theorem centerFittingInG_le_centralizer_inf {M A₀ : Subgroup G}
     congrArg Subtype.val (Subgroup.mem_center_iff.mp hzc ⟨y, hA₀F hy⟩)
   simpa [hzc_eqG] using hcomm
 
+/-- **BG (8.1), prime-support form**: `C_F(M)(A₀)` and `F(M)` have the same
+prime divisors when `A₀ ≤ F(M)`. -/
+theorem mem_primeFactors_cFitting_iff_mem_primeFactors_fittingInG [Finite G]
+    {M A₀ : Subgroup G} (hA₀F : A₀ ≤ fittingInG M) {q : ℕ} :
+    q ∈ (Nat.card ↥(Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M)).primeFactors ↔
+      q ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
+  constructor
+  · intro hq
+    exact Nat.primeFactors_mono
+      (Subgroup.card_dvd_of_le
+        (inf_le_right : Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M ≤ fittingInG M))
+      Nat.card_pos.ne' hq
+  · intro hqF
+    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
+    have hqZ : q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors :=
+      mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG hqF
+    exact Nat.primeFactors_mono
+      (Subgroup.card_dvd_of_le (centerFittingInG_le_centralizer_inf hA₀F))
+      Nat.card_pos.ne' hqZ
+
+/-- **BG (8.1), `π`-notation form**: `π(C_F(M)(A₀)) = π(F(M))`. -/
+theorem primesOf_cFitting_eq_primesOf_fittingInG [Finite G]
+    {M A₀ : Subgroup G} (hA₀F : A₀ ≤ fittingInG M) :
+    OddOrder.BG.Ch2.S07.primesOf
+        (Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M) =
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+  ext q
+  exact mem_primeFactors_cFitting_iff_mem_primeFactors_fittingInG hA₀F
+
 /-- **`ℰ_p^*(H)` membership**: `A₀` は `H` の中で極大な `p`-elementary abelian 部分群
 (`A₀ ≤ H` elem-ab で、`H` 内の elem-ab `B ⊇ A₀` は `A₀` に戻る)。 -/
 def isMaxElemAbelianIn (p : ℕ) (A₀ H : Subgroup G) : Prop :=
@@ -290,6 +320,54 @@ theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B :
     (hA₀B : A₀ ≤ B) :
     B = A₀ :=
   hA₀.2.2 B hB hBH hA₀B
+
+/-- A maximal elementary abelian subgroup of `F(M)` is nontrivial when `p` divides
+`|F(M)|`. -/
+theorem isMaxElemAbelianIn_ne_bot_of_mem_primeFactors_fittingInG [Finite G]
+    {p : ℕ} [Fact p.Prime] {M A₀ : Subgroup G}
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA₀ : isMaxElemAbelianIn p A₀ (fittingInG M)) :
+    A₀ ≠ ⊥ := by
+  intro hA₀_bot
+  have hp_dvd : p ∣ Nat.card ↥(fittingInG M) := (Nat.mem_primeFactors.mp hp).2.1
+  obtain ⟨x, hx_order⟩ :=
+    exists_prime_orderOf_dvd_card' (G := ↥(fittingInG M)) p hp_dvd
+  let B₀ : Subgroup ↥(fittingInG M) := Subgroup.zpowers x
+  let B : Subgroup G := B₀.map (fittingInG M).subtype
+  have hB_card : Nat.card B = p := by
+    rw [show B = B₀.map (fittingInG M).subtype from rfl,
+      Subgroup.card_map_of_injective (fittingInG M).subtype_injective,
+      show B₀ = Subgroup.zpowers x from rfl, Nat.card_zpowers, hx_order]
+  have hB_elem : B.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hB_card
+  have hB_le_F : B ≤ fittingInG M := by
+    exact Subgroup.map_subtype_le B₀
+  have hA₀_le_B : A₀ ≤ B := by
+    rw [hA₀_bot]
+    exact bot_le
+  have hB_eq_A₀ : B = A₀ :=
+    isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le hA₀ hB_elem hB_le_F hA₀_le_B
+  have hB_ne_bot : B ≠ ⊥ := by
+    intro hB_bot
+    have hp_one : p = 1 := by
+      rw [hB_bot, Subgroup.card_bot] at hB_card
+      exact hB_card.symm
+    exact (Fact.out : p.Prime).ne_one hp_one
+  exact hB_ne_bot (hB_eq_A₀.trans hA₀_bot)
+
+/-- The relative centralizer `C_F(M)(A₀)` is nontrivial under the hypotheses of BG (8.1). -/
+theorem cFitting_ne_bot_of_isMaxElemAbelianIn [Finite G]
+    {p : ℕ} [Fact p.Prime] {M A₀ : Subgroup G}
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (hA₀ : isMaxElemAbelianIn p A₀ (fittingInG M)) :
+    Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M ≠ ⊥ := by
+  have hA₀_ne : A₀ ≠ ⊥ :=
+    isMaxElemAbelianIn_ne_bot_of_mem_primeFactors_fittingInG hp hA₀
+  have hA₀_le :
+      A₀ ≤ Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M :=
+    isMaxElemAbelianIn_le_centralizer_inf hA₀
+  intro hbot
+  apply hA₀_ne
+  exact le_bot_iff.mp (by simpa [hbot] using hA₀_le)
 
 /-- The subgroup A0, restricted to C_F(M)(A0), lies in that relative centralizer's center. -/
 theorem subgroupOf_cFitting_le_center (M A0 : Subgroup G) :

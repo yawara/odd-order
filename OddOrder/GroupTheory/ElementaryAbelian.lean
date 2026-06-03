@@ -530,6 +530,20 @@ theorem IsElementaryAbelian.of_map {p : ℕ} {N : Type*} [Group N] {H : Subgroup
   OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
     (Subgroup.equivMapOfInjective H f hf).symm hH
 
+/-- A finite subgroup of prime order is elementary abelian. -/
+theorem IsElementaryAbelian.of_card_prime {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    [Finite H] (hH : Nat.card H = p) :
+    H.IsElementaryAbelian p := by
+  have hHcyc : IsCyclic H := isCyclic_of_prime_card hH
+  constructor
+  · haveI : IsCyclic H := hHcyc
+    letI : CommGroup H := IsCyclic.commGroup
+    intro x y
+    exact mul_comm x y
+  · intro x
+    have hx := pow_card_eq_one' (G := H) (x := x)
+    simpa [hH] using hx
+
 /-- The join of two elementary abelian subgroups is elementary abelian when the two
 subgroups centralize each other. -/
 theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
