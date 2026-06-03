@@ -829,6 +829,58 @@ theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
     dsimp [cFittingInG]
     exact three_le_rank_center_cFitting_of_isMaxElemAbelianIn hA0 hm)
 
+/-- The subgroup `C_F(M)(A0)` is subnormal inside `F(M)`, because `F(M)` is nilpotent. -/
+theorem cFittingInG_subgroupOf_fittingInG_isSubnormal [Finite G] {M A0 : Subgroup G} :
+    ((cFittingInG M A0).subgroupOf (fittingInG M)).IsSubnormal := by
+  haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
+  exact OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite _
+
+/-- Theorem 7.4 specialized to the propagation step in BG (8.6), with
+`A = C_F(M)(A0)` and `P = F(M)`. -/
+theorem transitivity_propagates_to_fittingInG_of_cFittingInG [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime] {M A0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hm : 3 ≤ rank ↥A0)
+    (hA : OddOrder.BG.Ch2.S07.Hypothesis71 (cFittingInG M A0))
+    (hq : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ) :
+    Subgroup.centralizer (fittingInG M : Set G) ⊓
+        OddOrder.BG.Ch2.S07.kSubgroup (cFittingInG M A0) =
+      opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ
+        (Subgroup.centralizer (fittingInG M : Set G)) ∧
+    OddOrder.BG.Ch2.S07.ConjTransitiveOn
+      (opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ
+        (Subgroup.centralizer (fittingInG M : Set G)))
+      (hInvariantStar ⊤ (fittingInG M) {q}) ∧
+    hInvariantStar ⊤ (fittingInG M) {q} ⊆
+      hInvariantStar ⊤ (cFittingInG M A0) {q} ∧
+    (∀ Q ∈ hInvariantStar ⊤ (fittingInG M) {q},
+      fittingInG M ⊓ derivedInG (Subgroup.normalizer (fittingInG M)) ≤
+        derivedInG (Subgroup.normalizer Q) ∧
+      ∀ n : G, n ∈ Subgroup.normalizer (fittingInG M) →
+        ∃ c ∈ opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ
+            (Subgroup.centralizer (fittingInG M : Set G)),
+          ∃ m ∈ Subgroup.normalizer (fittingInG M) ⊓ Subgroup.normalizer Q, n = c * m) := by
+  have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
+  have hPrimes :
+      OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
+        OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+    dsimp [cFittingInG]
+    exact primesOf_cFitting_eq_primesOf_fittingInG hA0F
+  have hPproper : fittingInG M < ⊤ :=
+    lt_of_le_of_lt (fittingInG_le M) (mem_maximalSubgroups.mp hM).lt_top
+  have hPpi : Subgroup.IsPiSubgroup
+      (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0)) (fittingInG M) := by
+    rw [hPrimes]
+    intro r hr
+    simpa [OddOrder.BG.Ch2.S07.primesOf] using hr
+  have hAP : cFittingInG M A0 ≤ fittingInG M := by
+    dsimp [cFittingInG]
+    exact inf_le_right
+  exact OddOrder.BG.Ch2.S07.transitivity_propagates hG hA hq (fittingInG M)
+    hPproper hPpi hAP cFittingInG_subgroupOf_fittingInG_isSubnormal
+    (transitive_cFittingInG_of_hypothesis71 hG hA0 hm hA hq)
+
 /-- The relative centralizer C_F(M)(A0) is proper whenever M is maximal. -/
 theorem cFitting_lt_top_of_mem_maximal {M A0 : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
