@@ -465,7 +465,8 @@ axiom-clean = `#print axioms` で propext/Classical.choice/Quot.sound のみ, �
   nested `ClassFunction` namespace → `ClassFunction.` 前置。`coe_trivialIrreducibleCharacter` は
   `IrreducibleCharacter.` namespace。`star (↑n)`=`star_natCast`。
 
-**🔜 T7 残**: c2 (case A `X⊆Irr L`, brick② FPF route) は §F の通り別途 (本 Xset_eq とは独立、case A 専用)。
+**✅✅ T7-c2 case A `X⊆Irr L` 完了 (2026-06-03, attended; full build 3562 green, axiom-clean #print 確認済, S08 sorry 不変=capstone のみ)**: brick① `eq_one_of_fixedPointFree_invariant` (S08, 汎用: 乗法的 `f` が FPF endo σ 不変 ⟹ `f≡1`, `commutatorMap_surjective`) + `inertia_eq_H_of_c2_caseA` (FPF-on-Z route: w∈I_L(θ)∩W₁∖1 なら [Is]2.27 の中心線形 φ が σ=(·)^w 不変 ⟹ φ≡1 ⟹ Z.subgroupOf H⊆Ker θ; 対偶 + complement split `L=H⋊W₁` で `I_L(θ)=H`; σ=`Z.normalizerMonoidHom ⟨w,_⟩`, C_Z(w)=Z∩W₂=⊥ で FPF; **Hall coprime 不要・任意 θ**) + `isIrreducibleCharacter_of_mem_Xset_caseA` (χ=Ind θ∈X⟹χ∉S(Z)⟹Z⊄Ker θ⟹bridge⟹6.34)。仮説 (hZH/hZcentral/hZnorm/hZfpf) は明示引数 (case-A の具体 Z 構成・(6.8) assembly 時に放電; honest, scaffolding 無)。AxiomsCheck は S08 を未 import (T6 結果も未登録) ゆえ未登録, #print axioms で clean 確認。
+**🔜 T7 残**: なし (c1 Xset_eq✅ + case A X⊆Irr L✅; case B は X⊆Irr L 不要=T10)。**次 = T8** (DadeChainStep 実 instance: T8.3 degree + T8.4 Dmem 最重 + T8.5 hdeg_c[B2 待ち] + T8.6 enum)。
 **次 = T8** (`DadeChainStep` 実 instance; B engine surgery で blocker 解消済 = `peterfalvi_66_coherence_of_X_from_dade`
 が X-family で instantiate 可) → T9/T10 (glue) → T11 + capstone `sibleySetup_is_coherent` (S08 唯一の sorry)。
 

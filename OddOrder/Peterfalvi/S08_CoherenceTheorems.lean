@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
+import Mathlib.GroupTheory.FixedPointFree
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
@@ -383,6 +384,27 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
         (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆ ∧
         Nat.Coprime (Nat.card ↥H) (Nat.card W1)
 
+/-- **(T7-c2 case A, brick ①)** A multiplicative `ℂ`-valued function `f` (e.g. a linear character)
+that is *invariant* under a fixed-point-free endomorphism `σ` is identically `1`.  Indeed
+`z ↦ z·(σ z)⁻¹` is surjective (`MonoidHom.FixedPointFree.commutatorMap_surjective`), and
+`f (z₀·(σ z₀)⁻¹) = f z₀ · f (σ z₀)⁻¹ = f z₀ · (f z₀)⁻¹ = 1` using `f ∘ σ = f`. -/
+theorem eq_one_of_fixedPointFree_invariant {Z : Type*} [Group Z] [Finite Z]
+    {F : Type*} [FunLike F Z Z] [MonoidHomClass F Z Z] {σ : F}
+    (hσ : MonoidHom.FixedPointFree σ)
+    {f : Z → ℂ} (hf_mul : ∀ a b, f (a * b) = f a * f b) (hf_one : f 1 = 1)
+    (hinv : ∀ z, f (σ z) = f z) (z : Z) : f z = 1 := by
+  have hne : ∀ a : Z, f a ≠ 0 := fun a ha => one_ne_zero
+    (show (1 : ℂ) = 0 by rw [← hf_one, ← mul_inv_cancel a, hf_mul, ha, zero_mul])
+  have hf_inv : ∀ a : Z, f a⁻¹ = (f a)⁻¹ := fun a =>
+    eq_inv_of_mul_eq_one_right (by rw [← hf_mul, mul_inv_cancel, hf_one])
+  obtain ⟨z₀, hz₀⟩ := hσ.commutatorMap_surjective z
+  rw [MonoidHom.commutatorMap_apply, div_eq_mul_inv] at hz₀
+  calc f z = f (z₀ * (σ z₀)⁻¹) := by rw [hz₀]
+    _ = f z₀ * f (σ z₀)⁻¹ := hf_mul _ _
+    _ = f z₀ * (f (σ z₀))⁻¹ := by rw [hf_inv]
+    _ = f z₀ * (f z₀)⁻¹ := by rw [hinv]
+    _ = 1 := mul_inv_cancel₀ (hne z₀)
+
 namespace SibleyDadeHypothesis
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -683,6 +705,103 @@ theorem inertia_eq_H_of_c2 (hyp : SibleyDadeHypothesis G L H)
       (G := ↥L ⧸ M) (H := Hbar) (mkM (w : ↥L)) hclass hθbar_ne hwbar
   · exact ClassFunction.subgroup_le_inertia (θ : ClassFunction ↥H ℂ)
 
+/-- **(T7-c2 case A) Inertia `I_L(θ) = H`** via the **fixed-point-free action on `Z`**.  Here
+`Z ≤ H` is central in `H` (`Z.subgroupOf H ≤ Z(H)`), normalized by `W₁`, with `W₁∖1` acting
+fixed-point-freely (`C_Z(w) = Z ∩ W₂ = 1` in case A).  If `w ∈ W₁∖1` fixed `θ`, the central linear
+character `φ` of `Res_Z θ` ([Is] 2.27) would be `σ = (·)^w`-invariant, hence `≡ 1`
+(`eq_one_of_fixedPointFree_invariant`), forcing `Z.subgroupOf H ⊆ Ker θ`, contradicting `hZker`.
+So `I_L(θ) ∩ W₁ = 1` and the complement split `L = H ⋊ W₁` gives `I_L(θ) = H`.  Needs no Hall
+coprimality and works for an arbitrary (not necessarily linear) `θ`. -/
+theorem inertia_eq_H_of_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) (hZcentral : Z.subgroupOf H ≤ Subgroup.center ↥H)
+    (hZnorm : ∀ w ∈ hyp.W1, w ∈ Subgroup.normalizer Z)
+    (hZfpf : ∀ w ∈ hyp.W1, w ≠ 1 → Subgroup.centralizer ({w} : Set ↥L) ⊓ Z = ⊥)
+    {θ : IrreducibleCharacter ↥H}
+    (hZker : ¬ ((Z.subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))) :
+    letI : H.Normal := hyp.H_normal
+    ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
+  obtain ⟨φ, hφirr, hφ1, -, hφpt⟩ :=
+    θ.isIrreducible.exists_central_linear_restriction (Z.subgroupOf H) hZcentral
+  have hφmul : ∀ a b : ↥(Z.subgroupOf H), φ (a * b) = φ a * φ b :=
+    hφirr.map_mul_of_apply_one_eq_one hφ1
+  have hθ1_ne : (θ : ClassFunction ↥H ℂ) 1 ≠ 0 := by
+    obtain ⟨n, hpos, hn1, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+    rw [hn1]; exact_mod_cast hpos.ne'
+  apply le_antisymm
+  · intro g hg
+    by_contra hgH
+    obtain ⟨⟨h, w⟩, hgw⟩ := (hyp.split.existsUnique g).exists
+    rw [ClassFunction.mem_inertia] at hg
+    have hwne : (w : ↥L) ≠ 1 := by
+      rintro hw1; apply hgH
+      have : g = (h : ↥L) := by rw [← hgw, hw1, mul_one]
+      rw [this]; exact h.property
+    have hhinertia : (h : ↥L) ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) :=
+      ClassFunction.subgroup_le_inertia (θ : ClassFunction ↥H ℂ) h.property
+    have hwinertia : (w : ↥L) ∈ ClassFunction.inertia (θ : ClassFunction ↥H ℂ) := by
+      have hwval : (w : ↥L) = (h : ↥L)⁻¹ * g := by rw [← hgw]; group
+      rw [hwval]
+      exact (ClassFunction.inertia _).mul_mem
+        ((ClassFunction.inertia _).inv_mem hhinertia) (ClassFunction.mem_inertia.mpr hg)
+    have hwW1 : (w : ↥L) ∈ hyp.W1 := w.property
+    -- Conjugation `σ` by `w` on `Z`, fixed-point-free (`C_Z(w) = Z ∩ W₂ = 1`).
+    set σ : MulAut ↥Z := Z.normalizerMonoidHom ⟨(w : ↥L), hZnorm (w : ↥L) hwW1⟩ with hσ_def
+    have hσval : ∀ z : ↥Z, ((σ z : ↥Z) : ↥L) = (w : ↥L) * (z : ↥L) * (w : ↥L)⁻¹ := fun _ => rfl
+    have hσfpf : MonoidHom.FixedPointFree σ := by
+      intro z hz
+      have hzmem : ((z : ↥Z) : ↥L) ∈ Subgroup.centralizer ({(w : ↥L)} : Set ↥L) ⊓ Z := by
+        refine Subgroup.mem_inf.mpr ⟨?_, z.property⟩
+        rw [Subgroup.mem_centralizer_iff]
+        rintro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
+        have hzL := congrArg (Subtype.val : ↥Z → ↥L) hz
+        rw [hσval] at hzL
+        rw [mul_inv_eq_iff_eq_mul] at hzL
+        exact hzL
+      rw [hZfpf (w : ↥L) hwW1 hwne, Subgroup.mem_bot] at hzmem
+      exact Subtype.ext hzmem
+    -- `f = φ ∘ iso` is multiplicative and `σ`-invariant; brick ① gives `φ ≡ 1`.
+    set iso : ↥Z ≃* ↥(Z.subgroupOf H) := (Subgroup.subgroupOfEquivOfLe hZH).symm with hiso_def
+    have hisoL : ∀ z : ↥Z, (((iso z : ↥(Z.subgroupOf H)) : ↥H) : ↥L) = (z : ↥L) := fun _ => rfl
+    set f : ↥Z → ℂ := fun z => φ (iso z) with hf_def
+    have hfmul : ∀ a b : ↥Z, f (a * b) = f a * f b := fun a b => by
+      simp only [hf_def, map_mul, hφmul]
+    have hfone : f 1 = 1 := by simp only [hf_def, map_one, hφ1]
+    have hfinv : ∀ z : ↥Z, f (σ z) = f z := by
+      intro z
+      have hconj : ClassFunction.conjBy (w : ↥L) (θ : ClassFunction ↥H ℂ)
+          = (θ : ClassFunction ↥H ℂ) := ClassFunction.mem_inertia.mp hwinertia
+      have hval : (θ : ClassFunction ↥H ℂ) ((iso (σ z) : ↥(Z.subgroupOf H)) : ↥H)
+          = (θ : ClassFunction ↥H ℂ) ((iso z : ↥(Z.subgroupOf H)) : ↥H) := by
+        have hc := congrArg (fun ψ : ClassFunction ↥H ℂ => ψ ((iso z : ↥(Z.subgroupOf H)) : ↥H))
+          hconj
+        simp only [ClassFunction.conjBy_apply] at hc
+        rw [← hc]
+        congr 1
+      have e1 := hφpt (iso (σ z))
+      have e2 := hφpt (iso z)
+      have hmul : φ (iso (σ z)) * (θ : ClassFunction ↥H ℂ) 1
+          = φ (iso z) * (θ : ClassFunction ↥H ℂ) 1 := by rw [← e1, hval]; exact e2
+      simp only [hf_def]
+      exact mul_right_cancel₀ hθ1_ne hmul
+    -- `φ ≡ 1` forces `Z.subgroupOf H ⊆ Ker θ`, contradicting `hZker`.
+    apply hZker
+    intro x hx
+    rw [SetLike.mem_coe] at hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+    have hφx : φ (⟨x, hx⟩ : ↥(Z.subgroupOf H)) = 1 := by
+      have hfx := eq_one_of_fixedPointFree_invariant hσfpf hfmul hfone hfinv
+        (iso.symm ⟨x, hx⟩)
+      simpa only [hf_def, MulEquiv.apply_symm_apply] using hfx
+    have hpt := hφpt (⟨x, hx⟩ : ↥(Z.subgroupOf H))
+    rw [hφx, one_mul] at hpt
+    exact hpt
+  · exact ClassFunction.subgroup_le_inertia (θ : ClassFunction ↥H ℂ)
+
 /-- **Peterfalvi (6.8) Y-family irreducibility.**  For a nontrivial degree-one (linear) source
 character `θ` of `H`, the induced character `Ind_H^L θ` is irreducible.  Inertia `I_L(θ) = H`
 (free action of `W₁`) is discharged via the (6.8)(c) disjunction and fed to [Is] Thm 6.34
@@ -816,6 +935,30 @@ theorem isIrreducibleCharacter_of_mem_Xset_of_frobenius (hyp : SibleyDadeHypothe
     {Z : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Xset Z) :
     IsIrreducibleCharacter φ :=
   hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hyp.mem_Xset.mp hφ).1
+
+/-- **(T7-c2 case A) `X ⊆ Irr L`.**  In case A every `χ ∈ X = S − S(Z)` is irreducible.  Writing
+`χ = Ind_H^L θ` (`θ ≠ 1`, from `χ ∈ S`), membership `χ ∉ S(Z)` forces `Z.subgroupOf H ⊄ Ker θ`, so
+`inertia_eq_H_of_c2_caseA` gives `I_L(θ) = H`, and [Is] Thm 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`) makes `Ind_H^L θ = χ` irreducible.  This is the
+case-A analogue of `isIrreducibleCharacter_of_mem_Xset_of_frobenius` (the Frobenius case). -/
+theorem isIrreducibleCharacter_of_mem_Xset_caseA (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) (hZcentral : Z.subgroupOf H ≤ Subgroup.center ↥H)
+    (hZnorm : ∀ w ∈ hyp.W1, w ∈ Subgroup.normalizer Z)
+    (hZfpf : ∀ w ∈ hyp.W1, w ≠ 1 → Subgroup.centralizer ({w} : Set ↥L) ⊓ Z = ⊥)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    letI : H.Normal := hyp.H_normal
+    IsIrreducibleCharacter χ := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  obtain ⟨hχS, hχnotZ⟩ := hχX
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, hθne, hχeq⟩ := hχS
+  have hZker : ¬ ((Z.subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ)) :=
+    fun hsub => hχnotZ ⟨θ, hθne, hsub, hχeq⟩
+  have hinertia := hyp.inertia_eq_H_of_c2_caseA hZH hZcentral hZnorm hZfpf hZker
+  rw [hχeq]
+  exact isIrreducibleCharacter_induce_of_inertia_eq θ hinertia
 
 /-- **Peterfalvi (6.6) `X`-characterization** (mmd 04.8 L74-76).  For a normal `Z ≤ H` such that
 every member of `X = S − S(Z)` is irreducible (the (6.8) Frobenius/case-A input `hX`), `X` is
