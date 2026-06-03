@@ -4946,7 +4946,7 @@ theorem dade_Y_collapse_of_family
     (hfam_supp : ∀ i ∈ s, (B.chiFam i).support ⊆ supportInSubgroup A L)
     (hchi1_supp : chi1.support ⊆ supportInSubgroup A L)
     (hchi1_ZIrr : chi1 ∈ ZIrr (↥L))
-    (hχ_supp : χ.support ⊆ supportInSubgroup A L)
+    (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
     (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
       CharacterPsiDecomposition (L := ↥L) (G := G)
         (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
@@ -4960,15 +4960,17 @@ theorem dade_Y_collapse_of_family
         (ClassFunction.inner (B.chiFam i) (B.chiFam i)).re) :
     Da.Y = a • Da.tau1 chi1 := by
   classical
-  set S₀ : Set (ClassFunction (↥L) ℂ) := insert χ (insert chi1 (B.chiFam '' ↑s)) with hS₀def
+  -- Generator set uses the supported difference `χ − a·χ₁` (NOT bare `χ`): the isometry is only ever
+  -- applied to family members and to differences, so no individual `χ`-support is needed (X-family).
+  set S₀ : Set (ClassFunction (↥L) ℂ) := insert ((χ : ClassFunction (↥L) ℂ) - a • chi1)
+    (insert chi1 (B.chiFam '' ↑s)) with hS₀def
   have hS₀supp : ∀ x ∈ S₀, x.support ⊆ supportInSubgroup A L := by
     intro x hx
     simp only [hS₀def, Set.mem_insert_iff, Set.mem_image, Finset.mem_coe] at hx
     rcases hx with rfl | rfl | ⟨i, hi, rfl⟩
-    · exact hχ_supp
+    · exact hdiffasupp
     · exact hchi1_supp
     · exact hfam_supp i hi
-  have hχ_mem : χ ∈ zSpan (L := ↥L) S₀ := Submodule.subset_span (by simp [hS₀def])
   have hchi1_mem : chi1 ∈ zSpan (L := ↥L) S₀ :=
     Submodule.subset_span (by simp [hS₀def])
   have hfam_zspan : ∀ i ∈ s, B.chiFam i ∈ zSpan (L := ↥L) S₀ := fun i hi =>
@@ -4976,7 +4978,7 @@ theorem dade_Y_collapse_of_family
       simp only [hS₀def, Set.mem_insert_iff, Set.mem_image, Finset.mem_coe]
       exact Or.inr (Or.inr ⟨i, hi, rfl⟩))
   have hdiff_zspan : χ - a • chi1 ∈ zSpan (L := ↥L) S₀ :=
-    Submodule.sub_mem _ hχ_mem (nsmul_mem hchi1_mem a)
+    Submodule.subset_span (by simp [hS₀def])
   have hfamdiff_zspan : ∀ i ∈ s, B.chiFam i - B.ratio i • chi1 ∈ zSpan (L := ↥L) S₀ := fun i hi =>
     Submodule.sub_mem _ (hfam_zspan i hi) (nsmul_mem hchi1_mem _)
   -- the norm function `mc i = ‖χᵢ‖²` (real and positive).
@@ -5514,8 +5516,9 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
     ?_ (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
   -- The (5.6.2) collapse `hY`, now *proved* from the family data via the (5.6.1) producer.
   exact dade_Y_collapse_of_family hyp hconj _ rfl B (fun i hi => hmemS₁ i hi) step.famNe
-    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hχsupp step.Dmem step.hmemTau1Base
-    step.hmemOrtho
+    step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z
+    ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
+    step.Dmem step.hmemTau1Base step.hmemOrtho
     (dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
       ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset step.hχsupp step.haχ1supp))
       (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a)))
