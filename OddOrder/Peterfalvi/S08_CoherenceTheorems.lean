@@ -997,36 +997,6 @@ theorem crux1_of_memberFamily
   have hμval : μ = -(a : ℤ) := by omega
   rw [hμeq, hμval]; push_cast; ring
 
-/-- **The retargeting map preserves virtual characters (ZIrr-codomain, inductive step).**
-
-`retarget τ₁ χ χ̄ X Xbar φ ∈ ℤ[Irr G]` for `φ ∈ ℤ[Irr L]`, given `X, Xbar ∈ ℤ[Irr G]`,
-`χ, χ̄ ∈ ℤ[Irr L]`, and that the prior extension `τ₁` already maps `ℤ[Irr L] → ℤ[Irr G]` (`hτ₁Z`).
-
-`retarget … φ = τ₁(φ − ⟨φ,χ⟩·χ − ⟨φ,χ̄⟩·χ̄) + ⟨φ,χ⟩·X + ⟨φ,χ̄⟩·Xbar`; the coefficients
-`⟨φ,χ⟩, ⟨φ,χ̄⟩ ∈ ℤ` (virtual-character inner products, `inner_mem_ZIrr_int`), so each `ℂ`-smul is a
-`ℤ`-smul of a virtual character.  This is the inductive step showing the (5.6.3) running extension
-keeps its **ZIrr-codomain** — the property `IsCoherent` does not record but the (6.6)/(6.8) chain
-needs (it makes `ν χⱼ ∈ ZIrr`, the load-bearing input of `crux1_of_memberFamily`). -/
-theorem retarget_mem_ZIrr
-    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
-    {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
-    (τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G)
-    (hτ₁Z : ∀ ψ ∈ ZIrr L, τ₁ ψ ∈ ZIrr G)
-    {χ chibar : ClassFunction L ℂ} (hχZ : χ ∈ ZIrr L) (hchibarZ : chibar ∈ ZIrr L)
-    {X Xbar : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hXbarZ : Xbar ∈ ZIrr G)
-    {φ : ClassFunction L ℂ} (hφZ : φ ∈ ZIrr L) :
-    OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget τ₁ χ chibar X Xbar φ ∈ ZIrr G := by
-  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hφZ hχZ
-  obtain ⟨m', hm'⟩ := ClassFunction.inner_mem_ZIrr_int hφZ hchibarZ
-  rw [OddOrder.Peterfalvi.S07.IntegralCharacterMap.retarget_apply,
-    OddOrder.Peterfalvi.S07.IntegralCharacterMap.orthoResidualMap_apply,
-    hm, hm', Int.cast_smul_eq_zsmul ℂ m χ, Int.cast_smul_eq_zsmul ℂ m' chibar,
-    Int.cast_smul_eq_zsmul ℂ m X, Int.cast_smul_eq_zsmul ℂ m' Xbar]
-  refine Submodule.add_mem _ (Submodule.add_mem _ (hτ₁Z _ ?_) (Submodule.smul_mem _ m hXZ))
-    (Submodule.smul_mem _ m' hXbarZ)
-  exact Submodule.sub_mem _ (Submodule.sub_mem _ hφZ (Submodule.smul_mem _ m hχZ))
-    (Submodule.smul_mem _ m' hchibarZ)
-
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
@@ -1065,6 +1035,8 @@ noncomputable def retarget_isCoherent_of_extensionImage
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0)
     (hchi1 : chi1 ∈ S₁)
+    (hτaχ1Z : τ ((χ : ClassFunction ↥L ℂ) - a • chi1) ∈ ZIrr G)
+    (hτdiffZ : τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G)
     (hcrux1 : ClassFunction.inner
       (τ
         ((χ : ClassFunction ↥L ℂ) - a • chi1)) (hS₁.extension chi1) = -(a : ℂ))
@@ -1165,6 +1137,16 @@ noncomputable def retarget_isCoherent_of_extensionImage
     τ ((χ : ClassFunction ↥L ℂ) - a • chi1) + a • hS₁.extension chi1 with hX
   set Xbar : ClassFunction G ℂ := X - τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)
     with hXbar
+  -- `X, X̄ ∈ ℤ[Irr G]`: the supported Dade images `(χ−a·χ₁)^τ`, `(χ−χ̄)^τ` are virtual (hypotheses),
+  -- and `ν χ₁ ∈ ZIrr` is now recorded by the coherence's `extension_mem_ZIrr` field (`χ₁ ∈ S₁`).
+  have hνchi1Z : hS₁.extension chi1 ∈ ZIrr G :=
+    hS₁.extension_mem_ZIrr chi1 (Submodule.subset_span hchi1)
+  have hXZ : X ∈ ZIrr G := by
+    rw [hX]
+    refine Submodule.add_mem _ hτaχ1Z ?_
+    rw [← Nat.cast_smul_eq_nsmul ℤ a (hS₁.extension chi1)]
+    exact Submodule.smul_mem _ (a : ℤ) hνchi1Z
+  have hXbarZ : Xbar ∈ ZIrr G := by rw [hXbar]; exact Submodule.sub_mem _ hXZ hτdiffZ
   -- `‖X‖² = 1`.
   have hXX : ClassFunction.inner X X = 1 := by
     rw [hX, ← Nat.cast_smul_eq_nsmul ℂ a (hS₁.extension chi1)]
@@ -1278,7 +1260,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
   have himg : τ ((χ : ClassFunction ↥L ℂ) - a • chi1) = X - a • hS₁.extension chi1 := by
     rw [hX]; abel
   exact OddOrder.Peterfalvi.S07.retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ
-    hXX hXbarXbar hXXbar hXbarX hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
+    hXX hXbarXbar hXXbar hXbarX hXZ hXbarZ hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
 
 open scoped Classical in
 /-- **(T-A1) Per-step X-family coherence adjoin from a member family.** (`noncomputable def`: the
@@ -1474,11 +1456,17 @@ noncomputable def xAdjoinStep
       Finset.sum_eq_zero (fun α hα =>
         OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily
           (Dmem i₁ hi₁) (hortho_mem i₁ hi₁) rfl hα), star_zero]
+  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is `htau1_memaχ`.
+  have hτdiffZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G := by
+    rw [Da.imageFamily.image_eq]
+    exact Submodule.sum_mem _ (fun α hα => Da.imageFamily.mem_ZIrr α hα)
   -- Adjoin via the (T8.11 option A) bridge.
   exact retarget_isCoherent_of_extensionImage hyp hconj
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
     hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
-    (hmemS1 i₁ hi₁) hcrux1 hcrux2 hSgen hgen
+    (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
 open scoped Classical in
 /-- **(T-A2 input) Per-step `xAdjoinStep` data bundle.**
