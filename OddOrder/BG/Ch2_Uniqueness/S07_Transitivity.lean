@@ -81,6 +81,21 @@ def kSubgroup (A : Subgroup G) : Subgroup G :=
 def ConjTransitiveOn (K : Subgroup G) (S : Set (Subgroup G)) : Prop :=
   ∀ Q₁ ∈ S, ∀ Q₂ ∈ S, ∃ k ∈ K, MulAut.conj k • Q₁ = Q₂
 
+/-- If a trivial subgroup acts transitively on `ℋ_H*(A;π)`, that set has at most one
+member. -/
+theorem hInvariantStar_eq_of_conjTransitiveOn_bot
+    {K H A : Subgroup G} {π : Set ℕ} (hKbot : K = ⊥)
+    (htrans : ConjTransitiveOn K (hInvariantStar H A π))
+    {Q₁ Q₂ : Subgroup G} (hQ₁ : Q₁ ∈ hInvariantStar H A π)
+    (hQ₂ : Q₂ ∈ hInvariantStar H A π) :
+    Q₁ = Q₂ := by
+  obtain ⟨k, hkK, hkQ⟩ := htrans Q₁ hQ₁ Q₂ hQ₂
+  have hk_one : k = 1 := by
+    rw [hKbot, Subgroup.mem_bot] at hkK
+    exact hkK
+  rw [hk_one, map_one, one_smul] at hkQ
+  exact hkQ
+
 /-- **`SCN₃(p)` global** (BG §7 L2137): あるシロー `p`-部分群 `P` で `A ∈ SCN₃(P)`
 (↥P 内で `IsSCN₃`) となる `A ≤ G`。 -/
 def scn3Global (p : ℕ) (G : Type*) [Group G] : Set (Subgroup G) :=
@@ -905,6 +920,18 @@ theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G
       (Subgroup.centralizer ({z} : Set G)) (centralizer_singleton_lt_top hG hz_ne)
       (hA_Cz z (le_trans hYB hB_cent hzY)) hHQ₁ (by rw [inf_comm]; exact hzQ₂)
     exact ⟨k, hk_K, hk_eq⟩
+
+/-- If `K = O_{π'}(C_G(A))` is trivial, Theorem 7.2 makes `ℋ_G*(A;q)`
+a singleton. This is the reusable form of the first conclusion in BG (8.6). -/
+theorem hInvariantStar_eq_of_three_le_rank_center_of_kSubgroup_eq_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {A : Subgroup G} (hA : Hypothesis71 A)
+    {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    (hm : 3 ≤ rank ↥(Subgroup.center ↥A)) (hKbot : kSubgroup A = ⊥)
+    {Q₁ Q₂ : Subgroup G} (hQ₁ : Q₁ ∈ hInvariantStar ⊤ A {q})
+    (hQ₂ : Q₂ ∈ hInvariantStar ⊤ A {q}) :
+    Q₁ = Q₂ :=
+  hInvariantStar_eq_of_conjTransitiveOn_bot hKbot
+    (transitive_of_three_le_rank_center hG hA hq hm) hQ₁ hQ₂
 
 /-- **BG Theorem 7.3** (mmd L2187): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 2` かつ
 `q ∈ π(C_G(A))` ⇒ `K` は `ℋ_G*(A;q)` 上推移的。`R ⊇ Sylow_q(C_G(A))` 経由で Lem 7.1 を連鎖。 -/
