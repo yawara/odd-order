@@ -1061,6 +1061,24 @@ private theorem exists_conj_eq_of_isHall_subgroupOf [Finite G] {V : Subgroup G}
   rw [Subgroup.pointwise_smul_def]
   exact h
 
+/-- **subnormal proper ⟹ 真の正規 overgroup** (Thm 7.4 還元 R1 step1): `A'` が `Q` で subnormal
+かつ `A' < ⊤` なら `∃ B ⊴ Q`, `A' ≤ B < ⊤`。subnormal 系列の頂点直下を `IsSubnormal` 帰納で。 -/
+private theorem exists_normal_lt_top_of_isSubnormal {Q : Type*} [Group Q] {A' : Subgroup Q}
+    (hA' : A'.IsSubnormal) (hlt : A' < ⊤) :
+    ∃ B : Subgroup Q, A' ≤ B ∧ B < ⊤ ∧ B.Normal := by
+  revert hlt
+  induction hA' with
+  | top => intro hlt; exact absurd rfl hlt.ne
+  | step H K hle hSubn hN ih =>
+    intro hlt
+    rcases eq_or_lt_of_le (le_top : K ≤ ⊤) with hKtop | hKlt
+    · refine ⟨H, le_refl _, hlt, ?_⟩
+      subst hKtop
+      exact Subgroup.normalizer_eq_top_iff.mp
+        (top_le_iff.mp ((Subgroup.normal_subgroupOf_iff_le_normalizer le_top).mp hN))
+    · obtain ⟨B, hKB, hBlt, hBnorm⟩ := ih hKlt
+      exact ⟨B, hle.trans hKB, hBlt, hBnorm⟩
+
 /-- **nontrivial 有限可解群は素数指数の正規部分群を持つ** (Thm 7.4 還元 R1a, mmd L2206
 composition factor)。card 最大の proper 正規部分群 `N` を取ると `Q⧸N` は simple かつ solvable
 ゆえ abelian、`Group.is_simple_iff_prime_card` で素数位数 `= N.index`。 -/
