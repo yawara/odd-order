@@ -24,10 +24,14 @@
   specialCase@↥(C_G(b)) (Sylow=sylow_subgroupOf_of_le, A.subgroupOf SCN 移送) → map_subgroupOf で ambient。
   **non-cyclic Z(P) ケース (B⊆Z(P)) の hspec はこれで全 b∈B^# 充足。**
 - **(b) special2** (cyclic Z(P), b∈B^#∖Z): mmd L2287-2297。`P₁=C_P(b)`,`P₂` Sylow⊇P₁, `Z⊆Z(P₁)⊆O_{p',p}`(Thm6.1),
-  `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(specialCase@Z) ⟹(rel-1.15b) `C_Y(Z)⊆O_{p'}(C_G(b))`,
-  `Y=C_Y(Z)·[Y,Z]`。**唯一残る重い数学**。
+  `[Y,Z]⊆O_{p'}`, `C_Y(Z)⊆O_{p'}(C_G(Z))`(=hspec(a) for z 生成元∈Z(P); `le_opiCoreInG_centralizer_of_mem_centralizer_sylow`✅)
+  ⟹(per-b 橋 `le_opiCoreInG_of_le_opiCoreInG_centralizer`✅, X=C_G(b), z) `C_Y(Z)⊆O_{p'}(C_G(b))`,
+  `Y=C_Y(Z)·[Y,Z]`。**🔴 要新規インフラ (repo/mathlib に無し, 確認済 2026-06-03)**:
+  (i) **coprime 分解 `Y=C_Y(Z)·[Y,Z]` for NON-ABELIAN Y** = Gorenstein 5.3.5 / Isaacs coprime action (~100 LOC);
+  (ii) **`Z⊆Z(P₁)⊆O_{p',p}(C_G(b))`** = P₁=C_P(b), P₂ Sylow⊇P₁ (|P₂:P₁|≤p via 7.4), Z(P₁)⊴P₂, Thm6.1。
 - **(c) B-construction** (E_p² in A, ⊴P): Z(P) noncyclic→B∈E_p²(Z(P))⊆Z(P) (全 b∈Z(P), special1=(a)で hspec);
   Z(P) cyclic→B=⟨b⟩×Z, Z=Ω₁(Z(P)) (special2=(b))。G 2.6.4。
+  **🔴 要新規インフラ**: noncyclic 側 = **finite abelian p-group `¬IsCyclic ⟹ E_p²`** (gateway 対偶 `isCyclic_of_card_pow_eq_one_le`, ~50 LOC); cyclic 側 = G 2.6.4 + `(Ω₁(A)/Z)∩Z(P/Z)≠1` の B 持ち上げ。
 - **(d) 配線**: core claim で `primesOf A={p}` (primesOf_eq_singleton) 変換 → by_cases Z(P) cyclic →
   B 構成 → coreClaimGeneral (hspec を (a)/(b) で供給)。
 
