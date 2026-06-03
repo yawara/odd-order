@@ -244,23 +244,66 @@ theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Norm
   rw [← Subgroup.map_subtype_commutator U]
   exact ⟨⟨d, hdU⟩, hdcomm, rfl⟩
 
-/-- **BG Lemma 6.5(c)** (mmd L2056): 上記仮定で, `g ∈ G` が `H^g ≤ U` を満たすなら
-`g = c·u` (`c ∈ C_K(H)`, `u ∈ U`) と分解できる。 -/
+/-- **BG Lemma 6.5(c)** (mmd L2056): 上記仮定で, `g ∈ G` が `H^g = g⁻¹Hg ≤ U` を満たすなら
+`g = c·u` (`c ∈ C_K(H)`, `u ∈ U`) と分解できる。`H^g` は BG 規約 `g⁻¹Hg`
+(= `H.comap (MulAut.conj g)`)。 -/
 theorem exists_mem_centralizerK_mul_of_conj_le [IsSolvable G] {K U H : Subgroup G} [K.Normal]
     (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K))
-    {g : G} (hg : H.map (MulAut.conj g).toMonoidHom ≤ U) :
+    {g : G} (hg : H.comap (MulAut.conj g).toMonoidHom ≤ U) :
     ∃ c ∈ Subgroup.centralizer (H : Set G) ⊓ K, ∃ u ∈ U, g = c * u := by
   sorry
 
-/-- **BG Lemma 6.5(b)** (mmd L2055): 上記仮定で `N_G(H) = C_K(H)·N_U(H)` (集合等式)。 -/
+omit [Finite G] in
+/-- 集合 `H` の中心化群は `H` (部分群) の正規化群に含まれる (`c` が各 `h∈H` と可換 ⟹
+`c·h·c⁻¹ = h ∈ H`)。 -/
+private theorem centralizer_set_le_normalizer (H : Subgroup G) :
+    Subgroup.centralizer (H : Set G) ≤ Subgroup.normalizer H := by
+  intro c hc
+  have hcomm : ∀ h ∈ H, h * c = c * h := fun h hh =>
+    Subgroup.mem_centralizer_iff.mp hc h hh
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  constructor
+  · intro hh
+    have he : c * h * c⁻¹ = h := by rw [← hcomm h hh]; group
+    rw [he]; exact hh
+  · intro hh
+    have he : h = c * h * c⁻¹ := by
+      have h2 : c * h = c * (c * h * c⁻¹) := by rw [← hcomm _ hh]; group
+      exact mul_left_cancel h2
+    rw [he]; exact hh
+
+/-- **BG Lemma 6.5(b)** (mmd L2055): 上記仮定で `N_G(H) = C_K(H)·N_U(H)` (集合等式)。
+原文どおり (c) から従う: `n ∈ N_G(H)` は `n⁻¹Hn = H ≤ U` で (c) を満たし `n = cu`,
+`u = c⁻¹n ∈ N_G(H) ⊓ U = N_U(H)`。逆は両因子が `N_G(H)` 内ゆえ自明。 -/
 theorem normalizer_eq_centralizerK_mul_normalizerU [IsSolvable G] {K U H : Subgroup G}
     [K.Normal] (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) :
     SetLike.coe (Subgroup.normalizer H)
       = SetLike.coe (Subgroup.centralizer (H : Set G) ⊓ K)
         * SetLike.coe (Subgroup.normalizer H ⊓ U) := by
-  sorry
+  apply Set.Subset.antisymm
+  · intro n hn
+    rw [SetLike.mem_coe] at hn
+    have hcn : H.comap (MulAut.conj n).toMonoidHom ≤ U := by
+      intro x hx
+      rw [Subgroup.mem_comap] at hx
+      exact hHU (((Subgroup.mem_normalizer_iff.mp hn) x).mpr hx)
+    obtain ⟨c, hc, u, hu, hnu⟩ := exists_mem_centralizerK_mul_of_conj_le hKU hHU hcop hcn
+    have hcN : c ∈ Subgroup.normalizer H := centralizer_set_le_normalizer H (Subgroup.mem_inf.mp hc).1
+    have huN : u ∈ Subgroup.normalizer H := by
+      have hue : u = c⁻¹ * n := by rw [hnu]; group
+      rw [hue]; exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hcN) hn
+    rw [Set.mem_mul]
+    exact ⟨c, SetLike.mem_coe.mpr hc, u,
+      SetLike.mem_coe.mpr (Subgroup.mem_inf.mpr ⟨huN, hu⟩), hnu.symm⟩
+  · rintro x hx
+    rw [Set.mem_mul] at hx
+    obtain ⟨c, hc, u, hu, rfl⟩ := hx
+    rw [SetLike.mem_coe] at hc hu ⊢
+    exact Subgroup.mul_mem _ (centralizer_set_le_normalizer H (Subgroup.mem_inf.mp hc).1)
+      (Subgroup.mem_inf.mp hu).1
 
 end
 
