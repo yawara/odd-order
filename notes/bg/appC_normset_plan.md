@@ -179,6 +179,8 @@ AxiomsCheck 登録済み。
 #### ✅ class-sum bridge: coefficient lower bound reducer (2026-06-04)
 `normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card` で、将来の指標論から
 `classSumCoeff(C_s,C_s,C_{2s}) > |U|` が得られれば `|E| ≥ 2` へ直ちに落とせる形にした。
+さらに `s=1` 版 `normSetE_ncard_ge_two_of_normOneCoeff_one_gt_normOneUnits_card` で、
+odd characteristic の `2≠0` と `q≠0` の side condition を prime/odd 仮定から消した。
 q≥5 分岐の残りを concrete Frobenius group の coefficient lower bound に分離。AxiomsCheck 登録済み。
 
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】

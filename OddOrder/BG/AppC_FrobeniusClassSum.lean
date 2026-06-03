@@ -422,6 +422,21 @@ theorem classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normS
   rw [classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard
       p q hs h2, normOnePairSetAt_ncard_eq_normSetE_ncard p q hq hs]
 
+/-- In the odd-characteristic finite fields used by Appendix C, `2` is nonzero. -/
+lemma two_ne_zero_galoisField [Fact p.Prime] (hpodd : Odd p) :
+    (2 : GaloisField p q) ≠ 0 := by
+  haveI : CharP (GaloisField p q) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
+    exact ZMod.charP p
+  intro hzero
+  have hp_dvd_two : p ∣ 2 := by
+    have h2cast : ((2 : ℕ) : GaloisField p q) = 0 := by simpa using hzero
+    exact (CharP.cast_eq_zero_iff (GaloisField p q) p 2).mp h2cast
+  rcases (Nat.dvd_prime Nat.prime_two).mp hp_dvd_two with hp_eq_one | hp_eq_two
+  · exact (Fact.out : p.Prime).ne_one hp_eq_one
+  · rcases hpodd with ⟨k, hk⟩
+    omega
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
@@ -443,6 +458,22 @@ theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
     Nat.mul_le_mul_left _ hE_le_one
   rw [Nat.mul_one] at hmul_le
   exact (Nat.not_lt_of_ge hmul_le) hcoeff
+
+/-- The `s = 1` form needed for the `q ≥ 5` branch of Lemma C.2: the only
+remaining input is the character-theoretic lower bound for the `C_1*C_1`
+coefficient of `C_2`. -/
+theorem normSetE_ncard_ge_two_of_normOneCoeff_one_gt_normOneUnits_card
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hpodd : Odd p) (hq : q.Prime)
+    (hcoeff :
+      Nat.card (normOneUnits p q) <
+        classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (2 : GaloisField p q))) :
+    2 ≤ (normSetE p q).ncard := by
+  refine normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card p q hq.ne_zero
+    (s := (1 : GaloisField p q)) one_ne_zero (two_ne_zero_galoisField p q hpodd) ?_
+  simpa using hcoeff
 
 /-- A pair counted by `normOnePairSetAt s` gives a class-pair counted by the
 class-sum structure constants for the class of `s` and the class of `2*s` in
