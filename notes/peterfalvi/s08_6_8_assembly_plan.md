@@ -477,3 +477,17 @@ step1-2 (`retarget_isCoherent_of_supportedDecomposition*`) は **X-family で sc
 貫流する htau1_inner_eq param を差分集合 isometry に re-target, ~7-10 関数, invasive=attended)。
 詳細 = `notes/meta/b_xpath_wiring_goal.md` 🛑 LOOP STOPPED 節。✅ step3a (`dadeOrthonormalCharacterImageFamilyOfDiff`,
 18238b9) は genuine な差分-support R(χ) で field 弱化後の正当部品。
+
+### I 進捗 2 (2026-06-03 attended, B engine surgery 大幅前進)
+**✅ 完了・build-green・commit 済 (X-family per-step coherence path 全通)**:
+- 真の fix: `tau1_inner_eq_on_support` 差分 sublattice 弱化 (9640c03)
+- `decompositionDaFromDadeOfDiff` (ded579e): Da を X で ofProjection 直構成
+- `dadeOrthonormalCharacterImageFamilyOfDiff` (18238b9): 差分-support R(χ)
+- step1 `retarget_isCoherent_of_supportedDecomposition` + step2 `_and_memberFamily` (de-scaffolded)
+- **`retarget_isCoherent_fromDade_X` (83f91c2)**: X-member の per-step adjoining 完成
+  chain = fromDade_X → step2 → step1 → `retarget_isCoherent`、D₀/τχ∈ZIrr/個別 support 一切なし。
+
+**🔜 残 step4 (DadeChainStep iteration layer, mechanical)**: `DadeChainStep`(S07:5397, ~30 field, 個別
+support `hχsupp`/`hχbarsupp`/`haχ1supp` + famS 次数列) の X-version (`DadeChainStepX`: 差分-support 化) +
+`advance` の X-version (`advanceX`: fromDade_X を呼ぶ) + `peterfalvi_66_coherence_of_X_from_dade` を X-chain に。
+fromDade_X が per-step を供給済ゆえ、残りは structure の差分化と advance の付け替えのみ。
