@@ -1539,6 +1539,48 @@ private theorem le_opiCoreInG_centralizer_of_mem_centralizer_sylow
     _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥K).map K.subtype := Subgroup.map_mono hW'
     _ = opiCoreInG ({p} : Set ℕ)ᶜ K := rfl
 
+/-- **SCN unpacked into ambient form**: if `A.subgroupOf P` is `SCN` in `↥P` (with `A ≤ P`), then
+`A` is abelian, `P ≤ N_G(A)`, and `C_G(A) ⊓ P ≤ A` — exactly the hypotheses `specialCase` /
+`le_opiCoreInG_centralizer_of_mem_centralizer_sylow` require. Transports normality/self-centralizing
+from `↥P` to `G`. -/
+private theorem scn_ambient {p : ℕ} {G : Type*} [Group G] {P : Sylow p G} {A : Subgroup G}
+    (hAP : A ≤ (P : Subgroup G)) (h : IsSCN (A.subgroupOf (P : Subgroup G))) :
+    IsMulCommutative A ∧ (P : Subgroup G) ≤ Subgroup.normalizer A ∧
+      Subgroup.centralizer (A : Set G) ⊓ (P : Subgroup G) ≤ A := by
+  haveI hAcomm : IsMulCommutative A :=
+    IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
+      congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp h.isMulCommutative
+        (⟨a, hAP ha⟩ : ↥(P : Subgroup G)) (Subgroup.mem_subgroupOf.mpr ha)
+        ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
+  refine ⟨hAcomm, ?_, ?_⟩
+  · intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro a
+    constructor
+    · intro ha
+      have := h.isNormal.conj_mem ⟨a, hAP ha⟩ (Subgroup.mem_subgroupOf.mpr ha) ⟨g, hg⟩
+      rw [Subgroup.mem_subgroupOf] at this
+      simpa [Subgroup.coe_mul, Subgroup.coe_inv] using this
+    · intro ha
+      have hga : g * a * g⁻¹ ∈ A := ha
+      have := h.isNormal.conj_mem ⟨g * a * g⁻¹, hAP hga⟩ (Subgroup.mem_subgroupOf.mpr hga)
+        ⟨g, hg⟩⁻¹
+      rw [Subgroup.mem_subgroupOf] at this
+      have heq : ((⟨g, hg⟩⁻¹ * ⟨g * a * g⁻¹, hAP hga⟩ * (⟨g, hg⟩⁻¹)⁻¹ : ↥(P : Subgroup G)) : G)
+          = a := by simp [Subgroup.coe_mul, Subgroup.coe_inv]; group
+      rwa [heq] at this
+  · intro x hx
+    have hmem : (⟨x, (Subgroup.mem_inf.mp hx).2⟩ : ↥(P : Subgroup G))
+        ∈ Subgroup.centralizer ((A.subgroupOf (P : Subgroup G) : Subgroup ↥(P : Subgroup G))
+          : Set ↥(P : Subgroup G)) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro a ha
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at ha
+      exact Subtype.ext
+        (Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hx).1 (a : G) ha)
+    rw [h.selfCentralizing] at hmem
+    rwa [Subgroup.mem_subgroupOf] at hmem
+
 /-- For a nontrivial `p`-group `A`, `π(A) = {p}` (so `(π(A))ᶜ = {p}ᶜ`). Used to align
 `hInvariant`/`opiCoreInG (primesOf A)ᶜ` with the single-prime lemmas of §1. -/
 private theorem primesOf_eq_singleton [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
