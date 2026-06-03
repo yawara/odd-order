@@ -454,3 +454,16 @@ D₀ 結合は wrapper `retarget_isCoherent_of_decomposition`(3127, `D.retargetT
 
 **要読込 (実装前)**: `RetargetTargetPair` struct(2169) / `eq_sum_of_psi_eq_zero` / supported-isometry lemma 名
 (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) / `imageFamily.image_eq` / hperElem source。
+
+### I 進捗 (2026-06-03 セッション)
+- ✅ **step1** `retarget_isCoherent_of_supportedDecomposition` (commit 0ba7572, build-green): X:=Da.X の
+  {X,X̄} 6 facts を supported route で導出 (‖X‖²=1 via `inner_self_chi_add_psi_eq`, ‖Y‖²=a²,
+  ⟨X,(χ−χ̄)^τ⟩=⟨χ,χ⟩=1 via `inner_self_chi_eq_sum_coeff`)。**htau1_mem0 blocker 解消**。
+- ✅ **step2** `retarget_isCoherent_of_supportedDecomposition_and_memberFamily` (commit 0a664bf): hperElem を
+  Dmem family から discharge (既存 `inner_extension_*_orthogonal_imageSet*` 再利用)。
+- 🔜 **step3**: (a) `dadeOrthonormalCharacterImageFamily`(~4500) を**差分-support** に弱化
+  — `dadeIntegralCharacterMap_inner_eq_on_supported_span`(4460, 個別 support `hS:∀s∈S,supp⊆A` 要求) を
+  差分集合 S={0, χ̄−χ} 等で適用 (χ−χ̄ は 1 で消え A-supported; iter1 設計と同じ)。
+  (b) `retarget_isCoherent_fromDade_X`: Da を `ofProjection`(htau1_mema のみ, htau1_mem0 不要)で構成、
+  差分-support imageFamily を渡し step2 を呼ぶ。
+- 🔜 **step4**: `DadeChainStep.advance`(5146) を X-version に rewire (or 分岐) → `peterfalvi_66_coherence_of_X_from_dade` 解禁。
