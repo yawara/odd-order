@@ -45,6 +45,8 @@ The contradiction `p ≤ q` (BG Theorem C) is obtained from three lemmas:
 * `conditionA_iff_not_dvd` — **Remark (I)**: condition (A) `⟺ q ∤ (p-1)`.
 * `normOneUnits_card` — **Remark (VII)**: the norm-one subgroup
   `U ≤ 𝔽_{p^q}ˣ` has order `(p^q - 1)/(p - 1)`.
+* `normOnePairSet_ncard_eq_normSetE_ncard` — the finite-field counting bridge
+  identifying `|E|` with the number of pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.
 
 Lemma C.1 and the `q = 3` branch of Lemma C.2 are formalized; the `q ≥ 5`
 branch of C.2, Lemma C.3, and the assembly into BG Theorem C are tracked in
@@ -144,6 +146,12 @@ theorem normOneUnits_card [Fact p.Prime] (hq : q ≠ 0) :
   exact Nat.eq_div_of_mul_eq_right (ne_of_gt (Nat.sub_pos_of_lt (Fact.out : p.Prime).one_lt))
     (by simpa [mul_comm] using hmul)
 
+/-- The pair set `{(u, v) ∈ U × U | u + v = 2}` whose cardinality is the
+structure constant identified with `|E|` in BG Appendix C, Lemma C.2. -/
+def normOnePairSet [Fact p.Prime] : Set (normOneUnits p q × normOneUnits p q) :=
+  {uv | (((uv.1 : (GaloisField p q)ˣ) : GaloisField p q) +
+      ((uv.2 : (GaloisField p q)ˣ) : GaloisField p q)) = 2}
+
 lemma mem_normSetE_iff [Fact p.Prime] {a : GaloisField p q} :
     a ∈ normSetE p q ↔ normN p q a = 1 ∧ normN p q (2 - a) = 1 := Iff.rfl
 
@@ -224,6 +232,51 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
   have := ha.2
   rw [h, normN_zero p q hq] at this
   exact zero_ne_one this
+
+/-- BG Appendix C, Lemma C.2 structure-constant bridge: the norm set `E` is in
+bijection with pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.  This is the
+finite-field counting identity used before the `q ≥ 5` character calculation. -/
+theorem normOnePairSet_ncard_eq_normSetE_ncard [Fact p.Prime] (hq : q ≠ 0) :
+    (normOnePairSet p q).ncard = (normSetE p q).ncard := by
+  classical
+  let F := GaloisField p q
+  refine Set.ncard_congr
+    (fun uv _ => (((uv.1 : normOneUnits p q) : Fˣ) : F)) ?maps_to ?inj ?surj
+  · rintro ⟨u, v⟩ huv
+    have hu : normN p q ((u : Fˣ) : F) = 1 :=
+      (mem_normOneUnits_iff_normN p q hq (u : Fˣ)).mp u.property
+    have hv : normN p q ((v : Fˣ) : F) = 1 :=
+      (mem_normOneUnits_iff_normN p q hq (v : Fˣ)).mp v.property
+    refine ⟨hu, ?_⟩
+    have hvval : (2 : F) - ((u : Fˣ) : F) = ((v : Fˣ) : F) := by
+      rw [← huv]
+      ring
+    rw [hvval]
+    exact hv
+  · rintro ⟨u₁, v₁⟩ ⟨u₂, v₂⟩ h₁ h₂ hu
+    change ((u₁ : Fˣ) : F) = ((u₂ : Fˣ) : F) at hu
+    have hv : ((v₁ : Fˣ) : F) = ((v₂ : Fˣ) : F) := by
+      calc
+        ((v₁ : Fˣ) : F) = (2 : F) - ((u₁ : Fˣ) : F) := by
+          rw [← h₁]
+          ring
+        _ = (2 : F) - ((u₂ : Fˣ) : F) := by rw [hu]
+        _ = ((v₂ : Fˣ) : F) := by
+          rw [← h₂]
+          ring
+    exact Prod.ext (Subtype.ext (Units.ext hu)) (Subtype.ext (Units.ext hv))
+  · intro a ha
+    have hqpos : 0 < q := Nat.pos_of_ne_zero hq
+    let u : Fˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hqpos ha)
+    let v : Fˣ := Units.mk0 (2 - a) (two_sub_ne_zero_of_mem_normSetE p q hqpos ha)
+    have hu : u ∈ normOneUnits p q :=
+      (mem_normOneUnits_iff_normN p q hq u).mpr ha.1
+    have hv : v ∈ normOneUnits p q :=
+      (mem_normOneUnits_iff_normN p q hq v).mpr ha.2
+    refine ⟨(⟨u, hu⟩, ⟨v, hv⟩), ?_, ?_⟩
+    · change (a + (2 - a) : F) = 2
+      ring
+    · rfl
 
 /-- The sequence `d_k := (k+1) - k·a = (1-a)·k + 1` of BG Lemma C.1. -/
 noncomputable def dSeq [Fact p.Prime] (a : GaloisField p q) (k : ℕ) : GaloisField p q :=

@@ -84,6 +84,13 @@ generator-relation 版 (`p ≤ q` を強制)。下流監査 (`s16_appc_downstrea
 `normOneUnits_card : |U| = (p^q - 1)/(p - 1)` を sorry-free 証明し、AxiomsCheck に登録。
 これは C.2(q≥5) の Frobenius 群 `H=P⋊U` で使う `|U|` の基礎補題。
 
+#### ✅ C.2 structure-constant bridge 完成 (2026-06-04)
+`normOnePairSet : Set (U × U)` を `{(u,v) | u+v=2}` として定義し、
+`normOnePairSet_ncard_eq_normSetE_ncard` で `|E|` とこの pair set の個数を同一視。
+写像 `(u,v) ↦ u` と逆写像 `a ↦ (a, 2-a)` を `normN`/`U` membership bridge で Lean 化した。
+これにより q≥5 branch で残る作業は、この pair count を Frobenius 群 `H=P⋊U` の class-sum
+構造定数へ持ち上げ、指標直交関係から下界 `p^{q-2}-p^{q/2}>1` を出す部分に絞られた。
+
 ### Lemma C.3 — `E=E⁻¹` 【群論的 generator-relation・最難・仮説(B)必須】
 Step1: `∀x∈PU, ∃u,v∈U, s₁∈P_0, x=us₁v` (∵ F^*=F_p^*×U)。
 Step2: `s₁us₂∈U ⟹ (s₁=s₂=1) ∨ (u=1∧s₁s₂=1)`。

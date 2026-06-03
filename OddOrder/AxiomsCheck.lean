@@ -1809,6 +1809,10 @@ set_option linter.style.longLine false in
 -- `(p^q - 1)/(p - 1)`, the `|U|` used in the `q ≥ 5` branch of Lemma C.2.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card
 
+-- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
+-- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard
+
 -- BG App C Lemma C.1: if the norm set `E = {a | N(a)=N(2-a)=1}` is inverse-closed and
 -- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,
 -- and the degree-`q` Frobenius polynomial `∏_{i<q}((1-a)^{p^i}X+1)-1` then has `p` roots.
