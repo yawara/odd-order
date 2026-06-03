@@ -21,7 +21,9 @@ created: 2026-06-04
 
 - [x] 基盤: `normN` / `normSetE` 定義 + **Remark (I)** `conditionA_iff_not_dvd` (条件A ⟺ q∤(p-1), axiom-clean, AxiomsCheck 登録) — 2026-06-04 commit
 - [x] **Lemma C.1** `lemmaC1` (E=E⁻¹ ∧ |E|≥2 ⟹ p≤q) — **完成・sorry-free・axiom-clean・AxiomsCheck 登録** (2026-06-04 commit 32ae2f4)。τ-反復 `tauIter`/`dSeq`/`normN_dSeq_eq_one` (telescoping) + `natCast_pow_pPow` + degree-q Frobenius 多項式根数 (`natDegree_prod`/`card_roots'`/`CharP.natCast_injOn_Iio`)。
-- [ ] **Lemma C.2 (q=3)**: 三次式 `f_c(x)=x(x-2)(x-c)+(x-1)` の F_p-無根 ⟹ E に元。純有限体。
+- [~] **Lemma C.2 (q=3)**: 前半 ✅ (2026-06-04 commits 6f5324d/793d0ec): `exists_rootFree_cubic`
+  (pigeonhole ∃c 無根) + `fCubic`/`fCubic_natDegree`(=3)/`fCubic_irreducible`。**残**: 持ち上げ
+  (AdjoinRoot で root∈F_{p³} + Frobenius 軌道因数分解 + normN=-fCubic(0)/fCubic(2)) ~200行。詳細=plan note 「残作業 breakdown (A)」。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。別 infra・重。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
