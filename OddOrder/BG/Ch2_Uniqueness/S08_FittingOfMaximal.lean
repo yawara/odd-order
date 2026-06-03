@@ -1752,6 +1752,69 @@ theorem opiCoreInG_cFittingInG_singleton_compl_le_opiCoreInG_singleton_compl
     exact opiCoreInG_singleton_cFittingInG_le_opiCoreInG_singleton_compl_of_ne
       hG hM hA0 hHsolv hAH hq hr_not_q)
 
+/-- BG (8.7), complement-centralizer form: after `π(F(H)) = π(F(M))`, the
+`p`-core of `C_F(M)(A0)` centralizes `O_{p'}(F(H))`. -/
+theorem opiCoreInG_singleton_cFittingInG_le_centralizer_opiCoreInG_singleton_compl_fittingInG
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hHsolv : IsSolvable ↥H)
+    (hAH : cFittingInG M A0 ≤ H)
+    (hPrimes : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) =
+      OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) :
+    opiCoreInG ({p} : Set ℕ) (cFittingInG M A0) ≤
+      Subgroup.centralizer (opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H) : Set G) := by
+  let Ap : Subgroup G := opiCoreInG ({p} : Set ℕ) (cFittingInG M A0)
+  let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H)
+  have hK_le_cent_Ap : K ≤ Subgroup.centralizer (Ap : Set G) := by
+    have hK_le_FH : K ≤ fittingInG H := by
+      dsimp [K]
+      exact opiCoreInG_le ({p} : Set ℕ)ᶜ (fittingInG H)
+    have hK_nilp : Group.IsNilpotent ↥K := by
+      haveI : Group.IsNilpotent ↥(fittingInG H) := fittingInG_isNilpotent H
+      exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FH)
+    refine le_of_sylow_le_of_nilpotent hK_nilp ?_
+    intro r
+    haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
+    let S : Subgroup G := ((default : Sylow (r : ℕ) ↥K) : Subgroup ↥K).map K.subtype
+    have hS_le_K : S ≤ K := by
+      dsimp [S]
+      exact Subgroup.map_subtype_le _
+    have hS_le_FH : S ≤ fittingInG H := hS_le_K.trans hK_le_FH
+    have hS_p : IsPGroup (r : ℕ) ↥S := by
+      dsimp [S]
+      exact (default : Sylow (r : ℕ) ↥K).isPGroup'.map K.subtype
+    have hS_le_OrFH : S ≤ opiCoreInG ({(r : ℕ)} : Set ℕ) (fittingInG H) :=
+      le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+        (fittingInG_isNilpotent H) hS_le_FH hS_p
+    have hrFH : (r : ℕ) ∈ (Nat.card ↥(fittingInG H)).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_dvd_of_le hK_le_FH) Nat.card_pos.ne' r.2
+    have hrFM_primes : (r : ℕ) ∈ OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
+      rw [← hPrimes]
+      exact hrFH
+    have hKpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := by
+      dsimp [K]
+      exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG H)
+    have hr_not_p : (r : ℕ) ≠ p := by
+      have hrcomp : (r : ℕ) ∈ ({p} : Set ℕ)ᶜ := hKpi (r : ℕ) r.2
+      intro hrp
+      exact hrcomp (by simp [hrp])
+    have hAp_le_OrH_compl : Ap ≤ opiCoreInG ({(r : ℕ)} : Set ℕ)ᶜ H := by
+      dsimp [Ap]
+      exact opiCoreInG_singleton_cFittingInG_le_opiCoreInG_singleton_compl_of_ne
+        (p := p) (q := (r : ℕ)) (r := p) hG hM hA0 hHsolv hAH hrFM_primes hr_not_p
+    have hOrFH_cent_Ap :
+        opiCoreInG ({(r : ℕ)} : Set ℕ) (fittingInG H) ≤
+          Subgroup.centralizer (Ap : Set G) :=
+      opiCoreInG_fittingInG_le_centralizer_of_le_opiCoreInG_compl
+        ({(r : ℕ)} : Set ℕ) hAp_le_OrH_compl
+    exact hS_le_OrFH.trans hOrFH_cent_Ap
+  change Ap ≤ Subgroup.centralizer (K : Set G)
+  intro x hx
+  refine Subgroup.mem_centralizer_iff.mpr ?_
+  intro y hy
+  exact (Subgroup.mem_centralizer_iff.mp (hK_le_cent_Ap hy) x hx).symm
+
 /-- BG (8.7): in the non-`p`-group case, each q-core of `F(H)` lies in the
 original maximal subgroup `M` whenever `H` contains `C_F(M)(A0)`. -/
 theorem opiCoreInG_fittingInG_singleton_le_maximal_of_cFittingInG_le_of_not_pGroup
