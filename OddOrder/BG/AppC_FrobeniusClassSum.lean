@@ -672,6 +672,28 @@ theorem normOneClassAt_out_centralizer_card_eq [Fact p.Prime]
   rw [Nat.mul_comm (Nat.card (normOneUnits p q))] at hmul
   exact Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := normOneUnits p q)) hmul
 
+/-- A class function evaluated at the chosen representative of `C_s` agrees with
+its value at the concrete additive-kernel representative `inl s`. -/
+theorem normOneClassAt_out_apply_eq_inl [Fact p.Prime]
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ) (s : GaloisField p q) :
+    χ (normOneClassAt p q s).out =
+      χ (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) := by
+  have hmk_out : ConjClasses.mk (normOneClassAt p q s).out = normOneClassAt p q s :=
+    OddOrder.RepresentationTheory.conjClass_mk_out (normOneClassAt p q s)
+  have hmk_inl :
+      ConjClasses.mk
+          (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) =
+        normOneClassAt p q s := rfl
+  exact χ.of_isConj (ConjClasses.mk_eq_mk_iff_isConj.mp (hmk_out.trans hmk_inl.symm))
+
+/-- Irreducible-character version for the inverse of the chosen class representative. -/
+theorem normOneClassAt_out_inv_irreducibleCharacter_apply_eq_star_inl [Fact p.Prime]
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q)) (s : GaloisField p q) :
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ) (normOneClassAt p q s).out⁻¹ =
+      star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q)) := by
+  rw [OddOrder.RepresentationTheory.irreducibleCharacter_apply_inv]
+  rw [normOneClassAt_out_apply_eq_inl p q]
 
 /-- Fixed-product version of `IsClassPair`: the two entries lie in prescribed
 classes and their product is the chosen representative `z`, not merely an
@@ -1032,6 +1054,125 @@ theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
       (Cs := normOneClassAt p q (2 : GaloisField p q))
   rw [hcent, hcard1] at h
   exact h
+
+open scoped Classical in
+/-- Same App C class-sum coefficient formula, rewritten at the concrete additive-kernel
+representatives `inl 1` and `inl 2` instead of the chosen `ConjClasses.out` values. -/
+theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_concrete_character_sum
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hpodd : Odd p) (hq : 1 < q) :
+    (classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (1 : GaloisField p q))
+          (normOneClassAt p q (2 : GaloisField p q)) : ℂ) *
+        ((p ^ q : ℕ) : ℂ) =
+      ∑ χ : IrreducibleCharacter (normOneFrobeniusGroup p q),
+        (((Nat.card (normOneUnits p q) : ℂ) *
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+                normOneFrobeniusGroup p q) *
+          ((Nat.card (normOneUnits p q) : ℂ) *
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+                normOneFrobeniusGroup p q))) /
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (1 : normOneFrobeniusGroup p q)) *
+          star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+              normOneFrobeniusGroup p q)) := by
+  have h := normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum p q hpodd hq
+  refine h.trans ?_
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  rw [normOneClassAt_out_apply_eq_inl p q,
+    normOneClassAt_out_inv_irreducibleCharacter_apply_eq_star_inl p q]
+
+open scoped Classical in
+/-- In the concrete class-sum formula for `C_1 * C_1 -> C_2`, the irreducible
+characters whose kernels contain the additive kernel contribute exactly `|U|^3`. -/
+theorem normOneFrobenius_kernelCharacter_concrete_classSumContribution_eq
+    [Fact p.Prime] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+        (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)),
+      (((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q) *
+        ((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q))) /
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (1 : normOneFrobeniusGroup p q)) *
+        star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+            normOneFrobeniusGroup p q)) =
+      (Nat.card (normOneUnits p q) : ℂ) ^ 3 := by
+  let pred : IrreducibleCharacter (normOneFrobeniusGroup p q) → Prop := fun χ =>
+    (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+  let Uc : ℂ := (Nat.card (normOneUnits p q) : ℂ)
+  have hterm : ∀ χ ∈ Finset.univ.filter pred,
+      (((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q) *
+        ((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q))) /
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (1 : normOneFrobeniusGroup p q)) *
+        star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+            normOneFrobeniusGroup p q)) =
+        Uc ^ 2 *
+          ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (1 : normOneFrobeniusGroup p q)) ^ 2 := by
+    intro χ hχ
+    have hker := (Finset.mem_filter.mp hχ).2
+    rw [normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset p q hker
+        (1 : GaloisField p q),
+      normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset p q hker
+        (2 : GaloisField p q)]
+    obtain ⟨d, hdpos, hdχ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+    rw [hdχ, star_natCast]
+    change ((((Nat.card (normOneUnits p q) : ℂ) * (d : ℂ) *
+          ((Nat.card (normOneUnits p q) : ℂ) * (d : ℂ))) / (d : ℂ)) *
+        (d : ℂ) = Uc ^ 2 * (d : ℂ) ^ 2)
+    field_simp [Nat.cast_ne_zero.mpr (ne_of_gt hdpos)]
+    ring
+  have hsum := Finset.sum_congr rfl (fun χ hχ => hterm χ hχ)
+  calc
+    ∑ χ ∈ Finset.univ.filter pred,
+      (((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q) *
+        ((Nat.card (normOneUnits p q) : ℂ) *
+          (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+            (SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q)) :
+              normOneFrobeniusGroup p q))) /
+        (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (1 : normOneFrobeniusGroup p q)) *
+        star ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+          (SemidirectProduct.inl (Multiplicative.ofAdd (2 : GaloisField p q)) :
+            normOneFrobeniusGroup p q))
+        = ∑ χ ∈ Finset.univ.filter pred,
+            Uc ^ 2 *
+              ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+                (1 : normOneFrobeniusGroup p q)) ^ 2 := hsum
+    _ = Uc ^ 2 *
+          ∑ χ ∈ Finset.univ.filter pred,
+            ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+              (1 : normOneFrobeniusGroup p q)) ^ 2 := by
+          rw [Finset.mul_sum]
+    _ = Uc ^ 2 * Uc := by
+          rw [normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card]
+    _ = (Nat.card (normOneUnits p q) : ℂ) ^ 3 := by
+          change Uc ^ 2 * Uc = Uc ^ 3
+          ring
 
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/

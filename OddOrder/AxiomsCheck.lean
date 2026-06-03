@@ -1906,6 +1906,13 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.normOneClassAt_out_centralizer_card_eq
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneClassAt_out_apply_eq_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_out_inv_irreducibleCharacter_apply_eq_star_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_concrete_character_sum
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_kernelCharacter_concrete_classSumContribution_eq
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
 -- fixed-product fiber over `inl (2*s)` before passing to the full product class.
