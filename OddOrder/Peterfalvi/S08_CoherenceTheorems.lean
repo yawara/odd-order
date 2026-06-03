@@ -1069,6 +1069,41 @@ theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
   rw [hre]
   exact hχ.2 ψ hψ
 
+/-- A member `χ = Ind_H^L θ` of `S` is supported on `H` (its induced character vanishes off the
+normal subgroup `H`). -/
+theorem sMember_support_subset_H (hyp : SibleyDadeHypothesis G L H)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) :
+    χ.support ⊆ (H : Set ↥L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  rw [hχeq]
+  exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
+
+/-- **(T8 leaf 6) equal-degree difference support.**  For two members `χ, χ'` of `S` of equal
+degree (`χ(1) = χ'(1)`) the difference `χ − χ'` is supported on `H^# = sharpImage H`: both are
+supported on `H` (`sMember_support_subset_H`) and the difference vanishes at `1` (equal degree).
+This is the `hsuppdiff` input of `coherentEqualDegree_fromDade` for the equal-minimal-degree base
+block `S₀` (`irreducibleCharacterDifference χ j = χⱼ − χ₀`), and the (5.6) `χ − a·χ₁` support shape. -/
+theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
+    {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) (hdeg : χ 1 = χ' 1) :
+    (χ - χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [ClassFunction.sub_apply, hdeg, sub_self])
+  have hgH : g ∈ H := by
+    rcases eq_or_ne (χ g) 0 with hχg | hχg
+    · have hχ'g : χ' g ≠ 0 := fun h0 =>
+        hg (by rw [ClassFunction.sub_apply, hχg, h0, sub_self])
+      exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
+    · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
