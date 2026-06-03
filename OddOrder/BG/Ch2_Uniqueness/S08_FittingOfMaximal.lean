@@ -205,6 +205,81 @@ theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
   exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
     M.subtype M.subtype_injective)
 
+/-- For a finite solvable subgroup `H`, its `π(F(H))`-complement core is trivial.
+
+This is the ambient form of the BG §8 step `O_{σ'}(H)=1`, where `σ=π(F(H))`.
+If the core were nontrivial, the Fitting subgroup of that normal solvable subgroup would
+map to a nontrivial subgroup of both `F(H)` and the `σ`-complement core. -/
+theorem opiCoreInG_primesOf_fittingInG_compl_eq_bot [Finite G]
+    {H : Subgroup G} [IsSolvable ↥H] :
+    opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG H))ᶜ H = ⊥ := by
+  classical
+  let σ : Set ℕ := OddOrder.BG.Ch2.S07.primesOf (fittingInG H)
+  let N : Subgroup G := opiCoreInG σᶜ H
+  suffices N = ⊥ by simpa [N, σ]
+  by_contra hN_ne_bot
+  have hNH : N ≤ H := by
+    dsimp [N]
+    exact opiCoreInG_le σᶜ H
+  let NH : Subgroup H := N.subgroupOf H
+  haveI hNH_normal : NH.Normal := by
+    dsimp [NH]
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer hNH).mpr (by
+      dsimp [N]
+      exact le_normalizer_opiCoreInG σᶜ H)
+  have hNH_ne_bot : NH ≠ ⊥ := by
+    intro hbot
+    apply hN_ne_bot
+    have hmap : NH.map H.subtype = N := by
+      dsimp [NH]
+      exact Subgroup.map_subgroupOf_eq_of_le hNH
+    rw [← hmap, hbot, Subgroup.map_bot]
+  haveI hNH_nontrivial : Nontrivial ↥NH :=
+    (Subgroup.nontrivial_iff_ne_bot NH).mpr hNH_ne_bot
+  have hFNH_ne_bot : Ch01.fitting ↥NH ≠ ⊥ :=
+    Ch01.fitting_ne_bot_of_solvable_nontrivial ↥NH
+  let FNH : Subgroup H := (Ch01.fitting ↥NH).map NH.subtype
+  have hFNH_ne_bot : FNH ≠ ⊥ := by
+    intro hbot
+    apply hFNH_ne_bot
+    exact (Subgroup.map_eq_bot_iff_of_injective (Ch01.fitting ↥NH)
+      NH.subtype_injective).mp hbot
+  let B : Subgroup G := FNH.map H.subtype
+  have hB_ne_bot : B ≠ ⊥ := by
+    intro hbot
+    apply hFNH_ne_bot
+    exact (Subgroup.map_eq_bot_iff_of_injective FNH H.subtype_injective).mp hbot
+  have hFNH_le_fittingH : FNH ≤ Ch01.fitting ↥H := by
+    dsimp [FNH]
+    exact Ch01.fitting_map_subtype_le_fitting
+  have hB_le_fittingH : B ≤ fittingInG H := by
+    dsimp [B, fittingInG]
+    exact Subgroup.map_mono hFNH_le_fittingH
+  have hFNH_le_NH : FNH ≤ NH := by
+    dsimp [FNH]
+    exact Subgroup.map_subtype_le _
+  have hB_le_N : B ≤ N := by
+    dsimp [B]
+    calc FNH.map H.subtype
+        ≤ NH.map H.subtype := Subgroup.map_mono hFNH_le_NH
+      _ = N := by
+        dsimp [NH]
+        exact Subgroup.map_subgroupOf_eq_of_le hNH
+  have hN_pi_compl : Subgroup.IsPiSubgroup σᶜ N := by
+    dsimp [N]
+    exact isPiSubgroup_opiCoreInG σᶜ H
+  have hB_pi_compl : Subgroup.IsPiSubgroup σᶜ B := by
+    intro r hr
+    exact hN_pi_compl r
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hB_le_N) Nat.card_pos.ne' hr)
+  have hFittingH_pi : Subgroup.IsPiSubgroup σ (fittingInG H) := by
+    intro r hr
+    simpa [σ, OddOrder.BG.Ch2.S07.primesOf] using hr
+  have hB_bot : B = ⊥ :=
+    eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hB_le_fittingH hFittingH_pi
+      hB_pi_compl
+  exact hB_ne_bot hB_bot
+
 /-- BG Proposition 1.10, packaged for the cyclic conjugation action on `F(M)`.
 
 If the fixed subgroup `C_{F(M)}(<x>)` is self-centralizing in `F(M)` and `<x>` has
@@ -1861,6 +1936,20 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
       OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
     intro q hq
     exact hFittingH_pi q (by simpa [OddOrder.BG.Ch2.S07.primesOf] using hq)
+  haveI hH_solvable : IsSolvable ↥H := hG.solvable_of_lt_top H hHco.lt_top
+  have hO_sigma_compl_bot :
+      opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG H))ᶜ H = ⊥ :=
+    opiCoreInG_primesOf_fittingInG_compl_eq_bot
+  have hO_pi_compl_le_sigma :
+      opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ H ≤
+        opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG H))ᶜ H := by
+    rw [opiCoreInG, opiCoreInG]
+    refine Subgroup.map_mono (Ch03.oPiCore_mono ?_ ↥H)
+    intro q hq_not_pi hq_sigma
+    exact hq_not_pi (hSigma_subset_pi hq_sigma)
+  have hO_pi_compl_bot :
+      opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ H = ⊥ := by
+    exact le_bot_iff.mp (by rw [← hO_sigma_compl_bot]; exact hO_pi_compl_le_sigma)
   sorry
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
