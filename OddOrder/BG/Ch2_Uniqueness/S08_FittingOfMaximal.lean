@@ -535,6 +535,56 @@ theorem isMaxElemAbelianIn_le_centralizer_inf {p : ℕ} {M A₀ : Subgroup G}
   intro y hy
   exact congrArg Subtype.val (hA₀.1.comm ⟨y, hy⟩ ⟨x, hx⟩)
 
+/-- If `x` centralizes `C_F(M)(A0)`, then `C_F(M)(A0)` lies in
+`C_F(M)(<x>)`. -/
+theorem cFitting_le_centralizer_zpowers_inf_fittingInG_of_mem_centralizer
+    {M A0 : Subgroup G} {x : G}
+    (hxC : x ∈ Subgroup.centralizer (cFittingInG M A0 : Set G)) :
+    cFittingInG M A0 ≤ Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M := by
+  intro a haA
+  have haA_saved : a ∈ cFittingInG M A0 := haA
+  rw [cFittingInG, Subgroup.mem_inf] at haA
+  refine ⟨?_, haA.2⟩
+  refine Subgroup.mem_centralizer_iff.mpr ?_
+  intro y hy
+  obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  have hcomm_eq : (a : G) * x = x * (a : G) :=
+    Subgroup.mem_centralizer_iff.mp hxC (a : G) haA_saved
+  have hcomm : Commute (a : G) x := hcomm_eq
+  exact (hcomm.symm.zpow_left n).eq
+
+/-- BG (8.3) self-centralizer bridge: for `A = C_F(M)(A0)`, an element of `C_G(A)`
+satisfies the `C_F(C_F(<x>)) ≤ C_F(<x>)` input needed for Proposition 1.10. -/
+theorem centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_cFitting
+    {p : ℕ} {M A0 : Subgroup G} {x : G}
+    (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
+    (hxC : x ∈ Subgroup.centralizer (cFittingInG M A0 : Set G)) :
+    Subgroup.centralizer
+        ((Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
+          (fittingInG M) : Set ↥(fittingInG M))
+      ≤ (Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
+          (fittingInG M) := by
+  let C : Subgroup G := Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M
+  have hA_le_C : cFittingInG M A0 ≤ C := by
+    dsimp [C]
+    exact cFitting_le_centralizer_zpowers_inf_fittingInG_of_mem_centralizer hxC
+  have hA0A : A0 ≤ Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M :=
+    isMaxElemAbelianIn_le_centralizer_inf hA0
+  intro y hy
+  rw [Subgroup.mem_subgroupOf]
+  have hyA : (y : G) ∈ cFittingInG M A0 := by
+    rw [cFittingInG, Subgroup.mem_inf]
+    refine ⟨?_, y.2⟩
+    refine Subgroup.mem_centralizer_iff.mpr ?_
+    intro a0 ha0
+    let a0F : ↥(fittingInG M) := ⟨a0, (hA0A ha0).2⟩
+    have ha0C : a0F ∈ C.subgroupOf (fittingInG M) := by
+      rw [Subgroup.mem_subgroupOf]
+      exact hA_le_C (by simpa [cFittingInG] using (hA0A ha0).1)
+    have hcommF := Subgroup.mem_centralizer_iff.mp hy a0F ha0C
+    exact congrArg Subtype.val hcommF
+  exact hA_le_C hyA
+
 /-- Maximality clause for `isMaxElemAbelianIn`. -/
 theorem isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le {p : ℕ} {A₀ H B : Subgroup G}
     (hA₀ : isMaxElemAbelianIn p A₀ H) (hB : B.IsElementaryAbelian p) (hBH : B ≤ H)
