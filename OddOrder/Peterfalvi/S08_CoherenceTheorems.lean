@@ -863,6 +863,47 @@ theorem inner_Y_extension_member_eq
     ClassFunction.inner_add_right, hfound, hsrc, hsmul]
   ring
 
+open scoped Classical in
+/-- **Indexed integral orthogonal projection onto a ZIrr-orthonormal family.**
+
+The `ι`-indexed form of `exists_intProjection_of_orthonormal_ZIrr`, the shape the (5.6.2)
+integer-forcing `lambda_eq_zero_and_Z_eq_zero` consumes: for `φ ∈ ZIrr G` and an **injective**
+orthonormal family `vc : ι → CF G` over `s : Finset ι` (each `vc i ∈ ZIrr G`), there are integer
+coefficients `c i = ⟨φ, vc i⟩` and an orthogonal residual `Z` with
+
+`φ = (∑_{i ∈ s} c i • vc i) + Z`    and    `⟨Z, vc i⟩ = 0`.
+
+Reindexes the image-indexed primitive (`R = s.image vc`, `Finset.sum_image` with `hvcinj`). -/
+theorem exists_indexed_intProjection_of_orthonormal_ZIrr
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    {ι : Type*} (s : Finset ι) (vc : ι → ClassFunction G ℂ)
+    (hvcZ : ∀ i ∈ s, vc i ∈ ZIrr G)
+    (hvcinj : ∀ i ∈ s, ∀ j ∈ s, vc i = vc j → i = j)
+    (horth : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (vc i) (vc j) = if i = j then (1 : ℂ) else 0) :
+    ∃ (c : ι → ℤ) (Z : ClassFunction G ℂ),
+      (∀ i ∈ s, ClassFunction.inner φ (vc i) = (c i : ℂ)) ∧
+      φ = (∑ i ∈ s, (c i : ℂ) • vc i) + Z ∧
+      ∀ i ∈ s, ClassFunction.inner Z (vc i) = 0 := by
+  classical
+  have hZR : ∀ α ∈ s.image vc, α ∈ ZIrr G := by
+    intro α hα; rw [Finset.mem_image] at hα; obtain ⟨i, hi, rfl⟩ := hα; exact hvcZ i hi
+  have horthR : ∀ α ∈ s.image vc, ∀ β ∈ s.image vc,
+      ClassFunction.inner α β = if α = β then (1 : ℂ) else 0 := by
+    intro α hα β hβ
+    rw [Finset.mem_image] at hα hβ
+    obtain ⟨i, hi, rfl⟩ := hα; obtain ⟨j, hj, rfl⟩ := hβ
+    rw [horth i hi j hj]
+    by_cases hij : i = j
+    · rw [if_pos hij, if_pos (by rw [hij])]
+    · rw [if_neg hij, if_neg (fun h => hij (hvcinj i hi j hj h))]
+  obtain ⟨c, Y, hcoeff, hsum, hY⟩ :=
+    ClassFunction.exists_intProjection_of_orthonormal_ZIrr hφ hZR horthR
+  refine ⟨fun i => c (vc i), Y, fun i hi => hcoeff (vc i) (Finset.mem_image_of_mem vc hi), ?_,
+    fun i hi => hY (vc i) (Finset.mem_image_of_mem vc hi)⟩
+  rw [hsum, Finset.sum_image hvcinj]
+
 /-- **(T8.11 surgery, option A) coherence from the corrected extension image.**
 
 The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of mapping the new pair
