@@ -3025,6 +3025,116 @@ private theorem le_centralizer_inf_of_local_cor419Data_chain
     (H := L ⊓ M) (K := D ⊓ L) (P0 := P0)
     (odd_card_subgroup_of_odd hG.odd (L ⊓ M)) hP0_der hDL_le_LM hcop hsolv hdata
 
+/-- A `π`-subgroup remains a `π`-subgroup when viewed as a subgroup of an
+ambient overgroup. -/
+private theorem isPiSubgroup_subgroupOf_of_le [Finite G]
+    {π : Set ℕ} {K H : Subgroup G} (hKH : K ≤ H)
+    (hKpi : Subgroup.IsPiSubgroup π K) :
+    Subgroup.IsPiSubgroup π (K.subgroupOf H) := by
+  intro r hr
+  exact hKpi r (by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv] at hr)
+
+/-- Nilpotent/rank version of the local `D ∩ L` Corollary 4.19 consumption
+step.  The solvability of the local group supplies the chief-factor prime, and
+nilpotence supplies the `O_q(K)` absorption for every chief layer. -/
+private theorem le_centralizer_inf_of_local_nilpotent_rank_chain
+    [Finite G] (hG : IsMinimalSimpleOdd G) {D L M P0 : Subgroup G}
+    [IsSolvable ↥(L ⊓ M)]
+    (hDM : D ≤ M) (hMnormD : M ≤ Subgroup.normalizer (D : Set G))
+    (hP0_der : P0 ≤ derivedInG (L ⊓ M))
+    (hcop : (Nat.card ↥(P0.subgroupOf (L ⊓ M))).Coprime
+      (Nat.card ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M))))
+    (hKnilp : Group.IsNilpotent
+      ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))))
+    (hK_rank :
+      rank ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) ≤ 2) :
+    P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
+  have hK_solv :
+      IsSolvable
+        ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) := by
+    haveI : Group.IsNilpotent
+        ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) :=
+      hKnilp
+    infer_instance
+  haveI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
+      Subgroup ↥(L ⊓ M))).Normal :=
+    inf_subgroupOf_inf_normal_of_le_normalizer hDM hMnormD
+  exact le_centralizer_inf_of_local_cor419Data_chain
+    (D := D) (L := L) (M := M) (P0 := P0)
+    hG hDM hMnormD hP0_der hcop (Or.inr hK_solv)
+    (cor419ChiefFactorData_chiefSeriesInside_of_nilpotent
+      (M := ↥(L ⊓ M))
+      (K := ((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M)))
+      (odd_card_subgroup_of_odd hG.odd (L ⊓ M)) hKnilp hK_rank)
+
+/-- Lemma 9.5's concrete local centralizer step for
+`D = O_{p'}(F(M))`.  If the local `(9.10)` inclusion puts a `p`-subgroup `P₀`
+inside `(L ∩ M)'`, then Corollary 4.19 and Lemma 1.9 force `P₀` to centralize
+`O_{p'}(F(M)) ∩ L`. -/
+private theorem le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M L P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G) (hLM : L ≠ M)
+    (hP0p : IsPGroup p ↥P0) (hP0_der : P0 ≤ derivedInG (L ⊓ M)) :
+    P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M) ⊓ L : Subgroup G) : Set G) := by
+  classical
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  let H : Subgroup G := L ⊓ M
+  let K : Subgroup G := D ⊓ L
+  have hD_le_F : D ≤ S08.fittingInG M := by
+    simpa [D] using opiCoreInG_le ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  have hDM : D ≤ M := hD_le_F.trans (S08.fittingInG_le M)
+  have hM_norm_F : M ≤ Subgroup.normalizer (S08.fittingInG M : Set G) := by
+    intro x hxM
+    exact S08.mem_normalizer_fittingInG_of_mem hxM
+  have hMnormD : M ≤ Subgroup.normalizer (D : Set G) := by
+    simpa [D] using le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ)ᶜ hM_norm_F
+  have hK_le_H : K ≤ H := by
+    refine le_inf inf_le_right ?_
+    exact inf_le_left.trans hDM
+  have hP0H : P0 ≤ H := by
+    simpa [H] using hP0_der.trans (derivedInG_le_self (L ⊓ M))
+  have hD_nilp : Group.IsNilpotent ↥D := by
+    haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hD_le_F)
+  have hK_nilp_ambient : Group.IsNilpotent ↥K := by
+    haveI : Group.IsNilpotent ↥D := hD_nilp
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_left)
+  have hK_nilp :
+      Group.IsNilpotent ↥((K.subgroupOf H : Subgroup ↥H)) := by
+    haveI : Group.IsNilpotent ↥K := hK_nilp_ambient
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_H).symm
+  have hK_rank_ambient : rank ↥K ≤ 2 := by
+    simpa [D, K] using
+      (rank_inf_opiCoreFitting_le_two_of_distinct_maximals
+        (G := G) (p := p) hG hM hL hLM)
+  have hK_rank : rank ↥(K.subgroupOf H) ≤ 2 :=
+    (rank_subgroupOf_le_of_le hK_le_H).trans hK_rank_ambient
+  have hP0p_local : IsPGroup p ↥(P0.subgroupOf H) :=
+    hP0p.of_equiv (Subgroup.subgroupOfEquivOfLe hP0H).symm
+  have hP0pi : Subgroup.IsPiSubgroup ({p} : Set ℕ) (P0.subgroupOf H) :=
+    isPiSubgroup_singleton_of_isPGroup hP0p_local
+  have hDpic : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ D := by
+    simpa [D] using isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  have hKpic_ambient : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := by
+    intro r hr
+    exact hDpic r
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left) Nat.card_pos.ne' hr)
+  have hKpic : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (K.subgroupOf H) :=
+    isPiSubgroup_subgroupOf_of_le hK_le_H hKpic_ambient
+  have hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime (Nat.card ↥(K.subgroupOf H)) :=
+    coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hP0pi hKpic
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hHsolv : IsSolvable ↥H :=
+    solvable_of_solvable_injective (f := Subgroup.inclusion (inf_le_right : H ≤ M))
+      (Subgroup.inclusion_injective (inf_le_right : H ≤ M))
+  simpa [D, H, K] using
+    (le_centralizer_inf_of_local_nilpotent_rank_chain
+      (D := D) (L := L) (M := M) (P0 := P0)
+      hG hDM hMnormD (by simpa [H] using hP0_der) hcop hK_nilp hK_rank)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
