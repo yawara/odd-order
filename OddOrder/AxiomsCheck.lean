@@ -1912,13 +1912,25 @@ set_option linter.style.longLine false in
 
 -- BG App C Lemma C.3 Step 3: the norm-one subgroup acts irreducibly on
 -- the additive `𝔽_p`-space `𝔽_{p^q}` under condition (A), and therefore
--- any nonzero `U`-stable subspace generates all of `P ⋊ U` together with `U`.
+-- any nonzero `U`-stable subspace or subgroup-kernel preimage generates all of
+-- `P ⋊ U` together with `U`.
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneUnits_invariant_submodule_eq_top_of_ne_bot
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusKernelPreimageSubmodule
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
 
 -- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
 -- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.

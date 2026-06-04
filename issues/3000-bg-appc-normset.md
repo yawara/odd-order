@@ -158,7 +158,10 @@ created: 2026-06-04
   norm-one subgroup `U` が加法群 `𝔽_{p^q}` を `𝔽_p`-既約に作用することを
   `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明。さらに非零 `U`-不変
   subspace が `U` とともに concrete `P⋊U` 全体を生成することを
-  `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` として固定。AxiomsCheck 登録済み。
+  `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` として固定。続いて任意の subgroup
+  `X≤P⋊U` について、`U≤X` かつ `X∩P` が非自明なら `X=⊤` とする
+  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` まで materialize。
+  AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 4 finite-field Frobenius core**: `normN_pow_p` と
   `normSetE_pow_p` により `p`-power Frobenius が `E` を保つことを証明し、
   `normSetE_frobenius_pair` で `a,b∈E` かつ `a+b=2` なら `a^p,b^p∈E` かつ

@@ -12,6 +12,7 @@ import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
 import Mathlib.Data.ZMod.Basic
+import Mathlib.Algebra.Module.ZMod
 
 /-!
 # BG Appendix C: the finite-field norm-set argument
@@ -754,6 +755,102 @@ theorem normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot [Fact p.Prime] (hq : q.Pr
     rw [hW]
     simp
   · exact ⟨x.right, rfl⟩
+
+/-- Additive-kernel preimage of a subgroup `X ≤ P ⋊ U`. -/
+noncomputable def normOneFrobeniusKernelPreimageAddSubgroup [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) : AddSubgroup (GaloisField p q) where
+  carrier := {s | (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X}
+  zero_mem' := by
+    simp
+  add_mem' := by
+    intro a b ha hb
+    have hmul := X.mul_mem ha hb
+    simpa [← map_mul, ofAdd_add] using hmul
+  neg_mem' := by
+    intro a ha
+    have hinv := X.inv_mem ha
+    simpa using hinv
+
+/-- The additive-kernel preimage of `X ≤ P ⋊ U`, viewed as an `𝔽_p`-subspace. -/
+noncomputable def normOneFrobeniusKernelPreimageSubmodule [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) : Submodule (ZMod p) (GaloisField p q) :=
+  AddSubgroup.toZModSubmodule (n := p) (normOneFrobeniusKernelPreimageAddSubgroup p q X)
+
+/-- Membership in the kernel-preimage subspace is membership of the corresponding
+embedded additive element in `X`. -/
+@[simp] theorem mem_normOneFrobeniusKernelPreimageSubmodule [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) (s : GaloisField p q) :
+    s ∈ normOneFrobeniusKernelPreimageSubmodule p q X ↔
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X := by
+  rfl
+
+/-- If `X` contains the norm-one complement `U`, then its additive-kernel preimage
+is stable under the `U` action. -/
+theorem normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X) :
+    ∀ u : normOneUnits p q, ∀ x : GaloisField p q,
+      x ∈ normOneFrobeniusKernelPreimageSubmodule p q X →
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈
+          normOneFrobeniusKernelPreimageSubmodule p q X := by
+  intro u x hx
+  have hu : (SemidirectProduct.inr u : normOneFrobeniusGroup p q) ∈ X := hUle ⟨u, rfl⟩
+  have hxX :
+      (SemidirectProduct.inl (Multiplicative.ofAdd x) : normOneFrobeniusGroup p q) ∈ X := by
+    simpa using hx
+  have huinv : (SemidirectProduct.inr u⁻¹ : normOneFrobeniusGroup p q) ∈ X := by
+    simpa using X.inv_mem hu
+  have hconj :
+      (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd x) * SemidirectProduct.inr u⁻¹ ∈ X := by
+    exact X.mul_mem (X.mul_mem hu hxX) huinv
+  rw [normOneFrobenius_conj_inl p q u x] at hconj
+  simpa using hconj
+
+/-- A subgroup `X ≤ P ⋊ U` with a nontrivial additive-kernel element has nonzero
+additive-kernel preimage. -/
+theorem normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hker : ∃ s : GaloisField p q, s ≠ 0 ∧
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X) :
+    normOneFrobeniusKernelPreimageSubmodule p q X ≠ ⊥ := by
+  rcases hker with ⟨s, hs0, hsX⟩
+  intro hbot
+  have hsW : s ∈ normOneFrobeniusKernelPreimageSubmodule p q X := hsX
+  rw [hbot] at hsW
+  exact hs0 hsW
+
+/-- **BG Appendix C, Lemma C.3, Step 3 subgroup form**: in the concrete
+`P ⋊ U`, any subgroup containing the complement `U` and one nontrivial
+additive-kernel element is all of `P ⋊ U`.  This is the formal version of the
+irreducibility step `X ≠ U ⇒ X = PU`. -/
+theorem normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+    [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X)
+    (hker : ∃ s : GaloisField p q, s ≠ 0 ∧
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X) :
+    X = ⊤ := by
+  classical
+  let W := normOneFrobeniusKernelPreimageSubmodule p q X
+  have hU : ∀ u : normOneUnits p q, ∀ x : GaloisField p q, x ∈ W →
+      (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈ W := by
+    simpa [W] using normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le p q X hUle
+  have hne : W ≠ ⊥ := by
+    simpa [W] using normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl p q X hker
+  have hWtop := normOneUnits_invariant_submodule_eq_top_of_ne_bot p q hq hA W hU hne
+  apply le_antisymm le_top
+  intro g _
+  rw [← SemidirectProduct.inl_left_mul_inr_right g]
+  have hleft : (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) ∈ X := by
+    have hgW : g.left.toAdd ∈ W := by
+      rw [hWtop]
+      simp
+    simpa [W, ofAdd_toAdd] using hgW
+  have hright : (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q) ∈ X :=
+    hUle ⟨g.right, rfl⟩
+  exact X.mul_mem hleft hright
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 

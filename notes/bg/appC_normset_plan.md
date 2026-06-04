@@ -285,8 +285,10 @@ Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p�
 Step3 の `U`-既約作用入力も
 `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。さらに concrete `P⋊U` 内で
 非零 `U`-不変 subspace が `U` とともに全体を生成する
-`normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` を追加済み。Step4 の純有限体 core も
-`normSetE_pow_p` / `normSetE_frobenius_pair` /
+`normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` を追加済み。加えて任意の subgroup `X≤P⋊U` について
+`U≤X` かつ `X∩P` が非自明なら `X=⊤` とする Step3 subgroup form
+`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` まで materialize 済み。
+Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。さらに BG 最後の
 `(a⁻¹)^{t^3}` を p 回反復する tail は `inv_mem_of_twistedInv_step` /
 `normSetE_eq_inv_of_twisted_unit_step` として証明済み。AppC 側の `theoremC` は
