@@ -362,4 +362,4 @@ Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S08_FittingOfMaximal.lea
 
 - `fittingInG M` is the canonical `G`-ambient realization of `F(M)`, with `fittingInG_le` recording `F(M) ≤ M`.
 - `isMaxElemAbelianIn p A0 H` is the concrete `E_p^*(H)` predicate. Accessors landed: `isMaxElemAbelianIn_isElementaryAbelian`, `isMaxElemAbelianIn_le`, and `isMaxElemAbelianIn_eq_of_isElementaryAbelian_of_le`.
-- Remaining §8 `sorry`s are exactly Theorem 8.1(a) and Theorem 8.1(b). They remain hard because the proofs consume §7 transitivity plus BG §6 normal-J/p-length inputs; the statement still keeps Lemma 5.1 nonemptiness out of the theorem hypothesis.
+- Remaining §8 `sorry` is exactly Theorem 8.1(b), `sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup`. Theorem 8.1(a), `cFitting_isUniquelyMaximal_of_not_pGroup`, is sorry-free and AxiomsCheck-registered (issue 0057 closed). Part (b) remains hard because the proof consumes §7 transitivity plus BG §6 normal-J/p-length inputs; the statement still keeps Lemma 5.1 nonemptiness out of the theorem hypothesis.

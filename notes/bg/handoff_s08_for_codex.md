@@ -7,10 +7,10 @@
 
 ## 0. タスク
 
-`OddOrder/BG/Ch2_Uniqueness/S08_FittingOfMaximal.lean` の **2 sorry を埋める** (§8 唯一の結果 Thm 8.1):
-- **(a)** `cFitting_isUniquelyMaximal_of_not_pGroup` (L83-90, sorry @L90): `M∈ℳ`, `p∈π(F(M))`,
+`OddOrder/BG/Ch2_Uniqueness/S08_FittingOfMaximal.lean` の **残り 1 sorry を埋める** (§8 唯一の結果 Thm 8.1):
+- **(a)** `cFitting_isUniquelyMaximal_of_not_pGroup` (completed 2026-06-04; sorry-free and AxiomsCheck-registered): `M∈ℳ`, `p∈π(F(M))`,
   `A₀∈ℰ*_p(F(M))` (`isMaxElemAbelianIn`), `m(A₀)≥3`, `F(M)` が p-群でない ⟹ `C_{F(M)}(A₀)∈𝒰`。
-- **(b)** `sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup` (L97-106, sorry @L106): 同仮定で `F(M)` が
+- **remaining (b)** `sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup` (L97-106, sorry @L106): 同仮定で `F(M)` が
   p-群 ⟹ `M` の Sylow p `P` は `G` の Sylow p、かつ `SCN₃(P)` の各元 ⊆ `F(M)` ∧ ∈ `𝒰`。
 
 statement は faithful・変更不可 (`isMaxElemAbelianIn` 述語 + accessor は既存)。mmd 出典 = `references/bg/local-analysis.mmd` **L2315-2485** (§8 全文。proof (a)=L2326-2438, proof (b)=L2440-2482)。
@@ -108,7 +108,7 @@ transitivity_propagates (hG) (hA : Hypothesis71 A) (hq : q∈(primesOf A)ᶜ) (P
 ## 5. codex 運用規約 (CLAUDE.md 準拠)
 
 - **worktree 推奨**: `git worktree` で `/home/ywr/odd-order-bg-s08` (branch `bg-s08`), `.lake/packages`+`references` は main から symlink 共有 (手順 = `notes/meta/worktree_setup.md`)。`lake update` は worktree で走らせない。合流は main へ `--no-ff` merge。
-- **issue 採番**: worktree では `export ODD_ISSUE_BASE=2000` (並行レンジ)。main では本ノートと同時に作る 0057(8.1a)/0058(8.1b) を使用 (下記)。
+- **issue 採番**: worktree では `export ODD_ISSUE_BASE=2000` (並行レンジ)。main では 0057(8.1a) は closed, 0058(8.1b) を open tracker として使用。
 - **anti-scaffold gate** (memory `scaffold-sorry-free-not-done`): statement は faithful 固定 (extra 仮説で hard content を hoist しない)。各 helper は完全証明 (no sorry, no 仮説=結論)。
 - **完了判定**: `lake build OddOrder` green + `#print axioms <thm>` = `[propext, Classical.choice, Quot.sound]` (sorryAx 無) + `OddOrder/AxiomsCheck.lean` に `#assert_only_allowed_axioms` 登録。本セッションの §6→§7 登録例 (L1137-1159 付近) を踏襲。
 - **commit 粒度**: feature/subsection 単位 (Thm 8.1(a) + helper 群で 1 commit, (b) で 1 commit 等)。message 末尾に `Co-Authored-By: ...`。
@@ -130,5 +130,5 @@ transitivity_propagates (hG) (hA : Hypothesis71 A) (hq : q∈(primesOf A)ᶜ) (P
 - `notes/bg/s08_fitting_max.md` (詳細 mini-roadmap: (8.1)-(8.13) 全式、Thm 6.2 引用 3 箇所の精密文脈)。
 - `notes/meta/bg_s6_appAB_route_2026_05_28.md` (**Thm 6.2 = L(S) 形を使う理由・ゲート**, part (b) 必読)。
 - `notes/bg/s06_67_chain_design.md` (本セッション §6→§7 設計、§7 API 規約)。
-- memory `ft-master-roadmap` (全体現在地)。issues 0057/0058 (§8 tracker)。
+- memory `ft-master-roadmap` (全体現在地)。issue 0058 (§8(b) tracker; 0057 is closed)。
 - 次 (§8 後) = §9 Uniqueness Thm 9.1/9.6 (Thm 8.1 を r(F(H))≤2 で使用, mmd L2533)。
