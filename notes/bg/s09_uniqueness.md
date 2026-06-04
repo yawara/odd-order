@@ -610,9 +610,19 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      packages the full high-rank `Q` choice: for `R ≤ M` and `r_q(F(M)) ≥ 3`,
      it returns `Q ∈ ℋ_G^*(R;q)` with `O_q(M) ≤ Q` and `N_G(Q) ≤ M`.
 
+   The case integration layer is now separated too:
+
+   - `normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar`
+     consumes a uniform `Q` package and proves `N_G(R) ≤ M`.
+   - `normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow`
+     is the low-rank version after Thm 4.20(c) supplies
+     `(P_M : Subgroup M).map M.subtype = O_q(M)` and `O_q(M) ≠ ⊥`.
+   - `normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank`
+     is the high-rank version from `r_q(F(M)) ≥ 3`.
+
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
-   Sylow equality/nontriviality inputs, then combine the low/high rank `Q` packages
-   into the L2573-L2589 `N_G(R) ≤ M` bridge used by Lemma 9.5.
+   Sylow equality/nontriviality inputs and wire the BG choice of `q`/case split into
+   these low/high normalizer packages.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final

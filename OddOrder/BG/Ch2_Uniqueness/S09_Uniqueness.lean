@@ -1173,6 +1173,27 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate [Finite G]
   intro x hxR
   exact mem_of_mem_normalizer_of_conjTransitiveOn hxR hQ htrans hKleM hNQleM
 
+/-- BG Lemma 9.5's L2573-L2589 normalizer step, with the `Q` package as input.
+
+The low-rank and high-rank cases both produce a `Q ∈ ℋ_G^*(R;q)` with `N_G(Q) ≤ M`;
+this helper consumes that uniform package and applies the Theorems 7.6/7.4 transitivity
+bridge. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p)
+    (hQpack :
+      ∃ Q : Subgroup G,
+        Q ∈ hInvariantStar ⊤ R {q} ∧
+          opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  obtain ⟨Q, hQ, _hcoreQ, hNQleM⟩ := hQpack
+  exact normalizer_le_maximal_of_scn3Global_intermediate
+    hG hM hA hRp hAR hRlt hqp hQ hNQleM
+
 /-- The `Q`-choice in BG Lemma 9.5.
 
 If `R ≤ M`, then `R` normalizes `O_q(M)`, so `O_q(M)` lies in `ℋ_G(R;q)` and can be
@@ -1420,6 +1441,39 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
   exact normalizer_hInvariantStar_le_maximal_of_rank_three_opiCoreInG_witness
     hG hM h3Fq hQ hcoreQ
     (exists_rank_three_abelian_le_opiCoreInG_of_three_le_pRank_fittingInG h3Fq)
+
+/-- Low-rank version of the BG Lemma 9.5 normalizer step, after Thm 4.20(c) has supplied
+`O_q(M)` as the ambient image of a Sylow `q`-subgroup of `M`. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p) (hRM : R ≤ M) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    hG hM hA hRp hAR hRlt hqp
+    (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow
+      hG hM.1 PM hPMcore hOqne hRM)
+
+/-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
+rank-three witness inside `O_q(M)`. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p) (hRM : R ≤ M)
+    (h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    hG hM hA hRp hAR hRlt hqp
+    (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_high_pRank
+      hG hM.1 h3Fq hRM)
 
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
