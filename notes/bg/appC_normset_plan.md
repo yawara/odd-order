@@ -330,6 +330,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 さらに `Q_elementaryAbelian` から `FieldNormalizerData.Q_mul_comm` を導出し、
 `(s⁻¹)^n t^n` / `(t⁻¹)^n s^n` 型の `Q` 内 factor が互いに可換である特殊形も公開した。
 これは BG Step4 の “Since Q is commutative, (C.3) becomes (C.4)” に対応する reorder 入力。
+さらに `fieldNormalizerPrimeLineElement`、`exists_normOne_primeLine_normOne`、
+`exists_sigma_normOne_primeLine_normOne_of_mem_PU` により、BG Step1 の `u s₁ v` 分解を
+concrete `P⋊U` と transported `PU` の双方で使える形にした。
 また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
 `sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
 `left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。

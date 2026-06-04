@@ -217,6 +217,10 @@ created: 2026-06-04
   `FieldNormalizerData.Q_mul_comm` を公開し、`s^{-n}t^n` / `t^{-n}s^n` 型の
   Q 内 commutator factors が互いに可換であることを theorem 化。BG の
   “Since Q is commutative, (C.3) becomes (C.4)” を使う入口を固定。AxiomsCheck 登録済み。
+- [x] **C.3 Step 1 decomposition bridge**: `fieldNormalizerPrimeLineElement`、
+  `exists_normOne_primeLine_normOne`、`exists_sigma_normOne_primeLine_normOne_of_mem_PU` を公開し、
+  concrete `P⋊U` と transported `PU` の任意元を `u s₁ v` に分解できる入口を固定。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 sigma normal-form bridge**: `sigma_eq_left_eq`、
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の

@@ -2476,6 +2476,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
 
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fieldNormalizerKernel_sup_complement_eq_top
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_eq_sigma_top
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_normOne_primeLine_normOne
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
 #assert_only_allowed_axioms
