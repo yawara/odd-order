@@ -146,12 +146,14 @@ created: 2026-06-04
   full `lemmaC2` を class-sum 下流の `AppC_LemmaC2` へ移して
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
-- [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
+- [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + 残 gap `lemmaC3_inverse_closed` に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
+- [ ] **Theorem C full discharge**: `lemmaC3_inverse_closed` を FieldNormalizerData/Hypothesis(B) から証明し、`AppC_FinalContradiction` の最後の `sorry` を消す。
 
 ## 完了条件
 
 `AppC.theoremC` が sorry-free (Lemmas C.1-C.3 + 配線完成)。`nonexistence_of_G` の BG 側 gap が閉じる。
-段階的に C.1 → C.2(q=3) → C.2(q≥5) → C.3 → assembly。
+2026-06-04 時点で scaffold assembly は完了し、`AppC_FinalContradiction` の直接 gap は `lemmaC3_inverse_closed` のみ。
+段階的に C.1 → C.2(q=3) → C.2(q≥5) → assembly → C.3 full discharge。
 
 ## 参照
 
