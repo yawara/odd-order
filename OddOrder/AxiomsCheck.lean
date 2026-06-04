@@ -2255,6 +2255,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.zetaImages_mem_ZIrr_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_expand_delta
 #assert_only_allowed_axioms

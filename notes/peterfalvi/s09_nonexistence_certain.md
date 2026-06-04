@@ -501,3 +501,11 @@ S09 に `Hypothesis79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_o
 既存の irreducible-source 版はこれらの特殊化に戻し、二族の (7.9) consumer でも
 `Ind 1_H` source term には irreducibility ではなく `ZIrr` membership だけを要求する形に弱化した。
 これで H78 側の weak residual bridge と H79 側の parity conclusion が同じ入力粒度で接続できる。
+
+
+### 2026-06-04 pass: residual membership package
+
+S09 に `Hypothesis79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent`
+を追加した。H79 の weak source input から `Δ₁`, `Δ₂`, `ζ₁^ν`, `ζ₂^ν` の 4 つの
+`ZIrr` membership をまとめて返す package theorem で、直前に追加した residual integrality/parity
+consumer はこの package を使う形へ整理した。downstream は整数性 lemma を使う前に membership だけを取り出せる。
