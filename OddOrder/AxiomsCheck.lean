@@ -2518,6 +2518,10 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_first_k_three_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_neg_two_eq_primeLineElement_neg_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
 #assert_only_allowed_axioms
@@ -2618,6 +2622,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
+
+-- BG App C Lemma C.3 Step 4 final paragraph: reading the additive coordinate
+-- of the first `k = 3` equation in concrete `P ⋊ U` gives `N(2*w-1)=1`.
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
 
 -- BG App C Lemma C.3 Step 4: the `p`-power Frobenius preserves the norm-set
 -- relation `a,b ∈ E` and `a+b=2` used in the generator-relation propagation.

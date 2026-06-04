@@ -419,6 +419,36 @@ theorem s_zpow_mem_P_sup_U {hyp : Hypothesis (G := G)}
     data.s ^ n ∈ hyp.base.P ⊔ hyp.base.U :=
   (le_sup_left : hyp.base.P ≤ hyp.base.P ⊔ hyp.base.U) (data.s_zpow_mem_P n)
 
+/-- The `s^{-2}` factor in BG C.3 Step 4 is the `-2` point of the concrete
+prime-field line after transport by `σ`. -/
+theorem s_zpow_neg_two_eq_primeLineElement_neg_two
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ^ (-2 : ℤ) =
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [s, fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
+  let F := GaloisField hyp.base.p hyp.base.q
+  let H := fieldNormalizerFrobeniusGroup hyp
+  have hpow_two :
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) ^ 2 =
+        SemidirectProduct.inl (Multiplicative.ofAdd (2 : F)) := by
+    rw [pow_two, ← map_mul (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →* H)]
+    congr
+    apply Multiplicative.toAdd.injective
+    change (1 : F) + 1 = 2
+    ring
+  have hneg_two :
+      (algebraMap (ZMod hyp.base.p) F (-2 : ZMod hyp.base.p)) = -(2 : F) := by
+    simp only [map_neg, map_ofNat]
+  rw [← map_zpow]
+  congr
+  rw [zpow_neg, hneg_two]
+  change ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) ^ 2)⁻¹ =
+    SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))
+  have hpow_two_inv := congrArg Inv.inv hpow_two
+  exact hpow_two_inv.trans (by simp [F])
+
 /-- The transported element `s` is nontrivial. -/
 theorem s_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.s ≠ 1 := by
@@ -1189,6 +1219,79 @@ theorem right_component_of_step4_first_k_three_decomposition
     data.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
       (m := (1 : ℤ)) (r := (-2 : ℤ)) (n := 3) (u := u⁻¹)
       (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
+
+/-- BG Appendix C, Lemma C.3 Step 4 final paragraph, finite-field reading:
+if the first `k = 3` equation of `(C.5)` has middle prime-line factor `s^{-1}`,
+then its additive coordinate gives `N(2*w-1)=1` for
+`w = (tConjNormOneUnitsAut^3)(u^{-1})`. -/
+theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+      ((2 : GaloisField hyp.base.p hyp.base.q) *
+          ((((data.tConjNormOneUnitsAut ^ 3) u⁻¹ : fieldNormalizerNormOneUnits hyp) :
+              (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) - 1) = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let F := GaloisField hyp.base.p hyp.base.q
+  let H := fieldNormalizerFrobeniusGroup hyp
+  let w : fieldNormalizerNormOneUnits hyp := (data.tConjNormOneUnitsAut ^ 3) u⁻¹
+  have hline_neg_one :
+      fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p) =
+        (SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) : H) := by
+    simp [fieldNormalizerPrimeLineElement, F]
+  have hline_neg_two :
+      fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p) =
+        (SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F))) : H) := by
+    simp [fieldNormalizerPrimeLineElement, F, map_neg, map_ofNat]
+  have hσ :
+      data.sigma
+          ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) *
+              SemidirectProduct.inr w *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))) =
+        data.sigma
+          ((SemidirectProduct.inr u₁ : H) *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) *
+              SemidirectProduct.inr v₁) := by
+    calc
+      data.sigma
+          ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) *
+              SemidirectProduct.inr w *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))) =
+          data.s * data.sigma (SemidirectProduct.inr w : H) * data.s ^ (-2 : ℤ) := by
+        have hs :
+            data.s =
+              data.sigma
+                (SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) := by
+          simp [s, fieldNormalizerPrimeLineGenerator, F]
+        have hsneg_two :
+            data.s ^ (-2 : ℤ) =
+              data.sigma
+                (SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F))) : H) := by
+          simpa [hline_neg_two] using data.s_zpow_neg_two_eq_primeLineElement_neg_two
+        rw [map_mul, map_mul, hsneg_two, hs]
+      _ = data.sigma (SemidirectProduct.inr u₁ : H) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+              data.sigma (SemidirectProduct.inr v₁ : H) := by
+        simpa [w] using hdec
+      _ = data.sigma
+          ((SemidirectProduct.inr u₁ : H) *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) *
+              SemidirectProduct.inr v₁) := by
+        simp [map_mul, hline_neg_one]
+  have hH := data.sigma_injective hσ
+  simpa [w, F] using
+    OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.ne_zero w u₁ v₁ hH
 
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
