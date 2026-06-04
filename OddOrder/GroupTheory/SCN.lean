@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.Algebra.Group.Subgroup.Basic
+import OddOrder.Mathlib.Subgroup
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.PRank
 
@@ -93,6 +94,21 @@ theorem le_centralizer (h : IsSCN A) : A ≤ Subgroup.centralizer (A : Set G) :=
 `C_G(A) = A` and `A` is abelian, hence in the center of itself). -/
 theorem centralizer_le (h : IsSCN A) : Subgroup.centralizer (A : Set G) ≤ A :=
   h.selfCentralizing.le
+
+/-- Transport an `SCN` subgroup across a group isomorphism. -/
+theorem map_equiv {G' : Type*} [Group G'] (e : G ≃* G') (h : IsSCN A) :
+    IsSCN (A.map e.toMonoidHom) := by
+  refine ⟨h.isNormal.map e.toMonoidHom e.surjective, ?_, ?_⟩
+  · exact IsMulCommutative.of_setLike_mul_comm fun x hx y hy => by
+      letI : IsMulCommutative A := h.isMulCommutative
+      obtain ⟨a, ha, rfl⟩ := Subgroup.mem_map.mp hx
+      obtain ⟨b, hb, rfl⟩ := Subgroup.mem_map.mp hy
+      have hab : a * b = b * a :=
+        congrArg Subtype.val (mul_comm' (⟨a, ha⟩ : A) ⟨b, hb⟩)
+      simpa [map_mul] using congrArg e hab
+  · rw [Subgroup.coe_map]
+    rw [← Subgroup.map_centralizer_eq_of_bijective (A : Set G) e.toMonoidHom e.bijective,
+      h.selfCentralizing]
 
 end IsSCN
 
@@ -235,6 +251,16 @@ theorem IsSCN_n.le_pRank {p n : ℕ} {A : Subgroup G} (h : IsSCN_n p n A) :
 theorem IsSCN_n.mono {p m n : ℕ} {A : Subgroup G} (hmn : m ≤ n) (h : IsSCN_n p n A) :
     IsSCN_n p m A :=
   ⟨h.1, hmn.trans h.2⟩
+
+/-- Transport `SCN_n` membership across a group isomorphism. -/
+theorem IsSCN_n.map_equiv [Finite G] {G' : Type*} [Group G'] [Finite G']
+    {p n : ℕ} {A : Subgroup G} (e : G ≃* G') (h : IsSCN_n p n A) :
+    IsSCN_n p n (A.map e.toMonoidHom) := by
+  refine ⟨h.isSCN.map_equiv e, ?_⟩
+  exact h.le_pRank.trans
+    (pRank_le_of_injective
+      (f := (Subgroup.equivMapOfInjective A e.toMonoidHom e.injective).toMonoidHom)
+      (Subgroup.equivMapOfInjective A e.toMonoidHom e.injective).injective)
 
 /-- A normal abelian subgroup of `p`-rank at least `3` is contained in an `SCN₃`
 subgroup of a finite `p`-group.

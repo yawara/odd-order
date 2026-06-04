@@ -3393,6 +3393,42 @@ theorem sylow_map_mem_range_of_fittingInG_isPGroup [Finite G]
   exact sylow_map_mem_range_of_normalizer_le_normalizer hG hM P hK_ne_bot hK_le_SH
     hM_norm_K (by simpa [hSH_def] using hN_SH_le_NK)
 
+/-- BG 8.1(b), SCN3 bridge: if the image of a Sylow subgroup of `M` is the Sylow
+`Q` of `G`, then the image of every local `SCN₃(P)` subgroup is a global
+`SCN₃(p)` subgroup in the sense of §7. -/
+theorem scn3_map_mem_scn3Global_of_sylow_map [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {Q : Sylow p G}
+    (hQ : (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype)
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    A.map M.subtype ∈ OddOrder.BG.Ch2.S07.scn3Global p G := by
+  classical
+  let Pm : Subgroup ↥M := (P : Subgroup ↥M)
+  let SH : Subgroup G := Pm.map M.subtype
+  have hQSH : (Q : Subgroup G) = SH := by
+    simpa [SH, Pm] using hQ
+  let e0 : ↥Pm ≃* ↥SH :=
+    Subgroup.equivMapOfInjective Pm M.subtype M.subtype_injective
+  let eQ : ↥SH ≃* ↥(Q : Subgroup G) := (MulEquiv.subgroupCongr hQSH).symm
+  let e : ↥Pm ≃* ↥(Q : Subgroup G) := e0.trans eQ
+  have hAQ : A.map M.subtype ≤ (Q : Subgroup G) := by
+    rw [hQ]
+    exact Subgroup.map_mono hAP
+  have htarget :
+      (A.subgroupOf Pm).map e.toMonoidHom =
+        (A.map M.subtype).subgroupOf (Q : Subgroup G) := by
+    apply (Subgroup.map_subtype_inj (H := (Q : Subgroup G))).mp
+    rw [Subgroup.map_subgroupOf_eq_of_le hAQ]
+    rw [Subgroup.map_map]
+    have hcomp : (Q : Subgroup G).subtype.comp e.toMonoidHom = M.subtype.comp Pm.subtype := by
+      ext x
+      simp [e, e0, eQ, SH, Pm]
+    rw [hcomp, ← Subgroup.map_map, Subgroup.map_subgroupOf_eq_of_le hAP]
+  exact ⟨Q, hAQ, by
+    rw [← htarget]
+    exact hA.map_equiv e⟩
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -3407,8 +3443,11 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     (∃ Q : Sylow p G, (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype) ∧
     (∀ A : Subgroup ↥M, A ≤ (P : Subgroup ↥M) → IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)) →
       A.map M.subtype ≤ fittingInG M ∧ IsUniquelyMaximal (A.map M.subtype)) := by
-  refine ⟨sylow_map_mem_range_of_fittingInG_isPGroup hG hM hp P hFp, ?_⟩
+  obtain ⟨Q, hQ⟩ := sylow_map_mem_range_of_fittingInG_isPGroup hG hM hp P hFp
+  refine ⟨⟨Q, hQ⟩, ?_⟩
   intro A hAP hA
+  have hAglobal : A.map M.subtype ∈ OddOrder.BG.Ch2.S07.scn3Global p G :=
+    scn3_map_mem_scn3Global_of_sylow_map P hQ hAP hA
   refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
