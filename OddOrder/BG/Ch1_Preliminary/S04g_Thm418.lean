@@ -703,6 +703,18 @@ theorem rank_fitting_le_two_of_normal_subgroup {K : Subgroup G} [K.Normal]
     OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤ 2 :=
   (rank_fitting_le_of_normal_subgroup (G := G) (K := K)).trans hrF
 
+/-- The BG Theorem 4.20(c) induction hypothesis is inherited by a normal subgroup:
+either the whole-group rank bound restricts to the subgroup, or the Fitting-rank
+bound restricts via `F(K) <= F(G)`. -/
+theorem rank_or_rank_fitting_le_two_of_normal_subgroup {K : Subgroup G} [K.Normal]
+    (h : OddOrder.GroupTheory.rank G ≤ 2 ∨
+      OddOrder.GroupTheory.rank ↥(Ch01.fitting G) ≤ 2) :
+    OddOrder.GroupTheory.rank ↥K ≤ 2 ∨
+      OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤ 2 := by
+  rcases h with hG | hF
+  · exact Or.inl ((OddOrder.GroupTheory.rank_mono_of_le K).trans hG)
+  · exact Or.inr (rank_fitting_le_two_of_normal_subgroup (G := G) (K := K) hF)
+
 /-- If a Sylow `p`-subgroup lies in `F(G)`, then its `p`-rank is bounded by the
 rank of `F(G)`. -/
 theorem pRank_sylow_le_two_of_le_fitting {p : ℕ} [Fact p.Prime] (P : Sylow p G)
@@ -825,6 +837,40 @@ theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
       Finsupp.add_apply, hP_q_zero, add_zero]
   rw [QK.card_eq_multiplicity, QG.card_eq_multiplicity]
   exact congrArg (fun n => q ^ n) hfact.symm
+
+
+/-- If the canonical normal `p`-complement has a characteristic subgroup with
+the `q`-Sylow cardinality, then so does the ambient group, for `q != p`.
+
+This is the characteristic-subgroup lift needed in BG Theorem 4.20(c) after
+Theorem 4.18(b) replaces `H` by the canonical `O_{p-prime}(H)`. -/
+theorem exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (hK :
+      ∃ L : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G),
+        L.Characteristic ∧
+          Nat.card ↥L =
+            Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+              Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))) :
+    ∃ L : Subgroup G,
+      L.Characteristic ∧ Nat.card ↥L = Nat.card ↥((default : Sylow q G) : Subgroup G) := by
+  classical
+  obtain ⟨L, hL_char, hL_card⟩ := hK
+  refine ⟨L.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype, ?_, ?_⟩
+  · exact OddOrder.GroupTheory.characteristic_map_subtype_of_characteristic
+      (Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} G) hL_char
+  · calc
+      Nat.card ↥(L.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype) = Nat.card ↥L := by
+        exact Subgroup.card_map_of_injective
+          (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype_injective
+      _ =
+          Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+            Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) := hL_card
+      _ = Nat.card ↥((default : Sylow q G) : Subgroup G) :=
+        card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne hpq hG
+          (default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+          (default : Sylow q G)
 
 end Thm418
 
