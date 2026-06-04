@@ -130,6 +130,9 @@ created: 2026-06-04
   class-sum 公式 `coeff * p^q = |U|^3 + error` と degree-free error bound から、
   任意の `c≤|U|` が main term から error bound より遠いという純数値仮定を渡せば
   `|U| < coeff` を返す `normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card_of_error_separation` を追加。
+- [x] **C.2 q≥5 norm-one subgroup lower bound**:
+  `|U|=(p^q-1)/(p-1)=1+p+...+p^(q-1)` の最大項から
+  `pow_sub_one_le_normOneUnits_card : p^(q-1) ≤ |U|` を追加。q≥5 の純数値評価の入力。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

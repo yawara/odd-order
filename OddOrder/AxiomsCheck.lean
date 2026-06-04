@@ -1848,6 +1848,7 @@ set_option linter.style.longLine false in
 -- BG App C Remark (VII): the norm-one subgroup `U ≤ 𝔽_{p^q}ˣ` has order
 -- `(p^q - 1)/(p - 1)`, the `|U|` used in the `q ≥ 5` branch of Lemma C.2.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.pow_sub_one_le_normOneUnits_card
 
 -- BG App C Remark (VII): under condition (A), every unit of `𝔽_{p^q}` splits
 -- as a prime-field unit times a norm-one unit.

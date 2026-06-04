@@ -92,6 +92,14 @@ theorem normOneUnits_card_gt_one [Fact p.Prime] (hq : 1 < q) :
     omega
   exact htwo.trans_le hle
 
+/-- The largest term in the geometric sum for `|U|` gives the basic lower bound
+`p^(q-1) <= |U|`. -/
+theorem pow_sub_one_le_normOneUnits_card [Fact p.Prime] (hq : q ≠ 0) :
+    p ^ (q - 1) ≤ Nat.card (normOneUnits p q) := by
+  have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
+  rw [normOneUnits_card p q hq, ← Nat.geomSum_eq hp2 q]
+  exact Finset.single_le_sum (fun k _ => zero_le (p ^ k)) (by simp; omega)
+
 /-- If `1 < q`, then the norm-one complement in `H = P ⋊ U` is nontrivial. -/
 theorem normOneFrobeniusComplement_ne_bot [Fact p.Prime] (hq : 1 < q) :
     normOneFrobeniusComplement p q ≠ ⊥ := by
