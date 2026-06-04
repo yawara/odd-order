@@ -339,6 +339,10 @@ allowlist):
   caller 側の sum data は `D + tail = total` ではなく、直接
   `(∑ j : Fin k, dmem j*dmem j) + tail = total` を渡す形になり、actual prefix enumeration から
   自明に決まる `D` witness を保持しなくてよくなった。
+- **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
+  adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
+  `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で
+  局所導出されるため、§6.6 caller は fixed induction index の positivity witness を別途保持しなくてよい。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

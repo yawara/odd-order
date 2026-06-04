@@ -522,6 +522,10 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `Dprefix := ∑ j : Fin k, dmem j*dmem j` を局所定義して generic member-family adapter へ渡す。
     両 `PairUnion*StepData` からも `D` / `hDsum` field を削除し、caller は direct sum identity
     `(∑j dmem(j)^2) + tail = total` だけを供給すればよい。
+  - **2026-06-04 追記 13**: `commonIndex_pos_of_natDegree_factor` を追加し、
+    `degreeDivisibility_primePowerSums` 以降の common-index adapters と両 `PairUnion*StepData` から
+    caller-supplied `hidxpos : 0 < idx` を削除した。`idx > 0` は `χ(1)>0` と
+    `dχ = idx*θχ` から内部導出される。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

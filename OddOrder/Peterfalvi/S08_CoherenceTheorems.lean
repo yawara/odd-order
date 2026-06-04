@@ -2030,6 +2030,17 @@ theorem natDegree_pos_of_irreducibleCharacter_apply_one_eq
   have hde : d = e := Nat.cast_injective (hχone.symm.trans heq)
   rwa [hde]
 
+/-- A common index in a factorization of an irreducible character degree is positive. -/
+theorem commonIndex_pos_of_natDegree_factor
+    {G : Type*} [Group G] {χ : IrreducibleCharacter G} {idx d θ : ℕ}
+    (hχone : (χ : ClassFunction G ℂ) 1 = (d : ℂ)) (hd : d = idx * θ) :
+    0 < idx := by
+  have hdpos : 0 < d := natDegree_pos_of_irreducibleCharacter_apply_one_eq hχone
+  by_contra hidx
+  have hidx0 : idx = 0 := Nat.eq_zero_of_not_pos hidx
+  have hd0 : d = 0 := by simp [hd, hidx0]
+  omega
+
 /-- A member-family square sum is positive once it contains one irreducible character. -/
 theorem natDegreeSquareSum_pos_of_memberFamily
     {G : Type*} [Group G] {ι : Type*} {s : Finset ι}
@@ -3950,7 +3961,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
-    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hθχ : θχ = p ^ mχ)
+    (hdχ : dχ = idx * θχ) (hθχ : θχ = p ^ mχ)
     (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
     (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
     (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
@@ -3958,6 +3969,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     (htotal : total = qtot * c) (hidx_D : idx * idx ∣ D)
     (hcop : Nat.Coprime idx θχ) :
     XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  have hidxpos : 0 < idx := commonIndex_pos_of_natDegree_factor hχone hdχ
   have hdvd : dχ * dχ ∣ D :=
     OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
       tailSet (by omega) hidxpos hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal
@@ -4020,7 +4032,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
-    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j ∈ s, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
     (hθmem : ∀ j ∈ s, θmem j = p ^ mmem j)
@@ -4031,6 +4043,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hcop : Nat.Coprime idx θχ) :
     XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  have hidxpos : 0 < idx := commonIndex_pos_of_natDegree_factor hχone hdχ
   have hdvds :=
     OddOrder.Peterfalvi.S08.degreeDivisibilityInputs_of_commonIndex_primePowerData
       (G := ↥L) (χ := χs i) (χ₁ := χmem i₁) (χmem := χmem) (s := s)
@@ -4045,7 +4058,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
     hmemS1 hmembarS1 hmemconjortho hmemortho hdvds.1 hdvds.2
     hχone hχ₁one hmemone hDsum hp hq hdiv hlt
-    hidxpos hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
+    hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
 
 open scoped Classical in
 /-- **(T8.11u) X-adjoin input from a pairUnion enumeration and p-power degree data.**
@@ -4085,7 +4098,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
-    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
     (hθmem : ∀ j, θmem j = p ^ mmem j)
@@ -4172,7 +4185,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     hpair0 hpair1 hpairs hdisj hi hcover (by simp) hmemreal hmemdiffsupp
     hmemS1' hmembarS1 hmemconjortho hmemortho
     hχone hχ₁one (fun j _ => hmemone j) hDsum
-    hp hq hdiv hlt hidxpos hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
+    hp hq hdiv hlt hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
     (fun j _ => hθmem j) (fun j _ => hlemem j)
     hθtail htail_le hsum' hqtot hθsq_le_qtot htotal hcop
 
@@ -4212,7 +4225,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁)
-    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
     (hθmem : ∀ j, θmem j = p ^ mmem j)
@@ -4254,7 +4267,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) hχinj hrange
     hχone hχ₁one hmemone hp hq hdiv hlt
-    hidxpos hdχ hd₁ hdmem hθχ hθ₁ hθmem hlemem
+    hdχ hd₁ hdmem hθχ hθ₁ hθmem hlemem
     hθtail htail_le hsum hqtot hθsq_le_qtot htotal hcop
 
 /-- **(T8.11v) Common-index p-power data for one X-chain step.**
@@ -4303,7 +4316,6 @@ structure PairUnionCommonIndexPrimePowerStepData
   hq : q = p ^ m
   hdiv : dχ = q * d₁
   hlt : d₁ < dχ
-  hidxpos : 0 < idx
   hdχ : dχ = idx * θχ
   hd₁ : d₁ = idx * θ₁
   hdmem : ∀ j, dmem j = idx * θmem j
@@ -4365,7 +4377,6 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   hp : 3 ≤ p
   hq : q = p ^ m
   hdiv : dχ = q * d₁
-  hidxpos : 0 < idx
   hdχ : dχ = idx * θχ
   hd₁ : d₁ = idx * θ₁
   hdmem : ∀ j, dmem j = idx * θmem j
@@ -4414,7 +4425,7 @@ noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irr
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
     data.hχone data.hχ₁one data.hmemone
-    data.hp data.hq data.hdiv data.hlt data.hidxpos data.hdχ data.hd₁ data.hdmem
+    data.hp data.hq data.hdiv data.hlt data.hdχ data.hd₁ data.hdmem
     data.hθχ data.hθ₁ data.hθmem data.hlemem data.hθtail data.htail_le data.hsum
     data.hqtot data.hθsq_le_qtot data.htotal data.hcop
 
@@ -4452,7 +4463,7 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
   exact hyp.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
     data.hχone data.hχ₁one data.hanchor data.hmemone data.hp data.hq data.hdiv
-    data.hidxpos data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
+    data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hcop
 
 end SibleyDadeHypothesis
