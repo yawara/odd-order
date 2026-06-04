@@ -1905,6 +1905,11 @@ set_option linter.style.longLine false in
 -- `𝔽_{p^q}ˣ` under condition (A).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
 
+-- BG App C Lemma C.3 Step 1: under condition (A), every field element
+-- lies in the `U`-orbit of any fixed nonzero prime-field line.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeFieldUnit_mul_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeLine_eq
+
 -- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
 -- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_mem_primeFieldUnits

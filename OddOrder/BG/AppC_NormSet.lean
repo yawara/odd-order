@@ -368,6 +368,48 @@ theorem primeFieldUnits_mul_normOneUnits_eq_univ [Fact p.Prime] (hq : q.Prime)
 
 /-! ### Generator-relation finite-field helpers for Lemma C.3 -/
 
+/-- **BG Appendix C, Lemma C.3, Step 1 (nonzero orbit form)**: under
+condition (A), every nonzero field element lies in the `U`-orbit of a nonzero
+point on any fixed nonzero prime-field line.  This is the finite-field content
+of BG Step 1, using `𝔽_{p^q}ˣ = 𝔽_pˣ · U`. -/
+theorem exists_normOne_mul_primeFieldUnit_mul_eq [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s x : GaloisField p q} (hs : s ≠ 0) (hx : x ≠ 0) :
+    ∃ b : (ZMod p)ˣ, ∃ u : normOneUnits p q,
+      x = (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+        ((algebraMap (ZMod p) (GaloisField p q) (b : ZMod p)) * s)) := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  let xOverS : Fˣ := Units.mk0 (x / s) (div_ne_zero hx hs)
+  obtain ⟨b, u, hxu⟩ := exists_primeFieldUnit_mul_normOne p q hq hA xOverS
+  refine ⟨b, u, ?_⟩
+  let uval : F := ((u : Fˣ) : F)
+  have hval : x / s = emb (b : ZMod p) * uval := by
+    change (xOverS : F) = emb (b : ZMod p) * uval
+    simpa [xOverS, emb, uval] using congrArg (fun z : Fˣ => (z : F)) hxu
+  calc
+    x = (x / s) * s := by rw [div_mul_cancel₀ _ hs]
+    _ = (emb (b : ZMod p) * uval) * s := by rw [hval]
+    _ = uval * (emb (b : ZMod p) * s) := by ring
+
+/-- **BG Appendix C, Lemma C.3, Step 1 (prime-line decomposition)**: under
+condition (A), every field element is a norm-one multiple of a point on any
+fixed nonzero prime-field line.  The zero case supplies the identity element of
+the additive kernel; the nonzero case is the direct-product decomposition of
+`𝔽_{p^q}ˣ`. -/
+theorem exists_normOne_mul_primeLine_eq [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s x : GaloisField p q} (hs : s ≠ 0) :
+    ∃ c : ZMod p, ∃ u : normOneUnits p q,
+      x = (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+        ((algebraMap (ZMod p) (GaloisField p q) c) * s)) := by
+  by_cases hx : x = 0
+  · refine ⟨0, 1, ?_⟩
+    simp [hx]
+  · obtain ⟨b, u, h⟩ :=
+      exists_normOne_mul_primeFieldUnit_mul_eq p q hq hA (s := s) (x := x) hs hx
+    exact ⟨(b : ZMod p), u, h⟩
+
 /-- **BG Appendix C, Lemma C.3, Step 2 (intersection core)**: under condition
 (A), a norm-one unit that also comes from the prime field is trivial.  This is
 the finite-field `U ∩ 𝔽_pˣ = 1` input used in the generator-relation argument. -/
