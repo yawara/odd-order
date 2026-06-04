@@ -2060,6 +2060,10 @@ set_option linter.style.longLine false in
 -- BG App C Lemma C.2 bridge in the class-sum form `u*s + v*s = 2*s`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_normSetE_ncard
 
+-- BG App C Lemma C.3 note (`p = 3`): characteristic three makes
+-- `2*a - 1 = 2-a`, so the norm-set inverse closure is purely finite-field.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_p_eq_three
+
 -- BG App C Lemma C.1: if the norm set `E = {a | N(a)=N(2-a)=1}` is inverse-closed and
 -- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,
 -- and the degree-`q` Frobenius polynomial `∏_{i<q}((1-a)^{p^i}X+1)-1` then has `p` roots.

@@ -145,6 +145,7 @@ created: 2026-06-04
 - [x] **Lemma C.2 packaging (q≥5)**: q=3 helper を `AppC_NormSet` に残し、
   full `lemmaC2` を class-sum 下流の `AppC_LemmaC2` へ移して
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
+- [x] **Lemma C.3 p=3 branch**: BG C.3 note を `normSetE_eq_inv_of_p_eq_three` として純有限体で証明。characteristic 3 では `2*a-1=2-a` なので generator-relation argument なしで `E=E⁻¹`。AxiomsCheck 登録済み。
 - [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` の C.3 obligation を最終結論 `E=E⁻¹` から generator-relation 出力 `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) に細分化し、`AppC_FinalContradiction.lemmaC3_inverse_closed` は純有限体補題経由で `sorry` なしに維持 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは S16 の `field_normalizer_structure` 側の upstream obligation。

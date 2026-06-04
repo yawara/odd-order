@@ -482,6 +482,23 @@ theorem normSetE_eq_inv_of_forall_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 <
     rw [Set.mem_inv] at ha
     simpa using inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a⁻¹ ha)
 
+/-- **BG Appendix C, Lemma C.3, note (`p = 3`)**: in characteristic three the
+generator-relation argument is unnecessary.  Since `2 * a - 1 = 2 - a`, every
+`a ∈ E` already satisfies the relation needed to put `a⁻¹` back in `E`. -/
+theorem normSetE_eq_inv_of_p_eq_three [Fact (Nat.Prime 3)] (hq : 0 < q) :
+    normSetE 3 q = (normSetE 3 q)⁻¹ := by
+  apply normSetE_eq_inv_of_forall_normN_two_mul_sub_one (p := 3) (q := q) hq
+  intro a ha
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hthree : (3 : GaloisField 3 q) = 0 := by
+    change ((3 : ℕ) : GaloisField 3 q) = 0
+    rw [CharP.cast_eq_zero_iff (GaloisField 3 q) 3]
+  have hcalc : ((2 : GaloisField 3 q) * a - 1) = 2 - a := by
+    linear_combination (a - 1) * hthree
+  simpa [hcalc] using ha.2
+
 /-- BG Appendix C, Lemma C.2 structure-constant bridge: the norm set `E` is in
 bijection with pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.  This is the
 finite-field counting identity used before the `q ≥ 5` character calculation. -/
