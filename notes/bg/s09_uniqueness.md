@@ -594,11 +594,17 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      packages the high-rank `(9.8)` side once a rank-three abelian `q`-subgroup
      `B ≤ O_q(M)` has been supplied; Lemma 9.4 makes this `B` uniquely maximal,
      and the previous uniqueness bridge forces `N_G(Q) ≤ M`.
+   - `exists_rank_three_abelian_le_opiCoreInG_of_three_le_pRank_fittingInG`
+     now supplies that witness from `r_q(F(M)) ≥ 3`: choose
+     `A₀ ∈ ℰ_q^*(F(M))`, use nilpotence of `F(M)` to place it in `O_q(F(M))`,
+     then push along `O_q(F(M)) ≤ O_q(M)`.
+   - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_high_pRank`
+     packages the full high-rank `Q` choice: for `R ≤ M` and `r_q(F(M)) ≥ 3`,
+     it returns `Q ∈ ℋ_G^*(R;q)` with `O_q(M) ≤ Q` and `N_G(Q) ≤ M`.
 
    Remaining subfrontier for this item: derive the low-rank `(9.7)` hypotheses from
-   Thm 4.20(c), and prove the missing high-rank witness bridge that moves
-   `r_q(F(M)) ≥ 3` to an explicit rank-three abelian `q`-subgroup inside `O_q(M)`
-   (likely through `O_q(F(M)) ≤ O_q(M)`, rather than an arbitrary `E_q^*(F(M))`).
+   Thm 4.20(c), then combine the low/high rank `Q` packages into the L2573-L2589
+   `N_G(R) ≤ M` bridge used by Lemma 9.5.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final

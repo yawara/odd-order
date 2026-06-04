@@ -1290,6 +1290,51 @@ private theorem normalizer_hInvariantStar_le_maximal_of_rank_three_opiCoreInG_wi
   exact normalizer_le_maximal_of_isUniquelyMaximal_le hG hM hBU hBM hBQ hQne
     (hInvariantStar_isPiSubgroup hQ)
 
+/-- A high `q`-rank Fitting subgroup supplies a rank-three abelian `q`-subgroup inside
+`O_q(M)`.
+
+The point is that the elementary abelian witness in `F(M)` lies in `O_q(F(M))` by
+nilpotence, and `O_q(F(M)) ≤ O_q(M)`. -/
+private theorem exists_rank_three_abelian_le_opiCoreInG_of_three_le_pRank_fittingInG
+    [Finite G] {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q) :
+    ∃ B : Subgroup G,
+      IsMulCommutative B ∧ IsPGroup q B ∧ 3 ≤ rank ↥B ∧
+        B ≤ opiCoreInG ({q} : Set ℕ) M := by
+  classical
+  obtain ⟨B, hBmax, hBrank⟩ :=
+    exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank
+      (H := S08.fittingInG M) h3Fq
+  have hBea : B.IsElementaryAbelian q :=
+    S08.isMaxElemAbelianIn_isElementaryAbelian hBmax
+  have hBab : IsMulCommutative B := IsMulCommutative.of_comm hBea.comm
+  have hBq : IsPGroup q B := hBea.isPGroup
+  have hBF : B ≤ S08.fittingInG M := S08.isMaxElemAbelianIn_le hBmax
+  have hBOF : B ≤ opiCoreInG ({q} : Set ℕ) (S08.fittingInG M) :=
+    S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+      (S08.fittingInG_isNilpotent M) hBF hBq
+  have hBOM : B ≤ opiCoreInG ({q} : Set ℕ) M :=
+    hBOF.trans (S08.opiCoreInG_fittingInG_le_opiCoreInG ({q} : Set ℕ) M)
+  exact ⟨B, hBab, hBq, hBrank, hBOM⟩
+
+/-- The high-rank side of BG Lemma 9.5's `(9.8)` package.
+
+If `r_q(F(M)) ≥ 3`, the `Q ∈ ℋ_G^*(R;q)` chosen to contain `O_q(M)` has
+`N_G(Q) ≤ M`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_high_pRank
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q)
+    (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  classical
+  obtain ⟨Q, hQ, hcoreQ⟩ := exists_hInvariantStar_containing_opiCoreInG_of_le (q := q) hRM
+  refine ⟨Q, hQ, hcoreQ, ?_⟩
+  exact normalizer_hInvariantStar_le_maximal_of_rank_three_opiCoreInG_witness
+    hG hM h3Fq hQ hcoreQ
+    (exists_rank_three_abelian_le_opiCoreInG_of_three_le_pRank_fittingInG h3Fq)
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 
