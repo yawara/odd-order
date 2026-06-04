@@ -40,6 +40,12 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
 - [x] (2026-06-04) `IndChainDecomposition` consumer helper 5 件を AxiomsCheck 登録。
       `ofIsCoherent` と weighted-output Parseval まで allowlist 内で、(7.10) packaging が
       (6.8) 本体 sorry と独立に axiom-clean であることを CI で固定。
+- [x] (2026-06-04) `IndChainDecomposition.weightedDifferenceInput` と
+      `image_weightedDifferenceInput` を追加。Peterfalvi (7.10) の整数係数付き source difference
+      `∑ d_t(ζ_t - d_tζ_0)` に既存 `image_eq` を線形合成する consumer lemma。AxiomsCheck 登録済み。
+- [x] (2026-06-04) T6/Y-family 側の landed bricks (`coherentYFamily`, c2/case-A inertia,
+      degree-one induced degree/support, Xset irreducibility) を AxiomsCheck 登録。いずれも 3 axiom
+      allowlist 内で、(6.8) 本体 sorry と独立に axiom-clean。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

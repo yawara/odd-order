@@ -1959,6 +1959,31 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
 
+-- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
+-- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.support_sub_induce_subset_sharpImage_of_apply_one_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.support_sub_induce_subset_sharpImage_of_degree_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentInducedDegreeOneFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inertia_eq_H_of_c2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inertia_eq_H_of_c2_caseA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_induce_of_degree_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_of_frobenius
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
+-- Peterfalvi (7.10) consumer algebra: sum the Ind equations over an integral weighted source.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
+
 /-! ### Top-level Feit–Thompson reduction (downstream). -/
 
 -- Minimal-counterexample reduction: *if* no minimal simple group of odd order exists,

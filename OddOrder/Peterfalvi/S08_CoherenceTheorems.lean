@@ -4557,6 +4557,12 @@ noncomputable def weightedOutput
     (data : IndChainDecomposition (L := L) (G := G) τ ζ d) : ClassFunction G ℂ :=
   ∑ t : Fin n, (d t : ℂ) • data.χ t
 
+/-- The integral weighted source difference `∑ d_t (ζ_t - d_t ζ_0)` used in Peterfalvi (7.10). -/
+noncomputable def weightedDifferenceInput
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (_data : IndChainDecomposition (L := L) (G := G) τ ζ d) : ClassFunction L ℂ :=
+  ∑ t : Fin n, (d t) • (ζ t - (d t) • ζ 0)
+
 /-- Coefficient recovery for the weighted output sum. -/
 theorem inner_chi_weightedOutput
     {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
@@ -4590,6 +4596,17 @@ theorem weightedOutput_inner_self_eq_sum_sq
   rw [weightedOutput] at hinner
   rw [hinner]
   ring
+
+/-- The Ind equations combine linearly on Peterfalvi's weighted source difference. -/
+theorem image_weightedDifferenceInput
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    τ data.weightedDifferenceInput =
+      ∑ t : Fin n, (d t) • (data.χ t - (d t) • data.χ 0) := by
+  classical
+  rw [weightedDifferenceInput, map_sum]
+  refine Finset.sum_congr rfl fun t _ => ?_
+  rw [map_zsmul, data.image_eq t]
 
 /-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
 together with the membership `ζ_t ∈ S`, the orthonormality of the input family `ζ`,

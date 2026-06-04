@@ -77,7 +77,9 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
 - ✅ 2026-06-02: S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| を packaging。
 - ✅ 2026-06-02: S08 で degree-one induced differences の H^# support を packaging。
-- 残: Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
+- ✅ 2026-06-04: S08 の c2/case-A inertia bridge、degree-one induced irreducibility、
+  `coherentYFamily`、Xset irreducibility consumer を AxiomsCheck 登録。全て 3 axiom allowlist 内。
+- 残: `Y = S(H')` の exact finite family/range construction と `Yset` への接続。
 
 ## 参照
 

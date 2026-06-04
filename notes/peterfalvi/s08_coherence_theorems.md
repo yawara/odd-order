@@ -100,6 +100,10 @@ family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axio
   `inner_chi_eq_ite`, `inner_chi_weightedOutput`, `weightedOutput_inner_self_eq_sum_sq`,
   `ofIsCoherent`) を AxiomsCheck に登録。(7.10) 側がこの interface を使うとき、`sibleySetup_is_coherent`
   の未完成 proof と独立に consumer packaging が axiom-clean であることを CI で固定した。
+- **2026-06-04 追記 2**: `weightedDifferenceInput` / `image_weightedDifferenceInput` を追加。
+  (7.10) で使う整数係数付き source difference `∑ d_t(ζ_t - d_tζ_0)` へ `image_eq` を合成する
+  ℤ-linear consumer lemma。`IntegralCharacterMap` は ℂ-linear ではないため、source 側は `zsmul`
+  で表現し `map_zsmul` で証明する。AxiomsCheck 登録済み、3 axiom allowlist 内。
 - **의의**: (5.6)은 쌍 인접으로 coherence를 짓는 **귀납 엔진**, §6 (case-A/B coherence) 및
   궁극적으로 S08:188 `sibleySetup_is_coherent`로의 관문. 상세는 issue 0046 pass-5.
 
@@ -343,6 +347,12 @@ allowlist):
   caller 側の sum data は `D + tail = total` ではなく、直接
   `(∑ j : Fin k, dmem j*dmem j) + tail = total` を渡す形になり、actual prefix enumeration から
   自明に決まる `D` witness を保持しなくてよくなった。
+- **2026-06-04 T6 guard**: T6/Y-family 側の S08 landed bricks を AxiomsCheck に登録。
+  `induce_apply_one_eq_card_W1_of_degree_one`, degree-one induced difference support,
+  `coherentInducedDegreeOneFamily`, `inertia_eq_H_of_c2`, `inertia_eq_H_of_c2_caseA`,
+  `isIrreducibleCharacter_induce_of_degree_one`, `coherentYFamily`, Frobenius/case-A Xset
+  irreducibilityがいずれも 3 axiom allowlist 内。これで c2 inertia discharge と Y-family coherence
+  engine call は CI guard 下に入り、残る T6 は `Yset = S(H')` との exact family/range wiring。
 - **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で
