@@ -237,6 +237,14 @@ witnesses + prime-power/square-divisibility gap data から、normalized `hDeg` 
 `XAdjoinStepInput` を構成する bridge。これで §6.6 側の frontier は、ratio equation 自体と
 square-divisibility/prime-power data を実際の character theory から生成する部分にさらに絞られた。
 
+同日追記 2: `SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap`
+を landing。`exists_pos_natDegreeRatioFamily_of_dvd` / `exists_pos_natDegreeRatio_of_dvd` で
+member-family ratio function `deg` と新規 scalar `a` を divisibility hypotheses から非計算的に選び、
+上の nat-gap bridge に接続する。§6.6 caller は ratio equation を直接作らず、degree divisibility +
+natural degree values + prime-power/square-divisibility gap data を出せば `XAdjoinStepInput` まで
+進める形になった。残 frontier はこの divisibility と square-divisibility/prime-power data の
+実 character-theoretic producer。
+
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 
 `coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <

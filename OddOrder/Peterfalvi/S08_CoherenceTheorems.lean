@@ -3674,6 +3674,88 @@ noncomputable def xAdjoinStepInput_of_memberFamily_natDegreeGap
     (normalizedDegreeGap_of_natDegreeSumPrimePowerGap hdegχ hdeg_mem
       hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hdvd hDpos)
 
+open scoped Classical in
+/-- **(T8.11q) X-adjoin input from divisibility and natural degree-gap data.**
+
+This is the same per-step constructor as `xAdjoinStepInput_of_memberFamily_natDegreeGap`,
+but it derives the member-family ratios and the new-character ratio from natural degree
+divisibility data.  A §6.6 caller can now provide the character-theoretic divisibility
+hypotheses together with the prime-power/square-divisibility gap data, without naming the
+ratio function `deg` or scalar `a` separately. -/
+noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {ι : Type} {s : Finset ι} {χmem : ι → IrreducibleCharacter ↥L}
+    {i₁ : ι} {p d₁ dχ q m D : ℕ} {dmem : ι → ℕ}
+    (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+      ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ j ∈ s, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hmemS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmembarS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmemconjortho : ∀ j ∈ s, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        if j = l then (1 : ℂ) else 0)
+    (hdvd_mem : ∀ j ∈ s, ∀ d dAnchor : ℕ,
+      (χmem j : ClassFunction ↥L ℂ) 1 = (d : ℂ) →
+      (χmem i₁ : ClassFunction ↥L ℂ) 1 = (dAnchor : ℂ) → dAnchor ∣ d)
+    (hdvdχ : ∀ d dAnchor : ℕ,
+      (χs i : ClassFunction ↥L ℂ) 1 = (d : ℂ) →
+      (χmem i₁ : ClassFunction ↥L ℂ) 1 = (dAnchor : ℂ) → dAnchor ∣ d)
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
+    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  classical
+  let hratioFamily :=
+    OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatioFamily_of_dvd
+      (G := ↥L) (χ := χmem) (s := s) (i₁ := i₁) hdvd_mem
+  let deg : ι → ℕ := Classical.choose hratioFamily
+  have ha1 : deg i₁ = 1 := (Classical.choose_spec hratioFamily).1
+  have hdeg_mem : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 =
+      (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 :=
+    (Classical.choose_spec hratioFamily).2.2
+  let hratioχ :=
+    OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatio_of_dvd
+      (G := ↥L) (χs i) (χmem i₁) hdvdχ
+  let a : ℕ := Classical.choose hratioχ
+  have hdegχ_char : OddOrder.Peterfalvi.S03.characterDegree (χs i : ClassFunction ↥L ℂ) =
+      (a : ℂ) *
+        OddOrder.Peterfalvi.S03.characterDegree (χmem i₁ : ClassFunction ↥L ℂ) :=
+    (Classical.choose_spec hratioχ).2
+  have hdegχ : (χs i : ClassFunction ↥L ℂ) 1 =
+      (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 := by
+    simpa [OddOrder.Peterfalvi.S03.characterDegree_def] using hdegχ_char
+  exact hyp.xAdjoinStepInput_of_memberFamily_natDegreeGap hZH hX
+    hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
+    hmemS1 hmembarS1 hmemconjortho hmemortho ha1 hdeg_mem hdegχ
+    hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hdvd hDpos
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
