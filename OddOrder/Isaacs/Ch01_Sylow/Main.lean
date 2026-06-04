@@ -969,6 +969,27 @@ theorem fitting_ne_bot_of_solvable_nontrivial
   rw [hF_bot, le_bot_iff] at hL_le_fitting
   exact hL_ne_bot hL_le_fitting
 
+/-- A natural number greater than `1` has a largest prime factor.  The conclusion is
+packaged in the exact form used in BG when choosing "the largest prime divisor of `|G|`". -/
+theorem exists_max_primeFactor_of_one_lt {n : ℕ} (hn : 1 < n) :
+    ∃ p : ℕ, p ∈ n.primeFactors ∧ ∀ q ∈ n.primeFactors, q ≤ p := by
+  classical
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hn.ne'
+  have hn_ne_zero : n ≠ 0 := by omega
+  have hp_mem : p ∈ n.primeFactors := hp_prime.mem_primeFactors hp_dvd hn_ne_zero
+  refine ⟨n.primeFactors.max' ⟨p, hp_mem⟩, ?_, ?_⟩
+  · exact Finset.max'_mem _ _
+  · intro q hq
+    exact Finset.le_max' _ q hq
+
+/-- A nontrivial finite type has a largest prime factor in its cardinality. -/
+theorem exists_max_primeFactor_card_of_nontrivial (G : Type*) [Finite G] [Nontrivial G] :
+    ∃ p : ℕ, p ∈ (Nat.card G).primeFactors ∧ p.Prime ∧
+      ∀ q ∈ (Nat.card G).primeFactors, q ≤ p := by
+  obtain ⟨p, hp_mem, hp_max⟩ :=
+    exists_max_primeFactor_of_one_lt (n := Nat.card G) (Finite.one_lt_card (α := G))
+  exact ⟨p, hp_mem, Nat.prime_of_mem_primeFactors hp_mem, hp_max⟩
+
 /-- 有限 `G` で `p ∤ |G|` (より一般に `p` が `|G|` の素因子でない) なら, 任意の
 Sylow `p`-部分群は自明 `⊥`, 従って `opCore p G = ⊥`.
 

@@ -647,7 +647,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
    Sylow normality and wire the BG choice of `q`/case split into these low/high
-   normalizer packages.  A scout pass found no existing Thm 4.20(c) endpoint; the
+   normalizer packages.  The largest-prime selection itself is now covered by
+   `Ch01.exists_max_primeFactor_card_of_nontrivial` (with the Nat-level helper
+   `Ch01.exists_max_primeFactor_of_one_lt`), so the low-rank branch can assume the
+   chosen `q ∈ π(M)`, `q` prime, and `∀ r ∈ π(M), r ≤ q` without reopening finite
+   set bookkeeping.  A scout pass found no existing Thm 4.20(c) endpoint; the
    next missing helper can now be stated in the local §4 vocabulary as: `q` largest
    in `|M|` plus `rank F(M) ≤ 2` gives
    `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The extraction from the final
