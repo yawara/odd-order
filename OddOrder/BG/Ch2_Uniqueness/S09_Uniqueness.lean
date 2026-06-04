@@ -57,6 +57,44 @@ open OddOrder.Isaacs
 
 variable {G : Type*} [Group G]
 
+/-- `C_G(x) < ⊤` for `x ≠ 1` in a minimal simple group (`Z(G) = 1`). -/
+private theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x : G}
+    (hx : x ≠ (1 : G)) : Subgroup.centralizer ({x} : Set G) < ⊤ := by
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  rw [lt_top_iff_ne_top]
+  intro htop
+  refine hx (Subgroup.mem_bot.mp (hZbot ▸ ?_))
+  rw [Subgroup.mem_center_iff]
+  intro g
+  exact (Subgroup.mem_centralizer_iff.mp (htop ▸ Subgroup.mem_top g) x (Set.mem_singleton x)).symm
+
+/-- If `L` has a unique containing maximal subgroup and `x` centralizes `L`, then the
+centralizer of any nontrivial such `x` lies in that unique maximal subgroup. -/
+private theorem centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer [Finite G]
+    (hG : IsMinimalSimpleOdd G) {L : Subgroup G} (hL : IsUniquelyMaximal L)
+    {x : G} (hxL : x ∈ Subgroup.centralizer (L : Set G)) (hx : x ≠ 1) :
+    Subgroup.centralizer ({x} : Set G) ≤ hL.uniqueMaximalSubgroup := by
+  classical
+  have hCGlt : Subgroup.centralizer ({x} : Set G) < ⊤ :=
+    centralizer_singleton_lt_top hG hx
+  have hLleCG : L ≤ Subgroup.centralizer ({x} : Set G) := by
+    intro l hl
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy
+    subst y
+    exact (Subgroup.mem_centralizer_iff.mp hxL l hl).symm
+  obtain ⟨N, hNco, hCGleN⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer ({x} : Set G))).resolve_left hCGlt.ne
+  have hLleN : L ≤ N := hLleCG.trans hCGleN
+  have hN_eq : N = hL.uniqueMaximalSubgroup :=
+    hL.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hNco hLleN
+  exact hCGleN.trans (le_of_eq hN_eq)
+
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
 (a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
 

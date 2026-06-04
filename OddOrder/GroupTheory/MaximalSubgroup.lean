@@ -146,6 +146,16 @@ theorem eq_of_isCoatom_of_le {H M N : Subgroup G} (h : IsUniquelyMaximal H)
   (h.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hM hHM).trans
     (h.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hN hHN).symm
 
+/-- If a uniquely maximal subgroup lies in a proper overgroup, that overgroup is also
+uniquely maximal. -/
+theorem of_le_of_lt_top [Finite (Subgroup G)] {H K : Subgroup G} (h : IsUniquelyMaximal H)
+    (hHK : H ≤ K) (hK : K < ⊤) : IsUniquelyMaximal K := by
+  classical
+  obtain ⟨M, hM, hKM⟩ := (eq_top_or_exists_le_coatom K).resolve_left hK.ne
+  refine IsUniquelyMaximal.of_unique_maximal hK hM hKM ?_
+  intro N hN hKN
+  exact h.eq_of_isCoatom_of_le hN (hHK.trans hKN) hM (hHK.trans hKM)
+
 /-- Membership in `ℳ(H)` is equality with the chosen maximal subgroup. -/
 theorem mem_maximalSubgroupsContaining_iff_eq_uniqueMaximalSubgroup {H M : Subgroup G}
     (h : IsUniquelyMaximal H) :

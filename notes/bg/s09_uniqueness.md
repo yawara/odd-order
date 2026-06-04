@@ -321,3 +321,22 @@ Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`.
 - Shared uniqueness API landed in `OddOrder/GroupTheory/MaximalSubgroup.lean`: `IsUniquelyMaximal.uniqueMaximalSubgroup`, its membership/coatom/le accessors, equality of maximal overgroups, and `maximalSubgroupsContaining_eq_singleton`.
 - Shared `hInvariant`/`hInvariantStar` destructors landed in `OddOrder/GroupTheory/AInvariantPiSubgroups.lean`, so §9 proofs can project ambient containment, normalizer containment, pi-subgroup status, and star maximality without unfolding definitions by hand.
 - Remaining §9 `sorry`s are exactly Theorem 9.1, Corollary 9.2, Corollary 9.3, Lemma 9.4, Lemma 9.5, Theorem 9.6, and the `E^2 - E*` particular case. They remain hard because they depend on the unlanded §7/§8 chain, BG §6 Theorem 6.2, BG §5 Lemma 5.1, and BG §4 rank/centralizer inputs; no Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
+
+
+## Lean API status (2026-06-04)
+
+S08 completion after `d1ecd4e` unlocked the §9 frontier. The first sorry-free §9 support
+API is now in place:
+
+- `IsUniquelyMaximal.of_le_of_lt_top` in `OddOrder/GroupTheory/MaximalSubgroup.lean`: if
+  `H ∈ 𝒰`, `H ≤ K`, and `K < ⊤`, then `K ∈ 𝒰`. This is the general monotonicity step used
+  after proving an elementary abelian subgroup of `K` belongs to `𝒰`.
+- S09 local bridge `centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer`: in a
+  minimal simple odd group, if `x ≠ 1` centralizes `L ∈ 𝒰`, then `C_G(x)` lies in the unique
+  maximal subgroup containing `L`. This is the Lean form of the Corollary 9.2 line
+  `C_G(b) ⊇ L`, hence `C_G(b) ⊆ H`.
+
+Immediate remaining blocker for Corollary 9.2: extract a prime-indexed noncyclic elementary
+abelian subgroup from `2 ≤ rank ↥K`. The current `rank` is an `iSup` over all `Nat`, while
+Theorem 9.1 requires `[Fact p.Prime]`; the missing reusable lemma should turn a positive rank
+witness into a prime `p` witness suitable for `noncyclic_isUniquelyMaximal_of_centralizer_le`.
