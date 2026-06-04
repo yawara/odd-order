@@ -3171,6 +3171,19 @@ theorem beta_inner_beta_eq_zero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
       (H79.second.beta_support_subset_dadeSupport hg₂)
   exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
 
+/-- If the two distinguished coherent images are supported in the corresponding
+disjoint Dade supports, their cross inner product vanishes. -/
+theorem zetaImage_cross_eq_zero_of_support_subset
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hζ₁_supp : H79.firstZetaImage.support ⊆ H79.first.hyp76.hyp71.hyp.dadeSupport)
+    (hζ₂_supp : H79.secondZetaImage.support ⊆ H79.second.hyp76.hyp71.hyp.dadeSupport) :
+    ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0 := by
+  have hdisj : Disjoint H79.firstZetaImage.support H79.secondZetaImage.support := by
+    rw [Set.disjoint_left]
+    intro g hg₁ hg₂
+    exact Set.disjoint_left.mp H79.dadeSupport_disjoint (hζ₁_supp hg₁) (hζ₂_supp hg₂)
+  exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
+
 /-- Expanding `β₁ = 1_G - ζ₁^ν + Δ₁` and `β₂ = 1_G - ζ₂^ν + Δ₂`
 gives the displayed algebraic identity used in Peterfalvi (7.9). -/
 theorem beta_inner_beta_expand_delta (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
@@ -3385,6 +3398,33 @@ theorem conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
       hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁Z hzeta₁_irr hind₂Z hzeta₂_irr
   exact H79.conclusion_of_delta_cross_even_of_ZIrr hBD₁ hBD₂ hzeta_cross hδ₁ hδ₂
     hζ₁ hζ₂ hdelta_even
+
+/-- Support-subset form of the weak parity consumer: the `ζ^ν` cross
+orthogonality is obtained from disjoint Dade supports. -/
+theorem conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity_of_zeta_support
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct))
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hζ₁_supp : H79.firstZetaImage.support ⊆ H79.first.hyp76.hyp71.hyp.dadeSupport)
+    (hζ₂_supp : H79.secondZetaImage.support ⊆ H79.second.hyp76.hyp71.hyp.dadeSupport)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion :=
+  H79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁Z hzeta₁_irr hind₂Z hzeta₂_irr hBD₁ hBD₂
+    (H79.zetaImage_cross_eq_zero_of_support_subset hζ₁_supp hζ₂_supp) hdelta_even
 
 /-- Coherence and source irreducibility supply the integer cross terms needed by
 the parity form of Peterfalvi (7.9). -/

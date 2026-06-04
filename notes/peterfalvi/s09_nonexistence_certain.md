@@ -518,3 +518,12 @@ S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` �
 H78 単体でも `Ind 1_H` source term は irreducible ではなく `ZIrr` membership で十分な形になり、
 既存の irreducible 版と `delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` は
 この weak bridge への特殊化/合成に整理された。
+
+
+### 2026-06-04 pass: support-driven zeta cross socket
+
+S09 に `Hypothesis79.zetaImage_cross_eq_zero_of_support_subset` と
+`Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity_of_zeta_support`
+を追加した。これで (7.9) の `⟨ζ₁^ν, ζ₂^ν⟩ = 0` 入力は raw equality だけでなく、
+二つの distinguished coherent image の support が disjoint Dade supports に入ることから生成できる。
+将来の (4.1) `ν`-image support bridge と H79 parity consumer の接続点になる。
