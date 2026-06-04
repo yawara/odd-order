@@ -2867,6 +2867,25 @@ theorem SsubFiltration_nonempty_of_nontrivial_solvable_quotient
     (IsSolvable.commutator_lt_top_of_nontrivial
       (G := ↥H ⧸ A.subgroupOf H)).ne
 
+/-- **Peterfalvi (6.2), proper nilpotent quotient form.**  If `A` is a proper
+normal subgroup of the nilpotent kernel `H`, then the filtration layer `S(A)` is nonempty.
+
+The quotient `H/A` is nontrivial and nilpotent, hence solvable, so the solvable-quotient
+filtration form supplies a nontrivial degree-one source character. -/
+theorem SsubFiltration_nonempty_of_subgroupOf_ne_top
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal] (hA : A.subgroupOf H ≠ ⊤) :
+    (hyp.SsubFiltration A).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Group.IsNilpotent (↥H ⧸ A.subgroupOf H) :=
+    nilpotent_of_surjective (QuotientGroup.mk' (A.subgroupOf H))
+      (QuotientGroup.mk'_surjective (A.subgroupOf H))
+  haveI : IsSolvable (↥H ⧸ A.subgroupOf H) := IsNilpotent.to_isSolvable
+  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) :=
+    Subgroup.nontrivial_quotient_of_ne_top hA
+  exact hyp.SsubFiltration_nonempty_of_nontrivial_solvable_quotient A
+
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
 The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains
@@ -4610,6 +4629,70 @@ theorem realDegreeBound_of_natDegreeSumPrimePowerGap
   rw [hχre, hχ₁re, hright]
   exact hNatReal
 
+/-- **(T8.11n1) real absolute degree bound from common-index p-power data.**
+
+This variant of `realDegreeBound_of_natDegreeSumPrimePowerGap` uses the actual §6.6
+common-index data instead of asking the caller to name a quotient `q` with
+`dχ = q * d₁`.  The strict gap comes from
+`two_mul_lt_sq_of_commonIndex_primePower_gap`; square-divisibility then pushes it to
+the prefix degree sum. -/
+theorem realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap
+    {G : Type*} [Group G]
+    {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {p idx d₁ dχ θ₁ θχ m₁ mχ D : ℕ} {dmem : ι → ℕ}
+    (hχone : (χ : ClassFunction G ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ))
+    (hDsum : ∑ i ∈ s, dmem i * dmem i = D)
+    (hp : 3 ≤ p) (hlt : d₁ < dχ)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    2 * ((OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re *
+        (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re) <
+      ∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2 := by
+  classical
+  have hidxpos : 0 < idx := commonIndex_pos_of_natDegree_factor hχone hdχ
+  have hNat : 2 * (dχ * d₁) < D :=
+    OddOrder.Peterfalvi.S07.two_mul_lt_of_sq_dvd_of_gap
+      (OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_commonIndex_primePower_gap
+        hp hidxpos hd₁ hdχ hθ₁ hθχ hlt)
+      hdvd hDpos
+  have hNatReal : 2 * ((dχ : ℝ) * (d₁ : ℝ)) < (D : ℝ) := by
+    exact_mod_cast hNat
+  have hχre :
+      (OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re = (dχ : ℝ) := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχone]
+    norm_num
+  have hχ₁re :
+      (OddOrder.Peterfalvi.S03.characterDegree
+          (χ₁ : ClassFunction G ℂ)).re = (d₁ : ℝ) := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one]
+    norm_num
+  have hsumCast : (∑ i ∈ s, ((dmem i * dmem i : ℕ) : ℝ)) = (D : ℝ) := by
+    exact_mod_cast hDsum
+  have hright :
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+        (D : ℝ) := by
+    calc
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+          ∑ i ∈ s, ((dmem i : ℝ) ^ 2) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            rw [OddOrder.Peterfalvi.S03.characterDegree_def, hmemone i hi]
+            norm_num
+      _ = ∑ i ∈ s, ((dmem i * dmem i : ℕ) : ℝ) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            norm_num [pow_two]
+      _ = (D : ℝ) := hsumCast
+  rw [hχre, hχ₁re, hright]
+  exact hNatReal
+
 /-- **(T8.11o) normalized degree gap from natural prime-power data.**
 
 Combines `realDegreeBound_of_natDegreeSumPrimePowerGap` with
@@ -4659,6 +4742,34 @@ theorem natDegreeDvd_of_commonIndex_primePowerData
   subst e₁
   exact OddOrder.Peterfalvi.S07.mul_primePow_dvd_mul_primePow_of_le
     hp hidx hd₁ hd hθ₁ hθ hle
+
+/-- **(T8.11o1) normalized degree gap from common-index p-power data.**
+
+Combines `realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap` with
+`normalizedDegreeGap_of_realDegreeBound`.  This is the consumer form used by the
+common-index step constructors after the quotient `q` has been removed from their input data. -/
+theorem normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap
+    {G : Type*} [Group G]
+    {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {deg : ι → ℕ} {a p idx d₁ dχ θ₁ θχ m₁ mχ D : ℕ} {dmem : ι → ℕ}
+    (hχdeg : (χ : ClassFunction G ℂ) 1 =
+      (a : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hmemdeg : ∀ i ∈ s,
+      (χmem i : ClassFunction G ℂ) 1 =
+        (deg i : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hχone : (χ : ClassFunction G ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ))
+    (hDsum : ∑ i ∈ s, dmem i * dmem i = D)
+    (hp : 3 ≤ p) (hlt : d₁ < dχ)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2 :=
+  normalizedDegreeGap_of_realDegreeBound hχdeg hmemdeg
+    (realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap hχone hχ₁one hmemone hDsum
+      hp hlt hdχ hd₁ hθχ hθ₁ hdvd hDpos)
 
 /-- **(T8.11r) degree-divisibility inputs from common-index p-power sorted degrees.**
 
@@ -4846,6 +4957,89 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap
     hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hdvd hDpos
 
 open scoped Classical in
+/-- **(T8.11r1) X-adjoin input from degree divisibility and common-index gap data.**
+
+This is the quotient-free version of
+`xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap`: the normalized degree inequality is
+derived from the common-index p-power factorizations of `d₁` and `dχ`, rather than from a named
+quotient `q` with `dχ = q * d₁`. -/
+noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {ι : Type} {s : Finset ι} {χmem : ι → IrreducibleCharacter ↥L}
+    {i₁ : ι} {p idx d₁ dχ θ₁ θχ m₁ mχ D : ℕ} {dmem : ι → ℕ}
+    (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+      ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ j ∈ s, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hmemS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmembarS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmemconjortho : ∀ j ∈ s, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        if j = l then (1 : ℂ) else 0)
+    (hdvd_mem : ∀ j ∈ s, ∀ d dAnchor : ℕ,
+      (χmem j : ClassFunction ↥L ℂ) 1 = (d : ℂ) →
+      (χmem i₁ : ClassFunction ↥L ℂ) 1 = (dAnchor : ℂ) → dAnchor ∣ d)
+    (hdvdχ : ∀ d dAnchor : ℕ,
+      (χs i : ClassFunction ↥L ℂ) 1 = (d : ℂ) →
+      (χmem i₁ : ClassFunction ↥L ℂ) 1 = (dAnchor : ℂ) → dAnchor ∣ d)
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
+    (hp : 3 ≤ p) (hlt : d₁ < dχ)
+    (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  classical
+  let hratioFamily :=
+    OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatioFamily_of_dvd
+      (G := ↥L) (χ := χmem) (s := s) (i₁ := i₁) hdvd_mem
+  let deg : ι → ℕ := Classical.choose hratioFamily
+  have ha1 : deg i₁ = 1 := (Classical.choose_spec hratioFamily).1
+  have hdeg_mem : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 =
+      (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 :=
+    (Classical.choose_spec hratioFamily).2.2
+  let hratioχ :=
+    OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatio_of_dvd
+      (G := ↥L) (χs i) (χmem i₁) hdvdχ
+  let a : ℕ := Classical.choose hratioχ
+  have hdegχ_char : OddOrder.Peterfalvi.S03.characterDegree (χs i : ClassFunction ↥L ℂ) =
+      (a : ℂ) *
+        OddOrder.Peterfalvi.S03.characterDegree (χmem i₁ : ClassFunction ↥L ℂ) :=
+    (Classical.choose_spec hratioχ).2
+  have hdegχ : (χs i : ClassFunction ↥L ℂ) 1 =
+      (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 := by
+    simpa [OddOrder.Peterfalvi.S03.characterDegree_def] using hdegχ_char
+  exact hyp.xAdjoinStepInput_of_memberFamily_degreeRatios hZH hX
+    hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
+    hmemS1 hmembarS1 hmemconjortho hmemortho ha1 hdeg_mem hdegχ
+    (normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap hdegχ hdeg_mem
+      hχone hχ₁one hmemone hDsum hp hlt hdχ hd₁ hθχ hθ₁ hdvd hDpos)
+
+open scoped Classical in
 /-- **(T8.11r) X-adjoin input from degree divisibility and prime-power sum data.**
 
 This is the same constructor as `xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap`, but it
@@ -4950,7 +5144,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
     {ι κ : Type} {s : Finset ι} {tailSet : Finset κ}
     {χmem : ι → IrreducibleCharacter ↥L}
-    {i₁ : ι} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {i₁ : ι} {p idx d₁ dχ qtot c total θ₁ θχ m₁ mχ mq : ℕ}
     {dmem θmem mmem : ι → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
     (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
       ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
@@ -4972,8 +5166,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
-    (hp : 3 ≤ p)
-    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hp : 3 ≤ p) (hlt : d₁ < dχ)
     (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j ∈ s, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
@@ -4996,11 +5189,16 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
       hθmem (Nat.le_of_lt hlt) hlemem
   have hidx_D : idx * idx ∣ D :=
     OddOrder.Peterfalvi.S08.sq_dvd_natDegreeSquareSum_of_commonIndex hDsum hdmem
-  exact hyp.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums hZH hX
+  have hcop : Nat.Coprime idx θχ := coprime_commonIndex_primePower hidx_p hθχ
+  have hdvd : dχ * dχ ∣ D :=
+    OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
+      tailSet (by omega) hidxpos hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal
+      hidx_D hdχ hcop
+  have hDpos : 0 < D := natDegreeSquareSum_pos_of_memberFamily hi₁ hmemone hDsum
+  exact hyp.xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap hZH hX
     hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
     hmemS1 hmembarS1 hmemconjortho hmemortho hdvds.1 hdvds.2
-    hχone hχ₁one hmemone hDsum hp hq hdiv hlt
-    hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hidx_p
+    hχone hχ₁one hmemone hDsum hp hlt hdχ hd₁ hθχ hθ₁ hdvd hDpos
 
 open scoped Classical in
 /-- **(T8.11u) X-adjoin input from a pairUnion enumeration and p-power degree data.**
@@ -5033,13 +5231,12 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     (hχinj : Function.Injective χmem)
     (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
       OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
-    {i₁ : Fin k} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {i₁ : Fin k} {p idx d₁ dχ qtot c total θ₁ θχ m₁ mχ mq : ℕ}
     {dmem θmem mmem : Fin k → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
     (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
-    (hp : 3 ≤ p)
-    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hp : 3 ≤ p) (hlt : d₁ < dχ)
     (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
@@ -5127,7 +5324,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     hpair0 hpair1 hpairs hdisj hi hcover (by simp) hmemreal hmemdiffsupp
     hmemS1' hmembarS1 hmemconjortho hmemortho
     hχone hχ₁one (fun j _ => hmemone j) hDsum
-    hp hq hdiv hlt hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
+    hp hlt hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
     (fun j _ => hθmem j) (fun j _ => hlemem j)
     hθtail htail_le hsum' hqtot hθsq_le_qtot htotal hidx_p
 
@@ -5159,14 +5356,13 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
     (hχinj : Function.Injective χmem)
     (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
       OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
-    {i₁ : Fin k} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {i₁ : Fin k} {p idx d₁ dχ qtot c total θ₁ θχ m₁ mχ mq : ℕ}
     {dmem θmem mmem : Fin k → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
     (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z)
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hp : 3 ≤ p)
-    (hq : q = p ^ m) (hdiv : dχ = q * d₁)
     (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
@@ -5208,7 +5404,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
       hχ₁one (hmemone j)
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) hχinj hrange
-    hχone hχ₁one hmemone hp hq hdiv hlt
+    hχone hχ₁one hmemone hp hlt
     hdχ hd₁ hdmem hθχ hθ₁ hθmem hlemem
     hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_p
 
@@ -5236,13 +5432,11 @@ structure PairUnionCommonIndexPrimePowerStepData
   idx : ℕ
   d₁ : ℕ
   dχ : ℕ
-  q : ℕ
   qtot : ℕ
   c : ℕ
   total : ℕ
   θ₁ : ℕ
   θχ : ℕ
-  m : ℕ
   m₁ : ℕ
   mχ : ℕ
   mq : ℕ
@@ -5255,8 +5449,6 @@ structure PairUnionCommonIndexPrimePowerStepData
   hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ)
   hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ)
   hp : 3 ≤ p
-  hq : q = p ^ m
-  hdiv : dχ = q * d₁
   hlt : d₁ < dχ
   hdχ : dχ = idx * θχ
   hd₁ : d₁ = idx * θ₁
@@ -5297,13 +5489,11 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   idx : ℕ
   d₁ : ℕ
   dχ : ℕ
-  q : ℕ
   qtot : ℕ
   c : ℕ
   total : ℕ
   θ₁ : ℕ
   θχ : ℕ
-  m : ℕ
   m₁ : ℕ
   mχ : ℕ
   mq : ℕ
@@ -5317,8 +5507,6 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z
   hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ)
   hp : 3 ≤ p
-  hq : q = p ^ m
-  hdiv : dχ = q * d₁
   hdχ : dχ = idx * θχ
   hd₁ : d₁ = idx * θ₁
   hdmem : ∀ j, dmem j = idx * θmem j
@@ -5367,7 +5555,7 @@ noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irr
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
     data.hχone data.hχ₁one data.hmemone
-    data.hp data.hq data.hdiv data.hlt data.hdχ data.hd₁ data.hdmem
+    data.hp data.hlt data.hdχ data.hd₁ data.hdmem
     data.hθχ data.hθ₁ data.hθmem data.hlemem data.hθtail data.htail_le data.hsum
     data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
@@ -5404,7 +5592,7 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
   let data := hstepData pair N χs hpair0 hpair1 hpairs hdisj hmono i hi
   exact hyp.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
-    data.hχone data.hχ₁one data.hanchor data.hmemone data.hp data.hq data.hdiv
+    data.hχone data.hχ₁one data.hanchor data.hmemone data.hp
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 

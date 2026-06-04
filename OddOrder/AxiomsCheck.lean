@@ -1956,6 +1956,12 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_commonIndex_primePower_gap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_realDegreeBound
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap
@@ -2098,6 +2104,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_nontrivial_solvable_quotient
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_subgroupOf_ne_top
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_subset_Yset
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -2202,6 +2210,11 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaDistinct_mem_sourceSet
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_coherenceOn
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_eq_of_isCoherent
@@ -2382,7 +2395,45 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_integral_parity
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr
+-- Peterfalvi (7.5) reduced family inequality input for the (7.10) assembly.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.reduced_inequality_of_estimates
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.one_le_G0_norm_sum_of_one_le_norm_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.one_le_norm_sq_apply_one_of_signed_irreducible
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.one_le_G0_norm_sum_of_signed_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.base_estimate_of_family71_reduced_estimates
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.base_estimate_of_family71_reduced_estimates_of_signed_irreducible
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_signed_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_family71_coherent_zeta_source_data
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
 #assert_only_allowed_axioms
@@ -2434,6 +2485,9 @@ set_option linter.style.longLine false in
 -- Peterfalvi (7.11) conditional terminal contradiction from the named (7.10) estimate data.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_characterEstimateData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_family71_coherent_zeta_source_data
 -- Peterfalvi (7.11) consumer from the `𝓑`-sum bound and real reduced family inequality.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_real_Bsum_bound

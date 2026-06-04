@@ -885,6 +885,102 @@ theorem family_inequality {G : Type*} [Group G] [Fintype G]
     field_simp
   linarith [h_main, h_cancel]
 
+open scoped Classical in
+/-- Reduced form of the family inequality used in Peterfalvi (7.10).
+
+Starting from (7.5), it inserts:
+* the identity contribution on `G₀`, expressed as
+  `1 ≤ Σ_{g∈G₀} |χ(g)|²`;
+* a lower bound `c ≤ ‖χ^{ρ_i}‖²` for the distinguished index;
+* nonnegative contributions for the indices outside the chosen `𝓑`-set.
+
+The output is exactly the real-valued reduced inequality later converted into
+the `CharacterEstimateData.base_estimate` field. -/
+theorem reduced_inequality_of_estimates {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    (F : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    (i : Fin k) (B : Finset (Fin k)) (c : ℝ)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hG0 :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2)
+    (hi : c ≤ F.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      (Nat.card (F.A j) : ℝ) / (Nat.card (F.L j) : ℝ) ≤
+        F.chiRhoNormSq χ j) :
+    ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (c - (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) -
+          ∑ j ∈ B, (Nat.card (F.A j) : ℝ) / (Nat.card (F.L j) : ℝ)) ≤ 0 := by
+  classical
+  let ratio : Fin k → ℝ := fun j =>
+    (Nat.card (F.A j) : ℝ) / (Nat.card (F.L j) : ℝ)
+  let term : Fin k → ℝ := fun j => F.chiRhoNormSq χ j - ratio j
+  let g0sum : ℝ :=
+    ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0), ‖(χ : G → ℂ) g‖ ^ 2
+  let g0term : ℝ := (Nat.card G : ℝ)⁻¹ * (g0sum - (Nat.card F.G0 : ℝ))
+  have h75 : g0term + ∑ j : Fin k, term j ≤ 0 := by
+    simpa [g0term, g0sum, term, ratio] using family_inequality F χ hχ
+  have hG_pos : (0 : ℝ) < Nat.card G := by exact_mod_cast Nat.card_pos (α := G)
+  have hG0_lower :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) ≤ g0term := by
+    have hsub :
+        1 - (Nat.card F.G0 : ℝ) ≤ g0sum - (Nat.card F.G0 : ℝ) := by
+      dsimp [g0sum]
+      linarith [hG0]
+    have hmul := mul_le_mul_of_nonneg_left hsub (inv_nonneg.mpr hG_pos.le)
+    calc
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ))
+          = (Nat.card G : ℝ)⁻¹ * (1 - (Nat.card F.G0 : ℝ)) := by
+              rw [div_eq_inv_mul, mul_comm]
+      _ ≤ (Nat.card G : ℝ)⁻¹ * (g0sum - (Nat.card F.G0 : ℝ)) := hmul
+      _ = g0term := rfl
+  have hnorm_nonneg : ∀ j : Fin k, 0 ≤ F.chiRhoNormSq χ j := by
+    intro j
+    letI : Fintype (F.L j) := F.fintypeL j
+    letI : Invertible (Nat.card (F.L j) : ℂ) := F.invertibleL j
+    simpa [FamilyHypothesis71.chiRhoNormSq] using
+      Hypothesis71.ClassFunction.inner_self_re_nonneg ((F.hyp71 j).chiRhoCF χ)
+  have hterm_i : c - ratio i ≤ term i := by
+    dsimp [term]
+    linarith [hi]
+  have hB_bound : -(∑ j ∈ B, ratio j) ≤ ∑ j ∈ B, term j := by
+    rw [← Finset.sum_neg_distrib]
+    refine Finset.sum_le_sum fun j hj => ?_
+    have hnonneg := hnorm_nonneg j
+    dsimp [term]
+    linarith
+  have hB_subset : B ⊆ (Finset.univ : Finset (Fin k)).erase i := by
+    intro j hj
+    rw [Finset.mem_erase]
+    exact ⟨(hB_ne j hj).symm, by simp⟩
+  have hB_to_erase :
+      (∑ j ∈ B, term j) ≤
+        ∑ j ∈ (Finset.univ : Finset (Fin k)).erase i, term j := by
+    refine Finset.sum_le_sum_of_subset_of_nonneg hB_subset ?_
+    intro j hj_erase hjB
+    rw [Finset.mem_erase] at hj_erase
+    have hij : i ≠ j := hj_erase.1.symm
+    have hj_good := hgood j hij hjB
+    dsimp [term]
+    linarith
+  have hsum_terms :
+      c - ratio i - ∑ j ∈ B, ratio j ≤ ∑ j : Fin k, term j := by
+    have hsplit := Finset.add_sum_erase (Finset.univ : Finset (Fin k)) term
+      (Finset.mem_univ i)
+    linarith
+  have htarget :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (c - ratio i - ∑ j ∈ B, ratio j) ≤ 0 := by
+    have hle :
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+            (c - ratio i - ∑ j ∈ B, ratio j) ≤
+          g0term + ∑ j : Fin k, term j := by
+      linarith
+    exact le_trans hle h75
+  simpa [ratio] using htarget
+
 end Section_7_4_to_7_5
 
 section Section_7_6_to_7_7
@@ -1500,6 +1596,116 @@ noncomputable def indChainDecomposition_of_isCoherent
   d_zero := hd_zero
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
+
+open scoped Classical in
+/-- S09-facing `IndChainDecomposition` constructor from an arbitrary coherent
+source family.
+
+This is the set-parametric form of
+`indChainDecomposition_of_isCoherent`: the coherent set need not be
+`H78.sourceSet`.  It is the bridge used when §8 has already identified the
+source family as a Sibley set `hyp.S`, while the §9 notation still wants the
+output family to be exactly `χ_t = H78.nu (ζ_t)`. -/
+noncomputable def indChainDecomposition_of_coherenceOn
+    (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ S)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A_prime) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := L) (G := G) τ ζ d where
+  χ t := H78.nu (ζ t)
+  norm_one t := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem t)), hζ_norm]
+  pairwise_inner_zero t u htu := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem u)), hζ_pairwise htu]
+  d_zero := hd_zero
+  image_eq t := by
+    rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
+
+set_option linter.style.longLine false
+open scoped Classical in
+/-- **Peterfalvi (6.8.1) → (7.10), Frobenius/base-anchor form.**
+
+The S08 Frobenius branch constructs the full Sibley coherence target from the
+base-anchor common-index `X`-chain data and generator-level mixed-inner glue.
+This constructor feeds that coherence witness directly into the S09
+`Hypothesis78` Ind-chain package, fixing the output family as
+`χ_t = H78.nu (ζ_t)` rather than leaving it as an anonymous coherence extension.
+
+The remaining inputs are the genuine (6.6)/(6.8) payload: the `X`-chain step
+data, the `ν` agreement/mixed-inner facts for the final glue, and the chosen
+orthonormal source chain in the Xset/H-prime union with supported scaled differences. -/
+noncomputable def
+    indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
+    (H78 : Hypothesis78 G A L)
+    {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)]
+    (hyp : OddOrder.Peterfalvi.S08.SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → OddOrder.RepresentationTheory.IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
+      H78.nu x =
+        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+          hF hXne hstepData).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, H78.nu y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (H78.nu x) (H78.nu y) = ClassFunction.inner x y)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L)))
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction ↥L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L)) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := ↥L) (G := G) hyp.tau ζ d := by
+  let hX :=
+    hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+      hF hXne hstepData
+  let hcoh : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) :=
+    OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq
+      hX hyp.coherentYset H78.nu hagreeX hagreeY
+      (hyp.inner_span_Xset_Yset_eq_zero_of_frobenius hF) hmixed hgen
+  exact H78.indChainDecomposition_of_coherenceOn hcoh (by rfl)
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+
+set_option linter.style.longLine true
 
 /-- H78-facing per-term Ind equation in the constructed Ind-chain package. -/
 theorem indChain_image_eq_of_isCoherent
@@ -4103,6 +4309,61 @@ lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
   intro i
   exact F.one_not_mem_kernelSpread i
 
+open scoped Classical in
+/-- The identity contribution in Peterfalvi (7.10): since `1 ∈ G₀`, any class
+function with `1 ≤ |χ(1)|²` contributes at least `1` to the `G₀` norm sum. -/
+lemma one_le_G0_norm_sum_of_one_le_norm_one [Fintype G]
+    (F : FrobeniusFamily G k) (χ : ClassFunction G ℂ)
+    (hone : (1 : ℝ) ≤ ‖(χ : G → ℂ) 1‖ ^ 2) :
+    (1 : ℝ) ≤
+      ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+        ‖(χ : G → ℂ) g‖ ^ 2 := by
+  classical
+  have hmem : (1 : G) ∈ Finset.univ.filter (fun g : G => g ∈ F.G0) := by
+    simp [F.one_mem_G0]
+  exact hone.trans
+    (Finset.single_le_sum (f := fun g : G => ‖(χ : G → ℂ) g‖ ^ 2)
+      (fun g _ => sq_nonneg _) hmem)
+
+/-- A signed irreducible character has `|χ(1)|² ≥ 1`.  This is the numerical
+content behind the `χ₁(1)^2` term in Peterfalvi (7.10). -/
+lemma one_le_norm_sq_apply_one_of_signed_irreducible
+    (χ : ClassFunction G ℂ) (ε : ℤ)
+    (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_one :
+      (χ : G → ℂ) 1 =
+        (ε : ℂ) * ((ξ : ClassFunction G ℂ) : G → ℂ) 1) :
+    (1 : ℝ) ≤ ‖(χ : G → ℂ) 1‖ ^ 2 := by
+  obtain ⟨d, hdpos, hd⟩ :=
+    OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  rw [hχ_one, hd]
+  rcases hε with rfl | rfl
+  · rw [Int.cast_one, one_mul, Complex.norm_natCast]
+    have hd1 : (1 : ℝ) ≤ d := by exact_mod_cast hdpos
+    nlinarith
+  · rw [Int.cast_neg, Int.cast_one, neg_one_mul, norm_neg, Complex.norm_natCast]
+    have hd1 : (1 : ℝ) ≤ d := by exact_mod_cast hdpos
+    nlinarith
+
+open scoped Classical in
+/-- Signed-irreducible form of the `G₀` identity contribution used in (7.10). -/
+lemma one_le_G0_norm_sum_of_signed_irreducible [Fintype G]
+    (F : FrobeniusFamily G k) (χ : ClassFunction G ℂ) (ε : ℤ)
+    (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ : χ = ε • (ξ : ClassFunction G ℂ)) :
+    (1 : ℝ) ≤
+      ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+        ‖(χ : G → ℂ) g‖ ^ 2 := by
+  have hχ_one :
+      (χ : G → ℂ) 1 =
+        (ε : ℂ) * ((ξ : ClassFunction G ℂ) : G → ℂ) 1 := by
+    rw [hχ, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
+      ClassFunction.smul_apply]
+  exact F.one_le_G0_norm_sum_of_one_le_norm_one χ
+    (one_le_norm_sq_apply_one_of_signed_irreducible χ ε ξ hε hχ_one)
+
 /-- Elements of L_i = N_G(H_i) conjugate H_i to itself. -/
 lemma mem_kernel_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
     {g x : G} (hg : g ∈ F.L i) :
@@ -4795,6 +5056,21 @@ lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e [Finite G]
   rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
   norm_num [Nat.cast_sub hh1]
 
+/-- The local sharp-kernel ratio `|H_i^#| / |L_i|` as a real number, in the
+denominator order used by the real reduced-family estimate. -/
+lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℝ) /
+        (Nat.card (F.L i) : ℝ) =
+      ((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ)) := by
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
+  rw [Nat.cast_sub hh1, Nat.cast_mul]
+  rw [mul_comm (F.h i : ℝ) (F.e i : ℝ)]
+  norm_num
+
 /-- The global spread ratio equals the same local ratio `(h_i - 1)/(h_i e_i)`. -/
 lemma card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e [Finite G]
     (F : FrobeniusFamily G k) (i : Fin k) :
@@ -5369,6 +5645,344 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finit
   Bsum_le := hBsum
   base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
 
+open scoped Classical in
+/-- Base-estimate form of Peterfalvi (7.10) obtained directly from the (7.5)
+family inequality package and the per-index lower bounds.
+
+This removes the former standalone `hred` input for the base estimate: the caller
+only supplies the actual (7.5) family package, the identity contribution on
+`G₀`, the selected (7.8.b) lower bound, and the nonnegative outside-`𝓑`
+contributions.  The cardinality hypotheses identify the (7.5) local data with
+the Frobenius-family notation used in (7.10). -/
+lemma base_estimate_of_family71_reduced_estimates
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hG0sum :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  classical
+  have hratio : ∀ j : Fin k,
+      (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ) =
+        ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) := by
+    intro j
+    rw [hA j, hL j]
+    exact F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real j
+  have hgood' : ∀ j : Fin k, i ≠ j → j ∉ B →
+      (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ) ≤
+        P.chiRhoNormSq χ j := by
+    intro j hij hjB
+    rw [hratio j]
+    exact hgood j hij hjB
+  have hG0sumP :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ P.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2 := by
+    rw [hG0]
+    exact hG0sum
+  have hredP :=
+    reduced_inequality_of_estimates P χ hχ i B
+      (1 - (F.e i : ℝ) / (F.h i : ℝ))
+      hB_ne hG0sumP hi hgood'
+  have hredF :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0 := by
+    have hredP' :
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+            (Nat.card (P.A i) : ℝ) / (Nat.card (P.L i) : ℝ) -
+            (∑ j ∈ B,
+              (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ))) ≤ 0 := by
+      rw [← hG0]
+      exact hredP
+    have hsum_ratio :
+        (∑ j ∈ B, (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ)) =
+          ∑ j ∈ B, ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) :=
+      Finset.sum_congr rfl (fun j _ => hratio j)
+    rwa [hratio i, hsum_ratio] at hredP'
+  exact F.base_estimate_of_real_reduced_family_inequality i B hredF
+
+open scoped Classical in
+/-- Constructor form of `CharacterEstimateData` from a concrete (7.5) family
+package, per-index lower bounds, and the separately proved `𝓑`-sum bound. -/
+noncomputable def characterEstimateData_of_family71_reduced_estimates
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hG0sum :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate :=
+    F.base_estimate_of_family71_reduced_estimates P χ hχ B hL hA hG0
+      hB_ne hG0sum hi hgood
+
+open scoped Classical in
+/-- Signed-irreducible variant of
+`base_estimate_of_family71_reduced_estimates`.
+
+This packages the exact first inequality in Peterfalvi (7.10):
+`(|G₀|-1)/|G| ≥ (|G₀|-χ₁(1)^2)/|G|`, using that the selected `χ₁` is a signed
+irreducible character and `1 ∈ G₀`. -/
+lemma base_estimate_of_family71_reduced_estimates_of_signed_irreducible
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) :=
+  F.base_estimate_of_family71_reduced_estimates P χ hχ B hL hA hG0 hB_ne
+    (F.one_le_G0_norm_sum_of_signed_irreducible χ ε ξ hε hχ_signed)
+    hi hgood
+
+open scoped Classical in
+/-- Constructor form of the signed-irreducible `(7.5)` base assembly, retaining
+only the `𝓑`-sum bound as a separate final-assembly input. -/
+noncomputable def characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate :=
+    F.base_estimate_of_family71_reduced_estimates_of_signed_irreducible
+      P χ hχ B ε ξ hε hχ_signed hL hA hG0 hB_ne hi hgood
+
+open scoped Classical in
+/-- Constructor form of `CharacterEstimateData` from the concrete (7.5) family
+estimates, a signed-irreducible selected character, and Peterfalvi's orthogonal
+integer decomposition for the `𝓑`-sum.
+
+Compared with `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`,
+this no longer asks for the final `𝓑`-sum bound as an external input: it derives
+that bound from the orthogonal decomposition used in (7.9). -/
+noncomputable def characterEstimateData_of_family71_signed_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
+    P χ hχ hmin B ε ξ hε hχ_signed hL hA hG0 hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hi hgood
+
+open scoped Classical in
+/-- Coherence-source form of the concrete (7.5)+(7.9) final-assembly
+constructor.
+
+Here the selected character is the coherent image `νζ`.  The source
+irreducibility of `ζ` and the coherence witness produce the signed-irreducible
+witness internally, so the caller supplies neither `hG0sum` nor an explicit
+`νζ = ±ξ` certificate. -/
+noncomputable def characterEstimateData_of_family71_coherent_zeta_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    F.CharacterEstimateData := by
+  classical
+  let hsig :=
+    H78.exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent hcoh hnu hzeta_irr
+  let ε : ℤ := Classical.choose hsig
+  let hsigξ := Classical.choose_spec hsig
+  let ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G := Classical.choose hsigξ
+  have hχ_signed := Classical.choose_spec hsigξ
+  exact F.characterEstimateData_of_family71_signed_decomposition
+    P (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+    (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
+    hmin B ε ξ hχ_signed.1 hχ_signed.2 hL hA hG0 hB_ne
+    v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hi hgood
+
+open scoped Classical in
+/-- Source-data form of the concrete (7.5)+(7.8.b)+(7.9) final-assembly
+constructor.
+
+This refines `characterEstimateData_of_family71_coherent_zeta_decomposition` by
+deriving the residual `Γ` norm bound from the family-notated (7.8.b) source
+data, rather than taking `hΓ_bound` as a separate input.  The selected character
+is still the coherent image `νζ`, so the signed-irreducible witness and the
+`G₀` identity contribution are also generated internally. -/
+noncomputable def characterEstimateData_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_family71_coherent_zeta_decomposition
+    P H78 hcoh hnu hzeta_irr hmin B hP_L hP_A hP_G0 hB_ne
+    v x hBD.Gamma Γ₁ hΓ horth hΓ₁ hx_nonzero
+    (F.gamma_inner_self_re_le_of_family_source_data H78 hBD hLocalL hLocalH
+      hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv hsmall)
+    hi hgood
+
 /-- Constructor form of `CharacterEstimateData` from the real reduced family
 inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
 
@@ -5606,6 +6220,83 @@ lemma lowerBoundTerm_of_characterEstimateData [Finite G]
             2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
+
+
+/-- Concrete (7.5)+(7.8.b)+(7.9) source-data form of the displayed (7.10)
+lower bound.
+
+This is the lower-bound consumer for
+`characterEstimateData_of_family71_coherent_zeta_source_data`: the concrete
+`FamilyHypothesis71` reduced family inequality, the coherent `ζ` image, the
+family-notated (7.8.b) source estimates, and the orthogonal integer
+decomposition are assembled internally into `CharacterEstimateData` and then
+converted to Peterfalvi's displayed rational bound. -/
+lemma lowerBoundTerm_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) :=
+  F.lowerBoundTerm_of_characterEstimateData hodd
+    (F.characterEstimateData_of_family71_coherent_zeta_source_data P H78 hBD
+      hcoh hnu hzeta_irr hLocalL hLocalH hmin B hP_L hP_A hP_G0 hB_ne
+      v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hi hgood)
 
 /-- Real-valued form of `lowerBoundTerm_of_Bsum_bound`, matching the reduced
 inequality produced before Peterfalvi's final rational display. -/
@@ -5877,6 +6568,77 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
     (hG0 : F.G0 = {(1 : G)}) : False :=
   not_trivial_G0_of_lowerBoundTerm F hodd
     (F.lowerBoundTerm_of_characterEstimateData hodd hdata) hG0
+
+
+/-- **Peterfalvi (7.11), concrete family/source-data form.**  The terminal
+contradiction from the concrete (7.5) family inequality, coherent `ζ` image,
+(7.8.b) source estimates, and the (7.9) orthogonal integer decomposition.
+
+This bypasses the open top-level `card_G0_lower_bound`: once these textbook
+source-data inputs are available, the displayed lower bound and the final
+`G₀ = {1}` contradiction are already closed. -/
+theorem not_trivial_G0_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.lowerBoundTerm_of_family71_coherent_zeta_source_data hodd P H78 hBD
+      hcoh hnu hzeta_irr hLocalL hLocalH hmin B hP_L hP_A hP_G0 hB_ne
+      v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hi hgood)
+    hG0
 
 /-- **Peterfalvi (7.11), `𝓑`-sum-bound form.**  The terminal contradiction from
 the separately established `𝓑`-sum bound and the real reduced family inequality.

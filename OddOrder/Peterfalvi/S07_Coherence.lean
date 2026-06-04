@@ -1868,6 +1868,47 @@ theorem two_mul_lt_sq_of_primePow_gap
     omega
   nlinarith [hgap, hpos₁]
 
+/-- **Peterfalvi (6.6): the common-index p-power degree gap (ℕ).**
+
+This is the same strict gap as `two_mul_lt_sq_of_primePow_gap`, but in the exact
+common-index form used in the §8 Sibley X-chain.  If
+`d₁ = idx * p^m₁` and `dᵢ = idx * p^mᵢ` with `idx > 0`, `p ≥ 3`, and
+`d₁ < dᵢ`, then the p-power residual of `dᵢ` is at least one factor of `p`
+larger than the residual of `d₁`; hence `dᵢ ≥ 3 * d₁` and
+`2 * dᵢ * d₁ < dᵢ^2`.
+
+This removes the need to name a separate quotient `q = dᵢ / d₁` in the
+consumer-facing §8 constructors. -/
+theorem two_mul_lt_sq_of_commonIndex_primePower_gap
+    {p idx θ₁ θᵢ d₁ dᵢ m₁ mᵢ : ℕ} (hp : 3 ≤ p) (hidx : 0 < idx)
+    (hd₁ : d₁ = idx * θ₁) (hdᵢ : dᵢ = idx * θᵢ)
+    (hθ₁ : θ₁ = p ^ m₁) (hθᵢ : θᵢ = p ^ mᵢ) (hlt : d₁ < dᵢ) :
+    2 * (dᵢ * d₁) < dᵢ * dᵢ := by
+  have hθlt : θ₁ < θᵢ := by
+    rw [hd₁, hdᵢ] at hlt
+    exact (Nat.mul_lt_mul_left hidx).mp hlt
+  have hm_lt : m₁ < mᵢ := by
+    rw [hθ₁, hθᵢ] at hθlt
+    exact (Nat.pow_lt_pow_iff_right (show 1 < p by omega)).mp hθlt
+  have hpθ : p * θ₁ ≤ θᵢ := by
+    rw [hθ₁, hθᵢ]
+    have hm_succ : m₁ + 1 ≤ mᵢ := Nat.succ_le_of_lt hm_lt
+    calc
+      p * p ^ m₁ = p ^ (m₁ + 1) := by
+        rw [pow_succ']
+      _ ≤ p ^ mᵢ := Nat.pow_le_pow_right (by omega) hm_succ
+  have hgap : 3 * d₁ ≤ dᵢ := by
+    rw [hd₁, hdᵢ]
+    have h3θ : 3 * θ₁ ≤ θᵢ :=
+      (Nat.mul_le_mul_right θ₁ hp).trans hpθ
+    calc
+      3 * (idx * θ₁) = idx * (3 * θ₁) := by ring
+      _ ≤ idx * θᵢ := Nat.mul_le_mul_left idx h3θ
+  have hd₁pos : 0 < d₁ := by
+    rw [hd₁, hθ₁]
+    exact Nat.mul_pos hidx (pow_pos (by omega) m₁)
+  nlinarith [hgap, hd₁pos]
+
 /-- **Peterfalvi (6.6): chaining the gap to the partial degree sum (ℕ).**
 
 The gap `2·dᵢ·d₁ < dᵢ²` together with `dᵢ² ∣ D` (the square-divisibility `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`)

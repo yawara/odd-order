@@ -692,3 +692,90 @@ H78/S07 witness 入力列から直接返す adapter 形。
 
 これで weighted sum に集約する前の各 source difference 項も、§9 側から `data := ...`
 を手で作らず参照できる。
+
+### 2026-06-05 pass: reduced family inequality from (7.5)
+
+S09 に `reduced_inequality_of_estimates` を追加した。
+これは (7.5) `family_inequality` を、(7.10) の `CharacterEstimateData.base_estimate`
+へ渡す real reduced inequality まで実際に畳む補題。
+入力は `G₀` 上の identity contribution
+`1 ≤ Σ_{g∈G₀}|χ(g)|²`、選択 index `i` の下界 `c ≤ ‖χ^{ρ_i}‖²`、
+および `𝓑` の外側で `‖χ^{ρ_j}‖² ≥ |A_j|/|L_j|` となる非負寄与。
+
+これにより、従来 `hred` として外部仮定にしていた (7.5) 由来の不等式は、
+(7.8)/(7.9) 側の各 `ρ` 下界を揃えれば S09 内で生成できる形になった。
+
+### 2026-06-05 pass: concrete (7.5) family package to base estimate
+
+S09 に `FrobeniusFamily.base_estimate_of_family71_reduced_estimates` と
+`FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates` を追加した。
+
+これは前回の `reduced_inequality_of_estimates` を `CharacterEstimateData` 側へ直接接続する入口。
+入力は concrete な `FamilyHypothesis71`、`A_i = H_i^#`、`L_i` と `G₀` の識別、
+`G₀` 上の identity contribution、選択 index の (7.8.b) 下界
+`1 - e_i/h_i ≤ ‖χ^{ρ_i}‖²`、および `𝓑` 外の非負寄与。
+
+従来外部仮定だった `hred` は、この入口では (7.5) family inequality から生成される。
+
+### 2026-06-05 pass: `G₀` identity contribution from signed irreducibility
+
+S09 に `FrobeniusFamily.one_le_G0_norm_sum_of_signed_irreducible` と、
+それを使う `base_estimate_of_family71_reduced_estimates_of_signed_irreducible` /
+`characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible` を追加した。
+
+これは Peterfalvi (7.10) proof の表示
+`(|G₀|-1)/|G| ≥ (|G₀|-χ₁(1)^2)/|G|`
+に対応する Lean 実装。`1 ∈ G₀` と
+`χ₁ = ± ξ` (`ξ ∈ Irr G`) から `1 ≤ |χ₁(1)|²` を証明し、
+前回 constructor の外部入力 `hG0sum : 1 ≤ Σ_{g∈G₀}|χ(g)|²` を
+signed irreducible witness から生成できるようにした。
+
+### 2026-06-05 pass: family (7.5), coherent image, and `𝓑` decomposition assembly
+
+S09 に `characterEstimateData_of_family71_signed_decomposition`
+と `characterEstimateData_of_family71_coherent_zeta_decomposition`
+を追加した。
+
+これは (7.10) の `CharacterEstimateData` 構成で残っていた外部入力をさらに削る pass。
+(7.5) の concrete `FamilyHypothesis71` と per-index lower bounds から base estimate を作り、
+(7.9) の orthogonal integer decomposition から `𝓑`-sum bound を作る。さらに coherent
+source form では、`ζ` の irreducibility と S07 coherence witness から `νζ = ±ξ` を内部生成し、
+前回 pass の `G₀` identity contribution に接続する。`hred`、`hBsum`、明示的な
+signed-irreducible witness を同時に外へ出さずに `CharacterEstimateData` まで進められる。
+
+### 2026-06-05 pass: family (7.5) + source-data (7.8.b) coherent assembly
+
+S09 に `characterEstimateData_of_family71_coherent_zeta_source_data` を追加した。
+
+前回の coherent `ζ` constructor は `hΓ_bound : ⟨Γ,Γ⟩.re ≤ e_i - 1` を外部入力にしていた。
+今回の入口では既存の
+`FrobeniusFamily.gamma_inner_self_re_le_of_family_source_data` を内部で使い、family-notated な
+(7.8.b) source data (`hind_norm`, `hzeta_ind`, source irreducibility/distinctness, degree sum,
+`u,v,w` formula, small-index) から `Γ` bound を生成する。これで concrete (7.5)、coherence
+image、(7.8.b)、(7.9) decomposition が `CharacterEstimateData` まで同時に接続される。
+
+### 2026-06-05 pass: S08 Frobenius coherence to H78 Ind-chain socket
+
+S09 に `Hypothesis78.indChainDecomposition_of_coherenceOn` と
+`Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData`
+を追加した。
+
+S08 の Frobenius/base-anchor X-chain、Y coherence、generator-level mixed-inner glue から、
+set rewrite 前の `Xset H' ∪ Yset` coherence を直接作り、extension を `H78.nu` と
+definitional に固定したまま S08 `IndChainDecomposition` を返す。
+
+これで (6.8.1) Frobenius branch の証明済み assembly を、S09/H78 の weighted-chain consumer に
+`card_G0_lower_bound` の sorry を経由せず接続できる。`hyp.CoherenceTarget` への rewrite は
+extension の definitional equality を隠すため、この socket は union-level 入力を要求する。
+
+### 2026-06-05 pass: family71 source data to displayed bound and contradiction
+
+S09 に `FrobeniusFamily.lowerBoundTerm_of_family71_coherent_zeta_source_data` と
+`not_trivial_G0_of_family71_coherent_zeta_source_data` を追加した。
+
+既存の `characterEstimateData_of_family71_coherent_zeta_source_data` が組み立てる
+concrete (7.5)、coherent image、(7.8.b) source estimates、(7.9) decomposition を、
+中間 package に戻さず Peterfalvi (7.10) の表示下界と (7.11) の `G₀ = {1}` 矛盾へ直接接続する。
+
+これで `card_G0_lower_bound` の残り assembly 義務は、抽象的な `CharacterEstimateData` ではなく、
+教科書の concrete source-data package を存在させる問題として使える形に近づいた。
