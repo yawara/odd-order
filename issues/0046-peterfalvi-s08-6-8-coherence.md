@@ -517,6 +517,11 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     base-anchor common-index adapters と `PairUnion*StepData` から caller-supplied `hidx_D` を削除した。
     低層 `degreeDivisibility_primePowerSums` は tail 側 sum data だけを受ける層なので `hidx_D` 入力を残し、
     common-index adapter が局所 `have hidx_D` を作って接続する。
+  - **2026-06-04 追記 12**: actual `Fin k` prefix 版で `D` / `hDsum` を内部化。
+    `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums` と base-anchor 版は
+    `Dprefix := ∑ j : Fin k, dmem j*dmem j` を局所定義して generic member-family adapter へ渡す。
+    両 `PairUnion*StepData` からも `D` / `hDsum` field を削除し、caller は direct sum identity
+    `(∑j dmem(j)^2) + tail = total` だけを供給すればよい。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

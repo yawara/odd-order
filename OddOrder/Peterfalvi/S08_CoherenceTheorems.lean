@@ -4083,7 +4083,6 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
-    (hDsum : ∑ j : Fin k, dmem j * dmem j = D)
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
     (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
@@ -4093,7 +4092,8 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     (hlemem : ∀ j, d₁ ≤ dmem j)
     (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
     (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
-    (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
+    (hsum : (∑ j : Fin k, dmem j * dmem j) +
+      (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hcop : Nat.Coprime idx θχ) :
     XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
@@ -4162,13 +4162,19 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
       simpa using irreducibleCharacter_inner_eq_ite (χmem l) (χmem l)
     · have hχne : χmem j ≠ χmem l := fun h => hjl (hχinj h)
       simpa [hjl, hχne] using irreducibleCharacter_inner_eq_ite (χmem j) (χmem l)
+  let Dprefix : ℕ := ∑ j : Fin k, dmem j * dmem j
+  have hDsum : ∑ j ∈ (Finset.univ : Finset (Fin k)), dmem j * dmem j = Dprefix := by
+    simp [Dprefix]
+  have hsum' : Dprefix +
+      (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total := by
+    simpa [Dprefix] using hsum
   exact hyp.xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi hcover (by simp) hmemreal hmemdiffsupp
     hmemS1' hmembarS1 hmemconjortho hmemortho
-    hχone hχ₁one (fun j _ => hmemone j) (by simpa using hDsum)
+    hχone hχ₁one (fun j _ => hmemone j) hDsum
     hp hq hdiv hlt hidxpos hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
     (fun j _ => hθmem j) (fun j _ => hlemem j)
-    hθtail htail_le hsum hqtot hθsq_le_qtot htotal hcop
+    hθtail htail_le hsum' hqtot hθsq_le_qtot htotal hcop
 
 /-- **(T8.11v0) X-adjoin input from a pairUnion enumeration with a base-block anchor.**
 
@@ -4204,7 +4210,6 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z)
     (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
-    (hDsum : ∑ j : Fin k, dmem j * dmem j = D)
     (hp : 3 ≤ p)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁)
     (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
@@ -4213,7 +4218,8 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
     (hθmem : ∀ j, θmem j = p ^ mmem j)
     (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
     (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
-    (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
+    (hsum : (∑ j : Fin k, dmem j * dmem j) +
+      (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hcop : Nat.Coprime idx θχ) :
     XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
@@ -4247,7 +4253,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
       hχ₁one (hmemone j)
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) hχinj hrange
-    hχone hχ₁one hmemone hDsum hp hq hdiv hlt
+    hχone hχ₁one hmemone hp hq hdiv hlt
     hidxpos hdχ hd₁ hdmem hθχ hθ₁ hθmem hlemem
     hθtail htail_le hsum hqtot hθsq_le_qtot htotal hcop
 
@@ -4285,7 +4291,6 @@ structure PairUnionCommonIndexPrimePowerStepData
   m₁ : ℕ
   mχ : ℕ
   mq : ℕ
-  D : ℕ
   dmem : Fin k → ℕ
   θmem : Fin k → ℕ
   mmem : Fin k → ℕ
@@ -4294,7 +4299,6 @@ structure PairUnionCommonIndexPrimePowerStepData
   hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ)
   hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ)
   hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ)
-  hDsum : ∑ j : Fin k, dmem j * dmem j = D
   hp : 3 ≤ p
   hq : q = p ^ m
   hdiv : dχ = q * d₁
@@ -4309,7 +4313,8 @@ structure PairUnionCommonIndexPrimePowerStepData
   hlemem : ∀ j, d₁ ≤ dmem j
   hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j
   htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j
-  hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total
+  hsum : (∑ j : Fin k, dmem j * dmem j) +
+    (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total
   hqtot : qtot = p ^ mq
   hθsq_le_qtot : θχ * θχ ≤ qtot
   htotal : total = qtot * c
@@ -4348,7 +4353,6 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   m₁ : ℕ
   mχ : ℕ
   mq : ℕ
-  D : ℕ
   dmem : Fin k → ℕ
   θmem : Fin k → ℕ
   mmem : Fin k → ℕ
@@ -4358,7 +4362,6 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ)
   hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z
   hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ)
-  hDsum : ∑ j : Fin k, dmem j * dmem j = D
   hp : 3 ≤ p
   hq : q = p ^ m
   hdiv : dχ = q * d₁
@@ -4371,7 +4374,8 @@ structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
   hθmem : ∀ j, θmem j = p ^ mmem j
   hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j
   htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j
-  hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total
+  hsum : (∑ j : Fin k, dmem j * dmem j) +
+    (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total
   hqtot : qtot = p ^ mq
   hθsq_le_qtot : θχ * θχ ≤ qtot
   htotal : total = qtot * c
@@ -4409,7 +4413,7 @@ noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irr
   let data := hstepData pair N χs hpair0 hpair1 hpairs hdisj hmono i hi
   exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
-    data.hχone data.hχ₁one data.hmemone data.hDsum
+    data.hχone data.hχ₁one data.hmemone
     data.hp data.hq data.hdiv data.hlt data.hidxpos data.hdχ data.hd₁ data.hdmem
     data.hθχ data.hθ₁ data.hθmem data.hlemem data.hθtail data.htail_le data.hsum
     data.hqtot data.hθsq_le_qtot data.htotal data.hcop
@@ -4447,7 +4451,7 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
   let data := hstepData pair N χs hpair0 hpair1 hpairs hdisj hmono i hi
   exact hyp.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
-    data.hχone data.hχ₁one data.hanchor data.hmemone data.hDsum data.hp data.hq data.hdiv
+    data.hχone data.hχ₁one data.hanchor data.hmemone data.hp data.hq data.hdiv
     data.hidxpos data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hcop
 

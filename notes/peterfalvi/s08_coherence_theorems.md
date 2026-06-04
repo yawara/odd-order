@@ -333,6 +333,12 @@ allowlist):
   `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`, base-anchor 版, および両 `PairUnion*StepData`
   から caller-supplied `hidx_D` を削除した。低層 `degreeDivisibility_primePowerSums` は `hdmem` を持たないため、
   common-index adapter 内で局所 witness としてのみ `hidx_D` を作って渡す。
+- **2026-06-04 追記 13**: actual `Fin k` prefix 版の common-index adapters と両 `PairUnion*StepData`
+  から `D` / `hDsum` を削除。prefix square sum は `Dprefix := ∑ j : Fin k, dmem j*dmem j` として
+  adapter 内で定義し、generic member-family adapter へ `hDsum` を局所 `simp` witness として渡す。
+  caller 側の sum data は `D + tail = total` ではなく、直接
+  `(∑ j : Fin k, dmem j*dmem j) + tail = total` を渡す形になり、actual prefix enumeration から
+  自明に決まる `D` witness を保持しなくてよくなった。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
