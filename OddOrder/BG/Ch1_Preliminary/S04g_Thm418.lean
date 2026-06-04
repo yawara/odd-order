@@ -703,6 +703,18 @@ theorem rank_fitting_le_two_of_normal_subgroup {K : Subgroup G} [K.Normal]
     OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤ 2 :=
   (rank_fitting_le_of_normal_subgroup (G := G) (K := K)).trans hrF
 
+/-- The BG Theorem 4.20(c) induction hypothesis is inherited by a normal subgroup:
+either the whole-group rank bound restricts to the subgroup, or the Fitting-rank
+bound restricts via `F(K) <= F(G)`. -/
+theorem rank_or_rank_fitting_le_two_of_normal_subgroup {K : Subgroup G} [K.Normal]
+    (h : OddOrder.GroupTheory.rank G ≤ 2 ∨
+      OddOrder.GroupTheory.rank ↥(Ch01.fitting G) ≤ 2) :
+    OddOrder.GroupTheory.rank ↥K ≤ 2 ∨
+      OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤ 2 := by
+  rcases h with hG | hF
+  · exact Or.inl ((OddOrder.GroupTheory.rank_mono_of_le K).trans hG)
+  · exact Or.inr (rank_fitting_le_two_of_normal_subgroup (G := G) (K := K) hF)
+
 /-- If a Sylow `p`-subgroup lies in `F(G)`, then its `p`-rank is bounded by the
 rank of `F(G)`. -/
 theorem pRank_sylow_le_two_of_le_fitting {p : ℕ} [Fact p.Prime] (P : Sylow p G)
