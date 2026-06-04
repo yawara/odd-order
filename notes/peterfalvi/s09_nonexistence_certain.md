@@ -384,3 +384,13 @@ S09 に `not_trivial_G0_of_exists_penultimate`, `not_trivial_G0_of_exists_Bsum_b
 
 これにより downstream は fixed-index 形だけでなく、Peterfalvi (7.10) の自然な existential output 形でも
 axiom-clean な (7.11) conditional theorem を使える。
+
+### 2026-06-04 pass: S07 coherence witness to S09 `ν` ZIrr-codomain
+
+S09 に `Hypothesis78.nu_mem_ZIrr_of_isCoherent` と
+`Hypothesis78.nu_mem_ZIrr_of_isCoherent_of_mem` を追加。`Hypothesis78` に `nu_maps_ZIrr`
+のような証明書フィールドを足さず、具体的な S07 `IsCoherent` witness と `H78.nu = hcoh.extension`
+を明示引数にして、`IsCoherent.extension_mem_ZIrr` を S09 側で使える形に変換する。
+
+これは (7.8.a)/(7.9) で必要になる `νζ ∈ ℤ[Irr G]` 系の入力を、実際の coherence 構成から
+引き出すための入口。抽象 `Hypothesis78.nu` 自体に新しい仮定は追加していない。

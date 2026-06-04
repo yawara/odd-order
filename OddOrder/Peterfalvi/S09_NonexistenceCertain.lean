@@ -1398,6 +1398,35 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- If the abstract `ν` carried by `Hypothesis78` is identified with a concrete
+S07 coherent extension, then `ν` sends the coherent lattice `ℤ[S]` into virtual
+irreducible characters of `G`.
+
+This is the S09-facing bridge to the real S07 coherence construction: it adds no
+new field to `Hypothesis78`, but lets downstream (7.8)/(7.9) arguments use
+`IsCoherent.extension_mem_ZIrr` whenever the concrete witness is available. -/
+theorem nu_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := L) S) :
+    H78.nu φ ∈ ZIrr G := by
+  rw [hnu]
+  exact hcoh.extension_mem_ZIrr φ hφ
+
+/-- Generator form of `nu_mem_ZIrr_of_isCoherent`: a member of the coherent set
+itself is automatically in its `ℤ`-span. -/
+theorem nu_mem_ZIrr_of_isCoherent_of_mem (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ S) :
+    H78.nu φ ∈ ZIrr G :=
+  H78.nu_mem_ZIrr_of_isCoherent hcoh hnu (Submodule.subset_span hφ)
+
 /-- The Dade image defining `β` is supported on the corresponding Dade support. -/
 theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :
     H78.beta.support ⊆ H78.hyp76.hyp71.hyp.dadeSupport := by

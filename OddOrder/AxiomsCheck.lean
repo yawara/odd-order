@@ -2112,6 +2112,11 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+-- Peterfalvi (7.8) bridge from the S09 `ν` interface to a concrete S07 coherence witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent_of_mem
 -- Peterfalvi (7.8.b) raw norm-bound consumers from `NormEstimates`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates
