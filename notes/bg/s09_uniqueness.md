@@ -320,7 +320,7 @@ Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`.
 - §9 intentionally introduces no new local definitions: it consumes the shared `IsUniquelyMaximal`/`hInvariant` API, §7 `scn3Global`, and §8 `fittingInG`.
 - Shared uniqueness API landed in `OddOrder/GroupTheory/MaximalSubgroup.lean`: `IsUniquelyMaximal.uniqueMaximalSubgroup`, its membership/coatom/le accessors, equality of maximal overgroups, and `maximalSubgroupsContaining_eq_singleton`.
 - Shared `hInvariant`/`hInvariantStar` destructors landed in `OddOrder/GroupTheory/AInvariantPiSubgroups.lean`, so §9 proofs can project ambient containment, normalizer containment, pi-subgroup status, and star maximality without unfolding definitions by hand.
-- Current remaining §9 theorem-body `sorry`s are exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, and Lemma 9.5. Corollary 9.2, Theorem 9.6, and the `E^2 - E*` particular case are now Lean-proved from their upstream stated theorems. The remaining hard proofs still depend on the §7/§8 chain, BG §6 Theorem 6.2, BG §4 rank/centralizer inputs, and the Lemma 9.5 SCN₃-to-𝒰 argument. No Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
+- Current remaining §9 theorem-body `sorry`s are exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5. Corollary 9.2, Corollary 9.3, Theorem 9.6, and the `E^2 - E*` particular case are now Lean-proved from their upstream stated theorems. The remaining hard proofs still depend on the §7/§8 chain, BG §6 Theorem 6.2, BG §4 rank/centralizer inputs, and the Lemma 9.5 SCN₃-to-𝒰 argument. No Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
 
 
 ## Lean API status (2026-06-04)
@@ -365,10 +365,10 @@ The `E^2 - E*` particular case is now proved in Lean from Theorem 9.6. The local
 its strict cardinal growth over `|A| = p^2` into `3 ≤ rank C_G(A)`. Thus an `A ∈ E_p^2(G)`
 that is not in `E*` satisfies the second rank alternative of Theorem 9.6.
 
-Remaining §9 `sorry`s are now exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, and Lemma 9.5.
-Corollary 9.2 still depends on the stated Theorem 9.1 proof being completed. Theorem 9.6 and
-the particular case now have no theorem-body `sorry`, but they still depend on the stated
-Corollary 9.3 and Lemma 9.5 gates.
+Remaining §9 theorem-body `sorry`s are now exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5.
+Corollary 9.2 still depends on the stated Theorem 9.1 proof being completed. Corollary 9.3,
+Theorem 9.6, and the particular case now have no theorem-body `sorry`; Theorem 9.6 still
+passes through the stated Lemma 9.5 gate.
 
 Corollary 9.3 now has a sorry-free internal cascade lemma,
 `isUniquelyMaximal_of_rank_drop_witness`. It formalizes the book's final five successive
@@ -381,10 +381,10 @@ cyclic quotient calculations, namely `2 ≤ rank C_A(D)` and `2 ≤ rank C_{B*}(
 `D ≅ E_{p^2}` and `B* ≤ C_G(B)` with elementary-abelian rank at least three. It also adds the
 local bridge `two_le_rank_of_noncyclic_pSubgroup`, deriving `2 ≤ rank B` for a noncyclic
 `p`-subgroup of the minimal odd simple ambient group via §4 Lemma 4.5(a)'s existing
-non-normal elementary-abelian `E_{p^2}` existence half. The remaining Corollary 9.3 gap is
-therefore isolated to the book's earlier lines: choose a Sylow `P` containing the conjugated
-`A`/`B*`, supply the normal Lemma-4.5 witness `D ⊴ P` of order `p^2`, and prove the two
-cyclic-quotient rank drops for `A/C_A(D)` and `B*/C_{B*}(D)`.
+non-normal elementary-abelian `E_{p^2}` existence half. At this stage the Corollary 9.3 gap was
+isolated to the book's earlier lines: choose a Sylow `P` containing the conjugated `A`/`B*`,
+supply the normal Lemma-4.5 witness `D ⊴ P` of order `p^2`, and prove the two cyclic-quotient
+rank drops for `A/C_A(D)` and `B*/C_{B*}(D)`.
 
 
 ### Lean API status (2026-06-04, rank-drop bridge)
@@ -416,7 +416,7 @@ then maps the resulting subgroup through `P.subtype` and uses injective monotoni
 The wrapper `isUniquelyMaximal_of_overgroup_rank_drop_witness` connects this directly to the
 Corollary 9.3 cascade. Compared with `isUniquelyMaximal_of_rank_drop_witness`, the `B*`-side
 rank drop is no longer an explicit input once the overgroup witness `D ⊴ P` is available.
-The remaining Corollary 9.3 proof obligation is now concentrated in the witness-selection and
+The next Corollary 9.3 proof obligation was concentrated in the witness-selection and
 `A`-side rank-drop step: extract/conjugate the rank-three elementary abelian subgroup from
 `C_G(B)`, choose a common Sylow `P` and normal `D ≤ P` of order `p^2`, and prove
 `rank (A ∩ C_G(D)) >= 2` for the abelian `p`-subgroup `A`.
@@ -444,11 +444,10 @@ The `r_p(C_G(B)) >= 3` hypothesis in Corollary 9.3 is now consumed by
 `B* ≤ C_G(B)` with `B*` elementary abelian and `log_p |B*| >= 3` by taking a `pRank`
 witness inside `C_G(B)` and mapping it through the centralizer subtype.
 
-The body of `isUniquelyMaximal_of_abelian_rank_three` now performs this extraction before the
-remaining `sorry`. What remains is the genuinely book-specific conjugation/common-Sylow step:
-put `A` and the extracted `B*` into a common Sylow `p`-overgroup (up to conjugacy), then supply
-Lemma 4.5's normal noncyclic `E_{p^2}` witness `D ⊴ P` and feed it to
-`isUniquelyMaximal_of_overgroup_rank_three_witness`.
+The body of `isUniquelyMaximal_of_abelian_rank_three` uses this extraction before the
+book-specific conjugation/common-Sylow step: put `A` and the extracted `B*` into a common
+Sylow `p`-overgroup (up to conjugacy), supply Lemma 4.5's normal noncyclic `E_{p^2}` witness
+`D ⊴ P`, and feed it to `isUniquelyMaximal_of_overgroup_rank_three_witness`.
 
 
 ### Lean API status (2026-06-04, Sylow conjugacy bridge)
@@ -498,6 +497,23 @@ containing `A` and `(conj g) • B*`, plus the normal `E_{p^2}` witness `D ⊴ P
 `IsUniquelyMaximal ((conj g) • B)` back to `IsUniquelyMaximal B` using
 `IsUniquelyMaximal.comap_equiv`.
 
-The Corollary 9.3 gap is therefore narrowed to witness selection: choose a Sylow `P` with
-`A ≤ P`, use Sylow conjugacy to arrange `(conj g) • B* ≤ P`, and supply Lemma 4.5's normal
-`E_{p^2}` subgroup inside that same `P`.
+The remaining witness-selection step is now discharged in the completed Corollary 9.3 proof:
+choose a Sylow `P` with `A ≤ P`, use Sylow conjugacy to arrange `(conj g) • B* ≤ P`, and
+supply the normal `E_{p^2}` subgroup inside that same `P` from the rank-three `p`-subgroup
+`A`.
+
+
+### Lean API status (2026-06-04, Corollary 9.3 completed)
+
+`isUniquelyMaximal_of_abelian_rank_three` is now sorry-free. The final witness-selection
+proof adds three local bridges:
+
+- `odd_prime_of_isPGroup_of_three_le_rank`: obtains `Odd p` from the minimal odd ambient
+  group and a rank-three `p`-subgroup.
+- `exists_normal_isElementaryAbelian_card_prime_sq_of_three_le_pRank`: uses BG Lemma 5.1(b)
+  plus BG Lemma 1.22 to extract a normal `E_{p^2}` from a finite odd `p`-group with
+  `pRank >= 3`.
+- `exists_normal_isElementaryAbelian_card_prime_sq_in_overgroup_of_pSubgroup_rank_three`:
+  maps that normal witness back from the Sylow overgroup to the ambient group.
+
+Current S09 theorem-body `sorry`s are exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5.

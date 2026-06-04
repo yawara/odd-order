@@ -228,6 +228,126 @@ private theorem three_le_pRank_of_isPGroup_of_three_le_rank {H : Type*} [Group H
     3 ≤ pRank H p :=
   hr.trans (rank_le_pRank_of_isPGroup hH)
 
+/-- A finite odd `p`-group of `pRank` at least three has a normal elementary abelian
+subgroup of order `p^2`.
+
+This is the local S09 package of BG Lemma 5.1(b) followed by BG Lemma 1.22: first get a
+normal elementary abelian subgroup of order `p^3`, then take a normal subgroup of order
+`p^2` inside it. -/
+private theorem exists_normal_isElementaryAbelian_card_prime_sq_of_three_le_pRank
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp : Odd p) (hR : IsPGroup p R) (h3 : 3 ≤ pRank R p) :
+    ∃ D : Subgroup R, D.Normal ∧ D.IsElementaryAbelian p ∧ Nat.card D = p ^ 2 := by
+  obtain ⟨A, hA⟩ := OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank hp hR h3
+  obtain ⟨B, hB_normal, hB_elem, hBcard⟩ :=
+    OddOrder.BG.Ch1.S05.exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hR hA
+  haveI : B.Normal := hB_normal
+  have hB_dvd : p ^ 2 ∣ Nat.card B := by
+    rw [hBcard]
+    exact pow_dvd_pow p (by norm_num : 2 ≤ 3)
+  obtain ⟨D, hD_normal, hD_le_B, hDcard⟩ :=
+    OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup
+      (G := R) (p := p) hR (N := B) (r := 2) hB_dvd
+  have hD_elem : D.IsElementaryAbelian p := by
+    have hD_sub_elem : (D.subgroupOf B).IsElementaryAbelian p :=
+      hB_elem.to_subgroup (D.subgroupOf B)
+    exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hD_le_B)
+      hD_sub_elem
+  exact ⟨D, hD_normal, hD_elem, hDcard⟩
+
+/-- In a minimal odd group, a rank-three `p`-subgroup forces `p` to be odd. -/
+private theorem odd_prime_of_isPGroup_of_three_le_rank [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAp : IsPGroup p A) (hmA : 3 ≤ rank ↥A) :
+    Odd p := by
+  classical
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hmA
+  obtain ⟨A₀, hA₀ea, hA₀log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥A) (p := p) (n := 3) (by norm_num) h3pRankA
+  let Astar : Subgroup G := A₀.map A.subtype
+  have hAstar_ea : Astar.IsElementaryAbelian p := by
+    change (A₀.map A.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map A.subtype_injective hA₀ea
+  have hAstar_log : 3 ≤ Nat.log p (Nat.card Astar) := by
+    change 3 ≤ Nat.log p (Nat.card (A₀.map A.subtype))
+    rw [Subgroup.card_map_of_injective A.subtype_injective]
+    exact hA₀log
+  have hAstar_p : IsPGroup p Astar := hAstar_ea.isPGroup
+  have hp_dvd_Astar : p ∣ Nat.card Astar := by
+    obtain ⟨n, hn⟩ := hAstar_p.exists_card_eq
+    have hnpos : 0 < n := by
+      by_contra hn0
+      have hn_zero : n = 0 := by omega
+      rw [hn_zero, pow_zero] at hn
+      rw [hn] at hAstar_log
+      norm_num at hAstar_log
+    rw [hn]
+    exact dvd_pow_self p hnpos.ne'
+  exact hG.odd.of_dvd_nat (hp_dvd_Astar.trans (Subgroup.card_subgroup_dvd_card Astar))
+
+/-- Ambient form of the normal `E_{p^2}` witness inside an overgroup `P`.
+
+If `A ≤ P`, `A` is a rank-three `p`-subgroup, and `P` is a finite `p`-group, then `P`
+contains an ambient subgroup `D ≤ P` such that `D.subgroupOf P` is normal in `P`, `D` is
+integer elementary abelian of order `p^2`. -/
+private theorem exists_normal_isElementaryAbelian_card_prime_sq_in_overgroup_of_pSubgroup_rank_three
+    [Finite G] {p : ℕ} [Fact p.Prime] {A P : Subgroup G}
+    (hp : Odd p) (hPp : IsPGroup p P) (hAp : IsPGroup p A) (hAP : A ≤ P)
+    (hmA : 3 ≤ rank ↥A) :
+    ∃ D : Subgroup G,
+      D ≤ P ∧ (D.subgroupOf P).Normal ∧ D.IsElementaryAbelian p ∧ Nat.card D = p ^ 2 := by
+  classical
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hmA
+  obtain ⟨A₀, hA₀ea, hA₀log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥A) (p := p) (n := 3) (by norm_num) h3pRankA
+  let Astar : Subgroup G := A₀.map A.subtype
+  have hAstar_ea : Astar.IsElementaryAbelian p := by
+    change (A₀.map A.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map A.subtype_injective hA₀ea
+  have hAstar_log : 3 ≤ Nat.log p (Nat.card Astar) := by
+    change 3 ≤ Nat.log p (Nat.card (A₀.map A.subtype))
+    rw [Subgroup.card_map_of_injective A.subtype_injective]
+    exact hA₀log
+  have hAstarP : Astar ≤ P := by
+    intro x hx
+    rw [Subgroup.mem_map] at hx
+    obtain ⟨y, _hy, rfl⟩ := hx
+    exact hAP y.2
+  let AstarP : Subgroup ↥P := Astar.subgroupOf P
+  have hAstarP_ea : AstarP.IsElementaryAbelian p := by
+    change (Astar.subgroupOf P).IsElementaryAbelian p
+    exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAstarP).symm
+      hAstar_ea
+  have hAstarP_log : 3 ≤ Nat.log p (Nat.card AstarP) := by
+    change 3 ≤ Nat.log p (Nat.card (Astar.subgroupOf P))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAstarP).toEquiv]
+    exact hAstar_log
+  have h3P : 3 ≤ pRank ↥P p := hAstarP_log.trans (le_pRank AstarP hAstarP_ea)
+  obtain ⟨D₀, hD₀norm, hD₀ea, hD₀card⟩ :=
+    exists_normal_isElementaryAbelian_card_prime_sq_of_three_le_pRank
+      (R := ↥P) hp hPp h3P
+  let D : Subgroup G := D₀.map P.subtype
+  have hDP : D ≤ P := by
+    change D₀.map P.subtype ≤ P
+    exact Subgroup.map_subtype_le D₀
+  have hDnormP : (D.subgroupOf P).Normal := by
+    have htarget : D.subgroupOf P = D₀ := by
+      apply (Subgroup.map_subtype_inj (H := P)).mp
+      rw [Subgroup.map_subgroupOf_eq_of_le hDP]
+    rwa [htarget]
+  have hDea : D.IsElementaryAbelian p := by
+    change (D₀.map P.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map P.subtype_injective hD₀ea
+  have hDcard : Nat.card D = p ^ 2 := by
+    change Nat.card (D₀.map P.subtype) = p ^ 2
+    rw [Subgroup.card_map_of_injective P.subtype_injective]
+    exact hD₀card
+  exact ⟨D, hDP, hDnormP, hDea, hDcard⟩
+
 /-- A normal elementary abelian subgroup D of order p^2 cuts rank at most one from a
 rank-three elementary abelian subgroup.
 
@@ -653,9 +773,15 @@ theorem isUniquelyMaximal_of_abelian_rank_three [Finite G] (hG : IsMinimalSimple
   classical
   obtain ⟨Bstar, hBstarea, hBstar_le_CB, hBstarlog⟩ :=
     exists_elementaryAbelian_le_centralizer_of_three_le_pRank (B := B) hrB
-  -- It remains to conjugate `A`/`Bstar` into a common Sylow `p`-overgroup and
-  -- choose the normal Lemma-4.5 `E_{p^2}` witness `D` inside that overgroup.
-  sorry
+  obtain ⟨P, hAP⟩ := hAp.exists_le_sylow
+  have hp_odd : Odd p := odd_prime_of_isPGroup_of_three_le_rank hG hAp hmA
+  obtain ⟨g, hBstarP⟩ :=
+    exists_conj_le_sylow_of_isPGroup hBstarea.isPGroup P
+  obtain ⟨D, hDP, hDnormP, hDea, hDcard⟩ :=
+    exists_normal_isElementaryAbelian_card_prime_sq_in_overgroup_of_pSubgroup_rank_three
+      (P := (P : Subgroup G)) hp_odd P.isPGroup' hAp hAP hmA
+  exact isUniquelyMaximal_of_conj_overgroup_rank_three_witness hG hAab hAp hAU hBp
+    hBnc hAP hDP hBstarP hDnormP hDea hDcard hBstarea hBstarlog hBstar_le_CB hmA
 
 /-- **BG Lemma 9.4** (mmd L2555): `p` prime, `M ∈ ℳ`, `r_p(F(M)) ≥ 3` ⇒ `𝒰` は rank `≥ 3` の
 すべての abelian `p`-群を含む。 -/
