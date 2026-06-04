@@ -1587,6 +1587,22 @@ theorem normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt_of_degree_ge
           (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) := by
           rfl
 
+open scoped Classical in
+/-- In the concrete Appendix C Frobenius group, the non-kernel class-sum error
+term is bounded by `|U| * p^q * sqrt(p^q)`.
+
+The preceding degree-free form follows from the classification of non-kernel
+irreducible characters as induced characters from the additive kernel. -/
+theorem normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt
+    [Fact p.Prime] (hpodd : Odd p) (hq : 1 < q) :
+    ‖normOneFrobeniusNonKernelContribution p q‖ ≤
+      (Nat.card (normOneUnits p q) : ℝ) *
+        (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) :=
+  normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt_of_degree_ge
+    p q hpodd hq fun χ hχnon =>
+      normOneFrobenius_nonKernelCharacter_normOneUnits_card_le_degree
+        p q hq χ hχnon
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card

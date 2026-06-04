@@ -122,6 +122,10 @@ created: 2026-06-04
   kernel 元 `inl(s)` 上での column contribution も `|U|` になる concrete theorem を追加。
   total column norm `p^q` との差として、非 kernel 側の寄与が `p^q-|U|` になる split も theorem 化。
   q≥5 coefficient lower bound を主項と non-kernel error に分ける数値入力。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 non-kernel error bound, degree-free form**:
+  非 kernel 既約指標が additive kernel から誘導され degree `|U|` を持つことを使い、既存の
+  `hdeg` 仮定付き評価を `normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt` に閉じた。
+  これで残る q≥5 branch の Lean core は class-sum 公式から coefficient 下界を抜く実数/自然数評価。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
