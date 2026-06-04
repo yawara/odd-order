@@ -202,6 +202,10 @@ created: 2026-06-04
   `σ` で Peterfalvi の `U` へ運ぶ `normOneUnitsEquivU` を作成し、
   `t ∈ N_G(U)` から `tConjUAut` / `tConjNormOneUnitsAut` を theorem 化。
   `σ(inr u)` に対する ambient conjugation 公式も rewrite 可能にした。
+- [x] **C.3 Step 4 p-power action seed**: `fieldNormalizerPrimeLineGenerator_pow_p`、
+  `s_pow_p_eq_one`、`t_pow_p_eq_one`、`tConjUAut_pow_p_eq_one`、
+  `tConjNormOneUnitsAut_pow_p_eq_one` を追加し、BG Step4 の `t`-conjugation action が
+  p 乗で恒等になることを concrete complement 側にも transport した。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件

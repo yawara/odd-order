@@ -221,6 +221,23 @@ theorem fieldNormalizerPrimeLineGenerator_ne_one (hyp : Hypothesis (G := G)) :
     ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h)
   exact one_ne_zero hfield
 
+/-- The distinguished generator of `P₀` has order dividing `p`. -/
+theorem fieldNormalizerPrimeLineGenerator_pow_p (hyp : Hypothesis (G := G)) :
+    (fieldNormalizerPrimeLineGenerator hyp) ^ hyp.base.p = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  haveI : CharP (GaloisField hyp.base.p hyp.base.q) hyp.base.p := by
+    rw [← Algebra.charP_iff (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q)
+      hyp.base.p]
+    exact ZMod.charP hyp.base.p
+  dsimp [fieldNormalizerPrimeLineGenerator]
+  let inlHom :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
+        fieldNormalizerFrobeniusGroup hyp := SemidirectProduct.inl
+  rw [← map_pow inlHom, ← map_one inlHom, SemidirectProduct.inl_inj]
+  rw [← ofAdd_nsmul]
+  congr
+  simp
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The finite-field model is now carried as a concrete
 monomorphism from BG's Frobenius group `H = P \rtimes U` into `G`, together with
@@ -263,6 +280,11 @@ theorem s_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
   intro hs
   exact fieldNormalizerPrimeLineGenerator_ne_one hyp
     (data.sigma_injective (by simpa [s] using hs))
+
+/-- The transported prime-line generator has `p`-th power equal to `1`. -/
+theorem s_pow_p_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ^ hyp.base.p = 1 := by
+  simpa [s] using congrArg data.sigma (fieldNormalizerPrimeLineGenerator_pow_p hyp)
 
 /-- The transported prime-line generator normalizes `Q`. -/
 theorem s_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
@@ -348,6 +370,11 @@ theorem t_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
   intro ht
   exact data.s_ne_one ((MulAut.conj data.y).injective (by simpa [t] using ht))
 
+/-- The conjugate generator `t` has `p`-th power equal to `1`. -/
+theorem t_pow_p_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.t ^ hyp.base.p = 1 := by
+  simpa [t, map_pow] using congrArg (MulAut.conj data.y) data.s_pow_p_eq_one
+
 /-- `P₁` normalizes Peterfalvi subgroup `U`, as required in BG C.3 Step 3. -/
 theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.P1 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
@@ -369,10 +396,27 @@ theorem tConjUAut_apply_coe {hyp : Hypothesis (G := G)}
     (data.tConjUAut u : G) = data.t * (u : G) * data.t⁻¹ := by
   rfl
 
+/-- The `t`-conjugation automorphism of `U` has `p`-th power equal to `1`. -/
+theorem tConjUAut_pow_p_eq_one {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : data.tConjUAut ^ hyp.base.p = 1 := by
+  have ht_norm :
+      (⟨data.t, data.t_normalizes_U⟩ : Subgroup.normalizer (hyp.base.U : Set G)) ^
+          hyp.base.p = 1 := by
+    ext
+    exact data.t_pow_p_eq_one
+  rw [tConjUAut, ← map_pow, ht_norm, map_one]
+
 /-- Conjugation by `t`, transported back to the concrete norm-one unit group. -/
 noncomputable def tConjNormOneUnitsAut {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) : MulAut (fieldNormalizerNormOneUnits hyp) :=
   (MulAut.congr data.normOneUnitsEquivU).symm data.tConjUAut
+
+/-- The transported `t`-conjugation automorphism has `p`-th power equal to `1`. -/
+theorem tConjNormOneUnitsAut_pow_p_eq_one {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : data.tConjNormOneUnitsAut ^ hyp.base.p = 1 := by
+  rw [tConjNormOneUnitsAut,
+    ← map_pow ((MulAut.congr data.normOneUnitsEquivU).symm) data.tConjUAut hyp.base.p,
+    data.tConjUAut_pow_p_eq_one, map_one]
 
 /-- The transported automorphism agrees with conjugation by `t` after applying
 `σ` to the concrete complement. -/

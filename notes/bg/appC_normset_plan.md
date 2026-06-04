@@ -318,6 +318,8 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 `normOneUnits` から Peterfalvi `U` への `normOneUnitsEquivU` と、`t∈N_G(U)` 由来の
 `tConjUAut` / `tConjNormOneUnitsAut`、および `σ(inr u)` の ambient conjugation 公式を
 追加し、BG 最後の `(a⁻¹)^{t^3}` を concrete complement 側の automorphism として扱う入口を固定した。
+さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
+`normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_field_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と
