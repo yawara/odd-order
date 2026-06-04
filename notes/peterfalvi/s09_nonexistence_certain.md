@@ -559,3 +559,11 @@ S09 に `FrobeniusFamily.localKernelOrder_eq_h`,
 `FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities`
 を追加し、前回の source-data final assembly constructor が要求していた local `hindex` と
 `H78.smallIndex` を、`L = F.L i`, `H = F.H i`, family-side small-index から内部生成する入口にした。
+
+
+### 2026-06-04 pass: family-notated source-data final assembly
+
+S09 に `FrobeniusFamily.characterEstimateData_of_family_source_decomposition` を追加した。
+source norm / distinguished degree / degree-sum / `u,v,w` formula の RHS をすべて family 側の
+`F.e i` と `F.h i` で受け取り、前回追加した cardinality bridge で local `H78` 表記へ変換する。
+これで downstream の (7.8.b) 入力は family notation のまま `CharacterEstimateData` へ接続できる。

@@ -2317,6 +2317,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family_source_decomposition
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_characterEstimateData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
