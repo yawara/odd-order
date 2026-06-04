@@ -2837,6 +2837,36 @@ theorem Xset_closedUnderConjugate_unconditional
   have hφccZ := hyp.SsubFiltration_closedUnderConjugate Z hφcZ
   exact hφnotZ (by simpa [ClassFunction.conj_conj] using hφccZ)
 
+/-- **Peterfalvi (6.2), filtration form.**  If the quotient `H/A` has nontrivial
+abelianization, then the filtration layer `S(A)` is nonempty.
+
+The source character is the degree-one irreducible obtained on `H/A`, inflated to `H`; inducing it
+to `L` gives an element of the Peterfalvi filtration by construction. -/
+theorem SsubFiltration_nonempty_of_commutator_quotient_ne_top
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal]
+    (hcomm : commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
+    (hyp.SsubFiltration A).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  obtain ⟨θ, hθ_ne, hker, _hdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+      (K := ↥H) (A.subgroupOf H) hcomm
+  refine ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), ?_⟩
+  rw [hyp.mem_SsubFiltration]
+  exact ⟨θ, hθ_ne, hker, rfl⟩
+
+/-- **Peterfalvi (6.2), solvable quotient form.**  A nontrivial finite solvable quotient `H/A`
+has proper commutator subgroup, hence supplies a nontrivial degree-one source character and a
+member of `S(A)`. -/
+theorem SsubFiltration_nonempty_of_nontrivial_solvable_quotient
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal] [IsSolvable (↥H ⧸ A.subgroupOf H)]
+    [Nontrivial (↥H ⧸ A.subgroupOf H)] :
+    (hyp.SsubFiltration A).Nonempty :=
+  hyp.SsubFiltration_nonempty_of_commutator_quotient_ne_top A
+    (IsSolvable.commutator_lt_top_of_nontrivial
+      (G := ↥H ⧸ A.subgroupOf H)).ne
+
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
 The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains

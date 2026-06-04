@@ -2094,6 +2094,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate_unconditional
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_commutator_quotient_ne_top
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_nontrivial_solvable_quotient
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_subset_Yset
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
