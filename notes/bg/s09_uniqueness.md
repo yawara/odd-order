@@ -692,11 +692,16 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    quotient-layer version needed to glue consecutive characteristic factors is
    covered by `S04.characteristic_quotient_layer_lift_of_hasNormalPComplement_ne`;
    the BG 4.20(c)-shaped wrapper is `S04.CharacteristicSylowLayer`, with
+   `S04.CharacteristicSylowLayer.top_of_hasNormalPComplement` for the new top
+   layer `G/O_{p-prime}`,
+   `S04.CharacteristicSylowLayer.top_of_normal_subgroup_pRank_le_two` and
+   `S04.CharacteristicSylowLayer.top_of_normal_subgroup_sylow_le_fitting` for
+   the normal-subgroup `4.18(b)` assembly step,
    `S04.CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne` for
-   moving induction layers from the canonical complement back to the ambient group
-   and `S04.CharacteristicSylowLayer.exists_normal_sylow_of_lower_eq_bot` for
-   extracting the final normal Sylow subgroup from a bottom layer.  Its generic
-   subtype/cardinality support is in
+   moving induction layers from the canonical complement back to the ambient
+   group, and `S04.CharacteristicSylowLayer.exists_normal_sylow_of_lower_eq_bot`
+   for extracting the final normal Sylow subgroup from a bottom layer.  Its
+   generic subtype/cardinality support is in
    `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  The ambient
    normal-complement lift is now covered by
    `S04.hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup`,
@@ -722,7 +727,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    remaining §4 work is therefore to construct the actual
    characteristic layer/series under the `rank F(M) ≤ 2` hypothesis, using the
    packaged BG 4.20(c) induction step (`K = O_{r | r != p1}(G)`, lift the
-   characteristic factors from `K`, then attach the top `G/K` Sylow factor).  The
+   characteristic factors from `K`, then attach the top `G/K` Sylow factor).
+   Reconnaissance favors a small custom `Fin`-indexed series structure over
+   `CompositionSeries` or a public `List` representation, because the BG layers
+   are Sylow-sized characteristic factors rather than maximal factors; the
+   skeleton is `S04.CharacteristicSylowStep` / `S04.CharacteristicSylowSeries`.
+   The remaining BG-specific blockers are constructing `H` with `F ≤ H` and
+   `H/F = O_{p1-prime}(G/F)`, proving `G/H` is a `p1`-group from 4.20(a), and
+   showing the relevant Sylow `p1` subgroup of `H` lies in `F(H)`.  The
    `opCore`
    equality, ambient equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09
    once `q ∈ π(M)` is available.

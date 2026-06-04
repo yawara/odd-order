@@ -1209,6 +1209,87 @@ theorem exists_normal_sylow_of_lower_eq_bot {q : ℕ} [Fact q.Prime]
     L.upper_char ?_
   simpa [hlower] using L.card_quotient_eq_sylow
 
+/-- The top layer `G/O_{p-prime}` associated to a normal `p`-complement.
+
+This is the layer attached at the front of the BG Theorem 4.20(c) induction
+series after Theorem 4.18(b) replaces the chosen complement by the canonical
+`O_{p-prime}`. -/
+noncomputable def top_of_hasNormalPComplement
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G) :
+    CharacteristicSylowLayer G p := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  haveI : O.Normal := by dsimp [O]; infer_instance
+  haveI : (O.subgroupOf (⊤ : Subgroup G)).Normal :=
+    (inferInstance : O.Normal).subgroupOf (⊤ : Subgroup G)
+  have hquot_top :
+      Nat.card ((⊤ : Subgroup G) ⧸ O.subgroupOf (⊤ : Subgroup G)) =
+        Nat.card (G ⧸ O) := by
+    let e : (⊤ : Subgroup G) ≃* G := Subgroup.topEquiv
+    have hmap : (O.subgroupOf (⊤ : Subgroup G)).map e.toMonoidHom = O := by
+      ext x
+      constructor
+      · rintro ⟨y, hyO, rfl⟩
+        exact hyO
+      · intro hx
+        exact ⟨⟨x, trivial⟩, hx, rfl⟩
+    exact Nat.card_congr
+      (QuotientGroup.congr (O.subgroupOf (⊤ : Subgroup G)) O e hmap).toEquiv
+  exact
+    { upper := ⊤
+      lower := O
+      lower_le_upper := le_top
+      upper_char := Subgroup.topCharacteristic
+      lower_char := by
+        dsimp [O]
+        exact Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} G
+      card_quotient_eq_sylow := by
+        calc
+          Nat.card ((⊤ : Subgroup G) ⧸ O.subgroupOf (⊤ : Subgroup G)) =
+              Nat.card (G ⧸ O) := hquot_top
+          _ = Nat.card ↥((default : Sylow p G) : Subgroup G) := by
+            simpa [O] using
+              card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement
+                (G := G) hG (default : Sylow p G) }
+
+@[simp] theorem top_of_hasNormalPComplement_upper
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G) :
+    (top_of_hasNormalPComplement (G := G) hG).upper = ⊤ := rfl
+
+@[simp] theorem top_of_hasNormalPComplement_lower
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G) :
+    (top_of_hasNormalPComplement (G := G) hG).lower =
+      Ch03.oPiCore {r : ℕ | r ≠ p} G := rfl
+
+/-- Apply BG Theorem 4.18(b) inside a normal subgroup and attach the resulting
+normal `p`-complement as the ambient top Sylow layer. -/
+noncomputable def top_of_normal_subgroup_pRank_le_two
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [IsSolvable ↥H]
+    (hoddH : Odd (Nat.card ↥H)) (hpH : p ∣ Nat.card ↥H)
+    (hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥H).primeFactors, p ≤ q)
+    (hrH : pRank ↥H p ≤ 2) (houter : IsPGroup p (G ⧸ H)) :
+    CharacteristicSylowLayer G p := by
+  classical
+  have hH_compl : Ch05.HasNormalPComplement p ↥H :=
+    (solvable_structure_of_pRank_le_two (G := ↥H) hoddH hpH hrH).2.1 hpCaseH
+  exact top_of_hasNormalPComplement (G := G)
+    (hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient_isPGroup
+      (G := G) (H := H) hH_compl houter)
+
+/-- Fitting-rank version of `top_of_normal_subgroup_pRank_le_two`: if a Sylow
+`p`-subgroup of the normal subgroup lies in its Fitting subgroup and that Fitting
+subgroup has rank at most two, then the same ambient top layer is available. -/
+noncomputable def top_of_normal_subgroup_sylow_le_fitting
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [IsSolvable ↥H]
+    (hoddH : Odd (Nat.card ↥H)) (hpH : p ∣ Nat.card ↥H)
+    (hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥H).primeFactors, p ≤ q)
+    (P : Sylow p ↥H) (hPfit : (P : Subgroup ↥H) ≤ Ch01.fitting ↥H)
+    (hrFH : OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥H) ≤ 2)
+    (houter : IsPGroup p (G ⧸ H)) :
+    CharacteristicSylowLayer G p :=
+  top_of_normal_subgroup_pRank_le_two (G := G) (H := H) hoddH hpH hpCaseH
+    (pRank_le_two_of_sylow_le_fitting (G := ↥H) P hPfit hrFH) houter
+
 /-- Lift a characteristic Sylow layer from the canonical normal `p`-complement to
 the ambient group, for `q != p`. -/
 noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
@@ -1231,6 +1312,31 @@ noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
       card_quotient_eq_sylow := hcard }
 
 end CharacteristicSylowLayer
+
+/-- One labelled factor in the BG Theorem 4.20(c) characteristic Sylow series. -/
+structure CharacteristicSylowStep (G : Type*) [Group G] [Finite G] where
+  q : ℕ
+  q_prime : Fact q.Prime
+  layer : @CharacteristicSylowLayer G _ _ q q_prime
+
+/-- A finite characteristic Sylow series in the form used by BG Theorem 4.20(c).
+
+The terms are indexed as `G_0, ..., G_n`, with each step carrying the existing
+`CharacteristicSylowLayer` payload for the quotient `G_i/G_{i+1}`.  The labels
+are part of the step data; later theorem statements can impose that they enumerate
+`Nat.card G` prime factors in increasing order. -/
+structure CharacteristicSylowSeries (G : Type*) [Group G] [Finite G] where
+  length : ℕ
+  term : Fin (length + 1) → Subgroup G
+  top_eq : term 0 = ⊤
+  bot_eq : term (Fin.last length) = ⊥
+  step : Fin length → CharacteristicSylowStep G
+  upper_eq : ∀ i : Fin length,
+    @CharacteristicSylowLayer.upper G _ _ (step i).q (step i).q_prime (step i).layer =
+      term (Fin.castSucc i)
+  lower_eq : ∀ i : Fin length,
+    @CharacteristicSylowLayer.lower G _ _ (step i).q (step i).q_prime (step i).layer =
+      term i.succ
 
 end Thm418
 
