@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Lattice
+import Mathlib.Algebra.Group.Subgroup.Order
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.EquivFin
 import Mathlib.Data.Finset.Max
@@ -155,6 +156,32 @@ theorem of_le_of_lt_top [Finite (Subgroup G)] {H K : Subgroup G} (h : IsUniquely
   refine IsUniquelyMaximal.of_unique_maximal hK hM hKM ?_
   intro N hN hKN
   exact h.eq_of_isCoatom_of_le hN (hHK.trans hKN) hM (hHK.trans hKM)
+
+/-- Transport unique maximality across a group isomorphism. -/
+theorem map_equiv {G' : Type*} [Group G'] {H : Subgroup G} (φ : G ≃* G')
+    (h : IsUniquelyMaximal H) : IsUniquelyMaximal (H.map (φ : G →* G')) := by
+  classical
+  obtain ⟨M, hM, huniq⟩ := h.existsUnique
+  refine ⟨?_, ⟨M.map φ, ⟨?_, Subgroup.map_mono hM.2⟩, ?_⟩⟩
+  · simpa using (Subgroup.map_lt_map_iff_of_injective (f := (φ : G →* G')) φ.injective).mpr
+      h.lt_top
+  · exact (OrderIso.isCoatom_iff (φ.mapSubgroup) M).mpr hM.1
+  · intro N hN
+    have hNco : IsCoatom (N.comap (φ : G →* G')) :=
+      (OrderIso.isCoatom_iff (φ.comapSubgroup) N).mpr hN.1
+    have hHN : H ≤ N.comap (φ : G →* G') :=
+      (Subgroup.map_le_iff_le_comap).mp hN.2
+    have hcomap_eq : N.comap (φ : G →* G') = M :=
+      huniq (N.comap (φ : G →* G')) ⟨hNco, hHN⟩
+    calc
+      N = (N.comap (φ : G →* G')).map (φ : G →* G') :=
+        (Subgroup.map_comap_eq_self_of_surjective φ.surjective N).symm
+      _ = M.map φ := by rw [hcomap_eq]
+
+/-- Pull unique maximality back across a group isomorphism. -/
+theorem comap_equiv {G' : Type*} [Group G'] {H : Subgroup G'} (φ : G ≃* G')
+    (h : IsUniquelyMaximal H) : IsUniquelyMaximal (H.comap (φ : G →* G')) := by
+  simpa [Subgroup.comap_equiv_eq_map_symm] using h.map_equiv φ.symm
 
 /-- Membership in `ℳ(H)` is equality with the chosen maximal subgroup. -/
 theorem mem_maximalSubgroupsContaining_iff_eq_uniqueMaximalSubgroup {H M : Subgroup G}

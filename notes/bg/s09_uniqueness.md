@@ -462,3 +462,17 @@ This is the Lean form of BG's "Replacing by conjugates if necessary" line. The r
 Corollary 9.3 gap is to prove the relevant hypotheses are invariant under the chosen
 conjugations, then apply the overgroup witness wrapper after Lemma 4.5 supplies the normal
 `E_{p^2}` subgroup inside the common Sylow.
+
+
+### Lean API status (2026-06-04, uniqueness conjugation invariance)
+
+The shared uniqueness API now transports across group isomorphisms:
+`IsUniquelyMaximal.map_equiv` and `IsUniquelyMaximal.comap_equiv` live in
+`OddOrder/GroupTheory/MaximalSubgroup.lean`. For Corollary 9.3, the `A ∈ 𝒰` hypothesis can
+therefore be moved through conjugation directly as `hAU.map_equiv (MulAut.conj g)`, matching
+the book's replacement of `A` by a conjugate.
+
+This removes the uniqueness part of the conjugation-invariance gap. The remaining invariance
+pieces for the Corollary 9.3 replacement step are the elementary/abelian `p`-group data,
+rank lower bounds under conjugation, and the centralizer containment relating the conjugated
+`B*` to the correspondingly conjugated `B`.
